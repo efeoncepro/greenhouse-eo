@@ -2,6 +2,7 @@ import 'server-only'
 
 import { query } from '@/lib/db'
 import { captureWithDomain } from '@/lib/observability/capture'
+import { NOTION_TERMINAL_ARCHIVED_BLOCK_ERROR_PREFIX } from '@/lib/space-notion/notion-errors'
 
 import type { ReliabilitySignal } from '@/types/reliability'
 
@@ -53,6 +54,7 @@ export const WRITEBACK_DEAD_LETTER_SIGNAL_ID = 'notion.metrics.writeback_dead_le
 // Dead-letter threshold canonical: notion-rpa-writeback projection maxRetries=4
 // → snapshot con attempt_count >= 4 está exhausto.
 const WRITEBACK_DEAD_LETTER_THRESHOLD = 4
+const TERMINAL_NOTION_WRITEBACK_ERROR_PATTERN = `${NOTION_TERMINAL_ARCHIVED_BLOCK_ERROR_PREFIX}%`
 
 export const getNotionMetricsWritebackDeadLetterSignal = async (): Promise<ReliabilitySignal> => {
   const observedAt = new Date().toISOString()
@@ -65,8 +67,9 @@ export const getNotionMetricsWritebackDeadLetterSignal = async (): Promise<Relia
        FROM greenhouse_delivery.task_rpa_snapshots
        WHERE notion_writeback_attempt_count >= $1
          AND notion_writeback_last_error IS NOT NULL
-         AND written_to_notion_at IS NULL`,
-      [WRITEBACK_DEAD_LETTER_THRESHOLD]
+         AND written_to_notion_at IS NULL
+         AND COALESCE(notion_writeback_last_error, '') NOT LIKE $2`,
+      [WRITEBACK_DEAD_LETTER_THRESHOLD, TERMINAL_NOTION_WRITEBACK_ERROR_PATTERN]
     )
 
     const count = Number(rows[0]?.count ?? 0)
@@ -131,8 +134,9 @@ export const getNotionMetricsWritebackLagSignal = async (): Promise<ReliabilityS
          AND rpa_value IS NOT NULL
          AND written_to_notion_at IS NULL
          AND notion_writeback_attempt_count < $1
-         AND computed_at < NOW() - INTERVAL '${WRITEBACK_LAG_THRESHOLD_MIN} minutes'`,
-      [WRITEBACK_DEAD_LETTER_THRESHOLD]
+         AND computed_at < NOW() - INTERVAL '${WRITEBACK_LAG_THRESHOLD_MIN} minutes'
+         AND COALESCE(notion_writeback_last_error, '') NOT LIKE $2`,
+      [WRITEBACK_DEAD_LETTER_THRESHOLD, TERMINAL_NOTION_WRITEBACK_ERROR_PATTERN]
     )
 
     const count = Number(rows[0]?.count ?? 0)

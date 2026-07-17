@@ -24,14 +24,19 @@ description: >-
   testing → growth-marketing-cro; arquitectura de mensaje/canal → digital-marketing;
   SEO/AEO/GEO → seo-aeo; doctrina de marca/voz → efeonce-agency + docs/context/05;
   plantillas/entrega de email → greenhouse-email; tipografía → typography-design.
-  Incluye overlay Efeonce (voz "7 creencias contrarias", slogan "Empower your
-  Growth", es-CL tuteo). Triggers: "copywriting", "copy", "redacción", "redactar",
+  Incluye overlay Efeonce con router de speaker: voz institucional Efeonce ("7
+  creencias contrarias", "Empower your Growth") y voz autoral de Julio Reyes para
+  piezas firmadas, Marketing con Manzanitas y thought leadership personal, más el
+  método de authoring agentic con autor humano responsable. Triggers:
+  "copywriting", "copy", "redacción", "redactar",
   "escribir texto", "headline", "titular", "gancho", "hook", "lead", "storytelling",
   "narrativa", "storybrand", "AIDA", "PAS", "PASTOR", "framework de copy", "value
   proposition", "propuesta de valor", "tagline", "slogan", "eslogan", "sales page",
   "carta de ventas", "VSL", "email copy", "subject line", "asunto", "CTA", "llamado
   a la acción", "voz de marca", "tono", "tone of voice", "persuasión", "objeciones",
-  "power words", "swipe file", "editar copy", "reescribir", "AI slop", "copy con IA".
+  "power words", "swipe file", "editar copy", "reescribir", "AI slop", "copy con IA",
+  "Julio Reyes", "voz de Julio", "mi brand voice", "Marketing con Manzanitas",
+  "con manzanitas", "artículo firmado", "authoring agentic", "autoría con IA".
 user-invocable: true
 argument-hint: "[qué escribir/afinar o pregunta de craft — ej: 'headline para /aeo-2', 'la carta de ventas del grader', 'storytelling de la marca', 'auditar este copy']"
 ---
@@ -71,8 +76,10 @@ argument-hint: "[qué escribir/afinar o pregunta de craft — ej: 'headline para
 4. **Carga solo el módulo que aplica.** Esta skill es un router (mapa en §3).
 5. **Draftea rápido, edita despacio.** El primer borrador es para existir; el craft
    ocurre en la edición (ritmo, concisión, power words, cortar — `07`).
-6. **Voz consistente.** Todo copy encarna la voz de marca (fija) con el tono adecuado al
-   contexto (flexible). En Efeonce: las "7 creencias contrarias" (`efeonce/`).
+6. **Voz consistente.** Antes de redactar, resuelve `author + surface + speaker`. Copy
+   institucional usa Efeonce; copy firmado/hablado por Julio usa su sistema autoral;
+   thought leadership firmado puede combinar ambos con atribución visible. Router en
+   `efeonce/JULIO_REYES_VOICE_SYSTEM.md`; voz institucional en `efeonce/EFEONCE_VOICE_SYSTEM.md`.
 7. **Ética > manipulación.** Persuasión con claims verdaderos y en el momento correcto
    (`05`). Scarcity falsa, prueba sembrada, autoridad fabricada = manipulación (`ANTIPATTERNS`).
 
@@ -143,10 +150,11 @@ entregues el primer borrador como final.
 | **Craft y mecánica** (ritmo, retórica, power words, concisión, show-don't-tell, edición) | `modules/07_CRAFT_MECHANICS.md` |
 | **Copy por formato** (sales page/VSL, landing, ad, email, social, tagline, microcopy, CTA) | `modules/08_COPY_BY_FORMAT.md` |
 | **Copywriting con IA** (draft/variantes/edición, anti AI-slop, fidelidad de voz, prompting) | `modules/09_AI_ASSISTED_COPY.md` |
+| **Artículo firmado con apoyo agentic** (autoridad humana, captura de voz, reescritura, auditoría, CTA y disclosure) | `efeonce/AGENTIC_BLOGPOST_AUTHORING.md` + sistema de voz del autor |
 | Qué **NO** hacer (AI-slop, feature-dumping, jerga, hype-sin-prueba, clever>clear, scarcity falsa) | `ANTIPATTERNS.md` |
 | Vocabulario (AIDA, lead, kicker, deck, tagline vs slogan, VSL, big idea, swipe file…) | `GLOSSARY.md` |
 | El canon + fuentes + qué reverificar | `SOURCES.md` |
-| **Caso Efeonce/Greenhouse**: voz (7 creencias), boundary con las skills vecinas, copy en el repo, bilingüe | `efeonce/` (empezar por `EFEONCE_OVERLAY.md`) |
+| **Caso Efeonce/Greenhouse/Julio**: router de speaker, voz institucional, voz autoral, boundary, copy en repo, bilingüe | `efeonce/` (empezar por `EFEONCE_OVERLAY.md`) |
 | Artefactos listos | `templates/` (copy brief, voice guide, headline bank, sales page outline, SB7 brandscript, email sequence, messaging framework, objection map, edit checklist, swipe file) |
 
 ---
@@ -212,9 +220,14 @@ encadena**.
   clientes Globe internacionales, transcreación es-CL/en-US (no traducción literal) → `06`.
 - **Entrega:** el copy + una nota de *por qué* (qué framework, qué nivel de consciencia,
   qué se editó). No entregues palabras sin el pensamiento detrás.
-- **Voz Efeonce:** encarna las "7 creencias contrarias" y el slogan "Empower your Growth"
-  (`efeonce/EFEONCE_VOICE_SYSTEM.md`). El wording final de superficies de producto se valida
-  con la skill de UX-writing.
+- **Router de voz:** copy institucional, producto, UI, propuestas y piezas sin byline personal
+  usan Efeonce (`efeonce/EFEONCE_VOICE_SYSTEM.md`). Piezas firmadas o habladas por Julio usan
+  su voz (`efeonce/JULIO_REYES_VOICE_SYSTEM.md`). En híbridos, Julio narra y la doctrina se
+  atribuye como `En Efeonce...`; nunca mezclar speakers de forma invisible.
+- **Running motif personal:** `con manzanitas` / `te lo explico con manitas` pertenece a Julio;
+  no usarlo en copy institucional ni en textos de otros autores. Cuando se activa en copy visible,
+  lleva exactamente `🍏🍏🍏` antes de la puntuación. El wording final de superficies de producto
+  se valida con la skill de UX-writing.
 
 ---
 

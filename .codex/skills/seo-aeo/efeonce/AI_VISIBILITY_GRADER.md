@@ -36,6 +36,19 @@ consumers (email + HubSpot) alineados. El path viejo del portal `greenhouse.efeo
 Anti-regresión: `report-link.test.ts` afirma que NUNCA vuelve al host/path muerto.
 Tasks: `TASK-1325` (hub, complete) · `TASK-1324` (repoint del enlace, complete/released).
 
+## Grader → Radiografía AEO (diagnóstico → demostración)
+
+El **AI Visibility Grader** y la **Radiografía AEO** no compiten:
+
+| Activo | Trabajo |
+|---|---|
+| **Grader** | Mide cómo una marca aparece en motores de respuesta, qué fuentes la sostienen y dónde están los huecos |
+| **Radiografía AEO** | Muestra cómo uno de esos huecos se convierte en un artículo visible, estructurado, citable y distribuible |
+
+Regla para agentes: si el comprador ya vio un score o un informe y pregunta *"¿y cómo se arregla?"*, el siguiente activo es la Radiografía, no otro dashboard. Si la conversación empieza sin evidencia, primero corre o revisa el Grader.
+
+La Radiografía vive en `think.efeoncepro.com/muestras/<slug>-<token>` y su runtime está en `efeonce-think`; en `greenhouse-eo` sólo viven el gobierno documental y los playbooks. Manual comercial: `docs/manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md`. Manual técnico/runtime: `docs/think/radiografia-aeo-manual.md`.
+
 ## Reporte público final: contrato de facts (live, as-of 2026-07-04)
 
 El mockup enterprise del informe se promovió a reporte final user-facing en

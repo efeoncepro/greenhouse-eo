@@ -253,7 +253,7 @@ describe('TASK-914 — notion-status-transition-capture-demo (re-fetch pattern)'
       expect(mocks.fetchDemoPageStatus).not.toHaveBeenCalled()
     })
 
-    it('re-throw cuando el re-fetch falla (retry exponencial canonical)', async () => {
+    it('re-throw cuando el re-fetch retryable falla sin captura Sentry directa', async () => {
       const apiErr = new Error('Notion API GET page 429')
 
       mocks.fetchDemoPageStatus.mockRejectedValueOnce(apiErr)
@@ -265,11 +265,7 @@ describe('TASK-914 — notion-status-transition-capture-demo (re-fetch pattern)'
         )
       ).rejects.toThrow('429')
 
-      expect(mocks.captureWithDomain).toHaveBeenCalledWith(
-        apiErr,
-        'integrations.notion',
-        expect.objectContaining({ tags: expect.objectContaining({ stage: 'refetch' }) })
-      )
+      expect(mocks.captureWithDomain).not.toHaveBeenCalled()
     })
   })
 

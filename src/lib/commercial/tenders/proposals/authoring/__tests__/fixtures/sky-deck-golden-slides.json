@@ -1,0 +1,98 @@
+{
+  "_readme": "Golden FROZEN de TASK-1415: las láminas diagnostico + escalera del deck SKY (autoradas A MANO, run EO-GRUN-00046, 2026-07). Snapshot de deck-plan.json al 2026-07-16 SIN la clave template (el autor declara contentType; el selector resuelve). No se edita para 'hacer pasar' un eval.",
+  "slides": [
+    {
+      "slideId": "diagnostico",
+      "contentType": "one-metric",
+      "slots": {
+        "eyebrow": "EL DIAGNÓSTICO",
+        "leftVisual": {
+          "src": "assets/clay3d/clay-ai-visibility.png"
+        },
+        "title": "La IA <em>conoce</em> a SKY. Pero su contenido <em>no está</em> en la respuesta",
+        "narrative": [
+          "Medimos la marca antes de escribir esta propuesta, con el mismo instrumento con el que vamos a operar: nuestro AI Visibility Grader, sobre los cinco motores de respuesta, 35 respuestas resueltas.",
+          "La conversación sobre viajes la alimentan fuentes de terceros — <strong>la citabilidad del contenido propio es 0%</strong>. El informe está publicado: <a href=\"https://think.efeoncepro.com/brand-visibility/r/grt-9892e5684c394557a63f8171926871c26d3278216daf42a2a8100951ccb5537f\">puede recorrerlo entero</a>."
+        ],
+        "outcomesEyebrow": "LO QUE MEDIMOS",
+        "outcomesTitle": "Tres hechos, antes de proponer nada",
+        "goals": [
+          {
+            "kind": "citability",
+            "title": "Contenido propio citado",
+            "metric": "0%",
+            "body": "De las <strong>254 citas</strong> del estudio, ninguna es contenido editorial de SKY. Responden Trustpilot, Wikipedia e Instagram.",
+            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046 · 2026-07"
+          },
+          {
+            "kind": "growth",
+            "title": "LATAM domina la categoría",
+            "metric": "16 vs 9",
+            "body": "LATAM se menciona <strong>16 veces</strong> y JetSMART 9. La conversación de categoría tiene dueño, y no es SKY.",
+            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046 · 2026-07"
+          },
+          {
+            "kind": "visibility",
+            "title": "El blog ya trae tráfico",
+            "metric": "~40.000",
+            "body": "Visitas orgánicas al mes, con páginas <strong>a un paso del top 3</strong>. No partimos de cero: partimos de un activo desaprovechado.",
+            "evidenceRef": "Semrush · database CL · 2026-07-11"
+          }
+        ]
+      }
+    },
+    {
+      "slideId": "escalera",
+      "contentType": "maturity-ladder",
+      "slots": {
+        "sectionLabel": "DÓNDE ESTÁ SKY HOY",
+        "title": "Dos peldaños <em>firmes</em>. Tres por construir.",
+        "subject": {
+          "name": "SKY Airline",
+          "context": "5 motores · 35 respuestas · julio 2026"
+        },
+        "rungs": [
+          {
+            "label": "Que te encuentre",
+            "anchor": "Be Found",
+            "score": 40,
+            "body": "Aparece en menos de la mitad de las respuestas de descubrimiento de la categoría.",
+            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046"
+          },
+          {
+            "label": "Que te entienda",
+            "anchor": "Be Readable",
+            "score": 70,
+            "body": "La IA sabe quién es SKY y se apoya en fuentes creíbles. Fortaleza a defender.",
+            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046"
+          },
+          {
+            "label": "Que te describa bien",
+            "anchor": "Be Correct",
+            "score": 37,
+            "body": "Cuando la IA habla de SKY, no usa su narrativa. Se corrige con contenido propio.",
+            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046"
+          },
+          {
+            "label": "Que pueda actuar",
+            "anchor": "Be Actionable",
+            "score": 8,
+            "body": "La capa técnica ausente, medida: un agente de IA no puede operar con su sitio.",
+            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046"
+          },
+          {
+            "label": "Que te prefiera",
+            "anchor": "Be Intrinsic",
+            "score": 76,
+            "body": "SKY ya es opción por defecto dentro de la categoría. Su otra fortaleza.",
+            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046"
+          }
+        ],
+        "readout": {
+          "title": "Por eso el alcance",
+          "body": "La escalera es acumulativa: un peldaño no subido bloquea los de arriba. El servicio ataca los tres críticos, empezando por el primero."
+        }
+      }
+    }
+  ]
+}

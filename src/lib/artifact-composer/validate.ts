@@ -117,9 +117,11 @@ const validateItemShape = (
   shape: NonNullable<NonNullable<SlotContract['item']>['shape']>,
   item: Record<string, unknown>,
   index: number,
-  requireEvidence: boolean
+  requireEvidence: boolean,
+  pathLabel?: string
 ): SlotViolation[] => {
   const violations: SlotViolation[] = []
+  const label = pathLabel ?? (index >= 0 ? `item ${index}` : 'el objeto')
 
   for (const [fieldName, field] of Object.entries(shape)) {
     const raw = item[fieldName]
@@ -127,19 +129,88 @@ const validateItemShape = (
 
     if (field.required && !present) {
       violations.push(
-        violation(ctx, 'missing_required_field', `el item ${index} no trae el campo requerido "${fieldName}"`)
+        violation(ctx, 'missing_required_field', `${label} no trae el campo requerido "${fieldName}"`)
       )
       continue
     }
 
     if (!present) continue
 
+    if (field.type === 'array') {
+      if (!Array.isArray(raw)) {
+        violations.push(
+          violation(ctx, 'wrong_type', `${label}, campo "${fieldName}": se esperaba un array`)
+        )
+        continue
+      }
+
+      const { minItems, maxItems } = field.constraints ?? {}
+
+      if (minItems !== undefined && raw.length < minItems) {
+        violations.push(
+          violation(ctx, 'too_few_items', `${label}, campo "${fieldName}": ${raw.length} items, el mínimo es ${minItems}`)
+        )
+      }
+
+      if (maxItems !== undefined && raw.length > maxItems) {
+        violations.push(
+          violation(
+            ctx,
+            'too_many_items',
+            `${label}, campo "${fieldName}": ${raw.length} items excede el máximo de ${maxItems}. El renderer NO recorta la lista.`
+          )
+        )
+      }
+
+      if (field.item?.shape) {
+        raw.forEach((nestedItem, nestedIndex) => {
+          if (!isPlainObject(nestedItem)) {
+            violations.push(
+              violation(ctx, 'wrong_type', `${label}, campo "${fieldName}"[${nestedIndex}]: se esperaba un objeto`)
+            )
+
+            return
+          }
+
+          violations.push(
+            ...validateItemShape(
+              ctx,
+              field.item!.shape!,
+              nestedItem,
+              nestedIndex,
+              requireEvidence,
+              `${label}, campo "${fieldName}"[${nestedIndex}]`
+            )
+          )
+        })
+      }
+
+      continue
+    }
+
+    if (field.type === 'object') {
+      if (!isPlainObject(raw)) {
+        violations.push(
+          violation(ctx, 'wrong_type', `${label}, campo "${fieldName}": se esperaba un objeto`)
+        )
+        continue
+      }
+
+      if (field.shape) {
+        violations.push(
+          ...validateItemShape(ctx, field.shape, raw, index, requireEvidence, `${label}, campo "${fieldName}"`)
+        )
+      }
+
+      continue
+    }
+
     if (field.maxCharacters !== undefined && typeof raw === 'string' && visibleLength(raw) > field.maxCharacters) {
       violations.push(
         violation(
           ctx,
           'item_too_long',
-          `item ${index}, campo "${fieldName}": ${visibleLength(raw)} caracteres excede ${field.maxCharacters} (overflow=reject)`
+          `${label}, campo "${fieldName}": ${visibleLength(raw)} caracteres excede ${field.maxCharacters} (overflow=reject)`
         )
       )
     }
@@ -149,7 +220,7 @@ const validateItemShape = (
         violation(
           ctx,
           'disallowed_enum',
-          `item ${index}, campo "${fieldName}": "${raw}" no está en los valores permitidos (${field.values.join(', ')})`
+          `${label}, campo "${fieldName}": "${raw}" no está en los valores permitidos (${field.values.join(', ')})`
         )
       )
     }
@@ -163,7 +234,7 @@ const validateItemShape = (
           violation(
             ctx,
             'missing_evidence_ref',
-            `item ${index}: el campo "${fieldName}" trae un dato ("${String(raw)}") pero falta "${dependency}". ` +
+            `${label}: el campo "${fieldName}" trae un dato ("${String(raw)}") pero falta "${dependency}". ` +
               `Una cifra sin su fuente no entra a una oferta: dato real del bid, o ilustrativo marcado.`
           )
         )
@@ -180,10 +251,32 @@ const validateItemShape = (
         violation(
           ctx,
           'missing_evidence_ref',
-          `item ${index}: métrica "${String(item.metric)}" sin evidenceRef. Cifra sin fuente = no se compone.`
+          `${label}: métrica "${String(item.metric)}" sin evidenceRef. Cifra sin fuente = no se compone.`
         )
       )
     }
+  }
+
+  return violations
+}
+
+const validateObject = (ctx: ValidateContext, contract: SlotContract, value: SlotValue): SlotViolation[] => {
+  if (!isPlainObject(value)) {
+    return [violation(ctx, 'wrong_type', `se esperaba un objeto, llegó ${typeof value}`)]
+  }
+
+  const violations: SlotViolation[] = []
+
+  if (contract.shape) {
+    violations.push(
+      ...validateItemShape(
+        ctx,
+        contract.shape,
+        value,
+        -1,
+        contract.constraints?.quantifiedClaimsRequireEvidenceRef === true
+      )
+    )
   }
 
   return violations
@@ -291,8 +384,12 @@ export const validateSlide = (
         violations.push(...validateEnum(ctx, contractSlot, value))
         break
 
+      case 'object':
+        violations.push(...validateObject(ctx, contractSlot, value))
+        break
+
       default:
-        // asset / asset-ref / fixed-asset / object / enum: la forma la valida el resolver de assets.
+        // asset / asset-ref / fixed-asset: la forma la valida el resolver de assets.
         break
     }
   }

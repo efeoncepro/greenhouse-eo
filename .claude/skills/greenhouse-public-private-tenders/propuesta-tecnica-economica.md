@@ -22,6 +22,37 @@ Cómo ensamblar el paquete que gana. La skill decide **qué va y con qué estruc
 
 Nada se declara "listo" hasta que todos los excluyentes están ✅.
 
+## La oferta técnica se ITERA en Markdown, y el deck es su PROYECCIÓN (método canónico)
+
+**Antes del deck va el Markdown, y antes del Markdown va el WORKSPACE.** El deal vive en una carpeta
+canónica (el "DSR interno"): `pnpm tender:new <slug>` la scaffoldea con `bases/` (RFP), `research/`
+(investigación INTERNA), `oferta-tecnica.md` (copiada del template), `artifact-manifest.json` (piezas
+vivas por enlace) y `anexos/`. Contrato: `docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md`. La
+oferta técnica se escribe/itera —idea, investigación, evidencia, narrativa— en ese `.md` con taxonomía
+canónica (`TECHNICAL_OFFER_TEMPLATE.md`), y el deck se compone **desde** ahí.
+
+Regla híbrida de la plantilla: las **secciones son GUÍA** (cada RFP ordena distinto hacia
+sus criterios ponderados), pero la **evidencia es CONTRATO** — toda cifra vive primero en el
+**Ledger de evidencia** (Zona 0) con fuente googleable + as-of, mapeable 1:1 a
+`proposal_evidence`. Es el mismo gate que el composer ya aplica en el deck
+(`missing_evidence_ref` rompe el build), pero atrapado **antes**, en el Markdown.
+
+**El deck NO auto-deriva del Markdown.** SSOT del deck = los **slots del `deck-plan.json`**
+(mismos slots → mismo PDF; un humano firma). El `.md` es la fuente **narrativa + evidencia**;
+el `deck-plan.json` es la fuente de **composición**. Comparten el ledger, pero son archivos
+independientes y revisables por separado. El autor/agente construye el plan **desde** la
+oferta (propose→confirm), eligiendo qué secciones se vuelven lámina y con qué `contentType`
+(declara INTENCIÓN, nunca `template`). El mapa sección→contentType vive en la Zona 2 de la
+plantilla; el catálogo de content-types, en `deck-visual-system.md`.
+
+```
+investigación (INTERNO) → oferta-tecnica.md (ledger + narrativa + mapa) → deck-plan.json (slots) → PDF
+```
+
+**Familia de tres, no un archivo:** la técnica es un sobre. La **económica** se arma con
+`pricing-garantias-finance.md` + el generador de Excel; la **administrativa** con
+`compliance-riesgo-integridad.md`. No las metas en el `.md` técnico.
+
 ## Oferta técnica — anatomía que puntúa
 
 Modela cada sección **hacia el criterio ponderado que la evalúa** (lee primero la tabla de ponderaciones en `chile-publico-operativo.md`).
@@ -35,6 +66,15 @@ Modela cada sección **hacia el criterio ponderado que la evalúa** (lee primero
 - **Cumplimiento de requisitos técnicos / SLA** — tabla explícita item por item.
 
 ## Oferta económica — el detalle que descalifica por forma
+
+> **El Excel brandeado se GENERA, no se mantiene a mano.** Hay clientes que exigen Excel (documento
+> integrante). Las cifras + condiciones viven en `economica.json` (fuente única) y el `.xlsx` profesional
+> se emite con `pnpm economica:build <caso>/economica.json` (builder reusable
+> `scripts/commercial/lib/economic-offer-xlsx.mjs`: banda navy + wordmark, paleta AXIS, zebra, bloque
+> Neto/IVA/Total, print A4). **Techo:** las fuentes no se embeben en `.xlsx`; brand pixel-perfect = PDF
+> del composer, con el Excel como planilla editable. 🔴 NUNCA precio unitario por artículo.
+> **Confirmá primero si las bases exigen SU planilla** — formato equivocado = inadmisible.
+
 
 - Usa **exactamente el formato/planilla** que exigen (a veces un Excel específico). Un precio correcto en formato equivocado puede ser inadmisible.
 - Respeta la **estructura de ítems** pedida (unitarios, totales, con/sin impuestos según lo indicado).

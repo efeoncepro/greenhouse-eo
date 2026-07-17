@@ -38,6 +38,12 @@
     text-shadow:0 0 26px rgba(var(--axis-deck-teal-500-rgb), .38); }
   .ch .t { font-family:var(--axis-deck-type-display); font-weight:600; font-size:30px; line-height:1.06; letter-spacing:-.012em; color:var(--axis-ppt-neutral-50); }
   .ch .d { font-size:18px; line-height:1.3; color:rgba(var(--axis-ppt-neutral-50-rgb), .58); margin-top:8px; }
+  /* Chip de página: lo pinta el hook del catálogo (derivado del plan — NUNCA autorado). */
+  .ch .pg { margin-left:auto; align-self:center; flex:none; display:flex; align-items:baseline; gap:8px;
+    font-family:var(--axis-deck-type-text); font-weight:600; font-size:34px; color:var(--teal);
+    font-variant-numeric:tabular-nums; letter-spacing:-.01em; }
+  .ch .pg i { font-style:normal; font-size:14px; letter-spacing:.08em; text-transform:uppercase;
+    color:rgba(var(--axis-ppt-neutral-50-rgb), .45); }
 
   .foot { display:flex; justify-content:space-between; align-items:center; padding-top:24px;
     border-top:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .12); font-size:17px; color:rgba(var(--axis-ppt-neutral-50-rgb), .5); }

@@ -180,6 +180,39 @@ mueve, y este es el orden"* sí.
 
 ---
 
+## 4b. 🔴 La Radiografía AEO — el activo que ya tenemos (educa Y vende)
+
+En una categoría de humo, **la honestidad es el producto** (§0) — y ésta es la pieza que la hace **tangible**. Escribe un artículo **real** para el cliente y lo **abre en canal** en cuatro pantallas: el hueco de búsqueda medido · el artículo · la capa de máquina **acoplada** (tocas un párrafo y ves qué produce) · dónde más vive.
+
+**Live:** `think.efeoncepro.com/muestras/<slug>-<token>` · runtime en el repo **`efeonce-think`** (NO `greenhouse-eo`) · **el cliente es un payload JSON, cero código.**
+
+**Cadena comercial:** **Grader mide → Radiografía demuestra → propuesta/deck convierte → servicio opera.** Si el prospecto todavía no tiene diagnóstico, primero Grader. Si ya vio un score y pregunta *"¿cómo se arregla?"*, entra la Radiografía. En licitaciones y QBR se registra como evidencia `client_facing` sólo si el enlace tokenizado puede viajar al comité.
+
+**Dos trabajos — no los confundas:**
+
+| | Trabajo | Cuándo |
+|---|---|---|
+| **1** | **Educar** al cliente/prospecto | Casi nadie entiende qué significa *"aparecer en ChatGPT"*: lo confunde con SEO o lo cree magia. La pieza enseña la diferencia **sin una lámina de teoría**, y sirve **sin venta en curso** (educar un prospecto, o retener explicándole a un cliente vigente qué le hacemos) |
+| **2** | **Habilitar la venta** | Enlace + lámina de deck + demo en vivo + prueba que el comité **verifica solo** |
+
+**Por qué funciona, y por qué es frágil:** el schema **solo puede marcar contenido visible** — esa restricción **es** el argumento, y por eso la pantalla partida demuestra algo que un PDF no puede. Todo su valor es **no exagerar**.
+
+🔴 **Y ya nos pasó DOS veces.** Auditoría 2026-07-14: **de las 6 cifras que la pieza exhibía, 3 no resistían una verificación** — y venían de la propia skill `seo-aeo` (ya corregidas ahí). Las tres clases de error, que son las que hay que conocer para vender esto sin quemarse:
+
+| Error | Ejemplo real |
+|---|---|
+| **Una PREVALENCIA vendida como LIFT** | *«tabla + lista → 2,3× más citas»*. El estudio (Nectiv) dice que las páginas citadas por ChatGPT **contienen** una tabla 2,3× más seguido que las que rankean en Google (30% vs 13%): una razón **entre corpus**, no un lift por poner una tabla. Y **la lista se la agregamos nosotros** |
+| **Una fuente cuyo NOMBRE no se puede googlear** | Se publicó *«AI Platform Citation Source Index 2026, 680M de citas»*. **Ese estudio no existe con ese nombre** (el dato es de Bluefish vía Adweek). El evaluador **va a buscarlo** — y si no lo encuentra, **se cae todo lo demás** |
+| **Reclamar una táctica que no aplicaste** | El *+41% Quotation Addition* mide **citar FUENTES o EXPERTOS entre comillas**, no «poner una cita destacada propia» |
+
+✅ **El movimiento honesto vende MÁS:** *«la muestra dice también lo que le FALTA»* (si el cliente no tiene autor con credencial, **se declara — no se inventa**), y *«el `SearchAction` es higiene de grafo, pero Google mató la feature que alimentaba: el eje agéntico se gana en el motor de reservas, no en el buscador del blog»*. **Decirlo tú antes de que lo encuentre el evaluador es lo que construye la credibilidad que la pieza vino a construir.**
+
+🔴 **NUNCA** prometer el rich snippet de FAQ de Google (restringido desde 2023 a gobierno/salud). 🔴 **NUNCA** dejar que la pieza cite **nuestra propia oferta** ni narre su interfaz: **se defiende sola**. 🔴 **Gate humano:** el operador elige el ángulo del artículo.
+
+**Cargar al tocarla:** `docs/think/radiografia-aeo-architecture.md` (invariantes vigentes + gate de 46 asserts) · `docs/think/radiografia-aeo-manual.md` (cómo se crea la del siguiente cliente) · `docs/documentation/comercial/radiografia-aeo-muestra-de-trabajo.md` (encuadre funcional) · `docs/manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md` (playbook comercial).
+
+---
+
 ## 5. Antes de responder cualquier cosa
 
 1. ¿Vas a decir un precio? → **cotizador primero.** `modules/04_PRICING.md`.

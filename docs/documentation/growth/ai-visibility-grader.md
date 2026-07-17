@@ -12,6 +12,19 @@ Mide como los "answer engines" de IA (ChatGPT/OpenAI, Claude/Anthropic, Perplexi
 
 El grader ya es una capacidad completa de diagnostico y monitoreo: corre prompts contra providers, guarda evidencia cruda, normaliza findings, calcula score, arma reporte interno/publico, publica snapshots seguros, orquesta email/HubSpot cuando corresponde, ejecuta probes tecnicos/entity del sitio y puede re-gradear perfiles de cliente opt-in en el tiempo. La evidencia sigue siendo muestral y asistida por IA: sirve para decision comercial y priorizacion AEO, no como verdad absoluta del negocio.
 
+## Relación con la Radiografía AEO
+
+El Grader y la Radiografía cumplen trabajos distintos dentro del motion SEO/AEO:
+
+| Activo | Qué responde | Cuándo se usa |
+|---|---|---|
+| **AI Visibility Grader** | "¿Cómo ve la IA a esta marca y dónde están sus huecos?" | Diagnóstico, lead magnet, operator send, HubSpot, priorización |
+| **Radiografía AEO** | "¿Cómo se ve un trabajo que tapa uno de esos huecos?" | Educación, demo en vivo, licitación, propuesta, QBR |
+
+La cadena comercial correcta es **diagnóstico → demostración → propuesta → operación**. Un informe del Grader puede abrir la conversación; la Radiografía la vuelve tangible cuando el comprador necesita ver el método y no solo un score.
+
+Referencia comercial: [Usar la Radiografía AEO en venta y educación](../../manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md).
+
 ## Conceptos
 
 - **Surfaces (dos tipos de motor):** el grader mide dos superficies de respuesta IA distintas, con el mismo objetivo ("¿te mencionan/citan?") pero distinto canal:

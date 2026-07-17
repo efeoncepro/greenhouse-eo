@@ -4,6 +4,26 @@
 > específico, honesto y con voz. Un texto ingenioso pero confuso, o persuasivo pero
 > manipulador, no es buen copy: es riesgo.
 
+## 🔴 Copy que NARRA LA INTERFAZ (acotaciones de escenario)
+
+**La pregunta ante cada línea:** *¿esto se lo estoy diciendo al lector, o se lo estoy explicando a
+quien construyó la herramienta?*
+
+- ❌ *«Cada pieza **de abajo** nace de…»* · *«**A la derecha** verás…»* · *«**Esto es lo que
+  significa**»* → **describe la pantalla**. Es copy escrito desde la silla del que la construyó. La
+  interfaz **se explica sola**; el copy tiene que **argumentar**.
+- ❌ **Autorreferencia a documentos propios:** *«**Nuestra oferta** dice, textual: …»* → le habla al
+  lector sobre **nuestro PDF**, no sobre su negocio. Deja la pieza como **nota al pie** de otro
+  documento, y **huérfana** el día que se mande sola. ⚠️ Y puede entrar **por un NÚMERO**, no solo por
+  una frase: *«los **8 artículos del mes**»* — una cifra que **solo existe en nuestra propuesta**.
+- ✅ **Citar el documento del CLIENTE sí vale** (*«Requisito 5 de las bases»*): es **su** idioma, y
+  hablarlo suma.
+
+⚠️ **La línea es fina, y hay que saberla:** hablar del artefacto **para ser HONESTO** es correcto y a
+veces obligatorio (el disclaimer, «esto especifica el entregable y **no lo simula**», «esta parte no
+la podemos fingir»). **Narrar la interfaz, no.** En una auditoría real, de 8 coincidencias **7 eran
+honestidad legítima** — solo una estaba enferma.
+
 ## Claridad y craft
 
 - **Clever > clear.** Juego de palabras, doble sentido o "creatividad" que sacrifica la

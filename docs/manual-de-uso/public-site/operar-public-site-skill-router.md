@@ -65,6 +65,7 @@ Para cierre de cambios de skill, workflow, implementacion o incidentes, cargar `
 | Mutar Elementor o CSS scoped | `references/elementor-mutation.md` |
 | Tocar un form publico o Growth Forms | `references/growth-forms-wordpress.md` |
 | Editar posts Gutenberg o Content Factory | `references/content-factory-gutenberg.md` |
+| Crear y publicar un blogpost end to end | `references/content-factory-gutenberg.md` + `references/agentic-blogpost-end-to-end.md` + `references/runtime-and-discovery.md` |
 | Crear/cambiar custom Elementor widget | `references/custom-elementor-widgets.md` |
 | Diagnosticar Blog/Contacto u otro incidente historico | `references/layout-incidents.md` |
 | Explorar Kinsta/WP/bridge/runtime | `references/runtime-and-discovery.md` |
@@ -112,7 +113,9 @@ pnpm public-website:content-factory:refresh-plan -- --inspection <inspection.jso
 pnpm public-website:content-factory:patch-plan -- --refresh-plan <plan.json> --brief <brief.json> --write
 ```
 
-No mutar el post publicado. El write futuro debe ir a draft/private clone y requiere aprobacion.
+No mutar el post publicado durante refresh/authoring. El write debe ir primero a draft/private clone. Una
+transicion posterior a `publish` solo puede ocurrir con autorizacion humana explicita, snapshot, rollback y
+verificacion live; cargar `references/agentic-blogpost-end-to-end.md` para ese flujo.
 
 ### Custom Elementor Widget
 

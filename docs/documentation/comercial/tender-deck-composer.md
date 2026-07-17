@@ -38,13 +38,21 @@ decide si adjudica o no. El Deck Composer es la pieza que **arma ese deck**.
 
 La idea central es simple: **el deck no se dibuja, se compone.**
 
-Hay un catálogo cerrado de **25 plantillas** (portada, agenda, diagnóstico, método, cronograma,
+Hay un catálogo cerrado de **31 plantillas** (portada, agenda, diagnóstico, método, cronograma,
 equipo, caso acreditado, matriz de cumplimiento, oferta económica, contraportada…). Cada una sabe
 qué contenido acepta. Uno escribe el **contenido**, y el composer elige la plantilla correcta, la
 llena y produce el PDF.
 
 Nadie inventa una lámina nueva a mano. Si el contenido no calza en ninguna plantilla, eso **no**
 significa "improvisá un layout": significa que **falta una plantilla en el catálogo**.
+
+Para presentar la operación existen dos moldes complementarios. `tool-stack` muestra las herramientas
+como un sistema por etapas, con una capa transversal de colaboración, licencias y fuentes aprobadas.
+`daily-operations` muestra una jornada real dentro de un mismo workspace: conversación Teams/Slack,
+artículo en Notion, revisión en Frame.io y estado del ciclo. El primero responde **con qué**; el segundo,
+**cómo se trabaja**. `content-hub-anatomy` abre una pieza para enseñar **qué contiene**: research y
+fuentes, respuesta editorial, metadata, schema y QA SEO/AEO. Los datos de cada cliente viven en su plan,
+nunca en el molde.
 
 ## Por qué funciona así
 

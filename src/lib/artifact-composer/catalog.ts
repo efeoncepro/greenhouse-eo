@@ -46,8 +46,14 @@ export class UnimplementedOutputTargetError extends Error {
   }
 }
 
-/** Hook de layout derivado que el catálogo aporta para una plantilla (ej. TimelineFull). */
-export type CatalogLayoutHook = (page: Page, slide: SlideSpec) => Promise<void>
+/**
+ * Hook de layout derivado que el catálogo aporta para una plantilla (ej. TimelineFull).
+ * `deckPlan` (opcional) da acceso al plan completo: chrome que depende de OTRAS láminas —el número
+ * de página real de un capítulo de la agenda— se deriva, nunca se autora (un deck reordenado con
+ * páginas escritas a mano se contradice solo). En un render standalone (probe sintético de UNA
+ * lámina) puede venir undefined: el hook debe degradar a no-pintar, jamás a inventar.
+ */
+export type CatalogLayoutHook = (page: Page, slide: SlideSpec, deckPlan?: DeckPlan) => Promise<void>
 
 /** Violación semántica tipada, determinista y serializable. */
 export interface CatalogSemanticViolation {

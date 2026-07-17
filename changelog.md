@@ -1,6 +1,479 @@
 # changelog.md
 
+## 2026-07-16 — TASK-1422: UI de redacción del aviso con IA en el Publication Desk
+
+- El Publication Desk (`/agency/hiring/publication`) gana el CTA `✨ Redactar con IA` en la columna
+  pública del diff (variantes ready / locked con tooltip por flag / pendiente por ledger) y un
+  **drawer propose→confirm**: bloque "Lo que la IA verá" (rol + hechos + skills reales de la demanda,
+  con candado de exclusiones), template de assessment opcional, progreso honesto del LLM
+  (con "seguir en segundo plano"), formulario editable prefilled y Aplicar/Descartar. Cliente
+  delgado de TASK-1385: cero endpoints nuevos; el confirm humano escribe, el publish sigue aparte.
+- Además: selector de vacante en el header (la vista fijaba `openings[0]`) y copy bilingüe
+  `hiringDesk.publication.vacancyAi` (es-CL + en-US).
+- Diseño con contratos robustos (wireframe + flow que extiende el nodo N-publish del master
+  EPIC-011 + motion con reuso íntegro de `ghHiring*`), y **GVC en loop de 5 iteraciones** hasta
+  0 findings error + enterprise rubric PASS (desktop + mobile + teclado + reduced-motion), con
+  fixes reales salidos del loop (región scrolleable accesible, overlap mobile, generate enriquecido).
+- Rollout: gobernado por `HIRING_VACANCY_AI_ENABLED` (OFF; ledger de 1385). Dev local ON.
+
+## 2026-07-16 — TASK-1385: redacción asistida por IA del copy público de vacantes (propose→confirm)
+
+- La IA propone los campos `public_*` del aviso de una vacante desde inputs **allowlist-safe**
+  (demanda + competencias del template de assessment + voz Efeonce es-CL); NUNCA ve presupuesto,
+  tarifas, notas internas ni referencias de cliente (test negativo con sentinels). Propone COPY,
+  no hechos: ubicación/modalidad/compensación jamás se inventan.
+- El confirm humano aplica vía `updateHiringOpening` (writer canónico, ahora acepta client externo
+  para atomicidad); el LLM no tiene write path al opening y el publish sigue siendo acción humana
+  con su gate 422 (TASK-355/1371).
+- Reusa el ledger auditado de TASK-1361 con kind nuevo `opening_public_copy` (dedupe por digest,
+  state machine terminal-once). Capability nueva `hiring.opening.ai_assist` (propose, tier operador
+  hiring); el confirm exige `hiring.opening.write`. API: `POST /api/hiring/openings/[id]/ai/propose-public-copy`.
+- Prompt con checklist anti-sesgo de avisos (género/edad/proxies/solo job-related) + voz de marca
+  (context pack 05/09); provider Anthropic `claude-sonnet-5` con adapter honest-degrade.
+- Flag `HIRING_VACANCY_AI_ENABLED` default OFF (hermano deliberado del flag de assessment — no
+  hereda su gate regulatorio), registrado en el ledger. Migración aplicada en dev; live E2E PG
+  verde (propose no muta → confirm aplica → doble confirm idempotente → terminal-once 409).
+
+## 2026-07-16 — HubSpot as a Service: skill gestionada, QA ANAM y discovery RevOps
+
+- Se completó la triple documentación ANAM: canon técnico, overview funcional end-to-end y manual operativo.
+  Se canonizó Data Quality como cola por owner/cadencia, con causas separadas entre schema/plataforma,
+  fuente/migración, integración y captura/adopción; “disciplina comercial” exige evidencia y no autoriza inferir.
+  Las skills Codex/Claude quedaron equivalentes con matching acotado, cobertura cross-object, snapshots
+  inmutables, geografía multi-select no aditiva y moneda explícita. Excepción registrada: falta localizar/crear el
+  source pack Markdown ANAM independiente antes del próximo cambio de knowledge de Customer Agent.
+- Se reconcilió live el slice KPI de sector, mercado y región contra Notion, los adjuntos de María Paz/Pablo y
+  el portal ANAM `19893546`. Tras aprobación explícita, se creó Company `segmento_de_mercado_anam` con label
+  `Segmento de mercado` y 22 opciones. Un guard más fuerte de duplicidad del lado HubSpot dejó 471 Companies
+  seguras: import `77871653` actualizó segmento+región en 471/471 e import `77871743` actualizó 65/65 sectores
+  estratégicos directos, ambos con 0 errores, sin nuevos records, asociaciones, enriquecimiento ni merges.
+- Se retuvieron 22 Companies bajo 11 claves normalizadas duplicadas, 3 casos ambiguos de fuente y 527 no
+  emparejados. El readback completo verificó los 471 IDs y la evidencia previa quedó inmutable y separada del
+  snapshot posterior para rollback. Las ventas por segmento/sector/región siguen sin ser KPI oficial porque la
+  cobertura Deal→Company es sólo 629/1.240 (`50,73%`) y los TAM/SAM del workbook se contradicen.
+- El dry run read-only de asociación Deal→Company encontró 34 candidatos high-confidence por cadena explícita
+  Deal→Contact→Company, 113 candidatos de dominio para revisión manual y 498 held. Ninguno de los 34 apunta a
+  las Companies duplicadas conocidas. Tras aprobación exacta, import `77872707` ejecutó esos 34 pares como
+  Primary con 0 errores y 0 registros nuevos; el readback verificó 34/34, una Company por Deal y type ID `5`.
+  HubSpot reportó 68 asociaciones direccionales para los 34 pares. Los 113 candidatos por dominio y 498 held
+  quedaron intactos. El conector activo correspondía al portal `48713323` y se descartó antes de operar; toda la
+  ejecución se guardó contra ANAM `19893546`.
+- Se publicó y verificó en `Calidad de Datos Comercial` (`21144697`) el reporte reversible `DQ - Negocios sin
+  empresa asociada por responsable`, con baseline 645 Deals previo a la remediación. El schema, los dos backfills
+  y el primer slice exacto de 34 asociaciones están cerrados; los KPI oficiales y cualquier remediación adicional
+  de asociaciones/duplicados siguen approval-gated en
+  `anam-sector-geography-kpi-slice-change-set-2026-07-16.md`.
+- Con aprobación explícita se agregaron a Growth `19708354` tres diagnósticos históricos parciales: valor
+  comercial ganado por segmento `340896790` (14 categorías, CLF 41.830,35), sector estratégico `340897291`
+  (2 categorías, CLF 34.204,13) y región de sede `340897635` (12 regiones, CLF 41.830,35). Todos filtran
+  `Ganado` exacto y dimensión Company conocida. No se modificaron records, schema, asociaciones, workflows ni
+  reportes existentes. Son valor comercial cubierto, no facturación/revenue/penetración ni KPIs oficiales;
+  el gate >=95% sigue incumplido con Deal→Company en 629/1.240.
+- El relevo ANAM ahora exige comenzar con un readback live y read-only de reuniones/tareas en Notion y una matriz
+  decisión/owner/fase/evidencia/gap/aprobación antes de nuevos writes. La síntesis local queda explícitamente como
+  índice, no autorización. También se corrigió drift del roadmap: Fase 3 y Fase 5 tienen pilotos live con siete
+  reportes, pero siguen no oficiales porque sus cinco Services usan activación sintética marcada pendiente de ANAM.
+- Se crearon y verificaron los paneles cliente `ANAM — Retención (PILOTO)` (`21152855`) y `ANAM —
+  Fidelización (PILOTO)` (`21152950`). Retención contiene el Portafolio de cinco Services (`340874128`) y un
+  radar de atención/renovación (`340874425`), más summaries de cohorte recurrente elegible (`340877391` = `2`)
+  y ARR elegible (`340877588` = `22` UF). Fidelización contiene la cola de atención (`340874258`) y summaries
+  de seguimiento (`340877942` = `2`) y retrasos (`340878184` = `1`). Los action reports aplican `delivery delayed
+  OR renewal upcoming` y muestran Härting + Hidrogistica. Los inputs de
+  activación son sintéticos y están marcados en cada registro; `fields_ready` valida la fórmula, no aprobación
+  cliente. No se declararon GRR/NRR, NPS ni health score; ese slice piloto no modificó Growth, aunque el slice
+  diagnóstico posterior sí agregó los tres informes históricos parciales descritos arriba.
+- Se probó automation v4 beta y el action nativo `Create record → Service`. La definición compila, pero un Deal
+  workflow no puede garantizar el grain one-Service-per-line-item; queda descartado como materializer productivo.
+  Tres probes runtime no enrolaron por API y limpiaron todos sus Deals/line items/workflows temporales.
+- Se creó el workflow de revisión `1852406585`, limitado a los cinco pilotos, con una task de alta prioridad y
+  cero emails/notificaciones/writes de propiedades. El API-only enable no fue evidencia suficiente; la QA posterior
+  en editor autenticado validó Gasmar como positivo y Nestlé como negativo, activó sin enrolar existentes y ejecutó
+  rollout manual 1+4. Las cinco ejecuciones completaron y crearon exactamente cinco tasks asociadas; re-enrollment
+  sigue OFF. La creación forward requiere materializer/custom action Kortex idempotente por line item.
+- Con aprobación separada se ejecutó el piloto controlado de cinco native Services en el portal ANAM: Gasmar,
+  Hidrogistica, Härting, Golden Omega y McDonald's. Cada uno quedó en `New`, con Company única, Deal de origen,
+  source line item, owner heredado, CLF/TCV/ARR preservados y readiness `incomplete_core`; por ello siguen fuera
+  de KPIs oficiales. También quedaron live los pares `Negocio de origen/Servicio adjudicado`, `Negocio de
+  renovación/Servicio renovado` y `Renovado por/Renovación de`. No hubo workflows, backfill masivo ni reports.
+- El readback documentó dos guardrails reutilizables: una etiqueta pareada debe verificarse en ambas direcciones
+  y un search miss inmediato no prueba ausencia, porque el índice puede rezagarse mientras la unique constraint
+  ya está activa. Ledger y rollback: `anam-phase-3-forward-pilot-execution-2026-07-16.md`.
+- **Checkpoint de diseño previo al piloto (superado por las ejecuciones registradas arriba):** la Fase 3 quedó reconciliada para captura forward: Portafolio usa TCV por moneda original, Retention usa ARR
+  sólo en cohorte recurrente/renovable revisada, billing cadence no se confunde con delivery cadence y un award
+  propone Service `New` sin declarar activación. Backfill histórico continúa `NO-GO`; esquema y primer piloto
+  de 3–5 line items requerían aprobaciones separadas. En ese corte no hubo writes; schema y piloto fueron
+  posteriormente aprobados y ejecutados como documentan los bullets anteriores.
+- Las skills espejo agregan una matriz de propiedades HubSpot que separa storage type, field type, mecanismo de
+  población y gobierno, y decide entre native/custom/unique/calculation/rollup/sync/score/workflow/smart. Smart
+  queda como evidencia AI con créditos y revisión humana, nunca como identidad, dinero, lifecycle o elegibilidad.
+- El schema preview de Service incorpora una fórmula calculada de readiness con cuatro salidas accionables:
+  core incompleto, revisión humana pendiente, ARR faltante para modelos recurrentes/mixtos y campos preparados.
+  La fórmula no suplanta los gates de asociaciones; su aceptación por el parser requiere create/readback aprobado.
+- Con autorización del operador se ejecutó el schema native Service en ANAM: grupo visible `Contrato y renovación
+  ANAM`, nueve propiedades escalares y una calculada. Readback de definición pasó; HubSpot normalizó orden y
+  paréntesis sin cambiar semántica. Readiness propagó a `incomplete_core` sobre el sample sin tocar el registro.
+  Cero records/workflows/associations/reports.
+- **Dry run histórico previo a la ejecución posterior:** cinco adjudicaciones recientes de Companies distintas validaron la proyección de award
+  (identidad, Company, Product/familia, owner, moneda, TCV y ARR) y bloqueó correctamente activación por ausencia
+  de fechas, revenue model, renewal facts y delivery status. En ese corte no fueron creados; luego el lote exacto
+  fue aprobado, creado y marcado como piloto sintético según la evidencia de ejecución anterior.
+- Se incorpora un modelo de datos ANAM vivo con diagrama, grain y source-of-truth por objeto, matriz de
+  asociaciones, proyecciones permitidas/prohibidas y sinergias comerciales, Service, Loyalty, Tickets y billing.
+  El reconciliation fechado queda como evidencia con aviso de drift, evitando ejecutar propuestas superadas.
+- Se registra `TASK-1423` y la spec `client-billing-intake-data-model-spec-v1.md` para la foundation tenant-scoped
+  del workbook ANAM: modelo reusable `client_billing_*`, assets/scan compartidos, parser versionado y profiler
+  no-write. Se fija la frontera correcta: ANAM es cliente y dueño de source/CRM data; Greenhouse sólo opera el
+  control plane y no proyecta estas filas a su CRM, Finance, Income o Account 360. UI queda como `TASK-1424` futura.
+- Se reemplaza SharePoint como dependencia preferida del intake mensual ANAM por una UI administrada: superficie
+  autenticada en Greenhouse, upload firmado a GCS privado, validación/ledger en Cloud Run + Cloud SQL y aprobación
+  explícita antes de sincronizar HubSpot mediante Kortex OAuth. SharePoint queda como adaptador opcional y Cloud Run
+  + IAP como fallback de acceso. Arquitectura en `anam-managed-billing-intake-ui-2026-07-16.md`; no se provisionó
+  infraestructura ni se realizaron writes HubSpot.
+
+- Nace la skill espejo `.codex/.claude/skills/hubspot-as-a-service` como capa de delivery gestionado: intake,
+  inventario, diseño RevOps, change sets, Customer Agent, conocimiento Markdown, landing/chat, QA, handoff,
+  medición y reporting; mantiene fronteras explícitas con `hubspot-solutions-partner`, Kortex CMS y el bridge.
+- Greenhouse suma y gobierna `docs/architecture/kortex/hubspot-as-a-service/` como canon visible del modelo
+  operativo, el seam de la landing ANAM y el discovery combinado de seis hilos RevOps corporativos + tareas
+  Notion. Las skills Codex/Claude y la evidencia cliente permanecen en Greenhouse; Kortex conserva sólo su
+  implementación ejecutable y referencia este canon sin duplicarlo. No se ejecutaron properties, backfills,
+  workflows ni otros writes CRM durante el discovery.
+- Se corrige el estado operativo de la landing ANAM a build `#22` y tres intents. El informe cliente de QA queda
+  versionado en `docs/audits/ANAM_CUSTOMER_AGENT_QA_REPORT_2026-07-16.md`, con conteo de escenarios/turnos,
+  resultados y limitaciones nativas. ANAM confirmó Customer Agent y 30.000 créditos comprados; el aviso de un
+  día correspondía al inicio del consumo pagado, no a expiración o desactivación.
+- El readback de schema del portal `19893546` inventaría Deal/Company/Contact, asociaciones y pipelines accesibles,
+  mide cobertura de propiedades clave y documenta drift de opciones, duplicidades y límites de scope sin ejecutar
+  escrituras CRM.
+- El inventario ampliado reconcilia native Lead (291), line items (506; 501 asociados a Deals), Quote (10), Service
+  (1), Ticket (18), Invoice (0) y custom schemas (0). Los 10 Quotes no forman una base histórica: ninguno tiene line
+  items, seis tienen monto cero y sólo dos están asociados al mismo Deal. Se documenta el contrato final en
+  `anam-revops-schema-reconciliation-2026-07-16.md`.
+- `anam-commercial-catalog-dry-run-2026-07-16.md` reduce los 506 line items a 20 nombres normalizados y propone un
+  seed Product/Service gobernado; `M&A - Integral` concentra 331. El RUT duplicado de la propia Company ANAM se
+  conserva sólo como anomalía observada y fuera de alcance; no se corregirá ni fusionará en este trabajo.
+- Kortex despliega builds `#12/#13` para Product Library con `crm.objects.products.read` requerido y write
+  condicional. En el corte inicial HubSpot rechaza tres consentimientos antes del callback; la instalación ANAM
+  permanece activa con 109 scopes y Product API `403`, sin recurrir al scope obsoleto `e-commerce`.
+- Developer Monitoring identifica la causa de esos tres grants: `Please provide a valid recaptcha value`. También
+  se detecta drift en el control plane desplegado, cuyo authorization URL omitía Product read pese al build `#13`.
+  Con autorización explícita, el operador completa un consent corregido: callback/activation success, 110 scopes,
+  Product properties/search HTTP 200, 65 propiedades y 22 Products. No hubo Product writes, deploy ni rotación.
+- Se versiona un change set approval-ready para Service: data dictionary, asociaciones de renovación/Deals y
+  migración idempotente de Closed Won line items. Ningún schema/record write fue ejecutado.
+- El dependency audit confirma que Workflows, Forms, Lists, Ticket v3 y reglas de pipeline requieren scopes de
+  lectura adicionales. Se versiona un change set dividido: reconciliación reversible de dos propiedades pendiente
+  de aprobación y cambios estructurales bloqueados hasta observar consumidores y cerrar decisiones de negocio.
+- La revisión RevOps posterior pausa ese Slice A antes del cambio objetivo: `Down-sell` permanece oculto y
+  `variacion_contrato` permanece intacto. El nuevo governance de propiedades clasifica Deal/Company/Contact en
+  `KEEP / CHANGE / DEFER / RETIRE`, separa movimiento de ingreso de mecanismo de expansión y define como primer
+  entregable analítico un dashboard de calidad de datos; GRR/NRR quedan bloqueados hasta contar con contratos,
+  períodos, moneda y montos comparables.
+- El portal autenticado confirma uso efectivo de `tipo_de_ingreso` en 9 recursos (4 informes, 2 workflows,
+  formulario de creación, lógica condicional y property card); `variacion_contrato` y `tipo_de_servicio` no tienen
+  consumidores declarados. Estos conteos reemplazan la incertidumbre API para esas propiedades, no autorizan retiros.
+- Fase 1 RevOps queda cerrada con dos propiedades calculadas Deal API-managed y tres informes de outcome en
+  `Dashboard de Crecimiento`: count por Ganado/Perdido/No adjudicado (`340844496`), valor actual por outcome
+  (`340844919`) y tasa de adjudicación (`340845240`) con filtro obligatorio Ganado+Perdido. Readback al corte real:
+  13 ganados, 0 perdidos, 1 no adjudicado y 100% sobre denominador 13.
+- `Radar 0%` no fue corregido ni se movieron sus 10 Deals; la dimensión calculada los resuelve como `Abierto` y
+  evita los flags nativos basados en probabilidad. No hubo record writes, backfill, cambios de pipeline ni cambios
+  sobre las Companies ANAM duplicadas. Las skills espejo registran límites, propagación y semántica de fórmulas
+  calculadas, además del cutoff exacto de `current quarter to date`.
+- La lectura completa de reuniones de Maria Paz y José Pedro establece el modelo Contact -> Lead -> Company ->
+  Deal -> Service, con Ticket como caso/SLA. El objeto estándar Service (`0-162`) ya está activo: 43 properties,
+  dos custom sin cobertura, un registro de prueba y pipeline inglés sin reglas. Se documenta la síntesis en
+  `anam-revops-meeting-synthesis-2026-07-16.md`; el próximo cambio estructural exige data dictionary y dry-run.
+- Con autorización explícita se ejecuta Slice A por UI autenticada: `Down-sell` queda visible sin cambiar orden ni
+  internal value; `variacion_contrato` pasa a `Variación vs. cotizado`, descripción de adjudicación y labels
+  `Igual/Mayor/Menor`, preservando `Mismo valor/Mayor valor/Menor valor`. Readback API confirma 1.240 Deals y la
+  misma distribución 446/141/87/234/0, con variación en 0; no se tocaron records, workflows, requiredness ni pipelines.
+- **Corrección inmediata:** el operador aclara que Down-sell fue retirado porque no es tipo de ingreso. Se revierte
+  su visibilidad; readback final `tipo_de_ingreso.updatedAt=2026-07-16T09:13:40.908Z`, `Down-sell.hidden=true`,
+  sin cambios de records, valores internos u orden. `Variación vs. cotizado` permanece aplicada. El canon
+  `anam-commercial-first-operating-model-2026-07-16.md` fija la doctrina: contracción/Down-sell es movimiento de
+  Retención sobre Services comparables; implementación comercial primero y Operaciones después.
+- La skill espejo incorpora `references/report-design.md` como contrato obligatorio de diseño y QA de informes:
+  pregunta, periodo, denominador, matriz de visualizaciones, capas del dashboard y readback. Codex y Claude pasan
+  validación y permanecen idénticos.
+- `Dashboard de Crecimiento` suma siete informes verificados para el cohort Growth de Q3: dos KPI, dos donuts,
+  columnas por línea, tabla exacta y pivot responsable x línea. Los activos reconcilian 29 Deals y CLF 2.443,89;
+  no se alteraron informes legacy ni registros CRM. Tendencias, funnel y gauges se aplazan hasta que sus contratos
+  de serie temporal, estado Radar y denominador dinámico sean válidos.
+- Los 12 adjuntos no-agent de ANAM quedan clasificados sin modificar los originales: dos candidatos de migración
+  aún `NO-GO`, tres insumos de configuración, cinco referencias y dos exclusiones. La vista Finder usa enlaces y
+  el dictamen documenta granularidad, destino HubSpot, calidad y gates. Las skills espejo incorporan la regla de
+  no confundir adjunto útil, registro importable, insumo de configuración y evidencia administrativa.
+- La reconciliación cruzada de `Segmentación clientes` y `Ticket facturación` reemplaza la hipótesis de Código
+  ANAM único en Company por un custom object propuesto `Cuenta/Unidad ANAM`: 2.882 códigos fuente, 772 compartidos
+  con billing y 7.971 eventos cubiertos. Billing Event enlaza por código exacto a la Unidad y sólo después a Company
+  revisada; 106 códigos con múltiples RUT quedan en cuarentena. ADR/schema preview se mantienen `Proposed`.
+- Se define el operating model mensual: file drop SharePoint full-snapshot como MVP, target Graph/List incremental,
+  raw y run ledger inmutables, staging/crosswalk/exceptions, batch upsert/readback HubSpot y métricas por grano y
+  moneda. El ETL es un servicio de integración y no crea Services por fila; promedio de factura agrega primero
+  eventos por invoice+currency y la mediana acompaña al mean por outliers severos.
+
+## 2026-07-16 — Tender Proposal Studio: motor de chapter-authors servicio-agnóstico (TASK-1415)
+
+- El Studio ahora puede AUTORAR la lámina de diagnóstico (antes se escribía a mano en el `deck-plan.json`): nuevo
+  motor `src/lib/commercial/tenders/proposals/authoring/**` — interface `ChapterAuthor` servicio-agnóstica en el
+  molde propose→confirm (el LLM sólo enmarca; las cifras y `evidenceRef` se inyectan desde hechos derivados
+  determinísticamente; una cifra o URL huérfana rechaza la propuesta completa; confirm exige actor member).
+- Primera implementación completa: **diagnóstico (SEO/AEO)** — mapper `Grader → hechos` que reusa el mapeo canónico
+  dim→peldaño del Report Artifact, verificado contra el run real `EO-GRUN-00046` (reproduce el golden SKY
+  40/70/37/8/76 exacto). Segundo author (`credenciales`, otro servicio) prueba que el motor no está AEO-fitted.
+- Eval baseline determinista en CI (golden frozen = láminas SKY autoradas a mano) + corrida REAL end-to-end en
+  local: propose (claude-sonnet-5) → confirm → `composeArtifact` renderizó las 2 láminas (PNG+PDF, 0 warnings).
+- Flag `TENDER_CHAPTER_AUTHOR_ENABLED` default OFF (registrado en el ledger); capability reusa
+  `commercial.proposal.manage`. Orquestador y verifier de §5-ter siguen pendientes (tasks hermanas).
+
+## 2026-07-16 — HubSpot Solutions Partner: narrativa Agentic Customer Platform sincronizada
+
+- Las skills de Codex y Claude incorporan la lectura ejecutiva 2026 de HubSpot: Growth Context, workspaces,
+  agentes/MCP/Agent CLI, motion comercial por outcomes y cinco wedges de prospección para Efeonce.
+- El motion de prospección queda definido como Champion-led: entrada por el dueño operativo uno o dos niveles
+  bajo C-Level, escalamiento al sponsor económico, multithreading de 3–5 roles y gate de sponsor antes de propuesta.
+  La distribución 70/20/10 es una hipótesis inicial de Efeonce sujeta a métricas, no un benchmark de HubSpot.
+- Outbound/ABM incorpora enriquecimiento obligatorio de tres pasadas: HubSpot aporta historial y campos raw;
+  el sitio oficial confirma identidad/contexto; Internet público corrobora mercados y triggers. `country` vacío
+  o discrepante ya no excluye una cuenta, y sede, mercados operativos, evidencia y confianza se separan.
+- El ledger de fuentes queda verificado al 2026-07-16 e incorpora State of Ecosystems, incentivos H2 2026,
+  Marketing Studio, Sales Workspace, Customer Success Workspace y límites explícitos de las betas.
+
+## 2026-07-16 — ANAM: botones enrutan chatflows por `anam_intent` y logo ajustado
+
+- La landing ANAM queda en Developer Project build `#22`: cada botón de categoría actualiza la URL con `anam_intent` (`cotizar`, `seguimiento_servicio`, `requerimiento_calidad`) y ejecuta `HubSpotConversations.widget.refresh({ openToNewThread: true })` antes de abrir el chat.
+- El CTA general limpia `anam_intent` y abre el chat sin forzar branch. El logo se redujo/subió para dejarlo separado de la línea inferior del header en desktop y mobile.
+- Pendiente operativo fuera del Developer Project: configurar en HubSpot Chatflows las target rules/branches para consumir esos query params; el composer no se prellena en esta configuración porque el iframe actual descarta `setInputText`.
+
+## 2026-07-16 — ANAM: landing `Agente Virtual ANAM` publicada en HubSpot
+
+- La landing pública `https://anam-2.hubspotpagebuilder.com/agente-anam` pasa a titular `Agente Virtual ANAM` y reduce la entrada operativa a tres categorías: `Cotizar`, `Seguimiento del Servicio` y `Requerimientos de Calidad`, según correo de Maria Paz Haeger.
+- Developer Project `kortex-cms-react` en portal ANAM `19893546` quedó live en build `#21`; se validó con `hs project validate --profile anam`, upload/deploy automático, asset público `kortex-cms-react/21` y Playwright desktop/mobile sin overflow horizontal.
+- La documentación operativa de Kortex/HubSpot CMS queda sincronizada en `docs/architecture/kortex/hubspot-cms/anam-chat-landing.md`.
+
+## 2026-07-15 — Creative Workflows: diagramas V3 corregidos en producción
+
+- Se reemplazan los dos diagramas V2 después de que una revisión humana detectara cruces de conectores sobre copy/listas, un ordinal oculto, un label recortado, una tarjeta sobre el cierre y una colisión de puntuación que el QA anterior no capturó.
+- La Pillar publicada usa ahora frontera `251393` y autonomía `251392`; V1/V2 permanecen superseded para trazabilidad. Se preservaron los 114 bloques, metadata SEO, featured/OG, categoría, autor y estado del post.
+- Snapshot y rollback fail-closed, cache purge y QA live desktop/mobile completados. El canon visual suma inspección al `100%` del raster original más runtime real, incluyendo labels, conectores, divisores y puntuación.
+
+## 2026-07-15 — Creative Workflows V5: enriquecimiento visual y tabla Gutenberg nativa
+
+- La Pillar publicada suma dos diagramas editoriales deterministas en la mitad inferior, captions para las cinco imágenes de cuerpo y un scorecard semántico `core/table`; la intervención corrige el tramo final sin apoyo visual sin convertir el artículo en una secuencia decorativa.
+- El Content Factory incorpora tablas nativas validadas, captions de imagen y enlaces opcionales a media; `public-website:wpcli` acepta `--input-file` repetible para transportar payloads y archivos por el rail SSH gobernado.
+- Post `251363` actualizado con snapshot y rollback fail-closed, caché Kinsta purgada y QA live desktop/mobile: cinco imágenes cargadas, seis captions, tabla 3×4, tres `🍏`, canonical/robots/OG preservados y cero overflow. El video queda deliberadamente diferido hasta tener una demostración que aporte movimiento o evidencia real.
+
+## 2026-07-15 — Sentry: Notion writeback/re-fetch y performance reader endurecidos
+
+- Se corrigen tres familias de alertas productivas: timeouts retryable en `/reactive/process-domain`, errores Notion 400 por bloques archivados y `permission denied for schema greenhouse_serving` en `GET /api/my/performance`.
+- Notion ahora usa errores tipados (`status`, `code`, `retryable`) y las proyecciones no capturan en Sentry los timeouts/429/5xx que el outbox debe reintentar. Los writebacks RpA/FTR/OTD marcan bloques archivados con prefijo terminal auditable y los signals de lag/dead-letter los excluyen.
+- El reader de performance deja de ejecutar DDL runtime sobre `greenhouse_serving.person_operational_metrics`; la tabla/grants pasan a migración y el endpoint cae a `ico_member_metrics` si el read model derivado no está disponible. Rollout pendiente: aplicar migración `20260715161000000_incident-person-operational-serving-runtime-ddl.sql` y redeploy app/ops-worker.
+
+## 2026-07-15 — Composer: 2 plantillas de prueba social (`ClientLogosFull` + `TestimonialsFull`) + 🏆 primera licitación enviada programáticamente
+
+- 🏆 **Hito:** la oferta SKY Airline (blog, plataforma Wherex) se compuso y **envió end-to-end con el Artifact Composer** — la primera licitación de Efeonce armada de forma programática. El deck vigente tiene 28 láminas y el PDF quedó entregado en OneDrive `Licitaciones/Sky Airlines/`.
+- Dos plantillas **domain-free** nuevas en el catálogo `deck-axis`: `ClientLogosFull` (contentType `client-logos`) arma un muro de logos de clientes a color sobre panel claro, con allowlist `client-logo-asset`, destaque por `emphasis` como dato y una banda «+90 empresas» verificada; `TestimonialsFull` (contentType `testimonials`) rinde 2 citas verbatim con el validador `testimonials-sourced`, que exige atribución nombrada + `proofLink` con `href`. El framing es honesto — relación y confianza, no resultados SEO.
+- El deck SKY pasa de 26 a 28 láminas: clientes y testimonios entran en el cluster de prueba social (berel → clientes → testimonios → seguro). Para las plantillas se internalizaron 7 logos; `sky.svg` migró a su versión dark + `viewBox` recortado y `aguas-andinas.svg` quedó desenmascarado (una máscara de luminancia vacía ocultaba el logo) + wordmark recoloreado.
+- Gates: suite Composer `223` verde, color-ledger + gradient-inventory verdes (recipes/tokens canónicos, cero HEX ni gradientes literales), visual-gate `--freeze` 61 frames a 0 píxeles (single-owner, ISSUE-122). Commit `297de0261`; delta canónico en [BASELINE_DELTAS.md](scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md) (§2026-07-15 · Deck SKY 26→28).
+
+## 2026-07-15 — `CoverFull` canonizada y deck SKY v6
+
+- La portada reusable conserva su lockup centrado de cuatro elementos y sube la jerarquía de marca: wordmark Efeonce de 650 a 840px, marca cliente on-dark nativa, tipo de propuesta y URL Bubble fija. La recipe `cover-hero` concentra un halo cyan/teal detrás del lockup y controla la presencia violeta sin recuperar el gradiente multicolor histórico.
+- `clientLogo` deja de depender de `filter: brightness/invert`: el contrato exige `native-on-dark` y el template preserva el color del asset. SKY suma `sky-on-dark.svg`, derivado de la geometría y el verde del SVG oficial; un test focal bloquea recoloración CSS y drift del asset.
+- Baseline promovido únicamente para `templates/CoverFull.png` y `sky/01-portada.png`: selftest y gate final pasan 57 frames con 0 píxeles; Composer 215/215 y typecheck limpio. Proposal Studio adjunta el PDF de 26 páginas como `deck` v6 `client_facing`; v5 y toda la historia anterior se conservan.
+
+## 2026-07-15 — Oferta económica: builder de Excel BRANDEADO reusable
+
+- Hay clientes que exigen Excel (documento integrante). El que se generaba era vago y SKY-hardcodeado. Ahora hay un **builder domain-free reusable** ([economic-offer-xlsx.mjs](scripts/commercial/lib/economic-offer-xlsx.mjs)): banda navy con el wordmark Efeonce (imagen embebida, se ve igual en todo lector), paleta AXIS (navy `#00345F` + teal `#36C8BF`), tabla con zebra + montos alineados, **bloque Neto/IVA/Total** destacado, formato CLP y **print setup A4** (fit-to-width + footer confidencial + página). Verificado con un proxy HTML fiel (salto de ~4/10 a ~8/10).
+- **`pnpm economica:build <caso>/economica.json`**: cada licitación es un `economica.json` (fuente única), el código no cambia. SKY migrado (`build-sky-economica-xlsx.mjs` → wrapper delgado; cifras a `economica.json`). `pnpm tender:new` ahora scaffoldea también el `economica.json`. Tercer artefacto de la familia productizado (deck ✓ · oferta técnica ✓ · económica ✓).
+- **Techo honesto de Excel:** las fuentes no se embeben en `.xlsx` (degradan a la del lector); brand pixel-perfect = PDF del composer, con el Excel como planilla editable. 🔴 NUNCA precio unitario por artículo (el schema no tiene ese campo). Antes de brandear libre, confirmar si las bases exigen SU planilla. Documentado en workspace template + skill de tenders (ambos namespaces).
+
+## 2026-07-15 — DSR interno / workspace del deal: cierre documental (triple capa + skills)
+
+- Documentación funcional: [digital-sales-room-y-workspace-del-deal.md](docs/documentation/comercial/digital-sales-room-y-workspace-del-deal.md) (las tres capas en lenguaje simple + el workspace + el manifiesto). Manual de uso: [armar-el-workspace-de-un-deal.md](docs/manual-de-uso/comercial/armar-el-workspace-de-un-deal.md) (paso a paso `pnpm tender:new` → oferta → deck → Proposal). Ambos registrados en sus índices.
+- Skills enganchadas (ambos namespaces `.claude`/`.codex`): **deck-studio** (de dónde viene el `deck-plan`: es una proyección de la oferta técnica, no se auto-genera; el manifiesto alimenta `artifact-showcase`/`highlight` por enlace), **tenders** SKILL.md (árbol de decisión + regla dura #9 del workspace), **bid-construction-playbook** (Fase 0 arranca con `pnpm tender:new`), **proposal-studio-runtime** (las dos capas: taller/carpeta git vs registro/aggregate). `propuesta-tecnica-economica` ya tenía la costura md→deck.
+
+## 2026-07-15 — Proposal Studio: plantilla reusable de stack de herramientas
+
+- El catálogo `deck-axis` suma `contentType: tool-stack` → `ToolStackFull`: lámina 16:9 reutilizable para mostrar herramientas como sistema operativo, no como pared de logos. La versión vigente usa flujo de cinco etapas (`stages[] -> tools[]`) y una `supportLayer` transversal para colaboración, comentarios, versionamiento, licencias y fuentes aprobadas.
+- El Artifact Composer ahora valida, sintetiza y llena colecciones anidadas dentro de slots `array`/`object`; esto queda como capacidad reusable del motor, no como excepción de `ToolStackFull`. Se agregó resolver cerrado `tool-logo-asset` y assets autocontenidos en el catálogo para Notion, Frame.io, Adobe suite, Microsoft 365, Semrush, Ahrefs, Brand Visibility Grader, Screaming Frog, bancos licenciados y suites AI. El resolver también declara placa de contraste `light|dark|brand-dark` para evitar isotipos claros sobre contenedores claros y permitir bases oscuras con acento de marca.
+- Se corrigió un bug del motor: resolvers dentro de arrays anidados en un `object` top-level generaban paths con punto inicial, por lo que el blueprint podía conservar el logo de ejemplo. `tool-stack-full.test.ts` cubre que `supportLayer.tools[]` resuelva isotipos distintos. También se retiró la línea decorativa que se cruzaba con la URL bubble.
+- Preview reusable: `docs/commercial/tenders/sky-blog-2026/reusable-slides/tool-stack-preview.json` (`pnpm deck:compose ... --out .captures/sky-tools-template`). Gates: Composer focal `96/96`, preview compuesto, deck SKY completo recompuesto, ESLint focal, `pnpm typecheck`, `task:lint TASK-1414`, `ops:lint --changed`, `docs:closure-check`, `git diff --check`.
+
+## 2026-07-15 — Proposal Studio: plantilla reusable de operación diaria
+
+- El catálogo `deck-axis` suma `contentType: daily-operations` → `DailyOpsHubFull`: una escena operativa única, con conversación Teams/Slack, artículo vivo en Notion, revisión visual en Frame.io y ruta de estados dentro del mismo workspace. El wordmark de Efeonce es señal de primer viewport dentro de la interfaz, no sólo firma de cierre.
+- La plantilla es slot-driven: cliente/canal, cadencia, artículo, responsables, keyword, intención, estructura, checklist, asset, comentarios y estado del ciclo cambian desde el DeckPlan. `daily-workflow-step-tone` y los ordinales derivados impiden autorar clases o numeración a mano; el test focal cubre logos, pines, estados y ausencia de SKY en el prototipo.
+- Preview reusable: `docs/commercial/tenders/sky-blog-2026/reusable-slides/daily-ops-preview.json` → `.captures/sky-daily-ops-template/01-daily-ops.png` + PDF. El inventario ratchet de gradientes incorpora `ToolStackFull` y `DailyOpsHubFull`; la documentación funcional/manual refleja 30 plantillas vigentes y diferencia `tool-stack` (con qué sistema), `daily-operations` (cómo se trabaja) y `process-sequential` (secuencia abstracta).
+- Aprobación visual recibida y baseline promovido para `templates/ToolStackFull.png` + `templates/DailyOpsHubFull.png`, con delta declarado y manifest sellado. Ambos frames nuevos compararon a cero píxeles en ese checkpoint. El gate global también detectó drift concurrente fuera de estos moldes (`sky/10-operacion`) y el selftest aisló 54 píxeles no deterministas en el borde de avatares; el cierre y su corrección raíz se documentan en la entrada de integración SKY v5.
+
+## 2026-07-15 — Proposal Studio: radiografía reusable del Content Hub
+
+- El catálogo `deck-axis` suma `contentType: content-hub-anatomy` → `ContentHubAnatomyFull`: una lámina 16:9 que abre un único artículo en corte, con research trazable como banda horizontal, respuesta editorial answer-first a sangre e inspector machine-readable lateral con metadata, schema y QA SEO/AEO. No repite el workspace de tres paneles de `DailyOpsHubFull`: aquella explica cómo se colabora; ésta demuestra qué contiene el entregable.
+- El contrato es domain-free y slot-driven: pregunta de negocio, keyword, intención, clusters, fuentes, título, respuesta directa, tres secciones, comentario, metadata, tipos de schema y cuatro checks cambian por `DeckPlan`. Los resolvers `content-anatomy-cluster-strength`, `content-anatomy-check-tone` y `content-anatomy-layer-tone` derivan geometría y estado; el prototipo no contiene SKY ni la keyword del preview.
+- Preview SKY: `docs/commercial/tenders/sky-blog-2026/reusable-slides/content-hub-anatomy-preview.json` → `.captures/sky-content-hub-anatomy-template/01-content-hub-anatomy.png` + PDF. El inventario ratchet declara sus cinco gradientes tokenizados. El catálogo queda en 31 plantillas; la entrada SKY v5 documenta su integración y canonización final.
+
+## 2026-07-15 — SKY: integración operativa y deck v5 versionado
+
+- `deck-plan.json` integra `ToolStackFull`, `DailyOpsHubFull` y `ContentHubAnatomyFull` en las páginas 11, 13 y 17. La Radiografía AEO existente queda inmediatamente después, en la 18, con el mismo enlace vivo. El derivado vigente tiene 26 páginas, 12.2 MB y 11 enlaces (6 internos + 5 externos).
+- Proposal Studio adjuntó el PDF como artefacto `deck` v5, `client_facing` y `draft`; el número se derivó en transacción y v1-v4 permanecen disponibles. No se activó un render-job apagado ni se reemplazó el historial.
+- El visual selftest detectó no determinismo real en `TeamGalleryFull` por anchos fraccionales y clipping de radios. La causa raíz se corrigió antes de sellar el baseline: 57 frames comparan a 0 píxeles y el Composer pasa 213/213. TASK-1414 queda completa; Wherex continúa como acción humana de revisión, carga y firma.
+
+## 2026-07-15 — DSR interno: workspace canónico del deal + scaffolder + manifiesto de artefactos
+
+- Se canoniza el **workspace del deal** (el "DSR interno", F0 del Digital Sales Room): estructura de carpeta estándar + **`pnpm tender:new <slug>`** que la scaffoldea (`bases/` RFP · `research/` investigación INTERNA · `oferta-tecnica.md` copiada del template · `deck-plan.json` · `anexos/` · `*-INTERNO`). Contrato: [TENDER_WORKSPACE_TEMPLATE.md](docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md).
+- **`artifact-manifest.json`** ([schema](docs/commercial/tenders/ARTIFACT_MANIFEST_SCHEMA.md)): SSOT de las piezas VIVAS del deal (Radiografía AEO, informe del Grader) por **enlace, nunca captura** (`render: by_link`). Ata el ledger de evidencia (un run del Grader es fuente reproducible) + el deck (`artifact-showcase`/`highlight` las referencian) + el DSR externo futuro.
+- **Framing de tres capas** (refinamiento del operador) grabado en el ADR: (1) taller/fuentes = la carpeta git · (2) registro gobernado = el aggregate `Proposal` (la `Proposal` **es** el contenedor, no un doc adentro) · (3) DSR externo = proyección al comprador. **Decisión horneada:** las fuentes (`.md`, `deck-plan.json`) se quedan como archivos git, NO `proposal_assets` (conservan git-review; el composer las lee directo; el aggregate referencia por `proposal_id`; reversible). F0 redefinido a "workspace interno primero" (✅ hecho); la sala del comprador pasa a F1.
+
+## 2026-07-15 — Método: la oferta técnica se itera en Markdown y el deck es su proyección
+
+- Se canoniza como plantilla lo que el caso SKY ya hizo a mano: **[TECHNICAL_OFFER_TEMPLATE.md](docs/commercial/tenders/TECHNICAL_OFFER_TEMPLATE.md)** — la oferta técnica se escribe/itera (idea, investigación, evidencia, narrativa) en un `.md` con taxonomía canónica (15 secciones destiladas de SKY), y el deck se compone **desde** ahí.
+- **Regla híbrida:** secciones = GUÍA (cada RFP ordena hacia sus criterios ponderados); evidencia = CONTRATO — toda cifra vive primero en el «Ledger de evidencia» (Zona 0) con fuente googleable + as-of, mapeable 1:1 a `proposal_evidence` y al gate `missing_evidence_ref` del composer, pero atrapado antes. El deck **NO** auto-deriva: SSOT del deck = los slots del `deck-plan.json`; el `.md` es la fuente narrativa+evidencia; el autor/agente construye el plan DESDE la oferta (propose→confirm) con el mapa sección→contentType de la Zona 2.
+- Costura documentada en la skill `greenhouse-public-private-tenders` → `propuesta-tecnica-economica.md` (ambos namespaces `.claude`/`.codex`). Familia de tres: técnica (esta plantilla) · económica (`pricing-garantias-finance.md` + Excel) · administrativa (`compliance-riesgo-integridad.md`).
+
+## 2026-07-15 — Digital Sales Room (Sala de Ventas): decisión de arquitectura + spec (Proposed, deferred)
+
+- Tras comparar con Trumpet, se documenta la **Sala de Ventas Digital**: un micrositio por deal servido al comprador que reemplaza el PDF estático de una `Proposal` por una superficie viva, versionada y trackeable. La tesis: es **`quote-share` generalizado** de un PDF de cotización a una sala completa de `Proposal` — el repo ya tiene las 3 piezas (token HMAC + `quote_share_views` append-only + página pública `/public/quote/.../[token]`, el modelo headless `render-projection.ts`, y el audience gate del Proposal Studio); la sala las **combina**, no las inventa.
+- Docs nuevos: [GREENHOUSE_DIGITAL_SALES_ROOM_DECISION_V1.md](docs/architecture/GREENHOUSE_DIGITAL_SALES_ROOM_DECISION_V1.md) (decisión + alternativas rechazadas + 4-pilar) + [GREENHOUSE_DIGITAL_SALES_ROOM_ARCHITECTURE_V1.md](docs/architecture/GREENHOUSE_DIGITAL_SALES_ROOM_ARCHITECTURE_V1.md) (split, schema propuesto, carril por token, tracking, capabilities, roadmap F0-F4); registrado en `DECISIONS_INDEX.md`.
+- **Estado: `Proposed (direction endorsed, implementation deferred)` — cero runtime, cero schema, cero task.** Build-vs-buy Trumpet queda como open question honesta. Brecha real identificada: el acceso del comprador necesita un carril por token nuevo (el gate de sesión `canAccessProposalDocument` niega `client`). No autoriza `apps/*`/`packages/*` ni implementación hasta un EPIC formal.
+
+## 2026-07-15 — Preflight Kinsta SSH/WP-CLI resistente a Vercel
+
+- Se agrega `pnpm public-website:ssh-check`, smoke read-only que valida configuración, llave, autenticación SSH y el WordPress esperado antes de operar Kinsta.
+- Los entrypoints del sitio público cargan primero `.env.public-website.local`, aislando la metadata SSH de `.env.local`, que Vercel CLI puede regenerar.
+- `public-website:runtime-status.v2` separa explícitamente Kinsta API de SSH/WP-CLI; la ausencia del API token ya no puede interpretarse como caída de SSH.
+- `AGENTS.md`, `CLAUDE.md` y las skills espejo WordPress enrutan al nuevo contrato cross-agent y su árbol de diagnóstico.
+
+## 2026-07-15 — Roadmap cockpit sale del runtime del portal
+
+- Se deshabilito `/roadmap` y `GET /api/roadmap/work-items*`: el menu ya no ofrece el cockpit y los endpoints preservan auth/capability pero responden `410 roadmap_disabled`.
+- `next.config.ts` deja de bundlear `docs/{epics,tasks,mini-tasks,issues}/**/*.md` con `outputFileTracingIncludes`. El reader filesystem de TASK-1152/1153 queda como referencia historica fuera del grafo vivo.
+- Motivo: el modulo tenia bajo uso y disparaba el warning Turbopack de patron dinamico amplio, trazando decenas de miles de archivos durante build. La solucion futura debe mover el indice a una herramienta externa/materializada/local-first, no volver a leer `docs/**` desde el runtime del portal.
+
+## 2026-07-15 — El primer blogpost agentic end to end se convierte en canon operativo
+
+- La Pillar publicada recibe su pasada final de lectura: `99` énfasis `<strong>` distribuidos por todo el
+  artículo y una sección metodológica reescrita en tres párrafos conversacionales. Content Factory incorpora
+  `strong?: boolean` en rich text estructurado para intro, párrafos, listas y CTA, con tests para énfasis, links
+  y su combinación; QA live pasó en `1440x1000` y `390x844`.
+- La voz de Julio formaliza la firma visual de su running motif: toda activación visible de `con manzanitas` o
+  su familia lleva exactamente `🍏🍏🍏` antes de la puntuación. La regla vive en los mirrors de `copywriting`,
+  el authoring agentic y el context pack; no se extiende a Efeonce institucional ni a menciones documentales.
+- Creative Workflows gana una escalera de madurez gobernada: `Pillar -> satélites -> ebook/workbook -> tool
+  diagnóstica -> Creative Studio`. El nuevo `CREATIVE_WORKFLOWS_KNOWLEDGE_TO_PRODUCT_LADDER_V1.md` define el
+  trabajo, evidencia y gate de cada capa; propone el ebook como método enseñable y un eventual `Creative
+  Workflow Opportunity Mapper` como diagnóstico, sin autorizar runtime ni confundir autoridad editorial con
+  evidencia de producto. PDR-014, brief, roadmap, retrospectiva y `content-marketing-studio` quedaron conectados.
+- Creative Workflows deja dos sources of truth distintos: `CREATIVE_WORKFLOWS_AGENTIC_END_TO_END_RETROSPECTIVE_V1.md` conserva V1→V4, decisiones, incidentes, métricas, artefactos y residuos; `AGENTIC_BLOGPOST_END_TO_END_RUNBOOK_V1.md` define el proceso reusable desde research hasta publicación y cierre.
+- El contrato de Public Site queda corregido: Content Factory conserva dry/private por defecto y `run --send` no publica; un agente puede ejecutar después `private → publish` solo con autorización humana explícita, snapshot, rollback fail-closed, cache/readback y QA live desktop/mobile.
+- Skills WordPress, SEO/AEO, copywriting y Content Marketing reciben referencias cargables para publicación, E-E-A-T, autoría/voz y sistema visual. `AGENTS.md`, `CLAUDE.md`, PDR-014, arquitectura del skill router, docs funcionales, manuales e índices enlazan el canon sin convertir el artículo en product spec de Creative Studio.
+
+## 2026-07-15 — Creative Workflows V4 incorpora evidencia, experiencia y transparencia E-E-A-T
+
+- La Pillar `251363` suma fuentes primarias inline con tamaño de muestra y límites, evidencia de mercado Adobe/Advanis y Asana/GWI, resultados experimentales de Doshi/Hauser y Grinschgl, y el estudio correlacional de Chen et al. La sección SKY aporta `178` piezas, cinco mercados y una reducción observada de `21–25%` con caveat explícito de caso no controlado.
+- Se incorporaron autoría, límites de la guía, disclosure del uso de IA y bibliografía contextual. WP-CLI corrigió la entidad Yoast de Julio: Instagram, cargo, `worksFor=Efeonce Group`, `knowsAbout`, title y descripción, con snapshot de rollback.
+- Content Factory ahora renderiza enlaces inline y énfasis semántico seguros desde segmentos estructurados. La V4 pasó con 111 bloques, tres imágenes, 39 enlaces y cero findings; se publicó en `https://efeoncepro.com/creative/creative-workflows/` con canonical único, `index, follow`, CTA final gobernado, Open Graph y render desktop/mobile verificados.
+
+## 2026-07-15 — Creative Workflows V3 suma sistema visual y voz autoral de Julio
+
+- GPT Image 2 produjo el sistema editorial `La señal seleccionada`: cuatro masters, cinco WebP y un JPEG social; WordPress conserva los WebP `251365–251368` y usa `251370` como featured/OG JPEG con ALT/caption. La V3 pasó Content Factory con 101 bloques y cero findings y quedó aplicada al post privado `251363`: tres `core/image`, categoría Creative, extracto, focus keyphrase, meta title separado del H1, meta description y Open Graph/schema verificados. Ese corte `private`, `noindex, follow` y anónimo `404` queda preservado como snapshot histórico; V4 lo supersede con publicación y QA live.
+- La skill espejo `copywriting` registra `JULIO_REYES_VOICE_SYSTEM.md` y un router explícito Julio/Efeonce. Marketing con Manzanitas y piezas firmadas usan voz Julio; UI, landings, producto y copy institucional usan Efeonce. `con manzanitas` / `te lo explico con manitas` quedan protegidos como motivos personales, no como tono corporativo genérico.
+
+## 2026-07-15 — Radiografía AEO: playbook comercial + cadena Grader→demo→propuesta
+
+- La Radiografía AEO queda documentada en Greenhouse como herramienta de **educación** y **sales enablement** SEO/AEO, no solo como muestra del caso SKY. Nuevo manual: `docs/manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md`, con demo de 5 minutos, objeciones, follow-up, uso en Proposal Studio y límites de promesa.
+- Docs comerciales, Growth y Think ahora explican la cadena **AI Visibility Grader diagnostica → Radiografía demuestra → propuesta/deck convierte → servicio opera**. Licitaciones ganan un paso propio para usar la Radiografía como evidencia `client_facing` cuando el enlace puede viajar al comité.
+- Skills sincronizadas: `seo-aeo` conoce la Radiografía como demostración del oficio; `seo-aeo-practice` la opera comercialmente; `greenhouse-public-private-tenders` agrega Fase 4-ter; routers `AGENTS.md`/`CLAUDE.md` corrigen ownership (`seo-aeo` oficio, `seo-aeo-practice` sales enablement).
+
+## 2026-07-15 — Proposal Studio llega al portal: Propuestas con versiones y descarga (TASK-1413)
+
+- **`/admin/commercial/proposals`** (Administración → Propuestas): tabla operator-view con estados de la state machine (el terminal resuelto por origin — una venta directa no se «adjudica»), deadline risk en rojo con tooltip de deadline asumido, filtros por estado y contador de artefactos; **sidecar temporary** (Drawer full-width en mobile, overlay con scrim en desktop) con el historial de versiones por artefacto (chips Vigente/Interno) y **descarga del archivo real** por anchor nativo al endpoint gobernado de TASK-1412 — la UI jamás conoce URLs de storage. Deep-link `?proposal=` abre el panel directo.
+- Gobernanza completa en el mismo PR: viewCode `administracion.commercial_proposals` + seed a `efeonce_admin`/`efeonce_account` (NUNCA `client_*`), nav `GH_INTERNAL_NAV`, reachability 219/0, copy `GH_PROPOSALS` es-CL. **Matriz de acceso verificada en runtime**: persona client → página 307→`/401`, API 403, download interno 403; superadmin → PDF real de SKY 200 (5,5 MB). GVC desktop+mobile en loop con frames mirados (3 fixes: sidecar temporary, `includeClosed=true` — con `=1` los estados cerrados se caían en silencio —, metadata legible); scenarios committeados. Gates: 9497 tests + build prod + task:lint 0/0. Manual: `docs/manual-de-uso/comercial/descargar-propuestas-portal.md`. Con esto **ver dónde está una propuesta y bajarla ya no depende de escribirle a un agente.**
+
+## 2026-07-15 — Creative Workflows nace como territorio editorial Pillar + cluster
+
+- PDR-014 separa los trabajos del sistema: la Pillar educa y crea categoría, los satélites profundizan intenciones independientes, la landing Agencia Creativa convierte y Creative Studio permanece como arquitectura futura sin promesa de disponibilidad.
+- El brief maestro fija la tesis **“un sistema de decisiones creativas humanas vuelto ejecutable”**, la estructura de la Pillar y 12 satélites en tres olas, además de enlaces, evidencia, CTA, medición, atomización y flujo de producción.
+- El dossier de publicación registra la muestra SERP, cinco claims científicos con sus límites, evidencia primaria de mercado y claims prohibidos; no inventa volúmenes ni convierte neurociencia en prueba del producto.
+- Content Factory validó la `GutenbergArticleSpec` y creó el post WordPress `251363` como privado, autor `1`, manifest idempotente `greenhouse-cf-creative-workflows-pillar-v1`. Ese readback inicial confirmó 75 bloques gobernados, TOC, 20 headings, metadata SEO y acceso anónimo `404`; queda como evidencia histórica del draft antes de V2-V4.
+- En ese corte el estado editorial era listo para redactar en privado, no para publicar. Keyword/intent/SERP, taxonomía y canonical único entre WordPress y Think quedaron como gates explícitos; V4 los cerró y el roadmap público y PDR-004 permanecen conectados.
+- Frontera reforzada: este trabajo crea soporte científico/editorial para Creative Studio futuro; no implementa workflows ni convierte artículos, diagramas o templates conceptuales en product specs o tasks. La ejecución operativa permanece exclusivamente bajo RESEARCH-009, arquitectura vigente y EPIC-028 en el repositorio de Creative Studio.
+
+## 2026-07-14 — Proposal Studio: la versión se deriva y la descarga es gobernada (TASK-1412)
+
+- `attachProposalAsset` deriva la versión (MAX+1 por proposal+kind, misma tx; FOR UPDATE serializa + índice único `(proposal_id, kind, version)` como cinturón) y el campo `version` desaparece del input público — el `artifact-worker` ya llamaba attach con el PDF del render, así que el pipeline completo quedó versionado sin tocarlo. Migración con renumeración determinista de duplicados + DO guard, aplicada en dev.
+- Reader `readProposalArtifactVersions` (historial por kind, `current`, CERO URLs de storage) + `GET /assets/versions` + `GET /assets/[proposalAssetId]/download` con stream vía `downloadPrivateAsset` (gate único + capability `read` + audience gate: un `internal` jamás cruza a un principal client). Gates: módulo 68/68 · full 9497 · build prod limpio. **TASK-1413 (la superficie) desbloqueada.**
+
+## 2026-07-14 — Licitación SKY: la oferta completa iterada + el composer gana enlaces, anti-fuga y hooks con plan
+
+- **Oferta técnica reescrita** (SEO primero — es lo que piden las Bases; el AEO entra como la segunda conversación del mismo hallazgo): cifras del run publicado `EO-GRUN-00046` (el claim «0 citas» que el informe público contradecía → **«citabilidad propia 0%»**, dato publicado), diagnóstico técnico verificado en vivo sobre `blog.skyairline.com` (sin plugin SEO, sin meta description, cero schema, robots.txt 404), método con forma (base técnica → autoridad temática → E-E-A-T), §5 «qué compra el valor mensual», §14 riesgos con cobertura, matriz de cumplimiento movida a anexo, los 9 SLA completos y las 2 piezas vivas enlazadas (Radiografía + informe). **Económica reescrita a capacidad** (cero precio unitario: el ad-hoc de 260k dominaba al plan ampliado — bugs de `04_PRICING` §6 cerrados); el Excel ahora se **genera** (`scripts/commercial/build-sky-economica-xlsx.mjs`). Piso de negociación recalculado a 2 años sin reajuste: **≈ CLP 5,0M** (carta BAFO interna: 6 piezas a 4,3M).
+- **Deck 19 → 23 láminas** por el Artifact Composer: lámina `citas` muerta (contradecía el informe), `near-miss` (4 páginas atascadas), `capa-tecnica`, `informe` y `muestra` como **showcases de las piezas vivas** (capturas reales con chrome de navegador y URL horneada), escalera con el vocabulario del informe, agenda con **números de página derivados del plan**, equipo con **fotos reales** (mapeo confirmado por el operador; María Fernanda entra, Valentina sale), Grupo Berel con nombre autorizado, penalidades como statement, económica sin unitario.
+- **Motor (artifact-composer), 4 capacidades domain-free**: (1) `<a href>` `https://` en rich-slots → **anotaciones `/Link` reales en el PDF** — eran dos bugs: el sanitizador no admitía `A` y `copyPages` de pdf-lib **descarta** anotaciones al fusionar (medido; el merge ahora las re-crea; verificación vía API, nunca grep — object streams); (2) **anti-fuga de prototipo**: slot opcional no provisto se limpia (el copy «Propuesta técnica · SKY» ya no puede viajar a la licitación del siguiente cliente) + guard de 28 probes required-only; (3) `CatalogLayoutHook` recibe `deckPlan` (páginas de agenda derivadas, nunca autoradas); (4) catálogo a **28 plantillas**: `TeamGalleryFull` (fotos reales vía resolver `squad-person` con allowlist cerrada — una cara IA no puede entrar) y resolver `dual-concept-icon`.
+- **Gates**: vitest 195/195 · visual gate **51 frames a 0 píxeles** (2 promociones declaradas en `BASELINE_DELTAS.md` con shasum de renombres 18/18 + 6/7) · typecheck limpio · PDF con 4 `/URI` vivas. Docs: invariantes (§Delta 2026-07-14), README/SESSION-BRIEF del bid, skills `greenhouse-public-private-tenders` y `deck-studio` (ambos namespaces). **Pendiente humano: subir a Wherex (cierra 15/07).**
+
+## 2026-07-14 — Creative Studio: un producto, tres modos operativos
+
+- RESEARCH-009, la ADR/arquitectura objetivo y EPIC-028 definen una experiencia creative-native: el equipo trabaja con brief, referencias, variantes, rechazos y aprobación; el sistema compila el workflow y reserva el DAG para authoring avanzado.
+- `efeonce-managed`, `co-operated` y `client-operated` comparten run, assets, lineage, review y ledger. Cada corrida identifica operador, aprobadores y owners; la autonomía aumenta cuando bajan incertidumbre/riesgo y el escalamiento conserva contexto.
+- Context pack, PDR-004, documentación funcional/manual y skills espejo Codex/Claude aclaran que los modos no crean una quinta modalidad ni convierten client-operated en Managed Squad barato. El acceso cliente continúa pendiente de EPIC-028.
+
+## 2026-07-14 — Radiografía AEO: ④ artifact-first + iconografía funcional
+
+- La pantalla `Dónde más vive` en `efeonce-think` deja de abrir como tres cards explicativas y pasa a demostrar repurposing: línea de sangre visual `Artículo original → video / social / imágenes`, iconografía funcional de canal y artefactos primero.
+- Cada átomo muestra su hábitat antes de la métrica: video con thumbnail + guion/transcripción, social como mockup de feed y set de imágenes como pack visual con ALT. La cifra queda como prueba con fuente/as-of.
+- Verificación local: `pnpm build`, `pnpm verify:aeo-xray` (`46/46`), `pnpm verify:aeo-xray:scenarios` (`2/2`), `git diff --check`; capturas revisadas en `/tmp/aeo-atomizacion-repurpose-20260714/`. Push publicado a `efeonce-think` `main` (`64e42b2`); Vercel Production `Ready` (`dpl_6RJePVjNMiVcXJsreHZRg8vWkeMU`). Smoke live: cuatro pantallas `200`, sin JSON-LD, `noindex`, rótulo visible; ④ sin overflow en 1440/390, línea de sangre + social visibles e iconografía renderizada.
+
+## 2026-07-14 — Radiografía AEO: hardening de reusabilidad, atomización y docs
+
+- **El gate dejó de ser un test de SKY.** En `efeonce-think`, `verify:aeo-xray` ya no hardcodea `capsule-main`, `img-hero`, `h2-como-llegar`, `table-entradas`, `faq` ni `h1`: deriva los escenarios desde el payload por rol de bloque. Se agregó `pnpm verify:aeo-xray:scenarios` con una fixture no publicada de clínica dental para probar que el selector funciona con IDs distintos sin publicar una segunda muestra.
+- **La línea de sangre de los átomos ahora rompe el build.** `src/content.config.ts` valida que cada `atoms[].coupleId` exista en `article.blocks[]`; un átomo que apunte a un bloque renombrado ya no puede cerrar la ④ con genealogía falsa.
+- **Capturas de lámina menos frágiles.** Los frames `slide-oficio` y `slide-competencia` se posicionan desde el bloque acoplado, no desde offsets manuales; `slide-oficio` vuelve a mostrar H1 + cápsula sin recorte. Evidencia local: `pnpm build`, `pnpm verify:aeo-xray` **46/46**, `pnpm verify:aeo-xray:scenarios` **2/2**, `pnpm read:aeo-xray sky-carretera-austral`. `pnpm type-check` sigue rojo por deuda previa de Astro/Zod en `src/content.config.ts`.
+- **Docs sincronizadas.** Arquitectura, manual, doc comercial, routers (`AGENTS.md`, `CLAUDE.md`, `project_context.md`), task/wireframe e handoff dejan de fijar cifras congeladas de invariantes, cambian el color del instrumento a tokens AXIS y separan fixture técnica de segundo cliente vs. segundo payload comercial real.
+
+## 2026-07-14 — Radiografía AEO product/design iteration + push Think
+
+- La muestra de trabajo en `efeonce-think` recibió ajustes UI sobre sus cuatro pantallas: CTA integrado en ①, ③ móvil article-first con hoja inferior bajo demanda, riel móvil que centra el paso activo y ④ con pieza social protagonista.
+- La solución mantiene el motor payload-driven: sin condiciones por cliente, sin cambios de payload y con `class="atom"` exacto preservado para los gates. El destacado usa `data-featured`.
+- Verificación local: `pnpm build`, `pnpm verify:aeo-xray` (`46/46`) y `pnpm verify:aeo-xray:scenarios` (`2/2`).
+- Push publicado a `efeonce-think` `main` (`7113c34`); Vercel Production `Ready` (`dpl_5mPZLmAR7uZrpy5MvV8shPaBuvgC`). Smoke live: cuatro pantallas sin JSON-LD, `noindex`, `/muestras/` fuera del sitemap, rótulo visible y `overflow=0` en 1440/390.
+
+## 2026-07-14 — Radiografía AEO: la auditoría de seis lentes (3 de 6 cifras no resistían verificación)
+
+- **🔴 De las 6 cifras que la pieza exhibía, 3 no aguantaban que el comité las googleara** — en la pieza cuyo valor ENTERO es no exagerar. **La fuente del `16%` NO EXISTÍA con el nombre publicado** (se sintetizaron dos datasets: el dato es de Bluefish vía Adweek, los 6,1M de citas son de Goodie AI, son 4 firmas). El **`2,3×` era el `+41%` otra vez**: Nectiv midió una **prevalencia entre corpus** (30% vs 13%), no un lift — y la lista numerada **se le había agregado**. El **`72,4%`** iba sin citar y es un **base rate sin grupo de control**. El `28%` no tenía fuente → cortado. **Hueco estructural:** el schema no exigía `source` en `machine.craft[].stat`, donde viven los números grandes → la ③, la pantalla del rigor, era la única donde las cifras flotaban. Cerrado con un `superRefine` en la raíz que **rompe el build**.
+- **🔴 El fallo de accesibilidad estaba en la línea que PRUEBA el cumplimiento**: el crédito de foto daba 3,3:1 (WCAG pide 4,5:1) — y el crédito visible **es** la demostración del requisito 5 de las bases.
+- **🔴 El modo enfoque volvía la capa de máquina inusable con teclado**: el panel **se colapsaba a sí mismo** y expulsaba al usuario. Y el botón de salida **se borraba bajo su propio foco**. El acoplamiento nace en el ARTÍCULO y viaja al instrumento — **nunca al revés**. Los bloques pasan a ser **`<button>` reales** (rol + nombre + `aria-controls`), y sin JS **la afordancia ya no miente**.
+- **🔴 El argumento se leía a 13px** (el mismo error de densidad que la pieza ya había diagnosticado y arreglado **solo en el artículo**), **el bloque tocado era indistinguible del que está en reposo** (misma declaración CSS), **la ③ no tenía titular** y el `thesis` estaba **muerto en el payload**, y **el recorrido moría en la ④** → ahora cierra con *«Compruébelo usted»* + tres verificaciones (⚠️ Schema.org, **nunca** el Rich Results Test).
+- **🔴 El motor era reutilizable en el papel: cadenas de SKY vivían en el CÓDIGO** (el `flow` era dato y el render un switch de literales — **un step renombrado servía una página en blanco, sin ruido**; la **tipografía del cliente vivía en el CSS**, y el gate exigía literalmente `Assistant`: era el **test de regresión de SKY, no el del motor**). ✅ **Refinado con fixture no publicada de segundo cliente:** una clínica dental prueba IDs distintos sin tocar código; el segundo payload comercial real sigue como follow-up operativo.
+- **🟢 Upside:** entity linking al Knowledge Graph (Wikidata), `Organization` → `Airline`, nodo `WebPage` (había dos referencias colgantes), `FAQPage` marcando las 5 preguntas visibles.
+- Gate: **46/46**. Invariantes **13-17**. Live en `https://think.efeoncepro.com/muestras/sky-carretera-austral-861c18cc0e37`.
+
+## 2026-07-14 — Radiografía AEO: es una CAPACIDAD (educa + vende), y el instrumento no enfocaba
+
+- **🔴 Reencuadre: no es un anexo del bid de SKY, es una capacidad con DOS trabajos.** *(1)* **Educación** de cliente y **potencial** cliente — casi nadie entiende qué significa "aparecer en ChatGPT" (lo confunde con SEO o lo cree magia), y la pieza enseña la diferencia **sin una lámina de teoría**; sirve **sin venta en curso** (educar un prospecto, retener explicándole a un cliente vigente qué le hacemos). *(2)* **Habilitación de ventas** — enlace + lámina de deck + demo en vivo + prueba que el comité **verifica solo**. Consecuencia de diseño: **la pieza tiene que sostenerse sola**, sin nuestra oferta al lado y sin que el lector sepa SEO. Doc funcional nueva: `docs/documentation/comercial/radiografia-aeo-muestra-de-trabajo.md`. **Cero skills la conocían** — ahora la conocen `seo-aeo` (oficio/schema/citabilidad), `seo-aeo-practice` (uso comercial/sales enablement), `greenhouse-public-private-tenders` (consumer), `commercial-expert` (la vende) y el overlay de `astro` (donde vive el runtime), en ambos namespaces.
+- **🔴 El instrumento ATENUABA pero no ENFOCABA — de 51 datos prometidos, 44 no se veían NUNCA.** Medido sobre los 22 bloques acoplables: el `h1` prometía **11 y mostraba 0**; el `faq`, 5 y 0. La causa era de **arquitectura de información**: el panel se ordena **por familia** (Metadatos · Estructura · Evidencia) pero al tocar un bloque la pregunta es *"¿qué produce ESTO?"* — **por productor**; los datos de un bloque **nunca son contiguos**. El código atenuaba lo demás y scrolleaba al **primer match**, casi siempre el más tautológico (*"tu H2 está en la lista de H2"*): para quien no sabe SEO, **no pasaba nada**. Ahora el instrumento tiene **dos modos** — **MAPA** al llegar (el panel entero: el argumento de masa) y **ENFOQUE** al interrogar (colapsa a lo que ese bloque produce, y nada más). Resultado: **44 → 7** invisibles; 21 de 22 bloques muestran el 100%. Asserts **11b/11c** (cero ruido ajeno · el header declara la cuenta exacta del chip). Invariante **12b**: *atenuar no es enfocar*.
+- **🔴 La coherencia tampoco es propiedad del ARTÍCULO: la prosa vive en TRES capas.** El «tres transbordadores» se corrigió en el artículo y sobrevivió en **seis** lugares (meta description, `BlogPosting`, y título/descripción/guion/`VideoObject` del video). En la ③ quedaban **lado a lado**: la cápsula decía dos, la meta description decía tres. `read:aeo-xray` solo leía el artículo — ahora imprime también la capa de máquina y los átomos.
+- **La muestra se defiende sola** (invariante **12c**): la ④ abría con *"Nuestra oferta dice, textual…"* (le hablaba al comité sobre **nuestro PDF**) y el reemplazo seguía enfermo (*"cada pieza de abajo…"* **narra la interfaz**). La línea: hablar del artefacto **para ser honesto** ✅ (el disclaimer, el schema no emitido); **narrarlo** ❌. Assert **34b**.
+- **Otros:** `og:image` apuntaba al hero viejo y a NUESTRA ruta, contradiciendo al `ImageObject` acoplado al mismo bloque · la ④ afirmaba 3 cifras con **cero citas** (`source`+`asOf` ahora obligatorios en el schema del átomo, assert 42b) · el FAQ era la única sección que renderizaba como `<p>`, sin ancla y fuera del índice · la marca de SKY se escapaba del mockup social y **firmaba nuestro disclaimer**.
+- **Deck SKY: 15 → 16 láminas.** Entra `12-muestra` (`contentType: highlight`) tras `11-seo-aeo`: la 11 declara la capacidad AEO, la 12 la **prueba** con la URL viva. **Va por enlace, no por captura** — el catálogo del composer no tiene plantilla para capturas de UI, y la pieza es **interactiva**: un PNG estático mata justo lo que demuestra. Visual-gate en **CERO píxeles** (41 frames). *Follow-up: falta una plantilla de artifact showcase.*
+- Gate: **46/46**. Live en `https://think.efeoncepro.com/muestras/sky-carretera-austral-861c18cc0e37`.
+
+## 2026-07-14 — Radiografía AEO: pulido en vivo (tipografía · color · fotografía · voz · frontera ②/③)
+
+- **🔴 Un `@font-face` que falta no falla: sustituye.** La ruta `/muestras` pedía Poppins 600/700 y nunca importó ninguno de los dos (solo heredaba los 800/900i del slogan). El matching de CSS busca hacia arriba y **sustituye**: las 4 pantallas se dibujaban en ExtraBold mientras el CSS decía 600. Nada falló — el 800 es un cut real, así que se veía "pesado pero bien dibujado". Sistema de pesos con rol + compensación óptica (titulares ≥40px a 500). Asserts 36-37 comparan el peso **computado por el navegador**, no el declarado.
+- **El navy sale de AXIS, no de un hex a ojo.** `#001a33` no existe en la marca: el navy de Efeonce es el peldaño **800/900 de la rampa del acento**. De 24 hex crudos quedan la rampa AXIS y el blanco.
+- **El mockup usa la tipografía del cliente (SKY → Assistant).** Ponerle Poppins muestra un resultado que el cliente nunca vería. Frontera dura (`.xr-article`) + asserts 38-39 en ambos sentidos.
+- **Fotografía licenciada de Shutterstock + todas las imágenes a 16:9.** El hero estaba en `21/9` — sacar esa franja de una foto 3:2 tira el 60% del alto. 4 fotos licenciadas (94/100). 🔴 **Verificar contra la `description`, nunca contra las keywords**: una foto de la **Ruta 40 de Argentina** pasó la búsqueda de "Carretera Austral" porque traía `carretera` y `chile` entre sus keywords; de 13 candidatos, 9 eran de otra región o país. Capability formalizada en `TASK-1411`.
+- **🔴 La coherencia argumental no es una propiedad estructural.** El gate dio 40/40 con un artículo que se contradecía a sí mismo en **siete** puntos. Nuevo `pnpm read:aeo-xray` (obligatorio): imprime cada párrafo del narrador pegado a su cápsula. No verifica — **hace que la contradicción salte a la vista**.
+- **La voz del artículo: dos capas.** La cápsula responde; el párrafo cuenta lo que la respuesta no dice. **La cápsula puede ser el hook** (answer-first ≠ voz de diccionario). StoryBrand: el lector es el héroe, el artículo es el guía. + índice con anclas derivado de los H2 (drift imposible por construcción).
+- **La ② muestra lo que ve el lector; la ③ muestra el trabajo.** Fuera de la ②: rótulos, **recuadros** de cápsula y pie de licencias. No cuesta nada en AEO — el motor lee el texto, no el CSS. Y **4 de las 6 cápsulas eran huérfanas**: acoplables sin contraparte, se iluminaban contra la nada. Asserts 40-41 (huérfanos y fantasmas).
+- Gate: **42/42**. Vive en `https://think.efeoncepro.com/muestras/sky-carretera-austral-861c18cc0e37`.
+
 ## 2026-07-14
+
+- **Repo hygiene — `develop` divergido reconciliado en rama segura.** Se creó backup `codex/safety-develop-diverged-20260714-ff4877` y rama candidata `codex/reconcile-develop-20260714` desde `origin/develop`; se preservaron los hotfixes productivos remotos de TASK-1373, se re-aplicaron los commits locales AEO/SKY/TASK-1410/TASK-1411 no duplicados y se combinó el rollout documental de Hiring Activation Production ON. Push autorizado tras revisión final del operador.
+
+- **Hiring Activation PRODUCTION ON — handoff + bridge interno activados.** `HIRING_HANDOFF_BRIDGES_ENABLED` y `HIRING_ACTIVATION_ENABLED` quedaron ON en Vercel Production con valor exacto `"true"` y redeploy `dpl_Grm71rLhwyyURq9ar7jf87i7DGzF` Ready en `https://greenhouse.efeoncepro.com`. El primer add dejó `"true\n"` y el smoke devolvió `enabled:false`; se corrigió removiendo/recreando las vars sin newline y redeployando. Smoke autenticado: `GET /api/hr/hiring-activation?limit=5` -> `HTTP 200 { enabled:true, items:[] }`; command no-mutante inexistente -> `404 hiring_activation_not_found`, no disabled. `HIRING_HANDOFF_BRIDGES_ENABLED=true` también quedó en Cloud Run `ops-worker-00488-fvl` y declarado en `services/ops-worker/deploy.sh` para persistir futuros deploys.
 
 - **TASK-1373 PRODUCTION HOTFIX LIVE — Careers apply recupera la paleta, secciones y progreso del HTML original.** Tras comparar producción contra `/Users/jreye/Documents/carreers/Efeonce Carrers/Efeonce Careers.dc.html`, la variante `careers-html-fidelity` vuelve a usar CTA `#0375db` (no negro), uploader `#fafafa` + borde dashed `#c4c3cc`, secciones `01/02/03`, barra "Completa tu postulación" y grid `Nombre/Apellido`, conservando iconos inline/uploader rico/CTA con icono. Release: develop `67d2933edbe2e2c1d03ad64d9e22185339391669`, main `f7bb199ed537344c8c4f97abcb956e025e49bdf4`, manifest `f7bb199ed537-9e67483d-bf3b-4b90-8994-511520518329`, Production Release Orchestrator `29321246352` success, Vercel Production `dpl_CcYdEgiT9f7JyQm8PSycfCPSDnPV` Ready. Evidencia: Vitest renderer `45/45`, typecheck, lint/design/build/renderer/task/ops gates, API contract productivo, submit sin CAPTCHA fail-closed y Playwright production desktop/mobile con CTA `rgb(3,117,219)`, uploader dashed, progress `0%`, markers `01/02/03`, 9 SVGs gobernados y `scrollOverflow=false`. Watchdog `29322458259` conserva sólo el residual conocido de `ops-worker` label drift; diff runtime ampliado vacío, `Deploy needed=false`, `Ready=True`.
 
@@ -10,7 +483,17 @@
 
 - **Release control plane — Deep Verification ahora provisiona Playwright Chromium.** El primer intento productivo detectó que `ci-deep.yml` ejecutaba tests que lanzan Chromium sin instalar el browser. Se agregó provisioning/cache del headless shell de Playwright y el SHA final pasó CI `29294733436` + Deep Verification `29294733458`. Watchdog manual `29296256877` conserva el residual conocido de `ops-worker` (`838950916b27` vs target `a3b5ea3adb30`), validado como no funcional por diff runtime vacío, `deploy_needed=false` y `Ready=True` en `ops-worker-00487-rjm`; los demás workers están synced.
 
+## 2026-07-13 — TASK-1410 · Radiografía AEO (muestra reutilizable "artículo + su capa de máquina")
+
+Muestra de trabajo para propuestas comerciales, viva en `think.efeoncepro.com/muestras/<slug>-<token>` (repo `efeonce-think`). Tres paneles acoplados: el artículo, su capa de máquina (JSON-LD, metadatos, `alt`, encabezados, cluster) y **la evidencia** de por qué ese artículo existe. Primer caso: licitación SKY. El artículo (Carretera Austral) lo eligió la investigación Semrush, no el redactor.
+
+**Invariante nuevo:** el JSON-LD se renderiza como **texto escapado**, jamás dentro de un `<script type="application/ld+json">`. Emitirlo declararía, en nuestro dominio, que Efeonce publicó un artículo del cliente: un dato estructurado falso, ingerible por crawlers, justo en la pieza cuya tesis es el rigor técnico.
+
+El cliente es un **payload** (Content Collection + Zod), no código: un payload sin `alt`, sin licencia de imagen o sin `as-of` en una cifra rompe el build. URL tokenizada (`openssl rand -hex 6`, declarada en el payload, nunca generada en el build) para que la muestra de un cliente no sea adivinable desde la de otro. Verificado en producción: cero `ld+json`, `noindex`, fuera del sitemap, rótulo visible y acoplamiento vivo.
+
 ## 2026-07-13
+
+- **Experiencia Efeonce — primer Efeonce Wrapper cliente live y documentado.** `https://experiencia.efeoncepro.com` queda registrado como el primer wrapper anual cliente-facing de Efeonce, creado para SKY por su primer año de trabajo. Repo satélite `efeoncepro/sky-efeonce`: `Handoff.md`, `docs/experiencia/`, `README.md` y runbook de video actualizados; video self-hosted en GCS con HLS + MP4, CORS actualizado para el dominio custom y ruta versionada `v20260713-cors` para evitar caché vieja de segmentos. Canon Greenhouse sincronizado en `docs/context/10_experiencia-cliente.md`, `project_context.md`, `Handoff.md` y skills espejo `efeonce-agency` / `creative-practice`. No implica automatización Greenhouse ni autorización pública de caso sin permiso escrito de SKY.
 
 - **TASK-1373 STAGING LIVE — Careers apply ahora usa Growth Forms nativo.** `/public/careers/[publicId]/apply` renderiza `<greenhouse-form>` real para `efeonce-careers-application` (`form_key=9f7a8fc0-6fa7-4670-8e2d-efe0ce354001`, version 2, `styleVariant=careers-html-fidelity`) y conserva el form custom como rollback por `CAREERS_NATIVE_GROWTH_FORM_ENABLED`. Rollout sólo a `develop`/staging: Vercel `greenhouse-ldqkedyia` (`dpl_3hdhDYu6VxvadTHbXXH595gstjKj`) Ready en commit `838950916b270c47d1dc7a5f1bc36ce02b9d704f`, alias `dev-greenhouse.efeoncepro.com`; production OFF. Evidencia: GVC staging desktop/mobile PASS (`.captures/2026-07-13T22-07-38_task354-careers-runtime-audit`), API contract PASS, submit sin captcha fail-closed `captcha_failed/missing_token`, smoke sintético Growth Forms → ATS + CV privado PASS con destinations `0`. Se corrigió el helper GVC para no filtrar `x-vercel-protection-bypass` a Sentry.
 

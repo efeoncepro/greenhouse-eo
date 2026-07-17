@@ -63,7 +63,7 @@ const toNullNum = (v: unknown): number | null => {
   return toNum(v) || null
 }
 
-// ── Schema provisioning ──
+// ── Schema readiness ──
 
 let ensurePromise: Promise<void> | null = null
 
@@ -71,26 +71,8 @@ export const ensurePersonOperationalSchema = async (): Promise<void> => {
   if (ensurePromise) return ensurePromise
 
   ensurePromise = (async () => {
-    await runGreenhousePostgresQuery(`
-      CREATE TABLE IF NOT EXISTS greenhouse_serving.person_operational_metrics (
-        member_id TEXT NOT NULL,
-        period_year INT NOT NULL,
-        period_month INT NOT NULL,
-        tasks_completed INT NOT NULL DEFAULT 0,
-        tasks_active INT NOT NULL DEFAULT 0,
-        tasks_total INT NOT NULL DEFAULT 0,
-        rpa_avg NUMERIC(6,2),
-        otd_pct NUMERIC(5,2),
-        ftr_pct NUMERIC(5,2),
-        cycle_time_avg_days NUMERIC(6,2),
-        throughput_count INT,
-        stuck_asset_count INT DEFAULT 0,
-        project_breakdown JSONB DEFAULT '[]',
-        source TEXT NOT NULL DEFAULT 'ico_member_metrics',
-        materialized_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-        PRIMARY KEY (member_id, period_year, period_month)
-      )
-    `)
+    await runGreenhousePostgresQuery('SELECT 1 FROM greenhouse_serving.person_operational_metrics LIMIT 0')
+    await runGreenhousePostgresQuery('SELECT 1 FROM greenhouse_serving.ico_member_metrics LIMIT 0')
   })().catch(err => {
     ensurePromise = null
     throw err
@@ -102,7 +84,7 @@ export const ensurePersonOperationalSchema = async (): Promise<void> => {
 // ── Main function ──
 
 export const getPersonOperationalServing = async (memberId: string): Promise<PersonOperationalServing> => {
-  await ensurePersonOperationalSchema()
+  let primaryReadError: unknown = null
 
   // Try Postgres-first: person_operational_metrics
   const rows = await runGreenhousePostgresQuery<OpsMetricsRow>(
@@ -111,7 +93,11 @@ export const getPersonOperationalServing = async (memberId: string): Promise<Per
      ORDER BY period_year DESC, period_month DESC
      LIMIT 1`,
     [memberId]
-  )
+  ).catch(err => {
+    primaryReadError = err
+
+    return [] as OpsMetricsRow[]
+  })
 
   if (rows.length > 0) {
     const r = rows[0]
@@ -163,7 +149,15 @@ export const getPersonOperationalServing = async (memberId: string): Promise<Per
      ORDER BY period_year DESC, period_month DESC
      LIMIT 1`,
     [memberId]
-  ).catch(() => [] as OpsMetricsRow[])
+  ).catch(err => {
+    if (primaryReadError) {
+      throw new Error(
+        `Person operational serving unavailable: primary read failed and ico_member_metrics fallback failed (${err instanceof Error ? err.message : String(err)})`
+      )
+    }
+
+    return [] as OpsMetricsRow[]
+  })
 
   if (icoRows.length > 0) {
     const r = icoRows[0]

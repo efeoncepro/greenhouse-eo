@@ -20,6 +20,37 @@ Este documento fija:
 - Domain: `agency` + `people` + `hris` + `staff augmentation` + `finance` + `capacity`
 - Date: `2026-04-11`
 
+## Delta 2026-07-16 — TASK-1385: AI-assisted vacancy public copy (propose→confirm)
+
+La redacción del payload público de una vacante ahora tiene asistencia IA gobernada, extendiendo
+el patrón propose→confirm de TASK-1361 con el kind `opening_public_copy` en el MISMO ledger
+(`hiring_assessment_ai_proposal`, CHECK ampliado; eventos `hiring.assessment.ai_proposed/confirmed`
+reusados — el payload lleva `kind`):
+
+- **Propose**: `proposeOpeningPublicCopy` (`src/lib/hiring/vacancy-ai/**`) redacta los campos de
+  copy `public_*` desde una proyección **allowlist-safe** (`VacancyPromptInput`, copia explícita
+  campo a campo): demanda (rol/skills/idioma/tz/duración), hechos públicos ya seteados del opening
+  y competencias+pesos de un `templateId` opcional. La IA **NUNCA** recibe `budget_band`,
+  `rate_band`, `risk_notes`, `internal_notes`, owner ni referencias de cliente (test negativo con
+  sentinels en `vacancy-ai/prompt.test.ts`). La IA propone **COPY, no hechos**: ubicación/modalidad/
+  compensación nunca se inventan (compensación jamás se propone). Prompt con voz Efeonce (context
+  pack 05/09) + checklist anti-sesgo de avisos (género/edad/proxies/job-related), versión
+  `hiring_vacancy_ai_public_copy.v1`, provider Anthropic `claude-sonnet-5` (seam
+  `HIRING_VACANCY_AI_COPY_MODEL`), adapter honest-degrade. Dedupe por digest (mismo mecanismo 1383).
+- **Confirm**: la rama `opening_public_copy` de `confirmAiProposal` aplica el copy (merge con
+  `publicCopyOverride` humano) vía **`updateHiringOpening`** (writer canónico, ahora acepta un
+  `PoolClient` externo para atomicidad con la marca de la propuesta). El LLM nunca escribe el
+  opening; `note` de la propuesta nunca se persiste al opening; **el publish sigue siendo la acción
+  humana de TASK-355/1371 con su gate 422** intacto.
+- **API/parity**: `POST /api/hiring/openings/[id]/ai/propose-public-copy` (capability nueva
+  `hiring.opening.ai_assist`, grant tier operador hiring); el confirm reusa la ruta de proposals
+  1361 con capability least-privilege por kind (`opening_public_copy` ⇒ `hiring.opening.write`).
+  Registro del actionKey en Nexa = consecuencia de parity (follow-up, mismo criterio que 1361).
+- **Flag**: `HIRING_VACANCY_AI_ENABLED` default OFF, **hermano deliberado** de
+  `HIRING_ASSESSMENT_AI_ENABLED` (no hereda el gate regulatorio EU AI Act del scoring — el copy de
+  vacante no decide sobre personas; el riesgo de sesgo del aviso lo gobierna el checklist + confirm
+  humano). Ledger de flags actualizado.
+
 ## Delta 2026-07-13 — TASK-1363: Assessment Taking + Review Surface
 
 El assessment dejó de ser sólo motor y ahora tiene dos superficies runtime sobre los mismos primitives de dominio:
@@ -61,7 +92,7 @@ Verificación: 6 live guards E2E contra PG real (idempotencia, expiración, anti
 
 El loop `internal_hire` quedó cerrado end-to-end (falta solo la UI, TASK-1368):
 
-- **Bridge:** `src/lib/workforce/hiring-activation/**` — mapping durable `greenhouse_hr.hiring_activation_request` (UNIQUE por handoff) + trail append-only. Commands `review → create-member → open-onboarding → complete` + `cancel` (`POST /api/hr/hiring-activation/[id]/[action]`), flag `HIRING_ACTIVATION_ENABLED` OFF.
+- **Bridge:** `src/lib/workforce/hiring-activation/**` — mapping durable `greenhouse_hr.hiring_activation_request` (UNIQUE por handoff) + trail append-only. Commands `review → create-member → open-onboarding → complete` + `cancel` (`POST /api/hr/hiring-activation/[id]/[action]`), flag `HIRING_ACTIVATION_ENABLED` ON en Production desde 2026-07-14 (`dpl_Grm71rLhwyyURq9ar7jf87i7DGzF`).
 - **Member core source-neutral** (`member-core.ts`): hermano del cascade D-2 del SCIM — lanes por `identity_profile_id` → email legacy sin profile → reactivación de inactivo → INSERT espejo SCIM (`active=TRUE`, `workforce_intake_status='pending_intake'`, membership operating entity, `member.created`). Drift → `blocked` con código (`ambiguous_identity|member_conflict|member_already_active`), NUNCA auto-merge. Discoverability D-2 por construcción (profile poblado → SCIM backfillea `azure_oid` sin duplicar).
 - **Recalibración importante:** `members.active`/`status` NO son GENERATED (verificado live; el `Generated<>` de kysely = "tiene default"). La regla "activación solo vía `completeWorkforceMemberIntake` + readiness" es de GOBERNANZA — el bridge la honra: nunca escribe `workforce_intake_status='completed'` (test estático lo garantiza) y `complete` solo verifica la evidencia.
 - **REUSA, no reconstruye:** checklist vía `createOnboardingInstance` (TASK-030, sin template aplicable → `blocked:onboarding_template_missing`); case vía el propio `completeWorkforceMemberIntake`; readiness live en el detail reader (`ready_to_activate` derivado, nunca persistido).
@@ -76,7 +107,7 @@ El nodo N10 del master flow (handoff decisión→downstream) pasó de spec a run
 - **Aggregate:** `greenhouse_hiring.hiring_handoff` (UNIQUE por `hiring_application_id`, `decision_id` ancla del supersede, CHECK state/destination/blocked_reason, `completed` exige `downstream_ref`) + `hiring_handoff_audit` append-only (triggers anti-UPDATE/DELETE). Migración `20260710173221695`.
 - **Dominio:** `src/lib/hiring/handoff/**` — state-machine dual (command: `pending→approved→[in_setup]→completed`, `pending|approved|blocked→cancelled`, `blocked` NUNCA por command; system: supersede/revocación/reopen), `materializeHandoffFromApplication` (tx propia, lee snapshot actual, upsert guardado por `decision_id`+`state`), `transitionHiringHandoff` (command gobernado por capability `hiring.handoff.approve`, idempotente por target state).
 - **Consumer reactivo:** `hiring_handoff_materialize` (domain `people`, trigger SOLO `hiring.application.decided`). **SIN flag** — un no-op es terminal en `outbox_reactive_log`. Solo `decision='selected'` materializa; `backup_selected|rejected|withdrawn|on_hold` → no-op explícito o revocación (pending→cancelled; post-aprobación→`blocked:decision_revoked`). Supersede post-aprobación → `blocked:decision_superseded_after_approval` (nunca overwrite). Destinos sin owner V1 (`contractor`→EPIC-013, `partner`, `internal_reassignment`) nacen `blocked:destination_not_supported`.
-- **Bridges (flag `HIRING_HANDOFF_BRIDGES_ENABLED` default OFF, `enabled:false` explícito):** `listInternalHireReadyForOnboarding()` (cola para TASK-770), `getHiringJourneyForPerson()` (journey Person 360, sin flag), `listStaffAugmentationHandoffIntents()` (el owner llama `createStaffAugPlacement` explícito y completa con `downstream_ref`).
+- **Bridges (flag `HIRING_HANDOFF_BRIDGES_ENABLED` ON en Production desde 2026-07-14; `enabled:false` explícito si se apaga):** `listInternalHireReadyForOnboarding()` (cola para TASK-770), `getHiringJourneyForPerson()` (journey Person 360, sin flag), `listStaffAugmentationHandoffIntents()` (el owner llama `createStaffAugPlacement` explícito y completa con `downstream_ref`). El Reliability AI Observer en `ops-worker` también lee este flag para `hiring.internal_hire_awaiting_onboarding`; revision productiva `ops-worker-00488-fvl`.
 - **Command API:** `POST /api/hiring/handoffs/[id]/(approve|setup|complete|cancel)`.
 - **Reliability:** módulo `hiring` nuevo (ReliabilityModuleKey) con `hiring.handoff_blocked_stale` (48h) + `hiring.internal_hire_awaiting_onboarding` (72h SLA); las 2 señales de TASK-1362 migraron de `documents` → `hiring`.
 - **Eventos:** `hiring.handoff.*` (7, v1, audit-only) — ver `GREENHOUSE_EVENT_CATALOG_V1.md` Delta 2026-07-10.

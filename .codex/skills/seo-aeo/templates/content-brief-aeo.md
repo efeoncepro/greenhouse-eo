@@ -29,11 +29,14 @@
   - H2: ... → answer capsule:
   - H2: ... → answer capsule:
 - **Elementos de citabilidad obligatorios:**
-  - [ ] ≥1 **tabla** (formato que 2.3× la citabilidad)
+  - [ ] ≥1 **tabla** (una fila tabulada ES la respuesta: se extrae sin ambigüedad).
+        ⚠️ NO justifiques con «2,3× la citabilidad» — es una PREVALENCIA entre corpus, no un lift.
   - [ ] ≥1 **lista numerada**
   - [ ] **estadísticas** con unidad y fuente (cada ~150–200 palabras)
-  - [ ] **citas textuales** de expertos/fuentes (mayor lift GEO: +41%)
-  - [ ] **enlaces a fuentes** autoritativas (+30%)
+  - [ ] **citas textuales de EXPERTOS O FUENTES entre comillas** (mayor lift GEO: +41%).
+        🔴 NO es una cita destacada propia. Confundirlo es el error más caro del oficio.
+  - [ ] **enlaces a fuentes** autoritativas (+30% — ⚠️ medido sobre GPT-3.5 + top-5 de Google,
+        en participación dentro de la respuesta, NO en citas, y con lift que varía por dominio)
   - [ ] datos/ejemplos propios
 
 ## 4. E-E-A-T

@@ -2,7 +2,7 @@
 // Patrón propose→confirm→execute: la IA propone contenido (evidencia), el humano confirma.
 // El LLM NUNCA escribe el banco ni el score; solo confirmAiProposal aplica.
 
-export const AI_PROPOSAL_KINDS = ['question_draft', 'response_score'] as const
+export const AI_PROPOSAL_KINDS = ['question_draft', 'response_score', 'opening_public_copy'] as const
 export type AiProposalKind = (typeof AI_PROPOSAL_KINDS)[number]
 
 export const AI_PROPOSAL_STATUSES = ['proposed', 'confirmed', 'rejected'] as const
@@ -35,6 +35,25 @@ export interface ResponseScoreProposal {
   score: number
   rationale: string
   perCriterion?: Array<{ criterion: string; score: number; note?: string }>
+}
+
+/**
+ * Payload estructurado de un `opening_public_copy` (TASK-1385). La IA redacta SOLO copy público
+ * (campos de texto del aviso); los HECHOS (ubicación, work mode, banda de compensación) son del
+ * operador — la IA nunca los inventa ni los propone. `targetRef` = openingId. El confirm humano
+ * aplica vía `updateHiringOpening` (el LLM nunca escribe el opening).
+ */
+export interface OpeningPublicCopyProposal {
+  publicTitle: string
+  publicSummary: string
+  publicDescription: string
+  publicRequirements?: string
+  publicNiceToHave?: string
+  publicArea?: string
+  publicSkillTags?: string[]
+  publicSeniority?: string
+  publicProcessNotes?: string
+  note?: string
 }
 
 /** View model normalizado del ledger (snake→camel). NUNCA expone secretos crudos de credenciales. */
@@ -88,4 +107,6 @@ export interface ConfirmAiProposalInput {
   decisionNote?: string
   questionOverride?: Partial<QuestionDraftProposal>
   finalScore?: number
+  /** TASK-1385: edición humana del copy propuesto antes de aplicarlo al opening. */
+  publicCopyOverride?: Partial<OpeningPublicCopyProposal>
 }

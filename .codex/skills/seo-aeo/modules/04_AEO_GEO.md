@@ -87,12 +87,27 @@ nivel. Tu trabajo: que cada chunk sea **autosuficiente y citable**.
   No "como vimos arriba"; repite el sujeto. El chunk viaja solo.
 - **Un H2 = una idea/pregunta.** Encabezados descriptivos en forma de pregunta o
   afirmación clara (no "Introducción", sí "Cuánto cuesta X en Chile").
-- **Answer capsule:** primeras **40–60 palabras** tras el H2 = respuesta directa
-  y completa. El **72.4%** de páginas citadas por ChatGPT tienen este patrón.
+- **Answer capsule:** respuesta directa y completa justo tras el H2, autocontenida.
+  **Lo que la sostiene es el MECANISMO, no una cifra:** el motor recupera **pasajes**, no páginas —
+  si la respuesta vive en un pasaje que se entiende solo, se puede citar.
+  ⚠️ El **72.4%** (Search Engine Land) es un **base rate SIN grupo de control**: mide qué porcentaje
+  de las páginas **citadas** tiene el patrón, **no** qué porcentaje de las **no citadas** también lo
+  tiene. **Describe el patrón; no prueba el lift.** Y SEL define la cápsula como **~20-25 palabras**,
+  no 40-60: si escribes 40-60, es craft tuyo — ese número **no lo respalda**.
+- **🟢 EL H2 ES LA PALANCA CON MEJOR EVIDENCIA, y casi nadie lo dice.** Sobre **1,4M de prompts**,
+  Ahrefs midió que lo que más separa a una página **citada** de una **recuperada-y-no-citada** es la
+  **relevancia semántica del TÍTULO** frente a la sub-pregunta (**0,656** vs **0,484**). En ese mismo
+  estudio **la cápsula no aparece entre los predictores**. → **Escribe cada H2 como la pregunta
+  literal del fan-out.** Es lo que más pesa, y es gratis.
 - **Densidad semántica:** define términos, da el dato concreto, evita relleno
   antes del valor. El motor extrae el pasaje útil; no lo entierres.
-- **Formatos que se citan más:** tablas (≥1 tabla + ≥1 lista numerada → ~2.3× más
-  citas en ChatGPT browsing), listas, definiciones, Q&A, datos con unidades.
+- **Formatos que se citan más:** tablas, listas, definiciones, Q&A, datos con unidades.
+  ⚠️ 🔴 **NO digas "tabla + lista → 2,3× más citas".** Ese número es una **razón de PREVALENCIA entre
+  dos corpus**: el **30%** de las páginas que ChatGPT cita **contienen** una tabla, contra el **13%**
+  de las que rankean en Google (Nectiv). **No es un lift por agregar una tabla**, y **la lista
+  numerada no está en el hallazgo** — se la agregamos nosotros. Es el error del `+41%` con otro
+  número. El argumento honesto es el **mecanismo**: una fila tabulada **es** la respuesta, y se extrae
+  sin ambigüedad.
 
 ## CITABILIDAD — las tácticas GEO con evidencia
 
@@ -100,9 +115,18 @@ Investigación peer-reviewed (Princeton + Georgia Tech + Allen Institute for AI 
 IIT Delhi, **GEO**, KDD 2024; 10k queries, 25 dominios, validado en Perplexity).
 **Lift de visibilidad por táctica:**
 
+> 🔴 **TRES ADVERTENCIAS QUE VAN SIEMPRE QUE SE CITE ESTE PAPER.** Omitirlas es sobre-declarar, y
+> es el error más caro del oficio:
+> 1. **El motor no es de 2026:** se midió sobre **GPT-3.5-turbo + top-5 de Google** (GEO-BENCH). No es
+>    ChatGPT Search, ni AI Overviews, ni el Perplexity de hoy.
+> 2. **La métrica NO es "citas":** es *Position-Adjusted Word Count* — la **proporción de palabras de
+>    la respuesta atribuibles a tu fuente**, ponderada por posición.
+> 3. **El lift VARÍA POR DOMINIO** y el paper lo dice: *Statistics Addition* rinde sobre todo en
+>    **Law & Government** y **Opinion**. Trasladar un lift de un dominio a otro **es inventar**.
+
 | Táctica | Lift medido | Cómo aplicarla |
 |---|---|---|
-| **Quotation Addition** (citas textuales) | **+41%** | incluir citas de expertos/fuentes entre comillas |
+| **Quotation Addition** (citas textuales) | **+41%** | 🔴 **citar FUENTES O EXPERTOS entre comillas.** **NO** es "poner una cita destacada propia" — confundirlo es el error más caro y más fácil de cometer, y ya nos costó una corrección pública |
 | **Statistics Addition** (estadísticas) | **+32%** | datos numéricos con unidad y fuente, cada 150–200 palabras |
 | **Cite Sources** (citar fuentes) | **+30%** | enlazar a fuentes autoritativas a lo largo del texto |
 | **Fluency Optimization** | **+28%** | redacción clara, autoritativa, bien estructurada |

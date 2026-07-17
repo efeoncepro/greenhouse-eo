@@ -24,14 +24,36 @@ import {
 } from './gutenberg-blocks'
 import { slugifyPublicSiteDraft } from './gutenberg-planner'
 
+export type GutenbergRichTextSegment = {
+  text: string
+  href?: string
+  strong?: boolean
+}
+
+export type GutenbergRichText = string | GutenbergRichTextSegment[]
+
 export type GutenbergArticleBlock =
-  | { kind: 'paragraph'; text: string }
-  | { kind: 'list'; items: string[]; ordered?: boolean }
+  | { kind: 'paragraph'; text: GutenbergRichText }
+  | { kind: 'list'; items: GutenbergRichText[]; ordered?: boolean }
+  | {
+      kind: 'table'
+      headers: GutenbergRichText[]
+      rows: GutenbergRichText[][]
+      caption?: GutenbergRichText
+    }
   | { kind: 'quote'; text: string }
   | { kind: 'pullquote'; text: string }
   | { kind: 'separator' }
   // Media requires a real WordPress asset — never invent ids/urls.
-  | { kind: 'image'; mediaId: number; url: string; alt: string; sizeSlug?: string }
+  | {
+      kind: 'image'
+      mediaId: number
+      url: string
+      alt: string
+      sizeSlug?: string
+      caption?: GutenbergRichText
+      linkDestination?: 'none' | 'media'
+    }
   | { kind: 'embed'; provider: 'youtube'; url: string }
 
 export type GutenbergArticleSection = {
@@ -51,12 +73,12 @@ export type GutenbergArticleSpec = {
     indexPolicy?: 'index' | 'noindex'
   }
   /** Intro paragraphs framing the piece, rendered before the TOC. */
-  intro: string[]
+  intro: GutenbergRichText[]
   sections: GutenbergArticleSection[]
   /** Defaults to true when there are >= 2 H2 sections. */
   tableOfContents?: boolean
   /** Optional closing CTA paragraph, separated by a rule. */
-  cta?: { text: string }
+  cta?: { text: GutenbergRichText }
   intent?: 'create'
   attribution?: {
     campaignId?: string
@@ -65,15 +87,67 @@ export type GutenbergArticleSpec = {
   }
 }
 
-const paragraphBlock = (text: string): string =>
-  ['<!-- wp:paragraph -->', `<p>${escapeGutenbergHtml(text)}</p>`, '<!-- /wp:paragraph -->'].join('\n')
+const renderRichText = (value: GutenbergRichText): string => {
+  if (typeof value === 'string') return escapeGutenbergHtml(value)
 
-const listBlock = (items: string[], ordered = false): string => {
+  return value
+    .map(segment => {
+      const text = segment.strong
+        ? `<strong>${escapeGutenbergHtml(segment.text)}</strong>`
+        : escapeGutenbergHtml(segment.text)
+
+      if (!segment.href) return text
+
+      const url = new URL(segment.href)
+
+      if (!['http:', 'https:', 'mailto:'].includes(url.protocol)) {
+        throw new Error(`content_factory_article_link_protocol_invalid:${url.protocol}`)
+      }
+
+      return `<a href="${escapeGutenbergHtml(segment.href)}">${text}</a>`
+    })
+    .join('')
+}
+
+const paragraphBlock = (text: GutenbergRichText): string =>
+  ['<!-- wp:paragraph -->', `<p>${renderRichText(text)}</p>`, '<!-- /wp:paragraph -->'].join('\n')
+
+const listBlock = (items: GutenbergRichText[], ordered = false): string => {
   const tag = ordered ? 'ol' : 'ul'
-  const lis = items.map(item => `<li>${escapeGutenbergHtml(item)}</li>`).join('')
+  const lis = items.map(item => `<li>${renderRichText(item)}</li>`).join('')
   const attr = ordered ? ' {"ordered":true}' : ''
 
   return [`<!-- wp:list${attr} -->`, `<${tag}>${lis}</${tag}>`, '<!-- /wp:list -->'].join('\n')
+}
+
+const tableBlock = (block: Extract<GutenbergArticleBlock, { kind: 'table' }>): string => {
+  if (block.headers.length === 0) {
+    throw new Error('content_factory_article_table_headers_required')
+  }
+
+  if (block.rows.length === 0) {
+    throw new Error('content_factory_article_table_rows_required')
+  }
+
+  if (block.rows.some(row => row.length !== block.headers.length)) {
+    throw new Error('content_factory_article_table_column_count_mismatch')
+  }
+
+  const headers = block.headers.map(header => `<th scope="col">${renderRichText(header)}</th>`).join('')
+
+  const rows = block.rows
+    .map(row => `<tr>${row.map(cell => `<td>${renderRichText(cell)}</td>`).join('')}</tr>`)
+    .join('')
+
+  const caption = block.caption
+    ? `<figcaption class="wp-element-caption">${renderRichText(block.caption)}</figcaption>`
+    : ''
+
+  return [
+    '<!-- wp:table -->',
+    `<figure class="wp-block-table"><table><thead><tr>${headers}</tr></thead><tbody>${rows}</tbody></table>${caption}</figure>`,
+    '<!-- /wp:table -->'
+  ].join('\n')
 }
 
 const quoteBlock = (text: string): string =>
@@ -91,18 +165,29 @@ const pullquoteBlock = (text: string): string =>
   ].join('\n')
 
 const separatorBlock = (): string =>
-  ['<!-- wp:separator -->', '<hr class="wp-block-separator has-alpha-channel-opacity"/>', '<!-- /wp:separator -->'].join(
-    '\n'
-  )
+  [
+    '<!-- wp:separator -->',
+    '<hr class="wp-block-separator has-alpha-channel-opacity"/>',
+    '<!-- /wp:separator -->'
+  ].join('\n')
 
 const imageBlock = (block: Extract<GutenbergArticleBlock, { kind: 'image' }>): string => {
   const sizeSlug = block.sizeSlug ?? 'large'
+  const linkDestination = block.linkDestination ?? 'none'
+
+  const caption = block.caption
+    ? `<figcaption class="wp-element-caption">${renderRichText(block.caption)}</figcaption>`
+    : ''
+
+  const image = `<img src="${escapeGutenbergHtml(block.url)}" alt="${escapeGutenbergHtml(
+    block.alt
+  )}" class="wp-image-${block.mediaId}"/>`
+
+  const media = linkDestination === 'media' ? `<a href="${escapeGutenbergHtml(block.url)}">${image}</a>` : image
 
   return [
-    `<!-- wp:image {"id":${block.mediaId},"sizeSlug":"${sizeSlug}","linkDestination":"none"} -->`,
-    `<figure class="wp-block-image size-${sizeSlug}"><img src="${block.url}" alt="${escapeGutenbergHtml(
-      block.alt
-    )}" class="wp-image-${block.mediaId}"/></figure>`,
+    `<!-- wp:image {"id":${block.mediaId},"sizeSlug":"${sizeSlug}","linkDestination":"${linkDestination}"} -->`,
+    `<figure class="wp-block-image size-${sizeSlug}">${media}${caption}</figure>`,
     '<!-- /wp:image -->'
   ].join('\n')
 }
@@ -120,6 +205,8 @@ const renderArticleBlock = (block: GutenbergArticleBlock): string => {
       return paragraphBlock(block.text)
     case 'list':
       return listBlock(block.items, block.ordered)
+    case 'table':
+      return tableBlock(block)
     case 'quote':
       return quoteBlock(block.text)
     case 'pullquote':

@@ -29,7 +29,7 @@ Construir una licitación pasa por diez momentos encadenados. Cada uno produce a
 
 Antes de dar la propuesta por lista, se hace una **revisión crítica con tres miradas**: comercial (¿convence al comité y baja el miedo a decidir?), equipo (¿el equipo es real y tiene capacidad?) y finanzas (¿el precio cubre el costo real y no se erosiona con el tiempo?). Si las tres no pasan, la propuesta no está lista aunque el texto se lea bien.
 
-## El diagnóstico de visibilidad en IA (cuando el servicio es de contenido/SEO)
+## El diagnóstico y la demostración AEO (cuando el servicio es de contenido/SEO)
 
 Cuando la licitación es de contenido, SEO o presencia digital, Efeonce mide el activo del cliente con su propia herramienta —el **AI Visibility Grader**— y lo presenta en la propuesta como diferencial. La forma de mostrarlo tiene tres capas:
 
@@ -39,7 +39,15 @@ Cuando la licitación es de contenido, SEO o presencia digital, Efeonce mide el 
 
 Dos cuidados de honestidad: **(a)** la escalera medida por la IA (percepción) puede diferir de la revisión técnica del sitio (¿tiene los datos que la IA necesita?), y no se contradicen —una mide la marca, la otra el activo—; al cliente va la medida. **(b)** Que la IA cite "fuentes creíbles" no significa que cite al cliente; el dato fuerte es si el dominio del propio cliente aparece entre esas fuentes.
 
-> Detalle técnico y operación del grader: skill `greenhouse-public-private-tenders` → `bid-construction-playbook.md` (Fase 4-bis) y `docs/manual-de-uso/growth/ai-visibility-grader-smoke.md`.
+Cuando la venta necesita pasar de "diagnóstico" a "prueba de ejecución", se suma la **Radiografía AEO**. Su rol es distinto: el Grader dice dónde está el hueco; la Radiografía muestra un artículo real que cubre un hueco, lo abre en canal y permite ver qué produce cada bloque en la capa de máquina. En propuestas y comités, esa muestra funciona como sales enablement: enlace vivo, lámina de deck, demo en reunión y evidencia verificable.
+
+La cadena correcta es:
+
+1. **AI Visibility Grader:** mide la situación del cliente.
+2. **Radiografía AEO:** demuestra el método de ejecución sobre un hueco concreto.
+3. **Propuesta/deck:** convierte esa evidencia en alcance, equipo, precio y plan.
+
+> Operación: Grader → `docs/manual-de-uso/growth/ai-visibility-grader-smoke.md`; Radiografía → `docs/manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md`; método canónico → skill `greenhouse-public-private-tenders` → `bid-construction-playbook.md` (Fase 4-bis).
 
 ## Principios que no se negocian
 
@@ -61,7 +69,7 @@ Este método es **vivo**: cada vez que armamos o mejoramos una licitación, se a
 
 ## Primer caso de referencia
 
-El primer caso completo con este método fue la licitación de **SKY Airline — Producción de Contenido Blog** (plataforma Wherex, julio 2026): se leyeron las bases, se validó admisibilidad, se eligieron los diferenciadores (caso Berel, SEO + AEO, portal, metodología Surround Discovery, WordPress + partner de Automattic), se analizó el blog real con Semrush y el AI Visibility Grader, se benchmarkeó a la competencia (JetSMART, LATAM, Flybondi), se definió la cadencia con las áreas de contenido y SEO, se diseñó un squad de ~2,2 personas dedicadas, se calculó el precio sobre el costo real del equipo, y se redactó la propuesta con un pase de estilo. La propuesta incrusta el informe de visibilidad IA en vivo y la escalera Be X con los valores reales de SKY. Los archivos viven en la carpeta comercial de esa licitación.
+El primer caso completo con este método fue la licitación de **SKY Airline — Producción de Contenido Blog** (plataforma Wherex, julio 2026): se leyeron las bases, se validó admisibilidad, se eligieron los diferenciadores (caso Berel, SEO + AEO, portal, metodología Surround Discovery, WordPress + partner de Automattic), se analizó el blog real con Semrush y el AI Visibility Grader, se benchmarkeó a la competencia (JetSMART, LATAM, Flybondi), se definió la cadencia con las áreas de contenido y SEO, se diseñó un squad de ~2,2 personas dedicadas, se calculó el precio sobre el costo real del equipo, y se redactó la propuesta con un pase de estilo. La propuesta incrusta el informe de visibilidad IA en vivo, la escalera Be X con los valores reales de SKY y la Radiografía AEO como muestra viva de trabajo. Los archivos viven en la carpeta comercial de esa licitación.
 
 Este caso dejó dos aprendizajes que ya son parte del método: **medir antes de afirmar** (una versión previa dijo "SKY casi no aparece en la IA" por inferencia técnica; el grader real lo desmintió —SKY sí es reconocida y citada— y afirmar un negativo falso en una propuesta es grave), y **si la herramienta sale incompleta, se arregla la herramienta, no el informe del cliente** (así el resto de clientes no hereda el mismo hueco).
 

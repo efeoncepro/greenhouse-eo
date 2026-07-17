@@ -27,6 +27,7 @@ import { axisPackDir } from '../../brand-packs/axis'
 import { deckAxisResolvers } from './resolvers'
 import { deckAxisSemanticValidators } from './semantic-validators'
 import { timelineLayoutHook, timelineSlideValidator } from './timeline-hooks'
+import { agendaLayoutHook } from './agenda-hooks'
 
 /**
  * Home del catálogo, resuelto module-relative. Nota para el worker de TASK-1391: un bundle que
@@ -47,7 +48,7 @@ export const deckAxisCatalog: ArtifactCatalog = {
   outputTarget: 'pdf-merged',
   resolvers: deckAxisResolvers,
   slideValidators: { TimelineFull: timelineSlideValidator },
-  layoutHooks: { TimelineFull: timelineLayoutHook },
+  layoutHooks: { TimelineFull: timelineLayoutHook, AgendaFull: agendaLayoutHook },
   semanticValidators: deckAxisSemanticValidators,
   // La marca que gobierna el render, sellable en el manifest: el pack axis compilado + su font pack.
   brand: {

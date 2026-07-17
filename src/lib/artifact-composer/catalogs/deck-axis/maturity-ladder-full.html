@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <link rel="stylesheet" href="deck-fonts.css">
+  <link rel="stylesheet" href="deck-tokens.css">
+  <link rel="stylesheet" href="deck-mold.css">
+  <link rel="stylesheet" href="deck-signature.css">
+  <meta charset="utf-8">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0} body{overflow:hidden;font-family:var(--axis-deck-type-text)}
+    :root{--safe:72px}
+    .slide{color:var(--axis-ppt-neutral-50);background:var(--axis-deck-recipe-rich-content)}
+
+    .header{position:absolute;top:92px;left:132px;right:132px;display:flex;align-items:flex-end;justify-content:space-between;gap:48px}
+    .eyebrow{margin-bottom:18px;color:var(--axis-deck-teal-200);font-size:17px;font-weight:700;letter-spacing:.13em;line-height:1;text-transform:uppercase}
+    .title{max-width:900px;font-family:var(--axis-deck-type-display);font-size:58px;font-weight:600;letter-spacing:-.052em;line-height:1.05}
+    .title em{color:var(--axis-deck-teal-200);font-style:italic}
+    .subject{width:300px;padding:0 0 5px 28px;border-left:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .36);color:rgba(var(--axis-ppt-neutral-50-rgb), .68);font-size:18px;font-weight:500;line-height:1.36}
+    .subject strong{display:block;color:var(--axis-ppt-neutral-50);font-weight:600}
+
+    /* La escalera. Sube: el peldaño 1 abajo. El orden ES el argumento — un peldaño no subido
+       bloquea los de arriba, y por eso se lee de abajo hacia arriba como se sube una escalera. */
+    /* La escalera LLENA su banda: `flex:1` reparte los peldaños en el alto disponible. Sin esto,
+       5 peldaños de alto fijo se apelmazan contra el borde inferior y dejan una banda muerta bajo
+       el titular — la lámina se ve rota aunque los datos estén bien. */
+    .ladder{position:absolute;top:296px;left:132px;right:470px;bottom:96px;display:flex;flex-direction:column-reverse;gap:12px}
+    .rung{position:relative;flex:1 1 0;display:grid;grid-template-columns:64px minmax(0,1fr) 180px 116px;align-items:center;gap:26px;min-width:0;padding:14px 24px 14px 18px;border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .16);border-radius:18px;background:linear-gradient(145deg,rgba(var(--axis-ppt-neutral-50-rgb), .10),rgba(var(--axis-ppt-neutral-50-rgb), .04))}
+    /* El peldaño donde empieza el trabajo tiene que ser INEQUÍVOCO: es el único mensaje accionable
+       de la lámina. Un borde apenas más claro no lo dice. */
+    .rung[data-next='true']{border-color:var(--axis-deck-teal-200);background:linear-gradient(145deg,rgba(var(--axis-deck-teal-500-rgb), .28),rgba(var(--axis-deck-teal-500-rgb), .08));box-shadow:0 0 0 2px rgba(var(--axis-deck-teal-200-rgb), .40),0 20px 44px rgba(var(--axis-deck-navy-990-rgb), .28)}
+    .rung[data-next='true']::before{content:'EMPIEZA AQUÍ';position:absolute;top:-9px;left:22px;padding:3px 10px;border-radius:99px;background:var(--axis-deck-teal-200);color:var(--axis-deck-navy-980);font-size:10px;font-weight:700;letter-spacing:.12em;line-height:1.4}
+
+    .idx{width:52px;height:52px;display:grid;place-items:center;border:1px solid rgba(var(--axis-deck-teal-200-rgb), .48);border-radius:50%;background:rgba(var(--axis-deck-navy-850-rgb), .58);color:var(--axis-deck-teal-100);font-family:var(--axis-deck-type-display);font-size:22px;font-weight:600;letter-spacing:-.03em}
+    .rung[data-next='true'] .idx{border-color:var(--axis-deck-teal-200);color:var(--axis-ppt-neutral-50)}
+
+    .copy{min-width:0}
+    .lbl{display:flex;align-items:baseline;gap:12px;min-width:0}
+    .name{font-family:var(--axis-deck-type-display);font-size:27px;font-weight:600;letter-spacing:-.032em;line-height:1.1}
+    .anchor{flex:0 0 auto;color:rgba(var(--axis-deck-teal-200-rgb), .78);font-size:14px;font-weight:600;letter-spacing:.04em}
+    .body{margin-top:5px;color:rgba(var(--axis-ppt-neutral-50-rgb), .70);font-size:16px;line-height:1.34}
+
+    /* La barra es DATO, no adorno: su ancho lo escribe el resolver desde el score. */
+    .meter{position:relative;height:8px;border-radius:99px;background:rgba(var(--axis-ppt-neutral-50-rgb), .13);overflow:hidden}
+    .fill{position:absolute;inset:0 auto 0 0;width:50%;border-radius:99px;background:linear-gradient(90deg,rgba(var(--axis-deck-teal-500-rgb), .9),var(--axis-deck-teal-200))}
+    .rung[data-severity='critico'] .fill{background:linear-gradient(90deg,rgba(var(--axis-deck-violet-550-rgb), .85),var(--axis-deck-violet-150))}
+    .sev{margin-top:9px;font-size:12px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:rgba(var(--axis-ppt-neutral-50-rgb), .55)}
+    .rung[data-severity='critico'] .sev{color:var(--axis-deck-violet-150)}
+    .rung[data-severity='optimo'] .sev{color:var(--axis-deck-teal-200)}
+
+    .score{justify-self:end;font-family:var(--axis-deck-type-display);font-size:40px;font-weight:600;letter-spacing:-.045em;line-height:1;font-variant-numeric:tabular-nums}
+    .score::after{content:'/100';margin-left:3px;color:rgba(var(--axis-ppt-neutral-50-rgb), .42);font-size:15px;font-weight:500;letter-spacing:0}
+
+    /* El so-what. Una escalera sin lectura es un boletín de notas: el comité ve tres rojos y no
+       sabe qué le estamos vendiendo. */
+    /* El readout ACOMPAÑA a la escalera en alto: si flota suelto abajo, deja un hueco encima y la
+       columna derecha se ve descosida. Panel a la misma altura, contenido arriba. */
+    .readout{position:absolute;top:296px;right:132px;bottom:96px;width:290px;display:flex;flex-direction:column;padding:30px 26px;border:1px solid rgba(var(--axis-deck-teal-200-rgb), .42);border-radius:22px;background:linear-gradient(145deg,rgba(var(--axis-deck-teal-500-rgb), .14),rgba(var(--axis-ppt-neutral-50-rgb), .04));backdrop-filter:blur(var(--deck-blur-m))}
+    .readout h2{font-family:var(--axis-deck-type-display);font-size:26px;font-weight:600;letter-spacing:-.03em;line-height:1.14}
+    .readout p{margin-top:14px;color:rgba(var(--axis-ppt-neutral-50-rgb), .78);font-size:17px;line-height:1.44}
+    .readout .foot{margin-top:auto;padding-top:20px;border-top:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .18);color:rgba(var(--axis-ppt-neutral-50-rgb), .5);font-size:12px;font-weight:600;letter-spacing:.09em;line-height:1.45;text-transform:uppercase}
+
+    .footer{position:absolute;left:132px;bottom:52px;color:rgba(var(--axis-ppt-neutral-50-rgb), .5);font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+  </style>
+</head>
+<body>
+  <main class="slide" data-template="MaturityLadderFull" data-url-bubble-backdrop>
+    <header class="header">
+      <section>
+        <p class="eyebrow" data-slot="sectionLabel" data-slot-type="string">02. Punto de partida</p>
+        <h1 class="title" data-slot="title" data-slot-type="rich-string" data-slot-required="true">Dos peldaños <em>firmes</em>. Tres por construir.</h1>
+      </section>
+      <p class="subject" data-slot="subject" data-slot-type="object" data-slot-required="true">
+        <strong data-slot-field="name">Sujeto medido</strong>
+        <span data-slot-field="context">Instrumento · as-of</span>
+      </p>
+    </header>
+
+    <!-- `data-slot-items` marca el contenedor de repetición. El slot y el contenedor de repetición
+         SON el mismo nodo acá (no hay decoración hermana que clonar), pero el marcador va explícito
+         igual: sin él, el filler no sabe qué clonar y la lámina sale con los peldaños del ejemplo. -->
+    <section class="ladder" data-slot="rungs" data-slot-type="array" data-slot-required="true" data-slot-items aria-label="Escalera de madurez">
+      <article class="rung" data-severity="critico" data-next="true">
+        <p class="idx" aria-hidden="true" data-slot-field="number">01</p>
+        <div class="copy">
+          <div class="lbl"><h2 class="name" data-slot-field="label">Primer peldaño</h2><span class="anchor" data-slot-field="anchor">Anchor</span></div>
+          <p class="body" data-slot-field="body">Qué significa este peldaño para el sujeto medido, en una línea.</p>
+        </div>
+        <div>
+          <div class="meter"><span class="fill"></span></div>
+          <p class="sev" data-slot-field="severity">Crítico</p>
+        </div>
+        <p class="score" data-slot-field="score">40</p>
+        <span hidden data-slot-field="evidenceRef">run · as-of</span>
+      </article>
+      <article class="rung" data-severity="optimo" data-next="false">
+        <p class="idx" aria-hidden="true" data-slot-field="number">02</p>
+        <div class="copy">
+          <div class="lbl"><h2 class="name" data-slot-field="label">Segundo peldaño</h2><span class="anchor" data-slot-field="anchor">Anchor</span></div>
+          <p class="body" data-slot-field="body">Qué significa este peldaño para el sujeto medido, en una línea.</p>
+        </div>
+        <div>
+          <div class="meter"><span class="fill"></span></div>
+          <p class="sev" data-slot-field="severity">Óptimo</p>
+        </div>
+        <p class="score" data-slot-field="score">70</p>
+        <span hidden data-slot-field="evidenceRef">run · as-of</span>
+      </article>
+      <article class="rung" data-severity="critico" data-next="false">
+        <p class="idx" aria-hidden="true" data-slot-field="number">03</p>
+        <div class="copy">
+          <div class="lbl"><h2 class="name" data-slot-field="label">Tercer peldaño</h2><span class="anchor" data-slot-field="anchor">Anchor</span></div>
+          <p class="body" data-slot-field="body">Qué significa este peldaño para el sujeto medido, en una línea.</p>
+        </div>
+        <div>
+          <div class="meter"><span class="fill"></span></div>
+          <p class="sev" data-slot-field="severity">Crítico</p>
+        </div>
+        <p class="score" data-slot-field="score">37</p>
+        <span hidden data-slot-field="evidenceRef">run · as-of</span>
+      </article>
+    </section>
+
+    <aside class="readout" data-slot="readout" data-slot-type="object" data-slot-required="true">
+      <h2 data-slot-field="title">La lectura</h2>
+      <p data-slot-field="body">Qué implica el patrón de peldaños. Sin esto, la escalera es un boletín de notas.</p>
+      <p class="foot">Se sube de abajo hacia arriba: cada peldaño presupone el anterior</p>
+    </aside>
+
+    <p class="footer">Escalera de madurez · medición propia</p>
+    <img class="deck-url-bubble signature-MaturityLadderFull" src="assets/url-lum.svg" alt="efeoncepro.com">
+  </main>
+</body>
+</html>

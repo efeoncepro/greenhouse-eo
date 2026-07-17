@@ -22,6 +22,20 @@ import { solarIconPath } from './solar-icons'
 const SOLAR = (name: string) => `assets/solar/${name}-bold.svg`
 
 /**
+ * Umbrales de la escalera de madurez. Son los MISMOS que `severityFromScore` del informe de AI
+ * Visibility (`report-artifact/model.ts`): la escalera del deck y la del informe tienen que decir
+ * lo mismo del mismo número, o la propuesta se contradice con su propio anexo.
+ */
+const OPTIMAL_THRESHOLD = 70
+const ATTENTION_THRESHOLD = 45
+
+const SEVERITY_LABEL: Record<'optimo' | 'atencion' | 'critico', string> = {
+  optimo: 'Óptimo',
+  atencion: 'Atención',
+  critico: 'Crítico'
+}
+
+/**
  * `stat-goal-icon` — los 5 peldaños de la escalera Be X → su ícono.
  *
  * El mapa refleja el HTML de `StatSplit`, que ya trae un ícono por goal. Acá se hace explícito y
@@ -77,6 +91,82 @@ const CARD_GRID_ICON: Record<string, string> = {
   data: 'database',
   measurement: 'chart-square',
   governance: 'shield-check'
+}
+
+const DAILY_WORKFLOW_TONES = ['done', 'active', 'next'] as const
+const CONTENT_ANATOMY_CHECK_TONES = ['ready', 'review', 'evidence'] as const
+const CONTENT_ANATOMY_LAYER_TONES = ['research', 'reader', 'machine'] as const
+
+const CONTENT_ANATOMY_CLUSTER_WIDTH: Record<string, string> = {
+  high: '92%',
+  medium: '72%',
+  focused: '56%'
+}
+
+type ToolLogoPlate = 'light' | 'dark' | 'brand-dark'
+
+const TOOL_LOGO: Record<string, { src: string; label: string; plate: ToolLogoPlate; accentRgb?: string }> = {
+  notion: { src: 'assets/tools/notion-isotype.svg', label: 'Notion', plate: 'light' },
+  frameio: { src: 'assets/tools/frameio-isotype.svg', label: 'Frame.io', plate: 'light' },
+  'adobe-illustrator': {
+    src: 'assets/tools/adobe-illustrator-isotype.svg',
+    label: 'Adobe Illustrator',
+    plate: 'brand-dark',
+    accentRgb: '255, 154, 0'
+  },
+  'adobe-photoshop': { src: 'assets/tools/adobe-photoshop-isotype.svg', label: 'Adobe Photoshop', plate: 'dark' },
+  'adobe-premiere-pro': {
+    src: 'assets/tools/adobe-premiere-isotype.svg',
+    label: 'Adobe Premiere Pro',
+    plate: 'dark'
+  },
+  'adobe-after-effects': {
+    src: 'assets/tools/adobe-after-effects-isotype.svg',
+    label: 'Adobe After Effects',
+    plate: 'dark'
+  },
+  'adobe-express': { src: 'assets/tools/adobe-express-isotype.svg', label: 'Adobe Express', plate: 'dark' },
+  'microsoft-365': { src: 'assets/tools/microsoft-365-isotype.svg', label: 'Microsoft 365', plate: 'light' },
+  semrush: { src: 'assets/tools/semrush-isotype.svg', label: 'Semrush', plate: 'dark' },
+  ahrefs: { src: 'assets/tools/ahrefs-isotype.svg', label: 'Ahrefs', plate: 'light' },
+  'brand-visibility-grader': {
+    src: 'assets/tools/brand-visibility-grader-isotype.svg',
+    label: 'Brand Visibility Grader',
+    plate: 'dark'
+  },
+  'screaming-frog': { src: 'assets/tools/screaming-frog-isotype.svg', label: 'Screaming Frog', plate: 'light' },
+  shutterstock: { src: 'assets/tools/shutterstock-isotype.svg', label: 'Shutterstock', plate: 'light' },
+  'adobe-stock': { src: 'assets/tools/adobe-isotype.svg', label: 'Adobe Stock', plate: 'light' },
+  'envato-elements': { src: 'assets/tools/envato-isotype.svg', label: 'Envato Elements', plate: 'dark' },
+  'adobe-firefly': { src: 'assets/tools/adobe-firefly-isotype.svg', label: 'Adobe Firefly', plate: 'dark' },
+  higgsfield: { src: 'assets/tools/higgsfield-isotype.svg', label: 'Higgsfield', plate: 'dark' },
+  magnific: { src: 'assets/tools/magnific-isotype.svg', label: 'Magnific', plate: 'light' },
+  'microsoft-teams': { src: 'assets/tools/teams-isotype.svg', label: 'Microsoft Teams', plate: 'light' },
+  slack: { src: 'assets/tools/slack-isotype.svg', label: 'Slack', plate: 'light' }
+}
+
+/**
+ * `CLIENT_LOGO` — el muro de clientes de `ClientLogosFull`. Misma disciplina que `TOOL_LOGO` y que
+ * `squad-person`: la clave resuelve a un SVG APROBADO por allowlist cerrada; una marca nueva exige
+ * asset nuevo, no un fallback genérico. Son logos que Efeonce ya exhibe públicamente en su sitio
+ * (clientes reales) — presentar un logo de un cliente que no lo es sería tergiversación en un
+ * documento que evalúa un comité. Plate uniforme `light` (placa blanca) para un muro parejo y
+ * premium; cada logo va en sus colores de marca reales sobre la placa.
+ */
+const CLIENT_LOGO: Record<string, { src: string; label: string }> = {
+  // Marca SKY: `sky.svg` es la versión DARK (letras blancas + chevron verde), para celda oscura
+  // (así se usa acá: SKY va destacado con emphasis='primary' → su celda es navy). En FONDO CLARO el
+  // lockup de SKY lleva las letras en MORADO, no navy — si algún día SKY va sin destacar sobre el
+  // panel claro, hace falta una variante `sky-light` morada; no recolorear ésta a navy.
+  sky: { src: 'assets/clients/sky.svg', label: 'SKY Airline' },
+  carozzi: { src: 'assets/clients/carozzi.svg', label: 'Carozzi' },
+  'marca-chile': { src: 'assets/clients/marca-chile.svg', label: 'Marca Chile' },
+  'gobierno-santiago': { src: 'assets/clients/gobierno-santiago.svg', label: 'Gobierno de Santiago' },
+  bresler: { src: 'assets/clients/bresler.svg', label: 'Bresler' },
+  berel: { src: 'assets/clients/berel.svg', label: 'Grupo Berel' },
+  'aguas-andinas': { src: 'assets/clients/aguas-andinas.svg', label: 'Aguas Andinas' },
+  'universidad-temuco': { src: 'assets/clients/universidad-temuco.svg', label: 'Universidad Católica de Temuco' },
+  anam: { src: 'assets/clients/anam.svg', label: 'ANAM' }
 }
 
 
@@ -149,6 +239,49 @@ export const deckAxisResolvers: ResolverRegistry = {
     }
   },
 
+  // ── Fotos REALES del squad ───────────────────────────────────────────────────────────────────
+  //
+  // GUARDRAIL DURO DEL DOMINIO (materializa el `personaAssetContract` pre-declarado en
+  // quote-split/narrative-split): la clave resuelve a `assets/squad/squad-<nombre>.png` por
+  // allowlist CERRADA. Un nombre fuera de la lista → `UnknownResolverValueError` — una cara
+  // generada por IA no puede entrar ni por error de autor, porque su archivo no existe en la
+  // allowlist. Presentar una cara fabricada como parte del equipo es tergiversación.
+
+  'squad-person': {
+    known: ['andres', 'daniela', 'humberly', 'julio', 'luis', 'maria-fernanda', 'melkin', 'valentina'],
+    build: value =>
+      ['andres', 'daniela', 'humberly', 'julio', 'luis', 'maria-fernanda', 'melkin', 'valentina'].includes(value)
+        ? [{ selector: '.photo img', attr: 'src', value: `assets/squad/squad-${value}.png` }]
+        : null
+  },
+
+  /**
+   * `dual-concept-icon` — el glifo de cada columna de DualTextSplit deja de ser chrome fijo (• / ✓):
+   * el autor declara la SEMÁNTICA de la columna y el catálogo pinta el Solar correspondiente.
+   * (Caso fuente: «LA CARRERA DEL BUSCADOR» salía con un bullet genérico — el ícono no decía nada.)
+   */
+  'dual-concept-icon': {
+    known: ['search', 'ai', 'data', 'users', 'target'],
+    build: value => {
+      // Campo OPCIONAL: ausente (el filler planifica los derivados aunque no vengan y el valor
+      // llega como "undefined") → no-op y queda el glifo neutro del prototipo. Un valor real
+      // fuera del mapa sigue siendo UnknownResolverValueError: el typo no degrada en silencio.
+      if (value === 'undefined' || value === '') return []
+
+      const DUAL_CONCEPT_ICON: Record<string, string> = {
+        search: 'magnifer',
+        ai: 'cpu',
+        data: 'chart-2',
+        users: 'users-group-rounded',
+        target: 'target'
+      }
+
+      const icon = DUAL_CONCEPT_ICON[value]
+
+      return icon ? [{ selector: '.cicon svg path', attr: 'd', value: solarIconPath(icon) }] : null
+    }
+  },
+
   // ── Íconos SVG inline ────────────────────────────────────────────────────────────────────────
   // Estas plantillas no usan `<img src>` sino `<svg><path d="…">`: hay que reescribir el `d`.
 
@@ -179,6 +312,104 @@ export const deckAxisResolvers: ResolverRegistry = {
     }
   },
 
+  /**
+   * `tool-logo-asset` — el autor declara la herramienta por clave cerrada; el catálogo pinta el
+   * isotipo/asset aprobado. No hay fallback a ícono genérico: una marca nueva exige asset nuevo.
+   */
+  'tool-logo-asset': {
+    known: Object.keys(TOOL_LOGO),
+    build: value => {
+      const tool = TOOL_LOGO[value]
+
+      return tool
+        ? [
+            { selector: ':field', attr: 'src', value: tool.src },
+            { selector: ':field', attr: 'alt', value: tool.label },
+            { selector: ':field', attr: 'data-tool', value },
+            { selector: '.logo-mark', attr: 'data-logo-plate', value: tool.plate },
+            ...(tool.accentRgb
+              ? [{ selector: '.logo-mark', styleProp: '--tool-logo-accent-rgb', styleValue: tool.accentRgb }]
+              : [])
+          ]
+        : null
+    }
+  },
+
+  /**
+   * `client-logo-asset` — gemelo de `tool-logo-asset` para el muro de clientes: la clave cerrada
+   * resuelve al SVG aprobado. Sin fallback a genérico: un cliente nuevo exige asset nuevo en
+   * `CLIENT_LOGO`. No se pega un logo ad-hoc ni se inventa un cliente. La plantilla lo pinta
+   * monocromo (filtro CSS) para un muro uniforme, así que el resolver no decide placa: sólo el asset.
+   */
+  'client-logo-asset': {
+    known: Object.keys(CLIENT_LOGO),
+    build: value => {
+      const client = CLIENT_LOGO[value]
+
+      return client
+        ? [
+            { selector: ':field', attr: 'src', value: client.src },
+            { selector: ':field', attr: 'alt', value: client.label },
+            { selector: ':field', attr: 'data-client', value }
+          ]
+        : null
+    }
+  },
+
+  /**
+   * `client-logo-emphasis` — cuál logo del muro va DESTACADO es DATO del plan, no un literal en el
+   * template ni en el CSS (el test del segundo consumidor: hardcodear "sky" acá acoplaría el motor
+   * al primer cliente). 'primary' pinta la clase `.is-primary` sobre la tarjeta; cualquier otro
+   * valor la limpia — si no, el destaque del blueprint contagiaría a un logo equivocado.
+   */
+  'client-logo-emphasis': {
+    known: ['primary', 'none'],
+    build: value =>
+      value === 'primary'
+        ? [{ selector: ':self', toneClass: 'is-primary', toneGroup: ['is-primary'] }]
+        : [{ selector: ':self', toneGroup: ['is-primary'] }]
+  },
+
+  /**
+   * `daily-workflow-step-tone` — el estado del ciclo es dato del DeckPlan; la plantilla decide
+   * cómo distinguir lo completado, el trabajo activo y lo que sigue. Nunca se autoran clases CSS.
+   */
+  'daily-workflow-step-tone': {
+    known: [...DAILY_WORKFLOW_TONES],
+    build: value =>
+      DAILY_WORKFLOW_TONES.includes(value as (typeof DAILY_WORKFLOW_TONES)[number])
+        ? [{ selector: ':self', toneClass: value, toneGroup: [...DAILY_WORKFLOW_TONES] }]
+        : null
+  },
+
+  /** Intensidad visual derivada del cluster; el autor declara prioridad, nunca porcentaje CSS. */
+  'content-anatomy-cluster-strength': {
+    known: Object.keys(CONTENT_ANATOMY_CLUSTER_WIDTH),
+    build: value => {
+      const width = CONTENT_ANATOMY_CLUSTER_WIDTH[value]
+
+      return width ? [{ selector: ':field', styleProp: '--cluster-width', styleValue: width }] : null
+    }
+  },
+
+  /** Estado del QA técnico dentro del inspector machine-readable. */
+  'content-anatomy-check-tone': {
+    known: [...CONTENT_ANATOMY_CHECK_TONES],
+    build: value =>
+      CONTENT_ANATOMY_CHECK_TONES.includes(value as (typeof CONTENT_ANATOMY_CHECK_TONES)[number])
+        ? [{ selector: ':self', toneClass: value, toneGroup: [...CONTENT_ANATOMY_CHECK_TONES] }]
+        : null
+  },
+
+  /** Las tres capas conservan semántica y tono aunque cambie su copy visible. */
+  'content-anatomy-layer-tone': {
+    known: [...CONTENT_ANATOMY_LAYER_TONES],
+    build: value =>
+      CONTENT_ANATOMY_LAYER_TONES.includes(value as (typeof CONTENT_ANATOMY_LAYER_TONES)[number])
+        ? [{ selector: ':self', toneClass: value, toneGroup: [...CONTENT_ANATOMY_LAYER_TONES] }]
+        : null
+  },
+
   // ── Ordinales: chrome derivado, no dato autorable ────────────────────────────────────────────
   // El número de un capítulo/fase sale de su POSICIÓN. Si el autor lo escribiera a mano, un deck
   // reordenado quedaría con la numeración vieja y se contradiría solo.
@@ -193,15 +424,93 @@ export const deckAxisResolvers: ResolverRegistry = {
     build: (_value, ctx) => [{ selector: '.n', value: String(ctx.index + 1).padStart(2, '0'), asText: true }]
   },
 
+  // ── Escalera de madurez: el SCORE es la única verdad ─────────────────────────────────────────
+  //
+  // Todo lo demás de un peldaño —el ancho de su barra, su severidad, y cuál es el "usted está
+  // aquí"— se DERIVA del score. Nada de eso es autorable, y no es celo: es la misma bug class que
+  // ya nos costó caro tres veces. Si el autor pudiera rotular la severidad, una lámina podría
+  // decir "óptimo" sobre un 37. Eso no es un bug de layout: es **fabricación** — el evaluador ve
+  // una fortaleza que no existe. Y si pudiera marcar el peldaño destacado, dos podrían reclamar
+  // ser "el próximo" (exactamente lo que pasó con los dos planes marcados como "el propuesto").
+
+  'maturity-rung-geometry': {
+    known: ['<derivado del score>'],
+    build: (value, ctx) => {
+      const score = toNumber(value)
+
+      if (score === null) {
+        throw new Error(
+          'maturity-rung-geometry requiere un score numérico: no se puede dibujar un peldaño sin dato.'
+        )
+      }
+
+      if (score < 0 || score > 100) {
+        throw new Error(`maturity-rung-geometry recibió un score fuera de rango (0-100): ${score}.`)
+      }
+
+      const rungs = Array.isArray(ctx.slots.rungs) ? (ctx.slots.rungs as Record<string, unknown>[]) : []
+      const scores = rungs.map(rung => toNumber(rung.score))
+
+      if (scores.some(entry => entry === null)) {
+        throw new Error(
+          'maturity-rung-geometry: un peldaño sin score rompe la escalera entera — el "usted está aquí" se deriva de TODOS.'
+        )
+      }
+
+      // El "usted está aquí" es el PRIMER peldaño no-óptimo desde abajo. Es la única marca de la
+      // lámina, y es lo que convierte un boletín de notas en un alcance: la escalera es
+      // acumulativa, así que el trabajo empieza abajo, no en el peor score.
+      const firstBelowOptimal = (scores as number[]).findIndex(entry => entry < OPTIMAL_THRESHOLD)
+      const isNext = firstBelowOptimal === ctx.index
+
+      // La barra sale del dato. El prototipo trae anchos a mano; si el composer sólo cambiara el
+      // número, un 8 se seguiría dibujando con el ancho del ejemplo.
+      const MIN_PCT = 1.5 // un 0 tiene que verse como una raya, no como la nada
+
+      // ⚠️ `data-next` se escribe SIEMPRE, con 'true' o 'false'. Nunca "sólo cuando aplica": el
+      // prototipo trae un peldaño marcado, y un atributo que no se sobreescribe deja la marca del
+      // EJEMPLO sobre un peldaño real. La lámina saldría destacando el peldaño equivocado — y
+      // pareciendo terminada.
+      return [
+        { selector: '.fill', styleProp: 'width', styleValue: `${Math.max(MIN_PCT, score)}%` },
+        { selector: ':field', value: String(Math.round(score)), asText: true },
+        { selector: ':self', attr: 'data-next', value: isNext ? 'true' : 'false' }
+      ]
+    }
+  },
+
+  'maturity-rung-severity': {
+    known: ['<derivado del score: >=70 óptimo · >=45 atención · <45 crítico>'],
+    build: (_value, ctx) => {
+      const score = toNumber(ctx.item.score)
+
+      if (score === null) {
+        throw new Error('maturity-rung-severity requiere el score del peldaño; la severidad no es autorable.')
+      }
+
+      const severity =
+        score >= OPTIMAL_THRESHOLD ? 'optimo' : score >= ATTENTION_THRESHOLD ? 'atencion' : 'critico'
+
+      return [
+        { selector: ':field', value: SEVERITY_LABEL[severity], asText: true },
+        { selector: ':self', attr: 'data-severity', value: severity }
+      ]
+    }
+  },
+
   'section-number': {
     known: ['<derivado del orden de la sección>'],
     build: value => [{ selector: ':field', value: String(value).padStart(2, '0'), asText: true }]
   },
 
   'chapter-anchor': {
-    // No es texto: alimenta el `href="#<id>"` — la nav del HTML y el link interno del PDF.
+    // No es texto: alimenta el `href` del capítulo. Se emite como SENTINEL `https://deck.internal/<id>`
+    // porque Chromium sólo imprime anotaciones /Link para URLs absolutas (un `#ancla` cuyo destino
+    // vive en OTRA lámina no emite nada — cada lámina se imprime como documento propio). El merge
+    // (`mergeSlidePdfs`) convierte el sentinel en una anotación GoTo a la PÁGINA REAL del slideId,
+    // y si el destino no existe en el plan, la DESCARTA: el sentinel jamás llega al PDF entregado.
     known: ['<slideId destino>'],
-    build: value => [{ selector: ':self', attr: 'href', value: `#${value}` }]
+    build: value => [{ selector: ':self', attr: 'href', value: `https://deck.internal/${value}` }]
   },
 
   // ── Geometría: lo que impide que la lámina MIENTA ────────────────────────────────────────────

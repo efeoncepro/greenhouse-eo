@@ -13,20 +13,31 @@
 > | | Dónde | Qué es |
 > |---|---|---|
 > | **FUENTE** | **este repo** (`.md` · `deck-plan.json` · `.xlsx` · las bases) | **Lo único que se edita.** Versionado, auditable, con historia |
-> | **DERIVADO** | OneDrive (`.pdf`, `.html`) | **Se re-emite con un comando. NUNCA se edita a mano** |
+> | **DERIVADO VERSIONADO** | **Proposal Studio** (`proposal_assets`) | PDF client-facing adjunto con versión derivada `MAX+1`; nunca se reemplaza una versión anterior |
+> | **COPIA DE ENTREGA** | OneDrive (`.pdf`, `.html`) | Se re-emite desde la fuente y se copia para Wherex. NUNCA se edita a mano |
 >
 > ```bash
 > pnpm tender:render docs/commercial/tenders/sky-blog-2026/oferta-tecnica.md --out .captures/sky-oferta
 > pnpm deck:compose  docs/commercial/tenders/sky-blog-2026/deck-plan.json  --out .captures/sky-bid
 > ```
 >
-> Después se copian los PDF a OneDrive, **que es de donde el operador los sube a Wherex**.
+> Después de componer, el PDF se adjunta como una nueva versión en Proposal Studio. La copia de entrega se
+> lleva a OneDrive, **que es de donde el operador la sube a Wherex**.
 > *(Es el mismo principio del Artifact Composer: el Plan es el artefacto auditable; el PDF es derivado y
 > re-componible.)*
 >
 > 📁 **Carpeta OneDrive (entregables, sincronizada local):**
 > `~/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Sky Airlines/7. Blog/`
 > Se lee y escribe **por filesystem** — no hace falta el conector de SharePoint.
+
+---
+
+## 🚀 ¿Sesión nueva? Empezá acá
+
+**`SESSION-BRIEF.md`** — el brief de arranque. Está escrito para que una sesión nueva **NO empiece a
+hacer**: primero explora, mapea las piezas contra las láminas, presenta el diagnóstico y **espera**.
+Trae el estado real, los hilos abiertos que señaló el operador (el informe del grader sin lámina, los
+enlaces no clickeables, el discurso de la §3) y **lo que ya aprendimos y no hay que volver a aprender**.
 
 ---
 
@@ -45,7 +56,7 @@
 
 | # | Entregable | Estado |
 |---|---|---|
-| 1 | **Deck de la propuesta** — la propuesta **se presenta en un deck** | ✅ **15 láminas, PDF 3.5 MB** — pendiente de ajustes visuales |
+| 1 | **Deck de la propuesta** — la propuesta **se presenta en un deck** | ✅ **26 láminas, PDF 12.2 MB** (2026-07-15: suma stack operativo, día a día y anatomía del Content Hub; conserva los showcases vivos, agenda derivada, equipo real y 11 enlaces: 6 internos + 5 externos). La portada canónica amplía Efeonce, usa el logo SKY on-dark derivado del SVG oficial y conserva la URL Bubble. Registrado como **deck v6 · client-facing · draft** en Proposal Studio; v1-v5 se conservan. |
 | 2 | Subir a Wherex | ⏳ **Operador** (regla dura: el agente prepara; el humano sube y firma) |
 | — | Oferta técnica (PDF) | ✅ 2026-07-11 |
 | — | Oferta económica (PDF) | ✅ 2026-07-11 |
@@ -77,7 +88,8 @@
 | [`oferta-tecnica.md`](oferta-tecnica.md) | **La oferta técnica.** Abre con la **matriz de cumplimiento** (cruza cada requisito de las Bases con la sección donde se responde) y cierra el **régimen de penalidades** aceptado. Es además el **contenido fuente del deck**. |
 | [`oferta-economica.md`](oferta-economica.md) | **La oferta económica.** Cifras reales (ver abajo). |
 | [`propuesta-economica.xlsx`](propuesta-economica.xlsx) | **El Excel de la económica.** ⚠️ **Es FUENTE, no derivado** (Wherex no trae plantilla, se creó a mano). Las Bases lo listan como **documento integrante** (§1.2). |
-| [`deck-plan.json`](deck-plan.json) | El plan del deck — **artefacto auditable**; el PDF de 15 láminas es derivado. |
+| [`deck-plan.json`](deck-plan.json) | El plan del deck — **artefacto auditable**; el PDF de 26 láminas es derivado. La composición vigente está adjunta como versión 6 del artefacto `deck` en Proposal Studio; el número se deriva transaccionalmente y no se autora en el plan. |
+| **Radiografía AEO** (enlace vivo) | **Muestra de trabajo.** Un artículo nuevo (Carretera Austral) con **su capa de máquina visible y acoplada** al lado, más la **evidencia Semrush** de por qué existe. Es la prueba de lo que la §7 de la técnica promete. `noindex`, con rótulo *«Ejemplo ilustrativo de Efeonce»* y URL tokenizada.<br>🔗 https://think.efeoncepro.com/muestras/sky-carretera-austral-861c18cc0e37<br>**Recorrido de 4 pantallas:** ① el hueco (el SERP real: Wikipedia, Instagram, TripAdvisor — cero aerolíneas) · ② el artículo · ③ la radiografía (el acoplamiento) · ④ dónde más vive (video, social, imágenes).<br>Owner: `TASK-1410`. Fuente: repo `efeonce-think`. Docs: [`docs/think/`](../../think/radiografia-aeo-architecture.md). |
 
 > ⚠️ **Antes de subir el Excel: verificar que las Bases NO impongan un formato para la económica.** El
 > **Tribunal de Contratación Pública declaró ILEGAL una adjudicación** (SEREMI Magallanes, 2025) porque el
@@ -108,7 +120,7 @@
 |---|---|---|
 | **Base** (propuesto) | 8 artículos/mes + SEO/AEO + multimedia + reportería | **5.200.000** |
 | Ampliado (opcional) | 12 artículos/mes | 6.900.000 |
-| Artículo adicional / ad-hoc | por artículo | 260.000 |
+| ~~Artículo adicional~~ | ⚠️ **SIN precio unitario publicado** (2026-07-14): el ad-hoc se produce **dentro de la capacidad contratada**. El unitario de 260k dominaba al plan ampliado y le entregaba la calculadora al comprador (regla dura #2 de `seo-aeo-practice/04_PRICING`) | — |
 
 Pago 30 días desde aceptación conforme de la factura · facturación mensual · transferencia ·
 **2 años** renovables (aviso 60 días) · validez **120 días** · **desembolsos: no aplican** (todo incluido).
@@ -116,8 +128,8 @@ Pago 30 días desde aceptación conforme de la factura · facturación mensual �
 **Diagnóstico medido (AI Visibility Grader, 5 motores, 35 respuestas):**
 
 - Claridad de marca **100/100** · Ownership de categoría **20/100** (LATAM 16 menciones, JetSMART 9)
-- **El blog de SKY: 0 citas en 35 respuestas.** Las fuentes son terceros (BioBioChile 8, YouTube 8, Instagram 8, Despegar 7, Trustpilot 7).
-- **Escalera Be X:** Ser encontrada **40** · Ser legible **70** · Ser correcta **37** · Ser accionable **8** · Ser intrínseca **76**
+- **Citabilidad propia: 0%** (dato publicado del informe — de las 254 citas del estudio, ninguna es contenido editorial de SKY). Fuentes reales del run 46: skyairline.com 15 (corporativo, la #1), Trustpilot 14, Wikipedia 13, Instagram 11, BioBioChile 10, YouTube 8. ⚠️ NUNCA volver al claim «0 citas / no aparece ni una vez»: el informe que el comité abre muestra a skyairline.com como fuente #1.
+- **Escalera Be X** (vocabulario del informe publicado, NO «Ser encontrada…»): Que te encuentre **40** · Que te entienda **70** · Que te describa bien **37** · Que pueda actuar **8** · Que te prefiera **76**
 - Informe público en vivo: `think.efeoncepro.com/brand-visibility/r/grt-9892e5684c394557a63f8171926871c26d3278216daf42a2a8100951ccb5537f`
 
 **Semrush (el blog ya tiene tracción):** ~13.000 keywords · ~40.000 visitas orgánicas/mes.
@@ -130,7 +142,7 @@ una cara generada con IA es **tergiversación**, no un tema estético.
 
 ## Cómo se compone el deck
 
-El deck **no se dibuja**: se compone con el **Artifact Composer** desde el catálogo de 25 plantillas.
+El deck **no se dibuja**: se compone con el **Artifact Composer** desde el catálogo de 31 plantillas.
 
 ```bash
 pnpm deck:compose docs/commercial/tenders/sky-blog-2026/deck-plan.json --out .captures/sky-bid

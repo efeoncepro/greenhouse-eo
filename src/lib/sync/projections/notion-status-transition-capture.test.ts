@@ -269,7 +269,7 @@ describe('TASK-912 — notion-status-transition-capture (productivo Efeonce/Sky)
       expect(mocks.runGreenhousePostgresQuery.mock.calls[1][1][3]).toBe('Cambios solicitados')
     })
 
-    it('re-throw cuando re-fetch falla (retry exponencial)', async () => {
+    it('re-throw cuando re-fetch retryable falla sin captura Sentry directa', async () => {
       const apiErr = new Error('Notion API GET page 429')
 
       mocks.fetchPageStatus.mockRejectedValueOnce(apiErr)
@@ -281,11 +281,7 @@ describe('TASK-912 — notion-status-transition-capture (productivo Efeonce/Sky)
         )
       ).rejects.toThrow('429')
 
-      expect(mocks.captureWithDomain).toHaveBeenCalledWith(
-        apiErr,
-        'integrations.notion',
-        expect.objectContaining({ tags: expect.objectContaining({ stage: 'refetch' }) })
-      )
+      expect(mocks.captureWithDomain).not.toHaveBeenCalled()
     })
 
     it('NO throw cuando el emit del chain event falla (non-blocking)', async () => {

@@ -2,6 +2,7 @@ import 'server-only'
 
 import { query } from '@/lib/db'
 import { captureWithDomain } from '@/lib/observability/capture'
+import { NOTION_TERMINAL_ARCHIVED_BLOCK_ERROR_PREFIX } from '@/lib/space-notion/notion-errors'
 
 import type { ReliabilitySignal } from '@/types/reliability'
 
@@ -60,6 +61,7 @@ export const FTR_WRITEBACK_DEAD_LETTER_SIGNAL_ID = 'notion.metrics.ftr_writeback
 // Dead-letter threshold canonical: notion-ftr-writeback projection maxRetries=4
 // → snapshot con attempt_count >= 4 está exhausto.
 const FTR_WRITEBACK_DEAD_LETTER_THRESHOLD = 4
+const TERMINAL_NOTION_WRITEBACK_ERROR_PATTERN = `${NOTION_TERMINAL_ARCHIVED_BLOCK_ERROR_PREFIX}%`
 
 export const getNotionMetricsFtrWritebackDeadLetterSignal = async (): Promise<ReliabilitySignal> => {
   const observedAt = new Date().toISOString()
@@ -72,8 +74,9 @@ export const getNotionMetricsFtrWritebackDeadLetterSignal = async (): Promise<Re
        FROM greenhouse_delivery.task_ftr_snapshots
        WHERE notion_writeback_attempt_count >= $1
          AND notion_writeback_last_error IS NOT NULL
-         AND written_to_notion_at IS NULL`,
-      [FTR_WRITEBACK_DEAD_LETTER_THRESHOLD]
+         AND written_to_notion_at IS NULL
+         AND COALESCE(notion_writeback_last_error, '') NOT LIKE $2`,
+      [FTR_WRITEBACK_DEAD_LETTER_THRESHOLD, TERMINAL_NOTION_WRITEBACK_ERROR_PATTERN]
     )
 
     const count = Number(rows[0]?.count ?? 0)
@@ -148,8 +151,9 @@ export const getNotionMetricsFtrWritebackLagSignal = async (): Promise<Reliabili
          AND ftr_value IS NOT NULL
          AND written_to_notion_at IS NULL
          AND notion_writeback_attempt_count < $1
-         AND computed_at < NOW() - INTERVAL '${FTR_WRITEBACK_LAG_THRESHOLD_MIN} minutes'`,
-      [FTR_WRITEBACK_DEAD_LETTER_THRESHOLD]
+         AND computed_at < NOW() - INTERVAL '${FTR_WRITEBACK_LAG_THRESHOLD_MIN} minutes'
+         AND COALESCE(notion_writeback_last_error, '') NOT LIKE $2`,
+      [FTR_WRITEBACK_DEAD_LETTER_THRESHOLD, TERMINAL_NOTION_WRITEBACK_ERROR_PATTERN]
     )
 
     const count = Number(rows[0]?.count ?? 0)

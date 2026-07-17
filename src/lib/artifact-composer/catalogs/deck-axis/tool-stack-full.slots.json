@@ -1,0 +1,149 @@
+{
+  "template": "ToolStackFull",
+  "version": "0.4",
+  "viewport": { "width": 1920, "height": 1080 },
+  "slots": {
+    "sectionLabel": {
+      "selector": "[data-slot='sectionLabel']",
+      "type": "string",
+      "required": false,
+      "constraints": { "maxCharacters": 28, "maxLines": 1, "overflow": "reject" }
+    },
+    "title": {
+      "selector": "[data-slot='title']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": { "maxCharacters": 86, "maxLines": 2, "allowedTags": ["em"], "overflow": "reject" }
+    },
+    "badge": {
+      "selector": "[data-slot='badge']",
+      "type": "string",
+      "required": false,
+      "constraints": { "maxCharacters": 34, "maxLines": 1, "overflow": "reject" }
+    },
+    "lead": {
+      "selector": "[data-slot='lead']",
+      "type": "string",
+      "required": false,
+      "constraints": { "maxCharacters": 148, "maxLines": 4, "overflow": "reject" }
+    },
+    "stages": {
+      "selector": "[data-slot='stages']",
+      "type": "array",
+      "required": true,
+      "constraints": { "minItems": 5, "maxItems": 5, "overflow": "reject" },
+      "item": {
+        "type": "object",
+        "shape": {
+          "step": {
+            "type": "string",
+            "required": false,
+            "resolver": "ordinal-number",
+            "consumer": "resolver-only"
+          },
+          "stage": { "type": "string", "required": true, "maxCharacters": 22 },
+          "outcome": { "type": "string", "required": true, "maxCharacters": 108 },
+          "tools": {
+            "type": "array",
+            "required": true,
+            "constraints": { "minItems": 1, "maxItems": 6, "overflow": "reject" },
+            "item": {
+              "type": "object",
+              "shape": {
+                "tool": {
+                  "type": "enum",
+                  "required": true,
+                  "values": [
+                    "notion",
+                    "frameio",
+                    "adobe-illustrator",
+                    "adobe-photoshop",
+                    "adobe-premiere-pro",
+                    "adobe-after-effects",
+                    "adobe-express",
+                    "microsoft-365",
+                    "semrush",
+                    "ahrefs",
+                    "brand-visibility-grader",
+                    "screaming-frog",
+                    "shutterstock",
+                    "adobe-stock",
+                    "envato-elements",
+                    "adobe-firefly",
+                    "higgsfield",
+                    "magnific",
+                    "microsoft-teams",
+                    "slack"
+                  ],
+                  "resolver": "tool-logo-asset",
+                  "consumer": "resolver-only"
+                },
+                "name": { "type": "string", "required": true, "maxCharacters": 28 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "supportLayer": {
+      "selector": "[data-slot='supportLayer']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "label": { "type": "string", "required": true, "maxCharacters": 34 },
+        "summary": { "type": "string", "required": true, "maxCharacters": 128 },
+        "tools": {
+          "type": "array",
+          "required": true,
+          "constraints": { "minItems": 4, "maxItems": 6, "overflow": "reject" },
+          "item": {
+            "type": "object",
+            "shape": {
+              "tool": {
+                "type": "enum",
+                "required": true,
+                "values": [
+                  "notion",
+                  "frameio",
+                  "adobe-illustrator",
+                  "adobe-photoshop",
+                  "adobe-premiere-pro",
+                  "adobe-after-effects",
+                  "adobe-express",
+                  "microsoft-365",
+                  "semrush",
+                  "ahrefs",
+                  "brand-visibility-grader",
+                  "screaming-frog",
+                  "shutterstock",
+                  "adobe-stock",
+                  "envato-elements",
+                  "adobe-firefly",
+                  "higgsfield",
+                  "magnific",
+                  "microsoft-teams",
+                  "slack"
+                ],
+                "resolver": "tool-logo-asset",
+                "consumer": "resolver-only"
+              },
+              "name": { "type": "string", "required": true, "maxCharacters": 28 }
+            }
+          }
+        }
+      }
+    },
+    "footerNote": {
+      "selector": "[data-slot='footerNote']",
+      "type": "string",
+      "required": false,
+      "constraints": { "maxCharacters": 110, "maxLines": 2, "overflow": "reject" }
+    }
+  },
+  "presentation": {
+    "brandSurface": "timeline-full-approved-navy-gradient",
+    "composition": "full-canvas operational flow map: compact header + five fixed stages + one transverse support layer for collaboration, versioning, licensing and approved sources",
+    "logoPolicy": "tool key resolves through the closed tool-logo-asset resolver. The resolver also declares the logo plate contrast. Do not paste ad-hoc logos, hallucinated marks or generic icons for known tools; add the asset, source note, contrast plate and enum value to the catalog instead.",
+    "density": "Designed for reusable proposal slides: the process is the argument; the support layer prevents repeated collaboration/licensing logos from diluting the stage logic."
+  }
+}

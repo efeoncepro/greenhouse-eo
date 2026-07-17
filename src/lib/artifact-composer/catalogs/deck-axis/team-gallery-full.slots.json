@@ -1,0 +1,17 @@
+{
+  "template": "TeamGalleryFull",
+  "version": "0.1",
+  "viewport": { "width": 1920, "height": 1080 },
+  "slots": {
+    "sectionLabel": { "selector": "[data-slot='sectionLabel']", "type": "string", "required": false, "constraints": { "maxCharacters": 26, "maxLines": 1, "overflow": "reject" } },
+    "title": { "selector": "[data-slot='title']", "type": "rich-string", "required": true, "constraints": { "maxCharacters": 64, "maxLines": 2, "allowedTags": ["em"], "overflow": "reject" } },
+    "rosterMeta": { "selector": "[data-slot='rosterMeta']", "type": "string", "required": false, "constraints": { "maxCharacters": 34, "maxLines": 1, "overflow": "reject", "consistency": "must agree with the number of members; never claim more people than the roster renders" } },
+    "members": { "selector": "[data-slot='members']", "type": "array", "required": true, "constraints": { "minItems": 4, "maxItems": 6, "overflow": "reject", "order": "seniority / accountability first — the single accountable lead is item 1" }, "item": { "type": "object", "shape": {
+      "photo": { "type": "enum", "required": true, "values": ["andres", "daniela", "humberly", "julio", "luis", "maria-fernanda", "melkin", "valentina"], "resolver": "squad-person", "description": "FOTO REAL del squad: la clave resuelve a assets/squad/squad-<nombre>.png por allowlist cerrada (UnknownResolverValueError si no existe). GUARDRAIL DURO DEL DOMINIO: NUNCA una cara generada por IA ni retoque generativo del rostro — presentar una cara fabricada como parte del equipo es tergiversación, no un tema estético. Si falta la foto de alguien, se pide la foto; no se fabrica." },
+      "role": { "type": "string", "required": true, "maxCharacters": 34, "maxLines": 2 },
+      "name": { "type": "string", "required": true, "maxCharacters": 24, "maxLines": 1, "description": "nombre REAL de la persona de la foto — el binding foto↔nombre↔rol lo confirma el operador humano, nunca lo asume un agente" },
+      "dedication": { "type": "string", "required": true, "maxCharacters": 5, "maxLines": 1, "format": "NN%", "description": "written verbatim into .pct including the % sign — the renderer does not append it" }
+    } } }
+  },
+  "presentation": { "brandSurface": "timeline-full-approved-navy-gradient", "composition": "full-canvas photo roster: header (eyebrow + title + meta chip) above a cohesive row of 4-6 photo cards — real portrait, role, name, dedication", "staffingPolicy": "every card is a real, staffable person with a real dedication; the single accountable lead is mandatory and is always item 1", "rendererNote": "the photo is painted by the squad-person resolver as an <img src> effect; the blueprint card in the HTML is a real example (julio) that the filler clones and overwrites" }
+}

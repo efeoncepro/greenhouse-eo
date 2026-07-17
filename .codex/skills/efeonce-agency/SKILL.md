@@ -60,6 +60,8 @@ El crecimiento no se entrega: se **co-construye**. Tres pilares (una creencia):
 
 **El Why como EXPERIENCIA EFECTIVA DEL CLIENTE.** La **Experiencia Efeonce** significa que el cliente no contrató solo una agencia: contrató su entrada a un ecosistema de crecimiento. Capas: operación, software, aprendizaje, red y memoria. Canales: Greenhouse/Kortex/Verk/Creative Studio, Think, blog `efeoncepro.com/blog`, tools, YouTube, sociales, ebooks, webinars y futuro podcast. Greenhouse no reemplaza todos esos canales: los conecta, los hace visibles y convierte interacciones útiles en memoria de Account 360 / madurez / expansión. SSOT: `docs/context/10_experiencia-cliente.md`.
 
+**Primer wrapper vivo de la Experiencia Efeonce (SKY, 2026-07-13).** `https://experiencia.efeoncepro.com` es el primer **Efeonce Wrapper** cliente-facing: una experiencia anual creada para SKY por su primer año con Efeonce, operada desde el repo satélite `efeoncepro/sky-efeonce` y documentada en `sky-efeonce/docs/experiencia/`. Tratarlo como prueba de dirección para `"Tu año con Efeonce"`, no como automatización ya existente en Greenhouse ni como caso público autorizado sin permiso escrito.
+
 ---
 
 ## Filtro de decisión para una feature nueva
@@ -84,7 +86,7 @@ Antes de construir, poder responder **sí a ≥1 verde** y **no a todas las roja
  - **Greenhouse** = el hub (lo nuestro): experiencia del cliente + operaciones internas. Genera el switching cost. ~77% madurez ASaaS.
  - **Kortex** = CRM Intelligence sobre HubSpot (manifests YAML, agente Claude). `portal_id → space_id`. Alimenta Account 360.
  - **Verk** = Content + Distribution OS (Surround Map™). `brand_id → greenhouse_space_id`. Embed card en el dashboard.
- - **Efeonce Creative Studio** *(nombre de trabajo)* = producción creativa agentic de imagen/video/audio: templates, assets/runs/review y créditos; UI y MCP son consumers del mismo contrato. Primero interno, luego cliente gobernado. EPIC-028; runtime separado de Greenhouse.
+ - **Efeonce Creative Studio** *(nombre de trabajo)* = producción creativa agentic de imagen/video/audio: la persona trabaja con brief/referencias/candidatos/review y el sistema compila workflows; UI y MCP consumen el mismo contrato. Un solo runtime soporta `efeonce-managed`, `co-operated` y `client-operated` con responsabilidades por run y autonomía según riesgo. Primero interno, luego cliente gobernado; no es una quinta modalidad comercial ni “Managed Squad más barato”. EPIC-028; runtime separado de Greenhouse.
  - Regla: cada plataforma opera sola; **cuando el cliente está en el ecosistema completo, Greenhouse es donde todo converge.** No acoplar Greenhouse al runtime de Kortex/Verk/Creative Studio; consumir sólo contratos/proyecciones autorizadas.
 - **ASaaS (Agency Service as a Software)**: el servicio de agencia empaquetado como producto de software. 6 directrices: acceso permanente · datos en vivo · experiencia estandarizada · **valor acumulativo (el historial es feature)** · **switching cost creciente (North Star)** · monetización recurrente (tier pricing Basic/Pro/Enterprise = capability flags por tenant).
 

@@ -1,6 +1,10 @@
 import 'server-only'
 
 import { resolveSecretByRef } from '@/lib/secrets/secret-manager'
+import {
+  buildNotionApiErrorFromResponse,
+  buildNotionFetchError
+} from '@/lib/space-notion/notion-errors'
 
 /**
  * TASK-913 Slice 2 — Notion API client canonical demo-only (defense in depth).
@@ -36,6 +40,8 @@ import { resolveSecretByRef } from '@/lib/secrets/secret-manager'
 
 const NOTION_API = 'https://api.notion.com/v1'
 const NOTION_VERSION = '2022-06-28'
+const NOTION_WRITE_TIMEOUT_MS = 30_000
+const NOTION_READ_TIMEOUT_MS = 15_000
 // Reads (page GET + data source schema) usan 2026-03-11: data_sources endpoint
 // requiere >=2025-09-03 y matchea la Notion-Version de la suscripción webhook demo.
 const NOTION_READ_VERSION = '2026-03-11'
@@ -126,26 +132,26 @@ export const patchNotionDemoPage = async (
   properties: Record<string, NotionPropertyValue>
 ): Promise<unknown> => {
   const token = await resolveDemoToken()
+  const path = `/pages/${pageId}`
+  let response: Response
 
-  const response = await fetch(`${NOTION_API}/pages/${pageId}`, {
-    method: 'PATCH',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Notion-Version': NOTION_VERSION
-    },
-    body: JSON.stringify({ properties }),
-    signal: AbortSignal.timeout(30_000)
-  })
+  try {
+    response = await fetch(`${NOTION_API}${path}`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Notion-Version': NOTION_VERSION
+      },
+      body: JSON.stringify({ properties }),
+      signal: AbortSignal.timeout(NOTION_WRITE_TIMEOUT_MS)
+    })
+  } catch (error) {
+    throw buildNotionFetchError(error, { method: 'PATCH', path, timeoutMs: NOTION_WRITE_TIMEOUT_MS })
+  }
 
   if (!response.ok) {
-    const text = await response.text().catch(() => '')
-
-    const error = new Error(`Notion API PATCH ${response.status}: ${text}`)
-
-    // Tag for caller observability + retry policy
-    ;(error as Error & { status?: number }).status = response.status
-    throw error
+    throw await buildNotionApiErrorFromResponse(response, { method: 'PATCH', path })
   }
 
   return response.json()
@@ -174,25 +180,28 @@ export interface DemoPageStatus {
  */
 export const fetchDemoPageStatus = async (pageId: string): Promise<DemoPageStatus | null> => {
   const token = await resolveDemoToken()
+  const path = `/pages/${pageId}`
+  let response: Response
 
-  const response = await fetch(`${NOTION_API}/pages/${pageId}`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Notion-Version': NOTION_READ_VERSION
-    },
-    signal: AbortSignal.timeout(15_000)
-  })
+  try {
+    response = await fetch(`${NOTION_API}${path}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Notion-Version': NOTION_READ_VERSION
+      },
+      signal: AbortSignal.timeout(NOTION_READ_TIMEOUT_MS)
+    })
+  } catch (error) {
+    throw buildNotionFetchError(error, { method: 'GET', path, timeoutMs: NOTION_READ_TIMEOUT_MS })
+  }
 
   if (response.status === 404) {
     return null
   }
 
   if (!response.ok) {
-    const error = new Error(`Notion API GET page ${response.status}`)
-
-    ;(error as Error & { status?: number }).status = response.status
-    throw error
+    throw await buildNotionApiErrorFromResponse(response, { method: 'GET', path })
   }
 
   const body = (await response.json()) as {

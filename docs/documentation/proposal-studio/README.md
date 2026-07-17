@@ -60,7 +60,7 @@ confirmado.
 1. **El objeto se llama `Proposal`, no `Tender`.** Una licitación es un **origen** (`public_tender`),
    no la identidad del objeto. También existen `private_rfp` y `direct_sales`. Los estados finales son
    **ganada / perdida** (`won` / `lost`) — una venta directa no se "adjudica".
-2. **El motor es genérico y el deck es un catálogo.** El catálogo `deck-axis` (25 plantillas, 16:9,
+2. **El motor es genérico y el deck es un catálogo.** El catálogo `deck-axis` (29 plantillas, 16:9,
    sale en PDF) es **dato**, no una rama del motor. Un carrusel de Instagram sería otro catálogo, sin
    tocar una línea del motor.
 3. **Lo único que se renderiza productivamente es un manifiesto resuelto y sellado.** Un archivo con
@@ -87,7 +87,7 @@ confirmado.
 | Pieza | Estado |
 |---|---|
 | Aggregate `Proposal` + estados + evidencia + requisitos + API | ✅ funcionando, verificado en staging |
-| Motor Artifact Composer + catálogo `deck-axis` (25 plantillas) + brand pack | ✅ funcionando |
+| Motor Artifact Composer + catálogo `deck-axis` (29 plantillas) + brand pack | ✅ funcionando |
 | `artifact-worker` en la nube + cola + almacenamiento del PDF | ✅ verificado end-to-end en **staging** (la propuesta real de SKY produjo su PDF) |
 | **Producción** | ⛔ **apagada a propósito** — requiere sign-off e integración al control de releases |
 | Pantalla en el portal / Nexa | ❌ todavía no existe (la capacidad se opera por API y línea de comandos) |

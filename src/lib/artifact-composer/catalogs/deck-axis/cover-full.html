@@ -25,14 +25,14 @@
     background: var(--axis-deck-recipe-cover-hero);
   }
 
-  /* Lockup: marca Efeonce → marca cliente → tipo de propuesta.  El renderer
-     solo reemplaza los slots; la jerarquía y las proporciones no se negocian. */
-  .stack { position:relative; z-index:1; width:900px; display:flex; flex-direction:column; align-items:center; text-align:center; transform:translateY(-18px); }
-  .logo-efeonce { width:650px; max-height:188px; object-fit:contain; }
-  .relationship-mark { width:88px; height:1px; margin:26px 0 20px; background:linear-gradient(90deg, transparent, rgba(var(--axis-deck-recipe-cover-halo-teal-rgb), .76), transparent); box-shadow:0 0 18px rgba(var(--axis-deck-teal-500-rgb), .22); }
-  .client-stage { min-height:170px; display:flex; align-items:center; justify-content:center; }
-  .logo-client  { width:auto; height:170px; max-width:280px; object-fit:contain; filter:brightness(0) invert(1); }
-  .proposal-kind { max-width:790px; margin-top:26px; font-family:var(--axis-deck-type-display); font-weight:600; font-size:70px; color:var(--axis-ppt-neutral-50); line-height:1.06; letter-spacing:-.025em; text-wrap:balance; }
+  /* Lockup centrado: marca Efeonce → marca cliente → tipo de propuesta. El
+     cliente entrega una variante on-dark aprobada; el template nunca recolorea. */
+  .stack { position:relative; z-index:1; width:1100px; display:flex; flex-direction:column; align-items:center; text-align:center; transform:translateY(-42px); }
+  .logo-efeonce { width:840px; max-height:200px; object-fit:contain; }
+  .relationship-mark { width:104px; height:1px; margin:24px 0 20px; background:linear-gradient(90deg, transparent, rgba(var(--axis-deck-recipe-cover-halo-teal-rgb), .82), transparent); box-shadow:0 0 20px rgba(var(--axis-deck-teal-500-rgb), .26); }
+  .client-stage { min-height:130px; display:flex; align-items:center; justify-content:center; }
+  .logo-client  { width:auto; height:122px; max-width:360px; object-fit:contain; }
+  .proposal-kind { max-width:840px; margin-top:24px; font-family:var(--axis-deck-type-display); font-weight:600; font-size:70px; color:var(--axis-ppt-neutral-50); line-height:1.06; letter-spacing:-.025em; text-wrap:balance; }
 
 </style></head>
 <body>
@@ -41,7 +41,7 @@
       <img class="logo-efeonce" src="assets/brand/logo-negative.svg" alt="efeonce" data-slot="efeonceLogo">
       <div class="relationship-mark" aria-hidden="true"></div>
       <div class="client-stage">
-        <img class="logo-client" src="assets/clients/sky.svg" alt="SKY" data-slot="clientLogo" data-slot-type="asset" data-slot-required="true" data-slot-resolver="client-brand-mark">
+        <img class="logo-client" src="assets/clients/sky-on-dark.svg" alt="SKY" data-slot="clientLogo" data-slot-type="asset" data-slot-required="true" data-slot-resolver="client-brand-mark">
       </div>
       <div class="proposal-kind" data-slot="proposalKind" data-slot-type="enum" data-slot-required="true" data-slot-resolver="proposal-kind-label">Propuesta Técnica</div>
     </div>

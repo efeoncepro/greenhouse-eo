@@ -255,6 +255,14 @@ ENV_VARS="${ENV_VARS},RELIABILITY_AI_OBSERVER_ENABLED=${RELIABILITY_AI_OBSERVER_
 CLOUD_COST_AI_COPILOT_ENABLED="${CLOUD_COST_AI_COPILOT_ENABLED:-false}"
 ENV_VARS="${ENV_VARS},CLOUD_COST_AI_COPILOT_ENABLED=${CLOUD_COST_AI_COPILOT_ENABLED}"
 
+# TASK-356 / EPIC-011 — Hiring handoff downstream bridges.
+# Declarativo en deploy.sh porque `--set-env-vars` es destructivo: el Reliability
+# AI Observer corre en este worker y evalua `hiring.internal_hire_awaiting_onboarding`
+# con este flag. Vercel tambien lo consume para la UI/API de Hiring Activation.
+# Rollback (<5min): `gcloud run services update ops-worker --update-env-vars HIRING_HANDOFF_BRIDGES_ENABLED=false`.
+HIRING_HANDOFF_BRIDGES_ENABLED="${HIRING_HANDOFF_BRIDGES_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},HIRING_HANDOFF_BRIDGES_ENABLED=${HIRING_HANDOFF_BRIDGES_ENABLED}"
+
 # TASK-990 / TASK-995 / TASK-1210 — Finance multi-currency MXN + CLF activación.
 # El ops-worker corre el Nubox sync (/nubox/sync, /nubox/quotes-hot-sync) que
 # materializa income; estos flags gatean el plano nativo MXN + la proyección CLF.

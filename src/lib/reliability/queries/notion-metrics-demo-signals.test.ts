@@ -160,7 +160,8 @@ describe('TASK-913 Slice 3 — writeback demo signals canonical', () => {
       expect(sql).toContain('notion_writeback_attempt_count >=')
       expect(sql).toContain('notion_writeback_last_error IS NOT NULL')
       expect(sql).toContain('written_to_notion_at IS NULL')
-      expect(callArgs[1]).toEqual([4])
+      expect(sql).toContain("COALESCE(notion_writeback_last_error, '') NOT LIKE")
+      expect(callArgs[1]).toEqual([4, '[terminal:notion_archived_block]%'])
     })
   })
 
@@ -208,6 +209,7 @@ describe('TASK-913 Slice 3 — writeback demo signals canonical', () => {
       expect(sql).toContain('written_to_notion_at IS NULL')
       expect(sql).toContain('notion_writeback_attempt_count <')
       expect(sql).toContain("INTERVAL '30 minutes'")
+      expect(sql).toContain("COALESCE(notion_writeback_last_error, '') NOT LIKE")
       // Uses EXTRACT EPOCH from NOW() - computed_at (TIMESTAMPTZ subtraction, safe)
       expect(sql).toContain('EXTRACT(EPOCH FROM (NOW() - computed_at))')
     })

@@ -11,8 +11,9 @@ import type { AiProposalDecision, ConfirmAiProposalInput } from '@/types/hiring-
  * TASK-1361 — `POST /api/hiring/assessments/ai/proposals/[id]/confirm`. El write gobernado humano
  * (propose→confirm→execute). Capability LEAST-PRIVILEGE por kind: `question_draft` requiere
  * `hiring.assessment.author` (crea la pregunta), `response_score` requiere `hiring.assessment.score`
- * (aplica el puntaje). NO gateado por el flag del feature (drenar la cola siempre es posible).
- * Body: `{ decision: 'confirm'|'reject', decisionNote?, questionOverride?, finalScore? }`.
+ * (aplica el puntaje), `opening_public_copy` (TASK-1385) requiere `hiring.opening.write` (aplica el
+ * copy al opening). NO gateado por el flag del feature (drenar la cola siempre es posible).
+ * Body: `{ decision: 'confirm'|'reject', decisionNote?, questionOverride?, finalScore?, publicCopyOverride? }`.
  */
 export const dynamic = 'force-dynamic'
 
@@ -21,6 +22,7 @@ interface ConfirmBody {
   decisionNote?: string
   questionOverride?: ConfirmAiProposalInput['questionOverride']
   finalScore?: number
+  publicCopyOverride?: ConfirmAiProposalInput['publicCopyOverride']
 }
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -55,12 +57,24 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       if (!can(tenant, 'hiring.assessment.author', 'create', 'tenant')) {
         return canonicalErrorResponse('forbidden', { extra: { requiredCapability: 'hiring.assessment.author' } })
       }
+    } else if (proposal.kind === 'opening_public_copy') {
+      // TASK-1385: el confirm escribe los public_* del opening — mismo gate que el PATCH del opening.
+      if (!can(tenant, 'hiring.opening.write', 'update', 'tenant')) {
+        return canonicalErrorResponse('forbidden', { extra: { requiredCapability: 'hiring.opening.write' } })
+      }
     } else if (!can(tenant, 'hiring.assessment.score', 'execute', 'tenant')) {
       return canonicalErrorResponse('forbidden', { extra: { requiredCapability: 'hiring.assessment.score' } })
     }
 
     const result = await confirmAiProposal(
-      { proposalId: id, decision: body.decision, decisionNote: body.decisionNote, questionOverride: body.questionOverride, finalScore: body.finalScore },
+      {
+        proposalId: id,
+        decision: body.decision,
+        decisionNote: body.decisionNote,
+        questionOverride: body.questionOverride,
+        finalScore: body.finalScore,
+        publicCopyOverride: body.publicCopyOverride,
+      },
       tenant.userId,
     )
 

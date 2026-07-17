@@ -1,0 +1,99 @@
+{
+  "_readme": [
+    "Preview SKY para la plantilla reusable ContentHubAnatomyFull.",
+    "Componer: pnpm deck:compose docs/commercial/tenders/sky-blog-2026/reusable-slides/content-hub-anatomy-preview.json --out .captures/sky-content-hub-anatomy-template"
+  ],
+  "tenderId": "SKY-BLOG-2026-REUSABLE-CONTENT-HUB-ANATOMY",
+  "slides": [
+    {
+      "slideId": "content-hub-anatomy",
+      "contentType": "content-hub-anatomy",
+      "template": "ContentHubAnatomyFull",
+      "slots": {
+        "sectionLabel": "DETRÁS DE LA RADIOGRAFÍA AEO",
+        "title": "La Radiografía empieza antes de publicar: <em>se construye en tres capas</em>",
+        "lead": "Aquí se documentan las decisiones que luego el comité podrá comprobar en el X-ray vivo.",
+        "proofKicker": "SIGUIENTE · PRUEBA VIVA",
+        "proofLink": "<a href=\"https://think.efeoncepro.com/muestras/sky-carretera-austral-861c18cc0e37/\">Abrir la Radiografía AEO ↗</a>",
+        "workspaceName": "Backstage de la Radiografía",
+        "documentPath": "Carretera Austral / En validación",
+        "version": "Borrador v07",
+        "status": "Validación cliente",
+        "research": {
+          "kicker": "01 · Research trail",
+          "title": "La decisión editorial",
+          "state": "Trazable",
+          "question": "¿Cómo planificar la Carretera Austral sin perder tiempo ni conexiones?",
+          "primaryKeyword": "carretera austral",
+          "intent": "planificación de viaje",
+          "clusterCount": "3 señales",
+          "clusters": [
+            { "name": "cómo llegar a Carretera Austral", "signal": "Alta", "strength": "high" },
+            { "name": "cuántos días necesita la ruta", "signal": "Media", "strength": "medium" },
+            { "name": "mejor época para viajar", "signal": "Foco", "strength": "focused" }
+          ],
+          "sourceCount": "3 fuentes",
+          "sources": [
+            { "type": "SKY", "title": "Rutas y destinos SKY", "note": "Vigencia revisada · 2026" },
+            { "type": "GOV", "title": "Sernatur · Carretera Austral", "note": "Fuente institucional" },
+            { "type": "METEO", "title": "Dirección Meteorológica", "note": "Clima y estacionalidad" }
+          ]
+        },
+        "article": {
+          "toolLabel": "Artículo vivo",
+          "owner": "Owner · Equipo editorial",
+          "eyebrow": "Guía de planificación",
+          "title": "Carretera Austral: cómo llegar, cuándo ir y cuántos días necesita",
+          "deck": "Una guía práctica para decidir punto de entrada, temporada y duración antes de reservar el viaje.",
+          "answerLabel": "Respuesta directa",
+          "directAnswer": "La ruta puede recorrerse en 7 a 14 días según el punto de inicio, las conexiones elegidas y el tiempo destinado a cada tramo.",
+          "sections": [
+            {
+              "tag": "H2 · DECISIÓN 01",
+              "title": "Cómo llegar y desde dónde comenzar la ruta",
+              "copy": "El contenido compara accesos y conexiones para que la persona pueda elegir el punto de entrada más conveniente."
+            },
+            {
+              "tag": "H2 · DECISIÓN 02",
+              "title": "Cuántos días necesita según su itinerario",
+              "copy": "Tres escenarios de viaje ordenan las alternativas sin convertir la guía en una lista genérica de destinos."
+            },
+            {
+              "tag": "H2 · DECISIÓN 03",
+              "title": "Cuándo viajar: clima, temporada y reservas",
+              "copy": "La recomendación separa clima favorable, temporada alta y disponibilidad para evitar una respuesta simplista."
+            }
+          ],
+          "evidenceCallout": "Cada recomendación conserva fuente, vigencia y responsable de revisión dentro del mismo documento.",
+          "commentInitials": "CL",
+          "commentText": "Aclarar qué conexiones dependen de temporada antes de aprobar."
+        },
+        "machine": {
+          "kicker": "03 · X-ray técnico",
+          "title": "Lo que leerá la máquina",
+          "state": "Validado",
+          "metaTitle": "Carretera Austral: cómo llegar y cuántos días ir",
+          "metaDescription": "Planifique la Carretera Austral: accesos, temporada, conexiones y duración recomendada según su itinerario.",
+          "schemaLabel": "Schema conectado",
+          "schemaTypes": ["Article", "FAQPage", "BreadcrumbList"],
+          "schemaType": "Article + FAQPage",
+          "schemaAbout": "Carretera Austral",
+          "schemaEntity": "Cómo planificar el viaje",
+          "checks": [
+            { "label": "Intent + respuesta directa", "stateLabel": "Listo", "tone": "ready" },
+            { "label": "Entidades + enlaces internos", "stateLabel": "Con fuente", "tone": "evidence" },
+            { "label": "Metadata + canonical", "stateLabel": "Listo", "tone": "ready" },
+            { "label": "Vigencia de recomendaciones", "stateLabel": "Revisión", "tone": "review" }
+          ],
+          "commentInitials": "EO",
+          "comment": "La capa técnica se valida junto al texto; no se agrega como trámite después de redactar."
+        },
+        "layers": [
+          { "label": "Research trazable", "description": "La decisión parte de señales y fuentes.", "kind": "research" },
+          { "label": "Respuesta útil", "description": "La persona encuentra una respuesta antes del desarrollo.", "kind": "reader" },
+          { "label": "X-ray técnico", "description": "Metadata, schema y QA hacen recuperable la pieza.", "kind": "machine" }
+        ]
+      }
+    }
+  ]
+}

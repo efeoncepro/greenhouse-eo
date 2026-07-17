@@ -8,7 +8,7 @@ argument-hint: "[país/etapa del bid o pregunta concreta]"
 
 # greenhouse-public-private-tenders — Operador de Licitaciones
 
-> **Skill de dominio (método + conocimiento), NO un módulo runtime.** Esta skill es el "cerebro" reutilizable del ciclo de licitación. Hay DOS runtimes que alimenta: (a) el **discovery público** (ingesta Mercado Público, `public_tenders*`) del programa **RESEARCH-007** (TASK-673/675–687), y (b) el **Proposal Studio SHIPPED** (TASK-1392/1393/1391, 2026-07-12): aggregate `Proposal` + Artifact Composer + render pipeline gobernado — su manual de uso/evolución es el companion **`proposal-studio-runtime.md`**. Esta skill *alimenta y opera* esos módulos; **no los reimplementa**. Si te piden construir/extender runtime, carga también `arch-architect` (overlay Greenhouse) y `greenhouse-backend`.
+> **Skill de dominio (método + conocimiento), NO un módulo runtime.** Esta skill es el "cerebro" reutilizable del ciclo de licitación. Hay DOS runtimes que alimenta: (a) el **discovery público** (ingesta Mercado Público, `public_tenders*`) del programa **RESEARCH-007** (TASK-673/675–687), y (b) el **Proposal Studio SHIPPED** (TASK-1392/1393/1391 + 1412/1413/1415, 2026-07-12→16): aggregate `Proposal` + Artifact Composer + render pipeline gobernado + versionado derivado de artefactos + superficie de portal para ver/descargar (`/admin/commercial/proposals`) + **motor de chapter-authors** (TASK-1415: autoría agéntica de láminas servicio-agnóstica, propose→confirm, flag OFF — `proposals/authoring/**`) — su manual de uso/evolución es el companion **`proposal-studio-runtime.md`**. Esta skill *alimenta y opera* esos módulos; **no los reimplementa**. Si te piden construir/extender runtime, carga también `arch-architect` (overlay Greenhouse) y `greenhouse-backend`.
 
 ## Cuándo invocar
 
@@ -26,6 +26,7 @@ argument-hint: "[país/etapa del bid o pregunta concreta]"
 
 ```
 ¿En qué estás?
+├─ Arrancar un deal (workspace/carpeta canónica: bases/research/ofertas/deck/manifiesto)  `pnpm tender:new <slug>` → TENDER_WORKSPACE_TEMPLATE.md
 ├─ Construir la propuesta COMPLETA end-to-end (director de orquesta) . bid-construction-playbook.md
 ├─ Marco legal / norma / inhabilidades / recursos (Chile) ...... chile-publico-marco-legal.md
 ├─ Cómo opera ChileCompra: modalidades, códigos, bases,
@@ -48,6 +49,32 @@ argument-hint: "[país/etapa del bid o pregunta concreta]"
 
 Carga **solo** el/los companions relevantes a la etapa. No cargues los 9 de una.
 
+### 🔴 La Radiografía AEO — la muestra de trabajo que ya existe (no la reinventes)
+
+En una licitación de contenidos **todas las ofertas dicen lo mismo** ("optimizamos para SEO y AEO") y **ninguna lo muestra**. Ya tenemos la herramienta que cierra esa distancia: escribe un artículo **real** para el cliente y lo **abre en canal** en cuatro pantallas (el hueco · el artículo · la capa de máquina acoplada · dónde más vive). Live: `think.efeoncepro.com/muestras/<slug>-<token>` (primer caso: SKY, Wherex 2026).
+
+**Es una CAPACIDAD con dos trabajos, no un anexo del bid:** *(1)* **educar** al cliente/prospecto que no entiende qué significa "aparecer en ChatGPT" —sirve **sin venta en curso**— y *(2)* **habilitar la venta** (enlace + lámina de deck + demo en vivo + prueba verificable por el comité).
+
+- **Un cliente nuevo NO requiere código:** el cliente es un **payload** JSON. Cero componentes.
+- **Runtime en el repo `efeonce-think`**, NO en `greenhouse-eo`.
+- **En el deck va por ENLACE, no por captura** (el catálogo del composer no tiene plantilla para capturas de UI, y la pieza es **interactiva**: un PNG estático mata justo lo que demuestra). Ver la lámina `muestra` (`contentType: highlight`) del deck de SKY.
+- 🔴 **NUNCA** dejar que la muestra cite **nuestra propia oferta** ni narre su interfaz: **se defiende sola** (invariante 12c + assert 34b).
+- 🔴 **Gate humano:** el operador elige el ángulo del artículo. El agente no lo elige.
+- 🔴 **CERO cifras sin fuente googleable.** Auditoría 2026-07-14: **de las 6 cifras que la pieza
+  exhibía, 3 no resistían una verificación** — y una tenía un **nombre de estudio que no existe**. En
+  una licitación, el evaluador **va a buscar la fuente**: si no la encuentra, **se cae todo lo demás**.
+  El schema ahora rompe el build ante cualquier cifra sin `source`+`asOf`. ⚠️ Y **una prevalencia no es
+  un lift** (ver `seo-aeo` → `ANTIPATTERNS`).
+- 🔴 **Pásale `axe` antes de mandarla.** El fallo de accesibilidad va a aparecer **en la línea que
+  prueba el cumplimiento** (el crédito de foto —que demuestra el requisito de «imagen con licencia
+  verificable»— daba 3,3:1). En una agencia que vende rigor, eso no es un bug: es el titular.
+- ⚠️ **Si invitas al comité a verificar el schema, mándalo a `validator.schema.org` — NUNCA al Rich
+  Results Test de Google.** Ese reportaría el `FAQPage` como *«no elegible para resultado
+  enriquecido»*, que es exactamente el autogol que la pieza evita (Google restringió esa cajita en
+  2023 a gobierno y salud), **con el evaluador de testigo**.
+
+**Antes de tocarla, cargar:** `docs/think/radiografia-aeo-architecture.md` (los invariantes) + `docs/think/radiografia-aeo-manual.md` (cómo se crea la del siguiente cliente). Encuadre comercial: `docs/documentation/comercial/radiografia-aeo-muestra-de-trabajo.md`.
+
 ## Reglas duras (hard rules)
 
 1. **Nada de norma/umbral/plazo/monto como verdad eterna.** El derecho de compras cambia (Chile: **Ley 21.634/2023** modernizó la 19.886; Compra Ágil pasó de 30 a **100 UTM**; LATAM reforma seguido). Cita la fuente y su año, y recomienda verificar la versión vigente antes de actuar. Si no puedes verificar, dilo explícito.
@@ -58,6 +85,8 @@ Carga **solo** el/los companions relevantes a la etapa. No cargues los 9 de una.
 6. **Human-in-control en la presentación.** La skill/agente **prepara** el paquete; **nunca** envía una oferta ni firma sin confirmación humana explícita. No almacenar credenciales ni cookies de los portales.
 7. **Evidence-first.** Toda clasificación (fit, monto, plazo, riesgo) cita el campo/documento que la sustenta (nombre vs bases técnicas vs items). Nombre pesa menos que bases técnicas.
 8. **es-CL neutro, tuteo.** Sin voseo ni modismos rioplatenses. Copy visible pasa por `copywriting` / `greenhouse-ux-writing`.
+
+9. **El deal vive en un workspace canónico (el "DSR interno").** Arráncalo con `pnpm tender:new <slug>`: carpeta con `bases/` (RFP) · `research/` (investigación 🔒) · `oferta-tecnica.md` (fuente + ledger de evidencia) · `deck-plan.json` · `artifact-manifest.json` (piezas vivas por enlace) · `anexos/` · `*-INTERNO`. El discriminador que manda es **audiencia**: `research/` + `*-INTERNO` **nunca** cruzan al cliente. Las fuentes son archivos git (NO `proposal_assets`); el aggregate `Proposal` referencia la carpeta por `proposal_id`. Contrato: `docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md`.
 
 ## Sinergias — tabla de hand-off
 
@@ -92,10 +121,10 @@ Esta skill **decide y estructura**; delega el craft especializado. Declara siemp
 | `bid-lifecycle-go-no-go.md` | Pipeline canónico discovered→screened→triage→evaluate→plan-bid→submit→reconcile; scoring explicable (10 componentes) + decision bands; matcher hygiene (falsos positivos) |
 | `pricing-garantias-finance.md` | Costeo (cost-plus vs valor) sobre loaded cost, indexación UF/UTM, instrumentos de garantía y su costo/cashflow, plazos de pago del Estado, factoring |
 | `propuesta-tecnica-economica.md` | Estructura de la oferta (técnica/económica/administrativa), matriz de cumplimiento, anexos y declaraciones juradas, armado del equipo/casos |
-| `deck-visual-system.md` | **Sistema visual del deck:** el deck se **compone** desde un catálogo cerrado de **25 plantillas** (nunca freehand) + las 5 reglas del molde (degradado vibrante — **nunca navy plano** · tipografía sin Black/900 · safe-area · íconos Solar · glass milky) + el **selector determinista** (`registry.json`, 1 content-type → 1 plantilla) + **3D icons clay** (curar > generar; 3 filtros) + **guardrail de fotos del equipo** (fotos reales, **nunca caras IA**) + render HTML→Chromium |
+| `deck-visual-system.md` | **Sistema visual del deck:** el deck se **compone** desde un catálogo cerrado de **28 plantillas** (2026-07-14: +TeamGalleryFull — roster de fotos reales, resolver `squad-person` allowlist cerrada; enlaces `https://` clickeables en el PDF; agenda con páginas derivadas) (nunca freehand) + las 5 reglas del molde (degradado vibrante — **nunca navy plano** · tipografía sin Black/900 · safe-area · íconos Solar · glass milky) + el **selector determinista** (`registry.json`, 1 content-type → 1 plantilla) + **3D icons clay** (curar > generar; 3 filtros) + **guardrail de fotos del equipo** (fotos reales, **nunca caras IA**) + render HTML→Chromium |
 | `latam-portales-matriz.md` | Por país (CL, CO, PE, BR, MX, AR, PA, CR, EC, UY): portal, órgano rector, ley, registro de proveedor, particularidades, madurez de API |
 | `privado-rfp-lifecycle.md` | Tenders corporativos vendor-side: RFI/RFP/RFQ y cuándo es cuál, sourcing events, evaluación por el comprador, shortlist, negociación/BAFO, reverse auction, cómo ganar, diferencias con lo público |
 | `privado-plataformas-sectores.md` | E-procurement (SAP Ariba, Coupa, Jaggaer, GEP, Oracle, SAP Fieldglass/VMS), precalificación y registros (Achilles, SICEP, REPRO, TVEC privado), y playbooks por sector (minería, energía, retail, banca, telco, salud privada) |
 | `compliance-riesgo-integridad.md` | Checklist de admisibilidad, inhabilidades, probidad/conflicto de interés, subcontratación, PI/confidencialidad, multas y sanciones |
 | `data-sources-apis.md` | API Mercado Público v1 (ticket DCCP) + Compra Ágil v2 Beta, adjuntos WebForms, POC `scripts/research/mercadopublico-poc/`, conexión al módulo RESEARCH-007, MCP Legal Data Hunter, HubSpot/Notion |
-| `proposal-studio-runtime.md` | **El runtime SHIPPED (TASK-1392/1393/1391, 2026-07-12)**: cómo USAR el pipeline completo (Proposal → evidencia → manifest → render job gobernado → `artifact-worker` → PDF en asset store) y cómo EVOLUCIONARLO (costuras: catálogo nuevo, outputTarget, brand pack, fase agéntica con el molde propose→confirm→execute, failure codes, constraints del RFP) — lo primero que lee un agente nuevo que va a tocar el motor |
+| `proposal-studio-runtime.md` | **El runtime SHIPPED (TASK-1392/1393/1391 + 1415, 2026-07-12→16)**: cómo USAR el pipeline completo (Proposal → evidencia → manifest → render job gobernado → `artifact-worker` → PDF versionado en asset store → ver/descargar en el portal) y cómo EVOLUCIONARLO (costuras: catálogo nuevo, outputTarget, brand pack, fase agéntica con el molde propose→confirm→execute, **un chapter-author nuevo** — implementar la interface de `proposals/authoring/`, jamás tocarla —, failure codes, constraints del RFP) — lo primero que lee un agente nuevo que va a tocar el motor |

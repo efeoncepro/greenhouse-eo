@@ -15,6 +15,7 @@ Load only the references required by the current landing, widget, or operation.
 - Be read-only by default. Do not publish, delete, clear cache, install plugins, or mutate live WordPress unless the user explicitly asks.
 - Never print, store, commit, or screenshot raw Application Passwords, SSH passwords, private keys, bearer tokens, cookies, or authorization headers.
 - Public site runtime is WordPress on Kinsta at `https://efeoncepro.com`; active theme is `ohio-child`; parent is `ohio`.
+- Before any Kinsta SSH/WP-CLI operation, run `pnpm public-website:ssh-check`. A missing Kinsta API token does not mean SSH is unavailable; they are independent access lanes.
 - Use the repo wrapper for remote WP-CLI PHP:
   `pnpm public-website:wpcli -- --eval-file ./tmp/<script>.php --wp-user 12`
 - Do not write `_elementor_data` directly for normal mutations. Load the Elementor document and call:
@@ -39,6 +40,7 @@ Read the minimal set:
 | Growth Forms or public form embed | `references/growth-forms-wordpress.md` |
 | Measurement/tagging (GTM containers, dataLayer, GA4 events on the site) | `docs/reference/measurement-gtm-ga4/` (start with `04-greenhouse-gh-event-convention.md`; live container `GTM-NGHPGRLZ`) |
 | AI Content Factory, Gutenberg posts, draft/private clones | `references/content-factory-gutenberg.md` |
+| Agentic blogpost from governed write through human publication and live QA | `references/agentic-blogpost-end-to-end.md` |
 | Custom Elementor widget/plugin work | `references/custom-elementor-widgets.md` |
 | Historical layout incident or older public page | `references/layout-incidents.md` |
 | Runtime discovery, bridge inspection, repo binding, Kinsta/WP inventory | `references/runtime-and-discovery.md` |
@@ -66,6 +68,7 @@ Use repo docs as source of truth for long-lived contracts:
 - `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_DECISION_V1.md`
 - `docs/operations/public-site-repository-control-plane-discovery-20260614.md`
+- `docs/architecture/agent-invariants/PUBLIC_SITE_KINSTA_ACCESS_AGENT_INVARIANTS.md`
 
 For AEO/Growth Forms also use:
 
@@ -78,6 +81,7 @@ For AEO/Growth Forms also use:
 ## Common Commands
 
 ```bash
+pnpm public-website:ssh-check
 pnpm public-website:discover
 pnpm public-website:discover -- --authenticated --wpcli --write
 pnpm public-website:bridge-inspect -- --page-id <id>

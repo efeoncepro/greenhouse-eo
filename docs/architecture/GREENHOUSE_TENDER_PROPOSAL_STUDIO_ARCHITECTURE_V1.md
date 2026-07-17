@@ -29,7 +29,7 @@ contra él **sin actualizarlo**. Lo que sigue es la foto verificada contra el re
 | **Proposal Intake Agent Contract** (propose → confirm → execute + eval fixture) | ✅ **Code-complete** (internal-only, OFF sin módulo) | `proposals/intake-agent.ts` |
 | **Proyección allowlisted de render** + gate de audience fail-closed | ✅ **Code-complete** — el contrato que TASK-1391 consume | `proposals/render-projection.ts` |
 | UI · Nexa/MCP surface | ❌ **No existe** (F5) | — |
-| Los 3 nodos de juicio (orquestador · chapter-authors · verifier) | ❌ **No existe** (F1/F2) | — |
+| Los 3 nodos de juicio (orquestador · chapter-authors · verifier) | 🟡 **El nodo chapter-author EXISTE** (TASK-1415, 2026-07-16): motor servicio-agnóstico + diagnóstico (SEO/AEO) como primera implementación completa + 2º author (credenciales) que prueba el agnosticismo. Flag `TENDER_CHAPTER_AUTHOR_ENABLED` OFF. Orquestador y verifier siguen sin existir. | `proposals/authoring/**` |
 | **Renderer productivo (TASK-1391)** — `proposal_render_jobs` (aplicado a dev) + gates fail-closed al encolar (audience por referencia · accesibilidad · deadline · validadores) + QA mecánica en renderSlide (missing_asset/font_fallback/blank_slide) + Render Agent (propose→confirm→execute + eval) + dispatcher con prioridad deadline+aging + `services/artifact-worker` (PRIMER Cloud Run Job, frontera autorizada por excepción EPIC-027) | ✅ **Staging E2E verificado en Cloud Run:** 15 láminas en 25,2 s / 3,16 MB y 25 láminas en 32,3 s / 5,56 MB, assets privados + outbox publicados. Job/dispatcher/Vercel staging ON; Production sigue OFF y gateada por release control plane + sign-off. | `src/lib/commercial/tenders/proposals/render-*` · `services/artifact-worker/**` |
 | **Staging smoke + habilitación `module_assignments`** | ✅ **Ejecutado 2026-07-12** — módulo activo para Efeonce; smoke con evidencia en TASK-1392 Delta (d) | `cpma-task1392-efeonce-proposal-studio` |
 
@@ -376,6 +376,51 @@ La v0.2 declaraba el `src/lib/ai/agent-runtime` como **"precondición dura de F1
 - **Modelo por nodo:** ¿el chapter-author corre en el mismo modelo que el orquestador? (El orquestador razona sobre estructura; el author escribe copy institucional. Podrían querer modelos distintos.) Se decide con el eval baseline de F1, no antes.
 - **Eval baseline:** qué golden set usa (¿decks SKY ya producidos a mano como referencia?). Pendiente de F1.
 - **Imágenes:** el modo "runtime gen" (vs. assets pre-producidos por `assetId`) queda diseñado pero no autorizado; preferir siempre pre-producido. El `ContextualVisualSlot` ya define cómo una imagen se deriva semánticamente de una lámina, se aprueba y termina fijada como `assetId`, pero no habilita el command/runtime todavía (ver `GREENHOUSE_TENDER_DECK_COMPOSER_V1.md` → §capa de assets y `tender-deck-composer-prototypes/CONTEXTUAL_VISUAL_SLOT_CONTRACT_V1.md`).
+
+### Delta 2026-07-16 — el nodo chapter-author, materializado (TASK-1415)
+
+El primer nodo de juicio de la topología dejó de ser diseño: existe como **motor
+servicio-agnóstico** en `src/lib/commercial/tenders/proposals/authoring/`:
+
+- **`chapter-author.ts`** — la interface `ChapterAuthor<Source, Facts, Framing>` + la máquina
+  compartida: `deriveFacts` (por-author, PURO — la única fábrica de cifras, cada una con
+  `evidenceRef`), `proposeChapter` (structured output vía `generateStructuredAnthropic`, retry
+  acotado N=2 con feedback de la violación), `confirmChapter` (actor `member` obligatorio,
+  re-valida, idempotencyKey por hash) y `toSlides` (ensamble determinista: `metric`/`score`/
+  `evidenceRef` se inyectan DESDE LOS HECHOS, jamás desde el output del modelo). Guards
+  mecánicos compartidos: **cifra huérfana rechaza la propuesta completa** (todo token numérico
+  del framing debe existir en un hecho) y **URL huérfana rechaza** (los links entran como
+  hechos-allowlist; el LLM no inventa URLs). El output es un **plan canónico del composer**
+  (`AuthoredSlide` con `contentType` + `SlotValues`, SIN `template` — el selector resuelve).
+- **`eval-harness.ts`** — harness de eval domain-free (patrón eval-fixture-como-gate,
+  determinista, sin LLM en CI): `{author, source, goldenFraming, expectedSlides}` → corre el
+  pipeline y compara slots exactos.
+- **`diagnostico-facts.ts` + `diagnostico-chapter-author.ts`** — la primera implementación
+  completa (SEO/AEO): el mapper reusa el **mapeo canónico dim→peldaño del Report Artifact**
+  (`REPORT_LEVEL_DIMENSIONS` + `readiness.agentic` para Be Actionable — verificado contra el
+  run real `EO-GRUN-00046`: reproduce el golden SKY 40/70/37/8/76 exacto) y los hechos externos
+  del operador (p. ej. Semrush) entran **pre-evidenciados** (passthrough, jamás LLM). El author
+  emite `one-metric` + `maturity-ladder`; el validador fail-closed enforcea los límites reales
+  de los slot contracts.
+- **`credenciales-chapter-author.ts`** — el 2º author, de OTRO servicio (no lee el Grader):
+  la prueba dura del agnosticismo (test del segundo consumidor) — implementó la misma interface
+  sin tocar interface ni harness.
+- **Eval baseline (§5-bis) cumplido:** golden = las láminas `diagnostico` + `escalera` del deck
+  SKY autoradas a mano (fixtures frozen) + eval del 2º author. **Corrida real end-to-end
+  verificada en local (2026-07-16):** run `EO-GRUN-00046` → propose (claude-sonnet-5) →
+  confirm → `composeArtifact` renderizó las 2 láminas (PNG + PDF, 0 warnings), frames revisados.
+- **Flag `TENDER_CHAPTER_AUTHOR_ENABLED` default OFF** (gatea sólo `proposeChapter`; ledger
+  actualizado). Capability: **reusa `commercial.proposal.manage`** — no se creó
+  `commercial.proposal.author` (el catálogo ya fijó el criterio: *propose no escribe nada*;
+  la superficie API/Nexa futura mapea needs vía `NEED_TO_CAPABILITY`, como `render_propose`).
+- **Port cross-dominio documentado:** el author de diagnóstico consume el CONTRATO del reader
+  del Grader (`GraderReport`) + el SoT del framework de 5 niveles
+  (`report-artifact/model.ts`, módulo puro). Si el dominio Tender se extrae a package
+  (EPIC-027), esos dos imports son el port a declarar.
+- **Siguen sin existir:** el ORQUESTADOR (outline) y el VERIFIER — tasks hermanas. Los
+  chapter-authors productivos restantes (creativo, social, web/CRM, HubSpot, contenido,
+  económica, squad) se replican sobre estos rieles: uno por servicio, cambia sólo
+  `deriveFacts`/`validate`/`toSlides`.
 
 ## 6. Económica: fuente única (Greenhouse), múltiples formatos de salida
 

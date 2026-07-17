@@ -60,9 +60,47 @@ memoria en un entregable.
   5–11; "Scatter-Gather with Planning" (Google).
 - **GEO tácticas (KDD 2024):** quotations **+41%**, statistics **+32%**, cite
   sources **+30%**, fluency **+28%**.
-- **Citabilidad:** **72.4%** de páginas citadas por ChatGPT tienen answer capsule
-  40–60 palabras; tabla+lista → **~2.3×** más citas; freshness <2 meses →
-  **+28%** citas; brand mentions correlacionan **~3×** más que backlinks.
+  ⚠️ **TRES ADVERTENCIAS QUE HAY QUE DECIR SIEMPRE que se cite este paper** (se pagó caro no
+  decirlas — ver `ANTIPATTERNS.md` §"Prevalencia ≠ lift"):
+  1. **El motor no es un motor de 2026.** El paper mide contra un generative engine armado con
+     **GPT-3.5-turbo + top-5 de Google**, sobre GEO-BENCH. No es ChatGPT Search, ni AI Overviews,
+     ni Perplexity de hoy.
+  2. **La métrica NO es "citas".** Es *Position-Adjusted Word Count*: la **proporción de palabras
+     de la respuesta atribuibles a tu fuente**, ponderada por posición.
+  3. **El lift VARÍA POR DOMINIO**, y el paper lo dice: *Statistics Addition* rinde sobre todo en
+     **Law & Government** y **Opinion**. Aplicar un lift de un dominio a otro es sobre-declarar.
+  🔴 **`Quotation Addition` = citar FUENTES O EXPERTOS entre comillas.** NO es "poner una cita
+  destacada propia". Confundirlo es el error más caro y más fácil de cometer.
+- **Citabilidad — CIFRAS CORREGIDAS (auditadas 2026-07-14; la versión anterior de este archivo
+  sobre-declaraba las tres):**
+  - **Answer capsule:** el **72.4%** de las *entradas citadas por ChatGPT* tienen una cápsula de
+    respuesta identificable (**Search Engine Land**, 15 dominios, ~7.500 referidos).
+    ⚠️ Es un **base rate SIN grupo de control**: mide las citadas, no las NO citadas — **describe
+    el patrón, no prueba el lift**. Y SEL define la cápsula como **~120-150 caracteres (20-25
+    palabras)**, no 40-60: si escribes 40-60, es una decisión de craft tuya, **no la respalda ese
+    número**.
+  - **Tablas:** el **30%** de las páginas que ChatGPT cita **contienen** una tabla, contra el
+    **13%** de las que rankean en Google (**Nectiv**, ~8.800 URLs citadas vs ~25.000 rankeadas).
+    🔴 Eso es una **razón de PREVALENCIA entre dos corpus**, **NO un lift de 2,3× por agregar una
+    tabla** — y **la lista numerada NO aparece en el hallazgo**. Decir "tabla+lista → 2,3× más
+    citas" es exactamente el error del `+41%`, con otro número.
+  - **Freshness:** el **"<2 meses → +28% citas"** **NO tiene fuente localizable**: se retiró. Lo
+    verificable: el contenido citado por IA es **~25,7% más fresco** que el que rankea en Google
+    (Ahrefs, 17M de citas) y **~50% de lo citado tiene menos de 13 semanas**. Y fuera de queries
+    de noticias, Ahrefs encuentra que las páginas citadas son **más viejas** (~500 días) que las
+    recuperadas-no-citadas: **la metadata de fecha es señal poco fiable**.
+  - **Brand mentions:** correlacionan **~3×** más que los backlinks con la visibilidad en IA
+    (**Ahrefs**, 75.000 marcas: menciones sin enlace **0,664** vs backlinks **0,218**).
+    ✅ Bien atribuido — y **los propios autores advierten que es correlación, no causalidad**.
+    Matiz: Ahrefs midió sobre **AI Overviews de Google**, no "citas en IA" en general.
+- **🟢 LA EVIDENCIA PRIMARIA MÁS FUERTE que existe hoy, y que casi nadie cita** (Ahrefs, **1,4
+  millones de prompts de ChatGPT**): lo que más separa a una página **citada** de una
+  **recuperada-y-no-citada** es la **relevancia semántica del TÍTULO** frente a la sub-pregunta
+  (**0,656** vs **0,484**) y la claridad del slug (**89,8%** vs **81,1%**).
+  ⚠️ Y en ese mismo estudio **la cápsula de respuesta NO aparece entre los predictores**.
+  → **Consecuencia operativa:** escribir cada H2 como **la pregunta literal del fan-out** es la
+  palanca con mejor evidencia. La cápsula se sostiene por **mecanismo** (el motor recupera
+  pasajes), no por una cifra.
 - **Solapamiento de fuentes:** solo **~11%** de dominios citados coinciden entre
   ChatGPT y Perplexity (680M citas).
 - **Preferencias de cita:** ChatGPT ↦ Wikipedia (**47.9%**); Perplexity ↦ Reddit

@@ -12,16 +12,23 @@ El referente ejecutado es la intro Glitch El micrófono se abre. Su retrospectiv
 
 ## Antes de ejecutar
 
-1. Crear una corrida versionada bajo ai-generations con brief, secuencia, storyboard, motion y sonido, manifest y renderer.
-2. Mantener el key visual original como fuente canónica. No sobrescribirlo ni usar el storyboard multipanel como input.
-3. Validar dirección, duración, formato, acción, audio y límite de gasto antes de llamar al modelo.
-4. Elegir el motor mediante el gate `ancla visual flexible` vs `identidad de set`; no decidir por canal ni precio aislado. Ver [Selección de motor por contrato de fidelidad](../../../.codex/skills/motion-design-studio/workflows/engine-selection-by-fidelity-contract.md).
-5. Si se usará Omni/Vertex, autenticar ambos caminos de Google Cloud: gcloud auth login y gcloud auth application-default login. Si se usará Fal, comprobar saldo y credencial en Secret Manager sin exponerla.
-6. Ejecutar primero el modo plan. Ningún plan debe llamar al proveedor.
+1. Declarar `operating_mode`, operador de registro, aprobador creativo, aprobador de gasto, autoridad de derechos y owner de delivery. Los pilotos manuales actuales son `efeonce-managed`; este manual no habilita acceso cliente.
+2. Crear una corrida versionada bajo ai-generations con brief, secuencia, storyboard, motion y sonido, manifest y renderer.
+3. Mantener el key visual original como fuente canónica. No sobrescribirlo ni usar el storyboard multipanel como input.
+4. Validar dirección, duración, formato, acción, audio y límite de gasto antes de llamar al modelo.
+5. Elegir el motor mediante el gate `ancla visual flexible` vs `identidad de set`; no decidir por canal ni precio aislado. Ver [Selección de motor por contrato de fidelidad](../../../.codex/skills/motion-design-studio/workflows/engine-selection-by-fidelity-contract.md).
+6. Si se usará Omni/Vertex, autenticar ambos caminos de Google Cloud: gcloud auth login y gcloud auth application-default login. Si se usará Fal, comprobar saldo y credencial en Secret Manager sin exponerla.
+7. Ejecutar primero el modo plan. Ningún plan debe llamar al proveedor.
 
 ### Exploración no es producción
 
 Antes de crear un piloto, declarar si se está **explorando** una dirección o ejecutando una receta ya aprobada. Un agente puede recuperar contexto y proponer brief, referencias, shot list, ruta y estimate; debe entregar ese plan en forma editable. Sólo una aprobación humana habilita un run con gasto. No convertir una conversación, un prompt prometedor o un render aislado en un workflow compartible sin evidencia, rúbrica y límites explícitos. Contexto y preguntas abiertas: [RESEARCH-009](../../research/RESEARCH-009-creative-operations-agentic-workflows.md).
+
+La persona creativa no tiene que traducir su intención a nodos. Durante el piloto debe registrar qué se preserva, qué se explora, qué se rechaza y qué se aprueba; esas decisiones son la materia prima de la futura receta. Ingeniería sólo interviene para volverlas ejecutables, seguras y observables.
+
+### Modos futuros y escalamiento
+
+`Client-operated`, `co-operated` y `efeonce-managed` usarán el mismo run y la misma memoria cuando exista Creative Studio. Cambiar de modo no debe abrir una carpeta paralela ni reiniciar el brief. En los pilotos manuales, cualquier participación del cliente sigue siendo dirección/review dentro de una operación `efeonce-managed`; no improvisar self-service, compartir credenciales ni prometer SLA de plataforma todavía.
 
 ## Gate de selección de motor
 
@@ -98,9 +105,10 @@ No se debe intentar desactivar filtros, ocultar contenido sensible ni presentar 
 ## Cierre y archivo
 
 1. Actualizar manifest, README, retrospectivo, índice de generaciones y Handoff con estado real.
-2. Si el take sigue pendiente de aprobación, declararlo candidato técnico; no entrega final.
-3. Al aprobarse, archivar los binarios mediante el flujo gobernado de media y registrar URI, hash, tamaño y propietario.
-4. Registrar costo confirmado sólo cuando el ledger o proveedor lo permita; no inferir monto por tokens.
+2. Confirmar que el manifest conserva operating mode, operador, aprobadores y owner de delivery; si una responsabilidad cambió, registrar el handback/escalamiento sin perder lineage.
+3. Si el take sigue pendiente de aprobación, declararlo candidato técnico; no entrega final.
+4. Al aprobarse, archivar los binarios mediante el flujo gobernado de media y registrar URI, hash, tamaño y propietario.
+5. Registrar costo confirmado sólo cuando el ledger o proveedor lo permita; no inferir monto por tokens.
 
 ## Referencias
 

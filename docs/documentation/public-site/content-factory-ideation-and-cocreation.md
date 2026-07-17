@@ -18,10 +18,11 @@ mismo lienzo compartido: la **`GutenbergArticleSpec`**.
 Todo gira alrededor de un artefacto tipado, la `GutenbergArticleSpec`:
 
 ```
-title · slug? · excerpt · seo{title, description}
+title · slug? · excerpt · seo{title, description, indexPolicy?}
 intro[]                       ← párrafos antes del índice
-sections[{ heading, level(2|3), blocks[] }]   ← el cuerpo
-cta?{ text }
+sections[{ heading, level(2|3), blocks[] }]   ← párrafo, lista, quote, pullquote, separator, imagen o embed
+cta?{ text: string | [{text, href?}] }
+attribution?{ campaignId?, hubspotCampaignId?, utm? }
 ```
 
 La spec es **producible por un LLM, editable por un humano y co-autorable por
@@ -29,6 +30,11 @@ cualquier agente**. De ahí se ensambla el draft con `authorGutenbergDraft`, que
 garantiza la estructura correcta (headings anclados + TOC de Yoast poblado +
 escaping + no inventa media). El contenido lo decide el autor; la estructura la
 garantiza el ensamblado. Por eso la clase de defecto del TOC roto no puede volver.
+
+Los párrafos, listas y el CTA aceptan segmentos de rich text estructurado para
+enlaces inline. El renderer escapa texto y atributos y solo admite `http:`,
+`https:` y `mailto:`. Una imagen exige `mediaId`, URL y ALT reales; la spec nunca
+debe inventar assets ni IDs de WordPress.
 
 ## Modo autónomo
 
@@ -80,11 +86,14 @@ Reads directos; el write final (a WordPress) sigue el loop gobernado
 
 ## Qué NO hace
 
-- No publica en WordPress. La spec y el draft se quedan como artefacto local;
-  el write vive por la vía gobernada del bridge (autoría = usuario del operador).
+- No publica como efecto del ideation/authoring. La spec puede llegar a un post privado por el write path gobernado,
+  pero `publish` es una transicion posterior con autorizacion humana explicita, snapshot, rollback y QA live.
 - No inventa imágenes/videos ni cifras: la media la agregas tú con un asset real.
 - No reemplaza tu criterio: el modo autónomo es un punto de partida; el valor real
   aparece cuando co-creas.
+
+El flujo completo, incluida la frontera entre `private` y `publish`, vive en
+`docs/operations/public-site-content-factory/AGENTIC_BLOGPOST_END_TO_END_RUNBOOK_V1.md`.
 
 ## Referencias técnicas
 

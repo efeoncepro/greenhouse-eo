@@ -110,6 +110,46 @@ working, hardened widget-embed is a legitimate choice. C1 is not a correctness f
 - Proprietary illustrations / isotypes follow repo brand-asset rules — don't
   hand-transcribe third-party marks; import per the repo's brand SSOT.
 
+## La Radiografía AEO (`/muestras/<slug>-<token>`) — la OTRA cosa que vive en este repo
+
+efeonce-think no es solo el render del Brand Grader. También aloja la **Radiografía AEO**: una muestra
+de trabajo de 4 pantallas que es, a la vez, **herramienta de educación** (cliente y prospecto) y
+**herramienta de habilitación de ventas**. Escribe un artículo real para un cliente y lo abre en canal
+mostrando su capa de máquina acoplada. Primer caso: SKY (licitación Wherex 2026).
+
+- **El cliente es un PAYLOAD, no código.** Colección Content Layer `aeoXray` (`src/content.config.ts`)
+  + un JSON en `src/content/aeo-xray/<cliente>-<slug>.json`. **NUNCA** `if (cliente === 'sky')` en un
+  componente: eso rompe la frontera del motor.
+- **El schema Zod ES el gate de calidad, y ahora lo es DE VERDAD** (auditoría 2026-07-14). Un
+  `superRefine` en la raíz rompe el build ante: **cualquier `stat` sin `source`+`asOf`** (el hueco por
+  donde entraron 3 cifras que no resistían verificación — vivían en `machine.craft`, la única familia
+  que el schema no miraba), **bloques huérfanos y nodos fantasma** (el contrato del acoplamiento se
+  verificaba en un navegador DESPUÉS del build: un payload roto **pasaba**), **headline sin cifra**,
+  **anclas duplicadas**, y un **accent del cliente bajo 4,5:1** (entra como color de TEXTO).
+- 🔴 **El motor NO puede conocer al cliente — y la trampa está en cuatro sitios, no en uno:** un
+  `switch` de literales sobre el `flow` (**un step renombrado servía una página EN BLANCO, sin
+  ruido** → ahora es un `enum`), **la tipografía del cliente en el CSS** (era un `if (cliente ===
+  'sky')` escrito en una hoja de estilos → ahora sale del payload), una **constante con un `coupleId`
+  del cliente** (`HERO`), y **el gate exigiendo literalmente `Assistant`** — o sea, era el test de
+  regresión de SKY, no el del motor. ✅ Verificado con **el ejercicio del segundo cliente**: un payload
+  de clínica dental entra **sin tocar una línea de código**.
+- **Gate propio:** `pnpm build && pnpm verify:aeo-xray` → **46 asserts** (Playwright real). Y
+  `pnpm read:aeo-xray` es **OBLIGATORIO antes de tocar el texto**: la coherencia no es una propiedad
+  estructural, y la prosa vive en **tres capas** (artículo · capa de máquina · átomos).
+- 🔴 **El JSON-LD se renderiza como TEXTO ESCAPADO, jamás en un `<script type="application/ld+json">`**:
+  emitirlo declararía en NUESTRO dominio que Efeonce publicó un artículo del cliente. Dato estructurado
+  falso, en la pieza cuya tesis es el rigor. `noindex` + fuera del sitemap.
+- 🔴 **La muestra se defiende sola:** ni cita nuestros documentos ("nuestra oferta dice…") ni narra su
+  propia interfaz ("cada pieza de abajo…"). Hablar del artefacto **para ser honesto** sí (el disclaimer,
+  el schema no emitido); narrarlo, no.
+- **Imágenes por `astro:assets`** (helper `image()` de la colección), **NUNCA** desde `public/`: la pieza
+  no puede reprobar su propio PageSpeed.
+
+**Invariantes completos (cargar antes de tocarla):** `greenhouse-eo/docs/think/radiografia-aeo-architecture.md`
++ el manual `radiografia-aeo-manual.md`. Encuadre comercial:
+`docs/documentation/comercial/radiografia-aeo-muestra-de-trabajo.md`. Skills: `seo-aeo-practice` (dueña
+del oficio) · `greenhouse-public-private-tenders` (consumer) · `commercial-expert` (la vende).
+
 ## Primitives
 
 - **`MaturityLadder`** (TASK-1325) — self-contained primitive + adapter pattern.

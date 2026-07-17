@@ -9,6 +9,7 @@ import type { AiProposal, ConfirmAiProposalInput, QuestionDraftProposal, Respons
 import type { CreateQuestionInput } from '@/types/hiring-assessment'
 
 import { HiringValidationError } from '../../errors'
+import { applyOpeningPublicCopy } from '../../vacancy-ai/apply'
 import { createQuestion } from '../store'
 import { recordHumanScore } from '../scoring'
 import { lockAiProposalForUpdate, markProposalDecided } from './proposal-store'
@@ -23,6 +24,9 @@ import { resolveProposalTransition } from './state'
  *   `questionOverride` permite que el humano edite el borrador antes de crearlo.
  * - `response_score` + confirm → aplica `recordHumanScore` con `finalScore` (default = el score
  *   propuesto por la IA). El humano fija el valor; el LLM NUNCA escribió `human_score`.
+ * - `opening_public_copy` + confirm (TASK-1385) → aplica el copy público editado por el humano
+ *   (`publicCopyOverride`) vía `updateHiringOpening` (writer canónico). El publish sigue siendo
+ *   una acción humana aparte con su gate.
  * - `reject` → solo marca la propuesta `rejected`.
  *
  * El score NUNCA auto-rechaza ni toca payroll/ICO. El rollup a `hiring_application` sigue su curso
@@ -50,6 +54,8 @@ export const confirmAiProposal = async (
     if (input.decision === 'confirm') {
       if (proposal.kind === 'question_draft') {
         confirmedRef = await applyQuestionDraft(client, proposal, input.questionOverride, actorUserId)
+      } else if (proposal.kind === 'opening_public_copy') {
+        confirmedRef = await applyOpeningPublicCopy(client, proposal, input.publicCopyOverride, actorUserId)
       } else {
         confirmedRef = await applyResponseScore(client, proposal, input.finalScore, actorUserId)
       }

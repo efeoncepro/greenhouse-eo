@@ -1,0 +1,148 @@
+{
+  "template": "MaturityLadderFull",
+  "version": "0.1",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "slots": {
+    "sectionLabel": {
+      "selector": "[data-slot='sectionLabel']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "title": {
+      "selector": "[data-slot='title']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 76,
+        "maxLines": 3,
+        "allowedTags": [
+          "em"
+        ],
+        "overflow": "reject"
+      }
+    },
+    "subject": {
+      "selector": "[data-slot='subject']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "name": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1,
+          "description": "A quién se evalúa. La escalera SIEMPRE se afirma sobre un sujeto: una escalera sin sujeto es teoría, no diagnóstico."
+        },
+        "context": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 40,
+          "maxLines": 1,
+          "description": "Cuándo/con qué se midió. Es el as-of. Sin él, el score es una opinión con dígitos."
+        }
+      }
+    },
+    "rungs": {
+      "selector": "[data-slot='rungs']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 3,
+        "maxItems": 6,
+        "overflow": "reject",
+        "order": "ASCENDENTE y ACUMULATIVA: el peldaño N presupone el N-1. El orden ES el argumento — un peldaño no subido bloquea los de arriba. El renderer aporta el ordinal.",
+        "quantifiedClaimsRequireEvidenceRef": true
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "number": {
+            "type": "string",
+            "required": false,
+            "resolver": "ordinal-number",
+            "description": "Derivado del índice. El autor NO lo escribe (dos peldaños podrían decir \"01\")."
+          },
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 26,
+            "maxLines": 1,
+            "description": "El peldaño en el idioma del documento. Ej: \"Ser encontrada\"."
+          },
+          "anchor": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 18,
+            "maxLines": 1,
+            "description": "Ancla corta del framework (ej. el término en inglés). Opcional: el motor NO conoce ningún framework — es texto que el autor aporta."
+          },
+          "score": {
+            "type": "number",
+            "required": true,
+            "min": 0,
+            "max": 100,
+            "requires": [
+              "evidenceRef"
+            ],
+            "resolver": "maturity-rung-geometry",
+            "description": "0-100. ES LA ÚNICA VERDAD DE LA LÁMINA: de él se derivan la barra, la severidad y el usted-está-aquí. Un score sin evidenceRef no entra."
+          },
+          "severity": {
+            "type": "string",
+            "required": false,
+            "resolver": "maturity-rung-severity",
+            "description": "DERIVADA del score (>=70 óptimo · >=45 atención · <45 crítico). El autor NO la escribe: si pudiera, la lámina podría rotular \"óptimo\" un 37 — y eso no es un bug de layout, es fabricación."
+          },
+          "body": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 96,
+            "maxLines": 3,
+            "description": "Qué significa el peldaño para el sujeto. Es la lectura, no la definición del framework."
+          },
+          "evidenceRef": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 64,
+            "maxLines": 1,
+            "description": "De dónde sale el score (run, instrumento, as-of). Obligatorio por cada cifra."
+          }
+        }
+      }
+    },
+    "readout": {
+      "selector": "[data-slot='readout']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "title": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 30,
+          "maxLines": 1
+        },
+        "body": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 150,
+          "maxLines": 4,
+          "description": "El so-what. La escalera no se explica sola ante un comité: hay que decir qué implica el patrón de peldaños."
+        }
+      }
+    }
+  },
+  "presentation": {
+    "brandSurface": "timeline-full-approved-navy-gradient",
+    "composition": "escalera ascendente de 3-6 peldaños; cada uno con su score, su barra derivada del dato y su severidad derivada del score. El peldaño marcado es el primer NO-óptimo desde abajo: es donde empieza el trabajo.",
+    "evidencePolicy": "cada score declara su evidenceRef; sin él la lámina no compone",
+    "domainFreedom": "El motor NO sabe de SEO, AEO ni de ningún framework propietario. Es una escalera de madurez genérica: sirve igual para readiness de onboarding, madurez de ICO o cualquier modelo por etapas. Todo lo específico del dominio entra como DATO."
+  }
+}

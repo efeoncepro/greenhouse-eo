@@ -7,13 +7,14 @@
  * prints credentials or Authorization headers.
  */
 
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { mkdirSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 
 import {
   DEFAULT_PUBLIC_SITE_WORDPRESS_BASE_URL,
   inspectPublicSiteBridge
 } from '../../src/lib/public-site/bridge-inspection'
+import { loadPublicWebsiteEnvFiles } from './local-env'
 
 type CliOptions = {
   pageId: number | null
@@ -25,43 +26,7 @@ type CliOptions = {
 
 const REPORTS_ROOT = 'docs/operations/public-site-bridge-inspections'
 
-const loadEnvFile = (relativePath: string) => {
-  try {
-    const contents = readFileSync(resolve(process.cwd(), relativePath), 'utf8')
-
-    for (const rawLine of contents.split('\n')) {
-      const line = rawLine.trim()
-
-      if (!line || line.startsWith('#')) continue
-
-      const normalizedLine = line.startsWith('export ') ? line.slice('export '.length).trim() : line
-      const eq = normalizedLine.indexOf('=')
-
-      if (eq <= 0) continue
-
-      const key = normalizedLine.slice(0, eq).trim()
-
-      if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key) || process.env[key] !== undefined) continue
-
-      let value = normalizedLine.slice(eq + 1).trim()
-
-      if (
-        (value.startsWith('"') && value.endsWith('"')) ||
-        (value.startsWith("'") && value.endsWith("'"))
-      ) {
-        value = value.slice(1, -1)
-      }
-
-      process.env[key] = value
-    }
-
-    return true
-  } catch {
-    return false
-  }
-}
-
-const loadedEnvFiles = ['.env.local', '.env'].filter(loadEnvFile)
+const loadedEnvFiles = loadPublicWebsiteEnvFiles()
 
 const parseArgs = (argv: string[]): CliOptions => {
   const normalizedArgv = argv[0] === '--' ? argv.slice(1) : argv

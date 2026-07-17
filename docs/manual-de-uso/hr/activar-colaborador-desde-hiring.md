@@ -16,7 +16,7 @@ Este flujo empieza después de la decisión humana. Un assessment enviado o scor
 ## Antes de empezar
 
 - Necesitas la capability `hiring.activation.review` (HR, admins). Crear la ficha usa además `workforce.member.intake.update`; abrir onboarding usa `hr.onboarding_instance`.
-- Los flags `HIRING_ACTIVATION_ENABLED` y `HIRING_HANDOFF_BRIDGES_ENABLED` deben estar prendidos para operar casos reales. Si están apagados, la UI muestra un estado honesto de bridge deshabilitado.
+- Los flags `HIRING_ACTIVATION_ENABLED` y `HIRING_HANDOFF_BRIDGES_ENABLED` están prendidos en producción desde 2026-07-14. Si se apagan por rollback, la UI muestra un estado honesto de bridge deshabilitado.
 - El handoff debe estar **aprobado** (ver manual hermano).
 
 ## Paso a paso

@@ -5,6 +5,7 @@
 > **Creado:** 2026-07-11 por Claude (skills `typography-design`, `modern-ui`) con Julio Reyes
 > **v0.2 (2026-07-12):** se corrige el status (decía `doc-only` con el runtime ya shipped), se declara el **entregable PDF real** (merge `pdf-lib` de N páginas + gate de peso), el **CLI canónico `pnpm deck:compose`**, el **inventario de los 15 resolvers**, la **state machine** (12 estados, sin DB) y la **2ª bug class** (geometría). Se elimina el bloque muerto que decía "slotsRef sólo en CoverFull".
 > **v0.4 (2026-07-12):** se acepta la secuencia de destinos **PDF contractual → PPTX nativo editable → Adobe Express REST**. No existe todavía un renderer PPTX ni una integración Adobe: la decisión fija sus límites para que no nazcan como conversión frágil de HTML/PDF ni como un Gantt libre prometido sobre tags fijos.
+> **v0.5 (2026-07-15):** `CoverFull` consolida el lockup centrado aprobado: Efeonce ampliado, `clientLogo` nativo para fondos oscuros sin recoloración CSS, recipe AXIS de portada y URL Bubble fija. El contrato conserva dos slots y exige un asset on-dark canónico por cliente.
 > **Siguiente hardening de plataforma y marca:** `TASK-1393` extrae el Artifact Composer, formaliza el catálogo `deck-axis` y materializa AXIS como `brandPack` reutilizable; conserva el output aprobado y no construye el catálogo social.
 > **Spec raíz:** `GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md` (§4 deck pipeline, Apéndices A/B)
 > **Fuente de layouts y primitivas de presentación:** Figma `Sistema Axis - PPT` (fileKey `GXYeJaRjotmFuczfnd8hLi`; `Color Primitives` `33:2`). Sus aliases se llevaron locales a las primeras plantillas en `b38a8d0e2` y se replicaron al catálogo de 25 en `e78e9dfb2`; TASK-1393 los centraliza sin sustituirlos por el mirror UI.
@@ -221,7 +222,7 @@ Receta canónica:
 - **Base navy `#001a33` → `#023c70` → `#001327`** — la vida viene de luces teal/violeta periféricas, no de ampliar un azul eléctrico. El navy debe dominar la percepción del campo.
 - **Textura de puntos como capa de `background`** (no `::before`): pinta bajo el contenido, sin líos de z-index.
 - **Orientación fija de glows:** teal `at 100% 0%`, violeta `at 0% 104%`, `linear 120deg`. Es la composición aprobada de `TimelineFull`; no se espeja ni se inventa una variante por plantilla.
-- **`CoverFull` NO cambia de familia:** la portada mantiene su hero-Think (radial navy con luz arriba), con grano editorial tenue y una luz teal central de relación; no admite azul eléctrico ni un cuarto degradado. Es full-bleed y tiene su propio contrato.
+- **`CoverFull` NO cambia de familia:** la portada usa su recipe `cover-hero` full-bleed, con campo navy simétrico, halo cyan/teal concentrado detrás del lockup, presencia violeta controlada y grano editorial tenue; no admite un gradiente multicolor libre ni una variante por cliente.
 - **Ya aplicado a** `NarrativeSplit`, `MetricsSplit`, `QuoteSplit`, `ChartSplit` (Claude) + `DualTextSplit`, `ComparisonSplit` (Codex, origen de la receta). Toda Split nueva usa esta receta.
 
 ### Firma de URL — `URL Bubble` primitive (chrome fijo)
@@ -382,12 +383,12 @@ Portada **full-bleed** (degradado en toda la slide, NO bipartito). Stack centrad
 
 ```
 efeonceLogo:   asset (fijo)     // logo-negative.svg, blanco, centrado, GRANDE
-clientLogo:    asset (slot)     // logo del cliente — se normaliza a blanco mono dentro de client-stage
+clientLogo:    asset (slot)     // variante on-dark canónica del cliente; el template no recolorea
 proposalKind:  enum             // technical | economic | executive | combined → label formal visible
 urlBubble:     asset (fijo)     // Deck/SVG/url.svg (#848484 + mix-blend-mode:luminosity) al pie
 ```
 
-Reglas propias de `CoverFull`: degradado hero-Think (§1, navy radial + teal luz); logo efeonce grande centrado **con escala bloqueada**; debajo, una **marca de relación decorativa no configurable** y el `client-stage` que normaliza ópticamente la marca del comprador; luego el tipo de propuesta; burbuja `efeoncepro.com` al pie con luminosity (§6). La relación entre ambas marcas nace del layout, no de texto o de una composición libre del agente. El renderer solo sustituye `clientLogo` y el enum `proposalKind`; no agrega copy, fechas, tags ni logotipos extra. El contrato legible por el futuro composer vive en `tender-deck-composer-prototypes/cover-full.slots.json`: el agente entrega un `assetId` y la selección `proposalKind`, mientras los resolvers `client-brand-mark` y `proposal-kind-label` controlan normalización óptica, etiqueta formal y límites fail-closed. El agente nunca decide CSS, escalas ni labels libres. Prototipo vivo: `cover-full.html` en scratchpad.
+Reglas propias de `CoverFull`: recipe `cover-hero` (§1); logo Efeonce grande centrado **con escala bloqueada**; debajo, una **marca de relación decorativa no configurable** y el `client-stage` que ajusta ópticamente la marca del comprador sin filtros ni recoloración; luego el tipo de propuesta; burbuja `efeoncepro.com` al pie con luminosity (§6). La relación entre ambas marcas nace del layout, no de texto o de una composición libre del agente. El renderer solo sustituye `clientLogo` y el enum `proposalKind`; no agrega copy, fechas, tags ni logotipos extra. El contrato ejecutable vive en `src/lib/artifact-composer/catalogs/deck-axis/cover-full.slots.json`: el agente entrega un `assetId` on-dark aprobado y la selección `proposalKind`, mientras los resolvers `client-brand-mark` y `proposal-kind-label` controlan allowlist, etiqueta formal y límites fail-closed. El agente nunca decide CSS, escalas ni labels libres. Implementación viva: `src/lib/artifact-composer/catalogs/deck-axis/cover-full.html`.
 
 ### `BackCoverFull` — contrato de slots (contraportada)
 

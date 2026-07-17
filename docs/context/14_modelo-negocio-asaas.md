@@ -62,6 +62,7 @@ El doc ASaaS original asumía que Greenhouse era un MVP temprano por construir. 
 | **On-Going** | Fee mensual, equipo dedicado, ciclo completo | Crecimiento sostenido |
 | **On-Demand** | Proyectos con alcance y precio cerrado | Campañas, lanzamientos, auditorías |
 | **Staff Augmentation** | Perfiles integrados vía **Deel** | Talento específico sin riesgo laboral |
+| **Sample Sprint** | Engagement acotado con gobernanza completa y outcome documentado | Probar una relación/capability con bajo riesgo antes de escalar |
 
 ### Evolución: modelo híbrido por tiers
 No se abandona el fee de servicio — se **agrega una capa de producto** que justifica pricing premium y genera stickiness.
@@ -76,6 +77,22 @@ No se abandona el fee de servicio — se **agrega una capa de producto** que jus
 | **Reporting** | Mensual | Quincenal + portal | Real-time + custom |
 
 > Estos tiers son **capability flags en el producto** (ver Admin/RBAC y arquitectura de acceso vigente). El agente debe construir features pensando a qué tier pertenecen: una vista de Revenue Enabled es Pro+; los benchmarks cross-tenant son Enterprise y dependen de masa crítica.
+
+### Creative Studio: ASaaS en su forma más literal
+
+Creative Studio no obliga a escoger entre “vender software” y “vender agencia”. Productiza el servicio creativo en un sistema que puede ser operado con distintos grados de autonomía:
+
+| Modo operativo | Valor que compra el cliente | Frontera económica |
+|---|---|---|
+| **Efeonce-managed** | Capacidad gobernada, dirección, ejecución y accountability de delivery | Fee de servicio/capacidad; Efeonce controla el scope y puede comprometer OTD/FTR |
+| **Co-operated** | Sistema compartido + capacidad Efeonce en lanes, excepciones o picos | Servicio y acceso se empaquetan con responsabilidades explícitas por tramo |
+| **Client-operated** | Autonomía sobre templates curados, memoria y controles del Studio | Acceso/credits/soporte futuros; no incluye por defecto dirección ni SLA de Managed Squad |
+
+Estos modos **no son una quinta modalidad comercial**: se asignan dentro de On-Going, On-Demand, Staff Augmentation o Sample Sprint respetando sus fronteras. Staff Augmentation sigue siendo client-directed; no puede usarse para esconder un Managed Squad. Tampoco son tres productos. El mismo run, assets, lineage, review y ledger cambian de operador sin perder contexto.
+
+La progresión adecuada es **observar/revisar → correr templates curados → ajustar variables autorizadas → construir/versionar sólo con madurez y permiso**. El sistema debe enrutar alta ambigüedad, riesgo de marca, derechos complejos o gasto elevado hacia co-operación/managed; empujar todo a self-service dañaría craft y trasladaría riesgo al cliente.
+
+El flywheel económico es servicio → template validado → autonomía segura → uso/evidencia → excepciones y picos gestionados por Efeonce → mejor template. Por eso el producto no canibaliza automáticamente el servicio: lo mueve desde la repetición hacia dirección, diseño de workflows, QA y capacidad elástica. La prueba ASaaS no es vender más tokens; es que el cliente quede **más capaz** y el sistema con **más memoria**.
 
 ---
 
@@ -97,4 +114,4 @@ La recalibración cambia tres cosas, y todas tocan al producto:
 
 ---
 
-*Fuentes: ASaaS Strategy (mar-2026) + Addendum de Recalibración (vigente). El addendum prevalece sobre el roadmap original donde difieren. Nombres/dominios normalizados según `00` (Greenhouse, greenhouse.efeoncepro.com). Última verificación de drift contra runtime: 2026-06-09 (TASK-1064) — fases sin fecha dura; estado/roadmap vivo en `project_context.md`.*
+*Fuentes: ASaaS Strategy (mar-2026) + Addendum de Recalibración (vigente). El addendum prevalece sobre el roadmap original donde difieren. Nombres/dominios normalizados según `00` (Greenhouse, greenhouse.efeoncepro.com). Última verificación de drift contra runtime: 2026-07-14 — fases sin fecha dura; Creative Studio sigue como arquitectura objetivo/EPIC-028 y su acceso cliente no está habilitado; estado/roadmap vivo en `project_context.md`.*

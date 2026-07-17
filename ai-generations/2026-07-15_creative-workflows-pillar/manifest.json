@@ -1,0 +1,315 @@
+{
+  "contractVersion": "creativeEditorialImageRun.v1",
+  "runId": "2026-07-15_creative-workflows-pillar",
+  "engine": {
+    "path": "built-in-image-gen",
+    "modelFamily": "gpt-image-2"
+  },
+  "articleSpecSource": "docs/public-site/CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V2.json",
+  "articleSpecIntegrated": "docs/public-site/CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V5.json",
+  "historicalPrivateSpec": "docs/public-site/CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V3.json",
+  "visualSystem": "docs/public-site/CREATIVE_WORKFLOWS_PILLAR_VISUAL_SYSTEM_V1.md",
+  "visualAudit": "docs/public-site/CREATIVE_WORKFLOWS_PILLAR_VISUAL_AUDIT_V1.md",
+  "wordpressSeoAudit": "docs/public-site/CREATIVE_WORKFLOWS_PILLAR_EEAT_AUDIT_V4.md",
+  "historicalPrivateSeoAudit": "docs/public-site/CREATIVE_WORKFLOWS_PILLAR_WORDPRESS_SEO_AUDIT_V3.md",
+  "status": "selected-uploaded-integrated-published",
+  "generatedAt": "2026-07-15",
+  "wordpress": {
+    "postId": 251363,
+    "postState": "publish-v5",
+    "authorId": 1,
+    "categoryId": 193,
+    "featuredMediaId": 251370,
+    "integrationState": "V5 published; five body images, six captions, native measurement table, anonymous desktop/mobile render, SEO/AEO, E-E-A-T and Open Graph verified",
+    "url": "https://efeoncepro.com/creative/creative-workflows/"
+  },
+  "assets": [
+    {
+      "id": "CW-V01",
+      "slug": "hero-abundance-decision",
+      "status": "selected-uploaded",
+      "editorialRole": "hero source plus featured and Open Graph derivatives",
+      "sourcePath": "/Users/jreye/.codex/generated_images/019f61da-60fd-7563-adc9-48a595c7cc0e/exec-8f4d6563-612d-4f05-86ce-d4725aeb4f67.png",
+      "master": {
+        "path": "masters/creative-workflows-hero-master-v1.png",
+        "width": 1730,
+        "height": 909,
+        "bytes": 2182514,
+        "sha256": "79c50a6c14a93ce6753c98f8ba57da8bb3459c910597d147756cd2838cca6195"
+      },
+      "web": {
+        "path": "exports/creative-workflows-hero-featured-1440-v1.webp",
+        "width": 1440,
+        "height": 757,
+        "bytes": 104662,
+        "sha256": "0aca7db7fd3e991407d071828e20ebb3571683a144737275c3eecc20bf9ff55d"
+      },
+      "og": {
+        "path": "exports/creative-workflows-hero-og-1200x630-v1.webp",
+        "width": 1200,
+        "height": 630,
+        "bytes": 82216,
+        "sha256": "483e2ebfe0ed05b21236fc389abd68383c5ace3c199eb4159b5b614b5216086b"
+      },
+      "social": {
+        "path": "exports/creative-workflows-hero-featured-1440-v1.jpg",
+        "width": 1440,
+        "height": 757,
+        "bytes": 185911,
+        "sha256": "99f7fd5943c76818171aa891a0d609eac79bd181933be5c23707b8d17aa12a8e"
+      },
+      "media": {
+        "id": 251365,
+        "url": "https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-hero-featured-1440-v1.webp",
+        "authorId": 1,
+        "alt": "Mesa de trabajo creativa con múltiples variaciones visuales alrededor de una dirección seleccionada.",
+        "caption": "Generar más opciones no resuelve qué dirección merece avanzar."
+      },
+      "featuredMedia": {
+        "id": 251370,
+        "url": "https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-hero-featured-1440-v1.jpg",
+        "authorId": 1,
+        "mimeType": "image/jpeg",
+        "alt": "Mesa de trabajo creativa con múltiples variaciones visuales alrededor de una dirección seleccionada.",
+        "caption": "Generar más opciones no resuelve qué dirección merece avanzar."
+      },
+      "review": {
+        "verdict": "pass",
+        "notes": "La selección humana domina el centro óptico; anatomía plausible, sin texto legible ni marcas."
+      }
+    },
+    {
+      "id": "CW-V02",
+      "slug": "creative-craft-hidden-recipe",
+      "status": "selected-uploaded-integrated",
+      "editorialRole": "in-article explanation of the creative-facing interface",
+      "sourcePath": "/Users/jreye/.codex/generated_images/019f61da-60fd-7563-adc9-48a595c7cc0e/exec-e7268b1f-1ae5-4d1b-a6ce-9f0707c8174d.png",
+      "master": {
+        "path": "masters/creative-workflows-interface-master-v1.png",
+        "width": 1536,
+        "height": 1024,
+        "bytes": 2834757,
+        "sha256": "c6adda98fa1036b58cf06239aa4fcc9fa72285c1a51952105a333ed8c1975a0a"
+      },
+      "web": {
+        "path": "exports/creative-workflows-interface-web-1440-v1.webp",
+        "width": 1440,
+        "height": 960,
+        "bytes": 167700,
+        "sha256": "ad62cfbf5032ea0cb2e85f385873265cb3d478442aa930ba9a5ae3d322668331"
+      },
+      "media": {
+        "id": 251366,
+        "url": "https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-interface-web-1440-v1.webp",
+        "authorId": 1,
+        "alt": "Capas de un proceso creativo: referencias y decisiones visibles sobre un sistema ordenado que conserva versiones.",
+        "caption": "El creativo trabaja con significado; el sistema conserva la receta."
+      },
+      "review": {
+        "verdict": "pass",
+        "notes": "La capa creativa conserva prioridad; la estructura inferior apoya y no se lee como software o grafo."
+      }
+    },
+    {
+      "id": "CW-V03",
+      "slug": "two-speeds",
+      "status": "selected-uploaded-integrated",
+      "editorialRole": "in-article explanation of divergence, decision and convergence",
+      "sourcePath": "/Users/jreye/.codex/generated_images/019f61da-60fd-7563-adc9-48a595c7cc0e/exec-c83589b6-be97-4120-b578-8cdeaab2dedc.png",
+      "master": {
+        "path": "masters/creative-workflows-two-speeds-master-v1.png",
+        "width": 1536,
+        "height": 1024,
+        "bytes": 2486775,
+        "sha256": "2d86227ede410d73993affa166bf0b3b831c0211ada9c200f81b96200882566b"
+      },
+      "web": {
+        "path": "exports/creative-workflows-two-speeds-web-1440-v1.webp",
+        "width": 1440,
+        "height": 960,
+        "bytes": 81336,
+        "sha256": "135e39ee96789c0a4d62ffdeee5988ba9520d1233073dd741bc6c5d62113fb9f"
+      },
+      "media": {
+        "id": 251367,
+        "url": "https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-two-speeds-web-1440-v1.webp",
+        "authorId": 1,
+        "alt": "Exploración divergente que converge en una decisión humana y luego se transforma en formatos repetibles.",
+        "caption": "Primero se amplía el espacio de posibilidades. Después se produce con límites."
+      },
+      "review": {
+        "verdict": "pass",
+        "notes": "Las dos velocidades se leen como valiosas; la mano humana resuelve la transición sin etiquetas."
+      }
+    },
+    {
+      "id": "CW-V04",
+      "slug": "six-moments",
+      "status": "selected-uploaded-integrated",
+      "editorialRole": "in-article continuity model across six moments",
+      "sourcePath": "/Users/jreye/.codex/generated_images/019f61da-60fd-7563-adc9-48a595c7cc0e/exec-60e0c9b8-86dc-472b-af1a-2843abbafa0a.png",
+      "master": {
+        "path": "masters/creative-workflows-six-moments-master-v1.png",
+        "width": 1536,
+        "height": 1024,
+        "bytes": 2827416,
+        "sha256": "405f1917a9efb59dab2006a46202d465cfbbeaef459fe25cf66b19f3bc125612"
+      },
+      "web": {
+        "path": "exports/creative-workflows-six-moments-web-1440-v1.webp",
+        "width": 1440,
+        "height": 960,
+        "bytes": 164628,
+        "sha256": "e61b544aa9bf47ae2624045a46b65596eb33262378d723592187adfaaa159c41"
+      },
+      "media": {
+        "id": 251368,
+        "url": "https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-six-moments-web-1440-v1.webp",
+        "authorId": 1,
+        "alt": "Seis momentos de una campaña, desde el brief y la exploración hasta la revisión, entrega y aprendizaje.",
+        "caption": "El valor aparece en las transiciones entre intención, decisión, producción y aprendizaje."
+      },
+      "review": {
+        "verdict": "pass",
+        "notes": "Los seis momentos son distinguibles y la señal visual conserva continuidad desde la decisión hasta el aprendizaje."
+      }
+    },
+    {
+      "id": "CW-V05",
+      "slug": "decision-boundary",
+      "status": "selected-uploaded-integrated",
+      "editorialRole": "in-article explanatory diagram for system, AI and human decision authority",
+      "productionMethod": "deterministic HTML/CSS composition rendered with Playwright; no generated text",
+      "sourcePath": "sources/render-decision-v3.mjs",
+      "baseSourcePath": "sources/diagram-production-v2.html",
+      "overridePath": "sources/decision-boundary-v3-overrides.css",
+      "master": {
+        "path": "masters/creative-workflows-decision-boundary-master-v3.png",
+        "width": 1440,
+        "height": 960,
+        "bytes": 145666,
+        "sha256": "9fc7db9f7a5570f7823600112b3b7e4251be45cc2b6fc9c010fb0837c1801c7c"
+      },
+      "web": {
+        "path": "exports/creative-workflows-decision-boundary-web-1440-v3.webp",
+        "width": 1440,
+        "height": 960,
+        "bytes": 75474,
+        "sha256": "1db4a810dbdba75229086974531d5d9dc965116fd3e83cebcd82a0151148af31"
+      },
+      "media": {
+        "id": 251393,
+        "url": "https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-decision-boundary-web-1440-v3.webp",
+        "authorId": 1,
+        "alt": "Tres niveles de decisión: el sistema ejecuta, la IA amplía y una persona decide a medida que aumentan la ambigüedad y el impacto.",
+        "caption": "A mayor ambigüedad e impacto, mayor autoridad humana."
+      },
+      "supersedes": [
+        {
+          "mediaId": 251386,
+          "revision": "V1",
+          "reason": "La composición no protegía la esquina inferior derecha ocupada por el widget flotante de Next Post en Ohio."
+        },
+        {
+          "mediaId": 251389,
+          "revision": "V2",
+          "reason": "La línea lima atravesaba copy y listas, la tarjeta central invadía el cierre y el signo de apertura colisionaba visualmente con la Q."
+        }
+      ],
+      "review": {
+        "verdict": "pass",
+        "notes": "V3 inspeccionada a resolución original y en runtime live: labels y listas sin cruces, tres tarjetas alineadas, puntuación legible y zona Ohio sin información crítica."
+      }
+    },
+    {
+      "id": "CW-V06",
+      "slug": "autonomy-ladder",
+      "status": "selected-uploaded-integrated",
+      "editorialRole": "in-article explanatory diagram for managed, co-operated and client-operated autonomy",
+      "productionMethod": "deterministic HTML/CSS composition rendered with Playwright; no generated text",
+      "sourcePath": "sources/render-autonomy-v3.mjs",
+      "baseSourcePath": "sources/diagram-production-v2.html",
+      "overridePath": "sources/autonomy-ladder-v3-overrides.css",
+      "master": {
+        "path": "masters/creative-workflows-autonomy-ladder-master-v3.png",
+        "width": 1440,
+        "height": 960,
+        "bytes": 155042,
+        "sha256": "177b46e7184f2cc7be178bde9631fb800506981fdc37128ec02dbd3f5bdd795f"
+      },
+      "web": {
+        "path": "exports/creative-workflows-autonomy-ladder-web-1440-v3.webp",
+        "width": 1440,
+        "height": 960,
+        "bytes": 68120,
+        "sha256": "4c944fd0d7915b76bdaa67cf78de02ea40cc609965adec461a3b438d186fa1c4"
+      },
+      "media": {
+        "id": 251392,
+        "url": "https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-autonomy-ladder-web-1440-v3.webp",
+        "authorId": 1,
+        "alt": "Tres grados de autonomía: gestionado, co-operado y operado por cliente, con más autonomía a medida que se acumula evidencia.",
+        "caption": "La autonomía aumenta con evidencia, límites y rutas de escalamiento verificadas."
+      },
+      "supersedes": [
+        {
+          "mediaId": 251387,
+          "revision": "V1",
+          "reason": "Builder/Runner quedaba bajo la esquina cubierta por el widget flotante de Next Post."
+        },
+        {
+          "mediaId": 251390,
+          "revision": "V2",
+          "reason": "La diagonal ocultaba el ordinal 01, atravesaba las tarjetas y el label vertical de evidencia quedaba recortado."
+        }
+      ],
+      "review": {
+        "verdict": "pass",
+        "notes": "V3 inspeccionada a resolución original y en runtime live: tres ordinales visibles, progresión fuera del copy, label horizontal completo y Builder/Runner legibles."
+      }
+    }
+  ],
+  "validation": {
+    "visualInspection": "pass",
+    "wordpressAssetHttp": "pass-200-webp",
+    "contentFactoryDryRun": {
+      "snapshot": "v3-private",
+      "status": "pass",
+      "blockCount": 101,
+      "findings": 0,
+      "hasMedia": true
+    },
+    "wordpressReadback": {
+      "snapshot": "v3-private",
+      "status": "pass",
+      "postStatus": "private",
+      "blockCount": 101,
+      "imageBlockCount": 3,
+      "featuredMediaId": 251370,
+      "openGraph": "pass",
+      "anonymousStatus": 404
+    },
+    "currentPublication": {
+      "snapshot": "v5-published",
+      "status": "pass",
+      "postStatus": "publish",
+      "blockCount": 114,
+      "headingCount": 21,
+      "imageBlockCount": 5,
+      "captionCount": 6,
+      "tableBlockCount": 1,
+      "featuredMediaId": 251370,
+      "anonymousStatus": 200,
+      "robots": "index, follow",
+      "canonical": "https://efeoncepro.com/creative/creative-workflows/",
+      "openGraph": "pass",
+      "desktopViewport": "1440x1000",
+      "mobileViewport": "390x844",
+      "liveRender": "pass",
+      "desktopEvidence": "review/v5-diagrams-v3/qa-report.json",
+      "contentRuntimeSha256": "98299f2948f6671b89ebc50e03b846ba6f150be74c6cb61d37a7bee8847f67a3",
+      "diagramMediaIds": [251393, 251392],
+      "verifiedAt": "2026-07-15"
+    }
+  }
+}

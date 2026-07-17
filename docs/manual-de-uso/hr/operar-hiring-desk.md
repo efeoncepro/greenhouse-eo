@@ -118,10 +118,18 @@ Revisar al menos: instrucciones/consentimiento, timer, autosave, avance, scoreca
 
 ## Gobernar una publicación
 
-1. Abre `Publicación` y selecciona el opening.
+1. Abre `Publicación` y selecciona el opening (selector `Vacante` si hay más de uno).
 2. Revisa el diff `Se publicará` vs `Solo interno`.
 3. Edita solo contenido público permitido.
 4. Confirma publicar, pausar o cerrar. La publicación refresca Careers; las notas internas nunca salen en el payload público.
+
+## Redactar el aviso con IA (TASK-1385/1422)
+
+1. En la columna `Se publicará (público)`, pulsa `✨ Redactar con IA` (si dice `Revisar borrador pendiente`, ya existe un borrador esperándote). Si el botón está deshabilitado, el flag `HIRING_VACANCY_AI_ENABLED` está apagado en ese ambiente.
+2. En el drawer, revisa el bloque `Lo que la IA verá` (rol, hechos públicos y skills de la demanda — nunca presupuesto ni notas internas). Opcional: elige la plantilla de assessment para alinear el aviso con lo que el proceso evalúa.
+3. `Generar borrador` tarda unos segundos; puedes `Seguir en segundo plano` y volver después (quedará como pendiente).
+4. Revisa y EDITA el borrador como humano responsable: título, resumen y descripción son obligatorios; verifica el recordatorio anti-sesgo (sin señales de género/edad ni requisitos no laborales).
+5. `Aplicar al aviso` escribe el copy al opening (requiere permiso de edición) — o `Descartar borrador` lo rechaza. La IA nunca escribe ni publica sola: publicar sigue siendo el paso 4 de la sección anterior.
 
 ## Problemas comunes
 

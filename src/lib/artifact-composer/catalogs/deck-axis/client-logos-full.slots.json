@@ -1,0 +1,76 @@
+{
+  "template": "ClientLogosFull",
+  "version": "0.1",
+  "viewport": { "width": 1920, "height": 1080 },
+  "slots": {
+    "sectionLabel": {
+      "selector": "[data-slot='sectionLabel']",
+      "type": "string",
+      "required": false,
+      "constraints": { "maxCharacters": 30, "maxLines": 1, "overflow": "reject" }
+    },
+    "title": {
+      "selector": "[data-slot='title']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": { "maxCharacters": 72, "maxLines": 2, "allowedTags": ["em"], "overflow": "reject" }
+    },
+    "lead": {
+      "selector": "[data-slot='lead']",
+      "type": "string",
+      "required": false,
+      "constraints": { "maxCharacters": 150, "maxLines": 4, "overflow": "reject" }
+    },
+    "logos": {
+      "selector": "[data-slot='logos']",
+      "type": "array",
+      "required": true,
+      "constraints": { "minItems": 4, "maxItems": 9, "overflow": "reject" },
+      "item": {
+        "type": "object",
+        "shape": {
+          "client": {
+            "type": "enum",
+            "required": true,
+            "values": [
+              "sky",
+              "carozzi",
+              "marca-chile",
+              "gobierno-santiago",
+              "bresler",
+              "berel",
+              "aguas-andinas",
+              "universidad-temuco",
+              "anam"
+            ],
+            "resolver": "client-logo-asset",
+            "consumer": "resolver-only"
+          },
+          "emphasis": {
+            "type": "enum",
+            "required": true,
+            "values": ["primary", "none"],
+            "resolver": "client-logo-emphasis",
+            "consumer": "resolver-only"
+          }
+        }
+      }
+    },
+    "breadth": {
+      "selector": "[data-slot='breadth']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "value": { "type": "string", "required": true, "maxCharacters": 6 },
+        "kicker": { "type": "string", "required": true, "maxCharacters": 26 },
+        "caption": { "type": "string", "required": true, "maxCharacters": 92, "maxLines": 2 }
+      }
+    }
+  },
+  "presentation": {
+    "brandSurface": "timeline-full-approved-navy-gradient",
+    "composition": "full-canvas client trust wall: compact header + 4×2 uniform light-plate logo grid + one breadth band that signals the roster is larger than what is shown",
+    "logoPolicy": "client key resolves through the closed client-logo-asset resolver (approved SVG + contrast plate). Do not paste ad-hoc logos, hallucinated marks or a client that is not one. Add the asset + enum value to CLIENT_LOGO instead. Exactly one tile may carry emphasis='primary' (the prospect that is already a client); it renders a teal ring + 'Cliente' chip.",
+    "honesty": "the breadth number is a verifiable roster count (más de 90 empresas en Chile, Colombia, México y Perú — efeoncepro.com), NOT a fabricated figure; the '+' band is the 'there are more' signal the operator asked for."
+  }
+}

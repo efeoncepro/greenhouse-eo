@@ -6,12 +6,14 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Diseño`
+- Status real: `Motor + 3 consumers backend completos (12/13 childs complete); falta encender la cara pública self-serve — solo TASK-1246 (H) abierta`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `unassigned`
 - Branch: `epic/EPIC-020-public-ai-visibility-lead-magnet-program`
 - GitHub Issue: `none`
+
+> **Estado y qué sigue de TODO el programa AEO** (no solo este epic): [`../AEO_PROGRAM_STATUS.md`](../AEO_PROGRAM_STATUS.md). El trabajo pendiente vive repartido en EPIC-020/021/022/024 + tasks sueltas (`TASK-1276` cockpit operador, `TASK-1321`/`1327` cara pública) + blockers de config multi-runtime. Empezar ahí para recuperar visibilidad.
 
 ## Summary
 
@@ -37,19 +39,40 @@ El motor del grader está completo y verificado (TASK-1226/1227/1234/1235/1236/1
 
 ## Child Tasks
 
+> **Estado real (verificado por carpeta 2026-07-16):** 12/13 childs `complete`. **La única abierta es `TASK-1246` (H)** — el rollout de la cara pública self-serve. La lista abajo corrige el drift previo (varias figuraban como planificadas cuando ya están `complete`).
+
 - `TASK-1239` ✅ **complete (dev)** — **(A) Public Grader Report Snapshot + Token Reader** — `grader_reports` inmutable (run_id + score_version + report_version + recommendation_pack_version + as_of + DTO público congelado + token NO enumerable 256-bit + expires_at) + `readPublicGraderReport(reportToken)` + `publishGraderReportSnapshot` (idempotente, no publica gateados) + capability `report.publish` + endpoints admin/público. Foundation de parity pública. **P1.**
 - `TASK-1240` ✅ **code complete (dev); rollout pendiente** — **(B) Public Grader Run Intake + abuse/cost controls** — `createPublicGraderRun` (§9.2 input + consent + work email, **email nunca a providers**) → captcha (Turnstile) + rate-limit (per-IP 10/email 3) + presupuesto global diario (circuit breaker) + modo `light` → enqueue al worker async (TASK-1234). Lead dedicado `grader_leads` + `grader_intake_events`. Flag `GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_ENABLED` default OFF. **P1. Pendiente:** sign-off legal consent + secret captcha + flag ON staging.
-- `TASK-1241` — **(C) Public Lead Magnet Page** (ui-ux): landing + form §9.2 + consent + Turnstile + estados async honestos (§9.3) + render del reporte usando el artifact design system de `TASK-1252` (table-fallback + a11y WCAG 2.2 AA). Cliente puro de A (token-reader) + B (intake). **P1.**
-- `TASK-1242` — **(D) HubSpot Lead Handoff** (backend, integration): `syncAiVisibilityRunToHubSpot` upserta contact/company + props `ai_visibility_*` + lifecycle desde `primary_gap`/`recommended_motion`, vía outbox + reactive. **P2.**
+- `TASK-1241` ✅ **complete** — **(C) Public Lead Magnet Page** (ui-ux): landing + form §9.2 + consent + Turnstile + estados async honestos (§9.3) + render del reporte usando el artifact design system de `TASK-1252` (table-fallback + a11y WCAG 2.2 AA). Cliente puro de A (token-reader) + B (intake). **P1.**
+- `TASK-1242` ✅ **complete** — **(D) HubSpot Lead Handoff** (backend, integration): `syncAiVisibilityRunToHubSpot` upserta contact/company + props `ai_visibility_*` + lifecycle desde `primary_gap`/`recommended_motion`, vía outbox + reactive. **P2.**
 - `TASK-1243` ✅ **complete** (2026-06-26, code complete dev) — **(E) Client-Scoped Report Access** (backend, reader): reader client-scoped (binding additive `grader_profiles.organization_id`) gateado por capability dedicada `growth.ai_visibility.report.read_client`, mismo `buildGraderReport` (reusa `readGraderReport`). DTO `ClientGraderReport` leak-safe; tenant boundary A≠B (test + SQL live); endpoint BFF `GET /api/client-portal/growth/ai-visibility/report`. **Tercer consumer de la parity cerrado.** Desbloquea `TASK-1248` (UI). Rollout: poblar `organization_id` = intake cliente. **P2.**
 - `TASK-1244` ✅ **code complete (dev); rollout pendiente** — **(F) Admin Evidence Review** (backend, command): cola (`listPendingReportReviews`) + `approveAiVisibilityReport`/`rejectAiVisibilityReport` (log append-only `grader_report_reviews` = state machine + CHECK + audit; el LLM nunca aprueba) de `review_required` antes del release público; `publishGraderReportSnapshot` honra la aprobación (approved → publicable; pending/rejected → 409). Approve publica snapshot + delivery `ready` + HubSpot handoff; reject → `unavailable`. Capability `report.review` + grant. Signal `report_review_pending`. Gate humano YMYL. **P2. Pendiente:** UI admin (TASK-1247) + dry-run aprobar→publish sobre un `review_required` real en staging.
-- `TASK-1245` — **(G) Public Run Status + Delivery Orchestrator** (backend, api): endpoint público de poll por `runPublicId`, estados public-safe y delivery idempotente de `reportToken` cuando existe snapshot publicable. **P1.**
-- `TASK-1246` — **(H) Public Launch Readiness + Rollout** (ops/backend): legal consent + Turnstile + flags/envs + staging smoke end-to-end + release control plane + rollback. **P1.**
-- `TASK-1247` — **(I) Admin Review UI** (ui-ux): cola y detalle interno para operar approve/reject de `review_required` usando `TASK-1244`. **P2.**
-- `TASK-1248` — **(J) Client Report UI** (ui-ux): superficie del portal cliente sobre el reader client-scoped de `TASK-1243`, consumiendo el artifact design system de `TASK-1252`. **P2.**
-- `TASK-1249` — **(K) Calibration + Provider Completion** (backend, data-quality): Perplexity, prompt pack v2 y recalibración/golden eval; calidad del motor no bloqueante del MVP. **P2.**
+- `TASK-1245` ✅ **complete** — **(G) Public Run Status + Delivery Orchestrator** (backend, api): endpoint público de poll por `runPublicId`, estados public-safe y delivery idempotente de `reportToken` cuando existe snapshot publicable. **P1.**
+- `TASK-1246` 🚧 **in-progress — ÚNICA TASK ABIERTA DEL EPIC** — **(H) Public Launch Readiness + Rollout** (ops/backend): legal consent + Turnstile + flags/envs + staging smoke end-to-end + release control plane + rollback. **P1.** Residual central = **decisión de arquitectura abierta**: ¿la cara pública se embebe vía `<greenhouse-form>` (candidato `TASK-1321`, `/aeo-2/`) o se hace en el hub público Astro (candidato `TASK-1327`, `think/brand-visibility`)? Hoy 0 tráfico self-serve real. Ver [`../AEO_PROGRAM_STATUS.md`](../AEO_PROGRAM_STATUS.md) §6 Ola 3.
+- `TASK-1247` ✅ **complete** — **(I) Admin Review UI** (ui-ux): cola y detalle interno para operar approve/reject de `review_required` usando `TASK-1244`. **P2.**
+- `TASK-1248` ✅ **complete** — **(J) Client Report UI** (ui-ux): superficie del portal cliente sobre el reader client-scoped de `TASK-1243`, consumiendo el artifact design system de `TASK-1252`. **P2.** ⚠️ Rollout pendiente: la ruta `/aeo` es **deep-link (no está en nav)** y falta poblar `grader_profiles.organization_id` para que un cliente real la vea. Ver `AEO_PROGRAM_STATUS.md` §2.A.
+- `TASK-1249` ✅ **complete** — **(K) Calibration + Provider Completion** (backend, data-quality): Perplexity, prompt pack v2 y recalibración/golden eval; calidad del motor no bloqueante del MVP. **P2.**
 - `TASK-1250` ✅ **code complete (dev); rollout pendiente** — **(L) Email Report Delivery** (backend, communications): email transaccional al lead con resumen breve + insight prioritario + link tokenizado + **PDF completo adjunto** (TASK-1273), disparado write-side (reactive consumer del snapshot publicado) con idempotencia DB-level + consent-gate. Marca **Efeonce** (agencia), no el portal. Flag `GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED` default OFF. **P1. Pendiente:** redeploy ops-worker + flip flag dual-location + smoke staging (gated por TASK-1246).
-- `TASK-1252` — **(M) Report Artifact Design System** (ui-ux): visual y sistema reusable del informe completo del grader, con componentes/variants para web publica, portal cliente, attachment y admin preview. **P1.**
+- `TASK-1252` ✅ **complete** — **(M) Report Artifact Design System** (ui-ux): visual y sistema reusable del informe completo del grader, con componentes/variants para web publica, portal cliente, attachment y admin preview. **P1.**
+
+## Estado actual y qué sigue (2026-07-16)
+
+**Backend maduro, cara pública apagada.** Los 3 consumers (público/admin/cliente) están cerrados a nivel backend y el motor corre en prod (brand-aware, EPIC-021). Lo que resta para "cerrar el epic" es **encender la puerta pública self-serve** (`TASK-1246` + decidir entre `TASK-1321`/`TASK-1327`) y destrabar los blockers de config.
+
+**Blockers de config (no son tasks nuevas; encienden lo ya hecho):**
+
+- Provisionar property HubSpot `aeo_check_result` (script `scripts/growth/provision-ai-visibility-hubspot-properties.ts`) — sin ella el handoff (D) da 400 en el upsert de Company.
+- Flags AEO: **ya están ON en prod** (verificado runtime 2026-07-16 — Vercel prod y `ops-worker` rev. activa; el ledger estaba desactualizado). Acción restante = solo actualizar `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`, no prender nada.
+- `TASK-1341` (DataForSEO AIO en prod, `to-do`): hoy `missing_secret` → informes `partial`.
+- Poblar `grader_profiles.organization_id` para el consumer cliente (J).
+
+**Trabajo relacionado que vive FUERA de este epic** (por eso conviene mirar el doc de programa, no solo esta spec):
+
+- `TASK-1276` (`to-do`) — **cockpit operador `/growth/aeo` + facet AEO en Account 360**. Gap #1 de operabilidad interna; backend listo (`TASK-1275/1279/1287` complete). No es child de EPIC-020 pero es lo que falta para operar el AEO como herramienta de venta/servicio desde el portal.
+- `TASK-1321` / `TASK-1327` (`in-progress`) — las dos candidatas de la cara pública self-serve.
+- `TASK-1270` (`in-progress`) — re-grade recurrente / SoV (faceta operativa recurrente del cliente).
+
+**Secuencia recomendada:** ver [`../AEO_PROGRAM_STATUS.md`](../AEO_PROGRAM_STATUS.md) §6 (olas 1→4). Resumen: Ola 1 config → Ola 2 `TASK-1276` → Ola 3 cara pública → Ola 4 cara del cliente contratado.
 
 ## Existing Related Work
 

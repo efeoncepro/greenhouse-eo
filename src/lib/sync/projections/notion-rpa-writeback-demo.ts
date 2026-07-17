@@ -7,6 +7,11 @@ import {
   patchNotionDemoPage
 } from '@/lib/notion-metrics/notion-demo-client'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import {
+  formatTerminalNotionWritebackError,
+  isNotionArchivedBlockError,
+  isRetryableNotionError
+} from '@/lib/space-notion/notion-errors'
 
 import { EVENT_TYPES } from '../event-catalog'
 import type { ProjectionDefinition } from '../projection-registry'
@@ -259,28 +264,36 @@ export const notionRpaWritebackDemoProjection: ProjectionDefinition = {
       }
 
       const message = err instanceof Error ? err.message : String(err)
+      const isTerminalArchivedBlock = isNotionArchivedBlockError(err)
+      const persistedMessage = isTerminalArchivedBlock ? formatTerminalNotionWritebackError(err) : message
 
       // Mark failure first (best effort)
       try {
-        await markSnapshotFailed(snapshotId, message)
+        await markSnapshotFailed(snapshotId, persistedMessage)
       } catch (markErr) {
         captureWithDomain(markErr, 'integrations.notion', {
           level: 'warning',
           tags: { source: 'demo_rpa_writeback', stage: 'mark_failed' },
-          extra: { snapshotId, originalError: message }
+          extra: { snapshotId, originalError: persistedMessage }
         })
       }
 
-      captureWithDomain(err, 'integrations.notion', {
-        level: 'error',
-        tags: { source: 'demo_rpa_writeback', stage: 'patch_notion' },
-        extra: {
-          snapshotId,
-          taskSourceId: snapshot.task_source_id,
-          rpaValue: snapshot.rpa_value,
-          status: (err as Error & { status?: number }).status
-        }
-      })
+      if (isTerminalArchivedBlock) {
+        return `rpa_writeback_demo:${snapshotId}:skipped:archived_notion_block`
+      }
+
+      if (!isRetryableNotionError(err)) {
+        captureWithDomain(err, 'integrations.notion', {
+          level: 'error',
+          tags: { source: 'demo_rpa_writeback', stage: 'patch_notion' },
+          extra: {
+            snapshotId,
+            taskSourceId: snapshot.task_source_id,
+            rpaValue: snapshot.rpa_value,
+            status: (err as Error & { status?: number }).status
+          }
+        })
+      }
 
       throw err // Re-throw para retry exponencial canonical reactive consumer
     }

@@ -3,108 +3,526 @@
   "version": "0.1",
   "status": "draft",
   "note": "Registry canónico del Tender Deck Composer. Machine-readable: el selector agéntico elige plantilla por content-type; el renderer llena los slots. Doc raíz: GREENHOUSE_TENDER_DECK_COMPOSER_V1.md. Co-construido Claude ↔ Codex (doc-only, Proposed).",
-  "canvas": { "w": 1920, "h": 1080, "aspect": "16:9" },
+  "canvas": {
+    "w": 1920,
+    "h": 1080,
+    "aspect": "16:9"
+  },
   "figmaFileKey": "GXYeJaRjotmFuczfnd8hLi",
-
   "contentTypeTaxonomy": [
-    "cover", "back-cover", "agenda", "section-divider",
-    "narrative", "statement", "highlight",
-    "bullet-list", "dual-list", "dual-text",
-    "one-metric", "several-kpis", "chart", "comparison",
-    "capabilities-grid", "four-pillars", "process-sequential",
-    "timeline", "team", "case-study", "credentials", "pricing", "requirements-table",
-    "evidence-story", "human-impact"
+    "cover",
+    "back-cover",
+    "agenda",
+    "section-divider",
+    "narrative",
+    "statement",
+    "highlight",
+    "bullet-list",
+    "dual-list",
+    "dual-text",
+    "one-metric",
+    "several-kpis",
+    "maturity-ladder",
+    "artifact-showcase",
+    "chart",
+    "comparison",
+    "capabilities-grid",
+    "tool-stack",
+    "daily-operations",
+    "content-hub-anatomy",
+    "four-pillars",
+    "process-sequential",
+    "timeline",
+    "team",
+    "team-gallery",
+    "case-study",
+    "credentials",
+    "pricing",
+    "requirements-table",
+    "evidence-story",
+    "human-impact",
+    "client-logos",
+    "testimonials"
   ],
-
   "templates": [
-    { "name": "CoverFull", "kind": "full-bleed", "source": "design", "figmaNode": null, "owner": "claude", "status": "built",
-      "contentTypes": ["cover"], "prototype": "cover-full.html", "slotsRef": "cover-full.slots.json" },
-
-    { "name": "BackCoverFull", "kind": "full-bleed", "source": "design", "figmaNode": null, "owner": "codex", "status": "built",
-      "contentTypes": ["back-cover"], "prototype": "back-cover-full.html", "slotsRef": "back-cover-full.slots.json" },
-
-    { "name": "AgendaFull", "kind": "full-bleed", "source": "gap", "figmaNode": null, "owner": "claude", "status": "built",
-      "contentTypes": ["agenda"], "prototype": "agenda-full.html", "slotsRef": "agenda-full.slots.json",
-      "nav": { "clickableItems": true, "targetSlideIdPerItem": true, "pdfInternalLinks": true },
-      "overflow": "4-8 items (prefer 6); 7-8 => 2x4; >8 => group into Parts or consolidate, never split into 2 agenda slides" },
-
-    { "name": "SectionDividerSplit", "kind": "split", "source": "figma", "figmaNode": "6:12498 / 4:151", "owner": "claude", "status": "built",
-      "contentTypes": ["section-divider"], "prototype": "section-divider-split.html", "slotsRef": "section-divider-split.slots.json",
-      "variants": ["brand-left", "brand-right"] },
-
-    { "name": "NarrativeSplit", "kind": "split", "source": "figma", "figmaNode": "5:7869", "owner": "claude", "status": "built",
-      "contentTypes": ["narrative"], "prototype": "narrative-split.html", "slotsRef": "narrative-split.slots.json",
-      "rightSlot": ["PersonaAsset", "ConceptVisual"] },
-
-    { "name": "BulletListSplit", "kind": "split", "source": "figma", "figmaNode": "8:14178", "owner": "claude", "status": "built",
-      "contentTypes": ["bullet-list"], "prototype": "bullet-list-split.html", "slotsRef": "bullet-list-split.slots.json" },
-
-    { "name": "DualListSplit", "kind": "split", "source": "figma", "figmaNode": "8:14347", "owner": "codex", "status": "built",
-      "contentTypes": ["dual-list"], "prototype": "dual-list-split.html", "slotsRef": "dual-list-split.slots.json" },
-
-    { "name": "DualTextSplit", "kind": "split", "source": "figma", "figmaNode": "8:14102", "owner": "codex", "status": "built",
-      "contentTypes": ["dual-text"], "prototype": "dual-text-split.html", "slotsRef": "dual-text-split.slots.json" },
-
-    { "name": "StatSplit", "kind": "split", "source": "figma", "figmaNode": "7:13485", "owner": "codex", "status": "built",
-      "contentTypes": ["one-metric"], "prototype": "stat-split.html", "slotsRef": "stat-split.slots.json" },
-
-    { "name": "MetricsSplit", "kind": "split", "source": "figma", "figmaNode": "7:13598", "owner": "claude", "status": "built",
-      "contentTypes": ["several-kpis"], "prototype": "metrics-split.html", "slotsRef": "metrics-split.slots.json",
-      "rightSlot": ["PersonaAsset", "ConceptVisual"] },
-
-    { "name": "ChartSplit", "kind": "split", "source": "figma", "figmaNode": "5:10852", "owner": "claude", "status": "built",
-      "contentTypes": ["chart"], "prototype": "chart-split.html", "slotsRef": "chart-split.slots.json",
-      "requires": ["heroStat"] },
-
-    { "name": "ComparisonSplit", "kind": "split", "source": "figma", "figmaNode": "8:13782", "owner": "codex", "status": "built",
-      "contentTypes": ["comparison"], "prototype": "comparison-split.html", "slotsRef": "comparison-split.slots.json" },
-
-    { "name": "QuoteSplit", "kind": "split", "source": "figma", "figmaNode": "8:14071", "owner": "claude", "status": "built",
-      "contentTypes": ["statement"], "prototype": "quote-split.html", "slotsRef": "quote-split.slots.json",
-      "leftSlot": ["PersonaAsset", "Attribution"],
-      "modes": ["statement (Efeonce, first-party)", "testimonial (requires real sourced quote)"] },
-
-    { "name": "HighlightWave", "kind": "full-bleed", "source": "figma", "figmaNode": "4:124", "owner": "codex", "status": "built",
-      "contentTypes": ["highlight"], "prototype": "highlight-wave.html", "slotsRef": "highlight-wave.slots.json" },
-
-    { "name": "FourPillarsFull", "kind": "full-bleed", "source": "figma", "figmaNode": "8:24297", "owner": "codex", "status": "built",
-      "contentTypes": ["four-pillars"], "prototype": "four-pillars-full.html", "slotsRef": "four-pillars-full.slots.json" },
-
-    { "name": "CardGridFull", "kind": "full-bleed", "source": "figma", "figmaNode": "5:7657", "owner": "claude", "status": "built",
-      "contentTypes": ["capabilities-grid"], "prototype": "card-grid-full.html", "slotsRef": "card-grid-full.slots.json" },
-
-    { "name": "TimelineFull", "kind": "full-bleed", "source": "gap", "figmaNode": null, "owner": "claude", "status": "built",
-      "contentTypes": ["timeline"], "prototype": "timeline-full.html", "slotsRef": "timeline-full.slots.json" },
-
-    { "name": "TeamSplit", "kind": "split", "source": "gap", "figmaNode": null, "owner": "claude", "status": "built",
-      "contentTypes": ["team"], "prototype": "team-split.html", "slotsRef": "team-split.slots.json",
-      "memberAvatar": ["PhotoAsset", "RoleIcon"] },
-
-    { "name": "CaseStudySplit", "kind": "split", "source": "gap", "figmaNode": null, "owner": "claude", "status": "built",
-      "contentTypes": ["case-study"], "prototype": "case-study-split.html", "slotsRef": "case-study-split.slots.json",
-      "requires": ["result.hero", "result.beforeAfter", "result.source"] },
-
-    { "name": "PricingFull", "kind": "full-bleed", "source": "gap", "figmaNode": null, "owner": "codex", "status": "built",
-      "contentTypes": ["pricing"], "prototype": "pricing-full.html", "slotsRef": "pricing-full.slots.json" },
-
-    { "name": "RequirementsTableFull", "kind": "full-bleed", "source": "gap", "figmaNode": null, "owner": "codex", "status": "built",
-      "contentTypes": ["requirements-table"], "prototype": "requirements-table-full.html", "slotsRef": "requirements-table-full.slots.json" },
-
-    { "name": "ProcessStepsFull", "kind": "full-bleed", "source": "gap", "figmaNode": null, "owner": "codex", "status": "built",
-      "contentTypes": ["process-sequential"], "prototype": "process-steps-full.html", "slotsRef": "process-steps-full.slots.json" },
-
-    { "name": "CredentialsFull", "kind": "full-bleed", "source": "gap", "figmaNode": null, "owner": "codex", "status": "built",
-      "contentTypes": ["credentials"], "prototype": "credentials-full.html", "slotsRef": "credentials-full.slots.json" },
-
-    { "name": "EvidenceStoryGrid", "kind": "full-bleed", "source": "figma", "figmaNode": null, "owner": "codex", "status": "built",
-      "contentTypes": ["evidence-story"], "prototype": "evidence-story-grid.html", "slotsRef": "evidence-story-grid.slots.json",
-      "note": "PROVISIONAL: layout historia de transformación + grid de evidencia; el prototipo trae contenido de ejemplo IDD/Think, no SKY. Confirmar content-type y fit al set de licitación (Codex)." },
-
-    { "name": "HumanImpactFull", "kind": "full-bleed", "source": "figma", "figmaNode": null, "owner": "codex", "status": "built",
-      "contentTypes": ["human-impact"], "prototype": "human-impact-full.html", "slotsRef": "human-impact-full.slots.json",
-      "note": "PROVISIONAL: layout antes→después humano por rol/persona; prototipo con contenido de ejemplo IDD/Think, no SKY. Confirmar content-type y fit (Codex)." }
+    {
+      "name": "CoverFull",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "cover"
+      ],
+      "prototype": "cover-full.html",
+      "slotsRef": "cover-full.slots.json"
+    },
+    {
+      "name": "BackCoverFull",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "codex",
+      "status": "built",
+      "contentTypes": [
+        "back-cover"
+      ],
+      "prototype": "back-cover-full.html",
+      "slotsRef": "back-cover-full.slots.json"
+    },
+    {
+      "name": "AgendaFull",
+      "kind": "full-bleed",
+      "source": "gap",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "agenda"
+      ],
+      "prototype": "agenda-full.html",
+      "slotsRef": "agenda-full.slots.json",
+      "nav": {
+        "clickableItems": true,
+        "targetSlideIdPerItem": true,
+        "pdfInternalLinks": true
+      },
+      "overflow": "4-8 items (prefer 6); 7-8 => 2x4; >8 => group into Parts or consolidate, never split into 2 agenda slides"
+    },
+    {
+      "name": "SectionDividerSplit",
+      "kind": "split",
+      "source": "figma",
+      "figmaNode": "6:12498 / 4:151",
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "section-divider"
+      ],
+      "prototype": "section-divider-split.html",
+      "slotsRef": "section-divider-split.slots.json",
+      "variants": [
+        "brand-left",
+        "brand-right"
+      ]
+    },
+    {
+      "name": "NarrativeSplit",
+      "kind": "split",
+      "source": "figma",
+      "figmaNode": "5:7869",
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "narrative"
+      ],
+      "prototype": "narrative-split.html",
+      "slotsRef": "narrative-split.slots.json",
+      "rightSlot": [
+        "PersonaAsset",
+        "ConceptVisual"
+      ]
+    },
+    {
+      "name": "BulletListSplit",
+      "kind": "split",
+      "source": "figma",
+      "figmaNode": "8:14178",
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "bullet-list"
+      ],
+      "prototype": "bullet-list-split.html",
+      "slotsRef": "bullet-list-split.slots.json"
+    },
+    {
+      "name": "DualListSplit",
+      "kind": "split",
+      "source": "figma",
+      "figmaNode": "8:14347",
+      "owner": "codex",
+      "status": "built",
+      "contentTypes": [
+        "dual-list"
+      ],
+      "prototype": "dual-list-split.html",
+      "slotsRef": "dual-list-split.slots.json"
+    },
+    {
+      "name": "DualTextSplit",
+      "kind": "split",
+      "source": "figma",
+      "figmaNode": "8:14102",
+      "owner": "codex",
+      "status": "built",
+      "contentTypes": [
+        "dual-text"
+      ],
+      "prototype": "dual-text-split.html",
+      "slotsRef": "dual-text-split.slots.json"
+    },
+    {
+      "name": "StatSplit",
+      "kind": "split",
+      "source": "figma",
+      "figmaNode": "7:13485",
+      "owner": "codex",
+      "status": "built",
+      "contentTypes": [
+        "one-metric"
+      ],
+      "prototype": "stat-split.html",
+      "slotsRef": "stat-split.slots.json"
+    },
+    {
+      "name": "MetricsSplit",
+      "kind": "split",
+      "source": "figma",
+      "figmaNode": "7:13598",
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "several-kpis"
+      ],
+      "prototype": "metrics-split.html",
+      "slotsRef": "metrics-split.slots.json",
+      "rightSlot": [
+        "PersonaAsset",
+        "ConceptVisual"
+      ]
+    },
+    {
+      "name": "MaturityLadderFull",
+      "kind": "full-bleed",
+      "source": "gap",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "maturity-ladder"
+      ],
+      "prototype": "maturity-ladder-full.html",
+      "slotsRef": "maturity-ladder-full.slots.json"
+    },
+    {
+      "name": "ArtifactShowcaseFull",
+      "kind": "full-bleed",
+      "source": "gap",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "artifact-showcase"
+      ],
+      "prototype": "artifact-showcase-full.html",
+      "slotsRef": "artifact-showcase-full.slots.json"
+    },
+    {
+      "name": "ChartSplit",
+      "kind": "split",
+      "source": "figma",
+      "figmaNode": "5:10852",
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "chart"
+      ],
+      "prototype": "chart-split.html",
+      "slotsRef": "chart-split.slots.json",
+      "requires": [
+        "heroStat"
+      ]
+    },
+    {
+      "name": "ComparisonSplit",
+      "kind": "split",
+      "source": "figma",
+      "figmaNode": "8:13782",
+      "owner": "codex",
+      "status": "built",
+      "contentTypes": [
+        "comparison"
+      ],
+      "prototype": "comparison-split.html",
+      "slotsRef": "comparison-split.slots.json"
+    },
+    {
+      "name": "QuoteSplit",
+      "kind": "split",
+      "source": "figma",
+      "figmaNode": "8:14071",
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "statement"
+      ],
+      "prototype": "quote-split.html",
+      "slotsRef": "quote-split.slots.json",
+      "leftSlot": [
+        "PersonaAsset",
+        "Attribution"
+      ],
+      "modes": [
+        "statement (Efeonce, first-party)",
+        "testimonial (requires real sourced quote)"
+      ]
+    },
+    {
+      "name": "HighlightWave",
+      "kind": "full-bleed",
+      "source": "figma",
+      "figmaNode": "4:124",
+      "owner": "codex",
+      "status": "built",
+      "contentTypes": [
+        "highlight"
+      ],
+      "prototype": "highlight-wave.html",
+      "slotsRef": "highlight-wave.slots.json"
+    },
+    {
+      "name": "FourPillarsFull",
+      "kind": "full-bleed",
+      "source": "figma",
+      "figmaNode": "8:24297",
+      "owner": "codex",
+      "status": "built",
+      "contentTypes": [
+        "four-pillars"
+      ],
+      "prototype": "four-pillars-full.html",
+      "slotsRef": "four-pillars-full.slots.json"
+    },
+    {
+      "name": "CardGridFull",
+      "kind": "full-bleed",
+      "source": "figma",
+      "figmaNode": "5:7657",
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "capabilities-grid"
+      ],
+      "prototype": "card-grid-full.html",
+      "slotsRef": "card-grid-full.slots.json"
+    },
+    {
+      "name": "ToolStackFull",
+      "kind": "full-bleed",
+      "source": "gap",
+      "figmaNode": null,
+      "owner": "codex",
+      "status": "built",
+      "contentTypes": [
+        "tool-stack"
+      ],
+      "prototype": "tool-stack-full.html",
+      "slotsRef": "tool-stack-full.slots.json",
+      "note": "Plantilla reutilizable para stack operativo con isotipos/logos aprobados + nombres visibles. Nace por gap de TASK-1414/SKY: CardGridFull no soporta 15-20 herramientas ni marcas reales."
+    },
+    {
+      "name": "DailyOpsHubFull",
+      "kind": "full-bleed",
+      "source": "gap",
+      "figmaNode": null,
+      "owner": "codex",
+      "status": "built",
+      "contentTypes": [
+        "daily-operations"
+      ],
+      "prototype": "daily-ops-hub-full.html",
+      "slotsRef": "daily-ops-hub-full.slots.json",
+      "note": "Plantilla reutilizable para mostrar la operación diaria como un workspace vivo: conversación, Content Hub, revisión visual y workflow. Nace por gap de TASK-1414; ProcessStepsFull no representa colaboración simultánea ni artefactos versionados."
+    },
+    {
+      "name": "ContentHubAnatomyFull",
+      "kind": "full-bleed",
+      "source": "gap",
+      "figmaNode": null,
+      "owner": "codex",
+      "status": "built",
+      "contentTypes": [
+        "content-hub-anatomy"
+      ],
+      "prototype": "content-hub-anatomy-full.html",
+      "slotsRef": "content-hub-anatomy-full.slots.json",
+      "note": "Plantilla reutilizable para abrir un entregable editorial en tres capas: research trazable, artículo answer-first e inspector machine-readable con metadata, schema y QA. Nace por gap de TASK-1414; DailyOpsHubFull muestra colaboración, no la profundidad interna del artefacto."
+    },
+    {
+      "name": "TimelineFull",
+      "kind": "full-bleed",
+      "source": "gap",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "timeline"
+      ],
+      "prototype": "timeline-full.html",
+      "slotsRef": "timeline-full.slots.json"
+    },
+    {
+      "name": "TeamSplit",
+      "kind": "split",
+      "source": "gap",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "team"
+      ],
+      "prototype": "team-split.html",
+      "slotsRef": "team-split.slots.json",
+      "memberAvatar": [
+        "PhotoAsset",
+        "RoleIcon"
+      ]
+    },
+    {
+      "name": "TeamGalleryFull",
+      "kind": "full",
+      "source": "gap",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "team-gallery"
+      ],
+      "prototype": "team-gallery-full.html",
+      "slotsRef": "team-gallery-full.slots.json",
+      "memberAvatar": [
+        "PhotoAsset"
+      ]
+    },
+    {
+      "name": "CaseStudySplit",
+      "kind": "split",
+      "source": "gap",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "case-study"
+      ],
+      "prototype": "case-study-split.html",
+      "slotsRef": "case-study-split.slots.json",
+      "requires": [
+        "result.hero",
+        "result.beforeAfter",
+        "result.source"
+      ]
+    },
+    {
+      "name": "PricingFull",
+      "kind": "full-bleed",
+      "source": "gap",
+      "figmaNode": null,
+      "owner": "codex",
+      "status": "built",
+      "contentTypes": [
+        "pricing"
+      ],
+      "prototype": "pricing-full.html",
+      "slotsRef": "pricing-full.slots.json"
+    },
+    {
+      "name": "RequirementsTableFull",
+      "kind": "full-bleed",
+      "source": "gap",
+      "figmaNode": null,
+      "owner": "codex",
+      "status": "built",
+      "contentTypes": [
+        "requirements-table"
+      ],
+      "prototype": "requirements-table-full.html",
+      "slotsRef": "requirements-table-full.slots.json"
+    },
+    {
+      "name": "ProcessStepsFull",
+      "kind": "full-bleed",
+      "source": "gap",
+      "figmaNode": null,
+      "owner": "codex",
+      "status": "built",
+      "contentTypes": [
+        "process-sequential"
+      ],
+      "prototype": "process-steps-full.html",
+      "slotsRef": "process-steps-full.slots.json"
+    },
+    {
+      "name": "CredentialsFull",
+      "kind": "full-bleed",
+      "source": "gap",
+      "figmaNode": null,
+      "owner": "codex",
+      "status": "built",
+      "contentTypes": [
+        "credentials"
+      ],
+      "prototype": "credentials-full.html",
+      "slotsRef": "credentials-full.slots.json"
+    },
+    {
+      "name": "EvidenceStoryGrid",
+      "kind": "full-bleed",
+      "source": "figma",
+      "figmaNode": null,
+      "owner": "codex",
+      "status": "built",
+      "contentTypes": [
+        "evidence-story"
+      ],
+      "prototype": "evidence-story-grid.html",
+      "slotsRef": "evidence-story-grid.slots.json",
+      "note": "PROVISIONAL: layout historia de transformación + grid de evidencia; el prototipo trae contenido de ejemplo IDD/Think, no SKY. Confirmar content-type y fit al set de licitación (Codex)."
+    },
+    {
+      "name": "HumanImpactFull",
+      "kind": "full-bleed",
+      "source": "figma",
+      "figmaNode": null,
+      "owner": "codex",
+      "status": "built",
+      "contentTypes": [
+        "human-impact"
+      ],
+      "prototype": "human-impact-full.html",
+      "slotsRef": "human-impact-full.slots.json",
+      "note": "PROVISIONAL: layout antes→después humano por rol/persona; prototipo con contenido de ejemplo IDD/Think, no SKY. Confirmar content-type y fit (Codex)."
+    },
+    {
+      "name": "ClientLogosFull",
+      "kind": "full-bleed",
+      "source": "gap",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "client-logos"
+      ],
+      "prototype": "client-logos-full.html",
+      "slotsRef": "client-logos-full.slots.json",
+      "note": "Muro de confianza: grilla 4×2 de logos de clientes aprobados (resolver client-logo-asset + placa de contraste) + banda de amplitud. Nace por gap TASK-1414/SKY: ToolStackFull es un sistema de herramientas por etapas, no un muro de marcas. Exactamente un logo lleva emphasis='primary' (el prospecto que ya es cliente)."
+    },
+    {
+      "name": "TestimonialsFull",
+      "kind": "full-bleed",
+      "source": "gap",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "testimonials"
+      ],
+      "prototype": "testimonials-full.html",
+      "slotsRef": "testimonials-full.slots.json",
+      "note": "Dos testimonios verbatim de terceros reales en una lámina + enlace a la muestra viva (fuente verificable). Nace por gap TASK-1414/SKY: QuoteSplit es UNA cita (split); acá se enfrentan dos voces del mismo cliente. Anti-fabricación: cita verbatim, atribución real, proofLink con href obligatorio (validador testimonials-sourced)."
+    }
   ],
-
   "selector": {
     "model": "El agente clasifica el CONTENIDO de cada slide en un content-type de la taxonomía; el selector devuelve la(s) plantilla(s) cuyo `contentTypes` lo incluye. Match declarativo 1:1 en el caso base; las reglas de desambiguación resuelven los solapes.",
     "map": {
@@ -120,26 +538,39 @@
       "dual-text": "DualTextSplit",
       "one-metric": "StatSplit",
       "several-kpis": "MetricsSplit",
+      "maturity-ladder": "MaturityLadderFull",
+      "artifact-showcase": "ArtifactShowcaseFull",
       "chart": "ChartSplit",
       "comparison": "ComparisonSplit",
       "capabilities-grid": "CardGridFull",
+      "tool-stack": "ToolStackFull",
+      "daily-operations": "DailyOpsHubFull",
+      "content-hub-anatomy": "ContentHubAnatomyFull",
       "four-pillars": "FourPillarsFull",
       "process-sequential": "ProcessStepsFull",
       "timeline": "TimelineFull",
       "team": "TeamSplit",
+      "team-gallery": "TeamGalleryFull",
       "case-study": "CaseStudySplit",
       "credentials": "CredentialsFull",
       "pricing": "PricingFull",
       "requirements-table": "RequirementsTableFull",
       "evidence-story": "EvidenceStoryGrid",
-      "human-impact": "HumanImpactFull"
+      "human-impact": "HumanImpactFull",
+      "client-logos": "ClientLogosFull",
+      "testimonials": "TestimonialsFull"
     },
     "disambiguation": [
       "métrica: UNA hero sola => StatSplit; VARIOS KPIs (3-5) de diagnóstico => MetricsSplit; una métrica que necesita GRÁFICO/comparación => ChartSplit; una métrica como RESULTADO de un caso => CaseStudySplit.",
       "estructura de N ítems: PILARES paralelos (4, no secuenciales) => FourPillarsFull; PASOS secuenciales (1->2->3) => ProcessStepsFull; fases en el TIEMPO (con fechas) => TimelineFull.",
       "listas: UNA lista de puntos => BulletListSplit; DOS listas paralelas => DualListSplit; capacidades con ícono en GRID => CardGridFull.",
+      "herramientas: sistema operativo por etapas (planificar, investigar, producir, abastecer, revisar) con isotipo + nombre por herramienta => ToolStackFull. No usar CardGridFull: sus íconos Solar describen capacidades, no marcas.",
+      "operación diaria: un workspace compartido con conversación, artículo vivo, revisión de assets y estados => DailyOpsHubFull. No usar ProcessStepsFull: aquí la simultaneidad, los comentarios y el versionamiento son parte del argumento.",
+      "anatomía de entregable editorial: research y fuentes + artículo answer-first + metadata/schema/QA en una misma radiografía => ContentHubAnatomyFull. No usar DailyOpsHubFull: aquí se demuestra la profundidad interna de UNA pieza, no la colaboración entre plataformas.",
       "texto fuerte: STATEMENT/compromiso/pull-quote/testimonial => QuoteSplit; una IDEA/frase destacada => HighlightWave; PROSA narrativa (enfoque/método) => NarrativeSplit; DOS ideas enfrentadas (contexto+solución) => DualTextSplit.",
-      "comparación: vs COMPETENCIA en pares exactos => ComparisonSplit (no tabla libre); cumplimiento REQUISITO x SLA item por item => RequirementsTableFull."
+      "comparación: vs COMPETENCIA en pares exactos => ComparisonSplit (no tabla libre); cumplimiento REQUISITO x SLA item por item => RequirementsTableFull.",
+      "equipo: ROLES con dedicación (tarjetas con glifo, sin foto) => TeamSplit; el roster con FOTOS REALES del squad (resolver squad-person, allowlist cerrada) => TeamGalleryFull. NUNCA una cara generada por IA en ninguna de las dos.",
+      "prueba social: MURO de logos de clientes aprobados (confianza + amplitud, un logo destacado como el prospecto que ya es cliente) => ClientLogosFull; DOS testimonios verbatim de un tercero real, enfrentados, con enlace a la muestra viva => TestimonialsFull; UN statement propio de Efeonce o UNA sola cita => QuoteSplit. Logos y testimonios salen de allowlist/fuente real: NUNCA un cliente inventado ni una cita sin fuente."
     ],
     "rules": [
       "Un slide = un content-type = una plantilla. Si el contenido mezcla dos intenciones, dividir en dos slides (no forzar una plantilla híbrida).",

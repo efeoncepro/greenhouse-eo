@@ -41,10 +41,9 @@ export const ENTITLEMENT_MODULES = [
   // 5 capabilities: knowledge.{document.read,document.publish,source.admin,agentic.retrieve,
   // feedback.submit}. Aún no can()-checked (los consumen TASK-1083/1084).
   'knowledge',
-  // TASK-1152 — namespace del Roadmap (índice derivado del backlog Markdown:
-  // epics/tasks/mini-tasks/issues). Read-only V1; capability `roadmap.work_items.read`
-  // consumida por el reader server-side + la futura UI cockpit (TASK-1153). Distinto de
-  // `platform` (control plane release) y `admin` (governance).
+  // TASK-1152 — namespace histórico del Roadmap (índice derivado del backlog Markdown:
+  // epics/tasks/mini-tasks/issues). Runtime OFF desde 2026-07-15; se conserva para
+  // compatibilidad de grants/capabilities hasta una deprecación formal.
   'roadmap',
   // TASK-1161 — namespace Public Site control plane. V1 read-only para observar
   // el rail Astro/Vercel target desde Greenhouse sin deploy/cutover.
@@ -1930,9 +1929,9 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['create'] as const,
     defaultScope: 'tenant'
   },
-  // TASK-1152 — Roadmap work item index reader (Markdown SSOT, read-only).
-  // can()-checked en GET /api/roadmap/work-items. Grant en runtime.ts (internal ∪ admin)
-  // en el mismo PR (guard capability-grant-coverage). Future-proof TASK-1153.
+  // TASK-1152 — capability histórica del Roadmap work item index.
+  // Los endpoints conservan can() pero responden 410 roadmap_disabled desde 2026-07-15.
+  // No eliminar sin migration de deprecated_at/grants (ver Deprecated capabilities discipline).
   {
     key: 'roadmap.work_items.read',
     module: 'roadmap',
@@ -2137,6 +2136,9 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   { key: 'hiring.opening.read', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },
   { key: 'hiring.opening.write', module: 'hiring', actions: ['create', 'update'] as const, defaultScope: 'tenant' },
   { key: 'hiring.opening.publish', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
+  // TASK-1385 — AI assist del copy público de una vacante: proponer los public_* desde inputs
+  // allowlist-safe (propose→confirm). Solo PROPONE; el confirm reusa hiring.opening.write.
+  { key: 'hiring.opening.ai_assist', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
   { key: 'hiring.application.read', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },
   { key: 'hiring.application.write', module: 'hiring', actions: ['create', 'update'] as const, defaultScope: 'tenant' },
   { key: 'hiring.application.decide', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },

@@ -8,7 +8,7 @@ La voz de Efeonce no nace de adjetivos genéricos ("profesional y cercano") sino
 
 ## Las 8 creencias contrarias (el ADN narrativo)
 
-> Estas 8 creencias son el **ADN narrativo que sirve al Why de Efeonce** (*no te entregamos crecimiento, lo construimos contigo*): el Why es el centro del Golden Circle; las creencias son cómo ese Why ve el mundo. Las #3 (vanity metrics), #5 (creatividad medida), #7 (transparencia = mínimo) y #8 (ecosistema de crecimiento) son las que más directamente sostienen la co-creación, la educación, la integralidad y la Experiencia Efeonce. **SSOT del Why:** `09_marca-agencia.md` → §El Golden Circle de Efeonce.
+> Estas 8 creencias son el **ADN narrativo que sirve al Why de Efeonce** (_no te entregamos crecimiento, lo construimos contigo_): el Why es el centro del Golden Circle; las creencias son cómo ese Why ve el mundo. Las #3 (vanity metrics), #5 (creatividad medida), #7 (transparencia = mínimo) y #8 (ecosistema de crecimiento) son las que más directamente sostienen la co-creación, la educación, la integralidad y la Experiencia Efeonce. **SSOT del Why:** `09_marca-agencia.md` → §El Golden Circle de Efeonce.
 
 1. **El marketing sin sistema es caro accidentalmente.** El problema no es creatividad ni presupuesto: es arquitectura.
 2. **La integración real es operativa, no organizacional.** Estar bajo un mismo holding es cohabitación; integración es que los datos de Evolve alimenten el brief de Express sin copy-paste humano.
@@ -16,7 +16,7 @@ La voz de Efeonce no nace de adjetivos genéricos ("profesional y cercano") sino
 4. **La IA sin gobernanza produce más caos, no menos.**
 5. **La creatividad que no se mide no se defiende.** Medir no es enemigo de la creatividad: es su escudo.
 6. **El funnel está jubilado.** La gente circula, no hace fila.
-7. **La transparencia operativa no es un diferenciador, es un mínimo.** ← *Esta es la que Greenhouse encarna directamente.*
+7. **La transparencia operativa no es un diferenciador, es un mínimo.** ← _Esta es la que Greenhouse encarna directamente._
 8. **El cliente no contrata entregables; entra a un ecosistema que lo vuelve más capaz.** La relación no termina en la pieza ni en el reporte: incluye operación, software, aprendizaje, contenido/tools, networking y memoria acumulada.
 
 ## Personalidad (constante, no cambia entre canales)
@@ -43,15 +43,15 @@ La voz de Efeonce no nace de adjetivos genéricos ("profesional y cercano") sino
 
 Greenhouse vive principalmente en dos contextos: **docs internos/UI operativa** y **comunicación con clientes**.
 
-| Contexto | Tono | Densidad |
-|---|---|---|
-| **UI operativa interna (Agency, Admin)** | El más directo y técnico. Sin performance. Claridad operativa. | Lo necesario. |
-| **UI de cara al cliente (Dashboard, 360)** | Profesional, cálido sin ser blando. Transparente sobre problemas, proactivo con soluciones. | Conciso. El dato primero, la interpretación después. |
-| **Emails del sistema / notificaciones** | Como un partner que está de tu lado pero no te dice que sí a todo. | 2–4 oraciones. |
-| **Landing / marketing del producto** | Conciso, con filo. Cada frase compite por su lugar. | 1–2 oraciones. |
+| Contexto                                         | Tono                                                                                                                                           | Densidad                                              |
+| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| **UI operativa interna (Agency, Admin)**         | El más directo y técnico. Sin performance. Claridad operativa.                                                                                 | Lo necesario.                                         |
+| **UI de cara al cliente (Dashboard, 360)**       | Profesional, cálido sin ser blando. Transparente sobre problemas, proactivo con soluciones.                                                    | Conciso. El dato primero, la interpretación después.  |
+| **Emails del sistema / notificaciones**          | Como un partner que está de tu lado pero no te dice que sí a todo.                                                                             | 2–4 oraciones.                                        |
+| **Landing / marketing del producto**             | Conciso, con filo. Cada frase compite por su lugar.                                                                                            | 1–2 oraciones.                                        |
 | **Thought leadership / aprendizaje / comunidad** | Claro, generoso, con punto de vista. Enseña el mecanismo, no vende humo. Habla como alguien que opera lo que enseña, no como gurú ni academia. | Profundidad modular: idea fuerte, mecanismo, ejemplo. |
 
-**Patrón mental al escribir cualquier texto:** ¿estoy *instruyendo* (UI interna), *demostrando con datos* (UI cliente), *condensando con filo* (marketing), o *enseñando para volver al cliente más capaz* (contenido/comunidad)? La respuesta define el tono.
+**Patrón mental al escribir cualquier texto:** ¿estoy _instruyendo_ (UI interna), _demostrando con datos_ (UI cliente), _condensando con filo_ (marketing), o _enseñando para volver al cliente más capaz_ (contenido/comunidad)? La respuesta define el tono.
 
 ---
 
@@ -59,14 +59,14 @@ Greenhouse vive principalmente en dos contextos: **docs internos/UI operativa** 
 
 Cómo aterriza la voz en el portal (úsalos como calibración):
 
-| Situación | ❌ Genérico | ✅ Efeonce |
-|---|---|---|
-| Estado vacío de proyectos | "No hay proyectos para mostrar." | "Aún no hay proyectos en este espacio. Cuando se cree el primero, verás aquí su RpA y OTD% en vivo." |
-| Métrica de impacto | "Buen desempeño este mes 🎉" | "OTD% 94% este mes (+6 vs. anterior). 2 activos en riesgo requieren atención." |
-| Error de sync | "Algo salió mal." | "No pudimos sincronizar con HubSpot. Reintentamos en 10 min; tus datos no se perdieron." |
-| Onboarding/login | "Bienvenido a la plataforma." | "Este es tu espacio. Aquí ves tu operación con Efeonce en tiempo real —no el reporte del viernes." |
-| Experiencia Efeonce | "Accede a una experiencia integral de crecimiento." | "No trabajas con una agencia aislada. Entras a un sistema donde ves tu operación, aprendes con herramientas reales y cada ciclo deja memoria para crecer mejor el siguiente mes." |
-| Tooltip de RpA | "Reviews per Asset." | "Rounds per Asset: rondas de revisión promedio por entregable. Menos es mejor." |
+| Situación                 | ❌ Genérico                                         | ✅ Efeonce                                                                                                                                                                        |
+| ------------------------- | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Estado vacío de proyectos | "No hay proyectos para mostrar."                    | "Aún no hay proyectos en este espacio. Cuando se cree el primero, verás aquí su RpA y OTD% en vivo."                                                                              |
+| Métrica de impacto        | "Buen desempeño este mes 🎉"                        | "OTD% 94% este mes (+6 vs. anterior). 2 activos en riesgo requieren atención."                                                                                                    |
+| Error de sync             | "Algo salió mal."                                   | "No pudimos sincronizar con HubSpot. Reintentamos en 10 min; tus datos no se perdieron."                                                                                          |
+| Onboarding/login          | "Bienvenido a la plataforma."                       | "Este es tu espacio. Aquí ves tu operación con Efeonce en tiempo real —no el reporte del viernes."                                                                                |
+| Experiencia Efeonce       | "Accede a una experiencia integral de crecimiento." | "No trabajas con una agencia aislada. Entras a un sistema donde ves tu operación, aprendes con herramientas reales y cada ciclo deja memoria para crecer mejor el siguiente mes." |
+| Tooltip de RpA            | "Reviews per Asset."                                | "Rounds per Asset: rondas de revisión promedio por entregable. Menos es mejor."                                                                                                   |
 
 ---
 
@@ -88,6 +88,7 @@ Al escribir copy o prompts para Nexa, no basta con "sonar Efeonce": debe sentirs
 ## Estilo: reglas de ejecución
 
 **Do's**
+
 - Frases cortas en el punto clave. Contexto antes, remate limpio.
 - Datos concretos: "+127% tráfico orgánico", no "mejora significativa".
 - Contrastes que iluminan: estructura "no es X, es Y".
@@ -96,13 +97,17 @@ Al escribir copy o prompts para Nexa, no basta con "sonar Efeonce": debe sentirs
 - Profundidad accesible: si un CFO y un community manager no entienden lo mismo a la primera, reescribe.
 
 **Don'ts**
+
 - Superlativos vacíos: "el mejor", "líder", "innovador", "de clase mundial".
 - Promesas sin mecanismo: si dices que funciona, explica por qué.
 - Lenguaje de agencia genérica: "soluciones integrales", "acompañamiento estratégico", "impulsamos tu marca".
 - Lenguaje de ecosistema vacío: "experiencia 360", "comunidad exclusiva", "aprendizaje transformador", "ecosistema integral", "partner estratégico" sin mecanismo concreto.
 - Disculparse por cobrar bien.
 - Humor que trivialice (el de Efeonce, cuando aparece, es quirúrgico).
-- El running motif **🍏🍏🍏 (manzanitas)** en voz institucional: **es territorio exclusivo de la marca personal de Julio. No va en Greenhouse.**
+- El running motif **🍏🍏🍏 (manzanitas)** es territorio exclusivo de la marca personal de Julio y no va en
+  Greenhouse. Cuando se activa como giro visible de Julio, la frase lleva exactamente tres manzanas verdes antes
+  de la puntuación: `Vamos con manzanitas 🍏🍏🍏:`. Menciones documentales o el nombre de la marca editorial no
+  activan automáticamente la firma visual.
 
 **Non-negotiable:** toda afirmación de impacto debe poder rastrearse a un dato o caso. Toda promesa de experiencia, comunidad o ecosistema debe aterrizar en un mecanismo: login, tool, sesión, benchmark, contenido, dato, historial, red, playbook o ritual.
 
@@ -125,14 +130,14 @@ Este doc fija **la voz y el registro** (estratégico, prosa-doctrina). Se **ejec
 
 **Crosswalk contexto → tono operacional** (un solo eje, dos resoluciones — el contexto de marca de este doc se expande en el tone map de la skill, no compite con él):
 
-| Contexto (este doc) | Tono operacional (skill `greenhouse-ux-writing`) |
-|---|---|
-| UI operativa interna | loading · estados neutrales |
-| UI de cara al cliente | success · error · empty · data-alert (el dato primero, la interpretación después) |
-| Emails / notificaciones | billing/legal (formal) · toast · info |
-| Landing / marketing | onboarding · copy de alto impacto |
-| Thought leadership / aprendizaje / comunidad | contenido Think · webinars · ebooks · podcast · social · onboarding educativo |
+| Contexto (este doc)                          | Tono operacional (skill `greenhouse-ux-writing`)                                  |
+| -------------------------------------------- | --------------------------------------------------------------------------------- |
+| UI operativa interna                         | loading · estados neutrales                                                       |
+| UI de cara al cliente                        | success · error · empty · data-alert (el dato primero, la interpretación después) |
+| Emails / notificaciones                      | billing/legal (formal) · toast · info                                             |
+| Landing / marketing                          | onboarding · copy de alto impacto                                                 |
+| Thought leadership / aprendizaje / comunidad | contenido Think · webinars · ebooks · podcast · social · onboarding educativo     |
 
 ---
 
-*Fuente: Brand Voice, Tone & Personality v1.1 + Editorial Style Guide v1.0 + Brand Guideline v1.1. Marca visual canónica: Design System **AXIS** + `DESIGN.md` (cuando el Brand Guideline difiera de los tokens vigentes, prevalece AXIS/runtime). Ejecución de copy: skill `greenhouse-ux-writing` + `src/lib/copy/*` + `src/config/greenhouse-nomenclature.ts`. Última verificación de drift contra runtime: 2026-06-09 (TASK-1064). Delta de voz Experiencia Efeonce: 2026-07-09.*
+_Fuente: Brand Voice, Tone & Personality v1.1 + Editorial Style Guide v1.0 + Brand Guideline v1.1. Marca visual canónica: Design System **AXIS** + `DESIGN.md` (cuando el Brand Guideline difiera de los tokens vigentes, prevalece AXIS/runtime). Ejecución de copy: skill `greenhouse-ux-writing` + `src/lib/copy/_`+`src/config/greenhouse-nomenclature.ts`. Última verificación de drift contra runtime: 2026-06-09 (TASK-1064). Delta de voz Experiencia Efeonce: 2026-07-09.\*

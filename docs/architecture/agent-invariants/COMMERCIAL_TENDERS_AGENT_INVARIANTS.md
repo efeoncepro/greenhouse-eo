@@ -15,15 +15,15 @@
 | Pieza | Estado |
 |---|---|
 | **Artifact Composer** (selector · validate · slot-fill · dispatch de resolvers · geometría · render hermético · output targets) | ✅ shipped, **`src/lib/artifact-composer/**`** — primitive domain-free package-shaped; frontera mecánica (allowlist test + eslint); **cero Next-isms** (sin `server-only`/shim) |
-| **Catálogo `deck-axis`** (25 plantillas + registry + contratos + 16 resolvers + validadores semánticos + timeline hooks + molde compilado + assets) | ✅ **`src/lib/artifact-composer/catalogs/deck-axis/`** — 25/25 componibles; **cero HEX de marca** (todo sale de `deck-tokens.css`); recipes de gradiente como dato; fuentes locales del pack |
+| **Catálogo `deck-axis`** (28 plantillas + registry + contratos + 18 resolvers + validadores semánticos + timeline/agenda hooks + molde compilado + assets) | ✅ **`src/lib/artifact-composer/catalogs/deck-axis/`** — 28/28 componibles (2026-07-14: +`TeamGalleryFull`, +2 en la sesión previa); **cero HEX de marca** (todo sale de `deck-tokens.css`); recipes de gradiente como dato; fuentes locales del pack |
 | **Brand pack `axis`** (snapshot Figma PPT + ledger 78 bases + roles + font pack OFL + guard WCAG advisory) | ✅ `src/lib/artifact-composer/brand-packs/axis/` — compilado por `pnpm composer:brand-pack`; ⚠️ **71 altas `figma.status=proposed`** pendientes de validación del operador en `Sistema Axis - PPT` |
-| **Gate estético**: baseline 40 frames + `pnpm composer:visual-gate` a **0 píxeles** + `BASELINE_DELTAS.md` dos-vías | ✅ `scripts/frontend/baselines/artifact-composer/**` — corre en cada cambio del dominio |
+| **Gate estético**: baseline 51 frames (28 sintéticos + deck SKY 23) + `pnpm composer:visual-gate` a **0 píxeles** + `BASELINE_DELTAS.md` dos-vías | ✅ `scripts/frontend/baselines/artifact-composer/**` — corre en cada cambio del dominio |
 | `ResolvedCompositionManifest` (input + hashes de catálogo/contratos/brand pack/fuentes + validadores) | ✅ **se emite junto al PDF/PNG** (`<artifactId>.manifest.json`); es lo único que TASK-1391 debe aceptar |
 | CLI `pnpm deck:compose <plan.json> [--out dir]` (outDir default `.captures/tender-deck`) | ✅ shipped — **ya NO es el único consumer** (ver renderer productivo abajo); no depende de ningún flag: es el camino local y el modo degradado |
 | State machine (12 estados, 3 gates humanos) | ✅ **PERSISTIDA** (TASK-1392): matriz en `proposal_state_matrix` + trigger de enforcement + historial append-only; TS ↔ DB con test de paridad. Terminales `won`/`lost` |
 | Aggregate `Proposal` · API routes · migración · capabilities · entitlement per-ORG · outbox | ✅ **existen** (TASK-1392): `greenhouse_commercial.proposal*`, `/api/commercial/proposals/**`, `commercial.proposal.{read,manage,gate,render}`, módulo `proposal_studio_v1`, 9 eventos `commercial.proposal.*` |
 | UI · Nexa/MCP surface | ❌ **no existen** (F5) |
-| Los 3 nodos de juicio (orquestador · chapter-authors · verifier) | ❌ no existen (F1/F2) |
+| Los 3 nodos de juicio (orquestador · chapter-authors · verifier) | 🟡 el nodo **chapter-author** existe (TASK-1415, `proposals/authoring/**`, flag OFF); orquestador y verifier no |
 | **Renderer productivo**: Cloud Run **Job** `artifact-worker` + cola con prioridad + asset store + 2 signals | ✅ **TASK-1391 `complete`** — **staging E2E verificado en Cloud Run** (15 láminas 25,2 s / 3,16 MB · bench 25 láminas 32,3 s / 5,56 MB). **Producción explícitamente gateada** (release control plane + sign-off). Spec: **`GREENHOUSE_ARTIFACT_RENDER_PIPELINE_V1.md`** |
 
 ⚠️ **NUNCA** corras el render pesado (Chromium) en **Vercel** ni en el **`ops-worker`** — bloquearía el
@@ -38,6 +38,82 @@ referencia · accesibilidad · deadline vencido · validadores) y **en el worker
 font_fallback · blank_slide · peso · páginas). **El PDF NO es PDF/UA**: si el RFP exige accesibilidad, el
 render se rechaza al encolar (`accessibility_unsupported`) — *mejor no ofertar que entregar un artefacto
 inadmisible*.
+
+---
+
+## Delta 2026-07-14 — enlaces clickeables · anti-fuga de prototipo · hooks con plan · fotos del squad
+
+Capacidades nuevas del motor/catálogo (nacidas iterando la oferta SKY; TODAS domain-free y con gate):
+
+1. **Enlaces clickeables en el PDF.** El sanitizador de rich-strings admite `<a href>` (**sólo**
+   `https://` o ancla interna; todo otro atributo se sigue borrando). `deck-mold.css` estila el anchor
+   (color heredado + subrayado — el default UA azul sobre navy era ilegible). Y `mergeSlidePdfs`
+   **re-crea las anotaciones `/Link → /URI`** sobre la página copiada, porque `copyPages` de pdf-lib
+   las **descarta** (medido: Chromium emite la anotación, el merge llegaba con 0). ⚠️ Al verificar
+   anotaciones, **NUNCA grep sobre los bytes del PDF**: `deck.save()` usa object streams comprimidos y
+   el regex no ve adentro — se cuenta **vía API pdf-lib** (`page.node.Annots()`). **La agenda además
+   SALTA**: el resolver `chapter-anchor` emite el sentinel `https://deck.internal/<slideId>` (Chromium
+   sólo imprime anotaciones para URLs absolutas) y el merge lo convierte en **GoTo a la página real**
+   del slideId — coherente por construcción con los chips «pág. NN» (ambos derivan del plan). Un
+   sentinel sin destino se **DESCARTA**: jamás llega al PDF entregado.
+2. **Anti-fuga de prototipo (la garantía de reutilización entre licitaciones).** Los prototipos están
+   escritos contra un cliente real («Propuesta técnica · SKY»). Un slot **opcional no provisto** ahora
+   **se limpia** en el render (`absent-optional` en `fillDom`) — antes el copy de ejemplo viajaba al
+   PDF de la siguiente licitación. Guard mecánico: `template-composability` incluye un probe por
+   plantilla que la llena **sólo con los required** y falla si un slot opcional conserva texto/imagen
+   del prototipo. **NUNCA** escribas copy de cliente en un prototipo esperando que "nadie lo va a ver".
+3. **Hooks con acceso al plan.** `CatalogLayoutHook` recibe `deckPlan` opcional (3er parámetro): el
+   chrome que depende de OTRAS láminas se **deriva** — `agenda-hooks.ts` pinta el número de página real
+   de cada capítulo desde la posición viva de su `targetSlideId`. **NUNCA** autorar números de página
+   (un deck reordenado se contradice solo). Render standalone sin plan → el hook no pinta, jamás inventa.
+4. **`TeamGalleryFull`** (contentType `team-gallery`): roster de **FOTOS REALES** del squad vía resolver
+   `squad-person` — allowlist **cerrada** (`andres, daniela, humberly, julio, luis, maria-fernanda,
+   melkin, valentina` → `assets/squad/squad-<nombre>.png`); nombre desconocido →
+   `UnknownResolverValueError`, una cara IA no puede entrar ni por error. El binding foto↔nombre↔rol
+   **lo confirma el operador humano, nunca lo asume un agente**. Persona nueva = foto real (recorte con
+   alpha) + entrada en la allowlist + enum del contrato. Desambiguación: roles con glifo → `TeamSplit`;
+   caras reales → `TeamGalleryFull`.
+5. **`dual-concept-icon`** (DualTextSplit): el autor declara la **semántica** de la columna
+   (`search|ai|data|users|target`) y el catálogo pinta el Solar; ausente → glifo neutro del prototipo;
+   typo → error. **NUNCA** autorar nombres de ícono.
+6. **`ArtifactShowcaseFull.lead`** es rich-string (`em/strong/a`) — el patrón «pieza viva» es captura
+   real con **chrome de navegador y la URL horneada en la barra** (assets `radiografia-sky-xray.png`,
+   `informe-grader-sky.png`) + enlace clickeable en el lead. La pieza interactiva se muestra Y se
+   enlaza; el screenshot solo, sin URL, no es verificable por el comité.
+
+---
+
+## Delta 2026-07-15 — prueba social reusable (muro de logos + testimonios) · 🏆 primera oferta enviada programáticamente
+
+**🏆 Hito:** la oferta **SKY Airline** (blog, plataforma **Wherex**) se compuso y **ENVIÓ** end-to-end con
+el composer — la primera licitación de Efeonce hecha de forma programática. Dos plantillas nuevas
+domain-free, con gate, en el cluster de prueba social del cierre (`berel → clientes → testimonios → seguro`):
+
+1. **`ClientLogosFull`** (contentType `client-logos`): muro de logos de clientes **a color** en panel
+   claro cohesivo. El logo sale de la **allowlist cerrada** `client-logo-asset` (`CLIENT_LOGO` en
+   `resolvers.ts`) — misma disciplina que `squad-person`: **un cliente nuevo exige asset nuevo; NUNCA un
+   cliente inventado ni un logo ad-hoc.** Presentar como "cliente" a quien no lo es es tergiversación
+   ante el comité. El logo destacado se declara por `emphasis='primary'` (resolver `client-logo-emphasis`)
+   — es **DATO del plan, NUNCA un literal** en el template/CSS (hardcodear "el destacado" acopla el motor
+   al primer cliente). La banda de amplitud lleva una **cifra verificada** del sitio público, no fabricada.
+   Desambiguación: muro de logos → `ClientLogosFull`; credenciales con texto → `CredentialsFull`.
+2. **`TestimonialsFull`** (contentType `testimonials`): dos citas **verbatim** de terceros reales + enlace
+   a la muestra viva. Validador semántico `testimonials-sourced`: exige **atribución nombrada** (un
+   genérico "un cliente" = rechazo) + `proofLink` con **href absoluto** (la fuente verificable). El
+   testimonio **NO se edita ni se pule el registro** — alterar la cita de un tercero es fabricación. **Se
+   enmarca por lo que ES: relación/confianza, NUNCA "resultados de nuestro servicio"** (las citas de SKY
+   hablan de automatizaciones/procesos → un año de relación, no SEO/AEO). Desambiguación: DOS testimonios
+   enfrentados → `TestimonialsFull`; UNA cita/statement propio → `QuoteSplit`.
+
+**Marca del cliente en el muro:** el destacado va en **celda oscura con la versión dark del logo**; en
+fondo claro respetar la guía del cliente (SKY = letras **moradas**, no navy). Fixes de asset vistos en
+vivo (el craft reusable vive en `deck-studio/visual-system.md`): máscara de luminancia vacía que oculta
+el logo, viewBox con espacio en blanco que lo achica, logo diseñado en blanco que se desvanece en claro.
+**Un logo se mira RENDERIZADO sobre el fondo real** — puede compilar y aun así salir invisible/diminuto.
+
+**Gate/canon:** cero HEX y cero gradientes literales en las plantillas (recipes/tokens canónicos);
+`color-ledger` + `gradient-inventory` verdes **sin tocar el inventario**; `visual-gate --freeze` a 0 px
+(single-owner, `ISSUE-122`); delta en `BASELINE_DELTAS.md` §2026-07-15.
 
 ---
 
@@ -85,6 +161,14 @@ del contrato si se adjudica. De ahí salen los tres principios; todo lo demás s
   gigante del prototipo es **fabricación gráfica**: el evaluador ve una mejora que no ocurrió.
 - **NUNCA** generes una cara del squad con IA. El evaluador cruza el CV contra la persona. Si falta la
   foto de alguien, **se pide la foto**. No se fabrica. (Fotos reales: `assets/squad/squad-<nombre>.png`.)
+- **NUNCA** pongas en el muro de clientes (`ClientLogosFull`) un logo de quien **no es un cliente real**.
+  Sale de la allowlist cerrada `client-logo-asset` — misma disciplina que las fotos del squad. Un
+  "cliente" que no lo es es tergiversación, y la cifra de amplitud ("+N empresas") va **verificada**, no
+  inventada.
+- **NUNCA** publiques un testimonio (`TestimonialsFull`) sin **atribución nombrada** + fuente verificable
+  (`proofLink` con href), y **NUNCA edites el registro de la cita** de un tercero (pulir el tono = fabricar
+  la cita). El testimonio se enmarca por lo que **ES** (relación/confianza), nunca como un resultado del
+  servicio que no prueba.
 - **NUNCA** afirmes un negativo sin medirlo. Decir "la IA no cita a la marca" sin correr el AI Visibility
   Grader es afirmar algo falso en un documento contractual. **Mide, no infieras** (caso SKY: la primera
   versión afirmó un negativo que el grader desmintió).
@@ -235,6 +319,13 @@ command canónico y cruza la MISMA puerta que las rutas.
   `pnpm vitest run src/lib/artifact-composer src/lib/commercial/tenders` (las suites cubren las bug
   classes que ya nos costaron un deck roto) **y `pnpm composer:visual-gate`** (0 píxeles contra el
   baseline; rebaseline sólo declarado en `BASELINE_DELTAS.md` + `--freeze`).
+- **ANTES de cualquier `--freeze`, leé el runbook `docs/operations/runbooks/composer-visual-gate.md`**
+  (fuente única del proceso — cualquier agente lo carga al tocar el composer). Bug class `ISSUE-122`, dos
+  reglas duras: **(a)** el `--freeze` es **SINGLE-OWNER, serializado y atómico** (freeze + commit juntos);
+  **NUNCA** congeles con el composer sucio por otro agente (co-mingla su WIP → baseline corrupto). **(b)**
+  las láminas con **fotos** (`TeamGalleryFull`/equipo) driftean píxeles entre corridas/entornos aunque no
+  las toques; el `--selftest` de 2 corridas juntas NO lo atrapa. Si el gate flagea SOLO el área de foto de
+  una lámina que no cambiaste, **es `ISSUE-122`, NO tu regresión — NO la rebaselines** (oculta el bug).
 - **NUNCA** reintroduzcas un HEX/rgb de marca, un `@import` de Google Fonts o `'Poppins'/'Geist'`
   literal en una plantilla: color = `deck-tokens.css` (brand pack), gradientes = recipes/inventario
   ratchet, tipografía = `var(--axis-deck-type-display|text)` + font pack local (render bloquea red).
@@ -291,3 +382,28 @@ Los invariantes que dejaron:
   `file://`, paths absolutos y referencias que escapen del árbol en TODA plantilla.
 - Chromium en contenedor como root exige `--no-sandbox` — vive en el launch canónico UNIFORME
   (es aislamiento de proceso, no rasterización; visual gate 0 px lo prueba).
+
+## Chapter-author engine — invariantes (TASK-1415)
+
+El motor de autoría de láminas (`src/lib/commercial/tenders/proposals/authoring/**`, nodo de
+§5-ter del arch doc del Studio) es **servicio-agnóstico**: la interface `ChapterAuthor` sirve a
+cualquier línea de servicio; diagnóstico (SEO/AEO) y credenciales son implementaciones, no el motor.
+
+- **NUNCA** hornear una suposición de servicio en `chapter-author.ts` / `eval-harness.ts` (ni
+  "Grader", ni "escalera", ni "credencial"). Si un author nuevo te obliga a tocar la interface o
+  el harness, la abstracción está mal: STOP y revisar el diseño, no acomodar.
+- **NUNCA** dejar que una cifra viaje por el framing del LLM hacia los slots: `metric`/`score`/
+  `evidenceRef` se inyectan en `toSlides` DESDE los hechos de `deriveFacts` (puro, la única
+  fábrica de cifras). El guard compartido rechaza la propuesta COMPLETA ante una cifra o URL
+  sin hecho que la respalde (las URLs entran como hechos-allowlist).
+- **NUNCA** tocar el prompt/schema de un author sin su eval verde (patrón eval-fixture-como-gate,
+  determinista, golden frozen en `__tests__/fixtures/`). El golden de diagnóstico son las láminas
+  SKY autoradas a mano — no se edita para "hacer pasar" un eval.
+- **NUNCA** un hecho externo sin `evidenceRef` (los del operador entran pre-evidenciados,
+  passthrough verbatim); **NUNCA** el agente confirma (`confirmChapter` exige `actor.kind==='member'`).
+- El author declara `contentType` + slots (plan canónico del composer, tipo `AuthoredSlide` con
+  `SlotValues`), **NUNCA** `template`. Los límites del validador por-author son los REALES del
+  slot contract del catálogo; los targets del prompt van ~85% por debajo (el modelo no cuenta
+  caracteres — el contrato duro vive en `validate`, no en el prompt).
+- Flag `TENDER_CHAPTER_AUTHOR_ENABLED` (default OFF) gatea SOLO `proposeChapter` (costo LLM).
+  Capability: se reusa `commercial.proposal.manage` — NO existe `commercial.proposal.author`.

@@ -60,7 +60,6 @@ export async function POST(request: Request, { params }: { params: Promise<{ pro
       assetId: body.assetId,
       kind: body.kind as ProposalAssetKind,
       audience: body.audience as ProposalAudience | undefined,
-      version: body.version,
       actorUserId: tenant.userId,
       actor
     })

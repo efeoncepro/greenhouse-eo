@@ -1,0 +1,77 @@
+{
+  "$comment": "Datos de la oferta económica de SKY. FUENTE única; el .xlsx se re-emite con `pnpm economica:build <este archivo>`. NUNCA un precio unitario por artículo (regla 04_PRICING #2).",
+  "output": "propuesta-economica.xlsx",
+  "sheetName": "Propuesta Económica",
+  "title": "PROPUESTA ECONÓMICA",
+  "subtitle": "Servicio de Producción de Contenido Blog — SKY Airline",
+  "currency": "CLP",
+  "ivaRate": 0.19,
+  "meta": {
+    "Oferente": "Efeonce Group SpA",
+    "Licitación": "Servicio de Producción de Contenido Blog SKY (plataforma Wherex)",
+    "Fecha": "julio 2026",
+    "Validez de la oferta": "120 días desde su recepción por parte de SKY"
+  },
+  "sections": [
+    {
+      "type": "value-table",
+      "title": "1. Valor del servicio",
+      "columns": ["Plan", "Alcance de la operación mensual", "Valor mensual (neto, sin IVA)"],
+      "rows": [
+        {
+          "cells": [
+            "Plan propuesto",
+            "Operación mensual del blog: estrategia y planificación editorial · capa técnica de SEO implementada sobre su WordPress · producción de hasta 8 artículos publicados · recursos visuales y multimedia · medición en buscadores y en los 5 motores de respuesta con IA · informe mensual con los 8 indicadores exigidos · portal de cliente en vivo · gobernanza con los 9 SLA de las Bases",
+            5200000
+          ],
+          "strong": true
+        },
+        {
+          "cells": [
+            "Plan ampliado (opcional)",
+            "La misma operación, con capacidad de producción de hasta 12 artículos publicados al mes",
+            6900000
+          ]
+        },
+        {
+          "cells": [
+            "Contenidos ad-hoc",
+            "Se producen DENTRO de la capacidad mensual contratada, con la prioridad que SKY determine y en ≤ 5 días hábiles. Sin costo adicional: un contenido ad-hoc ocupa un espacio de la capacidad del mes.",
+            "Incluido"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "totals",
+      "title": "Detalle del valor mensual — plan propuesto",
+      "basis": 5200000,
+      "label": "Valor mensual neto"
+    },
+    {
+      "type": "keyvalue",
+      "title": "Proyección del plan propuesto",
+      "rows": [
+        { "cells": ["Anual (12 meses)", 62400000] },
+        { "cells": ["Total del contrato (24 meses)", 124800000], "strong": true }
+      ]
+    },
+    {
+      "type": "keyvalue",
+      "title": "2. Condiciones comerciales",
+      "rows": [
+        { "cells": ["Precio", "CLP 5.200.000 mensuales, valor neto. Tarifa fija en pesos chilenos, conforme al numeral 3.2 de las Bases"] },
+        { "cells": ["Impuestos", "Valores netos, sin IVA. El IVA se aplica en la factura según corresponda"] },
+        { "cells": ["Reajustes", "Sin reajuste durante la vigencia del contrato, conforme al numeral 3.2 de las Bases"] },
+        { "cells": ["Condiciones de pago", "30 días desde la correcta recepción y aceptación conforme de la factura por parte de SKY"] },
+        { "cells": ["Facturación", "Mensual"] },
+        { "cells": ["Modalidad de pago", "Transferencia electrónica a la cuenta bancaria de Efeonce Group SpA"] },
+        { "cells": ["Duración", "Dos (2) años a contar del inicio del servicio"] },
+        { "cells": ["Condiciones de término", "Renovable por igual período previo acuerdo de ambas partes, con notificación 60 días antes del término del período en curso (numeral 3.3.2 de las Bases)"] },
+        { "cells": ["Desembolsos", "No aplican. El valor mensual es todo incluido: planificación, capa técnica, producción, recursos visuales, multimedia, medición, portal y coordinación. Sin gastos reembolsables ni costos ocultos"] },
+        { "cells": ["Comisiones de plataforma", "Las comisiones de Wherex aplicables al adjudicado son asumidas por Efeonce y están consideradas en esta oferta"] }
+      ]
+    }
+  ],
+  "footerNote": "Documento integrante de la oferta económica. Valores expresados en pesos chilenos (CLP), netos sin IVA. El conteo de artículos es un techo de capacidad mensual, no una unidad de precio."
+}

@@ -59,3 +59,16 @@ body {
   height: var(--deck-canvas-h);
   overflow: hidden;
 }
+
+/*
+ * Enlaces en copy autorado (el sanitizador permite <a href="https://…"> desde 2026-07-14; Chromium
+ * los imprime como anotaciones /Link y el merge las porta al PDF final). El color es SIEMPRE el del
+ * texto que los rodea: el default UA (azul sobre panel navy) es ilegible y fuera de marca. El
+ * subrayado es el único affordance — y en papel, la señal de que la URL existe.
+ */
+a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 0.055em;
+  text-underline-offset: 0.14em;
+}

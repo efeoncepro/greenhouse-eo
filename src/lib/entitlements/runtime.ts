@@ -138,11 +138,10 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source: hasRouteGroup(subject, 'admin') ? 'role' : 'route_group'
     })
 
-    // TASK-1152 — Roadmap work item index (backlog operativo interno repo-native).
-    // Read-only para usuarios internos (route_group internal ∪ admin). El backlog
-    // es operación interna del repo; los clientes (`client_*`) NO lo ven por
-    // construcción del grant. Gated en GET /api/roadmap/work-items + future cockpit
-    // (TASK-1153, "main menu, non-admin" → internal collaborators incluidos).
+    // TASK-1152 — capability histórica del Roadmap work item index.
+    // Runtime OFF desde 2026-07-15; se conserva el grant interno para que los
+    // endpoints apagados puedan responder 410 después de auth/capability y para
+    // evitar una deprecación de access sin migration dedicada.
     addEntitlement(entries, {
       module: 'roadmap',
       capability: 'roadmap.work_items.read',
@@ -479,6 +478,10 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     // TASK-1361 — AI assist (proponer borradores/sugerencias) al mismo tier operador; el confirm
     // reusa author/score, así que quien puede autorar el banco puede pedir propuestas IA.
     addEntitlement(entries, { module: 'hiring', capability: 'hiring.assessment.ai_assist', action: 'execute', scope: 'tenant', source: hiringSource })
+
+    // TASK-1385 — AI assist del copy público de una vacante al mismo tier operador; el confirm
+    // reusa opening.write, así que quien puede editar el opening puede pedir el borrador IA.
+    addEntitlement(entries, { module: 'hiring', capability: 'hiring.opening.ai_assist', action: 'execute', scope: 'tenant', source: hiringSource })
   }
 
   // TASK-353 — publish/decide: verbos de gobernanza consecuentes (execute). Least-privilege

@@ -186,6 +186,10 @@ When advising commercial decisions inside this repo, the patterns below are pre-
 
 ---
 
+## Sales-enablement assets que YA existen (no los reinventes)
+
+- **🔴 Radiografía AEO** — muestra de trabajo viva en `think.efeoncepro.com/muestras/<slug>-<token>`. Escribe un artículo **real** para el cliente y lo **abre en canal** en 4 pantallas (el hueco medido · el artículo · la capa técnica acoplada · dónde más vive). Hace **dos** trabajos: **educar** al cliente/prospecto que no entiende qué significa *"aparecer en ChatGPT"* (**sirve sin venta en curso**: educación, retención) y **habilitar la venta** (enlace + lámina de deck + demo en vivo + prueba que el comité **verifica solo**). En una categoría donde **todas las ofertas dicen lo mismo y ninguna muestra**, es la pieza que rompe el empate — y **el competidor de fondo es la indecisión**, no la otra agencia. **Un cliente nuevo = un payload JSON, cero código.** Cargar: `docs/documentation/comercial/radiografia-aeo-muestra-de-trabajo.md`; playbook comercial en `docs/manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md`; craft/invariantes en `docs/think/radiografia-aeo-*.md`; oficio: `seo-aeo`; venta: `seo-aeo-practice`.
+
 ## Synergies with other skills
 
 - `arch-architect` (greenhouse-pinned) — cuando commercial decision fuerza arquitectura

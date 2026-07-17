@@ -47,10 +47,17 @@ cluster**:
 ## Anatomía de una página que rankea Y se cita (2026)
 
 1. **Answer capsule arriba** — respuesta directa en 40–60 palabras bajo un H2 con
-   la pregunta. El **72.4%** de páginas citadas por ChatGPT tienen este patrón.
+   la pregunta.
+   ⚠️ El **72.4%** (Search Engine Land) es un **base rate sin grupo de control**: describe el
+   patrón de las páginas citadas, **no prueba el lift**. Lo que sostiene la cápsula es el
+   **mecanismo** (el motor recupera pasajes). Y la palanca con **mejor evidencia primaria** es
+   otra: la **relevancia semántica del TÍTULO** frente a la sub-pregunta (Ahrefs, 1,4M de
+   prompts: 0,656 en citadas vs 0,484 en no citadas). Escribe el H2 como la pregunta del fan-out.
 2. **Estructura escaneable** — H2/H3 como preguntas, párrafos cortos, listas,
-   **tablas** (páginas con ≥1 tabla + ≥1 lista numerada tienen ~2.3× más
-   probabilidad de ser citadas).
+   **tablas**. 🔴 NO digas «2,3× más citas»: ese número es una razón de PREVALENCIA entre
+   corpus (30% de las citadas por ChatGPT contienen una tabla vs 13% de las que rankean en
+   Google — Nectiv), **no un lift por agregar una tabla**, y **la lista no está en el
+   hallazgo**. El argumento honesto es el mecanismo: una fila tabulada ES la respuesta.
 3. **Densidad de hechos** — estadística/dato cada ~150–200 palabras, con fuente.
 4. **Fuentes y citas** — enlaza a autoridades; las citas/quotes aumentan la
    citabilidad IA (ver tácticas GEO en `04`).

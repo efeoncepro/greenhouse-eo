@@ -6,13 +6,13 @@
 >
 > **Owner:** Efeonce Creative Studio / Creative Technology
 >
-> **Relacionado:** [EPIC-028](../epics/to-do/EPIC-028-efeonce-creative-studio-agentic-platform.md) · [arquitectura objetivo](../architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md) · [documentación funcional](../documentation/ai-tooling/estudio-de-flujos-creativos.md)
+> **Relacionado:** [EPIC-028](../epics/to-do/EPIC-028-efeonce-creative-studio-agentic-platform.md) · [arquitectura objetivo](../architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md) · [documentación funcional](../documentation/ai-tooling/estudio-de-flujos-creativos.md) · [territorio editorial PDR-014](../public-site/decisions/PDR-014-creative-workflows-territorio-editorial-pillar-cluster.md)
 >
-> **Alcance:** investigación estratégica y de producto. No autoriza runtime, gasto de proveedores, cambios de ADR ni el uso de un canvas libre.
+> **Alcance:** investigación estratégica y de producto. No autoriza runtime, gasto de proveedores, cambios de ADR ni el uso de un canvas libre. La Pillar y sus satélites aportan soporte científico/editorial y señales de audiencia; **no son implementación, product spec ni evidencia empírica suficiente para abrir una task**.
 
 ## Pregunta de investigación
 
-¿Cómo debe Efeonce Creative Studio convertir dirección y craft creativo en una capacidad acumulable, sin confundir la exploración con una línea de producción ni delegar criterio, gasto o aprobación a un agente?
+¿Cómo debe Efeonce Creative Studio convertir dirección y craft creativo en una capacidad acumulable, sin confundir la exploración con una línea de producción, exigir que una persona creativa piense como ingeniera ni delegar criterio, gasto o aprobación a un agente?
 
 ## Tesis de trabajo
 
@@ -60,19 +60,64 @@ Un output técnico nunca equivale a aprobación creativa.
 
 Confundir estos dos modos es el error de producto principal: un canvas rígido demasiado temprano mata exploración; un chat libre para producción repetida pierde calidad, costos, lineage y memoria.
 
+## El workflow no es la primera interfaz
+
+La persona usuaria principal no es ingeniería. Es dirección creativa, diseño, producción o marketing. Su lenguaje natural son briefs, referencias, tratamientos, storyboards, tomas, variantes, comentarios y aprobaciones. Creative Studio debe dejarla trabajar en ese lenguaje y **compilar** las decisiones aprobadas en una receta ejecutable; no pedirle que diseñe un DAG para empezar a crear.
+
+La gramática mínima de la experiencia es creativa:
+
+| Acción humana | Lo que el sistema conserva o compila |
+| --- | --- |
+| **Preservar** una referencia, texto, gesto o elemento de marca | Invariante, reference pack o fidelity contract |
+| **Explorar** una dirección o bifurcar una alternativa | Rama reversible que todavía no se vuelve template |
+| **Evitar** un error y explicar por qué se rechaza | Evidencia negativa y señal para la rúbrica |
+| **Entregar** una selección aprobada | Asset canónico, review gate y regla reutilizable |
+
+El workflow emerge del trabajo. Una referencia fijada, una variante elegida, un rechazo razonado y una aprobación son acciones creativas que el sistema puede estructurar. Sólo cuando esas decisiones tienen intención, límites y evidencia suficientes se publica una receta repetible. El grafo técnico puede existir como proyección avanzada para un builder que lo necesite; no es el onboarding universal ni la metáfora obligatoria del producto.
+
 ## El patrón Builder → Runner
 
 La distinción más reutilizable del mercado es separar quien **construye** una receta de quien la **ejecuta**:
 
 | Rol | Autoridad y responsabilidad |
 | --- | --- |
-| Dirección creativa / diseñador | Define intención, referencias canónicas, qué puede variar, rúbrica y estándar de calidad. Es el **builder** de un template o flow. |
+| Dirección creativa / diseñador | Define intención, referencias canónicas, qué puede variar, rúbrica y estándar de calidad. Es el **builder** de un template o flow; puede pertenecer al cliente o a Efeonce y no necesita programar. |
 | Agente | Recupera contexto, propone brief/tratamiento/shot list, arma un plan editable y opera sólo herramientas permitidas. |
-| Productor / operador | Estima, pide aprobación, ejecuta un flow publicado con inputs semánticos y coordina la revisión. Es el **runner**, no un operador de nodos arbitrarios. |
+| Productor / operador | Estima, pide aprobación, ejecuta un flow publicado con inputs semánticos y coordina la revisión. Es el **runner**, no un operador de nodos arbitrarios; puede ser producción Efeonce o un rol creativo/marketing del cliente. |
 | Revisor autorizado | Acepta, rechaza o pide cambios sobre craft, derechos, fidelidad, audio y delivery. |
 | Ingeniería | Mantiene contracts, lineage, permisos, jobs, costos, observabilidad e integración; no decide la dirección estética. |
 
 El resultado de un agente debe ser una propuesta o un espacio **editable**. No basta con devolver un render plano u ocultar un árbol de decisiones irreproducible.
+
+Builder y runner no son sinónimos de ingeniero y usuario. Son grados de autoridad creativa. Un equipo de marketing puede correr templates curados sin convertirse en dirección creativa; un Head of Creative puede construir o versionar una receta sin tocar provider keys, jobs ni contratos técnicos.
+
+## Un Studio, tres modos de operación
+
+Creative Studio no se divide en un producto para clientes y otro para la agencia. El mismo workspace, run, template, ledger, lineage y review soportan tres modos. Lo que cambia es la asignación de autoridad y accountability, no el motor.
+
+| Modo | Quién dirige y opera | Accountability principal | Mejor ajuste |
+| --- | --- | --- | --- |
+| **Client-operated** | El cliente define la dirección y corre templates curados dentro de sus permisos. | Efeonce responde por plataforma, policy y soporte; el cliente responde por operación creativa y delivery que controla. | Baja ambigüedad, alta repetición, variantes y adaptación de formatos. |
+| **Co-operated** | El cliente conserva dirección/brand authority; cliente y Efeonce se reparten la ejecución con un operador explícito por run o lane. | Cada parte responde por el tramo que controla; aprobaciones, presupuesto y escalamiento quedan declarados antes de ejecutar. | Dirección aprobada con producción compleja, picos de demanda o necesidad de craft especializado. |
+| **Efeonce-managed** | Efeonce construye/opera el workflow y gobierna delivery; el cliente conserva brief, marca y aprobación final. | Efeonce puede comprometer OTD/FTR sobre el scope que dirige y controla. | Alta incertidumbre creativa, campañas nuevas, identidad, hero assets y producción crítica. |
+
+Estos modos **no son una quinta modalidad comercial**. On-Going, On-Demand, Staff Augmentation y Sample Sprint siguen siendo los vehículos de engagement. El modo operativo declara quién hace qué dentro de ellos. Si una persona Efeonce queda bajo dirección cotidiana del cliente, es Staff Augmentation; si Efeonce dirige el sistema y responde por el outcome, es Managed Squad.
+
+Cada run debe resolver, como mínimo, quién es `operator_of_record`, quién aprueba creatividad, quién autoriza presupuesto, quién gobierna el template, quién responde por derechos y quién autoriza la entrega. Los nombres finales de schema quedan para el bootstrap, pero la responsabilidad no puede quedar implícita.
+
+## Autonomía progresiva, no self-service binario
+
+La autonomía adecuada crece cuando baja la incertidumbre creativa y el riesgo. No se maximiza porque sí:
+
+```text
+alta ambigüedad / alto riesgo de marca  -> Efeonce-managed
+dirección aprobada / producción compleja -> co-operated
+baja ambigüedad / alta repetición        -> client-operated
+```
+
+El paso entre modos debe ser reversible y conservar contexto. Un cliente puede iniciar una corrida curada, escalarla a co-operación cuando aparece una excepción y activar capacidad Efeonce sin reenviar brief, referencias, rechazos o historial. Del mismo modo, un workflow probado por Efeonce puede graduarse a operación del cliente sin convertirlo en una caja negra ni perder sus gates.
+
+Esta progresión es la expresión de ASaaS para Creative Studio: **servicio que valida craft → sistema que lo conserva → cliente que gana capacidad → uso que genera evidencia → Efeonce que absorbe complejidad y picos → sistema que aprende**. La autonomía no canibaliza el servicio; cambia el servicio desde ejecución repetitiva hacia dirección, diseño de workflows, QA, excepciones y capacidad elástica.
 
 ## Qué está productizando el mercado
 
@@ -96,6 +141,20 @@ Estas son hipótesis de bootstrap alineadas con la ADR vigente; no agregan schem
 5. **La memoria debe ser evidencia, no sólo conversación.** Brand profile, assets aprobados, derechos, prompts/recetas útiles, rechazos y decisiones deben vivir en datos versionados y con acceso scoped; la memoria LLM es una ayuda, no la fuente de verdad.
 6. **La review es un primitive de dominio.** Un evaluador automático puede aportar señales; nunca convierte `candidate_ready` en `approved`, ni aprueba gasto/publicación.
 7. **Roles de agentes pequeños primero.** Planner, archivista de referencias, productor de run y crítico contra rúbrica tienen herramientas y límites propios. No empezar con un “director autónomo” que a la vez decide, gasta y publica.
+8. **El modo operativo es parte del run.** No debe inferirse por contrato comercial, usuario logueado o canal de entrada; determina responsabilidades, escalamiento y compromisos medibles.
+9. **La transición entre modos conserva memoria.** Escalar de client-operated a co-operated o managed reutiliza brief, assets, lineage, decisiones y budget trail; no crea un proyecto paralelo ni un handoff por correo.
+10. **El cliente aprende por capas.** La ruta de adopción es observar/revisar → correr templates curados → ajustar variables permitidas → construir/versionar sólo cuando existe madurez y permiso.
+11. **La IP se separa con claridad.** El cliente conserva su marca, assets, decisiones y contexto; Efeonce conserva su método, recetas base, evaluaciones y know-how salvo acuerdo explícito distinto. Un template derivado debe declarar qué parte es portable y cuál es proprietary.
+12. **La optimización no puede homogeneizar.** Throughput, costo y tasa de aprobación son señales operativas, no una función objetivo suficiente. La review debe conservar razones de rechazo, amplitud de exploración y diversidad relevante para detectar fijación o convergencia genérica.
+
+## Qué debe medirse
+
+| Dimensión | Señales útiles | Riesgo de lectura incorrecta |
+| --- | --- | --- |
+| Craft | FTR, RpA, razones de rechazo, fidelidad al brief, diversidad de rutas consideradas | Aprobar rápido puede significar poca exploración o una rúbrica débil. |
+| Operación | Cycle time, TTM, costo estimado vs real, fallas recuperables, throughput | Más outputs no equivalen a más ideas ni a mejor trabajo. |
+| Capacidad del cliente | Time-to-first-successful-run, reuse de templates, runs operados sin escalamiento, calidad del brief | El objetivo no es empujar todo a self-service, sino aumentar autonomía donde es segura. |
+| Negocio | Capacidad desbloqueada, margen por modo, expansión, retención y Revenue Enabled cuando sea atribuible | No atribuir impacto de negocio a una generación aislada. |
 
 ## Antipatrones que se deben evitar
 
@@ -106,6 +165,10 @@ Estas son hipótesis de bootstrap alineadas con la ADR vigente; no agregan schem
 - Tratar memoria de chat como registro durable de marca, rights o aprobaciones.
 - Declarar entrega porque un proveedor respondió `completed`.
 - Crear un canvas generalista antes de probar templates curados, evals y review.
+- Tratar client-operated como “managed más barato” o prometer el mismo SLA cuando Efeonce no controla la ejecución.
+- Permitir responsabilidad compartida sin `operator_of_record`, aprobadores y owner de delivery explícitos.
+- Reiniciar el proyecto o perder contexto cuando un run escala de un modo operativo a otro.
+- Optimizar sólo volumen, velocidad o similitud con piezas aprobadas hasta homogeneizar el lenguaje creativo.
 
 ## Agenda de profundización
 
@@ -117,10 +180,17 @@ Estas son hipótesis de bootstrap alineadas con la ADR vigente; no agregan schem
 | ¿Qué rol agentic aporta valor real primero? | Eval de planner y archivista frente a un operador humano: calidad de plan, tiempo, costo y tasa de corrección. |
 | ¿Cuándo se justifica un canvas gobernado? | Evidencia de múltiples templates que comparten primitives y requieren branching visible; no interés estético por nodos. |
 | ¿Cómo se mide “on-brand” sin fingir aprobación automática? | Rúbrica humana, señales automáticas auxiliares y registro de desacuerdos/rechazos. |
+| ¿Qué workflow está listo para graduarse de managed a co-operated o client-operated? | Umbrales de ambigüedad, repetibilidad, riesgo, derechos, costo y tasa de escalamiento observados en pilotos. |
+| ¿Qué responsabilidades y SLAs cambian por modo? | RACI por run, incidentes simulados y medición separada del tramo controlado por Efeonce y el controlado por el cliente. |
+| ¿Cómo se evita homogeneización al aprender de aprobaciones? | Métricas de diversidad, muestreo de rechazos y review humana que premie rutas relevantes, no sólo similitud histórica. |
 
 ## Criterio de paso a task
 
 Este brief pasa de `Active` a `Validated` cuando exista una primera respuesta empírica para al menos un patrón builder/runner y un rol agentic acotado, con fixture, gasto, review humana y criterio de reversión documentados. La implementación sólo nace como task en el repositorio de Creative Studio después del bootstrap de EPIC-028.
+
+La investigación y publicación editorial pueden mejorar lenguaje, hipótesis y preguntas de validación, pero no
+satisfacen por sí solas este criterio. Un artículo publicado, una buena recepción o un template conceptual no
+reemplazan el piloto operativo ni autorizan convertir su estructura en backlog.
 
 ## Fuentes primarias consultadas
 

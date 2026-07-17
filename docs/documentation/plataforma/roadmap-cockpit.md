@@ -1,18 +1,18 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-06-16 por Claude (TASK-1152)
-> **Ultima actualizacion:** 2026-06-16 por Claude (TASK-1153 — capa visual)
+> **Ultima actualizacion:** 2026-07-15 por Codex (runtime deshabilitado)
 > **Documentacion tecnica:** `docs/tasks/complete/TASK-1152-roadmap-task-index-reader-markdown-ssot.md`, `docs/tasks/complete/TASK-1153-roadmap-cockpit-ui-main-menu.md`, `src/lib/roadmap/work-item-index/*`, `src/lib/roadmap/cockpit/*`, `src/views/greenhouse/roadmap/*`
 
 # Roadmap — Indice de Work Items (lectura del backlog Markdown)
 
-> **Capa visual (TASK-1153):** el índice ya tiene su cockpit humano en `/roadmap`
-> (item de menú **Roadmap**, fuera de Admin, solo interno). Muestra el backlog como
-> banda de KPIs + filtros + un tablero de 7 lanes (Programas · Listas para ejecutar ·
-> Bloqueadas · Incidentes abiertos · Necesitan grooming · En progreso · Resueltas) +
-> un inspector por work item. La UI consume `buildRoadmapCockpitData` (server-side)
-> sobre el reader de abajo; **no edita Markdown**. Cómo operarlo:
-> `docs/manual-de-uso/plataforma/roadmap-cockpit.md`.
+> **Estado 2026-07-15:** la superficie runtime `/roadmap` y los endpoints
+> `GET /api/roadmap/work-items*` estan deshabilitados. El reader filesystem de
+> TASK-1152/1153 hacia que Turbopack trazara un patron dinamico amplio sobre
+> decenas de miles de archivos y obligaba a bundlear `docs/**` via
+> `outputFileTracingIncludes`. El codigo queda como referencia historica, pero
+> fuera del runtime del portal hasta mover el indice a una proyeccion externa,
+> materializada o local-first.
 
 ## Que es
 
@@ -36,14 +36,19 @@ El indice expone los cuatro tipos juntos como un solo backlog navegable.
 
 ## Como se accede
 
-Endpoint interno: `GET /api/roadmap/work-items`.
+Estado actual: no hay acceso operativo desde el portal.
+
+El endpoint interno historico era `GET /api/roadmap/work-items`; ahora conserva
+la autenticacion/capability defensiva y responde `410 roadmap_disabled`.
 
 Quien puede leerlo:
 
 - Solo usuarios **internos** de Efeonce (route group `internal`) que tengan la capability `roadmap.work_items.read`.
 - Los usuarios de **cliente** (`client_*`) no lo ven: el backlog es operacion interna del repo.
 
-Si no estas autenticado → 401. Si no eres interno o no tienes la capability → 403. Ningun error expone rutas locales ni detalles tecnicos.
+Si no estas autenticado -> 401. Si no eres interno o no tienes la capability -> 403.
+Si tienes acceso, el endpoint responde 410 porque el modulo esta apagado. Ningun
+error expone rutas locales ni detalles tecnicos.
 
 ## Que devuelve
 
@@ -138,7 +143,9 @@ Todos opcionales, se combinan con AND:
 | `search` | `search=nubox` | texto libre sobre id / title / summary |
 | `page`, `pageSize` | `page=2&pageSize=50` | paginacion (pageSize max 500) |
 
-## Ejemplos para `TASK-1153`
+## Ejemplos historicos para `TASK-1153`
+
+Estos ejemplos ya no son operativos mientras el modulo esta deshabilitado.
 
 - **Listar todo lo "tomable" ahora**: `GET /api/roadmap/work-items?readiness=ready_to_execute`
 - **Cola de grooming**: `GET /api/roadmap/work-items?health=needs_grooming`
@@ -150,5 +157,5 @@ Todos opcionales, se combinan con AND:
 
 ## Notas de runtime
 
-- En Vercel los archivos `docs/**` se incluyen en el bundle de la funcion via `outputFileTracingIncludes` (`next.config.ts`). Sin eso, el reader no veria los archivos en produccion.
-- El indice se cachea por proceso usando un fingerprint barato (cantidad de archivos + suma de mtime/size). Si editas un Markdown, el siguiente request reconstruye el indice.
+- El runtime vigente ya no incluye `docs/**` en el bundle de la funcion. Esa inclusion fue retirada para eliminar el hotspot de build.
+- El indice historico se cacheaba por proceso usando un fingerprint barato (cantidad de archivos + suma de mtime/size). Ese comportamiento queda solo como referencia si se disena una proyeccion futura.

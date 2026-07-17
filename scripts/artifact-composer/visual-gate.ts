@@ -404,6 +404,15 @@ const freeze = async (): Promise<number> => {
     console.log(`  ${changed.length} frame(s) declarados se re-promueven:\n${changed.map(f => `    - ${f}`).join('\n')}`)
   }
 
+  // 🔴 El ledger VIVE DENTRO de `BASELINE_DIR`, y abajo hacemos `rm -r` de ese directorio. Hay que
+  // leerlo ANTES del borrado: si se lee después, el `readFile` falla, cae al `INITIAL_DELTAS` y la
+  // promoción **reescribe el ledger desde cero** — destruyendo la declaración que ella misma acaba
+  // de exigir, y con ella las declaraciones YA COMMITEADAS de promociones anteriores.
+  //
+  // Es exactamente el "rebaseline silencioso" que este archivo existe para impedir, cometido por el
+  // guardián. Mordió 4 veces el 2026-07-14 antes de que alguien mirara por qué.
+  const deltasRaw = await fs.readFile(DELTAS_PATH, 'utf8').catch(() => INITIAL_DELTAS)
+
   // Copiar frames al home durable + escribir manifest + sellar digest en el ledger.
   await fs.rm(BASELINE_DIR, { recursive: true, force: true })
   await fs.mkdir(BASELINE_DIR, { recursive: true })
@@ -418,7 +427,6 @@ const freeze = async (): Promise<number> => {
   await fs.writeFile(MANIFEST_PATH, `${JSON.stringify(nextManifest, null, 2)}\n`, 'utf8')
 
   const digest = manifestDigest(nextManifest)
-  const deltasRaw = previous ? await fs.readFile(DELTAS_PATH, 'utf8').catch(() => INITIAL_DELTAS) : INITIAL_DELTAS
 
   const sealed = DIGEST_MARKER.test(deltasRaw)
     ? deltasRaw.replace(DIGEST_MARKER, `<!-- manifest-digest: ${digest} -->`)

@@ -191,10 +191,10 @@ export const composeArtifact = async (
 
       // El PNG es para revisión visual (y ES el artefacto en `png-set`); el PDF (vectorial) sólo
       // se imprime cuando el target lo ensambla.
-      await renderSlide(browser, templateHtmlPath, slide, contract, { kind: 'png', outPath: `${stem}.png` }, catalog)
+      await renderSlide(browser, templateHtmlPath, slide, contract, { kind: 'png', outPath: `${stem}.png` }, catalog, deckPlan)
 
       if (emitPdf) {
-        await renderSlide(browser, templateHtmlPath, slide, contract, { kind: 'pdf', outPath: `${stem}.pdf` }, catalog)
+        await renderSlide(browser, templateHtmlPath, slide, contract, { kind: 'pdf', outPath: `${stem}.pdf` }, catalog, deckPlan)
       }
 
       return { png: `${stem}.png`, pdf: emitPdf ? `${stem}.pdf` : null }
@@ -211,7 +211,8 @@ export const composeArtifact = async (
 
     await mergeSlidePdfs(
       rendered.map(slide => slide.pdf!),
-      pdfPath
+      pdfPath,
+      deckPlan.slides.map(slide => slide.slideId)
     )
 
     const { size: pdfBytes } = await fs.stat(pdfPath)

@@ -4,7 +4,7 @@
 > materialmente solo en 2026**, y el producto se renombró en tres lugares. Todo dato numérico se cita
 > con marca y `as-of`. Si vas a decir un número frente a un cliente, sale de acá o no sale.
 
-**As-of de este ledger: 2026-07-13.** Refresh obligatorio: **antes de UNBOUND (16-18 sep 2026)** y
+**As-of de este ledger: 2026-07-16.** Refresh obligatorio: **antes de UNBOUND (16-18 sep 2026)** y
 **antes del 15 de enero de 2027** (suben los umbrales de tier).
 
 ---
@@ -62,6 +62,32 @@ y que le hacen perder el deal y la credibilidad en la misma frase.
 ---
 
 ## Producto HubSpot — as-of 2026-07-13
+
+### Narrativa agéntica, workspaces y motion de partners — as-of 2026-07-16 ✅
+
+| Claim verificado | Fuente primaria | Uso |
+|---|---|---|
+| **Agentic Customer Platform** = contexto compartido para humanos y agentes; capas de contexto, acción y coordinación | [Yamini Rangan — Introducing the Agentic Customer Platform](https://www.hubspot.com/company-news/introducing-the-agentic-customer-platform) | Arquitectura del pitch; no reducirlo a “CRM con IA” |
+| El gap es contexto, no modelo/dato; Growth Context incluye negocio, equipo, proceso, cliente y network | [Duncan Lennox — The Real AI Race](https://www.hubspot.com/company-news/the-real-ai-race-isnt-about-models-or-data-its-about-context) | Discovery de context gap y briefing tax |
+| Agentes pueden correr **sobre** HubSpot y **operar** HubSpot; full API parity es dirección futura | [Duncan Lennox — Open Ecosystem for the Agent Era](https://www.hubspot.com/company-news/our-vision-for-building-an-open-ecosystem-for-the-agent-era) | Plataforma abierta; nunca afirmar que la paridad ya está completa |
+| Empezar por problema/workflow; HubSpot clasifica casos como established, emerging y early | [Yamini Rangan — Where to Start with AI](https://www.hubspot.com/company-news/where-to-start-with-ai-gtm) | Discovery por outcome y madurez, no feature dump |
+| HubSpot opera un Agent-first GTM en attract/engage/delight | [Yamini Rangan — How we Grow with Agent-first GTM](https://www.hubspot.com/company-news/how-we-grow-with-agent-first-gtm) | Modelo de expansión; métricas son vendor first-party, confianza media |
+| Transformación organizacional: fluency → team outcomes → institutional AI + governance | [Yamini Rangan — How we Operate as an AI-first Company](https://www.hubspot.com/company-news/how-we-operate-as-an-ai-first-company) | Servicio de adoption/change/governance, no solo setup técnico |
+| **Marketing Studio**: workspace AI para brief, estrategia, assets y colaboración; KB lo marca beta | [Producto](https://www.hubspot.com/products/marketing/studio) · [KB](https://knowledge.hubspot.com/campaigns/create-campaigns-using-marketing-studio) | Wedge de campaign chaos; no SLA mientras beta |
+| **Sales Workspace** actualizado concentra companies, leads, deals, tareas, agenda y acciones sugeridas | [KB — Updated Sales Workspace](https://knowledge.hubspot.com/sales-workspace/manage-sales-activities-in-the-updated-sales-workspace) | Wedge de productividad/priorización comercial |
+| **Customer Success Workspace** configura customers, projects, revenue, workspaces por equipo y health scores | [KB — Customer Success Workspace](https://knowledge.hubspot.com/customer-success/set-up-and-manage-the-customer-success-workspace) | Wedge de churn, renewals y expansión |
+| **Breeze Studio** sigue beta; custom assistants migraron/read-only y el catálogo de agentes cambia | [KB — Breeze Studio](https://knowledge.hubspot.com/ai/use-assistants-and-agents-in-breeze-studio) | Vender capability y gobierno; no continuidad garantizada de betas |
+| **Agent CLI** beta pública: bulk/scheduled/background; MCP/conectores para conversación human-in-loop | [Developer changelog — Agent CLI](https://developers.hubspot.com/changelog/hubspot-agent-cli-available-in-public-beta) | Elegir rail por workflow; `--dry-run` obligatorio para writes |
+| Partners ganan en upmarket, agentic acceleration, marketing reimagined y especialización | [State of Ecosystems 2026](https://www.hubspot.com/state-of-ecosystems) | Prioridad de práctica y posicionamiento LATAM especializado |
+| HubSpot propone paquetes de servicios Loop/IA para partners | [Guide to Services for Loop Marketing](https://www.hubspot.com/hubfs/Agency/GTM%20-%20Product%20Resources%20%28Justin%29/Fall%20Spotlight/Guide%20to%20Services%20for%20Loop%20Marketing%20%281%29.pdf) | Validación de packaging; rangos orientativos, no price book Efeonce |
+| H2 2026 remunera activación de agentes, Credits y outcomes; premio mayor USD 100K y comisión promocional 40% para SKUs elegibles | [2026 Agentic Partner Incentives](https://www.hubspot.com/solutions-partners-2026-h2-incentives) | Señal interna. Confirmar cutoff/eligibilidad con PDM; la página tiene fechas inconsistentes |
+
+**Señales ejecutivas directas (LinkedIn; usar como contexto, no como política):**
+- [Angela O'Dowd](https://www.linkedin.com/in/angiemarie): Global VP, Partner Ecosystem; traduce la estrategia a activación, créditos y outcomes de partners.
+- [Dharmesh Shah — agentic users](https://www.linkedin.com/posts/dharmesh_this-is-just-the-beginning-were-all-in-activity-7449501581110185985-XQBd): agentes como usuarios de primera clase.
+- [Dharmesh Shah — agentic UX/full API parity](https://www.linkedin.com/posts/dharmesh_goosebumps-thats-what-i-got-when-i-saw-activity-7457125153370570752-IPzZ): APIs, MCP y CLI como experiencia de agentes.
+
+→ Síntesis y traducción comercial: `modules/14_NARRATIVA_AGENTICA_Y_MOTION_2026.md`.
 
 ### Los tres renombres (si usas el nombre viejo, te delatas)
 | Antes | Hoy | Marca |

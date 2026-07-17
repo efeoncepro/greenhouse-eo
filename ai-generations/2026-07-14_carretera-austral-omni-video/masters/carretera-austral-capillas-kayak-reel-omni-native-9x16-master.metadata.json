@@ -1,0 +1,106 @@
+{
+  "ok": true,
+  "runId": "2026-07-14_carretera-austral-omni-video",
+  "take": "capillas-kayak-reel-omni-native-9x16-master",
+  "mode": "execute",
+  "provider": "Google Cloud / Vertex AI / Gemini Omni generateContent",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-flash-preview",
+  "endpoint": "https://aiplatform.googleapis.com/v1/projects/efeonce-group/locations/global/publishers/google/models/gemini-omni-flash-preview:generateContent",
+  "task": "native portrait 9:16 image_to_video Reel",
+  "portraitFramePath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-14_carretera-austral-omni-video/portrait-refs/capillas-kayak-native-reel-ref-x610.png",
+  "outputPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-14_carretera-austral-omni-video/masters/carretera-austral-capillas-kayak-reel-omni-native-9x16-master.mp4",
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-14_carretera-austral-omni-video/prompts/omni-capillas-kayak-reel-native-9x16.md",
+  "constraints": [
+    "New native vertical Gemini Omni render, not a crop of the previous video.",
+    "Grounded in guided kayak / watercraft visits to Capillas de Marmol from Puerto Rio Tranquilo.",
+    "No glasses or sunglasses on either traveler at any moment.",
+    "Illustrative generated asset, not documentary SKY footage.",
+    "No logos, text overlays, UI, SKY uniforms, or recognizable real people."
+  ],
+  "startedAt": "2026-07-14T20:10:33.895Z",
+  "completedAt": "2026-07-14T20:11:14.867Z",
+  "response": {
+    "responseId": "updWaunCKuy3obIPioSJ-AI",
+    "modelVersion": "gemini-omni-flash-preview",
+    "usageMetadata": {
+      "promptTokenCount": 1618,
+      "candidatesTokenCount": 57920,
+      "totalTokenCount": 59944,
+      "trafficType": "ON_DEMAND",
+      "promptTokensDetails": [
+        {
+          "modality": "TEXT",
+          "tokenCount": 518
+        },
+        {
+          "modality": "IMAGE",
+          "tokenCount": 1100
+        }
+      ],
+      "candidatesTokensDetails": [
+        {
+          "modality": "VIDEO",
+          "tokenCount": 57920
+        }
+      ],
+      "thoughtsTokenCount": 406
+    },
+    "promptFeedback": null,
+    "candidates": [
+      {
+        "finishReason": "STOP",
+        "finishMessage": null,
+        "safetyRatings": null,
+        "parts": [
+          {
+            "text": "**Orchestrating a Vertical Reel**\n\nI will generate a 9:16 vertical travel video from a static image. I'll analyze the scene: kayakers, water, and marble formations. The camera will smoothly push in and tilt upwards. I'll animate characters and the environment with subtle movements for realism. I'll include natural sounds, and structure the video to meet the requested duration and timings.\n\n\n",
+            "mimeType": null,
+            "hasData": false
+          },
+          {
+            "text": null,
+            "mimeType": "video/mp4",
+            "hasData": true
+          }
+        ]
+      }
+    ]
+  },
+  "output": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-14_carretera-austral-omni-video/masters/carretera-austral-capillas-kayak-reel-omni-native-9x16-master.mp4",
+    "bytes": 2630340,
+    "mimeType": "video/mp4",
+    "probe": {
+      "ok": true,
+      "data": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 720,
+            "height": 1280,
+            "r_frame_rate": "24/1",
+            "avg_frame_rate": "24/1"
+          },
+          {
+            "index": 1,
+            "codec_name": "aac",
+            "codec_type": "audio",
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0"
+          }
+        ],
+        "format": {
+          "duration": "10.005000",
+          "size": "2630340",
+          "bit_rate": "2103220"
+        }
+      }
+    }
+  }
+}

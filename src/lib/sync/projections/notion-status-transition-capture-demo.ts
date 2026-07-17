@@ -4,6 +4,7 @@ import { normalizeTaskStatus } from '@/lib/delivery/task-status-canonical'
 import { fetchDemoPageStatus } from '@/lib/notion-metrics/notion-demo-client'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { isRetryableNotionError } from '@/lib/space-notion/notion-errors'
 
 import { EVENT_TYPES } from '../event-catalog'
 import { publishOutboxEvent } from '../publish-event'
@@ -230,11 +231,13 @@ export const notionStatusTransitionCaptureDemoProjection: ProjectionDefinition =
     } catch (err) {
       // Re-fetch falló (429 / 5xx / network). Throw → outbox retry exponencial.
       // Reliability signal `transition_capture_refetch_failed_demo` lo detecta.
-      captureWithDomain(err, 'integrations.notion', {
-        level: 'error',
-        tags: { source: 'demo_status_transition_capture', stage: 'refetch' },
-        extra: { taskSourceId, sourceEventId }
-      })
+      if (!isRetryableNotionError(err)) {
+        captureWithDomain(err, 'integrations.notion', {
+          level: 'error',
+          tags: { source: 'demo_status_transition_capture', stage: 'refetch' },
+          extra: { taskSourceId, sourceEventId }
+        })
+      }
 
       throw err
     }

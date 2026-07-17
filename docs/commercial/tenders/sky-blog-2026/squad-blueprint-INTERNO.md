@@ -91,6 +91,54 @@ Responsable de Cuenta (Account Lead)
   > comoditizarnos**. **Fix: ad-hoc ≥ 550k, o mejor, sin precio unitario publicado.**
   >
   > *(Drift previo corregido 2026-07-11: una versión anterior citaba 4,9M/3,5M.)*
+
+  > 🔴🔴 **DELTA 2026-07-14 — el piso de 4,6M TAMPOCO pasa. Es un piso de HOY, y el contrato es a DOS AÑOS SIN REAJUSTE.**
+  >
+  > Las Bases **imponen** tarifa fija en CLP **sin reajuste** (§3.2). Nuestra base de costo es **mixta**
+  > (nómina CLP + contractors en USD) y **sube todos los años**. El margen se erosiona durante la vigencia,
+  > en silencio. El piso hay que computarlo contra el **costo del año 2**, no contra el de hoy.
+  >
+  > | Inflación de costo | Costo año 2 *(con buffer 12%)* | Margen si cerramos a **4,6M** | **PISO real** *(45% en año 2)* | Espacio de negociación desde 5,2M |
+  > |---|---|---|---|---|
+  > | 3 % / año | 2.685.350 | 🔴 **41,6 %** | **4.882.000** | **318.000** |
+  > | **4 % / año** | 2.737.746 | 🔴 **40,5 %** | 🎯 **4.978.000** | 🔴 **222.000** |
+  > | 5 % / año | 2.790.648 | 🔴 **39,3 %** | **5.074.000** | 🔴 **126.000** |
+  >
+  > 🔴 **PISO VIGENTE: ≈ CLP 5.000.000.** *(No 4,6M. No 3,9M.)*
+  > 🔴 **Espacio de negociación real: CLP 130.000 – 320.000. Prácticamente CERO.**
+  >
+  > **Consecuencia operativa, y es la que importa el 20/07** *(«reuniones de negociación» = documento
+  > integrante de las Bases, §1.1 → hay BAFO):* **no tenemos palanca de precio. Necesitamos palanca de
+  > ALCANCE.** La doctrina es explícita (`04_PRICING` §8): **nunca bajes el precio; baja el alcance.**
+  >
+  > ### 🎯 La carta del BAFO — plan reducido de 6 piezas (INTERNO, **NO se publica en la oferta**)
+  >
+  > La capa fija (estrategia, capa técnica, medición, portal, gobernanza = **69 %** de la dedicación) **no
+  > escala con el volumen**. Solo escala la producción (**155 %**). Bajar de 8 a 6 piezas preserva el margen:
+  >
+  > | Capacidad | Precio | Loaded *(c/ buffer)* | Margen hoy | Margen año 2 | Promedio/pieza |
+  > |---|---|---|---|---|---|
+  > | **6 piezas** 🎯 *(carta BAFO)* | **4.300.000** | 2.093.325 | **51,3 %** ✅ | **47,3 %** ✅ | 716.667 |
+  > | **8 piezas** *(propuesto)* | **5.200.000** | 2.531.200 | **51,3 %** ✅ | **47,4 %** ✅ | 650.000 |
+  > | 12 piezas *(ampliado)* | 6.900.000 | 3.406.950 | 50,6 % ✅ | 46,6 % ✅ | 575.000 |
+  >
+  > **Marginal 6→8 = 450.000 · marginal 8→12 = 425.000** → **decreciente** (economías de escala sobre la capa
+  > fija). **Ningún plan domina a otro.** ✅ La escalera es coherente y sobrevive la aritmética del comprador.
+  >
+  > 🔴 **El plan de 6 NO se publica.** Es lo que se cede en la ronda del 20/07 **a cambio de bajar alcance**,
+  > no de regalar margen. Publicarlo en la oferta invita a SKY a tomar el más barato antes de negociar.
+  >
+  > ### ✅ Los tres bugs de `04_PRICING` §6 — CERRADOS en la oferta económica (2026-07-14)
+  >
+  > | Bug | Fix aplicado |
+  > |---|---|
+  > | **1 · Plan ampliado dominado** (base + 4 ad-hoc = 6,24M < 6,9M) | **Muerto**: ya no existe precio unitario con el que construir la alternativa |
+  > | **2 · Ad-hoc invertido** (260k < marginal de 425k) | **Muerto**: el ad-hoc **se produce dentro de la capacidad mensual contratada** (ocupa un espacio del mes). **Cero precio unitario publicado** — regla dura #2 de `04_PRICING` |
+  > | **3 · Sin reajuste a 2 años** | Las Bases **lo imponen** (§3.2) → no es negociable. **El buffer va en el precio**: por eso el piso real es 5,0M y no 4,6M *(ver tabla arriba)* |
+  >
+  > ⚠️ **Bug 4, nuevo, encontrado el 2026-07-14:** la oferta económica anterior publicaba *«valor referencial
+  > de mercado ~CLP 600.000/mes»* para el multimedia — **una cifra sin fuente en un documento contractual**.
+  > **Eliminada.** *(Regla: cero cifras sin fuente googleable.)*
 - **Sección de equipo del bid** → `greenhouse-public-private-tenders`. *(Aplicado en §10 de la Oferta Técnica, roles + seniority sin nombres.)*
 - **Reconciliación de capacity** → `greenhouse-ico` + `engagement-wellbeing.md`.
 - **Demanda runtime** → `TalentDemand` (stakeholder=client, fulfillment=managed).

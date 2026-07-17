@@ -1,0 +1,10 @@
+{
+  "generatedAt": "2026-07-14T00:00:00-04:00",
+  "source": "carretera-austral-capillas-kayak-omni-v2-master.mp4",
+  "method": "deterministic ffmpeg 9:16 crop from accepted Gemini Omni V2 master",
+  "crop": "scale=-2:1280,crop=720:1280:780:0,setsar=1",
+  "activityBasis": "Capillas de Marmol navigation/kayak from Puerto Rio Tranquilo; verified with Chile Travel, Aysen Patagonia and operator listings before use",
+  "dimensions": "720x1280",
+  "fps": 24,
+  "durationSeconds": 10
+}

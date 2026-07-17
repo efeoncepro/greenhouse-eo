@@ -171,9 +171,66 @@ const templateContentCompatibility: CatalogSemanticValidator = {
   }
 }
 
+/**
+ * `testimonials-sourced` — un testimonio es una cita de un TERCERO real: exige atribución nombrada y
+ * una fuente verificable. Es la misma raíz anti-fabricación de `QuoteSplit` en modo testimonial: sin
+ * persona nombrada y sin enlace de fuente, la lámina viste una frase con la autoridad de un
+ * testimonio de cliente sin que el comité pueda comprobarla. La forma (2 citas, campos requeridos)
+ * la cubre el contrato de slots; esto valida el SENTIDO: quién lo dijo, y dónde se puede verificar.
+ */
+const testimonialsSourced: CatalogSemanticValidator = {
+  name: 'testimonials-sourced',
+  version: '1.0.0',
+  validate: plan => {
+    const violations: CatalogSemanticViolation[] = []
+
+    for (const slide of plan.slides) {
+      if (slide.template !== 'TestimonialsFull') continue
+
+      const proofLink = String(slide.slots.proofLink ?? '')
+
+      if (!/href=["']https?:\/\/[^"']+["']/i.test(proofLink)) {
+        violations.push({
+          code: 'testimonial_source_missing',
+          slideId: slide.slideId,
+          message:
+            'TestimonialsFull exige un proofLink con href absoluto: es la fuente verificable de las ' +
+            'citas. Un testimonio de un tercero sin fuente comprobable no se publica en una oferta.'
+        })
+      }
+
+      asRecords(slide.slots.testimonials).forEach((testimonial, index) => {
+        const who = String(testimonial.who ?? '').trim()
+        const quote = String(testimonial.quote ?? '').trim()
+
+        if (!who || /^(un|una|el|la)\s+(cliente|persona|usuari|equipo)\b/i.test(who)) {
+          violations.push({
+            code: 'testimonial_unattributed',
+            slideId: slide.slideId,
+            message:
+              `el testimonio #${index + 1} no está atribuido a una persona nombrada ` +
+              `("${who || '—'}"); un genérico como "un cliente" es rechazo.`
+          })
+        }
+
+        if (!quote) {
+          violations.push({
+            code: 'testimonial_empty',
+            slideId: slide.slideId,
+            message: `el testimonio #${index + 1} no trae cita: un testimonio vacío no prueba nada.`
+          })
+        }
+      })
+    }
+
+    return violations
+  }
+}
+
 export const deckAxisSemanticValidators: CatalogSemanticValidator[] = [
   templateContentCompatibility,
   pricingIntegrity,
   teamDedicationDerivable,
-  requirementsCoverage
+  requirementsCoverage,
+  testimonialsSourced
 ]

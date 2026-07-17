@@ -133,7 +133,7 @@ La landing `https://anam-2.hubspotpagebuilder.com/agente-anam` quedo publicada d
 projectName: kortex-cms-react
 projectId: 103589049
 component UID: kortex-anam-cms-react-theme
-deployedBuildId: 19
+deployedBuildId: 22
 ```
 
 Documentacion especifica: [`anam-chat-landing.md`](anam-chat-landing.md).
@@ -142,6 +142,7 @@ Lecciones operativas:
 
 - HubSpot puede mostrar `deployedBuildId` nuevo antes de que la pagina publica sirva los assets nuevos; verificar la URL publica buscando `kortex-cms-react/<build>`.
 - La copy visible no debe mencionar `widget de HubSpot`; usar lenguaje de accion del usuario final.
+- Para abrir chatflows especificos desde botones, usar query params + `HubSpotConversations.widget.refresh({ openToNewThread: true })`; en ANAM el contrato vigente es `anam_intent=cotizar|seguimiento_servicio|requerimiento_calidad`.
 - El endpoint `draft/push-live` de Pages API requiere scopes `content` y `content.landing_pages.write`; si faltan, el refresh/publicacion debe hacerse desde editor o con un token nuevo autorizado para ese scope.
 
 ## Evidencia esperada de cierre

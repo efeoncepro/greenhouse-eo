@@ -18,7 +18,7 @@ This skill is a **decision aid, not legal advice**. For statutory pay, contract 
 | Trigger | Lane |
 |---|---|
 | "open a vacancy / define the role / job brief" | Talent acquisition — intake + scorecard |
-| "redact a public vacancy / oferta laboral / job posting" | Job offer recipe + inbound recruiting |
+| "redact a public vacancy / oferta laboral / job posting" | Job offer recipe + inbound recruiting; inside Greenhouse prefer the AI-assisted propose→confirm path (TASK-1385/1422 — see `references/greenhouse-runtime.md` §AI-assisted vacancy copy) |
 | "source candidates / head hunt / find a senior X" | Sourcing + executive search |
 | "inbound recruiting / careers / employer brand / talent pool" | Inbound + candidate experience |
 | "design the test / interview / competency assessment / rubric" | Assessment + structured interviewing |

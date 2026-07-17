@@ -565,6 +565,17 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'admin'
   },
   {
+    // TASK-1413 — Proposal Studio: ventana operador de proposals (lista + versiones + descarga).
+    // Sembrado SOLO a efeonce_admin + efeonce_account (los roles con commercial.proposal.read).
+    // NUNCA client_* (los artefactos internal llevan loaded cost / piso de negociación).
+    viewCode: 'administracion.commercial_proposals',
+    section: 'administracion',
+    label: 'Propuestas',
+    description: 'Propuestas comerciales: estado, historial de versiones por artefacto y descarga.',
+    routePath: '/admin/commercial/proposals',
+    routeGroup: 'admin'
+  },
+  {
     // TASK-1247 — Admin Review UI del AEO Grader (gate humano pre-publicación, EPIC-020 F).
     // Sembrado SOLO a efeonce_admin + ai_tooling_admin (mismos roles con la capability
     // growth.ai_visibility.report.review). NUNCA client_* (YMYL / gate interno).
@@ -646,15 +657,6 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     label: 'Design System',
     description: 'Catálogo interno de AXIS: tokens, primitives, patrones y labs. Recurso interno transversal — clientes no acceden.',
     routePath: '/design-system',
-    routeGroup: 'internal'
-  },
-  {
-    viewCode: 'plataforma.roadmap',
-    section: 'plataforma',
-    label: 'Roadmap',
-    description:
-      'Cockpit del backlog operativo (epics, tasks, mini-tasks e incidentes) leído del índice Markdown read-only. Recurso interno transversal — clientes no acceden.',
-    routePath: '/roadmap',
     routeGroup: 'internal'
   },
   {

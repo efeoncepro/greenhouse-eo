@@ -580,6 +580,11 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
                 href: '/admin/commercial/parties',
                 icon: 'tabler-building-community'
               },
+              {
+                label: nl(GH_INTERNAL_NAV.adminCommercialProposals),
+                href: '/admin/commercial/proposals',
+                icon: 'tabler-files'
+              },
               { label: nl(GH_INTERNAL_NAV.adminPricingCatalog), href: '/admin/pricing-catalog' },
               { label: nl(GH_INTERNAL_NAV.adminServiceSlas), href: '/admin/service-slas', icon: 'tabler-shield-check' },
               { label: nl(GH_INTERNAL_NAV.adminPaymentInstruments), href: '/admin/payment-instruments' }
@@ -589,6 +594,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               if (item.href === '/admin/talent-ops') return canSeeView('administracion.equipo', true)
               if (item.href === '/admin/business-lines') return canSeeView('administracion.admin_center', true)
               if (item.href === '/admin/commercial/parties') return canSeeView('administracion.commercial_parties', true)
+              if (item.href === '/admin/commercial/proposals') return canSeeView('administracion.commercial_proposals', true)
               if (item.href === '/admin/pricing-catalog') return canSeeView('administracion.admin_center', true)
               if (item.href === '/admin/service-slas') return canSeeView('administracion.admin_center', true)
               if (item.href === '/admin/payment-instruments') return canSeeView('administracion.instrumentos_pago', true)
@@ -811,19 +817,6 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         })
       }
     }
-  }
-
-  // ── Roadmap (standalone — cross-cutting INTERNAL resource, TASK-1153) ──
-  // Cockpit del backlog operativo (epics/tasks/mini-tasks/issues) leído del índice
-  // Markdown read-only (TASK-1152). FUERA de Admin — es capacidad de producto/operación
-  // con presencia propia. Gated por `plataforma.roadmap` (solo roles internos, nunca
-  // client_*). Precedente cross-cutting: Design System / Knowledge.
-  if (canSeeView('plataforma.roadmap', false)) {
-    menuData.push({
-      label: nl(GH_INTERNAL_NAV.roadmap),
-      href: '/roadmap',
-      icon: 'tabler-map-2'
-    })
   }
 
   // ── Knowledge (standalone — cross-cutting INTERNAL resource) ──

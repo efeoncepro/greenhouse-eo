@@ -58,8 +58,11 @@ export interface SlotFieldContract {
   type: SlotType
   required?: boolean
   maxCharacters?: number
+  constraints?: SlotConstraints
   allowedTags?: string[]
   values?: string[]
+  item?: SlotItemContract
+  shape?: Record<string, SlotFieldContract>
   /** Campos que DEBEN venir si éste viene (ej. `metric` requiere `evidenceRef`). */
   requires?: string[]
   /** Traduce el valor semántico a presentación (ej. `kind` → ícono). Ver `resolvers.ts`. */
@@ -84,6 +87,7 @@ export interface SlotContract {
   required?: boolean
   constraints?: SlotConstraints
   item?: SlotItemContract
+  shape?: Record<string, SlotFieldContract>
   /** Selector del blueprint de un item repetido; evita depender del orden casual de hijos del HTML. */
   itemSelector?: string
   /** Hijos fijos del host de repetición que se preservan al reconstruir los items (ej. una refline). */

@@ -104,6 +104,12 @@ en pipeline HubSpot. Cuando el trabajo toque el grader, su scoring, prompt packs
 o recomendaciones, cargar **`AI_VISIBILITY_GRADER.md`** (mapeo completo skill ↔
 producto + fronteras del dominio + estado de las tasks).
 
+Think también hospeda la **Radiografía AEO** (`/muestras/<slug>-<token>`): una
+muestra viva de trabajo que educa y habilita ventas SEO/AEO. No captura leads y
+no reemplaza al Grader. La cadena correcta es: **Grader diagnostica → Radiografía
+demuestra → propuesta/deck convierte → servicio opera**. Runtime en
+`efeonce-think`; documentación y manual comercial en `greenhouse-eo`.
+
 > **Cross-refs:** núcleo en `../SKILL.md` + `../modules/*`. Ejecución del sitio →
 > skill `efeonce-public-site-wordpress`. Guardrails → `../ANTIPATTERNS.md`.
 > Grader / dominio growth → `AI_VISIBILITY_GRADER.md`.

@@ -1,24 +1,19 @@
 ---
 name: seo-aeo
 description: >-
-  Skill experta y robusta de SEO + AEO/GEO (Answer/Generative Engine
-  Optimization) al estado del arte 2026. Úsala para diagnosticar, diseñar,
-  auditar, priorizar y ejecutar trabajo de búsqueda orgánica Y visibilidad en
-  motores de respuesta IA. Cubre SEO técnico (Core Web Vitals, crawl/index,
-  JSON-LD, crawlers IA), contenido y topical authority, E-E-A-T + Entity/
-  Knowledge Graph, AEO/GEO (Query Fan-Out, chunking, citabilidad, llms.txt,
-  por-motor: AI Overviews/AI Mode, ChatGPT Search, Perplexity, Gemini, Copilot),
-  off-page/digital PR + Reddit/UGC, local + internacional/multilingüe, YMYL,
-  medición (GSC/GA4/BigQuery + Share of Voice en LLMs + tráfico IA +
-  exactitud/alucinación), playbooks (auditoría, migración, recovery), y un
-  overlay Efeonce/efeoncepro.com (WordPress/Kinsta + AI Content Factory +
-  HubSpot). Triggers: "SEO", "AEO", "GEO", "LLMO", "AI Overviews", "AI Mode",
-  "query fan-out", "schema", "structured data", "JSON-LD", "EEAT", "E-E-A-T",
-  "knowledge graph", "entidad de marca", "chunking", "citabilidad", "citado por
-  ChatGPT/Perplexity", "share of voice IA", "llms.txt", "robots para bots IA",
-  "Core Web Vitals", "INP", "topical authority", "backlinks", "digital PR",
-  "local SEO", "hreflang", "auditoría SEO", "rankear", "posicionamiento",
-  "visibilidad en buscadores", "tráfico orgánico", "Semrush", "GSC".
+  Skill experta y robusta de SEO + AEO/GEO 2026 para diagnosticar, diseñar,
+  auditar, priorizar y ejecutar búsqueda orgánica y visibilidad en motores de
+  respuesta IA. Cubre SEO técnico (crawl/index, Core Web Vitals, JSON-LD y
+  crawlers IA), contenido y topical authority, E-E-A-T y entidades, Query
+  Fan-Out, chunking y citabilidad, AI Overviews/AI Mode, ChatGPT, Perplexity,
+  Gemini y Copilot, off-page/digital PR, local e internacional, YMYL,
+  GSC/GA4/BigQuery, Share of Voice, exactitud y playbooks de auditoría, migración
+  y recovery, con overlay Efeonce WordPress/Kinsta. Úsala también para blogposts,
+  pillars y guías: research dossier, intent/SERP, claim ledger, metadata,
+  canonical/robots, author Person, Article schema, publicación y QA live.
+  Triggers: SEO, AEO, GEO, LLMO, schema, JSON-LD, E-E-A-T, knowledge graph,
+  citabilidad, llms.txt, Core Web Vitals, topical authority, backlinks, hreflang,
+  auditoría SEO, rankear, posicionamiento, tráfico orgánico, Semrush y GSC.
 ---
 
 # SEO + AEO/GEO — Skill operativa 2026
@@ -127,9 +122,11 @@ decláralo. Ramifica la recomendación según las respuestas.
 | Qué **NO** hacer (black-hat, spam IA, riesgos) | `ANTIPATTERNS.md` |
 | Vocabulario (AEO vs GEO vs LLMO vs SGE vs AI Mode, etc.) | `GLOSSARY.md` |
 | Fuentes canónicas + qué reverificar y cada cuánto | `SOURCES.md` |
+| Blogposts, pillars y guías: dossier, metadata, E-E-A-T, publicación WordPress/Think, link health y verificación live | `references/agentic-editorial-eeat.md` |
 | **Framework + metodología propietaria Efeonce** (los 5 niveles para existir en un internet de agentes: Be Found · Readable · Correct · Actionable · Intrinsic; narrativa pública + modelo de 2 ejes del grader) | `efeonce/EFEONCE_AGENTIC_READINESS_FRAMEWORK.md` ⭐ |
 | Caso Efeonce: WordPress/Kinsta + AI Content Factory + HubSpot + ICP Globe | `efeonce/EFEONCE_OVERLAY.md` |
 | **Producto Greenhouse que operacionaliza esta skill** (AI Visibility Grader / dominio `growth`, TASK-1226/1227) | `efeonce/AI_VISIBILITY_GRADER.md` |
+| **Radiografía AEO** (Think): muestra viva que educa y demuestra ejecución SEO/AEO sobre un hueco medido; no reemplaza al Grader | `docs/think/radiografia-aeo-architecture.md` + manual comercial `docs/manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md` |
 | **Web agéntica**: WebMCP, exponer tools a agentes, agentic-web *readiness* (¿los agentes pueden *usar* el sitio, no solo *citarlo*?), Lighthouse API programática + audit `registered-webmcp-tools` | **skill `webmcp`** (cross-skill) |
 | Artefactos listos para usar | `templates/` (jsonld, llms-txt, briefs, checklists) |
 
@@ -177,6 +174,10 @@ Effort     = persona-semanas (dev + contenido + PR)
 - **(Overlay Efeonce)** — WordPress REST/WP-CLI vía la skill
   `efeonce-public-site-wordpress`; BigQuery para export GSC; HubSpot MCP para
   atribución a leads. No dupliques esa lógica: enlaza.
+- **Radiografía AEO (Think)** — si el trabajo pasa de diagnóstico a demostración,
+  recuerda la cadena: **Grader mide el hueco; Radiografía muestra el método**.
+  Runtime en `efeonce-think`, documentación/governance en `greenhouse-eo`.
+  Nunca la trates como lead magnet ni como promesa de ranking/cita.
 
 **Regla de honestidad de datos:** si no puedes medir algo (no hay GSC, no hay
 herramienta SoV), dilo explícito y marca el dato como *estimado*. Nunca presentes

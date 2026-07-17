@@ -19,11 +19,18 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
-import { PDFDocument } from 'pdf-lib'
+import { PDFArray, PDFDict, PDFDocument, PDFName, PDFNumber, PDFString } from 'pdf-lib'
 import { chromium, type Browser, type Page } from 'playwright'
 
 import type { CatalogLayoutHook } from './catalog'
-import type { SlideSpec, SlotContract, SlotValue, TemplateContract } from './contracts'
+import type {
+  DeckPlan,
+  SlideSpec,
+  SlotContract,
+  SlotFieldContract,
+  SlotValue,
+  TemplateContract
+} from './contracts'
 import { assertAllImagesResolved, assertNoFontFallback, assertSlideHasInk } from './quality-gates'
 import { resolveFieldDirective, type FieldDirective, type ResolverRegistry } from './resolver-contract'
 
@@ -102,6 +109,54 @@ const buildFieldPlan = (
   slots: Record<string, unknown>,
   resolvers: ResolverRegistry
 ): Record<string, FieldDirective> | undefined => {
+  const joinFieldPath = (...parts: Array<string | number | undefined>): string =>
+    parts.filter(part => part !== undefined && String(part) !== '').join('.')
+
+  const addFieldPlan = (
+    plan: Record<string, FieldDirective>,
+    pathPrefix: string,
+    shape: Record<string, SlotFieldContract>,
+    item: Record<string, unknown>,
+    index: number,
+    itemCount: number
+  ) => {
+    const ctx = { item, index, itemCount, slots }
+
+    for (const [fieldName, field] of Object.entries(shape)) {
+      const fieldValue = item[fieldName]
+
+      if (field.type === 'array' && Array.isArray(fieldValue) && field.item?.shape) {
+        fieldValue.forEach((nested, nestedIndex) => {
+          if (!isPlainRecord(nested)) return
+
+          addFieldPlan(
+            plan,
+            joinFieldPath(pathPrefix, fieldName, nestedIndex),
+            field.item!.shape!,
+            nested,
+            nestedIndex,
+            fieldValue.length
+          )
+        })
+
+        continue
+      }
+
+      // Un resolver DERIVADO (ordinal, geometría) corre aunque el campo no venga: el número de fase
+      // sale del índice, no de un dato que el autor tenga que escribir.
+      const derived = Boolean(field.resolver) || field.consumer === 'resolver-only'
+
+      if (!derived && (fieldValue === undefined || fieldValue === null || fieldValue === '')) continue
+
+      plan[joinFieldPath(pathPrefix, fieldName)] = resolveFieldDirective(
+        resolvers,
+        field,
+        fieldValue,
+        ctx
+      )
+    }
+  }
+
   // Un slot `object` tiene EL MISMO contrato de campo que un item de array: puede declarar evidencia
   // (`validation-only`) y campos DERIVADOS por resolver (la escala de una barra before/after). Que el
   // filler sólo honrara eso en los arrays dejaba a los objetos como ciudadanos de segunda — y era el
@@ -113,19 +168,7 @@ const buildFieldPlan = (
     const plan: Record<string, FieldDirective> = {}
     const record = value as unknown as Record<string, unknown>
 
-    for (const [fieldName, field] of Object.entries(objectShape)) {
-      const fieldValue = record[fieldName]
-      const derived = Boolean((field as { resolver?: string }).resolver)
-
-      if (!derived && (fieldValue === undefined || fieldValue === null || fieldValue === '')) continue
-
-      plan[fieldName] = resolveFieldDirective(resolvers, field, fieldValue, {
-        item: record,
-        index: 0,
-        itemCount: 1,
-        slots
-      })
-    }
+    addFieldPlan(plan, '', objectShape, record, 0, 1)
 
     return Object.keys(plan).length > 0 ? plan : undefined
   }
@@ -141,24 +184,7 @@ const buildFieldPlan = (
   value.forEach((item, index) => {
     if (typeof item !== 'object' || item === null) return
 
-    const ctx = {
-      item: item as Record<string, unknown>,
-      index,
-      itemCount: value.length,
-      slots
-    }
-
-    for (const [fieldName, field] of Object.entries(shape)) {
-      const fieldValue = (item as Record<string, unknown>)[fieldName]
-
-      // Un resolver DERIVADO (ordinal, geometría) corre aunque el campo no venga: el número de fase
-      // sale del índice, no de un dato que el autor tenga que escribir.
-      const derived = Boolean(field.resolver) || field.consumer === 'resolver-only'
-
-      if (!derived && (fieldValue === undefined || fieldValue === null || fieldValue === '')) continue
-
-      plan[`${index}.${fieldName}`] = resolveFieldDirective(resolvers, field, fieldValue, ctx)
-    }
+    addFieldPlan(plan, String(index), shape, item as Record<string, unknown>, index, value.length)
   })
 
   return plan
@@ -191,7 +217,18 @@ const buildInstructions = (
   for (const [slotName, slotContract] of Object.entries(contract.slots)) {
     const value = slide.slots[slotName]
 
-    if (value === undefined || value === null) continue
+    if (value === undefined || value === null) {
+      // 🔴 Slot OPCIONAL no provisto → se LIMPIA su nodo. Sin esto, el copy de EJEMPLO del
+      // prototipo se imprime tal cual — y los prototipos están escritos contra un cliente real
+      // («Propuesta técnica · SKY» en el footer de la agenda): la siguiente licitación que omita
+      // ese slot le entregaría a SU comité el nombre de OTRO cliente. Es la misma bug class que
+      // el filler ya cerraba para campos de item («quedaría el contenido de ejemplo del
+      // prototipo»), pero a nivel de slot top-level.
+      if (slotContract.consumer === 'validation-only' || slotContract.type.startsWith('fixed-')) continue
+
+      instructions.push({ selector: slotContract.selector, type: 'absent-optional', value: null })
+      continue
+    }
 
     // Evidencia: se valida, NUNCA se pinta. Sin esto, el `sourceRef` de QuoteSplit se escribía sobre
     // el nodo `[data-slot='mode']` —que es la lámina entera— y la borraba.
@@ -234,7 +271,7 @@ const buildInstructions = (
 const fillDom = (instructions: FillInstruction[]): string[] => {
   const problems: string[] = []
 
-  const ALLOWED_TAGS = ['EM', 'STRONG', 'BR', 'SPAN']
+  const ALLOWED_TAGS = ['EM', 'STRONG', 'BR', 'SPAN', 'A']
 
   const sanitize = (html: string): string => {
     const container = document.createElement('div')
@@ -249,7 +286,16 @@ const fillDom = (instructions: FillInstruction[]): string[] => {
         }
 
         for (const attr of Array.from(child.attributes)) {
-          // Un tag permitido no trae atributos: nada de `onclick`, `style`, `href`.
+          // Un tag permitido no trae atributos: nada de `onclick`, `style`, `class`.
+          // Única excepción: `href` en <a>, y sólo hacia https:// o un ancla interna.
+          // Chromium lo imprime como anotación /Link — es lo que hace clickeable el PDF
+          // (la Radiografía y el informe del grader viven en la web; ése es su valor).
+          if (child.tagName === 'A' && attr.name === 'href') {
+            const href = attr.value.trim()
+
+            if (href.startsWith('https://') || href.startsWith('#')) continue
+          }
+
           child.removeAttribute(attr.name)
         }
 
@@ -262,8 +308,193 @@ const fillDom = (instructions: FillInstruction[]): string[] => {
     return container.innerHTML
   }
 
+  const directFieldAnchors = (node: Element): Element[] =>
+    Array.from(node.querySelectorAll('[data-slot-field]')).filter(field => {
+      const parentField = field.parentElement?.closest('[data-slot-field]')
+
+      return parentField === null
+    })
+
+  const applyDirective = (
+    scope: Element,
+    fieldName: string,
+    directive: FieldDirective,
+    selectorLabel: string
+  ): boolean => {
+    let ok = true
+
+    if (directive.mode !== 'apply') return ok
+
+    for (const effect of directive.effects) {
+      const target =
+        effect.selector === ':self'
+          ? scope
+          : effect.selector === ':field'
+            ? scope.querySelector(`[data-slot-field="${fieldName}"]`)
+            : scope.querySelector(effect.selector)
+
+      if (!target) {
+        problems.push(
+          `${selectorLabel}: el resolver de "${fieldName}" apunta a "${effect.selector}", que no existe en el item del HTML.`
+        )
+        ok = false
+        continue
+      }
+
+      if (effect.attr && effect.value !== undefined) {
+        target.setAttribute(effect.attr, effect.value)
+      }
+
+      if (effect.remove) {
+        target.remove()
+        continue
+      }
+
+      if (effect.styleProp && effect.styleValue !== undefined) {
+        ;(target as HTMLElement).style.setProperty(effect.styleProp, effect.styleValue)
+      }
+
+      if (effect.asText && effect.value !== undefined) {
+        target.textContent = effect.value
+      }
+
+      for (const other of effect.toneGroup ?? []) {
+        target.classList.remove(other)
+      }
+
+      if (effect.toneClass) {
+        target.classList.add(effect.toneClass)
+      }
+    }
+
+    return ok
+  }
+
+  function fillArrayHost(
+    host: Element,
+    entries: unknown[],
+    instruction: FillInstruction,
+    pathPrefix: string,
+    selectorLabel: string
+  ) {
+    const itemHost = (host.querySelector('[data-slot-items]') as Element | null) ?? host
+    const itemTemplate = itemHost.firstElementChild
+
+    if (!itemTemplate) {
+      problems.push(`${selectorLabel}: el campo array "${pathPrefix}" no tiene item-template en el HTML.`)
+
+      return
+    }
+
+    const blueprint = itemTemplate.cloneNode(true) as Element
+
+    itemHost.innerHTML = ''
+
+    entries.forEach((entry, nestedIndex) => {
+      const node = blueprint.cloneNode(true) as Element
+
+      if (typeof entry === 'string') {
+        const field = node.querySelector('[data-slot-field]') ?? node
+
+        field.innerHTML = sanitize(entry)
+      } else if (entry && typeof entry === 'object' && !Array.isArray(entry)) {
+        fillRecordFields(
+          node,
+          entry as Record<string, unknown>,
+          instruction,
+          `${pathPrefix}.${nestedIndex}`,
+          selectorLabel
+        )
+      } else {
+        problems.push(`${selectorLabel}: el campo array "${pathPrefix}" trae un item no soportado.`)
+      }
+
+      itemHost.appendChild(node)
+    })
+  }
+
+  function fillRecordFields(
+    node: Element,
+    record: Record<string, unknown>,
+    instruction: FillInstruction,
+    pathPrefix: string,
+    selectorLabel: string
+  ) {
+    const plannedPrefix = pathPrefix ? `${pathPrefix}.` : ''
+
+    const planned = Object.keys(instruction.fieldPlan ?? {})
+      .filter(key => key.startsWith(plannedPrefix))
+      .map(key => key.slice(plannedPrefix.length).split('.')[0])
+
+    const fieldNames = new Set([...Object.keys(record), ...planned])
+
+    for (const fieldName of fieldNames) {
+      const fieldValue = record[fieldName]
+      const pathKey = pathPrefix ? `${pathPrefix}.${fieldName}` : fieldName
+      const directive = instruction.fieldPlan?.[pathKey] ?? { mode: 'text' as const }
+
+      if (directive.mode === 'skip') continue
+
+      if (directive.mode === 'text' && (fieldValue === undefined || fieldValue === null || fieldValue === '')) {
+        continue
+      }
+
+      if (directive.mode === 'apply') {
+        applyDirective(node, fieldName, directive, selectorLabel)
+        continue
+      }
+
+      const field = node.querySelector(`[data-slot-field="${fieldName}"]`)
+
+      if (!field) {
+        problems.push(
+          `${selectorLabel}: el campo "${fieldName}" no tiene [data-slot-field="${fieldName}"] en el HTML. ` +
+            `Sin ancla, quedaría el contenido de ejemplo del prototipo.`
+        )
+        continue
+      }
+
+      if (Array.isArray(fieldValue)) {
+        fillArrayHost(field, fieldValue, instruction, pathKey, selectorLabel)
+        continue
+      }
+
+      const nested = field.querySelector('[data-slot-field]')
+
+      if (nested) {
+        for (const child of Array.from(field.childNodes)) {
+          if (child.nodeType === Node.TEXT_NODE) child.remove()
+        }
+
+        field.insertBefore(document.createTextNode(String(fieldValue) + ' '), field.firstChild)
+        continue
+      }
+
+      field.innerHTML = sanitize(String(fieldValue))
+    }
+
+    for (const field of directFieldAnchors(node)) {
+      const name = field.getAttribute('data-slot-field')!
+      const authored = record[name]
+      const fieldPath = pathPrefix ? `${pathPrefix}.${name}` : name
+
+      const derived = Object.keys(instruction.fieldPlan ?? {}).some(
+        key => key === fieldPath || key.startsWith(`${fieldPath}.`)
+      )
+
+      if (derived) continue
+
+      if (authored === undefined || authored === null || authored === '') {
+        field.remove()
+      }
+    }
+  }
+
   for (const instruction of instructions) {
     const el = document.querySelector(instruction.selector)
+
+    // Un slot opcional AUSENTE con nodo ausente no es un problema: el prototipo puede no pintarlo.
+    if (!el && instruction.type === 'absent-optional') continue
 
     if (!el) {
       problems.push(`selector sin match en el DOM: ${instruction.selector}`)
@@ -271,6 +502,27 @@ const fillDom = (instructions: FillInstruction[]): string[] => {
     }
 
     const { type, value } = instruction
+
+    // Slot opcional NO provisto: el copy de ejemplo del prototipo NO puede llegar al PDF.
+    if (type === 'absent-optional') {
+      if (el.tagName === 'IMG') {
+        el.remove()
+        continue
+      }
+
+      // Si el nodo envuelve OTRO slot declarado, arrasarlo destruiría slots vivos: se limpian sólo
+      // los nodos de texto propios (mismo trato que un campo con hijo anotado).
+      if (el.querySelector('[data-slot]')) {
+        for (const child of Array.from(el.childNodes)) {
+          if (child.nodeType === Node.TEXT_NODE) child.remove()
+        }
+
+        continue
+      }
+
+      el.innerHTML = ''
+      continue
+    }
 
     if (type === 'string') {
       el.textContent = String(value)
@@ -327,96 +579,7 @@ const fillDom = (instructions: FillInstruction[]): string[] => {
         continue
       }
 
-      // Se recorre el PLAN además del objeto: un campo DERIVADO (la escala de la barra before/after)
-      // no tiene valor propio —se calcula—, así que iterar sólo el objeto lo dejaría fuera. Es la
-      // misma regla que ya regía en los arrays: **objeto y array honran el mismo contrato de campo**.
-      const record = value as Record<string, unknown>
-      const fieldNames = new Set([...Object.keys(record), ...Object.keys(instruction.fieldPlan ?? {})])
-
-      for (const fieldName of fieldNames) {
-        const fieldValue = record[fieldName]
-        const directive = instruction.fieldPlan?.[fieldName] ?? { mode: 'text' as const }
-
-        // Evidencia dentro de un objeto (el `evidenceRef` de un KPI): se exige, pero NUNCA se pinta.
-        // La fuente de una cifra no tiene por qué existir en el HTML — no es copy para el comité.
-        if (directive.mode === 'skip') continue
-
-        if (directive.mode === 'text' && (fieldValue === undefined || fieldValue === null || fieldValue === '')) {
-          continue
-        }
-
-        if (directive.mode === 'apply') {
-          for (const effect of directive.effects) {
-            const target = effect.selector === ':self' ? el : el.querySelector(effect.selector)
-
-            if (!target) {
-              problems.push(
-                `${instruction.selector}: el resolver de "${fieldName}" apunta a "${effect.selector}", que no existe en el HTML.`
-              )
-
-              continue
-            }
-
-            if (effect.attr) target.setAttribute(effect.attr, String(effect.value))
-
-            if (effect.remove) {
-              target.remove()
-              continue
-            }
-
-            if (effect.styleProp) (target as HTMLElement).style.setProperty(effect.styleProp, String(effect.styleValue))
-            if (effect.toneGroup) for (const cls of effect.toneGroup) target.classList.remove(cls)
-            if (effect.toneClass) target.classList.add(effect.toneClass)
-            if (effect.asText) target.textContent = String(effect.value)
-          }
-
-          continue
-        }
-
-        const field = el.querySelector(`[data-slot-field="${fieldName}"]`)
-
-        if (!field) {
-          problems.push(
-            `${instruction.selector}: el campo "${fieldName}" no tiene [data-slot-field="${fieldName}"] ` +
-              `en el HTML. Sin ancla, quedaría el valor de ejemplo del prototipo (un KPI falso en la lámina).`
-          )
-
-          continue
-        }
-
-        // Un campo con valor ARRAY dentro de un objeto (los `paragraphs` de una columna) es una LISTA
-        // REPETIDA, no un texto: su ancla es el CONTENEDOR y su primer hijo es el blueprint del item.
-        // Pasarlo por `String(array)` —lo que hacía antes— aplanaba los `<p>` del diseñador en un
-        // solo bloque y dejaba las comas del join a la vista. Es la misma semántica de un slot array:
-        // el markup del item vive en el HTML.
-        if (Array.isArray(fieldValue)) {
-          const blueprint = field.firstElementChild
-
-          if (!blueprint) {
-            problems.push(
-              `${instruction.selector}: el campo "${fieldName}" es una lista, pero su ancla no tiene un item-template en el HTML.`
-            )
-
-            continue
-          }
-
-          const itemTemplate = blueprint.cloneNode(true) as Element
-
-          field.innerHTML = ''
-
-          for (const entry of fieldValue) {
-            const node = itemTemplate.cloneNode(true) as Element
-
-            node.innerHTML = sanitize(String(entry))
-            field.appendChild(node)
-          }
-
-          continue
-        }
-
-        field.innerHTML = sanitize(String(fieldValue))
-      }
-
+      fillRecordFields(el, value as Record<string, unknown>, instruction, '', instruction.selector)
       continue
     }
 
@@ -534,150 +697,27 @@ const fillDom = (instructions: FillInstruction[]): string[] => {
       host.innerHTML = ''
       host.append(...fixedChildren)
 
-      for (const item of items) {
+      items.forEach((item, index) => {
         const node = blueprint.cloneNode(true) as Element
 
         if (typeof item === 'string') {
           const field = node.querySelector('[data-slot-field]') ?? node
 
           field.innerHTML = sanitize(item)
-        } else if (item && typeof item === 'object') {
-          const index = items.indexOf(item)
-          const record = item as Record<string, unknown>
-
-          // Se recorre el PLAN, no los campos del item: los resolvers derivados (el ordinal de una
-          // fase, la altura de una barra) no tienen valor propio en el item — se calculan desde el
-          // índice o desde la serie. Iterar el item los dejaría fuera.
-          const planned = Object.keys(instruction.fieldPlan ?? {})
-            .filter(key => key.startsWith(`${index}.`))
-            .map(key => key.slice(String(index).length + 1))
-
-          const fieldNames = new Set([...Object.keys(record), ...planned])
-
-          for (const fieldName of fieldNames) {
-            const fieldValue = record[fieldName]
-            const directive = instruction.fieldPlan?.[`${index}.${fieldName}`] ?? { mode: 'text' }
-
-            // Un campo sin valor y sin resolver no se escribe (lo limpia el barrido de abajo).
-            if (directive.mode === 'text' && (fieldValue === undefined || fieldValue === null || fieldValue === '')) {
-              continue
-            }
-
-            // `validation-only` (ej. evidenceRef): se exige, pero NUNCA se pinta. Es munición
-            // interna — la fuente de una cifra no es copy para el comité.
-            if (directive.mode === 'skip') continue
-
-            if (directive.mode === 'apply') {
-              for (const effect of directive.effects) {
-                const target =
-                  effect.selector === ':self'
-                    ? node
-                    : effect.selector === ':field'
-                      ? // El nodo del propio campo. Escribir texto en `:self` (la raíz del item)
-                        // borraría todos los hijos y con ellos las anclas del resto de los campos.
-                        node.querySelector(`[data-slot-field="${fieldName}"]`)
-                      : node.querySelector(effect.selector)
-
-                if (!target) {
-                  problems.push(
-                    `${instruction.selector} item ${index}: el resolver de "${fieldName}" apunta a ` +
-                      `"${effect.selector}", que no existe en el item del HTML.`
-                  )
-
-                  continue
-                }
-
-                if (effect.attr && effect.value !== undefined) {
-                  target.setAttribute(effect.attr, effect.value)
-                }
-
-                if (effect.remove) {
-                  target.remove()
-                  continue
-                }
-
-                // Geometría: la barra se DERIVA del dato (ver el comentario en resolvers.ts —
-                // una barra que no se recalcula es fabricación gráfica).
-                if (effect.styleProp && effect.styleValue !== undefined) {
-                  ;(target as HTMLElement).style.setProperty(effect.styleProp, effect.styleValue)
-                }
-
-                if (effect.asText && effect.value !== undefined) {
-                  target.textContent = effect.value
-                }
-
-                // El tono es excluyente. Se limpia el grupo SIEMPRE (aunque no venga un tono nuevo):
-                // el blueprint puede traer la clase del item destacado, y sin esta limpieza TODOS los
-                // items salen marcados como "el propuesto" — que en la lámina económica es una
-                // afirmación falsa sobre cuál plan se está ofreciendo.
-                for (const other of effect.toneGroup ?? []) {
-                  target.classList.remove(other)
-                }
-
-                if (effect.toneClass) {
-                  target.classList.add(effect.toneClass)
-                }
-              }
-
-              continue
-            }
-
-            const field = node.querySelector(`[data-slot-field="${fieldName}"]`)
-
-            if (!field) {
-              // ⚠️ Fallo RUIDOSO a propósito. Si el campo no tiene ancla en el HTML, el item se
-              // renderizaría con el COPY DE EJEMPLO del blueprint — un deck que sale al cliente con
-              // el relleno del prototipo y nadie se entera. Es el peor fallo posible acá.
-              problems.push(
-                `${instruction.selector} item ${index}: el campo "${fieldName}" no tiene ` +
-                  `[data-slot-field="${fieldName}"] en el HTML de la plantilla. ` +
-                  `Sin ancla, quedaría el contenido de ejemplo del prototipo.`
-              )
-
-              continue
-            }
-
-            // Un campo puede CONTENER a otro (`<p field="label">Base <span field="status">…</span></p>`).
-            // Escribirlo con innerHTML borraría al hijo anotado y el status desaparecería. Cuando eso
-            // pasa, sólo se reemplazan los nodos de TEXTO propios y los hijos anotados quedan intactos.
-            const nested = field.querySelector('[data-slot-field]')
-
-            if (nested) {
-              for (const child of Array.from(field.childNodes)) {
-                if (child.nodeType === Node.TEXT_NODE) child.remove()
-              }
-
-              field.insertBefore(document.createTextNode(String(fieldValue) + ' '), field.firstChild)
-              continue
-            }
-
-            field.innerHTML = sanitize(String(fieldValue))
-          }
-
-          // Un campo opcional que no vino se ELIMINA del DOM (no se deja el placeholder del blueprint).
-          //
-          // ⚠️ Pero un campo **DERIVADO** (el ordinal de un paso, la escala de una barra) tampoco
-          // "viene" del autor —lo escribe el resolver— y borrarlo destruye chrome legítimo. Es lo que
-          // hacía desaparecer los números de `ProcessStepsFull`: el resolver escribía "01", y el
-          // barrido inmediatamente le quitaba el nodo.
-          //
-          // La regla correcta: **un campo está provisto si lo dio el AUTOR o si lo derivó un
-          // RESOLVER.** Vale para cualquier plantilla con chrome derivado, no sólo ésta.
-          for (const field of Array.from(node.querySelectorAll('[data-slot-field]'))) {
-            const name = field.getAttribute('data-slot-field')!
-            const authored = (item as Record<string, unknown>)[name]
-            const derived = instruction.fieldPlan?.[`${index}.${name}`] !== undefined
-
-            if (derived) continue
-
-            if (authored === undefined || authored === null || authored === '') {
-              field.remove()
-            }
-          }
+        } else if (item && typeof item === 'object' && !Array.isArray(item)) {
+          fillRecordFields(
+            node,
+            item as Record<string, unknown>,
+            instruction,
+            String(index),
+            `${instruction.selector} item ${index}`
+          )
+        } else {
+          problems.push(`el slot array "${instruction.selector}" trae un item no soportado.`)
         }
 
         host.appendChild(node)
-      }
+      })
 
       continue
     }
@@ -712,7 +752,8 @@ export const fillSlide = async (
   templateHtmlPath: string,
   slide: SlideSpec,
   contract: TemplateContract,
-  runtime: CatalogRenderRuntime
+  runtime: CatalogRenderRuntime,
+  deckPlan?: DeckPlan
 ): Promise<void> => {
   // esbuild/tsx compila las funciones con `keepNames`, que las envuelve en un helper `__name`.
   // Ese helper existe en el bundle de Node, NO dentro del browser — y `page.evaluate` serializa la
@@ -739,7 +780,7 @@ export const fillSlide = async (
 
   // Layout derivado post-fill del catálogo (los conectores de TimelineFull no pueden ser un slot
   // autorado: labels, rombos y conectores deben salir del MISMO schedule o podrían discrepar).
-  await runtime.layoutHooks?.[slide.template]?.(page, slide)
+  await runtime.layoutHooks?.[slide.template]?.(page, slide, deckPlan)
 
   // Las fuentes pueden re-layoutear tras escribir el copy: esperar de nuevo evita capturar un frame
   // con el fallback de sistema (un deck con la tipografía equivocada es un deck fuera de marca).
@@ -774,17 +815,109 @@ export const fillSlide = async (
  * impresión a merced de cómo Chromium pagina iframes y de que las fuentes de cada frame estén listas
  * a tiempo. Imprimir + mergear no tiene ninguno de esos modos de falla.
  */
-export const mergeSlidePdfs = async (slidePdfPaths: string[], outPath: string): Promise<void> => {
+/**
+ * Sentinel de link INTERNO del deck (lo emite el resolver `chapter-anchor` del catálogo): Chromium
+ * sólo imprime anotaciones para URLs absolutas, así que el salto de agenda viaja como URI y el merge
+ * lo convierte en GoTo a la página real. Si el `slideId` no existe en el plan, la anotación se
+ * DESCARTA — el sentinel jamás puede llegar al PDF entregado.
+ */
+const INTERNAL_LINK_SENTINEL = 'https://deck.internal/'
+
+export const mergeSlidePdfs = async (
+  slidePdfPaths: string[],
+  outPath: string,
+  slideIds: string[] = []
+): Promise<void> => {
   const deck = await PDFDocument.create()
 
-  for (const slidePath of slidePdfPaths) {
+  // ⚠️ `copyPages` DESCARTA las anotaciones (medido: un slide con /URI llega al merge con 0).
+  // Los enlaces del deck son su valor probatorio —la Radiografía y el informe del grader viven en
+  // la web para que el comité los verifique solo—, así que se re-crean a mano en DOS pasadas:
+  // primero se agregan TODAS las páginas (un GoTo de la agenda necesita el ref de una página que
+  // aún no existe al copiar la lámina 2), después se materializan las anotaciones.
+  const pending: { pageIndex: number; uri: string; rect: number[] }[] = []
+
+  for (const [slideIndex, slidePath] of slidePdfPaths.entries()) {
     const bytes = await fs.readFile(slidePath)
     const slideDoc = await PDFDocument.load(bytes)
     const pages = await deck.copyPages(slideDoc, slideDoc.getPageIndices())
 
-    for (const page of pages) {
+    for (const [index, page] of pages.entries()) {
       deck.addPage(page)
+
+      const sourceAnnots = slideDoc.getPage(index).node.Annots()
+
+      if (!sourceAnnots) continue
+
+      for (let i = 0; i < sourceAnnots.size(); i++) {
+        const annot = sourceAnnots.lookup(i)
+
+        if (!(annot instanceof PDFDict)) continue
+        if (annot.lookup(PDFName.of('Subtype')) !== PDFName.of('Link')) continue
+
+        const action = annot.lookup(PDFName.of('A'))
+
+        if (!(action instanceof PDFDict)) continue
+        if (action.lookup(PDFName.of('S')) !== PDFName.of('URI')) continue
+
+        const uri = action.lookup(PDFName.of('URI'))
+        const rect = annot.lookup(PDFName.of('Rect'))
+
+        if (!(uri instanceof PDFString) || !(rect instanceof PDFArray)) continue
+        if (!uri.decodeText().startsWith('https://')) continue
+
+        pending.push({
+          pageIndex: slideIndex,
+          uri: uri.decodeText(),
+          rect: rect.asArray().map(value => (value instanceof PDFNumber ? value.asNumber() : 0))
+        })
+      }
     }
+  }
+
+  // Segunda pasada: URI externo se porta tal cual; el sentinel interno se convierte en GoTo a la
+  // página del `slideId` (índice en el plan = índice de página: cada lámina es UNA página).
+  const annotsByPage = new Map<number, ReturnType<typeof deck.context.register>[]>()
+
+  for (const { pageIndex, uri, rect } of pending) {
+    let ref
+
+    if (uri.startsWith(INTERNAL_LINK_SENTINEL)) {
+      const targetId = uri.slice(INTERNAL_LINK_SENTINEL.length)
+      const targetIndex = slideIds.indexOf(targetId)
+
+      // Fail-closed: sin destino real no hay anotación — un sentinel nunca se entrega como URL.
+      if (targetIndex < 0 || targetIndex >= deck.getPageCount()) continue
+
+      ref = deck.context.register(
+        deck.context.obj({
+          Type: 'Annot',
+          Subtype: 'Link',
+          Rect: rect,
+          Border: [0, 0, 0],
+          A: { Type: 'Action', S: 'GoTo', D: deck.context.obj([deck.getPage(targetIndex).ref, 'Fit']) }
+        })
+      )
+    } else {
+      ref = deck.context.register(
+        deck.context.obj({
+          Type: 'Annot',
+          Subtype: 'Link',
+          Rect: rect,
+          Border: [0, 0, 0],
+          A: { Type: 'Action', S: 'URI', URI: PDFString.of(uri) }
+        })
+      )
+    }
+
+    const refs = annotsByPage.get(pageIndex) ?? []
+
+    refs.push(ref)
+    annotsByPage.set(pageIndex, refs)
+  }
+
+  for (const [pageIndex, refs] of annotsByPage) {
+    deck.getPage(pageIndex).node.set(PDFName.of('Annots'), deck.context.obj(refs))
   }
 
   await fs.writeFile(outPath, await deck.save())
@@ -931,7 +1064,8 @@ export const renderSlide = async (
   slide: SlideSpec,
   contract: TemplateContract,
   target: RenderTarget,
-  runtime: CatalogRenderRuntime
+  runtime: CatalogRenderRuntime,
+  deckPlan?: DeckPlan
 ): Promise<void> => {
   const page = await browser.newPage({
     viewport: contract.viewport,
@@ -940,7 +1074,7 @@ export const renderSlide = async (
   })
 
   try {
-    await fillSlide(page, templateHtmlPath, slide, contract, runtime)
+    await fillSlide(page, templateHtmlPath, slide, contract, runtime, deckPlan)
 
     // Antes de imprimir NADA: si el copy no cabe, se rechaza. Un PDF con una palabra cortada es
     // peor que un fallo — se ve terminado, y nadie lo revisa dos veces.

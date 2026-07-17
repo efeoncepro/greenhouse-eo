@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="es"><head>
+  <link rel="stylesheet" href="deck-fonts.css">
+  <link rel="stylesheet" href="deck-tokens.css">
+  <link rel="stylesheet" href="deck-mold.css">
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="deck-signature.css">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:var(--axis-deck-type-text); overflow:hidden; }
+
+  :root { --safe-x:132px; --teal:var(--axis-deck-teal-500); --violet:var(--axis-deck-violet-550); }
+
+  .slide {
+    position:relative; color:var(--axis-ppt-neutral-50);
+    background:
+      radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .065) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(58% 66% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .43) 0%, rgba(var(--axis-deck-teal-550-rgb), .12) 44%, transparent 72%),
+      radial-gradient(50% 64% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .44) 0%, rgba(var(--axis-deck-violet-550-rgb), .13) 47%, transparent 76%),
+      linear-gradient(226deg, var(--axis-deck-navy-800) 0%, var(--axis-deck-navy-880) 44%, var(--axis-deck-navy-980) 100%);
+  }
+
+  .header { position:absolute; top:64px; left:var(--safe-x); right:var(--safe-x); display:grid; grid-template-columns:minmax(0, 1fr) 430px; gap:58px; align-items:end; }
+  .section-label { margin-bottom:13px; color:var(--teal); font-size:17px; font-weight:700; letter-spacing:0; line-height:1; text-transform:uppercase; }
+  .title { max-width:1110px; font-family:var(--axis-deck-type-display); font-size:50px; font-weight:600; letter-spacing:0; line-height:1.02; }
+  .title em { color:var(--teal); font-style:italic; }
+  .lead { align-self:end; padding:0 0 4px 28px; border-left:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .30); color:rgba(var(--axis-ppt-neutral-50-rgb), .76); font-size:17px; line-height:1.37; }
+
+  .workspace {
+    position:absolute; top:244px; left:var(--safe-x); right:var(--safe-x); height:716px; overflow:hidden;
+    border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .24); border-radius:24px;
+    background:rgba(var(--axis-deck-navy-990-rgb), .88);
+    box-shadow:0 28px 68px rgba(var(--axis-deck-navy-990-rgb), .34), inset 0 1px 0 rgba(var(--axis-ppt-neutral-50-rgb), .12);
+  }
+  .workspace::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg, var(--teal), rgba(var(--axis-deck-teal-300-rgb), .82) 48%, var(--violet)); }
+
+  .workspace-bar { height:64px; display:flex; align-items:center; gap:16px; padding:0 22px; border-bottom:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .14); background:rgba(var(--axis-deck-navy-910-rgb), .82); }
+  .window-dots { display:flex; gap:7px; margin-right:2px; }
+  .window-dots i { width:8px; height:8px; border-radius:50%; background:rgba(var(--axis-ppt-neutral-50-rgb), .26); }
+  .brand-logo { width:118px; height:30px; object-fit:contain; object-position:left center; }
+  .bar-separator { width:1px; height:28px; background:rgba(var(--axis-ppt-neutral-50-rgb), .20); }
+  .workspace-name { color:rgba(var(--axis-ppt-neutral-50-rgb), .86); font-size:15px; font-weight:700; letter-spacing:0; }
+  .live-chip { margin-left:auto; display:flex; align-items:center; gap:9px; padding:9px 13px; border:1px solid rgba(var(--axis-deck-teal-200-rgb), .28); border-radius:999px; background:rgba(var(--axis-deck-teal-500-rgb), .10); color:var(--axis-deck-teal-100); font-size:12px; font-weight:700; line-height:1; }
+  .live-dot { position:relative; width:8px; height:8px; border-radius:50%; background:var(--teal); box-shadow:0 0 14px rgba(var(--axis-deck-teal-300-rgb), .72); }
+  .live-dot::after { content:''; position:absolute; inset:-4px; border:1px solid rgba(var(--axis-deck-teal-300-rgb), .38); border-radius:50%; }
+
+  .workspace-body { height:536px; display:grid; grid-template-columns:330px minmax(0, 1fr) 404px; }
+  .conversation, .review { min-width:0; background:rgba(var(--axis-deck-navy-950-rgb), .68); }
+  .conversation { border-right:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .13); }
+  .review { border-left:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .13); }
+
+  .pane-head { min-height:72px; display:flex; align-items:center; gap:11px; padding:14px 18px; border-bottom:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .12); }
+  .logo-mark { width:34px; height:34px; flex:0 0 auto; display:grid; place-items:center; border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .18); border-radius:10px; overflow:hidden; }
+  .logo-mark[data-logo-plate='light'] { background:var(--axis-ppt-neutral-50); border-color:rgba(var(--axis-ppt-neutral-50-rgb), .76); }
+  .logo-mark[data-logo-plate='dark'] { background:var(--axis-deck-navy-990); }
+  .logo-mark[data-logo-plate='brand-dark'] { background:var(--axis-deck-navy-990); border-color:rgba(var(--tool-logo-accent-rgb), .48); }
+  .tool-logo { width:22px; height:22px; object-fit:contain; }
+  .pane-copy { min-width:0; }
+  .pane-label { color:var(--axis-ppt-neutral-50); font-size:14px; font-weight:750; line-height:1.1; }
+  .pane-sub { margin-top:4px; color:rgba(var(--axis-ppt-neutral-50-rgb), .54); font-size:11px; font-weight:600; line-height:1.1; }
+  .cadence { margin-left:auto; max-width:104px; color:rgba(var(--axis-ppt-neutral-50-rgb), .54); font-size:10px; font-weight:650; line-height:1.25; text-align:right; }
+
+  .messages { height:398px; padding:16px 16px 10px; }
+  .message-list { display:flex; flex-direction:column; gap:11px; }
+  .message { position:relative; min-width:0; padding:12px 12px 12px 44px; border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .10); border-radius:12px; background:rgba(var(--axis-ppt-neutral-50-rgb), .045); }
+  .message-avatar { position:absolute; top:11px; left:10px; width:25px; height:25px; display:grid; place-items:center; border-radius:8px; background:linear-gradient(145deg, rgba(var(--axis-deck-teal-300-rgb), .34), rgba(var(--axis-deck-violet-550-rgb), .32)); color:var(--axis-ppt-neutral-50); font-size:9px; font-weight:800; }
+  .message-meta { display:flex; align-items:center; gap:7px; }
+  .message-author { color:rgba(var(--axis-ppt-neutral-50-rgb), .88); font-size:11px; font-weight:750; }
+  .message-time { margin-left:auto; color:rgba(var(--axis-ppt-neutral-50-rgb), .40); font-size:9px; }
+  .message-text { margin-top:7px; color:rgba(var(--axis-ppt-neutral-50-rgb), .68); font-size:11px; line-height:1.34; }
+  .composer { height:48px; margin:0 16px; display:flex; align-items:center; padding:0 13px; border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .13); border-radius:11px; color:rgba(var(--axis-ppt-neutral-50-rgb), .34); font-size:10px; }
+  .composer::after { content:'+'; margin-left:auto; width:22px; height:22px; display:grid; place-items:center; border-radius:7px; background:rgba(var(--axis-ppt-neutral-50-rgb), .08); color:rgba(var(--axis-ppt-neutral-50-rgb), .58); font-size:15px; }
+
+  .document-lane { min-width:0; padding:16px; background:linear-gradient(180deg, rgba(var(--axis-deck-blue-500-rgb), .14), rgba(var(--axis-deck-navy-990-rgb), .10)); }
+  .document { position:relative; height:504px; overflow:hidden; border-radius:16px; background:var(--axis-ppt-neutral-50); color:var(--axis-deck-navy-950); box-shadow:0 16px 40px rgba(var(--axis-deck-navy-990-rgb), .24); }
+  .document-head { display:flex; align-items:center; gap:10px; padding:15px 19px; border-bottom:1px solid rgba(var(--axis-deck-navy-900-rgb), .10); }
+  .document-head .logo-mark { width:30px; height:30px; border-radius:9px; }
+  .document-head .tool-logo { width:19px; height:19px; }
+  .document-kicker { color:rgba(var(--axis-deck-navy-950-rgb), .58); font-size:10px; font-weight:750; text-transform:uppercase; }
+  .document-status { margin-left:auto; padding:7px 10px; border-radius:999px; background:rgba(var(--axis-deck-teal-500-rgb), .14); color:var(--axis-deck-teal-750); font-size:9px; font-weight:800; text-transform:uppercase; }
+  .document-content { padding:18px 20px 16px; }
+  .article-title { max-width:630px; font-family:var(--axis-deck-type-display); font-size:25px; font-weight:650; letter-spacing:0; line-height:1.08; }
+  .article-meta { display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; }
+  .meta-chip { padding:6px 8px; border:1px solid rgba(var(--axis-deck-navy-900-rgb), .10); border-radius:7px; background:rgba(var(--axis-deck-navy-900-rgb), .035); color:rgba(var(--axis-deck-navy-950-rgb), .62); font-size:9px; font-weight:650; }
+  .research-strip { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:8px; margin-top:15px; }
+  .research-item { min-width:0; padding:9px 10px; border-left:3px solid var(--teal); background:rgba(var(--axis-deck-teal-500-rgb), .08); }
+  .research-label { color:rgba(var(--axis-deck-navy-950-rgb), .46); font-size:8px; font-weight:800; text-transform:uppercase; }
+  .research-value { margin-top:4px; overflow:hidden; color:var(--axis-deck-navy-950); font-size:10px; font-weight:700; line-height:1.2; white-space:nowrap; text-overflow:ellipsis; }
+  .excerpt { margin-top:14px; color:rgba(var(--axis-deck-navy-950-rgb), .66); font-size:11px; line-height:1.42; }
+  .document-grid { display:grid; grid-template-columns:minmax(0, 1.36fr) minmax(190px, .72fr); gap:16px; margin-top:13px; }
+  .block-label { margin-bottom:8px; color:rgba(var(--axis-deck-navy-950-rgb), .46); font-size:8px; font-weight:800; text-transform:uppercase; }
+  .outline-list { display:flex; flex-direction:column; gap:6px; }
+  .outline-item { min-width:0; display:grid; grid-template-columns:28px minmax(0, 1fr); gap:8px; align-items:center; }
+  .outline-tag { color:var(--axis-deck-teal-750); font-size:8px; font-weight:850; }
+  .outline-title { overflow:hidden; color:rgba(var(--axis-deck-navy-950-rgb), .74); font-size:9px; font-weight:650; white-space:nowrap; text-overflow:ellipsis; }
+  .checklist { display:flex; flex-direction:column; gap:6px; }
+  .check-item { min-width:0; display:flex; align-items:center; gap:7px; padding-bottom:6px; border-bottom:1px solid rgba(var(--axis-deck-navy-900-rgb), .08); }
+  .check-dot { width:14px; height:14px; flex:0 0 auto; display:grid; place-items:center; border-radius:5px; background:rgba(var(--axis-deck-teal-500-rgb), .14); color:var(--axis-deck-teal-750); font-size:8px; font-weight:900; }
+  .check-label { min-width:0; flex:1; overflow:hidden; color:rgba(var(--axis-deck-navy-950-rgb), .68); font-size:8px; font-weight:650; white-space:nowrap; text-overflow:ellipsis; }
+  .check-state { color:rgba(var(--axis-deck-navy-950-rgb), .42); font-size:7px; font-weight:750; text-transform:uppercase; }
+  .inline-comment { position:absolute; right:18px; bottom:14px; max-width:310px; display:flex; align-items:center; gap:8px; padding:8px 10px; border:1px solid rgba(var(--axis-deck-violet-550-rgb), .18); border-radius:10px; background:var(--axis-ppt-neutral-50); box-shadow:0 8px 22px rgba(var(--axis-deck-navy-990-rgb), .13); }
+  .comment-avatar { width:23px; height:23px; flex:0 0 auto; display:grid; place-items:center; border-radius:8px; background:rgba(var(--axis-deck-violet-550-rgb), .12); color:var(--axis-deck-violet-650); font-size:8px; font-weight:850; }
+  .comment-text { color:rgba(var(--axis-deck-navy-950-rgb), .66); font-size:8px; font-weight:650; line-height:1.25; }
+
+  .review-head-meta { margin-left:auto; text-align:right; }
+  .review-version { color:var(--axis-deck-teal-100); font-size:10px; font-weight:800; }
+  .review-status { margin-top:4px; color:rgba(var(--axis-ppt-neutral-50-rgb), .46); font-size:9px; font-weight:650; }
+  .asset-stage { position:relative; height:230px; margin:16px 16px 0; overflow:hidden; border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .15); border-radius:14px; background:rgba(var(--axis-ppt-neutral-50-rgb), .06); }
+  .review-asset { width:100%; height:100%; display:block; object-fit:cover; object-position:left 24%; filter:saturate(.92) contrast(1.02); }
+  .asset-shade { position:absolute; inset:0; background:linear-gradient(180deg, transparent 48%, rgba(var(--axis-deck-navy-990-rgb), .70)); pointer-events:none; }
+  .asset-title { position:absolute; left:13px; right:13px; bottom:12px; color:var(--axis-ppt-neutral-50); font-size:11px; font-weight:750; line-height:1.25; text-shadow:0 2px 10px rgba(var(--axis-deck-navy-990-rgb), .7); }
+  .asset-pin { position:absolute; width:25px; height:25px; display:grid; place-items:center; border:2px solid var(--axis-ppt-neutral-50); border-radius:50% 50% 50% 5px; background:var(--violet); color:var(--axis-ppt-neutral-50); font-size:8px; font-weight:850; box-shadow:0 8px 18px rgba(var(--axis-deck-navy-990-rgb), .36); }
+  .asset-pin.one { top:52px; left:86px; }
+  .asset-pin.two { top:112px; right:62px; }
+  .review-comments { padding:13px 16px 0; }
+  .review-list { display:flex; flex-direction:column; gap:8px; }
+  .review-comment { min-width:0; display:grid; grid-template-columns:26px minmax(0, 1fr); gap:9px; padding:9px 10px; border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .10); border-radius:11px; background:rgba(var(--axis-ppt-neutral-50-rgb), .04); }
+  .review-pin { width:24px; height:24px; display:grid; place-items:center; border-radius:8px; background:rgba(var(--axis-deck-violet-550-rgb), .24); color:var(--axis-deck-violet-50); font-size:8px; font-weight:850; }
+  .review-author { color:rgba(var(--axis-ppt-neutral-50-rgb), .82); font-size:9px; font-weight:750; }
+  .review-message { margin-top:4px; color:rgba(var(--axis-ppt-neutral-50-rgb), .56); font-size:9px; line-height:1.28; }
+
+  .workflow { height:116px; padding:18px 22px 15px; border-top:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .14); background:rgba(var(--axis-deck-navy-910-rgb), .74); }
+  .workflow-label { margin-bottom:13px; color:rgba(var(--axis-ppt-neutral-50-rgb), .42); font-size:9px; font-weight:800; text-transform:uppercase; }
+  .workflow-list { position:relative; display:grid; grid-template-columns:repeat(6, minmax(0, 1fr)); gap:10px; }
+  .workflow-list::before { content:''; position:absolute; top:10px; left:16px; right:16px; height:2px; background:rgba(var(--axis-ppt-neutral-50-rgb), .10); }
+  .workflow-step { position:relative; z-index:1; min-width:0; display:grid; grid-template-columns:22px minmax(0, 1fr); gap:7px; align-items:center; }
+  .workflow-step.done::after { content:''; position:absolute; z-index:-1; top:10px; left:22px; right:-10px; height:2px; background:linear-gradient(90deg, rgba(var(--axis-deck-teal-300-rgb), .76), rgba(var(--axis-deck-teal-300-rgb), .34)); }
+  .workflow-index { width:22px; height:22px; display:grid; place-items:center; border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .20); border-radius:7px; background:var(--axis-deck-navy-900); color:rgba(var(--axis-ppt-neutral-50-rgb), .46); font-size:7px; font-weight:850; }
+  .workflow-title { overflow:hidden; color:rgba(var(--axis-ppt-neutral-50-rgb), .48); font-size:9px; font-weight:700; line-height:1.15; white-space:nowrap; text-overflow:ellipsis; }
+  .workflow-step.done .workflow-index { border-color:rgba(var(--axis-deck-teal-300-rgb), .42); background:rgba(var(--axis-deck-teal-500-rgb), .16); color:var(--axis-deck-teal-100); }
+  .workflow-step.done .workflow-title { color:rgba(var(--axis-ppt-neutral-50-rgb), .70); }
+  .workflow-step.active .workflow-index { border-color:rgba(var(--axis-deck-violet-150-rgb), .72); background:var(--violet); color:var(--axis-ppt-neutral-50); box-shadow:0 0 20px rgba(var(--axis-deck-violet-550-rgb), .45); }
+  .workflow-step.active .workflow-title { color:var(--axis-ppt-neutral-50); }
+</style></head>
+<body>
+  <main class="slide" data-template="DailyOpsHubFull" data-url-bubble-backdrop>
+    <header class="header">
+      <div>
+        <p class="section-label" data-slot="sectionLabel" data-slot-type="string">OPERACIÓN COMPARTIDA</p>
+        <h1 class="title" data-slot="title" data-slot-type="rich-string" data-slot-required="true">El trabajo diario queda <em>visible y versionado</em> desde un solo hub</h1>
+      </div>
+      <p class="lead" data-slot="lead" data-slot-type="string" data-slot-required="true">Conversaciones, research, redacción y revisión visual avanzan sobre el mismo artículo.</p>
+    </header>
+
+    <section class="workspace">
+      <div class="workspace-bar">
+        <div class="window-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+        <img class="brand-logo" data-slot="brandLogo" src="assets/brand/logo-negative.svg" alt="Efeonce">
+        <span class="bar-separator" aria-hidden="true"></span>
+        <span class="workspace-name" data-slot="workspaceName" data-slot-type="string">Content Hub editorial</span>
+        <span class="live-chip"><i class="live-dot" aria-hidden="true"></i><span data-slot="liveStatus" data-slot-type="string">Operación compartida</span></span>
+      </div>
+
+      <div class="workspace-body">
+        <aside class="conversation" data-slot="conversation" data-slot-type="object">
+          <div class="pane-head">
+            <span class="logo-mark" data-logo-plate="light"><img class="tool-logo" data-slot-field="tool" src="assets/tools/teams-isotype.svg" alt="Microsoft Teams"></span>
+            <div class="pane-copy">
+              <p class="pane-label" data-slot-field="toolName">Teams</p>
+              <p class="pane-sub" data-slot-field="channel">#proyecto-editorial</p>
+            </div>
+            <p class="cadence" data-slot-field="cadence">Ritual semanal</p>
+          </div>
+          <div class="messages" data-slot-field="messages"><div class="message-list" data-slot-items>
+            <article class="message">
+              <span class="message-avatar" data-slot-field="initials">EO</span>
+              <div class="message-meta"><span class="message-author" data-slot-field="author">Equipo Efeonce</span><span class="message-time" data-slot-field="time">09:42</span></div>
+              <p class="message-text" data-slot-field="message">La estructura SEO/AEO ya está lista para revisión.</p>
+            </article>
+          </div></div>
+          <div class="composer" data-slot-field="composerLabel">Responder en el canal</div>
+        </aside>
+
+        <section class="document-lane" data-slot="workspace" data-slot-type="object">
+          <article class="document">
+            <div class="document-head">
+              <span class="logo-mark" data-logo-plate="light"><img class="tool-logo" data-slot-field="tool" src="assets/tools/notion-isotype.svg" alt="Notion"></span>
+              <span class="document-kicker" data-slot-field="toolName">Notion Content Hub</span>
+              <span class="document-status" data-slot-field="status">En revisión</span>
+            </div>
+            <div class="document-content">
+              <h2 class="article-title" data-slot-field="articleTitle">Título del artículo en desarrollo</h2>
+              <div class="article-meta">
+                <span class="meta-chip" data-slot-field="version">v03</span>
+                <span class="meta-chip" data-slot-field="owner">Owner · Equipo editorial</span>
+                <span class="meta-chip" data-slot-field="due">Entrega · esta semana</span>
+              </div>
+              <div class="research-strip">
+                <div class="research-item"><p class="research-label">Keyword principal</p><p class="research-value" data-slot-field="keyword">keyword principal</p></div>
+                <div class="research-item"><p class="research-label">Intención</p><p class="research-value" data-slot-field="intent">intención de búsqueda</p></div>
+              </div>
+              <p class="excerpt" data-slot-field="excerpt">El research, la estructura y el texto conviven dentro del mismo artefacto de trabajo.</p>
+              <div class="document-grid">
+                <section>
+                  <p class="block-label">Estructura editorial</p>
+                  <div data-slot-field="outline"><div class="outline-list" data-slot-items>
+                    <div class="outline-item"><span class="outline-tag" data-slot-field="tag">H2</span><span class="outline-title" data-slot-field="title">Pregunta que responde la sección</span></div>
+                  </div></div>
+                </section>
+                <section>
+                  <p class="block-label">SEO / AEO</p>
+                  <div data-slot-field="checklist"><div class="checklist" data-slot-items>
+                    <div class="check-item"><span class="check-dot">✓</span><span class="check-label" data-slot-field="label">Schema definido</span><span class="check-state" data-slot-field="state">Listo</span></div>
+                  </div></div>
+                </section>
+              </div>
+              <div class="inline-comment"><span class="comment-avatar" data-slot-field="commentInitials">CL</span><span class="comment-text" data-slot-field="commentText">Comentario del cliente sobre el mismo artículo.</span></div>
+            </div>
+          </article>
+        </section>
+
+        <aside class="review" data-slot="review" data-slot-type="object">
+          <div class="pane-head">
+            <span class="logo-mark" data-logo-plate="light"><img class="tool-logo" data-slot-field="tool" src="assets/tools/frameio-isotype.svg" alt="Frame.io"></span>
+            <div class="pane-copy">
+              <p class="pane-label" data-slot-field="toolName">Frame.io</p>
+              <p class="pane-sub">Revisión visual</p>
+            </div>
+            <div class="review-head-meta"><p class="review-version" data-slot-field="version">v03</p><p class="review-status" data-slot-field="status">2 comentarios</p></div>
+          </div>
+          <div class="asset-stage">
+            <img class="review-asset" data-slot="reviewAsset" data-slot-type="asset" data-slot-required="true" src="assets/product/greenhouse-seo-dashboard.png" alt="">
+            <span class="asset-shade" aria-hidden="true"></span>
+            <span class="asset-pin one" aria-hidden="true">01</span><span class="asset-pin two" aria-hidden="true">02</span>
+            <p class="asset-title" data-slot-field="assetTitle">Visual principal del artículo</p>
+          </div>
+          <div class="review-comments" data-slot-field="comments"><div class="review-list" data-slot-items>
+            <article class="review-comment">
+              <span class="review-pin" data-slot-field="pin">01</span>
+              <div><p class="review-author" data-slot-field="author">Cliente</p><p class="review-message" data-slot-field="message">Ajustar el encuadre antes de aprobar.</p></div>
+            </article>
+          </div></div>
+        </aside>
+      </div>
+
+      <footer class="workflow">
+        <p class="workflow-label" data-slot="workflowLabel" data-slot-type="string">Ruta del artículo</p>
+        <div class="workflow-list" data-slot="workflow" data-slot-type="array"><article class="workflow-step">
+          <span class="workflow-index" data-slot-field="ordinal">01</span>
+          <span class="workflow-title" data-slot-field="label">Research</span>
+        </article></div>
+      </footer>
+    </section>
+
+    <img class="deck-url-bubble signature-DailyOpsHubFull" src="assets/url-lum.svg" alt="efeoncepro.com">
+  </main>
+</body></html>

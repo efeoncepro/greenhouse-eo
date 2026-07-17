@@ -1,6 +1,6 @@
 {
   "$comment": "Inventario RATCHET de gradientes locales del catálogo deck-axis (TASK-1393 Slice 3c). Las 4 recipes canónicas viven como tokens (gradient-recipes.json → deck-tokens.css); estos son los gradientes de CONTENIDO/variante que quedan declarados localmente (fills de barras derivadas, variantes de grano deliberadas, glass). Sus COLORES ya salen del pack. Contrato de dos vías: un gradiente nuevo o cambiado sin actualizar este inventario ROMPE el build — crecer el molde exige declararlo (recipe o inventario con rationale), nunca colarse.",
-  "total": 96,
+  "total": 136,
   "files": {
     "agenda-full.html": [
       "4558229106b6ab20 radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .07) .55px, transparent .8p",
@@ -52,12 +52,30 @@
       "99eb0805926a0286 radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8p",
       "bf49233afdb4f011 linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 4"
     ],
+    "content-hub-anatomy-full.html": [
+      "25f1ff3c73d143b2 radial-gradient(50% 64% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .44) 0",
+      "7340c739f6c27b6b linear-gradient(226deg, var(--axis-deck-navy-800) 0%, var(--axis-deck-navy-880) ",
+      "7c20fa95b9224c7f radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .065) .55px, transparent .8",
+      "7d46cd8341d6f1b3 radial-gradient(58% 66% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .43) 0%,",
+      "d267f2727081316d linear-gradient(90deg, var(--teal), rgba(var(--axis-deck-teal-300-rgb), .82) 48%"
+    ],
     "cover-full.html": [
-      "4ca9285ef04d0143 linear-gradient(90deg, transparent, rgba(var(--axis-deck-recipe-cover-halo-teal-"
+      "2c7d9a1ba97b8c83 linear-gradient(90deg, transparent, rgba(var(--axis-deck-recipe-cover-halo-teal-"
     ],
     "credentials-full.html": [
       "24e6ef1d9646db3a linear-gradient(145deg,rgba(var(--axis-ppt-neutral-50-rgb), .16),rgba(var(--axis",
       "2e763f5a95a190b6 linear-gradient(90deg,var(--teal),rgba(var(--axis-deck-violet-550-rgb), .9))"
+    ],
+    "daily-ops-hub-full.html": [
+      "021893487e503c04 linear-gradient(180deg, transparent 48%, rgba(var(--axis-deck-navy-990-rgb), .70",
+      "25f1ff3c73d143b2 radial-gradient(50% 64% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .44) 0",
+      "2b49a4207ecda480 linear-gradient(180deg, rgba(var(--axis-deck-blue-500-rgb), .14), rgba(var(--axi",
+      "7340c739f6c27b6b linear-gradient(226deg, var(--axis-deck-navy-800) 0%, var(--axis-deck-navy-880) ",
+      "7c20fa95b9224c7f radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .065) .55px, transparent .8",
+      "7d46cd8341d6f1b3 radial-gradient(58% 66% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .43) 0%,",
+      "9ba6b3f7c2daa5ad linear-gradient(90deg, rgba(var(--axis-deck-teal-300-rgb), .76), rgba(var(--axis",
+      "d267f2727081316d linear-gradient(90deg, var(--teal), rgba(var(--axis-deck-teal-300-rgb), .82) 48%",
+      "f055822d4d05c2c4 linear-gradient(145deg, rgba(var(--axis-deck-teal-300-rgb), .34), rgba(var(--axi"
     ],
     "dual-list-split.html": [
       "4f88c214fadb95fd radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .9) .55px, transparent .75p",
@@ -84,6 +102,13 @@
     "highlight-wave.html": [
       "217da9fa1b166df4 radial-gradient(130% 100% at 70% -10%, var(--axis-ppt-blue-800) 0%, var(--axis-d",
       "e64f593bbcf2b368 radial-gradient(64% 52% at 96% 100%, rgba(var(--axis-deck-teal-500-rgb), .22) 0%"
+    ],
+    "maturity-ladder-full.html": [
+      "2c4bf5d03502135a linear-gradient(145deg,rgba(var(--axis-deck-teal-500-rgb), .14),rgba(var(--axis-",
+      "5f2488e84989dfb3 linear-gradient(90deg,rgba(var(--axis-deck-teal-500-rgb), .9),var(--axis-deck-te",
+      "b6cbe04e306bf438 linear-gradient(145deg,rgba(var(--axis-ppt-neutral-50-rgb), .10),rgba(var(--axis",
+      "c6c030248644b58e linear-gradient(90deg,rgba(var(--axis-deck-violet-550-rgb), .85),var(--axis-deck",
+      "f1c51e7d03ca11ac linear-gradient(145deg,rgba(var(--axis-deck-teal-500-rgb), .28),rgba(var(--axis-"
     ],
     "metrics-split.html": [
       "1f03d54e347f73c6 linear-gradient(160deg, rgba(var(--axis-deck-teal-500-rgb), .22) 0%, rgba(var(--",
@@ -143,6 +168,31 @@
       "a57ab3d379711abf linear-gradient(180deg,var(--axis-deck-teal-450),var(--teal-deep))",
       "bf49233afdb4f011 linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 4",
       "f3806ca9299f94e0 linear-gradient(90deg, transparent 0, transparent calc(var(--m) - 1.5px), rgba(v"
+    ],
+    "tool-stack-full.html": [
+      "0b50661b6b160951 linear-gradient(90deg, rgba(var(--axis-deck-teal-300-rgb), .76), rgba(var(--axis",
+      "20add3a914ad594d linear-gradient(145deg, rgba(var(--axis-deck-teal-300-rgb), .25), rgba(var(--axi",
+      "3d313656da0185dd linear-gradient(226deg, var(--axis-deck-navy-800) 0%, var(--axis-deck-navy-880) ",
+      "4558229106b6ab20 radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .07) .55px, transparent .8p",
+      "4cab71b184d70041 linear-gradient(145deg, rgba(var(--axis-deck-navy-990-rgb), .97), rgba(var(--axi",
+      "55e4c34b4c8a032d linear-gradient(135deg, rgba(var(--axis-deck-teal-300-rgb), .13), rgba(var(--axi",
+      "59f0b6eb42de12de linear-gradient(180deg, rgba(var(--axis-deck-navy-990-rgb), .58), rgba(var(--axi",
+      "9c6f167e9329e381 linear-gradient(90deg, rgba(var(--axis-deck-navy-990-rgb), .56), rgba(var(--axis",
+      "a51d38164fd86179 linear-gradient(90deg, rgba(var(--axis-deck-teal-300-rgb), .95), rgba(var(--axis",
+      "b659f690a2312101 linear-gradient(90deg, rgba(var(--axis-deck-teal-300-rgb), .76), rgba(var(--axis",
+      "bbfa2034eca2f497 linear-gradient(180deg, rgba(var(--axis-ppt-neutral-50-rgb), .96), rgba(var(--ax",
+      "d7c4141a9d85c211 linear-gradient(145deg, rgba(var(--axis-deck-navy-980-rgb), .95), rgba(var(--axi",
+      "e5a42909f18f9a0e linear-gradient(150deg, rgba(var(--axis-ppt-neutral-50-rgb), .105), rgba(var(--a",
+      "e90149ef72c02b61 radial-gradient(54% 62% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .46) 0%,",
+      "ee03f1962182d7e6 radial-gradient(48% 58% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .48) 0",
+      "ee67f58d5ece1f1b radial-gradient(80% 90% at 16% 8%, rgba(var(--tool-logo-accent-rgb), .20), trans"
+    ],
+    "team-gallery-full.html": [
+      "1e812c60d50818b9 radial-gradient(50% 55% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .5) 0%",
+      "4558229106b6ab20 radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .07) .55px, transparent .8p",
+      "5e21eac7fbab61cf radial-gradient(52% 60% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .5) 0%, ",
+      "74a107bb042f7c61 linear-gradient(226deg, var(--axis-deck-navy-800) 0%, var(--axis-deck-navy-860) ",
+      "931194a7220caf2e linear-gradient(180deg, rgba(var(--axis-deck-ice-200-rgb), .55) 0%, rgba(var(--a"
     ]
   }
 }

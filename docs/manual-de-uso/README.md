@@ -12,7 +12,9 @@ La diferencia con otras capas de documentacion:
 
 ### Comercial
 
+- [Operar ANAM HubSpot Managed Service](hubspot-as-a-service/operar-anam-hubspot-managed-service.md) — rutina diaria/semanal/mensual para Customer Agent, calidad por owner, Growth, Services, automatización, pilotos y preparación read-only de billing.
 - [Componer el deck de una licitacion](comercial/componer-deck-de-licitacion.md) — `pnpm deck:compose <plan.json>`: escribir el plan, componer, revisar las laminas y entregar. Que significan `too_long` (el renderer NO trunca), `missing_evidence_ref` (una cifra sin fuente no se compone) y el aviso de peso del PDF (si el portal rechaza el archivo, la oferta queda fuera del proceso).
+- [Autorar una lámina con el chapter-author](comercial/autorar-lamina-con-chapter-author.md) — generar las láminas de diagnóstico desde un run real del Grader con el agente (propose → confirmación humana → render): prerrequisitos (proxy PG, flag, key), el script canónico, cómo entran los hechos externos del operador (siempre con fuente), qué significa cada rechazo (no son bugs: es el diseño anti-fabricación) y qué no hacer.
 
 ### Finanzas
 
@@ -29,7 +31,9 @@ La diferencia con otras capas de documentacion:
 
 ### Comercial
 
-- **[Proposal Studio — de un RFP al PDF (empieza acá)](proposal-studio/rfp-a-pdf-el-dia-a-dia.md)** — el manual del día a día: te llegó un RFP y quieres el PDF en la mano. Admisibilidad → registrar la propuesta → RFP y evidencia → plan del deck → render gobernado → revisar → subir. Incluye los prompts exactos para pedirle cada paso a un agente, qué información SOLO puedes dar tú, cómo se revisa y confirma, y el caso guía SKY completo. ⚠️ Hoy no hay UI ni Nexa: se opera desde el repo (ver TASK-1399).
+- **[Proposal Studio — de un RFP al PDF (empieza acá)](proposal-studio/rfp-a-pdf-el-dia-a-dia.md)** — el manual del día a día: te llegó un RFP y quieres el PDF en la mano. Admisibilidad → registrar la propuesta → RFP y evidencia → plan del deck → render gobernado → revisar → subir. Incluye los prompts exactos para pedirle cada paso a un agente, qué información SOLO puedes dar tú, cómo se revisa y confirma, y el caso guía SKY completo. ⚠️ La creación/gates se opera desde el repo (Nexa gated por flag, TASK-1399); para VER estado y DESCARGAR versiones ya hay UI: Administración → Propuestas (TASK-1413).
+- [Armar el workspace de una licitación/propuesta (el "DSR interno")](comercial/armar-el-workspace-de-un-deal.md) — cómo arrancar un deal con `pnpm tender:new <slug>`: la carpeta canónica (bases/ · research/ · oferta-tecnica.md · deck-plan.json · artifact-manifest.json · anexos/), qué va en cada una, el discriminador de audiencia (interno nunca cruza), el ledger de evidencia, el manifiesto de piezas vivas (por enlace, nunca captura) y el flujo carpeta → oferta → deck → Proposal.
+- [Propuestas en el portal — ver estado y descargar versiones](comercial/descargar-propuestas-portal.md) — la página `/admin/commercial/proposals`: tabla con estados y deadlines, panel con historial de versiones por artefacto (Vigente/Interno) y descarga del archivo real; qué significan las señales y por qué un 403 en un documento interno es lo esperado.
 - [Proposal Studio — índice del dominio](proposal-studio/README.md) — qué manual leer según lo que necesites hacer.
 - [Crear y operar una propuesta](proposal-studio/crear-y-operar-una-propuesta.md) — el objeto de negocio: crear, estados y sus compuertas humanas, adjuntar el RFP, registrar evidencia con su audiencia (interno vs. cliente), declarar requisitos y vincular la cotización con su gate de margen.
 - [Generar el deck de una propuesta](proposal-studio/generar-el-deck-de-una-propuesta.md) — de `plan.json` al PDF: los dos caminos (exploratorio `pnpm deck:compose` vs. productivo `requestProposalRender`), qué pasa en cada etapa (cola → dispatcher → worker → asset store) y cómo obtener el archivo.
@@ -39,6 +43,7 @@ La diferencia con otras capas de documentacion:
 - [Pipeline comercial](comercial/pipeline-comercial.md) — como usar la lane dedicada de forecast comercial sin confundirla con revenue reconocido ni cierre financiero.
 - [Sample Sprints](comercial/sample-sprints.md) — como declarar, aprobar, registrar progreso y cerrar outcomes de pilotos/trials/POCs/discovery.
 - [Construir una licitación paso a paso](comercial/construir-una-licitacion.md) — runbook para armar una propuesta de licitación (pública/privada, RFP/RFQ) end-to-end: leer bases, admisibilidad, bid/no-bid, alcance, squad, precio, redacción, económica y presentación human-in-control.
+- [Usar la Radiografía AEO en venta y educación](comercial/usar-radiografia-aeo-en-venta.md) — manual comercial para usar la muestra como educación, demo en vivo, evidencia en licitaciones, follow-up del Grader y herramienta de sales enablement SEO/AEO.
 
 ### Growth
 
@@ -94,7 +99,7 @@ La diferencia con otras capas de documentacion:
 ### Plataforma
 
 - [Operar layout Ohio + Elementor en el Public Site](public-site/wordpress-ohio-elementor-layout.md) — runbook para diagnosticar, corregir y revertir desfases de contenedor/sidebar en `efeoncepro.com` WordPress/Kinsta, incluyendo `/blog` y el fix page-scoped de Ohio `.light-typo`.
-- [Operar Public Site y Content Factory](public-site/operar-public-site-content-factory.md) — crear y publicar un articulo de blog con el pipeline `ideate → co-crear → author → validate → run --send` (borrador privado firmado por el operador; publicar es el paso humano), mas inspeccionar contenido WordPress, mapas de inteligencia y drift/dry-run sin mutar produccion fuera de una ventana aprobada.
+- [Operar Public Site y Content Factory](public-site/operar-public-site-content-factory.md) — crear y publicar un articulo con `ideate → co-crear → author → validate → private → approve → publish → verify`; Content Factory termina en privado y la transición pública requiere decisión humana, snapshot, rollback y QA live.
 - [Knowledge Platform (foundation)](plataforma/knowledge-platform.md) — operar la base del Knowledge Platform: aplicar la migración del schema `greenhouse_knowledge`, usar los helpers server-only de `src/lib/knowledge/` (registrar fuente, crear/publicar documento con chunks, transicionar lifecycle, feedback), qué significan los estados y qué no hacer.
 - [MCP Greenhouse Read-Only](plataforma/mcp-greenhouse-read-only.md) — cómo levantar el MCP local `stdio` o conectarse al gateway remoto HTTP privado, qué variables necesita, qué tools read-only existen hoy, qué límites de scope respeta y qué follow-ups siguen fuera de alcance.
 - [Operar Kortex Command Adapter](plataforma/kortex-command-adapter.md) — como ejecutar comandos Kortex gobernados desde Greenhouse con `Idempotency-Key`, binding preflight, dry-run obligatorio y live execute apagado por defecto.

@@ -40,7 +40,62 @@ que **tú** originaste. → `modules/03_MOTOR_LIBRO.md` § 2.
 
 ---
 
-## 2. El punto de vista — qué vendes realmente
+## 2. Enriquecimiento de cuentas — CRM + sitio + fuentes públicas
+
+El MCP/API de HubSpot es el **intake de la cartera**, no la verdad completa sobre la empresa. En particular,
+`country` puede estar vacío, obsoleto, derivado de un contacto, representar la casa matriz o no reflejar los
+mercados donde la cuenta realmente opera.
+
+🔴 **Nunca excluir una cuenta sólo porque `country` está vacío o no coincide con el mercado objetivo.** Para
+una revisión Chile/México/Colombia/Perú, incluir cuentas con país objetivo **y** cuentas sin país que tengan
+dominio, website, teléfono, dirección, contactos o actividad que permitan investigarlas.
+
+### Protocolo obligatorio de tres pasadas
+
+| Pasada | Qué revisar | Qué aporta |
+|---|---|---|
+| **1. HubSpot** | Nombre, dominio, website, `country` raw, ciudad, teléfono, industria, tamaño, owner, lifecycle, productos, actividad y contactos asociados | Relación existente, historial comercial y campos candidatos; no confirmar geografía sólo con una property |
+| **2. Sitio oficial** | Home, about, contacto, locations, footer/legal, idioma, moneda, teléfonos, oferta, clientes, equipo, careers y tecnología observable | País/sede y mercados operativos; qué vende, a quién, madurez digital, señales de escala y wedge probable |
+| **3. Internet público** | LinkedIn Company, buscador, prensa reciente, directorios/registro empresarial cuando aplique, vacantes, expansión, funding y cambios ejecutivos | Corroboración, triggers recientes, tamaño aproximado y contexto ausente del CRM/sitio |
+
+El sitio oficial es evidencia primaria para identidad y operación declarada; LinkedIn y buscadores ayudan a
+corroborar y descubrir cambios recientes. Un dominio o TLD geográfico es una señal, **no prueba suficiente**.
+Una empresa `.com` puede operar en LATAM y una `.cl` puede ser filial de una compañía global.
+
+### Campos de trabajo para cada cuenta
+
+No colapsar todo en una sola etiqueta `country`. Mantener durante el análisis:
+
+- `crm_country_raw`: valor exacto encontrado en HubSpot, incluso vacío.
+- `hq_country_inferred`: sede probable o confirmada.
+- `operating_markets`: países donde vende, atiende o tiene operación visible.
+- `company_context`: oferta, segmento, buyer, tamaño/señales y stack observable.
+- `trigger`: evento reciente útil para abrir conversación.
+- `wedge`: hipótesis comercial HubSpot/Efeonce derivada del contexto.
+- `evidence_urls`: URLs concretas que sostienen geografía, contexto y trigger.
+- `confidence`: `high`, `medium` o `low`, con `verified_at`.
+
+**Confianza alta:** sitio oficial + segunda fuente coherente. **Media:** una fuente sólida o varias señales
+indirectas coherentes. **Baja:** inferencia por nombre, TLD, idioma o teléfono sin corroboración. Las cuentas de
+confianza baja permanecen como `unknown/research`, no se descartan ni se presentan como dato confirmado.
+
+### Qué debe producir la revisión
+
+Cada fila del shortlist debe responder, antes del outreach:
+
+1. ¿Es la empresa correcta y cuál es su dominio canónico?
+2. ¿Dónde está su sede y en qué mercados opera realmente?
+3. ¿Qué vende, a quién y con qué complejidad comercial/de servicio?
+4. ¿Qué señal observable abre una conversación ahora?
+5. ¿Qué wedge y Champion probable corresponden?
+6. ¿Qué sabemos por CRM y qué inferimos desde fuentes públicas?
+
+No escribir inferencias de vuelta a HubSpot automáticamente. Primero entregar propuesta de enriquecimiento con
+evidencia, confianza y conflictos; cualquier mutación del CRM requiere confirmación y preserva el valor raw.
+
+---
+
+## 3. El punto de vista — qué vendes realmente
 
 **❌ No vendas HubSpot.** Nadie se despierta queriendo comprar un CRM.
 
@@ -59,7 +114,7 @@ diagnóstico verdadero y verificable** antes de mencionar un producto.
 
 ---
 
-## 3. Prioridad de cuentas — por costo de adquisición ascendente
+## 4. Prioridad de cuentas — por costo de adquisición ascendente
 
 | # | Segmento | Costo | Señal de entrada |
 |---|---|---|---|
@@ -75,7 +130,7 @@ diagnóstico verdadero y verificable** antes de mencionar un producto.
 
 ---
 
-## 4. Señales tecnográficas — qué mirar antes de escribir
+## 5. Señales tecnográficas — qué mirar antes de escribir
 
 | Señal | Dónde se ve | Qué significa |
 |---|---|---|
@@ -90,7 +145,7 @@ diagnóstico verdadero y verificable** antes de mencionar un producto.
 
 ---
 
-## 5. La secuencia — estructura, no plantilla
+## 6. La secuencia — estructura, no plantilla
 
 *(La mecánica de cadencias, canales y timing es de `commercial-expert`. Acá va solo lo que es HubSpot.)*
 
@@ -120,7 +175,7 @@ T+30 · El cierre honesto
 
 ---
 
-## 6. Dogfooding — el activo que no estás usando
+## 7. Dogfooding — el activo que no estás usando
 
 **Efeonce corre su propia operación sobre HubSpot + Greenhouse.** Eso no es un detalle de infraestructura:
 es **prueba viviente**, y es lo único que un competidor no puede copiar en una reunión.
@@ -133,13 +188,14 @@ sin usarse todos los meses.
 
 ---
 
-## 7. Anti-patrones
+## 8. Anti-patrones
 
 | Anti-patrón | Por qué |
 |---|---|
-| **Hacer outbound frío teniendo clientes con un solo Hub** | Estás resolviendo el problema difícil antes que el fácil (§ 3) |
+| **Hacer outbound frío teniendo clientes con un solo Hub** | Estás resolviendo el problema difícil antes que el fácil (§ 4) |
 | **Vender HubSpot en el primer mensaje** | Nadie quiere comprar un CRM. Vende el costo de lo que ya pasa |
 | **Ignorar la base instalada** | Es la motion más barata del programa **y casi nadie la corre** |
+| **Filtrar sólo por `country` del CRM** | Excluye cuentas válidas con el campo vacío/erróneo y confunde sede con mercado operativo; aplicar las tres pasadas (§ 2) |
 | **Detectar un deal y no registrarlo** | Sin deal registration **no hay comisión ni puntos** ✅ |
 | **Trabajar un deal sin POI firmado** | **Best Partner Wins.** Puedes perder seis meses de trabajo ante quien firmó primero |
 | **Mandar el grader con datos `unknown`** | Un dato malo en una reunión enterprise cuesta más que no tener dato |

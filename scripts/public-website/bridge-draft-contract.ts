@@ -7,8 +7,6 @@
  */
 
 import { execFileSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
 
 import {
   DEFAULT_PUBLIC_SITE_WORDPRESS_BASE_URL,
@@ -18,6 +16,7 @@ import {
   PUBLIC_SITE_BRIDGE_DRAFT_CONTRACT_VERSION,
   signPublicSiteBridgeRequest
 } from '../../src/lib/public-site/bridge-signing'
+import { loadPublicWebsiteEnvFiles } from './local-env'
 
 type CliOptions = {
   manifestId: string
@@ -30,40 +29,7 @@ type CliOptions = {
   help: boolean
 }
 
-const loadEnvFile = (relativePath: string) => {
-  try {
-    const contents = readFileSync(resolve(process.cwd(), relativePath), 'utf8')
-
-    for (const rawLine of contents.split('\n')) {
-      const line = rawLine.trim()
-
-      if (!line || line.startsWith('#')) continue
-
-      const normalizedLine = line.startsWith('export ') ? line.slice('export '.length).trim() : line
-      const eq = normalizedLine.indexOf('=')
-
-      if (eq <= 0) continue
-
-      const key = normalizedLine.slice(0, eq).trim()
-
-      if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key) || process.env[key] !== undefined) continue
-
-      let value = normalizedLine.slice(eq + 1).trim()
-
-      if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
-        value = value.slice(1, -1)
-      }
-
-      process.env[key] = value
-    }
-
-    return true
-  } catch {
-    return false
-  }
-}
-
-const loadedEnvFiles = ['.env.local', '.env'].filter(loadEnvFile)
+const loadedEnvFiles = loadPublicWebsiteEnvFiles()
 
 const parseArgs = (argv: string[]): CliOptions => {
   const normalizedArgv = argv[0] === '--' ? argv.slice(1) : argv

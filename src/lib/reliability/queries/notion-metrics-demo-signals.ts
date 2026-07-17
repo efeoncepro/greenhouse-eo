@@ -2,6 +2,7 @@ import 'server-only'
 
 import { query } from '@/lib/db'
 import { captureWithDomain } from '@/lib/observability/capture'
+import { NOTION_TERMINAL_ARCHIVED_BLOCK_ERROR_PREFIX } from '@/lib/space-notion/notion-errors'
 
 import type { ReliabilitySignal } from '@/types/reliability'
 
@@ -59,6 +60,7 @@ import type { ReliabilitySignal } from '@/types/reliability'
  */
 
 const MODULE_KEY = 'delivery' as const
+const TERMINAL_NOTION_WRITEBACK_ERROR_PATTERN = `${NOTION_TERMINAL_ARCHIVED_BLOCK_ERROR_PREFIX}%`
 
 // ════════════════════════════════════════════════════════════════════════════
 // 1. notion.metrics.shadow_paridad_rpa_demo
@@ -263,8 +265,9 @@ export const getNotionMetricsWritebackDeadLetterDemoSignal = async (): Promise<R
        FROM greenhouse_delivery.task_rpa_demo_snapshots
        WHERE notion_writeback_attempt_count >= $1
          AND notion_writeback_last_error IS NOT NULL
-         AND written_to_notion_at IS NULL`,
-      [WRITEBACK_DEAD_LETTER_THRESHOLD]
+         AND written_to_notion_at IS NULL
+         AND COALESCE(notion_writeback_last_error, '') NOT LIKE $2`,
+      [WRITEBACK_DEAD_LETTER_THRESHOLD, TERMINAL_NOTION_WRITEBACK_ERROR_PATTERN]
     )
 
     const count = Number(rows[0]?.count ?? 0)
@@ -327,8 +330,9 @@ export const getNotionMetricsWritebackLagDemoSignal = async (): Promise<Reliabil
          AND rpa_value IS NOT NULL
          AND written_to_notion_at IS NULL
          AND notion_writeback_attempt_count < $1
-         AND computed_at < NOW() - INTERVAL '${WRITEBACK_LAG_THRESHOLD_MIN} minutes'`,
-      [WRITEBACK_DEAD_LETTER_THRESHOLD]
+         AND computed_at < NOW() - INTERVAL '${WRITEBACK_LAG_THRESHOLD_MIN} minutes'
+         AND COALESCE(notion_writeback_last_error, '') NOT LIKE $2`,
+      [WRITEBACK_DEAD_LETTER_THRESHOLD, TERMINAL_NOTION_WRITEBACK_ERROR_PATTERN]
     )
 
     const count = Number(rows[0]?.count ?? 0)

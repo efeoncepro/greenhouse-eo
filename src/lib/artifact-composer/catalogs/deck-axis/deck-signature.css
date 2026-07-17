@@ -70,6 +70,14 @@
   bottom:36px;
 }
 
+/* TeamGalleryFull: canvas navy completo; el padding inferior de la lámina reserva la banda. */
+.signature-TeamGalleryFull {
+  left:0;
+  right:0;
+  margin-inline:auto;
+  bottom:36px;
+}
+
 /* La banda inferior está ocupada: firma lateral superior, antes del recorrido de lectura. */
 .signature-DualTextSplit {
   top:48px;
@@ -108,6 +116,13 @@
   bottom:30px;
 }
 
+/* La escalera ocupa la izquierda y la lectura la derecha: la firma se va al margen inferior
+   derecho, bajo el readout, donde no compite con ningún peldaño ni con su score. */
+.signature-MaturityLadderFull {
+  right:56px;
+  bottom:30px;
+}
+
 /* La matriz termina antes de la firma: la URL Bubble no puede leerse como una sexta fila. */
 .signature-RequirementsTableFull {
   right:0;
@@ -122,4 +137,21 @@
   left:0;
   margin-inline:auto;
   bottom:36px;
+}
+
+/* La anatomía abre un artefacto simétrico y ya concentra peso en el inspector derecho: la firma
+   cierra sobre el eje del canvas, fuera del shell, sin competir con la capa técnica. */
+.signature-ContentHubAnatomyFull {
+  right:0;
+  left:0;
+  margin-inline:auto;
+  bottom:28px;
+}
+
+/* El artefacto ocupa la derecha entera: la firma se va al margen inferior IZQUIERDO, bajo el texto,
+   donde no se superpone a la captura ni se lee como parte del producto mostrado. */
+.signature-ArtifactShowcaseFull {
+  right:auto;
+  left:132px;
+  bottom:52px;
 }

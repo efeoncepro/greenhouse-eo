@@ -19,7 +19,7 @@
 | Nombrar una métrica, propiedad, columna o KPI | `06_glosario-metricas` |
 | Entender el sistema de medición (ICO Engine, bonos, dashboards) | `07_ico` + `06_glosario-metricas` |
 | Trabajar un módulo de Greenhouse | `04_greenhouse-producto` |
-| Entender cómo Greenhouse conversa con Kortex/Verk/HubSpot | `03_ecosistema-producto` |
+| Entender cómo Greenhouse conversa con Kortex/Verk/Creative Studio/HubSpot | `03_ecosistema-producto` |
 | Priorizar features con justificación comercial (cuentas, cross-sell, Pulse) | `08_estrategia-comercial` |
 | Cuidar marca/branding en el portal (Ecosystem Tour, onboarding, naming) | `09_marca-agencia` |
 | Diseñar la experiencia/onboarding del cliente en el portal | `10_experiencia-cliente` |

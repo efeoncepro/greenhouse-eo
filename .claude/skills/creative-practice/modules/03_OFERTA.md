@@ -100,6 +100,24 @@ Discovery Sprint *(discovery)*.
 
 ---
 
+### 2.3 🔴 Modo operativo ≠ quinta modalidad comercial
+
+Creative Studio puede funcionar de tres maneras **dentro** de las cuatro modalidades anteriores. No inventes un quinto engagement ni vendas `client-operated` como un Managed Squad con descuento:
+
+| Modo | Quién dirige/opera | Qué puede comprometer Efeonce |
+|---|---|---|
+| **Efeonce-managed** | Efeonce construye y opera; el cliente conserva brief, marca y aprobación final | Outcome, OTD/FTR y delivery sobre el scope que Efeonce controla |
+| **Co-operated** | Cliente y Efeonce dividen lanes/etapas con owner explícito | Sólo el tramo bajo control Efeonce; el RACI y escalamiento se fijan antes de ejecutar |
+| **Client-operated** | El cliente corre templates curados con sus permisos | Plataforma, policy y soporte pactado; NO dirección/QA/SLA managed por defecto |
+
+**El mismo run debe poder cambiar de modo sin perder brief, assets, decisiones, review ni gasto.** La autonomía es progresiva: alta ambigüedad/riesgo → managed; dirección aprobada con producción compleja → co-operated; baja ambigüedad y repetición → client-operated.
+
+🔴 **Frontera con Staff Augmentation:** si una persona Efeonce trabaja bajo dirección cotidiana del cliente, es Staff Augmentation vía Deel. Si Efeonce diseña/dirige la operación y responde por el outcome, es Managed Squad. “Co-operated” no sirve para esconder una relación sin owner: cada lane/run declara quién opera, quién aprueba y quién responde.
+
+🎯 **Flywheel ASaaS:** Efeonce valida craft → lo convierte en template → el cliente gana autonomía segura → el uso produce evidencia → Efeonce absorbe excepciones/picos → mejora el sistema. El acceso producto no canibaliza el servicio; desplaza el valor hacia dirección, workflow design, QA y capacidad elástica.
+
+---
+
 ## 3. Qué es "una unidad de capacidad" — el squad como SISTEMA
 
 **Un squad no es una lista de gente. Es un sistema con lanes, jerarquía y sinergias.
@@ -246,6 +264,8 @@ Si es *cuánto vale, qué incluye y hasta dónde llega* → **es de acá.**
 6. 🔴 **Cero "etc." en el alcance.** Lista cerrada o no hay oferta.
 7. 🔴 **Nunca prometas una superficie del portal que no existe.** → `efeonce/ESTADO_ACTUAL.md` antes de cada propuesta.
 8. 🔴 **El ad-hoc cuesta MÁS que el marginal del plan.** Siempre.
+9. 🔴 **Modo operativo no es modalidad comercial.** No crear una quinta ni mezclar client-operated con Managed Squad.
+10. 🔴 **Ningún compromiso sin control.** OTD/FTR sólo aplican al scope cuya dirección y ejecución controla Efeonce.
 
 ---
 

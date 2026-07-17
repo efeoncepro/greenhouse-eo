@@ -11,6 +11,8 @@ Esta carpeta documenta como Kortex puede operar capacidades de HubSpot CMS / Con
 
 El objetivo es dejar una ruta segura para investigar, disenar y eventualmente crear landing pages, modulos, themes o assets CMS sin tocar contenido publicado ni confundir sistemas.
 
+La operación integral del portal cliente, RevOps y Customer Agent vive en [`../hubspot-as-a-service/README.md`](../hubspot-as-a-service/README.md). Esta carpeta conserva ownership exclusivo sobre CMS, landing, themes, modules y su acceso.
+
 ## Subcarpetas / documentos
 
 - [`developer-platform-research.md`](developer-platform-research.md): investigacion de la Developer Platform de HubSpot para landing pages, CMS React, modulos, templates y CLI.

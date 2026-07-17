@@ -1,11 +1,17 @@
 # Roadmap — cockpit del backlog
 
 > **Tipo de documento:** Manual de uso (operador del portal)
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-06-16 por Claude (TASK-1153)
+> **Última actualización:** 2026-07-15 por Codex (runtime deshabilitado)
 > **Documentación técnica:** `docs/tasks/complete/TASK-1153-roadmap-cockpit-ui-main-menu.md`, `docs/documentation/plataforma/roadmap-cockpit.md`
 
 ## Para qué sirve
+
+> **Estado actual:** el cockpit de Roadmap esta deshabilitado y ya no aparece en
+> el menu del portal. El backlog operativo sigue viviendo en `docs/epics/`,
+> `docs/tasks/`, `docs/mini-tasks/` y `docs/issues/`; los agentes deben seguir
+> usando esos Markdown y sus indices canonicos.
 
 El **Roadmap** es la pantalla para priorizar el backlog operativo completo —epics, tasks, mini-tasks e incidentes— sin tener que abrir los Markdown uno por uno. Lee el índice read-only de TASK-1152; **no edita** ningún archivo: los Markdown siguen siendo la fuente de verdad de los agentes.
 
@@ -13,7 +19,7 @@ Lo usas para: planificar la semana, hacer grooming, elegir la próxima task, ver
 
 ## Antes de empezar
 
-- Es una superficie **interna**. Vive como item de menú **Roadmap** (no dentro de Admin), junto a Design System y Knowledge.
+- El item de menu **Roadmap** fue retirado para sacar el reader filesystem del runtime/build del portal.
 - Solo la ven usuarios internos de Efeonce. Los clientes no acceden.
 
 ## Paso a paso
@@ -56,7 +62,7 @@ Lo usas para: planificar la semana, hacer grooming, elegir la próxima task, ver
 
 ## Problemas comunes
 
-- **No veo el item Roadmap en el menú**: tu rol no tiene el acceso `plataforma.roadmap`, o tu sesión es vieja. Cierra y vuelve a iniciar sesión; si persiste, pide acceso a un administrador.
+- **No veo el item Roadmap en el menú**: es esperado mientras el cockpit esta deshabilitado. Usa los Markdown canonicos bajo `docs/**`.
 - **El banner dice que faltan work items**: revisa el front-matter (Status, Lifecycle, filename canónico) de los archivos que aparecen en «Necesitan grooming».
 - **Una lane dice "+N más"**: hay más items de los que caben; filtra por prioridad/dominio/búsqueda para acotar.
 
