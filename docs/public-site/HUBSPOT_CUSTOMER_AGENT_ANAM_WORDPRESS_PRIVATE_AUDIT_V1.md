@@ -1,6 +1,6 @@
 # Customer Agent ANAM — auditoría del borrador privado en WordPress
 
-> **Estado:** `private content complete; authenticated Ohio render pending`
+> **Estado:** `private content + SEO package complete; authenticated Ohio render pending`
 > **Fecha:** 2026-07-17
 > **Post:** `251432`
 > **Publicación:** no autorizada ni ejecutada
@@ -20,8 +20,41 @@ artículo.
 - Tags: ninguno.
 - Robots: `noindex, follow`.
 - Manifest: `greenhouse-cf-ia-atencion-cliente-caso-anam-v1`.
-- SHA-256 de la spec Gutenberg: `736ce5fe7a58cd210c416ccd4881a367c067223ec310b7a46ef432817e1cf596`.
+- SHA-256 de la spec Gutenberg: `b86fd1bf7dc9360441ce35e8392157014f4e494aa973180631050d2e7d8c5001`.
 - SHA-256 del contenido persistido: `ddcb45a25b999deff0b79dbfa6635be4fd13956b321834448d19bbd78e9c5536`.
+
+## Paquete SEO/AEO y distribución
+
+- Meta title Yoast: `IA para atención al cliente: caso ANAM %%sep%% %%sitename%%`; la salida prevista es
+  `IA para atención al cliente: caso ANAM - Efeonce`.
+- Meta description: `Qué necesita una IA para atender bien a tus clientes: conocimiento, límites, pruebas y
+  transferencia humana en el caso Customer Agent de ANAM.`
+- Keyword principal: `IA para atención al cliente`.
+- El H1 conserva la promesa editorial y el meta title concentra la intención de búsqueda; no se duplican por
+  obligación mecánica.
+- El excerpt, la categoría HubSpot y la categoría primaria Yoast están completos; no se añadieron tags sin una
+  taxonomía editorial que los justifique.
+- Open Graph y Twitter usan título y descripción propios, más el asset social `251418` de `1440×757`.
+- El post privado conserva `noindex, follow`. El cambio a `index, follow` requiere el gate de publicación y no se
+  ejecutó en esta operación.
+- El override canonical queda vacío intencionalmente para que Yoast genere el self-canonical al publicar. No se
+  puede certificar su HTML final mientras la URL privada responda `404` a visitantes anónimos.
+
+### Contrato de schema
+
+No se inyectó JSON-LD manual. El primer artículo publicado de la serie confirma que el stack actual de Yoast
+compone un grafo conectado con `Article` + `BlogPosting`, `WebPage` + `ItemPage`, `BreadcrumbList`, `ImageObject`,
+`WebSite`, `Organization` y `Person`. Este artículo comparte post type, autor, categoría y configuración, por lo
+que se dejaron vacíos los overrides de tipo de página y artículo: forzar un segundo grafo crearía entidades
+duplicadas y relaciones inconsistentes.
+
+La entidad de autor está preparada como Julio Reyes y mantiene biografía y metadatos editoriales. La existencia
+del grafo esperado es una inferencia fundada en el runtime publicado del artículo anterior, no evidencia del HTML
+futuro de este post. Después de publicar deben verificarse en vivo los tipos, `@id`, relaciones de autor/editor,
+imagen, fechas, breadcrumbs y canonical.
+
+Yoast 28 no expone un campo nativo para `og:image:alt` o `twitter:image:alt`. Los attachments featured y social sí
+tienen ALT; no se añadió un parche frágil al runtime para fabricar esas etiquetas.
 
 ## Medios e integración visual
 
@@ -50,6 +83,8 @@ el attachment canónico `251417` y se eliminó permanentemente sólo la copia cr
 - La actualización visual guardó además el contenido anterior en el meta privado
   `_greenhouse_content_snapshot_before_visual_v2`, con hash
   `4bdd735edbf9794effbb99a835feaddf9b2ed2c8c1367c5cea1d9b152541414f`.
+- Antes del ajuste final del meta title se guardó un snapshot SEO reversible en
+  `_greenhouse_seo_snapshot_before_final_v1`.
 - Snapshot previo a metadata/medios: `/tmp/greenhouse-anam-customer-agent-251432-before-integration-20260717-171526.json` en el host WordPress, hash `ce6b64ccc450e349ea36621e76f6f2b7452a593a9cc47bd9a2312f45ac2a30a6`.
 
 ## QA visual privada
