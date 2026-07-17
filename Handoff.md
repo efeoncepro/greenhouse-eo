@@ -1,3 +1,12 @@
+## Sesión 2026-07-17 — TASK-1276 rollout a staging VERIFICADO
+
+> Push `develop` (7 commits TASK-1276) → staging Ready. **Incidente menor**: el alias
+> `greenhouse-eo-env-staging` quedó pegado a un deploy 2h viejo (2 deploys sin avanzar) → corregido
+> con `vercel alias set`; vigilar en próximos deploys. Verificado en staging: ruta 200 autenticada,
+> smoke write del estado del Plan AEO end-to-end (set + revert, auditado) y GVC desktop+compact
+> mirados. Flag de envío ON en staging (CTA habilitado; no ejercitado). Pendiente: promoción prod
+> vía release control plane (esperando confirmación del operador — promueve todo develop).
+
 ## Sesión 2026-07-17 — TASK-1276 code complete (rollout pendiente)
 
 > **Implementados los 7 slices** de la vista operador AEO en `develop` local (6 commits, sin push):

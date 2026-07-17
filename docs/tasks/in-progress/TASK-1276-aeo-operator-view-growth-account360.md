@@ -383,10 +383,22 @@ Implementados los 7 slices en `develop` local (sin push), con el **mockup aproba
   tiene. Follow-up backend si se quiere el per-motor. El "Historial" del mockup requiere reader de
   history que TASK-1275 no expone vía API → degradado (reason + provenance mínima); follow-up.
 
-**Rollout pendiente** (esperando instrucción de push del operador): push a develop → staging
-(migration ya aplicada al Cloud SQL dev compartido) → GVC staging → smoke write de status → prod
-(release control plane) con seed migration + grants verificados. El envío S11 además depende del
-rollout de TASK-1279 (flag OFF + property HubSpot `aeo_check_result` out-of-band).
+**Rollout 2026-07-17 — staging VERIFICADO** (autorizado por el operador "Haz el rollout"):
+
+- Push `develop` → deploy staging Ready (`5af42db1b`, dpl_5oYdwS2Qrc).
+- ⚠️ El alias `greenhouse-eo-env-staging-…vercel.app` quedó pegado a un deploy 2h viejo (no avanzó
+  en 2 deploys consecutivos); corregido con `vercel alias set` al deploy nuevo. Observación
+  operativa a vigilar en próximos deploys de staging.
+- `/growth/aeo` en staging: 307 anónimo (login) + **200 autenticado** (agente e2e).
+- **Smoke write end-to-end**: `POST recommendation-status` (Sky, `low_category_ownership`)
+  `in_progress` → revert `not_started` (202/200, `updatedBy: user-agent-e2e-001`, history
+  auditada); la UI de staging refleja "Sin empezar" en el foco 1 (capturas GVC).
+- GVC staging desktop + compact verdes y mirados (`.captures/2026-07-17T21-15-55_*`, `21-16-15_*`).
+- Nota: el flag `GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED` está ON en staging → el CTA de envío
+  aparece habilitado (no se ejercitó: enviaría email real). En prod sigue el rollout de TASK-1279.
+
+**Pendiente**: promoción a producción vía release control plane (promueve TODO develop, no solo esta
+task — requiere confirmación del operador + skill `greenhouse-production-release` + gates humanos).
 
 ## Delta 2026-06-29 — backend del cross-sell (S11) disponible — cerrado por TASK-1279
 
