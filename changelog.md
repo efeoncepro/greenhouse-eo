@@ -1,5 +1,12 @@
 # changelog.md
 
+## 2026-07-17 — ANAM: backlog operativo y criterios de cierre
+
+- Se consolidó en una fuente canónica el trabajo abierto posterior al rollout comercial: automatizaciones y QA
+  de pipeline, Calidad de Datos, Service/renovación, KPI oficiales, Customer Agent, facturación y Tickets/SLA.
+  Cada frente explicita owner, dependencias, aprobación y exit gate; el cambio es documental y no autoriza ni
+  ejecuta nuevos writes en HubSpot.
+
 ## 2026-07-17 — Prospecting Agent: contrato reusable de implementación
 
 - `hubspot-solutions-partner` incorpora una referencia client-agnostic para evaluar e implementar Prospecting

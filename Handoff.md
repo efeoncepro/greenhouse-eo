@@ -1,3 +1,12 @@
+## Sesión 2026-07-17 — ANAM: backlog abierto y gates de salida canonizados
+
+> Se consolidaron todos los pendientes posteriores al gobierno de pipelines en
+> `docs/architecture/kortex/hubspot-as-a-service/anam-open-work-and-exit-gates-2026-07-17.md`: ocho
+> automatizaciones prospectivas, QA con Deals controlados, adopción/Calidad de Datos (DQ), ratificación y
+> materialización de Services, lineage de renovación, KPI oficiales, desbloqueo de Customer Agent, Billing Event
+> + Account Unit y Tickets/SLA. Cada ítem declara prioridad, owner, dependencia, aprobación y criterio de cierre.
+> Documentarlo no autoriza writes; el runtime no cambió en este turno.
+
 ## Sesión 2026-07-17 — Prospecting Agent canonizado de forma agnóstica
 
 > **Qué cambió:** la skill espejo `hubspot-solutions-partner` ahora enruta Prospecting Agent explícitamente y

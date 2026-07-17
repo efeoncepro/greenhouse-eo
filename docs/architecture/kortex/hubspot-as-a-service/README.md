@@ -110,6 +110,7 @@ Requests from client emails or Notion tasks are intake, not executable schema. B
 - Sector, market and geography KPI reconciliation, attachment dry run, executed data-quality control and approval-gated backfill contract: [`anam-sector-geography-kpi-slice-change-set-2026-07-16.md`](anam-sector-geography-kpi-slice-change-set-2026-07-16.md)
 - Governed Deal execution-country property, Kortex release evidence and non-additive reporting contract: [`anam-deal-execution-countries-change-set-2026-07-17.md`](anam-deal-execution-countries-change-set-2026-07-17.md)
 - Executed Deal pipeline governance, renewal-stage redesign and prospective automation boundary: [`anam-commercial-pipeline-governance-change-set-2026-07-17.md`](anam-commercial-pipeline-governance-change-set-2026-07-17.md)
+- Canonical open-work backlog, dependencies, approvals and exit gates: [`anam-open-work-and-exit-gates-2026-07-17.md`](anam-open-work-and-exit-gates-2026-07-17.md)
 - Deal-to-Company association remediation dry run, owner queues and approval boundary: [`anam-deal-company-association-remediation-dry-run-2026-07-16.md`](anam-deal-company-association-remediation-dry-run-2026-07-16.md)
 - Final scoped QA verdict: [`../../../audits/ANAM_REVOPS_CHANGE_SET_QA_2026-07-16.md`](../../../audits/ANAM_REVOPS_CHANGE_SET_QA_2026-07-16.md)
 

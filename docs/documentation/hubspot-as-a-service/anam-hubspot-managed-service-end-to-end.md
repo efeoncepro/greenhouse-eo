@@ -126,6 +126,11 @@ Billing es el siguiente slice de construcción comprometido, no “lo único pen
 la ratificación de Services, asociaciones restantes, KPI oficiales y automatizaciones; Tickets/SLA y otras fases
 permanecen en backlog.
 
+El inventario completo de trabajo abierto, su prioridad, owner, dependencias, aprobación y criterio de cierre
+vive en el [backlog canónico ANAM](../../architecture/kortex/hubspot-as-a-service/anam-open-work-and-exit-gates-2026-07-17.md).
+Incluye automatizaciones de pipeline, QA controlada, Calidad de Datos (DQ), Service/renovación, KPI oficiales,
+Customer Agent, facturación y Tickets/SLA. Ningún ítem documentado equivale por sí solo a autorización de write.
+
 ## Reglas de confianza
 
 - Un KPI oficial necesita período, definición, denominador, cobertura y owner.

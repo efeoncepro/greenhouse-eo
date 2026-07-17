@@ -171,6 +171,7 @@ como identidad automática, no se retiró `(PILOTO)` y no se convirtió un gráf
 - [Modelo vivo](../../architecture/kortex/hubspot-as-a-service/anam-revops-data-model-and-object-synergies-v1.md)
 - [Change set de países de ejecución](../../architecture/kortex/hubspot-as-a-service/anam-deal-execution-countries-change-set-2026-07-17.md)
 - [Change set de gobierno de pipelines](../../architecture/kortex/hubspot-as-a-service/anam-commercial-pipeline-governance-change-set-2026-07-17.md)
+- [Backlog abierto y gates de salida](../../architecture/kortex/hubspot-as-a-service/anam-open-work-and-exit-gates-2026-07-17.md)
 - [Documentación funcional](../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md)
 - [Manual operativo](../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md)
 - [Canon técnico](../../architecture/kortex/hubspot-as-a-service/README.md)

@@ -7,6 +7,10 @@
 
 > **Client boundary:** ANAM is an Efeonce client. This roadmap governs work in ANAM's HubSpot portal; it does not define a Greenhouse product capability, tenant dashboard or Efeonce CRM dataset.
 
+The consolidated backlog after the 2026-07-17 pipeline rollout lives in
+[`anam-open-work-and-exit-gates-2026-07-17.md`](anam-open-work-and-exit-gates-2026-07-17.md). It is the current
+source for priorities, owners, approvals and definition of done; this roadmap continues to own phase sequencing.
+
 ## Outcome
 
 HubSpot must connect the complete ANAM lifecycle:
@@ -22,7 +26,7 @@ The phases below are delivery increments, not separate projects. Each phase must
 
 | Phase | Purpose | Principal output | Current state |
 |---|---|---|---|
-| 0. Customer Agent and landing | Resolve documented demand and gather context before human handoff. | Live landing, configured agent, Markdown knowledge, QA and Maria Paz handoff. | Complete; monitor in operation. |
+| 0. Customer Agent and landing | Resolve documented demand and gather context before human handoff. | Live landing, configured agent, Markdown knowledge, QA and Maria Paz handoff. | Configuration complete; runtime blocked by ANAM billing administration until credit usage and a new conversation are verified. |
 | 1. Commercial reporting foundation | Turn already-ratified business definitions into trustworthy current-state reports. | Existing-report inventory, Data Quality control tower and Commercial Growth dashboard. | Complete: Data Quality, Growth, Renewal proxy, Q1-Q2 queue and exact-stage outcome reporting are published and verified. |
 | 2. Catalog and sale composition | Confirm what each Deal sold without relying on uncontrolled free text. | Product/line-item mapping and governed service-family catalog. | Minimum mapping is sufficient: 505/506 line items reference Products and all 220 Closed Won line items resolve to known Products. Full catalog rebuild is deferred. |
 | 3. Service and contract portfolio | Represent each awarded service after the Deal is won. | Approved Service dictionary, controlled pilot and activation review. | Pilot live: group + 10 properties, association labels, five controlled Services and activation-review workflow are live/read back. Synthetic activation inputs make the five calculate `fields_ready` for QA only; ANAM ratification and historical migration remain pending/`NO-GO`. |

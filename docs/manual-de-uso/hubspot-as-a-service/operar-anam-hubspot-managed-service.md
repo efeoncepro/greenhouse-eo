@@ -16,6 +16,11 @@
 
 ## Cadencia operativa
 
+Para priorizar trabajo abierto y comprobar criterios de salida, usa el
+[backlog canónico ANAM](../../architecture/kortex/hubspot-as-a-service/anam-open-work-and-exit-gates-2026-07-17.md).
+En este manual, **Calidad de Datos (DQ)** siempre significa una cola operativa con denominador, excepción, owner,
+acción y cadencia; no un score cosmético ni una atribución automática de culpa.
+
 ### Diaria
 
 - Revisa disponibilidad, créditos, conversaciones no resueltas y transferencias de Customer Agent.
