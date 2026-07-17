@@ -88,7 +88,8 @@ const FACET_LABELS_ES_CL: Record<OrganizationFacet, string> = {
   finance: 'Finanzas',
   crm: 'CRM',
   services: 'Servicios',
-  staffAug: 'Staff Aug'
+  staffAug: 'Staff Aug',
+  aeo: 'AEO'
 }
 
 const requiredScopeForRelation = (relation: SubjectOrganizationRelation): EntitlementScope => {

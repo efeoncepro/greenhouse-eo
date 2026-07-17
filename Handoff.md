@@ -1,3 +1,32 @@
+## Sesión 2026-07-17 — TASK-1276 rollout a staging VERIFICADO
+
+> Push `develop` (7 commits TASK-1276) → staging Ready. **Incidente menor**: el alias
+> `greenhouse-eo-env-staging` quedó pegado a un deploy 2h viejo (2 deploys sin avanzar) → corregido
+> con `vercel alias set`; vigilar en próximos deploys. Verificado en staging: ruta 200 autenticada,
+> smoke write del estado del Plan AEO end-to-end (set + revert, auditado) y GVC desktop+compact
+> mirados. Flag de envío ON en staging (CTA habilitado; no ejercitado). Pendiente: promoción prod
+> vía release control plane (esperando confirmación del operador — promueve todo develop).
+
+## Sesión 2026-07-17 — TASK-1276 code complete (rollout pendiente)
+
+> **Implementados los 7 slices** de la vista operador AEO en `develop` local (6 commits, sin push):
+> cockpit + detalle (reuso masterDetail TASK-1248 con extensiones aditivas) + control de estado Plan
+> AEO + picker run operador + composer envío/Lead (flag OFF) + facet Account 360 + viewCode
+> `gestion.growth_aeo` (seed migration aplicada a greenhouse-pg-dev). Bugfix raíz: timestamptz como
+> `Date` bajo cast `as string` en el store del grader (500 con data real; normalizado ISO). GVC
+> desktop+mobile mirado con data real (scenarios `growth-aeo-operator` + `-compact`), scroll
+> horizontal 0. Gates: task/wireframe/flow lint 0 findings, reachability 0 orphans, tsc/lint verdes.
+> **Pendiente**: push a develop → staging → GVC staging + smoke status write → prod (esperando
+> instrucción del operador). Envío S11 depende además del rollout de TASK-1279 (flag + property HubSpot).
+
+## Sesión 2026-07-17 — TASK-1276 AEO Operator View (in-progress)
+
+> **Task tomada:** `TASK-1276` (vista operador AEO: cockpit `/growth/aeo` + detalle por-org + facet Account 360
+> + cross-sell). Trabajo en `develop` local-first, sin push hasta instrucción. Blockers TASK-1275/1279/1287
+> todos complete. Referencia de diseño: mockup Claude Design "AEO Operator View.dc.html" (proyecto
+> `f146e98a-fd29-407d-8f9e-2c4782fcb76a`, guardado en scratchpad de sesión). Objetivo: implementar Slices 1-7
+> según spec (gestión Plan AEO + cross-sell/prospección + GVC).
+
 ## Sesión 2026-07-17 — Aprendizajes consolidados del Customer Agent ANAM
 
 > **Editorial/publicación:** el runbook Content Factory ahora exige scan de lenguaje dependiente del lifecycle,
@@ -237,40 +266,54 @@
 > facturación ANAM; Retención/Fidelización y los cinco Services siguen piloto; billing continúa como siguiente
 > slice diseñado y no desplegado.
 
-## Sesión 2026-07-17 — Notion webhook burst protection — código completo, rollout pendiente
+## Sesión 2026-07-17 — Notion webhook burst protection — activa en producción
 
 > **Causa validada:** el burst/retry storm de `notion-tasks-demo` y
 > `notion-status-transitions` hacía que cada request Vercel tocara PostgreSQL
 > antes del ACK y agotara `max_connections`; Notion terminaba pausando las
 > suscripciones por fallos reiterados.
 >
-> **Cambio local:** recepción asíncrona opt-in con Cloud Tasks. La ruta pública
+> **Cambio desplegado:** recepción asíncrona opt-in con Cloud Tasks. La ruta pública
 > valida HMAC, crea una tarea determinística y responde `200`; el worker interno
 > exige OIDC Google, reconstruye el request y reusa `processInboundWebhook`, inbox,
 > dedupe y handlers existentes. Los retries pueden reclamar inbox events fallidos.
 > `notion-knowledge` queda fuera por fix-mínimo. Canon:
 > `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`.
 >
-> **Infra aplicada:** API Cloud Tasks habilitada; service account
+> **Infra activa:** API Cloud Tasks habilitada; service account
 > `greenhouse-webhook-worker@efeonce-group.iam.gserviceaccount.com`; queue
 > `notion-webhook-ingestion` en `us-east4`, `5 dispatch/s`, concurrencia `5`,
-> `100` intentos/`7d`, estado **PAUSED**; `greenhouse-portal` tiene sólo
+> `100` intentos/`7d`, estado **RUNNING**; `greenhouse-portal` tiene sólo
 > `roles/cloudtasks.enqueuer` + `iam.serviceAccountUser` sobre la identidad OIDC.
-> Vercel staging/production ya tiene queue/location/base URL/SA y
-> `NOTION_WEBHOOK_ASYNC_INGESTION_ENABLED=false`.
+> Vercel staging/production tiene queue/location/base URL/SA. El flag
+> `NOTION_WEBHOOK_ASYNC_INGESTION_ENABLED` quedó **ON en Production** y **OFF en
+> staging**; staging conserva OFF porque su alias protegido no permite un smoke
+> Cloud Tasks válido sin agregar un bypass específico.
 >
-> **Evidencia:** smoke real de `CreateTask` PASS con payload ficticio y cero
-> dispatch; tarea eliminada después. 53 tests focales PASS; ESLint focal PASS;
-> typecheck PASS con heap 8GB; `pnpm build` compiló y registró la nueva route;
-> `git diff --check` PASS. El audit local de secretos no cargó env runtime y
-> reportó 8/8 unconfigured, por lo que no cuenta como evidencia Vercel.
+> **Release productivo:** PR #156 squash-merged a
+> `416b12ad140c7558e7c57d62947fd2afd23f1259`. Orquestador `29609025464` y
+> manifest `416b12ad140c-143c9c6c-8659-4187-8b1e-6543e5be1036` cerraron
+> `success/released`; Vercel Production quedó READY, `/api/auth/health` respondió
+> `200` y los workers terminaron verdes. `ops-worker-00492-t4c` está `Ready=True`;
+> el watchdog sólo ve drift de etiqueta `b328cc1c`→`416b12ad`, con diff runtime
+> vacío, por lo que no se forzó un redeploy cosmético.
 >
-> **Pendiente/owner:** no se hizo commit, push ni deployment porque el checkout
-> `develop` contiene cambios ajenos ANAM/HubSpot. Siguiente paso humano/agente:
-> aislar este diff, desplegar staging con flag OFF, reanudar la queue, ejecutar
-> smoke OIDC del worker, activar el flag sólo en staging, reproducir burst y medir
-> ACK/backlog/`pg_stat_activity`; luego decidir producción. Rollback: flag OFF +
-> pausar queue. Estado correcto: **code complete, rollout pendiente**.
+> **Activación y evidencia runtime:** antes del flip se reanudó la queue y se
+> entregó un canary OIDC contra el endpoint productivo usando un evento ya
+> procesado, por lo que el inbox lo deduplicó sin ejecutar efectos de dominio.
+> Luego se actualizó el flag Production, se redeployó el mismo SHA en Vercel y
+> el alias productivo quedó en `dpl_DkdnLEUFwY3MvxyD9VncYwqzQNj1`
+> (`greenhouse-mmk0dhvln-efeonce-7670142f.vercel.app`, READY). Un payload de
+> `750001` bytes devolvió `413`, confirmando el branch asíncrono activo; un POST
+> firmado al endpoint público devolvió `200 {received:true,queued:true}`, fue
+> entregado por Cloud Tasks y el backlog volvió a cero. `/api/auth/health` =
+> `200`; PostgreSQL quedó en `10` conexiones (`1 active`, `9 idle`).
+>
+> **Estado/rollback:** producción está activa y el backlog está en cero. Ante
+> degradación, pausar primero la queue para conservar el recibo durable y luego
+> volver el flag Production a `false` + redeploy para retornar al path síncrono.
+> Pendiente no bloqueante: habilitar un bypass gobernado para el alias staging si
+> se quiere ejercer allí el mismo smoke; no afecta el runtime productivo.
 
 ## Sesión 2026-07-17 — ANAM Customer Agent — activación bloqueada por facturación
 

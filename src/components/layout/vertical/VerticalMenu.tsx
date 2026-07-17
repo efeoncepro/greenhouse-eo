@@ -249,11 +249,23 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
     const canSeeGrowthForms = canSeeView('administracion.growth_forms', isAdminUser)
     const canSeeGrowthAiVisibility = canSeeView('administracion.growth_ai_visibility', isAdminUser)
 
-    if (canSeeGrowthForms || canSeeGrowthAiVisibility) {
+    // TASK-1276 — cockpit operador del programa AEO (routeGroup internal, NO /admin).
+    const canSeeGrowthAeo = canSeeView('gestion.growth_aeo', isAdminUser)
+
+    if (canSeeGrowthForms || canSeeGrowthAiVisibility || canSeeGrowthAeo) {
       menuData.push({
         label: nl(GH_INTERNAL_NAV.growth),
         icon: 'tabler-growth',
         children: [
+          ...(canSeeGrowthAeo
+            ? [
+                {
+                  label: nl(GH_INTERNAL_NAV.growthAeo),
+                  href: '/growth/aeo',
+                  icon: 'tabler-radar-2'
+                }
+              ]
+            : []),
           ...(canSeeGrowthForms
             ? [
                 {

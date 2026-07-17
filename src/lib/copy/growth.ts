@@ -763,3 +763,200 @@ export const GH_GROWTH_AI_VISIBILITY_ADMIN_REVIEW = {
     permissionBody: 'Necesitas el permiso de revisión del AEO Grader. Pídeselo a un administrador.'
   }
 } as const
+
+/**
+ * TASK-1276 — Vista OPERADOR del programa AEO (nodos S8-S12 del EPIC-020): cockpit `/growth/aeo`,
+ * detalle por-cliente `/growth/aeo/[organizationId]`, control de estado del Plan AEO (TASK-1275),
+ * cross-sell (run operador TASK-1277 + enviar informe/crear Lead TASK-1279) y facet Account 360.
+ * Touchpoint INTERNO (operador Growth/Account) → tono operativo claro, es-CL tuteo neutro; los
+ * estados del plan son color-independientes (texto + ícono, nunca color solo). Validado con
+ * `greenhouse-ux-writing`. Diseño aprobado: mockup Claude Design "AEO Operator View".
+ */
+export const GH_GROWTH_AEO_OPERATOR = {
+  page: {
+    breadcrumbRoot: 'Inicio',
+    breadcrumbGrowth: 'Growth',
+    breadcrumbLeaf: 'AEO',
+    cockpitTitle: 'AEO',
+    cockpitSubtitle: 'Programa AEO: gestión del plan por cliente y cross-sell con diagnóstico real.',
+    detailBreadcrumbAria: 'Ruta de navegación del detalle AEO'
+  },
+  cockpit: {
+    kpiClients: 'Clientes con AEO',
+    kpiClientsSub: 'Módulo activo',
+    kpiAvgScore: 'Score AEO promedio',
+    kpiAvgScoreSub: 'Sobre clientes con medición',
+    kpiWithoutScore: 'Sin medición aún',
+    kpiWithoutScoreSub: 'Con módulo, sin run listo',
+    tableTitle: 'Clientes del programa',
+    tableSubtitle: 'Score, tier y último run por cliente',
+    colClient: 'Cliente',
+    colTier: 'Tier',
+    colScore: 'Score AEO',
+    colLastRun: 'Último run',
+    filterAll: 'Todos',
+    noAeoLabel: 'Sin AEO',
+    motionExpansionHint: 'Cliente sin AEO — expansión',
+    motionProspectHint: 'Prospecto HubSpot — new business',
+    runCta: 'Correr AEO',
+    runCtaAria: 'Correr AEO sobre este target',
+    headerRunCta: 'Correr AEO',
+    searchPlaceholder: 'Buscar cliente…',
+    searchEmpty: (query: string) => `Sin resultados para "${query}". Revisa la ortografía o limpia la búsqueda.`,
+    openDetailAria: 'Abrir el detalle AEO del cliente',
+    scoreNoData: 'Sin medición',
+    lastRunNever: 'Sin runs',
+    emptyTitle: 'Aún no hay clientes con AEO',
+    emptyBody: 'Cuando un cliente tenga el módulo AEO activo, aparece aquí con su score y su plan.',
+    errorTitle: 'No pudimos cargar el cockpit',
+    errorBody: 'Ocurrió un problema al traer los clientes del programa. Intenta de nuevo.',
+    retry: 'Reintentar'
+  },
+  tier: {
+    contracted: 'Contratado',
+    trial: 'Trial',
+    pilot: 'Piloto',
+    none: 'Sin AEO',
+    operator: 'Operador · sin tope'
+  },
+  // Cross-sell (Slice 5): picker de target agrupado por motion comercial + run operador (TASK-1277).
+  picker: {
+    title: 'Correr AEO',
+    subtitle: 'Elige el target — agrupado por motion comercial',
+    searchPlaceholder: 'Buscar cliente o prospecto…',
+    searchEmpty: (query: string) => `Sin resultados para "${query}".`,
+    groupAeo: 'Con AEO',
+    groupAeoHint: 'clientes del programa',
+    groupExpansion: 'Expansión',
+    groupExpansionHint: 'clientes sin AEO',
+    groupProspects: 'Prospecto',
+    groupProspectsHint: 'HubSpot sincronizado',
+    closeAria: 'Cerrar el selector de target',
+    footerNote: 'Puerta operador: run sin tope, costo atribuido a ventas.',
+    cta: 'Correr AEO',
+    ctaFor: (name: string) => `Correr AEO para ${name}`,
+    queued: (name: string) => `Run encolado para ${name}. El informe puede tardar unos minutos.`,
+    viewReport: 'Ver informe',
+    running: (name: string) => `Preparando run del motor para ${name}…`
+  },
+  run: {
+    detailCta: 'Correr AEO',
+    detailCtaAria: 'Correr un nuevo diagnóstico AEO para este cliente',
+    preparingTitle: 'Run en proceso…',
+    preparingBody: 'El motor está midiendo la visibilidad. Esta página se actualiza sola; el informe puede tardar unos minutos.',
+    refresh: 'Actualizar ahora',
+    errorGeneric: 'No pudimos encolar el run. Intenta de nuevo.',
+    errorProfile: 'Esta organización no tiene perfil AEO (falta el sitio web). Complétalo en Account 360.',
+    errorCategory: 'Falta resolver la categoría de la marca antes de correr el diagnóstico.',
+    errorBusinessModel: 'Falta confirmar el modelo de negocio de la marca antes de correr el diagnóstico.',
+    errorDisabled: 'El motor AEO está apagado en este ambiente.',
+    errorBusy: 'El motor está ocupado por presupuesto diario. Intenta más tarde.'
+  },
+  band: {
+    domainAria: 'Dominio del sitio',
+    lastRunLabel: 'Último run:',
+    lastRunNever: 'sin runs',
+    viewInAccount360: 'Ver en Account 360',
+    orgIdAria: 'Identificador de la organización',
+    allowanceRuns: (used: number, cap: number) => `${used}/${cap} runs este mes`
+  },
+  plan: {
+    sectionTitle: 'Estado de ejecución',
+    sectionHelp: 'Registra el avance de este foco del Plan AEO.',
+    groupAria: 'Cambiar estado del foco',
+    status: {
+      not_started: 'Sin empezar',
+      in_progress: 'En curso',
+      blocked: 'Bloqueado',
+      done: 'Hecho',
+      dismissed: 'Descartado'
+    },
+    untracked: 'Sin seguimiento aún',
+    reasonLabel: 'Motivo',
+    reasonRequiredBlocked: 'Bloquear un foco requiere un motivo.',
+    reasonRequiredDismissed: 'Descartar un foco requiere un motivo.',
+    reasonPlaceholder: 'Ej. fuera del alcance del contrato este trimestre',
+    reasonConfirm: 'Guardar estado',
+    reasonCancel: 'Cancelar',
+    saving: 'Guardando estado…',
+    saved: 'Estado guardado.',
+    saveError: 'No pudimos guardar el estado. Intenta de nuevo.',
+    statusAnnouncement: (statusLabel: string) => `Estado del foco actualizado a ${statusLabel}`,
+    updatedBy: (who: string) => `Actualizado por ${who}`,
+    partialTitle: 'Plan con seguimiento parcial',
+    partialBody: 'Algunos focos del Plan AEO todavía no tienen estado registrado. Se muestran como "sin seguimiento aún".'
+  },
+  // Enviar informe + abrir oportunidad (Slice 6, nodo S11 — command TASK-1279). El objeto comercial
+  // es un LEAD de HubSpot (NUNCA Deal); leadType y base legal se DERIVAN server-side y acá solo se
+  // muestran en la confirmación. Prospecto exige consentimiento capturado — NUNCA cold send.
+  send: {
+    cta: 'Enviar informe + abrir oportunidad',
+    ctaAria: 'Enviar el informe AEO por email y abrir una oportunidad comercial',
+    ctaDisabledHint: 'El envío está apagado en este ambiente.',
+    notPublishedHint: 'Este cliente aún no tiene un informe publicado para enviar.',
+    title: 'Enviar informe + abrir oportunidad',
+    closeAria: 'Cerrar el envío de informe',
+    motionLabel: {
+      expansion: 'Cliente · Expansión',
+      new_business: 'Prospecto · New business'
+    },
+    publishedBanner: 'Informe publicado — listo para enviar',
+    emailLabel: 'Correo del destinatario',
+    emailPlaceholder: 'nombre@empresa.com',
+    emailInvalid: 'Ingresa un correo válido (ej. nombre@empresa.com)',
+    firstNameLabel: 'Nombre',
+    lastNameLabel: 'Apellido',
+    namePlaceholder: 'Opcional',
+    consentTitle: 'Registra el consentimiento del contacto para enviar',
+    consentBody: 'Prospecto sin relación previa: por interés legítimo, nunca envío en frío.',
+    consentCheckbox: 'Tengo el consentimiento / interés legítimo registrado',
+    consentRefLabel: 'Referencia del consentimiento',
+    consentRefPlaceholder: 'Ej. HS-CONSENT-4821',
+    consentMissing: 'Registra la referencia del consentimiento antes de continuar.',
+    continueCta: 'Continuar',
+    backCta: 'Atrás',
+    cancelCta: 'Cancelar',
+    confirmTitle: 'Confirma la acción',
+    confirmSend: (org: string, email: string) => `Enviar el informe AEO de ${org} a ${email}`,
+    confirmLead: {
+      expansion: 'Abrir oportunidad de expansión · objeto comercial: Lead de HubSpot',
+      new_business: 'Abrir oportunidad nueva · objeto comercial: Lead de HubSpot'
+    },
+    confirmLegal: {
+      expansion: 'Base legal derivada: relación de servicio',
+      new_business: 'Base legal derivada: interés legítimo'
+    },
+    confirmNote: 'Queda registrado en el log de envíos con el consentimiento capturado. La acción no es reversible desde aquí.',
+    confirmCta: 'Confirmar y enviar',
+    sending: 'Enviando informe y abriendo la oportunidad…',
+    acceptedTitle: 'Envío en proceso',
+    acceptedBody: (email: string) =>
+      `El informe saldrá a ${email} y el Lead se creará en HubSpot en unos minutos. Quedó registrado en el log de envíos.`,
+    idempotentHint: 'Este envío ya estaba registrado para este destinatario — no se duplica.',
+    closeCta: 'Cerrar',
+    errorConsent: 'El envío requiere el consentimiento registrado del contacto.',
+    errorReportUnavailable: 'No hay un informe publicado para este cliente. Publícalo antes de enviar.',
+    errorDisabled: 'El envío está apagado en este ambiente.',
+    errorInvalid: 'Revisa el correo del destinatario e intenta de nuevo.',
+    errorGeneric: 'No pudimos completar el envío. Intenta de nuevo.'
+  },
+  facet: {
+    title: 'Diagnóstico y Plan AEO',
+    body: 'Score de visibilidad en IA, plan por foco y avance del servicio para este cliente.',
+    cta: 'Ver detalle AEO',
+    ctaAria: 'Abrir el detalle AEO de este cliente en Growth'
+  },
+  states: {
+    deniedTitle: 'No tienes acceso a este cliente',
+    deniedBody: 'Tu scope de operador no incluye esta organización. Pide acceso a un administrador de Growth.',
+    emptyTitle: 'Sin runs AEO',
+    emptyBody: 'Este cliente aún no tiene un diagnóstico AEO listo.',
+    preparingTitle: 'El informe se está preparando',
+    preparingBody: 'Hay un run en proceso. Vuelve en unos minutos para ver el diagnóstico.',
+    errorTitle: 'No pudimos cargar el AEO',
+    errorBody: 'Hubo un problema al leer el informe. Intenta de nuevo.',
+    retry: 'Reintentar',
+    notFoundTitle: 'Organización no encontrada',
+    notFoundBody: 'La organización no existe o fue archivada.'
+  }
+} as const

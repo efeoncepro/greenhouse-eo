@@ -25,5 +25,6 @@ export const FACET_TO_VIEW_CODE: Record<OrganizationFacet, string> = {
   economics: 'gestion.economia',
   crm: 'comercial.pipeline',
   services: 'gestion.servicios',
-  staffAug: 'gestion.staff_augmentation'
+  staffAug: 'gestion.staff_augmentation',
+  aeo: 'gestion.growth_aeo'
 } as const

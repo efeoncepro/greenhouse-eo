@@ -74,6 +74,15 @@ No ejecutes syncs manuales para "probar suerte" en produccion si hay una causa d
 5. Si el evento esta duplicado, no lo reproceses manualmente sin revisar idempotencia.
 6. Si el handler fallo, registra replay o fix gobernado.
 
+Para `notion-tasks-demo` y `notion-status-transitions` en Production, revisa
+además la queue `notion-webhook-ingestion` en `us-east4`. El estado sano es
+`RUNNING` y backlog cercano a cero. Si el worker falla, pausa primero la queue
+para conservar los eventos y diagnostica OIDC/handler; no apagues primero el flag
+ni borres tareas. El rollback completo es: queue pausada, flag
+`NOTION_WEBHOOK_ASYNC_INGESTION_ENABLED=false`, redeploy Vercel y drenaje
+gobernado posterior. Staging permanece OFF mientras su alias requiera protección
+sin bypass para Cloud Tasks.
+
 ## Diagnosticar webhook outbound
 
 1. Revisa subscription activa.

@@ -93,6 +93,13 @@ Nubox participa en finance/quotes y syncs programadas. El patron esperado es raw
 
 Los webhooks inbound entran por `/api/webhooks/[endpointKey]`, se autentican segun endpoint, se guardan en inbox y luego se procesan. Los outbound se encolan como deliveries, se firman y se reintentan desde dispatcher.
 
+Desde el 2026-07-17, los inbound `notion-tasks-demo` y `notion-status-transitions`
+usan en Production una recepción asíncrona con Cloud Tasks. Greenhouse valida la
+firma antes de confirmar recepción, deja el evento en una cola durable con límite
+global de 5 entregas por segundo y lo procesa después con la misma deduplicación e
+inbox. Esto evita que un burst de Notion abra una conexión PostgreSQL por request.
+`notion-knowledge` conserva el flujo síncrono.
+
 ## Estados de salud
 
 - **healthy:** hay runs exitosos recientes y freshness aceptable.

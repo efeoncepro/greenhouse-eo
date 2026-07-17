@@ -1,5 +1,20 @@
 # changelog.md
 
+## 2026-07-17 — TASK-1276: AEO Operator View (Growth + Account 360) — code complete local
+
+- Vista operador del programa AEO (nodos S8-S12 del EPIC-020), implementada desde el mockup aprobado de
+  Claude Design "AEO Operator View": cockpit `/growth/aeo` (KPIs + tabla score/tier/último run + filter
+  pills por motion + targets de cross-sell), detalle `/growth/aeo/[organizationId]` (banda de cliente +
+  reuso del workbench masterDetail de TASK-1248 vía extensiones aditivas `chrome`/`plan`), control de
+  estado del Plan AEO (5 estados TASK-1275, reason obligatorio en blocked/dismissed, a11y completo),
+  picker de run operador agrupado por motion (TASK-1277), composer de envío + Lead HubSpot con consent
+  gate (TASK-1279, flag OFF) y facet "AEO" en el Organization Workspace (Account 360).
+- viewCode `gestion.growth_aeo` + seed migration (roles operador; NUNCA client_*) + nav Growth; el facet
+  reusa la capability `report.read_operator` (sin capability nueva). Bugfix raíz en el store del grader
+  (timestamptz llegaba como `Date` bajo cast `as string` → 500 con data real; normalizado a ISO — también
+  cubría a `/aeo` cliente). GVC desktop+mobile mirado con data real (Sky Airlines/Grupo Berel), scroll
+  horizontal 0. Estado: code complete, rollout pendiente (push/staging/prod por instrucción del operador).
+
 ## 2026-07-17 — Cierre de aprendizaje editorial del Customer Agent ANAM
 
 - El runbook agentic de blogposts incorpora un scan de lenguaje de lifecycle, clasificación explícita del alcance
@@ -167,10 +182,13 @@
   `notion-status-transitions`: HMAC antes del ACK, Cloud Tasks como recibo durable,
   worker OIDC y procesamiento posterior reutilizando el inbox/handlers canónicos.
 - Cloud Tasks quedó provisionado en `us-east4` con concurrencia global 5 y queue
-  pausada. Vercel staging/production tiene la configuración no sensible y el
-  kill-switch en `false`; no hubo deploy ni tráfico real por el nuevo path.
-- Estado: código completo, rollout pendiente. El objetivo es absorber bursts sin
-  comprar PgBouncer; se mantiene rollback inmediato al path síncrono.
+  activa (`RUNNING`). Vercel staging/production tiene la configuración no
+  sensible; el kill-switch quedó `true` en Production y `false` en staging.
+- La capacidad fue desplegada a producción en el release `416b12ad140c` y pasó
+  health/control-plane. El rollout posterior quedó activo en el deployment
+  `dpl_DkdnLEUFwY3MvxyD9VncYwqzQNj1`: canary OIDC deduplicado, prueba pública
+  firmada `queued:true`, backlog cero, health `200` y PostgreSQL estable en 10
+  conexiones observadas. Con esto los bursts se absorben sin comprar PgBouncer.
 
 ## 2026-07-17 — ANAM Customer Agent: source pack live independiente
 

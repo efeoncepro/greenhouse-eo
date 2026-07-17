@@ -200,7 +200,7 @@ Cada acción visible = un command server-side (UI/Nexa/MCP son clientes del mism
 |---|---|
 | `growth-ai-visibility-client-report` | S5 (+ S7 read) |
 | `growth-aeo-client-tiering` (a crear) | S6 (contratado/trial/exhausted/locked) |
-| `growth-aeo-operator` (a crear) | S8/S9/S10/S11 (cockpit→detalle→run→enviar) |
+| `growth-aeo-operator` (desktop) + `growth-aeo-operator-compact` (390, drawer) | S8/S9/S10 + S7 (cockpit→picker→detalle→status; S11 gateado por flag OFF) |
 | report-artifact mockup | S14 (web/print) |
 
 ---
@@ -217,11 +217,11 @@ Cada acción visible = un command server-side (UI/Nexa/MCP son clientes del mism
 | 1252 | S14 artifact (web/print) | complete |
 | 1257 | S1 intake (nombre+apellido) | complete |
 | 1273 | S14 PDF | complete |
-| 1275 | S7 Plan AEO status (data) | to-do |
-| 1276 | S8/S9/S10/S11/S12 operador | to-do |
-| 1277 | resolución de superficie por tier (gate) | to-do |
-| 1278 | S6 tiering + PLG | to-do |
-| 1279 | S11 enviar + crear Lead (command) | to-do |
+| 1275 | S7 Plan AEO status (data) | complete |
+| 1276 | S8/S9/S10/S11/S12 operador | in-progress (code complete 2026-07-17, rollout pendiente) |
+| 1277 | resolución de superficie por tier (gate) | complete |
+| 1278 | S6 tiering + PLG | complete |
+| 1279 | S11 enviar + crear Lead (command) | complete (rollout pendiente) |
 
 ---
 

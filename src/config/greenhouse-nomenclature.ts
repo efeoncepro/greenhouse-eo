@@ -63,6 +63,7 @@ export const GH_INTERNAL_NAV = {
   growth: { label: 'Growth', subtitle: 'Captura, forms y operaciones de demanda' },
   growthForms: { label: 'Forms', subtitle: 'Formularios públicos, submissions y destinos' },
   growthAiVisibility: { label: 'AEO Grader', subtitle: 'Revisión de reportes de visibilidad en IA' },
+  growthAeo: { label: 'AEO', subtitle: 'Programa AEO: score y plan por cliente + cross-sell' },
   knowledge: { label: 'Knowledge', subtitle: 'Guías, fuentes y memoria operativa' },
   roadmap: { label: 'Roadmap', subtitle: 'Backlog operativo: epics, tasks, mini-tasks e incidentes' }
 } as const

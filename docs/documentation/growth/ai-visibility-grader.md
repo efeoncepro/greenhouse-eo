@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.21
+> **Version:** 1.22
 > **Creado:** 2026-06-24 por Claude (TASK-1226)
-> **Ultima actualizacion:** 2026-07-04 por Codex (TASK-1331 — reporte público final + view facts server-side)
+> **Ultima actualizacion:** 2026-07-17 por Claude (TASK-1276 — vista operador Growth/AEO + facet Account 360)
 > **Documentacion tecnica:** [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 
 # AI Visibility Grader — Motor de Providers (Growth)
@@ -199,6 +199,33 @@ Mostrar el resultado en pantalla no basta: si el prospecto cierra la pestaña, p
 > Detalle técnico: `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` §Delta 2026-06-27 (TASK-1250). Código: `src/lib/growth/ai-visibility/public-delivery/email/**`, template `src/emails/AiVisibilityGraderReportEmail.tsx`. Evento `growth.ai_visibility.report_email_requested` → consumer `growth_ai_visibility_report_email`. **Estado:** staging ON en worker + Vercel y smoke real ya dejó 1 dispatch enviado; producción OFF/gated por TASK-1246. Operación: [manual de smoke](../../manual-de-uso/growth/ai-visibility-grader-smoke.md).
 >
 > Destino del enlace (TASK-1324, released 2026-07-03): fuente única `buildPublicReportUrl` en `src/lib/growth/ai-visibility/hubspot/report-link.ts` → `${PUBLIC_GRADER_HUB_URL || 'https://think.efeoncepro.com'}/brand-visibility/r/<token>` (email + HubSpot `report_url` heredan). Redirect puente 307 del path viejo `/grader/r/<token>` en `next.config.ts`. ADR del render headless: `GREENHOUSE_PUBLIC_REPORT_HEADLESS_RENDER_DECISION_V1.md`.
+
+## Vista operador — cockpit Growth/AEO + detalle por cliente (TASK-1276)
+
+El operador interno (Growth/Account) tiene su propia superficie del programa, fuera de `/admin`:
+
+- **Cockpit `/growth/aeo`** (menú Growth → AEO): lista los clientes con módulo AEO activo con su score
+  (semáforo; "Sin medición" cuando no hay run con score — nunca un 0 inventado), tier y último run.
+  Los filtros por motion (Con AEO / Expansión / Prospecto) muestran además los targets de cross-sell:
+  clientes sin AEO y prospectos sincronizados desde HubSpot.
+- **Detalle `/growth/aeo/[organización]`**: el mismo workbench del informe que ve el cliente en `/aeo`
+  (idéntico modelo y layout), más una banda superior con tier, cupo de runs y acceso al Account 360,
+  y el **control de estado del Plan AEO**: cada foco se marca Sin empezar / En curso / Bloqueado /
+  Hecho / Descartado (bloquear o descartar exige un motivo). El cliente verá ese avance en `/aeo`
+  (follow-up de TASK-1248).
+- **Correr AEO**: desde el cockpit (selector de target agrupado por motion comercial) o desde el
+  detalle (re-run del cliente actual). Es la puerta operador de TASK-1277: sin tope, costo atribuido
+  a ventas. El run tarda minutos; la UI lo dice honesto ("encolado / preparando").
+- **Enviar informe + abrir oportunidad**: abre el composer del envío (TASK-1279) con captura de
+  consentimiento para prospectos; la base legal y el tipo de Lead se derivan en el servidor y solo
+  se muestran en la confirmación. Requiere informe publicado y el flag de envío encendido.
+- **Account 360**: el workspace de la organización tiene un facet "AEO" que deep-linkea al detalle.
+
+Quién lo ve: solo roles internos del set operador (admin, account, operations, ai tooling). Un
+usuario de portal cliente nunca ve estas rutas.
+
+> Detalle técnico: TASK-1276 (`docs/tasks/`), viewCode `gestion.growth_aeo`, readers TASK-1287,
+> command de estado TASK-1275, puerta de run TASK-1277, envío TASK-1279.
 
 ## Cross-sell del operador — enviar informe + crear Lead (TASK-1279)
 

@@ -21,7 +21,10 @@ export const FACET_TO_CAPABILITY_KEY = {
   finance: 'organization.finance',
   crm: 'organization.crm',
   services: 'organization.services',
-  staffAug: 'organization.staff_aug'
+  staffAug: 'organization.staff_aug',
+  // TASK-1276 — el facet AEO reusa la capability operador existente (TASK-1287): visible solo para
+  // el set operador interno; clientes jamás la reciben. NO se crea capability organization.aeo nueva.
+  aeo: 'growth.ai_visibility.report.read_operator'
 } as const satisfies Record<AccountFacetName, EntitlementCapabilityKey>
 
 export type OrganizationFacet = AccountFacetName
@@ -35,7 +38,8 @@ export const ORGANIZATION_FACETS: readonly OrganizationFacet[] = [
   'finance',
   'crm',
   'services',
-  'staffAug'
+  'staffAug',
+  'aeo'
 ] as const
 
 /**

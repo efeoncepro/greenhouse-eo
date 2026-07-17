@@ -44,11 +44,14 @@ Configuración runtime:
 | `NOTION_WEBHOOK_TASKS_OIDC_AUDIENCE` | Opcional; default URL completa del worker |
 | `NOTION_WEBHOOK_TASKS_SERVICE_ACCOUNT_EMAIL` | Identidad dedicada que firma el ID token |
 
-Rollout: desplegar con flag OFF, crear queue/IAM, ejecutar una tarea firmada de
-smoke contra staging, activar el flag en staging, reproducir un burst controlado
-y medir `pg_stat_activity`, latencia de ACK, retry count y backlog. Production
-solo se activa con esa evidencia. Rollback: flag OFF; pausar la queue si hubiera
-payload pendiente que requiera investigación.
+Estado runtime 2026-07-17: Production está activo con
+`NOTION_WEBHOOK_ASYNC_INGESTION_ENABLED=true`; la queue está `RUNNING` y staging
+permanece OFF porque su alias protegido requiere un bypass adicional para que
+Cloud Tasks alcance el worker. La activación productiva se validó primero con un
+canary OIDC deduplicado, luego con el límite de payload del branch asíncrono y
+finalmente con un webhook firmado que atravesó ingress, queue e inbox sin dejar
+backlog. Rollback: pausar primero la queue si hubiera payload pendiente y luego
+flag OFF + redeploy.
 
 Fuentes validadas 2026-07-17:
 

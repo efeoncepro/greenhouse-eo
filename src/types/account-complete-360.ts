@@ -16,7 +16,9 @@ export const ACCOUNT_FACET_NAMES = [
   'finance',
   'crm',
   'services',
-  'staffAug'
+  'staffAug',
+  // TASK-1276 — facet operador del programa AEO (deep-link a /growth/aeo/[organizationId]).
+  'aeo'
 ] as const
 
 export type AccountFacetName = (typeof ACCOUNT_FACET_NAMES)[number]
@@ -305,6 +307,15 @@ export interface AccountStaffAugFacet {
   byCurrency: { currency: string; totalRate: number; count: number }[]
 }
 
+// TASK-1276 — facet AEO (programa Growth): snapshot honesto del estado AEO de la org.
+export interface AccountAeoFacet {
+  hasAeoModule: boolean
+  aeoTier: string | null
+  /** Score del último run reportable; null = sin medición (NUNCA 0 sintético). */
+  latestScore: number | null
+  latestRunAt: string | null
+}
+
 // ── Complete 360 ──
 
 export interface AccountComplete360 {
@@ -318,6 +329,7 @@ export interface AccountComplete360 {
   crm?: AccountCrmFacet
   services?: AccountServicesFacet
   staffAug?: AccountStaffAugFacet
+  aeo?: AccountAeoFacet
 }
 
 // ── Options ──
