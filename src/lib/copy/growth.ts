@@ -971,3 +971,76 @@ export const GH_GROWTH_AEO_OPERATOR = {
     notFoundBody: 'La organización no existe o fue archivada.'
   }
 } as const
+
+/**
+ * TASK-1340 — Superficie de gobernanza del motor de CTAs (`/growth/ctas`, menú Growth).
+ * Copy validado con greenhouse-ux-writing (es-CL tuteo, verbo+objeto, estados honestos).
+ * El copy de CAMPAÑA de cada CTA vive en su render contract (data gobernada), no acá.
+ */
+export const GH_GROWTH_CTA_OPERATOR = {
+  title: 'CTAs y popups',
+  subtitle: 'Gobernanza del motor de CTAs: inventario, estado y preview del renderer portable.',
+  engineFlag: {
+    on: 'Motor encendido',
+    off: 'Motor apagado en este ambiente',
+    offHint:
+      'El flag GROWTH_CTA_ENGINE_ENABLED está apagado: las superficies públicas no muestran CTAs y las acciones de lifecycle quedan deshabilitadas. El flip se coordina con el despliegue del renderer.'
+  },
+  inventory: {
+    title: 'Inventario de CTAs',
+    columns: {
+      cta: 'CTA',
+      status: 'Estado',
+      placement: 'Ubicación',
+      campaign: 'Campaña',
+      version: 'Versión',
+      actions: 'Acciones'
+    },
+    emptyTitle: 'Aún no hay CTAs',
+    emptyBody: 'Autora el primer CTA vía la API admin o el seed canónico; acá aparecerá su estado.',
+    statusLabels: {
+      draft: 'Borrador',
+      review: 'En revisión',
+      published: 'Publicado',
+      paused: 'Pausado',
+      deprecated: 'Deprecado',
+      archived: 'Archivado'
+    } as Record<string, string>
+  },
+  actions: {
+    publish: 'Publicar',
+    pause: 'Pausar',
+    resume: 'Reanudar',
+    submitReview: 'Enviar a revisión',
+    pauseAria: 'Pausar esta versión publicada (freno de emergencia)',
+    resumeAria: 'Reanudar esta versión pausada',
+    publishAria: 'Publicar esta versión (deprecia la anterior)',
+    confirmPauseTitle: '¿Pausar este CTA?',
+    confirmPauseBody: 'La versión publicada deja de mostrarse en las superficies públicas en ~2 minutos. Puedes reanudarla cuando quieras.',
+    confirmPublishTitle: '¿Publicar esta versión?',
+    confirmPublishBody: 'El snapshot queda inmutable y la versión publicada anterior (si existe) se deprecia.',
+    cancel: 'Cancelar',
+    success: {
+      publish: 'Versión publicada.',
+      pause: 'CTA pausado. Deja de mostrarse en ~2 minutos.',
+      resume: 'CTA reanudado.',
+      submit_review: 'Versión enviada a revisión.'
+    } as Record<string, string>,
+    errorGeneric: 'No pudimos completar la acción. Intenta de nuevo.',
+    errorTransition: 'Esa transición no está permitida desde el estado actual.',
+    errorActionNotResolvable: 'La acción del CTA no resuelve: el formulario de destino no está publicado.'
+  },
+  surfaces: {
+    title: 'Surfaces registradas',
+    columns: { name: 'Surface', kind: 'Tipo', origins: 'Origins permitidos', embedKey: 'Credencial', status: 'Estado' },
+    emptyTitle: 'Sin surfaces',
+    emptyBody: 'Registra una surface vía la API admin para autorizar un host.',
+    statusLabels: { active: 'Activa', paused: 'Pausada', archived: 'Archivada' } as Record<string, string>
+  },
+  preview: {
+    title: 'Preview del renderer',
+    body: 'Así se ve el card en un host público, con fixtures deterministas. La variante visual la elige cada versión de CTA (style_variant).',
+    variantLabel: 'Variante',
+    variantAria: 'Elegir la variante de preview del renderer'
+  }
+} as const

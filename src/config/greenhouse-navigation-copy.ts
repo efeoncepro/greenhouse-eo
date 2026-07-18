@@ -94,6 +94,7 @@ const enUS: NavigationCopy = {
     growthForms: { label: 'Forms', subtitle: 'Public forms, submissions and destinations' },
     growthAiVisibility: { label: 'AEO Grader', subtitle: 'Review AI visibility reports before delivery' },
     growthAeo: { label: 'AEO', subtitle: 'AEO program: per-client score and plan + cross-sell' },
+    growthCtas: { label: 'CTAs', subtitle: 'CTA/popup engine: inventory, lifecycle and preview' },
     adminCommercialProposals: { label: 'Proposals', subtitle: 'Commercial proposals: state, artifact versions and downloads' },
     knowledge: { label: 'Knowledge', subtitle: 'Guides, sources and operational memory' },
     roadmap: { label: 'Roadmap', subtitle: 'Operational backlog: epics, tasks, mini-tasks and incidents' }
