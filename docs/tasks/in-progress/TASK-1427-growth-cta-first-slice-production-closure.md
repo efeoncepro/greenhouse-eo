@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Bajo`
@@ -361,6 +361,27 @@ Reglas obligatorias:
 - [ ] `greenhouse-qa-release-auditor` emite PASS o CONDITIONAL PASS sin blocker.
 - [ ] Chequeo de impacto cruzado completado.
 - [ ] Skill `greenhouse-growth-ctas` actualizada en el MISMO change set (Skill Maintenance Contract: estado de rollout, contratos, hard rules que cambien).
+
+## Delta 2026-07-18 — Slices 1 y 2 ejecutados (ventana de 7 días abierta)
+
+**Placement (decisión del operador):** página de prueba primero. Se creó `https://efeoncepro.com/greenhouse-cta-prueba/` (page id `251561`, `noindex`, sin sidebar, no enlazada) vía carril gobernado `pnpm public-website:wpcli` — bloque HTML con el snippet canónico (`cta-location=wp_test_page`), **cero cambios de tema/plugin** (rollback = borrar la página, <15 min). El placement amplio (recomendado: posts del blog al final del contenido, via `the_content` filter en `ohio-child/inc/` + registro del bundle como `class-eo-widgets-loader.php:169`) queda **pendiente de decisión del operador post-validación**.
+
+**Evidencia E2E (2026-07-18):**
+
+- **WP desktop 1440:** card `ready` sobre Ohio (frame mirado, sin overflow ni fugas CSS), click → `<greenhouse-form>` monta inline (wizard 5 pasos, inputs intactos pese a las reglas globales de Ohio — la safe zone del renderer alcanza sin CSS host extra); dataLayer `greenhouse_cta_viewed/clicked/form_opened` con `cta_slug/cta_location/placement` correctos; ingest `POST /api/public/growth/ctas/events` → 2×202; `/g/collect` con los 3 eventos hacia `G-KYPPY57M14` .
+- **WP mobile 390:** densidad condensada por container query, botón full-width, sin overflow; `viewed` en dataLayer + `/g/collect`.
+- **Think control (reporte prod real):** dataLayer `viewed/clicked/form_opened` + `/g/collect viewed` (batching del cliente GA4 explica los otros dos — LEARNINGS 2026-07-18).
+- **Ledger Tier A:** filas `clicked`/`form_opened` con `page_uri=/greenhouse-cta-prueba/`, `trust_level=browser_reported`, `ingest_status=accepted` en `greenhouse_growth.cta_conversion_event`.
+- **Forja:** POST con embed key inválida sobre la surface WP → `403 {"outcome":"surface_unauthorized"}` (es-CL, sanitizado).
+- Capturas: `.captures/task-1427-wp-test/` (desktop ready + after-click, mobile ready). Scripts reproducibles: `scripts/growth/_sanity-task1427-wp-live.mjs` + `_sanity-task1427-consent-denied.mjs`.
+
+**Desviaciones documentadas del plan:**
+
+1. **GVC scenario → Playwright directo:** `fe:capture` opera el portal con agent auth; los hosts públicos (WP/Think) se evidenciaron con Playwright directo (precedente TASK-1373), frames mirados. El scenario `task-1427-growth-cta-wordpress-closure.scenario.ts` no se creó; el preview del portal ya está cubierto por el scenario de TASK-1340.
+2. **Consent-denied NO ejercitable:** ni efeoncepro.com ni think tienen CMP/consent-mode defaults — los tags GA4 disparan sin gate de consentimiento (postura pre-existente de TODO el sitio, no introducida por el CTA; verificado con sesión sin consentir: los eventos salieron igual por `/g/collect` en ambos hosts). El criterio "consent-aware" se cierra como: hits reales verificados + estado de consent documentado en LEARNINGS; instalar CMP es un tema de gobernanza de medición del sitio, fuera de scope (candidato a task de measurement governance).
+3. **GA4 realtime:** lag documentado (LEARNINGS §6/§7c) — la prueba dura es el `/g/collect` capturado; el realtime/readback se re-verifica dentro de la ventana de 7 días con sesiones con engagement.
+
+**Estado:** Slices 1–2 completos; **Slice 3 abierto** (ventana steady-state `growth.cta.*` hasta 2026-07-25 + decisión de placement amplio + cierre lifecycle/docs). La task permanece `in-progress` por diseño.
 
 ## Ajuste 2026-07-18 (review Claude — arquitectura + diseño)
 

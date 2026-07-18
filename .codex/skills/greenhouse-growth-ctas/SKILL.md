@@ -94,8 +94,16 @@ va SOLO a dataLayer, jamás al ledger.
   LIVE en el reporte Think (`/brand-visibility/r/*`, dock `GrowthCtaDock.astro`, env
   `GREENHOUSE_CTA_SURFACE_ID`/`GREENHOUSE_CTA_EMBED_KEY` en Vercel de `efeonce-think`). GTM v4
   publicado (6 tags + 6 triggers CE + 7 DLVs) + custom dimensions GA4 `cta_slug`/`cta_location`/
-  `placement`. Pendiente: placement WP (snippet en el manual), placement interruptivo (task
-  siguiente), Tier B, admin cockpit de autoría/reportes, más acciones.
+  `placement`.
+- **2026-07-18 (TASK-1427): WordPress live en página de PRUEBA + E2E verificado en ambos hosts.**
+  Página `efeoncepro.com/greenhouse-cta-prueba/` (id `251561`, noindex, `cta-location=wp_test_page`,
+  bloque HTML con el snippet, cero cambios de tema — rollback = borrar la página). Evidencia:
+  dataLayer + `/g/collect` (3 eventos) + ingest 202 + ledger `browser_reported/accepted` + forja
+  403 (`surface_unauthorized`). ⚠️ Ningún host tiene CMP/consent-mode defaults — los tags disparan
+  sin gate (postura pre-existente del sitio; LEARNINGS 2026-07-18). Ventana steady-state 7d abierta
+  (hasta 2026-07-25). Pendiente: placement AMPLIO WP (decisión del operador post-validación;
+  recomendado posts del blog vía `the_content` en `ohio-child`), placement interruptivo, Tier B,
+  cockpit de autoría, más acciones.
 
 ## Hard rules (anti-regression — arch §20 + aprendizajes de implementación)
 

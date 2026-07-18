@@ -13,10 +13,10 @@ El motor de CTAs es el sistema que decide **qué invitación a la acción (promp
 
 ## Estado actual (2026-07-18): EN PRODUCCIÓN
 
-- La primera rebanada está **live**: el CTA `ai-visibility-report-followup` ("¿Cómo ve la IA a tu marca?") se muestra al final del **reporte público de AI Visibility en Think** (`think.efeoncepro.com/brand-visibility/r/…`) e invita a correr el diagnóstico del grader.
+- La primera rebanada está **live en las dos superficies**: el CTA `ai-visibility-report-followup` ("¿Cómo ve la IA a tu marca?") se muestra al final del **reporte público de AI Visibility en Think** (`think.efeoncepro.com/brand-visibility/r/…`) y en la **página de prueba de WordPress** (`efeoncepro.com/greenhouse-cta-prueba/`, no indexable — el operador decidió validar en una página de prueba antes del despliegue amplio).
 - El flag `GROWTH_CTA_ENGINE_ENABLED` está **encendido en staging y producción**.
-- La medición está **completa y verificada**: el renderer emite los eventos `greenhouse_cta_*` al dataLayer del host; el container GTM (v4) los reenvía a GA4 con las dimensiones `cta_slug`, `cta_location` y `placement`.
-- Falta por decisión del negocio: en qué páginas de **WordPress** montarlo (el snippet está listo), el placement **interruptivo** (popup/slide-in) y el cockpit de autoría visual (hoy se autora por API/CLI).
+- La medición está **completa y verificada de extremo a extremo en ambos hosts** (TASK-1427): eventos en el dataLayer, hits reales llegando a GA4, registro server-side en el ledger y rechazo comprobado de credenciales forjadas.
+- Falta por decisión del negocio: el **placement amplio en WordPress** (qué páginas, tras validar la prueba), el placement **interruptivo** (popup/slide-in) y el cockpit de autoría visual (hoy se autora por API/CLI).
 
 ## Cómo funciona (en simple)
 

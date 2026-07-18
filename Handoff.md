@@ -1,3 +1,21 @@
+## Sesión 2026-07-18 — TASK-1427 Slices 1–2: CTA live en WordPress (página de prueba) + E2E ambos hosts
+
+> `/implement-task 1427`. El operador decidió **página de prueba primero** para el placement WP:
+> se creó `efeoncepro.com/greenhouse-cta-prueba/` (id `251561`, noindex, sin sidebar, no enlazada)
+> vía `pnpm public-website:wpcli` — solo un bloque HTML con el snippet canónico
+> (`cta-location=wp_test_page`); cero cambios de tema/plugin, rollback = borrar la página.
+> Evidencia E2E mirada: WP 1440 (card ready + click → form 5 pasos inline, CSS Ohio sin fugas) y
+> 390 (condensed, sin overflow); dataLayer `viewed/clicked/form_opened`; ingest 2×202; ledger
+> `browser_reported/accepted`; `/g/collect` con los 3 eventos; **`greenhouse_cta_viewed` visible en
+> GA4 realtime** (sesión UA real + engagement + consent, LEARNINGS §7c); forja → 403
+> `surface_unauthorized`. Think control re-verificado live. Hallazgo documentado: **ningún host
+> tiene CMP/consent-mode defaults** (los tags disparan sin gate; postura pre-existente del sitio —
+> LEARNINGS 2026-07-18; candidato a task de measurement governance). Capturas en
+> `.captures/task-1427-wp-test/`; scripts `scripts/growth/_sanity-task1427-*.mjs`. Docs sincronizados:
+> task Delta, TRACKING-PLAN, LEARNINGS, manual, doc funcional, skill (ambos espejos). **Slice 3
+> abierto**: ventana steady-state `growth.cta.*` hasta 2026-07-25 + decisión de placement amplio
+> (recomendado: posts del blog) → la task sigue `in-progress` por diseño.
+
 ## Sesión 2026-07-18 — CTA Experience System incorporado a EPIC-023 (planning/architecture)
 
 > Por pedido del operador se elevó el objetivo de UI “rica, moderna y fluida” a un contrato ejecutable, sin crear

@@ -13,7 +13,9 @@ Definir, publicar, pausar, embeber y medir CTAs/popups gobernados en las superfi
 
 ## Estado vigente (2026-07-18)
 
-Motor **encendido en staging y producción**. Primer CTA (`ai-visibility-report-followup`) **live** en el reporte AI Visibility de Think. Medición GTM/GA4 **publicada y verificada**. Embed en WordPress pendiente de decisión de placement.
+Motor **encendido en staging y producción**. Primer CTA (`ai-visibility-report-followup`) **live** en el reporte AI Visibility de Think **y en WordPress** (página de prueba `efeoncepro.com/greenhouse-cta-prueba/`, noindex, `cta-location=wp_test_page` — decisión del operador: validar en test page antes del placement amplio). Medición GTM/GA4 **publicada y verificada E2E en ambos hosts** (dataLayer + `/g/collect` + ingest + ledger + forja 403; TASK-1427). Pendientes: placement amplio en WP (decisión post-validación) y ventana steady-state de 7 días de los signals.
+
+**Rollback de la página de prueba WP:** borrar la página id `251561` (`wp post delete 251561 --force` vía `pnpm public-website:wpcli`) — no se tocó tema ni plugin.
 
 ## Antes de empezar
 
