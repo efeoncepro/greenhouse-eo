@@ -338,7 +338,7 @@ const GrowthCtasGovernanceView = ({ ctas, surfaces, engineEnabled, loadError }: 
         </CardContent>
       </Card>
 
-      <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
+      <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }} data-capture='cta-preview-card'>
         <CardHeader title={O.preview.title} subheader={O.preview.body} />
         <Divider />
         <CardContent sx={{ display: 'grid', gap: 4 }}>
