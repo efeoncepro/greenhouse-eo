@@ -188,17 +188,25 @@ export class GreenhouseCtaElement extends HTMLElement {
     contract: CtaRenderContractMirror,
     getRenderer: () => CtaRenderer | null,
   ): (slot: HTMLElement) => Promise<boolean> {
-    return slot =>
-      openGrowthForm({
+    return slot => {
+      const action = contract.action
+
+      // TASK-1431: solo la familia growth_form ejecuta este callback; la familia
+      // navigate vive en el renderer (anchor nativo) y jamás llega acá. Defensivo:
+      // un mismatch retorna false (el renderer restaura el CTA fail-closed).
+      if (action.kind !== 'open_growth_form') return Promise.resolve(false)
+
+      return openGrowthForm({
         doc: document,
         slot,
-        action: contract.action,
+        action,
         baseUrl: config.baseUrl,
         formSurfaceId: this.getAttribute('form-surface'),
         locale: this.getAttribute('locale'),
         colorScheme: this.getAttribute('color-scheme'),
         onSubmitted: formSubmissionId => getRenderer()?.notifyFormSubmitted(formSubmissionId),
       })
+    }
   }
 
   private async load(): Promise<void> {

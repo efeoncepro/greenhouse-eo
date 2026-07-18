@@ -12,10 +12,66 @@
  * lo trae; browser_reported en ambos casos).
  */
 
+import type { CtaRenderActionMirror } from './contract'
+
 const FORMS_BUNDLE_PATH = '/growth-forms/renderer-latest.js'
 const FORMS_ELEMENT_TAG = 'greenhouse-form'
 const FORMS_ACCEPTED_EVENT = 'gh_form_submission_accepted'
 const FORMS_DEFINE_TIMEOUT_MS = 8000
+
+// ─── Familias de ejecución (TASK-1431) ────────────────────────────────────────
+
+export type RendererActionFamily = 'growth_form' | 'navigate'
+
+/**
+ * Espejo browser-safe de `CTA_ACTION_KIND_FAMILIES` (SoT server en
+ * `src/lib/growth/ctas/contracts.ts`; parity test los mantiene idénticos). El
+ * renderer dispatchea SOLO por familia — jamás lógica de integración por kind.
+ */
+export const RENDERER_ACTION_FAMILIES = {
+  open_growth_form: 'growth_form',
+  link_url: 'navigate',
+  open_think_tool: 'navigate',
+  book_meeting: 'navigate',
+} as const satisfies Record<CtaRenderActionMirror['kind'], RendererActionFamily>
+
+/** Familia del action o `null` para un kind desconocido (contrato más nuevo que el bundle ⇒ fail-closed, jamás adivinar destino). */
+export const resolveActionFamily = (action: { kind: string }): RendererActionFamily | null =>
+  (RENDERER_ACTION_FAMILIES as Record<string, RendererActionFamily | undefined>)[action.kind] ?? null
+
+/**
+ * Defensa en profundidad del executor: re-valida que el href resuelto sea https
+ * absoluta o path root-relative (sin protocol-relative `//`/`/\`). El server ya
+ * validó; un contrato corrupto/stale jamás produce navegación fuera del contrato.
+ */
+export const isSafeNavigateHref = (href: string): boolean => {
+  const trimmed = href.trim()
+
+  if (trimmed.length === 0) return false
+
+  if (trimmed.startsWith('/')) return !trimmed.startsWith('//') && !trimmed.startsWith('/\\')
+
+  try {
+    const url = new URL(trimmed)
+
+    return url.protocol === 'https:' && url.username === '' && url.password === ''
+  } catch {
+    return false
+  }
+}
+
+/** ¿El destino sale del host actual? (affordance de salida + `rel` seguro). */
+export const isExternalNavigateHref = (href: string, currentHost: string): boolean => {
+  const trimmed = href.trim()
+
+  if (trimmed.startsWith('/')) return false
+
+  try {
+    return new URL(trimmed).host !== currentHost
+  } catch {
+    return true
+  }
+}
 
 export interface OpenGrowthFormInput {
   doc: Document

@@ -1,12 +1,18 @@
 import { describe, expect, it } from 'vitest'
 
+import { RENDERER_ACTION_FAMILIES } from '@/growth-cta-renderer/action'
 import type {
   ArbitratedRenderResultMirror,
   CtaRenderContractMirror,
 } from '@/growth-cta-renderer/contract'
 import { RENDERER_CONTRACT_VERSION } from '@/growth-cta-renderer/version'
 
-import { CTA_CONTRACT_VERSION, type ArbitratedRenderResult, type CtaRenderContract } from '../contracts'
+import {
+  CTA_ACTION_KIND_FAMILIES,
+  CTA_CONTRACT_VERSION,
+  type ArbitratedRenderResult,
+  type CtaRenderContract,
+} from '../contracts'
 
 /**
  * TASK-1340 — Parity preview↔público del render contract (calca el patrón
@@ -27,5 +33,9 @@ describe('growth-cta renderer contract parity', () => {
   it('mantiene las funciones de asignabilidad referenciadas (compile-time guard)', () => {
     expect(typeof _assertCanonicalIsConsumable).toBe('function')
     expect(typeof _assertArbitratedIsConsumable).toBe('function')
+  })
+
+  it('familias de ejecución kind→familia idénticas server ↔ renderer (TASK-1431)', () => {
+    expect(RENDERER_ACTION_FAMILIES).toEqual(CTA_ACTION_KIND_FAMILIES)
   })
 })

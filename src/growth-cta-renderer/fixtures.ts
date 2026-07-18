@@ -101,4 +101,71 @@ export const CTA_FIXTURES: Record<string, { label: string; build: () => CtaRende
     build: () =>
       base({ slug: 'ai-visibility-slide-in-unknown', placement: 'slide_in', interruptive: true, styleVariant: 'campaign-neon' }),
   },
+
+  // ── TASK-1431 — familia navigate (mismo shell visual; solo cambia el executor) ──
+  linkUrlInternal: {
+    label: 'link_url interno (path same-origin, mismo contexto)',
+    build: () =>
+      base({
+        slug: 'navigate-link-internal',
+        action: { kind: 'link_url', href: '/servicios/aeo', newContext: false },
+        content: {
+          eyebrow: 'Sigue explorando',
+          headline: 'Conoce el servicio AEO de Efeonce',
+          body: 'Qué incluye, cómo se mide y qué resultados esperar en tu visibilidad con IA.',
+          ctaLabel: 'Ver el servicio AEO',
+          dismissLabel: 'Ahora no',
+        },
+      }),
+  },
+  linkUrlExternalNewTab: {
+    label: 'link_url externo (https, pestaña nueva + rel seguro)',
+    build: () =>
+      base({
+        slug: 'navigate-link-external',
+        action: { kind: 'link_url', href: 'https://efeoncepro.com/blog/', newContext: true },
+        content: {
+          eyebrow: 'Desde el blog',
+          headline: 'Ideas y guías del equipo Efeonce',
+          body: 'Contenido práctico sobre crecimiento, IA y operación de marketing.',
+          ctaLabel: 'Ir al blog de Efeonce',
+          dismissLabel: 'Ahora no',
+        },
+      }),
+  },
+  thinkTool: {
+    label: 'open_think_tool (hub Think + campaign context UTM)',
+    build: () =>
+      base({
+        slug: 'navigate-think-tool',
+        action: {
+          kind: 'open_think_tool',
+          href: 'https://think.efeoncepro.com/brand-visibility?utm_source=greenhouse_cta&utm_campaign=ai-visibility',
+          newContext: false,
+        },
+        content: {
+          eyebrow: 'Herramienta gratuita',
+          headline: 'Mide tu visibilidad en motores de IA',
+          body: 'El AI Visibility Grader analiza cómo te citan ChatGPT, Gemini y Perplexity.',
+          ctaLabel: 'Abrir el AI Visibility Grader',
+          dismissLabel: 'Ahora no',
+        },
+      }),
+  },
+  bookMeeting: {
+    label: 'book_meeting (agenda gobernada; navegación-only)',
+    build: () =>
+      base({
+        slug: 'navigate-book-meeting',
+        action: { kind: 'book_meeting', href: 'https://meetings.hubspot.com/efeonce/diagnostico', newContext: true },
+        content: {
+          eyebrow: 'Conversemos',
+          headline: 'Agenda una reunión con el equipo',
+          body: 'Se abrirá la agenda para que elijas el horario que te acomode.',
+          ctaLabel: 'Abrir la agenda',
+          dismissLabel: 'Ahora no',
+          footnote: 'Sin compromiso. Eliges tú el horario.',
+        },
+      }),
+  },
 }

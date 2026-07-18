@@ -189,6 +189,14 @@ greenhouse-cta, .ghc-scope {
   padding: 12px 20px;
   min-height: 44px;
   width: 100%;
+  /* TASK-1431: el primary puede ser <button> (growth_form) o <a href> (navigate)
+     — mismo shell visual, cero skin por action kind. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  text-decoration: none;
+  box-sizing: border-box;
   transition: filter var(--gh-cta-motion-duration) var(--gh-cta-motion-ease),
     transform var(--gh-cta-motion-duration) var(--gh-cta-motion-ease),
     box-shadow var(--gh-cta-motion-duration) var(--gh-cta-motion-ease);
@@ -220,7 +228,8 @@ greenhouse-cta, .ghc-scope {
   outline: 2px solid var(--gh-cta-focus);
   outline-offset: 2px;
 }
-:is(greenhouse-cta, .ghc-scope) .ghc-primary[disabled] { opacity: 0.7; cursor: progress; }
+:is(greenhouse-cta, .ghc-scope) .ghc-primary[disabled],
+:is(greenhouse-cta, .ghc-scope) .ghc-primary[aria-disabled='true'] { opacity: 0.7; cursor: progress; }
 
 :is(greenhouse-cta, .ghc-scope) .ghc-dismiss {
   appearance: none;

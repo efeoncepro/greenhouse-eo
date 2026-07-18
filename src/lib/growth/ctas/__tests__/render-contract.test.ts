@@ -52,7 +52,7 @@ describe('compileCtaVersion', () => {
     expect(renderContract).not.toBeNull()
     expect(renderContract?.contractVersion).toBe('greenhouse-growth-cta-popup.v1')
     expect(renderContract?.cta.slug).toBe('ai-visibility-followup')
-    expect(renderContract?.action.formSlug).toBe('ai-visibility-grader')
+    expect(renderContract?.action).toMatchObject({ kind: 'open_growth_form', formSlug: 'ai-visibility-grader' })
     expect(renderContract?.interruptive).toBe(false)
     expect(renderContract?.surfacePolicy.allowedOrigins).toEqual(['https://efeoncepro.com'])
   })

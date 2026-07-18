@@ -60,8 +60,12 @@ export type CtaSurfaceStatus = (typeof CTA_SURFACE_STATUSES)[number]
  * demand-driven — extender este enum + `action-registry.ts` + el espejo del renderer
  * JUNTOS (un kind sin entry registrado no publica ni renderiza: fail-closed).
  */
-export const CTA_ACTION_KINDS = ['open_growth_form'] as const
+export const CTA_ACTION_KINDS = ['open_growth_form', 'link_url', 'open_think_tool', 'book_meeting'] as const
 export type CtaActionKind = (typeof CTA_ACTION_KINDS)[number]
+
+/** Kinds de la familia `navigate` (proyección href + newContext; executor anchor nativo). */
+export const CTA_NAVIGATE_ACTION_KINDS = ['link_url', 'open_think_tool', 'book_meeting'] as const
+export type CtaNavigateActionKind = (typeof CTA_NAVIGATE_ACTION_KINDS)[number]
 
 // ─── Action registry — metadata browser-safe/read-only por kind (TASK-1431) ────
 
@@ -122,11 +126,44 @@ export const CTA_ACTION_KIND_METADATA: Readonly<Record<CtaActionKind, CtaActionK
     failureReasons: ['action_policy_invalid', 'action_destination_unavailable'],
     telemetryKind: 'open_growth_form',
   },
+  link_url: {
+    kind: 'link_url',
+    executionFamily: 'navigate',
+    destinationExpectation: 'internal_page',
+    navigationContext: 'new_context_allowed',
+    supportsInlineContinuation: false,
+    requiredPolicyFields: ['url'],
+    failureReasons: ['action_policy_invalid', 'action_destination_invalid'],
+    telemetryKind: 'link_url',
+  },
+  open_think_tool: {
+    kind: 'open_think_tool',
+    executionFamily: 'navigate',
+    destinationExpectation: 'think_tool',
+    navigationContext: 'new_context_allowed',
+    supportsInlineContinuation: false,
+    requiredPolicyFields: ['toolPath'],
+    failureReasons: ['action_policy_invalid', 'action_destination_invalid', 'action_destination_unavailable'],
+    telemetryKind: 'open_think_tool',
+  },
+  book_meeting: {
+    kind: 'book_meeting',
+    executionFamily: 'navigate',
+    destinationExpectation: 'booking_page',
+    navigationContext: 'new_context_allowed',
+    supportsInlineContinuation: false,
+    requiredPolicyFields: ['meetingUrl'],
+    failureReasons: ['action_policy_invalid', 'action_destination_invalid'],
+    telemetryKind: 'book_meeting',
+  },
 }
 
 /** Espejo browser-safe kind→familia para el executor (parity test contra la metadata). */
 export const CTA_ACTION_KIND_FAMILIES: Readonly<Record<CtaActionKind, CtaActionExecutionFamily>> = {
   open_growth_form: 'growth_form',
+  link_url: 'navigate',
+  open_think_tool: 'navigate',
+  book_meeting: 'navigate',
 }
 
 /** Tier A — evidencia de conversión audit-grade (arch §9.4). Exposición (eligible/suppressed/viewed) es Tier B, FUERA de este ledger. */
@@ -172,12 +209,70 @@ export const ctaOpenGrowthFormPolicySchema = z.object({
 })
 export type CtaOpenGrowthFormPolicy = z.infer<typeof ctaOpenGrowthFormPolicySchema>
 
+/** Keys UTM permitidas (allowlist dura; también gobierna el campaign context de Think). */
+export const CTA_UTM_ALLOWED_KEYS = ['source', 'medium', 'campaign', 'term', 'content'] as const
+
+/** Largo máximo de un destino autorado (espejo del límite del render action). */
+export const CTA_ACTION_DESTINATION_MAX = 2000
+
+/**
+ * Policy `link_url` (server): destino root-relative o HTTPS. La validación de
+ * gobernanza (protocolos peligrosos, credenciales embebidas, protocol-relative)
+ * vive en el resolver del registry — el schema solo acota shape/largo.
+ */
+export const ctaLinkUrlPolicySchema = z.object({
+  kind: z.literal('link_url'),
+  url: z.string().min(1).max(CTA_ACTION_DESTINATION_MAX),
+  /** Opt-in del autor a nueva pestaña/contexto (default seguro: mismo contexto). */
+  openInNewContext: z.boolean().default(false),
+})
+export type CtaLinkUrlPolicy = z.infer<typeof ctaLinkUrlPolicySchema>
+
+/**
+ * Policy `open_think_tool` (server): path DENTRO del hub Think gobernado (el host
+ * lo resuelve el registry — la policy jamás guarda un host arbitrario) + contexto
+ * de campaña allowlisted (UTM-only, `.strict()`): nunca identidad directa ni PII.
+ */
+export const ctaOpenThinkToolPolicySchema = z.object({
+  kind: z.literal('open_think_tool'),
+  toolPath: z.string().min(1).max(500),
+  campaignUtm: z
+    .object({
+      source: z.string().min(1).max(300).optional(),
+      medium: z.string().min(1).max(300).optional(),
+      campaign: z.string().min(1).max(300).optional(),
+      term: z.string().min(1).max(300).optional(),
+      content: z.string().min(1).max(300).optional(),
+    })
+    .strict()
+    .default({}),
+  openInNewContext: z.boolean().default(false),
+})
+export type CtaOpenThinkToolPolicy = z.infer<typeof ctaOpenThinkToolPolicySchema>
+
+/**
+ * Policy `book_meeting` (server): URL HTTPS de un host de booking gobernado
+ * (allowlist en el registry). Navegación-only: NUNCA crea Contact/Deal/Meeting
+ * por click (arch §12; el adapter CRM es demand-driven fuera de V1).
+ */
+export const ctaBookMeetingPolicySchema = z.object({
+  kind: z.literal('book_meeting'),
+  meetingUrl: z.string().min(1).max(CTA_ACTION_DESTINATION_MAX),
+  openInNewContext: z.boolean().default(false),
+})
+export type CtaBookMeetingPolicy = z.infer<typeof ctaBookMeetingPolicySchema>
+
 /**
  * Unión discriminada de action policies (TASK-1431). El shape por kind vive junto a
  * su entry del registry (`action-registry.ts` = SoT de validación server-side); esta
  * unión existe para tipado/authoring. NUNCA cruza al browser.
  */
-export const ctaActionPolicySchema = z.discriminatedUnion('kind', [ctaOpenGrowthFormPolicySchema])
+export const ctaActionPolicySchema = z.discriminatedUnion('kind', [
+  ctaOpenGrowthFormPolicySchema,
+  ctaLinkUrlPolicySchema,
+  ctaOpenThinkToolPolicySchema,
+  ctaBookMeetingPolicySchema,
+])
 export type CtaActionPolicy = z.infer<typeof ctaActionPolicySchema>
 
 /**
@@ -305,12 +400,36 @@ export const ctaRenderOpenGrowthFormActionSchema = z.object({
 })
 export type CtaRenderOpenGrowthFormAction = z.infer<typeof ctaRenderOpenGrowthFormActionSchema>
 
+/** Proyección navigate ya resuelta: href validado server-side + hint de contexto. */
+const buildNavigateRenderActionSchema = <K extends CtaNavigateActionKind>(kind: K) =>
+  z.object({
+    kind: z.literal(kind),
+    /** https absoluta o path root-relative — YA pasó la gobernanza del resolver. */
+    href: z.string().min(1).max(CTA_ACTION_DESTINATION_MAX),
+    /** true ⇒ el executor puede abrir nuevo contexto (con rel seguro obligatorio). */
+    newContext: z.boolean(),
+  })
+
+export const ctaRenderLinkUrlActionSchema = buildNavigateRenderActionSchema('link_url')
+export const ctaRenderOpenThinkToolActionSchema = buildNavigateRenderActionSchema('open_think_tool')
+export const ctaRenderBookMeetingActionSchema = buildNavigateRenderActionSchema('book_meeting')
+
+export type CtaRenderNavigateAction =
+  | z.infer<typeof ctaRenderLinkUrlActionSchema>
+  | z.infer<typeof ctaRenderOpenThinkToolActionSchema>
+  | z.infer<typeof ctaRenderBookMeetingActionSchema>
+
 /**
  * Unión discriminada de acciones YA resueltas (TASK-1431) — LO ÚNICO que cruza al
  * browser sobre la acción: kind + refs/href allowlisted + hints mínimos. Nunca la
  * policy, el destination mapping ni el candidate set.
  */
-export const ctaRenderActionSchema = z.discriminatedUnion('kind', [ctaRenderOpenGrowthFormActionSchema])
+export const ctaRenderActionSchema = z.discriminatedUnion('kind', [
+  ctaRenderOpenGrowthFormActionSchema,
+  ctaRenderLinkUrlActionSchema,
+  ctaRenderOpenThinkToolActionSchema,
+  ctaRenderBookMeetingActionSchema,
+])
 export type CtaRenderAction = z.infer<typeof ctaRenderActionSchema>
 
 export const ctaRenderContractSchema = z.object({
@@ -354,9 +473,6 @@ export interface ArbitratedRenderResult {
 
 /** Keys permitidas en `payload` (allowlist dura; sin PII). */
 export const CTA_EVENT_PAYLOAD_ALLOWED_KEYS = ['reason', 'step', 'durationMs'] as const
-
-/** Keys UTM permitidas (allowlist dura). */
-export const CTA_UTM_ALLOWED_KEYS = ['source', 'medium', 'campaign', 'term', 'content'] as const
 
 export const ctaPublicEventInputSchema = z.object({
   surfaceId: z.string().min(1).max(100),

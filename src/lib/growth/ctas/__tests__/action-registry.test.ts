@@ -141,3 +141,149 @@ describe('resolveRegisteredCtaAction (fachada resolveCtaAction delega acá)', ()
     })
   })
 })
+
+describe('link_url — navegación gobernada', () => {
+  it('acepta path root-relative y https absoluta; default same-context', async () => {
+    await expect(resolveCtaAction({ kind: 'link_url', url: '/servicios/aeo' })).resolves.toEqual({
+      ok: true,
+      action: { kind: 'link_url', href: '/servicios/aeo', newContext: false },
+    })
+
+    await expect(resolveCtaAction({ kind: 'link_url', url: 'https://efeoncepro.com/blog/' })).resolves.toEqual({
+      ok: true,
+      action: { kind: 'link_url', href: 'https://efeoncepro.com/blog/', newContext: false },
+    })
+  })
+
+  it('honra el opt-in de nuevo contexto (metadata new_context_allowed)', async () => {
+    await expect(
+      resolveCtaAction({ kind: 'link_url', url: 'https://efeoncepro.com/', openInNewContext: true }),
+    ).resolves.toMatchObject({ ok: true, action: { newContext: true } })
+  })
+
+  it('rechaza protocolos peligrosos, protocol-relative, credenciales y http no-seguro', async () => {
+    const invalid = [
+      'javascript:alert(1)',
+      'data:text/html,<script>1</script>',
+      'vbscript:x',
+      '//evil.com/path',
+      '/\\evil.com',
+      'http://efeoncepro.com/',
+      'https://user:pass@efeoncepro.com/',
+      'ftp://files.example.com/',
+      '   ',
+    ]
+
+    for (const url of invalid) {
+      await expect(resolveCtaAction({ kind: 'link_url', url })).resolves.toEqual({
+        ok: false,
+        reason: 'action_destination_invalid',
+      })
+    }
+  })
+})
+
+describe('open_think_tool — hub gobernado + campaign context allowlisted', () => {
+  it('compone la URL sobre el hub Think (el autor jamás elige host) + UTM allowlisted', async () => {
+    const result = await resolveCtaAction({
+      kind: 'open_think_tool',
+      toolPath: '/brand-visibility',
+      campaignUtm: { source: 'greenhouse_cta', campaign: 'ai-visibility' },
+    })
+
+    expect(result).toEqual({
+      ok: true,
+      action: {
+        kind: 'open_think_tool',
+        href: 'https://think.efeoncepro.com/brand-visibility?utm_source=greenhouse_cta&utm_campaign=ai-visibility',
+        newContext: false,
+      },
+    })
+  })
+
+  it('respeta el override de hub por env (GROWTH_CTA_THINK_HUB_URL)', async () => {
+    vi.stubEnv('GROWTH_CTA_THINK_HUB_URL', 'https://think-staging.efeoncepro.com/')
+
+    try {
+      await expect(resolveCtaAction({ kind: 'open_think_tool', toolPath: '/muestras/x' })).resolves.toMatchObject({
+        ok: true,
+        action: { href: 'https://think-staging.efeoncepro.com/muestras/x' },
+      })
+    } finally {
+      vi.unstubAllEnvs()
+    }
+  })
+
+  it('hub mal configurado (env no-https) ⇒ action_destination_unavailable, jamás un href roto', async () => {
+    vi.stubEnv('GROWTH_CTA_THINK_HUB_URL', 'http://plain-http.example.com')
+
+    try {
+      await expect(resolveCtaAction({ kind: 'open_think_tool', toolPath: '/x' })).resolves.toEqual({
+        ok: false,
+        reason: 'action_destination_unavailable',
+      })
+    } finally {
+      vi.unstubAllEnvs()
+    }
+  })
+
+  it('rechaza paths fuera del contrato (no root-relative, query/fragment propios, backslash, whitespace)', async () => {
+    const invalid = ['brand-visibility', '//evil.com', '/\\evil.com', '/x?y=1', '/x#y', '/x\\y', '/x y']
+
+    for (const toolPath of invalid) {
+      await expect(resolveCtaAction({ kind: 'open_think_tool', toolPath })).resolves.toEqual({
+        ok: false,
+        reason: 'action_destination_invalid',
+      })
+    }
+  })
+
+  it('campaign context fuera de la allowlist UTM ⇒ action_policy_invalid (strict, nunca identidad/PII)', async () => {
+    await expect(
+      resolveCtaAction({ kind: 'open_think_tool', toolPath: '/x', campaignUtm: { email: 'p@x.com' } }),
+    ).resolves.toEqual({ ok: false, reason: 'action_policy_invalid' })
+  })
+})
+
+describe('book_meeting — booking host gobernado, navegación-only', () => {
+  it('acepta hosts HubSpot Meetings (patrón regional incluido)', async () => {
+    await expect(
+      resolveCtaAction({ kind: 'book_meeting', meetingUrl: 'https://meetings.hubspot.com/efeonce/diagnostico' }),
+    ).resolves.toEqual({
+      ok: true,
+      action: { kind: 'book_meeting', href: 'https://meetings.hubspot.com/efeonce/diagnostico', newContext: false },
+    })
+
+    await expect(
+      resolveCtaAction({ kind: 'book_meeting', meetingUrl: 'https://meetings-eu1.hubspot.com/x', openInNewContext: true }),
+    ).resolves.toMatchObject({ ok: true, action: { newContext: true } })
+  })
+
+  it('rechaza hosts fuera del allowlist (incluidos lookalikes) y URLs relativas', async () => {
+    const invalid = [
+      'https://meetings.hubspot.com.evil.com/x',
+      'https://evil.com/meetings.hubspot.com',
+      'https://calendly.com/alguien',
+      '/agenda',
+    ]
+
+    for (const meetingUrl of invalid) {
+      await expect(resolveCtaAction({ kind: 'book_meeting', meetingUrl })).resolves.toEqual({
+        ok: false,
+        reason: 'action_destination_invalid',
+      })
+    }
+  })
+
+  it('permite hosts extra SOLO vía env GROWTH_CTA_BOOKING_URL_HOSTS', async () => {
+    vi.stubEnv('GROWTH_CTA_BOOKING_URL_HOSTS', 'agenda.efeoncepro.com')
+
+    try {
+      await expect(
+        resolveCtaAction({ kind: 'book_meeting', meetingUrl: 'https://agenda.efeoncepro.com/equipo' }),
+      ).resolves.toMatchObject({ ok: true, action: { href: 'https://agenda.efeoncepro.com/equipo' } })
+    } finally {
+      vi.unstubAllEnvs()
+    }
+  })
+})

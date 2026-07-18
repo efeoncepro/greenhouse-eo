@@ -97,6 +97,8 @@ const mountFixture = async (
     telemetry: { emit: () => undefined },
     onPrimary: async () => true,
     onIngest: () => undefined,
+    // TASK-1431: el preview jamás navega el portal — demo del pending sin salir.
+    inertNavigation: true,
   })
 
   renderer.render()
@@ -187,6 +189,7 @@ const SlideInDensityMatrix = ({ fixture }: { fixture: keyof typeof CTA_FIXTURES 
         onPrimary: async () => true,
         onIngest: () => undefined,
         triggerMode: 'immediate',
+        inertNavigation: true,
       })
 
       controller.arm()

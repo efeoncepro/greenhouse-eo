@@ -17,6 +17,10 @@ export interface CtaSystemCopy {
   loadingAria: string
   /** aria-live al montar el form (feedback perceptible sin animación). */
   formOpeningAria: string
+  /** role=status durante el dispatch de una acción navigate (TASK-1431). */
+  navigatingAria: string
+  /** sr-only dentro del anchor cuando la navegación abre nuevo contexto (TASK-1431). */
+  newTabAria: string
 }
 
 const ES_CL: CtaSystemCopy = {
@@ -24,6 +28,8 @@ const ES_CL: CtaSystemCopy = {
   dismissAria: 'Cerrar este aviso',
   loadingAria: 'Cargando contenido…',
   formOpeningAria: 'Abriendo el formulario…',
+  navigatingAria: 'Abriendo el enlace…',
+  newTabAria: 'Se abre en una pestaña nueva',
 }
 
 /** Default es-CL; el hook de locale queda para cuando exista contrato multi-locale. */
