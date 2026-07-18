@@ -6,6 +6,9 @@
   Semrush: shell de marca estable, arquetipo variable por relación, paleta auditada, shareability y sello
   `efeoncepro.com` consumido desde Artifact Composer. La regla está espejada en Codex/Claude y enlazada desde
   `design-studio` y el carril Gutenberg/WordPress.
+- El pillar privado `El fin de la web “solo para humanos”` aplica el sistema en siete infografías y 28 variantes
+  SVG: la firma completa —fuente/fecha, wordmark oficial y URL— vive en el footer, nunca en el header. El draft
+  `249387` quedó integrado con art direction light/dark y desktop/mobile, sin cambiar su estado a publicado.
 - El pipeline deja de imponer PNG/WebP: separa source SVG de delivery SVG saneado y rasteriza solo por contenido,
   destino, seguridad o comparación de peso. Se agregaron contrato reusable, preset JSON y auditor CLI. En la
   muestra histórica, el SVG comprimido resultó ~2.1×–5.6× más liviano que WebP 1200 comparable. Comando canónico:
@@ -42,7 +45,7 @@
 ## 2026-07-18 — Pillar privada de web agéntica preparada para revisión
 
 - El post WordPress `249387`, `El fin de la web “solo para humanos”`, quedó actualizado como pillar de 4.448 palabras para soportar la landing de desarrollo web: definición citable, cuatro tipos de sitio, arquitectura compartida, matriz WebMCP/MCP/API, estado real de Chrome/WebMCP y del mercado, evals por capas, cadena de autoridad, doce pruebas de readiness, reconstrucción y FAQ.
-- Content Factory pasa con 95 bloques semánticos, TOC de 20 destinos, featured/OG separados y tres diagramas de cuerpo. WAG-V04 agrega identidad, representación, alcance, confirmación y evidencia a WAG-V02/V03; el gate automático `getBBox()` y la QA privada 1440/390 light/dark pasan sin texto fuera de superficie, imágenes rotas ni overflow. El artículo sigue en `draft`; publicación, enlace recíproco, purge y QA live requieren autorización humana separada.
+- Content Factory pasa con 99 bloques semánticos, TOC de 20 destinos, featured/OG separados y siete diagramas de cuerpo. WAG-V04 agrega identidad, representación, alcance, confirmación y evidencia a WAG-V02/V03; el gate automático de geometría y la QA SVG light/dark desktop/mobile pasan sin texto fuera de superficie, imágenes rotas ni overflow. El artículo sigue en `draft`; publicación, enlace recíproco, purge y QA live requieren autorización humana separada.
 
 ## 2026-07-17 — TASK-1339: Growth CTA & Popup Engine — foundation `growth.cta` (code complete, shadow)
 

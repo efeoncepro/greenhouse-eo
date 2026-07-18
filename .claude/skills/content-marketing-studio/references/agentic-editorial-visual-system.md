@@ -167,8 +167,13 @@ Cada visual system brief debe declarar una **brand signature policy** antes de g
 - usos prohibidos: reconstrucción, deformación, recolor arbitrario, watermark dominante, textura repetida o acumulación de logos.
 
 Para Efeonce, usar exclusivamente los wordmarks oficiales de `public/branding/`; `AxisWordmark` es interno y no
-debe aparecer en piezas públicas. En diagramas de cuerpo la firma es pequeña y periférica; en hero/OG puede
-vivir en una esquina o banda editorial dentro de la zona segura. El logo de un cliente identifica el caso y
+debe aparecer en piezas públicas. En infografías de cuerpo para artículos, **toda la información de marca vive
+en el footer editorial**: nunca ubicar wordmark, sello, dominio o watermark en el header, la esquina superior o
+el campo explicativo. Consumir el sello canónico `efeoncepro.com` desde
+`src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg`; si el brief exige además un wordmark, también
+debe componerse dentro del footer y sin competir con fuente, fecha o contenido. El header queda reservado para
+kicker, título y bajada editorial. Hero/OG constituye otra superficie y puede usar una firma dentro de su zona
+segura si el brief lo declara. El logo de un cliente identifica el caso y
 requiere autorización específica; no reemplaza ni se fusiona con la firma de Efeonce. No pedir al generador que
 dibuje un logo: componer el activo oficial de forma determinística después de seleccionar el master.
 

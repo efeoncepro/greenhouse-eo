@@ -1,0 +1,2711 @@
+{
+  "contractVersion": "contentFactoryPostDeepInspection.v1",
+  "scannedAt": "2026-07-18T09:17:50+00:00",
+  "source": "wp_cli_parse_blocks",
+  "safetyPolicy": {
+    "writesWordPressContent": false,
+    "publishesContent": false,
+    "clearsCache": false,
+    "createsBackup": false,
+    "sendsSecretsToOutput": false
+  },
+  "post": {
+    "id": 249387,
+    "type": "post",
+    "status": "draft",
+    "slug": "web-agentica-agentes-ia",
+    "title": "El fin de la web “solo para humanos”",
+    "modified": "2026-07-18T09:17:42+00:00",
+    "permalink": "https://efeoncepro.com/?p=249387",
+    "contentLength": 50594
+  },
+  "seo": {
+    "yoastTitle": "Web agéntica: guía para sitios preparados para agentes de IA %%sep%% %%sitename%%",
+    "yoastDescription": "Guía de web agéntica: AEO, accesibilidad, WebMCP, arquitectura, seguridad y 12 pruebas para preparar un sitio para personas y agentes de IA.",
+    "primaryCategory": "156"
+  },
+  "summary": {
+    "totalBlocks": 197,
+    "topLevelBlocks": 197,
+    "counts": {
+      "core/freeform": 98,
+      "core/heading": 20,
+      "core/image": 7,
+      "core/list": 3,
+      "core/paragraph": 56,
+      "core/pullquote": 1,
+      "core/quote": 3,
+      "core/separator": 1,
+      "core/table": 7,
+      "yoast-seo/table-of-contents": 1
+    },
+    "maxDepth": 0,
+    "linkCount": 50,
+    "nonEmptyFreeformCount": 0,
+    "mediaIssueCount": 0
+  },
+  "headingOutline": [
+    {
+      "path": "10",
+      "level": 2,
+      "text": "¿Qué es una web agéntica?"
+    },
+    {
+      "path": "22",
+      "level": 2,
+      "text": "La web ahora tiene un segundo operador"
+    },
+    {
+      "path": "32",
+      "level": 2,
+      "text": "AEO y preparación agéntica no son lo mismo"
+    },
+    {
+      "path": "44",
+      "level": 2,
+      "text": "Cómo usan hoy la web los agentes"
+    },
+    {
+      "path": "56",
+      "level": 2,
+      "text": "¿Qué cambia en un proyecto de desarrollo web?"
+    },
+    {
+      "path": "66",
+      "level": 2,
+      "text": "WebMCP dejó de ser una nota al pie"
+    },
+    {
+      "path": "78",
+      "level": 2,
+      "text": "Las señales del mercado forman un sistema, no un solo protocolo"
+    },
+    {
+      "path": "94",
+      "level": 2,
+      "text": "Una herramienta disponible no es una tarea resuelta"
+    },
+    {
+      "path": "106",
+      "level": 2,
+      "text": "Los cinco niveles para existir en un internet de agentes"
+    },
+    {
+      "path": "116",
+      "level": 2,
+      "text": "¿Cómo saber si tu sitio está preparado para agentes?"
+    },
+    {
+      "path": "128",
+      "level": 2,
+      "text": "¿Debes reconstruir tu sitio para prepararlo?"
+    },
+    {
+      "path": "138",
+      "level": 2,
+      "text": "La confianza no es la última capa"
+    },
+    {
+      "path": "152",
+      "level": 2,
+      "text": "Preguntas frecuentes sobre la web agéntica"
+    },
+    {
+      "path": "156",
+      "level": 3,
+      "text": "¿Necesito WebMCP para tener un sitio preparado para agentes?"
+    },
+    {
+      "path": "160",
+      "level": 3,
+      "text": "¿WebMCP reemplaza al SEO, AEO, MCP o las APIs?"
+    },
+    {
+      "path": "164",
+      "level": 3,
+      "text": "¿Un sitio WordPress puede prepararse para agentes?"
+    },
+    {
+      "path": "168",
+      "level": 3,
+      "text": "¿Un chatbot convierte mi sitio en una web agéntica?"
+    },
+    {
+      "path": "172",
+      "level": 3,
+      "text": "¿Qué acciones no deberían automatizarse por completo?"
+    },
+    {
+      "path": "176",
+      "level": 3,
+      "text": "¿Cómo se mide la preparación agéntica?"
+    },
+    {
+      "path": "180",
+      "level": 2,
+      "text": "La decisión que vale la pena tomar"
+    }
+  ],
+  "blocks": [
+    {
+      "path": "0",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Tu próximo cliente puede llegar a tu sitio con una decisión bastante avanzada. No porque haya leído todas tus páginas, sino porque un agente ya investigó, comparó alternativas y preparó el siguiente paso.",
+      "innerBlockCount": 0,
+      "fingerprint": "c4038dc024e1e7adf40a83bfd86b95fd0334b5ca54579e6fc5e04367fe2f89d5",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "1",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2da24f92367f7c2b0e4f76ad392b66fce9027bfa35a81485910e5d0ae882d5b9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "2",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Eso no significa que la web para humanos esté desapareciendo. Significa que dejó de estar sola. Ahora conviven, al menos, dos operadores: la persona que navega y el agente que actúa en su nombre. A veces trabajan juntos. Otras veces, el agente llega primero.",
+      "innerBlockCount": 0,
+      "fingerprint": "61a526b6ad8cabd9d33e05ab8409929e105a17ac20960ea5427b8729f8e6e524",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "3",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "4b5c99f6fafba03d9973d68018f691c628527b5b6e25c9e4fe26fedf312548a7",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "4",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Vamos con manzanitas 🍏🍏🍏: imagina que alguien necesita una agencia capaz de implementar HubSpot en Chile, con experiencia B2B y disponibilidad durante el próximo mes. Su agente revisa varios sitios. En algunos encuentra promesas, pero no alcance, metodología n…",
+      "innerBlockCount": 0,
+      "fingerprint": "b548852353cba6d8a7fa66c092aea50dbc6601a066143d4ee1e6f8ae204da196",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "5",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "62db42a028e487a080771dcb8308c877e830521c7e072b6dbfb3206756272e1f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "6",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El ejemplo es hipotético, pero la decisión de diseño es real: tu presencia digital necesita seguir siendo clara para las personas y empezar a ser entendible, comparable y operable para agentes. Esta guía explica qué es una web agéntica, dónde entran AEO y WebM…",
+      "innerBlockCount": 0,
+      "fingerprint": "df1fa9952816d9159d8cbf3342e7e9e9c3d8e9ec770bf6f097321bc01b42e5de",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "7",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "c284c4c12aefa43352f47d5ae193ebd4c3db1e74bc665ace910fdbfd6b7ca2b5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "8",
+      "depth": 0,
+      "blockName": "yoast-seo/table-of-contents",
+      "attrs": {},
+      "text": "Tabla de contenidos¿Qué es una web agéntica?La web ahora tiene un segundo operadorAEO y preparación agéntica no son lo mismoCómo usan hoy la web los agentes¿Qué cambia en un proyecto de desarrollo web?WebMCP dejó de ser una nota al pieLas señales del mercado f…",
+      "innerBlockCount": 0,
+      "fingerprint": "151e37d5a3bd2f9b622db11777ad03d679e23c5eaa6c23446533dfd643132199",
+      "editability": "preserve_structure",
+      "risks": [],
+      "href": "#h-que-es-una-web-agentica"
+    },
+    {
+      "path": "9",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "83858823bfd43358305f10f00874c21d546e0764e53e599d4a1bd2a8983cbaf5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "10",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "¿Qué es una web agéntica?",
+      "innerBlockCount": 0,
+      "fingerprint": "e4668d66d80259979cdc48b520d0e1a5b6c2762538357af1a96f9cea2d79843f",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "11",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "4dca91fafb9af976b35ddc2b0ddb37e1f98fde38c886593c5707d32d12d69ea5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "12",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Una web agéntica es un sitio diseñado para que personas y agentes de IA puedan comprender su oferta, evaluar alternativas y completar tareas de manera segura. Combina una interfaz humana clara con información estructurada, capacidades invocables, permisos, con…",
+      "innerBlockCount": 0,
+      "fingerprint": "c1e294bbfd56b5461ba918081368e2f461c231a152d9a37e98d38c9f9c27c4cc",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "13",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e84eb997543a7dd41514d773b9cbe2137fd6e32c2a54cbfc9ac8bcce9e94bbd1",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "14",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "No es sinónimo de un sitio construido con IA ni de una página que incorpora un chatbot. La diferencia está en quién puede operar el sistema y bajo qué contrato. Un asistente dentro del sitio puede conversar con el visitante; una web preparada para agentes perm…",
+      "innerBlockCount": 0,
+      "fingerprint": "1d95acf490fab164b472726eedc422e10032ddf0c93f3e0cd0c04230b70411f4",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "15",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "661e12f5c6529bc71e7e349b071d9e1cb7932b3ca81965ead12f9a6463eb2414",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "16",
+      "depth": 0,
+      "blockName": "core/table",
+      "attrs": {},
+      "text": "Tipo de sitioQué haceQué no garantizaSitio tradicionalInforma y convierte mediante una interfaz humanaQue un agente pueda interpretarlo correctamenteSitio con IAIncorpora chatbot, generación o personalizaciónQue agentes externos puedan operar el negocioSitio p…",
+      "innerBlockCount": 0,
+      "fingerprint": "98fb097cc7f51a6c1147e95a29c7233a93b650bbc14826bef983b86780bd5f64",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "17",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "c423d4f29c415e75245bec0f0485223b01d85f2f11644b45cb4ac281d90df4a9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "18",
+      "depth": 0,
+      "blockName": "core/image",
+      "attrs": {
+        "id": 251514,
+        "sizeSlug": "large",
+        "linkDestination": "media"
+      },
+      "text": "La transición decisiva no es “más IA”, sino una acción explícita, gobernada y demostrable.",
+      "innerBlockCount": 0,
+      "fingerprint": "1c8c48217614120fe49183c7a7c3a73d407f2b8494e2f943134e83fdabfd5f09",
+      "editability": "media_requires_reconcile",
+      "risks": [
+        "media_refs_must_be_reconciled_before_write"
+      ],
+      "media": {
+        "id": 251514,
+        "attachmentUrl": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-frontera-operativa-desktop-light-v7.svg",
+        "renderedSrc": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-frontera-operativa-desktop-light-v7.svg",
+        "alt": "Cuatro estados muestran cómo disminuye la inferencia y aumentan la operabilidad y el gobierno: sitio tradicional, sitio con IA, sitio preparado y web agéntica.",
+        "width": null,
+        "height": null
+      },
+      "href": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-frontera-operativa-desktop-light-v7.svg"
+    },
+    {
+      "path": "19",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "dd6e2c3c76a82830321d48de818f635d83749645c0a63b252f31832eb9b0e432",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "20",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Esta distinción importa porque buena parte del mercado todavía usa “desarrollo web con IA” para describir producción acelerada, chatbots o automatización. Son capacidades válidas, pero resuelven otro problema. La preparación agéntica pregunta si un tercero aut…",
+      "innerBlockCount": 0,
+      "fingerprint": "ec89e280964e1011a5e4869c8825197ff8a4e461ebe4a642fe010c02eb6ed2e2",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "21",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "657f90f2163e0fe357d624219a016dabec7eba7d57a79f1d2f960c7347b2f9c0",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "22",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "La web ahora tiene un segundo operador",
+      "innerBlockCount": 0,
+      "fingerprint": "b5824eb4f9095bf3aa7c53b687bb0990763b5b7ebed94bf277e53cd6ccd4a397",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "23",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7d6d371d4dbfcfb1428409fff1c4c0037a77055eea9e723c3624f004292b3ab9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "24",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Durante años diseñamos el recorrido digital suponiendo que una persona miraría la pantalla, interpretaría el menú, leería la página y pulsaría un botón. Los agentes agregan otra forma de recorrer ese mismo sistema: pueden investigar, filtrar información, compl…",
+      "innerBlockCount": 0,
+      "fingerprint": "15869df8fae5d2e9e7c5593eb7793fa6d2f77fc5df233c2c91c310033ae65f93",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "25",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ac173ffb8869f6666f0831d325010b26566cbc77a3518c6dd8636efafccb6d9f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "26",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La consecuencia no es que la página deje de importar. La página sigue construyendo contexto, confianza y consentimiento; la acción se convierte en una segunda superficie del producto. Ya no basta con preguntar qué información mostramos. También debemos pregunt…",
+      "innerBlockCount": 0,
+      "fingerprint": "e417ef31c1185acd834c6ea70dae97f23f149178087a7863d7db172333bdba70",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "27",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "34b63d36ab5e5d57165076da458251645e23ae7836216c9ccd095ad047698b78",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "28",
+      "depth": 0,
+      "blockName": "core/pullquote",
+      "attrs": {},
+      "text": "La web humana no desaparece. Gana un segundo operador.",
+      "innerBlockCount": 0,
+      "fingerprint": "e780f55a674abcbcb67afacdae4bd6b298bc391187b9ea5a8d409f8f01b17e00",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "29",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2c9b09a2ebe532e3b49c51beea30f1663a68278c4920f7d960e01431c62b5ad5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "30",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Esto también cambia la medición. Vistas de página, sesiones y conversiones siguen siendo útiles, pero ya no describen todo el recorrido. Una experiencia agéntica necesita observar además si el agente entendió la tarea, encontró la acción correcta, completó cad…",
+      "innerBlockCount": 0,
+      "fingerprint": "dba4280e5a309869402f6d28ad1254745daa2184ce3942b690e2a8a98dec81b7",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "31",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "c50c720347dfe52776431315bb77275805c25a8c8e5cf37883a52413c5ae9cf5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "32",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "AEO y preparación agéntica no son lo mismo",
+      "innerBlockCount": 0,
+      "fingerprint": "f4de954975d93725d065b7304e284adec3996bf12f6ae8ba6d152c71e5a84570",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "33",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0ea2bb7516e325cff7952d2b45196e71af3c6fb7d59bbe5d55cbea5e58566194",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "34",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "AEO —Answer Engine Optimization— trabaja para que una marca y su contenido puedan ser recuperados, comprendidos, representados con precisión y citados por motores de respuesta. Eso exige fundamentos conocidos: acceso técnico, contenido útil, entidades consiste…",
+      "innerBlockCount": 0,
+      "fingerprint": "90e873467abf1a8dc491e8ce6fa57d63e559a58948b3155dfea309efcb2110b1",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "35",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e26d65395fc27b4cdb43da753a28c83ff1ed8e1720f59373d9f081535d704e9b",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "36",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La preparación agéntica —agentic readiness— responde otra pregunta: ¿puede un agente usar el sitio para completar una tarea? Una empresa puede aparecer correctamente en una respuesta de IA y, aun así, obligar al usuario a comenzar de cero cuando llega el momen…",
+      "innerBlockCount": 0,
+      "fingerprint": "5093b1e73e189a360f024e165d4ea7dbbd17edc414e788f4bef5b9a1ed7ff76f",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "37",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9a41c767a763d456d376dc318669e5ccca6a466b5acc4b23642d9b763fa2e27b",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "38",
+      "depth": 0,
+      "blockName": "core/table",
+      "attrs": {},
+      "text": "DisciplinaPregunta principalResultado esperadoSEO¿El buscador puede rastrear, entender y posicionar la página?Visibilidad en resultados de búsquedaAEO¿El motor de respuesta puede recuperar, representar y citar la marca?Presencia y precisión en respuestas gener…",
+      "innerBlockCount": 0,
+      "fingerprint": "d9e115b5ec21d0bacf66bc6ac0ea7ef00a78d8fc8b0d84e515e0567daa73c531",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "39",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2afbc9c9b8b1f9a4db9b0885d7a6a3c499d8d7c426782fa741759d88ba945d32",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "40",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Hay una razón técnica para mantener separadas percepción y operabilidad. Las herramientas WebMCP se descubren dentro del contexto de una página: el cliente debe visitar el sitio antes de saber que existen. Por eso una empresa puede construir acciones excelente…",
+      "innerBlockCount": 0,
+      "fingerprint": "eb6e0ffb7a29ae2a8cfe4d870e4da54866f3a99794a0d3e4cdcba226ac13cd89",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://developer.chrome.com/docs/ai/webmcp"
+    },
+    {
+      "path": "41",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2aefea39ecf1a11ef2f202e026852cabf742c3f2d9ea99480c5d5e3e7c11600a",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "42",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Por eso AEO no debe venderse como una capa mágica que vuelve operable un sitio. Ayuda a que el agente encuentre y entienda la opción. La operabilidad exige diseño de producto, accesibilidad, contratos en el servidor, herramientas, permisos y observabilidad.",
+      "innerBlockCount": 0,
+      "fingerprint": "5caf6bccc10918e03dedc7c5cc63303db914861dbc14e6efdd98f1d09a4f8713",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "43",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "053abf8768233eaab98513ddafe75724ac6e5a9754b362a36113ff86ff23aa9c",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "44",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Cómo usan hoy la web los agentes",
+      "innerBlockCount": 0,
+      "fingerprint": "1c8c8273290982052b6818aadcad3af02d0c9cb713b3332012feb51c465bc199",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "45",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "68a75eb3f45f83dd0fe0c8e79b4d72535a63bf009602dcfaf8963630ec2959fd",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "46",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Al corte de julio de 2026 conviven dos rutas. No son etapas mutuamente excluyentes ni una migración terminada. Un mismo agente puede usar ambas durante una tarea.",
+      "innerBlockCount": 0,
+      "fingerprint": "eb211da29c19d807d8361229cc9824230318504a1c06e9fd3237fd47ae672b13",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "47",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "dd8802fd51e15ee6daa5843253bfee36601c7e5d5c167c34afb0e54024ba8074",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "48",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Interacción sobre la interfaz. El agente observa capturas, DOM y árbol de accesibilidad; después simula clics, escritura y navegación. Esta ruta puede operar sitios existentes, pero hereda ambigüedades de la interfaz y se expone a cambios visuales, estados ine…",
+      "innerBlockCount": 0,
+      "fingerprint": "645f338660c97d70b5400888e51c31fb16c61f1c5b498fe314a13d01e600ce7c",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "49",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "51d2e1d1ec468a4a30e27f807594cf18daf531538b5a74412f461defc02da878",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "50",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Herramientas estructuradas. El sitio declara acciones con nombres, descripciones, entradas y resultados definidos. En lugar de inferir qué hace un botón, el agente puede descubrir una capacidad —capability— y solicitar su ejecución. WebMCP lleva ese patrón al …",
+      "innerBlockCount": 0,
+      "fingerprint": "bdcd27ecb73e024e2b4ff5deb3f2c1ac09b4995f98fc7ee0c96ccd3cec36bba8",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://developer.chrome.com/docs/ai/webmcp/compare-mcp"
+    },
+    {
+      "path": "51",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7ba90849d64f044316abde25f63291386e97caf3d0b2f4bc32e552b379c84d6e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "52",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Una capacidad puede ser tan concreta como prepare_meeting: recibe empresa, necesidad y disponibilidad; devuelve un resumen, preguntas abiertas y horarios posibles. En la interfaz humana puede verse como un formulario guiado. Para el agente, es una herramienta …",
+      "innerBlockCount": 0,
+      "fingerprint": "65fd1c23ac319a71689c13a1fec6640db8375a30598861ea5185d560661d918c",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "53",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "b119eb48acea4a3b75f200a5ef0ca220944809eb1d1e82d6e4522038affe3534",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "54",
+      "depth": 0,
+      "blockName": "core/table",
+      "attrs": {},
+      "text": "ContextoTarea del agentePunto de control humanoServicios B2BComparar alcance y preparar una reuniónConfirmar necesidad, asistentes y horarioEcommerceConsultar disponibilidad y preparar una compraRevisar precio, dirección y pagoPortal de clientesConsultar estad…",
+      "innerBlockCount": 0,
+      "fingerprint": "634145f7997443fcd70a50eeaa1ba034c2f63602c7732a81f50159ba7af97e0a",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "55",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "a6da1b32f6ea8e7fd1c94a558978854bfa24ac0739e981e4cc06507499a05ec1",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "56",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "¿Qué cambia en un proyecto de desarrollo web?",
+      "innerBlockCount": 0,
+      "fingerprint": "882f7d0bf690dec35dcb8eb324f2cb7b1bd14498ea192dcb381ab4be422ef0b6",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "57",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "75037fef1c327667189dd5ef37d294d327bade37501c34cce9bcc52874496345",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "58",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Diseñar para dos operadores no significa crear dos sitios. Significa construir una arquitectura compartida donde la interfaz humana, la información semántica y las capacidades del negocio nacen de contratos consistentes. La página sigue siendo el lugar donde u…",
+      "innerBlockCount": 0,
+      "fingerprint": "e4384ce33d77abc793ccfa8305ea2e583081c09d0af262a62a0d7a7fee4b41b0",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "59",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e6a500b950175889a31e84bef00f32729137a3e72a0ae1cf00247d3fe075d19e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "60",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "Discovery orientado a tareas. Además de inventariar páginas, identifica qué necesita investigar, comparar, preparar o ejecutar cada operador.Arquitectura separada de la interfaz. Datos, reglas y acciones viven en capacidades estables; la UI, una API o WebMCP p…",
+      "innerBlockCount": 0,
+      "fingerprint": "b199c5602ebd61953e56be911ee3b11de320291bbc03ab893674f24598003bea",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "61",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "46f36295e3cbaa7c9e9ad0514540c3421360fd75423cf1ea4fe33e95b0faa19e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "62",
+      "depth": 0,
+      "blockName": "core/image",
+      "attrs": {
+        "id": 251518,
+        "sizeSlug": "large",
+        "linkDestination": "media"
+      },
+      "text": "La interfaz cambia; la capacidad, el gobierno y la fuente de verdad permanecen compartidos.",
+      "innerBlockCount": 0,
+      "fingerprint": "bcbfae7d4f755753232c53221c1fd55b61f81a3eae6b4877551247a410e68e71",
+      "editability": "media_requires_reconcile",
+      "risks": [
+        "media_refs_must_be_reconciled_before_write"
+      ],
+      "media": {
+        "id": 251518,
+        "attachmentUrl": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-arquitectura-compartida-desktop-light-v7.svg",
+        "renderedSrc": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-arquitectura-compartida-desktop-light-v7.svg",
+        "alt": "La interfaz humana y la interfaz estructurada convergen en una capacidad compartida con contrato, gobierno y fuente de verdad únicos.",
+        "width": null,
+        "height": null
+      },
+      "href": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-arquitectura-compartida-desktop-light-v7.svg"
+    },
+    {
+      "path": "63",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "5503c0d261d1094800218d8e78d04fb56062b8419231c2207c9ffbe69e5804dd",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "64",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En Efeonce aplicamos esta lógica al desarrollo de sitios web para humanos y agentes: primero se define la tarea, la arquitectura y la evidencia; la tecnología viene después. WebMCP puede ser una interfaz del sistema, pero no debe convertirse en el sistema comp…",
+      "innerBlockCount": 0,
+      "fingerprint": "c71b8f737c1bfb7bb42c94e8b1aa1e2863aefe306b4614a162866faa171516e3",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://efeoncepro.com/desarrollo-sitios-web/"
+    },
+    {
+      "path": "65",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "a5f8311ec9417dccecf2995f705067795727f7edef69c275364ed0defcc1ddef",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "66",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "WebMCP dejó de ser una nota al pie",
+      "innerBlockCount": 0,
+      "fingerprint": "a840daaba102a3c1c67dcd1753bbd4338ad4fe0fba15efd943d798afd892718d",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "67",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "af5e91bed563afbeea9b1cddea107c5d64754d0a04856862e6fab84195a380a2",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "68",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Google presentó WebMCP oficialmente en I/O 2026 como una propuesta de estándar web abierto para exponer funciones y formularios como herramientas estructuradas. El origin trial comenzó en Chrome 149 y está aprobado hasta Chrome 156. Que Chrome ya esté en la ve…",
+      "innerBlockCount": 0,
+      "fingerprint": "154e6bd2387bd202d2a86b8f6ad17ae86f1ec58f91ff88d3d6cc6941369d9246",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://groups.google.com/a/chromium.org/g/blink-dev/c/gmYffo5WOE8/m/OJxuQRP3AAAJ"
+    },
+    {
+      "path": "69",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ca60a7609bbfb11d8627a3d860f2a22668122c737494981d54b2a242342d3c40",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "70",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La señal práctica para equipos web llegó con Chrome 150: Lighthouse incorporó la categoría experimental Agentic Browsing. Sus auditorías determinísticas revisan una parte de la accesibilidad relevante para agentes, estabilidad visual e integración WebMCP —herr…",
+      "innerBlockCount": 0,
+      "fingerprint": "0c6b343323abc3879eb459704b43a2b7bb6b3610a9499de170dc4d5fc69a9f6a",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://developer.chrome.com/blog/agent-ready-toolkit"
+    },
+    {
+      "path": "71",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "105166651fb600bf3c74595e4f3f53ff5313c12bd32f55b2f008e23c26c97583",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "72",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El estado correcto es incubación formal con despliegue experimental en navegador. La especificación publicada el 10 de julio de 2026 es un Draft Community Group Report: no es un W3C Standard ni está en el W3C Standards Track, y su sección declarativa todavía c…",
+      "innerBlockCount": 0,
+      "fingerprint": "3780d20ab35b5aa56241097813c6b8064baee61811ce471c2c1442c503507bf2",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://webmachinelearning.github.io/webmcp/"
+    },
+    {
+      "path": "73",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "d6367186a13e4adf1313064870ec2f9d5efbcf34905718193c8bafc772658859",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "74",
+      "depth": 0,
+      "blockName": "core/table",
+      "attrs": {},
+      "text": "SituaciónRuta recomendadaUn agente opera una página abiertaWebMCPIntegración entre sistemas o servidoresMCP, API u OpenAPISitio existente sin herramientas estructuradasInterfaz accesible y automatización visualAcción irreversible o de alto riesgoVista previa, …",
+      "innerBlockCount": 0,
+      "fingerprint": "799d3e2278a52d56f263db094ceb5cab66d73dca1c3e95d21c95d64e7ef1d9d4",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "75",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "21d5b1cde23c059d575b599a99f6b62c70c799468fe8461ce8b71605710aef0e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "76",
+      "depth": 0,
+      "blockName": "core/quote",
+      "attrs": {},
+      "text": "La decisión sensata no es esperar inmóviles ni reconstruir todo alrededor de WebMCP. Es diseñar acciones limpias, tipadas y gobernadas que puedan exponerse por el protocolo adecuado cuando corresponda.",
+      "innerBlockCount": 0,
+      "fingerprint": "7ec3531264958659fb69c34f45216dac261f4cda62cf200e0afe4190186d75bf",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "77",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "30bd06b0c23989fc42cec59b28bf9d88f3bd5114f51c7bdf3666368594a25612",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "78",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Las señales del mercado forman un sistema, no un solo protocolo",
+      "innerBlockCount": 0,
+      "fingerprint": "0dea9817c7adf8152ad86434f0e6bfdfe0c32aa968ed776c70293abe2fd2e508",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "79",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "531cc3f2648ef4e2beed396e1be6521a6ee1e794405a59b6466133fda5d9f05a",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "80",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "WebMCP es una pieza visible, pero la web agéntica no depende de un único estándar. Distintos proyectos están resolviendo interacción, descubrimiento, comercio, pagos, interoperabilidad y gobernanza. Conviene entender qué problema resuelve cada uno antes de con…",
+      "innerBlockCount": 0,
+      "fingerprint": "db37e7fb291c941f6c5eef39d39cbdda164e4bb54e98641a49f261c5991c0e6e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "81",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "edf656e8ae68f518cb6260d407b80f346334dc715042fa2ba07031b95b6b4659",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "82",
+      "depth": 0,
+      "blockName": "core/table",
+      "attrs": {},
+      "text": "CapaProyectoQué resuelveEstado al corteInteracción webWebMCPExpone herramientas de una página a agentes en el navegadorIncubación W3C CG + origin trial Chrome 149–156Interfaces conversacionalesNLWebConvierte contenido web en una interfaz consultable y servidor…",
+      "innerBlockCount": 0,
+      "fingerprint": "2b44e9c8c60200818d60dc2c895a63cce5991362fe51d0c0b60a7ced3dd814d9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "83",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "4d895cca29deb52cf5cc39c09167eeefe4a1b73c382911c8c0246b8e59ac92f6",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "84",
+      "depth": 0,
+      "blockName": "core/image",
+      "attrs": {
+        "id": 251522,
+        "sizeSlug": "large",
+        "linkDestination": "media"
+      },
+      "text": "No hay un ganador único: emerge un stack de interoperabilidad con fronteras distintas.",
+      "innerBlockCount": 0,
+      "fingerprint": "b1c217af25510d9bf0a2634b51178faf0547fbc1a2f328fc04be22f84f9dafae",
+      "editability": "media_requires_reconcile",
+      "risks": [
+        "media_refs_must_be_reconciled_before_write"
+      ],
+      "media": {
+        "id": 251522,
+        "attachmentUrl": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-mapa-ecosistema-desktop-light-v7.svg",
+        "renderedSrc": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-mapa-ecosistema-desktop-light-v7.svg",
+        "alt": "Mapa de seis iniciativas por capa: WebMCP para interacción web, NLWeb para consulta, ACP y UCP para comercio, AP2 para pagos, A2A para agentes y AAIF para gobernanza.",
+        "width": null,
+        "height": null
+      },
+      "href": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-mapa-ecosistema-desktop-light-v7.svg"
+    },
+    {
+      "path": "85",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e52f8a52551e6ae5e34e99987696aa1dbcd9a5954928292d8c03ebacb72215c5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "86",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Microsoft presentó NLWeb; hoy su implementación de referencia vive bajo la organización abierta nlweb-ai y cada instancia puede actuar como servidor MCP. En comercio, OpenAI amplió ACP desde checkout hacia product discovery. Google y Shopify co-desarrollaron U…",
+      "innerBlockCount": 0,
+      "fingerprint": "452f552088695241971581307b6e59981442894d20d34b38fc74e4f750a0ec7d",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://github.com/nlweb-ai/NLWeb"
+    },
+    {
+      "path": "87",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "36cf66906e25b0a6dfc7c1e530ac775708d129ab1b67eafc44c250585befb53f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "88",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Aquí conviene separar protocolo de rollout. Shopify abrió su infraestructura agéntica en modalidad self-service para desarrolladores y permite acceder a millones de comercios sin un proceso previo de aprobación. Ver Spring ’26 de Shopify. La experiencia de che…",
+      "innerBlockCount": 0,
+      "fingerprint": "78c34c9a2ee1f49020baa185e390a42195f44ead723e27c16de1fc6f11b418b3",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://www.shopify.com/news/spring-26-edition-dev"
+    },
+    {
+      "path": "89",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "287605b0d2f91e486ba16b88b418797425d607bc5d7a34631202951d8b40e187",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "90",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Para pagos, AP2 propone un lenguaje abierto para demostrar intención y autorización. Para coordinación, A2A ya tiene una versión 1.0 estable, más de 150 organizaciones y despliegues productivos. Y AAIF nació con MCP, goose y AGENTS.md como proyectos fundadores…",
+      "innerBlockCount": 0,
+      "fingerprint": "5c1106356cd7c5e95f7a71f635b9977beeddd2733f98337b1ceca7961de5171e",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://cloud.google.com/blog/products/ai-machine-learning/announcing-agents-to-payments-ap2-protocol"
+    },
+    {
+      "path": "91",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9c6d7b896a27b18208a07cbac18aa839f6278ce7b773532190a8fff22aa914cb",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "92",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La señal conjunta es más importante que cualquier logo: los agentes están pasando de improvisar sobre interfaces a combinar interfaces, contratos y protocolos especializados. Eso no prueba que exista un estándar ganador. Sí justifica preparar las capacidades i…",
+      "innerBlockCount": 0,
+      "fingerprint": "94932024714765f2627207659cb993867dc406296357c150ed20ce23836a4f8b",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "93",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ed3fc775d6bb7ad3db99d75e8c04e6f24fa56c04d9760d4e6cecf0d97e12e945",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "94",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Una herramienta disponible no es una tarea resuelta",
+      "innerBlockCount": 0,
+      "fingerprint": "21ee3715abe18e03ede076fc1888f970eb2a861fa9f53c13f686968237b81c57",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "95",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "1ddea7324634514aa124d436a81cf3e415d0fd7360be45ffde752f239d2e584b",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "96",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Registrar una herramienta y validar su schema demuestra que la puerta existe. No demuestra que el agente elegirá la herramienta correcta, enviará los parámetros adecuados, respetará el orden del flujo ni se recuperará de un fallo intermedio.",
+      "innerBlockCount": 0,
+      "fingerprint": "de3a8ea5e818155c6d02dec79450c4988c6bc7774e568ec485235892348f5d15",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "97",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "17e26bb627e0497b9be3bcaac2a3f7e56f1365f0c71328adaa2b00fc39fc93fb",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "98",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La propia guía de WebMCP separa tres capas de prueba: tests determinísticos para la lógica y sus efectos, evals probabilísticas para selección y razonamiento del modelo, y recorridos end to end para comprobar que una persona y su agente completan la tarea. Tam…",
+      "innerBlockCount": 0,
+      "fingerprint": "07a0f7b474a160bd58f1393b2605d6aa811b8c32e403928803eb02e5d3e399ab",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "99",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "a46f77a24f2314e2fd5bf7725c605caa94c3d9150085a29b1aa0f18e3743274a",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "100",
+      "depth": 0,
+      "blockName": "core/table",
+      "attrs": {},
+      "text": "Capa de pruebaPregunta que respondeFallo que descubreDeterminística¿La capacidad funciona como fue programada?Validación, dependencia, side effect o UI incorrectosProbabilística¿El modelo elige bien ante distintas formulaciones?Herramienta, parámetros o interp…",
+      "innerBlockCount": 0,
+      "fingerprint": "d83291209ea78261c82fce9278cc52c3fa029592beed9e7908ca52e19f2c4580",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "101",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "db7925d6b513298e9ea46e69f85b5845985facfab1aa040002acc371f5a2b9e6",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "102",
+      "depth": 0,
+      "blockName": "core/image",
+      "attrs": {
+        "id": 251526,
+        "sizeSlug": "large",
+        "linkDestination": "media"
+      },
+      "text": "La confianza aparece cuando contrato, comportamiento, resultado y recuperación se prueban como sistema.",
+      "innerBlockCount": 0,
+      "fingerprint": "e1ebc13d7abaa66aca86fad48c046f05f0a584262b306fc68c019b7d64a4dbde",
+      "editability": "media_requires_reconcile",
+      "risks": [
+        "media_refs_must_be_reconciled_before_write"
+      ],
+      "media": {
+        "id": 251526,
+        "attachmentUrl": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-circuito-evaluacion-desktop-light-v7.svg",
+        "renderedSrc": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-circuito-evaluacion-desktop-light-v7.svg",
+        "alt": "Circuito de evaluación en cinco pasos: contrato de herramienta, pruebas deterministas, evaluación probabilística, prueba de extremo a extremo y observación con recuperación.",
+        "width": null,
+        "height": null
+      },
+      "href": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-circuito-evaluacion-desktop-light-v7.svg"
+    },
+    {
+      "path": "103",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "1959bf9e19c1edd11f2267ce3b54644c6ba4c12aa8f4ab41e8deb0025330d067",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "104",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Por eso una auditoría agent-ready no termina en Lighthouse ni en un inspector de herramientas. Termina cuando el recorrido real funciona, falla de manera segura y deja evidencia suficiente para explicar el resultado. Ver guía oficial de evals para WebMCP.",
+      "innerBlockCount": 0,
+      "fingerprint": "3d2af80ab7b203b84aac8d37e379884c7260f2744b55bab623f26ecb4a59a625",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://developer.chrome.com/docs/ai/webmcp/evals"
+    },
+    {
+      "path": "105",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0ced5d98af983eb64e922fdd84692386306703c12f3f1d5cf40820c5602bebaf",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "106",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Los cinco niveles para existir en un internet de agentes",
+      "innerBlockCount": 0,
+      "fingerprint": "21d67259688676cad77d005a63bcc613f828cd0694e8a3bfac60b15f2ef4d181",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "107",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "87f0142c5e3df57803f7f74b79e46f3248ccbaacac9b26151406b05336b84bbd",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "108",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En Efeonce lo estamos pensando con cinco niveles. La secuencia ayuda a explicar el problema, pero no debe convertirse en un único indicador engañoso. En la práctica hay dos ejes: percepción —qué sabe y dice la IA sobre ti— y operabilidad —qué puede hacer un ag…",
+      "innerBlockCount": 0,
+      "fingerprint": "14c81b2cafa18f346e3afb33ec3c7ffd74df5e45f21c0c611827ccce0ca16b5e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "109",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e1b837899b752aeeb8cd013957906ad6fbbaf1c724bbdf66cb10bc914bd0c36f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "110",
+      "depth": 0,
+      "blockName": "core/table",
+      "attrs": {},
+      "text": "NivelPreguntaQué exige1. Be Found¿La IA puede encontrarte?Acceso técnico, indexación, presencia y señales de entidad2. Be Readable¿Puede entenderte sin adivinar?Contenido claro, semántica, datos estructurados y definiciones consistentes3. Be Correct¿Te represe…",
+      "innerBlockCount": 0,
+      "fingerprint": "4f27b570c157720da18a5531316a4f6658822e1b74ca8ac9cd5c1604817e0e52",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "111",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9cf788d29fec49f8018b7d53e14c3fc1c7bb2af271d22775a0a0ff9c73ff4ec3",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "112",
+      "depth": 0,
+      "blockName": "core/image",
+      "attrs": {
+        "id": 251530,
+        "sizeSlug": "large",
+        "linkDestination": "media"
+      },
+      "text": "Ser legible habilita comprensión; operar exige autoridad, límites, confirmación y evidencia.",
+      "innerBlockCount": 0,
+      "fingerprint": "044e5f45f6dab2c1de96ce8df84c9ebfc821a0782687f46ec49bc45b8f6cb92e",
+      "editability": "media_requires_reconcile",
+      "risks": [
+        "media_refs_must_be_reconciled_before_write"
+      ],
+      "media": {
+        "id": 251530,
+        "attachmentUrl": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-madurez-agentica-desktop-light-v7.svg",
+        "renderedSrc": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-madurez-agentica-desktop-light-v7.svg",
+        "alt": "Modelo de cinco niveles: encontrable, legible, correcto, intrínseco y operable; la acción gobernada no deriva automáticamente de la comprensión.",
+        "width": null,
+        "height": null
+      },
+      "href": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-madurez-agentica-desktop-light-v7.svg"
+    },
+    {
+      "path": "113",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "95cb33b8bebf19d5c934600164126ebf6728802a2624e38101c49fe3cc8105c2",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "114",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La distinción evita dos promesas fáciles. Primero, instalar WebMCP no hace que una marca sea recomendada por la IA. Segundo, ser citada no significa que un agente pueda operar su sitio. Visibilidad y operabilidad se refuerzan, pero se construyen y se miden por…",
+      "innerBlockCount": 0,
+      "fingerprint": "563f6bba806dbd4681211d97851339b364f963da0348944562fcfa0732fa1ff8",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "115",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7c5479807141885b2c36596d125591d304e01f0a310426b9837ae9d479f9af82",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "116",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "¿Cómo saber si tu sitio está preparado para agentes?",
+      "innerBlockCount": 0,
+      "fingerprint": "029580ea6e78335800bf498f063f83184ccf79516d0db09d23cd888eb4d04c93",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "117",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "6622ba2ebe1cf9fe53fd8e10ce2f57552747e2cf74d1d6b70be576b9711f106c",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "118",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La preparación agéntica no se demuestra instalando un archivo, un schema o una API. Se prueba recorriendo el sistema desde el descubrimiento hasta la recuperación. Estas doce preguntas sirven como primera auditoría.",
+      "innerBlockCount": 0,
+      "fingerprint": "9a0267838c642957ea16846d9fbf050fc54b73a8ecf6350f83504e1c3312512e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "119",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "3ca2b238e216764b7f46b31a9322ff950a2dc80d81fc6b29f46c49d09cc37ae8",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "120",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "¿La oferta se entiende sin interpretar slogans?¿Las entidades, servicios y condiciones se nombran de forma consistente?¿La información visible coincide con los datos estructurados?¿Los controles tienen nombres, estados y errores accesibles?¿Las tareas principa…",
+      "innerBlockCount": 0,
+      "fingerprint": "2bc7816259b4c281ff8233ba758422bbcee0f09b1c2de07ba24a1807888af510",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "121",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "009639836dc483ec5c02bb5e9898398a96830d008e8d82501c9a16e359a91df9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "122",
+      "depth": 0,
+      "blockName": "core/image",
+      "attrs": {
+        "id": 251534,
+        "sizeSlug": "large",
+        "linkDestination": "media"
+      },
+      "text": "Si una prueba falla, la autonomía debe detenerse o degradarse con seguridad.",
+      "innerBlockCount": 0,
+      "fingerprint": "8f14d2044bb6d949edd3e1490498cedb9c98ba06cc202197de6d926ed83b86e0",
+      "editability": "media_requires_reconcile",
+      "risks": [
+        "media_refs_must_be_reconciled_before_write"
+      ],
+      "media": {
+        "id": 251534,
+        "attachmentUrl": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-readiness-12-pruebas-desktop-light-v7.svg",
+        "renderedSrc": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-readiness-12-pruebas-desktop-light-v7.svg",
+        "alt": "Doce pruebas de preparación agrupadas en significado, interacción, ejecución y evidencia.",
+        "width": null,
+        "height": null
+      },
+      "href": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-readiness-12-pruebas-desktop-light-v7.svg"
+    },
+    {
+      "path": "123",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "3881fd435acf85c67ae5b3a334de9d356bcdc0da442f9e8e886a8d885e5e8246",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "124",
+      "depth": 0,
+      "blockName": "core/quote",
+      "attrs": {},
+      "text": "Un sitio está preparado cuando puede explicar la tarea, limitar la acción y demostrar el resultado. No cuando solamente declara que usa IA.",
+      "innerBlockCount": 0,
+      "fingerprint": "97d3d79be1e84e7fbcefaaced11fecbb35363d8bce0136ee6a68cafe04510245",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "125",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "1b0c539d38d5ec2644dac80d0619c8448f39d709a8fd52772a758df4d3fbd5ac",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "126",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "No todos los proyectos deben aprobar las doce pruebas desde el primer día. Un sitio informativo puede empezar por claridad, accesibilidad y lectura. Un ecommerce, un portal o una plataforma con acciones sensibles necesita avanzar antes en permisos, confirmació…",
+      "innerBlockCount": 0,
+      "fingerprint": "90c1c3695eeb7e69473437ad8046b77f0c5b1e82df30d69335d5debc8b59b332",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "127",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "6b680ddb15dc40099b3c99799ecbe4e2d028a327d564cd6f7900c203bbc09f2d",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "128",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "¿Debes reconstruir tu sitio para prepararlo?",
+      "innerBlockCount": 0,
+      "fingerprint": "2d28b0b4df8c5c882a0961e05767863b02cba1cf33b6ba88997214bbf771017a",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "129",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "da5d3241cb2c536a1be47a54db49d9e3bc6478765dc712651867f323d2c164e0",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "130",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "No necesariamente. La decisión depende de cuánto resiste la base actual. Un sitio puede mejorar por capas cuando su contenido, HTML, CMS y contratos permiten ordenar tareas sin duplicar la lógica. Reconstruir tiene sentido cuando la interfaz es la única fuente…",
+      "innerBlockCount": 0,
+      "fingerprint": "39acfd0960c435bb83e074b23f490573622fdd85af2807a3dc45fbab4d43c276",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "131",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7fef66948211ecbada4de13e162bbba23d3a1adc739239b3c5dd5b00b0b8c28f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "132",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "Elige una tarea acotada. Buscar disponibilidad, preparar una cotización, reservar una reunión o consultar el estado de una orden.Haz que el flujo humano sea claro y accesible. Usa HTML semántico, nombres programáticos, estados comprensibles y una experiencia e…",
+      "innerBlockCount": 0,
+      "fingerprint": "853ad2b322269928e68c7518385e2674f23053e1e9ae8a5536f3c8e2eaf51cca",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "133",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9a0637bbada41357a6850030ebcbce8af4913f2e33a38f6f782c27f7047ce496",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "134",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La arquitectura más resistente es aditiva: la misma capacidad estable en el servidor alimenta la interfaz humana, una API gobernada y, cuando corresponda, una herramienta para agentes. Así puedes experimentar con el canal sin convertir el protocolo del momento…",
+      "innerBlockCount": 0,
+      "fingerprint": "d2b66256c0a4e91cc5ffd35fbe1c0fd77fc085a0fbdb9854a3b0bb1c5b7c7292",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "135",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "15f118194aa682ad05207926a72fd00b64a43e15ee33f6c2d0b2b33067b84f6d",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "136",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Si estás evaluando construir, rediseñar o escalar tu presencia digital, revisa el enfoque de Desarrollo de sitios web de Efeonce. La recomendación correcta puede ser optimizar la base, migrar una parte o diseñar una arquitectura nueva; no se decide por la herr…",
+      "innerBlockCount": 0,
+      "fingerprint": "eb41dc3a5a64426f54c5a6add73e3be5a04b2eb5db3ca05dcae67e70164e975e",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://efeoncepro.com/desarrollo-sitios-web/"
+    },
+    {
+      "path": "137",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "32a95ae48e3d9252220f0ddc2faa1741c07518eeb2ef56e5c6ef96f2eb1a6b05",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "138",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "La confianza no es la última capa",
+      "innerBlockCount": 0,
+      "fingerprint": "017044f13de12386c49c008c59a1ac192855cf9613f4d9b8c49a0c4a65deb73a",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "139",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9b9c3a65a2df3a5cb7cf7ccb2169bc4f219252abe0b305cdcc17db3b4354a24e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "140",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La inyección de instrucciones, los permisos excesivos, los errores de interpretación y las acciones difíciles de revertir no son problemas posteriores. Aparecen desde el primer diseño. Por eso la confianza debe cruzar todo el sistema: identidad, alcance, autor…",
+      "innerBlockCount": 0,
+      "fingerprint": "5d4a9a0f02491cf0a0bc289d9863892f3c36ddc5445d552bd6f69050fe954dac",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "141",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "6e7d637f57e683b96f493a2f0ad3d26f56840948b6bcb47aed3c6a0447be7726",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "142",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La cadena de autoridad conecta a tres actores: la persona que expresa una intención, el agente u operador que actúa en su nombre y la empresa que acepta ejecutar la acción. Identificar al agente no demuestra por sí solo que tiene autoridad delegada. Para una o…",
+      "innerBlockCount": 0,
+      "fingerprint": "2b8b6b6f612084407b5ce96eea28320979be48c833dd3764c0514980b973d4d6",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "143",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "41b0089c4c96bc1e59cf38c2b12a8870d533ed9211c0e0762fd42db8faa31d12",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "144",
+      "depth": 0,
+      "blockName": "core/image",
+      "attrs": {
+        "id": 251538,
+        "sizeSlug": "large",
+        "linkDestination": "media"
+      },
+      "text": "Identificar al agente no basta: la acción debe demostrar representación, alcance, confirmación y resultado.",
+      "innerBlockCount": 0,
+      "fingerprint": "1bd8afe707fa49c770368bb79bebe8e2fb2c4c4ec7567735d480988254a45568",
+      "editability": "media_requires_reconcile",
+      "risks": [
+        "media_refs_must_be_reconciled_before_write"
+      ],
+      "media": {
+        "id": 251538,
+        "attachmentUrl": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-cadena-autoridad-desktop-light-v7.svg",
+        "renderedSrc": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-cadena-autoridad-desktop-light-v7.svg",
+        "alt": "Cadena de custodia desde la intención de una persona hasta la representación del agente, la decisión de la capacidad y la evidencia recuperable.",
+        "width": null,
+        "height": null
+      },
+      "href": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-cadena-autoridad-desktop-light-v7.svg"
+    },
+    {
+      "path": "145",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "cbd6f54bc110dc810e2b8ae8dfb7c77a17cbbbf49ee90578cdea9928e586b4d5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "146",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Ese problema todavía no tiene una solución universal. El grupo de identidad de agentes de W3C reconoce que no existe un mecanismo acordado para verificar en conjunto identidad, entidad controladora y alcance de autorización. Ver Agent Identity Registry Protoco…",
+      "innerBlockCount": 0,
+      "fingerprint": "08b47365f13efb1474e8707e500ca0dce68a6648580cdb94eb9c9ece8fd18e50",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://www.w3.org/community/agent-identity/"
+    },
+    {
+      "path": "147",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "d75b590cb7556b082384145305e5dddca92e6cdc619599ee7f10bf53b94ce5c7",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "148",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Los proveedores incorporan distintas formas de supervisión, restricciones y confirmación, pero ninguno puede garantizar que un modelo sea inmune a prompt injection. Ver guía de seguridad de WebMCP. Esa prudencia también debe existir en el sitio que expone la a…",
+      "innerBlockCount": 0,
+      "fingerprint": "f10b76c377558bbcb23274c9d813ea883a769617b50f08014c7eb4e2d12011ca",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://developer.chrome.com/docs/ai/webmcp/secure-tools"
+    },
+    {
+      "path": "149",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "521bc0a7adc61e03aaf6b5e7080eeb206faa8751b3b896eabde7beb110a08c35",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "150",
+      "depth": 0,
+      "blockName": "core/quote",
+      "attrs": {},
+      "text": "Una acción fácil de invocar y difícil de controlar no es preparación agéntica. Es deuda operativa con una interfaz nueva.",
+      "innerBlockCount": 0,
+      "fingerprint": "00996dc5b96bf0c223edd0c518b62df5c4472ed8b9b764ed63d53b0593e89600",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "151",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "bc14d10da8f146e862ddcc728896dc12367678986cc6c73d8aa8e339046a9ebc",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "152",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Preguntas frecuentes sobre la web agéntica",
+      "innerBlockCount": 0,
+      "fingerprint": "748596b1c9eccfae5849c27dd2c11227ea8b5bcd4ca4b83e575d1b4f20c9209d",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "153",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "69f20b3131d645c056e00882206f24e09e41e28da49e860c16265be56f218cd5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "154",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Estas respuestas separan los fundamentos que ya puedes trabajar de las tecnologías que todavía están madurando.",
+      "innerBlockCount": 0,
+      "fingerprint": "79671f26b4e8be3f3e71ec481e63bcc415c2c1ae8397526795c4f08bbca93749",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "155",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "eb2daf953c2ec62283a593c100d293851988124394a4c23f06a0ef47effd8619",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "156",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "¿Necesito WebMCP para tener un sitio preparado para agentes?",
+      "innerBlockCount": 0,
+      "fingerprint": "1a7abf35d76e288ea509cf6c12fd4dfc9082c30bc78bf722d44e1c3de5532744",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "157",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e2c0d23f0f9bf103e3abc39054d38418e186c6cdc116ca027ead1af85ce073ac",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "158",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "No. Un sitio puede mejorar mucho con contenido claro, HTML semántico, accesibilidad, datos estructurados y tareas bien definidas. WebMCP agrega una interfaz estructurada para agentes en el navegador, pero complementa esas bases; no las reemplaza.",
+      "innerBlockCount": 0,
+      "fingerprint": "bafcf78f90cffc88830cba9d1f296a87cd0bd5ad5aae1270497f181b6b1d0147",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "159",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ffc95905b9883d101f588ce46aa9b274976931b345af7aad4c06dfe2e7c83e49",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "160",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "¿WebMCP reemplaza al SEO, AEO, MCP o las APIs?",
+      "innerBlockCount": 0,
+      "fingerprint": "d64e84cd0bc6f1b34ed409b569d29f659a34f618cb2e3247d4d655956f446ed5",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "161",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "02d56a21a10524525b1d41e74d1466ca6d25e675a85ed32f85a987d45060c6e9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "162",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "No. SEO y AEO ayudan a que el sitio sea encontrado, comprendido y representado. Las APIs y MCP conectan sistemas y capacidades fuera de la página. WebMCP expone herramientas dentro del contexto del navegador. Pueden coexistir sobre la misma lógica de negocio.",
+      "innerBlockCount": 0,
+      "fingerprint": "4105e0ab78bf78da9a7de17eec0ad2deaab99bd31b3a7ead8058e1ad7e0e808d",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "163",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0299399a422e6558dbe987753bdd46e025543e34e8dddfd2bfb6fd8c2c417512",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "164",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "¿Un sitio WordPress puede prepararse para agentes?",
+      "innerBlockCount": 0,
+      "fingerprint": "3d1945ed6087fcec8636b7b2189a9ba645109c078a689cbaf5f9510efe8ed1fa",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "165",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0c31b73f5141f4b7c20509437d2c273383fd3712744c54c462e917e4f7b3888c",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "166",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Sí. WordPress no impide usar HTML semántico, accesibilidad, schema, APIs ni capacidades estructuradas. La pregunta es si el tema, los plugins y la arquitectura permiten separar datos y acciones de la interfaz sin depender de automatizaciones frágiles.",
+      "innerBlockCount": 0,
+      "fingerprint": "d7e56fd998b53c001eb92f523aa456205933635505feba91c4a4032200cd9062",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "167",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "64da2dc65d80c38f3eae39e4e88b56930336e69638990589418b765dbd24f4da",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "168",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "¿Un chatbot convierte mi sitio en una web agéntica?",
+      "innerBlockCount": 0,
+      "fingerprint": "7d5667635aea9ac9696e7cd18cd971db41c466410b96871ba60e2de293fa6625",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "169",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e93ca3e048e5d4e2c8e5102e19dadf806759335dfa4381897a23c0e3a5183f66",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "170",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "No por sí solo. Un chatbot es una interfaz conversacional dentro del sitio. Una web agéntica también considera agentes externos, tareas estructuradas, permisos, confirmaciones, trazabilidad y recuperación.",
+      "innerBlockCount": 0,
+      "fingerprint": "fd9cbe90878f11548d01c66926aea0b48670492822c8acab9e4685cf02aa7f78",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "171",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "d738bc9f05e2f3e14d5aa101abd28e2263da41caef8c7d9fc66e77b580b7236c",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "172",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "¿Qué acciones no deberían automatizarse por completo?",
+      "innerBlockCount": 0,
+      "fingerprint": "af81e3bb68044f7ada8cde394acd4d61f500f883d7a08b992838c57d0cab83ac",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "173",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "05c0c2e56395d04375de2abc889414ae44d64fe1334f008fd1157523cb6307b8",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "174",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Las acciones irreversibles, financieras, legales, sensibles o difíciles de recuperar deberían conservar revisión y confirmación proporcional al riesgo. Preparar un sitio para agentes no significa eliminar a la persona; significa decidir con precisión dónde deb…",
+      "innerBlockCount": 0,
+      "fingerprint": "12e537f74a525fdadd148a04102928664d4cab59033ca614fc2a7220f76c02fe",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "175",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9c213d587166d347133b7879881c8e4a9c8ec278b50c1fec8cad97861524938f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "176",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "¿Cómo se mide la preparación agéntica?",
+      "innerBlockCount": 0,
+      "fingerprint": "1a53b16f9ef16457252489299412f6c8bc1a63461b6d6cea02527361c0fbfb4d",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "177",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "dda9be2f07d28edfe71022796d240a0b562fad5d407713c3d8f0cebbfb6ea3ff",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "178",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Se combinan señales de percepción y operación: si el agente encuentra y representa correctamente la oferta, descubre la capacidad adecuada, completa la tarea, maneja errores y solicita confirmación cuando corresponde. Lighthouse Agentic Browsing aporta auditor…",
+      "innerBlockCount": 0,
+      "fingerprint": "8717336b7cd8a0ce3d79ac92a51c14d835892e81b9e47bd347606bac5461d00a",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "179",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "20c228daf7c972ee6a18c8d810ae9351f1c36d1b82b9d877c2328000e3179011",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "180",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "La decisión que vale la pena tomar",
+      "innerBlockCount": 0,
+      "fingerprint": "2d656f36b70e8909f5b87b26664508278fb0335d2e55cd1f31b0401ac9fa06c7",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "181",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "1b7ad09ce50d1d59cdc461d4433a63209a38725778c1afd7b0ba5d63e7b70533",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "182",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "No necesitas saber qué protocolo ganará para empezar. Necesitas saber qué tareas de tu negocio deberían poder entenderse y ejecutarse sin ambigüedad, cuáles requieren presencia humana y qué evidencia te permitiría confiar en el resultado.",
+      "innerBlockCount": 0,
+      "fingerprint": "83e34a8c71ef6f287db66e08171951df971f0c2c380034bdd65b2d778673c141",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "183",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "8dc68400d767be958d1ae88d43305378c5fa3828d162feb80d364ccc7ad6b3d7",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "184",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Mi lectura es esta: la ventaja temprana no está en declarar que tu sitio está preparado para agentes. Está en aprender antes que otros dónde un agente se pierde, qué necesita para avanzar y dónde debe detenerse.",
+      "innerBlockCount": 0,
+      "fingerprint": "252b8091e8eb814d2cd544270a17ff5d325153c649173fc13ddc91dc2fdae94e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "185",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "53b6001c270f82b054fbba177e5bbea9aec2e6a585a7a6b1e1f57b4f085895f4",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "186",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La secuencia completa ya no termina en “poder actuar”: ser encontrado → ser comprendido → poder actuar → demostrar que la acción fue correcta → demostrar que estaba autorizada.",
+      "innerBlockCount": 0,
+      "fingerprint": "5e6c6720dd0226accfb3ac46f963f4b9604f0dccae9bc80badb504b1827c5ada",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "187",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "77103d287a1ef7a689b77335e0f88335c9147ba4962b0713a13fe226dbb2c675",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "188",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La web no dejó de ser humana. Empezó a ser operada también por quienes actúan en nuestro nombre.",
+      "innerBlockCount": 0,
+      "fingerprint": "b91f62fcb95995ea2faa17d7e89a2018ac05273ccf76c31df430b3263505dbcb",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "189",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "cd4d942c145e423361b48260f9795a168d162b4f51a20fb323d44fb4c9c673ab",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "190",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Para profundizar en la capa de percepción, puedes leer El 80% de lo que cita la IA no existe en Google y Tu cliente ya no busca solo en Google. La web agéntica agrega la otra mitad de la conversación: qué puede hacer un agente después de encontrarte.",
+      "innerBlockCount": 0,
+      "fingerprint": "a38ad37c503973b3ef367a0f57f92068b5989ef41905358350f99e8ca40b2a91",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://efeoncepro.com/loop-marketing/aeo/donde-cita-la-ia/"
+    },
+    {
+      "path": "191",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "b72086421a42db763c62af947996b5499b6c6e4657eb982b42fb485ace922883",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "192",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Nota editorial: este artículo fue desarrollado por Julio Reyes con apoyo de IA en investigación, contraste de fuentes, estructura y edición. Julio conserva la decisión sobre la tesis, las fuentes, los límites y la aprobación de la versión final.",
+      "innerBlockCount": 0,
+      "fingerprint": "02b008fb24c101660b74c7ee2e13ef107adfb425b4f3eca38b8cea017201edfd",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "193",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7f9a2b5f235c4ce2db5d3b750c836a1984527076488f865bbc649dd2c322e65f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "194",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "5dde678326d1e473da24520db7ad20a6acf8dbb487858c54b643b0f23e2cf92f",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "195",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0a946544ca833faf1aee127c32dbd7d186d20b78b8b6da12a4192b54222414dc",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "196",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Elige una tarea importante de tu sitio y descríbela como una capacidad: entradas, resultados, permisos, confirmación y recuperación. Si necesitas construir, rediseñar o escalar esa arquitectura, revisa nuestro servicio de Desarrollo de sitios web para humanos …",
+      "innerBlockCount": 0,
+      "fingerprint": "279c8be11c007ab6239e0b5212a6c4f2f7c08235563b28aa8fbd924380c6061a",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://efeoncepro.com/desarrollo-sitios-web/"
+    }
+  ],
+  "links": [
+    {
+      "href": "#h-que-es-una-web-agentica",
+      "text": "¿Qué es una web agéntica?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-la-web-ahora-tiene-un-segundo-operador",
+      "text": "La web ahora tiene un segundo operador",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-aeo-y-preparacion-agentica-no-son-lo-mismo",
+      "text": "AEO y preparación agéntica no son lo mismo",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-como-usan-hoy-la-web-los-agentes",
+      "text": "Cómo usan hoy la web los agentes",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-que-cambia-en-un-proyecto-de-desarrollo-web",
+      "text": "¿Qué cambia en un proyecto de desarrollo web?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-webmcp-dejo-de-ser-una-nota-al-pie",
+      "text": "WebMCP dejó de ser una nota al pie",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-las-senales-del-mercado-forman-un-sistema-no-un-solo-protocolo",
+      "text": "Las señales del mercado forman un sistema, no un solo protocolo",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-una-herramienta-disponible-no-es-una-tarea-resuelta",
+      "text": "Una herramienta disponible no es una tarea resuelta",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-los-cinco-niveles-para-existir-en-un-internet-de-agentes",
+      "text": "Los cinco niveles para existir en un internet de agentes",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-como-saber-si-tu-sitio-esta-preparado-para-agentes",
+      "text": "¿Cómo saber si tu sitio está preparado para agentes?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-debes-reconstruir-tu-sitio-para-prepararlo",
+      "text": "¿Debes reconstruir tu sitio para prepararlo?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-la-confianza-no-es-la-ultima-capa",
+      "text": "La confianza no es la última capa",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-preguntas-frecuentes-sobre-la-web-agentica",
+      "text": "Preguntas frecuentes sobre la web agéntica",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-necesito-webmcp-para-tener-un-sitio-preparado-para-agentes",
+      "text": "¿Necesito WebMCP para tener un sitio preparado para agentes?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-webmcp-reemplaza-al-seo-aeo-mcp-o-las-apis",
+      "text": "¿WebMCP reemplaza al SEO, AEO, MCP o las APIs?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-un-sitio-wordpress-puede-prepararse-para-agentes",
+      "text": "¿Un sitio WordPress puede prepararse para agentes?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-un-chatbot-convierte-mi-sitio-en-una-web-agentica",
+      "text": "¿Un chatbot convierte mi sitio en una web agéntica?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-que-acciones-no-deberian-automatizarse-por-completo",
+      "text": "¿Qué acciones no deberían automatizarse por completo?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-como-se-mide-la-preparacion-agentica",
+      "text": "¿Cómo se mide la preparación agéntica?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-la-decision-que-vale-la-pena-tomar",
+      "text": "La decisión que vale la pena tomar",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-frontera-operativa-desktop-light-v7.svg",
+      "text": "",
+      "kind": "internal_url"
+    },
+    {
+      "href": "https://developer.chrome.com/docs/ai/webmcp",
+      "text": "Ver limitaciones actuales de WebMCP",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://developer.chrome.com/docs/ai/webmcp/compare-mcp",
+      "text": "Ver comparación oficial entre WebMCP y MCP",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-arquitectura-compartida-desktop-light-v7.svg",
+      "text": "",
+      "kind": "internal_url"
+    },
+    {
+      "href": "https://efeoncepro.com/desarrollo-sitios-web/",
+      "text": "desarrollo de sitios web para humanos y agentes",
+      "kind": "internal_url"
+    },
+    {
+      "href": "https://groups.google.com/a/chromium.org/g/blink-dev/c/gmYffo5WOE8/m/OJxuQRP3AAAJ",
+      "text": "Ver Intent to Experiment",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://developer.chrome.com/blog/agent-ready-toolkit",
+      "text": "Ver toolkit oficial",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://webmachinelearning.github.io/webmcp/",
+      "text": "Leer la especificación",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://github.com/webmachinelearning/webmcp",
+      "text": "el explainer del proyecto",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-mapa-ecosistema-desktop-light-v7.svg",
+      "text": "",
+      "kind": "internal_url"
+    },
+    {
+      "href": "https://github.com/nlweb-ai/NLWeb",
+      "text": "NLWeb",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://openai.com/index/powering-product-discovery-in-chatgpt/",
+      "text": "ACP",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://developers.googleblog.com/under-the-hood-universal-commerce-protocol-ucp/",
+      "text": "UCP",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://www.shopify.com/news/spring-26-edition-dev",
+      "text": "Ver Spring ’26 de Shopify",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://support.google.com/merchants/answer/16837055",
+      "text": "Ver estado en Merchant Center",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://cloud.google.com/blog/products/ai-machine-learning/announcing-agents-to-payments-ap2-protocol",
+      "text": "AP2",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year",
+      "text": "A2A",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://www.linuxfoundation.org/press/linux-foundation-announces-the-formation-of-the-agentic-ai-foundation",
+      "text": "AAIF",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-circuito-evaluacion-desktop-light-v7.svg",
+      "text": "",
+      "kind": "internal_url"
+    },
+    {
+      "href": "https://developer.chrome.com/docs/ai/webmcp/evals",
+      "text": "Ver guía oficial de evals para WebMCP",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-madurez-agentica-desktop-light-v7.svg",
+      "text": "",
+      "kind": "internal_url"
+    },
+    {
+      "href": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-readiness-12-pruebas-desktop-light-v7.svg",
+      "text": "",
+      "kind": "internal_url"
+    },
+    {
+      "href": "https://efeoncepro.com/desarrollo-sitios-web/",
+      "text": "Desarrollo de sitios web de Efeonce",
+      "kind": "internal_url"
+    },
+    {
+      "href": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-cadena-autoridad-desktop-light-v7.svg",
+      "text": "",
+      "kind": "internal_url"
+    },
+    {
+      "href": "https://www.w3.org/community/agent-identity/",
+      "text": "Ver Agent Identity Registry Protocol Community Group",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://developer.chrome.com/docs/ai/webmcp/secure-tools",
+      "text": "Ver guía de seguridad de WebMCP",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://efeoncepro.com/loop-marketing/aeo/donde-cita-la-ia/",
+      "text": "El 80% de lo que cita la IA no existe en Google",
+      "kind": "internal_url"
+    },
+    {
+      "href": "https://efeoncepro.com/loop-marketing/aeo/surround-discovery-seo-google-video-marketplace/",
+      "text": "Tu cliente ya no busca solo en Google",
+      "kind": "internal_url"
+    },
+    {
+      "href": "https://efeoncepro.com/desarrollo-sitios-web/",
+      "text": "Desarrollo de sitios web para humanos y agentes",
+      "kind": "internal_url"
+    },
+    {
+      "href": "https://efeoncepro.com/aeo-2/",
+      "text": "enfoque AEO de Efeonce",
+      "kind": "internal_url"
+    }
+  ],
+  "mediaIssues": [],
+  "editabilityLegend": {
+    "safe_text_edit": "Agent may propose text changes while preserving block type, path and surrounding structure.",
+    "safe_attrs_edit": "Agent may propose constrained attribute changes after validating the native block setting.",
+    "media_requires_reconcile": "Agent must reconcile WordPress media id, rendered src, alt text and source brief before write.",
+    "preserve_structure": "Agent should preserve structure and patch child blocks or attrs only with explicit intent.",
+    "inspect_only": "Agent should preserve by default until serialization/plugin behavior is understood."
+  }
+}

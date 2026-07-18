@@ -1,19 +1,19 @@
 # Sistema visual editorial — Web agéntica
 
-> **Estado:** producción visual v5 integrada en borrador privado; publicación pendiente.
+> **Estado:** producción visual v7 integrada en el borrador privado; publicación pendiente.
 > **Fecha:** 2026-07-18.
 > **Artículo:** borrador WordPress `249387`, `El fin de la web “solo para humanos”`.
 > **Manifest:** `WEB_AGENTICA_VISUAL_ASSET_MANIFEST_V1.json`.
 
 ## Decisión editorial
 
-La portada conserva la escena conceptual aprobada. El cuerpo usa tres infografías determinísticas y ninguna imagen
+La portada conserva la escena conceptual aprobada. El cuerpo usa siete infografías determinísticas y ninguna imagen
 decorativa adicional. Las piezas deben sentirse parte del artículo, no láminas insertadas: el canvas exterior
 coincide con el tema (`#FFFFFF` en light y `#111013` en dark), sin burbujas, manchas, gradientes, glow ni un marco
 redondeado alrededor de la composición.
 
-El color sólo codifica relaciones: teal para continuidad/recorrido, azul para capacidades, verde para gobierno y
-dorado para distinguir la interfaz humana. Las cards son superficies funcionales, no decoración de dashboard.
+El color sólo codifica relaciones: naranja para progresión/decisión, azul para capacidades, púrpura y magenta
+para fronteras intermedias y verde para gobierno/evidencia. Las cards son superficies funcionales, no decoración de dashboard.
 Después de la auditoría histórica del 2026-07-18, tampoco pueden convertirse en el arquetipo repetido de la serie:
 la relación de cada argumento debe elegir su propia composición semántica.
 
@@ -23,11 +23,11 @@ la relación de cada argumento debe elegir su propia composición semántica.
 - **Motivo:** recorridos que avanzan desde interfaz hacia capacidades y gobierno.
 - **Gramática:** ejes y capas; conectores detrás del copy; una conclusión por activo.
 - **Skin:** Efeonce core, sin paleta contextual de plataforma o cliente.
-- **Firma:** wordmarks oficiales `public/branding/logo-full.svg` y `logo-negative.svg`, pequeños y periféricos,
-  más el sello `efeoncepro.com` consumido desde
-  `src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg` en la próxima entrega.
+- **Firma:** toda información de marca vive exclusivamente en el footer. El header no lleva logo. La entrega reúne
+  fuente/fecha a la izquierda y, a la derecha, el wordmark oficial junto al sello `efeoncepro.com` consumido desde
+  `src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg`.
 - **Tema:** variantes light y dark deliberadas; nunca inversión o filtro CSS.
-- **Responsive:** desktop horizontal `1600×1000`; móvil vertical `1200×1600`; breakpoint gobernado `860px`.
+- **Responsive:** desktop horizontal `1600×1080`; móvil vertical `1200×1600`; breakpoint gobernado `860px`.
 - **Integración:** un `<picture>` por concepto, con dark+móvil, light+móvil, dark+desktop y fallback light+desktop.
 
 ## Visual job map
@@ -74,6 +74,34 @@ la relación de cada argumento debe elegir su propia composición semántica.
   alcance y confirmación antes de registrar un resultado auditable, revocable y recuperable.`
 - **Caption:** `Identificar al agente no basta: la empresa debe comprobar autoridad, alcance, confirmación y evidencia.`
 
+### WAG-V05 — Mapa del ecosistema
+
+- **Slot:** después de las señales del mercado.
+- **Función:** ubicar WebMCP, NLWeb, ACP/UCP, AP2, A2A y AAIF por la frontera que atienden.
+- **Arquetipo:** mapa de tránsito por capas; no una grilla de logos ni un ranking.
+- **Conclusión:** no existe un ganador único: emerge un stack de interoperabilidad.
+
+### WAG-V06 — Circuito de evaluación
+
+- **Slot:** después de la taxonomía de evals.
+- **Función:** conectar contrato, pruebas deterministas, evaluación probabilística, E2E y recuperación.
+- **Arquetipo:** circuito de evidencia con retorno; no checklist lineal ni pipeline de deployment.
+- **Conclusión:** una herramienta disponible todavía no demuestra una tarea resuelta.
+
+### WAG-V07 — Madurez agéntica
+
+- **Slot:** después del modelo de cinco niveles.
+- **Función:** separar la progresión de comprensión del eje de acción gobernada.
+- **Arquetipo:** escala de dos ejes; pieza insignia compartible de la serie.
+- **Conclusión:** operabilidad no deriva automáticamente de legibilidad.
+
+### WAG-V08 — Doce pruebas de readiness
+
+- **Slot:** después de la lista de doce pruebas.
+- **Función:** agrupar el diagnóstico en significado, interacción, ejecución y evidencia.
+- **Arquetipo:** ruta de inspección; no doce cards ni una captura de dashboard.
+- **Conclusión:** una falla obliga a detener o degradar la autonomía con seguridad.
+
 ## Qué se usa y qué se excluye
 
 Se usa jerarquía tipográfica clara, espacio negativo, acentos funcionales, firma oficial y superficies coherentes
@@ -81,20 +109,12 @@ con el tema. Se excluyen burbujas decorativas, fondos celestes o azul petróleo 
 glow, vidrio, perspectiva 3D, miniwidgets, estética SaaS genérica, texto microscópico y una composición única
 reescalada para móvil.
 
-## Dirección de la próxima iteración
+## Arquetipos ejecutados en v7
 
-La v5 permanece como evidencia integrada del borrador privado, pero V02 y V04 repiten una gramática de cards que
-no alcanza el estándar editorial auditado. La siguiente reconstrucción debe conservar tesis, copy validado,
-light/dark y responsive, pero reasignar arquetipos:
-
-- **WAG-V02 — paisaje de frontera/madurez:** usar los dos ejes como estructura real y un recorrido ascendente con
-  cuatro hitos; las variables de operador, comprensión, capacidad y control viven como señales del hito, no como
-  cuatro tarjetas equivalentes.
-- **WAG-V03 — corte arquitectónico por capas:** tres entradas —interfaz humana, WebMCP y API— convergen sobre una
-  espina de capacidades; gobierno y fuente de verdad cruzan el sistema como capas compartidas. Evitar un stack de
-  cajas que no muestre la convergencia.
-- **WAG-V04 — cadena de custodia y evidencia:** representar intención → representación → alcance → confirmación →
-  registro/recuperación como un trayecto verificable con gates y rastro de evidencia; no otro escalón de cards.
+La v7 reemplaza la gramática repetida de cards por siete composiciones semánticas: paisaje de frontera, corte
+arquitectónico, mapa de ecosistema, circuito de evaluación, escala de madurez, ruta de inspección y cadena de
+custodia. El shell —kicker, título, bajada, footer, paleta y tipografía— permanece estable; el cuerpo elige el
+arquetipo que mejor demuestra cada relación.
 
 El canon transversal y la auditoría de precedentes viven en
 `.codex/skills/content-marketing-studio/efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md` y
@@ -102,18 +122,12 @@ El canon transversal y la auditoría de precedentes viven en
 
 ## Producción y QA
 
-La cadena vigente pasa a ser `contrato → SVG source → delivery SVG saneado y/o raster justificado → prueba
-contextual`. La v5 existente todavía usa `SVG → PNG master → WebP`; no debe obligar a la próxima versión a
-rasterizar. Antes de servir SVG directo se ejecuta
+La cadena vigente es `contrato → SVG source editable → delivery SVG con texto trazado → prueba contextual`.
+Antes de servir SVG directo se ejecuta
 `pnpm content:editorial-svg:audit -- <delivery.svg...>` y se resuelven texto vivo, filtros, referencias, clipping
 y dimensiones intrínsecas.
-El reporte reproducible vive en `ai-generations/2026-07-18_web-agentica-pillar/build-report-v2.json`. Las pruebas
-contextuales usan los anchos medidos en los precedentes: `1112px` desktop y `358px` móvil. La producción no se
-considera desplegada hasta completar Media Library, `<picture>`, readback y QA dentro del borrador privado. La
-versión v5 completó esos gates para WAG-V04 en el post privado `249387`; el pendiente restante es la autorización
-humana de publicación y la QA live posterior.
-
-El build también mide el `getBBox()` de cada bloque de texto contenido en una card. Si cualquier glifo cruza los
-límites de su superficie, la generación falla antes de producir masters. Este gate se agregó tras detectar que el
-titular de la etapa `04 AGÉNTICO` excedía el ancho útil en desktop; desde v3 el contenido queda medido, v4 amplió
-la taxonomía compartible y v5 incorporó la cadena de autoridad sin volver a introducir desbordes.
+El reporte reproducible vive en `ai-generations/2026-07-18_web-agentica-pillar/build-report-v3.json`. Las 28
+variantes pasan tres gates geométricos: ningún texto sale del canvas o invade el footer; ningún par de textos
+colisiona; ningún asset de marca vive fuera del footer. La entrega suma el auditor de SVG: `28/28 PASS`, cero
+texto vivo, gradientes y filtros. Media Library, siete `<picture>` y readback se completaron sobre el borrador
+`249387`; el pendiente restante es autorización humana de publicación y QA live posterior.

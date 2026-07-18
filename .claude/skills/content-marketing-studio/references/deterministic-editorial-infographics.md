@@ -95,6 +95,9 @@ El SVG fuente debe:
 - usar texto determinístico, no texto convertido accidentalmente por un generador;
 - mantener una jerarquía tipográfica clara y contraste suficiente;
 - incorporar sólo logos oficiales, sin redibujarlos ni recolorearlos arbitrariamente;
+- en infografías editoriales Efeonce de cuerpo, confinar toda firma de marca al footer: el header y el campo de
+  datos no admiten logos, dominios ni watermarks; validar programáticamente que cada asset de marca descienda
+  del grupo de footer;
 - dejar conectores detrás del copy y evitar clipping/colisiones;
 - conservar un fondo explícito cuando el master raster no deba ser transparente;
 - usar nombres estables y versionados.

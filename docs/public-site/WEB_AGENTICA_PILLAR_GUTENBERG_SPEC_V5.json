@@ -1,0 +1,1334 @@
+{
+  "title": "El fin de la web “solo para humanos”",
+  "slug": "web-agentica-agentes-ia",
+  "excerpt": "Qué es la web agéntica, cómo cambia el desarrollo de sitios y qué necesita una web para ser entendida y operada de forma segura por personas y agentes de IA.",
+  "seo": {
+    "title": "Web agéntica: guía para sitios preparados para agentes de IA %%sep%% %%sitename%%",
+    "description": "Guía de web agéntica: AEO, accesibilidad, WebMCP, arquitectura, seguridad y 12 pruebas para preparar un sitio para personas y agentes de IA.",
+    "indexPolicy": "index"
+  },
+  "intro": [
+    [
+      {
+        "text": "Tu próximo cliente puede llegar a tu sitio con una decisión bastante avanzada. No porque haya leído todas tus páginas, sino porque un agente ya investigó, comparó alternativas y preparó el siguiente paso."
+      }
+    ],
+    [
+      {
+        "text": "Eso no significa que la web para humanos esté desapareciendo. Significa que dejó de estar sola.",
+        "strong": true
+      },
+      {
+        "text": " Ahora conviven, al menos, dos operadores: la persona que navega y el agente que actúa en su nombre. A veces trabajan juntos. Otras veces, el agente llega primero."
+      }
+    ],
+    [
+      {
+        "text": "Vamos con manzanitas 🍏🍏🍏: imagina que alguien necesita una agencia capaz de implementar HubSpot en Chile, con experiencia B2B y disponibilidad durante el próximo mes. Su agente revisa varios sitios. En algunos encuentra promesas, pero no alcance, metodología ni evidencia. En otros entiende la oferta, pero no puede saber qué incluye, comparar alternativas o preparar una reunión. Solo unos pocos le permiten construir una recomendación verificable y avanzar sin adivinar."
+      }
+    ],
+    [
+      {
+        "text": "El ejemplo es hipotético, pero la decisión de diseño es real: tu presencia digital necesita seguir siendo clara para las personas y empezar a ser entendible, comparable y operable para agentes. Esta guía explica qué es una web agéntica, dónde entran AEO y WebMCP, qué cambia en un proyecto de desarrollo web y cómo evaluar tu sitio sin confundir una propuesta en estandarización activa con un estándar interoperable ya consolidado."
+      }
+    ]
+  ],
+  "tableOfContents": true,
+  "sections": [
+    {
+      "heading": "¿Qué es una web agéntica?",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Una web agéntica es un sitio diseñado para que personas y agentes de IA puedan comprender su oferta, evaluar alternativas y completar tareas de manera segura. Combina una interfaz humana clara con información estructurada, capacidades invocables, permisos, confirmaciones y medición.",
+              "strong": true
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": "No es sinónimo de un sitio construido con IA ni de una página que incorpora un chatbot. La diferencia está en quién puede operar el sistema y bajo qué contrato. Un asistente dentro del sitio puede conversar con el visitante; una web preparada para agentes permite que sistemas externos comprendan tareas y soliciten acciones sin depender de adivinar la interfaz."
+        },
+        {
+          "kind": "table",
+          "headers": [
+            "Tipo de sitio",
+            "Qué hace",
+            "Qué no garantiza"
+          ],
+          "rows": [
+            [
+              "Sitio tradicional",
+              "Informa y convierte mediante una interfaz humana",
+              "Que un agente pueda interpretarlo correctamente"
+            ],
+            [
+              "Sitio con IA",
+              "Incorpora chatbot, generación o personalización",
+              "Que agentes externos puedan operar el negocio"
+            ],
+            [
+              "Sitio preparado para agentes",
+              "Reduce ambigüedad y estructura información y tareas",
+              "Que toda acción deba automatizarse"
+            ],
+            [
+              "Web agéntica",
+              "Personas y agentes usan capacidades gobernadas del mismo sistema",
+              "Autonomía sin permisos, confirmación ni control"
+            ]
+          ],
+          "caption": "Usar IA para construir o atender no convierte por sí solo un sitio en una web agéntica."
+        },
+        {
+          "kind": "image",
+          "mediaId": 251514,
+          "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-frontera-operativa-desktop-light-v7.svg",
+          "alt": "Cuatro estados muestran cómo disminuye la inferencia y aumentan la operabilidad y el gobierno: sitio tradicional, sitio con IA, sitio preparado y web agéntica.",
+          "width": 1600,
+          "height": 1080,
+          "sizeSlug": "large",
+          "linkDestination": "media",
+          "caption": "La transición decisiva no es “más IA”, sino una acción explícita, gobernada y demostrable.",
+          "sources": [
+            {
+              "media": "(prefers-color-scheme: dark) and (max-width: 860px)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-frontera-operativa-mobile-dark-v7.svg",
+              "type": "image/svg+xml",
+              "mediaId": 251517
+            },
+            {
+              "media": "(max-width: 860px)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-frontera-operativa-mobile-light-v7.svg",
+              "type": "image/svg+xml",
+              "mediaId": 251516
+            },
+            {
+              "media": "(prefers-color-scheme: dark)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-frontera-operativa-desktop-dark-v7.svg",
+              "type": "image/svg+xml",
+              "mediaId": 251515
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": "Esta distinción importa porque buena parte del mercado todavía usa “desarrollo web con IA” para describir producción acelerada, chatbots o automatización. Son capacidades válidas, pero resuelven otro problema. La preparación agéntica pregunta si un tercero autorizado puede entender la tarea, ejecutarla y dejar evidencia de lo ocurrido."
+        }
+      ]
+    },
+    {
+      "heading": "La web ahora tiene un segundo operador",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Durante años diseñamos el recorrido digital suponiendo que una persona miraría la pantalla, interpretaría el menú, leería la página y pulsaría un botón. Los agentes agregan otra forma de recorrer ese mismo sistema: pueden investigar, filtrar información, completar formularios y preparar acciones en nombre de alguien."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "La consecuencia no es que la página deje de importar. "
+            },
+            {
+              "text": "La página sigue construyendo contexto, confianza y consentimiento; la acción se convierte en una segunda superficie del producto.",
+              "strong": true
+            },
+            {
+              "text": " Ya no basta con preguntar qué información mostramos. También debemos preguntar qué tarea habilitamos, con qué datos, bajo qué permisos y dónde vuelve a intervenir la persona."
+            }
+          ]
+        },
+        {
+          "kind": "pullquote",
+          "text": "La web humana no desaparece. Gana un segundo operador."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Esto también cambia la medición. Vistas de página, sesiones y conversiones siguen siendo útiles, pero ya no describen todo el recorrido. Una experiencia agéntica necesita observar además si el agente entendió la tarea, encontró la acción correcta, completó cada paso y pidió confirmación cuando correspondía. En otras palabras: sumar tareas completadas, errores, derivaciones a personas y acciones confirmadas al tablero; no sustituir una métrica por otra a ciegas."
+        }
+      ]
+    },
+    {
+      "heading": "AEO y preparación agéntica no son lo mismo",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "AEO —Answer Engine Optimization— trabaja para que una marca y su contenido puedan ser recuperados, comprendidos, representados con precisión y citados por motores de respuesta. Eso exige fundamentos conocidos: acceso técnico, contenido útil, entidades consistentes, evidencia, estructura semántica y autoridad."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "La preparación agéntica —agentic readiness— responde otra pregunta: "
+            },
+            {
+              "text": "¿puede un agente usar el sitio para completar una tarea?",
+              "strong": true
+            },
+            {
+              "text": " Una empresa puede aparecer correctamente en una respuesta de IA y, aun así, obligar al usuario a comenzar de cero cuando llega el momento de cotizar, reservar o comprar. También puede ofrecer una acción técnicamente invocable sin tener suficiente autoridad para entrar en la consideración inicial."
+            }
+          ]
+        },
+        {
+          "kind": "table",
+          "headers": [
+            "Disciplina",
+            "Pregunta principal",
+            "Resultado esperado"
+          ],
+          "rows": [
+            [
+              "SEO",
+              "¿El buscador puede rastrear, entender y posicionar la página?",
+              "Visibilidad en resultados de búsqueda"
+            ],
+            [
+              "AEO",
+              "¿El motor de respuesta puede recuperar, representar y citar la marca?",
+              "Presencia y precisión en respuestas generadas"
+            ],
+            [
+              "Preparación agéntica",
+              "¿El agente puede completar una tarea de forma segura?",
+              "Operabilidad, tareas completadas y derivación a personas"
+            ]
+          ],
+          "caption": "Las tres disciplinas comparten fundamentos, pero no resuelven el mismo trabajo."
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Hay una razón técnica para mantener separadas percepción y operabilidad. Las herramientas WebMCP se descubren dentro del contexto de una página: el cliente debe visitar el sitio antes de saber que existen. "
+            },
+            {
+              "text": "Por eso una empresa puede construir acciones excelentes y seguir fuera de la consideración inicial; también puede ser ampliamente citada y no permitir que el agente avance.",
+              "strong": true
+            },
+            {
+              "text": " AEO trabaja antes de la visita. La preparación agéntica decide qué ocurre después. "
+            },
+            {
+              "text": "Ver limitaciones actuales de WebMCP",
+              "href": "https://developer.chrome.com/docs/ai/webmcp"
+            },
+            {
+              "text": "."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": "Por eso AEO no debe venderse como una capa mágica que vuelve operable un sitio. Ayuda a que el agente encuentre y entienda la opción. La operabilidad exige diseño de producto, accesibilidad, contratos en el servidor, herramientas, permisos y observabilidad."
+        }
+      ]
+    },
+    {
+      "heading": "Cómo usan hoy la web los agentes",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "Al corte de julio de 2026 conviven dos rutas. No son etapas mutuamente excluyentes ni una migración terminada. Un mismo agente puede usar ambas durante una tarea."
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Interacción sobre la interfaz.",
+              "strong": true
+            },
+            {
+              "text": " El agente observa capturas, DOM y árbol de accesibilidad; después simula clics, escritura y navegación. Esta ruta puede operar sitios existentes, pero hereda ambigüedades de la interfaz y se expone a cambios visuales, estados inesperados e inyección de instrucciones —prompt injection—. La accesibilidad importa especialmente porque el árbol accesible funciona como una de las representaciones primarias que el agente utiliza para comprender controles, nombres y estados."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Herramientas estructuradas.",
+              "strong": true
+            },
+            {
+              "text": " El sitio declara acciones con nombres, descripciones, entradas y resultados definidos. En lugar de inferir qué hace un botón, el agente puede descubrir una capacidad —capability— y solicitar su ejecución. WebMCP lleva ese patrón al navegador; MCP, OpenAPI y otros contratos siguen cumpliendo el trabajo de integración con sistemas internos. La propia documentación de Chrome recomienda combinarlos según el caso, no elegir uno como reemplazo universal. "
+            },
+            {
+              "text": "Ver comparación oficial entre WebMCP y MCP",
+              "href": "https://developer.chrome.com/docs/ai/webmcp/compare-mcp"
+            },
+            {
+              "text": "."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Una capacidad puede ser tan concreta como "
+            },
+            {
+              "text": "prepare_meeting",
+              "strong": true
+            },
+            {
+              "text": ": recibe empresa, necesidad y disponibilidad; devuelve un resumen, preguntas abiertas y horarios posibles. En la interfaz humana puede verse como un formulario guiado. Para el agente, es una herramienta invocable. El contrato es compartido; cambia quién lo opera."
+            }
+          ]
+        },
+        {
+          "kind": "table",
+          "headers": [
+            "Contexto",
+            "Tarea del agente",
+            "Punto de control humano"
+          ],
+          "rows": [
+            [
+              "Servicios B2B",
+              "Comparar alcance y preparar una reunión",
+              "Confirmar necesidad, asistentes y horario"
+            ],
+            [
+              "Ecommerce",
+              "Consultar disponibilidad y preparar una compra",
+              "Revisar precio, dirección y pago"
+            ],
+            [
+              "Portal de clientes",
+              "Consultar estado y abrir una solicitud",
+              "Autorizar cambios o datos sensibles"
+            ],
+            [
+              "Contenido",
+              "Recuperar evidencia y citar una definición",
+              "Verificar fuente, fecha y contexto"
+            ]
+          ],
+          "caption": "El trabajo cambia por negocio; la necesidad de contexto, límites y confirmación permanece."
+        }
+      ]
+    },
+    {
+      "heading": "¿Qué cambia en un proyecto de desarrollo web?",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "Diseñar para dos operadores no significa crear dos sitios. Significa construir una arquitectura compartida donde la interfaz humana, la información semántica y las capacidades del negocio nacen de contratos consistentes. La página sigue siendo el lugar donde una persona comprende y confía; debajo, el sistema deja de depender exclusivamente de botones y pantallas."
+        },
+        {
+          "kind": "list",
+          "ordered": false,
+          "items": [
+            [
+              {
+                "text": "Discovery orientado a tareas.",
+                "strong": true
+              },
+              {
+                "text": " Además de inventariar páginas, identifica qué necesita investigar, comparar, preparar o ejecutar cada operador."
+              }
+            ],
+            [
+              {
+                "text": "Arquitectura separada de la interfaz.",
+                "strong": true
+              },
+              {
+                "text": " Datos, reglas y acciones viven en capacidades estables; la UI, una API o WebMCP pueden consumirlas sin duplicar lógica."
+              }
+            ],
+            [
+              {
+                "text": "Contenido sin ambigüedad.",
+                "strong": true
+              },
+              {
+                "text": " Servicios, alcance, condiciones, precios cuando corresponda y evidencia se expresan de forma consistente y verificable."
+              }
+            ],
+            [
+              {
+                "text": "Accesibilidad como infraestructura.",
+                "strong": true
+              },
+              {
+                "text": " Controles, estados, errores y relaciones tienen nombres programáticos útiles para personas y agentes."
+              }
+            ],
+            [
+              {
+                "text": "Seguridad desde el contrato.",
+                "strong": true
+              },
+              {
+                "text": " Identidad, mínimo privilegio, vista previa, confirmación, trazabilidad y recuperación se diseñan antes de exponer la acción."
+              }
+            ],
+            [
+              {
+                "text": "Medición de tareas.",
+                "strong": true
+              },
+              {
+                "text": " Además de sesiones y conversiones, se observan descubrimiento, invocación, éxito, error, abandono y derivación humana."
+              }
+            ]
+          ]
+        },
+        {
+          "kind": "image",
+          "mediaId": 251518,
+          "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-arquitectura-compartida-desktop-light-v7.svg",
+          "alt": "La interfaz humana y la interfaz estructurada convergen en una capacidad compartida con contrato, gobierno y fuente de verdad únicos.",
+          "width": 1600,
+          "height": 1080,
+          "sizeSlug": "large",
+          "linkDestination": "media",
+          "caption": "La interfaz cambia; la capacidad, el gobierno y la fuente de verdad permanecen compartidos.",
+          "sources": [
+            {
+              "media": "(prefers-color-scheme: dark) and (max-width: 860px)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-arquitectura-compartida-mobile-dark-v7.svg",
+              "type": "image/svg+xml",
+              "mediaId": 251521
+            },
+            {
+              "media": "(max-width: 860px)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-arquitectura-compartida-mobile-light-v7.svg",
+              "type": "image/svg+xml",
+              "mediaId": 251520
+            },
+            {
+              "media": "(prefers-color-scheme: dark)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-arquitectura-compartida-desktop-dark-v7.svg",
+              "type": "image/svg+xml",
+              "mediaId": 251519
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "En Efeonce aplicamos esta lógica al "
+            },
+            {
+              "text": "desarrollo de sitios web para humanos y agentes",
+              "href": "https://efeoncepro.com/desarrollo-sitios-web/"
+            },
+            {
+              "text": ": primero se define la tarea, la arquitectura y la evidencia; la tecnología viene después. WebMCP puede ser una interfaz del sistema, pero no debe convertirse en el sistema completo."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "WebMCP dejó de ser una nota al pie",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Google presentó WebMCP oficialmente en I/O 2026 como una propuesta de estándar web abierto para exponer funciones y formularios como herramientas estructuradas. El origin trial comenzó en Chrome 149 y está aprobado hasta Chrome 156. "
+            },
+            {
+              "text": "Que Chrome ya esté en la versión 151 no convierte la API en estable:",
+              "strong": true
+            },
+            {
+              "text": " el registro de Chromium todavía habla de una incubación, mantiene pendiente la revisión del TAG, no registra señales de Gecko ni WebKit y sitúa Chrome 157 sólo como hito estimado de shipping. "
+            },
+            {
+              "text": "Ver Intent to Experiment",
+              "href": "https://groups.google.com/a/chromium.org/g/blink-dev/c/gmYffo5WOE8/m/OJxuQRP3AAAJ"
+            },
+            {
+              "text": "."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "La señal práctica para equipos web llegó con Chrome 150: Lighthouse incorporó la categoría experimental "
+            },
+            {
+              "text": "Agentic Browsing",
+              "strong": true
+            },
+            {
+              "text": ". Sus auditorías determinísticas revisan una parte de la accesibilidad relevante para agentes, estabilidad visual e integración WebMCP —herramientas registradas, schemas y formularios candidatos—. El resultado es informativo y no tiene la puntuación ponderada de 0 a 100 de otras categorías. Google no lo presenta como señal de ranking de búsqueda, sino como instrumento de desarrollo y control de calidad. "
+            },
+            {
+              "text": "Ver toolkit oficial",
+              "href": "https://developer.chrome.com/blog/agent-ready-toolkit"
+            },
+            {
+              "text": "."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "El estado correcto es "
+            },
+            {
+              "text": "incubación formal con despliegue experimental en navegador",
+              "strong": true
+            },
+            {
+              "text": ". La especificación publicada el 10 de julio de 2026 es un Draft Community Group Report: no es un W3C Standard ni está en el W3C Standards Track, y su sección declarativa todavía conserva trabajo normativo pendiente. El alcance también importa: la interfaz humana sigue siendo primaria, WebMCP complementa la automatización visual y no reemplaza las integraciones con sistemas internos. "
+            },
+            {
+              "text": "Leer la especificación",
+              "href": "https://webmachinelearning.github.io/webmcp/"
+            },
+            {
+              "text": " y "
+            },
+            {
+              "text": "el explainer del proyecto",
+              "href": "https://github.com/webmachinelearning/webmcp"
+            },
+            {
+              "text": "."
+            }
+          ]
+        },
+        {
+          "kind": "table",
+          "headers": [
+            "Situación",
+            "Ruta recomendada"
+          ],
+          "rows": [
+            [
+              "Un agente opera una página abierta",
+              "WebMCP"
+            ],
+            [
+              "Integración entre sistemas o servidores",
+              "MCP, API u OpenAPI"
+            ],
+            [
+              "Sitio existente sin herramientas estructuradas",
+              "Interfaz accesible y automatización visual"
+            ],
+            [
+              "Acción irreversible o de alto riesgo",
+              "Vista previa, confirmación humana y registros"
+            ],
+            [
+              "Consulta o preparación sin efectos",
+              "Capacidad de solo lectura"
+            ]
+          ],
+          "caption": "La arquitectura puede combinar rutas; el protocolo se elige según operador, contexto y riesgo."
+        },
+        {
+          "kind": "quote",
+          "text": "La decisión sensata no es esperar inmóviles ni reconstruir todo alrededor de WebMCP. Es diseñar acciones limpias, tipadas y gobernadas que puedan exponerse por el protocolo adecuado cuando corresponda."
+        }
+      ]
+    },
+    {
+      "heading": "Las señales del mercado forman un sistema, no un solo protocolo",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "WebMCP es una pieza visible, pero la web agéntica no depende de un único estándar. Distintos proyectos están resolviendo interacción, descubrimiento, comercio, pagos, interoperabilidad y gobernanza. Conviene entender qué problema resuelve cada uno antes de convertir las siglas en arquitectura."
+        },
+        {
+          "kind": "table",
+          "headers": [
+            "Capa",
+            "Proyecto",
+            "Qué resuelve",
+            "Estado al corte"
+          ],
+          "rows": [
+            [
+              "Interacción web",
+              "WebMCP",
+              "Expone herramientas de una página a agentes en el navegador",
+              "Incubación W3C CG + origin trial Chrome 149–156"
+            ],
+            [
+              "Interfaces conversacionales",
+              "NLWeb",
+              "Convierte contenido web en una interfaz consultable y servidor MCP",
+              "Proyecto abierto presentado por Microsoft; repo actual nlweb-ai"
+            ],
+            [
+              "Comercio",
+              "ACP y UCP",
+              "Cubren descubrimiento, compra y flujos comerciales entre agentes y empresas",
+              "ACP amplió discovery; UCP abierto con adopción y despliegues por superficie"
+            ],
+            [
+              "Pagos",
+              "AP2",
+              "Establece intención, autorización y mandatos verificables",
+              "Protocolo abierto respaldado por más de 60 organizaciones"
+            ],
+            [
+              "Agente a agente",
+              "A2A",
+              "Permite descubrimiento y coordinación entre agentes de distintos proveedores",
+              "Versión 1.0 estable, 150+ organizaciones y usos productivos"
+            ],
+            [
+              "Gobernanza",
+              "AAIF",
+              "Da un hogar neutral a infraestructura agéntica abierta",
+              "Fundación activa bajo Linux Foundation"
+            ]
+          ],
+          "caption": "Estado resumido a julio de 2026; madurez de la especificación, acceso de desarrolladores y rollout comercial no son la misma cosa."
+        },
+        {
+          "kind": "image",
+          "mediaId": 251522,
+          "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-mapa-ecosistema-desktop-light-v7.svg",
+          "alt": "Mapa de seis iniciativas por capa: WebMCP para interacción web, NLWeb para consulta, ACP y UCP para comercio, AP2 para pagos, A2A para agentes y AAIF para gobernanza.",
+          "width": 1600,
+          "height": 1080,
+          "sizeSlug": "large",
+          "linkDestination": "media",
+          "caption": "No hay un ganador único: emerge un stack de interoperabilidad con fronteras distintas.",
+          "sources": [
+            {
+              "media": "(prefers-color-scheme: dark) and (max-width: 860px)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-mapa-ecosistema-mobile-dark-v7.svg",
+              "type": "image/svg+xml",
+              "mediaId": 251525
+            },
+            {
+              "media": "(max-width: 860px)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-mapa-ecosistema-mobile-light-v7.svg",
+              "type": "image/svg+xml",
+              "mediaId": 251524
+            },
+            {
+              "media": "(prefers-color-scheme: dark)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-mapa-ecosistema-desktop-dark-v7.svg",
+              "type": "image/svg+xml",
+              "mediaId": 251523
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Microsoft presentó "
+            },
+            {
+              "text": "NLWeb",
+              "href": "https://github.com/nlweb-ai/NLWeb"
+            },
+            {
+              "text": "; hoy su implementación de referencia vive bajo la organización abierta nlweb-ai y cada instancia puede actuar como servidor MCP. En comercio, OpenAI amplió "
+            },
+            {
+              "text": "ACP",
+              "href": "https://openai.com/index/powering-product-discovery-in-chatgpt/"
+            },
+            {
+              "text": " desde checkout hacia product discovery. Google y Shopify co-desarrollaron "
+            },
+            {
+              "text": "UCP",
+              "href": "https://developers.googleblog.com/under-the-hood-universal-commerce-protocol-ucp/"
+            },
+            {
+              "text": " como estándar abierto compatible con AP2, A2A y MCP."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Aquí conviene separar protocolo de rollout. Shopify abrió su infraestructura agéntica en modalidad self-service para desarrolladores y permite acceder a millones de comercios sin un proceso previo de aprobación. "
+            },
+            {
+              "text": "Ver Spring ’26 de Shopify",
+              "href": "https://www.shopify.com/news/spring-26-edition-dev"
+            },
+            {
+              "text": ". La experiencia de checkout UCP dentro de AI Mode y Gemini, en cambio, sigue disponible para comercios seleccionados y se despliega por fases. "
+            },
+            {
+              "text": "Ver estado en Merchant Center",
+              "href": "https://support.google.com/merchants/answer/16837055"
+            },
+            {
+              "text": ". No son afirmaciones contradictorias: una describe acceso a infraestructura; la otra, disponibilidad en una superficie de Google."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Para pagos, "
+            },
+            {
+              "text": "AP2",
+              "href": "https://cloud.google.com/blog/products/ai-machine-learning/announcing-agents-to-payments-ap2-protocol"
+            },
+            {
+              "text": " propone un lenguaje abierto para demostrar intención y autorización. Para coordinación, "
+            },
+            {
+              "text": "A2A",
+              "href": "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year"
+            },
+            {
+              "text": " ya tiene una versión 1.0 estable, más de 150 organizaciones y despliegues productivos. Y "
+            },
+            {
+              "text": "AAIF",
+              "href": "https://www.linuxfoundation.org/press/linux-foundation-announces-the-formation-of-the-agentic-ai-foundation"
+            },
+            {
+              "text": " nació con MCP, goose y AGENTS.md como proyectos fundadores; A2A también está alojado por Linux Foundation, pero no fue uno de esos tres proyectos fundadores."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": "La señal conjunta es más importante que cualquier logo: los agentes están pasando de improvisar sobre interfaces a combinar interfaces, contratos y protocolos especializados. Eso no prueba que exista un estándar ganador. Sí justifica preparar las capacidades internas y aprender con implementaciones acotadas."
+        }
+      ]
+    },
+    {
+      "heading": "Una herramienta disponible no es una tarea resuelta",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Registrar una herramienta y validar su schema demuestra que la puerta existe. No demuestra que el agente elegirá la herramienta correcta, enviará los parámetros adecuados, respetará el orden del flujo ni se recuperará de un fallo intermedio.",
+              "strong": true
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": "La propia guía de WebMCP separa tres capas de prueba: tests determinísticos para la lógica y sus efectos, evals probabilísticas para selección y razonamiento del modelo, y recorridos end to end para comprobar que una persona y su agente completan la tarea. También recomienda ensayar consultas directas y ambiguas, órdenes alternativas válidas y fallos a mitad de una cadena."
+        },
+        {
+          "kind": "table",
+          "headers": [
+            "Capa de prueba",
+            "Pregunta que responde",
+            "Fallo que descubre"
+          ],
+          "rows": [
+            [
+              "Determinística",
+              "¿La capacidad funciona como fue programada?",
+              "Validación, dependencia, side effect o UI incorrectos"
+            ],
+            [
+              "Probabilística",
+              "¿El modelo elige bien ante distintas formulaciones?",
+              "Herramienta, parámetros o interpretación equivocados"
+            ],
+            [
+              "End to end",
+              "¿La tarea completa llega al resultado correcto?",
+              "Orden, contexto, recuperación o confirmación rotos"
+            ]
+          ],
+          "caption": "La unidad de calidad no es la herramienta registrada: es la tarea completada dentro de límites verificables."
+        },
+        {
+          "kind": "image",
+          "mediaId": 251526,
+          "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-circuito-evaluacion-desktop-light-v7.svg",
+          "alt": "Circuito de evaluación en cinco pasos: contrato de herramienta, pruebas deterministas, evaluación probabilística, prueba de extremo a extremo y observación con recuperación.",
+          "width": 1600,
+          "height": 1080,
+          "sizeSlug": "large",
+          "linkDestination": "media",
+          "caption": "La confianza aparece cuando contrato, comportamiento, resultado y recuperación se prueban como sistema.",
+          "sources": [
+            {
+              "media": "(prefers-color-scheme: dark) and (max-width: 860px)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-circuito-evaluacion-mobile-dark-v7.svg",
+              "type": "image/svg+xml",
+              "mediaId": 251529
+            },
+            {
+              "media": "(max-width: 860px)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-circuito-evaluacion-mobile-light-v7.svg",
+              "type": "image/svg+xml",
+              "mediaId": 251528
+            },
+            {
+              "media": "(prefers-color-scheme: dark)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-circuito-evaluacion-desktop-dark-v7.svg",
+              "type": "image/svg+xml",
+              "mediaId": 251527
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Por eso una auditoría agent-ready no termina en Lighthouse ni en un inspector de herramientas. Termina cuando el recorrido real funciona, falla de manera segura y deja evidencia suficiente para explicar el resultado. "
+            },
+            {
+              "text": "Ver guía oficial de evals para WebMCP",
+              "href": "https://developer.chrome.com/docs/ai/webmcp/evals"
+            },
+            {
+              "text": "."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Los cinco niveles para existir en un internet de agentes",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "En Efeonce lo estamos pensando con cinco niveles. La secuencia ayuda a explicar el problema, pero no debe convertirse en un único indicador engañoso. En la práctica hay dos ejes: percepción —qué sabe y dice la IA sobre ti— y operabilidad —qué puede hacer un agente contigo."
+        },
+        {
+          "kind": "table",
+          "headers": [
+            "Nivel",
+            "Pregunta",
+            "Qué exige"
+          ],
+          "rows": [
+            [
+              "1. Be Found",
+              "¿La IA puede encontrarte?",
+              "Acceso técnico, indexación, presencia y señales de entidad"
+            ],
+            [
+              "2. Be Readable",
+              "¿Puede entenderte sin adivinar?",
+              "Contenido claro, semántica, datos estructurados y definiciones consistentes"
+            ],
+            [
+              "3. Be Correct",
+              "¿Te representa con precisión?",
+              "Afirmaciones verificables, entidad consistente y corrección de errores"
+            ],
+            [
+              "4. Be Actionable",
+              "¿Puede completar una tarea?",
+              "Accesibilidad, acciones estructuradas, permisos, derivación a personas y observabilidad"
+            ],
+            [
+              "5. Be Intrinsic",
+              "¿Eres parte de cómo entiende la categoría?",
+              "Autoridad, presencia sostenida, evidencia y cuota de presencia"
+            ]
+          ],
+          "caption": "Be Actionable es un eje de operabilidad; los otros cuatro describen progresión de percepción."
+        },
+        {
+          "kind": "image",
+          "mediaId": 251530,
+          "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-madurez-agentica-desktop-light-v7.svg",
+          "alt": "Modelo de cinco niveles: encontrable, legible, correcto, intrínseco y operable; la acción gobernada no deriva automáticamente de la comprensión.",
+          "width": 1600,
+          "height": 1080,
+          "sizeSlug": "large",
+          "linkDestination": "media",
+          "caption": "Ser legible habilita comprensión; operar exige autoridad, límites, confirmación y evidencia.",
+          "sources": [
+            {
+              "media": "(prefers-color-scheme: dark) and (max-width: 860px)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-madurez-agentica-mobile-dark-v7.svg",
+              "type": "image/svg+xml",
+              "mediaId": 251533
+            },
+            {
+              "media": "(max-width: 860px)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-madurez-agentica-mobile-light-v7.svg",
+              "type": "image/svg+xml",
+              "mediaId": 251532
+            },
+            {
+              "media": "(prefers-color-scheme: dark)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-madurez-agentica-desktop-dark-v7.svg",
+              "type": "image/svg+xml",
+              "mediaId": 251531
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "La distinción evita dos promesas fáciles. Primero, instalar WebMCP no hace que una marca sea recomendada por la IA. Segundo, ser citada no significa que un agente pueda operar su sitio. "
+            },
+            {
+              "text": "Visibilidad y operabilidad se refuerzan, pero se construyen y se miden por separado.",
+              "strong": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "¿Cómo saber si tu sitio está preparado para agentes?",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "La preparación agéntica no se demuestra instalando un archivo, un schema o una API. Se prueba recorriendo el sistema desde el descubrimiento hasta la recuperación. Estas doce preguntas sirven como primera auditoría."
+        },
+        {
+          "kind": "list",
+          "ordered": true,
+          "items": [
+            "¿La oferta se entiende sin interpretar slogans?",
+            "¿Las entidades, servicios y condiciones se nombran de forma consistente?",
+            "¿La información visible coincide con los datos estructurados?",
+            "¿Los controles tienen nombres, estados y errores accesibles?",
+            "¿Las tareas principales están claramente delimitadas?",
+            "¿Cada acción tiene entradas, resultados y errores definidos?",
+            "¿Existe una capacidad estable en el servidor, separada de la pantalla?",
+            "¿Las operaciones sensibles muestran una vista previa y piden confirmación?",
+            "¿Los permisos siguen el principio de mínimo privilegio?",
+            "¿Queda registro de qué hizo el agente y bajo qué identidad?",
+            "¿Existe una ruta de recuperación y derivación a una persona?",
+            "¿La tarea combina tests determinísticos, evals probabilísticas y recorridos end to end?"
+          ]
+        },
+        {
+          "kind": "image",
+          "mediaId": 251534,
+          "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-readiness-12-pruebas-desktop-light-v7.svg",
+          "alt": "Doce pruebas de preparación agrupadas en significado, interacción, ejecución y evidencia.",
+          "width": 1600,
+          "height": 1080,
+          "sizeSlug": "large",
+          "linkDestination": "media",
+          "caption": "Si una prueba falla, la autonomía debe detenerse o degradarse con seguridad.",
+          "sources": [
+            {
+              "media": "(prefers-color-scheme: dark) and (max-width: 860px)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-readiness-12-pruebas-mobile-dark-v7.svg",
+              "type": "image/svg+xml",
+              "mediaId": 251537
+            },
+            {
+              "media": "(max-width: 860px)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-readiness-12-pruebas-mobile-light-v7.svg",
+              "type": "image/svg+xml",
+              "mediaId": 251536
+            },
+            {
+              "media": "(prefers-color-scheme: dark)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-readiness-12-pruebas-desktop-dark-v7.svg",
+              "type": "image/svg+xml",
+              "mediaId": 251535
+            }
+          ]
+        },
+        {
+          "kind": "quote",
+          "text": "Un sitio está preparado cuando puede explicar la tarea, limitar la acción y demostrar el resultado. No cuando solamente declara que usa IA."
+        },
+        {
+          "kind": "paragraph",
+          "text": "No todos los proyectos deben aprobar las doce pruebas desde el primer día. Un sitio informativo puede empezar por claridad, accesibilidad y lectura. Un ecommerce, un portal o una plataforma con acciones sensibles necesita avanzar antes en permisos, confirmación, observabilidad y recuperación."
+        }
+      ]
+    },
+    {
+      "heading": "¿Debes reconstruir tu sitio para prepararlo?",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "No necesariamente. La decisión depende de cuánto resiste la base actual. Un sitio puede mejorar por capas cuando su contenido, HTML, CMS y contratos permiten ordenar tareas sin duplicar la lógica. Reconstruir tiene sentido cuando la interfaz es la única fuente de reglas, la medición no es confiable o cada integración exige un parche distinto."
+        },
+        {
+          "kind": "list",
+          "ordered": true,
+          "items": [
+            [
+              {
+                "text": "Elige una tarea acotada.",
+                "strong": true
+              },
+              {
+                "text": " Buscar disponibilidad, preparar una cotización, reservar una reunión o consultar el estado de una orden."
+              }
+            ],
+            [
+              {
+                "text": "Haz que el flujo humano sea claro y accesible.",
+                "strong": true
+              },
+              {
+                "text": " Usa HTML semántico, nombres programáticos, estados comprensibles y una experiencia estable. Esto ayuda a personas y agentes."
+              }
+            ],
+            [
+              {
+                "text": "Formaliza la acción en el servidor.",
+                "strong": true
+              },
+              {
+                "text": " Define entradas, resultados, permisos, validaciones, errores e idempotencia antes de exponer otra interfaz."
+              }
+            ],
+            [
+              {
+                "text": "Empieza con lectura o preparación.",
+                "strong": true
+              },
+              {
+                "text": " Una capacidad de solo lectura o una vista previa antes de enviar enseña más con menos riesgo que automatizar de inmediato el paso irreversible."
+              }
+            ],
+            [
+              {
+                "text": "Agrega confirmación y trazabilidad.",
+                "strong": true
+              },
+              {
+                "text": " Las acciones con consecuencias deben mostrar qué ocurrirá, quién autorizó y cómo revertir o recuperar el flujo."
+              }
+            ],
+            [
+              {
+                "text": "Prueba más de una ruta.",
+                "strong": true
+              },
+              {
+                "text": " Valida el flujo sobre interfaz y, cuando tenga sentido, mediante WebMCP o el contrato estructurado correspondiente. Usa Lighthouse Agentic Browsing como señal informativa, no como certificado."
+              }
+            ],
+            [
+              {
+                "text": "Mide la tarea.",
+                "strong": true
+              },
+              {
+                "text": " Registra descubrimiento, invocación, éxito, error, confirmación, abandono y derivación a una persona."
+              }
+            ]
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": "La arquitectura más resistente es aditiva: la misma capacidad estable en el servidor alimenta la interfaz humana, una API gobernada y, cuando corresponda, una herramienta para agentes. Así puedes experimentar con el canal sin convertir el protocolo del momento en el centro del negocio."
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Si estás evaluando construir, rediseñar o escalar tu presencia digital, revisa el enfoque de "
+            },
+            {
+              "text": "Desarrollo de sitios web de Efeonce",
+              "href": "https://efeoncepro.com/desarrollo-sitios-web/"
+            },
+            {
+              "text": ". La recomendación correcta puede ser optimizar la base, migrar una parte o diseñar una arquitectura nueva; no se decide por la herramienta de moda."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "La confianza no es la última capa",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "La inyección de instrucciones, los permisos excesivos, los errores de interpretación y las acciones difíciles de revertir no son problemas posteriores. Aparecen desde el primer diseño. Por eso la confianza debe cruzar todo el sistema: identidad, alcance, autorización, vista previa, confirmación, registros, revocación y recuperación."
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "La cadena de autoridad conecta a tres actores: la persona que expresa una intención, el agente u operador que actúa en su nombre y la empresa que acepta ejecutar la acción. "
+            },
+            {
+              "text": "Identificar al agente no demuestra por sí solo que tiene autoridad delegada.",
+              "strong": true
+            },
+            {
+              "text": " Para una operación sensible también necesitas saber quién solicita, en nombre de quién, con qué alcance, durante cuánto tiempo, qué confirmación corresponde y qué registro permitirá revocar o recuperar."
+            }
+          ]
+        },
+        {
+          "kind": "image",
+          "mediaId": 251538,
+          "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-cadena-autoridad-desktop-light-v7.svg",
+          "alt": "Cadena de custodia desde la intención de una persona hasta la representación del agente, la decisión de la capacidad y la evidencia recuperable.",
+          "width": 1600,
+          "height": 1080,
+          "sizeSlug": "large",
+          "linkDestination": "media",
+          "caption": "Identificar al agente no basta: la acción debe demostrar representación, alcance, confirmación y resultado.",
+          "sources": [
+            {
+              "media": "(prefers-color-scheme: dark) and (max-width: 860px)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-cadena-autoridad-mobile-dark-v7.svg",
+              "type": "image/svg+xml",
+              "mediaId": 251541
+            },
+            {
+              "media": "(max-width: 860px)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-cadena-autoridad-mobile-light-v7.svg",
+              "type": "image/svg+xml",
+              "mediaId": 251540
+            },
+            {
+              "media": "(prefers-color-scheme: dark)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-cadena-autoridad-desktop-dark-v7.svg",
+              "type": "image/svg+xml",
+              "mediaId": 251539
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Ese problema todavía no tiene una solución universal. El grupo de identidad de agentes de W3C reconoce que no existe un mecanismo acordado para verificar en conjunto identidad, entidad controladora y alcance de autorización. "
+            },
+            {
+              "text": "Ver Agent Identity Registry Protocol Community Group",
+              "href": "https://www.w3.org/community/agent-identity/"
+            },
+            {
+              "text": ". En paralelo, las guías de Chrome advierten que ni siquiera “solo lectura” es sinónimo de inocuo: una consulta puede revelar información privada, y una salida puede contener contenido no confiable."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Los proveedores incorporan distintas formas de supervisión, restricciones y confirmación, pero ninguno puede garantizar que un modelo sea inmune a prompt injection. "
+            },
+            {
+              "text": "Ver guía de seguridad de WebMCP",
+              "href": "https://developer.chrome.com/docs/ai/webmcp/secure-tools"
+            },
+            {
+              "text": ". Esa prudencia también debe existir en el sitio que expone la acción."
+            }
+          ]
+        },
+        {
+          "kind": "quote",
+          "text": "Una acción fácil de invocar y difícil de controlar no es preparación agéntica. Es deuda operativa con una interfaz nueva."
+        }
+      ]
+    },
+    {
+      "heading": "Preguntas frecuentes sobre la web agéntica",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "Estas respuestas separan los fundamentos que ya puedes trabajar de las tecnologías que todavía están madurando."
+        }
+      ]
+    },
+    {
+      "heading": "¿Necesito WebMCP para tener un sitio preparado para agentes?",
+      "level": 3,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "No. Un sitio puede mejorar mucho con contenido claro, HTML semántico, accesibilidad, datos estructurados y tareas bien definidas. WebMCP agrega una interfaz estructurada para agentes en el navegador, pero complementa esas bases; no las reemplaza."
+        }
+      ]
+    },
+    {
+      "heading": "¿WebMCP reemplaza al SEO, AEO, MCP o las APIs?",
+      "level": 3,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "No. SEO y AEO ayudan a que el sitio sea encontrado, comprendido y representado. Las APIs y MCP conectan sistemas y capacidades fuera de la página. WebMCP expone herramientas dentro del contexto del navegador. Pueden coexistir sobre la misma lógica de negocio."
+        }
+      ]
+    },
+    {
+      "heading": "¿Un sitio WordPress puede prepararse para agentes?",
+      "level": 3,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "Sí. WordPress no impide usar HTML semántico, accesibilidad, schema, APIs ni capacidades estructuradas. La pregunta es si el tema, los plugins y la arquitectura permiten separar datos y acciones de la interfaz sin depender de automatizaciones frágiles."
+        }
+      ]
+    },
+    {
+      "heading": "¿Un chatbot convierte mi sitio en una web agéntica?",
+      "level": 3,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "No por sí solo. Un chatbot es una interfaz conversacional dentro del sitio. Una web agéntica también considera agentes externos, tareas estructuradas, permisos, confirmaciones, trazabilidad y recuperación."
+        }
+      ]
+    },
+    {
+      "heading": "¿Qué acciones no deberían automatizarse por completo?",
+      "level": 3,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "Las acciones irreversibles, financieras, legales, sensibles o difíciles de recuperar deberían conservar revisión y confirmación proporcional al riesgo. Preparar un sitio para agentes no significa eliminar a la persona; significa decidir con precisión dónde debe intervenir."
+        }
+      ]
+    },
+    {
+      "heading": "¿Cómo se mide la preparación agéntica?",
+      "level": 3,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "Se combinan señales de percepción y operación: si el agente encuentra y representa correctamente la oferta, descubre la capacidad adecuada, completa la tarea, maneja errores y solicita confirmación cuando corresponde. Lighthouse Agentic Browsing aporta auditorías experimentales, pero no sustituye pruebas reales de tareas."
+        }
+      ]
+    },
+    {
+      "heading": "La decisión que vale la pena tomar",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "No necesitas saber qué protocolo ganará para empezar. Necesitas saber qué tareas de tu negocio deberían poder entenderse y ejecutarse sin ambigüedad, cuáles requieren presencia humana y qué evidencia te permitiría confiar en el resultado."
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Mi lectura es esta: la ventaja temprana no está en declarar que tu sitio está preparado para agentes. Está en aprender antes que otros dónde un agente se pierde, qué necesita para avanzar y dónde debe detenerse."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "La secuencia completa ya no termina en “poder actuar”: "
+            },
+            {
+              "text": "ser encontrado → ser comprendido → poder actuar → demostrar que la acción fue correcta → demostrar que estaba autorizada.",
+              "strong": true
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "La web no dejó de ser humana. Empezó a ser operada también por quienes actúan en nuestro nombre.",
+              "strong": true
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Para profundizar en la capa de percepción, puedes leer "
+            },
+            {
+              "text": "El 80% de lo que cita la IA no existe en Google",
+              "href": "https://efeoncepro.com/loop-marketing/aeo/donde-cita-la-ia/"
+            },
+            {
+              "text": " y "
+            },
+            {
+              "text": "Tu cliente ya no busca solo en Google",
+              "href": "https://efeoncepro.com/loop-marketing/aeo/surround-discovery-seo-google-video-marketplace/"
+            },
+            {
+              "text": ". La web agéntica agrega la otra mitad de la conversación: qué puede hacer un agente después de encontrarte."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": "Nota editorial: este artículo fue desarrollado por Julio Reyes con apoyo de IA en investigación, contraste de fuentes, estructura y edición. Julio conserva la decisión sobre la tesis, las fuentes, los límites y la aprobación de la versión final."
+        }
+      ]
+    }
+  ],
+  "cta": {
+    "text": [
+      {
+        "text": "Elige una tarea importante de tu sitio y descríbela como una capacidad: entradas, resultados, permisos, confirmación y recuperación.",
+        "strong": true
+      },
+      {
+        "text": " Si necesitas construir, rediseñar o escalar esa arquitectura, revisa nuestro servicio de "
+      },
+      {
+        "text": "Desarrollo de sitios web para humanos y agentes",
+        "href": "https://efeoncepro.com/desarrollo-sitios-web/"
+      },
+      {
+        "text": ". Si primero necesitas entender cómo te perciben los motores de IA, revisa el "
+      },
+      {
+        "text": "enfoque AEO de Efeonce",
+        "href": "https://efeoncepro.com/aeo-2/"
+      },
+      {
+        "text": "."
+      }
+    ]
+  },
+  "attribution": {
+    "campaignId": "web-agentica-pillar-v3",
+    "utm": {
+      "utm_source": "efeoncepro",
+      "utm_medium": "editorial",
+      "utm_campaign": "web-agentica"
+    }
+  }
+}
