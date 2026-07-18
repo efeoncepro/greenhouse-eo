@@ -1,5 +1,23 @@
 # TASK-1430 — Growth CTA authoring and reporting cockpit
 
+## Delta 2026-07-18 (5) — CODE COMPLETE (local, sin push); rollout pendiente
+
+- Slices 0-3 implementados y commiteados en `develop` local: métricas de marketing server-side
+  (`getCtaMarketingMetrics` + coverage guard), `suppressionPolicy` en `authorDraftCta`, cockpit
+  master-detail (CompositionShell `split` + prop nueva `splitTemplateColumns`), drawer de autoría
+  de 8 pasos, preview harness canónico, kill switches operables, GETs admin + POST author
+  des-gateados del engine flag. Evidencia: suites dominio+renderer 137/137 · full `pnpm test`
+  9741 pass · `pnpm lint` 0 err · tsc limpio · `design:lint` 0/0 · `task:lint`/`ui:*-check`
+  limpios · SQL vivo (gate TASK-893) · GVC `task-1430-growth-cta-cockpit` (1440, 17 frames) +
+  `-mobile` (390, 9 frames) mirados en loop. Docs: arch §28 + skill (espejos) + funcional +
+  manual + changelog + Handoff.
+- **Estado: `code complete, rollout pendiente`** — falta push a develop (señal del operador),
+  smoke staging (authoring + lifecycle + kill switch live) y GVC staging 1440/390. La task se
+  mantiene `in-progress` hasta completar el Runtime Rollout Completion Gate.
+- Nota ambiente local (ajena a la task): ADC de gcloud vencida + `GOOGLE_APPLICATION_CREDENTIALS_JSON`
+  corrupto en `.env.local` — `pg:doctor` falla por eso; el SQL vivo se verificó vía Cloud SQL proxy
+  con token del CLI. Pendiente del operador: `gcloud auth login` + `gcloud auth application-default login`.
+
 ## Delta 2026-07-18 (4) — inicio de ejecución + instrucción del operador
 
 - Ejecución iniciada en `develop` local-first (sin push). Diseño de referencia: proyecto Claude Design

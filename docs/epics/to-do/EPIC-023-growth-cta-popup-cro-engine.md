@@ -17,6 +17,10 @@
 - Lo que queda del epic: `TASK-1431` (Action Registry + navegación gobernada), `TASK-1430`
   (cockpit de autoría/reporting), cierre de `TASK-1427` (ventana 7d hasta 2026-07-25 + decisión de
   placement amplio WP) y la campaña interruptiva inaugural.
+- Delta 2026-07-18: `TASK-1430` quedó **code complete local (sin push)** — cockpit master-detail
+  con autoría gobernada de 8 pasos, preview harness del renderer canónico, kill switches operables
+  y métricas de marketing server-side (CTR/tasas con trust tags). Rollout pendiente: push + smoke
+  staging. Con `TASK-1431` code-complete, el V1 operable del cockpit del epic está construido.
 
 ## Delta 2026-07-18
 
