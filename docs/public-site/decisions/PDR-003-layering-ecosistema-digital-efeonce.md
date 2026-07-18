@@ -160,3 +160,12 @@ EJE B — PLATAFORMAS / BACKBONES  ("con qué operas por dentro" + "qué más ve
 - Glitch/blog: `docs/documentation/public-site/glitch-drop-gutenberg-block.md`.
 - Think (docs): [`docs/think/README.md`](../../think/README.md).
 - Bow-tie / funnel: skill `commercial-expert` (overlay GH) + `spec/Arquitectura_BowTie_Efeonce_v1_1.md`.
+
+## Delta 2026-07-18 — Glitch numerado y Glitch táctico
+
+- Status del delta: `Proposed`; aceptación y contrato operativo en `TASK-1440` / `EPIC-031`.
+- Glitch conserva una edición numerada semanal (`weeklyEdition`) y puede alojar artículos tácticos (`tacticalGlitch`) sin que estos consuman número.
+- La cadencia editorial vigente es producción los lunes a las 09:00 `America/Santiago` para la ficha planificada del martes.
+- Notion conserva el calendario visible y los placeholders numerados; Greenhouse opera el pipeline agéntico y WordPress recibe el draft gobernado.
+- La autonomía V1 termina en WordPress `private`. Publicar exige autorización humana explícita.
+- Arquitectura y fuentes de verdad: `docs/architecture/GREENHOUSE_GLITCH_AGENTIC_EDITORIAL_PIPELINE_DECISION_V1.md`.

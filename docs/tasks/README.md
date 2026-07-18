@@ -1852,3 +1852,15 @@ Finance Dashboard Calculation Correction ←── Invoice Payment Ledger (cash 
 - Si una task contradice la arquitectura vigente, no debe ejecutarse tal cual.
  - primero se corrige la task
  - o se documenta explícitamente la nueva decisión arquitectónica antes de implementar
+
+## EPIC-031 — Glitch Agentic Editorial Pipeline
+
+| Rank | Task ID | Task | Prioridad | Impacto | Esfuerzo | Estado real | Foco |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| TBD | `TASK-1440` | [TASK-1440-glitch-agentic-architecture-governance.md](to-do/TASK-1440-glitch-agentic-architecture-governance.md) | P1 | Muy alto | Bajo | Diseño | ADR, PDR y gobierno editorial |
+| TBD | `TASK-1441` | [TASK-1441-glitch-16-controlled-agentic-pilot.md](to-do/TASK-1441-glitch-16-controlled-agentic-pilot.md) | P1 | Alto | Medio | Diseño | Piloto controlado #16, Notion + WordPress private |
+| TBD | `TASK-1442` | [TASK-1442-glitch-domain-api-foundation.md](to-do/TASK-1442-glitch-domain-api-foundation.md) | P1 | Muy alto | Alto | Diseño | Dominio, datos, commands/readers y audit |
+| TBD | `TASK-1443` | [TASK-1443-glitch-editorial-agent-skill-evals.md](to-do/TASK-1443-glitch-editorial-agent-skill-evals.md) | P1 | Alto | Medio | Diseño | Skill Daily/Flash/Weekly y evals |
+| TBD | `TASK-1444` | [TASK-1444-glitch-notion-content-factory-adapters.md](to-do/TASK-1444-glitch-notion-content-factory-adapters.md) | P1 | Muy alto | Alto | Diseño | Adapters Notion + Content Factory |
+| TBD | `TASK-1445` | [TASK-1445-glitch-scheduler-orchestration-reliability.md](to-do/TASK-1445-glitch-scheduler-orchestration-reliability.md) | P1 | Muy alto | Alto | Diseño | Cron, orquestación, recovery y señales |
+| TBD | `TASK-1446` | [TASK-1446-glitch-production-rollout-closure.md](to-do/TASK-1446-glitch-production-rollout-closure.md) | P1 | Muy alto | Medio | Diseño | Rollout, QA y cierre operativo |

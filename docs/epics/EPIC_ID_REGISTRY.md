@@ -44,7 +44,8 @@ Registro canónico de asignación de IDs `EPIC-###` para evitar colisiones y ren
 | `EPIC-028` | `to-do` | `docs/epics/to-do/EPIC-028-efeonce-creative-studio-agentic-platform.md` |
 | `EPIC-029` | `to-do` | `docs/epics/to-do/EPIC-029-tender-proposal-studio-agentic-authoring.md` |
 | `EPIC-030` | `to-do` | `docs/epics/to-do/EPIC-030-greenhouse-link-hub-control-plane.md` |
+| `EPIC-031` | `to-do` | `docs/epics/to-do/EPIC-031-glitch-agentic-editorial-pipeline.md` |
 
 ## Siguiente ID disponible
 
-- `EPIC-031`
+- `EPIC-032`
