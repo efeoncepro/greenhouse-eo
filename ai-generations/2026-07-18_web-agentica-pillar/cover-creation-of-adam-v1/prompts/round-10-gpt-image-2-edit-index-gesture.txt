@@ -1,0 +1,21 @@
+Edit the supplied image with strict high-fidelity preservation.
+
+LOCKED — DO NOT CHANGE:
+- exact 2048x1152 crop, composition and camera;
+- human hand, skin, anatomy, pose and fingertip position;
+- both web interface planes, their geometry, perspective, content and registration;
+- exactly five separate orange authorization segments and their position;
+- white-to-blue-to-deep-navy diagonal background, light bands, grain, shadows and color values;
+- overall scale, punch and magazine-cover finish.
+
+CHANGE ONLY THE ROBOTIC HAND AND WRIST POSE TO CREATE AN UNMISTAKABLE INDEX-FINGER POINTING GESTURE:
+- Keep the same deep Efeonce navy satin material, active-blue precision joints, small matte-white accents, size and entry from the upper-right.
+- Rotate/re-articulate the hand into a clear lateral pointing profile directed down-left toward the agent-facing blueprint plane.
+- Exactly one INDEX FINGER is fully extended. Its anatomical/mechanical connection to the radial side of the palm beside the thumb must be visually obvious from base knuckle to white fingertip.
+- The MIDDLE, RING and LITTLE fingers are visibly folded together into the palm as one compact curled group. Their fingertips must be tucked inward and must not extend downward, upward or toward the viewer.
+- The THUMB is separately visible and rests naturally across the folded middle finger, creating the universal silhouette of a hand pointing with its index finger.
+- The index fingertip ends at the same target point near the upper-left region of the blueprint plane. It does not touch the plane.
+- At thumbnail size, the silhouette must read instantly as “pointing with the index finger” and must not be visually interpretable as a raised middle finger, obscene gesture, gun gesture, peace sign or horns gesture.
+- Maintain exactly five mechanically plausible digits, correct joint count and believable articulation. No duplicated or missing fingers.
+
+Do not alter any other region. No text, logo, watermark, new icons, spark, glow, black, extra objects or changes to the human hand.

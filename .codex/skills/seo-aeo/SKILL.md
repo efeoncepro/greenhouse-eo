@@ -8,7 +8,8 @@ description: >-
   Fan-Out, chunking y citabilidad, AI Overviews/AI Mode, ChatGPT, Perplexity,
   Gemini y Copilot, off-page/digital PR, local e internacional, YMYL,
   GSC/GA4/BigQuery, Share of Voice, exactitud y playbooks de auditoría, migración
-  y recovery, con overlay Efeonce WordPress/Kinsta. Úsala también para blogposts,
+  y recovery, Google Search Console API/Platform Properties, con overlay Efeonce
+  WordPress/Kinsta. Úsala también para blogposts,
   pillars y guías: research dossier, intent/SERP, claim ledger, metadata,
   canonical/robots, author Person, Article schema, publicación y QA live.
   Triggers: SEO, AEO, GEO, LLMO, schema, JSON-LD, E-E-A-T, knowledge graph,
@@ -122,6 +123,8 @@ decláralo. Ramifica la recomendación según las respuestas.
 | Qué **NO** hacer (black-hat, spam IA, riesgos) | `ANTIPATTERNS.md` |
 | Vocabulario (AEO vs GEO vs LLMO vs SGE vs AI Mode, etc.) | `GLOSSARY.md` |
 | Fuentes canónicas + qué reverificar y cada cuánto | `SOURCES.md` |
+| GSC API, Platform Properties, URL Inspection, sitemaps, ping o aviso de una URL nueva | `references/google-search-console-api-indexing.md` + `modules/01_SEO_TECHNICAL.md` |
+| Infografías, SVG directo, `<picture>`, image SEO, ALT/caption, featured/OG y descripción larga | `references/editorial-image-seo.md` + `modules/01_SEO_TECHNICAL.md` |
 | Blogposts, pillars y guías: dossier, traducción de metadata, E-E-A-T, publicación WordPress/Think, link health y verificación live | `references/agentic-editorial-eeat.md` + `content-marketing-studio/references/metadata-translation-method.md` |
 | **Framework + metodología propietaria Efeonce** (los 5 niveles para existir en un internet de agentes: Be Found · Readable · Correct · Actionable · Intrinsic; narrativa pública + modelo de 2 ejes del grader) | `efeonce/EFEONCE_AGENTIC_READINESS_FRAMEWORK.md` ⭐ |
 | Caso Efeonce: WordPress/Kinsta + AI Content Factory + HubSpot + ICP Globe | `efeonce/EFEONCE_OVERLAY.md` |

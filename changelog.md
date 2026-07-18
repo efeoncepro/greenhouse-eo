@@ -1,5 +1,129 @@
 # changelog.md
 
+## 2026-07-18 — TASK-1429: slide_in interruptivo + CTA Experience System del renderer (code complete)
+
+- Primer placement interruptivo oficial del motor CTA: `slide_in` no modal (`role=complementary`,
+  sin focus trap), trigger gobernado del bundle (8s en página o 35% de scroll), apertura pasiva sin
+  robar foco, Escape + focus return, dismiss persistido antes de la salida visual (mecánica
+  `@starting-style` + `allow-discrete`, cero dependencia de animationend). Density
+  `full|condensed|peek` derivada del contenedor propio; appearances `default|spotlight|minimal`
+  tokenizadas con fallback seguro.
+- El renderer ahora envía la identidad pseudónima del visitante (session siempre; visitor durable
+  solo con `consent-state="granted"`) — activa el loop real de suppression de TASK-1428 — y
+  `greenhouse_cta_viewed` pasa a visibility-gated (corte de semántica registrado en TRACKING-PLAN).
+- Tokens del bundle al piso 2026 (`light-dark()`, `color-mix(in oklch)`, `linear()`) con fallbacks
+  `@supports` y nombres `--gh-cta-*` intactos. Preview `/growth/ctas` con matriz de density + demo
+  vivo del overlay. GVC desktop+mobile mirado; 90 tests verdes. Sin campaña interruptiva publicada
+  aún (decisión del operador).
+
+## 2026-07-18 — TASK-1428: suppression + Tier B + kill switches del motor CTA (code complete, shadow)
+
+- Migración aditiva `greenhouse_growth`: `cta_visitor_state` (estado pseudónimo por sujeto visitor/session,
+  hash-only, consent-aware), `cta_exposure_rollup` (Tier B agregado por hora — la exposición jamás entra al
+  ledger OLTP de conversión) y `cta_kill_switch_event` (append-only). Aplicada a la instancia; tablas dormidas
+  hasta el deploy del código.
+- Suppression/frequency capping server-side con taxonomía estable de razones y policy por versión
+  (`suppression_policy_json`, defaults conservadores, fail-closed): dismiss cooldown, conversión verificada
+  contra Growth Forms, caps per-CTA y global interruptivo con claim atómico multi-tab. Integrado al arbiter en
+  **shadow** (`GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` default OFF; registrado en el ledger de flags).
+- Kill switches global/per-surface operables **sin redeploy** (estado en DB, capability `growth.cta.pause`,
+  API `GET/POST /api/admin/growth/ctas/kill-switch`, outbox `growth.cta.kill_switch_changed`, respuesta pública
+  `engineState ok|killed`). Signals nuevos: `growth.cta.kill_switch_active`, `growth.cta.priority_collision`,
+  `growth.cta.event_ingest_backpressure`.
+- Evidencia: full suite 9684 tests verdes + build prod + SQL vivo contra PG real. Rollout pendiente
+  (push → shadow-compare staging → enforcement → prod gradual); la task sigue `in-progress` por diseño.
+
+## 2026-07-18 — EPIC-023: CTA Experience System incorporado al plan V1
+
+- El renderer portable se gobierna como una sola primitive con ejes ortogonales: placement, experience kind,
+  appearance (`style_variant`), density `full|condensed|peek` derivada por container query y `variant_id`
+  reservado para experimentación futura. Se canonizaron anatomía contextual, evidencia visual real, estados,
+  motion, reduced motion, asset failure, long content, overflow/CLS y paridad preview↔Think↔WordPress.
+- `TASK-1429` ahora entrega el sistema de presentación y un único interruptivo `slide_in`; `TASK-1431` define el
+  contrato perceptible por action kind sin action-driven skins; `TASK-1430` incorpora authoring secuencial y
+  preview con el renderer real, sin WYSIWYG/page builder; `TASK-1428` explicita dismiss/re-entry/caps/kill
+  semantics y `TASK-1427` conserva el baseline productivo.
+- El ADR aclara que `slide_in` es no modal: no usa `aria-modal` ni focus trap; sí exige Escape, dismiss accesible,
+  focus return tras interacción, suppression y safe-area. No hubo cambio de código, runtime, flags ni lifecycle.
+
+## 2026-07-18 — Pillar Web agéntica publicado y enlazado bidireccionalmente
+
+- Publicado el post WordPress `249387`, cuyo título final es `El fin de la web “solo para humanos”: cómo preparar tu sitio para los agentes de IA`, en
+  `https://efeoncepro.com/aeo/web-agentica-agentes-ia/`: 99 bloques gobernados, 14 H2 + 6 H3,
+  TOC de 20 destinos y siete infografías SVG art-directed light/dark y desktop/mobile.
+- La portada `WAG-V01-C15` quedó integrada como featured `251553` y OG/Twitter `251554`; schema, canonical,
+  robots, sitemap, archive card, media y caché fueron verificados en vivo.
+- La relación pillar–servicio quedó bidireccional: tres enlaces del artículo a `/desarrollo-sitios-web/` y un
+  enlace contextual de la landing hacia el artículo. QA Playwright en 1440 y 390 px confirma visibilidad,
+  recuentos exactos y ausencia de overflow. No se inventó tracking `gh_cta_clicked`; su gobernanza sigue pendiente.
+- Riesgo residual ajeno: Related Posts aún solicita una variante inexistente de la portada de Surround Discovery.
+  El body y la portada de este artículo no tienen recursos rotos. Cierre durable:
+  `docs/audits/public-site/2026-07-18-web-agentica-pillar-publication.md`.
+- El H1 se amplió post-publicación para conservar la tesis original y sumar una promesa práctica explícita. El
+  slug `web-agentica-agentes-ia` y el SEO title específico de Yoast permanecen estables; `og:title` y schema
+  heredan el nuevo título editorial. Yoast 28 no imprime `twitter:title`, por lo que X/Twitter usa el OG fallback
+  correcto y no se dejó metadata inerte. Snapshot: `/tmp/gh-post-249387-before-title-v2-20260718.json`.
+- AEO (`156`) fue promovida de hija de Loop Marketing a categoría raíz por `wp_update_term()`. Yoast SEO Premium
+  gestiona cuatro 301 explícitos —tres posts y el archive—; canonical, breadcrumbs, cards y sitemaps ya usan
+  `/aeo/`. El enlace recíproco de la landing fue actualizado al canonical mediante `Elementor\Document::save()`.
+- El cierre de canonización distribuyó y consolidó los aprendizajes en las skills espejo de WordPress, Content,
+  Design e Image Generator, el runbook agentic, los operating models visuales y `PDR-015`. El manifest general
+  ahora deriva WAG-V01 del submanifest C15 y no puede reintroducir la portada anterior; el template reusable
+  incorpora los arquetipos v7 y separa `indexed_observed` del estado de entrega. Los dos enlaces internos del
+  post que todavía dependían de 301 fueron reconciliados a sus canonicals, con snapshot, purge y nueva inspección
+  final `post-deep-inspection-249387-2026-07-18T11-37-13+00-00.json`.
+
+## 2026-07-18 — Método de portadas editoriales Efeonce y piloto Web Agéntica
+
+- La portada del pillar privado `El fin de la web “solo para humanos”` llegó a su candidato seleccionado
+  `WAG-V01-C15`: composición humano–interfaz–agente producida con `gpt-image-2`, calidad `high`, master
+  `2048×1152` y un degradado continuo blanco cálido → azul luminoso → azul nave que reemplaza los planos
+  triangulares. La topología de la mano robótica fue validada con referencia anatómica explícita para asegurar
+  que el gesto corresponde al índice y no al dedo medio o meñique.
+- Se generaron derivados featured `1600×900`, Open Graph `1440×756` y card cuadrada `1152×1152`, con score
+  editorial `49/50`, hashes y provenance reproducible. Posteriormente se integraron y verificaron en vivo como
+  media `251553` y `251554` del post WordPress `249387`.
+- El aprendizaje quedó canonizado en `EDITORIAL_COVER_KEY_VISUAL_OPERATING_MODEL_V1.md` y enlazado desde las
+  skills espejo de Content Marketing, Design Studio y AI Image Generator: metáfora editorial, roles de
+  referencia, modelo exacto, iteración de una variable, gradientes narrativos, anatomía/cultura, scorecard,
+  derivados, metadata y frontera de publicación. La metodología es estable; el lenguaje visual de la serie
+  seguirá provisional hasta validarlo en dos portadas adicionales.
+
+## 2026-07-18 — Artículo Agent Skills publicado
+
+- Publicado `«I Know Kung Fu»: el momento Matrix de los Agent Skills` en el sitio público, preservando la voz de
+  Julio Reyes y la tesis sobre convertir criterio organizacional en capacidades reutilizables.
+- La pieza incluye tres infografías editoriales (dos con variantes desktop/mobile), featured/OG `1200×630`,
+  metadescripción Yoast, focus keyphrase, metadata Open Graph/Twitter, canonical propio, robots indexables y
+  disclosure editorial. El cierre live confirmó `200`, schema Article/Person, sitemap, archivos multimedia,
+  fuentes y ausencia de duplicado WordPress/Think.
+- Compatibilidad móvil: la variante KFU-V02 usa un fallback PNG `1000×1500` bajo `600px` después de detectar que
+  un navegador móvil/in-app no interpretaba el SVG trazado. El SVG editable y la variante desktop permanecen;
+  el render live quedó verificado por `currentSrc`, dimensiones naturales, captura y ausencia de overflow.
+- La portada inicial fue reemplazada por la pieza aprobada `HI-YAAH!`: lluvia binaria, figura marcial y golpe de
+  energía en formato `1200×630`. WordPress media `251552` quedó sincronizado como featured, Open Graph, Twitter
+  y `primaryImage` del schema; caché purgada y readback público verificado.
+
+## 2026-07-18 — Sistema editorial de infografías Efeonce y entrega SVG directa
+
+- `content-marketing-studio` incorpora un canon Efeonce basado en siete precedentes SVG propios y benchmark
+  Semrush: shell de marca estable, arquetipo variable por relación, paleta auditada, shareability y sello
+  `efeoncepro.com` consumido desde Artifact Composer. La regla está espejada en Codex/Claude y enlazada desde
+  `design-studio` y el carril Gutenberg/WordPress.
+- El pillar privado `El fin de la web “solo para humanos”` aplica el sistema en siete infografías y 28 variantes
+  SVG: la firma completa —fuente/fecha, wordmark oficial y URL— vive en el footer, nunca en el header. El draft
+  `249387` quedó integrado con art direction light/dark y desktop/mobile, sin cambiar su estado a publicado.
+- El pipeline deja de imponer PNG/WebP: separa source SVG de delivery SVG saneado y rasteriza solo por contenido,
+  destino, seguridad o comparación de peso. Se agregaron contrato reusable, preset JSON y auditor CLI. En la
+  muestra histórica, el SVG comprimido resultó ~2.1×–5.6× más liviano que WebP 1200 comparable. Comando canónico:
+  `pnpm content:editorial-svg:audit -- <delivery.svg...>`.
+- Se promovió el aprendizaje a un operating model reusable, documentación funcional y manual; las skills
+  Content Marketing, Design Studio, SEO/AEO y Public Site WordPress ahora comparten footer-only, source/delivery,
+  SEO de SVG, alternativas largas, legibilidad CSS, CLS, shareability por canal y raster social-safe.
+- Una auditoría posterior corrigió el estado v7: el PASS existente cubre archivo/seguridad, pero no demuestra
+  todavía legibilidad al ancho CSS, geometría del delivery trazado ni CLS/currentSrc. El draft sigue privado y
+  queda `contextual_v7_qa_pending`; no se declara listo para publicación.
+
 ## 2026-07-18 — TASK-1340: Growth CTA Portable Renderer + capa GTM + gobernanza en Growth (code complete, shadow)
 
 - Renderer portable `<greenhouse-cta>` (`src/growth-cta-renderer/**`, vanilla TS 22,6KB, hermano del
@@ -30,8 +154,8 @@
 
 ## 2026-07-18 — Pillar privada de web agéntica preparada para revisión
 
-- El post WordPress `249387`, `El fin de la web “solo para humanos”`, quedó reescrito como pillar de 3.800 palabras para soportar la landing de desarrollo web: definición citable, cuatro tipos de sitio, arquitectura compartida, matriz WebMCP/MCP/API, doce pruebas de readiness, reconstrucción y FAQ.
-- Content Factory pasa con 84 bloques, TOC completo, featured/OG separados y dos diagramas de cuerpo. WAG-V02 v3 corrige el desborde del titular `04 AGÉNTICO`, añade un gate automático por `getBBox()` y pasa QA privada desktop/mobile en light/dark. El artículo sigue en `draft`, sus rutas públicas responden `404` y el enlace recíproco de la landing está preparado pero no aplicado; publicación, QA live y purge requieren autorización humana separada.
+- El post WordPress `249387`, `El fin de la web “solo para humanos”`, quedó actualizado como pillar de 4.448 palabras para soportar la landing de desarrollo web: definición citable, cuatro tipos de sitio, arquitectura compartida, matriz WebMCP/MCP/API, estado real de Chrome/WebMCP y del mercado, evals por capas, cadena de autoridad, doce pruebas de readiness, reconstrucción y FAQ.
+- Content Factory pasa con 99 bloques semánticos, TOC de 20 destinos, featured/OG separados y siete diagramas de cuerpo. WAG-V04 agrega identidad, representación, alcance, confirmación y evidencia a WAG-V02/V03; el gate automático de geometría y la QA SVG light/dark desktop/mobile pasan sin texto fuera de superficie, imágenes rotas ni overflow. El artículo sigue en `draft`; publicación, enlace recíproco, purge y QA live requieren autorización humana separada.
 
 ## 2026-07-17 — TASK-1339: Growth CTA & Popup Engine — foundation `growth.cta` (code complete, shadow)
 

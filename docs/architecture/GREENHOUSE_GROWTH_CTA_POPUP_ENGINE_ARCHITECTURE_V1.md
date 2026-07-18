@@ -185,7 +185,7 @@ flowchart TB
 | TypeScript root | `src/lib/growth/ctas/` |
 | Public API family | `/api/public/growth/ctas/**` |
 | Admin API family | `/api/admin/growth/ctas/**` |
-| Admin UI family | `/admin/growth/ctas` |
+| Admin UI family | `/growth/ctas` |
 | Capability prefix | `growth.cta.*` |
 | Event prefix | `growth.cta.*` |
 | Signal prefix | `growth.cta.*` |
@@ -221,7 +221,10 @@ The engine is designed as a governed capability, not a UI feature (`GREENHOUSE_F
 | `surface` | Runtime where the CTA appears. | WordPress public site, Think, Greenhouse preview. |
 | `action` | What happens when the visitor acts. | open form, download ebook, open Think tool, book meeting. |
 | `suppression` | Why it should not appear. | dismissed, frequency cap, converted, no consent, lower priority. |
-| `variant` | Experiment or message/design alternative. | value prop A vs B, banner vs slide-in. |
+| `appearance` | Tono visual tokenizado que no cambia semántica, geometría ni ejecución. Persiste hoy en `style_variant`. | `default`, `spotlight`, `minimal`. |
+| `experience kind` | Intención semántica del prompt; orienta authoring y preview, pero no autoriza layout o lógica host-specific. | report follow-up, lead magnet, tool continuation, meeting. |
+| `density` | Respuesta honesta al ancho del contenedor; es calculada por el renderer, no autorada por el host. | `full`, `condensed`, `peek`. |
+| `variant` | Alternativa experimental de mensaje/diseño bajo `variant_id`; no es sinónimo de placement ni appearance. | value proposition A vs B. |
 
 ## 9. Core domain model
 
@@ -443,6 +446,8 @@ Rules:
 - Think routes receive campaign context, not raw PII.
 - HubSpot handoff is explicit and bounded; no silent deal creation.
 
+**V1 action-registry boundary (amendment 2026-07-18).** V1 must ship the extensibility seam, not every speculative integration: one typed registry owns policy schema, server resolver, browser-safe projection, execution family and failure taxonomy. V1 proves `open_growth_form` plus governed navigation for `link_url`, `open_think_tool` and `book_meeting`; `dismiss` remains a renderer/suppression control. `download_asset`, `embed_growth_form` and `hubspot_handoff` remain supported architecture kinds but graduate as demand-driven adapters only when a real consumer supplies their asset/form/CRM, consent, retry and runtime-evidence contracts. Unknown or unregistered actions fail closed at publish/render.
+
 ## 13. Telemetry contract
 
 The renderer emits both browser events and server-side evidence.
@@ -514,6 +519,130 @@ Rules:
 - Winning a click metric is not enough if lead quality, form completion, meeting quality or downstream revenue guardrails degrade.
 
 ## 15. UI, motion and accessibility
+
+### 15.1 CTA Experience System — primitive, placement, kind and appearance
+
+`<greenhouse-cta>` is one portable experience primitive. Richness is produced by coherent hierarchy, truthful
+state transitions and contextual continuity, not by creating a component per campaign or adding decorative
+effects per host. The public renderer contract separates four concerns:
+
+1. **Placement** owns geometry, interruption level and focus model: `embedded`, `inline_banner`, `slide_in`, etc.
+2. **Experience kind** describes the visitor job and authoring intent: report follow-up, lead magnet, tool
+   continuation or meeting. It may constrain compatible content/action combinations but never injects copy or
+   destination logic in the browser.
+3. **Appearance** is the tokenized visual tone represented by `style_variant`: `default`, `spotlight` or
+   `minimal`. Appearance may change surface, contrast and emphasis; it must not change semantics, action,
+   suppression or focus behavior.
+4. **Density** is renderer-derived from the component's own inline size: `full`, `condensed` or `peek`. Hosts do
+   not choose density and must not hide or clip content to simulate it.
+
+`variant_id` remains reserved for experiment/message alternatives. It must not be overloaded as a visual skin,
+placement switch or density control. This separation prevents analytics ambiguity and keeps WordPress, Think and
+preview behaviorally equivalent.
+
+Official V1 presentation families:
+
+| Placement family | Visitor moment | Required anatomy | Density posture | Signature transition |
+| --- | --- | --- | --- | --- |
+| `embedded` editorial | Natural continuation after content/report evidence. | Optional contextual eyebrow, headline, supporting body/evidence, one primary action, optional honest footnote. | `full → condensed`; `peek` is not valid in content flow. | Reveal inside reserved space; no layout shift. |
+| `inline_banner` spotlight | Section-level opportunity with higher visual emphasis. | Same semantic anatomy; optional visual/evidence rail; one primary action. | `full → condensed`; action stacks when necessary. | Short opacity/translation reveal inside reserved space. |
+| `slide_in` contextual | Eligible high-intent secondary prompt after a governed trigger. | Compact context, headline, one action and always-visible dismiss. | `condensed → peek`; full only when container permits. | Edge entry on wide viewports, bottom/safe-area entry on compact. |
+| `form_expanded` state | Visitor has explicitly activated `open_growth_form`. This is a state of the originating placement, not a new placement. | Preserved CTA context + governed form or bounded handoff + recovery/close. | Container-aware; key context never disappears. | In-place continuity/crossfade without an abrupt unrelated modal. |
+
+The V1 `slide_in` is the only new interruptive presentation. `popup_modal` and `floating_button` remain contract
+families but do not become parallel visual products until a real consumer proves their need.
+
+### 15.2 Content anatomy and contextual continuity
+
+Every CTA must feel like the next relevant step in the host journey, not a generic promotional interruption.
+The content contract is interpreted as follows:
+
+- `eyebrow` identifies context or next-step category; it is not a decorative badge farm.
+- `headline` states the concrete value or continuation; it must stand alone without the image.
+- `body` explains the outcome, evidence or expectation in concise language.
+- `visualAssetRef`, when present, must provide explanatory value: report preview, real artifact, recognizable tool
+  or evidence. Generic stock decoration and image-only text are rejected.
+- `ctaLabel` names the actual action; it cannot promise an immediate result when the action only navigates.
+- `footnote` is reserved for honest expectation-setting such as duration, delivery or privacy—not legal dumping.
+- `dismissLabel` must be neutral and accessible; confirmshaming is prohibited.
+
+One primary action is allowed per CTA. A visible dismiss is a control, not a competing conversion action. Secondary
+navigation belongs in the destination experience unless a future contract explicitly governs it.
+
+### 15.3 Visual depth and token contract
+
+The renderer may create premium depth through a restrained layered surface: tonal background, subtle border,
+controlled elevation, clear typographic hierarchy, contextual visual/evidence and a single accent. The following
+are hard boundaries:
+
+- every visual value comes from the public `--gh-cta-*` token layer; host overrides theme the primitive, never
+  patch internal selectors or fork markup;
+- appearance must pass contrast in light, dark and forced-colors environments;
+- gradients, glow and elevated shadow are limited to the `spotlight` appearance and cannot animate continuously;
+- `minimal` removes chrome but preserves target size, focus, semantic hierarchy and state feedback;
+- no campaign-specific CSS, arbitrary per-page colors, glassmorphism stack, fake urgency, decorative counters or
+  asset that carries essential text;
+- visual asset failure degrades to a complete text CTA without broken layout or empty media chrome.
+
+### 15.4 Adaptive density contract
+
+The portable equivalent of Greenhouse Adaptive Card density is container-query driven and independent from the
+portal Composition Shell. The component adapts to its own width, not the viewport or a host-provided breakpoint:
+
+- `full`: visual/evidence, full supporting copy and inline-or-adjacent action when space permits;
+- `condensed`: headline, essential supporting sentence and action; optional visual becomes smaller or is removed
+  only when it is non-essential;
+- `peek`: interruptive teaser with context/headline, action and dismiss. It is not clipping of the full card.
+
+Across density changes, the headline, primary action and dismiss (when applicable) never disappear. Long copy
+wraps or is authoring-blocked; it is never truncated in a way that changes the promise. Density transitions may
+use interruptible compositor motion, but the semantic DOM order and focus order remain stable.
+
+### 15.5 Action-aware state continuity
+
+Action kind changes the execution/recovery contract, not the CTA's arbitrary visual skin:
+
+| Action | Perceptible contract | Required feedback |
+| --- | --- | --- |
+| `open_growth_form` | CTA evolves in place into the governed form state while preserving enough context to explain why the form is present. | Press/pending, focus transfer, form ready, validation/submission, success/error, close and focus return. |
+| `link_url` | Lightweight navigation matching the label and destination expectation. | Single-dispatch guard, safe same/new-context semantics and failure recovery. |
+| `open_think_tool` | Contextual continuation to a governed Think experience. | Optional real preview/evidence in CTA content, safe navigation and allowlisted campaign context only. |
+| `book_meeting` | Navigation to the governed booking experience; no silent CRM mutation. | Honest duration/expectation only when supplied by trusted authoring data; safe navigation and recovery. |
+
+The complete public state vocabulary is: `loading`, `ready`, `focused`, `pending`, `form_open`, `success`, `error`,
+`dismissed`, `suppressed`, `capped`, `killed` and `reduced_motion`. Each state must have deterministic telemetry,
+keyboard behavior and recovery. Richness is judged primarily by the quality of these transitions, not by the
+number of decorative variants.
+
+### 15.6 Motion language
+
+Motion expresses causality and spatial continuity:
+
+- embedded/banner reveal uses reserved space and a short opacity/translation transition;
+- slide-in enters from the nearest logical edge on wide screens and from the bottom within safe areas on compact;
+- action press/pending confirms that one activation was received;
+- CTA → form → result is a continuous state transition inside the same experience shell where practical;
+- exit/dismiss finishes state persistence and focus recovery deterministically; suppression never depends on an
+  animation-end event;
+- transitions are interruptible by Escape, navigation, kill switch, action completion and reduced-motion changes.
+
+Only `transform` and `opacity` are used for ordinary entrance/exit feedback. No bounce, autoplay loop, pulsing,
+scroll-jacking, repeated reveal, fake countdown or motion-created urgency is permitted. `prefers-reduced-motion`
+removes travel and stagger, preserves immediate state feedback and never delays focus or action completion.
+
+### 15.7 Experience verification matrix
+
+Every new placement, appearance change or action-state change must be reviewed through the same contract in
+preview, Think and WordPress where wired:
+
+- viewports/container widths covering wide `full`, narrow `condensed` and interruptive `peek` behavior;
+- light/dark/forced-colors where supported and `prefers-reduced-motion`;
+- keyboard activation, visible focus, Escape, dismiss, focus transfer and focus return;
+- loading, ready, pending, form open, error recovery, success, dismissed, suppressed/capped and killed;
+- visual asset present, missing/failing and long localized content;
+- `scrollWidth === clientWidth`, safe-area behavior, no page-level scroll jump and measured CLS;
+- parity of headline/body/action/destination/appearance/placement between admin preview and public renderer;
+- captured frames are manually reviewed; a passing automation report without looking at the frames is insufficient.
 
 Admin UI:
 
@@ -614,8 +743,8 @@ Operational dashboards should answer:
 1. **Vertical slice (thin on placement/action, honest on portability):** one real CTA rendered from a single published immutable contract on **both** the public WordPress host **and** Think, with **one** action (`open_growth_form`) and **one** embedded/banner placement, end-to-end — minimal `cta_definition`/`cta_version`, surface bindings for both surfaces, server-side arbitration, Tier A conversion ledger, GTM/dataLayer events, one reliability signal, preview↔public parity + GVC/Playwright evidence. This forces the whole spine (compile → arbitrate → render → event → action) through real user paths on two different host runtimes.
 2. **Widen the placement axis:** add one interruptive placement (`popup_modal` or `slide_in`) with full a11y/motion/CLS contract, on the surfaces already wired.
 3. **Exposure tier + suppression at scale:** Tier B exposure ingest (sampled/BQ per §9.4), visitor-state store, frequency capping, kill switch.
-4. **Action breadth:** `embed_growth_form`, `download_asset`, `book_meeting`, bounded `hubspot_handoff`.
-5. **Admin cockpit:** `/admin/growth/ctas` author/review/publish/pause/report, Composition Shell + sidecar, preview-parity test.
+4. **Action extensibility seam:** typed registry + browser-safe executor; prove `open_growth_form` and governed navigation (`link_url`, `open_think_tool`, navigation-only `book_meeting`). Demand-driven adapters for asset delivery, embedded forms and CRM handoff stay outside V1 until a real consumer exists.
+5. **Admin cockpit:** `/growth/ctas` author/review/publish/pause/report, Composition Shell + sidecar, preview-parity test.
 
 **Experimentation is explicitly deferred out of V1.** As §14 concedes, if public traffic is underpowered a powered A/B test is not viable; building the full assignment/SRM/guardrail layer before there is traffic to test is premature. V1 ships high-confidence CRO changes and records variant metadata only; the powered-experiment engine graduates to a later phase (candidate `growth.experiment` split, §19). Until then, no CTA "winner" may be declared.
 
@@ -654,7 +783,7 @@ Targeting and personalization can drift into sensitive profiling. V1 only allows
 - **NUNCA** enviar secretos, mapeos de provider o internals de HubSpot al browser; el render contract expone solo campos browser-safe.
 - **NUNCA** aplicar una regla de tracking/personalización sin `consent_state` válido y `consent_source` declarado (§16.2).
 - **NUNCA** declarar un "winner" de CTA sin métrica primaria, MDE/sample-size, guardrails y chequeo SRM (§14); experimentación powered está diferida fuera de V1 (§18).
-- **NUNCA** shippear un placement interruptivo sin dialog semantics, focus trap/return, escape, dismissal por teclado, reduced-motion y anti-CLS (§15).
+- **NUNCA** shippear un placement interruptivo sin semántica/foco correctos para su familia, Escape, dismissal por teclado, focus return tras interacción, reduced-motion y anti-CLS; `aria-modal`/focus trap son exclusivos de un modal real y están prohibidos en `slide_in` (§15).
 - **SIEMPRE** proveer kill switch global/por-surface que el renderer honra dentro del TTL del contrato (§16.3).
 - **SIEMPRE** cross-check `cta_version ↔ surface_id` en el ingest público y emitir `growth.cta.surface_unauthorized_attempt` ante mismatch (§16.1).
 - **SIEMPRE** mantener paridad preview↔público con un test de contrato (§15), replicando `renderer-contract-parity.test.ts` de Growth Forms.
@@ -699,3 +828,33 @@ La espina server-side de la rebanada vertical (§18.1) existe como runtime:
 - **Flag** `GROWTH_CTA_ENGINE_ENABLED` default OFF en todos los environments (ledger); flip coordinado con TASK-1340.
 
 Fuera de esta entrega (per §18): renderer visible (TASK-1340), Tier B exposición/visitor-state/frequency capping/kill switch global a escala, otras acciones/placements, admin cockpit UI, experimentación powered.
+
+## 24. Delta 2026-07-18 — TASK-1428: visitor state + suppression server-side (shadow) + Tier B + kill switches (fase 3 de §18)
+
+El data plane de suppression/exposición/kill-switch de §11/§9.4/§16.3 existe como runtime (code-complete; enforcement en shadow):
+
+- **Schema aditivo** (migración `20260718131956294`, aplicada a la instancia): `cta_visitor_state` (sujeto `visitor|session`, hash-only con el salt del dominio, `UNIQUE NULLS NOT DISTINCT (subject_kind, subject_hash, cta_id)`; la fila `cta_id IS NULL` es la ventana GLOBAL interruptiva del sujeto; retención explícita visitor 180d / session 48h con purga oportunista best-effort), `cta_exposure_rollup` (Tier B AGREGADO horario por dims `bucket×cta×surface×placement×kind×reason×source×enforced` — la opción 3 de §9.4: sampled/aggregates, jamás 1 fila OLTP por pageview; `observed_count` + `estimated_count = observed/rate`; retención 400d) y `cta_kill_switch_event` (append-only por trigger; estado vigente = último evento por scope; `reason` obligatorio + `actor_ref`).
+- **Decisión de suppression** (`suppression.ts`, pura): taxonomía estable `dismissed | frequency_capped | already_converted | higher_priority_selected | surface_killed | global_killed | consent_or_identity_limited | placement_not_supported | policy_invalid | runtime_degraded` (espejada en el CHECK del rollup). `suppression_policy_json` por versión con schema zod y defaults conservadores (`{}` foundation = válida: cooldown dismiss 14d, suppress-after-conversion ON, cap per-CTA 2/24h); malformada ⇒ fail-closed `policy_invalid`. Frequency caps SOLO a placements interruptivos + cap engine-level cross-CTA por sujeto/día (`GROWTH_CTA_INTERRUPTIVE_PER_SUBJECT_PER_DAY`, default 3). **Fallback conservador**: sin sujeto (sin keys o sin consent), un interruptivo NO se expone (`consent_or_identity_limited`); no-interruptivos siguen el flujo del contenido.
+- **Consent-awareness (§16.2)**: la key `visitor` solo habilita estado DURABLE con `consentState='granted'`; sin consent el estado es session-scoped (retención 48h, sin fingerprint persistente). El contexto viaja por headers (`x-greenhouse-cta-visitor/-session/-consent/-consent-source`) — nunca por query (keys fuera de logs de proxies); se hashea server-side y JAMÁS se persiste crudo.
+- **Semántica dismiss/conversión**: el dismiss persiste al aceptar el evento Tier A (`recordCtaDismissal` upsert idempotente — refresh/remount/multi-tab no reinician la ventana; la UX nunca depende de `animationend`). `already_converted` SOLO con evidencia verificada server-side: el `formSubmissionId` se valida contra Growth Forms (`isSubmissionServerAccepted` en `forms/readers.ts` — boundary §12 intacto, boolean-only); un click/claim browser jamás suprime permanente.
+- **Concurrencia determinista**: en enforcement, la exposición interruptiva se CLAIMEA atómicamente (`claimInterruptiveImpression`, `SELECT … FOR UPDATE`): de N tabs/renders concurrentes exactamente uno gana; un claim perdido no consume presupuesto de ventana. Validado contra PG real (`scripts/growth/_sanity-cta-suppression-sql.ts`: `[true,true,false]` con cap 2).
+- **Tier B runtime** (`exposure.ts`, adapter aislado FAIL-OPEN): `eligible/suppressed` los observa el server en el render path; `viewed` browser entra por el MISMO ingest defendido (surface+key+origin+cross-check) y va al rollup, nunca al ledger (los rechazos Tier B tampoco — el CHECK del ledger es Tier A-only). Sampling `GROWTH_CTA_EXPOSURE_SAMPLE_RATE` (0 = apagado). Fallo del sink ⇒ breadcrumb `exposure_backpressure` dedupe 1/día (fuente del signal) y el render sigue — analytics jamás bloquea ni produce tormenta de reaparición (suppression state es independiente y fail-closed por sus reglas).
+- **Kill switches (§16.3)**: estado OPERATIVO en DB (nunca env var), `engage/release` por command idempotente-observable + outbox `growth.cta.kill_switch_changed` in-tx + API `GET/POST /api/admin/growth/ctas/kill-switch` (`growth.cta.read` / `growth.cta.pause` — la autoridad del stop; cero capabilities nuevas). El render path lo consulta EN VIVO (sin cache propio) ANTES de candidatos: killed ⇒ `{ interruptive: null, nonInterruptive: [], engineState: 'killed' }` — nunca un falso vacío/`dismissed`. **Ventana compuesta efectiva**: el efecto server-side es inmediato (próximo request); el cache CORS 90s NO la alarga (un origin ya permitido sigue permitido y la respuesta ya dice killed); las rutas públicas no emiten `Cache-Control`. El límite real es la cadencia de fetch del renderer (1 por pageview hoy).
+- **Shadow → enforcement**: `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` default OFF = shadow (la decisión se computa y registra `enforced=false` sin alterar renders — base del shadow-compare); ON = exclusión + claim. El kill switch NO depende de este flag (siempre enforced). **Signals** nuevos cableados: `growth.cta.kill_switch_active` (steady 0), `growth.cta.priority_collision` (rollup `higher_priority_selected`), `growth.cta.event_ingest_backpressure`.
+- **Contrato para consumers** (TASK-1429/1430): render público aditivo `engineState: 'ok' | 'killed'` (browser recibe el mínimo; nunca ventanas/razones internas/candidate set); operador: `getKillSwitchState` + `listKillSwitchAudit` (actor/reason) + `summarizeCtaExposure` (rollup diario por reason class).
+
+Fuera de esta entrega: renderer enviando visitor/session keys + estados visibles `dismissed|suppressed|capped|killed` (TASK-1429), cockpit de kill switches/reporting (TASK-1430), sink BQ del rollup (el adapter aísla el swap), job de retención dedicado (la purga oportunista cubre el volumen actual).
+
+## 25. Delta 2026-07-18 — TASK-1429: slide_in interruptivo + CTA Experience System (renderer)
+
+El primer placement interruptivo del §10 y el sistema de experiencia del §15 existen como runtime del bundle (`1.1.0`):
+
+- **`SlideInController`** (`src/growth-cta-renderer/slide-in.ts`): único interruptivo V1, **no modal por contrato** (`role='complementary'`, sin `aria-modal` ni focus trap — Tab sigue el documento). Ciclo waiting (cero DOM focusable) → **trigger gobernado del bundle** (dwell 8s O scroll ≥35%, lo primero; el host JAMÁS define triggers) → apertura pasiva sin focus steal → action/dismiss. Escape cierra con focus dentro; focus return determinista al elemento pre-apertura. Shell hijo del custom element con clase `ghc-scope` propia (scope CSS independiente del embedded; ambos placements conviven en un element).
+- **Motion (motion doc TASK-1429)**: enter/exit con `@starting-style` + `transition-behavior: allow-discrete` — el display none↔block anima SIN JS ni `animationend`; la persistencia del dismiss se compromete ANTES del estado visual (ingest + guard local síncronos). Wide entra desde el borde lógico; compact desde abajo con `env(safe-area-inset-bottom)`. Morph card→form con View Transition API como enhancement (fallback directo; bypass total reduced-motion). Reduced motion: cero travel, semántica idéntica.
+- **Density `full|condensed|peek`** por container query del PROPIO shell (nunca viewport del host), keyed por `[data-ghc-placement='slide_in']` (el renderer lo setea en overlay Y preview inline — paridad por construcción): peek = eyebrow+headline+acción+dismiss (composición real, no clipping); condensed suma body; full suma footnote/visual. Headline/acción/dismiss invariantes; dismiss 44px en el interruptivo.
+- **Identidad pseudónima browser** (`visitor.ts`): `sessionKey` (sessionStorage) siempre; `visitorKey` (localStorage) SOLO con `consent-state="granted"` declarado por el host (attrs nuevos `consent-state`/`consent-source` — hook CMP §16.2). Keys UUID opacas (cero fingerprinting), enviadas por headers al render GET y en el body del ingest — cierra el loop con el visitor state de TASK-1428. Guard local de dismiss por sesión como defensa-en-profundidad (la autoridad es server-side). `engineState='killed'` ⇒ el element no monta nada.
+- **`viewed` visibility-gated**: IO ≥50% + dwell 300ms, una vez (`notifyViewed`), embedded y slide_in → dataLayer + ingest Tier B (rollup §9.4). Corte de semántica registrado en TRACKING-PLAN §CTAs (mount=viewed era el baseline TASK-1427).
+- **Tokens 2026** sin renombrar `--gh-cta-*`: pares dark vía `light-dark()` (`@supports`, media query legacy como fallback), hover ramp `color-mix(in oklch)` solo variante default filled, press `linear()` solo transform, `text-wrap: balance/pretty`. Acento P3 deliberadamente omitido: `--gh-cta-accent` es token del HOST y un override nuestro pisaría su re-tematización.
+- **Preview `/growth/ctas`**: matriz de density (mismo fixture a 3 anchos) + demo VIVO del overlay (`SlideInController` immediate) + fixtures pairwise (`slideIn`/`Spotlight`/`Minimal`/`LongCopy`/`UnknownAppearance`). GVC `task-1429-growth-cta-interruptive-placement` (1440+390) mirado: density matrix, overlay open/escaped, appearances, long copy. El loop cazó 2 bugs reales pre-merge (destroy cross-instance bajo StrictMode; density rules ancladas a la clase del overlay).
+
+Fuera de esta entrega: primer CTA slide_in REAL publicado (surface/copy/trigger = decisión del operador; ningún CTA interruptivo existe aún — el placement amplio sigue gateado por enforcement ON, §24), popup_modal/floating_button, action kinds nuevos (TASK-1431), cockpit (TASK-1430).

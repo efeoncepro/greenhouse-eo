@@ -1,0 +1,14 @@
+Use case: stylized-concept
+Asset type: text-free featured editorial image and source for social derivatives
+Primary request: Create an iconic premium editorial close-up where a web interface is the contract in the famous visual tension of two presences almost meeting.
+Scene/backdrop: Deep graphite-black editorial field, matte and quiet, with a barely visible mineral grain and large negative space.
+Subject/action: A real human index finger and partial hand approach from lower left with calm intention. From upper right, a non-human agent signal formed by three extremely precise dark-teal ribbons and a thin navy plane converges toward the same point, ending in a clean directional tip, never shaped like a hand. Between them floats a thin browser-inspired web window seen almost edge-on but still legible as a window. Neither presence touches the other.
+Recurring motif: a governed interval — the small gap contains an ordered five-step visual sequence of tiny abstract marks suggesting intent, authority, capability, confirmation and evidence, without text or icons that resemble a real product.
+Central object: The window is the protagonist, about 42 percent of image width, with smoked ivory glass, a dark graphite frame and a minimal abstract top bar. It reveals a single interface with two coordinated layers: warm human-readable blocks and cool machine-readable structure aligned to the same geometry. One restrained copper-orange state marker sits near the point of authorization.
+Style/medium: macro editorial photography plus high-end physical model making, tactile skin, fine machined edges, museum-object restraint, contemporary strategy magazine cover art, subtle film grain.
+Composition/framing: horizontal 16:9, dynamic diagonal tension rather than perfect symmetry. Preserve both approaching tips and the entire window inside the central 72 percent; the central square crop must remain meaningful. No embedded copy.
+Lighting/mood: soft directional studio light, natural warm skin, cool structural reflection, deep blacks retaining texture, sober and exact.
+Text: none — no readable text, letters, numbers, logos, signatures or watermark.
+Constraints: anatomically correct human hand and index; abstract agent only; interface geometry crisp; no fake screenshot; no literal Apple traffic-light controls; no touch, spark or magical energy.
+Avoid: robot or prosthetic hand, humanoid AI, God/Adam reenactment, fresco recreation, religious symbolism, lightning, portal, hologram, blue neon, floating code, dashboard, charts, circuit-board cliché, bokeh, lens flare, excessive depth blur, malformed fingers, plastic CGI, decorative particles.
+

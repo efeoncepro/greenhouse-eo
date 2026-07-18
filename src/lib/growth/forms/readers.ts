@@ -203,6 +203,23 @@ export interface SubmissionDeliveryVm {
   attempts: Array<Pick<FormDestinationAttemptRow, 'attempt_id' | 'destination_id' | 'provider' | 'status' | 'error_class' | 'retry_count' | 'created_at'>>
 }
 
+/**
+ * TASK-1428 — Evidencia mínima para consumers externos (motor de CTAs): ¿la
+ * submission existe y fue ACEPTADA server-side? Estados desde `accepted` en adelante
+ * cuentan (la falla de delivery downstream no anula la conversión); `received`/
+ * `validated`/`rejected` NO son evidencia. Boolean-only a propósito: los CTAs jamás
+ * ven campos, PII ni el pipeline del form (boundary arch §12).
+ */
+export const isSubmissionServerAccepted = async (submissionId: string): Promise<boolean> => {
+  const submission = await getSubmissionById(submissionId)
+
+  if (!submission) return false
+
+  return ['accepted', 'routed', 'delivered', 'destination_failed', 'retrying', 'dead_letter'].includes(
+    submission.status,
+  )
+}
+
 export const getSubmissionDeliveryStateAdmin = async (submissionId: string): Promise<SubmissionDeliveryVm | null> => {
   const submission = await getSubmissionById(submissionId)
 

@@ -6634,6 +6634,32 @@ export interface GreenhouseGrowthCtaDefinition {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseGrowthCtaExposureRollup {
+  bucket_start: Timestamp;
+  cta_id: string | null;
+  decision_source: string;
+  enforced: Generated<boolean>;
+  estimated_count: Generated<Numeric>;
+  exposure_kind: string;
+  first_seen_at: Generated<Timestamp>;
+  last_seen_at: Generated<Timestamp>;
+  observed_count: Generated<number>;
+  placement: string | null;
+  reason_class: string | null;
+  rollup_id: Generated<string>;
+  surface_id: string | null;
+}
+
+export interface GreenhouseGrowthCtaKillSwitchEvent {
+  action: string;
+  actor_ref: string | null;
+  created_at: Generated<Timestamp>;
+  kill_event_id: Generated<string>;
+  reason: string;
+  scope: string;
+  surface_id: string | null;
+}
+
 export interface GreenhouseGrowthCtaSurfaceBinding {
   allowed_cta_slugs_json: Generated<Json>;
   created_at: Generated<Timestamp>;
@@ -6667,6 +6693,23 @@ export interface GreenhouseGrowthCtaVersion {
   targeting_policy_json: Generated<Json>;
   version: number;
   visual_asset_ref: string | null;
+}
+
+export interface GreenhouseGrowthCtaVisitorState {
+  consent_state: string | null;
+  conversion_ref: string | null;
+  converted_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  cta_id: string | null;
+  dismiss_count: Generated<number>;
+  impressions_in_window: Generated<number>;
+  last_dismissed_at: Timestamp | null;
+  last_impression_at: Timestamp | null;
+  state_id: Generated<string>;
+  subject_hash: string;
+  subject_kind: string;
+  updated_at: Generated<Timestamp>;
+  window_started_at: Timestamp | null;
 }
 
 export interface GreenhouseGrowthEmailVerificationCache {
@@ -11736,8 +11779,11 @@ export interface DB {
   "greenhouse_finance.vat_monthly_positions": GreenhouseFinanceVatMonthlyPositions;
   "greenhouse_growth.cta_conversion_event": GreenhouseGrowthCtaConversionEvent;
   "greenhouse_growth.cta_definition": GreenhouseGrowthCtaDefinition;
+  "greenhouse_growth.cta_exposure_rollup": GreenhouseGrowthCtaExposureRollup;
+  "greenhouse_growth.cta_kill_switch_event": GreenhouseGrowthCtaKillSwitchEvent;
   "greenhouse_growth.cta_surface_binding": GreenhouseGrowthCtaSurfaceBinding;
   "greenhouse_growth.cta_version": GreenhouseGrowthCtaVersion;
+  "greenhouse_growth.cta_visitor_state": GreenhouseGrowthCtaVisitorState;
   "greenhouse_growth.email_verification_cache": GreenhouseGrowthEmailVerificationCache;
   "greenhouse_growth.form_asset": GreenhouseGrowthFormAsset;
   "greenhouse_growth.form_definition": GreenhouseGrowthFormDefinition;

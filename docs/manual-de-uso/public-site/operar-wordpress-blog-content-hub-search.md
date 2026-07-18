@@ -1,9 +1,9 @@
 # Operar WordPress Blog, Content Hub y Busqueda
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-07-09 por Codex
-> **Ultima actualizacion:** 2026-07-09 por Codex
+> **Ultima actualizacion:** 2026-07-18 por Codex
 > **Modulo:** Public Site / WordPress / Ohio / Content Hub
 > **Documentacion relacionada:** `docs/documentation/public-site/wordpress-blog-content-hub-search.md`
 
@@ -69,7 +69,9 @@ Para escribir un borrador privado gobernado:
 pnpm public-website:content-factory:run -- --spec spec.json --send --author-id 1
 ```
 
-El write termina en `private`. Publicar es paso humano desde WP Admin.
+El write termina en `private`. Publicar requiere autorización humana explícita;
+puede ejecutarse desde WP Admin o mediante el carril agentic gobernado, siempre
+con snapshot, rollback, purge y QA live según el runbook end-to-end.
 
 Para refrescar un publicado, no edites el source directamente:
 
@@ -80,14 +82,32 @@ pnpm public-website:content-factory:patch-plan -- --refresh-plan <refresh-plan.j
 
 ## Revisar Taxonomias
 
-Las categorias son visibles y pueden formar parte de la URL. Antes de mover un
-post de categoria:
+Procedimiento técnico canónico:
+`.codex/skills/efeonce-public-site-wordpress/references/taxonomy-permalink-migrations.md`.
+Este manual funciona como checklist del operador; no sustituye los guards y
+readbacks de esa referencia.
 
-1. Anota permalink actual.
-2. Anota categorias actuales y categoria primaria Yoast si existe.
-3. Verifica si el slug nuevo cambiara la URL.
-4. Define redirect/canonical si cambia.
-5. Revisa archivos de categoria afectados.
+Las categorias son visibles y la categoría primaria Yoast puede formar parte de
+la URL. Antes de mover un post o cambiar la jerarquía de una categoría:
+
+1. Anota permalink, canonical, `og:url`, breadcrumb, categorías asignadas y
+   `_yoast_wpseo_primary_category`.
+2. Inventaría todos los posts cuya categoría primaria use el término, aunque
+   también pertenezcan a otras categorías.
+3. Guarda snapshot del término, posts afectados e inventario Yoast de redirects;
+   prepara rollback antes de escribir.
+4. Cambia padre/slug con `wp_update_term()`; no uses SQL directo.
+5. Si la URL cambia, crea `301` explícitos para cada post y para el archivo de
+   categoría. Con Yoast SEO Premium usa `WPSEO_Redirect_Manager` y normaliza
+   slash inicial/final al validar el readback.
+6. Reemplaza enlaces internos antiguos por el canonical directo. Para contenido
+   Elementor usa `Document::save()`, preservando metas Ohio externas al árbol.
+7. Purga cachés y comprueba rutas nuevas `200`, antiguas `301` de un salto,
+   canonical, `og:url`, breadcrumb, cards de archivo, sitemaps y enlaces
+   bidireccionales.
+
+No confíes solo en la redirección para los enlaces propios: el contenido y las
+landings controladas por Efeonce deben enlazar directamente a la ruta vigente.
 
 No uses tags actuales como navegacion publica hasta limpiar deuda demo y
 duplicados.

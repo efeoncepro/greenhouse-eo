@@ -4,6 +4,16 @@
 
 ---
 
+## 2026-07-18 — CTA engine en WordPress (TASK-1427): evidencia E2E + estado real del consent
+
+**Qué:** primera verificación E2E del motor Growth CTA en el host WordPress (página de prueba `efeoncepro.com/greenhouse-cta-prueba/`, decisión del operador: test page antes del placement amplio). Desktop 1440: `greenhouse_cta_viewed/clicked/form_opened` en dataLayer + los 3 saliendo por `/g/collect` a `G-KYPPY57M14` + ingest server 202 + ledger `browser_reported/accepted`. Mobile 390: `viewed` completo. Forja con embed key inválida → `403 surface_unauthorized`.
+
+- **⚠️ Ninguno de los dos hosts tiene consent gating real.** La asserción "consent-denied ⇒ no `/g/collect`" NO es ejercitable hoy: ni efeoncepro.com ni think.efeoncepro.com tienen CMP ni consent mode defaults, así que los tags GA4 disparan sin interacción de consentimiento (verificado con Playwright sin aceptar/conceder nada: los `greenhouse_cta_*` salieron igual por `/g/collect` en ambos hosts). Es la postura **pre-existente de medición del sitio completo** (Site Kit page_view incluido), no algo que el CTA introdujo. Si algún día se instala CMP/consent defaults, re-verificar la familia `greenhouse_cta_*` bajo denied (esperado: modelado, fuera de realtime — §7b).
+- **Batching del cliente GA4:** en sesiones cortas, `clicked`/`form_opened` pueden salir en un batch posterior o en el flush de pagehide — un listener que cierra el browser ~3s tras el click puede capturar solo `viewed`. No concluir "el tag no disparó" sin esperar el flush (o mirar el POST body del batch, que lleva varios `en=` por request).
+- **El ingest del renderer también batchea:** el POST a `/api/public/growth/ctas/events` del `viewed` puede salir en el flush de pagehide (keepalive); en la sesión desktop los 2 requests capturados fueron `clicked`+`form_opened`. El ledger es la verdad (los eventos aparecen como filas `browser_reported/accepted` con su `page_uri`).
+
+**Patrón reusable:** para verificar un host nuevo del CTA engine → página de prueba noindex + Playwright directo (dataLayer + `/g/collect` + ingest statuses + ledger PG) + forja 403. Scripts: `scripts/growth/_sanity-task1427-wp-live.mjs` / `_sanity-task1427-consent-denied.mjs`.
+
 ## 2026-07-07 — Tagging de think.efeoncepro.com (subdominio, propiedad unificada, sin doble conteo)
 
 **Qué:** medir `think.efeoncepro.com` (hub Astro, repo `efeonce-think`) con la **MISMA propiedad GA4** (`486264460` / `G-KYPPY57M14`) que efeoncepro.com — funnel unificado (subdominio = mismo stream; NO crear stream/propiedad aparte).

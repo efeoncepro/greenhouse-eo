@@ -4,9 +4,10 @@
  * preview interno del portal (mismo contrato = parity real).
  *
  * El renderer NO decide política: recibe el contrato ya arbitrado y lo pinta
- * (arch §11). Telemetría: `viewed` es DIRECCIONAL y va SOLO a dataLayer/CustomEvent
- * (la exposición masiva es Tier B, fuera del ledger OLTP — arch §9.4); los kinds
- * Tier A (clicked/dismissed/form_opened/form_submitted) van además al ingest.
+ * (arch §11). Telemetría (TASK-1429): `viewed` es visibility-gated (IO ≥50% + dwell,
+ * vía `notifyViewed`) y va a dataLayer/CustomEvent + ingest Tier B (rollup agregado
+ * server-side, JAMÁS el ledger OLTP — arch §9.4/TASK-1428); los kinds Tier A
+ * (clicked/dismissed/form_opened/form_submitted) van al ledger de conversión.
  */
 import type { CtaRenderContractMirror } from './contract'
 import type { CtaSystemCopy } from './copy'
@@ -39,8 +40,21 @@ export interface CtaRendererOptions {
   pageUri?: string
   /** Callback del primary (el módulo action monta el form). Retorna false si no pudo abrir. */
   onPrimary: (slot: HTMLElement) => Promise<boolean>
-  /** Ingest Tier A (fire-and-forget). El caller inyecta el binding surface+key. */
-  onIngest: (eventKind: 'clicked' | 'dismissed' | 'form_opened' | 'form_submitted' | 'error', extra?: { formSubmissionId?: string; reason?: string }) => void
+  /** Ingest (fire-and-forget). Tier A + `viewed` Tier B (TASK-1428). El caller inyecta el binding surface+key. */
+  onIngest: (eventKind: 'viewed' | 'clicked' | 'dismissed' | 'form_opened' | 'form_submitted' | 'error', extra?: { formSubmissionId?: string; reason?: string }) => void
+  /**
+   * TASK-1429 — el slide-in retiene el DOM al descartar para que el exit CSS
+   * (`allow-discrete` → display:none) pinte; el embedded sigue limpiando al instante.
+   */
+  retainDomOnDismiss?: boolean
+  /** Hook post-dismiss (focus return + guard local del interruptivo). La persistencia YA ocurrió. */
+  onDismissed?: () => void
+  /**
+   * TASK-1429 — `viewed` visibility-gated: el caller (element/controller) decide CUÁNDO
+   * el card es visible (IO ≥50% + dwell). `false` ⇒ render() no emite viewed; el caller
+   * llama `notifyViewed()` al confirmar visibilidad. Default `true` (compat preview/tests).
+   */
+  emitViewedOnRender?: boolean
   doc?: Document
 }
 
@@ -48,6 +62,10 @@ export class CtaRenderer {
   private readonly options: CtaRendererOptions
   private readonly doc: Document
   private destroyed = false
+  /** Card propio de ESTA instancia: destroy/dismiss remueven SOLO este nodo (dos
+   * instancias sobre el mismo root — p.ej. StrictMode double-effect en el preview —
+   * jamás se borran el contenido entre sí). */
+  private card: HTMLElement | null = null
 
   constructor(options: CtaRendererOptions) {
     this.options = options
@@ -163,10 +181,27 @@ export class CtaRenderer {
     card.appendChild(dismiss)
 
     root.replaceChildren(card)
+    this.card = card
     root.dataset.ghcState = 'visible'
 
-    // viewed = direccional (dataLayer/CustomEvent); NUNCA al ledger Tier A (arch §9.4).
+    // viewed: visibility-gated por default en el element (TASK-1429 — IO ≥50% + dwell);
+    // acá solo cuando el caller no gatea (preview/tests con emitViewedOnRender=true).
+    if (this.options.emitViewedOnRender !== false) this.notifyViewed()
+  }
+
+  private viewedEmitted = false
+
+  /**
+   * TASK-1429 — `viewed` cuando el card ES visible (una sola vez): dataLayer/CustomEvent
+   * (familia `greenhouse_cta_*`) + ingest Tier B (rollup agregado, jamás el ledger —
+   * TASK-1428/arch §9.4). Corte de semántica registrado en TRACKING-PLAN §CTAs.
+   */
+  notifyViewed(): void {
+    if (this.viewedEmitted || this.destroyed) return
+
+    this.viewedEmitted = true
     this.options.telemetry.emit(RENDERER_GTM_EVENTS.viewed, this.basePayload())
+    this.options.onIngest('viewed')
   }
 
   private async handlePrimary(primary: HTMLButtonElement, card: HTMLElement): Promise<void> {
@@ -209,7 +244,28 @@ export class CtaRenderer {
       return
     }
 
-    this.options.root.dataset.ghcState = 'form_open'
+    // Morph card→form (TASK-1429): View Transition same-document como ENHANCEMENT —
+    // fallback = cambio directo (el crossfade CSS del slot); bypass total en
+    // reduced-motion. Nunca una dependencia: el estado se aplica igual sin VT.
+    const applyFormOpen = (): void => {
+      this.options.root.dataset.ghcState = 'form_open'
+    }
+
+    const docWithVt = this.doc as Document & { startViewTransition?: (update: () => void) => unknown }
+
+    const reducedMotion =
+      typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    if (typeof docWithVt.startViewTransition === 'function' && !reducedMotion) {
+      try {
+        docWithVt.startViewTransition(applyFormOpen)
+      } catch {
+        applyFormOpen()
+      }
+    } else {
+      applyFormOpen()
+    }
+
     this.options.telemetry.emit(RENDERER_GTM_EVENTS.formOpened, {
       ...this.basePayload(),
       form_slug: this.options.contract.action.formSlug,
@@ -227,15 +283,36 @@ export class CtaRenderer {
     this.options.onIngest('form_submitted', { formSubmissionId })
   }
 
-  private handleDismiss(): void {
+  /**
+   * Dismiss público (TASK-1429): lo invocan el botón, Escape (controller del slide-in)
+   * y el preview. La PERSISTENCIA (ingest + guard local vía onDismissed) ocurre ANTES
+   * del cambio visual — jamás depende de animación (motion doc).
+   */
+  dismiss(): void {
+    if (this.destroyed) return
+
     this.options.telemetry.emit(RENDERER_GTM_EVENTS.dismissed, this.basePayload())
     this.options.onIngest('dismissed')
+    this.options.onDismissed?.()
     this.options.root.dataset.ghcState = 'dismissed'
-    this.options.root.replaceChildren()
+
+    // El slide-in retiene el DOM: el exit CSS (`allow-discrete` → display:none) pinta
+    // la salida y el estado ya quedó comprometido; el embedded limpia al instante.
+    if (!this.options.retainDomOnDismiss) this.removeOwnCard()
+  }
+
+  private handleDismiss(): void {
+    this.dismiss()
+  }
+
+  /** Remueve SOLO el card de esta instancia (jamás contenido ajeno en el mismo root). */
+  private removeOwnCard(): void {
+    this.card?.remove()
+    this.card = null
   }
 
   destroy(): void {
     this.destroyed = true
-    this.options.root.replaceChildren()
+    this.removeOwnCard()
   }
 }

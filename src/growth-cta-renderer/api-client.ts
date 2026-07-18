@@ -7,12 +7,19 @@
  * Fail-closed: cualquier error de red/HTTP en el GET ⇒ el card no se muestra.
  */
 import type { ArbitratedRenderResultMirror } from './contract'
+import type { CtaVisitorIdentity } from './visitor'
 
 export interface CtaApiConfig {
   baseUrl: string
   surfaceId: string
   embedKey: string | null
   route: string
+  /**
+   * TASK-1429 — identidad pseudónima del visitante (TASK-1428): viaja por HEADERS
+   * (nunca query — keys fuera de logs de proxies); el server la hashea y decide
+   * suppression. Sin identidad, el server aplica el fallback conservador.
+   */
+  identity?: CtaVisitorIdentity
 }
 
 export type ContractLoadFailure = 'disabled' | 'unauthorized' | 'error'
@@ -41,6 +48,13 @@ export const fetchArbitratedContracts = async (
 
   if (config.embedKey) headers['x-greenhouse-cta-embed-key'] = config.embedKey
 
+  if (config.identity) {
+    if (config.identity.visitorKey) headers['x-greenhouse-cta-visitor'] = config.identity.visitorKey
+    if (config.identity.sessionKey) headers['x-greenhouse-cta-session'] = config.identity.sessionKey
+    headers['x-greenhouse-cta-consent'] = config.identity.consentState
+    headers['x-greenhouse-cta-consent-source'] = config.identity.consentSource
+  }
+
   let response: Response
 
   try {
@@ -59,7 +73,8 @@ export const fetchArbitratedContracts = async (
 export interface CtaIngestEventInput {
   ctaSlug: string
   ctaVersionId: string
-  eventKind: 'clicked' | 'action_started' | 'action_completed' | 'form_opened' | 'form_submitted' | 'dismissed' | 'error'
+  /** Tier A + `viewed` Tier B (TASK-1428: misma cadena de defensa; el server separa el destino). */
+  eventKind: 'viewed' | 'clicked' | 'action_started' | 'action_completed' | 'form_opened' | 'form_submitted' | 'dismissed' | 'error'
   pageUri?: string
   placement?: string
   trigger?: string

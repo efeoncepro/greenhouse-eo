@@ -9,6 +9,7 @@ import { RENDERER_GTM_EVENTS, type RendererGtmEvent, type TelemetryPayload } fro
 const makeRenderer = (overrides: {
   fixture?: keyof typeof CTA_FIXTURES
   onPrimary?: (slot: HTMLElement) => Promise<boolean>
+  emitViewedOnRender?: boolean
 } = {}) => {
   const root = document.createElement('greenhouse-cta') as HTMLElement
 
@@ -26,6 +27,7 @@ const makeRenderer = (overrides: {
     pageUri: '/blog/post',
     onPrimary: overrides.onPrimary ?? (async () => true),
     onIngest: (eventKind, extra) => ingested.push({ eventKind, extra: extra as Record<string, unknown> | undefined }),
+    emitViewedOnRender: overrides.emitViewedOnRender,
   })
 
   return { root, renderer, emitted, ingested }
@@ -36,7 +38,7 @@ beforeEach(() => {
 })
 
 describe('CtaRenderer', () => {
-  it('pinta el card con copy del contrato + emite viewed SOLO direccional (sin ingest)', () => {
+  it('pinta el card con copy del contrato + emite viewed (dataLayer + ingest Tier B, TASK-1428/1429)', () => {
     const { root, renderer, emitted, ingested } = makeRenderer()
 
     renderer.render()
@@ -48,7 +50,25 @@ describe('CtaRenderer', () => {
 
     expect(emitted.map(e => e.event)).toEqual([RENDERER_GTM_EVENTS.viewed])
     expect(emitted[0].payload).toMatchObject({ cta_location: 'report_followup', placement: 'embedded' })
+
+    // viewed va al ingest como Tier B (rollup agregado server-side, jamás el ledger).
+    expect(ingested.map(i => i.eventKind)).toEqual(['viewed'])
+  })
+
+  it('emitViewedOnRender=false → viewed queda gated hasta notifyViewed (visibility-gated, una sola vez)', () => {
+    const { root, renderer, emitted, ingested } = makeRenderer({ emitViewedOnRender: false })
+
+    renderer.render()
+
+    expect(root.dataset.ghcState).toBe('visible')
+    expect(emitted).toHaveLength(0)
     expect(ingested).toHaveLength(0)
+
+    renderer.notifyViewed()
+    renderer.notifyViewed()
+
+    expect(emitted.map(e => e.event)).toEqual([RENDERER_GTM_EVENTS.viewed])
+    expect(ingested.map(i => i.eventKind)).toEqual(['viewed'])
   })
 
   it('click primary → clicked + form_opened (telemetría + ingest) y monta el slot del form', async () => {
@@ -63,7 +83,7 @@ describe('CtaRenderer', () => {
       RENDERER_GTM_EVENTS.clicked,
       RENDERER_GTM_EVENTS.formOpened,
     ])
-    expect(ingested.map(i => i.eventKind)).toEqual(['clicked', 'form_opened'])
+    expect(ingested.map(i => i.eventKind)).toEqual(['viewed', 'clicked', 'form_opened'])
     expect(root.querySelector('.ghc-form-slot')).not.toBeNull()
   })
 

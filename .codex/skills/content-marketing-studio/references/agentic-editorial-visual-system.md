@@ -167,10 +167,26 @@ Cada visual system brief debe declarar una **brand signature policy** antes de g
 - usos prohibidos: reconstrucción, deformación, recolor arbitrario, watermark dominante, textura repetida o acumulación de logos.
 
 Para Efeonce, usar exclusivamente los wordmarks oficiales de `public/branding/`; `AxisWordmark` es interno y no
-debe aparecer en piezas públicas. En diagramas de cuerpo la firma es pequeña y periférica; en hero/OG puede
-vivir en una esquina o banda editorial dentro de la zona segura. El logo de un cliente identifica el caso y
+debe aparecer en piezas públicas. En infografías de cuerpo para artículos, **toda la información de marca vive
+en el footer editorial**: nunca ubicar wordmark, sello, dominio o watermark en el header, la esquina superior o
+el campo explicativo. Consumir el sello canónico `efeoncepro.com` desde
+`src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg`; si el brief exige además un wordmark, también
+debe componerse dentro del footer y sin competir con fuente, fecha o contenido. El header queda reservado para
+kicker, título y bajada editorial. Hero/OG constituye otra superficie y puede usar una firma dentro de su zona
+segura si el brief lo declara. El logo de un cliente identifica el caso y
 requiere autorización específica; no reemplaza ni se fusiona con la firma de Efeonce. No pedir al generador que
 dibuje un logo: componer el activo oficial de forma determinística después de seleccionar el master.
+
+El contrato completo de infografías de cuerpo —footer, arquetipos, source/delivery, SVG SEO, descripción larga,
+responsive, shareability y estados por canal— vive en
+`docs/operations/public-site-content-factory/EDITORIAL_INFOGRAPHIC_OPERATING_MODEL_V1.md`. No extender la regla
+footer-only a hero/featured/OG: esas superficies declaran crop, firma y raster social-safe por separado.
+
+Para hero/featured/OG cargar
+`docs/operations/public-site-content-factory/EDITORIAL_COVER_KEY_VISUAL_OPERATING_MODEL_V1.md`. La portada se
+audita como key visual: tesis, foco, divergencia, provenance verificable cuando se exige modelo, punch a
+thumbnail, seguridad anatómica/cultural, crops y blockers duros. No reutilizar automáticamente la paleta,
+metáfora, manos, interfaz o fondo de otro artículo.
 
 Dos pruebas de calibración: si al retirar el logo la pieza deja de sentirse de la marca, falta sistema visual;
 si el logo domina la lectura, la firma está sobredimensionada.
@@ -213,9 +229,9 @@ base conceptual sin texto, pero no debe decidir ni rasterizar contenido que nece
 puede producirse completamente en HTML/CSS, canvas o herramienta de diseño gobernada y luego capturarse como
 raster; registrar fuente, renderer, fonts, hash y versión igual que cualquier master.
 
-Cuando la pieza se resuelva como SVG determinístico con derivados raster, cargar además
-`deterministic-editorial-infographics.md` y aplicar su pipeline `SVG → PNG master → WebP`, art direction,
-manifest y QA de integridad/contexto.
+Cuando la pieza se resuelva como SVG determinístico, cargar además
+`deterministic-editorial-infographics.md` y decidir por evidencia entre SVG directo y derivados raster. Para
+Efeonce, cargar también `../efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md`.
 
 ### Paso 5: generar, seleccionar y auditar masters
 
@@ -252,7 +268,7 @@ Cuando una ilustración conceptual pueda confundirse con evidencia, corregir com
 
 Derivar siempre desde el master seleccionado. No encadenar compresiones desde otro derivado.
 
-Entregables recomendados por asset informativo:
+Entregables recomendados por asset informativo **raster**:
 
 - master PNG original en sRGB;
 - body WebP a `1600px` o `1440px` de ancho, manteniendo proporción útil;
@@ -356,7 +372,7 @@ Una validación local o `dry-run` no prueba Media Library ni render público. Si
 | `G2 Visual system` | concepto, motivo, invariantes, crops y exclusiones | los assets no forman una serie reconocible |
 | `G3 Prompt provenance` | prompt verbatim + modelo/config + concept ID | no se puede reproducir/auditar la intención |
 | `G4 Original-resolution QA` | master inspeccionado + hash + findings | hay anatomía, texto, logos o artefactos dudosos |
-| `G5 Derivatives/accessibility` | WebP/JPEG, tamaños, ALT/caption/description | crop, peso o metadata degradan comprensión/uso |
+| `G5 Delivery/accessibility` | SVG directo o raster, tamaños, bytes, ALT/caption/description | formato, crop, peso o metadata degradan comprensión/uso |
 | `G6 Media integration` | IDs y readback reales + placement map | IDs inventados, URLs rotas o hero duplicado |
 | `G7 Public verification` | desktop/mobile + HTTP/OG/performance | render, metadata o archivos públicos no coinciden |
 
@@ -368,7 +384,7 @@ Veredictos: `PASS`, `CONDITIONAL PASS` o `BLOCK`. Un gate bloqueado no se compen
 - Generar N assets y buscarles función después.
 - Usar una imagen por sección por simetría o para llenar espacio.
 - Aprobar desde miniatura sin revisar el master original.
-- Mantener solo el WebP/JPEG y perder el master, prompt o hash.
+- Mantener solo el derivado final y perder source/master, prompt o hash.
 - Estirar el hero para OG o recortar manos, foco y motivo sin revisión.
 - Pedir texto, cifras, logos o interfaces exactas al generador y tratarlos como confiables.
 - Presentar arte conceptual como screenshot de producto, prueba científica o caso cliente.
@@ -386,7 +402,7 @@ Veredictos: `PASS`, `CONDITIONAL PASS` o `BLOCK`. Un gate bloqueado no se compen
 2. **Visual system brief** con concepto maestro, motivo, invariantes y prohibiciones.
 3. **Prompt sheet** o prompts verbatim dentro del manifest.
 4. **Manifest versionado** con candidates, masters, hashes, derivados, QA, rights y Media IDs.
-5. **Masters originales** y derivados WebP/JPEG trazables.
+5. **Sources/masters originales** y entregas SVG/raster trazables.
 6. **Matriz de selección/QA** con veredicto a resolución original.
 7. **Metadata sheet**: filename, title, ALT, caption, descripción y disclosure.
 8. **Media registry** con attachment IDs, URLs, MIME, dimensiones y uso.

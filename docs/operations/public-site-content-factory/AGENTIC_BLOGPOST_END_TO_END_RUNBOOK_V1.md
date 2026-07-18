@@ -746,11 +746,26 @@ pnpm media:webp -- \
 shasum -a 256 ai-generations/YYYY-MM-DD_<run>/masters/* ai-generations/YYYY-MM-DD_<run>/exports/*
 ```
 
-- cuerpo: WebP optimizado con dimensiones conocidas;
+- cuerpo raster: WebP optimizado con dimensiones conocidas;
+- cuerpo vectorial: SVG directo cuando el contrato determinístico demuestra seguridad, autonomía, legibilidad y
+  ventaja de entrega; source editable y delivery saneado permanecen separados;
 - featured/OG: derivado `1200×630` o cercano a `1.91:1`;
 - preferir JPEG/PNG social si el ecosistema de previews no trata el WebP de forma consistente;
 - proteger el centro óptico y probar miniatura/card;
 - no duplicar el featured dentro del body si Ohio ya lo renderiza.
+
+Para portada/featured/hero/OG aplicar además el
+[Editorial Cover Key Visual Operating Model](EDITORIAL_COVER_KEY_VISUAL_OPERATING_MODEL_V1.md): tesis visual,
+divergencia estructural, provenance verificable del modelo cuando se exige, iteración single-change, punch a
+thumbnail, gradientes/fondos subordinados, seguridad anatómica y cultural, scorecard con blockers y derivados
+versionados. La metodología es reusable; el skin de un piloto no se convierte automáticamente en look del blog.
+
+Para SVG directo, aplicar el
+[Editorial Infographic Operating Model](EDITORIAL_INFOGRAPHIC_OPERATING_MODEL_V1.md): un único `<img src>`
+fallback dentro de `<picture>`, filename/ALT/caption/contexto HTML, alternativa larga para imágenes complejas,
+GET `200`, `image/svg+xml`, dimensiones, crawlability, `currentSrc`, legibilidad CSS proyectada y CLS. En piezas
+Efeonce de cuerpo, toda la firma —fuente/as-of, wordmark y `efeoncepro.com`— vive en el footer. El texto
+contorneado no sustituye contenido HTML indexable. Featured, Yoast Article image y OG/Twitter conservan raster.
 
 #### 10.5 Media Library
 
@@ -797,6 +812,32 @@ Verificar como una unidad:
 
 El permalink actual usa `/%category%/%postname%/`. Cambiar la categoría de un post publicado puede cambiar su
 URL. Antes del primer publish, resolver categoría. Después, cualquier retaxonomía exige redirect/canonical plan.
+
+Cuando la retaxonomía modifica la jerarquía o el slug de una categoría ya
+publicada, aplicar el contrato completo de migración:
+
+1. inventariar término/archivo, posts asignados, posts con esa categoría como
+   primaria Yoast, enlaces internos y redirects existentes;
+2. capturar snapshot y rollback antes de escribir;
+3. mutar jerarquía con `wp_update_term()`, nunca con SQL directo;
+4. crear `301` explícitos para cada permalink afectado y para el archivo. Si
+   Yoast SEO Premium está activo, usar `WPSEO_Redirect_Manager`; su persistencia
+   normaliza rutas sin slash inicial/final, por lo que el readback debe comparar
+   valores normalizados;
+5. actualizar enlaces propios al canonical directo. En páginas Elementor, usar
+   `Document::save()` y conservar las metas Ohio fuera del árbol;
+6. purgar cachés y verificar `200/301`, un solo salto, canonical, `og:url`,
+   BreadcrumbList, cards de archivo, sitemaps, enlaces recíprocos y desktop/mobile.
+
+No declarar la migración completa mientras el contenido controlado por Efeonce
+siga enlazando a una URL antigua, aunque el redirect funcione.
+
+El H1/título WordPress, el SEO title y el título social son campos relacionados,
+pero no idénticos. Tras un ajuste editorial, inspeccionar el HTML real: Yoast
+puede mantener un SEO title optimizado mientras H1, `og:title` y schema usan el
+título editorial. En la versión 28 observada, `twitter:title` no se imprime de
+forma independiente; X/Twitter consume el fallback de Open Graph. No rellenar
+metadatos redundantes si el render final no los emite.
 
 No heredar tags demo, duplicados o typos del content hub. No crear tags sólo para repetir keywords.
 
@@ -1008,6 +1049,9 @@ Verificar al menos:
 - sin solapamiento artículo/footer;
 - tipografía, contraste y jerarquía legibles;
 - imágenes con `naturalWidth > 0`, tamaño/crop correcto y sin duplicar featured;
+- `currentSrc` correcto por viewport/tema, texto esencial `>=16 CSS px`, notas `>=12–14 CSS px` y sin LayoutShift
+  material cuando una variante cambia aspect ratio;
+- infografías complejas con ALT breve y descripción larga equivalente visible/enlazada;
 - TOC visible, navegable y con todos sus destinos existentes;
 - navegación por teclado y focus de links;
 - lenguaje de estado coherente con `publish` en cuerpo, notas, captions, CTA y excerpt;
@@ -1052,6 +1096,22 @@ Comprobar:
 - redirects si existió una URL anterior.
 
 No basta con “no la encontré en Google”: la duplicación se verifica en runtime y source registries.
+
+#### 14.7 Discovery e inspección de indexación
+
+El gate sincrónico de publicación termina cuando la URL live es rastreable y aparece en el sitemap Yoast correcto
+con `<lastmod>` honesto. La indexación de Google es asíncrona y no debe falsearse como condición ya cumplida.
+
+- no llamar al sitemap ping legado: Google lo retiró y devuelve `404`;
+- no usar la Indexing API para artículos o landings genéricos; sólo corresponde a `JobPosting` y
+  `BroadcastEvent` dentro de `VideoObject`;
+- URL Inspection API observa la versión conocida por el índice; no ejecuta live test ni solicita indexación;
+- una solicitud manual desde URL Inspection puede reservarse para unas pocas URLs críticas, sin promesa de plazo;
+- cuando exista la capability verificada de `TASK-1426`, registrar checkpoints `0h`, `24h` y `72h` separados del
+  gate de publicación; hasta entonces, no inventar evidencia automatizada.
+
+Contrato técnico ampliado:
+`.codex/skills/seo-aeo/references/google-search-console-api-indexing.md`.
 
 **Gate live:** todos los checks críticos pasan. Links protegidos/timeouts quedan clasificados con riesgo
 residual; un `404/5xx`, canonical duplicado, robots incorrecto, schema roto o render móvil defectuoso bloquea.
@@ -1242,6 +1302,7 @@ Un blogpost está `documented_closed` sólo cuando todos los ítems aplicables s
 - [ ] Imágenes cargan y TOC navega.
 - [ ] Links clasificados; cero `404/5xx` confirmado.
 - [ ] Canonical, robots, OG, schema y author verificados en HTML live.
+- [ ] URL incluida en el sitemap correcto con `lastmod` honesto; seguimiento GSC reportado aparte si aplica.
 - [ ] Rutas duplicadas revisadas en runtime/source.
 - [ ] Consola sin errores materiales.
 - [ ] Proceso de QA terminó naturalmente y cerró browser, contexts, requests, timers y reporte.

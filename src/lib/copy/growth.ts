@@ -1041,6 +1041,12 @@ export const GH_GROWTH_CTA_OPERATOR = {
     title: 'Preview del renderer',
     body: 'Así se ve el card en un host público, con fixtures deterministas. La variante visual la elige cada versión de CTA (style_variant).',
     variantLabel: 'Variante',
-    variantAria: 'Elegir la variante de preview del renderer'
+    variantAria: 'Elegir la variante de preview del renderer',
+    densityFull: 'Density full (contenedor ancho)',
+    densityCondensed: 'Density condensed (contenedor medio)',
+    densityPeek: 'Density peek (contenedor compacto)',
+    slideInDemoCta: 'Probar el slide-in en vivo',
+    slideInDemoAria: 'Abrir una demo del slide-in interruptivo sobre esta página',
+    slideInDemoHint: 'Abre el overlay real (no modal): pruébalo con Escape, cierre y foco. El estado de cierre dura la sesión.'
   }
 } as const

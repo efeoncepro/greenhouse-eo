@@ -204,11 +204,21 @@ Assign featured and social media deliberately:
 - verify format, dimensions, aspect ratio, ALT/caption, and anonymous delivery;
 - preserve source masters and derivative lineage outside the post body.
 
+For direct SVG infographics, load the governed SVG lane in `content-factory-gutenberg.md` and the SEO contract
+in `.codex/skills/seo-aeo/references/editorial-image-seo.md`. A body SVG may be correct while featured/OG stays
+raster. Keep one `<img src>` fallback, ALT/caption/long description in HTML, anonymous GET/MIME readback and
+viewport/theme/CLS checks. For Efeonce body pieces, wordmark + URL + source/as-of live together in the footer.
+
 ## 7. Yoast Metadata and Author Entity
 
 Post-level SEO must be explicit and independently read back:
 
-- H1 and SEO title serve their different jobs;
+- `post_title`, rendered H1, SEO title, Open Graph title and schema headline are
+  related but distinct outputs. Change the intended editorial title in
+  `post_title`; keep `_yoast_wpseo_title` search-oriented when a shorter SERP
+  title is useful; read back the live H1, `<title>`, `og:title`, Twitter card
+  fallback and schema `headline` independently. Do not infer that changing one
+  field updated every surface;
 - meta description is factual, concise, and aligned with the article;
 - focus phrase matches the editorial/search decision;
 - primary category matches the visible category and permalink strategy;
@@ -237,11 +247,19 @@ user with a similar display name.
 
 ## 8. Slug, Category, Tags, and Canonical Surface
 
+For a live category hierarchy or permalink migration, load
+`taxonomy-permalink-migrations.md`; it owns the inventory, core term mutation,
+Yoast Premium redirect and migration QA contract.
+
 - Keep the slug stable, lowercase, and kebab-case.
 - Treat category as URL architecture because the current post permalink includes
   category. Changing category on a published post requires redirect, canonical,
   archive, breadcrumb, and internal-link analysis.
 - Assign one intentional category and align the Yoast primary category.
+- A hierarchy-only migration must preserve the category term ID and verify the
+  Yoast primary category on every affected post. Promote/reparent with
+  `wp_update_term()`; never patch term tables with SQL or delete/recreate the
+  term.
 - Use only useful, existing tags. Reject demo, typo, duplicate, and near-synonym
   tags; an empty curated set is better than taxonomy noise.
 - Check archive cards, excerpt, featured image, breadcrumb, related content, and
@@ -318,6 +336,27 @@ If cache or anonymous and authenticated readback disagree, publication is not
 complete. Revert to private when the mismatch affects content, identity,
 indexability, canonical, schema, or social representation.
 
+### Search discovery and index observation
+
+The synchronous publication gate proves that the final URL is crawlable and is
+present in the correct Yoast sitemap with an honest `lastmod`. Google indexing
+is asynchronous and remains separate from publication success.
+
+- Do not call the retired sitemap ping endpoint; it returns `404`.
+- Do not use the Indexing API for generic posts or landing pages. Google limits
+  it to `JobPosting` and `BroadcastEvent` inside `VideoObject`.
+- Search Console URL Inspection API observes the indexed version only; it does
+  not run a live test or request indexing.
+- A human may request indexing in the Search Console UI for a small number of
+  critical URLs, without any guarantee of timing or inclusion.
+- Use `0h`, `24h`, and `72h` observations only after the capability described in
+  `TASK-1426` exists and has runtime evidence. Until then, do not fabricate an
+  automated checkpoint.
+
+Load `.codex/skills/seo-aeo/references/google-search-console-api-indexing.md`
+for the capability matrix, OAuth scopes, Platform Properties canary, and source
+links.
+
 ## 12. Links, Anchors, and Duplicate Checks
 
 Extract unique internal and external links from the final rendered article,
@@ -330,6 +369,10 @@ including CTA and media links. Check redirects and final destinations.
 - Verify all TOC and in-page anchors resolve to unique elements.
 - Confirm internal links use the canonical route and do not point to previews,
   obsolete categories, or redirected drafts.
+- For a pillar that supports a service landing, verify the intended reciprocal
+  link in both directions after any permalink change. Redirects preserve old
+  traffic; they do not replace updating owned internal links to the canonical
+  URL.
 - Re-run WordPress manifest/slug/title searches and Think route probes after
   publication. No second indexable copy may exist.
 
@@ -397,6 +440,7 @@ indexing risk.
 - [ ] Link check found no confirmed broken links; unresolved responses were reviewed.
 - [ ] Playwright desktop and mobile passed render, TOC, image, console, and overflow checks.
 - [ ] Final anonymous robots, canonical, schema, Open Graph, and social image passed.
+- [ ] Final URL appears in the correct sitemap with an honest `lastmod`; any GSC observation is reported separately.
 - [ ] Rollback evidence and residual risks were recorded without sensitive material.
 
 Only then report the article as published and operational. Otherwise use the

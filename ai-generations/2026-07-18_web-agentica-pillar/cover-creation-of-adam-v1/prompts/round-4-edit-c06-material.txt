@@ -1,0 +1,10 @@
+Edit the provided image with surgical restraint. Preserve the exact composition, 16:9 framing, white paper field, human hand, central landscape web window, all interface geometry, diagonal near-touching gesture, lighting and negative space.
+
+Change only the robotic hand in the upper-right:
+- Make its construction visibly bespoke and about 12 percent more slender, with elegant mechanically plausible five-finger proportions.
+- Replace most large white plastic armor plates with satin deep Efeonce-blue anodized structural shells. Retain only small matte-white ceramic collars around selected joints for contrast.
+- Use restrained active blue on a few precision pivots. Remove unnecessary screws, chrome sparkle and toy-like detailing.
+- Keep the extended index and fingertip in exactly the same position and scale so it continues pointing toward the upper-right corner of the web window.
+- The result must feel like a museum-grade industrial sculpture: unmistakably robotic, calm, intelligent and premium, not humanoid or threatening.
+
+Do not change the human hand, interface, orange marker, background, shadows or crop. Do not add black, text, logo, glow, spark, religious imagery, extra fingers or objects.

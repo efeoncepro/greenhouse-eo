@@ -63,9 +63,12 @@ imprenta antes de entregar. Si el cliente Globe imprime, pide el perfil ICC prim
 
 **Reglas rápidas:**
 - **Transparencia** → PNG (raster) o SVG (vector) o WebP/AVIF (web con alpha). Nunca JPG.
-- **Web:** ofrece AVIF/WebP con fallback; el `<picture>`/optimizador lo resuelve.
-- **Retina/2x:** exporta al doble de las dimensiones de display y deja que el CSS lo baje.
+- **Web raster:** ofrece AVIF/WebP con fallback; el `<picture>`/optimizador lo resuelve.
+- **Retina/2x raster:** exporta al doble de las dimensiones de display y deja que el CSS lo baje.
   Un asset 1x en pantalla retina se ve blando.
+- **SVG vectorial portable:** no necesita `@2x` ni un WebP/AVIF ritual. Para una infografía, comparar SVG
+  raw/gzip/Brotli con raster al ancho real y conservar SVG si es seguro, autónomo, nítido y más eficiente.
+  Featured/OG/social siguen un contrato raster separado por compatibilidad de previews.
 - **Print:** PDF/X con fuentes embebidas o convertidas a curvas; nunca fuentes sueltas.
 
 ## 5. Naming y empaquetado

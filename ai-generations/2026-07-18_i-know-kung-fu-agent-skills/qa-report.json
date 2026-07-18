@@ -1,0 +1,93 @@
+{
+  "generatedAt": "2026-07-18T09:29:45.046Z",
+  "status": "PASS",
+  "scope": [
+    "outlined_text_and_signature_bbox",
+    "external_references",
+    "font_render_completion"
+  ],
+  "contextualReview": {
+    "desktop": "inspected_at_intrinsic_1600x1000",
+    "mobile": "inspected_in_real_358px_column",
+    "social": "inspected_at_intrinsic_1080x1350_and_358px_thumbnail",
+    "findings": []
+  },
+  "typographyContract": "Source SVG keeps editable Poppins text; delivery SVG contains glyph paths generated with fontkit and has zero live text nodes.",
+  "results": [
+    {
+      "file": "kfu-v01-three-layers-desktop-delivery-v1.svg",
+      "viewBox": {
+        "x": 0,
+        "y": 0,
+        "width": 1600,
+        "height": 1000
+      },
+      "textCount": 0,
+      "outlinedTextCount": 17,
+      "imageCount": 1,
+      "outOfBounds": [],
+      "externalReferences": [],
+      "verdict": "PASS"
+    },
+    {
+      "file": "kfu-v01-three-layers-mobile-delivery-v1.svg",
+      "viewBox": {
+        "x": 0,
+        "y": 0,
+        "width": 1000,
+        "height": 1500
+      },
+      "textCount": 0,
+      "outlinedTextCount": 20,
+      "imageCount": 1,
+      "outOfBounds": [],
+      "externalReferences": [],
+      "verdict": "PASS"
+    },
+    {
+      "file": "kfu-v02-tacit-knowledge-loop-desktop-delivery-v1.svg",
+      "viewBox": {
+        "x": 0,
+        "y": 0,
+        "width": 1600,
+        "height": 1000
+      },
+      "textCount": 0,
+      "outlinedTextCount": 22,
+      "imageCount": 1,
+      "outOfBounds": [],
+      "externalReferences": [],
+      "verdict": "PASS"
+    },
+    {
+      "file": "kfu-v02-tacit-knowledge-loop-mobile-delivery-v1.svg",
+      "viewBox": {
+        "x": 0,
+        "y": 0,
+        "width": 1000,
+        "height": 1500
+      },
+      "textCount": 0,
+      "outlinedTextCount": 27,
+      "imageCount": 1,
+      "outOfBounds": [],
+      "externalReferences": [],
+      "verdict": "PASS"
+    },
+    {
+      "file": "kfu-v03-skill-candidate-social-delivery-v1.svg",
+      "viewBox": {
+        "x": 0,
+        "y": 0,
+        "width": 1080,
+        "height": 1350
+      },
+      "textCount": 0,
+      "outlinedTextCount": 24,
+      "imageCount": 1,
+      "outOfBounds": [],
+      "externalReferences": [],
+      "verdict": "PASS"
+    }
+  ]
+}

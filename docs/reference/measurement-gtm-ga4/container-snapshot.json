@@ -1,5 +1,5 @@
 {
-  "name": "think GA4 config (hostname-gated)",
+  "name": "TASK-1340 greenhouse_cta_* events",
   "tags": [
     {
       "name": "GA4 Config - think (hostname-gated)",
@@ -95,6 +95,834 @@
       "consentSettings": {
         "consentStatus": "notSet"
       }
+    },
+    {
+      "name": "GA4 event - greenhouse_cta_clicked",
+      "type": "gaawe",
+      "parameter": [
+        {
+          "type": "boolean",
+          "key": "sendEcommerceData",
+          "value": "false"
+        },
+        {
+          "type": "list",
+          "key": "eventSettingsTable",
+          "list": [
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "cta_id"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - cta_id}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "cta_slug"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - cta_slug}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "cta_location"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - cta_location}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "placement"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - placement}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "variant_id"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - variant_id}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "form_slug"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - form_slug}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "campaign_slug"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - campaign_slug}}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "template",
+          "key": "eventName",
+          "value": "greenhouse_cta_clicked"
+        },
+        {
+          "type": "template",
+          "key": "measurementIdOverride",
+          "value": "G-KYPPY57M14"
+        }
+      ],
+      "firingTriggerId": [
+        "25"
+      ],
+      "consentSettings": {
+        "consentStatus": "notSet"
+      }
+    },
+    {
+      "name": "GA4 event - greenhouse_cta_dismissed",
+      "type": "gaawe",
+      "parameter": [
+        {
+          "type": "boolean",
+          "key": "sendEcommerceData",
+          "value": "false"
+        },
+        {
+          "type": "list",
+          "key": "eventSettingsTable",
+          "list": [
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "cta_id"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - cta_id}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "cta_slug"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - cta_slug}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "cta_location"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - cta_location}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "placement"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - placement}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "variant_id"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - variant_id}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "form_slug"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - form_slug}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "campaign_slug"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - campaign_slug}}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "template",
+          "key": "eventName",
+          "value": "greenhouse_cta_dismissed"
+        },
+        {
+          "type": "template",
+          "key": "measurementIdOverride",
+          "value": "G-KYPPY57M14"
+        }
+      ],
+      "firingTriggerId": [
+        "27"
+      ],
+      "consentSettings": {
+        "consentStatus": "notSet"
+      }
+    },
+    {
+      "name": "GA4 event - greenhouse_cta_error",
+      "type": "gaawe",
+      "parameter": [
+        {
+          "type": "boolean",
+          "key": "sendEcommerceData",
+          "value": "false"
+        },
+        {
+          "type": "list",
+          "key": "eventSettingsTable",
+          "list": [
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "cta_id"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - cta_id}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "cta_slug"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - cta_slug}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "cta_location"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - cta_location}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "placement"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - placement}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "variant_id"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - variant_id}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "form_slug"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - form_slug}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "campaign_slug"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - campaign_slug}}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "template",
+          "key": "eventName",
+          "value": "greenhouse_cta_error"
+        },
+        {
+          "type": "template",
+          "key": "measurementIdOverride",
+          "value": "G-KYPPY57M14"
+        }
+      ],
+      "firingTriggerId": [
+        "33"
+      ],
+      "consentSettings": {
+        "consentStatus": "notSet"
+      }
+    },
+    {
+      "name": "GA4 event - greenhouse_cta_form_opened",
+      "type": "gaawe",
+      "parameter": [
+        {
+          "type": "boolean",
+          "key": "sendEcommerceData",
+          "value": "false"
+        },
+        {
+          "type": "list",
+          "key": "eventSettingsTable",
+          "list": [
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "cta_id"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - cta_id}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "cta_slug"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - cta_slug}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "cta_location"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - cta_location}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "placement"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - placement}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "variant_id"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - variant_id}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "form_slug"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - form_slug}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "campaign_slug"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - campaign_slug}}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "template",
+          "key": "eventName",
+          "value": "greenhouse_cta_form_opened"
+        },
+        {
+          "type": "template",
+          "key": "measurementIdOverride",
+          "value": "G-KYPPY57M14"
+        }
+      ],
+      "firingTriggerId": [
+        "29"
+      ],
+      "consentSettings": {
+        "consentStatus": "notSet"
+      }
+    },
+    {
+      "name": "GA4 event - greenhouse_cta_form_submitted",
+      "type": "gaawe",
+      "parameter": [
+        {
+          "type": "boolean",
+          "key": "sendEcommerceData",
+          "value": "false"
+        },
+        {
+          "type": "list",
+          "key": "eventSettingsTable",
+          "list": [
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "cta_id"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - cta_id}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "cta_slug"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - cta_slug}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "cta_location"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - cta_location}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "placement"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - placement}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "variant_id"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - variant_id}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "form_slug"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - form_slug}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "campaign_slug"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - campaign_slug}}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "template",
+          "key": "eventName",
+          "value": "greenhouse_cta_form_submitted"
+        },
+        {
+          "type": "template",
+          "key": "measurementIdOverride",
+          "value": "G-KYPPY57M14"
+        }
+      ],
+      "firingTriggerId": [
+        "31"
+      ],
+      "consentSettings": {
+        "consentStatus": "notSet"
+      }
+    },
+    {
+      "name": "GA4 event - greenhouse_cta_viewed",
+      "type": "gaawe",
+      "parameter": [
+        {
+          "type": "boolean",
+          "key": "sendEcommerceData",
+          "value": "false"
+        },
+        {
+          "type": "list",
+          "key": "eventSettingsTable",
+          "list": [
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "cta_id"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - cta_id}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "cta_slug"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - cta_slug}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "cta_location"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - cta_location}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "placement"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - placement}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "variant_id"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - variant_id}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "form_slug"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - form_slug}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "campaign_slug"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - campaign_slug}}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "template",
+          "key": "eventName",
+          "value": "greenhouse_cta_viewed"
+        },
+        {
+          "type": "template",
+          "key": "measurementIdOverride",
+          "value": "G-KYPPY57M14"
+        }
+      ],
+      "firingTriggerId": [
+        "23"
+      ],
+      "consentSettings": {
+        "consentStatus": "notSet"
+      }
     }
   ],
   "triggers": [
@@ -114,6 +942,132 @@
               "type": "template",
               "key": "arg1",
               "value": "gh_form_submission_accepted"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CE - greenhouse_cta_clicked",
+      "type": "customEvent",
+      "customEventFilter": [
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{_event}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "greenhouse_cta_clicked"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CE - greenhouse_cta_dismissed",
+      "type": "customEvent",
+      "customEventFilter": [
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{_event}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "greenhouse_cta_dismissed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CE - greenhouse_cta_error",
+      "type": "customEvent",
+      "customEventFilter": [
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{_event}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "greenhouse_cta_error"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CE - greenhouse_cta_form_opened",
+      "type": "customEvent",
+      "customEventFilter": [
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{_event}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "greenhouse_cta_form_opened"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CE - greenhouse_cta_form_submitted",
+      "type": "customEvent",
+      "customEventFilter": [
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{_event}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "greenhouse_cta_form_submitted"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CE - greenhouse_cta_viewed",
+      "type": "customEvent",
+      "customEventFilter": [
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{_event}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "greenhouse_cta_viewed"
             }
           ]
         }
@@ -142,6 +1096,90 @@
     }
   ],
   "variables": [
+    {
+      "name": "DLV - campaign_slug",
+      "type": "v",
+      "parameter": [
+        {
+          "type": "integer",
+          "key": "dataLayerVersion",
+          "value": "2"
+        },
+        {
+          "type": "boolean",
+          "key": "setDefaultValue",
+          "value": "false"
+        },
+        {
+          "type": "template",
+          "key": "name",
+          "value": "campaign_slug"
+        }
+      ]
+    },
+    {
+      "name": "DLV - cta_id",
+      "type": "v",
+      "parameter": [
+        {
+          "type": "integer",
+          "key": "dataLayerVersion",
+          "value": "2"
+        },
+        {
+          "type": "boolean",
+          "key": "setDefaultValue",
+          "value": "false"
+        },
+        {
+          "type": "template",
+          "key": "name",
+          "value": "cta_id"
+        }
+      ]
+    },
+    {
+      "name": "DLV - cta_location",
+      "type": "v",
+      "parameter": [
+        {
+          "type": "integer",
+          "key": "dataLayerVersion",
+          "value": "2"
+        },
+        {
+          "type": "boolean",
+          "key": "setDefaultValue",
+          "value": "false"
+        },
+        {
+          "type": "template",
+          "key": "name",
+          "value": "cta_location"
+        }
+      ]
+    },
+    {
+      "name": "DLV - cta_slug",
+      "type": "v",
+      "parameter": [
+        {
+          "type": "integer",
+          "key": "dataLayerVersion",
+          "value": "2"
+        },
+        {
+          "type": "boolean",
+          "key": "setDefaultValue",
+          "value": "false"
+        },
+        {
+          "type": "template",
+          "key": "name",
+          "value": "cta_slug"
+        }
+      ]
+    },
     {
       "name": "DLV - form_kind",
       "type": "v",
@@ -185,6 +1223,27 @@
       ]
     },
     {
+      "name": "DLV - placement",
+      "type": "v",
+      "parameter": [
+        {
+          "type": "integer",
+          "key": "dataLayerVersion",
+          "value": "2"
+        },
+        {
+          "type": "boolean",
+          "key": "setDefaultValue",
+          "value": "false"
+        },
+        {
+          "type": "template",
+          "key": "name",
+          "value": "placement"
+        }
+      ]
+    },
+    {
       "name": "DLV - surface_id",
       "type": "v",
       "parameter": [
@@ -202,6 +1261,27 @@
           "type": "template",
           "key": "name",
           "value": "surface_id"
+        }
+      ]
+    },
+    {
+      "name": "DLV - variant_id",
+      "type": "v",
+      "parameter": [
+        {
+          "type": "integer",
+          "key": "dataLayerVersion",
+          "value": "2"
+        },
+        {
+          "type": "boolean",
+          "key": "setDefaultValue",
+          "value": "false"
+        },
+        {
+          "type": "template",
+          "key": "name",
+          "value": "variant_id"
         }
       ]
     }

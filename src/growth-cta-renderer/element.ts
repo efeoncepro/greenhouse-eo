@@ -20,9 +20,11 @@ import type { CtaRenderContractMirror } from './contract'
 import { resolveCtaSystemCopy } from './copy'
 import { openGrowthForm } from './action'
 import { CtaRenderer } from './renderer'
+import { observeVisibleOnce, SlideInController } from './slide-in'
 import { ensureStylesInjected } from './styles'
 import { createTelemetryEmitter, RENDERER_GTM_EVENTS } from './telemetry'
 import { RENDERER_CONTRACT_VERSION, RENDERER_VERSION } from './version'
+import { parseConsentState, resolveVisitorIdentity, type CtaVisitorIdentity } from './visitor'
 
 export const ELEMENT_TAG = 'greenhouse-cta'
 
@@ -40,10 +42,14 @@ export class GreenhouseCtaElement extends HTMLElement {
     'color-scheme',
     'appearance',
     'cta-location',
+    'consent-state',
+    'consent-source',
   ]
 
   private internals: ElementInternals | null = null
   private renderer: CtaRenderer | null = null
+  private slideIn: SlideInController | null = null
+  private viewedCleanup: (() => void) | null = null
   private loaded = false
 
   static get version(): string {
@@ -72,8 +78,12 @@ export class GreenhouseCtaElement extends HTMLElement {
   }
 
   disconnectedCallback(): void {
+    this.viewedCleanup?.()
+    this.viewedCleanup = null
     this.renderer?.destroy()
     this.renderer = null
+    this.slideIn?.destroy()
+    this.slideIn = null
   }
 
   attributeChangedCallback(): void {
@@ -96,7 +106,7 @@ export class GreenhouseCtaElement extends HTMLElement {
     if (!this.hasAttribute('aria-label')) this.setAttribute('aria-label', label)
   }
 
-  private apiConfig(): CtaApiConfig | null {
+  private apiConfig(identity: CtaVisitorIdentity): CtaApiConfig | null {
     const surfaceId = this.getAttribute('surface')
 
     if (!surfaceId) return null
@@ -109,6 +119,7 @@ export class GreenhouseCtaElement extends HTMLElement {
       surfaceId,
       embedKey: this.getAttribute('embed-key'),
       route,
+      identity,
     }
   }
 
@@ -147,11 +158,62 @@ export class GreenhouseCtaElement extends HTMLElement {
     return contracts[0] ?? null
   }
 
+  /** Ingest fire-and-forget con la identidad pseudónima (TASK-1428/1429). */
+  private ingestFor(
+    config: CtaApiConfig,
+    contract: CtaRenderContractMirror,
+    identity: CtaVisitorIdentity,
+    pageUri: string | undefined,
+  ): (eventKind: 'viewed' | 'clicked' | 'dismissed' | 'form_opened' | 'form_submitted' | 'error', extra?: { formSubmissionId?: string; reason?: string }) => void {
+    return (eventKind, extra) =>
+      void postCtaEvent(config, {
+        ctaSlug: contract.cta.slug,
+        ctaVersionId: contract.cta.ctaVersionId,
+        eventKind,
+        pageUri,
+        placement: contract.placement,
+        variantId: contract.variantId,
+        actionKind: contract.action.kind,
+        visitorKey: identity.visitorKey ?? undefined,
+        sessionKey: identity.sessionKey ?? undefined,
+        consentState: identity.consentState,
+        consentSource: identity.consentSource,
+        formSubmissionId: extra?.formSubmissionId,
+        payload: extra?.reason ? { reason: extra.reason } : undefined,
+      })
+  }
+
+  private primaryFor(
+    config: CtaApiConfig,
+    contract: CtaRenderContractMirror,
+    getRenderer: () => CtaRenderer | null,
+  ): (slot: HTMLElement) => Promise<boolean> {
+    return slot =>
+      openGrowthForm({
+        doc: document,
+        slot,
+        action: contract.action,
+        baseUrl: config.baseUrl,
+        formSurfaceId: this.getAttribute('form-surface'),
+        locale: this.getAttribute('locale'),
+        colorScheme: this.getAttribute('color-scheme'),
+        onSubmitted: formSubmissionId => getRenderer()?.notifyFormSubmitted(formSubmissionId),
+      })
+  }
+
   private async load(): Promise<void> {
     this.loaded = true
 
     const copy = resolveCtaSystemCopy(this.getAttribute('locale') ?? undefined)
-    const config = this.apiConfig()
+
+    // Identidad pseudónima consent-aware (TASK-1428/1429): session siempre; visitor
+    // durable SOLO con `consent-state="granted"` declarado por el host (CMP hook).
+    const identity = resolveVisitorIdentity({
+      consentState: parseConsentState(this.getAttribute('consent-state')),
+      consentSource: this.getAttribute('consent-source'),
+    })
+
+    const config = this.apiConfig(identity)
     const telemetry = createTelemetryEmitter(this)
 
     if (!config) {
@@ -163,14 +225,21 @@ export class GreenhouseCtaElement extends HTMLElement {
     ensureStylesInjected(document)
     this.renderSkeleton(copy)
 
-    let contract: CtaRenderContractMirror | null = null
+    let embedded: CtaRenderContractMirror | null = null
+    let interruptive: CtaRenderContractMirror | null = null
 
     try {
       const result = await fetchArbitratedContracts(config)
 
-      // Esta rebanada monta placements no-interruptivos (embedded/inline_banner);
-      // el interruptivo (0–1, arch §11) llega con la task siguiente.
-      contract = this.pickContract(result.nonInterruptive)
+      // Kill switch (§16.3): retiro operativo — nada se monta, jamás un falso dismissed.
+      if (result.engineState === 'killed') {
+        this.renderEmpty()
+
+        return
+      }
+
+      embedded = this.pickContract(result.nonInterruptive)
+      interruptive = result.interruptive
     } catch (error) {
       const reason = error instanceof CtaContractLoadError ? error.reason : 'error'
 
@@ -189,51 +258,60 @@ export class GreenhouseCtaElement extends HTMLElement {
       return
     }
 
-    if (!contract) {
-      this.renderEmpty()
+    const pageUri = typeof location !== 'undefined' ? `${location.pathname}${location.search}` : undefined
 
-      return
+    // ── Card embedded/no-interruptivo (in-place, TASK-1340) ──────────────────
+    if (embedded) {
+      const embeddedContract = embedded
+
+      this.renderer?.destroy()
+      this.renderer = new CtaRenderer({
+        root: this,
+        contract: embeddedContract,
+        copy,
+        telemetry,
+        ctaLocation: this.getAttribute('cta-location') ?? undefined,
+        pageUri,
+        onPrimary: this.primaryFor(config, embeddedContract, () => this.renderer),
+        onIngest: this.ingestFor(config, embeddedContract, identity, pageUri),
+        emitViewedOnRender: false,
+      })
+
+      this.renderer.render()
+
+      // `viewed` visibility-gated (TASK-1429): visible ≥50% + dwell, no al montar.
+      this.viewedCleanup?.()
+      this.viewedCleanup = observeVisibleOnce(this, () => this.renderer?.notifyViewed())
+    } else {
+      this.renderEmpty()
     }
 
-    const pageUri = typeof location !== 'undefined' ? `${location.pathname}${location.search}` : undefined
-    const activeContract = contract
+    // ── Slide-in interruptivo (0–1, arch §11; único interruptivo V1) ─────────
+    this.slideIn?.destroy()
+    this.slideIn = null
 
-    this.renderer?.destroy()
-    this.renderer = new CtaRenderer({
-      root: this,
-      contract: activeContract,
-      copy,
-      telemetry,
-      ctaLocation: this.getAttribute('cta-location') ?? undefined,
-      pageUri,
-      onPrimary: slot =>
-        openGrowthForm({
-          doc: document,
-          slot,
-          action: activeContract.action,
-          baseUrl: config.baseUrl,
-          formSurfaceId: this.getAttribute('form-surface'),
-          locale: this.getAttribute('locale'),
-          colorScheme: this.getAttribute('color-scheme'),
-          onSubmitted: formSubmissionId => this.renderer?.notifyFormSubmitted(formSubmissionId),
-        }),
-      onIngest: (eventKind, extra) =>
-        void postCtaEvent(config, {
-          ctaSlug: activeContract.cta.slug,
-          ctaVersionId: activeContract.cta.ctaVersionId,
-          eventKind,
-          pageUri,
-          placement: activeContract.placement,
-          variantId: activeContract.variantId,
-          actionKind: activeContract.action.kind,
-          consentState: 'unknown',
-          consentSource: 'none',
-          formSubmissionId: extra?.formSubmissionId,
-          payload: extra?.reason ? { reason: extra.reason } : undefined,
-        }),
-    })
+    if (interruptive && interruptive.placement === 'slide_in') {
+      const interruptiveContract = interruptive
+      let controller: SlideInController | null = null
 
-    this.renderer.render()
+      controller = new SlideInController({
+        doc: document,
+        host: this,
+        contract: interruptiveContract,
+        copy,
+        telemetry,
+        ctaLocation: this.getAttribute('cta-location') ?? undefined,
+        pageUri,
+        onPrimary: this.primaryFor(config, interruptiveContract, () => controller?.activeRenderer ?? null),
+        onIngest: this.ingestFor(config, interruptiveContract, identity, pageUri),
+      })
+
+      this.slideIn = controller
+      controller.arm()
+
+      // Con interruptivo armado y sin embedded, el element no debe colapsar a display:none.
+      if (!embedded) this.dataset.ghcState = 'host'
+    }
   }
 }
 

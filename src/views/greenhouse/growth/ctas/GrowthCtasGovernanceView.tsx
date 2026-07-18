@@ -32,6 +32,7 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Tooltip from '@mui/material/Tooltip'
+import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import EmptyState from '@/components/greenhouse/EmptyState'
@@ -67,6 +68,42 @@ interface Props {
   loadError?: boolean
 }
 
+/** Monta el core del renderer (paridad real con el público) en un host `.ghc-scope`. */
+const mountFixture = async (
+  root: HTMLDivElement,
+  fixture: keyof typeof CTA_FIXTURES,
+): Promise<() => void> => {
+  const [{ CtaRenderer }, { ensureStylesInjected }, { resolveCtaSystemCopy }] = await Promise.all([
+    import('@/growth-cta-renderer/renderer'),
+    import('@/growth-cta-renderer/styles'),
+    import('@/growth-cta-renderer/copy'),
+  ])
+
+  ensureStylesInjected(document)
+
+  const contract = CTA_FIXTURES[fixture].build()
+
+  // classList.add (NUNCA className=): preserva las clases MUI del Box (sx maxWidth
+  // de la matriz de density) — pisarlas dejaba todos los contenedores full-width.
+  root.classList.add('ghc-scope')
+  root.dataset.ghcVariant = contract.styleVariant ?? 'default'
+  root.dataset.ghcPlacement = contract.placement
+  root.style.containerType = 'inline-size'
+
+  const renderer = new CtaRenderer({
+    root,
+    contract,
+    copy: resolveCtaSystemCopy(),
+    telemetry: { emit: () => undefined },
+    onPrimary: async () => true,
+    onIngest: () => undefined,
+  })
+
+  renderer.render()
+
+  return () => renderer.destroy()
+}
+
 const CtaPreview = ({ fixture }: { fixture: keyof typeof CTA_FIXTURES }) => {
   const hostRef = useRef<HTMLDivElement | null>(null)
 
@@ -75,35 +112,12 @@ const CtaPreview = ({ fixture }: { fixture: keyof typeof CTA_FIXTURES }) => {
     let cleanup: (() => void) | null = null
 
     void (async () => {
-      const [{ CtaRenderer }, { ensureStylesInjected }, { resolveCtaSystemCopy }] = await Promise.all([
-        import('@/growth-cta-renderer/renderer'),
-        import('@/growth-cta-renderer/styles'),
-        import('@/growth-cta-renderer/copy'),
-      ])
+      if (!hostRef.current) return
 
-      if (disposed || !hostRef.current) return
+      const dispose = await mountFixture(hostRef.current, fixture)
 
-      ensureStylesInjected(document)
-
-      const root = hostRef.current
-      const contract = CTA_FIXTURES[fixture].build()
-
-      root.className = 'ghc-scope'
-      root.dataset.ghcVariant = contract.styleVariant ?? 'default'
-      root.dataset.ghcPlacement = contract.placement
-      root.style.containerType = 'inline-size'
-
-      const renderer = new CtaRenderer({
-        root,
-        contract,
-        copy: resolveCtaSystemCopy(),
-        telemetry: { emit: () => undefined },
-        onPrimary: async () => true,
-        onIngest: () => undefined,
-      })
-
-      renderer.render()
-      cleanup = () => renderer.destroy()
+      if (disposed) dispose()
+      else cleanup = dispose
     })()
 
     return () => {
@@ -113,6 +127,106 @@ const CtaPreview = ({ fixture }: { fixture: keyof typeof CTA_FIXTURES }) => {
   }, [fixture])
 
   return <Box ref={hostRef} data-capture='cta-preview' sx={{ maxWidth: 720 }} />
+}
+
+/**
+ * TASK-1429 — matriz de density del slide-in: el MISMO fixture a 3 anchos de
+ * contenedor (`full|condensed|peek` derivados por container query, nunca por
+ * viewport del host) + demo VIVA del overlay real (SlideInController immediate:
+ * Escape/dismiss/foco/motion reales; guard local de sesión incluido).
+ */
+const SLIDE_IN_DENSITY_WIDTHS: Array<{ key: string; width: number; labelKey: 'densityFull' | 'densityCondensed' | 'densityPeek' }> = [
+  { key: 'full', width: 680, labelKey: 'densityFull' },
+  { key: 'condensed', width: 480, labelKey: 'densityCondensed' },
+  { key: 'peek', width: 350, labelKey: 'densityPeek' },
+]
+
+const SlideInDensityMatrix = ({ fixture }: { fixture: keyof typeof CTA_FIXTURES }) => {
+  const hostsRef = useRef<Array<HTMLDivElement | null>>([])
+  const [demoBusy, setDemoBusy] = useState(false)
+
+  useEffect(() => {
+    let disposed = false
+    const cleanups: Array<() => void> = []
+
+    void (async () => {
+      for (const host of hostsRef.current) {
+        if (!host || disposed) continue
+
+        const dispose = await mountFixture(host, fixture)
+
+        if (disposed) dispose()
+        else cleanups.push(dispose)
+      }
+    })()
+
+    return () => {
+      disposed = true
+      cleanups.forEach(dispose => dispose())
+    }
+  }, [fixture])
+
+  const openLiveDemo = async () => {
+    setDemoBusy(true)
+
+    try {
+      const [{ SlideInController }, { ensureStylesInjected }, { resolveCtaSystemCopy }] = await Promise.all([
+        import('@/growth-cta-renderer/slide-in'),
+        import('@/growth-cta-renderer/styles'),
+        import('@/growth-cta-renderer/copy'),
+      ])
+
+      ensureStylesInjected(document)
+
+      const controller = new SlideInController({
+        doc: document,
+        host: document.body,
+        contract: { ...CTA_FIXTURES[fixture].build(), cta: { ...CTA_FIXTURES[fixture].build().cta, ctaId: `cdef-demo-${Date.now()}` } },
+        copy: resolveCtaSystemCopy(),
+        telemetry: { emit: () => undefined },
+        onPrimary: async () => true,
+        onIngest: () => undefined,
+        triggerMode: 'immediate',
+      })
+
+      controller.arm()
+    } finally {
+      setDemoBusy(false)
+    }
+  }
+
+  return (
+    <Stack spacing={4}>
+      {SLIDE_IN_DENSITY_WIDTHS.map((density, index) => (
+        <Box key={density.key} data-capture={`cta-preview-density-${density.key}`}>
+          <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mb: 1 }}>
+            {O.preview[density.labelKey]}
+          </Typography>
+          <Box
+            ref={(node: HTMLDivElement | null) => {
+              hostsRef.current[index] = node
+            }}
+            sx={{ maxWidth: density.width }}
+          />
+        </Box>
+      ))}
+      <Box>
+        <Button
+          variant='outlined'
+          size='small'
+          disabled={demoBusy}
+          onClick={() => void openLiveDemo()}
+          aria-label={O.preview.slideInDemoAria}
+          data-capture='cta-slidein-demo-trigger'
+        >
+          {O.preview.slideInDemoCta}
+        </Button>
+        <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 1 }}>
+          {O.preview.slideInDemoHint}
+        </Typography>
+      </Box>
+    </Stack>
+  )
 }
 
 const GrowthCtasGovernanceView = ({ ctas, surfaces, engineEnabled, loadError }: Props) => {
@@ -353,7 +467,11 @@ const GrowthCtasGovernanceView = ({ ctas, surfaces, engineEnabled, loadError }: 
               />
             ))}
           </Box>
-          <CtaPreview fixture={previewFixture} />
+          {CTA_FIXTURES[previewFixture].build().placement === 'slide_in' ? (
+            <SlideInDensityMatrix fixture={previewFixture} />
+          ) : (
+            <CtaPreview fixture={previewFixture} />
+          )}
         </CardContent>
       </Card>
 

@@ -3,7 +3,8 @@
 > Carga este módulo para: rastreo/indexación, Core Web Vitals, render JS,
 > sitemaps, canonicalización, datos estructurados (JSON-LD), arquitectura de
 > sitio, y **gestión de crawlers de IA** (robots para GPTBot/ClaudeBot/etc.).
-> Sello: as-of 2026-06. Reverifica umbrales CWV y lista de bots con WebSearch.
+> Sello base: as-of 2026-06; delta GSC/API verificado 2026-07-18. Reverifica
+> umbrales CWV, lista de bots y features de Search Console con WebSearch.
 
 ## Mapa mental: la técnica habilita las 3 capas
 
@@ -43,6 +44,30 @@ recuperar? → ¿se entiende? → ¿es rápido y estable?**
   confianza). Sitemaps separados por tipo ayudan a diagnosticar indexación.
 - **Estados a evitar:** `noindex` + bloqueo robots a la vez (Google no ve el
   noindex), soft 404, parámetros infinitos, calendarios/filtros sin límite.
+
+### GSC API, nuevas URLs y Platform Properties
+
+- La URL Inspection API **observa** la versión conocida por el índice; no hace
+  live test ni solicita indexación.
+- El sitemap ping legado fue retirado y responde `404`. Para páginas genéricas,
+  no reemplazarlo con Indexing API: Google la limita a `JobPosting` y
+  livestreams `BroadcastEvent` dentro de `VideoObject`.
+- Para una URL nueva, el flujo robusto es `200` + canonical + `index, follow` +
+  internal link + sitemap con `lastmod` honesto; luego observación asíncrona.
+- Platform Properties existen para Instagram, TikTok, X y YouTube, pero su
+  paridad con Search Console API no está documentada. Exige un canary live antes
+  de modelarlas o prometerlas.
+
+Carga `../references/google-search-console-api-indexing.md` para scopes,
+matriz de capacidades, canary y checkpoints post-publicación.
+
+### Imágenes editoriales y SVG
+
+Google admite SVG en `img[src]` y descubre el fallback de `<picture>`. Exigir un `<img src>` real, filename,
+ALT, contexto/caption, dimensiones, GET/MIME y crawlability. El texto convertido a paths no reemplaza HTML
+indexable. Mantener un raster representativo separado para featured, Open Graph, Twitter y schema de Article.
+Para infografías complejas, usar ALT breve + descripción larga equivalente. Carga
+`../references/editorial-image-seo.md` para el contrato completo.
 
 ## 3. Rendering (JavaScript SEO)
 

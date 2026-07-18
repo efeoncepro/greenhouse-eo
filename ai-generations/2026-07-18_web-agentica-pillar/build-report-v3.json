@@ -1,0 +1,903 @@
+{
+  "version": 7,
+  "generatedAt": "2026-07-18T09:16:55.811Z",
+  "renderer": "Chromium + fontkit outlined delivery",
+  "variants": [
+    {
+      "conceptId": "WAG-V02",
+      "slug": "frontera-operativa",
+      "viewport": "desktop",
+      "theme": "light",
+      "width": 1600,
+      "height": 1080,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-frontera-operativa-desktop-light-v7-source.svg",
+        "bytes": 27431,
+        "sha256": "d6e33773994310ed03186d4d8281b534136ab9aba6d6de32349da09ebbfc86f7"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-frontera-operativa-desktop-light-v7.svg",
+        "bytes": 227129,
+        "sha256": "d92c40328bfbae1e5400afaae548b2a23fd34f274a4a703d6e42e32075d07f02"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-frontera-operativa-desktop-light-v7.png",
+        "bytes": 133358,
+        "sha256": "cfdf81f70da4109ae9eb4b6013b9c4ce7faa661827cbc8531a2686ab42cbf0bf"
+      },
+      "social": null,
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    },
+    {
+      "conceptId": "WAG-V02",
+      "slug": "frontera-operativa",
+      "viewport": "desktop",
+      "theme": "dark",
+      "width": 1600,
+      "height": 1080,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-frontera-operativa-desktop-dark-v7-source.svg",
+        "bytes": 27427,
+        "sha256": "bcffcc1d3e34c30a7c97980305e463ac060771c8b0f956c6eef2e1601d51509f"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-frontera-operativa-desktop-dark-v7.svg",
+        "bytes": 227125,
+        "sha256": "477e4ef58b453af7a1ae0cf559ca17bc903db8aee225cbe46855dde1fc297cd5"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-frontera-operativa-desktop-dark-v7.png",
+        "bytes": 135814,
+        "sha256": "1ce4a86c0131578a1c292a19661512aa50ff6045016423c336b01fbff02d6c91"
+      },
+      "social": null,
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    },
+    {
+      "conceptId": "WAG-V02",
+      "slug": "frontera-operativa",
+      "viewport": "mobile",
+      "theme": "light",
+      "width": 1200,
+      "height": 1600,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-frontera-operativa-mobile-light-v7-source.svg",
+        "bytes": 25683,
+        "sha256": "3de39546241be35c65082dc22a0bd561179cb717aef142cba7b05a11e0a38841"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-frontera-operativa-mobile-light-v7.svg",
+        "bytes": 196901,
+        "sha256": "96ca248acab9b8cfcd8c5cc3eebb330c7e65f91831165d78477b591434d5a9cb"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-frontera-operativa-mobile-light-v7.png",
+        "bytes": 130042,
+        "sha256": "b7619ff237e242b8545a9c9f7008afccf99fdee49f23c9ac2571feb147485f33"
+      },
+      "social": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-frontera-operativa-mobile-light-v7-social.png",
+        "bytes": 22959,
+        "sha256": "125b109284c31698c00817400ac9f6d8f1a8f42df8c2934c5174f421104022dd"
+      },
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    },
+    {
+      "conceptId": "WAG-V02",
+      "slug": "frontera-operativa",
+      "viewport": "mobile",
+      "theme": "dark",
+      "width": 1200,
+      "height": 1600,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-frontera-operativa-mobile-dark-v7-source.svg",
+        "bytes": 25679,
+        "sha256": "3a87ccfb34cbf6a1d37085cff30fcbbbba82218be0f182e978973167aa455259"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-frontera-operativa-mobile-dark-v7.svg",
+        "bytes": 196897,
+        "sha256": "60df4b0eb2c568855ba647da4111ae1007916f79e2caaa074f4b8002f028725b"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-frontera-operativa-mobile-dark-v7.png",
+        "bytes": 133348,
+        "sha256": "bfed2c166a280215de1b9f110f5e9aa29789a484b5d35228f6c3aea95488b78c"
+      },
+      "social": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-frontera-operativa-mobile-dark-v7-social.png",
+        "bytes": 23616,
+        "sha256": "bed58eb37cffd64632957232dfb427c5ab3e791a47272c51dd40559d760a02ed"
+      },
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    },
+    {
+      "conceptId": "WAG-V03",
+      "slug": "arquitectura-compartida",
+      "viewport": "desktop",
+      "theme": "light",
+      "width": 1600,
+      "height": 1080,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-arquitectura-compartida-desktop-light-v7-source.svg",
+        "bytes": 24431,
+        "sha256": "840dacac7afb6fad270ce4c4a7f205f85a605dc324dff4e4a801c03b775ba46a"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-arquitectura-compartida-desktop-light-v7.svg",
+        "bytes": 194951,
+        "sha256": "5ab061db9d84cc050203308211442dc3ba0f493a0cecdd75f2ebba1a81c3856c"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-arquitectura-compartida-desktop-light-v7.png",
+        "bytes": 123048,
+        "sha256": "4387c17c4c7891823aa6586a8fc1c75d6948858ac1f325d8fbdfe2cb8e8c387d"
+      },
+      "social": null,
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    },
+    {
+      "conceptId": "WAG-V03",
+      "slug": "arquitectura-compartida",
+      "viewport": "desktop",
+      "theme": "dark",
+      "width": 1600,
+      "height": 1080,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-arquitectura-compartida-desktop-dark-v7-source.svg",
+        "bytes": 24427,
+        "sha256": "0770ed084ebcc3c1a52014ccc747dcaf0a671605c5f5b648e8fe369f727d01c2"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-arquitectura-compartida-desktop-dark-v7.svg",
+        "bytes": 194947,
+        "sha256": "dd013f6f615fe41a5d73bc681ec4d7d2052df46602fa04e5ce32685e9cd3afd6"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-arquitectura-compartida-desktop-dark-v7.png",
+        "bytes": 125680,
+        "sha256": "fb9b0e3b79d5fdbba64f00f483b07d436b3fc00576d9ec4eb5b6bf42f2c8466f"
+      },
+      "social": null,
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    },
+    {
+      "conceptId": "WAG-V03",
+      "slug": "arquitectura-compartida",
+      "viewport": "mobile",
+      "theme": "light",
+      "width": 1200,
+      "height": 1600,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-arquitectura-compartida-mobile-light-v7-source.svg",
+        "bytes": 23745,
+        "sha256": "538323666e8928452ccc2e11a813493c6afd0885f82bd2be908a151a7be5c002"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-arquitectura-compartida-mobile-light-v7.svg",
+        "bytes": 174461,
+        "sha256": "462a36dd4e76f55d4a19fb0edb4eb79e81f330dba1bb10d9647fcd387812bde7"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-arquitectura-compartida-mobile-light-v7.png",
+        "bytes": 118133,
+        "sha256": "3020e4eca6151ae763a89e34e2e11f904afa7fbbc8eba0bcea54eb6b4325afa7"
+      },
+      "social": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-arquitectura-compartida-mobile-light-v7-social.png",
+        "bytes": 22537,
+        "sha256": "fd8f9157d0a414d4b255e166a077c076126352578e5c9b6856016e4f8d351398"
+      },
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    },
+    {
+      "conceptId": "WAG-V03",
+      "slug": "arquitectura-compartida",
+      "viewport": "mobile",
+      "theme": "dark",
+      "width": 1200,
+      "height": 1600,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-arquitectura-compartida-mobile-dark-v7-source.svg",
+        "bytes": 23741,
+        "sha256": "e3853f92cb29b72ca135c8811a90f45ee9f559a9990f4f31a322dc51b3af4ae0"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-arquitectura-compartida-mobile-dark-v7.svg",
+        "bytes": 174457,
+        "sha256": "2b1192d724bb7155a71744e7f277ab28147c7a8be48e4488ffb80b283bbfd9e0"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-arquitectura-compartida-mobile-dark-v7.png",
+        "bytes": 121371,
+        "sha256": "48cb44b08dd4eb758b78185ef272cc3af90f45198badea0fc92c41b67827c562"
+      },
+      "social": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-arquitectura-compartida-mobile-dark-v7-social.png",
+        "bytes": 23837,
+        "sha256": "244d7fee5fd80eb0b9f71ede31b5d6b8d77116ea10c7bd46353d2355959f4b74"
+      },
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    },
+    {
+      "conceptId": "WAG-V05",
+      "slug": "mapa-ecosistema",
+      "viewport": "desktop",
+      "theme": "light",
+      "width": 1600,
+      "height": 1080,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-mapa-ecosistema-desktop-light-v7-source.svg",
+        "bytes": 26815,
+        "sha256": "68fb9183e186cfeeb20f47b304c6dcef06beb19d1cfbd9de5fd2a9fe7e190a23"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-mapa-ecosistema-desktop-light-v7.svg",
+        "bytes": 238952,
+        "sha256": "16a7e16b329ddf2ec5ce16f1e30c0ee153c78f8cde7105f50af4672a31cfcc38"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-mapa-ecosistema-desktop-light-v7.png",
+        "bytes": 136259,
+        "sha256": "fee9d3cfe20b555fd6cfd2fe5a0e554add38795ec0ed2295b3bd77a7ab01dbce"
+      },
+      "social": null,
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    },
+    {
+      "conceptId": "WAG-V05",
+      "slug": "mapa-ecosistema",
+      "viewport": "desktop",
+      "theme": "dark",
+      "width": 1600,
+      "height": 1080,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-mapa-ecosistema-desktop-dark-v7-source.svg",
+        "bytes": 26811,
+        "sha256": "75c8c35225f6196f74bc2d15b81d5d4eaf5b20dbb931a8b390d8061cdb695ea2"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-mapa-ecosistema-desktop-dark-v7.svg",
+        "bytes": 238948,
+        "sha256": "af75aadca0d74fa83ca6551b945f0b23ab9150662cea353e99a1e13f0d1ae61f"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-mapa-ecosistema-desktop-dark-v7.png",
+        "bytes": 138137,
+        "sha256": "6bdcafa5dfd5407206ee03dd08fdd0bdcdcea25acd9bfdd36989a165e1bd7915"
+      },
+      "social": null,
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    },
+    {
+      "conceptId": "WAG-V05",
+      "slug": "mapa-ecosistema",
+      "viewport": "mobile",
+      "theme": "light",
+      "width": 1200,
+      "height": 1600,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-mapa-ecosistema-mobile-light-v7-source.svg",
+        "bytes": 26445,
+        "sha256": "b8a3e538177c6cd28cbf28e822ee2c4ac763923f5e17e595a62dd6271df4e35c"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-mapa-ecosistema-mobile-light-v7.svg",
+        "bytes": 219737,
+        "sha256": "1448c112fcab3f81fda6ce1f15461f3f195c69dcb0031a679c841cda66e55dc1"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-mapa-ecosistema-mobile-light-v7.png",
+        "bytes": 129298,
+        "sha256": "7a6ca3dc57b6079f0c7fbcd117a8b7f8c5143b8a741c6be3c01d22fe5bb882f5"
+      },
+      "social": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-mapa-ecosistema-mobile-light-v7-social.png",
+        "bytes": 23121,
+        "sha256": "cfc3a62c35387e50b072b62e8b3d90a28036dd06a1d5e7f44df814468ec49c6d"
+      },
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    },
+    {
+      "conceptId": "WAG-V05",
+      "slug": "mapa-ecosistema",
+      "viewport": "mobile",
+      "theme": "dark",
+      "width": 1200,
+      "height": 1600,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-mapa-ecosistema-mobile-dark-v7-source.svg",
+        "bytes": 26441,
+        "sha256": "7abdadd968241e85789881d3d3d6eefb10d0de4dbf38f66d63740a34a384881c"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-mapa-ecosistema-mobile-dark-v7.svg",
+        "bytes": 219733,
+        "sha256": "0a2feed593245f32dda861600ed1854490975ddac0d995d3d9e5a291e8a483ab"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-mapa-ecosistema-mobile-dark-v7.png",
+        "bytes": 131576,
+        "sha256": "3a99084fa5b18bf99b7106862c39d5029a6bdbe25e552eb9686f294aae8fa89d"
+      },
+      "social": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-mapa-ecosistema-mobile-dark-v7-social.png",
+        "bytes": 23864,
+        "sha256": "631668c0b2f39fe1b1efd24823adf729afc05a9203dc3081a40530744aeadded"
+      },
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    },
+    {
+      "conceptId": "WAG-V06",
+      "slug": "circuito-evaluacion",
+      "viewport": "desktop",
+      "theme": "light",
+      "width": 1600,
+      "height": 1080,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-circuito-evaluacion-desktop-light-v7-source.svg",
+        "bytes": 25027,
+        "sha256": "11cfac3c1220ecc4ee42032d0809b7269253228a6f0bff3ef260831420e3c243"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-circuito-evaluacion-desktop-light-v7.svg",
+        "bytes": 191514,
+        "sha256": "075325845f6788d6cae3f18d7d48e04722f697bd838c04e5bf49e74a6bca8c94"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-circuito-evaluacion-desktop-light-v7.png",
+        "bytes": 131455,
+        "sha256": "23f52d1e25f13e17450d65bd49200a6cc0c0221169bac491676104a93f2e03d7"
+      },
+      "social": null,
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    },
+    {
+      "conceptId": "WAG-V06",
+      "slug": "circuito-evaluacion",
+      "viewport": "desktop",
+      "theme": "dark",
+      "width": 1600,
+      "height": 1080,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-circuito-evaluacion-desktop-dark-v7-source.svg",
+        "bytes": 25023,
+        "sha256": "dbc8249809e403d4b95a899b867b077f5c0568fc81dfb60a77e0b7205a0987aa"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-circuito-evaluacion-desktop-dark-v7.svg",
+        "bytes": 191510,
+        "sha256": "a99ac7b260c646891479ad2bb7b7984fad4d5a3b754c25a5b8309a705bc74830"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-circuito-evaluacion-desktop-dark-v7.png",
+        "bytes": 137870,
+        "sha256": "36f920af48f330b64cf2155d87569c6c6a799adfe475c51e596f162e148ae3e6"
+      },
+      "social": null,
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    },
+    {
+      "conceptId": "WAG-V06",
+      "slug": "circuito-evaluacion",
+      "viewport": "mobile",
+      "theme": "light",
+      "width": 1200,
+      "height": 1600,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-circuito-evaluacion-mobile-light-v7-source.svg",
+        "bytes": 25297,
+        "sha256": "26c363f1287b95b4447d21799c951e8b616c67eef5c2b84ca1fe26208e1c879a"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-circuito-evaluacion-mobile-light-v7.svg",
+        "bytes": 187656,
+        "sha256": "74413d4c99e92cca180dfaace177e999595845f8e34e9cfc81a76a68fb7ebb6b"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-circuito-evaluacion-mobile-light-v7.png",
+        "bytes": 121473,
+        "sha256": "a0da8d22ea96b95a20907c5bab0ce1f3cf05f03b8ca563e3bb2f7d9ed8caaf00"
+      },
+      "social": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-circuito-evaluacion-mobile-light-v7-social.png",
+        "bytes": 26391,
+        "sha256": "20c537100e9ba2b26c90656d87f90795e3a453589f404f03df8cd697b989c4d0"
+      },
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    },
+    {
+      "conceptId": "WAG-V06",
+      "slug": "circuito-evaluacion",
+      "viewport": "mobile",
+      "theme": "dark",
+      "width": 1200,
+      "height": 1600,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-circuito-evaluacion-mobile-dark-v7-source.svg",
+        "bytes": 25293,
+        "sha256": "ee7c4e86398e641b33c1fdad1e8f00513596fe87722d9bc2c99d613a76d18273"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-circuito-evaluacion-mobile-dark-v7.svg",
+        "bytes": 187652,
+        "sha256": "991138c84960f42b5c115ded42c21b83222b16fa772b3eddc2c2c0eb417d9874"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-circuito-evaluacion-mobile-dark-v7.png",
+        "bytes": 124362,
+        "sha256": "c34fb94e526377ce3f19b2689f95fc6dc931c266d472476bd7ce2f64818bd1c0"
+      },
+      "social": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-circuito-evaluacion-mobile-dark-v7-social.png",
+        "bytes": 27212,
+        "sha256": "0ec85e7b8b5fe89a0f54d4d59046b9a1d275f7347085b82723561cfe8127b1e5"
+      },
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    },
+    {
+      "conceptId": "WAG-V07",
+      "slug": "madurez-agentica",
+      "viewport": "desktop",
+      "theme": "light",
+      "width": 1600,
+      "height": 1080,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-madurez-agentica-desktop-light-v7-source.svg",
+        "bytes": 25648,
+        "sha256": "780750d6e18073571a11318d8611261ea31a3c2a72c8196f030977055cc24795"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-madurez-agentica-desktop-light-v7.svg",
+        "bytes": 198377,
+        "sha256": "0f515abfb0d618febb10dff53f9e9f668f44a39954422dbf47133fa0f06ef060"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-madurez-agentica-desktop-light-v7.png",
+        "bytes": 117680,
+        "sha256": "37048993d5b96a16af3d1e7a5a81f120ec78240d7fca0575cb6358b5e326fafc"
+      },
+      "social": null,
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    },
+    {
+      "conceptId": "WAG-V07",
+      "slug": "madurez-agentica",
+      "viewport": "desktop",
+      "theme": "dark",
+      "width": 1600,
+      "height": 1080,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-madurez-agentica-desktop-dark-v7-source.svg",
+        "bytes": 25644,
+        "sha256": "4a2ec7735c6598d489a5d672c29007460bff8ccbe64f9accbc9206591a6bd40c"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-madurez-agentica-desktop-dark-v7.svg",
+        "bytes": 198373,
+        "sha256": "71f503f45090aef11eecad5ed90469a3df7f4e061982531a850a15cbeb529904"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-madurez-agentica-desktop-dark-v7.png",
+        "bytes": 119472,
+        "sha256": "b982dc5359a865712f87f39b346d0baee08e7b5544546c853bba574b76dd6d8b"
+      },
+      "social": null,
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    },
+    {
+      "conceptId": "WAG-V07",
+      "slug": "madurez-agentica",
+      "viewport": "mobile",
+      "theme": "light",
+      "width": 1200,
+      "height": 1600,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-madurez-agentica-mobile-light-v7-source.svg",
+        "bytes": 25647,
+        "sha256": "b80fdf1e7feb1a383323786c84e64ea4cbe9ec0bd17241769305793570bbbd96"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-madurez-agentica-mobile-light-v7.svg",
+        "bytes": 199064,
+        "sha256": "d10a4b0e859e67c92a6fa94cab4df2732d4605ed55ce98750519cb583632816f"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-madurez-agentica-mobile-light-v7.png",
+        "bytes": 136461,
+        "sha256": "ad2b255c7279b23a5c612b9059e5445875e633869f9fbd3b516a7a9029afdb2a"
+      },
+      "social": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-madurez-agentica-mobile-light-v7-social.png",
+        "bytes": 28130,
+        "sha256": "7f89ce6a64d5abe836e7097f2e2b87f4781ac4d7b0d467d2edbf9f4b1cab3a18"
+      },
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    },
+    {
+      "conceptId": "WAG-V07",
+      "slug": "madurez-agentica",
+      "viewport": "mobile",
+      "theme": "dark",
+      "width": 1200,
+      "height": 1600,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-madurez-agentica-mobile-dark-v7-source.svg",
+        "bytes": 25643,
+        "sha256": "b2800839ac7794022af68e082f6e100837bba3d8246b9bcf491e1a450720b5b8"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-madurez-agentica-mobile-dark-v7.svg",
+        "bytes": 199060,
+        "sha256": "552024bd6e89d633961c06cc25e049b755c933969c890213c12eec7ca5291f41"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-madurez-agentica-mobile-dark-v7.png",
+        "bytes": 139523,
+        "sha256": "8e39686c2241af09b9065d8fe76b60ca24ede85628b25119d08218d9375859ab"
+      },
+      "social": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-madurez-agentica-mobile-dark-v7-social.png",
+        "bytes": 29278,
+        "sha256": "7d842c181b6527b2c61a7df5bdef51bf84df4d0d959803df12617bb985c8300e"
+      },
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    },
+    {
+      "conceptId": "WAG-V08",
+      "slug": "readiness-12-pruebas",
+      "viewport": "desktop",
+      "theme": "light",
+      "width": 1600,
+      "height": 1080,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-readiness-12-pruebas-desktop-light-v7-source.svg",
+        "bytes": 28357,
+        "sha256": "353dcd4a469b07d68a39a5bb33da3f2241e7d72db59b170e67f607a36b1cad52"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-readiness-12-pruebas-desktop-light-v7.svg",
+        "bytes": 218850,
+        "sha256": "e8400534e07a39712da4267edff613275189f7780dfe2da6436c6ddc154d252c"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-readiness-12-pruebas-desktop-light-v7.png",
+        "bytes": 113343,
+        "sha256": "d8230f47f88d293b6cd6a5a9053079ffa0a557455c05459b2b3f7d3f862bd204"
+      },
+      "social": null,
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    },
+    {
+      "conceptId": "WAG-V08",
+      "slug": "readiness-12-pruebas",
+      "viewport": "desktop",
+      "theme": "dark",
+      "width": 1600,
+      "height": 1080,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-readiness-12-pruebas-desktop-dark-v7-source.svg",
+        "bytes": 28353,
+        "sha256": "8f0b9cf3c6b1f1d0dfb954b29dc151a1910c1600f59d53950dfc3fc974a1a7d4"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-readiness-12-pruebas-desktop-dark-v7.svg",
+        "bytes": 218846,
+        "sha256": "be3c8bc9d253d042ef255e7d49065453c11b0e1709e00bc321a2af5fa2cb4a44"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-readiness-12-pruebas-desktop-dark-v7.png",
+        "bytes": 115899,
+        "sha256": "ab26354dd80db039f93b9c1be2306d32bbbb84023e5af42246ad70ee7aa5cea7"
+      },
+      "social": null,
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    },
+    {
+      "conceptId": "WAG-V08",
+      "slug": "readiness-12-pruebas",
+      "viewport": "mobile",
+      "theme": "light",
+      "width": 1200,
+      "height": 1600,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-readiness-12-pruebas-mobile-light-v7-source.svg",
+        "bytes": 26080,
+        "sha256": "19ec837259a1df0892ad7a5e0288f74c90c5907f8ff25ff4127bd7c51284f23f"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-readiness-12-pruebas-mobile-light-v7.svg",
+        "bytes": 193202,
+        "sha256": "ff977068d283b4dc51db83bff0c17f052f5e43ee722b133cf00962e1664e0238"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-readiness-12-pruebas-mobile-light-v7.png",
+        "bytes": 112568,
+        "sha256": "24d785ed404a1d5e0ebea5cd422bb59be4a23c697b94af5c646f32777421a130"
+      },
+      "social": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-readiness-12-pruebas-mobile-light-v7-social.png",
+        "bytes": 14224,
+        "sha256": "0a8db616db996fb8c65019832e9eaed10c482a1bee6ff60f1b77f9933c34c2ef"
+      },
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    },
+    {
+      "conceptId": "WAG-V08",
+      "slug": "readiness-12-pruebas",
+      "viewport": "mobile",
+      "theme": "dark",
+      "width": 1200,
+      "height": 1600,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-readiness-12-pruebas-mobile-dark-v7-source.svg",
+        "bytes": 26076,
+        "sha256": "c97c5bb025beeac590517e810f2461a29317a3d64352de15b65d0b8d64936ca5"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-readiness-12-pruebas-mobile-dark-v7.svg",
+        "bytes": 193198,
+        "sha256": "523adde2c6e624cfddaf9121608caf2b6ada0ee6d13695e28dbb22670ccf45e8"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-readiness-12-pruebas-mobile-dark-v7.png",
+        "bytes": 114860,
+        "sha256": "034519f4f13b9c013ba4bcc4038cbb50991ed2870c42e5608f1b702450963216"
+      },
+      "social": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-readiness-12-pruebas-mobile-dark-v7-social.png",
+        "bytes": 14455,
+        "sha256": "543e204d54d82b4429415130e464c585a9d9471eac757b8392372058cf26cc8b"
+      },
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    },
+    {
+      "conceptId": "WAG-V04",
+      "slug": "cadena-autoridad",
+      "viewport": "desktop",
+      "theme": "light",
+      "width": 1600,
+      "height": 1080,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-cadena-autoridad-desktop-light-v7-source.svg",
+        "bytes": 26576,
+        "sha256": "3809416771ddc28d57d461410e419738b3db4fefade42edcc2bb3bc96a085506"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-cadena-autoridad-desktop-light-v7.svg",
+        "bytes": 217761,
+        "sha256": "b3dd25e6171929ac64c30cfa4a7daaea571c484b4217ad3d47708a3161cc3049"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-cadena-autoridad-desktop-light-v7.png",
+        "bytes": 114180,
+        "sha256": "c42818ec5b93db26616c755563f137fc19ec4a9c4098238d55ce8911d0733bbc"
+      },
+      "social": null,
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    },
+    {
+      "conceptId": "WAG-V04",
+      "slug": "cadena-autoridad",
+      "viewport": "desktop",
+      "theme": "dark",
+      "width": 1600,
+      "height": 1080,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-cadena-autoridad-desktop-dark-v7-source.svg",
+        "bytes": 26572,
+        "sha256": "abca8b681c4dd55b3ef312ef1535bfc9e7dba9cdd734bd002ab81b4c9616ac8a"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-cadena-autoridad-desktop-dark-v7.svg",
+        "bytes": 217757,
+        "sha256": "a804d5ad1a6a99eb4906e7d14eaa6241cb633b57534cef2c20f1275652dee78c"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-cadena-autoridad-desktop-dark-v7.png",
+        "bytes": 116092,
+        "sha256": "abfc7a93a16dd4d2595aa751fafacb211dfd1f2677e4aed3099d3f21ba6b0bb7"
+      },
+      "social": null,
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    },
+    {
+      "conceptId": "WAG-V04",
+      "slug": "cadena-autoridad",
+      "viewport": "mobile",
+      "theme": "light",
+      "width": 1200,
+      "height": 1600,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-cadena-autoridad-mobile-light-v7-source.svg",
+        "bytes": 25207,
+        "sha256": "b51171d13c45dbf17dc7714b4cf2cf916cb206d98c0f4ac288934814c6b558ed"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-cadena-autoridad-mobile-light-v7.svg",
+        "bytes": 176767,
+        "sha256": "afce8934ced819427f1d79546912c53f12cad540e3bf447b22f2da2f0776a2fc"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-cadena-autoridad-mobile-light-v7.png",
+        "bytes": 117078,
+        "sha256": "88a0e9ac1df8570e5ff4b9a5aed4f05313bfa92d2154f56f7477c89aee3dd454"
+      },
+      "social": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-cadena-autoridad-mobile-light-v7-social.png",
+        "bytes": 23075,
+        "sha256": "b396f82c6048f65b2db531dbdcbc5fdbfc9942518f3aeb4ac081f0d983a7ebbd"
+      },
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    },
+    {
+      "conceptId": "WAG-V04",
+      "slug": "cadena-autoridad",
+      "viewport": "mobile",
+      "theme": "dark",
+      "width": 1200,
+      "height": 1600,
+      "source": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/source-v3/web-agentica-cadena-autoridad-mobile-dark-v7-source.svg",
+        "bytes": 25203,
+        "sha256": "a5fe6d452c83afe3f5f79b7671cc2b0207eca0188c8d9d142e5ba52e7ab5c520"
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery-v3/web-agentica-cadena-autoridad-mobile-dark-v7.svg",
+        "bytes": 176763,
+        "sha256": "da69d8a65a2f1fcca3ca3409d18ea459a922efd1d2a9644109c936df9085ae3a"
+      },
+      "review": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-cadena-autoridad-mobile-dark-v7.png",
+        "bytes": 119268,
+        "sha256": "3cf41b712b99885d16f7e8d61f58a5b65be82157a14f2f1df34f9f7491c0325d"
+      },
+      "social": {
+        "path": "ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-cadena-autoridad-mobile-dark-v7-social.png",
+        "bytes": 23975,
+        "sha256": "44f66e2919bd3c2da5d2c59a2ca838e70f1b494b1e0fc7eb13571275da44841b"
+      },
+      "qa": {
+        "canvasOverflow": false,
+        "liveTextInDelivery": false,
+        "gradients": false,
+        "filters": false
+      }
+    }
+  ]
+}

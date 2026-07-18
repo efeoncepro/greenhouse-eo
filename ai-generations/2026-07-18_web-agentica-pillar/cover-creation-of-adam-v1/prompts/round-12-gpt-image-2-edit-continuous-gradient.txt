@@ -1,0 +1,26 @@
+Edit the supplied image with strict high-fidelity preservation.
+
+LOCKED — DO NOT CHANGE ANY FOREGROUND ELEMENT:
+- exact 2048x1152 crop, camera and composition;
+- human hand, anatomy, skin, pose and fingertip;
+- robotic hand, anatomically anchored index-pointing topology, navy material, joints, pose and fingertip;
+- both interface planes, perspective, size, content, acrylic edges and registration;
+- exactly five separate orange authorization segments;
+- all foreground shadows, highlights, sharpness and scale.
+
+CHANGE ONLY THE BACKGROUND COLOR FIELD:
+- Remove every hard-edged triangle, wedge, ray, spotlight shape and geometric color boundary.
+- Replace them with one seamless, continuous premium Efeonce gradient spanning the full canvas.
+- Gradient direction: approximately 120 degrees, flowing naturally from the human lower-left toward the agent upper-right.
+- Color progression, smooth and band-free:
+  1. warm editorial white at the far left and lower-left behind the human hand;
+  2. cool off-white and very pale mineral blue approaching the center;
+  3. a soft ice-blue lift directly behind the two interface planes so their acrylic edges remain crisp;
+  4. medium Efeonce active blue through the right-middle;
+  5. saturated deep Efeonce navy at the far upper-right and right edge, visibly blue and never near-black.
+- The transition must be continuous with no visible stops, stripes, angular shapes or radial halo. It should feel like depth and atmosphere, not a graphic object.
+- Preserve subtle uncoated-paper micro-grain across the whole gradient to prevent digital banding, but do not introduce mottling, clouds, smoke or noise.
+- Keep enough mid-blue separation behind the navy robotic hand; retain a fine natural pale rim from the existing lighting, not a glow.
+- The center remains luminous enough to keep the interface as level-one focus. The background must support the diagonal movement without competing with it.
+
+No changes outside the background. No black, geometric triangles, rays, vignette, glow, neon, particles, text, logo, watermark, new objects or altered fingers.

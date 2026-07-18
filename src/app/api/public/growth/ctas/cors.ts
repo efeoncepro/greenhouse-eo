@@ -82,7 +82,8 @@ export const publicCtasCorsHeaders = async (request: Request, methods: string): 
     if (allowed.has(origin)) {
       headers['Access-Control-Allow-Origin'] = origin
       headers['Access-Control-Allow-Methods'] = methods
-      headers['Access-Control-Allow-Headers'] = 'content-type, accept, x-greenhouse-cta-embed-key'
+      headers['Access-Control-Allow-Headers'] =
+        'content-type, accept, x-greenhouse-cta-embed-key, x-greenhouse-cta-visitor, x-greenhouse-cta-session, x-greenhouse-cta-consent, x-greenhouse-cta-consent-source'
       headers['Access-Control-Max-Age'] = '86400'
     }
   }

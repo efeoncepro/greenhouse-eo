@@ -50,6 +50,7 @@ greenhouse-cta, .ghc-scope {
   --gh-cta-reserve: 148px;
   --gh-cta-motion-duration: 180ms;
   --gh-cta-motion-ease: cubic-bezier(0.2, 0, 0, 1);
+  --gh-cta-z: 2147482000;
 
   display: block;
   container-type: inline-size;
@@ -64,15 +65,34 @@ greenhouse-cta, .ghc-scope {
 :is(greenhouse-cta, .ghc-scope)[data-ghc-state='loading'] { min-height: var(--gh-cta-reserve); }
 :is(greenhouse-cta, .ghc-scope)[data-ghc-state='dismissed'], :is(greenhouse-cta, .ghc-scope)[data-ghc-state='empty'] { display: none; }
 
-/* Dark scheme del host: tokens alternos; data-color-scheme='light' lo fija claro. */
-@media (prefers-color-scheme: dark) {
-  greenhouse-cta:not([data-color-scheme='light']), .ghc-scope:not([data-color-scheme='light']) {
-    --gh-cta-fg: #e6eaf0;
-    --gh-cta-fg-muted: #9aa6b5;
-    --gh-cta-bg: #10161f;
-    --gh-cta-bg-soft: #171f2b;
-    --gh-cta-border: #263140;
-    --gh-cta-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+/* ── Pares dark (TASK-1429, piso 2026): light-dark() en browsers modernos (una sola
+   declaración por token, cero duplicación); el media query queda como fallback legacy.
+   Los NOMBRES de token no cambian (contrato público con hosts). ─────────────── */
+@supports (color: light-dark(red, blue)) {
+  greenhouse-cta, .ghc-scope {
+    color-scheme: light dark;
+    --gh-cta-fg: light-dark(#1f2937, #e6eaf0);
+    --gh-cta-fg-muted: light-dark(#55606e, #9aa6b5);
+    --gh-cta-bg: light-dark(#ffffff, #10161f);
+    --gh-cta-bg-soft: light-dark(#f5f7fa, #171f2b);
+    --gh-cta-border: light-dark(#dde3ea, #263140);
+    --gh-cta-shadow: 0 1px 2px light-dark(rgba(15, 23, 42, 0.06), rgba(0, 0, 0, 0.4));
+  }
+
+  greenhouse-cta[data-color-scheme='light'], .ghc-scope[data-color-scheme='light'] { color-scheme: light; }
+}
+
+/* Fallback legacy (sin light-dark): dark por media query, igual que TASK-1340. */
+@supports not (color: light-dark(red, blue)) {
+  @media (prefers-color-scheme: dark) {
+    greenhouse-cta:not([data-color-scheme='light']), .ghc-scope:not([data-color-scheme='light']) {
+      --gh-cta-fg: #e6eaf0;
+      --gh-cta-fg-muted: #9aa6b5;
+      --gh-cta-bg: #10161f;
+      --gh-cta-bg-soft: #171f2b;
+      --gh-cta-border: #263140;
+      --gh-cta-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    }
   }
 }
 
@@ -131,6 +151,7 @@ greenhouse-cta, .ghc-scope {
   line-height: 1.55;
   color: var(--gh-cta-fg-muted);
   max-width: 60ch;
+  text-wrap: pretty;
 }
 
 :is(greenhouse-cta, .ghc-scope) .ghc-footnote {
@@ -175,6 +196,26 @@ greenhouse-cta, .ghc-scope {
 
 :is(greenhouse-cta, .ghc-scope) .ghc-primary:hover { filter: brightness(1.08); box-shadow: var(--gh-cta-shadow-lift); }
 :is(greenhouse-cta, .ghc-scope) .ghc-primary:active { transform: translateY(1px); }
+
+/* Ramp de hover perceptualmente uniforme (TASK-1429): color-mix en OKLCH reemplaza el
+   filter en browsers modernos — SOLO en la variante filled default (spotlight/minimal
+   tienen su propia semántica de hover). Fallback legacy: el filter de arriba. */
+@supports (color: color-mix(in oklch, red, white)) {
+  :is(greenhouse-cta, .ghc-scope):not([data-ghc-variant='spotlight']):not([data-ghc-variant='minimal']) .ghc-primary:hover {
+    filter: none;
+    background: color-mix(in oklch, var(--gh-cta-accent) 86%, white);
+  }
+}
+
+/* Press con sensación física (TASK-1429, motion doc): linear() SOLO en transform. */
+@supports (transition-timing-function: linear(0, 1)) {
+  :is(greenhouse-cta, .ghc-scope) .ghc-primary {
+    --gh-cta-motion-spring: linear(0, 0.7 40%, 1.04 70%, 1);
+    transition: filter var(--gh-cta-motion-duration) var(--gh-cta-motion-ease),
+      box-shadow var(--gh-cta-motion-duration) var(--gh-cta-motion-ease),
+      transform calc(var(--gh-cta-motion-duration) * 0.8) var(--gh-cta-motion-spring);
+  }
+}
 :is(greenhouse-cta, .ghc-scope) .ghc-primary:focus-visible {
   outline: 2px solid var(--gh-cta-focus);
   outline-offset: 2px;
@@ -262,6 +303,86 @@ greenhouse-cta, .ghc-scope {
 :is(greenhouse-cta, .ghc-scope) .ghc-form-slot { display: grid; gap: var(--gh-cta-gap); }
 :is(greenhouse-cta, .ghc-scope)[data-ghc-state='form_open'] .ghc-actions .ghc-primary { display: none; }
 
+/* ══ Slide-in interruptivo (TASK-1429) — shell fijo no modal ═══════════
+   Geometría del PLACEMENT (nunca del appearance): edge-aligned en wide,
+   bottom + safe-area en compact. Density full|condensed|peek por container
+   query del PROPIO shell. Enter/exit con @starting-style + allow-discrete:
+   el estado jamás depende de animationend (motion doc TASK-1429). */
+:is(greenhouse-cta, .ghc-scope).ghc-slidein {
+  position: fixed;
+  z-index: var(--gh-cta-z);
+  inset-inline-end: 24px;
+  inset-inline-start: auto;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  width: min(420px, calc(100vw - 48px));
+  margin: 0;
+  --ghc-slidein-shift: 20px 0;
+}
+
+:is(greenhouse-cta, .ghc-scope).ghc-slidein[data-ghc-state='waiting'] { display: none; }
+
+:is(greenhouse-cta, .ghc-scope).ghc-slidein {
+  transition:
+    display var(--gh-cta-motion-duration) allow-discrete,
+    opacity var(--gh-cta-motion-duration) var(--gh-cta-motion-ease),
+    translate var(--gh-cta-motion-duration) var(--gh-cta-motion-ease);
+}
+
+/* Entrada desde el borde lógico (wide) / desde abajo (compact). */
+@starting-style {
+  :is(greenhouse-cta, .ghc-scope).ghc-slidein[data-ghc-state='visible'],
+  :is(greenhouse-cta, .ghc-scope).ghc-slidein[data-ghc-state='form_open'] {
+    opacity: 0;
+    translate: var(--ghc-slidein-shift);
+  }
+}
+
+/* Salida inversa breve: la persistencia YA ocurrió; display:none llega al final
+   de la transición (allow-discrete) sin listeners JS. */
+:is(greenhouse-cta, .ghc-scope).ghc-slidein[data-ghc-state='dismissed'] {
+  display: none;
+  opacity: 0;
+  translate: var(--ghc-slidein-shift);
+}
+
+/* Card del slide_in — keyed por PLACEMENT (data del contrato, lo setea el renderer
+   en el overlay Y en el preview inline: paridad por construcción). La clase
+   .ghc-slidein queda SOLO para la geometría fija del overlay real. */
+:is(greenhouse-cta, .ghc-scope)[data-ghc-placement='slide_in'] .ghc-card {
+  animation: none;
+  box-shadow: var(--gh-cta-shadow-lift);
+  max-height: min(70vh, 560px);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+/* Dismiss del interruptivo: target táctil pleno (wireframe a11y ≥44px). */
+:is(greenhouse-cta, .ghc-scope)[data-ghc-placement='slide_in'] .ghc-dismiss { width: 44px; height: 44px; top: 4px; right: 4px; }
+
+/* Compact (viewport angosto): panel inferior dentro de safe areas, nunca un
+   falso modal full-screen. */
+@media (max-width: 719px) {
+  :is(greenhouse-cta, .ghc-scope).ghc-slidein {
+    inset-inline: 12px;
+    width: auto;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    --ghc-slidein-shift: 0 16px;
+  }
+}
+
+/* ── Density del slide_in (container query del propio contenedor; wireframe
+   skeletons): peek (<400px) = headline + acción + dismiss — composición real,
+   no clipping. condensed (400-559px) = + body esencial. full (≥560px) =
+   + footnote/visual (reglas ≥560 existentes). Orden semántico invariante.
+   Keyed por placement: aplica igual en overlay y preview (paridad). ── */
+@container (max-width: 559px) {
+  :is(greenhouse-cta, .ghc-scope)[data-ghc-placement='slide_in'] .ghc-footnote { display: none; }
+}
+
+@container (max-width: 399px) {
+  :is(greenhouse-cta, .ghc-scope)[data-ghc-placement='slide_in'] .ghc-body { display: none; }
+}
+
 /* ── Skeleton (anti-CLS) ─────────────────────────────────────────────── */
 :is(greenhouse-cta, .ghc-scope) .ghc-skeleton {
   display: grid;
@@ -301,12 +422,15 @@ greenhouse-cta, .ghc-scope {
   :is(greenhouse-cta, .ghc-scope) .ghc-card { animation: none; }
   :is(greenhouse-cta, .ghc-scope) .ghc-skeleton-row { animation: none; }
   :is(greenhouse-cta, .ghc-scope) .ghc-primary, :is(greenhouse-cta, .ghc-scope) .ghc-dismiss { transition: none; }
+  /* Slide-in: sin travel — aparece/desaparece en estado final (semántica intacta). */
+  :is(greenhouse-cta, .ghc-scope).ghc-slidein { transition: none; translate: none; }
 }
 
 /* ── Forced colors (Windows high contrast) ───────────────────────────── */
 @media (forced-colors: active) {
   :is(greenhouse-cta, .ghc-scope) .ghc-card { border: 1px solid CanvasText; }
   :is(greenhouse-cta, .ghc-scope) .ghc-primary { border: 1px solid ButtonText; }
+  :is(greenhouse-cta, .ghc-scope).ghc-slidein .ghc-card { border: 1px solid CanvasText; }
 }
 `
 

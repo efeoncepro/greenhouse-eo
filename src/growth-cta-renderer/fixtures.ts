@@ -63,4 +63,42 @@ export const CTA_FIXTURES: Record<string, { label: string; build: () => CtaRende
         },
       }),
   },
+
+  // ── TASK-1429 — slide_in interruptivo (pairwise placement × appearance × contenido) ──
+  slideIn: {
+    label: 'Slide-in (interruptivo, default)',
+    build: () => base({ slug: 'ai-visibility-slide-in', placement: 'slide_in', interruptive: true }),
+  },
+  slideInSpotlight: {
+    label: 'Slide-in spotlight (máximo énfasis tokenizado)',
+    build: () =>
+      base({ slug: 'ai-visibility-slide-in-spotlight', placement: 'slide_in', interruptive: true, styleVariant: 'spotlight' }),
+  },
+  slideInMinimal: {
+    label: 'Slide-in minimal (editorial, peek-friendly)',
+    build: () =>
+      base({ slug: 'ai-visibility-slide-in-minimal', placement: 'slide_in', interruptive: true, styleVariant: 'minimal' }),
+  },
+  slideInLongCopy: {
+    label: 'Slide-in copy largo (límite de alto + scroll interno)',
+    build: () =>
+      base({
+        slug: 'ai-visibility-slide-in-long',
+        placement: 'slide_in',
+        interruptive: true,
+        content: {
+          eyebrow: 'Siguiente paso sugerido',
+          headline: 'Descubre exactamente cómo los motores de respuesta con IA describen, citan y recomiendan a tu marca hoy',
+          body: 'Los compradores ya no buscan: preguntan. Mide tu visibilidad en ChatGPT, Gemini y Perplexity con el AI Visibility Grader, identifica las brechas frente a tu competencia y recibe un informe accionable con los pasos concretos para aparecer en las respuestas de los motores.',
+          ctaLabel: 'Generar mi informe de visibilidad',
+          dismissLabel: 'Ahora no, gracias',
+          footnote: 'Gratis. Toma menos de 2 minutos y no necesitas tarjeta.',
+        },
+      }),
+  },
+  slideInUnknownAppearance: {
+    label: 'Slide-in appearance desconocida (fallback default)',
+    build: () =>
+      base({ slug: 'ai-visibility-slide-in-unknown', placement: 'slide_in', interruptive: true, styleVariant: 'campaign-neon' }),
+  },
 }

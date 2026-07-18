@@ -36,6 +36,21 @@
 - `docs/context/` — context pack de negocio/marca/GTM (empezar por `00_INDEX.md`; `05` voz, `06` métricas, `08` comercial).
 - Ecosistema de contenidos (Think / Marketing con Manzanitas / Glitch / ebooks) → `efeonce/EFEONCE_OVERLAY.md`.
 
+## Infografía editorial y benchmark visual (as-of 2026-07)
+
+- Sistema y auditoría Efeonce → `efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md`.
+- Precedentes SVG propios:
+  - `https://efeoncepro.com/inbound/estrategia-de-contenidos/`
+  - `https://efeoncepro.com/inbound/genera-leads-con-marketing-de-contenidos/`
+  - `https://efeoncepro.com/inbound/seo-inbound-marketing/`
+- Benchmark primario Semrush:
+  - `https://www.semrush.com/blog/infographic-examples/`
+  - `https://www.semrush.com/blog/content-marketing-tips/`
+  - `https://www.semrush.com/blog/types-of-content-marketing/`
+
+Semrush se usa para estudiar el principio “chrome estable + cuerpo semántico variable + póster autónomo”, no
+para copiar paleta, trade dress ni composiciones literales.
+
 ## Nota de honestidad
 
 Cuando cites un benchmark externo, formato: `<dato> (<fuente>, <as-of AAAA-MM>)`. Si no puedes verificar, dilo. La barra de originalidad (`03`, `07`) aplica también a las fuentes: prefiere dato propio de Efeonce cuando exista.

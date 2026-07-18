@@ -58,8 +58,13 @@ export interface CtaRenderContractMirror {
   }
 }
 
-/** Respuesta del GET público de render (0–1 interruptivo + N no-interruptivos, ya resueltos). */
+/**
+ * Respuesta del GET público de render (0–1 interruptivo + N no-interruptivos, ya resueltos).
+ * `engineState` (TASK-1428, aditivo): `killed` = retiro operativo (§16.3) — el renderer
+ * no monta NADA (nunca un falso `dismissed`); ausente = `ok` (compat).
+ */
 export interface ArbitratedRenderResultMirror {
   interruptive: CtaRenderContractMirror | null
   nonInterruptive: CtaRenderContractMirror[]
+  engineState?: 'ok' | 'killed'
 }

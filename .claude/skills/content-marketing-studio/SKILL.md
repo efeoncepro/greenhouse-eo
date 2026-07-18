@@ -1,7 +1,7 @@
 ---
 name: content-marketing-studio
 description: >-
-  Studio de ejecución del motor de contenidos 2026. Operacionaliza estrategia editorial y produce, opera, atomiza, distribuye y mide blog/pillar, ebook/whitepaper, case study, newsletter, webinar, video y podcast. Incluye sistema visual editorial, infografías determinísticas SVG→PNG→WebP y Método de utilidad citable para link earning, backlinks, menciones y contenido que terceros puedan compartir, enlazar o citar. Encadena conversión a `growth-marketing-cro`, descubribilidad a `seo-aeo`, palabras a `copywriting`, social a `social-media-studio` y publicación a su skill dueña. Usar para estrategia/calendario editorial, pillar/cluster, topical authority, content ops, repurposing, distribución, content brief, newsletter, lead magnet, case study, thought leadership, infografía editorial, diagrama SVG, visualización exacta de datos/copy, linkable assets, contenido enlazable/citable, content ROI, AI content, content factory y content-led growth.
+  Studio de ejecución del motor de contenidos 2026. Operacionaliza estrategia editorial y produce, opera, atomiza, distribuye y mide blog/pillar, ebook/whitepaper, case study, newsletter, webinar, video y podcast. Incluye sistema visual editorial, infografías determinísticas con entrega SVG directa o raster basada en evidencia y Método de utilidad citable para link earning, backlinks, menciones y contenido que terceros puedan compartir, enlazar o citar. Encadena conversión a `growth-marketing-cro`, descubribilidad a `seo-aeo`, palabras a `copywriting`, social a `social-media-studio` y publicación a su skill dueña. Usar para estrategia/calendario editorial, pillar/cluster, topical authority, content ops, repurposing, distribución, content brief, newsletter, lead magnet, case study, thought leadership, infografía editorial, diagrama SVG, visualización exacta de datos/copy, linkable assets, contenido enlazable/citable, content ROI, AI content, content factory y content-led growth.
 type: skill
 user-invocable: true
 argument-hint: "[etapa del content engine o pregunta concreta]"
@@ -34,8 +34,13 @@ si estas decisiones sólo aparecen en prosa.
 
 **Routing de infografía determinística:** si el significado depende de texto, cifras, ejes, conectores, logos o
 variantes responsive/theme exactas, carga `references/deterministic-editorial-infographics.md`. El método gobierna
-`contrato → SVG → PNG master → WebP → QA → manifest`; `design-studio` dirige la composición y `dataviz-design`
+`contrato → SVG source → delivery SVG y/o derivados raster → QA → manifest`; `design-studio` dirige la composición y `dataviz-design`
 gobierna el encoding cuando la visualización analítica lo requiere.
+Para Efeonce, cargar además `efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md`: gobierna paleta, shell de marca,
+arquetipos, sello `efeoncepro.com`, SVG directo y benchmark de shareability.
+Si la pieza se integrará en web, cargar también `.codex/skills/seo-aeo/references/editorial-image-seo.md` y el canon
+`docs/operations/public-site-content-factory/EDITORIAL_INFOGRAPHIC_OPERATING_MODEL_V1.md`: body SVG,
+featured/OG raster, footer-only, descripción larga, legibilidad CSS y estados por canal son contratos distintos.
 Para una portada/hero que “parece producto”, el mismo gate sigue vigente: si contiene gráficos o copy exactos,
 usar SVG y cargar `../design-studio/modules/11_PRODUCT_STORY_SCENES.md`; la gramática es agnóstica y el skin se
 decide por tema, sin convertir una paleta contextual de plataforma en branding Efeonce.
@@ -73,7 +78,8 @@ técnico que la pieza enseña; no conviertas jerga ni taxonomía de una sola pie
 ├─ Medir contenido→pipeline (leading/lagging, influenced pipeline, content ROI) .... 06_MEASUREMENT
 ├─ Producir con IA sin slop (Content Factory, fidelidad de voz, gobernanza) ........ 07_AI_CONTENT
 ├─ Diseñar/producir el sistema visual editorial, hero/body/OG y Media Library ..... references/agentic-editorial-visual-system
-├─ Producir infografía exacta SVG→PNG→WebP con QA y manifest ....................... references/deterministic-editorial-infographics
+├─ Producir infografía exacta SVG directo/raster con QA y manifest ................. references/deterministic-editorial-infographics
+├─ Aplicar el sistema editorial de infografías Efeonce .............................. efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM
 ├─ Diseñar utilidad citable para links/menciones/citas ............................. references/citation-utility-method
 ├─ Traducir tesis técnica a metadata y taxonomía comprensibles ..................... references/metadata-translation-method
 ├─ Madurar Pillar→ebook→tool→producto sin mezclar sources of truth ................. references/knowledge-to-product-ladder
@@ -147,10 +153,11 @@ Carga selectiva: no traigas los 7 módulos de una.
 | `modules/06_MEASUREMENT.md` | Leading/lagging, engagement→influenced pipeline, content ROI, atribución — hand-off a gtm-ga4/growth |
 | `modules/07_AI_CONTENT.md` | Content Factory/Media Foundry, contenido asistido por IA, anti AI-slop, fidelidad de voz, gobernanza |
 | `references/agentic-editorial-visual-system.md` | Flujo visual editorial: función contextual→sistema coherente→concept IDs/manifest→GPT Image 2→masters/derivados→Media Library→QA público |
-| `references/deterministic-editorial-infographics.md` | Método exacto: contrato editorial/datos→SVG accesible→Chromium/PNG master→WebP→QA original/contextual→manifest |
+| `references/deterministic-editorial-infographics.md` | Método exacto: contrato editorial/datos→SVG source→delivery SVG o raster justificado→QA original/contextual→manifest |
 | `references/citation-utility-method.md` | Método de utilidad citable: caso→objeto reutilizable→evidencia/límites→anchors→validación por pares→link earning/medición |
 | `references/metadata-translation-method.md` | Traducción editorial de metadata: problema reconocido→gate de jerga→trabajo por superficie→taxonomía→snapshot/readback |
 | `references/knowledge-to-product-ladder.md` | Escalera Pillar→satélites→ebook/workbook→tool diagnóstica→producto, con separación de evidencia y gates |
 | `ANTIPATTERNS.md` · `GLOSSARY.md` · `SOURCES.md` | Antipatrones, vocabulario, fuentes/benchmarks 2026 |
 | `efeonce/EFEONCE_OVERLAY.md` | Ecosistema Efeonce: Think, Marketing con Manzanitas, Glitch, Content Factory, ebooks/lead magnets, bow-tie, ICPs |
-| `templates/` | content-strategy-brief, pillar-cluster-map, editorial-calendar, content-brief, citation-utility-contract, repurposing-map, distribution-plan, measurement-dashboard |
+| `efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md` | Canon de infografías: precedentes, paleta, shell estable, arquetipos variables, sello URL, SVG directo, benchmark y gates |
+| `templates/` | content-strategy-brief, editorial-infographic-contract, pillar-cluster-map, editorial-calendar, content-brief, citation-utility-contract, repurposing-map, distribution-plan, measurement-dashboard |
