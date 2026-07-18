@@ -159,7 +159,7 @@ const CtaInventoryPanel = ({
         <Stack
           spacing={3}
           alignItems='center'
-          sx={theme => ({ p: 8, textAlign: 'center', borderRadius: `${theme.shape.customBorderRadius.xl}px`, bgcolor: 'background.paper', boxShadow: 'var(--mui-customShadows-md)' })}
+          sx={theme => ({ p: 8, textAlign: 'center', borderRadius: `${theme.shape.customBorderRadius.xl}px`, bgcolor: 'background.paper', boxShadow: theme.greenhouseElevation.raised.boxShadow })}
         >
           <Box
             sx={{
@@ -186,7 +186,7 @@ const CtaInventoryPanel = ({
           </Button>
         </Stack>
       ) : rows.length === 0 ? (
-        <Box sx={theme => ({ p: 6, borderRadius: `${theme.shape.customBorderRadius.xl}px`, bgcolor: 'background.paper', boxShadow: 'var(--mui-customShadows-md)' })}>
+        <Box sx={theme => ({ p: 6, borderRadius: `${theme.shape.customBorderRadius.xl}px`, bgcolor: 'background.paper', boxShadow: theme.greenhouseElevation.raised.boxShadow })}>
           <EmptyState icon='tabler-filter-off' title={I.emptyFilteredTitle} description={I.emptyFilteredBody} />
           <Stack alignItems='center' sx={{ mt: 3 }}>
             <Button size='small' variant='outlined' onClick={() => onFiltersChange({ query: '', status: 'all', placement: 'all' })}>
@@ -236,10 +236,11 @@ const CtaInventoryPanel = ({
                   flexDirection: 'column',
                   gap: 3,
                   bgcolor: selected ? alpha(theme.palette.primary.main, 0.04) : theme.palette.background.paper,
-                  border: selected ? `1.5px solid ${theme.palette.primary.main}` : '1px solid transparent',
-                  boxShadow: 'var(--mui-customShadows-xs)',
+                  // Elevation SoT (TASK-1049): reposo plano/outlined; `raised` SOLO como lift de hover.
+                  border: selected ? `1.5px solid ${theme.palette.primary.main}` : `1px solid ${theme.palette.divider}`,
+                  boxShadow: theme.greenhouseElevation.none.boxShadow,
                   transition: theme.transitions.create(['box-shadow', 'border-color', 'background-color'], { duration: 150 }),
-                  '&:hover': { boxShadow: 'var(--mui-customShadows-md)' },
+                  '&:hover': { boxShadow: theme.greenhouseElevation.raised.boxShadow },
                   '&:focus-visible': { outline: `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 },
                 })}
               >

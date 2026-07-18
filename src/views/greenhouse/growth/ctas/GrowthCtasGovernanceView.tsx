@@ -396,7 +396,7 @@ const GrowthCtasGovernanceView = ({
         textAlign: 'center',
         bgcolor: 'background.paper',
         borderRadius: theme => `${theme.shape.customBorderRadius.xl}px`,
-        boxShadow: 'var(--mui-customShadows-md)',
+        boxShadow: theme => theme.greenhouseElevation.raised.boxShadow,
       }}
       data-capture='cta-inventory'
     >
@@ -444,7 +444,7 @@ const GrowthCtasGovernanceView = ({
   )
 
   const aside = isEmptyInventory ? (
-    <Box sx={{ p: 8, bgcolor: 'background.paper', borderRadius: theme => `${theme.shape.customBorderRadius.xl}px`, boxShadow: 'var(--mui-customShadows-md)' }}>
+    <Box sx={{ p: 8, bgcolor: 'background.paper', borderRadius: theme => `${theme.shape.customBorderRadius.xl}px`, boxShadow: theme => theme.greenhouseElevation.raised.boxShadow }}>
       <EmptyState icon='tabler-layout-sidebar-right-expand' title={C.empty.asideTitle} description={C.empty.asideBody} />
     </Box>
   ) : selectedId ? (
@@ -468,7 +468,7 @@ const GrowthCtasGovernanceView = ({
       }}
     />
   ) : (
-    <Box sx={{ p: 8, bgcolor: 'background.paper', borderRadius: theme => `${theme.shape.customBorderRadius.xl}px`, boxShadow: 'var(--mui-customShadows-md)' }}>
+    <Box sx={{ p: 8, bgcolor: 'background.paper', borderRadius: theme => `${theme.shape.customBorderRadius.xl}px`, boxShadow: theme => theme.greenhouseElevation.raised.boxShadow }}>
       <EmptyState icon='tabler-click' title={C.noSelection.title} description={C.noSelection.body} />
     </Box>
   )

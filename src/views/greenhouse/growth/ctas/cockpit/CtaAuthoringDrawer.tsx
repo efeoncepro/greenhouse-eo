@@ -203,10 +203,11 @@ const OptionCard = ({ selected, icon, label, desc, badge, onClick }: OptionCardP
       gap: 2,
       font: 'inherit',
       bgcolor: selected ? alpha(theme.palette.primary.main, 0.06) : theme.palette.background.paper,
-      border: selected ? `1.5px solid ${theme.palette.primary.main}` : '1px solid transparent',
-      boxShadow: 'var(--mui-customShadows-xs)',
+      // Elevation SoT (TASK-1049): reposo plano/outlined; `raised` SOLO como lift de hover.
+      border: selected ? `1.5px solid ${theme.palette.primary.main}` : `1px solid ${theme.palette.divider}`,
+      boxShadow: theme.greenhouseElevation.none.boxShadow,
       transition: theme.transitions.create(['border-color', 'background-color', 'box-shadow'], { duration: 150 }),
-      '&:hover': { boxShadow: 'var(--mui-customShadows-md)' },
+      '&:hover': { boxShadow: theme.greenhouseElevation.raised.boxShadow },
       '&:focus-visible': { outline: `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 },
     })}
   >

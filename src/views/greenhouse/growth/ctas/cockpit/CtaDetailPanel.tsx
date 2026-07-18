@@ -339,7 +339,7 @@ const CtaDetailPanel = ({
       <Stack
         spacing={3}
         alignItems='center'
-        sx={theme => ({ p: 10, textAlign: 'center', borderRadius: radius(theme, 'xl'), bgcolor: 'background.paper', boxShadow: 'var(--mui-customShadows-md)' })}
+        sx={theme => ({ p: 10, textAlign: 'center', borderRadius: radius(theme, 'xl'), bgcolor: 'background.paper', boxShadow: theme.greenhouseElevation.raised.boxShadow })}
       >
         <Box
           sx={theme => ({
@@ -495,7 +495,8 @@ const CtaDetailPanel = ({
           p: 5,
           borderRadius: radius(theme, 'xl'),
           bgcolor: killedBySwitch ? alpha(theme.palette.error.main, 0.08) : theme.palette.background.paper,
-          boxShadow: 'var(--mui-customShadows-md)',
+          // Elevation SoT (TASK-1049): superficie de reposo que necesita separación → `raised`.
+          boxShadow: theme.greenhouseElevation.raised.boxShadow,
           border: killedBySwitch ? `1px solid ${alpha(theme.palette.error.main, 0.4)}` : 'none',
         })}
         data-capture='cta-detail-kill'
