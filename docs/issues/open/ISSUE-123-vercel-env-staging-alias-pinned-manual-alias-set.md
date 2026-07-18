@@ -93,7 +93,11 @@ es `alias rm` (des-pin) o tooling por deployment vigente (`staging:url`).
       automáticamente — pasó de 404 a servir el bundle vigente (`BUILDINFO bytes=38098`) sin ningún
       `alias set`. Mientras el deploy compilaba, el resolver siguió eligiendo el último READY
       (resiliencia diseñada, observada en vivo).
-- [ ] Ciclo 2: el próximo deploy staging mueve el alias solo (sin intervención manual).
+- [ ] Ciclo 2: el próximo deploy staging **real** mueve el alias solo (sin intervención manual).
+      Nota 2026-07-18: los pushes docs-only producen builds `CANCELED` (ignored build step del
+      proyecto — patrón también visto en `44f964149`); un build cancelado NO mueve el alias ni
+      confunde al resolver (ambos se quedan en el último READY, consistentes — observado en vivo).
+      El ciclo 2 se verificará con el próximo push de código (p.ej. el release de TASK-1431).
 - [x] `pnpm staging:request` (E2E: resolver + auth agente + 200) y `pnpm staging:url` resuelven el
       deployment vigente; GVC compuesto (`STAGING_URL=$(pnpm --silent staging:url)`) capturó OK con
       storageState por host.
