@@ -1,5 +1,13 @@
 ## Estado vigente para agentes
 
+- **Notion work management skill V1.1 (2026-07-18):** Codex y Claude comparten ahora
+  `.codex/skills/notion-platform/` y `.claude/skills/notion-platform/` como canon versionado para delegar y
+  consultar trabajo. La skill fija Enhanced Markdown con renderer/linter cerrado, proyectos planos, tasks con
+  self-relation recursiva, resolución multi-space por registry/property IDs/schema fingerprint y separación
+  entre estado live, historial observado y resultado/evidencia. No inferir teamspace por prefijo de ID ni
+  redescubrir schema en cada conversación; MCP queda para interacción y bootstrap, mientras CLI/runtime debe
+  consumir el command compartido + registry + API directa.
+
 - **Link Hub controlado desde Greenhouse (decisión 2026-07-18; runtime pendiente):** `EPIC-030` y el ADR
   `docs/architecture/GREENHOUSE_LINK_HUB_CONTROL_PLANE_DECISION_V1.md` fijan a Greenhouse como SSOT/control
   plane de páginas link-in-bio multi-marca. La primera activación será `links.efeoncepro.com/efeonce` para

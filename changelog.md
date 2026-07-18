@@ -1,5 +1,11 @@
 # changelog.md
 
+## 2026-07-18 — notion-platform V1.1: delegación y seguimiento gobernados
+
+- Se versionó la skill `notion-platform` para Codex y Claude con gramática canónica de Notion Enhanced Markdown, renderer/linter determinista y templates de proyecto, tarea, subtarea recursiva, cierre y snapshot de estado.
+- Se añadió el contrato multi-space `alias → space_id → data sources/token ref/property IDs/schema fingerprint`; los proyectos permanecen planos y las subtareas son una relación autorreferencial sin límite de profundidad de dominio, con ciclos y límites operativos controlados.
+- Se canonizaron consultas live de vencimiento/progreso/resultado, ledger observado para historial y cierre incompleto cuando falta resultado o evidencia. También se retiró la inferencia insegura por prefijo de ID y se actualizó el inventario MCP/async.
+
 ## 2026-07-18 — RELEASE: TASK-1428 + TASK-1429 en producción + enforcement ON (d5db8b568)
 
 - Release develop→main (PR #159 + fix CI #160; orquestador `29651461496`, manifest `released`):

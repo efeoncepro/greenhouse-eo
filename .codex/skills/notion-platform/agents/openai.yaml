@@ -1,0 +1,7 @@
+interface:
+  display_name: "Notion Platform"
+  short_description: "Operate Notion APIs, MCP, work items, and rich page content safely."
+  default_prompt: "Use $notion-platform to design or operate this Notion workflow with the canonical API, multi-space, Enhanced Markdown, safety, and verification contracts."
+
+policy:
+  allow_implicit_invocation: true
