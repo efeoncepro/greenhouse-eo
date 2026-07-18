@@ -16,6 +16,24 @@
 > ampliación OAuth: Greenhouse sigue `webmasters.readonly`; `TASK-1426` concentra multi-property, canary live y
 > checkpoints `0h/24h/72h` pendientes de implementación.
 
+## Sesión 2026-07-18 — ROLLOUT COMPLETO Growth CTA Engine → PRODUCCIÓN (released)
+
+> Orden del operador "haz el rollout" ejecutada end-to-end: (1) flag `GROWTH_CTA_ENGINE_ENABLED`
+> ON en staging + Production (redeploys con flag horneado); (2) release develop→main PR #158
+> (squash `4a1cd11e2`), orquestador `29637892573` success, ambos gates `production` aprobados por
+> watcher, manifest **released** (`4a1cd11e2db0-9bc3c61d…`), 3 workers en target + `ops-worker`
+> residual label change-gated (`ba3b7faff`, diff runtime vacío — NO drift); (3) Think PR #13
+> merged + env `GREENHOUSE_CTA_EMBED_KEY`/`SURFACE_ID` en su Vercel → **CTA LIVE en el reporte
+> `/brand-visibility/r/*` de producción** (screenshot mirado; `greenhouse_cta_viewed` real en
+> dataLayer); (4) GTM v4 publicado (6 tags `greenhouse_cta_*` + 6 triggers + 7 DLVs vía
+> `scripts/gtm/build-cta-events-workspace.ts`, workspace→preview→publish) + custom dimensions GA4
+> `cta_slug`/`cta_location`/`placement`; snapshot refrescado; (5) smoke prod: bundle 200, render
+> arbitrado, forja 403, ingest accepted. TRACKING-PLAN §CTAs ✅ · ledger flags ON/ON · timing
+> ledger registrado. **Pendientes**: embed WP (falta decisión de placement del host — snippet listo
+> en el manual), signals `growth.cta.*` en `/admin/operations` a monitorear 7d (los 2 unauthorized
+> del smoke 17-jul ya expiraron), y ⚠️ `staging-request`/GVC-staging ROTOS: el access token del
+> Vercel CLI expiró en abril y el CLI no lo re-persiste — correr `vercel login` para reparar.
+
 ## Sesión 2026-07-18 — TASK-1340 Renderer CTA + capa GTM + gobernanza Growth COMPLETA (code complete, shadow)
 
 > Implementada TASK-1340 en `develop` local (SIN push) con los 3 deltas del operador: (1) renderer
