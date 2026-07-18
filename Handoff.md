@@ -1,3 +1,11 @@
+## Sesión 2026-07-17 (noche) — TASK-1339 Growth CTA Engine foundation EN CURSO
+
+> Tomada TASK-1339 (EPIC-023, backend-data): foundation server-side `growth.cta` — schema
+> `greenhouse_growth.cta_*`, primitive `src/lib/growth/ctas/` (readers/commands/arbiter/render
+> contract/ingest/action router), API pública render+events + admin lifecycle, capability
+> `growth.cta.*`+grants, signals, flag `GROWTH_CTA_ENGINE_ENABLED` default OFF. Trabajo en
+> `develop` local-first, SIN push. Bloquea TASK-1340 (renderer).
+
 ## Sesión 2026-07-17 (noche) — polish cockpit AEO post-feedback + resolver canónico de logos
 
 > Feedback del operador sobre prod: cockpit no fiel al mockup, sin logos, picker=dump del CRM.
