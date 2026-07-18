@@ -1,5 +1,19 @@
 # changelog.md
 
+## 2026-07-18 — ISSUE-123: staging access resuelve el deployment vigente (alias env-staging des-pinneado)
+
+- Causa raíz identificada del bug class recurrente (3 veces en 2 días): un `vercel alias set` manual
+  FIJA el alias `greenhouse-eo-env-staging-….vercel.app` y cada deploy posterior lo deja rezagado —
+  los agentes validaban staging contra código viejo en silencio. El "fix" manual era la causa.
+- Tooling resiliente: `resolveStagingAccess()` ahora resuelve el **último deployment staging READY
+  vía Vercel API** (alias solo como fallback con warning); nuevo `pnpm staging:url` para componer
+  (`STAGING_URL=$(pnpm --silent staging:url) pnpm fe:capture … --env=staging`); GVC con
+  `STAGING_URL` + storageState por host (cookies no cruzan subdominios). Picker unit-testeado con
+  el shape real de la API v6 (`customEnvironment.slug === 'staging'`, `target: null`).
+- Alias des-pinneado (`vercel alias rm`, autorizado por el operador). Regla anti-recurrencia en la
+  spec: NUNCA re-apuntar con `alias set`. ISSUE-123 queda open hasta verificar el re-atado
+  automático en 2 deploys. Specs: `GREENHOUSE_STAGING_ACCESS_V1.md` §10 + ISSUE-123.
+
 ## 2026-07-18 — EPIC-032: Notion Work Management Control Plane planificado
 
 - Se registraron `EPIC-032` y cuatro tasks compactas (`TASK-1449…1452`) para convertir la delegación y consulta

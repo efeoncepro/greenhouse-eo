@@ -147,14 +147,96 @@ export async function persistBypassSecret(secret, { log = noop } = {}) {
   }
 }
 
+// ─── Resolución del deployment staging vigente (ISSUE-123) ────────────────────
+//
+// El alias `greenhouse-eo-env-staging-….vercel.app` puede quedar FIJADO a un
+// deployment viejo (bug class ISSUE-123: un `vercel alias set` manual lo saca de
+// la gestión automática y cada deploy posterior lo deja rezagado — recurrió
+// 2026-07-17 y 2× 2026-07-18). El tooling de agentes NO debe depender de la
+// frescura del alias: se resuelve el último deployment staging READY vía la
+// Vercel API y el alias queda solo como fallback (con warning ruidoso).
+
+/**
+ * Elige el deployment staging READY más reciente. Shape real de la API v6
+ * (verificado 2026-07-18): los deploys de custom environments llegan con
+ * `target: null` + `customEnvironment.slug === 'staging'`; production llega con
+ * `target: 'production'`. Función pura (unit-testeada) — el fetch vive aparte.
+ */
+export const pickLatestReadyStagingDeployment = (deployments = []) => {
+  const candidates = deployments.filter(
+    deployment =>
+      deployment?.customEnvironment?.slug === 'staging' &&
+      (deployment?.readyState === 'READY' || deployment?.state === 'READY') &&
+      typeof deployment?.url === 'string' &&
+      deployment.url.length > 0
+  )
+
+  candidates.sort((a, b) => (b?.createdAt ?? b?.created ?? 0) - (a?.createdAt ?? a?.created ?? 0))
+
+  return candidates[0] ?? null
+}
+
+/**
+ * URL del último deployment staging READY vía Vercel API. `null` si no hay token,
+ * la API falla o no hay deployment — el caller decide el fallback (alias).
+ */
+export async function resolveLatestStagingDeploymentUrl({ log = noop, fetchImpl = fetch } = {}) {
+  const token = await getVercelCliToken({ log })
+
+  if (!token) return null
+
+  const apiUrl = `https://api.vercel.com/v6/deployments?projectId=${VERCEL_PROJECT_ID}&teamId=${VERCEL_TEAM_ID}&limit=20`
+
+  try {
+    const res = await fetchImpl(apiUrl, { headers: { Authorization: `Bearer ${token}` } })
+
+    if (!res.ok) {
+      log(`  staging: Vercel deployments API ${res.status} — fallback al alias`)
+
+      return null
+    }
+
+    const data = await res.json()
+    const picked = pickLatestReadyStagingDeployment(data?.deployments ?? [])
+
+    if (!picked) {
+      log('  staging: sin deployment staging READY en la API — fallback al alias')
+
+      return null
+    }
+
+    return { url: `https://${picked.url}`, uid: picked.uid ?? null, createdAt: picked.createdAt ?? picked.created ?? null }
+  } catch (error) {
+    log(`  staging: resolución de deployment falló (${error?.message ?? error}) — fallback al alias`)
+
+    return null
+  }
+}
+
 export async function resolveStagingAccess({ log = noop, persistBypass = true, includePlaywrightBaseUrl = false } = {}) {
   const envLocal = await readEnvFile(ENV_LOCAL_PATH)
 
-  const stagingUrl =
+  const explicitUrl =
     process.env.STAGING_URL ||
     envLocal.STAGING_URL ||
-    (includePlaywrightBaseUrl ? process.env.PLAYWRIGHT_BASE_URL || envLocal.PLAYWRIGHT_BASE_URL : undefined) ||
-    DEFAULT_STAGING_URL
+    (includePlaywrightBaseUrl ? process.env.PLAYWRIGHT_BASE_URL || envLocal.PLAYWRIGHT_BASE_URL : undefined)
+
+  let stagingUrl = explicitUrl
+  let stagingSource = 'override'
+
+  if (!stagingUrl) {
+    const resolved = await resolveLatestStagingDeploymentUrl({ log })
+
+    if (resolved) {
+      stagingUrl = resolved.url
+      stagingSource = 'latest-deployment'
+      log(`  staging: deployment vigente ${resolved.uid ?? resolved.url} (READY más reciente vía API)`)
+    } else {
+      stagingUrl = DEFAULT_STAGING_URL
+      stagingSource = 'alias-fallback'
+      log('  staging: ⚠️ usando el alias env-staging como fallback — puede estar REZAGADO (ISSUE-123)')
+    }
+  }
 
   const bypassSecret = await resolveBypassSecret({
     envLocal,
@@ -172,6 +254,7 @@ export async function resolveStagingAccess({ log = noop, persistBypass = true, i
 
   return {
     stagingUrl,
+    stagingSource,
     bypassSecret,
     agentSecret,
     email
