@@ -20,7 +20,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `content`
-- Blocked by: `TASK-1442, TASK-1443`
+- Blocked by: `TASK-1442, TASK-1443, TASK-1448`
 - Branch: `task/TASK-1444-glitch-notion-content-factory-adapters`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -63,7 +63,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-1442`, `TASK-1443`, TASK-1123 y TASK-1337.
+- `TASK-1442`, `TASK-1443`, `TASK-1448`, TASK-1123 y TASK-1337.
 
 ### Blocks / Impacts
 
@@ -115,7 +115,7 @@ Reglas obligatorias:
 ### Data model and invariants
 
 - Entidades/tablas/views afectadas: `external mappings/audit definidos por TASK-1442`
-- Invariantes: Q3 #16–26; Q4 #27–39; una página y un post por edición; `private`; ocho drops; TOC/SEO/media válidos.
+- Invariantes: Q3 #16–26; Q4 #27–39; una página y un post por edición Weekly; Daily/Flash no escriben; cada promoción `glitchFlash` confirmada crea como máximo un post private de una noticia y no usa placeholder numerado; TOC/SEO/media válidos según content kind.
 - Tenant/space boundary: `Efeonce teamspace y efeoncepro.com explícitos`
 - Idempotency/concurrency: `provider mapping unique + expected-version write + lock por edition`
 - Audit/outbox/history: `request/result redacted, provider IDs, checksum y reconciliation outcome`
@@ -160,8 +160,8 @@ Reglas obligatorias:
 
 ### Slice 2 — Content Factory adapter
 
-- Traducir edition spec a Gutenberg con `efeoncepro/glitch-drop`.
-- Implementar private upsert, deep inspection y mapping/checksum.
+- Traducir Weekly edition spec y Glitch Flash promotion spec a recetas Gutenberg diferenciadas.
+- Implementar private upsert, deep inspection y mapping/checksum; rechazar outputs Daily/Flash sin promoción confirmada.
 
 ## Out of Scope
 
@@ -209,7 +209,7 @@ Credenciales Notion y acceso Kinsta ya autenticados deben validarse; publish hum
 ## Acceptance Criteria
 
 - [ ] Resolver #16–#39 es determinista por número/fecha y falla cerrado ante mismatch.
-- [ ] Re-run no crea otra página ni otro post.
+- [ ] Re-run no crea otra página ni otro post; Daily/Flash sin promoción no crean ninguno.
 - [ ] WordPress queda `private` y usa Content Factory + bloque Glitch canónico.
 - [ ] Reconciliation recupera writes parciales sin duplicar.
 - [ ] Snapshots, checksums, audit redacted y smoke externo quedan documentados.

@@ -45,6 +45,8 @@ El flujo cruza doctrina editorial, skills, datos, API, Notion, scheduler/worker,
 - `TASK-1444` — implementa adapters Notion + Content Factory/WordPress privado.
 - `TASK-1445` — implementa scheduler, orquestación y reliability.
 - `TASK-1446` — ejecuta rollout gradual y cierre operativo/documental.
+- `TASK-1447` — crea Glitch Desk como workbench humano de supervisión, evidencia y recovery.
+- `TASK-1448` — formaliza promoción gobernada de candidata Daily/Flash a `glitchFlash` publicable.
 
 ## Existing Related Work
 
@@ -59,6 +61,8 @@ El flujo cruza doctrina editorial, skills, datos, API, Notion, scheduler/worker,
 - [ ] ADR aceptado y PDR-003 actualizado sin duplicar arquitectura.
 - [ ] Piloto #16 produce ficha Notion completa y un único draft WordPress `private`, con aprobación pública humana.
 - [ ] Foundation, skill, adapters y scheduler cumplen idempotencia, audit, recovery y Full API Parity.
+- [ ] Daily/Flash permanecen internos; sólo Weekly y promociones `glitchFlash` confirmadas pueden producir drafts privados.
+- [ ] Glitch Desk permite inspeccionar decisiones, evidencia, runs y promociones sin duplicar lógica de negocio.
 - [ ] Shadow runs y golden evals demuestran calidad editorial suficiente para activar Daily/Weekly.
 - [ ] Runbook, manual, documentación funcional, changelog y handoff quedan sincronizados.
 
@@ -69,4 +73,3 @@ El flujo cruza doctrina editorial, skills, datos, API, Notion, scheduler/worker,
 - Migración automática de Gutenberg histórico #12/#13.
 - Reemplazar Notion como calendario del equipo.
 - Resolver el rediseño completo de la categoría pública Glitch.
-

@@ -20,7 +20,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `ops`
-- Blocked by: `TASK-1445`
+- Blocked by: `TASK-1445, TASK-1447`
 - Branch: `task/TASK-1446-glitch-production-rollout-closure`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -63,7 +63,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-1445` y evidencias de TASK-1441–1444.
+- `TASK-1445`, `TASK-1447` y evidencias de TASK-1441–1444/TASK-1448.
 
 ### Blocks / Impacts
 
@@ -118,7 +118,7 @@ Reglas obligatorias:
 ### Data model and invariants
 
 - Entidades/tablas/views afectadas: `sin schema nuevo; runs/editions/mappings existentes`
-- Invariantes: cero publish automático; una edición/página/post; audit completo; fallo nunca se presenta como éxito.
+- Invariantes: cero publish automático; Daily/Flash internos; Weekly o promoción Glitch Flash confirmada como únicos caminos a private draft; audit completo; fallo nunca se presenta como éxito.
 - Tenant/space boundary: `Efeonce`
 - Idempotency/concurrency: `validar mediante fault injection/replay`
 - Audit/outbox/history: `verificar completitud y retención del historial`
@@ -213,7 +213,7 @@ Sign-off del operador para cada flip y para cada publicación pública individua
 - [ ] Dos ventanas semanales consecutivas completan sin duplicados ni recovery manual no documentado.
 - [ ] Scorecard editorial cumple umbrales aceptados y conserva revisión humana.
 - [ ] Kill switch, replay, provider degradation y partial-write recovery tienen evidencia.
-- [ ] Daily y Weekly llegan como máximo a WordPress `private`.
+- [ ] Daily/Flash quedan en candidate staging; Weekly y `glitchFlash` confirmado llegan como máximo a WordPress `private`.
 - [ ] Runbook, manual, documentación funcional, changelog, Handoff, project_context e EPIC quedan sincronizados.
 
 ## Verification

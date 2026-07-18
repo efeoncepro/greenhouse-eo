@@ -1864,3 +1864,5 @@ Finance Dashboard Calculation Correction ←── Invoice Payment Ledger (cash 
 | TBD | `TASK-1444` | [TASK-1444-glitch-notion-content-factory-adapters.md](to-do/TASK-1444-glitch-notion-content-factory-adapters.md) | P1 | Muy alto | Alto | Diseño | Adapters Notion + Content Factory |
 | TBD | `TASK-1445` | [TASK-1445-glitch-scheduler-orchestration-reliability.md](to-do/TASK-1445-glitch-scheduler-orchestration-reliability.md) | P1 | Muy alto | Alto | Diseño | Cron, orquestación, recovery y señales |
 | TBD | `TASK-1446` | [TASK-1446-glitch-production-rollout-closure.md](to-do/TASK-1446-glitch-production-rollout-closure.md) | P1 | Muy alto | Medio | Diseño | Rollout, QA y cierre operativo |
+| TBD | `TASK-1447` | [TASK-1447-glitch-editorial-operations-desk.md](to-do/TASK-1447-glitch-editorial-operations-desk.md) | P1 | Alto | Alto | Diseño | Glitch Desk: queue, inspector, promoción y recovery |
+| TBD | `TASK-1448` | [TASK-1448-glitch-candidate-promotion-flash-contract.md](to-do/TASK-1448-glitch-candidate-promotion-flash-contract.md) | P1 | Muy alto | Medio | Diseño | Promotion candidata Daily/Flash → Glitch Flash |

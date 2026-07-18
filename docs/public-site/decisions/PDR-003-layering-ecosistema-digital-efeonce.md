@@ -164,8 +164,9 @@ EJE B — PLATAFORMAS / BACKBONES  ("con qué operas por dentro" + "qué más ve
 ## Delta 2026-07-18 — Glitch numerado y Glitch táctico
 
 - Status del delta: `Proposed`; aceptación y contrato operativo en `TASK-1440` / `EPIC-031`.
-- Glitch conserva una edición numerada semanal (`weeklyEdition`) y puede alojar artículos tácticos (`tacticalGlitch`) sin que estos consuman número.
+- Glitch conserva una edición numerada semanal (`weeklyEdition`) y un formato destacado de noticia única (`glitchFlash`) sin número.
 - La cadencia editorial vigente es producción los lunes a las 09:00 `America/Santiago` para la ficha planificada del martes.
+- Daily y Flash son modos internos de discovery/staging: no escriben WordPress. Solo Weekly genera un draft privado por calendario; una candidata Daily/Flash llega a `glitchFlash` únicamente después de promoción explícita y auditable.
 - Notion conserva el calendario visible y los placeholders numerados; Greenhouse opera el pipeline agéntico y WordPress recibe el draft gobernado.
 - La autonomía V1 termina en WordPress `private`. Publicar exige autorización humana explícita.
 - Arquitectura y fuentes de verdad: `docs/architecture/GREENHOUSE_GLITCH_AGENTIC_EDITORIAL_PIPELINE_DECISION_V1.md`.

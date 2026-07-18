@@ -22,10 +22,10 @@ The next numbered edition is Glitch #16, scheduled in the Efeonce Notion Q3 cale
 2. Notion remains the team-facing editorial calendar and numbered placeholder registry. It is a projection/integration boundary, not the authoritative candidate ledger.
 3. WordPress remains the editorial destination. The governed Content Factory is the only write path for Gutenberg drafts.
 4. The exported Markdown corpus is migration seed, doctrine and historical evidence; it is not mutable production state.
-5. One dedicated `greenhouse-glitch-editorial-agent` skill owns the editorial modes `daily`, `flash` and `weekly`. The public-site WordPress skill remains a compact publishing router.
-6. Agentic autonomy may cover research, candidate scoring, selection, POV, writing, Notion preparation and creation/update of one idempotent WordPress `private` draft.
+5. One dedicated `greenhouse-glitch-editorial-agent` skill owns the operational modes `daily`, `flash` and `weekly`. `daily` and `flash` discover, enrich and stage internal candidates; they never write WordPress directly. The public-site WordPress skill remains a compact publishing router.
+6. `weekly` is the only scheduled mode that creates/updates a WordPress `private` draft automatically. A Daily/Flash candidate can become a single-news **Glitch Flash** only through the governed promotion contract `propose -> confirm -> execute`; the confirmed promotion then creates one idempotent private draft.
 7. Public publication remains a human-authorized action. TASK-1323 auto-publish is not a dependency and cannot silently widen this boundary.
-8. `weeklyEdition` and `tacticalGlitch` are distinct content kinds. Only `weeklyEdition` consumes the numbered calendar sequence.
+8. `weeklyEdition` and `glitchFlash` are distinct publishable content kinds. Only `weeklyEdition` consumes the numbered calendar sequence. Existing unnumbered tactical posts are legacy observations, not a third output kind for the new agent.
 9. Schedulers wake governed commands; prompts do not own persistence, locking, retries, budgets, audit, recovery or publication state.
 10. Glitch #14 and #15 are initial golden examples. Historical #12/#13 Gutenberg structures are not migrated automatically.
 
@@ -36,6 +36,7 @@ The next numbered edition is Glitch #16, scheduled in the Efeonce Notion Q3 cale
 - Make Notion the complete source of truth: rejected because candidate/claim ledgers, locks, retries and audit need stronger contracts than an editorial calendar.
 - Auto-publish every Tuesday: rejected for V1 because editorial truth, brand safety and public rollback still require explicit human authorization.
 - Three independent agents: rejected because shared doctrine, dedupe and learning would drift across Daily, Flash and Weekly.
+- Let Daily/Flash publish whenever their score is high: rejected because candidate urgency is not publication authorization; promotion requires a separately auditable decision.
 
 ## Consequences
 
@@ -55,6 +56,8 @@ The next numbered edition is Glitch #16, scheduled in the Efeonce Notion Q3 cale
 - Notion and Content Factory adapters: `TASK-1444`.
 - Scheduler/reliability: `TASK-1445`.
 - Rollout/closure: `TASK-1446`.
+- Human operations UI: `TASK-1447`.
+- Candidate-to-Glitch-Flash promotion contract: `TASK-1448`.
 - Existing consumers/contracts: TASK-1123 Content Factory, TASK-1337 `efeoncepro/glitch-drop`, PDR-003 and the agentic blogpost runbook.
 
 No schema/table/command name in this Proposed ADR is authoritative until TASK-1442 accepts the concrete contract and updates this document.
@@ -66,4 +69,3 @@ No schema/table/command name in this Proposed ADR is authoritative until TASK-14
 - WordPress stops being the editorial CMS/origin after public-site cutover.
 - A second editorial product needs the same candidate/edition primitives.
 - Tactical Glitch and numbered editions require separate public information architecture.
-

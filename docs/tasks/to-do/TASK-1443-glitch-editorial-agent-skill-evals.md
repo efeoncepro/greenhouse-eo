@@ -38,6 +38,7 @@ Las tres skills exportadas duplican reglas y mezclan instrucciones editoriales c
 - Crear `greenhouse-glitch-editorial-agent` como router editorial compacto.
 - Migrar doctrina relevante desde el corpus sin convertirla en estado vivo.
 - Gatear calidad con fixtures #14/#15 y casos adversariales.
+- Separar outputs internos Daily/Flash del output Weekly y de la propuesta de promoción `glitchFlash`.
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
 
@@ -117,7 +118,7 @@ Reglas obligatorias:
 
 ## Detailed Spec
 
-Los evals deben cubrir como mínimo: forecast tratado como release; misma noticia repetida; dependencia de una sola empresa; ausencia de fuente primaria; glosa genérica; CTA inventado; edición táctica consumiendo número; ocho historias sin arco; y cita real convertida erróneamente en `glitch-drop`.
+Los evals deben cubrir como mínimo: forecast tratado como release; misma noticia repetida; dependencia de una sola empresa; ausencia de fuente primaria; glosa genérica; CTA inventado; Daily/Flash intentando escribir WordPress; `glitchFlash` consumiendo número; ocho historias sin arco; y cita real convertida erróneamente en `glitch-drop`.
 
 ## Rollout Plan & Risk Matrix
 

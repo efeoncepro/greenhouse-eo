@@ -1519,7 +1519,9 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-1444` | `to-do` | **Glitch Notion and Content Factory Adapters.** Resolución Q3/Q4, writes idempotentes y private upsert Gutenberg gobernado. P1. Muy alto. Alto. backend-data / integration. EPIC-031. | `docs/tasks/to-do/TASK-1444-glitch-notion-content-factory-adapters.md` |
 | `TASK-1445` | `to-do` | **Glitch Scheduler, Orchestration and Reliability.** Daily/Flash/Weekly sobre ops-worker, lunes 09:00 Chile, locks, budgets, recovery, signals y kill switch. P1. Muy alto. Alto. backend-data / cron. EPIC-031. | `docs/tasks/to-do/TASK-1445-glitch-scheduler-orchestration-reliability.md` |
 | `TASK-1446` | `to-do` | **Glitch Production Rollout and Operational Closure.** Shadow/assisted rollout, fault recovery, QA real, runbook/manual y cierre hasta draft private. P1. Muy alto. Medio. backend-data / integration. EPIC-031. | `docs/tasks/to-do/TASK-1446-glitch-production-rollout-closure.md` |
+| `TASK-1447` | `to-do` | **Glitch Editorial Operations Desk.** Workbench queue+inspector en `/growth/glitch` para Weekly, candidatas Daily/Flash, evidencia, promoción gobernada y run recovery; thin UI sobre backend contracts, sin editor WP ni publish. P1. Alto. Alto. ui-ux / flow. UI ready no. EPIC-031. | `docs/tasks/to-do/TASK-1447-glitch-editorial-operations-desk.md` |
+| `TASK-1448` | `to-do` | **Glitch Candidate Promotion and Flash Publication Contract.** Único puente candidata Daily/Flash → `glitchFlash`: propose→confirm→execute humano, single-news sin número, idempotencia, capability, audit y DTO para Content Factory. P1. Muy alto. Medio. backend-data / command. EPIC-031. | `docs/tasks/to-do/TASK-1448-glitch-candidate-promotion-flash-contract.md` |
 
 ## Siguiente ID disponible
 
-`TASK-1447`
+`TASK-1449`

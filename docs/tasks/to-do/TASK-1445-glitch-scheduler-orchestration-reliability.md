@@ -155,7 +155,7 @@ Reglas obligatorias:
 
 ### Slice 1 — Orchestrator and scheduling
 
-- Implementar handlers Daily/Flash/Weekly y clock/calendar tests.
+- Implementar handlers Daily/Flash/Weekly y clock/calendar tests; Daily/Flash terminan en candidate staging y no llaman al adapter WordPress.
 - Provisionar Scheduler inicialmente disabled/shadow.
 
 ### Slice 2 — Reliability and recovery
@@ -209,7 +209,7 @@ Provisioning Cloud Scheduler y confirmación de budgets/horarios por operador.
 ## Acceptance Criteria
 
 - [ ] Weekly resuelve lunes 09:00 Chile hacia el martes siguiente con tests de calendario.
-- [ ] Replays/concurrencia no duplican run, Notion ni WordPress.
+- [ ] Replays/concurrencia no duplican run, Notion ni WordPress, y sólo Weekly alcanza el write path privado programado.
 - [ ] Daily/Flash/Weekly tienen budgets, deadlines y terminal states.
 - [ ] Kill switch y flags detienen writes sin perder audit.
 - [ ] Canaries y señales detectan missed/stale/partial/failed runs.

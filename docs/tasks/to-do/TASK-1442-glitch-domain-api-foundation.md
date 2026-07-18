@@ -116,7 +116,7 @@ Reglas obligatorias:
 ### Data model and invariants
 
 - Entidades/tablas/views afectadas: `nombres físicos a decidir en plan y congelar en ADR antes de migrar`
-- Invariantes: edición numerada única; tactical no consume número; source/claim trazable; run state monotónico; mapping externo único por provider.
+- Invariantes: edición numerada única; `glitchFlash` no consume número; Daily/Flash no producen publicación sin promoción confirmada; source/claim trazable; run state monotónico; mapping externo único por provider.
 - Tenant/space boundary: `propiedad Efeonce explícita; diseño extraction-ready para scope futuro sin simular multi-tenant`
 - Idempotency/concurrency: `keys por mode+window y edition number; advisory/row lock; replays no duplican writes`
 - Audit/outbox/history: `historial append-only de runs/transiciones y eventos para adapters`
@@ -209,7 +209,7 @@ No requiere coordinación externa: esta task sólo aplica schema/primitives con 
 ## Acceptance Criteria
 
 - [ ] Modelo y state machine están versionados y migrados aditivamente.
-- [ ] `weeklyEdition` y `tacticalGlitch` no compiten por numeración.
+- [ ] `weeklyEdition` y `glitchFlash` no compiten por numeración y Daily/Flash no abren drafts por sí solos.
 - [ ] Commands/readers cumplen Full API Parity e idempotencia concurrente.
 - [ ] Backfill histórico es dry-run/allowlist y no activa runs.
 - [ ] Audit, errores y señales tienen pruebas y evidencia Postgres.
