@@ -1,5 +1,14 @@
 # TASK-1430 — Growth CTA authoring and reporting cockpit
 
+## Delta 2026-07-18 (2)
+
+- TASK-1429 quedó code-complete — assets nuevos que este cockpit reutiliza (no re-crear): matriz de
+  density del preview (`SlideInDensityMatrix` en `GrowthCtasGovernanceView`, mismo core del
+  renderer a 3 anchos) + demo vivo del overlay (`SlideInController` con `triggerMode: 'immediate'`)
+  + fixtures pairwise `slideIn*` en `src/growth-cta-renderer/fixtures.ts`. El authoring de
+  `placement: 'slide_in'` ya es válido end-to-end (enum + arbiter + renderer); el gate de review
+  para interruptivos (cap/dismiss/kill-switch posture) sigue siendo responsabilidad de esta task.
+
 ## Delta 2026-07-18
 
 - Los readers/commands de TASK-1428 que el cockpit consume quedaron **code-complete (sin push)** — cerrado

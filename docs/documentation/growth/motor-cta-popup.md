@@ -1,9 +1,9 @@
 # Motor de CTAs y Popups — `growth.cta`
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-07-17 por Claude (TASK-1339)
-> **Ultima actualizacion:** 2026-07-18 por Claude (TASK-1428: suppression/frequency capping en shadow + exposición Tier B + kill switches operables sin redeploy)
+> **Ultima actualizacion:** 2026-07-18 por Claude (TASK-1429: primer placement interruptivo `slide_in` no modal + CTA Experience System + identidad pseudónima consent-aware en el renderer)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md)
 > **Skill de dominio:** `greenhouse-growth-ctas` (Claude + Codex; se actualiza con cada cambio del motor)
 
@@ -48,6 +48,21 @@ La superficie de gobernanza vive en el **menú Growth** (junto a AEO y Forms), v
 | Kill switch global/per-surface (engage/release) | `growth.cta.pause` |
 
 `pause` es una capability separada a propósito: frenar un CTA problemático no exige autoridad de publicación. El kill switch usa esa misma autoridad.
+
+## El primer formato interruptivo: slide-in — TASK-1429
+
+Además del card embebido, el motor ya puede mostrar un **panel deslizante no invasivo**: aparece
+tras un tiempo o profundidad de scroll (nunca al instante), no bloquea la página ni roba el foco,
+se cierra con Escape o con su botón visible, y una vez cerrado no vuelve a aparecer. En pantallas
+chicas se ancla abajo respetando las zonas seguras del teléfono y muestra solo lo esencial
+(titular + acción); en anchas puede mostrar evidencia y detalle. Las tres apariencias
+(`default`/`spotlight`/`minimal`) son capas visuales tokenizadas — nunca cambian el
+comportamiento. El renderer ahora también envía la identidad anónima del visitante (con
+consentimiento, durable; sin él, solo de sesión), que es lo que permite que el "no volver a
+molestar" de TASK-1428 funcione con visitantes reales. Aún no hay ninguna campaña interruptiva
+publicada: encenderla es una decisión del operador (elegir superficie, mensaje y momento).
+
+> Detalle técnico: [src/growth-cta-renderer/slide-in.ts](../../../src/growth-cta-renderer/slide-in.ts) + [visitor.ts](../../../src/growth-cta-renderer/visitor.ts); arquitectura §25 (Delta 2026-07-18); preview y demo vivo en `/growth/ctas`.
 
 ## Respeto al visitante (suppression) y frenos de emergencia — TASK-1428
 

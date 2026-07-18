@@ -83,12 +83,22 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
   (store consent-aware + claim atómico FOR UPDATE + purga), `exposure.ts` (adapter Tier B
   fail-open + sampling + summary reader), `kill-switch.ts` (estado en DB + command idempotente-
   observable + audit) — todo TASK-1428.
-- `src/growth-cta-renderer/` — bundle público (vanilla TS ~23KB, light DOM + ElementInternals):
+- `src/growth-cta-renderer/` — bundle público (vanilla TS ~34KB, light DOM + ElementInternals):
   `element.ts` (`<greenhouse-cta>`; attrs `surface`/`embed-key`/`base-url`/`route`/`cta`/
-  `form-surface`/`cta-location`/`locale`/`color-scheme`/`appearance`), `styles.ts` (**paridad
-  preview↔público POR CONSTRUCCIÓN**: todo selector es `:is(greenhouse-cta, .ghc-scope)`),
-  `telemetry.ts` (espejo del SoT; sanitize allowlist antes de CustomEvent + dataLayer),
-  `action.ts` (monta el form, carga lazy del bundle forms), `fixtures.ts` (preview/tests).
+  `form-surface`/`cta-location`/`locale`/`color-scheme`/`appearance` + TASK-1429
+  `consent-state`/`consent-source`), `styles.ts` (**paridad preview↔público POR CONSTRUCCIÓN**:
+  todo selector es `:is(greenhouse-cta, .ghc-scope)`; geometría del overlay en `.ghc-slidein`,
+  density/card del interruptivo keyed por `[data-ghc-placement='slide_in']` — aplica igual en
+  overlay y preview), `telemetry.ts` (espejo del SoT; sanitize allowlist antes de CustomEvent +
+  dataLayer), `action.ts` (monta el form, carga lazy del bundle forms), `fixtures.ts`
+  (preview/tests, pairwise slide_in), **TASK-1429**: `slide-in.ts` (`SlideInController` — único
+  interruptivo V1: no modal `role=complementary` sin `aria-modal`/trap, trigger gobernado del
+  bundle dwell 8s O scroll 35%, apertura pasiva sin focus steal, Escape + focus return, dismiss
+  persistido ANTES de la salida `allow-discrete`, density `full|condensed|peek` por container
+  query del PROPIO shell, `observeVisibleOnce` para viewed IO ≥50% + dwell 300ms) y `visitor.ts`
+  (identidad pseudónima consent-aware: `sessionKey` sessionStorage siempre; `visitorKey`
+  localStorage SOLO con `consent-state="granted"`; guard local de dismiss por sesión — defensa
+  en profundidad, la autoridad de suppression es server-side TASK-1428).
   Build: `pnpm renderer:cta:build` → `public/growth-cta/renderer-<canal>.js` (prebuild lo corre).
 - Gobernanza: `src/app/(dashboard)/growth/ctas/` + `GrowthCtasGovernanceView` (copy
   `GH_GROWTH_CTA_OPERATOR` en `src/lib/copy/growth.ts`).
@@ -113,6 +123,15 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
   (hasta 2026-07-25). Pendiente: placement AMPLIO WP (decisión del operador post-validación;
   recomendado posts del blog vía `the_content` en `ohio-child`), placement interruptivo, cockpit
   de autoría, más acciones.
+- **2026-07-18 (TASK-1429): slide_in interruptivo + Experience System CODE-COMPLETE (local).**
+  El renderer monta el interruptivo 0–1 del arbiter vía `SlideInController` (bundle `1.1.0`);
+  envía la identidad pseudónima por headers al render/ingest (TASK-1428 cierra el loop: dismiss/
+  caps ya operan por visitante real cuando enforcement esté ON); `viewed` visibility-gated con
+  corte de semántica registrado en TRACKING-PLAN §CTAs; tokens 2026 (`light-dark()` +
+  `color-mix(in oklch)` con fallbacks `@supports`, nombres `--gh-cta-*` intactos); preview
+  `/growth/ctas` con matriz de density + demo vivo del overlay; GVC desktop+mobile mirado
+  (scenario `task-1429-growth-cta-interruptive-placement`). NO hay CTA slide_in publicado aún:
+  el primer interruptivo real (surface/copy/trigger) es decisión del operador post-rollout.
 - **2026-07-18 (TASK-1428): suppression/Tier B/kill switches CODE-COMPLETE en SHADOW (sin push).**
   Migración `20260718131956294` aplicada a la instancia (3 tablas aditivas dormidas). Flag
   `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` default OFF = shadow (decisión computada +
@@ -156,6 +175,15 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
   el preview y el público comparten reglas por construcción (drift real atrapado en GVC 2026-07-18).
 - **NUNCA** emitir un evento/param fuera del SoT (`CTA_GTM_EVENT_NAMES`/allowlist): extender SoT +
   espejo del renderer JUNTOS (el parity test revienta si divergen) y registrar en TRACKING-PLAN.
+- **NUNCA** (TASK-1429) darle al `slide_in` semántica modal (`aria-modal`/focus trap/focus steal
+  al abrir): es `role='complementary'` no modal; Escape + focus return sí son obligatorios. La
+  persistencia del dismiss JAMÁS depende de `animationend` (mecánica `@starting-style` +
+  `transition-behavior: allow-discrete`). El trigger vive en el BUNDLE (el host no define
+  triggers) y la density se deriva del contenedor PROPIO (`full|condensed|peek`), nunca del
+  viewport del host. `viewed` es visibility-gated (IO ≥50% + dwell) — no volver al mount=viewed.
+- **NUNCA** (TASK-1429) crear el `visitorKey` durable sin `consent-state="granted"` declarado por
+  el host, ni derivar keys del browser (UUID opaco random; cero fingerprinting). El guard local
+  de dismiss es defensa-en-profundidad de sesión — la autoridad es el visitor state del server.
 - **NUNCA** armonizar los 3 namespaces: `greenhouse_cta_*` (browser/GTM) ≠ `growth.cta.*`
   (interno: outbox/signals/capabilities) ≠ `gh_cta_clicked` (rail legacy ad-hoc WP — deprecar,
   no renombrar). Ningún click de CTA es key event GA4.

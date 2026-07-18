@@ -1,5 +1,15 @@
 # TASK-1427 — Growth CTA first-slice production closure
 
+## Delta 2026-07-18
+
+- **Corte de semántica de `greenhouse_cta_viewed` dentro de la ventana steady-state** — causado por
+  TASK-1429: al deployar el bundle `1.1.0`, `viewed` pasa de mount-gated a **visibility-gated**
+  (IO ≥50% + dwell 300ms). Esperable: la serie `greenhouse_cta_viewed` BAJA para placements
+  below-the-fold (medición más honesta, NO regresión del motor). Al evaluar la ventana 7d (hasta
+  2026-07-25), interpretar el quiebre desde la fecha del deploy productivo del bundle; el corte
+  está registrado en TRACKING-PLAN §CTAs. Además `viewed` ahora también aparece en el rollup Tier B
+  (`cta_exposure_rollup`, decision_source='browser') — nueva fuente para reconciliar exposición.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

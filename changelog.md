@@ -1,5 +1,21 @@
 # changelog.md
 
+## 2026-07-18 — TASK-1429: slide_in interruptivo + CTA Experience System del renderer (code complete)
+
+- Primer placement interruptivo oficial del motor CTA: `slide_in` no modal (`role=complementary`,
+  sin focus trap), trigger gobernado del bundle (8s en página o 35% de scroll), apertura pasiva sin
+  robar foco, Escape + focus return, dismiss persistido antes de la salida visual (mecánica
+  `@starting-style` + `allow-discrete`, cero dependencia de animationend). Density
+  `full|condensed|peek` derivada del contenedor propio; appearances `default|spotlight|minimal`
+  tokenizadas con fallback seguro.
+- El renderer ahora envía la identidad pseudónima del visitante (session siempre; visitor durable
+  solo con `consent-state="granted"`) — activa el loop real de suppression de TASK-1428 — y
+  `greenhouse_cta_viewed` pasa a visibility-gated (corte de semántica registrado en TRACKING-PLAN).
+- Tokens del bundle al piso 2026 (`light-dark()`, `color-mix(in oklch)`, `linear()`) con fallbacks
+  `@supports` y nombres `--gh-cta-*` intactos. Preview `/growth/ctas` con matriz de density + demo
+  vivo del overlay. GVC desktop+mobile mirado; 90 tests verdes. Sin campaña interruptiva publicada
+  aún (decisión del operador).
+
 ## 2026-07-18 — TASK-1428: suppression + Tier B + kill switches del motor CTA (code complete, shadow)
 
 - Migración aditiva `greenhouse_growth`: `cta_visitor_state` (estado pseudónimo por sujeto visitor/session,

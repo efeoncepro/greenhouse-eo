@@ -103,6 +103,19 @@ pnpm staging:request POST "/api/admin/growth/ctas/kill-switch" '{"action":"relea
 
 **Ventana efectiva**: el servidor responde `killed` desde el request siguiente al engage (no hay cache HTTP en las rutas públicas; el cache CORS de 90s no la alarga — un origin ya permitido recibe la respuesta `killed` igual). Lo que domina la ventana es la cadencia de fetch del renderer: hoy 1 fetch por pageview, así que las páginas ya abiertas conservan el CTA pintado hasta la próxima navegación. Mientras un switch esté activo, el signal `growth.cta.kill_switch_active` queda en warning en `/admin/operations` — el retiro es visible, no silencioso. Cada engage/release queda en el audit trail (quién, cuándo, por qué).
 
+## Placement interruptivo `slide_in` (TASK-1429)
+
+El renderer ya sabe montar el interruptivo del arbitraje (0–1 por página): un panel no modal que
+entra desde el borde en desktop y desde abajo en móvil, tras un trigger gobernado (8 s en página o
+35 % de scroll, lo primero). No roba el foco al aparecer; Escape lo cierra; el cierre persiste
+server-side ANTES de la animación de salida y no reaparece en la sesión. La densidad
+(`full|condensed|peek`) se adapta al ancho del propio panel. Para **usarlo en una campaña real**:
+autorar una versión con `placement: "slide_in"` (API admin o cockpit futuro), publicarla y
+allowlistearla en la surface — con `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` **ON** en ese
+environment (gate duro: sin enforcement no hay caps reales). Preview y demo vivo en `/growth/ctas`.
+Si el host tiene CMP, declarar `consent-state="granted"` en el snippet habilita la memoria durable
+del visitante; sin consent, la ventana es de sesión.
+
 ## Suppression y frequency capping (TASK-1428 — hoy en shadow)
 
 El motor decide server-side si un visitante debe volver a ver un CTA: dismiss reciente (cooldown default 14 días), conversión verificada, o tope de impresiones interruptivas (per-CTA 2/24h + global 3/día por visitante). Con `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` OFF (estado actual) la decisión solo se **registra** (shadow) sin alterar lo que se muestra; el flip a ON activa la exclusión real. La policy por versión vive en `suppression_policy_json` (vacía = defaults conservadores). Sin consentimiento del visitante no se guarda estado durable: la ventana es de sesión (48 h) y los placements interruptivos directamente no se muestran a visitantes sin identidad.
