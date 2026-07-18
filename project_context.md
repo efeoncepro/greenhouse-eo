@@ -1,5 +1,12 @@
 ## Estado vigente para agentes
 
+- **Link Hub controlado desde Greenhouse (decisión 2026-07-18; runtime pendiente):** `EPIC-030` y el ADR
+  `docs/architecture/GREENHOUSE_LINK_HUB_CONTROL_PLANE_DECISION_V1.md` fijan a Greenhouse como SSOT/control
+  plane de páginas link-in-bio multi-marca. La primera activación será `links.efeoncepro.com/efeonce` para
+  Instagram/TikTok; clientes reutilizan `links.efeoncepro.com/<slug>` y pueden conectar un custom domain al
+  mismo `link_page_id`. No comprar dominio corto, crear deployable o forkear código por cliente como
+  precondición. La ejecución comienza en `TASK-1433` y continúa hasta `TASK-1439`; nada está desplegado aún.
+
 - **Método de portadas editoriales Efeonce (2026-07-18):** el canon reusable vive en
   `docs/operations/public-site-content-factory/EDITORIAL_COVER_KEY_VISUAL_OPERATING_MODEL_V1.md` y gobierna
   `tesis -> metáfora -> sistema visual -> divergencia -> modelo/provenance -> iteración de una variable ->

@@ -43,7 +43,8 @@ Registro canónico de asignación de IDs `EPIC-###` para evitar colisiones y ren
 | `EPIC-027` | `in-progress` | `docs/epics/in-progress/EPIC-027-greenhouse-build-cost-recovery-decomposition.md` |
 | `EPIC-028` | `to-do` | `docs/epics/to-do/EPIC-028-efeonce-creative-studio-agentic-platform.md` |
 | `EPIC-029` | `to-do` | `docs/epics/to-do/EPIC-029-tender-proposal-studio-agentic-authoring.md` |
+| `EPIC-030` | `to-do` | `docs/epics/to-do/EPIC-030-greenhouse-link-hub-control-plane.md` |
 
 ## Siguiente ID disponible
 
-- `EPIC-030`
+- `EPIC-031`

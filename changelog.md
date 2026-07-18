@@ -1,5 +1,11 @@
 # changelog.md
 
+## 2026-07-18 — EPIC-030: Greenhouse Link Hub Control Plane
+
+- Se aceptó la dirección arquitectónica para una capacidad link-in-bio multi-marca controlada íntegramente desde Greenhouse: aggregate/versiones/dominios/audit como SSOT y renderer público limitado a una proyección allowlisted.
+- El MVP parte con `links.efeoncepro.com/efeonce` para Instagram y TikTok; luego extiende `links.efeoncepro.com/<slug>` y custom domains opcionales de clientes sobre el mismo `link_page_id`. Comprar un dominio corto no es precondición.
+- Se crearon `EPIC-030` y las tasks `TASK-1433…1439` para foundation/API, renderer, cockpit, dominios, medición, piloto Efeonce y productización cliente. Cambio sólo documental: no modifica runtime, DNS, Vercel ni perfiles sociales.
+
 ## 2026-07-18 — TASK-1429: slide_in interruptivo + CTA Experience System del renderer (code complete)
 
 - Primer placement interruptivo oficial del motor CTA: `slide_in` no modal (`role=complementary`,
