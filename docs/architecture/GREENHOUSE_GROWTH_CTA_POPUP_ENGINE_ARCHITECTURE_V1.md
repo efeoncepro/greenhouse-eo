@@ -185,7 +185,7 @@ flowchart TB
 | TypeScript root | `src/lib/growth/ctas/` |
 | Public API family | `/api/public/growth/ctas/**` |
 | Admin API family | `/api/admin/growth/ctas/**` |
-| Admin UI family | `/admin/growth/ctas` |
+| Admin UI family | `/growth/ctas` |
 | Capability prefix | `growth.cta.*` |
 | Event prefix | `growth.cta.*` |
 | Signal prefix | `growth.cta.*` |
@@ -443,6 +443,8 @@ Rules:
 - Think routes receive campaign context, not raw PII.
 - HubSpot handoff is explicit and bounded; no silent deal creation.
 
+**V1 action-registry boundary (amendment 2026-07-18).** V1 must ship the extensibility seam, not every speculative integration: one typed registry owns policy schema, server resolver, browser-safe projection, execution family and failure taxonomy. V1 proves `open_growth_form` plus governed navigation for `link_url`, `open_think_tool` and `book_meeting`; `dismiss` remains a renderer/suppression control. `download_asset`, `embed_growth_form` and `hubspot_handoff` remain supported architecture kinds but graduate as demand-driven adapters only when a real consumer supplies their asset/form/CRM, consent, retry and runtime-evidence contracts. Unknown or unregistered actions fail closed at publish/render.
+
 ## 13. Telemetry contract
 
 The renderer emits both browser events and server-side evidence.
@@ -614,8 +616,8 @@ Operational dashboards should answer:
 1. **Vertical slice (thin on placement/action, honest on portability):** one real CTA rendered from a single published immutable contract on **both** the public WordPress host **and** Think, with **one** action (`open_growth_form`) and **one** embedded/banner placement, end-to-end — minimal `cta_definition`/`cta_version`, surface bindings for both surfaces, server-side arbitration, Tier A conversion ledger, GTM/dataLayer events, one reliability signal, preview↔public parity + GVC/Playwright evidence. This forces the whole spine (compile → arbitrate → render → event → action) through real user paths on two different host runtimes.
 2. **Widen the placement axis:** add one interruptive placement (`popup_modal` or `slide_in`) with full a11y/motion/CLS contract, on the surfaces already wired.
 3. **Exposure tier + suppression at scale:** Tier B exposure ingest (sampled/BQ per §9.4), visitor-state store, frequency capping, kill switch.
-4. **Action breadth:** `embed_growth_form`, `download_asset`, `book_meeting`, bounded `hubspot_handoff`.
-5. **Admin cockpit:** `/admin/growth/ctas` author/review/publish/pause/report, Composition Shell + sidecar, preview-parity test.
+4. **Action extensibility seam:** typed registry + browser-safe executor; prove `open_growth_form` and governed navigation (`link_url`, `open_think_tool`, navigation-only `book_meeting`). Demand-driven adapters for asset delivery, embedded forms and CRM handoff stay outside V1 until a real consumer exists.
+5. **Admin cockpit:** `/growth/ctas` author/review/publish/pause/report, Composition Shell + sidecar, preview-parity test.
 
 **Experimentation is explicitly deferred out of V1.** As §14 concedes, if public traffic is underpowered a powered A/B test is not viable; building the full assignment/SRM/guardrail layer before there is traffic to test is premature. V1 ships high-confidence CRO changes and records variant metadata only; the powered-experiment engine graduates to a later phase (candidate `growth.experiment` split, §19). Until then, no CTA "winner" may be declared.
 

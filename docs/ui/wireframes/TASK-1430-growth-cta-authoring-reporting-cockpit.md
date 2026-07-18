@@ -45,6 +45,7 @@ At compact widths the detail becomes the canonical temporary sidecar/drawer beha
 
 - Route uses `CompositionShell` and canonical Greenhouse breadcrumbs, buttons, chips, states and sidecar/dialog primitives.
 - Reuse existing CTA list/detail readers and author/review/publish/pause/resume/deprecate/archive/surface commands.
+- Consume TASK-1431 action-registry metadata for authoring; do not duplicate action kinds or validation in the form.
 - Consume TASK-1428 suppression/kill-switch read and command contracts; do not reproduce rules client-side.
 - Cards/summary elements use the shared card-density contract because the aside width changes.
 - Visible reusable copy belongs in `src/lib/copy/growth/*` (or the established Growth namespace), not inline JSX.

@@ -5,11 +5,13 @@
 - **Primera rebanada activa en Think; cierre productivo aún incompleto**: TASK-1339 y TASK-1340
   están `complete/`, pero WordPress, la prueba GA4 consent-aware, la ventana de señales de siete
   días y la reconciliación documental/lifecycle quedan agrupadas en `TASK-1427`.
-- El resto de V1 se compacta en tres trabajos cohesivos: `TASK-1428` gobierna Tier B,
+- El resto de V1 se compacta en cuatro trabajos cohesivos: `TASK-1428` gobierna Tier B,
   suppression/frequency capping y kill switches; `TASK-1429` agrega exactamente un placement
-  interruptivo; `TASK-1430` reúne authoring, lifecycle, surfaces y reporting en un solo cockpit.
-- No se crean tasks independientes para documentación, CI o cada acción futura. La amplitud de
-  actions queda diferida y `TASK-1366` sigue siendo discovery del caso `book_meeting`.
+  interruptivo; `TASK-1431` crea el Action Registry extensible con navegación gobernada; y
+  `TASK-1430` reúne authoring, lifecycle, surfaces y reporting en un solo cockpit.
+- No se crean tasks independientes para documentación, CI ni cada adapter futuro. V1 implementa
+  `open_growth_form` y navegación gobernada (`link_url`, `open_think_tool`, `book_meeting`);
+  `download_asset`, `embed_growth_form` y `hubspot_handoff` quedan demand-driven.
 
 ## Status
 
@@ -41,8 +43,8 @@ Esto no cabe en una sola task porque cruza backend/data, renderer portable, publ
 - `growth.cta` existe como capability Greenhouse con source of truth propio, Full API Parity y boundary claro contra `growth.forms`, `public_site`, `commercial`, HubSpot y GTM.
 - Un renderer portable host-DOM/no-iframe por defecto puede desplegar CTAs/popups en WordPress, Astro/Think y Greenhouse preview sin duplicar lógica por surface.
 - Los eventos `greenhouse_cta_*` son GTM/dataLayer-compatible y además se registran en un ledger server-side sin PII, reconciliable con Growth Forms y futuro Tracking Engine.
-- Las acciones `open_growth_form`, `embed_growth_form`, `download_asset`, `open_think_tool`, `book_meeting` y `hubspot_handoff` quedan gobernadas por un action router, no por snippets.
-- El cockpit `/admin/growth/ctas` permite autorar/revisar/publicar/pausar/reportar CTAs con Composition Shell, Sidecar, contracts UI y GVC.
+- Un Action Registry gobierna schemas, resolución server-side y proyecciones browser-safe; V1 prueba `open_growth_form`, `link_url`, `open_think_tool` y `book_meeting`, y deja adapters con semántica propia para consumidores reales futuros.
+- El cockpit `/growth/ctas` permite autorar/revisar/publicar/pausar/reportar CTAs con Composition Shell, Sidecar, contracts UI y GVC.
 - La capa de experimentación impide declarar winners sin hipótesis, MDE, sample size, guardrails y evidencia suficiente.
 
 ## Architecture Alignment
@@ -67,8 +69,9 @@ Sequencing is **vertical-slice-first**, not horizontal-platform-first (Arch §18
 - `TASK-1427` — [ui-ux/integration] **First-slice production closure**: WordPress parity, Think+WordPress smoke, consent-aware GA4 proof, seven-day signal window and lifecycle/operator-doc reconciliation as one closure unit.
 - `TASK-1428` — [backend-data] **Exposure, suppression and kill-switch hardening**: Tier B ingest, visitor state, frequency capping, forgeable-ingest defenses and global/per-surface controls. Blocks interruptive rollout and cockpit controls.
 - `TASK-1429` — [ui-ux/platform] **One interruptive placement** (`slide_in` preferred unless discovery proves `popup_modal`), consuming TASK-1428 and covering a11y, focus, motion, mobile and both wired hosts.
-- `TASK-1430` — [ui-ux] **Authoring and reporting cockpit** at `/growth/ctas`, reusing existing readers/commands plus TASK-1428 controls in one Composition Shell workbench.
-- Deferred post-V1 — action breadth (`embed_growth_form`, `download_asset`, `book_meeting`, bounded `hubspot_handoff`) only when a real consumer justifies it; `TASK-1366` informs `book_meeting` feasibility.
+- `TASK-1431` — [backend-data/interaction] **Action Registry + governed navigation adapters**: one typed registry and browser-safe executor for `open_growth_form`, `link_url`, `open_think_tool` and navigation-only `book_meeting`. Blocks action authoring in TASK-1430.
+- `TASK-1430` — [ui-ux] **Authoring and reporting cockpit** at `/growth/ctas`, reusing existing readers/commands plus TASK-1428 controls and TASK-1431 registry metadata in one Composition Shell workbench.
+- Deferred demand-driven — `download_asset`, `embed_growth_form` and bounded `hubspot_handoff` only when a real consumer supplies the asset/form/CRM contract and runtime evidence.
 - `TASK-TBD` (deferred, post-V1) — [backend-data] Experimentation layer: stable assignment, mutual exclusion, sample ratio mismatch detection, powered-test metadata and guardrail reporting. **Deferred out of V1** (Arch §18 / ADR §Deferred): built only when public traffic supports a powered test; candidate `growth.experiment` split.
 
 ## Existing Related Work
@@ -93,6 +96,7 @@ Sequencing is **vertical-slice-first**, not horizontal-platform-first (Arch §18
 - [ ] A global/per-surface **kill switch** takes a live CTA down within the render-contract cache TTL, without redeploy.
 - [ ] GTM/dataLayer event taxonomy `greenhouse_cta_*` is documented (deliberately distinct from internal `growth.cta.*`), no raw PII reaches browser telemetry, and server-side ledger reconciles with host events.
 - [ ] Growth Forms integration proves CTA→form open/submit relationship without duplicating form schema, validation or consent.
+- [ ] A typed Action Registry governs policy validation, server resolution and browser-safe execution; V1 proves `open_growth_form` plus safe navigation for link, Think and Meetings without CRM mutation.
 - [ ] At least one public surface and one Think or Greenhouse surface consume the same published render contract.
 - [ ] Admin cockpit can author/review/publish/pause/report CTAs through commands/readers, not direct table writes.
 - [ ] Reliability signals for render, ingest error, ingest backpressure, action, GTM, form handoff, unauthorized surface, kill-switch-active and priority collisions are registered and visible in the reliability plane.
@@ -101,6 +105,7 @@ Sequencing is **vertical-slice-first**, not horizontal-platform-first (Arch §18
 ### Deferred, post-V1
 
 - [ ] Experimentation layer blocks or clearly labels underpowered tests; no CTA winner can be declared without primary metric, MDE/sample-size plan, guardrails and SRM check. **Not required for V1** — built only when public traffic supports a powered test (candidate `growth.experiment` split).
+- [ ] Asset delivery, embedded-form and HubSpot handoff adapters graduate only with a real consumer and their own security/retry/evidence contracts.
 
 ## Non-goals
 

@@ -20,14 +20,14 @@
 - Status real: `Definida`
 - Rank: `4`
 - Domain: `ui|growth`
-- Blocked by: `TASK-1428`
+- Blocked by: `TASK-1428`, `TASK-1431`
 - Branch: `task/TASK-1430-growth-cta-authoring-reporting-cockpit`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-Completa `/growth/ctas` como cockpit operator: inventario + detalle, author/review/publish/pause, surfaces/kill switches y reporting básico. Reutiliza commands/readers/APIs existentes y los deltas de TASK-1428; la UI no crea endpoints, reglas ni agregaciones paralelas.
+Completa `/growth/ctas` como cockpit operator: inventario + detalle, author/review/publish/pause, surfaces/kill switches y reporting básico. Reutiliza commands/readers/APIs existentes, los deltas de TASK-1428 y metadata del Action Registry TASK-1431; la UI no crea endpoints, enums, reglas ni agregaciones paralelas.
 
 ## Why This Task Exists
 
@@ -69,6 +69,7 @@ Reglas obligatorias:
 ### Depends on
 
 - TASK-1428 para kill switches/suppression status.
+- TASK-1431 para action kinds, schemas y metadata de authoring; la UI no mantiene un enum paralelo.
 - APIs/readers/commands TASK-1339 y preview TASK-1340.
 
 ### Blocks / Impacts
@@ -164,7 +165,7 @@ Reglas obligatorias:
 - Primitive / variant / kind: CompositionShell + master/detail/sidecar primitives existentes
 - Component candidates: refactor/extend `GrowthCtasGovernanceView`
 - Copy source: `src/lib/copy/growth.ts`
-- Data reader / command: list/detail/author/lifecycle + TASK-1428 kill switch
+- Data reader / command: list/detail/author/lifecycle + TASK-1428 kill switch + TASK-1431 action registry metadata
 - API parity: APIs admin existentes; no UI-only business action
 - Access / capability: `gestion.growth_ctas` + `growth.cta.read/author/publish/pause`
 - States to implement: list/detail/draft/review/published/paused/degraded/error/permission/compact
@@ -206,7 +207,7 @@ Reglas obligatorias:
 
 ## Detailed Spec
 
-Construir una sola ruta master-detail sobre los readers/commands existentes, sumar únicamente los contratos de TASK-1428 que falten y mantener todas las mutaciones server-confirmed. Composition Shell gobierna regiones; el sidecar/dialog canónico gobierna authoring y confirmaciones; reporting degradado nunca bloquea lifecycle.
+Construir una sola ruta master-detail sobre los readers/commands existentes, sumar únicamente los contratos de TASK-1428 que falten, consumir la metadata TASK-1431 para actions y mantener todas las mutaciones server-confirmed. Composition Shell gobierna regiones; el sidecar/dialog canónico gobierna authoring y confirmaciones; reporting degradado nunca bloquea lifecycle.
 
 ## Scope
 

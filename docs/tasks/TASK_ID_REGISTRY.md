@@ -1503,7 +1503,8 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-1428` | `to-do` | **Growth CTA suppression, exposure and kill switches** (EPIC-023) — Tier B analítico, visitor state, frequency capping, defensas de ingest y kill switches global/per-surface. P1. Muy alto. Alto. backend-data / migration. Domain growth\|data\|reliability\|security. | `docs/tasks/to-do/TASK-1428-growth-cta-suppression-exposure-kill-switches.md` |
 | `TASK-1429` | `to-do` | **Growth CTA interruptive placement** (EPIC-023) — un placement interruptivo reusable, preferentemente slide-in, consumiendo suppression/kill switches y verificando a11y/motion/mobile en Think+WordPress. P1. Alto. Medio. ui-ux / motion. Domain growth\|public-site\|ui. | `docs/tasks/to-do/TASK-1429-growth-cta-interruptive-placement.md` |
 | `TASK-1430` | `to-do` | **Growth CTA authoring and reporting cockpit** (EPIC-023) — workbench único `/growth/ctas` para inventario, detalle, author/review/lifecycle, surfaces, kill switches y reporting; reusa readers/commands existentes. P1. Alto. Alto. ui-ux / flow. Domain growth\|ui\|analytics. | `docs/tasks/to-do/TASK-1430-growth-cta-authoring-reporting-cockpit.md` |
+| `TASK-1431` | `to-do` | **Growth CTA Action Registry and governed navigation adapters** (EPIC-023) — registry tipado para policy/resolver/projection/executor; conserva `open_growth_form` y agrega navegación segura `link_url`/`open_think_tool`/`book_meeting`, sin implementar asset/embed/CRM adapters especulativos. P1. Alto. Medio. backend-data / api + UI interaction híbrida justificada. Domain growth\|public-site\|platform. | `docs/tasks/to-do/TASK-1431-growth-cta-action-registry-navigation-adapters.md` |
 
 ## Siguiente ID disponible
 
-`TASK-1431`
+`TASK-1432`

@@ -179,6 +179,8 @@ Trust and consent contract:
 
 Required actions:
 
+> Amended by `Architecture Decision 2026-07-18 — Action Registry extensible y adapters demand-driven` below. This original target list remains historical; the amendment defines the current V1 graduation contract.
+
 - `link_url`
 - `download_asset`
 - `open_growth_form`
@@ -234,3 +236,52 @@ Architecture + product-design review after acceptance. The direction stands; the
 6. **Vertical-slice-first sequencing** and **experimentation deferred out of V1**.
 
 Still no runtime changes, migrations, GTM changes, tasks or deployments authorized.
+
+## Architecture Decision 2026-07-18 — Action Registry extensible y adapters demand-driven
+
+- Status: `Accepted`
+- Owner: Product / Platform Architecture / Growth
+- Scope: `growth.cta` action policy, server resolver, browser-safe render contract, portable executor and cockpit authoring metadata
+- Reversibility: `two-way`
+- Confidence: `high`
+- Validated as of: `2026-07-18`
+
+### Context
+
+TASK-1339/1340 proved `open_growth_form` end-to-end and exposed the correct server/browser seam, but the current implementation hardcodes one action literal. Implementing every target adapter now would mix unrelated asset delivery, embedded-form and CRM concerns without real consumers; leaving the literal untouched would make every future action a cross-runtime fork.
+
+### Decision
+
+V1 ships one typed Action Registry that owns each kind's policy schema, server resolver, browser-safe projection, execution family, failure taxonomy and authoring metadata. V1 keeps `open_growth_form` and adds governed navigation for `link_url`, `open_think_tool` and `book_meeting`; the latter is navigation-only and never creates CRM records. `dismiss` remains a renderer/suppression control rather than a primary destination.
+
+`download_asset`, `embed_growth_form` and `hubspot_handoff` remain valid architecture kinds but are not V1 exit requirements. They graduate as adapters only when a real consumer provides the canonical asset/form/CRM contract, consent posture, retry/idempotency semantics and runtime evidence.
+
+The canonical operator route is `/growth/ctas`, matching the runtime shipped by TASK-1340; the earlier planned `/admin/growth/ctas` family is superseded.
+
+### Alternatives Considered
+
+- Implement all adapters in V1: rejected as speculative breadth with materially different risk and ownership.
+- Keep only `open_growth_form` and add conditionals per campaign: rejected because it creates cross-runtime drift.
+- Create one task per action immediately: rejected because no real consumer or independent rollout exists for most adapters.
+
+### Consequences
+
+- Adding an action becomes an adapter registration, not edits scattered across router, renderer and cockpit.
+- Contract parity and rollout negotiation become explicit gates when a new browser action branch appears.
+- V1 remains small enough to verify while preserving a stable extension path.
+- Asset, embedded-form and CRM adapters require later demand-driven work and cannot be claimed supported merely because their names exist in architecture.
+
+### Runtime Contract
+
+- Canonical registry/resolver: `src/lib/growth/ctas/`.
+- Browser-safe executor: `src/growth-cta-renderer/`.
+- V1 action kinds: `open_growth_form`, `link_url`, `open_think_tool`, `book_meeting`; `dismiss` is renderer control.
+- Unknown/unregistered actions fail closed at author/publish/render.
+- Operator UI family: `/growth/ctas`.
+- Implementation task: `TASK-1431`.
+
+### Revisit When
+
+- A campaign requires governed asset delivery or an embedded form.
+- A CRM handoff has explicit consent, bounded write semantics, retry/audit ownership and a real consumer.
+- Multiple navigation kinds need a separate destination registry or provider-backed configuration.
