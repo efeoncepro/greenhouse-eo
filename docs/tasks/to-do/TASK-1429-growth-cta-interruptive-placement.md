@@ -1,5 +1,16 @@
 # TASK-1429 — Growth CTA interruptive placement
 
+## Delta 2026-07-18
+
+- El contrato de TASK-1428 que esta task consume quedó **code-complete (shadow, sin push)** — cerrado por
+  trabajo en TASK-1428. Disponible: decisión server-side `eligible|suppressed|capped|killed` (el renderer
+  NO reconstruye ventanas), respuesta pública aditiva `engineState: 'ok'|'killed'`, headers de visitor
+  context (`x-greenhouse-cta-visitor/-session/-consent/-consent-source`) que **esta task debe hacer que el
+  renderer envíe** (hoy nadie los manda → interruptivos caen al fallback `consent_or_identity_limited`),
+  claim atómico interruptivo, y kill switch admin (`/api/admin/growth/ctas/kill-switch`). Gate de rollout
+  intacto: el placement interruptivo NO sale a producción con `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED`
+  en shadow (ver ledger §Pendientes + arch §24).
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

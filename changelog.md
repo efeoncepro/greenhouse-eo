@@ -1,5 +1,22 @@
 # changelog.md
 
+## 2026-07-18 — TASK-1428: suppression + Tier B + kill switches del motor CTA (code complete, shadow)
+
+- Migración aditiva `greenhouse_growth`: `cta_visitor_state` (estado pseudónimo por sujeto visitor/session,
+  hash-only, consent-aware), `cta_exposure_rollup` (Tier B agregado por hora — la exposición jamás entra al
+  ledger OLTP de conversión) y `cta_kill_switch_event` (append-only). Aplicada a la instancia; tablas dormidas
+  hasta el deploy del código.
+- Suppression/frequency capping server-side con taxonomía estable de razones y policy por versión
+  (`suppression_policy_json`, defaults conservadores, fail-closed): dismiss cooldown, conversión verificada
+  contra Growth Forms, caps per-CTA y global interruptivo con claim atómico multi-tab. Integrado al arbiter en
+  **shadow** (`GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` default OFF; registrado en el ledger de flags).
+- Kill switches global/per-surface operables **sin redeploy** (estado en DB, capability `growth.cta.pause`,
+  API `GET/POST /api/admin/growth/ctas/kill-switch`, outbox `growth.cta.kill_switch_changed`, respuesta pública
+  `engineState ok|killed`). Signals nuevos: `growth.cta.kill_switch_active`, `growth.cta.priority_collision`,
+  `growth.cta.event_ingest_backpressure`.
+- Evidencia: full suite 9684 tests verdes + build prod + SQL vivo contra PG real. Rollout pendiente
+  (push → shadow-compare staging → enforcement → prod gradual); la task sigue `in-progress` por diseño.
+
 ## 2026-07-18 — EPIC-023: CTA Experience System incorporado al plan V1
 
 - El renderer portable se gobierna como una sola primitive con ejes ortogonales: placement, experience kind,

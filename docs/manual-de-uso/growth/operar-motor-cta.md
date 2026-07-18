@@ -83,6 +83,30 @@ Snippet canónico (WordPress vía widget HTML/Elementor, o cualquier host HTML):
 
 `Borrador → En revisión → Publicado → Pausado → Deprecado → Archivado`. Solo `Publicado` se muestra; `Pausado` es reversible; una sola versión publicada viva por CTA.
 
+## Kill switch de emergencia (TASK-1428 — sin redeploy)
+
+Tres frenos, del más fino al más amplio: **pausar la versión** (lifecycle `pause`, deja de arbitrarse en ≤ ~2 min), **kill switch per-surface** y **kill switch global**. Los dos últimos son estado operativo en base de datos (nunca una env var) y operan al instante server-side:
+
+```bash
+# Ver estado vigente + audit trail (capability growth.cta.read)
+pnpm staging:request "/api/admin/growth/ctas/kill-switch"
+
+# Apagar TODO el motor en todas las surfaces (capability growth.cta.pause; reason obligatorio ≥5 chars)
+pnpm staging:request POST "/api/admin/growth/ctas/kill-switch" '{"action":"engage","scope":"global","reason":"incidente en el host"}'
+
+# Apagar una sola surface
+pnpm staging:request POST "/api/admin/growth/ctas/kill-switch" '{"action":"engage","scope":"surface","surfaceId":"csur-…","reason":"surface rota"}'
+
+# Restaurar (release del mismo scope)
+pnpm staging:request POST "/api/admin/growth/ctas/kill-switch" '{"action":"release","scope":"global","reason":"incidente resuelto"}'
+```
+
+**Ventana efectiva**: el servidor responde `killed` desde el request siguiente al engage (no hay cache HTTP en las rutas públicas; el cache CORS de 90s no la alarga — un origin ya permitido recibe la respuesta `killed` igual). Lo que domina la ventana es la cadencia de fetch del renderer: hoy 1 fetch por pageview, así que las páginas ya abiertas conservan el CTA pintado hasta la próxima navegación. Mientras un switch esté activo, el signal `growth.cta.kill_switch_active` queda en warning en `/admin/operations` — el retiro es visible, no silencioso. Cada engage/release queda en el audit trail (quién, cuándo, por qué).
+
+## Suppression y frequency capping (TASK-1428 — hoy en shadow)
+
+El motor decide server-side si un visitante debe volver a ver un CTA: dismiss reciente (cooldown default 14 días), conversión verificada, o tope de impresiones interruptivas (per-CTA 2/24h + global 3/día por visitante). Con `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` OFF (estado actual) la decisión solo se **registra** (shadow) sin alterar lo que se muestra; el flip a ON activa la exclusión real. La policy por versión vive en `suppression_policy_json` (vacía = defaults conservadores). Sin consentimiento del visitante no se guarda estado durable: la ventana es de sesión (48 h) y los placements interruptivos directamente no se muestran a visitantes sin identidad.
+
 ## Qué no hacer
 
 - **No** editar filas de `cta_version` publicadas por SQL (el trigger lo bloquea; editar = versión nueva).
@@ -90,6 +114,9 @@ Snippet canónico (WordPress vía widget HTML/Elementor, o cualquier host HTML):
 - **No** tratar clics `browser_reported` como conversiones — solo `server_confirmed` cuenta en reportes.
 - **No** committear ni loggear los embed key secrets.
 - **No** publicar tags al container GTM sin preview + confirmación humana.
+- **No** dejar un kill switch engaged sin dueño: es un estado de emergencia visible (signal en warning), no una pausa de largo plazo — para retiros planificados usar `pause`/`deprecate` del lifecycle.
+- **No** borrar filas de `cta_kill_switch_event` (append-only; es el audit del stop de emergencia).
+- **No** prender `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` en producción sin la ventana de shadow-compare en staging (secuencia del rollout de TASK-1428).
 
 ## Problemas comunes
 

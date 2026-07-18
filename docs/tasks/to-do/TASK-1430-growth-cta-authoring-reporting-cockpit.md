@@ -1,5 +1,14 @@
 # TASK-1430 — Growth CTA authoring and reporting cockpit
 
+## Delta 2026-07-18
+
+- Los readers/commands de TASK-1428 que el cockpit consume quedaron **code-complete (sin push)** — cerrado
+  por trabajo en TASK-1428: `getKillSwitchState()` + `listKillSwitchAudit()` (actor/reason/timestamp,
+  operador-only) + `setCtaKillSwitch()` vía `GET/POST /api/admin/growth/ctas/kill-switch`
+  (capabilities `growth.cta.read`/`growth.cta.pause`, cero capabilities nuevas), y
+  `summarizeCtaExposure(windowDays)` (rollup Tier B diario por reason class, con `enforced` para
+  distinguir shadow de enforcement). La UI no debe crear agregaciones paralelas: estos son los canónicos.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

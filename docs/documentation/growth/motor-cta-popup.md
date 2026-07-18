@@ -1,9 +1,9 @@
 # Motor de CTAs y Popups — `growth.cta`
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-07-17 por Claude (TASK-1339)
-> **Ultima actualizacion:** 2026-07-18 por Claude (rollout a producción + gobernanza + capa GTM + skill de dominio)
+> **Ultima actualizacion:** 2026-07-18 por Claude (TASK-1428: suppression/frequency capping en shadow + exposición Tier B + kill switches operables sin redeploy)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md)
 > **Skill de dominio:** `greenhouse-growth-ctas` (Claude + Codex; se actualiza con cada cambio del motor)
 
@@ -45,11 +45,20 @@ La superficie de gobernanza vive en el **menú Growth** (junto a AEO y Forms), v
 | Crear/editar borradores | `growth.cta.author` |
 | Publicar, deprecar, archivar y gestionar superficies | `growth.cta.publish` |
 | Pausar/reanudar (freno de emergencia) | `growth.cta.pause` |
+| Kill switch global/per-surface (engage/release) | `growth.cta.pause` |
 
-`pause` es una capability separada a propósito: frenar un CTA problemático no exige autoridad de publicación.
+`pause` es una capability separada a propósito: frenar un CTA problemático no exige autoridad de publicación. El kill switch usa esa misma autoridad.
+
+## Respeto al visitante (suppression) y frenos de emergencia — TASK-1428
+
+El motor recuerda de forma pseudónima (solo hashes, nunca datos personales) si un visitante ya cerró un CTA, ya convirtió, o ya vio demasiados prompts interruptivos — y decide en el servidor no volver a mostrárselo dentro de la ventana correspondiente. Sin consentimiento del visitante el recuerdo dura solo la sesión, y los formatos interruptivos directamente no se muestran a visitantes sin identidad. Hoy esta decisión corre **en shadow**: se registra qué se habría suprimido, sin cambiar lo que se muestra; el enforcement se activa por flag tras comparar.
+
+La exposición masiva (cuántas veces se mostró/suprimió/vio un CTA) se guarda **agregada por hora** en una tabla analítica aparte — nunca infla el ledger de conversión. Y ante un incidente, el operador puede apagar el motor completo o una sola superficie **al instante y sin deploy** (kill switch con auditoría de quién/cuándo/por qué); mientras esté activo, una señal en warning lo hace visible.
+
+> Detalle técnico: `cta_visitor_state` + `cta_exposure_rollup` + `cta_kill_switch_event` (migración TASK-1428); decisión en [src/lib/growth/ctas/suppression.ts](../../../src/lib/growth/ctas/suppression.ts); kill switch en [src/lib/growth/ctas/kill-switch.ts](../../../src/lib/growth/ctas/kill-switch.ts) + `POST /api/admin/growth/ctas/kill-switch`. Arquitectura §24 (Delta 2026-07-18).
 
 ## Señales de salud
 
-Visibles en `/admin/operations` (el dashboard transversal de salud de plataforma — la operación del *programa* vive en `/growth/ctas`; la salud de la *máquina* converge con la de todos los módulos): errores de render, errores de ingest, intentos no autorizados/forjados y handoffs rotos hacia formularios (un CTA publicado apuntando a un form despublicado se excluye del render y alerta). Todas en steady 0.
+Visibles en `/admin/operations` (el dashboard transversal de salud de plataforma — la operación del *programa* vive en `/growth/ctas`; la salud de la *máquina* converge con la de todos los módulos): errores de render, errores de ingest, intentos no autorizados/forjados, handoffs rotos hacia formularios (un CTA publicado apuntando a un form despublicado se excluye del render y alerta), kill switch activo (visible mientras dure el retiro), colisiones de prioridad interruptiva y backpressure del sink de exposición. Todas en steady 0.
 
 > Detalle técnico: [src/lib/reliability/queries/growth-cta-signals.ts](../../../src/lib/reliability/queries/growth-cta-signals.ts). Manual de operación: [operar-motor-cta.md](../../manual-de-uso/growth/operar-motor-cta.md).

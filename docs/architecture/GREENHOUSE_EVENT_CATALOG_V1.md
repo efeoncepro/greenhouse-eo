@@ -1241,3 +1241,11 @@ Spec: `docs/tasks/in-progress/TASK-1175-design-handoff-control-plane-full-api-pa
 | `growth.cta.surface_registered` | v1 | `growth_cta_surface` (`csur-{uuid}`) | `insertSurfaceBinding` (registro/credencial de surface), in-tx | — |
 
 **Payload lifecycle v1**: `{ schemaVersion: 1, ctaId, ctaVersionId, fromStatus, toStatus }` — un solo event type para toda la state machine `draft→review→published→paused→deprecated→archived` (el publish atómico emite además la transición `published→deprecated` de la versión superseded). **Payload surface v1**: `{ schemaVersion: 1, surfaceId, surfaceKind }` — NUNCA lleva el embed key secret ni su hash. Ambos se emiten transaccionalmente con el write (patrón outbox canónico). Namespace interno `growth.cta.*` deliberadamente distinto del browser `greenhouse_cta_*` (arch §13 — no unificar). Dominio de observabilidad: `captureWithDomain(err, 'growth', …)`.
+
+## Delta 2026-07-18 — TASK-1428: `growth.cta.kill_switch_changed` (kill switch global/per-surface)
+
+| Evento | Versión | Aggregate | Emisor | Consumer |
+| --- | --- | --- | --- | --- |
+| `growth.cta.kill_switch_changed` | v1 | `growth_cta_kill_switch` (`global` \| `csur-{uuid}`) | `setCtaKillSwitch` (`src/lib/growth/ctas/kill-switch.ts`), in-tx con el INSERT append-only en `cta_kill_switch_event` | — (audit trail del stop de emergencia §16.3; el estado vigente lo lee el render path directo de la tabla) |
+
+**Payload v1**: `{ schemaVersion: 1, scope: 'global'|'surface', surfaceId, action: 'engage'|'release', reason, actorRef }` — `actorRef` es identidad interna del operador (jamás cruza al browser; el render público solo recibe `engineState: 'killed'`). El command es idempotente-observable: si el estado vigente ya es el pedido no inserta evento ni emite outbox (un retry no infla el audit). La exposición Tier B (`eligible/suppressed/viewed`) NO pasa por el outbox: va al rollup agregado `cta_exposure_rollup` (arch §9.4 — jamás 1 fila por pageview).

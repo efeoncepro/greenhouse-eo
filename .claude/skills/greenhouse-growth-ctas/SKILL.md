@@ -61,9 +61,13 @@ operador (/growth/ctas o API admin, capability growth.cta.*)
 | `cta_version` | state machine CHECK; **UNIQUE parcial: 1 published por cta**; trigger de inmutabilidad post-publish (contenido/policies/published_at congelados; solo status transiciona) |
 | `cta_surface_binding` | origin_allowlist_json + allowed_cta_slugs_json + embed_key_id/hash (solo hash; secreto se entrega UNA vez) |
 | `cta_conversion_event` | **append-only por trigger** (sin UPDATE/DELETE; runtime solo SELECT/INSERT); `trust_level` browser_reported/server_confirmed; `ingest_status` accepted/**rejected** (rechazos de forja sin PII = fuente del signal); CHECKs: accepted exige refs reales, rejected exige reason_class |
+| `cta_visitor_state` (TASK-1428) | estado pseudónimo por sujeto (`visitor` durable consent-gated \| `session` fallback); **UNIQUE NULLS NOT DISTINCT (subject_kind, subject_hash, cta_id)** — la fila `cta_id IS NULL` es la ventana GLOBAL interruptiva del sujeto; retención visitor 180d / session 48h (purga oportunista) |
+| `cta_exposure_rollup` (TASK-1428) | **Tier B AGREGADO horario** (jamás 1 fila por pageview); dims bucket×cta×surface×placement×kind×reason×source×**enforced** (shadow=false); `observed_count` + `estimated_count` (sampling); reason_class = enum cerrado CHECK; retención 400d |
+| `cta_kill_switch_event` (TASK-1428) | kill switch global/per-surface **append-only por trigger**; estado vigente = último evento (`engage`\|`release`) por scope; `reason` obligatorio + `actor_ref`; outbox `growth.cta.kill_switch_changed` in-tx |
 
-Tier B (exposición `eligible/suppressed/viewed` masiva) NUNCA entra a OLTP — arch §9.4; `viewed`
-va SOLO a dataLayer, jamás al ledger.
+Tier B (exposición `eligible/suppressed/viewed` masiva) NUNCA entra a OLTP — arch §9.4. Desde
+TASK-1428 `viewed` SÍ tiene ingest server (misma cadena de defensa → rollup agregado, nunca el
+ledger); `eligible/suppressed` los observa el server en el render path. El dataLayer sigue igual.
 
 ## Domain code map
 
@@ -73,7 +77,12 @@ va SOLO a dataLayer, jamás al ledger.
   `arbiter.ts` (matcher glob-lite + priority + 0–1 interruptivo; targeting ausente/inválido =
   NO elegible, fail-closed), `render-contract.ts` (compiler browser-safe), `action-router.ts`
   (SOLO `open_growth_form`, resuelve vía `getPublishedRenderContractByRef` de forms),
-  `ingest.ts` (pipeline forjable-hardened), `commands.ts` (lifecycle + surfaces), `readers.ts`.
+  `ingest.ts` (pipeline forjable-hardened + routing Tier B + hooks dismiss/conversión),
+  `commands.ts` (lifecycle + surfaces), `readers.ts` (arbitraje + suppression + kill switch),
+  `suppression.ts` (decisión PURA: taxonomía + policy zod, fail-closed), `visitor-state.ts`
+  (store consent-aware + claim atómico FOR UPDATE + purga), `exposure.ts` (adapter Tier B
+  fail-open + sampling + summary reader), `kill-switch.ts` (estado en DB + command idempotente-
+  observable + audit) — todo TASK-1428.
 - `src/growth-cta-renderer/` — bundle público (vanilla TS ~23KB, light DOM + ElementInternals):
   `element.ts` (`<greenhouse-cta>`; attrs `surface`/`embed-key`/`base-url`/`route`/`cta`/
   `form-surface`/`cta-location`/`locale`/`color-scheme`/`appearance`), `styles.ts` (**paridad
@@ -102,8 +111,19 @@ va SOLO a dataLayer, jamás al ledger.
   403 (`surface_unauthorized`). ⚠️ Ningún host tiene CMP/consent-mode defaults — los tags disparan
   sin gate (postura pre-existente del sitio; LEARNINGS 2026-07-18). Ventana steady-state 7d abierta
   (hasta 2026-07-25). Pendiente: placement AMPLIO WP (decisión del operador post-validación;
-  recomendado posts del blog vía `the_content` en `ohio-child`), placement interruptivo, Tier B,
-  cockpit de autoría, más acciones.
+  recomendado posts del blog vía `the_content` en `ohio-child`), placement interruptivo, cockpit
+  de autoría, más acciones.
+- **2026-07-18 (TASK-1428): suppression/Tier B/kill switches CODE-COMPLETE en SHADOW (sin push).**
+  Migración `20260718131956294` aplicada a la instancia (3 tablas aditivas dormidas). Flag
+  `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` default OFF = shadow (decisión computada +
+  registrada `enforced=false` en el rollup, renders intactos). Kill switch = estado en DB
+  (`POST /api/admin/growth/ctas/kill-switch`, capability `growth.cta.pause`), SIEMPRE enforced
+  (no depende del flag de suppression). Render público acepta headers
+  `x-greenhouse-cta-visitor/-session/-consent/-consent-source` y responde `engineState ok|killed`
+  aditivo — el renderer AÚN no los envía (eso es TASK-1429). Signals nuevos:
+  `kill_switch_active`/`priority_collision`/`event_ingest_backpressure`. SQL vivo validado
+  (`_sanity-cta-suppression-sql.ts`). Rollout pendiente: push → shadow-compare staging →
+  enforcement staging + smoke kill switch sin redeploy → prod gradual (ledger §Pendientes).
 
 ## Hard rules (anti-regression — arch §20 + aprendizajes de implementación)
 
@@ -115,7 +135,21 @@ va SOLO a dataLayer, jamás al ledger.
   `<greenhouse-form>` gobernado y guarda solo la relación (test de boundary lo vigila).
 - **NUNCA** editar una `cta_version` published (trigger DB lo bloquea): editar = versión nueva;
   publish deprecia la anterior en la misma tx.
-- **NUNCA** escribir exposición masiva (`viewed`/`eligible`/`suppressed`) al ledger OLTP.
+- **NUNCA** escribir exposición masiva (`viewed`/`eligible`/`suppressed`) al ledger OLTP: va al
+  rollup agregado (`cta_exposure_rollup`) vía `exposure.ts` (fail-open, sampling); los rechazos
+  Tier B tampoco entran al ledger (su CHECK de `event_kind` es Tier A-only).
+- **NUNCA** reconstruir ventanas de suppression en el browser/renderer: la decisión es server-side
+  (`suppression.ts` + visitor state); el browser recibe solo el outcome mínimo (`engineState`,
+  resultado arbitrado) — jamás ventanas, razones internas ni candidate set.
+- **NUNCA** persistir visitor/session keys crudas (se hashean server-side; la key `visitor` solo
+  habilita estado durable con `consentState='granted'` — sin consent, session-scoped 48h).
+- **NUNCA** suprimir por `already_converted` desde un claim browser: solo con `formSubmissionId`
+  verificado server-side contra Growth Forms (`isSubmissionServerAccepted`).
+- **NUNCA** implementar el kill switch como env var: es estado OPERATIVO en DB
+  (`cta_kill_switch_event` append-only, command `setCtaKillSwitch`, capability `growth.cta.pause`)
+  y opera sin redeploy; killed produce `engineState='killed'`, nunca un falso vacío/`dismissed`.
+- **NUNCA** servir una impresión interruptiva en enforcement sin el claim atómico
+  (`claimInterruptiveImpression` FOR UPDATE — multi-tab determinista, exactamente uno gana).
 - **NUNCA** saltarse el cross-check `cta_version↔surface` + embed key + origin en el ingest; los
   rechazos se persisten sin PII (capped por IP/hora) — son la fuente del signal de forja.
 - **NUNCA** agregar un selector CSS del renderer que no use `:is(greenhouse-cta, .ghc-scope)` —
@@ -166,6 +200,8 @@ pnpm renderer:cta:build                                           # bundle públ
 pnpm fe:capture task-1340-growth-cta-renderer --env=local         # GVC gobernanza + preview
 npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/seed-cta-ai-visibility-followup.ts --smoke
 pnpm staging:request "/api/admin/growth/ctas"                     # inventario vía API admin
+pnpm staging:request "/api/admin/growth/ctas/kill-switch"         # estado + audit del kill switch
+npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/_sanity-cta-suppression-sql.ts  # SQL vivo TASK-1428
 ```
 
 ## Reference docs

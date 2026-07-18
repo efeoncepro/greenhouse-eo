@@ -1,10 +1,40 @@
 # TASK-1428 — Growth CTA suppression, exposure and kill switches
 
+## Delta 2026-07-18 — Slices 1-3 CODE-COMPLETE (shadow); rollout pendiente
+
+- **Implementado y committeado en develop local (SIN push)**: migración aditiva `20260718131956294`
+  (`cta_visitor_state` + `cta_exposure_rollup` + `cta_kill_switch_event`, aplicada a la instancia con
+  DO-block anti pre-up-marker verde) · decisión pura de suppression (`suppression.ts`, taxonomía completa
+  de la spec + policy zod defaults conservadores, fail-closed) · visitor state consent-aware
+  (`visitor-state.ts`: visitor durable solo con consent granted, session fallback 48h, claim atómico
+  FOR UPDATE multi-tab determinista, purga oportunista) · Tier B (`exposure.ts`: rollup agregado horario
+  fail-open + sampling + breadcrumb backpressure; `viewed` browser entra por la misma cadena de defensa
+  del ingest y NUNCA toca el ledger) · hooks de ingest (dismiss persiste al aceptar; `already_converted`
+  SOLO con `formSubmissionId` verificado vía `isSubmissionServerAccepted` de forms/readers) · kill switch
+  global/per-surface (`kill-switch.ts` + `GET/POST /api/admin/growth/ctas/kill-switch`, capability
+  `growth.cta.pause` reutilizada, estado en DB + outbox `growth.cta.kill_switch_changed`, SIEMPRE
+  enforced) · render público con headers de visitor context + `engineState: ok|killed` aditivo · signals
+  `kill_switch_active`/`priority_collision`/`event_ingest_backpressure` cableados.
+- **Verificación**: `pnpm test` full 9684 verdes · `pnpm build` prod OK · typecheck/lint 0 err · SQL vivo
+  contra PG real (`scripts/growth/_sanity-cta-suppression-sql.ts`: claim `[true,true,false]`, upserts
+  idempotentes, rollup increment, DISTINCT ON kill state; writes limpiados).
+- **Decisiones de discovery (Open Questions resueltas)**: Tier B = opción §9.4-3 (rollup PG agregado,
+  adapter aislado para futuro sink BQ) · kill switch append-only (estado = último evento por scope) ·
+  cero capabilities nuevas (`pause` es la autoridad §16.3) · fallback sin identity = interruptivos
+  suprimidos `consent_or_identity_limited` · ventana compuesta del kill: efecto server inmediato, el
+  cache CORS 90s NO la alarga (origins ya permitidos reciben `killed`), domina la cadencia de fetch del
+  renderer.
+- **Estado honesto: `code complete, rollout pendiente`** — falta: push a develop → deploy staging →
+  ventana shadow-compare → flip `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` staging + smoke kill switch
+  live sin redeploy (secuencia §Production verification) → prod gradual + monitor 7d. El renderer AÚN no
+  envía visitor keys (TASK-1429); el fallback conservador cubre el estado actual. Ledger:
+  fila + §Pendientes de acción registradas.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
