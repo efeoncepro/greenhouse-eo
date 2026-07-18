@@ -24,6 +24,7 @@ import {
   ctaActionPolicySchema,
   ctaContentSchema,
   ctaPriorityPolicySchema,
+  ctaSuppressionPolicySchema,
   ctaTargetingPolicySchema,
   CTA_PLACEMENTS,
 } from './contracts'
@@ -53,6 +54,8 @@ export interface AuthorCtaInput {
   visualAssetRef?: string | null
   actionPolicy: Record<string, unknown>
   targetingPolicy?: Record<string, unknown>
+  /** TASK-1430: postura de supresión autorada (cap/dismiss/ventana). Sin ella el store persiste `{}`. */
+  suppressionPolicy?: Record<string, unknown>
   priorityPolicy?: Record<string, unknown>
   createdBy?: string | null
 }
@@ -84,6 +87,10 @@ export const authorDraftCta = async (input: AuthorCtaInput): Promise<AuthorCtaRe
     details.push('priority_policy_invalid')
   }
 
+  if (input.suppressionPolicy !== undefined && !ctaSuppressionPolicySchema.safeParse(input.suppressionPolicy).success) {
+    details.push('suppression_policy_invalid')
+  }
+
   if (details.length > 0) return { ok: false, reason: 'invalid_input', details }
 
   const created = await insertCtaDraft({
@@ -101,6 +108,7 @@ export const authorDraftCta = async (input: AuthorCtaInput): Promise<AuthorCtaRe
     visualAssetRef: input.visualAssetRef ?? null,
     actionPolicy: input.actionPolicy,
     targetingPolicy: input.targetingPolicy ?? { routes: ['/**'], excludeRoutes: [] },
+    suppressionPolicy: input.suppressionPolicy ?? undefined,
     priorityPolicy: input.priorityPolicy ?? { score: 100 },
   })
 

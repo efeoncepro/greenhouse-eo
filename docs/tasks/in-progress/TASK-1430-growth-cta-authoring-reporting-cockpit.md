@@ -13,6 +13,13 @@
   (el store ya lo soportaba; sin esto el paso targeting/suppression del authoring no puede persistir).
 - Bind/unbind de surface queda **read-only** en V1 (el scope dice "Mostrar bindings"); no existe command
   de update de allowlist y no se crea en esta task. El estado de binding se deriva server-side.
+- **Instrucción del operador (2026-07-18, mid-ejecución): la autoridad VISUAL es el diseño de Claude
+  Design** (`Cockpit de CTAs.dc.html`) — no aplanar la UI a los patrones visuales existentes del repo
+  cuando eso degrade la estética. El operador **autoriza explícitamente crear patrones, estética y
+  primitives nuevas** donde el catálogo actual no alcance la fidelidad del mock. Esto relaja el
+  "Primitive decision: reuse" del UI/UX Contract (reuse donde calce, nuevo donde el mock lo pida);
+  se mantienen los invariantes duros: tokens del theme (cero HEX inline), copy tokenizado, renderer
+  canónico para el preview, capabilities/estados honestos y GVC en loop.
 
 ## Delta 2026-07-18 (3)
 
