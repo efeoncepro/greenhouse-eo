@@ -17,6 +17,9 @@ export const GROWTH_CTA_RENDER_ERROR_SIGNAL_ID = 'growth.cta.render_error_rate'
 export const GROWTH_CTA_INGEST_ERROR_SIGNAL_ID = 'growth.cta.event_ingest_error_rate'
 export const GROWTH_CTA_SURFACE_UNAUTHORIZED_SIGNAL_ID = 'growth.cta.surface_unauthorized_attempt'
 export const GROWTH_CTA_FORM_HANDOFF_FAILED_SIGNAL_ID = 'growth.cta.form_handoff_failed'
+export const GROWTH_CTA_KILL_SWITCH_ACTIVE_SIGNAL_ID = 'growth.cta.kill_switch_active'
+export const GROWTH_CTA_PRIORITY_COLLISION_SIGNAL_ID = 'growth.cta.priority_collision'
+export const GROWTH_CTA_INGEST_BACKPRESSURE_SIGNAL_ID = 'growth.cta.event_ingest_backpressure'
 
 const MODULE_KEY = 'growth' as const
 const SOURCE = 'getGrowthCtaSignals'
@@ -30,6 +33,7 @@ export const getGrowthCtaSignals = async (): Promise<ReliabilitySignal[]> => {
       ingest_errors: number
       unauthorized: number
       handoff_failed: number
+      backpressure: number
     }>(
       `SELECT
          COUNT(*) FILTER (
@@ -44,12 +48,46 @@ export const getGrowthCtaSignals = async (): Promise<ReliabilitySignal[]> => {
          COUNT(*) FILTER (
            WHERE event_kind = 'error' AND trust_level = 'server_confirmed'
              AND event_payload_json->>'reason' = 'form_handoff_failed'
-         )::int AS handoff_failed
+         )::int AS handoff_failed,
+         COUNT(*) FILTER (
+           WHERE event_kind = 'error' AND trust_level = 'server_confirmed'
+             AND event_payload_json->>'reason' = 'exposure_backpressure'
+         )::int AS backpressure
        FROM greenhouse_growth.cta_conversion_event
        WHERE created_at > NOW() - INTERVAL '1 day'`,
     )
 
-    const counts = rows[0] ?? { render_errors: 0, ingest_errors: 0, unauthorized: 0, handoff_failed: 0 }
+    // Kill switch vigente (TASK-1428 §16.3): último evento por scope en el ledger append-only.
+    const killRows = await runGreenhousePostgresQuery<{ engaged: number }>(
+      `SELECT COUNT(*)::int AS engaged
+         FROM (
+           SELECT DISTINCT ON (scope, surface_id) action
+             FROM greenhouse_growth.cta_kill_switch_event
+            ORDER BY scope, surface_id, created_at DESC
+         ) current
+        WHERE current.action = 'engage'`,
+    )
+
+    // Colisiones de prioridad (TASK-1428): interruptivos elegibles que perdieron arbitraje,
+    // acumulados en el rollup Tier B (estimated bajo sampling; observed como evidencia).
+    const collisionRows = await runGreenhousePostgresQuery<{ collisions: number }>(
+      `SELECT COALESCE(SUM(observed_count), 0)::int AS collisions
+         FROM greenhouse_growth.cta_exposure_rollup
+        WHERE reason_class = 'higher_priority_selected'
+          AND decision_source = 'server'
+          AND bucket_start > NOW() - INTERVAL '1 day'`,
+    )
+
+    const counts = rows[0] ?? {
+      render_errors: 0,
+      ingest_errors: 0,
+      unauthorized: 0,
+      handoff_failed: 0,
+      backpressure: 0,
+    }
+
+    const killEngaged = killRows[0]?.engaged ?? 0
+    const collisions = collisionRows[0]?.collisions ?? 0
 
     return [
       {
@@ -107,6 +145,48 @@ export const getGrowthCtaSignals = async (): Promise<ReliabilitySignal[]> => {
             : `${counts.handoff_failed} CTA(s) publicado(s) apuntan a un form que ya no resuelve — excluidos del render (campaña a oscuras).`,
         observedAt,
         evidence: [{ kind: 'metric', label: 'form_handoff_failed', value: String(counts.handoff_failed) }],
+      },
+      {
+        signalId: GROWTH_CTA_KILL_SWITCH_ACTIVE_SIGNAL_ID,
+        moduleKey: MODULE_KEY,
+        kind: 'runtime',
+        source: SOURCE,
+        label: 'Kill switch del motor de CTAs activo',
+        severity: killEngaged > 0 ? 'warning' : 'ok',
+        summary:
+          killEngaged === 0
+            ? 'Sin retiros operativos activos (global ni per-surface).'
+            : `${killEngaged} kill switch(es) activo(s) — hay un retiro operativo vivo que debe ser visible (arch §16.3).`,
+        observedAt,
+        evidence: [{ kind: 'metric', label: 'kill_switches_engaged', value: String(killEngaged) }],
+      },
+      {
+        signalId: GROWTH_CTA_PRIORITY_COLLISION_SIGNAL_ID,
+        moduleKey: MODULE_KEY,
+        kind: 'data_quality',
+        source: SOURCE,
+        label: 'Colisiones de prioridad interruptiva (último día)',
+        severity: collisions > 0 ? 'warning' : 'ok',
+        summary:
+          collisions === 0
+            ? 'Sin colisiones: a lo sumo un candidato interruptivo por arbitraje.'
+            : `${collisions} arbitraje(s) con más de un interruptivo elegible — revisar priorización de campañas activas.`,
+        observedAt,
+        evidence: [{ kind: 'metric', label: 'priority_collisions', value: String(collisions) }],
+      },
+      {
+        signalId: GROWTH_CTA_INGEST_BACKPRESSURE_SIGNAL_ID,
+        moduleKey: MODULE_KEY,
+        kind: 'runtime',
+        source: SOURCE,
+        label: 'Backpressure del sink Tier B de exposición (último día)',
+        severity: counts.backpressure > 0 ? 'warning' : 'ok',
+        summary:
+          counts.backpressure === 0
+            ? 'El sink de exposición (rollup agregado) escribe sin fallas.'
+            : `${counts.backpressure} día(s)-fallo del sink Tier B — el adapter degradó fail-open (analytics dropped, render intacto).`,
+        observedAt,
+        evidence: [{ kind: 'metric', label: 'exposure_backpressure', value: String(counts.backpressure) }],
       },
     ]
   } catch (error) {
