@@ -1,5 +1,17 @@
 # TASK-1430 — Growth CTA authoring and reporting cockpit
 
+## Delta 2026-07-18 (3)
+
+- TASK-1431 quedó code-complete (local): el blocker de metadata YA existe. El cockpit consume
+  `CTA_ACTION_KIND_METADATA` + enums (`CTA_ACTION_KINDS`, `CTA_NAVIGATE_ACTION_KINDS`, failure
+  reasons) desde `src/lib/growth/ctas/contracts.ts` (browser-safe, sin server-only) — cero enum
+  paralelo. Policies por kind: `ctaLinkUrlPolicySchema`/`ctaOpenThinkToolPolicySchema`/
+  `ctaBookMeetingPolicySchema` (mismo archivo); la validación/resolución server sigue en
+  `action-registry.ts` vía `resolveCtaAction`. El preview ya soporta las 4 acciones con
+  `inertNavigation: true` (fixtures `linkUrlInternal`/`linkUrlExternalNewTab`/`thinkTool`/
+  `bookMeeting`). Bloqueo restante de TASK-1431: solo su rollout (bundle 1.2.0 en hosts), no el
+  contrato de authoring.
+
 ## Delta 2026-07-18 (2)
 
 - TASK-1429 quedó code-complete — assets nuevos que este cockpit reutiliza (no re-crear): matriz de
