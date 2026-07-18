@@ -83,7 +83,9 @@ const mountFixture = async (
 
   const contract = CTA_FIXTURES[fixture].build()
 
-  root.className = 'ghc-scope'
+  // classList.add (NUNCA className=): preserva las clases MUI del Box (sx maxWidth
+  // de la matriz de density) — pisarlas dejaba todos los contenedores full-width.
+  root.classList.add('ghc-scope')
   root.dataset.ghcVariant = contract.styleVariant ?? 'default'
   root.dataset.ghcPlacement = contract.placement
   root.style.containerType = 'inline-size'

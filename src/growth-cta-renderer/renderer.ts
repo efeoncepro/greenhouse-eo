@@ -62,6 +62,10 @@ export class CtaRenderer {
   private readonly options: CtaRendererOptions
   private readonly doc: Document
   private destroyed = false
+  /** Card propio de ESTA instancia: destroy/dismiss remueven SOLO este nodo (dos
+   * instancias sobre el mismo root — p.ej. StrictMode double-effect en el preview —
+   * jamás se borran el contenido entre sí). */
+  private card: HTMLElement | null = null
 
   constructor(options: CtaRendererOptions) {
     this.options = options
@@ -177,6 +181,7 @@ export class CtaRenderer {
     card.appendChild(dismiss)
 
     root.replaceChildren(card)
+    this.card = card
     root.dataset.ghcState = 'visible'
 
     // viewed: visibility-gated por default en el element (TASK-1429 — IO ≥50% + dwell);
@@ -293,15 +298,21 @@ export class CtaRenderer {
 
     // El slide-in retiene el DOM: el exit CSS (`allow-discrete` → display:none) pinta
     // la salida y el estado ya quedó comprometido; el embedded limpia al instante.
-    if (!this.options.retainDomOnDismiss) this.options.root.replaceChildren()
+    if (!this.options.retainDomOnDismiss) this.removeOwnCard()
   }
 
   private handleDismiss(): void {
     this.dismiss()
   }
 
+  /** Remueve SOLO el card de esta instancia (jamás contenido ajeno en el mismo root). */
+  private removeOwnCard(): void {
+    this.card?.remove()
+    this.card = null
+  }
+
   destroy(): void {
     this.destroyed = true
-    this.options.root.replaceChildren()
+    this.removeOwnCard()
   }
 }

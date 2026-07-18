@@ -345,7 +345,10 @@ greenhouse-cta, .ghc-scope {
   translate: var(--ghc-slidein-shift);
 }
 
-:is(greenhouse-cta, .ghc-scope).ghc-slidein .ghc-card {
+/* Card del slide_in — keyed por PLACEMENT (data del contrato, lo setea el renderer
+   en el overlay Y en el preview inline: paridad por construcción). La clase
+   .ghc-slidein queda SOLO para la geometría fija del overlay real. */
+:is(greenhouse-cta, .ghc-scope)[data-ghc-placement='slide_in'] .ghc-card {
   animation: none;
   box-shadow: var(--gh-cta-shadow-lift);
   max-height: min(70vh, 560px);
@@ -354,7 +357,7 @@ greenhouse-cta, .ghc-scope {
 }
 
 /* Dismiss del interruptivo: target táctil pleno (wireframe a11y ≥44px). */
-:is(greenhouse-cta, .ghc-scope).ghc-slidein .ghc-dismiss { width: 44px; height: 44px; top: 4px; right: 4px; }
+:is(greenhouse-cta, .ghc-scope)[data-ghc-placement='slide_in'] .ghc-dismiss { width: 44px; height: 44px; top: 4px; right: 4px; }
 
 /* Compact (viewport angosto): panel inferior dentro de safe areas, nunca un
    falso modal full-screen. */
@@ -367,16 +370,17 @@ greenhouse-cta, .ghc-scope {
   }
 }
 
-/* ── Density del slide-in (container del propio shell; wireframe skeletons) ──
-   peek (<400px): headline + acción + dismiss — composición real, no clipping.
-   condensed (400-559px): + body esencial. full (≥560px): + footnote/visual
-   (heredado de las reglas ≥560 existentes). El orden semántico nunca cambia. */
+/* ── Density del slide_in (container query del propio contenedor; wireframe
+   skeletons): peek (<400px) = headline + acción + dismiss — composición real,
+   no clipping. condensed (400-559px) = + body esencial. full (≥560px) =
+   + footnote/visual (reglas ≥560 existentes). Orden semántico invariante.
+   Keyed por placement: aplica igual en overlay y preview (paridad). ── */
 @container (max-width: 559px) {
-  :is(greenhouse-cta, .ghc-scope).ghc-slidein .ghc-footnote { display: none; }
+  :is(greenhouse-cta, .ghc-scope)[data-ghc-placement='slide_in'] .ghc-footnote { display: none; }
 }
 
 @container (max-width: 399px) {
-  :is(greenhouse-cta, .ghc-scope).ghc-slidein .ghc-body { display: none; }
+  :is(greenhouse-cta, .ghc-scope)[data-ghc-placement='slide_in'] .ghc-body { display: none; }
 }
 
 /* ── Skeleton (anti-CLS) ─────────────────────────────────────────────── */
