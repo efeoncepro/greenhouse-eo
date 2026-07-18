@@ -123,6 +123,14 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
   (hasta 2026-07-25). Pendiente: placement AMPLIO WP (decisión del operador post-validación;
   recomendado posts del blog vía `the_content` en `ohio-child`), placement interruptivo, cockpit
   de autoría, más acciones.
+- **2026-07-18 (release `d5db8b568`, PR #159+#160): TASK-1428 + TASK-1429 EN PRODUCCIÓN.**
+  Enforcement de suppression **ON en staging y Production** (verificado E2E post-release:
+  visitante dismissed → excluido; fresco → ve; `engineState: ok`). Kill switches operativos en
+  prod (mismo código verificado live en staging: engage→killed→release sin redeploy). El
+  renderer `1.1.0` envía identidad pseudónima — el loop de suppression opera con visitantes
+  reales. Manifest `released`; watchdog con residual conocido `ops-worker` (label, diff runtime
+  vacío). Ventana monitor 7d `growth.cta.*` hasta 2026-07-25. Pendiente de negocio: primera
+  campaña `slide_in` real (surface/copy/trigger = decisión del operador; el motor está listo).
 - **2026-07-18 (TASK-1429): slide_in interruptivo + Experience System CODE-COMPLETE (local).**
   El renderer monta el interruptivo 0–1 del arbiter vía `SlideInController` (bundle `1.1.0`);
   envía la identidad pseudónima por headers al render/ingest (TASK-1428 cierra el loop: dismiss/

@@ -1,5 +1,18 @@
 # changelog.md
 
+## 2026-07-18 — RELEASE: TASK-1428 + TASK-1429 en producción + enforcement ON (d5db8b568)
+
+- Release develop→main (PR #159 + fix CI #160; orquestador `29651461496`, manifest `released`):
+  suppression/Tier B/kill switches (TASK-1428) y slide_in/Experience System (TASK-1429) LIVE en
+  producción. `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` ON en staging y Production —
+  verificado E2E post-release con visitante sintético (dismiss → exclusión; fresco → ve).
+- Incidente cazado y cerrado de raíz durante el release: los timeouts del CI (Test 8 min /
+  Coverage 10 min) mataban runs SANOS exactamente en el techo — la suite creció a ~9.8k tests.
+  Subidos a 14/17 (job deep 25) y validados en el mismo release. Dos releases previos ya habían
+  rozado el mismo patrón.
+- Ambas tasks movidas a `complete/`. Ventana de monitoreo 7d de `growth.cta.*` hasta 2026-07-25.
+  La primera campaña interruptiva real (superficie/mensaje/momento) queda como decisión de negocio.
+
 ## 2026-07-18 — EPIC-030: Greenhouse Link Hub Control Plane
 
 - Se aceptó la dirección arquitectónica para una capacidad link-in-bio multi-marca controlada íntegramente desde Greenhouse: aggregate/versiones/dominios/audit como SSOT y renderer público limitado a una proyección allowlisted.
