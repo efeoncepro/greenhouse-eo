@@ -26,7 +26,7 @@ export const scenario: CaptureScenario = {
   ],
   quality: {
     layout: { enabled: true, failOnViolations: false },
-    runtime: { enabled: true, failOnViolations: false },
+    runtime: { failOnConsoleError: false },
     enterpriseRubric: { enabled: true, failOnViolations: false }
   },
   steps: [

@@ -35,7 +35,7 @@ export const scenario: CaptureScenario = {
   // "wireframe look" pasó el gate porque el rubric era opt-in y no se declaró).
   quality: {
     layout: { enabled: true, failOnViolations: false },
-    runtime: { enabled: true, failOnViolations: false },
+    runtime: { failOnConsoleError: false },
     enterpriseRubric: {
       enabled: true,
       failOnViolations: false,
