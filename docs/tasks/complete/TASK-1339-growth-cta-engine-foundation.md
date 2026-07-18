@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -26,6 +26,25 @@
 - Branch: `task/TASK-1339-growth-cta-engine-foundation`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Delta 2026-07-17 — ejecutada (code complete, rollout pendiente)
+
+- Implementada completa en `develop` local (4 slices, commits `e48847761`→HEAD). Migraciones
+  `20260718001431135` (schema cta_*) + `20260718002549989` (capabilities) APLICADAS a
+  `greenhouse-pg-dev` y verificadas contra `information_schema`/`pg_trigger`/`table_privileges`.
+- Smoke e2e VERDE contra PG real (seed `scripts/growth/seed-cta-ai-visibility-followup.ts --smoke`):
+  CTA `ai-visibility-report-followup` published + bindings `wordpress`/`think` (embed keys minteadas,
+  secretos entregados una vez en el run) + render arbitrado browser-safe sin leak de policy + ingest
+  accepted/idempotente + forja (embed key inválido, versión↔surface mismatch) rechazada y persistida
+  + outbox `growth.cta.*` emitido in-tx + SQL de signals verificado (unauthorized=2 del smoke).
+- Gates: `pnpm test` full 9622 passed · `pnpm build` prod · lint/tsc verdes · coverage de grants verde
+  · `flags:audit --strict` limpio. Resolución de Open Questions documentada en el audit de sesión:
+  schema existía (TASK-1226); grants espejo growth.forms (internal ∪ admin ∪ account ∪ operations);
+  primera acción `open_growth_form` (confirmado contra TASK-1340).
+- **Estado: code complete, rollout pendiente** — flag `GROWTH_CTA_ENGINE_ENABLED` OFF en todos los
+  environments (por diseño; ledger actualizado). El flip staging/prod + verificación de rutas live +
+  signals visibles en `/admin/operations` desplegado se coordinan con TASK-1340 (sin renderer, la
+  foundation queda en shadow). Sin push a remoto en esta sesión (local-first).
 
 ## Summary
 
@@ -167,23 +186,23 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth (`greenhouse_growth.cta_*`), contract surface (`greenhouse-growth-cta-popup.v1`) y consumers (renderer TASK-1340, admin, Nexa/MCP) nombrados con paths reales.
-- [ ] Invariantes (published inmutable, append-only, surface cross-check, browser-safe) listados y con CHECK/guard.
-- [ ] Access boundary explícito (admin capability vs surface/embed-key para ingest).
-- [ ] Migration additive + rollback (flag OFF + reverse migration) explícito.
-- [ ] Evidencia DB/runtime listada (migrate verify + arbiter SQL smoke + form-handoff smoke).
-- [ ] Errores canónicos + `captureWithDomain` + sin leak de PII/internals.
+- [x] Source of truth (`greenhouse_growth.cta_*`), contract surface (`greenhouse-growth-cta-popup.v1`) y consumers (renderer TASK-1340, admin, Nexa/MCP) nombrados con paths reales.
+- [x] Invariantes (published inmutable, append-only, surface cross-check, browser-safe) listados y con CHECK/guard.
+- [x] Access boundary explícito (admin capability vs surface/embed-key para ingest).
+- [x] Migration additive + rollback (flag OFF + reverse migration) explícito.
+- [x] Evidencia DB/runtime listada (migrate verify + arbiter SQL smoke + form-handoff smoke).
+- [x] Errores canónicos + `captureWithDomain` + sin leak de PII/internals.
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] **Lógica en el primitive:** commands/readers en `src/lib/growth/ctas/`, no en UI.
-- [ ] **Modelada como aggregate/recurso/command** (`cta_definition`/`cta_version` + lifecycle commands + render-contract reader), no click-handler.
-- [ ] **Read** como reader canónico (render contract, list, report); **write** como command con command semantics, authorization fina (`growth.cta.*`, NO admin-coarse), idempotencia, audit/outbox, errores canónicos, observabilidad.
-- [ ] **Capability + grant en el MISMO PR:** registrar `growth.cta.author/publish/pause/read` en registry + catalog + grant a ≥1 rol real (`efeonce_admin` + rol growth/marketing aplicable) + coverage test verde.
-- [ ] **Camino programático declarado:** `/api/admin/growth/ctas/**` (governance) + `/api/public/growth/ctas/**` (data plane); MCP/ecosystem heredan por el primitive.
-- [ ] **Write apto para `propose → confirm → execute`** (lifecycle); NO integración Nexa-específica.
-- [ ] **Un primitive, muchos consumers:** cero lógica duplicada por consumer.
-- [ ] **Parity check = SÍ** a nivel capability.
+- [x] **Lógica en el primitive:** commands/readers en `src/lib/growth/ctas/`, no en UI.
+- [x] **Modelada como aggregate/recurso/command** (`cta_definition`/`cta_version` + lifecycle commands + render-contract reader), no click-handler.
+- [x] **Read** como reader canónico (render contract, list, report); **write** como command con command semantics, authorization fina (`growth.cta.*`, NO admin-coarse), idempotencia, audit/outbox, errores canónicos, observabilidad.
+- [x] **Capability + grant en el MISMO PR:** registrar `growth.cta.author/publish/pause/read` en registry + catalog + grant a ≥1 rol real (`efeonce_admin` + rol growth/marketing aplicable) + coverage test verde.
+- [x] **Camino programático declarado:** `/api/admin/growth/ctas/**` (governance) + `/api/public/growth/ctas/**` (data plane); MCP/ecosystem heredan por el primitive.
+- [x] **Write apto para `propose → confirm → execute`** (lifecycle); NO integración Nexa-específica.
+- [x] **Un primitive, muchos consumers:** cero lógica duplicada por consumer.
+- [x] **Parity check = SÍ** a nivel capability.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -292,16 +311,16 @@ Notas de implementación:
 
 ## Acceptance Criteria
 
-- [ ] Existen `greenhouse_growth.cta_definition/cta_version/cta_surface_binding/cta_conversion_event` con state machine + CHECK + append-only + GRANTs, verificadas contra `information_schema`.
-- [ ] `src/lib/growth/ctas/` expone readers + lifecycle commands + arbiter server-side + render-contract compiler + action router (`open_growth_form`), con `published` inmutable.
-- [ ] Capability `growth.cta.author/publish/pause/read` registrada + grant a ≥1 rol real + coverage test verde en el mismo PR.
-- [ ] `GET /api/public/growth/ctas/render` devuelve solo campos browser-safe y contrato arbitrado (0–1 interruptivo + N no-interruptivos); nunca candidate set ni política.
-- [ ] `POST /api/public/growth/ctas/events` valida surface+origin+embed key + cross-check `cta_version↔surface_id`, escribe append-only con `trust_level`/`consent_source`, es idempotente y rate-limited; mismatch → rechazo + `surface_unauthorized_attempt`.
-- [ ] `open_growth_form` resuelve el contrato de Growth Forms sin duplicar schema/validación/consent (test de no-duplicación).
-- [ ] Signals `growth.cta.render_error_rate/event_ingest_error_rate/surface_unauthorized_attempt/form_handoff_failed` registradas y visibles en `/admin/operations`.
-- [ ] El CTA follow-up del reporte AI Visibility está autorado + publicado con binding a `wordpress` + `astro/think`.
-- [ ] `GROWTH_CTA_ENGINE_ENABLED` (default OFF) registrado en `FEATURE_FLAG_STATE_LEDGER.md`.
-- [ ] Errores client-facing usan `canonicalErrorResponse` (es-CL); errores server usan `captureWithDomain`; sin leak de PII/internals.
+- [x] Existen `greenhouse_growth.cta_definition/cta_version/cta_surface_binding/cta_conversion_event` con state machine + CHECK + append-only + GRANTs, verificadas contra `information_schema`.
+- [x] `src/lib/growth/ctas/` expone readers + lifecycle commands + arbiter server-side + render-contract compiler + action router (`open_growth_form`), con `published` inmutable.
+- [x] Capability `growth.cta.author/publish/pause/read` registrada + grant a ≥1 rol real + coverage test verde en el mismo PR.
+- [x] `GET /api/public/growth/ctas/render` devuelve solo campos browser-safe y contrato arbitrado (0–1 interruptivo + N no-interruptivos); nunca candidate set ni política.
+- [x] `POST /api/public/growth/ctas/events` valida surface+origin+embed key + cross-check `cta_version↔surface_id`, escribe append-only con `trust_level`/`consent_source`, es idempotente y rate-limited; mismatch → rechazo + `surface_unauthorized_attempt`.
+- [x] `open_growth_form` resuelve el contrato de Growth Forms sin duplicar schema/validación/consent (test de no-duplicación).
+- [x] Signals `growth.cta.render_error_rate/event_ingest_error_rate/surface_unauthorized_attempt/form_handoff_failed` registradas y visibles en `/admin/operations`.
+- [x] El CTA follow-up del reporte AI Visibility está autorado + publicado con binding a `wordpress` + `astro/think`.
+- [x] `GROWTH_CTA_ENGINE_ENABLED` (default OFF) registrado en `FEATURE_FLAG_STATE_LEDGER.md`.
+- [x] Errores client-facing usan `canonicalErrorResponse` (es-CL); errores server usan `captureWithDomain`; sin leak de PII/internals.
 
 ## Verification
 
@@ -314,14 +333,14 @@ Notas de implementación:
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] archivo en la carpeta correcta (`to-do/` → `in-progress/` → `complete/`)
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado si cambió comportamiento/estructura
-- [ ] chequeo de impacto cruzado (marcar TASK-1340 desbloqueada al publicar el render contract)
-- [ ] `pnpm test` (full) + `pnpm build` (prod) verdes en el último commit antes de cerrar (Task Closing Quality Gate)
-- [ ] fila del flag en `FEATURE_FLAG_STATE_LEDGER.md` refleja el estado real por environment
+- [x] `Lifecycle` sincronizado (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] archivo en la carpeta correcta (`to-do/` → `in-progress/` → `complete/`)
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado si cambió comportamiento/estructura
+- [x] chequeo de impacto cruzado (marcar TASK-1340 desbloqueada al publicar el render contract)
+- [x] `pnpm test` (full) + `pnpm build` (prod) verdes en el último commit antes de cerrar (Task Closing Quality Gate)
+- [x] fila del flag en `FEATURE_FLAG_STATE_LEDGER.md` refleja el estado real por environment
 
 ## Follow-ups
 

@@ -1,10 +1,17 @@
-## Sesión 2026-07-17 (noche) — TASK-1339 Growth CTA Engine foundation EN CURSO
+## Sesión 2026-07-17 (noche) — TASK-1339 Growth CTA Engine foundation COMPLETA (code complete, shadow)
 
-> Tomada TASK-1339 (EPIC-023, backend-data): foundation server-side `growth.cta` — schema
-> `greenhouse_growth.cta_*`, primitive `src/lib/growth/ctas/` (readers/commands/arbiter/render
-> contract/ingest/action router), API pública render+events + admin lifecycle, capability
-> `growth.cta.*`+grants, signals, flag `GROWTH_CTA_ENGINE_ENABLED` default OFF. Trabajo en
-> `develop` local-first, SIN push. Bloquea TASK-1340 (renderer).
+> Implementados los 4 slices en `develop` local (SIN push): schema `greenhouse_growth.cta_*`
+> (2 migraciones APLICADAS a dev + verificadas), primitive `src/lib/growth/ctas/` (arbiter
+> server-side 0–1 interruptivo, ingest forjable-hardened con trust_level + cross-check, publish
+> atómico inmutable, action router solo open_growth_form), API pública render/events + admin
+> lifecycle/surfaces, capabilities `growth.cta.*`+grants+coverage, 4 signals cableadas, outbox
+> v1 in-tx. Primer CTA real `ai-visibility-report-followup` PUBLISHED con bindings wordpress+think;
+> smoke e2e verde contra PG dev (embed key secrets entregados UNA vez en el seed run — para la
+> config de hosts de TASK-1340; rotables). El smoke SQL atrapó un bug real (query() retorna rows,
+> no {rows}). Suite full 9622 passed + build prod verdes. Flag `GROWTH_CTA_ENGINE_ENABLED` OFF en
+> todos los environments (ledger al día): **flip coordinado con TASK-1340 (desbloqueada, delta
+> escrito en su spec)**. Task movida a complete/. Pendiente del operador: push a develop cuando
+> corresponda batchear.
 
 ## Sesión 2026-07-17 (noche) — polish cockpit AEO post-feedback + resolver canónico de logos
 

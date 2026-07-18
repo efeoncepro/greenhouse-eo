@@ -1,5 +1,23 @@
 # changelog.md
 
+## 2026-07-17 — TASK-1339: Growth CTA & Popup Engine — foundation `growth.cta` (code complete, shadow)
+
+- Fundación server-side de la primera rebanada vertical de EPIC-023: schema `greenhouse_growth.cta_*`
+  (definition/version con state machine + published inmutable por trigger; surface bindings con embed key;
+  conversion ledger Tier A append-only con `trust_level`/`consent_source` + rechazos sin PII), primitive
+  canónico `src/lib/growth/ctas/` (contracts `greenhouse-growth-cta-popup.v1`, arbiter server-side 0–1
+  interruptivo, render-contract compiler browser-safe, action router SOLO `open_growth_form` vía el reader
+  de Growth Forms sin duplicar schema/validación/consent, ingest forjable-hardened con cross-check
+  `cta_version↔surface` + rate-limit + idempotencia), API pública render/events (CORS data-driven) y
+  admin list/author/lifecycle/surfaces (capability fina por acción).
+- Capabilities `growth.cta.{read,author,publish,pause}` (catalog + registry + grants espejo growth.forms +
+  coverage verde; `pause` separada = freno de emergencia sin autoridad de publish). 4 reliability signals
+  `growth.cta.*` cableadas al overview. Outbox `growth.cta.version_lifecycle_changed` + `surface_registered`
+  v1 in-tx (EVENT_CATALOG delta). Primer CTA real `ai-visibility-report-followup` publicado con bindings
+  `wordpress` + `think`; smoke e2e verde contra PG dev (render sin leak de policy, ingest idempotente,
+  forja rechazada y persistida). Flag `GROWTH_CTA_ENGINE_ENABLED` default OFF (ledger); flip coordinado
+  con TASK-1340 (renderer), que queda desbloqueada por el contrato publicado.
+
 ## 2026-07-17 — TASK-1276: AEO Operator View (Growth + Account 360) — code complete local
 
 - Vista operador del programa AEO (nodos S8-S12 del EPIC-020), implementada desde el mockup aprobado de

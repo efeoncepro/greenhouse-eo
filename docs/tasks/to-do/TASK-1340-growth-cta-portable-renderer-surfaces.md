@@ -4,6 +4,21 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-07-17
+
+- **DESBLOQUEADA** — TASK-1339 (foundation `growth.cta`) quedó code-complete: el render contract
+  `greenhouse-growth-cta-popup.v1` existe y está publicado para el primer CTA real
+  (`ai-visibility-report-followup`, placement `embedded`, acción `open_growth_form` →
+  `ai-visibility-grader`). Consumir: `GET /api/public/growth/ctas/render?surfaceId=…&route=…` con
+  header `x-greenhouse-cta-embed-key` + `POST /api/public/growth/ctas/events` (ingest Tier A;
+  todo entra `browser_reported`). Surfaces YA registradas: `Efeonce public site (WordPress)` +
+  `Think (Astro)` — surface ids + embed key secrets entregados al operador en el seed run
+  2026-07-17 (rotables vía `POST /api/admin/growth/ctas/surfaces {action:'rotate_embed_key'}`).
+  El shape del contrato: `{ interruptive: null|contract, nonInterruptive: contract[] }`, cada
+  contract con `cta/placement/interruptive/content/action/variantId/surfacePolicy` (browser-safe;
+  sin targeting/priority). Flag `GROWTH_CTA_ENGINE_ENABLED` sigue OFF: el flip staging/prod se
+  coordina con esta task (foundation en shadow hasta el renderer).
+
 ## Status
 
 - Lifecycle: `to-do`
