@@ -12,8 +12,12 @@ open cockpit
   -> load inventory
      -> empty -> author CTA
      -> select CTA -> load detail/report/surfaces
-        -> author new version -> validate -> save draft
-        -> review -> approve/reject
+        -> author new version
+           -> intent/kind -> placement -> appearance -> content/evidence
+           -> action from registry -> targeting/suppression posture
+           -> canonical preview matrix -> review blockers
+           -> validate server-side -> save draft
+        -> review -> parity/expectation/suppression checklist -> approve/reject
         -> publish/pause/resume/deprecate/archive -> confirm -> refresh
         -> bind/unbind surface -> confirm -> refresh
         -> toggle governed kill switch -> confirm -> refresh
@@ -25,6 +29,7 @@ open cockpit
 - Selection is URL-addressable when the existing route contract supports it; otherwise it remains deterministic local cockpit state without inventing a second route family.
 - Opening/closing compact detail preserves inventory search, filters and scroll position.
 - Mutations refresh canonical readers; optimistic UI cannot claim a lifecycle state the server rejected.
+- Preview controls are draft-local diagnostics and never mutate published state or persist renderer-derived density.
 
 ## Focus and Accessibility
 
@@ -37,6 +42,7 @@ open cockpit
 
 - Reader failures are bounded to inventory, detail or reporting regions.
 - Command errors preserve form/context and provide safe retry.
+- Preview parity failure, unsupported placement/action/surface, copy-action mismatch or missing interruptive defenses block review with a concrete correction path.
 - Capability denial removes or disables the action with an explicit reason; it is not treated as a generic error.
 
 ## Evidence

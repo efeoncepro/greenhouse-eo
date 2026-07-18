@@ -10,7 +10,7 @@
 
 ## Brief
 
-Turn the existing CTA list/detail APIs and lifecycle commands into one operator cockpit. The operator must understand what is live, where, how it performs and whether it is suppressed or killed without jumping across ad-hoc admin screens.
+Turn the existing CTA list/detail APIs and lifecycle commands into one operator cockpit. The operator must understand what is live, where, how it performs and whether it is suppressed or killed, and must author a modern CTA through governed experience axes without editing JSON/CSS or guessing how production will render.
 
 ## Layout Skeleton
 
@@ -20,10 +20,41 @@ Use `CompositionShell` with `split`, `fluidity='rich'`:
 |---|---|
 | Lead/header | `GreenhouseBreadcrumbs`, title, status summary and primary create action |
 | Primary | Search/filterable CTA inventory with status, placement, surfaces and signal summary |
-| Aside | Selected CTA detail, version/lifecycle controls, bindings, suppression and reporting |
-| Overlay | Author/review confirmation or bounded contextual form using canonical sidecar/dialog pattern |
+| Aside | Selected CTA detail, version/lifecycle controls, bindings, suppression, reporting and preview diagnostics |
+| Overlay | Sequential author/review form using canonical sidecar/dialog; preview remains contextual and preserves draft state |
 
 At compact widths the detail becomes the canonical temporary sidecar/drawer behavior; inventory state is preserved.
+
+## Authoring Sequence
+
+```text
+Intent/kind
+  → placement
+  → appearance
+  → content + real evidence/asset
+  → action from registry metadata
+  → targeting + suppression posture
+  → canonical preview matrix
+  → review checklist
+  → submit review / publish confirmation
+```
+
+There is no blank canvas, drag-and-drop, color picker, spacing control, breakpoint selector, raw JSON, CSS or host
+HTML. Density is displayed as a derived renderer result, never saved as an author override.
+
+## Preview Region
+
+The preview mounts the production renderer/CSS inside controlled host harnesses. Controls outside the canvas select:
+
+- host context `Think|WordPress`;
+- container `wide|narrow|compact`;
+- normal/reduced motion and supported color preference;
+- nominal/long content and asset present/missing;
+- ready/focus/pending/form/error states applicable to the selected action.
+
+Diagnostic chips outside visitor content show contract version, renderer channel, surface, placement, experience
+kind, appearance, derived density and action kind. Review uses pairwise coverage plus mandatory boundary cases rather
+than rendering every possible Cartesian combination.
 
 ## States
 
@@ -33,6 +64,8 @@ At compact widths the detail becomes the canonical temporary sidecar/drawer beha
 - `partial`: reporting unavailable while lifecycle controls remain usable, labeled with freshness.
 - `error`: bounded retry per region; no raw error.
 - `denied`: capability-aware route/action state.
+- `draft_invalid`: exact field/compatibility reasons and safe correction path; no silent coercion.
+- `preview_degraded`: renderer/host harness failure is explicit and blocks review when parity cannot be proven.
 
 ## Accessibility Contract
 
@@ -49,12 +82,14 @@ At compact widths the detail becomes the canonical temporary sidecar/drawer beha
 - Consume TASK-1428 suppression/kill-switch read and command contracts; do not reproduce rules client-side.
 - Cards/summary elements use the shared card-density contract because the aside width changes.
 - Visible reusable copy belongs in `src/lib/copy/growth/*` (or the established Growth namespace), not inline JSX.
+- Keep placement, experience kind, appearance, density and experiment metadata distinct in labels, DTO mapping and reporting.
+- Use the canonical renderer for preview; never recreate public CTA markup with MUI components.
 
 ## GVC Scenario Plan
 
 - Scenario: `scripts/frontend/scenarios/task-1430-growth-cta-cockpit.scenario.ts`.
 - Viewports: `1440` and `390`.
-- Capture: inventory, selected detail, empty, partial reporting, author/review, paused/killed and denied states.
+- Capture: inventory, selected detail, empty, partial reporting, every authoring section, preview wide/narrow/compact, action expectation mismatch, asset failure, long content, review blockers, paused/killed and denied states.
 - Assert: keyboard selection, focus return, dirty-close recovery, no page-level horizontal scroll and lifecycle state refresh after commands.
 - Baseline only after design review; runtime assertions are additive.
 

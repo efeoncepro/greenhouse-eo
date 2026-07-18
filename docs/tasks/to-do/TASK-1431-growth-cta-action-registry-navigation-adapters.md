@@ -27,7 +27,7 @@
 
 ## Summary
 
-Reemplaza el action router cerrado sobre `open_growth_form` por un registry tipado y extensible, con validación/resolución server-side y proyección browser-safe. V1 conserva `open_growth_form` y agrega navegación gobernada para `link_url`, `open_think_tool` y `book_meeting`; adapters con semántica propia de assets, forms embebidos o CRM quedan demand-driven.
+Reemplaza el action router cerrado sobre `open_growth_form` por un registry tipado y extensible, con validación/resolución server-side, proyección browser-safe y metadata de presentación mínima. V1 conserva `open_growth_form` y agrega navegación gobernada para `link_url`, `open_think_tool` y `book_meeting`; cada acción declara expectativa, familia de ejecución y estados/recovery compatibles sin decidir placement, appearance o density. Adapters con semántica propia de assets, forms embebidos o CRM quedan demand-driven.
 
 ## Why This Task Exists
 
@@ -37,6 +37,7 @@ El motor ya tiene la frontera correcta, pero `CTA_ACTION_KINDS`, el schema, el r
 
 - Un registry canónico modela policy schema, resolver server-side, proyección browser-safe y clase de ejecución por action kind.
 - `open_growth_form`, `link_url`, `open_think_tool` y `book_meeting` funcionan end-to-end sin exponer policy interna ni PII.
+- Cada action kind tiene un contrato perceptible honesto: label/destination expectation, pending, success/navigation y recovery; ninguno introduce una skin o layout paralelo.
 - El cockpit y futuros consumers pueden descubrir actions soportadas sin duplicar enums o reglas.
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
@@ -56,6 +57,7 @@ Reglas obligatorias:
 - El browser recibe solo una unión discriminada ya resuelta; nunca policy, destination mapping, secretos, PII ni candidate set.
 - Navegación acepta solo destinos HTTPS o relativos gobernados; `book_meeting` es navegación, nunca mutación CRM silenciosa.
 - Un action kind sin adapter/resolver registrado no se puede publicar ni renderizar.
+- Action metadata puede declarar execution family, destination expectation, new-context policy y capabilities de estado; nunca impone `styleVariant`, placement, density, copy final ni asset decorativo.
 
 ## Normative Docs
 
@@ -126,9 +128,9 @@ Reglas obligatorias:
 
 - Primary user: visitante que activa un CTA publicado en Think o WordPress.
 - User moment: decide continuar hacia un form, herramienta Think, recurso interno/externo o agenda.
-- Job to be done: ejecutar la acción prometida una vez, con destino predecible y recovery seguro.
+- Job to be done: ejecutar la acción prometida una vez, con continuidad perceptual, destino predecible y recovery seguro.
 - Primary decision signal: el label del CTA coincide con un destino gobernado y la acción no produce popup, redirect o mutación inesperada.
-- Non-goals: nuevo layout, nueva primitive, modal propio, download delivery, CRM handoff o rediseño del card.
+- Non-goals: nuevo layout, skin por action kind, appearance automática, modal propio, download delivery, CRM handoff o rediseño del card.
 
 ### Surface and system decision
 
@@ -142,10 +144,11 @@ Reglas obligatorias:
 
 - Loading / skeleton: sin cambio.
 - Ready / populated: primary action habilitada cuando el render action resolvió.
-- Empty: action inválida impide publish/render.
-- Error: executor falla cerrado, restaura primary y emite error sanitizado.
-- Pending / disabled: primary deshabilitada durante ejecución para evitar doble activación.
-- Success: navegación iniciada o Growth Form abierto.
+- Empty: action inválida impide publish/render; nunca se sustituye silenciosamente por un link genérico.
+- Error: executor falla cerrado, restaura primary/foco/contexto y emite error sanitizado.
+- Pending / disabled: primary deshabilitada durante ejecución, expone busy state accesible y preserva ancho para evitar salto.
+- Form ready/open: el shell conserva contexto suficiente y transfiere foco solo cuando el Growth Form está listo.
+- Success: navegación iniciada o Growth Form/resultado confirmado; no se vuelve a mostrar el pitch original como si nada hubiera ocurrido.
 - Permission denied: no aplica al visitante; policy inválida se bloquea server-side.
 - Degraded / partial: destino no resoluble no cruza al renderer.
 - Mobile / compact: comportamiento nativo del mismo botón, sin surface adicional.
@@ -157,11 +160,12 @@ Reglas obligatorias:
 - Keyboard: botón real; la navegación conserva semántica y el form mantiene foco/recovery existente.
 - Escape / click-away: solo aplica al Growth Form según su contrato.
 - Focus restore: si la ejecución falla, vuelve a habilitarse el mismo botón; navegación entrega el foco al destino.
+- Expectation integrity: label y footnote deben coincidir con la familia real; “descargar” no puede resolver a una página genérica y “agendar” no puede implicar que una reunión ya quedó creada.
 - Destructive confirmations: ninguna acción V1 muta CRM o datos de negocio.
 
 ### Motion & microinteractions
 
-- Motion primitive: ninguna nueva; se conserva feedback de pending/press existente.
+- Motion primitive: ninguna nueva en esta task; expone estados deterministas al renderer y TASK-1429/arquitectura §15 gobierna continuidad visual.
 - Enter / exit: `n/a` para navegación.
 - Feedback: disabled mientras ejecuta y error fail-closed.
 - Reduced motion: sin cambio respecto del renderer.
@@ -170,7 +174,7 @@ Reglas obligatorias:
 ### Implementation mapping
 
 - Route / surface: public render API y `<greenhouse-cta>` existentes.
-- Components / primitives: `CtaRenderer`, `GreenhouseCtaElement`, action executor.
+- Components / primitives: `CtaRenderer`, `GreenhouseCtaElement`, action executor; un solo shell visual para todas las actions.
 - Copy source: CTA content contract existente.
 - Data reader / command: `resolveCtaAction()` delegando al registry.
 - API parity: mismo registry alimenta publish gate, render, preview, cockpit y programmatic consumers.
@@ -181,8 +185,8 @@ Reglas obligatorias:
 - Scenario file: extender `scripts/frontend/scenarios/task-1340-growth-cta-renderer.scenario.ts` o crear `task-1431-growth-cta-actions.scenario.ts`.
 - Route: preview/runtime CTA existente.
 - Viewports: `1440` y `390`.
-- Required steps: open form, internal link, Think tool y meeting navigation; invalid destination no renderiza.
-- Required captures: ready, pending/failure recovery y form open; navegación se prueba por URL/event assertion.
+- Required steps: open form, focus transfer, form error/success, internal link, Think tool y meeting navigation, duplicate activation; invalid destination no renderiza.
+- Required captures: ready, pressed/pending, form ready/open, form error recovery/success y navigation failure recovery; navegación exitosa se prueba por URL/event assertion.
 - Scroll-width: sin cambio de layout, mantener 0.
 - Accessibility/focus: button keyboard activation y recovery tras fallo.
 
@@ -289,6 +293,40 @@ La unión V1 queda:
 
 `dismiss` permanece como control del renderer y evento de suppression, no como primary destination. `download_asset`, `embed_growth_form` y `hubspot_handoff` quedan fuera hasta que sus adapters tengan consumidor, seguridad y evidencia propias.
 
+### Action-aware presentation metadata
+
+Cada registry entry expone metadata browser-safe/read-only suficiente para que cockpit, preview, tests y executor
+comprendan la expectativa sin duplicar lógica. El shape exacto se decide en implementación, pero debe cubrir como
+mínimo:
+
+- `executionFamily`: `growth_form|navigate`;
+- `destinationExpectation`: `form|internal_page|think_tool|booking_page`;
+- `navigationContext`: `same_context|new_context_allowed` con default seguro;
+- `supportsInlineContinuation`: booleano derivado del adapter, no de la campaña;
+- `requiredPolicyFields` y validation/error taxonomy para authoring programático;
+- `telemetryKind` allowlisted, sin URL completa, PII, provider internals ni destination mapping.
+
+Hard rules:
+
+- La metadata no contiene appearance recomendada obligatoria, placement, density breakpoint, copy final o visual
+  asset; esas decisiones pertenecen al CTA Experience System y al contenido gobernado.
+- `open_growth_form` habilita continuidad in-place solo reutilizando el renderer/form slot existente; no copia
+  schema, validación, consent ni success behavior.
+- `open_think_tool` puede acompañarse de preview/evidencia real autorada en el CTA, pero el registry no inventa
+  score, thumbnail ni promesa.
+- `book_meeting` solo puede mostrar duración, zona horaria o modalidad si provienen de data gobernada disponible;
+  si no, el CTA usa expectativa neutral de navegación a agenda.
+- `link_url` conserva la experiencia más ligera; no obtiene automáticamente spotlight ni nueva pestaña.
+
+### Per-action perceptual contract
+
+| Kind | Before activation | Pending | Success | Recoverable failure |
+|---|---|---|---|---|
+| `open_growth_form` | Label nombra el formulario/resultado real. | One-shot guard; form shell no aparece vacío. | Form visible y enfocado cuando ready; submit conserva authority de Growth Forms. | Mantiene CTA/contexto, restaura acción o muestra error sanitizado del form. |
+| `link_url` | Label anticipa navegación; externality es coherente. | Bounded dispatch, sin spinner largo ficticio. | Navegación segura en contexto configurado. | Rehabilita botón/foco y conserva contenido. |
+| `open_think_tool` | CTA puede mostrar preview real, no dato inventado. | Igual que navigate. | Think recibe solo contexto allowlisted. | Restaura CTA, sin fallback a destino no gobernado. |
+| `book_meeting` | Explica que se abrirá agenda; no promete reserva. | Igual que navigate. | Booking page gobernada; cero write CRM por click. | Restaura CTA y permite reintento seguro. |
+
 ### Contract/version posture
 
 Mantener compatibilidad de `greenhouse-growth-cta-popup.v1` si las ramas son aditivas y hosts se actualizan en el mismo rollout. Si discovery demuestra que caches/hosts antiguos pueden recibir una rama desconocida, introducir negociación/capability de renderer o bump versionado antes de publicar nuevas actions; nunca confiar en despliegue simultáneo implícito.
@@ -298,7 +336,7 @@ Mantener compatibilidad de `greenhouse-growth-cta-popup.v1` si las ramas son adi
 ### Slice 1 — Registry and typed contracts
 
 - Introducir registry y uniones discriminadas sin cambiar `open_growth_form`.
-- Exponer metadata browser-safe/read-only para authoring y parity tests.
+- Exponer metadata browser-safe/read-only de ejecución/expectativa/estado para authoring y parity tests, sin presentation skin/layout.
 
 ### Slice 2 — Governed navigation resolvers
 
@@ -308,7 +346,7 @@ Mantener compatibilidad de `greenhouse-growth-cta-popup.v1` si las ramas son adi
 ### Slice 3 — Portable executor and evidence
 
 - Generalizar action executor del custom element por familia `growth_form|navigate`.
-- Cubrir keyboard, duplicate-click guard, error recovery, telemetry allowlist, staging smoke y docs.
+- Cubrir keyboard, busy/pending accesible, duplicate-click guard, form-ready/focus, error recovery, expectation integrity, telemetry allowlist, staging smoke y docs.
 
 ## Out of Scope
 
@@ -353,6 +391,10 @@ Mantener compatibilidad de `greenhouse-growth-cta-popup.v1` si las ramas son adi
 - [ ] Registry único y exhaustivo gobierna schema, resolver, projection, metadata y failure reasons.
 - [ ] `open_growth_form` conserva compatibilidad y tests actuales.
 - [ ] `link_url`, `open_think_tool` y `book_meeting` funcionan end-to-end con destinos seguros.
+- [ ] Cada registry entry publica execution family, destination expectation, state/recovery metadata y authoring contract mínimos sin filtrar policy.
+- [ ] Ningún action kind selecciona appearance, placement, density, asset o copy por side effect.
+- [ ] Labels/footnotes pasan expectation-integrity: describen la acción real y no prometen descarga/reserva/resultado que el adapter no ejecuta.
+- [ ] Pending es single-dispatch y accesible; error restaura control/foco/contexto; Growth Form recibe foco solo cuando está ready.
 - [ ] `dismiss` sigue como control/suppression; no se convierte en destination artificial.
 - [ ] `download_asset`, `embed_growth_form` y `hubspot_handoff` no se implementan especulativamente.
 - [ ] Publish/render bloquean action inválida o bundle no compatible.

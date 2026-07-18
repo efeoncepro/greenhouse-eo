@@ -285,3 +285,74 @@ The canonical operator route is `/growth/ctas`, matching the runtime shipped by 
 - A campaign requires governed asset delivery or an embedded form.
 - A CRM handoff has explicit consent, bounded write semantics, retry/audit ownership and a real consumer.
 - Multiple navigation kinds need a separate destination registry or provider-backed configuration.
+
+## Architecture Decision 2026-07-18 — CTA Experience System portable
+
+- Status: `Accepted`
+- Owner: Product Design / Platform Architecture / Growth
+- Scope: portable renderer presentation model, adaptive density, action-state continuity and governed authoring/preview
+- Reversibility: `two-way`
+- Confidence: `high`
+- Validated as of: `2026-07-18`
+
+### Context
+
+TASK-1340 proved a portable renderer and three useful style modes, but “rich UI” can become an uncontrolled mix
+of campaign skins, host-specific CSS, action-specific cards and animation. That would collapse distinct concerns:
+placement geometry, semantic intent, appearance, responsive density, experiment metadata and action execution.
+It would also make the admin preview look correct while WordPress or Think drift in production.
+
+### Decision
+
+Greenhouse treats `<greenhouse-cta>` as one portable experience primitive with orthogonal axes:
+
+- `placement` owns geometry, interruption level and focus model;
+- experience kind owns semantic authoring intent and compatibility guidance;
+- `style_variant` is renamed conceptually to **appearance** and owns tokenized tone only;
+- density `full|condensed|peek` is derived from the component container by the renderer;
+- `variant_id` remains experiment/message metadata and is not a style or placement switch;
+- action kind owns execution, expectation and recovery semantics, never visual skin.
+
+V1 adds only one interruptive placement, `slide_in`. The existing `default|spotlight|minimal` modes remain
+approved appearances. The premium experience comes from contextual content anatomy, explanatory evidence,
+container-aware composition, complete states and restrained placement-aware motion. The cockpit authors these
+governed axes and previews them with the canonical renderer; it is not a page builder.
+
+### Consequences
+
+- Campaigns cannot ship page-specific CTA markup/CSS or choose density through host breakpoints.
+- Richness is testable through state, density, host parity, accessibility, reduced motion, asset failure, long
+  content, overflow and CLS matrices.
+- `open_growth_form` may preserve context and continue in-place, while navigation actions remain lightweight;
+  registry metadata describes this capability without controlling appearance.
+- `popup_modal`, `floating_button`, new appearances and bespoke motion require a real consumer plus the same
+  platform-level contract/evidence; they are not implied by enum availability.
+- TASK-1428/1429/1430/1431 jointly own suppression elegance, presentation, authoring/preview and action continuity
+  without spawning one task per visual variation.
+
+### Alternatives Considered
+
+- One component/skin per campaign: rejected because it forks accessibility, motion, telemetry and host parity.
+- Let action kind select layout/appearance: rejected because domain semantics would leak into presentation and
+  produce analytics/UX coupling.
+- Let hosts choose density and CSS: rejected because WordPress/Think would drift and responsive behavior would
+  depend on viewport assumptions rather than the component container.
+- Build a freeform WYSIWYG/page builder: rejected because it expands scope, weakens governance and makes reliable
+  cross-host rendering untestable.
+
+### Runtime Contract
+
+- Canonical primitive and token layer: `src/growth-cta-renderer/**`.
+- Canonical server/browser contract: `src/lib/growth/ctas/contracts.ts` plus compile-time mirror/parity tests.
+- Presentation implementation and `slide_in`: `TASK-1429`.
+- Suppression/re-entry/kill semantics: `TASK-1428`.
+- Action expectation/state metadata: `TASK-1431`.
+- Governed authoring and canonical preview: `TASK-1430`.
+- Detailed normative behavior: `GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md` §15.
+
+### Revisit When
+
+- A second real interruptive use case cannot be served accessibly by `slide_in`.
+- A fourth appearance has repeated cross-campaign demand and cannot be expressed through approved tokens.
+- Density/content constraints require a browser-contract field rather than renderer derivation.
+- Powered experimentation graduates and needs explicit separation between message and presentation variants.

@@ -9,6 +9,10 @@
   suppression/frequency capping y kill switches; `TASK-1429` agrega exactamente un placement
   interruptivo; `TASK-1431` crea el Action Registry extensible con navegación gobernada; y
   `TASK-1430` reúne authoring, lifecycle, surfaces y reporting en un solo cockpit.
+- La experiencia visible se gobierna como un sistema, no como skins/campañas sueltas: `TASK-1429` formaliza
+  primitive + placement + experience kind + appearance + density + estados/motion; `TASK-1431` agrega el
+  contrato perceptible por acción sin elegir estilos; `TASK-1430` autora y previsualiza esos ejes con el renderer
+  canónico; `TASK-1428` hace que dismiss/caps/kill switches se sientan coherentes y no invasivos.
 - No se crean tasks independientes para documentación, CI ni cada adapter futuro. V1 implementa
   `open_growth_form` y navegación gobernada (`link_url`, `open_think_tool`, `book_meeting`);
   `download_asset`, `embed_growth_form` y `hubspot_handoff` quedan demand-driven.
@@ -68,9 +72,9 @@ Sequencing is **vertical-slice-first**, not horizontal-platform-first (Arch §18
 - `TASK-1340` — [ui-ux/platform] **Portable renderer proving the first host contract** (complete): framework-light Web Component `<greenhouse-cta>`, embedded/banner placement, `open_growth_form`, anti-CLS/a11y, `greenhouse_cta_*` events and preview/runtime evidence. Think is live; remaining production closure moved to TASK-1427.
 - `TASK-1427` — [ui-ux/integration] **First-slice production closure**: WordPress parity, Think+WordPress smoke, consent-aware GA4 proof, seven-day signal window and lifecycle/operator-doc reconciliation as one closure unit.
 - `TASK-1428` — [backend-data] **Exposure, suppression and kill-switch hardening**: Tier B ingest, visitor state, frequency capping, forgeable-ingest defenses and global/per-surface controls. Blocks interruptive rollout and cockpit controls.
-- `TASK-1429` — [ui-ux/platform] **One interruptive placement** (`slide_in` preferred unless discovery proves `popup_modal`), consuming TASK-1428 and covering a11y, focus, motion, mobile and both wired hosts.
-- `TASK-1431` — [backend-data/interaction] **Action Registry + governed navigation adapters**: one typed registry and browser-safe executor for `open_growth_form`, `link_url`, `open_think_tool` and navigation-only `book_meeting`. Blocks action authoring in TASK-1430.
-- `TASK-1430` — [ui-ux] **Authoring and reporting cockpit** at `/growth/ctas`, reusing existing readers/commands plus TASK-1428 controls and TASK-1431 registry metadata in one Composition Shell workbench.
+- `TASK-1429` — [ui-ux/platform] **CTA Experience System + one interruptive placement** (`slide_in`): formaliza placement/kind/appearance/density/variant, anatomía contextual, profundidad tokenizada, estados y motion; consume TASK-1428 y cubre a11y, focus, mobile y ambos hosts.
+- `TASK-1431` — [backend-data/interaction] **Action Registry + governed navigation adapters**: one typed registry and browser-safe executor for `open_growth_form`, `link_url`, `open_think_tool` and navigation-only `book_meeting`, including expectation/state/recovery metadata but no action-driven skins. Blocks action authoring in TASK-1430.
+- `TASK-1430` — [ui-ux] **Governed authoring, canonical preview and reporting cockpit** at `/growth/ctas`, reusing existing readers/commands plus TASK-1428 controls and TASK-1431 registry metadata in one Composition Shell workbench; no freeform page builder or parallel preview renderer.
 - Deferred demand-driven — `download_asset`, `embed_growth_form` and bounded `hubspot_handoff` only when a real consumer supplies the asset/form/CRM contract and runtime evidence.
 - `TASK-TBD` (deferred, post-V1) — [backend-data] Experimentation layer: stable assignment, mutual exclusion, sample ratio mismatch detection, powered-test metadata and guardrail reporting. **Deferred out of V1** (Arch §18 / ADR §Deferred): built only when public traffic supports a powered test; candidate `growth.experiment` split.
 

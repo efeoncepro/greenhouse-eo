@@ -14,8 +14,11 @@ surface mounts
      -> on: evaluate eligibility + suppression + frequency cap
         -> blocked: do not render
         -> eligible: wait for governed trigger
-           -> open interruptive CTA
-              -> primary action -> governed destination/form -> close/complete
+           -> open non-modal slide-in without passive focus steal
+              -> adapt density from own container (full/condensed/peek)
+              -> primary action -> pending (single dispatch)
+                 -> Growth Form ready -> preserve CTA context -> transfer focus -> success/error recovery
+                 -> governed navigation -> destination or restore action on failure
               -> dismiss/Escape -> persist suppression -> restore focus
               -> runtime failure -> close safely -> host remains usable
 ```
@@ -25,11 +28,13 @@ surface mounts
 - Trigger is explicit and testable (for example time-on-page or scroll threshold), never a host-specific inline heuristic.
 - The eligibility decision runs before the visual trigger and is not duplicated in the UI.
 - Re-evaluation cannot reopen during the same capped/suppressed visit.
+- Kill switch can interrupt waiting/open/pending presentation; it cannot falsify an already accepted downstream submission.
 
 ## Focus and Accessibility
 
 - Store a stable focus-return target before opening.
-- `Escape` closes; tab behavior follows slide-in versus dialog semantics selected in discovery.
+- Passive reveal does not move focus. The slide-in remains non-modal; Tab follows document order and never loops artificially.
+- `Escape` closes while focus is within the CTA; explicit close/action recovery returns to a stable origin.
 - Dismiss and primary action remain reachable at `390px` without page-level horizontal scroll.
 
 ## Failure and Recovery
@@ -40,7 +45,7 @@ surface mounts
 
 ## Evidence
 
-- GVC states: open, action, dismiss, capped, killed and reduced motion.
+- GVC states: all densities, each appearance, open/focus/pending/form/error/success, dismiss, capped, killed, asset failure, long content and reduced motion.
 - Browser checks: focus return, Escape, scroll width and no duplicate opening.
 
 ## GVC Scenario Plan

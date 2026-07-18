@@ -221,7 +221,10 @@ The engine is designed as a governed capability, not a UI feature (`GREENHOUSE_F
 | `surface` | Runtime where the CTA appears. | WordPress public site, Think, Greenhouse preview. |
 | `action` | What happens when the visitor acts. | open form, download ebook, open Think tool, book meeting. |
 | `suppression` | Why it should not appear. | dismissed, frequency cap, converted, no consent, lower priority. |
-| `variant` | Experiment or message/design alternative. | value prop A vs B, banner vs slide-in. |
+| `appearance` | Tono visual tokenizado que no cambia semántica, geometría ni ejecución. Persiste hoy en `style_variant`. | `default`, `spotlight`, `minimal`. |
+| `experience kind` | Intención semántica del prompt; orienta authoring y preview, pero no autoriza layout o lógica host-specific. | report follow-up, lead magnet, tool continuation, meeting. |
+| `density` | Respuesta honesta al ancho del contenedor; es calculada por el renderer, no autorada por el host. | `full`, `condensed`, `peek`. |
+| `variant` | Alternativa experimental de mensaje/diseño bajo `variant_id`; no es sinónimo de placement ni appearance. | value proposition A vs B. |
 
 ## 9. Core domain model
 
@@ -517,6 +520,130 @@ Rules:
 
 ## 15. UI, motion and accessibility
 
+### 15.1 CTA Experience System — primitive, placement, kind and appearance
+
+`<greenhouse-cta>` is one portable experience primitive. Richness is produced by coherent hierarchy, truthful
+state transitions and contextual continuity, not by creating a component per campaign or adding decorative
+effects per host. The public renderer contract separates four concerns:
+
+1. **Placement** owns geometry, interruption level and focus model: `embedded`, `inline_banner`, `slide_in`, etc.
+2. **Experience kind** describes the visitor job and authoring intent: report follow-up, lead magnet, tool
+   continuation or meeting. It may constrain compatible content/action combinations but never injects copy or
+   destination logic in the browser.
+3. **Appearance** is the tokenized visual tone represented by `style_variant`: `default`, `spotlight` or
+   `minimal`. Appearance may change surface, contrast and emphasis; it must not change semantics, action,
+   suppression or focus behavior.
+4. **Density** is renderer-derived from the component's own inline size: `full`, `condensed` or `peek`. Hosts do
+   not choose density and must not hide or clip content to simulate it.
+
+`variant_id` remains reserved for experiment/message alternatives. It must not be overloaded as a visual skin,
+placement switch or density control. This separation prevents analytics ambiguity and keeps WordPress, Think and
+preview behaviorally equivalent.
+
+Official V1 presentation families:
+
+| Placement family | Visitor moment | Required anatomy | Density posture | Signature transition |
+| --- | --- | --- | --- | --- |
+| `embedded` editorial | Natural continuation after content/report evidence. | Optional contextual eyebrow, headline, supporting body/evidence, one primary action, optional honest footnote. | `full → condensed`; `peek` is not valid in content flow. | Reveal inside reserved space; no layout shift. |
+| `inline_banner` spotlight | Section-level opportunity with higher visual emphasis. | Same semantic anatomy; optional visual/evidence rail; one primary action. | `full → condensed`; action stacks when necessary. | Short opacity/translation reveal inside reserved space. |
+| `slide_in` contextual | Eligible high-intent secondary prompt after a governed trigger. | Compact context, headline, one action and always-visible dismiss. | `condensed → peek`; full only when container permits. | Edge entry on wide viewports, bottom/safe-area entry on compact. |
+| `form_expanded` state | Visitor has explicitly activated `open_growth_form`. This is a state of the originating placement, not a new placement. | Preserved CTA context + governed form or bounded handoff + recovery/close. | Container-aware; key context never disappears. | In-place continuity/crossfade without an abrupt unrelated modal. |
+
+The V1 `slide_in` is the only new interruptive presentation. `popup_modal` and `floating_button` remain contract
+families but do not become parallel visual products until a real consumer proves their need.
+
+### 15.2 Content anatomy and contextual continuity
+
+Every CTA must feel like the next relevant step in the host journey, not a generic promotional interruption.
+The content contract is interpreted as follows:
+
+- `eyebrow` identifies context or next-step category; it is not a decorative badge farm.
+- `headline` states the concrete value or continuation; it must stand alone without the image.
+- `body` explains the outcome, evidence or expectation in concise language.
+- `visualAssetRef`, when present, must provide explanatory value: report preview, real artifact, recognizable tool
+  or evidence. Generic stock decoration and image-only text are rejected.
+- `ctaLabel` names the actual action; it cannot promise an immediate result when the action only navigates.
+- `footnote` is reserved for honest expectation-setting such as duration, delivery or privacy—not legal dumping.
+- `dismissLabel` must be neutral and accessible; confirmshaming is prohibited.
+
+One primary action is allowed per CTA. A visible dismiss is a control, not a competing conversion action. Secondary
+navigation belongs in the destination experience unless a future contract explicitly governs it.
+
+### 15.3 Visual depth and token contract
+
+The renderer may create premium depth through a restrained layered surface: tonal background, subtle border,
+controlled elevation, clear typographic hierarchy, contextual visual/evidence and a single accent. The following
+are hard boundaries:
+
+- every visual value comes from the public `--gh-cta-*` token layer; host overrides theme the primitive, never
+  patch internal selectors or fork markup;
+- appearance must pass contrast in light, dark and forced-colors environments;
+- gradients, glow and elevated shadow are limited to the `spotlight` appearance and cannot animate continuously;
+- `minimal` removes chrome but preserves target size, focus, semantic hierarchy and state feedback;
+- no campaign-specific CSS, arbitrary per-page colors, glassmorphism stack, fake urgency, decorative counters or
+  asset that carries essential text;
+- visual asset failure degrades to a complete text CTA without broken layout or empty media chrome.
+
+### 15.4 Adaptive density contract
+
+The portable equivalent of Greenhouse Adaptive Card density is container-query driven and independent from the
+portal Composition Shell. The component adapts to its own width, not the viewport or a host-provided breakpoint:
+
+- `full`: visual/evidence, full supporting copy and inline-or-adjacent action when space permits;
+- `condensed`: headline, essential supporting sentence and action; optional visual becomes smaller or is removed
+  only when it is non-essential;
+- `peek`: interruptive teaser with context/headline, action and dismiss. It is not clipping of the full card.
+
+Across density changes, the headline, primary action and dismiss (when applicable) never disappear. Long copy
+wraps or is authoring-blocked; it is never truncated in a way that changes the promise. Density transitions may
+use interruptible compositor motion, but the semantic DOM order and focus order remain stable.
+
+### 15.5 Action-aware state continuity
+
+Action kind changes the execution/recovery contract, not the CTA's arbitrary visual skin:
+
+| Action | Perceptible contract | Required feedback |
+| --- | --- | --- |
+| `open_growth_form` | CTA evolves in place into the governed form state while preserving enough context to explain why the form is present. | Press/pending, focus transfer, form ready, validation/submission, success/error, close and focus return. |
+| `link_url` | Lightweight navigation matching the label and destination expectation. | Single-dispatch guard, safe same/new-context semantics and failure recovery. |
+| `open_think_tool` | Contextual continuation to a governed Think experience. | Optional real preview/evidence in CTA content, safe navigation and allowlisted campaign context only. |
+| `book_meeting` | Navigation to the governed booking experience; no silent CRM mutation. | Honest duration/expectation only when supplied by trusted authoring data; safe navigation and recovery. |
+
+The complete public state vocabulary is: `loading`, `ready`, `focused`, `pending`, `form_open`, `success`, `error`,
+`dismissed`, `suppressed`, `capped`, `killed` and `reduced_motion`. Each state must have deterministic telemetry,
+keyboard behavior and recovery. Richness is judged primarily by the quality of these transitions, not by the
+number of decorative variants.
+
+### 15.6 Motion language
+
+Motion expresses causality and spatial continuity:
+
+- embedded/banner reveal uses reserved space and a short opacity/translation transition;
+- slide-in enters from the nearest logical edge on wide screens and from the bottom within safe areas on compact;
+- action press/pending confirms that one activation was received;
+- CTA → form → result is a continuous state transition inside the same experience shell where practical;
+- exit/dismiss finishes state persistence and focus recovery deterministically; suppression never depends on an
+  animation-end event;
+- transitions are interruptible by Escape, navigation, kill switch, action completion and reduced-motion changes.
+
+Only `transform` and `opacity` are used for ordinary entrance/exit feedback. No bounce, autoplay loop, pulsing,
+scroll-jacking, repeated reveal, fake countdown or motion-created urgency is permitted. `prefers-reduced-motion`
+removes travel and stagger, preserves immediate state feedback and never delays focus or action completion.
+
+### 15.7 Experience verification matrix
+
+Every new placement, appearance change or action-state change must be reviewed through the same contract in
+preview, Think and WordPress where wired:
+
+- viewports/container widths covering wide `full`, narrow `condensed` and interruptive `peek` behavior;
+- light/dark/forced-colors where supported and `prefers-reduced-motion`;
+- keyboard activation, visible focus, Escape, dismiss, focus transfer and focus return;
+- loading, ready, pending, form open, error recovery, success, dismissed, suppressed/capped and killed;
+- visual asset present, missing/failing and long localized content;
+- `scrollWidth === clientWidth`, safe-area behavior, no page-level scroll jump and measured CLS;
+- parity of headline/body/action/destination/appearance/placement between admin preview and public renderer;
+- captured frames are manually reviewed; a passing automation report without looking at the frames is insufficient.
+
 Admin UI:
 
 - Use `CompositionShell` as the default surface substrate.
@@ -656,7 +783,7 @@ Targeting and personalization can drift into sensitive profiling. V1 only allows
 - **NUNCA** enviar secretos, mapeos de provider o internals de HubSpot al browser; el render contract expone solo campos browser-safe.
 - **NUNCA** aplicar una regla de tracking/personalización sin `consent_state` válido y `consent_source` declarado (§16.2).
 - **NUNCA** declarar un "winner" de CTA sin métrica primaria, MDE/sample-size, guardrails y chequeo SRM (§14); experimentación powered está diferida fuera de V1 (§18).
-- **NUNCA** shippear un placement interruptivo sin dialog semantics, focus trap/return, escape, dismissal por teclado, reduced-motion y anti-CLS (§15).
+- **NUNCA** shippear un placement interruptivo sin semántica/foco correctos para su familia, Escape, dismissal por teclado, focus return tras interacción, reduced-motion y anti-CLS; `aria-modal`/focus trap son exclusivos de un modal real y están prohibidos en `slide_in` (§15).
 - **SIEMPRE** proveer kill switch global/por-surface que el renderer honra dentro del TTL del contrato (§16.3).
 - **SIEMPRE** cross-check `cta_version ↔ surface_id` en el ingest público y emitir `growth.cta.surface_unauthorized_attempt` ante mismatch (§16.1).
 - **SIEMPRE** mantener paridad preview↔público con un test de contrato (§15), replicando `renderer-contract-parity.test.ts` de Growth Forms.

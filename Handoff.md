@@ -1,3 +1,17 @@
+## Sesión 2026-07-18 — CTA Experience System incorporado a EPIC-023 (planning/architecture)
+
+> Por pedido del operador se elevó el objetivo de UI “rica, moderna y fluida” a un contrato ejecutable, sin crear
+> nuevas tasks. El ADR/arquitectura CTA ahora separa `placement`, experience kind, appearance
+> (`style_variant`), density derivada `full|condensed|peek` y `variant_id` experimental; canoniza anatomía
+> contextual, profundidad tokenizada, estados completos, motion placement-aware y action-state continuity.
+> `TASK-1429` pasa a ser CTA Experience System + único interruptivo `slide_in`; `TASK-1431` agrega metadata de
+> expectation/state/recovery sin skins por acción; `TASK-1430` autora esos ejes y previsualiza con el renderer
+> canónico, sin page builder; `TASK-1428` fija dismiss/re-entry/caps privacy-safe; `TASK-1427` conserva baseline
+> cross-host. Se corrigió una ambigüedad previa: `slide_in` es no modal, sin `aria-modal`/focus trap; Escape,
+> dismiss y focus return siguen obligatorios. Todos los task/UI/ops linters pasan con 0 errors/0 warnings. Cambio
+> solo documental; runtime y lifecycle permanecen intactos. Pendiente: commit cuando lo ordene el operador y
+> luego ejecutar las tasks en su secuencia vigente.
+
 ## Sesión 2026-07-18 — Pillar Web Agéntica publicado y bidireccional
 
 > Publicado `El fin de la web “solo para humanos”: cómo preparar tu sitio para los agentes de IA` como post WordPress `249387` en

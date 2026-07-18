@@ -7,7 +7,7 @@
 - Lifecycle: `to-do`
 - Priority: `P1`
 - Impact: `Alto`
-- Effort: `Medio`
+- Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
@@ -27,7 +27,7 @@
 
 ## Summary
 
-Completa `/growth/ctas` como cockpit operator: inventario + detalle, author/review/publish/pause, surfaces/kill switches y reporting básico. Reutiliza commands/readers/APIs existentes, los deltas de TASK-1428 y metadata del Action Registry TASK-1431; la UI no crea endpoints, enums, reglas ni agregaciones paralelas.
+Completa `/growth/ctas` como cockpit operator: inventario + detalle, author/review/publish/pause, surfaces/kill switches, reporting básico y authoring/preview gobernado del CTA Experience System. Permite componer placement, experience kind, appearance, contenido/asset y action sin convertir el cockpit en un page builder; density sigue siendo automática y `variantId` no se mezcla con apariencia. Reutiliza commands/readers/APIs existentes, los deltas de TASK-1428 y metadata del Action Registry TASK-1431; la UI no crea endpoints, enums, reglas ni agregaciones paralelas.
 
 ## Why This Task Exists
 
@@ -37,6 +37,7 @@ La vista actual de TASK-1340 permite inventario, lifecycle mínimo y preview, pe
 
 - Workbench operator end-to-end sobre `/growth/ctas` y `gestion.growth_ctas`.
 - Authoring/review/publish/pause con estado honesto y confirmaciones.
+- Authoring guiado que hace visibles compatibilidad, anatomía, expectativa de acción, density preview y riesgos antes de review/publish.
 - Reporting básico y kill switches desde readers/commands canónicos.
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
@@ -54,6 +55,8 @@ Reglas obligatorias:
 - UI cliente del primitive/API; cero SQL, agregación o state machine local.
 - Conversión reportada distingue `browser_reported` de `server_confirmed`.
 - Copy reusable en `src/lib/copy/growth.ts` y acceso fino por capability.
+- La UI no ofrece controles de pixel/spacing/color libre, breakpoint manual, CSS, z-index, motion curve ni HTML; solo ejes gobernados y tokens aprobados.
+- Preview usa el mismo CSS/contract renderer que producción; nunca una recreación MUI “parecida”.
 
 ## Normative Docs
 
@@ -112,15 +115,15 @@ Reglas obligatorias:
 - UI rigor: `ui-standard`
 - Usuario / rol: operador Growth/Marketing autorizado
 - Momento del flujo: crear, revisar, publicar, pausar y leer resultado de CTAs
-- Resultado perceptible esperado: una cola y detalle claros con estado/acción confiables
+- Resultado perceptible esperado: una cola y detalle claros, más un authoring que permite anticipar exactamente cómo se verá, adaptará y actuará un CTA real sin conocer JSON interno
 - Friccion que debe reducir: operar por payload/API o vista parcial sin contexto
-- No-goals UX: editor visual libre, experimentación o analytics avanzado
+- No-goals UX: canvas drag-and-drop, editor visual libre, CSS/spacing arbitrario, experimentación powered o analytics avanzado
 
 ### Surface & system decision
 
 - Surface: `/growth/ctas`
 - Composition Shell: `aplica` — `leadPlusContext`/`split` según mapping
-- Primitive decision: `reuse` — CompositionShell, OperationalPanel, DataTableShell, ContextualSidecar/fields existentes
+- Primitive decision: `reuse` — CompositionShell, OperationalPanel, DataTableShell, ContextualSidecar/fields existentes; preview monta el renderer CTA canónico dentro de un harness, no una card paralela
 - Adaptive density / The Seam: aplica en cards/resumen del detalle
 - Floating/Sidecar/Dialog decision: sidecar/context region para detalle/editor; confirmación gobernada para publish/pause
 - Copy source: `src/lib/copy/growth.ts`
@@ -138,6 +141,9 @@ Reglas obligatorias:
 - Mobile / compact: lista→detalle secuencial; no tabla aplastada
 - Keyboard / focus: selección, sidecar/dialog, confirmación y restore
 - Reduced motion: primitives existentes
+- Draft valid: matriz placement/kind/appearance/action compatible, content limits y preview parity verdes
+- Draft invalid: errores por campo + resumen accionable; publish deshabilitado por razón server-confirmed
+- Preview modes: host `Think|WordPress`, container `wide|narrow|compact`, appearance, asset/no-asset, long content y reduced motion
 
 ### Interaction contract
 
@@ -148,6 +154,8 @@ Reglas obligatorias:
 - Focus restore: fila/acción origen
 - Latency feedback: inline pending + refresh de detail
 - Toast / alert behavior: toast de éxito; Alert persistente para bloqueo/error
+- Authoring sequence: intent/kind → placement → appearance → content/evidence → action → targeting/suppression → preview matrix → review; no empieza por un canvas visual vacío
+- Compatibility feedback: combinaciones inválidas se bloquean con razón y alternativa segura; la UI no corrige silenciosamente ni muta payload al publicar
 
 ### Motion & microinteractions
 
@@ -162,21 +170,21 @@ Reglas obligatorias:
 ### Implementation mapping
 
 - Route / surface: `/growth/ctas`
-- Primitive / variant / kind: CompositionShell + master/detail/sidecar primitives existentes
+- Primitive / variant / kind: CompositionShell + master/detail/sidecar primitives existentes + harness del `<greenhouse-cta>` canónico; cero `CtaPreviewCard` local
 - Component candidates: refactor/extend `GrowthCtasGovernanceView`
 - Copy source: `src/lib/copy/growth.ts`
 - Data reader / command: list/detail/author/lifecycle + TASK-1428 kill switch + TASK-1431 action registry metadata
 - API parity: APIs admin existentes; no UI-only business action
 - Access / capability: `gestion.growth_ctas` + `growth.cta.read/author/publish/pause`
-- States to implement: list/detail/draft/review/published/paused/degraded/error/permission/compact
+- States to implement: list/detail/draft-valid/draft-invalid/preview-host/preview-density/review/published/paused/degraded/error/permission/compact/dirty
 
 ### GVC scenario plan
 
 - Scenario file: `scripts/frontend/scenarios/task-1430-growth-cta-cockpit.scenario.ts`
 - Route: `/growth/ctas`
 - Viewports: 1440 y 390
-- Required steps: list/select/detail, author/review confirmation, report, kill-switch state
-- Required captures: empty/populated/detail/editor/confirm/degraded/mobile
+- Required steps: list/select/detail; author por secuencia; cambiar kind/placement/appearance/action; preview wide/narrow/compact y Think/WP; asset failure/long copy; invalid compatibility; review confirmation; report; kill-switch state
+- Required captures: empty/populated/detail/editor cada sección, preview matrix, invalid/review checklist, confirm, degraded y mobile
 - Required `data-capture` markers: shell/list/detail/editor/report/surface
 - Assertions: auth, no error, keyboard, state labels, capability denials
 - Scroll-width checks: obligatorio
@@ -188,7 +196,7 @@ Reglas obligatorias:
 - Alternatives considered: nueva route admin; editor visual drag-drop; API-only
 - Why this pattern: conserva nav/viewCode y backend ya shippeado
 - Reuse / extend / new primitive: reuse/extend consumer, cero primitive nueva prevista
-- Open risks: densidad del detail y edición de JSON/policies; resolver con fields gobernados, no textarea crudo
+- Open risks: densidad del detail, combinatoria de preview y edición de JSON/policies; resolver con fields gobernados, pairwise preview + casos frontera y nunca textarea crudo
 
 ### Visual verification
 
@@ -209,6 +217,49 @@ Reglas obligatorias:
 
 Construir una sola ruta master-detail sobre los readers/commands existentes, sumar únicamente los contratos de TASK-1428 que falten, consumir la metadata TASK-1431 para actions y mantener todas las mutaciones server-confirmed. Composition Shell gobierna regiones; el sidecar/dialog canónico gobierna authoring y confirmaciones; reporting degradado nunca bloquea lifecycle.
 
+### Governed authoring model
+
+El editor no es WYSIWYG libre. Expone un recorrido con ejes explícitos y validación progresiva:
+
+1. **Intent / experience kind:** `report_followup|lead_magnet|tool_continuation|meeting` como semántica de authoring. Define checklist de expectativa/evidencia, no copy automática.
+2. **Placement:** solo placements soportados por el renderer channel/surface. Explica nivel de interrupción y requisitos de suppression.
+3. **Appearance:** `default|spotlight|minimal`, con descripción de énfasis y contraste; no ofrece color picker ni CSS.
+4. **Content anatomy:** eyebrow opcional, headline obligatorio, body, CTA label, dismiss label, footnote y visual asset ref, con límites y guidance contextual.
+5. **Action:** options y required fields vienen de TASK-1431 registry metadata; muestra destination expectation y valida integridad label↔action.
+6. **Targeting/suppression:** consume contratos canónicos; placement interruptivo no avanza a review sin cap/dismiss/kill-switch posture válido.
+7. **Preview matrix:** mismo renderer bajo harnesses de host/container/state; no guarda density porque es derivada.
+8. **Review checklist:** contrato, surface, accessibility, copy/action expectation, suppression, measurement y rollback antes de `submit review`/`publish`.
+
+### Preview matrix
+
+La UI evita una explosión combinatoria mediante cobertura pairwise más casos frontera obligatorios:
+
+| Dimension | Values |
+|---|---|
+| Host context | Think, WordPress token harness |
+| Container | wide/full, narrow/condensed, compact/peek cuando placement lo admite |
+| Appearance | default, selected appearance; all appearances en review de platform change |
+| Content | nominal, long localized, no optional body/footnote |
+| Asset | present, missing/error fallback |
+| State | ready, focus, pending, form-open/error cuando action aplica, dismissed/suppressed/killed read-only evidence |
+| Preference | normal, reduced motion; light/dark/forced-colors cuando host/harness lo soporta |
+
+El preview muestra badges fuera del canvas para `surface`, `placement`, `appearance`, `derived density`,
+`action kind`, renderer channel y contract version. Esos badges son diagnóstico del cockpit, no contenido que llega
+al visitante.
+
+### Review blockers
+
+No puede enviarse a review/publicarse cuando:
+
+- action no registrada, destino inválido o label promete un resultado distinto;
+- placement interruptivo no tiene dismiss/suppression/frequency/kill-switch posture válido;
+- headline/action/dismiss desaparecen en alguna density requerida;
+- visual contiene texto esencial o su fallback rompe la anatomía;
+- preview y public contract difieren;
+- copy excede límites, contraste/foco falla o existe overflow/CLS conocido;
+- surface/renderer channel no soporta placement/action/contract version.
+
 ## Scope
 
 ### Slice 1 — Workbench structure
@@ -216,10 +267,11 @@ Construir una sola ruta master-detail sobre los readers/commands existentes, sum
 - Migrar la vista actual a Composition Shell master/detail responsive.
 - Cablear list/detail/version/conversion summary sin agregación cliente.
 
-### Slice 2 — Authoring and lifecycle
+### Slice 2 — Governed authoring, preview and lifecycle
 
-- Form gobernado para draft/review/publish/pause con capability/state guards.
-- Confirmaciones, dirty-state, errores y refresh del detalle.
+- Form secuencial gobernado para kind/placement/appearance/content/action/targeting-suppression, sin raw JSON/CSS.
+- Preview harness canónico con matriz pairwise/casos frontera y review blockers server-confirmed.
+- Draft/review/publish/pause con capability/state guards, confirmaciones, dirty-state, errores y refresh del detalle.
 
 ### Slice 3 — Surfaces, kill switches and evidence
 
@@ -273,6 +325,10 @@ Construir una sola ruta master-detail sobre los readers/commands existentes, sum
 - [ ] `/growth/ctas` usa Composition Shell y conserva route/viewCode existentes.
 - [ ] Inventario/detalle/versiones/reporting consumen readers/APIs canónicos sin derivar business truth en UI.
 - [ ] Author/review/publish/pause y kill switches respetan capabilities, transitions y confirmación.
+- [ ] Authoring separa kind, placement, appearance, action, density derivada y `variantId`; no ofrece controles visuales arbitrarios.
+- [ ] Action fields/expectations vienen del registry TASK-1431 y suppression/kill-switch posture de TASK-1428; no hay enum/reglas espejo.
+- [ ] Preview monta el renderer canónico y cubre host/container/state/preferences con pairwise + casos frontera; no existe preview card paralela.
+- [ ] Review bloquea mismatch copy↔action, interruptivo sin defensas, fallback de asset roto, overflow/CLS, incompatibilidad de renderer y parity drift.
 - [ ] `browser_reported` y `server_confirmed` se distinguen visual y semánticamente.
 - [ ] Estados empty/loading/error/degraded/permission/compact/dirty quedan cubiertos.
 - [ ] GVC 1440/390, keyboard/focus/reduced-motion y overflow 0 pasan.

@@ -1,5 +1,18 @@
 # changelog.md
 
+## 2026-07-18 — EPIC-023: CTA Experience System incorporado al plan V1
+
+- El renderer portable se gobierna como una sola primitive con ejes ortogonales: placement, experience kind,
+  appearance (`style_variant`), density `full|condensed|peek` derivada por container query y `variant_id`
+  reservado para experimentación futura. Se canonizaron anatomía contextual, evidencia visual real, estados,
+  motion, reduced motion, asset failure, long content, overflow/CLS y paridad preview↔Think↔WordPress.
+- `TASK-1429` ahora entrega el sistema de presentación y un único interruptivo `slide_in`; `TASK-1431` define el
+  contrato perceptible por action kind sin action-driven skins; `TASK-1430` incorpora authoring secuencial y
+  preview con el renderer real, sin WYSIWYG/page builder; `TASK-1428` explicita dismiss/re-entry/caps/kill
+  semantics y `TASK-1427` conserva el baseline productivo.
+- El ADR aclara que `slide_in` es no modal: no usa `aria-modal` ni focus trap; sí exige Escape, dismiss accesible,
+  focus return tras interacción, suppression y safe-area. No hubo cambio de código, runtime, flags ni lifecycle.
+
 ## 2026-07-18 — Pillar Web agéntica publicado y enlazado bidireccionalmente
 
 - Publicado el post WordPress `249387`, cuyo título final es `El fin de la web “solo para humanos”: cómo preparar tu sitio para los agentes de IA`, en

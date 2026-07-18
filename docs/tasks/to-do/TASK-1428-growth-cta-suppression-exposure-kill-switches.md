@@ -36,6 +36,7 @@ La foundation actual arbitra y registra conversiones Tier A, pero todavía no pu
 ## Goal
 
 - Suppression/frequency cap determinista y server-side antes de arbitrar.
+- Una UX de exposición elegante: dismiss inmediato, no reapertura sorprendente, conversión-aware suppression y estado consistente entre placements/surfaces dentro del límite de privacidad.
 - Tier B analítico/sampled separado del ledger de conversión.
 - Kill switch global/per-surface con command/reader/API, audit y signals.
 
@@ -54,6 +55,8 @@ Reglas obligatorias:
 - Conversion truth queda en Tier A; exposición alta va a Tier B sampled/analítico.
 - Kill switches no dependen de deploy y deben invalidar/evitar cache stale dentro del TTL documentado.
 - No almacenar identificadores crudos, PII o fingerprinting invasivo.
+- La ausencia de visitor identity/consent no autoriza exposición ilimitada: debe existir un fallback conservador de sesión/surface documentado.
+- Suppression gobierna elegibilidad; el renderer solo representa `eligible|suppressed|capped|killed` y nunca reconstruye ventanas localmente.
 
 ## Normative Docs
 
@@ -128,6 +131,9 @@ Reglas obligatorias:
   - 0–1 interruptivo por arbitraje y frequency cap aplicado antes del render
   - solo `server_confirmed` alimenta conversion truth
   - visitor key es pseudónima/rotatable y consent-aware
+  - dismiss confirmado impide reapertura del mismo CTA/placement durante la ventana efectiva
+  - conversión server-confirmed puede suprimir prompts equivalentes/menos avanzados según policy explícita; nunca por heurística browser
+  - kill switch gana sobre eligibility/cache local y produce `killed`, no un falso `dismissed`
 - Tenant/space boundary: surface binding + scope global/per-surface; admin por `growth.cta.*`
 - Idempotency/concurrency: upsert/transaction o lock para ventanas; commands reintentables
 - Audit/outbox/history: cambios de kill switch auditados + outbox; exposure sampled con retención explícita
@@ -179,12 +185,56 @@ Reglas obligatorias:
 
 Implementar primero el modelo durable de visitor state, suppression y controles; después conectar el arbiter y el ingest Tier B; finalmente exponer readers/commands gobernados para consumidores UI/runtime. La política vive en `growth.cta`, las superficies solo envían contexto verificable y ningún evento browser se trata como conversión confiable.
 
+### Visitor-experience policy
+
+La task debe definir y probar una taxonomía de razones estable, al menos:
+
+- `dismissed`: decisión explícita del visitante;
+- `frequency_capped`: ventana/límite alcanzado;
+- `already_converted`: evidencia Tier A server-confirmed compatible con la policy;
+- `higher_priority_selected`: otro interruptivo ganó arbitraje;
+- `surface_killed|global_killed`: retiro operativo;
+- `consent_or_identity_limited`: no existe base permitida para state duradero/personalización;
+- `placement_not_supported`: host/viewport/renderer channel incompatible;
+- `policy_invalid|runtime_degraded`: fail-closed o fallback definido.
+
+El browser recibe solo el outcome mínimo necesario; nunca ventana exacta, prioridad, candidate set, hashes o
+razón interna sensible. Telemetría Tier B usa reason class allowlisted para comprender exposición sin revelar
+policy.
+
+### Frequency and re-entry semantics
+
+- Dismiss explícito persiste antes de completar la salida visual; la UX no depende de `animationend`.
+- Un refresh, resize, route transition SPA o re-mount del custom element no reinicia la ventana.
+- Múltiples tabs/concurrent renders resuelven de manera determinista; como máximo uno obtiene exposición
+  interruptiva cuando la policy así lo exige.
+- Fallo del sink Tier B no debe producir una tormenta de reaparición; se define fail-open/fail-closed separando
+  analytics de suppression state.
+- Sin consentimiento para state duradero, el sistema aplica como mínimo un cap conservador de sesión/surface sin
+  crear fingerprint persistente.
+- `already_converted` solo usa evidencia compatible y server-confirmed; un click o navegación browser-reported no
+  suprime permanentemente como conversión.
+- Kill global/per-surface invalida contratos dentro del SLA/TTL y evita mount/foco/entrance; restore no causa
+  aparición inmediata fuera del trigger original.
+
+### Contract consumed by renderer/cockpit
+
+Readers/DTOs deben permitir a TASK-1429/1430 distinguir, sin recalcular:
+
+- outcome `eligible|suppressed|capped|killed`;
+- reason class sanitizada;
+- scope `cta|placement|surface|global` cuando sea seguro;
+- effective/observed timestamp y freshness/TTL para operación;
+- next-eligible hint solo si no filtra policy ni facilita evasión de caps;
+- kill switch actor/reason/audit visible solo al operador autorizado, nunca al browser.
+
 ## Scope
 
 ### Slice 1 — Visitor state and suppression
 
 - Define consent-aware pseudonymous state, frequency windows and server-side decision.
-- Integrate with arbiter in shadow first; add collision/suppression evidence.
+- Define reason taxonomy, dismiss/conversion/re-entry/concurrency semantics and privacy-safe fallback.
+- Integrate with arbiter in shadow first; add collision/suppression evidence and refresh/remount/multi-tab tests.
 
 ### Slice 2 — Tier B exposure
 
@@ -245,6 +295,10 @@ Implementar primero el modelo durable de visitor state, suppression y controles;
 ## Acceptance Criteria
 
 - [ ] Frequency capping/suppression es server-side, consent-aware y probado bajo concurrencia.
+- [ ] Dismiss persiste antes de exit visual y refresh/remount/resize/SPA navigation no reabre dentro de la ventana.
+- [ ] Sin consentimiento/state durable existe fallback conservador sin fingerprinting ni exposición ilimitada.
+- [ ] `already_converted` usa solo evidencia compatible `server_confirmed`; browser click/navigation no genera suppression permanente falsa.
+- [ ] Renderer/cockpit reciben outcome/reason/freshness mínimos y no policy, candidate set, hashes ni ventanas sensibles.
 - [ ] Tier B no escribe exposure de alto volumen en `cta_conversion_event`.
 - [ ] Kill switches global/per-surface detienen render dentro del TTL sin redeploy y son reversibles.
 - [ ] Browser data sigue untrusted y conversion truth solo usa `server_confirmed`.

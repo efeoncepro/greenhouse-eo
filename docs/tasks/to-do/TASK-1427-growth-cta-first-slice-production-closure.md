@@ -37,6 +37,7 @@ TASK-1339/1340 están en `complete/` y Think está live, pero la promesa origina
 
 - WordPress consume el mismo contrato y renderer que Think, sin lógica CTA local.
 - Render, apertura de Growth Form, ingest y medición quedan probados en ambas superficies.
+- Se conserva un baseline visual/interaction del renderer actual en ambos hosts para comparar TASK-1429/1431 sin confundir enriquecimiento con regresión de portabilidad.
 - El cierre de siete días y los documentos canónicos reflejan la verdad productiva.
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
@@ -182,6 +183,7 @@ Reglas obligatorias:
 - Viewports: 1440 y 390
 - Required steps: load, CTA visible, foco, abrir/cerrar form
 - Required captures: default + form abierto
+- Baseline contract: capturar `default|spotlight|minimal` disponibles, wide/390, asset/no-asset y form-open cuando existan fixtures válidos; registrar hashes/rutas como referencia, no como baseline visual rígido entre hosts con temas distintos
 - Required `data-capture` markers: host/CTA/form cuando el host permita
 - Assertions: bundle/API 200, sin consola, sin error boundary, evento emitido
 - Scroll-width checks: `scrollWidth == clientWidth`
@@ -334,6 +336,7 @@ Reglas obligatorias:
 ## Acceptance Criteria
 
 - [ ] WordPress y Think renderizan el mismo CTA/contrato sin lógica ni copy duplicados.
+- [ ] Queda evidencia baseline mirada de anatomía, appearances, responsive container, focus y form-open en ambos hosts para la comparación de TASK-1429/1431.
 - [ ] CTA→Growth Form funciona con teclado, Escape/focus restore y sin overflow en 1440/390.
 - [ ] Render/event ingest y rechazo de credencial inválida se verifican productivamente.
 - [ ] `greenhouse_cta_viewed` se observa en `dataLayer`, request `/g/collect` consentido y GA4 realtime/readback.

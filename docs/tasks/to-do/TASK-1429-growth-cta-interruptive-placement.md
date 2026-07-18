@@ -7,7 +7,7 @@
 - Lifecycle: `to-do`
 - Priority: `P1`
 - Impact: `Alto`
-- Effort: `Medio`
+- Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `motion`
@@ -27,7 +27,7 @@
 
 ## Summary
 
-Extiende el renderer existente con un primer placement interruptivo oficial —preferentemente `slide_in`, salvo evidencia de discovery a favor de `popup_modal`— usando el contrato ya soportado. Cubre foco, Escape/cierre, focus return, reduced motion, mobile, anti-CLS y paridad preview↔público.
+Extiende el renderer existente con el primer placement interruptivo oficial, `slide_in`, y formaliza el CTA Experience System portable: separación estricta entre placement, experience kind, appearance, density y experiment variant; anatomía contextual; profundidad visual tokenizada; densidad `full|condensed|peek`; estados ricos; motion placement-aware; y paridad preview↔Think↔WordPress. Cubre foco, Escape/cierre, focus return, reduced motion, safe areas, anti-CLS y recovery sin crear un renderer paralelo.
 
 ## Why This Task Exists
 
@@ -35,9 +35,10 @@ El contrato/arbiter ya distingue `slide_in` y `popup_modal`, pero `<greenhouse-c
 
 ## Goal
 
-- Un placement interruptivo reusable, accesible y gobernado por datos.
+- Un `slide_in` reusable, accesible, contextual y gobernado por datos.
+- Un contrato explícito de presentación que enriquece el renderer sin convertir campañas en forks visuales.
 - Mismo contrato en preview, Think y WordPress; cero política en browser.
-- Evidencia GVC desktop/mobile/keyboard/reduced-motion/anti-CLS.
+- Evidencia GVC desktop/mobile/keyboard/reduced-motion/anti-CLS, densidad, long content, asset failure y estados suppression/action.
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
 
@@ -51,8 +52,10 @@ El contrato/arbiter ya distingue `slide_in` y `popup_modal`, pero `<greenhouse-c
 Reglas obligatorias:
 
 - Reusar `CtaPlacement` y el contrato actual; no crear renderer paralelo.
+- `placement` gobierna geometría/interrupción; `styleVariant` gobierna solo appearance; `variantId` sigue reservado para experimentación futura; density se deriva por container query. Nunca intercambiar esos ejes.
 - Sin mobile interstitial intrusivo, confirmshaming, countdown falso ni cierre oculto.
-- Focus trap/return y Escape son parte del comportamiento, no polish.
+- Semántica/foco correcta por placement, Escape y focus return son parte del comportamiento, no polish; focus trap solo existe para un modal real, nunca para `slide_in`.
+- El `slide_in` es no modal y usa `role='complementary'`/label apropiado; no declara `aria-modal` ni roba un trap modal. Si el flujo monta un Growth Form que sí tiene contrato modal, ese subflujo conserva su propia semántica.
 - Suppression/kill switch de TASK-1428 bloquea el rollout productivo.
 
 ## Normative Docs
@@ -109,39 +112,42 @@ Reglas obligatorias:
 - UI rigor: `ui-platform`
 - Usuario / rol: visitante público elegible
 - Momento del flujo: prompt contextual no inmediato, después del trigger gobernado
-- Resultado perceptible esperado: superficie clara, cerrable y no invasiva
+- Resultado perceptible esperado: una superficie editorial premium que se percibe como siguiente paso del contenido, entra con continuidad espacial, se adapta a su ancho y mantiene acción/cierre inequívocos
 - Friccion que debe reducir: CTA relevante sin perder contexto de página
-- No-goals UX: modal de marketing agresivo, múltiples overlays o rediseño embedded
+- No-goals UX: modal de marketing agresivo, múltiples overlays, skins por campaña, glassmorphism ornamental, motion teatral, fake urgency o editor libre de layout
 
 ### Surface & system decision
 
 - Surface: `<greenhouse-cta>` en hosts públicos + preview Growth
 - Composition Shell: `no aplica` — custom element público
-- Primitive decision: `extend` — renderer TASK-1340, placement `slide_in|popup_modal`
-- Adaptive density / The Seam: container queries existentes + límites compact
-- Floating/Sidecar/Dialog decision: floating/dialog semantics dentro del renderer, sin MUI
+- Primitive decision: `extend` — renderer TASK-1340 con placement funcional `slide_in`; `popup_modal` permanece diferido
+- Adaptive density / The Seam: `aplica por principio, no por import` — contrato portable container-aware `full|condensed|peek`, sin importar primitives React/MUI
+- Floating/Sidecar/Dialog decision: slide-in no modal, edge-aligned en wide y bottom/safe-area en compact, sin MUI ni drawer host-specific
 - Copy source: contrato publicado
 - Access impact: `none`
 
 ### State inventory
 
-- Default: cerrado hasta trigger elegible
+- Default: cerrado hasta trigger elegible; el host no reserva un overlay invisible interactivo
 - Loading: no abrir antes de contrato listo
 - Empty: no surface
 - Error: fail-closed
 - Degraded / partial: no abrir si action no resuelve
 - Permission denied: n/a
-- Long content: max-height/scroll interno accesible
-- Mobile / compact: no full-screen engañoso; target de cierre ≥44px
-- Keyboard / focus: trap, Escape, return
-- Reduced motion: aparición instantánea/opacity mínima
+- Long content: wrapping completo dentro del límite de alto; body/footnote nunca ocultan headline, action o dismiss; scroll interno solo si contenido válido excede el viewport y con región accesible
+- Mobile / compact: density `peek|condensed`, safe-area, no full-screen engañoso, sin cubrir navegación/formulario esencial; target de cierre y acción ≥44px
+- Keyboard / focus: no trap para slide-in; foco no se mueve automáticamente al abrir salvo que el trigger nazca de una acción explícita; Escape cierra y focus return es determinista
+- Reduced motion: estado final inmediato o opacity mínima, sin travel ni espera por animation events
+- Visual asset present: preview/evidencia explicativa, nunca texto esencial dentro de la imagen
+- Visual asset missing/error: remoción del chrome visual y recomposición completa del contenido, sin placeholder roto
+- Suppressed/capped/killed: no se monta una superficie focusable ni se reproduce la entrada
 
 ### Interaction contract
 
-- Primary interaction: abrir por trigger → CTA/form o cerrar
-- Hover / focus / active: foco visible
+- Primary interaction: trigger gobernado → reveal una vez → activar una vez o dismiss → persistir estado antes de permitir reapertura
+- Hover / focus / active: feedback contenido; lift/sombra solo cuando el appearance lo permite, press confirma recepción sin mover layout
 - Pending / disabled: una activación; no reaparece en ventana suprimida
-- Escape / click-away: Escape obligatorio; click-away según decisión de flow
+- Escape / click-away: Escape obligatorio; click-away no cierra por defecto para evitar cierres accidentales y métricas ambiguas
 - Focus restore: elemento previo o ancla estable
 - Latency feedback: no overlay vacío
 - Toast / alert behavior: ninguno; error fail-closed
@@ -149,9 +155,9 @@ Reglas obligatorias:
 ### Motion & microinteractions
 
 - Motion primitive: `CSS` tokenizado en bundle
-- Enter / exit: transform+opacity breve para slide-in; dialog fade/scale si se elige modal
-- Layout morph: none
-- Stagger: none
+- Enter / exit: translate+opacity desde borde lógico en wide y desde abajo en compact; salida inversa breve, interrumpible por kill switch/navegación
+- Layout morph: cambio de densidad preserva orden semántico y continuidad; CTA→Growth Form usa continuidad in-place/crossfade dentro del shell cuando el contrato existente lo permite
+- Stagger: máximo eyebrow→headline/body→action como secuencia perceptual sutil solo si los tokens públicos existentes lo soportan sin retrasar primer paint; `none` en reduced motion
 - Timing / easing token: contrato motion adjunto
 - Reduced-motion fallback: sin desplazamiento
 - Non-goal motion: bounce, auto-loop, urgencia falsa
@@ -159,31 +165,31 @@ Reglas obligatorias:
 ### Implementation mapping
 
 - Route / surface: renderer público + preview `/growth/ctas`
-- Primitive / variant / kind: extend `<greenhouse-cta>` placement interruptivo
+- Primitive / variant / kind: `<greenhouse-cta>` / placement `slide_in` / experience kind derivado de metadata gobernada / appearance `default|spotlight|minimal`; `variantId` no participa del layout
 - Component candidates: `element.ts`, `render.ts`, `styles.ts`, focus controller local
 - Copy source: render contract
 - Data reader / command: API pública existente
 - API parity: sin cambio; browser pinta resultado arbitrado
 - Access / capability: surface binding existente
-- States to implement: closed/open/action/error/reduced-motion/mobile
+- States to implement: loading/eligible-waiting/open/focused/pending/form-open/success/error/dismissed/suppressed/capped/killed/reduced-motion + asset failure + long content
 
 ### GVC scenario plan
 
 - Scenario file: `scripts/frontend/scenarios/task-1429-growth-cta-interruptive-placement.scenario.ts`
 - Route: preview Growth y surface staging
 - Viewports: 1440 y 390
-- Required steps: trigger, focus loop, Escape, reopen/suppression, action
-- Required captures: closed/open/focused/mobile/reduced-motion
+- Required steps: trigger; comprobar no focus steal; keyboard primary; Escape; dismiss; intento de reopen; cap; kill switch; action; form handoff; asset failure; long copy; resize container full→condensed→peek
+- Required captures: waiting/open/focus-visible/pending/form-open/error-recovered/dismissed/suppressed/capped/killed, full/condensed/peek, asset/no-asset, mobile safe-area y reduced-motion
 - Required `data-capture` markers: interruptive shell, close, action
-- Assertions: no console/error/login, one surface, foco contenido/restaurado
+- Assertions: no console/error/login, una sola surface interruptiva, no focus steal, Escape/focus return, action/dismiss ≥44px, headline/action/dismiss nunca desaparecen, no reapertura, asset failure seguro, appearance no cambia action semantics
 - Scroll-width checks: obligatorio
 - Reduced-motion / focus evidence: obligatorio
 
 ### Design decision log
 
-- Decision: preferir `slide_in` como primer interruptivo salvo discovery contrario
-- Alternatives considered: popup modal; sticky banner; host-specific drawer
-- Why this pattern: menor interrupción y prueba el eje interruptivo
+- Decision: `slide_in` es el único nuevo placement V1; la task además canoniza el sistema placement × kind × appearance × density sin agregar un segundo renderer
+- Alternatives considered: popup modal; sticky banner; host-specific drawer; una primitive por campaña; usar `styleVariant` o `variantId` para cambiar comportamiento
+- Why this pattern: menor interrupción, mejor continuidad con el contenido y un modelo extensible que evita drift semántico/analítico
 - Reuse / extend / new primitive: extend
 - Open risks: mobile viewport, overlays del host y timing de trigger
 
@@ -204,28 +210,76 @@ Reglas obligatorias:
 
 ## Detailed Spec
 
-Hacer discovery breve y elegir un solo variant oficial —`slide_in` por defecto—, extender el placement registry/renderer existente, consumir la decisión de elegibilidad de TASK-1428 y validar el mismo contrato en Think, WordPress y preview. El host no define triggers, suppression, foco ni action routing en paralelo.
+Implementar `slide_in` como único placement interruptivo V1 y usarlo para cerrar el contrato de experiencia portable descrito en arquitectura §15. El renderer debe interpretar consistentemente placement, experience kind, appearance, density y state; consumir la decisión de elegibilidad de TASK-1428; y validar el mismo contrato en Think, WordPress y preview. El host no define triggers, suppression, foco, density, visual variants ni action routing en paralelo.
+
+### CTA Experience System contract
+
+#### Axes and ownership
+
+| Axis | Owner | Allowed effect | Forbidden effect |
+|---|---|---|---|
+| Placement | render contract + renderer | geometry, interruption level, safe-area and focus model | campaign copy, destination selection, experiment assignment |
+| Experience kind | governed authoring metadata | compatible anatomy/action guidance and preview labeling | browser-side targeting or hidden content injection |
+| Appearance (`styleVariant`) | token layer | surface, contrast, emphasis and approved visual asset treatment | focus semantics, suppression, action execution or density |
+| Density | renderer/container query | `full|condensed|peek` composition at own width | host breakpoint, clipping or hiding key promise/action |
+| Experiment (`variantId`) | future experiment plane | attribution of a governed alternative | visual skin, placement switch or runtime randomization in V1 |
+
+#### Required content anatomy
+
+- Contextual eyebrow is optional and explains provenance/next-step category; never stacks multiple badges.
+- Headline is mandatory, self-sufficient and describes the outcome rather than a generic “learn more”.
+- Body provides evidence/expectation, remains concise and is never required to understand the action.
+- Visual is optional but explanatory; a report preview, artifact or tool cue is valid, stock decoration is not.
+- Exactly one primary action is visible. Dismiss remains a neutral control with its own accessible name.
+- Footnote may communicate duration, delivery or privacy only when true and sourced; it cannot conceal conditions.
+
+#### Appearance rules
+
+- `default`: restrained layered card; border, tonal surface and subtle elevation.
+- `spotlight`: highest emphasis; approved gradient/elevation only, contrast verified, never pulsing or glowing continuously.
+- `minimal`: editorial continuation with reduced chrome; still preserves target size, focus, hierarchy and pending/error feedback.
+- Unknown appearance fails to `default`; no campaign CSS selectors, arbitrary colors or per-host markup forks.
+
+#### Density rules
+
+- `full`: optional evidence/visual + eyebrow + headline + body + action + optional footnote.
+- `condensed`: headline, essential support and action; visual may reduce only if non-essential.
+- `peek`: contextual teaser for slide-in with headline, action and visible dismiss; never a clipped `full` card.
+- Headline, primary action and dismiss never disappear. Semantic/focus order is invariant across density changes.
+
+#### State and continuity rules
+
+- `loading → ready/open`: no empty overlay, focus steal or CLS.
+- `open → pending`: one activation, primary disabled with accessible busy feedback.
+- `pending → form_open`: preserve CTA context and move focus to the governed form only after it is ready.
+- `form_open → success|error`: success is explicit; error is recoverable without losing visitor context.
+- `open → dismissed`: persist dismissal, finish bounded exit, restore focus; persistence does not depend on animation end.
+- `suppressed|capped|killed`: no focusable DOM and no entrance replay.
+- Kill switch can interrupt any pre-action visual state safely; an already accepted form submission is not rolled back visually as if it failed.
 
 ## Scope
 
-### Slice 1 — Placement shell
+### Slice 1 — Presentation contract and placement shell
 
-- Resolver `slide_in` vs `popup_modal` con evidencia y extender render/styles/state.
-- Implementar semantics, foco, cierre y telemetría sin nueva API.
+- Fijar `slide_in` y documentar/mecanizar la separación placement/kind/appearance/density/variant.
+- Extender render/styles/state con shell no modal, safe areas, z-index isolation, neutral dismiss y telemetría sin nueva API.
+- Mantener `default|spotlight|minimal` como appearances; ningún appearance cambia markup semántico o executor.
 
-### Slice 2 — Motion, responsive and host hardening
+### Slice 2 — Adaptive density, state richness and motion
 
-- Tokenizar enter/exit, reduced motion, z-index/containment y compact behavior.
-- Probar compatibilidad Think/WordPress y action `open_growth_form`.
+- Implementar `full|condensed|peek` por container query, long content y asset failure sin clipping.
+- Tokenizar enter/exit, density transition, press/pending, reduced motion y acción→form continuity.
+- Cubrir todos los estados contractuales con focus/recovery determinista y sin animation-dependent state.
 
-### Slice 3 — Preview and GVC
+### Slice 3 — Preview matrix and cross-host GVC
 
-- Agregar fixture/preview y scenario desktop/mobile/keyboard/reduced-motion.
-- Medir overflow y anti-CLS; revisar frames.
+- Agregar fixtures que crucen placement, appearance, density, experience kind y estados sin convertirlos en combinatoria infinita: usar pairwise coverage y casos frontera explícitos.
+- Probar Think/WordPress/preview, `open_growth_form`, asset/no-asset, long copy, safe-area, forced colors/reduced-motion y unknown appearance fallback.
+- Medir overflow, scroll jump, anti-CLS y foco; revisar manualmente frames y dossier GVC.
 
 ## Out of Scope
 
-- Nuevos action kinds, experimentación, cambios schema/API o múltiples interruptivos simultáneos.
+- Nuevos action kinds, powered experimentation, cambios schema/API, popup modal/floating button, múltiples interruptivos simultáneos o editor visual libre.
 
 ## Rollout Plan & Risk Matrix
 
@@ -268,11 +322,16 @@ Hacer discovery breve y elegir un solo variant oficial —`slide_in` por defecto
 ## Acceptance Criteria
 
 - [ ] Un placement interruptivo rinde desde el contrato existente y no desde lógica host.
-- [ ] Focus trap/return, Escape, cierre visible y teclado pasan desktop/mobile.
+- [ ] `slide_in` es no modal, no roba foco al aparecer y tiene Escape, cierre visible, teclado y focus return correctos en desktop/mobile.
+- [ ] Placement, experience kind, appearance, density y experiment variant permanecen separados en contrato, código, preview y telemetría.
+- [ ] `default|spotlight|minimal` actúan como appearances tokenizadas; unknown fallback es `default` y ninguna cambia semántica/action.
+- [ ] Density `full|condensed|peek` depende del contenedor, no del host; headline/action/dismiss nunca desaparecen ni se simulan por clipping.
+- [ ] Loading, open, focused, pending, form-open, success, error recovery, dismissed, suppressed, capped y killed están implementados/evidenciados.
+- [ ] Asset explicativo se integra sin image-only text; asset missing/error degrada sin layout roto.
 - [ ] Reduced motion elimina desplazamiento decorativo y conserva estado.
 - [ ] Suppression/kill switch impiden reapertura indebida y permiten retiro sin deploy.
 - [ ] CTA→Growth Form y telemetría funcionan sin duplicar form/schema/consent.
-- [ ] GVC 1440/390 mirado, overflow 0 y anti-CLS documentado.
+- [ ] GVC 1440/390 y anchos de contenedor representativos fue mirado; overflow 0, safe-area, scroll jump y anti-CLS están documentados.
 - [ ] `pnpm task:lint --task TASK-1429` y wireframe/flow/motion/readiness pasan.
 
 ## Verification
