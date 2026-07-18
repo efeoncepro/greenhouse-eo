@@ -1,0 +1,1246 @@
+{
+  "contractVersion": "contentFactoryPostDeepInspection.v1",
+  "scannedAt": "2026-07-18T10:27:46+00:00",
+  "source": "wp_cli_parse_blocks",
+  "safetyPolicy": {
+    "writesWordPressContent": false,
+    "publishesContent": false,
+    "clearsCache": false,
+    "createsBackup": false,
+    "sendsSecretsToOutput": false
+  },
+  "post": {
+    "id": 250748,
+    "type": "post",
+    "status": "publish",
+    "slug": "i-know-kung-fu-agent-skills-momento-matrix-ia-empresarial",
+    "title": "«I Know Kung Fu»: el momento Matrix de los Agent Skills",
+    "modified": "2026-07-18T10:12:55+00:00",
+    "permalink": "https://efeoncepro.com/ai/i-know-kung-fu-agent-skills-momento-matrix-ia-empresarial/",
+    "contentLength": 17208
+  },
+  "seo": {
+    "yoastTitle": "Agent Skills: cómo escalar el conocimiento de tu empresa",
+    "yoastDescription": "Qué son los Agent Skills, cómo se complementan con MCP y por qué el conocimiento operativo de tu empresa puede convertirse en una ventaja escalable.",
+    "primaryCategory": "194"
+  },
+  "summary": {
+    "totalBlocks": 91,
+    "topLevelBlocks": 91,
+    "counts": {
+      "core/freeform": 45,
+      "core/heading": 9,
+      "core/image": 3,
+      "core/list": 3,
+      "core/paragraph": 25,
+      "core/pullquote": 2,
+      "core/quote": 1,
+      "core/separator": 1,
+      "core/table": 1,
+      "yoast-seo/table-of-contents": 1
+    },
+    "maxDepth": 0,
+    "linkCount": 18,
+    "nonEmptyFreeformCount": 0,
+    "mediaIssueCount": 0
+  },
+  "headingOutline": [
+    {
+      "path": "8",
+      "level": 2,
+      "text": "Qué es un Agent Skill, en simple"
+    },
+    {
+      "path": "16",
+      "level": 2,
+      "text": "MCP le da manos al agente; los skills le dan método"
+    },
+    {
+      "path": "26",
+      "level": 2,
+      "text": "Por qué este momento sí importa"
+    },
+    {
+      "path": "34",
+      "level": 2,
+      "text": "El verdadero activo no es el skill público"
+    },
+    {
+      "path": "44",
+      "level": 2,
+      "text": "Qué conocimiento vale la pena convertir en un skill"
+    },
+    {
+      "path": "56",
+      "level": 2,
+      "text": "Cómo evitar que el skill se convierta en otra wiki"
+    },
+    {
+      "path": "64",
+      "level": 2,
+      "text": "La seguridad no viene incluida en la carpeta"
+    },
+    {
+      "path": "74",
+      "level": 2,
+      "text": "El programa que nadie más puede escribir"
+    },
+    {
+      "path": "84",
+      "level": 2,
+      "text": "Nota editorial"
+    }
+  ],
+  "blocks": [
+    {
+      "path": "0",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Hay una escena de The Matrix que todavía funciona como una explicación bastante precisa de hacia dónde va la IA empresarial. Neo abre los ojos después de que le cargan un programa en el cerebro y dice: «I know Kung Fu». No estudió durante años. No buscó un tut…",
+      "innerBlockCount": 0,
+      "fingerprint": "ad8bb333effb224f5b9c377fda1a5cc0e564697f27c6b5901bb3f305c6f8a3db",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "1",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2da24f92367f7c2b0e4f76ad392b66fce9027bfa35a81485910e5d0ae882d5b9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "2",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Eso es lo que los Agent Skills prometen para los agentes de IA: cargar instrucciones, referencias y herramientas especializadas cuando una tarea las necesita. No entrenan de nuevo al modelo ni le implantan conocimiento para siempre. Le entregan un manual opera…",
+      "innerBlockCount": 0,
+      "fingerprint": "a7cbde65d9ec75a113a4b753a17a0eea98047650a935f32d5d342f337b5fe8cb",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "3",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "4b5c99f6fafba03d9973d68018f691c628527b5b6e25c9e4fe26fedf312548a7",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "4",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La parte realmente interesante no es que ahora podamos descargar más skills. Es que una empresa puede convertir su criterio, sus excepciones y su manera de hacer bien el trabajo en capacidades que sus agentes puedan reutilizar. Ahí aparece una ventaja que ning…",
+      "innerBlockCount": 0,
+      "fingerprint": "b4b4d099a6cf06806a0046d0540bb5b5c973e8cdc431ae96f943a52c85bb84f7",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "5",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "62db42a028e487a080771dcb8308c877e830521c7e072b6dbfb3206756272e1f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "6",
+      "depth": 0,
+      "blockName": "yoast-seo/table-of-contents",
+      "attrs": {},
+      "text": "Tabla de contenidosQué es un Agent Skill, en simpleMCP le da manos al agente; los skills le dan métodoPor qué este momento sí importaEl verdadero activo no es el skill públicoQué conocimiento vale la pena convertir en un skillCómo evitar que el skill se convie…",
+      "innerBlockCount": 0,
+      "fingerprint": "47554ba67e50a7e304c623f8dacbb53ef4e6a1e118a50c4f39f2bad2a6628638",
+      "editability": "preserve_structure",
+      "risks": [],
+      "href": "#h-que-es-un-agent-skill-en-simple"
+    },
+    {
+      "path": "7",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "c284c4c12aefa43352f47d5ae193ebd4c3db1e74bc665ace910fdbfd6b7ca2b5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "8",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Qué es un Agent Skill, en simple",
+      "innerBlockCount": 0,
+      "fingerprint": "855fac84695bc79de8b413859360d0687b81027cc6436eea669c15f0fbab7bfb",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "9",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "83858823bfd43358305f10f00874c21d546e0764e53e599d4a1bd2a8983cbaf5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "10",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Un Agent Skill es un paquete de instrucciones y recursos que un agente descubre y carga bajo demanda. Anthropic presentó el formato en octubre de 2025 y publicó el estándar abierto en diciembre. La idea es deliberadamente sencilla: una carpeta con un archivo p…",
+      "innerBlockCount": 0,
+      "fingerprint": "19ff71f719d2b5065f6a9264ede226af248203ed03d0f2e010df0bdfd19d4aa3",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills"
+    },
+    {
+      "path": "11",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "4dca91fafb9af976b35ddc2b0ddb37e1f98fde38c886593c5707d32d12d69ea5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "12",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Piensa en la diferencia entre contratar a alguien inteligente y entregarle el playbook de tu operación. El modelo aporta la capacidad general de razonar y escribir. El skill aporta el contexto especializado: los pasos, los criterios, las restricciones, los eje…",
+      "innerBlockCount": 0,
+      "fingerprint": "f2efd7ff6756fc487de2f0ffe414825207f107765c15a3fc778d4ac9c764c005",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "13",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e84eb997543a7dd41514d773b9cbe2137fd6e32c2a54cbfc9ac8bcce9e94bbd1",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "14",
+      "depth": 0,
+      "blockName": "core/pullquote",
+      "attrs": {},
+      "text": "El modelo sabe pensar. El skill le enseña cómo se hace el trabajo aquí.",
+      "innerBlockCount": 0,
+      "fingerprint": "151d74d273981f0a7678d050e1eea98a6bdc86767e7844e30e64844a9568c50a",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "15",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "661e12f5c6529bc71e7e349b071d9e1cb7932b3ca81965ead12f9a6463eb2414",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "16",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "MCP le da manos al agente; los skills le dan método",
+      "innerBlockCount": 0,
+      "fingerprint": "2336d7dece2b0f179019790dfd0444778fc62b9e9eadb2c7030f5528dc624081",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "17",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "c423d4f29c415e75245bec0f0485223b01d85f2f11644b45cb4ac281d90df4a9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "18",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "MCP y Agent Skills suelen aparecer en la misma conversación, pero resuelven problemas distintos. MCP conecta al agente con sistemas y datos. Un skill organiza la forma en que debe usar esas conexiones para conseguir un resultado.",
+      "innerBlockCount": 0,
+      "fingerprint": "61937f4557e8a59f21494b767a59e0d5eec975460ee5dacb67a40eaedc83bd78",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "19",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "dd6e2c3c76a82830321d48de818f635d83749645c0a63b252f31832eb9b0e432",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "20",
+      "depth": 0,
+      "blockName": "core/table",
+      "attrs": {},
+      "text": "CapaPregunta que respondeEjemploMCP¿A qué puede acceder o qué acción puede ejecutar?Consultar HubSpot, leer un documento o crear una tarea.Agent Skill¿Cómo debe resolver esta tarea y cómo sabemos que quedó bien?Preparar una propuesta, auditar una landing o cer…",
+      "innerBlockCount": 0,
+      "fingerprint": "01843be46c5de58e2b76d39c49f4d62b83daba1fa2fc81439418b0252251c93b",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "21",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "657f90f2163e0fe357d624219a016dabec7eba7d57a79f1d2f960c7347b2f9c0",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "22",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Tener acceso a HubSpot no significa saber calificar una oportunidad. Poder abrir Google Drive no significa reconocer cuál documento es fuente de verdad. La conexión habilita; el método orienta.",
+      "innerBlockCount": 0,
+      "fingerprint": "58e1927fa576b74f75151692309cb6f00b062a4daafa32a193f2e2d468bb2653",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "23",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7d6d371d4dbfcfb1428409fff1c4c0037a77055eea9e723c3624f004292b3ab9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "24",
+      "depth": 0,
+      "blockName": "core/image",
+      "attrs": {
+        "id": 251543,
+        "sizeSlug": "full",
+        "linkDestination": "none"
+      },
+      "text": "Modelo, conexión y método cumplen trabajos distintos; juntos producen un resultado gobernado.",
+      "innerBlockCount": 0,
+      "fingerprint": "97e115b442ee3818ae2befadb2dbaf5eb66165409b5dba179b2c3badb187a952",
+      "editability": "media_requires_reconcile",
+      "risks": [
+        "media_refs_must_be_reconciled_before_write"
+      ],
+      "media": {
+        "id": 251543,
+        "attachmentUrl": "https://efeoncepro.com/wp-content/uploads/2026/07/agent-skills-tres-capas-desktop-v1.svg",
+        "renderedSrc": "https://efeoncepro.com/wp-content/uploads/2026/07/agent-skills-tres-capas-desktop-v1.svg",
+        "alt": "Diagrama de tres capas para un agente útil: modelo para razonar, MCP para conectar sistemas y skills para aportar criterio, límites y verificaciones.",
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "path": "25",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ac173ffb8869f6666f0831d325010b26566cbc77a3518c6dd8636efafccb6d9f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "26",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Por qué este momento sí importa",
+      "innerBlockCount": 0,
+      "fingerprint": "29a7d4e6d6abb46636bddd963e68a2ca2776ec539951903699825f7a7988e6e4",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "27",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "34b63d36ab5e5d57165076da458251645e23ae7836216c9ccd095ad047698b78",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "28",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El formato dejó de ser una función aislada de Claude y empezó a convertirse en una capa compartida. Vercel lanzó skills.sh en enero de 2026 con soporte para múltiples agentes. GitHub Copilot ya había incorporado Agent Skills en diciembre de 2025 y después agre…",
+      "innerBlockCount": 0,
+      "fingerprint": "379b485beb2ff11124766bdb8417e964890e0ac966a326501b04f8d671282f66",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://vercel.com/changelog/introducing-skills-the-open-agent-skills-ecosystem"
+    },
+    {
+      "path": "29",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2c9b09a2ebe532e3b49c51beea30f1663a68278c4920f7d960e01431c62b5ad5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "30",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Eso no significa que cualquier skill funcione idéntico en todos los agentes. El formato puede viajar; el resultado todavía depende de las herramientas disponibles, los permisos, el modelo, las convenciones del runtime y la calidad de las instrucciones. Portabi…",
+      "innerBlockCount": 0,
+      "fingerprint": "d17250ba88e614e6a79a2ce1406c4d13c1fc4181aaf8e7eed1ef25829df533f5",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "31",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "c50c720347dfe52776431315bb77275805c25a8c8e5cf37883a52413c5ae9cf5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "32",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Una señal útil del cambio es la cantidad de definiciones que ya aparecen en repositorios públicos. OSS Insight analizó más de 31.000 archivos de skills y describió esta etapa como una capa todavía transicional. Es una lectura más valiosa que cualquier cifra es…",
+      "innerBlockCount": 0,
+      "fingerprint": "7218fef1be5aa758a9bae4d86a0831d2730eff797f1a3c0a6039d7ba169508b7",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://ossinsight.io/blog/agent-skills-explosion-2026"
+    },
+    {
+      "path": "33",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0ea2bb7516e325cff7952d2b45196e71af3c6fb7d59bbe5d55cbea5e58566194",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "34",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "El verdadero activo no es el skill público",
+      "innerBlockCount": 0,
+      "fingerprint": "ef9094c882abd20e8a00edb024ec274d5314b192d9f0fe1de710b1ca936ccae1",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "35",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e26d65395fc27b4cdb43da753a28c83ff1ed8e1720f59373d9f081535d704e9b",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "36",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Los skills públicos sirven para resolver capacidades horizontales: trabajar con hojas de cálculo, preparar documentos, operar una herramienta o seguir un framework conocido. Son útiles, pero rara vez constituyen una ventaja competitiva. Si cualquiera puede ins…",
+      "innerBlockCount": 0,
+      "fingerprint": "98410f1c9a6de03a4dd0cd73e217a44c3ca398f5afabbad2a56876df483c6eb9",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "37",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9a41c767a763d456d376dc318669e5ccca6a466b5acc4b23642d9b763fa2e27b",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "38",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La ventaja aparece en los skills propietarios: los que capturan cómo tu organización decide, qué excepciones reconoce, qué evidencia exige y dónde se detiene. Ese conocimiento suele vivir disperso en conversaciones, documentos, revisiones y en la cabeza de las…",
+      "innerBlockCount": 0,
+      "fingerprint": "78046858b8eb15065f4a07bfdd18651fcab547b64b2b9f78cb1295394039f623",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "39",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2afbc9c9b8b1f9a4db9b0885d7a6a3c499d8d7c426782fa741759d88ba945d32",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "40",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En Efeonce empezamos a ver el cambio cuando dejamos de guardar el criterio sólo en conversaciones y lo convertimos en instrucciones, referencias, checks y rutas de verificación. El valor no estaba en documentar una secuencia de pasos. Estaba en capturar decisi…",
+      "innerBlockCount": 0,
+      "fingerprint": "2db84a13434574192c6a03bfa92ad6d197b9899c01c3417eb27eeff975ef9170",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "41",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2aefea39ecf1a11ef2f202e026852cabf742c3f2d9ea99480c5d5e3e7c11600a",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "42",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Es la misma lógica que aplicamos al diseñar workflows creativos: la automatización se vuelve valiosa cuando conecta criterio, ejecución y control de calidad, no cuando sólo acelera una tarea aislada.",
+      "innerBlockCount": 0,
+      "fingerprint": "7be0c3450fed1db3159a1ea09b6122f1dfba1bf64e3a214f72abcdd7a997fbfe",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://efeoncepro.com/creative/creative-workflows/"
+    },
+    {
+      "path": "43",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "053abf8768233eaab98513ddafe75724ac6e5a9754b362a36113ff86ff23aa9c",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "44",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Qué conocimiento vale la pena convertir en un skill",
+      "innerBlockCount": 0,
+      "fingerprint": "959e7c22d886c13e3c538aefcd544122414ab3cdc3fb55407048862ef83d0a24",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "45",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "68a75eb3f45f83dd0fe0c8e79b4d72535a63bf009602dcfaf8963630ec2959fd",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "46",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "No todo proceso necesita un skill. Una buena candidata suele reunir varias de estas condiciones:",
+      "innerBlockCount": 0,
+      "fingerprint": "25886a0a01dd53d7d5f60151b9b7e69b6cb4d2b9bc7ef0dc5ad1bdf7efe18779",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "47",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "dd8802fd51e15ee6daa5843253bfee36601c7e5d5c167c34afb0e54024ba8074",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "48",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "Se repite con suficiente frecuencia como para justificar mantener una capacidad reusable.Depende de criterio, no sólo de seguir pasos mecánicos.Tiene ejemplos, excepciones y límites que una instrucción genérica no captura.Produce un resultado verificable con s…",
+      "innerBlockCount": 0,
+      "fingerprint": "7f029178990e355ddb77d16e53d5d2e6fbfc6cc98d22ba39a1950aaf4bb8f8d0",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "49",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "51d2e1d1ec468a4a30e27f807594cf18daf531538b5a74412f461defc02da878",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "50",
+      "depth": 0,
+      "blockName": "core/image",
+      "attrs": {
+        "id": 251547,
+        "sizeSlug": "full",
+        "linkDestination": "none"
+      },
+      "text": "Cinco señales para distinguir una capacidad reusable de documentación que sólo ocupará espacio.",
+      "innerBlockCount": 0,
+      "fingerprint": "b3e3e36fba5a76c27bd86e1073ba7c0cf839bb3eed883201df5537b4f99fc777",
+      "editability": "media_requires_reconcile",
+      "risks": [
+        "media_refs_must_be_reconciled_before_write"
+      ],
+      "media": {
+        "id": 251547,
+        "attachmentUrl": "https://efeoncepro.com/wp-content/uploads/2026/07/agent-skills-candidato-social-v1.svg",
+        "renderedSrc": "https://efeoncepro.com/wp-content/uploads/2026/07/agent-skills-candidato-social-v1.svg",
+        "alt": "Guía de decisión con cinco criterios para saber si un proceso merece convertirse en un skill: repetición, criterio, excepciones, resultado verificable y dueño.",
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "path": "51",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7ba90849d64f044316abde25f63291386e97caf3d0b2f4bc32e552b379c84d6e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "52",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Un buen punto de partida es observar una tarea que tu mejor operador resuelve casi sin pensarlo. No preguntes solamente qué hace. Pregunta qué mira primero, qué descarta, qué le hace desconfiar y qué necesita ver antes de decir «esto está bien». Ahí vive el co…",
+      "innerBlockCount": 0,
+      "fingerprint": "d1b97add05c9d27c353949294b03ed7bd9bdc84c111fd1458854ca9145ba1290",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "53",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "b119eb48acea4a3b75f200a5ef0ca220944809eb1d1e82d6e4522038affe3534",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "54",
+      "depth": 0,
+      "blockName": "core/image",
+      "attrs": {
+        "id": 251545,
+        "sizeSlug": "full",
+        "linkDestination": "none"
+      },
+      "text": "El conocimiento tácito se vuelve capacidad cuando las decisiones pueden explicarse, probarse y mantenerse.",
+      "innerBlockCount": 0,
+      "fingerprint": "c5ccfddab9acc7a57346259b8a366945d3b227152ad7f69267fdbfff0ae903b0",
+      "editability": "media_requires_reconcile",
+      "risks": [
+        "media_refs_must_be_reconciled_before_write"
+      ],
+      "media": {
+        "id": 251545,
+        "attachmentUrl": "https://efeoncepro.com/wp-content/uploads/2026/07/agent-skills-criterio-tacito-desktop-v1.svg",
+        "renderedSrc": "https://efeoncepro.com/wp-content/uploads/2026/07/agent-skills-criterio-tacito-desktop-v1.svg",
+        "alt": "Ciclo para convertir criterio tácito en una capacidad reusable: observar decisiones, explicitar criterios, estructurar el skill, probar con casos reales y mantener con evidencia.",
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "path": "55",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "a6da1b32f6ea8e7fd1c94a558978854bfa24ac0739e981e4cc06507499a05ec1",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "56",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Cómo evitar que el skill se convierta en otra wiki",
+      "innerBlockCount": 0,
+      "fingerprint": "5ced71e0bee19b41b35189965c54653ab1d20c77fdcda3901c0363f08b68b00d",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "57",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "75037fef1c327667189dd5ef37d294d327bade37501c34cce9bcc52874496345",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "58",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Una documentación extensa puede seguir siendo inútil para un agente. El skill necesita ser ejecutable: debe ayudar a tomar decisiones dentro de una tarea, no limitarse a describir el proceso desde lejos.",
+      "innerBlockCount": 0,
+      "fingerprint": "27a70ac0c5d4c8869d3278f7d9807eb9fbe23a7cfdc7eed2995f1dce27a7a65a",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "59",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e6a500b950175889a31e84bef00f32729137a3e72a0ae1cf00247d3fe075d19e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "60",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "Define el disparador. Cuándo debe cargarse y cuándo no.Declara el resultado. Qué artefacto o cambio debe existir al final.Captura decisiones. Incluye criterios, excepciones y rutas de escalamiento.Conecta fuentes y herramientas. Señala dónde está la verdad y q…",
+      "innerBlockCount": 0,
+      "fingerprint": "68fefd46a821e7f52339bfd8a4962e8b7c407e17991f8a03db5fb7ab46bd679f",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "61",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "46f36295e3cbaa7c9e9ad0514540c3421360fd75423cf1ea4fe33e95b0faa19e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "62",
+      "depth": 0,
+      "blockName": "core/pullquote",
+      "attrs": {},
+      "text": "Un skill útil no sólo dice qué hacer. También sabe cuándo no avanzar.",
+      "innerBlockCount": 0,
+      "fingerprint": "9c1315f8b0875d52a22488a4c5a42be9c9a338ebda9f37297328b5144111c69f",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "63",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "5503c0d261d1094800218d8e78d04fb56062b8419231c2207c9ffbe69e5804dd",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "64",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "La seguridad no viene incluida en la carpeta",
+      "innerBlockCount": 0,
+      "fingerprint": "c6d118edc1f46dcbf789bd953d1621619d28a15d9a438763489961e885f3d9d4",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "65",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "a5f8311ec9417dccecf2995f705067795727f7edef69c275364ed0defcc1ddef",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "66",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Un skill puede contener instrucciones, scripts y referencias que el agente ejecutará con los permisos de su entorno. Instalarlo sin revisión se parece más a incorporar código de un tercero que a copiar un prompt.",
+      "innerBlockCount": 0,
+      "fingerprint": "6be2eb4a6d490094ca2c4af531080840bb0b4cac9acac134b80c3adc17eafa91",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "67",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "af5e91bed563afbeea9b1cddea107c5d64754d0a04856862e6fab84195a380a2",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "68",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En una revisión de 3.984 skills, Snyk encontró problemas críticos en 13,4% y algún hallazgo de seguridad en 36,8%. Es una muestra concreta, no una sentencia sobre todo el estándar, pero alcanza para descartar la instalación ciega.",
+      "innerBlockCount": 0,
+      "fingerprint": "11a96818babf1550585d7255e442030254c1376ef62dc051c6a81d82b687a2d9",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://labs.snyk.io/resources/agent-scan-skill-inspector/"
+    },
+    {
+      "path": "69",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ca60a7609bbfb11d8627a3d860f2a22668122c737494981d54b2a242342d3c40",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "70",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "También conviene no mezclar ecosistemas. Las campañas documentadas alrededor de ClawHub y OpenClaw —como las analizadas por Unit 42— muestran un riesgo real de cadena de suministro, pero pertenecen a ese contexto específico. No prueban que cada Agent Skill sea…",
+      "innerBlockCount": 0,
+      "fingerprint": "c26b3d3a9e434aad79fd5ca38e32f3800eb345cc1029e5c66ba02ea853de10ee",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://unit42.paloaltonetworks.com/openclaw-ai-supply-chain-risk/"
+    },
+    {
+      "path": "71",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "105166651fb600bf3c74595e4f3f53ff5313c12bd32f55b2f008e23c26c97583",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "72",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "Revisar instrucciones y scripts antes de instalar.Limitar permisos y acceso a secretos según la tarea.Fijar versiones y registrar la procedencia.Probar en un entorno acotado antes de conectar sistemas sensibles.Mantener una ruta clara para desactivar o reverti…",
+      "innerBlockCount": 0,
+      "fingerprint": "fffa1566ac685a4d231e1299738b36c7854b6db8761fe99cdabd0026c7c33c29",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "73",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "d6367186a13e4adf1313064870ec2f9d5efbcf34905718193c8bafc772658859",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "74",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "El programa que nadie más puede escribir",
+      "innerBlockCount": 0,
+      "fingerprint": "234b09917e3120440fe5d02419472f628eecbb111fb8f3041a6e2619bb7e493f",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "75",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "21d5b1cde23c059d575b599a99f6b62c70c799468fe8461ce8b71605710aef0e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "76",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Durante años hablamos de transformación digital como la tarea de llevar procesos a software. Los Agent Skills abren una capa distinta: llevar criterio organizacional a un formato que un agente pueda descubrir, aplicar y verificar.",
+      "innerBlockCount": 0,
+      "fingerprint": "8427b4b6f0c8b31eb3346548241ac7a00acb38a5e7c42bb9334732ecae6890c2",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "77",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "30bd06b0c23989fc42cec59b28bf9d88f3bd5114f51c7bdf3666368594a25612",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "78",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Eso no elimina a las personas que conocen el oficio. Las vuelve más importantes. Alguien tiene que reconocer el buen juicio, explicitarlo, discutir sus límites y mantenerlo vivo. La ventaja no será tener más archivos SKILL.md. Será aprender más rápido qué part…",
+      "innerBlockCount": 0,
+      "fingerprint": "a6d7bb1c79da19f1192ade962ead2cffd72e2b32c97f7b2361e643e6f07a6d01",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "79",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "531cc3f2648ef4e2beed396e1be6521a6ee1e794405a59b6466133fda5d9f05a",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "80",
+      "depth": 0,
+      "blockName": "core/quote",
+      "attrs": {},
+      "text": "El momento Matrix no consiste en descargar Kung Fu. Consiste en escribir el programa que contiene la forma particular en que tu empresa sabe ganar.",
+      "innerBlockCount": 0,
+      "fingerprint": "916b0e8549572be1463db693fea7d103f098ea571e9495dc5d59f364cc98dc55",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "81",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "edf656e8ae68f518cb6260d407b80f346334dc715042fa2ba07031b95b6b4659",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "82",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La próxima vez que una persona clave resuelva un problema que parecía ambiguo, no te quedes sólo con el resultado. Observa el criterio. Ahí puede estar el skill más valioso de tu empresa.",
+      "innerBlockCount": 0,
+      "fingerprint": "b9ca7b584453e1ece2052e464ce81ba8e1dfd76a6b8b314ca4c5d3e5e43dbdce",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "83",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "4d895cca29deb52cf5cc39c09167eeefe4a1b73c382911c8c0246b8e59ac92f6",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "84",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Nota editorial",
+      "innerBlockCount": 0,
+      "fingerprint": "9d81122c113cfc57ac7b9fcc06752fa1f3721412e6b3b76fd0477c66fffc7cac",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "85",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e52f8a52551e6ae5e34e99987696aa1dbcd9a5954928292d8c03ebacb72215c5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "86",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Desarrollé este artículo con apoyo de IA en investigación, estructura y edición. La tesis, la selección de fuentes, la interpretación y la versión final son responsabilidad mía.",
+      "innerBlockCount": 0,
+      "fingerprint": "de549d9f28518d32c5870a7296889a301215b0f20854108c869712d02d015da9",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "87",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "36cf66906e25b0a6dfc7c1e530ac775708d129ab1b67eafc44c250585befb53f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "88",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "8d6f23154be1b019da59ffac9eb07a061aa1b668dc3cb9d3cbee2ca1d87e452f",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "89",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "287605b0d2f91e486ba16b88b418797425d607bc5d7a34631202951d8b40e187",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "90",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Un ejercicio para empezar: elige un proceso que dependa de una persona experta y registra durante una semana sus decisiones, no sólo sus pasos. Si puedes convertir esas decisiones en criterios y verificaciones, ya encontraste el primer skill propietario que va…",
+      "innerBlockCount": 0,
+      "fingerprint": "c64a9778ef18b00efe2a56f816d6348a6576cd667ad2b7ea15f2f8a72dd8e2e0",
+      "editability": "safe_text_edit",
+      "risks": []
+    }
+  ],
+  "links": [
+    {
+      "href": "#h-que-es-un-agent-skill-en-simple",
+      "text": "Qué es un Agent Skill, en simple",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-mcp-le-da-manos-al-agente-los-skills-le-dan-metodo",
+      "text": "MCP le da manos al agente; los skills le dan método",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-por-que-este-momento-si-importa",
+      "text": "Por qué este momento sí importa",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-el-verdadero-activo-no-es-el-skill-publico",
+      "text": "El verdadero activo no es el skill público",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-que-conocimiento-vale-la-pena-convertir-en-un-skill",
+      "text": "Qué conocimiento vale la pena convertir en un skill",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-como-evitar-que-el-skill-se-convierta-en-otra-wiki",
+      "text": "Cómo evitar que el skill se convierta en otra wiki",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-la-seguridad-no-viene-incluida-en-la-carpeta",
+      "text": "La seguridad no viene incluida en la carpeta",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-el-programa-que-nadie-mas-puede-escribir",
+      "text": "El programa que nadie más puede escribir",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-nota-editorial",
+      "text": "Nota editorial",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills",
+      "text": "Anthropic presentó el formato en octubre de 2025 y publicó el estándar abierto en diciembre",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://vercel.com/changelog/introducing-skills-the-open-agent-skills-ecosystem",
+      "text": "Vercel lanzó skills.sh en enero de 2026",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://github.blog/changelog/2025-12-18-github-copilot-now-supports-agent-skills/",
+      "text": "GitHub Copilot ya había incorporado Agent Skills en diciembre de 2025",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://developers.googleblog.com/closing-the-knowledge-gap-with-agent-skills/",
+      "text": "Google mostró el mismo patrón en su ecosistema",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://academy.openai.com/en/public/clubs/work-users-ynjqu/resources/skills",
+      "text": "OpenAI documenta importación y exportación de skills compatibles con el estándar abierto",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://ossinsight.io/blog/agent-skills-explosion-2026",
+      "text": "OSS Insight analizó más de 31.000 archivos de skills y describió esta etapa como una capa todavía transicional",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://efeoncepro.com/creative/creative-workflows/",
+      "text": "workflows creativos",
+      "kind": "internal_url"
+    },
+    {
+      "href": "https://labs.snyk.io/resources/agent-scan-skill-inspector/",
+      "text": "Snyk encontró problemas críticos en 13,4% y algún hallazgo de seguridad en 36,8%",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://unit42.paloaltonetworks.com/openclaw-ai-supply-chain-risk/",
+      "text": "Unit 42",
+      "kind": "external_url"
+    }
+  ],
+  "mediaIssues": [],
+  "editabilityLegend": {
+    "safe_text_edit": "Agent may propose text changes while preserving block type, path and surrounding structure.",
+    "safe_attrs_edit": "Agent may propose constrained attribute changes after validating the native block setting.",
+    "media_requires_reconcile": "Agent must reconcile WordPress media id, rendered src, alt text and source brief before write.",
+    "preserve_structure": "Agent should preserve structure and patch child blocks or attrs only with explicit intent.",
+    "inspect_only": "Agent should preserve by default until serialization/plugin behavior is understood."
+  }
+}

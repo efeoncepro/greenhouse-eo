@@ -1,12 +1,26 @@
 {
-  "schemaVersion": 1,
-  "id": "efeonceEditorialInfographicSystem.v1",
+  "schemaVersion": 2,
+  "id": "efeonceEditorialInfographicSystem.v2",
+  "scope": "editorial_body_infographic",
   "brand": {
+    "placement": "footer_only",
+    "headerAllows": ["kicker", "title", "subtitle"],
+    "headerBlocks": ["wordmark", "domain", "url-seal", "watermark"],
+    "footer": {
+      "left": ["source", "note", "limit", "as-of"],
+      "right": ["official-wordmark", "canonical-url-seal"],
+      "groupMarker": "data-footer=true"
+    },
+    "wordmarkLight": "public/branding/logo-full.svg",
+    "wordmarkDark": "public/branding/logo-negative.svg",
     "signatureAsset": "src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg",
     "signatureLabel": "efeoncepro.com",
-    "deprecatedSignature": "efeonce.cl"
+    "deprecatedSignature": "efeonce.cl",
+    "blockedPublicAsset": "AxisWordmark"
   },
   "palette": {
+    "canvasLight": "#FFFFFF",
+    "canvasDark": "#111013",
     "ink": "#022A4E",
     "blueDeep": "#023C70",
     "blueMedium": "#024C8F",
@@ -14,39 +28,53 @@
     "energy": "#F55D01",
     "leadDark": "#263448",
     "leadMedium": "#505964",
-    "paper": "#FFFFFF",
-    "accents": {
-      "magenta": "#BB1954",
-      "purple": "#633F93",
-      "passive": "#DBDBDB"
-    }
+    "accents": { "magenta": "#BB1954", "purple": "#633F93", "passive": "#DBDBDB" },
+    "blockedDecoration": ["ambient-bubbles", "colored-editorial-canvas", "gradient", "glow", "glass", "outer-rounded-frame"]
   },
   "archetypes": [
-    "metaphor",
-    "network",
-    "cycle",
-    "path",
-    "comparison",
-    "layered-model",
-    "dataviz"
+    "metaphor", "network", "cycle", "path", "comparison", "layered-model", "dataviz",
+    "frontier-landscape", "architectural-cutaway", "ecosystem-map", "evaluation-circuit",
+    "two-axis-maturity", "inspection-route", "authority-chain"
   ],
+  "deliveryContract": {
+    "viewport": ["art_directed", "single_composition", "crop_safe"],
+    "theme": ["light_dark", "single_theme"],
+    "canvas": ["opaque", "transparent"],
+    "skin": ["efeonce_core", "contextual_platform", "contextual_client", "campaign_specific"]
+  },
+  "responsive": {
+    "referenceDesktop": { "width": 1600, "height": 1080 },
+    "referenceMobile": { "width": 1200, "height": 1600 },
+    "referenceBreakpointPx": 860,
+    "essentialTextMinCssPx": 16,
+    "noteTextMinCssPx": 12,
+    "requiresProjectedCssSizeCheck": true,
+    "requiresLayoutShiftCheckWhenAspectRatioChanges": true
+  },
   "delivery": {
     "preferredVectorMode": "source-svg-plus-sanitized-delivery-svg",
     "requiredGeometry": ["viewBox", "width", "height"],
-    "blockedFeatures": ["script", "event-handlers", "foreignObject", "remote-resources"],
-    "rasterOnlyWhen": ["raster-content", "destination-requires-it", "security-policy", "measured-weight-win"]
+    "blockedFeatures": ["script", "event-handlers", "foreignObject", "javascript-href", "remote-resources", "remote-css"],
+    "rasterOnlyWhen": ["raster-content", "destination-requires-it", "security-policy", "measured-weight-win"],
+    "rasterRequiredFor": ["featured-social-safe", "open-graph", "twitter-card"],
+    "vectorRetinaExportRequired": false
   },
+  "html": {
+    "pictureUsesSingleImgFallback": true,
+    "fallbackPreference": "desktop-light-stable-representative",
+    "requires": ["descriptive-filename", "img-src", "alt", "caption-or-nearby-context", "intrinsic-dimensions"],
+    "complexImageRequires": ["short-alt", "long-description-or-equivalent-visible-structure"]
+  },
+  "seo": {
+    "bodySvgAllowed": true,
+    "outlinedTextIsHtmlIndexable": false,
+    "requires": ["get-200", "image-svg+xml", "crawlable", "stable-url", "page-canonical", "html-semantics"],
+    "indexingIsAsynchronous": true
+  },
+  "channelStates": ["body_ready", "featured_ready", "og_ready", "social_ready", "integrated", "verified"],
   "qualityGates": [
-    "explanatory-delta",
-    "semantic-archetype",
-    "autonomous-reading",
-    "three-second-route",
-    "svg-safety",
-    "typographic-fit",
-    "real-column",
-    "mobile",
-    "theme",
-    "thumbnail",
-    "provenance"
+    "explanatory-delta", "semantic-archetype", "autonomous-reading", "three-second-route", "second-read-depth",
+    "svg-safety", "typographic-fit", "projected-css-size", "geometry-on-delivery", "footer-only-brand",
+    "real-column", "mobile", "theme", "layout-shift", "thumbnail", "html-accessibility", "seo-discovery", "provenance"
   ]
 }

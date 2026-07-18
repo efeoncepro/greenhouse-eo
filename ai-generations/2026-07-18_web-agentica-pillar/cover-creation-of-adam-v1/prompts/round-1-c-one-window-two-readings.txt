@@ -1,0 +1,13 @@
+Use case: stylized-concept
+Asset type: text-free featured editorial image and source for social derivatives
+Primary request: Create a sophisticated editorial key visual showing one web window read simultaneously by a human and an authorized software agent.
+Scene/backdrop: A charcoal-black, lead-like studio field with quiet mineral texture and generous negative space.
+Subject/action: From the left edge, an anatomically correct human hand with a relaxed extended index points toward the lower-left corner of a central web window. From the right, an abstract agent presence made from sparse navy architectural lines and translucent deep-teal layers points toward the upper-right corner of that same window. The two trajectories echo a near-touching Renaissance composition but never form two human hands and never reenact a religious scene.
+Recurring motif: a governed interval around the web window, visibly bounded by five subtle aligned notches that imply intent, authority, capability, confirmation and evidence without text.
+Central object: A single browser-inspired window in a slight three-quarter perspective, floating like a precisely made piece of smoked glass and blackened metal, about 40 percent of image width. The pane visibly carries two perfectly aligned layers: on the front, a warm editorial web layout of abstract image and content blocks; just behind it, a cool semantic structure with clean nodes and connections matching those blocks. No code, no labels, no dashboard. One small copper-orange confirmation detail bridges the layers.
+Style/medium: premium mixed-media editorial still life, physical glass model, sculptural realism, restrained architectural graphics, tactile human skin, high craft, no futuristic spectacle.
+Composition/framing: 16:9 horizontal, asymmetric but balanced; window is level-one focus, hand and agent signal are level two. Keep all critical content within the central 72 percent and preserve a strong centered square crop. Lots of dark breathing room.
+Lighting/mood: low-key controlled museum lighting, warm left reflection and cool right reflection meeting on the glass, graphite blacks with detail, contemplative and authoritative.
+Text: no readable text, letters, numbers, logo, signature or watermark.
+Constraints: correct human anatomy; one human hand only; agent is non-humanoid abstraction; crisp reflections and edges; conceptual interface, not a real product screenshot; no literal macOS controls.
+Avoid: robot hand, second human hand, deity symbolism, direct Michelangelo copy, fresco, spark, energy beam, portal, hologram, floating code, dashboard, data chart, network globe, neon cyan, orange-teal cinematic grade, bokeh, lens flare, plastic surfaces, clutter, generated text, malformed fingers.

@@ -1,5 +1,20 @@
 # changelog.md
 
+## 2026-07-18 — Artículo Agent Skills publicado
+
+- Publicado `«I Know Kung Fu»: el momento Matrix de los Agent Skills` en el sitio público, preservando la voz de
+  Julio Reyes y la tesis sobre convertir criterio organizacional en capacidades reutilizables.
+- La pieza incluye tres infografías editoriales (dos con variantes desktop/mobile), featured/OG `1200×630`,
+  metadescripción Yoast, focus keyphrase, metadata Open Graph/Twitter, canonical propio, robots indexables y
+  disclosure editorial. El cierre live confirmó `200`, schema Article/Person, sitemap, archivos multimedia,
+  fuentes y ausencia de duplicado WordPress/Think.
+- Compatibilidad móvil: la variante KFU-V02 usa un fallback PNG `1000×1500` bajo `600px` después de detectar que
+  un navegador móvil/in-app no interpretaba el SVG trazado. El SVG editable y la variante desktop permanecen;
+  el render live quedó verificado por `currentSrc`, dimensiones naturales, captura y ausencia de overflow.
+- La portada inicial fue reemplazada por la pieza aprobada `HI-YAAH!`: lluvia binaria, figura marcial y golpe de
+  energía en formato `1200×630`. WordPress media `251552` quedó sincronizado como featured, Open Graph, Twitter
+  y `primaryImage` del schema; caché purgada y readback público verificado.
+
 ## 2026-07-18 — Sistema editorial de infografías Efeonce y entrega SVG directa
 
 - `content-marketing-studio` incorpora un canon Efeonce basado en siete precedentes SVG propios y benchmark
@@ -13,6 +28,12 @@
   destino, seguridad o comparación de peso. Se agregaron contrato reusable, preset JSON y auditor CLI. En la
   muestra histórica, el SVG comprimido resultó ~2.1×–5.6× más liviano que WebP 1200 comparable. Comando canónico:
   `pnpm content:editorial-svg:audit -- <delivery.svg...>`.
+- Se promovió el aprendizaje a un operating model reusable, documentación funcional y manual; las skills
+  Content Marketing, Design Studio, SEO/AEO y Public Site WordPress ahora comparten footer-only, source/delivery,
+  SEO de SVG, alternativas largas, legibilidad CSS, CLS, shareability por canal y raster social-safe.
+- Una auditoría posterior corrigió el estado v7: el PASS existente cubre archivo/seguridad, pero no demuestra
+  todavía legibilidad al ancho CSS, geometría del delivery trazado ni CLS/currentSrc. El draft sigue privado y
+  queda `contextual_v7_qa_pending`; no se declara listo para publicación.
 
 ## 2026-07-18 — TASK-1340: Growth CTA Portable Renderer + capa GTM + gobernanza en Growth (code complete, shadow)
 

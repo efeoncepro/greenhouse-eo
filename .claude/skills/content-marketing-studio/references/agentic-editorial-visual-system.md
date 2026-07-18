@@ -177,6 +177,11 @@ segura si el brief lo declara. El logo de un cliente identifica el caso y
 requiere autorización específica; no reemplaza ni se fusiona con la firma de Efeonce. No pedir al generador que
 dibuje un logo: componer el activo oficial de forma determinística después de seleccionar el master.
 
+El contrato completo de infografías de cuerpo —footer, arquetipos, source/delivery, SVG SEO, descripción larga,
+responsive, shareability y estados por canal— vive en
+`docs/operations/public-site-content-factory/EDITORIAL_INFOGRAPHIC_OPERATING_MODEL_V1.md`. No extender la regla
+footer-only a hero/featured/OG: esas superficies declaran crop, firma y raster social-safe por separado.
+
 Dos pruebas de calibración: si al retirar el logo la pieza deja de sentirse de la marca, falta sistema visual;
 si el logo domina la lectura, la firma está sobredimensionada.
 

@@ -1,0 +1,20 @@
+Edit the supplied image with strict high-fidelity preservation.
+
+LOCKED — DO NOT CHANGE:
+- exact 2048x1152 composition and crop;
+- human hand, skin, anatomy, pose and fingertip position;
+- robotic hand, blue material, mechanics, five fingers, pose and fingertip position;
+- white-to-active-blue-to-deep-navy diagonal background, lighting and texture;
+- size, perspective, geometry and content of both interface planes;
+- warm-white human-facing web plane and navy blueprint agent-facing plane;
+- all shadows, highlights, blue values and white negative space.
+
+CHANGE ONLY THE ORANGE CENTRAL ELEMENT:
+- Remove the literal mechanical/book hinge appearance, hinge knuckles and connecting hardware.
+- Replace it with a narrow floating authorization spine in the governed gap between the two planes.
+- The spine consists of exactly five separate vivid Efeonce-orange precision capsules or short rectangular segments, vertically aligned with small equal gaps between them.
+- The five segments are suspended cleanly between the planes and do not mechanically attach or rotate them. They suggest five governed states: intent, authority, capability, confirmation and evidence, but contain no labels, letters, numbers, icons or symbols.
+- Give the segments crisp machined edges, subtle physical depth and restrained orange reflections on the adjacent plane edges. No glow, electricity or portal effect.
+- Preserve the energetic V-shaped exploded arrangement: it is a cutaway of two registered web layers, not a book.
+
+No other edits. No text, logo, watermark, new icons, extra objects, black, spark, glow or altered fingers.

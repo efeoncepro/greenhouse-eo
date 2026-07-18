@@ -107,13 +107,20 @@ also apply `content-marketing-studio/efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTE
 - Keep editable source SVG separate from the sanitized delivery SVG.
 - Block scripts, event handlers, `foreignObject`, remote resources and uncontrolled fonts before upload.
 - Require explicit `viewBox`, `width` and `height`; inspect all text and shapes for clipping.
-- Use the canonical `efeoncepro.com` bubble geometry at build time; do not upload or link a second dependent SVG.
+- For Efeonce body infographics, keep all brand information in the footer: source/as-of left; official
+  `public/branding/` wordmark + canonical `efeoncepro.com` bubble right. No brand asset belongs in the header.
+- Use the canonical bubble geometry at build time; do not upload or link a second dependent SVG.
 - Upload through the governed Media Library path, then read back attachment ID, MIME, URL, bytes and metadata.
 - Prefer a normal image block/attachment reference for a standalone SVG. Inline SVG requires an explicit,
   sanitized runtime contract; never paste arbitrary SVG markup into a generated spec.
 - Use `<picture>` only when theme or viewport art direction requires distinct files. Keep one semantic `<img>`
-  fallback with one ALT.
+  fallback with `src`, descriptive filename, dimensions and one ALT. Verify `currentSrc`, reserved ratio and CLS.
+- Outlined SVG text does not replace HTML semantics. Keep thesis/data in caption, nearby copy or a linked/visible
+  long description; complex diagrams need short ALT plus an equivalent long alternative.
+- Read back anonymous GET `200`, `image/svg+xml`, crawlability, cache/encoding and DOM ALT/caption. Confirm that
+  attachment-page behavior does not create an unintended indexable duplicate.
 - Preserve raster derivatives only for OG/social/compatibility or when measured delivery weight favors raster.
+- Keep a dedicated raster for featured, Yoast Article image, OG and Twitter previews.
 - Publishing remains private/draft until human authorization and live QA.
 
 ## Content Hub / Search Guardrails

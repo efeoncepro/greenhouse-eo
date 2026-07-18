@@ -1,0 +1,30 @@
+Use case: stylized-concept
+Asset type: bold premium featured editorial key visual, text-free
+Primary request: Create a high-impact Efeonce editorial image about the exact moment a web interface becomes shared operational infrastructure for a human and an AI agent. It must stop the scroll at thumbnail size while remaining sophisticated.
+
+Composition and action:
+- 16:9 horizontal, dynamic diagonal composition with controlled asymmetry and strong scale contrast.
+- A real adult human hand surges in from the lower-left with natural anatomical tension, index extended upward-right.
+- A bespoke robotic hand drives in from the upper-right, clearly mechanical, sculptural and elegant: deep Efeonce navy-blue satin shells, active-blue precision joints, small matte-white fingertip and collars, five mechanically plausible fingers, no body.
+- The two index fingertips stop only a few millimeters from opposite faces of the central web object. No spark and no direct contact.
+- The hands and interface form one large compact visual unit occupying roughly 68 percent of the canvas; the interface is approximately 25 percent larger than in the reference and is the undeniable level-one focus.
+
+Central concept — the blue hinge:
+- One landscape browser-inspired web surface is exploded into two closely registered physical planes, tilted in dramatic three-quarter perspective.
+- The front human-facing plane is luminous warm white with one bold editorial hero composition: a deep-blue sweeping form, strong white negative space and a minimal content rhythm. No generic cards, dashboard, text or icons.
+- The rear agent-facing plane is saturated active blue and navy, showing the exact same geometry as a precision semantic blueprint: region contours, bounded capability rails and a short evidence trace. No code, nodes, checklist or data charts.
+- Between the planes runs one vivid Efeonce-orange vertical hinge/gate, visually simple and physically credible. It is the only orange element and the compositional fulcrum. Five tiny machined notches along it imply intent, authority, capability, confirmation and evidence without labels.
+- The object should feel like a premium kinetic editorial sculpture, not two app screens.
+
+Background and color:
+- No black. Build a bold editorial diagonal field: warm white and pale mineral blue in the lower-left, saturated Efeonce active blue through the middle distance, deep navy blue in the upper-right.
+- Use a crisp diagonal color transition and a restrained soft halo of pale blue behind the central object for separation, not a sci-fi glow.
+- Strong white/navy contrast, rich blue tonal depth and exactly one saturated orange gate.
+
+Style and craft:
+- International strategy magazine cover, museum-grade industrial sculpture, art-directed mixed-media photography, tactile paper grain, crisp machined edges, controlled shadows, high color depth.
+- Strong silhouette and graphic read at 160-pixel thumbnail; detailed craft at full resolution.
+- Inspired only by the tension and spacing of a famous Renaissance near-touching gesture; do not reproduce a fresco, characters, anatomy, setting or religious symbolism.
+
+Text: absolutely none — no readable letters, numbers, logos, signature or watermark.
+Avoid: calm minimalism with too much empty white, generic SaaS UI, cards, checklist, dashboard, literal Apple controls, humanoid robot, stock white plastic robot, black background, cyberpunk, neon, electric spark, portal, floating code, brain, network globe, lens flare, bokeh, excessive particles, malformed fingers, toy-like surfaces.

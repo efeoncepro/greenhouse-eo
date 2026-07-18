@@ -1,0 +1,15 @@
+Edit the provided image with surgical restraint. Preserve exactly: the white-to-navy Efeonce gradient background, tactile paper texture, human hand, blue robotic hand, anatomy, diagonal gesture, fingertip positions, lighting, shadows, 16:9 framing and negative space. Do not alter either hand or the background.
+
+Redesign only the central interface to eliminate all generic SaaS/dashboard language.
+
+Replace the current split-screen, list, cards, lock, shield, check marks and arrow button with one distinctive two-plane web cutaway:
+
+- FRONT PLANE, closest to the human hand: one refined landscape editorial webpage in a thin deep-navy browser frame. It has a single dominant photographic/abstract hero field, a strong asymmetrical content rhythm, a small navigation band and one understated interaction area. All content remains text-free abstract geometry; no button icon, no cards and no dashboard.
+- BACK PLANE, closest to the robotic hand: a second translucent blueprint plane offset slightly upward and right behind the first, showing the exact same page geometry as semantic outlines. Use elegant navy contour brackets, region boundaries and one bounded action path that follows the same hero and content regions. No nodes, checklist, icons, code or data visualization.
+- BETWEEN THE PLANES: a narrow, physically visible governed gap with five tiny ordered ticks along one short rail. One small plain orange bead or capsule sits at the confirmation position. It has no lock, check, arrow, letter or symbol.
+- The two planes must be visibly related and precisely registered, like a museum-grade exploded architectural model of one web page. They are not two different apps and not left/right halves of one dashboard.
+- Keep the total interface footprint in the same central area and approximately the same size as the current window. Crisp straight edges, subtle acrylic depth, no excessive glass reflections.
+
+The result should make the concept readable without labels: the person sees a page; the agent sees the same page as structured, bounded capabilities; authorization exists in the controlled space between them.
+
+No readable text, letters, numbers, logos, watermark, generic UI icons, cards, checklist, dashboard, charts, network nodes, code, browser brand, black, neon glow, spark, portal, new objects or altered fingers.

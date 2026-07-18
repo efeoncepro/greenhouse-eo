@@ -65,10 +65,14 @@ Cada satélite debe resolver una pregunta estrecha, enlazar la definición canó
 - **WAG-V03:** arquitectura compartida: interfaces distintas sobre capacidades, gobierno, datos y reglas comunes.
 - **WAG-V04:** cadena de autoridad: persona, agente/operador, capacidad y registro atravesados por identidad,
   alcance delegado, confirmación proporcional y evidencia recuperable.
+- **WAG-V05:** mapa de ecosistema por fronteras: WebMCP, NLWeb, ACP/UCP, AP2, A2A y AAIF.
+- **WAG-V06:** circuito de evaluación: contrato, pruebas, eval probabilística, E2E y recuperación.
+- **WAG-V07:** madurez agéntica en dos ejes: comprensión y acción gobernada.
+- **WAG-V08:** ruta de readiness en cuatro dominios y doce pruebas.
 - Sistema canónico: `docs/public-site/WEB_AGENTICA_EDITORIAL_VISUAL_SYSTEM_V1.md`.
-- Manifiesto: `docs/public-site/WEB_AGENTICA_VISUAL_ASSET_MANIFEST_V1.json` (`visuals-v4`).
-- Media WordPress: portada/OG `251453–251454`; WAG-V02 `251470–251473`; WAG-V03 `251474–251477`; WAG-V04
-  `251479–251482`.
+- Manifiesto: `docs/public-site/WEB_AGENTICA_VISUAL_ASSET_MANIFEST_V1.json` (`visuals-v7`).
+- Media WordPress: portada/OG `251453–251454`; 28 variantes SVG v7 `251514–251541`, integradas como siete
+  `<picture>` con desktop/mobile × light/dark.
 
 ## Medición
 
@@ -93,8 +97,9 @@ El evento es el contrato recomendado, pero todavía no se emite. La familia gen�
 
 ## Estado operativo — 2026-07-18
 
-- Borrador V3 escrito y validado por Content Factory.
+- Borrador V5 escrito y validado por Content Factory.
 - Estado WordPress: `draft`; autor humano `1`; categoría AEO `156`.
-- Featured, OG/Twitter y dos visuales de cuerpo integrados; v4 aumenta densidad editorial y shareability con gate de contención de texto.
+- Featured, OG/Twitter y siete infografías de cuerpo integradas en privado. El delivery v7 pasó seguridad y
+  geometría de archivo; permanece pendiente repetir QA contextual de legibilidad CSS/CLS sobre las siete piezas.
 - Enlace recíproco preparado, no aplicado mientras la pillar no sea pública.
 - Publicación requiere autorización humana separada y explícita.

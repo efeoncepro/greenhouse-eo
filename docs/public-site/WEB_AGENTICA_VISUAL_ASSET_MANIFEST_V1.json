@@ -273,10 +273,15 @@
         }
       ],
       "metadata": {
+        "alt": "Cuatro etapas aumentan la operabilidad para agentes externos y el gobierno de las acciones: sitio tradicional, sitio con IA, sitio preparado y web agéntica.",
+        "description": "Mapa de frontera que compara operador, comprensión, capacidad, control y señal de éxito sin presentarlo como ranking universal.",
+        "longDescriptionRef": "adjacent_article_section",
         "caption": "La transición decisiva no es “más IA”, sino una acción explícita, gobernada y demostrable."
       },
       "rights": {
         "sourceAssets": [
+          "public/branding/logo-full.svg",
+          "public/branding/logo-negative.svg",
           "src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg",
           "src/assets/fonts/Poppins-Medium.ttf",
           "src/assets/fonts/Poppins-SemiBold.ttf",
@@ -287,10 +292,10 @@
         "disclosure": "none"
       },
       "qa": {
-        "status": "integration_pass",
+        "status": "file_pass_contextual_v7_pending",
         "renderer": "Chromium + fontkit outlined delivery",
-        "themesReviewed": true,
-        "responsiveReviewed": true,
+        "themesReviewed": false,
+        "responsiveReviewed": false,
         "directSvgAudit": "28/28 PASS",
         "integration": "draft"
       }
@@ -478,10 +483,15 @@
         }
       ],
       "metadata": {
+        "alt": "La interfaz humana, WebMCP y la API consumen las mismas capacidades gobernadas, datos y reglas del negocio.",
+        "description": "Corte arquitectónico que separa interfaces, capacidades, contrato de ejecución, gobierno y fuente de verdad compartida.",
+        "longDescriptionRef": "adjacent_article_section",
         "caption": "La interfaz cambia; la capacidad, el gobierno y la fuente de verdad permanecen compartidos."
       },
       "rights": {
         "sourceAssets": [
+          "public/branding/logo-full.svg",
+          "public/branding/logo-negative.svg",
           "src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg",
           "src/assets/fonts/Poppins-Medium.ttf",
           "src/assets/fonts/Poppins-SemiBold.ttf",
@@ -492,10 +502,10 @@
         "disclosure": "none"
       },
       "qa": {
-        "status": "integration_pass",
+        "status": "file_pass_contextual_v7_pending",
         "renderer": "Chromium + fontkit outlined delivery",
-        "themesReviewed": true,
-        "responsiveReviewed": true,
+        "themesReviewed": false,
+        "responsiveReviewed": false,
         "directSvgAudit": "28/28 PASS",
         "integration": "draft"
       }
@@ -683,10 +693,15 @@
         }
       ],
       "metadata": {
+        "alt": "WebMCP, NLWeb, ACP y UCP, AP2, A2A y AAIF se ubican en fronteras complementarias de un stack de interoperabilidad.",
+        "description": "Mapa de ecosistema por capas; no representa un ranking ni afirma que exista un estándar ganador único.",
+        "longDescriptionRef": "adjacent_article_section",
         "caption": "No hay un ganador único: emerge un stack de interoperabilidad con fronteras distintas."
       },
       "rights": {
         "sourceAssets": [
+          "public/branding/logo-full.svg",
+          "public/branding/logo-negative.svg",
           "src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg",
           "src/assets/fonts/Poppins-Medium.ttf",
           "src/assets/fonts/Poppins-SemiBold.ttf",
@@ -697,10 +712,10 @@
         "disclosure": "none"
       },
       "qa": {
-        "status": "integration_pass",
+        "status": "file_pass_contextual_v7_pending",
         "renderer": "Chromium + fontkit outlined delivery",
-        "themesReviewed": true,
-        "responsiveReviewed": true,
+        "themesReviewed": false,
+        "responsiveReviewed": false,
         "directSvgAudit": "28/28 PASS",
         "integration": "draft"
       }
@@ -888,10 +903,15 @@
         }
       ],
       "metadata": {
+        "alt": "La evaluación conecta contrato, pruebas deterministas, evaluación probabilística, pruebas de extremo a extremo y recuperación.",
+        "description": "Circuito de evidencia con retorno que distingue disponibilidad de herramienta y resolución demostrada de la tarea.",
+        "longDescriptionRef": "adjacent_article_section",
         "caption": "La confianza aparece cuando contrato, comportamiento, resultado y recuperación se prueban como sistema."
       },
       "rights": {
         "sourceAssets": [
+          "public/branding/logo-full.svg",
+          "public/branding/logo-negative.svg",
           "src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg",
           "src/assets/fonts/Poppins-Medium.ttf",
           "src/assets/fonts/Poppins-SemiBold.ttf",
@@ -902,10 +922,10 @@
         "disclosure": "none"
       },
       "qa": {
-        "status": "integration_pass",
+        "status": "file_pass_contextual_v7_pending",
         "renderer": "Chromium + fontkit outlined delivery",
-        "themesReviewed": true,
-        "responsiveReviewed": true,
+        "themesReviewed": false,
+        "responsiveReviewed": false,
         "directSvgAudit": "28/28 PASS",
         "integration": "draft"
       }
@@ -1093,10 +1113,15 @@
         }
       ],
       "metadata": {
+        "alt": "Cinco niveles de madurez progresan en comprensión y acción gobernada como ejes relacionados pero independientes.",
+        "description": "Escala de dos ejes que muestra que legibilidad y operabilidad no avanzan automáticamente al mismo ritmo.",
+        "longDescriptionRef": "adjacent_article_section",
         "caption": "Ser legible habilita comprensión; operar exige autoridad, límites, confirmación y evidencia."
       },
       "rights": {
         "sourceAssets": [
+          "public/branding/logo-full.svg",
+          "public/branding/logo-negative.svg",
           "src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg",
           "src/assets/fonts/Poppins-Medium.ttf",
           "src/assets/fonts/Poppins-SemiBold.ttf",
@@ -1107,10 +1132,10 @@
         "disclosure": "none"
       },
       "qa": {
-        "status": "integration_pass",
+        "status": "file_pass_contextual_v7_pending",
         "renderer": "Chromium + fontkit outlined delivery",
-        "themesReviewed": true,
-        "responsiveReviewed": true,
+        "themesReviewed": false,
+        "responsiveReviewed": false,
         "directSvgAudit": "28/28 PASS",
         "integration": "draft"
       }
@@ -1298,10 +1323,15 @@
         }
       ],
       "metadata": {
+        "alt": "Doce pruebas recorren significado, interacción, ejecución y evidencia para decidir si la autonomía puede continuar.",
+        "description": "Ruta de inspección donde una falla obliga a detener o degradar la autonomía con seguridad.",
+        "longDescriptionRef": "adjacent_article_section",
         "caption": "Si una prueba falla, la autonomía debe detenerse o degradarse con seguridad."
       },
       "rights": {
         "sourceAssets": [
+          "public/branding/logo-full.svg",
+          "public/branding/logo-negative.svg",
           "src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg",
           "src/assets/fonts/Poppins-Medium.ttf",
           "src/assets/fonts/Poppins-SemiBold.ttf",
@@ -1312,10 +1342,10 @@
         "disclosure": "none"
       },
       "qa": {
-        "status": "integration_pass",
+        "status": "file_pass_contextual_v7_pending",
         "renderer": "Chromium + fontkit outlined delivery",
-        "themesReviewed": true,
-        "responsiveReviewed": true,
+        "themesReviewed": false,
+        "responsiveReviewed": false,
         "directSvgAudit": "28/28 PASS",
         "integration": "draft"
       }
@@ -1503,10 +1533,15 @@
         }
       ],
       "metadata": {
+        "alt": "Una persona delega una intención a un agente; el sitio valida identidad, alcance y confirmación antes de registrar un resultado recuperable.",
+        "description": "Cadena de autoridad entre persona, agente u operador, capacidad del sitio y sistema de registro; no es un flujo IAM completo.",
+        "longDescriptionRef": "adjacent_article_section",
         "caption": "Identificar al agente no basta: la acción debe demostrar representación, alcance, confirmación y resultado."
       },
       "rights": {
         "sourceAssets": [
+          "public/branding/logo-full.svg",
+          "public/branding/logo-negative.svg",
           "src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg",
           "src/assets/fonts/Poppins-Medium.ttf",
           "src/assets/fonts/Poppins-SemiBold.ttf",
@@ -1517,10 +1552,10 @@
         "disclosure": "none"
       },
       "qa": {
-        "status": "integration_pass",
+        "status": "file_pass_contextual_v7_pending",
         "renderer": "Chromium + fontkit outlined delivery",
-        "themesReviewed": true,
-        "responsiveReviewed": true,
+        "themesReviewed": false,
+        "responsiveReviewed": false,
         "directSvgAudit": "28/28 PASS",
         "integration": "draft"
       }

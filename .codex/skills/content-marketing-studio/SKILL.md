@@ -35,6 +35,9 @@ variantes responsive/theme exactas, carga `references/deterministic-editorial-in
 gobierna el encoding cuando la visualización analítica lo requiere.
 Para Efeonce, cargar además `efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md`: gobierna paleta, shell de marca,
 arquetipos, sello `efeoncepro.com`, SVG directo y benchmark de shareability.
+Si la pieza se integrará en web, cargar también `../seo-aeo/references/editorial-image-seo.md` y el canon
+`docs/operations/public-site-content-factory/EDITORIAL_INFOGRAPHIC_OPERATING_MODEL_V1.md`: body SVG,
+featured/OG raster, footer-only, descripción larga, legibilidad CSS y estados por canal son contratos distintos.
 Para una portada/hero que “parece producto”, el mismo gate sigue vigente: si contiene gráficos o copy exactos,
 usar SVG y cargar `../design-studio/modules/11_PRODUCT_STORY_SCENES.md`; la gramática es agnóstica y el skin se
 decide por tema, sin convertir una paleta contextual de plataforma en branding Efeonce.

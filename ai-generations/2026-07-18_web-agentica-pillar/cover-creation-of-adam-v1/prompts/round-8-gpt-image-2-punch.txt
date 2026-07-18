@@ -1,0 +1,34 @@
+Create the definitive high-impact editorial cover for Efeonce using the two supplied references.
+
+REFERENCE ROLES
+- Reference image 1 is the STRUCTURE reference. Preserve its core idea: a real human hand enters from lower-left, a bespoke blue robotic hand enters from upper-right, and one web interface is exploded into a human-facing front plane plus an aligned agent-facing blueprint plane.
+- Reference image 2 is the IMPACT reference. Borrow its bold scale, saturated Efeonce blue/navy depth, sharp diagonal energy, strong thumbnail silhouette and orange fulcrum. Do not copy its book-like hinge, literal browser dots or near-black field.
+
+VIEWER TAKEAWAY
+In one second: a person and an AI agent approach the same web infrastructure, but each reads a different governed layer of one system.
+
+COMPOSITION
+- 16:9 horizontal editorial key visual; compact, bold diagonal composition with controlled asymmetry.
+- One anatomically correct real adult human hand reaches upward-right from lower-left.
+- One unmistakably robotic, museum-grade industrial hand reaches downward-left from upper-right. Deep Efeonce navy satin shells, active-blue precision joints, small matte-white fingertip/collars, exactly five mechanically plausible fingers, no body or face.
+- Both index fingertips stop only millimeters from their corresponding interface planes. No spark and no contact.
+- Enlarge the central interface so it occupies about 45 percent of canvas width and becomes the undeniable level-one focal point. Hands + interface should read as one iconic unit at 160-pixel thumbnail size.
+
+THE CENTRAL WEB OBJECT — NOT GENERIC UI
+- One landscape web application represented as two closely registered acrylic planes in an exploded architectural cutaway, not a book, not two apps and not a split-screen dashboard.
+- FRONT/HUMAN PLANE: warm white editorial webpage with one bold navy sweeping hero shape, clear asymmetrical reading rhythm, a restrained navigation band and one understated interaction zone. Abstract, text-free, no cards, icons, charts or button arrows.
+- BACK/AGENT PLANE: saturated active-blue/navy blueprint of the exact same geometry, using precise semantic region contours, bounded capability channels and one short evidence trace. No code, checklist, nodes, tables or charts.
+- The planes are offset just enough to reveal a governed gap. In that gap, a short vivid orange vertical gate contains five tiny machined notches. It is a structural connector, not a book hinge, lock, icon or glowing portal.
+- Straight impeccable edges, plausible acrylic depth and clean registration between both readings.
+
+BACKGROUND AND BRAND
+- Absolutely no black. Create a bold Efeonce diagonal gradient field: warm white/mineral light around the human side, pale active blue around the object, saturated Efeonce blue through the diagonal middle, and deep navy at the far upper-right. Deep navy must retain visibly blue chroma and never read as black.
+- One strong geometric diagonal light band supports the motion without becoming decoration.
+- The orange gate is the only orange element.
+
+FINISH
+International strategy magazine cover, art-directed mixed-media photography, sculptural industrial design, tactile uncoated-paper grain, rich color depth, crisp machined edges, believable skin and mechanics, controlled studio highlights, premium and intellectually confident.
+The cultural reference is only the tension and spacing of a famous Renaissance near-touching gesture. Do not recreate any fresco, characters, anatomy, setting or religious symbolism.
+
+HARD CONSTRAINTS
+No readable text, letters, numbers, logos, watermark, Apple controls, dashboard, generic SaaS cards, checklist, data charts, network globe, code, humanoid robot, stock white plastic robot, black background, cyberpunk, neon, electric spark, portal, lens flare, bokeh, excessive particles, malformed fingers or toy surfaces.

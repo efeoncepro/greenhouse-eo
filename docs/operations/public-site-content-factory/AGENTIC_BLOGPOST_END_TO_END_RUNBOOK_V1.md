@@ -746,11 +746,20 @@ pnpm media:webp -- \
 shasum -a 256 ai-generations/YYYY-MM-DD_<run>/masters/* ai-generations/YYYY-MM-DD_<run>/exports/*
 ```
 
-- cuerpo: WebP optimizado con dimensiones conocidas;
+- cuerpo raster: WebP optimizado con dimensiones conocidas;
+- cuerpo vectorial: SVG directo cuando el contrato determinístico demuestra seguridad, autonomía, legibilidad y
+  ventaja de entrega; source editable y delivery saneado permanecen separados;
 - featured/OG: derivado `1200×630` o cercano a `1.91:1`;
 - preferir JPEG/PNG social si el ecosistema de previews no trata el WebP de forma consistente;
 - proteger el centro óptico y probar miniatura/card;
 - no duplicar el featured dentro del body si Ohio ya lo renderiza.
+
+Para SVG directo, aplicar el
+[Editorial Infographic Operating Model](EDITORIAL_INFOGRAPHIC_OPERATING_MODEL_V1.md): un único `<img src>`
+fallback dentro de `<picture>`, filename/ALT/caption/contexto HTML, alternativa larga para imágenes complejas,
+GET `200`, `image/svg+xml`, dimensiones, crawlability, `currentSrc`, legibilidad CSS proyectada y CLS. En piezas
+Efeonce de cuerpo, toda la firma —fuente/as-of, wordmark y `efeoncepro.com`— vive en el footer. El texto
+contorneado no sustituye contenido HTML indexable. Featured, Yoast Article image y OG/Twitter conservan raster.
 
 #### 10.5 Media Library
 
@@ -1008,6 +1017,9 @@ Verificar al menos:
 - sin solapamiento artículo/footer;
 - tipografía, contraste y jerarquía legibles;
 - imágenes con `naturalWidth > 0`, tamaño/crop correcto y sin duplicar featured;
+- `currentSrc` correcto por viewport/tema, texto esencial `>=16 CSS px`, notas `>=12–14 CSS px` y sin LayoutShift
+  material cuando una variante cambia aspect ratio;
+- infografías complejas con ALT breve y descripción larga equivalente visible/enlazada;
 - TOC visible, navegable y con todos sus destinos existentes;
 - navegación por teclado y focus de links;
 - lenguaje de estado coherente con `publish` en cuerpo, notas, captions, CTA y excerpt;
@@ -1052,6 +1064,22 @@ Comprobar:
 - redirects si existió una URL anterior.
 
 No basta con “no la encontré en Google”: la duplicación se verifica en runtime y source registries.
+
+#### 14.7 Discovery e inspección de indexación
+
+El gate sincrónico de publicación termina cuando la URL live es rastreable y aparece en el sitemap Yoast correcto
+con `<lastmod>` honesto. La indexación de Google es asíncrona y no debe falsearse como condición ya cumplida.
+
+- no llamar al sitemap ping legado: Google lo retiró y devuelve `404`;
+- no usar la Indexing API para artículos o landings genéricos; sólo corresponde a `JobPosting` y
+  `BroadcastEvent` dentro de `VideoObject`;
+- URL Inspection API observa la versión conocida por el índice; no ejecuta live test ni solicita indexación;
+- una solicitud manual desde URL Inspection puede reservarse para unas pocas URLs críticas, sin promesa de plazo;
+- cuando exista la capability verificada de `TASK-1426`, registrar checkpoints `0h`, `24h` y `72h` separados del
+  gate de publicación; hasta entonces, no inventar evidencia automatizada.
+
+Contrato técnico ampliado:
+`.codex/skills/seo-aeo/references/google-search-console-api-indexing.md`.
 
 **Gate live:** todos los checks críticos pasan. Links protegidos/timeouts quedan clasificados con riesgo
 residual; un `404/5xx`, canonical duplicado, robots incorrecto, schema roto o render móvil defectuoso bloquea.
@@ -1242,6 +1270,7 @@ Un blogpost está `documented_closed` sólo cuando todos los ítems aplicables s
 - [ ] Imágenes cargan y TOC navega.
 - [ ] Links clasificados; cero `404/5xx` confirmado.
 - [ ] Canonical, robots, OG, schema y author verificados en HTML live.
+- [ ] URL incluida en el sitemap correcto con `lastmod` honesto; seguimiento GSC reportado aparte si aplica.
 - [ ] Rutas duplicadas revisadas en runtime/source.
 - [ ] Consola sin errores materiales.
 - [ ] Proceso de QA terminó naturalmente y cerró browser, contexts, requests, timers y reporte.

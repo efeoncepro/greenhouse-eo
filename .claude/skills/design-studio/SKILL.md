@@ -93,7 +93,8 @@ argument-hint: "[tarea o pregunta — ej: 'audita este key visual', 'diseña una
   `../content-marketing-studio/references/deterministic-editorial-infographics.md`; `design-studio` dirige la
   composición, Content Marketing gobierna función/manifest/integración y `dataviz-design` toma el encoding si
   existe una decisión analítica compleja. Para marca Efeonce, cargar además
-  `../content-marketing-studio/efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md`.
+  `../content-marketing-studio/efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md`. En web, aplicar además
+  `.codex/skills/seo-aeo/references/editorial-image-seo.md`; SVG vectorial no necesita `@2x` y featured/OG conserva raster.
 - ¿**Motion**/animación/identidad kinética a implementar? → **`motion-design`** (design-studio
   la dirige conceptualmente).
 - ¿Formato/algoritmo/cadencia **por red social**? → **`social-media-studio`** (el KV alimenta

@@ -1,0 +1,90 @@
+{
+  "generatedAt": "2026-07-18T09:16:04.225Z",
+  "files": [
+    {
+      "name": "kfu-v01-three-layers-desktop",
+      "source": {
+        "path": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills/source/kfu-v01-three-layers-desktop-source-v1.svg",
+        "sha256": "4a230153bfc03b8eca364832ea070b68493f5253a30923a21df5b4c158cf0dbd",
+        "bytes": 16711
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills/delivery/kfu-v01-three-layers-desktop-delivery-v1.svg",
+        "sha256": "cd38315514ee619d3898c87eb7d3460afb0aa122ebf370bd20c4970e62300ab0",
+        "bytes": {
+          "raw": 147140,
+          "gzip": 21494,
+          "brotli": 14139
+        }
+      }
+    },
+    {
+      "name": "kfu-v01-three-layers-mobile",
+      "source": {
+        "path": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills/source/kfu-v01-three-layers-mobile-source-v1.svg",
+        "sha256": "af7ffbd7474c8b4f69875537eaf3e0e98d085b12db84becacef044e34969b0aa",
+        "bytes": 16407
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills/delivery/kfu-v01-three-layers-mobile-delivery-v1.svg",
+        "sha256": "184ab2c437ba6f2ccc92c331d99f5fb2331be7f6d008fe3bd68540d917ece6df",
+        "bytes": {
+          "raw": 124730,
+          "gzip": 19296,
+          "brotli": 13434
+        }
+      }
+    },
+    {
+      "name": "kfu-v02-tacit-knowledge-loop-desktop",
+      "source": {
+        "path": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills/source/kfu-v02-tacit-knowledge-loop-desktop-source-v1.svg",
+        "sha256": "51c5d215601b160973af61f7d6a6c0ccbcc8f75776d051b50e992773b5b4a2a5",
+        "bytes": 17521
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills/delivery/kfu-v02-tacit-knowledge-loop-desktop-delivery-v1.svg",
+        "sha256": "9d9d23f5112a63dd8623d1fe8514c3ba5c0d207adfd189d04085b1c20aeefd41",
+        "bytes": {
+          "raw": 149741,
+          "gzip": 19663,
+          "brotli": 13841
+        }
+      }
+    },
+    {
+      "name": "kfu-v02-tacit-knowledge-loop-mobile",
+      "source": {
+        "path": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills/source/kfu-v02-tacit-knowledge-loop-mobile-source-v1.svg",
+        "sha256": "782fc838bd329a81a0f5705deb88c2eb64559ce53be65829af023409a71f855c",
+        "bytes": 17084
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills/delivery/kfu-v02-tacit-knowledge-loop-mobile-delivery-v1.svg",
+        "sha256": "d87e36b274b289c52593e73ce2fc7c5d4ead68f263e13b07f64bf9d521be429e",
+        "bytes": {
+          "raw": 160422,
+          "gzip": 20223,
+          "brotli": 13913
+        }
+      }
+    },
+    {
+      "name": "kfu-v03-skill-candidate-social",
+      "source": {
+        "path": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills/source/kfu-v03-skill-candidate-social-source-v1.svg",
+        "sha256": "3538e1ffae936fc3c0f428487f350f2689ef6c3f8faf71cffbe57d2a76538948",
+        "bytes": 17026
+      },
+      "delivery": {
+        "path": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills/delivery/kfu-v03-skill-candidate-social-delivery-v1.svg",
+        "sha256": "381c2566271c84e18a55fd080fc7aaad7ae5414ba8765070b8f46e4516f2d664",
+        "bytes": {
+          "raw": 208723,
+          "gzip": 24241,
+          "brotli": 15572
+        }
+      }
+    }
+  ]
+}

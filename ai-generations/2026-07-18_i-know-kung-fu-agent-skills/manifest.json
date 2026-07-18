@@ -1,0 +1,275 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-07-18_i-know-kung-fu-agent-skills",
+  "status": "published_and_live_verified",
+  "article": {
+    "wordpressPostId": 250748,
+    "title": "«I Know Kung Fu»: el momento Matrix de los Agent Skills",
+    "slug": "i-know-kung-fu-agent-skills-momento-matrix-ia-empresarial",
+    "wordpressStatus": "publish"
+  },
+  "visualSystem": {
+    "name": "El criterio se vuelve capacidad",
+    "thesis": "Razonamiento, acceso y método convergen; el conocimiento propietario gana valor cuando se convierte en un loop verificable.",
+    "skin": "efeonce_core",
+    "canvas": "white_poster",
+    "signatureAsset": "src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg",
+    "signatureLabel": "efeoncepro.com",
+    "palette": {
+      "ink": "#022A4E",
+      "deep": "#023C70",
+      "mid": "#024C8F",
+      "active": "#0375DB",
+      "energy": "#F55D01",
+      "lead": "#263448",
+      "muted": "#505964",
+      "passive": "#DBDBDB",
+      "paper": "#FFFFFF",
+      "paleBlue": "#EAF4FC",
+      "paleOrange": "#FFF0E7",
+      "paleGray": "#F4F6F8"
+    },
+    "invariants": [
+      "título autónomo",
+      "una relación dominante",
+      "navy estructural",
+      "naranja para decisión",
+      "firma periférica"
+    ],
+    "forbidden": [
+      "Matrix literal",
+      "lluvia de código",
+      "UI ficticia",
+      "cards de dashboard",
+      "glass",
+      "glow",
+      "gradientes",
+      "cifras no verificadas"
+    ]
+  },
+  "pictureContract": {
+    "breakpointPx": 720,
+    "rationale": "Los body assets cambian de composición triangular/circular a recorridos verticales; no se resuelven encogiendo desktop.",
+    "fallback": "desktopLight"
+  },
+  "assets": [
+    {
+      "conceptId": "KFU-V01",
+      "slot": "body_after_mcp_and_skills",
+      "function": "Mostrar que razonamiento, acceso y método cumplen trabajos distintos y convergen en un resultado gobernado.",
+      "explanatoryDelta": "Hace visible la convergencia simultánea de tres capas que la tabla adyacente sólo compara de forma binaria.",
+      "archetype": "layered-model",
+      "deliveryContract": {
+        "viewport": "art_directed",
+        "theme": "single_theme",
+        "canvas": "opaque",
+        "skin": "efeonce_core",
+        "rationale": "La convergencia triangular necesita una composición vertical específica para conservar texto legible en móvil."
+      },
+      "variants": {
+        "desktopLight": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills/delivery/kfu-v01-three-layers-desktop-delivery-v1.svg",
+        "mobileLight": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills/delivery/kfu-v01-three-layers-mobile-delivery-v1.svg"
+      },
+      "sources": {
+        "desktop": {
+          "path": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills/source/kfu-v01-three-layers-desktop-source-v1.svg",
+          "sha256": "4a230153bfc03b8eca364832ea070b68493f5253a30923a21df5b4c158cf0dbd",
+          "bytes": 16711
+        },
+        "mobile": {
+          "path": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills/source/kfu-v01-three-layers-mobile-source-v1.svg",
+          "sha256": "af7ffbd7474c8b4f69875537eaf3e0e98d085b12db84becacef044e34969b0aa",
+          "bytes": 16407
+        }
+      },
+      "deliveries": {
+        "desktop": {
+          "path": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills/delivery/kfu-v01-three-layers-desktop-delivery-v1.svg",
+          "sha256": "cd38315514ee619d3898c87eb7d3460afb0aa122ebf370bd20c4970e62300ab0",
+          "bytes": {
+            "raw": 147140,
+            "gzip": 21494,
+            "brotli": 14139
+          }
+        },
+        "mobile": {
+          "path": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills/delivery/kfu-v01-three-layers-mobile-delivery-v1.svg",
+          "sha256": "184ab2c437ba6f2ccc92c331d99f5fb2331be7f6d008fe3bd68540d917ece6df",
+          "bytes": {
+            "raw": 124730,
+            "gzip": 19296,
+            "brotli": 13434
+          }
+        }
+      },
+      "metadata": {
+        "alt": "Modelo, MCP y Agent Skill aportan razonamiento, acceso y método; las tres capas convergen en un resultado utilizable, verificable y auditable.",
+        "caption": "La conexión habilita y el modelo razona; el skill aporta el criterio y las verificaciones del trabajo.",
+        "description": "Infografía editorial determinística KFU-V01. No representa productos independientes ni garantiza calidad por sí sola."
+      },
+      "qa": {
+        "status": "pass",
+        "liveTextInDelivery": false,
+        "outlinedFont": "Poppins",
+        "typographyFitChecked": true,
+        "reviewedAtOriginalResolution": true
+      }
+    },
+    {
+      "conceptId": "KFU-V02",
+      "slot": "body_after_skill_candidate_criteria",
+      "function": "Mostrar cómo decisiones expertas entran en un loop de explicitación, ejecución con evidencia y mantenimiento.",
+      "explanatoryDelta": "Hace visible el feedback que transforma experiencia dispersa en una capacidad mantenible, no sólo una lista de pasos.",
+      "archetype": "cycle",
+      "deliveryContract": {
+        "viewport": "art_directed",
+        "theme": "single_theme",
+        "canvas": "opaque",
+        "skin": "efeonce_core",
+        "rationale": "El loop se lee horizontalmente en desktop y como recorrido serpenteante con retorno explícito en móvil."
+      },
+      "variants": {
+        "desktopLight": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills/delivery/kfu-v02-tacit-knowledge-loop-desktop-delivery-v1.svg",
+        "mobileLight": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills/delivery/kfu-v02-tacit-knowledge-loop-mobile-delivery-v1.svg"
+      },
+      "sources": {
+        "desktop": {
+          "path": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills/source/kfu-v02-tacit-knowledge-loop-desktop-source-v1.svg",
+          "sha256": "51c5d215601b160973af61f7d6a6c0ccbcc8f75776d051b50e992773b5b4a2a5",
+          "bytes": 17521
+        },
+        "mobile": {
+          "path": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills/source/kfu-v02-tacit-knowledge-loop-mobile-source-v1.svg",
+          "sha256": "782fc838bd329a81a0f5705deb88c2eb64559ce53be65829af023409a71f855c",
+          "bytes": 17084
+        }
+      },
+      "deliveries": {
+        "desktop": {
+          "path": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills/delivery/kfu-v02-tacit-knowledge-loop-desktop-delivery-v1.svg",
+          "sha256": "9d9d23f5112a63dd8623d1fe8514c3ba5c0d207adfd189d04085b1c20aeefd41",
+          "bytes": {
+            "raw": 149741,
+            "gzip": 19663,
+            "brotli": 13841
+          }
+        },
+        "mobile": {
+          "path": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills/delivery/kfu-v02-tacit-knowledge-loop-mobile-delivery-v1.svg",
+          "sha256": "d87e36b274b289c52593e73ce2fc7c5d4ead68f263e13b07f64bf9d521be429e",
+          "bytes": {
+            "raw": 160422,
+            "gzip": 20223,
+            "brotli": 13913
+          }
+        }
+      },
+      "metadata": {
+        "alt": "Cinco movimientos convierten conocimiento tácito en una capacidad reusable: observar decisiones, extraer criterios, empaquetar el skill, ejecutar con evidencia y revisar para actualizar.",
+        "caption": "El skill no congela el conocimiento: lo convierte en un sistema que puede revisarse cuando cambia la operación.",
+        "description": "Infografía editorial determinística KFU-V02. No implica que todo conocimiento pueda automatizarse."
+      },
+      "qa": {
+        "status": "pass",
+        "liveTextInDelivery": false,
+        "outlinedFont": "Poppins",
+        "typographyFitChecked": true,
+        "reviewedAtOriginalResolution": true
+      }
+    },
+    {
+      "conceptId": "KFU-V03",
+      "slot": "social_derivative_skill_candidate",
+      "function": "Convertir cinco señales editoriales en una guía autónoma para decidir qué proceso prototipar como skill.",
+      "explanatoryDelta": "Transforma una lista de condiciones en un recorrido de decisión autónomo que puede circular sin el artículo.",
+      "archetype": "path",
+      "deliveryContract": {
+        "viewport": "crop_safe",
+        "theme": "single_theme",
+        "canvas": "opaque",
+        "skin": "efeonce_core",
+        "rationale": "El póster 4:5 conserva título, cinco señales y decisión dentro de una zona segura para social y thumbnail."
+      },
+      "variants": {
+        "desktopLight": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills/delivery/kfu-v03-skill-candidate-social-delivery-v1.svg"
+      },
+      "sources": {
+        "social": {
+          "path": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills/source/kfu-v03-skill-candidate-social-source-v1.svg",
+          "sha256": "3538e1ffae936fc3c0f428487f350f2689ef6c3f8faf71cffbe57d2a76538948",
+          "bytes": 17026
+        }
+      },
+      "deliveries": {
+        "social": {
+          "path": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills/delivery/kfu-v03-skill-candidate-social-delivery-v1.svg",
+          "sha256": "381c2566271c84e18a55fd080fc7aaad7ae5414ba8765070b8f46e4516f2d664",
+          "bytes": {
+            "raw": 208723,
+            "gzip": 24241,
+            "brotli": 15572
+          }
+        }
+      },
+      "metadata": {
+        "alt": "Cinco señales ayudan a decidir si un proceso merece convertirse en Agent Skill: se repite, depende de criterio, contiene excepciones, produce un resultado verificable y tiene un dueño.",
+        "caption": "Cuantas más señales reúna el proceso, mejor candidato es para un skill propietario.",
+        "description": "Infografía editorial determinística KFU-V03. Es una guía de decisión, no una fórmula universal."
+      },
+      "qa": {
+        "status": "pass",
+        "liveTextInDelivery": false,
+        "outlinedFont": "Poppins",
+        "typographyFitChecked": true,
+        "reviewedAtOriginalResolution": true
+      }
+    }
+  ],
+  "production": {
+    "generator": "build-infographics.mjs",
+    "renderer": "fontkit outlined delivery",
+    "fontSources": [
+      "src/assets/fonts/Poppins-Medium.ttf",
+      "src/assets/fonts/Poppins-SemiBold.ttf",
+      "src/assets/fonts/Poppins-Bold.ttf"
+    ],
+    "sourceAndDeliverySeparated": true,
+    "typographyFitGate": "typography-fit-report.json",
+    "externalResources": false,
+    "rasterRequired": true,
+    "rasterRationale": "Las infografías de cuerpo permanecen como SVG con texto trazado. La imagen destacada/Open Graph se rasterizó a PNG 1200×630 para compatibilidad amplia con crawlers y previews sociales."
+  },
+  "integration": {
+    "wordpressPostId": 250748,
+    "wordpressMediaIds": [251543, 251544, 251545, 251546, 251547, 251548, 251550, 251552],
+    "bodyMediaIds": [251543, 251545, 251547],
+    "featuredMediaId": 251552,
+    "featuredSocial": {
+      "conceptId": "KFU-COVER-V05",
+      "path": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills/cover-v2/kfu-cover-hi-yaah-og-1200x630-v1.png",
+      "sha256": "c1e0b3c2b750c514ca94b1525550e3241aafee683248a4cb07ee48071b0899c3",
+      "width": 1200,
+      "height": 630,
+      "wordpressUrl": "https://efeoncepro.com/wp-content/uploads/2026/07/agent-skills-hi-yaah-kung-fu-cover-v1.png",
+      "wordpressMediaId": 251552,
+      "supersedesMediaId": 251548,
+      "alt": "Figura marcial formada por código verde ejecuta una patada entre lluvia binaria y el grito «HI-YAAH!»."
+    },
+    "mobileCompatibilityFallback": {
+      "conceptId": "KFU-V02",
+      "reason": "La variante SVG trazada falló en un navegador móvil/in-app pese a responder 200 con MIME correcto. El PNG conserva el arte y elimina la dependencia del parser SVG del cliente.",
+      "path": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills/delivery/kfu-v02-tacit-knowledge-loop-mobile-fallback-v2.png",
+      "sha256": "63824c03c7df580ca263e809b8fc3393fe7bba65368957761fb5af08f17acbf0",
+      "width": 1000,
+      "height": 1500,
+      "wordpressMediaId": 251550,
+      "wordpressUrl": "https://efeoncepro.com/wp-content/uploads/2026/07/agent-skills-criterio-tacito-mobile-fallback-v2.png",
+      "qa": ".captures/i-know-kung-fu-mobile-image-v4/manifest.json"
+    },
+    "articleUpdated": true,
+    "publicationAuthorized": true,
+    "publishedAt": "2026-07-18T09:24:31Z",
+    "publicUrl": "https://efeoncepro.com/ai/i-know-kung-fu-agent-skills-momento-matrix-ia-empresarial/",
+    "liveVerification": "pass_after_approved_hi_yaah_cover"
+  }
+}

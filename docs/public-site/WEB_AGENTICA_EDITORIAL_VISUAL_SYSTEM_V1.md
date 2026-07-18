@@ -1,6 +1,6 @@
 # Sistema visual editorial — Web agéntica
 
-> **Estado:** producción visual v7 integrada en el borrador privado; publicación pendiente.
+> **Estado:** producción visual v7 integrada en el borrador privado; QA contextual v7 y publicación pendientes.
 > **Fecha:** 2026-07-18.
 > **Artículo:** borrador WordPress `249387`, `El fin de la web “solo para humanos”`.
 > **Manifest:** `WEB_AGENTICA_VISUAL_ASSET_MANIFEST_V1.json`.
@@ -119,6 +119,8 @@ arquetipo que mejor demuestra cada relación.
 El canon transversal y la auditoría de precedentes viven en
 `.codex/skills/content-marketing-studio/efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md` y
 `docs/audits/public-site/2026-07-18-efeonce-editorial-infographic-system.md`.
+El proceso reusable, SEO de SVG, accesibilidad compleja y estados por canal viven en
+`docs/operations/public-site-content-factory/EDITORIAL_INFOGRAPHIC_OPERATING_MODEL_V1.md`.
 
 ## Producción y QA
 
@@ -127,7 +129,14 @@ Antes de servir SVG directo se ejecuta
 `pnpm content:editorial-svg:audit -- <delivery.svg...>` y se resuelven texto vivo, filtros, referencias, clipping
 y dimensiones intrínsecas.
 El reporte reproducible vive en `ai-generations/2026-07-18_web-agentica-pillar/build-report-v3.json`. Las 28
-variantes pasan tres gates geométricos: ningún texto sale del canvas o invade el footer; ningún par de textos
-colisiona; ningún asset de marca vive fuera del footer. La entrega suma el auditor de SVG: `28/28 PASS`, cero
-texto vivo, gradientes y filtros. Media Library, siete `<picture>` y readback se completaron sobre el borrador
-`249387`; el pendiente restante es autorización humana de publicación y QA live posterior.
+variantes pasan tres gates geométricos en source: ningún texto sale del canvas o invade el footer; ningún par de
+textos colisiona; ningún asset de marca vive fuera del footer. La entrega suma el auditor de SVG: `28/28 PASS`,
+cero texto vivo, gradientes y filtros. Media Library y siete `<picture>` se completaron sobre el borrador
+`249387`.
+
+La auditoría posterior detectó que esos gates no prueban todavía tres cosas: geometría del **delivery** trazado,
+legibilidad proyectada al ancho CSS real ni CLS/currentSrc cuando mobile cambia aspect ratio. Con las unidades
+actuales, algunos tamaños mínimos proyectan por debajo de `16 CSS px`. Por eso el estado honesto es
+`integrated_private; contextual_v7_qa_pending`: antes de publicación hay que capturar las siete piezas v7 en
+desktop/mobile y tema real, medir tipo, contraste, `currentSrc`, `scrollWidth` y LayoutShift, y corregir el
+builder si falla. Los PNG sociales locales son pruebas efímeras, no derivados `social-ready` publicados.

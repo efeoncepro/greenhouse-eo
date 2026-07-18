@@ -94,3 +94,24 @@ serie, la siguiente iteración debe conservar el shell y reasignar cada argument
 - sello `efeoncepro.com` consumido desde Artifact Composer;
 - contrato, preset JSON y auditor automatizado compartidos por Codex/Claude;
 - producción privada y QA contextual antes de cualquier publicación.
+
+## Addendum v7 — 2026-07-18
+
+La auditoría anterior preserva el corte source inicial. La v7 posterior produjo siete conceptos × cuatro
+variantes (`28` delivery SVG), firma completa únicamente en footer y media IDs `251514–251541`. El auditor de
+archivo reportó `28/28 PASS`; la familia suma aproximadamente `5.67 MB` raw, `777 KB` gzip y `519 KB` Brotli.
+Una muestra CDN respondió `200`, `image/svg+xml`, `nosniff`, Brotli y cache anual, confirmando que SVG directo
+sigue siendo correcto para este body vectorial.
+
+La auditoría de cierre encontró deuda que el PASS de archivo no cubre:
+
+- el screenshot del builder inspecciona source, no delivery trazado;
+- la escala proyectada puede dejar texto bajo `16 CSS px` y notas bajo `12–14 CSS px` en columna real;
+- el fixture contextual vigente corresponde a visuales anteriores, no a las siete piezas v7;
+- el ratio mobile difiere del fallback desktop y requiere medición de `currentSrc`/LayoutShift;
+- ALT breve + caption debe complementarse con descripción larga equivalente para diagramas complejos;
+- manifest, build report y spec aún duplican metadata y no registran toda la toolchain/evidencia.
+
+Resultado: `integrated_private`, no `contextually_verified`. La publicación sigue bloqueada hasta QA v7 real.
+El canon detallado se promovió a
+`docs/operations/public-site-content-factory/EDITORIAL_INFOGRAPHIC_OPERATING_MODEL_V1.md`.

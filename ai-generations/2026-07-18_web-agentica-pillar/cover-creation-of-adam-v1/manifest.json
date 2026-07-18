@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-07-18_web-agentica-cover-creation-of-adam-v1",
+  "article": {
+    "slug": "el-fin-de-la-web-solo-para-humanos",
+    "sourceRef": "WordPress private draft 249387"
+  },
+  "visualSystem": {
+    "name": "Human / Agent / Interface",
+    "motif": "governed interval",
+    "invariants": [
+      "one level-one focal point",
+      "human and agent remain distinct",
+      "the interface mediates rather than decorates",
+      "white editorial field with Efeonce blue structure",
+      "one orange authorization accent",
+      "no generated text or logo"
+    ],
+    "forbidden": [
+      "black dominant canvas",
+      "AI as deity or savior",
+      "direct fresco recreation",
+      "fake product evidence",
+      "spark portal code or dashboard cliché"
+    ]
+  },
+  "generation": {
+    "provider": "OpenAI",
+    "tool": "imagegen",
+    "model": null,
+    "modelNote": "Runtime did not expose a model identifier; it is intentionally not inferred.",
+    "generatedAt": "2026-07-18",
+    "requestRefs": null
+  },
+  "concept": {
+    "conceptId": "WAG-V01",
+    "slot": "hero-featured",
+    "function": "Show that a human and an authorized software agent converge on the same web infrastructure.",
+    "notFunction": "Not a real interface, product screenshot, autonomous-agent proof or theological claim.",
+    "placement": {
+      "featured": true,
+      "body": false,
+      "og": true,
+      "card": true
+    }
+  },
+  "candidates": [
+    {"id":"WAG-V01-C01","file":"candidates/WAG-V01-C01-mediating-window.png","sha256":"fe637d0faf8163902f4f68648aa767507f26d1cbc7a1cf34981f15d71fcf6937","width":1672,"height":941,"status":"rejected","score":34},
+    {"id":"WAG-V01-C02","file":"candidates/WAG-V01-C02-contract-in-gap.png","sha256":"c8054b1e9583eb6a76a8bdc114f1cb3297ff9d734e6cccef40eba3760a7e354b","width":1672,"height":941,"status":"rejected","score":36},
+    {"id":"WAG-V01-C03","file":"candidates/WAG-V01-C03-interface-between-hands.png","sha256":"fa763e3b9e487fdead99ec11fab0b416bcb38fdf355cf97e98164a343fc82c42","width":1672,"height":941,"status":"superseded","score":42},
+    {"id":"WAG-V01-C04","file":"candidates/WAG-V01-C04-blue-sculptural-agent.png","sha256":"0a95393e1f5bacbc1f228647847a9277c4199943bbb69754f890fbc0ada3aedc","width":1672,"height":941,"status":"rejected","score":39},
+    {"id":"WAG-V01-C05","file":"candidates/WAG-V01-C05-refined-interface-between-hands.png","sha256":"cfb2675702535fb0a5aefee85ca62db337e93af726ebe7a6321d7f1e4c54a20a","width":1672,"height":941,"status":"superseded","score":43},
+    {"id":"WAG-V01-C06","file":"candidates/WAG-V01-C06-diagonal-web-contract.png","sha256":"56ac0a421ab78755e0e08ee83679a826cfd8cac0c19788356eb32c1c9d4a4a55","width":1672,"height":941,"status":"superseded","score":44},
+    {"id":"WAG-V01-C07","file":"candidates/WAG-V01-C07-blue-agent-premium.png","sha256":"31decd8386f0e5dfb28866899c237dbba46c5c3ce747f6d5b72618d8fe676b64","width":1672,"height":941,"status":"selected","score":46}
+  ],
+  "selectedMaster": {
+    "candidateId": "WAG-V01-C07",
+    "path": "exports/web-agentica-cover-human-agent-interface-master-v1.png",
+    "sha256": "31decd8386f0e5dfb28866899c237dbba46c5c3ce747f6d5b72618d8fe676b64",
+    "width": 1672,
+    "height": 941,
+    "mime": "image/png",
+    "colorSpace": "RGB/sRGB-intended"
+  },
+  "derivatives": [
+    {"role":"featured","path":"exports/web-agentica-cover-featured-1600x900-v1.webp","sha256":"c64e71b01a0abe9520d0f6161ac209f19b479e85afd90446ee251e6d55019830","width":1600,"height":900,"mime":"image/webp","bytes":null},
+    {"role":"open-graph","path":"exports/web-agentica-cover-og-1440x756-v1.jpg","sha256":"f5b4d1d6e03604f66db208d03a6113328d20471c821260c87d3092ef198d7ce4","width":1440,"height":756,"mime":"image/jpeg","bytes":null},
+    {"role":"card-square","path":"exports/web-agentica-cover-card-square-941-v1.webp","sha256":"7e27848cc2ba642065e9946b71c42fdcf0c09009b42cf5686812958f1de367c0","width":941,"height":941,"mime":"image/webp","bytes":null}
+  ],
+  "metadata": {
+    "alt": "Una mano humana y una mano robótica se aproximan a una interfaz web compartida desde lados opuestos.",
+    "caption": "La web deja de ser sólo una superficie: se convierte en un contrato común para personas y agentes autorizados.",
+    "description": "Ilustración conceptual WAG-V01. No representa un producto, una interfaz real ni una capacidad autónoma.",
+    "disclosure": "Conceptual generated illustration; not evidence or a real screenshot."
+  },
+  "rights": {
+    "sourceAssets": [],
+    "license": "generated",
+    "provenance": "OpenAI imagegen generation plus directed iterative editing; prompts stored verbatim in prompts/.",
+    "culturalReference": "Near-touching compositional tension associated with The Creation of Adam; no source image was used and no fresco, characters or religious iconography were reproduced."
+  },
+  "qa": {
+    "status": "selected; derivatives_ready; cms_not_integrated",
+    "reviewedAtOriginalResolution": true,
+    "cropProofs": ["proofs/WAG-V01-C07-og-proof.png", "proofs/WAG-V01-C07-square-proof.png"],
+    "findings": ["Conceptual interface must not be described as a real product.", "CMS upload/readback and live crop verification remain pending."]
+  },
+  "media": {
+    "featuredAttachmentId": null,
+    "ogAttachmentId": null,
+    "urls": null
+  }
+}

@@ -5,6 +5,10 @@
 > (1) niveles de volatilidad por tema, (2) fuentes canónicas, (3) protocolo de
 > refresh, (4) datos clave verificados con su fecha.
 
+> **Delta 2026-07-18:** API de Search Console, Platform Properties y mecanismos
+> de discovery/indexación verificados contra fuentes oficiales. Ver
+> `references/google-search-console-api-indexing.md`.
+
 ## 1. Niveles de volatilidad (qué reverificar y cada cuánto)
 
 | Nivel | Significado | Ejemplos | Reverificar |
@@ -21,6 +25,9 @@ memoria en un entregable.
 **Oficiales / primarias (máxima confianza):**
 - Google Search Central (`developers.google.com/search`) — docs + "AI features"
   + "AI optimization guide" + Core Web Vitals.
+- Search Console Help + API (`support.google.com/webmasters` y
+  `developers.google.com/webmaster-tools`) — propiedades, Search Analytics, URL
+  Inspection y sitemaps. Platform Properties y su paridad API son 🔴 volátiles.
 - Google Search Status Dashboard — ranking updates confirmados.
 - Search Quality Rater Guidelines (PDF oficial) — E-E-A-T.
 - `web.dev` / Chrome — Core Web Vitals, CrUX.
@@ -45,6 +52,8 @@ memoria en un entregable.
 3. Al detectar un cambio material, actualiza el módulo + el sello `as-of` + esta
    lista de datos clave. Registra qué cambió.
 4. Mantén el GLOSSARY al día cuando aparezcan/mueran términos (p.ej. SGE → AIO).
+5. Para GSC/API, reverifica scopes, endpoints y Platform Properties antes de
+   cada implementación; la disponibilidad en UI no implica paridad API.
 
 ## 4. Datos clave verificados (as-of 2026-06, con fuente)
 

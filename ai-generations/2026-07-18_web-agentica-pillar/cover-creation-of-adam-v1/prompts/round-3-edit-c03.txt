@@ -1,0 +1,9 @@
+Edit the provided image with surgical restraint. Preserve the pure white background, exact 16:9 composition, human hand, central window position, near-touching gesture, scale, lighting and generous negative space.
+
+Change only these items:
+1. Refine the robotic hand so it is about 15 percent slimmer and less bulky, with elegant industrial proportions and mechanically plausible five-finger articulation. Keep white satin ceramic outer shells, but replace the bright cobalt/chrome internals with restrained deep Efeonce blue anodized joints and fine ink-blue structural details. Reduce visible screws and visual clutter. It must remain unmistakably robotic, premium and non-threatening, never a toy or stock humanoid robot.
+2. Remove the two circular traffic-light-like controls from the top-left of the central window. Replace them with one clean abstract horizontal browser groove; no literal macOS controls.
+3. Make the window face slightly more frontal and its vertical edges perfectly straight while preserving its size. Keep the existing two aligned warm/cool interface readings and the tiny orange confirmation mark. Do not introduce text, code, dashboard charts or extra UI widgets.
+4. Reduce the broad ground shadows beneath both hands; keep only soft, short blue-gray contact shadows so the image feels editorial rather than like an ecommerce product render.
+
+Do not alter the human anatomy, skin tone or pose. No black background, no text, no logo, no glow, no spark, no religious imagery, no extra fingers, no new objects.

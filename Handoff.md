@@ -1,3 +1,25 @@
+## Sesión 2026-07-18 — Artículo Agent Skills publicado y verificado
+
+> El post WordPress `250748`, `«I Know Kung Fu»: el momento Matrix de los Agent Skills`, pasó revisión final de
+> voz/copy, claims y SEO y fue publicado con autorización explícita. Se integraron tres infografías de cuerpo con
+> art direction desktop/mobile, featured/OG PNG `1200×630`, metadescripción, focus keyphrase y metadata social.
+> QA live: `200` anónimo, canonical único, `index, follow`, schema Article/Person, sitemap Yoast con `lastmod`
+> `2026-07-18T09:24:31+00:00`, nueve fuentes `200`, slug WP único, candidato Think `404`, caché Kinsta purgada y
+> media sin issues. URL: `https://efeoncepro.com/ai/i-know-kung-fu-agent-skills-momento-matrix-ia-empresarial/`.
+> Evidencia: `docs/operations/public-site-content-factory/post-deep-inspection-250748-2026-07-18T09-28-56+00-00.json`.
+> Corrección post-publicación: KFU-V02 falló como SVG en un navegador móvil/in-app. El `<picture>` ahora sirve
+> PNG `1000×1500` sólo bajo `600px`; SVG source/desktop se conservan. QA live Pixel/Chrome emulado: `currentSrc`
+> PNG, `naturalWidth=1000`, `naturalHeight=1500`, sin overflow; captura en
+> `.captures/i-know-kung-fu-mobile-image-v4/mobile-figure.png`. Snapshot de rollback remoto:
+> `/tmp/greenhouse-post-250748-before-mobile-image-fix-v4-20260718-101226.json`. Readback final:
+> `docs/operations/public-site-content-factory/post-deep-inspection-250748-2026-07-18T10-15-21+00-00.json`.
+> Portada aprobada aplicada después de publicar: PNG `1200×630` con estética de lluvia binaria, figura marcial y
+> texto exacto `HI-YAAH!`; media WordPress `251552`. Es ahora featured image, Open Graph, Twitter y
+> `primaryImage` del schema. Caché Kinsta purgada y verificación anónima `200` sin regresiones de contenido/SEO.
+> Snapshot previo: `/tmp/greenhouse-post-250748-before-cover-v5-20260718-102200.json`; rollback preparado en
+> `tmp/rollback-i-know-kung-fu-cover-v5.php`. Readback final sin media issues:
+> `docs/operations/public-site-content-factory/post-deep-inspection-250748-2026-07-18T10-27-46+00-00.json`.
+
 ## Sesión 2026-07-18 — Sistema escalable de infografías editoriales Efeonce
 
 > Auditados siete SVG históricos de Marketing con Manzanitas, el sello URL de Artifact Composer, cuatro familias
@@ -38928,3 +38950,15 @@ El operador confirmó que el key visual 4K original ya contenía el `ON AIR` int
 > Snapshot previo a v7: `/tmp/gh-post-249387-before-web-agentica-v7-20260718.json` (`aa59a43c…8d1f`). Inspección durable: `docs/operations/public-site-content-factory/post-deep-inspection-249387-2026-07-18T09-17-50+00-00.json`. Brief: `docs/public-site/WEB_AGENTICA_PILLAR_CLUSTER_BRIEF_V1.md`; spec vigente: `docs/public-site/WEB_AGENTICA_PILLAR_GUTENBERG_SPEC_V5.json`. El enlace recíproco preparado no se ejecutó y `gh_cta_clicked` no se instrumentó ad hoc.
 >
 > Cierre real pendiente: autorización humana explícita para publicar, aplicar el enlace recíproco con su guard, purgar cache y ejecutar QA live desktop/mobile. No declarar publicada antes de ese gate.
+
+### Addendum — canon de infografías y corrección del estado v7
+
+- Se creó `EDITORIAL_INFOGRAPHIC_OPERATING_MODEL_V1.md`, documentación funcional y manual, y se sincronizaron
+  las skills Content Marketing/Design/SEO/WordPress. El contrato separa body SVG, featured, OG y social; fija
+  footer-only para body Efeonce; incorpora SEO `<img src>`, ALT + descripción larga, CSS px, CLS y estados por canal.
+- Auditoría independiente detectó que el builder captura source y no delivery, y que la escala proyectada puede
+  dejar tipografía bajo los mínimos al ancho real. El fixture contextual existente no cubre las siete v7.
+- Corrección de estado: Media/readback de archivo permanece válido, pero `themesReviewed/responsiveReviewed` no
+  pueden considerarse cerrados para v7. Estado honesto: `integrated_private; contextual_v7_qa_pending`.
+- Antes de publicar: QA de siete conceptos en desktop/mobile y tema real, `currentSrc`, contraste, CSS px,
+  `scrollWidth`, LayoutShift y descripción larga; luego autorización humana, write, purge y QA live.

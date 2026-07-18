@@ -1,0 +1,14 @@
+Edit the provided selected image with surgical restraint. Preserve the exact 16:9 composition, human hand and anatomy, blue robotic hand and mechanics, fingertip positions, diagonal near-touching gesture, scale and abundant negative space. Do not move or redesign either hand.
+
+Upgrade the central web window and background only:
+
+1. Replace the generic rectangle-block interface with one distinctive premium browser-inspired web surface, still landscape and in the exact same position and size. Use a refined thin deep-navy frame, subtly rounded corners and a minimal abstract top rail with no literal Apple traffic lights or brand chrome.
+2. Make the window itself communicate the article thesis through a physical cutaway, not a dashboard:
+   - The left/front human-facing layer is a sophisticated editorial webpage: one strong visual canvas, a clear content hierarchy, a restrained navigation rail and one obvious interaction control, all abstract and text-free.
+   - The right/back agent-facing layer is revealed as a translucent architectural layer aligned exactly to the visible page: semantic regions, one bounded action rail, permission boundary, confirmation state and a short evidence trail. Use precise outlines and five small ordered states rather than boxes, charts, nodes or code.
+   - At the seam, one small Efeonce-orange authorization control connects both layers. It must feel functional and intentional, not decorative.
+   - Add subtle physical depth between the two aligned layers, like a museum-grade acrylic cutaway, while keeping all edges crisp and plausible.
+3. Replace the flat white field with a restrained Efeonce editorial gradient: warm white remains dominant around the human hand and behind the window; the upper-right and far-right transition through pale active blue into deep navy blue, never black. Add a very soft navy-to-blue atmospheric sweep behind the robotic hand so its silhouette remains separated with a fine pale rim. Keep the lower center light and preserve generous breathing room.
+4. Maintain tactile uncoated-paper grain across the field and soft short shadows. The finish must feel like an international strategy magazine cover, not SaaS marketing or a device advertisement.
+
+No readable text, letters, numbers, logos, watermark, browser brand, dashboard, charts, floating code, network nodes, neon glow, black background, spark, portal, extra objects or altered fingers.

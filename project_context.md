@@ -1,5 +1,12 @@
 ## Estado vigente para agentes
 
+- **Search Console API e indexación (investigación 2026-07-18):** la API de URL Inspection sólo observa la
+  versión conocida por el índice; no hace live test ni solicita indexación. El sitemap ping legado devuelve
+  `404`; Indexing API no aplica a páginas genéricas. Platform Properties cubre Instagram, TikTok, X y YouTube en
+  la UI, pero su paridad API no está documentada y exige canary live. Canon load-on-demand:
+  `.codex/skills/seo-aeo/references/google-search-console-api-indexing.md`. Greenhouse conserva
+  `webmasters.readonly`; `TASK-1426` sigue siendo trabajo pendiente, no capability desplegada.
+
 - **Gate ejecutable de entrega visual editorial (2026-07-17):** todo `conceptId` producido por
   `content-marketing-studio` debe declarar un `explanatoryDelta` y un `deliveryContract` con `viewport`
   (`art_directed|single_composition|crop_safe`), `theme` (`light_dark|single_theme`), `canvas`
@@ -6437,3 +6444,14 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - La producción `ai-generations/2026-07-11_glitch-microphone-intro/` queda congelada sin master: el 4K canónico ya muestra contacto y señal, pero el brief exigía hover inicial y señal sólo tras un segundo tap.
 - Regla reusable: antes de generar image-to-video, validar `estado visible del source ↔ estado requerido al frame 0`; usar preflight del producto, asignar roles explícitos a referencias y no resolver contradicciones visuales con prompts. Máximo dos fallos equivalentes por arquitectura.
 - Auditoría canónica: `ai-generations/2026-07-11_glitch-microphone-intro/review/source-state-and-creative-video-workflow-audit.md`.
+
+## Delta 2026-07-18 — Infografías editoriales Efeonce tienen canon operativo reusable
+
+- Canon técnico: `docs/operations/public-site-content-factory/EDITORIAL_INFOGRAPHIC_OPERATING_MODEL_V1.md`;
+  funcional: `docs/documentation/public-site/editorial-infographic-system.md`; manual:
+  `docs/manual-de-uso/public-site/producir-infografias-editoriales.md`.
+- Body Efeonce usa shell estable y composición semántica variable; toda marca vive en el footer. SVG directo es
+  válido cuando pasa seguridad, entrega, SEO y legibilidad; featured/OG/social conserva raster propio.
+- `file_pass`, `integrated`, `contextually_verified`, `social_ready` e `indexed` son estados separados.
+- El post privado Web Agéntica `249387` mantiene 28 SVG v7 integrados, pero requiere QA contextual v7 de delivery,
+  CSS px, `currentSrc`, descripción larga y CLS antes de publicación.

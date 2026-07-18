@@ -165,6 +165,20 @@ Separar source editable y delivery portable. El delivery debe tener `viewBox`, d
 scripts/event handlers/`foreignObject`, cero referencias remotas y fuentes controladas. Convertir texto a
 contornos cuando la fidelidad tipográfica sea crítica. Conservar ALT/caption en HTML cuando se sirve con `<img>`.
 
+### Contrato SEO/accesible de SVG externo
+
+- Google admite SVG descubierto mediante `<img src>`, incluido el fallback de un `<picture>`.
+- Mantener un único `<img src>` real, filename descriptivo, dimensiones y ALT; no sustituirlo por CSS background.
+- El texto trazado a paths no es texto HTML indexable. La tesis, datos y límites materiales deben existir en
+  caption, copy cercano o una descripción larga visible/enlazada.
+- Una infografía compleja usa ALT breve + alternativa larga equivalente (`longDescriptionRef` o contenido
+  estructurado adyacente); no intentar volcar el diagrama completo dentro del ALT.
+- Verificar GET `200`, MIME, crawlability, cache/compresión y selección real de `currentSrc`.
+- Mantener raster dedicado para featured, OG/Twitter y canales con soporte SVG inconsistente.
+- Indexación es asíncrona; el gate de publicación prueba rastreabilidad, no presencia garantizada en Google.
+
+Contrato ampliado: `.codex/skills/seo-aeo/references/editorial-image-seo.md`.
+
 ### Vía raster
 
 Crear cada WebP directamente desde su PNG master, nunca desde otro WebP. Ejemplo cuando `cwebp` está disponible:
@@ -214,6 +228,8 @@ Inspeccionar el master o derivado final al ancho real de la columna:
 - convivencia con caption, tema y chrome del sitio;
 - selección correcta de viewport y tema;
 - ALT/caption presentes en el DOM después de integrar.
+- tamaño proyectado del texto en CSS px; esencial `>=16`, notas `>=12–14` según contraste;
+- `currentSrc`, ratio reservado y LayoutShift en mobile cuando los `<source>` cambian dimensiones.
 
 La previsualización no sustituye al delivery. Si una preview incrusta un SVG con assets locales, verificar que el
 browser realmente los cargó. Para validar firma y compresión, montar el SVG/PNG/WebP final. Una
@@ -231,6 +247,7 @@ Registrar por variante:
 - comparación de peso y rationale de formato;
 - relación viewport/tema;
 - ALT, caption y descripción;
+- filename, `longDescriptionRef` y superficie canónica del asset;
 - activos de marca y licencia/provenance;
 - estado de QA y hallazgos;
 - Media ID/URL sólo después del upload y readback reales.

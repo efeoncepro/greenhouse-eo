@@ -26,7 +26,7 @@ Hallazgos visuales:
 - formas vectoriales planas, bordes limpios, jerarquía tipográfica fuerte y poca ornamentación;
 - una metáfora distinta para cada relación: árbol, red, círculos, rueda, loop o recorrido infinito;
 - copy reducido al mínimo necesario para navegar la pieza;
-- marca y URL como chrome estable, sin competir con el contenido;
+- firma de marca estable y confinada al footer, sin competir con el contenido;
 - el valor visual está en el **encoding de la relación**, no en una grilla repetida de cards.
 
 Los precedentes son evidencia de sistema, no archivos para copiar literalmente. La ejecución nueva debe conservar
@@ -65,13 +65,17 @@ deben remapearse con contraste comprobado; no agregar blobs o fondos decorativos
 
 Toda infografía editorial debe resolver:
 
-1. **eyebrow o dominio** opcional;
+1. **kicker editorial** opcional;
 2. **título autónomo**, entendible fuera del artículo;
 3. **bajada** solo cuando agrega el marco necesario;
 4. **cuerpo semántico** elegido por la relación;
 5. **fuente/nota/límite** si hay evidencia o dato;
-6. **firma Efeonce** discreta;
-7. **sello URL oficial `efeoncepro.com`**.
+6. **footer izquierdo:** fuente, nota, límite y fecha/as-of cuando aplica;
+7. **footer derecho:** wordmark oficial + sello URL `efeoncepro.com`.
+
+En infografías de cuerpo, esta ubicación es obligatoria: el header sólo contiene kicker, título y bajada. No
+se admite wordmark, dominio, sello ni watermark en el header, las esquinas superiores o el campo explicativo.
+Hero, featured, OG, social y deck son superficies diferentes y declaran su propia política de firma.
 
 El sello canónico vive en:
 
@@ -84,6 +88,9 @@ Su tratamiento de referencia vive en:
 Para una entrega SVG autónoma, consumir esa geometría durante el build e incrustarla en el SVG final. No enlazarla
 como recurso remoto, no redibujarla y no mutar el source. Resolver su fill/opacidad por canvas. El viejo sello
 `efeonce.cl` no se mantiene en piezas nuevas.
+
+Wordmarks públicos oficiales: `public/branding/logo-full.svg` en light y
+`public/branding/logo-negative.svg` en dark. `AxisWordmark` es interno y no se usa en piezas públicas.
 
 ### Cuerpo variable: elegir por relación
 
@@ -108,12 +115,14 @@ Semrush funciona como referencia de categoría porque trata la infografía como 
 - título grande y promesa legible sin el artículo;
 - navegación visual clara mediante números, recorridos o nodos;
 - una gran forma organizadora en vez de una colección de módulos equivalentes;
-- marca y URL constantes en cabecera o footer;
+- marca y URL constantes en cabecera o footer dentro de sus ejemplos;
 - composiciones altas cuando el relato necesita recorrido;
 - copy breve pero suficiente para que el asset circule solo.
 
 Adoptar el **principio de sistema** —chrome constante + arquetipo variable + lectura autónoma—, no su trade dress,
-paleta, ilustraciones ni layouts literales. Fuentes primarias de benchmark, verificadas en 2026-07:
+paleta, ilustraciones ni layouts literales. La cabecera observada en Semrush no modifica la regla Efeonce:
+en infografías de cuerpo, la firma completa permanece únicamente en el footer. Fuentes primarias de benchmark,
+verificadas en 2026-07:
 
 - `https://www.semrush.com/blog/infographic-examples/`
 - `https://www.semrush.com/blog/content-marketing-tips/`
@@ -131,6 +140,10 @@ Una infografía está lista para compartir solo si pasa estos tests:
 - **recorte:** conserva identidad y tesis en thumbnail/social cuando el destino lo requiere;
 - **atribución:** la firma permanece visible pero no parece un anuncio;
 - **citabilidad:** datos, definiciones y límites tienen fuente o nota cuando corresponde.
+
+`body-ready` y `social-ready` son estados distintos. Un destino compartible declara ratio, safe area, tamaño
+mínimo de tipo al thumbnail, crop/preview y archivo durable con lineage. Un PNG local de revisión no es un
+derivado social publicado.
 
 No llenar la pieza para que “se sienta premium”. Premium es edición, precisión, aire, consistencia óptica y una
 metáfora inevitable para el argumento.
@@ -182,6 +195,17 @@ Crear PNG/WebP/JPEG/AVIF solo cuando:
 
 No rasterizar por costumbre. Registrar bytes comparables al ancho real y elegir por evidencia.
 
+### SEO y descubrimiento del SVG
+
+Google admite SVG cuando existe en un `<img src>`. Un `<picture>` conserva un único `<img>` fallback estable;
+las variantes de tema/viewport son art direction, no cuatro URLs que deban competir por indexación. El texto
+convertido a paths fija la apariencia, pero no reemplaza contenido HTML indexable. Filename, ALT, caption,
+descripción larga/texto cercano y la página canónica llevan la semántica.
+
+Verificar GET `200`, `Content-Type: image/svg+xml`, dimensiones, crawlability y robots. Mantener
+featured/OG/Twitter como raster social-safe. Ver
+`.codex/skills/seo-aeo/references/editorial-image-seo.md`.
+
 ## 7. Light, dark y responsive
 
 - Si una composición funciona sobre canvas blanco deliberado, puede mantenerse como póster blanco en ambos temas.
@@ -189,7 +213,8 @@ No rasterizar por costumbre. Registrar bytes comparables al ancho real y elegir 
   mecanismo gobernado del runtime; no confiar en filtros CSS.
 - Para ratios diferentes, crear SVGs art-directed separados. No encoger un póster horizontal hasta volver
   ilegible su copy.
-- Texto esencial: mínimo visual equivalente a 16 px en la columna real; notas, 12–14 px según contraste.
+- Texto esencial: mínimo visual equivalente a 16 CSS px en la columna real; notas, 12–14 CSS px según contraste.
+- Calcular `fontSizeSVG × anchoCSS / viewBoxWidth`; las dimensiones de exportación no prueban legibilidad.
 - Todo label debe quedar dentro del `viewBox` y de su safe area; medir bounding boxes, no aprobar “a ojo”.
 
 ## 8. Flujo repetible
@@ -215,6 +240,7 @@ No rasterizar por costumbre. Registrar bytes comparables al ancho real y elegir 
 | SVG | hay contenido inseguro, referencias externas, clipping o ausencia de `viewBox` |
 | tipografía | hay overflow, labels minúsculos o dependencia de fuente no controlada |
 | performance | se eligió formato sin comparar bytes y uso real |
-| accesibilidad | falta ALT/caption/desc según modo de integración |
+| accesibilidad | falta ALT/caption/alternativa larga según complejidad y modo de integración |
+| SEO | falta `<img src>` fallback, filename descriptivo, contexto HTML, MIME/GET o crawlability |
 | contexto | falla en columna, mobile, dark/light o thumbnail requerido |
 | trazabilidad | no existen source, delivery, hashes, contrato y manifest |
