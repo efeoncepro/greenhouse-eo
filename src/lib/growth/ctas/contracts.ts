@@ -54,12 +54,80 @@ export const CTA_SURFACE_STATUSES = ['active', 'paused', 'archived'] as const
 export type CtaSurfaceStatus = (typeof CTA_SURFACE_STATUSES)[number]
 
 /**
- * Acciones soportadas en esta rebanada vertical (arch §12/§18): SOLO `open_growth_form`.
- * `embed_growth_form`/`download_asset`/`book_meeting`/`hubspot_handoff`/etc. llegan por
- * tasks futuras — extender este enum + el action router juntos.
+ * Acciones soportadas (arch §12 + amendment 2026-07-18, TASK-1431): registry tipado
+ * con `open_growth_form` + navegación gobernada. `download_asset`/`embed_growth_form`/
+ * `hubspot_handoff` siguen siendo kinds de arquitectura pero gradúan como adapters
+ * demand-driven — extender este enum + `action-registry.ts` + el espejo del renderer
+ * JUNTOS (un kind sin entry registrado no publica ni renderiza: fail-closed).
  */
 export const CTA_ACTION_KINDS = ['open_growth_form'] as const
 export type CtaActionKind = (typeof CTA_ACTION_KINDS)[number]
+
+// ─── Action registry — metadata browser-safe/read-only por kind (TASK-1431) ────
+
+/**
+ * Familia de ejecución del executor portable: `growth_form` monta el form gobernado
+ * in-place; `navigate` es navegación real del browser (anchor nativo). El renderer
+ * dispatchea SOLO por familia — nunca lógica por-kind duplicada en cada consumer.
+ */
+export const CTA_ACTION_EXECUTION_FAMILIES = ['growth_form', 'navigate'] as const
+export type CtaActionExecutionFamily = (typeof CTA_ACTION_EXECUTION_FAMILIES)[number]
+
+/** Expectativa de destino (expectation integrity: el label debe coincidir con esto). */
+export const CTA_ACTION_DESTINATION_EXPECTATIONS = ['form', 'internal_page', 'think_tool', 'booking_page'] as const
+export type CtaActionDestinationExpectation = (typeof CTA_ACTION_DESTINATION_EXPECTATIONS)[number]
+
+/** Política de contexto de navegación. Default seguro: mismo contexto; `new_context_allowed` solo habilita el opt-in del autor, nunca lo impone. */
+export const CTA_ACTION_NAVIGATION_CONTEXTS = ['same_context', 'new_context_allowed'] as const
+export type CtaActionNavigationContext = (typeof CTA_ACTION_NAVIGATION_CONTEXTS)[number]
+
+/** Taxonomía canónica de fallo de resolución (task §Security; sin raw error ni URL cruda). */
+export const CTA_ACTION_FAILURE_REASONS = [
+  'action_policy_invalid',
+  'action_kind_unsupported',
+  'action_destination_invalid',
+  'action_destination_unavailable',
+] as const
+export type CtaActionFailureReason = (typeof CTA_ACTION_FAILURE_REASONS)[number]
+
+/**
+ * Metadata read-only por action kind, browser-safe: la consumen cockpit (TASK-1430),
+ * preview, tests de parity y el executor SIN importar resolvers server-only. NUNCA
+ * contiene appearance/placement/density/copy final/asset (eso es del CTA Experience
+ * System + contenido gobernado) ni policy interna/destination mapping.
+ */
+export interface CtaActionKindMetadata {
+  kind: CtaActionKind
+  executionFamily: CtaActionExecutionFamily
+  destinationExpectation: CtaActionDestinationExpectation
+  navigationContext: CtaActionNavigationContext
+  /** Derivado del adapter (¿continúa in-place dentro del shell?), no de la campaña. */
+  supportsInlineContinuation: boolean
+  /** Campos de policy requeridos para authoring programático (cockpit/Nexa/CLI). */
+  requiredPolicyFields: readonly string[]
+  /** Subconjunto de la taxonomía que este kind puede emitir al fallar la resolución. */
+  failureReasons: readonly CtaActionFailureReason[]
+  /** Valor allowlisted que viaja como `action_kind` en telemetría (jamás URL completa). */
+  telemetryKind: CtaActionKind
+}
+
+export const CTA_ACTION_KIND_METADATA: Readonly<Record<CtaActionKind, CtaActionKindMetadata>> = {
+  open_growth_form: {
+    kind: 'open_growth_form',
+    executionFamily: 'growth_form',
+    destinationExpectation: 'form',
+    navigationContext: 'same_context',
+    supportsInlineContinuation: true,
+    requiredPolicyFields: ['formRef'],
+    failureReasons: ['action_policy_invalid', 'action_destination_unavailable'],
+    telemetryKind: 'open_growth_form',
+  },
+}
+
+/** Espejo browser-safe kind→familia para el executor (parity test contra la metadata). */
+export const CTA_ACTION_KIND_FAMILIES: Readonly<Record<CtaActionKind, CtaActionExecutionFamily>> = {
+  open_growth_form: 'growth_form',
+}
 
 /** Tier A — evidencia de conversión audit-grade (arch §9.4). Exposición (eligible/suppressed/viewed) es Tier B, FUERA de este ledger. */
 export const CTA_EVENT_KINDS = [
@@ -97,11 +165,19 @@ export type CtaConsentState = (typeof CTA_CONSENT_STATES)[number]
 
 // ─── Server-side policies (persisten en cta_version; NUNCA cruzan al browser) ──
 
-/** Política de acción (server). `formRef` = slug o form_key del Growth Form; el CTA guarda SOLO la relación (arch §12: nunca copia schema/validación/consent). */
-export const ctaActionPolicySchema = z.object({
-  kind: z.enum(CTA_ACTION_KINDS),
+/** Policy `open_growth_form` (server). `formRef` = slug o form_key del Growth Form; el CTA guarda SOLO la relación (arch §12: nunca copia schema/validación/consent). */
+export const ctaOpenGrowthFormPolicySchema = z.object({
+  kind: z.literal('open_growth_form'),
   formRef: z.string().min(1).max(200),
 })
+export type CtaOpenGrowthFormPolicy = z.infer<typeof ctaOpenGrowthFormPolicySchema>
+
+/**
+ * Unión discriminada de action policies (TASK-1431). El shape por kind vive junto a
+ * su entry del registry (`action-registry.ts` = SoT de validación server-side); esta
+ * unión existe para tipado/authoring. NUNCA cruza al browser.
+ */
+export const ctaActionPolicySchema = z.discriminatedUnion('kind', [ctaOpenGrowthFormPolicySchema])
 export type CtaActionPolicy = z.infer<typeof ctaActionPolicySchema>
 
 /**
@@ -221,12 +297,20 @@ export type CtaContent = z.infer<typeof ctaContentSchema>
 
 // ─── Render contract — LO ÚNICO que cruza al browser (arch §9.2/§16) ───────────
 
-/** Acción ya resuelta server-side: refs browser-safe del form (slug + key estable). */
-export const ctaRenderActionSchema = z.object({
+/** Acción `open_growth_form` ya resuelta server-side: refs browser-safe del form (slug + key estable). */
+export const ctaRenderOpenGrowthFormActionSchema = z.object({
   kind: z.literal('open_growth_form'),
   formSlug: z.string().min(1),
   formKey: z.string().optional(),
 })
+export type CtaRenderOpenGrowthFormAction = z.infer<typeof ctaRenderOpenGrowthFormActionSchema>
+
+/**
+ * Unión discriminada de acciones YA resueltas (TASK-1431) — LO ÚNICO que cruza al
+ * browser sobre la acción: kind + refs/href allowlisted + hints mínimos. Nunca la
+ * policy, el destination mapping ni el candidate set.
+ */
+export const ctaRenderActionSchema = z.discriminatedUnion('kind', [ctaRenderOpenGrowthFormActionSchema])
 export type CtaRenderAction = z.infer<typeof ctaRenderActionSchema>
 
 export const ctaRenderContractSchema = z.object({

@@ -6,6 +6,7 @@
 export * from './contracts'
 export * from './flags'
 export * from './arbiter'
+export * from './action-registry'
 export * from './action-router'
 export * from './render-contract'
 export * from './ingest'
