@@ -362,6 +362,15 @@ export type CtaExposureKind = (typeof CTA_EXPOSURE_KINDS)[number]
 export const CTA_EXPOSURE_DECISION_SOURCES = ['server', 'browser'] as const
 export type CtaExposureDecisionSource = (typeof CTA_EXPOSURE_DECISION_SOURCES)[number]
 
+/**
+ * TASK-1430 — predicado canónico de binding surface↔CTA: una surface admite un
+ * slug si su allowlist está vacía (admite todos) o lo incluye. Misma regla que
+ * aplica el store en `listPublishedCandidates` (allowlist vacía ⇒ sin filtro);
+ * el cockpit lo consume para mostrar bindings sin duplicar la regla inline.
+ */
+export const surfaceAllowsCtaSlug = (allowedSlugs: readonly string[], slug: string): boolean =>
+  allowedSlugs.length === 0 || allowedSlugs.includes(slug)
+
 // ─── Kill switch (TASK-1428, arch §16.3) ───────────────────────────────────────
 
 export const CTA_KILL_SWITCH_SCOPES = ['global', 'surface'] as const

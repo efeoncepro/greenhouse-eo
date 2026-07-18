@@ -257,11 +257,20 @@ export interface CtaSummaryVm {
   latestVersionId: string | null
   latestVersionStatus: string | null
   publishedVersionId: string | null
+  /** TASK-1430: ejes de la última versión para inventario del cockpit (filtros/íconos). */
+  latestPlacement: string | null
+  latestStyleVariant: string | null
+  latestActionKind: string | null
 }
 
 const toSummaryVm = (definition: CtaDefinitionRow, versions: CtaVersionRow[]): CtaSummaryVm => {
   const latest = versions[0] ?? null
   const published = versions.find(version => version.status === 'published') ?? null
+
+  const actionPolicy =
+    latest?.action_policy_json && typeof latest.action_policy_json === 'object'
+      ? (latest.action_policy_json as Record<string, unknown>)
+      : null
 
   return {
     ctaId: definition.cta_id,
@@ -276,6 +285,9 @@ const toSummaryVm = (definition: CtaDefinitionRow, versions: CtaVersionRow[]): C
     latestVersionId: latest?.cta_version_id ?? null,
     latestVersionStatus: latest?.status ?? null,
     publishedVersionId: published?.cta_version_id ?? null,
+    latestPlacement: latest?.placement ?? null,
+    latestStyleVariant: latest?.style_variant ?? null,
+    latestActionKind: typeof actionPolicy?.kind === 'string' ? actionPolicy.kind : null,
   }
 }
 
@@ -302,7 +314,10 @@ export interface CtaVersionVm {
   content: unknown
   actionPolicy: unknown
   targetingPolicy: unknown
+  /** TASK-1430: la postura de supresión autorada viaja al cockpit (editar = versión nueva la preserva). */
+  suppressionPolicy: unknown
   priorityPolicy: unknown
+  visualAssetRef: string | null
   publishedAt: Date | null
   createdAt: Date
 }
@@ -460,7 +475,9 @@ export const getCtaDetailAdmin = async (ctaId: string): Promise<CtaDetailVm | nu
       content: version.content_json,
       actionPolicy: version.action_policy_json,
       targetingPolicy: version.targeting_policy_json,
+      suppressionPolicy: version.suppression_policy_json,
       priorityPolicy: version.priority_policy_json,
+      visualAssetRef: version.visual_asset_ref,
       publishedAt: version.published_at,
       createdAt: version.created_at,
     })),

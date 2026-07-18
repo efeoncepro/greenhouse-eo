@@ -99,6 +99,7 @@ const CompositionShell = ({
   morphStrategy = 'viewTransition',
   onTelemetry,
   telemetrySource,
+  splitTemplateColumns,
   className
 }: CompositionShellProps) => {
   const theme = useTheme()
@@ -295,10 +296,11 @@ const CompositionShell = ({
           // empujaría el scrollWidth de página (clase ISSUE-015). Desde sm vuelve a 2 columnas.
           // Data-driven por composición (split: primary ancho + aside angosto; masterDetail: nav angosto +
           // detail ancho). Complementario al colapso a drawer del size-class compact (drawerRegion).
-          gridTemplateColumns: config.splitTemplateColumns ?? {
-            xs: '1fr',
-            sm: 'minmax(0, 1fr) clamp(320px, 32%, 480px)'
-          },
+          gridTemplateColumns: splitTemplateColumns ??
+            config.splitTemplateColumns ?? {
+              xs: '1fr',
+              sm: 'minmax(0, 1fr) clamp(320px, 32%, 480px)'
+            },
           alignItems: 'start',
           '& > *': { minInlineSize: 0 }
         }}

@@ -1,503 +1,549 @@
 'use client'
 
 /**
- * TASK-1340 — Vista de gobernanza del motor de CTAs (`/growth/ctas`, menú Growth).
- * Wireframe: docs/ui/wireframes/TASK-1340-growth-ctas-governance.md.
+ * TASK-1430 — Cockpit operator de CTAs (`/growth/ctas`): inventario master +
+ * detalle contextual + autoría gobernada + kill switches + resultados, sobre
+ * los readers/commands canónicos (Full API Parity — esta vista es un consumer
+ * más del primitive `growth.cta`; cero regla de negocio local).
  *
- * Consumer del primitive `growth.cta` (Full API Parity): lee los VMs que el page
- * server resolvió con los readers canónicos y ejecuta lifecycle vía la API admin
- * (que re-valida capability fina + flag). El preview monta el CORE del renderer
- * portable con fixtures deterministas (cero red) — mismo contrato que el público.
+ * Evolución de la vista TASK-1340. Autoridad visual: proyecto Claude Design
+ * "Cockpit de CTAs" (instrucción del operador 2026-07-18) con tokens del theme.
+ * Wireframe: docs/ui/wireframes/TASK-1430-growth-cta-authoring-reporting-cockpit.md
  */
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+
+import { useRouter } from 'next/navigation'
 
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
-import CardHeader from '@mui/material/CardHeader'
 import Chip from '@mui/material/Chip'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
-import Divider from '@mui/material/Divider'
 import Snackbar from '@mui/material/Snackbar'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
-import Tooltip from '@mui/material/Tooltip'
 import Stack from '@mui/material/Stack'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
+import { alpha } from '@mui/material/styles'
 
+import CustomTextField from '@core/components/mui/TextField'
+import ConfirmDialog from '@/components/dialogs/ConfirmDialog'
 import EmptyState from '@/components/greenhouse/EmptyState'
+import { CompositionShell, GreenhouseBreadcrumbs } from '@/components/greenhouse/primitives'
 import { GH_GROWTH_CTA_OPERATOR } from '@/lib/copy/growth'
 import { throwIfNotOk } from '@/lib/api/parse-error-response'
 import type { CtaSummaryVm, CtaSurfaceVm } from '@/lib/growth/ctas/readers'
-import { CTA_FIXTURES } from '@/growth-cta-renderer/fixtures'
+
+import CtaAuthoringDrawer from './cockpit/CtaAuthoringDrawer'
+import CtaDetailPanel, { type LifecycleRequest } from './cockpit/CtaDetailPanel'
+import CtaInventoryPanel, { type CtaInventoryFilters } from './cockpit/CtaInventoryPanel'
+import {
+  draftFromVersion,
+  newAuthoringDraft,
+  type CtaAuthoringDraft,
+  type CtaCockpitCapabilities,
+  type CtaDetailClient,
+  type CtaKillSwitchAuditClient,
+  type CtaKillSwitchStateClient,
+} from './cockpit/cta-cockpit-meta'
 
 const O = GH_GROWTH_CTA_OPERATOR
-
-type LifecycleAction = 'submit_review' | 'publish' | 'pause' | 'resume'
-
-interface PendingAction {
-  action: LifecycleAction
-  ctaId: string
-  ctaVersionId: string
-  ctaName: string
-}
-
-const STATUS_CHIP_COLOR: Record<string, 'default' | 'info' | 'success' | 'warning' | 'secondary'> = {
-  draft: 'default',
-  review: 'info',
-  published: 'success',
-  paused: 'warning',
-  deprecated: 'secondary',
-  archived: 'secondary',
-}
+const C = O.cockpit
 
 interface Props {
   ctas: CtaSummaryVm[]
   surfaces: CtaSurfaceVm[]
   engineEnabled: boolean
+  suppressionEnforced: boolean
+  killState: CtaKillSwitchStateClient
+  killAudit: CtaKillSwitchAuditClient[]
+  capabilities: CtaCockpitCapabilities
   loadError?: boolean
 }
 
-/** Monta el core del renderer (paridad real con el público) en un host `.ghc-scope`. */
-const mountFixture = async (
-  root: HTMLDivElement,
-  fixture: keyof typeof CTA_FIXTURES,
-): Promise<() => void> => {
-  const [{ CtaRenderer }, { ensureStylesInjected }, { resolveCtaSystemCopy }] = await Promise.all([
-    import('@/growth-cta-renderer/renderer'),
-    import('@/growth-cta-renderer/styles'),
-    import('@/growth-cta-renderer/copy'),
-  ])
+interface PendingLifecycle extends LifecycleRequest {
+  ctaId: string
+  title: string
+  body: string
+  confirmLabel: string
+  confirmColor: 'primary' | 'error' | 'warning' | 'success'
+  needsConfirm: boolean
+}
 
-  ensureStylesInjected(document)
+interface PendingKill {
+  scope: 'global' | 'surface'
+  surfaceId: string | null
+  action: 'engage' | 'release'
+}
 
-  const contract = CTA_FIXTURES[fixture].build()
+const LIFECYCLE_CONFIRM: Record<
+  LifecycleRequest['action'],
+  { title: string; body: string; confirmLabel: string; confirmColor: PendingLifecycle['confirmColor']; needsConfirm: boolean }
+> = {
+  submit_review: { title: '', body: '', confirmLabel: O.actions.submitReview, confirmColor: 'primary', needsConfirm: false },
+  publish: {
+    title: O.actions.confirmPublishTitle,
+    body: O.actions.confirmPublishBody,
+    confirmLabel: O.actions.publish,
+    confirmColor: 'primary',
+    needsConfirm: true,
+  },
+  pause: {
+    title: O.actions.confirmPauseTitle,
+    body: O.actions.confirmPauseBody,
+    confirmLabel: O.actions.pause,
+    confirmColor: 'warning',
+    needsConfirm: true,
+  },
+  resume: {
+    title: C.lifecycle.resumeConfirmTitle,
+    body: C.lifecycle.resumeConfirmBody,
+    confirmLabel: O.actions.resume,
+    confirmColor: 'primary',
+    needsConfirm: true,
+  },
+  deprecate: {
+    title: C.lifecycle.deprecateConfirmTitle,
+    body: C.lifecycle.deprecateConfirmBody,
+    confirmLabel: C.lifecycle.deprecate,
+    confirmColor: 'error',
+    needsConfirm: true,
+  },
+  archive: {
+    title: C.lifecycle.archiveConfirmTitle,
+    body: C.lifecycle.archiveConfirmBody,
+    confirmLabel: C.lifecycle.archive,
+    confirmColor: 'error',
+    needsConfirm: true,
+  },
+}
 
-  // classList.add (NUNCA className=): preserva las clases MUI del Box (sx maxWidth
-  // de la matriz de density) — pisarlas dejaba todos los contenedores full-width.
-  root.classList.add('ghc-scope')
-  root.dataset.ghcVariant = contract.styleVariant ?? 'default'
-  root.dataset.ghcPlacement = contract.placement
-  root.style.containerType = 'inline-size'
+const GrowthCtasGovernanceView = ({
+  ctas,
+  surfaces,
+  engineEnabled,
+  suppressionEnforced,
+  killState,
+  killAudit,
+  capabilities,
+  loadError,
+}: Props) => {
+  const router = useRouter()
 
-  const renderer = new CtaRenderer({
-    root,
-    contract,
-    copy: resolveCtaSystemCopy(),
-    telemetry: { emit: () => undefined },
-    onPrimary: async () => true,
-    onIngest: () => undefined,
-    // TASK-1431: el preview jamás navega el portal — demo del pending sin salir.
-    inertNavigation: true,
+  const [filters, setFilters] = useState<CtaInventoryFilters>({ query: '', status: 'all', placement: 'all' })
+  const [selectedId, setSelectedId] = useState<string | null>(ctas[0]?.ctaId ?? null)
+  const [detail, setDetail] = useState<CtaDetailClient | null>(null)
+  const [detailLoading, setDetailLoading] = useState(false)
+  const [detailError, setDetailError] = useState(false)
+
+  const [authoring, setAuthoring] = useState<{ open: boolean; existingSlug: string | null; draft: CtaAuthoringDraft }>({
+    open: false,
+    existingSlug: null,
+    draft: newAuthoringDraft(),
   })
 
-  renderer.render()
-
-  return () => renderer.destroy()
-}
-
-const CtaPreview = ({ fixture }: { fixture: keyof typeof CTA_FIXTURES }) => {
-  const hostRef = useRef<HTMLDivElement | null>(null)
-
-  useEffect(() => {
-    let disposed = false
-    let cleanup: (() => void) | null = null
-
-    void (async () => {
-      if (!hostRef.current) return
-
-      const dispose = await mountFixture(hostRef.current, fixture)
-
-      if (disposed) dispose()
-      else cleanup = dispose
-    })()
-
-    return () => {
-      disposed = true
-      cleanup?.()
-    }
-  }, [fixture])
-
-  return <Box ref={hostRef} data-capture='cta-preview' sx={{ maxWidth: 720 }} />
-}
-
-/**
- * TASK-1429 — matriz de density del slide-in: el MISMO fixture a 3 anchos de
- * contenedor (`full|condensed|peek` derivados por container query, nunca por
- * viewport del host) + demo VIVA del overlay real (SlideInController immediate:
- * Escape/dismiss/foco/motion reales; guard local de sesión incluido).
- */
-const SLIDE_IN_DENSITY_WIDTHS: Array<{ key: string; width: number; labelKey: 'densityFull' | 'densityCondensed' | 'densityPeek' }> = [
-  { key: 'full', width: 680, labelKey: 'densityFull' },
-  { key: 'condensed', width: 480, labelKey: 'densityCondensed' },
-  { key: 'peek', width: 350, labelKey: 'densityPeek' },
-]
-
-const SlideInDensityMatrix = ({ fixture }: { fixture: keyof typeof CTA_FIXTURES }) => {
-  const hostsRef = useRef<Array<HTMLDivElement | null>>([])
-  const [demoBusy, setDemoBusy] = useState(false)
-
-  useEffect(() => {
-    let disposed = false
-    const cleanups: Array<() => void> = []
-
-    void (async () => {
-      for (const host of hostsRef.current) {
-        if (!host || disposed) continue
-
-        const dispose = await mountFixture(host, fixture)
-
-        if (disposed) dispose()
-        else cleanups.push(dispose)
-      }
-    })()
-
-    return () => {
-      disposed = true
-      cleanups.forEach(dispose => dispose())
-    }
-  }, [fixture])
-
-  const openLiveDemo = async () => {
-    setDemoBusy(true)
-
-    try {
-      const [{ SlideInController }, { ensureStylesInjected }, { resolveCtaSystemCopy }] = await Promise.all([
-        import('@/growth-cta-renderer/slide-in'),
-        import('@/growth-cta-renderer/styles'),
-        import('@/growth-cta-renderer/copy'),
-      ])
-
-      ensureStylesInjected(document)
-
-      const controller = new SlideInController({
-        doc: document,
-        host: document.body,
-        contract: { ...CTA_FIXTURES[fixture].build(), cta: { ...CTA_FIXTURES[fixture].build().cta, ctaId: `cdef-demo-${Date.now()}` } },
-        copy: resolveCtaSystemCopy(),
-        telemetry: { emit: () => undefined },
-        onPrimary: async () => true,
-        onIngest: () => undefined,
-        triggerMode: 'immediate',
-        inertNavigation: true,
-      })
-
-      controller.arm()
-    } finally {
-      setDemoBusy(false)
-    }
-  }
-
-  return (
-    <Stack spacing={4}>
-      {SLIDE_IN_DENSITY_WIDTHS.map((density, index) => (
-        <Box key={density.key} data-capture={`cta-preview-density-${density.key}`}>
-          <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mb: 1 }}>
-            {O.preview[density.labelKey]}
-          </Typography>
-          <Box
-            ref={(node: HTMLDivElement | null) => {
-              hostsRef.current[index] = node
-            }}
-            sx={{ maxWidth: density.width }}
-          />
-        </Box>
-      ))}
-      <Box>
-        <Button
-          variant='outlined'
-          size='small'
-          disabled={demoBusy}
-          onClick={() => void openLiveDemo()}
-          aria-label={O.preview.slideInDemoAria}
-          data-capture='cta-slidein-demo-trigger'
-        >
-          {O.preview.slideInDemoCta}
-        </Button>
-        <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 1 }}>
-          {O.preview.slideInDemoHint}
-        </Typography>
-      </Box>
-    </Stack>
-  )
-}
-
-const GrowthCtasGovernanceView = ({ ctas, surfaces, engineEnabled, loadError }: Props) => {
-  const [pending, setPending] = useState<PendingAction | null>(null)
-  const [busy, setBusy] = useState(false)
+  const [pendingLifecycle, setPendingLifecycle] = useState<PendingLifecycle | null>(null)
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [pendingKill, setPendingKill] = useState<PendingKill | null>(null)
+  const [killReason, setKillReason] = useState('')
+  const [busyAction, setBusyAction] = useState<string | null>(null)
   const [snack, setSnack] = useState<{ message: string; severity: 'success' | 'error' } | null>(null)
-  const [previewFixture, setPreviewFixture] = useState<keyof typeof CTA_FIXTURES>('default')
 
-  const runAction = async (action: PendingAction) => {
-    setBusy(true)
+  const selected = useMemo(() => ctas.find(cta => cta.ctaId === selectedId) ?? null, [ctas, selectedId])
+
+  // La selección sigue al inventario cuando el server refresca (mutación → router.refresh()).
+  useEffect(() => {
+    if (selectedId && !ctas.some(cta => cta.ctaId === selectedId)) setSelectedId(ctas[0]?.ctaId ?? null)
+    if (!selectedId && ctas.length > 0) setSelectedId(ctas[0].ctaId)
+  }, [ctas, selectedId])
+
+  const fetchDetail = useCallback(async (ctaId: string) => {
+    setDetailLoading(true)
+    setDetailError(false)
 
     try {
-      const response = await fetch(`/api/admin/growth/ctas/${action.ctaId}/lifecycle`, {
+      const response = await fetch(`/api/admin/growth/ctas/${ctaId}`)
+
+      await throwIfNotOk(response, C.detail.loadError)
+      setDetail((await response.json()) as CtaDetailClient)
+    } catch {
+      setDetail(null)
+      setDetailError(true)
+    } finally {
+      setDetailLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (selectedId) void fetchDetail(selectedId)
+    else setDetail(null)
+  }, [selectedId, fetchDetail])
+
+  const refreshAll = useCallback(() => {
+    router.refresh()
+
+    if (selectedId) void fetchDetail(selectedId)
+  }, [router, selectedId, fetchDetail])
+
+  // ── Lifecycle (server-confirmed; jamás verdad optimista) ──
+  const runLifecycle = async (request: PendingLifecycle) => {
+    setBusyAction(`${request.ctaId}:${request.action}`)
+
+    try {
+      const response = await fetch(`/api/admin/growth/ctas/${request.ctaId}/lifecycle`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ action: action.action, ctaVersionId: action.ctaVersionId }),
+        body: JSON.stringify({ action: request.action, ctaVersionId: request.ctaVersionId }),
       })
 
       await throwIfNotOk(response, O.actions.errorGeneric)
-      setSnack({ message: O.actions.success[action.action] ?? O.actions.success.publish, severity: 'success' })
-
-      // refresco simple: el page server re-lee los readers canónicos.
-      window.location.reload()
+      setSnack({ message: O.actions.success[request.action] ?? O.actions.success.publish, severity: 'success' })
+      refreshAll()
     } catch (error) {
       setSnack({
         message: error instanceof Error && error.message ? error.message : O.actions.errorGeneric,
         severity: 'error',
       })
     } finally {
-      setBusy(false)
-      setPending(null)
+      setBusyAction(null)
+      setPendingLifecycle(null)
+      setConfirmOpen(false)
     }
   }
 
-  const requestAction = (action: PendingAction) => {
-    if (action.action === 'publish' || action.action === 'pause') {
-      setPending(action)
+  const requestLifecycle = (request: LifecycleRequest) => {
+    if (!selected) return
 
-      return
+    const config = LIFECYCLE_CONFIRM[request.action]
+
+    const pending: PendingLifecycle = {
+      ...request,
+      ctaId: selected.ctaId,
+      title: config.title.replace('{name}', request.ctaName),
+      body: config.body,
+      confirmLabel: config.confirmLabel,
+      confirmColor: config.confirmColor,
+      needsConfirm: config.needsConfirm,
     }
 
-    void runAction(action)
+    if (pending.needsConfirm) {
+      setPendingLifecycle(pending)
+      setConfirmOpen(true)
+    } else {
+      void runLifecycle(pending)
+    }
   }
 
-  const actionButtons = (cta: CtaSummaryVm) => {
-    const buttons: Array<{ label: string; aria: string; action: LifecycleAction; versionId: string }> = []
+  // ── Kill switch gobernado (reason obligatorio; auditado) ──
+  const runKill = async () => {
+    if (!pendingKill || killReason.trim().length < 5) return
 
-    if (cta.latestVersionStatus === 'draft' && cta.latestVersionId) {
-      buttons.push({ label: O.actions.submitReview, aria: O.actions.submitReview, action: 'submit_review', versionId: cta.latestVersionId })
+    setBusyAction('kill-switch')
+
+    try {
+      const response = await fetch('/api/admin/growth/ctas/kill-switch', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          scope: pendingKill.scope,
+          surfaceId: pendingKill.surfaceId ?? undefined,
+          action: pendingKill.action,
+          reason: killReason.trim(),
+        }),
+      })
+
+      await throwIfNotOk(response, O.actions.errorGeneric)
+      setSnack({
+        message: pendingKill.action === 'engage' ? C.toasts.killEngaged : C.toasts.killReleased,
+        severity: 'success',
+      })
+      refreshAll()
+    } catch (error) {
+      setSnack({
+        message: error instanceof Error && error.message ? error.message : O.actions.errorGeneric,
+        severity: 'error',
+      })
+    } finally {
+      setBusyAction(null)
+      setPendingKill(null)
+      setKillReason('')
     }
-
-    if (cta.latestVersionStatus === 'review' && cta.latestVersionId) {
-      buttons.push({ label: O.actions.publish, aria: O.actions.publishAria, action: 'publish', versionId: cta.latestVersionId })
-    }
-
-    if (cta.publishedVersionId) {
-      buttons.push({ label: O.actions.pause, aria: O.actions.pauseAria, action: 'pause', versionId: cta.publishedVersionId })
-    }
-
-    if (cta.latestVersionStatus === 'paused' && cta.latestVersionId) {
-      buttons.push({ label: O.actions.resume, aria: O.actions.resumeAria, action: 'resume', versionId: cta.latestVersionId })
-    }
-
-    return buttons
   }
+
+  const openCreate = () => setAuthoring({ open: true, existingSlug: null, draft: newAuthoringDraft() })
+
+  const openEdit = () => {
+    if (!detail || detail.versions.length === 0) return
+
+    const latest = detail.versions[0]
+
+    const suppression =
+      latest.suppressionPolicy && typeof latest.suppressionPolicy === 'object'
+        ? (latest.suppressionPolicy as Record<string, unknown>)
+        : null
+
+    setAuthoring({
+      open: true,
+      existingSlug: detail.summary.slug,
+      draft: draftFromVersion(detail.summary, latest, suppression),
+    })
+  }
+
+  // ── Resumen de estados del header ──
+  const statusSummary = useMemo(() => {
+    const counts = { published: 0, review: 0, draft: 0, paused: 0 }
+
+    ctas.forEach(cta => {
+      const status = cta.latestVersionStatus ?? 'draft'
+
+      if (status in counts) counts[status as keyof typeof counts] += 1
+    })
+
+    return [
+      { key: 'published', count: counts.published, label: C.summary.published, color: 'success.main' },
+      { key: 'review', count: counts.review, label: C.summary.review, color: 'info.main' },
+      { key: 'draft', count: counts.draft, label: C.summary.draft, color: 'text.disabled' },
+      { key: 'paused', count: counts.paused, label: C.summary.paused, color: 'warning.main' },
+    ]
+  }, [ctas])
+
+  const killScopeLabel = pendingKill?.scope === 'global' ? C.kill.scopeGlobal : C.kill.scopeSurface
+
+  const lead = (
+    <Stack spacing={2.5} sx={{ pb: 4 }}>
+      <GreenhouseBreadcrumbs
+        kind='pageHierarchy'
+        dataCapture='cta-cockpit-breadcrumbs'
+        items={[
+          { label: C.breadcrumbs.growth, iconClassName: 'tabler-growth' },
+          { label: C.breadcrumbs.ctas, iconClassName: 'tabler-hand-click' },
+        ]}
+      />
+      <Stack direction='row' alignItems='flex-end' justifyContent='space-between' gap={4} flexWrap='wrap'>
+        <Stack spacing={1.5} sx={{ minWidth: 0, flex: '1 1 480px' }}>
+          <Typography variant='h4' sx={{ lineHeight: 1.1 }}>
+            {O.title}
+          </Typography>
+          <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 640 }}>
+            {C.subtitle}
+          </Typography>
+          <Stack direction='row' alignItems='center' gap={4} flexWrap='wrap'>
+            {statusSummary.map(item => (
+              <Typography key={item.key} variant='caption' color='text.secondary' sx={{ display: 'inline-flex', alignItems: 'center', gap: 1.5 }}>
+                <Box component='span' sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: item.color }} aria-hidden />
+                <Box component='span' sx={{ fontWeight: 700, color: 'text.primary', fontFeatureSettings: '"tnum" 1' }}>
+                  {item.count}
+                </Box>
+                {item.label}
+              </Typography>
+            ))}
+          </Stack>
+        </Stack>
+        <Stack direction='row' alignItems='center' gap={2.5} flexWrap='wrap'>
+          <Tooltip title={engineEnabled ? '' : O.engineFlag.offHint}>
+            <Chip
+              label={engineEnabled ? O.engineFlag.on : O.engineFlag.off}
+              color={engineEnabled ? 'success' : 'warning'}
+              variant='tonal'
+              size='small'
+            />
+          </Tooltip>
+          <Button
+            variant='outlined'
+            color='inherit'
+            startIcon={<i className='tabler-refresh' style={{ fontSize: 16 }} />}
+            onClick={() => {
+              refreshAll()
+              setSnack({ message: C.toasts.refreshed, severity: 'success' })
+            }}
+            sx={{ color: 'text.secondary', borderColor: 'divider' }}
+          >
+            {C.refresh}
+          </Button>
+          <Tooltip title={capabilities.canAuthor ? '' : C.denied.readOnlyHint}>
+            <span>
+              <Button
+                variant='contained'
+                startIcon={<i className='tabler-plus' style={{ fontSize: 16 }} />}
+                onClick={openCreate}
+                disabled={!capabilities.canAuthor}
+                aria-label={C.createAria}
+                data-capture='cta-cockpit-create'
+              >
+                {C.create}
+              </Button>
+            </span>
+          </Tooltip>
+        </Stack>
+      </Stack>
+      {loadError ? <Alert severity='error'>{O.actions.errorGeneric}</Alert> : null}
+    </Stack>
+  )
+
+  const isEmptyInventory = !loadError && ctas.length === 0
+
+  const primary = isEmptyInventory ? (
+    <Stack
+      spacing={4}
+      alignItems='center'
+      sx={{
+        p: 12,
+        textAlign: 'center',
+        borderRadius: 3,
+        bgcolor: 'background.paper',
+        border: theme => `1px dashed ${theme.palette.divider}`,
+      }}
+      data-capture='cta-inventory'
+    >
+      <Box
+        sx={{
+          width: 64,
+          height: 64,
+          borderRadius: 3,
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'primary.dark',
+          bgcolor: theme => alpha(theme.palette.primary.main, 0.12),
+        }}
+      >
+        <i className='tabler-hand-click' style={{ fontSize: 30 }} aria-hidden />
+      </Box>
+      <Stack spacing={1.5}>
+        <Typography variant='h6'>{C.empty.title}</Typography>
+        <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 380, lineHeight: 1.55 }}>
+          {C.empty.body}
+        </Typography>
+      </Stack>
+      <Button
+        variant='contained'
+        startIcon={<i className='tabler-plus' style={{ fontSize: 16 }} />}
+        onClick={openCreate}
+        disabled={!capabilities.canAuthor}
+      >
+        {C.empty.cta}
+      </Button>
+    </Stack>
+  ) : (
+    <CtaInventoryPanel
+      ctas={ctas}
+      surfaces={surfaces}
+      selectedId={selectedId}
+      onSelect={setSelectedId}
+      filters={filters}
+      onFiltersChange={setFilters}
+      loading={false}
+      loadError={Boolean(loadError)}
+      onRetry={refreshAll}
+    />
+  )
+
+  const aside = isEmptyInventory ? (
+    <Box sx={{ p: 8, borderRadius: 3, bgcolor: 'background.paper', border: theme => `1px solid ${theme.palette.divider}` }}>
+      <EmptyState icon='tabler-layout-sidebar-right-expand' title={C.empty.asideTitle} description={C.empty.asideBody} />
+    </Box>
+  ) : selectedId ? (
+    <CtaDetailPanel
+      detail={detail}
+      loading={detailLoading}
+      loadError={detailError}
+      onRetry={() => selectedId && void fetchDetail(selectedId)}
+      surfaces={surfaces}
+      killState={killState}
+      capabilities={capabilities}
+      engineEnabled={engineEnabled}
+      suppressionEnforced={suppressionEnforced}
+      busyAction={busyAction}
+      latestKillAudit={killAudit[0] ?? null}
+      onEdit={openEdit}
+      onLifecycle={requestLifecycle}
+      onKillToggle={(scope, surfaceId, action) => {
+        setPendingKill({ scope, surfaceId, action })
+        setKillReason('')
+      }}
+    />
+  ) : (
+    <Box sx={{ p: 8, borderRadius: 3, bgcolor: 'background.paper', border: theme => `1px dashed ${theme.palette.divider}` }}>
+      <EmptyState icon='tabler-click' title={C.noSelection.title} description={C.noSelection.body} />
+    </Box>
+  )
 
   return (
-    <Box sx={{ display: 'grid', gap: 6 }}>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 3, justifyContent: 'space-between' }}>
-        <Box>
-          <Typography variant='h4'>{O.title}</Typography>
-          <Typography variant='body2' color='text.secondary'>
-            {O.subtitle}
-          </Typography>
-        </Box>
-        <Tooltip title={engineEnabled ? '' : O.engineFlag.offHint}>
-          <Chip
-            label={engineEnabled ? O.engineFlag.on : O.engineFlag.off}
-            color={engineEnabled ? 'success' : 'warning'}
-            variant='tonal'
-          />
-        </Tooltip>
-      </Box>
+    <Box data-capture='cta-cockpit-shell'>
+      {/* Lead/header: `split` no monta región lead — vive encima del shell (mismo patrón GrowthFormsAdminCockpit). */}
+      {lead}
+      <CompositionShell
+        composition='split'
+        fluidity='rich'
+        instanceId='growth-cta-cockpit'
+        asideLabel={C.detail.regionAria}
+        telemetrySource='task-1430-growth-cta-cockpit'
+        splitTemplateColumns={{ xs: '1fr', md: 'minmax(0, 0.95fr) minmax(0, 1.2fr)' }}
+        regions={{ primary, aside }}
+      />
 
-      {loadError ? <Alert severity='error'>{O.actions.errorGeneric}</Alert> : null}
+      {/* Autoría gobernada */}
+      <CtaAuthoringDrawer
+        open={authoring.open}
+        existingSlug={authoring.existingSlug}
+        initialDraft={authoring.draft}
+        onClose={() => setAuthoring(current => ({ ...current, open: false }))}
+        onSubmitted={message => {
+          setAuthoring(current => ({ ...current, open: false }))
+          setSnack({ message, severity: 'success' })
+          refreshAll()
+        }}
+      />
 
-      <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }} data-capture='cta-inventory'>
-        <CardHeader title={O.inventory.title} />
-        <Divider />
-        <CardContent sx={{ p: 0 }}>
-          {ctas.length === 0 ? (
-            <Box sx={{ p: 6 }}>
-              <EmptyState icon='tabler-hand-click' title={O.inventory.emptyTitle} description={O.inventory.emptyBody} />
-            </Box>
-          ) : (
-            <TableContainer sx={{ overflowX: 'auto' }}>
-              <Table size='small'>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>{O.inventory.columns.cta}</TableCell>
-                    <TableCell>{O.inventory.columns.status}</TableCell>
-                    <TableCell>{O.inventory.columns.campaign}</TableCell>
-                    <TableCell align='right'>{O.inventory.columns.version}</TableCell>
-                    <TableCell align='right'>{O.inventory.columns.actions}</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {ctas.map(cta => (
-                    <TableRow key={cta.ctaId} hover>
-                      <TableCell>
-                        <Typography variant='body2' sx={{ fontWeight: 600 }}>
-                          {cta.name}
-                        </Typography>
-                        <Typography variant='monoId' color='text.secondary'>
-                          {cta.slug}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          size='small'
-                          variant='tonal'
-                          color={STATUS_CHIP_COLOR[cta.latestVersionStatus ?? 'draft'] ?? 'default'}
-                          label={O.inventory.statusLabels[cta.latestVersionStatus ?? 'draft'] ?? cta.latestVersionStatus}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant='body2'>{cta.campaignSlug ?? '—'}</Typography>
-                      </TableCell>
-                      <TableCell align='right'>
-                        <Typography variant='body2'>{cta.latestVersion ?? '—'}</Typography>
-                      </TableCell>
-                      <TableCell align='right'>
-                        <Box sx={{ display: 'inline-flex', gap: 2 }}>
-                          {actionButtons(cta).map(button => (
-                            <Tooltip key={button.action} title={engineEnabled ? '' : O.engineFlag.offHint}>
-                              <span>
-                                <Button
-                                  size='small'
-                                  variant='tonal'
-                                  disabled={!engineEnabled || busy}
-                                  aria-label={button.aria}
-                                  onClick={() =>
-                                    requestAction({
-                                      action: button.action,
-                                      ctaId: cta.ctaId,
-                                      ctaVersionId: button.versionId,
-                                      ctaName: cta.name,
-                                    })
-                                  }
-                                >
-                                  {button.label}
-                                </Button>
-                              </span>
-                            </Tooltip>
-                          ))}
-                        </Box>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </CardContent>
-      </Card>
+      {/* Confirmación de lifecycle (server-confirmed) */}
+      <ConfirmDialog
+        open={confirmOpen && pendingLifecycle !== null}
+        setOpen={setConfirmOpen}
+        title={pendingLifecycle?.title ?? ''}
+        description={pendingLifecycle?.body}
+        confirmLabel={pendingLifecycle?.confirmLabel}
+        cancelLabel={O.actions.cancel}
+        confirmColor={pendingLifecycle?.confirmColor ?? 'primary'}
+        loading={busyAction !== null}
+        onConfirm={() => (pendingLifecycle ? runLifecycle(pendingLifecycle) : undefined)}
+      />
 
-      <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }} data-capture='cta-surfaces'>
-        <CardHeader title={O.surfaces.title} />
-        <Divider />
-        <CardContent sx={{ p: 0 }}>
-          {surfaces.length === 0 ? (
-            <Box sx={{ p: 6 }}>
-              <EmptyState icon='tabler-world' title={O.surfaces.emptyTitle} description={O.surfaces.emptyBody} />
-            </Box>
-          ) : (
-            <TableContainer sx={{ overflowX: 'auto' }}>
-              <Table size='small'>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>{O.surfaces.columns.name}</TableCell>
-                    <TableCell>{O.surfaces.columns.kind}</TableCell>
-                    <TableCell>{O.surfaces.columns.origins}</TableCell>
-                    <TableCell>{O.surfaces.columns.embedKey}</TableCell>
-                    <TableCell>{O.surfaces.columns.status}</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {surfaces.map(surface => (
-                    <TableRow key={surface.surfaceId} hover>
-                      <TableCell>
-                        <Typography variant='body2' sx={{ fontWeight: 600 }}>
-                          {surface.surfaceName}
-                        </Typography>
-                        <Typography variant='monoId' color='text.secondary'>
-                          {surface.surfaceId}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>{surface.surfaceKind}</TableCell>
-                      <TableCell>
-                        <Typography variant='body2' sx={{ maxWidth: 280, overflowWrap: 'anywhere' }}>
-                          {surface.originAllowlist.join(', ') || '—'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant='monoId'>
-                          {surface.embedKeyId ?? '—'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          size='small'
-                          variant='tonal'
-                          color={surface.status === 'active' ? 'success' : 'warning'}
-                          label={O.surfaces.statusLabels[surface.status] ?? surface.status}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </CardContent>
-      </Card>
-
-      <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }} data-capture='cta-preview-card'>
-        <CardHeader title={O.preview.title} subheader={O.preview.body} />
-        <Divider />
-        <CardContent sx={{ display: 'grid', gap: 4 }}>
-          <Box role='group' aria-label={O.preview.variantAria} sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-            {(Object.keys(CTA_FIXTURES) as Array<keyof typeof CTA_FIXTURES>).map(key => (
-              <Chip
-                key={key}
-                label={CTA_FIXTURES[key].label}
-                onClick={() => setPreviewFixture(key)}
-                color={previewFixture === key ? 'primary' : 'default'}
-                variant={previewFixture === key ? 'filled' : 'outlined'}
-              />
-            ))}
-          </Box>
-          {CTA_FIXTURES[previewFixture].build().placement === 'slide_in' ? (
-            <SlideInDensityMatrix fixture={previewFixture} />
-          ) : (
-            <CtaPreview fixture={previewFixture} />
-          )}
-        </CardContent>
-      </Card>
-
-      <Dialog open={pending !== null} onClose={() => (busy ? null : setPending(null))}>
+      {/* Confirmación de kill switch con motivo obligatorio (auditado) */}
+      <Dialog open={pendingKill !== null} onClose={() => (busyAction ? null : setPendingKill(null))} maxWidth='xs' fullWidth>
         <DialogTitle>
-          {pending?.action === 'pause' ? O.actions.confirmPauseTitle : O.actions.confirmPublishTitle}
+          {(pendingKill?.action === 'engage' ? C.kill.engageConfirmTitle : C.kill.releaseConfirmTitle).replace('{scope}', killScopeLabel)}
         </DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            {pending?.action === 'pause' ? O.actions.confirmPauseBody : O.actions.confirmPublishBody}
-          </DialogContentText>
+          <Stack spacing={4} sx={{ pt: 1 }}>
+            <DialogContentText>
+              {pendingKill?.action === 'engage' ? C.kill.engageConfirmBody : C.kill.releaseConfirmBody}
+            </DialogContentText>
+            <CustomTextField
+              autoFocus
+              fullWidth
+              label={C.kill.reasonLabel}
+              placeholder={C.kill.reasonPlaceholder}
+              helperText={C.kill.reasonHelper}
+              value={killReason}
+              onChange={event => setKillReason(event.target.value)}
+            />
+          </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setPending(null)} disabled={busy} autoFocus>
+          <Button color='secondary' onClick={() => setPendingKill(null)} disabled={busyAction !== null}>
             {O.actions.cancel}
           </Button>
           <Button
             variant='contained'
-            color={pending?.action === 'pause' ? 'warning' : 'primary'}
-            disabled={busy}
-            onClick={() => (pending ? void runAction(pending) : undefined)}
+            color={pendingKill?.action === 'engage' ? 'error' : 'success'}
+            disabled={busyAction !== null || killReason.trim().length < 5}
+            onClick={() => void runKill()}
+            data-capture='cta-kill-confirm'
           >
-            {pending?.action === 'pause' ? O.actions.pause : O.actions.publish}
+            {pendingKill?.action === 'engage' ? C.kill.engage : C.kill.release}
           </Button>
         </DialogActions>
       </Dialog>
@@ -506,12 +552,13 @@ const GrowthCtasGovernanceView = ({ ctas, surfaces, engineEnabled, loadError }: 
         open={snack !== null}
         autoHideDuration={snack?.severity === 'success' ? 4000 : null}
         onClose={() => setSnack(null)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
         <Alert severity={snack?.severity ?? 'success'} onClose={() => setSnack(null)}>
           {snack?.message}
         </Alert>
       </Snackbar>
+
     </Box>
   )
 }

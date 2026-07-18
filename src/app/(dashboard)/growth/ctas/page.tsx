@@ -3,7 +3,8 @@ import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 
 import { can } from '@/lib/entitlements/runtime'
-import { isCtaEngineEnabled } from '@/lib/growth/ctas/flags'
+import { isCtaEngineEnabled, isCtaSuppressionEnforcementEnabled } from '@/lib/growth/ctas/flags'
+import { getKillSwitchState, listKillSwitchAudit } from '@/lib/growth/ctas/kill-switch'
 import { listCtasAdmin, listCtaSurfacesAdmin } from '@/lib/growth/ctas/readers'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
@@ -11,14 +12,14 @@ import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 import GrowthCtasGovernanceView from '@/views/greenhouse/growth/ctas/GrowthCtasGovernanceView'
 
 /**
- * TASK-1340 — Gobernanza del motor de CTAs bajo el menú Growth (delta operador
- * 2026-07-18). Guard: viewCode `gestion.growth_ctas` (seed 20260718074718550) +
- * redirect defensivo para tenants cliente. Data server-side vía readers canónicos
- * (Full API Parity: esta vista es un consumer más del primitive `growth.cta`);
- * las acciones de lifecycle van por la API admin de TASK-1339, que re-valida
- * capability fina + flag.
+ * TASK-1430 — Cockpit operator de CTAs bajo el menú Growth (evolución de la
+ * gobernanza TASK-1340). Guard: viewCode `gestion.growth_ctas` + capability
+ * `growth.cta.read`; las capabilities finas (`author`/`publish`/`pause`) se
+ * resuelven acá y gatean affordances — la API admin re-valida siempre.
+ * Data server-side vía readers canónicos (Full API Parity); kill switch +
+ * audit de TASK-1428; degradación por región si una lectura falla.
  */
-export const metadata: Metadata = { title: 'CTAs — Gobernanza | Growth | Greenhouse' }
+export const metadata: Metadata = { title: 'CTAs — Cockpit | Growth | Greenhouse' }
 export const dynamic = 'force-dynamic'
 
 const VIEW_CODE = 'gestion.growth_ctas'
@@ -38,14 +39,64 @@ const Page = async () => {
 
   if (!authorized) redirect('/401')
 
+  const capabilities = {
+    canAuthor: can(tenant, 'growth.cta.author', 'execute', 'tenant'),
+    canPublish: can(tenant, 'growth.cta.publish', 'execute', 'tenant'),
+    canPause: can(tenant, 'growth.cta.pause', 'execute', 'tenant')
+  }
+
+  const engineEnabled = isCtaEngineEnabled()
+  const suppressionEnforced = isCtaSuppressionEnforcementEnabled()
+
+  // Kill switch degrada por región (jamás bloquea inventario/lifecycle).
+  let killState = { globalKilled: false, killedSurfaceIds: [] as string[] }
+  let killAudit: Awaited<ReturnType<typeof listKillSwitchAudit>> = []
+
+  try {
+    ;[killState, killAudit] = await Promise.all([getKillSwitchState(), listKillSwitchAudit(10)])
+  } catch (error) {
+    captureWithDomain(error, 'growth', { tags: { source: 'growth_ctas_cockpit_kill_switch_read' } })
+  }
+
+  const killAuditVm = killAudit.map(entry => ({
+    killEventId: entry.killEventId,
+    scope: entry.scope,
+    surfaceId: entry.surfaceId,
+    action: entry.action,
+    reason: entry.reason,
+    actorRef: entry.actorRef,
+    createdAt: entry.createdAt instanceof Date ? entry.createdAt.toISOString() : String(entry.createdAt)
+  }))
+
   try {
     const [ctas, surfaces] = await Promise.all([listCtasAdmin(), listCtaSurfacesAdmin()])
 
-    return <GrowthCtasGovernanceView ctas={ctas} surfaces={surfaces} engineEnabled={isCtaEngineEnabled()} />
+    return (
+      <GrowthCtasGovernanceView
+        ctas={ctas}
+        surfaces={surfaces}
+        engineEnabled={engineEnabled}
+        suppressionEnforced={suppressionEnforced}
+        killState={killState}
+        killAudit={killAuditVm}
+        capabilities={capabilities}
+      />
+    )
   } catch (error) {
     captureWithDomain(error, 'growth', { tags: { source: 'growth_ctas_governance_page' } })
 
-    return <GrowthCtasGovernanceView ctas={[]} surfaces={[]} engineEnabled={isCtaEngineEnabled()} loadError />
+    return (
+      <GrowthCtasGovernanceView
+        ctas={[]}
+        surfaces={[]}
+        engineEnabled={engineEnabled}
+        suppressionEnforced={suppressionEnforced}
+        killState={killState}
+        killAudit={killAuditVm}
+        capabilities={capabilities}
+        loadError
+      />
+    )
   }
 }
 

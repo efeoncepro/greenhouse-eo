@@ -24,8 +24,6 @@ export async function GET() {
 
   if (!tenant) return errorResponse ?? canonicalErrorResponse('unauthorized')
 
-  if (!isCtaEngineEnabled()) return canonicalErrorResponse('growth_cta_engine_disabled')
-
   if (!can(tenant, 'growth.cta.read', 'read', 'tenant')) {
     return canonicalErrorResponse('forbidden', { extra: { requiredCapability: 'growth.cta.read' } })
   }
