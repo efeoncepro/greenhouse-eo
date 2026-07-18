@@ -59,7 +59,9 @@ export const resolveEnvConfig = (env: CaptureEnv): EnvConfig => {
       }
 
       return {
-        baseUrl: STAGING_VERCEL_URL,
+        // STAGING_URL: mismo override que scripts/staging-request.mjs — permite apuntar a la
+        // URL directa de un deployment (p.ej. cuando el alias env-staging quedó rezagado).
+        baseUrl: process.env.STAGING_URL ?? STAGING_VERCEL_URL,
         storageStatePath: '.auth/storageState.staging.json',
         agentEmail,
         bypassSecret,

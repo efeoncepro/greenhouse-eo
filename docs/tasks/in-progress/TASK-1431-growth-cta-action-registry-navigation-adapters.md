@@ -37,10 +37,20 @@
   1440/390 mirado (`.captures/2026-07-18T17-14-30_*`: rol link nativo + affordance pestaña nueva +
   pending accesible en el aria tree). Docs sincronizados: arch §27, funcional 1.6, manual 1.3,
   TRACKING-PLAN §CTAs, skill `greenhouse-growth-ctas` (2 espejos).
-- **Pendiente para cierre (por eso sigue in-progress):** push/release · bundle 1.2.0 desplegado en
-  hosts ANTES de publicar cualquier CTA con action nueva · smoke staging de destinos reales
-  (Verification: `fe:capture --env=staging` + `qa:gates --runtime --browser`) · runtime/host parity
-  audit del Closing Protocol.
+- **Push + smoke staging COMPLETOS (2026-07-18 tarde):** push a develop (`9df4175b1`); deploy
+  staging Ready (`greenhouse-78e4p3ntz`, bundle `1.2.0-preview.1`/38KB verificado servido).
+  Smoke runtime contra el deployment: draft `link_url` gobernado → 201; kind no registrado
+  (`download_asset`) → 400 `action_policy_invalid` al autorar; draft con `javascript:` →
+  publish RECHAZADO 422 `growth_cta_action_not_resolvable` + `blockingReasons:
+  ["action_destination_invalid"]` (nada publicado; quedan 2 drafts `task-1431-smoke-navigation-gate`
+  como evidencia, jamás publicar). GVC staging 1440/390 verde y mirado
+  (`.captures/2026-07-18T17-58-48_*`; aria: link nativo + affordance pestaña nueva + pending).
+  ⚠️ Hallazgo operativo: el alias `greenhouse-eo-env-staging-…vercel.app` quedó REZAGADO en un
+  deployment de la mañana (pre-1429) — `dev-greenhouse.efeoncepro.com` sí movió; el smoke usó la
+  URL directa vía override `STAGING_URL` (agregado también a GVC `env.ts`).
+- **Pendiente para cierre (por eso sigue in-progress):** release a producción (bundle 1.2.0 en
+  hosts públicos Think/WP ANTES de publicar cualquier CTA con action nueva) + runtime/host parity
+  audit del Closing Protocol + decisión de campaña (primera CTA de navegación).
 
 ## Summary
 
