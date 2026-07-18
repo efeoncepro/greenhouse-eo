@@ -13,7 +13,7 @@ Definir, publicar, pausar, embeber y medir CTAs/popups gobernados en las superfi
 
 ## Estado vigente (2026-07-18)
 
-Motor **encendido en staging y producción**. Primer CTA (`ai-visibility-report-followup`) **live** en el reporte AI Visibility de Think **y en WordPress** (página de prueba `efeoncepro.com/greenhouse-cta-prueba/`, noindex, `cta-location=wp_test_page` — decisión del operador: validar en test page antes del placement amplio). Medición GTM/GA4 **publicada y verificada E2E en ambos hosts** (dataLayer + `/g/collect` + ingest + ledger + forja 403; TASK-1427). Pendientes: placement amplio en WP (decisión post-validación) y ventana steady-state de 7 días de los signals.
+Motor **encendido en staging y producción**. Primer CTA (`ai-visibility-report-followup`) **live** en el reporte AI Visibility de Think **y en WordPress** (página de prueba `efeoncepro.com/greenhouse-cta-prueba/`, noindex, `cta-location=wp_test_page` — decisión del operador: validar en test page antes del placement amplio). Medición GTM/GA4 **publicada y verificada E2E en ambos hosts** (dataLayer + `/g/collect` + ingest + ledger + forja 403; TASK-1427). Con el release `d5db8b568` (2026-07-18, TASK-1428/1429): **enforcement de suppression ON en staging y Production** (ya no es shadow; verificado E2E en ambos ambientes), **kill switches global/per-surface operativos en producción** (engage → `engineState:"killed"` → release verificado live, sin redeploy) y placement **`slide_in` disponible** (preview + demo en `/growth/ctas`), todavía **sin campaña interruptiva publicada** — publicarla es decisión de negocio del operador (surface/copy/trigger). Pendientes: placement amplio en WP (decisión post-validación), primera campaña interruptiva y ventana de monitoreo de 7 días de los signals `growth.cta.*` en `/admin/operations` (hasta 2026-07-25).
 
 **Rollback de la página de prueba WP:** borrar la página id `251561` (`wp post delete 251561 --force` vía `pnpm public-website:wpcli`) — no se tocó tema ni plugin.
 
@@ -109,16 +109,17 @@ El renderer ya sabe montar el interruptivo del arbitraje (0–1 por página): un
 entra desde el borde en desktop y desde abajo en móvil, tras un trigger gobernado (8 s en página o
 35 % de scroll, lo primero). No roba el foco al aparecer; Escape lo cierra; el cierre persiste
 server-side ANTES de la animación de salida y no reaparece en la sesión. La densidad
-(`full|condensed|peek`) se adapta al ancho del propio panel. Para **usarlo en una campaña real**:
-autorar una versión con `placement: "slide_in"` (API admin o cockpit futuro), publicarla y
-allowlistearla en la surface — con `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` **ON** en ese
-environment (gate duro: sin enforcement no hay caps reales). Preview y demo vivo en `/growth/ctas`.
+(`full|condensed|peek`) se adapta al ancho del propio panel. Para **usarlo en una campaña real**
+solo falta autorar una versión con `placement: "slide_in"` (API admin o cockpit futuro), publicarla
+y allowlistearla en la surface — el gate de enforcement ya está cumplido
+(`GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` ON en staging y Production: los caps interruptivos
+son reales). Preview y demo vivo en `/growth/ctas`.
 Si el host tiene CMP, declarar `consent-state="granted"` en el snippet habilita la memoria durable
 del visitante; sin consent, la ventana es de sesión.
 
-## Suppression y frequency capping (TASK-1428 — hoy en shadow)
+## Suppression y frequency capping (TASK-1428 — enforcement ACTIVO)
 
-El motor decide server-side si un visitante debe volver a ver un CTA: dismiss reciente (cooldown default 14 días), conversión verificada, o tope de impresiones interruptivas (per-CTA 2/24h + global 3/día por visitante). Con `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` OFF (estado actual) la decisión solo se **registra** (shadow) sin alterar lo que se muestra; el flip a ON activa la exclusión real. La policy por versión vive en `suppression_policy_json` (vacía = defaults conservadores). Sin consentimiento del visitante no se guarda estado durable: la ventana es de sesión (48 h) y los placements interruptivos directamente no se muestran a visitantes sin identidad.
+El motor decide server-side si un visitante debe volver a ver un CTA y, con `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` **ON en staging y Production** (estado actual desde el release `d5db8b568`), esa decisión **ya excluye del render**: dismiss reciente (cooldown default 14 días), conversión verificada, o tope de impresiones interruptivas (per-CTA 2/24h + global 3/día por visitante). Verificado E2E en ambos ambientes: un visitante que descarta un CTA queda excluido (`nonInterruptive: []`), un visitante fresco sí lo ve, y sin identidad el embedded sigue eligible (el fallback conservador solo suprime interruptivos). La policy por versión vive en `suppression_policy_json` (vacía = defaults conservadores). Sin consentimiento del visitante no se guarda estado durable: la ventana es de sesión (48 h) y los placements interruptivos directamente no se muestran a visitantes sin identidad. Volver a shadow es poner el flag en `false` en el environment correspondiente (<5 min, sin deploy).
 
 ## Qué no hacer
 
@@ -129,7 +130,7 @@ El motor decide server-side si un visitante debe volver a ver un CTA: dismiss re
 - **No** publicar tags al container GTM sin preview + confirmación humana.
 - **No** dejar un kill switch engaged sin dueño: es un estado de emergencia visible (signal en warning), no una pausa de largo plazo — para retiros planificados usar `pause`/`deprecate` del lifecycle.
 - **No** borrar filas de `cta_kill_switch_event` (append-only; es el audit del stop de emergencia).
-- **No** prender `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` en producción sin la ventana de shadow-compare en staging (secuencia del rollout de TASK-1428).
+- **No** apagar `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` (hoy ON en staging y Production) sin registrar el cambio en el Feature Flag State Ledger — volver a shadow es válido ante un incidente, pero debe quedar con dueño y motivo.
 
 ## Problemas comunes
 

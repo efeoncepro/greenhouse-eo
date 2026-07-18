@@ -1,5 +1,23 @@
 # EPIC-023 — Growth CTA & Popup CRO Engine
 
+## Delta 2026-07-18 (2) — TASK-1428+1429 released
+
+- Release `d5db8b568` (PR #159 + #160, orquestador run `29651461496`, manifest `released` 16:23Z)
+  llevó `TASK-1428` (suppression/visitor state/Tier B/kill switches) y `TASK-1429` (slide_in
+  interruptivo + Experience System) a producción; ambas en `complete/`.
+- Enforcement `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` ON en staging + Production, verificado
+  E2E post-release: visitante dismissed → excluido; visitante fresco → ve el CTA; `engineState: ok`.
+- Kill switches global/per-surface operativos en producción, sin redeploy; renderer 1.1.0 live
+  enviando identidad pseudónima consent-aware.
+- `slide_in` disponible end-to-end; no hay campaña interruptiva publicada aún — surface/copy/trigger
+  es decisión del operador, no un pendiente de ingeniería.
+- Exit criteria del epic que ya se cumplen con esto: placement interruptivo shipped con evidencia,
+  eventos two-tier (Tier B rollup fuera del ledger OLTP), kill switch live dentro del TTL del
+  render contract, y visitor suppression consent-aware.
+- Lo que queda del epic: `TASK-1431` (Action Registry + navegación gobernada), `TASK-1430`
+  (cockpit de autoría/reporting), cierre de `TASK-1427` (ventana 7d hasta 2026-07-25 + decisión de
+  placement amplio WP) y la campaña interruptiva inaugural.
+
 ## Delta 2026-07-18
 
 - **Primera rebanada activa en Think; cierre productivo aún incompleto**: TASK-1339 y TASK-1340

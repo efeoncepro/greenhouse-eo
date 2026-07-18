@@ -1,9 +1,9 @@
 # Motor de CTAs y Popups — `growth.cta`
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-07-17 por Claude (TASK-1339)
-> **Ultima actualizacion:** 2026-07-18 por Claude (TASK-1429: primer placement interruptivo `slide_in` no modal + CTA Experience System + identidad pseudónima consent-aware en el renderer)
+> **Ultima actualizacion:** 2026-07-18 por Claude (release d5db8b568: enforcement de suppression ACTIVO en producción + slide_in live)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md)
 > **Skill de dominio:** `greenhouse-growth-ctas` (Claude + Codex; se actualiza con cada cambio del motor)
 
@@ -16,7 +16,8 @@ El motor de CTAs es el sistema que decide **qué invitación a la acción (promp
 - La primera rebanada está **live en las dos superficies**: el CTA `ai-visibility-report-followup` ("¿Cómo ve la IA a tu marca?") se muestra al final del **reporte público de AI Visibility en Think** (`think.efeoncepro.com/brand-visibility/r/…`) y en la **página de prueba de WordPress** (`efeoncepro.com/greenhouse-cta-prueba/`, no indexable — el operador decidió validar en una página de prueba antes del despliegue amplio).
 - El flag `GROWTH_CTA_ENGINE_ENABLED` está **encendido en staging y producción**.
 - La medición está **completa y verificada de extremo a extremo en ambos hosts** (TASK-1427): eventos en el dataLayer, hits reales llegando a GA4, registro server-side en el ledger y rechazo comprobado de credenciales forjadas.
-- Falta por decisión del negocio: el **placement amplio en WordPress** (qué páginas, tras validar la prueba), el placement **interruptivo** (popup/slide-in) y el cockpit de autoría visual (hoy se autora por API/CLI).
+- Con el release de hoy (`d5db8b568`) también están **en producción**: el **respeto al visitante (suppression) operando de verdad** — el motor ya no repite un CTA a quien lo descartó, dentro de su ventana —, los **frenos de emergencia** (kill switch global y por superficie, verificados en vivo sin necesidad de deploy) y el formato **slide-in** listo en el motor.
+- Falta por decisión del negocio: el **placement amplio en WordPress** (qué páginas, tras validar la prueba), **publicar la primera campaña interruptiva** (el formato slide-in ya está listo; falta elegir superficie, mensaje y momento) y el cockpit de autoría visual (hoy se autora por API/CLI).
 
 ## Cómo funciona (en simple)
 
@@ -66,7 +67,7 @@ publicada: encenderla es una decisión del operador (elegir superficie, mensaje 
 
 ## Respeto al visitante (suppression) y frenos de emergencia — TASK-1428
 
-El motor recuerda de forma pseudónima (solo hashes, nunca datos personales) si un visitante ya cerró un CTA, ya convirtió, o ya vio demasiados prompts interruptivos — y decide en el servidor no volver a mostrárselo dentro de la ventana correspondiente. Sin consentimiento del visitante el recuerdo dura solo la sesión, y los formatos interruptivos directamente no se muestran a visitantes sin identidad. Hoy esta decisión corre **en shadow**: se registra qué se habría suprimido, sin cambiar lo que se muestra; el enforcement se activa por flag tras comparar.
+El motor recuerda de forma pseudónima (solo hashes, nunca datos personales) si un visitante ya cerró un CTA, ya convirtió, o ya vio demasiados prompts interruptivos — y decide en el servidor no volver a mostrárselo dentro de la ventana correspondiente. Sin consentimiento del visitante el recuerdo dura solo la sesión, y los formatos interruptivos directamente no se muestran a visitantes sin identidad. Desde el release del 2026-07-18 esta decisión está **activa en staging y producción** (verificada con visitantes de prueba en ambos ambientes): el motor ya no le muestra un CTA a quien lo descartó, dentro de su ventana.
 
 La exposición masiva (cuántas veces se mostró/suprimió/vio un CTA) se guarda **agregada por hora** en una tabla analítica aparte — nunca infla el ledger de conversión. Y ante un incidente, el operador puede apagar el motor completo o una sola superficie **al instante y sin deploy** (kill switch con auditoría de quién/cuándo/por qué); mientras esté activo, una señal en warning lo hace visible.
 

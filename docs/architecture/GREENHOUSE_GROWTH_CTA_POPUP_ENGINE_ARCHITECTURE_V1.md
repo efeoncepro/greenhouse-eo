@@ -858,3 +858,21 @@ El primer placement interruptivo del §10 y el sistema de experiencia del §15 e
 - **Preview `/growth/ctas`**: matriz de density (mismo fixture a 3 anchos) + demo VIVO del overlay (`SlideInController` immediate) + fixtures pairwise (`slideIn`/`Spotlight`/`Minimal`/`LongCopy`/`UnknownAppearance`). GVC `task-1429-growth-cta-interruptive-placement` (1440+390) mirado: density matrix, overlay open/escaped, appearances, long copy. El loop cazó 2 bugs reales pre-merge (destroy cross-instance bajo StrictMode; density rules ancladas a la clase del overlay).
 
 Fuera de esta entrega: primer CTA slide_in REAL publicado (surface/copy/trigger = decisión del operador; ningún CTA interruptivo existe aún — el placement amplio sigue gateado por enforcement ON, §24), popup_modal/floating_button, action kinds nuevos (TASK-1431), cockpit (TASK-1430).
+
+## 26. Delta 2026-07-18 — Rollout productivo de §24+§25 (release `d5db8b568`)
+
+Release `d5db8b568` (manifest `released`, orquestador run 29651461496) llevó TASK-1428+1429 a producción:
+
+- **Suppression enforcement ON**: `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` activo en staging y
+  Production, verificado E2E post-release (dismiss ⇒ exclusión por visitante; visitante fresco ve;
+  sin identidad ⇒ solo embedded eligible).
+- **Kill switches operativos en producción**: ciclo engage ⇒ `engineState: 'killed'` ⇒ release ⇒
+  restaurado, verificado en runtime real sin redeploy; la ventana efectiva quedó como documenta §24.
+- **Renderer 1.1.0 en producción** enviando identidad pseudónima consent-aware: el visitor state de
+  §24 opera con visitantes reales.
+- **`viewed` visibility-gated activo** (IO ≥50% + dwell) en producción; el corte de serie está
+  registrado en TRACKING-PLAN §CTAs.
+- **Pendiente**: primera campaña `slide_in` real (decisión de operador) + monitor 7d de señales
+  `growth.cta.*` hasta 2026-07-25.
+
+Con esto, las fases 1-3 de §18 están productivas; quedan cockpit (TASK-1430) y Action Registry (TASK-1431).

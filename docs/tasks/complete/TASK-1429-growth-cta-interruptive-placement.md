@@ -1,5 +1,18 @@
 # TASK-1429 — Growth CTA interruptive placement
 
+## Delta 2026-07-18 (cierre) — RELEASED a producción
+
+- **Bundle 1.1.0 del renderer en producción vía release `d5db8b568`** (PR #159 + #160, manifest
+  `released` 16:23Z), junto con TASK-1428.
+- **Identidad pseudónima consent-aware live**: el renderer envía visitor/session/consent headers en
+  render + ingest — cierra el loop con TASK-1428, cuyo enforcement quedó ON en staging + Production
+  (verificado E2E: dismissed → excluido; fresco → ve).
+- **`viewed` visibility-gated activo en producción** (IO ≥50% + dwell 300ms); el corte de serie
+  quedó registrado en TRACKING-PLAN §CTAs y afecta la lectura de la ventana 7d de TASK-1427.
+- La primera campaña slide_in real (surface/copy/trigger) es **decisión de campaña del operador**;
+  el motor quedó listo end-to-end, sin campaña interruptiva publicada aún.
+- **Task complete.**
+
 ## Delta 2026-07-18 (implementación) — Slices 1-3 CODE-COMPLETE; GVC mirado; rollout en curso
 
 - **Implementado en develop local** (2 commits feat): `SlideInController` no modal (waiting sin DOM

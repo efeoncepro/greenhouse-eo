@@ -1,5 +1,19 @@
 # TASK-1428 — Growth CTA suppression, exposure and kill switches
 
+## Delta 2026-07-18 (cierre) — RELEASED a producción
+
+- **Release `d5db8b568` (PR #159 + #160, orquestador run `29651461496`, manifest `released`
+  16:23Z)** llevó esta task a producción junto con TASK-1429.
+- **Enforcement `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` ON en staging + Production**,
+  verificado E2E post-release con visitante real sintético: dismiss → exclusión del mismo visitor;
+  visitante fresco sigue viendo el CTA; sin identidad = solo embedded eligible. `engineState: ok`.
+- **Kill switch operativo en producción** (global/per-surface, efecto sin redeploy, verificado
+  dentro del TTL del render contract).
+- Fila del flag en `FEATURE_FLAG_STATE_LEDGER.md` en estado final (ON staging + Production);
+  §Pendientes de acción de esta task cerrados.
+- **Task complete.** Queda la ventana de monitor 7d de señales `growth.cta.*` hasta 2026-07-25
+  (seguimiento en TASK-1427), pendiente de negocio, no de ingeniería.
+
 ## Delta 2026-07-18 — Slices 1-3 CODE-COMPLETE (shadow); rollout pendiente
 
 - **Implementado y committeado en develop local (SIN push)**: migración aditiva `20260718131956294`
