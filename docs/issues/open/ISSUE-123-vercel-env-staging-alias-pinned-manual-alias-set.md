@@ -1,6 +1,6 @@
 # ISSUE-123 — Alias `env-staging` de Vercel fijado a un deployment viejo por `vercel alias set` manual (bug class recurrente)
 
-- **Estado:** open (tooling resiliente SHIPPED; des-pin del alias pendiente de acción del operador)
+- **Estado:** open (tooling resiliente SHIPPED + des-pin ejecutado + **re-atado automático VERIFICADO ciclo 1**; falta 1 ciclo más para cierre)
 - **Detectado:** 2026-07-18 (3ª recurrencia; 1ª 2026-07-17, 2ª 2026-07-18 AM)
 - **Ambiente:** Vercel staging (custom environment `staging` del proyecto `greenhouse-eo`)
 - **Dominio:** infra/tooling de agentes (staging access)
@@ -86,7 +86,14 @@ es `alias rm` (des-pin) o tooling por deployment vigente (`staging:url`).
 
 ## Verificación de cierre
 
-- [ ] Operador ejecutó `vercel alias rm` (o decidió explícitamente convivir con el alias pinneado).
-- [ ] Deploy staging posterior re-ata el alias automáticamente (BUILDINFO del alias == deploy vigente).
-- [ ] Un deploy MÁS y el alias sigue moviéndose solo (2 ciclos sin intervención manual).
-- [ ] `pnpm staging:request` y `pnpm staging:url` siguen resolviendo el deployment vigente.
+- [x] `vercel alias rm` ejecutado 2026-07-18 PM con autorización explícita del operador (el classifier
+      bloquea la mutación a agentes; la autorización en sesión la destrabó).
+- [x] **Ciclo 1 VERIFICADO** (2026-07-18 ~14:40): tras el `rm` el alias quedó 404 (suelto); al quedar
+      Ready el deploy `greenhouse-52ktlj8ze` (push `e6c29d70a`), Vercel re-ató el alias
+      automáticamente — pasó de 404 a servir el bundle vigente (`BUILDINFO bytes=38098`) sin ningún
+      `alias set`. Mientras el deploy compilaba, el resolver siguió eligiendo el último READY
+      (resiliencia diseñada, observada en vivo).
+- [ ] Ciclo 2: el próximo deploy staging mueve el alias solo (sin intervención manual).
+- [x] `pnpm staging:request` (E2E: resolver + auth agente + 200) y `pnpm staging:url` resuelven el
+      deployment vigente; GVC compuesto (`STAGING_URL=$(pnpm --silent staging:url)`) capturó OK con
+      storageState por host.
