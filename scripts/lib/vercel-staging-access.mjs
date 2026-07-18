@@ -13,6 +13,23 @@ export const DEFAULT_AGENT_EMAIL = 'agent@greenhouse.efeonce.org'
 const noop = () => {}
 
 export async function getVercelCliToken({ log = noop } = {}) {
+  // 1) VERCEL_TOKEN del entorno (o de .env.local) — la fuente CANÓNICA en las máquinas
+  //    del equipo: el propio CLI se invoca como `vercel --token "$VERCEL_TOKEN"` (función
+  //    de shell), así que el auth.json del CLI puede quedar con un access token OAuth
+  //    expirado (el CLI refresca en memoria y NUNCA persiste — 403 invalidToken detectado
+  //    2026-07-18 durante el rollout TASK-1340). El env var es un token personal estable.
+  if (process.env.VERCEL_TOKEN) return process.env.VERCEL_TOKEN
+
+  try {
+    const env = await readEnvFile()
+
+    if (env.VERCEL_TOKEN) return env.VERCEL_TOKEN
+  } catch {
+    // sin .env.local — seguir con los paths del CLI.
+  }
+
+  // 2) auth.json del CLI (fallback; puede estar expirado — ver arriba). Se valida
+  //    contra expiresAt cuando existe para no devolver un token muerto.
   const paths = [
     resolve(homedir(), 'Library/Application Support/com.vercel.cli/auth.json'),
     resolve(homedir(), '.local/share/com.vercel.cli/auth.json')
@@ -22,7 +39,17 @@ export async function getVercelCliToken({ log = noop } = {}) {
     try {
       const data = JSON.parse(await readFile(path, 'utf-8'))
 
-      if (data.token) return data.token
+      if (data.token) {
+        // expiresAt viene en segundos (formato OAuth del CLI); normalizar por si cambia a ms.
+        const expiresMs = typeof data.expiresAt === 'number' ? (data.expiresAt > 1e12 ? data.expiresAt : data.expiresAt * 1000) : null
+
+        if (expiresMs !== null && expiresMs < Date.now()) {
+          log(`  bypass: token de ${path} expirado (expiresAt=${data.expiresAt}) — se ignora; exportá VERCEL_TOKEN o corré vercel login`)
+          continue
+        }
+
+        return data.token
+      }
     } catch {
       // Try the next platform-specific path.
     }

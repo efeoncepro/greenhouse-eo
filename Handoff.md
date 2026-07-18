@@ -121,9 +121,13 @@
 > `cta_slug`/`cta_location`/`placement`; snapshot refrescado; (5) smoke prod: bundle 200, render
 > arbitrado, forja 403, ingest accepted. TRACKING-PLAN §CTAs ✅ · ledger flags ON/ON · timing
 > ledger registrado. **Pendientes**: embed WP (falta decisión de placement del host — snippet listo
-> en el manual), signals `growth.cta.*` en `/admin/operations` a monitorear 7d (los 2 unauthorized
-> del smoke 17-jul ya expiraron), y ⚠️ `staging-request`/GVC-staging ROTOS: el access token del
-> Vercel CLI expiró en abril y el CLI no lo re-persiste — correr `vercel login` para reparar.
+> en el manual) y signals `growth.cta.*` en `/admin/operations` a monitorear 7d. ✅ **Vercel
+> RESUELTO (fix de raíz)**: `getVercelCliToken` ahora prefiere `VERCEL_TOKEN` (env/.env.local —
+> la fuente que usa el propio CLI vía función de shell) y descarta tokens de auth.json expirados
+> con log accionable; `staging-request` volvió a 200 y el bypass secret quedó persistido en
+> .env.local (GVC staging desbloqueado). ⚠️ El alias `greenhouse-eo-env-staging` volvió a quedar
+> pegado a un deploy viejo (2ª vez — 1ª el 2026-07-17): re-apuntado con `vercel alias set`;
+> si recurre, candidato a task de guard. Smoke staging del CTA: render contract arbitrado 200.
 
 ## Sesión 2026-07-18 — TASK-1340 Renderer CTA + capa GTM + gobernanza Growth COMPLETA (code complete, shadow)
 
