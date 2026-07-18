@@ -6593,6 +6593,82 @@ export interface GreenhouseFinanceVatMonthlyPositions {
   vat_position_id: string;
 }
 
+export interface GreenhouseGrowthCtaConversionEvent {
+  action_kind: string | null;
+  consent_source: string | null;
+  consent_state: string | null;
+  created_at: Generated<Timestamp>;
+  cta_id: string | null;
+  cta_version_id: string | null;
+  dedupe_fingerprint: string | null;
+  event_id: Generated<string>;
+  event_kind: string;
+  event_payload_json: Generated<Json>;
+  form_submission_id: string | null;
+  ingest_status: Generated<string>;
+  ip_hash: string | null;
+  page_uri: string | null;
+  placement: string | null;
+  referrer_domain: string | null;
+  rejection_reason_class: string | null;
+  session_key_hash: string | null;
+  surface_id: string | null;
+  trigger_kind: string | null;
+  trust_level: Generated<string>;
+  utm_json: Generated<Json>;
+  variant_id: string | null;
+  visitor_key_hash: string | null;
+}
+
+export interface GreenhouseGrowthCtaDefinition {
+  campaign_slug: string | null;
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  cta_id: Generated<string>;
+  default_locale: Generated<string>;
+  name: string;
+  owner_team: string | null;
+  purpose: string;
+  slug: string;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseGrowthCtaSurfaceBinding {
+  allowed_cta_slugs_json: Generated<Json>;
+  created_at: Generated<Timestamp>;
+  embed_key_hash: string | null;
+  embed_key_id: string | null;
+  origin_allowlist_json: Generated<Json>;
+  renderer_channel: Generated<string>;
+  status: Generated<string>;
+  surface_id: Generated<string>;
+  surface_kind: string;
+  surface_name: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseGrowthCtaVersion {
+  action_policy_json: Generated<Json>;
+  analytics_policy_json: Generated<Json>;
+  content_json: Generated<Json>;
+  copy_refs_json: Generated<Json>;
+  created_at: Generated<Timestamp>;
+  cta_id: string;
+  cta_version_id: Generated<string>;
+  experiment_policy_json: Generated<Json>;
+  locale: Generated<string>;
+  placement: string;
+  priority_policy_json: Generated<Json>;
+  published_at: Timestamp | null;
+  status: Generated<string>;
+  style_variant: string | null;
+  suppression_policy_json: Generated<Json>;
+  targeting_policy_json: Generated<Json>;
+  version: number;
+  visual_asset_ref: string | null;
+}
+
 export interface GreenhouseGrowthEmailVerificationCache {
   created_at: Generated<Timestamp>;
   deliverable: Generated<string>;
@@ -11658,6 +11734,10 @@ export interface DB {
   "greenhouse_finance.tax_codes": GreenhouseFinanceTaxCodes;
   "greenhouse_finance.vat_ledger_entries": GreenhouseFinanceVatLedgerEntries;
   "greenhouse_finance.vat_monthly_positions": GreenhouseFinanceVatMonthlyPositions;
+  "greenhouse_growth.cta_conversion_event": GreenhouseGrowthCtaConversionEvent;
+  "greenhouse_growth.cta_definition": GreenhouseGrowthCtaDefinition;
+  "greenhouse_growth.cta_surface_binding": GreenhouseGrowthCtaSurfaceBinding;
+  "greenhouse_growth.cta_version": GreenhouseGrowthCtaVersion;
   "greenhouse_growth.email_verification_cache": GreenhouseGrowthEmailVerificationCache;
   "greenhouse_growth.form_asset": GreenhouseGrowthFormAsset;
   "greenhouse_growth.form_definition": GreenhouseGrowthFormDefinition;

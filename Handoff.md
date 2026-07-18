@@ -1,3 +1,61 @@
+## Sesión 2026-07-18 — Investigación GSC canonizada en skills
+
+> `seo-aeo` incorpora una referencia fechada sobre Search Console API, URL Inspection, sitemaps, Indexing API y
+> Platform Properties. El runbook Content Factory y `efeonce-public-site-wordpress` (Codex/Claude) ahora exigen
+> sitemap con `lastmod` honesto y separan publicación de observación de indexación. No hubo cambio runtime ni
+> ampliación OAuth: Greenhouse sigue `webmasters.readonly`; `TASK-1426` concentra multi-property, canary live y
+> checkpoints `0h/24h/72h` pendientes de implementación.
+
+## Sesión 2026-07-18 — TASK-1340 Renderer CTA + capa GTM + gobernanza Growth COMPLETA (code complete, shadow)
+
+> Implementada TASK-1340 en `develop` local (SIN push) con los 3 deltas del operador: (1) renderer
+> portable `<greenhouse-cta>` rico y versátil (3 style variants por dato + tokens host-override +
+> slot visual; 22,6KB; parity CSS por construcción tras drift atrapado en GVC); (2) capa GTM:
+> `greenhouse_cta_*` → dataLayer con allowlist dura + SoT server + TRACKING-PLAN §CTAs con spec
+> turnkey de tags (publish gobernado en el flip); (3) gobernanza en `/growth/ctas` (menú Growth,
+> viewCode `gestion.growth_ctas` seeded, lifecycle + preview, GVC mirado 1440/390). Island Think
+> commiteada en rama LOCAL `task/TASK-1340-growth-cta-followup` de `efeonce-think` (sin push; PR a
+> señal; type-check roto preexiste en su main). Embed WP documentado en el manual. Master flow
+> EPIC-023 creado. Flip turnkey documentado en el flag ledger (flag + Think env + WP embed + tags
+> GA4 + smoke). OJO: detuve el dev server (:3000) para los gates de cierre — relanzar con `pnpm dev`
+> si lo necesitas.
+
+## Sesión 2026-07-17 (noche) — TASK-1339 Growth CTA Engine foundation COMPLETA (code complete, shadow)
+
+> Implementados los 4 slices en `develop` local (SIN push): schema `greenhouse_growth.cta_*`
+> (2 migraciones APLICADAS a dev + verificadas), primitive `src/lib/growth/ctas/` (arbiter
+> server-side 0–1 interruptivo, ingest forjable-hardened con trust_level + cross-check, publish
+> atómico inmutable, action router solo open_growth_form), API pública render/events + admin
+> lifecycle/surfaces, capabilities `growth.cta.*`+grants+coverage, 4 signals cableadas, outbox
+> v1 in-tx. Primer CTA real `ai-visibility-report-followup` PUBLISHED con bindings wordpress+think;
+> smoke e2e verde contra PG dev (embed key secrets entregados UNA vez en el seed run — para la
+> config de hosts de TASK-1340; rotables). El smoke SQL atrapó un bug real (query() retorna rows,
+> no {rows}). Suite full 9622 passed + build prod verdes. Flag `GROWTH_CTA_ENGINE_ENABLED` OFF en
+> todos los environments (ledger al día): **flip coordinado con TASK-1340 (desbloqueada, delta
+> escrito en su spec)**. Task movida a complete/. Pendiente del operador: push a develop cuando
+> corresponda batchear.
+
+## Sesión 2026-07-17 (noche) — polish cockpit AEO post-feedback + resolver canónico de logos
+
+> Feedback del operador sobre prod: cockpit no fiel al mockup, sin logos, picker=dump del CRM.
+> Aplicado y verificado local (GVC + scroll 0 + 710 tests focales): resolver canónico
+> `resolveOrganizationLogoUrl` (6 call sites consolidados), cockpit con 4 KPIs/sparkline/plan/
+> filtros segmentados, picker search-first (prospectos solo con búsqueda + sitio web). Berel scoreó
+> 44,5 con el re-run (caso "sin score" era pre-fix 04-07). Pendiente: push→staging y decidir si va
+> en un release a prod ahora o en el próximo batch. VS Code crasheó una vez por presión de memoria
+> (dev server 10GB + suite + build simultáneos) — mantener carga secuencial.
+
+## Sesión 2026-07-17 — TASK-1276 RELEASED a producción
+
+> Release develop→main PR #157 (squash `83e4926f83dd`, 139 commits de develop, cabeza TASK-1276).
+> Orquestador `29616458382` completo: preflight (bypass batch-policy documentado por la seed
+> migration idempotente), 2 gates `production` aprobados al toque (watcher de pending_deployments),
+> workers 4/4, Azure no-op, Vercel READY, health OK → manifest
+> `83e4926f83dd-bfc135d8-e89b-4efe-82c4-7e26105b8e5f` **released**. Prod `/growth/aeo` = 307 anon.
+> Watchdog: residual conocido `ops-worker` change-gated (diff runtime vacío, Ready=True) — NO drift,
+> sin redeploy. CI `Test` volvió a pisar su timeout de 8 min con suite verde (2do release del día) —
+> candidato a subir timeout-minutes. Cero flags a prender. TASK-1276 movida a `complete/`.
+
 ## Sesión 2026-07-17 — TASK-1276 rollout a staging VERIFICADO
 
 > Push `develop` (7 commits TASK-1276) → staging Ready. **Incidente menor**: el alias

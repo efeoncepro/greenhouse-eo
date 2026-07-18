@@ -2121,6 +2121,16 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // reason + audit append-only. Grant least-privilege (EFEONCE_ADMIN ∪ EFEONCE_OPERATIONS,
   // NO EFEONCE_ACCOUNT) en runtime.ts mismo PR.
   { key: 'growth.forms.lead_pii.reveal', module: 'growth', actions: ['read'] as const, defaultScope: 'tenant' },
+  // TASK-1339 — Growth CTA & Popup Engine (dominio growth.cta). 4 capabilities gobernadas
+  // (Full API Parity): lifecycle author/publish/pause como commands, read como reader.
+  // `pause` es capability SEPARADA de `publish` a propósito: habilita el stop de emergencia
+  // (arch §16.3) sin otorgar autoridad de publicación. Acción canónica `execute` (la
+  // intención vive en la key). Grant en runtime.ts (internal ∪ EFEONCE_ADMIN ∪
+  // EFEONCE_ACCOUNT ∪ EFEONCE_OPERATIONS — espejo growth.forms) mismo PR.
+  { key: 'growth.cta.read', module: 'growth', actions: ['read'] as const, defaultScope: 'tenant' },
+  { key: 'growth.cta.author', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
+  { key: 'growth.cta.publish', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
+  { key: 'growth.cta.pause', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
   // TASK-1282 — Search Console connection. Conectar/desconectar la propiedad Google
   // Search Console de una organización cliente (OAuth 3-legged, token per-org). Acción
   // canónica `execute` (verbo de gobernanza: connect/disconnect son commands; el LLM

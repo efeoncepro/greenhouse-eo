@@ -24,8 +24,10 @@ import { type TenantEntitlementSubject } from '@/lib/entitlements/types'
 import {
   getClientGraderRunById,
   getLatestClientGraderRun,
+  getOperatorAeoRunActivityThisMonth,
   listOperatorCrossOrgAeoScores,
-  type OperatorAeoCockpitRow
+  type OperatorAeoCockpitRow,
+  type OperatorAeoRunActivity
 } from '../store'
 import { readGraderReport, GraderReportError } from '../report/command'
 import { type ClientGraderReport } from '../report/contracts'
@@ -115,4 +117,23 @@ export const readOperatorCrossOrgAeoScores = async (input: {
   }
 
   return listOperatorCrossOrgAeoScores()
+}
+
+export type { OperatorAeoRunActivity }
+
+/**
+ * TASK-1276 polish — actividad de runs del mes para el KPI del cockpit (mockup aprobado:
+ * "Runs este mes · N de venta"). Mismo gate operador; solo lectura.
+ */
+export const readOperatorAeoRunActivity = async (input: {
+  subject: TenantEntitlementSubject
+}): Promise<OperatorAeoRunActivity> => {
+  if (!can(input.subject, 'growth.ai_visibility.report.read_operator', 'read', 'tenant')) {
+    throw new OperatorGraderReportError(
+      'forbidden',
+      'No tienes acceso al cockpit AEO de operador.'
+    )
+  }
+
+  return getOperatorAeoRunActivityThisMonth()
 }

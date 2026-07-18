@@ -117,3 +117,5 @@ scripts/knowledge/.cache/
 # TASK-1231 — Growth Forms renderer bundle (generado por pnpm renderer:build / prebuild)
 public/growth-forms/*.js
 public/growth-forms/BUILDINFO.json
+public/growth-cta/*.js
+public/growth-cta/BUILDINFO.json

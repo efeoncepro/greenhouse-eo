@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
@@ -18,10 +19,8 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
+import { useTheme } from '@mui/material/styles'
 
-import Button from '@mui/material/Button'
-
-import CustomAvatar from '@core/components/mui/Avatar'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import EmptyState from '@/components/greenhouse/EmptyState'
@@ -29,14 +28,17 @@ import { GreenhouseBreadcrumbs } from '@/components/greenhouse/primitives'
 import { GH_GROWTH_AEO_OPERATOR } from '@/lib/copy/growth'
 import { formatNumber } from '@/lib/format/number'
 import AeoOperatorRunPicker, { type AeoRunTargetVM } from './AeoOperatorRunPicker'
+import OrgLogoAvatar from './OrgLogoAvatar'
 
 /**
- * TASK-1276 Slice 3 — Cockpit cross-cliente del programa AEO (nodo S8, ruta /growth/aeo).
+ * TASK-1276 Slice 3 + polish 2026-07-17 — Cockpit cross-cliente del programa AEO (nodo S8).
  *
- * Diseño aprobado: mockup Claude Design "AEO Operator View" (KPIs + tabla de clientes con score,
- * tier y último run; fila → detalle). Data = `readOperatorCrossOrgAeoScores` (TASK-1287, honest
- * degradation: score null = "Sin medición", NUNCA 0). Las filas de targets sin AEO + prospectos
- * (cross-sell) llegan con el subject picker (Slice 5) — este cockpit lista orgs CON módulo AEO.
+ * Diseño aprobado: mockup Claude Design "AEO Operator View" (Región 1). Fidelidad aplicada tras el
+ * feedback del operador en producción: logos reales de las orgs (resolver canónico server-side),
+ * columnas del mockup (Cliente+publicId · Tier · Score+barra · Tendencia sparkline · Plan AEO ·
+ * chevron), filtros segmentados en contenedor, y 4 KPIs con data real (clientes, score promedio,
+ * focos en curso, runs del mes con atribución a ventas). Honest siempre: score null = "Sin
+ * medición"; sin histórico = "—"; plan sin filas = "Sin seguimiento aún".
  */
 
 const O = GH_GROWTH_AEO_OPERATOR
@@ -44,29 +46,37 @@ const O = GH_GROWTH_AEO_OPERATOR
 export interface AeoCockpitRowVM {
   organizationId: string
   organizationName: string
+  organizationPublicId: string | null
+  logoUrl: string | null
   tierLabel: string
   /** null = sin run con score (degradación honesta — nunca 0). */
   latestScore: number | null
+  /** Últimos scores (asc) para el sparkline; [] o 1 punto = sin tendencia. */
+  scoreHistory: number[]
+  planInProgress: number
+  planDone: number
+  planTracked: number
   /** Fecha formateada del último run reportable; null = sin runs. */
   lastRunLabel: string | null
 }
 
+export interface AeoCockpitKpisVM {
+  clientsWithAeo: number
+  avgScore: number | null
+  planInProgressTotal: number
+  runsThisMonth: number
+  salesRunsThisMonth: number
+}
+
 export interface AeoOperatorCockpitViewProps {
   rows: AeoCockpitRowVM[]
+  kpis: AeoCockpitKpisVM
   /** Targets de cross-sell (clientes sin AEO = expansión; prospectos HubSpot = new business). */
   targets: AeoRunTargetVM[]
 }
 
-// Filtros del cockpit (pills del mockup): todos / por tier / por motion de cross-sell.
+// Filtros del cockpit (pills del mockup): todos / por grupo.
 type CockpitFilter = 'all' | 'aeo' | 'expansion' | 'new_business'
-
-const initialsOf = (name: string): string =>
-  name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map(w => w[0]?.toUpperCase() ?? '')
-    .join('')
 
 // Semáforo del score (espejo del severity mapping del report): >=70 óptimo, >=50 atención, <50 crítico.
 const scoreTone = (score: number): 'success' | 'warning' | 'error' =>
@@ -85,7 +95,7 @@ const ScoreCell = ({ score }: { score: number | null }) => {
 
   return (
     <Stack direction='row' spacing={3} alignItems='center' sx={{ minWidth: 140 }}>
-      <Typography variant='monoId' sx={{ minWidth: 28, fontWeight: 700, color: `${tone}.main` }}>
+      <Typography variant='monoId' sx={{ minWidth: 30, fontWeight: 700, color: `${tone}.main` }}>
         {formatNumber(score)}
       </Typography>
       <Box
@@ -111,7 +121,70 @@ const ScoreCell = ({ score }: { score: number | null }) => {
   )
 }
 
-const AeoOperatorCockpitView = ({ rows, targets }: AeoOperatorCockpitViewProps) => {
+// Sparkline honesto (mockup): línea de los últimos scores; <2 puntos = "—" (sin tendencia fabricada).
+const ScoreSparkline = ({ history, name, score }: { history: number[]; name: string; score: number | null }) => {
+  const theme = useTheme()
+
+  if (history.length < 2) {
+    return (
+      <Typography variant='body2' color='text.disabled'>
+        —
+      </Typography>
+    )
+  }
+
+  const tone = score === null ? 'warning' : scoreTone(score)
+  const color = theme.palette[tone].main
+  const w = 70
+  const h = 22
+  const max = 100
+  const lo = Math.max(0, Math.min(...history) - 10)
+  const x = (i: number) => (i / (history.length - 1)) * w
+  const y = (v: number) => h - ((v - lo) / (max - lo)) * h
+  const points = history.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ')
+  const last = history[history.length - 1]
+
+  return (
+    <Box role='img' aria-label={`${O.cockpit.trendAria(name)}: ${history.map(v => formatNumber(v)).join(' → ')}`}>
+      <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ display: 'block', overflow: 'visible' }}>
+        <polyline
+          points={points}
+          fill='none'
+          stroke={color}
+          strokeWidth={2}
+          strokeLinecap='round'
+          strokeLinejoin='round'
+        />
+        <circle cx={x(history.length - 1)} cy={y(last)} r={2.5} fill={color} />
+      </svg>
+    </Box>
+  )
+}
+
+// Plan AEO honesto: conteos reales del write de TASK-1275 (nunca un % contra un total desconocido).
+const PlanCell = ({ row }: { row: AeoCockpitRowVM }) => {
+  if (row.planTracked === 0) {
+    return (
+      <Typography variant='body2' color='text.disabled'>
+        {O.cockpit.planUntracked}
+      </Typography>
+    )
+  }
+
+  const parts: string[] = []
+
+  if (row.planInProgress > 0) parts.push(O.cockpit.planInProgressLabel(row.planInProgress))
+  if (row.planDone > 0) parts.push(O.cockpit.planDoneLabel(row.planDone))
+  if (parts.length === 0) parts.push(O.cockpit.planUntracked)
+
+  return (
+    <Typography variant='body2' color='text.secondary' sx={{ whiteSpace: 'nowrap' }}>
+      {parts.join(' · ')}
+    </Typography>
+  )
+}
+
+const AeoOperatorCockpitView = ({ rows, kpis, targets }: AeoOperatorCockpitViewProps) => {
   const router = useRouter()
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState<CockpitFilter>('all')
@@ -130,7 +203,8 @@ const AeoOperatorCockpitView = ({ rows, targets }: AeoOperatorCockpitViewProps) 
         organizationId: r.organizationId,
         organizationName: r.organizationName,
         motion: 'aeo' as const,
-        subtitle: r.tierLabel
+        subtitle: r.tierLabel,
+        logoUrl: r.logoUrl
       })),
       ...targets
     ],
@@ -159,8 +233,6 @@ const AeoOperatorCockpitView = ({ rows, targets }: AeoOperatorCockpitViewProps) 
     return base.filter(t => t.organizationName.toLowerCase().includes(q))
   }, [targets, q, filter])
 
-  const scored = rows.filter(r => r.latestScore !== null)
-
   const filterPills: Array<{ key: CockpitFilter; label: string }> = [
     { key: 'all', label: O.cockpit.filterAll },
     { key: 'aeo', label: O.picker.groupAeo },
@@ -168,10 +240,38 @@ const AeoOperatorCockpitView = ({ rows, targets }: AeoOperatorCockpitViewProps) 
     { key: 'new_business', label: O.picker.groupProspects }
   ]
 
-  const avgScore =
-    scored.length > 0 ? Math.round(scored.reduce((sum, r) => sum + (r.latestScore ?? 0), 0) / scored.length) : null
-
   const openDetail = (organizationId: string) => router.push(`/growth/aeo/${organizationId}`)
+
+  const kpiCards = [
+    {
+      title: O.cockpit.kpiClients,
+      stats: formatNumber(kpis.clientsWithAeo),
+      avatarIcon: 'tabler-building-community',
+      avatarColor: 'primary' as const,
+      subtitle: O.cockpit.kpiClientsSub
+    },
+    {
+      title: O.cockpit.kpiAvgScore,
+      stats: kpis.avgScore === null ? O.cockpit.scoreNoData : formatNumber(kpis.avgScore),
+      avatarIcon: 'tabler-gauge',
+      avatarColor: 'info' as const,
+      subtitle: O.cockpit.kpiAvgScoreSub
+    },
+    {
+      title: O.cockpit.kpiPlanInProgress,
+      stats: formatNumber(kpis.planInProgressTotal),
+      avatarIcon: 'tabler-list-check',
+      avatarColor: 'success' as const,
+      subtitle: O.cockpit.kpiPlanInProgressSub
+    },
+    {
+      title: O.cockpit.kpiRunsMonth,
+      stats: formatNumber(kpis.runsThisMonth),
+      avatarIcon: 'tabler-player-play',
+      avatarColor: 'warning' as const,
+      subtitle: O.cockpit.kpiRunsMonthSub(kpis.salesRunsThisMonth)
+    }
+  ]
 
   return (
     <Stack spacing={6} sx={{ p: { xs: 4, md: 6 }, minWidth: 0 }} data-capture='aeo-operator-cockpit'>
@@ -210,41 +310,19 @@ const AeoOperatorCockpitView = ({ rows, targets }: AeoOperatorCockpitViewProps) 
       </Stack>
 
       <Grid container spacing={6}>
-        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <HorizontalWithSubtitle
-            title={O.cockpit.kpiClients}
-            stats={formatNumber(rows.length)}
-            avatarIcon='tabler-building-community'
-            avatarColor='primary'
-            subtitle={O.cockpit.kpiClientsSub}
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <HorizontalWithSubtitle
-            title={O.cockpit.kpiAvgScore}
-            stats={avgScore === null ? O.cockpit.scoreNoData : formatNumber(avgScore)}
-            avatarIcon='tabler-gauge'
-            avatarColor='info'
-            subtitle={O.cockpit.kpiAvgScoreSub}
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <HorizontalWithSubtitle
-            title={O.cockpit.kpiWithoutScore}
-            stats={formatNumber(rows.length - scored.length)}
-            avatarIcon='tabler-radar-2'
-            avatarColor='warning'
-            subtitle={O.cockpit.kpiWithoutScoreSub}
-          />
-        </Grid>
+        {kpiCards.map(card => (
+          <Grid key={card.title} size={{ xs: 12, sm: 6, lg: 3 }}>
+            <HorizontalWithSubtitle {...card} />
+          </Grid>
+        ))}
       </Grid>
 
       <Card elevation={0} sx={theme => ({ border: `1px solid ${theme.palette.divider}` })}>
         <CardContent>
           <Stack
-            direction={{ xs: 'column', sm: 'row' }}
+            direction={{ xs: 'column', lg: 'row' }}
             spacing={3}
-            alignItems={{ xs: 'flex-start', sm: 'center' }}
+            alignItems={{ xs: 'flex-start', lg: 'center' }}
             justifyContent='space-between'
           >
             <Stack spacing={0.5}>
@@ -256,18 +334,48 @@ const AeoOperatorCockpitView = ({ rows, targets }: AeoOperatorCockpitViewProps) 
               </Typography>
             </Stack>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} alignItems={{ xs: 'flex-start', sm: 'center' }}>
-              <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap role='group' aria-label={O.cockpit.tableTitle}>
-                {filterPills.map(pill => (
-                  <Chip
-                    key={pill.key}
-                    size='small'
-                    variant={filter === pill.key ? 'filled' : 'outlined'}
-                    color={filter === pill.key ? 'primary' : undefined}
-                    label={pill.label}
-                    onClick={() => setFilter(pill.key)}
-                  />
-                ))}
-              </Stack>
+              {/* Segmented control del mockup: contenedor neutro, pill activa resaltada */}
+              <Box
+                role='group'
+                aria-label={O.cockpit.tableTitle}
+                sx={theme => ({
+                  display: 'flex',
+                  gap: 1,
+                  p: 1,
+                  borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                  border: `1px solid ${theme.palette.divider}`,
+                  backgroundColor: theme.palette.action.hover,
+                  flexWrap: 'wrap'
+                })}
+              >
+                {filterPills.map(pill => {
+                  const active = filter === pill.key
+
+                  return (
+                    <Button
+                      key={pill.key}
+                      size='small'
+                      disableElevation
+                      onClick={() => setFilter(pill.key)}
+                      aria-pressed={active}
+                      sx={theme => ({
+                        px: 3,
+                        py: 1,
+                        minWidth: 0,
+                        borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                        fontWeight: 600,
+                        color: active ? theme.palette.primary.contrastText : theme.palette.text.secondary,
+                        backgroundColor: active ? theme.palette.primary.main : 'transparent',
+                        '&:hover': {
+                          backgroundColor: active ? theme.palette.primary.dark : theme.palette.action.selected
+                        }
+                      })}
+                    >
+                      {pill.label}
+                    </Button>
+                  )
+                })}
+              </Box>
               <CustomTextField
                 value={query}
                 onChange={e => setQuery(e.target.value)}
@@ -290,7 +398,8 @@ const AeoOperatorCockpitView = ({ rows, targets }: AeoOperatorCockpitViewProps) 
                   <TableCell>{O.cockpit.colClient}</TableCell>
                   <TableCell>{O.cockpit.colTier}</TableCell>
                   <TableCell sx={{ minWidth: 180 }}>{O.cockpit.colScore}</TableCell>
-                  <TableCell>{O.cockpit.colLastRun}</TableCell>
+                  <TableCell>{O.cockpit.colTrend}</TableCell>
+                  <TableCell>{O.cockpit.colPlan}</TableCell>
                   <TableCell align='right' />
                 </TableRow>
               </TableHead>
@@ -313,12 +422,17 @@ const AeoOperatorCockpitView = ({ rows, targets }: AeoOperatorCockpitViewProps) 
                   >
                     <TableCell>
                       <Stack direction='row' spacing={3} alignItems='center'>
-                        <CustomAvatar skin='light' color='primary' variant='rounded' size={34}>
-                          {initialsOf(row.organizationName)}
-                        </CustomAvatar>
-                        <Typography variant='body2' sx={{ fontWeight: 600 }} color='text.primary'>
-                          {row.organizationName}
-                        </Typography>
+                        <OrgLogoAvatar name={row.organizationName} logoUrl={row.logoUrl} size={34} />
+                        <Stack sx={{ minWidth: 0 }}>
+                          <Typography variant='body2' sx={{ fontWeight: 600 }} color='text.primary' noWrap>
+                            {row.organizationName}
+                          </Typography>
+                          {row.organizationPublicId ? (
+                            <Typography variant='monoId' color='text.disabled'>
+                              {row.organizationPublicId}
+                            </Typography>
+                          ) : null}
+                        </Stack>
                       </Stack>
                     </TableCell>
                     <TableCell>
@@ -328,9 +442,10 @@ const AeoOperatorCockpitView = ({ rows, targets }: AeoOperatorCockpitViewProps) 
                       <ScoreCell score={row.latestScore} />
                     </TableCell>
                     <TableCell>
-                      <Typography variant='body2' color='text.secondary'>
-                        {row.lastRunLabel ?? O.cockpit.lastRunNever}
-                      </Typography>
+                      <ScoreSparkline history={row.scoreHistory} name={row.organizationName} score={row.latestScore} />
+                    </TableCell>
+                    <TableCell>
+                      <PlanCell row={row} />
                     </TableCell>
                     <TableCell align='right'>
                       <i className='tabler-chevron-right' aria-hidden='true' />
@@ -356,14 +471,12 @@ const AeoOperatorCockpitView = ({ rows, targets }: AeoOperatorCockpitViewProps) 
                   >
                     <TableCell>
                       <Stack direction='row' spacing={3} alignItems='center'>
-                        <CustomAvatar
-                          skin='light'
-                          color={target.motion === 'expansion' ? 'info' : 'warning'}
-                          variant='rounded'
+                        <OrgLogoAvatar
+                          name={target.organizationName}
+                          logoUrl={target.logoUrl}
                           size={34}
-                        >
-                          {initialsOf(target.organizationName)}
-                        </CustomAvatar>
+                          color={target.motion === 'expansion' ? 'info' : 'warning'}
+                        />
                         <Typography variant='body2' sx={{ fontWeight: 600 }} color='text.primary'>
                           {target.organizationName}
                         </Typography>
@@ -377,17 +490,12 @@ const AeoOperatorCockpitView = ({ rows, targets }: AeoOperatorCockpitViewProps) 
                         label={O.cockpit.noAeoLabel}
                       />
                     </TableCell>
-                    <TableCell>
+                    <TableCell colSpan={2}>
                       <Typography variant='body2' color='text.secondary'>
                         {target.motion === 'expansion' ? O.cockpit.motionExpansionHint : O.cockpit.motionProspectHint}
                       </Typography>
                     </TableCell>
-                    <TableCell>
-                      <Typography variant='body2' color='text.secondary'>
-                        {O.cockpit.lastRunNever}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align='right'>
+                    <TableCell colSpan={2} align='right'>
                       <Chip
                         size='small'
                         variant='tonal'
@@ -400,7 +508,7 @@ const AeoOperatorCockpitView = ({ rows, targets }: AeoOperatorCockpitViewProps) 
                 ))}
                 {filtered.length === 0 && filteredTargets.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5}>
+                    <TableCell colSpan={6}>
                       <Typography variant='body2' color='text.secondary' sx={{ py: 4, textAlign: 'center' }}>
                         {O.cockpit.searchEmpty(query)}
                       </Typography>

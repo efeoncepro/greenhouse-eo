@@ -252,7 +252,10 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
     // TASK-1276 — cockpit operador del programa AEO (routeGroup internal, NO /admin).
     const canSeeGrowthAeo = canSeeView('gestion.growth_aeo', isAdminUser)
 
-    if (canSeeGrowthForms || canSeeGrowthAiVisibility || canSeeGrowthAeo) {
+    // TASK-1340 — gobernanza del motor de CTAs (delta operador: vive en Growth).
+    const canSeeGrowthCtas = canSeeView('gestion.growth_ctas', isAdminUser)
+
+    if (canSeeGrowthForms || canSeeGrowthAiVisibility || canSeeGrowthAeo || canSeeGrowthCtas) {
       menuData.push({
         label: nl(GH_INTERNAL_NAV.growth),
         icon: 'tabler-growth',
@@ -263,6 +266,15 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
                   label: nl(GH_INTERNAL_NAV.growthAeo),
                   href: '/growth/aeo',
                   icon: 'tabler-radar-2'
+                }
+              ]
+            : []),
+          ...(canSeeGrowthCtas
+            ? [
+                {
+                  label: nl(GH_INTERNAL_NAV.growthCtas),
+                  href: '/growth/ctas',
+                  icon: 'tabler-hand-click'
                 }
               ]
             : []),

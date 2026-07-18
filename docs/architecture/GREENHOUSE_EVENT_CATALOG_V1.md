@@ -1232,3 +1232,12 @@ Spec: `docs/tasks/in-progress/TASK-1175-design-handoff-control-plane-full-api-pa
 | `hiring.assessment.fairness.adverse_impact_detected` | v1 | `assessment_fairness_evidence` (`evidence_id`) | `persistFairnessEvidence` cuando verdict=`adverse_impact` | — (evidencia AI-Act + revisión humana; nunca auto-decisión) |
 
 **Payload adverse-impact v1:** `{ schemaVersion, signalId, evidenceId, stage, templateId, windowMonths, computedAt }`; solo scope agregado y emitido transaccionalmente con el snapshot. El self-ID crudo nunca entra al outbox: su trazabilidad permanece en `hiring_demographic_selfid_audit`, dentro de la frontera sensible. El reporte completo es k-anon y vive en evidence append-only.
+
+## Delta 2026-07-17 — TASK-1339: `growth.cta.version_lifecycle_changed` + `growth.cta.surface_registered` (motor Growth CTA)
+
+| Evento | Versión | Aggregate | Emisor | Consumer |
+| --- | --- | --- | --- | --- |
+| `growth.cta.version_lifecycle_changed` | v1 | `growth_cta_version` (`cver-{uuid}`) | store del motor CTA (`src/lib/growth/ctas/store.ts`): `insertCtaDraft` / `transitionCtaVersionStatus` / `publishCtaVersionAtomic`, in-tx con la transición | — (audit/reconciliación; sin consumer reactivo en V1) |
+| `growth.cta.surface_registered` | v1 | `growth_cta_surface` (`csur-{uuid}`) | `insertSurfaceBinding` (registro/credencial de surface), in-tx | — |
+
+**Payload lifecycle v1**: `{ schemaVersion: 1, ctaId, ctaVersionId, fromStatus, toStatus }` — un solo event type para toda la state machine `draft→review→published→paused→deprecated→archived` (el publish atómico emite además la transición `published→deprecated` de la versión superseded). **Payload surface v1**: `{ schemaVersion: 1, surfaceId, surfaceKind }` — NUNCA lleva el embed key secret ni su hash. Ambos se emiten transaccionalmente con el write (patrón outbox canónico). Namespace interno `growth.cta.*` deliberadamente distinto del browser `greenhouse_cta_*` (arch §13 — no unificar). Dominio de observabilidad: `captureWithDomain(err, 'growth', …)`.

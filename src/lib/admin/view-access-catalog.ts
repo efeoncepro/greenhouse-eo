@@ -600,6 +600,20 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'internal'
   },
   {
+    // TASK-1340 — Gobernanza del motor de CTAs bajo el menú Growth (delta operador 2026-07-18:
+    // "esto se gobierna desde Growth", NO /admin/design-system). Inventario + lifecycle
+    // (publish/pause/resume vía API admin TASK-1339, capability fina growth.cta.*) + preview
+    // del renderer portable. Sembrado al set operador growth (mismos roles con grants
+    // growth.cta.* en runtime.ts): efeonce_admin + efeonce_account + efeonce_operations.
+    // NUNCA client_*. Migration acompañante mismo PR: 20260718074718550.
+    viewCode: 'gestion.growth_ctas',
+    section: 'gestion',
+    label: 'CTAs',
+    description: 'Gobernanza del motor de CTAs/popups: inventario con estado, lifecycle y preview del renderer portable.',
+    routePath: '/growth/ctas',
+    routeGroup: 'internal'
+  },
+  {
     // TASK-873 Slice 4 — Workforce Activation workspace V1 (esqueleto admin governance).
     //
     // **Surface canonical**: este es el variant `admin governance / transitional`

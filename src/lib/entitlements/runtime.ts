@@ -422,6 +422,28 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     }
   }
 
+  // TASK-1339 — Growth CTA & Popup Engine. Operación interna del motor de CTAs/popups
+  // (author/publish/pause/read). Mismo grant set que growth.forms (capability hermana:
+  // account/operations operan growth/CRO). Los `client_*` NO lo ven. `pause` va en el
+  // set execute completo: cualquier operador del motor puede ejecutar el stop de
+  // emergencia (arch §16.3) — restringir el stop sería invertir el riesgo.
+  if (
+    hasRouteGroup(subject, 'internal') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS)
+  ) {
+    const ctaSource: TenantEntitlementSource = hasRouteGroup(subject, 'internal') ? 'route_group' : 'role'
+
+    addEntitlement(entries, { module: 'growth', capability: 'growth.cta.read', action: 'read', scope: 'tenant', source: ctaSource })
+
+    const CTA_EXECUTE_CAPS = ['growth.cta.author', 'growth.cta.publish', 'growth.cta.pause'] as const
+
+    for (const capability of CTA_EXECUTE_CAPS) {
+      addEntitlement(entries, { module: 'growth', capability, action: 'execute', scope: 'tenant', source: ctaSource })
+    }
+  }
+
   // TASK-1255 — Reveal de PII de leads (cédula/email/teléfono): MÁS restringido que el
   // read masked. Least-privilege: solo admin internos y operaciones (NO efeonce_account,
   // que vende pero no necesita ver cédulas crudas). reason + audit obligatorios en runtime.

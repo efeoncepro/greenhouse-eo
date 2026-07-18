@@ -267,6 +267,8 @@ Evidencia operativa:
 
 ## Desglose obligatorio desde el siguiente release
 
+| 2026-07-17 | Claude (Fable 5) | `83e4926f83dd-bfc135d8-e89b-4efe-82c4-7e26105b8e5f` | `29616458382` | `83e4926f83dd1db521c855ffd2b9da90130a1446` | develop→main por PR #157: batch develop encabezado por TASK-1276 (AEO Operator View: /growth/aeo + detalle + Plan AEO status + cross-sell + facet Account 360) + seed migration `gestion.growth_aeo` | ~1h15m desde invocación de la skill (21:20Z) hasta cierre documental (~22:35Z). Desglose: preparacion/revision ~8m · PR/merge ~5m · espera CI (timeout+rerun) ~32m · orquestador ~13m (21:59:10→22:12) · watchdog/diagnosis ~11m · docs/final ~10m | ~13m | `released` dentro del run (22:11:51Z) | Vercel READY + health en el run; prod `/growth/aeo` 307 verificado 22:13Z | CI `Test` step agotó su timeout de 8 min con la suite VERDE (1357 files / 9606 tests / 0 fail, summary "Success: yes") — mismo patrón que el release #156 del mismo día; rerun verde en 15m. | (1) El timeout del step Test está borderline con el tamaño actual de la suite: dos releases seguidos lo pisaron con tests verdes — candidato a subir `timeout-minutes` o particionar. (2) Watchdog repite el falso positivo `ops-worker` change-gated (gh=83e4926f vs run=5af42db1b): diff runtime vacío + `Ready=True` → residual de label, sin redeploy. (3) El watcher de `pending_deployments` en loop aprobó AMBOS gates `production` sin stall (2do gate cazado al toque). (4) Alias `env-staging` quedó pegado 2 deploys antes del release; `vercel alias set` lo corrigió — vigilar. |
+
 Cada fila nueva debe agregar, en la columna `Aprendizaje` o en una nota debajo
 de la tabla, el desglose:
 

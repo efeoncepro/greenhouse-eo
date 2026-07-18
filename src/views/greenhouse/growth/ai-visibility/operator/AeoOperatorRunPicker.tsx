@@ -14,10 +14,10 @@ import ListItemButton from '@mui/material/ListItemButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import CustomAvatar from '@core/components/mui/Avatar'
 import CustomTextField from '@core/components/mui/TextField'
 import { CanonicalApiError, throwIfNotOk } from '@/lib/api/parse-error-response'
 import { GH_GROWTH_AEO_OPERATOR } from '@/lib/copy/growth'
+import OrgLogoAvatar from './OrgLogoAvatar'
 
 /**
  * TASK-1276 Slice 5 — Subject picker + run operador (nodo S10, cross-sell).
@@ -43,6 +43,8 @@ export interface AeoRunTargetVM {
   motion: AeoRunTargetMotion
   /** Sub-línea del ítem (publicId, dominio o hint del grupo). */
   subtitle: string | null
+  /** Logo real de la org (URL ya resuelta server-side); null = iniciales. */
+  logoUrl: string | null
 }
 
 export interface AeoOperatorRunPickerProps {
@@ -69,14 +71,6 @@ const GROUPS: Array<{ motion: AeoRunTargetMotion; label: string; hint: string; i
   { motion: 'new_business', label: P.groupProspects, hint: P.groupProspectsHint, icon: 'tabler-user-plus' }
 ]
 
-const initialsOf = (name: string): string =>
-  name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map(w => w[0]?.toUpperCase() ?? '')
-    .join('')
-
 const AeoOperatorRunPicker = ({ open, onClose, targets, preselectedId }: AeoOperatorRunPickerProps) => {
   const router = useRouter()
   const [query, setQuery] = useState('')
@@ -87,13 +81,18 @@ const AeoOperatorRunPicker = ({ open, onClose, targets, preselectedId }: AeoOper
   const effectiveSelectedId = selectedId ?? preselectedId ?? null
   const selected = targets.find(t => t.organizationId === effectiveSelectedId) ?? null
 
+  // Search-first para prospectos (feedback del operador: el picker NO es un dump del CRM):
+  // clientes (con AEO + expansión) se listan siempre; los prospectos SOLO aparecen buscándolos.
+  const q = query.trim().toLowerCase()
+  const prospectsTotal = useMemo(() => targets.filter(t => t.motion === 'new_business').length, [targets])
+
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase()
+    const base = q.length >= 2 ? targets : targets.filter(t => t.motion !== 'new_business')
 
-    if (!q) return targets
+    if (!q) return base
 
-    return targets.filter(t => t.organizationName.toLowerCase().includes(q))
-  }, [targets, query])
+    return base.filter(t => t.organizationName.toLowerCase().includes(q))
+  }, [targets, q])
 
   const handleClose = () => {
     setPhase({ kind: 'idle' })
@@ -202,9 +201,7 @@ const AeoOperatorRunPicker = ({ open, onClose, targets, preselectedId }: AeoOper
                           borderColor: isSelected ? 'primary.main' : 'divider'
                         })}
                       >
-                        <CustomAvatar skin='light' color='primary' variant='rounded' size={32}>
-                          {initialsOf(item.organizationName)}
-                        </CustomAvatar>
+                        <OrgLogoAvatar name={item.organizationName} logoUrl={item.logoUrl} size={32} />
                         <Stack sx={{ minWidth: 0, flex: 1 }}>
                           <Typography variant='body2' sx={{ fontWeight: 600 }} noWrap>
                             {item.organizationName}
@@ -227,6 +224,14 @@ const AeoOperatorRunPicker = ({ open, onClose, targets, preselectedId }: AeoOper
             <Typography variant='body2' color='text.secondary' sx={{ p: 4, textAlign: 'center' }}>
               {P.searchEmpty(query)}
             </Typography>
+          ) : null}
+          {q.length < 2 && prospectsTotal > 0 ? (
+            <Stack direction='row' spacing={1.5} alignItems='center' sx={{ px: 3, py: 2, color: 'text.disabled' }}>
+              <i className='tabler-search' aria-hidden='true' style={{ fontSize: 14 }} />
+              <Typography variant='caption' color='text.disabled'>
+                {P.prospectsSearchHint(prospectsTotal)}
+              </Typography>
+            </Stack>
           ) : null}
         </Box>
 

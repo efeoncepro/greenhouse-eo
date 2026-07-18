@@ -4,6 +4,8 @@ import { randomUUID } from 'node:crypto'
 
 import type { PoolClient } from 'pg'
 
+import { resolveOrganizationLogoUrl } from '@/lib/account-360/resolve-organization-logo'
+
 import { can } from '@/lib/entitlements/runtime'
 import type { TenantEntitlementSubject } from '@/lib/entitlements/types'
 import { withGreenhousePostgresTransaction } from '@/lib/postgres/client'
@@ -304,7 +306,7 @@ export const attachOrganizationLogoAsset = async ({
       organizationId: organization.organization_id,
       previousLogoAssetId: organization.logo_asset_id,
       logoAssetId: attachedAsset.assetId,
-      logoUrl: `${buildPrivateAssetDownloadUrl(attachedAsset.assetId)}?inline=1`
+      logoUrl: resolveOrganizationLogoUrl(attachedAsset.assetId) as string
     }
   })
 
@@ -666,7 +668,7 @@ export const getOrganizationBrandAssetReviewOverview = async ({
       organizationName: row.organization_name,
       websiteUrl: row.website_url,
       logoAssetId: row.logo_asset_id,
-      logoUrl: row.logo_asset_id ? `${buildPrivateAssetDownloadUrl(row.logo_asset_id)}?inline=1` : null,
+      logoUrl: resolveOrganizationLogoUrl(row.logo_asset_id),
       pendingCandidates: candidatesByOrganization.get(row.organization_id) ?? []
     }))
 

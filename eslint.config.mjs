@@ -47,6 +47,10 @@ export default [
       '**/.venv/**',
       '**/venv/**',
       'videos/**',
+      // Workspace de assets generados con IA (pnpm ai:image + scripts ad-hoc de dirección de
+      // arte). Es material de trabajo, no código de producto — nunca se lintea (un script WIP
+      // de otra sesión acá no debe bloquear el pre-push de todos).
+      'ai-generations/**',
       'full-version/**',
       'demo-configs/**',
       '.claude/**',

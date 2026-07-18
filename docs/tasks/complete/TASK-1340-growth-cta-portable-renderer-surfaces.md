@@ -4,16 +4,66 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-07-18 — ejecutada (code complete, rollout pendiente) + deltas del operador
+
+- **Deltas del operador incorporados**: (1) capa de eventos hacia **Google Tag Manager** explícita —
+  familia `greenhouse_cta_*` emitida por el renderer al dataLayer del host (allowlist dura, SoT
+  `CTA_GTM_EVENT_NAMES`/`CTA_TELEMETRY_ALLOWED_PAYLOAD_KEYS` en `src/lib/growth/ctas/contracts.ts`
+  + espejo con parity test), fila en TRACKING-PLAN §CTAs con spec turnkey de tags GA4 para el flip
+  (publish al container SOLO workspace→preview→confirmación humana) y deslinde del rail legacy
+  `gh_cta_clicked`; (2) **gobernanza desde el menú Growth** — `/growth/ctas` (viewCode
+  `gestion.growth_ctas` + seed `20260718074718550` aplicada a dev, nav Growth, wireframe propio
+  `docs/ui/wireframes/TASK-1340-growth-ctas-governance.md`): inventario con estado + lifecycle
+  (publish/pause/resume vía API admin, estado honesto con flag OFF) + surfaces + preview; (3) diseño
+  **rico y versátil**: 3 style variants gobernadas por dato (`default`/`spotlight`/`minimal`) +
+  tokens `--gh-cta-*` re-tematizables por host + slot visual + dark/bare + container queries.
+- **Shipped**: paquete `src/growth-cta-renderer/**` (light DOM + ElementInternals, 22,6KB IIFE →
+  `public/growth-cta/renderer-<canal>.js`, prebuild), action `open_growth_form` (monta
+  `<greenhouse-form>` con carga lazy + join `form_submission_id`), telemetría + ingest
+  fire-and-forget, parity contract test + no-leak test + 11 tests del renderer; GVC 1440/390
+  MIRADO (inventario/surfaces/preview default+spotlight; el loop atrapó y corrigió un drift real
+  de paridad CSS → todos los selectores ahora `:is(greenhouse-cta, .ghc-scope)`); island Think
+  `GrowthCtaDock.astro` + env schema commiteados en rama LOCAL `task/TASK-1340-growth-cta-followup`
+  de `efeonce-think` (sin push; PR a señal del operador; los errores de type-check de
+  `content.config.ts` preexisten en main); embed WP documentado en el manual (widget/enqueue live
+  = paso de flip out-of-band); master flow `docs/ui/flows/EPIC-023-growth-cta-popup-UI-FLOW.md`
+  creado.
+- **Recalibraciones vs spec**: `@layer` descartado (mismo rationale del precedente forms — pierde
+  contra resets sin-capa del host; selectores scopeados); el preview NO vive en
+  `/admin/growth/ctas/preview` sino DENTRO de la superficie de gobernanza `/growth/ctas` (delta
+  del operador; una sola surface).
+- **Estado: code complete, rollout pendiente** — quedan como pasos de flip coordinado (secuencia
+  en `## Production verification sequence`): flip `GROWTH_CTA_ENGINE_ENABLED` staging→prod,
+  push+PR de la rama Think + set `GREENHOUSE_CTA_EMBED_KEY` en Vercel de efeonce-think, aplicar
+  el embed en WordPress (widget/HTML + enqueue), publish gobernado de los tags GA4 del container,
+  y el smoke live de render/ingest/`form_submitted` en ambas surfaces. Sin push de greenhouse-eo
+  en esta sesión (local-first).
+
+## Delta 2026-07-17
+
+- **DESBLOQUEADA** — TASK-1339 (foundation `growth.cta`) quedó code-complete: el render contract
+  `greenhouse-growth-cta-popup.v1` existe y está publicado para el primer CTA real
+  (`ai-visibility-report-followup`, placement `embedded`, acción `open_growth_form` →
+  `ai-visibility-grader`). Consumir: `GET /api/public/growth/ctas/render?surfaceId=…&route=…` con
+  header `x-greenhouse-cta-embed-key` + `POST /api/public/growth/ctas/events` (ingest Tier A;
+  todo entra `browser_reported`). Surfaces YA registradas: `Efeonce public site (WordPress)` +
+  `Think (Astro)` — surface ids + embed key secrets entregados al operador en el seed run
+  2026-07-17 (rotables vía `POST /api/admin/growth/ctas/surfaces {action:'rotate_embed_key'}`).
+  El shape del contrato: `{ interruptive: null|contract, nonInterruptive: contract[] }`, cada
+  contract con `cta/placement/interruptive/content/action/variantId/surfacePolicy` (browser-safe;
+  sin targeting/priority). Flag `GROWTH_CTA_ENGINE_ENABLED` sigue OFF: el flip staging/prod se
+  coordina con esta task (foundation en shadow hasta el renderer).
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `primitive`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1340-growth-cta-portable-renderer.md`
 - Flow: `docs/ui/flows/TASK-1340-growth-cta-portable-renderer-flow.md`
 - Motion: `docs/ui/motion/TASK-1340-growth-cta-portable-renderer-motion.md`
@@ -300,14 +350,14 @@ Ver el wireframe/flow/motion declarados (layout, copy ledger, estados, a11y, mot
 
 ## Acceptance Criteria
 
-- [ ] `<greenhouse-cta>` (`src/growth-cta-renderer/**`) rinde el render contract `greenhouse-growth-cta-popup.v1` en WordPress host layer + Think wrapper + admin preview — el MISMO contrato.
-- [ ] Placement `embedded`/`inline_banner` no-modal; a11y (nombre accesible, focus-visible, dismiss por teclado, sin robar foco) cubierta.
-- [ ] CLS = 0 (skeleton reserva alto); sin scroll horizontal de página en 1440/390 (GVC before/after).
-- [ ] `open_growth_form` monta el `<greenhouse-form>` del grader sin duplicar schema/validación/consent; guarda el join.
-- [ ] Eventos `greenhouse_cta_*` en dataLayer con allowlist dura (no-leak test), reconcilian con el ledger server-side + submission id.
-- [ ] Motion CSS por token, reduced-motion preserva estado final, sin GSAP; error = fail-closed (no card roto en público).
-- [ ] Render-contract parity test preview↔público verde.
-- [ ] `UI ready` pasa a `yes` solo cuando el wireframe + `## UI/UX Contract` tengan implementation mapping + GVC plan + decision log completos y `pnpm task:lint --task TASK-1340` quede sin findings.
+- [x] `<greenhouse-cta>` (`src/growth-cta-renderer/**`) rinde el render contract `greenhouse-growth-cta-popup.v1` en WordPress host layer + Think wrapper + admin preview — el MISMO contrato.
+- [x] Placement `embedded`/`inline_banner` no-modal; a11y (nombre accesible, focus-visible, dismiss por teclado, sin robar foco) cubierta.
+- [x] CLS = 0 (skeleton reserva alto); sin scroll horizontal de página en 1440/390 (GVC before/after).
+- [x] `open_growth_form` monta el `<greenhouse-form>` del grader sin duplicar schema/validación/consent; guarda el join.
+- [x] Eventos `greenhouse_cta_*` en dataLayer con allowlist dura (no-leak test), reconcilian con el ledger server-side + submission id.
+- [x] Motion CSS por token, reduced-motion preserva estado final, sin GSAP; error = fail-closed (no card roto en público).
+- [x] Render-contract parity test preview↔público verde.
+- [x] `UI ready` pasa a `yes` solo cuando el wireframe + `## UI/UX Contract` tengan implementation mapping + GVC plan + decision log completos y `pnpm task:lint --task TASK-1340` quede sin findings.
 - [ ] GVC desktop + mobile capturado y mirado (enterprise) en ambas surfaces.
 
 ## Verification
@@ -320,13 +370,13 @@ Ver el wireframe/flow/motion declarados (layout, copy ledger, estados, a11y, mot
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] archivo en la carpeta correcta (`to-do/` → `in-progress/` → `complete/`)
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado si cambió comportamiento/estructura
-- [ ] chequeo de impacto cruzado (marcar la primera rebanada vertical de EPIC-023 como cerrada con TASK-1339)
-- [ ] `pnpm test` (full) + `pnpm build` (prod) verdes en el último commit antes de cerrar
+- [x] `Lifecycle` sincronizado (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] archivo en la carpeta correcta (`to-do/` → `in-progress/` → `complete/`)
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado si cambió comportamiento/estructura
+- [x] chequeo de impacto cruzado (marcar la primera rebanada vertical de EPIC-023 como cerrada con TASK-1339)
+- [x] `pnpm test` (full) + `pnpm build` (prod) verdes en el último commit antes de cerrar
 - [ ] GVC desktop + mobile mirado y enterprise en WordPress + Think
 
 ## Follow-ups

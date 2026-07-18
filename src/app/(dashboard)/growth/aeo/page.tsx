@@ -10,11 +10,15 @@ import { getOrganizationList } from '@/lib/account-360/organization-store'
 import { GH_GROWTH_AEO_OPERATOR } from '@/lib/copy/growth'
 import { can } from '@/lib/entitlements/runtime'
 import { formatDate } from '@/lib/format/date'
-import { readOperatorCrossOrgAeoScores } from '@/lib/growth/ai-visibility/operator/command'
+import {
+  readOperatorAeoRunActivity,
+  readOperatorCrossOrgAeoScores
+} from '@/lib/growth/ai-visibility/operator/command'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 import AeoOperatorCockpitView, {
+  type AeoCockpitKpisVM,
   type AeoCockpitRowVM
 } from '@/views/greenhouse/growth/ai-visibility/operator/AeoOperatorCockpitView'
 import type { AeoRunTargetVM } from '@/views/greenhouse/growth/ai-visibility/operator/AeoOperatorRunPicker'
@@ -58,15 +62,37 @@ export default async function AeoOperatorCockpitPage() {
   if (!hasAccess) redirect('/401')
 
   try {
-    const scores = await readOperatorCrossOrgAeoScores({ subject: tenant })
+    const [scores, activity] = await Promise.all([
+      readOperatorCrossOrgAeoScores({ subject: tenant }),
+      readOperatorAeoRunActivity({ subject: tenant })
+    ])
 
     const rows: AeoCockpitRowVM[] = scores.map(row => ({
       organizationId: row.organizationId,
       organizationName: row.organizationName,
+      organizationPublicId: row.organizationPublicId,
+      logoUrl: row.logoUrl,
       tierLabel: tierLabel(row.aeoTier, row.assignmentStatus),
       latestScore: row.latestScore,
+      scoreHistory: row.scoreHistory,
+      planInProgress: row.planInProgress,
+      planDone: row.planDone,
+      planTracked: row.planTracked,
       lastRunLabel: row.latestRunAt ? formatDate(row.latestRunAt) : null
     }))
+
+    const scored = rows.filter(r => r.latestScore !== null)
+
+    const kpis: AeoCockpitKpisVM = {
+      clientsWithAeo: rows.length,
+      avgScore:
+        scored.length > 0
+          ? Math.round(scored.reduce((sum, r) => sum + (r.latestScore ?? 0), 0) / scored.length)
+          : null,
+      planInProgressTotal: rows.reduce((sum, r) => sum + r.planInProgress, 0),
+      runsThisMonth: activity.runsThisMonth,
+      salesRunsThisMonth: activity.salesRunsThisMonth
+    }
 
     // Targets de cross-sell (Slice 5): orgs activas SIN módulo AEO — clientes (Expansión) y
     // prospectos HubSpot org-sincronizados (New Business, TASK-706). Degradación honesta: si el
@@ -86,18 +112,23 @@ export default async function AeoOperatorCockpitPage() {
                 organizationId: org.organizationId,
                 organizationName: org.organizationName,
                 motion: 'expansion',
-                subtitle: org.publicId
+                subtitle: org.publicId,
+                logoUrl: org.logoUrl
               }
             ]
           }
 
-          if (org.organizationType === 'other' && org.hubspotCompanyId) {
+          // Prospectos: SOLO orgs HubSpot-sincronizadas CON sitio web — sin sitio el motor no puede
+          // medir (grader_profile requiere website), y así se filtra la basura del CRM (feedback
+          // del operador 2026-07-17).
+          if (org.organizationType === 'other' && org.hubspotCompanyId && org.websiteUrl) {
             return [
               {
                 organizationId: org.organizationId,
                 organizationName: org.organizationName,
                 motion: 'new_business',
-                subtitle: org.websiteUrl ? org.websiteUrl.replace(/^https?:\/\//, '').replace(/\/$/, '') : org.publicId
+                subtitle: org.websiteUrl.replace(/^https?:\/\//, '').replace(/\/$/, ''),
+                logoUrl: org.logoUrl
               }
             ]
           }
@@ -108,7 +139,7 @@ export default async function AeoOperatorCockpitPage() {
       captureWithDomain(error, 'growth', { tags: { source: 'aeo_operator_cockpit_targets' } })
     }
 
-    return <AeoOperatorCockpitView rows={rows} targets={targets} />
+    return <AeoOperatorCockpitView rows={rows} kpis={kpis} targets={targets} />
   } catch (error) {
     captureWithDomain(error, 'growth', { tags: { source: 'aeo_operator_cockpit_page' } })
 

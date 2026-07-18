@@ -13,7 +13,6 @@ import Snackbar from '@mui/material/Snackbar'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import CustomAvatar from '@core/components/mui/Avatar'
 import type { ReportArtifactModel } from '@/components/growth/ai-visibility/report-artifact/model'
 import { throwIfNotOk } from '@/lib/api/parse-error-response'
 import { GH_GROWTH_AEO_OPERATOR } from '@/lib/copy/growth'
@@ -21,6 +20,7 @@ import type { RecommendationStatusValue } from '@/lib/growth/ai-visibility/recom
 import AiVisibilityClientReportView from '../client/AiVisibilityClientReportView'
 import type { PlanStatusVM } from '../plan/PlanStatusSection'
 import AeoOperatorRunButton from './AeoOperatorRunButton'
+import OrgLogoAvatar from './OrgLogoAvatar'
 import AeoOperatorSendComposer, { type AeoSendMotion } from './AeoOperatorSendComposer'
 
 /**
@@ -40,6 +40,8 @@ const O = GH_GROWTH_AEO_OPERATOR
 export interface AeoOperatorSubjectBand {
   organizationId: string
   organizationName: string
+  /** Logo real de la org (URL resuelta server-side con el resolver canónico); null = iniciales. */
+  logoUrl: string | null
   publicId: string | null
   domain: string | null
   /** Label del tier resuelto server-side desde el entitlement (TASK-1277) — es-CL, listo para pintar. */
@@ -72,14 +74,6 @@ export interface AeoOperatorDetailViewProps {
   send?: AeoOperatorSendConfig
 }
 
-const initialsOf = (name: string): string =>
-  name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map(w => w[0]?.toUpperCase() ?? '')
-    .join('')
-
 // Banda del cliente (mockup: avatar + nombre + tier + allowance + metadatos + Account 360 + acciones).
 const SubjectBand = ({
   band,
@@ -99,9 +93,7 @@ const SubjectBand = ({
         justifyContent='space-between'
       >
         <Stack direction='row' spacing={4} alignItems='center' sx={{ minWidth: 0 }}>
-          <CustomAvatar skin='light' color='primary' variant='rounded' size={52}>
-            {initialsOf(band.organizationName)}
-          </CustomAvatar>
+          <OrgLogoAvatar name={band.organizationName} logoUrl={band.logoUrl} size={52} />
           <Stack spacing={1} sx={{ minWidth: 0 }}>
             <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap' useFlexGap>
               <Typography variant='h4' component='h2' noWrap>

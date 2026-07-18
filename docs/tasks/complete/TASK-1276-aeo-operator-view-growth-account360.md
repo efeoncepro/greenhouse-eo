@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -344,6 +344,29 @@ Ver el wireframe + flow contract declarados. El detalle por-cliente reusa el `ma
 - ~~¿El cockpit cross-cliente necesita su propio reader agregado de scores por org?~~ **Resuelto 2026-06-29:** sí → `readOperatorCrossOrgAeoScores` en **TASK-1287**.
 - El subject picker de cross-sell (Slice 5) necesita listar también orgs **sin** AEO + prospectos; TASK-1287 acota su agregado a orgs CON AEO. ¿De dónde sale el listado de targets sin AEO (reader de orgs/prospectos general vs extender TASK-1287)? Resolver en Discovery.
 
+## Delta 2026-07-17 (bis) — polish post-release por feedback del operador en producción
+
+Tras revisar producción, el operador reportó: cockpit no fiel al mockup aprobado, logos ausentes
+(iniciales), y el picker como dump del CRM (~150 orgs). Aplicado en develop→staging:
+
+- **Logos reales**: resolver CANÓNICO nuevo `resolveOrganizationLogoUrl` (`src/lib/account-360/
+  resolve-organization-logo.ts`, espejo de `resolveAvatarUrl` — sugerencia del operador) reemplaza
+  la derivación inline duplicada en 6 call sites (organization-store, identity facet, brand-assets,
+  party-search, grader store). `OrgLogoAvatar` (logo + fallback iniciales) en cockpit, banda del
+  detalle y picker.
+- **Cockpit fiel al mockup**: 4 KPIs con data real (clientes, score promedio, focos en curso, runs
+  del mes + atribución a ventas vía `readOperatorAeoRunActivity` nuevo), columnas del mockup
+  (Cliente+publicId · Tier · Score+barra · **Tendencia sparkline** · **Plan AEO** · chevron),
+  filtros segmentados. Store extendido (SQL ejercido vs PG real): logo, publicId, score_history
+  (últimos 6), conteos del plan (TASK-1275).
+- **Picker search-first**: clientes siempre; prospectos SOLO buscando (2+ letras) y SOLO con sitio
+  web (sin sitio el motor no mide) — se elimina la basura del CRM. El run sigue siendo SIEMPRE
+  1 target seleccionado (nunca batch).
+- **Caso Berel resuelto**: el re-run con el motor actual scoreó (44,5) — confirma que los runs sin
+  score eran de la era pre-fix 04-07. El estado honesto "run sin score" sigue en TASK-1425.
+- Follow-up detectado: logos de 850KB (1024px) servidos para avatares de 34px — candidato a
+  thumbnails de assets.
+
 ## Delta 2026-07-17 — implementación completa local-first (code complete, rollout pendiente)
 
 Implementados los 7 slices en `develop` local (sin push), con el **mockup aprobado de Claude Design
@@ -397,8 +420,13 @@ Implementados los 7 slices en `develop` local (sin push), con el **mockup aproba
 - Nota: el flag `GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED` está ON en staging → el CTA de envío
   aparece habilitado (no se ejercitó: enviaría email real). En prod sigue el rollout de TASK-1279.
 
-**Pendiente**: promoción a producción vía release control plane (promueve TODO develop, no solo esta
-task — requiere confirmación del operador + skill `greenhouse-production-release` + gates humanos).
+**PRODUCCIÓN 2026-07-17 — RELEASED.** PR #157 squash `83e4926f83dd` → orquestador `29616458382`
+(preflight con bypass documentado del batch-policy por la seed migration idempotente) → workers 4/4 +
+Azure no-op (`no_infra_diff`) + Vercel READY + health OK → manifest
+`83e4926f83dd-bfc135d8-e89b-4efe-82c4-7e26105b8e5f` en `released`. Prod `/growth/aeo` responde 307
+anónimo (ruta live tras login). Watchdog: residual conocido `ops-worker` change-gated (diff runtime
+vacío + Ready=True) — no drift. Cero flags a prender (OPERATOR_SEND ya ON en prod). Timing en
+`PRODUCTION_RELEASE_TIMING_LEDGER.md`.
 
 ## Delta 2026-06-29 — backend del cross-sell (S11) disponible — cerrado por TASK-1279
 

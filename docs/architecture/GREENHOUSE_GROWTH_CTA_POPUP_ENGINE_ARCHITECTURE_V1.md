@@ -1,7 +1,7 @@
 # Greenhouse Growth CTA & Popup Engine Architecture V1
 
 > Tipo de documento: arquitectura de producto/plataforma  
-> Status: Accepted direction -- no runtime changes yet  
+> Status: Accepted direction — foundation runtime SHIPPED (TASK-1339, §23); renderer pendiente (TASK-1340)  
 > Version: V1  
 > Fecha: 2026-07-04  
 > Owner: Product / Platform Architecture / Growth / Marketing Operations / CRO  
@@ -686,3 +686,16 @@ Sin cambios de runtime, migraciones, GTM ni deploy autorizados por esta revisió
 - `GREENHOUSE_FLOATING_SURFACE_DECISION_V1.md`
 - `docs/context/08_estrategia-comercial.md`
 - `docs/context/11_hubspot-bowtie.md`
+
+## 23. Delta 2026-07-17 — TASK-1339: foundation `growth.cta` shipped (primera rebanada vertical, server-side)
+
+La espina server-side de la rebanada vertical (§18.1) existe como runtime:
+
+- **Schema** `greenhouse_growth.cta_definition` / `cta_version` (CHECK state machine + UNIQUE parcial published + trigger de inmutabilidad post-publish) / `cta_surface_binding` / `cta_conversion_event` (Tier A append-only por trigger; persiste también rechazos de ingest sin PII con `ingest_status='rejected'` como fuente del signal de forja — espejo del precedente forms). Migraciones `20260718001431135` + `20260718002549989` (capabilities), aplicadas a dev.
+- **Primitive** `src/lib/growth/ctas/` (contracts zod `greenhouse-growth-cta-popup.v1`, store con outbox in-tx, render-contract compiler browser-safe, action router SOLO `open_growth_form` vía `getPublishedRenderContractByRef` de forms, arbiter server-side 0–1 interruptivo con targeting fail-closed, ingest forjable-hardened con cross-check `cta_version↔surface`+`trust_level`+dedupe+abuse port compartido, lifecycle commands con publish atómico + pause/resume).
+- **API**: pública `GET /api/public/growth/ctas/render` + `POST /api/public/growth/ctas/events` (CORS data-driven desde bindings, cache 90s) y admin `/api/admin/growth/ctas/**` (list/author/detalle/lifecycle/surfaces) con `can()` por capability fina.
+- **Capabilities** `growth.cta.{read,author,publish,pause}` (registry + catalog + grants espejo growth.forms; `pause` separada de `publish` a propósito — §16.3). **Signals** `growth.cta.{render_error_rate,event_ingest_error_rate,surface_unauthorized_attempt,form_handoff_failed}` cableadas al overview. **Outbox**: `growth.cta.version_lifecycle_changed` + `growth.cta.surface_registered` v1 (EVENT_CATALOG Delta 2026-07-17).
+- **Primer CTA real**: `ai-visibility-report-followup` autorado+publicado por commands, con bindings `wordpress` + `think` (embed keys minteadas). Smoke e2e verde contra PG dev (render arbitrado browser-safe sin leak de policy, ingest accepted+idempotente, forja/mismatch rechazados y persistidos).
+- **Flag** `GROWTH_CTA_ENGINE_ENABLED` default OFF en todos los environments (ledger); flip coordinado con TASK-1340.
+
+Fuera de esta entrega (per §18): renderer visible (TASK-1340), Tier B exposición/visitor-state/frequency capping/kill switch global a escala, otras acciones/placements, admin cockpit UI, experimentación powered.
