@@ -1,16 +1,16 @@
 # Motor de CTAs y Popups — Foundation `growth.cta`
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-17 por Claude (TASK-1339)
-> **Ultima actualizacion:** 2026-07-17 por Claude (TASK-1339)
+> **Ultima actualizacion:** 2026-07-18 por Claude (TASK-1340 — renderer portable + gobernanza en Growth + capa GTM)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md)
 
 ## Qué es
 
 El motor de CTAs es el sistema que decide **qué invitación a la acción (prompt de conversión) se muestra en cada página pública** de Efeonce (sitio WordPress, Think y futuras superficies), con gobernanza central en Greenhouse. En vez de pegar botones o banners a mano en cada página, un operador define el CTA una vez, lo publica, y todas las superficies muestran **el mismo contrato publicado**.
 
-Esta primera entrega (TASK-1339) es la **fundación server-side**: define, publica, arbitra y mide. El componente visible que pinta el CTA en las páginas llega con TASK-1340 (renderer portable).
+TASK-1339 entregó la **fundación server-side** (definir, publicar, arbitrar, medir). TASK-1340 sumó: el **renderer portable** `<greenhouse-cta>` (Web Component sin frameworks, 3 variantes visuales gobernadas por dato + tokens re-tematizables por host), la **superficie de gobernanza en el menú Growth** (`/growth/ctas`: inventario, estado, pausar/publicar, preview) y la **capa de eventos hacia Google Tag Manager** (familia `greenhouse_cta_*` al dataLayer del host, con allowlist dura sin PII, registrada en el TRACKING-PLAN; los tags GA4 se publican gobernados en el flip).
 
 ## Cómo funciona (en simple)
 

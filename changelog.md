@@ -1,5 +1,38 @@
 # changelog.md
 
+## 2026-07-18 — TASK-1340: Growth CTA Portable Renderer + capa GTM + gobernanza en Growth (code complete, shadow)
+
+- Renderer portable `<greenhouse-cta>` (`src/growth-cta-renderer/**`, vanilla TS 22,6KB, hermano del
+  forms-renderer): light DOM + ElementInternals, espejo del contrato v1 con parity test, capa visual
+  rica y versátil (tokens `--gh-cta-*` re-tematizables, 3 style variants por dato
+  default/spotlight/minimal, slot visual, dark/bare, container queries, skeleton anti-CLS,
+  reduced-motion), action `open_growth_form` montando el `<greenhouse-form>` gobernado (carga lazy +
+  join submission), fail-closed en público. Build esbuild → `public/growth-cta/renderer-<canal>.js`
+  (prebuild). El loop GVC atrapó un drift real de paridad preview↔público → selectores unificados
+  `:is(greenhouse-cta, .ghc-scope)` (paridad por construcción).
+- **Capa GTM** (nota del operador): familia `greenhouse_cta_*` → dataLayer del host con allowlist
+  dura sin PII (SoT server + espejo renderer + parity test), fila TRACKING-PLAN §CTAs con spec
+  turnkey de tags GA4 para el flip y deslinde del rail legacy `gh_cta_clicked`; publish al container
+  SOLO gobernado (workspace→preview→confirmación humana).
+- **Gobernanza en el menú Growth** (nota del operador): `/growth/ctas` (viewCode
+  `gestion.growth_ctas` + seed aplicada; roles operador growth) con inventario + lifecycle
+  (publish/pause/resume, estado honesto con flag OFF) + surfaces + preview de variantes; GVC
+  desktop/mobile mirado. Island Think `GrowthCtaDock.astro` commiteada en rama local de
+  `efeonce-think` (PR a señal); embed WP documentado. Master flow EPIC-023 creado. Flag
+  `GROWTH_CTA_ENGINE_ENABLED` sigue OFF: flip turnkey documentado en el ledger.
+
+## 2026-07-18 — Contrato operativo GSC API, Platform Properties e indexación
+
+- `seo-aeo` documenta capacidades/scopes reales de Search Console API, el retiro del sitemap ping, el límite de
+  Indexing API y el canary obligatorio antes de asumir paridad API para Platform Properties.
+- El runbook y las skills espejo del sitio público separan el gate de publicación (URL rastreable + sitemap con
+  `lastmod` honesto) del seguimiento asíncrono de indexación. `TASK-1426` conserva la implementación pendiente.
+
+## 2026-07-18 — Pillar privada de web agéntica preparada para revisión
+
+- El post WordPress `249387`, `El fin de la web “solo para humanos”`, quedó reescrito como pillar de 3.800 palabras para soportar la landing de desarrollo web: definición citable, cuatro tipos de sitio, arquitectura compartida, matriz WebMCP/MCP/API, doce pruebas de readiness, reconstrucción y FAQ.
+- Content Factory pasa con 84 bloques, TOC completo, featured/OG separados y dos diagramas de cuerpo. WAG-V02 v3 corrige el desborde del titular `04 AGÉNTICO`, añade un gate automático por `getBBox()` y pasa QA privada desktop/mobile en light/dark. El artículo sigue en `draft`, sus rutas públicas responden `404` y el enlace recíproco de la landing está preparado pero no aplicado; publicación, QA live y purge requieren autorización humana separada.
+
 ## 2026-07-17 — TASK-1339: Growth CTA & Popup Engine — foundation `growth.cta` (code complete, shadow)
 
 - Fundación server-side de la primera rebanada vertical de EPIC-023: schema `greenhouse_growth.cta_*`

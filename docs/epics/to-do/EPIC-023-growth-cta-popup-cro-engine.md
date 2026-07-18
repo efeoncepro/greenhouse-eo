@@ -1,5 +1,15 @@
 # EPIC-023 — Growth CTA & Popup CRO Engine
 
+## Delta 2026-07-18
+
+- **Primera rebanada vertical CODE COMPLETE (en shadow)**: TASK-1339 (foundation server-side) +
+  TASK-1340 (renderer portable `<greenhouse-cta>` + capa GTM `greenhouse_cta_*` + gobernanza
+  `/growth/ctas` en el menú Growth — delta del operador) están `complete/` con smoke/GVC
+  verificados. El valor de usuario queda gateado al **flip coordinado** (flag
+  `GROWTH_CTA_ENGINE_ENABLED` + embed en WordPress + PR/env de `efeonce-think` + publish
+  gobernado de tags GA4) — runbook en el ledger de flags y en TASK-1340 §Delta. Siguiente
+  nodo del epic: placement interruptivo (`popup_modal`/`slide_in`).
+
 ## Status
 
 - Lifecycle: `to-do`

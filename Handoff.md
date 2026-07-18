@@ -1,3 +1,25 @@
+## Sesión 2026-07-18 — Investigación GSC canonizada en skills
+
+> `seo-aeo` incorpora una referencia fechada sobre Search Console API, URL Inspection, sitemaps, Indexing API y
+> Platform Properties. El runbook Content Factory y `efeonce-public-site-wordpress` (Codex/Claude) ahora exigen
+> sitemap con `lastmod` honesto y separan publicación de observación de indexación. No hubo cambio runtime ni
+> ampliación OAuth: Greenhouse sigue `webmasters.readonly`; `TASK-1426` concentra multi-property, canary live y
+> checkpoints `0h/24h/72h` pendientes de implementación.
+
+## Sesión 2026-07-18 — TASK-1340 Renderer CTA + capa GTM + gobernanza Growth COMPLETA (code complete, shadow)
+
+> Implementada TASK-1340 en `develop` local (SIN push) con los 3 deltas del operador: (1) renderer
+> portable `<greenhouse-cta>` rico y versátil (3 style variants por dato + tokens host-override +
+> slot visual; 22,6KB; parity CSS por construcción tras drift atrapado en GVC); (2) capa GTM:
+> `greenhouse_cta_*` → dataLayer con allowlist dura + SoT server + TRACKING-PLAN §CTAs con spec
+> turnkey de tags (publish gobernado en el flip); (3) gobernanza en `/growth/ctas` (menú Growth,
+> viewCode `gestion.growth_ctas` seeded, lifecycle + preview, GVC mirado 1440/390). Island Think
+> commiteada en rama LOCAL `task/TASK-1340-growth-cta-followup` de `efeonce-think` (sin push; PR a
+> señal; type-check roto preexiste en su main). Embed WP documentado en el manual. Master flow
+> EPIC-023 creado. Flip turnkey documentado en el flag ledger (flag + Think env + WP embed + tags
+> GA4 + smoke). OJO: detuve el dev server (:3000) para los gates de cierre — relanzar con `pnpm dev`
+> si lo necesitas.
+
 ## Sesión 2026-07-17 (noche) — TASK-1339 Growth CTA Engine foundation COMPLETA (code complete, shadow)
 
 > Implementados los 4 slices en `develop` local (SIN push): schema `greenhouse_growth.cta_*`

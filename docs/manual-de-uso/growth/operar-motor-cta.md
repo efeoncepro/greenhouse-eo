@@ -1,13 +1,14 @@
-# Operar el motor de CTAs (foundation TASK-1339)
+# Operar el motor de CTAs (foundation TASK-1339 + renderer/gobernanza TASK-1340)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-17 por Claude (TASK-1339)
+> **Ultima actualizacion:** 2026-07-18 por Claude (TASK-1340 — embed en hosts + gobernanza /growth/ctas)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md)
 
 ## Para qué sirve
 
-Definir, publicar, pausar y medir CTAs/popups gobernados que se muestran en las superficies públicas (WordPress, Think). Hoy se opera por API admin o CLI (el cockpit visual es una task futura); el renderer visible llega con TASK-1340.
+Definir, publicar, pausar y medir CTAs/popups gobernados que se muestran en las superficies públicas (WordPress, Think). Se opera desde **/growth/ctas** (menú Growth: inventario, estado, lifecycle y preview — TASK-1340) o por API admin/CLI. El renderer portable `<greenhouse-cta>` ya existe; su despliegue a hosts es el flip coordinado.
 
 ## Antes de empezar
 
@@ -70,3 +71,41 @@ Idempotente; con `--smoke` ejercita render arbitrado + ingest + rechazo de forja
 - Primitive: [src/lib/growth/ctas/](../../../src/lib/growth/ctas/)
 - Smoke SQL: `scripts/growth/_sanity-cta-store-sql.ts`
 - Spec: `docs/architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md` (§23 delta de esta entrega)
+
+## Incrustar el CTA en un host (WordPress / Astro / Think)
+
+El renderer portable se sirve como bundle estático desde Greenhouse (espejo del de forms):
+
+```
+https://greenhouse.efeoncepro.com/growth-cta/renderer-<canal>.js   (preview|beta|stable; alias renderer-latest.js)
+```
+
+Snippet canónico (WordPress vía widget HTML/Elementor, o cualquier host HTML):
+
+```html
+<script src="https://greenhouse.efeoncepro.com/growth-cta/renderer-latest.js" defer></script>
+<greenhouse-cta
+  surface="<surface_id del binding>"
+  embed-key="<embed key secret de la surface>"
+  cta="ai-visibility-report-followup"
+  cta-location="<ubicación semántica, ej. blog_footer>"
+  form-surface="<surface_id del Growth Form en este host>"
+  locale="es-CL"
+></greenhouse-cta>
+```
+
+- El `embed-key` autentica la **surface** (host), no al visitante — es config del host (wp-config /
+  Vercel env), NUNCA se committea a un repo. Rotable vía `POST /api/admin/growth/ctas/surfaces
+  {action:'rotate_embed_key'}`.
+- `route` se toma sola del pathname; `cta` filtra el resultado arbitrado a un slug específico
+  (sin `cta`, monta el primer no-interruptivo elegible).
+- Fail-closed: con flag OFF, contrato no elegible o error, el element queda `display:none` —
+  jamás un card roto en público.
+- **Think**: usar el componente `GrowthCtaDock.astro` (rama `task/TASK-1340-growth-cta-followup`
+  de `efeonce-think`); config por env `GREENHOUSE_CTA_SURFACE_ID` + `GREENHOUSE_CTA_EMBED_KEY`.
+- **Variantes visuales**: cada versión de CTA elige su `style_variant` (`default` | `spotlight` |
+  `minimal`) — es DATO gobernado; el host además puede re-tematizar por tokens CSS `--gh-cta-*`.
+- **Medición**: el renderer emite `greenhouse_cta_*` al `dataLayer` del host (allowlist dura, sin
+  PII). Los tags GA4 del container se publican en el flip (spec turnkey en
+  `docs/reference/measurement-gtm-ga4/TRACKING-PLAN.md` §CTAs; publish SOLO workspace → preview →
+  confirmación humana).
