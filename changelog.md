@@ -1,5 +1,24 @@
 # changelog.md
 
+## 2026-07-18 — TASK-1430: cockpit operator de CTAs (autoría gobernada + métricas + kill switches) — code complete
+
+- `/growth/ctas` evoluciona a cockpit master-detail (CompositionShell `split` con nueva prop
+  `splitTemplateColumns`): inventario con filtros/teclado + detalle con lifecycle completo, kill
+  switches global/surface operables (reason auditado), preview del renderer canónico, superficies,
+  supresión y versiones. Autoridad visual: proyecto Claude Design «Cockpit de CTAs» (instrucción
+  del operador), traducido a tokens del theme.
+- Autoría gobernada de 8 pasos en drawer (intención→…→revisión) consumiendo la metadata del Action
+  Registry TASK-1431 (cero enum paralelo); preview harness con scrubber de density (umbrales reales
+  560/400), claro/oscuro, hosts Think/WordPress y matriz pairwise; el mount degradado bloquea la
+  revisión. Dirty-close con confirmación; submit server-confirmed.
+- Métricas de marketing pedidas por el operador, resueltas SERVER-side: `getCtaMarketingMetrics`
+  (impresiones Tier B viewed, clics, conversiones solo `server_confirmed`, CTR/tasa + deltas
+  ventana-a-ventana, guard `impressions_undercounted` que evita % imposibles) wired a
+  `CtaDetailVm.metrics`; `authorDraftCta` acepta `suppressionPolicy`. SQL vivo verificado (gate
+  TASK-893). GETs admin + POST author des-gateados de `GROWTH_CTA_ENGINE_ENABLED` (el flag gobierna
+  exposición pública). GVC desktop+mobile mirados. Arch §28 + skill actualizada (ambos espejos).
+  Rollout pendiente: push + smoke staging.
+
 ## 2026-07-18 — ISSUE-123: staging access resuelve el deployment vigente (alias env-staging des-pinneado)
 
 - Causa raíz identificada del bug class recurrente (3 veces en 2 días): un `vercel alias set` manual

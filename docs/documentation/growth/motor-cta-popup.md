@@ -38,6 +38,33 @@ La superficie de gobernanza vive en el **menú Growth** (junto a AEO y Forms), v
 - ve las **surfaces registradas** (hosts autorizados con sus origins y credencial — nunca el secreto);
 - usa el **preview del renderer** con las variantes visuales, tal cual se ve en un host público.
 
+## El cockpit del operador (TASK-1430)
+
+`/growth/ctas` dejó de ser una lista con preview: es un cockpit completo de dos paneles.
+
+- **Inventario (izquierda):** busca por nombre/slug/campaña, filtra por estado y ubicación, y
+  navega con las flechas del teclado. Cada card muestra la ubicación, la acción y en qué
+  superficies puede aparecer.
+- **Detalle (derecha):** el CTA seleccionado con su preview real (el mismo renderer de
+  producción), sus resultados de marketing, sus superficies, su segmentación/supresión, su
+  historial de versiones y los controles de ciclo de vida (editar, enviar a revisión, publicar,
+  pausar, reanudar, deprecar, archivar) con confirmación.
+- **Resultados:** impresiones, clics, conversiones, CTR y tasa de conversión de los últimos 30
+  días con comparación contra la ventana anterior. Cada número dice su nivel de confianza:
+  `browser_reported` (lo que reportó el navegador) o `server_confirmed` (la única verdad de
+  conversión). Si el conteo de impresiones aún no cubre el período (es más nuevo que el de
+  clics), el cockpit muestra los conteos y explica por qué no muestra tasas — nunca un
+  porcentaje imposible.
+- **Crear/editar CTA:** un recorrido guiado de 8 pasos (intención → ubicación → apariencia →
+  contenido → acción → segmentación → vista previa → revisión). No hay canvas libre, ni colores,
+  ni CSS: se compone por ejes gobernados y la densidad se deriva sola. La vista previa monta el
+  renderer real bajo distintos anchos, esquema claro/oscuro y hosts (Think/WordPress), y si el
+  preview no puede montar, la revisión queda bloqueada (sin paridad probada no se envía).
+- **Kill switch:** detiene la exposición global o por superficie al instante, sin redeploy, con
+  motivo obligatorio y auditoría visible (quién, cuándo, por qué).
+
+> Detalle técnico: `docs/architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md` §28.
+
 ## Quién puede operarlo
 
 | Acción | Capability |

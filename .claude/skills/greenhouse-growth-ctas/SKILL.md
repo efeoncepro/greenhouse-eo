@@ -110,13 +110,36 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
   localStorage SOLO con `consent-state="granted"`; guard local de dismiss por sesión — defensa
   en profundidad, la autoridad de suppression es server-side TASK-1428).
   Build: `pnpm renderer:cta:build` → `public/growth-cta/renderer-<canal>.js` (prebuild lo corre).
-- Gobernanza: `src/app/(dashboard)/growth/ctas/` + `GrowthCtasGovernanceView` (copy
-  `GH_GROWTH_CTA_OPERATOR` en `src/lib/copy/growth.ts`).
+- Gobernanza/cockpit (TASK-1430): `src/app/(dashboard)/growth/ctas/` + `GrowthCtasGovernanceView`
+  (orquestador CompositionShell `split` + lead) con `src/views/greenhouse/growth/ctas/cockpit/`:
+  `cta-cockpit-meta.ts` (draft model + builders payload/preview-contract; presentación de enums
+  canónicos — cero enum paralelo), `CtaInventoryPanel` (filtros + listbox ↑↓), `CtaDetailPanel`
+  (lifecycle bar + kill switch global/surface con reason auditado + métricas con trust tags +
+  bindings vía `surfaceAllowsCtaSlug` + supresión + versiones), `CtaAuthoringDrawer` (8 pasos;
+  submit → `POST /api/admin/growth/ctas`, server-confirmed) y `CtaPreviewHarness` (renderer
+  canónico bajo harness: scrubber density 560/400, esquema claro/oscuro vía `colorScheme`, hosts
+  Think navy/WP, matriz pairwise con `ScaledFrame`, degradación bloquea revisión). Copy
+  `GH_GROWTH_CTA_OPERATOR(.cockpit)` en `src/lib/copy/growth.ts`. Métricas de marketing:
+  `getCtaMarketingMetrics` (readers.ts; Tier B viewed + ledger, rates/deltas SERVER-side,
+  `coverage='impressions_undercounted'` cuando clicks>viewed — la UI muestra conteos, jamás un
+  % imposible) wired a `CtaDetailVm.metrics`. `authorDraftCta` acepta `suppressionPolicy`
+  (validado `ctaSuppressionPolicySchema`). GETs admin + POST author NO se gatean por
+  `GROWTH_CTA_ENGINE_ENABLED` (el flag gobierna exposición pública; lifecycle sigue gated).
 - GTM build: `scripts/gtm/build-cta-events-workspace.ts` (workspace→preview→publish gobernado).
 - Seed/smoke: `scripts/growth/seed-cta-ai-visibility-followup.ts --smoke` ·
   `scripts/growth/_sanity-cta-store-sql.ts` (SQL vivo vs PG).
 
 ## Estado de rollout (actualizar al cambiar)
+
+- **2026-07-18 (TASK-1430): Cockpit operator CODE-COMPLETE (local, sin push).** `/growth/ctas` es
+  master-detail con autoría gobernada de 8 pasos, preview harness del renderer real, kill switches
+  operables (global/surface, reason auditado), métricas de marketing server-side (CTR/tasas con
+  trust tags y guard de cobertura — pedido explícito del operador) y bindings read-only
+  (`surfaceAllowsCtaSlug`; mutación de allowlist sigue API-only). Autoridad visual: proyecto
+  Claude Design "Cockpit de CTAs" traducido a tokens (primitive nueva autorizada:
+  `splitTemplateColumns` override en CompositionShell). GVC `task-1430-growth-cta-cockpit`
+  (desktop) + `-mobile` (390) mirados. Sin flag nuevo, sin migración, sin telemetría nueva.
+  Rollout pendiente: push/release + smoke staging.
 
 - **2026-07-18 (TASK-1431): Action Registry + navegación gobernada CODE-COMPLETE (local, sin push).**
   Registry tipado (`action-registry.ts`) con `open_growth_form` + `link_url`/`open_think_tool`/

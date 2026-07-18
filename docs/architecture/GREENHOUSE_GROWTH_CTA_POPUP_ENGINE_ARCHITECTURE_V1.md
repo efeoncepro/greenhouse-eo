@@ -916,3 +916,49 @@ local — rollout pendiente** (push/release + bundle en hosts; ninguna CTA con a
   `action_unsupported` en telemetría).
 - `dismiss` sigue como control/suppression del renderer; `download_asset`/`embed_growth_form`/
   `hubspot_handoff` permanecen demand-driven (§12).
+
+## 28. Delta 2026-07-18 — TASK-1430: cockpit operator de autoría/reporting (code complete)
+
+- **`/growth/ctas` es el cockpit operator completo** (evoluciona la gobernanza de §TASK-1340):
+  master-detail sobre CompositionShell `split` (lead sobre el shell; nueva prop data-driven
+  `splitTemplateColumns` en la primitive — override de proporción de lanes, jamás un sistema de
+  regiones paralelo), inventario con filtros/navegación por teclado, detalle con lifecycle
+  completo (incluye `deprecate`/`archive` que la vista previa no exponía), kill switches
+  operables (global + per-surface, reason ≥5 chars auditado, `getKillSwitchState` +
+  `listKillSwitchAudit` en el page server), preview del renderer canónico y autoría gobernada
+  de 8 pasos en drawer (intención→placement→apariencia→contenido→acción→segmentación→preview→
+  revisión). Autoridad visual: proyecto Claude Design "Cockpit de CTAs" con tokens del theme
+  (navy Think = `customColors.midnight/deepAzure`; cero HEX inline).
+- **Métricas de marketing server-resolved (pedido explícito del operador):** reader canónico
+  `getCtaMarketingMetrics(ctaId, windowDays=30)` en `readers.ts` — impressions = rollup Tier B
+  `viewed` (`summarizeViewedExposureWindows`, browser-observed), clicks = ledger `clicked`
+  accepted, conversions = ledger `form_submitted|action_completed` **solo `server_confirmed`**
+  (los breadcrumbs `error` jamás cuentan); CTR/tasa de conversión + deltas ventana-a-ventana se
+  computan SERVER-side (la UI jamás deriva rates). Guard de cobertura: `coverage=
+  'impressions_undercounted'` cuando clicks>viewed en la ventana (tracking Tier B más nuevo que
+  el ledger) ⇒ la UI muestra conteos + nota, nunca un % físicamente imposible. Wired aditivo a
+  `CtaDetailVm.metrics` con degradación honesta (`null` = región parcial; lifecycle operable).
+- **Command surface:** `authorDraftCta` acepta `suppressionPolicy` opcional (validado con
+  `ctaSuppressionPolicySchema`; detail `suppression_policy_invalid`) — el paso de segmentación
+  del cockpit persiste la postura (antes el store recibía `{}` siempre). `CtaVersionVm` expone
+  `suppressionPolicy` + `visualAssetRef`; `CtaSummaryVm` expone `latestPlacement/StyleVariant/
+  ActionKind` (editar = versión nueva preserva todo; el publish deprecia la anterior, §7).
+- **Semántica del engine flag en el plano admin:** los **GET** admin (list/detail/surfaces/
+  kill-switch) y el **POST author** ya NO se gatean por `GROWTH_CTA_ENGINE_ENABLED` — el flag
+  gobierna la **exposición pública**, no la lectura de gobernanza ni el drafting (un draft no se
+  arbitra). Lifecycle (`publish/pause/resume/deprecate/archive`) y surfaces POST siguen gated.
+  El kill switch POST ya operaba sin flag (§24) — ahora su GET también.
+- **Binding surface↔CTA:** predicado canónico `surfaceAllowsCtaSlug(allowedSlugs, slug)` en
+  `contracts.ts` (allowlist vacía = admite todos; misma regla del store en
+  `listPublishedCandidates`) — el cockpit muestra bindings read-only; mutar allowlist sigue
+  siendo API-only (fuera de scope V1 del cockpit).
+- **Preview parity:** el harness monta el CORE del renderer (`.ghc-scope`, `inertNavigation`)
+  con un contract construido del draft (`buildPreviewContract`, mirror browser-safe); density
+  derivada por las container queries reales (badge con umbrales 560/400); esquema claro/oscuro
+  vía `color-scheme` (resuelve `light-dark()` nativo); matriz pairwise con `ScaledFrame`
+  (escala visual manteniendo px CSS ⇒ density verdadera); degradación del mount **bloquea la
+  revisión** (paridad no probada = no se envía).
+- GVC: `task-1430-growth-cta-cockpit` (desktop 1440, 17 frames) + `task-1430-growth-cta-cockpit-mobile`
+  (390, 9 frames; detalle = drawer canónico del shell). Sin flag nuevo, sin migración, sin
+  cambios de telemetría SoT. Task: `docs/tasks/in-progress/TASK-1430-*.md` (rollout: push +
+  smoke staging pendientes).

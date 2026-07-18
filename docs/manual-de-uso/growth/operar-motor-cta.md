@@ -132,6 +132,27 @@ del visitante; sin consent, la ventana es de sesión.
 
 El motor decide server-side si un visitante debe volver a ver un CTA y, con `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` **ON en staging y Production** (estado actual desde el release `d5db8b568`), esa decisión **ya excluye del render**: dismiss reciente (cooldown default 14 días), conversión verificada, o tope de impresiones interruptivas (per-CTA 2/24h + global 3/día por visitante). Verificado E2E en ambos ambientes: un visitante que descarta un CTA queda excluido (`nonInterruptive: []`), un visitante fresco sí lo ve, y sin identidad el embedded sigue eligible (el fallback conservador solo suprime interruptivos). La policy por versión vive en `suppression_policy_json` (vacía = defaults conservadores). Sin consentimiento del visitante no se guarda estado durable: la ventana es de sesión (48 h) y los placements interruptivos directamente no se muestran a visitantes sin identidad. Volver a shadow es poner el flag en `false` en el environment correspondiente (<5 min, sin deploy).
 
+## Usar el cockpit (TASK-1430)
+
+1. Entra a `/growth/ctas` (menú Growth → CTAs). A la izquierda está el inventario; a la derecha,
+   el detalle del CTA seleccionado. En pantallas angostas el detalle se abre como panel.
+2. **Crear un CTA:** botón «Crear CTA» → recorre los 8 pasos. En «Acción» las opciones y campos
+   vienen del registro canónico (formulario, URL, herramienta Think, agendador). En «Vista
+   previa» mueve el ancho del contenedor para ver el morph full → condensed → peek y prueba
+   esquema claro/oscuro y ambos hosts. «Revisión» lista los bloqueos; el envío queda
+   deshabilitado hasta resolverlos. El resultado siempre lo confirma el servidor.
+3. **Editar:** «Editar y previsualizar» crea una VERSIÓN nueva (la publicada es inmutable);
+   al publicar, la anterior se deprecia sola.
+4. **Publicar/pausar/reanudar/deprecar/archivar:** desde la barra del detalle, con confirmación.
+   Con el motor apagado en el ambiente, estas acciones quedan deshabilitadas (leer y autorar
+   borradores sí funciona).
+5. **Kill switch:** «Activar kill switch» (global, en la card) o por superficie (en la lista de
+   superficies). Pide un motivo (mínimo 5 caracteres) y queda auditado. Liberar reanuda la
+   exposición según el ciclo de vida vigente.
+6. **Resultados:** revisa los 30 días con deltas. Solo `server_confirmed` es conversión real;
+   si ves «Sin datos» en CTR/tasa con una nota de cobertura, es honestidad del sistema (las
+   impresiones aún no cubren la ventana), no un bug.
+
 ## Qué no hacer
 
 - **No** editar filas de `cta_version` publicadas por SQL (el trigger lo bloquea; editar = versión nueva).
