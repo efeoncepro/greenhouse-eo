@@ -1,9 +1,9 @@
 # Operar el motor de CTAs (`/growth/ctas` + API)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-07-17 por Claude (TASK-1339)
-> **Ultima actualizacion:** 2026-07-18 por Claude (rollout a producción: gobernanza en Growth, embed en hosts, medición GTM live)
+> **Ultima actualizacion:** 2026-07-18 por Claude (TASK-1431: acciones de navegación gobernada en el authoring — code complete, rollout pendiente)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md)
 > **Skill de dominio (agentes):** `greenhouse-growth-ctas`
 
@@ -32,7 +32,18 @@ Motor **encendido en staging y producción**. Primer CTA (`ai-visibility-report-
 
 ## Crear y publicar un CTA (API admin)
 
-1. `POST /api/admin/growth/ctas` con slug, name, purpose, placement, content (eyebrow/headline/body/ctaLabel/dismissLabel/footnote), `styleVariant` opcional (`default`|`spotlight`|`minimal`), `actionPolicy: { kind: 'open_growth_form', formRef: '<slug-o-form-key>' }`, targeting (`routes` glob) y priority. Crea la versión **draft**.
+1. `POST /api/admin/growth/ctas` con slug, name, purpose, placement, content (eyebrow/headline/body/ctaLabel/dismissLabel/footnote), `styleVariant` opcional (`default`|`spotlight`|`minimal`), `actionPolicy` (ver tabla), targeting (`routes` glob) y priority. Crea la versión **draft**.
+
+   **Acciones disponibles (`actionPolicy`, TASK-1431 — registro cerrado; un kind fuera del registro no publica):**
+
+   | Kind | Shape | Reglas del destino |
+   | --- | --- | --- |
+   | `open_growth_form` | `{ kind, formRef: '<slug-o-form-key>' }` | El form debe estar **publicado** en Growth Forms |
+   | `link_url` | `{ kind, url, openInNewContext? }` | Solo path interno (`/algo`) o HTTPS; sin `javascript:`/`data:`, sin `//host`, sin credenciales embebidas |
+   | `open_think_tool` | `{ kind, toolPath: '/brand-visibility', campaignUtm?: { source/medium/campaign/term/content }, openInNewContext? }` | `toolPath` es un **path del hub Think** (el host lo pone el motor — nunca lo elige el autor); sin `?`/`#` propios; contexto de campaña SOLO por UTM permitidas |
+   | `book_meeting` | `{ kind, meetingUrl, openInNewContext? }` | Solo HTTPS en hosts de agenda gobernados (`meetings*.hubspot.com`; extras vía env `GROWTH_CTA_BOOKING_URL_HOSTS`). **Navegación pura: cero write CRM por click** |
+
+   **Expectation integrity (regla de autoría):** el `ctaLabel`/footnote debe describir la acción real — "Agendar" abre la agenda (no promete reunión creada), "Ver X" navega. Nunca un label de descarga/resultado que el kind no ejecuta. `openInNewContext` default `false` (mismo contexto).
 2. `POST /api/admin/growth/ctas/{ctaId}/lifecycle` con `{ action: 'submit_review', ctaVersionId }` y luego `{ action: 'publish', ctaVersionId }` (o desde la UI).
 3. Para editar un CTA vivo: autora una **versión nueva** (paso 1 con el mismo slug) y publícala — nunca se edita la publicada.
 4. **Registrar la medición**: fila del CTA en `docs/reference/measurement-gtm-ga4/TRACKING-PLAN.md` §CTAs (obligatorio; los tags GTM de la familia ya cubren todo CTA nuevo — se distinguen por `cta_slug`).
@@ -137,7 +148,7 @@ El motor decide server-side si un visitante debe volver a ver un CTA y, con `GRO
 | Síntoma | Causa probable | Qué hacer |
 | --- | --- | --- |
 | El CTA no aparece en el host | Motor apagado en ese ambiente, CTA no publicado, ruta fuera del targeting, o surface/embed key mal configurada | Chip de estado en `/growth/ctas`; probar `GET /render` con la surface real; revisar el signal de forja |
-| Publish rechaza con `growth_cta_action_not_resolvable` | El form de destino no está publicado | Publicar el Growth Form primero |
+| Publish rechaza con `growth_cta_action_not_resolvable` | El form de destino no está publicado (`action_destination_unavailable`), el destino no pasa la gobernanza (`action_destination_invalid`: protocolo/host/credenciales/path fuera del contrato), la policy no cumple el shape del kind (`action_policy_invalid`) o el kind no está registrado (`action_kind_unsupported`) | Revisar `blockingReasons` de la respuesta; corregir la policy o publicar el Growth Form primero |
 | Signal `surface_unauthorized_attempt` > 0 | Ingest forjado o host mal configurado (embed key/origin) | Revisar el host; si es ataque, rotar embed key |
 | Signal `form_handoff_failed` > 0 | Un CTA publicado apunta a un form despublicado | Pausar el CTA o republicar el form |
 | Eventos no llegan a GA4 | Consent denied, tag sin propagar (CDN toma minutos), o lag del realtime | Verificar `/g/collect` con consent granted (LEARNINGS de medición); no concluir por el realtime |

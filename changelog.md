@@ -1,5 +1,26 @@
 # changelog.md
 
+## 2026-07-18 — TASK-1431: Growth CTA Action Registry + navegación gobernada (code complete, rollout pendiente)
+
+- El action router monomórfico del motor de CTAs se reemplazó por un **Action Registry tipado**
+  (`src/lib/growth/ctas/action-registry.ts`, server-only): un entry por kind con policy schema,
+  resolver y proyección browser-safe; `resolveCtaAction` queda como fachada estable y publish/render
+  fallan closed ante kinds sin entry. Metadata read-only browser-safe por kind
+  (`CTA_ACTION_KIND_METADATA`) para cockpit (TASK-1430)/preview/tests sin server-only. Taxonomía
+  canónica de fallo `action_policy_invalid|action_kind_unsupported|action_destination_invalid|action_destination_unavailable`.
+- Nuevas acciones de **navegación gobernada**: `link_url` (root-relative o https; anti open-redirect,
+  sin credenciales ni protocol-relative), `open_think_tool` (path sobre hub Think gobernado + campaign
+  context UTM-allowlisted strict) y `book_meeting` (hosts `meetings*.hubspot.com` + env
+  `GROWTH_CTA_BOOKING_URL_HOSTS`; navegación-only, cero write CRM). `open_growth_form` sin cambios.
+- Renderer `1.2.0`: executor por familia `growth_form|navigate` — navigate renderiza **`<a href>` real**
+  (middle-click/historial/copy-link/a11y de link; `rel='noopener noreferrer'` externo, `target=_blank`
+  opt-in + affordance sr-only), telemetría `clicked` ANTES de navegar (ingest keepalive), pending
+  single-dispatch accesible con recovery 4s, fail-closed ante kind desconocido. Sin migración; SoT de
+  telemetría intacta (`action_kind` porta 4 valores). Evidencia: 9728 tests verdes + build prod +
+  GVC `task-1431-growth-cta-actions` 1440/390 mirado. Docs: arch §27, funcional 1.6, manual 1.3,
+  TRACKING-PLAN §CTAs, skill `greenhouse-growth-ctas` (2 espejos). **Rollout pendiente**: push/release +
+  bundle 1.2.0 en hosts antes de publicar cualquier CTA con action nueva + smoke staging.
+
 ## 2026-07-18 — notion-platform V1.1: delegación y seguimiento gobernados
 
 - Se versionó la skill `notion-platform` para Codex y Claude con gramática canónica de Notion Enhanced Markdown, renderer/linter determinista y templates de proyecto, tarea, subtarea recursiva, cierre y snapshot de estado.

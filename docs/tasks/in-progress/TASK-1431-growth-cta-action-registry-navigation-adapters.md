@@ -25,6 +25,23 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-07-18 — Slices 1-3 CODE COMPLETE (local), rollout pendiente
+
+- Implementado y commiteado en develop local (sin push): registry (`action-registry.ts` server-only,
+  con metadata browser-safe `CTA_ACTION_KIND_METADATA` en `contracts.ts`), resolvers gobernados
+  `link_url`/`open_think_tool`/`book_meeting` (anti open-redirect; Think = path sobre hub gobernado
+  con UTM strict; booking = hosts HubSpot Meetings + env `GROWTH_CTA_BOOKING_URL_HOSTS`), executor
+  del renderer por familia con `<a href>` real (bundle `1.2.0-preview.1`).
+- Evidencia local: 122 tests focales + 9728 full suite verdes · `pnpm build` prod OK · lint/tsc OK ·
+  `task:lint`/`ui:wireframe|flow|readiness-check` limpios · GVC `task-1431-growth-cta-actions`
+  1440/390 mirado (`.captures/2026-07-18T17-14-30_*`: rol link nativo + affordance pestaña nueva +
+  pending accesible en el aria tree). Docs sincronizados: arch §27, funcional 1.6, manual 1.3,
+  TRACKING-PLAN §CTAs, skill `greenhouse-growth-ctas` (2 espejos).
+- **Pendiente para cierre (por eso sigue in-progress):** push/release · bundle 1.2.0 desplegado en
+  hosts ANTES de publicar cualquier CTA con action nueva · smoke staging de destinos reales
+  (Verification: `fe:capture --env=staging` + `qa:gates --runtime --browser`) · runtime/host parity
+  audit del Closing Protocol.
+
 ## Summary
 
 Reemplaza el action router cerrado sobre `open_growth_form` por un registry tipado y extensible, con validación/resolución server-side, proyección browser-safe y metadata de presentación mínima. V1 conserva `open_growth_form` y agrega navegación gobernada para `link_url`, `open_think_tool` y `book_meeting`; cada acción declara expectativa, familia de ejecución y estados/recovery compatibles sin decidir placement, appearance o density. Adapters con semántica propia de assets, forms embebidos o CRM quedan demand-driven.

@@ -75,8 +75,18 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
   `CTA_GTM_EVENT_NAMES` + `CTA_TELEMETRY_ALLOWED_PAYLOAD_KEYS` + outbox constants), `store.ts`
   (SQL + outbox in-tx; ojo: `query()` de `@/lib/db` retorna `rows` directo, NO `{rows}`),
   `arbiter.ts` (matcher glob-lite + priority + 0–1 interruptivo; targeting ausente/inválido =
-  NO elegible, fail-closed), `render-contract.ts` (compiler browser-safe), `action-router.ts`
-  (SOLO `open_growth_form`, resuelve vía `getPublishedRenderContractByRef` de forms),
+  NO elegible, fail-closed), `render-contract.ts` (compiler browser-safe), **TASK-1431**: `action-registry.ts`
+  (Action Registry canónico server-only — un entry por kind: policy schema zod + resolver +
+  proyección browser-safe; metadata pública `CTA_ACTION_KIND_METADATA` vive en `contracts.ts`,
+  browser-safe para cockpit/preview/tests; taxonomía de fallo `action_policy_invalid|
+  action_kind_unsupported|action_destination_invalid|action_destination_unavailable`) y
+  `action-router.ts` (fachada estable `resolveCtaAction` → delega al registry; publish gate y
+  render path fail-closed por la misma puerta). Kinds V1: `open_growth_form` (via
+  `getPublishedRenderContractByRef` de forms) + navegación gobernada `link_url` (root-relative o
+  https sin credenciales/protocol-relative) / `open_think_tool` (PATH sobre hub gobernado
+  `GROWTH_CTA_THINK_HUB_URL`∥`PUBLIC_GRADER_HUB_URL`∥think.efeoncepro.com + campaign context
+  UTM-allowlisted strict) / `book_meeting` (https en `meetings*.hubspot.com` + env
+  `GROWTH_CTA_BOOKING_URL_HOSTS`; navegación-only, CERO write CRM),
   `ingest.ts` (pipeline forjable-hardened + routing Tier B + hooks dismiss/conversión),
   `commands.ts` (lifecycle + surfaces), `readers.ts` (arbitraje + suppression + kill switch),
   `suppression.ts` (decisión PURA: taxonomía + policy zod, fail-closed), `visitor-state.ts`
@@ -107,6 +117,17 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
   `scripts/growth/_sanity-cta-store-sql.ts` (SQL vivo vs PG).
 
 ## Estado de rollout (actualizar al cambiar)
+
+- **2026-07-18 (TASK-1431): Action Registry + navegación gobernada CODE-COMPLETE (local, sin push).**
+  Registry tipado (`action-registry.ts`) con `open_growth_form` + `link_url`/`open_think_tool`/
+  `book_meeting`; executor del renderer por familia `growth_form|navigate` — navigate = `<a href>`
+  REAL (rel seguro, `target=_blank` opt-in + affordance sr-only, pending single-dispatch accesible,
+  recovery 4s `navigation_stalled`, fail-closed `action_unsupported` ante kind desconocido). Bundle
+  `1.2.0-preview.1`; fixtures navigate + preview inerte en `/growth/ctas`; GVC
+  `task-1431-growth-cta-actions` mirado (1440/390). SIN migración; telemetría SoT intacta
+  (`action_kind` porta 4 valores — TRACKING-PLAN §CTAs delta). **Rollout pendiente**: push/release,
+  bundle 1.2.0 desplegado en hosts ANTES de publicar cualquier CTA con action nueva (bundle viejo
+  falla closed), smoke staging de destinos reales. Arch delta §27.
 
 - **2026-07-18: PRIMERA REBANADA EN PRODUCCIÓN (released).** Flag `GROWTH_CTA_ENGINE_ENABLED` ON
   en staging + Production (solo Vercel lo lee). CTA `ai-visibility-report-followup` published,
@@ -153,6 +174,20 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
   enforcement staging + smoke kill switch sin redeploy → prod gradual (ledger §Pendientes).
 
 ## Hard rules (anti-regression — arch §20 + aprendizajes de implementación)
+
+- **NUNCA** (TASK-1431) agregar un action kind sin su entry completo: enum en `contracts.ts` +
+  metadata browser-safe + entry del registry (schema+resolver) + espejo/executor del renderer
+  JUNTOS (parity test de familias revienta si divergen). Un kind sin entry NO publica NI renderiza.
+- **NUNCA** (TASK-1431) renderizar una acción navigate como `<button>` con `location.assign`: es un
+  `<a href>` REAL (semántica nativa). Externo/newContext lleva `rel='noopener noreferrer'`;
+  `target=_blank` SOLO por opt-in del autor (`openInNewContext`) + affordance sr-only. La
+  telemetría `clicked` sale ANTES de navegar (ingest `keepalive`) y el destino (URL) JAMÁS viaja
+  en telemetría — solo `action_kind` allowlisted.
+- **NUNCA** (TASK-1431) resolver un destino fuera de la gobernanza: `link_url` solo root-relative o
+  https sin credenciales (anti `//host` y `/\host`); `open_think_tool` guarda un PATH (el host lo
+  pone el motor — el autor jamás elige host) con campaign context UTM-allowlisted strict;
+  `book_meeting` solo hosts de booking gobernados y es navegación-only (CERO write CRM por click —
+  el adapter CRM es `hubspot_handoff`, demand-driven futuro).
 
 - **NUNCA** arbitrar/decidir política en el browser: el renderer recibe 0–1 interruptivo + N
   no-interruptivos YA resueltos; targeting/priority/suppression jamás cruzan al contrato.

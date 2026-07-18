@@ -876,3 +876,43 @@ Release `d5db8b568` (manifest `released`, orquestador run 29651461496) llevó TA
   `growth.cta.*` hasta 2026-07-25.
 
 Con esto, las fases 1-3 de §18 están productivas; quedan cockpit (TASK-1430) y Action Registry (TASK-1431).
+
+## 27. Delta 2026-07-18 — TASK-1431: Action Registry + navegación gobernada (fase 4 de §18, code complete)
+
+Implementa el amendment de §12 (V1 action-registry boundary). **Estado: code complete en develop
+local — rollout pendiente** (push/release + bundle en hosts; ninguna CTA con action nueva publicada).
+
+- **Registry canónico** en `src/lib/growth/ctas/action-registry.ts` (server-only): un entry por kind
+  con policy schema (zod), resolver, proyección browser-safe y metadata; `resolveCtaAction()`
+  (action-router) queda como fachada estable que delega — publish gate y render path fail-closed
+  para kinds sin entry por la misma puerta. Metadata read-only browser-safe por kind
+  (`CTA_ACTION_KIND_METADATA` en `contracts.ts`: executionFamily · destinationExpectation ·
+  navigationContext · supportsInlineContinuation · requiredPolicyFields · failureReasons ·
+  telemetryKind) — consumible por cockpit (TASK-1430)/preview/tests sin server-only; JAMÁS contiene
+  appearance/placement/density/copy/asset.
+- **Taxonomía canónica de fallo** (reemplaza `form_not_resolvable` interno): `action_policy_invalid`
+  · `action_kind_unsupported` · `action_destination_invalid` · `action_destination_unavailable`.
+- **Unión V1**: `open_growth_form` (sin cambios de shape); `link_url` (root-relative o https; sin
+  protocolos peligrosos/credenciales/protocol-relative `//`·`/\`); `open_think_tool` (policy guarda
+  un PATH; el host lo resuelve el motor — hub gobernado `GROWTH_CTA_THINK_HUB_URL` ∥
+  `PUBLIC_GRADER_HUB_URL` ∥ `think.efeoncepro.com`; campaign context SOLO UTM-allowlisted `.strict()`);
+  y `book_meeting` (https en `meetings*.hubspot.com` más extras por `GROWTH_CTA_BOOKING_URL_HOSTS`;
+  navegación-only, cero write CRM). Proyección navigate browser-safe: `kind + href + newContext`
+  (opt-in del autor, default same-context).
+- **Executor por familia** (renderer `1.2.0`): `growth_form` conserva botón + form slot; `navigate`
+  renderiza **`<a href>` real** (semántica nativa: middle-click/cmd-click, historial, copy-link,
+  a11y de link) — externo/newContext lleva `rel='noopener noreferrer'`, newContext `target=_blank` +
+  affordance sr-only (`Se abre en una pestaña nueva`). Telemetría `clicked` sale ANTES de navegar
+  (ingest `keepalive`); pending single-dispatch accesible (`aria-disabled` + `role=status`) con
+  recovery acotado 4s (`navigation_stalled`); kind desconocido/href fuera de contrato ⇒ fail-closed
+  sin card (`action_unsupported`/`action_destination_invalid`) — un contrato más nuevo que el bundle
+  nunca adivina destino. Parity server↔renderer: familias (`CTA_ACTION_KIND_FAMILIES` ↔
+  `RENDERER_ACTION_FAMILIES`) + asignabilidad compile-time existente.
+- **Sin cambios de telemetría SoT**: cero eventos/params nuevos; `action_kind` (param existente)
+  ahora puede portar los 4 valores. Sin migración (`action_policy_json` JSONB + `action_kind` TEXT).
+- **Contract posture**: `greenhouse-growth-cta-popup.v1` se mantiene (ramas aditivas). Regla de
+  rollout: **ninguna CTA con action nueva se publica hasta que el bundle 1.2.0 esté desplegado en los
+  hosts objetivo**; un bundle viejo que reciba una rama nueva falla closed (evidencia:
+  `action_unsupported` en telemetría).
+- `dismiss` sigue como control/suppression del renderer; `download_asset`/`embed_growth_form`/
+  `hubspot_handoff` permanecen demand-driven (§12).
