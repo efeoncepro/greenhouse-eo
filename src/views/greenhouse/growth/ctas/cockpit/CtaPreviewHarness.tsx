@@ -127,6 +127,7 @@ export const PreviewFrame = ({
   const hostRef = useRef<HTMLDivElement | null>(null)
   const theme = useTheme()
   const frame = hostFrame(theme, host)
+  const [failClosed, setFailClosed] = useState(false)
   const showRenderer = !degraded && !suppressedEvidence
 
   useEffect(() => {
@@ -135,11 +136,18 @@ export const PreviewFrame = ({
     let disposed = false
     let cleanup: (() => void) | null = null
 
+    setFailClosed(false)
+
     void (async () => {
       if (!hostRef.current) return
 
       try {
         const dispose = await mountContract(hostRef.current, contract)
+
+        // Fail-closed honesto: si el renderer dejó el root en `empty` (acción no
+        // resoluble / contrato inválido), el visitante no vería NADA — el cockpit
+        // lo dice en vez de mostrar un marco vacío indistinguible de un bug.
+        if (hostRef.current?.dataset.ghcState === 'empty') setFailClosed(true)
 
         if (disposed) dispose()
         else cleanup = dispose
@@ -159,9 +167,9 @@ export const PreviewFrame = ({
   return (
     <Box
       data-capture={dataCapture}
-      sx={{
+      sx={theme => ({
         position: 'relative',
-        borderRadius: 3,
+        borderRadius: `${theme.shape.customBorderRadius.xl}px`,
         overflow: 'hidden',
         minHeight: heightPx,
         background: frame.bg,
@@ -170,7 +178,7 @@ export const PreviewFrame = ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-      }}
+      })}
     >
       <Stack spacing={2.5} sx={{ position: 'absolute', inset: 0, p: mini ? 4 : 6 }} aria-hidden>
         {lines.map((_, index) => (
@@ -188,7 +196,7 @@ export const PreviewFrame = ({
 
       {degraded ? (
         <Stack spacing={2} alignItems='center' sx={{ position: 'relative', textAlign: 'center', maxWidth: 320, color: frame.ink }}>
-          <i className='tabler-plug-connected-x' style={{ fontSize: 34 }} aria-hidden />
+          <i className='tabler-plug-connected-x' style={{ fontSize: 22 }} aria-hidden />
           <Typography variant='subtitle2' sx={{ color: 'inherit' }}>
             {P.degradedTitle}
           </Typography>
@@ -198,12 +206,27 @@ export const PreviewFrame = ({
         </Stack>
       ) : suppressedEvidence ? (
         <Stack spacing={2} alignItems='center' sx={{ position: 'relative', textAlign: 'center', maxWidth: 280, color: frame.ink }}>
-          <i className='tabler-eye-off' style={{ fontSize: 30 }} aria-hidden />
+          <i className='tabler-eye-off' style={{ fontSize: 22 }} aria-hidden />
           <Typography variant='subtitle2' sx={{ color: 'inherit' }}>
             {P.suppressedEvidenceTitle}
           </Typography>
           <Typography variant='caption' sx={{ color: 'inherit', opacity: 0.85 }}>
             {P.suppressedEvidenceBody}
+          </Typography>
+        </Stack>
+      ) : failClosed ? (
+        <Stack
+          spacing={2}
+          alignItems='center'
+          sx={{ position: 'relative', textAlign: 'center', maxWidth: 320, color: frame.ink }}
+          data-capture='cta-preview-fail-closed'
+        >
+          <i className='tabler-shield-x' style={{ fontSize: 22 }} aria-hidden />
+          <Typography variant='subtitle2' sx={{ color: 'inherit' }}>
+            {P.failClosedTitle}
+          </Typography>
+          <Typography variant='caption' sx={{ color: 'inherit', opacity: 0.85 }}>
+            {P.failClosedBody}
           </Typography>
         </Stack>
       ) : (
@@ -249,7 +272,7 @@ const ScaledFrame = ({ targetWidth, height, children }: { targetWidth: number; h
   }, [targetWidth])
 
   return (
-    <Box ref={wrapRef} sx={{ overflow: 'hidden', height: height * scale, borderRadius: 3 }}>
+    <Box ref={wrapRef} sx={theme => ({ overflow: 'hidden', height: height * scale, borderRadius: `${theme.shape.customBorderRadius.xl}px` })}>
       <Box sx={{ width: targetWidth, height, transform: `scale(${scale})`, transformOrigin: 'top left' }}>{children}</Box>
     </Box>
   )
@@ -283,7 +306,7 @@ export const SegmentedControl = <T extends string>({ label, value, options, onCh
         flexWrap: 'wrap',
         gap: 1,
         p: 1,
-        borderRadius: 2,
+        borderRadius: theme => `${theme.shape.customBorderRadius.lg}px`,
         bgcolor: 'action.hover',
         border: theme => `1px solid ${theme.palette.divider}`,
         alignSelf: 'flex-start',
@@ -298,12 +321,12 @@ export const SegmentedControl = <T extends string>({ label, value, options, onCh
             size='small'
             onClick={() => onChange(option.value)}
             aria-pressed={active}
-            startIcon={option.icon ? <i className={option.icon} style={{ fontSize: 15 }} /> : undefined}
+            startIcon={option.icon ? <i className={option.icon} style={{ fontSize: 16 }} /> : undefined}
             sx={{
-              px: 2.5,
+              px: 3,
               py: 1,
               minWidth: 0,
-              borderRadius: 1.5,
+              borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
               textTransform: 'none',
               fontWeight: 600,
               color: active ? 'primary.main' : 'text.secondary',
@@ -431,7 +454,7 @@ export const DiagnosticChips = ({ items }: { items: Array<{ k: string; v: string
           gap: 1,
           px: 2,
           py: 0.5,
-          borderRadius: 1,
+          borderRadius: theme => `${theme.shape.customBorderRadius.sm}px`,
           border: theme => `1px solid ${theme.palette.divider}`,
           bgcolor: 'action.hover',
           typography: 'caption',
@@ -539,7 +562,7 @@ export const CtaPreviewHarness = ({ draft, degraded, onDegradedChange, diagnosti
         spacing={2}
         sx={{
           p: 4,
-          borderRadius: 2,
+          borderRadius: theme => `${theme.shape.customBorderRadius.lg}px`,
           bgcolor: 'action.hover',
           border: theme => `1px solid ${theme.palette.divider}`,
         }}
@@ -557,11 +580,10 @@ export const CtaPreviewHarness = ({ draft, degraded, onDegradedChange, diagnosti
               sx={{
                 px: 2,
                 py: 0.5,
-                borderRadius: 1,
+                borderRadius: theme => `${theme.shape.customBorderRadius.sm}px`,
                 typography: 'caption',
                 fontWeight: 700,
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
+                letterSpacing: '0.02em',
                 color: 'primary.dark',
                 bgcolor: theme => alpha(theme.palette.primary.main, 0.12),
               }}
@@ -587,7 +609,7 @@ export const CtaPreviewHarness = ({ draft, degraded, onDegradedChange, diagnosti
               variant='outlined'
               color='inherit'
               onClick={() => setWidth(preset.width)}
-              sx={{ borderRadius: 5, py: 0.5, textTransform: 'none', color: 'text.secondary', borderColor: 'divider' }}
+              sx={{ borderRadius: '9999px', py: 0.5, textTransform: 'none', color: 'text.secondary', borderColor: 'divider' }}
             >
               {P[preset.labelKey]}
             </Button>
@@ -619,7 +641,7 @@ export const CtaPreviewHarness = ({ draft, degraded, onDegradedChange, diagnosti
         <Button
           size='small'
           variant='outlined'
-          startIcon={<i className='tabler-refresh' style={{ fontSize: 15 }} />}
+          startIcon={<i className='tabler-refresh' style={{ fontSize: 16 }} />}
           onClick={() => setMountKey(key => key + 1)}
         >
           {P.remount}
@@ -627,7 +649,7 @@ export const CtaPreviewHarness = ({ draft, degraded, onDegradedChange, diagnosti
         <Button
           size='small'
           variant='outlined'
-          startIcon={<i className='tabler-keyboard' style={{ fontSize: 15 }} />}
+          startIcon={<i className='tabler-keyboard' style={{ fontSize: 16 }} />}
           onClick={focusPrimary}
         >
           {P.focusPrimary}
@@ -637,7 +659,7 @@ export const CtaPreviewHarness = ({ draft, degraded, onDegradedChange, diagnosti
           size='small'
           color={degraded ? 'error' : 'inherit'}
           variant={degraded ? 'contained' : 'text'}
-          startIcon={<i className='tabler-bug' style={{ fontSize: 15 }} />}
+          startIcon={<i className='tabler-bug' style={{ fontSize: 16 }} />}
           onClick={() => onDegradedChange(!degraded)}
           data-capture='cta-harness-degrade-toggle'
           sx={degraded ? undefined : { color: 'text.secondary' }}

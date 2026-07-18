@@ -17,7 +17,6 @@ import { useRouter } from 'next/navigation'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import Chip from '@mui/material/Chip'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
@@ -32,7 +31,7 @@ import { alpha } from '@mui/material/styles'
 import CustomTextField from '@core/components/mui/TextField'
 import ConfirmDialog from '@/components/dialogs/ConfirmDialog'
 import EmptyState from '@/components/greenhouse/EmptyState'
-import { CompositionShell, GreenhouseBreadcrumbs } from '@/components/greenhouse/primitives'
+import { CompositionShell, GreenhouseBreadcrumbs, GreenhouseChip } from '@/components/greenhouse/primitives'
 import { GH_GROWTH_CTA_OPERATOR } from '@/lib/copy/growth'
 import { throwIfNotOk } from '@/lib/api/parse-error-response'
 import type { CtaSummaryVm, CtaSurfaceVm } from '@/lib/growth/ctas/readers'
@@ -303,10 +302,10 @@ const GrowthCtasGovernanceView = ({
     })
 
     return [
-      { key: 'published', count: counts.published, label: C.summary.published, color: 'success.main' },
-      { key: 'review', count: counts.review, label: C.summary.review, color: 'info.main' },
-      { key: 'draft', count: counts.draft, label: C.summary.draft, color: 'text.disabled' },
-      { key: 'paused', count: counts.paused, label: C.summary.paused, color: 'warning.main' },
+      { key: 'published', count: counts.published, label: C.summary.published, tone: 'success' as const },
+      { key: 'review', count: counts.review, label: C.summary.review, tone: 'info' as const },
+      { key: 'draft', count: counts.draft, label: C.summary.draft, tone: 'default' as const },
+      { key: 'paused', count: counts.paused, label: C.summary.paused, tone: 'warning' as const },
     ]
   }, [ctas])
 
@@ -322,35 +321,38 @@ const GrowthCtasGovernanceView = ({
           { label: C.breadcrumbs.ctas, iconClassName: 'tabler-hand-click' },
         ]}
       />
-      <Stack direction='row' alignItems='flex-end' justifyContent='space-between' gap={4} flexWrap='wrap'>
-        <Stack spacing={1.5} sx={{ minWidth: 0, flex: '1 1 480px' }}>
-          <Typography variant='h4' sx={{ lineHeight: 1.1 }}>
-            {O.title}
-          </Typography>
+      <Stack direction='row' alignItems='flex-start' justifyContent='space-between' gap={4} flexWrap='wrap'>
+        <Stack spacing={2} sx={{ minWidth: 0, flex: '1 1 480px' }}>
+          <Typography variant='h4'>{O.title}</Typography>
           <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 640 }}>
             {C.subtitle}
           </Typography>
-          <Stack direction='row' alignItems='center' gap={4} flexWrap='wrap'>
+          <Stack direction='row' alignItems='center' gap={2} flexWrap='wrap' sx={{ pt: 1 }}>
             {statusSummary.map(item => (
-              <Typography key={item.key} variant='caption' color='text.secondary' sx={{ display: 'inline-flex', alignItems: 'center', gap: 1.5 }}>
-                <Box component='span' sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: item.color }} aria-hidden />
-                <Box component='span' sx={{ fontWeight: 700, color: 'text.primary', fontFeatureSettings: '"tnum" 1' }}>
-                  {item.count}
-                </Box>
-                {item.label}
-              </Typography>
+              <GreenhouseChip
+                key={item.key}
+                kind='metric'
+                size='small'
+                variant='label'
+                tone={item.tone}
+                label={`${item.count} ${item.label}`}
+              />
             ))}
+            <Tooltip title={engineEnabled ? '' : O.engineFlag.offHint}>
+              <span>
+                <GreenhouseChip
+                  kind='status'
+                  size='small'
+                  variant='label'
+                  tone={engineEnabled ? 'success' : 'warning'}
+                  iconClassName={engineEnabled ? 'tabler-bolt' : 'tabler-bolt-off'}
+                  label={engineEnabled ? O.engineFlag.on : O.engineFlag.off}
+                />
+              </span>
+            </Tooltip>
           </Stack>
         </Stack>
-        <Stack direction='row' alignItems='center' gap={2.5} flexWrap='wrap'>
-          <Tooltip title={engineEnabled ? '' : O.engineFlag.offHint}>
-            <Chip
-              label={engineEnabled ? O.engineFlag.on : O.engineFlag.off}
-              color={engineEnabled ? 'success' : 'warning'}
-              variant='tonal'
-              size='small'
-            />
-          </Tooltip>
+        <Stack direction='row' alignItems='center' gap={2.5} flexWrap='wrap' sx={{ pt: 1 }}>
           <Button
             variant='outlined'
             color='inherit'
@@ -392,9 +394,9 @@ const GrowthCtasGovernanceView = ({
       sx={{
         p: 12,
         textAlign: 'center',
-        borderRadius: 3,
         bgcolor: 'background.paper',
-        border: theme => `1px dashed ${theme.palette.divider}`,
+        borderRadius: theme => `${theme.shape.customBorderRadius.xl}px`,
+        boxShadow: 'var(--mui-customShadows-md)',
       }}
       data-capture='cta-inventory'
     >
@@ -402,7 +404,7 @@ const GrowthCtasGovernanceView = ({
         sx={{
           width: 64,
           height: 64,
-          borderRadius: 3,
+          borderRadius: theme => `${theme.shape.customBorderRadius.xl}px`,
           display: 'inline-flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -410,7 +412,7 @@ const GrowthCtasGovernanceView = ({
           bgcolor: theme => alpha(theme.palette.primary.main, 0.12),
         }}
       >
-        <i className='tabler-hand-click' style={{ fontSize: 30 }} aria-hidden />
+        <i className='tabler-hand-click' style={{ fontSize: 22 }} aria-hidden />
       </Box>
       <Stack spacing={1.5}>
         <Typography variant='h6'>{C.empty.title}</Typography>
@@ -442,7 +444,7 @@ const GrowthCtasGovernanceView = ({
   )
 
   const aside = isEmptyInventory ? (
-    <Box sx={{ p: 8, borderRadius: 3, bgcolor: 'background.paper', border: theme => `1px solid ${theme.palette.divider}` }}>
+    <Box sx={{ p: 8, bgcolor: 'background.paper', borderRadius: theme => `${theme.shape.customBorderRadius.xl}px`, boxShadow: 'var(--mui-customShadows-md)' }}>
       <EmptyState icon='tabler-layout-sidebar-right-expand' title={C.empty.asideTitle} description={C.empty.asideBody} />
     </Box>
   ) : selectedId ? (
@@ -466,7 +468,7 @@ const GrowthCtasGovernanceView = ({
       }}
     />
   ) : (
-    <Box sx={{ p: 8, borderRadius: 3, bgcolor: 'background.paper', border: theme => `1px dashed ${theme.palette.divider}` }}>
+    <Box sx={{ p: 8, bgcolor: 'background.paper', borderRadius: theme => `${theme.shape.customBorderRadius.xl}px`, boxShadow: 'var(--mui-customShadows-md)' }}>
       <EmptyState icon='tabler-click' title={C.noSelection.title} description={C.noSelection.body} />
     </Box>
   )

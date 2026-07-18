@@ -153,19 +153,19 @@ export const buildReviewChecks = (draft: CtaAuthoringDraft, previewDegraded: boo
 const StepHead = ({ title, subtitle, icon }: { title: string; subtitle: string; icon: string }) => (
   <Stack direction='row' spacing={3} alignItems='flex-start' sx={{ mb: 5 }}>
     <Box
-      sx={{
+      sx={theme => ({
         width: 40,
         height: 40,
-        borderRadius: 2,
+        borderRadius: `${theme.shape.customBorderRadius.lg}px`,
         flexShrink: 0,
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
         color: 'primary.dark',
-        bgcolor: theme => alpha(theme.palette.primary.main, 0.12),
-      }}
+        bgcolor: alpha(theme.palette.primary.main, 0.12),
+      })}
     >
-      <i className={icon} style={{ fontSize: 21 }} aria-hidden />
+      <i className={icon} style={{ fontSize: 20 }} aria-hidden />
     </Box>
     <Stack spacing={0.5}>
       <Typography variant='h6' sx={{ lineHeight: 1.2 }}>
@@ -193,57 +193,55 @@ const OptionCard = ({ selected, icon, label, desc, badge, onClick }: OptionCardP
     type='button'
     onClick={onClick}
     aria-pressed={selected}
-    sx={{
+    sx={theme => ({
       textAlign: 'left',
       cursor: 'pointer',
-      borderRadius: 2,
+      borderRadius: `${theme.shape.customBorderRadius.xl}px`,
       p: 4,
       display: 'flex',
       flexDirection: 'column',
       gap: 2,
       font: 'inherit',
-      bgcolor: theme => (selected ? alpha(theme.palette.primary.main, 0.08) : theme.palette.background.paper),
-      border: theme =>
-        selected ? `1.5px solid ${theme.palette.primary.main}` : `1px solid ${theme.palette.divider}`,
-      transition: theme => theme.transitions.create(['border-color', 'background-color'], { duration: 150 }),
-      '&:hover': { borderColor: 'primary.light' },
-      '&:focus-visible': { outline: theme => `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 },
-    }}
+      bgcolor: selected ? alpha(theme.palette.primary.main, 0.06) : theme.palette.background.paper,
+      border: selected ? `1.5px solid ${theme.palette.primary.main}` : '1px solid transparent',
+      boxShadow: 'var(--mui-customShadows-xs)',
+      transition: theme.transitions.create(['border-color', 'background-color', 'box-shadow'], { duration: 150 }),
+      '&:hover': { boxShadow: 'var(--mui-customShadows-md)' },
+      '&:focus-visible': { outline: `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 },
+    })}
   >
     <Stack direction='row' alignItems='center' justifyContent='space-between'>
       <Box
-        sx={{
-          width: 34,
-          height: 34,
-          borderRadius: 1.5,
+        sx={theme => ({
+          width: 36,
+          height: 36,
+          borderRadius: `${theme.shape.customBorderRadius.md}px`,
           display: 'inline-flex',
           alignItems: 'center',
           justifyContent: 'center',
           color: selected ? 'primary.contrastText' : 'text.secondary',
-          bgcolor: selected ? 'primary.main' : 'action.hover',
-        }}
+          bgcolor: selected ? theme.palette.primary.main : theme.palette.action.hover,
+        })}
       >
         <i className={icon} style={{ fontSize: 18 }} aria-hidden />
       </Box>
       {badge ? (
         <Box
           component='span'
-          sx={{
-            px: 1.5,
-            py: 0.25,
-            borderRadius: 1,
+          sx={theme => ({
+            px: 2,
+            py: 0.5,
+            borderRadius: `${theme.shape.customBorderRadius.sm}px`,
             typography: 'caption',
-            fontWeight: 700,
-            textTransform: 'uppercase',
-            letterSpacing: '0.04em',
+            fontWeight: 600,
             color: 'warning.dark',
-            bgcolor: theme => alpha(theme.palette.warning.main, 0.16),
-          }}
+            bgcolor: alpha(theme.palette.warning.main, 0.16),
+          })}
         >
           {badge}
         </Box>
       ) : selected ? (
-        <i className='tabler-circle-check-filled' style={{ fontSize: 20 }} aria-hidden />
+        <Box component='i' className='tabler-circle-check-filled' sx={{ fontSize: 20, color: 'primary.main' }} aria-hidden />
       ) : null}
     </Stack>
     <Typography variant='subtitle2'>{label}</Typography>
@@ -261,16 +259,16 @@ const InfoBanner = ({ icon, tone, children }: { icon: string; tone: 'info' | 'wa
   <Stack
     direction='row'
     spacing={2.5}
-    sx={{
+    sx={theme => ({
       mt: 4,
-      p: 3.5,
-      borderRadius: 2,
+      p: 4,
+      borderRadius: `${theme.shape.customBorderRadius.lg}px`,
       alignItems: 'flex-start',
-      bgcolor: theme => alpha(theme.palette[tone].main, 0.12),
-      border: theme => `1px solid ${alpha(theme.palette[tone].main, 0.3)}`,
-    }}
+      bgcolor: alpha(theme.palette[tone].main, 0.12),
+      border: `1px solid ${alpha(theme.palette[tone].main, 0.3)}`,
+    })}
   >
-    <i className={icon} style={{ fontSize: 19, marginTop: 2 }} aria-hidden />
+    <i className={icon} style={{ fontSize: 18, marginTop: 2 }} aria-hidden />
     <Typography variant='body2' sx={{ lineHeight: 1.5 }}>
       {children}
     </Typography>
@@ -557,7 +555,7 @@ const CtaAuthoringDrawer = ({ open, existingSlug, initialDraft, onClose, onSubmi
               direction='row'
               alignItems='center'
               justifyContent='space-between'
-              sx={{ p: 3.5, borderRadius: 2, bgcolor: 'action.hover', border: theme => `1px solid ${theme.palette.divider}` }}
+              sx={theme => ({ p: 4, borderRadius: `${theme.shape.customBorderRadius.lg}px`, bgcolor: 'action.hover' })}
             >
               <Stack spacing={0.5}>
                 <Typography variant='subtitle2'>{A.content.assetTitle}</Typography>
@@ -632,7 +630,7 @@ const CtaAuthoringDrawer = ({ open, existingSlug, initialDraft, onClose, onSubmi
                 direction='row'
                 alignItems='center'
                 justifyContent='space-between'
-                sx={{ p: 3.5, borderRadius: 2, bgcolor: 'action.hover', border: theme => `1px solid ${theme.palette.divider}` }}
+                sx={theme => ({ p: 4, borderRadius: `${theme.shape.customBorderRadius.lg}px`, bgcolor: 'action.hover' })}
               >
                 <Stack spacing={0.5}>
                   <Typography variant='subtitle2'>{A.action.newContextLabel}</Typography>
@@ -711,7 +709,7 @@ const CtaAuthoringDrawer = ({ open, existingSlug, initialDraft, onClose, onSubmi
               direction='row'
               alignItems='center'
               justifyContent='space-between'
-              sx={{ p: 3.5, borderRadius: 2, bgcolor: 'action.hover', border: theme => `1px solid ${theme.palette.divider}` }}
+              sx={theme => ({ p: 4, borderRadius: `${theme.shape.customBorderRadius.lg}px`, bgcolor: 'action.hover' })}
             >
               <Stack spacing={0.5}>
                 <Typography variant='subtitle2'>{A.targeting.afterConversion}</Typography>
@@ -752,20 +750,18 @@ const CtaAuthoringDrawer = ({ open, existingSlug, initialDraft, onClose, onSubmi
           direction='row'
           spacing={3}
           alignItems='center'
-          sx={{
+          sx={theme => ({
             p: 4,
             mb: 4,
-            borderRadius: 2,
-            bgcolor: theme =>
-              blockedCount > 0 ? alpha(theme.palette.error.main, 0.1) : alpha(theme.palette.success.main, 0.1),
-            border: theme =>
-              `1px solid ${alpha(blockedCount > 0 ? theme.palette.error.main : theme.palette.success.main, 0.3)}`,
-          }}
+            borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+            bgcolor: blockedCount > 0 ? alpha(theme.palette.error.main, 0.1) : alpha(theme.palette.success.main, 0.1),
+            border: `1px solid ${alpha(blockedCount > 0 ? theme.palette.error.main : theme.palette.success.main, 0.3)}`,
+          })}
           data-capture='cta-author-review-summary'
         >
           <i
             className={blockedCount > 0 ? 'tabler-alert-octagon' : 'tabler-circle-check'}
-            style={{ fontSize: 24 }}
+            style={{ fontSize: 22 }}
             aria-hidden
           />
           <Stack spacing={0.5}>
@@ -785,7 +781,7 @@ const CtaAuthoringDrawer = ({ open, existingSlug, initialDraft, onClose, onSubmi
               <Box
                 component='i'
                 className={check.ok ? 'tabler-circle-check-filled' : 'tabler-alert-circle-filled'}
-                sx={{ fontSize: 19, mt: 0.5, color: check.ok ? 'success.main' : 'error.main' }}
+                sx={{ fontSize: 18, mt: 0.5, color: check.ok ? 'success.main' : 'error.main' }}
                 aria-hidden
               />
               <Stack spacing={0.5}>
@@ -840,18 +836,18 @@ const CtaAuthoringDrawer = ({ open, existingSlug, initialDraft, onClose, onSubmi
           }}
         >
           <Box
-            sx={{
-              width: 34,
-              height: 34,
-              borderRadius: 1.5,
+            sx={theme => ({
+              width: 36,
+              height: 36,
+              borderRadius: `${theme.shape.customBorderRadius.md}px`,
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: 'primary.dark',
-              bgcolor: theme => alpha(theme.palette.primary.main, 0.12),
-            }}
+              bgcolor: alpha(theme.palette.primary.main, 0.12),
+            })}
           >
-            <i className='tabler-wand' style={{ fontSize: 19 }} aria-hidden />
+            <i className='tabler-wand' style={{ fontSize: 18 }} aria-hidden />
           </Box>
           <Stack spacing={0}>
             <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
@@ -865,17 +861,18 @@ const CtaAuthoringDrawer = ({ open, existingSlug, initialDraft, onClose, onSubmi
           {dirty ? (
             <Box
               component='span'
-              sx={{
+              sx={theme => ({
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 1,
-                px: 2.5,
+                px: 3,
                 py: 1,
-                borderRadius: 5,
+                borderRadius: '9999px',
                 typography: 'caption',
+                fontWeight: 600,
                 color: 'warning.dark',
-                bgcolor: theme => alpha(theme.palette.warning.main, 0.16),
-              }}
+                bgcolor: alpha(theme.palette.warning.main, 0.16),
+              })}
               data-capture='cta-author-dirty-badge'
             >
               <i className='tabler-point-filled' style={{ fontSize: 14 }} aria-hidden />
@@ -931,20 +928,20 @@ const CtaAuthoringDrawer = ({ open, existingSlug, initialDraft, onClose, onSubmi
                   type='button'
                   onClick={() => setStep(index)}
                   aria-current={active ? 'step' : undefined}
-                  sx={{
+                  sx={theme => ({
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 2.5,
+                    gap: 3,
                     textAlign: 'left',
-                    p: 2.25,
-                    borderRadius: 2,
+                    p: 2,
+                    borderRadius: `${theme.shape.customBorderRadius.lg}px`,
                     cursor: 'pointer',
                     font: 'inherit',
                     border: 'none',
-                    bgcolor: theme => (active ? alpha(theme.palette.primary.main, 0.1) : 'transparent'),
-                    '&:hover': { bgcolor: theme => (active ? alpha(theme.palette.primary.main, 0.1) : theme.palette.action.hover) },
-                    '&:focus-visible': { outline: theme => `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 },
-                  }}
+                    bgcolor: active ? alpha(theme.palette.primary.main, 0.1) : 'transparent',
+                    '&:hover': { bgcolor: active ? alpha(theme.palette.primary.main, 0.1) : theme.palette.action.hover },
+                    '&:focus-visible': { outline: `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 },
+                  })}
                 >
                   <Box
                     sx={{
@@ -963,7 +960,7 @@ const CtaAuthoringDrawer = ({ open, existingSlug, initialDraft, onClose, onSubmi
                         `1.5px solid ${active ? theme.palette.primary.main : done ? theme.palette.success.main : theme.palette.divider}`,
                     }}
                   >
-                    {done ? <i className='tabler-check' style={{ fontSize: 15 }} aria-hidden /> : index + 1}
+                    {done ? <i className='tabler-check' style={{ fontSize: 16 }} aria-hidden /> : index + 1}
                   </Box>
                   <Stack spacing={0} sx={{ minWidth: 0 }}>
                     <Typography variant='caption' sx={{ fontWeight: 600, color: active ? 'primary.dark' : 'text.primary' }}>

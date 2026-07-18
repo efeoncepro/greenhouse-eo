@@ -24,6 +24,11 @@ export const scenario: CaptureScenario = {
     { kind: 'noLoginRedirect', reason: 'ruta interna autenticada (viewCode gestion.growth_ctas)' },
     { kind: 'noErrorBoundary', reason: 'la captura no debe ser un error boundary' }
   ],
+  quality: {
+    layout: { enabled: true, failOnViolations: false },
+    runtime: { enabled: true, failOnViolations: false },
+    enterpriseRubric: { enabled: true, failOnViolations: false }
+  },
   steps: [
     { kind: 'mark', label: '01-mobile-shell' },
     { kind: 'mark', label: '02-mobile-inventory', clipSelector: '[data-capture="cta-inventory"]' },

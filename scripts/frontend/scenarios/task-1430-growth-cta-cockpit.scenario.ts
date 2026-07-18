@@ -31,6 +31,17 @@ export const scenario: CaptureScenario = {
     { kind: 'noLoginRedirect', reason: 'ruta interna autenticada (viewCode gestion.growth_ctas)' },
     { kind: 'noErrorBoundary', reason: 'la captura no debe ser un error boundary' }
   ],
+  // GVC V1.5 — gates de calidad SIEMPRE en este cockpit (lección TASK-1430: el
+  // "wireframe look" pasó el gate porque el rubric era opt-in y no se declaró).
+  quality: {
+    layout: { enabled: true, failOnViolations: false },
+    runtime: { enabled: true, failOnViolations: false },
+    enterpriseRubric: {
+      enabled: true,
+      failOnViolations: false,
+      expectedDataCaptureRegions: ['cta-cockpit-shell', 'cta-inventory', 'cta-detail']
+    }
+  },
   steps: [
     // ── Workbench: inventario + detalle ──
     { kind: 'mark', label: '01-cockpit-shell' },

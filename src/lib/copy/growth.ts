@@ -1138,18 +1138,18 @@ export const GH_GROWTH_CTA_OPERATOR = {
       conversions: 'Conversiones',
       ctr: 'CTR',
       conversionRate: 'Tasa de conversión',
-      trustBrowser: 'browser_reported',
-      trustServer: 'server_confirmed',
+      trustBrowser: 'reporte del navegador',
+      trustServer: 'confirmada por el servidor',
       deltaVsPrev: 'vs. ventana anterior',
-      deltaNew: 'Primera ventana',
-      rateNoData: 'Sin datos',
+      deltaNew: 'primera ventana',
+      rateNoData: 'Sin datos aún',
       coverageUndercounted:
         'Cobertura parcial: el conteo de impresiones empezó después que el de clics, así que las tasas aún no son confiables. Se muestran los conteos.',
       partialTitle: 'Resultados no disponibles',
       partialBody: 'La lectura de resultados no respondió. El ciclo de vida sigue operable.',
       enforcementOn: 'enforcement activo',
       enforcementShadow: 'supresión en shadow',
-      conversionTruthHint: 'Solo server_confirmed cuenta como conversión. El CTR es browser-reported.'
+      conversionTruthHint: 'Solo la conversión confirmada por el servidor cuenta como verdad; el CTR viene del reporte del navegador.'
     },
     kill: {
       title: 'Kill switch gobernado',
@@ -1408,7 +1408,10 @@ export const GH_GROWTH_CTA_OPERATOR = {
         matrixAria: 'Matriz de casos frontera del preview',
         badgesNote: 'Estos badges son diagnóstico del cockpit — no llegan al visitante.',
         suppressedEvidenceTitle: 'No se muestra',
-        suppressedEvidenceBody: 'Suprimido por cap de frecuencia o descarte reciente. Evidencia read-only del motor.'
+        suppressedEvidenceBody: 'Suprimido por cap de frecuencia o descarte reciente. Evidencia read-only del motor.',
+        failClosedTitle: 'El renderer no montó este contrato (fail-closed)',
+        failClosedBody:
+          'La acción no resuelve un destino gobernado o el contrato no es válido: el visitante no vería nada. Corrige la acción en una versión nueva.'
       },
       review: {
         title: 'Revisión',

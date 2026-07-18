@@ -12,10 +12,13 @@ import { useMemo } from 'react'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import CardHeader from '@mui/material/CardHeader'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import { alpha } from '@mui/material/styles'
+import { alpha, type Theme } from '@mui/material/styles'
 
 import { GreenhouseChip } from '@/components/greenhouse/primitives'
 import { GH_GROWTH_CTA_OPERATOR } from '@/lib/copy/growth'
@@ -53,57 +56,46 @@ export interface LifecycleRequest {
   ctaName: string
 }
 
+/** Radius canónico como CSS length (overlay modern-ui: jamás multiplicadores sx). */
+const radius = (theme: Theme, key: 'sm' | 'md' | 'lg' | 'xl') => `${theme.shape.customBorderRadius[key]}px`
+
+/**
+ * Card de sección canónica del portal (Vuexy Card + CardHeader + CardContent):
+ * sombra/radius/padding vienen del theme — cero bordes wireframe ad-hoc.
+ */
 const SectionCard = ({
   title,
   subtitle,
   action,
   children,
   dataCapture,
+  disablePadding = false,
 }: {
   title: string
   subtitle?: string
   action?: React.ReactNode
   children: React.ReactNode
   dataCapture?: string
+  disablePadding?: boolean
 }) => (
-  <Box
-    data-capture={dataCapture}
-    sx={{
-      borderRadius: 2.5,
-      overflow: 'hidden',
-      bgcolor: 'background.paper',
-      border: theme => `1px solid ${theme.palette.divider}`,
-    }}
-  >
-    <Stack
-      direction='row'
-      alignItems='center'
-      justifyContent='space-between'
-      gap={3}
-      sx={{ px: 5, py: 3.5, borderBottom: theme => `1px solid ${theme.palette.divider}` }}
-    >
-      <Stack spacing={0.25}>
-        <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
-          {title}
-        </Typography>
-        {subtitle ? (
-          <Typography variant='caption' color='text.secondary'>
-            {subtitle}
-          </Typography>
-        ) : null}
-      </Stack>
-      {action}
-    </Stack>
-    <Box sx={{ p: 5 }}>{children}</Box>
-  </Box>
+  <Card data-capture={dataCapture}>
+    <CardHeader
+      title={title}
+      subheader={subtitle}
+      action={action}
+      titleTypographyProps={{ variant: 'h5' }}
+      subheaderTypographyProps={{ variant: 'body2', color: 'text.secondary' }}
+      sx={{ pb: subtitle ? 4 : 3, '& .MuiCardHeader-action': { alignSelf: 'center', m: 0 } }}
+    />
+    <CardContent sx={disablePadding ? { p: 0, '&:last-child': { pb: 0 } } : undefined}>{children}</CardContent>
+  </Card>
 )
 
 // ─── Métricas (formato canónico src/lib/format; rates ya vienen resueltos) ────
 
 const formatCount = (value: number): string => formatNumber(value)
 
-const formatRate = (value: number | null): string =>
-  value === null ? C.metrics.rateNoData : formatPercent(value)
+const formatRate = (value: number | null): string => (value === null ? '—' : formatPercent(value))
 
 const MetricDelta = ({ delta, unit }: { delta: number | null; unit: 'pct' | 'pp' }) => {
   if (delta === null) {
@@ -128,30 +120,20 @@ const MetricDelta = ({ delta, unit }: { delta: number | null; unit: 'pct' | 'pp'
         color: down ? 'error.main' : 'success.main',
       }}
     >
-      <i className={down ? 'tabler-trending-down' : 'tabler-trending-up'} style={{ fontSize: 13 }} aria-hidden />
+      <i className={down ? 'tabler-trending-down' : 'tabler-trending-up'} style={{ fontSize: 14 }} aria-hidden />
       {formatted} {C.metrics.deltaVsPrev}
     </Typography>
   )
 }
 
 const TrustTag = ({ trust }: { trust: 'browser' | 'server' }) => (
-  <Box
-    component='span'
-    sx={{
-      px: 1.25,
-      py: 0.25,
-      borderRadius: 1,
-      typography: 'caption',
-      fontSize: '0.625rem',
-      fontWeight: 600,
-      textTransform: 'uppercase',
-      letterSpacing: '0.03em',
-      color: trust === 'server' ? 'success.dark' : 'info.dark',
-      bgcolor: theme => alpha(trust === 'server' ? theme.palette.success.main : theme.palette.info.main, 0.14),
-    }}
-  >
-    {trust === 'server' ? C.metrics.trustServer : C.metrics.trustBrowser}
-  </Box>
+  <GreenhouseChip
+    kind='attribute'
+    size='small'
+    variant='label'
+    tone={trust === 'server' ? 'success' : 'info'}
+    label={trust === 'server' ? C.metrics.trustServer : C.metrics.trustBrowser}
+  />
 )
 
 const MetricCard = ({
@@ -168,16 +150,16 @@ const MetricCard = ({
   trust: 'browser' | 'server'
 }) => (
   <Stack
-    spacing={1}
-    sx={{ p: 3.5, borderRadius: 2, border: theme => `1px solid ${theme.palette.divider}` }}
+    spacing={2}
+    sx={theme => ({ p: 4, borderRadius: radius(theme, 'lg'), bgcolor: 'action.hover' })}
   >
     <Typography variant='caption' sx={{ fontWeight: 600, color: 'text.secondary' }}>
       {label}
     </Typography>
-    <Typography variant='h5' sx={{ fontWeight: 800, lineHeight: 1, fontFeatureSettings: '"tnum" 1' }}>
+    <Typography variant='kpiValue' component='p' sx={{ lineHeight: 1 }}>
       {value}
     </Typography>
-    <Stack direction='row' alignItems='center' gap={1.5} flexWrap='wrap'>
+    <Stack direction='row' alignItems='center' gap={2} flexWrap='wrap'>
       <MetricDelta delta={delta} unit={deltaUnit} />
       <TrustTag trust={trust} />
     </Stack>
@@ -248,12 +230,15 @@ const MetricsSection = ({
           {undercounted ? (
             <Stack
               spacing={1}
-              sx={{ p: 3.5, borderRadius: 2, border: theme => `1px dashed ${theme.palette.divider}`, justifyContent: 'center' }}
+              sx={theme => ({ p: 4, borderRadius: radius(theme, 'lg'), border: `1px dashed ${theme.palette.divider}`, justifyContent: 'center' })}
             >
               <Typography variant='caption' sx={{ fontWeight: 600, color: 'text.secondary' }}>
                 {C.metrics.ctr} · {C.metrics.conversionRate}
               </Typography>
-              <Typography variant='h6' color='text.disabled' sx={{ lineHeight: 1 }}>
+              <Typography variant='kpiValue' component='p' color='text.disabled' sx={{ lineHeight: 1 }}>
+                —
+              </Typography>
+              <Typography variant='caption' color='text.disabled'>
                 {C.metrics.rateNoData}
               </Typography>
             </Stack>
@@ -340,12 +325,12 @@ const CtaDetailPanel = ({
 
   if (loading) {
     return (
-      <Stack spacing={4} sx={{ p: 5, borderRadius: 2.5, bgcolor: 'background.paper', border: theme => `1px solid ${theme.palette.divider}` }}>
+      <Card><CardContent><Stack spacing={4}>
         <Skeleton variant='rounded' height={26} width='60%' />
         <Skeleton variant='rounded' height={16} width='40%' />
         <Skeleton variant='rounded' height={200} />
         <Skeleton variant='rounded' height={120} />
-      </Stack>
+      </Stack></CardContent></Card>
     )
   }
 
@@ -354,24 +339,24 @@ const CtaDetailPanel = ({
       <Stack
         spacing={3}
         alignItems='center'
-        sx={{ p: 10, textAlign: 'center', borderRadius: 2.5, bgcolor: 'background.paper', border: theme => `1px solid ${theme.palette.divider}` }}
+        sx={theme => ({ p: 10, textAlign: 'center', borderRadius: radius(theme, 'xl'), bgcolor: 'background.paper', boxShadow: 'var(--mui-customShadows-md)' })}
       >
         <Box
-          sx={{
+          sx={theme => ({
             width: 48,
             height: 48,
-            borderRadius: 2,
+            borderRadius: radius(theme, 'lg'),
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
             color: 'error.dark',
-            bgcolor: theme => alpha(theme.palette.error.main, 0.12),
-          }}
+            bgcolor: alpha(theme.palette.error.main, 0.12),
+          })}
         >
-          <i className='tabler-cloud-off' style={{ fontSize: 24 }} aria-hidden />
+          <i className='tabler-cloud-off' style={{ fontSize: 22 }} aria-hidden />
         </Box>
         <Typography variant='subtitle2'>{C.detail.loadError}</Typography>
-        <Button variant='outlined' size='small' startIcon={<i className='tabler-refresh' style={{ fontSize: 15 }} />} onClick={onRetry}>
+        <Button variant='outlined' size='small' startIcon={<i className='tabler-refresh' style={{ fontSize: 16 }} />} onClick={onRetry}>
           {C.detail.retry}
         </Button>
       </Stack>
@@ -434,7 +419,7 @@ const CtaDetailPanel = ({
   return (
     <Stack spacing={4} data-capture='cta-detail'>
       {/* Header */}
-      <Box sx={{ borderRadius: 2.5, overflow: 'hidden', bgcolor: 'background.paper', border: theme => `1px solid ${theme.palette.divider}` }}>
+      <Card sx={{ overflow: 'hidden' }}>
         <Stack spacing={3.5} sx={{ p: 5 }}>
           <Stack direction='row' alignItems='flex-start' justifyContent='space-between' gap={3}>
             <Stack spacing={1} sx={{ minWidth: 0 }}>
@@ -473,7 +458,7 @@ const CtaDetailPanel = ({
             size='small'
             variant='contained'
             color='primary'
-            startIcon={<i className='tabler-pencil' style={{ fontSize: 15 }} />}
+            startIcon={<i className='tabler-pencil' style={{ fontSize: 16 }} />}
             onClick={onEdit}
             disabled={!capabilities.canAuthor}
             aria-label={C.detail.editAria}
@@ -486,7 +471,7 @@ const CtaDetailPanel = ({
               size='small'
               variant={action.variant}
               color={action.key === 'pause' ? 'warning' : action.key === 'deprecate' || action.key === 'archive' ? 'secondary' : 'primary'}
-              startIcon={<i className={action.icon} style={{ fontSize: 15 }} />}
+              startIcon={<i className={action.icon} style={{ fontSize: 16 }} />}
               disabled={!action.allowed || !engineEnabled || busyAction !== null}
               onClick={() => onLifecycle({ action: action.key, ctaVersionId: action.versionId, ctaName: summary.name })}
             >
@@ -499,34 +484,34 @@ const CtaDetailPanel = ({
             v{summary.latestVersion ?? 1} {C.detail.versionCurrent}
           </Typography>
         </Stack>
-      </Box>
+      </Card>
 
       {/* Kill switch posture */}
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
         alignItems={{ xs: 'flex-start', sm: 'center' }}
         gap={3.5}
-        sx={{
-          p: 4,
-          borderRadius: 2,
-          bgcolor: theme => (killedBySwitch ? alpha(theme.palette.error.main, 0.08) : theme.palette.background.paper),
-          border: theme =>
-            `1px solid ${killedBySwitch ? alpha(theme.palette.error.main, 0.4) : theme.palette.divider}`,
-        }}
+        sx={theme => ({
+          p: 5,
+          borderRadius: radius(theme, 'xl'),
+          bgcolor: killedBySwitch ? alpha(theme.palette.error.main, 0.08) : theme.palette.background.paper,
+          boxShadow: 'var(--mui-customShadows-md)',
+          border: killedBySwitch ? `1px solid ${alpha(theme.palette.error.main, 0.4)}` : 'none',
+        })}
         data-capture='cta-detail-kill'
       >
         <Box
-          sx={{
-            width: 38,
-            height: 38,
-            borderRadius: 2,
+          sx={theme => ({
+            width: 40,
+            height: 40,
+            borderRadius: radius(theme, 'lg'),
             flexShrink: 0,
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
             color: killedBySwitch ? 'error.contrastText' : 'text.secondary',
-            bgcolor: theme => (killedBySwitch ? theme.palette.error.main : theme.palette.action.hover),
-          }}
+            bgcolor: killedBySwitch ? theme.palette.error.main : theme.palette.action.hover,
+          })}
         >
           <i className='tabler-power' style={{ fontSize: 20 }} aria-hidden />
         </Box>
@@ -552,7 +537,7 @@ const CtaDetailPanel = ({
           size='small'
           variant={killState.globalKilled ? 'contained' : 'outlined'}
           color={killState.globalKilled ? 'success' : 'error'}
-          startIcon={<i className={killState.globalKilled ? 'tabler-player-play' : 'tabler-power'} style={{ fontSize: 15 }} />}
+          startIcon={<i className={killState.globalKilled ? 'tabler-player-play' : 'tabler-power'} style={{ fontSize: 16 }} />}
           disabled={!capabilities.canPause || busyAction !== null}
           onClick={() => onKillToggle('global', null, killState.globalKilled ? 'release' : 'engage')}
           data-capture='cta-detail-kill-toggle'
@@ -566,7 +551,7 @@ const CtaDetailPanel = ({
         title={C.detail.previewTitle}
         subtitle={C.detail.previewSubtitle}
         action={
-          <Button size='small' variant='outlined' startIcon={<i className='tabler-arrows-maximize' style={{ fontSize: 15 }} />} onClick={onEdit} disabled={!capabilities.canAuthor}>
+          <Button size='small' variant='outlined' startIcon={<i className='tabler-arrows-maximize' style={{ fontSize: 16 }} />} onClick={onEdit} disabled={!capabilities.canAuthor}>
             {C.detail.openPreview}
           </Button>
         }
@@ -594,17 +579,17 @@ const CtaDetailPanel = ({
             return (
               <Stack key={surface.surfaceId} direction='row' alignItems='center' gap={3} flexWrap='wrap' sx={{ py: 2.75 }}>
                 <Box
-                  sx={{
-                    width: 34,
-                    height: 34,
-                    borderRadius: 1.5,
+                  sx={theme => ({
+                    width: 36,
+                    height: 36,
+                    borderRadius: radius(theme, 'md'),
                     flexShrink: 0,
                     display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     color: 'text.secondary',
                     bgcolor: 'action.hover',
-                  }}
+                  })}
                 >
                   <i className={surface.surfaceKind === 'wordpress' ? 'tabler-brand-wordpress' : 'tabler-square-rounded'} style={{ fontSize: 18 }} aria-hidden />
                 </Box>
@@ -661,7 +646,7 @@ const CtaDetailPanel = ({
               },
             ].map(row => (
               <Stack key={row.label} direction='row' spacing={2.5} sx={{ py: 2.5 }} alignItems='flex-start'>
-                <i className={row.icon} style={{ fontSize: 15, marginTop: 2 }} aria-hidden />
+                <i className={row.icon} style={{ fontSize: 16, marginTop: 2 }} aria-hidden />
                 <Stack spacing={0}>
                   <Typography variant='caption' sx={{ textTransform: 'uppercase', letterSpacing: '0.04em', color: 'text.disabled', fontWeight: 600 }}>
                     {row.label}

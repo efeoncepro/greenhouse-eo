@@ -94,7 +94,7 @@ const CtaInventoryPanel = ({
     <Stack spacing={3.5} component='section' aria-label={I.listAria} data-capture='cta-inventory' sx={{ minWidth: 0 }}>
       {/* Búsqueda + filtros (wrap en compact: nada colapsa a 0 ni empuja scroll) */}
       <Stack direction='row' gap={2.5} alignItems='center' flexWrap='wrap'>
-        <Box sx={{ flex: '1 1 220px', minWidth: 0 }}>
+        <Box sx={{ flex: '2 1 240px', minWidth: 0 }}>
           <CustomTextField
             fullWidth
             placeholder={I.searchPlaceholder}
@@ -113,7 +113,7 @@ const CtaInventoryPanel = ({
           value={filters.status}
           onChange={event => onFiltersChange({ ...filters, status: event.target.value })}
           slotProps={{ input: { 'aria-label': I.statusFilterAria } }}
-          sx={{ flex: '1 1 150px', maxWidth: { sm: 180 } }}
+          sx={{ flex: '1 0 150px', maxWidth: { sm: 176 } }}
         >
           <MenuItem value='all'>{I.allStatuses}</MenuItem>
           {Object.entries(O.inventory.statusLabels).map(([value, label]) => (
@@ -127,7 +127,7 @@ const CtaInventoryPanel = ({
           value={filters.placement}
           onChange={event => onFiltersChange({ ...filters, placement: event.target.value })}
           slotProps={{ input: { 'aria-label': I.placementFilterAria } }}
-          sx={{ flex: '1 1 150px', maxWidth: { sm: 180 } }}
+          sx={{ flex: '1 0 150px', maxWidth: { sm: 176 } }}
         >
           <MenuItem value='all'>{I.allPlacements}</MenuItem>
           {CTA_PLACEMENTS.map(placement => (
@@ -159,13 +159,13 @@ const CtaInventoryPanel = ({
         <Stack
           spacing={3}
           alignItems='center'
-          sx={{ p: 8, textAlign: 'center', borderRadius: 2.5, bgcolor: 'background.paper', border: theme => `1px solid ${theme.palette.divider}` }}
+          sx={theme => ({ p: 8, textAlign: 'center', borderRadius: `${theme.shape.customBorderRadius.xl}px`, bgcolor: 'background.paper', boxShadow: 'var(--mui-customShadows-md)' })}
         >
           <Box
             sx={{
               width: 48,
               height: 48,
-              borderRadius: 2,
+              borderRadius: theme => `${theme.shape.customBorderRadius.lg}px`,
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -173,7 +173,7 @@ const CtaInventoryPanel = ({
               bgcolor: theme => alpha(theme.palette.error.main, 0.12),
             }}
           >
-            <i className='tabler-cloud-off' style={{ fontSize: 24 }} aria-hidden />
+            <i className='tabler-cloud-off' style={{ fontSize: 22 }} aria-hidden />
           </Box>
           <Stack spacing={1}>
             <Typography variant='subtitle2'>{I.errorTitle}</Typography>
@@ -181,12 +181,12 @@ const CtaInventoryPanel = ({
               {I.errorBody}
             </Typography>
           </Stack>
-          <Button variant='outlined' size='small' startIcon={<i className='tabler-refresh' style={{ fontSize: 15 }} />} onClick={onRetry}>
+          <Button variant='outlined' size='small' startIcon={<i className='tabler-refresh' style={{ fontSize: 16 }} />} onClick={onRetry}>
             {I.retry}
           </Button>
         </Stack>
       ) : rows.length === 0 ? (
-        <Box sx={{ p: 6, borderRadius: 2.5, bgcolor: 'background.paper', border: theme => `1px dashed ${theme.palette.divider}` }}>
+        <Box sx={theme => ({ p: 6, borderRadius: `${theme.shape.customBorderRadius.xl}px`, bgcolor: 'background.paper', boxShadow: 'var(--mui-customShadows-md)' })}>
           <EmptyState icon='tabler-filter-off' title={I.emptyFilteredTitle} description={I.emptyFilteredBody} />
           <Stack alignItems='center' sx={{ mt: 3 }}>
             <Button size='small' variant='outlined' onClick={() => onFiltersChange({ query: '', status: 'all', placement: 'all' })}>
@@ -225,22 +225,23 @@ const CtaInventoryPanel = ({
                 role='option'
                 aria-selected={selected}
                 onClick={() => onSelect(cta.ctaId)}
-                sx={{
+                sx={theme => ({
                   position: 'relative',
                   textAlign: 'left',
                   cursor: 'pointer',
                   font: 'inherit',
-                  borderRadius: 2,
+                  borderRadius: `${theme.shape.customBorderRadius.xl}px`,
                   p: 4,
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 2.5,
-                  bgcolor: 'background.paper',
-                  border: theme => (selected ? `1.5px solid ${theme.palette.primary.main}` : `1px solid ${theme.palette.divider}`),
-                  transition: theme => theme.transitions.create(['box-shadow', 'border-color'], { duration: 150 }),
-                  '&:hover': { boxShadow: 2 },
-                  '&:focus-visible': { outline: theme => `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 },
-                }}
+                  gap: 3,
+                  bgcolor: selected ? alpha(theme.palette.primary.main, 0.04) : theme.palette.background.paper,
+                  border: selected ? `1.5px solid ${theme.palette.primary.main}` : '1px solid transparent',
+                  boxShadow: 'var(--mui-customShadows-xs)',
+                  transition: theme.transitions.create(['box-shadow', 'border-color', 'background-color'], { duration: 150 }),
+                  '&:hover': { boxShadow: 'var(--mui-customShadows-md)' },
+                  '&:focus-visible': { outline: `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 },
+                })}
               >
                 {selected ? (
                   <Box
