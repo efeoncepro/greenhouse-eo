@@ -30,6 +30,26 @@
   envía visitor keys (TASK-1429); el fallback conservador cubre el estado actual. Ledger:
   fila + §Pendientes de acción registradas.
 
+## Delta 2026-07-18 (2ª sesión) — rollout staging ejecutado; smoke live cazó y cerró un bug real
+
+- **Push a develop + deploy staging HECHOS.** Smoke live contra el deployment staging (visitor sintético,
+  página de prueba WP): render con visitor headers → `engineState: ok` + CTA · `dismissed` 202 →
+  `cta_visitor_state` con filas visitor+session (consent granted) · render post-dismiss INTACTO (shadow) +
+  rollup `suppressed/dismissed enforced=false` (evidencia del shadow-compare) · `viewed` 202 → rollup
+  browser (jamás el ledger).
+- **Kill switch verificado live SIN redeploy** (per-surface WP, ventana <60s en página noindex): engage →
+  `{"interruptive":null,"nonInterruptive":[],"engineState":"killed"}` + estado/audit admin correctos →
+  release → CTA restaurado. La surface Think (tráfico real) nunca se tocó.
+- **El smoke cazó un bug real que ningún test con mocks podía ver**: el engage vía API daba 502 porque
+  `SELECT … FOR UPDATE` exige privilegio UPDATE y `greenhouse_runtime` solo tiene SELECT/INSERT en la tabla
+  append-only (por diseño). Fix `3bb0d0779`: `pg_advisory_xact_lock` por scope (el grant NO se amplió);
+  misma semántica idempotente-observable; re-verificado bajo el usuario runtime real.
+- **Pendiente (1 comando del operador + secuencia):** flip staging
+  (`printf 'true' | vercel env add GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED staging` + redeploy —
+  `vercel env add` quedó bloqueado por permisos del agente en esta sesión) → smoke enforcement (dismiss
+  excluye al mismo visitor; visitante fresco sigue viendo el CTA) → prod gradual + monitor 7d. Con el
+  renderer actual (sin visitor keys) el flip NO cambia el tráfico real — el gate duro es para TASK-1429.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
