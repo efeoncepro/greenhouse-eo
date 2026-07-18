@@ -128,13 +128,21 @@ export const setCtaKillSwitch = async (input: SetKillSwitchInput): Promise<SetKi
       if (!surface.rows[0]) return { ok: false as const, reason: 'surface_not_found' as const }
     }
 
+    // Serializa engage/release concurrentes por scope con advisory lock transaccional.
+    // NUNCA `FOR UPDATE` acá: el row-lock exige privilegio UPDATE y el runtime solo tiene
+    // SELECT/INSERT en esta tabla append-only (bug real cazado en el smoke staging 2026-07-18:
+    // el 502 del engage era `permission denied` del FOR UPDATE bajo greenhouse_runtime).
+    await client.query(`SELECT pg_advisory_xact_lock(hashtext('growth.cta.kill_switch:' || $1 || ':' || COALESCE($2, '')))`, [
+      input.scope,
+      input.surfaceId ?? null,
+    ])
+
     const current = await client.query<{ action: string; kill_event_id: string }>(
       `SELECT action, kill_event_id
          FROM greenhouse_growth.cta_kill_switch_event
         WHERE scope = $1 AND surface_id IS NOT DISTINCT FROM $2
         ORDER BY created_at DESC
-        LIMIT 1
-        FOR UPDATE`,
+        LIMIT 1`,
       [input.scope, input.surfaceId ?? null],
     )
 

@@ -63,8 +63,9 @@ describe('setCtaKillSwitch', () => {
     expect(dbMock.clientQuery).not.toHaveBeenCalled()
   })
 
-  it('engage global nuevo → INSERT append-only + outbox in-tx', async () => {
+  it('engage global nuevo → advisory lock + INSERT append-only + outbox in-tx (jamás FOR UPDATE: runtime no tiene UPDATE en la tabla append-only)', async () => {
     dbMock.clientQuery
+      .mockResolvedValueOnce({ rows: [] }) // pg_advisory_xact_lock (serializa por scope)
       .mockResolvedValueOnce({ rows: [] }) // estado vigente (ninguno)
       .mockResolvedValueOnce({ rows: [{ kill_event_id: 'cksw-1' }] }) // insert
 
@@ -77,6 +78,9 @@ describe('setCtaKillSwitch', () => {
 
     expect(result).toEqual({ ok: true, killEventId: 'cksw-1', changed: true })
 
+    expect(dbMock.clientQuery.mock.calls[0][0]).toContain('pg_advisory_xact_lock')
+    expect(dbMock.clientQuery.mock.calls[1][0]).not.toContain('FOR UPDATE')
+
     expect(outboxMock.publishOutboxEvent).toHaveBeenCalledWith(
       expect.objectContaining({
         eventType: 'growth.cta.kill_switch_changed',
@@ -88,7 +92,9 @@ describe('setCtaKillSwitch', () => {
   })
 
   it('engage cuando ya está engaged → changed=false SIN evento duplicado ni outbox', async () => {
-    dbMock.clientQuery.mockResolvedValueOnce({ rows: [{ action: 'engage', kill_event_id: 'cksw-1' }] })
+    dbMock.clientQuery
+      .mockResolvedValueOnce({ rows: [] }) // advisory lock
+      .mockResolvedValueOnce({ rows: [{ action: 'engage', kill_event_id: 'cksw-1' }] })
 
     const result = await setCtaKillSwitch({
       scope: 'global',
