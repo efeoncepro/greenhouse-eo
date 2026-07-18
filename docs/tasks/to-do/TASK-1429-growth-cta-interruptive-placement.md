@@ -155,10 +155,10 @@ Reglas obligatorias:
 ### Motion & microinteractions
 
 - Motion primitive: `CSS` tokenizado en bundle
-- Enter / exit: translate+opacity desde borde lógico en wide y desde abajo en compact; salida inversa breve, interrumpible por kill switch/navegación
-- Layout morph: cambio de densidad preserva orden semántico y continuidad; CTA→Growth Form usa continuidad in-place/crossfade dentro del shell cuando el contrato existente lo permite
+- Enter / exit: translate+opacity desde borde lógico en wide y desde abajo en compact; salida inversa breve, interrumpible por kill switch/navegación. Mecánica CSS moderna: `@starting-style` + `transition-behavior: allow-discrete` para animar desde/hacia `display:none` sin JS ni listeners de animationend (el estado NUNCA depende del fin de la animación)
+- Layout morph: cambio de densidad preserva orden semántico y continuidad; CTA→Growth Form usa continuidad in-place/crossfade dentro del shell cuando el contrato existente lo permite. Enhancement progresivo: same-document **View Transition API** para el morph card→form (shared element continuity) con fallback crossfade y bypass total en reduced-motion — nunca una dependencia dura
 - Stagger: máximo eyebrow→headline/body→action como secuencia perceptual sutil solo si los tokens públicos existentes lo soportan sin retrasar primer paint; `none` en reduced motion
-- Timing / easing token: contrato motion adjunto
+- Timing / easing token: contrato motion adjunto; press/settle puede usar curvas `linear()` de sensación física (spring-like sin JS) como token opcional — solo en transform, jamás en opacity/color
 - Reduced-motion fallback: sin desplazamiento
 - Non-goal motion: bounce, auto-loop, urgencia falsa
 
@@ -264,12 +264,14 @@ Implementar `slide_in` como único placement interruptivo V1 y usarlo para cerra
 - Fijar `slide_in` y documentar/mecanizar la separación placement/kind/appearance/density/variant.
 - Extender render/styles/state con shell no modal, safe areas, z-index isolation, neutral dismiss y telemetría sin nueva API.
 - Mantener `default|spotlight|minimal` como appearances; ningún appearance cambia markup semántico o executor.
+- Modernizar la capa de tokens del bundle al piso 2026 SIN romper overrides de host: pares dark via `light-dark()` (reemplaza la duplicación por media query), ramps de hover derivadas con `color-mix(in oklch, …)` (uniformidad perceptual) y acento P3 opcional con fallback sRGB; `text-wrap: balance` (headline) + `text-wrap: pretty` (body). Los nombres `--gh-cta-*` NO cambian (contrato público con hosts).
 
 ### Slice 2 — Adaptive density, state richness and motion
 
 - Implementar `full|condensed|peek` por container query, long content y asset failure sin clipping.
 - Tokenizar enter/exit, density transition, press/pending, reduced motion y acción→form continuity.
 - Cubrir todos los estados contractuales con focus/recovery determinista y sin animation-dependent state.
+- **`viewed` visibility-gated (integridad de medición + fluidez):** `greenhouse_cta_viewed` pasa a dispararse cuando el card ES visible (IntersectionObserver ≥50% con dwell corto), no al montar; para el `embedded` below-the-fold la entrada puede ligarse a visibilidad (IO compartido; `animation-timeline: view()` solo como enhancement donde exista soporte, nunca como dependencia). Registrar el corte de semántica en TRACKING-PLAN (baseline TASK-1427) y en el SoT si cambia algún param.
 
 ### Slice 3 — Preview matrix and cross-host GVC
 
@@ -332,6 +334,8 @@ Implementar `slide_in` como único placement interruptivo V1 y usarlo para cerra
 - [ ] Suppression/kill switch impiden reapertura indebida y permiten retiro sin deploy.
 - [ ] CTA→Growth Form y telemetría funcionan sin duplicar form/schema/consent.
 - [ ] GVC 1440/390 y anchos de contenedor representativos fue mirado; overflow 0, safe-area, scroll jump y anti-CLS están documentados.
+- [ ] Enter/exit usan `@starting-style`/`allow-discrete` (estado nunca depende de animationend); el morph card→form con View Transition API es enhancement con fallback y reduced-motion bypass.
+- [ ] `greenhouse_cta_viewed` es visibility-gated (IO ≥50%) con el corte de semántica registrado en TRACKING-PLAN; tokens modernizados (`light-dark()`, `color-mix(in oklch)`) sin renombrar `--gh-cta-*`.
 - [ ] `pnpm task:lint --task TASK-1429` y wireframe/flow/motion/readiness pasan.
 
 ## Verification
@@ -350,6 +354,7 @@ Implementar `slide_in` como único placement interruptivo V1 y usarlo para cerra
 - [ ] UI architecture/manual/Handoff/changelog actualizados según docs governor.
 - [ ] QA Release Auditor + enterprise UI review sin blockers.
 - [ ] Chequeo de impacto cruzado completado.
+- [ ] Skill `greenhouse-growth-ctas` actualizada en el MISMO change set (Skill Maintenance Contract: estado de rollout, contratos, hard rules que cambien).
 
 ## Follow-ups
 

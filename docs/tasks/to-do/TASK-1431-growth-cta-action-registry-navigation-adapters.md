@@ -346,6 +346,7 @@ Mantener compatibilidad de `greenhouse-growth-cta-popup.v1` si las ramas son adi
 ### Slice 3 — Portable executor and evidence
 
 - Generalizar action executor del custom element por familia `growth_form|navigate`.
+- **Semántica nativa para `navigate`:** las acciones de navegación renderizan un `<a href>` real (no un `<button>` con `location.assign`): habilita middle-click/cmd-click/tab nuevo, historial, copy-link, prefetch del host y a11y de link; destinos externos llevan `rel='noopener noreferrer'` + affordance perceptible de salida (target/expectation microcopy del registry), destinos internos del host navegan normal. El click igual emite telemetría/ingest ANTES de navegar (usar `keepalive`/`fetchLater` — nunca bloquear la navegación ni perder el evento).
 - Cubrir keyboard, busy/pending accesible, duplicate-click guard, form-ready/focus, error recovery, expectation integrity, telemetry allowlist, staging smoke y docs.
 
 ## Out of Scope
@@ -419,6 +420,7 @@ Mantener compatibilidad de `greenhouse-growth-cta-popup.v1` si las ramas son adi
 - [ ] EPIC-023, architecture/ADR, functional/manual docs, Handoff and changelog reflect actual shipped actions.
 - [ ] TASK lifecycle, README and registry synchronized.
 - [ ] `pnpm docs:closure-check` and cross-impact check pass.
+- [ ] Skill `greenhouse-growth-ctas` actualizada en el MISMO change set (Skill Maintenance Contract: registry de acciones = flujo crítico).
 
 ## Follow-ups
 

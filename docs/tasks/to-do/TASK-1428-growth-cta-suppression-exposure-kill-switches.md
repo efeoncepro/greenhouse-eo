@@ -54,6 +54,7 @@ Reglas obligatorias:
 - Browser events siguen `untrusted`; personalization requiere consentimiento explícito.
 - Conversion truth queda en Tier A; exposición alta va a Tier B sampled/analítico.
 - Kill switches no dependen de deploy y deben invalidar/evitar cache stale dentro del TTL documentado.
+- El TTL efectivo del kill switch incluye TODOS los caches del read path: el resolver CORS in-memory (`src/app/api/public/growth/ctas/cors.ts`, TTL 90s stale-while-revalidate) y cualquier `Cache-Control` del render endpoint — documentar la ventana compuesta y verificarla en el smoke.
 - No almacenar identificadores crudos, PII o fingerprinting invasivo.
 - La ausencia de visitor identity/consent no autoriza exposición ilimitada: debe existir un fallback conservador de sesión/surface documentado.
 - Suppression gobierna elegibilidad; el renderer solo representa `eligible|suppressed|capped|killed` y nunca reconstruye ventanas localmente.
@@ -319,6 +320,7 @@ Readers/DTOs deben permitir a TASK-1429/1430 distinguir, sin recalcular:
 - [ ] Arquitectura/ADR, Handoff y changelog actualizados según docs governor.
 - [ ] QA Release Auditor sin blockers y smoke staging/productivo documentado.
 - [ ] Chequeo de impacto cruzado sobre TASK-1429/1430 completado.
+- [ ] Skill `greenhouse-growth-ctas` actualizada en el MISMO change set (Skill Maintenance Contract: estado de rollout, contratos, hard rules que cambien).
 
 ## Follow-ups
 

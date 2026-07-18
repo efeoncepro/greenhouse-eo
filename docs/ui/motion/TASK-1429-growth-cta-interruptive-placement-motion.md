@@ -56,3 +56,16 @@ Motion announces a contextual surface without manufacturing urgency. It is short
 
 - Decision: extend the renderer's CSS motion contract instead of adding GSAP/framer choreography.
 - Why: the placement needs predictable public-host behavior, small payload and explicit reduced-motion support.
+
+## Delta 2026-07-18 — review Claude (modern-ui 2026)
+
+- Mecánica de enter/exit: `@starting-style` + `transition-behavior: allow-discrete` (animar desde/
+  hacia `display:none` sin JS ni `animationend`; el estado persiste independiente de la animación).
+- Morph card→form: same-document **View Transition API** como enhancement progresivo (fallback
+  crossfade; bypass total en reduced-motion). Nunca dependencia dura.
+- Press/settle: curvas `linear()` de sensación física como token opcional, solo en `transform`.
+- `greenhouse_cta_viewed` pasa a visibility-gated (IO ≥50%) — la entrada del embedded puede ligarse
+  a visibilidad; `animation-timeline: view()` solo como enhancement. Corte de semántica registrado
+  en TRACKING-PLAN (baseline en TASK-1427).
+- Tokens: `light-dark()` para pares dark + ramps `color-mix(in oklch, …)`; nombres `--gh-cta-*`
+  inmutables (contrato público con hosts).

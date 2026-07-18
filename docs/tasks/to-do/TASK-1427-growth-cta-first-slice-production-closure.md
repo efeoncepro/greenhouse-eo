@@ -184,6 +184,7 @@ Reglas obligatorias:
 - Required steps: load, CTA visible, foco, abrir/cerrar form
 - Required captures: default + form abierto
 - Baseline contract: capturar `default|spotlight|minimal` disponibles, wide/390, asset/no-asset y form-open cuando existan fixtures válidos; registrar hashes/rutas como referencia, no como baseline visual rígido entre hosts con temas distintos
+- Baseline de medición: dejar registrado que hoy `greenhouse_cta_viewed` dispara AL MONTAR el card (no al ser visible); si TASK-1429 lo migra a visibility-gated, el corte de semántica se anota en TRACKING-PLAN para no leer la caída de viewed como regresión
 - Required `data-capture` markers: host/CTA/form cuando el host permita
 - Assertions: bundle/API 200, sin consola, sin error boundary, evento emitido
 - Scroll-width checks: `scrollWidth == clientWidth`
@@ -359,6 +360,12 @@ Reglas obligatorias:
 - [ ] `Handoff.md` y `changelog.md` registran evidencia y riesgos residuales.
 - [ ] `greenhouse-qa-release-auditor` emite PASS o CONDITIONAL PASS sin blocker.
 - [ ] Chequeo de impacto cruzado completado.
+- [ ] Skill `greenhouse-growth-ctas` actualizada en el MISMO change set (Skill Maintenance Contract: estado de rollout, contratos, hard rules que cambien).
+
+## Ajuste 2026-07-18 (review Claude — arquitectura + diseño)
+
+- La semántica de `viewed` (mount vs visible) queda documentada como baseline de medición (GVC plan); migrarla a visibility-gated pertenece a TASK-1429.
+- El cierre de esta task actualiza la skill `greenhouse-growth-ctas` (§Estado de rollout: WordPress live + evidencia GA4 + steady 7d).
 
 ## Follow-ups
 

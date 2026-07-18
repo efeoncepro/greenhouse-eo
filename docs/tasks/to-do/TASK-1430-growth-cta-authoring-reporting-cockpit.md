@@ -271,6 +271,7 @@ No puede enviarse a review/publicarse cuando:
 
 - Form secuencial gobernado para kind/placement/appearance/content/action/targeting-suppression, sin raw JSON/CSS.
 - Preview harness canónico con matriz pairwise/casos frontera y review blockers server-confirmed.
+- Harness rico de contexto (mismo core del renderer, cero red): toggle light/dark del preview (los hosts públicos tienen ambos esquemas), **scrubber de ancho de contenedor** para ver el morph de density `full→condensed→peek` en vivo, y presets de fondo de host (superficie clara tipo WordPress / navy tipo bookend Think) para juzgar contraste real de cada appearance — el preview enseña el sistema, no una sola instancia.
 - Draft/review/publish/pause con capability/state guards, confirmaciones, dirty-state, errores y refresh del detalle.
 
 ### Slice 3 — Surfaces, kill switches and evidence
@@ -351,6 +352,7 @@ No puede enviarse a review/publicarse cuando:
 - [ ] Functional/manual/Handoff/changelog actualizados según docs governor.
 - [ ] QA Release Auditor + enterprise UI review sin blockers.
 - [ ] Chequeo de impacto cruzado completado.
+- [ ] Skill `greenhouse-growth-ctas` actualizada en el MISMO change set (Skill Maintenance Contract: estado de rollout, contratos, hard rules que cambien).
 
 ## Follow-ups
 
