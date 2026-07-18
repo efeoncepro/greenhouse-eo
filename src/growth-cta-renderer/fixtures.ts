@@ -1,0 +1,66 @@
+/**
+ * TASK-1340 — Fixtures del render contract para tests + preview interno.
+ * Deterministas (GVC estable); espejan el primer CTA real publicado por TASK-1339.
+ */
+import type { CtaRenderContractMirror } from './contract'
+import { RENDERER_CONTRACT_VERSION } from './version'
+
+const base = (overrides: Partial<CtaRenderContractMirror> & { slug: string }): CtaRenderContractMirror => ({
+  contractVersion: RENDERER_CONTRACT_VERSION,
+  cta: {
+    ctaId: `cdef-fixture-${overrides.slug}`,
+    slug: overrides.slug,
+    campaignSlug: 'ai-visibility-grader',
+    ctaVersionId: `cver-fixture-${overrides.slug}`,
+    version: 1,
+    locale: 'es-CL',
+  },
+  placement: 'embedded',
+  interruptive: false,
+  content: {
+    eyebrow: 'Diagnóstico gratuito',
+    headline: '¿Cómo ve la IA a tu marca?',
+    body: 'Mide tu visibilidad en ChatGPT, Gemini y Perplexity con el AI Visibility Grader y recibe un informe accionable.',
+    ctaLabel: 'Haz el diagnóstico gratis',
+    dismissLabel: 'Ahora no',
+    footnote: 'Toma menos de 2 minutos.',
+  },
+  action: { kind: 'open_growth_form', formSlug: 'ai-visibility-grader', formKey: '69cd5269-5f97-4d32-99c4-0b23f41aa2f5' },
+  variantId: 'control',
+  surfacePolicy: { surfaceId: 'csur-fixture', allowedOrigins: [], rendererChannel: 'preview' },
+  ...overrides,
+})
+
+export const CTA_FIXTURES: Record<string, { label: string; build: () => CtaRenderContractMirror }> = {
+  default: {
+    label: 'Default (embedded)',
+    build: () => base({ slug: 'ai-visibility-report-followup' }),
+  },
+  spotlight: {
+    label: 'Spotlight (gradiente de marca)',
+    build: () => base({ slug: 'ai-visibility-report-followup-spotlight', styleVariant: 'spotlight' }),
+  },
+  minimal: {
+    label: 'Minimal (editorial)',
+    build: () => base({ slug: 'ai-visibility-report-followup-minimal', styleVariant: 'minimal' }),
+  },
+  banner: {
+    label: 'Inline banner',
+    build: () => base({ slug: 'ai-visibility-report-followup-banner', placement: 'inline_banner' }),
+  },
+  longCopy: {
+    label: 'Copy largo (truncado con gracia)',
+    build: () =>
+      base({
+        slug: 'ai-visibility-report-followup-long',
+        content: {
+          eyebrow: 'Diagnóstico gratuito de visibilidad en motores de IA',
+          headline: 'Descubre exactamente cómo los motores de respuesta con IA describen, citan y recomiendan a tu marca hoy',
+          body: 'Los compradores ya no buscan: preguntan. Mide tu visibilidad en ChatGPT, Gemini y Perplexity con el AI Visibility Grader, identifica las brechas frente a tu competencia y recibe un informe accionable con los pasos concretos para aparecer en las respuestas.',
+          ctaLabel: 'Generar mi informe de visibilidad',
+          dismissLabel: 'Ahora no, gracias',
+          footnote: 'Gratis. Toma menos de 2 minutos y no necesitas tarjeta.',
+        },
+      }),
+  },
+}
