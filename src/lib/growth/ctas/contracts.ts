@@ -73,6 +73,22 @@ export const CTA_EVENT_KINDS = [
 ] as const
 export type CtaEventKind = (typeof CTA_EVENT_KINDS)[number]
 
+/**
+ * Tier B — kinds de exposición (TASK-1428, arch §9.4): el ingest público los acepta
+ * tras la MISMA cadena de defensa que Tier A, pero van al rollup agregado
+ * (`cta_exposure_rollup`), JAMÁS al ledger OLTP. `eligible`/`suppressed` los observa
+ * el server en el render path; el browser solo aporta `viewed`.
+ */
+export const CTA_TIER_B_EVENT_KINDS = ['viewed'] as const
+export type CtaTierBEventKind = (typeof CTA_TIER_B_EVENT_KINDS)[number]
+
+/** Kinds aceptados por el ingest público (Tier A + Tier B; el pipeline decide el destino). */
+export const CTA_PUBLIC_INGEST_EVENT_KINDS = [...CTA_EVENT_KINDS, ...CTA_TIER_B_EVENT_KINDS] as const
+export type CtaPublicIngestEventKind = (typeof CTA_PUBLIC_INGEST_EVENT_KINDS)[number]
+
+export const isTierBEventKind = (kind: string): kind is CtaTierBEventKind =>
+  (CTA_TIER_B_EVENT_KINDS as readonly string[]).includes(kind)
+
 export const CTA_TRUST_LEVELS = ['browser_reported', 'server_confirmed'] as const
 export type CtaTrustLevel = (typeof CTA_TRUST_LEVELS)[number]
 
@@ -103,6 +119,93 @@ export const ctaPriorityPolicySchema = z.object({
   score: z.number().int().min(0).max(1000).default(100),
 })
 export type CtaPriorityPolicy = z.infer<typeof ctaPriorityPolicySchema>
+
+// ─── Suppression / visitor state (TASK-1428, arch §11/§16.2) ───────────────────
+
+/**
+ * Taxonomía ESTABLE de razones de suppression (server-only, task §Visitor-experience
+ * policy). Al browser solo cruza el outcome mínimo; a Tier B va la reason class
+ * allowlisted (enum cerrado espejado en el CHECK de `cta_exposure_rollup`).
+ */
+export const CTA_SUPPRESSION_REASONS = [
+  'dismissed',
+  'frequency_capped',
+  'already_converted',
+  'higher_priority_selected',
+  'surface_killed',
+  'global_killed',
+  'consent_or_identity_limited',
+  'placement_not_supported',
+  'policy_invalid',
+  'runtime_degraded',
+] as const
+export type CtaSuppressionReason = (typeof CTA_SUPPRESSION_REASONS)[number]
+
+/** Sujetos del visitor state store: `visitor` = durable consent-gated; `session` = fallback conservador. */
+export const CTA_VISITOR_SUBJECT_KINDS = ['visitor', 'session'] as const
+export type CtaVisitorSubjectKind = (typeof CTA_VISITOR_SUBJECT_KINDS)[number]
+
+/**
+ * Suppression policy V1 (server; vive en `cta_version.suppression_policy_json`).
+ * Defaults conservadores: `{}` (el default de toda versión foundation) ES una policy
+ * válida con estos valores. Policy malformada ⇒ fail-closed (`policy_invalid`).
+ *  - `dismissCooldownDays`: ventana de no-reaparición tras dismiss explícito (0 = sin cooldown).
+ *  - `suppressAfterConversion`: suprime tras conversión server-verificada (`already_converted`).
+ *  - `maxImpressionsPerWindow`/`windowHours`: frequency cap per-CTA (solo placements interruptivos).
+ */
+export const ctaSuppressionPolicySchema = z.object({
+  dismissCooldownDays: z.number().int().min(0).max(365).default(14),
+  suppressAfterConversion: z.boolean().default(true),
+  maxImpressionsPerWindow: z.number().int().min(1).max(100).default(2),
+  windowHours: z.number().int().min(1).max(2160).default(24),
+})
+export type CtaSuppressionPolicy = z.infer<typeof ctaSuppressionPolicySchema>
+
+/**
+ * Contexto pseudónimo del read público (headers `x-greenhouse-cta-visitor|session|consent|
+ * consent-source`): keys crudas se hashean server-side y JAMÁS se persisten. La key
+ * `visitor` solo habilita state durable con `consentState='granted'` (arch §16.2);
+ * sin consentimiento el fallback es session-scoped (retención corta).
+ */
+export interface CtaVisitorContext {
+  visitorKey: string | null
+  sessionKey: string | null
+  consentState: CtaConsentState
+  consentSource: string
+}
+
+/** Outcome de la decisión server-side. El renderer solo representa; nunca reconstruye ventanas. */
+export const CTA_SUPPRESSION_OUTCOMES = ['eligible', 'suppressed', 'capped', 'killed'] as const
+export type CtaSuppressionOutcome = (typeof CTA_SUPPRESSION_OUTCOMES)[number]
+
+export interface CtaSuppressionDecision {
+  outcome: CtaSuppressionOutcome
+  reason: CtaSuppressionReason | null
+}
+
+// ─── Tier B exposure (TASK-1428, arch §9.4) ────────────────────────────────────
+
+export const CTA_EXPOSURE_KINDS = ['eligible', 'suppressed', 'viewed'] as const
+export type CtaExposureKind = (typeof CTA_EXPOSURE_KINDS)[number]
+
+export const CTA_EXPOSURE_DECISION_SOURCES = ['server', 'browser'] as const
+export type CtaExposureDecisionSource = (typeof CTA_EXPOSURE_DECISION_SOURCES)[number]
+
+// ─── Kill switch (TASK-1428, arch §16.3) ───────────────────────────────────────
+
+export const CTA_KILL_SWITCH_SCOPES = ['global', 'surface'] as const
+export type CtaKillSwitchScope = (typeof CTA_KILL_SWITCH_SCOPES)[number]
+
+export const CTA_KILL_SWITCH_ACTIONS = ['engage', 'release'] as const
+export type CtaKillSwitchAction = (typeof CTA_KILL_SWITCH_ACTIONS)[number]
+
+/**
+ * Estado del motor que cruza al browser: mínimo necesario para que el renderer
+ * distinga "no hay CTAs" de "retiro operativo" (`killed`, nunca un falso `dismissed`).
+ * Sin actor/reason/ventanas — eso es operador-only (readers admin).
+ */
+export const CTA_ENGINE_STATES = ['ok', 'killed'] as const
+export type CtaEngineState = (typeof CTA_ENGINE_STATES)[number]
 
 // ─── Contenido browser-safe del prompt ─────────────────────────────────────────
 
@@ -152,10 +255,15 @@ export const ctaRenderContractSchema = z.object({
 })
 export type CtaRenderContract = z.infer<typeof ctaRenderContractSchema>
 
-/** Respuesta arbitrada del GET público: 0–1 interruptivo + N no-interruptivos (arch §11). */
+/**
+ * Respuesta arbitrada del GET público: 0–1 interruptivo + N no-interruptivos (arch §11).
+ * `engineState` (TASK-1428) es aditivo: `killed` = retiro operativo (arch §16.3); el
+ * renderer legacy que lo ignora sigue funcionando (resultado vacío = fail-closed).
+ */
 export interface ArbitratedRenderResult {
   interruptive: CtaRenderContract | null
   nonInterruptive: CtaRenderContract[]
+  engineState?: CtaEngineState
 }
 
 // ─── Public event ingest (POST body) — write forjable, tratado untrusted (§16.1) ──
@@ -171,7 +279,8 @@ export const ctaPublicEventInputSchema = z.object({
   embedKey: z.string().min(1).max(200),
   ctaSlug: z.string().min(1).max(200),
   ctaVersionId: z.string().min(1).max(100),
-  eventKind: z.enum(CTA_EVENT_KINDS),
+  /** Tier A + Tier B (`viewed`): misma cadena de defensa; el pipeline separa el destino (§9.4). */
+  eventKind: z.enum(CTA_PUBLIC_INGEST_EVENT_KINDS),
   pageUri: z.string().max(2000).optional(),
   placement: z.enum(CTA_PLACEMENTS).optional(),
   trigger: z.string().max(60).optional(),
@@ -287,4 +396,21 @@ export interface CtaSurfaceRegisteredEventPayload {
   schemaVersion: 1
   surfaceId: string
   surfaceKind: CtaSurfaceKind
+}
+
+/**
+ * Cambio de kill switch global/per-surface (TASK-1428, arch §16.3); se emite in-tx
+ * con el INSERT append-only en `cta_kill_switch_event`. Payload v1 (audit trail;
+ * `actorRef` es identidad interna del operador, jamás cruza al browser).
+ */
+export const CTA_KILL_SWITCH_CHANGED_EVENT = 'growth.cta.kill_switch_changed' as const
+export const CTA_KILL_SWITCH_AGGREGATE = 'growth_cta_kill_switch' as const
+
+export interface CtaKillSwitchChangedEventPayload {
+  schemaVersion: 1
+  scope: CtaKillSwitchScope
+  surfaceId: string | null
+  action: CtaKillSwitchAction
+  reason: string
+  actorRef: string | null
 }

@@ -18,6 +18,7 @@ import 'server-only'
 
 import { decideAbuse } from '@/lib/growth/public-submission'
 import { verifyEmbedKeySecret } from '@/lib/growth/forms/embed-key'
+import { isSubmissionServerAccepted } from '@/lib/growth/forms/readers'
 
 import {
   CTA_EVENT_PAYLOAD_ALLOWED_KEYS,
@@ -26,7 +27,9 @@ import {
   type CtaPublicEventInput,
   type CtaPublicEventResult,
   ctaPublicEventInputSchema,
+  isTierBEventKind,
 } from './contracts'
+import { recordCtaExposure } from './exposure'
 import { isCtaEngineEnabled, resolveCtaAbuseLimits, resolveCtaDedupeWindowMinutes, resolveCtaRejectionWriteCapPerHour } from './flags'
 import { ctaEventDedupeFingerprint, ctaIdentifierHash } from './hash'
 import {
@@ -38,6 +41,7 @@ import {
   getSurfaceBindingById,
   insertConversionEvent,
 } from './store'
+import { recordCtaConversion, recordCtaDismissal, resolveVisitorSubjects } from './visitor-state'
 
 export interface IngestContext {
   origin: string | null
@@ -47,13 +51,20 @@ export interface IngestContext {
 const pickAllowlisted = <T extends Record<string, unknown>>(source: T, allowedKeys: readonly string[]) =>
   Object.fromEntries(Object.entries(source).filter(([key]) => allowedKeys.includes(key)))
 
-/** Persiste el rechazo sin PII, capped por IP/hora (la forja no infla el ledger sin límite). */
+/**
+ * Persiste el rechazo sin PII, capped por IP/hora (la forja no infla el ledger sin
+ * límite). Los kinds Tier B (`viewed`) NO se persisten en el ledger ni rechazados
+ * (el CHECK de `event_kind` es Tier A-only; la telemetría de forja sigue siendo
+ * Tier A — un forjador de Tier A queda igual de visible).
+ */
 const recordRejection = async (
   reason: CtaIngestRejectionReason,
   input: CtaPublicEventInput,
   context: IngestContext,
   refs: { ctaId?: string | null; ctaVersionId?: string | null; surfaceId?: string | null },
 ): Promise<void> => {
+  if (isTierBEventKind(input.eventKind)) return
+
   const ipHash = ctaIdentifierHash(context.ip)
   const rejectedLastHour = await countRejectedEventsByIp(ipHash)
 
@@ -143,6 +154,23 @@ export const ingestCtaEvent = async (rawInput: unknown, context: IngestContext):
     return { outcome: 'surface_unauthorized' }
   }
 
+  // 5-bis. Tier B (`viewed`, TASK-1428): tras la MISMA cadena de defensa, la exposición
+  // va al rollup agregado (sampling + fail-open), JAMÁS al ledger OLTP (arch §9.4).
+  // Sin rate-limit del ledger (no escribe filas) — sampling + surface auth son el guard.
+  if (isTierBEventKind(input.eventKind)) {
+    await recordCtaExposure({
+      ctaId: definition.cta_id,
+      surfaceId: surface.surface_id,
+      placement: input.placement ?? version.placement,
+      exposureKind: 'viewed',
+      reasonClass: null,
+      decisionSource: 'browser',
+      enforced: false,
+    })
+
+    return { outcome: 'accepted' }
+  }
+
   // 6. Rate-limit sobre el ledger (per-visitor → per-IP), core de decisión compartido.
   const visitorKeyHash = ctaIdentifierHash(input.visitorKey)
   const sessionKeyHash = ctaIdentifierHash(input.sessionKey)
@@ -202,6 +230,34 @@ export const ingestCtaEvent = async (rawInput: unknown, context: IngestContext):
     formSubmissionId: input.formSubmissionId ?? null,
     payload: pickAllowlisted(input.payload, CTA_EVENT_PAYLOAD_ALLOWED_KEYS),
   })
+
+  // 9. Hooks de visitor state (TASK-1428). El dismiss persiste ANTES de que la UX
+  //    complete la salida visual (el renderer espera este 202 — la suppression jamás
+  //    depende de animationend). La conversión suprime SOLO con evidencia verificada
+  //    server-side contra Growth Forms (un claim browser nunca suprime permanente).
+  const subjects = resolveVisitorSubjects({
+    visitorKey: input.visitorKey ?? null,
+    sessionKey: input.sessionKey ?? null,
+    consentState: input.consentState,
+    consentSource: input.consentSource,
+  })
+
+  if (subjects.length > 0) {
+    try {
+      if (input.eventKind === 'dismissed') {
+        await recordCtaDismissal(subjects, definition.cta_id, input.consentState)
+      } else if (input.eventKind === 'form_submitted' && input.formSubmissionId) {
+        const verified = await isSubmissionServerAccepted(input.formSubmissionId)
+
+        if (verified) {
+          await recordCtaConversion(subjects, definition.cta_id, input.formSubmissionId, input.consentState)
+        }
+      }
+    } catch {
+      // Best-effort: el estado de suppression nunca rompe el ingest aceptado (el
+      // evento Tier A ya persistió; Sentry cubre fallas sistémicas en la route).
+    }
+  }
 
   return { outcome: 'accepted', eventId }
 }
