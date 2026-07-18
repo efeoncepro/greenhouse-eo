@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "id": "efeonceEditorialInfographicSystem.v1",
+  "brand": {
+    "signatureAsset": "src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg",
+    "signatureLabel": "efeoncepro.com",
+    "deprecatedSignature": "efeonce.cl"
+  },
+  "palette": {
+    "ink": "#022A4E",
+    "blueDeep": "#023C70",
+    "blueMedium": "#024C8F",
+    "blueActive": "#0375DB",
+    "energy": "#F55D01",
+    "leadDark": "#263448",
+    "leadMedium": "#505964",
+    "paper": "#FFFFFF",
+    "accents": {
+      "magenta": "#BB1954",
+      "purple": "#633F93",
+      "passive": "#DBDBDB"
+    }
+  },
+  "archetypes": [
+    "metaphor",
+    "network",
+    "cycle",
+    "path",
+    "comparison",
+    "layered-model",
+    "dataviz"
+  ],
+  "delivery": {
+    "preferredVectorMode": "source-svg-plus-sanitized-delivery-svg",
+    "requiredGeometry": ["viewBox", "width", "height"],
+    "blockedFeatures": ["script", "event-handlers", "foreignObject", "remote-resources"],
+    "rasterOnlyWhen": ["raster-content", "destination-requires-it", "security-policy", "measured-weight-win"]
+  },
+  "qualityGates": [
+    "explanatory-delta",
+    "semantic-archetype",
+    "autonomous-reading",
+    "three-second-route",
+    "svg-safety",
+    "typographic-fit",
+    "real-column",
+    "mobile",
+    "theme",
+    "thumbnail",
+    "provenance"
+  ]
+}

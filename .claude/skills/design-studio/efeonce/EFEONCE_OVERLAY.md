@@ -17,6 +17,10 @@ público, portal) o un cliente Globe. Para diseño genérico basta `../modules/`
 | `DESIGN_BOUNDARY.md` | La costura completa vs greenhouse-ai-image-generator / brand-asset-designer / product-design-loop / modern-ui / typography / dataviz / social-media-studio / digital-marketing. |
 | `CLIENT_DELIVERY.md` | Diseño as-a-service para clientes Globe: multi-marca, KV, aprobaciones. |
 
+Para infografías de artículos, el canon de composición y entrega vive en
+`../../content-marketing-studio/efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md`. Este overlay dirige el arte;
+Content Marketing gobierna argumento, shareability, manifest e integración.
+
 ## Marca (dura)
 
 - **Efeonce ≠ Greenhouse.** Greenhouse es el portal operativo interno (los clientes NO lo ven).

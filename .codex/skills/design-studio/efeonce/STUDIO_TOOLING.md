@@ -15,7 +15,7 @@
 | **Video / motion** | `higgsfield-*` + `social-media-studio` (motion) + modelos video | KV en movimiento, video social |
 | **Craft fino de tipo** | `typography-design` | peso/variante/escala/tracking/leading |
 | **Chart / infografía** | `dataviz-design` | encoding de datos |
-| **Infografía editorial exacta** | SVG + Chromium/Playwright + `cwebp` | aplicar `../../content-marketing-studio/references/deterministic-editorial-infographics.md`; design-studio dirige composición |
+| **Infografía editorial exacta** | SVG source + delivery SVG o raster medido | aplicar `../../content-marketing-studio/references/deterministic-editorial-infographics.md`; para Efeonce sumar `../../content-marketing-studio/efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md`; design-studio dirige composición |
 | **Auditar** | `../modules/05` + `templates/key-visual-audit-scorecard.md` | rúbrica puntuada del KV |
 | **Handoff / design system** | Figma (MCP) | entregar a diseño/dev, tokens, componentes |
 

@@ -98,6 +98,24 @@ pnpm public-website:content-factory:post-tool -- edit-pullquote --post-url <url>
 - `status=block` from validation is a hard stop; `status=warning` requires review.
 - For Glitch POV, prefer `efeoncepro/glitch-drop`; it is an editorial aside, not a quote.
 
+## Direct editorial SVG lane
+
+Infographics and diagrams may be delivered as SVG directly when the format decision in
+`content-marketing-studio/references/deterministic-editorial-infographics.md` passes. For Efeonce-branded pieces,
+also apply `content-marketing-studio/efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md`.
+
+- Keep editable source SVG separate from the sanitized delivery SVG.
+- Block scripts, event handlers, `foreignObject`, remote resources and uncontrolled fonts before upload.
+- Require explicit `viewBox`, `width` and `height`; inspect all text and shapes for clipping.
+- Use the canonical `efeoncepro.com` bubble geometry at build time; do not upload or link a second dependent SVG.
+- Upload through the governed Media Library path, then read back attachment ID, MIME, URL, bytes and metadata.
+- Prefer a normal image block/attachment reference for a standalone SVG. Inline SVG requires an explicit,
+  sanitized runtime contract; never paste arbitrary SVG markup into a generated spec.
+- Use `<picture>` only when theme or viewport art direction requires distinct files. Keep one semantic `<img>`
+  fallback with one ALT.
+- Preserve raster derivatives only for OG/social/compatibility or when measured delivery weight favors raster.
+- Publishing remains private/draft until human authorization and live QA.
+
 ## Content Hub / Search Guardrails
 
 - Do not treat current tags as public navigation until demo tags, duplicates and typos are cleaned.

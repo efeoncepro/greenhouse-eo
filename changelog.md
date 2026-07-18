@@ -1,5 +1,16 @@
 # changelog.md
 
+## 2026-07-18 — Sistema editorial de infografías Efeonce y entrega SVG directa
+
+- `content-marketing-studio` incorpora un canon Efeonce basado en siete precedentes SVG propios y benchmark
+  Semrush: shell de marca estable, arquetipo variable por relación, paleta auditada, shareability y sello
+  `efeoncepro.com` consumido desde Artifact Composer. La regla está espejada en Codex/Claude y enlazada desde
+  `design-studio` y el carril Gutenberg/WordPress.
+- El pipeline deja de imponer PNG/WebP: separa source SVG de delivery SVG saneado y rasteriza solo por contenido,
+  destino, seguridad o comparación de peso. Se agregaron contrato reusable, preset JSON y auditor CLI. En la
+  muestra histórica, el SVG comprimido resultó ~2.1×–5.6× más liviano que WebP 1200 comparable. Comando canónico:
+  `pnpm content:editorial-svg:audit -- <delivery.svg...>`.
+
 ## 2026-07-18 — TASK-1340: Growth CTA Portable Renderer + capa GTM + gobernanza en Growth (code complete, shadow)
 
 - Renderer portable `<greenhouse-cta>` (`src/growth-cta-renderer/**`, vanilla TS 22,6KB, hermano del
@@ -30,8 +41,8 @@
 
 ## 2026-07-18 — Pillar privada de web agéntica preparada para revisión
 
-- El post WordPress `249387`, `El fin de la web “solo para humanos”`, quedó reescrito como pillar de 3.800 palabras para soportar la landing de desarrollo web: definición citable, cuatro tipos de sitio, arquitectura compartida, matriz WebMCP/MCP/API, doce pruebas de readiness, reconstrucción y FAQ.
-- Content Factory pasa con 84 bloques, TOC completo, featured/OG separados y dos diagramas de cuerpo. WAG-V02 v3 corrige el desborde del titular `04 AGÉNTICO`, añade un gate automático por `getBBox()` y pasa QA privada desktop/mobile en light/dark. El artículo sigue en `draft`, sus rutas públicas responden `404` y el enlace recíproco de la landing está preparado pero no aplicado; publicación, QA live y purge requieren autorización humana separada.
+- El post WordPress `249387`, `El fin de la web “solo para humanos”`, quedó actualizado como pillar de 4.448 palabras para soportar la landing de desarrollo web: definición citable, cuatro tipos de sitio, arquitectura compartida, matriz WebMCP/MCP/API, estado real de Chrome/WebMCP y del mercado, evals por capas, cadena de autoridad, doce pruebas de readiness, reconstrucción y FAQ.
+- Content Factory pasa con 95 bloques semánticos, TOC de 20 destinos, featured/OG separados y tres diagramas de cuerpo. WAG-V04 agrega identidad, representación, alcance, confirmación y evidencia a WAG-V02/V03; el gate automático `getBBox()` y la QA privada 1440/390 light/dark pasan sin texto fuera de superficie, imágenes rotas ni overflow. El artículo sigue en `draft`; publicación, enlace recíproco, purge y QA live requieren autorización humana separada.
 
 ## 2026-07-17 — TASK-1339: Growth CTA & Popup Engine — foundation `growth.cta` (code complete, shadow)
 

@@ -89,10 +89,11 @@ argument-hint: "[tarea o pregunta — ej: 'audita este key visual', 'diseña una
   (design-studio hace tipo-como-imagen a nivel dirección de arte).
 - ¿Encoding de un **chart/infografía de datos**? → **`dataviz-design`**.
 - ¿Una **infografía editorial determinística** con copy/cifras/logos exactos, variantes responsive/light-dark y
-  entrega SVG→PNG→WebP? → cargar
+  entrega SVG directa o raster justificada? → cargar
   `../content-marketing-studio/references/deterministic-editorial-infographics.md`; `design-studio` dirige la
   composición, Content Marketing gobierna función/manifest/integración y `dataviz-design` toma el encoding si
-  existe una decisión analítica compleja.
+  existe una decisión analítica compleja. Para marca Efeonce, cargar además
+  `../content-marketing-studio/efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md`.
 - ¿**Motion**/animación/identidad kinética a implementar? → **`motion-design`** (design-studio
   la dirige conceptualmente).
 - ¿Formato/algoritmo/cadencia **por red social**? → **`social-media-studio`** (el KV alimenta
@@ -127,7 +128,7 @@ Cierra el loop **idear → dirigir → producir → auditar → iterar** (detall
 - **Producir**: la herramienta correcta para cada trabajo — **UI de Greenhouse →**
   `greenhouse-ai-image-generator`; **marketing/concept →** Nano Banana / Midjourney /
   Ideogram / Adobe Firefly / Higgsfield / Magnific (upscale) vía sus MCP/skills;
-  **infografía editorial exacta →** SVG determinístico + render Chromium + PNG master + WebP según el método
+  **infografía editorial exacta →** SVG determinístico + delivery SVG directo o raster según el método
   canónico de `content-marketing-studio`.
 - **Escena editorial de producto:** separar siempre la **gramática agnóstica** —jerarquía, gráficos,
   solapamiento, crop, responsive— del **skin contextual**. Una paleta HubSpot sólo corresponde a piezas cuyo tema
@@ -187,6 +188,8 @@ Cada apuesta con su volatilidad en `SOURCES.md`:
 - `GLOSSARY.md` — vocabulario de diseño 2026 (KV, lockup, duotono, mood board, upscale…).
 - `ANTIPATTERNS.md` — los errores que arruinan un diseño.
 - `../content-marketing-studio/references/deterministic-editorial-infographics.md` — pipeline reusable para
-  infografías exactas SVG→PNG→WebP, responsive/theme, manifest y QA.
+  infografías exactas SVG directo/raster, responsive/theme, manifest y QA.
+- `../content-marketing-studio/efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md` — paleta, shell, arquetipos,
+  sello URL, benchmark Semrush y gates editoriales propios de Efeonce.
 - `efeonce/` — overlay: `EFEONCE_OVERLAY.md`, `STUDIO_TOOLING.md`, `DESIGN_BOUNDARY.md`,
   `CLIENT_DELIVERY.md`.

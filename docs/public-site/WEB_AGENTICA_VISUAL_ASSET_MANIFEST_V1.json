@@ -1,0 +1,808 @@
+{
+  "manifestId": "greenhouse-cf-web-agentica-pillar-v3-visuals-v5",
+  "runId": "2026-07-18_web-agentica-pillar",
+  "article": {
+    "postId": 249387,
+    "slug": "web-agentica-agentes-ia",
+    "status": "draft_private"
+  },
+  "visualSystem": {
+    "name": "Una base, dos operadores",
+    "motif": "Recorridos que avanzan desde interfaz hacia capacidades y gobierno",
+    "themeContract": "Light #FFFFFF and dark #111013; no decorative canvas, bubbles, gradients or outer rounded frame",
+    "responsiveContract": "Desktop horizontal and mobile vertical art direction at 860px",
+    "brandSignature": "Official Efeonce wordmarks only, small and peripheral",
+    "forbidden": [
+      "decorative bubbles",
+      "colored editorial canvas",
+      "gradients or glow",
+      "generic SaaS dashboard",
+      "single composition scaled to mobile",
+      "simulated product UI"
+    ]
+  },
+  "production": {
+    "builder": "ai-generations/2026-07-18_web-agentica-pillar/build-assets.mjs",
+    "report": "ai-generations/2026-07-18_web-agentica-pillar/build-report-v2.json",
+    "renderer": "Chromium /Users/jreye/Library/Caches/ms-playwright/chromium-1217/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing"
+  },
+  "assets": [
+    {
+      "conceptId": "WAG-V01",
+      "slot": "hero_featured_og",
+      "function": "Presentar una infraestructura web compartida por una persona y un agente sin sugerir reemplazo humano.",
+      "explanatoryDelta": "Instala la tesis de dos operadores sobre una base compartida antes de entrar a la arquitectura.",
+      "status": "integrated_private",
+      "deliveryContract": {
+        "viewport": "crop_safe",
+        "theme": "single_theme",
+        "canvas": "opaque",
+        "skin": "efeonce_core",
+        "rationale": "La portada necesita estabilidad cromática y foco central para featured y Open Graph."
+      },
+      "production": {
+        "kind": "generated-conceptual",
+        "master": {
+          "path": "tmp/web-agentica-visuals/web-agentica-dos-operadores-master.png",
+          "sha256": "52d5971491b9cbd40df06411e4c74be14b9d860189a3a7e82d7785f3e280c9da",
+          "bytes": 1958351,
+          "mime": "image/png",
+          "width": 1536,
+          "height": 1024
+        },
+        "derivatives": [
+          {
+            "role": "featured",
+            "path": "tmp/web-agentica-visuals/web-agentica-dos-operadores-featured-1600-v1.webp",
+            "sha256": "5ddc64b88adf4e6346f4638039af955b6f811a5006283ad3df826ad6c8a0be7f",
+            "bytes": 116760,
+            "mime": "image/webp",
+            "width": 1600,
+            "height": 900
+          },
+          {
+            "role": "openGraph",
+            "path": "tmp/web-agentica-visuals/web-agentica-dos-operadores-og-1440x757-v1.jpg",
+            "sha256": "a08a2ddfc272e128c90754eab68647662121fafc9e00210d65c6ef17141abb35",
+            "bytes": 269623,
+            "mime": "image/jpeg",
+            "width": 1440,
+            "height": 757
+          }
+        ]
+      },
+      "metadata": {
+        "alt": "Una persona y un agente de IA convergen sobre la misma infraestructura web compartida.",
+        "caption": null,
+        "description": "Portada editorial conceptual; no representa una interfaz, producto ni cliente real."
+      },
+      "media": {
+        "featured": {
+          "id": 251453,
+          "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-dos-operadores-featured-1600-v1.webp"
+        },
+        "openGraph": {
+          "id": 251454,
+          "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-dos-operadores-og-1440x757-v1.jpg"
+        }
+      }
+    },
+    {
+      "conceptId": "WAG-V02",
+      "slot": "body_operability_map",
+      "context": "Después de distinguir sitio tradicional, sitio con IA, sitio preparado y web agéntica.",
+      "function": "Mostrar que operabilidad externa y gobierno crecen juntos y que la IA interna no basta.",
+      "notFunction": "No es un ranking universal ni una promesa de automatización total.",
+      "explanatoryDelta": "Convierte la taxonomía en un mapa de dos ejes: el salto decisivo es autoridad acotada, auditable y revocable, no más IA dentro del sitio.",
+      "status": "integrated_private",
+      "deliveryContract": {
+        "viewport": "art_directed",
+        "theme": "light_dark",
+        "canvas": "opaque",
+        "skin": "efeonce_core",
+        "rationale": "La progresión requiere composición horizontal en desktop y vertical en móvil; el canvas coincide exactamente con el blanco y el negro plomo del tema, sin fondo decorativo."
+      },
+      "variants": {
+        "desktopLight": "ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v02-frontera-operativa-desktop-light-web-v2.webp",
+        "desktopDark": "ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v02-frontera-operativa-desktop-dark-web-v2.webp",
+        "mobileLight": "ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v02-frontera-operativa-mobile-light-web-v2.webp",
+        "mobileDark": "ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v02-frontera-operativa-mobile-dark-web-v2.webp"
+      },
+      "productionVariants": [
+        {
+          "viewport": "desktop",
+          "theme": "light",
+          "source": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/source/web-agentica-v02-frontera-operativa-desktop-light-v2.svg",
+            "sha256": "73fc99eb77b877e91f22a8473e82b34fdcd78e7c86c26096cba4d293dc53056d",
+            "bytes": 15791,
+            "mime": "image/svg+xml",
+            "width": 1600,
+            "height": 1000
+          },
+          "master": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/masters/web-agentica-v02-frontera-operativa-desktop-light-master-v2.png",
+            "sha256": "a81cc0af3f67b839605cd3188eaf0ee85a6979720543870d73e765cfa1b28aa8",
+            "bytes": 171044,
+            "mime": "image/png",
+            "colorSpace": "sRGB",
+            "width": 1600,
+            "height": 1000
+          },
+          "derivative": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v02-frontera-operativa-desktop-light-web-v2.webp",
+            "sha256": "4e078a44bf136e9509356cb1ee5639a89178af58dfe06a6779f4e00ed2de2faf",
+            "bytes": 121748,
+            "mime": "image/webp",
+            "colorSpace": "sRGB",
+            "width": 1600,
+            "height": 1000
+          },
+          "contextualProof": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v02-frontera-operativa-desktop-light-context-proof-v2.png",
+            "sha256": "32dde5e856326472883741f33af485f12013d9549adae22d37eb768f2afa9236",
+            "bytes": 311272
+          },
+          "qa": {
+            "reviewedAtOriginalResolution": true,
+            "articleWidth": 1112,
+            "projectedRenderHeight": 695,
+            "clipping": false,
+            "brokenBrandAsset": false
+          },
+          "media": {
+            "id": 251470,
+            "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-frontera-operativa-desktop-light-web-1600-v4.webp",
+            "mime": "image/webp",
+            "readback": "pass"
+          }
+        },
+        {
+          "viewport": "desktop",
+          "theme": "dark",
+          "source": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/source/web-agentica-v02-frontera-operativa-desktop-dark-v2.svg",
+            "sha256": "0e589143777e58dc77aa54f9b576310e9de3e60cde3e9dd4c235a3c431090009",
+            "bytes": 15799,
+            "mime": "image/svg+xml",
+            "width": 1600,
+            "height": 1000
+          },
+          "master": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/masters/web-agentica-v02-frontera-operativa-desktop-dark-master-v2.png",
+            "sha256": "0a74f35573346094eccfd76502a7d16e3693931c2bf330e91bc29356fc62eed1",
+            "bytes": 173983,
+            "mime": "image/png",
+            "colorSpace": "sRGB",
+            "width": 1600,
+            "height": 1000
+          },
+          "derivative": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v02-frontera-operativa-desktop-dark-web-v2.webp",
+            "sha256": "489b9d7a38649c20ae5bc1294d52b833f783e2dbb93d537fb92ee26e7eabdf07",
+            "bytes": 106560,
+            "mime": "image/webp",
+            "colorSpace": "sRGB",
+            "width": 1600,
+            "height": 1000
+          },
+          "contextualProof": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v02-frontera-operativa-desktop-dark-context-proof-v2.png",
+            "sha256": "494678e7b9bac021726e36cc5b32af3e23ee6cfc289c179689dede7774e6beec",
+            "bytes": 255334
+          },
+          "qa": {
+            "reviewedAtOriginalResolution": true,
+            "articleWidth": 1112,
+            "projectedRenderHeight": 695,
+            "clipping": false,
+            "brokenBrandAsset": false
+          },
+          "media": {
+            "id": 251472,
+            "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-frontera-operativa-desktop-dark-web-1600-v4.webp",
+            "mime": "image/webp",
+            "readback": "pass"
+          }
+        },
+        {
+          "viewport": "mobile",
+          "theme": "light",
+          "source": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/source/web-agentica-v02-frontera-operativa-mobile-light-v2.svg",
+            "sha256": "a72990753a6fddd0e1f072590d13a11a593a4023b5b4a5e8d90c0561c2647bff",
+            "bytes": 12851,
+            "mime": "image/svg+xml",
+            "width": 1200,
+            "height": 1600
+          },
+          "master": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/masters/web-agentica-v02-frontera-operativa-mobile-light-master-v2.png",
+            "sha256": "84fb5866e83f43d392d0d622657764b35e426302d42b5a8940373b3d17f68df6",
+            "bytes": 163061,
+            "mime": "image/png",
+            "colorSpace": "sRGB",
+            "width": 1200,
+            "height": 1600
+          },
+          "derivative": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v02-frontera-operativa-mobile-light-web-v2.webp",
+            "sha256": "db0f1117eb781968fec3afd3c355244e1b0f71def1ff372f064f6d74283b30dd",
+            "bytes": 109770,
+            "mime": "image/webp",
+            "colorSpace": "sRGB",
+            "width": 1200,
+            "height": 1600
+          },
+          "contextualProof": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v02-frontera-operativa-mobile-light-context-proof-v2.png",
+            "sha256": "1b65edfd9efeca7d9bf8c835ed2116454860fa29601b38a8eb098c9dbb8db80b",
+            "bytes": 71981
+          },
+          "qa": {
+            "reviewedAtOriginalResolution": true,
+            "articleWidth": 358,
+            "projectedRenderHeight": 477,
+            "clipping": false,
+            "brokenBrandAsset": false
+          },
+          "media": {
+            "id": 251471,
+            "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-frontera-operativa-mobile-light-web-1200-v4.webp",
+            "mime": "image/webp",
+            "readback": "pass"
+          }
+        },
+        {
+          "viewport": "mobile",
+          "theme": "dark",
+          "source": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/source/web-agentica-v02-frontera-operativa-mobile-dark-v2.svg",
+            "sha256": "d7f74f0bbbd879593ced5816dda88ae26d23a7d16216cfe8a191cea28c14c5dc",
+            "bytes": 12859,
+            "mime": "image/svg+xml",
+            "width": 1200,
+            "height": 1600
+          },
+          "master": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/masters/web-agentica-v02-frontera-operativa-mobile-dark-master-v2.png",
+            "sha256": "5b3f62805e43b0cc57def74686867fd8531bd5a45d76d12c66cdab8599fc12b3",
+            "bytes": 163931,
+            "mime": "image/png",
+            "colorSpace": "sRGB",
+            "width": 1200,
+            "height": 1600
+          },
+          "derivative": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v02-frontera-operativa-mobile-dark-web-v2.webp",
+            "sha256": "d5331af4730cfeda0f1ff3c2c71ae581e2447c1fabaa199259406ffe642db5b4",
+            "bytes": 95568,
+            "mime": "image/webp",
+            "colorSpace": "sRGB",
+            "width": 1200,
+            "height": 1600
+          },
+          "contextualProof": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v02-frontera-operativa-mobile-dark-context-proof-v2.png",
+            "sha256": "7d23860054fa5b92d188fb545edc548e21c1faa72544d875b838e1fbcf9e62d6",
+            "bytes": 60543
+          },
+          "qa": {
+            "reviewedAtOriginalResolution": true,
+            "articleWidth": 358,
+            "projectedRenderHeight": 477,
+            "clipping": false,
+            "brokenBrandAsset": false
+          },
+          "media": {
+            "id": 251473,
+            "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-frontera-operativa-mobile-dark-web-1200-v4.webp",
+            "mime": "image/webp",
+            "readback": "pass"
+          }
+        }
+      ],
+      "metadata": {
+        "title": "De una interfaz a un contrato operativo",
+        "alt": "Cuatro etapas aumentan la operabilidad para agentes externos y el gobierno de las acciones: sitio tradicional, sitio con IA, sitio preparado y web agéntica.",
+        "caption": "La transición decisiva no es “más IA”, sino autoridad acotada, auditable y revocable.",
+        "description": "Mapa editorial determinístico de la frontera entre IA interna y operación externa gobernada."
+      },
+      "rights": {
+        "sourceAssets": [
+          "public/branding/logo-full.svg",
+          "public/branding/logo-negative.svg"
+        ],
+        "license": "Efeonce original",
+        "provenance": "SVG determinístico; sin generación de imagen ni assets de terceros.",
+        "disclosure": "none"
+      },
+      "qa": {
+        "status": "integration_pass",
+        "renderer": "Chromium via Playwright",
+        "themesReviewed": true,
+        "responsiveReviewed": true,
+        "findings": [],
+        "integration": "private"
+      }
+    },
+    {
+      "conceptId": "WAG-V03",
+      "slot": "body_shared_architecture",
+      "context": "En la sección sobre los cambios de arquitectura de un proyecto web.",
+      "function": "Mostrar que interfaz humana, WebMCP y API consumen capacidades, gobierno, datos y reglas compartidos.",
+      "notFunction": "No es un diagrama de despliegue completo ni afirma que WebMCP reemplace una API.",
+      "explanatoryDelta": "Localiza la frontera de reutilización: cambian las interfaces, pero no el contrato de capacidades, gobierno y datos.",
+      "status": "integrated_private",
+      "deliveryContract": {
+        "viewport": "art_directed",
+        "theme": "light_dark",
+        "canvas": "opaque",
+        "skin": "efeonce_core",
+        "rationale": "Las capas se comparan en paralelo en desktop y se apilan en móvil; el exterior coincide con el tema y no crea una lámina visual separada."
+      },
+      "variants": {
+        "desktopLight": "ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v03-arquitectura-compartida-desktop-light-web-v2.webp",
+        "desktopDark": "ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v03-arquitectura-compartida-desktop-dark-web-v2.webp",
+        "mobileLight": "ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v03-arquitectura-compartida-mobile-light-web-v2.webp",
+        "mobileDark": "ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v03-arquitectura-compartida-mobile-dark-web-v2.webp"
+      },
+      "productionVariants": [
+        {
+          "viewport": "desktop",
+          "theme": "light",
+          "source": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/source/web-agentica-v03-arquitectura-compartida-desktop-light-v2.svg",
+            "sha256": "fc594d6e3e4231481f697b1f9c66a1adc5e4228fabb1d9d552cb3e9b29afaf74",
+            "bytes": 10879,
+            "mime": "image/svg+xml",
+            "width": 1600,
+            "height": 1000
+          },
+          "master": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/masters/web-agentica-v03-arquitectura-compartida-desktop-light-master-v2.png",
+            "sha256": "eb8bc2ce9644b9ba99308467e38382d173c5ca72881359d19120787364c8fc25",
+            "bytes": 157609,
+            "mime": "image/png",
+            "colorSpace": "sRGB",
+            "width": 1600,
+            "height": 1000
+          },
+          "derivative": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v03-arquitectura-compartida-desktop-light-web-v2.webp",
+            "sha256": "bc96bc70e5a2875a08357601b083d4440d5b7604e5206998823cf3effb81059b",
+            "bytes": 109904,
+            "mime": "image/webp",
+            "colorSpace": "sRGB",
+            "width": 1600,
+            "height": 1000
+          },
+          "contextualProof": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v03-arquitectura-compartida-desktop-light-context-proof-v2.png",
+            "sha256": "242aa9bc8fc735d2623ad4d5729ce09e538a29bc1f75903b99131c4a7e9500f7",
+            "bytes": 286793
+          },
+          "qa": {
+            "reviewedAtOriginalResolution": true,
+            "articleWidth": 1112,
+            "projectedRenderHeight": 695,
+            "clipping": false,
+            "brokenBrandAsset": false
+          },
+          "media": {
+            "id": 251474,
+            "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-arquitectura-compartida-desktop-light-web-1600-v4.webp",
+            "mime": "image/webp",
+            "readback": "pass"
+          }
+        },
+        {
+          "viewport": "desktop",
+          "theme": "dark",
+          "source": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/source/web-agentica-v03-arquitectura-compartida-desktop-dark-v2.svg",
+            "sha256": "c9bb50bdce4d8aaf4b82c73ddba01cc1fdfef575e95d4381df909b1689dbd318",
+            "bytes": 10875,
+            "mime": "image/svg+xml",
+            "width": 1600,
+            "height": 1000
+          },
+          "master": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/masters/web-agentica-v03-arquitectura-compartida-desktop-dark-master-v2.png",
+            "sha256": "2e8f8260d9ce62739bfbbf09d0cb37f3aca4c3ead9de3b8b98720fa09049e88c",
+            "bytes": 158954,
+            "mime": "image/png",
+            "colorSpace": "sRGB",
+            "width": 1600,
+            "height": 1000
+          },
+          "derivative": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v03-arquitectura-compartida-desktop-dark-web-v2.webp",
+            "sha256": "71bc67c252d88658c330fd09f171be60686f90ae77eff78b637ff9d108b77354",
+            "bytes": 96258,
+            "mime": "image/webp",
+            "colorSpace": "sRGB",
+            "width": 1600,
+            "height": 1000
+          },
+          "contextualProof": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v03-arquitectura-compartida-desktop-dark-context-proof-v2.png",
+            "sha256": "25feafff5b086b6a7f6654a56ee90ec80b9c6b7bcebf569492409fa293426f76",
+            "bytes": 235492
+          },
+          "qa": {
+            "reviewedAtOriginalResolution": true,
+            "articleWidth": 1112,
+            "projectedRenderHeight": 695,
+            "clipping": false,
+            "brokenBrandAsset": false
+          },
+          "media": {
+            "id": 251476,
+            "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-arquitectura-compartida-desktop-dark-web-1600-v4.webp",
+            "mime": "image/webp",
+            "readback": "pass"
+          }
+        },
+        {
+          "viewport": "mobile",
+          "theme": "light",
+          "source": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/source/web-agentica-v03-arquitectura-compartida-mobile-light-v2.svg",
+            "sha256": "30ba34cbbd41aa453e3a834d0743b1dac72c25d7cb3807b71e93b0ea0fb91ece",
+            "bytes": 10658,
+            "mime": "image/svg+xml",
+            "width": 1200,
+            "height": 1600
+          },
+          "master": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/masters/web-agentica-v03-arquitectura-compartida-mobile-light-master-v2.png",
+            "sha256": "fd2a674b07169d8a18a2b105a15753bf080a63ff1ca7db0eef512032bdb1f296",
+            "bytes": 155373,
+            "mime": "image/png",
+            "colorSpace": "sRGB",
+            "width": 1200,
+            "height": 1600
+          },
+          "derivative": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v03-arquitectura-compartida-mobile-light-web-v2.webp",
+            "sha256": "0e5e5f783834bc2e4577324bc1baed7ac2ed4a56ce3b6e207f685dd8a468bd98",
+            "bytes": 103134,
+            "mime": "image/webp",
+            "colorSpace": "sRGB",
+            "width": 1200,
+            "height": 1600
+          },
+          "contextualProof": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v03-arquitectura-compartida-mobile-light-context-proof-v2.png",
+            "sha256": "51f5b44a692d98192c5779b1975d69f3e2532e2ebaad33742dd160147a4e4ad8",
+            "bytes": 70353
+          },
+          "qa": {
+            "reviewedAtOriginalResolution": true,
+            "articleWidth": 358,
+            "projectedRenderHeight": 477,
+            "clipping": false,
+            "brokenBrandAsset": false
+          },
+          "media": {
+            "id": 251475,
+            "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-arquitectura-compartida-mobile-light-web-1200-v4.webp",
+            "mime": "image/webp",
+            "readback": "pass"
+          }
+        },
+        {
+          "viewport": "mobile",
+          "theme": "dark",
+          "source": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/source/web-agentica-v03-arquitectura-compartida-mobile-dark-v2.svg",
+            "sha256": "21e4987a51ed6fdf38287589a16d11d0b543bf1bbe2f3ab1952c863189025f52",
+            "bytes": 10654,
+            "mime": "image/svg+xml",
+            "width": 1200,
+            "height": 1600
+          },
+          "master": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/masters/web-agentica-v03-arquitectura-compartida-mobile-dark-master-v2.png",
+            "sha256": "2baf8897c0227bf3878ca3bd9fa08c98a79ba5e28a137617abfc8a8b4c40e6a3",
+            "bytes": 157498,
+            "mime": "image/png",
+            "colorSpace": "sRGB",
+            "width": 1200,
+            "height": 1600
+          },
+          "derivative": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v03-arquitectura-compartida-mobile-dark-web-v2.webp",
+            "sha256": "18e893bf0b2407a6877606c1e0f1ca9dd216415f02e4107f2c44e7d6d3d045a9",
+            "bytes": 90128,
+            "mime": "image/webp",
+            "colorSpace": "sRGB",
+            "width": 1200,
+            "height": 1600
+          },
+          "contextualProof": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v03-arquitectura-compartida-mobile-dark-context-proof-v2.png",
+            "sha256": "108dfbeaff5b2c388853290ada6da1811e41edc57ef2ac0de8bee6eb74e87345",
+            "bytes": 59967
+          },
+          "qa": {
+            "reviewedAtOriginalResolution": true,
+            "articleWidth": 358,
+            "projectedRenderHeight": 477,
+            "clipping": false,
+            "brokenBrandAsset": false
+          },
+          "media": {
+            "id": 251477,
+            "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-arquitectura-compartida-mobile-dark-web-1200-v4.webp",
+            "mime": "image/webp",
+            "readback": "pass"
+          }
+        }
+      ],
+      "metadata": {
+        "title": "Una base, dos formas de operar",
+        "alt": "La interfaz humana, WebMCP y la API consumen las mismas capacidades gobernadas, los mismos datos y las mismas reglas del negocio.",
+        "caption": "La interfaz cambia; el contrato de capacidades, gobierno y datos permanece compartido.",
+        "description": "Diagrama editorial determinístico de arquitectura compartida para personas y agentes."
+      },
+      "rights": {
+        "sourceAssets": [
+          "public/branding/logo-full.svg",
+          "public/branding/logo-negative.svg"
+        ],
+        "license": "Efeonce original",
+        "provenance": "SVG determinístico; sin generación de imagen ni assets de terceros.",
+        "disclosure": "none"
+      },
+      "qa": {
+        "status": "integration_pass",
+        "renderer": "Chromium via Playwright",
+        "themesReviewed": true,
+        "responsiveReviewed": true,
+        "findings": [],
+        "integration": "private"
+      }
+    },
+    {
+      "conceptId": "WAG-V04",
+      "slot": "body_authority_chain",
+      "context": "Dentro de la sección sobre confianza, identidad y autoridad delegada.",
+      "function": "Mostrar la cadena persona, agente u operador, capacidad del sitio y sistema de registro.",
+      "notFunction": "No es un estándar de identidad, flujo OAuth completo ni garantía de seguridad.",
+      "explanatoryDelta": "Separa identidad, alcance delegado, confirmación y evidencia recuperable, y ubica cada gate en el recorrido de una acción.",
+      "status": "integrated_private",
+      "deliveryContract": {
+        "viewport": "art_directed",
+        "theme": "light_dark",
+        "canvas": "opaque",
+        "skin": "efeonce_core",
+        "rationale": "La cadena se lee horizontalmente en desktop y como recorrido vertical en móvil; el canvas coincide con el tema y no agrega decoración ambiental."
+      },
+      "variants": {
+        "desktopLight": "ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v04-cadena-autoridad-desktop-light-web-v2.webp",
+        "desktopDark": "ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v04-cadena-autoridad-desktop-dark-web-v2.webp",
+        "mobileLight": "ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v04-cadena-autoridad-mobile-light-web-v2.webp",
+        "mobileDark": "ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v04-cadena-autoridad-mobile-dark-web-v2.webp"
+      },
+      "productionVariants": [
+        {
+          "viewport": "desktop",
+          "theme": "light",
+          "source": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/source/web-agentica-v04-cadena-autoridad-desktop-light-v2.svg",
+            "sha256": "929207138c8190793056fac1ae2854fab3e0db7949e49511beb4dc59c950da27",
+            "bytes": 13291,
+            "mime": "image/svg+xml",
+            "width": 1600,
+            "height": 1000
+          },
+          "master": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/masters/web-agentica-v04-cadena-autoridad-desktop-light-master-v2.png",
+            "sha256": "62d70b5c0a23a4583d52596f60bdf41c70c43fb0b000243223207a75b9aadeae",
+            "bytes": 156839,
+            "mime": "image/png",
+            "colorSpace": "sRGB",
+            "width": 1600,
+            "height": 1000
+          },
+          "derivative": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v04-cadena-autoridad-desktop-light-web-v2.webp",
+            "sha256": "940c61a65a4fdbc63af9832e44c50b1e3d70a9562b434a3275bf2d197ad2958b",
+            "bytes": 119824,
+            "mime": "image/webp",
+            "colorSpace": "sRGB",
+            "width": 1600,
+            "height": 1000
+          },
+          "contextualProof": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v04-cadena-autoridad-desktop-light-context-proof-v2.png",
+            "sha256": "4c23d4dee2e240e4571b3ce0d7f57f4c8573a5033340ba8a307538942c5a2fa2",
+            "bytes": 300307
+          },
+          "qa": {
+            "reviewedAtOriginalResolution": true,
+            "articleWidth": 1112,
+            "projectedRenderHeight": 695,
+            "clipping": false,
+            "brokenBrandAsset": false
+          },
+          "media": {
+            "id": 251479,
+            "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-cadena-autoridad-desktop-light-web-1600-v1.webp",
+            "mime": "image/webp",
+            "readback": "pass"
+          }
+        },
+        {
+          "viewport": "desktop",
+          "theme": "dark",
+          "source": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/source/web-agentica-v04-cadena-autoridad-desktop-dark-v2.svg",
+            "sha256": "2e1f7b2f1a567b3f3c9027e0d7eb2d46a742958a8da390476b3d1cd21662c786",
+            "bytes": 13299,
+            "mime": "image/svg+xml",
+            "width": 1600,
+            "height": 1000
+          },
+          "master": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/masters/web-agentica-v04-cadena-autoridad-desktop-dark-master-v2.png",
+            "sha256": "6185d38e3c490732aca478f3120b2ac6adf8d65624b49be406fab77722daba79",
+            "bytes": 158260,
+            "mime": "image/png",
+            "colorSpace": "sRGB",
+            "width": 1600,
+            "height": 1000
+          },
+          "derivative": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v04-cadena-autoridad-desktop-dark-web-v2.webp",
+            "sha256": "b6a5b1091f7d98631c0048d64490f2789062e40dbb8b8847f9ad97b7e75bd42e",
+            "bytes": 108206,
+            "mime": "image/webp",
+            "colorSpace": "sRGB",
+            "width": 1600,
+            "height": 1000
+          },
+          "contextualProof": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v04-cadena-autoridad-desktop-dark-context-proof-v2.png",
+            "sha256": "705b025064cb951beed4146067d47434a683fcc54d14c9c30e6d9b0d0ad32533",
+            "bytes": 260272
+          },
+          "qa": {
+            "reviewedAtOriginalResolution": true,
+            "articleWidth": 1112,
+            "projectedRenderHeight": 695,
+            "clipping": false,
+            "brokenBrandAsset": false
+          },
+          "media": {
+            "id": 251481,
+            "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-cadena-autoridad-desktop-dark-web-1600-v1.webp",
+            "mime": "image/webp",
+            "readback": "pass"
+          }
+        },
+        {
+          "viewport": "mobile",
+          "theme": "light",
+          "source": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/source/web-agentica-v04-cadena-autoridad-mobile-light-v2.svg",
+            "sha256": "e8e13f2e1ba7db48b2682007681bfbadc00dfa9b220590d636f0c8a58cb3fd12",
+            "bytes": 11754,
+            "mime": "image/svg+xml",
+            "width": 1200,
+            "height": 1600
+          },
+          "master": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/masters/web-agentica-v04-cadena-autoridad-mobile-light-master-v2.png",
+            "sha256": "f59b535afc7b64f80cb93bd0cf3ab868c5937bf5eea8ce9fce6aa386e5960470",
+            "bytes": 140494,
+            "mime": "image/png",
+            "colorSpace": "sRGB",
+            "width": 1200,
+            "height": 1600
+          },
+          "derivative": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v04-cadena-autoridad-mobile-light-web-v2.webp",
+            "sha256": "7d2b00ee5f4f4de7efae7838d1224fd795054d81eec6891e8bf07639e7235177",
+            "bytes": 97268,
+            "mime": "image/webp",
+            "colorSpace": "sRGB",
+            "width": 1200,
+            "height": 1600
+          },
+          "contextualProof": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v04-cadena-autoridad-mobile-light-context-proof-v2.png",
+            "sha256": "b273b6bb8e19e4f6ba2fb12de12b61b7faa3c514adc83031d6dd49e03a8b1339",
+            "bytes": 65897
+          },
+          "qa": {
+            "reviewedAtOriginalResolution": true,
+            "articleWidth": 358,
+            "projectedRenderHeight": 477,
+            "clipping": false,
+            "brokenBrandAsset": false
+          },
+          "media": {
+            "id": 251480,
+            "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-cadena-autoridad-mobile-light-web-1200-v1.webp",
+            "mime": "image/webp",
+            "readback": "pass"
+          }
+        },
+        {
+          "viewport": "mobile",
+          "theme": "dark",
+          "source": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/source/web-agentica-v04-cadena-autoridad-mobile-dark-v2.svg",
+            "sha256": "61dea135bb3ab170bde9b7fe248344cb5687dde76c7476c2528c3bd68583d02c",
+            "bytes": 11762,
+            "mime": "image/svg+xml",
+            "width": 1200,
+            "height": 1600
+          },
+          "master": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/masters/web-agentica-v04-cadena-autoridad-mobile-dark-master-v2.png",
+            "sha256": "784acf40b90889b9131897b30370b57506b761f6bab2a472cfb5f8aa7b36b18c",
+            "bytes": 141416,
+            "mime": "image/png",
+            "colorSpace": "sRGB",
+            "width": 1200,
+            "height": 1600
+          },
+          "derivative": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v04-cadena-autoridad-mobile-dark-web-v2.webp",
+            "sha256": "cfbab79d79df2bbc525f8f91e45bd0cd126007632068800b5b278004a52d7a45",
+            "bytes": 87036,
+            "mime": "image/webp",
+            "colorSpace": "sRGB",
+            "width": 1200,
+            "height": 1600
+          },
+          "contextualProof": {
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v04-cadena-autoridad-mobile-dark-context-proof-v2.png",
+            "sha256": "8a5954e3836d76823a5cc1e42ef98e704c5f4a0956c92cd736146896d4d7c867",
+            "bytes": 59163
+          },
+          "qa": {
+            "reviewedAtOriginalResolution": true,
+            "articleWidth": 358,
+            "projectedRenderHeight": 477,
+            "clipping": false,
+            "brokenBrandAsset": false
+          },
+          "media": {
+            "id": 251482,
+            "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-cadena-autoridad-mobile-dark-web-1200-v1.webp",
+            "mime": "image/webp",
+            "readback": "pass"
+          }
+        }
+      ],
+      "metadata": {
+        "title": "Cadena de autoridad para agentes",
+        "alt": "Una persona delega una intención a un agente u operador; la capacidad del sitio valida identidad, alcance y confirmación antes de registrar un resultado auditable, revocable y recuperable.",
+        "caption": "Identificar al agente no basta: la empresa debe comprobar autoridad, alcance, confirmación y evidencia.",
+        "description": "Infografía editorial determinística de la cadena de autoridad entre persona, agente u operador, capacidad del sitio y sistema de registro."
+      },
+      "rights": {
+        "sourceAssets": [
+          "public/branding/logo-full.svg",
+          "public/branding/logo-negative.svg"
+        ],
+        "license": "Efeonce original",
+        "provenance": "SVG determinístico; sin generación de imagen ni assets de terceros.",
+        "disclosure": "none"
+      },
+      "qa": {
+        "status": "integration_pass",
+        "renderer": "Chromium via Playwright",
+        "themesReviewed": true,
+        "responsiveReviewed": true,
+        "findings": [],
+        "integration": "private"
+      }
+    }
+  ]
+}

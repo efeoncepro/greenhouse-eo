@@ -76,8 +76,10 @@ El baseline competitivo de la agencia vive en `docs/context/15_panorama-competit
 - **NUNCA** confundir `/aeo-2/` (servicio) con el grader (lead magnet).
 - **NUNCA** publicar output IA crudo (gate de REVIEW + barra de insight/voz).
 - El contenido de Think vive en su **repo dedicado** (efeonce-think, Astro), no en greenhouse-eo.
+- Las infografías editoriales usan `EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md`: shell estable, arquetipo elegido por
+  relación, sello canónico `efeoncepro.com` y SVG directo cuando gana por seguridad, fidelidad y peso.
 
 ## Cross-links
 
-- Estrategia → `../modules/01`; ops → `../modules/02`; formatos/ebooks → `../modules/03`; atomizar → `../modules/04`; distribuir → `../modules/05`; medir → `../modules/06`; IA/factory → `../modules/07`.
+- Estrategia → `../modules/01`; ops → `../modules/02`; formatos/ebooks → `../modules/03`; atomizar → `../modules/04`; distribuir → `../modules/05`; medir → `../modules/06`; IA/factory → `../modules/07`; infografías Efeonce → `EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md`.
 - Publicar → `efeonce-public-site-wordpress` + `astro`; social → `social-media-studio`; email → `greenhouse-email`; lead forms → `greenhouse-growth-forms`; voz/ICP → `efeonce-agency`.

@@ -3,7 +3,7 @@
 Usar este método cuando una pieza editorial necesite texto, cifras, escalas, conectores, taxonomías o firmas de
 marca exactas. La cadena canónica es:
 
-> **contrato editorial y de datos → SVG fuente → render controlado → PNG master → WebP → QA original y contextual → manifest → integración**
+> **contrato editorial y de datos → SVG fuente → SVG de entrega y/o raster justificado → QA original y contextual → manifest → integración**
 
 Es un método de producción y verificación, no un estilo. No obliga fondos, cards, paletas, gradientes, ratios ni
 formas comunes entre artículos.
@@ -131,6 +131,10 @@ completo vive en `../../design-studio/modules/11_PRODUCT_STORY_SCENES.md`.
 
 ## 5. Render controlado a PNG master
 
+Este paso es **condicional**. Ejecutarlo cuando el destino requiera raster, el SVG incorpore material raster o se
+necesite un master para OG/social/compatibilidad. Una infografía vectorial segura y portable puede entregarse
+directamente como SVG sin crear PNG/WebP rituales.
+
 Renderizar el SVG en Chromium/Playwright —o el renderer canónico equivalente— usando un viewport igual a las
 dimensiones intrínsecas del master.
 
@@ -145,7 +149,20 @@ Antes de capturar:
 El PNG resultante es el master raster. No capturar a partir de una miniatura, una imagen del chat ni otro
 derivado. Registrar renderer, dimensiones, fecha y SHA-256.
 
-## 6. Derivar WebP
+## 6. Seleccionar la entrega web
+
+Comparar el SVG optimizado y comprimido con el raster al ancho real. Elegir SVG directo cuando sea seguro,
+autónomo, nítido y más liviano; elegir raster cuando el contenido o el runtime lo justifiquen. Para Efeonce,
+cargar `../efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md` y ejecutar
+`pnpm content:editorial-svg:audit -- <delivery.svg...>` sobre el delivery SVG.
+
+### Vía SVG directa
+
+Separar source editable y delivery portable. El delivery debe tener `viewBox`, dimensiones intrínsecas, cero
+scripts/event handlers/`foreignObject`, cero referencias remotas y fuentes controladas. Convertir texto a
+contornos cuando la fidelidad tipográfica sea crítica. Conservar ALT/caption en HTML cuando se sirve con `<img>`.
+
+### Vía raster
 
 Crear cada WebP directamente desde su PNG master, nunca desde otro WebP. Ejemplo cuando `cwebp` está disponible:
 
@@ -174,14 +191,14 @@ versión publicada con significado visual distinto.
 
 ### A. Integridad del archivo
 
-Inspeccionar SVG, PNG y WebP a resolución original:
+Inspeccionar el SVG de entrega y todo raster requerido a resolución original:
 
 - copy, cifras, fechas y puntuación completos;
 - ninguna colisión, clipping, asset roto o conector sobre texto;
 - ejes, proporciones y gates fieles a los datos;
 - logo correcto, visible, proporcionado y con zona de respeto;
 - contraste light/dark y jerarquía equivalentes;
-- ausencia de halos, banding o pérdida de nitidez después de WebP;
+- ausencia de halos, banding o pérdida de nitidez después de rasterizar;
 - dimensiones, MIME, peso y hashes reales.
 
 ### B. Experiencia contextual
@@ -195,8 +212,8 @@ Inspeccionar el master o derivado final al ancho real de la columna:
 - selección correcta de viewport y tema;
 - ALT/caption presentes en el DOM después de integrar.
 
-La previsualización no sustituye al master. Si una preview incrusta un SVG con assets locales, verificar que el
-browser realmente los cargó. Para validar firma y compresión, preferir escalar o montar el PNG/WebP final. Una
+La previsualización no sustituye al delivery. Si una preview incrusta un SVG con assets locales, verificar que el
+browser realmente los cargó. Para validar firma y compresión, montar el SVG/PNG/WebP final. Una
 preview con un logo roto no es evidencia válida aunque el source esté correcto.
 
 ## 8. Manifest y provenance
@@ -204,9 +221,11 @@ preview con un logo roto no es evidencia válida aunque el source esté correcto
 Registrar por variante:
 
 - ruta y SHA-256 del SVG source;
-- renderer y fuentes;
-- ruta, hash, dimensiones, MIME y espacio de color del PNG master;
-- ruta, hash, dimensiones, MIME y bytes del WebP;
+- ruta, hash, dimensiones, MIME, bytes raw/gzip/brotli y auditoría del delivery SVG cuando aplique;
+- renderer y fuentes cuando aplique;
+- ruta, hash, dimensiones, MIME y espacio de color del PNG master cuando exista;
+- ruta, hash, dimensiones, MIME y bytes de cada raster requerido;
+- comparación de peso y rationale de formato;
 - relación viewport/tema;
 - ALT, caption y descripción;
 - activos de marca y licencia/provenance;
@@ -220,12 +239,12 @@ No inventar hashes, pesos, IDs ni URLs. Verificar que el manifest coincide con d
 Una infografía está producida cuando:
 
 - el contrato editorial y de datos está congelado;
-- existen SVG source, PNG master y WebP por variante necesaria;
-- todos los derivados provienen del master correcto;
-- original, WebP y ancho real fueron inspeccionados;
+- existen SVG source y delivery(s) requeridos por variante;
+- los raster opcionales provienen del master correcto;
+- delivery final y ancho real fueron inspeccionados;
 - firma, texto, escala, tema y responsive pasaron QA;
 - manifest, ALT, caption, derechos y provenance están completos.
-- `explanatoryDelta` se cumple en el raster final sin depender de la explicación del autor.
+- `explanatoryDelta` se cumple en la entrega final sin depender de la explicación del autor.
 
 No está desplegada hasta que Media Library/CMS, `<picture>`, metadata, performance y QA live tengan readback. El
 estado honesto entre ambos momentos es `producción visual completa; integración/publicación pendiente`.
@@ -237,9 +256,10 @@ estado honesto entre ambos momentos es `producción visual completa; integració
 - Truncar una escala para dramatizar el resultado.
 - Resolver móvil con crop o texto microscópico.
 - Capturar antes de que fuentes y logos terminen de cargar.
-- Aprobar desde una preview o thumbnail y no desde el master/WebP final.
+- Aprobar desde una preview o thumbnail y no desde el delivery final.
 - Convertir WebP desde otro derivado comprimido.
-- Mantener sólo el WebP y perder SVG, master o lineage.
+- Rasterizar por costumbre sin comparar un SVG directo seguro y comprimido.
+- Mantener sólo el derivado y perder source, delivery o lineage.
 - Convertir el lenguaje visual de un caso en regla universal para el blog.
 
 ## Precedente

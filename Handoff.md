@@ -1,3 +1,13 @@
+## Sesión 2026-07-18 — Sistema escalable de infografías editoriales Efeonce
+
+> Auditados siete SVG históricos de Marketing con Manzanitas, el sello URL de Artifact Composer, cuatro familias
+> de ejemplos Semrush y las 12 variantes SVG source del pillar Web Agéntica. El canon nuevo define shell estable +
+> arquetipo semántico variable, paleta auditada, `efeoncepro.com` como firma URL y SVG directo evaluado antes que
+> raster. Quedaron sincronizados Codex/Claude en `content-marketing-studio`, `design-studio` y el carril WordPress,
+> con contrato, preset JSON y auditor SVG. Los SVG Web Agéntica son muy livianos (Brotli estimado ~3.8–4.2 KB),
+> pero siguen como source: texto vivo + filtro requieren hardening antes de entrega directa. No se modificó ni
+> publicó WordPress en esta sesión. Auditoría: `docs/audits/public-site/2026-07-18-efeonce-editorial-infographic-system.md`.
+
 ## Sesión 2026-07-18 — Investigación GSC canonizada en skills
 
 > `seo-aeo` incorpora una referencia fechada sobre Search Console API, URL Inspection, sitemaps, Indexing API y
@@ -38889,3 +38899,14 @@ El operador confirmó que el key visual 4K original ya contenía el `ON AIR` int
   usuario `1`; no hubo leak al repo ni degradación del sitio. Julio puede necesitar reautorizar Yoast AI.
 - Canon actualizado:
   [auditoría WordPress ANAM](docs/public-site/HUBSPOT_REVOPS_ANAM_WORDPRESS_PRIVATE_AUDIT_V1.md).
+## Sesión 2026-07-18 — Pillar web agéntica actualizada en privado; publicación pendiente
+
+> Post WordPress `249387`, `El fin de la web “solo para humanos”`, actualizado sobre el mismo draft con autor Julio (`1`), categoría AEO (`156`) y slug `web-agentica-agentes-ia`. El corte vigente tiene 95 bloques semánticos, 14 H2 + 6 H3, 4.448 palabras, TOC con 20 destinos resueltos, tres imágenes de cuerpo y cero freeform no vacío; conserva featured `251453`, OG/Twitter `251454` y metadata Yoast. Hash runtime `66490c4b…ef49`; estado `draft`, sin publicación.
+>
+> Se revalidaron los supuestos de WebMCP/Chrome y mercado: Origin Trial M149–M156, shipping estimado M157 todavía no consolidado, Lighthouse Agentic Browsing desde M150, y estado actual de ACP, UCP, NLWeb y A2A. La narrativa incorpora además descubrimiento post-visita, evals deterministas/probabilísticas/E2E y la separación identidad → autoridad → alcance → confirmación → evidencia.
+>
+> WAG-V02 y WAG-V03 conservan la taxonomía y arquitectura compartible; WAG-V04 agrega la cadena de autoridad con media `251479–251482`. El manifest vigente es `greenhouse-cf-web-agentica-pillar-v3-visuals-v5`. El gate `getBBox()` rechazó un overflow durante producción y la corrección pasó sin reducir tipografía. QA privada del contenido filtrado pasó en 1440×1000 y 390×844, light/dark, con 3/3 art-directions correctas, cero imágenes rotas y `scrollWidth === clientWidth`.
+>
+> Snapshot previo al refresh: `/tmp/gh-post-249387-before-web-agentica-refresh-v4-20260718.json` (`18bdd196…4ac5`). Inspección durable: `docs/operations/public-site-content-factory/post-deep-inspection-249387-2026-07-18T08-27-15+00-00.json`. Brief: `docs/public-site/WEB_AGENTICA_PILLAR_CLUSTER_BRIEF_V1.md`; spec vigente: `docs/public-site/WEB_AGENTICA_PILLAR_GUTENBERG_SPEC_V4.json`. El enlace recíproco preparado no se ejecutó y `gh_cta_clicked` no se instrumentó ad hoc.
+>
+> Cierre real pendiente: autorización humana explícita para publicar, aplicar el enlace recíproco con su guard, purgar cache y ejecutar QA live desktop/mobile. No declarar publicada antes de ese gate.

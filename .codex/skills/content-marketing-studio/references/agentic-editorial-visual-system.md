@@ -213,9 +213,9 @@ base conceptual sin texto, pero no debe decidir ni rasterizar contenido que nece
 puede producirse completamente en HTML/CSS, canvas o herramienta de diseño gobernada y luego capturarse como
 raster; registrar fuente, renderer, fonts, hash y versión igual que cualquier master.
 
-Cuando la pieza se resuelva como SVG determinístico con derivados raster, cargar además
-`deterministic-editorial-infographics.md` y aplicar su pipeline `SVG → PNG master → WebP`, art direction,
-manifest y QA de integridad/contexto.
+Cuando la pieza se resuelva como SVG determinístico, cargar además
+`deterministic-editorial-infographics.md` y decidir por evidencia entre SVG directo y derivados raster. Para
+Efeonce, cargar también `../efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md`.
 
 ### Paso 5: generar, seleccionar y auditar masters
 
@@ -252,7 +252,7 @@ Cuando una ilustración conceptual pueda confundirse con evidencia, corregir com
 
 Derivar siempre desde el master seleccionado. No encadenar compresiones desde otro derivado.
 
-Entregables recomendados por asset informativo:
+Entregables recomendados por asset informativo **raster**:
 
 - master PNG original en sRGB;
 - body WebP a `1600px` o `1440px` de ancho, manteniendo proporción útil;
@@ -356,7 +356,7 @@ Una validación local o `dry-run` no prueba Media Library ni render público. Si
 | `G2 Visual system` | concepto, motivo, invariantes, crops y exclusiones | los assets no forman una serie reconocible |
 | `G3 Prompt provenance` | prompt verbatim + modelo/config + concept ID | no se puede reproducir/auditar la intención |
 | `G4 Original-resolution QA` | master inspeccionado + hash + findings | hay anatomía, texto, logos o artefactos dudosos |
-| `G5 Derivatives/accessibility` | WebP/JPEG, tamaños, ALT/caption/description | crop, peso o metadata degradan comprensión/uso |
+| `G5 Delivery/accessibility` | SVG directo o raster, tamaños, bytes, ALT/caption/description | formato, crop, peso o metadata degradan comprensión/uso |
 | `G6 Media integration` | IDs y readback reales + placement map | IDs inventados, URLs rotas o hero duplicado |
 | `G7 Public verification` | desktop/mobile + HTTP/OG/performance | render, metadata o archivos públicos no coinciden |
 
@@ -368,7 +368,7 @@ Veredictos: `PASS`, `CONDITIONAL PASS` o `BLOCK`. Un gate bloqueado no se compen
 - Generar N assets y buscarles función después.
 - Usar una imagen por sección por simetría o para llenar espacio.
 - Aprobar desde miniatura sin revisar el master original.
-- Mantener solo el WebP/JPEG y perder el master, prompt o hash.
+- Mantener solo el derivado final y perder source/master, prompt o hash.
 - Estirar el hero para OG o recortar manos, foco y motivo sin revisión.
 - Pedir texto, cifras, logos o interfaces exactas al generador y tratarlos como confiables.
 - Presentar arte conceptual como screenshot de producto, prueba científica o caso cliente.
@@ -386,7 +386,7 @@ Veredictos: `PASS`, `CONDITIONAL PASS` o `BLOCK`. Un gate bloqueado no se compen
 2. **Visual system brief** con concepto maestro, motivo, invariantes y prohibiciones.
 3. **Prompt sheet** o prompts verbatim dentro del manifest.
 4. **Manifest versionado** con candidates, masters, hashes, derivados, QA, rights y Media IDs.
-5. **Masters originales** y derivados WebP/JPEG trazables.
+5. **Sources/masters originales** y entregas SVG/raster trazables.
 6. **Matriz de selección/QA** con veredicto a resolución original.
 7. **Metadata sheet**: filename, title, ALT, caption, descripción y disclosure.
 8. **Media registry** con attachment IDs, URLs, MIME, dimensiones y uso.

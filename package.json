@@ -53,6 +53,7 @@
     "docs:context-check": "node scripts/check-context-handoff.mjs",
     "flags:audit": "node scripts/ci/feature-flags-audit.mjs",
     "docs:context-check:strict": "node scripts/check-context-handoff.mjs --strict",
+    "content:editorial-svg:audit": "node .codex/skills/content-marketing-studio/scripts/audit-editorial-svg.mjs",
     "content:visual-manifest:lint": "node scripts/content/validate-visual-manifest.mjs",
     "next-global-entrypoint-gate": "node scripts/ci/next-global-entrypoint-gate.mjs",
     "start": "node scripts/run-next-start.mjs",
