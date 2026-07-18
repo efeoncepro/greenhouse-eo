@@ -88,6 +88,12 @@ export type CanonicalErrorCode =
   | 'growth_submission_not_found'
   | 'growth_lead_field_not_revealable'
   | 'growth_lead_reveal_reason_required'
+  // Growth CTA engine (TASK-1339).
+  | 'growth_cta_engine_disabled'
+  | 'growth_cta_invalid_input'
+  | 'growth_cta_not_found'
+  | 'growth_cta_invalid_transition'
+  | 'growth_cta_action_not_resolvable'
   // Growth AI Visibility · admin grader routes (TASK-1226/1235/1239) + review gate (TASK-1244).
   | 'grader_run_not_found'
   | 'grader_run_invalid_input'
@@ -340,6 +346,32 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     status: 400,
     message: 'Indica una razón de al menos 10 caracteres para revelar este dato (queda auditado).',
     actionable: true
+  },
+  // TASK-1339 — Growth CTA engine.
+  growth_cta_engine_disabled: {
+    status: 404,
+    message: 'El motor de CTAs no está habilitado en este entorno.',
+    actionable: false
+  },
+  growth_cta_invalid_input: {
+    status: 400,
+    message: 'Revisa los datos del CTA. Falta un campo obligatorio o un valor no es válido.',
+    actionable: true
+  },
+  growth_cta_not_found: {
+    status: 404,
+    message: 'No encontramos ese CTA o esa versión. Puede que se haya archivado o no exista.',
+    actionable: false
+  },
+  growth_cta_invalid_transition: {
+    status: 409,
+    message: 'Esa transición de estado no está permitida desde el estado actual de la versión.',
+    actionable: false
+  },
+  growth_cta_action_not_resolvable: {
+    status: 422,
+    message: 'La acción del CTA no resuelve: el formulario de destino no está publicado o la política es inválida.',
+    actionable: false
   },
   // Growth AI Visibility · admin grader routes (TASK-1226/1235/1239) + review gate (TASK-1244).
   // Errores estructurales (no se resuelven reintentando) → actionable: false; los de input
