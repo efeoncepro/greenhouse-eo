@@ -178,6 +178,7 @@ import { getGrowthAiVisibilityBusinessModelSignals } from './queries/growth-ai-v
 import { getGrowthAiVisibilityProbeSignals } from './queries/growth-ai-visibility-probe-signals'
 import { getGrowthAiVisibilityPublicIntakeSignals } from './queries/growth-ai-visibility-public-intake-signals'
 import { getGrowthAiVisibilityPublicDeliverySignals } from './queries/growth-ai-visibility-public-delivery-signals'
+import { getGrowthCtaSignals } from './queries/growth-cta-signals'
 import { getGrowthFormsSignals } from './queries/growth-forms-signals'
 import { getGrowthFormsEmailSignals } from './queries/growth-forms-email-signals'
 import { getGrowthFormsHubspotSignals } from './queries/growth-forms-hubspot-signals'
@@ -649,6 +650,7 @@ interface ReliabilityOverviewSources {
   growthAiVisibilityPublicIntake?: ReliabilitySignal[] | null
   growthAiVisibilityPublicDelivery?: ReliabilitySignal[] | null
   growthForms?: ReliabilitySignal[] | null
+  growthCta?: ReliabilitySignal[] | null
   growthFormsEmail?: ReliabilitySignal[] | null
   growthFormsHubspot?: ReliabilitySignal[] | null
   growthFormsPii?: ReliabilitySignal[] | null
@@ -1080,6 +1082,7 @@ export const buildReliabilityOverview = (
     ...(sources.growthAiVisibilityPublicIntake ?? []),
     ...(sources.growthAiVisibilityPublicDelivery ?? []),
     ...(sources.growthForms ?? []),
+    ...(sources.growthCta ?? []),
     ...(sources.growthFormsEmail ?? []),
     ...(sources.growthFormsHubspot ?? []),
     ...(sources.growthFormsPii ?? []),
@@ -1514,6 +1517,13 @@ export const getReliabilityOverview = async (
     preloadedSources.growthForms !== undefined
       ? preloadedSources.growthForms
       : await getGrowthFormsSignals().catch(() => null)
+
+  // TASK-1339 — Growth CTA engine (render/ingest errors, forja, form handoff).
+  // Sin CTAs publicados / DB vacía → steady ok.
+  const growthCta =
+    preloadedSources.growthCta !== undefined
+      ? preloadedSources.growthCta
+      : await getGrowthCtaSignals().catch(() => null)
 
   // TASK-1254 — Gate de correo corporativo (rechazos + leads sospechosos).
   const growthFormsEmail =
@@ -2515,6 +2525,7 @@ export const getReliabilityOverview = async (
     growthAiVisibilityPublicIntake,
     growthAiVisibilityPublicDelivery,
     growthForms,
+    growthCta,
     growthFormsEmail,
     growthFormsHubspot,
     growthFormsPii,

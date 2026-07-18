@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { publicCtasCorsHeaders, publicCtasOptionsResponse } from '@/app/api/public/growth/ctas/cors'
 import { ingestCtaEvent } from '@/lib/growth/ctas/ingest'
 import type { CtaPublicEventOutcome } from '@/lib/growth/ctas/contracts'
+import { recordServerErrorEventOncePerDay } from '@/lib/growth/ctas/store'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 /**
@@ -77,6 +78,13 @@ export async function POST(request: Request) {
     )
   } catch (error) {
     captureWithDomain(error, 'growth', { tags: { source: 'growth_cta_public_events_route' } })
+
+    // Breadcrumb PG best-effort (dedupe 1/día): fuente del signal growth.cta.event_ingest_error_rate.
+    try {
+      await recordServerErrorEventOncePerDay({ ctaId: null, ctaVersionId: null, surfaceId: null, reason: 'ingest_error' })
+    } catch {
+      // Sentry ya capturó el error primario; el breadcrumb jamás rompe la respuesta.
+    }
 
     return NextResponse.json({ error: MESSAGE_BY_OUTCOME.error }, { status: 503, headers })
   }

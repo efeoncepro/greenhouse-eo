@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { publicCtasCorsHeaders, publicCtasOptionsResponse } from '@/app/api/public/growth/ctas/cors'
 import { getArbitratedRenderContracts } from '@/lib/growth/ctas/readers'
+import { recordServerErrorEventOncePerDay } from '@/lib/growth/ctas/store'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 /**
@@ -48,6 +49,13 @@ export async function GET(request: Request) {
     return NextResponse.json(resolved.result, { status: 200, headers })
   } catch (error) {
     captureWithDomain(error, 'growth', { tags: { source: 'growth_cta_public_render_route' } })
+
+    // Breadcrumb PG best-effort (dedupe 1/día): fuente del signal growth.cta.render_error_rate.
+    try {
+      await recordServerErrorEventOncePerDay({ ctaId: null, ctaVersionId: null, surfaceId: null, reason: 'render_error' })
+    } catch {
+      // Sentry ya capturó el error primario; el breadcrumb jamás rompe la respuesta.
+    }
 
     return NextResponse.json({ error: 'No fue posible resolver los CTAs.' }, { status: 502, headers })
   }
