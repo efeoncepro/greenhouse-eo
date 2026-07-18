@@ -6,7 +6,9 @@
   self-relation recursiva, resolución multi-space por registry/property IDs/schema fingerprint y separación
   entre estado live, historial observado y resultado/evidencia. No inferir teamspace por prefijo de ID ni
   redescubrir schema en cada conversación; MCP queda para interacción y bootstrap, mientras CLI/runtime debe
-  consumir el command compartido + registry + API directa.
+  consumir el command compartido + registry + API directa. La implementación quedó planificada en `EPIC-032`
+  con cuatro tasks compactas: `TASK-1449` foundation/ADR, `TASK-1450` commands jerárquicos, `TASK-1451`
+  status/history y `TASK-1452` CLI+rollout. Todo sigue `to-do`; no existe aún la capability runtime.
 
 - **Link Hub controlado desde Greenhouse (decisión 2026-07-18; runtime pendiente):** `EPIC-030` y el ADR
   `docs/architecture/GREENHOUSE_LINK_HUB_CONTROL_PLANE_DECISION_V1.md` fijan a Greenhouse como SSOT/control

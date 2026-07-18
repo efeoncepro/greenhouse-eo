@@ -1521,7 +1521,11 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-1446` | `to-do` | **Glitch Production Rollout and Operational Closure.** Shadow/assisted rollout, fault recovery, QA real, runbook/manual y cierre hasta draft private. P1. Muy alto. Medio. backend-data / integration. EPIC-031. | `docs/tasks/to-do/TASK-1446-glitch-production-rollout-closure.md` |
 | `TASK-1447` | `to-do` | **Glitch Editorial Operations Desk.** Workbench queue+inspector en `/growth/glitch` para Weekly, candidatas Daily/Flash, evidencia, promoción gobernada y run recovery; thin UI sobre backend contracts, sin editor WP ni publish. P1. Alto. Alto. ui-ux / flow. UI ready no. EPIC-031. | `docs/tasks/to-do/TASK-1447-glitch-editorial-operations-desk.md` |
 | `TASK-1448` | `to-do` | **Glitch Candidate Promotion and Flash Publication Contract.** Único puente candidata Daily/Flash → `glitchFlash`: propose→confirm→execute humano, single-news sin número, idempotencia, capability, audit y DTO para Content Factory. P1. Muy alto. Medio. backend-data / command. EPIC-031. | `docs/tasks/to-do/TASK-1448-glitch-candidate-promotion-flash-contract.md` |
+| `TASK-1449` | `to-do` | **Notion Work Registry and Markdown Foundation.** ADR/reconciliación con TASK-880/577, registry multi-space, schema fingerprint, adapter único y Enhanced Markdown seguro. P1. Muy alto. Alto. backend-data / migration. EPIC-032. | `docs/tasks/to-do/TASK-1449-notion-work-registry-markdown-foundation.md` |
+| `TASK-1450` | `to-do` | **Notion Delegation and Recursive Hierarchy Commands.** Create/update/reparent idempotente para Projects, Tasks y subtasks recursivas, con dry-run, saga, cycle guards y audit. P1. Muy alto. Alto. backend-data / integration. EPIC-032. | `docs/tasks/to-do/TASK-1450-notion-delegation-recursive-hierarchy-commands.md` |
+| `TASK-1451` | `to-do` | **Notion Work Status, Results and Observed History.** Readers live+observed para propiedades, deadlines, progreso recursivo, resultado, freshness e historia honesta. P1. Alto. Alto. backend-data / webhook. EPIC-032. | `docs/tasks/to-do/TASK-1451-notion-work-status-results-observed-history.md` |
+| `TASK-1452` | `to-do` | **Governed Notion Work CLI and Agent Rollout.** CLI human/JSON sobre primitives compartidos, adopción Codex/Claude y canary gobernado en Efeonce + otro space. P1. Alto. Medio. backend-data / command. EPIC-032. | `docs/tasks/to-do/TASK-1452-governed-notion-work-cli-agent-rollout.md` |
 
 ## Siguiente ID disponible
 
-`TASK-1449`
+`TASK-1453`

@@ -1,5 +1,13 @@
 # changelog.md
 
+## 2026-07-18 — EPIC-032: Notion Work Management Control Plane planificado
+
+- Se registraron `EPIC-032` y cuatro tasks compactas (`TASK-1449…1452`) para convertir la delegación y consulta
+  de trabajo Notion en una capability multi-space por commands/readers y CLI: registry+Enhanced Markdown,
+  jerarquía recursiva, estado/resultados/historia observada y rollout de agentes.
+- El plan exige reconciliar `TASK-880` y `TASK-577` antes de implementar para conservar un solo cliente seam y
+  un solo write bridge. Cambio sólo documental: no habilita runtime, flags, migrations ni writes Notion.
+
 ## 2026-07-18 — TASK-1431: Growth CTA Action Registry + navegación gobernada (code complete, rollout pendiente)
 
 - El action router monomórfico del motor de CTAs se reemplazó por un **Action Registry tipado**
