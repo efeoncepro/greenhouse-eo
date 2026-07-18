@@ -44,7 +44,8 @@ gh_form_success_action_clicked
 
 | Superficie | Eventos `gh_` | Params propios (sumados al allowlist base) |
 |---|---|---|
-| **CTA / botón** | `gh_cta_viewed`, `gh_cta_clicked` | `cta_id`, `cta_kind`, `cta_location`, `cta_variant`, `destination_id` |
+| **CTA / botón (ad-hoc de host)** | `gh_cta_clicked` (rail legacy pre-motor, vivo en redes-sociales) | `cta_id`, `cta_kind`, `cta_location`, `cta_variant`, `destination_id` |
+| **Motor Growth CTA (`<greenhouse-cta>`, TASK-1339/1340)** | `greenhouse_cta_viewed/clicked/dismissed/form_opened/form_submitted/error` — namespace canónico del arch spec CTA §13 (deliberado, ≠ `gh_`, NO armonizar; deprecar-no-renombrar protege al rail legacy) | SoT `CTA_TELEMETRY_ALLOWED_PAYLOAD_KEYS` (`src/lib/growth/ctas/contracts.ts`): `cta_id/cta_slug/cta_version_id/cta_kind/cta_location/campaign_slug/surface_id/placement/variant_id/action_kind/form_slug/form_key/form_submission_id/reason_class/renderer_version/contract_version/page_uri` |
 | **Meeting embed** | `gh_meeting_embed_viewed`, `gh_meeting_embed_loaded`, `gh_meeting_embed_failed` | `surface_id`, `surface_kind`, `destination_id`, `meeting_provider`, `reason_class` |
 | Página | `gh_page_viewed` | `page_uri`, `page_type` |
 | Scroll | `gh_scroll_depth_reached` | `percent` (enum 25/50/75/90/100) |

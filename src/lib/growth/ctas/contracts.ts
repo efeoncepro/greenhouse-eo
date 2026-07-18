@@ -218,6 +218,53 @@ export const CTA_INGEST_REJECTION_REASONS = [
 ] as const
 export type CtaIngestRejectionReason = (typeof CTA_INGEST_REJECTION_REASONS)[number]
 
+// ─── Telemetría browser (greenhouse_cta_*) — SoT de la familia (TASK-1340) ─────
+
+/**
+ * Eventos browser/host-facing del motor (arch §13). Namespace `greenhouse_cta_*`
+ * DELIBERADAMENTE distinto del interno `growth.cta.*` (no armonizar) y del rail
+ * legacy ad-hoc `gh_cta_clicked` de widgets WordPress pre-motor (deprecar-no-
+ * renombrar; deslinde registrado en TRACKING-PLAN §CTAs). Espejo browser:
+ * `RENDERER_GTM_EVENTS` en `src/growth-cta-renderer/telemetry.ts` (parity test).
+ */
+export const CTA_GTM_EVENT_NAMES = [
+  'greenhouse_cta_viewed',
+  'greenhouse_cta_clicked',
+  'greenhouse_cta_dismissed',
+  'greenhouse_cta_form_opened',
+  'greenhouse_cta_form_submitted',
+  'greenhouse_cta_error',
+] as const
+export type CtaGtmEventName = (typeof CTA_GTM_EVENT_NAMES)[number]
+
+/**
+ * Allowlist DURA de params de la familia CTA (doc 04 §2 + arch §13): identidad por
+ * PARÁMETRO (`cta_id`/`cta_slug`/`cta_location`…), nunca un evento por superficie.
+ * Sin PII, sin policies server-only. Espejo browser: `RENDERER_ALLOWED_PAYLOAD_KEYS`
+ * (mismo archivo de telemetry; parity test los mantiene idénticos).
+ */
+export const CTA_TELEMETRY_ALLOWED_PAYLOAD_KEYS = [
+  'event',
+  'cta_id',
+  'cta_slug',
+  'cta_version_id',
+  'cta_kind',
+  'cta_location',
+  'campaign_slug',
+  'surface_id',
+  'placement',
+  'variant_id',
+  'action_kind',
+  'form_slug',
+  'form_key',
+  'form_submission_id',
+  'reason_class',
+  'renderer_version',
+  'contract_version',
+  'page_uri',
+] as const
+export type CtaTelemetryAllowedPayloadKey = (typeof CTA_TELEMETRY_ALLOWED_PAYLOAD_KEYS)[number]
+
 // ─── Outbox events canónicos del motor (internos growth.cta.*, §13) ────────────
 
 /** Transición de lifecycle de una versión; se emite in-tx con la transición. Payload v1. */
