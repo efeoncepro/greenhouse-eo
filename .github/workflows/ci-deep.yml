@@ -26,7 +26,9 @@ jobs:
   coverage:
     name: Coverage and deep test observability
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # 2026-07-18: subido de 20 junto con el timeout del step Coverage (10→17);
+    # setup (checkout+install+playwright) toma ~3 min — 20 quedaba sin holgura.
+    timeout-minutes: 25
     env:
       CI: true
       NEXT_TELEMETRY_DISABLED: 1
@@ -77,7 +79,11 @@ jobs:
 
       - name: Coverage
         run: pnpm test:coverage
-        timeout-minutes: 10
+        # Instrumented full suite (~9.8k tests, 2026-07-18) exceeds 10 minutes on
+        # the 2-core runner: the old timeout killed a healthy run at exactly
+        # start+10:00 (release 9f00a1715) leaving the summary as n/a. Headroom
+        # bounded by the job-level 20-minute limit.
+        timeout-minutes: 17
 
       - name: Test observability summary
         if: always()
