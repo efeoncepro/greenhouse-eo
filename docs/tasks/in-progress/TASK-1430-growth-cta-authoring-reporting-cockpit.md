@@ -11,9 +11,14 @@
   limpios · SQL vivo (gate TASK-893) · GVC `task-1430-growth-cta-cockpit` (1440, 17 frames) +
   `-mobile` (390, 9 frames) mirados en loop. Docs: arch §28 + skill (espejos) + funcional +
   manual + changelog + Handoff.
-- **Estado: `code complete, rollout pendiente`** — falta push a develop (señal del operador),
-  smoke staging (authoring + lifecycle + kill switch live) y GVC staging 1440/390. La task se
-  mantiene `in-progress` hasta completar el Runtime Rollout Completion Gate.
+- **Estado: `code complete + staging VERIFICADO; producción pendiente del próximo release train`.**
+  Push a develop autorizado y ejecutado (`787f594ed`); deploy staging READY
+  (`dpl_CF21oKbss8x5Qdw4xM1S3qqUEPPF`, resuelto vía picker ISSUE-123). Smoke staging: GET
+  list/detail 200 con métricas reales (`coverage=impressions_undercounted` operando live) +
+  kill-switch GET con 4 entradas de audit + **POST author 201 con `suppressionPolicy`
+  persistido round-trip** (draft `task-1430-smoke-cockpit-draft`, targeting a ruta que nunca
+  matchea, NUNCA publicar). GVC staging 1440 (17 frames) + 390 (9 frames) OK. La task queda
+  `in-progress` hasta que el release train promueva develop→main (mismo criterio que TASK-1431).
 - Nota ambiente local (ajena a la task): ADC de gcloud vencida + `GOOGLE_APPLICATION_CREDENTIALS_JSON`
   corrupto en `.env.local` — `pg:doctor` falla por eso; el SQL vivo se verificó vía Cloud SQL proxy
   con token del CLI. Pendiente del operador: `gcloud auth login` + `gcloud auth application-default login`.
