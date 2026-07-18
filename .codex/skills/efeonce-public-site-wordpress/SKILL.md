@@ -1,6 +1,6 @@
 ---
 name: efeonce-public-site-wordpress
-description: Operate and update the Efeonce public WordPress site safely. Use for efeoncepro.com, Kinsta, WordPress REST/WP-CLI, WP Abilities, Ohio theme, Elementor, public landing pages, Greenhouse-to-WordPress bridge, Growth Forms embeds, HubSpot attribution, custom Elementor widgets, AI Content Factory/Gutenberg workflows, post-publication search discovery/index observation, public-site layout incidents, authenticated discovery, runtime repo binding, or EPIC-019/TASK-1111/TASK-1116/TASK-1122/TASK-1123 work.
+description: Operate and update the Efeonce public WordPress site safely. Use for efeoncepro.com, Kinsta, WordPress REST/WP-CLI, WP Abilities, Ohio theme, Elementor, public landing pages, WordPress taxonomy/category or permalink migrations, Yoast Premium redirects, Greenhouse-to-WordPress bridge, Growth Forms embeds, HubSpot attribution, custom Elementor widgets, AI Content Factory/Gutenberg workflows, post-publication search discovery/index observation, public-site layout incidents, authenticated discovery, runtime repo binding, or EPIC-019/TASK-1111/TASK-1116/TASK-1122/TASK-1123 work.
 ---
 
 # Efeonce Public Site WordPress
@@ -41,6 +41,7 @@ Read the minimal set:
 | Measurement/tagging (GTM containers, dataLayer, GA4 events on the site) | `docs/reference/measurement-gtm-ga4/` (start with `04-greenhouse-gh-event-convention.md`; live container `GTM-NGHPGRLZ`) |
 | AI Content Factory, Gutenberg posts, draft/private clones | `references/content-factory-gutenberg.md` |
 | Agentic blogpost from governed write through human publication and live QA | `references/agentic-blogpost-end-to-end.md` |
+| Category hierarchy, published-post permalink or Yoast redirect migration | `references/taxonomy-permalink-migrations.md` + `references/agentic-blogpost-end-to-end.md` |
 | Post-publication sitemap, GSC observation, indexing request or Platform Properties | `references/agentic-blogpost-end-to-end.md` + `.codex/skills/seo-aeo/references/google-search-console-api-indexing.md` |
 | Direct SVG infographics, `<picture>`, Media Library, ALT/long description, featured/OG raster | `references/content-factory-gutenberg.md` + `.codex/skills/seo-aeo/references/editorial-image-seo.md` |
 | Custom Elementor widget/plugin work | `references/custom-elementor-widgets.md` |

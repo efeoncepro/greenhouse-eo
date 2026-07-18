@@ -1,3 +1,58 @@
+## Sesión 2026-07-18 — Pillar Web Agéntica publicado y bidireccional
+
+> Publicado `El fin de la web “solo para humanos”: cómo preparar tu sitio para los agentes de IA` como post WordPress `249387` en
+> `https://efeoncepro.com/aeo/web-agentica-agentes-ia/`. El body final mantiene hash
+> `6ba9232e…7c94`, 99 bloques gobernados, 14 H2 + 6 H3, 20 destinos de TOC y siete `<picture>` SVG. Portada C15:
+> featured `251553`, OG/Twitter `251554`. QA live desktop/mobile y light/dark: canonical, index/follow, schema,
+> sitemap, media y `currentSrc` correctos, sin overflow.
+>
+> Enlaces bidireccionales verificados: artículo → landing `3`; landing `/desarrollo-sitios-web/` → artículo `1`,
+> visible a 1440 y 390 px. La landing conserva H1, shell y forms. No se añadió medición ad hoc. Snapshots remotos:
+> `/tmp/gh-post-249387-before-publish-c15-20260718.json` y
+> `/tmp/gh-page-250816-before-web-agentica-reciprocal-link-20260718.json`. Auditoría:
+> `docs/audits/public-site/2026-07-18-web-agentica-pillar-publication.md`. Deuda ajena no bloqueante: un asset
+> 404 de Surround Discovery en Related Posts; body/portada de Web agéntica están íntegros.
+>
+> Ajuste de título post-publicación aplicado con `wp_update_post`: el slug y permalink no cambiaron; el SEO
+> title explícito de Yoast permanece `Web agéntica: guía para sitios preparados para agentes de IA %%sep%%
+> %%sitename%%`, mientras `og:title` y schema heredan el nuevo título editorial. Yoast 28 no emite
+> `twitter:title`; X/Twitter usa el OG fallback y el meta específico quedó vacío. Snapshot remoto:
+> `/tmp/gh-post-249387-before-title-v2-20260718.json`; rollback local:
+> `tmp/rollback-web-agentica-title-v2.php`. Caché Kinsta purgada.
+>
+> Migración de categoría aplicada por la vía WordPress: AEO (`156`) ahora es raíz (`parent=0`) mediante
+> `wp_update_term()`. Yoast Premium guarda cuatro 301 plain desde los tres posts publicados y el archive bajo
+> `/loop-marketing/aeo/`; readback del manager `71` redirects totales. Canonical, `og:url`, BreadcrumbList,
+> archive cards y sitemaps usan `/aeo/`. La landing enlaza directo al nuevo canonical mediante
+> `Elementor\Document::save()`. Snapshots remotos: `/tmp/gh-category-156-before-root-migration-20260718.json`,
+> `/tmp/gh-yoast-redirects-before-aeo-root-migration-20260718.json` y
+> `/tmp/gh-page-250816-before-aeo-canonical-link-20260718.json`. QA:
+> `.captures/aeo-category-root-migration-2026-07-18/report.json`. Residual ajeno: el drawer móvil global del
+> archive Ohio extiende `6px` el `scrollWidth`; no nace de las cards ni de la jerarquía AEO.
+>
+> Cierre de canonización: una flota auditó WordPress/Yoast, sistema visual y trazabilidad. El artículo ya no
+> contiene anchors hacia `/loop-marketing/aeo/`; snapshot remoto
+> `/tmp/gh-post-249387-before-canonical-internal-links-20260718.json`, purge Kinsta y readback live completos.
+> Inspección final post-migración:
+> `docs/operations/public-site-content-factory/post-deep-inspection-249387-2026-07-18T11-37-13+00-00.json`.
+> Decisión durable: `docs/public-site/decisions/PDR-015-aeo-categoria-editorial-raiz.md`. Las skills espejo
+> canonizan `wp_update_term`, primary category Yoast, redirects y normalización; los operating models visuales
+> canonizan SVG art-directed, footer-only, portada premium, provenance `gpt-image-2`, anatomía/cultura y crops.
+> Deuda honesta adicional: los siete diagramas complejos aún carecen de descripción larga dedicada.
+
+## Sesión 2026-07-18 — Portada Web Agéntica C15 seleccionada (histórico preintegración)
+
+> Seleccionado `WAG-V01-C15` para la portada de `El fin de la web “solo para humanos”`: master `2048×1152`
+> producido por el CLI canónico con `gpt-image-2` + `quality=high`, anatomía del índice robótico corregida con
+> referencia explícita y fondo convertido en un degradado continuo blanco cálido → azul luminoso → azul nave.
+> Score editorial `49/50`; derivados v3 featured `1600×900`, OG `1440×756` y card `1152×1152` viven en
+> `ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/exports/`. Prompts, candidatos, proofs,
+> hashes y decisiones están en el mismo run; el canon reusable quedó en
+> `docs/operations/public-site-content-factory/EDITORIAL_COVER_KEY_VISUAL_OPERATING_MODEL_V1.md` y sus pointers
+> fueron sincronizados en las skills espejo. Este bloque conserva el corte previo a integración; el estado live
+> vigente está documentado arriba. La metodología ya es reusable, pero la skin de portadas no debe declararse
+> universal antes de dos pilotos adicionales.
+
 ## Sesión 2026-07-18 — Artículo Agent Skills publicado y verificado
 
 > El post WordPress `250748`, `«I Know Kung Fu»: el momento Matrix de los Agent Skills`, pasó revisión final de

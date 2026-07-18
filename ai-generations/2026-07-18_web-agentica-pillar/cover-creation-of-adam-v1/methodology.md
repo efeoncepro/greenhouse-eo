@@ -14,6 +14,10 @@
 6. **Generar no equivale a seleccionar.** Cada candidato conserva prompt, hash, estado y motivo. Las rutas descartadas son evidencia del sistema, no desperdicio invisible.
 7. **Los crops son parte del concepto.** El master sólo se aprobó después de comprobar que `1.905:1` y `1:1` preservaban ventana e índices.
 8. **La marca no se delega al generador.** Paleta y materialidad pueden dirigirse; logo, URL, título y chrome exacto se componen determinísticamente si el canal los requiere.
+9. **Un gesto cultural se valida por topología, no por silueta.** En una mano, la posición del pulgar fija el lado radial; el índice debe nacer junto a él. Una pose que “parece señalar” puede ser anatómicamente un meñique o un dedo medio. Si hay ambigüedad, se rechaza y se usa una referencia anatómica explícita.
+10. **El modelo exigido requiere provenance verificable.** El generador conversacional no expuso `model_id`; cuando se exigió GPT Image 2, la producción migró al CLI canónico `pnpm ai:image`, que devolvió `gpt-image-2 · high · 2048x1152`. Nunca inferir el modelo por calidad aparente.
+11. **Punch no significa oscuridad.** Se obtuvo mediante escala del foco, diagonal, contraste blanco/navy, profundidad cromática y un único fulcro naranja; no mediante fondo negro, neón, partículas o glow.
+12. **Un gradiente premium describe profundidad; no dibuja otra forma.** Los triángulos blanco/azul añadían energía pero competían con el foco. La versión aprobada usa una transición continua blanco cálido → azul hielo → azul activo → navy, con micrograno para evitar banding y centro luminoso para separar el objeto.
 
 ## Flujo reusable de nueve gates
 
@@ -26,8 +30,10 @@
 | 5. Divergencia | ¿Se probaron rutas realmente distintas? | Tres candidatos controlados, no tres cambios cosméticos. |
 | 6. Convergencia | ¿Qué candidato gana por evidencia? | Scorecard 0–50, miniatura y original al 100%. |
 | 7. Iteración | ¿Se cambia una variable identificable? | Prompt de edición con preservaciones y cambios explícitos. |
-| 8. Derivación | ¿Sobrevive a sus superficies? | Featured, OG y card desde el master, nunca desde otro derivado. |
-| 9. Integración | ¿El CMS devuelve lo esperado? | Upload, readback, HTTP, metadata y QA live; fuera del alcance de esta ronda. |
+| 8. Integridad cultural | ¿Anatomía, gesto, símbolo y lectura sobreviven otros contextos? | Inspección topológica, silueta a thumbnail y referencia anatómica si aplica. |
+| 9. Provenance | ¿El provider/model requerido está demostrado? | Respuesta CLI/API con modelo/calidad/tamaño; no inferencia. |
+| 10. Derivación | ¿Sobrevive a sus superficies? | Featured, OG y card desde el master, nunca desde otro derivado. |
+| 11. Integración | ¿El CMS devuelve lo esperado? | Upload, readback, HTTP, metadata y QA live; fuera del alcance de esta ronda. |
 
 ## Dirección candidata para el blog
 
@@ -42,6 +48,17 @@
 - copy fuera del raster salvo que se componga de forma determinística;
 - centro crop-safe y derivados validados antes de integrar;
 - score mínimo `42/50`, objetivo premium `46/50`.
+- ningún score compensa un blocker de anatomía, gesto cultural, verdad editorial, derechos o provenance exigida.
+
+## Gate anatómico y cultural para manos/gestos
+
+1. Identificar palma/dorso y ubicar el pulgar.
+2. Determinar lado radial (pulgar) y cubital (meñique).
+3. Seguir cada dígito desde el metacarpo hasta la punta; no nombrarlo sólo por su posición aparente.
+4. Verificar que el índice nace adyacente al pulgar y que medio/anular/meñique permanecen plegados cuando el gesto es señalar.
+5. Revisar lecturas ofensivas o alternativas por mercado: dedo medio, meñique proyectado, gesto de arma, cuernos o V.
+6. Repetir la prueba a resolución original y a `160px` de ancho.
+7. Si falla, usar una referencia anatómica recortada con rol explícito; no intentar corregir con caption.
 
 ### Lo que no debe universalizarse desde un solo piloto
 
@@ -57,4 +74,3 @@ La dirección de arte del blog será reconocible si conserva **criterio, aire, p
 ## Próxima validación del sistema
 
 Aplicar el mismo flujo a dos artículos con tesis y medios diferentes. Comparar si la familia se reconoce sin repetir manos, interfaz ni composición. Sólo entonces promover los invariantes visuales aprobados a una guía transversal del blog.
-

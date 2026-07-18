@@ -58,7 +58,7 @@ Leyenda tagging: `✅` taggeado y verificado en GA4 · `⏳` pendiente · `n/a` 
 | `social_meeting_audit_fallback` | meeting_booking | `/servicios/redes-sociales/` · `audit_fallback` | ✅ `dataLayer` | `gh_cta_clicked` → pendiente de tag GA4 | no | ⏳ pendiente | Fallback visible si el Growth Form no renderiza. |
 | `social_meeting_tab` | meeting_booking | `/servicios/redes-sociales/` · `final_cta` | ✅ `dataLayer` | `gh_cta_clicked` → pendiente de tag GA4 | no | ⏳ pendiente | Tab que cambia de Auditoría a Reunión. |
 | `social_meeting_direct_fallback` | meeting_booking | `/servicios/redes-sociales/` · `meeting_embed` | ✅ `dataLayer` | `gh_cta_clicked` → pendiente de tag GA4 | no | ⏳ pendiente | Link directo a HubSpot si el iframe no aparece o el usuario prefiere nueva pestaña. |
-| `web_agentica_pillar` | editorial_resource | `/desarrollo-sitios-web/` · `two_visitors` | ⏳ no implementado | `gh_cta_clicked` → pendiente de contrato runtime y tag GA4 | no | ⏳ pendiente | Enlace recíproco a la pillar `El fin de la web “solo para humanos”`; no debe activarse mientras el post `249387` siga en draft ni emitir un evento ad hoc antes de gobernar la familia `gh_cta_*`. |
+| `web_agentica_pillar` | editorial_resource | `/desarrollo-sitios-web/` · `two_visitors` | enlace editorial implementado; sin dataLayer | medición pendiente de contrato runtime; no emitir `gh_cta_clicked` ad hoc | no | ⏳ pendiente | Enlace recíproco live hacia la pillar pública `El fin de la web “solo para humanos”: cómo preparar tu sitio para los agentes de IA`. El artículo devuelve tres enlaces a la landing. La bidireccionalidad editorial está verificada; la instrumentación sigue separada y pendiente de gobernanza. |
 
 ## Meeting embeds
 

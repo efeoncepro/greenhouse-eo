@@ -18,7 +18,7 @@
 
 ## Composición
 
-- arquetipo: `metaphor | network | cycle | path | comparison | layered-model | dataviz`
+- arquetipo: `metaphor | network | cycle | path | comparison | layered-model | dataviz | frontier-landscape | architectural-cutaway | ecosystem-map | evaluation-circuit | two-axis-maturity | inspection-route | authority-chain`
 - por qué este arquetipo representa la relación:
 - ruta de lectura:
 - detalle que debe sobrevivir al thumbnail:
@@ -71,6 +71,7 @@
 - OG/Twitter raster:
 - destino social, ratio, safe area y preview:
 - estado por canal: `body_ready | featured_ready | og_ready | social_ready | integrated | verified`
+- observación de indexación: `not_checked | indexed_observed | not_indexed_observed` (asíncrona; nunca inferirla desde `verified`)
 
 ## QA
 
@@ -83,6 +84,8 @@
 - [ ] thumbnail/social según contrato
 - [ ] contraste y tamaño de texto
 - [ ] tamaño proyectado en CSS px y LayoutShift mobile
+- [ ] `currentSrc`/`naturalWidth` correctos en cada combinación viewport × tema
+- [ ] ratio reservado estable; sin CLS al seleccionar/cambiar `<source>`
 - [ ] sello `efeoncepro.com` canónico
 - [ ] wordmark y sello únicamente dentro del footer para body Efeonce
 - [ ] ALT breve + descripción larga equivalente cuando la imagen es compleja

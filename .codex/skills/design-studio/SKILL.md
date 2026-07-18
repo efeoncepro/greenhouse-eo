@@ -95,6 +95,11 @@ argument-hint: "[tarea o pregunta — ej: 'audita este key visual', 'diseña una
   existe una decisión analítica compleja. Para marca Efeonce, cargar además
   `../content-marketing-studio/efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md`. En web, aplicar además
   `../seo-aeo/references/editorial-image-seo.md`; SVG vectorial no necesita `@2x` y featured/OG conserva raster.
+- ¿Una **portada/featured/hero/OG editorial Efeonce**? → cargar
+  `docs/operations/public-site-content-factory/EDITORIAL_COVER_KEY_VISUAL_OPERATING_MODEL_V1.md`. El canon exige
+  tesis visual, divergencia estructural, modelo/provenance demostrados, iteración de una variable, punch a
+  thumbnail, anatomía/seguridad cultural y crops reales. La metáfora, interfaz, manos, gradiente y paleta de un
+  piloto son variables del artículo, no una skin universal del blog.
 - ¿**Motion**/animación/identidad kinética a implementar? → **`motion-design`** (design-studio
   la dirige conceptualmente).
 - ¿Formato/algoritmo/cadencia **por red social**? → **`social-media-studio`** (el KV alimenta

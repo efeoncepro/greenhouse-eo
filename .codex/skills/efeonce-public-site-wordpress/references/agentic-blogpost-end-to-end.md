@@ -213,7 +213,12 @@ viewport/theme/CLS checks. For Efeonce body pieces, wordmark + URL + source/as-o
 
 Post-level SEO must be explicit and independently read back:
 
-- H1 and SEO title serve their different jobs;
+- `post_title`, rendered H1, SEO title, Open Graph title and schema headline are
+  related but distinct outputs. Change the intended editorial title in
+  `post_title`; keep `_yoast_wpseo_title` search-oriented when a shorter SERP
+  title is useful; read back the live H1, `<title>`, `og:title`, Twitter card
+  fallback and schema `headline` independently. Do not infer that changing one
+  field updated every surface;
 - meta description is factual, concise, and aligned with the article;
 - focus phrase matches the editorial/search decision;
 - primary category matches the visible category and permalink strategy;
@@ -242,11 +247,19 @@ user with a similar display name.
 
 ## 8. Slug, Category, Tags, and Canonical Surface
 
+For a live category hierarchy or permalink migration, load
+`taxonomy-permalink-migrations.md`; it owns the inventory, core term mutation,
+Yoast Premium redirect and migration QA contract.
+
 - Keep the slug stable, lowercase, and kebab-case.
 - Treat category as URL architecture because the current post permalink includes
   category. Changing category on a published post requires redirect, canonical,
   archive, breadcrumb, and internal-link analysis.
 - Assign one intentional category and align the Yoast primary category.
+- A hierarchy-only migration must preserve the category term ID and verify the
+  Yoast primary category on every affected post. Promote/reparent with
+  `wp_update_term()`; never patch term tables with SQL or delete/recreate the
+  term.
 - Use only useful, existing tags. Reject demo, typo, duplicate, and near-synonym
   tags; an empty curated set is better than taxonomy noise.
 - Check archive cards, excerpt, featured image, breadcrumb, related content, and
@@ -356,6 +369,10 @@ including CTA and media links. Check redirects and final destinations.
 - Verify all TOC and in-page anchors resolve to unique elements.
 - Confirm internal links use the canonical route and do not point to previews,
   obsolete categories, or redirected drafts.
+- For a pillar that supports a service landing, verify the intended reciprocal
+  link in both directions after any permalink change. Redirects preserve old
+  traffic; they do not replace updating owned internal links to the canonical
+  URL.
 - Re-run WordPress manifest/slug/title searches and Think route probes after
   publication. No second indexable copy may exist.
 

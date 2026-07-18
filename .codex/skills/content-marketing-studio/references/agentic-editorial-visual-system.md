@@ -182,6 +182,12 @@ responsive, shareability y estados por canal— vive en
 `docs/operations/public-site-content-factory/EDITORIAL_INFOGRAPHIC_OPERATING_MODEL_V1.md`. No extender la regla
 footer-only a hero/featured/OG: esas superficies declaran crop, firma y raster social-safe por separado.
 
+Para hero/featured/OG cargar
+`docs/operations/public-site-content-factory/EDITORIAL_COVER_KEY_VISUAL_OPERATING_MODEL_V1.md`. La portada se
+audita como key visual: tesis, foco, divergencia, provenance verificable cuando se exige modelo, punch a
+thumbnail, seguridad anatómica/cultural, crops y blockers duros. No reutilizar automáticamente la paleta,
+metáfora, manos, interfaz o fondo de otro artículo.
+
 Dos pruebas de calibración: si al retirar el logo la pieza deja de sentirse de la marca, falta sistema visual;
 si el logo domina la lectura, la firma está sobredimensionada.
 

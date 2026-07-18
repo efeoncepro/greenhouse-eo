@@ -1,0 +1,28 @@
+Edit reference image 1 using reference image 2 solely as an anatomical pose guide.
+
+REFERENCE ROLES
+- Reference image 1 is the LOCKED MASTER for crop, composition, background, human hand, interface, orange authorization segments, lighting, colors and robotic material.
+- Reference image 2 is the ANATOMY-ONLY GUIDE. It shows the correct hand topology and desired pointing pose: wrist enters from upper-right, palm is visible, the INDEX finger extends down-left, the THUMB crosses over the three folded fingers, and MIDDLE/RING/LITTLE fingers remain curled together. Ignore its skin, background and partial interface.
+
+LOCKED FROM REFERENCE 1 — DO NOT CHANGE
+- exact 2048x1152 crop and camera;
+- human hand and all its details;
+- both interface planes, their perspective, content and registration;
+- exactly five separate orange authorization segments;
+- diagonal white/blue/deep-navy field, texture, light bands, shadows and color values;
+- overall scale, punch and magazine-cover finish.
+
+CHANGE ONLY THE ROBOTIC HAND
+- Rebuild the robotic hand using the EXACT DIGIT TOPOLOGY AND PALM ORIENTATION shown in reference image 2.
+- The palm must be visibly oriented toward the viewer/lower-left just as in reference 2.
+- The single extended digit is the INDEX finger. Its base must visibly originate beside the thumb on the radial side of the palm.
+- The THUMB must visibly cross over and restrain the folded MIDDLE, RING and LITTLE fingers.
+- MIDDLE, RING and LITTLE fingers form one compact curled group inside the palm; none of them protrudes or points.
+- Match the general target of reference 1: the index points down-left and stops just before the agent-facing blueprint plane.
+- Preserve the robot material language from reference 1: deep Efeonce navy satin shells, active-blue precision joints, small matte-white fingertip/collars, museum-grade industrial design.
+- Exactly five mechanically plausible digits and correct joints. The result must be anatomically legible at full resolution and as a 160px-wide silhouette.
+
+CULTURAL SAFETY GATE
+The gesture must not be interpretable as an extended middle finger, extended little finger, obscene gesture, gun gesture, horns or peace sign. If necessary, favor the explicit palm-and-thumb topology of reference image 2 over elegance.
+
+No edits outside the robotic hand. No text, logo, watermark, new icons, spark, glow, black, extra objects or changes to the human hand.

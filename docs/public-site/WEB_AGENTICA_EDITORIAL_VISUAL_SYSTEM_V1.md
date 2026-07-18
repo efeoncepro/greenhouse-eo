@@ -1,8 +1,9 @@
 # Sistema visual editorial — Web agéntica
 
-> **Estado:** producción visual v7 integrada en el borrador privado; QA contextual v7 y publicación pendientes.
+> **Estado:** producción visual v7 publicada y verificada en vivo.
 > **Fecha:** 2026-07-18.
-> **Artículo:** borrador WordPress `249387`, `El fin de la web “solo para humanos”`.
+> **Artículo:** WordPress `249387`, `El fin de la web “solo para humanos”: cómo preparar tu sitio para los agentes de IA`, publicado en
+> `https://efeoncepro.com/aeo/web-agentica-agentes-ia/`.
 > **Manifest:** `WEB_AGENTICA_VISUAL_ASSET_MANIFEST_V1.json`.
 
 ## Decisión editorial
@@ -37,7 +38,7 @@ la relación de cada argumento debe elegir su propia composición semántica.
 - **Slot:** featured y OG; no se repite en body.
 - **Función:** instalar que una persona y un agente convergen sobre la misma infraestructura web.
 - **No es:** interfaz real, robot humanoide, evidencia de producto ni promesa de autonomía.
-- **Estado:** aprobado e integrado en el borrador; no cambia en v2.
+- **Estado:** aprobado, integrado y verificado en archive card, OG/Twitter y schema.
 
 ### WAG-V02 — Frontera operativa
 
@@ -134,9 +135,8 @@ textos colisiona; ningún asset de marca vive fuera del footer. La entrega suma 
 cero texto vivo, gradientes y filtros. Media Library y siete `<picture>` se completaron sobre el borrador
 `249387`.
 
-La auditoría posterior detectó que esos gates no prueban todavía tres cosas: geometría del **delivery** trazado,
-legibilidad proyectada al ancho CSS real ni CLS/currentSrc cuando mobile cambia aspect ratio. Con las unidades
-actuales, algunos tamaños mínimos proyectan por debajo de `16 CSS px`. Por eso el estado honesto es
-`integrated_private; contextual_v7_qa_pending`: antes de publicación hay que capturar las siete piezas v7 en
-desktop/mobile y tema real, medir tipo, contraste, `currentSrc`, `scrollWidth` y LayoutShift, y corregir el
-builder si falla. Los PNG sociales locales son pruebas efímeras, no derivados `social-ready` publicados.
+El cierre live verificó las siete piezas en desktop/mobile y light/dark, selección correcta de `currentSrc`,
+ausencia de imágenes rotas en el artículo y `scrollWidth === clientWidth` a `1440` y `390` px. El post conserva
+14 H2 + 6 H3, 20 destinos de TOC y siete `<picture>` gobernados. Los PNG sociales locales siguen siendo pruebas
+efímeras; la portada social publicada es el JPEG C15 dedicado. La deuda transversal de descripciones largas para
+diagramas complejos permanece como mejora del sistema, no como afirmación de equivalencia accesible ya resuelta.

@@ -5,8 +5,40 @@ import { fileURLToPath } from 'node:url'
 const runDir = path.dirname(fileURLToPath(import.meta.url))
 const root = path.resolve(runDir, '../..')
 const report = JSON.parse(await readFile(path.join(runDir, 'build-report-v3.json'), 'utf8'))
-const previous = JSON.parse(await readFile(path.join(root, 'docs/public-site/WEB_AGENTICA_VISUAL_ASSET_MANIFEST_V1.json'), 'utf8'))
-const hero = previous.assets.find(asset => asset.conceptId === 'WAG-V01')
+const coverDir = path.join(runDir, 'cover-creation-of-adam-v1')
+const cover = JSON.parse(await readFile(path.join(coverDir, 'manifest.json'), 'utf8'))
+const coverPath = relativePath => path.posix.join('ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1', relativePath)
+const featuredDerivative = cover.derivatives.find(asset => asset.role === 'featured')
+const openGraphDerivative = cover.derivatives.find(asset => asset.role === 'open-graph')
+const cardDerivative = cover.derivatives.find(asset => asset.role === 'card-square')
+
+const hero = {
+  conceptId: 'WAG-V01',
+  slot: 'hero_featured_og',
+  function: cover.concept.function,
+  notFunction: cover.concept.notFunction,
+  explanatoryDelta: 'Instala la tesis de una web compartida por una persona y un agente autorizado antes de entrar a la arquitectura.',
+  status: 'published_live_verified',
+  deliveryContract: {
+    viewport: 'crop_safe', theme: 'single_theme', canvas: 'opaque', skin: 'efeonce_core',
+    rationale: 'Un master gobernado alimenta featured, Open Graph y card; cada crop se revisa por anatomía, lectura cultural y foco.'
+  },
+  production: {
+    kind: 'generated-conceptual',
+    provider: cover.generation.provider,
+    model: cover.generation.model,
+    quality: cover.generation.quality,
+    master: { path: coverPath(cover.selectedMaster.path), sha256: cover.selectedMaster.sha256, width: cover.selectedMaster.width, height: cover.selectedMaster.height, mime: cover.selectedMaster.mime },
+    derivatives: [featuredDerivative, openGraphDerivative, cardDerivative].map(asset => ({ ...asset, path: coverPath(asset.path) }))
+  },
+  metadata: cover.metadata,
+  rights: cover.rights,
+  media: {
+    featured: { id: cover.media.featuredAttachmentId, url: cover.media.urls.featured },
+    openGraph: { id: cover.media.ogAttachmentId, url: cover.media.urls.openGraph }
+  },
+  qa: cover.qa
+}
 
 const configs = [
   ['WAG-V02','frontera-operativa','body_operability_map','Después de la taxonomía de tipos de sitio.','Mostrar que disminuye la inferencia mientras aumentan operabilidad y gobierno.','La transición decisiva no es “más IA”, sino una acción explícita, gobernada y demostrable.',251514],
@@ -24,7 +56,7 @@ const assets = configs.map(([conceptId,slug,slot,context,job,caption,baseId]) =>
   return {
     conceptId, slot, context, function: job,
     notFunction: 'No es una captura de producto, un estándar normativo ni una garantía de seguridad o interoperabilidad.',
-    explanatoryDelta: caption, status: 'integrated_private',
+    explanatoryDelta: caption, status: 'published_live_verified',
     deliveryContract: {
       format: 'direct_svg', viewport: 'art_directed', theme: 'light_dark', canvas: 'opaque',
       skin: 'efeonce_core', breakpoint: '860px',
@@ -52,13 +84,13 @@ const assets = configs.map(([conceptId,slug,slot,context,job,caption,baseId]) =>
       sourceAssets: ['src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg','src/assets/fonts/Poppins-Medium.ttf','src/assets/fonts/Poppins-SemiBold.ttf','src/assets/fonts/Poppins-Bold.ttf'],
       license: 'Efeonce original', provenance: 'Deterministic SVG built locally; delivery text outlined with fontkit; no generated imagery or third-party assets.', disclosure: 'none'
     },
-    qa: { status: 'integration_pass', renderer: report.renderer, themesReviewed: true, responsiveReviewed: true, directSvgAudit: '28/28 PASS', integration: 'draft' }
+    qa: { status: 'live_pass', renderer: report.renderer, themesReviewed: true, responsiveReviewed: true, directSvgAudit: '28/28 PASS', integration: 'publish' }
   }
 })
 
 const manifest = {
   manifestId: 'greenhouse-cf-web-agentica-pillar-v7-visuals', runId: '2026-07-18_web-agentica-pillar',
-  article: { postId: 249387, slug: 'web-agentica-agentes-ia', status: 'draft' },
+  article: { postId: 249387, slug: 'web-agentica-agentes-ia', status: 'publish', url: 'https://efeoncepro.com/aeo/web-agentica-agentes-ia/' },
   visualSystem: {
     name: 'Una base, dos operadores', motif: 'Semantic maps, circuits, scales and chains; one archetype per argument.',
     themeContract: 'Light #FFFFFF and dark #111013; no decorative canvas, bubbles, gradients, glow or outer rounded frame.',

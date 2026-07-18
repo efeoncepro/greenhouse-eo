@@ -112,6 +112,12 @@ La auditoría de cierre encontró deuda que el PASS de archivo no cubre:
 - ALT breve + caption debe complementarse con descripción larga equivalente para diagramas complejos;
 - manifest, build report y spec aún duplican metadata y no registran toda la toolchain/evidencia.
 
-Resultado: `integrated_private`, no `contextually_verified`. La publicación sigue bloqueada hasta QA v7 real.
+### Cierre live posterior
+
+La autorización humana de publicación se recibió y el post `249387` se publicó el 2026-07-18. El QA live v7
+confirmó las siete composiciones en desktop/mobile y light/dark, `currentSrc` correcto, cero imágenes rotas en el
+cuerpo y ausencia de overflow a `1440` y `390` px. El estado pasa a `published; contextually_verified` para este
+artículo. La necesidad de una alternativa larga equivalente para diagramas complejos sigue siendo una mejora
+transversal del sistema y no debe darse por resuelta por el ALT breve o el caption.
 El canon detallado se promovió a
 `docs/operations/public-site-content-factory/EDITORIAL_INFOGRAPHIC_OPERATING_MODEL_V1.md`.

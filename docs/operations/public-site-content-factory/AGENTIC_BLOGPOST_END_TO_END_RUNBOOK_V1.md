@@ -754,6 +754,12 @@ shasum -a 256 ai-generations/YYYY-MM-DD_<run>/masters/* ai-generations/YYYY-MM-D
 - proteger el centro óptico y probar miniatura/card;
 - no duplicar el featured dentro del body si Ohio ya lo renderiza.
 
+Para portada/featured/hero/OG aplicar además el
+[Editorial Cover Key Visual Operating Model](EDITORIAL_COVER_KEY_VISUAL_OPERATING_MODEL_V1.md): tesis visual,
+divergencia estructural, provenance verificable del modelo cuando se exige, iteración single-change, punch a
+thumbnail, gradientes/fondos subordinados, seguridad anatómica y cultural, scorecard con blockers y derivados
+versionados. La metodología es reusable; el skin de un piloto no se convierte automáticamente en look del blog.
+
 Para SVG directo, aplicar el
 [Editorial Infographic Operating Model](EDITORIAL_INFOGRAPHIC_OPERATING_MODEL_V1.md): un único `<img src>`
 fallback dentro de `<picture>`, filename/ALT/caption/contexto HTML, alternativa larga para imágenes complejas,
@@ -806,6 +812,32 @@ Verificar como una unidad:
 
 El permalink actual usa `/%category%/%postname%/`. Cambiar la categoría de un post publicado puede cambiar su
 URL. Antes del primer publish, resolver categoría. Después, cualquier retaxonomía exige redirect/canonical plan.
+
+Cuando la retaxonomía modifica la jerarquía o el slug de una categoría ya
+publicada, aplicar el contrato completo de migración:
+
+1. inventariar término/archivo, posts asignados, posts con esa categoría como
+   primaria Yoast, enlaces internos y redirects existentes;
+2. capturar snapshot y rollback antes de escribir;
+3. mutar jerarquía con `wp_update_term()`, nunca con SQL directo;
+4. crear `301` explícitos para cada permalink afectado y para el archivo. Si
+   Yoast SEO Premium está activo, usar `WPSEO_Redirect_Manager`; su persistencia
+   normaliza rutas sin slash inicial/final, por lo que el readback debe comparar
+   valores normalizados;
+5. actualizar enlaces propios al canonical directo. En páginas Elementor, usar
+   `Document::save()` y conservar las metas Ohio fuera del árbol;
+6. purgar cachés y verificar `200/301`, un solo salto, canonical, `og:url`,
+   BreadcrumbList, cards de archivo, sitemaps, enlaces recíprocos y desktop/mobile.
+
+No declarar la migración completa mientras el contenido controlado por Efeonce
+siga enlazando a una URL antigua, aunque el redirect funcione.
+
+El H1/título WordPress, el SEO title y el título social son campos relacionados,
+pero no idénticos. Tras un ajuste editorial, inspeccionar el HTML real: Yoast
+puede mantener un SEO title optimizado mientras H1, `og:title` y schema usan el
+título editorial. En la versión 28 observada, `twitter:title` no se imprime de
+forma independiente; X/Twitter consume el fallback de Open Graph. No rellenar
+metadatos redundantes si el render final no los emite.
 
 No heredar tags demo, duplicados o typos del content hub. No crear tags sólo para repetir keywords.
 

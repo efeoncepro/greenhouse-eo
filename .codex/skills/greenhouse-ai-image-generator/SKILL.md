@@ -83,6 +83,21 @@ pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (
 - Use `generateAnimation()` for small SVG/CSS animations, not raster image generation.
 - Use the native chat image tool only for exploratory artifacts or when the user asks for an image in chat rather than a repo asset.
 
+## Editorial cover assets
+
+For an Efeonce editorial cover/featured/hero/OG, load
+`docs/operations/public-site-content-factory/EDITORIAL_COVER_KEY_VISUAL_OPERATING_MODEL_V1.md` and follow the
+direction from `design-studio`. Treat the cover as a thesis-bearing key visual, not topical decoration. If the
+contract requires `gpt-image-2`, the generation evidence must expose that model; visual quality is not proof.
+Iterate one variable at a time while restating locked geometry, editorial truth and cultural safety.
+
+Interfaces must visualize the mechanism and remain clearly conceptual, not resemble a generic SaaS dashboard or
+a fabricated product screenshot. A premium gradient creates depth and separation without wedges, triangles,
+bands, halos or near-black defaults; Efeonce does not use black as a shortcut for punch. For robotic/human hands,
+trace thumb, index, middle and little finger from base to tip at original resolution and after every crop: a pose
+that reads as middle-finger or little-finger pointing is a blocker, regardless of aesthetics. Deliver and inspect
+the master plus featured, OG and card crops independently; the crop can change anatomical and cultural meaning.
+
 ## Fal.ai API (video + media aggregator, out-of-band)
 
 Fal.ai is a programmatic media-generation aggregator — one API fronts many models: **video** (Seedance 2.0, Kling v3, PixVerse, Veo, Grok Imagine, Gemini Omni, Runway, Luma Ray, Hailuo, Wan…), **image** (flux, krea), **audio**, **3D**. Canonical client: `src/lib/ai/fal.ts` — `runFalModel({ model, input })` submits to the fal queue and polls to completion; model-agnostic (pass the fal slug, e.g. `bytedance/seedance-2.0/mini/image-to-video`). Secret resolves server-side via `FAL_API_KEY` / `FAL_API_KEY_SECRET_REF` — never hardcode the `<id>:<secret>` key.
@@ -110,9 +125,21 @@ Fal.ai is a programmatic media-generation aggregator — one API fronts many mod
 ## Hard Constraints
 
 - Never hardcode API keys or print secret values.
+- When the user or contract requires an exact model, use a path that returns the model identity. For
+  `gpt-image-2`, prefer `pnpm ai:image --model gpt-image-2 ...` and retain the CLI result with model, quality and
+  size. The built-in chat generator may be used for exploration, but its model must remain `unknown` when the
+  runtime does not expose `model_id`; never infer it from visual quality.
 - Never generate official logos or brand marks from memory.
 - Do not include visible text unless the user explicitly asks and accepts risk; image models can still struggle with precise text.
 - Do not ship assets with watermarks, fake logos, accidental letters, cropped subjects, dirty alpha edges, or background residue.
+- For hands or culturally meaningful gestures, validate topology rather than silhouette: identify palm/dorso,
+  locate the thumb/radial side, trace every digit from base to tip and inspect offensive/alternative readings at
+  original resolution and thumbnail. A mirrored crop invalidates the previous approval. If text-only prompting
+  remains ambiguous, supply a cropped anatomy reference with an explicit `ANATOMY` role and reject the result if
+  it does not preserve that topology.
+- In multi-reference edits, assign each image one explicit role (`STRUCTURE`, `IMPACT`, `ANATOMY`, `MATERIAL`,
+  `IDENTITY` or `ANTI-REFERENCE`) and state which role wins conflicts. Do not ask the model to generically
+  “combine” references.
 - Keep generated drafts out of commits unless the user asked for an exploration set.
 
 ## Closure Bar

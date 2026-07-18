@@ -7,6 +7,23 @@ const root = path.resolve(runDir, '../..')
 const input = path.join(root, 'docs/public-site/WEB_AGENTICA_PILLAR_GUTENBERG_SPEC_V4.json')
 const output = path.join(root, 'docs/public-site/WEB_AGENTICA_PILLAR_GUTENBERG_SPEC_V5.json')
 const spec = JSON.parse(await readFile(input, 'utf8'))
+spec.title = 'El fin de la web “solo para humanos”: cómo preparar tu sitio para los agentes de IA'
+
+const canonicalLinkMigrations = new Map([
+  ['https://efeoncepro.com/loop-marketing/aeo/donde-cita-la-ia/', 'https://efeoncepro.com/aeo/donde-cita-la-ia/'],
+  ['https://efeoncepro.com/loop-marketing/aeo/surround-discovery-seo-google-video-marketplace/', 'https://efeoncepro.com/aeo/surround-discovery-seo-google-video-marketplace/']
+])
+
+for (const section of spec.sections) {
+  for (const block of section.blocks) {
+    if (!Array.isArray(block.text)) continue
+    for (const fragment of block.text) {
+      if (fragment.href && canonicalLinkMigrations.has(fragment.href)) {
+        fragment.href = canonicalLinkMigrations.get(fragment.href)
+      }
+    }
+  }
+}
 
 const media = {
   'WAG-V02': { slug: 'frontera-operativa', ids: [251514, 251515, 251516, 251517], alt: 'Cuatro estados muestran cómo disminuye la inferencia y aumentan la operabilidad y el gobierno: sitio tradicional, sitio con IA, sitio preparado y web agéntica.', caption: 'La transición decisiva no es “más IA”, sino una acción explícita, gobernada y demostrable.' },

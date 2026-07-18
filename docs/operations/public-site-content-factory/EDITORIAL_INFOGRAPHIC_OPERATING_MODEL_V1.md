@@ -2,11 +2,14 @@
 
 > **Tipo:** canon operativo reusable para infografías editoriales.
 > **Estado:** vigente.
-> **Versión:** 1.0.
+> **Versión:** 1.1.
 > **Fecha:** 2026-07-18.
 > **Owner:** Content Marketing + Design Studio + Public Site.
 > **Aplica a:** artículos, pillars, guías y derivados editoriales Efeonce.
-> **Caso de calibración:** `El fin de la web “solo para humanos”`, post WordPress `249387`.
+> **Caso de calibración:** `El fin de la web “solo para humanos”: cómo preparar tu sitio para los agentes de IA`, post WordPress `249387`.
+
+El sistema se diseñó mientras la pieza usaba el título corto `El fin de la web “solo para humanos”`; el cambio
+de título no altera sus concept IDs, argumento visual ni lineage.
 
 ## 1. Propósito
 
@@ -179,6 +182,11 @@ densidad. Para decidir peso comparar transferencia gzip/Brotli del SVG con raste
 - Labels esenciales deben ser legibles en CSS pixels dentro de la columna real.
 - ALT y caption son compartidos por concepto; no cambian por tema o viewport.
 
+La verificación no se resuelve mirando el DOM declarativo: debe leer `currentSrc` en desktop/mobile y
+light/dark, comprobar `naturalWidth`/`naturalHeight`, confirmar que la relación de aspecto reservada coincide con
+la variante elegida y observar LayoutShift/CLS durante el cambio de `<source>`. Una captura visual correcta con
+el fallback equivocado no pasa el gate.
+
 ## 9. SEO, descubrimiento y accesibilidad
 
 Google Search admite SVG y descubre imágenes desde `<img src>`, incluido el `<img>` fallback dentro de
@@ -248,4 +256,3 @@ Una infografía está **producida** cuando contrato, source, delivery, metadata,
 están completos. Está **integrada** cuando Media Library y DOM tienen readback. Está **verificada** cuando la
 superficie pública sirve el archivo correcto, su semántica HTML y sus variantes sin overflow. `body-ready`,
 `featured-ready`, `OG-ready`, `social-ready` y `indexed` son estados distintos y no se heredan.
-

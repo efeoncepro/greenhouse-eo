@@ -39,6 +39,16 @@ Capture:
 ## After Save
 
 - Re-check the protected metas and hashes.
+- Read `_elementor_data` back as decoded JSON and inspect the intended widget or
+  semantic value. Raw string searches can fail because WordPress/Elementor may
+  persist URLs as escaped `\/`; normalize only for diagnostics or traverse the
+  decoded tree. A failed raw-string assertion after `Document::save()` does not
+  prove the write failed. Inspect semantic readback and the live DOM before
+  retrying, or a retry can duplicate the mutation.
+- Expect `Document::save()` to synchronize `post_content` on some documents.
+  Snapshot it, but do not require its pre-save hash to remain unchanged unless
+  the current document contract proves it should. Protect semantic content and
+  unrelated metas instead.
 - Do not treat missing `wp-content/uploads/elementor/css/post-<id>.css` immediately after save as failure. Elementor may delete generated CSS/cache; render the public page to regenerate.
 - Purge Kinsta cache after live mutation.
 - Verify in browser at desktop and mobile 390px.
@@ -78,6 +88,10 @@ Visual guardrails:
 ## Common Hazards
 
 - `Document::save()` can affect metas outside the edited widget on published Ohio pages. Protect `_thumbnail_id`, especially when `page_header_title_background_type=featured`.
+- A known failed guard is counting an unescaped URL directly in raw
+  `_elementor_data` and then treating zero matches as a failed save. Prefer a
+  decoded-tree count plus an anonymous rendered-link count; never reapply until
+  those two readbacks agree that the link is absent.
 - Elementor/Ohio may repeat ids across containers and widgets. Use semantic classes + text/structure when selecting.
 - Elementor data may already be valid JSON. When reading `_elementor_data`, try `json_decode($raw, true)` first and use `wp_unslash()` only as fallback; unconditional unslash can corrupt copied HTML/copy strings.
 - Page-level `!important` rules can override correct widget HTML/CSS; verify computed style.

@@ -24,7 +24,7 @@ El **intervalo gobernado**: una separación pequeña donde se hace visible una c
 
 ## Paleta funcional
 
-- Blanco: campo editorial y espacio negativo dominante.
+- Blanco/mineral claro: origen humano y espacio negativo.
 - Tinta `#022A4E` y azul profundo `#023C70`: estructura, profundidad y contraste.
 - Azul activo `#0375DB`: comprensión agéntica y detalle mecánico.
 - Naranja `#F55D01`, restringido: autoridad, confirmación y evidencia.
@@ -33,7 +33,8 @@ El **intervalo gobernado**: una separación pequeña donde se hace visible una c
 ## Dirección de imagen
 
 - Encuadre macro/editorial, como still life de museo contemporáneo.
-- Luz lateral suave y localizada sobre un campo blanco limpio; sombras azul-gris muy contenidas.
+- Campo diagonal de blanco mineral → azul activo → navy inequívocamente azul; nunca negro. El gradiente puede aportar punch cuando codifica la transición humano/agente y no funciona como decoración ambiental.
+- Luz lateral controlada; blanco con textura, azules con profundidad y sombras azul-gris contenidas.
 - Profundidad moderada: interfaz e índices nítidos simultáneamente.
 - La presencia agéntica es una mano robótica de diseño industrial: cerámica blanca, articulaciones mecánicas precisas y estructura azul Efeonce. Debe leerse como agente en menos de un segundo, sin convertirse en personaje humanoide.
 - La ventana central es browser-inspired, no una réplica de Apple: barra superior mínima, controles abstractos, cero trade dress literal.

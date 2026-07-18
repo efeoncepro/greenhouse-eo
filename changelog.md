@@ -1,5 +1,48 @@
 # changelog.md
 
+## 2026-07-18 — Pillar Web agéntica publicado y enlazado bidireccionalmente
+
+- Publicado el post WordPress `249387`, cuyo título final es `El fin de la web “solo para humanos”: cómo preparar tu sitio para los agentes de IA`, en
+  `https://efeoncepro.com/aeo/web-agentica-agentes-ia/`: 99 bloques gobernados, 14 H2 + 6 H3,
+  TOC de 20 destinos y siete infografías SVG art-directed light/dark y desktop/mobile.
+- La portada `WAG-V01-C15` quedó integrada como featured `251553` y OG/Twitter `251554`; schema, canonical,
+  robots, sitemap, archive card, media y caché fueron verificados en vivo.
+- La relación pillar–servicio quedó bidireccional: tres enlaces del artículo a `/desarrollo-sitios-web/` y un
+  enlace contextual de la landing hacia el artículo. QA Playwright en 1440 y 390 px confirma visibilidad,
+  recuentos exactos y ausencia de overflow. No se inventó tracking `gh_cta_clicked`; su gobernanza sigue pendiente.
+- Riesgo residual ajeno: Related Posts aún solicita una variante inexistente de la portada de Surround Discovery.
+  El body y la portada de este artículo no tienen recursos rotos. Cierre durable:
+  `docs/audits/public-site/2026-07-18-web-agentica-pillar-publication.md`.
+- El H1 se amplió post-publicación para conservar la tesis original y sumar una promesa práctica explícita. El
+  slug `web-agentica-agentes-ia` y el SEO title específico de Yoast permanecen estables; `og:title` y schema
+  heredan el nuevo título editorial. Yoast 28 no imprime `twitter:title`, por lo que X/Twitter usa el OG fallback
+  correcto y no se dejó metadata inerte. Snapshot: `/tmp/gh-post-249387-before-title-v2-20260718.json`.
+- AEO (`156`) fue promovida de hija de Loop Marketing a categoría raíz por `wp_update_term()`. Yoast SEO Premium
+  gestiona cuatro 301 explícitos —tres posts y el archive—; canonical, breadcrumbs, cards y sitemaps ya usan
+  `/aeo/`. El enlace recíproco de la landing fue actualizado al canonical mediante `Elementor\Document::save()`.
+- El cierre de canonización distribuyó y consolidó los aprendizajes en las skills espejo de WordPress, Content,
+  Design e Image Generator, el runbook agentic, los operating models visuales y `PDR-015`. El manifest general
+  ahora deriva WAG-V01 del submanifest C15 y no puede reintroducir la portada anterior; el template reusable
+  incorpora los arquetipos v7 y separa `indexed_observed` del estado de entrega. Los dos enlaces internos del
+  post que todavía dependían de 301 fueron reconciliados a sus canonicals, con snapshot, purge y nueva inspección
+  final `post-deep-inspection-249387-2026-07-18T11-37-13+00-00.json`.
+
+## 2026-07-18 — Método de portadas editoriales Efeonce y piloto Web Agéntica
+
+- La portada del pillar privado `El fin de la web “solo para humanos”` llegó a su candidato seleccionado
+  `WAG-V01-C15`: composición humano–interfaz–agente producida con `gpt-image-2`, calidad `high`, master
+  `2048×1152` y un degradado continuo blanco cálido → azul luminoso → azul nave que reemplaza los planos
+  triangulares. La topología de la mano robótica fue validada con referencia anatómica explícita para asegurar
+  que el gesto corresponde al índice y no al dedo medio o meñique.
+- Se generaron derivados featured `1600×900`, Open Graph `1440×756` y card cuadrada `1152×1152`, con score
+  editorial `49/50`, hashes y provenance reproducible. Posteriormente se integraron y verificaron en vivo como
+  media `251553` y `251554` del post WordPress `249387`.
+- El aprendizaje quedó canonizado en `EDITORIAL_COVER_KEY_VISUAL_OPERATING_MODEL_V1.md` y enlazado desde las
+  skills espejo de Content Marketing, Design Studio y AI Image Generator: metáfora editorial, roles de
+  referencia, modelo exacto, iteración de una variable, gradientes narrativos, anatomía/cultura, scorecard,
+  derivados, metadata y frontera de publicación. La metodología es estable; el lenguaje visual de la serie
+  seguirá provisional hasta validarlo en dos portadas adicionales.
+
 ## 2026-07-18 — Artículo Agent Skills publicado
 
 - Publicado `«I Know Kung Fu»: el momento Matrix de los Agent Skills` en el sitio público, preservando la voz de

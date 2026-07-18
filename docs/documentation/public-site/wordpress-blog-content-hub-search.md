@@ -1,9 +1,9 @@
 # WordPress Blog, Content Hub and Search Contract
 
 > **Tipo de documento:** Documentacion funcional
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-07-09 por Codex
-> **Ultima actualizacion:** 2026-07-09 por Codex
+> **Ultima actualizacion:** 2026-07-18 por Codex
 > **Modulo:** Public Site / WordPress / Ohio / Content Hub
 > **Runtime vigente:** `efeoncepro.com` en WordPress/Kinsta, tema activo
 > `ohio-child`, parent `ohio`
@@ -47,9 +47,12 @@ Configuracion actual:
 - Algunos accesos cortos como `/glitch/` responden, pero el canonical observado
   para Glitch apunta a `/category/glitch/`.
 
-Implicacion: la categoria puede formar parte del URL publicado. Antes de
-retaxonomizar contenido, decidir si el slug actual se conserva, si se redirige o
-si se movemos el articulo a una URL canonica nueva.
+Implicacion: la categoria primaria puede formar parte del URL publicado. Antes
+de retaxonomizar contenido, decidir si el slug actual se conserva, si se
+redirige o si el articulo se mueve a una URL canonica nueva. En un post con
+Yoast, inventariar por `_yoast_wpseo_primary_category`, no solo por categorías
+asignadas: esa selección gobierna permalink y breadcrumb aunque el post tenga
+más de una categoría.
 
 ## Taxonomia Editorial
 
@@ -64,7 +67,7 @@ Categorias reales que pueden sostener el content hub:
 
 - `glitch`
 - `loop-marketing`
-- `loop-marketing/aeo`
+- `aeo` (categoría raíz desde 2026-07-18; término `156`)
 - `inbound/seo`
 - `hubspot`
 - `hubspot/crm`
@@ -92,6 +95,36 @@ Contrato recomendado para el refresh:
   publica hasta limpiar deuda.
 - Si se necesita separar serie editorial, tema SEO y formato, evaluar una
   taxonomia custom futura en vez de sobrecargar categorias.
+
+### Migrar una categoría que participa en permalinks
+
+Una migración publicada es un cambio de rutas, no una edición cosmética de
+taxonomía. El procedimiento canónico es:
+
+1. Capturar término, padre, slug, archivo, posts asignados y posts que lo usan
+   como primaria Yoast; guardar también el inventario de redirects de Yoast.
+2. Crear snapshot y rollback antes de escribir. Cambiar la jerarquía con
+   `wp_update_term()`; no mutar tablas WordPress directamente.
+3. Recalcular las URLs de todos los posts afectados por la categoría primaria.
+4. Si Yoast SEO Premium está activo, crear redirects `301` explícitos tanto
+   para cada post como para el archivo de categoría mediante
+   `WPSEO_Redirect_Manager`. Su readback normaliza orígenes y destinos sin
+   slash inicial/final; comparar rutas normalizadas para no reportar un falso
+   negativo.
+5. Actualizar enlaces internos para que apunten directamente al canonical nuevo;
+   un `301` conserva compatibilidad, pero no reemplaza la higiene del grafo.
+   Si el enlace vive en Elementor, guardar mediante `Document::save()` y
+   proteger las metas Ohio ajenas al árbol Elementor.
+6. Purgar Elementor/Kinsta y verificar rutas nuevas `200`, rutas antiguas `301`
+   de un solo salto, canonical, `og:url`, breadcrumb Yoast, cards de archivo,
+   sitemap de posts/categorías y enlaces recíprocos.
+
+Caso de calibración: AEO (`156`) pasó de hija de Loop Marketing a categoría
+raíz el 2026-07-18. Los tres posts con AEO primaria migraron de
+`/loop-marketing/aeo/<slug>/` a `/aeo/<slug>/`; el archivo migró de
+`/category/loop-marketing/aeo/` a `/category/aeo/`, con redirects explícitos y
+QA live documentados en
+`docs/audits/public-site/2026-07-18-web-agentica-pillar-publication.md`.
 
 ## Render Ohio
 

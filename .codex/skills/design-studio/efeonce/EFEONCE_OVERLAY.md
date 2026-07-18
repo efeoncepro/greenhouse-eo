@@ -21,6 +21,12 @@ Para infografías de artículos, el canon de composición y entrega vive en
 `../../content-marketing-studio/efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md`. Este overlay dirige el arte;
 Content Marketing gobierna argumento, shareability, manifest e integración.
 
+Para portadas/featured/hero/OG editoriales, cargar además
+`docs/operations/public-site-content-factory/EDITORIAL_COVER_KEY_VISUAL_OPERATING_MODEL_V1.md`. Ese contrato
+gobierna tesis visual, divergencia, provenance de modelo, punch, gradientes, anatomía/gestos culturales,
+crops y blockers. No copiar el skin de un piloto como look universal: la metodología es estable; la dirección
+visual transversal requiere validación en varias portadas.
+
 ## Marca (dura)
 
 - **Efeonce ≠ Greenhouse.** Greenhouse es el portal operativo interno (los clientes NO lo ven).

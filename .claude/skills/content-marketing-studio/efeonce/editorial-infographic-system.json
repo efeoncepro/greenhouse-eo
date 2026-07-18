@@ -49,7 +49,9 @@
     "essentialTextMinCssPx": 16,
     "noteTextMinCssPx": 12,
     "requiresProjectedCssSizeCheck": true,
-    "requiresLayoutShiftCheckWhenAspectRatioChanges": true
+    "requiresLayoutShiftCheckWhenAspectRatioChanges": true,
+    "requiresCurrentSrcReadbackPerViewportTheme": true,
+    "requiresNaturalDimensionsReadback": true
   },
   "delivery": {
     "preferredVectorMode": "source-svg-plus-sanitized-delivery-svg",
@@ -72,9 +74,10 @@
     "indexingIsAsynchronous": true
   },
   "channelStates": ["body_ready", "featured_ready", "og_ready", "social_ready", "integrated", "verified"],
+  "indexingObservationStates": ["not_checked", "indexed_observed", "not_indexed_observed"],
   "qualityGates": [
     "explanatory-delta", "semantic-archetype", "autonomous-reading", "three-second-route", "second-read-depth",
     "svg-safety", "typographic-fit", "projected-css-size", "geometry-on-delivery", "footer-only-brand",
-    "real-column", "mobile", "theme", "layout-shift", "thumbnail", "html-accessibility", "seo-discovery", "provenance"
+    "real-column", "mobile", "theme", "current-src", "natural-dimensions", "layout-shift", "thumbnail", "html-accessibility", "seo-discovery", "provenance"
   ]
 }

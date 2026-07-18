@@ -4,7 +4,8 @@
   "article": {
     "postId": 249387,
     "slug": "web-agentica-agentes-ia",
-    "status": "draft"
+    "status": "publish",
+    "url": "https://efeoncepro.com/aeo/web-agentica-agentes-ia/"
   },
   "visualSystem": {
     "name": "Una base, dos operadores",
@@ -33,61 +34,94 @@
     {
       "conceptId": "WAG-V01",
       "slot": "hero_featured_og",
-      "function": "Presentar una infraestructura web compartida por una persona y un agente sin sugerir reemplazo humano.",
-      "explanatoryDelta": "Instala la tesis de dos operadores sobre una base compartida antes de entrar a la arquitectura.",
-      "status": "integrated_private",
+      "function": "Show that a human and an authorized software agent converge on the same web infrastructure.",
+      "notFunction": "Not a real interface, product screenshot, autonomous-agent proof or theological claim.",
+      "explanatoryDelta": "Instala la tesis de una web compartida por una persona y un agente autorizado antes de entrar a la arquitectura.",
+      "status": "published_live_verified",
       "deliveryContract": {
         "viewport": "crop_safe",
         "theme": "single_theme",
         "canvas": "opaque",
         "skin": "efeonce_core",
-        "rationale": "La portada necesita estabilidad cromática y foco central para featured y Open Graph."
+        "rationale": "Un master gobernado alimenta featured, Open Graph y card; cada crop se revisa por anatomía, lectura cultural y foco."
       },
       "production": {
         "kind": "generated-conceptual",
+        "provider": "OpenAI",
+        "model": "gpt-image-2",
+        "quality": "high",
         "master": {
-          "path": "tmp/web-agentica-visuals/web-agentica-dos-operadores-master.png",
-          "sha256": "52d5971491b9cbd40df06411e4c74be14b9d860189a3a7e82d7785f3e280c9da",
-          "bytes": 1958351,
-          "mime": "image/png",
-          "width": 1536,
-          "height": 1024
+          "path": "ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/exports/web-agentica-cover-human-agent-interface-master-v3.png",
+          "sha256": "c9f7d6114a3c22666a3fe436fa0774965b669977d5d8aae91a578413f65d71d5",
+          "width": 2048,
+          "height": 1152,
+          "mime": "image/png"
         },
         "derivatives": [
           {
             "role": "featured",
-            "path": "tmp/web-agentica-visuals/web-agentica-dos-operadores-featured-1600-v1.webp",
-            "sha256": "5ddc64b88adf4e6346f4638039af955b6f811a5006283ad3df826ad6c8a0be7f",
-            "bytes": 116760,
-            "mime": "image/webp",
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/exports/web-agentica-cover-featured-1600x900-v3.webp",
+            "sha256": "a6256cf1c8ec116ffefc5219575285bb8df06f4e6e7d594b6cfc61265aaa9ff1",
             "width": 1600,
-            "height": 900
+            "height": 900,
+            "mime": "image/webp",
+            "bytes": 100170
           },
           {
-            "role": "openGraph",
-            "path": "tmp/web-agentica-visuals/web-agentica-dos-operadores-og-1440x757-v1.jpg",
-            "sha256": "a08a2ddfc272e128c90754eab68647662121fafc9e00210d65c6ef17141abb35",
-            "bytes": 269623,
-            "mime": "image/jpeg",
+            "role": "open-graph",
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/exports/web-agentica-cover-og-1440x756-v3.jpg",
+            "sha256": "d0a956f4c0d800000871b89ff5fa32b56fb5b50489f9945931640d66b9e6ae29",
             "width": 1440,
-            "height": 757
+            "height": 756,
+            "mime": "image/jpeg",
+            "bytes": 242430
+          },
+          {
+            "role": "card-square",
+            "path": "ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/exports/web-agentica-cover-card-square-1152-v3.webp",
+            "sha256": "e8e805f6e30682edc93073196abdc2aaf442b08b9d69e986c89f2876aab0c56f",
+            "width": 1152,
+            "height": 1152,
+            "mime": "image/webp",
+            "bytes": 91916
           }
         ]
       },
       "metadata": {
-        "alt": "Una persona y un agente de IA convergen sobre la misma infraestructura web compartida.",
-        "caption": null,
-        "description": "Portada editorial conceptual; no representa una interfaz, producto ni cliente real."
+        "alt": "Una mano humana y una mano robótica se aproximan a una interfaz web compartida desde lados opuestos.",
+        "caption": "La web deja de ser sólo una superficie: se convierte en un contrato común para personas y agentes autorizados.",
+        "description": "Ilustración conceptual WAG-V01. No representa un producto, una interfaz real ni una capacidad autónoma.",
+        "disclosure": "Conceptual generated illustration; not evidence or a real screenshot."
+      },
+      "rights": {
+        "sourceAssets": [],
+        "license": "generated",
+        "provenance": "Exploration began in conversational imagegen; selected master and final edits were produced through the canonical pnpm ai:image CLI with explicit gpt-image-2 and quality high. Prompts are stored verbatim in prompts/.",
+        "culturalReference": "Near-touching compositional tension associated with The Creation of Adam; no source image was used and no fresco, characters or religious iconography were reproduced."
       },
       "media": {
         "featured": {
-          "id": 251453,
-          "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-dos-operadores-featured-1600-v1.webp"
+          "id": 251553,
+          "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-interfaz-humano-agente-featured-1600x900-v3.webp"
         },
         "openGraph": {
-          "id": 251454,
-          "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-dos-operadores-og-1440x757-v1.jpg"
+          "id": 251554,
+          "url": "https://efeoncepro.com/wp-content/uploads/2026/07/web-agentica-interfaz-humano-agente-og-1440x756-v3.jpg"
         }
+      },
+      "qa": {
+        "status": "selected; derivatives_ready; cms_integrated; live_verified",
+        "reviewedAtOriginalResolution": true,
+        "cropProofs": [
+          "proofs/WAG-V01-C15-og-proof.png",
+          "proofs/WAG-V01-C15-square-proof.png",
+          "proofs/WAG-V01-C15-thumbnail-160.png"
+        ],
+        "findings": [
+          "Conceptual interface must not be described as a real product.",
+          "Do not mirror the selected master; the robotic hand gesture must preserve radial/cubital orientation.",
+          "The active Ohio single-post template does not render the featured image inside the article hero; the asset is verified in archive cards, Open Graph, Twitter and schema primaryImage."
+        ]
       }
     },
     {
@@ -97,7 +131,7 @@
       "function": "Mostrar que disminuye la inferencia mientras aumentan operabilidad y gobierno.",
       "notFunction": "No es una captura de producto, un estándar normativo ni una garantía de seguridad o interoperabilidad.",
       "explanatoryDelta": "La transición decisiva no es “más IA”, sino una acción explícita, gobernada y demostrable.",
-      "status": "integrated_private",
+      "status": "published_live_verified",
       "deliveryContract": {
         "format": "direct_svg",
         "viewport": "art_directed",
@@ -273,15 +307,10 @@
         }
       ],
       "metadata": {
-        "alt": "Cuatro etapas aumentan la operabilidad para agentes externos y el gobierno de las acciones: sitio tradicional, sitio con IA, sitio preparado y web agéntica.",
-        "description": "Mapa de frontera que compara operador, comprensión, capacidad, control y señal de éxito sin presentarlo como ranking universal.",
-        "longDescriptionRef": "adjacent_article_section",
         "caption": "La transición decisiva no es “más IA”, sino una acción explícita, gobernada y demostrable."
       },
       "rights": {
         "sourceAssets": [
-          "public/branding/logo-full.svg",
-          "public/branding/logo-negative.svg",
           "src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg",
           "src/assets/fonts/Poppins-Medium.ttf",
           "src/assets/fonts/Poppins-SemiBold.ttf",
@@ -292,12 +321,12 @@
         "disclosure": "none"
       },
       "qa": {
-        "status": "file_pass_contextual_v7_pending",
+        "status": "live_pass",
         "renderer": "Chromium + fontkit outlined delivery",
-        "themesReviewed": false,
-        "responsiveReviewed": false,
+        "themesReviewed": true,
+        "responsiveReviewed": true,
         "directSvgAudit": "28/28 PASS",
-        "integration": "draft"
+        "integration": "publish"
       }
     },
     {
@@ -307,7 +336,7 @@
       "function": "Mostrar que personas y agentes consumen una capacidad, un gobierno y una fuente de verdad compartidos.",
       "notFunction": "No es una captura de producto, un estándar normativo ni una garantía de seguridad o interoperabilidad.",
       "explanatoryDelta": "La interfaz cambia; la capacidad, el gobierno y la fuente de verdad permanecen compartidos.",
-      "status": "integrated_private",
+      "status": "published_live_verified",
       "deliveryContract": {
         "format": "direct_svg",
         "viewport": "art_directed",
@@ -483,15 +512,10 @@
         }
       ],
       "metadata": {
-        "alt": "La interfaz humana, WebMCP y la API consumen las mismas capacidades gobernadas, datos y reglas del negocio.",
-        "description": "Corte arquitectónico que separa interfaces, capacidades, contrato de ejecución, gobierno y fuente de verdad compartida.",
-        "longDescriptionRef": "adjacent_article_section",
         "caption": "La interfaz cambia; la capacidad, el gobierno y la fuente de verdad permanecen compartidos."
       },
       "rights": {
         "sourceAssets": [
-          "public/branding/logo-full.svg",
-          "public/branding/logo-negative.svg",
           "src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg",
           "src/assets/fonts/Poppins-Medium.ttf",
           "src/assets/fonts/Poppins-SemiBold.ttf",
@@ -502,12 +526,12 @@
         "disclosure": "none"
       },
       "qa": {
-        "status": "file_pass_contextual_v7_pending",
+        "status": "live_pass",
         "renderer": "Chromium + fontkit outlined delivery",
-        "themesReviewed": false,
-        "responsiveReviewed": false,
+        "themesReviewed": true,
+        "responsiveReviewed": true,
         "directSvgAudit": "28/28 PASS",
-        "integration": "draft"
+        "integration": "publish"
       }
     },
     {
@@ -517,7 +541,7 @@
       "function": "Ordenar iniciativas por la frontera del sistema que atienden, sin declarar un ganador universal.",
       "notFunction": "No es una captura de producto, un estándar normativo ni una garantía de seguridad o interoperabilidad.",
       "explanatoryDelta": "No hay un ganador único: emerge un stack de interoperabilidad con fronteras distintas.",
-      "status": "integrated_private",
+      "status": "published_live_verified",
       "deliveryContract": {
         "format": "direct_svg",
         "viewport": "art_directed",
@@ -693,15 +717,10 @@
         }
       ],
       "metadata": {
-        "alt": "WebMCP, NLWeb, ACP y UCP, AP2, A2A y AAIF se ubican en fronteras complementarias de un stack de interoperabilidad.",
-        "description": "Mapa de ecosistema por capas; no representa un ranking ni afirma que exista un estándar ganador único.",
-        "longDescriptionRef": "adjacent_article_section",
         "caption": "No hay un ganador único: emerge un stack de interoperabilidad con fronteras distintas."
       },
       "rights": {
         "sourceAssets": [
-          "public/branding/logo-full.svg",
-          "public/branding/logo-negative.svg",
           "src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg",
           "src/assets/fonts/Poppins-Medium.ttf",
           "src/assets/fonts/Poppins-SemiBold.ttf",
@@ -712,12 +731,12 @@
         "disclosure": "none"
       },
       "qa": {
-        "status": "file_pass_contextual_v7_pending",
+        "status": "live_pass",
         "renderer": "Chromium + fontkit outlined delivery",
-        "themesReviewed": false,
-        "responsiveReviewed": false,
+        "themesReviewed": true,
+        "responsiveReviewed": true,
         "directSvgAudit": "28/28 PASS",
-        "integration": "draft"
+        "integration": "publish"
       }
     },
     {
@@ -727,7 +746,7 @@
       "function": "Explicar que una capacidad requiere contrato, pruebas deterministas, evals probabilísticas, E2E y recuperación.",
       "notFunction": "No es una captura de producto, un estándar normativo ni una garantía de seguridad o interoperabilidad.",
       "explanatoryDelta": "La confianza aparece cuando contrato, comportamiento, resultado y recuperación se prueban como sistema.",
-      "status": "integrated_private",
+      "status": "published_live_verified",
       "deliveryContract": {
         "format": "direct_svg",
         "viewport": "art_directed",
@@ -903,15 +922,10 @@
         }
       ],
       "metadata": {
-        "alt": "La evaluación conecta contrato, pruebas deterministas, evaluación probabilística, pruebas de extremo a extremo y recuperación.",
-        "description": "Circuito de evidencia con retorno que distingue disponibilidad de herramienta y resolución demostrada de la tarea.",
-        "longDescriptionRef": "adjacent_article_section",
         "caption": "La confianza aparece cuando contrato, comportamiento, resultado y recuperación se prueban como sistema."
       },
       "rights": {
         "sourceAssets": [
-          "public/branding/logo-full.svg",
-          "public/branding/logo-negative.svg",
           "src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg",
           "src/assets/fonts/Poppins-Medium.ttf",
           "src/assets/fonts/Poppins-SemiBold.ttf",
@@ -922,12 +936,12 @@
         "disclosure": "none"
       },
       "qa": {
-        "status": "file_pass_contextual_v7_pending",
+        "status": "live_pass",
         "renderer": "Chromium + fontkit outlined delivery",
-        "themesReviewed": false,
-        "responsiveReviewed": false,
+        "themesReviewed": true,
+        "responsiveReviewed": true,
         "directSvgAudit": "28/28 PASS",
-        "integration": "draft"
+        "integration": "publish"
       }
     },
     {
@@ -937,7 +951,7 @@
       "function": "Separar progresión de comprensión y operabilidad gobernada.",
       "notFunction": "No es una captura de producto, un estándar normativo ni una garantía de seguridad o interoperabilidad.",
       "explanatoryDelta": "Ser legible habilita comprensión; operar exige autoridad, límites, confirmación y evidencia.",
-      "status": "integrated_private",
+      "status": "published_live_verified",
       "deliveryContract": {
         "format": "direct_svg",
         "viewport": "art_directed",
@@ -1113,15 +1127,10 @@
         }
       ],
       "metadata": {
-        "alt": "Cinco niveles de madurez progresan en comprensión y acción gobernada como ejes relacionados pero independientes.",
-        "description": "Escala de dos ejes que muestra que legibilidad y operabilidad no avanzan automáticamente al mismo ritmo.",
-        "longDescriptionRef": "adjacent_article_section",
         "caption": "Ser legible habilita comprensión; operar exige autoridad, límites, confirmación y evidencia."
       },
       "rights": {
         "sourceAssets": [
-          "public/branding/logo-full.svg",
-          "public/branding/logo-negative.svg",
           "src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg",
           "src/assets/fonts/Poppins-Medium.ttf",
           "src/assets/fonts/Poppins-SemiBold.ttf",
@@ -1132,12 +1141,12 @@
         "disclosure": "none"
       },
       "qa": {
-        "status": "file_pass_contextual_v7_pending",
+        "status": "live_pass",
         "renderer": "Chromium + fontkit outlined delivery",
-        "themesReviewed": false,
-        "responsiveReviewed": false,
+        "themesReviewed": true,
+        "responsiveReviewed": true,
         "directSvgAudit": "28/28 PASS",
-        "integration": "draft"
+        "integration": "publish"
       }
     },
     {
@@ -1147,7 +1156,7 @@
       "function": "Convertir el checklist en una ruta de inspección agrupada en significado, interacción, ejecución y evidencia.",
       "notFunction": "No es una captura de producto, un estándar normativo ni una garantía de seguridad o interoperabilidad.",
       "explanatoryDelta": "Si una prueba falla, la autonomía debe detenerse o degradarse con seguridad.",
-      "status": "integrated_private",
+      "status": "published_live_verified",
       "deliveryContract": {
         "format": "direct_svg",
         "viewport": "art_directed",
@@ -1323,15 +1332,10 @@
         }
       ],
       "metadata": {
-        "alt": "Doce pruebas recorren significado, interacción, ejecución y evidencia para decidir si la autonomía puede continuar.",
-        "description": "Ruta de inspección donde una falla obliga a detener o degradar la autonomía con seguridad.",
-        "longDescriptionRef": "adjacent_article_section",
         "caption": "Si una prueba falla, la autonomía debe detenerse o degradarse con seguridad."
       },
       "rights": {
         "sourceAssets": [
-          "public/branding/logo-full.svg",
-          "public/branding/logo-negative.svg",
           "src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg",
           "src/assets/fonts/Poppins-Medium.ttf",
           "src/assets/fonts/Poppins-SemiBold.ttf",
@@ -1342,12 +1346,12 @@
         "disclosure": "none"
       },
       "qa": {
-        "status": "file_pass_contextual_v7_pending",
+        "status": "live_pass",
         "renderer": "Chromium + fontkit outlined delivery",
-        "themesReviewed": false,
-        "responsiveReviewed": false,
+        "themesReviewed": true,
+        "responsiveReviewed": true,
         "directSvgAudit": "28/28 PASS",
-        "integration": "draft"
+        "integration": "publish"
       }
     },
     {
@@ -1357,7 +1361,7 @@
       "function": "Mostrar cómo intención, representación, decisión y evidencia forman una cadena de custodia.",
       "notFunction": "No es una captura de producto, un estándar normativo ni una garantía de seguridad o interoperabilidad.",
       "explanatoryDelta": "Identificar al agente no basta: la acción debe demostrar representación, alcance, confirmación y resultado.",
-      "status": "integrated_private",
+      "status": "published_live_verified",
       "deliveryContract": {
         "format": "direct_svg",
         "viewport": "art_directed",
@@ -1533,15 +1537,10 @@
         }
       ],
       "metadata": {
-        "alt": "Una persona delega una intención a un agente; el sitio valida identidad, alcance y confirmación antes de registrar un resultado recuperable.",
-        "description": "Cadena de autoridad entre persona, agente u operador, capacidad del sitio y sistema de registro; no es un flujo IAM completo.",
-        "longDescriptionRef": "adjacent_article_section",
         "caption": "Identificar al agente no basta: la acción debe demostrar representación, alcance, confirmación y resultado."
       },
       "rights": {
         "sourceAssets": [
-          "public/branding/logo-full.svg",
-          "public/branding/logo-negative.svg",
           "src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg",
           "src/assets/fonts/Poppins-Medium.ttf",
           "src/assets/fonts/Poppins-SemiBold.ttf",
@@ -1552,12 +1551,12 @@
         "disclosure": "none"
       },
       "qa": {
-        "status": "file_pass_contextual_v7_pending",
+        "status": "live_pass",
         "renderer": "Chromium + fontkit outlined delivery",
-        "themesReviewed": false,
-        "responsiveReviewed": false,
+        "themesReviewed": true,
+        "responsiveReviewed": true,
         "directSvgAudit": "28/28 PASS",
-        "integration": "draft"
+        "integration": "publish"
       }
     }
   ]
