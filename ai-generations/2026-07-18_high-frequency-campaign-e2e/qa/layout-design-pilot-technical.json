@@ -1,0 +1,115 @@
+{
+  "stage": "layout-design-technical-qa",
+  "checkedAt": "2026-07-19T02:16:07.759Z",
+  "pass": true,
+  "checks": [
+    {
+      "id": "16x9",
+      "output": "delivery/layout-design/high-frequency-layout-design-16x9-v1.jpg",
+      "bytes": 617452,
+      "width": 1920,
+      "height": 1080,
+      "colourspace": "srgb",
+      "copyField": {
+        "left": 88,
+        "top": 238,
+        "width": 826,
+        "height": 518
+      },
+      "whiteContrastP95": 18.3,
+      "mintContrastP95": 13.69,
+      "finishing": {
+        "normalizedMae": 0.0209,
+        "sourceMeanChroma": 0.1721,
+        "finishedMeanChroma": 0.1741,
+        "relativeChromaChange": 0.0118
+      },
+      "assertions": {
+        "dimensions": true,
+        "jpeg": true,
+        "srgb": true,
+        "maxBytes": true,
+        "exactCopyPresent": true,
+        "officialLogo": true,
+        "whiteContrastP95": true,
+        "mintContrastP95": true,
+        "finishDeltaBounded": true,
+        "storyInterfaceSafe": true,
+        "manifestHash": true
+      },
+      "pass": true
+    },
+    {
+      "id": "4x5",
+      "output": "delivery/layout-design/high-frequency-layout-design-4x5-v1.jpg",
+      "bytes": 393209,
+      "width": 1080,
+      "height": 1350,
+      "colourspace": "srgb",
+      "copyField": {
+        "left": 68,
+        "top": 243,
+        "width": 659,
+        "height": 446
+      },
+      "whiteContrastP95": 17.15,
+      "mintContrastP95": 12.84,
+      "finishing": {
+        "normalizedMae": 0.0308,
+        "sourceMeanChroma": 0.1889,
+        "finishedMeanChroma": 0.1785,
+        "relativeChromaChange": -0.055
+      },
+      "assertions": {
+        "dimensions": true,
+        "jpeg": true,
+        "srgb": true,
+        "maxBytes": true,
+        "exactCopyPresent": true,
+        "officialLogo": true,
+        "whiteContrastP95": true,
+        "mintContrastP95": true,
+        "finishDeltaBounded": true,
+        "storyInterfaceSafe": true,
+        "manifestHash": true
+      },
+      "pass": true
+    },
+    {
+      "id": "9x16",
+      "output": "delivery/layout-design/high-frequency-layout-design-9x16-v1.jpg",
+      "bytes": 566929,
+      "width": 1080,
+      "height": 1920,
+      "colourspace": "srgb",
+      "copyField": {
+        "left": 70,
+        "top": 384,
+        "width": 626,
+        "height": 576
+      },
+      "whiteContrastP95": 17.72,
+      "mintContrastP95": 13.26,
+      "finishing": {
+        "normalizedMae": 0.0232,
+        "sourceMeanChroma": 0.1778,
+        "finishedMeanChroma": 0.18,
+        "relativeChromaChange": 0.0123
+      },
+      "assertions": {
+        "dimensions": true,
+        "jpeg": true,
+        "srgb": true,
+        "maxBytes": true,
+        "exactCopyPresent": true,
+        "officialLogo": true,
+        "whiteContrastP95": true,
+        "mintContrastP95": true,
+        "finishDeltaBounded": true,
+        "storyInterfaceSafe": true,
+        "manifestHash": true
+      },
+      "pass": true
+    }
+  ]
+}

@@ -9,6 +9,7 @@ Se produjo una campaña visual completa para comunicar **producción creativa a 
 - 3 territorios generados con Seedream 5 Lite;
 - 1 anchor desarrollado con Seedream 5 Pro;
 - 3 source plates derivados directamente del anchor con GPT Image 2;
+- 3 masters adicionales del piloto **Layout Design & Finishing** (`16:9`, `4:5`, `9:16`), con Seedream Pro sólo sobre placas limpias y composición final determinística;
 - 3 mensajes × 6 formatos = **18 piezas still de campaña**;
 - 12 masters digitales + 6 proofs de producción A2/OOH;
 - 2 hero motion de 15 s + 2 masters de 10 s + 2 bumpers de 6 s, en 9:16 y 16:9;
@@ -23,6 +24,7 @@ Se produjo una campaña visual completa para comunicar **producción creativa a 
 - masters motion Omni estimados: **USD 2.08**;
 - costo generativo del release: **USD 2.965**, al precio publicado el 2026-07-18.
 - costo generativo incremental de los dos heroes: **USD 0**; reutilizan masters/stills aprobados;
+- costo incremental del piloto layout-design: **USD 0.27**, fuera del ZIP V3 y de su costo de release histórico;
 - paquete inmutable V3: SHA-256 `13a84dbbffd9be389c2304fbc5360c3410cd5d91b2a45e5b14ae372e2322d24b`.
 
 ## Dirección seleccionada
@@ -35,6 +37,13 @@ Se produjo una campaña visual completa para comunicar **producción creativa a 
 - [ZIP de release](./delivery/high-frequency-campaign-release-v3.zip)
 - [Matriz de assets y alt text](./delivery/asset-matrix.csv)
 - [Contact sheet del set still](./review/campaign-contact-sheet.jpg)
+- [Contact sheet del piloto layout-design](./review/layout-design-pilot-contact-sheet.jpg)
+- [Masters layout-design](./delivery/layout-design/)
+- [Scorecard layout-design](./qa/layout-design-pilot-scorecard.md)
+- [QA técnica layout-design](./qa/layout-design-pilot-technical.json)
+- [Auditoría de release layout-design](./qa/layout-design-pilot-release-audit.md)
+- [Método operativo canónico](../../docs/operations/GREENHOUSE_MULTIMODAL_CAMPAIGN_PRODUCTION_V1.md#5a-layout-design--finishing-para-sets-estáticos)
+- [Manual reusable](../../docs/manual-de-uso/ai-tooling/producir-layout-design-y-finishing.md)
 - [Secuencia del master motion 10 s · 9:16](./review/motion-master-9x16-contact-sheet.jpg)
 - [Secuencia del master motion 10 s · 16:9](./review/motion-master-16x9-contact-sheet.jpg)
 - [Secuencia del hero motion 15 s · 9:16](./review/motion-hero-9x16-15s-contact-sheet.jpg)
@@ -97,10 +106,19 @@ pnpm tsx ai-generations/2026-07-18_high-frequency-campaign-e2e/scripts/07-genera
 node ai-generations/2026-07-18_high-frequency-campaign-e2e/scripts/08-compose-motion-release.mjs
 node ai-generations/2026-07-18_high-frequency-campaign-e2e/scripts/10-compose-hero-15s.mjs
 node ai-generations/2026-07-18_high-frequency-campaign-e2e/scripts/09-qa-multimodal-campaign.mjs
+
+FAL_API_KEY_SECRET_REF=greenhouse-fal-api-key \
+GCP_PROJECT=efeonce-group GOOGLE_CLOUD_PROJECT=efeonce-group \
+pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs \
+  ai-generations/2026-07-18_high-frequency-campaign-e2e/scripts/11-finish-layout-design-pilot.ts
+
+node ai-generations/2026-07-18_high-frequency-campaign-e2e/scripts/12-compose-layout-design-pilot.mjs
+node ai-generations/2026-07-18_high-frequency-campaign-e2e/scripts/13-qa-layout-design-pilot.mjs
 ```
 
 Los scripts generativos `01`, `02`, `03`, `06` y `07` consumen presupuesto; `06` es sólo el probe histórico.
-`04`, `05`, `08`, `09` y `10` son determinísticos y pueden repetirse sin costo de modelo.
+`04`, `05`, `08`, `09`, `10`, `12` y `13` son determinísticos y pueden repetirse sin costo de modelo.
+`11` consume presupuesto sólo para el acabado generativo de las tres placas limpias.
 
 El fallback de motion previsto era Seedance reference-to-video si Omni no preservaba identidad espacial,
 anatomía o continuidad. No se invocó: los dos clean masters Omni pasaron el gate temporal y el hero se

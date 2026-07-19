@@ -55,6 +55,10 @@ print proof ◀── approved anchor ──┼──▶ 4:5 / 9:16 / 16:9 / 3:1
 
 El router es un default del benchmark, no un ranking eterno. La operación manda; la campaña puede volver de GPT a Pro y regresar a GPT.
 
+Cuando el problema central sea control compositivo y acabado de un set estático, cargar además
+`13_LAYOUT_DESIGN_AND_FINISHING.md`. El flujo especializado inserta
+`layout contract → clean ratio plate → finish → composición determinística → mastering` después del anchor.
+
 ## Dos ejes obligatorios
 
 - `channelMode`: `digital-static | digital-motion | print | ooh`.
@@ -218,6 +222,8 @@ Un anchor es una decisión; no simplemente el output con más detalle.
 - Medir costo por candidato aprobado y first-pass compliance, no sólo precio por imagen.
 - Lite/low abre; medium prueba sistema; high cierra un anchor ya elegido.
 - Si una iteración no mejora el scorecard o el próximo delta es determinístico, detener el loop.
+- Nunca enviar el anuncio final compuesto a un modelo para “pulirlo”: el finish generativo recibe sólo el
+  clean plate y copy/logo/legal permanecen bajo el compositor autoritativo.
 - Para lotes: aprobar primero un mensaje en todos los formatos; luego revisar 100% del lote en
   contact sheet/thumbnail y ejecutar auditoría full-size al menos sobre un representante de cada
   mensaje y cada formato. Los checks técnicos de dimensiones, peso y naming son 100%.

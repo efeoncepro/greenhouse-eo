@@ -1,6 +1,7 @@
 # Greenhouse Multimodal Campaign Production V1
 
-> Estado: operativo para producción out-of-band. Validado el 2026-07-18 con Seedream 5 Lite/Pro,
+> Estado: operativo para producción out-of-band. Validado el 2026-07-18 y ampliado el 2026-07-19 con
+> Layout Design & Finishing sobre Seedream 5 Lite/Pro,
 > GPT Image 2, Gemini Omni Flash y post determinístico. Seedance 2.0 queda como fallback condicionado;
 > no fue necesario para el release validado. No modifica el runtime del portal.
 
@@ -49,6 +50,10 @@ Seedream 5 Pro ─── develop material, luz, color, atmósfera
                     ▼
 GPT Image 2 ────── organize, repair, extend ratios, copy fields
                     │
+          layout contract + clean ratio plates
+                    │
+      Seedream Pro / GPT ─ bounded finish by remaining delta
+                    │
               ┌─────┴─────────────┐
               ▼                   ▼
        clean still plates    Gemini Omni Flash
@@ -87,6 +92,7 @@ anchor aprobado; no se encadenan derivados como `v1 → v2 → v3`.
 | Divergencia visual económica | Seedream 5 Lite | abre familias de medio/material sin gastar cierre premium |
 | Desarrollo expresivo | Seedream 5 Pro | material, color, luz, atmósfera y edición regional semántica |
 | Disciplina compositiva | GPT Image 2 | reencuadre, identidad, safe zones, reparación y ratios |
+| Finish de plates con layout aprobado | Seedream Pro o GPT Image 2 | Pro para material/luz/atmósfera; GPT para geometría/safe zones/protección |
 | Toma motion base desde anchor limpio | Gemini Omni Flash | una toma continua por ratio, con audio nativo y plate sin marca |
 | Familia 15/10/6 desde toma aprobada | edición determinista | trim, montaje, format wall, end card, mezcla y exports sin regenerar |
 | Nueva toma, ángulo o continuidad física ausente | Seedance 2.0, fallback | sólo cuando los píxeles/actuación necesarios no existen en el master aprobado |
@@ -152,6 +158,33 @@ crop y riesgo semántico. Un anchor es una decisión con owner; todavía no es u
 
 Desde el mismo anchor, producir plates directos por ratio. Un pase cambia un delta: escala, crop, espacio de
 copy, reparación o extensión. Bloquear sujeto, hook, paleta y dirección de luz. Texto de modelo es concept-only.
+
+### 5A. Layout Design & Finishing para sets estáticos
+
+Cuando la campaña necesita control compositivo fino y acabado premium, insertar este subflujo antes de la
+composición final:
+
+```text
+anchor → layout contract → clean plate por ratio → bounded finish → compose → master → QA
+```
+
+1. Definir una grilla y composición nativas para cada ratio, con sujeto, `copy_field`, márgenes, peor crop,
+   hook gráfico, capas y compositor autoritativo. No recortar un master universal.
+2. Exportar un `clean_plate` por ratio sin headline, logo, CTA, legal ni locale.
+3. Elegir el executor por el delta restante: Seedream 5 Pro para material, microtextura, luz, color, atmósfera
+   e integración; GPT Image 2 para geometría, escala, safe zones, identidad o reparación protegida.
+4. Aplicar un solo delta por pase y restatar locks. Detener si el scorecard no mejora o el siguiente trabajo
+   ya es determinístico.
+5. Componer underlay óptico, hook, tipo, logo, CTA y legal en Figma, Adobe, código/Sharp u otra herramienta
+   declarada. Nunca devolver el anuncio final al modelo para “pulirlo”.
+6. Masterizar por destino y pasar gates de anchor, layout, finish, craft, formato, técnica y release humano.
+
+El layout no garantiza por sí solo un resultado premium. La calidad emerge de
+`layout + integración + finishing + mastering + QA`. Las capas operativas son archivos y autoridades reales;
+la edición regional de Seedream sigue siendo semántica sobre un raster aplanado.
+
+Contrato reusable: `.codex/skills/design-studio/templates/layout-design-contract.yaml`. Método de dirección:
+`.codex/skills/design-studio/modules/13_LAYOUT_DESIGN_AND_FINISHING.md`.
 
 ### 6. Bifurcación still/motion
 
@@ -259,6 +292,10 @@ Fuentes oficiales: [Google Gemini Omni](https://ai.google.dev/gemini-api/docs/om
   sigue siendo un gate de activación aunque el creative release esté empaquetado.
 - QA: primera composición digital corregida por copy/safe zones; OOH corrigió densidad informativa retirando
   support copy; print/OOH quedan honestamente como production proofs pendientes de ICC/vendor spec.
+- Piloto Layout Design: el mismo sistema se reabrió sólo en estático para `16:9`, `4:5` y `9:16`.
+  Cada formato recibió grilla nativa, clean plate, finish Seedream 5 Pro y composición Sharp/fontkit con
+  tipo/logo exactos. QA `3/3`, score `47/50`, costo incremental estimado `USD 0,27`; copy/logo nunca entraron
+  al modelo. Las métricas son observación, no SLA.
 
 ## Package profesional mínimo
 
@@ -267,6 +304,7 @@ campaign-id/
   brief/          strategy, claims, channel/brand modes, rights, matrix
   prompts/        exact prompts and model/version
   work/           territories, anchors, clean plates, motion masters
+  layout/         ratio grids, layer contracts, clean/finished plates
   manifests/      lineage, hashes, request IDs, cost, approvals
   review/         contact sheets, frame strips, scorecards, decision log
   delivery/
@@ -283,6 +321,8 @@ campaign-id/
 - [ ] `channelMode` y `brandMode` declarados por asset.
 - [ ] Cada salida deriva de un anchor aprobado, no de otro derivado.
 - [ ] Clean plates no contienen marca accidental ni texto generado.
+- [ ] Sets con Layout Design declaran grilla/capas por ratio; el finish sólo recibe clean plates.
+- [ ] El anuncio final compuesto no vuelve a un modelo generativo.
 - [ ] Copy/logo/CTA/legal/captions son determinísticos.
 - [ ] Motion pasa identidad temporal, anatomía, flicker, audio y poster frame.
 - [ ] La familia 15/10/6 deriva del single-shot aprobado; cualquier nueva generación justifica qué píxel/toma faltaba.

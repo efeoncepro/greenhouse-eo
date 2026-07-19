@@ -173,3 +173,4 @@ publicada.
 - Evidencia rechazada del take I: ai-generations/2026-07-11_glitch-microphone-intro/review/take-i-percussive-tap-on-air-gemini-foley-review.md
 - Campaña multimodal 15/10/6: ai-generations/2026-07-18_high-frequency-campaign-e2e/
 - Contrato técnico de campaña: docs/operations/GREENHOUSE_MULTIMODAL_CAMPAIGN_PRODUCTION_V1.md
+- Método Layout Design & Finishing: docs/manual-de-uso/ai-tooling/producir-layout-design-y-finishing.md

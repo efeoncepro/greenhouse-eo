@@ -126,6 +126,24 @@ diverge → develop → anchor → organize → extend → repair → compose �
 7. **Compose:** aplicar tipo, logo, CTA y legales determinísticamente.
 8. **Release:** validar formato, safe zones, color, peso, provenance y destino.
 
+### Variante Layout Design & Finishing
+
+Cuando el objetivo es un set estático de alto craft con composición controlada, insertar después del anchor:
+
+```text
+layout contract → clean plate nativo por ratio → finish acotado → compose → master → QA
+```
+
+- Diseñar primero grilla, sujeto, copy field, hook, márgenes y capas usando
+  `design-studio/templates/layout-design-contract.yaml`.
+- Seedream Pro recibe sólo clean plates cuando el delta restante es material, luz, color o atmósfera.
+- GPT Image 2 recibe el plate cuando el delta restante es geometría, escala, safe zone o reparación protegida.
+- Copy, logo, CTA, legal, locale y export quedan en Figma/Adobe/código/Sharp u otro compositor declarado.
+- Nunca enviar el anuncio ya compuesto a un modelo. Un pase cambia un delta y se detiene si no mejora el
+  scorecard o si el siguiente trabajo es determinístico.
+
+Método completo: `design-studio/modules/13_LAYOUT_DESIGN_AND_FINISHING.md`.
+
 ### Topología estrella y revisión del anchor
 
 El `anchor_id` aprobado es el centro de una estrella: 1:1, 4:5, 9:16, 16:9, 3:1, clean motion
@@ -278,6 +296,9 @@ Resultados del laboratorio `hummingbird-high-frequency`:
 - Flujo Seedream Pro→GPT: Pro creó el look source en 121,39 s. GPT high requirió cuatro pases
   registrados: el primero clonó cuerpos, el segundo corrigió anatomía, el tercero redujo escala
   demasiado y el cuarto cerró 3:1 a 4,67/5 con 48% copy-safe.
+- Piloto Layout Design: tres clean plates (`16:9`, `4:5`, `9:16`) pasaron por Seedream 5 Pro Edit y luego
+  composición Sharp/fontkit con tipo y logo exactos. QA `3/3`, score `47/50`, costo incremental estimado
+  `USD 0,27`; copy/logo nunca entraron al modelo. Es evidencia, no SLA.
 
 Usar estos datos para routing y presupuesto exploratorio, no como SLA.
 
@@ -302,6 +323,7 @@ Usar estos datos para routing y presupuesto exploratorio, no como SLA.
 16. Usar porcentajes aproximados para escala; preferir cotas duras y márgenes mínimos.
 17. Construir una cadena de ratios o promover una reparación local a anchor sin aprobación.
 18. Enviar un defecto de edición a Seedance: sólo usarlo si de verdad falta una toma/acción/continuidad.
+19. Enviar el anuncio final con copy/logo a un modelo para finishing.
 
 ## Gate de aceptación
 

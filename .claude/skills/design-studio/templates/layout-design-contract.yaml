@@ -1,0 +1,63 @@
+version: layout-design-contract.v1
+campaign_id: campaign-id
+anchor:
+  id: campaign-kv-v1
+  revision: 1
+  asset: path/to/approved-anchor.png
+  locks:
+    - subject identity and anatomy
+    - campaign palette and lighting logic
+    - recurring visual hook
+formats:
+  - id: social-landscape
+    ratio: '16:9'
+    canvas: { width: 1920, height: 1080 }
+    grid: { columns: 12, margin_pct: 5, gutter_pct: 2 }
+    subject_zone: right 48 percent
+    copy_field: left 40 percent
+  - id: social-feed
+    ratio: '4:5'
+    canvas: { width: 1600, height: 2000 }
+    grid: { columns: 8, margin_pct: 6, gutter_pct: 2.5 }
+    subject_zone: lower-right 52 percent
+    copy_field: upper-left 42 percent
+  - id: story
+    ratio: '9:16'
+    canvas: { width: 1080, height: 1920 }
+    grid: { columns: 6, margin_pct: 7, gutter_pct: 3 }
+    subject_zone: center-lower 55 percent
+    copy_field: upper 36 percent; outside platform overlays
+layers:
+  - clean_plate
+  - optical_underlay
+  - campaign_hook
+  - type
+  - brand
+  - channel
+finish:
+  executor: bytedance/seedream/v5/pro/edit
+  delta: improve material integration, atmospheric depth and micro-detail only
+  input_policy: clean plate only; no final copy, logo, CTA or legal
+  stop_condition: stop if scorecard does not improve or next delta is deterministic
+composition:
+  executor: Figma | Adobe | Sharp/fontkit | other-declared-tool
+  authoritative_assets:
+    logo: path/to/official-logo.svg
+    typography: named-family-and-files
+  exact_content:
+    headline: ''
+    support: ''
+    cta: ''
+    legal: ''
+gates:
+  - anchor
+  - layout
+  - finish
+  - craft
+  - format
+  - technical
+  - human_release
+provenance:
+  manifest: path/to/manifest.json
+  scorecard: path/to/scorecard.md
+  release_owner: named-role

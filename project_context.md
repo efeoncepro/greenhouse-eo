@@ -23,6 +23,13 @@
   montaje. Creative release no implica media
   activation ni press-ready sin ICC/vendor spec. Es
   producción out-of-band; no modifica el runtime del portal.
+  **Delta Layout Design & Finishing (2026-07-19):** para sets estáticos premium, el canon inserta
+  `layout contract → clean plate nativo por ratio → bounded finish → composición determinística → mastering`
+  después del anchor. Seedream Pro resuelve material/luz/atmósfera; GPT Image 2, geometría/safe zones/protección;
+  el compositor conserva copy, logo, CTA, legal y locale. Nunca reenviar el anuncio final al modelo. Skill:
+  `design-studio/modules/13_LAYOUT_DESIGN_AND_FINISHING.md`; manual:
+  `docs/manual-de-uso/ai-tooling/producir-layout-design-y-finishing.md`. Piloto: tres formatos, QA `3/3`,
+  `47/50`, costo incremental estimado `USD 0,27`.
 
 - **Premium Agentic UI Delivery (2026-07-18, TASK-1453 / EPIC-033):** la calidad visual de UI nueva ya no se infiere por tokens, primitives o build verde. `greenhouse-ai-design-studio` orquesta Visual Direction → recipe/Composition Shell → primitives → GVC premium → review. El ADR `docs/architecture/GREENHOUSE_PREMIUM_AGENTIC_UI_DELIVERY_DECISION_V1.md` y el estándar `docs/ui/GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md` hacen bloqueantes card wallpaper, más de tres superficies `contained` en el first fold normal, falta de un momento visual dominante y mobile serializado como stack de cards. Cierre: cuatro gates (`design-contract`, `ui-code`, `ui-visual`, `ui-quality`), media ≥4.5/5, piso ≥4 y cinco dimensiones críticas ≥4.5. MUI/Vuexy siguen como foundation accesible, no como autor visual.
 

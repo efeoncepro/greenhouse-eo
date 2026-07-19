@@ -1,5 +1,16 @@
 # changelog.md
 
+## 2026-07-19 — Layout Design & Finishing canonizado para producción estática premium
+
+- El método `anchor → layout contract → clean plate por ratio → bounded finish → composición determinística
+  → mastering → QA` se incorporó al canon multimodal, con documentación funcional y manual operativo.
+- `design-studio` suma el módulo 13 y un contrato YAML reusable; `greenhouse-ai-image-generator` adopta el
+  mismo routing. Codex y Claude quedaron espejados.
+- Regla dura: Seedream Pro termina material/luz/color/atmósfera; GPT Image 2 corrige geometría/safe zones o
+  regiones protegidas; copy, logo, CTA, legal y locale nunca se devuelven al modelo después de componerlos.
+- El piloto High Frequency produjo `16:9`, `4:5` y `9:16`, pasó QA `3/3`, obtuvo `47/50` y registró costo
+  incremental estimado de `USD 0,27`. Es benchmark observado, no SLA. No cambia runtime, IAM ni despliegue.
+
 ## 2026-07-18 — Worked example E2E de campaña visual multimodal
 
 - Se produjo y versionó `ai-generations/2026-07-18_high-frequency-campaign-e2e/`: brief, fuentes,

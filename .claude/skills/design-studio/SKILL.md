@@ -33,7 +33,8 @@ description: >-
   Banana", "Midjourney", "Ideogram", "Firefly", "Flux", "Magnific", "upscale",
   "textura", "gradiente", "duotono", "crítica de diseño", "design critique",
   "completar el visual de la UI", "arte para la UI", "infografía editorial",
-  "diagrama SVG", "SVG a WebP". Para infografías determinísticas con copy/datos
+  "diagrama SVG", "SVG a WebP", "layout design", "finishing", "acabado premium".
+  Para infografías determinísticas con copy/datos
   exactos dirige composición y carga el método canónico de `content-marketing-studio`.
 user-invocable: true
 argument-hint: "[tarea o pregunta — ej: 'audita este key visual', 'diseña una imagen para la campaña del grader', 'dame un concepto visual para Glitch', 'dirige el arte del hero de /aeo-2', 'mood board para SKY']"
@@ -67,7 +68,7 @@ argument-hint: "[tarea o pregunta — ej: 'audita este key visual', 'diseña una
 
 1. **Clasifica la intención** (§2). ¿Es dirección de arte / diseño gráfico / auditoría de
    KV / imagen de marketing? Si pertenece a otra skill, **delega explícito** (§5) y para.
-2. **Carga el módulo o módulos** que apliquen (§3). No cargues los 12 — carga lo justo.
+2. **Carga el módulo o módulos** que apliquen (§3). No cargues los 13 — carga lo justo.
 3. **Chequea frescura**: si vas a nombrar una herramienta IA, versión, feature o tendencia
    volátil, reverifica primero (`SOURCES.md`).
 4. **Si hay que ejecutar** (auditar / producir / dirigir), abre `efeonce/STUDIO_TOOLING.md`
@@ -125,6 +126,7 @@ argument-hint: "[tarea o pregunta — ej: 'audita este key visual', 'diseña una
 | 10 | `modules/10_FORMATS_DELIVERY.md` | specs de entregable, formatos, safe zones, empaquetado |
 | 11 | `modules/11_PRODUCT_STORY_SCENES.md` | portadas/heroes con producto o analítica, auditoría forense de referencias, anti-referencias y SVG determinístico |
 | 12 | `modules/12_HYBRID_IMAGE_CAMPAIGN_PRODUCTION.md` | campañas Seedream↔GPT→Gemini Omni, still+motion, digital+print/OOH, brand modes, anchors y routing por operación |
+| 13 | `modules/13_LAYOUT_DESIGN_AND_FINISHING.md` | control compositivo por ratio, capas operativas, finish Seedream/GPT, mastering y QA premium |
 
 ## 4. La mano de ejecución (por qué es "studio")
 
@@ -138,6 +140,8 @@ Cierra el loop **idear → dirigir → producir → auditar → iterar** (detall
   Ideogram / Adobe Firefly / Higgsfield / Magnific (upscale) vía sus MCP/skills;
   **campaña híbrida Seedream/GPT/Gemini Omni →** cargar `modules/12_HYBRID_IMAGE_CAMPAIGN_PRODUCTION.md` y
   relevar por contrato `brand/channel→diverge→develop→anchor→organize→extend→animate→compose/post→prepress→release`;
+  **set estático premium con layout controlado →** cargar `modules/13_LAYOUT_DESIGN_AND_FINISHING.md`, completar
+  `templates/layout-design-contract.yaml` y usar `anchor→layout→clean plate→finish→compose→master→QA`;
   **infografía editorial exacta →** SVG determinístico + delivery SVG directo o raster según el método
   canónico de `content-marketing-studio`.
 - **Escena editorial de producto:** separar siempre la **gramática agnóstica** —jerarquía, gráficos,
@@ -191,7 +195,8 @@ Cada apuesta con su volatilidad en `SOURCES.md`:
 
 `templates/key-visual-brief.md` · `key-visual-audit-scorecard.md` · `art-direction-moodboard.md` ·
 `image-prompt-sheet.md` · `campaign-visual-system.md` · `design-critique.md` ·
-`asset-delivery-spec.md` · `reference-library.md` · `model-handoff-contract.yaml`
+`asset-delivery-spec.md` · `reference-library.md` · `model-handoff-contract.yaml` ·
+`layout-design-contract.yaml`
 
 ## 8. Archivos de apoyo
 
@@ -204,5 +209,7 @@ Cada apuesta con su volatilidad en `SOURCES.md`:
   sello URL, benchmark Semrush y gates editoriales propios de Efeonce.
 - `modules/12_HYBRID_IMAGE_CAMPAIGN_PRODUCTION.md` — factory de campañas multi-modelo y multi-canal,
   contratos de relevo, brand/channel modes, anchor gate y routing Seedream 5 ↔ GPT Image 2 → Gemini Omni.
+- `modules/13_LAYOUT_DESIGN_AND_FINISHING.md` — composición nativa por ratio, capas con autoridad explícita,
+  routing de finish y cierre determinístico premium.
 - `efeonce/` — overlay: `EFEONCE_OVERLAY.md`, `STUDIO_TOOLING.md`, `DESIGN_BOUNDARY.md`,
   `CLIENT_DELIVERY.md`.

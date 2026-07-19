@@ -1,6 +1,6 @@
 ---
 name: greenhouse-ai-image-generator
-description: Expertly art-direct, prompt, generate, edit, validate, and apply AI-generated visual assets for Greenhouse, including transparent PNG icons, UI elements, empty states, banners, hero images, thumbnails, professional finishes, material/style control, reference-guided edits, and hybrid Seedream 5↔GPT Image 2→Gemini Omni campaign workflows across digital, motion, print and OOH. Use when a user asks to create images with AI, improve image prompts, use OpenAI/GPT Image/Imagen/Nano Banana/Seedream via fal.ai, create transparent assets, or produce and scale polished visuals for Greenhouse UI or campaign production.
+description: Expertly art-direct, prompt, generate, edit, validate, and apply AI-generated visual assets for Greenhouse, including transparent PNG icons, UI elements, empty states, banners, hero images, thumbnails, layout-design finishing, material/style control, reference-guided edits, and hybrid Seedream 5↔GPT Image 2→Gemini Omni campaign workflows across digital, motion, print and OOH. Use when a user asks to create images with AI, improve image prompts, use OpenAI/GPT Image/Imagen/Nano Banana/Seedream via fal.ai, create transparent assets, or produce and scale polished visuals for Greenhouse UI or campaign production.
 ---
 
 # Greenhouse AI Image Generator
@@ -19,6 +19,8 @@ Read only what the task needs:
   fal.ai still-image generation, multiple image models or campaign profusion
 - `docs/operations/GREENHOUSE_MULTIMODAL_CAMPAIGN_PRODUCTION_V1.md` when stills hand off to Gemini Omni,
   or the campaign includes motion, print/OOH or explicit branded/brand-light/neutral/client modes
+- `../design-studio/modules/13_LAYOUT_DESIGN_AND_FINISHING.md` when static campaign pieces need controlled
+  ratio layouts, generative finishing and deterministic copy/brand composition
 - `DESIGN.md` when the asset will appear in UI
 - `AGENTS.md`, `project_context.md`, `Handoff.md` for repo coordination
 
@@ -95,6 +97,9 @@ pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (
 - Campaign derivation uses a governed **star topology**: the approved `anchor_id`/`anchor_revision` is the
   center; ratios, motion plates, print proofs and OOH proofs are independent spokes. A local repair does not
   become the next anchor without explicit human promotion.
+- For layout-designed static sets, the model receives only a clean ratio plate. Build the layout contract first,
+  use Seedream Pro for material/light/atmosphere or GPT Image 2 for geometry/protected repair, then compose
+  final copy, logo, CTA and legal deterministically. Never send the composed ad back through a model.
 - Use `generateAnimation()` for small SVG/CSS animations, not raster image generation.
 - Use the native chat image tool only for exploratory artifacts or when the user asks for an image in chat rather than a repo asset.
 

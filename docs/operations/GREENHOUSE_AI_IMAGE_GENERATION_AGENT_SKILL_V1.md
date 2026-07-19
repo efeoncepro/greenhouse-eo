@@ -3,7 +3,7 @@
 > **Tipo:** operating guide para agentes
 > **Estado:** Accepted
 > **Creado:** 2026-06-01
-> **Ultima actualizacion:** 2026-07-18
+> **Ultima actualizacion:** 2026-07-19
 > **Fuentes externas verificadas:** OpenAI developer docs y fichas oficiales Fal.ai, 2026-07-18
 
 ## Purpose
@@ -426,6 +426,28 @@ Worked example E2E:
 handoff es un `technical-probe`, nunca una pieza de campaña. Motion profesional debe declarar su familia de
 entrega —al menos master y cutdown en los ratios acordados—, arco temporal, end card, audio, poster, captions/
 muted comprehension y QA. Un límite de modelo no autoriza llamar “spot” a un smoke test.
+
+### Layout Design & Finishing
+
+Para sets estáticos con alta exigencia compositiva, no pedir al modelo que invente y termine simultáneamente el
+anuncio. Después del anchor, fijar un layout contract por ratio y separar:
+
+- `clean_plate`: sujeto, ambiente, material y luz;
+- `optical_underlay` y `campaign_hook`: integración y sistema gráfico;
+- `type` y `brand`: copy, logo, CTA, legal y locale exactos;
+- `channel`: crop, safe zone, color, tamaño, compresión o prepress.
+
+Seedream Pro cierra material/luz/color/atmósfera; GPT Image 2 cierra geometría/safe zones/región protegida. El
+modelo recibe sólo el clean plate y un delta. Figma/Adobe/código/Sharp compone la pieza final. Nunca se reenvía
+el anuncio compuesto al modelo. Detener la inferencia cuando el scorecard no mejora o el siguiente delta es
+determinístico.
+
+Canon y evidencia:
+
+- `.codex/skills/design-studio/modules/13_LAYOUT_DESIGN_AND_FINISHING.md`;
+- `.codex/skills/design-studio/templates/layout-design-contract.yaml`;
+- `docs/documentation/ai-tooling/layout-design-and-finishing.md`;
+- `ai-generations/2026-07-18_high-frequency-campaign-e2e/brief/layout-design-pilot.md`.
 
 ## Safety And Governance
 
