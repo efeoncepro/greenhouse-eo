@@ -21,10 +21,12 @@
 
 ## Pendientes inmediatos
 
-- `TASK-1481` (Globe API Contract Spine + cross-surface harness) EN PROGRESO local-first en `develop`, sin push.
-  Código en el repo hermano `../efeonce-globe` (packages contracts/domain/sdk + apps/studio-web); en greenhouse-eo
-  sólo cambia lifecycle documental. Gate de cierre del runtime: `cd ../efeonce-globe && pnpm check && pnpm build`
-  (NO consume el build de greenhouse-eo). Desbloquea `TASK-1457` (primer provider canary sobre el spine).
+- `TASK-1481` (Globe API Contract Spine + cross-surface harness) COMPLETE local-first, sin push. Implementado en
+  el repo hermano `../efeonce-globe` (5 commits en `main`: contracts trusted spine · dispatch API/SDK · conformance
+  harness · idempotency · docs); `pnpm check` + `pnpm build` verdes. En greenhouse-eo sólo cambió lifecycle
+  documental (cero runtime, cero build). Desbloquea `TASK-1457`: extiende `CapabilityRegistry` con el primer
+  Model Lab command + provider canary y voltea su coverage de policy-blocked a available. Deferidos declarados:
+  replay dedup con estado y mapping ID-token→principal por identidad → TASK-1457; tenancy store → TASK-1465.
 - EPIC-028 avanza en tres carriles paralelos gobernados íntegramente por Greenhouse. `TASK-1456…1485` viven
   en `docs/tasks/to-do/`, pasan por hooks/lint/QA/handoff de este repo y pueden poseer paths de implementación
   en el repositorio hermano. Globe conserva sólo arquitectura, runtime y evidencia técnica; no tiene registry

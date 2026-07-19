@@ -1,5 +1,33 @@
 # TASK-1481 — Globe API Contract Spine and Cross-Surface Harness
 
+## Delta 2026-07-19 — COMPLETE (implementado en `../efeonce-globe`, 5 commits)
+
+Spine implementado, `pnpm check` + `pnpm build` verdes en el repo hermano. Ningún cambio de runtime en
+greenhouse-eo (sólo lifecycle documental). Commits Globe: `c7590a4` (Slice 1 trusted contract spine),
+`9eb91e9` (Slice 2 private API + SDK dispatch), `1a9c9db` (Slice 3 conformance harness), `ddbab12` (idempotency
+contract evidence), `d1851c9` (docs).
+
+- **Slice 1 — trusted contract spine.** `packages/contracts`: `CommandRequestEnvelopeV1`/`ReaderRequestEnvelopeV1`
+  sin actor/capability/workspace de autoridad (sólo `workspaceSelection` no confiable), `CommandResultV1`/
+  `ReaderResultV1`, error `policy_blocked`, `GLOBE_SURFACES` + `SurfaceCoverageState` de 3 estados (`missing`
+  irrepresentable), `CapabilityDescriptorV1`/`CapabilityCoverageManifestV1`, `parseGlobeCapabilities`,
+  `AuthenticatedPrincipalV1.workspaceBindings`. `packages/domain`: `TrustedCommandContextV1` (branded server-only) +
+  `deriveTrustedContext` (valida selection contra bindings, deny tipado en mismatch/ambigüedad). studio-web deja de
+  hardcodear capabilities (las deriva del broker) y bindea el workspace data-driven desde la org.
+- **Slice 2 — private API + SDK.** `CapabilityRegistry` (home único transport-neutral) + dispatch con enforcement de
+  coverage por surface + mapeo canónico de errores; fixture inerte (`globe.spine.echo`/`globe.spine.status`) + una
+  capability reservada policy-blocked (`globe.run.prepare`, sin handler hasta TASK-1457). studio-web: `GET
+  /v1/capabilities`, `POST /v1/commands`, `POST /v1/readers`, principal derivado server-side en ambos planos (web =
+  sesión humana; api = service principal IAM-gated). SDK: `capabilities`/`dispatchCommand`/`dispatchReader` tipados.
+- **Slice 3 — conformance harness.** Ejercita el handler real por HTTP y por el SDK (fetch inyectado): HTTP≡SDK mismo
+  primitive/result/audit; header/body no suplantan authority; selection ajena → 403; policy_blocked vía SDK; matriz
+  data-driven desde el manifest (una capability nueva se ejercita sin editar el harness); idempotency-key exigida +
+  replay determinístico del fixture inerte.
+
+**Rollout:** N/A productivo — internal-only, sin flags/infra/provider/migración, fixture inerte. El primer provider
+canary (gasto real, credenciales) pertenece a TASK-1457/TASK-1464. Replay dedup con estado se difiere a la primera
+capability con estado (TASK-1457). Mapping real ID-token → principal por identidad se difiere a TASK-1457.
+
 ## Delta 2026-07-19 — pre-execution review (arch-architect + state-design + info-architecture + creative-practice)
 
 - `TASK-1456` está `complete`: la dependencia de `Depends on` quedó satisfecha y esta task está desbloqueada.
@@ -26,7 +54,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -275,17 +303,23 @@ Ninguna. La primera credencial/provider call pertenece al checkpoint aprobado de
 
 ## Acceptance Criteria
 
-- [ ] `packages/contracts` separa untrusted payload de trusted actor/workspace/capabilities.
-- [ ] Body, query y headers no pueden suplantar authority context; tests negativos pasan.
-- [ ] Un fixture command/reader produce el mismo result/error/audit correlation por HTTP y SDK.
-- [ ] Existe coverage machine-readable por capability/surface con `available|policy-blocked|not-applicable`.
-- [ ] No existe generic `endpoint + arbitrary JSON` ni import provider/DB/storage desde transports.
-- [ ] El SDK deja de ser health-only como patrón, sin inventar business capability antes de su task.
-- [ ] El error canónico distingue capability/surface `policy-blocked` de `access_denied`/`not_found` con un código estable, consumible por UI/MCP/agentes para renderizar el estado honesto.
-- [ ] Workspace selection caller-provided se valida contra bindings (deny + audit en mismatch) y existe test negativo de principal válido operando un workspace ajeno.
-- [ ] El trusted context se deriva y prueba para ambos planos de auth (`greenhouse-session` humano y `google-id-token` workload), o el plano diferido queda declarado explícito con su task.
-- [ ] TASK-1457 puede añadir el primer Model Lab command y provider canary sin cambiar el spine.
-- [ ] No se habilitan Production, provider spend, cliente externo ni MCP creativo.
+- [x] `packages/contracts` separa untrusted payload de trusted actor/workspace/capabilities.
+- [x] Body, query y headers no pueden suplantar authority context; tests negativos pasan.
+- [x] Un fixture command/reader produce el mismo result/error/audit correlation por HTTP y SDK.
+- [x] Existe coverage machine-readable por capability/surface con `available|policy-blocked|not-applicable`.
+- [x] No existe generic `endpoint + arbitrary JSON` ni import provider/DB/storage desde transports.
+- [x] El SDK deja de ser health-only como patrón, sin inventar business capability antes de su task.
+- [x] El error canónico distingue capability/surface `policy-blocked` de `access_denied`/`not_found` con un código estable, consumible por UI/MCP/agentes para renderizar el estado honesto.
+- [x] Workspace selection caller-provided se valida contra bindings (deny + audit en mismatch) y existe test negativo de principal válido operando un workspace ajeno.
+- [x] El trusted context se deriva y prueba para ambos planos de auth (`greenhouse-session` humano y `google-id-token` workload), o el plano diferido queda declarado explícito con su task.
+- [x] TASK-1457 puede añadir el primer Model Lab command y provider canary sin cambiar el spine.
+- [x] No se habilitan Production, provider spend, cliente externo ni MCP creativo.
+
+### Backend/data acceptance additions
+
+- [x] El spine permite añadir una capability sin duplicar business logic por transport (`CapabilityRegistry`).
+- [x] Auth spoofing, idempotency replay, deny y canonical error paths tienen contract evidence (conformance harness).
+- [x] La conformance matrix y sus asserts se derivan de los capability descriptors/coverage machine-readable; añadir una capability nueva no requiere editar el harness, sólo declarar descriptor + fixture.
 
 ## Verification
 
@@ -298,9 +332,9 @@ Ninguna. La primera credencial/provider call pertenece al checkpoint aprobado de
 
 ## Closing Protocol
 
-- [ ] Lifecycle/carpeta, README, registry, EPIC-028, changelog y Handoff sincronizados.
-- [ ] Arquitectura/ADR y coverage contract reflejan el runtime real.
-- [ ] QA release auditor y documentation governor ejecutados.
+- [x] Lifecycle/carpeta, README, registry, EPIC-028, changelog y Handoff sincronizados.
+- [x] Arquitectura/ADR y coverage contract reflejan el runtime real (Globe `changelog.md` + `Handoff.md`).
+- [x] QA release auditor y documentation governor ejecutados.
 
 ## Follow-ups
 
