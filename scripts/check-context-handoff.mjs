@@ -62,6 +62,7 @@ const agents = read('AGENTS.md')
 const claude = read('CLAUDE.md')
 const claudeTaskCommand = read('.claude/commands/implement-task.md')
 const claudeDocumentationGovernor = read('.claude/skills/greenhouse-documentation-governor/SKILL.md')
+const codexDocumentationGovernor = read('.codex/skills/greenhouse-documentation-governor/SKILL.md')
 const codexPrompt = read('docs/operations/CODEX_EXECUTION_PROMPT_V1.md')
 const documentationModel = read('docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md')
 const changelog = read('changelog.md')
@@ -161,6 +162,8 @@ requireIncludes(
   'the immutable changelog snapshot manifest'
 )
 requireIncludes('AGENTS.md', agents, 'CONTEXT_HANDOFF_OPERATING_MODEL_V1.md')
+requireIncludes('AGENTS.md', agents, 'docs/changelog/internal/README.md')
+requireIncludes('AGENTS.md', agents, 'docs:context-rotate --apply')
 requireIncludes('CLAUDE.md', claude, 'CONTEXT_HANDOFF_OPERATING_MODEL_V1.md')
 requireIncludes(
   '.claude/commands/implement-task.md',
@@ -227,14 +230,32 @@ requireIncludes(
   'the historical context fallback'
 )
 requireIncludes('.claude/commands/implement-task.md', claudeTaskCommand, 'docs:context-check:strict')
+requireIncludes('.claude/commands/implement-task.md', claudeTaskCommand, 'changelog.md')
+requireIncludes('.claude/commands/implement-task.md', claudeTaskCommand, 'docs/changelog/internal/')
+requireIncludes('.claude/commands/implement-task.md', claudeTaskCommand, 'docs:context-rotate --apply')
 requireIncludes(
   '.claude/skills/greenhouse-documentation-governor/SKILL.md',
   claudeDocumentationGovernor,
   'Never reintroduce `## Delta YYYY-MM-DD`',
   'the no-reaccretion rule'
 )
+requireIncludes(
+  '.claude/skills/greenhouse-documentation-governor/SKILL.md',
+  claudeDocumentationGovernor,
+  'Never let `changelog.md` become an append-only archive',
+  'the bounded changelog rule'
+)
+requireIncludes(
+  '.codex/skills/greenhouse-documentation-governor/SKILL.md',
+  codexDocumentationGovernor,
+  'Never let `changelog.md` become an append-only archive',
+  'the bounded changelog rule'
+)
 requireIncludes('docs/operations/CODEX_EXECUTION_PROMPT_V1.md', codexPrompt, 'CONTEXT_HANDOFF_OPERATING_MODEL_V1.md')
 requireIncludes('docs/operations/CODEX_EXECUTION_PROMPT_V1.md', codexPrompt, 'docs:context-check:strict')
+requireIncludes('docs/operations/CODEX_EXECUTION_PROMPT_V1.md', codexPrompt, 'changelog.md')
+requireIncludes('docs/operations/CODEX_EXECUTION_PROMPT_V1.md', codexPrompt, 'docs/changelog/internal/')
+requireIncludes('docs/operations/CODEX_EXECUTION_PROMPT_V1.md', codexPrompt, 'docs:context-rotate --apply')
 requireIncludes(
   'docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md',
   documentationModel,

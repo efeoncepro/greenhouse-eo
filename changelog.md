@@ -15,7 +15,9 @@
 - `pnpm docs:context-rotate --apply` rota Handoff y changelog de forma independiente, mueve entradas completas
   a shards mensuales con hash, actualiza sus índices y aborta la reescritura ante edición concurrente.
 - `pnpm docs:context-check:strict` y el workflow de governance ahora aplican budget, formato, orden, pointers e
-  integridad. `docs/changelog/CLIENT_CHANGELOG.md`, `CLAUDE.md` y su CI permanecen fuera de este cambio.
+  integridad; el prompt operativo de Codex y `implement-task` de Claude declaran explícitamente la ventana,
+  archivo, rotación y gate del changelog, y CI verifica esos pointers. `docs/changelog/CLIENT_CHANGELOG.md`,
+  `CLAUDE.md` y su CI permanecen fuera de este cambio.
 
 ## 2026-07-19 — Creative Studio: portfolio enterprise y routing agentic gobernado
 

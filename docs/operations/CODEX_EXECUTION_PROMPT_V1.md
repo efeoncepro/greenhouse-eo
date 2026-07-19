@@ -314,7 +314,8 @@ Ejecuta lo proporcional al cambio:
 - `pnpm ops:lint --changed` si tocaste tasks/epics/mini-tasks
 - `pnpm qa:gates --changed` + skill `greenhouse-qa-release-auditor` antes de cerrar implementaciones no triviales
 - UI: `pnpm fe:capture ...` y revisar frames PNG
-- Docs/operating contracts: `pnpm docs:closure-check` y, si cambió contexto/handoff, `pnpm docs:context-check:strict`
+- Docs/operating contracts: `pnpm docs:closure-check` y, si cambió contexto/handoff/changelog governance,
+  `pnpm docs:context-check:strict`
 
 Si no puedes ejecutar una validación razonable, dilo con causa concreta y riesgo residual.
 
@@ -405,7 +406,8 @@ Todo cambio a este harness debe sincronizar, con deltas breves:
 - `CLAUDE.md` solo como awareness de convivencia cuando corresponda.
 - `Handoff.md` solo para continuidad activa; `changelog.md` si cambia realmente
   el contrato operativo, producto, runtime o workflow. La cronología histórica
-  pertenece a los shards/snapshots, no a deltas acumulativos en documentos vivos.
+  pertenece a `docs/changelog/internal/` y a los shards/snapshots, no a deltas acumulativos en documentos
+  vivos. Mantener la ventana activa con `pnpm docs:context-rotate --apply`.
 
 No duplicar el prompt completo en otros archivos. Este documento es la fuente
 canónica del harness Codex; los demás entrypoints deben enlazar o resumir.
