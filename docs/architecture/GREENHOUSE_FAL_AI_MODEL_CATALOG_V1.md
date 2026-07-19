@@ -44,6 +44,7 @@ const res = await runFalModel<{ images?: Array<{ url: string }> }>({
 - **Out-of-band, NO runtime del producto:** el cliente Greenhouse es un puente de laboratorio. El runtime
   productivo futuro pertenece al repositorio separado de Creative Studio.
 - **Gotcha queue URLs:** para slugs con sub-path (`fal-ai/flux/schnell`), Fal.ai devuelve `status_url`/`response_url` en el **app padre** (`fal-ai/flux/requests/...`). `runFalModel` ya usa esas URLs; nunca reconstruirlas a mano (da HTTP 405).
+- **⚠️ Gotcha prefijo ByteDance (verificado en vivo 2026-07-19):** los modelos **ByteDance** (Seedream, Seedance, Seed Audio) usan slug **SIN** el prefijo `fal-ai/` — `bytedance/seedream/v5/pro/text-to-image`, `bytedance/seedance-2.0/text-to-video`. Con el prefijo `fal-ai/bytedance/...` el submit se acepta (200) pero el **result da 404** (`Path /seedream/... not found`) y `inference_time` ≈ 0.02s (no generó nada). El resto de los proveedores (FLUX, Recraft, ElevenLabs, Topaz, Trellis, Hyper3D…) **sí** llevan `fal-ai/`. Fuente de verdad de slugs: las **skills** (tested), no este catálogo si difieren.
 - **Dirección de arte:** video → skill `motion-design-studio`; audio → `audio-studio`; elección de modelo/estética → `design-studio`; still images de UI/marca → `greenhouse-ai-image-generator`.
 
 ### Modelo de pricing (resumen)
@@ -101,10 +102,10 @@ Fal.ai cobra **por uso**, con la unidad según la modalidad (siempre confirmar e
 | OpenAI | GPT Image 2 | `openai/gpt-image-2` ✅ | (misma familia que nuestro runtime OpenAI) |
 | xAI | Grok Imagine Image | `xai/grok-imagine-image` ✅ | |
 | xAI | Grok Imagine Pro | `xai/grok-imagine-image/quality/text-to-image` ✅ | |
-| Seedream (ByteDance) | Seedream 4.5 | `fal-ai/bytedance/seedream/v4.5/text-to-image` ✅ | |
-| Seedream | Seedream 4.0 | `fal-ai/bytedance/seedream/v4/text-to-image` ✅ | |
-| Seedream | Seedream 5.0 Lite | `fal-ai/bytedance/seedream/v5/lite/text-to-image` ✅ | divergencia y lotes rápidos |
-| Seedream | Seedream 5.0 Pro | `fal-ai/bytedance/seedream/v5/pro/text-to-image` ✅ | materialidad, atmósfera y desarrollo de look |
+| Seedream (ByteDance) | Seedream 4.5 | `bytedance/seedream/v4.5/text-to-image` ✅ | |
+| Seedream | Seedream 4.0 | `bytedance/seedream/v4/text-to-image` ✅ | |
+| Seedream | Seedream 5.0 Lite | `bytedance/seedream/v5/lite/text-to-image` ✅ | divergencia y lotes rápidos |
+| Seedream | Seedream 5.0 Pro | `bytedance/seedream/v5/pro/text-to-image` ✅ | materialidad, atmósfera y desarrollo de look |
 | Krea | Krea 2 Turbo | `fal-ai/krea-2/turbo` ✅ | |
 | Krea | Krea 2 Turbo LoRA | `fal-ai/krea-2/turbo/lora` ✅ | |
 | Ideogram | Ideogram V4 Instant / Fast | `ideogram/v4/instant` · `ideogram/v4/fast` ✅ | fuerte en **texto en imagen** |
@@ -127,9 +128,9 @@ Edición dirigida por prompt, inpainting, reference/kontext, controlnet.
 | GPT Image 2 Edit | `openai/gpt-image-2/edit` ✅ | edición image-to-image |
 | FLUX.2 [pro] Edit | `fal-ai/flux-2-pro/edit` ✅ | |
 | FLUX.1 Kontext [pro] | `fal-ai/flux-pro/kontext` ✅ | edición contextual / reference |
-| Seedream 4.5 Edit | `fal-ai/bytedance/seedream/v4.5/edit` ✅ | |
-| Seedream 5.0 Lite Edit | `fal-ai/bytedance/seedream/v5/lite/edit` ✅ | |
-| Seedream 5.0 Pro Edit | `fal-ai/bytedance/seedream/v5/pro/edit` ✅ | edición de alta fidelidad para desarrollo de look |
+| Seedream 4.5 Edit | `bytedance/seedream/v4.5/edit` ✅ | |
+| Seedream 5.0 Lite Edit | `bytedance/seedream/v5/lite/edit` ✅ | |
+| Seedream 5.0 Pro Edit | `bytedance/seedream/v5/pro/edit` ✅ | edición de alta fidelidad para desarrollo de look |
 | Grok Imagine Image Edit | `xai/grok-imagine-image/edit` · `xai/grok-imagine-image/quality/edit` ✅ | |
 | ControlNet / IP-Adapter (FLUX/SD) | `fal-ai/flux-controlnet-*` 🔎 | control estructural (pose, depth, canny) |
 

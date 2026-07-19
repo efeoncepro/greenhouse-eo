@@ -7,6 +7,12 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-19 — EPIC-028 · Globe Fal adapter model expansion + canary en vivo (TASK-1488)
+
+- `TASK-1488` COMPLETE en `../efeonce-globe`. Expande el `FalCreativeAdapter` (TASK-1487): `CREATIVE_CAPABILITIES` +3 (`image-upscale`, `video-upscale`, `model-3d-generate`) y `FAL_ROUTING` con modelos verificados **contra las skills** (fuente tested): Seedream 5 Pro/Lite (image), Recraft v4.1 `text-to-vector`, Topaz upscale (imagen/video), Hyper3D Rodin v2.5 `text-to-3d`, Seed Audio (audio, reverify), ElevenLabs (speech), Seedance 2.0 (video).
+- **Bug de slug descubierto y corregido en vivo:** los modelos **ByteDance** en Fal usan slug **SIN** prefijo `fal-ai/` (`bytedance/seedream/v5/pro/text-to-image`); con el prefijo el submit pasa (200) pero el result da 404. La skill `greenhouse-ai-image-generator` lo tenía bien; el catálogo doc (`GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md`) lo tenía mal — se corrigió el prefijo + se agregó la regla dura.
+- **Canary Fal verificado EN VIVO** por el seam con la key Fal existente del repo (excepción temporal documentada; retiro = Globe provisiona su propia key): `image-generate` → Seedream 5 Pro, `candidate_ready`, `provider=fal`, `actualRoute=bytedance/seedream/v5/pro/text-to-image`, `estimated==actual==10`, `sha256:f9d9a216…`, fence liquidó. `pnpm check` verde (30 tests creative-runner con las 10 caps). Slugs 🔎 (Seed Audio, Topaz) marcados reverify.
+
 ## 2026-07-19 — EPIC-028 · Globe Fal provider adapter + Composite router (TASK-1487)
 
 - `TASK-1487` COMPLETE (code-complete, rollout gated) local-first en `../efeonce-globe`. Segundo `CreativeProviderAdapter` real: `FalCreativeAdapter` conecta el stack **no-Google** vía la queue API de Fal — **Seedream 5** (`image-generate`/`image-edit`), **Recraft** (`image-vectorize`), **Seedance 2.0** (`video-generate`/`video-extend`) y **ElevenLabs** (`audio-generate`/`speech-synthesize`) — las 7 capabilities. Secreto propio de Globe (`GLOBE_FAL_API_KEY`, nunca `greenhouse-fal-api-key`), inyectado; queue con el gotcha `status_url`/`response_url` (nunca reconstruir desde el slug); output descargado server-side → `sha256` (nunca URL pública); error mapping sanitizado.
@@ -718,21 +724,3 @@
   0 findings error + enterprise rubric PASS (desktop + mobile + teclado + reduced-motion), con
   fixes reales salidos del loop (región scrolleable accesible, overlap mobile, generate enriquecido).
 - Rollout: gobernado por `HIRING_VACANCY_AI_ENABLED` (OFF; ledger de 1385). Dev local ON.
-
-## 2026-07-16 — TASK-1385: redacción asistida por IA del copy público de vacantes (propose→confirm)
-
-- La IA propone los campos `public_*` del aviso de una vacante desde inputs **allowlist-safe**
-  (demanda + competencias del template de assessment + voz Efeonce es-CL); NUNCA ve presupuesto,
-  tarifas, notas internas ni referencias de cliente (test negativo con sentinels). Propone COPY,
-  no hechos: ubicación/modalidad/compensación jamás se inventan.
-- El confirm humano aplica vía `updateHiringOpening` (writer canónico, ahora acepta client externo
-  para atomicidad); el LLM no tiene write path al opening y el publish sigue siendo acción humana
-  con su gate 422 (TASK-355/1371).
-- Reusa el ledger auditado de TASK-1361 con kind nuevo `opening_public_copy` (dedupe por digest,
-  state machine terminal-once). Capability nueva `hiring.opening.ai_assist` (propose, tier operador
-  hiring); el confirm exige `hiring.opening.write`. API: `POST /api/hiring/openings/[id]/ai/propose-public-copy`.
-- Prompt con checklist anti-sesgo de avisos (género/edad/proxies/solo job-related) + voz de marca
-  (context pack 05/09); provider Anthropic `claude-sonnet-5` con adapter honest-degrade.
-- Flag `HIRING_VACANCY_AI_ENABLED` default OFF (hermano deliberado del flag de assessment — no
-  hereda su gate regulatorio), registrado en el ledger. Migración aplicada en dev; live E2E PG
-  verde (propose no muta → confirm aplica → doble confirm idempotente → terminal-once 409).

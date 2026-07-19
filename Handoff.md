@@ -65,6 +65,14 @@
   = `fake|vertex|fal|composite` (default fake). 29 tests creative-runner verdes. **Desbloquea audio (1461)** + motores
   alternativos (1459/1460). Canary Fal billable gated por el secreto Fal de Globe + verificación de slugs.
   Inputs con bytes (edit/vectorize/i2v) → `inputs_unavailable` hasta la resolución hash→bytes (follow-up compartido).
+  **`TASK-1488` (Fal model expansion) COMPLETE — canary Fal VERIFICADO EN VIVO.** Expande el adapter Fal a 10 caps
+  (+`image-upscale`/`video-upscale`/`model-3d-generate`) con modelos verificados **contra las skills**: Seedream 5
+  Pro/Lite, Recraft v4.1 text-to-vector, Topaz upscale, Hyper3D Rodin v2.5 text-to-3D, Seed Audio (reverify),
+  ElevenLabs speech, Seedance 2.0. **Regla dura descubierta:** modelos **ByteDance** en Fal usan slug **sin** prefijo
+  `fal-ai/` (con prefijo el submit pasa pero el result da 404) — la skill lo tenía bien, el catálogo doc mal (corregido).
+  Canary Fal en vivo por el seam con la **key Fal existente del repo** (excepción temporal; retiro = key propia de
+  Globe): Seedream 5 Pro, `candidate_ready`, `sha256:f9d9a216…`, fence liquidó. Slugs 🔎 (Seed Audio, Topaz) reverify;
+  inputs con bytes (edit/upscale/i2v) → `inputs_unavailable` hasta la resolución hash→bytes.
 - EPIC-028 avanza en tres carriles paralelos gobernados íntegramente por Greenhouse. `TASK-1456…1485` viven
   en `docs/tasks/to-do/`, pasan por hooks/lint/QA/handoff de este repo y pueden poseer paths de implementación
   en el repositorio hermano. Globe conserva sólo arquitectura, runtime y evidencia técnica; no tiene registry
