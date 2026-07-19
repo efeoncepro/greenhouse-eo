@@ -21,6 +21,10 @@ Los archivos de arranque creados para continuidad multi-agente se convirtieron e
 - `project_context.md`: 6.527 líneas y ~169 k tokens;
 - `AGENTS.md`: 1.886 líneas y ~58 k tokens.
 
+La auditoria posterior detecto el mismo patron en `changelog.md`: 11.256 lineas, 2,2 MB y 261 entradas
+fechadas. Aunque no se auto-carga siempre, seguia concentrando conflictos, busquedas y cierre documental en un
+solo archivo sin budget ni rotacion.
+
 La acumulación preservaba texto pero degradaba el objetivo original: las fuentes vigentes quedaban enterradas,
 el orden del handoff dejó de ser confiable, aumentaban conflictos concurrentes y ningún agente podía consumir
 el corpus completo de forma estable. Borrar o resumir sin red de seguridad tampoco era aceptable: podía perder
@@ -42,6 +46,8 @@ Greenhouse adopta un modelo de contexto **router-first, load-on-demand y con pre
    - Tasks, issues, ADRs, commits, arquitectura y changelog siguen siendo evidencia canónica.
    - `Handoff.archive.md` es índice; los archivos históricos viven bajo
      `docs/operations/agent-context-history/` y se buscan por keyword.
+   - `changelog.md` conserva solo una ventana reciente; el snapshot inicial y los shards mensuales viven bajo
+     `docs/changelog/internal/`, indexados y verificables sin cargarlos completos.
 4. **No pérdida**
    - Antes del primer corte se preservan los cuatro archivos completos byte-for-byte.
    - Un manifest versionado guarda SHA-256, líneas y caracteres; el gate estricto recalcula todo.
@@ -51,6 +57,8 @@ Greenhouse adopta un modelo de contexto **router-first, load-on-demand y con pre
    - `pnpm docs:context-rotate --apply` conserva las sesiones más recientes por fecha, mueve excedentes a
      archivos mensuales idempotentes, enlaza cada shard desde el índice y aborta si detecta una edición
      concurrente del handoff.
+   - El mismo comando rota entradas completas del changelog, con hash por entrada y abort por edicion
+     concurrente independiente; `CLIENT_CHANGELOG.md` queda fuera de este contrato.
    - Un workflow CI independiente ejecuta el gate cuando cambian estos contratos.
    - Claude conserva su `CLAUDE.md` y CI independientes: el pointer existente lleva al operating model, mientras
      `.claude/commands/implement-task.md` y su documentation governor aplican carga, fallback y cierre. El gate
@@ -58,12 +66,13 @@ Greenhouse adopta un modelo de contexto **router-first, load-on-demand y con pre
 
 ## Presupuestos V1
 
-| Archivo activo       |                                   Techo |
-| -------------------- | --------------------------------------: |
-| `AGENTS.md`          |                 20.000 tokens estimados |
-| `project_context.md` |                 12.000 tokens estimados |
-| `Handoff.md`         | 12.000 tokens, 600 líneas y 20 sesiones |
-| `Handoff.archive.md` |                            2.000 tokens |
+| Archivo activo       |                                     Techo |
+| -------------------- | ----------------------------------------: |
+| `AGENTS.md`          |                   20.000 tokens estimados |
+| `project_context.md` |                   12.000 tokens estimados |
+| `Handoff.md`         |   12.000 tokens, 600 líneas y 20 sesiones |
+| `Handoff.archive.md` |                              2.000 tokens |
+| `changelog.md`       | 60.000 tokens, 2.000 lineas y 60 entradas |
 
 La estimación usa `ceil(chars / 4)`, igual que el gate documental existente. Los techos son límites, no metas
 de relleno: agregar contexto solo se justifica si es transversal y accionable.

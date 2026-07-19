@@ -26,8 +26,11 @@ invariantes y skills versionadas.
 ## Recuperación de contexto y regla de no pérdida
 
 La compactación de 2026-07-19 preservó byte-for-byte el `AGENTS.md`, `project_context.md`, `Handoff.md`
-y `Handoff.archive.md` anteriores. Índice, hashes y conteos:
+y `Handoff.archive.md` anteriores. La extensión del mismo día preservó también el `changelog.md` previo al
+corte. Índices, hashes y conteos:
 [`docs/operations/agent-context-history/2026-07-19/README.md`](docs/operations/agent-context-history/2026-07-19/README.md).
+Para historia interna del producto, usar
+[`docs/changelog/internal/README.md`](docs/changelog/internal/README.md); no cargar snapshots completos al inicio.
 
 Si este router no resuelve una duda load-bearing:
 
@@ -158,6 +161,8 @@ y [`GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md`](docs/ui/GREENHOUSE_PREMIUM_U
 - `AGENTS.md`: reglas transversales y router; nunca volver a almacenar specs de dominio inline.
 - `project_context.md`: estado durable vigente; sin diario ni secciones `Delta`.
 - `Handoff.md`: continuidad activa, máximo 20 sesiones.
+- `changelog.md`: ventana reciente de cambios reales; el historial sale a `docs/changelog/internal/` mediante
+  `pnpm docs:context-rotate --apply`, nunca se elimina ni se vuelve a pegar en raíz.
 - Tasks/issues/ADRs/arquitectura: evidencia y contrato canónico.
 - Historia: `docs/operations/agent-context-history/`, buscable bajo demanda y nunca auto-cargada completa.
 - Toda capacidad mantiene documentación técnica, funcional y manual/runbook proporcional.

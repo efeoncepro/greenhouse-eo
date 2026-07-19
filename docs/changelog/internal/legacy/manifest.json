@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "greenhouse-internal-changelog-snapshot.v1",
+  "createdAt": "2026-07-19T09:49:40.734Z",
+  "source": "changelog.md before bounded-window migration",
+  "files": [
+    {
+      "source": "changelog.md",
+      "snapshot": "docs/changelog/internal/legacy/changelog.pre-window.md",
+      "sha256": "3e492418393dbe1a5a02ef8de0b12f50ad1f981e7fcc60b69147dcbb30af80a0",
+      "lines": 11257,
+      "chars": 2182331
+    }
+  ]
+}

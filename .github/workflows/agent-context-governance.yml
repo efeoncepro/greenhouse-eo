@@ -7,12 +7,15 @@ on:
       - project_context.md
       - Handoff.md
       - Handoff.archive.md
+      - changelog.md
+      - docs/changelog/internal/**
       - docs/operations/agent-context-history/**
       - docs/operations/agent-context-router.json
       - docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md
       - docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md
       - scripts/check-context-handoff.mjs
       - scripts/maintenance/rotate-handoff-context.mjs
+      - scripts/maintenance/rotate-handoff-context.test.mjs
       - package.json
       - pnpm-lock.yaml
   push:
@@ -22,12 +25,15 @@ on:
       - project_context.md
       - Handoff.md
       - Handoff.archive.md
+      - changelog.md
+      - docs/changelog/internal/**
       - docs/operations/agent-context-history/**
       - docs/operations/agent-context-router.json
       - docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md
       - docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md
       - scripts/check-context-handoff.mjs
       - scripts/maintenance/rotate-handoff-context.mjs
+      - scripts/maintenance/rotate-handoff-context.test.mjs
       - package.json
       - pnpm-lock.yaml
 
@@ -51,3 +57,5 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Verify active context budgets, routing and immutable snapshots
         run: pnpm docs:context-check:strict
+      - name: Test context and changelog rotation
+        run: node --test scripts/maintenance/rotate-handoff-context.test.mjs
