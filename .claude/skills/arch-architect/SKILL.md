@@ -81,6 +81,24 @@ Bidirectional handoff:
   `pnpm build` in `efeonce-globe`, `node --test`, import-extension convention), and the
   trusted-context / dispatch mechanics.
 
+**Two worked examples now live on the spine, and the second is an architecture pattern
+worth stealing.** The Model Lab (TASK-1457) is the first — a capability with external state
++ a provider behind it. The **Evaluation Harness** (TASK-1458, SPEC-003,
+`EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md`, capability `globe.lab.evaluation.run`) is the
+second, and it demonstrates **capability-consumes-capability**: it never reimplements
+experiment execution — it reuses the Lab through an exported domain helper
+(`runModelLabExperiment`, the real `prepare→execute` path with every guardrail), never
+re-dispatching through the registry from inside a handler and never duplicating the logic.
+Its golden briefs + rubrics are **versioned data** flowing through one engine (no `switch`
+per fixture — two distinct fidelity contracts, one engine). And it draws the line the eval
+discipline demands: `objectiveChecks` (automatic, deterministic) stay separate from
+`humanCriteria` (declared, never auto-scored); the verdict is only
+`objective_fail | objective_pass_pending_human` — never a creative "passed", never "model X
+is globally better" — and reports are versioned, workspace-scoped, with limitations
+declared. **This is framework #10 (eval-driven AI design) as a Globe primitive:** promoting
+a model route to production is a gate SEPARATE from running it in the Lab, and the evidence
+for that promotion is an evaluation report per fidelity contract.
+
 Flow: **decide the shape here → hand to `greenhouse-globe` for the Globe-specific
 structure → it hands back up if a new shape decision surfaces.** Canonical specs:
 `efeonce-globe/docs/architecture/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md` (SPEC-001) +

@@ -1,5 +1,11 @@
 # TASK-1463 — Globe Model Promotion and Readiness Registry
 
+## Delta 2026-07-19 — TASK-1458 complete: el artefacto de evidencia para promoción ya existe
+
+`TASK-1458` (Golden Briefs & Evaluation Harness, SPEC-003) quedó **complete** (fake canary). Es una de las cuatro dependencias directas de esta task (`TASK-1458, 1459, 1460, 1461`) y aporta el **artefacto de evidencia** que las transiciones de estado del registry referencian: el `EvaluationReportV1` versionado (con `fixtureVersion` + `rubricVersion` + `schemaVersion`), scopeado al workspace del caller y con sus **limitaciones declaradas** (proveedor fake, muestra única). Esto alimenta directamente las AC "Cambio de estado exige evidencia y actor autorizado" y los `evidence refs` de los commands `propose`/`promote`/`pause`/`retire`.
+
+Nota de frontera, alineada con el Goal ("separar probar de autorizar") y la AC "Sólo rutas promoted pueden llegar al router productivo": un report es **evidencia técnica, nunca una aprobación de ruta** (invariante 9) ni de artefacto (invariante 6), y su verdict nunca es un "passed" creativo (sólo `objective_fail` u `objective_pass_pending_human`). El registry debe seguir exigiendo revisión humana + actor autorizado por encima del report objetivo; un `objective_pass_pending_human` **no** autoriza promover por sí solo. — cerrado por trabajo en TASK-1458.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

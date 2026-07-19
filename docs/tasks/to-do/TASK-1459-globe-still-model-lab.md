@@ -1,5 +1,15 @@
 # TASK-1459 — Globe Still Model Lab
 
+## Delta 2026-07-19 — TASK-1458 complete: harness de evals listo para el carril still
+
+`TASK-1458` (Golden Briefs & Evaluation Harness, SPEC-003) quedó **complete** (fake canary). Cierra la dependencia declarada en `Depends on` y desbloquea Slice 2 ("Ejecutar golden briefs y registrar costo/latencia/calidad") y Slice 3 ("recommendation matrix y candidatos de promoción"): esta task ya **no** construye el harness, lo **consume**. Provee, consumible por SDK, para el medio still:
+
+- Fixture golden versionado `rrss-key-visual-still` (capability `image-generate`, contrato de fidelidad `flexible-style`, hard cap 30), como **dato** con derechos declarados (`license`/`consent`/`permittedUse`).
+- Rúbrica versionada del mismo contrato con checks objetivos deterministas (`output_present`, `within_hard_cap`, `input_lineage_intact`, `route_stable`, `outcome_candidate`) y criterios humanos declarados (nunca auto-respondidos).
+- Comando `globe.lab.evaluation.evaluate`, que corre el brief por el camino real del Lab (`runModelLabExperiment`) y puntúa el manifest, más los readers de reporte (`listGoldenBriefs`, `getEvaluationReport`).
+
+Nota para Slice 3: el verdict del harness nunca es un "passed" creativo — sólo `objective_fail` u `objective_pass_pending_human`. La recommendation matrix debe tratar el reporte como evidencia objetiva (checks técnicos), no como aprobación de craft ni de ruta, y declarar la limitación "proveedor fake" hasta el canary real. — cerrado por trabajo en TASK-1458.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

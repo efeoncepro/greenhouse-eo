@@ -411,6 +411,20 @@ La gobernanza de ejecución no se desplaza con el runtime: Greenhouse conserva E
 task hooks, Plan Mode, lint, QA, lifecycle, cierre y handoff. Globe posee código, infraestructura, datos y
 evidencia técnica; su plan operativo referencia las tasks canónicas y no crea un segundo backlog.
 
+> **Estado — `TASK-1458` implementado (2026-07-19, fake canary).** El Golden Briefs & Evaluation Harness (SPEC-003)
+> es la capa versionada que convierte un intento del Model Lab en evidencia repetible por contrato de fidelidad:
+> capability `globe.lab.evaluation.run` sobre el mismo spine de `TASK-1481`, comando `evaluate` + readers `fixtures`/`report`.
+> **Consume** el Model Lab (`runModelLabExperiment`) —no reimplementa ejecución, spend fence ni provider seam— para
+> correr golden briefs versionados con derechos declarados (still `rrss-key-visual-still`, motion `product-motion-loop`,
+> audio `glitch-microphone-foley`; fixtures y rúbricas son **dato**) y puntúa el manifest con checks objetivos
+> deterministas (`output_present`, `within_hard_cap`, `input_lineage_intact`, `route_stable`, `outcome_candidate`),
+> separados de los criterios humanos declarados (nunca auto-respondidos). El verdict **nunca** es un "passed" creativo:
+> sólo `objective_fail` u `objective_pass_pending_human`. Emite un `EvaluationReportV1` versionado, scopeado al workspace
+> y con limitaciones declaradas (proveedor fake, muestra única). Un report es evidencia técnica, **nunca** aprobación de
+> ruta (invariante 9) ni de artefacto (invariante 6). `ui`/`mcp` quedan `policy-blocked`; el juicio humano real y la
+> corrida contra proveedor real quedan pendientes del canary de SPEC-002. Spec canónica:
+> `efeonce-globe/docs/architecture/EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md`.
+
 | Phase | Outcome | Explicitly excluded |
 | --- | --- | --- |
 | 0 — foundation | New repo, project boundaries, tenant/auth, assets, ledger skeleton, audit/telemetry, provider contract, one internal template | Client access, payments, free canvas |

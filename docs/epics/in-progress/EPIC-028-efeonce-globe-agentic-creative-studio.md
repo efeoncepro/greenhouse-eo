@@ -159,3 +159,18 @@ conserva sólo contexto de credits por run. `TASK-1485` funda el Design System p
 gobierna decisiones, registry, lifecycle, QA, evidencia y promoción; Globe posee tokens seleccionados,
 patterns, components, motion y runtime. Compartir deliberadamente un color no implica heredar el sistema UI
 de Greenhouse.
+
+## Delta 2026-07-19 — TASK-1458 complete (Golden Briefs & Evaluation Harness)
+
+`TASK-1458` quedó **complete** (fake canary), sumándose a `TASK-1481` (spine), `TASK-1457` (Model Lab) y
+`TASK-1464` (IaC) como capabilities cerradas sobre el spine. El Golden Briefs & Evaluation Harness (SPEC-003)
+consume el Model Lab (`runModelLabExperiment`) para puntuar golden briefs still/motion/audio —con derechos
+declarados— contra rúbricas versionadas: checks objetivos deterministas separados de criterios humanos, verdict
+que nunca es un "passed" creativo (`objective_fail` u `objective_pass_pending_human`) y reports versionados,
+scopeados al workspace y con limitaciones declaradas. Capability `globe.lab.evaluation.run` (`ui`/`mcp`
+`policy-blocked`); un report es evidencia técnica, no aprobación de ruta (invariante 9) ni de artefacto
+(invariante 6). Con esto el Lab gate y los fixtures/rúbricas están listos: `TASK-1459` (still), `TASK-1460`
+(motion) y `TASK-1461` (audio) quedan desbloqueadas en su dependencia de harness y consumen el comando
+`evaluate` + readers de reporte; `TASK-1463` (readiness registry) ya dispone del `EvaluationReportV1`
+versionado como artefacto de evidencia para sus transiciones de estado. Spec canónica:
+`efeonce-globe/docs/architecture/EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md`.

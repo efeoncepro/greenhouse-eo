@@ -21,9 +21,9 @@
 
 ## Pendientes inmediatos
 
-- `TASK-1481` (Globe API Contract Spine), `TASK-1457` (Safe Model Lab foundation) y `TASK-1464` (keyless IaC
-  foundation) COMPLETE local-first, sin push, en el repo hermano `../efeonce-globe` (`main`; en greenhouse-eo sólo
-  lifecycle documental). El spine + el Model Lab (`LabSpendFence` hard cap, private-ingest, kill switch,
+- `TASK-1481` (Globe API Contract Spine), `TASK-1457` (Safe Model Lab foundation), `TASK-1464` (keyless IaC
+  foundation) y `TASK-1458` (Golden Briefs & Evaluation Harness) COMPLETE local-first, sin push, en el repo hermano
+  `../efeonce-globe` (`main`; en greenhouse-eo sólo lifecycle documental). El spine + el Model Lab (`LabSpendFence` hard cap, private-ingest, kill switch,
   `FakeReferenceAdapter` + `LabRunner`) fluyen end-to-end con un proveedor **fake determinístico** (cero gasto,
   cero infra); `pnpm check` + `pnpm build` verdes. `TASK-1464` escribió el Terraform completo (import blocks de los
   recursos VIVOS de TASK-1454 + GitHub WIF/budgets/observabilidad + outputs para 1457), los workflows keyless y el
@@ -36,6 +36,11 @@
   ya no bloquea; falta código+config: un provider adapter real que reemplace el fake en el `LabRunner`, secretos de
   provider en Secret Manager, un Dockerfile de studio-web, y prender el flag. Deferidos: mapping ID-token→principal
   por identidad → live; tenancy/store durable → TASK-1465.
+  **`TASK-1458` (Evaluation Harness, SPEC-003)** es la segunda capability (`globe.lab.evaluation.run`): CONSUME el Lab
+  vía `runModelLabExperiment` para puntuar golden briefs (still/motion/audio con derechos) contra rúbricas
+  versionadas — objetivo (checks automáticos) separado del juicio humano; verdict nunca auto-"passed". Comparte el
+  gate de rollout del canary real (con proveedor fake declara la limitación "sólo técnico"); el juicio humano
+  (surface `ui`) y el store durable de reports quedan diferidos.
 - EPIC-028 avanza en tres carriles paralelos gobernados íntegramente por Greenhouse. `TASK-1456…1485` viven
   en `docs/tasks/to-do/`, pasan por hooks/lint/QA/handoff de este repo y pueden poseer paths de implementación
   en el repositorio hermano. Globe conserva sólo arquitectura, runtime y evidencia técnica; no tiene registry
@@ -363,27 +368,3 @@
 > redeploy) — permiso denegado en la sesión; queda como 1 comando del operador + smoke enforcement + prod
 > gradual (ledger §Pendientes actualizado). Con el renderer actual (sin visitor keys) el flip no altera
 > tráfico real.
-
-## Sesión 2026-07-18 — TASK-1428 Slices 1-3: suppression + Tier B + kill switches (code complete, rollout pendiente)
-
-> `/implement-task 1428`. **Code-complete en develop local, SIN push** (2 commits feat + 1 docs).
-> Migración aditiva `20260718131956294` APLICADA a la instancia (DO-block verde + tipos regenerados):
-> `cta_visitor_state` (hash-only, visitor durable consent-gated / session fallback 48h, fila
-> `cta_id NULL` = ventana global interruptiva), `cta_exposure_rollup` (Tier B agregado horario —
-> jamás 1 fila OLTP por pageview, §9.4 opción 3) y `cta_kill_switch_event` (append-only §16.3).
-> Runtime: decisión pura de suppression (taxonomía completa, policy zod defaults conservadores,
-> fail-closed) integrada al arbiter en SHADOW (`GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` OFF =
-> registra `enforced=false` sin alterar renders); claim atómico interruptivo FOR UPDATE (multi-tab
-> determinista); dismiss persiste al aceptar el ingest; `already_converted` SOLO con submission
-> verificada vía `isSubmissionServerAccepted` (forms/readers, boundary intacto); `viewed` browser →
-> rollup tras la misma cadena de defensa; kill switch global/per-surface con estado en DB + API
-> `GET/POST /api/admin/growth/ctas/kill-switch` (capability `growth.cta.pause`, cero capabilities
-> nuevas) + outbox `growth.cta.kill_switch_changed` + `engineState ok|killed` aditivo al público;
-> headers de visitor context en render (CORS extendido). Signals nuevos: `kill_switch_active`,
-> `priority_collision`, `event_ingest_backpressure`. Evidencia: `pnpm test` full 9684 verdes +
-> `pnpm build` prod OK + SQL vivo contra PG real (`_sanity-cta-suppression-sql.ts`: claim
-> `[true,true,false]`, writes limpiados). Docs sincronizados: arch §24, EVENT_CATALOG, ledger
-> (fila + §Pendientes), manual (runbook kill switch + ventana compuesta), doc funcional 1.3, skill
-> ambos espejos, Deltas cruzados a TASK-1429/1430. **Rollout pendiente** (por eso sigue
-> `in-progress`): push → shadow-compare staging → enforcement staging + smoke kill switch live sin
-> redeploy → prod gradual 7d. El renderer aún no envía visitor keys (TASK-1429).

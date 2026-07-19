@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -146,8 +146,8 @@ Convertir pruebas creativas en evidencia repetible y comparable por contrato de 
 
 ### Acceptance criteria additions
 
-- [ ] El contrato programático existe antes que cualquier UI específica.
-- [ ] Auth, tenant isolation, idempotencia, observabilidad y rollback tienen evidencia proporcional al riesgo.
+- [x] El contrato programático existe antes que cualquier UI específica. — `globe.lab.evaluation.*` nace con schema versionado + command/reader transport-neutral + HTTP/SDK + coverage; `ui` `policy-blocked`.
+- [x] Auth, tenant isolation, idempotencia, observabilidad y rollback tienen evidencia proporcional al riesgo. — capability grant + trusted context; reports workspace-scoped (cross-workspace → `not_found`); `evaluate` idempotente (fake determinístico); correlationId atraviesa el dispatch; rollback = fixtures/rúbricas son dato + store in-memory (sin persistencia productiva).
 
 <!-- ZONE 2 — PLAN MODE: se completa al tomar la task -->
 <!-- ZONE 3 — EXECUTION SPEC -->
@@ -215,13 +215,13 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 
 ## Acceptance Criteria
 
-- [ ] Los fixtures declaran licencia, consentimiento y uso permitido.
-- [ ] El reporte separa métricas objetivas de juicio creativo humano.
-- [ ] La misma versión de fixture/config produce evidencia comparable.
-- [ ] Fixture, rubric, evaluation request y report son schemas versionados consumibles por SDK/E2E.
-- [ ] El runner/harness no duplica scoring/policy fuera del canonical evaluation primitive.
-- [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
-- [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
+- [x] Los fixtures declaran licencia, consentimiento y uso permitido. — `FixtureRightsV1` (`license`/`consent`/`permittedUse`) en cada `GoldenBriefFixtureV1`; test "every fixture declares license, consent and permitted use".
+- [x] El reporte separa métricas objetivas de juicio creativo humano. — `objectiveResults` (checks automáticos) vs `humanCriteria` (sin `pass`/`score`); verdict nunca auto-"passed" (`objective_fail` | `objective_pass_pending_human`); test "clears a clean attempt for human review and separates objective from human judgment".
+- [x] La misma versión de fixture/config produce evidencia comparable. — fake determinístico + report versionado; test "produces comparable evidence for the same fixture + rubric version (reproducible)".
+- [x] Fixture, rubric, evaluation request y report son schemas versionados consumibles por SDK/E2E. — `GoldenBriefFixtureV1`/`EvaluationRubricV1`/`EvaluateAttemptPayloadV1`/`EvaluationReportV1` (todos `schemaVersion:'1'` + `fixtureVersion`/`rubricVersion`) en `packages/contracts`; métodos SDK `evaluateGoldenBrief`/`listGoldenBriefs`/`getEvaluationReport`.
+- [x] El runner/harness no duplica scoring/policy fuera del canonical evaluation primitive. — corre por `runModelLabExperiment` (reusa el camino real del Lab, sus guardrails y el provider seam); un solo motor de checks para todos los contratos de fidelidad.
+- [x] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica. — código + SPEC-003 + runbook en `efeonce-globe`; lifecycle/README/registry/changelog/Handoff en `greenhouse-eo`.
+- [x] No se habilitan producción ni clientes externos sin una task/gate posterior explícito. — `ui`/`mcp` `policy-blocked`; el juicio humano y la corrida contra proveedor real quedan diferidos (limitaciones declaradas en cada report).
 
 ## Verification
 
@@ -233,9 +233,9 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 
 ## Closing Protocol
 
-- [ ] Lifecycle/carpeta, `docs/tasks/README.md`, registry, EPIC-028, changelog y Handoff sincronizados.
-- [ ] QA release auditor y documentation governor ejecutados.
-- [ ] Evidencia faltante queda declarada como `code complete, rollout pendiente` o bloqueo operativo.
+- [x] Lifecycle/carpeta, `docs/tasks/README.md`, registry, EPIC-028, changelog y Handoff sincronizados.
+- [x] QA release auditor y documentation governor ejecutados. — gate real de Globe verde (`pnpm check` + `pnpm build`, 11 tests de evaluación + suites del monorepo sin fallos); doc de arquitectura (SPEC-003) + runbook §7-ter + skill mirrors sincronizados.
+- [x] Evidencia faltante queda declarada como `code complete, rollout pendiente` o bloqueo operativo. — sin rollout productivo: fake canary determinístico (cero gasto, cero infra); el juicio humano (surface `ui`) y el proveedor real quedan `policy-blocked`/diferidos y declarados como limitaciones.
 
 ## Follow-ups
 

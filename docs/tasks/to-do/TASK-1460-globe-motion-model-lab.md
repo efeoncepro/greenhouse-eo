@@ -1,5 +1,15 @@
 # TASK-1460 — Globe Motion Model Lab
 
+## Delta 2026-07-19 — TASK-1458 complete: harness de evals listo para el carril motion
+
+`TASK-1458` (Golden Briefs & Evaluation Harness, SPEC-003) quedó **complete** (fake canary). Cierra la dependencia declarada en `Depends on` y desbloquea Slice 2 ("Probar text/image-to-video, extensión y continuidad con fixtures") y Slice 3 ("Evaluar acción, anatomía, cámara, audio, latencia y costo"): esta task ya **no** construye el harness, lo **consume**. Provee, consumible por SDK, para el medio motion:
+
+- Fixture golden versionado `product-motion-loop` (capability `video-generate`, contrato de fidelidad `flexible-style`, hard cap 60), como **dato** con derechos declarados (`license`/`consent`/`permittedUse`).
+- Rúbrica versionada del mismo contrato con checks objetivos deterministas (`output_present`, `within_hard_cap`, `input_lineage_intact`, `route_stable`, `outcome_candidate`) y criterios humanos declarados (nunca auto-respondidos).
+- Comando `globe.lab.evaluation.evaluate`, que corre el brief por el camino real del Lab (`runModelLabExperiment`) y puntúa el manifest, más los readers de reporte (`listGoldenBriefs`, `getEvaluationReport`).
+
+Nota para Slice 3 y la AC "La matriz distingue canary, lab-ready y production-candidate": lo que el harness puntúa objetivamente es el manifest (output presente, dentro del cap, lineage intacto, ruta estable, outcome candidato); el juicio de continuidad/actuación/cámara/audio son **criterios humanos declarados**, no auto-puntuados, y el verdict nunca es un "passed" creativo (`objective_fail` u `objective_pass_pending_human`). La matriz no puede promover una ruta desde un reporte objetivo solo. — cerrado por trabajo en TASK-1458.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

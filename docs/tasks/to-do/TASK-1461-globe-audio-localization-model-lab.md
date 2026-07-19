@@ -1,5 +1,15 @@
 # TASK-1461 — Globe Audio and Localization Model Lab
 
+## Delta 2026-07-19 — TASK-1458 complete: harness de evals listo para el carril audio/foley
+
+`TASK-1458` (Golden Briefs & Evaluation Harness, SPEC-003) quedó **complete** (fake canary). Cierra la dependencia declarada en `Depends on` y desbloquea Slice 2 ("Probar speech, dubbing, music y foley sobre fixtures autorizados") y Slice 3 ("Medir inteligibilidad, sincronía, naturalidad, rights y costo"): esta task ya **no** construye el harness, lo **consume**. Provee, consumible por SDK, para el medio audio:
+
+- Fixture golden versionado `glitch-microphone-foley` (capability `audio-generate`, contrato de fidelidad `audio-foley`, hard cap 20), como **dato** con derechos declarados (`license`/`consent`/`permittedUse`) — el "fixture autorizado" que pide Slice 2, con inputs sintéticos/internos (cero derechos de terceros, cero riesgo de consentimiento).
+- Rúbrica versionada del mismo contrato con checks objetivos deterministas (`output_present`, `within_hard_cap`, `input_lineage_intact`, `route_stable`, `outcome_candidate`) y criterios humanos declarados (nunca auto-respondidos).
+- Comando `globe.lab.evaluation.evaluate`, que corre el brief por el camino real del Lab (`runModelLabExperiment`) y puntúa el manifest, más los readers de reporte (`listGoldenBriefs`, `getEvaluationReport`).
+
+Nota para las AC de consentimiento/rights y sincronía: el foley del micrófono se juzga como **sonido-de-contacto** (golpe-y-rebote práctico), y ese juicio de oficio es un **criterio humano declarado**, no un check auto-puntuado; la sincronía/naturalidad no las resuelve el harness. Consent/license quedan declarados a nivel de fixture. El verdict nunca es un "passed" creativo (`objective_fail` u `objective_pass_pending_human`). — cerrado por trabajo en TASK-1458.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
