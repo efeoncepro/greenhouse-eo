@@ -21,15 +21,19 @@
 
 ## Pendientes inmediatos
 
-- `TASK-1481` (Globe API Contract Spine) y `TASK-1457` (Safe Model Lab foundation) COMPLETE local-first, sin push,
-  en el repo hermano `../efeonce-globe` (`main`, `pnpm check` + `pnpm build` verdes; en greenhouse-eo sólo lifecycle
-  documental). El spine (trusted context, registry, coverage, conformance) y el Model Lab (experiment
-  commands/readers, state machine, `LabSpendFence` hard cap, private-ingest, kill switch, `FakeReferenceAdapter` +
-  `LabRunner`) fluyen end-to-end con un proveedor **fake determinístico** (cero red, cero gasto, cero infra).
-  **Rollout pendiente declarado:** el canary con **proveedor real** (credenciales WIF/ADC, bucket, budgets) queda
-  `code complete, rollout pendiente`, gateado por **TASK-1464** + aprobación explícita; `GLOBE_LAB_ENABLED` default
-  OFF. Próximo paso: TASK-1464 (IaC/WIF/budgets/bucket), luego un adapter real reemplaza el fake en el `LabRunner`
-  detrás del flip. Deferidos: mapping ID-token→principal por identidad → live; tenancy/store durable → TASK-1465.
+- `TASK-1481` (Globe API Contract Spine), `TASK-1457` (Safe Model Lab foundation) y `TASK-1464` (keyless IaC
+  foundation) COMPLETE local-first, sin push, en el repo hermano `../efeonce-globe` (`main`; en greenhouse-eo sólo
+  lifecycle documental). El spine + el Model Lab (`LabSpendFence` hard cap, private-ingest, kill switch,
+  `FakeReferenceAdapter` + `LabRunner`) fluyen end-to-end con un proveedor **fake determinístico** (cero gasto,
+  cero infra); `pnpm check` + `pnpm build` verdes. `TASK-1464` escribió el Terraform completo (import blocks de los
+  recursos VIVOS de TASK-1454 + GitHub WIF/budgets/observabilidad + outputs para 1457), los workflows keyless y el
+  runbook; `tofu validate` verde, **cero GCP tocado**.
+  **Rollouts pendientes declarados (paso SUPERVISADO, no autónomo):** (1) el **import/plan/apply real** de 1464
+  contra GCP vivo — apply sólo tras un plan con CERO destroy/replace (los SAs/WIF de Vercel están vivos); (2) el
+  canary con **proveedor real** de 1457 (`GLOBE_LAB_ENABLED` default OFF), que depende de (1). Próximo paso: correr
+  el runbook de IaC supervisado (bootstrap state bucket → init → plan → apply), setear el secret
+  `GCP_WORKLOAD_IDENTITY_PROVIDER`, y recién ahí un adapter real reemplaza el fake en el `LabRunner` detrás del flip.
+  Deferidos: mapping ID-token→principal por identidad → live; tenancy/store durable → TASK-1465.
 - EPIC-028 avanza en tres carriles paralelos gobernados íntegramente por Greenhouse. `TASK-1456…1485` viven
   en `docs/tasks/to-do/`, pasan por hooks/lint/QA/handoff de este repo y pueden poseer paths de implementación
   en el repositorio hermano. Globe conserva sólo arquitectura, runtime y evidencia técnica; no tiene registry

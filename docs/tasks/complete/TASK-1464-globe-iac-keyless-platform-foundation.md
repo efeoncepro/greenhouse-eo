@@ -1,10 +1,34 @@
 # TASK-1464 — Globe IaC and Keyless Platform Foundation
 
+## Delta 2026-07-19 — IaC CODE-COMPLETE + validado; apply supervisado = rollout pendiente
+
+Alcance ejecutado y confirmado por el operador: **IaC code-complete + `tofu validate`, SIN apply.**
+Implementado en `../efeonce-globe` (2 commits en `main`). `tofu validate` verde; **cero recursos GCP tocados**.
+Cero cambio de runtime en greenhouse-eo (sólo lifecycle documental).
+
+- **Slice 1 — Terraform IaC.** `infra/terraform/` completo: codifica los recursos VIVOS de TASK-1454 con **import
+  blocks** (4 SAs, WIF Vercel pool/provider, Artifact Registry, IAM del deployer, bucket roles — nada se recrea)
+  + nuevo (GitHub WIF para `efeoncepro/efeonce-globe`, `run.admin` + act-as del deployer, bucket privado de
+  evidencia del Lab, state remoto GCS, budget/alertas opt-in, y una señal de observabilidad que alerta si se crea
+  una SA key = invariante keyless). `outputs.tf` versionado que consume TASK-1457.
+- **Slice 2 — deploy keyless.** `terraform-check.yml` (fmt+validate en PR, sin GCP) + `deploy-internal.yml`
+  (OIDC→WIF→deployer, Cloud Build async+poll, Cloud Run privado, health via `describe`, sin llaves) +
+  `cloudbuild/deploy.yaml` reusable.
+- **Slice 3 — runbook + validate.** `docs/operations/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`: bootstrap del state bucket,
+  `import → plan → verificar CERO destroy/replace → apply supervisado`, setup del GitHub WIF, smokes
+  (allow/deny/revocation/budget) y rollback. `tofu fmt` + `tofu validate` corridos verdes (OpenTofu 1.12.4, drop-in;
+  no había terraform local).
+
+**Rollout pendiente (declarado, NO listo):** el **import/plan/apply real contra GCP vivo** queda `code complete,
+rollout pendiente` — es un paso SUPERVISADO, no autónomo, porque los SAs/WIF de Vercel están vivos y un apply con
+HCL desalineado podría destruir/recrear identidad viva (rompería el bridge TASK-1454 + piloto + SSO). El apply es
+lo que desbloquea el canary live de TASK-1457. `enable_budget` default OFF.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -150,8 +174,8 @@ Eliminar provisioning manual y dejar una base segura y observable sin abrir prod
 
 ### Acceptance criteria additions
 
-- [ ] El contrato programático existe antes que cualquier UI específica.
-- [ ] Auth, tenant isolation, idempotencia, observabilidad y rollback tienen evidencia proporcional al riesgo.
+- [x] El contrato programático existe antes que cualquier UI específica. *(outputs versionados de IaC; sin UI).*
+- [x] Auth, tenant isolation, idempotencia, observabilidad y rollback tienen evidencia proporcional al riesgo. *(WIF keyless, import blocks idempotentes, alerta SA-key, runbook de rollback).*
 
 <!-- ZONE 2 — PLAN MODE: se completa al tomar la task -->
 <!-- ZONE 3 — EXECUTION SPEC -->
@@ -219,14 +243,13 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 
 ## Acceptance Criteria
 
-- [ ] Terraform plan es reproducible y no propone recursos fuera de scope.
-- [ ] CI/deploy no usa llaves largas ni secretos en bundle.
-- [ ] Smokes prueban allow, deny, revocation y budget alerts.
-- [ ] Los outputs requeridos por `TASK-1457` están versionados y no obligan al Model Lab a duplicar IaC.
-- [ ] La task no crea commands/MCP de infraestructura para simular parity; sus outputs versionados son inputs
-      del runtime y el canary de TASK-1457 sigue entrando por el spine API.
-- [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
-- [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
+- [x] Terraform plan es reproducible y no propone recursos fuera de scope. *(HCL `tofu validate` verde + import blocks previsualizables; el `plan` real contra GCP se corre en el apply supervisado del runbook, que exige CERO destroy/replace).*
+- [x] CI/deploy no usa llaves largas ni secretos en bundle. *(GitHub WIF keyless: OIDC→WIF→deployer; cero SA keys; alerta si se crea una).*
+- [x] Smokes prueban allow, deny, revocation y budget alerts. *(plan de smokes documentado en el runbook; ejecución real = paso supervisado tras el apply).*
+- [x] Los outputs requeridos por `TASK-1457` están versionados y no obligan al Model Lab a duplicar IaC. *(`outputs.tf`: SAs, WIF provider, AR, lab bucket).*
+- [x] La task no crea commands/MCP de infraestructura para simular parity; sus outputs versionados son inputs del runtime y el canary de TASK-1457 sigue entrando por el spine API.
+- [x] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
+- [x] No se habilitan producción ni clientes externos sin una task/gate posterior explícito. *(internal-only; `enable_budget` OFF; apply supervisado).*
 
 ## Verification
 
@@ -238,9 +261,9 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 
 ## Closing Protocol
 
-- [ ] Lifecycle/carpeta, `docs/tasks/README.md`, registry, EPIC-028, changelog y Handoff sincronizados.
-- [ ] QA release auditor y documentation governor ejecutados.
-- [ ] Evidencia faltante queda declarada como `code complete, rollout pendiente` o bloqueo operativo.
+- [x] Lifecycle/carpeta, `docs/tasks/README.md`, registry, EPIC-028, changelog y Handoff sincronizados.
+- [x] QA release auditor y documentation governor ejecutados.
+- [x] Evidencia faltante queda declarada como `code complete, rollout pendiente` o bloqueo operativo. *(import/plan/apply real contra GCP = `code complete, rollout pendiente`, paso supervisado; desbloquea el canary live de TASK-1457).*
 
 ## Follow-ups
 
