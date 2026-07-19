@@ -49,24 +49,23 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
 
 ## Child Tasks
 
-> Las tasks de producto nacen en `efeoncepro/efeonce-globe` con namespace repo-qualified `GLOBE-###`; **no
-> autorizan implementación Greenhouse bajo esos nombres**. Registry, dependencias, gates y estado canónico:
-> `efeonce-globe/docs/tasks/TASK_ID_REGISTRY.md` +
-> `efeonce-globe/docs/operations/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`. La Pillar y los satélites de PDR-014
-> siguen siendo soporte editorial: no crean tasks ni especificaciones ejecutables.
+> Greenhouse es el único control plane operativo: registra `TASK-###`, dependencias, lifecycle, hooks, lint,
+> QA, cierre documental y handoff incluso cuando los paths de implementación viven en el repositorio hermano.
+> Globe posee código, datos, infraestructura, ejecución creativa y evidencia técnica; su execution plan referencia
+> estas tasks, pero no mantiene un registry ni un namespace de trabajo paralelo.
 
 - `TASK-1454` — **Greenhouse ↔ Globe federated identity and governed SDK bridge.** Única task Greenhouse explícita de esta fase: generaliza el broker reusable, registra Globe internal-only y prueba SSO/WIF/ADC sin llaves. No mueve runtime creativo a Greenhouse ni habilita producción/clientes externos.
 - `TASK-1455` — **Globe internal launch and brand shell.** Superficie humana internal-only, identidad visual y
   estados de sesión/recovery; no implementa el Studio funcional.
 
-- `GLOBE-001` — gobierno del repo y lifecycle de tasks.
-- `GLOBE-002…008` — **Model Lab y craft:** sandbox seguro, fixtures/evals, still, motion, audio, campaña E2E y
+- `TASK-1456` — gobierno central y operating model parallel-first.
+- `TASK-1457…1463` — **Model Lab y craft:** sandbox seguro, fixtures/evals, still, motion, audio, campaña E2E y
   registry de readiness. Las integraciones reales empiezan temprano bajo hard budgets y private ingest.
-- `GLOBE-009…020` — **plataforma gobernada:** IaC, tenancy, responsabilidad, rights/assets, shadow credits,
+- `TASK-1464…1475` — **plataforma gobernada:** IaC, tenancy, responsabilidad, rights/assets, shadow credits,
   lifecycle transaccional, adapters promovidos, composición determinística, review/delivery, MCP, UI y
   proyección Greenhouse.
-- `GLOBE-021…025` — **validación comercial:** demo/Sample Sprint managed, buyer discovery, 30–50 runs de
-  calibración, pilotos por modo y commercial approval. `GLOBE-025` no habilita clientes sin sign-off explícito.
+- `TASK-1476…1480` — **validación comercial:** demo/Sample Sprint managed, buyer discovery, 30–50 runs de
+  calibración, pilotos por modo y commercial approval. `TASK-1480` no habilita clientes sin sign-off explícito.
 
 ### Parallel execution contract
 
@@ -124,9 +123,11 @@ El programa adopta un solo producto con tres modos operativos (`client-operated`
 
 El operador fija **Efeonce Globe** como nombre canónico del producto; Creative Studio permanece como descriptor funcional de la vertical creativa. Se creó el repositorio privado `efeoncepro/efeonce-globe` y un único proyecto GCP adicional `efeonce-globe` bajo la organización Efeonce, con billing y APIs base habilitadas. No se crearon workloads, bases de datos, buckets, secretos ni gasto de proveedores. La separación de un proyecto productivo queda diferida hasta que exista un primer release reproducible, con presupuesto, IAM, rollback y promoción de secretos aprobados.
 
-## Delta 2026-07-19 — ejecución parallel-first y backlog Globe
+## Delta 2026-07-19 — ejecución parallel-first y gobierno central Greenhouse
 
 El programa deja de interpretar gobierno y prueba de modelos como una secuencia lineal. Se aceptan tres lanes
 paralelas —Model Lab/craft, plataforma gobernada y validación comercial— con gates distintos para ejecutar un
-experimento y promover una ruta a producción. Globe registra `GLOBE-001…025`; la primera wave materializa
-`GLOBE-001`, `002`, `003` y `009`, y `GLOBE-004` comienza apenas el Lab gate y los fixtures estén listos.
+experimento y promover una ruta a producción. Greenhouse registra `TASK-1456…1480` y conserva todo el harness;
+Globe ejecuta el runtime y guarda evidencia técnica. `TASK-1456` cerró la corrección de gobierno; la siguiente
+wave ejecuta `TASK-1457`, `TASK-1458` y `TASK-1464`. `TASK-1459` comienza apenas el Lab gate y los
+fixtures estén listos.

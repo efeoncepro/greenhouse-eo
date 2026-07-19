@@ -350,6 +350,10 @@ idempotencia, estimate/reservation, approval token, rights/provider policy, eval
 rollback. El execution plan canónico vive en
 `efeonce-globe/docs/operations/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`.
 
+La gobernanza de ejecución no se desplaza con el runtime: Greenhouse conserva EPIC-028, `TASK-1456…1480`,
+task hooks, Plan Mode, lint, QA, lifecycle, cierre y handoff. Globe posee código, infraestructura, datos y
+evidencia técnica; su plan operativo referencia las tasks canónicas y no crea un segundo backlog.
+
 | Phase | Outcome | Explicitly excluded |
 | --- | --- | --- |
 | 0 — foundation | New repo, project boundaries, tenant/auth, assets, ledger skeleton, audit/telemetry, provider contract, one internal template | Client access, payments, free canvas |

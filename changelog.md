@@ -7,13 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-## 2026-07-19 — EPIC-028 adopta ejecución paralela y backlog propio de Globe
+## 2026-07-19 — EPIC-028 adopta ejecución paralela bajo el harness de Greenhouse
 
 - Model Lab/craft, plataforma gobernada y validación comercial avanzan en paralelo; probar una ruta bajo sandbox
   ya no espera al ledger/workbench completo, mientras su promoción a UI/MCP conserva un gate enterprise aparte.
-- `efeonce-globe` registra `GLOBE-001…025`, operating model y plan de dependencias. La primera wave prepara
-  sandbox/fixtures e IaC simultáneamente; el primer motion comercial es un Sample Sprint Efeonce-managed, no
-  Studio Access ni créditos comerciales.
+- Greenhouse registra `TASK-1456…1480` y conserva tasks, hooks, lint, QA, planes, lifecycle, handoff y cierre
+  cross-repo. Globe posee código/runtime/evidencia y mantiene un execution plan referencial, no un backlog paralelo.
+- La primera wave prepara gobierno, sandbox/fixtures e IaC simultáneamente; el primer motion comercial es un
+  Sample Sprint Efeonce-managed, no Studio Access ni créditos comerciales.
 
 ## 2026-07-19 — Globe ya existe como producto interno visible
 
