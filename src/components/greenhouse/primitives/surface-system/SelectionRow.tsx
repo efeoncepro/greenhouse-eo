@@ -68,7 +68,8 @@ const SelectionRow = ({
     >
       <ButtonBase
         onClick={onSelect}
-        aria-pressed={selected}
+        role='option'
+        aria-selected={selected}
         sx={theme => ({
           position: 'relative',
           inlineSize: '100%',
@@ -77,8 +78,8 @@ const SelectionRow = ({
           border: '1px solid',
           borderColor: selected ? 'primary.mainOpacity' : 'transparent',
           borderRadius: `${theme.shape.customBorderRadius.lg}px`,
-          bgcolor: selected ? 'background.paper' : 'transparent',
-          boxShadow: selected ? theme.greenhouseElevation.raised.boxShadow : 'none',
+          bgcolor: selected ? 'primary.lightOpacity' : 'transparent',
+          boxShadow: 'none',
           p: compact ? 3 : 4,
           overflow: 'hidden',
           transition: theme.transitions.create(['background-color', 'border-color', 'transform'], {
@@ -94,9 +95,7 @@ const SelectionRow = ({
             transition: theme.transitions.create('inline-size', { duration: theme.transitions.duration.shorter })
           },
           '&:hover': {
-            bgcolor: 'background.paper',
-            boxShadow: theme.greenhouseElevation.raised.boxShadow,
-            transform: reduced ? 'none' : 'translateY(-2px)'
+            bgcolor: selected ? 'primary.lightOpacity' : 'action.hover'
           },
           '&.Mui-focusVisible': { outline: `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 },
           '@media (prefers-reduced-motion: reduce)': { transition: 'none', '&::before': { transition: 'none' } }

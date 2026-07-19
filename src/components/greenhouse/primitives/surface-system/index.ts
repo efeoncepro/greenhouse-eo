@@ -14,6 +14,8 @@ export { default as OperationalSection } from './OperationalSection'
 export type { OperationalSectionProps } from './OperationalSection'
 export { default as PreviewStage } from './PreviewStage'
 export type { PreviewStageProps } from './PreviewStage'
+export { default as SurfaceRecipe } from './SurfaceRecipe'
+export type { SurfaceRecipeProps } from './SurfaceRecipe'
 export { SURFACE_RECIPE_COMPOSITIONS } from './surface-system-controller'
 export {
   resolveContextCommandBarVariant,

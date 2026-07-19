@@ -33,7 +33,7 @@ export const scenario: CaptureScenario = {
   assertions: [
     { kind: 'noLoginRedirect', reason: 'El Lab interno debe capturarse con actor GVC autenticado.' },
     { kind: 'noErrorBoundary', reason: 'La evidencia premium no puede contener un error boundary.' },
-    { kind: 'visible', selector: '[data-surface-recipe="operational-workbench"]', reason: 'El workbench inicial debe renderizar.' }
+    { kind: 'visible', selector: '[data-surface-recipe="operationalWorkbench"]', reason: 'El workbench inicial debe renderizar.' }
   ],
   quality: {
     accessibility: {
@@ -94,7 +94,7 @@ export const scenario: CaptureScenario = {
   },
   steps: [
     { kind: 'wait', selector: '[data-capture="recipe-workbench"]', timeout: 15000 },
-    { kind: 'scroll', selector: '[data-surface-recipe="operational-workbench"]', scrollBlock: 'start', scrollY: -120 },
+    { kind: 'scroll', selector: '[data-surface-recipe="operationalWorkbench"]', scrollBlock: 'start', scrollY: -120 },
     { kind: 'mark', label: 'workbench-first-fold', note: 'Contexto, señales, inventario y detalle comparten una jerarquía operativa.' },
     {
       kind: 'interaction',

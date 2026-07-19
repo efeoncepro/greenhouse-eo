@@ -31,7 +31,13 @@ import { alpha } from '@mui/material/styles'
 import CustomTextField from '@core/components/mui/TextField'
 import ConfirmDialog from '@/components/dialogs/ConfirmDialog'
 import EmptyState from '@/components/greenhouse/EmptyState'
-import { CompositionShell, GreenhouseBreadcrumbs, GreenhouseChip, WorkbenchHeader } from '@/components/greenhouse/primitives'
+import {
+  GreenhouseBreadcrumbs,
+  GreenhouseButton,
+  GreenhouseChip,
+  SurfaceRecipe,
+  WorkbenchHeader
+} from '@/components/greenhouse/primitives'
 import { GH_GROWTH_CTA_OPERATOR } from '@/lib/copy/growth'
 import { throwIfNotOk } from '@/lib/api/parse-error-response'
 import type { CtaSummaryVm, CtaSurfaceVm } from '@/lib/growth/ctas/readers'
@@ -302,10 +308,10 @@ const GrowthCtasGovernanceView = ({
     })
 
     return [
-      { key: 'published', count: counts.published, label: C.summary.published, tone: 'success' as const },
-      { key: 'review', count: counts.review, label: C.summary.review, tone: 'info' as const },
-      { key: 'draft', count: counts.draft, label: C.summary.draft, tone: 'default' as const },
-      { key: 'paused', count: counts.paused, label: C.summary.paused, tone: 'warning' as const },
+      { key: 'published', count: counts.published, label: C.summary.published, singular: C.summary.singular.published },
+      { key: 'review', count: counts.review, label: C.summary.review, singular: C.summary.singular.review },
+      { key: 'draft', count: counts.draft, label: C.summary.draft, singular: C.summary.singular.draft },
+      { key: 'paused', count: counts.paused, label: C.summary.paused, singular: C.summary.singular.paused },
     ]
   }, [ctas])
 
@@ -317,7 +323,7 @@ const GrowthCtasGovernanceView = ({
         kind='pageHierarchy'
         dataCapture='cta-cockpit-breadcrumbs'
         items={[
-          { label: C.breadcrumbs.growth, iconClassName: 'tabler-growth' },
+          { label: C.breadcrumbs.growth, iconClassName: 'tabler-trending-up' },
           { label: C.breadcrumbs.ctas, iconClassName: 'tabler-hand-click' },
         ]}
       />
@@ -327,17 +333,14 @@ const GrowthCtasGovernanceView = ({
         title={O.title}
         description={C.subtitle}
         supporting={
-          <Stack direction='row' alignItems='center' gap={2} flexWrap='wrap'>
-            {statusSummary.map(item => (
-              <GreenhouseChip
-                key={item.key}
-                kind='metric'
-                size='small'
-                variant='label'
-                tone={item.tone}
-                label={`${item.count} ${item.label}`}
-              />
-            ))}
+          <Stack direction='row' alignItems='center' gap={2.5} flexWrap='wrap'>
+            <Typography variant='body2' color='inherit' sx={{ fontWeight: 600 }}>
+              {C.inventory.summaryCount(ctas.length)}
+              {statusSummary
+                .filter(item => item.count > 0)
+                .map(item => ` · ${item.count} ${item.count === 1 ? item.singular : item.label}`)
+                .join('')}
+            </Typography>
             <Tooltip title={engineEnabled ? '' : O.engineFlag.offHint}>
               <span>
                 <GreenhouseChip
@@ -353,32 +356,32 @@ const GrowthCtasGovernanceView = ({
           </Stack>
         }
         secondaryActions={
-          <Button
+          <GreenhouseButton
+            kind='secondaryAction'
             variant='outlined'
-            color='inherit'
-            startIcon={<i className='tabler-refresh' style={{ fontSize: 16 }} />}
+            tone='secondary'
+            leadingIconClassName='tabler-refresh'
             onClick={() => {
               refreshAll()
               setSnack({ message: C.toasts.refreshed, severity: 'success' })
             }}
-            sx={{ color: 'text.secondary', borderColor: 'divider' }}
           >
             {C.refresh}
-          </Button>
+          </GreenhouseButton>
         }
         primaryAction={
           <Tooltip title={capabilities.canAuthor ? '' : C.denied.readOnlyHint}>
             <span>
-              <Button
-                variant='contained'
-                startIcon={<i className='tabler-plus' style={{ fontSize: 16 }} />}
+              <GreenhouseButton
+                kind='primaryAction'
+                leadingIconClassName='tabler-plus'
                 onClick={openCreate}
                 disabled={!capabilities.canAuthor}
                 aria-label={C.createAria}
-                data-capture='cta-cockpit-create'
+                dataCapture='cta-cockpit-create'
               >
                 {C.create}
-              </Button>
+              </GreenhouseButton>
             </span>
           </Tooltip>
         }
@@ -395,10 +398,7 @@ const GrowthCtasGovernanceView = ({
       alignItems='center'
       sx={{
         p: 12,
-        textAlign: 'center',
-        bgcolor: 'background.paper',
-        borderRadius: theme => `${theme.shape.customBorderRadius.xl}px`,
-        boxShadow: theme => theme.greenhouseElevation.raised.boxShadow,
+        textAlign: 'center'
       }}
       data-capture='cta-inventory'
     >
@@ -446,7 +446,7 @@ const GrowthCtasGovernanceView = ({
   )
 
   const aside = isEmptyInventory ? (
-    <Box sx={{ p: 8, bgcolor: 'background.paper', borderRadius: theme => `${theme.shape.customBorderRadius.xl}px`, boxShadow: theme => theme.greenhouseElevation.raised.boxShadow }}>
+    <Box sx={{ p: 8 }}>
       <EmptyState icon='tabler-layout-sidebar-right-expand' title={C.empty.asideTitle} description={C.empty.asideBody} />
     </Box>
   ) : selectedId ? (
@@ -470,24 +470,22 @@ const GrowthCtasGovernanceView = ({
       }}
     />
   ) : (
-    <Box sx={{ p: 8, bgcolor: 'background.paper', borderRadius: theme => `${theme.shape.customBorderRadius.xl}px`, boxShadow: theme => theme.greenhouseElevation.raised.boxShadow }}>
+    <Box sx={{ p: 8 }}>
       <EmptyState icon='tabler-click' title={C.noSelection.title} description={C.noSelection.body} />
     </Box>
   )
 
   return (
-    <Box data-capture='cta-cockpit-shell' data-surface-recipe='listDetail'>
-      {/* Lead/header: `split` no monta región lead — vive encima del shell (mismo patrón GrowthFormsAdminCockpit). */}
-      {lead}
-      <CompositionShell
-        composition='split'
-        fluidity='rich'
-        instanceId='growth-cta-cockpit'
-        asideLabel={C.detail.regionAria}
-        telemetrySource='task-1430-growth-cta-cockpit'
-        splitTemplateColumns={{ xs: '1fr', md: 'minmax(0, 0.95fr) minmax(0, 1.2fr)' }}
-        regions={{ primary, aside }}
-      />
+    <SurfaceRecipe
+      kind='operationalWorkbench'
+      dataCapture='cta-cockpit-shell'
+      header={lead}
+      instanceId='growth-cta-cockpit'
+      asideLabel={O.inventory.title}
+      detailLabel='Ver detalle'
+      telemetrySource='growth-cta-cockpit'
+      regions={{ aside: primary, primary: aside }}
+    >
 
       {/* Autoría gobernada */}
       <CtaAuthoringDrawer
@@ -563,7 +561,7 @@ const GrowthCtasGovernanceView = ({
         </Alert>
       </Snackbar>
 
-    </Box>
+    </SurfaceRecipe>
   )
 }
 

@@ -5,6 +5,7 @@ import type { ReactNode } from 'react'
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import { alpha } from '@mui/material/styles'
 
 import GreenhouseChip from '../GreenhouseChip'
 import { resolvePreviewStageVariant } from './surface-system-controller'
@@ -64,6 +65,15 @@ const PreviewStage = ({
           borderColor: 'primary.mainOpacity',
           background: `linear-gradient(90deg, ${theme.palette.customColors.midnight}, ${theme.palette.customColors.deepAzure})`,
           '& .MuiTypography-root': { color: 'inherit' },
+          '& .MuiButton-outlined, & .MuiButton-text': {
+            color: 'primary.contrastText',
+            borderColor: alpha(theme.palette.primary.contrastText, 0.58),
+            bgcolor: alpha(theme.palette.primary.contrastText, 0.08),
+            '&:hover': {
+              borderColor: 'primary.contrastText',
+              bgcolor: alpha(theme.palette.primary.contrastText, 0.16)
+            }
+          },
           '&::before': {
             content: "''",
             inlineSize: 42,

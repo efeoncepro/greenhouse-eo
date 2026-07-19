@@ -21,6 +21,7 @@ Direction selected: **Quiet Command Center** — enterprise density with editori
 - A first fold must reveal one dominant decision, one contextual relationship and at most five supporting signals.
 - Use contrast of scale/weight/spacing before color.
 - Depth is zoned: base canvas → operational surface → selected/context surface → floating transient.
+- The base canvas is spatial substrate only. Navigation chrome may cross it, but sustained readable content—headings, lists, metadata, evidence and decisions—belongs to a recipe-owned paper/work plane.
 - Chrome is budgeted: open sections, rails and dividers carry most grouping; contained surfaces are reserved for selected, immersive, stage or floating roles.
 - Every archetype has one task-native visual impact moment, not uniformly distributed card polish.
 - Primary blue is an action/selection signal, not decoration.
@@ -64,6 +65,7 @@ Direction selected: **Quiet Command Center** — enterprise density with editori
 ## Anti-patterns
 
 - Nested rounded white cards at every level.
+- Operational text or rows floating directly on `background.default` without a reading-plane owner.
 - One blue outline per selectable thing.
 - More than one contained primary in the same header/context.
 - Uniform font size/weight across metadata, title and action.

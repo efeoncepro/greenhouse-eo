@@ -70,7 +70,7 @@ La referencia viva es `/admin/design-system/colors`, complementada por los labs 
 El flujo ya no comienza eligiendo cards. Comienza con una tesis visual y termina con evidencia:
 
 1. La Visual Direction define tono, jerarquía, ritmo, densidad, contraste espacial, responsive y momento dominante.
-2. Un surface recipe traduce esa intención a regiones del Composition Shell y primitives compuestas.
+2. `SurfaceRecipe` traduce esa intención a regiones del Composition Shell y primitives compuestas; sus work planes sostienen inventarios, detalle, metadata y decisiones para que el canvas gris funcione como gutter, no como superficie de lectura.
 3. Las superficies se declaran por función: `open`, `contained`, `band`, `immersive`, `stage`, `selected` o `floating`.
 4. El first fold normal admite como máximo tres superficies `contained`. Una card necesita una frontera semántica; no se usa como wrapper por defecto.
 5. Mobile recompone la jerarquía y la acción principal; no serializa el desktop en una columna de cards.

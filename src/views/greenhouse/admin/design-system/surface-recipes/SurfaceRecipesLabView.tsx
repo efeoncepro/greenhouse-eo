@@ -17,6 +17,7 @@ import {
   PreviewStage,
   SelectionRow,
   SignalStrip,
+  SurfaceRecipe,
   WorkbenchHeader
 } from '@/components/greenhouse/primitives'
 import useReducedMotion from '@/hooks/useReducedMotion'
@@ -24,11 +25,6 @@ import { AnimatePresence, motion } from '@/libs/FramerMotion'
 import { surfaceRecipesCopy as copy } from '@/lib/copy/surface-recipes'
 
 type Archetype = 'workbench' | 'report' | 'settings'
-
-const accessibleSpecimenSx = {
-  '& .MuiChip-label': { color: 'text.primary' },
-  '& .MuiButton-tonal': { color: 'text.primary' }
-} as const
 
 const EMPHASIZED_EASE = [...MOTION_EASE.emphasized.cubicBezier] as [number, number, number, number]
 
@@ -323,16 +319,7 @@ const WorkbenchSpecimen = () => {
                   </Typography>
                 </Stack>
               </Stack>
-              <Stack
-                spacing={2}
-                sx={{
-                  borderInlineStart: { lg: '2px solid' },
-                  borderBlockStart: { xs: '2px solid', lg: 'none' },
-                  borderColor: 'primary.main',
-                  ps: { lg: 5 },
-                  pt: { xs: 4, lg: 0 }
-                }}
-              >
+              <Stack spacing={2} sx={{ pt: { xs: 2, lg: 0 } }}>
                 <Typography variant='overline' color='primary.dark'>
                   {copy.workbench.insightTitle}
                 </Typography>
@@ -396,49 +383,45 @@ const WorkbenchSpecimen = () => {
   )
 
   return (
-    <Stack
-      data-surface-recipe='operational-workbench'
-      data-capture='recipe-workbench'
-      spacing={4}
-      sx={accessibleSpecimenSx}
-    >
-      <WorkbenchHeader
-        eyebrow={copy.workbench.eyebrow}
-        title={copy.workbench.title}
-        description={copy.workbench.description}
-        statusLabel={copy.workbench.status}
-        statusTone='success'
-        secondaryActions={<GreenhouseButton kind='secondaryAction'>{copy.workbench.secondary}</GreenhouseButton>}
-        primaryAction={
-          <GreenhouseButton kind='primaryAction' leadingIconClassName='tabler-plus'>
-            {copy.workbench.primary}
-          </GreenhouseButton>
-        }
-        dataCapture='recipe-workbench-header'
-        supporting={
-          <SignalStrip
-            signals={copy.workbench.signals}
-            kind='insight'
-            variant='integrated'
-            dataCapture='recipe-workbench-signals'
-            ariaLabel={copy.lab.aria.workbenchSignals}
-          />
-        }
-      />
-      <CompositionShell
-        kind='workbench'
-        fluidity='rich'
-        instanceId='surface-recipes-workbench'
-        asideLabel='Inventario de activaciones'
-        detailLabel='Detalle de activación'
-        regions={{ aside: navigator, primary: detail }}
-      />
-    </Stack>
+    <SurfaceRecipe
+      kind='operationalWorkbench'
+      dataCapture='recipe-workbench'
+      instanceId='surface-recipes-workbench'
+      asideLabel='Inventario de activaciones'
+      detailLabel='Detalle de activación'
+      header={
+        <WorkbenchHeader
+          eyebrow={copy.workbench.eyebrow}
+          title={copy.workbench.title}
+          description={copy.workbench.description}
+          statusLabel={copy.workbench.status}
+          statusTone='success'
+          titleComponent='h2'
+          secondaryActions={<GreenhouseButton kind='secondaryAction'>{copy.workbench.secondary}</GreenhouseButton>}
+          primaryAction={
+            <GreenhouseButton kind='primaryAction' leadingIconClassName='tabler-plus'>
+              {copy.workbench.primary}
+            </GreenhouseButton>
+          }
+          dataCapture='recipe-workbench-header'
+          supporting={
+            <SignalStrip
+              signals={copy.workbench.signals}
+              kind='insight'
+              variant='integrated'
+              dataCapture='recipe-workbench-signals'
+              ariaLabel={copy.lab.aria.workbenchSignals}
+            />
+          }
+        />
+      }
+      regions={{ aside: navigator, primary: detail }}
+    />
   )
 }
 
 const ReportSpecimen = () => (
-  <Stack data-surface-recipe='analytics-report' data-capture='recipe-report' spacing={4} sx={accessibleSpecimenSx}>
+  <Stack data-surface-recipe='analytics-report' data-capture='recipe-report' spacing={4}>
     <WorkbenchHeader
       eyebrow={copy.report.eyebrow}
       title={copy.report.title}
@@ -446,6 +429,7 @@ const ReportSpecimen = () => (
       statusLabel={copy.report.status}
       statusTone='success'
       kind='report'
+      titleComponent='h2'
       secondaryActions={
         <GreenhouseButton
           kind='secondaryAction'
@@ -528,7 +512,7 @@ const SettingsSpecimen = () => {
   const selectedOption = copy.settings.options.find(option => option.id === selected) ?? copy.settings.options[0]
 
   return (
-    <Stack data-surface-recipe='settings-flow' data-capture='recipe-settings' spacing={4} sx={accessibleSpecimenSx}>
+    <Stack data-surface-recipe='settings-flow' data-capture='recipe-settings' spacing={4}>
       <WorkbenchHeader
         eyebrow={copy.settings.eyebrow}
         title={copy.settings.title}
@@ -536,6 +520,7 @@ const SettingsSpecimen = () => {
         statusLabel={copy.settings.status}
         statusTone='warning'
         kind='settings'
+        titleComponent='h2'
         dataCapture='recipe-settings-header'
       />
       <CompositionShell
@@ -656,7 +641,19 @@ const SurfaceRecipesLabView = () => {
   return (
     <Box sx={{ minWidth: 0, overflowX: 'clip', p: { xs: 4, md: 6 } }}>
       <Stack spacing={5}>
-        <Stack direction={{ xs: 'column', md: 'row' }} justifyContent='space-between' spacing={4}>
+        <Stack
+          direction={{ xs: 'column', md: 'row' }}
+          justifyContent='space-between'
+          spacing={4}
+          data-ui-surface='contained'
+          sx={theme => ({
+            bgcolor: 'background.paper',
+            border: '1px solid',
+            borderColor: 'divider',
+            borderRadius: `${theme.shape.customBorderRadius.xl}px`,
+            p: { xs: 4, md: 5 }
+          })}
+        >
           <Stack spacing={1} sx={{ maxInlineSize: 760 }}>
             <Typography variant='overline' color='primary.main'>
               {copy.lab.eyebrow}
@@ -677,7 +674,7 @@ const SurfaceRecipesLabView = () => {
             sx={theme => ({
               alignSelf: 'flex-start',
               borderRadius: `${theme.shape.customBorderRadius.lg}px`,
-              bgcolor: 'action.hover',
+              bgcolor: 'background.paper',
               border: '1px solid',
               borderColor: 'divider',
               p: 1

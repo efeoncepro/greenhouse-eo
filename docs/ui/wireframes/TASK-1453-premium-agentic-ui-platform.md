@@ -54,6 +54,7 @@
 | Editorial hierarchy | Geist variants + bounded lines | raw font-size/family |
 | Dense but breathable | recipe slots + 4n spacing + density | local card pile |
 | Chrome economy | `open`/`rail`/`band` plus role-specific contained layers | card-on-card / rounded wrapper for spacing |
+| Reading planes | sustained headings, lists, metadata and decisions live inside a recipe-owned work plane; `background.default` is gutter, never a reading surface | body copy or operational rows floating directly on the gray app canvas |
 | Visual impact | one dominant task-native canvas/stage/panel | uniform polish across identical cards |
 | Selected context | selection primitive + layout motion | blue border everywhere |
 | Causal motion | motion tokens/wrappers | ad-hoc ms/easing/imports |
@@ -124,6 +125,7 @@
 - Why this pattern: proves reuse without sameness and gives agents a concrete first fold.
 - Reuse / extend / new primitive: extend shell/density/motion; new composed primitives.
 - Open risks: over-abstraction, card wallpaper and decorative density; the scorecard and `data-ui-surface` probe test all three.
+- No-regression benchmark: `/growth/ctas` remains the accepted operational-workbench consumer; Lab convergence must not alter or visually regress its local inventory/detail composition.
 - Follow-up: adopt in new tasks, then audit legacy separately.
 
 ## Acceptance Checklist

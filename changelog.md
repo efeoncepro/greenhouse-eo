@@ -7,6 +7,12 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-19 — Surface Recipes adopta planos de lectura sin degradar CTA
+
+- `SurfaceRecipe` convierte los recipes oficiales en composición ejecutable sobre `CompositionShell`; el canvas gris queda como gutter y la lectura sostenida vive en work planes equilibrados.
+- `/growth/ctas` consume el recipe conservando sus paneles maduros como benchmark de no regresión; se redujo card-on-card, se tokenizaron títulos/sombras/colores y Growth usa un icono semántico.
+- El Lab de recipes y sus contratos técnico, funcional y operativo declaran el antipatrón de texto flotando sobre `background.default`. El baseline visual anterior no se promovió automáticamente: requiere aprobación humana de la nueva dirección.
+
 ## 2026-07-19 — EPIC-028 completa credits operations y Design System propio de Globe
 
 - `TASK-1468` queda como kernel append-only; `TASK-1482` administra pools, grants, project budgets, policies

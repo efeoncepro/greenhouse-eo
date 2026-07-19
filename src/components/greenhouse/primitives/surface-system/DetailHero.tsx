@@ -45,18 +45,18 @@ const DetailHero = ({
       data-capture={dataCapture}
       data-kind={kind}
       data-variant={resolvedVariant}
-      data-ui-surface='contained'
+      data-ui-surface={resolvedVariant === 'entity' ? 'open' : 'contained'}
       spacing={4}
       sx={theme => ({
-        borderRadius: `${theme.shape.customBorderRadius.xl}px`,
+        borderRadius: resolvedVariant === 'entity' ? 0 : `${theme.shape.customBorderRadius.xl}px`,
         background:
           resolvedVariant === 'evidence'
             ? `linear-gradient(135deg, ${theme.palette.background.paper}, ${theme.palette.primary.lightOpacity})`
-            : theme.palette.background.paper,
-        border: '1px solid',
+            : 'transparent',
+        border: resolvedVariant === 'entity' ? 'none' : '1px solid',
         borderColor: resolvedVariant === 'evidence' ? 'primary.lightOpacity' : 'divider',
-        boxShadow: theme.greenhouseElevation.raised.boxShadow,
-        p: { xs: 4, md: 5.5 }
+        boxShadow: resolvedVariant === 'entity' ? 'none' : theme.greenhouseElevation.raised.boxShadow,
+        p: resolvedVariant === 'entity' ? 0 : { xs: 4, md: 5.5 }
       })}
     >
       <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent='space-between' spacing={4}>

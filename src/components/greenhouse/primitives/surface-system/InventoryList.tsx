@@ -27,7 +27,7 @@ const InventoryList = ({
   emptyState,
   isEmpty = false,
   dataCapture,
-  variant = 'contained'
+  variant = 'rail'
 }: InventoryListProps) => (
   <Stack
     component='section'
@@ -39,12 +39,11 @@ const InventoryList = ({
     sx={theme => ({
       minWidth: 0,
       borderRadius: variant === 'rail' ? 0 : `${theme.shape.customBorderRadius.xl}px`,
-      bgcolor: variant === 'rail' ? 'transparent' : 'action.hover',
+      bgcolor: variant === 'rail' ? 'transparent' : 'background.paper',
       border: variant === 'rail' ? 'none' : '1px solid',
       borderColor: 'divider',
       p: variant === 'rail' ? 0 : { xs: 3, md: 4 },
-      pe: variant === 'rail' ? { md: 3 } : undefined,
-      borderInlineEnd: variant === 'rail' ? { md: '1px solid' } : undefined
+      pe: variant === 'rail' ? { md: 1 } : undefined
     })}
   >
     <Stack spacing={1}>
@@ -65,7 +64,13 @@ const InventoryList = ({
       ) : null}
     </Stack>
     {controls ? <Box>{controls}</Box> : null}
-    {isEmpty ? <Box>{emptyState}</Box> : <Stack spacing={variant === 'rail' ? 1 : 2}>{children}</Stack>}
+    {isEmpty ? (
+      <Box>{emptyState}</Box>
+    ) : (
+      <Stack role='listbox' aria-label={typeof title === 'string' ? title : 'Inventario'} spacing={variant === 'rail' ? 1 : 2}>
+        {children}
+      </Stack>
+    )}
   </Stack>
 )
 

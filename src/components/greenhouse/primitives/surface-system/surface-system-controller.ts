@@ -65,10 +65,10 @@ export const resolveContextCommandBarVariant = (kind: ContextCommandBarKind, var
 
 export const resolveOperationalSectionVariant = (kind: OperationalSectionKind, variant?: OperationalSectionVariant) =>
   resolveVariant(kind, variant, {
-    content: 'standard',
-    evidence: 'quiet',
+    content: 'open',
+    evidence: 'open',
     decision: 'emphasized',
-    custom: 'standard'
+    custom: 'open'
   })
 
 export const resolvePreviewStageVariant = (kind: PreviewStageKind, variant?: PreviewStageVariant) =>

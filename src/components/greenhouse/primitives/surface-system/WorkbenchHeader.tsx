@@ -5,6 +5,7 @@ import type { ReactNode } from 'react'
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import { alpha } from '@mui/material/styles'
 
 import useReducedMotion from '@/hooks/useReducedMotion'
 import { motion } from '@/libs/FramerMotion'
@@ -26,6 +27,7 @@ export interface WorkbenchHeaderProps {
   variant?: WorkbenchHeaderVariant
   kind?: WorkbenchHeaderKind
   dataCapture?: string
+  titleComponent?: 'h1' | 'h2'
 }
 
 const WorkbenchHeader = ({
@@ -40,7 +42,8 @@ const WorkbenchHeader = ({
   supporting,
   variant,
   kind = 'workbench',
-  dataCapture
+  dataCapture,
+  titleComponent = 'h1'
 }: WorkbenchHeaderProps) => {
   const reduced = useReducedMotion()
   const resolvedVariant = resolveWorkbenchHeaderVariant(kind, variant)
@@ -70,7 +73,7 @@ const WorkbenchHeader = ({
             ? `radial-gradient(circle at 92% 0%, ${theme.palette.primary.lightOpacity} 0%, transparent 44%), linear-gradient(135deg, transparent 0%, ${theme.palette.primary.lightOpacity} 180%)`
             : 'transparent',
         boxShadow: immersive ? theme.greenhouseElevation.raised.boxShadow : 'none',
-        p: resolvedVariant === 'report' ? { xs: 2, md: 3 } : { xs: 5, md: 7 },
+        p: resolvedVariant === 'report' ? { xs: 2, md: 3 } : { xs: 4, md: 7 },
         '&::after': immersive
           ? {
               content: "''",
@@ -96,11 +99,29 @@ const WorkbenchHeader = ({
               border: `1px solid ${theme.palette.primary.contrastText}`,
               '&:hover': { bgcolor: 'primary.main' }
             }
+          : undefined,
+        '& .MuiButton-outlined, & .MuiButton-text': immersive
+          ? {
+              color: theme.palette.primary.contrastText,
+              borderColor: alpha(theme.palette.primary.contrastText, 0.58),
+              bgcolor: alpha(theme.palette.primary.contrastText, 0.08),
+              '&:hover': {
+                borderColor: theme.palette.primary.contrastText,
+                bgcolor: alpha(theme.palette.primary.contrastText, 0.16)
+              }
+            }
+          : undefined,
+        '& .MuiButton-containedPrimary': immersive
+          ? {
+              color: theme.palette.customColors.midnight,
+              bgcolor: theme.palette.background.paper,
+              '&:hover': { bgcolor: alpha(theme.palette.primary.contrastText, 0.88) }
+            }
           : undefined
       })}
     >
-      <Stack direction={{ xs: 'column', md: 'row' }} justifyContent='space-between' spacing={5}>
-        <Stack spacing={2} sx={{ minWidth: 0, maxInlineSize: 760 }}>
+      <Stack direction={{ xs: 'column', md: 'row' }} justifyContent='space-between' spacing={{ xs: 3, md: 5 }}>
+        <Stack spacing={1.5} sx={{ minWidth: 0, maxInlineSize: 760 }}>
           <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap' useFlexGap>
             {eyebrow ? (
               <Typography variant='overline' color={immersive ? 'inherit' : 'primary.dark'} sx={{ opacity: immersive ? 0.76 : 1 }}>
@@ -109,11 +130,15 @@ const WorkbenchHeader = ({
             ) : null}
             {statusLabel ? <GreenhouseChip label={statusLabel} kind='status' variant='label' tone={statusTone} size='small' /> : null}
           </Stack>
-          <Typography component='h1' variant={resolvedVariant === 'report' ? 'h2' : 'h3'} sx={{ maxInlineSize: immersive ? 780 : undefined, textWrap: 'balance' }}>
+          <Typography
+            component={titleComponent}
+            variant='surfaceHeroTitle'
+            sx={{ maxInlineSize: immersive ? 780 : undefined, textWrap: 'balance' }}
+          >
             {title}
           </Typography>
           {description ? (
-            <Typography variant='body1' color={immersive ? 'inherit' : 'text.secondary'} sx={{ maxInlineSize: 720, opacity: immersive ? 0.78 : 1 }}>
+            <Typography variant='body2' color={immersive ? 'inherit' : 'text.secondary'} sx={{ maxInlineSize: 720, opacity: immersive ? 0.82 : 1 }}>
               {description}
             </Typography>
           ) : null}
@@ -129,8 +154,8 @@ const WorkbenchHeader = ({
       {supporting ? (
         <Box
           sx={{
-            mt: 5,
-            pt: 4,
+            mt: { xs: 3, md: 5 },
+            pt: { xs: 3, md: 4 },
             borderBlockStart: '1px solid',
             borderColor: immersive ? 'primary.mainOpacity' : 'divider'
           }}

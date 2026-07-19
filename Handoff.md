@@ -66,6 +66,10 @@
 - Snapshot íntegro pre-migración: [`docs/operations/agent-context-history/2026-07-19/Handoff.legacy.md`](docs/operations/agent-context-history/2026-07-19/Handoff.legacy.md).
 - Modelo operativo: [`docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md`](docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md).
 
+## Sesión 2026-07-19 — Surface Recipes hardening y CTA como benchmark de no regresión
+
+> Se añadió `SurfaceRecipe` como ejecutor tipado de los seis recipes sobre `CompositionShell` y se migraron el Lab workbench y `/growth/ctas` sin reemplazar los paneles maduros del cockpit. El contrato prohíbe lectura sostenida directamente sobre `background.default`: el gris es gutter y los work planes sostienen inventario, detalle, metadata y decisión. Se redujo card-on-card, `WorkbenchHeader` usa `surfaceHeroTitle`, sombras/colores pasan por tokens y Growth usa `tabler-trending-up`. ESLint/TypeScript y gates estructurales pasan; la captura nueva del Lab confirma que el separador vertical fue retirado. Estado de QA: checkpoint, no cierre. CTA devuelve exit 0 bajo perfil standard pero conserva warnings de a11y/layout en shell y autoría; el Lab premium conserva `aria-required-parent` en Settings y falla el diff contra el baseline anterior. Ese baseline permanece sin promover hasta aprobación humana y la variante móvil del Lab necesita normalizar el drawer global antes de contar como evidencia responsive final. No hubo push ni rollout.
+
 ## Sesión 2026-07-19 — Studio Credits y Design System Globe cerrados como backlog formal
 
 > Se registraron `TASK-1482` (pools/grants/budgets), `TASK-1483` (credits operations UI), `TASK-1484`

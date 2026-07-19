@@ -1052,8 +1052,7 @@ export const GH_GROWTH_CTA_OPERATOR = {
   // ── TASK-1430 — cockpit operator (master-detail + authoring gobernado) ──
   cockpit: {
     breadcrumbs: { growth: 'Growth', ctas: 'CTAs' },
-    subtitle:
-      'Autoría, ciclo de vida, superficies y resultados de cada CTA en un solo lugar. Compón por ejes gobernados; la densidad se deriva sola.',
+    subtitle: 'Autoría, ciclo de vida, superficies y resultados del motor de CTAs.',
     refresh: 'Actualizar',
     create: 'Crear CTA',
     createAria: 'Crear un CTA nuevo con autoría gobernada',
@@ -1061,16 +1060,26 @@ export const GH_GROWTH_CTA_OPERATOR = {
       published: 'publicados',
       review: 'en revisión',
       draft: 'borradores',
-      paused: 'pausados'
+      paused: 'pausados',
+      singular: {
+        published: 'publicado',
+        review: 'en revisión',
+        draft: 'borrador',
+        paused: 'pausado'
+      }
     },
     inventory: {
+      searchLabel: 'Buscar CTAs',
       searchPlaceholder: 'Buscar por nombre, slug o campaña…',
       searchAria: 'Buscar CTAs en el inventario',
+      statusFilterLabel: 'Estado',
       statusFilterAria: 'Filtrar por estado',
+      placementFilterLabel: 'Ubicación',
       placementFilterAria: 'Filtrar por ubicación',
       allStatuses: 'Todos los estados',
       allPlacements: 'Toda ubicación',
       keyboardHint: '↑↓ para navegar',
+      summaryCount: (count: number) => `${count} ${count === 1 ? 'CTA en inventario' : 'CTAs en inventario'}`,
       resultOne: 'CTA',
       resultMany: 'CTAs',
       resultFiltered: 'filtrados',

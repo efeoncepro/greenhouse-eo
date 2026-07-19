@@ -40,7 +40,7 @@ const ContextCommandBar = ({
       data-capture={dataCapture}
       data-kind={kind}
       data-variant={resolvedVariant}
-      data-ui-surface='floating'
+      data-ui-surface={sticky ? 'floating' : 'open'}
       direction={{ xs: 'column', sm: 'row' }}
       alignItems={{ xs: 'stretch', sm: 'center' }}
       justifyContent='space-between'
@@ -49,21 +49,22 @@ const ContextCommandBar = ({
         position: sticky ? { xs: 'relative', sm: 'sticky' } : 'relative',
         insetBlockEnd: sticky ? { sm: theme.spacing(3) } : undefined,
         zIndex: sticky ? { sm: theme.zIndex.appBar } : undefined,
-        border: '1px solid',
+        border: sticky || resolvedVariant !== 'contextual' ? '1px solid' : 'none',
+        borderBlockStart: !sticky && resolvedVariant === 'contextual' ? '1px solid' : undefined,
         borderColor: resolvedVariant === 'review' ? 'primary.lightOpacity' : 'divider',
-        borderRadius: `${theme.shape.customBorderRadius.xl}px`,
-        bgcolor: 'background.paper',
+        borderRadius: sticky || resolvedVariant !== 'contextual' ? `${theme.shape.customBorderRadius.xl}px` : 0,
+        bgcolor: sticky ? 'background.paper' : 'transparent',
         boxShadow: sticky
           ? theme.greenhouseElevation.overlay.boxShadow
-          : theme.greenhouseElevation.raised.boxShadow,
-        px: { xs: 4, md: 5 },
+          : 'none',
+        px: sticky || resolvedVariant !== 'contextual' ? { xs: 4, md: 5 } : 0,
         py: 3.5,
         '&::before': {
           content: "''",
           position: 'absolute',
           insetBlock: 12,
           insetInlineStart: 0,
-          inlineSize: 3,
+          inlineSize: sticky || resolvedVariant !== 'contextual' ? 3 : 0,
           borderRadius: 9999,
           bgcolor: resolvedVariant === 'review' ? 'success.main' : 'primary.main'
         }

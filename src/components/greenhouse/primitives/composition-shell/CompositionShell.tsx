@@ -345,13 +345,21 @@ const CompositionShell = ({
     drawerRegion && regions[drawerRegion] ? (
       <>
         <Button
-          variant='tonal'
+          size='small'
+          variant='outlined'
           onClick={() => setDrawerOpen(true)}
           aria-haspopup='dialog'
           aria-expanded={drawerOpen}
           startIcon={<i className={isPrimaryDrawer ? 'tabler-layout-sidebar-right-expand' : 'tabler-layout-sidebar-right'} />}
           data-capture={`composition-shell-${drawerRegion}-drawer-trigger`}
-          sx={{ alignSelf: 'flex-start' }}
+          sx={theme => ({
+            alignSelf: 'flex-end',
+            bgcolor: 'background.paper',
+            borderColor: 'divider',
+            borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+            boxShadow: 'none',
+            '&:hover': { bgcolor: 'background.paper', borderColor: 'primary.main' }
+          })}
         >
           {drawerLabel}
         </Button>
@@ -366,7 +374,16 @@ const CompositionShell = ({
               role: isPrimaryDrawer ? 'region' : 'complementary',
               'aria-label': drawerLabel,
               // El detail canvas necesita más ancho que el inspector; el aside conserva su ancho histórico.
-              sx: { width: isPrimaryDrawer ? 'min(480px, 92vw)' : 'min(420px, 88vw)', p: 5 }
+              sx: {
+                width: isPrimaryDrawer ? 'min(480px, 92vw)' : 'min(420px, 88vw)',
+                p: { xs: 3, sm: 5 },
+                '& > [data-recipe-plane]': {
+                  border: 0,
+                  borderRadius: 0,
+                  boxShadow: 'none',
+                  p: 0
+                }
+              }
             }
           }}
           data-capture={`composition-shell-${drawerRegion}-drawer`}

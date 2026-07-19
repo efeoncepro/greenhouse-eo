@@ -12,8 +12,6 @@ import { useMemo } from 'react'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
@@ -22,6 +20,7 @@ import { alpha, type Theme } from '@mui/material/styles'
 import {
   ContextCommandBar,
   DetailHero,
+  GreenhouseButton,
   GreenhouseChip,
   OperationalSection,
   PreviewStage,
@@ -73,7 +72,7 @@ const formatRate = (value: number | null): string => (value === null ? '—' : f
 const MetricDelta = ({ delta, unit }: { delta: number | null; unit: 'pct' | 'pp' }) => {
   if (delta === null) {
     return (
-      <Typography variant='caption' color='text.disabled'>
+      <Typography variant='caption' color='text.secondary'>
         {C.metrics.deltaNew}
       </Typography>
     )
@@ -124,7 +123,13 @@ const MetricCard = ({
 }) => (
   <Stack
     spacing={2}
-    sx={theme => ({ p: 4, borderRadius: radius(theme, 'lg'), bgcolor: 'action.hover' })}
+    sx={theme => ({
+      p: 4,
+      borderRadius: radius(theme, 'lg'),
+      bgcolor: 'background.paper',
+      border: '1px solid',
+      borderColor: 'divider'
+    })}
   >
     <Typography variant='caption' sx={{ fontWeight: 600, color: 'text.secondary' }}>
       {label}
@@ -214,10 +219,10 @@ const MetricsSection = ({
               <Typography variant='caption' sx={{ fontWeight: 600, color: 'text.secondary' }}>
                 {C.metrics.ctr} · {C.metrics.conversionRate}
               </Typography>
-              <Typography variant='kpiValue' component='p' color='text.disabled' sx={{ lineHeight: 1 }}>
+              <Typography variant='kpiValue' component='p' color='text.secondary' sx={{ lineHeight: 1 }}>
                 —
               </Typography>
-              <Typography variant='caption' color='text.disabled'>
+              <Typography variant='caption' color='text.secondary'>
                 {C.metrics.rateNoData}
               </Typography>
             </Stack>
@@ -240,7 +245,7 @@ const MetricsSection = ({
             />
           ) : null}
         </Box>
-        <Typography variant='caption' color='text.disabled'>
+        <Typography variant='caption' color='text.secondary'>
           {C.metrics.conversionTruthHint}
         </Typography>
       </Stack>
@@ -304,12 +309,12 @@ const CtaDetailPanel = ({
 
   if (loading) {
     return (
-      <Card><CardContent><Stack spacing={4}>
+      <Stack spacing={4} data-capture='cta-detail-loading'>
         <Skeleton variant='rounded' height={26} width='60%' />
         <Skeleton variant='rounded' height={16} width='40%' />
         <Skeleton variant='rounded' height={200} />
         <Skeleton variant='rounded' height={120} />
-      </Stack></CardContent></Card>
+      </Stack>
     )
   }
 
@@ -318,7 +323,7 @@ const CtaDetailPanel = ({
       <Stack
         spacing={3}
         alignItems='center'
-        sx={theme => ({ p: 10, textAlign: 'center', borderRadius: radius(theme, 'xl'), bgcolor: 'background.paper', boxShadow: theme.greenhouseElevation.raised.boxShadow })}
+        sx={{ p: 10, textAlign: 'center' }}
       >
         <Box
           sx={theme => ({
@@ -335,9 +340,9 @@ const CtaDetailPanel = ({
           <i className='tabler-cloud-off' style={{ fontSize: 22 }} aria-hidden />
         </Box>
         <Typography variant='subtitle2'>{C.detail.loadError}</Typography>
-        <Button variant='outlined' size='small' startIcon={<i className='tabler-refresh' style={{ fontSize: 16 }} />} onClick={onRetry}>
+        <GreenhouseButton kind='secondaryAction' variant='outlined' size='small' leadingIconClassName='tabler-refresh' onClick={onRetry}>
           {C.detail.retry}
-        </Button>
+        </GreenhouseButton>
       </Stack>
     )
   }
@@ -392,6 +397,24 @@ const CtaDetailPanel = ({
     lifecycleActions.push({ key: 'archive', label: C.lifecycle.archive, icon: 'tabler-archive-off', variant: 'text', versionId: summary.latestVersionId, allowed: capabilities.canPublish })
   }
 
+  const primaryLifecycle = lifecycleActions.find(action => action.variant === 'contained') ?? null
+  const secondaryLifecycle = lifecycleActions.filter(action => action !== primaryLifecycle)
+
+  const lifecycleButton = (action: (typeof lifecycleActions)[number], primary = false) => (
+    <GreenhouseButton
+      key={action.key}
+      kind={primary ? 'primaryAction' : 'secondaryAction'}
+      variant={primary ? 'solid' : action.variant === 'outlined' ? 'outlined' : 'text'}
+      tone={action.key === 'pause' ? 'warning' : action.key === 'deprecate' || action.key === 'archive' ? 'error' : 'primary'}
+      size='small'
+      leadingIconClassName={action.icon}
+      disabled={!action.allowed || !engineEnabled || busyAction !== null}
+      onClick={() => onLifecycle({ action: action.key, ctaVersionId: action.versionId, ctaName: summary.name })}
+    >
+      {busyAction === `${summary.ctaId}:${action.key}` ? C.lifecycle.busyGeneric : action.label}
+    </GreenhouseButton>
+  )
+
   const targeting = previewDraft.targeting
   const suppression = previewDraft.suppression
 
@@ -406,7 +429,7 @@ const CtaDetailPanel = ({
           statusLabel={statusLabel ?? ''}
           statusTone={STATUS_TONE[summary.latestVersionStatus ?? 'draft'] ?? 'default'}
           description={
-            <Typography variant='monoId' color='text.disabled' component='span'>
+            <Typography variant='monoId' color='text.secondary' component='span'>
               {summary.slug} · v{summary.latestVersion ?? 1} {summary.campaignSlug ? `· ${summary.campaignSlug}` : ''}
             </Typography>
           }
@@ -426,34 +449,42 @@ const CtaDetailPanel = ({
           ariaLabel={C.detail.lifecycleBarAria}
           dataCapture='cta-detail-lifecycle'
           primaryAction={
-            /* Autorar drafts NO se gatea por el engine flag (no expone nada público); lifecycle sí. */
-            <Button
-              size='small'
-              variant='contained'
-              color='primary'
-              startIcon={<i className='tabler-pencil' style={{ fontSize: 16 }} />}
-              onClick={onEdit}
-              disabled={!capabilities.canAuthor}
-              aria-label={C.detail.editAria}
-            >
-              {C.detail.edit}
-            </Button>
+            primaryLifecycle ? (
+              lifecycleButton(primaryLifecycle, true)
+            ) : (
+              <GreenhouseButton
+                kind='primaryAction'
+                size='small'
+                leadingIconClassName='tabler-pencil'
+                onClick={onEdit}
+                disabled={!capabilities.canAuthor}
+                aria-label={C.detail.editAria}
+              >
+                {C.detail.edit}
+              </GreenhouseButton>
+            )
           }
-          secondaryActions={lifecycleActions.map(action => (
-            <Button
-              key={action.key}
-              size='small'
-              variant={action.variant}
-              color={action.key === 'pause' ? 'warning' : action.key === 'deprecate' || action.key === 'archive' ? 'secondary' : 'primary'}
-              startIcon={<i className={action.icon} style={{ fontSize: 16 }} />}
-              disabled={!action.allowed || !engineEnabled || busyAction !== null}
-              onClick={() => onLifecycle({ action: action.key, ctaVersionId: action.versionId, ctaName: summary.name })}
-            >
-              {busyAction === `${summary.ctaId}:${action.key}` ? C.lifecycle.busyGeneric : action.label}
-            </Button>
-          ))}
+          secondaryActions={
+            <>
+              {primaryLifecycle ? (
+                <GreenhouseButton
+                  kind='secondaryAction'
+                  variant='outlined'
+                  tone='primary'
+                  size='small'
+                  leadingIconClassName='tabler-pencil'
+                  onClick={onEdit}
+                  disabled={!capabilities.canAuthor}
+                  aria-label={C.detail.editAria}
+                >
+                  {C.detail.edit}
+                </GreenhouseButton>
+              ) : null}
+              {secondaryLifecycle.map(action => lifecycleButton(action))}
+            </>
+          }
           status={
-            <Typography variant='caption' color='text.disabled' sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant='caption' color='text.secondary' sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
               <i className='tabler-git-branch' style={{ fontSize: 14 }} aria-hidden />
               v{summary.latestVersion ?? 1} {C.detail.versionCurrent}
             </Typography>
@@ -467,12 +498,11 @@ const CtaDetailPanel = ({
         alignItems={{ xs: 'flex-start', sm: 'center' }}
         gap={3.5}
         sx={theme => ({
-          p: 5,
-          borderRadius: radius(theme, 'xl'),
-          bgcolor: killedBySwitch ? alpha(theme.palette.error.main, 0.08) : theme.palette.background.paper,
-          // Elevation SoT (TASK-1049): superficie de reposo que necesita separación → `raised`.
-          boxShadow: theme.greenhouseElevation.raised.boxShadow,
-          border: killedBySwitch ? `1px solid ${alpha(theme.palette.error.main, 0.4)}` : 'none',
+          p: { xs: 3.5, md: 4 },
+          borderRadius: radius(theme, 'lg'),
+          bgcolor: killedBySwitch ? alpha(theme.palette.error.main, 0.08) : 'transparent',
+          border: '1px solid',
+          borderColor: killedBySwitch ? alpha(theme.palette.error.main, 0.4) : 'divider'
         })}
         data-capture='cta-detail-kill'
       >
@@ -485,8 +515,8 @@ const CtaDetailPanel = ({
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: killedBySwitch ? 'error.contrastText' : 'text.secondary',
-            bgcolor: killedBySwitch ? theme.palette.error.main : theme.palette.action.hover,
+            color: killedBySwitch ? 'error.contrastText' : 'primary.main',
+            bgcolor: killedBySwitch ? theme.palette.error.main : theme.palette.primary.lightOpacity,
           })}
         >
           <i className='tabler-power' style={{ fontSize: 20 }} aria-hidden />
@@ -502,7 +532,7 @@ const CtaDetailPanel = ({
             </Typography>
           ) : null}
           {latestKillAudit ? (
-            <Typography variant='caption' color='text.disabled' data-capture='cta-kill-audit'>
+            <Typography variant='caption' color='text.secondary' data-capture='cta-kill-audit'>
               {C.kill.auditTitle}: {latestKillAudit.actorRef ?? '—'}{' '}
               {latestKillAudit.action === 'engage' ? C.kill.auditEngaged : C.kill.auditReleased} ·{' '}
               «{latestKillAudit.reason}» · {formatDateTime(latestKillAudit.createdAt)}
@@ -528,16 +558,16 @@ const CtaDetailPanel = ({
         title={C.detail.previewTitle}
         description={C.detail.previewSubtitle}
         toolbar={
-          <Button size='small' variant='outlined' startIcon={<i className='tabler-arrows-maximize' style={{ fontSize: 16 }} />} onClick={onEdit} disabled={!capabilities.canAuthor}>
+          <GreenhouseButton kind='secondaryAction' size='small' variant='outlined' tone='secondary' leadingIconClassName='tabler-arrows-maximize' onClick={onEdit} disabled={!capabilities.canAuthor}>
             {C.detail.openPreview}
-          </Button>
+          </GreenhouseButton>
         }
         dataCapture='cta-detail-preview'
       >
         <Stack spacing={3.5}>
           {previewContract ? <PreviewFrame contract={previewContract} host='think' scheme='light' heightPx={300} mini /> : null}
           <DiagnosticChips items={diagnostics} />
-          <Typography variant='caption' color='text.disabled'>
+          <Typography variant='caption' color='text.secondary'>
             {C.detail.diagnosticsNote}
           </Typography>
         </Stack>
@@ -564,8 +594,8 @@ const CtaDetailPanel = ({
                     display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: 'text.secondary',
-                    bgcolor: 'action.hover',
+                    color: 'primary.main',
+                    bgcolor: 'primary.lightOpacity',
                   })}
                 >
                   <i className={surface.surfaceKind === 'wordpress' ? 'tabler-brand-wordpress' : 'tabler-square-rounded'} style={{ fontSize: 18 }} aria-hidden />
@@ -625,7 +655,7 @@ const CtaDetailPanel = ({
               <Stack key={row.label} direction='row' spacing={2.5} sx={{ py: 2.5 }} alignItems='flex-start'>
                 <i className={row.icon} style={{ fontSize: 16, marginTop: 2 }} aria-hidden />
                 <Stack spacing={0}>
-                  <Typography variant='caption' sx={{ textTransform: 'uppercase', letterSpacing: '0.04em', color: 'text.disabled', fontWeight: 600 }}>
+                  <Typography variant='caption' sx={{ textTransform: 'uppercase', letterSpacing: '0.04em', color: 'text.secondary', fontWeight: 600 }}>
                     {row.label}
                   </Typography>
                   <Typography variant='body2'>{row.value}</Typography>

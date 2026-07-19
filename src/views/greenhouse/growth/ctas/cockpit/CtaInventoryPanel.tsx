@@ -85,7 +85,7 @@ const CtaInventoryPanel = ({
     const nextIndex = Math.min(rows.length - 1, Math.max(0, currentIndex < 0 ? 0 : currentIndex + delta))
 
     onSelect(rows[nextIndex].ctaId)
-    const options = listRef.current?.querySelectorAll<HTMLElement>('button[aria-pressed]')
+    const options = listRef.current?.querySelectorAll<HTMLElement>('button[role="option"]')
 
     options?.[nextIndex]?.focus()
   }
@@ -95,6 +95,7 @@ const CtaInventoryPanel = ({
       title={O.inventory.title}
       count={`${rows.length} ${rows.length === 1 ? I.resultOne : I.resultMany} ${filtered ? I.resultFiltered : I.resultTotal}`}
       dataCapture='cta-inventory'
+      variant='rail'
       isEmpty={!loading && !loadError && rows.length === 0}
       emptyState={
         <Stack spacing={3} alignItems='center'>
@@ -110,6 +111,7 @@ const CtaInventoryPanel = ({
             <Box sx={{ flex: '2 1 240px', minWidth: 0 }}>
               <CustomTextField
                 fullWidth
+                label={I.searchLabel}
                 placeholder={I.searchPlaceholder}
                 value={filters.query}
                 onChange={event => onFiltersChange({ ...filters, query: event.target.value })}
@@ -123,6 +125,7 @@ const CtaInventoryPanel = ({
             </Box>
             <CustomTextField
               select
+              label={I.statusFilterLabel}
               value={filters.status}
               onChange={event => onFiltersChange({ ...filters, status: event.target.value })}
               slotProps={{ input: { 'aria-label': I.statusFilterAria } }}
@@ -137,6 +140,7 @@ const CtaInventoryPanel = ({
             </CustomTextField>
             <CustomTextField
               select
+              label={I.placementFilterLabel}
               value={filters.placement}
               onChange={event => onFiltersChange({ ...filters, placement: event.target.value })}
               slotProps={{ input: { 'aria-label': I.placementFilterAria } }}
@@ -150,7 +154,7 @@ const CtaInventoryPanel = ({
               ))}
             </CustomTextField>
           </Stack>
-          <Typography variant='caption' color='text.disabled' sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, alignSelf: 'flex-end' }}>
+          <Typography variant='caption' color='text.secondary' sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, alignSelf: 'flex-end' }}>
             <i className='tabler-keyboard' style={{ fontSize: 14 }} aria-hidden />
             {I.keyboardHint}
           </Typography>
@@ -216,7 +220,7 @@ const CtaInventoryPanel = ({
                 selected={cta.ctaId === selectedId}
                 onSelect={() => onSelect(cta.ctaId)}
                 subtitle={
-                  <Typography variant='monoId' color='text.disabled' component='span'>
+                  <Typography variant='monoId' color='text.secondary' component='span'>
                     {cta.slug} · v{cta.latestVersion ?? 1}
                   </Typography>
                 }

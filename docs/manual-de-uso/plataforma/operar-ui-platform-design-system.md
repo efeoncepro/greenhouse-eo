@@ -11,7 +11,7 @@
 
 1. Invoca `greenhouse-ai-design-studio` y registra la Visual Direction aplicable.
 2. Lee `DESIGN.md` y `docs/ui/GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md`.
-3. Elige un recipe en `docs/ui/recipes/` y una composición de Composition Shell.
+3. Elige un recipe en `docs/ui/recipes/` y consúmelo con `<SurfaceRecipe kind='…' />`; no reconstruyas su Composition Shell localmente. Conserva el canvas base como gutter y coloca lectura sostenida dentro de los work planes del recipe.
 4. Busca si ya existe primitive o pattern; si hay Figma/Claude Design, mapea la intención a tokens y primitives.
 5. Define jerarquía de acciones, contenido real y estados: loading, empty, error, degraded, ready.
 6. Diseña el first fold con máximo tres superficies `contained` y un momento visual dominante.
@@ -50,6 +50,8 @@ Si una entry está como `research_required`, no se debe cerrar como implementada
 6. Declara route reachability.
 7. Documenta en `ui-platform/PRIMITIVES.md` o doc tematico.
 8. Captura con GVC desktop/mobile.
+
+Al extender `SurfaceRecipe`, compara primero con `/growth/ctas`: es el benchmark operacional de no regresión. No migres un consumer maduro hacia una variante del Lab que tenga menor jerarquía, accesibilidad o economía de superficies.
 
 ## Validar visualmente
 

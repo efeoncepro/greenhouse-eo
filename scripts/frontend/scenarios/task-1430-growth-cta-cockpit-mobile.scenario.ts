@@ -1,5 +1,5 @@
 // TASK-1430 — Cockpit de CTAs en compact (390): el detalle colapsa al drawer
-// canónico del Composition Shell (trigger `composition-shell-aside-drawer-trigger`)
+// canónico del Composition Shell (trigger `composition-shell-primary-drawer-trigger`)
 // preservando el inventario; la autoría corre sin el rail (oculto en compact).
 // NO muta estado (fills sin submit; dirty-close → Descartar al final).
 
@@ -37,8 +37,8 @@ export const scenario: CaptureScenario = {
     // Detalle = drawer temporal del shell (inventario/filtros se preservan detrás).
     { kind: 'click', selector: '[data-capture="cta-inventory-row"]:nth-of-type(1) button' },
     { kind: 'sleep', ms: 1200 },
-    { kind: 'scroll', selector: '[data-capture="composition-shell-aside-drawer-trigger"]' },
-    { kind: 'click', selector: '[data-capture="composition-shell-aside-drawer-trigger"]' },
+    { kind: 'scroll', selector: '[data-capture="composition-shell-primary-drawer-trigger"]' },
+    { kind: 'click', selector: '[data-capture="composition-shell-primary-drawer-trigger"]' },
     { kind: 'sleep', ms: 1500 },
     { kind: 'mark', label: '03-mobile-detail-drawer' },
     { kind: 'press', key: 'Escape' },

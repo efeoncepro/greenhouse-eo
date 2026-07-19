@@ -258,7 +258,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
     if (canSeeGrowthForms || canSeeGrowthAiVisibility || canSeeGrowthAeo || canSeeGrowthCtas) {
       menuData.push({
         label: nl(GH_INTERNAL_NAV.growth),
-        icon: 'tabler-growth',
+        icon: 'tabler-trending-up',
         children: [
           ...(canSeeGrowthAeo
             ? [
