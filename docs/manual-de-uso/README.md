@@ -126,6 +126,10 @@ La diferencia con otras capas de documentacion:
 - [Producir un set con Layout Design & Finishing](ai-tooling/producir-layout-design-y-finishing.md) — diseñar
   grillas por ratio, terminar clean plates con Seedream/GPT y componer copy/marca de forma determinística.
 
+### Creative Studio (Efeonce Globe — plataforma hermana)
+
+- [Operar y extender el Contract Spine de Efeonce Globe](creative-studio/efeonce-globe-api-contract-spine.md) — puente desde Greenhouse hacia el runbook operativo de la plataforma hermana: quién opera qué, el flujo para agregar una capability al `CapabilityRegistry`, cómo verificar (`pnpm check`/`build` en `efeonce-globe`), la semántica de estados/errores y las reglas duras. El detalle paso a paso vive en el repo `efeonce-globe`; invocá la skill `greenhouse-globe`.
+
 ## Plantilla recomendada
 
 ```md

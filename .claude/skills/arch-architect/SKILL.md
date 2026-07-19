@@ -55,6 +55,39 @@ mechanics here, and don't let the `astro` skill make an SSOT / blast-radius call
 alone. (Codex mirrors this contract: `software-architect-2026` ↔ `astro` under
 `.codex/skills/`.)
 
+## Compose with the `greenhouse-globe` skill (Efeonce Globe / Creative Studio / EPIC-028)
+
+When a design or review touches **Efeonce Globe** — the sibling creative-production
+platform (`efeonce-globe` repo, governed by Greenhouse under EPIC-028) — **compose
+with the `greenhouse-globe` skill**. It owns the Globe-specific runtime: the Node 24
+native-TS monorepo, the API Contract Spine (TASK-1481: trusted context vs untrusted
+payload, `CapabilityRegistry`, three-state coverage, canonical errors, conformance
+harness), the capability-extension flow (TASK-1457…1480), the provider boundary
+(`provider-contract` → `creative-runner`), and the Globe↔Greenhouse ownership line.
+
+Bidirectional handoff:
+
+- **This skill decides the SHAPE** — reversibility / blast-radius, 4-pillar scoring,
+  domain boundaries and the sister-platform line (Greenhouse owns identity/desired
+  access/governance and the `TASK-###`/EPIC control plane; Globe owns
+  code/runtime/data/creative evidence — never share DB/session/bucket/provider
+  secret/admin role), canonical primitive vs new entity, whether a capability needs a
+  governed contract (Full API Parity by birth). "Sister platform vs Greenhouse module"
+  is decided here (it's already decided: Globe is a peer — see the Creative Studio ADR).
+- **The `greenhouse-globe` skill fills the IMPLEMENTATION** — how to extend the spine
+  (schemas in `packages/contracts` → `registry.registerCommand` → flip coverage
+  policy-blocked→available → handler via `provider-contract`/`creative-runner` → typed
+  SDK method → grant → manifest-driven harness), the build/toolchain (`pnpm check` /
+  `pnpm build` in `efeonce-globe`, `node --test`, import-extension convention), and the
+  trusted-context / dispatch mechanics.
+
+Flow: **decide the shape here → hand to `greenhouse-globe` for the Globe-specific
+structure → it hands back up if a new shape decision surfaces.** Canonical specs:
+`efeonce-globe/docs/architecture/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md` (SPEC-001) +
+Greenhouse `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_{DECISION,ARCHITECTURE}_V1.md`
++ `docs/epics/in-progress/EPIC-028-*.md`. (Codex mirrors this: `software-architect-2026`
+↔ `greenhouse-globe` under `.codex/skills/`.)
+
 ## Pinned decisions (OVERRIDES global arch-architect)
 
 ### 1. Canonical 360 extension is mandatory

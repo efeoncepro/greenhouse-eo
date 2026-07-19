@@ -147,6 +147,33 @@ Flow: decide the shape here → hand to `$astro` for the Astro structure → it 
 back up if a new shape decision surfaces. The same contract is mirrored on the
 Claude side (`arch-architect` ↔ `astro`).
 
+## Compose with the `greenhouse-globe` skill (Efeonce Globe / Creative Studio / EPIC-028)
+
+When a design or review touches **Efeonce Globe** — the sibling creative-production
+platform (`efeonce-globe` repo, governed by Greenhouse under EPIC-028) — **compose
+with the `$greenhouse-globe` skill** (`.codex/skills/greenhouse-globe`). Bidirectional
+handoff:
+
+- **This skill decides the SHAPE** — reversibility / blast-radius, 4-pillar scoring,
+  domain boundaries and the sister-platform line (Greenhouse owns identity / desired
+  access / governance and the `TASK-###`/EPIC control plane; Globe owns
+  code / runtime / data / creative evidence — never share DB / session / bucket /
+  provider secret / admin role), canonical primitive vs new entity, and whether a
+  capability needs a governed contract (Full API Parity by birth). Globe-as-peer is
+  already decided (Creative Studio ADR).
+- **The `greenhouse-globe` skill fills the IMPLEMENTATION** — how to extend the API
+  Contract Spine (TASK-1481: schemas in `packages/contracts` → `registry.registerCommand`
+  → flip coverage policy-blocked→available → handler via `provider-contract` /
+  `creative-runner` → typed SDK method → grant → manifest-driven harness), the
+  build/toolchain (`pnpm check` / `pnpm build` in `efeonce-globe`, `node --test`,
+  import-extension convention), and trusted-context / dispatch mechanics.
+
+Flow: decide the shape here → hand to `$greenhouse-globe` for the Globe structure → it
+hands back up if a new shape decision surfaces. Canonical specs:
+`efeonce-globe/docs/architecture/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md` (SPEC-001) +
+Greenhouse `EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_{DECISION,ARCHITECTURE}_V1.md` +
+`EPIC-028`. Mirrored on the Claude side (`arch-architect` ↔ `greenhouse-globe`).
+
 ## What this skill explicitly does NOT do
 
 - **Does not write production code by default.** It produces decision-grade specs that humans or implementation agents execute. If the user asks Codex to implement after the architecture pass, switch back to the repo's normal implementation workflow and obey `AGENTS.md`.

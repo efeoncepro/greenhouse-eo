@@ -322,6 +322,14 @@ contract spine, trusted-context envelope and conformance harness; `TASK-1457` ad
 contract, `TASK-1469` stabilizes the production run lifecycle and `TASK-1473` publishes/certifies SDK/MCP
 transports. The semantic boundary is:
 
+> **Estado — `TASK-1481` implementado (2026-07-19).** El contract spine existe y está verde en el repo
+> hermano `efeonce-globe`: separación untrusted payload / trusted context branded server-side, `CapabilityRegistry`
+> transport-neutral, coverage machine-readable de 3 estados (`missing` irrepresentable), errores canónicos
+> (`policy_blocked` ≠ `access_denied` ≠ `not_found`), private HTTP (`/v1/capabilities`, `/v1/commands`, `/v1/readers`)
+> + SDK tipado, y un conformance harness manifest-driven (HTTP≡SDK, anti-spoofing). Ships con una capability
+> inerte; las creativas quedan `policy-blocked` hasta su task. Spec canónica: `efeonce-globe/docs/architecture/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md`
+> (SPEC-001) + runbook y doc funcional en el mismo repo. Al implementar sobre Globe, invocar la skill `greenhouse-globe`.
+
 ```text
 GET  /v1/templates
 GET  /v1/runs/{runId}

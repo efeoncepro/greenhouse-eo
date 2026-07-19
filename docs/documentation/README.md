@@ -177,6 +177,10 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 - [Creative Operations y agentes](../research/RESEARCH-009-creative-operations-agentic-workflows.md) — investigación activa que distingue exploración creativa de producción repetible, documenta builder → runner y evalúa el mercado de agentes/workflows antes de convertir hipótesis en runtime.
 - [Previsualización 3D con Seedance](ai-tooling/previs-3d-y-referencias-seedance.md) — capacidad investigada de reference-to-video: un playblast/viewport exportado orienta cámara, blocking y timing, mientras un keyframe define el look. No es importación `.blend`, receta validada ni autorización para reutilizar el blocking Glitch rechazado.
 
+### Creative Studio (Efeonce Globe — plataforma hermana)
+
+- [Efeonce Globe — Contrato de API (Contract Spine)](creative-studio/efeonce-globe-api-contract-spine.md) — el contrato central por el que pasa toda acción de la plataforma hermana de producción creativa (imagen/video/audio), construido en `TASK-1481` antes de conectar proveedores: identidad confiable derivada server-side, una definición por acción, mapa honesto de disponibilidad (sin "falta" silencioso) y prueba de paridad HTTP↔SDK. Greenhouse gobierna (EPIC-028); Globe posee runtime/evidencia. Detalle canónico en el repo `efeonce-globe`.
+
 ---
 
 ## Documentacion tecnica (arquitectura)
