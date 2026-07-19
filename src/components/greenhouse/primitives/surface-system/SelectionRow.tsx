@@ -59,6 +59,7 @@ const SelectionRow = ({
       layout={reduced ? false : 'position'}
       transition={cardDensityLayoutTransition(reduced)}
       data-card-density={resolvedDensity}
+      suppressHydrationWarning
       data-capture={dataCapture}
       data-kind={kind}
       data-variant={resolvedVariant}

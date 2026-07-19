@@ -155,7 +155,8 @@ export interface CtaMarketingMetricsClient {
   conversions: CtaMetricWindowValueClient
   ctr: CtaRateWindowValueClient
   conversionRate: CtaRateWindowValueClient
-  coverage: 'ok' | 'impressions_undercounted'
+  coverage: 'ok' | 'aligned_partial' | 'impressions_undercounted'
+  coverageSince: string | null
   lastEventAt: string | null
 }
 

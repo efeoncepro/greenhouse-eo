@@ -223,6 +223,18 @@ export const summarizeViewedExposureWindows = async (
   return rows.map(row => ({ window: row.window_key, viewed: row.viewed, lastBucketAt: row.last_bucket_at }))
 }
 
+/** Primer bucket `viewed` de un CTA — ancla de la ventana alineada de rates (TASK-1430). */
+export const getFirstViewedBucketAt = async (ctaId: string): Promise<string | null> => {
+  const rows = await query<{ first_at: string | null }>(
+    `SELECT MIN(bucket_start)::text AS first_at
+       FROM greenhouse_growth.cta_exposure_rollup
+      WHERE cta_id::text = $1::text AND exposure_kind = 'viewed'`,
+    [ctaId],
+  )
+
+  return rows[0]?.first_at ?? null
+}
+
 /** Test-only: resetea el contador de purga oportunista. */
 export const __resetExposurePurgeCounterForTests = (): void => {
   writeCounter = 0

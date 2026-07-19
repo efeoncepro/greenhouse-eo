@@ -39,6 +39,7 @@ const SignalStrip = ({ signals, variant, kind = 'health', density = 'auto', data
       transition={cardDensityLayoutTransition(reduced)}
       aria-label={ariaLabel}
       data-card-density={resolvedDensity}
+      suppressHydrationWarning
       data-capture={dataCapture}
       data-kind={kind}
       data-variant={resolvedVariant}

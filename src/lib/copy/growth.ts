@@ -1146,6 +1146,8 @@ export const GH_GROWTH_CTA_OPERATOR = {
       rateNoData: 'Sin datos aún',
       coverageUndercounted:
         'Cobertura parcial: el conteo de impresiones empezó después que el de clics, así que las tasas aún no son confiables. Se muestran los conteos.',
+      coverageAligned:
+        'Los conteos cubren toda la ventana; el CTR y la tasa se calculan desde {date}, cuando empezó el conteo de impresiones (ventana alineada, sin comparación previa aún).',
       partialTitle: 'Resultados no disponibles',
       partialBody: 'La lectura de resultados no respondió. El ciclo de vida sigue operable.',
       enforcementOn: 'enforcement activo',

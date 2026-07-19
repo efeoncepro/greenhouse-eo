@@ -13,19 +13,21 @@ import type * as StoreModule from '../store'
 
 const storeMock = vi.hoisted(() => ({
   summarizeConversionEventWindows: vi.fn(),
+  summarizeAlignedEventCounts: vi.fn(),
   getLastAcceptedEventAt: vi.fn(),
   getCtaDefinitionById: vi.fn(),
   listVersionsForCta: vi.fn(),
   summarizeConversionEvents: vi.fn(),
 }))
 
-const exposureMock = vi.hoisted(() => ({ summarizeViewedExposureWindows: vi.fn() }))
+const exposureMock = vi.hoisted(() => ({ summarizeViewedExposureWindows: vi.fn(), getFirstViewedBucketAt: vi.fn() }))
 
 const captureMock = vi.hoisted(() => ({ captureWithDomain: vi.fn() }))
 
 vi.mock('../store', async importOriginal => ({
   ...(await importOriginal<typeof StoreModule>()),
   summarizeConversionEventWindows: storeMock.summarizeConversionEventWindows,
+  summarizeAlignedEventCounts: storeMock.summarizeAlignedEventCounts,
   getLastAcceptedEventAt: storeMock.getLastAcceptedEventAt,
   getCtaDefinitionById: storeMock.getCtaDefinitionById,
   listVersionsForCta: storeMock.listVersionsForCta,
@@ -35,6 +37,7 @@ vi.mock('../store', async importOriginal => ({
 vi.mock('../exposure', async importOriginal => ({
   ...(await importOriginal<typeof ExposureModule>()),
   summarizeViewedExposureWindows: exposureMock.summarizeViewedExposureWindows,
+  getFirstViewedBucketAt: exposureMock.getFirstViewedBucketAt,
 }))
 
 vi.mock('@/lib/observability/capture', () => ({ captureWithDomain: captureMock.captureWithDomain }))
@@ -47,7 +50,9 @@ beforeEach(() => {
   vi.clearAllMocks()
   storeMock.getLastAcceptedEventAt.mockResolvedValue('2026-07-18 10:00:00+00')
   exposureMock.summarizeViewedExposureWindows.mockResolvedValue([])
+  exposureMock.getFirstViewedBucketAt.mockResolvedValue('2020-01-01 00:00:00+00')
   storeMock.summarizeConversionEventWindows.mockResolvedValue([])
+  storeMock.summarizeAlignedEventCounts.mockResolvedValue([])
 })
 
 describe('getCtaMarketingMetrics', () => {
@@ -77,7 +82,51 @@ describe('getCtaMarketingMetrics', () => {
     expect(metrics.lastEventAt).toBe('2026-07-18 10:00:00+00')
   })
 
-  it('clicks > impressions ⇒ coverage impressions_undercounted (rates no confiables)', async () => {
+  it('cobertura parcial ⇒ CTR/tasa sobre la ventana ALINEADA (desde el primer viewed)', async () => {
+    const ayer = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+
+    exposureMock.getFirstViewedBucketAt.mockResolvedValue(ayer)
+    exposureMock.summarizeViewedExposureWindows.mockResolvedValue([
+      { window: 'current', viewed: 2, lastBucketAt: ayer },
+    ])
+    storeMock.summarizeConversionEventWindows.mockResolvedValue([
+      // 3 clics en la ventana COMPLETA (2 son anteriores al tracking de viewed)
+      { window: 'current', eventKind: 'clicked', trustLevel: 'browser_reported', total: 3 },
+    ])
+    storeMock.summarizeAlignedEventCounts.mockResolvedValue([
+      { eventKind: 'clicked', trustLevel: 'browser_reported', total: 1 },
+    ])
+
+    const metrics = await getCtaMarketingMetrics(CTA_ID)
+
+    expect(metrics.coverage).toBe('aligned_partial')
+    expect(metrics.coverageSince).toBe(ayer)
+    expect(metrics.clicks.current).toBe(3) // conteo de card = ventana completa
+    expect(metrics.ctr.current).toBeCloseTo(0.5) // rate = alineado: 1/2
+    expect(metrics.ctr.previous).toBeNull()
+  })
+
+  it('cobertura parcial pero alineado clicks > viewed ⇒ sigue undercounted', async () => {
+    const ayer = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+
+    exposureMock.getFirstViewedBucketAt.mockResolvedValue(ayer)
+    exposureMock.summarizeViewedExposureWindows.mockResolvedValue([
+      { window: 'current', viewed: 1, lastBucketAt: ayer },
+    ])
+    storeMock.summarizeConversionEventWindows.mockResolvedValue([
+      { window: 'current', eventKind: 'clicked', trustLevel: 'browser_reported', total: 5 },
+    ])
+    storeMock.summarizeAlignedEventCounts.mockResolvedValue([
+      { eventKind: 'clicked', trustLevel: 'browser_reported', total: 4 },
+    ])
+
+    const metrics = await getCtaMarketingMetrics(CTA_ID)
+
+    expect(metrics.coverage).toBe('impressions_undercounted')
+    expect(metrics.ctr.current).toBeNull()
+  })
+
+  it('clicks > impressions con cobertura completa ⇒ impressions_undercounted', async () => {
     exposureMock.summarizeViewedExposureWindows.mockResolvedValue([
       { window: 'current', viewed: 2, lastBucketAt: '2026-07-18 09:00:00+00' },
     ])

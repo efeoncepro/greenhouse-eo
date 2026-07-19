@@ -15,7 +15,12 @@ import { captureWithDomain } from '@/lib/observability/capture'
 import { resolveCtaAction } from './action-router'
 import { arbitrateCandidates, isRouteEligible, resolvePriorityScore, type ArbiterCandidate } from './arbiter'
 import type { ArbitratedRenderResult, CtaSuppressionDecision, CtaVisitorContext } from './contracts'
-import { recordCtaExposureBatch, summarizeViewedExposureWindows, type RecordExposureInput } from './exposure'
+import {
+  getFirstViewedBucketAt,
+  recordCtaExposureBatch,
+  summarizeViewedExposureWindows,
+  type RecordExposureInput,
+} from './exposure'
 import {
   isCtaEngineEnabled,
   isCtaSuppressionEnforcementEnabled,
@@ -35,6 +40,7 @@ import {
   listSurfaceBindings,
   listVersionsForCta,
   recordServerErrorEventOncePerDay,
+  summarizeAlignedEventCounts,
   summarizeConversionEventWindows,
   summarizeConversionEvents,
 } from './store'
@@ -357,12 +363,18 @@ export interface CtaMarketingMetricsVm {
   ctr: CtaRateWindowValue
   conversionRate: CtaRateWindowValue
   /**
-   * `impressions_undercounted` cuando clicks > impressions en la ventana (el
-   * tracking Tier B de `viewed` es más nuevo que el ledger, o hay sampling):
-   * los rates serían físicamente imposibles — la UI muestra conteos + nota en
-   * vez de un % roto. Determinado server-side, jamás en la UI.
+   * Cobertura de los RATES (determinada server-side, jamás en la UI):
+   * - `ok`: el tracking de impresiones cubre toda la ventana; rates ventana completa.
+   * - `aligned_partial`: las impresiones nacieron DENTRO de la ventana (Tier B más
+   *   nuevo que el ledger) — CTR/tasa se computan sobre la VENTANA ALINEADA
+   *   (clics/conversiones desde `coverageSince` ÷ impresiones). Los conteos de las
+   *   cards siguen siendo ventana completa; la UI explica el ancla.
+   * - `impressions_undercounted`: incluso alineado clicks > impressions (sampling/
+   *   asimetrías) — un % sería imposible; la UI muestra conteos + nota.
    */
-  coverage: 'ok' | 'impressions_undercounted'
+  coverage: 'ok' | 'aligned_partial' | 'impressions_undercounted'
+  /** Ancla de la ventana alineada (primer bucket viewed) cuando coverage=aligned_partial. */
+  coverageSince: string | null
   lastEventAt: string | null
 }
 
@@ -392,10 +404,11 @@ export const getCtaMarketingMetrics = async (
   ctaId: string,
   windowDays = 30,
 ): Promise<CtaMarketingMetricsVm> => {
-  const [eventWindows, viewedWindows, lastEventAt] = await Promise.all([
+  const [eventWindows, viewedWindows, lastEventAt, firstViewedAt] = await Promise.all([
     summarizeConversionEventWindows(ctaId, windowDays),
     summarizeViewedExposureWindows(ctaId, windowDays),
     getLastAcceptedEventAt(ctaId),
+    getFirstViewedBucketAt(ctaId),
   ])
 
   const sumEvents = (window: 'current' | 'previous', predicate: (row: { eventKind: string; trustLevel: string }) => boolean) =>
@@ -424,14 +437,53 @@ export const getCtaMarketingMetrics = async (
 
   const freshness = [lastEventAt, lastBucketAt].filter((value): value is string => value !== null).sort().at(-1) ?? null
 
+  // Cobertura de rates: si el tracking de impresiones nació DENTRO de la ventana,
+  // el CTR honesto se computa sobre la ventana ALINEADA (desde el primer bucket
+  // viewed) — "si tienes clics e impresiones, tienes CTR", pero sobre el tramo
+  // donde AMBAS señales existen. Los conteos de cards siguen siendo ventana completa.
+  const windowStartMs = Date.now() - windowDays * 24 * 60 * 60 * 1000
+  const firstViewedMs = firstViewedAt ? Date.parse(firstViewedAt) : null
+  const partialCoverage = firstViewedMs !== null && firstViewedMs > windowStartMs
+
+  let ctr = toRateValue(clicks, impressions)
+  let conversionRate = toRateValue(conversions, impressions)
+  let coverage: CtaMarketingMetricsVm['coverage'] = clicks.current > impressions.current ? 'impressions_undercounted' : 'ok'
+  let coverageSince: string | null = null
+
+  if (partialCoverage && impressions.current > 0 && firstViewedAt) {
+    const aligned = await summarizeAlignedEventCounts(ctaId, firstViewedAt)
+    const alignedClicks = aligned.filter(isClick).reduce((total, row) => total + row.total, 0)
+    const alignedConversions = aligned.filter(isConversion).reduce((total, row) => total + row.total, 0)
+
+    if (alignedClicks <= impressions.current) {
+      ctr = { current: alignedClicks / impressions.current, previous: null, deltaPp: null }
+      conversionRate = { current: alignedConversions / impressions.current, previous: null, deltaPp: null }
+      coverage = 'aligned_partial'
+      coverageSince = firstViewedAt
+    } else {
+      coverage = 'impressions_undercounted'
+    }
+  } else if (partialCoverage) {
+    // Aún sin impresiones: rates null (el guard clásico decide el label).
+    coverage = clicks.current > 0 ? 'impressions_undercounted' : 'ok'
+  }
+
+  // Con cobertura undercounted el VM jamás porta un rate físicamente imposible
+  // (contrato limpio: la UI no debe depender de "saber ocultarlo").
+  if (coverage === 'impressions_undercounted') {
+    ctr = { current: null, previous: null, deltaPp: null }
+    conversionRate = { current: null, previous: null, deltaPp: null }
+  }
+
   return {
     windowDays,
     impressions,
     clicks,
     conversions,
-    ctr: toRateValue(clicks, impressions),
-    conversionRate: toRateValue(conversions, impressions),
-    coverage: clicks.current > impressions.current ? 'impressions_undercounted' : 'ok',
+    ctr,
+    conversionRate,
+    coverage,
+    coverageSince,
     lastEventAt: freshness,
   }
 }

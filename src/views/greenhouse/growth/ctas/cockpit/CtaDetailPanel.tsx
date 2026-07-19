@@ -155,6 +155,7 @@ const MetricsSection = ({
   }
 
   const undercounted = metrics.coverage === 'impressions_undercounted'
+  const aligned = metrics.coverage === 'aligned_partial'
 
   return (
     <OperationalSection
@@ -177,6 +178,10 @@ const MetricsSection = ({
         {undercounted ? (
           <Alert severity='info' icon={<i className='tabler-info-circle' />}>
             {C.metrics.coverageUndercounted}
+          </Alert>
+        ) : aligned ? (
+          <Alert severity='info' icon={<i className='tabler-info-circle' />}>
+            {C.metrics.coverageAligned.replace('{date}', metrics.coverageSince ? formatDate(metrics.coverageSince) : '—')}
           </Alert>
         ) : null}
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))' }, gap: 3 }}>
