@@ -291,6 +291,8 @@
     "@anthropic-ai/sdk": "^0.100.1",
     "@assistant-ui/react": "^0.12.21",
     "@assistant-ui/react-markdown": "^0.12.7",
+    "@efeonce-globe/contracts": "file:vendor/efeonce-globe/efeonce-globe-contracts-0.0.0.tgz",
+    "@efeonce-globe/sdk": "file:vendor/efeonce-globe/efeonce-globe-sdk-0.1.0.tgz",
     "@emoji-mart/data": "1.2.1",
     "@emoji-mart/react": "1.1.1",
     "@emotion/cache": "11.14.0",

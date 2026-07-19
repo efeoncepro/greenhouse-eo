@@ -26,17 +26,20 @@ const buildOAuthRedirect = ({
   redirectUri,
   state,
   code,
-  error
+  error,
+  correlationId
 }: {
   redirectUri: string
   state: string
   code?: string
   error?: string
+  correlationId?: string
 }) => {
   const target = new URL(redirectUri)
 
   if (code) target.searchParams.set('code', code)
   if (error) target.searchParams.set('error', error)
+  if (correlationId) target.searchParams.set('correlation_id', correlationId)
   target.searchParams.set('state', state)
 
   return NextResponse.redirect(target, { status: 303 })
@@ -106,7 +109,8 @@ export async function GET(request: Request) {
     return buildOAuthRedirect({
       redirectUri: authorizeRequest.redirectUri,
       state: authorizeRequest.state,
-      code: issued.code
+      code: issued.code,
+      correlationId: issued.correlationId
     })
   } catch (error) {
     const normalized =
@@ -138,7 +142,13 @@ export async function GET(request: Request) {
       return buildOAuthRedirect({
         redirectUri: safeOAuthRedirect.redirectUri,
         state: safeOAuthRedirect.state,
-        error: normalized.errorCode === 'user_scope_not_allowed' ? 'access_denied' : normalized.errorCode
+        error:
+          normalized.errorCode === 'audience_not_allowed' ||
+          normalized.errorCode === 'required_scope_missing' ||
+          normalized.errorCode === 'user_not_eligible'
+            ? 'access_denied'
+            : normalized.errorCode,
+        correlationId: auditMetadata.correlationId
       })
     }
 

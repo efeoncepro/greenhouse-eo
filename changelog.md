@@ -7,6 +7,18 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-19 — Globe ya existe como producto interno visible
+
+- TASK-1455 convirtió el callback técnico de Globe en una shell branded live: raíz anónima, OAuth Greenhouse,
+  callback `303 /studio`, sesión/revalidación, logout y recovery/revocación sin exponer tokens al browser.
+- El runtime `globe-studio-internal-00006-445` sirve 100% del tráfico no productivo desde Node 24, min 0/max 1;
+  build `fd79b83e-eafc-4fb1-93c9-ddf6309c4c17`, digest `sha256:7b213f7d…c8f4a`.
+- Dirección `Orbital Threshold` usa los SVG/font assets canónicos con proveniencia. GVC premium live pasó
+  1440×1000 y 390×844, teclado, reduced motion, axe, layout, runtime, performance y rubric enterprise;
+  scorecard 4,73/5, floor 4,5 y cero overflow.
+- Continúa internal-only y sin Production, clientes, projects, runs, providers, DB ni asset bucket. El siguiente
+  slice funcional debe especificar el workbench real sin reabrir identidad o brand foundation.
+
 ## 2026-07-19 — Creative Studio formaliza el primer Business Model del repo
 
 - Nace `docs/business-models/` con índice, lifecycle, fronteras y template canónico; Strategy conserva

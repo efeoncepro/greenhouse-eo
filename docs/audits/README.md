@@ -16,6 +16,8 @@ Indice de auditorias tecnicas y operativas versionadas dentro de `docs/`.
 - [ANAM RevOps diagnosis and change-set QA — 2026-07-16](ANAM_REVOPS_CHANGE_SET_QA_2026-07-16.md)
 - [ANAM execution countries property QA — 2026-07-17](ANAM_EXECUTION_COUNTRIES_PROPERTY_QA_2026-07-17.md)
 - [ANAM commercial pipeline governance QA — 2026-07-17](ANAM_COMMERCIAL_PIPELINE_GOVERNANCE_QA_2026-07-17.md)
+- [TASK-1454 Globe identity bridge QA — 2026-07-19](platform/TASK-1454_GLOBE_IDENTITY_BRIDGE_QA_2026-07-19.md)
+- [TASK-1455 Globe brand shell QA — 2026-07-19](platform/TASK-1455_GLOBE_BRAND_SHELL_QA_2026-07-19.md)
 
 - [Design Tokens](design-tokens/README.md)
 - [Cloud Cost](cloud-cost/README.md)

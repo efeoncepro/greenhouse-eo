@@ -3601,6 +3601,7 @@ export interface GreenhouseCoreSisterPlatformAuthorizationCodes {
   consume_failure_count: Generated<number>;
   consumed_at: Timestamp | null;
   consumed_by_consumer_id: string | null;
+  correlation_id: string | null;
   created_at: Generated<Timestamp>;
   expires_at: Timestamp;
   hash_algorithm: Generated<string>;
@@ -3677,13 +3678,19 @@ export interface GreenhouseCoreSisterPlatformConsumers {
 }
 
 export interface GreenhouseCoreSisterPlatformOauthAccessTokens {
+  correlation_id: string | null;
   created_at: Generated<Timestamp>;
   expires_at: Timestamp;
   hash_algorithm: Generated<string>;
   identity_profile_id: string | null;
   last_used_at: Timestamp | null;
   metadata_json: Generated<Json>;
+  /**
+   * TASK-1454: non-sensitive canonical reason for explicit token revocation.
+   */
+  revocation_reason: string | null;
   revoked_at: Timestamp | null;
+  revoked_by_user_id: string | null;
   scopes: string[];
   sister_platform_authorization_code_id: string | null;
   sister_platform_consumer_id: string;
@@ -3697,6 +3704,7 @@ export interface GreenhouseCoreSisterPlatformOauthAccessTokens {
 
 export interface GreenhouseCoreSisterPlatformOauthAuditLog {
   client_id: string | null;
+  correlation_id: string | null;
   created_at: Generated<Timestamp>;
   duration_ms: Generated<number>;
   error_code: string | null;
@@ -3730,6 +3738,10 @@ export interface GreenhouseCoreSisterPlatformOauthClients {
   deprecated_by_user_id: string | null;
   issue_identity_inline: Generated<boolean>;
   metadata_json: Generated<Json>;
+  /**
+   * TASK-1454: versioned, fail-closed audience/scope/claims/revocation policy evaluated generically by the broker.
+   */
+  policy_json: Json | null;
   redirect_uris: string[];
   require_pkce: Generated<boolean>;
   sister_platform_consumer_id: string;

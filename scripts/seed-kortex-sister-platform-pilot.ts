@@ -335,6 +335,18 @@ async function main() {
     accessTokenTtlSeconds: readPositiveInt('KORTEX_OAUTH_ACCESS_TOKEN_TTL_SECONDS', 300),
     requirePkce: true,
     issueIdentityInline: true,
+    policy: {
+      schemaVersion: '1',
+      audience: { tenantTypes: ['efeonce_internal'] },
+      requiredScopes: ['openid', 'kortex.operator_console.access'],
+      capabilityScopes: ['kortex.operator_console.access'],
+      claims: { includeGreenhouseRoles: true },
+      revocation: {
+        mode: 'userinfo_revalidation',
+        revalidateAfterSeconds: 60,
+        requireOnPrivilegedAction: true
+      }
+    },
     metadata: {
       source: 'scripts/seed-kortex-sister-platform-pilot.ts',
       installationId,

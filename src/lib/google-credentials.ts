@@ -1,5 +1,5 @@
 import { getVercelOidcToken, getVercelOidcTokenSync } from '@vercel/oidc'
-import { ExternalAccountClient, GoogleAuth, type AuthClient, type GoogleAuthOptions } from 'google-auth-library'
+import { ExternalAccountClient, GoogleAuth, Impersonated, type AuthClient, type GoogleAuthOptions } from 'google-auth-library'
 
 export type GoogleCredentialSource = 'wif' | 'service_account_key' | 'ambient_adc'
 
@@ -160,7 +160,8 @@ const getGoogleCredentialPreference = (env: NodeJS.ProcessEnv = process.env): Go
 const hasVercelRuntimeMetadata = (env: NodeJS.ProcessEnv = process.env) =>
   hasValue(env.VERCEL_URL) || hasValue(env.VERCEL_DEPLOYMENT_ID) || hasValue(env.VERCEL_REGION)
 
-const isVercelRuntime = (env: NodeJS.ProcessEnv = process.env) => hasValue(env.VERCEL) && hasVercelRuntimeMetadata(env)
+export const isVercelRuntime = (env: NodeJS.ProcessEnv = process.env) =>
+  hasValue(env.VERCEL) && hasVercelRuntimeMetadata(env)
 
 const hasInjectedVercelOidcToken = (env: NodeJS.ProcessEnv = process.env) =>
   env !== process.env && hasValue(env.VERCEL_OIDC_TOKEN)
@@ -263,6 +264,104 @@ const getWorkloadIdentityProvider = (env: NodeJS.ProcessEnv = process.env) => {
 export const isWorkloadIdentityConfigured = (env: NodeJS.ProcessEnv = process.env) =>
   hasValue(getWorkloadIdentityProvider(env)) && hasValue(env.GCP_SERVICE_ACCOUNT_EMAIL)
 
+const createVercelSubjectTokenSupplier = (env: NodeJS.ProcessEnv) => ({
+  getSubjectToken: async () => {
+    if (hasInjectedVercelOidcToken(env)) {
+      return env.VERCEL_OIDC_TOKEN!.trim()
+    }
+
+    if (!isVercelRuntime(env)) {
+      throw new Error('Vercel OIDC token is only available during real Vercel runtime execution')
+    }
+
+    const token = await getVercelOidcToken().catch(() => process.env.VERCEL_OIDC_TOKEN?.trim())
+
+    if (!token) {
+      throw new Error('Vercel OIDC token is not available in this runtime context')
+    }
+
+    return token.trim()
+  }
+})
+
+export const createVercelWifGoogleAuthClient = ({
+  provider,
+  serviceAccountEmail,
+  env = process.env,
+  scopes
+}: {
+  provider: string
+  serviceAccountEmail: string
+  env?: NodeJS.ProcessEnv
+  scopes?: string | string[]
+}) => {
+  const normalizedProvider = normalizeWorkloadIdentityProvider(provider)
+  const normalizedServiceAccountEmail = serviceAccountEmail.trim()
+
+  if (!normalizedProvider || !normalizedServiceAccountEmail) {
+    throw new Error('Workload Identity Federation is not fully configured for this runtime')
+  }
+
+  const client = ExternalAccountClient.fromJSON({
+    type: 'external_account',
+    audience: normalizeWorkloadIdentityAudience(normalizedProvider),
+    subject_token_type: 'urn:ietf:params:oauth:token-type:jwt',
+    token_url: 'https://sts.googleapis.com/v1/token',
+    service_account_impersonation_url: `https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/${encodeURIComponent(normalizedServiceAccountEmail)}:generateAccessToken`,
+    ...(scopes ? { scopes: Array.isArray(scopes) ? scopes : [scopes] } : {}),
+    subject_token_supplier: createVercelSubjectTokenSupplier(env)
+  })
+
+  if (!client) {
+    throw new Error('Unable to build Google external account client for Workload Identity Federation')
+  }
+
+  return client
+}
+
+export const createVercelWifGoogleIdTokenClientFactory = ({
+  provider,
+  serviceAccountEmail,
+  env = process.env
+}: {
+  provider: string
+  serviceAccountEmail: string
+  env?: NodeJS.ProcessEnv
+}) => {
+  const normalizedProvider = normalizeWorkloadIdentityProvider(provider)
+  const normalizedServiceAccountEmail = serviceAccountEmail.trim()
+
+  if (!normalizedProvider || !normalizedServiceAccountEmail) {
+    throw new Error('Workload Identity Federation is not fully configured for this runtime')
+  }
+
+  const sourceClient = ExternalAccountClient.fromJSON({
+    type: 'external_account',
+    audience: normalizeWorkloadIdentityAudience(normalizedProvider),
+    subject_token_type: 'urn:ietf:params:oauth:token-type:jwt',
+    token_url: 'https://sts.googleapis.com/v1/token',
+    scopes: ['https://www.googleapis.com/auth/cloud-platform'],
+    subject_token_supplier: createVercelSubjectTokenSupplier(env)
+  })
+
+  if (!sourceClient) {
+    throw new Error('Unable to build Google external account client for Workload Identity Federation')
+  }
+
+  const impersonated = new Impersonated({
+    sourceClient,
+    targetPrincipal: normalizedServiceAccountEmail,
+    targetScopes: ['https://www.googleapis.com/auth/cloud-platform'],
+    lifetime: 900
+  })
+
+  return {
+    async getIdTokenClient() {
+      return { idTokenProvider: impersonated }
+    }
+  }
+}
+
 const getWorkloadIdentityAuthClient = ({
   env = process.env,
   scopes
@@ -277,39 +376,12 @@ const getWorkloadIdentityAuthClient = ({
     throw new Error('Workload Identity Federation is not fully configured for this runtime')
   }
 
-  const client = ExternalAccountClient.fromJSON({
-    type: 'external_account',
-    audience: normalizeWorkloadIdentityAudience(provider),
-    subject_token_type: 'urn:ietf:params:oauth:token-type:jwt',
-    token_url: 'https://sts.googleapis.com/v1/token',
-    service_account_impersonation_url: `https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/${encodeURIComponent(serviceAccountEmail)}:generateAccessToken`,
-    ...(scopes ? { scopes: Array.isArray(scopes) ? scopes : [scopes] } : {}),
-    subject_token_supplier: {
-      getSubjectToken: async () => {
-        if (hasInjectedVercelOidcToken(env)) {
-          return env.VERCEL_OIDC_TOKEN!.trim()
-        }
-
-        if (!isVercelRuntime(env)) {
-          throw new Error('Vercel OIDC token is only available during real Vercel runtime execution')
-        }
-
-        const token = await getVercelOidcToken().catch(() => process.env.VERCEL_OIDC_TOKEN?.trim())
-
-        if (!token) {
-          throw new Error('Vercel OIDC token is not available in this runtime context')
-        }
-
-        return token.trim()
-      }
-    }
+  return createVercelWifGoogleAuthClient({
+    provider,
+    serviceAccountEmail,
+    env,
+    scopes
   })
-
-  if (!client) {
-    throw new Error('Unable to build Google external account client for Workload Identity Federation')
-  }
-
-  return client
 }
 
 export const shouldUseWorkloadIdentity = (env: NodeJS.ProcessEnv = process.env) => {

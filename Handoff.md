@@ -21,6 +21,21 @@
 
 ## Pendientes inmediatos
 
+- `TASK-1454` completó su runtime interno en `develop`, sin push ni Production: broker OAuth multiproducto,
+  migración aditiva aplicada a `greenhouse-pg-dev/greenhouse_app`, client/binding Globe internal-only,
+  callback `globe-studio-internal`, API privada `globe-api-internal`, SDK y WIF/ADC sin llaves. Los smokes live
+  cubren acceso humano interno, denegación de tenant cliente, PKCE/replay, revocación convergente, audience
+  correcto/incorrecto y Vercel OIDC → WIF → Cloud Run. Globe queda activo sólo como piloto interno por
+  instrucción del operador; rollback = suspender client/binding y retirar IAM/WIF. No existen Production,
+  clientes externos, providers creativos, base Globe ni buckets. El repo hermano `efeonce-globe` permanece
+  `main` local, sin push; la distribución por tarballs vendorizados es temporal hasta registry privado.
+  Incidente contenido: un JWT OIDC efímero apareció en un log diagnóstico y se retiraron deployments/binding
+  Preview; una credencial operativa existente de DB apareció durante diagnóstico local y requiere rotación en
+  checkpoint separado, sin repetirla ni rotarla unilateralmente.
+  `TASK-1455` cerró la lane UI separada: Globe está live en Cloud Run revision `globe-studio-internal-00006-445`
+  con root branded, callback→`/studio`, sesión/recovery, assets canónicos y GVC premium desktop/mobile. Score visual
+  4,73/5, cero overflow y cero errores Globe. El próximo slice debe especificar el workbench real; projects, runs,
+  providers, clientes y Production siguen ausentes. No renombrar el typo histórico `goble` sin revisar consumers.
 - Para continuar trabajo activo, partir desde las sesiones recientes de abajo y el artefacto formal aplicable.
 - Para investigar decisiones anteriores, buscar primero task/issue/ADR y después los snapshots históricos.
 

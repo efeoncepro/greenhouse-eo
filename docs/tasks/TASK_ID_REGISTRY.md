@@ -1526,7 +1526,9 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-1451` | `to-do` | **Notion Work Status, Results and Observed History.** Readers live+observed para propiedades, deadlines, progreso recursivo, resultado, freshness e historia honesta. P1. Alto. Alto. backend-data / webhook. EPIC-032. | `docs/tasks/to-do/TASK-1451-notion-work-status-results-observed-history.md` |
 | `TASK-1452` | `to-do` | **Governed Notion Work CLI and Agent Rollout.** CLI human/JSON sobre primitives compartidos, adopción Codex/Claude y canary gobernado en Efeonce + otro space. P1. Alto. Medio. backend-data / command. EPIC-032. | `docs/tasks/to-do/TASK-1452-governed-notion-work-cli-agent-rollout.md` |
 | `TASK-1453` | `complete` | **Premium Agentic UI Platform.** Dirección visual obligatoria, readiness sustantivo, gates separados, GVC premium, scorecard, recipes, primitives compuestas y Lab de tres arquetipos. P0. Muy alto. Alto. ui-ux / motion. EPIC-033. | `docs/tasks/complete/TASK-1453-premium-agentic-ui-platform.md` |
+| `TASK-1454` | `complete` | **Efeonce Globe Federated Identity and Governed SDK Bridge.** Piloto interno no productivo live: broker OAuth multiproducto, migration/policy, Globe internal-only, callback/session, private API, SDK/WIF/ADC sin llaves y smokes allow/deny/replay/revocation/correlation. QA conditional pass; broader release requiere rotación DB, registry privado y hardening de callback logs. | `docs/tasks/complete/TASK-1454-efeonce-globe-identity-sdk-bridge.md` |
+| `TASK-1455` | `complete` | **Globe Internal Launch and Brand Shell.** Primera superficie humana premium internal-only live: logo canónico, raíz/callback/session UI, estados honestos, GVC premium desktop/mobile y Cloud Run; sin Studio funcional, Production ni clientes externos. P0. Muy alto. Medio. ui-ux / flow, backend api híbrido mínimo. EPIC-028. | `docs/tasks/complete/TASK-1455-globe-internal-launch-brand-shell.md` |
 
 ## Siguiente ID disponible
 
-`TASK-1454`
+`TASK-1456`

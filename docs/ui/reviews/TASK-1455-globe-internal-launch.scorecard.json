@@ -1,0 +1,98 @@
+{
+  "taskId": "TASK-1455",
+  "scenario": "globe-internal-launch",
+  "reviewedAt": "2026-07-19",
+  "reviewer": "Codex + GVC premium live evidence",
+  "evidence": {
+    "desktop": "scripts/frontend/baselines/globe.internal-launch/desktop__anonymous-first-fold.png",
+    "mobile": "scripts/frontend/baselines/globe.internal-launch/mobile__anonymous-first-fold.png",
+    "dossier": "docs/ui/reviews/TASK-1455-globe-internal-launch.review.md"
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.8,
+      "rationale": "The brand mark, concise promise and single governed entry action create an unmistakable first-fold reading order.",
+      "evidence": "desktop and mobile anonymous first-fold baselines",
+      "nextAction": ""
+    },
+    "proportions": {
+      "score": 4.7,
+      "rationale": "The asymmetric lead and oversized isotype remain balanced at desktop while recomposing cleanly into the compact mobile crop.",
+      "evidence": "anonymous and authenticated durable baselines",
+      "nextAction": ""
+    },
+    "rhythm": {
+      "score": 4.6,
+      "rationale": "Open negative space and a restrained status rail separate product promise, action and operational context without dead zones.",
+      "evidence": "desktop__anonymous-first-fold.png",
+      "nextAction": ""
+    },
+    "density": {
+      "score": 4.6,
+      "rationale": "Only identity and access facts appear; no speculative project or provider data inflates the launch foundation.",
+      "evidence": "desktop__authenticated-first-fold.png",
+      "nextAction": ""
+    },
+    "depth": {
+      "score": 4.6,
+      "rationale": "Orbital lines, radial light and mark scale establish atmospheric depth without decorative card stacks or heavy shadows.",
+      "evidence": "desktop and mobile anonymous first-fold baselines",
+      "nextAction": ""
+    },
+    "surfaceEconomy": {
+      "score": 4.9,
+      "rationale": "The composition is an open plane with one identity band and one status rail, avoiding card wallpaper entirely.",
+      "evidence": "enterprise rubric pass and desktop baselines",
+      "nextAction": ""
+    },
+    "visualImpact": {
+      "score": 4.9,
+      "rationale": "The architectural Globe isotype and near-poster typography create a memorable arrival appropriate for a creative production platform.",
+      "evidence": "desktop__anonymous-first-fold.png",
+      "nextAction": ""
+    },
+    "typography": {
+      "score": 4.7,
+      "rationale": "Local Poppins and Geist assets provide a strong display-to-operational hierarchy with controlled measure and legibility.",
+      "evidence": "all durable first-fold baselines",
+      "nextAction": ""
+    },
+    "color": {
+      "score": 4.7,
+      "rationale": "Midnight, azure and paper preserve Globe identity while green and orange remain semantic connection and focus signals.",
+      "evidence": "zero axe contrast findings in premium GVC",
+      "nextAction": ""
+    },
+    "iconography": {
+      "score": 4.6,
+      "rationale": "The canonical balloon mark dominates and the few directional or status symbols reinforce meaning without an invented icon system.",
+      "evidence": "anonymous and authenticated durable baselines",
+      "nextAction": ""
+    },
+    "responsive": {
+      "score": 4.8,
+      "rationale": "The 390-pixel composition preserves brand, action and status with exact zero page overflow and full-width touch targets.",
+      "evidence": "mobile baselines and scrollWidth equals clientWidth evidence",
+      "nextAction": ""
+    },
+    "motion": {
+      "score": 4.5,
+      "rationale": "A short causal entrance and pending feedback use local tokens, while reduced motion reaches the same final state immediately.",
+      "evidence": "GVC keyboard and reduced-motion frames plus recording",
+      "nextAction": ""
+    },
+    "fidelity": {
+      "score": 4.9,
+      "rationale": "Supplied SVG and font assets are used without redrawing the mark, and their provenance is recorded beside the runtime copies.",
+      "evidence": "canonical assets, provenance file and durable baselines",
+      "nextAction": ""
+    },
+    "genericTemplateResistance": {
+      "score": 4.9,
+      "rationale": "Orbital Threshold reads as a branded creative-platform threshold rather than a Vuexy dashboard, SaaS landing template or KPI grid.",
+      "evidence": "visual direction decision and enterprise rubric pass",
+      "nextAction": ""
+    }
+  },
+  "verdict": "pass"
+}

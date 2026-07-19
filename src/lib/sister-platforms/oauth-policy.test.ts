@@ -1,0 +1,98 @@
+import { describe, expect, it } from 'vitest'
+
+import {
+  assertSisterPlatformOAuthPolicyScopes,
+  evaluateSisterPlatformOAuthEligibility,
+  parseSisterPlatformOAuthPolicy,
+  resolveSisterPlatformOAuthCapabilities,
+  SisterPlatformOAuthPolicyError
+} from './oauth-policy'
+
+const globePolicyInput = {
+  schemaVersion: '1',
+  audience: { tenantTypes: ['efeonce_internal'] },
+  requiredScopes: ['openid', 'globe.studio.access'],
+  capabilityScopes: ['globe.studio.access'],
+  claims: { includeGreenhouseRoles: false },
+  revocation: {
+    mode: 'userinfo_revalidation',
+    revalidateAfterSeconds: 60,
+    requireOnPrivilegedAction: true
+  }
+} as const
+
+describe('sister platform OAuth policy', () => {
+  it('accepts an internal Globe user with the required capability scope', () => {
+    const policy = parseSisterPlatformOAuthPolicy(globePolicyInput)
+
+    expect(
+      evaluateSisterPlatformOAuthEligibility(policy, {
+        active: true,
+        status: 'active',
+        tenantType: 'efeonce_internal',
+        requestedScopes: ['openid', 'profile', 'email', 'globe.studio.access']
+      })
+    ).toEqual({ allowed: true })
+    expect(resolveSisterPlatformOAuthCapabilities(policy, ['openid', 'globe.studio.access'])).toEqual([
+      'globe.studio.access'
+    ])
+  })
+
+  it('denies a client tenant even when the caller requests the Globe scope', () => {
+    const policy = parseSisterPlatformOAuthPolicy(globePolicyInput)
+
+    expect(
+      evaluateSisterPlatformOAuthEligibility(policy, {
+        active: true,
+        status: 'active',
+        tenantType: 'client',
+        requestedScopes: ['openid', 'globe.studio.access']
+      })
+    ).toEqual({ allowed: false, errorCode: 'audience_not_allowed' })
+  })
+
+  it('denies an internal user when the client-required capability is absent', () => {
+    const policy = parseSisterPlatformOAuthPolicy(globePolicyInput)
+
+    expect(
+      evaluateSisterPlatformOAuthEligibility(policy, {
+        active: true,
+        status: 'active',
+        tenantType: 'efeonce_internal',
+        requestedScopes: ['openid', 'profile', 'email']
+      })
+    ).toEqual({ allowed: false, errorCode: 'required_scope_missing' })
+  })
+
+  it('fails closed when the policy is missing or malformed', () => {
+    expect(() => parseSisterPlatformOAuthPolicy(null)).toThrowError(
+      expect.objectContaining({ errorCode: 'client_policy_missing' })
+    )
+    expect(() =>
+      parseSisterPlatformOAuthPolicy({
+        ...globePolicyInput,
+        audience: { tenantTypes: ['efeonce_internal', 'external'] }
+      })
+    ).toThrowError(SisterPlatformOAuthPolicyError)
+  })
+
+  it('rejects policy scopes that are not registered on the OAuth client', () => {
+    const policy = parseSisterPlatformOAuthPolicy(globePolicyInput)
+
+    expect(() => assertSisterPlatformOAuthPolicyScopes(policy, ['openid', 'profile', 'email'])).toThrowError(
+      expect.objectContaining({ errorCode: 'client_policy_scope_mismatch' })
+    )
+  })
+
+  it('keeps legacy role exposure as a registered policy choice instead of product branching', () => {
+    const policy = parseSisterPlatformOAuthPolicy({
+      ...globePolicyInput,
+      requiredScopes: ['openid', 'kortex.operator_console.access'],
+      capabilityScopes: ['kortex.operator_console.access'],
+      claims: { includeGreenhouseRoles: true }
+    })
+
+    expect(policy.claims.includeGreenhouseRoles).toBe(true)
+    expect(policy.capabilityScopes).toEqual(['kortex.operator_console.access'])
+  })
+})

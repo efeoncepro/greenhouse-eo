@@ -5,6 +5,15 @@ import { createHash, randomBytes, randomUUID, timingSafeEqual } from 'node:crypt
 import { query, withTransaction } from '@/lib/db'
 import { getTenantAccessRecordByUserId, type TenantAccessRecord } from '@/lib/tenant/access'
 
+import {
+  assertSisterPlatformOAuthPolicyScopes,
+  evaluateSisterPlatformOAuthEligibility,
+  parseSisterPlatformOAuthPolicy,
+  resolveSisterPlatformOAuthCapabilities,
+  SisterPlatformOAuthPolicyError,
+  type SisterPlatformOAuthPolicyV1
+} from './oauth-policy'
+
 type OAuthClientRow = {
   oauth_client_id: string
   consumer_id: string
@@ -21,6 +30,7 @@ type OAuthClientRow = {
   access_token_ttl_seconds: number
   require_pkce: boolean
   issue_identity_inline: boolean
+  policy_json: unknown
   metadata_json: Record<string, unknown> | null
 }
 
@@ -37,6 +47,7 @@ type OAuthCodeRow = {
   nonce_hash: string
   code_challenge: string
   code_challenge_method: string
+  correlation_id: string | null
   expires_at: string | Date
   consumed_at: string | Date | null
 }
@@ -49,6 +60,7 @@ type OAuthAccessTokenRow = {
   identity_profile_id: string | null
   token_hash: string
   scopes: string[] | null
+  correlation_id: string | null
   expires_at: string | Date
   revoked_at: string | Date | null
 }
@@ -77,6 +89,7 @@ export type SisterPlatformOAuthClient = {
   accessTokenTtlSeconds: number
   requirePkce: boolean
   issueIdentityInline: boolean
+  policy: SisterPlatformOAuthPolicyV1
   metadata: Record<string, unknown>
 }
 
@@ -98,6 +111,7 @@ export type SisterPlatformOAuthIdentityPayload = {
 }
 
 export type OAuthRequestAuditMetadata = {
+  correlationId: string
   ipHash: string | null
   userAgentHash: string | null
 }
@@ -115,6 +129,7 @@ export type ValidatedAuthorizeRequest = {
 export type IssuedAuthorizationCode = {
   authorizationCodeId: string
   code: string
+  correlationId: string
   expiresAt: string
 }
 
@@ -122,6 +137,7 @@ export type ConsumedAuthorizationCode = {
   authorizationCodeId: string
   accessTokenId: string
   accessToken: string
+  correlationId: string
   expiresIn: number
   scopes: string[]
   identity: SisterPlatformOAuthIdentityPayload
@@ -138,6 +154,7 @@ export type UpsertSisterPlatformOAuthClientInput = {
   accessTokenTtlSeconds?: number
   requirePkce?: boolean
   issueIdentityInline?: boolean
+  policy: SisterPlatformOAuthPolicyV1
   metadata?: Record<string, unknown> | null
   actorUserId?: string | null
 }
@@ -154,11 +171,10 @@ export class SisterPlatformOAuthError extends Error {
   }
 }
 
-const CORE_OIDC_SCOPES = new Set(['openid', 'profile', 'email'])
-const KORTEX_OPERATOR_SCOPE = 'kortex.operator_console.access'
 const CODE_PREFIX_LENGTH = 18
 const TOKEN_PREFIX_LENGTH = 18
 const DEFAULT_ALLOWED_SCOPES = ['openid', 'profile', 'email']
+const CORRELATION_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/
 
 const toIsoString = (value: string | Date | null) => {
   if (!value) return null
@@ -252,24 +268,44 @@ const generateAccessToken = () => `ghspoat_${randomBytes(48).toString('base64url
 const buildPkceChallenge = (codeVerifier: string) =>
   createHash('sha256').update(codeVerifier).digest('base64url')
 
-const mapOAuthClient = (row: OAuthClientRow): SisterPlatformOAuthClient => ({
-  oauthClientId: row.oauth_client_id,
-  consumerId: row.consumer_id,
-  sisterPlatformKey: row.sister_platform_key,
-  consumerName: row.consumer_name,
-  consumerStatus: row.consumer_status,
-  consumerExpiresAt: toIsoString(row.consumer_expires_at),
-  clientId: row.client_id,
-  clientName: row.client_name,
-  clientStatus: row.client_status,
-  redirectUris: normalizeStringArray(row.redirect_uris, []),
-  allowedScopes: normalizeStringArray(row.allowed_scopes, DEFAULT_ALLOWED_SCOPES),
-  codeTtlSeconds: Number(row.code_ttl_seconds || 300),
-  accessTokenTtlSeconds: Number(row.access_token_ttl_seconds || 300),
-  requirePkce: Boolean(row.require_pkce),
-  issueIdentityInline: Boolean(row.issue_identity_inline),
-  metadata: row.metadata_json ?? {}
-})
+const mapOAuthClient = (row: OAuthClientRow): SisterPlatformOAuthClient => {
+  const allowedScopes = normalizeStringArray(row.allowed_scopes, DEFAULT_ALLOWED_SCOPES)
+
+  try {
+    const policy = parseSisterPlatformOAuthPolicy(row.policy_json)
+
+    assertSisterPlatformOAuthPolicyScopes(policy, allowedScopes)
+
+    return {
+      oauthClientId: row.oauth_client_id,
+      consumerId: row.consumer_id,
+      sisterPlatformKey: row.sister_platform_key,
+      consumerName: row.consumer_name,
+      consumerStatus: row.consumer_status,
+      consumerExpiresAt: toIsoString(row.consumer_expires_at),
+      clientId: row.client_id,
+      clientName: row.client_name,
+      clientStatus: row.client_status,
+      redirectUris: normalizeStringArray(row.redirect_uris, []),
+      allowedScopes,
+      codeTtlSeconds: Number(row.code_ttl_seconds || 300),
+      accessTokenTtlSeconds: Number(row.access_token_ttl_seconds || 300),
+      requirePkce: Boolean(row.require_pkce),
+      issueIdentityInline: Boolean(row.issue_identity_inline),
+      policy,
+      metadata: row.metadata_json ?? {}
+    }
+  } catch (error) {
+    if (error instanceof SisterPlatformOAuthPolicyError) {
+      throw new SisterPlatformOAuthError('OAuth client policy is unavailable.', {
+        statusCode: 503,
+        errorCode: error.errorCode
+      })
+    }
+
+    throw error
+  }
+}
 
 export const isSisterPlatformOAuthEnabled = () => {
   const raw = process.env.GREENHOUSE_SISTER_PLATFORM_OAUTH_ENABLED?.trim().toLowerCase()
@@ -304,10 +340,17 @@ const assertClientAllowedByEnv = (clientId: string) => {
   }
 }
 
-export const getOAuthRequestAuditMetadata = (request: Request): OAuthRequestAuditMetadata => ({
-  ipHash: hashSensitiveValue(request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || request.headers.get('x-real-ip')),
-  userAgentHash: hashSensitiveValue(request.headers.get('user-agent')?.trim() || null)
-})
+export const getOAuthRequestAuditMetadata = (request: Request): OAuthRequestAuditMetadata => {
+  const requestedCorrelationId = request.headers.get('x-correlation-id')?.trim() || ''
+
+  return {
+    correlationId: CORRELATION_ID_PATTERN.test(requestedCorrelationId) ? requestedCorrelationId : randomUUID(),
+    ipHash: hashSensitiveValue(
+      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || request.headers.get('x-real-ip')
+    ),
+    userAgentHash: hashSensitiveValue(request.headers.get('user-agent')?.trim() || null)
+  }
+}
 
 export const loadSisterPlatformOAuthClient = async (clientId: string) => {
   const normalizedClientId = clientId.trim().toLowerCase()
@@ -330,6 +373,7 @@ export const loadSisterPlatformOAuthClient = async (clientId: string) => {
         oauth.access_token_ttl_seconds,
         oauth.require_pkce,
         oauth.issue_identity_inline,
+        oauth.policy_json,
         oauth.metadata_json
       FROM greenhouse_core.sister_platform_oauth_clients oauth
       JOIN greenhouse_core.sister_platform_consumers consumer
@@ -351,6 +395,9 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
   const allowedScopes = normalizeAllowedScopes(input.allowedScopes)
   const codeTtlSeconds = normalizeTtl(input.codeTtlSeconds, 300, 60, 600)
   const accessTokenTtlSeconds = normalizeTtl(input.accessTokenTtlSeconds, 300, 60, 900)
+  const policy = parseSisterPlatformOAuthPolicy(input.policy)
+
+  assertSisterPlatformOAuthPolicyScopes(policy, allowedScopes)
   const oauthClientId = `spoauth-client-${randomUUID()}`
 
   if (!clientId || !clientName) {
@@ -385,9 +432,10 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
             access_token_ttl_seconds = $8,
             require_pkce = $9,
             issue_identity_inline = $10,
-            metadata_json = $11::jsonb,
-            suspended_by_user_id = CASE WHEN $4 = 'suspended' THEN $12 ELSE NULL END,
-            deprecated_by_user_id = CASE WHEN $4 = 'deprecated' THEN $12 ELSE NULL END,
+            policy_json = $11::jsonb,
+            metadata_json = $12::jsonb,
+            suspended_by_user_id = CASE WHEN $4 = 'suspended' THEN $13 ELSE NULL END,
+            deprecated_by_user_id = CASE WHEN $4 = 'deprecated' THEN $13 ELSE NULL END,
             suspended_at = CASE WHEN $4 = 'suspended' THEN CURRENT_TIMESTAMP ELSE NULL END,
             deprecated_at = CASE WHEN $4 = 'deprecated' THEN CURRENT_TIMESTAMP ELSE NULL END,
             updated_at = CURRENT_TIMESTAMP
@@ -404,6 +452,7 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
           accessTokenTtlSeconds,
           input.requirePkce ?? true,
           input.issueIdentityInline ?? true,
+          JSON.stringify(policy),
           JSON.stringify(input.metadata ?? {}),
           input.actorUserId ?? null
         ]
@@ -426,6 +475,7 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
           access_token_ttl_seconds,
           require_pkce,
           issue_identity_inline,
+          policy_json,
           metadata_json,
           created_by_user_id,
           suspended_by_user_id,
@@ -433,10 +483,10 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
           suspended_at,
           deprecated_at
         ) VALUES (
-          $1, $2, $3, $4, $5, $6::text[], $7::text[], $8, $9, $10, $11, $12::jsonb,
-          $13,
-          CASE WHEN $5 = 'suspended' THEN $13 ELSE NULL END,
-          CASE WHEN $5 = 'deprecated' THEN $13 ELSE NULL END,
+          $1, $2, $3, $4, $5, $6::text[], $7::text[], $8, $9, $10, $11, $12::jsonb, $13::jsonb,
+          $14,
+          CASE WHEN $5 = 'suspended' THEN $14 ELSE NULL END,
+          CASE WHEN $5 = 'deprecated' THEN $14 ELSE NULL END,
           CASE WHEN $5 = 'suspended' THEN CURRENT_TIMESTAMP ELSE NULL END,
           CASE WHEN $5 = 'deprecated' THEN CURRENT_TIMESTAMP ELSE NULL END
         )
@@ -453,6 +503,7 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
         accessTokenTtlSeconds,
         input.requirePkce ?? true,
         input.issueIdentityInline ?? true,
+        JSON.stringify(policy),
         JSON.stringify(input.metadata ?? {}),
         input.actorUserId ?? null
       ]
@@ -575,36 +626,32 @@ const getOAuthTenantId = (tenant: TenantAccessRecord) =>
 
 export const assertTenantEligibleForSisterPlatformOAuth = (
   tenant: TenantAccessRecord,
+  client: SisterPlatformOAuthClient,
   requestedScopes: string[]
 ) => {
-  if (!tenant.active || tenant.status !== 'active') {
-    throw new SisterPlatformOAuthError('User is not eligible for this sister platform.', {
-      statusCode: 403,
-      errorCode: 'user_not_eligible'
-    })
-  }
+  const decision = evaluateSisterPlatformOAuthEligibility(client.policy, {
+    active: tenant.active,
+    status: tenant.status,
+    tenantType: tenant.tenantType,
+    requestedScopes
+  })
 
-  if (tenant.tenantType !== 'efeonce_internal') {
-    throw new SisterPlatformOAuthError('User is outside the approved Kortex operator audience.', {
+  if (!decision.allowed) {
+    throw new SisterPlatformOAuthError('User is not eligible for this OAuth client.', {
       statusCode: 403,
-      errorCode: 'user_scope_not_allowed'
-    })
-  }
-
-  if (!requestedScopes.includes(KORTEX_OPERATOR_SCOPE)) {
-    throw new SisterPlatformOAuthError('Kortex operator-console scope is required.', {
-      statusCode: 403,
-      errorCode: 'missing_kortex_scope'
+      errorCode: decision.errorCode
     })
   }
 }
 
 export const buildSisterPlatformOAuthIdentityPayload = ({
   tenant,
+  client,
   requestedScopes,
   expiresAt
 }: {
   tenant: TenantAccessRecord
+  client: SisterPlatformOAuthClient
   requestedScopes: string[]
   expiresAt: string
 }): SisterPlatformOAuthIdentityPayload => ({
@@ -613,8 +660,8 @@ export const buildSisterPlatformOAuthIdentityPayload = ({
   name: tenant.fullName,
   tenantId: getOAuthTenantId(tenant),
   identityProfileId: tenant.identityProfileId,
-  roles: tenant.roleCodes,
-  capabilities: requestedScopes.filter(scope => !CORE_OIDC_SCOPES.has(scope)),
+  roles: client.policy.claims.includeGreenhouseRoles ? tenant.roleCodes : [],
+  capabilities: resolveSisterPlatformOAuthCapabilities(client.policy, requestedScopes),
   issuedAt: new Date().toISOString(),
   expiresAt,
   organization: {
@@ -637,6 +684,7 @@ export const recordSisterPlatformOAuthAuditEvent = async ({
   requestedScopes,
   responseStatus,
   durationMs,
+  correlationId,
   auditMetadata,
   metadata
 }: {
@@ -654,12 +702,15 @@ export const recordSisterPlatformOAuthAuditEvent = async ({
     | 'userinfo_reject'
     | 'code_replay'
     | 'redirect_rejected'
+    | 'token_revoked'
+    | 'client_status_changed'
   outcome: 'success' | 'rejected' | 'failure'
   errorCode?: string | null
   redirectUri?: string | null
   requestedScopes?: string[] | null
   responseStatus?: number | null
   durationMs?: number
+  correlationId?: string | null
   auditMetadata?: OAuthRequestAuditMetadata | null
   metadata?: Record<string, unknown> | null
 }) => {
@@ -681,12 +732,13 @@ export const recordSisterPlatformOAuthAuditEvent = async ({
         requested_scopes,
         response_status,
         duration_ms,
+        correlation_id,
         ip_hash,
         user_agent_hash,
         metadata_json
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7, $8,
-        $9, $10, $11, $12, $13::text[], $14, $15, $16, $17, $18::jsonb
+        $9, $10, $11, $12, $13::text[], $14, $15, $16, $17, $18, $19::jsonb
       )
     `,
     [
@@ -705,6 +757,7 @@ export const recordSisterPlatformOAuthAuditEvent = async ({
       requestedScopes ?? null,
       responseStatus ?? null,
       Math.max(0, Math.trunc(durationMs ?? 0)),
+      correlationId ?? auditMetadata?.correlationId ?? null,
       auditMetadata?.ipHash ?? null,
       auditMetadata?.userAgentHash ?? null,
       JSON.stringify(metadata ?? {})
@@ -721,7 +774,7 @@ export const issueSisterPlatformAuthorizationCode = async ({
   tenant: TenantAccessRecord
   auditMetadata: OAuthRequestAuditMetadata
 }): Promise<IssuedAuthorizationCode> => {
-  assertTenantEligibleForSisterPlatformOAuth(tenant, authorizeRequest.requestedScopes)
+  assertTenantEligibleForSisterPlatformOAuth(tenant, authorizeRequest.client, authorizeRequest.requestedScopes)
 
   const code = generateAuthorizationCode()
   const now = new Date()
@@ -744,13 +797,14 @@ export const issueSisterPlatformAuthorizationCode = async ({
         nonce_hash,
         code_challenge,
         code_challenge_method,
+        correlation_id,
         expires_at,
         ip_hash,
         user_agent_hash,
         metadata_json
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7, $8, $9::text[],
-        $10, $11, $12, 'S256', $13, $14, $15, $16::jsonb
+        $10, $11, $12, 'S256', $13, $14, $15, $16, $17::jsonb
       )
     `,
     [
@@ -766,6 +820,7 @@ export const issueSisterPlatformAuthorizationCode = async ({
       hashValue(authorizeRequest.state),
       hashValue(authorizeRequest.nonce),
       authorizeRequest.codeChallenge,
+      auditMetadata.correlationId,
       expiresAt,
       auditMetadata.ipHash,
       auditMetadata.userAgentHash,
@@ -776,6 +831,7 @@ export const issueSisterPlatformAuthorizationCode = async ({
   return {
     authorizationCodeId,
     code,
+    correlationId: auditMetadata.correlationId,
     expiresAt
   }
 }
@@ -922,6 +978,7 @@ export const consumeSisterPlatformAuthorizationCode = async ({
           nonce_hash,
           code_challenge,
           code_challenge_method,
+          correlation_id,
           expires_at,
           consumed_at
         FROM greenhouse_core.sister_platform_authorization_codes
@@ -1031,7 +1088,7 @@ export const consumeSisterPlatformAuthorizationCode = async ({
 
     const requestedScopes = normalizeStringArray(codeRow.requested_scopes, DEFAULT_ALLOWED_SCOPES)
 
-    assertTenantEligibleForSisterPlatformOAuth(tenant, requestedScopes)
+    assertTenantEligibleForSisterPlatformOAuth(tenant, client, requestedScopes)
 
     const accessTokenId = `spoauth-token-${randomUUID()}`
     const expiresAt = new Date(Date.now() + client.accessTokenTtlSeconds * 1000).toISOString()
@@ -1061,10 +1118,11 @@ export const consumeSisterPlatformAuthorizationCode = async ({
           token_prefix,
           token_hash,
           scopes,
+          correlation_id,
           expires_at,
           metadata_json
         ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9::text[], $10, $11::jsonb
+          $1, $2, $3, $4, $5, $6, $7, $8, $9::text[], $10, $11, $12::jsonb
         )
       `,
       [
@@ -1077,6 +1135,7 @@ export const consumeSisterPlatformAuthorizationCode = async ({
         accessTokenPrefix,
         accessTokenHash,
         requestedScopes,
+        codeRow.correlation_id ?? auditMetadata.correlationId,
         expiresAt,
         JSON.stringify({ source: 'TASK-948 token exchange' })
       ]
@@ -1087,6 +1146,7 @@ export const consumeSisterPlatformAuthorizationCode = async ({
       accessTokenId,
       tenant,
       requestedScopes,
+      correlationId: codeRow.correlation_id ?? auditMetadata.correlationId,
       expiresAt
     }
   }).catch(async error => {
@@ -1107,6 +1167,7 @@ export const consumeSisterPlatformAuthorizationCode = async ({
     outcome: 'success',
     requestedScopes: result.requestedScopes,
     responseStatus: 200,
+    correlationId: result.correlationId,
     auditMetadata,
     metadata: {
       expiresAt: result.expiresAt
@@ -1117,10 +1178,12 @@ export const consumeSisterPlatformAuthorizationCode = async ({
     authorizationCodeId: result.authorizationCodeId,
     accessTokenId: result.accessTokenId,
     accessToken,
+    correlationId: result.correlationId,
     expiresIn: client.accessTokenTtlSeconds,
     scopes: result.requestedScopes,
     identity: buildSisterPlatformOAuthIdentityPayload({
       tenant: result.tenant,
+      client,
       requestedScopes: result.requestedScopes,
       expiresAt: result.expiresAt
     })
@@ -1149,6 +1212,7 @@ export const resolveSisterPlatformOAuthUserinfo = async ({
         token.identity_profile_id,
         token.token_hash,
         token.scopes,
+        token.correlation_id,
         token.expires_at,
         token.revoked_at,
         oauth.sister_platform_oauth_client_id AS oauth_client_id,
@@ -1166,6 +1230,7 @@ export const resolveSisterPlatformOAuthUserinfo = async ({
         oauth.access_token_ttl_seconds,
         oauth.require_pkce,
         oauth.issue_identity_inline,
+        oauth.policy_json,
         oauth.metadata_json
       FROM greenhouse_core.sister_platform_oauth_access_tokens token
       JOIN greenhouse_core.sister_platform_oauth_clients oauth
@@ -1207,7 +1272,7 @@ export const resolveSisterPlatformOAuthUserinfo = async ({
     })
   }
 
-  assertTenantEligibleForSisterPlatformOAuth(tenant, requestedScopes)
+  assertTenantEligibleForSisterPlatformOAuth(tenant, client, requestedScopes)
 
   await query(
     `
@@ -1227,16 +1292,196 @@ export const resolveSisterPlatformOAuthUserinfo = async ({
     outcome: 'success',
     requestedScopes,
     responseStatus: 200,
+    correlationId: row.correlation_id ?? auditMetadata.correlationId,
     auditMetadata
   })
 
   return {
     client,
     accessTokenId: row.access_token_id,
+    correlationId: row.correlation_id ?? auditMetadata.correlationId,
     identity: buildSisterPlatformOAuthIdentityPayload({
       tenant,
+      client,
       requestedScopes,
       expiresAt: toIsoString(row.expires_at) || new Date().toISOString()
     })
   }
+}
+
+export type RevokeSisterPlatformOAuthTokensInput = Readonly<{
+  clientId: string
+  userId?: string | null
+  actorUserId?: string | null
+  reason: string
+  correlationId?: string | null
+}>
+
+export type SetSisterPlatformOAuthClientStatusInput = Readonly<{
+  clientId: string
+  status: 'draft' | 'active' | 'suspended' | 'deprecated'
+  actorUserId?: string | null
+  reason: string
+  correlationId?: string | null
+}>
+
+const normalizeCorrelationId = (value?: string | null) => {
+  const normalized = value?.trim() || ''
+
+  return CORRELATION_ID_PATTERN.test(normalized) ? normalized : randomUUID()
+}
+
+const normalizeRevocationReason = (value: string) => {
+  const normalized = value.trim()
+
+  if (!/^[A-Za-z0-9][A-Za-z0-9 ._:-]{2,127}$/.test(normalized)) {
+    throw new SisterPlatformOAuthError('Invalid revocation reason.', {
+      errorCode: 'invalid_revocation_reason'
+    })
+  }
+
+  return normalized
+}
+
+export const revokeSisterPlatformOAuthAccessTokens = async (
+  input: RevokeSisterPlatformOAuthTokensInput
+) => {
+  const client = await loadSisterPlatformOAuthClient(input.clientId)
+
+  if (!client) {
+    throw new SisterPlatformOAuthError('Unknown OAuth client.', {
+      statusCode: 404,
+      errorCode: 'invalid_client'
+    })
+  }
+
+  const correlationId = normalizeCorrelationId(input.correlationId)
+  const reason = normalizeRevocationReason(input.reason)
+
+  const revoked = await query<{
+    access_token_id: string
+    user_id: string
+    identity_profile_id: string | null
+    scopes: string[] | null
+  }>(
+    `
+      UPDATE greenhouse_core.sister_platform_oauth_access_tokens
+      SET
+        revoked_at = CURRENT_TIMESTAMP,
+        revoked_by_user_id = $3,
+        revocation_reason = $4,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE sister_platform_oauth_client_id = $1
+        AND revoked_at IS NULL
+        AND ($2::text IS NULL OR user_id = $2)
+      RETURNING
+        sister_platform_oauth_access_token_id AS access_token_id,
+        user_id,
+        identity_profile_id,
+        scopes
+    `,
+    [client.oauthClientId, input.userId ?? null, input.actorUserId ?? null, reason]
+  )
+
+  if (revoked.length === 0) {
+    await recordSisterPlatformOAuthAuditEvent({
+      client,
+      userId: input.userId ?? null,
+      eventType: 'token_revoked',
+      outcome: 'success',
+      responseStatus: 200,
+      correlationId,
+      metadata: { reason, revokedCount: 0 }
+    })
+  } else {
+    for (const token of revoked) {
+      await recordSisterPlatformOAuthAuditEvent({
+        client,
+        accessTokenId: token.access_token_id,
+        userId: token.user_id,
+        identityProfileId: token.identity_profile_id,
+        eventType: 'token_revoked',
+        outcome: 'success',
+        requestedScopes: token.scopes,
+        responseStatus: 200,
+        correlationId,
+        metadata: { reason }
+      })
+    }
+  }
+
+  return { clientId: client.clientId, correlationId, revokedCount: revoked.length }
+}
+
+export const setSisterPlatformOAuthClientStatus = async (
+  input: SetSisterPlatformOAuthClientStatusInput
+) => {
+  const current = await loadSisterPlatformOAuthClient(input.clientId)
+
+  if (!current) {
+    throw new SisterPlatformOAuthError('Unknown OAuth client.', {
+      statusCode: 404,
+      errorCode: 'invalid_client'
+    })
+  }
+
+  const correlationId = normalizeCorrelationId(input.correlationId)
+  const reason = normalizeRevocationReason(input.reason)
+
+  await withTransaction(async pgClient => {
+    await pgClient.query(
+      `
+        UPDATE greenhouse_core.sister_platform_oauth_clients
+        SET
+          client_status = $2,
+          suspended_by_user_id = CASE WHEN $2 = 'suspended' THEN $3 ELSE NULL END,
+          deprecated_by_user_id = CASE WHEN $2 = 'deprecated' THEN $3 ELSE NULL END,
+          suspended_at = CASE WHEN $2 = 'suspended' THEN CURRENT_TIMESTAMP ELSE NULL END,
+          deprecated_at = CASE WHEN $2 = 'deprecated' THEN CURRENT_TIMESTAMP ELSE NULL END,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE sister_platform_oauth_client_id = $1
+      `,
+      [current.oauthClientId, input.status, input.actorUserId ?? null]
+    )
+
+    if (input.status === 'suspended' || input.status === 'deprecated') {
+      await pgClient.query(
+        `
+          UPDATE greenhouse_core.sister_platform_oauth_access_tokens
+          SET
+            revoked_at = COALESCE(revoked_at, CURRENT_TIMESTAMP),
+            revoked_by_user_id = COALESCE(revoked_by_user_id, $2),
+            revocation_reason = COALESCE(revocation_reason, $3),
+            updated_at = CURRENT_TIMESTAMP
+          WHERE sister_platform_oauth_client_id = $1
+            AND revoked_at IS NULL
+        `,
+        [current.oauthClientId, input.actorUserId ?? null, reason]
+      )
+    }
+  })
+
+  await recordSisterPlatformOAuthAuditEvent({
+    client: current,
+    eventType: 'client_status_changed',
+    outcome: 'success',
+    responseStatus: 200,
+    correlationId,
+    metadata: {
+      from: current.clientStatus,
+      to: input.status,
+      reason
+    }
+  })
+
+  const client = await loadSisterPlatformOAuthClient(input.clientId)
+
+  if (!client) {
+    throw new SisterPlatformOAuthError('OAuth client could not be reloaded.', {
+      statusCode: 500,
+      errorCode: 'client_reload_failed'
+    })
+  }
+
+  return { client, correlationId }
 }

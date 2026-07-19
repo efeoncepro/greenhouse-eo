@@ -92,12 +92,14 @@ export async function POST(request: Request) {
         access_token: consumed.accessToken,
         expires_in: consumed.expiresIn,
         scope: consumed.scopes.join(' '),
+        correlation_id: consumed.correlationId,
         identity: consumed.identity
       },
       {
         status: 200,
         headers: {
-          'cache-control': 'no-store'
+          'cache-control': 'no-store',
+          'x-correlation-id': consumed.correlationId
         }
       }
     )

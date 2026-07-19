@@ -557,7 +557,7 @@ Antes de abrir una integracion nueva, confirmar:
 
 - `Verk` queda explicitamente contemplada como future sister platform consumer de este contrato
 - no debe recibir anexo propio hasta tener baseline real de repo o arquitectura equivalente
-- `Efeonce Creative Studio` queda contemplada como plataforma hermana agentic de producción creativa (EPIC-028). Antes de existir su repositorio y baseline, Greenhouse sólo puede tratarla como dirección arquitectónica: al bootstrap debe recibir binding explícito, credentials por service account, scope de workspace y contratos versionados para proyecciones/deliverables. Sus assets, créditos y provider secrets son de su propiedad y no se comparten por DB, sesión ni acceso administrativo implícito. El contrato cross-format futuro usa una solicitud minimizada de composición y un `artifact_manifest` versionado; no replica RFPs, diagnósticos internos ni storage de Tender.
+- **Efeonce Globe** (Creative Studio) es una plataforma hermana agentic de producción creativa (EPIC-028). Desde 2026-07-19 existe como piloto interno no productivo: binding explícito, sesión humana federada independiente, callback propio, API privada y bridge SDK/WIF/ADC sin llaves. Greenhouse sigue siendo source of truth de identidad y desired access; Globe revalida capabilities namespaced y conserva su sesión local. Sus assets, créditos y provider secrets son de su propiedad y no se comparten por DB, cookie ni acceso administrativo implícito. Production, clientes externos, storage y providers creativos continúan ausentes. El contrato cross-format futuro usa una solicitud minimizada de composición y un `artifact_manifest` versionado; no replica RFPs, diagnósticos internos ni storage de Tender.
 
 ### 13.3 Contratos ya conectados a este marco
 
@@ -608,7 +608,9 @@ Este carril es aditivo. No autoriza cambios al SSO existente de Greenhouse, SCIM
 
 ### 15.3 Estado V1
 
-Kortex es el primer consumer de este carril. La implementacion y el rollout viven en `docs/tasks/in-progress/TASK-948-greenhouse-identity-broker-kortex-sso.md`.
+Kortex fue el primer consumer de este carril. TASK-1454 generalizó la elegibilidad mediante `SisterPlatformOAuthPolicy` validada por client y añadió Globe como segundo consumer internal-only, sin condicionales por producto en el broker. La implementación Kortex y su rollout independiente siguen en `docs/tasks/in-progress/TASK-948-greenhouse-identity-broker-kortex-sso.md`.
+
+El piloto Globe usa authorization code + PKCE S256, redirect exacto, consumo atómico one-time, claims mínimos sin roles Greenhouse y revocación explícita/convergente. La identidad de workload es un plano separado: Vercel OIDC → WIF → service-account impersonation → Google ID token de audience exacto para Cloud Run. Ningún plano admite service-account JSON keys.
 
 El endpoint password-based `/api/integrations/v1/sister-platforms/identity` queda como bridge transicional/break-glass mientras se valida el SSO broker; su hardening sigue separado en TASK-413.
 
