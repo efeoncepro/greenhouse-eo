@@ -6,7 +6,7 @@
 >
 > **Owner:** Efeonce Creative Studio / Creative Technology
 >
-> **Relacionado:** [EPIC-028](../epics/to-do/EPIC-028-efeonce-creative-studio-agentic-platform.md) · [arquitectura objetivo](../architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md) · [documentación funcional](../documentation/ai-tooling/estudio-de-flujos-creativos.md) · [territorio editorial PDR-014](../public-site/decisions/PDR-014-creative-workflows-territorio-editorial-pillar-cluster.md)
+> **Relacionado:** [EPIC-028](../epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md) · [arquitectura objetivo](../architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md) · [documentación funcional](../documentation/ai-tooling/estudio-de-flujos-creativos.md) · [territorio editorial PDR-014](../public-site/decisions/PDR-014-creative-workflows-territorio-editorial-pillar-cluster.md)
 >
 > **Alcance:** investigación estratégica y de producto. No autoriza runtime, gasto de proveedores, cambios de ADR ni el uso de un canvas libre. La Pillar y sus satélites aportan soporte científico/editorial y señales de audiencia; **no son implementación, product spec ni evidencia empírica suficiente para abrir una task**.
 
@@ -101,7 +101,11 @@ Creative Studio no se divide en un producto para clientes y otro para la agencia
 | **Co-operated** | El cliente conserva dirección/brand authority; cliente y Efeonce se reparten la ejecución con un operador explícito por run o lane. | Cada parte responde por el tramo que controla; aprobaciones, presupuesto y escalamiento quedan declarados antes de ejecutar. | Dirección aprobada con producción compleja, picos de demanda o necesidad de craft especializado. |
 | **Efeonce-managed** | Efeonce construye/opera el workflow y gobierna delivery; el cliente conserva brief, marca y aprobación final. | Efeonce puede comprometer OTD/FTR sobre el scope que dirige y controla. | Alta incertidumbre creativa, campañas nuevas, identidad, hero assets y producción crítica. |
 
-Estos modos **no son una quinta modalidad comercial**. On-Going, On-Demand, Staff Augmentation y Sample Sprint siguen siendo los vehículos de engagement. El modo operativo declara quién hace qué dentro de ellos. Si una persona Efeonce queda bajo dirección cotidiana del cliente, es Staff Augmentation; si Efeonce dirige el sistema y responde por el outcome, es Managed Squad.
+Estos modos **no son un modelo de delivery ni una forma de engagement adicional**. El business model separa
+modelo de delivery (Managed Squad, Staff Augmentation, Studio Access), forma de engagement (On-Going,
+On-Demand, Sample Sprint) y modo operativo por run. Si una persona Efeonce queda bajo dirección cotidiana del
+cliente, es Staff Augmentation; si Efeonce dirige el sistema y responde por el outcome, es Managed Squad. Canon:
+[Creative Studio Business Model V1](../business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md).
 
 Cada run debe resolver, como mínimo, quién es `operator_of_record`, quién aprueba creatividad, quién autoriza presupuesto, quién gobierna el template, quién responde por derechos y quién autoriza la entrega. Los nombres finales de schema quedan para el bootstrap, pero la responsabilidad no puede quedar implícita.
 

@@ -35,16 +35,27 @@
 
 ---
 
-## 2. Las cuatro modalidades reales de Efeonce
+## 2. La taxonomía real: tres ejes, no cuatro modalidades
 
-**Estas son las que existen** *(`docs/context/14_modelo-negocio-asaas.md` + runtime)*. **No inventes una quinta.**
+**Canon:** `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md` +
+`docs/context/14_modelo-negocio-asaas.md`. Antes de cotizar, responde tres preguntas separadas:
 
-| Modalidad | Qué es | Cuándo se usa | 🔴 Cuándo NO |
+| Eje | Opciones | Qué decide |
+|---|---|---|
+| **Modelo de delivery** | **Managed Squad** · **Staff Augmentation** · **Studio Access** · híbrido por lanes | Quién dirige, qué se compra y quién responde por el outcome |
+| **Forma de engagement** | **On-Going** · **On-Demand** · **Sample Sprint** | Duración y forma contractual/comercial |
+| **Modo operativo Creative Studio** | `efeonce-managed` · `co-operated` · `client-operated` | Quién opera/aprueba un run o lane específico |
+
+🔴 **No construyas un enum plano.** `On-Going + Managed Squad + efeonce-managed` es una combinación válida;
+`Staff Augmentation + efeonce-managed` en la misma lane es contradictoria.
+
+### Las tres formas de engagement
+
+| Forma | Qué es | Cuándo se usa | 🔴 Cuándo NO |
 |---|---|---|---|
-| 🎯 **On-Going** *(el corazón)* | **Fee mensual + equipo dedicado**, ciclo completo | **Cuando el dolor es de capacidad sostenida.** Es donde vive el squad, el gobierno y la renovación | Si el cliente tiene una necesidad puntual con fin |
-| **On-Demand** | **Proyecto con alcance y precio cerrado** | Campaña, lanzamiento, rebranding, auditoría. **Tiene fecha de término** | 🔴 **Si en realidad es capacidad recurrente disfrazada de proyecto** — ahí te comes el scope creep entero |
-| ⚠️ **Staff Augmentation** *(vía **Deel**)* | **Perfiles integrados en el equipo del cliente**, bajo **su** dirección | Cuando el cliente necesita un skill específico **y quiere dirigirlo él** | 🔴 **NUNCA lo confundas con el Managed Squad. Ver § 2.1** |
-| 🎯 **Sample Sprint** *(la puerta)* | Engagement acotado con gobernanza completa | **La entrada de menor riesgo que tenemos.** § 2.2 | Si el cliente ya está listo para firmar el On-Going *(no le pongas fricción)* |
+| 🎯 **On-Going** *(el corazón)* | Relación recurrente con fee/capacidad/pool por período | Cuando el dolor es de capacidad sostenida y memoria acumulativa | Si la necesidad es puntual con fin claro |
+| **On-Demand** | Proyecto con alcance y precio cerrado | Campaña, lanzamiento, rebranding o auditoría | Si es capacidad recurrente disfrazada de proyecto |
+| 🎯 **Sample Sprint** *(la puerta)* | Piloto pagado, acotado y con gobernanza completa | Validar relación, workflow, costo y outcome antes de escalar | Si el cliente ya está listo para On-Going; no agregues fricción |
 
 ---
 
@@ -100,9 +111,10 @@ Discovery Sprint *(discovery)*.
 
 ---
 
-### 2.3 🔴 Modo operativo ≠ quinta modalidad comercial
+### 2.3 🔴 Modo operativo ≠ modelo de delivery ni forma de engagement
 
-Creative Studio puede funcionar de tres maneras **dentro** de las cuatro modalidades anteriores. No inventes un quinto engagement ni vendas `client-operated` como un Managed Squad con descuento:
+Creative Studio puede funcionar de tres maneras dentro de cualquier combinación válida. No vendas
+`client-operated` como Managed Squad con descuento ni uses `co-operated` para ocultar ownership:
 
 | Modo | Quién dirige/opera | Qué puede comprometer Efeonce |
 |---|---|---|
@@ -264,7 +276,7 @@ Si es *cuánto vale, qué incluye y hasta dónde llega* → **es de acá.**
 6. 🔴 **Cero "etc." en el alcance.** Lista cerrada o no hay oferta.
 7. 🔴 **Nunca prometas una superficie del portal que no existe.** → `efeonce/ESTADO_ACTUAL.md` antes de cada propuesta.
 8. 🔴 **El ad-hoc cuesta MÁS que el marginal del plan.** Siempre.
-9. 🔴 **Modo operativo no es modalidad comercial.** No crear una quinta ni mezclar client-operated con Managed Squad.
+9. 🔴 **Modo operativo no es modelo de delivery ni forma de engagement.** No mezclar `client-operated` con Managed Squad.
 10. 🔴 **Ningún compromiso sin control.** OTD/FTR sólo aplican al scope cuya dirección y ejecución controla Efeonce.
 
 ---

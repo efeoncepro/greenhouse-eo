@@ -50,6 +50,7 @@ Una task o cierre no debe declararse `complete` si falta una de las tres capas p
 
 - Aqui viven specs, roadmap, tasks y guias especializadas.
 - La taxonomia vigente es:
+  - `docs/business-models/`
   - `docs/services/`
   - `docs/architecture/`
   - `docs/api/`
@@ -80,6 +81,17 @@ de las tres capas obligatorias y no debe duplicar su detalle técnico u operativ
 
 `docs/services/` tampoco es el catálogo runtime de productos/componentes de Greenhouse ni un objeto CRM. Precios
 y términos comerciales siguen viviendo en propuestas/contratos; la ficha define el servicio operable.
+
+### Capa de modelos de negocio
+
+`docs/business-models/` es el source of truth de cómo una oferta crea, entrega y captura valor: ICP/JTBD,
+taxonomía de delivery y engagement, arquitectura de ingresos, unidad de cobro, unit economics, riesgo, derechos,
+validación y gates comerciales. Su contrato e índice viven en `docs/business-models/README.md`.
+
+Esta capa no sustituye `docs/services/`: el business model explica la economía completa; la ficha de servicio
+explica qué resultado y responsabilidad asume Efeonce frente al cliente. Tampoco sustituye Finance/CPQ,
+propuestas o contratos: cifras por cliente, aprobaciones de margen, impuestos y términos transaccionales viven
+en sus dueños operativos. `docs/context/` puede resumir el modelo y debe enlazarlo, no duplicarlo.
 
 No mezclar las capas:
 

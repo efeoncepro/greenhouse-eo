@@ -128,6 +128,16 @@
       ]
     },
     {
+      "id": "business-models",
+      "triggers": ["business model", "modelo de negocio", "pricing", "packaging", "credits", "créditos", "Managed Squad", "Staff Augmentation"],
+      "skills": ["efeonce-agency", "creative-practice"],
+      "sources": [
+        "docs/business-models/README.md",
+        "docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md",
+        "docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md"
+      ]
+    },
+    {
       "id": "growth-public-site",
       "triggers": ["growth", "SEO", "AEO", "form", "CTA", "GTM", "WordPress", "Kinsta"],
       "skills": ["seo-aeo", "efeonce-public-site-wordpress", "greenhouse-gtm-ga4-operator"],

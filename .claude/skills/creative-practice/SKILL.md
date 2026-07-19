@@ -242,7 +242,7 @@ Dos cosas que el SEO no tiene y el creativo sí, y que **ninguna** de nuestras s
 |---|---|
 | 🔴 **El mercado 2026** — la hora muerta, el in-housing, la grieta entre el holding y la suscripción | **`modules/01_MERCADO.md`** |
 | **El comprador** — CMO/Head of Growth/Brand Manager + procurement + 🎯 **el creative lead in-house** *(aliado o verdugo)* | **`modules/02_COMPRADOR.md`** |
-| **La oferta** — las 4 modalidades y qué es "una unidad de capacidad" | **`modules/03_OFERTA.md`** |
+| **La oferta** — delivery model × engagement form × operating mode y qué es una unidad de capacidad | **`modules/03_OFERTA.md`** |
 | 🎯 **Precio, rate card de capacidad, loaded cost, piso, descuentos** *(+ el 🩸 hallazgo del loaded cost)* | **`modules/04_PRICING.md`** |
 | 🎯 **El SOW creativo** — rondas, derechos de uso, change order, scope creep. **El módulo que más margen protege** | **`modules/05_SCOPE_SOW.md`** |
 | **La cuña** — el diagnóstico que se regala *(Grader + auditoría de KV + diagnóstico de operación creativa)* | **`modules/06_CUNA.md`** |

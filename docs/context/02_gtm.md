@@ -38,7 +38,11 @@ Cinco líneas. Cuatro son las unidades; la quinta (CRM Solutions) es transversal
 | **Digital Infrastructure** | Wave | Transversal | Greenhouse |
 | **CRM Solutions** | Efeonce Digital (líder) + Wave | Tailor + Evolve | **Kortex** |
 
-**Tres modalidades de servicio:** On-Going (fee mensual, equipo dedicado, ciclo completo, acceso al ecosistema de producto) · On-Demand (proyectos con alcance/precio cerrado) · Staff Augmentation (perfiles integrados al equipo del cliente vía Deel como EOR).
+**Taxonomía comercial:** la relación separa **modelo de delivery** (Managed Squad, Staff Augmentation, Studio
+Access o híbrido por lanes), **forma de engagement** (On-Going, On-Demand o Sample Sprint) y, cuando aplica
+Creative Studio, **modo operativo por run** (`efeonce-managed`, `co-operated`, `client-operated`). Staff
+Augmentation mantiene perfiles bajo dirección del cliente vía Deel; no es un Managed Squad más barato. Canon:
+`docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md`.
 
 ---
 

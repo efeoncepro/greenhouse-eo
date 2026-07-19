@@ -1,4 +1,4 @@
-# ADR — Efeonce Creative Studio: plataforma agentic peer con paridad UI + MCP
+# ADR — Efeonce Globe: Creative Studio agentic peer con paridad UI + MCP
 
 > **Tipo:** Architecture Decision Record (ecosistema / plataforma hermana)
 > **Especificación canónica:** [Efeonce Creative Studio — Agentic Platform Architecture V1](EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md)
@@ -6,14 +6,14 @@
 
 ## Architecture Decision 2026-07-11 — la capacidad creativa nace agentic y fuera de Greenhouse
 
-- **Status:** `Accepted (direction)` — autoriza el programa y sus contratos de diseño; no crea todavía un repositorio, proyecto GCP, base de datos, credenciales ni gasto de proveedores.
+- **Status:** `Accepted / implementation started` — el repositorio y el proyecto GCP inicial existen; runtime, datos, credenciales y gasto de proveedores siguen gateados.
 - **Date:** 2026-07-11
 - **Owner:** Efeonce Creative Technology / Product
 - **Scope:** plataforma independiente para producir, revisar y operar imágenes, video, audio y, cuando corresponda, 3D. Incluye interfaz humana, agentes y MCP; no incluye el runtime de Greenhouse.
 - **Reversibility:** `two-way-but-slow` — los proveedores, el modelo de rutas y la UI son intercambiables; separar la propiedad de assets, créditos, identidad operativa y contratos cross-platform no debe revertirse sin migración explícita.
 - **Confidence:** `high` en la frontera y contrato agentic; `medium` en el orden exacto de proveedores/modelos y en pricing comercial, que requieren evidencia por modalidad.
-- **Validated as of:** 2026-07-14 — pilotos reales de RRSS y Glitch, investigación RESEARCH-009 y decisión de operating model documentados.
-- **Program:** [EPIC-028](../epics/to-do/EPIC-028-efeonce-creative-studio-agentic-platform.md).
+- **Validated as of:** 2026-07-19 — repositorio privado y proyecto GCP inicial verificados, sin workloads ni secretos.
+- **Program:** [EPIC-028](../epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md).
 - **Editorial support:** [PDR-014](../public-site/decisions/PDR-014-creative-workflows-territorio-editorial-pillar-cluster.md) construye soporte científico y editorial; no modifica esta ADR ni autoriza implementación.
 
 ### Context
@@ -27,7 +27,7 @@ Greenhouse es el hub de experiencia y operaciones de cuenta; no debe absorber ot
 
 ### Decision
 
-Se crea **Efeonce Creative Studio** como nombre de trabajo de una **plataforma hermana de Efeonce**, agentic desde el primer contrato. No se presenta todavía como nueva sub-marca pública: hacia el mercado sigue siendo una capability de Efeonce hasta que exista una decisión de producto/naming.
+Se crea **Efeonce Globe** como nombre canónico de una **plataforma hermana de Efeonce**, agentic desde el primer contrato. **Creative Studio** es su descriptor funcional y Globe continúa siendo la vertical creativa interna de Efeonce; cualquier presentación pública como producto o submarca requiere una decisión de posicionamiento separada.
 
 1. **Runtime y propiedad separados.** Creative Studio tendrá repositorio, despliegue, base de datos, buckets, secretos, provider adapters y ledger propios. Greenhouse, Think, Verk y el sitio público podrán consumir contratos versionados, pero no alojarán la lógica ni escribirán sus tablas.
 2. **Una capability, tres superficies equivalentes.** La UI humana, el servidor MCP y los agentes son clientes del mismo command/reader contract. Ninguna acción de negocio será UI-only; MCP no recibe atajos ni privilegios distintos de la UI.
@@ -71,7 +71,7 @@ Se crea **Efeonce Creative Studio** como nombre de trabajo de una **plataforma h
 
 ### Revisit When
 
-- Se apruebe el bootstrap del repositorio/proyectos GCP y se creen las primeras tasks de EPIC-028.
+- Se complete el hardening del bootstrap existente y se registren las primeras tasks ejecutables en `efeoncepro/efeonce-globe`.
 - Se habilite el primer workspace cliente o se comercialicen créditos — requiere revisión legal, fiscal, billing y política de derechos antes de activar pagos.
 - Una modalidad requiera GPU/latencia que Cloud Run Jobs no resuelva de forma económica.
 - El catálogo o las condiciones de proveedores cambien materialmente, o los evals de fidelidad contradigan el router vigente.
@@ -135,3 +135,32 @@ La autonomía se habilita de manera progresiva: mayor incertidumbre creativa, ri
 **No cambia el modelo comercial por sí sola.** Los modos se asignan dentro de On-Going, On-Demand, Staff Augmentation o Sample Sprint respetando sus fronteras. Si Efeonce controla delivery, es capacidad gestionada; si una persona queda bajo dirección cotidiana del cliente, aplica Staff Augmentation y no puede etiquetarse como managed. Un acceso client-operated no es “Managed Squad más barato” ni hereda sus compromisos.
 
 Los nombres exactos de roles/fields y el packaging quedan diferidos al bootstrap de EPIC-028, pero el contrato semántico no: todo run debe identificar operador, aprobadores de creatividad y presupuesto, autoridad de template/derechos y owner de delivery.
+
+---
+
+## Delta 2026-07-19 — soberanía de provider y portafolio creativo gobernado
+
+**Decisión aceptada por el operador.** Los modelos nativos de Google se consumirán exclusivamente mediante
+Google Cloud/Vertex AI. La presencia de Veo, Gemini Image, Gemini Omni, Lyria, Chirp u otro modelo Google en un
+marketplace de terceros no autoriza esa ruta. Fal queda como provider agregado para modelos **no-Google** y
+utilidades especializadas allowlisted; OpenAI se consume directo.
+
+Creative Studio no expone un catálogo arbitrario de modelos a UI, MCP ni agentes. Expone capabilities
+versionadas y un router que propone una ruta según operación, fidelity contract, asset policy, launch stage,
+SLO y costo. El portafolio vigente, estados de promoción y registro machine-readable viven en
+[Enterprise Model Portfolio V1](EFEONCE_CREATIVE_STUDIO_ENTERPRISE_MODEL_PORTFOLIO_V1.md) y
+[Capability Registry V1](EFEONCE_CREATIVE_STUDIO_CAPABILITY_REGISTRY_V1.json).
+
+### Invariantes que agrega
+
+- modelo Google nativo → credencial, IAM, cuota, audit y ejecución directos en GCP;
+- un endpoint `preview` requiere fallback y no puede sostener por sí solo un SLA;
+- `provider completed` sólo crea un candidato; no crea aprobación, entrega ni publicación;
+- `deprecated` y `blocked` son no-ejecutables; Seedance 2.5 permanece bloqueado hasta existir endpoint oficial
+  verificable y superar evals;
+- el precio relevante es costo por candidato aprobado y por familia entregada, no por request aislado;
+- la amplitud del marketplace no equivale a allowlist productivo.
+
+**Reversibility:** `two-way-but-slow` para cambiar providers/modelos; la separación del contrato de capability
+respecto del endpoint es obligatoria. **Confidence:** alta en provider routing y lifecycle; media en la
+clasificación creativa hasta completar bake-offs. **Validated as of:** 2026-07-19.

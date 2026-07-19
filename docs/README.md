@@ -14,6 +14,15 @@ Indice maestro de la documentacion no operativa del repo.
 
 ## Mapa por categoria
 
+### Business Models
+
+- [Índice y contrato de Business Models](business-models/README.md)
+- [Template canónico](business-models/BUSINESS_MODEL_TEMPLATE.md)
+- [Creative Studio — Business Model V1](business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md)
+- [Creative Studio — Studio Credit Model V1](business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md)
+- Esta categoría define propuesta de valor, taxonomía comercial, arquitectura de ingresos, unidad económica,
+  riesgos y validación. No reemplaza servicios, CPQ/Finance, propuestas ni contratos.
+
 ### Services
 
 - [Catálogo de servicios Efeonce](services/README.md)
@@ -24,6 +33,10 @@ Indice maestro de la documentacion no operativa del repo.
 ### Architecture
 
 - [Architecture Decisions Index](architecture/DECISIONS_INDEX.md)
+- [Creative Studio — Business Model Decision V1](architecture/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_DECISION_V1.md)
+- [Efeonce Creative Studio — Agentic Platform](architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md)
+- [Efeonce Creative Studio — Enterprise Model Portfolio](architecture/EFEONCE_CREATIVE_STUDIO_ENTERPRISE_MODEL_PORTFOLIO_V1.md)
+- [Efeonce Creative Studio — Capability Registry (research)](architecture/EFEONCE_CREATIVE_STUDIO_CAPABILITY_REGISTRY_V1.json)
 - [GREENHOUSE_ARCHITECTURE_V1.md](architecture/GREENHOUSE_ARCHITECTURE_V1.md)
 - [MULTITENANT_ARCHITECTURE.md](architecture/MULTITENANT_ARCHITECTURE.md)
 - [GREENHOUSE_IDENTITY_ACCESS_V1.md](architecture/GREENHOUSE_IDENTITY_ACCESS_V1.md)

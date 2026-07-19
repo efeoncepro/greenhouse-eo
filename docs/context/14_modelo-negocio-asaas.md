@@ -56,13 +56,28 @@ El doc ASaaS original asumía que Greenhouse era un MVP temprano por construir. 
 
 ## Modelo comercial
 
-### Actual
-| Modalidad | Cómo funciona | Ideal para |
+> El business model completo de cada oferta vive en `docs/business-models/`. Este context pack conserva sólo
+> la doctrina ASaaS y el mapa necesario para orientar producto; no es un tarifario ni el source of truth de
+> unit economics.
+
+### Taxonomía comercial vigente
+
+La relación no cabe en un solo enum. Se separa en tres preguntas:
+
+| Eje | Opciones | Pregunta que responde |
 |---|---|---|
-| **On-Going** | Fee mensual, equipo dedicado, ciclo completo | Crecimiento sostenido |
-| **On-Demand** | Proyectos con alcance y precio cerrado | Campañas, lanzamientos, auditorías |
-| **Staff Augmentation** | Perfiles integrados vía **Deel** | Talento específico sin riesgo laboral |
-| **Sample Sprint** | Engagement acotado con gobernanza completa y outcome documentado | Probar una relación/capability con bajo riesgo antes de escalar |
+| **Modelo de delivery** | **Managed Squad** · **Staff Augmentation** · **Studio Access** · híbrido por lanes | ¿Quién dirige, qué capacidad se compra y quién responde por el outcome? |
+| **Forma de engagement** | **On-Going** · **On-Demand** · **Sample Sprint** | ¿Qué duración y forma contractual toma la relación? |
+| **Modo operativo Creative Studio** | `efeonce-managed` · `co-operated` · `client-operated` | ¿Quién opera y aprueba un run/lane específico? |
+
+**Managed Squad no es Staff Augmentation.** En Managed Squad Efeonce arma, dirige y gobierna la operación;
+puede responder por OTD/FTR del scope que controla. En Staff Augmentation el cliente dirige perfiles integrados
+vía Deel; Efeonce no vende silenciosamente dirección creativa ni outcome SLA. Si una cuenta combina ambas,
+cada lane tiene owner, precio y accountability separados.
+
+On-Going, On-Demand y Sample Sprint no compiten con esos modelos: son formas de engagement. Un Sample Sprint
+puede validar un Managed Squad, Studio Access o una configuración co-operated; no es una cuarta forma de
+delivery ni un descuento.
 
 ### Evolución: modelo híbrido por tiers
 No se abandona el fee de servicio — se **agrega una capa de producto** que justifica pricing premium y genera stickiness.
@@ -88,7 +103,14 @@ Creative Studio no obliga a escoger entre “vender software” y “vender agen
 | **Co-operated** | Sistema compartido + capacidad Efeonce en lanes, excepciones o picos | Servicio y acceso se empaquetan con responsabilidades explícitas por tramo |
 | **Client-operated** | Autonomía sobre templates curados, memoria y controles del Studio | Acceso/credits/soporte futuros; no incluye por defecto dirección ni SLA de Managed Squad |
 
-Estos modos **no son una quinta modalidad comercial**: se asignan dentro de On-Going, On-Demand, Staff Augmentation o Sample Sprint respetando sus fronteras. Staff Augmentation sigue siendo client-directed; no puede usarse para esconder un Managed Squad. Tampoco son tres productos. El mismo run, assets, lineage, review y ledger cambian de operador sin perder contexto.
+Estos modos **no son un modelo de delivery ni una forma de engagement adicional**. Tampoco son tres productos.
+El mismo run, assets, lineage, review y ledger cambian de operador sin perder contexto. Staff Augmentation sigue
+siendo client-directed y no puede usarse para esconder un Managed Squad.
+
+La formulación completa reemplaza esa lista plana: los modos se asignan dentro de una combinación explícita de
+**modelo de delivery + forma de engagement**. Por ejemplo, `On-Going + Managed Squad` puede contener runs
+`efeonce-managed` y una lane graduada a `client-operated`; `Staff Augmentation + efeonce-managed` en la misma
+lane es inválido. Canon: [Creative Studio Business Model V1](../business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md).
 
 La progresión adecuada es **observar/revisar → correr templates curados → ajustar variables autorizadas → construir/versionar sólo con madurez y permiso**. El sistema debe enrutar alta ambigüedad, riesgo de marca, derechos complejos o gasto elevado hacia co-operación/managed; empujar todo a self-service dañaría craft y trasladaría riesgo al cliente.
 

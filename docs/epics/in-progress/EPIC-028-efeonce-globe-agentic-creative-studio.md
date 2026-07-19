@@ -1,21 +1,21 @@
-# EPIC-028 — Efeonce Creative Studio: plataforma agentic de producción creativa
+# EPIC-028 — Efeonce Globe: Creative Studio agentic de producción profesional
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Dirección de arquitectura aprobada; bootstrap pendiente`
+- Status real: `Bootstrap de repositorio y proyecto GCP completado; foundation runtime en construcción`
 - Rank: `TBD`
 - Domain: `cross-domain`
-- Owner: `unassigned`
-- Branch: `epic/EPIC-028-efeonce-creative-studio-agentic-platform`
-- GitHub Issue: `TBD — crear en el repositorio nuevo al aprobar el bootstrap`
+- Owner: `Efeonce Creative Technology / Product`
+- Branch: `main` en el repositorio hermano
+- GitHub Issue: `TBD — backlog operativo en https://github.com/efeoncepro/efeonce-globe`
 
 ## Summary
 
-Construir la capability creativa propia de Efeonce como una plataforma **agentic por nacimiento** para imagen, video, audio y extensiones futuras. El producto se opera por UI, MCP y agentes sobre el mismo contrato, pero la experiencia humana empieza en briefs, referencias, tratamientos, candidatos y review; el workflow técnico se compila por debajo. Templates/rúbricas de Efeonce, assets trazables, gasto controlado y revisión humana viven en una plataforma hermana: Greenhouse la integra como consumidor, no la hospeda.
+Construir **Efeonce Globe**, la capability creativa propia de Efeonce, como una plataforma **agentic por nacimiento** para imagen, video, audio y extensiones futuras. Creative Studio es su descriptor funcional. El producto se opera por UI, MCP y agentes sobre el mismo contrato, pero la experiencia humana empieza en briefs, referencias, tratamientos, candidatos y review; el workflow técnico se compila por debajo. Templates/rúbricas de Efeonce, assets trazables, gasto controlado y revisión humana viven en una plataforma hermana: Greenhouse la integra como consumidor, no la hospeda.
 
 ## Why This Epic Exists
 
@@ -42,12 +42,16 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
 - [PDR-003 — Layering del ecosistema digital Efeonce](../../public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md)
 - [Greenhouse Sister Platforms Integration Contract V1](../../architecture/GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md)
 - [Efeonce Product Ecosystem](../../context/03_ecosistema-producto.md)
+- [Creative Studio Business Model V1](../../business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md)
+- [Studio Credit Model V1](../../business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md)
 
 ## Child Tasks
 
-> Las tasks nacen en el repositorio nuevo, después de aprobar el bootstrap y registrar su gobernanza allí. Se mantienen aquí como slices de ownership; **no autorizar implementación Greenhouse bajo estos nombres**. La Pillar y los satélites de PDR-014 son un programa editorial de soporte: sus secciones, diagramas, checklists o títulos **no crean child tasks ni especificaciones ejecutables**.
+> Las tasks nacen en `efeoncepro/efeonce-globe` después de registrar allí su modelo operativo. Se mantienen aquí como slices de ownership; **no autorizar implementación Greenhouse bajo estos nombres**. La Pillar y los satélites de PDR-014 son un programa editorial de soporte: sus secciones, diagramas, checklists o títulos **no crean child tasks ni especificaciones ejecutables**.
 
-- `TASK-###` — **Creative Studio repository and cloud boundary.** Crear repositorio privado, CI, proyectos GCP, IAM/Secret Manager, Cloud Run, Cloud SQL, buckets, IaC y observabilidad base.
+- `TASK-1454` — **Greenhouse ↔ Globe federated identity and governed SDK bridge.** Única task Greenhouse explícita de esta fase: generaliza el broker reusable, registra Globe internal-only y prueba SSO/WIF/ADC sin llaves. No mueve runtime creativo a Greenhouse ni habilita producción/clientes externos.
+
+- `TASK-###` — **Globe repository and cloud foundation.** Continuar desde el bootstrap existente: IaC/state, Workload Identity Federation, service accounts de mínimo privilegio, budgets, Cloud Run, Cloud SQL, buckets y observabilidad base dentro del único proyecto inicial `efeonce-globe`.
 - `TASK-###` — **Identity, workspace and canonical command foundation.** Tenant/RLS, roles/capabilities, actor/audit/idempotency y API contract base para UI/MCP.
 - `TASK-###` — **Operating modes, responsibility assignments and escalation.** Modelar operador, aprobadores, template/rights authority y delivery owner; comandos auditados para handback/escalamiento sin duplicar run ni ampliar permisos implícitamente.
 - `TASK-###` — **Asset provenance and rights foundation.** Asset ingestion privado, hashes, versiones, lineage, signed delivery y políticas de clasificación/derechos.
@@ -69,7 +73,7 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
 
 ## Exit Criteria
 
-- [ ] Nuevo repositorio y límites cloud aprobados, con separación efectiva de Greenhouse y evidencia de IAM/secret/tenant posture.
+- [ ] Repositorio y límite cloud aislados, con IaC, IAM/secret/tenant posture y evidencia runtime completa. El repositorio privado y el proyecto `efeonce-globe` ya existen; hardening y recursos runtime siguen pendientes.
 - [ ] Las capacidades de la primera plantilla funcionan mediante UI y MCP sobre el mismo command/reader layer, con autorización e idempotencia verificadas.
 - [ ] Un run completa el lifecycle estimate → reserve → approve → execute → candidate → review → settle/release sin doble gasto ni pérdida de evidencia.
 - [ ] Assets, referencias, provider attempts, output y review poseen lineage y acceso scoped por workspace.
@@ -96,3 +100,7 @@ Epic creado desde la decisión explícita del operador: la capability debe nacer
 ## Delta 2026-07-14
 
 El programa adopta un solo producto con tres modos operativos (`client-operated`, `co-operated`, `efeonce-managed`), autonomía progresiva según incertidumbre/riesgo y UI creative-native que compila workflows desde decisiones. Esto no habilita clientes ni crea una quinta modalidad comercial; agrega contratos que el bootstrap debe resolver antes del primer rollout externo.
+
+## Delta 2026-07-19 — Efeonce Globe y bootstrap inicial
+
+El operador fija **Efeonce Globe** como nombre canónico del producto; Creative Studio permanece como descriptor funcional de la vertical creativa. Se creó el repositorio privado `efeoncepro/efeonce-globe` y un único proyecto GCP adicional `efeonce-globe` bajo la organización Efeonce, con billing y APIs base habilitadas. No se crearon workloads, bases de datos, buckets, secretos ni gasto de proveedores. La separación de un proyecto productivo queda diferida hasta que exista un primer release reproducible, con presupuesto, IAM, rollback y promoción de secretos aprobados.
