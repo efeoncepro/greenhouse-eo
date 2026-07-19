@@ -33,6 +33,7 @@ export const scenario: CaptureScenario = {
   ],
   // GVC V1.5 — gates de calidad SIEMPRE en este cockpit (lección TASK-1430: el
   // "wireframe look" pasó el gate porque el rubric era opt-in y no se declaró).
+  qualityProfile: 'standard',
   quality: {
     layout: { enabled: true, failOnViolations: false },
     runtime: { failOnConsoleError: false },
@@ -48,7 +49,7 @@ export const scenario: CaptureScenario = {
     { kind: 'mark', label: '02-inventory', clipSelector: '[data-capture="cta-inventory"]' },
 
     // Selección por teclado: foco en la primera opción → ↓ navega a la segunda.
-    { kind: 'click', selector: '[role="option"]:nth-of-type(1)' },
+    { kind: 'click', selector: '[data-capture="cta-inventory-row"]:nth-of-type(1) button' },
     { kind: 'press', key: 'ArrowDown' },
     { kind: 'sleep', ms: 1500 },
     { kind: 'mark', label: '03-detail-header', clipSelector: '[data-capture="cta-detail"]' },

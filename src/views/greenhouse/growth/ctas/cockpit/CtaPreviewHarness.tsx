@@ -184,12 +184,12 @@ export const PreviewFrame = ({
         {lines.map((_, index) => (
           <Box
             key={index}
-            sx={{
+            sx={theme => ({
               height: index === 0 ? 12 : 8,
               width: index === 0 ? '52%' : `${60 + ((index * 7) % 34)}%`,
-              borderRadius: 1,
+              borderRadius: `${theme.shape.customBorderRadius.sm}px`,
               background: frame.line,
-            }}
+            })}
           />
         ))}
       </Stack>

@@ -46,9 +46,19 @@ la PIEL sale SIEMPRE del sistema Greenhouse. Igual que el Figma Implementation C
 3. ¿CERO HEX/px/fontFamily/fontSize transcritos del mock?
 4. ¿Chips = `GreenhouseChip`, inputs = `CustomTextField`, fechas/números = `src/lib/format`?
 5. ¿Íconos en {14,16,18,20,22} y spacing en la escala 4n?
-6. ¿El scenario GVC declara `quality.layout` + `quality.runtime` + `quality.enterpriseRubric`?
-   (lección: el wireframe-look PASÓ el gate porque el rubric era opt-in y nadie lo declaró)
+6. ¿El scenario GVC declara `qualityProfile: 'standard'` (mínimo) o `'premium'` (TASK-1453)?
+   (lección: el wireframe-look PASÓ el gate porque los guards eran opt-in y nadie los declaró)
 7. ¿Loop GVC mirando frames (desktop+mobile) ANTES de declarar listo?
+
+## Composición: primero el `surface-system` (TASK-1453)
+
+Antes de armar secciones a mano, componer con las primitives de
+`src/components/greenhouse/primitives/surface-system/` según la recipe de la superficie
+(`docs/ui/recipes/`): `WorkbenchHeader` (header hero), `InventoryList` + `SelectionRow`
+(listas seleccionables), `DetailHero` + `ContextCommandBar` (detalle + acciones),
+`OperationalSection` (secciones de contenido/evidencia/decisión), `PreviewStage` (previews),
+`SignalStrip` (señales). Declarar la recipe en el root (`data-surface-recipe='listDetail'` etc.).
+Consumer de referencia: el cockpit de CTAs (`src/views/greenhouse/growth/ctas/`).
 
 ## Qué SÍ copiar del mock
 

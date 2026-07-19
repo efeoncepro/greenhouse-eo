@@ -1110,6 +1110,7 @@ export const GH_GROWTH_CTA_OPERATOR = {
       edit: 'Editar y previsualizar',
       editAria: 'Editar este CTA como versión nueva y previsualizarla',
       moreAria: 'Más acciones de ciclo de vida',
+      lifecycleBarAria: 'Acciones de ciclo de vida del CTA',
       versionCurrent: 'actual',
       metaUpdated: 'actualizado',
       openPreview: 'Abrir matriz',

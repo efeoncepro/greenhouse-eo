@@ -14,13 +14,18 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
-import CardHeader from '@mui/material/CardHeader'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha, type Theme } from '@mui/material/styles'
 
-import { GreenhouseChip } from '@/components/greenhouse/primitives'
+import {
+  ContextCommandBar,
+  DetailHero,
+  GreenhouseChip,
+  OperationalSection,
+  PreviewStage,
+} from '@/components/greenhouse/primitives'
 import { GH_GROWTH_CTA_OPERATOR } from '@/lib/copy/growth'
 import { formatDate, formatDateTime, formatNumber, formatPercent } from '@/lib/format'
 import { surfaceAllowsCtaSlug } from '@/lib/growth/ctas/contracts'
@@ -58,38 +63,6 @@ export interface LifecycleRequest {
 
 /** Radius canónico como CSS length (overlay modern-ui: jamás multiplicadores sx). */
 const radius = (theme: Theme, key: 'sm' | 'md' | 'lg' | 'xl') => `${theme.shape.customBorderRadius[key]}px`
-
-/**
- * Card de sección canónica del portal (Vuexy Card + CardHeader + CardContent):
- * sombra/radius/padding vienen del theme — cero bordes wireframe ad-hoc.
- */
-const SectionCard = ({
-  title,
-  subtitle,
-  action,
-  children,
-  dataCapture,
-  disablePadding = false,
-}: {
-  title: string
-  subtitle?: string
-  action?: React.ReactNode
-  children: React.ReactNode
-  dataCapture?: string
-  disablePadding?: boolean
-}) => (
-  <Card data-capture={dataCapture}>
-    <CardHeader
-      title={title}
-      subheader={subtitle}
-      action={action}
-      titleTypographyProps={{ variant: 'h5' }}
-      subheaderTypographyProps={{ variant: 'body2', color: 'text.secondary' }}
-      sx={{ pb: subtitle ? 4 : 3, '& .MuiCardHeader-action': { alignSelf: 'center', m: 0 } }}
-    />
-    <CardContent sx={disablePadding ? { p: 0, '&:last-child': { pb: 0 } } : undefined}>{children}</CardContent>
-  </Card>
-)
 
 // ─── Métricas (formato canónico src/lib/format; rates ya vienen resueltos) ────
 
@@ -184,9 +157,9 @@ const MetricsSection = ({
   const undercounted = metrics.coverage === 'impressions_undercounted'
 
   return (
-    <SectionCard
+    <OperationalSection
       title={C.metrics.title}
-      subtitle={`${C.metrics.windowLabel} · ${metrics.lastEventAt ? `${C.metrics.updated} ${formatDateTime(metrics.lastEventAt)}` : C.metrics.neverMeasured}`}
+      description={`${C.metrics.windowLabel} · ${metrics.lastEventAt ? `${C.metrics.updated} ${formatDateTime(metrics.lastEventAt)}` : C.metrics.neverMeasured}`}
       action={
         <GreenhouseChip
           kind='status'
@@ -197,6 +170,7 @@ const MetricsSection = ({
           label={suppressionEnforced ? C.metrics.enforcementOn : C.metrics.enforcementShadow}
         />
       }
+      kind='evidence'
       dataCapture='cta-detail-metrics'
     >
       <Stack spacing={4}>
@@ -265,7 +239,7 @@ const MetricsSection = ({
           {C.metrics.conversionTruthHint}
         </Typography>
       </Stack>
-    </SectionCard>
+    </OperationalSection>
   )
 }
 
@@ -418,54 +392,49 @@ const CtaDetailPanel = ({
 
   return (
     <Stack spacing={4} data-capture='cta-detail'>
-      {/* Header */}
-      <Card sx={{ overflow: 'hidden' }}>
-        <Stack spacing={3.5} sx={{ p: 5 }}>
-          <Stack direction='row' alignItems='flex-start' justifyContent='space-between' gap={3}>
-            <Stack spacing={1} sx={{ minWidth: 0 }}>
-              <Stack direction='row' alignItems='center' gap={2.5} flexWrap='wrap'>
-                <Typography variant='h5' sx={{ fontWeight: 600, lineHeight: 1.2 }}>
-                  {summary.name}
-                </Typography>
-                <GreenhouseChip kind='status' size='small' tone={STATUS_TONE[summary.latestVersionStatus ?? 'draft'] ?? 'default'} label={statusLabel ?? ''} />
-              </Stack>
-              <Typography variant='monoId' color='text.disabled'>
-                {summary.slug} · v{summary.latestVersion ?? 1} {summary.campaignSlug ? `· ${summary.campaignSlug}` : ''}
-              </Typography>
+      {/* Header: DetailHero + ContextCommandBar (surface-system TASK-1453) */}
+      <Stack spacing={0}>
+        <DetailHero
+          kind='entity'
+          dataCapture='cta-detail-hero'
+          title={summary.name}
+          statusLabel={statusLabel ?? ''}
+          statusTone={STATUS_TONE[summary.latestVersionStatus ?? 'draft'] ?? 'default'}
+          description={
+            <Typography variant='monoId' color='text.disabled' component='span'>
+              {summary.slug} · v{summary.latestVersion ?? 1} {summary.campaignSlug ? `· ${summary.campaignSlug}` : ''}
+            </Typography>
+          }
+          metadata={
+            <Stack direction='row' gap={2} flexWrap='wrap'>
+              {intent ? (
+                <GreenhouseChip kind='attribute' size='small' variant='outlined' iconClassName={INTENT_ICON[intent]} label={C.author.intent.kinds[intent].label} />
+              ) : null}
+              <GreenhouseChip kind='attribute' size='small' variant='outlined' iconClassName={PLACEMENT_ICON[placement]} label={C.author.placement.kinds[placement]?.label ?? placement} />
+              <GreenhouseChip kind='attribute' size='small' variant='outlined' iconClassName='tabler-palette' label={C.author.appearance.kinds[appearance]?.label ?? appearance} />
+              <GreenhouseChip kind='attribute' size='small' variant='outlined' tone='primary' iconClassName={ACTION_ICON[actionKind]} label={C.author.action.kinds[actionKind]?.label ?? actionKind} />
             </Stack>
-          </Stack>
-          <Stack direction='row' gap={2} flexWrap='wrap'>
-            {intent ? (
-              <GreenhouseChip kind='attribute' size='small' variant='outlined' iconClassName={INTENT_ICON[intent]} label={C.author.intent.kinds[intent].label} />
-            ) : null}
-            <GreenhouseChip kind='attribute' size='small' variant='outlined' iconClassName={PLACEMENT_ICON[placement]} label={C.author.placement.kinds[placement]?.label ?? placement} />
-            <GreenhouseChip kind='attribute' size='small' variant='outlined' iconClassName='tabler-palette' label={C.author.appearance.kinds[appearance]?.label ?? appearance} />
-            <GreenhouseChip kind='attribute' size='small' variant='outlined' tone='primary' iconClassName={ACTION_ICON[actionKind]} label={C.author.action.kinds[actionKind]?.label ?? actionKind} />
-          </Stack>
-        </Stack>
-
-        {/* Lifecycle bar */}
-        <Stack
-          direction='row'
-          alignItems='center'
-          gap={2}
-          flexWrap='wrap'
-          sx={{ px: 5, py: 3, bgcolor: 'action.hover', borderTop: theme => `1px solid ${theme.palette.divider}` }}
-          data-capture='cta-detail-lifecycle'
-        >
-          {/* Autorar drafts NO se gatea por el engine flag (no expone nada público); lifecycle sí. */}
-          <Button
-            size='small'
-            variant='contained'
-            color='primary'
-            startIcon={<i className='tabler-pencil' style={{ fontSize: 16 }} />}
-            onClick={onEdit}
-            disabled={!capabilities.canAuthor}
-            aria-label={C.detail.editAria}
-          >
-            {C.detail.edit}
-          </Button>
-          {lifecycleActions.map(action => (
+          }
+        />
+        <ContextCommandBar
+          kind='workbench'
+          ariaLabel={C.detail.lifecycleBarAria}
+          dataCapture='cta-detail-lifecycle'
+          primaryAction={
+            /* Autorar drafts NO se gatea por el engine flag (no expone nada público); lifecycle sí. */
+            <Button
+              size='small'
+              variant='contained'
+              color='primary'
+              startIcon={<i className='tabler-pencil' style={{ fontSize: 16 }} />}
+              onClick={onEdit}
+              disabled={!capabilities.canAuthor}
+              aria-label={C.detail.editAria}
+            >
+              {C.detail.edit}
+            </Button>
+          }
+          secondaryActions={lifecycleActions.map(action => (
             <Button
               key={action.key}
               size='small'
@@ -478,13 +447,14 @@ const CtaDetailPanel = ({
               {busyAction === `${summary.ctaId}:${action.key}` ? C.lifecycle.busyGeneric : action.label}
             </Button>
           ))}
-          <Box sx={{ flex: 1 }} />
-          <Typography variant='caption' color='text.disabled' sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
-            <i className='tabler-git-branch' style={{ fontSize: 14 }} aria-hidden />
-            v{summary.latestVersion ?? 1} {C.detail.versionCurrent}
-          </Typography>
-        </Stack>
-      </Card>
+          status={
+            <Typography variant='caption' color='text.disabled' sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
+              <i className='tabler-git-branch' style={{ fontSize: 14 }} aria-hidden />
+              v{summary.latestVersion ?? 1} {C.detail.versionCurrent}
+            </Typography>
+          }
+        />
+      </Stack>
 
       {/* Kill switch posture */}
       <Stack
@@ -547,11 +517,12 @@ const CtaDetailPanel = ({
         </Button>
       </Stack>
 
-      {/* Preview */}
-      <SectionCard
+      {/* Preview: renderer canónico en vivo (PreviewStage) */}
+      <PreviewStage
+        variant='live'
         title={C.detail.previewTitle}
-        subtitle={C.detail.previewSubtitle}
-        action={
+        description={C.detail.previewSubtitle}
+        toolbar={
           <Button size='small' variant='outlined' startIcon={<i className='tabler-arrows-maximize' style={{ fontSize: 16 }} />} onClick={onEdit} disabled={!capabilities.canAuthor}>
             {C.detail.openPreview}
           </Button>
@@ -565,13 +536,13 @@ const CtaDetailPanel = ({
             {C.detail.diagnosticsNote}
           </Typography>
         </Stack>
-      </SectionCard>
+      </PreviewStage>
 
       {/* Métricas de marketing */}
       <MetricsSection metrics={detail.metrics} suppressionEnforced={suppressionEnforced} />
 
       {/* Superficies */}
-      <SectionCard title={C.surfaces.title} dataCapture='cta-surfaces'>
+      <OperationalSection title={C.surfaces.title} dataCapture='cta-surfaces'>
         <Stack divider={<Box sx={{ borderBottom: theme => `1px solid ${theme.palette.divider}` }} />}>
           {surfaces.map(surface => {
             const bound = surfaceAllowsCtaSlug(surface.allowedCtaSlugs, summary.slug)
@@ -623,11 +594,11 @@ const CtaDetailPanel = ({
             )
           })}
         </Stack>
-      </SectionCard>
+      </OperationalSection>
 
       {/* Supresión + versiones */}
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: '1fr 1fr' }, gap: 4 }}>
-        <SectionCard title={C.targeting.title} dataCapture='cta-detail-suppression'>
+        <OperationalSection title={C.targeting.title} dataCapture='cta-detail-suppression'>
           <Stack divider={<Box sx={{ borderBottom: theme => `1px solid ${theme.palette.divider}` }} />}>
             {[
               { icon: 'tabler-route', label: C.targeting.routes, value: targeting.routes },
@@ -657,9 +628,9 @@ const CtaDetailPanel = ({
               </Stack>
             ))}
           </Stack>
-        </SectionCard>
+        </OperationalSection>
 
-        <SectionCard title={C.versions.title} dataCapture='cta-detail-versions'>
+        <OperationalSection title={C.versions.title} dataCapture='cta-detail-versions'>
           <Stack divider={<Box sx={{ borderBottom: theme => `1px solid ${theme.palette.divider}` }} />}>
             {detail.versions.map((version, index) => (
               <Stack key={version.ctaVersionId} direction='row' spacing={3} sx={{ py: 2.5 }} alignItems='flex-start'>
@@ -688,7 +659,7 @@ const CtaDetailPanel = ({
               </Stack>
             ))}
           </Stack>
-        </SectionCard>
+        </OperationalSection>
       </Box>
     </Stack>
   )

@@ -17,7 +17,6 @@ import {
 } from '@/lib/growth/ctas/contracts'
 import type { CtaRenderContractMirror } from '@/growth-cta-renderer/contract'
 import { RENDERER_CONTRACT_VERSION } from '@/growth-cta-renderer/version'
-import type { GreenhouseChipTone } from '@/components/greenhouse/primitives'
 
 export { CTA_ACTION_KIND_METADATA, CTA_ACTION_KINDS, CTA_PLACEMENTS, isInterruptivePlacement }
 export type { CtaActionKind, CtaPlacement }
@@ -66,7 +65,8 @@ export const ACTION_ICON: Record<CtaActionKind, string> = {
   book_meeting: 'tabler-calendar-plus',
 }
 
-export const STATUS_TONE: Record<string, GreenhouseChipTone> = {
+/** Compatible con GreenhouseChip.tone Y con statusTone del surface-system (sin `secondary`). */
+export const STATUS_TONE: Record<string, 'default' | 'primary' | 'info' | 'success' | 'warning' | 'error'> = {
   draft: 'default',
   review: 'info',
   published: 'success',

@@ -31,7 +31,7 @@ import { alpha } from '@mui/material/styles'
 import CustomTextField from '@core/components/mui/TextField'
 import ConfirmDialog from '@/components/dialogs/ConfirmDialog'
 import EmptyState from '@/components/greenhouse/EmptyState'
-import { CompositionShell, GreenhouseBreadcrumbs, GreenhouseChip } from '@/components/greenhouse/primitives'
+import { CompositionShell, GreenhouseBreadcrumbs, GreenhouseChip, WorkbenchHeader } from '@/components/greenhouse/primitives'
 import { GH_GROWTH_CTA_OPERATOR } from '@/lib/copy/growth'
 import { throwIfNotOk } from '@/lib/api/parse-error-response'
 import type { CtaSummaryVm, CtaSurfaceVm } from '@/lib/growth/ctas/readers'
@@ -321,13 +321,13 @@ const GrowthCtasGovernanceView = ({
           { label: C.breadcrumbs.ctas, iconClassName: 'tabler-hand-click' },
         ]}
       />
-      <Stack direction='row' alignItems='flex-start' justifyContent='space-between' gap={4} flexWrap='wrap'>
-        <Stack spacing={2} sx={{ minWidth: 0, flex: '1 1 480px' }}>
-          <Typography variant='h4'>{O.title}</Typography>
-          <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 640 }}>
-            {C.subtitle}
-          </Typography>
-          <Stack direction='row' alignItems='center' gap={2} flexWrap='wrap' sx={{ pt: 1 }}>
+      <WorkbenchHeader
+        kind='workbench'
+        dataCapture='cta-cockpit-header'
+        title={O.title}
+        description={C.subtitle}
+        supporting={
+          <Stack direction='row' alignItems='center' gap={2} flexWrap='wrap'>
             {statusSummary.map(item => (
               <GreenhouseChip
                 key={item.key}
@@ -351,8 +351,8 @@ const GrowthCtasGovernanceView = ({
               </span>
             </Tooltip>
           </Stack>
-        </Stack>
-        <Stack direction='row' alignItems='center' gap={2.5} flexWrap='wrap' sx={{ pt: 1 }}>
+        }
+        secondaryActions={
           <Button
             variant='outlined'
             color='inherit'
@@ -365,6 +365,8 @@ const GrowthCtasGovernanceView = ({
           >
             {C.refresh}
           </Button>
+        }
+        primaryAction={
           <Tooltip title={capabilities.canAuthor ? '' : C.denied.readOnlyHint}>
             <span>
               <Button
@@ -379,8 +381,8 @@ const GrowthCtasGovernanceView = ({
               </Button>
             </span>
           </Tooltip>
-        </Stack>
-      </Stack>
+        }
+      />
       {loadError ? <Alert severity='error'>{O.actions.errorGeneric}</Alert> : null}
     </Stack>
   )
@@ -474,7 +476,7 @@ const GrowthCtasGovernanceView = ({
   )
 
   return (
-    <Box data-capture='cta-cockpit-shell'>
+    <Box data-capture='cta-cockpit-shell' data-surface-recipe='listDetail'>
       {/* Lead/header: `split` no monta región lead — vive encima del shell (mismo patrón GrowthFormsAdminCockpit). */}
       {lead}
       <CompositionShell

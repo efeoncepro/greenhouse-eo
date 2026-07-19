@@ -24,6 +24,7 @@ export const scenario: CaptureScenario = {
     { kind: 'noLoginRedirect', reason: 'ruta interna autenticada (viewCode gestion.growth_ctas)' },
     { kind: 'noErrorBoundary', reason: 'la captura no debe ser un error boundary' }
   ],
+  qualityProfile: 'standard',
   quality: {
     layout: { enabled: true, failOnViolations: false },
     runtime: { failOnConsoleError: false },
@@ -34,7 +35,7 @@ export const scenario: CaptureScenario = {
     { kind: 'mark', label: '02-mobile-inventory', clipSelector: '[data-capture="cta-inventory"]' },
 
     // Detalle = drawer temporal del shell (inventario/filtros se preservan detrás).
-    { kind: 'click', selector: '[role="option"]:nth-of-type(1)' },
+    { kind: 'click', selector: '[data-capture="cta-inventory-row"]:nth-of-type(1) button' },
     { kind: 'sleep', ms: 1200 },
     { kind: 'scroll', selector: '[data-capture="composition-shell-aside-drawer-trigger"]' },
     { kind: 'click', selector: '[data-capture="composition-shell-aside-drawer-trigger"]' },
