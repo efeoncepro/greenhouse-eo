@@ -14,6 +14,10 @@ Nota para Slice 3 y la AC "La matriz distingue canary, lab-ready y production-ca
 
 `TASK-1486` dejó el `VertexCreativeAdapter` **code-complete** (rollout gated): `video-generate`/`video-extend` rutean a `gemini-omni-flash-preview` en Vertex región `global` (us-east4/us-central1 → `NOT_FOUND`), keyless, detrás del `LabRunner`. Slice de ejecución del lab motion ya puede correr contra el proveedor **real** con `GLOBE_LAB_PROVIDER=vertex` + `GLOBE_LAB_ENABLED=true` (canary billable gated por el go-live checklist de 1486). Nota dura: el canary sirve **prompt-only** (text-to-video); un motion que requiere una imagen de referencia (i2v) queda `inputs_unavailable` hasta que aterrice la resolución hash→bytes desde el bucket privado (follow-up declarado en 1486). Omni deforma texto/logos/UI — no usar para copy/logo. — gap de adapter cerrado por TASK-1486.
 
+## Delta 2026-07-19 — TASK-1487: Seedance 2.0 disponible como motor motion alternativo (Fal)
+
+`TASK-1487` agregó el `FalCreativeAdapter` (code-complete): `video-generate`/`video-extend` también rutean a **Seedance 2.0** por Fal, además de Veo/Omni por Vertex. El lab motion ahora puede comparar Vertex vs Seedance **por contrato de fidelidad** (la evidencia `engine-selection-by-fidelity-contract` muestra que Seedance preserva mejor un set existente; Omni anima un ancla de lenguaje) — seleccionable con `GLOBE_LAB_PROVIDER=fal` vs `vertex`. Nota: video-extend (i2v) requiere una imagen de referencia → `inputs_unavailable` hasta la resolución hash→bytes (follow-up de 1487). Canary Fal billable gated. — motor alternativo agregado por TASK-1487.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

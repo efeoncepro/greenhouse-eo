@@ -14,6 +14,10 @@ Nota para las AC de consentimiento/rights y sincronía: el foley del micrófono 
 
 `TASK-1486` dejó el `VertexCreativeAdapter` code-complete para image + video, pero **deliberadamente devuelve `supports('audio-generate') = false` y `supports('speech-synthesize') = false`**: audio/voz **no** se sirven por este adapter Google-native (los líderes — ElevenLabs/Seed Audio — son no-Google; Chirp/Lyria de Google son opción, no implementados). Este carril audio **sigue bloqueado por adapter**: necesita un adapter dedicado (Fal para ElevenLabs/Seed, o un `ChirpCreativeAdapter` Vertex) + el `CompositeProviderAdapter` que rutee por `supports()` (follow-up declarado en 1486). NO asumir que 1486 habilita audio. — adapter de audio sigue pendiente; 1486 sólo fijó el patrón y el boundary.
 
+## Delta 2026-07-19 — TASK-1487: audio DESBLOQUEADO vía ElevenLabs/Fal (corrige el Delta de 1486)
+
+Actualización del Delta anterior (TASK-1486 dejaba audio `supports=false` en el adapter Vertex): **`TASK-1487` agregó el `FalCreativeAdapter` (code-complete) que SÍ sirve audio/voz** — `audio-generate` → ElevenLabs sound-effects, `speech-synthesize` → ElevenLabs TTS multilingual, por la queue API de Fal (secreto propio de Globe). Este carril audio pasa de "sin adapter" a **code-complete detrás de Fal** (`GLOBE_LAB_PROVIDER=fal`). El canary Fal billable en vivo es rollout gated (necesita el secreto Fal de Globe + verificación del slug ElevenLabs vigente). El fixture `glitch-microphone-foley` (audio-foley) ya puede evaluarse contra ElevenLabs una vez prendido el flag. — adapter de audio cerrado por TASK-1487.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

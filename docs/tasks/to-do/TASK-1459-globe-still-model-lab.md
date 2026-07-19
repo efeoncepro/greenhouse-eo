@@ -14,6 +14,10 @@ Nota para Slice 3: el verdict del harness nunca es un "passed" creativo — sól
 
 `TASK-1486` dejó el `VertexCreativeAdapter` **code-complete** (rollout gated): `image-generate` rutea a `gemini-2.5-flash-image` en Vertex, keyless (ADC/WIF), detrás del mismo `LabRunner`. Slice 2 ("ejecutar golden briefs y registrar costo/latencia/calidad") ya puede correr contra el proveedor **real** prendiendo `GLOBE_LAB_PROVIDER=vertex` + `GLOBE_LAB_ENABLED=true` (canary billable gated por el go-live checklist de 1486: Vertex enablement en `efeonce-globe` + SA `aiplatform.user` + budget). Hasta ese flip, el fake sigue default y el reporte del harness declara "proveedor fake". Nota: el canary sirve prompt-only (text-to-X); el still `rrss-key-visual-still` (inputs `[]`) califica. — gap de adapter cerrado por TASK-1486.
 
+## Delta 2026-07-19 — TASK-1487: Seedream 5 disponible como motor still alternativo (Fal)
+
+`TASK-1487` agregó el `FalCreativeAdapter` (code-complete): `image-generate` también rutea a **Seedream 5** por Fal, además de Nano Banana por Vertex. El lab still ahora puede comparar Vertex vs Seedream **por contrato de fidelidad** — seleccionable con `GLOBE_LAB_PROVIDER=fal` (Seedream) vs `vertex` (Nano Banana), o el `composite` (default Vertex para image, política explícita). La recommendation matrix debe tratar ambos como candidatos objetivos (verdict del harness nunca aprueba craft). Canary Fal billable gated por el secreto Fal de Globe. — motor alternativo agregado por TASK-1487.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

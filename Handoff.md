@@ -57,6 +57,14 @@
   reservó/liquidó). Prereqs OK (aiplatform habilitada + ambos modelos accesibles en `efeonce-globe`). El runtime
   **deployado sigue `fake` por default** — el canary probó el path vertex sin cambiar el default; el harness one-shot
   no se commiteó.
+  **`TASK-1487` (Fal provider adapter + Composite) COMPLETE — code-complete, rollout gated.** Segundo adapter real
+  (`FalCreativeAdapter`, `apps/creative-runner/src/fal-adapter.ts`) conecta el stack no-Google vía Fal: **Seedream 5**
+  (image), **Recraft** (vectorize), **Seedance 2.0** (video), **ElevenLabs** (audio/voz) — las 7 caps. Secreto propio de
+  Globe (`GLOBE_FAL_API_KEY`); queue con gotcha `status_url`/`response_url`; output→hash. `CompositeProviderAdapter`
+  combina Vertex+Fal (Fal-only por supports(); overlap image/video por política, default Vertex). `GLOBE_LAB_PROVIDER`
+  = `fake|vertex|fal|composite` (default fake). 29 tests creative-runner verdes. **Desbloquea audio (1461)** + motores
+  alternativos (1459/1460). Canary Fal billable gated por el secreto Fal de Globe + verificación de slugs.
+  Inputs con bytes (edit/vectorize/i2v) → `inputs_unavailable` hasta la resolución hash→bytes (follow-up compartido).
 - EPIC-028 avanza en tres carriles paralelos gobernados íntegramente por Greenhouse. `TASK-1456…1485` viven
   en `docs/tasks/to-do/`, pasan por hooks/lint/QA/handoff de este repo y pueden poseer paths de implementación
   en el repositorio hermano. Globe conserva sólo arquitectura, runtime y evidencia técnica; no tiene registry
