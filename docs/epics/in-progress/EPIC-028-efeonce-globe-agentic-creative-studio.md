@@ -49,20 +49,35 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
 
 ## Child Tasks
 
-> Las tasks nacen en `efeoncepro/efeonce-globe` después de registrar allí su modelo operativo. Se mantienen aquí como slices de ownership; **no autorizar implementación Greenhouse bajo estos nombres**. La Pillar y los satélites de PDR-014 son un programa editorial de soporte: sus secciones, diagramas, checklists o títulos **no crean child tasks ni especificaciones ejecutables**.
+> Las tasks de producto nacen en `efeoncepro/efeonce-globe` con namespace repo-qualified `GLOBE-###`; **no
+> autorizan implementación Greenhouse bajo esos nombres**. Registry, dependencias, gates y estado canónico:
+> `efeonce-globe/docs/tasks/TASK_ID_REGISTRY.md` +
+> `efeonce-globe/docs/operations/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`. La Pillar y los satélites de PDR-014
+> siguen siendo soporte editorial: no crean tasks ni especificaciones ejecutables.
 
 - `TASK-1454` — **Greenhouse ↔ Globe federated identity and governed SDK bridge.** Única task Greenhouse explícita de esta fase: generaliza el broker reusable, registra Globe internal-only y prueba SSO/WIF/ADC sin llaves. No mueve runtime creativo a Greenhouse ni habilita producción/clientes externos.
+- `TASK-1455` — **Globe internal launch and brand shell.** Superficie humana internal-only, identidad visual y
+  estados de sesión/recovery; no implementa el Studio funcional.
 
-- `TASK-###` — **Globe repository and cloud foundation.** Continuar desde el bootstrap existente: IaC/state, Workload Identity Federation, service accounts de mínimo privilegio, budgets, Cloud Run, Cloud SQL, buckets y observabilidad base dentro del único proyecto inicial `efeonce-globe`.
-- `TASK-###` — **Identity, workspace and canonical command foundation.** Tenant/RLS, roles/capabilities, actor/audit/idempotency y API contract base para UI/MCP.
-- `TASK-###` — **Operating modes, responsibility assignments and escalation.** Modelar operador, aprobadores, template/rights authority y delivery owner; comandos auditados para handback/escalamiento sin duplicar run ni ampliar permisos implícitamente.
-- `TASK-###` — **Asset provenance and rights foundation.** Asset ingestion privado, hashes, versiones, lineage, signed delivery y políticas de clasificación/derechos.
-- `TASK-###` — **Curated format composition and artifact contract.** `format_spec` + `composition_spec` + `artifact_manifest` versionados para formatos curados; primer proving ground = carrusel Instagram. Decks Tender podrán ser consumer futuro sólo por contrato sister-platform, sin absorber RFPs ni mover su renderer contractual.
-- `TASK-###` — **Credit ledger and governed run lifecycle.** Estimate/reserve/approve/execute/settle con append-only ledger y worker dispatch seguro.
-- `TASK-###` — **Provider contract and first curated template.** Adapter registry, router por contrato de fidelidad, prueba de una modalidad y fixture/evals de control.
-- `TASK-###` — **Studio UI and MCP parity proving ground.** La misma corrida se prepara/estima/envía/revisa desde una UI creative-native y herramienta MCP, con evidencia de no duplicación y sin exponer inputs técnicos al runner.
-- `TASK-###` — **Creative review, delivery and ecosystem projection.** Review gates, paquete de entrega y primer contrato read/event/deep-link hacia Greenhouse o Verk.
-- `TASK-###` — **Client enablement and commercial credits.** Sólo después de legal/finance: roles externos, intake/rights, límites, asignación comercial, templates client-operated acotados, co-operación y experiencia cliente progresiva.
+- `GLOBE-001` — gobierno del repo y lifecycle de tasks.
+- `GLOBE-002…008` — **Model Lab y craft:** sandbox seguro, fixtures/evals, still, motion, audio, campaña E2E y
+  registry de readiness. Las integraciones reales empiezan temprano bajo hard budgets y private ingest.
+- `GLOBE-009…020` — **plataforma gobernada:** IaC, tenancy, responsabilidad, rights/assets, shadow credits,
+  lifecycle transaccional, adapters promovidos, composición determinística, review/delivery, MCP, UI y
+  proyección Greenhouse.
+- `GLOBE-021…025` — **validación comercial:** demo/Sample Sprint managed, buyer discovery, 30–50 runs de
+  calibración, pilotos por modo y commercial approval. `GLOBE-025` no habilita clientes sin sign-off explícito.
+
+### Parallel execution contract
+
+Model Lab, plataforma y validación comercial son carriles complementarios, no fases mutuamente excluyentes.
+Una ruta puede probarse en vivo con credenciales gobernadas, presupuesto duro, inputs autorizados, manifest e
+ingest privado antes de que exista el wallet comercial completo. Sólo puede promoverse a UI/MCP cuando además
+tenga tenancy, idempotencia, estimate/reservation, rights policy, eval calificada, observabilidad y rollback.
+
+Esto habilita vender primero un **Sample Sprint Efeonce-managed** basado en una campaña demostrable: Efeonce
+opera Globe internamente y el cliente compra capacidad/outcome gobernado. `Studio Access`, operación cliente,
+precios públicos y wallet self-serve permanecen posteriores a la calibración y aprobación comercial.
 
 ## Existing Related Work
 
@@ -108,3 +123,10 @@ El programa adopta un solo producto con tres modos operativos (`client-operated`
 ## Delta 2026-07-19 — Efeonce Globe y bootstrap inicial
 
 El operador fija **Efeonce Globe** como nombre canónico del producto; Creative Studio permanece como descriptor funcional de la vertical creativa. Se creó el repositorio privado `efeoncepro/efeonce-globe` y un único proyecto GCP adicional `efeonce-globe` bajo la organización Efeonce, con billing y APIs base habilitadas. No se crearon workloads, bases de datos, buckets, secretos ni gasto de proveedores. La separación de un proyecto productivo queda diferida hasta que exista un primer release reproducible, con presupuesto, IAM, rollback y promoción de secretos aprobados.
+
+## Delta 2026-07-19 — ejecución parallel-first y backlog Globe
+
+El programa deja de interpretar gobierno y prueba de modelos como una secuencia lineal. Se aceptan tres lanes
+paralelas —Model Lab/craft, plataforma gobernada y validación comercial— con gates distintos para ejecutar un
+experimento y promover una ruta a producción. Globe registra `GLOBE-001…025`; la primera wave materializa
+`GLOBE-001`, `002`, `003` y `009`, y `GLOBE-004` comienza apenas el Lab gate y los fixtures estén listos.

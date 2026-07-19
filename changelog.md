@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-19 — EPIC-028 adopta ejecución paralela y backlog propio de Globe
+
+- Model Lab/craft, plataforma gobernada y validación comercial avanzan en paralelo; probar una ruta bajo sandbox
+  ya no espera al ledger/workbench completo, mientras su promoción a UI/MCP conserva un gate enterprise aparte.
+- `efeonce-globe` registra `GLOBE-001…025`, operating model y plan de dependencias. La primera wave prepara
+  sandbox/fixtures e IaC simultáneamente; el primer motion comercial es un Sample Sprint Efeonce-managed, no
+  Studio Access ni créditos comerciales.
+
 ## 2026-07-19 — Globe ya existe como producto interno visible
 
 - TASK-1455 convirtió el callback técnico de Globe en una shell branded live: raíz anónima, OAuth Greenhouse,
@@ -903,9 +911,3 @@ ANAM`, nueve propiedades escalares y una calculada. Readback de definición pas�
 - Se reemplazan los dos diagramas V2 después de que una revisión humana detectara cruces de conectores sobre copy/listas, un ordinal oculto, un label recortado, una tarjeta sobre el cierre y una colisión de puntuación que el QA anterior no capturó.
 - La Pillar publicada usa ahora frontera `251393` y autonomía `251392`; V1/V2 permanecen superseded para trazabilidad. Se preservaron los 114 bloques, metadata SEO, featured/OG, categoría, autor y estado del post.
 - Snapshot y rollback fail-closed, cache purge y QA live desktop/mobile completados. El canon visual suma inspección al `100%` del raster original más runtime real, incluyendo labels, conectores, divisores y puntuación.
-
-## 2026-07-15 — Creative Workflows V5: enriquecimiento visual y tabla Gutenberg nativa
-
-- La Pillar publicada suma dos diagramas editoriales deterministas en la mitad inferior, captions para las cinco imágenes de cuerpo y un scorecard semántico `core/table`; la intervención corrige el tramo final sin apoyo visual sin convertir el artículo en una secuencia decorativa.
-- El Content Factory incorpora tablas nativas validadas, captions de imagen y enlaces opcionales a media; `public-website:wpcli` acepta `--input-file` repetible para transportar payloads y archivos por el rail SSH gobernado.
-- Post `251363` actualizado con snapshot y rollback fail-closed, caché Kinsta purgada y QA live desktop/mobile: cinco imágenes cargadas, seis captions, tabla 3×4, tres `🍏`, canonical/robots/OG preservados y cero overflow. El video queda deliberadamente diferido hasta tener una demostración que aporte movimiento o evidencia real.

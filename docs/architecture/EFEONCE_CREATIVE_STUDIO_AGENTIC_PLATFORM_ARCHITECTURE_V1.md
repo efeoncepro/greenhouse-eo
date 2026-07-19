@@ -338,6 +338,18 @@ sequenceDiagram
 
 ## 12. Phased delivery and deliberate non-goals
 
+Las fases describen madurez del producto, no una waterfall de implementación. EPIC-028 se ejecuta en paralelo:
+
+- Model Lab prueba rutas reales desde el inicio bajo credenciales gobernadas, hard spend cap, rights de inputs,
+  manifest inmutable, ingest privado, aprobación humana y kill switch;
+- la plataforma construye tenancy, assets, responsibilities, shadow ledger, commands, workers y surfaces;
+- validación comercial empieza con evidencia y un Sample Sprint `efeonce-managed`, sin esperar Studio Access.
+
+`Lab-qualified` no equivale a `production_approved`. UI/MCP sólo consumen rutas que además cumplen aislamiento,
+idempotencia, estimate/reservation, approval token, rights/provider policy, eval calificada, observabilidad y
+rollback. El execution plan canónico vive en
+`efeonce-globe/docs/operations/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`.
+
 | Phase | Outcome | Explicitly excluded |
 | --- | --- | --- |
 | 0 — foundation | New repo, project boundaries, tenant/auth, assets, ledger skeleton, audit/telemetry, provider contract, one internal template | Client access, payments, free canvas |

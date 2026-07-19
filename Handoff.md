@@ -21,6 +21,11 @@
 
 ## Pendientes inmediatos
 
+- EPIC-028 quedó replanificado como tres carriles paralelos. El repo Globe contiene el operating model,
+  execution plan y registry `GLOBE-001…025`; las entradas siguen `reserved` hasta materializar sus task files.
+  Próxima wave: `GLOBE-001`, `002`, `003` y `009`; `GLOBE-004` puede integrar/probar still models apenas cierre
+  el Lab gate, sin esperar Cloud SQL/ledger/workbench. Producción, clientes externos, precios y checkout siguen
+  fuera de alcance.
 - `TASK-1454` completó su runtime interno en `develop`, sin push ni Production: broker OAuth multiproducto,
   migración aditiva aplicada a `greenhouse-pg-dev/greenhouse_app`, client/binding Globe internal-only,
   callback `globe-studio-internal`, API privada `globe-api-internal`, SDK y WIF/ADC sin llaves. Los smokes live
