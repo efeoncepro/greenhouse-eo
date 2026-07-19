@@ -21,12 +21,15 @@
 
 ## Pendientes inmediatos
 
-- `TASK-1481` (Globe API Contract Spine + cross-surface harness) COMPLETE local-first, sin push. Implementado en
-  el repo hermano `../efeonce-globe` (5 commits en `main`: contracts trusted spine · dispatch API/SDK · conformance
-  harness · idempotency · docs); `pnpm check` + `pnpm build` verdes. En greenhouse-eo sólo cambió lifecycle
-  documental (cero runtime, cero build). Desbloquea `TASK-1457`: extiende `CapabilityRegistry` con el primer
-  Model Lab command + provider canary y voltea su coverage de policy-blocked a available. Deferidos declarados:
-  replay dedup con estado y mapping ID-token→principal por identidad → TASK-1457; tenancy store → TASK-1465.
+- `TASK-1481` (Globe API Contract Spine) y `TASK-1457` (Safe Model Lab foundation) COMPLETE local-first, sin push,
+  en el repo hermano `../efeonce-globe` (`main`, `pnpm check` + `pnpm build` verdes; en greenhouse-eo sólo lifecycle
+  documental). El spine (trusted context, registry, coverage, conformance) y el Model Lab (experiment
+  commands/readers, state machine, `LabSpendFence` hard cap, private-ingest, kill switch, `FakeReferenceAdapter` +
+  `LabRunner`) fluyen end-to-end con un proveedor **fake determinístico** (cero red, cero gasto, cero infra).
+  **Rollout pendiente declarado:** el canary con **proveedor real** (credenciales WIF/ADC, bucket, budgets) queda
+  `code complete, rollout pendiente`, gateado por **TASK-1464** + aprobación explícita; `GLOBE_LAB_ENABLED` default
+  OFF. Próximo paso: TASK-1464 (IaC/WIF/budgets/bucket), luego un adapter real reemplaza el fake en el `LabRunner`
+  detrás del flip. Deferidos: mapping ID-token→principal por identidad → live; tenancy/store durable → TASK-1465.
 - EPIC-028 avanza en tres carriles paralelos gobernados íntegramente por Greenhouse. `TASK-1456…1485` viven
   en `docs/tasks/to-do/`, pasan por hooks/lint/QA/handoff de este repo y pueden poseer paths de implementación
   en el repositorio hermano. Globe conserva sólo arquitectura, runtime y evidencia técnica; no tiene registry

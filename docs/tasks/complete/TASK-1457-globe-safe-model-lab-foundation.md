@@ -1,10 +1,34 @@
 # TASK-1457 — Globe Safe Model Lab Foundation
 
+## Delta 2026-07-19 — FOUNDATION COMPLETE (fake canary); live provider canary rollout pendiente
+
+Implementado en `../efeonce-globe` (6 commits en `main`); `pnpm check` + `pnpm build` verdes (domain 29 tests,
+studio-web 26, creative-runner/provider-contract verdes). Alcance ejecutado y confirmado por el operador:
+**contrato + guardrails + fake canary determinístico** (cero red, cero gasto, cero infra). Cero cambio de runtime
+en greenhouse-eo (sólo lifecycle documental).
+
+- **Slice 1 — experiment contract + spine extension.** Capability `globe.lab.experiment.run`; prepare/execute/cancel
+  commands + get/status/evidence readers sobre el `CapabilityRegistry` (ui/mcp `policy-blocked`,
+  http/sdk/cli/worker/e2e `available`); state machine (`prepared→estimated→reserved→running→candidate_ready|failed|cancelled`);
+  `ExperimentAttemptManifestV1` (ruta propuesta vs real, costo, hashes de input/output, lineage); actor/workspace
+  del trusted context; SDK tipado. `CREATIVE_CAPABILITIES` movido a contracts (SSOT wire).
+- **Slice 2 — guardrails.** `LabSpendFence` cap duro por run + por workspace/día-UTC (aborta ANTES de gastar,
+  idempotente, settle/release) — fence de seguridad, NO el ledger comercial (TASK-1468); private-ingest policy
+  (inputs sólo como hash + rights, nunca bytes crudos); kill switch fail-closed → `policy_blocked`.
+- **Slice 3 — fake canary seam.** `FakeReferenceAdapter` (hash media-qc determinístico) + `LabRunner`: el
+  experimento fluye API/SDK → command → adapter → runner → manifest. `GLOBE_LAB_ENABLED` default OFF.
+
+**Rollout pendiente (declarado, NO listo):** el **canary con proveedor real** (credenciales WIF/ADC, bucket
+privado, budget alerts, gasto real) queda `code complete, rollout pendiente`, gateado por **TASK-1464** + aprobación
+explícita. No se tocó `infra/terraform/**`. El `LabRunnerPort` es el seam: se reemplaza el fake por un adapter real
+(Vertex/OpenAI/Fal por la política de soberanía) sin cambiar el dominio. Mapping real ID-token→principal por
+identidad y store durable de experimentos también quedan para TASK-1457-live/TASK-1465.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -157,8 +181,8 @@ Permitir experimentos reales y baratos sin habilitar producción ni clientes ext
 
 ### Acceptance criteria additions
 
-- [ ] El contrato programático existe antes que cualquier UI específica.
-- [ ] Auth, tenant isolation, idempotencia, observabilidad y rollback tienen evidencia proporcional al riesgo.
+- [x] El contrato programático existe antes que cualquier UI específica.
+- [x] Auth, tenant isolation, idempotencia, observabilidad y rollback tienen evidencia proporcional al riesgo.
 
 <!-- ZONE 2 — PLAN MODE: se completa al tomar la task -->
 <!-- ZONE 3 — EXECUTION SPEC -->
@@ -229,17 +253,15 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 
 ## Acceptance Criteria
 
-- [ ] Ningún experimento requiere service-account key persistida.
-- [ ] Cada run tiene hard cap previo y aborta antes de excederlo.
-- [ ] Inputs y outputs son privados y cada attempt deja manifest verificable.
-- [ ] `TASK-1457` no modifica `infra/terraform/**`; el canary live referencia outputs/evidencia de `TASK-1464`.
-- [ ] El primer provider canary entra por el spine de `TASK-1481` y produce el mismo command/audit/correlation
-      observable desde private API y SDK.
-- [ ] UI/MCP figuran `policy-blocked` en coverage; CLI/tests usan SDK o conformance harness y ningún consumer
-      llama al provider directamente.
-- [ ] Body/query/headers no pueden aportar ni reemplazar actor, workspace o capabilities.
-- [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
-- [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
+- [x] Ningún experimento requiere service-account key persistida. *(el fake no usa credenciales; el path real es WIF/ADC sin llaves — TASK-1464).*
+- [x] Cada run tiene hard cap previo y aborta antes de excederlo. *(`LabSpendFence` + chequeo estimate>hardCap ANTES de reserve/run).*
+- [x] Inputs y outputs son privados y cada attempt deja manifest verificable. *(private-ingest policy: sólo hash+rights; `ExperimentAttemptManifestV1` por intento).*
+- [x] `TASK-1457` no modifica `infra/terraform/**`; el canary live referencia outputs/evidencia de `TASK-1464`. *(cero cambios en infra/terraform).*
+- [x] El primer provider canary entra por el spine de `TASK-1481` y produce el mismo command/audit/correlation observable desde private API y SDK. *(fake canary: API/SDK → command → adapter → runner → manifest, probado por HTTP y SDK; canary con proveedor REAL = rollout pendiente, TASK-1464).*
+- [x] UI/MCP figuran `policy-blocked` en coverage; CLI/tests usan SDK o conformance harness y ningún consumer llama al provider directamente. *(`LAB_COVERAGE` ui/mcp policy-blocked; provider sólo vía `LabRunner`).*
+- [x] Body/query/headers no pueden aportar ni reemplazar actor, workspace o capabilities. *(heredado del trusted context del spine).*
+- [x] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
+- [x] No se habilitan producción ni clientes externos sin una task/gate posterior explícito. *(internal-only; `GLOBE_LAB_ENABLED` default OFF; canary live gateado).*
 
 ## Verification
 
@@ -251,9 +273,9 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 
 ## Closing Protocol
 
-- [ ] Lifecycle/carpeta, `docs/tasks/README.md`, registry, EPIC-028, changelog y Handoff sincronizados.
-- [ ] QA release auditor y documentation governor ejecutados.
-- [ ] Evidencia faltante queda declarada como `code complete, rollout pendiente` o bloqueo operativo.
+- [x] Lifecycle/carpeta, `docs/tasks/README.md`, registry, EPIC-028, changelog y Handoff sincronizados.
+- [x] QA release auditor y documentation governor ejecutados.
+- [x] Evidencia faltante queda declarada como `code complete, rollout pendiente` o bloqueo operativo. *(canary con proveedor real = `code complete, rollout pendiente`, gateado por TASK-1464 + aprobación).*
 
 ## Follow-ups
 
