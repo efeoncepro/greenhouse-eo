@@ -129,6 +129,7 @@ La diferencia con otras capas de documentacion:
 ### Creative Studio (Efeonce Globe — plataforma hermana)
 
 - [Operar y extender el Contract Spine de Efeonce Globe](creative-studio/efeonce-globe-api-contract-spine.md) — puente desde Greenhouse hacia el runbook operativo de la plataforma hermana: quién opera qué, el flujo para agregar una capability al `CapabilityRegistry`, cómo verificar (`pnpm check`/`build` en `efeonce-globe`), la semántica de estados/errores y las reglas duras. El detalle paso a paso vive en el repo `efeonce-globe`; invocá la skill `greenhouse-globe`.
+- [Correr un experimento en el Model Lab de Efeonce Globe](creative-studio/efeonce-globe-model-lab.md) — puente desde Greenhouse hacia el runbook §7-bis de Globe: cómo se prepara, ejecuta y audita un experimento (capacidad, ruta, insumos por huella, tope de gasto), la habilitación con el flag apagado por defecto, la semántica de estados (`candidate_ready` ≠ aprobado) y errores (`policy_blocked`/`day_cap_exceeded`/…), y las reglas duras (nunca subir el archivo crudo, nunca llamar al proveedor por fuera del runner). Hoy con proveedor de ensayo; el detalle vive en `efeonce-globe`; invocá la skill `greenhouse-globe`.
 
 ## Plantilla recomendada
 

@@ -1,6 +1,6 @@
 ---
 name: greenhouse-globe
-description: Ingeniero senior de la plataforma hermana Efeonce Globe (Creative Studio) y guardián de su contrato de arquitectura. Úsala para cualquier trabajo sobre el repo `efeonce-globe`: extender el API Contract Spine (TASK-1481), agregar una capability con Full API Parity, escribir un command/reader/handler transport-neutral, montar un provider adapter, tocar trusted context / dispatch / SDK, o razonar el boundary Globe↔Greenhouse. Triggers — "Efeonce Globe", "creative studio", "contract spine", "capability", "command/reader", "trusted context", "provider adapter", "coverage matrix", "policy-blocked", "creative-runner", "EPIC-028", "TASK-1457…1481".
+description: Ingeniero senior de la plataforma hermana Efeonce Globe (Creative Studio) y guardián de su contrato de arquitectura. Úsala para cualquier trabajo sobre el repo `efeonce-globe`: extender el API Contract Spine (TASK-1481), agregar una capability con Full API Parity, escribir un command/reader/handler transport-neutral, montar un provider adapter, extender el Model Lab (spend fence, private-ingest, kill switch) como ejemplo trabajado de una capability, tocar la foundation IaC keyless (Terraform/OpenTofu + deploy sin llaves), tocar trusted context / dispatch / SDK, o razonar el boundary Globe↔Greenhouse. Triggers — "Efeonce Globe", "creative studio", "contract spine", "capability", "command/reader", "trusted context", "provider adapter", "coverage matrix", "policy-blocked", "creative-runner", "Model Lab", "spend fence", "kill switch", "IaC", "Terraform", "OpenTofu", "keyless deploy", "WIF", "EPIC-028", "TASK-1457…1481", "TASK-1464".
 ---
 
 # Efeonce Globe — Ingeniero de plataforma hermana
@@ -118,6 +118,25 @@ Este es el camino exacto. Seguilo; no inventes uno paralelo.
 6. **Granteá la `requiredCapability`** para que aparezca en `AuthenticatedPrincipalV1.capabilities` del broker grant. La autorización final la hace `#authorize` del registry: chequea coverage de la surface → `trustedContextHasCapability` → falla cerrado si el handler falta bajo un estado `available`.
 7. **El harness manifest-driven de conformance la ejercita sola** — no escribas un backdoor de test que llame al provider o al handler saltándose el spine.
 
+## El ejemplo trabajado — Model Lab (TASK-1457): la primera capability real sobre el spine
+
+El flujo de arriba es abstracto. El **Model Lab** es su primera instancia real y el patrón a copiar: una capability con estado externo y un provider detrás. Vive en `packages/domain/src/model-lab.ts` (+ `spend-fence.ts`), con el runner en `apps/creative-runner/src/index.ts` y el wiring en `apps/studio-web/src/app.ts`. Léelo como la plantilla de "cómo se ve una capability terminada".
+
+**Qué es.** Una sola capability de autoridad — `globe.lab.experiment.run` (`GLOBE_LAB_EXPERIMENT_CAPABILITY`) — gobierna 3 commands (`globe.lab.experiment.prepare|execute|cancel`) y 3 readers (`globe.lab.experiment.get|status|evidence`), todos registrados de una vez por `registerModelLabCapabilities(registry, deps)`. Su `coverage` (`LAB_COVERAGE`) declara `ui` y `mcp` como `policy-blocked` (aún no promovidas), y `http`/`sdk`/`cli`/`worker`/`e2e` como `available`; `sister-platform` es `not-applicable`. Es exactamente el patrón de la sección anterior: parity contractual completa, surfaces ejecutables prendidas, UI/MCP gobernadas-pero-apagadas hasta el gate de promoción.
+
+**Ports + inyección de dependencias (el patrón a repetir).** El dominio no conoce impls concretas: define **ports** y recibe todo por `ModelLabDependencies` — `ExperimentStorePort` (persistencia workspace-scoped), `SpendFencePort` (fence de gasto), `LabRunnerPort` (el seam del provider) y `LabKillSwitchPort` (`() => boolean`), más `now`/`newId`. El transporte inyecta las impls reales (`app.ts`: `InMemoryExperimentStore`, `LabSpendFence`, `LabRunner(new FakeReferenceAdapter)`, `killSwitch: () => labEnabled`); los tests inyectan dobles. Cuando una capability nueva toque estado externo o un provider, **replica esta forma**: define ports en el dominio, inyecta impls desde el transporte/runner, prueba con dobles — nunca acoples el handler a una DB, un bucket o un SDK concretos.
+
+**El provider seam.** El **único** lugar donde se invoca un provider es el `LabRunner` (`apps/creative-runner`), detrás del command `execute`. Hoy corre con `FakeReferenceAdapter`: determinístico, hermético (cero I/O de red), gasto cero — el "output" es un `sha256` estable del request. El provider real se enchufa **reemplazando el adapter** (`CreativeProviderAdapter`), sin tocar el dominio ni el command. **NUNCA** un SDK de provider directo desde el handler/UI/MCP/CLI/scripts/tests.
+
+**Los guardrails, como patrones reusables.** Cuatro defensas nacen acá y son plantilla para toda capability cara:
+
+- **Hard spend fence** (`LabSpendFence` / `SpendFencePort`): aborta *antes* de gastar. Cap doble — por-run (`hardCapCredits`) y por-workspace-día (UTC) — con `reserve` → `settle`/`release` idempotentes. Es un fence de **seguridad**, **NO** el credit ledger comercial (eso es TASK-1468, durable y append-only). Es in-memory y resetea al reiniciar: aceptable para un Lab interno acotado, reemplazado por el ledger durable antes de cualquier exposición externa.
+- **Private-ingest**: un input cruza el API solo como **content hash + postura de derechos declarada**, nunca como bytes crudos. `validateAuthorizedInputs` exige `inputId`, `sha256`, `mediaType` conocido (`image|video|audio|text`) y `rights` declarados (`internal-owned|licensed|test-fixture`), con tope de 16 inputs; cualquier entrada malformada rechaza el request.
+- **Kill switch fail-closed**: `GLOBE_LAB_ENABLED` (env, default **OFF**). Con el lab apagado, cada command/reader hace `assertLabEnabled` y lanza `DispatchError('surface_policy_blocked')` → `policy_blocked`. Apagado = negado, no "roto".
+- **State machine**: `canTransitionExperiment` / `EXPERIMENT_TRANSITIONS` gobierna `prepared → estimated → reserved → running → candidate_ready|failed` (+ `cancelled`); `transition()` lanza ante un salto ilegal. `candidate_ready` es un **candidato técnico, jamás una aprobación**. Un id cross-workspace o desconocido es `capability_not_found` (nunca revelar existencia fuera del scope); un `execute` sobre un experimento ya ejecutado es replay idempotente que devuelve la vista actual.
+
+**Error de dominio → API code.** `InvalidExperimentRequestError` **no** es un código de `DispatchError`: el transporte (`handlerErrorToApiCode` en `dispatch.ts`) lo mapea al canónico `invalid_request`. Ese es el patrón para errores de validación de payload propios de una capability — una clase de error de dominio + su mapeo explícito en el transporte, nunca prosa cruda ni un throw sin traducir.
+
 ## Provider boundary
 
 - **El primer provider call *billable* entra por el mismo seam que las surfaces posteriores:** API/SDK o conformance harness → command/reader canónico → provider adapter (`packages/provider-contract`) → runner (`apps/creative-runner`). **NUNCA** un provider SDK directo desde UI/MCP/CLI/scripts/tests.
@@ -125,6 +144,22 @@ Este es el camino exacto. Seguilo; no inventes uno paralelo.
 - **Ruteo de providers:** modelos Google-native solo directo por **Google Cloud / Vertex** (proyecto `efeonce-globe`); **Fal** solo para modelos **no-Google allowlisted**; **OpenAI** directo.
 - **NUNCA** expongas una tool genérica `endpoint + arbitrary JSON` (`run_endpoint(endpoint, ...)`). Las capabilities son **semánticas** y gobernadas.
 - Cada run registra model/version, inputs, operación semántica, costo de provider, tiempo, hashes de output y rights/classification. `policy-blocked` en una surface significa apagada, **no** que se puedan llamar providers desde scripts ad-hoc.
+
+## Foundation IaC keyless (TASK-1464) — aplicada en vivo
+
+La infraestructura de Globe es **reproducible y sin llaves**, y ya está **APLICADA en vivo (2026-07-19)**. Vive en `infra/terraform/` (HCL, validado con **OpenTofu**; en CI corre `terraform-check.yml` → `fmt -check -recursive` + `init -backend=false` + `validate`, sin credenciales GCP, en cada PR que toca `infra/terraform/**`).
+
+**Qué codifica.** Toma los recursos **VIVOS** de TASK-1454 con **import blocks** (`imports.tf`) — nada se recrea: los servicios habilitados, las 4 service accounts (`caller`/`api_runtime`/`web_runtime`/`deployer`), el pool+provider de **Vercel WIF**, el Artifact Registry `globe-runtime`, los bindings WIF del caller y los roles del deployer. Y **crea** lo nuevo: **GitHub WIF** (pool/provider `github-actions` restringido por repositorio en DOS capas — `attribute_condition` del provider **y** `principalSet` del binding, defensa en profundidad), deployer `run.admin` + `act-as` (runtime SAs + Cloud Build compute SA), el bucket privado `efeonce-globe-lab-evidence` (versionado, `public_access_prevention` enforced; el `api_runtime` escribe/lee vía signed URLs), el **state remoto** `gs://efeonce-globe-tfstate` (`prevent_destroy`, versionado), el **budget opt-in** (`enable_budget` default OFF) y una **alerta si se crea una SA key** (log metric + alert: invariante keyless).
+
+**Protocolo de import (regla dura).** Los SAs y el WIF están **vivos** y sostienen el bridge de identidad, el piloto interno y el SSO. Por eso: **import → `plan` → leer el plan → aplicar SOLO si NO hay `destroy`/`replace`** de una identidad viva. Nunca apliques un plan que destruya o recree un SA/pool/provider vivo. El apply del 2026-07-19 (`tofu apply`) dio **`23 imported, 13 added, 0 changed, 0 destroyed`** — cero identidad viva tocada. El bootstrap del state bucket es un paso humano fuera de Terraform (no puede crearse a sí mismo).
+
+**Deploy keyless.** Cero SA keys: OIDC → WIF → `globe-deployer`. El workflow `deploy-internal.yml` (`workflow_dispatch` manual, `id-token: write`) autentica con `google-github-actions/auth@v2` usando el secret **`GCP_WORKLOAD_IDENTITY_PROVIDER`** (el output `github_wif_provider`) + la deployer SA, construye con **Cloud Build async + poll** (`builds submit --async` + `builds describe` en loop — **nunca sync**, que se cuelga en el log bucket), despliega Cloud Run **privado** (`--no-allow-unauthenticated`, corriendo como la runtime SA) y verifica readiness con `gcloud run services describe` (`status.conditions[0].status == True`) — **nunca un proxy**.
+
+**IaC ↔ runtime.** Los **outputs versionados** de IaC (`outputs.tf`: SA emails, `lab_evidence_bucket`, `github_wif_provider`, …) son **inputs del runtime**: el canary live del Model Lab (TASK-1457) los **consume**, no duplica infra. La frontera es clara: **la IaC provisiona; el spine opera** — no existe un "command/MCP de infraestructura". Cambiar infra es Terraform/`gcloud`, no una capability.
+
+**Git hygiene.** **NUNCA** committees `*.tfstate`, `.terraform/`, `tfplan` ni `terraform.tfvars` real (el `.gitignore` los bloquea); el **`.terraform.lock.hcl` SÍ se committea** (pinea versiones de providers). El state vive solo en `gs://efeonce-globe-tfstate`; en git solo está el HCL.
+
+**Qué NO hace.** No aprovisiona las Cloud Run services de la app (las despliega el workflow keyless), ni Cloud SQL/tenancy (TASK-1465), ni secretos de provider (rollout del canary live), ni producción/clientes externos. Runbook: `docs/operations/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`.
 
 ## Errores canónicos y correlación
 
@@ -143,10 +178,17 @@ Este es el camino exacto. Seguilo; no inventes uno paralelo.
 - **NUNCA** llames Google-native fuera de Vertex/GCP, ni un modelo Google por Fal; Fal solo non-Google allowlisted; OpenAI directo.
 - **NUNCA** confundas `policy_blocked` con `access_denied` / `not_found`; **NUNCA** filtres secretos/tokens/body upstream a cliente o logs.
 - **NUNCA** introduzcas Vitest/Jest (Globe usa `node --test`), ni rompas la convención de extensiones (`.js` source↔source de packages; `.ts` en studio-web y en todos los tests).
+- **NUNCA** invoques un provider fuera del runner que corre detrás del command (el Model Lab lo hace por el `LabRunner` en `apps/creative-runner`); un SDK de provider directo desde handler/UI/MCP/CLI/scripts/tests está prohibido.
+- **NUNCA** dejes un command de capability cara sin kill switch fail-closed (apagado ⇒ `policy_blocked`), sin hard spend fence que aborte *antes* de gastar (el fence es de seguridad, NO el credit ledger de TASK-1468), ni aceptes inputs como bytes crudos (private-ingest: content hash + rights declarados).
+- **NUNCA** apliques Terraform/OpenTofu con un `plan` que muestre `destroy`/`replace` de una identidad viva (SA/WIF/registry): el protocolo es import → plan cero-destroy/replace → apply.
+- **NUNCA** committees state ni planes (`*.tfstate`/`.terraform/`/`tfplan`/`terraform.tfvars` real; el state vive en `gs://efeonce-globe-tfstate`); el `.terraform.lock.hcl` SÍ se committea.
+- **NUNCA** modeles infraestructura como un command/MCP del spine ni dupliques en runtime lo que la IaC provisiona: el runtime consume los outputs versionados de IaC. Cambiar infra es Terraform/`gcloud`, no una capability.
+- **NUNCA** deployees con SA keys ni verifiques readiness por proxy: el deploy es keyless (OIDC→WIF→deployer) y la readiness se lee con `run services describe`.
 - **SIEMPRE** una capability nace con schema versionado + command/reader transport-neutral + trusted context + path HTTP/SDK + coverage + conformance (Full API Parity by birth).
 - **SIEMPRE** el primer provider call entra por API/SDK/harness → command → adapter → runner.
 - **SIEMPRE** commands mutantes llevan actor (derivado), workspace, `idempotencyKey`, `correlationId` y audit; todo run caro se estima y aprueba antes de reservar créditos; los outputs son *candidates* hasta review humano.
 - **SIEMPRE** corré `pnpm check && pnpm build` en `efeonce-globe` antes de cerrar, y `pnpm install` al agregar una dep de workspace.
+- **SIEMPRE** que una capability nueva toque estado externo o un provider, sigue el patrón del Model Lab: ports en el dominio + impls inyectadas desde transporte/runner + dobles en tests + state machine + error de dominio mapeado a su API code (p.ej. `InvalidExperimentRequestError → invalid_request`).
 
 ## Sinergias y gobierno
 

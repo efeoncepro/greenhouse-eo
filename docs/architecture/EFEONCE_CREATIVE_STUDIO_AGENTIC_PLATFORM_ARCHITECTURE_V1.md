@@ -90,6 +90,17 @@ efeonce-globe/                            # private repository
 
 El bootstrap usa un único proyecto GCP aislado, `efeonce-globe`, bajo la organización y billing de Efeonce. Esta postura inicial no mezcla Globe con Greenhouse: separa runtime, IAM, datos, storage y secretos por proyecto. Un proyecto productivo separado se crea sólo cuando el primer release sea reproducible por IaC y tenga presupuesto, seguridad, backup, rollback y promoción de secretos aprobados.
 
+> **Estado — `TASK-1464` IaC aplicada en vivo (2026-07-19).** La reproducibilidad por IaC ya existe:
+> `infra/terraform/` codifica la foundation del proyecto no productivo `efeonce-globe`. Los recursos vivos de
+> `TASK-1454` (4 service accounts, WIF de Vercel, Artifact Registry, IAM del deployer, bucket de Cloud Build) se
+> adoptan con **import blocks** —sin recrear nada—, y se agrega la foundation nueva: GitHub WIF para deploy keyless
+> (OIDC → WIF → deployer, sin service-account keys), deployer `run.admin` + act-as, bucket privado de evidencia del
+> Lab `efeonce-globe-lab-evidence`, remote state en `gs://efeonce-globe-tfstate`, budget/alertas opt-in y una alerta
+> anti-SA-key (invariante keyless). El `tofu apply` supervisado dio `23 imported, 13 added, 0 changed, 0 destroyed`
+> (identidad de `TASK-1454` adoptada sin un solo destroy/replace). Protocolo: el apply ocurre sólo tras un `plan` con
+> CERO destroy/replace. Runbook: `efeonce-globe/docs/operations/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`. Al trabajar sobre
+> Globe, invocar la skill `greenhouse-globe`.
+
 ## 4. Core domain model
 
 | Aggregate | Responsibility | Key invariants |
@@ -383,6 +394,18 @@ Las fases describen madurez del producto, no una waterfall de implementación. E
 idempotencia, estimate/reservation, approval token, rights/provider policy, eval calificada, observabilidad y
 rollback. El execution plan canónico vive en
 `efeonce-globe/docs/operations/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`.
+
+> **Estado — `TASK-1457` implementado (2026-07-19, fake canary).** El Model Lab es la primera capability de negocio
+> sobre el spine de `TASK-1481`: capability `globe.lab.experiment.run`, commands `prepare`/`execute`/`cancel` +
+> readers `get`/`status`/`evidence`, state machine del experimento
+> (`prepared → estimated → reserved → running → candidate_ready | failed | cancelled`) con autoridad derivada
+> server-side, hard spend fence (`LabSpendFence`, aborta antes de gastar; cap por run y por workspace/día-UTC),
+> private-ingest (los inputs cruzan la API sólo como content hash + rights declarados, nunca bytes crudos), kill
+> switch fail-closed (fuerza `policy_blocked`) y el provider seam probado end-to-end con un `FakeReferenceAdapter`
+> determinístico (cero red, cero gasto, cero infraestructura). El canary con **proveedor real** queda pendiente
+> —gated en `TASK-1464` + aprobación explícita— y falta adapter real, secretos de proveedor en Secret Manager,
+> Dockerfile de studio-web y `GLOBE_LAB_ENABLED=true` (default OFF). UI/MCP quedan `policy-blocked` hasta la
+> promoción. Spec canónica: `efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md`.
 
 La gobernanza de ejecución no se desplaza con el runtime: Greenhouse conserva EPIC-028, `TASK-1456…1481`,
 task hooks, Plan Mode, lint, QA, lifecycle, cierre y handoff. Globe posee código, infraestructura, datos y
