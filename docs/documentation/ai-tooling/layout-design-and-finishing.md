@@ -6,7 +6,7 @@
 >
 > **Última actualización:** 2026-07-19
 >
-> **Canon técnico:** [Greenhouse Multimodal Campaign Production V1](../../operations/GREENHOUSE_MULTIMODAL_CAMPAIGN_PRODUCTION_V1.md)
+> **Canon técnico:** [Campaign Layout Compiler V1](../../architecture/GREENHOUSE_CAMPAIGN_LAYOUT_COMPILER_V1.md)
 >
 > **Manual:** [Producir un set con Layout Design & Finishing](../../manual-de-uso/ai-tooling/producir-layout-design-y-finishing.md)
 
@@ -34,6 +34,10 @@ anchor aprobado
 El director de arte define tesis, jerarquía, grilla, campos de copy, hook y locks. Seedream 5 Pro o GPT Image 2
 reciben sólo el delta visual que les corresponde. La herramienta de composición —Figma, Adobe, Sharp/fontkit u
 otra declarada— conserva autoridad sobre tipografía, logo, CTA, legal, localización y export.
+
+Para familias compatibles, `pnpm creative:layout` vuelve esa última mitad un proceso ejecutable: toma el anchor,
+los mensajes, el brand kit, los formatos y las reglas de layout; produce un plan, fuentes SVG editables, masters,
+manifests/hashes, contact sheet y QA. La persona sigue decidiendo dirección, aceptación del finish y release.
 
 ## División de responsabilidades
 
@@ -64,6 +68,10 @@ formatos —`16:9`, `4:5`, `9:16`— con plates por ratio, finish Seedream 5 Pro
 Sharp/fontkit. El set obtuvo `47/50`, pasó QA técnico `3/3` y costó aproximadamente `USD 0,27` de inferencia
 incremental. El copy y el logo nunca entraron al modelo.
 
+El mismo set se recompiló después con Campaign Layout Compiler V1 sin nuevas llamadas de modelo. Volvió a pasar
+`3/3`; la desviación media normalizada contra los masters aprobados fue `0,001096–0,001155`, bajo el gate
+`0,002`. Esto valida reproducibilidad del ensamblaje, no reemplaza la revisión visual.
+
 Estas cifras son evidencia de método, no SLA. La dirección, prompts, manifests, métricas y paquete están en
 [`ai-generations/2026-07-18_high-frequency-campaign-e2e/`](../../../ai-generations/2026-07-18_high-frequency-campaign-e2e/).
 
@@ -73,3 +81,5 @@ Estas cifras son evidencia de método, no SLA. La dirección, prompts, manifests
 - No entrega PSD/SVG generado por Seedream ni localidad pixel-perfect.
 - No vuelve press-ready una prueba sin tamaño físico, sustrato, bleed e ICC del proveedor.
 - No garantiza performance de campaña; eso exige activación, tracking y aprendizaje por `asset_id`.
+- V1 no es un editor visual: usa coordenadas declaradas y entrega SVG editable para el relevo a Figma/Adobe.
+- V1 soporta `frequency-rail|none`; nuevos hooks requieren extender schema, renderer, fixtures y QA.

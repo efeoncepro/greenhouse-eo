@@ -12,7 +12,7 @@
 | Marca | Efeonce (una) | la del cliente (multi-marca; nunca mezclar con Efeonce/AXIS) |
 | Fuente de verdad visual | `efeonce-brand.ts` + AXIS | el **brand book del cliente** (pedirlo; no asumir) |
 | Aprobación del KV | operador Efeonce | flujo formal del cliente (brand/legal/compliance) |
-| Licencia de assets IA | criterio interno | **commercially-safe obligatorio** (preferir Adobe Firefly / modelos con licencia limpia) |
+| Licencia de assets IA | criterio interno | términos, licencia, indemnidad, retención y derechos revisados por endpoint/cliente/destino |
 | Idioma | es-CL neutro | localización real por mercado (lockups/copy por país) |
 | Riesgo | tolerante | conservador — banca/aerolíneas = YMYL; compliance manda |
 | Entregable | interno | presentable, empaquetado, con spec y versiones |

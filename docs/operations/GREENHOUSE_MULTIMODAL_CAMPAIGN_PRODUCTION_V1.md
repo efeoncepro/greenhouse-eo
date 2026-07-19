@@ -16,21 +16,21 @@ prepress, QA, paquete y aprendizaje.
 
 ### Canal
 
-| `channelMode` | Salidas típicas | Gate específico |
-|---|---|---|
-| `digital-static` | 4:5, 1:1, 9:16, 16:9, display | safe zones, peso, thumbnail, landing |
+| `channelMode`    | Salidas típicas                                                    | Gate específico                                            |
+| ---------------- | ------------------------------------------------------------------ | ---------------------------------------------------------- |
+| `digital-static` | 4:5, 1:1, 9:16, 16:9, display                                      | safe zones, peso, thumbnail, landing                       |
 | `digital-motion` | 9:16/16:9; shots generativos 3–10 s; masters editados 6/10/15/30 s | identidad temporal, flicker, audio, captions, poster frame |
-| `print` | A-series, afiche, folleto | tamaño físico, bleed, trim, 300 ppi, ICC de imprenta |
-| `ooh` | billboard, mobiliario, gran formato | lectura a distancia, 3 s, pocas palabras, vendor spec |
+| `print`          | A-series, afiche, folleto                                          | tamaño físico, bleed, trim, 300 ppi, ICC de imprenta       |
+| `ooh`            | billboard, mobiliario, gran formato                                | lectura a distancia, 3 s, pocas palabras, vendor spec      |
 
 ### Presencia de marca
 
-| `brandMode` | Significado | Regla |
-|---|---|---|
-| `branded` | marca, tipo, URL y paleta visibles | activos oficiales y composición determinista |
-| `brand-light` | la campaña se reconoce sin dominar con el logo | firma/end card discreto; nunca logo generado |
-| `editorial-neutral` | plate útil sin firma visual de Efeonce | no hereda AXIS ni una skin Efeonce; conserva provenance |
-| `client-brand` | pertenece a un cliente | sólo brand book/activos del cliente; Efeonce no contamina |
+| `brandMode`         | Significado                                    | Regla                                                     |
+| ------------------- | ---------------------------------------------- | --------------------------------------------------------- |
+| `branded`           | marca, tipo, URL y paleta visibles             | activos oficiales y composición determinista              |
+| `brand-light`       | la campaña se reconoce sin dominar con el logo | firma/end card discreto; nunca logo generado              |
+| `editorial-neutral` | plate útil sin firma visual de Efeonce         | no hereda AXIS ni una skin Efeonce; conserva provenance   |
+| `client-brand`      | pertenece a un cliente                         | sólo brand book/activos del cliente; Efeonce no contamina |
 
 `off-branding` no significa “fuera de control”. Significa que la capa visual generativa queda limpia
 para contenido editorial, performance, motion o cliente, y que la firma correcta se decide en post. Tampoco
@@ -87,17 +87,17 @@ anchor aprobado; no se encadenan derivados como `v1 → v2 → v3`.
 
 ## Router validado
 
-| Operación | Mano | Por qué |
-|---|---|---|
-| Divergencia visual económica | Seedream 5 Lite | abre familias de medio/material sin gastar cierre premium |
-| Desarrollo expresivo | Seedream 5 Pro | material, color, luz, atmósfera y edición regional semántica |
-| Disciplina compositiva | GPT Image 2 | reencuadre, identidad, safe zones, reparación y ratios |
-| Finish de plates con layout aprobado | Seedream Pro o GPT Image 2 | Pro para material/luz/atmósfera; GPT para geometría/safe zones/protección |
-| Toma motion base desde anchor limpio | Gemini Omni Flash | una toma continua por ratio, con audio nativo y plate sin marca |
-| Familia 15/10/6 desde toma aprobada | edición determinista | trim, montaje, format wall, end card, mezcla y exports sin regenerar |
-| Nueva toma, ángulo o continuidad física ausente | Seedance 2.0, fallback | sólo cuando los píxeles/actuación necesarios no existen en el master aprobado |
-| Copy/logo/legal exactos | composición determinista | precisión, localización, compliance y reemplazo sin regenerar |
-| Aprobación | director/a de arte + brand/legal/media | el modelo no es autoridad de marca ni de lanzamiento |
+| Operación                                       | Mano                                   | Por qué                                                                       |
+| ----------------------------------------------- | -------------------------------------- | ----------------------------------------------------------------------------- |
+| Divergencia visual económica                    | Seedream 5 Lite                        | abre familias de medio/material sin gastar cierre premium                     |
+| Desarrollo expresivo                            | Seedream 5 Pro                         | material, color, luz, atmósfera y edición regional semántica                  |
+| Disciplina compositiva                          | GPT Image 2                            | reencuadre, identidad, safe zones, reparación y ratios                        |
+| Finish de plates con layout aprobado            | Seedream Pro o GPT Image 2             | Pro para material/luz/atmósfera; GPT para geometría/safe zones/protección     |
+| Toma motion base desde anchor limpio            | Gemini Omni Flash                      | una toma continua por ratio, con audio nativo y plate sin marca               |
+| Familia 15/10/6 desde toma aprobada             | edición determinista                   | trim, montaje, format wall, end card, mezcla y exports sin regenerar          |
+| Nueva toma, ángulo o continuidad física ausente | Seedance 2.0, fallback                 | sólo cuando los píxeles/actuación necesarios no existen en el master aprobado |
+| Copy/logo/legal exactos                         | composición determinista               | precisión, localización, compliance y reemplazo sin regenerar                 |
+| Aprobación                                      | director/a de arte + brand/legal/media | el modelo no es autoridad de marca ni de lanzamiento                          |
 
 Gemini Omni Flash es **video**, no un tercer generador de stills. Al 2026-07-18 está en preview como
 `gemini-omni-flash-preview`: genera 720p, 3–10 s, 16:9 o 9:16, admite texto/imagen y edición conversacional.
@@ -109,11 +109,11 @@ El generador no tiene que producir una pieza por duración. La corrida aprobada 
 8 s por ratio** (`9:16` y `16:9`), cada uno como toma continua sin cortes, copy ni logo. Desde esos dos masters,
 el post determinístico produjo la familia profesional completa:
 
-| Pieza | Construcción | Generaciones incrementales |
-|---|---|---:|
-| Hero 15 s | toma aprobada + montaje de piezas reales de la campaña + end card de 2,5 s | 0 |
-| Master 10 s | 8 s de toma aprobada + end card de 2 s | 0 |
-| Bumper 6 s | 4 s seleccionados de la toma aprobada + end card de 2 s | 0 |
+| Pieza       | Construcción                                                               | Generaciones incrementales |
+| ----------- | -------------------------------------------------------------------------- | -------------------------: |
+| Hero 15 s   | toma aprobada + montaje de piezas reales de la campaña + end card de 2,5 s |                          0 |
+| Master 10 s | 8 s de toma aprobada + end card de 2 s                                     |                          0 |
+| Bumper 6 s  | 4 s seleccionados de la toma aprobada + end card de 2 s                    |                          0 |
 
 En dos ratios, la matriz es **2 × 3 = 6 videos**. El `format wall` del hero no se vuelve a generar ni simula
 interfaces: se compone con los stills finales reales del mismo release, identificados por path/hash. Esto hace
@@ -186,6 +186,12 @@ la edición regional de Seedream sigue siendo semántica sobre un raster aplanad
 Contrato reusable: `.codex/skills/design-studio/templates/layout-design-contract.yaml`. Método de dirección:
 `.codex/skills/design-studio/modules/13_LAYOUT_DESIGN_AND_FINISHING.md`.
 
+La implementación determinística V1 vive en `scripts/creative/layout-compiler/` y se opera con
+`pnpm creative:layout -- --contract <yaml> --mode plan|compile|check`. Produce fuentes SVG editables, masters,
+manifests/hashes, contact sheet y QA sin llamar a modelos. `compile` bloquea anchor/layout/finish no aprobados;
+el release humano permanece como checkpoint separado. Contrato técnico:
+[`GREENHOUSE_CAMPAIGN_LAYOUT_COMPILER_V1.md`](../architecture/GREENHOUSE_CAMPAIGN_LAYOUT_COMPILER_V1.md).
+
 ### 6. Bifurcación still/motion
 
 - **Still:** el clean plate pasa a composición determinista branded, brand-light, neutral o client-brand.
@@ -236,7 +242,7 @@ regla de marca universal por una sola campaña.
 ```yaml
 anchor_id: campaign-kv-v1
 parent_asset: path/to/clean-plate.png
-parent_sha256: "..."
+parent_sha256: '...'
 source_stage: gpt-organized-plate
 target_model: gemini-omni-flash-preview
 target_endpoint: google/gemini-omni-flash/image-to-video

@@ -1,54 +1,103 @@
-version: layout-design-contract.v1
+# Executable template for `pnpm creative:layout`.
+# Paths are resolved from `run_root`, itself relative to this contract file.
+version: campaign-layout-compiler.v1
 campaign_id: campaign-id
+run_root: ..
+
 anchor:
   id: campaign-kv-v1
   revision: 1
-  asset: path/to/approved-anchor.png
+  asset: work/anchor/campaign-kv-v1.png
+  status: approved # pending | approved | rejected
   locks:
     - subject identity and anatomy
     - campaign palette and lighting logic
     - recurring visual hook
+
+brand_mode: branded # branded | brand-light | editorial-neutral | client-brand
+channel_mode: digital-static # digital-static | digital-motion | print | ooh
+
+message:
+  kicker: CAMPAIGN SYSTEM 01
+  headline:
+    - EXACT HEADLINE.
+    - SECOND LINE.
+  support: Exact support copy controlled outside the image model.
+  url: example.com
+
+brand:
+  logo: ../../public/branding/logo-negative.svg
+  fonts:
+    medium: ../../src/assets/fonts/Poppins-Medium.ttf
+    bold: ../../src/assets/fonts/Poppins-Bold.ttf
+    extra_bold: ../../src/assets/fonts/Poppins-ExtraBold.ttf
+  colors:
+    background: '#03142D'
+    foreground: '#FFFFFF'
+    support: '#F4F8FF'
+    muted: '#B8C9DE'
+    accent: '#7CF4D1'
+    accent_secondary: '#2FD7FF'
+
+visual_system:
+  underlay:
+    color: '#03142D'
+    copy_opacity_start: 0.78
+    copy_opacity_mid: 0.45
+    top_opacity: 0.42
+    vignette_opacity: 0.28
+  hook:
+    type: frequency-rail # frequency-rail | none
+    colors: ['#2FD7FF', '#7CF4D1', '#9C63FF']
+
+composition:
+  renderer: sharp-fontkit
+  output_format: jpeg # jpeg | png
+  quality: 94
+  max_bytes: 5242880
+  contact_sheet_columns: 2
+
+approvals:
+  layout: approved
+  human_release: pending
+  anchor_owner: creative-director
+  release_owner: campaign-owner
+
+artifacts:
+  plan_manifest: manifests/layout-compiler-plan.json
+  composition_manifest: manifests/layout-compiler-composition.json
+  qa_report: qa/layout-compiler-technical.json
+  contact_sheet: review/layout-compiler-contact-sheet.jpg
+  editable_dir: work/layout-compiler/editable
+
 formats:
   - id: social-landscape
     ratio: '16:9'
     canvas: { width: 1920, height: 1080 }
     grid: { columns: 12, margin_pct: 5, gutter_pct: 2 }
-    subject_zone: right 48 percent
-    copy_field: left 40 percent
-  - id: social-feed
-    ratio: '4:5'
-    canvas: { width: 1600, height: 2000 }
-    grid: { columns: 8, margin_pct: 6, gutter_pct: 2.5 }
-    subject_zone: lower-right 52 percent
-    copy_field: upper-left 42 percent
-  - id: story
-    ratio: '9:16'
-    canvas: { width: 1080, height: 1920 }
-    grid: { columns: 6, margin_pct: 7, gutter_pct: 3 }
-    subject_zone: center-lower 55 percent
-    copy_field: upper 36 percent; outside platform overlays
-layers:
-  - clean_plate
-  - optical_underlay
-  - campaign_hook
-  - type
-  - brand
-  - channel
-finish:
-  executor: bytedance/seedream/v5/pro/edit
-  delta: improve material integration, atmospheric depth and micro-detail only
-  input_policy: clean plate only; no final copy, logo, CTA or legal
-  stop_condition: stop if scorecard does not improve or next delta is deterministic
-composition:
-  executor: Figma | Adobe | Sharp/fontkit | other-declared-tool
-  authoritative_assets:
-    logo: path/to/official-logo.svg
-    typography: named-family-and-files
-  exact_content:
-    headline: ''
-    support: ''
-    cta: ''
-    legal: ''
+    source_plate: work/plates/campaign-landscape-source.png
+    finished_plate: work/finished/campaign-landscape-finished.png
+    output: delivery/layout-compiler/campaign-landscape-v1.jpg
+    # Optional migration guard against an approved previous master:
+    # baseline: { output: delivery/approved-landscape.jpg, max_normalized_mae: 0.002 }
+    copy_field: { x: 0.05, y: 0.2, width: 0.44, height: 0.5 }
+    safe_zones: { top: 0.04, right: 0.04, bottom: 0.04, left: 0.04 }
+    finish:
+      status: approved
+      executor: bytedance/seedream/v5/pro/edit
+      delta: improve material integration, atmospheric depth and micro-detail only
+      input_policy: clean plate only; no final copy, logo, CTA or legal
+    layout:
+      copy_fade_mid: 0.43
+      copy_fade_end: 0.66
+      logo: { left: 88, top: 70, width: 245 }
+      kicker: { x: 116, y: 275, size: 18, tracking: 2.2 }
+      hook: { x: 88, y: 252, width: 6, height: 186 }
+      headline: { x: 116, y: 390, size: 79, gap: 92, tracking: -1.2 }
+      support: { x: 116, y: 650, size: 29, max_width: 560, gap: 42, tracking: 0 }
+      url: { x: 88, y: 996, size: 24, tracking: 0.25 }
+      rule: { x: 88, y: 946, width: 250, height: 2 }
+
 gates:
   - anchor
   - layout
@@ -57,7 +106,3 @@ gates:
   - format
   - technical
   - human_release
-provenance:
-  manifest: path/to/manifest.json
-  scorecard: path/to/scorecard.md
-  release_owner: named-role

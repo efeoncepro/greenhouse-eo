@@ -1,0 +1,276 @@
+{
+  "schema": "campaign-layout-composition.v1",
+  "compiledAt": "2026-07-19T08:08:43.124Z",
+  "campaignId": "high-frequency-layout-design",
+  "compiler": "scripts/creative/layout-compiler",
+  "mode": "deterministic-no-provider-calls",
+  "contractSha256": "a1cb72925cc18e2f3dd718677f16829eec61c2e2d538d4683bec7f94dc699727",
+  "planManifest": "manifests/14-layout-compiler-plan.json",
+  "renderer": "sharp + fontkit outlined typography",
+  "logo": "../../public/branding/logo-negative.svg",
+  "logoSha256": "f221fc925c15cddad307a81362a0ec948e1b850fc6679a49a1bc88bad2eb6b3f",
+  "contactSheet": "review/layout-compiler-contact-sheet.jpg",
+  "contactSheetSha256": "9acdd36a31941fbdb1173e42dfa8b8abfe5a85f7e60892a6a89f9cef030c039f",
+  "checkpoints": {
+    "anchor": "approved",
+    "layout": "approved",
+    "finishes": {
+      "16x9": "approved",
+      "4x5": "approved",
+      "9x16": "approved"
+    },
+    "humanRelease": "approved"
+  },
+  "status": "creative_release_candidate",
+  "results": [
+    {
+      "id": "16x9",
+      "ratio": "16:9",
+      "anchorId": "high-frequency-anchor-v1",
+      "anchorRevision": 1,
+      "topology": {
+        "kind": "star",
+        "derivationParent": "anchor"
+      },
+      "brandMode": "branded",
+      "channelMode": "digital-static",
+      "sourcePlate": "work/plates/high-frequency-plate-3x1-source.png",
+      "sourcePlateSha256": "1bb95b5a376b22fde2500aa3ea01654c49133016790976232d284ef1bcd05ab4",
+      "finishedPlate": "work/layout-design/finished/high-frequency-layout-finish-16x9.png",
+      "finishedPlateSha256": "cc6e65b3d3764aef2c83cb79be5832816dbc409ff352fd03953995c06ae6250c",
+      "finish": {
+        "status": "approved",
+        "executor": "bytedance/seedream/v5/pro/edit",
+        "delta": "improve material integration, atmospheric depth and micro-detail only",
+        "input_policy": "clean plate only; no final copy, logo, CTA or legal"
+      },
+      "editableSource": "work/layout-compiler/editable/16x9-layout-source.svg",
+      "vectorOverlay": "work/layout-compiler/editable/16x9-overlay.svg",
+      "underlay": "work/layout-compiler/editable/16x9-underlay.png",
+      "output": "delivery/layout-compiler/high-frequency-layout-design-16x9-v1.jpg",
+      "width": 1920,
+      "height": 1080,
+      "format": "jpeg",
+      "colourspace": "srgb",
+      "bytes": 618198,
+      "sha256": "fd3d6699b2683343cb17b5cf50b3800fe89e0d2fefc2ab4f73a054e45db04abc",
+      "logoSha256": "f221fc925c15cddad307a81362a0ec948e1b850fc6679a49a1bc88bad2eb6b3f",
+      "exactCopy": {
+        "kicker": "PRODUCCIÓN CREATIVA · SISTEMA 01",
+        "headline": [
+          "ALTA FRECUENCIA.",
+          "ALTO ESTÁNDAR."
+        ],
+        "support": "Producción creativa a escala, sin bajar el nivel.",
+        "url": "efeoncepro.com"
+      },
+      "copyField": {
+        "x": 0.0458,
+        "y": 0.22,
+        "width": 0.43,
+        "height": 0.48
+      },
+      "contentBounds": {
+        "left": 88,
+        "top": 70,
+        "right": 846.2089999999998,
+        "bottom": 996
+      },
+      "safeBounds": {
+        "left": 76.8,
+        "top": 43.2,
+        "right": 1843.1999999999998,
+        "bottom": 1036.8
+      },
+      "contrast": {
+        "foregroundP95": 18.3,
+        "accentP95": 13.69
+      },
+      "baselineComparison": {
+        "output": "delivery/layout-design/high-frequency-layout-design-16x9-v1.jpg",
+        "maxNormalizedMae": 0.002,
+        "normalizedMae": 0.001096,
+        "maxChannelDelta": 15
+      },
+      "assertions": {
+        "dimensions": true,
+        "format": true,
+        "srgb": true,
+        "maxBytes": true,
+        "finishApproved": true,
+        "inputPolicyClean": true,
+        "contentInSafeZone": true,
+        "foregroundContrastP95": true,
+        "accentContrastP95": true,
+        "baselineWithinTolerance": true
+      },
+      "pass": true
+    },
+    {
+      "id": "4x5",
+      "ratio": "4:5",
+      "anchorId": "high-frequency-anchor-v1",
+      "anchorRevision": 1,
+      "topology": {
+        "kind": "star",
+        "derivationParent": "anchor"
+      },
+      "brandMode": "branded",
+      "channelMode": "digital-static",
+      "sourcePlate": "work/plates/high-frequency-plate-4x5-source.png",
+      "sourcePlateSha256": "07ceae9a76c0c99194ce5cecf732b00812a68d2d63f8afdec99d51ca668a3f39",
+      "finishedPlate": "work/layout-design/finished/high-frequency-layout-finish-4x5.png",
+      "finishedPlateSha256": "954d51dc3a58939155e9751cc5da9f7a47a07646be3efcb7b0d485d00aaa30b3",
+      "finish": {
+        "status": "approved",
+        "executor": "bytedance/seedream/v5/pro/edit",
+        "delta": "improve material integration, atmospheric depth and micro-detail only",
+        "input_policy": "clean plate only; no final copy, logo, CTA or legal"
+      },
+      "editableSource": "work/layout-compiler/editable/4x5-layout-source.svg",
+      "vectorOverlay": "work/layout-compiler/editable/4x5-overlay.svg",
+      "underlay": "work/layout-compiler/editable/4x5-underlay.png",
+      "output": "delivery/layout-compiler/high-frequency-layout-design-4x5-v1.jpg",
+      "width": 1080,
+      "height": 1350,
+      "format": "jpeg",
+      "colourspace": "srgb",
+      "bytes": 393694,
+      "sha256": "61bae6b5e48f1fd6bbe682ca4f53612cc10bd32ebaac3cde969802e4586c5957",
+      "logoSha256": "f221fc925c15cddad307a81362a0ec948e1b850fc6679a49a1bc88bad2eb6b3f",
+      "exactCopy": {
+        "kicker": "PRODUCCIÓN CREATIVA · SISTEMA 01",
+        "headline": [
+          "ALTA FRECUENCIA.",
+          "ALTO ESTÁNDAR."
+        ],
+        "support": "Producción creativa a escala, sin bajar el nivel.",
+        "url": "efeoncepro.com"
+      },
+      "copyField": {
+        "x": 0.063,
+        "y": 0.18,
+        "width": 0.61,
+        "height": 0.33
+      },
+      "contentBounds": {
+        "left": 70,
+        "top": 62,
+        "right": 708.086,
+        "bottom": 1268
+      },
+      "safeBounds": {
+        "left": 54,
+        "top": 54,
+        "right": 1036.8,
+        "bottom": 1296
+      },
+      "contrast": {
+        "foregroundP95": 17.15,
+        "accentP95": 12.84
+      },
+      "baselineComparison": {
+        "output": "delivery/layout-design/high-frequency-layout-design-4x5-v1.jpg",
+        "maxNormalizedMae": 0.002,
+        "normalizedMae": 0.001155,
+        "maxChannelDelta": 17
+      },
+      "assertions": {
+        "dimensions": true,
+        "format": true,
+        "srgb": true,
+        "maxBytes": true,
+        "finishApproved": true,
+        "inputPolicyClean": true,
+        "contentInSafeZone": true,
+        "foregroundContrastP95": true,
+        "accentContrastP95": true,
+        "baselineWithinTolerance": true
+      },
+      "pass": true
+    },
+    {
+      "id": "9x16",
+      "ratio": "9:16",
+      "anchorId": "high-frequency-anchor-v1",
+      "anchorRevision": 1,
+      "topology": {
+        "kind": "star",
+        "derivationParent": "anchor"
+      },
+      "brandMode": "branded",
+      "channelMode": "digital-static",
+      "sourcePlate": "work/plates/high-frequency-plate-9x16-source.png",
+      "sourcePlateSha256": "4a48f2871a3976b63b08f2703b9bf50424ede2b91f058c6236c102c3b8623dda",
+      "finishedPlate": "work/layout-design/finished/high-frequency-layout-finish-9x16.png",
+      "finishedPlateSha256": "454ef8bee726f574c25ae31186dab42f96819f52a989e68d72c083f218326fa7",
+      "finish": {
+        "status": "approved",
+        "executor": "bytedance/seedream/v5/pro/edit",
+        "delta": "improve material integration, atmospheric depth and micro-detail only",
+        "input_policy": "clean plate only; no final copy, logo, CTA or legal"
+      },
+      "editableSource": "work/layout-compiler/editable/9x16-layout-source.svg",
+      "vectorOverlay": "work/layout-compiler/editable/9x16-overlay.svg",
+      "underlay": "work/layout-compiler/editable/9x16-underlay.png",
+      "output": "delivery/layout-compiler/high-frequency-layout-design-9x16-v1.jpg",
+      "width": 1080,
+      "height": 1920,
+      "format": "jpeg",
+      "colourspace": "srgb",
+      "bytes": 567628,
+      "sha256": "39bf12701a7b55ce5d5045a623c30e2cac3cc9e182ea13215f5491a34a3c127f",
+      "logoSha256": "f221fc925c15cddad307a81362a0ec948e1b850fc6679a49a1bc88bad2eb6b3f",
+      "exactCopy": {
+        "kicker": "PRODUCCIÓN CREATIVA · SISTEMA 01",
+        "headline": [
+          "ALTA FRECUENCIA.",
+          "ALTO ESTÁNDAR."
+        ],
+        "support": "Producción creativa a escala, sin bajar el nivel.",
+        "url": "efeoncepro.com"
+      },
+      "copyField": {
+        "x": 0.065,
+        "y": 0.2,
+        "width": 0.58,
+        "height": 0.3
+      },
+      "contentBounds": {
+        "left": 72,
+        "top": 235,
+        "right": 738.499,
+        "bottom": 1492
+      },
+      "safeBounds": {
+        "left": 64.8,
+        "top": 230.39999999999998,
+        "right": 1026,
+        "bottom": 1536
+      },
+      "contrast": {
+        "foregroundP95": 17.72,
+        "accentP95": 13.26
+      },
+      "baselineComparison": {
+        "output": "delivery/layout-design/high-frequency-layout-design-9x16-v1.jpg",
+        "maxNormalizedMae": 0.002,
+        "normalizedMae": 0.001113,
+        "maxChannelDelta": 14
+      },
+      "assertions": {
+        "dimensions": true,
+        "format": true,
+        "srgb": true,
+        "maxBytes": true,
+        "finishApproved": true,
+        "inputPolicyClean": true,
+        "contentInSafeZone": true,
+        "foregroundContrastP95": true,
+        "accentContrastP95": true,
+        "baselineWithinTolerance": true
+      },
+      "pass": true
+    }
+  ]
+}

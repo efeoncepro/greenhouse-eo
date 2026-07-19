@@ -54,7 +54,7 @@ EJE B — PLATAFORMAS / BACKBONES  ("con qué operas por dentro" + "qué más ve
   • Runtime Greenhouse    PG + BQ, modelo canónico 360, Nexa, entitlements
   • Kortex                CRM / datos comercial (peer system + producto vendible)
   • Verk                  analítica (producto)
-  • Efeonce Creative Studio (nombre de trabajo)  producción creativa agentic: UI + MCP,
+  • Efeonce Globe / Creative Studio  producción creativa agentic: UI + MCP,
        assets/runs/review/créditos; peer runtime, no módulo Greenhouse
   • Pipelines             Notion↔BQ, HubSpot↔BQ, ops-worker
 ```
@@ -105,7 +105,7 @@ EJE B — PLATAFORMAS / BACKBONES  ("con qué operas por dentro" + "qué más ve
   pipeline) y (b) producto vendible del portfolio. Peer system: Greenhouse lo
   **observa y le pide comandos gobernados**, no lo absorbe (contrato sister
   platforms + reader/command adapter, TASK-1162/1164).
-- **Efeonce Creative Studio vive en el eje B**, no como una página nueva de
+- **Efeonce Globe / Creative Studio vive en el eje B**, no como una página nueva de
   Greenhouse ni como una sub-marca pública por defecto. Es la capability creativa
   agentic de Efeonce: sus surfaces humanas, MCP y agentes consumen un mismo
   contrato; Greenhouse puede converger entregables aprobados por integración, pero

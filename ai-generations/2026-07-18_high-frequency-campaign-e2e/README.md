@@ -10,6 +10,8 @@ Se produjo una campaña visual completa para comunicar **producción creativa a 
 - 1 anchor desarrollado con Seedream 5 Pro;
 - 3 source plates derivados directamente del anchor con GPT Image 2;
 - 3 masters adicionales del piloto **Layout Design & Finishing** (`16:9`, `4:5`, `9:16`), con Seedream Pro sólo sobre placas limpias y composición final determinística;
+- 1 contrato **Campaign Layout Compiler V1** que recompila esos tres masters, sus SVGs editables, manifests,
+  contact sheet y QA sin nuevas llamadas de modelo;
 - 3 mensajes × 6 formatos = **18 piezas still de campaña**;
 - 12 masters digitales + 6 proofs de producción A2/OOH;
 - 2 hero motion de 15 s + 2 masters de 10 s + 2 bumpers de 6 s, en 9:16 y 16:9;
@@ -25,6 +27,8 @@ Se produjo una campaña visual completa para comunicar **producción creativa a 
 - costo generativo del release: **USD 2.965**, al precio publicado el 2026-07-18.
 - costo generativo incremental de los dos heroes: **USD 0**; reutilizan masters/stills aprobados;
 - costo incremental del piloto layout-design: **USD 0.27**, fuera del ZIP V3 y de su costo de release histórico;
+- replay del compiler: **USD 0** de inferencia, QA `3/3` y MAE normalizado máximo `0.001155` contra los masters
+  layout-design previos;
 - paquete inmutable V3: SHA-256 `13a84dbbffd9be389c2304fbc5360c3410cd5d91b2a45e5b14ae372e2322d24b`.
 
 ## Dirección seleccionada
@@ -42,6 +46,14 @@ Se produjo una campaña visual completa para comunicar **producción creativa a 
 - [Scorecard layout-design](./qa/layout-design-pilot-scorecard.md)
 - [QA técnica layout-design](./qa/layout-design-pilot-technical.json)
 - [Auditoría de release layout-design](./qa/layout-design-pilot-release-audit.md)
+- [Contrato ejecutable del layout compiler](./brief/layout-compiler-v1.yaml)
+- [Plan portable del compiler](./manifests/14-layout-compiler-plan.json)
+- [Composition manifest del compiler](./manifests/15-layout-compiler-composition.json)
+- [Fuentes SVG editables](./work/layout-compiler/editable/)
+- [Contact sheet del compiler](./review/layout-compiler-contact-sheet.jpg)
+- [QA técnica del compiler](./qa/layout-compiler-technical.json)
+- [Auditoría de release del compiler](./qa/layout-compiler-release-audit.md)
+- [Contrato técnico del compiler](../../docs/architecture/GREENHOUSE_CAMPAIGN_LAYOUT_COMPILER_V1.md)
 - [Método operativo canónico](../../docs/operations/GREENHOUSE_MULTIMODAL_CAMPAIGN_PRODUCTION_V1.md#5a-layout-design--finishing-para-sets-estáticos)
 - [Manual reusable](../../docs/manual-de-uso/ai-tooling/producir-layout-design-y-finishing.md)
 - [Secuencia del master motion 10 s · 9:16](./review/motion-master-9x16-contact-sheet.jpg)
@@ -63,6 +75,16 @@ Se produjo una campaña visual completa para comunicar **producción creativa a 
 - [Scorecard visual](./qa/key-visual-scorecard.md)
 - [Métricas y costo](./qa/run-metrics.json)
 - [Flujo profesional reproducible](./workflow.md)
+
+## Archivo remoto de binarios
+
+Los binarios de esta corrida no forman parte del bundle de Greenhouse. El archivo privado canónico contiene
+84 objetos (`148861636` bytes) bajo
+`gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/`.
+[`artifacts.remote.json`](./artifacts.remote.json) registra para cada archivo su ruta relativa, tamaño, SHA-256
+y `gsUri`; los contratos, manifests, QA, scripts y SVG editables permanecen versionados en Git. Para rearchivar
+o verificar una restauración, usar el flujo documentado en
+[`docs/operations/web-media-delivery-tooling.md`](../../docs/operations/web-media-delivery-tooling.md).
 
 ## Arquitectura de producción
 
@@ -114,11 +136,23 @@ pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs \
 
 node ai-generations/2026-07-18_high-frequency-campaign-e2e/scripts/12-compose-layout-design-pilot.mjs
 node ai-generations/2026-07-18_high-frequency-campaign-e2e/scripts/13-qa-layout-design-pilot.mjs
+
+pnpm creative:layout -- \
+  --contract ai-generations/2026-07-18_high-frequency-campaign-e2e/brief/layout-compiler-v1.yaml \
+  --mode plan
+pnpm creative:layout -- \
+  --contract ai-generations/2026-07-18_high-frequency-campaign-e2e/brief/layout-compiler-v1.yaml \
+  --mode compile
+pnpm creative:layout -- \
+  --contract ai-generations/2026-07-18_high-frequency-campaign-e2e/brief/layout-compiler-v1.yaml \
+  --mode check
 ```
 
 Los scripts generativos `01`, `02`, `03`, `06` y `07` consumen presupuesto; `06` es sólo el probe histórico.
 `04`, `05`, `08`, `09`, `10`, `12` y `13` son determinísticos y pueden repetirse sin costo de modelo.
 `11` consume presupuesto sólo para el acabado generativo de las tres placas limpias.
+`creative:layout` reutiliza esos finishes aprobados; sus tres modos son determinísticos y no consumen presupuesto
+de modelo.
 
 El fallback de motion previsto era Seedance reference-to-video si Omni no preservaba identidad espacial,
 anatomía o continuidad. No se invocó: los dos clean masters Omni pasaron el gate temporal y el hero se

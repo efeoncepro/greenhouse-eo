@@ -77,10 +77,19 @@ pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (
 - Si se exigen cards, gráficos, ejes, microcopy, cifras o logos exactos, detener la generación y usar SVG o
   composición determinística. Una portada puede seguir siendo un problema vectorial.
 
-- **Engine verdict (bake-off 2026-07-05):** for identity + logo fidelity on an edit, `gpt-image-2` (this CLI, our OpenAI key, zero third-party credits) wins. `nano_banana_pro` (Higgsfield) is a strong plan B (slightly better face/expression, costs credits). Do NOT use text-to-image or "character" models (e.g. Soul) for consistency — they treat the reference as inspiration and drift to a different subject + mangled logo.
+- **Engine verdict (bake-off 2026-07-05):** for identity + logo fidelity on an edit, `gpt-image-2` (this CLI,
+  direct OpenAI route) wins. `nano_banana_pro` (Higgsfield) is a strong plan B (slightly better
+  face/expression, with separate vendor usage). Do NOT use text-to-image or "character" models (e.g. Soul) for
+  consistency — they treat the reference as inspiration and drift to a different subject + mangled logo.
 - **Prompt = identity-lock scaffold + one small delta.** Fix everything (face, hair, outfit, the exact logo, framing, lighting) and change ONLY the requested pose/expression. Big deltas break consistency; small deltas hold it. Anchor every variant to the SAME canonical reference, not to a previous generation.
 - **No engine keeps a logo pixel-exact** (~90% redraw). If the mark must be exact, mask its region and re-stamp the real vector (e.g. `public/branding/SVG/isotipo-efeonce-negativo.svg`) by composition. With `gpt-image-2` the logo is faithful enough that this is optional.
-- **Background:** `gpt-image-2` returns opaque. `pnpm ai:image:rmbg` cuts it to transparent with **AI matting** (soft, professional hair edges) — a color-key/flood-fill leaves "bitten" edges + white halos in hair and must not be used for character assets. Free/local matting; do not spend Higgsfield/Magnific credits on this. Engine = `@imgly/background-removal-node` (model `medium` default; `small` for speed — `large` is NOT bundled in v1.4.5). Its native deps (`onnxruntime-node` + a nested `sharp`) are approved via `pnpm.onlyBuiltDependencies` in `package.json`, so a plain `pnpm install` builds them; first run has a few-seconds model warm-up.
+- **Background:** `gpt-image-2` returns opaque. `pnpm ai:image:rmbg` cuts it to transparent with **AI matting**
+  (soft, professional hair edges) — a color-key/flood-fill leaves "bitten" edges + white halos in hair and must
+  not be used for character assets. Local deterministic matting: do not route it through a metered generative
+  workbench. Engine = `@imgly/background-removal-node` (model `medium` default; `small` for speed — `large` is
+  NOT bundled in v1.4.5). Its native deps (`onnxruntime-node` + a nested `sharp`) are approved via
+  `pnpm.onlyBuiltDependencies` in `package.json`, so a plain `pnpm install` builds them; first run has a
+  few-seconds model warm-up.
 - **Human-review every variant against the anchor** for identity drift before keeping it.
 - **Log durable generations in `ai-generations/`** (repo, not `.captures/`): one subfolder per run named `YYYY-MM-DD_<semantic>/` with `README.md` (verbatim prompts) + `manifest.json`, plus a row in `ai-generations/INDEX.md`. Worked example: `ai-generations/2026-07-05_nexa-fallback-characters/` — the 3D Nexa character (`public/images/illustrations/characters/greenhouse-*.png`) posed per fallback `kind`.
 
@@ -101,7 +110,9 @@ pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (
   become the next anchor without explicit human promotion.
 - For layout-designed static sets, the model receives only a clean ratio plate. Build the layout contract first,
   use Seedream Pro for material/light/atmosphere or GPT Image 2 for geometry/protected repair, then compose
-  final copy, logo, CTA and legal deterministically. Never send the composed ad back through a model.
+  final copy, logo, CTA and legal deterministically. After approving the finish, use `pnpm creative:layout` for
+  reproducible composition/QA when the contract fits V1. The compiler never calls a provider. Never send the
+  composed ad back through a model.
 - Use `generateAnimation()` for small SVG/CSS animations, not raster image generation.
 - Use the native chat image tool only for exploratory artifacts or when the user asks for an image in chat rather than a repo asset.
 
@@ -126,7 +137,9 @@ Fal.ai is a programmatic media-generation aggregator — one API fronts many mod
 
 - **Out-of-band, NOT runtime** (same rule as Higgsfield): generate here + upload via the canonical uploader; never wire fal into a product runtime flow (runtime image path stays `src/lib/ai/image-generator.ts`).
 - **Video is the headline** — for video art direction / model choice use `motion-design-studio`; audio → `audio-studio`; model/aesthetic pick → `design-studio`. THIS skill covers still-image asset craft.
-- **Pricing is per-second, public on each model page** (verify at fal.ai/models first): e.g. Seedance 2.0 Standard ~$0.3024/s, Fast ~$0.2419/s, Mini 480p ~$0.0721/s. Audio included free.
+- **Provider pricing is volatile and internal to routing.** Verify the exact endpoint/model pricing at execution
+  time and persist an evidence snapshot; never convert a vendor price directly into customer-facing Studio
+  Credits or copy a point-in-time vendor price into a commercial offer.
 - **Full model & capability catalog** (13 categories, verified slugs): `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md`.
 
 ### Seedream 5 still-image routing (verified 2026-07-18)
@@ -173,7 +186,8 @@ Do not publish `1 credit = money`, vendor→credit conversion, per-piece tables 
    engine; load `../design-studio/modules/11_PRODUCT_STORY_SCENES.md` for product/editorial scenes.
 4. Load the shared guide for professional prompt recipes, finish playbooks, and quality gate.
 5. Write a prompt with explicit asset intent, subject, composition, style, material, lighting, palette, background, constraints, and output target.
-6. Generate through the canonical helper for repo-bound assets.
+6. For a Creative Studio run, obtain the governed estimate/reservation/approval; then generate through the
+   canonical capability route. For a repo-bound Greenhouse asset outside Globe, use the canonical helper.
 7. Critique the result like production design: small-size readability, crop, alpha edge, material believability, brand fit, and integration fit.
 8. Refine with single-change follow-ups; restate invariants on every edit. In multi-model flows,
    carry `anchor_id`, parent asset, reference roles, precedence, locks, one delta, safe zones and

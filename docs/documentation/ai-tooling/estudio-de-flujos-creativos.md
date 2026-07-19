@@ -7,6 +7,7 @@
 > **Estado:** Visión funcional de la plataforma hermana agentic; no está construida. La propuesta histórica de ubicarla en Greenhouse quedó superseded.
 > **Documentación técnica vigente:** [Efeonce Creative Studio — Agentic Platform Architecture V1](../../architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md). La [ADR Creative Flow Studio](../../architecture/GREENHOUSE_CREATIVE_FLOW_STUDIO_DECISION_V1.md) se conserva como referencia de diseño DAG, ya superseded como runtime.
 > **Investigación activa:** [RESEARCH-009 — Creative Operations y workflows agentic](../../research/RESEARCH-009-creative-operations-agentic-workflows.md) separa evidencia de mercado de decisiones de producto.
+> **Portafolio enterprise vigente:** [modelos, providers y gates](../../architecture/EFEONCE_CREATIVE_STUDIO_ENTERPRISE_MODEL_PORTFOLIO_V1.md); el [registry JSON](../../architecture/EFEONCE_CREATIVE_STUDIO_CAPABILITY_REGISTRY_V1.json) es inventario de research, no allowlist ejecutable.
 
 ## Que es
 
@@ -82,6 +83,22 @@ Tiene tres capas, y es importante entender que son distintas:
 3. **El runner (lo que no ves).** Cuando una persona autorizada aprueba ejecutar, el motor recorre la receta en orden. Como generar video o audio tarda minutos, trabaja en segundo plano, conserva el avance y avisa cuando hay candidato o revisión pendiente.
 
 Una idea clave: **la receta no genera nada por sí misma.** Creative Studio coordina adapters de generación, edición y composición mediante su runner separado; conserva assets, derechos, gasto, lineage y review. Greenhouse puede recibir proyecciones o entregables aprobados, pero no hospeda ese runtime ni sus créditos.
+
+## Cómo elige herramientas sin convertirse en un catálogo infinito
+
+El Studio pide una capacidad —por ejemplo `image.edit`, `video.reference` o `post.upscale`— y el router propone
+una ruta exacta. Google se consume directamente en Google Cloud; GPT Image, directo en OpenAI; Fal agrega sólo
+modelos no-Google allowlisted. Que un modelo sea “core” expresa prioridad, no permiso: toda ruta nueva queda
+`research_verified` hasta probar adapter, calidad, carga, derechos, retención y recuperación.
+
+En imagen Google se diseñan tres carriles: Gemini 3.1 Flash Lite para escala, Gemini 3.1 Flash como core y
+Gemini 3 Pro para acabado premium. Seedream, FLUX, Ideogram, Recraft, Bria y Topaz cubren operaciones distintas;
+no se intercambian silenciosamente. Gemini 2.5 queda como fallback temporal hasta su retiro y Imagen 4 no entra
+en trabajo nuevo. Seedance 2.5 permanece bloqueado mientras Fal no publique un endpoint oficial verificable.
+
+Un agente puede consultar capabilities, salud y estimate, preparar el plan y pedir aprobación. Para gastar recibe
+un token de un solo uso ligado al plan, inputs, ruta, región, cantidad y costo máximo. Aprobar una ruta, un delivery
+o publicar sigue siendo una decisión humana/policy. Así la paridad agentic no elimina segregación de funciones.
 
 ## Como se estructura una receta por dentro
 

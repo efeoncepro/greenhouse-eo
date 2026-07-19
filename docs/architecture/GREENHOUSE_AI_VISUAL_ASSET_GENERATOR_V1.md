@@ -10,7 +10,14 @@
 
 ## Purpose
 
-Define el contrato, arquitectura y reglas del **AI Visual Asset Generator** — un modulo interno de toolchain que permite al agente AI generar assets visuales on-demand durante el desarrollo de interfaces: imagenes rasterizadas (banners, ilustraciones, fondos) via **Imagen 4** o **OpenAI GPT Image** y animaciones SVG con CSS keyframes via **Gemini**.
+> **P0 runtime drift — 2026-07-19:** el helper Greenhouse aún referencia `imagen-4.0-generate-001`, retirado
+> del camino recomendado por Google. No usar esa ruta para trabajo nuevo. Migrar correctamente requiere un
+> provider Gemini Image basado en `generateContent`, smoke tests y golden bake-off; no es un cambio de ID sobre
+> `generateImages`. Este helper es tooling Greenhouse, no el runtime de Efeonce Creative Studio.
+
+Define el contrato, arquitectura y reglas del **AI Visual Asset Generator** — un módulo interno de toolchain
+para generar assets visuales on-demand durante el desarrollo de interfaces. GPT Image sigue disponible; la ruta
+Imagen legacy queda bloqueada hasta implementar el adapter Gemini Image correcto.
 
 No es un feature para usuarios finales. Es infraestructura de productividad del agente.
 
@@ -41,7 +48,7 @@ git add + commit → asset servido por Vercel CDN
 
 | Canal | Motor | Modelo | Output | Uso |
 |-------|-------|--------|--------|-----|
-| Imagenes rasterizadas default | Imagen 4 | `imagen-4.0-generate-001` (configurable via `IMAGEN_MODEL`) | PNG/WebP | Banners, ilustraciones, fondos, thumbnails |
+| Imágenes rasterizadas legacy | Imagen 4 | `imagen-4.0-generate-001` — **deprecated/bloqueado para trabajo nuevo** | PNG/WebP | Migrar a provider Gemini Image `generateContent`; no sustituir sólo el ID |
 | Imagenes rasterizadas opt-in | OpenAI GPT Image | `gpt-image-2` (configurable via `OPENAI_IMAGE_MODEL`) | PNG/WebP/JPEG | Assets de mayor fidelidad, composicion y adherencia a prompts |
 | Imagenes PNG transparentes | OpenAI GPT Image | `gpt-image-1.5` fallback automatico cuando `background='transparent'` | PNG transparente | Batches de assets recortables, stickers, overlays, iconografia raster |
 | Animaciones SVG | Gemini | Resuelto via `resolveNexaModel()` | SVG con CSS keyframes | Loading spinners, iconos animados, empty states, micro-interacciones |
@@ -263,7 +270,12 @@ Zero dependencias nuevas.
 
 ### Fal.ai — agregador de generación media (imagen/video/audio) — desde 2026-07-06
 
-**Qué es:** Fal.ai es un **agregador de generación media por API** — una sola API frontea muchos modelos: **video** (Seedance 2.0 std/fast/mini + reference, Kling v3 pro/standard, PixVerse V6, Grok Imagine, Google Gemini Omni Flash; y las familias establecidas Veo, Runway, Luma Ray, Minimax Hailuo, Alibaba Wan, Hunyuan, LTX, Vidu, Pika), **imagen** (flux, krea), **audio** y **3D**. Patrón de queue: submit → poll status → fetch result. Auth `Authorization: Key <key_id>:<key_secret>`. No hay endpoint de "listar modelos": el catálogo vive en `https://fal.ai/models` (verificar el slug exacto en la página del modelo antes de llamar).
+**Qué es:** Fal.ai es un **agregador de generación media por API** con más de 1.000 Model APIs para modelos
+no-Google y utilidades. En el policy vigente, Gemini, Veo, Omni, Lyria, TTS/STT y Translation de Google se
+consumen directamente por Google Cloud/Vertex, nunca por Fal. Fal ofrece Model Search API
+(`GET https://api.fal.ai/v1/models`) con estado, OpenAPI y `enterprise_status`; un resultado de búsqueda no es
+una allowlist. Queue: submit → status/result o webhook → cancel/recovery; el adapter Studio productivo es
+separado de este helper Greenhouse.
 
 **Cliente canónico:** `src/lib/ai/fal.ts` (scaffold 2026-07-06, hermano de `openai-image.ts`/`anthropic.ts`/`perplexity.ts`). Expone `isFalConfigured()` y `runFalModel({ model, input, pollTimeoutMs?, pollIntervalMs? })` — **model-agnostic** (pasás el slug fal, ej. `bytedance/seedance-2.0/mini/image-to-video`, + el input de ese modelo), hace **submit+poll a COMPLETED** y **NO lanza en HTTP-not-ok** (devuelve `ok:false` con `errorDetail` saneado, espejo de `runPerplexitySearch`).
 

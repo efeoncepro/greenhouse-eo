@@ -1,0 +1,55 @@
+{
+  "schema": "campaign-layout-qa.v1",
+  "checkedAt": "2026-07-19T11:53:15.874Z",
+  "campaignId": "high-frequency-layout-design",
+  "manifest": "manifests/15-layout-compiler-composition.json",
+  "humanRelease": "approved",
+  "pass": true,
+  "checks": [
+    {
+      "id": "16x9",
+      "output": "delivery/layout-compiler/high-frequency-layout-design-16x9-v1.jpg",
+      "assertions": {
+        "rendererAssertions": true,
+        "dimensions": true,
+        "format": true,
+        "srgb": true,
+        "exactCopyInVectorSource": true,
+        "outputHash": true,
+        "logoHash": true,
+        "editableSourcePresent": true
+      },
+      "pass": true
+    },
+    {
+      "id": "4x5",
+      "output": "delivery/layout-compiler/high-frequency-layout-design-4x5-v1.jpg",
+      "assertions": {
+        "rendererAssertions": true,
+        "dimensions": true,
+        "format": true,
+        "srgb": true,
+        "exactCopyInVectorSource": true,
+        "outputHash": true,
+        "logoHash": true,
+        "editableSourcePresent": true
+      },
+      "pass": true
+    },
+    {
+      "id": "9x16",
+      "output": "delivery/layout-compiler/high-frequency-layout-design-9x16-v1.jpg",
+      "assertions": {
+        "rendererAssertions": true,
+        "dimensions": true,
+        "format": true,
+        "srgb": true,
+        "exactCopyInVectorSource": true,
+        "outputHash": true,
+        "logoHash": true,
+        "editableSourcePresent": true
+      },
+      "pass": true
+    }
+  ]
+}

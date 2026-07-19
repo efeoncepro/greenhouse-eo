@@ -91,7 +91,7 @@ Reglas obligatorias:
 
 - `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md` — el ledger en archivo es un **workaround declarado**: temporal, reversible, con dueño y condición de retiro.
 - `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md` — `EPIC-027`: la task **no** crea `apps/*` ni `packages/*`.
-- `docs/epics/to-do/EPIC-028-efeonce-creative-studio-agentic-platform.md` — el hogar futuro del licenciamiento.
+- `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md` — el hogar futuro del licenciamiento.
 - `docs/tasks/complete/TASK-1410-aeo-article-xray.md` — el primer consumer, y de dónde salen las tres bug classes.
 
 ## Dependencies & Impact

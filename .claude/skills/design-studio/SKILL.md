@@ -8,7 +8,7 @@ description: >-
   jerarquía/color/contraste, tipografía como imagen, Key Visual systems, dirección
   de arte y mood, tendencias visuales vigentes, craft de imagen IA por herramienta),
   y (2) capacidad de ejecución (audita KV con rúbrica, arma brief/mood, elige la
-  herramienta o secuencia de herramientas — Seedream 5 Lite/Pro / GPT Image 2 /
+  herramienta o secuencia de herramientas desde un portafolio enterprise gobernado — Seedream 5 Lite/Pro / GPT Image 2 /
   Nano Banana / Midjourney / Ideogram / Firefly / Flux / Higgsfield / Magnific —,
   produce/dirige y hace handoff humano), cerrando el loop
   idear→dirigir→producir→auditar→iterar. COMPLEMENTARIA pero DISTINTA de
@@ -44,7 +44,7 @@ argument-hint: "[tarea o pregunta — ej: 'audita este key visual', 'diseña una
 
 > **Qué es esto.** Una skill de **dos manos**: **(1) conocimiento experto** de diseño
 > gráfico y dirección de arte al estado del arte 2026 — los fundamentos que no caducan
-> *y* las tendencias del año — y **(2) un estudio de ejecución** que audita, dirige,
+> _y_ las tendencias del año — y **(2) un estudio de ejecución** que audita, dirige,
 > produce y hace handoff. No es un banco de imágenes ni un botón de "generá una imagen":
 > es el **director de arte** que decide el concepto, el sistema visual y qué mano lo hace.
 
@@ -115,21 +115,22 @@ argument-hint: "[tarea o pregunta — ej: 'audita este key visual', 'diseña una
 
 ## 3. Módulos (carga selectiva)
 
-| # | Módulo | Cárgalo cuando… |
-|---|---|---|
-| 01 | `modules/01_VISUAL_FUNDAMENTALS.md` | composición, grilla, gestalt, jerarquía, foco, contraste |
-| 02 | `modules/02_COLOR_SYSTEMS.md` | paleta, duotono, gradiente, armonía, contraste/a11y en imagen |
-| 03 | `modules/03_TYPE_IN_IMAGE.md` | tipografía como elemento visual, lockups, headline art |
-| 04 | `modules/04_KEY_VISUAL_SYSTEMS.md` | qué es un KV, master→derivados, sistema de campaña, escalabilidad |
-| 05 | `modules/05_KEY_VISUAL_AUDIT.md` | auditar un KV/visual con rúbrica puntuada |
-| 06 | `modules/06_ART_DIRECTION_MOOD.md` | mood boards, referencias, dirección foto vs ilustración, brief→visual |
-| 07 | `modules/07_TRENDS_2026.md` | aplicar tendencias visuales vigentes sin caer en gimmick |
-| 08 | `modules/08_AI_IMAGE_CRAFT.md` | prompt para diseño + selección por herramienta + edición/upscale |
-| 09 | `modules/09_PRODUCTION_STUDIO.md` | orquestar generadores + handoff humano + iteración |
-| 10 | `modules/10_FORMATS_DELIVERY.md` | specs de entregable, formatos, safe zones, empaquetado |
-| 11 | `modules/11_PRODUCT_STORY_SCENES.md` | portadas/heroes con producto o analítica, auditoría forense de referencias, anti-referencias y SVG determinístico |
-| 12 | `modules/12_HYBRID_IMAGE_CAMPAIGN_PRODUCTION.md` | campañas Seedream↔GPT→Gemini Omni, still+motion, digital+print/OOH, brand modes, anchors y routing por operación |
-| 13 | `modules/13_LAYOUT_DESIGN_AND_FINISHING.md` | control compositivo por ratio, capas operativas, finish Seedream/GPT, mastering y QA premium |
+| #   | Módulo                                           | Cárgalo cuando…                                                                                                   |
+| --- | ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| 01  | `modules/01_VISUAL_FUNDAMENTALS.md`              | composición, grilla, gestalt, jerarquía, foco, contraste                                                          |
+| 02  | `modules/02_COLOR_SYSTEMS.md`                    | paleta, duotono, gradiente, armonía, contraste/a11y en imagen                                                     |
+| 03  | `modules/03_TYPE_IN_IMAGE.md`                    | tipografía como elemento visual, lockups, headline art                                                            |
+| 04  | `modules/04_KEY_VISUAL_SYSTEMS.md`               | qué es un KV, master→derivados, sistema de campaña, escalabilidad                                                 |
+| 05  | `modules/05_KEY_VISUAL_AUDIT.md`                 | auditar un KV/visual con rúbrica puntuada                                                                         |
+| 06  | `modules/06_ART_DIRECTION_MOOD.md`               | mood boards, referencias, dirección foto vs ilustración, brief→visual                                             |
+| 07  | `modules/07_TRENDS_2026.md`                      | aplicar tendencias visuales vigentes sin caer en gimmick                                                          |
+| 08  | `modules/08_AI_IMAGE_CRAFT.md`                   | prompt para diseño + selección por herramienta + edición/upscale                                                  |
+| 09  | `modules/09_PRODUCTION_STUDIO.md`                | orquestar generadores + handoff humano + iteración                                                                |
+| 10  | `modules/10_FORMATS_DELIVERY.md`                 | specs de entregable, formatos, safe zones, empaquetado                                                            |
+| 11  | `modules/11_PRODUCT_STORY_SCENES.md`             | portadas/heroes con producto o analítica, auditoría forense de referencias, anti-referencias y SVG determinístico |
+| 12  | `modules/12_HYBRID_IMAGE_CAMPAIGN_PRODUCTION.md` | campañas Seedream↔GPT→Gemini Omni, still+motion, digital+print/OOH, brand modes, anchors y routing por operación |
+| 13  | `modules/13_LAYOUT_DESIGN_AND_FINISHING.md`      | control compositivo por ratio, capas operativas, finish Seedream/GPT, mastering y QA premium                      |
+| 14  | `modules/14_ENTERPRISE_CREATIVE_MODEL_ROUTING.md`| selección/incorporación de modelos, Google→GCP, escala enterprise, estados y routing agentic                       |
 
 ## 4. La mano de ejecución (por qué es "studio")
 
@@ -144,7 +145,8 @@ Cierra el loop **idear → dirigir → producir → auditar → iterar** (detall
   **campaña híbrida Seedream/GPT/Gemini Omni →** cargar `modules/12_HYBRID_IMAGE_CAMPAIGN_PRODUCTION.md` y
   relevar por contrato `brand/channel→diverge→develop→anchor→organize→extend→animate→compose/post→prepress→release`;
   **set estático premium con layout controlado →** cargar `modules/13_LAYOUT_DESIGN_AND_FINISHING.md`, completar
-  `templates/layout-design-contract.yaml` y usar `anchor→layout→clean plate→finish→compose→master→QA`;
+  `templates/layout-design-contract.yaml`, ejecutar `pnpm creative:layout` después del finish aprobado y usar
+  `anchor→layout→clean plate→finish→compose→master→QA`;
   **infografía editorial exacta →** SVG determinístico + delivery SVG directo o raster según el método
   canónico de `content-marketing-studio`.
 - **Escena editorial de producto:** separar siempre la **gramática agnóstica** —jerarquía, gráficos,
@@ -213,7 +215,9 @@ Cada apuesta con su volatilidad en `SOURCES.md`:
 - `modules/12_HYBRID_IMAGE_CAMPAIGN_PRODUCTION.md` — factory de campañas multi-modelo y multi-canal,
   contratos de relevo, brand/channel modes, anchor gate y routing Seedream 5 ↔ GPT Image 2 → Gemini Omni.
 - `modules/13_LAYOUT_DESIGN_AND_FINISHING.md` — composición nativa por ratio, capas con autoridad explícita,
-  routing de finish y cierre determinístico premium.
+  routing de finish, Campaign Layout Compiler V1 y cierre determinístico premium.
+- `modules/14_ENTERPRISE_CREATIVE_MODEL_ROUTING.md` — portafolio enterprise, registry machine-readable,
+  provider sovereignty, promotion gates y route proposals operables por agentes.
 - `efeonce/` — overlay: `EFEONCE_OVERLAY.md`, `STUDIO_TOOLING.md`, `DESIGN_BOUNDARY.md`,
   `CLIENT_DELIVERY.md`.
 - `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md` — contrato económico

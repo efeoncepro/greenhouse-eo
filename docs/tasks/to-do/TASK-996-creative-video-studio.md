@@ -1,6 +1,6 @@
 # TASK-996 — Greenhouse Creative Video Studio *(superseded historical proposal)*
 
-> **No ejecutar en `greenhouse-eo`.** Desde 2026-07-11 esta task queda superseded como ubicación de runtime por [EPIC-028 — Efeonce Creative Studio](../../epics/to-do/EPIC-028-efeonce-creative-studio-agentic-platform.md). Conserva el piloto HyperFrames como evidencia; la implementación debe nacer en el repositorio separado y bajo la nueva arquitectura agentic/UI+MCP.
+> **No ejecutar en `greenhouse-eo`.** Desde 2026-07-11 esta task queda superseded como ubicación de runtime por [EPIC-028 — Efeonce Globe](../../epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md). Conserva el piloto HyperFrames como evidencia; la implementación debe nacer en el repositorio separado y bajo la nueva arquitectura agentic/UI+MCP.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE

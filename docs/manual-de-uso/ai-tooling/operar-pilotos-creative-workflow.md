@@ -21,7 +21,9 @@ Este manual permite a un operador o agente ejecutar un piloto creativo de imagen
 
 Si GPT duplica un sujeto para representar movimiento, declarar “exactamente un cuerpo, una cabeza y una cola; sólo las alas repiten fases desde un hombro común”. Si una corrección de escala se sobrepasa, usar límites duros de margen o porcentaje máximo, no “aproximadamente”. Si Seedream altera estructura, reducir la región editable y volver al último anchor aprobado.
 
-Para transferir una salida local de GPT a Fal, usar upload temporal `fal-cdn-v3`; no hacer público un bucket GCS ni ampliar permisos. La URL es efímera y no se registra en el manifest.
+Para transferir una salida local de GPT a Fal, usar upload temporal con ACL restrictiva; no hacer público un
+bucket GCS ni ampliar permisos. Registrar hash/lineage sin persistir tokens de URL y traer el output de inmediato
+al storage privado. `X-Fal-Store-IO: 0` reduce retención del payload, pero no vuelve privado un archivo CDN.
 
 Los referentes ejecutados son la intro Glitch `El micrófono se abre` y la campaña multimodal
 `ai-generations/2026-07-18_high-frequency-campaign-e2e/`. El primero prueba continuidad física/practical;
@@ -55,6 +57,22 @@ el segundo prueba familia de campaña, format wall, mezcla y release creativo si
 5. Elegir la mano mediante el gate `el master ya contiene la toma/física` vs `falta una toma, ángulo o continuidad física`; no decidir por canal ni precio aislado. Ver [Selección de motor por contrato de fidelidad](../../../.codex/skills/motion-design-studio/workflows/engine-selection-by-fidelity-contract.md).
 6. Si se usará Omni/Vertex, autenticar ambos caminos de Google Cloud: gcloud auth login y gcloud auth application-default login. Si se usará Fal, comprobar saldo y credencial en Secret Manager sin exponerla.
 7. Ejecutar primero el modo plan. Ningún plan debe llamar al proveedor.
+
+### Preflight enterprise del provider
+
+1. Resolver una `capability` estable y una `route_id` exacta desde el registry; nunca entregar endpoint + JSON
+   arbitrario a un agente. El registry de research no ejecuta por sí solo.
+2. Confirmar `readiness=production_approved`, schema hash, owner, fecha de revisión, región, licencia, asset
+   classification allowlist, retención, fallback y evidencia de eval. Si falta uno, detener.
+3. Google nativo va directo a Google Cloud/Vertex; no seleccionar su réplica Fal.
+4. Obtener pricing/usage vivo y guardar snapshot, moneda/FX, TTL y supuestos. Estimar costo fully-loaded por
+   candidato aprobado, no un precio hardcodeado por request/segundo.
+5. Pedir un approval token single-use ligado a plan hash, actor, workspace, route, hashes de inputs, cantidad,
+   resolución/duración, región, costo máximo, fallbacks, policy revision y expiración.
+6. Verificar privacidad con la matriz `classification × provider × endpoint × region × retention × territory`.
+   Material restringido, biométrico, M&A, regulado o no publicado falla cerrado.
+7. El runner debe usar submission fence/outbox/idempotencia, lease/heartbeat, reconciliación, DLQ y recuperación
+   de reservas huérfanas. Si no puede probar que un retry no duplica gasto, no reintentar automáticamente.
 
 ### Exploración no es producción
 

@@ -80,6 +80,25 @@ detener la generación.
 7. Masterizar por destino: color, contraste, tamaño, compresión, naming y package.
 8. Ejecutar QA técnico y revisión humana del set completo.
 
+## Campaign Layout Compiler V1
+
+Después de aprobar los finishes, convertir el contrato en outputs reproducibles con:
+
+```bash
+pnpm creative:layout -- --contract <contract.yaml> --mode plan
+pnpm creative:layout -- --contract <contract.yaml> --mode compile
+pnpm creative:layout -- --contract <contract.yaml> --mode check
+```
+
+- `plan` valida schema, inputs, hashes y checkpoints sin exigir que todo esté aprobado;
+- `compile` bloquea anchor/layout/finish pendientes o rechazados y genera SVGs editables, masters, manifests,
+  contact sheet y QA;
+- `check` revalida outputs y hashes sin recomponer.
+
+El compiler nunca llama a un modelo. No reemplaza el finish ni el juicio de arte; automatiza la zona que debe ser
+exacta. Mantener `human_release: pending` hasta revisar el set completo y usar `baseline` al migrar masters
+aprobados. Contrato técnico: `docs/architecture/GREENHOUSE_CAMPAIGN_LAYOUT_COMPILER_V1.md`.
+
 ## Gates
 
 - **Anchor:** tesis, sujeto, anatomía/producto, paleta y hook aprobados.
@@ -126,3 +145,4 @@ Evidencia: `ai-generations/2026-07-18_high-frequency-campaign-e2e/brief/layout-d
 - [ ] Copy, logo, CTA, legal y locale son determinísticos.
 - [ ] El set pasa thumbnail, tamaño real, contraste, crop/destino y QA técnico.
 - [ ] La aprobación humana distingue `creative release` de activación en medios.
+- [ ] `pnpm creative:layout ... --mode check` pasa y los manifests son portables.

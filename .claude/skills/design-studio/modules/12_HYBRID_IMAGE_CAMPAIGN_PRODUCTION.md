@@ -48,7 +48,7 @@ print proof ◀── approved anchor ──┼──▶ 4:5 / 9:16 / 16:9 / 3:1
 | Organize | GPT Image 2 | Estructura, safe zones y disciplina compositiva |
 | Extend | GPT Image 2 | Recomponer ratios desde el mismo anchor |
 | Repair | Pro semántico o GPT + máscara | Art direction regional o cirugía protegida |
-| Animate | Gemini Omni Flash | Convertir un clean plate en video corto y editarlo por conversación |
+| Animate | Gemini Omni Flash vía Vertex (canary) | Convertir un clean plate en video corto y editarlo por conversación |
 | Compose | Diseño determinístico | Tipo, marca, CTA, precio, legal y locale |
 | Prepress | Humano + vendor spec | ICC, bleed, trim, sustrato y lectura OOH |
 | Release | Humano + QA | Validar destino, provenance, peso, motion y sistema |
@@ -70,10 +70,10 @@ su brand book. Logo, CTA, legal, captions y end card se añaden determinísticam
 
 ## Gemini Omni Flash: relevo still → motion
 
-- Es video, no otro generador de stills. Endpoint Fal preferido para un anchor limpio:
-  `google/gemini-omni-flash/image-to-video`; existen también `/reference-to-video` y `/edit`.
-- Contrato verificado: preview, 720p, 3–10 s, 16:9/9:16 y audio nativo. Pinned model Google:
-  `gemini-omni-flash-preview`.
+- Es video, no otro generador de stills. Se consume **directo en Google Cloud/Vertex**, nunca mediante Fal.
+  Modelo: `gemini-omni-flash-preview`, `global`.
+- Contrato verificado: preview, 720p, máximo 10 s, 16:9/9:16, reference-to-video, edición y audio nativo.
+  Es `canary`: no puede ser la única ruta de una entrega con SLA.
 - Entregar un plate sin logo/copy, declarar `FIRST_FRAME`/referencia, cámara, acción, audio, locks y una sola
   transformación. En edición usar un delta simple + `Keep everything else the same`.
 - Auditar primer/medio/último frame, anatomía temporal, clones, flicker, texto accidental, audio, poster frame

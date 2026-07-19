@@ -1,15 +1,29 @@
 # Greenhouse — Fal.ai Model & Capability Catalog V1
 
 > **Tipo:** Referencia técnica agent-facing · **Version:** 1.0 · **Creado:** 2026-07-06 por Claude
-> **Ultima verificacion parcial:** 2026-07-18 — Seedream 5.0 Lite/Pro y GPT Image 2
+> **Estado:** inventario histórico de discovery Greenhouse; no es allowlist productivo de Creative Studio.
+> **Última verificación parcial:** 2026-07-19.
+> **Fuente vigente de incorporación:** [Efeonce Creative Studio Enterprise Model Portfolio V1](EFEONCE_CREATIVE_STUDIO_ENTERPRISE_MODEL_PORTFOLIO_V1.md)
+> y su [Capability Registry](EFEONCE_CREATIVE_STUDIO_CAPABILITY_REGISTRY_V1.json).
 > **Contrato/acceso:** [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md) → §Fal.ai
 > **Cliente canónico:** [`src/lib/ai/fal.ts`](../../src/lib/ai/fal.ts) (`runFalModel`)
 
 ## Propósito
 
+Fal publica más de 1.000 Model APIs, pero amplitud de catálogo no equivale a capacidad aprobada. Este documento
+sirve para discovery y para encontrar familias; el portafolio del Studio decide qué endpoints se evalúan y
+promueven.
+
+**Política 2026-07-19:** todos los modelos nativos Google se manejan directo por Google Cloud/Vertex AI. Las
+filas Google que permanezcan aquí prueban que Fal las lista, no autorizan su uso. Fal se reserva para modelos
+no-Google y utilidades allowlisted.
+
 Catálogo de **capacidades y modelos** disponibles en Greenhouse a través de **Fal.ai** — un agregador que frontea, bajo una sola API, cientos de modelos de generación de **imagen, video, audio, 3D, LLM y training**. Este doc es exhaustivo **a nivel de capacidad** (cubre todas las familias/categorías que Fal.ai expone) y **representativo-verificado a nivel de modelo** (slugs concretos verificados el 2026-07-06).
 
-> ⚠️ **El catálogo de Fal.ai es GRANDE (600+ modelos) y VOLÁTIL** (versiones nuevas/deprecaciones cada semana). Fal.ai **no tiene endpoint de "listar modelos"**. La **verdad live** es la web `https://fal.ai/models` (filtrable por categoría / búsqueda) y la página de cada modelo (`https://fal.ai/models/<slug>`), que trae el **input schema exacto + pricing**. **SIEMPRE verificar el slug + schema + precio en la página del modelo antes de llamar** — este doc lista los slugs que existían el 2026-07-06, no una verdad congelada.
+> ⚠️ **El catálogo de Fal es GRANDE (1.000+ Model APIs) y VOLÁTIL.** Discovery programático usa
+> `GET https://api.fal.ai/v1/models`, que expone búsqueda, estado, OpenAPI y `enterprise_status`; pricing se
+> consulta por la API oficial. La ficha del modelo sigue siendo evidencia complementaria. Verificar slug,
+> operación, schema, enterprise status, licencia y precio antes de incorporar; este inventario no es allowlist.
 
 ### Cómo llamar cualquier modelo (patrón único)
 
@@ -27,7 +41,8 @@ const res = await runFalModel<{ images?: Array<{ url: string }> }>({
 
 - **Model-agnostic:** cambiar de capacidad = cambiar el `slug` + el `input`. El cliente hace submit → poll → result (queue API).
 - **Secreto** server-side vía `FAL_API_KEY_SECRET_REF=greenhouse-fal-api-key` (GCP Secret Manager). NUNCA hardcodear la key.
-- **Out-of-band, NO runtime del producto:** generar acá + subir el asset por el uploader canónico. El runtime de imagen del producto sigue siendo `src/lib/ai/image-generator.ts` (OpenAI/Imagen).
+- **Out-of-band, NO runtime del producto:** el cliente Greenhouse es un puente de laboratorio. El runtime
+  productivo futuro pertenece al repositorio separado de Creative Studio.
 - **Gotcha queue URLs:** para slugs con sub-path (`fal-ai/flux/schnell`), Fal.ai devuelve `status_url`/`response_url` en el **app padre** (`fal-ai/flux/requests/...`). `runFalModel` ya usa esas URLs; nunca reconstruirlas a mano (da HTTP 405).
 - **Dirección de arte:** video → skill `motion-design-studio`; audio → `audio-studio`; elección de modelo/estética → `design-studio`; still images de UI/marca → `greenhouse-ai-image-generator`.
 
@@ -38,7 +53,7 @@ Fal.ai cobra **por uso**, con la unidad según la modalidad (siempre confirmar e
 | Modalidad | Unidad típica | Ejemplo verificado |
 |---|---|---|
 | Imagen | por imagen / por megapíxel | FLUX schnell ~US$0.003/img |
-| Video | por segundo | Seedance 2.0 Std ~US$0.3024/s · Veo 3 ~US$0.20–0.40/s · Veo 3 Fast ~US$0.10–0.15/s |
+| Video | por segundo | Seedance 2.0 observado 2026-07-19: ~US$0.3034/s 720p con audio; Fast ~US$0.2419/s. Precio volátil: consultar API |
 | Audio (TTS) | por carácter / por segundo | según proveedor |
 | 3D | por generación | Hunyuan3D ~US$0.16 · TripoSR ~US$0.07 |
 | Training (LoRA) | por run de entrenamiento | según modelo base |

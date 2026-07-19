@@ -77,17 +77,22 @@
 > pendientes y mantiene el release humano independiente. High Frequency se recompiló en `16:9`, `4:5` y
 > `9:16` sin inferencia nueva: tests `2/2`, QA `3/3`, fidelity MAE `0,001096–0,001155` bajo `0,002`, contact sheet
 > inspeccionado. Canon: `docs/architecture/GREENHOUSE_CAMPAIGN_LAYOUT_COMPILER_V1.md`; contrato de prueba:
-> `ai-generations/2026-07-18_high-frequency-campaign-e2e/brief/layout-compiler-v1.yaml`. No hay rollout,
-> secrets, IAM, deploy ni media activation pendientes. Cambios locales aún sin commit al cerrar esta entrada.
+> `ai-generations/2026-07-18_high-frequency-campaign-e2e/brief/layout-compiler-v1.yaml`. Los 84 binarios de la
+> corrida (`148861636` bytes) están archivados en el bucket privado canónico y referenciados por
+> `artifacts.remote.json`; Git conserva contratos, manifests, QA, scripts y SVG editables. No hay rollout,
+> secrets, IAM, deploy ni media activation pendientes. La unidad queda cerrada en commit local, sin push.
 >
-> En la misma línea de Creative Studio se consolidó un portfolio enterprise y un registry machine-readable de
+> En la misma línea de **Efeonce Globe / Creative Studio** se consolidó un portfolio enterprise y un registry machine-readable de
 > research. Google nativo queda directo GCP; Fal sólo no-Google exacto/allowlisted; OpenAI directo; finishing
 > determinístico. Gemini Image se divide en Flash Lite/Flash/Pro; Imagen 4 está deprecado y el helper actual
 > `src/lib/ai/image-generator.ts` conserva un P0 de migración que no se resolvió aquí porque el runtime del Studio
 > debe nacer fuera de Greenhouse. Seedance 2.5 sigue bloqueado/no verificado. Todas las routes permanecen
 > `research_verified`: no hay adapter, secrets, provisioning, bake-off/load test ni autorización de gasto.
-> Próximo paso: bootstrap de EPIC-028 y promoción adapter → eval → production approval con approval token,
-> privacy/rights matrix, submission fence, private ingest y DR. Sin commit/push en esta pasada.
+> **Bootstrap ejecutado 2026-07-19:** existe el repositorio privado `efeoncepro/efeonce-globe` y el único proyecto
+> GCP inicial `efeonce-globe` (billing + APIs base). El monorepo foundation compila y prueba domain contracts,
+> provider boundary, artifact manifest, run gates, runner y media hash. No existen workloads, DB, buckets,
+> service accounts de aplicación, secretos ni gasto de providers. Próximo paso: registrar las tasks en Globe y
+> cerrar IaC/state + WIF + presupuesto antes de aprovisionar el primer vertical slice.
 
 ## Sesión 2026-07-18 — Campaña E2E “Alta frecuencia” (creative release completo)
 
