@@ -28,6 +28,15 @@ El router es un default informado, no una ley. Revisar cada salida contra el bri
 
 ## Contratos confirmados
 
+> **Regla dura de slug ByteDance (reverificado en vivo 2026-07-19, end-to-end con hash real):** los slugs de
+> Seedream van **SIN** el prefijo `fal-ai/` — `bytedance/seedream/v5/{pro,lite}/{text-to-image,edit}`. Con
+> `fal-ai/bytedance/...` el submit responde 200 pero el *result* da **404** (`Path /... not found`) con
+> `inference_time` ≈ 0.02s y no genera nada. FLUX, Recraft, GPT Image y Topaz **sí** llevan `fal-ai/`.
+>
+> **Método barato para verificar un slug (sin gastar):** `POST {}` (body vacío) a `https://fal.run/<slug>` →
+> **404** = la app no existe · **422** = la app existe (falló la validación de input por falta de campos).
+> Confirmar el slug así antes de generar.
+
 ### Seedream 5 Lite en fal.ai
 
 Endpoints:

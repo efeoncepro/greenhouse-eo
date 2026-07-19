@@ -1,9 +1,9 @@
 # Efeonce Globe — Model Lab (banco de pruebas de capacidades creativas)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-19 por Claude (TASK-1457)
-> **Ultima actualizacion:** 2026-07-19 por Claude
+> **Ultima actualizacion:** 2026-07-19 por Claude (TASK-1486/1487/1488/1459 — proveedores reales)
 > **Documentacion tecnica:** [`efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md`](../../../../efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md) (repo hermano; nombre canónico previsto)
 
 ## De qué se trata este documento
@@ -29,18 +29,18 @@ Lo que garantiza, y por qué conecta con la disciplina de Greenhouse:
 - **"Candidato listo" ≠ "aprobado".** Que un intento produzca un resultado técnico no significa que alguien lo revisó ni lo autorizó. La aprobación es un paso humano aparte.
 - **Cada quién ve solo lo suyo.** Los experimentos están acotados al espacio de trabajo; pedir uno ajeno responde "no encontrado", sin revelar si existe en otra parte.
 
-> **Estado real de hoy — importante:** el Model Lab **todavía no genera** imágenes, videos ni audio. Corre con un **proveedor de ensayo** (simulador) que **no toca la red y no gasta nada**. El proveedor real llega después, sobre la infraestructura de `TASK-1464` (ya aplicada) y las tareas que le siguen. Lo que ya funciona y quedó probado es **todo el mecanismo**: preparar con tope, ingesta por huella, estimar, frenar, reservar, correr, saldar y dejar evidencia.
+> **Estado real de hoy — importante:** ya hay **proveedores reales conectados** al Model Lab (Vertex + Fal + Composite) y las **10 capacidades quedaron verificadas en vivo** el 2026-07-19. Pero el **runtime desplegado sigue en modo `fake`** (proveedor de ensayo determinístico: cero red, cero gasto) por defecto: el proveedor real se elige con un interruptor (`GLOBE_LAB_PROVIDER`) y encender el canary facturable en continuo sigue **detrás de gates humanos**. El mecanismo (preparar con tope, ingesta por huella, estimar, frenar, reservar, correr, saldar, dejar evidencia) es el mismo de siempre — los proveedores se enchufaron sin tocarlo. Qué proveedores/modelos hay, cómo se elige uno y qué es la matriz de recomendación: [Proveedores del Model Lab](efeonce-globe-model-lab-providers.md).
 
 ## Cómo lo gobierna Greenhouse
 
 - **Greenhouse es el único control plane operativo:** registra `TASK-###`, dependencias, lifecycle, hooks, lint, QA, cierre documental y handoff — aunque el código viva en `efeonce-globe`. Esta capacidad se implementó bajo `TASK-1457`, gobernada por `EPIC-028`.
 - **Globe conserva el runtime y la evidencia técnica.** Los experimentos, los manifiestos por intento, el spend fence y el proveedor viven en Globe. Greenhouse consume, cuando corresponde, proyecciones/eventos/deep links versionados; nunca su base de datos, su bucket ni sus secretos.
 - **Todo es interno.** No hay producción ni clientes; el Lab nace apagado y se enciende solo para el piloto interno.
-- **Estado:** implementado sobre el Contract Spine de `TASK-1481`. El **primer proveedor real** queda pendiente hasta que la infraestructura (`TASK-1464`, ya viva) y la política de soberanía de proveedores habiliten un adapter real.
+- **Estado:** implementado sobre el Contract Spine de `TASK-1481`. Los **proveedores reales ya existen** — `VertexCreativeAdapter` (`TASK-1486`), `FalCreativeAdapter` + `CompositeProviderAdapter` (`TASK-1487`) y las 10 capacidades (`TASK-1488`) — todos verificados en vivo; quedan **code-complete con rollout detrás de gates humanos** (el runtime desplegado corre en `fake` por defecto).
 
 ## Qué NO hace todavía
 
-El Model Lab **no genera** piezas reales: corre con el proveedor de ensayo, apagado por defecto, sin clientes ni producción. El registro contable de créditos comerciales (durable, a prueba de pérdidas) es una capacidad aparte, aún pendiente — el spend fence de hoy es un **freno de seguridad** en memoria, no ese registro.
+Con el interruptor en `fake` (el default del runtime desplegado) el Model Lab **no genera** piezas reales, sin clientes ni producción. Con `vertex`/`fal`/`composite` sí genera y gasta — por eso encender el canary facturable en continuo sigue **detrás de gates humanos**. Además, las 4 capacidades que necesitan un archivo de entrada (editar imagen, upscalear imagen/video, extender video) tienen su ruta verificada pero su corrida de punta a punta **espera la resolución de huella→bytes** desde el bucket privado. Y el registro contable de créditos comerciales (durable, a prueba de pérdidas) es una capacidad aparte, aún pendiente — el spend fence de hoy es un **freno de seguridad** en memoria, no ese registro.
 
 > **Detalle técnico y operación (repo hermano `efeonce-globe`):**
 >
@@ -51,6 +51,7 @@ El Model Lab **no genera** piezas reales: corre con el proveedor de ensayo, apag
 >
 > **Gobierno en Greenhouse:**
 >
+> - Proveedores reales, modelos por capacidad y matriz de recomendación: [`Proveedores del Model Lab`](efeonce-globe-model-lab-providers.md).
 > - Camino central sobre el que se monta: [`Contrato de API (Contract Spine)`](efeonce-globe-api-contract-spine.md).
 > - ADR y arquitectura del programa: [`EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md`](../../architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md) + [`..._ARCHITECTURE_V1.md`](../../architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md).
 > - Programa: [`EPIC-028`](../../epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md) · task: `docs/tasks/**/TASK-1457-*.md`.

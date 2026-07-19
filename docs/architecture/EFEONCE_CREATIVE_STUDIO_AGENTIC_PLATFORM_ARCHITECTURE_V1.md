@@ -265,6 +265,24 @@ production_approved`). Ausencia de readiness explícito equivale a no ejecutable
 seleccionan una capability semántica estable y parámetros autorizados; el router resuelve una route candidate.
 Nunca reciben un tool genérico `run_endpoint(endpoint, arbitrary_json)`.
 
+> **Estado — stack de proveedores real implementado (2026-07-19, verificado en vivo).** El `ProviderAdapter` de esta
+> sección ya tiene implementaciones reales detrás del `creative-runner`, verificadas contra cuentas de proveedor en vivo.
+> `TASK-1486` entrega el `VertexCreativeAdapter` (Google-native por Vertex AI, **keyless** vía ADC/WIF). `TASK-1487`
+> agrega el `FalCreativeAdapter` (non-Google, queue API) y el `CompositeProviderAdapter`, que rutea entre Vertex y Fal por
+> `supports()` + política de proveedor (Google-native → Vertex; non-Google → Fal), materializando la Provider policy de
+> arriba. `TASK-1488` cierra 10 capabilities con modelos verificados en vivo (Seedream 5, Recraft, Topaz, Seedance, Seed
+> Audio, ElevenLabs, Rodin 3D; regla dura: los IDs de modelos ByteDance sin prefijo `fal-ai/`). `TASK-1459` convierte el
+> Still Model Lab en una **recommendation matrix** real (Vertex Nano Banana vs Fal Seedream comparados por
+> costo/latencia/objetivo) y corrige un bug de `route_stable`. Invariantes materializados: el ruteo capability→modelo vive
+> **dentro del adapter** (no en policy de dominio); `actualRoute` es la ruta del contrato de fidelidad, no el slug; keyless
+> para Google-native y keyed-con-secreto-propio para el resto, **nunca un secreto compartido Globe↔Greenhouse** (la key Fal
+> compartida del canary es excepción temporal); y la matrix compara motores objetivamente, pero **el harness nunca
+> auto-elige un ganador creativo** (craft = decisión humana; promover una ruta a producción sigue siendo un gate separado).
+> Pendientes: resolución hash→bytes (desbloquea input-bearing + motion/audio labs), key Fal propia de Globe, deploy de
+> `studio-web` y routing por contrato de fidelidad en el Composite. Spec canónica:
+> `efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md` (provider seam del Model Lab). Al trabajar sobre Globe,
+> invocar la skill `greenhouse-globe`.
+
 The Glitch intro becomes a canonical fixture: a practical `ON AIR` must be born in the scene, the finger performs a strike-and-rebound rather than a button press, and microphone foley must be evaluated as sound-of-contact. The router cannot silently replace this with an overlay or generic tap SFX. The RRSS micro-scenes are a different fixture: synthetic key visuals can be a flexible visual anchor and may route to a different video engine.
 
 ### Asset and rights policy

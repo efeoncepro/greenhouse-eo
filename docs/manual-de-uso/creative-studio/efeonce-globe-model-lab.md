@@ -1,9 +1,9 @@
 # Manual — Correr un experimento en el Model Lab de Efeonce Globe
 
 > **Tipo de documento:** Manual de uso / runbook (orientado al operador)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-19 por Claude (TASK-1457)
-> **Ultima actualizacion:** 2026-07-19 por Claude
+> **Ultima actualizacion:** 2026-07-19 por Claude (proveedores reales — TASK-1486/1487/1488)
 
 ## Para qué sirve
 
@@ -14,11 +14,12 @@ El **Model Lab** de Efeonce Globe (`TASK-1457`) es un banco de pruebas gobernado
 - **Dónde vive el código:** repo hermano `efeonce-globe` (por convención local `../efeonce-globe`). NO es parte del build de `greenhouse-eo`; tiene su propio toolchain (Node 24 nativo, `pnpm check` / `pnpm build`).
 - **Quién gobierna:** Greenhouse. El trabajo se hace bajo la `TASK-1457` de Greenhouse (control plane), gobernada por `EPIC-028`. No se crea un registry de tareas paralelo en Globe.
 - **Skill obligatoria:** invoca **`greenhouse-globe`** antes de tocar el repo de Globe. Encapsula el boundary, el flujo de extensión de capabilities y las reglas duras.
-- **Estado hoy:** el Model Lab corre con un **proveedor de ensayo** (simulador) que no toca la red ni gasta. El canary con proveedor real queda `rollout pendiente` (depende de la infra de `TASK-1464`, ya viva, y de la política de proveedores).
+- **Estado hoy:** el Model Lab **ya tiene proveedores reales** (TASK-1486/1487/1488). Por defecto sigue corriendo con el **proveedor de ensayo** (`fake`) — determinista, sin red, sin gasto — pero el operador puede seleccionar un motor real por la variable `GLOBE_LAB_PROVIDER` (`fake` | `vertex` | `fal` | `composite`). Cualquier motor que no sea `fake` **factura**. El detalle de cómo elegir motor, qué modelo sirve cada capacidad y cómo comparar motores en una eval vive en el manual hermano [**Operar los proveedores del Model Lab**](./efeonce-globe-model-lab-providers.md).
 
 ## Paso a paso (resumen — el detalle está en el runbook de Globe)
 
 1. **Habilita el Lab (nace apagado).** El interruptor de apagado está OFF por defecto: mientras esté OFF, cualquier comando de experimento responde `policy_blocked`. Para el piloto interno se enciende con la variable de entorno `GLOBE_LAB_ENABLED=true`; el tope diario por espacio de trabajo se fija con `GLOBE_LAB_DAILY_CAP_CREDITS` (default 500). El caller interno ya tiene la capability `globe.lab.experiment.run`.
+   - **Elige el motor** con `GLOBE_LAB_PROVIDER` (default `fake`). El kill switch (`GLOBE_LAB_ENABLED`) sigue mandando sobre si el experimento corre; `GLOBE_LAB_PROVIDER` solo decide **qué proveedor** ejecuta cuando sí corre. Motor y modelos: manual [Operar los proveedores del Model Lab](./efeonce-globe-model-lab-providers.md).
 2. **Preparar.** Declara la **capacidad semántica** (por ejemplo, "generar imagen"), la **ruta de referencia**, los **insumos autorizados** (solo `inputId` + huella `sha256` + tipo + derechos — nunca el archivo crudo) y el **tope de gasto duro** (`hardCapCredits`). Opcionalmente un `prompt`.
 3. **Ejecutar.** El sistema **estima → compara contra el tope → reserva → corre → salda**. Si la estimación supera el tope, aborta **antes de gastar** (`run_cap_exceeded`); si el espacio superó su tope diario, `day_cap_exceeded`; si el proveedor falla, libera la reserva y queda `failed`.
 4. **Ver evidencia.** Lee los **manifiestos por intento**: ruta propuesta vs real, costo estimado y real, huellas de insumos y de resultado, línea de origen.
@@ -51,6 +52,8 @@ El **runbook operativo completo** (habilitación con el flag, el flujo real por 
 
 ## Referencias técnicas
 
+- Operar los proveedores reales y comparar motores en una eval: [`efeonce-globe-model-lab-providers.md`](./efeonce-globe-model-lab-providers.md).
+- Evaluar un golden brief (Evaluation Harness): [`efeonce-globe-evaluation-harness.md`](./efeonce-globe-evaluation-harness.md).
 - Runbook operativo — correr un experimento paso a paso: [`efeonce-globe/docs/operations/EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md`](../../../../efeonce-globe/docs/operations/EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md) §7-bis.
 - Spec técnica canónica (nombre previsto): [`efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md`](../../../../efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md).
 - Documentación funcional (Greenhouse): [`docs/documentation/creative-studio/efeonce-globe-model-lab.md`](../../documentation/creative-studio/efeonce-globe-model-lab.md).

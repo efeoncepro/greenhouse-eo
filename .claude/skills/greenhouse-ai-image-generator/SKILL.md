@@ -55,7 +55,7 @@ pnpm ai:image --batch concepts.json         # [{ "filename": "a.png", "prompt": 
 
 - Wraps the canonical `generateOpenAIImage` (`src/lib/ai/openai-image.ts`). Self-contained: loads `.env.local`, resolves `OPENAI_API_KEY_SECRET_REF` server-side, never prints the secret.
 - Defaults: `gpt-image-2 · 1536x1024 · quality high · opaque · out-dir public/images/generated`. Timeout default **280s** (gpt-image-2 `high` exceeds the 125s of the runtime `generateImage` helper).
-- `--background transparent` falls back to `gpt-image-1.5` (gpt-image-2 has no alpha). Still **raster** (PNG) — for real vectors use Higgsfield + Recraft V4.1.
+- `--background transparent` falls back to `gpt-image-1.5` (gpt-image-2 has no alpha). Still **raster** (PNG) — for real vectors use Higgsfield + Recraft V4.1 (fal slug verified live 2026-07-19: `fal-ai/recraft/v4.1/text-to-vector`, text-driven, carries the `fal-ai/` prefix).
 - The CLI **operates** the model; THIS skill is the **art direction** (brief, composition, finish, palette, QA). Run the skill to write the prompt, then the CLI to generate, then critique + GVC if it lands in UI.
 - Keep exploratory concepts out of commits (gitignored dir, e.g. `.captures/concepts/`).
 
@@ -149,6 +149,13 @@ Fal.ai is a programmatic media-generation aggregator — one API fronts many mod
 - Pro endpoints: `bytedance/seedream/v5/pro/text-to-image` and
   `bytedance/seedream/v5/pro/edit`; use for expressive development, multireference material
   fusion and semantic regional art direction.
+- **ByteDance slugs carry NO `fal-ai/` prefix — hard rule (re-verified live 2026-07-19, end-to-end
+  with a real image hash):** the Seedream slugs above are correct as-is. With `fal-ai/bytedance/...`
+  the submit is accepted (200) but the **result 404s** (`Path /... not found`) with `inference_time`
+  ≈ 0.02s — nothing was generated. FLUX, Recraft, GPT Image, Topaz etc. **do** keep `fal-ai/`.
+- **Cheap slug check before generating (no spend):** `POST {}` (empty body) to `https://fal.run/<slug>`
+  → **404** = the app does not exist · **422** = the app exists (input validation failed). Confirm any
+  slug this way before a run.
 - Both edit endpoints accept ordered `image_urls`; assign every reference a role and conflict
   precedence. Pro's marketed region/layer comprehension still returns a flat raster and exposes
   no public mask/layer output contract.

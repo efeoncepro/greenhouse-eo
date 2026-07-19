@@ -31,6 +31,14 @@ con `FAL_API_KEY_SECRET_REF`. Verificar slug, schema y pricing en `fal.ai/models
 Catálogo: `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md`; contrato:
 `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`.
 
+**Slug verificado en vivo (2026-07-19).** Seedance 2.0 (ByteDance) va **SIN** el prefijo `fal-ai/` —
+`bytedance/seedance-2.0/text-to-video`. Con `fal-ai/bytedance/...` el submit responde 200 pero el *result*
+da **404** (`Path /... not found`, `inference_time` ≈ 0.02s) y no genera nada. **Content-policy del audio
+nativo:** Seedance 2.0 genera audio nativo que a veces cae en la policy del proveedor (un **422 en el
+*result*** = rechazo del proveedor, no error de input); con un prompt neutro completa limpio. **Método barato
+para chequear un slug sin gastar:** `POST {}` (body vacío) a `https://fal.run/<slug>` → **404** = la app no
+existe · **422** = la app existe (falló la validación de input por falta de campos).
+
 ## Fuentes base (as-of 2026-07)
 
 **Tendencias motion / animación 2026**

@@ -99,6 +99,24 @@ declared. **This is framework #10 (eval-driven AI design) as a Globe primitive:*
 a model route to production is a gate SEPARATE from running it in the Lab, and the evidence
 for that promotion is an evaluation report per fidelity contract.
 
+**The provider stack behind the runner is itself a pattern worth stealing (TASK-1486…1488, 1459).**
+A `CreativeProviderAdapter` is minted **per vendor** behind the `creative-runner`: `VertexCreativeAdapter`
+(TASK-1486, Google-native via Vertex, **keyless** through ADC/WIF, verified live) and `FalCreativeAdapter`
+(TASK-1487, non-Google, queue API), exposing capabilities verified against **live provider accounts, not marketing
+claims** (TASK-1488: Seedream 5 / Recraft / Topaz / Seedance / Seed Audio / ElevenLabs / Rodin 3D — with vendor
+quirks like ByteDance model IDs carrying no `fal-ai/` prefix). Two shape rules generalize to any provider design:
+(a) **capability→model routing lives INSIDE the adapter, never in domain policy** — a template/agent selects a stable
+semantic capability and the adapter resolves the concrete model + vendor quirk; and (b) `actualRoute` is the
+**fidelity-contract route, not the raw provider slug** (a `route_stable` bug fixed in TASK-1459). Secrets follow the
+sister-platform line: **keyless for Google-native (own project's ADC/WIF), keyed-with-its-own-secret for everything
+else — never a secret shared between Globe and Greenhouse** (the shared Fal canary key is a declared, temporary
+exception). The **`CompositeProviderAdapter`** (TASK-1487) is the router: it fans a capability across adapters by
+`supports()` + provider policy (Google-native → Vertex, non-Google → Fal). This is where **eval-driven design
+(framework #10) turns concrete for creative work**: the Still Model Lab **recommendation matrix** (TASK-1459) compares
+engines *objectively* — Vertex Nano Banana vs Fal Seedream by cost/latency/objective — yet craft stays a human call and
+**the harness never auto-elects a creative winner**; the matrix informs the human, it never promotes a route (route
+promotion to production stays the separate gate from framework #10 above).
+
 Flow: **decide the shape here → hand to `greenhouse-globe` for the Globe-specific
 structure → it hands back up if a new shape decision surfaces.** Canonical specs:
 `efeonce-globe/docs/architecture/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md` (SPEC-001) +

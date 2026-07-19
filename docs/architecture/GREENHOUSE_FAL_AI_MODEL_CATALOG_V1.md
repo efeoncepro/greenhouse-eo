@@ -44,7 +44,8 @@ const res = await runFalModel<{ images?: Array<{ url: string }> }>({
 - **Out-of-band, NO runtime del producto:** el cliente Greenhouse es un puente de laboratorio. El runtime
   productivo futuro pertenece al repositorio separado de Creative Studio.
 - **Gotcha queue URLs:** para slugs con sub-path (`fal-ai/flux/schnell`), Fal.ai devuelve `status_url`/`response_url` en el **app padre** (`fal-ai/flux/requests/...`). `runFalModel` ya usa esas URLs; nunca reconstruirlas a mano (da HTTP 405).
-- **⚠️ Gotcha prefijo ByteDance (verificado en vivo 2026-07-19):** los modelos **ByteDance** (Seedream, Seedance, Seed Audio) usan slug **SIN** el prefijo `fal-ai/` — `bytedance/seedream/v5/pro/text-to-image`, `bytedance/seedance-2.0/text-to-video`. Con el prefijo `fal-ai/bytedance/...` el submit se acepta (200) pero el **result da 404** (`Path /seedream/... not found`) y `inference_time` ≈ 0.02s (no generó nada). El resto de los proveedores (FLUX, Recraft, ElevenLabs, Topaz, Trellis, Hyper3D…) **sí** llevan `fal-ai/`. Fuente de verdad de slugs: las **skills** (tested), no este catálogo si difieren.
+- **⚠️ Gotcha prefijo ByteDance (verificado en vivo 2026-07-19):** los modelos **ByteDance** de imagen y video (Seedream, Seedance) usan slug **SIN** el prefijo `fal-ai/` — `bytedance/seedream/v5/pro/text-to-image`, `bytedance/seedance-2.0/text-to-video`. Con el prefijo `fal-ai/bytedance/...` el submit se acepta (200) pero el **result da 404** (`Path /seedream/... not found`) y `inference_time` ≈ 0.02s (no generó nada). El resto de los proveedores (FLUX, Recraft, ElevenLabs, Topaz, Trellis, Hyper3D…) **sí** llevan `fal-ai/`. **Excepción Seed Audio:** pese a ser ByteDance, **Seed Audio NO sigue esta regla** — vive en `fal-ai/seed-audio` (CON prefijo; `bytedance/seed-audio` da 404) y usa el campo `prompt` (ver §9). Fuente de verdad de slugs: las **skills** (tested), no este catálogo si difieren.
+- **🔬 Método barato para verificar un slug (verificado en vivo 2026-07-19, sin generar ni gastar):** `POST {}` (body vacío) a `https://fal.run/<slug>` → **404** = la app no existe · **422** = la app existe (falló la validación de input por falta de campos). Confirmá cualquier slug así antes de incorporarlo, sin correr una generación real.
 - **Dirección de arte:** video → skill `motion-design-studio`; audio → `audio-studio`; elección de modelo/estética → `design-studio`; still images de UI/marca → `greenhouse-ai-image-generator`.
 
 ### Modelo de pricing (resumen)
@@ -225,7 +226,7 @@ Edición, restyle, restauración, lipsync, upscale, reframe sobre video existent
 | Tarea | Modelo / Slug | Nota |
 |---|---|---|
 | Sound effects | ElevenLabs Sound Effects `fal-ai/elevenlabs/sound-effects` 🔎 | SFX desde texto |
-| Música generativa | Stable Audio 🔎 · CassetteAI 🔎 · Lyria (Google) 🔎 · MiniMax Music 🔎 · Seed Audio (ByteDance) 🔎 | verificar slug + licencia |
+| Música generativa | Stable Audio 🔎 · CassetteAI 🔎 · Lyria (Google) 🔎 · MiniMax Music 🔎 · Seed Audio (ByteDance) `fal-ai/seed-audio` ✅ (usa `prompt`; **CON** prefijo `fal-ai/`, verificado en vivo 2026-07-19) | verificar slug + licencia |
 | Audio para video | MMAudio `fal-ai/mmaudio-v2` 🔎 | genera audio sincronizado a un video |
 
 ## 10. Speech-to-Text / audio-to-audio
