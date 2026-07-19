@@ -71,8 +71,11 @@
   ElevenLabs speech, Seedance 2.0. **Regla dura descubierta:** modelos **ByteDance** en Fal usan slug **sin** prefijo
   `fal-ai/` (con prefijo el submit pasa pero el result da 404) — la skill lo tenía bien, el catálogo doc mal (corregido).
   Canary Fal en vivo por el seam con la **key Fal existente del repo** (excepción temporal; retiro = key propia de
-  Globe): Seedream 5 Pro, `candidate_ready`, `sha256:f9d9a216…`, fence liquidó. Slugs 🔎 (Seed Audio, Topaz) reverify;
-  inputs con bytes (edit/upscale/i2v) → `inputs_unavailable` hasta la resolución hash→bytes.
+  Globe): Seedream 5 Pro, `candidate_ready`, `sha256:f9d9a216…`, fence liquidó. **Los 10 modelos verificados en vivo:**
+  6 text-driven con hash real end-to-end (Seedream 5 Pro, Recraft v4.1, Seed Audio, ElevenLabs TTS, Rodin v2.5 3D,
+  Seedance 2.0) + 4 input-requiring con slug 422 (edit, Topaz image/video, Seedance i2v). Seed Audio vive en
+  `fal-ai/seed-audio` (usa `prompt`); poll budget 450s; 422 en result → `provider_failed`. Inputs con bytes
+  (edit/upscale/i2v) → `inputs_unavailable` hasta la resolución hash→bytes.
 - EPIC-028 avanza en tres carriles paralelos gobernados íntegramente por Greenhouse. `TASK-1456…1485` viven
   en `docs/tasks/to-do/`, pasan por hooks/lint/QA/handoff de este repo y pueden poseer paths de implementación
   en el repositorio hermano. Globe conserva sólo arquitectura, runtime y evidencia técnica; no tiene registry

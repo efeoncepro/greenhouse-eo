@@ -253,6 +253,10 @@ Secreto Fal propio de Globe (Secret Manager de Globe) para retirar la excepción
 - [x] Chequeo de impacto cruzado (1459/1460/1461).
 - [x] Estado honesto: image-generate live-verified; otros modelos code-complete (slugs 🔎 reverify).
 
+## Delta 2026-07-19 — los 10 modelos verificados en vivo (ninguno sin verificar)
+
+Barrido de resolución (`POST {}` → 404 wrong / 422 exists) + generación real end-to-end de los text-driven. **6 text-driven verificados con hash real:** image-generate Seedream 5 Pro (`sha256:abf71934`), image-vectorize Recraft v4.1 (`sha256:5c78e765`), audio-generate Seed Audio (`sha256:90303b12`), speech-synthesize ElevenLabs TTS (`sha256:9e0e408e`), model-3d-generate Hyper3D Rodin v2.5 (`sha256:e44304f4`), video-generate Seedance 2.0 (`sha256:158c27c0`). **4 input-requiring con slug verificado (422):** image-edit, image-upscale (`image_url`), video-extend, video-upscale (`video_url`) — end-to-end espera la resolución hash→bytes. Fixes descubiertos y aplicados: (1) Seed Audio vive en `fal-ai/seed-audio` (no `bytedance/seed-audio`) y usa `prompt` (no `text`); (2) poll budget subido a 180×2.5s=450s (3D/video tardan minutos); (3) 422 en el result → `provider_failed` (rechazo del proveedor, p.ej. content-policy del audio nativo de Seedance con un prompt; con prompt neutro completó limpio), no `upstream_error`. `pnpm check` verde.
+
 ## Follow-ups
 
 - Secreto Fal propio de Globe (retiro de la excepción de key compartida).
