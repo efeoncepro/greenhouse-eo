@@ -43,6 +43,7 @@ Medir operaciones generativas gobernadas y calibrar unit economics sin simular d
 
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` — principio heredado/adaptado por Globe.
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
 - `../efeonce-globe/docs/architecture/PLATFORM_FOUNDATION_V1.md`
 - `../efeonce-globe/docs/operations/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`
@@ -70,6 +71,7 @@ Medir operaciones generativas gobernadas y calibrar unit economics sin simular d
 - `../efeonce-globe/packages/database/`
 - `../efeonce-globe/packages/domain/`
 - `../efeonce-globe/packages/contracts/`
+- `../efeonce-globe/packages/sdk/`
 
 ## Current Repo State
 
@@ -105,9 +107,9 @@ Medir operaciones generativas gobernadas y calibrar unit economics sin simular d
 ### Contract surface
 
 - Contrato existente a respetar: `EPIC-028, arquitectura agentic de Globe y provider contracts versionados`
-- Contrato nuevo o modificado: `contratos descritos en Scope; nombres finales se fijan en Plan Mode antes de implementar`
+- Contrato nuevo o modificado: `estimate/reserve/settle/release/adjust commands and balance/history readers with immutable rate version`
 - Backward compatibility: `gated`
-- Full API parity: `la capacidad se implementa como command/reader server-side antes de cualquier consumer UI o agente`
+- Full API parity: `ledger writes/reads live in canonical primitives; UI/MCP/SDK never calculate or mutate balance locally`
 
 ### Data model and invariants
 
@@ -152,11 +154,13 @@ Medir operaciones generativas gobernadas y calibrar unit economics sin simular d
 
 ### Slice 1
 
-- Definir rate catalog versionado y estimate determinista.
+- Definir rate catalog versionado y estimate determinista que conserve capability/banda y la ruta
+  provider/modelo/version propuesta sin convertir esa ruta en la unidad económica del crédito.
 
 ### Slice 2
 
-- Persistir reserve, settle, release y adjustments append-only.
+- Persistir reserve, attempts, settle, release y adjustments append-only, incluyendo ruta realmente ejecutada
+  y fallback por attempt sin exponer costo vendor o margen en superficies cliente.
 
 ### Slice 3
 
@@ -213,6 +217,8 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 - [ ] Studio Credit no equivale a token, pieza, hora, moneda ni derecho.
 - [ ] Estimate conserva rate version y ruta propuesta.
 - [ ] Retry/fallback no duplica reserva ni settlement.
+- [ ] El ledger distingue ruta propuesta de ruta ejecutada y conserva fallback/model version por attempt.
+- [ ] API/SDK/conformance prueban estimate/reserve/replay/settle/release/history y doble-submit sin doble saldo.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
 - [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
 
@@ -233,4 +239,3 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Follow-ups
 
 - Las dependencias sucesoras se leen desde EPIC-028 y `docs/tasks/README.md`.
-

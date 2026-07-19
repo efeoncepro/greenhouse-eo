@@ -29,6 +29,10 @@
 
 Integrar y probar Veo, Seedance, Kling, PixVerse y Gemini Omni canary para motion profesional, continuidad, actuación, cámara, audio y extensión.
 
+Seedance se evalúa por ruta y versión verificables. A la fecha del diseño, `Seedance 2.5` permanece
+`blocked/unverified`: una landing, rollout de cuenta o wrapper comercial no equivale a endpoint público ni a
+model ID ejecutable. La task debe revalidar esa condición al comenzar y nunca degradar silenciosamente a 2.0.
+
 ## Why This Task Exists
 
 EPIC-028 exige que integración de modelos, plataforma gobernada y validación comercial avancen en paralelo, pero con gates distintos. Greenhouse gobierna esta task y su evidencia; Efeonce Globe posee el código, datos y runtime creativo.
@@ -43,6 +47,7 @@ Definir rutas de video promovibles por tipo de toma y riesgo creativo.
 
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` — principio heredado/adaptado por Globe.
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
 - `../efeonce-globe/docs/architecture/PLATFORM_FOUNDATION_V1.md`
 - `../efeonce-globe/docs/operations/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`
@@ -104,10 +109,10 @@ Definir rutas de video promovibles por tipo de toma y riesgo creativo.
 
 ### Contract surface
 
-- Contrato existente a respetar: `EPIC-028, arquitectura agentic de Globe y provider contracts versionados`
-- Contrato nuevo o modificado: `contratos descritos en Scope; nombres finales se fijan en Plan Mode antes de implementar`
+- Contrato existente a respetar: `TASK-1481 spine + TASK-1457 experiment commands/readers y provider contracts versionados`
+- Contrato nuevo o modificado: `async motion submit/status/result/cancel descriptors y typed artifact/attempt projections`
 - Backward compatibility: `gated`
-- Full API parity: `la capacidad se implementa como command/reader server-side antes de cualquier consumer UI o agente`
+- Full API parity: `motion routes usan el mismo experiment API/SDK y async command/reader; ningún transport llama al provider`
 
 ### Data model and invariants
 
@@ -152,7 +157,9 @@ Definir rutas de video promovibles por tipo de toma y riesgo creativo.
 
 ### Slice 1
 
-- Implementar adapters y capacidades motion versionadas.
+- Implementar adapters y capacidades motion versionadas detrás del canonical async experiment command sólo
+  para endpoints/model IDs oficiales o contractualmente verificables; registrar las rutas anunciadas pero no
+  ejecutables como `blocked`.
 
 ### Slice 2
 
@@ -161,12 +168,16 @@ Definir rutas de video promovibles por tipo de toma y riesgo creativo.
 ### Slice 3
 
 - Evaluar acción, anatomía, cámara, audio, latencia y costo.
+- Capturar provider/modelo/version propuestos y ejecutados por attempt; cualquier fallback, incluida una
+  sustitución 2.5→2.0, requiere nueva decisión explícita y evidencia separada.
 
 ## Out of Scope
 
 - Producción pública, clientes externos, pricing/wallet self-serve o permisos más amplios que los aprobados expresamente.
 - Mover runtime creativo, datos, provider secrets o lógica de Globe a Greenhouse.
 - Crear un segundo harness o namespace de tasks dentro de Globe.
+- Tratar páginas promocionales, acceso UI no reproducible o agregadores sin model ID/schema oficial como una
+  integración de Seedance 2.5.
 
 ## Detailed Spec
 
@@ -213,6 +224,11 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 - [ ] Cada video conserva source assets, modelo/version y parámetros.
 - [ ] La matriz distingue canary, lab-ready y production-candidate.
 - [ ] Fallos de seguridad, continuidad o audio bloquean promoción.
+- [ ] Seedance 2.5 permanece fail-closed mientras no exista ruta verificable; si aparece, la evidencia incluye
+  provider legal, model ID exacto, endpoint/schema, región, precio, derechos y metadata reproducible.
+- [ ] Ningún fallback cambia de modelo o versión silenciosamente.
+- [ ] Submit/status/result/cancel se prueban por API/SDK sobre el mismo primitive y audit; no hay provider SDK
+      directo desde CLI, UI, MCP, scripts ni E2E.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
 - [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
 
@@ -233,4 +249,3 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Follow-ups
 
 - Las dependencias sucesoras se leen desde EPIC-028 y `docs/tasks/README.md`.
-

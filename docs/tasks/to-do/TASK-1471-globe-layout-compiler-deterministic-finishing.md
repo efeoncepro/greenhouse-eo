@@ -43,6 +43,7 @@ Combinar riqueza generativa con control compositivo, tipográfico y de formatos.
 
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` — principio heredado/adaptado por Globe.
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
 - `../efeonce-globe/docs/architecture/PLATFORM_FOUNDATION_V1.md`
 - `../efeonce-globe/docs/operations/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`
@@ -105,9 +106,9 @@ Combinar riqueza generativa con control compositivo, tipográfico y de formatos.
 ### Contract surface
 
 - Contrato existente a respetar: `EPIC-028, arquitectura agentic de Globe y provider contracts versionados`
-- Contrato nuevo o modificado: `contratos descritos en Scope; nombres finales se fijan en Plan Mode antes de implementar`
+- Contrato nuevo o modificado: `template list/get/version readers; compile/render/export commands and composition/artifact schemas`
 - Backward compatibility: `gated`
-- Full API parity: `la capacidad se implementa como command/reader server-side antes de cualquier consumer UI o agente`
+- Full API parity: `layout/compiler business logic lives in commands; UI/SDK/MCP/runner consume the same resolved composition contract`
 
 ### Data model and invariants
 
@@ -213,6 +214,8 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 - [ ] Derivados comparten master/version y no se rediseñan independientemente.
 - [ ] Texto/logos críticos se componen determinísticamente cuando corresponda.
 - [ ] Export cumple dimensiones, bleed/safe zones, color profile y peso.
+- [ ] API/SDK/conformance generan el mismo resolved composition/artifact manifest; ningún consumer recompone
+      layouts o finishing localmente.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
 - [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
 
@@ -233,4 +236,3 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Follow-ups
 
 - Las dependencias sucesoras se leen desde EPIC-028 y `docs/tasks/README.md`.
-

@@ -20,7 +20,7 @@
 - Status real: `Diseño gobernado; implementación pendiente`
 - Rank: `TBD`
 - Domain: `creative|commercial|ops`
-- Blocked by: `TASK-1474, TASK-1476, TASK-1477, TASK-1478`
+- Blocked by: `TASK-1473, TASK-1474, TASK-1476, TASK-1477, TASK-1478`
 - Branch: `task/TASK-1479-globe-operating-mode-pilot-validation`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -58,7 +58,7 @@ Probar responsabilidades, calidad, soporte y escalamiento antes de habilitar ope
 
 ### Depends on
 
-- `TASK-1474`, `TASK-1476`, `TASK-1477`, `TASK-1478`.
+- `TASK-1473`, `TASK-1474`, `TASK-1476`, `TASK-1477`, `TASK-1478`.
 
 ### Blocks / Impacts
 
@@ -160,6 +160,8 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 - [ ] Cada modo usa el mismo run contract con assignments distintos.
 - [ ] Incidentes, rework, soporte y outcome quedan medidos.
 - [ ] Un piloto no habilita producción/clientes por defecto.
+- [ ] Cada modo prueba UI y al menos un consumer programático autorizado sobre el mismo command/audit, con
+      responsabilidades y denegaciones equivalentes.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
 - [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
 
@@ -180,4 +182,3 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Follow-ups
 
 - Las dependencias sucesoras se leen desde EPIC-028 y `docs/tasks/README.md`.
-

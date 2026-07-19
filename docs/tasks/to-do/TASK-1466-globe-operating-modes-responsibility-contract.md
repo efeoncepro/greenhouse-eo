@@ -15,7 +15,7 @@
 - Wireframe: `none`
 - Flow: `none`
 - Motion: `none`
-- Backend impact: `db`
+- Backend impact: `command`
 - Epic: `EPIC-028`
 - Status real: `Diseño gobernado; implementación pendiente`
 - Rank: `TBD`
@@ -43,6 +43,7 @@ Cambiar el modo operativo sin perder contexto ni elevar permisos implícitamente
 
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` — principio heredado/adaptado por Globe.
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
 - `../efeonce-globe/docs/architecture/PLATFORM_FOUNDATION_V1.md`
 - `../efeonce-globe/docs/operations/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`
@@ -97,7 +98,7 @@ Cambiar el modo operativo sin perder contexto ni elevar permisos implícitamente
 ### Backend/data brief
 
 - Backend rigor: `backend-standard`
-- Impacto principal: `db`
+- Impacto principal: `command`
 - Source of truth afectado: `Globe para runtime creativo; Greenhouse conserva sólo gobierno TASK/EPIC y proyecciones explícitas`
 - Consumidores afectados: `Globe UI, creative runner, SDK/MCP y Greenhouse sólo cuando exista contrato versionado`
 - Runtime target: `sibling-service`
@@ -105,9 +106,9 @@ Cambiar el modo operativo sin perder contexto ni elevar permisos implícitamente
 ### Contract surface
 
 - Contrato existente a respetar: `EPIC-028, arquitectura agentic de Globe y provider contracts versionados`
-- Contrato nuevo o modificado: `contratos descritos en Scope; nombres finales se fijan en Plan Mode antes de implementar`
+- Contrato nuevo o modificado: `assign/change responsibility commands and effective-responsibility readers, versioned by run/workspace`
 - Backward compatibility: `gated`
-- Full API parity: `la capacidad se implementa como command/reader server-side antes de cualquier consumer UI o agente`
+- Full API parity: `mode/responsibility writes use propose-confirm-execute capable commands; surfaces never infer authority locally`
 
 ### Data model and invariants
 
@@ -213,6 +214,8 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 - [ ] Cada run declara responsables y aprobadores por función.
 - [ ] Cambiar modo genera audit y no concede capability por sí mismo.
 - [ ] El contexto comercial se vincula sin convertirlo en pricing público.
+- [ ] API/SDK/conformance prueban assign/change/read, deny y replay sobre el mismo audit; ningún consumer cambia
+      modo o responsabilidades por DB/config directo.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
 - [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
 
@@ -233,4 +236,3 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Follow-ups
 
 - Las dependencias sucesoras se leen desde EPIC-028 y `docs/tasks/README.md`.
-

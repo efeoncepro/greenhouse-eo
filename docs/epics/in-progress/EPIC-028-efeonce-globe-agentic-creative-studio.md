@@ -29,6 +29,8 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
 
 - Existe un repositorio y runtime propios de Creative Studio con tenancy, assets, ledger, auditoría y workers aislados de Greenhouse.
 - Un operador o agente autorizado puede preparar, estimar, aprobar, ejecutar, revisar y ramificar una corrida mediante el mismo contract UI/MCP.
+- Cada capability nace con schema versionado, command/reader transport-neutral, trusted context, HTTP/SDK path,
+  coverage matrix y conformance tests; una surface puede estar `policy-blocked`, pero no quedar sin contrato.
 - El estimate y el historial del run hacen visible el provider/modelo/version propuesto y realmente ejecutado,
   incluyendo readiness, limitaciones y fallbacks, sin exponer secretos, costo vendor confidencial ni margen.
 - El mismo run soporta `client-operated`, `co-operated` y `efeonce-managed` mediante responsabilidades y entitlements explícitos; cambiar de modo conserva brief, assets, lineage, review y ledger.
@@ -59,6 +61,8 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
   estados de sesión/recovery; no implementa el Studio funcional.
 
 - `TASK-1456` — gobierno central y operating model parallel-first.
+- `TASK-1481` — **API Contract Spine y cross-surface conformance harness**, gate técnico anterior al primer
+  provider call; no bloquea la lane IaC de `TASK-1464`.
 - `TASK-1457…1463` — **Model Lab y craft:** sandbox seguro, fixtures/evals, still, motion, audio, campaña E2E y
   registry de readiness. Las integraciones reales empiezan temprano bajo hard budgets y private ingest.
 - `TASK-1464…1475` — **plataforma gobernada:** IaC, tenancy, responsabilidad, rights/assets, shadow credits,
@@ -73,6 +77,8 @@ Model Lab, plataforma y validación comercial son carriles complementarios, no f
 Una ruta puede probarse en vivo con credenciales gobernadas, presupuesto duro, inputs autorizados, manifest e
 ingest privado antes de que exista el wallet comercial completo. Sólo puede promoverse a UI/MCP cuando además
 tenga tenancy, idempotencia, estimate/reservation, rights policy, eval calificada, observabilidad y rollback.
+Desde el primer canary, sin embargo, la llamada entra por el spine de `TASK-1481`: API/SDK o harness normal →
+command/reader → adapter → runner. Parity contractual nace temprano; habilitar una surface es un gate separado.
 
 Esto habilita vender primero un **Sample Sprint Efeonce-managed** basado en una campaña demostrable: Efeonce
 opera Globe internamente y el cliente compra capacidad/outcome gobernado. `Studio Access`, operación cliente,
@@ -91,6 +97,11 @@ precios públicos y wallet self-serve permanecen posteriores a la calibración y
 
 - [ ] Repositorio y límite cloud aislados, con IaC, IAM/secret/tenant posture y evidencia runtime completa. El repositorio privado y el proyecto `efeonce-globe` ya existen; hardening y recursos runtime siguen pendientes.
 - [ ] Las capacidades de la primera plantilla funcionan mediante UI y MCP sobre el mismo command/reader layer, con autorización e idempotencia verificadas.
+- [ ] Existe un contract spine machine-readable con schemas versionados, trusted actor/workspace context,
+      errores canónicos y coverage matrix por capability/surface.
+- [ ] El primer provider canary y el E2E usan API/SDK/conformance harness sobre el mismo primitive; no existen
+      direct provider calls desde UI, MCP, CLI, scripts de task o tests con backdoor.
+- [ ] `TASK-1473` certifica transports/SDK/MCP sin introducir business logic ni reparar parity tardía.
 - [ ] Un run completa el lifecycle estimate → reserve → approve → execute → candidate → review → settle/release sin doble gasto ni pérdida de evidencia.
 - [ ] Estimate, approval y run history muestran ruta propuesta versus ruta real por attempt; un fallback nunca
   cambia de modelo silenciosamente ni convierte provider/modelo en la unidad de crédito.
@@ -127,7 +138,7 @@ El operador fija **Efeonce Globe** como nombre canónico del producto; Creative 
 
 El programa deja de interpretar gobierno y prueba de modelos como una secuencia lineal. Se aceptan tres lanes
 paralelas —Model Lab/craft, plataforma gobernada y validación comercial— con gates distintos para ejecutar un
-experimento y promover una ruta a producción. Greenhouse registra `TASK-1456…1480` y conserva todo el harness;
+experimento y promover una ruta a producción. Greenhouse registra `TASK-1456…1481` y conserva todo el harness;
 Globe ejecuta el runtime y guarda evidencia técnica. `TASK-1456` cerró la corrección de gobierno; la siguiente
 wave ejecuta `TASK-1457`, `TASK-1458` y `TASK-1464`. `TASK-1459` comienza apenas el Lab gate y los
 fixtures estén listos.

@@ -43,6 +43,7 @@ Definir una matriz segura de audio/localización para campañas profesionales.
 
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` — principio heredado/adaptado por Globe.
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
 - `../efeonce-globe/docs/architecture/PLATFORM_FOUNDATION_V1.md`
 - `../efeonce-globe/docs/operations/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`
@@ -104,10 +105,10 @@ Definir una matriz segura de audio/localización para campañas profesionales.
 
 ### Contract surface
 
-- Contrato existente a respetar: `EPIC-028, arquitectura agentic de Globe y provider contracts versionados`
-- Contrato nuevo o modificado: `contratos descritos en Scope; nombres finales se fijan en Plan Mode antes de implementar`
+- Contrato existente a respetar: `TASK-1481 spine + TASK-1457 experiment commands/readers y provider contracts versionados`
+- Contrato nuevo o modificado: `audio/localization capability descriptors, consent/license policy inputs and typed result evidence`
 - Backward compatibility: `gated`
-- Full API parity: `la capacidad se implementa como command/reader server-side antes de cualquier consumer UI o agente`
+- Full API parity: `audio routes usan el mismo experiment API/SDK; consent/voice/license policy vive en el primitive, no en consumers`
 
 ### Data model and invariants
 
@@ -152,7 +153,8 @@ Definir una matriz segura de audio/localización para campañas profesionales.
 
 ### Slice 1
 
-- Versionar adapters, voces y políticas de consentimiento.
+- Versionar adapters, voces y políticas de consentimiento detrás del canonical experiment command; ningún
+  consumer puede omitir consent/license policy llamando al provider.
 
 ### Slice 2
 
@@ -213,6 +215,8 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 - [ ] No se clona voz sin consentimiento verificable.
 - [ ] Música/voz registran licencia y restricciones de release.
 - [ ] Outputs con sincronía o rights insuficientes no se promueven.
+- [ ] API/SDK/conformance harness producen el mismo command/audit/manifest para voz, música, dubbing y foley.
+- [ ] No existe provider SDK directo desde CLI, UI, MCP, scripts o E2E.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
 - [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
 
@@ -233,4 +237,3 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Follow-ups
 
 - Las dependencias sucesoras se leen desde EPIC-028 y `docs/tasks/README.md`.
-

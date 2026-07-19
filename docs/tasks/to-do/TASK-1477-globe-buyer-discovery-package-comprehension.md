@@ -92,6 +92,11 @@ Saber qué compran, qué confunden y qué evidencia necesitan antes de pilotear.
 - Build impact: `Globe valida su runtime; Greenhouse valida task, docs, integraciones y proyecciones en scope`
 - Extraction blocker: `ninguno: el runtime ya nace fuera del monolito Greenhouse`
 
+## Full API Parity
+
+No aplica como nueva capability: esta task es investigación comercial. Cualquier demo o tooling utilizado debe
+consumir readers/SDK existentes y no crear un workflow, cálculo o acceso paralelo.
+
 <!-- ZONE 2 — PLAN MODE: se completa al tomar la task -->
 <!-- ZONE 3 — EXECUTION SPEC -->
 
@@ -160,6 +165,7 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 - [ ] La muestra y metodología quedan documentadas.
 - [ ] Hallazgos separan opinión de evidencia observable.
 - [ ] No se convierte feedback temprano en pricing definitivo.
+- [ ] Research tooling no introduce business logic ni acceso fuera de los contracts de Globe.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
 - [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
 
@@ -180,4 +186,3 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Follow-ups
 
 - Las dependencias sucesoras se leen desde EPIC-028 y `docs/tasks/README.md`.
-

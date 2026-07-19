@@ -68,9 +68,16 @@ Eliminar provisioning manual y dejar una base segura y observable sin abrir prod
 ### Files owned
 
 - `../efeonce-globe/infra/terraform/`
-- `../efeonce-globe/apps/studio-web/`
-- `../efeonce-globe/apps/creative-runner/`
 - `../efeonce-globe/.github/workflows/`
+
+### Cross-task ownership boundary
+
+- Esta task es la dueña exclusiva de IaC, GitHub WIF, IAM compartido, backend de state, presupuestos/alertas
+  GCP y observabilidad base.
+- `TASK-1457` posee el runtime y las políticas de ejecución del Model Lab; consume outputs de infraestructura
+  versionados y no modifica `infra/terraform/**`.
+- Cambios mínimos a una app para probar identidad/deploy se limitan a fixtures de smoke explícitos; la lógica
+  de producto y del lab permanece fuera de esta task.
 
 ## Current Repo State
 
@@ -106,9 +113,9 @@ Eliminar provisioning manual y dejar una base segura y observable sin abrir prod
 ### Contract surface
 
 - Contrato existente a respetar: `EPIC-028, arquitectura agentic de Globe y provider contracts versionados`
-- Contrato nuevo o modificado: `contratos descritos en Scope; nombres finales se fijan en Plan Mode antes de implementar`
+- Contrato nuevo o modificado: `versioned Terraform outputs, deployment identities, budget/alert signals and smoke evidence consumed by runtime tasks`
 - Backward compatibility: `gated`
-- Full API parity: `la capacidad se implementa como command/reader server-side antes de cualquier consumer UI o agente`
+- Full API parity: `n/a — IaC no es product capability; entrega Terraform outputs, CLI/runbook y smoke evidence machine-readable, no MCP de infraestructura`
 
 ### Data model and invariants
 
@@ -157,7 +164,8 @@ Eliminar provisioning manual y dejar una base segura y observable sin abrir prod
 
 ### Slice 2
 
-- Configurar identities, deploy keyless, budgets y observabilidad.
+- Configurar identities, deploy keyless, storage/secret bindings, budgets, alertas y observabilidad base con
+  outputs consumibles por `TASK-1457` y las platform tasks posteriores.
 
 ### Slice 3
 
@@ -214,6 +222,9 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 - [ ] Terraform plan es reproducible y no propone recursos fuera de scope.
 - [ ] CI/deploy no usa llaves largas ni secretos en bundle.
 - [ ] Smokes prueban allow, deny, revocation y budget alerts.
+- [ ] Los outputs requeridos por `TASK-1457` están versionados y no obligan al Model Lab a duplicar IaC.
+- [ ] La task no crea commands/MCP de infraestructura para simular parity; sus outputs versionados son inputs
+      del runtime y el canary de TASK-1457 sigue entrando por el spine API.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
 - [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
 
@@ -234,4 +245,3 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Follow-ups
 
 - Las dependencias sucesoras se leen desde EPIC-028 y `docs/tasks/README.md`.
-

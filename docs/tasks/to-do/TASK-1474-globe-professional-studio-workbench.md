@@ -43,6 +43,7 @@ Dar a operadores una experiencia creative-native de agencia, no un formulario de
 
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` — principio heredado/adaptado por Globe.
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
 - `../efeonce-globe/docs/architecture/PLATFORM_FOUNDATION_V1.md`
 - `../efeonce-globe/docs/operations/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`
@@ -99,6 +100,7 @@ Dar a operadores una experiencia creative-native de agencia, no un formulario de
 - Motion: `docs/ui/motion/TASK-1474-globe-studio-workbench-motion.md`
 - Surface architecture: `Composition Shell leadPlusContext/rich; adaptive cards por container query; sidecar sólo para contexto/review`
 - Primitive decision: `reusar primero primitives Globe/Greenhouse compatibles; cualquier primitive nueva exige registry, a11y y Lab antes de uso repetido`
+- Full API parity: `UI es thin client de SDK/contracts certificados por TASK-1473; cero business logic, provider/DB/storage imports o endpoint ad hoc`
 - Copy/state source: `copy funcional centralizada por dominio; cero mensajes reusable hardcodeados`
 - Accessibility: `keyboard completo, focus visible, landmarks, reduced motion y contraste WCAG AA`
 - Visual evidence: `GVC desktop y 390px del primer fold antes de cableado exhaustivo; scorecard premium al cierre`
@@ -114,7 +116,9 @@ Dar a operadores una experiencia creative-native de agencia, no un formulario de
 
 ### Slice 2
 
-- Cablear states, approvals, estimate y run history sin lógica provider local.
+- Cablear states, approvals, estimate y run history sin lógica provider local. Estimate/approval muestran
+  provider, nombre comercial del modelo, versión/readiness, limitaciones y fallback propuesto; history muestra
+  la ruta realmente ejecutada por attempt y cualquier diferencia respecto de la aprobada.
 
 ### Slice 3
 
@@ -169,7 +173,11 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Acceptance Criteria
 
 - [ ] UI usa los mismos contracts del SDK/MCP.
+- [ ] Cada write UI produce el mismo command/result/error/audit que SDK/MCP en el conformance E2E; ningún
+      handler UI implementa policy o llama provider/DB/storage.
 - [ ] Estados de espera, error, rights, budget y review son honestos y recuperables.
+- [ ] Provider/modelo/version propuestos y ejecutados son visibles sin revelar keys, costo vendor, margen ni
+  prompt/IP interno; ningún fallback queda oculto.
 - [ ] GVC desktop/mobile alcanza estándar premium sin card wallpaper.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
 - [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
@@ -191,4 +199,3 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Follow-ups
 
 - Las dependencias sucesoras se leen desde EPIC-028 y `docs/tasks/README.md`.
-

@@ -166,6 +166,8 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 - [ ] La decisión identifica alcance, fecha, owners y evidencia.
 - [ ] Sin sign-off el estado permanece internal-only/no production.
 - [ ] Go parcial no habilita capacidades o segmentos no evaluados.
+- [ ] El dossier incluye coverage machine-readable y conformance PASS por capability crítica; cualquier
+      business capability con surface `missing`, lógica duplicada o provider bypass obliga `no-go`.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
 - [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
 

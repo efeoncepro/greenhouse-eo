@@ -43,6 +43,7 @@ Demostrar craft, método, formatos y trazabilidad end-to-end sobre un mismo sist
 
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` — principio heredado/adaptado por Globe.
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
 - `../efeonce-globe/docs/architecture/PLATFORM_FOUNDATION_V1.md`
 - `../efeonce-globe/docs/operations/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`
@@ -69,6 +70,8 @@ Demostrar craft, método, formatos y trazabilidad end-to-end sobre un mismo sist
 
 - `../efeonce-globe/apps/creative-runner/`
 - `../efeonce-globe/packages/domain/`
+- `../efeonce-globe/packages/contracts/`
+- `../efeonce-globe/packages/sdk/`
 - `../efeonce-globe/packages/media-qc/`
 - `../efeonce-globe/docs/operations/`
 
@@ -106,9 +109,9 @@ Demostrar craft, método, formatos y trazabilidad end-to-end sobre un mismo sist
 ### Contract surface
 
 - Contrato existente a respetar: `EPIC-028, arquitectura agentic de Globe y provider contracts versionados`
-- Contrato nuevo o modificado: `contratos descritos en Scope; nombres finales se fijan en Plan Mode antes de implementar`
+- Contrato nuevo o modificado: `campaign orchestration commands/readers y campaign/artifact manifest projections versionadas`
 - Backward compatibility: `gated`
-- Full API parity: `la capacidad se implementa como command/reader server-side antes de cualquier consumer UI o agente`
+- Full API parity: `la campaña E2E es un consumer normal del SDK/commands; ningún script obtiene privilegios o lógica paralela`
 
 ### Data model and invariants
 
@@ -157,7 +160,7 @@ Demostrar craft, método, formatos y trazabilidad end-to-end sobre un mismo sist
 
 ### Slice 2
 
-- Generar/iterar key visual y derivados digital/off con rutas híbridas.
+- Generar/iterar key visual y derivados digital/off orquestando únicamente commands/readers existentes por SDK.
 
 ### Slice 3
 
@@ -214,6 +217,8 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 - [ ] La campaña incluye al menos 9:16, 4:5 y un formato off aprobado.
 - [ ] Cada pieza deriva de un master/manifest y pasa QA técnico-creativo.
 - [ ] Un segundo operador puede reproducir el set desde la documentación.
+- [ ] La campaña completa puede reproducirse por SDK/CLI gobernado y produce el mismo audit/manifests que
+      cualquier futuro consumer UI/MCP; los scripts sólo orquestan contracts públicos internos.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
 - [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
 
@@ -234,4 +239,3 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Follow-ups
 
 - Las dependencias sucesoras se leen desde EPIC-028 y `docs/tasks/README.md`.
-

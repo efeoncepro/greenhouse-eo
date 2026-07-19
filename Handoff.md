@@ -26,7 +26,15 @@
   en el repositorio hermano. Globe conserva sólo arquitectura, runtime y evidencia técnica; no tiene registry
   ni namespace de tasks propio. `TASK-1456` cerró esta corrección; próxima wave: `TASK-1457`, `TASK-1458`
   y `TASK-1464`; `TASK-1459` puede integrar/probar still models apenas cierre el Lab gate, sin esperar ledger/workbench.
+  Las specs separan ahora ownership: `TASK-1464` posee IaC/WIF/IAM/budgets/observabilidad y `TASK-1457` el
+  runtime/policy del Lab. `TASK-1460`, `1468`, `1470` y `1474` mantienen Seedance 2.5 fail-closed hasta una ruta
+  verificable y exigen mostrar provider/modelo/version propuestos versus ejecutados, incluidos fallbacks.
   Producción, clientes externos, precios y checkout siguen fuera de alcance.
+  **Full API Parity correction:** `TASK-1481` es ahora el primer gate P0 antes de cualquier provider call:
+  separa trusted actor/workspace de payload no confiable y entrega schemas, private API/SDK, coverage matrix y
+  conformance harness. `TASK-1457` ejecuta el primer canary real por ese spine; `TASK-1473` sólo
+  empaqueta/certifica SDK/MCP, no crea parity tardía. El runtime actual es parity-aware, no parity-complete:
+  SDK sólo expone health y `CommandEnvelope` bootstrap todavía debe endurecerse durante TASK-1481.
 - `TASK-1454` completó su runtime interno en `develop`, sin push ni Production: broker OAuth multiproducto,
   migración aditiva aplicada a `greenhouse-pg-dev/greenhouse_app`, client/binding Globe internal-only,
   callback `globe-studio-internal`, API privada `globe-api-internal`, SDK y WIF/ADC sin llaves. Los smokes live

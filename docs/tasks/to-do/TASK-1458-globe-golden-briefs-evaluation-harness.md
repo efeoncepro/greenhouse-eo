@@ -20,7 +20,7 @@
 - Status real: `Diseño gobernado; implementación pendiente`
 - Rank: `TBD`
 - Domain: `creative|data|ops`
-- Blocked by: `TASK-1456`
+- Blocked by: `TASK-1481`
 - Branch: `task/TASK-1458-globe-golden-briefs-evaluation-harness`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -43,6 +43,7 @@ Convertir pruebas creativas en evidencia repetible y comparable por contrato de 
 
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` — principio heredado/adaptado por Globe.
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
 - `../efeonce-globe/docs/architecture/PLATFORM_FOUNDATION_V1.md`
 - `../efeonce-globe/docs/operations/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`
@@ -58,7 +59,7 @@ Convertir pruebas creativas en evidencia repetible y comparable por contrato de 
 
 ### Depends on
 
-- `TASK-1456`.
+- `TASK-1481`.
 
 ### Blocks / Impacts
 
@@ -69,6 +70,9 @@ Convertir pruebas creativas en evidencia repetible y comparable por contrato de 
 
 - `../efeonce-globe/packages/media-qc/`
 - `../efeonce-globe/packages/provider-contract/`
+- `../efeonce-globe/packages/contracts/` sólo para fixture/rubric/report schemas.
+- `../efeonce-globe/packages/domain/` sólo para evaluate command y report readers.
+- `../efeonce-globe/packages/sdk/` sólo para typed evaluation methods.
 - `../efeonce-globe/docs/operations/`
 
 ## Current Repo State
@@ -105,9 +109,9 @@ Convertir pruebas creativas en evidencia repetible y comparable por contrato de 
 ### Contract surface
 
 - Contrato existente a respetar: `EPIC-028, arquitectura agentic de Globe y provider contracts versionados`
-- Contrato nuevo o modificado: `contratos descritos en Scope; nombres finales se fijan en Plan Mode antes de implementar`
+- Contrato nuevo o modificado: `versioned fixture/rubric schemas, evaluate-attempt command y fixture/report readers sobre el TASK-1481 spine`
 - Backward compatibility: `gated`
-- Full API parity: `la capacidad se implementa como command/reader server-side antes de cualquier consumer UI o agente`
+- Full API parity: `evaluation CLI/E2E usa SDK o conformance harness sobre el mismo command/reader; no existe harness con business logic paralela`
 
 ### Data model and invariants
 
@@ -156,7 +160,8 @@ Convertir pruebas creativas en evidencia repetible y comparable por contrato de 
 
 ### Slice 2
 
-- Implementar rúbricas humanas y checks automáticos reproducibles.
+- Implementar rúbricas humanas y checks automáticos reproducibles detrás de un evaluate-attempt command y
+  fixture/rubric/report readers versionados.
 
 ### Slice 3
 
@@ -213,6 +218,8 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 - [ ] Los fixtures declaran licencia, consentimiento y uso permitido.
 - [ ] El reporte separa métricas objetivas de juicio creativo humano.
 - [ ] La misma versión de fixture/config produce evidencia comparable.
+- [ ] Fixture, rubric, evaluation request y report son schemas versionados consumibles por SDK/E2E.
+- [ ] El runner/harness no duplica scoring/policy fuera del canonical evaluation primitive.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
 - [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
 
@@ -233,4 +240,3 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Follow-ups
 
 - Las dependencias sucesoras se leen desde EPIC-028 y `docs/tasks/README.md`.
-

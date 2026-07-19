@@ -15,6 +15,9 @@
   cross-repo. Globe posee código/runtime/evidencia y mantiene un execution plan referencial, no un backlog paralelo.
 - La primera wave prepara gobierno, sandbox/fixtures e IaC simultáneamente; el primer motion comercial es un
   Sample Sprint Efeonce-managed, no Studio Access ni créditos comerciales.
+- Full API Parity queda convertida en gate de nacimiento, no follow-up de UI/MCP: `TASK-1481` crea el API
+  Contract Spine/trusted context/conformance antes del primer provider call; `TASK-1457` prueba el primer
+  canary por API/SDK→command→adapter→runner y `TASK-1473` queda como packaging/certificación sin business logic.
 
 ## 2026-07-19 — Globe ya existe como producto interno visible
 

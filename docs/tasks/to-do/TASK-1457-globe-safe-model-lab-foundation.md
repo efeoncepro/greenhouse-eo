@@ -20,7 +20,7 @@
 - Status real: `Diseño gobernado; implementación pendiente`
 - Rank: `TBD`
 - Domain: `creative|platform|ops`
-- Blocked by: `TASK-1456`
+- Blocked by: `TASK-1481`
 - Branch: `task/TASK-1457-globe-safe-model-lab-foundation`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -43,6 +43,7 @@ Permitir experimentos reales y baratos sin habilitar producción ni clientes ext
 
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` — principio heredado/adaptado por Globe.
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
 - `../efeonce-globe/docs/architecture/PLATFORM_FOUNDATION_V1.md`
 - `../efeonce-globe/docs/operations/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`
@@ -58,7 +59,8 @@ Permitir experimentos reales y baratos sin habilitar producción ni clientes ext
 
 ### Depends on
 
-- `TASK-1456`.
+- `TASK-1481` completa. `TASK-1464` avanza en paralelo y sólo bloquea el canary live si faltan sus outputs
+  mínimos de secret/storage/budget.
 
 ### Blocks / Impacts
 
@@ -67,10 +69,22 @@ Permitir experimentos reales y baratos sin habilitar producción ni clientes ext
 
 ### Files owned
 
-- `../efeonce-globe/infra/terraform/`
 - `../efeonce-globe/apps/creative-runner/`
+- `../efeonce-globe/apps/studio-web/` sólo para el Model Lab private API adapter.
+- `../efeonce-globe/packages/contracts/` sólo para experiment schemas/capabilities.
+- `../efeonce-globe/packages/domain/` sólo para experiment commands/readers/policy.
+- `../efeonce-globe/packages/sdk/` sólo para typed Model Lab methods.
 - `../efeonce-globe/packages/provider-contract/`
 - `../efeonce-globe/packages/media-qc/`
+
+### Cross-task ownership boundary
+
+- `TASK-1464` es dueño exclusivo de `../efeonce-globe/infra/terraform/`, GitHub WIF, IAM compartido,
+  presupuestos GCP y observabilidad de plataforma.
+- Esta task consume outputs versionados de `TASK-1464`; no crea IaC, identities, buckets o alertas paralelos.
+- El runtime y los tests locales pueden avanzar en paralelo, pero el canary con credenciales, storage y budget
+  alerts reales queda `code complete, rollout pendiente` hasta que cierre el checkpoint de infraestructura
+  mínimo de `TASK-1464`.
 
 ## Current Repo State
 
@@ -105,10 +119,10 @@ Permitir experimentos reales y baratos sin habilitar producción ni clientes ext
 
 ### Contract surface
 
-- Contrato existente a respetar: `EPIC-028, arquitectura agentic de Globe y provider contracts versionados`
-- Contrato nuevo o modificado: `contratos descritos en Scope; nombres finales se fijan en Plan Mode antes de implementar`
+- Contrato existente a respetar: `TASK-1481 API Contract Spine, EPIC-028 y provider contracts versionados`
+- Contrato nuevo o modificado: `prepare/execute/cancel experiment commands; get/status/evidence readers; attempt manifest y capability coverage V1`
 - Backward compatibility: `gated`
-- Full API parity: `la capacidad se implementa como command/reader server-side antes de cualquier consumer UI o agente`
+- Full API parity: `private API, SDK y conformance harness consumen el mismo experiment command/reader; UI/MCP permanecen policy-blocked hasta promotion, no missing`
 
 ### Data model and invariants
 
@@ -153,15 +167,19 @@ Permitir experimentos reales y baratos sin habilitar producción ni clientes ext
 
 ### Slice 1
 
-- Definir IAM/WIF, secrets y allowlist de providers/modelos.
+- Extender el spine de `TASK-1481` con schemas/capabilities de experimento, prepare/execute/cancel commands,
+  get/status/evidence readers y typed SDK. Actor/workspace provienen sólo de trusted context.
 
 ### Slice 2
 
-- Implementar budget fence, cuotas, cancelación y storage privado.
+- Implementar el budget fence de aplicación por run/día, cuotas, cancelación, kill switch y private-ingest
+  policy sin aprovisionar infraestructura duplicada.
 
 ### Slice 3
 
-- Emitir manifest por attempt con costo, ruta, inputs autorizados y lineage.
+- Integrar **una ruta exacta de referencia** y ejecutar el primer provider canary por
+  SDK/private API → experiment command → provider adapter → runner. Emitir manifest por attempt con costo,
+  ruta, inputs autorizados y lineage; el proveedor nunca se invoca desde script/CLI/UI/MCP.
 
 ## Out of Scope
 
@@ -214,6 +232,12 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 - [ ] Ningún experimento requiere service-account key persistida.
 - [ ] Cada run tiene hard cap previo y aborta antes de excederlo.
 - [ ] Inputs y outputs son privados y cada attempt deja manifest verificable.
+- [ ] `TASK-1457` no modifica `infra/terraform/**`; el canary live referencia outputs/evidencia de `TASK-1464`.
+- [ ] El primer provider canary entra por el spine de `TASK-1481` y produce el mismo command/audit/correlation
+      observable desde private API y SDK.
+- [ ] UI/MCP figuran `policy-blocked` en coverage; CLI/tests usan SDK o conformance harness y ningún consumer
+      llama al provider directamente.
+- [ ] Body/query/headers no pueden aportar ni reemplazar actor, workspace o capabilities.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
 - [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
 
@@ -234,4 +258,3 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Follow-ups
 
 - Las dependencias sucesoras se leen desde EPIC-028 y `docs/tasks/README.md`.
-

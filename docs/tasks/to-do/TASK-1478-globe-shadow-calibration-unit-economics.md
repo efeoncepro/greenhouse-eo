@@ -43,6 +43,7 @@ Validar unit economics antes de exponer precios, wallets o promesas de volumen.
 
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` — principio heredado/adaptado por Globe.
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
 - `../efeonce-globe/docs/architecture/PLATFORM_FOUNDATION_V1.md`
 - `../efeonce-globe/docs/operations/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`
@@ -69,6 +70,8 @@ Validar unit economics antes de exponer precios, wallets o promesas de volumen.
 
 - `../efeonce-globe/packages/database/`
 - `../efeonce-globe/packages/domain/`
+- `../efeonce-globe/packages/contracts/`
+- `../efeonce-globe/packages/sdk/`
 - `docs/business-models/creative-studio/`
 
 ## Current Repo State
@@ -105,9 +108,9 @@ Validar unit economics antes de exponer precios, wallets o promesas de volumen.
 ### Contract surface
 
 - Contrato existente a respetar: `EPIC-028, arquitectura agentic de Globe y provider contracts versionados`
-- Contrato nuevo o modificado: `contratos descritos en Scope; nombres finales se fijan en Plan Mode antes de implementar`
+- Contrato nuevo o modificado: `versioned unit-economics/report reader with audience-based redaction`
 - Backward compatibility: `gated`
-- Full API parity: `la capacidad se implementa como command/reader server-side antes de cualquier consumer UI o agente`
+- Full API parity: `calibration reports use a canonical reader/SDK; vendor cost and margin redaction is policy, not UI-only formatting`
 
 ### Data model and invariants
 
@@ -213,6 +216,8 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 - [ ] Se analizan 30–50 runs válidos o se documenta por qué la muestra no alcanza.
 - [ ] Costos vendor y capacidad humana se separan de Studio Credits.
 - [ ] Outliers, retries y fallbacks no se ocultan.
+- [ ] SDK/report reader devuelve la misma evidencia con redaction por audience; ningún spreadsheet/script
+      reconstruye la métrica como source of truth paralelo.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
 - [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
 
@@ -233,4 +238,3 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Follow-ups
 
 - Las dependencias sucesoras se leen desde EPIC-028 y `docs/tasks/README.md`.
-

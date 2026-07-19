@@ -2,6 +2,7 @@
 
 > **Tipo:** Architecture Decision Record (ecosistema / plataforma hermana)
 > **Especificación canónica:** [Efeonce Creative Studio — Agentic Platform Architecture V1](EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md)
+> **Principio heredado/adaptado:** [Greenhouse Full API Parity Decision V1](GREENHOUSE_FULL_API_PARITY_DECISION_V1.md)
 > **Regla ADR:** `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md`
 
 ## Architecture Decision 2026-07-11 — la capacidad creativa nace agentic y fuera de Greenhouse
@@ -30,7 +31,10 @@ Greenhouse es el hub de experiencia y operaciones de cuenta; no debe absorber ot
 Se crea **Efeonce Globe** como nombre canónico de una **plataforma hermana de Efeonce**, agentic desde el primer contrato. **Creative Studio** es su descriptor funcional y Globe continúa siendo la vertical creativa interna de Efeonce; cualquier presentación pública como producto o submarca requiere una decisión de posicionamiento separada.
 
 1. **Runtime y propiedad separados.** Creative Studio tendrá repositorio, despliegue, base de datos, buckets, secretos, provider adapters y ledger propios. Greenhouse, Think, Verk y el sitio público podrán consumir contratos versionados, pero no alojarán la lógica ni escribirán sus tablas.
-2. **Una capability, tres superficies equivalentes.** La UI humana, el servidor MCP y los agentes son clientes del mismo command/reader contract. Ninguna acción de negocio será UI-only; MCP no recibe atajos ni privilegios distintos de la UI.
+2. **Full API Parity by birth.** Cada capability nace como primitive server-side transport-neutral con schemas
+   versionados, command/reader, auth, idempotencia, audit, errores y evidencia de conformance antes de su primera
+   surface. UI, HTTP API, SDK, MCP/agentes, CLI/runbooks, workers, eventos, sister platforms y E2E son clientes
+   del mismo contrato; ninguna acción de negocio será UI-only ni transport-only.
 3. **Autonomía gobernada, no chat que gasta.** El agente puede investigar, componer un brief, elegir una plantilla, proponer proveedor, estimar créditos y preparar una corrida. Una acción con coste, acceso a material restringido, entrega externa o publicación exige autorización explícita: `propose → reserve → approve → execute`.
 4. **Experiencia creativa y agents primero; canvas después.** El V1 se opera con briefs, referencias, tratamientos, candidatos, revisión y flujos curados parametrizables (por ejemplo, still-to-video, video repair, audio/foley, set de RRSS). El sistema compila decisiones aprobadas en una receta. Un canvas DAG libre es una proyección posterior sobre el mismo runner, no el MVP ni el centro de gravedad.
 5. **Assets, linaje y créditos son dominio first-class.** El sistema conserva una copia durable autorizada, hash, derechos, referencias, modelo/proveedor, prompt/brief versionado, revisiones y derivaciones. El crédito vendible se registra en un ledger append-only independiente del costo bruto del proveedor.
@@ -56,6 +60,13 @@ Se crea **Efeonce Globe** como nombre canónico de una **plataforma hermana de E
 ### Invariants
 
 - La UI, MCP, agentes, CLI y workers consumen commands/readers canónicos; no hay lógica de negocio sólo en una surface.
+- Parity se evalúa por capability y desde su primer slice ejecutable. No significa API pública, disponibilidad
+  idéntica ni autonomía irrestricta: una surface puede quedar `policy-blocked`, pero esa ausencia debe ser
+  explícita y machine-readable, no una implementación pendiente escondida.
+- El primer provider call billable ya entra por API/SDK o harness de conformance → command → adapter → runner;
+  ningún script, UI, CLI o MCP llama un SDK de provider directamente.
+- Actor y workspace son trusted context derivados server-side de identidad/binding. Nunca se confían desde
+  body, query o headers aportados por el caller.
 - Cada write reintentable lleva actor, `workspace_id`, idempotency key, audit event y estado observable.
 - Los providers nunca son source of truth de un asset o de su costo final.
 - Los créditos se reservan y liquidan en ledger append-only; un contador mutable no basta.
@@ -66,12 +77,13 @@ Se crea **Efeonce Globe** como nombre canónico de una **plataforma hermana de E
 - Cambiar de modo operativo conserva workspace, brief, assets, lineage, review y ledger; no crea un handoff paralelo ni eleva permisos por sí solo.
 - Efeonce sólo compromete métricas de delivery sobre el scope cuya dirección y ejecución controla. `Client-operated` no hereda por defecto el SLA de un Managed Squad.
 - El contenido editorial puede informar lenguaje e hipótesis, pero nunca crea commands, schemas, templates,
-  provider routes, acceptance criteria o tasks por inferencia. La implementación sólo se autoriza por EPIC-028
-  y sus tasks en el repositorio de Creative Studio.
+  provider routes, acceptance criteria o tasks por inferencia. Greenhouse autoriza la implementación mediante
+  EPIC-028 y sus `TASK-###`; Globe posee el código, runtime y evidencia técnica.
 
 ### Revisit When
 
-- Se complete el hardening del bootstrap existente y se registren las primeras tasks ejecutables en `efeoncepro/efeonce-globe`.
+- Se complete el hardening del bootstrap y las primeras tasks canónicas de Greenhouse prueben el spine API y
+  un provider canary end-to-end en Globe.
 - Se habilite el primer workspace cliente o se comercialicen créditos — requiere revisión legal, fiscal, billing y política de derechos antes de activar pagos.
 - Una modalidad requiera GPU/latencia que Cloud Run Jobs no resuelva de forma económica.
 - El catálogo o las condiciones de proveedores cambien materialmente, o los evals de fidelidad contradigan el router vigente.

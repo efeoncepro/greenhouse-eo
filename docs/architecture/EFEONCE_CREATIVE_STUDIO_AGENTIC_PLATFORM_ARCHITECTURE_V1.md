@@ -181,6 +181,29 @@ actor + workspace scope + capability + idempotency key + command payload
 
 Reads are policy-filtered projections. Commands have explicit idempotency and return a stable result or an in-progress/replay response; clients never retry by duplicating provider spend.
 
+### Full API Parity birth contract
+
+Parity is a Definition of Done at the **capability** boundary, not a transport added after UI. Every capability
+task must deliver or extend:
+
+1. versioned serializable schemas in `packages/contracts`;
+2. a transport-neutral command/reader primitive in `packages/domain`;
+3. trusted actor/workspace context derived by server auth/binding, separated from untrusted caller payload;
+4. authorization, idempotency/concurrency, audit, canonical errors and observable result/status;
+5. a private versioned HTTP mapping and typed SDK path where the capability is executable;
+6. a machine-readable coverage record for UI, SDK, MCP/agent, CLI/runbook, worker/event, sister platform and E2E;
+7. conformance tests proving every enabled surface reaches the same primitive and audit record.
+
+`available`, `policy-blocked` and `not-applicable` are valid per-surface states. `missing` is not a valid
+closure state for an executable business capability. This does **not** imply a public API or simultaneous client
+exposure: Model Lab may be internal-only and MCP/UI may remain `policy-blocked` until route promotion. It does
+mean that the first billable provider canary is invoked through the canonical API/SDK or conformance harness,
+never by direct provider calls from UI, MCP, CLI or task scripts.
+
+The first spine and spoofing-negative harness are owned by `TASK-1481`; `TASK-1457` proves it with the first
+safe model canary. Capability tasks extend the spine themselves. `TASK-1473` packages/publishes SDK and MCP
+adapters and certifies cross-surface equivalence; it is not where parity or business logic first appears.
+
 ### Surface parity matrix
 
 | Capability | UI | MCP / agent | Control point |
@@ -292,9 +315,12 @@ prompt/IP fields not included in the approved transparency policy.
 
 Golden fixtures begin with the validated RRSS workflow and the Glitch recovery record. A provider/model is not promoted simply because it returned `completed`; it needs documented performance on the fidelity contract it claims to serve.
 
-## 10. Initial public/private API shape
+## 10. Initial private API shape
 
-All external programmatic routes are versioned and authenticated. The exact OpenAPI/MCP schema is a bootstrap task; this is the semantic boundary:
+All programmatic routes are versioned and authenticated. `TASK-1481` owns the minimal machine-readable
+contract spine, trusted-context envelope and conformance harness; `TASK-1457` adds the Model Lab experiment
+contract, `TASK-1469` stabilizes the production run lifecycle and `TASK-1473` publishes/certifies SDK/MCP
+transports. The semantic boundary is:
 
 ```text
 GET  /v1/templates
@@ -350,7 +376,7 @@ idempotencia, estimate/reservation, approval token, rights/provider policy, eval
 rollback. El execution plan canónico vive en
 `efeonce-globe/docs/operations/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`.
 
-La gobernanza de ejecución no se desplaza con el runtime: Greenhouse conserva EPIC-028, `TASK-1456…1480`,
+La gobernanza de ejecución no se desplaza con el runtime: Greenhouse conserva EPIC-028, `TASK-1456…1481`,
 task hooks, Plan Mode, lint, QA, lifecycle, cierre y handoff. Globe posee código, infraestructura, datos y
 evidencia técnica; su plan operativo referencia las tasks canónicas y no crea un segundo backlog.
 

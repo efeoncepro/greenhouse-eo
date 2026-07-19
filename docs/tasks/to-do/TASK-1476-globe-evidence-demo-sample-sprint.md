@@ -20,7 +20,7 @@
 - Status real: `Diseño gobernado; implementación pendiente`
 - Rank: `TBD`
 - Domain: `creative|commercial|sales`
-- Blocked by: `TASK-1462, TASK-1467, TASK-1472`
+- Blocked by: `TASK-1462, TASK-1467, TASK-1472, TASK-1473`
 - Branch: `task/TASK-1476-globe-evidence-demo-sample-sprint`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -58,7 +58,7 @@ Permitir demostrar y vender capacidad creativa gobernada sin prometer Studio Acc
 
 ### Depends on
 
-- `TASK-1462`, `TASK-1467`, `TASK-1472`.
+- `TASK-1462`, `TASK-1467`, `TASK-1472`, `TASK-1473`.
 
 ### Blocks / Impacts
 
@@ -160,6 +160,8 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 - [ ] Cada claim comercial enlaza evidencia real.
 - [ ] Sample Sprint no implica wallet, self-serve ni acceso cliente.
 - [ ] Derechos, exclusiones y responsabilidad humana son explícitos.
+- [ ] El demo incluye al menos una corrida reproducible por SDK/MCP/CLI gobernado además de la UI y demuestra
+      el mismo command/audit/manifest; no se afirma agentic operability sólo desde screenshots.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
 - [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
 
@@ -180,4 +182,3 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Follow-ups
 
 - Las dependencias sucesoras se leen desde EPIC-028 y `docs/tasks/README.md`.
-

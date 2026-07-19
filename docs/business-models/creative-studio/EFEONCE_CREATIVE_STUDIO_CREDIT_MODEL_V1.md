@@ -194,7 +194,7 @@ Cada asignación declara:
 
 ## 9. Experiencia y transparencia
 
-La UI muestra al usuario:
+La proyección gobernada compartida por UI, API, SDK y MCP autorizado muestra al usuario:
 
 - saldo disponible, reservado y consumido;
 - estimate como rango y drivers semánticos;

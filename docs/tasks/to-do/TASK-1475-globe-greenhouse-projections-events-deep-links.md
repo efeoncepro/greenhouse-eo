@@ -43,6 +43,7 @@ Hacer Globe alcanzable y observable desde Greenhouse conservando fronteras de pr
 
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` — principio heredado/adaptado por Globe.
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
 - `../efeonce-globe/docs/architecture/PLATFORM_FOUNDATION_V1.md`
 - `../efeonce-globe/docs/operations/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`
@@ -106,9 +107,9 @@ Hacer Globe alcanzable y observable desde Greenhouse conservando fronteras de pr
 ### Contract surface
 
 - Contrato existente a respetar: `EPIC-028, arquitectura agentic de Globe y provider contracts versionados`
-- Contrato nuevo o modificado: `contratos descritos en Scope; nombres finales se fijan en Plan Mode antes de implementar`
+- Contrato nuevo o modificado: `versioned projection/event/deep-link schemas and a thin Greenhouse SDK consumer`
 - Backward compatibility: `gated`
-- Full API parity: `la capacidad se implementa como command/reader server-side antes de cualquier consumer UI o agente`
+- Full API parity: `ecosystem adapter consumes Globe SDK/contracts; no duplicated Globe policy or database projection logic in Greenhouse`
 
 ### Data model and invariants
 
@@ -214,6 +215,8 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 - [ ] Greenhouse no accede a la DB ni secretos de Globe.
 - [ ] Eventos soportan replay sin duplicar efectos.
 - [ ] Deep links preservan tenant/capability sin tokens en URL.
+- [ ] Contract tests cubren schema version, replay/deprecation, freshness y ausencia de imports Globe internos
+      fuera del SDK/contracts.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
 - [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
 
@@ -234,4 +237,3 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Follow-ups
 
 - Las dependencias sucesoras se leen desde EPIC-028 y `docs/tasks/README.md`.
-

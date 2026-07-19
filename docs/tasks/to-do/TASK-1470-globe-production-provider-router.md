@@ -43,6 +43,7 @@ Elegir el motor adecuado por caso sin acoplar UI o agentes a un provider.
 
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` — principio heredado/adaptado por Globe.
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
 - `../efeonce-globe/docs/architecture/PLATFORM_FOUNDATION_V1.md`
 - `../efeonce-globe/docs/operations/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`
@@ -105,9 +106,9 @@ Elegir el motor adecuado por caso sin acoplar UI o agentes a un provider.
 ### Contract surface
 
 - Contrato existente a respetar: `EPIC-028, arquitectura agentic de Globe y provider contracts versionados`
-- Contrato nuevo o modificado: `contratos descritos en Scope; nombres finales se fijan en Plan Mode antes de implementar`
+- Contrato nuevo o modificado: `internal route-proposal/estimate domain service consumed only by run commands and typed projections`
 - Backward compatibility: `gated`
-- Full API parity: `la capacidad se implementa como command/reader server-side antes de cualquier consumer UI o agente`
+- Full API parity: `router is internal business logic; surfaces receive route proposal through run contracts, never a generic provider tool`
 
 ### Data model and invariants
 
@@ -152,7 +153,8 @@ Elegir el motor adecuado por caso sin acoplar UI o agentes a un provider.
 
 ### Slice 1
 
-- Implementar resolver provider-neutral y adapter interface productiva.
+- Implementar resolver provider-neutral y adapter interface productiva sobre rutas exactas; ausencia de
+  provider, model ID, versión o readiness verificables equivale a ruta no ejecutable.
 
 ### Slice 2
 
@@ -160,7 +162,9 @@ Elegir el motor adecuado por caso sin acoplar UI o agentes a un provider.
 
 ### Slice 3
 
-- Agregar fallbacks declarativos, circuit breakers y observabilidad.
+- Agregar fallbacks declarativos, circuit breakers y observabilidad, conservando propuesta, aprobación y
+  ruta real por attempt. Una ruta `blocked/unverified` —incluido Seedance 2.5 mientras mantenga ese estado— no
+  puede entrar al set productivo por alias, marketing name o wrapper de tercero.
 
 ## Out of Scope
 
@@ -213,6 +217,9 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 - [ ] Provider/model/version propuesto y real son visibles en history.
 - [ ] Ruta no promoted o incompatible falla cerrado.
 - [ ] Fallback nunca es silencioso ni cambia la unidad de crédito.
+- [ ] La promoción exige model ID/endpoint exactos, evidencia de eval y provenance contractual; un nombre
+  comercial por sí solo no satisface el gate.
+- [ ] No existe router API/MCP genérico ni consumer que seleccione endpoint/model ID fuera del run primitive.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
 - [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
 
@@ -233,4 +240,3 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Follow-ups
 
 - Las dependencias sucesoras se leen desde EPIC-028 y `docs/tasks/README.md`.
-

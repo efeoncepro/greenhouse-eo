@@ -1,4 +1,4 @@
-# TASK-1473 — Globe MCP and SDK API Parity
+# TASK-1473 — Globe Contract Packaging, SDK/MCP Adapters and Parity Certification
 
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
@@ -21,13 +21,13 @@
 - Rank: `TBD`
 - Domain: `platform|agentic|integration`
 - Blocked by: `TASK-1469, TASK-1472`
-- Branch: `task/TASK-1473-globe-mcp-sdk-api-parity`
+- Branch: `task/TASK-1473-globe-contract-packaging-parity-certification`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-Exponer commands/readers canónicos de Globe mediante SDK y MCP con el mismo auth, scopes, idempotencia y errores de la UI.
+Empaquetar y publicar los contracts ya nacidos en cada capability, implementar adapters delgados SDK/MCP y certificar equivalencia cross-surface sin introducir business logic.
 
 ## Why This Task Exists
 
@@ -35,7 +35,7 @@ EPIC-028 exige que integración de modelos, plataforma gobernada y validación c
 
 ## Goal
 
-Hacer operable por agentes toda capacidad de Studio sin crear una segunda lógica.
+Demostrar que las capabilities promovidas son operables por SDK/MCP sobre los mismos primitives, auth, idempotencia, errores y audit que UI/CLI/workers.
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
 
@@ -43,6 +43,7 @@ Hacer operable por agentes toda capacidad de Studio sin crear una segunda lógic
 
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` — principio heredado/adaptado por Globe.
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
 - `../efeonce-globe/docs/architecture/PLATFORM_FOUNDATION_V1.md`
 - `../efeonce-globe/docs/operations/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`
@@ -87,7 +88,7 @@ Hacer operable por agentes toda capacidad de Studio sin crear una segunda lógic
 - Topology impact: `cross-runtime`
 - Current home: `Efeonce Globe como plataforma hermana; Greenhouse como control plane operativo/documental`
 - Future candidate home: `remain-shared`
-- Boundary: `Globe MCP and SDK API Parity`
+- Boundary: `Globe contract packaging, thin SDK/MCP transports and parity certification`
 - Server/browser split: `secrets, providers y writes server-only; contratos serializables y consumidores explícitos`
 - Build impact: `Globe valida su runtime; Greenhouse valida task, docs, integraciones y proyecciones en scope`
 - Extraction blocker: `ninguno: el runtime ya nace fuera del monolito Greenhouse`
@@ -105,9 +106,9 @@ Hacer operable por agentes toda capacidad de Studio sin crear una segunda lógic
 ### Contract surface
 
 - Contrato existente a respetar: `EPIC-028, arquitectura agentic de Globe y provider contracts versionados`
-- Contrato nuevo o modificado: `contratos descritos en Scope; nombres finales se fijan en Plan Mode antes de implementar`
+- Contrato nuevo o modificado: `versioned contract packages, typed SDK distribution, thin MCP tools/resources and parity certification report`
 - Backward compatibility: `gated`
-- Full API parity: `la capacidad se implementa como command/reader server-side antes de cualquier consumer UI o agente`
+- Full API parity: `no se crea aquí: TASK-1481 y cada capability task ya la entregan; esta task empaqueta transports y certifica coverage`
 
 ### Data model and invariants
 
@@ -150,21 +151,22 @@ Hacer operable por agentes toda capacidad de Studio sin crear una segunda lógic
 
 ## Scope
 
-### Slice 1
+### Slice 1 — Contract packaging and SDK distribution
 
-- Publicar SDK versionado sobre contracts canónicos.
+- Empaquetar schemas/contracts canónicos y publicar métodos SDK tipados por capability promovida, con versionado, deprecation y redaction.
 
-### Slice 2
+### Slice 2 — Thin MCP adapters
 
-- Implementar MCP tools/resources con scopes y redaction.
+- Implementar MCP tools/resources como adapters delgados sobre SDK/commands existentes, con scopes, policy-blocked states y redaction; cero imports de DB/provider/storage.
 
-### Slice 3
+### Slice 3 — Parity certification
 
-- Probar parity UI/SDK/MCP, replay y revocación.
+- Ejecutar el conformance harness acumulado y emitir coverage/certification por capability para UI, HTTP, SDK, MCP, CLI, worker/event, sister platform y E2E.
 
 ## Out of Scope
 
 - Producción pública, clientes externos, pricing/wallet self-serve o permisos más amplios que los aprobados expresamente.
+- Crear, corregir o duplicar business primitives que debieron nacer en su capability task.
 - Mover runtime creativo, datos, provider secrets o lógica de Globe a Greenhouse.
 - Crear un segundo harness o namespace de tasks dentro de Globe.
 
@@ -210,9 +212,11 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 
 ## Acceptance Criteria
 
-- [ ] MCP no llama providers ni DB directamente.
-- [ ] Una misma acción produce el mismo command/audit en UI, SDK y MCP.
-- [ ] Smokes cubren allow, deny, replay, revoke y correlation.
+- [ ] MCP/SDK no importan ni llaman providers, DB o storage directamente.
+- [ ] Una misma acción produce el mismo command/result/error/audit en UI, HTTP, SDK, MCP y CLI habilitados.
+- [ ] Coverage machine-readable no contiene `missing`; surfaces deshabilitadas están `policy-blocked` o `not-applicable` con razón.
+- [ ] Smokes cubren allow, deny, replay, revoke, redaction y correlation.
+- [ ] La task no introduce business logic, schema de dominio nuevo ni endpoint model-specific.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
 - [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
 
@@ -233,4 +237,3 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Follow-ups
 
 - Las dependencias sucesoras se leen desde EPIC-028 y `docs/tasks/README.md`.
-

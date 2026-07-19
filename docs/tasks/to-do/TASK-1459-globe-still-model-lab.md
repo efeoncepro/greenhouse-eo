@@ -43,6 +43,7 @@ Saber qué rutas promover para ideación, edición, layout, texto, vector y acab
 
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` — principio heredado/adaptado por Globe.
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
 - `../efeonce-globe/docs/architecture/PLATFORM_FOUNDATION_V1.md`
 - `../efeonce-globe/docs/operations/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`
@@ -104,10 +105,10 @@ Saber qué rutas promover para ideación, edición, layout, texto, vector y acab
 
 ### Contract surface
 
-- Contrato existente a respetar: `EPIC-028, arquitectura agentic de Globe y provider contracts versionados`
-- Contrato nuevo o modificado: `contratos descritos en Scope; nombres finales se fijan en Plan Mode antes de implementar`
+- Contrato existente a respetar: `TASK-1481 spine + TASK-1457 experiment commands/readers y provider contracts versionados`
+- Contrato nuevo o modificado: `still capability descriptors, route schemas y typed attempt/result evidence; ningún endpoint por modelo`
 - Backward compatibility: `gated`
-- Full API parity: `la capacidad se implementa como command/reader server-side antes de cualquier consumer UI o agente`
+- Full API parity: `cada still route se ejecuta por el experiment command/API/SDK existente; adapters no crean transports ni scripts paralelos`
 
 ### Data model and invariants
 
@@ -152,7 +153,8 @@ Saber qué rutas promover para ideación, edición, layout, texto, vector y acab
 
 ### Slice 1
 
-- Implementar adapters de laboratorio con provider/model/version explícitos.
+- Implementar adapters de laboratorio con provider/model/version explícitos detrás del canonical experiment
+  command de `TASK-1457`; ningún adapter es invocable directamente por CLI/UI/MCP.
 
 ### Slice 2
 
@@ -213,6 +215,9 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 - [ ] Google-native usa Google Cloud; rutas no Google usan provider aprobado.
 - [ ] No existe fallback silencioso entre modelos.
 - [ ] Cada recomendación enlaza evidencia y limitaciones reales.
+- [ ] Todos los canaries se invocan mediante private API/SDK/conformance harness y producen el mismo
+      command/audit/manifest; no existe `run_endpoint(arbitrary_json)`.
+- [ ] Agregar un modelo no crea un endpoint/tool model-specific: extiende capability descriptor y adapter.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
 - [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
 
@@ -233,4 +238,3 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Follow-ups
 
 - Las dependencias sucesoras se leen desde EPIC-028 y `docs/tasks/README.md`.
-

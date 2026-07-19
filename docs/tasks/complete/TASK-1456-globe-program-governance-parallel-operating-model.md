@@ -159,7 +159,7 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Acceptance Criteria
 
 - [x] No existe un segundo registry de tasks en Globe.
-- [x] EPIC-028 y TASK-1456…1480 usan dependencias y estados canónicos de Greenhouse.
+- [x] EPIC-028 y sus TASK-### usan dependencias y estados canónicos de Greenhouse.
 - [x] El plan técnico de Globe referencia, pero no gobierna, las tasks.
 - [x] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
 - [x] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
@@ -190,4 +190,3 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Follow-ups
 
 - `TASK-1457`, `TASK-1458` y `TASK-1464` forman la siguiente wave; `TASK-1459` comienza al cerrar el Lab gate.
-
