@@ -19,10 +19,16 @@ Cero cambio de runtime en greenhouse-eo (sólo lifecycle documental).
   (allow/deny/revocation/budget) y rollback. `tofu fmt` + `tofu validate` corridos verdes (OpenTofu 1.12.4, drop-in;
   no había terraform local).
 
-**Rollout pendiente (declarado, NO listo):** el **import/plan/apply real contra GCP vivo** queda `code complete,
-rollout pendiente` — es un paso SUPERVISADO, no autónomo, porque los SAs/WIF de Vercel están vivos y un apply con
-HCL desalineado podría destruir/recrear identidad viva (rompería el bridge TASK-1454 + piloto + SSO). El apply es
-lo que desbloquea el canary live de TASK-1457. `enable_budget` default OFF.
+**Apply SUPERVISADO EJECUTADO (2026-07-19):** `tofu apply` contra GCP vivo completó
+`23 imported, 13 added, 0 changed, 0 destroyed` — la identidad de TASK-1454 se adoptó **sin un solo destroy/replace**
+(gate de seguridad verificado en el plan antes de aplicar; el único cambio detectado, el `display_name` del deployer,
+se alineó al valor real para dejar el plan en cero cambios). Ya vivo: GitHub WIF pool/provider (ACTIVE), deployer
+`run.admin` + act-as, bucket privado `efeonce-globe-lab-evidence`, log metric de SA-key, state remoto en
+`gs://efeonce-globe-tfstate`. Secret `GCP_WORKLOAD_IDENTITY_PROVIDER` seteado en `efeoncepro/efeonce-globe`. State
+remoto (no en git); sólo el HCL vive en git. `enable_budget` default OFF.
+
+Con esto **el canary live de TASK-1457 queda desbloqueado a nivel infra**. Falta aún, para prenderlo: un provider
+adapter real, secretos de provider en Secret Manager, un Dockerfile de studio-web y `GLOBE_LAB_ENABLED=true`.
 
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 

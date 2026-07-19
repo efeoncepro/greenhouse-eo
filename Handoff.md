@@ -27,13 +27,15 @@
   `FakeReferenceAdapter` + `LabRunner`) fluyen end-to-end con un proveedor **fake determinístico** (cero gasto,
   cero infra); `pnpm check` + `pnpm build` verdes. `TASK-1464` escribió el Terraform completo (import blocks de los
   recursos VIVOS de TASK-1454 + GitHub WIF/budgets/observabilidad + outputs para 1457), los workflows keyless y el
-  runbook; `tofu validate` verde, **cero GCP tocado**.
-  **Rollouts pendientes declarados (paso SUPERVISADO, no autónomo):** (1) el **import/plan/apply real** de 1464
-  contra GCP vivo — apply sólo tras un plan con CERO destroy/replace (los SAs/WIF de Vercel están vivos); (2) el
-  canary con **proveedor real** de 1457 (`GLOBE_LAB_ENABLED` default OFF), que depende de (1). Próximo paso: correr
-  el runbook de IaC supervisado (bootstrap state bucket → init → plan → apply), setear el secret
-  `GCP_WORKLOAD_IDENTITY_PROVIDER`, y recién ahí un adapter real reemplaza el fake en el `LabRunner` detrás del flip.
-  Deferidos: mapping ID-token→principal por identidad → live; tenancy/store durable → TASK-1465.
+  runbook. **1464 APPLY SUPERVISADO EJECUTADO (2026-07-19):** `tofu apply` contra GCP vivo → `23 imported, 13 added,
+  0 changed, 0 destroyed` (identidad TASK-1454 adoptada sin destroy/replace, verificado en el plan antes de aplicar).
+  Vivo: GitHub WIF pool/provider (ACTIVE), deployer run.admin + act-as, bucket privado `efeonce-globe-lab-evidence`,
+  log metric de SA-key, state remoto `gs://efeonce-globe-tfstate`; secret `GCP_WORKLOAD_IDENTITY_PROVIDER` seteado en
+  `efeoncepro/efeonce-globe`.
+  **Único rollout pendiente:** el canary con **proveedor real** de 1457 (`GLOBE_LAB_ENABLED` default OFF). La infra
+  ya no bloquea; falta código+config: un provider adapter real que reemplace el fake en el `LabRunner`, secretos de
+  provider en Secret Manager, un Dockerfile de studio-web, y prender el flag. Deferidos: mapping ID-token→principal
+  por identidad → live; tenancy/store durable → TASK-1465.
 - EPIC-028 avanza en tres carriles paralelos gobernados íntegramente por Greenhouse. `TASK-1456…1485` viven
   en `docs/tasks/to-do/`, pasan por hooks/lint/QA/handoff de este repo y pueden poseer paths de implementación
   en el repositorio hermano. Globe conserva sólo arquitectura, runtime y evidencia técnica; no tiene registry
