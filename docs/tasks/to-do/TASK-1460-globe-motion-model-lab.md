@@ -10,6 +10,10 @@
 
 Nota para Slice 3 y la AC "La matriz distingue canary, lab-ready y production-candidate": lo que el harness puntúa objetivamente es el manifest (output presente, dentro del cap, lineage intacto, ruta estable, outcome candidato); el juicio de continuidad/actuación/cámara/audio son **criterios humanos declarados**, no auto-puntuados, y el verdict nunca es un "passed" creativo (`objective_fail` u `objective_pass_pending_human`). La matriz no puede promover una ruta desde un reporte objetivo solo. — cerrado por trabajo en TASK-1458.
 
+## Delta 2026-07-19 — TASK-1486: adapter real Vertex disponible (code-complete, rollout gated)
+
+`TASK-1486` dejó el `VertexCreativeAdapter` **code-complete** (rollout gated): `video-generate`/`video-extend` rutean a `gemini-omni-flash-preview` en Vertex región `global` (us-east4/us-central1 → `NOT_FOUND`), keyless, detrás del `LabRunner`. Slice de ejecución del lab motion ya puede correr contra el proveedor **real** con `GLOBE_LAB_PROVIDER=vertex` + `GLOBE_LAB_ENABLED=true` (canary billable gated por el go-live checklist de 1486). Nota dura: el canary sirve **prompt-only** (text-to-video); un motion que requiere una imagen de referencia (i2v) queda `inputs_unavailable` hasta que aterrice la resolución hash→bytes desde el bucket privado (follow-up declarado en 1486). Omni deforma texto/logos/UI — no usar para copy/logo. — gap de adapter cerrado por TASK-1486.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

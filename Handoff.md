@@ -41,6 +41,16 @@
   versionadas — objetivo (checks automáticos) separado del juicio humano; verdict nunca auto-"passed". Comparte el
   gate de rollout del canary real (con proveedor fake declara la limitación "sólo técnico"); el juicio humano
   (surface `ui`) y el store durable de reports quedan diferidos.
+  **`TASK-1486` (Vertex real provider adapter) COMPLETE — code-complete, rollout gated.** Primer `CreativeProviderAdapter`
+  real (`VertexCreativeAdapter`, `apps/creative-runner/src/vertex-adapter.ts`) reemplaza el fake detrás del `LabRunner`
+  sin tocar dominio/contrato: routing capability→modelo Vertex interno (image→`gemini-2.5-flash-image`; video→
+  `gemini-omni-flash-preview` región `global`), keyless (ADC/WIF lazy), `estimate` sin red / `submit` única facturable /
+  `poll`→hashes, error mapping sanitizado. Provider-selection `GLOBE_LAB_PROVIDER` default **`fake`** (reversible);
+  15 tests mockeados (cero gasto), `pnpm check`+`build` verdes. **Canary billable en vivo = gated por humano** —
+  go-live checklist (§"Realización" en `EFEONCE_GLOBE_MODEL_LAB_V1.md`): habilitar Vertex+modelos en el proyecto
+  `efeonce-globe` (verificados en `efeonce-group`, NO aún en `efeonce-globe`), SA `aiplatform.user`, deploy/ADC, budget,
+  `GLOBE_LAB_PROVIDER=vertex`+`GLOBE_LAB_ENABLED=true`. Audio (TASK-1461) NO queda desbloqueado (adapter Vertex
+  `supports('audio-generate')=false`; necesita adapter Fal/Chirp + `CompositeProviderAdapter`).
 - EPIC-028 avanza en tres carriles paralelos gobernados íntegramente por Greenhouse. `TASK-1456…1485` viven
   en `docs/tasks/to-do/`, pasan por hooks/lint/QA/handoff de este repo y pueden poseer paths de implementación
   en el repositorio hermano. Globe conserva sólo arquitectura, runtime y evidencia técnica; no tiene registry

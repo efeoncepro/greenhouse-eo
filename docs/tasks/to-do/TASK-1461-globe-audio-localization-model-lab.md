@@ -10,6 +10,10 @@
 
 Nota para las AC de consentimiento/rights y sincronía: el foley del micrófono se juzga como **sonido-de-contacto** (golpe-y-rebote práctico), y ese juicio de oficio es un **criterio humano declarado**, no un check auto-puntuado; la sincronía/naturalidad no las resuelve el harness. Consent/license quedan declarados a nivel de fixture. El verdict nunca es un "passed" creativo (`objective_fail` u `objective_pass_pending_human`). — cerrado por trabajo en TASK-1458.
 
+## Delta 2026-07-19 — TASK-1486: adapter real Vertex NO desbloquea audio (boundary explícito)
+
+`TASK-1486` dejó el `VertexCreativeAdapter` code-complete para image + video, pero **deliberadamente devuelve `supports('audio-generate') = false` y `supports('speech-synthesize') = false`**: audio/voz **no** se sirven por este adapter Google-native (los líderes — ElevenLabs/Seed Audio — son no-Google; Chirp/Lyria de Google son opción, no implementados). Este carril audio **sigue bloqueado por adapter**: necesita un adapter dedicado (Fal para ElevenLabs/Seed, o un `ChirpCreativeAdapter` Vertex) + el `CompositeProviderAdapter` que rutee por `supports()` (follow-up declarado en 1486). NO asumir que 1486 habilita audio. — adapter de audio sigue pendiente; 1486 sólo fijó el patrón y el boundary.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

@@ -6,6 +6,10 @@
 
 Nota de frontera, alineada con el Goal ("separar probar de autorizar") y la AC "Sólo rutas promoted pueden llegar al router productivo": un report es **evidencia técnica, nunca una aprobación de ruta** (invariante 9) ni de artefacto (invariante 6), y su verdict nunca es un "passed" creativo (sólo `objective_fail` u `objective_pass_pending_human`). El registry debe seguir exigiendo revisión humana + actor autorizado por encima del report objetivo; un `objective_pass_pending_human` **no** autoriza promover por sí solo. — cerrado por trabajo en TASK-1458.
 
+## Delta 2026-07-19 — TASK-1486: adapter real Vertex disponible (code-complete, rollout gated)
+
+`TASK-1486` dejó el `VertexCreativeAdapter` code-complete: cuando el canary billable se prenda (`GLOBE_LAB_PROVIDER=vertex`, gated por su go-live checklist), los reportes de evaluación (TASK-1458) dejarán de declarar "proveedor fake" y llevarán `model`/`modelVersion` reales de Vertex + `actualCredits` del uso real. La promotion readiness registry debe seguir tratando el `EvaluationReportV1` como **evidencia objetiva** (no aprobación de craft ni de ruta): el verdict del harness nunca es un "passed" creativo, y `objective_pass_pending_human` no promueve por sí solo. La promoción de una ruta a producción sigue siendo un gate **separado** de ejecutarla en el Lab (invariante 9). — adapter real disponible por TASK-1486.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

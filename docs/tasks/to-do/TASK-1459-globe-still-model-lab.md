@@ -10,6 +10,10 @@
 
 Nota para Slice 3: el verdict del harness nunca es un "passed" creativo — sólo `objective_fail` u `objective_pass_pending_human`. La recommendation matrix debe tratar el reporte como evidencia objetiva (checks técnicos), no como aprobación de craft ni de ruta, y declarar la limitación "proveedor fake" hasta el canary real. — cerrado por trabajo en TASK-1458.
 
+## Delta 2026-07-19 — TASK-1486: adapter real Vertex disponible (code-complete, rollout gated)
+
+`TASK-1486` dejó el `VertexCreativeAdapter` **code-complete** (rollout gated): `image-generate` rutea a `gemini-2.5-flash-image` en Vertex, keyless (ADC/WIF), detrás del mismo `LabRunner`. Slice 2 ("ejecutar golden briefs y registrar costo/latencia/calidad") ya puede correr contra el proveedor **real** prendiendo `GLOBE_LAB_PROVIDER=vertex` + `GLOBE_LAB_ENABLED=true` (canary billable gated por el go-live checklist de 1486: Vertex enablement en `efeonce-globe` + SA `aiplatform.user` + budget). Hasta ese flip, el fake sigue default y el reporte del harness declara "proveedor fake". Nota: el canary sirve prompt-only (text-to-X); el still `rrss-key-visual-still` (inputs `[]`) califica. — gap de adapter cerrado por TASK-1486.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
