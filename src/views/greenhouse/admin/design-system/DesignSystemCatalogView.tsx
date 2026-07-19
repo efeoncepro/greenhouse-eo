@@ -274,6 +274,20 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-layout-board-split'
   },
   {
+    id: 'surface-recipes',
+    title: 'Surface recipes',
+    description:
+      'Seis composiciones canónicas y ocho primitives compuestas para que una interfaz nueva nazca con jerarquía, densidad adaptable, estados y motion gobernados. El Lab recorre workbench, reporte ejecutivo y configuración.',
+    route: '/design-system/surface-recipes',
+    category: 'Patterns',
+    kind: 'Pattern',
+    status: 'Canonical',
+    owner: 'Greenhouse AI Design Studio',
+    tags: ['premium UI', 'recipes', 'workbench', 'report', 'settings', 'agentic UI', 'composition'],
+    searchAliases: ['surface recipes', 'premium ui', 'operational workbench', 'analytics report', 'settings flow'],
+    icon: 'tabler-layout-dashboard'
+  },
+  {
     id: 'card-density',
     title: 'Adaptive card density',
     description:

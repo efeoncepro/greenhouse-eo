@@ -13,6 +13,7 @@ import { writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import type { CaptureEnv } from './env'
+import type { CaptureQualityProfile } from './scenario'
 
 /** Rectángulo en píxeles del frame ya escalado por deviceScaleFactor. */
 export interface FrameMaskRect {
@@ -192,6 +193,7 @@ export interface CaptureVariantSummary {
 export interface CaptureManifest {
   schemaVersion: 1
   scenarioName: string
+  qualityProfile?: CaptureQualityProfile
   route: string
   env: CaptureEnv
   viewport: { width: number; height: number }

@@ -7,6 +7,10 @@
 
 ---
 
+## Delta 2026-07-18 — Secondary Tidal Teal
+
+El rol `secondary` deja el lime/green y adopta Tidal Teal con ramp `100→900`, alias semánticos mode-aware y contraste AA. El runtime deriva desde `axisRamp.secondary`/`greenhouseSecondaryPalette`; consumers usan `theme.palette.secondary.*`. La decisión, alternativas, rollback y condición de reconciliación con AXIS Figma viven en `GREENHOUSE_SECONDARY_TEAL_COLOR_DECISION_V1.md`; evidencia durable en el scenario/baseline `design-system.colors` desktop/mobile.
+
 ## Delta 2026-07-09 — Public Anonymous Surface Shell Pattern (TASK-354)
 
 Se documenta el patrón `Public Anonymous Surface Shell` para superficies públicas

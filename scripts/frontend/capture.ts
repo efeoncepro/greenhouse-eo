@@ -321,6 +321,7 @@ const runOneCapture = async ({
   const reportManifest: CaptureManifest = {
     schemaVersion: 1,
     scenarioName: scenario.name,
+    qualityProfile: scenario.qualityProfile,
     route: scenario.route,
     env,
     viewport,

@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
 
 import type { AxisColorFamily } from '@core/theme/axis-tokens'
+import { greenhouseSecondaryPalette } from '@core/theme/axis-secondary'
 import { axisSemanticPalette, axisSemanticSubValues } from '@core/theme/axis-semantic'
 import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
@@ -39,7 +40,7 @@ const OPACITY_STEPS = [8, 16, 24, 32, 38] as const
 
 const BRAND: { key: AxisColorFamily; label: string }[] = [
   { key: 'primary', label: 'Primary (Efeonce)' },
-  { key: 'secondary', label: 'Secondary (lime)' }
+  { key: 'secondary', label: 'Secondary (Tidal Teal)' }
 ]
 
 const FEEDBACK: { key: AxisColorFamily; label: string }[] = [
@@ -109,6 +110,7 @@ const RampSwatch = ({ family }: { family: AxisColorFamily }) => {
             {/* Specimen: the background is the AXIS token being documented. */}
             <Box
               aria-label={`${family}-${step} ${hex}`}
+              role='img'
               sx={theme => ({
                 bgcolor: hex,
                 minBlockSize: theme.spacing(13),
@@ -254,6 +256,7 @@ const ProposedBrandAccentCard = () => {
               <Box key={step} sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                 <Box
                   aria-label={`tertiary-orange-${step} ${hex}`}
+                  role='img'
                   sx={theme => ({
                     bgcolor: hex,
                     minBlockSize: theme.spacing(13),
@@ -416,6 +419,12 @@ const FamilyCard = ({ family, label }: { family: AxisColorFamily; label: string 
           main {main}
         </Typography>
       </Box>
+      {family === 'secondary' ? (
+        <Typography variant='caption' color='text.secondary'>
+          Primitive anchor 500 · semantic light main {greenhouseSecondaryPalette.light.main} · semantic dark main{' '}
+          {greenhouseSecondaryPalette.dark.main}
+        </Typography>
+      ) : null}
       <RampSwatch family={family} />
       {/* opacity soft-fills over light + dark surfaces (graduated 8 → 38%) */}
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75, mt: 0.5 }}>
@@ -436,6 +445,7 @@ const FamilyCard = ({ family, label }: { family: AxisColorFamily; label: string 
                 <Box
                   key={op}
                   aria-label={`${family} opacity ${op}`}
+                  role='img'
                   sx={theme => ({
                     bgcolor: theme.axis.opacity[family][op],
                     flex: 1,
@@ -492,9 +502,15 @@ const NeutralPanel = ({ mode }: { mode: 'light' | 'dark' }) => {
         <Typography variant='caption' sx={{ color: n.textSecondary }}>
           text.secondary · {n.textSecondary}
         </Typography>
-        <Typography variant='caption' sx={{ color: n.textDisabled }}>
-          text.disabled · {n.textDisabled}
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+          <Box
+            aria-hidden
+            sx={theme => ({ bgcolor: n.textDisabled, inlineSize: theme.spacing(3), blockSize: theme.spacing(3) })}
+          />
+          <Typography variant='caption' sx={{ color: n.textPrimary }}>
+            text.disabled · {n.textDisabled}
+          </Typography>
+        </Box>
       </Box>
       <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
         {[
@@ -514,10 +530,10 @@ const NeutralPanel = ({ mode }: { mode: 'light' | 'dark' }) => {
 const ChartSwatch = ({ color, label }: { color: string; label: string }) => (
   <Box sx={{ textAlign: 'center', minInlineSize: 84 }}>
     <Box sx={{ height: 48, borderRadius: 1, bgcolor: color, mb: 0.75 }} />
-    <Typography variant='caption' sx={{ display: 'block', fontWeight: 600 }}>
+    <Typography variant='caption' color='text.primary' sx={{ display: 'block', fontWeight: 600 }}>
       {label}
     </Typography>
-    <Typography variant='caption' color='text.secondary' sx={{ fontSize: 10 }}>
+    <Typography variant='caption' color='text.primary'>
       {color.toUpperCase()}
     </Typography>
   </Box>
@@ -538,7 +554,7 @@ const ChartPaletteCard = () => (
       </Box>
 
       <Box>
-        <Typography variant='subtitle2' sx={{ mb: 1 }}>
+        <Typography variant='subtitle2' color='text.primary' sx={{ mb: 1 }}>
           Categórica (series arbitrarias · CSC fases · multi-serie) — light
         </Typography>
         <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
@@ -549,7 +565,7 @@ const ChartPaletteCard = () => (
       </Box>
 
       <Box>
-        <Typography variant='subtitle2' sx={{ mb: 1 }}>
+        <Typography variant='subtitle2' color='text.primary' sx={{ mb: 1 }}>
           Categórica — dark (charcoal)
         </Typography>
         <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
@@ -560,7 +576,7 @@ const ChartPaletteCard = () => (
       </Box>
 
       <Box>
-        <Typography variant='subtitle2' sx={{ mb: 1 }}>
+        <Typography variant='subtitle2' color='text.primary' sx={{ mb: 1 }}>
           Direccional (Finanzas / deltas) — siempre con signo +/− o ícono ▲/▼
         </Typography>
         <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
@@ -580,10 +596,10 @@ const TonalSwatch = ({ color, label }: { color: string; label: string }) => (
     <Box
       sx={{ height: 48, borderRadius: 1, bgcolor: color, mb: 0.75, border: '1px solid', borderColor: 'divider' }}
     />
-    <Typography variant='caption' sx={{ display: 'block', fontWeight: 600 }}>
+    <Typography variant='caption' color='text.primary' sx={{ display: 'block', fontWeight: 600 }}>
       {label}
     </Typography>
-    <Typography variant='caption' color='text.secondary' sx={{ fontSize: 10 }}>
+    <Typography variant='caption' color='text.primary'>
       {color.toUpperCase()}
     </Typography>
   </Box>
@@ -616,7 +632,7 @@ const SemanticTonalCard = () => (
 
         return (
           <Box key={role.key}>
-            <Typography variant='subtitle2' sx={{ mb: 1 }}>
+            <Typography variant='subtitle2' color='text.primary' sx={{ mb: 1 }}>
               {role.label}
             </Typography>
             <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
@@ -635,12 +651,17 @@ const SemanticTonalCard = () => (
 
 const AxisColorLabView = () => (
   <Box
+    data-capture='colors-lab'
     sx={{
       display: 'flex',
       flexDirection: 'column',
       gap: 4,
       maxInlineSize: theme => theme.spacing(275),
-      mx: 'auto'
+      mx: 'auto',
+      '& code': {
+        color: 'text.primary',
+        backgroundColor: 'action.hover'
+      }
     }}
   >
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
@@ -652,12 +673,13 @@ const AxisColorLabView = () => (
         Referencia viva de todos los tokens de color de AXIS (ramps 100→900 + opacity 8/16/24/32/38 + neutrales
         light/dark), consumidos desde el SoT <code>@core/theme/axis-tokens.ts</code>. En cada paso del ramp:{' '}
         <strong>✓ texto</strong> = contraste ≥4.5:1 sobre blanco (apto para texto chico); si no, muestra el ratio real.
-        Fuente de verdad upstream: AXIS en Figma (<code>yyMksCoijfMaIoYplXKZaR</code>, nodo <code>11205:5341</code>).
-        Superficie interna — no visible para clientes.
+        Fuente upstream: AXIS en Figma (<code>yyMksCoijfMaIoYplXKZaR</code>, nodo <code>11205:5341</code>), con el
+        override Greenhouse Tidal Teal gobernado en código hasta su reconciliación upstream. Superficie interna —
+        no visible para clientes.
       </Typography>
     </Box>
 
-    <Card variant='outlined'>
+    <Card variant='outlined' data-capture='colors-brand-ramp'>
       <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         <Typography variant='h5'>
           Marca

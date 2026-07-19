@@ -19,7 +19,7 @@ Esta carpeta describe la **plataforma de ingeniería UI**. El **lenguaje visual 
 | **Contrato agente (visual)** | `DESIGN.md` (raíz, lint-gated TASK-764) |
 | **Tokens visuales (extendido)** | [GREENHOUSE_DESIGN_TOKENS_V1.md](../GREENHOUSE_DESIGN_TOKENS_V1.md) · [GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md](../GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md) |
 | **Catálogo vivo del Design System** | `/admin/design-system` (interno) — home navegable de tokens, primitives, patrones y labs |
-| **Color AXIS** | `/admin/design-system/colors` (interno) · ramps/opacidades/neutrales desde `src/@core/theme/axis-tokens.ts` |
+| **Color AXIS + Greenhouse overrides** | `/admin/design-system/colors` (interno) · ramps/opacidades/neutrales desde `src/@core/theme/axis-tokens.ts` · Tidal Teal secondary governed by [GREENHOUSE_SECONDARY_TEAL_COLOR_DECISION_V1](../GREENHOUSE_SECONDARY_TEAL_COLOR_DECISION_V1.md) |
 | **Geometry foundations** | `/admin/design-system/geometry` (interno) · spacing `theme.spacing(N)` · radius `theme.shape.customBorderRadius.*` |
 | **Tipografía** | skill `typography-design` + `src/components/theme/typography-tokens.ts` (SoT) |
 | **Runtime (autoridad final)** | `src/components/theme/mergedTheme.ts` + `src/components/greenhouse/primitives/**` |
@@ -54,6 +54,7 @@ Regla: cuando un doc temático difiera del runtime, **gana el runtime** y el doc
 - Tablas: [OPERATIONAL_TABLE_PLATFORM_V1](../GREENHOUSE_OPERATIONAL_TABLE_PLATFORM_V1.md)
 - i18n: [I18N_ARCHITECTURE_V1](../GREENHOUSE_I18N_ARCHITECTURE_V1.md)
 - Operating model: [PRODUCT_UI_OPERATING_MODEL_V1](../GREENHOUSE_PRODUCT_UI_OPERATING_MODEL_V1.md)
+- Color secondary: [SECONDARY_TEAL_COLOR_DECISION_V1](../GREENHOUSE_SECONDARY_TEAL_COLOR_DECISION_V1.md)
 
 ## Cómo evoluciona esta carpeta (regla anti-monolito)
 

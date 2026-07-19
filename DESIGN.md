@@ -2,15 +2,15 @@
 version: alpha
 name: Greenhouse EO Portal
 designSystem: AXIS
-description: Greenhouse design contract for coding agents. Derived from the live MUI theme and the canonical typography/token docs. El Design System de Efeonce se llama AXIS (multi-marca Efeonce/Kortex/Verk); fuente de verdad en Figma "Design System | Vuexy → AXIS" (fileKey yyMksCoijfMaIoYplXKZaR, read-only). Cuando este contrato y AXIS difieran, AXIS es el norte y el runtime converge hacia él.
+description: Greenhouse design contract for coding agents. Derived from the live MUI theme and canonical token docs. AXIS Figma is upstream for mirrored families; accepted Greenhouse overrides such as Tidal Teal remain code-first until explicitly reconciled upstream.
 colors:
   primary: "#0375DB"
   primary-light: "#3691E3"
   primary-dark: "#024C8F"
   primary-tonal: "#D7E9F9"
-  secondary: "#4B8405"
-  secondary-light: "#6EC207"
-  secondary-dark: "#396504"
+  secondary: "#0B726C"
+  secondary-light: "#12AFA2"
+  secondary-dark: "#0A5955"
   info: "#1F6FD4"
   neutral: "#F8F7FA"
   surface: "#FFFFFF"
@@ -248,22 +248,22 @@ Default accent is Core Blue. The runtime supports other approved Efeonce brand p
 The product is built on bright neutral surfaces, deep blue structural tones, and one strong accent at a time.
 
 - `primary` is the canonical CTA and active-state color. Use it for the single most important action in a local context.
-- `secondary` and its darker family are structural blues for shells, navigation depth, or emphasis blocks, not for stacking many competing CTAs.
+- `secondary` is Tidal Teal: a supporting action, contextual-selection and branded-emphasis role. Structural shells remain Midnight/Core Blue; secondary must not compete with the primary CTA.
 - `neutral`, `surface`, and `surface-alt` keep the product bright, legible, and operational.
 - `success`, `warning`, and `error` are semantic only. Do not repurpose them for decorative emphasis.
 - In dark mode, prefer the dedicated dark surfaces and text tokens instead of inverting colors ad hoc.
 
-The overall impression should be crisp and trustworthy rather than flashy. Blue is the product's default energy source; orange, lime, and crimson are controlled signals, not a rainbow palette.
+The overall impression should be crisp and trustworthy rather than flashy. Blue is the product's default energy source; Tidal Teal adds controlled depth, while orange, lime and crimson stay exceptional signals rather than a rainbow palette.
 
 ### AXIS palette — full reference
 
 The colors above are the **semantic + key tokens** an agent needs day to day. The complete AXIS palette (Efeonce's Design System) is the source of truth and lives in code, not in this front-matter — the design-contract lint gate forbids unreferenced tokens here, so the full ramps stay where they're consumed:
 
-- **Source of truth (code):** `src/@core/theme/axis-tokens.ts` (1:1 mirror of AXIS Figma).
+- **Source of truth (code):** `src/@core/theme/axis-tokens.ts` (AXIS mirror plus the governed Greenhouse Tidal Teal secondary override).
 - **Source of truth (design, live via Figma MCP):** the AXIS Figma file is the upstream SoT. An agent with the Figma MCP can pull the live ramps/semantics for context before a design decision:
   - **fileKey:** `yyMksCoijfMaIoYplXKZaR` · **Theme Color node:** `11205:5341` (light + dark swatches, all ramps 100→900 + opacity + elevation).
   - **Tools:** `get_variable_defs(nodeId, fileKey)` → every token's resolved hex (e.g. `Color Efeonce/Secundary/secundary-700 = #138760`); `get_screenshot(nodeId, fileKey)` → the swatch sheet. URL: `figma.com/design/yyMksCoijfMaIoYplXKZaR/...?node-id=11205-5341`.
-  - When AXIS Figma and this contract disagree, AXIS is the north — pull it, then reconcile the runtime + this file (parity 3-capas).
+  - When AXIS Figma and this contract disagree, reconcile the runtime + this file (parity 3-capas). Exception: the accepted Tidal Teal secondary is intentionally code-first until the AXIS master is updated; never overwrite it with the retired lime ramp during regeneration.
 - **Runtime access:** `theme.axis.*`.
   - **Living inventory for agents:** `/admin/design-system/colors` lists every runtime token name with its current resolved color. Check it when choosing a color token; do not invent names or paste HEX from screenshots/Figma.
   - `theme.axis.main.<family>` — quick alias for the current main color of `primary`, `secondary`, `info`, `success`, `warning`, and `error`.
@@ -272,18 +272,29 @@ The colors above are the **semantic + key tokens** an agent needs day to day. Th
   - `theme.axis.neutral.{light,dark}.{bodyBg|paper|bgWhite|textPrimary|textSecondary|textDisabled|divider|actionHover|snackbar}` — per-mode surface/text/divider neutrals (the values mapped into `background`/`paper`/`text` below).
 - **Default rule:** components consume the **semantic** layer (`theme.palette.*`, `theme.customColors.*`) — the AXIS primitives mint those semantics; only drop to `theme.axis.ramp.*` when no semantic token fits.
 - **Which step to use (agents: do NOT pick a ramp step by eye):** the semantic `main`/`light`/`dark` already encode the right step per role — use them, not raw ramp steps. The mapping + a11y rule:
-  - `main` = the **functional fill/text step** chosen for AA. For feedback semantics (TASK-1053 Restraint v1) `main` = the nominal `500`, now AA with white text by design: `error.main` = error-`500` `#DC2E39` (white 4.6:1), `success.main` = success-`500` `#157F47` (white 5.05:1), `info.main` = info-`500` `#1F6FD4` (white 4.9:1); `warning.main` = warning-`500` `#FFB703` uses **dark ink** (white-on-amber fails AA). The legacy error-800 deviation was removed. `secondary.main` = secondary-**700** (`#4B8405` crisp green, white 4.56:1; the lime `500` `#6EC207` is illegible as text ~1.8:1). When you need a solid fill or text in a brand/semantic color, use `main`.
-  - `light` = the **bright/tint accent end** (e.g. `secondary.light` = lime `500` `#6EC207`) — use ONLY as a tint behind dark/ink text or as a soft fill, never with white text (it fails AA). `theme.axis.opacity.<family>[8|16]` is the canonical soft-fill alpha.
-  - `dark` = **hover/active** (darken), e.g. `secondary.dark` = secondary-`800`.
+  - `main` = the **functional fill/text step** chosen for AA. For feedback semantics (TASK-1053 Restraint v1) `main` = the nominal `500`, now AA with white text by design: `error.main` = error-`500` `#DC2E39` (white 4.6:1), `success.main` = success-`500` `#157F47` (white 5.05:1), `info.main` = info-`500` `#1F6FD4` (white 4.9:1); `warning.main` = warning-`500` `#FFB703` uses **dark ink** (white-on-amber fails AA). `secondary.main` is mode-aware: light = secondary-`700` `#0B726C` with white (5.77:1); dark = secondary-`400` `#3BCBBD` with Midnight ink (7.25:1). When you need a solid fill or text in a brand/semantic color, use `main`.
+  - `light` = the brighter accent/tint end. For secondary: light mode maps to `500 #12AFA2`; dark mode maps to `300 #79E0D4`. Use opacity tokens for soft fills rather than inventing alpha values.
+  - `dark` = **hover/active**. For secondary: light mode maps to `800 #0A5955`; dark mode maps to `500 #12AFA2`.
   - Raw `theme.axis.ramp.<family>[<step>]` is for the rare case the semantic layer can't cover (a chart series needing N distinct steps, a specific contrast-safe tint) — and you must verify contrast yourself.
 - **Neutrals are AXIS** (light bg `#F8F7FA` / paper `#FFFFFF` / ink `#2F2B3D`; dark bg `#25293C` / paper `#2F3349` / ink `#E1DEF5`), default-on at runtime; the env kill-switch `NEXT_PUBLIC_AXIS_NEUTRALS_ENABLED=false` reverts to legacy navy only in emergency.
-- **`secondary` = AXIS green (ADOPTED, TASK-1034).** AXIS defines `secondary` as the green/lime ramp; the legacy Efeonce azure `#023C70` was NOT an AXIS color and is retired. `secondary.main` = secondary-**700** `#4B8405` (crisp green — the functional, AA-legible step: white text 4.56:1, and legible as tonal/outlined text where `main` drives the color; TASK-1053 A1b corrigió el hue-shift a teal `#138760`). `secondary.light` = secondary-**500** `#6EC207` (the bright lime — tint/accent only, dark/ink text). `secondary.dark` = secondary-**800** `#396504` (hover/active). Default-on at runtime; kill-switch `NEXT_PUBLIC_AXIS_SECONDARY_LIME_ENABLED=false` reverts to legacy azure only in emergency. **Why deep green, not the nominal lime `500`:** `color="secondary"` is ~241 tonal/outlined usages (0 contained) where `main` is the text/border — bright lime as text is illegible (~1.8:1) and reads candy; the deep green is sophisticated + AA. Same principle as picking the AA-legible step over the bright nominal `500` (TASK-1053 corrected the feedback semantics to AA-capable `500`s, so only `secondary` keeps a non-500 main).
+- **`secondary` = Greenhouse Tidal Teal (ADOPTED 2026-07-18).** The retired lime ramp collided with success emerald and made soft fills/chips read as status rather than supporting action. The canonical primitive ramp is `#DDF9F5 → #083F3D`, anchored at `500 #12AFA2`. Semantic aliases are mode-aware: light `{main:700 #0B726C, light:500 #12AFA2, dark:800 #0A5955, contrastText:white}`; dark `{main:400 #3BCBBD, light:300 #79E0D4, dark:500 #12AFA2, contrastText:Midnight #022A4E}`. Consume `theme.palette.secondary.*`; use `theme.axis.ramp.secondary` only for deliberate ramp work. Emergency kill-switch: `NEXT_PUBLIC_GREENHOUSE_SECONDARY_TEAL_ENABLED=false` reverts to legacy azure. ADR: `GREENHOUSE_SECONDARY_TEAL_COLOR_DECISION_V1.md`.
 - **`primary-light` / `primary-dark`** remain runtime-computed (`lighten`/`darken` of the tenant primary), not AXIS ramp steps, because `primary` is tenant-driven.
 - **Tonal-by-default feedback (TASK-1053 Fase B) — `theme.greenhouseSemantic.<role>`.** A status chip/alert default is **tonal** (soft surface + AA ink), not a saturated solid (solid reads "admin template 2016"). The palette role only carries `main`/`contrastText`; the tonal treatment needs three more curated values per feedback role (`info`/`success`/`warning`/`error`), exposed as a **mode-aware factory** (mirror of `theme.greenhouseElevation`):
   - `theme.greenhouseSemantic.<role>.tonalSurface` — soft tonal background.
   - `theme.greenhouseSemantic.<role>.tonalText` — **AA ink** on that surface (≥5.3:1). **NOT `main`** — e.g. `warning.main` `#FFB703` (amber) as text is unreadable; the ink `#8A5A00` passes. This is the canonical tonal/text color for feedback.
   - `theme.greenhouseSemantic.<role>.tonalBorder` — soft hairline (decorative reinforcement; state is carried by surface+ink).
   - Also exposes `fill`/`onFill` (= `main`/`contrastText`, for the solid variant) + the raw `ink`/`tint`/`border`/`darkFg` sub-values. **Light** mode → `tonalSurface=tint · tonalText=ink · tonalBorder=border`; **dark** mode → `tonalText=darkFg` (AA on charcoal ≥5.98:1), surface/border are `color-mix` of `darkFg`. SoT: `src/components/theme/greenhouse-semantic-tokens.ts` + curated sub-values in `src/@core/theme/axis-semantic.ts` (`axisSemanticSubValues`). Drift-guard: `greenhouse-semantic-drift.test.ts`; contrast gate: `axis-semantic-contrast.test.ts`. First consumer: `GreenhouseChip` `label` (tonal) variant. **NEVER** use `palette.<role>.main` as a tonal TEXT color — that is the fill.
+
+## Premium surface composition
+
+Correct tokens do not make a premium interface. For every new `ui-standard` or `ui-platform` surface, the canonical delivery contract is `docs/ui/GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md` and the architecture decision is `docs/architecture/GREENHOUSE_PREMIUM_AGENTIC_UI_DELIVERY_DECISION_V1.md`.
+
+- Start from a Visual Direction, a surface recipe and Composition Shell; do not start by arranging MUI cards.
+- A card is a semantic boundary, not a default section wrapper. The normal first fold allows at most three `data-ui-surface="contained"` regions.
+- Prefer open editorial sections, rails, bands, immersive planes and a single dominant stage when the content relationship supports them.
+- Every relevant surface needs one task-native dominant visual moment. Mobile must recompose it, not serialize desktop chrome.
+- MUI/Vuexy provide accessibility and interaction foundations. They never waive the visual scorecard.
+- Acceptance requires GVC premium on desktop and 390 px, mean score `≥4.5/5`, every dimension `≥4/5`, and critical visual dimensions `≥4.5/5`.
 
 ## Typography
 
@@ -470,6 +481,11 @@ The recipe is the convergent 2026 one: two soft shadow layers + a 1px hairline b
 - `modal` — blocking surfaces (Dialog, temporary Drawer, destructive/legal/financial confirmations).
 - `overflow` — reserved (no runtime value yet): scroll/sticky-edge affordance.
 
+Vuexy `var(--mui-customShadows-*)` remains valid compatibility infrastructure in
+theme overrides and legacy/non-primitive consumers. It is not an ad-hoc literal,
+but it is also not the authoring contract for new Greenhouse primitives: those
+must use `theme.greenhouseElevation.<role>` so depth communicates intent.
+
 If a layout already communicates hierarchy with spacing and contrast, do not add shadow just to make it feel "designed". Cards inside workbenches stay flat/outlined. On `floating`/`overlay`/`modal` the **border carries the separation under `forced-colors`** (the browser strips `box-shadow`); the shadow is the enhancement. Avoid layering many shadowed containers inside each other.
 
 ## Shapes
@@ -508,7 +524,7 @@ Buttons:
 - `button-primary-tonal` is a soft-tone alternative that uses the primary-light fill with dark text — reserved for secondary placements where the primary CTA already exists nearby
 - `button-primary-disabled` is the disabled variant; relies on text-disabled and inherits the primary surface
 - `button-secondary` is an intentional structural action, not a ghost button substitute
-- `button-secondary-hover` and `button-secondary-active` darken the secondary navy on interaction
+- `button-secondary-hover` and `button-secondary-active` move to the mode-aware deeper Tidal Teal interaction token
 - button text stays sentence-case, never all caps
 
 Cards:

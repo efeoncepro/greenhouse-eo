@@ -167,6 +167,16 @@ export interface CaptureEnterpriseRubricOptions {
   maxEmptyTokensRatio?: number
   /** Regiones `data-capture` que deben existir en la superficie. */
   expectedDataCaptureRegions?: string[]
+  /** Exige `data-surface-recipe` en la superficie premium. */
+  requireSurfaceRecipeMarker?: boolean
+  /** Máximo de cards con geometría prácticamente idéntica. */
+  maxUniformCards?: number
+  /** Profundidad máxima de Card/Paper anidados. Default 2. */
+  maxNestedSurfaceDepth?: number
+  /** Máximo de superficies contenidas visibles simultáneamente en el viewport. */
+  maxContainedSurfacesInViewport?: number
+  /** Ratio mínimo del heading principal respecto al body. Default 1.35. */
+  minHeadingScaleRatio?: number
 }
 
 export interface CaptureQualityOptions {
@@ -181,6 +191,8 @@ export interface CaptureQualityOptions {
   performance?: CapturePerformanceQualityOptions
   enterpriseRubric?: CaptureEnterpriseRubricOptions
 }
+
+export type CaptureQualityProfile = 'legacy' | 'diagnostic' | 'standard' | 'premium'
 
 export interface CaptureScenarioStep {
   /** Tipo de step (state machine cerrado) */
@@ -269,6 +281,15 @@ export interface CaptureScenario {
   /** Quality guard de frames. Opt-out explícito por scenario. */
   quality?: CaptureQualityOptions
 
+  /**
+   * Perfil de calidad declarativo.
+   * - legacy: conserva behavior histórico.
+   * - diagnostic: evidencia de diagnóstico; no satisface aceptación UI.
+   * - standard: guards activos warning-first.
+   * - premium: guards bloqueantes + keyboard/reduced-motion explícitos.
+   */
+  qualityProfile?: CaptureQualityProfile
+
   /** Metadata + contrato de visual diff para flujo mockup aprobado -> runtime. */
   baseline?: CaptureBaselineMeta
 
@@ -300,6 +321,63 @@ export interface ScenarioRunContext {
 const DEFAULT_TIMEOUT = 5000
 const DEFAULT_READINESS_TIMEOUT = 10000
 const SCROLL_POSITIONS = new Set<ScrollLogicalPosition>(['start', 'center', 'end', 'nearest'])
+const QUALITY_PROFILES = new Set<CaptureQualityProfile>(['legacy', 'diagnostic', 'standard', 'premium'])
+
+const mergeQuality = (base: CaptureQualityOptions, override?: CaptureQualityOptions): CaptureQualityOptions => ({
+  ...base,
+  ...override,
+  accessibility: { ...base.accessibility, ...override?.accessibility },
+  layout: { ...base.layout, ...override?.layout },
+  runtime: { ...base.runtime, ...override?.runtime },
+  keyboard: override?.keyboard ?? base.keyboard,
+  performance: { ...base.performance, ...override?.performance },
+  enterpriseRubric: { ...base.enterpriseRubric, ...override?.enterpriseRubric }
+})
+
+export const resolveCaptureQualityProfile = (
+  profile: CaptureQualityProfile | undefined,
+  quality?: CaptureQualityOptions
+): CaptureQualityOptions | undefined => {
+  if (!profile || profile === 'legacy' || profile === 'diagnostic') return quality
+
+  const blocking = profile === 'premium'
+
+  const defaults: CaptureQualityOptions = {
+    allowEmpty: false,
+    allowLoading: false,
+    allowLogin: false,
+    allowErrorBoundary: false,
+    accessibility: { enabled: true, failOnViolations: blocking },
+    layout: { enabled: true, minTargetSize: 24, failOnViolations: blocking },
+    runtime: {
+      failOnConsoleError: blocking,
+      failOnPageError: true,
+      failOnHydrationWarning: true,
+      failOnHttpStatus: blocking
+    },
+    performance: {
+      enabled: true,
+      severity: blocking ? 'error' : 'warning',
+      maxDomNodes: 8000,
+      maxRequests: 500,
+      maxTransferBytes: 25_000_000,
+      maxFcpMs: 3500
+    },
+    enterpriseRubric: {
+      enabled: true,
+      failOnViolations: blocking,
+      maxPrimaryButtonsPerHeader: 1,
+      maxEmptyTokensRatio: 0.5,
+      requireSurfaceRecipeMarker: blocking,
+      maxUniformCards: blocking ? 8 : 12,
+      maxNestedSurfaceDepth: 2,
+      maxContainedSurfacesInViewport: blocking ? 4 : 6,
+      minHeadingScaleRatio: 1.35
+    }
+  }
+
+  return mergeQuality(defaults, quality)
+}
 
 export const validateScenario = (s: CaptureScenario): void => {
   if (!s.name || !/^[a-z0-9-]+$/.test(s.name)) {
@@ -313,6 +391,12 @@ export const validateScenario = (s: CaptureScenario): void => {
   if (s.mutating && !s.safeForCapture) {
     throw new Error(`scenario "${s.name}" marcado mutating:true requiere safeForCapture:true explícito`)
   }
+
+  if (s.qualityProfile && !QUALITY_PROFILES.has(s.qualityProfile)) {
+    throw new Error(`scenario.qualityProfile inválido: \"${s.qualityProfile}\"`)
+  }
+
+  s.quality = resolveCaptureQualityProfile(s.qualityProfile, s.quality)
 
   const usedLabels = new Set<string>()
 
@@ -435,6 +519,10 @@ export const validateScenario = (s: CaptureScenario): void => {
 
   const keyboard = s.quality?.keyboard
 
+  if (s.qualityProfile === 'premium' && !keyboard?.enabled) {
+    throw new Error('qualityProfile premium requiere quality.keyboard.enabled + probes + reducedMotionCheck')
+  }
+
   if (keyboard?.enabled) {
     if (!keyboard.probes?.length) {
       throw new Error('quality.keyboard.enabled requiere al menos un probe')
@@ -452,6 +540,10 @@ export const validateScenario = (s: CaptureScenario): void => {
       if (!probe.keys?.length) throw new Error(`quality.keyboard probe "${probe.name}" requiere keys`)
 
       probeNames.add(probe.name)
+    }
+
+    if (s.qualityProfile === 'premium' && keyboard.reducedMotionCheck !== true) {
+      throw new Error('qualityProfile premium requiere quality.keyboard.reducedMotionCheck:true')
     }
   }
 }

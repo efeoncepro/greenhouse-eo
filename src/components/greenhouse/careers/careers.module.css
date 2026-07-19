@@ -6,8 +6,8 @@
   --primary: #0375db;
   --primary-dark: #024c8f;
   --primary-tonal: #d7e9f9;
-  --secondary: #4b8405;
-  --secondary-dark: #396504;
+  --secondary: var(--mui-palette-secondary-main);
+  --secondary-dark: var(--mui-palette-secondary-dark);
   --neutral: #f8f7fa;
   --surface: #ffffff;
   --surface-alt: #fafafa;

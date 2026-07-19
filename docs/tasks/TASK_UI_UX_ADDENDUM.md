@@ -31,6 +31,12 @@ la razon en `Current Repo State` o `Out of Scope`; no usar `Wireframe: none` con
 - `yes` — la task tiene contratos suficientes para escribir JSX/copy visible sin inventar arquitectura.
 - `n/a` — solo para tasks sin impacto UI.
 
+Desde `TASK-1453`, `UI ready: yes` también exige un Visual Direction Contract
+sustantivo. El wireframe debe declarar source duradero, modo
+`source-led|repo-native-benchmark`, targets desktop/mobile, action hierarchy,
+visual fidelity mapping y GVC `qualityProfile: premium` con dossier, baseline
+decision y scroll-width. Headings vacíos o placeholders bloquean.
+
 `pnpm task:lint --task TASK-###` bloquea `UI ready: yes` si faltan `### Implementation mapping`,
 `### GVC scenario plan` o `### Design decision log` dentro del `## UI/UX Contract`, o si el
 wireframe declarado no tiene `## Implementation Mapping`, `## GVC Scenario Plan` y
@@ -161,12 +167,15 @@ Declarar el nivel dentro de `## UI/UX Contract`.
 - Scenario file:
 - Route:
 - Viewports:
+- Quality profile: `premium` para `ui-standard|ui-platform`
 - Required steps:
 - Required captures:
 - Required `data-capture` markers:
 - Assertions:
 - Scroll-width checks:
 - Reduced-motion / focus evidence:
+- Review dossier:
+- Baseline decision / surface ID:
 
 ### Design decision log
 
@@ -186,6 +195,8 @@ Declarar el nivel dentro de `## UI/UX Contract`.
 - Accessibility/focus checks:
 - Before/after evidence:
 - Known visual debt:
+- Visual scorecard: `docs/ui/reviews/TASK-###-short-slug.scorecard.json`
+- Quality threshold: `average >= 4.2; floor >= 3; fidelity/template resistance >= 4`
 ```
 
 ## Acceptance Criteria para UI

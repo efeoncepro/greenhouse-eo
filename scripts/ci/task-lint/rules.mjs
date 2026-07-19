@@ -25,6 +25,8 @@ const UI_DOMAINS = ['ui', 'design-system', 'motion', 'accessibility']
 const UI_IMPACTS = new Set(['copy', 'layout', 'interaction', 'motion', 'primitive', 'flow'])
 const UI_READY_VALUES = new Set(['yes', 'no', 'n/a', 'na'])
 const MODULAR_PLACEMENT_ADOPTION_ID = 1376
+const PREMIUM_UI_READINESS_ADOPTION_ID = 1453
+const PREMIUM_DIRECTION_MODES = new Set(['source-led', 'repo-native-benchmark'])
 
 const TOPOLOGY_IMPACTS = new Set([
   'none',
@@ -83,7 +85,18 @@ const BACKEND_DATA_DOMAINS = [
   'reliability'
 ]
 
-const BACKEND_DATA_IMPACTS = new Set(['api', 'db', 'migration', 'command', 'reader', 'sync', 'cron', 'webhook', 'integration'])
+const BACKEND_DATA_IMPACTS = new Set([
+  'api',
+  'db',
+  'migration',
+  'command',
+  'reader',
+  'sync',
+  'cron',
+  'webhook',
+  'integration'
+])
+
 const WIREFRAME_PATH_RE = /^docs\/ui\/wireframes\/(?:TASK-\d{3,}(?:\.\d+)?-[^`|\s]+|[a-z0-9][a-z0-9-]*\.md)$/
 const FLOW_PATH_RE = /^docs\/ui\/flows\/(?:TASK-\d{3,}(?:\.\d+)?-[^`|\s]+|[a-z0-9][a-z0-9-]*\.md)$/
 const MOTION_PATH_RE = /^docs\/ui\/motion\/(?:TASK-\d{3,}(?:\.\d+)?-[^`|\s]+|[a-z0-9][a-z0-9-]*\.md)$/
@@ -108,6 +121,67 @@ const hasMarkdownHeading = (source, heading) => {
   const escaped = heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
   return new RegExp(`^#{2,6}\\s+${escaped}\\s*$`, 'im').test(source)
+}
+
+const markdownHeadingBody = (source, heading) => {
+  const lines = source.split('\n')
+  const normalizedHeading = heading.trim().toLowerCase()
+  let start = -1
+  let level = 0
+
+  for (let index = 0; index < lines.length; index += 1) {
+    const match = lines[index].match(/^(#{2,6})\s+(.+?)\s*$/)
+
+    const candidate = match?.[2].trim().toLowerCase() ?? ''
+
+    if (!match || (candidate !== normalizedHeading && !candidate.startsWith(`${normalizedHeading} `))) continue
+    start = index + 1
+    level = match[1].length
+    break
+  }
+
+  if (start < 0) return null
+
+  let end = lines.length
+
+  for (let index = start; index < lines.length; index += 1) {
+    const match = lines[index].match(/^(#{2,6})\s+/)
+
+    if (match && match[1].length <= level) {
+      end = index
+      break
+    }
+  }
+
+  return lines.slice(start, end).join('\n').trim()
+}
+
+const markdownListField = (source, field) => {
+  const escaped = field.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const match = source.match(new RegExp(`^\\s*-\\s+${escaped}:\\s*(.*?)\\s*$`, 'im'))
+
+  return match ? stripStatusValue(match[1]).trim() : ''
+}
+
+const extractRepoAssetPath = value => {
+  const match = value.match(/(?:^|[\s;,(])((?:docs|src|public|scripts)\/[^`\s;,)]*\.(?:md|png|jpe?g|webp|svg|html?))/i)
+
+  return match?.[1] ?? ''
+}
+
+const hasSubstantiveMarkdown = body => {
+  if (!body) return false
+
+  const meaningful = body
+    .replace(/<!--[\s\S]*?-->/g, ' ')
+    .replace(/^\s*\|?[\s:|-]+\|?\s*$/gm, ' ')
+    .replace(/[`*_>#|[\]()-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+  const placeholderOnly = /^(?:tbd|todo|placeholder|verificar|n\/a)(?:\W|$)/i.test(meaningful)
+
+  return meaningful.length >= 36 && !placeholderOnly
 }
 
 const readRepoFile = (context, relativePath) => {
@@ -377,7 +451,9 @@ const checkRolloutPlan = (task, context) => {
   const lowerContent = content.toLowerCase()
   const lowerDomain = task.domain ?? ''
   const touchesSensitiveDomain = SENSITIVE_DOMAINS.some(domain => lowerDomain.includes(domain))
-  const usesBareNa = /\bn\/a\b/.test(lowerContent) && !/additive|repo-only|no production runtime impact|sin impacto/.test(lowerContent)
+
+  const usesBareNa =
+    /\bn\/a\b/.test(lowerContent) && !/additive|repo-only|no production runtime impact|sin impacto/.test(lowerContent)
 
   if (task.type === 'implementation' && touchesSensitiveDomain && usesBareNa) {
     findings.push(
@@ -469,8 +545,7 @@ const checkNextIdMarker = (_task, context) => {
       rule: 'next-id-marker',
       severity: 'warning',
       line: context.readmeNextId.line,
-      message:
-        `README next-id marker is "${context.readmeNextId.id}" but registry max+1 is "${context.expectedNextId}".`
+      message: `README next-id marker is "${context.readmeNextId.id}" but registry max+1 is "${context.expectedNextId}".`
     }
   ]
 }
@@ -657,6 +732,124 @@ const checkUiReadinessGate = (task, context) => {
         }
       }
     }
+  }
+
+  return findings
+}
+
+const checkPremiumUiReadiness = (task, context) => {
+  if (!task.idNumber || task.idNumber < PREMIUM_UI_READINESS_ADOPTION_ID || !isUiUxImpacted(task)) return []
+
+  const fields = task.status.fields
+  const uiReady = normalizeStatusValue(fields['UI ready'] ?? fields['UI Ready'] ?? '')
+
+  if (uiReady !== 'yes') return []
+
+  const severity = blockingSeverity(context)
+  const findings = []
+  const wireframePath = stripStatusValue(fields.Wireframe ?? fields.wireframe ?? '')
+  const wireframeSource = readRepoFile(context, wireframePath)
+
+  if (!wireframeSource) return []
+
+  const addFinding = message => {
+    findings.push(
+      finding({
+        task,
+        rule: 'ui-premium-readiness',
+        severity,
+        line: task.status.fieldLines.Wireframe ?? task.status.fieldLines.wireframe,
+        message
+      })
+    )
+  }
+
+  const directionMode = markdownListField(wireframeSource, 'Visual direction mode').toLowerCase()
+  const assetValue = markdownListField(wireframeSource, 'Product Design asset')
+  const assetPath = extractRepoAssetPath(assetValue)
+
+  if (!PREMIUM_DIRECTION_MODES.has(directionMode)) {
+    addFinding('UI ready: yes requires Visual direction mode: source-led|repo-native-benchmark in the wireframe.')
+  }
+
+  if (!assetPath) {
+    addFinding('UI ready: yes requires Product Design asset to reference a durable repo file.')
+  } else if (!context.repoRoot || !existsSync(join(context.repoRoot, assetPath))) {
+    addFinding(`UI ready: yes references missing visual source \"${assetPath}\".`)
+  }
+
+  const requiredWireframeSections = [
+    'Desktop Target',
+    'Mobile Target',
+    'Action Hierarchy',
+    'Visual Fidelity Mapping',
+    'Copy Ledger',
+    'State Copy',
+    'Accessibility Contract',
+    'Implementation Mapping',
+    'GVC Scenario Plan',
+    'Design Decision Log'
+  ]
+
+  for (const heading of requiredWireframeSections) {
+    const body = markdownHeadingBody(wireframeSource, heading)
+
+    if (!hasSubstantiveMarkdown(body)) {
+      addFinding(
+        `UI ready: yes requires substantive \"## ${heading}\" content in the wireframe, not only a heading/table shell.`
+      )
+    }
+  }
+
+  const stateCopy = markdownHeadingBody(wireframeSource, 'State Copy') ?? ''
+  const normalizedStateCopy = stateCopy.replace(/`/g, '').toLowerCase()
+
+  for (const state of ['ready', 'loading', 'empty', 'partial', 'error', 'denied']) {
+    const stateRow = new RegExp(`\\|\\s*${state}\\s*\\|`)
+
+    if (!stateRow.test(normalizedStateCopy)) {
+      addFinding(`State Copy must define the ${state} state with visible copy and recovery behavior.`)
+    }
+  }
+
+  const gvcPlan = markdownHeadingBody(wireframeSource, 'GVC Scenario Plan') ?? ''
+  const normalizedGvcPlan = gvcPlan.replace(/`/g, '').toLowerCase()
+
+  const gvcRequirements = [
+    ['Quality profile: premium', /quality profile:\s*premium/],
+    ['desktop evidence', /\b(?:desktop|1440|1280|2048)\b/],
+    ['390px mobile evidence', /\b390(?:px\b|x\d+|\b)/],
+    ['review dossier', /review dossier/],
+    ['baseline decision', /baseline/],
+    ['scroll-width evidence', /scroll-width|scrollwidth/]
+  ]
+
+  for (const [label, pattern] of gvcRequirements) {
+    if (!pattern.test(normalizedGvcPlan)) addFinding(`GVC Scenario Plan must declare ${label}.`)
+  }
+
+  const contract = sectionContent(task, 'ui/ux contract')
+  const contractGvcPlan = markdownHeadingBody(contract, 'GVC scenario plan') ?? ''
+  const normalizedContractGvc = contractGvcPlan.replace(/`/g, '').toLowerCase()
+
+  if (!/quality profile:\s*premium/.test(normalizedContractGvc)) {
+    addFinding('UI/UX Contract GVC scenario plan must declare Quality profile: premium.')
+  }
+
+  if (directionMode === 'repo-native-benchmark' && assetPath.endsWith('.md')) {
+    const directionSource = readRepoFile(context, assetPath)
+
+    if (directionSource) {
+      for (const heading of ['Decision', 'Desktop target', 'Mobile target', 'Token mapping', 'Anti-patterns']) {
+        if (!hasSubstantiveMarkdown(markdownHeadingBody(directionSource, heading))) {
+          addFinding(`Repo-native direction \"${assetPath}\" needs substantive \"## ${heading}\".`)
+        }
+      }
+    }
+  }
+
+  if (directionMode === 'source-led' && !/surface\s*id|surfaceid/.test(normalizedGvcPlan)) {
+    addFinding('Source-led UI requires a baseline surface ID in the GVC Scenario Plan.')
   }
 
   return findings
@@ -925,6 +1118,11 @@ export const RULES = [
     id: 'ui-readiness-gate',
     appliesTo: task => task.kind === 'template',
     check: checkUiReadinessGate
+  },
+  {
+    id: 'ui-premium-readiness',
+    appliesTo: task => task.kind === 'template',
+    check: checkPremiumUiReadiness
   },
   {
     id: 'ui-wireframe-contract',

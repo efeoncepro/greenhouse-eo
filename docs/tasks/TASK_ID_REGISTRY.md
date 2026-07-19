@@ -1525,7 +1525,8 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-1450` | `to-do` | **Notion Delegation and Recursive Hierarchy Commands.** Create/update/reparent idempotente para Projects, Tasks y subtasks recursivas, con dry-run, saga, cycle guards y audit. P1. Muy alto. Alto. backend-data / integration. EPIC-032. | `docs/tasks/to-do/TASK-1450-notion-delegation-recursive-hierarchy-commands.md` |
 | `TASK-1451` | `to-do` | **Notion Work Status, Results and Observed History.** Readers live+observed para propiedades, deadlines, progreso recursivo, resultado, freshness e historia honesta. P1. Alto. Alto. backend-data / webhook. EPIC-032. | `docs/tasks/to-do/TASK-1451-notion-work-status-results-observed-history.md` |
 | `TASK-1452` | `to-do` | **Governed Notion Work CLI and Agent Rollout.** CLI human/JSON sobre primitives compartidos, adopción Codex/Claude y canary gobernado en Efeonce + otro space. P1. Alto. Medio. backend-data / command. EPIC-032. | `docs/tasks/to-do/TASK-1452-governed-notion-work-cli-agent-rollout.md` |
+| `TASK-1453` | `complete` | **Premium Agentic UI Platform.** Dirección visual obligatoria, readiness sustantivo, gates separados, GVC premium, scorecard, recipes, primitives compuestas y Lab de tres arquetipos. P0. Muy alto. Alto. ui-ux / motion. EPIC-033. | `docs/tasks/complete/TASK-1453-premium-agentic-ui-platform.md` |
 
 ## Siguiente ID disponible
 
-`TASK-1453`
+`TASK-1454`

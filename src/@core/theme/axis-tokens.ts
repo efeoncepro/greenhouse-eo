@@ -2,16 +2,18 @@
  * AXIS design tokens — primitive (reference) layer.
  *
  * AXIS is the name of Efeonce's Design System (multi-brand Efeonce/Kortex/Verk).
- * This file is a FAITHFUL 1:1 MIRROR of the AXIS color tokens. It is the single
- * source of truth in code; AXIS (Figma) is the upstream source of truth.
+ * This file is the runtime primitive source of truth. Most families mirror AXIS
+ * Figma 1:1; `secondary` is the operator-approved Greenhouse Tidal Teal override
+ * accepted on 2026-07-18 and remains code-first until AXIS is reconciled upstream.
  *
  * Source: Figma "Design System | Vuexy → AXIS"
  *   fileKey: yyMksCoijfMaIoYplXKZaR
  *   nodes:   11205:5342 (Theme Color · light) + 11205:6238 (Theme Color · dark)
  *
- * Regenerate (do NOT hand-edit values): pull via Figma MCP `get_variable_defs`
- * on the two nodes above and re-emit this file. Scope = Efeonce + GreenHouse only
- * (Kortex/Verk brand variants are out of scope for the Greenhouse runtime).
+ * Regenerate mirrored families from Figma MCP `get_variable_defs` on the two
+ * nodes above. Do not overwrite the governed `secondary` override without the
+ * corresponding color ADR and operator approval. Scope = Efeonce + GreenHouse
+ * only (Kortex/Verk brand variants are out of scope for the runtime).
  *
  * This layer carries the raw AXIS values verbatim. Role mapping (main/light/dark/
  * contrastText) and any accessibility overrides live in the semantic alias layer,
@@ -39,18 +41,19 @@ export const axisRamp = {
     800: '#023c70',
     900: '#00284d'
   },
-  // Brand · Efeonce Secondary — TASK-1053 A1b Restraint v1: verde coherente (corrige el
-  // hue-shift a teal en 600-900). pop #6ec207 (500) · ink #4b8405 (700, AA blanco 4.56:1).
+  // Brand · Greenhouse Secondary — Tidal Teal (operator-approved 2026-07-18).
+  // Separates brand-secondary from success emerald. Accent #12afa2 (500) ·
+  // light-mode functional ink/fill #0b726c (700, white 5.77:1 AA).
   secondary: {
-    100: '#eef8e1',
-    200: '#d9efbf',
-    300: '#bfe492',
-    400: '#9ad451',
-    500: '#6ec207',
-    600: '#5ca306',
-    700: '#4b8405',
-    800: '#396504',
-    900: '#284603'
+    100: '#ddf9f5',
+    200: '#b5f0e8',
+    300: '#79e0d4',
+    400: '#3bcbbd',
+    500: '#12afa2',
+    600: '#0c9188',
+    700: '#0b726c',
+    800: '#0a5955',
+    900: '#083f3d'
   },
   // Feedback · Info — TASK-1053 Restraint v1: azure (cyan → azul; AA texto-sobre-blanco desde 500, 4.9:1)
   info: {
@@ -133,7 +136,7 @@ export const axisMain = {
  */
 export const axisOpacity = {
   primary: { 8: '#0375db14', 16: '#0375db29', 24: '#0375db3d', 32: '#0375db52', 38: '#0375db61' },
-  secondary: { 8: '#6ec20714', 16: '#6ec20729', 24: '#6ec2073d', 32: '#6ec20752', 38: '#6ec20761' },
+  secondary: { 8: '#12afa214', 16: '#12afa229', 24: '#12afa23d', 32: '#12afa252', 38: '#12afa261' },
   info: { 8: '#1f6fd414', 16: '#1f6fd429', 24: '#1f6fd43d', 32: '#1f6fd452', 38: '#1f6fd461' },
   success: { 8: '#157f4714', 16: '#157f4729', 24: '#157f473d', 32: '#157f4752', 38: '#157f4761' },
   warning: { 8: '#ffb70314', 16: '#ffb70329', 24: '#ffb7033d', 32: '#ffb70352', 38: '#ffb70361' },

@@ -17,6 +17,7 @@ import {
   type GreenhouseButtonVariant
 } from '@/components/greenhouse/primitives'
 import { axisNeutral, axisRamp } from '@core/theme/axis-tokens'
+import { greenhouseSecondaryPalette } from '@core/theme/axis-secondary'
 import { axisSemanticHex, axisSemanticPalette } from '@core/theme/axis-semantic'
 
 type PreviewMode = 'light' | 'dark'
@@ -33,7 +34,7 @@ const tones: { label: string; value: GreenhouseButtonTone }[] = [
 
 const toneToken = {
   primary: axisRamp.primary[500],
-  secondary: axisRamp.secondary[700],
+  secondary: greenhouseSecondaryPalette.light.main,
   error: axisSemanticHex.error,
   warning: axisSemanticHex.warning,
   info: axisSemanticHex.info,
@@ -48,6 +49,12 @@ const contrastToken = {
   info: axisSemanticPalette.info.contrastText,
   success: axisSemanticPalette.success.contrastText
 } as const satisfies Record<GreenhouseButtonTone, string>
+
+const getToneToken = (tone: GreenhouseButtonTone, mode: PreviewMode) =>
+  tone === 'secondary' ? greenhouseSecondaryPalette[mode].main : toneToken[tone]
+
+const getContrastToken = (tone: GreenhouseButtonTone, mode: PreviewMode) =>
+  tone === 'secondary' ? greenhouseSecondaryPalette[mode].contrastText : contrastToken[tone]
 
 const variants: { label: string; value: GreenhouseButtonVariant }[] = [
   { label: 'Default', value: 'solid' },
@@ -90,8 +97,8 @@ const getPreviewButtonSx = ({
   tone: GreenhouseButtonTone
   variant: GreenhouseButtonVariant
 }): SxProps<Theme> => {
-  const main = toneToken[tone]
-  const ink = contrastToken[tone]
+  const main = getToneToken(tone, mode)
+  const ink = getContrastToken(tone, mode)
   const paper = surfaceColor(mode)
   const hoverFill = state === 'hover' || state === 'focus' ? 0.24 : 0.16
   const disabled = state === 'disabled'

@@ -1,5 +1,31 @@
 # changelog.md
 
+## 2026-07-18 — Secondary Tidal Teal tokenizado y validado
+
+- Se reemplazó el secondary lime/green por una familia Tidal Teal propia: ramp `100→900`
+  `#DDF9F5→#083F3D`, anchor `500 #12AFA2`, opacidades derivadas y aliases semánticos por modo.
+  Light usa `700 #0B726C` + blanco (5.77:1); dark usa `400 #3BCBBD` + Midnight (7.25:1).
+- `mergedTheme` resuelve secondary por modo; Colors, Buttons, Chips, nomenclatura/chart secondary y
+  Careers consumen el SoT. La antigua cláusula verde de TASK-1053 queda supersedida por
+  `GREENHOUSE_SECONDARY_TEAL_COLOR_DECISION_V1.md`; AXIS Figma requiere reconciliación upstream.
+- El Colors Lab ahora expone el mapping funcional, corrige 142 atributos ARIA inválidos y 53
+  contrast findings preexistentes. Nuevo GVC `design-system-colors` desktop/mobile con accessibility,
+  layout y runtime gates; baseline durable de cuatro frames, rerun con drift `0.00%`. Buttons y Chips
+  también pasaron sus escenarios desktop/mobile y fueron inspeccionados.
+- `ui:code-lint` permite HEX sólo en fuentes canónicas de color y fixtures de drift, manteniendo el
+  bloqueo en consumers. El kill-switch canónico es `NEXT_PUBLIC_GREENHOUSE_SECONDARY_TEAL_ENABLED=false`;
+  unset/default = Tidal Teal. El flag lime anterior queda retirado.
+
+## 2026-07-18 — TASK-1453: Premium Agentic UI Platform
+
+- Se cerró la causa sistémica de la UI genérica: nuevas interfaces `ui-standard`/`ui-platform` parten de Visual Direction + surface recipe + Composition Shell, no de un grid MUI. MUI/Vuexy quedan como foundation accesible, no como autor visual.
+- Se incorporaron seis recipes y ocho primitives compuestas, Lab `/design-system/surface-recipes`, semántica `data-ui-surface`, presupuesto de máximo tres superficies `contained` en el first fold y blockers explícitos para card-on-card, mobile serializado y ausencia de impacto visual.
+- Cuatro gates separan contrato, código, evidencia y calidad. GVC premium revisa desktop/390 px, enterprise rubric y dossier de catorce dimensiones; aceptación: media ≥4.5/5, piso ≥4 y cinco dimensiones críticas ≥4.5. ADR y reglas de Codex/Claude sincronizados.
+- Hardening posterior al repro cross-agent: `ui:code-lint` reconoce `customShadows` como
+  compatibilidad Vuexy sólo fuera de primitives, exime tamaños ópticos de glyphs Tabler
+  y preserva números de línea reales en `--changed`; sombras literales y tipografía
+  inline siguen bloqueadas.
+
 ## 2026-07-18 — TASK-1430: cockpit operator de CTAs (autoría gobernada + métricas + kill switches) — code complete
 
 - `/growth/ctas` evoluciona a cockpit master-detail (CompositionShell `split` con nueva prop

@@ -2,7 +2,7 @@
 
 > **Version:** 1.5
 > **Created:** 2026-04-19 (TASK-488)
-> **Last updated:** 2026-05-04 (TASK-764 closed: CI gate live, 17 warnings cleared, skills inject DESIGN.md, design:diff operativo, Opción A confirmada)
+> **Last updated:** 2026-07-18 (Tidal Teal secondary adopted; mode-aware semantic mapping and rollback contract documented)
 > **Audience:** Frontend engineers, UI/UX architects, AI agents (Claude + Codex), designers extending the system
 > **Source of truth status:** CANONICAL. Any component, view, or pattern that drifts from this document is incorrect and must be corrected or the doc updated with explicit rationale.
 > **Runtime authority:** `src/components/theme/mergedTheme.ts` — when this doc and runtime disagree on a hex value, **runtime wins** and this doc updates. Decision formalized in [`GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md`](GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md) §1.4.
@@ -389,7 +389,7 @@ Three layers compose the effective palette (see `GREENHOUSE_THEME_TOKEN_CONTRACT
 | Token | Hex | Brand meaning | Usage |
 |---|---|---|---|
 | `primary.main` | runtime-driven, default `#0375DB` (Core Blue) | Brand identity | CTAs, active state, filled chips, links |
-| `secondary.main` | `#4B8405` (AXIS secondary-700, crisp green, TASK-1053) | Brand secondary | Secondary actions (tonal/outlined buttons + chips). `light` = lime `#6EC207` (tint/accent, ink text only); `dark` = `#396504` (hover/active). Legacy azure `#023C70` retired (TASK-1034 — not an AXIS color); el teal `#138760` corregido a verde coherente en TASK-1053 A1b. main=700 not 500: lime is illegible as tonal/outlined text (~1.8:1), crisp green is AA (white 4.56:1). Kill-switch `NEXT_PUBLIC_AXIS_SECONDARY_LIME_ENABLED=false`. |
+| `secondary.main` | Light `#0B726C` (Tidal Teal 700); dark `#3BCBBD` (Tidal Teal 400) | Brand secondary | Supporting actions, contextual selection and branded emphasis, distinct from success emerald. Light mapping: `light=#12AFA2`, `dark=#0A5955`, white text 5.77:1. Dark mapping: `light=#79E0D4`, `dark=#12AFA2`, Midnight text 7.25:1. Primitive anchor `theme.axis.main.secondary=#12AFA2`; full ramp `#DDF9F5→#083F3D`. Emergency kill-switch `NEXT_PUBLIC_GREENHOUSE_SECONDARY_TEAL_ENABLED=false`. ADR `GREENHOUSE_SECONDARY_TEAL_COLOR_DECISION_V1.md`. |
 | `success.main` | `#157F47` (AXIS emerald-500, TASK-1053) | Healthy / optimal | KPI óptimo, margin healthy, task complete |
 | `warning.main` | `#FFB703` (AXIS amber) | Attention | Margin warning, expiring soon, approaching limit |
 | `error.main` | `#DC2E39` (AXIS vermilion-500, TASK-1053) | Critical / blocked | Validation fail, margin critical, quote expired |
@@ -471,7 +471,7 @@ Token expuesto por rol: `{ fill, onFill, ink, tint, border, darkFg, tonalSurface
 | `customColors.coreBlue` | `#0375DB` | Brand accent (= primary default) |
 | `customColors.deepAzure` | `#023C70` | Mirror of `secondary.main` for contexts where brand naming reads better |
 | `customColors.royalBlue` | `#024C8F` | Mid-stop in the blue ramp |
-| ~~`customColors.neonLime`~~ | — | **REMOVIDO (Slice 4, TASK-1034).** Token pseudo-semántico legacy sin consumers reales (auditado). Para verde semántico usar `theme.palette.success` o el SoT `axisSemanticHex.success` (`#157F47`, TASK-1053); el lime de marca vive en `theme.axis.ramp.secondary[500]`. |
+| ~~`customColors.neonLime`~~ | — | **REMOVIDO (Slice 4, TASK-1034).** Token pseudo-semántico legacy sin consumers reales (auditado). Para verde semántico usar `theme.palette.success` o el SoT `axisSemanticHex.success` (`#157F47`, TASK-1053). El antiguo lime de marca fue retirado del rol secondary; Tidal Teal vive en `theme.axis.ramp.secondary` y se consume semánticamente desde `theme.palette.secondary.*`. |
 | ~~`customColors.sunsetOrange`~~ | — | **REMOVIDO (Slice 4, TASK-1034).** Sin consumers. Para ámbar semántico usar `theme.palette.warning` / `axisSemanticHex.warning` (`#FFB703`). |
 | ~~`customColors.crimson`~~ | — | **REMOVIDO (Slice 4, TASK-1034).** Sin consumers; divergía de `error.main` (AXIS error vigente = `#DC2E39` vermilion-500, TASK-1053). Para error usar `theme.palette.error` / `axisSemanticHex.error`. La opción de color primario `efeonce-crimson` (`primaryColorConfig.ts`) NO se ve afectada. |
 | `customColors.bodyText` | tied to `text.primary` | Body text in non-MUI primitives |

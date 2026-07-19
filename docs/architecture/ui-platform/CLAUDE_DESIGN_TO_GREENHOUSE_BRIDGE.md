@@ -32,7 +32,7 @@ la PIEL sale SIEMPRE del sistema Greenhouse. Igual que el Figma Implementation C
 | Números KPI grandes (`font-weight: 800; font-size: 1.4rem`) | `fontWeight: 800` + fontSize inline | variant **`kpiValue`** (Geist 28px extrabold + `tabular-nums`) |
 | Labels/etiquetas técnicas (`BROWSER_REPORTED`, uppercase tracking) | ALL-CAPS + snake_case visible | `GreenhouseChip kind='attribute' variant='label'` con copy es-CL legible en minúsculas |
 | Chips de estado del mock | `Chip` MUI crudo o spans | `GreenhouseChip kind='status'` con `tone` semántico |
-| Botones secundarios grises del mock | `color='secondary'` (olivo — feedback del operador en contra) | `color='inherit'` + `sx={{ color: 'text.secondary', borderColor: 'divider' }}` (o `GreenhouseButton` kind) |
+| Botones secundarios del mock | inventar gris/olivo o copiar el HEX del mock | `GreenhouseButton kind='secondaryAction'` / `theme.palette.secondary.*` cuando la acción realmente sea supporting; usa `inherit` sólo para acciones neutras sin rol de marca. Secondary es Tidal Teal y nunca un segundo primary contained. |
 | Íconos 13/15/17/19/21/24/26/30px | copiar el px del mock | escala canónica **{14, 16, 18, 20, 22}** |
 | Spacing del mock (13px, 18px, 22px…) | multiplicadores no canónicos (2.25, 2.75, 3.5) | escala `4n`: {1, 1.5, 2, 3, 4, 5, 6, 8} |
 | Inputs/selects/textarea | `TextField`/`Select` MUI crudos | `CustomTextField` (+`select`/`multiline`); counters vía `helperText` `${len}/${max}` |

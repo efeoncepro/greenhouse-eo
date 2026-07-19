@@ -1,5 +1,11 @@
 # Greenhouse Theme Token Contract
 
+> **Current color delta (2026-07-18):** this foundation predates the AXIS Restraint and Tidal Teal decisions.
+> For effective runtime values, `GREENHOUSE_DESIGN_TOKENS_V1.md` and
+> `GREENHOUSE_SECONDARY_TEAL_COLOR_DECISION_V1.md` take precedence. In particular,
+> `secondary` is no longer Deep Azure or lime/green: light mode uses `#0B726C`, dark mode
+> uses `#3BCBBD`, and `theme.axis.main.secondary` is `#12AFA2`.
+
 > **Tipo de documento:** Spec de arquitectura (contrato de decisiones)
 > **Version:** 1.1
 > **Creado:** 2026-04-11 por Claude (TASK-368)

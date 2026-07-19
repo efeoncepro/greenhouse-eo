@@ -19,6 +19,9 @@ Use after implementation and screenshots, before commit or approval.
 
 ## Gate Rubric
 
+Surface economy is a scored visual-quality dimension: every contained surface
+must earn a grouping or stack role.
+
 Score 1-5:
 
 - product intent clarity
@@ -43,6 +46,10 @@ Score 1-5:
 - Partial/degraded data appears complete.
 - Important state is color-only.
 - UI is generic template composition rather than task-native.
+- The first fold is card wallpaper: repeated contained surfaces, card-on-card
+  nesting, or identical rounded panels without a spatial hierarchy.
+- The surface has no task-relevant dominant visual moment; polish is distributed
+  uniformly instead of producing a clear editorial/operational focal point.
 - Copy is vague or reusable copy is hardcoded in JSX.
 - High-friction error surfaces use generic template copy only, or creative variants obscure cause/recovery, rotate while reading, or hardcode reusable copy in JSX.
 - New component bypasses established Greenhouse primitives without rationale.
@@ -53,9 +60,11 @@ Score 1-5:
 
 ## Verdict Rules
 
-- `PASS`: no blockers and average score >= 4.2.
-- `CONDITIONAL PASS`: no blockers, average >= 3.8, polish follow-ups acceptable.
-- `BLOCK`: any blocker or average < 3.8.
+- `PASS`: no blockers; average >= 4.5; no dimension <4; hierarchy, surface
+  economy, visual impact, fidelity and generic-template resistance each >=4.5.
+- `CONDITIONAL PASS`: only for low-risk rollout/evidence follow-ups external to
+  visual quality. It cannot waive a score threshold or aesthetic blocker.
+- `BLOCK`: any blocker or any threshold failure.
 
 ## Output Format
 

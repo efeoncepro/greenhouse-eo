@@ -19,32 +19,20 @@ Run this loop for:
 
 ## Loop
 
-1. **Intent**
-   - user, job, primary decision, risk.
-2. **Design Architecture**
-   - invoke `product-design-architect-2026`.
-3. **Visual Direction**
-   - invoke `ai-ui-generation-director` when alternatives or high-fidelity direction are needed.
-4. **UX and Accessibility**
-   - invoke UX/content skill for labels, state language, error recovery, accessibility.
-5. **Microinteractions**
-   - invoke `microinteraction-systems-architect`.
-6. **Greenhouse Mapping**
-   - invoke `greenhouse-product-ui-architect`.
-7. **Implementation Review**
-   - invoke `frontend-product-implementation-reviewer`.
-8. **Build**
-   - implement in the repo or mockup route.
-9. **Screenshot QA**
-   - capture desktop, laptop, mobile with `pnpm fe:capture` or `pnpm fe:capture:review`; use scenario files for repeated or interactive flows and `--route` only for quick route evidence.
-10. **Critique**
-   - invoke `visual-regression-product-critic`.
-11. **Enterprise Gate**
-   - invoke `greenhouse-ui-enterprise-review`.
-12. **Verify**
-   - run relevant lint/type/test/design checks.
-13. **Close**
-   - document what changed, what was validated, and any remaining risk.
+The single orchestrator is `greenhouse-ai-design-studio`.
+
+1. **Intent + rigor** — user/job/decision/risk; `ui-lite|standard|platform`.
+2. **Durable direction** — persist source or compare/select repo-native direction.
+3. **Greenhouse mapping** — recipe, Shell, primitives, variants/kinds and tokens.
+4. **UX + motion contracts** — states, copy, a11y, responsive and causal feedback.
+5. **Readiness** — substantive contract gate; no JSX while failing.
+6. **First fold** — build/capture desktop+mobile composition only.
+7. **Checkpoint** — `ACCEPT FIRST FOLD` or revise exact findings.
+8. **Full build** — behavior, data, access, states, keyboard and reduced motion.
+9. **GVC premium** — capture then generate/review dossier.
+10. **Visual scorecard** — fourteen dimensions; surface economy and visual impact are critical floors; iterate to threshold.
+11. **Implementation + enterprise gates** — neither may `BLOCK`.
+12. **Verify and close** — four UI gates, tests, QA and docs.
 
 ## Screenshot Requirements
 
@@ -55,6 +43,11 @@ Minimum:
 - mobile: 390x844
 
 Capture after meaningful layout changes and after final polish. Primary evidence must be the structured `.captures/<ISO>_<scenario>/` output: `.webm`, marker PNG frames, `manifest.json`, optional `flipbook.gif`, and `review-dossier.md` when using `pnpm fe:capture:review`.
+
+For `ui-standard`/`ui-platform`, `review-dossier.md` is required and the scenario
+declares `qualityProfile: 'premium'`. Source-led work declares a durable
+baseline. A versioned scorecard under `docs/ui/reviews/` links desktop/mobile
+frames and passes the premium standard thresholds.
 
 Use `pnpm fe:capture:diff <previous-run> <current-run>` for before/after comparisons and `pnpm fe:capture:health` before long review loops. A focused Playwright/Chromium script is allowed only when console logs, network/API payloads, local-only auth state, or an unsupported interaction is required; keep its artifacts under `.captures/`, explain why the canonical helper was insufficient, and prefer promoting the flow to a scenario afterwards.
 

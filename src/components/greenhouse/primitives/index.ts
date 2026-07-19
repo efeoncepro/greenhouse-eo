@@ -850,3 +850,7 @@ export type {
 // (isotipos de motor/integración con Tooltip AXIS). Doc: ui-platform/PRIMITIVES.md · lab /design-system/team-avatar-group.
 export { default as TeamAvatarGroup } from '../TeamAvatarGroup'
 export type { TeamAvatarGroupMember, TeamAvatarGroupBrand } from '../TeamAvatarGroup'
+
+// Surface recipes — composed primitives for premium, agent-generated operational UI.
+// Domain consumers select a semantic `kind`; composition, density and motion stay platform-owned.
+export * from './surface-system'

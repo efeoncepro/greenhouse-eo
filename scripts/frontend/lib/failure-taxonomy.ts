@@ -67,6 +67,9 @@ export const FINDING_CODES = {
   enterprise_multiple_primary_actions: 'enterprise_multiple_primary_actions',
   enterprise_color_saturation: 'enterprise_color_saturation',
   enterprise_data_capture_missing: 'enterprise_data_capture_missing',
+  enterprise_contained_surface_saturation: 'enterprise_contained_surface_saturation',
+  enterprise_uniform_card_wallpaper: 'enterprise_uniform_card_wallpaper',
+  enterprise_nested_surfaces: 'enterprise_nested_surfaces',
   enterprise_probe_failed: 'enterprise_probe_failed'
 } as const
 

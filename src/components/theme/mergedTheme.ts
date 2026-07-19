@@ -25,8 +25,8 @@ import { axisSemanticPalette } from '@core/theme/axis-semantic'
 // AXIS neutrals (TASK-1034 Slice 3) — surface/text/customColors behind a
 // build-time rollout flag (NEXT_PUBLIC_AXIS_NEUTRALS_ENABLED, default OFF).
 import { resolveNeutralFragments } from '@core/theme/axis-neutrals'
-// AXIS secondary brand role (TASK-1034) — azure→AXIS deep-green behind a
-// build-time rollout flag (NEXT_PUBLIC_AXIS_SECONDARY_LIME_ENABLED, default OFF).
+// Greenhouse secondary brand role — mode-aware Tidal Teal behind an emergency
+// build-time kill switch (NEXT_PUBLIC_GREENHOUSE_SECONDARY_TEAL_ENABLED).
 import { resolveSecondaryPalette } from '@core/theme/axis-secondary'
 
 // Greenhouse typography tokens — line-height namespace (v1.3+) + scale SoT (TASK-1036)
@@ -45,8 +45,9 @@ const { mobileFontSize: surfaceHeroTitleMobileFontSize, ...surfaceHeroTitleToken
 const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['direction']) => {
   // AXIS neutral fragments (Slice 3) — flag-gated; OFF = legacy navy bit-for-bit.
   const neutrals = resolveNeutralFragments()
-  // AXIS secondary role — flag-gated; OFF = legacy azure, ON = AXIS deep-green.
-  const secondary = resolveSecondaryPalette()
+  // Greenhouse secondary role — mode-aware so light/dark both preserve contrast.
+  const secondaryLight = resolveSecondaryPalette('light')
+  const secondaryDark = resolveSecondaryPalette('dark')
 
   const userTheme: ThemeOptions = {
     // Expose line-height tokens al theme — accesible vía `theme.lineHeights.<token>`
@@ -72,8 +73,8 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
         palette: {
           // primary is set by the provider via settings.primaryColor (source: primaryColorConfig.ts)
           // — no need to duplicate it here. See GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md §4.1
-          // secondary brand role — flag-gated (legacy azure OFF / AXIS deep-green ON)
-          secondary,
+          // secondary brand role — Tidal Teal; emergency flag OFF = legacy azure
+          secondary: secondaryLight,
           // Feedback semantics from AXIS (TASK-1034 Slice 2). contrastText AA-validated.
           info: axisSemanticPalette.info,
           success: axisSemanticPalette.success,
@@ -103,8 +104,8 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
       dark: {
         palette: {
           // primary is set by the provider via settings.primaryColor (same source as light)
-          // secondary brand role — flag-gated (legacy azure OFF / AXIS deep-green ON)
-          secondary,
+          // secondary brand role — brighter mode mapping for dark-surface contrast
+          secondary: secondaryDark,
           // Feedback semantics from AXIS (mains are mode-agnostic; same mapping as light).
           info: axisSemanticPalette.info,
           success: axisSemanticPalette.success,
