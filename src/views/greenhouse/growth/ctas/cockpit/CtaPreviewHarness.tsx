@@ -459,10 +459,10 @@ export const DiagnosticChips = ({ items }: { items: Array<{ k: string; v: string
           bgcolor: 'action.hover',
           typography: 'caption',
           fontWeight: 600,
-          color: 'text.secondary',
+          color: 'text.primary',
         }}
       >
-        <Box component='span' sx={{ color: 'text.disabled', fontWeight: 500 }}>
+        <Box component='span' sx={{ color: 'text.primary', fontWeight: 500 }}>
           {item.k}
         </Box>
         {item.v}

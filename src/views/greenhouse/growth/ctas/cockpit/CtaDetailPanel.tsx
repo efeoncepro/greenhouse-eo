@@ -522,7 +522,7 @@ const CtaDetailPanel = ({
           <i className='tabler-power' style={{ fontSize: 20 }} aria-hidden />
         </Box>
         <Stack spacing={0.5} sx={{ flex: 1, minWidth: 0 }}>
-          <Typography variant='subtitle2'>{C.kill.title}</Typography>
+          <Typography variant='subtitle2' color='text.primary'>{C.kill.title}</Typography>
           <Typography variant='caption' color='text.secondary' sx={{ lineHeight: 1.45 }}>
             {killState.globalKilled ? C.kill.globalOnDesc : C.kill.globalOffDesc}
           </Typography>
@@ -601,7 +601,7 @@ const CtaDetailPanel = ({
                   <i className={surface.surfaceKind === 'wordpress' ? 'tabler-brand-wordpress' : 'tabler-square-rounded'} style={{ fontSize: 18 }} aria-hidden />
                 </Box>
                 <Stack spacing={0} sx={{ flex: 1, minWidth: 0 }}>
-                  <Typography variant='subtitle2' noWrap>
+                  <Typography variant='subtitle2' color='text.primary' noWrap>
                     {surface.surfaceName}
                   </Typography>
                   <Typography variant='caption' color='text.secondary'>
@@ -681,7 +681,7 @@ const CtaDetailPanel = ({
                   }}
                 />
                 <Stack spacing={0} sx={{ minWidth: 0 }}>
-                  <Typography variant='subtitle2'>
+                  <Typography variant='subtitle2' color='text.primary'>
                     v{version.version} · {O.inventory.statusLabels[version.status] ?? version.status}
                   </Typography>
                   <Typography variant='caption' color='text.secondary'>

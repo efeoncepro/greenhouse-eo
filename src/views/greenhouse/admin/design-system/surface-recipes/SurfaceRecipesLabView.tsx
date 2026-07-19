@@ -546,7 +546,12 @@ const SettingsSpecimen = () => {
                   eyebrow='Paso 1 de 2'
                   variant='open'
                 >
-                  <Stack spacing={1} sx={{ borderBlockStart: '1px solid', borderColor: 'divider', pt: 2 }}>
+                  <Stack
+                    role='listbox'
+                    aria-label={copy.settings.sectionTitle}
+                    spacing={1}
+                    sx={{ borderBlockStart: '1px solid', borderColor: 'divider', pt: 2 }}
+                  >
                     {copy.settings.options.map(option => (
                       <SelectionRow
                         key={option.id}

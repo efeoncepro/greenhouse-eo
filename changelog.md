@@ -12,6 +12,7 @@
 - `SurfaceRecipe` convierte los recipes oficiales en composición ejecutable sobre `CompositionShell`; el canvas gris queda como gutter y la lectura sostenida vive en work planes equilibrados.
 - `/growth/ctas` consume el recipe conservando sus paneles maduros como benchmark de no regresión; se redujo card-on-card, se tokenizaron títulos/sombras/colores y Growth usa un icono semántico.
 - El Lab de recipes y sus contratos técnico, funcional y operativo declaran el antipatrón de texto flotando sobre `background.default`. El baseline visual anterior no se promovió automáticamente: requiere aprobación humana de la nueva dirección.
+- La segunda pasada corrige accesibilidad en sus dueños compartidos: navegación con botones nativos y Escape, Search/Notifications con microcopy ARIA canónico, Settings con `listbox→option`, footer interno correcto para Growth y contraste tokenizado en CTA. El shell desktop/mobile queda verificado; authoring profundo y nuevos baselines siguen como checkpoint pendiente.
 
 ## 2026-07-19 — EPIC-028 completa credits operations y Design System propio de Globe
 

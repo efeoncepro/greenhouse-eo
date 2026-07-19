@@ -26,6 +26,9 @@ import CustomAvatar from '@core/components/mui/Avatar'
 import themeConfig from '@configs/themeConfig'
 import { useSettings } from '@core/hooks/useSettings'
 import { CATEGORY_ICONS, timeAgo } from '@/config/notification-ui'
+import { getMicrocopy } from '@/lib/copy'
+
+const microcopy = getMicrocopy()
 
 // ── Types ──
 
@@ -162,7 +165,7 @@ const NotificationDropdown = () => {
 
   return (
     <>
-      <IconButton ref={anchorRef} onClick={handleToggle} className='text-textPrimary'>
+      <IconButton aria-label={microcopy.aria.notifications} ref={anchorRef} onClick={handleToggle} className='text-textPrimary'>
         <Badge
           color='error'
           className='cursor-pointer'
@@ -223,7 +226,12 @@ const NotificationDropdown = () => {
                       }}
                     >
                       {notifications.length > 0 ? (
-                        <IconButton size='small' onClick={handleMarkAllRead} className='text-textPrimary'>
+                        <IconButton
+                          aria-label={readAll ? microcopy.aria.markAllNotificationsUnread : microcopy.aria.markAllNotificationsRead}
+                          size='small'
+                          onClick={handleMarkAllRead}
+                          className='text-textPrimary'
+                        >
                           <i className={readAll ? 'tabler-mail' : 'tabler-mail-opened'} />
                         </IconButton>
                       ) : (

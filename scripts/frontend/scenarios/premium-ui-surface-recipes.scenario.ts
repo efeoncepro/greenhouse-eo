@@ -3,6 +3,7 @@ import type { CaptureScenario } from '../lib/scenario'
 export const scenario: CaptureScenario = {
   name: 'premium-ui-surface-recipes',
   route: '/design-system/surface-recipes',
+  mutating: true,
   safeForCapture: true,
   qualityProfile: 'premium',
   viewport: { width: 1440, height: 1000 },
@@ -94,6 +95,9 @@ export const scenario: CaptureScenario = {
   },
   steps: [
     { kind: 'wait', selector: '[data-capture="recipe-workbench"]', timeout: 15000 },
+    { kind: 'sleep', ms: 1800 },
+    { kind: 'press', key: 'Escape', note: 'Normaliza el drawer global abierto en viewport compacto antes de evaluar la surface.' },
+    { kind: 'sleep', ms: 350 },
     { kind: 'scroll', selector: '[data-surface-recipe="operationalWorkbench"]', scrollBlock: 'start', scrollY: -120 },
     { kind: 'mark', label: 'workbench-first-fold', note: 'Contexto, señales, inventario y detalle comparten una jerarquía operativa.' },
     {
