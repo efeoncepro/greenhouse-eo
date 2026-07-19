@@ -51,6 +51,12 @@
   `efeonce-globe` (verificados en `efeonce-group`, NO aún en `efeonce-globe`), SA `aiplatform.user`, deploy/ADC, budget,
   `GLOBE_LAB_PROVIDER=vertex`+`GLOBE_LAB_ENABLED=true`. Audio (TASK-1461) NO queda desbloqueado (adapter Vertex
   `supports('audio-generate')=false`; necesita adapter Fal/Chirp + `CompositeProviderAdapter`).
+  **Canary billable VERIFICADO EN VIVO (2026-07-19):** una generación real por el seam (harness→command→runner→adapter→
+  `generateContent`), ADC del operador contra `efeonce-globe`: `image-generate`→`gemini-2.5-flash-image` (global),
+  `candidate_ready`, `provider=vertex`, sin fallback, `estimated==actual==10` créditos, output como `sha256:…` (fence
+  reservó/liquidó). Prereqs OK (aiplatform habilitada + ambos modelos accesibles en `efeonce-globe`). El runtime
+  **deployado sigue `fake` por default** — el canary probó el path vertex sin cambiar el default; el harness one-shot
+  no se commiteó.
 - EPIC-028 avanza en tres carriles paralelos gobernados íntegramente por Greenhouse. `TASK-1456…1485` viven
   en `docs/tasks/to-do/`, pasan por hooks/lint/QA/handoff de este repo y pueden poseer paths de implementación
   en el repositorio hermano. Globe conserva sólo arquitectura, runtime y evidencia técnica; no tiene registry

@@ -307,6 +307,10 @@ Prerequisitos de rollout (fuera del repo, gated por humano): habilitar Vertex + 
 - [x] Chequeo de impacto cruzado sobre TASK-1459/1460/1461/1463 (Delta: adapter real disponible).
 - [x] Estado final honesto: `code complete, rollout pendiente` mientras el canary billable no se autorice/ejecute.
 
+## Delta 2026-07-19 — canary billable verificado en vivo
+
+Con autorización explícita de gasto del operador, se ejecutó la **primera llamada facturable real** de Globe por el seam sancionado (harness → `command → registry → LabRunner → VertexCreativeAdapter.submit → Vertex generateContent`), ADC del operador contra el proyecto `efeonce-globe`. Prereqs confirmados sin gasto: `aiplatform.googleapis.com` habilitada + `gemini-omni-flash-preview` y `gemini-2.5-flash-image` accesibles (HTTP 200) en `efeonce-globe`/global. Resultado: `image-generate` → `gemini-2.5-flash-image`, `state=candidate_ready`, `provider=vertex`, `proposedRoute==actualRoute` (sin fallback), `estimatedCredits==actualCredits==10`, output `sha256:5b2311e8…` (nunca URL pública), fence reservó/liquidó. El harness one-shot NO se commiteó. El runtime deployado sigue `GLOBE_LAB_PROVIDER=fake` por default — el canary probó el path vertex sin cambiar el default. Estado: **rollout verificado en vivo (canary), default aún fake**.
+
 ## Follow-ups
 
 - Persistencia de bytes de salida al bucket `efeonce-globe-lab-evidence` (hoy hash-only).
