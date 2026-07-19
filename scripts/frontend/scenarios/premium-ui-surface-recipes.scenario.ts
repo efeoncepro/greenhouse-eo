@@ -98,7 +98,7 @@ export const scenario: CaptureScenario = {
     { kind: 'sleep', ms: 1800 },
     { kind: 'press', key: 'Escape', note: 'Normaliza el drawer global abierto en viewport compacto antes de evaluar la surface.' },
     { kind: 'sleep', ms: 350 },
-    { kind: 'scroll', selector: '[data-surface-recipe="operationalWorkbench"]', scrollBlock: 'start', scrollY: -120 },
+    { kind: 'scroll', selector: '[data-surface-recipe="operationalWorkbench"]', scrollBlock: 'start', scrollY: -80 },
     { kind: 'mark', label: 'workbench-first-fold', note: 'Contexto, señales, inventario y detalle comparten una jerarquía operativa.' },
     {
       kind: 'interaction',
@@ -121,12 +121,12 @@ export const scenario: CaptureScenario = {
     { kind: 'scroll', scrollTo: 'top' },
     { kind: 'click', selector: '[data-capture="recipe-tab-report"]' },
     { kind: 'sleep', ms: 500 },
-    { kind: 'scroll', selector: '[data-surface-recipe="analytics-report"]', scrollBlock: 'start', scrollY: -120 },
+    { kind: 'scroll', selector: '[data-surface-recipe="analytics-report"]', scrollBlock: 'start', scrollY: -80 },
     { kind: 'mark', label: 'report-first-fold', note: 'Narrativa ejecutiva, señal protagonista y evidencia desigual.' },
     { kind: 'mark', label: 'report-full-page', fullPage: true, note: 'Reporte completo con narrativa, evidencia y lectura contextual.' },
     { kind: 'click', selector: '[data-capture="recipe-tab-settings"]' },
     { kind: 'sleep', ms: 500 },
-    { kind: 'scroll', selector: '[data-surface-recipe="settings-flow"]', scrollBlock: 'start', scrollY: -120 },
+    { kind: 'scroll', selector: '[data-surface-recipe="settings-flow"]', scrollBlock: 'start', scrollY: -80 },
     { kind: 'mark', label: 'settings-first-fold', note: 'Flujo focal con impacto y command bar gobernada.' },
     {
       kind: 'interaction',

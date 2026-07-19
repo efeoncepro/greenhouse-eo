@@ -17,6 +17,7 @@ export interface SurfaceRecipeProps {
   instanceId: string
   asideLabel?: string
   detailLabel?: string
+  drawerCloseLabel?: string
   leadLabel?: string
   dataCapture?: string
   telemetrySource?: string
@@ -32,6 +33,7 @@ const SurfaceRecipe = ({
   instanceId,
   asideLabel,
   detailLabel,
+  drawerCloseLabel,
   leadLabel,
   dataCapture,
   telemetrySource,
@@ -81,6 +83,7 @@ const SurfaceRecipe = ({
         instanceId={instanceId}
         asideLabel={asideLabel}
         detailLabel={detailLabel}
+        drawerCloseLabel={drawerCloseLabel}
         leadLabel={leadLabel}
         telemetrySource={telemetrySource}
         regions={resolvedRegions}

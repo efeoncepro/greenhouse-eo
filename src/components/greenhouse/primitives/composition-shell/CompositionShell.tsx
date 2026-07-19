@@ -6,6 +6,7 @@ import type { ReactNode } from 'react'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Drawer from '@mui/material/Drawer'
+import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import { useTheme, type Theme } from '@mui/material/styles'
 
@@ -90,6 +91,7 @@ const CompositionShell = ({
   leadLabel = 'Respuesta',
   asideLabel = 'Panel contextual',
   detailLabel = 'Detalle',
+  drawerCloseLabel = 'Cerrar panel',
   instanceId,
   // Default `rich` (decisión del operador 2026-06-14): la coreografía rica (stagger de entrada) es el
   // estándar — más moderna y atractiva. Reduced-motion horneado + el primer paint no se retrasa (el stagger
@@ -334,8 +336,11 @@ const CompositionShell = ({
 
   // La región-drawer temporal (compact). MUI Drawer temporary aporta focus trap + aria-modal + Esc nativos.
   // El trigger es disclosure local (mecanismo, no dominio). Generalizado por `drawerRegion`:
-  //  - split → aside (inspector), label `asideLabel`, paper `complementary`.
-  //  - masterDetail → primary (detail canvas), label `detailLabel`, paper `region`.
+  //  - split → aside (inspector), label `asideLabel`.
+  //  - masterDetail → primary (detail canvas), label `detailLabel`.
+  // El paper temporal es un diálogo modal en ambos casos: MUI agrega `aria-modal=true`,
+  // por lo que no puede anunciarse como `region`/`complementary`. La semántica de
+  // región permanece en el contenido in-flow; el transporte compacto es `dialog`.
   // Los `data-capture` se mantienen estables por región (`composition-shell-aside-drawer*` intacto para
   // los consumers de split — QuoteBuilderShell depende de ese selector).
   const isPrimaryDrawer = drawerRegion === 'primary'
@@ -370,11 +375,12 @@ const CompositionShell = ({
           ModalProps={{ keepMounted: false }}
           slotProps={{
             paper: {
-              component: isPrimaryDrawer ? 'section' : 'aside',
-              role: isPrimaryDrawer ? 'region' : 'complementary',
+              component: 'section',
+              role: 'dialog',
               'aria-label': drawerLabel,
               // El detail canvas necesita más ancho que el inspector; el aside conserva su ancho histórico.
               sx: {
+                position: 'relative',
                 width: isPrimaryDrawer ? 'min(480px, 92vw)' : 'min(420px, 88vw)',
                 p: { xs: 3, sm: 5 },
                 '& > [data-recipe-plane]': {
@@ -388,6 +394,26 @@ const CompositionShell = ({
           }}
           data-capture={`composition-shell-${drawerRegion}-drawer`}
         >
+          <IconButton
+            size='small'
+            onClick={() => setDrawerOpen(false)}
+            aria-label={drawerCloseLabel}
+            sx={theme => ({
+              position: 'sticky',
+              insetBlockStart: 0,
+              zIndex: 2,
+              alignSelf: 'flex-end',
+              flexShrink: 0,
+              ml: 2,
+              mb: 2,
+              bgcolor: 'background.paper',
+              border: `1px solid ${theme.palette.divider}`,
+              boxShadow: theme.greenhouseElevation.raised.boxShadow,
+              '&:hover': { bgcolor: 'action.hover' }
+            })}
+          >
+            <i className='tabler-x' aria-hidden />
+          </IconButton>
           {regions[drawerRegion]}
         </Drawer>
       </>

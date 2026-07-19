@@ -600,7 +600,7 @@ const CtaDetailPanel = ({
                 >
                   <i className={surface.surfaceKind === 'wordpress' ? 'tabler-brand-wordpress' : 'tabler-square-rounded'} style={{ fontSize: 18 }} aria-hidden />
                 </Box>
-                <Stack spacing={0} sx={{ flex: 1, minWidth: 0 }}>
+                <Stack spacing={0} sx={{ flex: '1 1 220px', minWidth: 0 }}>
                   <Typography variant='subtitle2' color='text.primary' noWrap>
                     {surface.surfaceName}
                   </Typography>

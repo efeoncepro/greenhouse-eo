@@ -29,7 +29,7 @@ const SignalStrip = ({ signals, variant, kind = 'health', density = 'auto', data
   const { ref, density: resolvedDensity, containerType } = useContainerDensity(density)
   const resolvedVariant = resolveSignalStripVariant(kind, variant)
   const integrated = resolvedVariant === 'integrated'
-  const open = resolvedVariant === 'narrative' || integrated
+  const open = integrated
 
   return (
     <Box
@@ -83,7 +83,7 @@ const SignalStrip = ({ signals, variant, kind = 'health', density = 'auto', data
             alignItems='flex-start'
             sx={theme => ({
               minWidth: 0,
-              px: integrated ? { xs: 1, sm: 4 } : { xs: 0, sm: 4 },
+              px: integrated ? { xs: 0.5, sm: 4 } : { xs: 0, sm: 4 },
               py: { xs: 2, sm: 0 },
               borderInlineStart: { xs: 'none', sm: index === 0 ? 'none' : `1px solid ${theme.palette.divider}` }
             })}
@@ -93,8 +93,8 @@ const SignalStrip = ({ signals, variant, kind = 'health', density = 'auto', data
                 sx={theme => ({
                   display: 'grid',
                   placeItems: 'center',
-                  inlineSize: integrated ? { xs: 28, sm: 34 } : 34,
-                  blockSize: integrated ? { xs: 28, sm: 34 } : 34,
+                  inlineSize: integrated ? { xs: 26, sm: 34 } : 34,
+                  blockSize: integrated ? { xs: 26, sm: 34 } : 34,
                   flexShrink: 0,
                   borderRadius: `${theme.shape.customBorderRadius.md}px`,
                   bgcolor: `${signal.tone ?? 'primary'}.lightOpacity`,
@@ -105,7 +105,11 @@ const SignalStrip = ({ signals, variant, kind = 'health', density = 'auto', data
               </Box>
             ) : null}
             <Stack spacing={0.5} sx={{ minWidth: 0 }}>
-              <Typography variant='caption' color={integrated ? 'inherit' : 'text.primary'} sx={{ opacity: integrated ? 0.72 : 1 }}>
+              <Typography
+                variant='caption'
+                color={integrated ? 'inherit' : 'text.primary'}
+                sx={{ opacity: integrated ? 0.78 : 1, lineHeight: 1.25 }}
+              >
                 {signal.label}
               </Typography>
               <Typography

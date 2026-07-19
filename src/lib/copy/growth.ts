@@ -1114,6 +1114,7 @@ export const GH_GROWTH_CTA_OPERATOR = {
     },
     detail: {
       regionAria: 'Detalle del CTA seleccionado',
+      closeAria: 'Cerrar el detalle del CTA',
       loadError: 'No pudimos cargar el detalle. Intenta de nuevo.',
       retry: 'Reintentar',
       edit: 'Editar y previsualizar',

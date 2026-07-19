@@ -245,7 +245,9 @@ const OptionCard = ({ selected, icon, label, desc, badge, onClick }: OptionCardP
         <Box component='i' className='tabler-circle-check-filled' sx={{ fontSize: 20, color: 'primary.main' }} aria-hidden />
       ) : null}
     </Stack>
-    <Typography variant='subtitle2'>{label}</Typography>
+    <Typography variant='subtitle2' color='text.primary'>
+      {label}
+    </Typography>
     <Typography variant='caption' color='text.secondary' sx={{ lineHeight: 1.45 }}>
       {desc}
     </Typography>
@@ -567,7 +569,7 @@ const CtaAuthoringDrawer = ({ open, existingSlug, initialDraft, onClose, onSubmi
               <Switch
                 checked={draft.hasAsset}
                 onChange={event => patch(next => (next.hasAsset = event.target.checked))}
-                inputProps={{ 'aria-label': A.content.assetTitle }}
+                slotProps={{ input: { 'aria-label': A.content.assetTitle } }}
               />
             </Stack>
             {draft.hasAsset ? (
@@ -642,7 +644,7 @@ const CtaAuthoringDrawer = ({ open, existingSlug, initialDraft, onClose, onSubmi
                 <Switch
                   checked={draft.actionNewContext}
                   onChange={event => patch(next => (next.actionNewContext = event.target.checked))}
-                  inputProps={{ 'aria-label': A.action.newContextLabel }}
+                  slotProps={{ input: { 'aria-label': A.action.newContextLabel } }}
                 />
               </Stack>
             ) : null}
@@ -721,7 +723,7 @@ const CtaAuthoringDrawer = ({ open, existingSlug, initialDraft, onClose, onSubmi
               <Switch
                 checked={draft.suppression.suppressAfterConversion}
                 onChange={event => patch(next => (next.suppression.suppressAfterConversion = event.target.checked))}
-                inputProps={{ 'aria-label': A.targeting.afterConversion }}
+                slotProps={{ input: { 'aria-label': A.targeting.afterConversion } }}
               />
             </Stack>
           </Stack>
@@ -766,7 +768,7 @@ const CtaAuthoringDrawer = ({ open, existingSlug, initialDraft, onClose, onSubmi
             aria-hidden
           />
           <Stack spacing={0.5}>
-            <Typography variant='subtitle2' color={blockedCount > 0 ? 'error.main' : 'success.main'}>
+            <Typography variant='subtitle2' color={blockedCount > 0 ? 'error.dark' : 'success.dark'}>
               {blockedCount > 0
                 ? `${blockedCount} ${blockedCount === 1 ? A.review.blockedOne : A.review.blockedMany}`
                 : A.review.readyTitle}
@@ -818,7 +820,11 @@ const CtaAuthoringDrawer = ({ open, existingSlug, initialDraft, onClose, onSubmi
         open={open}
         onClose={requestClose}
         PaperProps={{
-          sx: { width: 'min(1160px, 96vw)', bgcolor: 'background.default' },
+          sx: theme => ({
+            width: 'min(1160px, 96vw)',
+            bgcolor: theme.palette.background.default,
+            '&& .MuiInputLabel-root.Mui-focused': { color: theme.palette.customColors.midnight },
+          }),
           'aria-label': A.dialogAria,
         }}
         data-capture='cta-authoring-drawer'
@@ -827,8 +833,12 @@ const CtaAuthoringDrawer = ({ open, existingSlug, initialDraft, onClose, onSubmi
         <Stack
           direction='row'
           alignItems='center'
-          spacing={3}
+          useFlexGap
           sx={{
+            display: { xs: 'grid', sm: 'flex' },
+            gridTemplateColumns: { xs: '36px minmax(0, 1fr) auto', sm: undefined },
+            columnGap: { xs: 2, sm: 3 },
+            rowGap: { xs: 1, sm: 0 },
             px: 5,
             py: 3,
             flexShrink: 0,
@@ -851,14 +861,14 @@ const CtaAuthoringDrawer = ({ open, existingSlug, initialDraft, onClose, onSubmi
             <i className='tabler-wand' style={{ fontSize: 18 }} aria-hidden />
           </Box>
           <Stack spacing={0}>
-            <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
+            <Typography variant='subtitle1' color='text.primary' sx={{ fontWeight: 600 }}>
               {existingSlug ? A.titleEdit : A.titleNew}
             </Typography>
             <Typography variant='caption' color='text.secondary'>
               {existingSlug ? A.subtitleEdit : A.subtitleNew}
             </Typography>
           </Stack>
-          <Box sx={{ flex: 1 }} />
+          <Box sx={{ display: { xs: 'none', sm: 'block' }, flex: 1 }} />
           {dirty ? (
             <Box
               component='span'
@@ -866,12 +876,16 @@ const CtaAuthoringDrawer = ({ open, existingSlug, initialDraft, onClose, onSubmi
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 1,
-                px: 3,
+                gridColumn: { xs: '2 / 3', sm: 'auto' },
+                gridRow: { xs: 2, sm: 'auto' },
+                justifySelf: 'start',
+                whiteSpace: 'nowrap',
+                px: 2,
                 py: 1,
                 borderRadius: '9999px',
                 typography: 'caption',
                 fontWeight: 600,
-                color: 'warning.dark',
+                color: 'text.primary',
                 bgcolor: alpha(theme.palette.warning.main, 0.16),
               })}
               data-capture='cta-author-dirty-badge'
@@ -886,7 +900,15 @@ const CtaAuthoringDrawer = ({ open, existingSlug, initialDraft, onClose, onSubmi
             size='small'
             onClick={requestClose}
             aria-label={A.closeAria}
-            sx={{ minWidth: 38, px: 2, color: 'text.secondary', borderColor: 'divider' }}
+            sx={{
+              gridColumn: { xs: 3, sm: 'auto' },
+              gridRow: { xs: 1, sm: 'auto' },
+              alignSelf: 'start',
+              minWidth: 38,
+              px: 2,
+              color: 'text.secondary',
+              borderColor: 'divider'
+            }}
           >
             <i className='tabler-x' style={{ fontSize: 18 }} aria-hidden />
           </Button>
@@ -955,7 +977,7 @@ const CtaAuthoringDrawer = ({ open, existingSlug, initialDraft, onClose, onSubmi
                       justifyContent: 'center',
                       typography: 'caption',
                       fontWeight: 700,
-                      color: active || done ? 'primary.contrastText' : 'text.disabled',
+                      color: active || done ? 'primary.contrastText' : 'text.secondary',
                       bgcolor: active ? 'primary.main' : done ? 'success.main' : 'background.paper',
                       border: theme =>
                         `1.5px solid ${active ? theme.palette.primary.main : done ? theme.palette.success.main : theme.palette.divider}`,
@@ -967,7 +989,7 @@ const CtaAuthoringDrawer = ({ open, existingSlug, initialDraft, onClose, onSubmi
                     <Typography variant='caption' sx={{ fontWeight: 600, color: active ? 'primary.dark' : 'text.primary' }}>
                       {A.steps[stepKey].label}
                     </Typography>
-                    <Typography variant='caption' color='text.disabled'>
+                    <Typography variant='caption' color='text.secondary'>
                       {A.steps[stepKey].hint}
                     </Typography>
                   </Stack>
@@ -977,7 +999,7 @@ const CtaAuthoringDrawer = ({ open, existingSlug, initialDraft, onClose, onSubmi
             <Stack sx={{ mt: 'auto', pt: 3.5, borderTop: theme => `1px solid ${theme.palette.divider}` }} spacing={1.5}>
               <Typography
                 variant='caption'
-                sx={{ textTransform: 'uppercase', letterSpacing: '0.06em', color: 'text.disabled', fontWeight: 600 }}
+                sx={{ textTransform: 'uppercase', letterSpacing: '0.06em', color: 'text.secondary', fontWeight: 600 }}
               >
                 {A.draftSummaryTitle}
               </Typography>
@@ -995,7 +1017,13 @@ const CtaAuthoringDrawer = ({ open, existingSlug, initialDraft, onClose, onSubmi
           </Stack>
 
           {/* Step content */}
-          <Box sx={{ overflowY: 'auto', p: { xs: 4, md: 6 } }} data-capture='cta-author-step-content'>
+          <Box
+            role='region'
+            aria-label={A.steps[STEP_KEYS[step]].label}
+            tabIndex={0}
+            sx={{ minWidth: 0, overflowY: 'auto', overflowX: 'clip', p: { xs: 4, md: 6 } }}
+            data-capture='cta-author-step-content'
+          >
             {stepBody()}
           </Box>
 
@@ -1016,7 +1044,7 @@ const CtaAuthoringDrawer = ({ open, existingSlug, initialDraft, onClose, onSubmi
                 <Typography variant='caption' sx={{ fontWeight: 600, color: 'text.secondary' }}>
                   {O.cockpit.detail.previewTitle}
                 </Typography>
-                <Typography variant='caption' color='text.disabled' sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant='caption' color='text.secondary' sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
                   <i className='tabler-eye' style={{ fontSize: 14 }} aria-hidden />
                   en vivo
                 </Typography>

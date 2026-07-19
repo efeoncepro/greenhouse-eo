@@ -48,6 +48,7 @@ const WorkbenchHeader = ({
   const reduced = useReducedMotion()
   const resolvedVariant = resolveWorkbenchHeaderVariant(kind, variant)
   const immersive = resolvedVariant === 'operational'
+  const editorialPlane = resolvedVariant === 'report' || resolvedVariant === 'settings'
 
   return (
     <Box
@@ -58,22 +59,28 @@ const WorkbenchHeader = ({
       data-capture={dataCapture}
       data-kind={kind}
       data-variant={resolvedVariant}
-      data-ui-surface={immersive ? 'immersive' : 'open'}
+      data-ui-surface={immersive ? 'immersive' : editorialPlane ? 'contained' : 'open'}
       sx={theme => ({
         position: 'relative',
         overflow: 'clip',
         isolation: 'isolate',
-        border: resolvedVariant === 'operational' ? '1px solid' : 'none',
+        border: immersive || editorialPlane ? '1px solid' : 'none',
         borderColor: immersive ? theme.palette.customColors.deepAzure : 'divider',
-        borderRadius: resolvedVariant === 'operational' ? `${theme.shape.customBorderRadius.xl}px` : 0,
+        borderRadius: immersive || editorialPlane ? `${theme.shape.customBorderRadius.xl}px` : 0,
         color: immersive ? 'primary.contrastText' : 'text.primary',
         background: immersive
           ? `radial-gradient(circle at 88% -18%, ${theme.palette.primary.main} 0%, transparent 36%), linear-gradient(135deg, ${theme.palette.customColors.midnight} 0%, ${theme.palette.customColors.deepAzure} 100%)`
           : resolvedVariant === 'settings'
-            ? `radial-gradient(circle at 92% 0%, ${theme.palette.primary.lightOpacity} 0%, transparent 44%), linear-gradient(135deg, transparent 0%, ${theme.palette.primary.lightOpacity} 180%)`
-            : 'transparent',
-        boxShadow: immersive ? theme.greenhouseElevation.raised.boxShadow : 'none',
-        p: resolvedVariant === 'report' ? { xs: 2, md: 3 } : { xs: 4, md: 7 },
+            ? `radial-gradient(circle at 92% 0%, ${theme.palette.primary.lightOpacity} 0%, transparent 44%), ${theme.palette.background.paper}`
+            : resolvedVariant === 'report'
+              ? theme.palette.background.paper
+              : 'transparent',
+        boxShadow: immersive
+          ? theme.greenhouseElevation.raised.boxShadow
+          : editorialPlane
+            ? theme.greenhouseElevation.raised.boxShadow
+            : 'none',
+        p: resolvedVariant === 'report' ? { xs: 3, md: 5 } : { xs: 3, sm: 4, md: 7 },
         '&::after': immersive
           ? {
               content: "''",
@@ -120,7 +127,7 @@ const WorkbenchHeader = ({
           : undefined
       })}
     >
-      <Stack direction={{ xs: 'column', md: 'row' }} justifyContent='space-between' spacing={{ xs: 3, md: 5 }}>
+      <Stack direction={{ xs: 'column', md: 'row' }} justifyContent='space-between' spacing={{ xs: 2.5, md: 5 }}>
         <Stack spacing={1.5} sx={{ minWidth: 0, maxInlineSize: 760 }}>
           <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap' useFlexGap>
             {eyebrow ? (
@@ -145,7 +152,21 @@ const WorkbenchHeader = ({
           {meta ? <Box sx={{ color: 'text.secondary' }}>{meta}</Box> : null}
         </Stack>
         {primaryAction || secondaryActions ? (
-          <Stack direction='row' spacing={2} alignItems='flex-start' flexWrap='wrap' useFlexGap sx={{ flexShrink: 0 }}>
+          <Stack
+            direction='row'
+            spacing={{ xs: 1, sm: 2 }}
+            alignItems='flex-start'
+            flexWrap='wrap'
+            useFlexGap
+            sx={{
+              flexShrink: 0,
+              inlineSize: { xs: '100%', md: 'auto' },
+              '& > .MuiButton-root': {
+                flex: { xs: '1 1 0', md: '0 0 auto' },
+                minInlineSize: 0
+              }
+            }}
+          >
             {secondaryActions}
             {primaryAction}
           </Stack>
@@ -154,8 +175,8 @@ const WorkbenchHeader = ({
       {supporting ? (
         <Box
           sx={{
-            mt: { xs: 3, md: 5 },
-            pt: { xs: 3, md: 4 },
+            mt: { xs: 2.5, md: 5 },
+            pt: { xs: 2.5, md: 4 },
             borderBlockStart: '1px solid',
             borderColor: immersive ? 'primary.mainOpacity' : 'divider'
           }}

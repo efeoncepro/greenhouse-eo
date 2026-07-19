@@ -10,13 +10,14 @@
  * Autoridad visual: diseño Claude Design "Cockpit de CTAs" (instrucción del
  * operador 2026-07-18) traducido a tokens del theme.
  */
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Slider from '@mui/material/Slider'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import useMediaQuery from '@mui/material/useMediaQuery'
 import { alpha, useTheme, type Theme } from '@mui/material/styles'
 
 import { GH_GROWTH_CTA_OPERATOR } from '@/lib/copy/growth'
@@ -130,7 +131,7 @@ export const PreviewFrame = ({
   const [failClosed, setFailClosed] = useState(false)
   const showRenderer = !degraded && !suppressedEvidence
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!showRenderer) return undefined
 
     let disposed = false
@@ -272,7 +273,17 @@ const ScaledFrame = ({ targetWidth, height, children }: { targetWidth: number; h
   }, [targetWidth])
 
   return (
-    <Box ref={wrapRef} sx={theme => ({ overflow: 'hidden', height: height * scale, borderRadius: `${theme.shape.customBorderRadius.xl}px` })}>
+    <Box
+      ref={wrapRef}
+      sx={theme => ({
+        minWidth: 0,
+        maxWidth: '100%',
+        overflow: 'clip',
+        contain: 'layout paint',
+        height: height * scale,
+        borderRadius: `${theme.shape.customBorderRadius.xl}px`,
+      })}
+    >
       <Box sx={{ width: targetWidth, height, transform: `scale(${scale})`, transformOrigin: 'top left' }}>{children}</Box>
     </Box>
   )
@@ -329,7 +340,7 @@ export const SegmentedControl = <T extends string>({ label, value, options, onCh
               borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
               textTransform: 'none',
               fontWeight: 600,
-              color: active ? 'primary.main' : 'text.secondary',
+              color: active ? 'primary.dark' : 'text.secondary',
               bgcolor: active ? 'background.paper' : 'transparent',
               boxShadow: active ? 2 : 'none',
               '&:hover': { bgcolor: active ? 'background.paper' : 'action.selected' },
@@ -409,15 +420,21 @@ export const SlideInDensityMatrix = ({ contract }: { contract: CtaRenderContract
   return (
     <Stack spacing={4}>
       {SLIDE_IN_DENSITY_WIDTHS.map((density, index) => (
-        <Box key={density.key} data-capture={`cta-preview-density-${density.key}`}>
+        <Box
+          key={density.key}
+          data-capture={`cta-preview-density-${density.key}`}
+          sx={{ display: { xs: density.key === 'peek' ? 'block' : 'none', sm: 'block' } }}
+        >
           <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mb: 1 }}>
             {O.preview[density.labelKey]}
           </Typography>
           <Box
+            inert
+            aria-hidden='true'
             ref={(node: HTMLDivElement | null) => {
               hostsRef.current[index] = node
             }}
-            sx={{ maxWidth: density.width }}
+            sx={{ width: { xs: '100%', sm: density.width }, maxWidth: '100%', minHeight: 240, overflowX: 'clip' }}
           />
         </Box>
       ))}
@@ -496,6 +513,9 @@ const PAIRWISE_COMBOS: Array<{ host: PreviewHost; scheme: PreviewScheme; width: 
 ]
 
 export const CtaPreviewHarness = ({ draft, degraded, onDegradedChange, diagnostics }: CtaPreviewHarnessProps) => {
+  const theme = useTheme()
+  const compact = useMediaQuery(theme.breakpoints.down('sm'))
+  const compactInitializedRef = useRef(false)
   const [host, setHost] = useState<PreviewHost>('think')
   const [scheme, setScheme] = useState<PreviewScheme>('light')
   const [contentMode, setContentMode] = useState<PreviewContentMode>('nominal')
@@ -507,6 +527,15 @@ export const CtaPreviewHarness = ({ draft, degraded, onDegradedChange, diagnosti
   const contract = useMemo(() => buildPreviewContract(draft, contentMode, assetPresent), [draft, contentMode, assetPresent])
   const density = densityForWidth(width)
   const isSlideIn = draft.placement === 'slide_in'
+
+  useEffect(() => {
+    if (compact && !compactInitializedRef.current) {
+      compactInitializedRef.current = true
+      setWidth(360)
+    } else if (!compact) {
+      compactInitializedRef.current = false
+    }
+  }, [compact])
 
   const handleMountError = useCallback(() => onDegradedChange(true), [onDegradedChange])
 
@@ -568,7 +597,7 @@ export const CtaPreviewHarness = ({ draft, degraded, onDegradedChange, diagnosti
         }}
       >
         <Stack direction='row' alignItems='center' justifyContent='space-between' gap={2} flexWrap='wrap'>
-          <Typography variant='caption' sx={{ fontWeight: 600 }}>
+          <Typography variant='caption' color='text.primary' sx={{ fontWeight: 600 }}>
             {P.widthLabel}
           </Typography>
           <Stack direction='row' alignItems='center' gap={2}>
@@ -584,7 +613,7 @@ export const CtaPreviewHarness = ({ draft, degraded, onDegradedChange, diagnosti
                 typography: 'caption',
                 fontWeight: 700,
                 letterSpacing: '0.02em',
-                color: 'primary.dark',
+                color: 'text.primary',
                 bgcolor: theme => alpha(theme.palette.primary.main, 0.12),
               }}
             >
@@ -595,7 +624,7 @@ export const CtaPreviewHarness = ({ draft, degraded, onDegradedChange, diagnosti
         <Slider
           value={width}
           min={320}
-          max={900}
+          max={compact ? 390 : 900}
           step={4}
           onChange={(_, value) => setWidth(value as number)}
           aria-label={P.widthLabel}
@@ -609,13 +638,20 @@ export const CtaPreviewHarness = ({ draft, degraded, onDegradedChange, diagnosti
               variant='outlined'
               color='inherit'
               onClick={() => setWidth(preset.width)}
-              sx={{ borderRadius: '9999px', py: 0.5, textTransform: 'none', color: 'text.secondary', borderColor: 'divider' }}
+              sx={{
+                display: { xs: preset.width === 360 ? 'inline-flex' : 'none', sm: 'inline-flex' },
+                borderRadius: '9999px',
+                py: 0.5,
+                textTransform: 'none',
+                color: 'text.secondary',
+                borderColor: 'divider'
+              }}
             >
               {P[preset.labelKey]}
             </Button>
           ))}
         </Stack>
-        <Typography variant='caption' color='text.disabled'>
+        <Typography variant='caption' color='text.secondary'>
           {P.widthHint}
         </Typography>
       </Stack>
@@ -623,17 +659,31 @@ export const CtaPreviewHarness = ({ draft, degraded, onDegradedChange, diagnosti
       {isSlideIn ? (
         <SlideInDensityMatrix contract={contract} />
       ) : (
-        <Box data-capture='cta-harness-canvas'>
-          <PreviewFrame
-            key={`${mountKey}-${host}-${scheme}-${contentMode}-${assetPresent}`}
-            contract={contract}
-            host={host}
-            scheme={scheme}
-            widthPx={width}
-            heightPx={380}
-            degraded={degraded}
-            onMountError={handleMountError}
-          />
+        <Box data-capture='cta-harness-canvas' sx={{ minWidth: 0, maxWidth: '100%', overflowX: 'clip' }}>
+          {compact ? (
+            <PreviewFrame
+              key={`${mountKey}-${host}-${scheme}-${contentMode}-${assetPresent}`}
+              contract={contract}
+              host={host}
+              scheme={scheme}
+              heightPx={380}
+              degraded={degraded}
+              onMountError={handleMountError}
+            />
+          ) : (
+            <ScaledFrame targetWidth={width + 48} height={380}>
+              <PreviewFrame
+                key={`${mountKey}-${host}-${scheme}-${contentMode}-${assetPresent}`}
+                contract={contract}
+                host={host}
+                scheme={scheme}
+                widthPx={width}
+                heightPx={380}
+                degraded={degraded}
+                onMountError={handleMountError}
+              />
+            </ScaledFrame>
+          )}
         </Box>
       )}
 
@@ -672,7 +722,7 @@ export const CtaPreviewHarness = ({ draft, degraded, onDegradedChange, diagnosti
       </Typography>
 
       <DiagnosticChips items={diagnostics} />
-      <Typography variant='caption' color='text.disabled' sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+      <Typography variant='caption' color='text.secondary' sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <i className='tabler-info-circle' style={{ fontSize: 14 }} aria-hidden />
         {P.badgesNote}
       </Typography>
@@ -684,7 +734,7 @@ export const CtaPreviewHarness = ({ draft, degraded, onDegradedChange, diagnosti
             role='group'
             aria-label={P.matrixAria}
             data-capture='cta-harness-matrix'
-            sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }, gap: 3 }}
+            sx={{ display: { xs: 'none', sm: 'grid' }, gridTemplateColumns: { sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }, gap: 3 }}
           >
             {PAIRWISE_COMBOS.map(combo => (
               <Stack key={combo.label} spacing={1.5}>

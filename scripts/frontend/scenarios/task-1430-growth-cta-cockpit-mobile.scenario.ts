@@ -31,15 +31,16 @@ export const scenario: CaptureScenario = {
     enterpriseRubric: { enabled: true, failOnViolations: false }
   },
   steps: [
+    { kind: 'press', key: 'Escape', note: 'Normaliza el drawer global persistido antes de medir el viewport compacto.' },
+    { kind: 'sleep', ms: 350 },
     { kind: 'mark', label: '01-mobile-shell' },
     { kind: 'mark', label: '02-mobile-inventory', clipSelector: '[data-capture="cta-inventory"]' },
 
     // Detalle = drawer temporal del shell (inventario/filtros se preservan detrás).
-    { kind: 'click', selector: '[data-capture="cta-inventory-row"]:nth-of-type(1) button' },
-    { kind: 'sleep', ms: 1200 },
     { kind: 'scroll', selector: '[data-capture="composition-shell-primary-drawer-trigger"]' },
     { kind: 'click', selector: '[data-capture="composition-shell-primary-drawer-trigger"]' },
-    { kind: 'sleep', ms: 1500 },
+    { kind: 'wait', selector: '[data-capture="cta-detail"]', timeout: 10000 },
+    { kind: 'sleep', ms: 500 },
     { kind: 'mark', label: '03-mobile-detail-drawer' },
     { kind: 'press', key: 'Escape' },
     { kind: 'sleep', ms: 700 },

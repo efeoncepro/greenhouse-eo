@@ -483,6 +483,7 @@ const GrowthCtasGovernanceView = ({
       instanceId='growth-cta-cockpit'
       asideLabel={O.inventory.title}
       detailLabel='Ver detalle'
+      drawerCloseLabel={C.detail.closeAria}
       telemetrySource='growth-cta-cockpit'
       regions={{ aside: primary, primary: aside }}
     >

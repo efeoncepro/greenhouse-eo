@@ -51,7 +51,9 @@ export const scenario: CaptureScenario = {
     // Selección por teclado: foco en la primera opción → ↓ navega a la segunda.
     { kind: 'click', selector: '[data-capture="cta-inventory-row"]:nth-of-type(1) button' },
     { kind: 'press', key: 'ArrowDown' },
-    { kind: 'sleep', ms: 1500 },
+    { kind: 'press', key: 'ArrowUp' },
+    { kind: 'wait', selector: '[data-capture="cta-detail"]', timeout: 10000 },
+    { kind: 'sleep', ms: 500 },
     { kind: 'mark', label: '03-detail-header', clipSelector: '[data-capture="cta-detail"]' },
     { kind: 'scroll', selector: '[data-capture="cta-detail-metrics"], [data-capture="cta-detail-metrics-partial"]' },
     { kind: 'sleep', ms: 600 },

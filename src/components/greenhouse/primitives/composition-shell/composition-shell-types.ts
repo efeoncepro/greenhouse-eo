@@ -119,6 +119,8 @@ export interface CompositionShellProps {
    * colapsa `primary` a drawer en compact (`masterDetail`). Default `'Detalle'`.
    */
   detailLabel?: string
+  /** Label accesible del control que cierra el drawer temporal en compact. */
+  drawerCloseLabel?: string
   /**
    * ID estable opcional para escopar view-transition-name por instancia sin depender de `useId`.
    * Útil en surfaces SSR donde el árbol puede montar widgets de terceros/MUI con IDs propios.
