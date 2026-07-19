@@ -7,6 +7,13 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-19 — Routing HubSpot de email y secuencias por API canonizado
+
+- Las skills `hubspot-as-a-service` y `hubspot-solutions-partner`, espejadas para Codex/Claude, distinguen
+  marketing directo, automatización legítima por formulario, email de ventas 1:1 y enrollment de secuencias.
+  Marketing Starter no obtiene Single-Send; Sales Hub Professional sí puede inscribir contactos vía API bajo
+  seat, inbox, permisos, scopes, consentimiento y límites de envío verificados.
+
 ## 2026-07-19 — Changelog interno adopta ventana activa e historia verificable
 
 - `changelog.md` deja de ser un monolito append-only de 11.256 líneas y conserva hasta 60 entradas recientes;
@@ -879,9 +886,3 @@ ANAM`, nueve propiedades escalares y una calculada. Readback de definición pas�
 - La portada reusable conserva su lockup centrado de cuatro elementos y sube la jerarquía de marca: wordmark Efeonce de 650 a 840px, marca cliente on-dark nativa, tipo de propuesta y URL Bubble fija. La recipe `cover-hero` concentra un halo cyan/teal detrás del lockup y controla la presencia violeta sin recuperar el gradiente multicolor histórico.
 - `clientLogo` deja de depender de `filter: brightness/invert`: el contrato exige `native-on-dark` y el template preserva el color del asset. SKY suma `sky-on-dark.svg`, derivado de la geometría y el verde del SVG oficial; un test focal bloquea recoloración CSS y drift del asset.
 - Baseline promovido únicamente para `templates/CoverFull.png` y `sky/01-portada.png`: selftest y gate final pasan 57 frames con 0 píxeles; Composer 215/215 y typecheck limpio. Proposal Studio adjunta el PDF de 26 páginas como `deck` v6 `client_facing`; v5 y toda la historia anterior se conservan.
-
-## 2026-07-15 — Oferta económica: builder de Excel BRANDEADO reusable
-
-- Hay clientes que exigen Excel (documento integrante). El que se generaba era vago y SKY-hardcodeado. Ahora hay un **builder domain-free reusable** ([economic-offer-xlsx.mjs](scripts/commercial/lib/economic-offer-xlsx.mjs)): banda navy con el wordmark Efeonce (imagen embebida, se ve igual en todo lector), paleta AXIS (navy `#00345F` + teal `#36C8BF`), tabla con zebra + montos alineados, **bloque Neto/IVA/Total** destacado, formato CLP y **print setup A4** (fit-to-width + footer confidencial + página). Verificado con un proxy HTML fiel (salto de ~4/10 a ~8/10).
-- **`pnpm economica:build <caso>/economica.json`**: cada licitación es un `economica.json` (fuente única), el código no cambia. SKY migrado (`build-sky-economica-xlsx.mjs` → wrapper delgado; cifras a `economica.json`). `pnpm tender:new` ahora scaffoldea también el `economica.json`. Tercer artefacto de la familia productizado (deck ✓ · oferta técnica ✓ · económica ✓).
-- **Techo honesto de Excel:** las fuentes no se embeben en `.xlsx` (degradan a la del lector); brand pixel-perfect = PDF del composer, con el Excel como planilla editable. 🔴 NUNCA precio unitario por artículo (el schema no tiene ese campo). Antes de brandear libre, confirmar si las bases exigen SU planilla. Documentado en workspace template + skill de tenders (ambos namespaces).

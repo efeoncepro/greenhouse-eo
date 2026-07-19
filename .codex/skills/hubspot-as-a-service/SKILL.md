@@ -1,6 +1,6 @@
 ---
 name: hubspot-as-a-service
-description: "Deliver and operate HubSpot as a managed client service: portal discovery, RevOps design, CRM properties and pipelines, Customer Agent configuration, Markdown knowledge, landing/chat integration, conversational QA, human handoff, rollout, measurement, and client reporting. Use for client HubSpot implementation or managed operations, especially ANAM; do not use for generic HubSpot selling, the Greenhouse write bridge, or CMS-only implementation."
+description: "Deliver and operate HubSpot as a managed client service: portal discovery, RevOps design, CRM properties and pipelines, marketing/sales email and sequence API routing, Customer Agent configuration, Markdown knowledge, landing/chat integration, conversational QA, human handoff, rollout, measurement, and client reporting. Use for client HubSpot implementation or managed operations, especially ANAM; do not use for generic HubSpot selling, the Greenhouse write bridge, or CMS-only implementation."
 ---
 
 # HubSpot as a Service
@@ -16,6 +16,7 @@ Operate HubSpot as an accountable managed service, not as a collection of portal
    - RevOps/schema: [revops-schema.md](references/revops-schema.md)
    - Property types, calculations, sync, rollups, scores or smart properties: [property-types.md](references/property-types.md)
    - Reports and dashboards: [report-design.md](references/report-design.md)
+   - Marketing/sales email or sequence automation by API: [email-api-routing.md](references/email-api-routing.md)
    - ANAM: [anam-case.md](references/anam-case.md)
 4. When the work derives from a sold implementation, read `../hubspot-solutions-partner/modules/12_IMPLEMENTACION.md`; for agents, also read `../hubspot-solutions-partner/modules/13_AGENTES.md`. Product claims and prices remain owned by that skill's `SOURCES.md`.
 
