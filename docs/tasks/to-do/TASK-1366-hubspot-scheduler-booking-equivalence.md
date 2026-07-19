@@ -1,5 +1,26 @@
 # TASK-1366 — HubSpot Scheduler Booking Equivalence Spike
 
+## Delta 2026-07-19
+
+- **Colisión de naming `book_meeting`** — TASK-1431 (code-complete 2026-07-18) implementó
+  `book_meeting` como action kind **navegación-only** del Action Registry del Growth CTA engine
+  (`src/lib/growth/ctas/contracts.ts` + `action-registry.ts`): `<a href>` real a hosts
+  `meetings*.hubspot.com`, regla dura "CERO write CRM por click". El adapter server-side que este
+  spike evalúa NO gradúa ese kind: si el veredicto es pass, el follow-up define un kind/adapter
+  NUEVO (working name `hubspot_handoff`, reservado así en la skill `greenhouse-growth-ctas`, o
+  `native_booking`), y `book_meeting` navigate queda como fallback de navegación. Toda mención a
+  "adapter `book_meeting`" en esta task debe leerse con ese matiz.
+- **Exit gate explícito de Slice 1 (scopes)** — el app HubSpot canónico
+  (`services/hubspot_greenhouse_integration/hubspot-app/hubspot-bigquery/src/app/app-hsmeta.json`)
+  NO tiene ningún scope `scheduler.*` (verificado 2026-07-19). Slice 2 no puede correr sin: agregar
+  scope → `hs project upload --account=48713323` → reinstalación del app por el operador → token
+  `pat-na1-*` nuevo. Esa aprobación es out-of-band y debe pedirse al cierre de Slice 1, antes de
+  cualquier booking.
+- **Postura de consent real para Slice 3** — ningún host público (efeoncepro.com / think) tiene CMP
+  ni consent-mode defaults hoy (LEARNINGS medición 2026-07-18). La mitigación Forms API +
+  `context.hutk` no puede asumir un consent gate existente; el diseño debe declarar la postura
+  vigente y qué cambia si se instala CMP.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -95,7 +116,8 @@ Reglas obligatorias:
 ### Blocks / Impacts
 
 - Decide el mecanismo futuro del CTA "Agenda una reunion" para `TASK-1350`, `TASK-1351`, `TASK-1352` y `TASK-1358`.
-- Informa el action router `book_meeting` de `EPIC-023`.
+- Informa el futuro adapter de booking nativo del action router de `EPIC-023` (kind nuevo; NO el
+  `book_meeting` navigate existente — ver Delta 2026-07-19).
 - Puede abrir una task posterior `ui-ux` para booking nativo cross-surface si el spike pasa.
 - Puede abrir una task de hardening del iframe si el spike falla.
 
@@ -118,7 +140,9 @@ Reglas obligatorias:
 
 - `HubSpotMeetingEmbed` live en `/servicios/redes-sociales/`, con shell Efeonce, fallback directo y eventos `dataLayer` sin PII.
 - `docs/reference/measurement-gtm-ga4/TRACKING-PLAN.md` registra CTAs meeting y embed como `pendiente` para GTM/GA4.
-- `EPIC-023` ya contempla `book_meeting` como action futura del Growth CTA engine.
+- `book_meeting` ya existe como action kind navegación-only del Growth CTA engine (TASK-1431,
+  `src/lib/growth/ctas/action-registry.ts`); el adapter CRM/booking real sigue siendo demand-driven
+  futuro (ver Delta 2026-07-19).
 - `services/hubspot_greenhouse_integration/` existe como bridge Cloud Run para HubSpot CRM writes/webhooks, pero hoy no expone Scheduler booking.
 
 ### Gap
