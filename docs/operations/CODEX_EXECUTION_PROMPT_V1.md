@@ -28,7 +28,7 @@ Si hay conflicto, prevalecen en este orden:
 No se usa para brainstorming, reviews, mini-tasks, issues o cambios locales sin
 task formal, salvo pedido explicito del operador.
 
-## Hook operativo TASK-*
+## Hook operativo TASK-\*
 
 Antes de escribir codigo, Codex debe ejecutar:
 
@@ -75,6 +75,7 @@ Objetivo: ejecutar la task de forma canónica, local-first, reusable, segura, re
 FUENTES VIVAS
 
 Lee primero, con proporcionalidad:
+
 - `AGENTS.md`
 - `project_context.md`
 - `Handoff.md`
@@ -114,7 +115,7 @@ Antes de ejecutar el hook para una `TASK-###`, verifica si el operador ya dio un
   para esa task y espera confirmación del operador.
 - El `/goal` recomendado debe incluir objetivo de cierre, evidencia obligatoria,
   límites de alcance, estado correcto si falta rollout (`code complete, rollout
-  pendiente` u `operativamente bloqueado`) y si conviene `mantente en develop` o
+pendiente` u `operativamente bloqueado`) y si conviene `mantente en develop` o
   `con subagentes`.
 - Si el operador acepta el goal o entrega uno propio, continúa con el hook
   (`pnpm codex:task-hook ...`) usando `--develop` y/o `--subagents` cuando
@@ -134,6 +135,7 @@ MODO DE RAMA / WORKTREE
 INTAKE DE TASK
 
 Si la task está en `in-progress/`:
+
 - Lee la task y `Handoff.md`.
 - Busca contexto previo en commits, PRs, branches y notas recientes.
 - No repitas Discovery/Audit/Plan si ya existen y siguen vigentes.
@@ -141,6 +143,7 @@ Si la task está en `in-progress/`:
 - Rehaz fases solo si detectas drift real: commits relevantes nuevos, schema/runtime cambiado, docs actualizadas o task redefinida.
 
 Si la task está en `to-do/`:
+
 - Verifica ownership activo antes de implementar.
 - Si está libre, mueve a `in-progress/`, ajusta `Lifecycle`, sincroniza `docs/tasks/README.md` y deja nota breve en `Handoff.md`.
 - Mantén la rama actual salvo instrucción explícita distinta.
@@ -152,6 +155,7 @@ Si la spec tiene `## Open Questions`, resuélvelas antes de implementar con la o
 DISCOVERY READ-ONLY
 
 Antes de escribir código:
+
 - Explora `src/`, `migrations/`, `scripts/`, `services/`, `docs/`, tests, lint rules, signals, capabilities, workers y components/views existentes.
 - Reutiliza primitives/helpers/readers/commands existentes antes de crear nuevos.
 - Si toca Postgres, revisa schema real y usa `pnpm pg:doctor` / `pnpm pg:connect` / `pnpm pg:connect:migrate` según aplique.
@@ -163,26 +167,26 @@ Antes de implementar, presenta un bloque breve:
 
 === AUDIT: [TASK ID] ===
 SUPUESTOS CORRECTOS:
+
 - ...
-SUPUESTOS DESACTUALIZADOS:
+  SUPUESTOS DESACTUALIZADOS:
 - spec dice X, realidad Y (verificado en path/runtime) → acción
-ARQUITECTURA / DOCS OBLIGATORIOS:
+  ARQUITECTURA / DOCS OBLIGATORIOS:
 - doc → por qué aplica
-CÓDIGO EXISTENTE PARA REUTILIZAR:
+  CÓDIGO EXISTENTE PARA REUTILIZAR:
 - path/helper/primitive → uso
-SCHEMA / RUNTIME REAL:
+  SCHEMA / RUNTIME REAL:
 - tabla/view/route/worker/signal → evidencia
-ACCESS MODEL:
+  ACCESS MODEL:
 - solo si aplica: routeGroups, views/view_code, entitlements/capabilities, startup policy
-SKILLS A USAR:
+  SKILLS A USAR:
 - skill → para qué
-SUBAGENTES:
+  SUBAGENTES:
 - `sequential` | `fork` | `fork recomendado, no autorizado/no disponible` + por qué
-RIESGOS / BLAST RADIUS:
+  RIESGOS / BLAST RADIUS:
 - ...
-OPEN QUESTIONS RESUELTAS:
-- Q → resolución → rationale
-===
+  OPEN QUESTIONS RESUELTAS:
+- # Q → resolución → rationale
 
 SUBAGENT TOOLING
 
@@ -221,6 +225,7 @@ aceptable; para P0/P1, Effort Alto o blast radius alto, pide checkpoint humano.
 MAPA DE CONEXIONES
 
 Si la task no es puramente local, documenta lo aplicable:
+
 - eventos salientes/entrantes
 - FKs, joins, views, projections, materializaciones
 - readers/helpers/services compartidos
@@ -233,6 +238,7 @@ Si la task no es puramente local, documenta lo aplicable:
 PLAN
 
 Antes de implementar, presenta un plan slice-by-slice proporcional. Orden sugerido:
+
 1. Migraciones / schema
 2. Tipos / contratos
 3. Readers / helpers / commands
@@ -250,6 +256,7 @@ SKILLS
 Usa el conjunto mínimo de skills reales disponibles. Cárgalas antes de tomar decisiones de implementación del dominio, no como checklist decorativo.
 
 Guía Codex vigente:
+
 - Backend / TS / rutas / dominio Greenhouse: `greenhouse-agent`
 - Task/spec/planning: `greenhouse-task-planner`
 - UI visible o platform UI: `greenhouse-ui-orchestrator` +, según dominio, `greenhouse-product-ui-architect`, `greenhouse-portal-ui-implementer`, `greenhouse-vuexy-ui-expert`
@@ -273,9 +280,7 @@ Si la task tiene `Execution profile: ui-ux`, `UI impact != none`, toca UI visibl
 
 Condición mínima recomendada:
 
-```text
-/goal [TASK-###] UI enterprise-ready: las skills product design aplicables fueron cargadas antes de JSX; la task declara UI ready y permanece no hasta que el wireframe/UI contract tengan implementation mapping, GVC scenario plan y design decision log; si se declara UI ready yes, pnpm task:lint --task TASK-### pasa sin findings; el wireframe está declarado en la task, existe bajo docs/ui/wireframes y pasa pnpm ui:wireframe-check --task TASK-###; si hay flow, sidecar, drawer, modal, popover o navegación cruzada, el flow contract está declarado, existe bajo docs/ui/flows y pasa pnpm ui:flow-check --task TASK-###; si hay motion o microinteracciones no triviales, el motion contract está declarado, existe bajo docs/ui/motion y pasa pnpm ui:motion-check --task TASK-###; la decisión primitive reuse/extend/new quedó documentada; no hay HEX/font/px hardcodeado fuera de tokens; copy visible vive en la capa canónica; GVC desktop+mobile corrió en loop y los frames PNG fueron revisados; scrollWidth==clientWidth en desktop y 390px o hay blocker exacto; no hay overlaps, clipping incoherente ni console/page errors; docs, handoff y gates proporcionales están sincronizados.
-```
+    /goal [TASK-###] UI enterprise-ready: las skills product design aplicables fueron cargadas antes de JSX; la task declara UI ready y permanece no hasta que el wireframe/UI contract tengan implementation mapping, GVC scenario plan y design decision log; si se declara UI ready yes, pnpm task:lint --task TASK-### pasa sin findings; el wireframe está declarado en la task, existe bajo docs/ui/wireframes y pasa pnpm ui:wireframe-check --task TASK-###; si hay flow, sidecar, drawer, modal, popover o navegación cruzada, el flow contract está declarado, existe bajo docs/ui/flows y pasa pnpm ui:flow-check --task TASK-###; si hay motion o microinteracciones no triviales, el motion contract está declarado, existe bajo docs/ui/motion y pasa pnpm ui:motion-check --task TASK-###; la decisión primitive reuse/extend/new quedó documentada; no hay HEX/font/px hardcodeado fuera de tokens; copy visible vive en la capa canónica; GVC desktop+mobile corrió en loop y los frames PNG fueron revisados; scrollWidth==clientWidth en desktop y 390px o hay blocker exacto; no hay overlaps, clipping incoherente ni console/page errors; docs, handoff y gates proporcionales están sincronizados.
 
 No declares UI lista si esa condición no está demostrada en la conversación con comandos, rutas de captura y hallazgos resueltos o bloqueadores exactos.
 
@@ -298,6 +303,7 @@ IMPLEMENTACIÓN
 VALIDACIÓN
 
 Ejecuta lo proporcional al cambio:
+
 - Focal tests/lint del slice
 - `pnpm local:check`
 - `pnpm lint`
@@ -308,7 +314,7 @@ Ejecuta lo proporcional al cambio:
 - `pnpm ops:lint --changed` si tocaste tasks/epics/mini-tasks
 - `pnpm qa:gates --changed` + skill `greenhouse-qa-release-auditor` antes de cerrar implementaciones no triviales
 - UI: `pnpm fe:capture ...` y revisar frames PNG
-- Docs/operating contracts: `pnpm docs:closure-check` y, si cambió contexto/handoff, `pnpm docs:context-check`
+- Docs/operating contracts: `pnpm docs:closure-check` y, si cambió contexto/handoff, `pnpm docs:context-check:strict`
 
 Si no puedes ejecutar una validación razonable, dilo con causa concreta y riesgo residual.
 
@@ -317,6 +323,7 @@ CIERRE
 No declares la task completa si falta rollout real: flags/env vars, redeploy, migración aplicada, backfill, provisioning externo, cron/webhook/worker, secret, recuperación de datos o verificación runtime. Usa `code complete, rollout pendiente` u `operativamente bloqueado` cuando corresponda.
 
 Antes de cerrar:
+
 - Resume qué cambió y qué reutilizaste.
 - Lista validaciones ejecutadas y no ejecutadas.
 - Lista migrations/capabilities/events/signals nuevos si existen.
@@ -345,7 +352,7 @@ Revisar y, si aplica, actualizar este documento cuando cambie cualquiera de:
 - `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`.
 - `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`.
 - `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md`.
-- package scripts usados como gates (`docs:closure-check`, `docs:context-check`,
+- package scripts usados como gates (`docs:closure-check`, `docs:context-check:strict`,
   `ops:lint`, `qa:gates`, `fe:capture`, `local:check`, `pg:doctor`, etc.).
 - Inventario o nombre de skills Greenhouse que este harness referencia.
 
@@ -359,7 +366,7 @@ pnpm codex:task-hook:check
 pnpm codex:task-hook 1109 --develop --prompt-only
 pnpm codex:task-hook 1109 --develop --subagents --prompt-only
 pnpm docs:closure-check
-pnpm docs:context-check
+pnpm docs:context-check:strict
 git diff --check
 ```
 
@@ -393,9 +400,12 @@ Todo cambio a este harness debe sincronizar, con deltas breves:
 
 - `.codex/skills/greenhouse-task-execution-hook/SKILL.md` si cambia trigger,
   comando o comportamiento pre-ejecución.
-- `AGENTS.md` y `project_context.md` si cambia una regla vigente para Codex.
+- `AGENTS.md` si cambia el router/preflight de Codex y `project_context.md` solo
+  si cambia un contrato durable o su ruta canónica.
 - `CLAUDE.md` solo como awareness de convivencia cuando corresponda.
-- `Handoff.md` y `changelog.md` si cambia el contrato operativo.
+- `Handoff.md` solo para continuidad activa; `changelog.md` si cambia realmente
+  el contrato operativo, producto, runtime o workflow. La cronología histórica
+  pertenece a los shards/snapshots, no a deltas acumulativos en documentos vivos.
 
 No duplicar el prompt completo en otros archivos. Este documento es la fuente
 canónica del harness Codex; los demás entrypoints deben enlazar o resumir.

@@ -37,11 +37,11 @@ try {
           developOverride: options.develop,
           subagentsAuthorized: options.subagents,
           currentBranch: getCurrentBranch(repoRoot),
-          prompt,
+          prompt
         },
         null,
-        2,
-      ),
+        2
+      )
     )
     process.exit(0)
   }
@@ -59,7 +59,7 @@ function parseArgs(rawArgs) {
     subagents: false,
     json: false,
     promptOnly: false,
-    help: false,
+    help: false
   }
 
   for (const arg of rawArgs) {
@@ -150,7 +150,7 @@ function resolveTask(repoRoot, taskRef) {
 
   if (matches.length > 1 && activeMatches.length > 1) {
     throw new Error(
-      `Multiple active task files found for ${taskId}: ${matches.map(filePath => relative(repoRoot, filePath)).join(', ')}`,
+      `Multiple active task files found for ${taskId}: ${matches.map(filePath => relative(repoRoot, filePath)).join(', ')}`
     )
   }
 
@@ -199,7 +199,9 @@ function readTask(repoRoot, filePath) {
   const status = parseStatus(source)
 
   if (status.Lifecycle === 'complete' || /\/docs\/tasks\/complete\//.test(filePath)) {
-    throw new Error(`${id} is already complete at ${relative(repoRoot, filePath)}. Do not execute it as an active task.`)
+    throw new Error(
+      `${id} is already complete at ${relative(repoRoot, filePath)}. Do not execute it as an active task.`
+    )
   }
 
   const blockedBy = status['Blocked by']
@@ -213,7 +215,7 @@ function readTask(repoRoot, filePath) {
     path: filePath,
     relativePath: relative(repoRoot, filePath),
     source,
-    status,
+    status
   }
 }
 
@@ -241,7 +243,7 @@ function stripTicks(value) {
 function buildPrompt(repoRoot, task, hookOptions) {
   const promptPath = join(repoRoot, 'docs', 'operations', 'CODEX_EXECUTION_PROMPT_V1.md')
   const promptDoc = readFileSync(promptPath, 'utf8')
-  const promptMatch = promptDoc.match(/## Prompt canónico\s+```md\n([\s\S]*?)\n```/)
+  const promptMatch = promptDoc.match(/## Prompt canónico\s+(`{3,})md\n([\s\S]*?)\n\1/)
 
   if (!promptMatch) {
     throw new Error('Could not extract canonical prompt block from CODEX_EXECUTION_PROMPT_V1.md.')
@@ -255,11 +257,11 @@ function buildPrompt(repoRoot, task, hookOptions) {
     ? '\n\nInstrucción explícita del operador para esta ejecución: **subagentes autorizados**. Si Discovery/Plan selecciona `fork`, carga el tooling multi-agent disponible y delega slices independientes con ownership exclusivo; si no conviene fork, documenta por qué.\n'
     : ''
 
-  return promptMatch[1]
+  return promptMatch[2]
     .replaceAll('[TASK-###]', task.id)
     .replace(
       `Vas a implementar la task **${task.id}** ubicada en \`docs/tasks/{to-do,in-progress}/TASK-###-*.md\` dentro del repo \`greenhouse-eo\`.`,
-      `Vas a implementar la task **${task.id}** ubicada en \`${task.relativePath}\` dentro del repo \`greenhouse-eo\`.${branchOverride}${subagentOverride}`,
+      `Vas a implementar la task **${task.id}** ubicada en \`${task.relativePath}\` dentro del repo \`greenhouse-eo\`.${branchOverride}${subagentOverride}`
     )
 }
 
@@ -268,7 +270,7 @@ function getCurrentBranch(repoRoot) {
     return execFileSync('git', ['branch', '--show-current'], {
       cwd: repoRoot,
       encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore'],
+      stdio: ['ignore', 'pipe', 'ignore']
     }).trim()
   } catch {
     return ''

@@ -15,6 +15,10 @@ Comunicación: español neutro latinoamericano (sin voseo/modismos argentinos). 
 
 ## 0. Intake de la task
 
+- **Contrato de contexto**: antes de discovery, lee `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md`.
+  Usa `project_context.md` como router vigente y `Handoff.md` como continuidad activa; no cargues snapshots
+  completos al arranque. Si falta contexto load-bearing, busca por keyword en task/issue/ADR/runtime y luego en
+  `docs/operations/agent-context-history/`; revalida cualquier hallazgo histórico antes de obedecerlo.
 - **`in-progress/`**: lee el `.md` + `Handoff.md` + busca trabajo previo (commits en `develop`, WIP con `git status --short`). Continúa desde el primer slice incompleto; NO repitas fases ya hechas salvo drift (commits nuevos en `main`, schema cambiado, archivos owned movidos). Cuidado con orphan uncommitted de sesiones previas (clase TASK-943): ciérralo o stashealo antes de acoplar commits que dependan de él.
 - **`to-do/`**: verifica que nadie la trabaja (`gh pr list --search "TASK-###"` + `git branch -a | grep TASK-###` vacíos) → mueve a `in-progress/`, `Lifecycle: in-progress`, sync `docs/tasks/README.md`, anota en `Handoff.md` (trabajo en develop local-first; sin branch salvo que el operador pida preview remoto), confirma bloque `## Dependencies & Impact`.
 - Si la spec tiene `## Open Questions`: resuélvelas con la opción más robusta + documenta rationale antes de FASE 1. Bloqueante → detente y reporta.
@@ -34,6 +38,7 @@ Si llevas **>3 slices sin commit del primero**, **re-haces Discovery 2da vez**, 
 ---
 
 ## FASE 1 — Discovery (read-only)
+
 1. Lee la spec completa.
 2. Lee los arch docs que declare + `DECISIONS_INDEX.md` (busca acá antes de tocar contratos compartidos) + `project_context.md` ("Estado vigente") + `Handoff.md`.
 3. Explora `src/`, `migrations/`, `eslint-plugins/greenhouse/rules/`, `src/lib/reliability/queries/`, `src/config/entitlements-catalog.ts`, `src/lib/entitlements/runtime.ts`. Encuentra helpers canónicos / VIEWs / primitives / signals / capabilities / lint rules ya existentes. **Subagentes `Explore` en paralelo** si >2 módulos.
@@ -55,25 +60,31 @@ Si llevas **>3 slices sin commit del primero**, **re-haces Discovery 2da vez**, 
 Cosmético desactualizado → recalibra la spec primero (`docs(TASK-###): baseline recalibration pre-execution`). Bloqueante → detente, reporta, espera.
 
 ## FASE 3 — Mapa de conexiones (imprime, no avances sin)
+
 Por módulo tocado/impactado: outbox events OUT/IN (`EVENT_CATALOG`) · webhooks · crons (clasifica async_critical/prod_only/tooling) · FKs/JOINs/VIEWs · tenant isolation · helpers reusables · reliability signals · capabilities (+ grant en `runtime.ts`, guard `capability-grant-coverage.test`) · tests transversales (column-parity, KPI anti-regresión, paridad SQL↔TS, drift-guards) · boundary workers `@core` + `worker:runtime-deps-gate` si tocás `src/lib/**` worker-bundled. **Subagentes en paralelo** si >2 módulos.
 
 ## FASE 4 — Plan (imprime; si P0/P1 o blast alto → STOP checkpoint humano)
+
 Slices ordenados: migrations (`pnpm migrate:create`, marker `-- Up Migration`, DDL solo en Up, DO block anti pre-up-marker, CHECK NOT VALID+VALIDATE, backfill idempotente con dry-run, commit + `db.d.ts` juntos) → types → API routes (auth + capability least-privilege + validación + outbox v1 + `canonicalErrorResponse` es-CL + `captureWithDomain`) → helpers de dominio (single source of truth) → outbox events v1 (publisher + consumer que re-lee de PG) → reliability signals (key + kind + severity + steady=0 + reader + wire-up) → lint rules (override block + RuleTester) → UI (primitive lookup → Vuexy `Custom*` → MUI; tokens `theme.palette.*`/`theme.axis.*` + variants tipográficas, sin HEX/px/`fontSize` inline; copy via `getMicrocopy()`/`src/lib/copy`/`greenhouse-nomenclature`; charts ECharts→Apex→Recharts; ruta `(dashboard)` alcanzable o en `route-reachability-manifest`) → docs → ISSUE-###. Indica skill por item.
 
 ## FASE 5 — Implementación
+
 Invoca el skill ANTES de Bash/Edit/Write. Reglas duras vigentes en `CLAUDE.md` (no las re-declaro). Recordatorios fáciles de olvidar: reutilizar > crear · tenant isolation en SQL · nunca `new Pool()` fuera de `src/lib/postgres/client.ts` · nunca `error.message`/prosa inglesa raw al cliente · nunca `Sentry.captureException` directo · nunca copy/HEX/`fontSize` hardcodeado · capability ⇒ grant en `runtime.ts` mismo slice (rol real de `role-codes.ts`) · viewCode ⇒ migration seed mismo PR · `pnpm` siempre · `printf %s` para secrets · `npx tsx --require ./scripts/lib/server-only-shim.cjs` para CLI server-only · `gtimeout` no `timeout`. Acciones destructivas/blast alto → confirma. Por slice: `pnpm local:check` + tests focales, commit `feat(<domain>): TASK-### Slice N — <título>` con co-author trailer; `git status --short` antes de commitear (no acoples orphan WIP). Lint/test roto ajeno → documenta y sigue; lint que destapa bug latente real → arréglalo.
 
 ## FASE 6 — Verificación + Cierre
+
 **Gate local (el pre-push hook lint+tsc NO basta)**: `pnpm test` (full) + `pnpm build` (Turbopack) + `pnpm lint` 0 err + `pnpm tsc --noEmit` + `pnpm pg:doctor`. UI: contratos wireframe/flow/motion/readiness + `pnpm design-contract:lint --task TASK-###` + `pnpm ui:code-lint --changed` + `pnpm ui:visual-gate --task TASK-###` + `pnpm ui:quality --task TASK-###` + `pnpm local:check:ui` + evidencia GVC premium desktop+mobile mirada. Workers tocados: `pnpm worker:runtime-deps-gate` + sin import `@core` worker-bundled + (post-push) 4 workflows Cloud Run en `success`. Checks: `grep -r "new Pool" src/` → 0 fuera del client · 0 `getServerAuthSession()` directo en pages/layouts · 0 error inglés raw en endpoints nuevos · signals nuevos en steady esperado · tests anti-regresión cubren el incidente (si cierra ISSUE).
 **Runtime Rollout Completion Gate**: si depende de flags/env/migraciones/backfills/redeploy/integración externa no verificada → reporta `code complete, rollout pendiente`, NO "listo".
 **Gates de skill**: `greenhouse-documentation-governor` (`pnpm docs:closure-check`) + `greenhouse-qa-release-auditor` (`pnpm qa:gates --changed` → `PASS | CONDITIONAL PASS | BLOCK`).
-**Closing Protocol**: `Lifecycle: complete` + mover a `complete/` (carpeta ≡ Lifecycle) · sync `README.md` + `TASK_ID_REGISTRY.md` · `Handoff.md` + `changelog.md` (entry visible) · arch docs `## Delta` · `CLAUDE.md` solo si hay invariante duro nuevo · `EVENT_CATALOG`/`RELIABILITY_CONTROL_PLANE` Delta si aplica · doc funcional + manual si cambia comportamiento visible · impacto cruzado (`## Delta` a tasks que referencien archivos tocados) · ISSUE-### si cerró incidente.
+**Closing Protocol**: `Lifecycle: complete` + mover a `complete/` (carpeta ≡ Lifecycle) · sync `README.md` + `TASK_ID_REGISTRY.md` · actualizar `Handoff.md` solo con continuidad activa (riesgos, rollout pendiente y próximo paso) · actualizar `project_context.md` solo si cambió un contrato durable o su ruta canónica · `changelog.md` solo ante cambio real de producto/runtime/workflow · actualizar el contenido vigente de arquitectura/ADR, sin crear cronología automática `## Delta` · `CLAUDE.md` solo si su contrato independiente exige una invariante dura nueva · `EVENT_CATALOG`/`RELIABILITY_CONTROL_PLANE` si aplica · doc funcional + manual si cambia comportamiento visible · impacto cruzado en los documentos canónicos que referencien contratos tocados · ISSUE-### si cerró incidente · ejecutar `pnpm docs:context-check:strict` si cambió `AGENTS.md`, `project_context.md`, `Handoff.md`, su archivo índice o el router de contexto.
 **Push/PR**: solo con instrucción explícita. Si la hay: PR `gh pr create --base develop`; si aprueba merge directo → squash + esperar deploy + reproducir flow en vivo + signal en steady ANTES de marcar `complete`.
 
 ## Cierre
+
 Resumen: slices, tests verdes, migrations, capabilities/events/signals, docs, KPI/data diff, evidencia GVC (si UI), estado de rollout (code-complete vs operativamente completo), próximo paso. NO "completada" mientras `Lifecycle: in-progress` siga vivo o falte una capa de rollout/documental.
 
 ---
 
 ## Auto-mantenimiento de este command
+
 Si durante la task notás que este harness referencia un comando/gate/path/token **desactualizado** respecto a `CLAUDE.md`/`AGENTS.md`/skills/package.json, **flaggéalo al final** y propón el edit a este archivo (`.claude/commands/implement-task.md`). Si el drift toca la convivencia con Codex, correr también `pnpm codex:task-hook:check` y revisar `docs/operations/CODEX_EXECUTION_PROMPT_V1.md`. El governor documental lo trata como doc viva del repo.

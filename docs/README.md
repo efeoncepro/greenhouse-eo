@@ -146,6 +146,8 @@ Indice maestro de la documentacion no operativa del repo.
 ### Operations
 
 - [Issue Tracker](issues/README.md)
+- [Agent Context History](operations/agent-context-history/README.md)
+- [Agent Context Router Decision](architecture/GREENHOUSE_AGENT_CONTEXT_ROUTER_DECISION_V1.md)
 - [SOLUTION_QUALITY_OPERATING_MODEL_V1.md](operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md)
 - [ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md](operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md)
 - [MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md](operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md)

@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "greenhouse-agent-context-snapshot.v1",
+  "createdAt": "2026-07-19",
+  "sourceCommit": "2ba11dd5aacb10d5cc34b9bc66bb5763df263a72",
+  "note": "Sources include the complete dirty-working-tree contents at migration time. Snapshots are immutable.",
+  "files": [
+    {
+      "source": "AGENTS.md",
+      "snapshot": "docs/operations/agent-context-history/2026-07-19/AGENTS.legacy.md",
+      "lines": 1886,
+      "chars": 231730,
+      "estimatedTokens": 57933,
+      "sha256": "778417917aabb027b50d972e786044a02bb284b1774d0cb84b849ac0714a305d"
+    },
+    {
+      "source": "project_context.md",
+      "snapshot": "docs/operations/agent-context-history/2026-07-19/project_context.legacy.md",
+      "lines": 6527,
+      "chars": 677418,
+      "estimatedTokens": 169355,
+      "sha256": "17a3a4a910af6603061ff939f4134e3fb11b1858a64df0ea1fe1c0374e358287"
+    },
+    {
+      "source": "Handoff.md",
+      "snapshot": "docs/operations/agent-context-history/2026-07-19/Handoff.legacy.md",
+      "lines": 39325,
+      "chars": 4174249,
+      "estimatedTokens": 1043563,
+      "sha256": "d307062d5c4be9d62399655e0e13d50b1260ce8e34db6a80251089249bc166af"
+    },
+    {
+      "source": "Handoff.archive.md",
+      "snapshot": "docs/operations/agent-context-history/2026-07-19/Handoff.archive.legacy.md",
+      "lines": 1879,
+      "chars": 81819,
+      "estimatedTokens": 20455,
+      "sha256": "417137e6ef21f9da38d6eeff8a43de5a77452558bbc3a52cb4d56223e373b59b"
+    }
+  ]
+}

@@ -18,7 +18,7 @@ const files = {
   agents: 'AGENTS.md',
   claude: 'CLAUDE.md',
   claudeCommand: '.claude/commands/implement-task.md',
-  projectContext: 'project_context.md',
+  projectContext: 'project_context.md'
 }
 
 for (const [key, relativePath] of Object.entries(files)) {
@@ -30,7 +30,7 @@ for (const [key, relativePath] of Object.entries(files)) {
 const sources = Object.fromEntries(
   Object.entries(files)
     .filter(([, relativePath]) => existsSync(join(repoRoot, relativePath)))
-    .map(([key, relativePath]) => [key, readFileSync(join(repoRoot, relativePath), 'utf8')]),
+    .map(([key, relativePath]) => [key, readFileSync(join(repoRoot, relativePath), 'utf8')])
 )
 
 requireIncludes('package.json', sources.packageJson, '"codex:task-hook"')
@@ -64,7 +64,7 @@ requireIncludes('CODEX architect', sources.architectSkill, 'MODULAR_MIGRATION_NE
 requireIncludes('modular operating model', sources.modularOperatingModel, '## Mechanical enforcement')
 requireIncludes('modular operating model', sources.modularOperatingModel, 'pnpm task:lint --task TASK-###')
 requireIncludes('AGENTS.md', sources.agents, '/implement-task ###')
-requireIncludes('AGENTS.md', sources.agents, 'Goal preflight TASK-* para Codex')
+requireIncludes('AGENTS.md', sources.agents, 'Goal preflight TASK-\\* para Codex')
 requireIncludes('AGENTS.md', sources.agents, '--subagents')
 requireIncludes('CLAUDE.md', sources.claude, '/implement-task ###')
 requireIncludes('CLAUDE.md', sources.claude, 'Delta Codex goal preflight')
@@ -80,7 +80,7 @@ rejectIncludes('CODEX prompt stale skill', sources.prompt, 'vercel:nextjs')
 rejectIncludes('CODEX prompt stale skill', sources.prompt, 'modern-ui-architect')
 rejectIncludes('CODEX prompt stale slice rule', sources.prompt, 'llevas más de 3 slices sin commit')
 
-const promptBlock = sources.prompt?.match(/## Prompt canónico\s+```md\n([\s\S]*?)\n```/)
+const promptBlock = sources.prompt?.match(/## Prompt canónico\s+(`{3,})md\n([\s\S]*?)\n\1/)
 
 if (!promptBlock) {
   failures.push('CODEX prompt: could not extract canonical prompt block')
@@ -95,7 +95,7 @@ if (!activeTask) {
     const output = execFileSync('node', ['scripts/codex-task-hook.mjs', activeTask, '--develop', '--prompt-only'], {
       cwd: repoRoot,
       encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'pipe'],
+      stdio: ['ignore', 'pipe', 'pipe']
     })
 
     if (!output.includes(`task **${activeTask}**`)) {
@@ -112,8 +112,8 @@ if (!activeTask) {
       {
         cwd: repoRoot,
         encoding: 'utf8',
-        stdio: ['ignore', 'pipe', 'pipe'],
-      },
+        stdio: ['ignore', 'pipe', 'pipe']
+      }
     )
 
     if (!subagentOutput.includes('subagentes autorizados')) {
@@ -156,7 +156,11 @@ function findActiveTask() {
       if (!id) continue
 
       const source = readFileSync(filePath, 'utf8')
-      const blockedBy = source.match(/^\s*-\s*Blocked by:\s*(.+?)\s*$/m)?.[1]?.replace(/`/g, '').trim()
+
+      const blockedBy = source
+        .match(/^\s*-\s*Blocked by:\s*(.+?)\s*$/m)?.[1]
+        ?.replace(/`/g, '')
+        .trim()
 
       if (blockedBy && blockedBy !== 'none') continue
 

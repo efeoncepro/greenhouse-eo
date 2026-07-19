@@ -95,6 +95,8 @@ No mezclar las capas:
 - `project_context.md`
 - Aqui vive el estado actual del repo, stack, rutas, librerias activas, deploy y restricciones.
 - Debe responder: que existe hoy, que se usa hoy, que sigue pendiente hoy.
+- Es un router de estado durable: no acepta secciones `Delta`, diarios por task ni listas exhaustivas de
+  features. El detalle vive en su source of truth y aqui queda un pointer solo si cambia como opera el agente.
 - La especializacion canonica para `project_context.md` + `Handoff.md` + `Handoff.archive.md` vive en `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md`.
 
 ### 3. Continuidad de turno
@@ -105,8 +107,10 @@ No mezclar las capas:
   - validacion
   - riesgos o pendientes
 - Formato corto. No duplicar arquitectura.
-- Si hace falta conservar historia detallada, moverla a `Handoff.archive.md` y dejar en `Handoff.md` solo el estado activo.
-- No borrar historia auditable para reducir tamano: preservar en `Handoff.archive.md`, task complete, issue resuelto o doc canonica, y dejar puntero corto cuando siga siendo relevante.
+- Si hace falta conservar historia detallada, moverla a `docs/operations/agent-context-history/` y dejar en
+  `Handoff.archive.md` un indice y en `Handoff.md` solo el estado activo.
+- No borrar historia auditable para reducir tamano: preservar snapshot/shard con manifest cuando aplique,
+  task complete, issue resuelto o doc canonica, y dejar puntero corto cuando siga siendo relevante.
 
 ### 4. Registro de cambios
 - `changelog.md`
@@ -192,16 +196,16 @@ Cuando un cambio toque varios documentos:
 - si cambia la taxonomia documental o aparece una auditoria relevante nueva, enlazarla desde `docs/README.md`
 
 ### project_context
-- que tecnologia o libreria se activo
-- donde vive
-- para que se usara
-- que decision arquitectonica nueva cambia el contrato operativo vigente, con link al ADR o indice
+- actualizar solo si una tecnologia, source of truth, runtime constraint o decision cambia de forma durable
+  como los agentes deben operar
+- dejar nombre + proposito + pointer; no copiar el detalle ni registrar un delta por cada implementacion
 
 ### Handoff
 - que se hizo
 - que se valido
 - que queda pendiente
 - que ADR se acepto, supersedio o quedo pendiente, si aplica
+- omitir el cierre si ya esta plenamente representado por task/changelog y no aporta continuidad activa
 
 ### changelog
 - una linea de impacto

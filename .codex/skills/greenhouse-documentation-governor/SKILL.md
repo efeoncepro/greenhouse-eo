@@ -90,12 +90,12 @@ Use this matrix to choose the smallest complete update set.
 |---|---|
 | Any implementation with behavior change | `changelog.md` short delta + task/spec progress or completion evidence |
 | User/client-visible feature or changed workflow | `docs/documentation/<domain>/...` and, if step-by-step operation matters, `docs/manual-de-uso/<domain>/...`; consider `docs/changelog/CLIENT_CHANGELOG.md` when channel/availability changes |
-| Shared architecture, source of truth, schema, access, API, runtime projection, UI platform, cloud/deploy/secrets, auth, finance/payroll/accounting, events/webhooks, AI/agent workflow | Architecture doc or ADR + `DECISIONS_INDEX.md` when accepted + short `project_context.md` delta if it changes agent operating contract |
+| Shared architecture, source of truth, schema, access, API, runtime projection, UI platform, cloud/deploy/secrets, auth, finance/payroll/accounting, events/webhooks, AI/agent workflow | Architecture doc or ADR + `DECISIONS_INDEX.md` when accepted + short `project_context.md` pointer only if it durably changes how agents operate |
 | Runtime rollout, env vars, flags, migrations, backfill, external integration, cron, webhook, worker, release | `Handoff.md` with what was applied, verified, pending, owner, next step; update runbook/manual if operator steps changed |
 | Production release or release control-plane change | Use `greenhouse-production-release`; update release architecture/runbooks/manuals/skills as that skill requires |
 | UI visible change | `DESIGN.md` or UI architecture only if visual contract changed; functional/manual docs if user workflow changed; GVC evidence required before closure |
 | Access, roles, views, entitlements, capabilities, route groups | Access architecture/task/spec + both planes (`views` and `entitlements`) documented; migrations/grants/audit if applicable |
-| New or changed local skill | Update both `.codex/skills/<name>/SKILL.md` and `.claude/skills/<name>/SKILL.md` when the behavior must be shared; register in `project_context.md`, `Handoff.md`, `changelog.md`, and only update `AGENTS.md` / `CLAUDE.md` if it changes a standing agent rule |
+| New or changed local skill | Update both `.codex/skills/<name>/SKILL.md` and `.claude/skills/<name>/SKILL.md` when the behavior must be shared; update changelog/canonical docs, `project_context.md` only for a durable operating-contract change, `Handoff.md` only for active continuity, and agent routers only when their route/standing rule changes |
 | New canonical gate, `pnpm` script/command, token/visual convention, or standing agent rule | Verify the task-implementation harness command `.claude/commands/implement-task.md` still names the right gates/commands/paths; update it if it drifted. It is a process harness, not a fact dump — only edit it when a gate/command/path/convention it references actually changed (the canonical rules stay in `CLAUDE.md`/skills, which the harness points to) |
 | **Domain-specific invariant** (`NUNCA`/`SIEMPRE` of one subsystem: payroll, finance, ICO, contractor, notion, hubspot, identity, knowledge, a UI primitive, etc.) | Canonize it in **that domain's spec or its `docs/architecture/agent-invariants/<DOMAIN>_AGENT_INVARIANTS.md` companion** (§"Invariantes operativos para agentes"), and in `AGENTS.md`/`CLAUDE.md` add **at most a 1-2 line pointer** (+ the router-table row) — **NEVER a full inline block.** `CLAUDE.md` is a router (TASK-1160), not a spec-store: it loads every turn and every subagent inherits it, so domain invariants must be load-on-demand. After editing, run `pnpm claude-md check` (= budget `--strict` + rule-audit; hard ceiling 35k tokens, CI fails if breached + alerts if a rule became unreachable). CLI: `pnpm claude-md {inventory\|budget\|audit\|check}`. Same discipline applies to `AGENTS.md` (its router refactor is the TASK-1160 follow-up) |
 | Audit performed | Create/update dated `docs/audits/...`; link from task, handoff, or architecture only if it remains operationally relevant |
@@ -113,13 +113,12 @@ Use this matrix to choose the smallest complete update set.
   per domain. Keep aligned with `AGENTS.md` when the rule is cross-agent. Hard
   ceiling 35k tokens (`pnpm claude-md:budget --strict`). If a request says
   `claude.mc`, treat it as `CLAUDE.md` unless a real `claude.mc` file exists.
-- `project_context.md`: current repo state and durable operating contracts.
-  Add short entries for new skills, architecture decisions, active tooling,
-  runtime constraints, or changed deployment/source-of-truth assumptions.
+- `project_context.md`: compact current-state router and durable operating
+  contracts. No dated deltas, per-task narrative, or exhaustive feature lists.
 - `Handoff.md`: active continuity only. Include what changed, evidence, risks,
   pending rollout, and next step. Do not paste full specs or old history.
-- `Handoff.archive.md`: historical session memory. Move, do not delete, when
-  handoff cleanup is required.
+- `Handoff.archive.md`: compact index to historical snapshots/shards under
+  `docs/operations/agent-context-history/`; move, do not delete.
 - `changelog.md`: behavior, structure, workflow, rollout, or operating
   capability deltas. One concise entry is usually enough.
 
@@ -137,6 +136,8 @@ Use this matrix to choose the smallest complete update set.
   `pnpm claude-md check`. The router (not re-accretion) is how `CLAUDE.md` stays
   loadable by subagents.
 - Never use `Handoff.md` as the canonical architecture source.
+- Never reintroduce `## Delta YYYY-MM-DD` sections in `project_context.md` or
+  full session history in the root handoff/archive index.
 - Never move a task to `complete/` without acceptance evidence and proportional
   verification.
 - Never update docs based only on stale audit/handoff memory; re-check code,

@@ -1,0 +1,53 @@
+name: Agent Context Governance
+
+on:
+  pull_request:
+    paths:
+      - AGENTS.md
+      - project_context.md
+      - Handoff.md
+      - Handoff.archive.md
+      - docs/operations/agent-context-history/**
+      - docs/operations/agent-context-router.json
+      - docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md
+      - docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md
+      - scripts/check-context-handoff.mjs
+      - scripts/maintenance/rotate-handoff-context.mjs
+      - package.json
+      - pnpm-lock.yaml
+  push:
+    branches: [develop, main]
+    paths:
+      - AGENTS.md
+      - project_context.md
+      - Handoff.md
+      - Handoff.archive.md
+      - docs/operations/agent-context-history/**
+      - docs/operations/agent-context-router.json
+      - docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md
+      - docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md
+      - scripts/check-context-handoff.mjs
+      - scripts/maintenance/rotate-handoff-context.mjs
+      - package.json
+      - pnpm-lock.yaml
+
+jobs:
+  context-governance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.9.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - name: Verify active context budgets, routing and immutable snapshots
+        run: pnpm docs:context-check:strict

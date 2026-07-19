@@ -1,5 +1,17 @@
 # changelog.md
 
+## 2026-07-19 — Contexto de agentes migra a router con preservación verificable
+
+- `AGENTS.md`, `project_context.md` y `Handoff.md` dejan de operar como monolitos append-only: ahora separan
+  reglas transversales, estado vigente y continuidad activa con carga por dominio.
+- Los cuatro archivos anteriores al corte quedaron preservados byte-for-byte con manifest SHA-256 bajo
+  `docs/operations/agent-context-history/2026-07-19/`; `Handoff.archive.md` pasa a ser índice.
+- `pnpm docs:context-check:strict` aplica budgets, máximo 20 sesiones, targets y hashes; la rotación futura usa
+  `pnpm docs:context-rotate --apply`, conserva por fecha, indexa shards con hash y aborta ante ediciones
+  concurrentes; un workflow CI independiente evita reacreción.
+- `CLAUDE.md` y su CI no fueron modificados; su pointer existente abre el operating model y los entrypoints
+  `.claude/commands/implement-task.md` + documentation governor aplican el nuevo protocolo, verificado por CI.
+
 ## 2026-07-19 — Layout Design & Finishing canonizado para producción estática premium
 
 - El método `anchor → layout contract → clean plate por ratio → bounded finish → composición determinística
