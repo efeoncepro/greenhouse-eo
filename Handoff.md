@@ -76,6 +76,13 @@
   Seedance 2.0) + 4 input-requiring con slug 422 (edit, Topaz image/video, Seedance i2v). Seed Audio vive en
   `fal-ai/seed-audio` (usa `prompt`); poll budget 450s; 422 en result → `provider_failed`. Inputs con bytes
   (edit/upscale/i2v) → `inputs_unavailable` hasta la resolución hash→bytes.
+  **`TASK-1459` (Still Model Lab) COMPLETE — recommendation matrix en vivo.** El golden brief still corrió por el
+  harness de evaluación real contra 2 motores: Vertex Nano Banana (10cr, **7s**, pass) vs Fal Seedream 5 Pro (10cr,
+  **138s**, pass), ambos `objective_pass_pending_human`; diferenciador = latencia; craft a revisión humana. La corrida
+  **encontró un bug**: el `route_stable` de Fal comparaba el slug contra el route del contrato — corregido
+  (`actualRoute=request.route`). **Próximo:** TASK-1460 (motion) + 1461 (audio) necesitan la **resolución hash→bytes**
+  (track B) porque sus briefs parten de una imagen/referencia; el aún pendiente compartido es la **key Fal propia de
+  Globe** (retirar la excepción de la key compartida) + deploy del studio-web.
 - EPIC-028 avanza en tres carriles paralelos gobernados íntegramente por Greenhouse. `TASK-1456…1485` viven
   en `docs/tasks/to-do/`, pasan por hooks/lint/QA/handoff de este repo y pueden poseer paths de implementación
   en el repositorio hermano. Globe conserva sólo arquitectura, runtime y evidencia técnica; no tiene registry

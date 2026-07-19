@@ -7,6 +7,11 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-19 — EPIC-028 · Globe Still Model Lab — recommendation matrix en vivo (TASK-1459)
+
+- `TASK-1459` COMPLETE. El golden brief still (`rrss-key-visual-still`, contrato `flexible-style`) se corrió **por el harness de evaluación real** (`globe.lab.evaluation.evaluate` vía el seam) contra **dos motores reales** con generación facturable: **Vertex Nano Banana** (`gemini-2.5-flash-image`, 10cr, **7s**, objective pass) vs **Fal Seedream 5 Pro** (10cr, **138s**, objective pass) — ambos `objective_pass_pending_human`. Recommendation matrix: candidatos válidos al mismo costo; diferenciador objetivo = latencia (Nano Banana ~20× más rápido); craft (`brand-anchor`/`exploration-breadth`) queda a revisión humana (el harness nunca auto-elige ganador creativo).
+- **Bug encontrado por la corrida:** el `route_stable` del `FalCreativeAdapter` fallaba porque devolvía el slug del modelo como `actualRoute` en vez del route del contrato de fidelidad (el slug va en `model`). Corregido → `actualRoute=request.route` (como Vertex). Motion/audio (TASK-1460/1461) esperan la resolución hash→bytes (sus briefs parten de una imagen/referencia). `pnpm check` verde.
+
 ## 2026-07-19 — EPIC-028 · Globe Fal adapter model expansion + canary en vivo (TASK-1488)
 
 - `TASK-1488` COMPLETE en `../efeonce-globe`. Expande el `FalCreativeAdapter` (TASK-1487): `CREATIVE_CAPABILITIES` +3 (`image-upscale`, `video-upscale`, `model-3d-generate`) y `FAL_ROUTING` con modelos verificados **contra las skills** (fuente tested): Seedream 5 Pro/Lite (image), Recraft v4.1 `text-to-vector`, Topaz upscale (imagen/video), Hyper3D Rodin v2.5 `text-to-3d`, Seed Audio (audio, reverify), ElevenLabs (speech), Seedance 2.0 (video).
@@ -709,19 +714,3 @@
   la cuenta sí muestra 33.000 créditos mensuales, pero está vencida por la factura `#760627868` (venció el
   2026-06-07). Dos intentos confirmados de activar el uso fallaron en HubSpot; facturación ANAM debe regularizarla
   antes del retry y readback. No se pagó ni cambió la suscripción.
-
-## 2026-07-16 — TASK-1422: UI de redacción del aviso con IA en el Publication Desk
-
-- El Publication Desk (`/agency/hiring/publication`) gana el CTA `✨ Redactar con IA` en la columna
-  pública del diff (variantes ready / locked con tooltip por flag / pendiente por ledger) y un
-  **drawer propose→confirm**: bloque "Lo que la IA verá" (rol + hechos + skills reales de la demanda,
-  con candado de exclusiones), template de assessment opcional, progreso honesto del LLM
-  (con "seguir en segundo plano"), formulario editable prefilled y Aplicar/Descartar. Cliente
-  delgado de TASK-1385: cero endpoints nuevos; el confirm humano escribe, el publish sigue aparte.
-- Además: selector de vacante en el header (la vista fijaba `openings[0]`) y copy bilingüe
-  `hiringDesk.publication.vacancyAi` (es-CL + en-US).
-- Diseño con contratos robustos (wireframe + flow que extiende el nodo N-publish del master
-  EPIC-011 + motion con reuso íntegro de `ghHiring*`), y **GVC en loop de 5 iteraciones** hasta
-  0 findings error + enterprise rubric PASS (desktop + mobile + teclado + reduced-motion), con
-  fixes reales salidos del loop (región scrolleable accesible, overlap mobile, generate enriquecido).
-- Rollout: gobernado por `HIRING_VACANCY_AI_ENABLED` (OFF; ledger de 1385). Dev local ON.

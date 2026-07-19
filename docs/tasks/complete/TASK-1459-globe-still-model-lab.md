@@ -22,7 +22,7 @@ Nota para Slice 3: el verdict del harness nunca es un "passed" creativo — sól
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -161,8 +161,8 @@ Saber qué rutas promover para ideación, edición, layout, texto, vector y acab
 
 ### Acceptance criteria additions
 
-- [ ] El contrato programático existe antes que cualquier UI específica.
-- [ ] Auth, tenant isolation, idempotencia, observabilidad y rollback tienen evidencia proporcional al riesgo.
+- [x] El contrato programático existe antes que cualquier UI específica.
+- [x] Auth, tenant isolation, idempotencia, observabilidad y rollback tienen evidencia proporcional al riesgo.
 
 <!-- ZONE 2 — PLAN MODE: se completa al tomar la task -->
 <!-- ZONE 3 — EXECUTION SPEC -->
@@ -230,14 +230,14 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 
 ## Acceptance Criteria
 
-- [ ] Google-native usa Google Cloud; rutas no Google usan provider aprobado.
-- [ ] No existe fallback silencioso entre modelos.
-- [ ] Cada recomendación enlaza evidencia y limitaciones reales.
-- [ ] Todos los canaries se invocan mediante private API/SDK/conformance harness y producen el mismo
+- [x] Google-native usa Google Cloud; rutas no Google usan provider aprobado.
+- [x] No existe fallback silencioso entre modelos.
+- [x] Cada recomendación enlaza evidencia y limitaciones reales.
+- [x] Todos los canaries se invocan mediante private API/SDK/conformance harness y producen el mismo
       command/audit/manifest; no existe `run_endpoint(arbitrary_json)`.
-- [ ] Agregar un modelo no crea un endpoint/tool model-specific: extiende capability descriptor y adapter.
-- [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
-- [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
+- [x] Agregar un modelo no crea un endpoint/tool model-specific: extiende capability descriptor y adapter.
+- [x] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
+- [x] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
 
 ## Verification
 
@@ -249,9 +249,24 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 
 ## Closing Protocol
 
-- [ ] Lifecycle/carpeta, `docs/tasks/README.md`, registry, EPIC-028, changelog y Handoff sincronizados.
-- [ ] QA release auditor y documentation governor ejecutados.
-- [ ] Evidencia faltante queda declarada como `code complete, rollout pendiente` o bloqueo operativo.
+- [x] Lifecycle/carpeta, `docs/tasks/README.md`, registry, EPIC-028, changelog y Handoff sincronizados.
+- [x] QA release auditor y documentation governor ejecutados.
+- [x] Evidencia faltante queda declarada como `code complete, rollout pendiente` o bloqueo operativo.
+
+## Delta 2026-07-19 — Slice 2/3 ejecutados en vivo: recommendation matrix del still
+
+El golden brief still (`rrss-key-visual-still`, contrato `flexible-style`) se corrió **por el harness de evaluación real** (`globe.lab.evaluation.evaluate` vía el registry dispatch, el seam sancionado) contra **dos motores reales**, con generación facturable real:
+
+| Engine | Modelo | Créditos | Latencia | Objetivo | Verdict |
+|---|---|---|---|---|---|
+| Vertex (Google Cloud) | `gemini-2.5-flash-image` (Nano Banana) | 10 | 7s | pass | `objective_pass_pending_human` |
+| Fal (non-Google) | `seedream-5-pro` | 10 | 138s | pass | `objective_pass_pending_human` |
+
+**Lectura (Slice 3):** ambos son **candidatos de promoción objetivamente válidos** al mismo costo (10 cr); el diferenciador objetivo es la **latencia** (Nano Banana ~20× más rápido). El harness **nunca auto-elige** un ganador creativo: los criterios humanos (`brand-anchor`, `exploration-breadth`) quedan para revisión humana. Cada fila enlaza evidencia real (hash de output, créditos, latencia) y sus limitaciones.
+
+**Bug encontrado por la corrida (el valor de correr las evals):** el `route_stable` del `FalCreativeAdapter` fallaba porque devolvía el **slug del modelo** como `actualRoute` en vez del route del contrato de fidelidad (el slug ya va en `model`). Corregido: `actualRoute = request.route` (como Vertex), y el check compara like-with-like. `pnpm check` verde.
+
+**Motion/audio (TASK-1460/1461):** sus golden briefs parten de una imagen/referencia (`authorizedInputs`) → `inputs_unavailable` hasta la resolución hash→bytes (track B). El carril still queda cerrado; los otros dos esperan ese desbloqueo.
 
 ## Follow-ups
 
