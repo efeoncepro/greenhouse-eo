@@ -26,6 +26,10 @@ playwright-report/
 # Dependencies are installed inside the image
 node_modules/
 
+# Versioned local package inputs are part of the deterministic build contract.
+# Keep this explicit even when the included .gitignore changes.
+!vendor/efeonce-globe/**
+
 # Git / CI metadata
 .git/
 .github/

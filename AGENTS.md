@@ -88,6 +88,7 @@ Manifest machine-readable y gateado: [`docs/operations/agent-context-router.json
 | Release/promoción develop→main                      | `greenhouse-production-release`                                  | `GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`                                                                                                                                             |
 | Cloud, secrets, deploy, runtime config              | `greenhouse-secret-hygiene`, skill cloud aplicable               | cloud governance + security posture + infra architecture                                                                                                                             |
 | Ops/reliability/crons/Teams/Platform Health         | skill ops aplicable, `teams-bot-platform`                        | `agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md`                                                                                                                               |
+| Workers/Cloud Build/build inputs                    | `software-architect-2026`                                        | `GREENHOUSE_WORKER_BUILD_CONTRACT_V1.md` + `agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md`                                                                                    |
 | PostgreSQL/migraciones/SQL readers                  | skill PostgreSQL aplicable                                       | `GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md` + SQL date-math invariants                                                                                                                  |
 | Backend/API/outbox/webhooks                         | `software-architect-2026`                                        | API platform + webhooks architecture + full API parity decision                                                                                                                      |
 | Finance/ledger/bank/CLP/FX/payments                 | `greenhouse-finance-accounting-operator`                         | `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`                                                                                                                                              |
@@ -146,6 +147,8 @@ y [`GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md`](docs/ui/GREENHOUSE_PREMIUM_U
 - macOS usa `gtimeout`, no asumir `timeout` GNU.
 - GVC: `pnpm fe:capture <scenario> --env=staging`; review/diff/health según necesidad.
 - Antes de una acción sensible, consultar Platform Health/safe modes cuando el dominio lo exponga.
+- Workers/build inputs: `pnpm worker:build-contract-gate` + `pnpm worker:runtime-deps-gate`; un `file:` local
+  debe existir, estar versionado, coincidir con el lockfile y entrar a cada etapa/contexto consumidor.
 
 ## Git, verificación y cierre
 

@@ -29,6 +29,9 @@ on:
       - 'src/types/db.d.ts'
       - 'package.json'
       - 'pnpm-lock.yaml'
+      - '.dockerignore'
+      - '.gcloudignore'
+      - 'vendor/**'
       - 'tsconfig.json'
   workflow_dispatch:
     inputs:

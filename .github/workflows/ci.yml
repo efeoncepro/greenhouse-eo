@@ -154,6 +154,11 @@ jobs:
         # no escucha en 8080 → deploy failed. Convierte ese crash en CI-fail.
         run: pnpm worker:runtime-deps-gate
 
+      - name: Worker build-input contract gate
+        # Verifica package-manager SoT, tarballs file:+integrity, orden COPY→install,
+        # contextos Cloud Build/Docker y path triggers de los cuatro workers.
+        run: pnpm worker:build-contract-gate && pnpm worker:build-contract-gate:test
+
       # NOTA (TASK-1160): los gates de CLAUDE.md (budget + rule-audit) viven en su
       # workflow dedicado `claude-md-governance.yml`, porque ESTE workflow ignora
       # `**/*.md` y `docs/**` en sus triggers — un PR que solo edita CLAUDE.md NO

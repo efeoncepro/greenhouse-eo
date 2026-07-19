@@ -26,6 +26,7 @@ RUN corepack enable && corepack prepare "pnpm@${PNPM_VERSION}" --activate
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml ./
+COPY vendor/ ./vendor/
 # --ignore-scripts: sin husky/postinstalls en el contenedor (mismo patrón que ops-worker);
 # los binarios nativos (esbuild de tsx, sharp) llegan como optional deps por plataforma.
 RUN pnpm install --frozen-lockfile --ignore-scripts

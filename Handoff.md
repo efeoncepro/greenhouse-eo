@@ -74,6 +74,17 @@
 > produce el commercial decision record. Greenhouse gobierna el Design System, pero Globe no hereda sus
 > patterns: construye los propios incrementalmente. Siguiente ID libre: `TASK-1486`. No hubo runtime/rollout.
 
+## Sesión 2026-07-19 — Worker build contract endurecido; rollout remoto pendiente
+
+> Se corrigió la causa compartida de los deploys rojos: los 4 Dockerfiles copian `vendor/` antes de instalar,
+> los 4 workflows observan todos los build inputs y Agent Context Governance hereda pnpm `10.32.1` desde
+> `packageManager` con Node/actions canónicos. Nuevo `pnpm worker:build-contract-gate`: valida Git + SHA-512
+> contra lockfile, orden Docker, ignores, triggers y toolchain; 6 tests negativos PASS. `worker:runtime-deps-gate`
+> cubre ahora Artifact Worker y forzó declarar `playwright@1.59.1` runtime exacto. `gcloud meta
+> list-files-for-upload` confirma ambos tarballs. Docker local no está disponible, por lo que el estado es
+> **code complete, rollout pendiente** hasta que los workflows canónicos construyan las cuatro imágenes. El
+> registry privado y retiro de tarballs siguen bajo `TASK-1473` (bloqueada por `TASK-1469`/`TASK-1472`).
+
 ## Sesión 2026-07-19 — Creative Studio Business Model V1 formalizado
 
 > Se creó la categoría `docs/business-models/` y el primer modelo formal del repo. Creative Studio separa
@@ -357,21 +368,3 @@
 > ambos espejos, Deltas cruzados a TASK-1429/1430. **Rollout pendiente** (por eso sigue
 > `in-progress`): push → shadow-compare staging → enforcement staging + smoke kill switch live sin
 > redeploy → prod gradual 7d. El renderer aún no envía visitor keys (TASK-1429).
-
-## Sesión 2026-07-18 — TASK-1427 Slices 1–2: CTA live en WordPress (página de prueba) + E2E ambos hosts
-
-> `/implement-task 1427`. El operador decidió **página de prueba primero** para el placement WP:
-> se creó `efeoncepro.com/greenhouse-cta-prueba/` (id `251561`, noindex, sin sidebar, no enlazada)
-> vía `pnpm public-website:wpcli` — solo un bloque HTML con el snippet canónico
-> (`cta-location=wp_test_page`); cero cambios de tema/plugin, rollback = borrar la página.
-> Evidencia E2E mirada: WP 1440 (card ready + click → form 5 pasos inline, CSS Ohio sin fugas) y
-> 390 (condensed, sin overflow); dataLayer `viewed/clicked/form_opened`; ingest 2×202; ledger
-> `browser_reported/accepted`; `/g/collect` con los 3 eventos; **`greenhouse_cta_viewed` visible en
-> GA4 realtime** (sesión UA real + engagement + consent, LEARNINGS §7c); forja → 403
-> `surface_unauthorized`. Think control re-verificado live. Hallazgo documentado: **ningún host
-> tiene CMP/consent-mode defaults** (los tags disparan sin gate; postura pre-existente del sitio —
-> LEARNINGS 2026-07-18; candidato a task de measurement governance). Capturas en
-> `.captures/task-1427-wp-test/`; scripts `scripts/growth/_sanity-task1427-*.mjs`. Docs sincronizados:
-> task Delta, TRACKING-PLAN, LEARNINGS, manual, doc funcional, skill (ambos espejos). **Slice 3
-> abierto**: ventana steady-state `growth.cta.*` hasta 2026-07-25 + decisión de placement amplio
-> (recomendado: posts del blog) → la task sigue `in-progress` por diseño.

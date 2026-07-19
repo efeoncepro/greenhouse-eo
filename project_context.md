@@ -79,6 +79,8 @@ Todo trabajo formal sigue:
 - Producción estática reproducible: `pnpm creative:layout -- --contract <yaml|json> --mode plan|compile|check`;
   binarios de `ai-generations` se archivan con `pnpm media:archive-ai-generation` y Git conserva su manifest.
 - PostgreSQL: `pnpm pg:connect`; no improvisar pools ni credenciales.
+- Workers/Cloud Build: `pnpm worker:build-contract-gate` valida toolchain, inputs `file:`, Docker contexts y
+  triggers; `pnpm worker:runtime-deps-gate` valida la dependency closure runtime de los cuatro workers.
 - Sitio público por SSH/WP-CLI: `pnpm public-website:ssh-check` antes de mutar.
 - Contexto histórico: `rg -n '<keyword>' docs/operations/agent-context-history`.
 

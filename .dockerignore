@@ -39,6 +39,10 @@ artifacts/
 # Dependencies are installed inside the image
 node_modules/
 
+# Versioned local package inputs are part of the deterministic build contract.
+# Keep this explicit even when .gitignore changes; CI validates the exception.
+!vendor/efeonce-globe/**
+
 # Local env / secrets
 .env*
 !.env.example

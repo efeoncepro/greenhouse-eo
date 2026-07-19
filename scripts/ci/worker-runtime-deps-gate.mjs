@@ -2,7 +2,8 @@
 /**
  * Worker runtime-deps gate (canonical).
  *
- * Los 3 workers Cloud Run Node (ops-worker, commercial-cost-worker, ico-batch)
+ * Los 4 workers Cloud Run Node (ops-worker, commercial-cost-worker, ico-batch,
+ * artifact-worker)
  * bundlean `services/<w>/server.ts` con esbuild `--packages=external` y, en el
  * runtime stage del Dockerfile, hacen `pnpm install --prod` (SOLO `dependencies`).
  *
@@ -30,10 +31,7 @@ const repoRoot = fileURLToPath(new URL('../..', import.meta.url))
 const pkg = require(join(repoRoot, 'package.json'))
 const declaredDeps = new Set(Object.keys(pkg.dependencies ?? {}))
 
-const NODE_BUILTINS = new Set([
-  ...builtinModules,
-  ...builtinModules.map(name => `node:${name}`)
-])
+const NODE_BUILTINS = new Set([...builtinModules, ...builtinModules.map(name => `node:${name}`)])
 
 // Nombres de paquete que los Dockerfiles aliasan a shims locales (NO se instalan
 // en el runtime stage). Mantener en sync con los `--alias:*=./*-shim.js`:
@@ -44,7 +42,8 @@ const SHIMMED_PACKAGES = new Set(['server-only', 'next', 'next-auth', 'bcryptjs'
 const WORKERS = [
   { name: 'ops-worker', entry: 'services/ops-worker/server.ts' },
   { name: 'commercial-cost-worker', entry: 'services/commercial-cost-worker/server.ts' },
-  { name: 'ico-batch', entry: 'services/ico-batch/server.ts' }
+  { name: 'ico-batch', entry: 'services/ico-batch/server.ts' },
+  { name: 'artifact-worker', entry: 'services/artifact-worker/main.ts' }
 ]
 
 /** Resuelve el nombre de paquete de un specifier: `a/b/c`→`a`, `@s/p/sub`→`@s/p`. */
@@ -123,10 +122,14 @@ for (const worker of WORKERS) {
     for (const name of missing) {
       const inDev = pkg.devDependencies?.[name] !== undefined
 
-      console.error(`    - ${name}${inDev ? '  (está en devDependencies — moverlo a dependencies)' : '  (no declarado)'}`)
+      console.error(
+        `    - ${name}${inDev ? '  (está en devDependencies — moverlo a dependencies)' : '  (no declarado)'}`
+      )
     }
   } else {
-    console.log(`✓ ${worker.name}: todos los paquetes externalizados están en dependencies (${externals.size} externos)`)
+    console.log(
+      `✓ ${worker.name}: todos los paquetes externalizados están en dependencies (${externals.size} externos)`
+    )
   }
 }
 
@@ -138,4 +141,4 @@ if (hadError) {
   process.exit(1)
 }
 
-console.log('\nOK — los 3 workers Node resuelven todos sus paquetes externos desde dependencies.')
+console.log('\nOK — los 4 workers Node resuelven todos sus paquetes externos desde dependencies.')

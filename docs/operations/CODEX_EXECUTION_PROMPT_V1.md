@@ -311,6 +311,7 @@ Ejecuta lo proporcional al cambio:
 - `pnpm test`
 - `pnpm build`
 - `pnpm pg:doctor`
+- Workers/build inputs: `pnpm worker:build-contract-gate` + `pnpm worker:runtime-deps-gate`
 - `pnpm ops:lint --changed` si tocaste tasks/epics/mini-tasks
 - `pnpm qa:gates --changed` + skill `greenhouse-qa-release-auditor` antes de cerrar implementaciones no triviales
 - UI: `pnpm fe:capture ...` y revisar frames PNG

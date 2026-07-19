@@ -20,12 +20,19 @@ on:
     branches:
       - develop
     paths:
+      - '.github/workflows/ico-batch-deploy.yml'
       - 'services/ico-batch/**'
       - 'src/lib/ico-engine/**'
       - 'src/lib/finance/ai/**'
       - 'src/lib/ai/**'
       - 'src/lib/sync/event-catalog.ts'
       - 'src/lib/sync/publish-event.ts'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.dockerignore'
+      - '.gcloudignore'
+      - 'vendor/**'
+      - 'tsconfig.json'
   workflow_dispatch:
     inputs:
       environment:

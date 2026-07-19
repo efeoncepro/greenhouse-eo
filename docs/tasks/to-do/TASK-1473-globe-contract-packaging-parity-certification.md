@@ -154,6 +154,9 @@ Demostrar que las capabilities promovidas son operables por SDK/MCP sobre los mi
 ### Slice 1 — Contract packaging and SDK distribution
 
 - Empaquetar schemas/contracts canónicos y publicar métodos SDK tipados por capability promovida, con versionado, deprecation y redaction.
+- Reemplazar el bridge temporal `file:vendor/efeonce-globe/*.tgz` sólo después de certificar un registry privado
+  scoped con SemVer inmutable, pins exactos, integrity/provenance, WIF/OIDC sin tokens persistentes, rollback de
+  versión e instalación real desde local, GitHub Actions, Cloud Build y Vercel.
 
 ### Slice 2 — Thin MCP adapters
 
@@ -218,6 +221,10 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 - [ ] Smokes cubren allow, deny, replay, revoke, redaction y correlation.
 - [ ] La task no introduce business logic, schema de dominio nuevo ni endpoint model-specific.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
+- [ ] La distribución SDK/contracts no depende de tarballs sobrescritos, paquetes `0.0.0`, tokens estáticos ni
+      una ruta que funcione en Cloud Build pero falle durante `pnpm install` de Vercel.
+- [ ] El vendoring temporal se retira sólo después de que todos los consumidores pasan con el registry; hasta
+      entonces cumple `GREENHOUSE_WORKER_BUILD_CONTRACT_V1.md` y conserva rollback reproducible.
 - [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
 
 ## Verification
