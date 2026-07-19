@@ -200,7 +200,8 @@ Dos cosas que el SEO no tiene y el creativo sí, y que **ninguna** de nuestras s
    gobierno cuesta cero.**
 7. 🔴 **NUNCA conviertas Studio Credits en precio por pieza, hora, token, dólar o pass-through del provider.**
    Un credit mide una operación generativa gobernada; la pieza sólo explica un escenario. Sin shadow ledger,
-   p50/p95 y commercial approval no existe equivalencia pública, package, top-up ni checkout.
+   p50/p95 y commercial approval no existe equivalencia pública, package, top-up ni checkout. **Provider-neutral
+   no significa provider-oculto:** muestra modelo/version y fallback reales; reserva costo, margen, keys y prompt/IP.
 
 **Alcance**
 

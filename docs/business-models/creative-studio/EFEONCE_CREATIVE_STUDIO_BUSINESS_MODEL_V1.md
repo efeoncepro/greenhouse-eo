@@ -56,7 +56,7 @@ Creative Studio resuelve cinco jobs:
 | --- | --- | --- |
 | Escalar output sin inflar permanentemente el equipo | Capacidad elástica y predecible | templates, pool de créditos, routing y squads/lanes |
 | Mantener control de marca y craft | Menos retrabajo y menor riesgo | references, invariantes, review humana y lineage |
-| Saber qué ocurre y cuánto cuesta | Transparencia y forecast | estimate, reservation, ledger, costo real y telemetría |
+| Saber qué ocurre y cuánto cuesta | Transparencia y forecast | estimate, ruta/modelo visible, reservation, ledger, costo real y telemetría |
 | Repetir lo que funcionó sin empezar de cero | Memoria acumulativa | templates versionados, assets, decisiones y rechazos |
 | Ganar autonomía sin asumir complejidad innecesaria | Cliente más capaz | progresión managed → co-operated → client-operated por evidencia |
 
@@ -145,8 +145,10 @@ promesa como un envelope de producción; no deben convertir la relación en una 
 ### Studio Access
 
 El cliente compra autonomía gobernada: templates curados, memoria, referencias, controles, review, budget y
-soporte. El valor no es “usar IA”; es operar capacidades repetibles sin administrar providers, lineage o
-policy. No incluye por defecto dirección creativa, curation, QA managed ni compromiso OTD/FTR.
+soporte. El valor no es “usar IA”; es operar capacidades repetibles sin tener que administrar providers,
+lineage o policy. La ruta no es una caja negra: Globe muestra el provider/modelo/version propuesto, el realmente
+ejecutado y cualquier fallback, sin convertir esa marca en la unidad tarifaria. No incluye por defecto
+dirección creativa, curation, QA managed ni compromiso OTD/FTR.
 
 ### Co-operated / hybrid
 

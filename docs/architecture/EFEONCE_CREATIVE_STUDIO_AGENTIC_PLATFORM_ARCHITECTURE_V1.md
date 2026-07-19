@@ -187,7 +187,7 @@ Reads are policy-filtered projections. Commands have explicit idempotency and re
 | --- | --- | --- | --- |
 | Browse templates, assets and run history | Reader API | Read-only tool/resource | Workspace and asset policy |
 | Prepare brief/reference pack | Form calls `prepareRun` | `creative.prepare_run` | Validation, rights/classification check |
-| Estimate model route and credit spend | UI estimate | `creative.estimate_run` | Router and commercial policy |
+| Estimate model route and credit spend | UI estimate with provider/model/version, readiness, limitations and fallback | `creative.estimate_run` | Router and commercial policy |
 | Reserve and submit a run | Approval dialog | `creative.submit_run` with one-time approval token | Role, budget, idempotency, credit reservation |
 | Follow run/review evidence | Run detail | `creative.get_run` / `creative.get_asset` | Scoped projection only |
 | Request changes or branch an attempt | Review surface | `creative.branch_run` | Lineage and review policy |
@@ -218,7 +218,12 @@ compositor determinístico permanece bajo ownership del Studio.
 
 `ProviderAdapter` is a capability interface, not a generic lowest-common-denominator wrapper. A template declares what it needs: input/output modality, reference count, camera/action constraint, exact-text sensitivity, foley/audio requirement, allowed transformations, latency ceiling and budget tier.
 
-The router returns a **route proposal**: chosen provider/model, input adapter plan, expected credit range, known limitations and fallback policy. It stores that proposal with the run so it can be audited when a model or pricing changes.
+The router returns a **route proposal**: chosen provider/model/version, readiness, input adapter plan, expected
+credit range, known limitations and fallback policy. UI and MCP expose that route before spend approval; this
+transparency is part of the product value, not an internal-only diagnostic. Each provider attempt records and
+exposes the route actually used. If fallback executes a different route, the run shows proposed and actual
+routes without rewriting history. Provider-neutral credits therefore mean stable capability pricing, not a
+hidden model.
 
 Cada route candidate tiene dos ejes: `portfolio_tier` (`core | core-scale | specialist | canary | watch |
 deprecated | blocked`) y `readiness` (`research_verified | adapter_verified | eval_qualified |
@@ -269,6 +274,10 @@ allocation → estimate → reservation hold → approval → execution
 ## 9. Observability, evaluation and review
 
 Each run produces a correlated record across API, agent/MCP call, queue dispatch, worker, provider attempt, storage ingest and review. Required dimensions include `workspace_id`, `project_id`, `run_id`, `operating_mode`, responsibility assignment IDs, `template_version`, `provider`, `model`, `attempt`, `actor_type`, `credit_reservation_id` and error class (never raw secret or public asset URL).
+
+The user-facing projection includes provider, model display name, exact version/readiness and fallback history.
+It excludes provider credentials, privileged endpoints, confidential vendor cost, Efeonce margin and internal
+prompt/IP fields not included in the approved transparency policy.
 
 ### Quality gates
 

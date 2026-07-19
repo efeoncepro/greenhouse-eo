@@ -39,6 +39,9 @@ All affected skills preserve these invariants:
    implementation/IP, and rights/licenses/pass-through.
 5. A Studio Credit measures a governed generative operation, not a piece, hour, currency, provider token,
    API call, license, FTE or final asset.
+   Provider-neutral is not provider-opaque: customer-facing estimates and run history disclose the proposed
+   and actual provider/model/version plus fallbacks, while confidential cost, margin, credentials and internal
+   prompt/IP remain protected.
 6. Deterministic planning, layout, editing, copy, curation, QA, mix/master, export and reuse consume zero
    Studio Credits but still have real cost financed outside the wallet.
 7. Spend follows an append-only lifecycle: allocation, estimate, reservation, approval, execution,

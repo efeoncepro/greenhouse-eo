@@ -123,8 +123,13 @@ La banda es válida cuando:
 - menos de 10% requiere override manual;
 - no incentiva fragmentar/agrupar artificialmente operaciones;
 - resiste oscilaciones menores de vendor;
-- se entiende sin conocer modelos o tokens;
+- se entiende sin convertir modelos o tokens en una tarifa, aunque la ruta real sea visible;
 - el package completo sostiene margen bruto ≥45%.
+
+**Provider-neutral no significa provider-oculto.** El estimate debe mostrar provider, modelo/version,
+readiness, limitaciones y fallback antes de aprobar gasto; el run muestra la ruta real por attempt. El modelo
+aporta confianza y valor percibido, pero no se convierte en una tabla `provider → credits` ni revela costo
+vendor, margen, keys o prompts/IP internos.
 
 ### 5.3 Shadow calibration
 
@@ -236,6 +241,8 @@ explicar la composición, nunca para publicar una tarifa unitaria.
 - rights, stock, talento, voz, música, territorio y buyout por separado;
 - rate version, período, restricciones y política de rollover/expiry sólo si están aprobados;
 - soporte, SLA y escalamiento acordados;
+- transparencia de ruta: provider/modelo/version propuesto y ejecutado, readiness y fallback, sin costo vendor
+  confidencial ni tabla provider→credit;
 - aclaración: credits no son dinero, gift card ni token transferible.
 
 ## 10. Commercial approval gate
@@ -262,3 +269,5 @@ pública `1 credit = $X`, top-up self-serve ni promesa de “ilimitado”.
 6. Nunca permitas saldo cross-tenant, transferencia o aumento autónomo de budget.
 7. Nunca derives precio público desde las bandas ilustrativas de este módulo.
 8. Nunca uses `Studio Credits` y `Globe Credits` simultáneamente.
+9. Nunca ocultes el provider/modelo/version realmente usado ni un fallback ejecutado; neutralidad económica no
+   es opacidad técnica.

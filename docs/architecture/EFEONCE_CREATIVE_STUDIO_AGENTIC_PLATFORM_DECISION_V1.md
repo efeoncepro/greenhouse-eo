@@ -161,6 +161,14 @@ SLO y costo. El portafolio vigente, estados de promoción y registro machine-rea
 - el precio relevante es costo por candidato aprobado y por familia entregada, no por request aislado;
 - la amplitud del marketplace no equivale a allowlist productivo.
 
+### Transparencia de ruta
+
+Provider-neutral no significa provider-oculto. Antes de aprobar gasto, UI y MCP muestran provider,
+modelo/version, readiness, limitaciones materiales y fallback propuesto. Después de ejecutar, el run muestra
+la ruta real de cada attempt y cualquier fallback. Se mantienen privados keys, endpoints privilegiados, costo
+vendor confidencial, margen Efeonce y prompt/IP no incluido en la policy de transparencia. La marca del modelo
+aporta valor y auditabilidad, pero no define por sí sola la banda de Studio Credits.
+
 **Reversibility:** `two-way-but-slow` para cambiar providers/modelos; la separación del contrato de capability
 respecto del endpoint es obligatoria. **Confidence:** alta en provider routing y lifecycle; media en la
 clasificación creativa hasta completar bake-offs. **Validated as of:** 2026-07-19.

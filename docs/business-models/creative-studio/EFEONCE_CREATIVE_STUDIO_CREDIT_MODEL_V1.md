@@ -27,7 +27,8 @@ Esas dimensiones usan líneas económicas separadas.
 
 ## 2. Principios no negociables
 
-1. **Provider-neutral:** la unidad representa capacidad Efeonce, no una llamada a un vendor.
+1. **Provider-neutral, no provider-opaque:** la unidad representa capacidad Efeonce, no una llamada a un
+   vendor; el usuario puede ver qué provider/modelo/version fue propuesto y cuál se ejecutó realmente.
 2. **Semantic-first:** se cobra la operación aprobada que el usuario entiende, no parámetros internos.
 3. **Mode-neutral:** la misma operación consume los mismos créditos en managed, co-operated o client-operated.
 4. **Estimate before spend:** ningún run reserva sin estimate visible y ninguna ejecución excede approval bounds.
@@ -84,6 +85,9 @@ por `capability_class` y `quality_tier`.
 
 No se crea una equivalencia distinta por provider salvo que cambie materialmente la capacidad prometida. El
 router puede elegir rutas más baratas o caras dentro de la misma banda; ese spread es riesgo/margen Efeonce.
+Esta estabilidad económica no autoriza opacidad: el estimate identifica la ruta propuesta con provider,
+modelo, versión/readiness, limitaciones materiales y fallback; el run identifica la ruta efectivamente usada
+por cada attempt. Si un fallback cambia el modelo, el historial conserva y muestra ambos.
 
 ## 5. Método para calibrar equivalencias
 
@@ -120,7 +124,7 @@ Para cada capability/template:
 - menos de 10% requiere override manual por clasificación;
 - no incentiva fragmentar o agrupar artificiosamente una operación;
 - no cambia por oscilaciones menores de vendor;
-- sigue siendo comprensible sin conocer modelos ni tokens;
+- sigue siendo comprensible sin convertir modelos o tokens en una tarifa, aunque la ruta real sea visible;
 - mantiene margen total ≥45% bajo mix esperado y p95 acordado.
 
 ## 6. Lifecycle económico
@@ -194,6 +198,9 @@ La UI muestra al usuario:
 
 - saldo disponible, reservado y consumido;
 - estimate como rango y drivers semánticos;
+- provider, nombre comercial del modelo y versión/readiness de la ruta propuesta antes de aprobar gasto;
+- provider/modelo/version realmente usados por attempt y cualquier fallback, visibles en el historial del run;
+- limitaciones materiales de una ruta `preview`, `canary` o equivalente antes de que el usuario la apruebe;
 - qué operación se cobrará y cuándo;
 - historial de settlement/refund legible;
 - alertas de budget y próximo reset/expiry sólo si están aprobados;
@@ -201,7 +208,7 @@ La UI muestra al usuario:
 
 No muestra por defecto:
 
-- provider keys, raw prompts internos o secretos;
+- provider keys, raw prompts internos, endpoints privilegiados o secretos;
 - costo contractual confidencial del vendor;
 - margen Efeonce;
 - logs privados o datos de otros workspaces;
@@ -279,7 +286,8 @@ Cambios menores de provider quedan absorbidos mientras no rompan margen/forecast
 3. Etiquetar 30–50 runs con costo, attempts, causa de retry, tiempo humano y outcome.
 4. Simular bandas y revisar forecast/margen por template y modo.
 5. Hacer readback con operadores: ¿pueden explicar por qué se cobró?
-6. Hacer test con clientes: ¿pueden estimar uso sin conocer providers?
+6. Hacer test con clientes: ¿pueden estimar uso aunque cambie el provider y entienden qué modelo fue propuesto,
+   cuál se ejecutó y por qué cambió si hubo fallback?
 7. Aprobar refund taxonomy con Finance/Legal/Operations.
 8. Ejecutar Sample Sprints con pool visible pero sin top-up self-serve.
 9. Sólo después proponer packages/precio y commercial approval.
@@ -288,6 +296,7 @@ Cambios menores de provider quedan absorbidos mientras no rompan margen/forecast
 
 - publicar precio por crédito o tabla proveedor→crédito;
 - revender un token vendor como Studio Credit;
+- ocultar al usuario el provider/modelo/version realmente usado o un fallback ejecutado;
 - cobrar por assets finales sin mapear operaciones;
 - cobrar retries técnicos o errores Efeonce;
 - esconder derechos, talento, stock o música dentro de credits;

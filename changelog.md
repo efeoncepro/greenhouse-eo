@@ -29,6 +29,8 @@
 - Studio Credits quedan definidos como operaciones generativas gobernadas, no horas, piezas, tokens, moneda ni
   derechos. El modelo está aprobado para shadow ledger/pilotos; pricing público, checkout, top-ups, impuestos y
   acceso externo siguen bloqueados por Finance/Legal/EPIC-028.
+- Provider-neutral deja explícitamente de significar provider-oculto: estimate, approval e historial muestran
+  provider/modelo/version, readiness y fallbacks reales; siguen privados costo vendor, margen, keys y prompt/IP.
 - El modelo se propagó a 20 skills en ambos runtimes: doctrina comercial/agencia; diseño, imagen, social,
   contenido, copy, decks y Digital Marketing; motion, audio y HyperFrames; Finance, Legal/IP, Talent, Tenders, GTM y Research.
   Nuevos módulos operativos cubren lifecycle, retries/refunds, derechos, ejemplos por pieza y finishing

@@ -50,7 +50,9 @@
 > Se creó la categoría `docs/business-models/` y el primer modelo formal del repo. Creative Studio separa
 > delivery model, engagement form y operating mode; Managed Squad deja de confundirse con Staff Augmentation o
 > `efeonce-managed`. Studio Credits miden operaciones generativas gobernadas y excluyen capacidad humana,
-> finishing determinístico y derechos. El estado es `Approved for validation`: faltan shadow ledger, 30–50
+> finishing determinístico y derechos. Provider-neutral no significa provider-oculto: estimate, approval y
+> run history muestran provider/modelo/version, readiness y fallbacks reales, sin revelar costo vendor, margen,
+> keys ni prompt/IP interno. El estado es `Approved for validation`: faltan shadow ledger, 30–50
 > runs instrumentados, entrevistas, Sample Sprints y sign-off Finance/Legal antes de precio público o clientes
 > externos. El contrato se propagó a 20 skills comerciales, productivas y transversales en `.codex/.claude`,
 > con módulos específicos para credits comerciales, visuales, motion, audio y HyperFrames; Finance, Legal,

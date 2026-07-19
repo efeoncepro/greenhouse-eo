@@ -42,6 +42,8 @@ para clientes externos, checkout ni facturación.
 4. Studio Credits representan **operaciones generativas gobernadas**, no horas, piezas, tokens, moneda ni costo
    directo de un provider. La misma operación semántica consume los mismos créditos cualquiera sea el modo;
    la capacidad humana y el accountability cambian de precio por otra línea.
+   Provider-neutral no significa provider-oculto: estimate, approval e historial muestran provider,
+   modelo/version, readiness y fallbacks reales, sin publicar costo vendor, margen ni una tabla provider→credit.
 5. El fee de gobierno/plataforma, la capacidad humana, implementación/IP, derechos/licencias y pass-through se
    separan de los créditos. Derechos nunca quedan ocultos dentro de un crédito.
 6. No se publica `1 crédito = $X`, paquetes, top-ups ni checkout hasta validar costos p50/p95, refund policy,
@@ -68,6 +70,7 @@ Positivas:
 - un cliente puede graduar autonomía sin cambiar de producto ni perder memoria;
 - Finance puede observar margen por línea y por modo;
 - el ledger puede permanecer provider-neutral y compatible con cambios de ruta/modelo;
+- la transparencia de ruta permite que el cliente valore y audite el motor usado sin convertirlo en moneda;
 - los contratos pueden asignar claramente errores, cambios de dirección y derechos.
 
 Costos y riesgos:
