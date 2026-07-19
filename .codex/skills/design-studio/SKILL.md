@@ -1,43 +1,6 @@
 ---
 name: design-studio
-description: >-
-  Skill experta de DIRECCIÓN DE ARTE y DISEÑO GRÁFICO al estado del arte 2026 — el
-  "estudio" que audita un Key Visual, define el sistema visual, crea imágenes para
-  marketing y dirige la producción con IA y/o humanos. Dos manos: (1) conocimiento
-  profundo de la disciplina (fundamentos visuales — composición/grilla/gestalt/
-  jerarquía/color/contraste, tipografía como imagen, Key Visual systems, dirección
-  de arte y mood, tendencias visuales vigentes, craft de imagen IA por herramienta),
-  y (2) capacidad de ejecución (audita KV con rúbrica, arma brief/mood, elige la
-  herramienta o secuencia de herramientas — Seedream 5 Lite/Pro / GPT Image 2 /
-  Nano Banana / Midjourney / Ideogram / Firefly / Flux / Higgsfield / Magnific —,
-  produce/dirige y hace handoff humano), cerrando el loop
-  idear→dirigir→producir→auditar→iterar. COMPLEMENTARIA pero DISTINTA de
-  greenhouse-ai-image-generator: esa GENERA el pixel (la mano, atada al runtime
-  Greenhouse); design-studio DIRIGE el arte (concepto, sistema visual, Key Visual,
-  auditoría) y decide qué mano/herramienta. Para un asset que entra a la UI, dirige
-  y DELEGA la producción canónica a greenhouse-ai-image-generator (DESIGN.md/AXIS/
-  transparencia). Delega a greenhouse-ai-image-generator (producción de assets UI),
-  a greenhouse-digital-brand-asset-designer (logos reales de terceros), a
-  typography-design (craft fino de tipo), a dataviz-design (charts), a
-  modern-ui/product-design-loop/greenhouse-ux (pantalla/layout/interacción del
-  producto), a motion-design (implementar animación/identidad kinética), a
-  social-media-studio (formato/algoritmo por red que consume el KV), a
-  digital-marketing (estrategia creativa de campaña) y a efeonce-agency (doctrina
-  de marca). Incluye overlay Efeonce (brand SSOT, AXIS, ilustraciones propietarias)
-  y capa de delivery para clientes Globe. Triggers: "diseño", "diseñar", "imagen de
-  marketing", "key visual", "KV", "auditar diseño", "auditar key visual", "dirección
-  de arte", "art direction", "concepto visual", "sistema visual", "identidad visual",
-  "mood board", "moodboard", "referencias visuales", "composición", "paleta", "color",
-  "diseño gráfico", "poster", "afiche", "banner", "hero", "ilustración", "campaña
-  visual", "creatividad visual", "genera una imagen", "prompt de imagen", "Nano
-  Banana", "Midjourney", "Ideogram", "Firefly", "Flux", "Magnific", "upscale",
-  "textura", "gradiente", "duotono", "crítica de diseño", "design critique",
-  "completar el visual de la UI", "arte para la UI", "infografía editorial",
-  "diagrama SVG", "SVG a WebP", "layout design", "finishing", "acabado premium".
-  Para infografías determinísticas con copy/datos
-  exactos dirige composición y carga el método canónico de `content-marketing-studio`.
-user-invocable: true
-argument-hint: "[tarea o pregunta — ej: 'audita este key visual', 'diseña una imagen para la campaña del grader', 'dame un concepto visual para Glitch', 'dirige el arte del hero de /aeo-2', 'mood board para SKY']"
+description: Dirige arte y diseño gráfico enterprise con IA y humanos. Use for conceptos visuales, Key Visuals, campañas, posters, banners, imagen de marketing, layout y finishing, auditoría de diseño, selección de herramientas y Studio Credits visuales; delega la generación runtime a greenhouse-ai-image-generator.
 ---
 
 # Design Studio — Dirección de arte + diseño gráfico 2026
@@ -77,6 +40,9 @@ argument-hint: "[tarea o pregunta — ej: 'audita este key visual', 'diseña una
    `efeonce/EFEONCE_OVERLAY.md` / `efeonce/CLIENT_DELIVERY.md`.
 6. **Cierra con un artefacto** de `templates/` (brief, scorecard de auditoría, mood board,
    prompt sheet, sistema visual, crítica, spec de entrega), no con prosa suelta.
+7. Si el trabajo corre dentro de **Creative Studio / Efeonce Globe**, carga el Business Model y el Credit
+   Model canónicos enlazados en `efeonce/CLIENT_DELIVERY.md`. Cotiza la producción generativa por operación;
+   nunca conviertas una pieza, una hora o el costo de un provider en la unidad de crédito.
 
 ## 2. Árbol de decisión (a qué skill pertenece)
 
@@ -213,3 +179,5 @@ Cada apuesta con su volatilidad en `SOURCES.md`:
   routing de finish y cierre determinístico premium.
 - `efeonce/` — overlay: `EFEONCE_OVERLAY.md`, `STUDIO_TOOLING.md`, `DESIGN_BOUNDARY.md`,
   `CLIENT_DELIVERY.md`.
+- `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md` — contrato económico
+  canónico de Studio Credits; no duplicar bandas ni equivalencias dentro de esta skill.

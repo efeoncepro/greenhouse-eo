@@ -4,6 +4,11 @@
 > el loop **idear → guion/brief → producir → editar → mezclar → masterizar → entregar**. Reverifica
 > capacidades **y licencias** de cada modelo/MCP (cambian por mes/trimestre — ver `SOURCES.md`).
 
+> **Frontera económica.** Antes de generar carga `../modules/11_STUDIO_CREDITS_AND_RIGHTS.md`.
+> Credits miden la operación generativa por segundos/tier/attempt; edición, cleanup determinístico,
+> mix/master, loudness, stems y export consumen `0 credits` aunque sí capacidad. Estimate/reservation/
+> approval preceden la ejecución; settlement/release/refund siguen al review. No hay tarifa pública aprobada.
+
 ## El loop y qué corre cada paso
 
 | Paso | Herramienta / skill | Qué hace |
@@ -51,9 +56,14 @@ o multi-voz rápido. Verificar términos de licencia antes de uso comercial.
 
 ## Reglas duras: gasto + licencia + consentimiento + confirmación
 
-- **Gasto gobernado:** generar IA cuesta créditos (~$0.18/min Seed Audio, etc.). Dimensiona antes de volumen.
+- **Gasto gobernado:** estima capability, segundos, tier y attempts; costo vendor es evidencia interna, no
+  conversión a credits. Reserva y exige approval antes de ejecutar; concilia settlement/release/refund.
 - **Licencia:** todo audio comercial/cliente exige **licencia verificada**; documenta la fuente. ElevenLabs
   Music es lo seguro; Suno/Udio verificar términos.
 - **Consentimiento:** clonar una voz exige **permiso explícito** del dueño.
 - **Confirmación humana:** entregar/publicar pasa **siempre** por aprobación del operador.
+- **Retry/cambio:** falla técnica sin output útil no se cobra dos veces; guion/idioma/voz/mood nuevos tras
+  aprobación requieren branch y estimate nuevo.
+- **Rights separados:** consentimiento, licencia, sync/master, territorio, plazo, talento y buyout no se
+  compran con credits.
 - **Vertex/clientes LLM:** los clientes canónicos de IA viven en `src/lib/ai/*`; no instanciar SDK paralelo en un dominio.

@@ -30,6 +30,18 @@
 - Snapshot íntegro pre-migración: [`docs/operations/agent-context-history/2026-07-19/Handoff.legacy.md`](docs/operations/agent-context-history/2026-07-19/Handoff.legacy.md).
 - Modelo operativo: [`docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md`](docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md).
 
+## Sesión 2026-07-19 — Creative Studio Business Model V1 formalizado
+
+> Se creó la categoría `docs/business-models/` y el primer modelo formal del repo. Creative Studio separa
+> delivery model, engagement form y operating mode; Managed Squad deja de confundirse con Staff Augmentation o
+> `efeonce-managed`. Studio Credits miden operaciones generativas gobernadas y excluyen capacidad humana,
+> finishing determinístico y derechos. El estado es `Approved for validation`: faltan shadow ledger, 30–50
+> runs instrumentados, entrevistas, Sample Sprints y sign-off Finance/Legal antes de precio público o clientes
+> externos. El contrato se propagó a 20 skills comerciales, productivas y transversales en `.codex/.claude`,
+> con módulos específicos para credits comerciales, visuales, motion, audio y HyperFrames; Finance, Legal,
+> Talent, Tenders, GTM, Research y Digital Marketing preservan sus boundaries. Los 20 routers Codex pasan `quick_validate`; la
+> matriz de adopción registra también dominios auditados sin cambio. Canon: `docs/business-models/creative-studio/`.
+
 ## Sesión 2026-07-19 — Contexto de agentes migrado a router con preservación íntegra
 
 > Se separó bootstrap, estado vigente y memoria histórica sin borrar contexto. Los cuatro archivos previos al

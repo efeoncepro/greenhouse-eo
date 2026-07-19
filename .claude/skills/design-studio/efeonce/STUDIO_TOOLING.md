@@ -57,10 +57,17 @@ solo en `us-central1`/`global`, NO `us-east4`. Los clientes LLM canónicos viven
 
 ## Gasto gobernado
 
-Producir con IA **cuesta créditos/API**. Antes de generar en volumen: dimensiona el gasto,
-prefiere `virality_predictor`/iteración barata antes de 20 variantes, y no generes assets
-especulativos sin brief aprobado. Prefiere el modelo más barato que resuelva la tarea (ej.
-Seedance ~$0.06/s vs Veo ~$0.10/s si no necesitas broadcast).
+Separar dos registros que nunca deben confundirse:
+
+- **costo interno del provider/compute:** input confidencial para routing, unit economics y margen;
+- **Studio Credits:** unidad client-facing de operaciones generativas gobernadas, provider-neutral.
+
+Antes de ejecutar, clasifica la `capability_class`, prepara un estimate en la rate version vigente, reserva el
+máximo aprobado y registra attempts. El settlement se decide por outcome y refund policy; un retry técnico no
+genera doble cargo. Dirección, moodboard, curaduría, QA, layout, composición, copy, export y finishing
+determinístico cuestan capacidad/gobierno, pero devengan **0 Studio Credits**. Derechos y pass-through van en
+línea separada. No hardcodees precio por crédito, banda, equivalencia vendor→crédito ni tabla por pieza en esta
+skill: el canon es `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md`.
 
 ## Autenticidad + gobernanza IA
 

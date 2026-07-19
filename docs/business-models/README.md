@@ -94,3 +94,5 @@ Todo business model debe separar al menos estas dimensiones:
 - [Efeonce Creative Studio](creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md) — `Approved for validation`.
 - [Studio Credits](creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md) — política económica V1,
   todavía sin precio público ni venta self-serve.
+- [Creative Studio Skill Adoption Matrix](creative-studio/EFEONCE_CREATIVE_STUDIO_SKILL_ADOPTION_V1.md) —
+  cobertura de skills, fronteras de ownership, validación y dominios auditados sin cambio.

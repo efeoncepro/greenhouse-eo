@@ -4,6 +4,12 @@
 > conectadas en el loop **idear → storyboard → animatic → producir → editar → finalizar → entregar**.
 > Reverifica capacidades de cada modelo/MCP (cambian por mes — ver `SOURCES.md`).
 
+> **Frontera económica.** Esta página enruta herramientas; no define tarifas. Antes de invocar una
+> capability generativa carga `../modules/13_STUDIO_CREDITS_AND_ACCOUNTABILITY.md`: estimate por
+> operación/segundos/tier/attempt, reservation y approval antes de ejecutar; settlement/release/refund con
+> evidencia después del review. Edición, conform, mix/master, HyperFrames/AE/Resolve y export determinísticos
+> consumen `0 credits` aunque sí demandan capacidad. No hay pricing público aprobado.
+
 ## El loop y qué corre cada paso
 
 | Paso | Herramienta / skill | Qué hace |
@@ -115,6 +121,12 @@ grande (pregunta, thinking, ambiente) + **mograph crisp** donde el micro-texto e
 
 ## Regla dura: gasto gobernado + confirmación humana
 
-Producir/renderizar IA **cuesta créditos**. Antes de volumen: dimensiona el gasto, valida el ritmo en el
-**animatic** (barato) antes de producir tomas, genera en **chunks 5–8s**, y sube calidad/upscale solo de lo
-elegido. **Entregar/publicar pasa SIEMPRE por confirmación humana.** La IA acelera; el humano dirige y hace el finish.
+Sólo una operación generativa gobernada **cuesta credits**. Antes de volumen: descompón capability,
+segundos, tier, controls y attempts; emite estimate/rate version; reserva y obtén approval humano. Valida el
+ritmo en el animatic determinístico (`0 credits`), genera en **chunks 5–8s** y escala calidad/upscale sólo de
+lo elegido. Después del review, settlement consume lo elegible, release libera remanente y refund corrige
+fallas técnicas sin borrar historia. Cambio creativo aprobado = branch/estimate nuevo.
+
+El costo/saldo del provider es evidencia interna, no conversión comercial. No cobres por pieza, hora,
+render/export o retry técnico. Voz, likeness, música, stock, sync/master, territorio, plazo y buyout viven
+fuera de credits. **Entregar/publicar pasa SIEMPRE por confirmación humana.**

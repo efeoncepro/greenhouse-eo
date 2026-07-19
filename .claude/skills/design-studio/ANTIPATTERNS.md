@@ -22,7 +22,7 @@
   vector→Recraft, realismo/cámara→FLUX.2, video→Seedance/Veo/Kling. Ver `SOURCES.md`.
 - ❌ **Citar de memoria qué modelo/versión/feature domina.** Cambia por mes. ✅ Reverifica con WebSearch.
 - ❌ **Basar algo nuevo en Sora 2** (deprecado, shutdown 2026-09-24). ✅ Usa Seedance/Veo/Kling/Omni.
-- ❌ **Generar 20 variantes sin brief.** Quema créditos. ✅ Brief + mood → pocas variantes dirigidas →
+- ❌ **Generar 20 variantes sin brief.** Quema costo variable y Studio Credits sin aprendizaje. ✅ Brief + mood → pocas variantes dirigidas →
   itera lo que funciona. Gasto gobernado.
 - ❌ **Delegar el juicio de marca a la IA.** ✅ IA diverge; el humano cura, decide y da el craft final.
 - ❌ **Pasar IA como foto real sin criterio de disclosure** cuando el contexto lo exige. ✅ "Ante la duda, revela".

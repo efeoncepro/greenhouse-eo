@@ -66,5 +66,19 @@
 - [ ] Licencia de música/voz/SFX documentada
 - [ ] **Confirmación humana antes de entregar**
 
+## 7. Conciliación del run de Studio
+
+| Campo | Valor |
+|---|---|
+| Run / rate version | [run_id · credit_rate_version] |
+| Estimate / reservation | [rango · hold aprobado] |
+| Settlement / release / refund | [consumo · remanente · ajuste y causa] |
+| Attempts | [segmento/idioma/tier · candidate · técnico o cambio creativo] |
+| Trabajo determinístico (`0 credits`) | [edit · cleanup · mix/master · loudness · stems/export] |
+| Rights separados | [consentimiento · licencia · sync/master · territorio/plazo/buyout] |
+
+- [ ] Ningún mix/master/export/cutdown determinístico fue liquidado como Studio Credits
+- [ ] Retry técnico/refund y cambio creativo/branch quedaron diferenciados con evidencia
+
 > **Regla dura.** Mide el loudness con un medidor, no lo estimes. Cada destino tiene su target;
 > "más fuerte" no es una entrega. True peak -1 dBTP siempre para evitar distorsión inter-muestra.

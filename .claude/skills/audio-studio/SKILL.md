@@ -29,8 +29,6 @@ description: >-
   "doblaje", "ElevenLabs", "Suno", "Udio", "Seed Audio", "Seedaudio", "mezcla", "mixing",
   "mastering", "masterización", "loudness", "LUFS", "EQ", "compresión de audio", "enhance de
   voz", "restauración de audio".
-user-invocable: true
-argument-hint: "[tarea o pregunta — ej: 'produce un jingle para el grader', 'dirige la voz de un VO en es-CL', 'diseña el sonic branding de Efeonce', 'plan de episodio de podcast de Glitch', 'qué modelo IA para música comercial con licencia limpia', 'audita esta mezcla']"
 ---
 
 # Audio Studio — Producción de audio (voz · música · SFX · podcast) 2026
@@ -65,7 +63,8 @@ argument-hint: "[tarea o pregunta — ej: 'produce un jingle para el grader', 'd
 
 1. **Clasifica la intención** (§2). ¿Es producción/craft de audio? Si es sonido a-picture de un
    video, coordina con `motion-design-studio` (§5).
-2. **Carga el módulo o módulos** que apliquen (§3). No cargues los 10 — carga lo justo.
+2. **Carga el módulo o módulos** que apliquen (§3). No cargues todos — carga lo justo. Si la tarea
+   estima, reserva, explica o liquida Studio Credits, carga siempre el módulo 11.
 3. **Chequea frescura + licencia**: si vas a nombrar un modelo de audio IA o usar música/voz IA en
    algo comercial/cliente, reverifica el modelo **y su licencia** (`SOURCES.md`).
 4. **Si hay que ejecutar** (producir/editar/mezclar), abre `efeonce/STUDIO_TOOLING.md` y usa el
@@ -106,6 +105,7 @@ argument-hint: "[tarea o pregunta — ej: 'produce un jingle para el grader', 'd
 | 08 | `modules/08_AUDIO_NARRATIVE.md` | audiolibro, radiodrama, sound design narrativo, multi-voz, binaural/espacial |
 | 09 | `modules/09_MIX_MASTER_LOUDNESS.md` | EQ/comp/de-ess, mezcla, mastering, loudness por plataforma, entrega |
 | 10 | `modules/10_AI_AUDIO_PIPELINE_STUDIO.md` | selección de modelo, licenciamiento, humano+IA, orquestación, enhance/restore |
+| 11 | `modules/11_STUDIO_CREDITS_AND_RIGHTS.md` | credits por operación/duración/tier/attempt, lifecycle, VO/música/lip-sync, retries, derechos y modos |
 
 ## 4. La mano de ejecución (por qué es "studio")
 
@@ -121,7 +121,9 @@ Cierra el loop **idear → guion/brief → producir → editar → mezclar → m
 - **Craft humano**: grabación, edición, mezcla, mastering (DAW) — handoff con spec cuando aplique.
 
 > **Regla dura (director + licencia + consentimiento).** El estudio **decide y dirige**, pero:
-> **(a)** producir con IA **cuesta créditos** (gasto gobernado); **(b)** todo audio comercial/cliente
+> **(a)** las operaciones generativas consumen credits por duración/tier/attempt; edición, mix/master y
+> export determinísticos consumen `0 credits` aunque sí capacidad; todo spend sigue estimate, reservation,
+> approval y settlement/release/refund; **(b)** todo audio comercial/cliente
 > exige **licencia verificada** (música IA: ElevenLabs Music es lo seguro); **(c)** clonar una voz exige
 > **consentimiento explícito** del dueño; **(d)** entregar/publicar pasa **SIEMPRE por confirmación humana**.
 
@@ -136,6 +138,8 @@ Cierra el loop **idear → guion/brief → producir → editar → mezclar → m
 - **NUNCA** clones una voz sin **consentimiento explícito**, ni uses música IA de licencia dudosa en un
   entregable comercial/cliente.
 - **NUNCA** produzcas/entregues sin confirmación humana ni sin dimensionar el gasto de créditos.
+- **NUNCA** cotices credits por pieza/hora/caracteres, conviertas costo vendor en credits, cobres un retry
+  técnico o escondas licencia/consentimiento/sync/master/buyout en el saldo. Usa `modules/11`.
 - **NUNCA** transcribas mal la marca: Efeonce ≠ Greenhouse. Ver `efeonce/EFEONCE_OVERLAY.md`.
 
 ## 6. Doctrina 2026 (lo que hay que creer este año)
@@ -168,3 +172,5 @@ Cada apuesta con su volatilidad en `SOURCES.md`:
 - `GLOSSARY.md` — vocabulario de audio 2026 (LUFS, gain staging, IVC/PVC, dubbing, foley, mnemonic…).
 - `ANTIPATTERNS.md` — los errores que arruinan un audio (y los legales que arruinan una entrega).
 - `efeonce/` — overlay: `EFEONCE_OVERLAY.md`, `STUDIO_TOOLING.md`, `AUDIO_BOUNDARY.md`, `CLIENT_DELIVERY.md`.
+- `modules/11_STUDIO_CREDITS_AND_RIGHTS.md` — frontera económica de audio, lifecycle, ejemplos por pieza,
+  retry vs cambio creativo, modos y rights fuera de credits.

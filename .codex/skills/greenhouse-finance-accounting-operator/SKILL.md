@@ -1,6 +1,6 @@
 ---
 name: greenhouse-finance-accounting-operator
-description: Investigate, design, audit, and explain Greenhouse finance and accounting work across management accounting, cost accounting, fiscal/tax treatment, treasury, cashflow, payments, reconciliation, P&L, budgeting, variance, forecasting, and financial controls.
+description: Investigate, design, audit, and explain Greenhouse finance and accounting work across management accounting, cost accounting, fiscal/tax treatment, treasury, cashflow, payments, reconciliation, P&L, budgeting, variance, forecasting, financial controls, and Creative Studio credit economics.
 ---
 
 # Greenhouse Finance & Accounting Operator
@@ -55,6 +55,7 @@ If the task is narrower, also read the domain-specific docs that apply:
 - treasury / bank / reconciliation: `docs/documentation/finance/modulos-caja-cobros-pagos.md`, `docs/documentation/finance/conciliacion-bancaria.md`
 - payroll-finance bridge: `docs/documentation/hr/pagos-de-nomina.md`, `docs/documentation/hr/periodos-de-nomina.md`
 - payment operations: `docs/documentation/finance/ordenes-de-pago.md`, `docs/documentation/finance/payment-orders-bank-settlement-resilience.md`
+- Creative Studio pricing, credits, margin, recognition, or ledger: `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md`, `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md`, and `docs/architecture/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_DECISION_V1.md`
 
 ## References
 
@@ -127,6 +128,21 @@ If the task is narrower, also read the domain-specific docs that apply:
 9. Prefer root-cause fixes in the canonical primitive over local patches in a dashboard or single endpoint.
 
 10. If the correct treatment is ambiguous, surface the ambiguity explicitly instead of silently classifying it.
+
+## Creative Studio Credits — Finance Boundary
+
+Use this section only when the request concerns Studio Credits or the Creative Studio business model. The canonical business-model and credit-model documents own the product definition; Finance owns cost, margin, accounting treatment, controls, and approval of economic equivalences.
+
+1. Model the five revenue lines separately: **governance/platform**, **human capacity**, **Studio Credits**, **implementation/IP**, and **rights/licenses/pass-through**. Never use credits to hide labor, platform governance, or third-party rights.
+2. A Studio Credit is a governed unit of generative consumption. It is **not** a piece, hour, currency, provider token, or provider invoice. Keep its customer-facing value provider-neutral and operating-mode-neutral.
+3. Deterministic layout, editing, mixing, mastering and export consume **0 credits**, but they do not have zero cost; attribute them to human capacity or implementation according to the contract. Direction, curation, QA, Account Lead and delivery management always belong to human capacity. Governance/platform covers workspace, policy, ledger, memory, security, observability and base support, never creative labor.
+4. First compute the expected variable cost of a valid operation: provider inference, compute/queue, variable storage/egress, failure/retry allowance, strictly incremental support/exception handling, and payment/FX exposure when applicable. Direction, curation and QA remain in human capacity. Use shadow-ledger distributions (`p50`, `p75`, `p95`), then select the credit band and package that sustain the canonical total gross-margin floor; margin is not itself a cost component.
+5. Track margin by account, delivery model, engagement form, operating mode, template/capability, and provider. Do not let aggregate margin conceal a loss-making capability or lane.
+6. The ledger is append-only across `allocate → estimate → reserve → approve → execute → settle/release/refund`. Technical/provider/Efeonce failures release or refund the reservation; a valid output followed by a new creative direction is new scope and a new estimate.
+7. Do not publish a CLP/USD equivalence, top-up price, expiration, rollover, breakage policy, or public checkout until Finance and Commercial approve it from observed data. Unused credits are not automatically free margin; revenue-recognition treatment depends on the enforceable contract and must be assessed under IFRS 15 with the accountant/auditor.
+8. Rights, likeness/voice releases, stock, music, talent, media, and other pass-throughs always stay outside the credit wallet. An approved SOW may sell them alongside credits, but only as a separate economic line.
+
+Recommended internal analysis fields: `delivery_model`, `engagement_form`, `operating_mode`, `capability`, `template_version`, `estimated_credits`, `reserved_credits`, `settled_credits`, `provider_cost`, `human_exception_cost`, `rights_cost`, `failure_class`, and `refund_reason`.
 
 ## Decision Framework
 

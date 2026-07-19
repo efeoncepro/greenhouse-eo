@@ -1,7 +1,7 @@
 # ESTADO ACTUAL — la línea entre la munición y el humo
 
 > **Este es el archivo más importante de la skill.** Todo lo demás se apoya acá.
-> **Verificado contra el repo y el runtime: 2026-07-13.**
+> **Verificado contra el repo y el runtime: 2026-07-19.**
 >
 > Un vendedor que promete una superficie que no existe **nos quema con el cliente que más nos costó ganar.**
 > Antes de prometer cualquier cosa en una propuesta, un deck o una reunión: **léelo acá.**
@@ -116,6 +116,23 @@ renovación te compara por precio como si fueras cualquiera. → `modules/12_RET
 ---
 
 ## 3. Economía — qué sabemos costear de verdad
+
+### Creative Studio / Studio Credits — 🟡 aprobados para validación, no para venta pública
+
+El Business Model y Credit Model V1 están formalizados en `docs/business-models/creative-studio/`, pero su
+estado es **`Approved for validation`**, no `Commercially approved`.
+
+✅ Se puede usar en piloto/SOW gobernado: tres ejes explícitos, cinco líneas económicas, shadow ledger con
+estimate/reservation/settlement/refund, Studio Credits como operaciones generativas gobernadas y ejemplos por
+pieza sólo para explicar composición.
+
+🔴 No se puede prometer todavía: precio público o `1 credit = $X`; packages/pools definitivos; top-up,
+checkout, rollover, expiración o “ilimitado”; acceso externo general; `Globe Credits` en paralelo; ni runtime
+productivo de credits dentro de Greenhouse.
+
+El gate requiere shadow data de 30–50 runs, p50/p95, margen total ≥45%, refund policy y sign-off de Finance,
+Legal/IP, Product/Architecture/Security, Operations/Creative Practice y Leadership.
+→ `modules/14_STUDIO_CREDITS.md`.
 
 ### ✅ REAL — el cotizador, y es serio
 
@@ -281,3 +298,5 @@ era de dos días antes que la fuente.)*
 5. Que **todos los clientes ya usan el portal** *(login activo declarado: 0%)*.
 6. Las **cifras de fricción de ICO** *(21 hrs/sem, 68%, 30% — sin auditoría de fuente)*.
 7. **Casos creativos** con métrica de negocio *(hoy no hay ninguno formalizado)*.
+8. **Studio Credits comercialmente disponibles**, top-ups, checkout, “Globe Credits” o precio por crédito
+   *(hoy: shadow/piloto aprobado, no commercial approval)*.

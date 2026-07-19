@@ -211,7 +211,7 @@ utilización firmwide** · **47% de las firmas pierde hasta USD 500k/año en hor
 | 🔴 **BCS · Attributable Lateness · TTM · Revenue Enabled** | **No están maduras** *(data-empty / shadow / narrativas)* |
 | 🔴 **`Creative Hub` · `ROI Reports` · `Exports` · `CVR trimestral`** | **Son viewCodes SIN página. NO existen** |
 | 🔴 **Un umbral nuevo comprometido para calmar la sala** | **No se salta la escalera de compromiso.** Un SLA mal escrito no se deshace: el cliente lo ve todos los días |
-| 🔴 **Un descuento sobre la línea de plataforma/gobierno** | **Costo marginal ≈ 0, y es lo único que el freelancer, el in-house y Superside no pueden darle. Descontarla es descontar la retención** |
+| 🔴 **Un descuento sobre plataforma/gobierno sin reducir alcance/SLA** | **Tiene costo operativo asignado y sostiene control, transparencia y switching cost; descontarla sin rediseño erosiona margen y retención** |
 | 🔴 **Cifras sin fuente** | Prohibidas: **21 hrs/sem · 68% bottlenecks · 30% del contenido · "8 segundos de atención"** *(→ `SOURCES.md` § Datos que NO se citan)* |
 
 ---

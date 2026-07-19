@@ -129,7 +129,17 @@ para WebP. Runbook: `docs/operations/web-media-delivery-tooling.md`.
   usage rights de cualquier referencia (cruza con módulo 06 para UGC/creador).
 - **Efeonce ≠ Greenhouse:** no transcribas marca; respeta el overlay (`efeonce/EFEONCE_OVERLAY.md`).
 
-## 6. Handoffs y cierre
+## 6. Accounting de Studio Credits
+
+Antes del handoff, si la pieza se produce en Creative Studio, construye un **operation map**: cada generación o
+transformación de imagen/video/audio es una operación estimable; cada paso determinístico/humano se marca como
+capacidad/gobierno y 0 Studio Credits. No uses `1 post`, `1 slide`, `1 Reel`, `1 hora` ni el saldo del provider
+como unidad. Reserva antes de ejecutar, liquida según outcome y conserva release/refund. La misma operación usa
+la misma banda en `efeonce-managed`, `co-operated` y `client-operated`; lo que cambia es operator,
+accountability y fee de capacidad. Canon:
+`docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md`.
+
+## 7. Handoffs y cierre
 
 - **Detalle de herramientas** (capacidades, endpoints, flujos, gotchas) → `efeonce/STUDIO_TOOLING.md`.
 - **Copy visible del portal Greenhouse** → `greenhouse-ux-writing` (no es copy social).

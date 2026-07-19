@@ -19,6 +19,11 @@ Before writing HTML, think at a high level:
 
 For small edits (fix a color, adjust timing, add one element), skip straight to the rules.
 
+If the composition belongs to Efeonce Creative Studio/Globe or the user asks about Studio Credits, read
+[references/studio-credits.md](references/studio-credits.md). HyperFrames authoring/render/exports are
+deterministic finishing and consume `0 Studio Credits`; only separately invoked generative capabilities are
+metered. Zero credits does not mean zero capacity cost, and this skill never reserves or settles the ledger.
+
 ### Visual Identity Gate
 
 <HARD-GATE>
@@ -346,6 +351,9 @@ Skip on small edits (fixing a color, adjusting one duration). Run on new composi
 
 - **[references/captions.md](references/captions.md)** — Captions, subtitles, lyrics, karaoke synced to audio. Tone-adaptive style detection, per-word styling, text overflow prevention, caption exit guarantees, word grouping. Read when adding any text synced to audio timing.
 - **[references/tts.md](references/tts.md)** — Text-to-speech with Kokoro-82M. Voice selection, speed tuning, TTS+captions workflow. Read when generating narration or voiceover.
+- **[references/studio-credits.md](references/studio-credits.md)** — Creative Studio accounting boundary:
+  deterministic composition/render/cutdowns = 0 credits; upstream generative operations, lifecycle, retries
+  and rights. Read for any Globe/Creative Studio run or credit question.
 - **[references/audio-reactive.md](references/audio-reactive.md)** — Audio-reactive animation: map frequency bands and amplitude to GSAP properties. Read when visuals should respond to music, voice, or sound.
 - **[references/css-patterns.md](references/css-patterns.md)** — CSS+GSAP marker highlighting: highlight, circle, burst, scribble, sketchout. Deterministic, fully seekable. Read when adding visual emphasis to text.
 - **[references/typography.md](references/typography.md)** — Typography: font pairing, OpenType features, dark-background adjustments, font discovery script. **Always read** — every composition has text.

@@ -42,7 +42,8 @@
 
 ## Gobernanza y entrega
 
-- ❌ **Generar audio IA en volumen sin dimensionar créditos** (~$0.18/min Seed Audio, etc.). ✅ Gasto gobernado.
+- ❌ **Generar audio IA en volumen sin estimate/reservation/approval** o convertir costo vendor en credits.
+  ✅ Estima por operación/segundos/tier/attempt; mix/master/export determinístico = `0 credits`.
 - ❌ **Entregar/publicar sin confirmación humana.** ✅ El estudio propone/produce; el operador aprueba.
 - ❌ **Entregar sin spec** (loudness/formato/sample-rate equivocados). ✅ `templates/mix-master-delivery-spec.md` + checklist.
 - ❌ **Transcribir mal la marca** (Efeonce ≠ Greenhouse). ✅ `efeonce/EFEONCE_OVERLAY.md`.

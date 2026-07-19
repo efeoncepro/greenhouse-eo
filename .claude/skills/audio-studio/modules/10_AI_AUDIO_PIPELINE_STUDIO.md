@@ -6,6 +6,8 @@
 > masteriza y cura**. **El landscape de modelos y — sobre todo — el licenciamiento es lo más
 > volátil**: reverifica antes de comprometer una herramienta `(as-of 2026-07 — reverificar)`.
 > Cierra con `efeonce/STUDIO_TOOLING.md`.
+> Para estimación, lifecycle, retries, ejemplos y rights carga
+> `modules/11_STUDIO_CREDITS_AND_RIGHTS.md`; este módulo no define una tarifa.
 
 ---
 
@@ -55,9 +57,10 @@ idear → guion/brief → [IA genera drafts: voz/música/SFX] → el humano DIRI
 > sin **permiso documentado del dueño de la voz**. Aplica a talentos, clientes y a cualquier
 > persona real. Sin consentimiento por escrito, no se clona.
 
-> **(c) Gasto gobernado.** Producir con IA **cuesta créditos**. Dimensiona el costo antes de
-> generar en volumen (ej. Seed Audio **~$0.18/min**; ElevenLabs por caracteres/minutos según
-> plan). No generes 40 variantes "a ver cuál queda" sin estimar el gasto.
+> **(c) Gasto gobernado.** Una operación generativa consume credits por segmento/duración/tier/attempt.
+> El costo vendor (ej. por minuto o caracteres) es sólo evidencia interna de calibración, nunca una
+> conversión pública. Estimate → reservation → approval antes de ejecutar; settlement/release/refund tras
+> review. No generes 40 variantes “a ver cuál queda” sin candidates/attempts aprobados.
 
 > **(d) Confirmación humana antes de entregar.** Ninguna pieza se publica ni se entrega sin que
 > un humano la escuche completa y apruebe. La IA no cierra el loop sola.
@@ -96,9 +99,10 @@ idear → guion/brief → [IA genera drafts: voz/música/SFX] → el humano DIRI
 
 ☐ Tarea clasificada y herramienta correcta del router · ☐ **licencia comercial verificada** para
 todo lo que sale a cliente/comercial · ☐ **consentimiento escrito** si se clona una voz ·
-☐ música de cliente vía ElevenLabs Music (Suno/Udio solo interno) · ☐ **gasto de créditos
-estimado** antes de generar en volumen · ☐ prototipo barato → dirección → versión final ·
+☐ música de cliente vía ruta licenciada/verificada · ☐ **gasto de credits estimado y reservado por
+operación/duración/tier/attempt** antes de volumen · ☐ prototipo barato → dirección → versión final ·
 ☐ humano dirige performance + mezcla + master · ☐ **confirmación humana antes de entregar** ·
+☐ retry técnico vs cambio creativo clasificado · ☐ settlement/release/refund conciliado ·
 ☐ fuente + licencia de cada asset IA documentada · ☐ WAV master guardado.
 
 > **Remite a** `efeonce/STUDIO_TOOLING.md` para el detalle operativo de las herramientas

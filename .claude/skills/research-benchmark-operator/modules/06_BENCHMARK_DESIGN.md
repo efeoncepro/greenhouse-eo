@@ -29,6 +29,18 @@ Sin normalizar, comparas peras con manzanas:
 - **Definiciones alineadas** entre fuentes (que "lead" signifique lo mismo).
 - Crea **unidades comparables** (por cliente, por campaña, por $1.000 de inversión).
 
+### Caso especial: benchmark de créditos creativos o AI production
+
+No compares el número nominal de “credits” entre proveedores: cada empresa define una unidad distinta. Normaliza por una **canasta reproducible de operaciones/capabilities**, calidad/aceptación, resolución o duración, iteraciones incluidas, latencia/SLA, derechos, intervención humana y modo de operación. Separa siempre:
+
+- fee de plataforma/gobernanza;
+- capacidad humana o managed service;
+- consumo generativo;
+- implementación/IP;
+- derechos/licencias/pass-through.
+
+La ausencia de precio público no equivale a precio cero ni autoriza inferir una tasa. Marca `not_public`, usa evidencia fechada y registra si el benchmark viene de pricing público, sales quote, prueba controlada o estimación. Para Efeonce, contrasta el hallazgo con el modelo canónico en `docs/business-models/creative-studio/`; el benchmark informa calibración, pero no redefine Studio Credits.
+
 ## Fuentes de datos de benchmark (2026)
 
 - **Presencia digital / competidor:** Semrush (tráfico, keywords, **AI Visibility Index**), social listening, análisis de sus canales.
@@ -50,6 +62,7 @@ Documenta el diseño **antes** de recolectar (plantilla `templates/benchmark-sco
 - [ ] **5–8 métricas primarias** con definición explícita (outcome + driver).
 - [ ] Métricas de competidor **observables externamente**.
 - [ ] **Normalización** definida (moneda, estacionalidad, mix, tamaño → ratios).
+- [ ] Si compara créditos creativos: canasta de operaciones, calidad, derechos, humanos y fees separados; unidades nominales no comparadas directamente.
 - [ ] Framework documentado antes de recolectar.
 
 ## Cross-links

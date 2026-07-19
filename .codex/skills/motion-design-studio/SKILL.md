@@ -1,42 +1,6 @@
 ---
 name: motion-design-studio
-description: >-
-  Skill experta de PRODUCCIÓN DE ANIMACIÓN CINEMATOGRÁFICA / BROADCAST de nivel
-  enterprise al estado del arte 2026 — el "estudio" que dirige y produce brand films,
-  spots, explainers, title sequences, motion graphics y video con IA y/o humanos, y lo
-  entrega como video renderizado. Dos manos: (1) conocimiento profundo del craft (los 12
-  principios de animación a nivel pro, timing/easing/ritmo, lenguaje cinematográfico —
-  cámara/lente/luz/composición en movimiento, storyboard→animatic→previs, motion graphics
-  + tipografía kinética + title sequences, edición/montaje/pacing, sound design + sync a
-  música, color grading + finishing, VFX/compositing — keying/roto/tracking/CGI/simulaciones),
-  y (2) capacidad de ejecución (dirige el pipeline IA
-  — Higgsfield Cinema Studio/Soul ID vía MCP + Runway Gen-4.5 / Seedance / Veo / Kling /
-  Gemini Omni —, integra craft humano AE/Blender/DaVinci, y hace handoff), cerrando el loop
-  idear→storyboard→animatic→producir→editar→finalizar→entregar. Es "humano + IA": el craft
-  (módulos 01-08) aplica anime quien anime; el pipeline IA (09) y la orquestación híbrida
-  (10) suman la mano moderna. COMPLEMENTARIA pero DISTINTA de motion-design: motion-design
-  es motion como LENGUAJE DE INTERFAZ (web/UI, implementado en código, runtime, reduced-
-  motion); motion-design-studio es motion como CINE/CRAFT (video renderizado). Delega a
-  motion-design/gsap/greenhouse-microinteractions-auditor (motion de UI runtime), a
-  design-studio (imagen fija / dirección de arte / Key Visual / matriz de modelos IA), a
-  social-media-studio (formato/duración/safe-zone/algoritmo por red), a digital-marketing
-  (estrategia creativa de campaña), a typography-design (craft fino de tipo), a
-  greenhouse-ai-image-generator (keyframes/stills para image-to-video), a los generadores
-  Higgsfield (higgsfield-* para producir el video IA) y a efeonce-agency (doctrina de marca).
-  Incluye overlay Efeonce (brand SSOT, mascota Nexa) y capa de delivery para clientes Globe.
-  Triggers: "animación", "animar", "motion", "motion design", "motion graphics", "mograph",
-  "video", "film", "brand film", "spot", "comercial", "publicidad audiovisual", "explainer",
-  "video explicativo", "title sequence", "intro", "opener", "cortinilla", "logo animation",
-  "animación de logo", "tipografía kinética", "kinetic typography", "cinematográfico",
-  "cinematic", "cámara", "storyboard", "animatic", "previs", "edición", "montaje", "corte",
-  "color grading", "grade", "sound design", "diseño sonoro", "banda sonora", "render",
-  "video IA", "AI video", "Higgsfield", "Runway", "Seedance", "Veo", "Kling", "Gemini Omni",
-  "image-to-video", "Soul ID", "consistencia de personaje", "After Effects", "Blender",
-  "DaVinci", "VFX", "efectos visuales", "compositing", "rotoscoping", "roto", "green screen",
-  "chroma", "keying", "tracking", "matchmove", "CGI", "Nuke", "Fusion", "Mocha", "Houdini",
-  "simulación", "matte painting", "reel", "sizzle", "trailer".
-user-invocable: true
-argument-hint: "[tarea o pregunta — ej: 'dirige un brand film de 30s para el grader', 'storyboard del title sequence de Glitch', 'anima el logo Efeonce', 'qué modelo IA para un spot cinematográfico con personaje consistente', 'audita este motion']"
+description: Dirige y produce video, animación cinematográfica y motion graphics enterprise con IA y humanos. Use for spots, reels, brand films, explainers, storyboards, edición, VFX, finishing, Studio Credits audiovisuales y delivery renderizado; no para motion de interfaz.
 ---
 
 # Motion Design Studio — Animación cinematográfica/broadcast 2026
@@ -72,7 +36,8 @@ argument-hint: "[tarea o pregunta — ej: 'dirige un brand film de 30s para el g
 
 1. **Clasifica la intención** (§2). ¿Es producción cinematográfica/broadcast? Si es motion de UI
    runtime, **delega** (§5) y para.
-2. **Carga el módulo o módulos** que apliquen (§3). No cargues los 11 — carga lo justo.
+2. **Carga el módulo o módulos** que apliquen (§3). No cargues todos — carga lo justo. Si la tarea
+   estima, reserva, explica o liquida Studio Credits, carga siempre el módulo 13.
 3. **Chequea frescura**: si vas a nombrar un modelo IA de video, feature o pipeline, reverifica
    (`SOURCES.md`).
 4. **Si hay que ejecutar** (dirigir/producir/editar/finalizar), abre `efeonce/STUDIO_TOOLING.md`
@@ -124,6 +89,7 @@ argument-hint: "[tarea o pregunta — ej: 'dirige un brand film de 30s para el g
 | 10 | `modules/10_PRODUCTION_STUDIO.md` | orquestar humano/IA/híbrido + gasto gobernado + handoff |
 | 11 | `modules/11_VFX_COMPOSITING.md` | compositing, keying, roto, tracking/matchmove, CGI, simulaciones, AI-VFX |
 | 12 | `modules/12_CREATIVE_WORKFLOWS.md` | elegir receta validada; clean shot→15/10/6; routing Omni/Seedance/post |
+| 13 | `modules/13_STUDIO_CREDITS_AND_ACCOUNTABILITY.md` | créditos por operación/duración/tier/attempt, lifecycle, retries, ejemplos reel/spot/cutdown y accountability |
 
 ## 4. La mano de ejecución (por qué es "studio")
 
@@ -143,9 +109,11 @@ Cierra el loop **idear → storyboard → animatic → producir → editar → f
   Omni sirve para microescena reinterpretada; Seedance 2.0 sólo para una toma/acción/continuidad nueva que
   preserve el mundo. Timing, crop, safe zone, copy/logo, grade, foley y mezcla pertenecen a post.
 
-> **Regla dura (director, no dictador).** El estudio **decide y dirige**, pero **producir/renderizar
-> con IA cuesta créditos** (gasto gobernado) y **entregar/publicar pasa SIEMPRE por confirmación
-> humana**. La IA acelera; el humano dirige y hace el finish. El juicio de marca no se delega al modelo.
+> **Regla dura (director, no dictador).** El estudio **decide y dirige**. Las **operaciones
+> generativas gobernadas** consumen créditos según duración/tier/attempt; storyboard, animatic, edición,
+> conform, mix/master y export determinísticos consumen **0 credits** aunque sí requieren capacidad.
+> Todo spend sigue `estimate → reservation → approval → execution → settlement/release/refund`, y
+> entregar/publicar pasa SIEMPRE por confirmación humana. Ver módulo 13.
 
 ## 5. Boundaries duros (lo que esta skill NO hace)
 
@@ -154,6 +122,8 @@ Cierra el loop **idear → storyboard → animatic → producir → editar → f
 - **NUNCA** produzcas la imagen fija / KV acá → `design-studio` (esta skill lo anima).
 - **NUNCA** afirmes qué modelo/feature/pipeline de video IA domina de memoria. Reverifica (§Frescura).
 - **NUNCA** produzcas/entregues sin confirmación humana ni sin dimensionar el gasto de créditos.
+- **NUNCA** cotices credits por pieza/hora, conviertas costo vendor en credits, cobres un retry técnico o
+  escondas derechos de voz/música/likeness en el saldo. Usa `modules/13` y el rate versionado del Studio.
 - **NUNCA** uses IA que confunda con real sin criterio de disclosure cuando aplique, ni la mascota
   Nexa / ilustraciones propietarias de Efeonce como si fueran stock. Ver `efeonce/EFEONCE_OVERLAY.md`.
 - **NUNCA** transcribas mal la marca: Efeonce ≠ Greenhouse; `AxisWordmark` solo interno.
@@ -196,6 +166,8 @@ Cada apuesta con su volatilidad en `SOURCES.md`:
   no es una receta ejecutable.
 - `modules/12_CREATIVE_WORKFLOWS.md` — router compacto de esas recetas y de la regla: un output de IA
   completado es candidato técnico, no aprobación creativa.
+- `modules/13_STUDIO_CREDITS_AND_ACCOUNTABILITY.md` — frontera económica audiovisual: operación vs.
+  pieza, lifecycle, retries, modos y ejemplos ilustrativos de reel/spot/cutdown.
 - `spot-studio/SPOT_STUDIO.md` — **sistema de producción de spots** (IA + humano): pipeline por etapas +
   gates que garantizan el acabado final + lanes (UI-crisp/Omni/product-real) + checklists (animatic gate,
   finish pre-flight) + 4 pilares. Léelo al producir un **spot/brand film completo** (no una toma suelta).

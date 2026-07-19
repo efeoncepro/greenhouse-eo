@@ -77,6 +77,9 @@ argument-hint: "[tarea o pregunta — ej: 'audita este key visual', 'diseña una
    `efeonce/EFEONCE_OVERLAY.md` / `efeonce/CLIENT_DELIVERY.md`.
 6. **Cierra con un artefacto** de `templates/` (brief, scorecard de auditoría, mood board,
    prompt sheet, sistema visual, crítica, spec de entrega), no con prosa suelta.
+7. Si el trabajo corre dentro de **Creative Studio / Efeonce Globe**, carga el Business Model y el Credit
+   Model canónicos enlazados en `efeonce/CLIENT_DELIVERY.md`. Cotiza la producción generativa por operación;
+   nunca conviertas una pieza, una hora o el costo de un provider en la unidad de crédito.
 
 ## 2. Árbol de decisión (a qué skill pertenece)
 
@@ -213,3 +216,5 @@ Cada apuesta con su volatilidad en `SOURCES.md`:
   routing de finish y cierre determinístico premium.
 - `efeonce/` — overlay: `EFEONCE_OVERLAY.md`, `STUDIO_TOOLING.md`, `DESIGN_BOUNDARY.md`,
   `CLIENT_DELIVERY.md`.
+- `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md` — contrato económico
+  canónico de Studio Credits; no duplicar bandas ni equivalencias dentro de esta skill.

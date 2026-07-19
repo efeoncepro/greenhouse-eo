@@ -154,10 +154,12 @@ completa es dinero y azar; la edición es cirugía barata.
 
 ## 6. Gasto y disciplina (puente a `modules/09`)
 
-Generar cuesta créditos. **Dimensiona antes de producir en volumen.** Diverge barato en
+Generar tiene costo variable y, dentro de Creative Studio, devenga Studio Credits sólo por la operación
+generativa gobernada. **Dimensiona antes de producir en volumen.** Diverge barato en
 miniaturas, elige, *después* subes calidad/cantidad de la elegida. No sacas 20 variantes en
 4K de una dirección sin validar; sacas 12 miniaturas, eliges 2, y esas 2 van a 4K + upscale.
-Gobernanza completa del gasto en `modules/09` y `efeonce/STUDIO_TOOLING.md`.
+No confundas vendor spend con créditos, ni cobres la pieza, curaduría o QA como inferencia. Gobernanza completa
+del gasto en `modules/09` y `efeonce/STUDIO_TOOLING.md`.
 
 ---
 

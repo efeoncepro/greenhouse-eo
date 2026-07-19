@@ -11,6 +11,17 @@
 
 ## 1. Alcance de los servicios
 
+### 1.0 Configuración de responsabilidad
+
+| Eje | Selección |
+|---|---|
+| Modelo de delivery | {{Managed Squad / Staff Augmentation / Studio Access / hybrid por lanes}} |
+| Forma de engagement | {{On-Going / On-Demand / Sample Sprint}} |
+| Modo operativo por lane/run | {{efeonce-managed / co-operated / client-operated}} |
+
+Para cada lane/run: **operator:** {{}} · **creative approver:** {{}} · **budget approver:** {{}} ·
+**delivery/failure owner:** {{}}. `Co-operated` nunca significa responsabilidad conjunta sin owner.
+
 ### 1.1 Entregables
 
 🔴 **Contados y descritos.** *"Piezas para redes sociales"* no es un entregable: es una demanda futura sin
@@ -160,7 +171,45 @@ ANTES de su ejecución**, indicando alcance, plazo y valor.
 
 ---
 
-## 6. Plazos y urgencias
+## 6. Studio Credits *(si aplica)*
+
+> Un Studio Credit representa una operación generativa gobernada. No es pieza, hora, token, dinero, licencia
+> ni costo directo del provider. La misma operación consume la misma banda en cualquier modo operativo.
+
+| Campo | Acuerdo |
+|---|---|
+| Pool/envelope y período | {{}} |
+| Capability/template scope | {{}} |
+| Quality tiers permitidos | {{}} |
+| `credit_rate_version` | {{}} |
+| Estimate y tolerancia | {{rango visible + approval bounds}} |
+| Reservation/expiración de hold | {{}} |
+| Budget approver y caps | {{}} |
+| Momento de settlement | {{}} |
+| Release/refund | {{policy version + failure owner}} |
+| Rollover/expiry/top-up | {{sólo si Finance/Legal lo aprobaron; de otro modo N/A}} |
+
+**No consume credits:** discovery, briefing, ideación, dirección, curation, aprobación, QA/rights review,
+layout/edición/mix/master/export determinístico y reuse sin nueva inferencia. Su costo se cubre en las líneas de
+gobierno, capacidad o implementación.
+
+| Causa | Tratamiento |
+|---|---|
+| error provider/plataforma/template Efeonce sin output útil | retry, release o refund; no doble cobro |
+| error Efeonce sobre brief aprobado | Efeonce absorbe |
+| candidato válido no elegido dentro de exploración aprobada | settlement según estimate/policy |
+| cambio de dirección posterior a aprobación | nuevo estimate/run y, cuando corresponda, orden de cambio |
+| input/derechos incorrectos provistos por cliente | pausa + revisión/reestimate según costo irreversible |
+
+Rights, stock, talento, voz/likeness, música, territorio, plazo, exclusividad y buyout permanecen separados.
+El ledger es append-only: un refund compensa; no borra el settlement histórico.
+
+🔴 Esta sección no habilita precio público, top-up, rollover, expiración o “ilimitado” si el Business Model
+sigue `Approved for validation`. Esas condiciones exigen commercial approval documentado.
+
+---
+
+## 7. Plazos y urgencias
 
 | | |
 |---|---|
@@ -180,10 +229,14 @@ ANTES de su ejecución**, indicando alcance, plazo y valor.
 - [ ] 🎯 **Definición de qué ES una ronda** *(consolidada · una voz · un envío)*
 - [ ] **Reloj de feedback** + cláusula de aprobación tácita
 - [ ] **Responsable del brief** nombrado, con autoridad
+- [ ] Tres ejes declarados y **owner por lane/run**
 - [ ] **Derechos de uso**: canal + territorio + plazo + exclusividad, **cotizados aparte**
 - [ ] Lo que **NO se cede** *(archivos abiertos, metodología, licencias de terceros)*
 - [ ] 🎯 **Autorización de portafolio** — **¡no la omita!**
 - [ ] **Orden de cambio**: disparadores, quién aprueba, y **que los errores propios no se cobran**
+- [ ] Si hay credits: pool/scope/rate version + estimate/reservation/approval/settlement/refund
+- [ ] Trabajo sin credits y rights/pass-through separados; **cero precio por pieza/provider**
+- [ ] Top-up/rollover/expiry sólo con **commercial approval**
 - [ ] **Urgencias** con precio
 - [ ] Métricas: **sin umbrales comprometidos** antes del baseline
 - [ ] **Revisión legal** → `legal-privacy-ip-operator`

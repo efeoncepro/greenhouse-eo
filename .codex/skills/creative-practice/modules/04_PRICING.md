@@ -59,6 +59,7 @@ recibió un pedido de **"descuento por IA"**. La IA comprime el entregable **3-4
 | **Horas** | Tu **costo** | 🔴 Te negocia el costo. Y cuando la IA te lo baja, **te exige el descuento.** |
 | **Piezas** | Un **commodity con precio unitario** | 🔴 Divide cualquier propuesta futura por ese número. **Le diste la calculadora.** |
 | 🎯 **Capacidad gobernada** | Un **equipo que cumple** | 🎯 Te compara con **el costo de tener ese equipo** — que es 5-10× más caro. |
+| 🎯 **Acceso + Studio Credits** | Un sistema gobernado + consumo generativo auditable | 🎯 Puede prever/limitar uso sin comprar tokens ni esconder personas/derechos |
 
 > ## Facturar por hora es poner tu estructura de costos en la factura para que te la negocien.
 > **Y en 2026, tu propio ahorro de IA se convierte en el argumento del cliente para pagarte menos.**
@@ -280,22 +281,40 @@ por el outcome**. **Cobrar un Managed Squad a precio de staff-aug es regalar la 
 
 ---
 
-## 8. La capa de gobierno — la línea que NUNCA se descuenta
+## 8. Las cinco líneas económicas — sin doble cobro
 
-Toda oferta creativa tiene **tres capas**, y se cotizan por separado:
+Creative Studio compone el precio con cinco líneas. Separarlas permite calcular margen, asignar riesgo y
+explicar qué compra el cliente sin vender horas, piezas ni tokens.
 
-| Capa | Qué es | Descontable |
+| Línea | Qué es | Tratamiento |
 |---|---|---|
-| **Capacidad** | El squad (FTE × roles) | ⚠️ Sí, **bajando alcance** *(menos capacidad = menos precio)* |
-| 🎯 **Gobierno** | Portal, métricas (OTD/FTR/RpA), reportería, account lead, QA | 🔴 **NUNCA** |
-| **Derechos de uso** | Licencia, exclusividad, plazo, territorio | Se **negocia**, no se regala (→ `modules/05_SCOPE_SOW.md`) |
+| 🎯 **Gobierno/plataforma** | workspace, policy, ledger, memoria, observabilidad, seguridad y soporte base | 🔴 **Nunca se descuenta** |
+| **Capacidad humana** | squad, dirección, producción, curation, QA y delivery management | Puede bajar sólo si baja capacidad/alcance |
+| **Studio Credits** | operaciones generativas variables gobernadas | pool/envelope; nunca precio por pieza/token/provider |
+| **Implementación/IP** | onboarding, Brand Profile, templates, workflows, integración y training | milestone/aceptación; no regalar buyout del método |
+| **Derechos/licencias/pass-through** | stock, talento, voz, música, territorio, exclusividad y terceros | se negocia/cotiza aparte; no se esconde en credits |
 
-🔴 **Por qué el gobierno no se descuenta:** su costo marginal es ≈ 0 **y es lo único que el freelancer, el
-in-house y Superside no pueden darle.** Descontarlo es regalar **margen puro** *y* **devaluar tu único
-diferenciador** en el mismo movimiento.
+🔴 **Por qué el gobierno no se descuenta sin rediseño:** workspace, policy, ledger, seguridad, observabilidad
+y soporte base tienen costo operativo asignado y sostienen control, transparencia y switching cost. Un descuento
+sin reducir alcance/SLA erosiona margen y **devalúa el diferenciador** en el mismo movimiento.
 
 > ## Descuenta capacidad. Nunca descuentes el gobierno.
 > **Si el cliente quiere pagar menos, que reciba menos capacidad — no menos transparencia.**
+
+### Studio Credits: primero shadow, después pricing
+
+No derives una tarifa desde list prices del provider ni desde los ejemplos por pieza. La secuencia obligatoria
+es: 30–50 runs instrumentados → costo p50/p75/p95 → bandas semánticas simples → shadow settlement → test de
+comprensión → validación de margen total ≥45% → sign-off Finance/Legal/Product/Operations/Leadership.
+
+Hasta commercial approval:
+
+- no existe `1 credit = $X` público;
+- no existen pool sizes, overage/top-up, rollover o expiración aprobados;
+- los credits sólo son shadow ledger o allowance en SOW piloto aprobado;
+- rights, humanos, gobierno e implementación permanecen líneas separadas.
+
+Método, lifecycle, refunds y ejemplos explicativos → `modules/14_STUDIO_CREDITS.md`.
 
 ---
 
@@ -368,6 +387,9 @@ para cerrar **nunca vuelve a subirlo, y además enseñó que su primer precio er
 - [ ] ¿El **ad-hoc cuesta MÁS** que el marginal del plan?
 - [ ] ¿El **plan mayor NO está dominado** por el menor + ad-hoc?
 - [ ] ¿La capa de **gobierno** está cotizada y **marcada como no descontable**?
+- [ ] ¿La propuesta separa **gobierno, capacidad, credits, implementación/IP y derechos/pass-through**?
+- [ ] Si hay credits: ¿la equivalencia viene de shadow data versionada y tiene **commercial approval**?
+- [ ] ¿No existe doble imputación de trabajo humano, soporte o derechos dentro del credit?
 - [ ] ¿Los **derechos de uso** están cotizados aparte?
 - [ ] ¿El supuesto de **FX** está declarado si el contrato es multianual?
 

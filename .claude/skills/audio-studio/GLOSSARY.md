@@ -57,3 +57,18 @@
 - **Licencia comercial**: el derecho a usar el audio en algo monetizado/cliente. **ElevenLabs Music** la da
   desde día 1; **Suno/Udio** tienen historia más compleja. Documenta la fuente.
 - **Consentimiento de voz**: permiso explícito del dueño para clonar/usar su voz. No opcional.
+
+## Creative Studio — economía gobernada
+
+- **Studio Credit**: unidad provider-neutral de una operación generativa gobernada; no es dinero, token,
+  hora, pieza, caracteres, licencia ni costo de proveedor.
+- **Capability / quality tier / attempt**: operación semántica, banda de calidad y cada intento auditable.
+  En audio, segmento, segundos, idioma, voice/music/SFX tier y attempts son drivers del estimate.
+- **Estimate / reservation / settlement**: rango informativo; hold idempotente aprobado; y consumo elegible
+  conciliado después de review. **Release** libera remanente; **refund adjustment** compensa sin borrar historia.
+- **Retry técnico vs cambio creativo**: falla provider/plataforma/spec objetiva no se cobra dos veces; guion,
+  idioma, voz, tempo o mood nuevos tras output válido crean branch y estimate nuevos.
+- **Deterministic post**: edición, cleanup, mix/master, loudness, stems, cutdowns y export sin nueva inferencia
+  consumen `0 credits`, aunque sí capacidad.
+- **Rights outside credits**: consentimiento de voz/likeness, licencia, composición/master, sync, talento,
+  territorio, plazo, exclusividad y buyout nunca se compran con saldo.

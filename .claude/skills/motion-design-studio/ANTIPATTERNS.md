@@ -29,7 +29,8 @@
 - ❌ **Dejar que el personaje "derive"** entre tomas. ✅ Soul ID / Voice Binding / refs para bloquear rostro y voz.
 - ❌ **Pedir tomas >10s, handheld o through-object directo** (fallan). ✅ Chunks 5–8s + montar; grano/shake en
   post; plates estáticos + moves en post.
-- ❌ **Generar 30 variantes en 4K sin animatic.** Quema créditos. ✅ Dimensiona el gasto, diverge barato,
+- ❌ **Generar 30 variantes en 4K sin animatic.** Multiplica operaciones/attempts. ✅ Estima por
+  duración/tier/attempt, reserva, aprueba, diverge barato,
   sube calidad de la elegida; upscale final con Magnific.
 - ❌ **Delegar el juicio de marca a la IA.** ✅ IA acelera; el humano dirige, cura y hace el finish.
 - ❌ **Usar Seedance para arreglar timing, crop, texto/logo, grade o audio.** ✅ Seedance 2.0 sólo cuando
@@ -66,7 +67,8 @@
 
 ## Gobernanza y entrega
 
-- ❌ **Producir/renderizar IA sin dimensionar el gasto de créditos.** ✅ Gasto gobernado; chunks; diverge barato.
+- ❌ **Invocar operaciones generativas sin estimate/reservation/approval.** ✅ Gasto gobernado por
+  duración/tier/attempt; chunks; diverge barato; render/export determinístico = `0 credits`.
 - ❌ **Entregar/publicar sin confirmación humana.** ✅ El estudio propone/produce; el operador aprueba antes de que salga.
 - ❌ **Pasar IA como real sin criterio de disclosure** cuando el contexto lo exige. ✅ "Ante la duda, revela".
 - ❌ **Entregar sin spec** (aspect/fps/codec/loudness/color-space equivocados). ✅ `templates/motion-delivery-spec.md` + checklist.

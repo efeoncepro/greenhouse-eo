@@ -45,7 +45,9 @@
 - **Modelo IA elegido:** [ElevenLabs Music · Suno · Udio · otro] · **versión/`as-of`:** [reverificar]
 - **Licencia requerida por el uso:** [comercial día 1 → ElevenLabs Music · interno → Suno/Udio]
 - **Licencia verificada:** [sí/no · fuente · fecha] — *cambia por trimestre, no asumas*
-- **Presupuesto de créditos:** [nº aprox] · **aprobado por:** [quién]
+- **Plan/estimate de Studio Credits:** [capability × segundos × tier × candidates/attempts · rango · rate version · reservation] · **budget approver:** [quién]
+- **Post determinístico (`0 credits`):** [edición de estructura/duración · stems · mix/master · exports]
+- **Rights separados:** [composición/master · sync · territorio/plazo · exclusividad/buyout]
 
 ## 6. Variantes y edición humana
 

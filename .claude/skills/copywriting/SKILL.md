@@ -205,11 +205,20 @@ Copywriting es el **craft**; las vecinas gobiernan/deciden. Detalle + precedenci
 | **Contenido para búsqueda** | el craft del artículo | táctica SEO/AEO/GEO/schema → **`seo-aeo`** |
 | **Marca / voz** | *aplicar y extender* la voz en el craft | doctrina de marca/voz/posicionamiento → **`efeonce-agency`** + `docs/context/05_voz-tono-estilo.md` |
 | **Email** | el copy del email | plantillas/entrega runtime → **`greenhouse-email`** |
+| **Creative Studio: oferta, modalidades o créditos** | explicar con claridad sin inventar claims | taxonomía, pricing y ledger → Business Model + Credit Model canónicos; `efeonce-agency` / Finance |
 
 **Regla de oro:** si la pregunta es *cómo redactar/estructurar/afinar las palabras* → es
 esta skill. Si es *dónde vive el texto, si convierte, en qué canal, o la doctrina de marca*
 → es la skill dueña. Copywriting craftea; las otras gobiernan. Cuando cruza, **nómbralo y
 encadena**.
+
+Para Creative Studio, nunca uses como sinónimos `Managed Squad` y `efeonce-managed`, ni presentes
+`On-Going`, `On-Demand` o `Sample Sprint` como operating modes. No escribas `1 crédito = $X`, precio por pieza,
+saldo “ilimitado” ni banda ilustrativa como aprobada. La unidad es **Studio Credits** (no alternar con “Globe
+Credits” sin una decisión de naming) y representa operaciones generativas gobernadas; copy, layout, QA, export,
+capacidad y derechos no se esconden dentro de ella. Fuentes:
+`docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md` y
+`docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md`.
 
 ---
 

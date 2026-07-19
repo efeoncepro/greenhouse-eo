@@ -27,6 +27,15 @@ PILLAR: Data study "Estado del AEO en Chile 2026" (blog + PDF)
 
 Un data study se convierte en **8–10 activos** con una fracción del esfuerzo de producir 8 piezas originales.
 
+### Implicación de Studio Credits
+
+Atomizar no significa multiplicar créditos por el número de piezas. Un pillar puede alimentar newsletter,
+carrusel, deck y posts con **0 nuevas operaciones generativas** si reutiliza el anchor y compone copy/layout de
+forma determinística. Sólo devengan las generaciones o transformaciones nuevas realmente ejecutadas —por
+ejemplo un hero nuevo, un clip generativo o un outpaint necesario— bajo estimate/reservation aprobados. La
+edición, crop, layout, export, QA y distribución siguen siendo capacidad/gobierno. Derechos de música, voz,
+creator, stock o likeness permanecen separados.
+
 ## Matriz de atomización por tipo de pilar
 
 | Pilar | Átomos de alto rendimiento |
@@ -67,6 +76,8 @@ Repurposing no es solo atomizar hacia afuera; es **exprimir el activo en el tiem
 - [ ] Átomos **secuenciados en el tiempo**, con cross-link al pilar y linaje etiquetado.
 - [ ] Plan de **refresh** para los pillars evergreen.
 - [ ] Hand-offs nombrados (copywriting / studios de asset / social-media-studio / runtime).
+- [ ] El mapa distingue reutilización/producción determinística (0 Studio Credits) de nuevas operaciones
+      generativas; no multiplica créditos por cantidad de átomos.
 
 ## Cross-links
 

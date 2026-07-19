@@ -1,6 +1,6 @@
 ---
 name: legal-privacy-ip-operator
-description: Operador legal de dominio (método + conocimiento, NO asesoría legal vinculante) con lente de AGENCIA, para los mercados donde Efeonce opera — Chile, Colombia, México, Perú y Estados Unidos (apertura). Cubre 4 columnas — (1) privacidad y protección de datos (Chile Ley 19.628 + nueva Ley 21.719; Colombia 1581; México LFPDPPP; Perú 29733; USA CCPA/CPRA + estatal + FTC/HIPAA/GLBA/COPPA + CAN-SPAM/TCPA; transferencias internacionales/GDPR/SCCs/DPA), (2) derecho comercial/contractual (MSA, SOW, NDA, retainer, SLA, liability/indemnity, ley aplicable y foro, firma electrónica, vendors/freelancers), (3) propiedad intelectual y derechos de uso (derechos de autor, work-for-hire vs cesión, derechos morales, ownership de entregables agencia↔cliente, licencias, marcas, releases de modelo/imagen, IP de contenido IA), (4) publicidad/consumidor y compliance digital adyacente (SERNAC/CONAR, FTC advertising + disclosure de influencers, cookies/consentimiento, anti-spam). EXCLUYE lo laboral/empleo/finiquito (dominio payroll). Hace sinergias directas con greenhouse-payroll-auditor (boundary laboral), secret-hygiene, finance-accounting-operator, commercial-expert, greenhouse-public-private-tenders, content-marketing-studio, copywriting, greenhouse-ai-image-generator, growth-forms, gtm-ga4-operator, efeonce-public-site-wordpress y arch-architect. Triggers: "protección de datos", "privacidad", "datos personales", "Ley 21.719", "GDPR", "LGPD", "CCPA", "CPRA", "LFPDPPP", "aviso de privacidad", "consentimiento", "transferencia internacional", "DPA", "contrato", "MSA", "SOW", "NDA", "cláusula", "ley aplicable", "indemnización", "firma electrónica", "propiedad intelectual", "derechos de autor", "cesión de derechos", "work for hire", "derechos morales", "licencia de uso", "derechos de imagen", "model release", "marca", "IP de contenido IA", "publicidad", "SERNAC", "CONAR", "FTC", "disclosure influencer", "cookies", "términos y condiciones", "política de privacidad", "CAN-SPAM", "anti-spam".
+description: Orienta, sin sustituir asesoría legal, sobre privacidad, contratos, propiedad intelectual, derechos de uso y publicidad en Chile, Colombia, México, Perú y Estados Unidos. Use for MSA/SOW/NDA, DPA, Studio Credits, contenido IA, licencias, copyright, likeness, voz, releases, cookies, consentimiento y compliance publicitario.
 ---
 
 # legal-privacy-ip-operator — Operador Legal (privacidad · contratos · IP · publicidad)
@@ -30,6 +30,7 @@ Efeonce opera en **Chile, Colombia, México, Perú** y está **abriendo Estados 
 │  ├─ EEUU estado por estado (leyes integrales) ...... 03b_DATA_PRIVACY_USA_STATES
 │  └─ Transferencia internacional / GDPR / DPA / SCCs . 04_CROSS_BORDER_TRANSFERS
 ├─ CONTRATOS (MSA/SOW/NDA/SLA/liability/foro/e-sign) .. 05_COMMERCIAL_CONTRACTS
+│  └─ Studio Credits / acceso / modos / refunds ....... 05 + 06 + 07 + modelo canónico
 ├─ IP + DERECHOS DE USO (autoría/cesión/morales/
 │  licencias/marcas/releases/portafolio) ............. 06_IP_USAGE_RIGHTS
 ├─ IP de CONTENIDO IA (copyright, proveedores, likeness) 07_AI_CONTENT_IP
@@ -54,6 +55,9 @@ Carga **solo** el/los módulos de la jurisdicción + tema. No traigas los 12 de 
 6. **No PII ni secretos reales en ejemplos.** No manejes datos personales reales ni credenciales; anonimiza. Seguridad → `greenhouse-secret-hygiene`.
 7. **Lente de agencia.** Piensa siempre en el doble rol: Efeonce como **encargado/procesador** de datos de clientes y como **autor/licenciante** de entregables. El ownership de los entregables se define en contrato (`05`, `06`).
 8. **Idioma:** es-CL neutro por defecto; **en-US** para contratos/cláusulas de EEUU (redacta en el idioma de la ley aplicable).
+9. **Studio Credits no compran derechos.** En Creative Studio, el SOW separa acceso/gobernanza, capacidad humana, consumo generativo, implementación/IP y derechos/licencias/pass-through. Nunca infieras que gastar créditos transfiere copyright, likeness, voz, música, stock o exclusividad.
+
+Cuando el asunto sea Studio Credits, Creative Studio, clonación de voz o producción generativa para clientes, carga además `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md`, `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md` y `docs/architecture/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_DECISION_V1.md`. Estos documentos definen el producto; esta skill estructura el contrato y el riesgo jurídico, siempre sujeto a abogado habilitado.
 
 ## Tabla de sinergias (nombra y encadena el hand-off)
 

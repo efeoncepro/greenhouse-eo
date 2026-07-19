@@ -21,6 +21,8 @@ Read only what the task needs:
   or the campaign includes motion, print/OOH or explicit branded/brand-light/neutral/client modes
 - `../design-studio/modules/13_LAYOUT_DESIGN_AND_FINISHING.md` when static campaign pieces need controlled
   ratio layouts, generative finishing and deterministic copy/brand composition
+- `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md` when generation runs through
+  Creative Studio / Efeonce Globe or the task asks for estimates, reservations, credits, retries or refunds
 - `DESIGN.md` when the asset will appear in UI
 - `AGENTS.md`, `project_context.md`, `Handoff.md` for repo coordination
 
@@ -144,6 +146,24 @@ Fal.ai is a programmatic media-generation aggregator — one API fronts many mod
 - For the full capability contract, prices, dimensions, GPT limits, measured benchmark and
   hybrid handoff schema, load `references/seedream-5-gpt-image-2-hybrid-production.md`.
 - **State (2026-07-06): OPERATIONAL — key persisted + real generation verified end-to-end.** Secret `greenhouse-fal-api-key` in GCP Secret Manager + `FAL_API_KEY_SECRET_REF` in `.env.local`; `runFalModel('fal-ai/flux/schnell')` returns `ok:true` HTTP 200 with a real image (`secretSource=secret_manager`). Key temporary (rotation pending). Not wired to Vercel runtime. **Queue-URL gotcha:** for sub-path models fal returns `status_url`/`response_url` on the PARENT app — never reconstruct polling URLs from the slug (→ 405). Full contract: `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`.
+
+## Studio Credits boundary
+
+This skill executes image operations; it does not define price, packages or credit bands. In Creative Studio:
+
+- `image_generate`, `image_transform` and generative upscale may accrue Studio Credits when estimated,
+  approved and auditable;
+- selecting candidates, art direction, QA, rights review, deterministic copy/logo composition, layout, export,
+  local matting and reuse of an approved asset accrue **0 Studio Credits** while still consuming
+  governance/capacity;
+- a post, carousel, KV or adaptation is never itself the credit unit: count the governed generative operations
+  inside it;
+- a technical/provider/platform failure without usable output follows release/refund policy and is not silently
+  charged twice; a client-directed branch after a valid output needs a new estimate;
+- provider spend is internal evidence. Rights, stock, talent, likeness and licences remain separate lines.
+
+The lifecycle is `estimate → reservation → approval → execution → settlement | release | refund adjustment`.
+Do not publish `1 credit = money`, vendor→credit conversion, per-piece tables or illustrative bands as approved.
 
 ## Workflow
 

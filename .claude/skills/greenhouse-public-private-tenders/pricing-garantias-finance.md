@@ -26,6 +26,22 @@ Dos verdades que conviven:
 
 En público con precio dominante, cost-plus disciplinado gana más que "adivinar" un precio agresivo.
 
+## Si el alcance incluye Creative Studio o producción generativa
+
+Lee el modelo y credit model canónicos en `docs/business-models/creative-studio/`. La hoja interna de pricing separa siempre:
+
+1. acceso, gobernanza y soporte de plataforma;
+2. capacidad humana de Managed Squad o Staff Augmentation;
+3. Studio Credits para operaciones generativas gobernadas;
+4. implementación, integraciones e IP reusable/específica;
+5. derechos, licencias y pass-throughs (stock, música, talento, likeness/voz, medios y otros terceros).
+
+Un Studio Credit no equivale a una pieza, hora, moneda, token o costo de proveedor. Una pieza se **estima** como una secuencia de operaciones generativas más trabajo determinista y humano: la generación puede consumir créditos; layout, edición, mezcla, mastering, export y QA deterministas consumen 0 créditos, pero se costean en capacidad/gobernanza. Derechos y licencias permanecen fuera del wallet.
+
+Para bids que exigen precio total o precio unitario por entregable, presenta el formato solicitado, pero conserva internamente el desglose anterior, el supuesto de mix, los créditos estimados, capacidad, derechos y margen. Los rangos por pieza son estimaciones de alcance, no una paridad contractual perpetua.
+
+No publiques equivalencia CLP/USD por crédito, top-ups, expiración, rollover o checkout mientras sean provisionales. Usa shadow ledger y escenarios `p50/p75/p95`; Finance y Commercial deben aprobar cualquier equivalencia. Error técnico/proveedor/Efeonce libera o reembolsa créditos; un output válido seguido por cambio de dirección creativa es una nueva estimación/change order.
+
 ## Indexación: UF y UTM
 
 - **UF** (Unidad de Fomento): reajuste diario por IPC. Contratos plurianuales o con costos que suben conviene expresarlos/reajustarlos en UF para no perder margen con inflación. Verifica si las bases lo permiten.

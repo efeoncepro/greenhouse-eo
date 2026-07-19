@@ -149,7 +149,7 @@ mide cada canal. Nunca saltes a "hagamos TikTok" sin objetivo/audiencia/mensaje.
 | **Content marketing**: estrategia editorial, formatos, distribución, repurposing, thought leadership, content-led demand, GEO como canal | `modules/02_CONTENT_MARKETING.md` — para **ejecución profunda del motor de contenidos** (content ops/pipeline, producción, atomización, formatos, medición contenido→pipeline, Content Factory) → skill **`content-marketing-studio`** |
 | **Paid media / performance advertising**: Google/Meta/LinkedIn/TikTok, PMax/Advantage+, programmatic, retargeting, cuentas, bidding, presupuesto, creative testing, signal loss, IA | `modules/03_PAID_MEDIA.md` ⭐ |
 | **Social orgánico + comunidad** (nivel canal/estrategia): rol de social en el mix, calendario dentro de la campaña integrada | `modules/04_ORGANIC_SOCIAL_COMMUNITY.md` — para **ejecución profunda por red** (algoritmos/formatos/comunidad/creator/social commerce/producción + programar con Metricool) → skill **`social-media-studio`** |
-| **Creatividad y video**: creative strategy, creative-as-targeting, hooks, formatos, video-first, UGC ads, IA creativa | `modules/05_CREATIVE_VIDEO.md` |
+| **Creatividad y video**: creative strategy, creative-as-targeting, hooks, formatos, video-first, UGC ads, IA creativa | `modules/05_CREATIVE_VIDEO.md`; producción/credits → skills Creative Studio |
 | **Email marketing / automation como canal**: newsletters, campañas, nurture/drip, segmentación, MAP | `modules/06_EMAIL_MARKETING_AUTOMATION.md` |
 | **Campañas integradas / GTM launches**: orquestación multicanal, messaging architecture, calendarios, presupuesto, PR digital, influencer, **ABM** | `modules/07_INTEGRATED_CAMPAIGNS.md` |
 | **Martech / marketing ops**: stack, CDP, first-party data, **taxonomía UTM/campaña**, tag management, reporting, consolidación | `modules/08_MARTECH_MARKETING_OPS.md` |
@@ -250,3 +250,8 @@ marketing), **nómbralo y encadena** a la skill dueña.
    sin oversight = riesgo de marca, legal y de confianza. Ética por diseño (`ANTIPATTERNS`).
 8. **Diversifica canales.** El monocanal es frágil. Portafolio > apuesta única al algoritmo
    de una plataforma.
+9. **Pauta no es producción y producción no es una pieza tarifaria.** En campañas con Creative Studio separa
+   media spend/activation de Studio Credits y regístralo como pass-through/plan de medios dentro de la quinta
+   línea. Digital Marketing define hipótesis, matriz y canal;
+   las skills de producción estiman operaciones generativas bajo Studio Credits. Layout, edición, QA y export
+   determinísticos consumen 0 credits, pero tienen costo humano; rights/creator/whitelisting quedan separados.

@@ -51,6 +51,13 @@
 - **Meta numérica / benchmark:** `[vs. mediana de la cuenta o meta absoluta]`
 - **Ventana de lectura:** `[a las 48h y a los 7 días — social search da cola larga]`
 
+## Creative Studio run (sólo si aplica)
+- **Delivery / engagement / operating mode:** `[Managed Squad|Staff Augmentation|Studio Access|hybrid]` · `[On-Going|On-Demand|Sample Sprint]` · `[efeonce-managed|co-operated|client-operated]`
+- **Operation map generativo:** `[imagen / video / voz / SFX / transformaciones realmente requeridas]`
+- **Rate version + estimate/reservation refs:** `[IDs/rango; no precio ni tabla por pieza]`
+- **Pasos 0 Studio Credits:** `[copy / layout / edición / captions / export / QA / publicación / medición]`
+- **Derechos separados:** `[creator / whitelisting / música / voz / likeness / paid usage / territorio / plazo]`
+
 ## Antes de producir — checklist
 - [ ] El objetivo es UNO y el KPI mide ese objetivo (no likes)
 - [ ] El hook cabe en <2s y dice el gancho, no lo insinúa
@@ -58,3 +65,4 @@
 - [ ] El CTA pide save/send/comentario, no like pasivo
 - [ ] Datos volátiles (cadencia, hora, feature) reverificados `as-of [fecha]`
 - [ ] Publicación pasa por confirmación humana (nunca auto-post)
+- [ ] Si usa Creative Studio, el operation map separa inferencia de producción determinística/humana

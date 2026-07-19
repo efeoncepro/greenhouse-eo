@@ -51,7 +51,7 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 | Qué pasó históricamente                    | task/issue/commit y snapshots bajo `agent-context-history/`                                        |
 | Qué ofrece/opera Efeonce                   | `docs/services/README.md`                                                                          |
 | Qué tooling/modelos evalúa Efeonce Globe / Creative Studio | `docs/architecture/EFEONCE_CREATIVE_STUDIO_ENTERPRISE_MODEL_PORTFOLIO_V1.md` + capability registry |
-| Cómo crea y captura valor Creative Studio, y cómo funcionan sus créditos | `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md` + `EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md` |
+| Cómo crea y captura valor Creative Studio, cómo funcionan sus créditos y qué skills lo adoptan | `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md` + `EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md` + `EFEONCE_CREATIVE_STUDIO_SKILL_ADOPTION_V1.md` |
 | Qué significa para producto/negocio        | `docs/context/00_INDEX.md` + docs funcionales                                                      |
 | Cómo lo opera una persona/agente           | `docs/manual-de-uso/**` y runbook aplicable                                                        |
 

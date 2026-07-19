@@ -25,7 +25,7 @@ virtualmente imposible de medir si el SoW está mal definido"*.
 
 ---
 
-## 2. Las tres cosas sin las cuales NO hay alcance
+## 2. Las tres cosas universales — y el cuarto contrato cuando hay Studio Credits
 
 🔴 **Un documento que no tiene estas tres cosas no es un SOW. Es una carta de intenciones.**
 
@@ -34,6 +34,10 @@ virtualmente imposible de medir si el SoW está mal definido"*.
 | **1. Cap de rondas** | Las revisiones son infinitas. El margen se evapora ronda a ronda. → §3 |
 | **2. Derechos de uso acotados** | Regalas **2-3× el trabajo** sin cobrarlo. → §4 |
 | **3. Change order** | Todo lo que se sale del alcance… **se hace igual, gratis.** → §5 |
+
+Cuando Creative Studio usa un pool/envelope, el SOW también necesita un **contrato de consumo**: capability
+scope, estimate, reservation, aprobador de gasto, settlement, release/refund, rate version y failure owner.
+Sin eso, el cliente no puede prever ni auditar el consumo. → `modules/14_STUDIO_CREDITS.md`.
 
 ---
 
@@ -265,6 +269,11 @@ regalo:
 - [ ] **Archivos abiertos**: qué se entrega y qué no
 - [ ] **Autorización de portafolio** *(¡en el contrato!)*
 - [ ] **Change order**: mecanismo, quién aprueba, y **que los errores nuestros NO se cobran**
+- [ ] Si hay Creative Studio: **delivery model + engagement form + operating mode** por lane/run
+- [ ] Si hay credits: **pool/envelope + capability scope + estimate/reservation/approval/settlement**
+- [ ] **Refund/retry taxonomy y failure owner**; error técnico/Efeonce no se cobra dos veces
+- [ ] Trabajo sin credits y su línea económica explícita; **derechos nunca dentro de credits**
+- [ ] `credit_rate_version`, rollover/expiry/top-up sólo si tienen commercial approval
 - [ ] **SLA de urgencias** *(y su precio)*
 - [ ] **Qué NO incluye** — una sección explícita. **Lo que no se excluye, se incluye**
 - [ ] Redacción legal → **`legal-privacy-ip-operator`**

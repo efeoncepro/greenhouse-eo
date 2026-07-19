@@ -10,6 +10,12 @@ The registry provides reusable blocks and components installable via `hyperframe
 - **Blocks** — standalone sub-compositions (own dimensions, duration, timeline). Included via `data-composition-src` in a host composition.
 - **Components** — effect snippets (no own dimensions). Pasted directly into a host composition's HTML.
 
+Installing, wiring, reusing or rendering a block/component is deterministic authoring and consumes
+`0 Studio Credits`; it may still require funded capacity. A registry item never reserves or settles the
+Creative Studio ledger. If its media was generated upstream, meter only that governed generative operation —
+never the item, composition, piece or export. Voice/likeness/music rights remain separate. Full boundary:
+sibling skill `hyperframes` → `references/studio-credits.md`.
+
 ## When to use this skill
 
 - User mentions `hyperframes add`, "block", "component", or `hyperframes.json`

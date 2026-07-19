@@ -67,9 +67,18 @@ publicación sin que el operador diga que sí. Es la misma doctrina Full API Par
 
 ## Gasto gobernado
 
-Producir con IA (Higgsfield, image gen) **cuesta créditos/API**. Antes de generar en volumen,
-dimensiona el gasto y confírmalo. Prefiere `virality_predictor`/iteración barata antes de
-producir 20 variantes. No generes assets especulativos sin brief aprobado.
+El saldo/precio de Higgsfield u otro provider es **costo interno**, no Studio Credits. Dentro de Creative
+Studio, los créditos miden operaciones generativas gobernadas y provider-neutral. Antes de producir:
+
+1. clasifica las operaciones de imagen/video/audio requeridas;
+2. ejecuta `estimate → reservation → approval` con rate version vigente;
+3. registra attempts y cierra `settlement | release | refund adjustment` según outcome;
+4. no cobres dos veces un retry técnico ni traduzcas precio vendor→crédito.
+
+Copy, layout de carrusel, edición, subtítulos, export, programación, QA y medición devengan **0 Studio Credits**,
+aunque consuman capacidad/gobierno. Derechos de creator, whitelisting, música, voz, likeness y paid usage se
+autorizan/cotizan aparte. Canon:
+`docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md`.
 
 ## Autenticidad + gobernanza IA
 

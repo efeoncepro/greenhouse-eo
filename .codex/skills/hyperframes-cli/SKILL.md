@@ -18,6 +18,20 @@ Everything runs through `npx hyperframes`. Requires Node.js >= 22 and FFmpeg.
 
 Lint and inspect before preview. `lint` catches missing `data-composition-id`, overlapping tracks, and unregistered timelines. `inspect` opens the rendered composition in headless Chrome, seeks through the timeline, and reports text spilling out of bubbles/containers or off the canvas.
 
+## Creative Studio credit boundary
+
+`init`, `lint`, `inspect`, `preview`, `render`, `transcribe`, transcode and
+re-render do not create Studio Credits by command, frame, minute or output. HyperFrames is deterministic
+composition/finishing; those activities consume `0 Studio Credits` but can still use paid capacity/compute.
+
+If a Globe/Creative Studio run invokes a separate generative video/audio/voice capability, that operation is
+estimated by duration/tier/attempt in the Studio runtime. The CLI must not reserve, approve, settle or refund
+credits, and a retry of `render` is not a second generative charge. Rights for voice/likeness/music remain
+separate. `hyperframes tts` is synthetic generation: the command itself does not invent a rate, but a governed
+Studio run must meter its voice operation through the ledger. Canon and full examples: sibling skill
+`hyperframes` → `references/studio-credits.md` and the repository's
+`docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md`.
+
 ## Scaffolding
 
 ```bash

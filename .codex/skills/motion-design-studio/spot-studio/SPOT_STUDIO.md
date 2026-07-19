@@ -16,6 +16,11 @@ es la **instancia de referencia** que puebla etapas, lanes, gates y checklists.
 > Un Spot Studio como capability de portal (jobs async, asset DB, cost dashboard) es una puerta poco
 > reversible → se decide tras 2-3 spots (ver Roadmap).
 
+> **Accounting boundary:** un spot no tiene un precio fijo en credits. Descompón clips/transformaciones/audio
+> generativos por segundos, tier y attempts; storyboard/animatic, edición, conform, color, mix/master, overlay,
+> export y cutdowns determinísticos son `0 credits` y se financian por capacidad. Lifecycle, ejemplos de spot
+> 30 s y refund policy: `../modules/13_STUDIO_CREDITS_AND_ACCOUNTABILITY.md`.
+
 ## El pipeline por etapas + gates (garantía del acabado final)
 
 La garantía **no es "quedó lindo"** — son **gates objetivos**: validar barato antes de gastar caro, y nunca
@@ -88,6 +93,8 @@ confiar lo exacto a la IA. Cada etapa **emite un artefacto persistido y re-ejecu
 - **NUNCA** música sin licencia comercial ni voz clonada sin consentimiento documentado.
 - **SIEMPRE** persistir el artefacto de cada etapa (re-ejecutable).
 - **SIEMPRE** correr el **finish pre-flight** antes de declarar "listo".
+- **SIEMPRE** estimar/reservar/aprobar antes de generar y conciliar settlement/release/refund con evidencia.
+- **NUNCA** cobrar un retry técnico; cambio de dirección tras aprobación = nuevo branch/estimate.
 
 ## Alternativas rechazadas
 

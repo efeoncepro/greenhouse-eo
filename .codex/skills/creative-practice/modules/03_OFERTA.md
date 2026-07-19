@@ -8,7 +8,11 @@
 
 ---
 
-## 1. 🔴 El reframe — la unidad de venta es el SQUAD
+## 1. 🔴 El reframe — no hay una sola unidad para tres modelos de delivery
+
+En **Managed Squad**, la unidad principal es capacidad gobernada/outcome. En **Staff Augmentation**, es el
+perfil/dedicación bajo dirección cliente. En **Studio Access**, es acceso/gobierno + operaciones generativas
+medidas en Studio Credits. La regla común es que **ninguno vende una pieza final como unidad de valor**.
 
 | ❌ Lo que vende el mercado | ✅ Lo que vendemos nosotros |
 |---|---|
@@ -18,7 +22,7 @@
 | *"Rondas ilimitadas"* | 🔴 *"2-3 rondas. La cuarta es change order."* |
 | *"Te entregamos el material"* | *"Te entregamos el material con estos derechos de uso, por este plazo"* |
 
-### Por qué la unidad tiene que ser el FTE y no el entregable
+### Por qué Managed Squad usa capacidad y no el entregable
 
 **Tres razones, y las tres son de supervivencia:**
 
@@ -31,7 +35,7 @@
    dolor declarado de los in-house **no es falta de proveedores — es energizar creativos y atraer talento.**
    Le estás vendiendo exactamente lo que dice que le falta.
 
-> ## Una pieza es un resultado. Un squad es una capacidad. Solo una de las dos se puede escalar, gobernar y renovar.
+> ## Una pieza es un resultado. La capacidad y el sistema son lo que se puede escalar, gobernar y renovar.
 
 ---
 
@@ -174,32 +178,43 @@ la capacidad libre real.** Nadie puede pasar de 100% sumando todos sus engagemen
 
 ---
 
-## 4. Las tres capas de toda oferta creativa
+## 4. Las cinco líneas económicas de toda oferta Creative Studio
 
-**Toda oferta creativa nuestra tiene estas tres capas. Si te falta una, no es una oferta: es una cotización.**
+**El Business Model V1 reemplaza la simplificación de tres capas por cinco líneas separables.** No todas
+necesitan monto distinto en toda configuración, pero ninguna puede quedar oculta o imputada dos veces.
 
 ```
-CAPACIDAD (mensual o por proyecto)                        ← lo que el mercado también vende
+GOBIERNO / PLATAFORMA                                     ← no descontable
+  Workspace · policy · ledger · memoria · observabilidad · soporte base
+
+CAPACIDAD HUMANA (mensual o por proyecto)                 ← lo que el mercado también vende
   El squad: lanes, seniority, FTE, dedicación, RACI
   Capacidad de hasta N piezas/mes  ← borde del alcance, NO precio unitario
 
-GOBIERNO (mensual)                                        ← 🎯 lo que NADIE más puede darle
-  Portal + métricas de delivery (OTD · FTR · RpA · cycle time · stuck)
-  Reportería + trazabilidad + política de confianza del dato
-  🔴 NUNCA SE DESCUENTA
+STUDIO CREDITS                                             ← sólo inferencia generativa variable
+  Estimate · reservation · approval · settlement/refund
+  Nunca hora, pieza, token, dólar, finishing o licencia
 
-DERECHOS DE USO                                           ← 🔴 lo que TODOS regalan sin darse cuenta
-  Canal · territorio · plazo · exclusividad
-  Se cotiza SEPARADO del fee de creación
+IMPLEMENTACIÓN / IP                                       ← onboarding y sistema específico
+  Brand Profile · templates · workflows · integración · training
+
+DERECHOS / LICENCIAS / PASS-THROUGH                       ← terceros y uso
+  Stock · talento · voz/likeness · música · canal · territorio · plazo · exclusividad
+  Se cotiza SEPARADO de creación, capacidad y credits
 ```
 
-### 🔴 Capa 2 — el gobierno **nunca se descuenta**. Nunca.
+🔴 **Regla anti doble cobro:** dirección, curation, QA, Account Lead y delivery management viven en capacidad
+humana; no se esconden dentro de gobierno ni del credit. El credit sólo mide una operación generativa gobernada.
+→ `modules/14_STUDIO_CREDITS.md`.
+
+### 🔴 Gobierno/plataforma **nunca se descuenta**. Nunca.
 
 **Tres razones, y hay que saberlas de memoria porque el descuento siempre ataca acá:**
 
-1. **Su costo marginal es ≈ 0.** Descontarlo es **regalar margen puro** — no ahorras nada al darlo.
-2. 🎯 **Es lo único que el freelancer, el in-house y Superside NO pueden darle.**
-   Descontarlo es **devaluar tu único diferenciador con tus propias manos.**
+1. **Tiene costo operativo real y asignado.** Workspace, policy, ledger, seguridad, observabilidad y soporte
+   base deben financiarse; descontarlos sin cambiar alcance/SLA erosiona margen.
+2. 🎯 **Es una diferencia sistémica frente a alternativas no gobernadas.** Descontarlo devalúa el control y la
+   transparencia que sostienen la oferta.
 3. 🔴 **Es tu switching cost.** El cliente que entra al portal y ve su operación **percibe el costo de irse.**
    El que nunca entró **te compara por precio en la renovación como si fueras cualquiera.**
    → `modules/12_RETENCION_EXPANSION.md`.
@@ -215,7 +230,7 @@ un número NO es fiable** en vez de pintarlo bonito.
 **Brief Clarity Score**, `Revenue Enabled`. **Están sembrados en el registry pero no tienen página ni datos.**
 **Prometerlos es humo, y explota en el onboarding.** → `efeonce/ESTADO_ACTUAL.md`.
 
-### 🔴 Capa 3 — los derechos de uso: **el 2-3× que regalamos sin saberlo**
+### 🔴 Derechos de uso: **el 2-3× que regalamos sin saberlo**
 
 ✅ *verificado*: **el fee de creación y el fee de uso se cotizan por separado.** Multiplicadores
 direccionales del mercado: **no exclusivo 1,0× · exclusividad de categoría 2,0× · buyout / exclusividad total
@@ -268,7 +283,8 @@ Si es *cuánto vale, qué incluye y hasta dónde llega* → **es de acá.**
 
 ## 7. Reglas duras de este módulo
 
-1. 🔴 **La unidad de venta es el FTE de squad.** Nunca la hora. Nunca la pieza suelta.
+1. 🔴 **Managed Squad se vende como capacidad/outcome gobernado; Studio Access como acceso + credits; Staff
+   Augmentation como perfil/dedicación.** Nunca la pieza suelta y nunca confundas sus accountabilities.
 2. 🔴 **Nunca publiques precio unitario por pieza.** Es la calculadora del procurement.
 3. 🔴 **Managed Squad ≠ Staff Augmentation.** No son sinónimos comerciales. Cambian precio, riesgo y accountability.
 4. 🔴 **El gobierno es línea propia y NUNCA se descuenta.** Descuenta capacidad si tienes que descontar.
@@ -278,6 +294,10 @@ Si es *cuánto vale, qué incluye y hasta dónde llega* → **es de acá.**
 8. 🔴 **El ad-hoc cuesta MÁS que el marginal del plan.** Siempre.
 9. 🔴 **Modo operativo no es modelo de delivery ni forma de engagement.** No mezclar `client-operated` con Managed Squad.
 10. 🔴 **Ningún compromiso sin control.** OTD/FTR sólo aplican al scope cuya dirección y ejecución controla Efeonce.
+11. 🔴 **Studio Credits sólo para operaciones generativas gobernadas.** La pieza es ejemplo de composición,
+    no unidad de precio; sin shadow ledger y commercial approval no hay tarifa pública ni top-up.
+12. 🔴 **Toda oferta separa cinco líneas económicas:** gobierno/plataforma, capacidad, credits,
+    implementación/IP y derechos/pass-through.
 
 ---
 

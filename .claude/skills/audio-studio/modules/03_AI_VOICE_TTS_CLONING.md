@@ -64,8 +64,9 @@ Herramientas de audio expuestas por MCP (orquestables desde el estudio):
 - **`dubbing`** — doblaje cross-idioma.
 - (Enhance de voz: `enhanceSpeechPoll` para limpiar/mejorar — ver módulo 10.)
 
-> Todas cuestan créditos y pasan por confirmación humana antes de entregar. Detalle de conexión y
-> orquestación en `efeonce/STUDIO_TOOLING.md`.
+> Cada invocación elegible es una operación generativa: se estima por segmento/duración/tier/attempt bajo
+> `modules/11_STUDIO_CREDITS_AND_RIGHTS.md`. No se cobra por pieza, hora o caracteres; dirección, edición,
+> mix/master y export determinísticos consumen `0 credits`. Todo delivery pasa por confirmación humana.
 
 ---
 

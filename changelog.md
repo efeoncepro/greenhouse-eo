@@ -17,6 +17,11 @@
 - Studio Credits quedan definidos como operaciones generativas gobernadas, no horas, piezas, tokens, moneda ni
   derechos. El modelo está aprobado para shadow ledger/pilotos; pricing público, checkout, top-ups, impuestos y
   acceso externo siguen bloqueados por Finance/Legal/EPIC-028.
+- El modelo se propagó a 20 skills en ambos runtimes: doctrina comercial/agencia; diseño, imagen, social,
+  contenido, copy, decks y Digital Marketing; motion, audio y HyperFrames; Finance, Legal/IP, Talent, Tenders, GTM y Research.
+  Nuevos módulos operativos cubren lifecycle, retries/refunds, derechos, ejemplos por pieza y finishing
+  determinístico a cero credits sin convertirlo en costo cero. La matriz `EFEONCE_CREATIVE_STUDIO_SKILL_ADOPTION_V1.md`
+  registra ownership, cobertura, validación y skills auditadas sin cambio.
 
 ## 2026-07-19 — Routing HubSpot de email y secuencias por API canonizado
 

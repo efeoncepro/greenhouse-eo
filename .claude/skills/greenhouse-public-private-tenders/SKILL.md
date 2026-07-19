@@ -1,6 +1,6 @@
 ---
 name: greenhouse-public-private-tenders
-description: Operador experto de licitaciones públicas y privadas (Chile a fondo + LATAM como matriz). Úsala para descubrir, calificar (bid/no-bid), preparar, cotizar, garantizar, presentar y hacer seguimiento de licitaciones y RFP/RFQ/RFI. Cubre Ley 19.886 + reforma 21.634, ChileCompra/Mercado Público, modalidades (Licitación Pública/Privada, Trato Directo, Convenio Marco, Compra Ágil), códigos de procedimiento (L1/LE/LP/LS/COT), bases administrativas y técnicas, criterios de evaluación, garantías (seriedad/fiel cumplimiento), inhabilidades e integridad, matriz de portales LATAM (SECOP, SEACE, PNCP, CompraNet, COMPR.AR…), y tenders privados/corporativos (Ariba, Coupa, Fieldglass, Achilles/SICEP). Alimenta el módulo runtime RESEARCH-007 y se apoya en commercial-expert, copywriting, finance-accounting-operator, talent-people-operator y task-planner. Triggers: "licitación", "licitaciones", "mercado público", "chilecompra", "convenio marco", "compra ágil", "trato directo", "bases administrativas/técnicas", "garantía de seriedad", "fiel cumplimiento", "bid/no-bid", "RFP", "RFQ", "RFI", "propuesta técnica", "oferta económica", "SECOP", "SEACE", "PNCP", "CompraNet", "adjudicación", "oferente".
+description: Opera licitaciones públicas y privadas en Chile y LATAM desde discovery y bid/no-bid hasta propuesta, pricing, garantías, presentación y seguimiento. Use for RFP/RFQ/RFI, Mercado Público, oferta técnica/económica, Managed Squad, Studio Access y Studio Credits dentro de un bid.
 type: skill
 user-invocable: true
 argument-hint: "[país/etapa del bid o pregunta concreta]"
@@ -85,6 +85,7 @@ En una licitación de contenidos **todas las ofertas dicen lo mismo** ("optimiza
 6. **Human-in-control en la presentación.** La skill/agente **prepara** el paquete; **nunca** envía una oferta ni firma sin confirmación humana explícita. No almacenar credenciales ni cookies de los portales.
 7. **Evidence-first.** Toda clasificación (fit, monto, plazo, riesgo) cita el campo/documento que la sustenta (nombre vs bases técnicas vs items). Nombre pesa menos que bases técnicas.
 8. **es-CL neutro, tuteo.** Sin voseo ni modismos rioplatenses. Copy visible pasa por `copywriting` / `greenhouse-ux-writing`.
+9. **Creative Studio se cotiza por capas, no por una falsa tarifa por pieza.** Si el bid incluye producción generativa, separa acceso/gobernanza, capacidad humana, Studio Credits, implementación/IP y derechos/licencias/pass-through. El precio total exigido por las bases puede consolidarse hacia afuera, pero la hoja económica interna conserva las cinco líneas y su margen.
 
 9. **El deal vive en un workspace canónico (el "DSR interno").** Arráncalo con `pnpm tender:new <slug>`: carpeta con `bases/` (RFP) · `research/` (investigación 🔒) · `oferta-tecnica.md` (fuente + ledger de evidencia) · `deck-plan.json` · `artifact-manifest.json` (piezas vivas por enlace) · `anexos/` · `*-INTERNO`. El discriminador que manda es **audiencia**: `research/` + `*-INTERNO` **nunca** cruzan al cliente. Las fuentes son archivos git (NO `proposal_assets`); el aggregate `Proposal` referencia la carpeta por `proposal_id`. Contrato: `docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md`.
 
@@ -98,6 +99,7 @@ Esta skill **decide y estructura**; delega el craft especializado. Declara siemp
 | Qué servicios puede ofertar Efeonce, matching de rubro/BU | `efeonce-agency` | El catálogo de servicios y las BU (Globe/Wave/Reach…) son de agency; acá se usan para el fit |
 | Redacción persuasiva de la propuesta | `copywriting` | Esta skill define QUÉ va y la estructura; copywriting el CÓMO se escribe |
 | Garantías, costeo, cashflow, factoring, indexación UF/UTM, margen | `greenhouse-finance-accounting-operator` | Loaded cost y tesorería son de finance; acá se consumen para el precio/garantía |
+| Creative Studio, Studio Credits y estimaciones por pieza | `efeonce-agency` + `creative-practice` + `greenhouse-finance-accounting-operator` | El bid traduce el alcance; el modelo canónico define créditos y Finance aprueba equivalencias/margen |
 | Equipo, CVs, competencias para la oferta técnica | `greenhouse-talent-people-operator` | El staffing/competencias es de talent; acá se ensamblan en el anexo técnico |
 | Convertir un "GO" en trabajo operable | `greenhouse-task-planner` | Un GO genera un capture plan/TASK-### con plazos y owners |
 | Pipeline comercial y bid desk | `hubspot-greenhouse-bridge` + `notion-platform` | La oportunidad vive como deal (HubSpot) y como ficha de bid (Notion/módulo) |

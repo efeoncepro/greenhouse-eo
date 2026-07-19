@@ -37,18 +37,24 @@ un commodity con 10.000 competidores y un ranking de recall en el que no salimos
 | **Social** *(adaptación y ejecución)* | `social-media-studio` |
 | **Audio / sonic branding** | `audio-studio` |
 
-**Las modalidades** *(`docs/context/14`)*:
+**La taxonomía comercial** *(`docs/context/14` + Business Model V1)* tiene tres ejes, no una lista de
+modalidades:
 
-| Modalidad | Qué es | 🎯 Cuál empujar |
+| Eje | Opciones | Qué decide |
 |---|---|---|
-| **On-Going** | Fee mensual, **equipo dedicado** | 🎯 **SIEMPRE. Es el producto.** |
-| **On-Demand** | Proyecto cerrado | Solo si el on-going no es viable **hoy** *(y con recargo de arranque/cierre)* |
-| **Staff Augmentation** *(vía Deel)* | El cliente dirige | 🔴 **Otro producto, otro riesgo.** No confundir con Managed Squad |
-| **Sample Sprint** | La puerta de entrada acotada | 🎯 **El mejor primer paso.** Reduce el tamaño de la decisión |
+| **Modelo de delivery** | Managed Squad · Staff Augmentation · Studio Access · híbrido por lanes | quién dirige, qué compra y quién responde |
+| **Forma de engagement** | On-Going · On-Demand · Sample Sprint | duración y vehículo contractual |
+| **Modo operativo por run/lane** | `efeonce-managed` · `co-operated` · `client-operated` | quién opera/aprueba cada ejecución |
 
 🔴 **La distinción que más plata vale:** **Managed Squad ≠ Staff Augmentation.**
 En Managed Squad **Efeonce arma, opera y responde por el outcome**. En staff-aug el cliente dirige.
 **Cobrar un Managed Squad a precio de staff-aug es regalar exactamente la parte que más vale: el gobierno.**
+`efeonce-managed` tampoco es sinónimo de Managed Squad: es autoridad sobre un run. Staff Augmentation +
+`efeonce-managed` en la misma lane es inválido; si se requiere servicio managed se separa lane, precio y SOW.
+
+**Arquitectura de ingresos:** gobierno/plataforma + capacidad humana + Studio Credits + implementación/IP +
+derechos/licencias/pass-through. Credits sólo miden operaciones generativas gobernadas; no piezas, horas,
+tokens, dólares, derechos o QA. Canon operativo → `modules/14_STUDIO_CREDITS.md`.
 
 ---
 

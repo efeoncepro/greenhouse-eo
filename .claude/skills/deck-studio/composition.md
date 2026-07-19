@@ -56,6 +56,11 @@ pnpm deck:compose <plan.json> --out <dir>
 El `Plan` (el JSON) es **el artefacto auditable**. El PDF es **derivado y re-componible** — si el
 molde se corrige, el deck **se re-emite** sin re-autorarlo.
 
+**Accounting:** elegir template, llenar slots, resolver geometría, componer, renderizar, exportar y hacer QA son
+operaciones determinísticas con **0 Studio Credits**. El costo humano/plataforma vive en capacidad/gobierno. Un
+asset generativo incluido en un slot conserva su propio run y ledger; el Composer no lo recobra por slide ni
+convierte costo de provider en créditos. Reemitir el mismo plan o derivar otro target tampoco crea inferencia.
+
 **El entregable es UN PDF de N páginas**, no un puñado de PNGs. El merge y el **gate de peso** son
 parte del contrato: **los portales rechazan adjuntos sobre su límite** — el peso es **admisibilidad**,
 no cosmética. *(Y el límite lo fijan **las bases**, no el portal. Ver [`evidence-integrity.md`](evidence-integrity.md).)*
@@ -250,3 +255,5 @@ Tres capacidades del motor que cambian lo que un deck puede afirmar:
   rechazarlo y el autor debe resolver el contenido o el schedule.
 - **NUNCA** declares un deck listo sin **MIRAR TODOS LOS FRAMES**. Los tests verdes no son el gate.
 - **SIEMPRE** el `Plan` es el artefacto auditable; el PDF es derivado y re-componible.
+- **SIEMPRE** preserva el lineage/ledger de un asset generativo insertado, sin imputar el render del deck como
+  nueva operación generativa.

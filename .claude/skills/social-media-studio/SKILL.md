@@ -73,6 +73,9 @@ argument-hint: "[red/tarea o pregunta — ej: 'plan de 30 días para LinkedIn de
    `efeonce/EFEONCE_OVERLAY.md` / `efeonce/CLIENT_DELIVERY.md`.
 6. **Cierra con un artefacto** de `templates/` (brief, calendario, guion, reporte…),
    no con prosa suelta.
+7. Si la producción corre por Creative Studio / Efeonce Globe, carga el Business Model y Credit Model desde
+   `efeonce/CLIENT_DELIVERY.md`: la pieza social no es la unidad de crédito; identifica las operaciones
+   generativas y separa layout/copy/export/QA, capacidad y derechos.
 
 ## 2. Árbol de decisión (a qué skill pertenece)
 
@@ -146,6 +149,8 @@ herramientas conectadas (detalle en `efeonce/STUDIO_TOOLING.md`):
 - **NUNCA** produzcas copy visible en el portal Greenhouse sin pasar por
   `greenhouse-ux-writing` + `src/lib/copy/*` (eso es copy de producto, no social).
 - **NUNCA** transcribas la marca: Efeonce ≠ Greenhouse. Ver `efeonce/EFEONCE_OVERLAY.md`.
+- **NUNCA** cotices Studio Credits por post, slide, Reel u hora. Estima sólo operaciones generativas
+  gobernadas; composición, copy, publicación, QA y medición se financian por capacidad/gobierno.
 
 ## 6. Doctrina 2026 (lo que hay que creer este año)
 
