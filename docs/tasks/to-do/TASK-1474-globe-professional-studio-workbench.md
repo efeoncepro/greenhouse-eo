@@ -20,7 +20,7 @@
 - Status real: `Diseño gobernado; implementación pendiente`
 - Rank: `TBD`
 - Domain: `creative|ui|product`
-- Blocked by: `TASK-1469, TASK-1472, TASK-1473`
+- Blocked by: `TASK-1468, TASK-1469, TASK-1472, TASK-1473, TASK-1485`
 - Branch: `task/TASK-1474-globe-professional-studio-workbench`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -59,7 +59,7 @@ Dar a operadores una experiencia creative-native de agencia, no un formulario de
 
 ### Depends on
 
-- `TASK-1469`, `TASK-1472`, `TASK-1473`.
+- `TASK-1468`, `TASK-1469`, `TASK-1472`, `TASK-1473` y `TASK-1485`.
 
 ### Blocks / Impacts
 
@@ -69,8 +69,9 @@ Dar a operadores una experiencia creative-native de agencia, no un formulario de
 ### Files owned
 
 - `../efeonce-globe/apps/studio-web/`
-- `../efeonce-globe/packages/contracts/`
-- `../efeonce-globe/packages/sdk/`
+- Copy, fixtures y evidencia visual específicos de esta surface.
+
+Los contracts de dominio pertenecen a sus capability tasks y el packaging SDK a `TASK-1473`.
 
 ## Current Repo State
 
@@ -98,8 +99,11 @@ Dar a operadores una experiencia creative-native de agencia, no un formulario de
 - Wireframe: `docs/ui/wireframes/TASK-1474-globe-studio-workbench.md`
 - Flow: `docs/ui/flows/TASK-1474-globe-studio-workbench-flow.md`
 - Motion: `docs/ui/motion/TASK-1474-globe-studio-workbench-motion.md`
-- Surface architecture: `Composition Shell leadPlusContext/rich; adaptive cards por container query; sidecar sólo para contexto/review`
-- Primitive decision: `reusar primero primitives Globe/Greenhouse compatibles; cualquier primitive nueva exige registry, a11y y Lab antes de uso repetido`
+- Visual direction: `docs/ui/visual-directions/TASK-1474-globe-studio-workbench-direction.md`
+- Surface architecture: `Creative Desk compuesto con patterns propios de Globe definidos/registrados por
+  TASK-1485; no adopta layouts, recipes ni primitives de Greenhouse`
+- Primitive decision: `reuse | extend | new sobre el registry Globe; esta task puede proponer patterns nuevos
+  con anatomy, states, accessibility, responsive contract y evidence antes de promoverlos`
 - Full API parity: `UI es thin client de SDK/contracts certificados por TASK-1473; cero business logic, provider/DB/storage imports o endpoint ad hoc`
 - Copy/state source: `copy funcional centralizada por dominio; cero mensajes reusable hardcodeados`
 - Accessibility: `keyboard completo, focus visible, landmarks, reduced motion y contraste WCAG AA`
@@ -112,13 +116,18 @@ Dar a operadores una experiencia creative-native de agencia, no un formulario de
 
 ### Slice 1
 
-- Implementar Composition Shell de brief/context/candidates/review.
+- Implementar el Creative Desk sobre la shell y patterns propios de Globe: canvas, context rail, candidate
+  dock y review surface; registrar cualquier pattern nuevo mediante `TASK-1485`.
 
 ### Slice 2
 
 - Cablear states, approvals, estimate y run history sin lógica provider local. Estimate/approval muestran
   provider, nombre comercial del modelo, versión/readiness, limitaciones y fallback propuesto; history muestra
   la ruta realmente ejecutada por attempt y cualquier diferencia respecto de la aprobada.
+- Mostrar mediante readers de `TASK-1468` el balance disponible/reservado/consumido, reserva del run y
+  settlement/refund legibles; la UI nunca deriva ni corrige saldos localmente.
+- Limitar credits al contexto de la campaña/run. Pools, grants, sub-budgets, limits, ajustes y reconciliación
+  pertenecen a `TASK-1482`/`TASK-1483`.
 
 ### Slice 3
 
@@ -176,6 +185,8 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 - [ ] Cada write UI produce el mismo command/result/error/audit que SDK/MCP en el conformance E2E; ningún
       handler UI implementa policy o llama provider/DB/storage.
 - [ ] Estados de espera, error, rights, budget y review son honestos y recuperables.
+- [ ] Balance, reservation y consumo coinciden con los DTOs redactados del reader canónico; no existe cálculo,
+      descuento ni ajuste de credits dentro de componentes.
 - [ ] Provider/modelo/version propuestos y ejecutados son visibles sin revelar keys, costo vendor, margen ni
   prompt/IP interno; ningún fallback queda oculto.
 - [ ] GVC desktop/mobile alcanza estándar premium sin card wallpaper.

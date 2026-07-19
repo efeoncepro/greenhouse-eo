@@ -48,6 +48,7 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
 - [Efeonce Product Ecosystem](../../context/03_ecosistema-producto.md)
 - [Creative Studio Business Model V1](../../business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md)
 - [Studio Credit Model V1](../../business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md)
+- [Globe Design System Governance Decision V1](../../architecture/EFEONCE_GLOBE_DESIGN_SYSTEM_GOVERNANCE_DECISION_V1.md)
 
 ## Child Tasks
 
@@ -65,11 +66,13 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
   provider call; no bloquea la lane IaC de `TASK-1464`.
 - `TASK-1457…1463` — **Model Lab y craft:** sandbox seguro, fixtures/evals, still, motion, audio, campaña E2E y
   registry de readiness. Las integraciones reales empiezan temprano bajo hard budgets y private ingest.
-- `TASK-1464…1475` — **plataforma gobernada:** IaC, tenancy, responsabilidad, rights/assets, shadow credits,
-  lifecycle transaccional, adapters promovidos, composición determinística, review/delivery, MCP, UI y
-  proyección Greenhouse.
+- `TASK-1464…1475`, `TASK-1482…1483`, `TASK-1485` — **plataforma gobernada:** IaC, tenancy, responsabilidad,
+  rights/assets, kernel shadow credits, pools/grants/budgets, lifecycle transaccional, adapters promovidos,
+  composición determinística, review/delivery, MCP, workbenches y proyección Greenhouse.
 - `TASK-1476…1480` — **validación comercial:** demo/Sample Sprint managed, buyer discovery, 30–50 runs de
   calibración, pilotos por modo y commercial approval. `TASK-1480` no habilita clientes sin sign-off explícito.
+- `TASK-1484` — **monetización bloqueada:** implementa packages/billing/tax/revenue/payments sólo después de
+  un `commercial_decision_record` aplicable; tampoco habilita cobros/clientes sin rollout posterior.
 
 ### Parallel execution contract
 
@@ -97,12 +100,16 @@ precios públicos y wallet self-serve permanecen posteriores a la calibración y
 
 - [ ] Repositorio y límite cloud aislados, con IaC, IAM/secret/tenant posture y evidencia runtime completa. El repositorio privado y el proyecto `efeonce-globe` ya existen; hardening y recursos runtime siguen pendientes.
 - [ ] Las capacidades de la primera plantilla funcionan mediante UI y MCP sobre el mismo command/reader layer, con autorización e idempotencia verificadas.
+- [ ] Globe posee su propio Design System incremental. Greenhouse gobierna registry/lifecycle/QA/evidencia;
+      Globe posee patterns/components/motion/runtime y no hereda el sistema UI Greenhouse.
 - [ ] Existe un contract spine machine-readable con schemas versionados, trusted actor/workspace context,
       errores canónicos y coverage matrix por capability/surface.
 - [ ] El primer provider canary y el E2E usan API/SDK/conformance harness sobre el mismo primitive; no existen
       direct provider calls desde UI, MCP, CLI, scripts de task o tests con backdoor.
 - [ ] `TASK-1473` certifica transports/SDK/MCP sin introducir business logic ni reparar parity tardía.
 - [ ] Un run completa el lifecycle estimate → reserve → approve → execute → candidate → review → settle/release sin doble gasto ni pérdida de evidencia.
+- [ ] Pools, grants y project budgets se aplican transaccionalmente sobre el mismo ledger; no existe un segundo
+      saldo ni un pre-check TOCTOU fuera de `reserveCredits`.
 - [ ] Estimate, approval y run history muestran ruta propuesta versus ruta real por attempt; un fallback nunca
   cambia de modelo silenciosamente ni convierte provider/modelo en la unidad de crédito.
 - [ ] Assets, referencias, provider attempts, output y review poseen lineage y acceso scoped por workspace.
@@ -138,7 +145,17 @@ El operador fija **Efeonce Globe** como nombre canónico del producto; Creative 
 
 El programa deja de interpretar gobierno y prueba de modelos como una secuencia lineal. Se aceptan tres lanes
 paralelas —Model Lab/craft, plataforma gobernada y validación comercial— con gates distintos para ejecutar un
-experimento y promover una ruta a producción. Greenhouse registra `TASK-1456…1481` y conserva todo el harness;
+experimento y promover una ruta a producción. Greenhouse registra `TASK-1456…1485` y conserva todo el harness;
 Globe ejecuta el runtime y guarda evidencia técnica. `TASK-1456` cerró la corrección de gobierno; la siguiente
 wave ejecuta `TASK-1457`, `TASK-1458` y `TASK-1464`. `TASK-1459` comienza apenas el Lab gate y los
 fixtures estén listos.
+
+## Delta 2026-07-19 — cierre del sistema de créditos
+
+El programa separa cuatro responsabilidades: `TASK-1468` posee el kernel append-only; `TASK-1482` administra
+pools, grants, policies y budgets sin segundo saldo; `TASK-1483` entrega el Runway Control Plane UI; y
+`TASK-1484` queda bloqueada para implementar monetización sólo después del gate `TASK-1480`. `TASK-1474`
+conserva sólo contexto de credits por run. `TASK-1485` funda el Design System propio de Globe: Greenhouse
+gobierna decisiones, registry, lifecycle, QA, evidencia y promoción; Globe posee tokens seleccionados,
+patterns, components, motion y runtime. Compartir deliberadamente un color no implica heredar el sistema UI
+de Greenhouse.

@@ -7,7 +7,8 @@ partículas ni bloquea el primer paint.
 
 ## Choreography
 
-- Composition Shell usa entrada rich con stagger corto y regiones interrumpibles.
+- `Globe Studio Shell` define su entrada breve e interrumpible y registra el motion contract como propio;
+  Greenhouse gobierna evidencia/promoción, no le transfiere motion patterns.
 - Cambio de candidate usa continuidad espacial discreta; canvas y metadata se actualizan como una unidad.
 - Context rail desktop entra in-flow; en mobile usa drawer temporal con focus management.
 - Adaptive cards morph entre full/condensed/peek mediante container density.
@@ -24,3 +25,4 @@ partículas ni bloquea el primer paint.
 - Interrupción rápida al cambiar candidate o cerrar sidecar no deja estado visual stale.
 - Mobile 390px mantiene target sizes, foco y ausencia de overflow.
 - GVC captura default y reduced-motion para approval, running, candidate-ready y blocked.
+- El first-fold checkpoint valida canvas, context, estimate y candidate dock antes del cableado exhaustivo.

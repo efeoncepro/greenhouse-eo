@@ -20,7 +20,7 @@
 - Status real: `Diseño gobernado; implementación pendiente`
 - Rank: `TBD`
 - Domain: `commercial|legal|finance|security`
-- Blocked by: `TASK-1477, TASK-1478, TASK-1479`
+- Blocked by: `TASK-1477, TASK-1478, TASK-1479, TASK-1482`
 - Branch: `task/TASK-1480-globe-commercial-external-readiness-gate`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -58,7 +58,9 @@ Evitar que la disponibilidad técnica se interprete como autorización comercial
 
 ### Depends on
 
-- `TASK-1477`, `TASK-1478`, `TASK-1479`.
+- `TASK-1477`, `TASK-1478`, `TASK-1479` y `TASK-1482`.
+- `TASK-1483` es evidencia obligatoria si el scope incluye operación `client-operated` o budget administrado
+  por el cliente; no bloquea un go estrictamente managed.
 
 ### Blocks / Impacts
 
@@ -110,16 +112,23 @@ no crea ni modifica schema, API, commands, readers, migrations o integraciones r
 ### Slice 2
 
 - Obtener sign-off explícito de Finance, Legal, Security y Leadership.
+- Emitir un `commercial_decision_record` versionado, firmado y machine-readable con `go | conditional-go |
+  no-go`, scope y restricciones. Un go aprueba parámetros; no habilita runtime, cobros ni clientes.
 
 ### Slice 3
 
 - Definir rollout/rollback, límites de oferta y próximos gates.
+- Registrar segmentos/geografías/canales, packages y cinco líneas económicas, pricing/rate versions,
+  monedas/FX, descuentos, tax/accounting memo, revenue recognition, expiry/rollover/breakage, refunds,
+  top-up/overage, soporte/SLA, stop-loss y rollback aprobados.
 
 ## Out of Scope
 
 - Producción pública, clientes externos, pricing/wallet self-serve o permisos más amplios que los aprobados expresamente.
 - Mover runtime creativo, datos, provider secrets o lógica de Globe a Greenhouse.
 - Crear un segundo harness o namespace de tasks dentro de Globe.
+- Implementar monetización, billing, tax, checkout o revenue projections: eso pertenece a `TASK-1484` y
+  permanece fail-closed hasta que esta task produzca un record aplicable.
 
 ## Detailed Spec
 
@@ -164,12 +173,19 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Acceptance Criteria
 
 - [ ] La decisión identifica alcance, fecha, owners y evidencia.
+- [ ] Existe un `commercial_decision_record` versionado/firmado con go state, segments/geographies/channels,
+      packages/five-line economics, pricing/rates, currency/FX, discounts, tax/accounting/revenue memo refs,
+      expiry/rollover/breakage/refunds/top-up/overage y support/SLA/stop-loss/rollback.
+- [ ] `conditional-go` expresa restricciones machine-readable y `TASK-1484` falla cerrado fuera de ellas.
+- [ ] Sign-off contable/tributario y legal referencia profesionales habilitados para entidades/jurisdicciones
+      incluidas; ausencia o ambigüedad no se interpreta como aprobación.
 - [ ] Sin sign-off el estado permanece internal-only/no production.
 - [ ] Go parcial no habilita capacidades o segmentos no evaluados.
 - [ ] El dossier incluye coverage machine-readable y conformance PASS por capability crítica; cualquier
       business capability con surface `missing`, lógica duplicada o provider bypass obliga `no-go`.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
 - [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
+- [ ] El go aprueba parámetros pero no activa feature flags, adapters de pago, external tenants ni cobros.
 
 ## Verification
 

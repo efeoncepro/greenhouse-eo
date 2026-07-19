@@ -21,7 +21,7 @@
 
 ## Pendientes inmediatos
 
-- EPIC-028 avanza en tres carriles paralelos gobernados íntegramente por Greenhouse. `TASK-1456…1480` viven
+- EPIC-028 avanza en tres carriles paralelos gobernados íntegramente por Greenhouse. `TASK-1456…1485` viven
   en `docs/tasks/to-do/`, pasan por hooks/lint/QA/handoff de este repo y pueden poseer paths de implementación
   en el repositorio hermano. Globe conserva sólo arquitectura, runtime y evidencia técnica; no tiene registry
   ni namespace de tasks propio. `TASK-1456` cerró esta corrección; próxima wave: `TASK-1457`, `TASK-1458`
@@ -35,6 +35,13 @@
   conformance harness. `TASK-1457` ejecuta el primer canary real por ese spine; `TASK-1473` sólo
   empaqueta/certifica SDK/MCP, no crea parity tardía. El runtime actual es parity-aware, no parity-complete:
   SDK sólo expone health y `CommandEnvelope` bootstrap todavía debe endurecerse durante TASK-1481.
+  `TASK-1468` fue reforzada como kernel: allocation shadow, catálogo/rates, balance reconstruible,
+  reserve/settle/release/expire/adjust, posting source-ref único, funding pinning y BudgetPolicyPort
+  transaccional. `TASK-1482` posee pools/grants/project budgets/policies/forecast sin segundo saldo;
+  `TASK-1483` posee `/studio/credits` como Runway Control Plane; `TASK-1474` conserva sólo credits del run.
+  `TASK-1484` queda bloqueada para packages/billing/tax/revenue/payments después del decision record de
+  `TASK-1480`. `TASK-1485` crea el Design System propio de Globe: Greenhouse gobierna registry/lifecycle/QA,
+  Globe posee patterns/components/motion/runtime; compartir color no implica heredar UI Greenhouse.
 - `TASK-1454` completó su runtime interno en `develop`, sin push ni Production: broker OAuth multiproducto,
   migración aditiva aplicada a `greenhouse-pg-dev/greenhouse_app`, client/binding Globe internal-only,
   callback `globe-studio-internal`, API privada `globe-api-internal`, SDK y WIF/ADC sin llaves. Los smokes live
@@ -58,6 +65,14 @@
 - Índice: [Handoff.archive.md](Handoff.archive.md).
 - Snapshot íntegro pre-migración: [`docs/operations/agent-context-history/2026-07-19/Handoff.legacy.md`](docs/operations/agent-context-history/2026-07-19/Handoff.legacy.md).
 - Modelo operativo: [`docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md`](docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md).
+
+## Sesión 2026-07-19 — Studio Credits y Design System Globe cerrados como backlog formal
+
+> Se registraron `TASK-1482` (pools/grants/budgets), `TASK-1483` (credits operations UI), `TASK-1484`
+> (monetización bloqueada) y `TASK-1485` (Design System Globe). `TASK-1468` sigue siendo el único kernel/ledger;
+> `TASK-1469` liga approvals a funding/policy; `TASK-1478` calibra percentiles/five-line economics; `TASK-1480`
+> produce el commercial decision record. Greenhouse gobierna el Design System, pero Globe no hereda sus
+> patterns: construye los propios incrementalmente. Siguiente ID libre: `TASK-1486`. No hubo runtime/rollout.
 
 ## Sesión 2026-07-19 — Creative Studio Business Model V1 formalizado
 
@@ -360,17 +375,3 @@
 > task Delta, TRACKING-PLAN, LEARNINGS, manual, doc funcional, skill (ambos espejos). **Slice 3
 > abierto**: ventana steady-state `growth.cta.*` hasta 2026-07-25 + decisión de placement amplio
 > (recomendado: posts del blog) → la task sigue `in-progress` por diseño.
-
-## Sesión 2026-07-18 — CTA Experience System incorporado a EPIC-023 (planning/architecture)
-
-> Por pedido del operador se elevó el objetivo de UI “rica, moderna y fluida” a un contrato ejecutable, sin crear
-> nuevas tasks. El ADR/arquitectura CTA ahora separa `placement`, experience kind, appearance
-> (`style_variant`), density derivada `full|condensed|peek` y `variant_id` experimental; canoniza anatomía
-> contextual, profundidad tokenizada, estados completos, motion placement-aware y action-state continuity.
-> `TASK-1429` pasa a ser CTA Experience System + único interruptivo `slide_in`; `TASK-1431` agrega metadata de
-> expectation/state/recovery sin skins por acción; `TASK-1430` autora esos ejes y previsualiza con el renderer
-> canónico, sin page builder; `TASK-1428` fija dismiss/re-entry/caps privacy-safe; `TASK-1427` conserva baseline
-> cross-host. Se corrigió una ambigüedad previa: `slide_in` es no modal, sin `aria-modal`/focus trap; Escape,
-> dismiss y focus return siguen obligatorios. Todos los task/UI/ops linters pasan con 0 errors/0 warnings. Cambio
-> solo documental; runtime y lifecycle permanecen intactos. Pendiente: commit cuando lo ordene el operador y
-> luego ejecutar las tasks en su secuencia vigente.

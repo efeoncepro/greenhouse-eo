@@ -52,7 +52,7 @@ existente es la autoridad visual; este documento fija estructura, no valores lit
 
 | Región | Primitive/contract | Fuente |
 |---|---|---|
-| Shell | Composition Shell `leadPlusContext`, `fluidity='rich'` | controller compartido |
+| Shell | `Globe Studio Shell` + `Creative Desk` propios | registry Globe gobernado en Greenhouse |
 | Header | Breadcrumb/session/run summary | run reader |
 | Canvas | media viewer/compare primitive | candidate reader |
 | Context rail | adaptive sidecar + adaptive sections | brief, rights, estimate readers |
@@ -67,6 +67,19 @@ existente es la autoridad visual; este documento fija estructura, no valores lit
 - Medir `scrollWidth <= clientWidth` en ambos viewports.
 - Capturar primer fold tras shell y datos fixture antes del cableado exhaustivo.
 - Gate final: `design-contract:lint`, `ui:code-lint`, `ui:visual-gate`, `ui:quality` y scorecard >=4.5.
+- Baseline futuro: `globe.professional-studio-workbench`; markers `globe-studio-workbench`,
+  `studio-canvas`, `studio-context`, `studio-candidate-dock`, `studio-estimate`, `studio-review`,
+  `studio-state-*`.
+- Capturar también denied/redacted por audience, estimate expired, budget block y fallback ejecutado.
+
+## Copy ledger
+
+- Empty: `Inicia con un brief, una plantilla curada o una campaña existente.`
+- Estimate expired: `La ruta o sus condiciones cambiaron. Recalcula antes de aprobar.`
+- Budget blocked: `Este run supera el límite disponible. Ajusta el alcance o solicita aprobación.`
+- Rights blocked: `Falta evidencia de uso para una referencia o asset.`
+- Fallback: `La ruta ejecutada cambió respecto de la aprobada`; siempre muestra attempt/model/version.
+- Error: mensaje sanitizado + recovery; ningún raw provider/database error.
 
 ## Design Decision Log
 
@@ -75,4 +88,4 @@ existente es la autoridad visual; este documento fija estructura, no valores lit
 - Candidate dock es región, no wallpaper de cards.
 - El rail contextual usa The Seam: shell y cards se adaptan por sus propios contratos, sin acoplamiento.
 - Texto/logos de release se muestran como finishing determinista, no como promesa del modelo generativo.
-
+- Greenhouse gobierna registry/QA/promoción; Globe no hereda layouts, recipes, components ni primitives.

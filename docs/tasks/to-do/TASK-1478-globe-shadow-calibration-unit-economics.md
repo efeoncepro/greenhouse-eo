@@ -164,6 +164,11 @@ Validar unit economics antes de exponer precios, wallets o promesas de volumen.
 ### Slice 3
 
 - Emitir distribución, sensibilidad y recomendaciones de rate catalog.
+- Emitir `commercial_calibration_report_version` con p50/p75/p95 y confidence por
+  capability/template/provider; separar las cinco líneas económicas y modelar margen por delivery,
+  engagement, operating mode y account.
+- Incorporar support minutes, retry/refund reserve, FX sensitivity, working-capital exposure y simulación
+  de package/mix sin publicar precios ni convertirse en CPQ paralelo.
 
 ## Out of Scope
 
@@ -214,7 +219,11 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Acceptance Criteria
 
 - [ ] Se analizan 30–50 runs válidos o se documenta por qué la muestra no alcanza.
+- [ ] El report versionado incluye p50/p75/p95, confidence y sensibilidad por capability/template/provider.
 - [ ] Costos vendor y capacidad humana se separan de Studio Credits.
+- [ ] Governance/platform, human capacity, Studio Credits, implementation y rights/pass-through permanecen
+      como cinco líneas separadas; se modelan support, retry/refund reserve, FX y working capital.
+- [ ] Package/mix simulations son inputs de `TASK-1480`, no prices publicados ni CPQ source of truth.
 - [ ] Outliers, retries y fallbacks no se ocultan.
 - [ ] SDK/report reader devuelve la misma evidencia con redaction por audience; ningún spreadsheet/script
       reconstruye la métrica como source of truth paralelo.

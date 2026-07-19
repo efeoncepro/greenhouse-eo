@@ -20,14 +20,16 @@
 - Status real: `Diseño gobernado; implementación pendiente`
 - Rank: `TBD`
 - Domain: `finance|creative|data`
-- Blocked by: `TASK-1465, TASK-1466`
+- Blocked by: `TASK-1481, TASK-1465, TASK-1466`
 - Branch: `task/TASK-1468-globe-studio-credits-shadow-ledger`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-Implementar un ledger shadow de Studio Credits y catálogo de rates inmutable por versión, sin wallet, cobro, top-up ni exposición comercial.
+Implementar el kernel Full API Parity de Studio Credits: catálogo de rates inmutable, allocations shadow,
+estimate, balance proyectado, reservations, settlements, releases y ajustes compensatorios auditables, sin
+wallet, cobro, top-up ni exposición comercial.
 
 ## Why This Task Exists
 
@@ -35,7 +37,8 @@ EPIC-028 exige que integración de modelos, plataforma gobernada y validación c
 
 ## Goal
 
-Medir operaciones generativas gobernadas y calibrar unit economics sin simular dinero.
+Medir y controlar operaciones generativas gobernadas mediante un ledger reproducible que pueda operar UI,
+SDK, MCP, CLI, workers y harnesses sin que ningún consumer calcule o mute saldos por su cuenta.
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
 
@@ -59,7 +62,9 @@ Medir operaciones generativas gobernadas y calibrar unit economics sin simular d
 
 ### Depends on
 
-- `TASK-1465`, `TASK-1466`.
+- `TASK-1481` para trusted context, private API/SDK, coverage y conformance harness.
+- `TASK-1465` para workspace/tenancy, persistence, commands y audit.
+- `TASK-1466` para operating mode, responsibility y budget approver efectivos.
 
 ### Blocks / Impacts
 
@@ -72,6 +77,16 @@ Medir operaciones generativas gobernadas y calibrar unit economics sin simular d
 - `../efeonce-globe/packages/domain/`
 - `../efeonce-globe/packages/contracts/`
 - `../efeonce-globe/packages/sdk/`
+
+### Cross-task ownership boundary
+
+- `TASK-1481` posee el spine genérico; esta task lo extiende con schemas/primitives de credits y no crea otro
+  dispatcher, envelope, auth path o coverage format.
+- `TASK-1469` coordina approval y ejecución de runs; consume `estimate/reserve/settle/release` y no escribe
+  tablas de credits directamente.
+- `TASK-1474` sólo presenta balance, estimate e historial mediante readers/commands canónicos.
+- La administración de pools/grants/budgets y su cockpit pertenecen a `TASK-1482`/`TASK-1483`; esta task
+  soporta la allocation shadow mínima y el seam transaccional que esos consumers necesitan.
 
 ## Current Repo State
 
@@ -107,39 +122,68 @@ Medir operaciones generativas gobernadas y calibrar unit economics sin simular d
 ### Contract surface
 
 - Contrato existente a respetar: `EPIC-028, arquitectura agentic de Globe y provider contracts versionados`
-- Contrato nuevo o modificado: `estimate/reserve/settle/release/adjust commands and balance/history readers with immutable rate version`
+- Contrato nuevo o modificado:
+  - commands `allocateCredits`, `estimateCredits`, `reserveCredits`, `settleCredits`,
+    `releaseCreditReservation`, `postCreditAdjustment` y `expireCreditReservation`;
+  - readers `getCreditBalance`, `getCreditEstimate`, `getCreditReservation`, `listCreditLedgerEntries`,
+    `getCreditRateCatalog` y `getCreditUsageSummary`;
+  - DTOs/result/error schemas versionados, private HTTP/SDK adapters y capability coverage.
 - Backward compatibility: `gated`
-- Full API parity: `ledger writes/reads live in canonical primitives; UI/MCP/SDK never calculate or mutate balance locally`
+- Full API parity: `cada command/reader extiende TASK-1481; UI/MCP/SDK/CLI/worker llaman el mismo primitive,
+  actor/workspace se derivan server-side y ninguna surface calcula o muta balance localmente`
 
 ### Data model and invariants
 
-- Entidades/tablas/views afectadas: `sólo agregados Globe definidos por la migración/contrato aceptado de esta task`
-- Invariantes que no se pueden romper: `tenant isolation, lineage, idempotencia, provider/model/version explícitos y audit append-only`
+- Entidades/tablas/views afectadas: `credit rate versions, allocations/grants shadow, ledger entries,
+  reservations, settlements/adjustments y balance/usage projections; ledger y reservations conservan
+  source_ref, pool_id/grant_id opcionales, funding breakdown y budget_policy_version`
+- Invariantes que no se pueden romper:
+  - `el ledger append-only es source of truth; balance es proyección y nunca contador mutable independiente`;
+  - `allocation crea derecho de uso y no es consumo; estimate no mueve balance`;
+  - `reservation inmoviliza saldo con rate version, run, scope y expiración; settlement/release son idempotentes`;
+  - `refund/corrección se registra como adjustment compensatorio; ninguna fila histórica se edita o elimina`;
+  - `un workspace no puede leer, reservar, transferir o ajustar saldo de otro`;
+  - `provider/model/version propuestos y ejecutados quedan como evidencia, no como unidad del crédito`;
+  - `pool/sub-budget no es un segundo saldo: su check corre en la misma transacción de reserveCredits y la
+    fuente de fondos queda pinneada en la reservation`;
+  - `una allocation originada por grant usa source_type/source_id únicos y no puede postearse dos veces`;
+  - `el mismo idempotency key + fingerprint devuelve el mismo resultado; payload diferente produce conflict`;
+  - `no hay saldo negativo salvo policy futura explícita, versionada y aprobada`.
 - Tenant/space boundary: `studio_workspace_id derivado de identidad autorizada; nunca aceptado ciegamente desde el cliente`
-- Idempotency/concurrency: `keys durables, preconditions y locks/fences proporcionales al write externo o financiero`
-- Audit/outbox/history: `actor, correlation, intento, decisión, estado y error sanitizado; secretos y payload sensible excluidos`
+- Idempotency/concurrency: `claim/fingerprint durable y transacción/locking que impide over-reservation,
+  double-settlement, double-release y replay con payload distinto; BudgetPolicyPort fail-closed permite a
+  TASK-1482 evaluar pool/project caps atómicamente, nunca mediante un pre-check TOCTOU`
+- Audit/outbox/history: `actor trusted, workspace, project/run, command, reason code, rate version, proposed and
+  actual route, correlation, before/after projection y error sanitizado; costo vendor/margen se redactan por audience`
 
 ### Migration, backfill and rollout
 
 - Migration posture: `additive`
 - Default state: `internal-only y flag/allowlist OFF para clientes externos`
-- Backfill plan: `ninguno salvo plan explícito y reversible aprobado en ejecución`
-- Rollback path: `kill switch, revert de adapter/consumer y reconciliación desde audit`
+- Backfill plan: `ninguno; el shadow ledger comienza vacío y sólo recibe allocations por command canónico`
+- Rollback path: `deshabilitar nuevos writes, liberar holds seguros y reconstruir projections desde el ledger;
+  nunca borrar entries ni recalcular settlements históricos con una rate version nueva`
 - External coordination: `owner de GCP/provider y, cuando aplique, Legal/Finance/Security`
 
 ### Security and access
 
-- Auth/access gate: `capability por actor, workspace y acción; WIF/ADC sin llaves persistidas`
+- Auth/access gate: `capabilities separadas para read, estimate, allocate, reserve, settle/release y adjust;
+  actor/workspace/budget authority derivados del trusted context de TASK-1481`
 - Sensitive data posture: `assets privados, logs redacted y secretos sólo server-side`
 - Error contract: `errores tipados y sanitizados; raw provider/cloud/database errors no cruzan la frontera`
-- Abuse/rate-limit posture: `hard budget, rate limit, concurrency cap, timeout, retry acotado y circuit breaker`
+- Abuse/rate-limit posture: `hard budget, sufficient-balance check, per-run/daily cap, rate limit, concurrency
+  fence, reservation TTL y global/workspace kill switch`
 
 ### Runtime evidence
 
-- Local checks: `unit, contract, negative-path e idempotency tests`
-- DB/runtime checks: `migrations/readback e invariantes tenant-scoped cuando aplique`
-- Integration checks: `smoke no productivo allow/deny/replay/revoke y provider canary dentro de presupuesto`
-- Reliability signals/logs: `correlation_id, route, attempt, latency, cost/reservation y outcome sin secretos`
+- Local checks: `rate calculation, projection rebuild, reason taxonomy, negative balance, expiry, redaction,
+  contract, spoofing-negative, idempotency and concurrency tests`
+- DB/runtime checks: `migration/readback, cross-workspace denial, concurrent reserve/settle, projection rebuild
+  equality y ledger reconciliation`
+- Integration checks: `private API + SDK conformance para allocate/estimate/reserve/settle/release/adjust/read;
+  MCP/UI pueden permanecer policy-blocked pero nunca missing`
+- Reliability signals/logs: `low balance, expired/stuck hold, duplicate settlement attempt, estimate/actual
+  deviation, retry storm y projection drift; correlation sin secretos`
 - Production verification sequence: `local -> sandbox -> internal allowlist -> staging/canary -> promoción explícita`
 
 ### Acceptance criteria additions
@@ -152,23 +196,36 @@ Medir operaciones generativas gobernadas y calibrar unit economics sin simular d
 
 ## Scope
 
-### Slice 1
+### Slice 1 — Contract, rates and allocation
 
-- Definir rate catalog versionado y estimate determinista que conserve capability/banda y la ruta
-  provider/modelo/version propuesta sin convertir esa ruta en la unidad económica del crédito.
+- Extender el spine de `TASK-1481` con schemas, errors, capability descriptors y coverage de credits.
+- Definir catálogo de rates versionado, allocation shadow por workspace/período y estimate determinista que
+  conserve capability/banda y ruta provider/modelo/version propuesta sin convertirla en unidad económica.
+- Entregar `allocateCredits`, `estimateCredits`, `getCreditRateCatalog`, `getCreditEstimate` y
+  `getCreditBalance` como primitives + private API/SDK.
+- Mantener `allocateCredits` como primitive kernel/internal: grants llaman este seam con source ref idempotente
+  y no exponen un bypass genérico a UI/MCP.
 
-### Slice 2
+### Slice 2 — Transactional ledger lifecycle
 
-- Persistir reserve, attempts, settle, release y adjustments append-only, incluyendo ruta realmente ejecutada
-  y fallback por attempt sin exponer costo vendor o margen en superficies cliente.
+- Persistir ledger, reservations, settlements y adjustments append-only con rate pinning, TTL, reason taxonomy
+  y projections reconstruibles.
+- Implementar reserve, settle, release, expire y adjust con idempotency/concurrency fences y saldo no negativo.
+- Registrar ruta realmente ejecutada y fallback por attempt sin exponer costo vendor o margen a audiencias no autorizadas.
 
-### Slice 3
+### Slice 3 — Readers, reconciliation and parity evidence
 
-- Probar replay, concurrencia, reconciliación y reporting shadow.
+- Publicar balance/history/reservation/usage readers y sus adapters SDK/private API.
+- Implementar expiry/reconciliation sobre primitives canónicos; worker/CLI no escriben DB directo.
+- Extender coverage/conformance para replay, concurrencia, redaction, projection rebuild y reporting shadow.
 
 ## Out of Scope
 
 - Producción pública, clientes externos, pricing/wallet self-serve o permisos más amplios que los aprobados expresamente.
+- Descuentos comerciales sobre precio, facturación, impuestos, reconocimiento de ingreso, top-ups, checkout,
+  rollover/expiración comercial o transferencias entre tenants.
+- Un cockpit administrativo completo de pools/grants/policies; V1 sólo incluye la allocation shadow mínima y
+  sus contratos para calibración interna.
 - Mover runtime creativo, datos, provider secrets o lógica de Globe a Greenhouse.
 - Crear un segundo harness o namespace de tasks dentro de Globe.
 
@@ -187,6 +244,9 @@ La ejecución comienza desde Greenhouse con `pnpm codex:task-hook TASK-1468 --de
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
 | Doble contabilización o semántica financiera engañosa | Globe/Greenhouse | medium | gate binario, allowlist, audit y rollback antes de ampliar | balance cambia sin ledger entry |
+| Consumer calcula o muta saldo fuera del primitive | API/credits | medium | Full API Parity coverage + conformance | UI, worker o script escribe tabla/proyección directo |
+| Over-reservation por concurrencia | credits/DB | medium | transaction/lock + invariant tests | disponible cae bajo cero o dos holds consumen el mismo saldo |
+| Rate version reescribe historia | credits/economics | low | pin inmutable por reservation/settlement | run histórico cambia al publicar rate nueva |
 | Deriva entre task y runtime | documentation | medium | task hook, checkpoint, QA y closure en Greenhouse | cambio Globe sin evidencia TASK |
 | Habilitación accidental externa | security/commercial | low | internal-only, deny tests y sign-off separado | actor externo obtiene acceso |
 
@@ -215,10 +275,23 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Acceptance Criteria
 
 - [ ] Studio Credit no equivale a token, pieza, hora, moneda ni derecho.
-- [ ] Estimate conserva rate version y ruta propuesta.
-- [ ] Retry/fallback no duplica reserva ni settlement.
+- [ ] Allocation shadow, estimate, balance, reservation, settlement, release, expiry y adjustment existen como
+      commands/readers canónicos y no como writes directos de fixtures, workers o UI.
+- [ ] Balance disponible/reservado/consumido/ajustado se reconstruye exactamente desde el ledger append-only.
+- [ ] Estimate conserva rate version y ruta propuesta; settlement conserva ruta real y fallbacks por attempt.
+- [ ] Retry, replay, fallback y concurrencia no duplican allocation, reserva, settlement, release ni adjustment.
+- [ ] Source refs de grant/pool son únicos y el funding breakdown queda pinneado; concurrencia/replay no crea
+      dos allocations para un mismo grant.
+- [ ] `reserveCredits` revalida atómicamente el BudgetPolicyPort; pool pausado, agotado o project-capped
+      rechaza la reserva aunque el balance agregado sea suficiente.
+- [ ] Una reservation expirada libera saldo mediante command idempotente y deja audit/reason; no se borra.
+- [ ] Actor/workspace/budget authority se derivan del trusted context; spoofing y cross-tenant access fallan cerrado.
 - [ ] El ledger distingue ruta propuesta de ruta ejecutada y conserva fallback/model version por attempt.
-- [ ] API/SDK/conformance prueban estimate/reserve/replay/settle/release/history y doble-submit sin doble saldo.
+- [ ] API/SDK/conformance prueban todos los commands/readers; surfaces aún no habilitadas figuran
+      `policy-blocked|not-applicable`, nunca `missing`.
+- [ ] Costos vendor y margen sólo aparecen en readers de audiencia autorizada; client-facing recibe credits,
+      modelo/ruta transparente y razones legibles sin secretos ni economía confidencial.
+- [ ] Reliability detecta holds vencidos/stuck, duplicados, projection drift, saldo bajo y desviación estimate/actual.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
 - [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
 

@@ -26,3 +26,8 @@
 - Sidecar móvil devuelve foco al trigger y no deja acciones críticas detrás de un overlay.
 - Cambios async importantes usan live region moderada; el progreso visual no es la única señal.
 
+## Access and evidence branches
+
+- Audience redactada: conserva provider/model/version y credits del run permitidos, oculta cost/margin/IP.
+- Capability denied: explica quién puede aprobar o revisar sin filtrar datos cross-workspace.
+- Scenario markers y baseline se definen en la visual direction; first-fold se acepta antes de cableado total.

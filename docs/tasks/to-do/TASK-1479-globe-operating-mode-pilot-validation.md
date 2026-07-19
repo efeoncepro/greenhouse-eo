@@ -20,7 +20,7 @@
 - Status real: `Diseño gobernado; implementación pendiente`
 - Rank: `TBD`
 - Domain: `creative|commercial|ops`
-- Blocked by: `TASK-1473, TASK-1474, TASK-1476, TASK-1477, TASK-1478`
+- Blocked by: `TASK-1473, TASK-1474, TASK-1476, TASK-1477, TASK-1478, TASK-1482, TASK-1483`
 - Branch: `task/TASK-1479-globe-operating-mode-pilot-validation`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -58,7 +58,7 @@ Probar responsabilidades, calidad, soporte y escalamiento antes de habilitar ope
 
 ### Depends on
 
-- `TASK-1473`, `TASK-1474`, `TASK-1476`, `TASK-1477`, `TASK-1478`.
+- `TASK-1473`, `TASK-1474`, `TASK-1476`, `TASK-1477`, `TASK-1478`, `TASK-1482` y `TASK-1483`.
 
 ### Blocks / Impacts
 
@@ -108,6 +108,8 @@ Probar responsabilidades, calidad, soporte y escalamiento antes de habilitar ope
 ### Slice 3
 
 - Validar client-operated sólo en allowlist y si gates previos lo permiten.
+- Probar budget manager/client viewer con proyección redactada y controls de `TASK-1483`; no convertir piloto
+  en habilitación general ni exponer cost/margin/internal reasons.
 
 ## Out of Scope
 

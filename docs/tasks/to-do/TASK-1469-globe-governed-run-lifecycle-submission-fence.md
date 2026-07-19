@@ -20,7 +20,7 @@
 - Status real: `Diseño gobernado; implementación pendiente`
 - Rank: `TBD`
 - Domain: `creative|platform|ops`
-- Blocked by: `TASK-1466, TASK-1467, TASK-1468`
+- Blocked by: `TASK-1466, TASK-1467, TASK-1468, TASK-1482`
 - Branch: `task/TASK-1469-globe-governed-run-lifecycle-submission-fence`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -59,7 +59,7 @@ Garantizar que un run autorizado se ejecute una vez, conserve ruta real y sea re
 
 ### Depends on
 
-- `TASK-1466`, `TASK-1467`, `TASK-1468`.
+- `TASK-1466`, `TASK-1467`, `TASK-1468` y `TASK-1482` para el seam final de budget policy/funding.
 
 ### Blocks / Impacts
 
@@ -114,7 +114,9 @@ Garantizar que un run autorizado se ejecute una vez, conserve ruta real y sea re
 ### Data model and invariants
 
 - Entidades/tablas/views afectadas: `sólo agregados Globe definidos por la migración/contrato aceptado de esta task`
-- Invariantes que no se pueden romper: `tenant isolation, lineage, idempotencia, provider/model/version explícitos y audit append-only`
+- Invariantes que no se pueden romper: `tenant isolation, lineage, idempotencia, provider/model/version
+  explícitos y audit append-only; approval token liga estimate/reservation, pool, funding breakdown y
+  budget_policy_version, y submit revalida sus preconditions sin elevar permisos`
 - Tenant/space boundary: `studio_workspace_id derivado de identidad autorizada; nunca aceptado ciegamente desde el cliente`
 - Idempotency/concurrency: `keys durables, preconditions y locks/fences proporcionales al write externo o financiero`
 - Audit/outbox/history: `actor, correlation, intento, decisión, estado y error sanitizado; secretos y payload sensible excluidos`
@@ -155,6 +157,8 @@ Garantizar que un run autorizado se ejecute una vez, conserve ruta real y sea re
 ### Slice 1
 
 - Definir state machine, commands y approval token ligados a estimate.
+- Bindear approval a pool/funding breakdown/budget policy version y revalidar en submit; cambio material exige
+  estimate/reservation/approval nuevos.
 
 ### Slice 2
 
@@ -213,6 +217,7 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Acceptance Criteria
 
 - [ ] Ningún provider submission ocurre sin approval/reservation válidos.
+- [ ] Approval y submission preservan pool/funding/policy version; pause/cap/cambio material falla cerrado.
 - [ ] El mismo idempotency key no genera doble gasto.
 - [ ] Fallback requiere policy explícita y registra proposed vs actual route.
 - [ ] API/SDK/conformance cubren prepare→estimate→approve→submit→status/cancel/retry/branch, deny y replay con
