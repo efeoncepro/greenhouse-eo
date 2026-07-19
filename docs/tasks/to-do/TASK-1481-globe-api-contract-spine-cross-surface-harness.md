@@ -1,5 +1,27 @@
 # TASK-1481 — Globe API Contract Spine and Cross-Surface Harness
 
+## Delta 2026-07-19 — pre-execution review (arch-architect + state-design + info-architecture + creative-practice)
+
+- `TASK-1456` está `complete`: la dependencia de `Depends on` quedó satisfecha y esta task está desbloqueada.
+- Hallazgos verificados contra el runtime real de Globe que precisan el `### Gap`: el SDK ya envía
+  `X-Globe-Workspace-Id` caller-provided (`packages/sdk/src/index.ts`) y la shell deriva
+  `AuthenticatedPrincipalV1.capabilities` hardcodeadas a `[globe.studio.access]` en vez de leerlas del binding
+  del broker (`apps/studio-web/src/app.ts`).
+- Precisión semántica obligatoria: workspace **selection** (input no confiable que declara sobre qué workspace
+  se quiere operar) es válida por header/payload; workspace **authority** NUNCA — el trusted context valida la
+  selección contra los bindings del principal server-side y deniega con audit si no corresponde. Prohibido tanto
+  eliminar la selección (rompe multi-workspace) como promoverla a autoridad (spoofing).
+- Test del segundo consumidor: la conformance matrix y sus asserts se derivan de los capability
+  descriptors/coverage machine-readable, no se hardcodean al fixture. `TASK-1457` extiende declarando
+  descriptor + fixture con cero edición del harness; un harness que se edita por capability sólo prueba que el
+  primer fixture sigue igual.
+- El vocabulario de error canónico debe distinguir capability/surface `policy-blocked` de
+  `access_denied`/`not_found` con código estable, para que toda surface (UI/MCP/agente) renderice el estado
+  honesto "bloqueado por política" sin adivinar y sin retry inútil.
+- El harness prueba la derivación de trusted context para ambos planos de auth (`greenhouse-session` humano y
+  `google-id-token` workload) o declara explícito cuál queda diferido y a qué task.
+- Estas precisiones se reflejan en `### Gap`, `### Data model and invariants` y `## Acceptance Criteria`.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
@@ -103,6 +125,10 @@ CLI, workers, sister platforms y E2E, aunque varias surfaces permanezcan `policy
 - No hay schema/discovery machine-readable para creative capabilities ni conformance matrix.
 - SDK/MCP/CLI/worker todavía no tienen creative command/read paths.
 - `CommandEnvelope` acepta `actorId` y `workspaceId` pese a que la autoridad debe derivarse server-side.
+- El SDK envía `X-Globe-Workspace-Id` y `GlobeInvocationContext.workspaceId` caller-provided sin contrato que
+  los declare workspace selection no confiable (`packages/sdk/src/index.ts`).
+- La shell deriva `AuthenticatedPrincipalV1.capabilities` hardcodeadas a `[globe.studio.access]` en vez del
+  binding del broker (`apps/studio-web/src/app.ts`).
 - No existe test que demuestre que body/query/headers no pueden suplantar actor/workspace.
 
 ## Modular Placement Contract
@@ -137,6 +163,7 @@ CLI, workers, sister platforms y E2E, aunque varias surfaces permanezcan `policy
 - Entidades/tablas/views afectadas: `ninguna migration; tipos/ports y conformance fixtures repo-only`
 - Invariantes que no se pueden romper:
   - `actor/workspace/capabilities salen de auth + binding confiables, nunca de payload/query/header caller-provided`;
+  - `workspace selection caller-provided es input no confiable: se valida contra los bindings del principal y se deniega con audit si no corresponde; nunca se copia directo al trusted context`;
   - `business logic vive una vez en command/reader; transports no llaman DB, storage o providers directamente`;
   - `una surface disabled usa available|policy-blocked|not-applicable; missing bloquea closure`;
   - `command result, error y audit correlation son iguales para todo consumer`.
@@ -171,6 +198,7 @@ CLI, workers, sister platforms y E2E, aunque varias surfaces permanezcan `policy
 
 - [ ] El spine permite añadir una capability sin duplicar business logic por transport.
 - [ ] Auth spoofing, idempotency replay, deny y canonical error paths tienen contract evidence.
+- [ ] La conformance matrix y sus asserts se derivan de los capability descriptors/coverage machine-readable; añadir una capability nueva no requiere editar el harness, sólo declarar descriptor + fixture.
 
 <!-- ZONE 2 — PLAN MODE: se completa al tomar la task -->
 <!-- ZONE 3 — EXECUTION SPEC -->
@@ -253,6 +281,9 @@ Ninguna. La primera credencial/provider call pertenece al checkpoint aprobado de
 - [ ] Existe coverage machine-readable por capability/surface con `available|policy-blocked|not-applicable`.
 - [ ] No existe generic `endpoint + arbitrary JSON` ni import provider/DB/storage desde transports.
 - [ ] El SDK deja de ser health-only como patrón, sin inventar business capability antes de su task.
+- [ ] El error canónico distingue capability/surface `policy-blocked` de `access_denied`/`not_found` con un código estable, consumible por UI/MCP/agentes para renderizar el estado honesto.
+- [ ] Workspace selection caller-provided se valida contra bindings (deny + audit en mismatch) y existe test negativo de principal válido operando un workspace ajeno.
+- [ ] El trusted context se deriva y prueba para ambos planos de auth (`greenhouse-session` humano y `google-id-token` workload), o el plano diferido queda declarado explícito con su task.
 - [ ] TASK-1457 puede añadir el primer Model Lab command y provider canary sin cambiar el spine.
 - [ ] No se habilitan Production, provider spend, cliente externo ni MCP creativo.
 
