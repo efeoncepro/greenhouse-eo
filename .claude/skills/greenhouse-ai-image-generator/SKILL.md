@@ -1,8 +1,6 @@
 ---
 name: greenhouse-ai-image-generator
-description: Expertly art-direct, prompt, generate, edit, validate, and apply AI-generated visual assets for Greenhouse, including transparent PNG icons, UI elements, empty states, banners, hero images, thumbnails, professional finishes, material/style control, and reference-guided image edits. Invoke when asked to create images with AI, improve image prompts, use OpenAI/GPT Image/Imagen/Nano Banana, create transparent assets, or produce polished visuals for Greenhouse UI.
-user-invocable: true
-argument-hint: "[asset brief, target surface, format, transparency, provider constraints]"
+description: Expertly art-direct, prompt, generate, edit, validate, and apply AI-generated visual assets for Greenhouse, including transparent PNG icons, UI elements, empty states, banners, hero images, thumbnails, professional finishes, material/style control, reference-guided edits, and hybrid Seedream 5↔GPT Image 2→Gemini Omni campaign workflows across digital, motion, print and OOH. Use when a user asks to create images with AI, improve image prompts, use OpenAI/GPT Image/Imagen/Nano Banana/Seedream via fal.ai, create transparent assets, or produce and scale polished visuals for Greenhouse UI or campaign production.
 ---
 
 # Greenhouse AI Image Generator
@@ -11,16 +9,18 @@ Use this skill whenever Greenhouse needs AI-generated visual assets: icons, UI e
 
 Act as both the image-generation operator and the art director. The job is not only to call a model; it is to produce a professional asset with deliberate composition, material, lighting, palette, hierarchy, technical fit, and QA.
 
-Manual invocation in Claude Code: `/greenhouse-ai-image-generator [asset brief]`.
-
 ## First Reads
 
 Read only what the task needs:
 
 - `docs/operations/GREENHOUSE_AI_IMAGE_GENERATION_AGENT_SKILL_V1.md`
 - `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`
+- `references/seedream-5-gpt-image-2-hybrid-production.md` when the task uses Seedream 5,
+  fal.ai still-image generation, multiple image models or campaign profusion
+- `docs/operations/GREENHOUSE_MULTIMODAL_CAMPAIGN_PRODUCTION_V1.md` when stills hand off to Gemini Omni,
+  or the campaign includes motion, print/OOH or explicit branded/brand-light/neutral/client modes
 - `DESIGN.md` when the asset will appear in UI
-- `CLAUDE.md`, `project_context.md`, `Handoff.md` for repo coordination
+- `AGENTS.md`, `project_context.md`, `Handoff.md` for repo coordination
 
 If the request is a real third-party logo or payment mark, stop and use `greenhouse-digital-brand-asset-designer` instead.
 
@@ -47,14 +47,13 @@ pnpm ai:image --prompt "<text>" [--out <path>] [--size 1024x1024|1536x1024|1024x
               [--model gpt-image-2] [--count N] [--timeout 280000] [--open]
 pnpm ai:image --prompt-file <path>          # long prompts
 pnpm ai:image --batch concepts.json         # [{ "filename": "a.png", "prompt": "…" }, …] — multiple
-pnpm ai:image --concept <loop> [--task TASK-###] --batch concepts.json   # design-loop concepts
 ```
 
 - Wraps the canonical `generateOpenAIImage` (`src/lib/ai/openai-image.ts`). Self-contained: loads `.env.local`, resolves `OPENAI_API_KEY_SECRET_REF` server-side, never prints the secret.
 - Defaults: `gpt-image-2 · 1536x1024 · quality high · opaque · out-dir public/images/generated`. Timeout default **280s** (gpt-image-2 `high` exceeds the 125s of the runtime `generateImage` helper).
 - `--background transparent` falls back to `gpt-image-1.5` (gpt-image-2 has no alpha). Still **raster** (PNG) — for real vectors use Higgsfield + Recraft V4.1.
 - The CLI **operates** the model; THIS skill is the **art direction** (brief, composition, finish, palette, QA). Run the skill to write the prompt, then the CLI to generate, then critique + GVC if it lands in UI.
-- **Concepts: use `--concept <loop>`** (optionally `--task TASK-###`) — it auto-routes to `.captures/concepts/<loop>/` (gitignored, **protected from the GVC garbage collector**), writes a traceable `manifest.json`, and surfaces in `pnpm fe:capture:index` grouped by loop. Don't hand-route concepts with `--out`/`--out-dir`, and never commit them.
+- Keep exploratory concepts out of commits (gitignored dir, e.g. `.captures/concepts/`).
 
 ## Reference edit + character consistency (`--image`)
 
@@ -64,7 +63,7 @@ Canonical path to make **consistent variants** of an existing character/asset (n
 pnpm ai:image --image <ref.png> --prompt "keep this exact <subject>, change ONLY <delta>" --out <out.png>
 #   --image <path>        reference to edit (repeatable) → switches to editOpenAIImage (image-to-image)
 #   --input-fidelity high strict reference preservation (only models ≠ gpt-image-2)
-pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (preserves interior white)
+pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (AI matting, soft edges)
 ```
 
 - El cliente acepta hasta **10** `--image` por request y conserva su orden. Cada referencia debe declarar en el
@@ -77,27 +76,27 @@ pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (
 - **Engine verdict (bake-off 2026-07-05):** for identity + logo fidelity on an edit, `gpt-image-2` (this CLI, our OpenAI key, zero third-party credits) wins. `nano_banana_pro` (Higgsfield) is a strong plan B (slightly better face/expression, costs credits). Do NOT use text-to-image or "character" models (e.g. Soul) for consistency — they treat the reference as inspiration and drift to a different subject + mangled logo.
 - **Prompt = identity-lock scaffold + one small delta.** Fix everything (face, hair, outfit, the exact logo, framing, lighting) and change ONLY the requested pose/expression. Big deltas break consistency; small deltas hold it. Anchor every variant to the SAME canonical reference, not to a previous generation.
 - **No engine keeps a logo pixel-exact** (~90% redraw). If the mark must be exact, mask its region and re-stamp the real vector (e.g. `public/branding/SVG/isotipo-efeonce-negativo.svg`) by composition. With `gpt-image-2` the logo is faithful enough that this is optional.
-- **Background:** `gpt-image-2` returns opaque. `pnpm ai:image:rmbg` cuts it to transparent with **AI matting** (soft, professional hair edges) instead of color-key/flood-fill, which leaves "bitten" edges and white halos. Free/local matting; do not spend Higgsfield/Magnific credits on this. Engine = `@imgly/background-removal-node` (model `medium` default; `small` for speed — `large` is NOT bundled in v1.4.5). Its native deps (`onnxruntime-node` + a nested `sharp`) are approved via `pnpm.onlyBuiltDependencies` in `package.json`, so a plain `pnpm install` builds them; first run has a few-seconds model warm-up.
+- **Background:** `gpt-image-2` returns opaque. `pnpm ai:image:rmbg` cuts it to transparent with **AI matting** (soft, professional hair edges) — a color-key/flood-fill leaves "bitten" edges + white halos in hair and must not be used for character assets. Free/local matting; do not spend Higgsfield/Magnific credits on this. Engine = `@imgly/background-removal-node` (model `medium` default; `small` for speed — `large` is NOT bundled in v1.4.5). Its native deps (`onnxruntime-node` + a nested `sharp`) are approved via `pnpm.onlyBuiltDependencies` in `package.json`, so a plain `pnpm install` builds them; first run has a few-seconds model warm-up.
 - **Human-review every variant against the anchor** for identity drift before keeping it.
-
-## Icon / asset SET craft (lessons from `2026-07-11_tender-deck-clay3d`)
-
-When the deliverable is a **set** of assets (icon family, illustration library) rather than a single image:
-
-- **Judge the set COMPOSED on its real background, never asset-by-asset.** Build a contact sheet on the actual surface color and look at it. An asset that reads fine in isolation can break the cohesion of the group — and cohesion is the whole point of a set. In that run, the first curation passed asset-by-asset and then **half of it collapsed** the moment it was composited on the real navy.
-- **Curate before you generate.** Check whether the team already produced the assets (e.g. the OneDrive clay libraries). But **a pre-existing library is not automatically usable**: define explicit filters up front (subject type · palette · render language · no baked-in text) and **enforce them even when it means regenerating everything**. Convenience does not override the criterion.
-- **Never bake text into a reusable asset.** A clay icon with the word "SEO" modeled into it is dead the moment the concept changes. Prompt hard: *"absolutely NO text, NO letters, NO numbers, NO logos"* — and re-check the render, because models sneak glyphs in.
-- **Matting eats white objects.** `@imgly/background-removal-node` will devour a white/cream subject sitting on a light studio background — it reads as background. If the subject must be light, **generate it in color** instead of trying to rescue it at cutout time.
-- **Never `sharp.trim()`** an asset whose background is semi-transparent: it leaves a visible halo rectangle. Use the matting path.
-- **Prompt the negative space of the concept, not just the concept.** Asking for "ascending steps" yields a **bar chart** (which then collides with your metrics icon). Spell out what it must NOT be: *"do NOT make ascending bars, do NOT make a bar chart, equal-height platforms"*.
 - **Log durable generations in `ai-generations/`** (repo, not `.captures/`): one subfolder per run named `YYYY-MM-DD_<semantic>/` with `README.md` (verbatim prompts) + `manifest.json`, plus a row in `ai-generations/INDEX.md`. Worked example: `ai-generations/2026-07-05_nexa-fallback-characters/` — the 3D Nexa character (`public/images/illustrations/characters/greenhouse-*.png`) posed per fallback `kind`.
 
 ## Provider Choice
 
 - Use `openai-image` for higher prompt fidelity, complex composition, reference-guided edits, UI assets, icon sets, and transparent PNG batches.
 - Use `google-imagen` when matching existing Imagen-generated banners or when the current surface already uses that visual language.
+- Use Seedream 5 Lite out-of-band for inexpensive creative divergence and Seedream 5 Pro for
+  material/color/atmosphere development or semantic regional edits; use `src/lib/ai/fal.ts`,
+  never a parallel fal client or product runtime wiring.
+- For campaign systems, do not choose one provider globally. Load
+  `references/seedream-5-gpt-image-2-hybrid-production.md` and route each operation through an
+  explicit anchor/handoff contract. If the system adds Gemini Omni motion or offline outputs, also load
+  `docs/operations/GREENHOUSE_MULTIMODAL_CAMPAIGN_PRODUCTION_V1.md`; keep clean plates separate from the
+  deterministic brand/channel layer.
+- Campaign derivation uses a governed **star topology**: the approved `anchor_id`/`anchor_revision` is the
+  center; ratios, motion plates, print proofs and OOH proofs are independent spokes. A local repair does not
+  become the next anchor without explicit human promotion.
 - Use `generateAnimation()` for small SVG/CSS animations, not raster image generation.
-- Use any native image generation tool only for exploratory artifacts or when the user asks for an image in chat rather than a repo asset.
+- Use the native chat image tool only for exploratory artifacts or when the user asks for an image in chat rather than a repo asset.
 
 ## Editorial cover assets
 
@@ -122,6 +121,23 @@ Fal.ai is a programmatic media-generation aggregator — one API fronts many mod
 - **Video is the headline** — for video art direction / model choice use `motion-design-studio`; audio → `audio-studio`; model/aesthetic pick → `design-studio`. THIS skill covers still-image asset craft.
 - **Pricing is per-second, public on each model page** (verify at fal.ai/models first): e.g. Seedance 2.0 Standard ~$0.3024/s, Fast ~$0.2419/s, Mini 480p ~$0.0721/s. Audio included free.
 - **Full model & capability catalog** (13 categories, verified slugs): `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md`.
+
+### Seedream 5 still-image routing (verified 2026-07-18)
+
+- Lite endpoints: `bytedance/seedream/v5/lite/text-to-image` and
+  `bytedance/seedream/v5/lite/edit`; use for parallel divergence before an anchor exists.
+- Pro endpoints: `bytedance/seedream/v5/pro/text-to-image` and
+  `bytedance/seedream/v5/pro/edit`; use for expressive development, multireference material
+  fusion and semantic regional art direction.
+- Both edit endpoints accept ordered `image_urls`; assign every reference a role and conflict
+  precedence. Pro's marketed region/layer comprehension still returns a flat raster and exposes
+  no public mask/layer output contract.
+- Large data URIs proved unreliable in the real bridge. For local files, prefer a temporary
+  `fal-cdn-v3` upload with short lifecycle and do not persist its input URL. A private GCS object
+  with short-lived signed URL is only an alternative when `signBlob` is already authorized;
+  never widen IAM or publish a bucket for convenience.
+- For the full capability contract, prices, dimensions, GPT limits, measured benchmark and
+  hybrid handoff schema, load `references/seedream-5-gpt-image-2-hybrid-production.md`.
 - **State (2026-07-06): OPERATIONAL — key persisted + real generation verified end-to-end.** Secret `greenhouse-fal-api-key` in GCP Secret Manager + `FAL_API_KEY_SECRET_REF` in `.env.local`; `runFalModel('fal-ai/flux/schnell')` returns `ok:true` HTTP 200 with a real image (`secretSource=secret_manager`). Key temporary (rotation pending). Not wired to Vercel runtime. **Queue-URL gotcha:** for sub-path models fal returns `status_url`/`response_url` on the PARENT app — never reconstruct polling URLs from the slug (→ 405). Full contract: `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`.
 
 ## Workflow
@@ -134,7 +150,10 @@ Fal.ai is a programmatic media-generation aggregator — one API fronts many mod
 5. Write a prompt with explicit asset intent, subject, composition, style, material, lighting, palette, background, constraints, and output target.
 6. Generate through the canonical helper for repo-bound assets.
 7. Critique the result like production design: small-size readability, crop, alpha edge, material believability, brand fit, and integration fit.
-8. Refine with single-change follow-ups; restate invariants on every edit.
+8. Refine with single-change follow-ups; restate invariants on every edit. In multi-model flows,
+   carry `anchor_id`, parent asset, reference roles, precedence, locks, one delta, safe zones and
+   acceptance criteria at every handoff; derive every ratio from the approved anchor using star topology,
+   not from the previous ratio or latest available output.
 9. If placed in UI, verify the surface with Greenhouse Visual Capture.
 10. Report paths, model/provider, transparency validation, visual QA, and limitations.
 
@@ -147,6 +166,13 @@ Fal.ai is a programmatic media-generation aggregator — one API fronts many mod
   runtime does not expose `model_id`; never infer it from visual quality.
 - Never generate official logos or brand marks from memory.
 - Do not include visible text unless the user explicitly asks and accepts risk; image models can still struggle with precise text.
+- Treat model-rendered campaign text as concept-only. Final copy, logo, CTA, price, legal and
+  localization require deterministic composition unless an explicit exception accepts raster risk.
+- Seedream Pro «region/layer editing» is semantic art direction over one flattened raster, not editable
+  layers or pixel-perfect locality. Use GPT + alpha mask when protected-region drift has operational cost.
+- If a still becomes motion, hand the approved clean plate to `motion-design-studio`. Build the 15/10/6
+  family in deterministic post; use Seedance 2.0 only for a genuinely new shot/action/continuity need,
+  never to repair timing, crop, copy/logo, grade, foley or other editing defects.
 - Do not ship assets with watermarks, fake logos, accidental letters, cropped subjects, dirty alpha edges, or background residue.
 - For hands or culturally meaningful gestures, validate topology rather than silhouette: identify palm/dorso,
   locate the thumb/radial side, trace every digit from base to tip and inspect offensive/alternative readings at
@@ -160,4 +186,4 @@ Fal.ai is a programmatic media-generation aggregator — one API fronts many mod
 
 ## Closure Bar
 
-A generated asset is done only when it has a clear path, has been visually inspected, and its technical contract has been validated. For transparent PNGs, alpha verification is mandatory.
+A generated asset is done only when it has a clear path, has been visually inspected, and its technical contract has been validated. For transparent PNGs, alpha verification is mandatory. For hybrid outputs, provenance must include the parent asset, `anchor_id`/revision/topology, exact model/endpoint, ordered references, mask, stage/delta, channel/brand modes, latency and request ID/tokens when available. Print/OOH remain `proof-only` until vendor specs/ICC are known; motion remains incomplete until its duration-specific post/audio gates pass.

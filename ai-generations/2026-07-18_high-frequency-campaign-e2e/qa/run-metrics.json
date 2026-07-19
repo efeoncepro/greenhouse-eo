@@ -1,0 +1,58 @@
+{
+  "pricingAsOf": "2026-07-18",
+  "pricingSources": {
+    "falLite": "https://fal.ai/models/bytedance/seedream/v5/lite/text-to-image/api",
+    "falPro": "https://fal.ai/models/bytedance/seedream/v5/pro/edit",
+    "openAi": "https://developers.openai.com/api/docs/pricing"
+  },
+  "calls": {
+    "seedreamLite": 3,
+    "seedreamPro": 1,
+    "gptImage2": 3,
+    "totalGenerative": 7,
+    "omniReleaseMasters": 2,
+    "technicalProbe": 1,
+    "releaseGenerative": 9,
+    "experimentGenerative": 10
+  },
+  "outputs": {
+    "territories": 3,
+    "anchor": 1,
+    "sourcePlates": 3,
+    "staticReleaseAssets": 18,
+    "motionReleaseAssets": 6,
+    "totalReleaseAssets": 24,
+    "technicalProbe": 1
+  },
+  "latencyMs": {
+    "liteParallelWallClockApprox": 43609,
+    "pro": 148842,
+    "gptSequential": 302895
+  },
+  "usage": {
+    "inputImageTokens": 4515,
+    "inputTextTokens": 632,
+    "outputImageTokens": 20192
+  },
+  "estimatedCostUsd": {
+    "falLite": 0.105,
+    "falPro": 0.135,
+    "openAi": 0.645,
+    "totalGenerative": 0.885,
+    "omniReleaseMasters": 2.08,
+    "heroIncremental": 0,
+    "releasePathOnly": 2.965,
+    "technicalProbeExcluded": 0.39,
+    "totalExperiment": 3.355
+  },
+  "costNote": "Provider estimate only; excludes human time, storage, media spend, tax and regional pricing uplifts.",
+  "scope": "multimodal-release-v3",
+  "packageV3": {
+    "file": "delivery/high-frequency-campaign-release-v3.zip",
+    "bytes": 46412071,
+    "sha256": "13a84dbbffd9be389c2304fbc5360c3410cd5d91b2a45e5b14ae372e2322d24b",
+    "manifestHashMatch": true,
+    "stills": 18,
+    "motion": 6
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "campaignId": "2026-07-18_high-frequency-campaign-e2e",
+  "status": "creative_release_complete",
+  "concept": "Alta frecuencia. Alto estándar.",
+  "selectedTerritory": "t02-chromatic-wake",
+  "anchor": "work/anchor/high-frequency-anchor-v1.png",
+  "models": [
+    "bytedance/seedream/v5/lite/text-to-image",
+    "bytedance/seedream/v5/pro/edit",
+    "gpt-image-2",
+    "google/gemini-omni-flash/image-to-video"
+  ],
+  "release": {
+    "messages": 3,
+    "formats": 6,
+    "staticAssets": 18,
+    "motionAssets": 6,
+    "assets": 24,
+    "folder": "delivery/",
+    "assetMatrix": "delivery/asset-matrix.csv",
+    "package": "delivery/high-frequency-campaign-release-v3.zip",
+    "packageBytes": 46412071,
+    "packageSha256": "13a84dbbffd9be389c2304fbc5360c3410cd5d91b2a45e5b14ae372e2322d24b"
+  },
+  "qa": {
+    "status": "PASS",
+    "technical": "qa/technical-qa.json",
+    "multimodal": "qa/multimodal-qa.json",
+    "motionReview": "qa/motion-review.md",
+    "visual": "qa/key-visual-scorecard.md",
+    "score": 47.4,
+    "maximumScore": 50
+  },
+  "review": {
+    "contactSheet": "review/campaign-contact-sheet.jpg",
+    "board": "review/review-board.html",
+    "motionVertical": "review/motion-master-9x16-contact-sheet.jpg",
+    "motionLandscape": "review/motion-master-16x9-contact-sheet.jpg",
+    "heroVertical": "review/motion-hero-9x16-15s-contact-sheet.jpg",
+    "heroLandscape": "review/motion-hero-16x9-15s-contact-sheet.jpg"
+  },
+  "provenance": [
+    "manifests/01-lite-territories.json",
+    "manifests/02-anchor-selection.json",
+    "manifests/03-pro-anchor.json",
+    "manifests/04-gpt-format-derivatives.json",
+    "manifests/05-composed-campaign.json",
+    "manifests/07-omni-motion-masters.json",
+    "manifests/08-motion-release.json",
+    "manifests/10-hero-15s-release.json",
+    "manifests/11-reproducibility-audit.json"
+  ],
+  "technicalProbe": {
+    "manifest": "manifests/06-omni-off-brand-motion.json",
+    "durationSecondsMeasured": 3.008,
+    "estimatedProviderCostUsd": 0.39,
+    "releaseExcluded": true
+  },
+  "motionFamily": {
+    "heroes15s": 2,
+    "masters10s": 2,
+    "bumpers6s": 2,
+    "releaseAssets": 6,
+    "heroIncrementalGenerativeCostUsd": 0,
+    "edl": "brief/motion-15s-edl.md",
+    "formatWall": ["4x5", "9x16", "16x9"]
+  },
+  "motionFallback": {
+    "provider": "Seedance reference-to-video",
+    "status": "planned-not-invoked",
+    "trigger": "Gemini Omni fails identity, anatomy, set fidelity or temporal continuity gate",
+    "rationale": "The campaign anchor is a flexible visual scene without exact in-plate copy or practicals, and both Omni clean masters passed temporal review; deterministic post completed the 15s heroes without another model call.",
+    "additionalCostUsd": 0
+  },
+  "humanPending": [
+    "headphone and phone-speaker listening pass",
+    "channel normalization for 10s masters and 6s bumpers if trafficked",
+    "brand and legal release approval",
+    "audience, offer, landing, UTM, conversion, budget, trafficking and experiment design",
+    "vendor ICC, bleed, trim, substrate and media specification for print/OOH"
+  ],
+  "estimatedGenerativeCostUsd": 2.965,
+  "estimatedExperimentCostIncludingProbeUsd": 3.355,
+  "activationStatus": "not_activated"
+}

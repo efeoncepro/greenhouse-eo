@@ -1,0 +1,511 @@
+{
+  "stage": "deterministic-composition",
+  "logo": "public/branding/logo-negative.svg",
+  "renderer": "sharp + fontkit outlined Poppins",
+  "results": [
+    {
+      "id": "m01-4x5",
+      "messageId": "m01",
+      "formatId": "4x5",
+      "channel": "meta-feed",
+      "releaseClass": "digital-release",
+      "brandMode": "branded",
+      "density": 72,
+      "maxBytes": 5242880,
+      "requiresVendorIcc": false,
+      "file": "delivery/4x5/high-frequency-m01-meta-feed-4x5-v1.jpg",
+      "overlay": "work/composition/m01-4x5-overlay.svg",
+      "sourcePlate": "work/plates/high-frequency-plate-4x5-source.png",
+      "width": 1080,
+      "height": 1350,
+      "format": "jpeg",
+      "colourspace": "srgb",
+      "bytes": 329043,
+      "sha256": "02e17bc7e07ca238b673f1acb3c6f2497a8bf5867d07d1ff3f06407a385e91ae",
+      "exactCopy": {
+        "headline": [
+          "ALTA FRECUENCIA.",
+          "ALTO ESTÁNDAR."
+        ],
+        "support": "Producción creativa a escala, sin bajar el nivel.",
+        "url": "efeoncepro.com"
+      }
+    },
+    {
+      "id": "m02-4x5",
+      "messageId": "m02",
+      "formatId": "4x5",
+      "channel": "meta-feed",
+      "releaseClass": "digital-release",
+      "brandMode": "branded",
+      "density": 72,
+      "maxBytes": 5242880,
+      "requiresVendorIcc": false,
+      "file": "delivery/4x5/high-frequency-m02-meta-feed-4x5-v1.jpg",
+      "overlay": "work/composition/m02-4x5-overlay.svg",
+      "sourcePlate": "work/plates/high-frequency-plate-4x5-source.png",
+      "width": 1080,
+      "height": 1350,
+      "format": "jpeg",
+      "colourspace": "srgb",
+      "bytes": 326180,
+      "sha256": "adbd2634ed5d9305417a5f23f0e0a5598e6519b2588b2df580c85fc9ed0408b8",
+      "exactCopy": {
+        "headline": [
+          "PRODUCE MÁS.",
+          "SIN BAJAR EL NIVEL."
+        ],
+        "support": "Una dirección. Todos los formatos.",
+        "url": "efeoncepro.com"
+      }
+    },
+    {
+      "id": "m03-4x5",
+      "messageId": "m03",
+      "formatId": "4x5",
+      "channel": "meta-feed",
+      "releaseClass": "digital-release",
+      "brandMode": "branded",
+      "density": 72,
+      "maxBytes": 5242880,
+      "requiresVendorIcc": false,
+      "file": "delivery/4x5/high-frequency-m03-meta-feed-4x5-v1.jpg",
+      "overlay": "work/composition/m03-4x5-overlay.svg",
+      "sourcePlate": "work/plates/high-frequency-plate-4x5-source.png",
+      "width": 1080,
+      "height": 1350,
+      "format": "jpeg",
+      "colourspace": "srgb",
+      "bytes": 322840,
+      "sha256": "99f01e03abf290659151d65f8194ce737b41c674926de5730b1be7ce0ac2d8a1",
+      "exactCopy": {
+        "headline": [
+          "UNA IDEA.",
+          "TODA LA CAMPAÑA."
+        ],
+        "support": "El sistema escala. El criterio se mantiene.",
+        "url": "efeoncepro.com"
+      }
+    },
+    {
+      "id": "m01-9x16",
+      "messageId": "m01",
+      "formatId": "9x16",
+      "channel": "meta-story-reel",
+      "releaseClass": "digital-release",
+      "brandMode": "branded",
+      "density": 72,
+      "maxBytes": 5242880,
+      "requiresVendorIcc": false,
+      "file": "delivery/9x16/high-frequency-m01-meta-story-reel-9x16-v1.jpg",
+      "overlay": "work/composition/m01-9x16-overlay.svg",
+      "sourcePlate": "work/plates/high-frequency-plate-9x16-source.png",
+      "width": 1080,
+      "height": 1920,
+      "format": "jpeg",
+      "colourspace": "srgb",
+      "bytes": 393506,
+      "sha256": "c79cc2253748e6d6c19d8f248a7b7a2e6eeca1077cc86827319a9bc800657999",
+      "exactCopy": {
+        "headline": [
+          "ALTA FRECUENCIA.",
+          "ALTO ESTÁNDAR."
+        ],
+        "support": "Producción creativa a escala, sin bajar el nivel.",
+        "url": "efeoncepro.com"
+      }
+    },
+    {
+      "id": "m02-9x16",
+      "messageId": "m02",
+      "formatId": "9x16",
+      "channel": "meta-story-reel",
+      "releaseClass": "digital-release",
+      "brandMode": "branded",
+      "density": 72,
+      "maxBytes": 5242880,
+      "requiresVendorIcc": false,
+      "file": "delivery/9x16/high-frequency-m02-meta-story-reel-9x16-v1.jpg",
+      "overlay": "work/composition/m02-9x16-overlay.svg",
+      "sourcePlate": "work/plates/high-frequency-plate-9x16-source.png",
+      "width": 1080,
+      "height": 1920,
+      "format": "jpeg",
+      "colourspace": "srgb",
+      "bytes": 390511,
+      "sha256": "6c5d2f4684a13c40f2e0ed7b006dcb62532ef08fb60def4dbfca96b4e291a467",
+      "exactCopy": {
+        "headline": [
+          "PRODUCE MÁS.",
+          "SIN BAJAR EL NIVEL."
+        ],
+        "support": "Una dirección. Todos los formatos.",
+        "url": "efeoncepro.com"
+      }
+    },
+    {
+      "id": "m03-9x16",
+      "messageId": "m03",
+      "formatId": "9x16",
+      "channel": "meta-story-reel",
+      "releaseClass": "digital-release",
+      "brandMode": "branded",
+      "density": 72,
+      "maxBytes": 5242880,
+      "requiresVendorIcc": false,
+      "file": "delivery/9x16/high-frequency-m03-meta-story-reel-9x16-v1.jpg",
+      "overlay": "work/composition/m03-9x16-overlay.svg",
+      "sourcePlate": "work/plates/high-frequency-plate-9x16-source.png",
+      "width": 1080,
+      "height": 1920,
+      "format": "jpeg",
+      "colourspace": "srgb",
+      "bytes": 387356,
+      "sha256": "31534a725821b2444db44cc7e57730611b6ac3f79203cb0e225ead0d96a8edb0",
+      "exactCopy": {
+        "headline": [
+          "UNA IDEA.",
+          "TODA LA CAMPAÑA."
+        ],
+        "support": "El sistema escala. El criterio se mantiene.",
+        "url": "efeoncepro.com"
+      }
+    },
+    {
+      "id": "m01-3x1",
+      "messageId": "m01",
+      "formatId": "3x1",
+      "channel": "display-banner",
+      "releaseClass": "digital-release",
+      "brandMode": "branded",
+      "density": 72,
+      "maxBytes": 5242880,
+      "requiresVendorIcc": false,
+      "file": "delivery/3x1/high-frequency-m01-display-banner-3x1-v1.jpg",
+      "overlay": "work/composition/m01-3x1-overlay.svg",
+      "sourcePlate": "work/plates/high-frequency-plate-3x1-source.png",
+      "width": 1800,
+      "height": 600,
+      "format": "jpeg",
+      "colourspace": "srgb",
+      "bytes": 246517,
+      "sha256": "318532465dfb783d3c3e9bb9de163b11422e7fbb1ed72ccc3cb3669fa4d86338",
+      "exactCopy": {
+        "headline": [
+          "ALTA FRECUENCIA.",
+          "ALTO ESTÁNDAR."
+        ],
+        "support": "Producción creativa a escala, sin bajar el nivel.",
+        "url": "efeoncepro.com"
+      }
+    },
+    {
+      "id": "m02-3x1",
+      "messageId": "m02",
+      "formatId": "3x1",
+      "channel": "display-banner",
+      "releaseClass": "digital-release",
+      "brandMode": "branded",
+      "density": 72,
+      "maxBytes": 5242880,
+      "requiresVendorIcc": false,
+      "file": "delivery/3x1/high-frequency-m02-display-banner-3x1-v1.jpg",
+      "overlay": "work/composition/m02-3x1-overlay.svg",
+      "sourcePlate": "work/plates/high-frequency-plate-3x1-source.png",
+      "width": 1800,
+      "height": 600,
+      "format": "jpeg",
+      "colourspace": "srgb",
+      "bytes": 244376,
+      "sha256": "b5f5862650adbd7458c1713338bb324230463b831d583908cf0b61dee51ccdac",
+      "exactCopy": {
+        "headline": [
+          "PRODUCE MÁS.",
+          "SIN BAJAR EL NIVEL."
+        ],
+        "support": "Una dirección. Todos los formatos.",
+        "url": "efeoncepro.com"
+      }
+    },
+    {
+      "id": "m03-3x1",
+      "messageId": "m03",
+      "formatId": "3x1",
+      "channel": "display-banner",
+      "releaseClass": "digital-release",
+      "brandMode": "branded",
+      "density": 72,
+      "maxBytes": 5242880,
+      "requiresVendorIcc": false,
+      "file": "delivery/3x1/high-frequency-m03-display-banner-3x1-v1.jpg",
+      "overlay": "work/composition/m03-3x1-overlay.svg",
+      "sourcePlate": "work/plates/high-frequency-plate-3x1-source.png",
+      "width": 1800,
+      "height": 600,
+      "format": "jpeg",
+      "colourspace": "srgb",
+      "bytes": 242293,
+      "sha256": "d7f45a99ed7c639498fc241579808025ff6da3925f60ef9fd74714602bdd3de1",
+      "exactCopy": {
+        "headline": [
+          "UNA IDEA.",
+          "TODA LA CAMPAÑA."
+        ],
+        "support": "El sistema escala. El criterio se mantiene.",
+        "url": "efeoncepro.com"
+      }
+    },
+    {
+      "id": "m01-16x9",
+      "messageId": "m01",
+      "formatId": "16x9",
+      "channel": "digital-landscape",
+      "releaseClass": "digital-release",
+      "brandMode": "branded",
+      "density": 72,
+      "maxBytes": 5242880,
+      "requiresVendorIcc": false,
+      "file": "delivery/16x9/high-frequency-m01-digital-landscape-16x9-v1.jpg",
+      "overlay": "work/composition/m01-16x9-overlay.svg",
+      "sourcePlate": "work/plates/high-frequency-plate-3x1-source.png",
+      "width": 1920,
+      "height": 1080,
+      "format": "jpeg",
+      "colourspace": "srgb",
+      "bytes": 371748,
+      "sha256": "78db0010d710bae483a92e69b4c7c5fcf0ca9d31058952725f0df5ea0ad55f28",
+      "exactCopy": {
+        "headline": [
+          "ALTA FRECUENCIA.",
+          "ALTO ESTÁNDAR."
+        ],
+        "support": "Producción creativa a escala, sin bajar el nivel.",
+        "url": "efeoncepro.com"
+      }
+    },
+    {
+      "id": "m02-16x9",
+      "messageId": "m02",
+      "formatId": "16x9",
+      "channel": "digital-landscape",
+      "releaseClass": "digital-release",
+      "brandMode": "branded",
+      "density": 72,
+      "maxBytes": 5242880,
+      "requiresVendorIcc": false,
+      "file": "delivery/16x9/high-frequency-m02-digital-landscape-16x9-v1.jpg",
+      "overlay": "work/composition/m02-16x9-overlay.svg",
+      "sourcePlate": "work/plates/high-frequency-plate-3x1-source.png",
+      "width": 1920,
+      "height": 1080,
+      "format": "jpeg",
+      "colourspace": "srgb",
+      "bytes": 365834,
+      "sha256": "58f320b97d130c9886f9edf33772b1c7c930bb2899d21ded3e0a400fae09a86a",
+      "exactCopy": {
+        "headline": [
+          "PRODUCE MÁS.",
+          "SIN BAJAR EL NIVEL."
+        ],
+        "support": "Una dirección. Todos los formatos.",
+        "url": "efeoncepro.com"
+      }
+    },
+    {
+      "id": "m03-16x9",
+      "messageId": "m03",
+      "formatId": "16x9",
+      "channel": "digital-landscape",
+      "releaseClass": "digital-release",
+      "brandMode": "branded",
+      "density": 72,
+      "maxBytes": 5242880,
+      "requiresVendorIcc": false,
+      "file": "delivery/16x9/high-frequency-m03-digital-landscape-16x9-v1.jpg",
+      "overlay": "work/composition/m03-16x9-overlay.svg",
+      "sourcePlate": "work/plates/high-frequency-plate-3x1-source.png",
+      "width": 1920,
+      "height": 1080,
+      "format": "jpeg",
+      "colourspace": "srgb",
+      "bytes": 363707,
+      "sha256": "56496b3de6af95f4c3dcb9d0c2befa527f871a0a527f3bfca727feffd3034a77",
+      "exactCopy": {
+        "headline": [
+          "UNA IDEA.",
+          "TODA LA CAMPAÑA."
+        ],
+        "support": "El sistema escala. El criterio se mantiene.",
+        "url": "efeoncepro.com"
+      }
+    },
+    {
+      "id": "m01-a2",
+      "messageId": "m01",
+      "formatId": "a2",
+      "channel": "print-poster-proof",
+      "releaseClass": "print-production-proof",
+      "brandMode": "branded",
+      "density": 300,
+      "maxBytes": 20971520,
+      "requiresVendorIcc": true,
+      "file": "delivery/a2/high-frequency-m01-print-poster-proof-a2-v1.jpg",
+      "overlay": "work/composition/m01-a2-overlay.svg",
+      "sourcePlate": "work/plates/high-frequency-plate-4x5-source.png",
+      "width": 3508,
+      "height": 4961,
+      "format": "jpeg",
+      "colourspace": "srgb",
+      "bytes": 2524840,
+      "sha256": "602af9b0e4c4c7e95d4732f60cf495d62addf2d7ab55a5e5d39a5eb8f5ae7e1a",
+      "exactCopy": {
+        "headline": [
+          "ALTA FRECUENCIA.",
+          "ALTO ESTÁNDAR."
+        ],
+        "support": "Producción creativa a escala, sin bajar el nivel.",
+        "url": "efeoncepro.com"
+      }
+    },
+    {
+      "id": "m02-a2",
+      "messageId": "m02",
+      "formatId": "a2",
+      "channel": "print-poster-proof",
+      "releaseClass": "print-production-proof",
+      "brandMode": "branded",
+      "density": 300,
+      "maxBytes": 20971520,
+      "requiresVendorIcc": true,
+      "file": "delivery/a2/high-frequency-m02-print-poster-proof-a2-v1.jpg",
+      "overlay": "work/composition/m02-a2-overlay.svg",
+      "sourcePlate": "work/plates/high-frequency-plate-4x5-source.png",
+      "width": 3508,
+      "height": 4961,
+      "format": "jpeg",
+      "colourspace": "srgb",
+      "bytes": 2512281,
+      "sha256": "1a319429cdc9efe5037af3810022205d4aaf390b20d00d168c333058bb7c7f14",
+      "exactCopy": {
+        "headline": [
+          "PRODUCE MÁS.",
+          "SIN BAJAR EL NIVEL."
+        ],
+        "support": "Una dirección. Todos los formatos.",
+        "url": "efeoncepro.com"
+      }
+    },
+    {
+      "id": "m03-a2",
+      "messageId": "m03",
+      "formatId": "a2",
+      "channel": "print-poster-proof",
+      "releaseClass": "print-production-proof",
+      "brandMode": "branded",
+      "density": 300,
+      "maxBytes": 20971520,
+      "requiresVendorIcc": true,
+      "file": "delivery/a2/high-frequency-m03-print-poster-proof-a2-v1.jpg",
+      "overlay": "work/composition/m03-a2-overlay.svg",
+      "sourcePlate": "work/plates/high-frequency-plate-4x5-source.png",
+      "width": 3508,
+      "height": 4961,
+      "format": "jpeg",
+      "colourspace": "srgb",
+      "bytes": 2509906,
+      "sha256": "eadce45bb81625a16647f7c030fdfc0686795ddb362ca4f300def39bbe57f3fe",
+      "exactCopy": {
+        "headline": [
+          "UNA IDEA.",
+          "TODA LA CAMPAÑA."
+        ],
+        "support": "El sistema escala. El criterio se mantiene.",
+        "url": "efeoncepro.com"
+      }
+    },
+    {
+      "id": "m01-ooh-3x1",
+      "messageId": "m01",
+      "formatId": "ooh-3x1",
+      "channel": "static-ooh-proof",
+      "releaseClass": "print-production-proof",
+      "brandMode": "branded",
+      "density": 150,
+      "maxBytes": 20971520,
+      "requiresVendorIcc": true,
+      "file": "delivery/ooh-3x1/high-frequency-m01-static-ooh-proof-ooh-3x1-v1.jpg",
+      "overlay": "work/composition/m01-ooh-3x1-overlay.svg",
+      "sourcePlate": "work/plates/high-frequency-plate-3x1-source.png",
+      "width": 6000,
+      "height": 2000,
+      "format": "jpeg",
+      "colourspace": "srgb",
+      "bytes": 1528719,
+      "sha256": "ba2b13849b0cf3cb54f76dee8d49167c009dbd5b71d499737deeff81afc96446",
+      "exactCopy": {
+        "headline": [
+          "ALTA FRECUENCIA.",
+          "ALTO ESTÁNDAR."
+        ],
+        "support": "Producción creativa a escala, sin bajar el nivel.",
+        "url": "efeoncepro.com"
+      }
+    },
+    {
+      "id": "m02-ooh-3x1",
+      "messageId": "m02",
+      "formatId": "ooh-3x1",
+      "channel": "static-ooh-proof",
+      "releaseClass": "print-production-proof",
+      "brandMode": "branded",
+      "density": 150,
+      "maxBytes": 20971520,
+      "requiresVendorIcc": true,
+      "file": "delivery/ooh-3x1/high-frequency-m02-static-ooh-proof-ooh-3x1-v1.jpg",
+      "overlay": "work/composition/m02-ooh-3x1-overlay.svg",
+      "sourcePlate": "work/plates/high-frequency-plate-3x1-source.png",
+      "width": 6000,
+      "height": 2000,
+      "format": "jpeg",
+      "colourspace": "srgb",
+      "bytes": 1528466,
+      "sha256": "cf2564fc07ef58534940a19a7951cd0ac1a14b81563c5ad329268a6b0bd3c01d",
+      "exactCopy": {
+        "headline": [
+          "PRODUCE MÁS.",
+          "SIN BAJAR EL NIVEL."
+        ],
+        "support": "Una dirección. Todos los formatos.",
+        "url": "efeoncepro.com"
+      }
+    },
+    {
+      "id": "m03-ooh-3x1",
+      "messageId": "m03",
+      "formatId": "ooh-3x1",
+      "channel": "static-ooh-proof",
+      "releaseClass": "print-production-proof",
+      "brandMode": "branded",
+      "density": 150,
+      "maxBytes": 20971520,
+      "requiresVendorIcc": true,
+      "file": "delivery/ooh-3x1/high-frequency-m03-static-ooh-proof-ooh-3x1-v1.jpg",
+      "overlay": "work/composition/m03-ooh-3x1-overlay.svg",
+      "sourcePlate": "work/plates/high-frequency-plate-3x1-source.png",
+      "width": 6000,
+      "height": 2000,
+      "format": "jpeg",
+      "colourspace": "srgb",
+      "bytes": 1519542,
+      "sha256": "ab387e99a7632abe49d1b6d0a676d04c8019e80f869d699ddc5064a513d69af2",
+      "exactCopy": {
+        "headline": [
+          "UNA IDEA.",
+          "TODA LA CAMPAÑA."
+        ],
+        "support": "El sistema escala. El criterio se mantiene.",
+        "url": "efeoncepro.com"
+      }
+    }
+  ]
+}

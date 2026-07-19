@@ -32,6 +32,11 @@
   ✅ Declara el rol y el rasgo prohibido; revisa contaminación y cambia a composición determinística si persiste.
 - ❌ **Confundir “escena de producto” con dashboard SaaS genérico.** Muchas cards, miniwidgets, vidrio, glow o
   racks isométricos no comunican producto. ✅ Construye una relación legible entre contexto e interpretación.
+- ❌ **Cadena de derivados (`4:5→9:16→3:1`) sin anchor.** ✅ Topología estrella: todos los formatos vuelven al
+  `anchor_id`; una reparación local sólo cambia el centro con aprobación y nueva `anchor_revision`.
+- ❌ **Llamar “capas” a un raster de Seedream Pro.** ✅ Es edición regional semántica; no hay PSD, layer IDs,
+  máscara pública ni preservación pixel-perfect.
+- ❌ **Hornear copy/logo/legal en el master generativo.** ✅ Clean plate + composición determinística por canal.
 
 ## Boundaries (duras)
 

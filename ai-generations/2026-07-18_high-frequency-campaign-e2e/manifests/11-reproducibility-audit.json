@@ -1,0 +1,116 @@
+{
+  "stage": "release-v3-reproducibility-audit",
+  "auditedAt": "2026-07-18",
+  "releaseInventory": {
+    "stills": 18,
+    "motion": {
+      "heroes15s": 2,
+      "masters10s": 2,
+      "bumpers6s": 2,
+      "total": 6
+    },
+    "totalAssets": 24
+  },
+  "timingEdl": {
+    "document": "brief/motion-15s-edl.md",
+    "hero": "7.2s motion + 1.5s M02 + 1.5s M03 + 2.3s format wall + 2.5s end card = 15.0s",
+    "master": "8.0s motion + 2.0s deterministic end card = 10.0s",
+    "bumper": "4.0s motion + 2.0s deterministic end card = 6.0s"
+  },
+  "formatWall": {
+    "interval": "10.2-12.5s",
+    "releaseFormats": [
+      "4x5",
+      "9x16",
+      "16x9"
+    ],
+    "deterministic": true,
+    "verified": true
+  },
+  "audioMeasurements": [
+    {
+      "id": "master-9x16",
+      "file": "delivery/motion/high-frequency-m01-brand-light-master-9x16-10s-v1.mp4",
+      "integratedLufs": -30.7,
+      "peakDbfs": -8.9,
+      "policy": "measurement-only; normalize for destination before trafficking",
+      "measured": true
+    },
+    {
+      "id": "bumper-9x16",
+      "file": "delivery/motion/high-frequency-m01-brand-light-bumper-9x16-6s-v1.mp4",
+      "integratedLufs": -30.6,
+      "peakDbfs": -10,
+      "policy": "measurement-only; normalize for destination before trafficking",
+      "measured": true
+    },
+    {
+      "id": "master-16x9",
+      "file": "delivery/motion/high-frequency-m01-brand-light-master-16x9-10s-v1.mp4",
+      "integratedLufs": -20.4,
+      "peakDbfs": -1,
+      "policy": "measurement-only; normalize for destination before trafficking",
+      "measured": true
+    },
+    {
+      "id": "bumper-16x9",
+      "file": "delivery/motion/high-frequency-m01-brand-light-bumper-16x9-6s-v1.mp4",
+      "integratedLufs": -19,
+      "peakDbfs": -1,
+      "policy": "measurement-only; normalize for destination before trafficking",
+      "measured": true
+    },
+    {
+      "id": "hero-9x16-15s",
+      "file": "delivery/motion/high-frequency-m01-brand-light-hero-9x16-15s-v1.mp4",
+      "integratedLufs": -16.4,
+      "peakDbfs": -2.2,
+      "policy": "target -16 LUFS",
+      "measured": true
+    },
+    {
+      "id": "hero-16x9-15s",
+      "file": "delivery/motion/high-frequency-m01-brand-light-hero-16x9-15s-v1.mp4",
+      "integratedLufs": -16.3,
+      "peakDbfs": -2,
+      "policy": "target -16 LUFS",
+      "measured": true
+    }
+  ],
+  "costsUsd": {
+    "still": 0.885,
+    "omniReleaseMasters": 2.08,
+    "heroIncremental": 0,
+    "release": 2.965,
+    "technicalProbeExcluded": 0.39,
+    "totalExperiment": 3.355
+  },
+  "technicalProbe": {
+    "file": "work/motion/high-frequency-off-brand-omni-9x16-v1.mp4",
+    "measuredDurationSeconds": 3.008,
+    "releaseExcluded": true
+  },
+  "packageV3": {
+    "file": "delivery/high-frequency-campaign-release-v3.zip",
+    "bytes": 46412071,
+    "sha256": "13a84dbbffd9be389c2304fbc5360c3410cd5d91b2a45e5b14ae372e2322d24b",
+    "manifestHashMatch": true,
+    "stills": 18,
+    "motion": 6
+  },
+  "fallback": {
+    "provider": "Seedance reference-to-video",
+    "status": "planned-not-invoked",
+    "trigger": "Gemini Omni fails identity, anatomy, set fidelity or temporal continuity gate",
+    "rationale": "The campaign anchor is a flexible visual scene without exact in-plate copy or practicals, and both Omni clean masters passed temporal review; deterministic post completed the 15s heroes without another model call.",
+    "additionalCostUsd": 0
+  },
+  "humanPending": [
+    "headphone and phone-speaker listening pass",
+    "channel normalization for 10s masters and 6s bumpers if trafficked",
+    "brand and legal release approval",
+    "audience, offer, landing, UTM, conversion, budget, trafficking and experiment design",
+    "vendor ICC, bleed, trim, substrate and media specification for print/OOH"
+  ],
+  "verdict": "PASS with human launch/prepress/audio gates pending"
+}

@@ -1,0 +1,58 @@
+{
+  "stage": "diverge",
+  "pricingAsOf": "2026-07-18",
+  "estimatedUnitUsd": 0.035,
+  "results": [
+    {
+      "id": "t01-iridescent-precision",
+      "title": "Iridescent precision",
+      "file": "work/territories/t01-iridescent-precision.png",
+      "model": "bytedance/seedream/v5/lite/text-to-image",
+      "requestId": "019f7785-a430-76e1-97dd-6a02b9d17cf0",
+      "providerLatencyMs": 32330,
+      "wallClockMs": 34156,
+      "startedAt": "2026-07-18T23:17:53.999Z",
+      "completedAt": "2026-07-18T23:18:28.156Z",
+      "seed": 1396093124,
+      "width": 1792,
+      "height": 2240,
+      "bytes": 1145459,
+      "sha256": "cb63efa52aff61be9bc6b2f0f90e06c5b0b93a359438385c2f475f728c2d82bf",
+      "prompt": "Premium campaign key visual, no text. Exactly one anatomically credible hummingbird in fast forward flight, full body visible, positioned on the right half with generous clean negative space on the left. One head, one torso, one tail. Only the wings show four translucent temporal phases radiating from the same shoulder, never cloned bodies. Macro feather detail and subtle glass-like iridescence in electric blue, emerald and violet. Deep navy atmospheric background, directional rim light, crisp beak and eye, controlled motion energy, asymmetrical editorial composition, premium commercial photography fused with refined 3D material craft. No words, no letters, no logos, no watermark, no frame, no extra bird, no duplicated head or tail, no UI."
+    },
+    {
+      "id": "t02-chromatic-wake",
+      "title": "Chromatic wake",
+      "file": "work/territories/t02-chromatic-wake.png",
+      "model": "bytedance/seedream/v5/lite/text-to-image",
+      "requestId": "019f7785-a436-74c2-8cb8-b4acd98cb993",
+      "providerLatencyMs": 40959,
+      "wallClockMs": 43609,
+      "startedAt": "2026-07-18T23:17:54.024Z",
+      "completedAt": "2026-07-18T23:18:37.633Z",
+      "seed": 1226071449,
+      "width": 1792,
+      "height": 2240,
+      "bytes": 4496748,
+      "sha256": "5a5aafc396d9fc547a306f9aad9789d972ea06d55e60d9fb7e4202b2f2bd9e57",
+      "prompt": "High-impact creative agency campaign visual, no text. Exactly one complete hummingbird flying toward the right, sharp and anatomically believable, full body visible. Behind it, a controlled chromatic wake decomposes into dozens of precise iridescent tiles and light fragments, suggesting one creative idea scaling into many assets without cloning the animal. Deep navy field, saturated blue, green and violet micro-textures, one directional light source, strong silhouette, large quiet copy field on the left, dynamic diagonal movement, premium mixed-media editorial finish with subtle grain. No second bird, no duplicated head, torso or tail, no words, no letters, no logos, no watermark, no dashboard, no literal factory."
+    },
+    {
+      "id": "t03-modular-orbit",
+      "title": "Modular orbit",
+      "file": "work/territories/t03-modular-orbit.png",
+      "model": "bytedance/seedream/v5/lite/text-to-image",
+      "requestId": "019f7785-a460-7672-9beb-19821e69c16a",
+      "providerLatencyMs": 32258,
+      "wallClockMs": 34296,
+      "startedAt": "2026-07-18T23:17:54.024Z",
+      "completedAt": "2026-07-18T23:18:28.320Z",
+      "seed": 2046696478,
+      "width": 1792,
+      "height": 2240,
+      "bytes": 2476962,
+      "sha256": "a640c559b5b3cedc982303f3f544d7b6deb26e7abe7bfadc8b31a6624747b715",
+      "prompt": "Sophisticated key visual for scalable creative production, no text. Exactly one iridescent hummingbird suspended in precise flight on the right side, one head, one body and one tail, perfect anatomy. Around the same bird, elegant translucent framing planes in several aspect ratios orbit like a disciplined visual system, each plane catching the same blue-green-violet light; they are abstract frames, not screens and contain no UI. Deep navy atmosphere, sharp editorial hierarchy, refined glass and feather material contrast, subtle motion trails, generous left negative space for copy, memorable at thumbnail size. No extra bird, no cloned body, no words, no letters, no logo, no watermark, no interface, no sci-fi HUD."
+    }
+  ]
+}

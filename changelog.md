@@ -1,5 +1,23 @@
 # changelog.md
 
+## 2026-07-18 — Worked example E2E de campaña visual multimodal
+
+- Se produjo y versionó `ai-generations/2026-07-18_high-frequency-campaign-e2e/`: brief, fuentes,
+  prompts, scripts, contratos de relevo, lineage, costo, QA, review board y paquete final.
+- El routing validado usa Seedream 5 Lite para divergencia, Seedream 5 Pro para el mundo visual,
+  GPT Image 2 para plates directos y Gemini Omni Flash para clean motion; Sharp/fontkit/FFmpeg resuelven
+  copy, marca, end cards y exports. La topología es estrella, sin derivados en cadena.
+- Se entregaron 18 stills (digital, A2 y OOH), 2 heroes motion de 15 s, 2 masters de 10 s y 2 bumpers
+  de 6 s. Los heroes combinan el clean shot aprobado con claims exactos, una pared de formatos reales
+  y end card determinísticos; agregarlos no requirió nueva inferencia. El clip Omni inicial de 3 s queda
+  como technical probe y no como asset. QA `18/18 + 6/6`, audio de heroes medido en `-16.3/-16.4 LUFS`
+  y true peak `-2.0/-2.2 dBFS`, score `47.4/50`, ZIP V3 reproducible y costo generativo release estimado
+  de `USD 2.9650`. La auditoría endurecida mide los seis MP4 y deja masters/bumpers explícitamente pendientes
+  de normalización por destino; Seedance 2.0 queda como fallback sólo para una nueva toma, ángulo o continuidad
+  física ausente. La entrega
+  queda aprobada como creative release; media activation sigue fuera de alcance hasta definir
+  audience, offer, landing, tracking, presupuesto, legal, escucha humana y experimento.
+
 ## 2026-07-18 — Secondary Tidal Teal tokenizado y validado
 
 - Se reemplazó el secondary lime/green por una familia Tidal Teal propia: ramp `100→900`
@@ -15,6 +33,18 @@
 - `ui:code-lint` permite HEX sólo en fuentes canónicas de color y fixtures de drift, manteniendo el
   bloqueo en consumers. El kill-switch canónico es `NEXT_PUBLIC_GREENHOUSE_SECONDARY_TEAL_ENABLED=false`;
   unset/default = Tidal Teal. El flag lime anterior queda retirado.
+
+## 2026-07-18 — Método híbrido Seedream 5 ↔ GPT Image 2 para campañas still
+
+- `design-studio` y `greenhouse-ai-image-generator` ahora diseñan una secuencia de manos:
+  Seedream Lite para divergencia, Seedream Pro para materialidad/atmósfera, GPT Image 2 para
+  estructura/reparación/adaptación y composición determinista para copy/logo/legal.
+- Se agregaron módulo de producción, referencia técnica y contrato YAML de relevo, espejados para
+  Codex/Claude. El flujo usa anchors aprobados, topología estrella, gates representativos por lote y
+  un executor destino explícito; evita cadenas de derivados y comparaciones uno-a-uno sin operación.
+- Dos pruebas reales validaron ambos sentidos. Los assets permanecen en `.captures` (gitignored);
+  no se cambió runtime, IAM, secretos ni deploy. El puente GPT local → Fal usa upload temporal
+  `fal-cdn-v3`, sin bucket público ni expansión de permisos GCP.
 
 ## 2026-07-18 — TASK-1453: Premium Agentic UI Platform
 

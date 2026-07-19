@@ -1,9 +1,9 @@
 # Efeonce Creative Studio — Creative Workflows para equipos creativos
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.2
 > **Creado:** 2026-07-06 por Claude (vision operador Julio Reyes)
-> **Ultima actualizacion:** 2026-07-14 por Codex
+> **Ultima actualizacion:** 2026-07-18 por Codex
 > **Estado:** Visión funcional de la plataforma hermana agentic; no está construida. La propuesta histórica de ubicarla en Greenhouse quedó superseded.
 > **Documentación técnica vigente:** [Efeonce Creative Studio — Agentic Platform Architecture V1](../../architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md). La [ADR Creative Flow Studio](../../architecture/GREENHOUSE_CREATIVE_FLOW_STUDIO_DECISION_V1.md) se conserva como referencia de diseño DAG, ya superseded como runtime.
 > **Investigación activa:** [RESEARCH-009 — Creative Operations y workflows agentic](../../research/RESEARCH-009-creative-operations-agentic-workflows.md) separa evidencia de mercado de decisiones de producto.
@@ -47,9 +47,31 @@ El proveedor bloqueó seis requests iniciales antes de generar candidatos. La re
 
 El piloto además comprobó un límite operativo importante: una edición video-a-video puede completar técnicamente y aun así romper continuidad. Un finish determinista sirve sólo si el master ya contiene la actuación correcta y el ajuste no cambia la verdad física del plano. La revisión creativa posterior rechazó la recuperación F/I: el `ON AIR` ya existía como practical en el key visual original, pero al reponerlo en post se veía pegado; el retime de la mano se leía como presión y el foley Gemini no sonaba a una prueba real de micrófono. Seedance después conservó correctamente el set 4K de Glitch, pero tampoco aprobó el gesto ni el audio: conservar diseño y cumplir una acción física son gates separados.
 
-La comparación no clasifica motores por canal. En la landing de Redes Sociales se generó primero un paquete ficticio de ocho imágenes; Omni animó seis referencias de ese paquete en microescenas publicadas. Allí las imágenes eran una ancla de lenguaje visual y no había texto/practical exacto que conservar. Para una identidad de set, producto o practical físico que debe mantenerse reconocible, el workflow prueba primero un motor de referencia como Seedance. Para una microescena flexible, un loop conversacional o una campaña ficticia desde stills, Omni sigue siendo una mano probada. El paso futuro `generate-video` debe registrar este contrato de fidelidad junto a modelo, referencia, presupuesto y revisión; no debe inferirlo desde “RRSS” o “landing”. La regla operativa completa vive en [Selección por contrato de fidelidad](../../../.codex/skills/motion-design-studio/workflows/engine-selection-by-fidelity-contract.md). El estado sigue siendo piloto: no implica que el Estudio de Flujos exista como producto ni que una generación sea automáticamente aprobada o publicable.
+La comparación no clasifica motores por canal. En la landing de Redes Sociales se generó primero un paquete ficticio de ocho imágenes; Omni animó seis referencias de ese paquete en microescenas publicadas. Allí las imágenes eran un ancla de lenguaje visual y no había texto/practical exacto que conservar. El gate correcto es preguntar si el material aprobado ya contiene la toma y la física necesarias. Si las contiene, ritmo, duración, orden y firma se resuelven en edición; no se abre otra generación. Seedance 2.0 queda como fallback cuando falta una toma, un ángulo o continuidad física real que no puede fabricarse honestamente con retime o post. En Glitch ese fallback correspondía porque la actuación requerida no existía; conservar la identidad del set por sí solo no convierte cada derivado en una nueva generación. El paso futuro `generate-video` debe registrar este contrato junto a modelo, referencia, presupuesto y revisión; no debe inferirlo desde “RRSS” o “landing”. La regla operativa completa vive en [Selección por contrato de fidelidad](../../../.codex/skills/motion-design-studio/workflows/engine-selection-by-fidelity-contract.md). El estado sigue siendo piloto: no implica que el Estudio de Flujos exista como producto ni que una generación sea automáticamente aprobada o publicable.
 
 Una capacidad externa adicional, aún sin prueba interna aprobada, es usar una previs 3D exportada como video de referencia junto a un keyframe de look final en Seedance. No significa importar Blender ni habilitar un renderer 3D: el modelo interpreta video, imágenes y prompt. El contrato, límites y la exclusión expresa del blocking 3D de Glitch viven en [Previsualización 3D con Seedance](previs-3d-y-referencias-seedance.md).
+
+## Piloto still híbrido: Seedream 5 ↔ GPT Image 2
+
+El 2026-07-18 se probaron dos relevos reales sobre la campaña visual del colibrí: GPT Image 2 → Seedream 5 Pro y Seedream 5 Pro → GPT Image 2. La conclusión no fue escoger un motor, sino diseñar una secuencia de manos.
+
+La receta reusable es:
+
+`divergir -> desarrollar -> aprobar anchor -> organizar -> extender formatos -> reparar -> componer -> liberar`
+
+Seedream Lite/Pro gobierna mejor la búsqueda de familias, materialidad, color, atmósfera y energía. GPT Image 2 gobierna mejor la organización espacial, las instrucciones duras, la reparación localizada y la adaptación a formatos. El texto exacto, logos y legales no se delegan a ninguno: entran en composición determinista.
+
+El paso crítico es el relevo. Cada cambio de modelo lleva una referencia aprobada, regiones editables, invariantes protegidos, safe zones, formato de trabajo y criterio de aceptación. Para escalar se usa una topología estrella: cada pieza nace del anchor o de un master de mensaje, nunca de la última pieza producida. El método completo vive en [la guía operativa de imagen](../../operations/GREENHOUSE_AI_IMAGE_GENERATION_AGENT_SKILL_V1.md).
+
+## Piloto multimodal: una toma, una familia profesional
+
+La misma campaña validó que “producir a escala” no significa pedir un video nuevo por cada duración. Gemini Omni creó una toma limpia de ocho segundos para `9:16` y otra para `16:9`. Desde esos dos masters se editaron determinísticamente seis entregables: dos heroes de 15 s, dos masters de 10 s y dos bumpers de 6 s.
+
+El hero de 15 s combina la toma aprobada con claims exactos, end card y un **format wall hecho con las piezas still reales de la campaña**. No son miniaturas inventadas por el modelo ni una interfaz ficticia: son assets del mismo release. Los cortes de 10 y 6 s reutilizan el master y su end card. Así, la familia completa mantiene identidad y no suma costo generativo por cada derivado.
+
+El audio nativo de Omni fue materia prima, no master automático. La mezcla se terminó en post con target `−16 LUFS` y ceiling `≤ −1 dBTP`; las dos piezas de 15 s quedaron dentro de esos límites. Aun así, medición correcta no equivale a escucha aprobada: audífonos, parlante de teléfono, crossfade y cierre siguen requiriendo revisión humana.
+
+La entrega quedó en `creative_release_complete`: imágenes, seis videos, posters, manifests y QA empaquetados. Eso no la activó en medios. Audiencia, landing, UTMs, pixel/CAPI, conversión, presupuesto, trafficking, legal y escucha final pertenecen a un segundo estado de activación. Creative Studio debe mostrar ambos, no esconder launch pendiente detrás de “completado”.
 
 ## Como funciona (en simple)
 
@@ -100,7 +122,8 @@ Cuando corres un flujo, ves su avance:
 - **En cola:** la receta esta lista y esperando turno para ejecutarse.
 - **Ejecutando:** el motor esta generando; cada paso muestra su propio estado (esperando, generando, listo).
 - **En revisión:** el asset existe, pero una persona debe mirar actuación, continuidad, texto, sonido y corte. Aún no es un entregable.
-- **Completado:** todos los pasos, incluida la revisión requerida, terminaron; los entregables estan en la libreria.
+- **Creative release completo:** todos los pasos creativos, incluida la revisión requerida, terminaron; los entregables están en la librería. Todavía puede faltar activación.
+- **Activación pendiente / activa:** media, landing, tracking, presupuesto, legal y experimento tienen un estado separado del asset.
 - **Con fallas:** algun paso no pudo terminar. Importante: **no pierdes lo que ya se genero** — los pasos que si terminaron quedan guardados, y puedes retomar desde ahi.
 - **Cancelado:** lo detuviste; los pasos que faltaban no se ejecutan ni se cobran.
 
@@ -125,6 +148,7 @@ Un flujo **multiplica el gasto**: si tiene 5 pasos que generan media, son 5 gene
 - **"La receta no acepta este input."** El tipo o la variable no está publicada para ese template (por ejemplo, audio donde se espera imagen). Un builder autorizado debe revisar la receta; el runner no cambia su estructura durante una corrida.
 - **"Me pide aprobar antes de correr."** El costo total estimado supero el limite; es la proteccion de gasto funcionando.
 - **"La edición terminó, pero se ve mal."** El estado técnico no es aprobación creativa. Rechaza ese paso conservando su evidencia. Si sólo necesitas timing, orden, texto exacto o foley, usa el mismo clip en una etapa de composición; si faltan píxeles/acción, formula una nueva edición acotada.
+- **"Necesito otra duración."** Si la toma aprobada ya contiene el beat, crea el corte en post. Seedance 2.0 sólo entra si falta una toma, ángulo o continuidad física nueva.
 
 ## Diferencia con otras herramientas
 

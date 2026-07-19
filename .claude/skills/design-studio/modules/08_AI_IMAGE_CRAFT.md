@@ -55,6 +55,8 @@ Cierra siempre en `templates/image-prompt-sheet.md` — no dejes el prompt suelt
 |---|---|---|---|
 | **Nano Banana Pro** (Gemini 3 Pro Image, Vertex) | **texto legible en imagen**, 4K <10s, físico, razonamiento, enterprise-safe | "alma" estética < Midjourney | default de marketing con copy en la imagen; disponible en Vertex `efeonce-group` |
 | **GPT Image 2** (OpenAI) | realismo, fidelidad al prompt, edición, texto, uso diario (top general) | estilo cinematográfico < MJ | default realista y de publishing diario; el repo ya lo usa (personaje Nexa) |
+| **Seedream 5 Lite** (ByteDance vía fal.ai) | divergencia material rápida y barata, refs/edición de volumen | continuidad/anatomía de campaña antes del anchor | abrir 8–16 territorios y descartar barato |
+| **Seedream 5 Pro** (ByteDance vía fal.ai) | riqueza material, color, atmósfera, fusión multirreferencia y edición regional semántica | layout extremo menos obediente en el benchmark; sin máscara/layers públicos | desarrollar el mundo visual y hacer art direction regional |
 | **Midjourney v7** | **estética/dirección de arte**, cinematográfico, surreal/pictórico, concept | texto-en-imagen, control literal | mood boards, editorial, hero de alto concepto |
 | **FLUX.2 Pro / 1.1 Pro** | calidad técnica, realismo, velocidad (~4.5s), **params de cámara** (focal/DoF/ángulo) | estética "de autor" | pre-viz de film/VFX, storyboard, realismo comercial; open-weight/self-host |
 | **Ideogram 3** | **texto-en-imagen** (posters, thumbnails, headlines) | fotorrealismo fino | piezas donde el titular vive dentro de la imagen |
@@ -87,6 +89,11 @@ Cierra siempre en `templates/image-prompt-sheet.md` — no dejes el prompt suelt
 - **Vector/logo/icono/mascota escalable y editable** → Recraft.
 - **Realismo + control de cámara / storyboard** → FLUX.2.
 - **Realista diario / edición fiel** → GPT Image 2.
+- **Divergencia de campaña barata** → Seedream 5 Lite.
+- **Material/color/atmósfera o región semántica** → Seedream 5 Pro.
+- **Campaña multi-modelo** → cargar `modules/12_HYBRID_IMAGE_CAMPAIGN_PRODUCTION.md`; usar
+  Seedream para abrir/desarrollar y GPT para organizar/extender/reparar cuando ese routing
+  corresponda al contrato, no como regla rígida de marca.
 - **Cliente con licencia limpia + Photoshop** → Adobe Firefly.
 - **Ya elegiste el frame y falta resolución** → Magnific (upscale).
 - **UI de Greenhouse** → nada de esto: `greenhouse-ai-image-generator`.

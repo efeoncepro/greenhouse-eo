@@ -1,0 +1,119 @@
+{
+  "stage": "deterministic-15s-hero-edit",
+  "renderer": "ffmpeg; existing Omni motion + exact campaign stills + format-wall composite",
+  "storyboard": "brief/motion-15s-animatic-shotlist.md",
+  "edl": "brief/motion-15s-edl.md",
+  "soundDesign": "brief/motion-15s-sound-design.md",
+  "results": [
+    {
+      "id": "hero-9x16-15s",
+      "kind": "hero",
+      "formatId": "9x16",
+      "brandMode": "brand-light",
+      "channelMode": "digital-motion",
+      "output": "delivery/motion/high-frequency-m01-brand-light-hero-9x16-15s-v1.mp4",
+      "poster": "delivery/motion/high-frequency-m01-brand-light-hero-9x16-15s-v1-poster.jpg",
+      "contactSheet": "review/motion-hero-9x16-15s-contact-sheet.jpg",
+      "sourceMotion": "work/motion/high-frequency-omni-clean-9x16-8s-v1.mp4",
+      "sourceStills": [
+        "delivery/9x16/high-frequency-m01-meta-story-reel-9x16-v1.jpg",
+        "delivery/9x16/high-frequency-m02-meta-story-reel-9x16-v1.jpg",
+        "delivery/9x16/high-frequency-m03-meta-story-reel-9x16-v1.jpg",
+        "delivery/4x5/high-frequency-m01-meta-feed-4x5-v1.jpg",
+        "delivery/9x16/high-frequency-m02-meta-story-reel-9x16-v1.jpg",
+        "delivery/16x9/high-frequency-m03-digital-landscape-16x9-v1.jpg"
+      ],
+      "durationSeconds": 15,
+      "deterministicEndcardSeconds": 2.5,
+      "loudnessTargetLufs": -16,
+      "truePeakCeilingDbfs": -1,
+      "generativeCostUsd": 0,
+      "rasterNote": "Deterministic Lanczos scale from 720p clean master to 1080p delivery raster; not native 1080p detail.",
+      "bytes": 8773447,
+      "sha256": "492e4fb08fe6a040f6c358510e769cbe11302a481023e3bac24c7a2ee5e9a29e",
+      "posterSha256": "6fe51037be3d95192049e1e2472d61dab4d7fdd9388920be51c6d6adb9312986",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 1080,
+            "height": 1920,
+            "r_frame_rate": "24/1"
+          },
+          {
+            "index": 1,
+            "codec_name": "aac",
+            "codec_type": "audio",
+            "sample_rate": "48000",
+            "channels": 2,
+            "r_frame_rate": "0/0"
+          }
+        ],
+        "format": {
+          "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+          "duration": "15.000000",
+          "size": "8773447"
+        }
+      }
+    },
+    {
+      "id": "hero-16x9-15s",
+      "kind": "hero",
+      "formatId": "16x9",
+      "brandMode": "brand-light",
+      "channelMode": "digital-motion",
+      "output": "delivery/motion/high-frequency-m01-brand-light-hero-16x9-15s-v1.mp4",
+      "poster": "delivery/motion/high-frequency-m01-brand-light-hero-16x9-15s-v1-poster.jpg",
+      "contactSheet": "review/motion-hero-16x9-15s-contact-sheet.jpg",
+      "sourceMotion": "work/motion/high-frequency-omni-clean-16x9-8s-v1.mp4",
+      "sourceStills": [
+        "delivery/16x9/high-frequency-m01-digital-landscape-16x9-v1.jpg",
+        "delivery/16x9/high-frequency-m02-digital-landscape-16x9-v1.jpg",
+        "delivery/16x9/high-frequency-m03-digital-landscape-16x9-v1.jpg",
+        "delivery/4x5/high-frequency-m01-meta-feed-4x5-v1.jpg",
+        "delivery/9x16/high-frequency-m02-meta-story-reel-9x16-v1.jpg",
+        "delivery/16x9/high-frequency-m03-digital-landscape-16x9-v1.jpg"
+      ],
+      "durationSeconds": 15,
+      "deterministicEndcardSeconds": 2.5,
+      "loudnessTargetLufs": -16,
+      "truePeakCeilingDbfs": -1,
+      "generativeCostUsd": 0,
+      "rasterNote": "Deterministic Lanczos scale from 720p clean master to 1080p delivery raster; not native 1080p detail.",
+      "bytes": 9102832,
+      "sha256": "629fc52b45b4dfeed6e6e19526a27a8861011d0c0b02bdabe869c34f87dba49d",
+      "posterSha256": "e46c68ade50ec20b289477619f36cd526f96a9ed8ee17575e2e3a09dcfd90c99",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 1920,
+            "height": 1080,
+            "r_frame_rate": "24/1"
+          },
+          {
+            "index": 1,
+            "codec_name": "aac",
+            "codec_type": "audio",
+            "sample_rate": "48000",
+            "channels": 2,
+            "r_frame_rate": "0/0"
+          }
+        ],
+        "format": {
+          "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+          "duration": "15.000000",
+          "size": "9102832"
+        }
+      }
+    }
+  ]
+}

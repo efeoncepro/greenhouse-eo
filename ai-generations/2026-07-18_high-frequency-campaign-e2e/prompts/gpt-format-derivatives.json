@@ -1,0 +1,20 @@
+[
+  {
+    "id": "plate-4x5",
+    "size": "1536x2048",
+    "output": "work/plates/high-frequency-plate-4x5-source.png",
+    "prompt": "Use IMAGE 1 as the locked campaign anchor and preserve its exact visual language: one anatomically credible hummingbird, right-facing fast flight, premium blue-emerald-violet iridescence, deep navy atmosphere, and one coherent chromatic tile wake representing a single idea multiplying into many assets. Recompose it for a vertical social feed master that will be center-cropped from 3:4 to 4:5. Keep exactly one complete bird on the right half, fully inside an 8 percent edge margin. Keep the upper-left and left-center 44 percent calm, dark and low-detail for later deterministic Spanish typography. The wake may cross the lower-left but must not enter the upper-left copy field. Maintain one light direction, crisp eye and beak, premium editorial realism, subtle grain and a strong thumbnail silhouette. Do not add or render text, letters, numbers, logos, watermarks, UI, frames, a second bird, duplicated anatomy or detached feathers."
+  },
+  {
+    "id": "plate-9x16",
+    "size": "1152x2048",
+    "output": "work/plates/high-frequency-plate-9x16-source.png",
+    "prompt": "Use IMAGE 1 as the locked campaign anchor and preserve its exact visual language: one anatomically credible hummingbird, right-facing fast flight, premium blue-emerald-violet iridescence, deep navy atmosphere, and one coherent chromatic tile wake representing a single idea multiplying into many assets. Recompose for a 9:16 Stories/Reels master. Keep exactly one complete bird in the middle-right, away from the top 12 percent and bottom 20 percent interface-safe zones, with the full beak, wings and tail visible. Reserve a calm dark copy field from approximately x=8–52 percent and y=22–60 percent. Keep bright tiles out of that field and concentrate the wake behind/below the bird. Maintain one light direction, premium editorial realism, subtle grain and a strong thumbnail silhouette. Do not add or render text, letters, numbers, logos, watermarks, UI, frames, a second bird, duplicated anatomy or detached feathers."
+  },
+  {
+    "id": "plate-3x1",
+    "size": "2048x1152",
+    "output": "work/plates/high-frequency-plate-3x1-source.png",
+    "prompt": "Use IMAGE 1 as the locked campaign anchor and preserve its exact visual language: one anatomically credible hummingbird, right-facing fast flight, premium blue-emerald-violet iridescence, deep navy atmosphere, and one coherent chromatic tile wake representing a single idea multiplying into many assets. Recompose as a wide 16:9 source designed to be center-cropped to a 3:1 campaign banner: all essential content must stay inside the central horizontal band between y=22 and y=78 percent. Put exactly one complete bird in the right 42 percent, with full beak, wings and tail inside that central band and at least 7 percent horizontal edge margin. Reserve the left 48 percent as a calm dark low-detail copy field. Keep the chromatic wake mainly in the middle-right and away from the left copy field. Maintain one light direction, premium editorial realism, subtle grain and immediate legibility at small size. Do not add or render text, letters, numbers, logos, watermarks, UI, frames, a second bird, duplicated anatomy or detached feathers."
+  }
+]

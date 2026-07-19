@@ -1,0 +1,141 @@
+{
+  "campaign": "high-frequency",
+  "url": "efeoncepro.com",
+  "expected": { "messages": 3, "formats": 6, "releaseAssets": 18 },
+  "messages": [
+    {
+      "id": "m01",
+      "headline": ["ALTA FRECUENCIA.", "ALTO ESTÁNDAR."],
+      "support": "Producción creativa a escala, sin bajar el nivel."
+    },
+    {
+      "id": "m02",
+      "headline": ["PRODUCE MÁS.", "SIN BAJAR EL NIVEL."],
+      "support": "Una dirección. Todos los formatos."
+    },
+    {
+      "id": "m03",
+      "headline": ["UNA IDEA.", "TODA LA CAMPAÑA."],
+      "support": "El sistema escala. El criterio se mantiene."
+    }
+  ],
+  "formats": [
+    {
+      "id": "4x5",
+      "channel": "meta-feed",
+      "releaseClass": "digital-release",
+      "brandMode": "branded",
+      "maxBytes": 5242880,
+      "density": 72,
+      "width": 1080,
+      "height": 1350,
+      "plate": "work/plates/high-frequency-plate-4x5-source.png",
+      "sourceCrop": { "left": 0, "top": 64, "width": 1536, "height": 1920 },
+      "layout": {
+        "logo": { "left": 68, "top": 64, "width": 225 },
+        "accent": { "x": 68, "y": 270, "width": 82, "height": 7 },
+        "headline": { "x": 68, "y": 370, "size": 74, "gap": 91 },
+        "support": { "x": 70, "y": 585, "size": 27, "maxWidth": 520, "gap": 38 },
+        "url": { "x": 70, "y": 1264, "size": 23 }
+      }
+    },
+    {
+      "id": "9x16",
+      "channel": "meta-story-reel",
+      "releaseClass": "digital-release",
+      "brandMode": "branded",
+      "maxBytes": 5242880,
+      "density": 72,
+      "width": 1080,
+      "height": 1920,
+      "plate": "work/plates/high-frequency-plate-9x16-source.png",
+      "sourceCrop": null,
+      "layout": {
+        "logo": { "left": 72, "top": 245, "width": 230 },
+        "accent": { "x": 72, "y": 390, "width": 86, "height": 7 },
+        "headline": { "x": 72, "y": 500, "size": 75, "gap": 93 },
+        "support": { "x": 74, "y": 720, "size": 28, "maxWidth": 560, "gap": 40 },
+        "url": { "x": 74, "y": 1510, "size": 25 }
+      }
+    },
+    {
+      "id": "3x1",
+      "channel": "display-banner",
+      "releaseClass": "digital-release",
+      "brandMode": "branded",
+      "maxBytes": 5242880,
+      "density": 72,
+      "width": 1800,
+      "height": 600,
+      "plate": "work/plates/high-frequency-plate-3x1-source.png",
+      "sourceCrop": { "left": 1, "top": 200, "width": 2046, "height": 682 },
+      "layout": {
+        "logo": { "left": 78, "top": 45, "width": 190 },
+        "accent": { "x": 78, "y": 165, "width": 72, "height": 6 },
+        "headline": { "x": 78, "y": 245, "size": 52, "gap": 65 },
+        "support": { "x": 80, "y": 405, "size": 22, "maxWidth": 620, "gap": 30 },
+        "url": { "x": 80, "y": 548, "size": 19 }
+      }
+    },
+    {
+      "id": "16x9",
+      "channel": "digital-landscape",
+      "releaseClass": "digital-release",
+      "brandMode": "branded",
+      "maxBytes": 5242880,
+      "density": 72,
+      "width": 1920,
+      "height": 1080,
+      "plate": "work/plates/high-frequency-plate-3x1-source.png",
+      "sourceCrop": null,
+      "layout": {
+        "logo": { "left": 90, "top": 72, "width": 260 },
+        "accent": { "x": 90, "y": 290, "width": 100, "height": 8 },
+        "headline": { "x": 90, "y": 420, "size": 80, "gap": 100 },
+        "support": { "x": 95, "y": 650, "size": 32, "maxWidth": 720, "gap": 45 },
+        "url": { "x": 95, "y": 995, "size": 28 }
+      }
+    },
+    {
+      "id": "a2",
+      "channel": "print-poster-proof",
+      "releaseClass": "print-production-proof",
+      "brandMode": "branded",
+      "maxBytes": 20971520,
+      "density": 300,
+      "requiresVendorIcc": true,
+      "width": 3508,
+      "height": 4961,
+      "plate": "work/plates/high-frequency-plate-4x5-source.png",
+      "sourceCrop": { "left": 44, "top": 0, "width": 1448, "height": 2048 },
+      "layout": {
+        "logo": { "left": 260, "top": 260, "width": 700 },
+        "accent": { "x": 260, "y": 1050, "width": 280, "height": 24 },
+        "headline": { "x": 260, "y": 1380, "size": 250, "gap": 310 },
+        "support": { "x": 270, "y": 2100, "size": 90, "maxWidth": 1800, "gap": 125 },
+        "url": { "x": 270, "y": 4660, "size": 75 }
+      }
+    },
+    {
+      "id": "ooh-3x1",
+      "channel": "static-ooh-proof",
+      "releaseClass": "print-production-proof",
+      "brandMode": "branded",
+      "showSupport": false,
+      "maxBytes": 20971520,
+      "density": 150,
+      "requiresVendorIcc": true,
+      "width": 6000,
+      "height": 2000,
+      "plate": "work/plates/high-frequency-plate-3x1-source.png",
+      "sourceCrop": { "left": 1, "top": 200, "width": 2046, "height": 682 },
+      "layout": {
+        "logo": { "left": 260, "top": 150, "width": 650 },
+        "accent": { "x": 260, "y": 520, "width": 260, "height": 20 },
+        "headline": { "x": 260, "y": 800, "size": 180, "gap": 230 },
+        "support": { "x": 270, "y": 1360, "size": 75, "maxWidth": 2100, "gap": 110 },
+        "url": { "x": 270, "y": 1840, "size": 60 }
+      }
+    }
+  ]
+}

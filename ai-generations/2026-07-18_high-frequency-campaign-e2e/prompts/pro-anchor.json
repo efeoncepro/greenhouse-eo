@@ -1,0 +1,6 @@
+{
+  "model": "bytedance/seedream/v5/pro/edit",
+  "source": "work/territories/t02-chromatic-wake.png",
+  "output": "work/anchor/high-frequency-anchor-v1.png",
+  "prompt": "IMAGE 1 is the locked visual identity and composition source. Preserve exactly one anatomically credible hummingbird, its right-facing forward flight, sharp eye and beak, one head, one torso, one tail, and the chromatic tile wake emerging behind it. Develop only the finish and spatial discipline: enrich the bird's blue, emerald and violet iridescence; make feather detail and translucent tile materials premium and tactile; deepen the navy atmosphere; use one controlled directional rim light; organize the wake as a coherent accelerating stream that stays mostly in the center and right half. Reserve the upper-left 42 percent as a quiet dark copy field with subtle texture and no bright fragments. Keep the entire bird visible with safe edge margins and preserve a strong thumbnail silhouette. No text, letters, numbers, logo, watermark, UI, screens, frames, factory, second bird, cloned body, duplicated head, extra tail, or detached anatomy."
+}

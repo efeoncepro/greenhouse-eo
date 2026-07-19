@@ -1,0 +1,53 @@
+{
+  "stage": "motion-clean-masters",
+  "pricingAsOf": "2026-07-18",
+  "pricingSource": "https://fal.ai/models/google/gemini-omni-flash/image-to-video",
+  "results": [
+    {
+      "id": "vertical",
+      "stage": "motion-clean-master",
+      "brandMode": "brand-light",
+      "channelMode": "digital-motion",
+      "source": "work/plates/high-frequency-plate-9x16-source.png",
+      "sourceSha256": "4a48f2871a3976b63b08f2703b9bf50424ede2b91f058c6236c102c3b8623dda",
+      "transport": "base64 data URI; not persisted",
+      "output": "work/motion/high-frequency-omni-clean-9x16-8s-v1.mp4",
+      "model": "google/gemini-omni-flash/image-to-video",
+      "requestId": "019f77d0-3099-7382-8f15-79fb95582c91",
+      "providerLatencyMs": 52080,
+      "wallClockMs": 54950,
+      "startedAt": "2026-07-19T00:39:15.379Z",
+      "completedAt": "2026-07-19T00:40:10.330Z",
+      "aspectRatio": "9:16",
+      "durationSeconds": 8,
+      "contentType": "video/mp4",
+      "bytes": 2103001,
+      "sha256": "c6cf1b58fee3ac4c8f392e2da16962383dff94d5ad08a3c4922ad298b10e6137",
+      "estimatedProviderCostUsd": 1.04,
+      "prompt": "Create an eight-second premium agency film in one continuous unbroken shot from the exact reference. [0-2s] The exact single iridescent hummingbird snaps into rapid controlled flight toward the upper right, with a strong immediate visual hook. [2-6s] The camera accelerates beside it as the existing chromatic modular wake expands into hundreds of precise luminous tiles, shifting from cyan and teal through violet and coral while preserving the navy environment and premium photographic detail. [6-8s] The bird climbs and the modules converge into a disciplined flowing system, leaving clean negative space and a calm visual resolution for a later deterministic end card. Preserve exactly one head, one torso, one tail and two wings; only the wings repeat through natural motion blur. No cuts, no scene changes, no additional birds, no clone bodies, no logo, no typography, no letters, no watermark, no interface. Sound design: restrained high-frequency wing pulse, controlled crystalline acceleration and a refined low cinematic rise; no dialogue, no melody. Finish cleanly without an abrupt audio cut. Keep the approved bird identity, palette, material and environment unchanged."
+    },
+    {
+      "id": "landscape",
+      "stage": "motion-clean-master",
+      "brandMode": "brand-light",
+      "channelMode": "digital-motion",
+      "source": "work/plates/high-frequency-plate-3x1-source.png",
+      "sourceSha256": "1bb95b5a376b22fde2500aa3ea01654c49133016790976232d284ef1bcd05ab4",
+      "transport": "base64 data URI; not persisted",
+      "output": "work/motion/high-frequency-omni-clean-16x9-8s-v1.mp4",
+      "model": "google/gemini-omni-flash/image-to-video",
+      "requestId": "019f77d1-01b8-7922-83d3-a6d4d8dc90f6",
+      "providerLatencyMs": 48389,
+      "wallClockMs": 50513,
+      "startedAt": "2026-07-19T00:40:10.333Z",
+      "completedAt": "2026-07-19T00:41:00.846Z",
+      "aspectRatio": "16:9",
+      "durationSeconds": 8,
+      "contentType": "video/mp4",
+      "bytes": 2284733,
+      "sha256": "c6369ee25eab6cdd316278f12c4f1123fb1b324f2111dc1ef85922a941e39388",
+      "estimatedProviderCostUsd": 1.04,
+      "prompt": "Create an eight-second high-impact premium agency film in one continuous unbroken widescreen shot from the exact reference. [0-2s] The exact single iridescent hummingbird makes a sharp controlled acceleration across the right half of frame while the left field remains visually clean. [2-6s] The camera performs a subtle lateral chase as the existing chromatic modular wake multiplies into an elegant high-frequency stream of luminous tiles, conveying speed, precision and production at scale. [6-8s] The bird rises slightly and the tile system locks into a coherent directional flow, resolving with strong negative space for a later deterministic brand end card. Preserve exactly one head, one torso, one tail and two wings; only the wings repeat through natural motion blur. Keep the approved navy environment, cyan, teal, violet and coral palette, photographic detail, lighting and material. No cuts, no scene changes, no extra birds, no clone bodies, no logo, no typography, no letters, no watermark, no interface. Sound design: precise wing pulse, restrained crystalline particles and a refined cinematic acceleration; no dialogue, no melody. Finish cleanly without an abrupt audio cut. Keep everything else the same."
+    }
+  ]
+}

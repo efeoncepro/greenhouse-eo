@@ -25,7 +25,11 @@
 
 ## Acceso programático — Fal.ai API (desde 2026-07-06)
 
-Además del MCP Higgsfield (interactivo), Greenhouse tiene un **path API a Fal.ai** — agregador que frontea los mismos modelos de video (Seedance 2.0, Kling v3, PixVerse, Veo, Grok Imagine, Gemini Omni, Runway, Luma Ray, Hailuo, Wan…) con una sola API. Cliente canónico: `src/lib/ai/fal.ts` → `runFalModel({ model, input })` (submit+poll; pasás el slug fal, ej. `bytedance/seedance-2.0/mini/image-to-video`). Secreto server-side `FAL_API_KEY` / `FAL_API_KEY_SECRET_REF` — **nunca** hardcodear la key. **Producción out-of-band** (generar + subir por uploader; NO runtime del producto). Pricing por-segundo público en `fal.ai/models` (verificar antes de correr; es volátil). Catálogo completo de modelos (t2v/i2v/v2v + slugs): `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md`. Contrato: `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`.
+Además del MCP Higgsfield, Greenhouse tiene un path API out-of-band a Fal.ai mediante el cliente canónico
+`src/lib/ai/fal.ts` → `runFalModel({ model, input })`. Nunca hardcodear `FAL_API_KEY`; resolverla server-side
+con `FAL_API_KEY_SECRET_REF`. Verificar slug, schema y pricing en `fal.ai/models` antes de cada producción.
+Catálogo: `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md`; contrato:
+`docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`.
 
 ## Fuentes base (as-of 2026-07)
 

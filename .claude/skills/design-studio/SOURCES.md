@@ -21,7 +21,11 @@
 
 ## Acceso programático — Fal.ai API (desde 2026-07-06)
 
-Path de producción adicional a los MCP (Higgsfield/Firefly/Magnific): **Fal.ai** — agregador que frontea muchos modelos de imagen (flux, krea) y video (Seedance, Kling, Veo, PixVerse…) con una sola API. Al dirigir y elegir modelo, considerá fal como opción de producción vía el cliente canónico `src/lib/ai/fal.ts` (`runFalModel`). **Out-of-band** (generar + subir por uploader, NO runtime); secreto server-side `FAL_API_KEY` / `FAL_API_KEY_SECRET_REF`, nunca hardcodear. Pricing público por modelo en `fal.ai/models`. Catálogo completo de modelos + slugs (imagen/edit/upscale/video/3D/…): `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md`. Contrato: `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`.
+Path de producción adicional a los MCP: **Fal.ai** — agregador de imagen/video/audio/3D con cliente canónico
+`src/lib/ai/fal.ts` (`runFalModel`). Es **out-of-band**: generar + subir por uploader, nunca runtime.
+Secret server-side `FAL_API_KEY` / `FAL_API_KEY_SECRET_REF`; pricing público por modelo en `fal.ai/models`.
+Catálogo y slugs: `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md`; contrato técnico:
+`docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`.
 
 ## Fuentes base (as-of 2026-07)
 
@@ -33,6 +37,13 @@ Path de producción adicional a los MCP (Higgsfield/Firefly/Magnific): **Fal.ai*
 - Digital Synopsis — Top 20 Graphic Design Trends 2026 — https://digitalsynopsis.com/design/graphic-design-trends-2026/
 
 **Modelos IA de imagen**
+- OpenAI — GPT Image 2 model contract — https://developers.openai.com/api/docs/models/gpt-image-2
+- OpenAI — Image generation/editing guide — https://developers.openai.com/api/docs/guides/image-generation
+- OpenAI — API pricing — https://openai.com/api/pricing/
+- fal.ai — Seedream 5 Lite text-to-image API — https://fal.ai/models/bytedance/seedream/v5/lite/text-to-image/api
+- fal.ai — Seedream 5 Lite edit API — https://fal.ai/models/bytedance/seedream/v5/lite/edit/api
+- fal.ai — Seedream 5 Pro text-to-image API — https://fal.ai/models/bytedance/seedream/v5/pro/text-to-image/api
+- fal.ai — Seedream 5 Pro edit API — https://fal.ai/models/bytedance/seedream/v5/pro/edit/api
 - Gradually — 9 Best AI Image Generation Models 2026 — https://www.gradually.ai/en/ai-image-models/
 - Melies — Best AI Image Models 2026 (FLUX/GPT Image 2/Seedream/Ideogram/Imagen 4/Recraft) — https://melies.co/compare/ai-image-models
 - Google — Nano Banana Pro (Gemini 3 Pro Image) — https://blog.google/technology/ai/nano-banana-pro/
@@ -41,6 +52,11 @@ Path de producción adicional a los MCP (Higgsfield/Firefly/Magnific): **Fal.ai*
 
 **Modelos IA de video**
 - Google DeepMind — Gemini Omni — https://deepmind.google/models/gemini-omni/
+- Google AI — Gemini Omni Flash API/limitations — https://ai.google.dev/gemini-api/docs/omni
+- Google AI — Gemini API release notes — https://ai.google.dev/gemini-api/docs/changelog
+- Google AI — Gemini Omni pricing — https://ai.google.dev/gemini-api/docs/pricing
+- fal.ai — Gemini Omni image-to-video — https://fal.ai/models/google/gemini-omni-flash/image-to-video/api
+- fal.ai — Gemini Omni reference-to-video/edit — https://fal.ai/models/google/gemini-omni-flash/reference-to-video · https://fal.ai/models/google/gemini-omni-flash/edit
 - WaveSpeed — Seedance 2.0 vs Kling 3.0 vs Sora 2 vs Veo 3.1 — https://wavespeed.ai/blog/posts/seedance-2-0-vs-kling-3-0-sora-2-veo-3-1-video-generation-comparison-2026/
 - DigitalApplied — Seedance 2.5 (30s AI video) — https://www.digitalapplied.com/blog/seedance-2-5-bytedance-ai-video-model-2026
 - Atlas Cloud — Seedance vs Kling vs Sora vs Veo — https://www.atlascloud.ai/blog/guides/seedance-vs-kling-vs-sora-vs-veo
@@ -56,6 +72,8 @@ Path de producción adicional a los MCP (Higgsfield/Firefly/Magnific): **Fal.ai*
 |---|---|---|---|
 | **Nano Banana Pro** (Gemini 3 Pro Image, Vertex) | **texto legible en imagen**, 4K, razonamiento/conocimiento real, físico, enterprise-safe | estilo "de autor" menos que MJ | default marketing con copy en la imagen; disponible en `efeonce-group` (Vertex) |
 | **GPT Image 2** (OpenAI) | realismo, fidelidad al prompt, edición, texto, publishing diario (top general) | estilo cinematográfico < MJ | default realista y de uso diario; el repo ya lo usa (personaje Nexa) |
+| **Seedream 5 Lite** (ByteDance/fal.ai) | divergencia de medios/materiales a USD 0,035 por output publicado | continuidad/anatomía antes del anchor | abrir territorios en paralelo y curar antes de Pro |
+| **Seedream 5 Pro** (ByteDance/fal.ai) | material/color/atmósfera, multirreferencia, edición regional semántica | salida raster plana; sin máscara/layers públicos; layout extremo puede requerir otra pasada | desarrollar el mundo visual; relevar a GPT para system extension cuando aplique |
 | **Midjourney v7** | **estética/dirección de arte**, cinematográfico, surreal/pictórico, concept art | texto en imagen, control preciso | mood boards, editorial, hero de alto concepto |
 | **FLUX.2 Pro / 1.1 Pro** | calidad técnica, realismo, velocidad (~4.5s), **params de cámara** (focal/DoF/ángulo) | — | pre-viz de film/VFX, storyboard, realismo comercial; open-weight |
 | **Ideogram 3** | **texto-en-imagen** (posters, thumbnails, headlines) | — | piezas donde el titular dentro de la imagen manda |
@@ -81,6 +99,7 @@ Path de producción adicional a los MCP (Higgsfield/Firefly/Magnific): **Fal.ai*
   (grano, xerox, analógico) · layering/mixed-media · color audaz + surrealismo · texturas táctiles.
 - Selección de modelo por tarea: **texto en imagen → Nano Banana Pro / Ideogram**; **estética/concepto
   → Midjourney**; **vector/logo escalable → Recraft**; **realismo/cámara → FLUX.2**; **realista diario →
-  GPT Image 2**; **licencia limpia + Photoshop → Firefly**; **video con control por referencias → Seedance**;
+  GPT Image 2**; **divergencia de campaña → Seedream 5 Lite**; **material/color/región semántica →
+  Seedream 5 Pro**; **secuencia híbrida → módulo 12 + anchor/handoff**; **licencia limpia + Photoshop → Firefly**; **video con control por referencias → Seedance**;
   **broadcast/cine → Veo**; **económico simple → Kling**; **edición conversacional → Gemini Omni**.
 - Sora 2 deprecado (shutdown 2026-09-24) — no basar nada nuevo en él.

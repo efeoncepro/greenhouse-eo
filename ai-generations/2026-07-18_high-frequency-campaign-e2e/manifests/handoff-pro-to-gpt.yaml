@@ -1,0 +1,23 @@
+handoff: pro-to-gpt-image-2
+source_asset: work/anchor/high-frequency-anchor-v1.png
+reference_role: identity-style-and-concept-anchor
+purpose: recompose one approved key visual into channel-specific source plates
+locked:
+  - exactly one complete hummingbird
+  - right-facing flight
+  - deep navy and blue/emerald/violet iridescence
+  - chromatic tile wake as scale metaphor
+  - premium editorial realism
+variable_by_format:
+  - subject scale and placement
+  - negative-space placement
+  - safe zones and crop protection
+  - wake density
+forbidden:
+  - generated copy, logo or URL
+  - cloned bird or anatomy
+  - UI and decorative frames
+acceptance:
+  - all essential anatomy survives the release crop
+  - deterministic copy area remains low-detail
+  - visual family remains recognizable across formats

@@ -8,8 +8,9 @@ description: >-
   jerarquía/color/contraste, tipografía como imagen, Key Visual systems, dirección
   de arte y mood, tendencias visuales vigentes, craft de imagen IA por herramienta),
   y (2) capacidad de ejecución (audita KV con rúbrica, arma brief/mood, elige la
-  herramienta — Nano Banana / Midjourney / Ideogram / Firefly / Flux / Higgsfield /
-  Magnific —, produce/dirige y hace handoff humano), cerrando el loop
+  herramienta o secuencia de herramientas — Seedream 5 Lite/Pro / GPT Image 2 /
+  Nano Banana / Midjourney / Ideogram / Firefly / Flux / Higgsfield / Magnific —,
+  produce/dirige y hace handoff humano), cerrando el loop
   idear→dirigir→producir→auditar→iterar. COMPLEMENTARIA pero DISTINTA de
   greenhouse-ai-image-generator: esa GENERA el pixel (la mano, atada al runtime
   Greenhouse); design-studio DIRIGE el arte (concepto, sistema visual, Key Visual,
@@ -66,7 +67,7 @@ argument-hint: "[tarea o pregunta — ej: 'audita este key visual', 'diseña una
 
 1. **Clasifica la intención** (§2). ¿Es dirección de arte / diseño gráfico / auditoría de
    KV / imagen de marketing? Si pertenece a otra skill, **delega explícito** (§5) y para.
-2. **Carga el módulo o módulos** que apliquen (§3). No cargues los 11 — carga lo justo.
+2. **Carga el módulo o módulos** que apliquen (§3). No cargues los 12 — carga lo justo.
 3. **Chequea frescura**: si vas a nombrar una herramienta IA, versión, feature o tendencia
    volátil, reverifica primero (`SOURCES.md`).
 4. **Si hay que ejecutar** (auditar / producir / dirigir), abre `efeonce/STUDIO_TOOLING.md`
@@ -123,6 +124,7 @@ argument-hint: "[tarea o pregunta — ej: 'audita este key visual', 'diseña una
 | 09 | `modules/09_PRODUCTION_STUDIO.md` | orquestar generadores + handoff humano + iteración |
 | 10 | `modules/10_FORMATS_DELIVERY.md` | specs de entregable, formatos, safe zones, empaquetado |
 | 11 | `modules/11_PRODUCT_STORY_SCENES.md` | portadas/heroes con producto o analítica, auditoría forense de referencias, anti-referencias y SVG determinístico |
+| 12 | `modules/12_HYBRID_IMAGE_CAMPAIGN_PRODUCTION.md` | campañas Seedream↔GPT→Gemini Omni, still+motion, digital+print/OOH, brand modes, anchors y routing por operación |
 
 ## 4. La mano de ejecución (por qué es "studio")
 
@@ -131,9 +133,11 @@ Cierra el loop **idear → dirigir → producir → auditar → iterar** (detall
 
 - **Auditar**: rúbrica de KV (`modules/05` + `templates/key-visual-audit-scorecard.md`).
 - **Dirigir**: brief + mood board + selección de herramienta por tarea (`modules/06`, `08`).
-- **Producir**: la herramienta correcta para cada trabajo — **UI de Greenhouse →**
+- **Producir**: la herramienta o secuencia correcta para cada trabajo — **UI de Greenhouse →**
   `greenhouse-ai-image-generator`; **marketing/concept →** Nano Banana / Midjourney /
   Ideogram / Adobe Firefly / Higgsfield / Magnific (upscale) vía sus MCP/skills;
+  **campaña híbrida Seedream/GPT/Gemini Omni →** cargar `modules/12_HYBRID_IMAGE_CAMPAIGN_PRODUCTION.md` y
+  relevar por contrato `brand/channel→diverge→develop→anchor→organize→extend→animate→compose/post→prepress→release`;
   **infografía editorial exacta →** SVG determinístico + delivery SVG directo o raster según el método
   canónico de `content-marketing-studio`.
 - **Escena editorial de producto:** separar siempre la **gramática agnóstica** —jerarquía, gráficos,
@@ -177,8 +181,9 @@ Cada apuesta con su volatilidad en `SOURCES.md`:
    rechazo a lo plano.
 6. **Color audaz + surrealismo + texturas táctiles** (gradientes, duotonos, glassy/waxy/hiperreal)
    — con intención, no por novelty.
-7. **No elijas un modelo — ten acceso a todos y sabe cuándo usar cada uno.** El valor 2026 del
-   diseñador es **elegir la herramienta correcta por tarea**, no casarse con una.
+7. **No elijas un modelo: diseña una secuencia de manos.** El valor 2026 del diseñador es
+   **elegir la herramienta correcta por operación y preservar el anchor entre relevos**, no
+   casarse con una ni convertir el proceso en torneo uno-a-uno.
 8. **IA + humano, no IA vs humano.** La IA diverge rápido y barato; el humano cura, decide y
    pone el craft final. El juicio de marca nunca se delega al modelo.
 
@@ -186,7 +191,7 @@ Cada apuesta con su volatilidad en `SOURCES.md`:
 
 `templates/key-visual-brief.md` · `key-visual-audit-scorecard.md` · `art-direction-moodboard.md` ·
 `image-prompt-sheet.md` · `campaign-visual-system.md` · `design-critique.md` ·
-`asset-delivery-spec.md` · `reference-library.md`
+`asset-delivery-spec.md` · `reference-library.md` · `model-handoff-contract.yaml`
 
 ## 8. Archivos de apoyo
 
@@ -197,5 +202,7 @@ Cada apuesta con su volatilidad en `SOURCES.md`:
   infografías exactas SVG directo/raster, responsive/theme, manifest y QA.
 - `../content-marketing-studio/efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md` — paleta, shell, arquetipos,
   sello URL, benchmark Semrush y gates editoriales propios de Efeonce.
+- `modules/12_HYBRID_IMAGE_CAMPAIGN_PRODUCTION.md` — factory de campañas multi-modelo y multi-canal,
+  contratos de relevo, brand/channel modes, anchor gate y routing Seedream 5 ↔ GPT Image 2 → Gemini Omni.
 - `efeonce/` — overlay: `EFEONCE_OVERLAY.md`, `STUDIO_TOOLING.md`, `DESIGN_BOUNDARY.md`,
   `CLIENT_DELIVERY.md`.

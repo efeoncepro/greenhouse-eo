@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-04-07 por Claude (TASK-278)
-> **Ultima actualizacion:** 2026-07-06 por Claude (acceso Fal.ai)
+> **Ultima actualizacion:** 2026-07-18 por Codex (produccion hibrida Seedream + GPT Image)
 > **Documentacion tecnica:** [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md)
 
 # Generador Visual de Assets con IA
@@ -73,3 +73,16 @@ Ademas de Imagen/OpenAI (imagen) y Higgsfield (vectores), Greenhouse tiene acces
 - **Costo:** se paga por segundo de video segun el modelo (ejemplo: un clip corto economico ronda los US$0.36; uno de mayor calidad, varios dolares). Siempre revisar el precio del modelo en `fal.ai/models` antes de generar.
 
 > Detalle tecnico: ver [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md) para la API del generador, system prompts, contrato SVG, endpoints internos y la seccion "Fal.ai — agregador de generacion media".
+
+## Produccion de campañas con varias manos de IA
+
+Para una campaña grande no se elige necesariamente un solo modelo. El equipo puede iniciar una dirección en **Seedream 5**, pasar un anchor aprobado a **GPT Image 2** para organizarlo o adaptarlo, y volver a Seedream si hace falta enriquecer materialidad o atmósfera. También funciona en sentido inverso.
+
+La regla es asignar cada operación a la mano más fuerte:
+
+- Seedream Lite explora familias visuales rápidamente.
+- Seedream Pro desarrolla color, material, luz y energía.
+- GPT Image 2 organiza composición, corrige regiones y crea derivados con restricciones precisas.
+- Un compositor determinista agrega copy, logo, legal y exports finales.
+
+Antes de multiplicar formatos se aprueba un **anchor** y un contrato de relevo que declara qué puede cambiar y qué debe permanecer intacto. Así una campaña puede crecer a 9:16, 4:5, 3:1 y otros formatos sin convertir cada nueva pieza en una reinterpretación de la anterior. Sigue siendo producción operada fuera del portal: no habilita generación en tiempo real para usuarios.

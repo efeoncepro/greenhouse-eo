@@ -23,6 +23,14 @@
 | Herramientas AI-VFX (roto/track/relight/mocap) | **volátil (mensual)** | qué tool automatiza qué, cuál lidera | 11 |
 | Specs de entrega (loudness, codecs, tamaños) | **semestral** | targets exactos por destino | 08, 10 |
 
+## Acceso programático — Fal.ai API (desde 2026-07-06)
+
+Además del MCP Higgsfield, Greenhouse tiene un path API out-of-band a Fal.ai mediante el cliente canónico
+`src/lib/ai/fal.ts` → `runFalModel({ model, input })`. Nunca hardcodear `FAL_API_KEY`; resolverla server-side
+con `FAL_API_KEY_SECRET_REF`. Verificar slug, schema y pricing en `fal.ai/models` antes de cada producción.
+Catálogo: `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md`; contrato:
+`docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`.
+
 ## Fuentes base (as-of 2026-07)
 
 **Tendencias motion / animación 2026**

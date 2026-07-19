@@ -1,6 +1,7 @@
 # Greenhouse — Fal.ai Model & Capability Catalog V1
 
 > **Tipo:** Referencia técnica agent-facing · **Version:** 1.0 · **Creado:** 2026-07-06 por Claude
+> **Ultima verificacion parcial:** 2026-07-18 — Seedream 5.0 Lite/Pro y GPT Image 2
 > **Contrato/acceso:** [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md) → §Fal.ai
 > **Cliente canónico:** [`src/lib/ai/fal.ts`](../../src/lib/ai/fal.ts) (`runFalModel`)
 
@@ -87,6 +88,8 @@ Fal.ai cobra **por uso**, con la unidad según la modalidad (siempre confirmar e
 | xAI | Grok Imagine Pro | `xai/grok-imagine-image/quality/text-to-image` ✅ | |
 | Seedream (ByteDance) | Seedream 4.5 | `fal-ai/bytedance/seedream/v4.5/text-to-image` ✅ | |
 | Seedream | Seedream 4.0 | `fal-ai/bytedance/seedream/v4/text-to-image` ✅ | |
+| Seedream | Seedream 5.0 Lite | `fal-ai/bytedance/seedream/v5/lite/text-to-image` ✅ | divergencia y lotes rápidos |
+| Seedream | Seedream 5.0 Pro | `fal-ai/bytedance/seedream/v5/pro/text-to-image` ✅ | materialidad, atmósfera y desarrollo de look |
 | Krea | Krea 2 Turbo | `fal-ai/krea-2/turbo` ✅ | |
 | Krea | Krea 2 Turbo LoRA | `fal-ai/krea-2/turbo/lora` ✅ | |
 | Ideogram | Ideogram V4 Instant / Fast | `ideogram/v4/instant` · `ideogram/v4/fast` ✅ | fuerte en **texto en imagen** |
@@ -111,6 +114,7 @@ Edición dirigida por prompt, inpainting, reference/kontext, controlnet.
 | FLUX.1 Kontext [pro] | `fal-ai/flux-pro/kontext` ✅ | edición contextual / reference |
 | Seedream 4.5 Edit | `fal-ai/bytedance/seedream/v4.5/edit` ✅ | |
 | Seedream 5.0 Lite Edit | `fal-ai/bytedance/seedream/v5/lite/edit` ✅ | |
+| Seedream 5.0 Pro Edit | `fal-ai/bytedance/seedream/v5/pro/edit` ✅ | edición de alta fidelidad para desarrollo de look |
 | Grok Imagine Image Edit | `xai/grok-imagine-image/edit` · `xai/grok-imagine-image/quality/edit` ✅ | |
 | ControlNet / IP-Adapter (FLUX/SD) | `fal-ai/flux-controlnet-*` 🔎 | control estructural (pose, depth, canny) |
 

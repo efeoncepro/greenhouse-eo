@@ -115,6 +115,15 @@ Antes de gastar, declara si la referencia es una **ancla visual flexible** o una
 | Un spot que mezcla mundo IA + producto | **D** (híbrido) |
 | Cambiar una escena ya generada sin regenerar por reflejo | **E** (editar sólo si hacen falta píxeles nuevos; post determinista si no) |
 | Elegir motor para una referencia, practical o acción física | **F** (contrato de fidelidad antes que canal/precio) |
+| Convertir un clean shot aprobado en familia 15/10/6 sin nueva inferencia | **G** (`workflows/single-shot-to-deterministic-campaign-hero.md`) |
+
+### Regla de routing de Workflow G
+
+- **Omni** anima o edita una microescena cuando el plate tolera reinterpretación.
+- **Seedance 2.0** sólo abre una toma, ángulo, acción o continuidad nuevos cuando conservar set/sujeto es
+  prioritario. No se usa para reparar crop, pacing, copy/logo, grade, foley, mezcla ni loudness.
+- Si los frames aprobados ya contienen la verdad visual, 15/10/6 se cierra con montaje, mograph y audio post
+  determinísticos; cada duración tiene EDL, end card, poster y medición propios.
 
 > **Regla transversal:** el **look** puede venir de IA; la **exactitud** (texto, citas, logos, números,
 > marca) **siempre** de assets/mograph reales compuestos. El operador aprueba antes de entregar; gasto

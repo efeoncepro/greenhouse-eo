@@ -1,0 +1,78 @@
+# Copy once per model-to-model pass. Keep values literal and versioned.
+handoff_id: campaign-message-format-v1
+campaign_id: campaign-2026
+batch_id: batch-v1
+anchor_id: campaign-kv-v1/message-01
+parent_asset: path-or-temporary-url
+topology:
+  kind: star
+  anchor_revision: 1
+  derivation_parent: anchor # anchor | local-correction
+channel_mode: digital-static # digital-static | digital-motion | print | ooh
+brand_mode: branded # branded | brand-light | editorial-neutral | client-brand
+
+source:
+  model: exact-source-model-id
+  endpoint: exact-source-endpoint
+  request_id: request-id-or-null
+  stage: develop
+
+target_executor:
+  model: exact-target-model-id
+  endpoint: exact-target-endpoint
+  stage: organize
+  quality: medium
+
+reference_roles:
+  - index: 1
+    asset: path-or-url
+    role: IDENTITY
+
+conflict_precedence:
+  - IDENTITY > MATERIAL
+  - safe_zone > decorative_crop
+
+locks:
+  - approved subject identity and anatomy
+  - approved palette and lighting logic
+  - recurring campaign hook
+
+delta: one principal change only
+
+safe_zones:
+  copy_field: explicit percentage and position
+  edge_clearance: explicit percentage
+  platform_overlay: verified destination or pending
+
+forbidden:
+  - accidental text or fake logo
+  - watermark
+  - extra anatomy or duplicate subject
+
+output:
+  working_size: widthxheight
+  release_size: widthxheight
+  ratio: 4:5
+  format: png
+  color_space: sRGB
+
+acceptance:
+  - delta is the dominant change
+  - all locks match the anchor
+  - safe-zone overlay passes
+  - hook reads at 320px
+  - manifest and provenance complete
+
+approval:
+  anchor_owner: named-role
+  art_direction_approver: named-role
+  release_approver: named-role
+  reopen_authority: named-role
+  promote_local_correction_to_anchor: false
+
+provenance_required:
+  - exact model and endpoint
+  - request ID and prompt verbatim
+  - ordered references and roles
+  - mask path plus alpha validation when used
+  - parent asset, latency, cost and pricing as-of

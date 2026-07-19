@@ -37,7 +37,7 @@ criterio. El loop es corto y barato en las primeras vueltas (miniaturas), caro s
 | Destino del asset | Mano / herramienta | Regla |
 |---|---|---|
 | **UI de Greenhouse** (icono, empty state, banner, hero de producto, PNG transparente, edición) | **`greenhouse-ai-image-generator`** | Helper canónico + DESIGN.md/AXIS + QA de transparencia. **NUNCA** por fuera. |
-| **Marketing / campaña / concepto** (afiche, social, hero de landing, mood) | Nano Banana / Midjourney / Ideogram / Firefly / Higgsfield / Magnific vía MCP (`modules/08` §2) | design-studio dirige; la herramienta produce. |
+| **Marketing / campaña / concepto** (afiche, social, hero de landing, mood) | Secuencia de manos según operación: Seedream Lite/Pro, GPT Image 2, Nano Banana, Midjourney, Ideogram, Firefly, Higgsfield o Magnific (`modules/08` y `modules/12`) | design-studio dirige el linaje; cada herramienta cambia un delta y preserva el anchor. |
 | **Logo real de tercero / marca de pago** | **`greenhouse-digital-brand-asset-designer`** | **NUNCA** dibujar de memoria. |
 | **Craft final humano** (retoque fino, ilustración propietaria, print) | Persona del equipo creativo | Handoff con spec + refs (§4). |
 | **Motion / identidad kinética** | Dirige acá → implementa **`motion-design`** | El estado estático se resuelve primero. |
@@ -84,6 +84,10 @@ alta calidad sin haber validado dirección barata primero.
 3. **Generación de calidad** de las elegidas (menos, mejor).
 4. **Edición dirigida** (inpaint/outpaint) del ganador — más barato que regenerar.
 5. **Upscale/enhance** solo del frame final (`modules/08` §4).
+
+En campañas multi-modelo, costo y azar también se controlan en los relevos: aprobar un anchor
+antes de derivar, ejecutar en paralelo sólo ramas independientes y registrar first-pass
+compliance. Cargar `modules/12_HYBRID_IMAGE_CAMPAIGN_PRODUCTION.md`.
 
 > **Regla dura (dimensionar antes de volumen).** No saques **20 variantes en 4K** de una
 > dirección sin validar. Saca ~12 miniaturas, elige 2, *esas* van a alta + upscale. La

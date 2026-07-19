@@ -1,0 +1,23 @@
+{
+  "stage": "motion-off-brand-proof",
+  "brandMode": "editorial-neutral",
+  "source": "work/plates/high-frequency-plate-9x16-source.png",
+  "sourceSha256": "4a48f2871a3976b63b08f2703b9bf50424ede2b91f058c6236c102c3b8623dda",
+  "transport": "base64 data URI; not persisted",
+  "output": "work/motion/high-frequency-off-brand-omni-9x16-v1.mp4",
+  "model": "google/gemini-omni-flash/image-to-video",
+  "requestId": "019f77c6-b1fc-7f53-ba55-5a8df0a76e99",
+  "providerLatencyMs": 42287,
+  "wallClockMs": 44720,
+  "startedAt": "2026-07-19T00:28:53.077Z",
+  "completedAt": "2026-07-19T00:29:37.797Z",
+  "aspectRatio": "9:16",
+  "durationSeconds": 3,
+  "contentType": "video/mp4",
+  "bytes": 723336,
+  "sha256": "9bdac7bafbc01aac0726e969942d38f227b62bd0a137d2e56ed80e8d5e2b6dbe",
+  "estimatedProviderCostUsd": 0.39,
+  "pricingAsOf": "2026-07-18",
+  "pricingSource": "https://fal.ai/models/google/gemini-omni-flash/image-to-video",
+  "prompt": "In a single continuous unbroken shot, animate the exact single iridescent hummingbird from the reference. The bird flies rapidly toward the upper right with precise natural wing motion while its existing chromatic modular wake flows, multiplies and resolves into an elegant field of luminous geometric particles. Preserve exactly one head, one torso and one tail; only the two wings move. Keep the original navy environment, cyan, teal, violet and coral material language, premium photographic detail and clean negative space. Subtle forward camera drift, no cuts. Sound design: a restrained airy wing pulse and a soft crystalline acceleration, no music, no dialogue. No logo, no brand mark, no typography, no letters, no watermark, no interface, no additional birds. Keep everything else the same."
+}

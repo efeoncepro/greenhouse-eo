@@ -123,7 +123,7 @@ argument-hint: "[tarea o pregunta — ej: 'dirige un brand film de 30s para el g
 | 09 | `modules/09_AI_VIDEO_PIPELINE.md` | dirigir el pipeline IA (modelos, image-to-video, cámara, consistencia) |
 | 10 | `modules/10_PRODUCTION_STUDIO.md` | orquestar humano/IA/híbrido + gasto gobernado + handoff |
 | 11 | `modules/11_VFX_COMPOSITING.md` | compositing, keying, roto, tracking/matchmove, CGI, simulaciones, AI-VFX |
-| 12 | `modules/12_CREATIVE_WORKFLOWS.md` | elegir una receta validada y decidir entre edición Omni y post determinista |
+| 12 | `modules/12_CREATIVE_WORKFLOWS.md` | elegir receta validada; clean shot→15/10/6; routing Omni/Seedance/post |
 
 ## 4. La mano de ejecución (por qué es "studio")
 
@@ -138,6 +138,10 @@ Cierra el loop **idear → storyboard → animatic → producir → editar → f
 - **Producir (humano)**: After Effects (mograph/compositing), Blender/C4D (3D), Nuke/Fusion
   (compositing/VFX), Mocha (tracking), Houdini (FX/simulaciones) — handoff con spec (`modules/11`).
 - **Editar + finalizar**: montaje, sonido, color grade, render, entrega (`modules/06`, `07`, `08`, `10`).
+- **Profusionar una campaña motion**: desde un clean shot aprobado, construir 15/10/6 como tres argumentos
+  editoriales con copy/logo exactos y audio medido (`workflows/single-shot-to-deterministic-campaign-hero.md`).
+  Omni sirve para microescena reinterpretada; Seedance 2.0 sólo para una toma/acción/continuidad nueva que
+  preserve el mundo. Timing, crop, safe zone, copy/logo, grade, foley y mezcla pertenecen a post.
 
 > **Regla dura (director, no dictador).** El estudio **decide y dirige**, pero **producir/renderizar
 > con IA cuesta créditos** (gasto gobernado) y **entregar/publicar pasa SIEMPRE por confirmación

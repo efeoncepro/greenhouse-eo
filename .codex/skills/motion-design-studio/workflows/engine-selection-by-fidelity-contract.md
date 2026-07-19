@@ -11,12 +11,17 @@
 | Contrato de la toma | Primera mano | Por qué |
 | --- | --- | --- |
 | Un paquete de stills ficticios define tono/campaña, pero cada microescena puede interpretarse; no hay texto ni objeto diegético que deba ser exacto | **Gemini Omni image-to-video** | Convierte cada key visual en un beat vivo y breve; funciona especialmente bien para UGC, Reel, Historia y Creador si se describe la acción humana concreta. |
-| Un key visual existente es la verdad del set: composición, micrófono/producto, practical, color y profundidad deben seguir reconocibles | **Seedance image/reference-to-video** | Empieza desde la referencia íntegra y favorece el contrato de conservar mundo/objeto. Sigue siendo candidato técnico y debe pasar actuación, texto y sonido. |
+| Un key visual existente es la verdad del set y hace falta una **toma nueva**: composición, producto/practical, color y profundidad deben seguir reconocibles | **Seedance 2.0 image/reference-to-video** | Fallback de producción para ángulo, acción o continuidad nuevos preservando mundo/objeto. Sigue siendo candidato técnico y debe pasar actuación, texto y sonido. |
 | La toma necesita cámara, blocking o timing espacial preplaneados; el look puede reinterpretarse | **Seedance reference-to-video** con playblast/viewport **exportado** + keyframe de look | El modelo puede tomar video e imagen como referencias; requiere un endpoint que exponga ambos y una prueba aislada. Capacidad investigada, no receta validada. |
 | Falta una acción/objeto que no existe y se necesita explorar o editar hablando sobre una escena que tolera reinterpretación | **Gemini Omni edit/generation** | Su valor diferencial es el loop conversacional, no una promesa de fidelidad frame-perfect. |
 | Sólo cambia orden, pausa, trim, freeze, grade o copy no diegético exacto | **Post determinista / mograph** | No gastar generación ni fingir física que no existe en los frames. |
+| El clip tiene crop, pacing, safe-zone, texto/logo, captions, grade, foley, mezcla o loudness defectuosos | **Post determinista / audio post** | Son defectos editoriales; Seedance no es un reparador de finish. |
 
 La plataforma o canal es un dato de formato; la **fidelidad permitida**, la presencia de un practical y la semántica física de la acción son la decisión de motor.
+
+**Regla de fallback:** Seedance 2.0 entra porque falta verdad temporal nueva —otra toma, ángulo, acción o
+continuidad—, no porque una edición existente necesite arreglo. Si la acción ya existe, termina en NLE/composite/
+audio. Si no existe y es el significado del plano, reabre producción de toma integral y vuelve al animatic.
 
 ## Previs 3D → Seedance: capacidad investigada, no evidencia interna
 
@@ -57,6 +62,7 @@ El reintento T está documentado pero bloqueado por saldo Fal. No promocionar Se
 - No inferir que **Seedance siempre conserva física humana**: S preservó el set de Glitch, no el doble golpe pedido.
 - No inferir que un MP4 terminado, un precio bajo o una referencia aceptada equivalen a master aprobado.
 - No reparar en post un practical que pertenece al mundo ni una acción corporal cuyo significado no existe en la fuente.
+- No mandar a Seedance defectos de edición que deben resolverse de forma reversible en post.
 
 ## Referencias
 

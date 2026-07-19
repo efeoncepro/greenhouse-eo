@@ -32,6 +32,10 @@
 - ❌ **Generar 30 variantes en 4K sin animatic.** Quema créditos. ✅ Dimensiona el gasto, diverge barato,
   sube calidad de la elegida; upscale final con Magnific.
 - ❌ **Delegar el juicio de marca a la IA.** ✅ IA acelera; el humano dirige, cura y hace el finish.
+- ❌ **Usar Seedance para arreglar timing, crop, texto/logo, grade o audio.** ✅ Seedance 2.0 sólo cuando
+  falta una toma, ángulo, acción o continuidad nuevos; los defectos editoriales se cierran en post.
+- ❌ **Recortar el master de 15 s hasta obtener 10/6 s sin reescribir el arco.** ✅ Cada duración tiene
+  hook, prueba, resolución, EDL, end card, poster y audio medido propios.
 
 ## VFX y compositing
 

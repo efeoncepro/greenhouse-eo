@@ -26,9 +26,14 @@
 - **¿Es imagen de marketing/marca (KV, hero, poster, social)?** → elige el modelo por tarea
   (matriz en `SOURCES.md`): texto-en-imagen → Nano Banana Pro / Ideogram; estética/concepto →
   Midjourney; vector/logo escalable → Recraft; realismo/cámara → FLUX.2; realista diario →
-  GPT Image 2; licencia limpia + Photoshop → Adobe Firefly.
+  GPT Image 2; divergencia barata → Seedream 5 Lite; material/color/atmósfera o región semántica
+  → Seedream 5 Pro; licencia limpia + Photoshop → Adobe Firefly. Si una campaña requiere varias
+  fortalezas, cargar `../modules/12_HYBRID_IMAGE_CAMPAIGN_PRODUCTION.md` y diseñar una secuencia
+  de manos con anchor/handoff, no un torneo de modelos.
 - **¿Es video/motion?** → Seedance (control por referencias) / Veo (broadcast) / Kling (económico) /
-  Gemini Omni (edición conversacional) / Higgsfield; producción y formato social → `social-media-studio`.
+  Gemini Omni (still→motion + edición conversacional) / Higgsfield; producción y formato social →
+  `social-media-studio`. Un clip de duración mínima sólo valida el endpoint: el release profesional exige
+  master + cutdown por ratio, end card, poster, audio/captions y QA temporal.
 - **¿Es un logo real de tercero?** → `greenhouse-digital-brand-asset-designer`.
 - **¿El craft final lo hace una persona** (retoque, ilustración propietaria, print)? → handoff con
   `templates/asset-delivery-spec.md` + referencias; no fuerces IA.

@@ -1,0 +1,24 @@
+[
+  {
+    "id": "vertical",
+    "model": "google/gemini-omni-flash/image-to-video",
+    "source": "work/plates/high-frequency-plate-9x16-source.png",
+    "output": "work/motion/high-frequency-omni-clean-9x16-8s-v1.mp4",
+    "aspectRatio": "9:16",
+    "duration": 8,
+    "brandMode": "brand-light",
+    "channelMode": "digital-motion",
+    "prompt": "Create an eight-second premium agency film in one continuous unbroken shot from the exact reference. [0-2s] The exact single iridescent hummingbird snaps into rapid controlled flight toward the upper right, with a strong immediate visual hook. [2-6s] The camera accelerates beside it as the existing chromatic modular wake expands into hundreds of precise luminous tiles, shifting from cyan and teal through violet and coral while preserving the navy environment and premium photographic detail. [6-8s] The bird climbs and the modules converge into a disciplined flowing system, leaving clean negative space and a calm visual resolution for a later deterministic end card. Preserve exactly one head, one torso, one tail and two wings; only the wings repeat through natural motion blur. No cuts, no scene changes, no additional birds, no clone bodies, no logo, no typography, no letters, no watermark, no interface. Sound design: restrained high-frequency wing pulse, controlled crystalline acceleration and a refined low cinematic rise; no dialogue, no melody. Finish cleanly without an abrupt audio cut. Keep the approved bird identity, palette, material and environment unchanged."
+  },
+  {
+    "id": "landscape",
+    "model": "google/gemini-omni-flash/image-to-video",
+    "source": "work/plates/high-frequency-plate-3x1-source.png",
+    "output": "work/motion/high-frequency-omni-clean-16x9-8s-v1.mp4",
+    "aspectRatio": "16:9",
+    "duration": 8,
+    "brandMode": "brand-light",
+    "channelMode": "digital-motion",
+    "prompt": "Create an eight-second high-impact premium agency film in one continuous unbroken widescreen shot from the exact reference. [0-2s] The exact single iridescent hummingbird makes a sharp controlled acceleration across the right half of frame while the left field remains visually clean. [2-6s] The camera performs a subtle lateral chase as the existing chromatic modular wake multiplies into an elegant high-frequency stream of luminous tiles, conveying speed, precision and production at scale. [6-8s] The bird rises slightly and the tile system locks into a coherent directional flow, resolving with strong negative space for a later deterministic brand end card. Preserve exactly one head, one torso, one tail and two wings; only the wings repeat through natural motion blur. Keep the approved navy environment, cyan, teal, violet and coral palette, photographic detail, lighting and material. No cuts, no scene changes, no extra birds, no clone bodies, no logo, no typography, no letters, no watermark, no interface. Sound design: precise wing pulse, restrained crystalline particles and a refined cinematic acceleration; no dialogue, no melody. Finish cleanly without an abrupt audio cut. Keep everything else the same."
+  }
+]

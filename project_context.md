@@ -9,6 +9,21 @@
   es default-on y sólo `false` revierte a azure. AXIS Figma debe reconciliarse upstream; no
   sobrescribir el teal con el ramp lime durante una regeneración.
 
+- **Producción multimodal Seedream 5 ↔ GPT Image 2 → Gemini Omni (2026-07-18):** `design-studio` y
+  `greenhouse-ai-image-generator` gobiernan campañas como secuencias de manos, no torneos. Canon:
+  `brand/channel -> diverge -> develop -> anchor -> organize -> extend -> animate -> compose/post ->
+  prepress -> release`. Cada asset declara `channelMode` y `brandMode`; offline no es off-branding.
+  `GREENHOUSE_MULTIMODAL_CAMPAIGN_PRODUCTION_V1.md` gobierna digital, motion, print/OOH, clean plates y
+  post determinístico. El worked example `ai-generations/2026-07-18_high-frequency-campaign-e2e/`
+  entrega 18 stills, 2 heroes motion 15 s, 2 masters 10 s y 2 bumpers 6 s. Los heroes extienden un
+  clean shot Omni aprobado con claims, format wall y end card determinísticos, sin nueva inferencia;
+  el probe Omni 3 s queda explícitamente fuera del release. QA mide loudness/peak en los 6 MP4; sólo los
+  heroes están normalizados al target compartido y masters/bumpers requieren normalización por destino si se
+  trafican. Seedance 2.0 es fallback para una toma/ángulo/continuidad física ausente, no para defectos de
+  montaje. Creative release no implica media
+  activation ni press-ready sin ICC/vendor spec. Es
+  producción out-of-band; no modifica el runtime del portal.
+
 - **Premium Agentic UI Delivery (2026-07-18, TASK-1453 / EPIC-033):** la calidad visual de UI nueva ya no se infiere por tokens, primitives o build verde. `greenhouse-ai-design-studio` orquesta Visual Direction → recipe/Composition Shell → primitives → GVC premium → review. El ADR `docs/architecture/GREENHOUSE_PREMIUM_AGENTIC_UI_DELIVERY_DECISION_V1.md` y el estándar `docs/ui/GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md` hacen bloqueantes card wallpaper, más de tres superficies `contained` en el first fold normal, falta de un momento visual dominante y mobile serializado como stack de cards. Cierre: cuatro gates (`design-contract`, `ui-code`, `ui-visual`, `ui-quality`), media ≥4.5/5, piso ≥4 y cinco dimensiones críticas ≥4.5. MUI/Vuexy siguen como foundation accesible, no como autor visual.
 
 - **Notion work management skill V1.1 (2026-07-18):** Codex y Claude comparten ahora
