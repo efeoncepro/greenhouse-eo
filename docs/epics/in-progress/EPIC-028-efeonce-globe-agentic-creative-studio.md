@@ -73,6 +73,17 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
   calibración, pilotos por modo y commercial approval. `TASK-1480` no habilita clientes sin sign-off explícito.
 - `TASK-1484` — **monetización bloqueada:** implementa packages/billing/tax/revenue/payments sólo después de
   un `commercial_decision_record` aplicable; tampoco habilita cobros/clientes sin rollout posterior.
+- `TASK-1506` — **frontend hosting and front door decision.** Gate P0 anterior al primer Studio funcional y a
+  cualquier custom domain: decide mediante ADR Cloud Run+Global ALB versus Vercel web/BFF+Cloud Run API, fija el
+  owner de `globe.efeoncepro.com` y registra una task de implementación separada. No muta runtime, DNS ni OAuth.
+
+### Front door ordering contract
+
+- Ejecutar `TASK-1506` ahora, antes de implementar `TASK-1505`, del rollout del workbench `TASK-1474`, del
+  canary/cutover de callbacks de `TASK-1469` y de publicar deep links en `TASK-1475`.
+- Un dominio internal-only puede implementarse después de la ADR sin esperar `TASK-1480`, siempre con una sola
+  réplica mientras la sesión/OAuth siga en memoria. Alta disponibilidad o clientes requieren persistencia durable;
+  Production/clientes externos permanecen bloqueados por `TASK-1480` y un release explícito posterior.
 
 ### Parallel execution contract
 
