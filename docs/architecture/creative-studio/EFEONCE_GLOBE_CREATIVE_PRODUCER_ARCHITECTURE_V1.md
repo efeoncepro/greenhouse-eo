@@ -151,13 +151,20 @@ prompt-first, no interpreta brief). **Sincroniza** projects durables con `1465` 
   in-process `getProducerRoute` de TASK-1500 (reuse SSOT, sin re-dispatch ni ciclo de módulos), cableado en
   `app.ts`; los tests inyectan doubles. `catalog?` es opcional en `ModelLabDependencies` (un experimento sin
   `output` no necesita catálogo; con `output` sin catálogo ⇒ fail-closed).
-- **Threading al provider seam (image-first):** `CreativeProviderRequestV1` gana `quality?`/`aspectRatio?`/`count?`;
-  `toProviderRequest` los hilvana desde `experiment.request.output` cuando `modality==='image'`. El fal image adapter
-  (Seedream v5/pro) los lee con el schema **verificado contra la doc publicada de Fal** (2026-07-20): `count →
-  num_images`, y el aspect ratio neutral del catálogo → **`image_size` (preset nombrado)** — Seedream v5/pro **no
-  tiene campo `aspect_ratio`**, así que `16:9 → landscape_16_9`, `1:1 → square_hd`, etc.; un aspect ratio sin preset
-  omite `image_size` (default del modelo). **Absorbe el aspect ratio de TASK-1495 para image.** El threading de
-  video/audio a sus adapters es TASK-1504.
+- **Threading al provider seam (image-first, AMBOS adapters de imagen):** `CreativeProviderRequestV1` gana
+  `quality?`/`aspectRatio?`/`count?`; `toProviderRequest` los hilvana desde `experiment.request.output` cuando
+  `modality==='image'`. Los **dos** adapters de imagen los leen, cada uno con el schema verificado de su proveedor
+  (el aspect ratio del catálogo es vocabulario neutro, cada adapter lo traduce):
+  - **Fal (Seedream v5/pro)** — verificado contra la doc publicada de Fal: `count → num_images`, y el aspect ratio
+    neutral → **`image_size` (preset nombrado)** (Seedream v5/pro **no tiene** `aspect_ratio`: `16:9 →
+    landscape_16_9`, `1:1 → square_hd`, …; sin preset omite `image_size`).
+  - **Vertex (Nano Banana / gemini-2.5-flash-image)** — verificado contra la API de Gemini `generateContent`:
+    aspect ratio → **`generationConfig.imageConfig.aspectRatio`** (toma el formato neutro `"16:9"` directo, sin
+    presets); `count` no se cablea (Gemini image no tiene multi-image documentado; Seedream sí vía `num_images`).
+  - Es el default del composite el que rutea image-generate a Vertex, así que cablear **ambos** evita que el shape
+    se ignore en silencio según qué proveedor se elija.
+
+  **Absorbe el aspect ratio de TASK-1495 para image.** El threading de video/audio a sus adapters es TASK-1504.
 - **Coverage sin cambios:** misma capability (`globe.lab.experiment.run` / `globe.run.prepare`), `ui`/`mcp`
   `policy-blocked`. La UI (1505), MCP, SDK y CLI consumen el MISMO command con el nuevo shape.
 

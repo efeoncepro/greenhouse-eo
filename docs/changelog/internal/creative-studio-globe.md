@@ -21,11 +21,13 @@
   firma real es `RouteCatalogPort.getRoute(referenceRoute): ProducerRouteDescriptorV1` (el descriptor ya trae
   capability + constraints + inputModes). Impl de producción = `getProducerRoute` reusado in-process (SSOT, sin
   re-dispatch ni ciclo de módulos); `catalog?` opcional en `ModelLabDependencies`.
-- **Threading image-first + absorción de TASK-1495:** `CreativeProviderRequestV1` gana `quality`/`aspectRatio`/
-  `count`; `toProviderRequest` los hilvana cuando `modality==='image'`; el fal image adapter (Seedream v5/pro) los
-  lee con el schema **verificado contra la doc publicada de Fal**: `count → num_images`, y el aspect ratio neutral
-  → **`image_size` preset** (Seedream v5/pro NO tiene campo `aspect_ratio`; `16:9 → landscape_16_9`, etc.). El
-  aspect ratio deja de ser hardcode. Video/audio adapter reads = TASK-1504.
+- **Threading image-first (AMBOS adapters de imagen) + absorción de TASK-1495:** `CreativeProviderRequestV1` gana
+  `quality`/`aspectRatio`/`count`; `toProviderRequest` los hilvana cuando `modality==='image'`. Los **dos** adapters
+  de imagen los leen con el schema verificado de su proveedor: **Fal (Seedream v5/pro)** `count → num_images` +
+  aspect ratio neutral → `image_size` preset (NO tiene `aspect_ratio`); **Vertex (Nano Banana)** aspect ratio →
+  `generationConfig.imageConfig.aspectRatio` (formato `"16:9"` directo; `count` no aplica). El default del composite
+  rutea image a Vertex, así que cablear ambos evita que el shape se ignore según el proveedor. El aspect ratio deja
+  de ser hardcode. Video/audio adapter reads = TASK-1504.
 - **Estado:** local-first en `main` de `efeonce-globe`, sin push; `pnpm check` + `build` verdes (domain 85 tests,
   creative-runner 89). Backward-compat: un `prepare` sin `output` conserva el comportamiento previo. Coverage sin
   cambios (`ui`/`mcp` `policy-blocked`).

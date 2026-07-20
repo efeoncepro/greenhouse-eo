@@ -45,9 +45,10 @@
   estructuralmente, su ejecución = TASK-1504) + `validateOutputShape` fail-closed en `prepare` **antes de
   `fence.reserve`**, contra los constraints del catálogo (TASK-1500 reusado in-process vía `RouteCatalogPort.getRoute`
   = `getProducerRoute`; el diseño proponía `constraintsFor` — reconciliado a `getRoute`) + threading image-first
-  al provider seam (**absorbe TASK-1495** aspect ratio para image; fal Seedream v5/pro `num_images` +
-  `image_size` preset — **verificado contra la doc publicada de Fal**, la adivinanza `aspect_ratio` era
-  incorrecta y se corrigió sin gasto). `pnpm check` + `build` verdes (domain 85 + creative-runner 91 tests). Backward-compat: sin
+  al provider seam en **AMBOS** adapters de imagen (**absorbe TASK-1495** aspect ratio para image): Fal Seedream
+  v5/pro (`num_images` + `image_size` preset) y Vertex Nano Banana (`generationConfig.imageConfig.aspectRatio`),
+  **cada uno verificado contra la doc publicada de su proveedor** (sin gasto; el composite rutea image a Vertex por
+  default, por eso ambos). `pnpm check` + `build` verdes (domain 85 + creative-runner 93 tests). Backward-compat: sin
   `output` = comportamiento previo. Coverage sin cambios (`ui`/`mcp` `policy-blocked`). **Rollout:** aditivo,
   sin redeploy hasta autorización. Próximo paso del cluster: `TASK-1502` (estimate `f(ruta,shape)`, ya puede
   leer el shape) y `TASK-1504` (adapter reads video/audio).
