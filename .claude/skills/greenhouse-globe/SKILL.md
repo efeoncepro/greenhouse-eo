@@ -259,7 +259,7 @@ La infraestructura de Globe es **reproducible y sin llaves**, y ya está **APLIC
 
 **Git hygiene.** **NUNCA** committees `*.tfstate`, `.terraform/`, `tfplan` ni `terraform.tfvars` real (el `.gitignore` los bloquea); el **`.terraform.lock.hcl` SÍ se committea** (pinea versiones de providers). El state vive solo en `gs://efeonce-globe-tfstate`; en git solo está el HCL.
 
-**Qué NO hace.** No aprovisiona las Cloud Run services de la app (las despliega el workflow keyless), ni Cloud SQL/tenancy (TASK-1465), ni secretos de provider (rollout del canary live), ni producción/clientes externos. Runbook: `docs/operations/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`.
+**Qué NO hace.** No aprovisiona las Cloud Run services de la app (las despliega el workflow keyless), ni Cloud SQL/tenancy (TASK-1465), ni secretos de provider (rollout del canary live), ni producción/clientes externos. Runbook: `docs/operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`.
 
 ## Errores canónicos y correlación
 
