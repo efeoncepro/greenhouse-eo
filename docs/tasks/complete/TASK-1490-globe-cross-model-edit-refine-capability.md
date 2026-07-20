@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-028`
-- Status real: `Diseño gobernado; implementación pendiente`
+- Status real: `Implementado y verificado en vivo por el seam; rollout del servicio desplegado pendiente`
 - Rank: `TBD`
 - Domain: `creative|ai|platform`
 - Blocked by: `none`
@@ -84,15 +84,38 @@ Reglas obligatorias:
 - `../efeonce-globe/packages/domain/src/model-lab.ts` (validación/ruteo de edit)
 - `../efeonce-globe/apps/creative-runner/src/{fal-adapter,vertex-adapter,vertex-omni-adapter}.ts` (mecanismo de edit por adapter)
 - `../efeonce-globe/apps/studio-web/src/app.ts` (wiring de transports de edit)
-- `docs/tasks/to-do/TASK-1490-...` (esta task)
+- `docs/tasks/complete/TASK-1490-...` (esta task)
 
 ## Current Repo State
 
 ### Already exists
 
 - **Seam de edit + reference impl (Omni)**: `providerRunRef` en el manifest, `previousInteractionId` en el payload, `VertexOmniAdapter` dual-transport (generate keyless Vertex + edit Gemini-key), y la regla cross-surface. Verificado en vivo (create `store:true` → edit → 200 completed).
-- **Reference-based ya soportado a nivel de input**: track B + `resolvedInputs` permiten re-inyectar un output previo como referencia (edit por referencia) — falta la semántica que lo orqueste candidato→edit.
+- **Track B resuelve hash→bytes DE ENTRADA**: `InputResolverPort` + `resolvedInputs` traen a bytes un input declarado (fixture simbólico o bucket content-addressed).
 - Slugs de edit por modelo en el catálogo Fal (Seedream edit, Seedance i2v).
+
+### Recalibración de baseline 2026-07-20 (pre-ejecución)
+
+La afirmación original de esta sección — *"reference-based ya soportado a nivel de input: track B
+permite re-inyectar un output previo como referencia; falta sólo la semántica"* — **es falsa contra
+el runtime**. Falta la mitad de escritura del loop:
+
+- Los **bytes de output del proveedor nunca se persisten**. Los adapters los hashean y los descartan
+  (viven en un `Map` en memoria hasta el `poll`); `ProviderAttemptResult` sólo transporta
+  `outputHashes` y `LabRunner.run` sólo copia ese array al manifest.
+- El `InputResolverPort` resuelve desde el registry de fixtures (hashes simbólicos, rights
+  `test-fixture`) o desde el bucket content-addressed — y **nadie escribió nunca un output ahí**.
+- El comentario `"Output bytes are ingested privately by the runner"` en `provider-contract`
+  describe una **intención**, no el runtime.
+
+Consecuencia: un edit reference-based falla hoy con `InputResolutionError('not_found')`. El
+paradigma completo (Slices 2-3) y sus Acceptance Criteria son inalcanzables sin cerrar esto, así
+que la task incorpora **Slice 0 — ingest de outputs** como prerrequisito duro. El bucket privado ya
+está provisionado por TASK-1464 (`efeonce-globe-lab-evidence`) y hoy está sin uso.
+
+Segundo hallazgo (regresión silenciosa de superficie): `apps/studio-web/src/app.ts` hardcodea
+`store: true` en el `VertexOmniAdapter`, de modo que **todo** generate de Omni sale hoy por la
+superficie Gemini con API key, perdiendo el keyless. Pasa a flag explícito (Slice 3).
 
 ### Gap
 
@@ -135,6 +158,19 @@ Reglas obligatorias:
 
 ## Scope
 
+### Slice 0 — Ingest de outputs (prerrequisito duro del paradigma reference-based)
+
+- `ProviderAttemptResult` transporta los bytes de output como valor **server-internal**
+  (mismo estatuto que `resolvedInputs` en el request: nunca cruza el wire, nunca se loggea).
+  Los adapters ya los tienen en mano cuando hashean; hoy los descartan.
+- `OutputIngestPort` en el `LabRunner` — espejo exacto de `InputResolverPort`, en el mismo y único
+  punto de invocación de proveedor — persiste cada output **content-addressed por su sha256** en el
+  store privado de media del Lab, con la misma convención de nombre que `GcsInputResolver` lee.
+- El manifest declara si los outputs quedaron retenidos, para que un `prepare` con `editFrom` sobre
+  un padre no editable falle rápido y honesto en vez de quemar un `execute`.
+- Sin store configurado el ingest es no-op y un edit reference-based falla closed en resolución
+  (degradación honesta, nunca un output silenciosamente irrecuperable).
+
 ### Slice 1 — Semántica de edit canónica + lineage padre→editado
 
 - Definir (en `packages/contracts`) la forma canónica de "editar candidato X": unificar `previousInteractionId` (stateful) y `editFromOutputHash`/`editFromAttempt` (reference-based) bajo una semántica clara, transport-neutral.
@@ -172,8 +208,9 @@ Referencia de implementación (patrón a generalizar), repo `efeonce-globe`:
 
 ### Slice ordering hard rule
 
-- Slice 1 (semántica + lineage) → Slice 2 (router + adapters) → Slice 3 (wiring + verificación).
+- Slice 0 (ingest de outputs) → Slice 1 (semántica + lineage) → Slice 2 (router + adapters) → Slice 3 (wiring + verificación) → Slice 4 (multi-referencia).
 - Ningún adapter reference-based se cablea (Slice 2) antes de que la semántica canónica (Slice 1) exista, para no fragmentar el contrato.
+- Slice 0 va primero y es duro: sin bytes de output persistidos, el paradigma reference-based compila y falla en runtime.
 
 ### Risk matrix
 
@@ -192,6 +229,7 @@ Referencia de implementación (patrón a generalizar), repo `efeonce-globe`:
 
 | Slice | Rollback | Tiempo | Reversible? |
 |---|---|---|---|
+| Slice 0 | revert PR (campos opcionales aditivos + port inyectado); el store queda con objetos huérfanos, inertes | <10 min | sí |
 | Slice 1 | revert PR (campos opcionales aditivos) | <10 min | sí |
 | Slice 2 | revert PR / desactivar el router de edit por modelo | <10 min | sí |
 | Slice 3 | env/flag OFF + revert wiring | <10 min | sí |
@@ -213,14 +251,15 @@ Referencia de implementación (patrón a generalizar), repo `efeonce-globe`:
 
 ## Acceptance Criteria
 
-- [ ] Existe una semántica de edit canónica transport-neutral (source of truth = contracts) que un consumer invoca igual para cualquier modelo editable.
-- [ ] El router de edit despacha correctamente a stateful (Omni) y reference-based (Seedream/Seedance/Nano Banana) según el modelo.
-- [ ] El candidato editado encadena su lineage al padre en el manifest.
-- [ ] Un edit stateful cross-surface falla closed (regla contractual verificada por test).
-- [ ] El edit reference-based sólo cruza hash por la API (bytes resueltos server-side vía track B).
-- [ ] Spend fence cobra el edit como experimento nuevo; kill switch lo gobierna.
-- [ ] Cada adapter consume TODAS las `resolvedInputs` (no sólo la primera) cuando el modelo lo soporta; refs combinadas cross-modales (imagen+video) funcionan donde el modelo lo permite (p.ej. Omni `reference_to_video`); falla closed si excede el máximo de refs del modelo.
-- [ ] Evidencia en vivo: un chain generate→edit por cada paradigma a través del seam, con manifest + lineage; y una generación multi-referencia (≥2 refs, con al menos un caso cross-modal).
+- [x] Los bytes de output de un candidato quedan retenidos content-addressed en el store privado, de modo que su hash resuelve a bytes por track B (sin esto el reference-based no existe).
+- [x] Existe una semántica de edit canónica transport-neutral (source of truth = contracts) que un consumer invoca igual para cualquier modelo editable.
+- [x] El router de edit despacha correctamente a stateful (Omni) y reference-based (Seedream/Seedance/Nano Banana) según el modelo.
+- [x] El candidato editado encadena su lineage al padre en el manifest.
+- [x] Un edit stateful cross-surface falla closed (regla contractual verificada por test).
+- [x] El edit reference-based sólo cruza hash por la API (bytes resueltos server-side vía track B).
+- [x] Spend fence cobra el edit como experimento nuevo; kill switch lo gobierna.
+- [x] Cada adapter consume TODAS las `resolvedInputs` (no sólo la primera) cuando el modelo lo soporta; refs combinadas cross-modales (imagen+video) funcionan donde el modelo lo permite (p.ej. Omni `reference_to_video`); falla closed si excede el máximo de refs del modelo.
+- [x] Evidencia en vivo: un chain generate→edit por cada paradigma a través del seam, con manifest + lineage; y una generación multi-referencia (≥2 refs, con al menos un caso cross-modal).
 
 ## Verification
 
@@ -229,20 +268,73 @@ Referencia de implementación (patrón a generalizar), repo `efeonce-globe`:
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` (Globe) actualizado con el patrón + evidencia
-- [ ] `changelog.md` (Globe) actualizado
-- [ ] chequeo de impacto cruzado (TASK-1460/1461/1467)
-- [ ] skills actualizadas (greenhouse-globe + motion/audio) con el patrón de edit generalizado
+- [x] `Lifecycle` sincronizado (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` (Globe) actualizado con el patrón + evidencia
+- [x] `changelog.md` (Globe) actualizado
+- [x] chequeo de impacto cruzado (TASK-1460/1461/1467)
+- [x] skills actualizadas (greenhouse-globe + motion/audio) con el patrón de edit generalizado
+
+## Verification evidence (2026-07-20)
+
+Gate en `efeonce-globe`: `pnpm check` (typecheck + `node --test`) y `pnpm build` verdes.
+
+Canary en vivo por el seam completo (`command → registry → runner → adapter`), los cuatro
+`candidate_ready` con lineage encadenado padre→hijo:
+
+| Carril | Evidencia |
+|---|---|
+| Reference-based | Seedream generate → Seedream edit; `editMode=reference`, `outputsRetained=true` |
+| **Cross-model** | Seedream generate → **Nano Banana (Vertex)** edit por referencia; `editMode=reference` |
+| Stateful | Omni generate (`surface=gemini-api`, `chainable=true`) → edit; `editMode=stateful` |
+| Cross-modal | Omni `reference_to_video` con imagen + vídeo en un set; `candidate_ready` |
+
+Dos defectos que **sólo el gasto real reveló**, con la suite unitaria en verde en ambos casos:
+
+1. `providerRunChainable` se calculaba en el adapter y el runner no lo copiaba al manifest. Un
+   candidato genuinamente encadenable se veía como no encadenable y **todo edit stateful degradaba
+   en silencio** a reference-based. Se detectó porque un run reportó `surface=gemini-api` junto a
+   `chainable=false`, dos cosas que no pueden ser ciertas a la vez.
+2. Todo fallo del runner colapsaba a `runner_error`, dejando el fallo más común de un edit
+   indistinguible de cualquier otro. Propagar la razón (sólo cuando pertenece a nuestro vocabulario
+   cerrado) es lo que hizo encontrable el defecto siguiente.
+
+Ambos tienen guarda de regresión. Además Omni ahora separa `provider_incomplete` (aceptado, el
+modelo declinó) de `provider_failed` (request rechazado): piden respuestas opuestas, y confundirlos
+me mandó a buscar un bug de payload inexistente.
+
+## Rollout status
+
+`code complete + verificado en vivo por el seam; rollout del servicio desplegado PENDIENTE.`
+
+El servicio `globe-studio-internal` sigue con `GLOBE_LAB_PROVIDER=fake` y **sin**
+`GLOBE_LAB_INPUT_BUCKET`. Sin ese bucket no hay retención de outputs y todo edit por referencia se
+rechaza en `prepare` (degradación honesta, no un fallo raro). Prender el Lab exige, **en el mismo
+flip**: `GLOBE_LAB_ENABLED=true` + `GLOBE_LAB_PROVIDER=composite` +
+`GLOBE_LAB_INPUT_BUCKET=efeonce-globe-lab-evidence` (+ `GLOBE_LAB_OMNI_EDITABLE` sólo si se quiere
+el carril stateful, sabiendo que saca a Omni del keyless). La runtime SA necesita
+`storage.objectCreator` sobre ese bucket — el canary corrió con ADC humana.
 
 ## Follow-ups
 
 - UI "refinar candidato" (task `ui-ux` consumer).
-- Provenance del candidato editado (TASK-1467).
+- Provenance del candidato editado + retención/lifecycle de los outputs retenidos (TASK-1467).
+- Grant `storage.objectCreator` a la runtime SA sobre `efeonce-globe-lab-evidence` (Terraform).
 
 ## Open Questions
 
-- ¿La superficie stateful (Omni) debe ser el default cuando el operador quiere editabilidad, aún perdiendo el keyless-generate? (trade-off costo/keyless vs. editabilidad).
-- ¿`globe.lab.experiment.edit` command dedicado vs. flag `previousInteractionId`/`editFrom` en `prepare`?
+Ambas resueltas en Discovery (2026-07-20); se dejan con su rationale porque son load-bearing.
+
+- **¿La superficie stateful (Omni) debe ser el default cuando se quiere editabilidad, aún perdiendo
+  el keyless-generate?** → **No.** Con el paradigma reference-based implementado, todo modelo
+  editable se refina sin sesión stateful; el stateful es una optimización exclusiva de Omni con
+  costo de API key + billing propio. Pasa a opt-in explícito (`GLOBE_LAB_OMNI_EDITABLE`, default
+  OFF ⇒ generate keyless). Hoy `app.ts` fuerza `store: true` y ya está pagando ese costo sin
+  haberlo decidido.
+- **¿Command `globe.lab.experiment.edit` dedicado vs. flag en `prepare`?** → **Flag `editFrom` en
+  `prepare`.** La autoridad (`globe.lab.experiment.run`), el spend fence, la state machine y el
+  manifest son idénticos a los de un generate: un command dedicado duplicaría todo el guardrail sin
+  agregar semántica de autoridad, y sería el anti-patrón "handler remoto". Además el caller sigue
+  declarando `capability`/`referenceRoute`/`hardCapCredits` explícitamente: eso es exactamente lo
+  que habilita el edit **cross-model** (heredarlos del padre lo impediría).

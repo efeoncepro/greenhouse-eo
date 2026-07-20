@@ -7,6 +7,20 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-20 — Globe: edit/refine cross-model generalizado (TASK-1490)
+
+- Refinar un candidato del Model Lab pasó a ser **una sola semántica** para todo modelo editable
+  (`editFrom = { experimentId }`); el paradigma nativo — stateful por sesión vs. reference-based — lo resuelve el
+  seam según qué proveedor ejecuta, y el cambio queda registrado en el manifest, nunca en silencio. Habilita
+  **edit cross-model** (refinar un candidato de un motor con otro). Task:
+  `docs/tasks/complete/TASK-1490-globe-cross-model-edit-refine-capability.md`.
+- Se descubrió y cerró el prerrequisito que la task daba por hecho: los outputs del proveedor **nunca se
+  persistían**, así que el paradigma reference-based fallaba en runtime. Ahora se retienen content-addressed.
+- Skill `greenhouse-globe` (Claude + Codex) actualizada con el patrón de edit generalizado, sus reglas duras y la
+  lección de método: un campo de evidencia que nace debe verificarse **hasta el manifest**, no sólo en el adapter.
+- Implementación en el repo hermano `efeonce-globe` (verificada en vivo por el seam); rollout del servicio
+  desplegado pendiente — ver `Handoff.md`.
+
 ## 2026-07-19 — EPIC-028 · Globe Still Model Lab — recommendation matrix en vivo (TASK-1459)
 
 - `TASK-1459` COMPLETE. El golden brief still (`rrss-key-visual-still`, contrato `flexible-style`) se corrió **por el harness de evaluación real** (`globe.lab.evaluation.evaluate` vía el seam) contra **dos motores reales** con generación facturable: **Vertex Nano Banana** (`gemini-2.5-flash-image`, 10cr, **7s**, objective pass) vs **Fal Seedream 5 Pro** (10cr, **138s**, objective pass) — ambos `objective_pass_pending_human`. Recommendation matrix: candidatos válidos al mismo costo; diferenciador objetivo = latencia (Nano Banana ~20× más rápido); craft (`brand-anchor`/`exploration-breadth`) queda a revisión humana (el harness nunca auto-elige ganador creativo).
@@ -700,17 +714,3 @@
   `dpl_DkdnLEUFwY3MvxyD9VncYwqzQNj1`: canary OIDC deduplicado, prueba pública
   firmada `queued:true`, backlog cero, health `200` y PostgreSQL estable en 10
   conexiones observadas. Con esto los bursts se absorben sin comprar PgBouncer.
-
-## 2026-07-17 — ANAM Customer Agent: source pack live independiente
-
-- Se retiró la excepción documental del Customer Agent con un source pack Markdown independiente bajo
-  `docs/architecture/kortex/hubspot-as-a-service/anam-customer-agent-source-pack/`: 23 fuentes privadas en uso,
-  seis documentos de dominio, 17 respuestas cortas completas y catálogo técnico de 356 registros/métodos/plazos.
-- El pack separa knowledge de identidad, directrices, handoff, canales y acciones; incorpora IDs de archivo,
-  fechas de sincronización, reglas de sincronización y checks de republicación. No se mutó HubSpot.
-- El readback autenticado del portal ANAM `19893546` reveló drift de continuidad: HubSpot muestra término de
-  acceso gratuito, agente pausado, nuevas conversaciones pausadas y `Reanudar` deshabilitado, pese a la compra y
-  30.000 créditos confirmados el día anterior. Configuración, 23 fuentes y chatflow 24/7/100% siguen presentes;
-  la cuenta sí muestra 33.000 créditos mensuales, pero está vencida por la factura `#760627868` (venció el
-  2026-06-07). Dos intentos confirmados de activar el uso fallaron en HubSpot; facturación ANAM debe regularizarla
-  antes del retry y readback. No se pagó ni cambió la suscripción.

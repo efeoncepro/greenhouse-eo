@@ -133,6 +133,23 @@
 - Snapshot íntegro pre-migración: [`docs/operations/agent-context-history/2026-07-19/Handoff.legacy.md`](docs/operations/agent-context-history/2026-07-19/Handoff.legacy.md).
 - Modelo operativo: [`docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md`](docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md).
 
+## Sesión 2026-07-20 — TASK-1490 cerrada: edit/refine cross-model en Globe (verificado en vivo)
+
+- Refinar un candidato pasó a ser **una sola semántica** para todo modelo editable en `efeonce-globe`:
+  `editFrom = { experimentId }`; el paradigma (stateful vs reference-based) lo resuelve el seam según qué
+  proveedor va a ejecutar. Spec: `efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md`.
+- **Hallazgo que cambió el alcance:** la task daba por hecho que track B ya permitía re-inyectar un output
+  previo. Era falso — los adapters hasheaban los bytes de salida y los **descartaban**, así que el paradigma
+  reference-based fallaba en runtime, no en compilación. Se sumó Slice 0 (retención de outputs) como
+  prerrequisito duro y se recalibró la spec antes de implementar.
+- Verificado en vivo por el seam: reference-based, **cross-model** (Seedream→Nano Banana), stateful (Omni) y
+  cross-modal (imagen+vídeo). Dos defectos aparecieron sólo gastando plata real, con la suite unitaria verde.
+- **Rollout pendiente (no cerrado):** el servicio `globe-studio-internal` sigue en `GLOBE_LAB_PROVIDER=fake`
+  y **sin `GLOBE_LAB_INPUT_BUCKET`** — sin ese flag no hay retención de outputs y todo edit por referencia se
+  rechaza en `prepare`. El flip debe incluirlo en la MISMA operación, y la runtime SA necesita
+  `storage.objectCreator` sobre `efeonce-globe-lab-evidence` (el canary corrió con ADC humana).
+- Sin push: los 5 commits quedan locales en `efeonce-globe` (`596b818`…`1e9dc32`).
+
 ## Sesión 2026-07-19 — Surface Recipes hardening y CTA como benchmark de no regresión
 
 > Se añadió `SurfaceRecipe` como ejecutor tipado de los seis recipes sobre `CompositionShell` y se migraron el Lab workbench y `/growth/ctas` sin reemplazar los paneles maduros del cockpit. El contrato prohíbe lectura sostenida directamente sobre `background.default`: el gris es gutter y los work planes sostienen inventario, detalle, metadata y decisión. Se redujo card-on-card, `WorkbenchHeader` usa `surfaceHeroTitle`, sombras/colores pasan por tokens y Growth usa `tabler-trending-up`. La iteración siguiente corrigió causas compartidas: `NavCollapseIcons` ahora es un botón nativo con labels/teclado/target válido, el drawer compacto responde a Escape, Search/Notifications consumen microcopy ARIA canónico, Settings recuperó la jerarquía `listbox→option`, Growth usa el footer interno y los textos CTA señalados pasan por tokens con contraste suficiente. ESLint y TypeScript pasan; GVC iPhone del Lab queda sin findings reales y el shell CTA desktop/mobile fue inspeccionado. Estado de QA: checkpoint, no cierre visual. Los baselines anteriores permanecen sin promover; el authoring profundo CTA conserva hydration warning, skeleton dominante y findings de contraste/label/overflow que requieren otra iteración. No hubo push ni rollout.
@@ -400,18 +417,3 @@
 > cross-instance StrictMode; density anclada a la clase del overlay). 90 tests verdes; bundle
 > `1.1.0-preview.1` (33.7KB). Ningún CTA slide_in publicado aún (decisión de campaña del
 > operador). Siguiente en esta misma sesión: push → staging → enforcement ON → producción.
-
-## Sesión 2026-07-18 (cont.) — TASK-1428 rollout staging: shadow + kill switch VERIFICADOS live; bug real cazado y cerrado
-
-> Continuación por orden del operador ("termina todo lo pendiente"). **Push a develop hecho** (staging
-> auto-deploy) + smoke live contra el deployment staging con visitor sintético: dismiss 202 →
-> `cta_visitor_state` (visitor+session) → render post-dismiss INTACTO (shadow) + rollup
-> `suppressed/dismissed enforced=false` · `viewed` 202 → rollup browser · **kill switch per-surface sin
-> redeploy**: engage → `engineState:"killed"` + vacío → release → CTA restaurado + audit (ventana <60s en
-> la página de prueba noindex; Think intacta). **El smoke cazó un 502 real**: `SELECT … FOR UPDATE` exige
-> UPDATE y `greenhouse_runtime` es SELECT/INSERT-only en la tabla append-only → fix `3bb0d0779`
-> (`pg_advisory_xact_lock` por scope, grants intactos), re-verificado. **Bloqueado para el agente**: el
-> flip staging del enforcement (`vercel env add GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED staging` +
-> redeploy) — permiso denegado en la sesión; queda como 1 comando del operador + smoke enforcement + prod
-> gradual (ledger §Pendientes actualizado). Con el renderer actual (sin visitor keys) el flip no altera
-> tráfico real.

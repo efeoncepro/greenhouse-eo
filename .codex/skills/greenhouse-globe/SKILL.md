@@ -191,7 +191,30 @@ El seam del Model Lab ahora enhebra **edit stateful de punta a punta**: un `exec
 
 **Evidencia en vivo (por el seam completo).** `prepare(video-generate, store)` → `execute` → `candidate_ready` con `providerRunRef=v1_…` → `prepare(previousInteractionId)` → `execute` → EDIT `candidate_ready`, con video nuevo + id encadenable. Real.
 
-**Multi-referencia (estado + TASK-1490).** `CreativeProviderRequestV1.resolvedInputs` es un `readonly ResolvedInputV1[]` (cada uno con `mediaType` image/video/audio/text) — el seam **ya carga múltiples refs + media mixta**. Pero los adapters son **inconsistentes**: Vertex-image (Nano Banana) + Fal Seedream-edit (`image_urls` array) consumen **todas**; **Omni, Veo y las rutas Fal single-key consumen solo `resolvedInputs[0]`**; y **ningún adapter arma sets combinados image+video** todavía (Omni `reference_to_video` lo soporta). Generalizar el edit a todos los modelos editables (paradigma reference-based) + multi-referencia/combined-refs completo es **TASK-1490** (registry de Greenhouse).
+## Edit / refine cross-model — TASK-1490 (live-verified 2026-07-20)
+
+El edit dejó de ser específico de Omni. Hay **una sola semántica** y el mecanismo se resuelve adentro.
+
+**El contrato.** `PrepareExperimentPayloadV1.editFrom = { experimentId }` es lo ÚNICO que un caller dice: no nombra paradigma, sesión ni modelo. El caller **sí** declara `capability`/`referenceRoute`/`hardCapCredits` del edit — eso es exactamente lo que habilita el **edit cross-model** (refinar un candidato de Seedream con Nano Banana); heredarlos del padre lo impediría. `previousInteractionId` quedó **deprecado** y es **mutuamente excluyente** con `editFrom` (mandar ambos = `invalid_request`, jamás precedencia silenciosa). **No** hay command `edit` dedicado: un edit ES un experimento (misma autoridad, mismo fence, misma state machine, mismo manifest); un command aparte sería duplicar el guardrail sin agregar semántica de autoridad.
+
+**Los dos paradigmas y quién elige.** *Stateful* = el proveedor guarda la sesión y se encadena por id (Omni `previous_interaction_id`). *Reference-based* = el output del padre se re-inyecta como base; es el que hace posible el cross-model porque no depende de ninguna sesión. El **dominio** resuelve el padre y deriva `editSource` server-side; el **runner** elige usando el único dato que sólo él tiene en ese momento: **qué proveedor va a ejecutar**. Un handle de sesión sólo significa algo para quien lo emitió, así que se hilvana **únicamente** cuando el proveedor ejecutante es el del padre; cualquier otro caso cae a reference-based y queda registrado en `editMode` — **nunca en silencio**.
+
+**La pieza que faltaba (y que la task daba por hecha): retención de outputs.** Antes de TASK-1490 los adapters hasheaban los bytes de salida y los **descartaban**, así que el hash de un candidato no resolvía a nada: reference-based fallaba en runtime, no en compilación. `OutputIngestPort` + `GcsOutputIngest` (espejo de `InputResolverPort`, en el mismo y único punto de invocación) los persisten content-addressed bajo el mismo `sha256` que publica el manifest; `outputsRetained` lo declara. Un fallo de storage NUNCA destruye un candidato ya pagado: degrada a `outputsRetained: false`.
+
+**Encadenabilidad la certifica el ADAPTER.** Un id puede existir y no ser editable en ningún lado (el keyless de Vertex emite ids que después rechaza). Sólo el adapter conoce sus superficies → reporta `providerRunChainable` junto a `providerRunSurface`; el dominio lee un booleano y nunca aprende vocabulario de proveedor.
+
+**Multi-referencia.** Cada ruta declara su tope de referencias y **falla cerrado** al excederlo. Omni acepta sets **combinados imagen+vídeo** en un `reference_to_video` ("este sujeto, con esta cámara") — verificado en vivo en **ambas** superficies. El set siempre va **edit base primero** (el orden es condicionamiento).
+
+**`GLOBE_LAB_OMNI_EDITABLE`** (default OFF) reemplazó el `store:true` hardcodeado. Un generate editable DEBE correr en la superficie Gemini, así que prenderlo saca **todo** generate de Omni del keyless hacia facturación por API key. Default OFF es seguro sólo **porque** los outputs se retienen.
+
+**Reglas duras del edit:**
+- **NUNCA** metas la base de un edit en `authorizedInputs` — ese campo es declaración del caller y su significado no puede cambiar entre generate y edit (rompe `input_lineage_intact`, el tope `MAX_AUTHORIZED_INPUTS` y la desambiguación de referencias del adapter). Viaja como `editReference`.
+- **NUNCA** blanquees un derivado como `internal-owned`: es `derived-internal` (postura que un caller no puede declarar) + los derechos heredados del padre, para que un input `licensed` siga restringiendo a sus descendientes.
+- **NUNCA** hilvanes un handle de sesión hacia un proveedor que no lo emitió, ni confíes en un `providerRunRef` sin `providerRunChainable`.
+- **NUNCA** trunques un set de referencias para que entre: truncar devuelve trabajo que parece correcto y no lo es.
+- **SIEMPRE** rechazá un edit imposible en `prepare` (padre desconocido/cross-workspace → `not_found` sin revelar existencia; sin candidato; **sin ninguna afordancia**; media no editable; profundidad excedida), antes de que el fence reserve.
+
+**Lección de método (vale más que el código).** Dos defectos sobrevivieron una suite unitaria en verde y sólo aparecieron gastando plata real: `providerRunChainable` se calculaba en el adapter y el runner no lo copiaba (todo edit stateful degradaba en silencio), y todo fallo del runner colapsaba a `runner_error` (el fallo más común de un edit era indistinguible de cualquier otro). Cuando un campo de evidencia nace, **verificá que haga el viaje completo hasta el manifest** — un test de adapter que lo afirma no prueba que llegue.
 
 **Primer deploy keyless de la app.** `studio-web` quedó desplegado en Cloud Run `globe-studio-internal` rev `00007-jrr` (Ready), **privado**; `GLOBE_LAB_PROVIDER` sigue en `fake` en el servicio desplegado (los engines están desplegados pero **OFF** — prenderlos es un flip de flag gobernado). Deploy vía `.github/workflows/deploy-internal.yml` (keyless WIF → Cloud Build → Cloud Run).
 

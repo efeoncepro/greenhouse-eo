@@ -1,5 +1,24 @@
 # TASK-1467 — Globe Asset Provenance, Rights and Private Ingest
 
+## Delta 2026-07-20
+
+Cerrado por TASK-1490 (cross-model edit/refine), que cambió dos supuestos de esta task:
+
+- **Los outputs del proveedor ahora SÍ se persisten.** Antes se hasheaban y se descartaban; hoy
+  `OutputIngestPort`/`GcsOutputIngest` los escriben content-addressed en
+  `efeonce-globe-lab-evidence`, y `ExperimentAttemptManifestV1.outputsRetained` lo declara. O sea:
+  **ya hay bytes acumulándose sin política de retención ni lifecycle** — eso es de esta task, y pasa
+  de hipotético a real.
+- **Existe una postura de derechos para derivados**: `derived-internal` (que un caller no puede
+  declarar) más `LabEditSourceV1.parentRights`, calculado como la postura más restrictiva sobre los
+  inputs del padre — de modo que un input `licensed` sigue restringiendo a sus descendientes. Esta
+  task debe absorber esa cadena en el modelo completo de provenance, no reinventarla.
+- **El lineage de un candidato editado ya encadena al padre** (`lineage` en el manifest), que era el
+  requisito que esta task declaraba sobre TASK-1490.
+
+Follow-up concreto heredado: la runtime SA necesita `storage.objectCreator` sobre ese bucket
+(el canary corrió con ADC humana), y falta la política de retención/lifecycle de lo retenido.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
