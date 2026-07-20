@@ -223,3 +223,24 @@ construidas: el store content-addressed completo —lectura y escritura— y la 
 impide blanquear un derivado como material propio y arrastra los derechos del padre a sus descendientes. El
 rollout del servicio `globe-studio-internal` se ejecutó en esta sesión; el estado vigente vive en `Handoff.md`.
 Spec canónica: `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md` → §"Edit / refine cross-model".
+
+## Delta 2026-07-20 — Creative Producer (superficie hermana del Workbench, se construye antes)
+
+Tras análisis riguroso de la referencia Higgsfield (Image/Video/Audio), el operador fija que Globe expone **dos
+superficies sobre el mismo backend**: el **Creative Producer** (producción atómica de piezas sueltas
+image/video/audio, low-ceremony, prompt-first) y el **Workbench** (`TASK-1474`, agencia brief-first). El
+**Producer se construye ANTES del Workbench**: salta el critical path de plataforma (no necesita aprobación
+`1469`, delivery `1472`, parity `1473` ni ledger comercial `1468/1482` — solo spine `1481` ✅ + Model Lab
+`1457` ✅ + spend fence + ~5 primitivos nuevos) y **construye los primitivos compartidos** que el Workbench
+también consume.
+
+Cluster nuevo (no EPIC nuevo — es parte de Globe): **`TASK-1500` catálogo de rutas gobernado · `TASK-1501`
+contrato discriminado por modalidad · `TASK-1502` estimate previewable · `TASK-1503` retrieval + asset actions
+· `TASK-1504` capability expansion (frames, motion-control, change-voice, translate, omni multi-output,
+voice-preset) · `TASK-1505` Producer Surface (UI)**. Contrato de run = **discriminated union por modalidad**
+(diseñado para las 3 desde el día 1; impl incremental Image→Video→Audio), validado contra constraints del
+catálogo fail-closed pre-spend; **naming dual** (modelo-real interno / fidelidad-curada cliente); unidad de
+crédito = ruta×shape, nunca el modelo. Reusa `1493/1494/1496/1497/1498` (primitivos compartidos), **absorbe
+`1495`** (formatos → output-shape), y `1499` queda como única exclusiva del Workbench. `TASK-1474` pasa a
+depender también de `1500–1503`. Spec canónica:
+`docs/architecture/creative-studio/EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md`.

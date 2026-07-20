@@ -1,5 +1,18 @@
 # TASK-1495 — Globe Target Formats + Multi-format Set Generation
 
+## Delta 2026-07-20 — aspect ratio ABSORBIDO por TASK-1501
+
+El **aspect ratio / formato objetivo de un run** (1:1, 4:5, 16:9, 9:16, …) queda **absorbido por
+`TASK-1501`** (Modality-Discriminated Run Contract): pasa a ser un campo del output-shape
+(`ImageOutputShapeV1.aspectRatio` / `VideoOutputShapeV1.aspectRatio`), validado contra los constraints
+de la ruta del catálogo gobernado (`TASK-1500`), en vez de un literal hardcodeado en la tabla de ruteo
+del adapter. Lo que **queda como scope propio de esta task**: el **FormatSet fan-out** — un brief → N
+formatos como **agregado gobernado** con estado/gasto/fence comunes (distinto del batch-de-N de un solo
+run, que va por `count` del output-shape de 1501). Al tomar esta task: re-scopearla al FormatSet, o
+cerrarla como superseded si el batch-de-N por `count` (1501) + la variación (1496) cubren el caso.
+Parte del cluster **Creative Producer** de EPIC-028
+(`docs/architecture/creative-studio/EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md`).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

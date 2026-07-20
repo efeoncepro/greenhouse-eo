@@ -28,7 +28,7 @@
 - Status real: `Diseño gobernado; implementación pendiente`
 - Rank: `TBD`
 - Domain: `creative|ui|product`
-- Blocked by: `TASK-1468, TASK-1469, TASK-1472, TASK-1473, TASK-1485, TASK-1493, TASK-1494, TASK-1495, TASK-1496, TASK-1497, TASK-1498, TASK-1499`
+- Blocked by: `TASK-1468, TASK-1469, TASK-1472, TASK-1473, TASK-1485, TASK-1493, TASK-1494, TASK-1495, TASK-1496, TASK-1497, TASK-1498, TASK-1499, TASK-1500, TASK-1501, TASK-1502, TASK-1503`
 - Branch: `task/TASK-1474-globe-professional-studio-workbench`
 - Legacy ID: `none`
 - GitHub Issue: `none`
