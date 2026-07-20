@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -341,11 +341,31 @@ Sin flag — cambio documental, cutover inmediato por PR. Reversible por revert.
   (defensa en profundidad sobre la regla de la skill).
 - Revisar si el `AGENTS.md`/`README.md` de otros repos hermanos del ecosistema tienen el mismo drift.
 
+## Delta 2026-07-20 — Slice 0 resuelto (ubicación canónica decidida)
+
+Slice 0 ejecutado. La ubicación canónica **NO** es `globe/` sino **`creative-studio/`** — es la
+convención ya establecida en Greenhouse (`docs/documentation/creative-studio/`,
+`docs/manual-de-uso/creative-studio/`, `docs/business-models/creative-studio/` ya existen y están
+poblados). Usar `globe/` habría creado una tercera convención inconsistente.
+
+Creado en este slice:
+- `docs/architecture/creative-studio/README.md` (índice + racional + mapa doc↔repo).
+- `docs/operations/creative-studio/README.md` (índice de runbooks).
+- Decisión registrada en `docs/architecture/DECISIONS_INDEX.md` ("Documentación de Globe vive en
+  Greenhouse bajo `creative-studio/`").
+
+Hallazgo que reduce el trabajo pendiente: la doc **funcional** y los **manuales** de Globe **ya
+están** parcialmente repatriados en `docs/documentation/creative-studio/` y
+`docs/manual-de-uso/creative-studio/`. Lo que falta mover (Slices 2-3) es sobre todo la
+**arquitectura** y los **runbooks** que aún viven en `efeonce-globe/docs/`, más handoff/changelog.
+
+Pendiente (Slices 1-4): corregir la causa raíz (skill + CLAUDE.md), mover arquitectura/runbooks,
+repatriar handoff/changelog, reducir el meta-repo de Globe.
+
 ## Open Questions
 
-- ¿La ubicación canónica es `docs/architecture/globe/` (subdir por plataforma) o los docs se integran
-  planos con prefijo `EFEONCE_GLOBE_*` como ya hacen algunos? Decidir en Slice 0 con la convención
-  vigente de Greenhouse.
+- ~~¿La ubicación canónica es `globe/` o planos con prefijo?~~ **Resuelto (Delta 2026-07-20):
+  `creative-studio/`, subdir por dominio, consistente con la convención existente.**
 - ¿`BOOTSTRAP_EVIDENCE.md`, `QA_RELEASE_AUDIT_2026-07-19.md`, `TASK_1455_BRAND_SHELL_EVIDENCE.md`
   cuentan como "evidencia técnica" (quedan en Globe) o como documentación (se repatrían)? La regla
   dice que la evidencia es de Globe; confirmar caso por caso en Slice 0.
