@@ -21,6 +21,11 @@
 
 ## Pendientes inmediatos
 
+- `TASK-1489` quedó registrada como foundation P0 de IaC GCP para Greenhouse. Orden obligatorio: inventario
+  brownfield → ADR aceptada → scaffold/state/CI no mutante → plan con cero destroy/replace → apply supervisado
+  opcional → cutover de ownership/drift. La task no autoriza apply por sí sola, no comparte state con Globe, no
+  gestiona payloads de secrets y difiere Cloud Run, Scheduler, Cloud SQL y aislamiento a follow-ups. Estado:
+  diseño/backlog; cero cambios en GCP.
 - `TASK-1481` (Globe API Contract Spine), `TASK-1457` (Safe Model Lab foundation), `TASK-1464` (keyless IaC
   foundation) y `TASK-1458` (Golden Briefs & Evaluation Harness) COMPLETE local-first, sin push, en el repo hermano
   `../efeonce-globe` (`main`; en greenhouse-eo sólo lifecycle documental). El spine + el Model Lab (`LabSpendFence` hard cap, private-ingest, kill switch,
