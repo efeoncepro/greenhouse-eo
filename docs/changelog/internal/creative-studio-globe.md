@@ -6,6 +6,22 @@
 
 # Changelog
 
+## 2026-07-20 — TASK-1500 (revisión): modelo público, casa interna (invariante invertido)
+
+- **Decisión de producto:** mostrar el modelo real al cliente **añade valor** — para el ICP de Globe (equipos
+  de marketing enterprise) el modelo es una señal de calidad conocida y un **ancla de posicionamiento de la
+  suite**. Se invirtió el naming dual de la versión inicial de TASK-1500 (que hacía el modelo operator-only).
+- **Tres capas separadas:** `model` = **nombre + versión** ("Seedance" · "2.0") → **client-facing**; `house`
+  ("Studio Motion I") → **operator-only**, taxonomía interna de Efeonce; slug + costo vendor + margen → nunca.
+  Se corrigió una conflación de la V1 que trataba "nombre del modelo" y "slug de wire" como lo mismo: son
+  distintos ("Seedance 2.0" es marca legible; `bytedance/seedance-2.0/text-to-video` es plomería).
+- **Contrato:** `RouteModelIdentityV1 { name; version? }` (version = etiqueta libre opcional). La capability
+  `globe.producer.route.reveal_model` se renombró a `globe.producer.route.reveal_house` (ahora gatea la casa,
+  no el modelo). `resolveRouteAudience` (`operator`|`client`) reemplaza a `resolveNamingView`; la proyección
+  client **omite** `house`. Guards no-slug-leak ahora barren `model.name`/`model.version`/`house`.
+- **Estado:** local-first en `main` de `efeonce-globe`, sin push; `pnpm check` + `build` verdes (domain 73
+  tests). Sin cambio de despliegue.
+
 ## 2026-07-20 — TASK-1500: catálogo gobernado de rutas del Creative Producer (keystone del cluster)
 
 - **El catálogo de rutas nace como dato versionado** (`PRODUCER_ROUTE_CATALOG` + `PRODUCER_CATALOG_VERSION`

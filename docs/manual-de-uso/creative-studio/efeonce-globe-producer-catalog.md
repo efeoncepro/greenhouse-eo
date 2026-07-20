@@ -1,18 +1,18 @@
 # Manual — Leer y ampliar el catálogo de rutas del Creative Producer
 
 > **Tipo de documento:** Manual de uso / runbook (orientado al operador)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-20 por Claude (TASK-1500)
-> **Ultima actualizacion:** 2026-07-20 por Claude (TASK-1500)
+> **Ultima actualizacion:** 2026-07-20 por Claude (TASK-1500 — modelo público, casa interna)
 
 ## Para qué sirve
 
-El catálogo gobernado de rutas (`TASK-1500`) es la SSOT de qué admite cada ruta creativa de Globe: constraints de forma de salida por modalidad, specialty, modos de entrada y naming dual (modelo-real / fidelidad-curada). Este manual cubre las dos operaciones del día a día: **leerlo** (SDK/HTTP) y **ampliarlo** (agregar o ajustar una ruta como dato).
+El catálogo gobernado de rutas (`TASK-1500`) es la SSOT de qué admite cada ruta creativa de Globe: constraints de forma de salida por modalidad, specialty, modos de entrada, el **modelo** público (nombre + versión) y la **casa** interna de clasificación. Este manual cubre las dos operaciones del día a día: **leerlo** (SDK/HTTP) y **ampliarlo** (agregar o ajustar una ruta como dato).
 
 ## Antes de empezar
 
 - **Dónde vive:** repo hermano `efeonce-globe` (`../efeonce-globe`). Skill obligatoria: `greenhouse-globe`.
-- **Autoridad:** leer el catálogo requiere la capability `globe.producer.catalog.read`. Ver el nombre **modelo-real** requiere además `globe.producer.route.reveal_model` (autoridad de operador; el service principal interno la tiene). Sin ella, la proyección trae solo el naming cliente — no es un error, es la vista correcta.
+- **Autoridad:** leer el catálogo requiere la capability `globe.producer.catalog.read`. El **modelo** (nombre + versión) viaja siempre. Ver la **casa** interna requiere además `globe.producer.route.reveal_house` (autoridad de operador; el service principal interno la tiene). Sin ella, la proyección omite la casa — no es un error, es la vista de cliente.
 - **Superficies:** HTTP/SDK/CLI/worker/E2E disponibles; UI y MCP `policy-blocked` hasta el gate de `TASK-1505`.
 
 ## Leer el catálogo (SDK)
@@ -36,7 +36,8 @@ Por HTTP es `POST /v1/readers` con `reader: 'globe.producer.catalog.list'` o `'g
    - `routeId` único, minúsculas/dígitos/guiones/slashes (convención `ref/<modalidad>/<nombre>-vN`).
    - `capability` debe existir en `CREATIVE_CAPABILITIES` y su modalidad debe coincidir con `constraints.modality`.
    - `audioCapable` coherente: imagen nunca, audio siempre, video según el motor.
-   - **Nunca un slug de proveedor** en `routeId` ni en `naming` (ni prefijos `fal-ai/`/`bytedance/`, ni hosts `fal.run`/`run.app`/`googleapis.com`; los labels de naming no llevan `/`).
+   - `model.name` y `house` no vacíos; `model.version` opcional (etiqueta libre: "2.0", "5 Pro", "Multilingual v2").
+   - **Nunca un slug de proveedor** en `routeId`, `model.name`, `model.version` ni `house` (ni prefijos `fal-ai/`/`bytedance/`, ni hosts `fal.run`/`run.app`/`googleapis.com`; los labels no llevan `/`). El **nombre del modelo** ("Seedance") sí es válido y público; el **slug** (`bytedance/seedance-2.0/...`) no.
 3. Correr `cd ../efeonce-globe && pnpm check` — un catálogo inválido es un build roto, nunca un catálogo servido.
 4. Los constraints son *seed anclado al motor real*: si un adapter cambia sus límites (duración, resoluciones, formatos), se ajusta acá el dato + versión. No prometas en el catálogo lo que el seam no puede servir — `TASK-1501` valida contra esto **antes de gastar**.
 

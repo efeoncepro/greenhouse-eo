@@ -28,7 +28,10 @@
   `policy-blocked` hasta el gate de `TASK-1505`) + naming dual fail-closed a cliente (vista modelo-real =
   capability dedicada `globe.producer.route.reveal_model`, granteada al service principal junto con
   `globe.producer.catalog.read`) + helpers in-process que `TASK-1501`/`1502` consumen sin re-dispatch + SDK
-  tipado. **Rollout:** cambio aditivo read-only; el servicio Cloud Run `globe-studio-internal` NO se
+  tipado. **Revisión post-ship (invariante invertido, decisión del operador):** el **modelo real es público**
+  (`model` = nombre + versión, p.ej. "Seedance · 2.0" — ancla de posicionamiento de la suite); lo operator-only
+  es la **casa** (`house`, taxonomía interna), gateada por `globe.producer.route.reveal_house`; slug/costo/margen
+  nunca salen. **Rollout:** cambio aditivo read-only; el servicio Cloud Run `globe-studio-internal` NO se
   redespliega hasta que el operador autorice push + workflow manual — el reader queda alcanzable por las
   surfaces internas en el próximo deploy. Próximo paso del cluster: `TASK-1501` (run contract discriminado,
   consume `resolveRouteConstraints`).

@@ -29,6 +29,21 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-07-20 (reabierta post-ship: invariante de naming invertido)
+
+Decisión de producto del operador: **mostrar el modelo real al cliente añade valor** (ancla de posicionamiento
+de la suite; el ICP enterprise sabe qué modelo da mejor calidad). Se invirtió el naming dual que la primera
+entrega dejó (modelo operator-only):
+
+- `model` = **nombre + versión** ("Seedance" · "2.0") es **público** (client-facing). `version` es etiqueta
+  libre opcional ("2.0", "5 Pro", "Multilingual v2", o ausente).
+- `house` (taxonomía interna de Efeonce, ex-`naming.client`) es **operator-only**, gateada por la capability
+  renombrada `globe.producer.route.reveal_house` (ex `reveal_model`).
+- Se corrigió la conflación "nombre del modelo" ≡ "slug de wire": el nombre es público; el slug (+ costo +
+  margen) sigue prohibido. Guards no-slug-leak ahora barren `model.name`/`model.version`/`house`.
+- Implementado sobre los mismos 4 commits de slices + 1 commit de inversión en `efeonce-globe` (`main`,
+  local-first); `pnpm check` + `build` verdes. Contratos reales en la spec del Producer (§Contratos reales).
+
 ## Summary
 
 Crea el **catálogo gobernado de rutas/modelos del Creative Producer** de Efeonce Globe: un reader transport-neutral que expone, por ruta, su `CreativeCapability`, sus **constraints** de output-shape (opciones de resolución / duración / sampleRate / formato / count, con límites), su **specialty** (multi-speaker, emotion-tags, HD, long-form, idiomas), si es **audio-capable**, los **modos de input** que soporta y su **naming dual** (modelo-real interno / fidelidad-curada cliente; el slug del proveedor jamás entra al catálogo — vive solo en el adapter). El catálogo es **dato versionado**: agregar una ruta es editar dato, no código. Es la keystone del cluster Producer — la UI (`TASK-1505`) lee de acá para renderizar solo opciones válidas, y el contrato discriminado (`TASK-1501`) valida el output-shape **fail-closed antes de gastar** contra estos mismos constraints, in-process.
@@ -219,9 +234,9 @@ Reglas obligatorias (heredadas del Producer + del spine):
     - `{ modality: 'video', resolution: readonly string[], duration: { minSeconds: number; maxSeconds: number; stepSeconds?: number }, aspectRatio: readonly string[], audioMode: readonly string[] }`
     - `{ modality: 'audio', sampleRate: readonly number[], format: readonly string[], speed: { min: number; max: number }, volume: { min: number; max: number }, pitch: { min: number; max: number } }`
   - `RouteSpecialtyV1` — flags declarativos opcionales: `{ multiSpeaker?: boolean; emotionTags?: boolean; hd?: boolean; longForm?: boolean; languages?: readonly string[] }`.
-  - `RouteNamingV1` — `{ internal: string; client: string }` (modelo-real / fidelidad-curada; **sin slug**).
-  - `ProducerRouteDescriptorV1` — `{ schemaVersion: '1'; routeId: string; capability: CreativeCapability; naming: RouteNamingV1; constraints: RouteConstraintsV1; specialty: RouteSpecialtyV1; audioCapable: boolean; inputModes: readonly RouteInputMode[]; fidelityContract?: FidelityContract }`.
-  - `ProducerCatalogViewV1` — la proyección de wire del reader: como `ProducerRouteDescriptorV1` pero con `naming` recortado a la vista resuelta (`client` siempre; `internal` solo si autorizado).
+  - `RouteModelIdentityV1` — `{ name: string; version?: string }` (**client-facing**: modelo real como nombre + versión opcional; **sin slug**). *(Delta 2026-07-20: reemplazó a `RouteNamingV1 { internal; client }`.)*
+  - `ProducerRouteDescriptorV1` — `{ schemaVersion: '1'; routeId: string; capability: CreativeCapability; model: RouteModelIdentityV1; house: string; constraints: RouteConstraintsV1; specialty: RouteSpecialtyV1; audioCapable: boolean; inputModes: readonly RouteInputMode[]; fidelityContract?: FidelityContract }`.
+  - `ProducerCatalogViewV1` — la proyección de wire del reader: como `ProducerRouteDescriptorV1` pero con `house` recortado a la audiencia resuelta (`model` siempre; `house` solo si operador).
   - `ProducerCatalogListQueryV1` — `{ capability?: CreativeCapability; modality?: 'image' | 'video' | 'audio' }` (filtros opcionales).
   - `ProducerCatalogGetQueryV1` — `{ routeId: string }`.
 - Agregar `globe.producer.catalog.read` a `GLOBE_CAPABILITIES` (tuple cerrado). `[verificar naming en Plan Mode]`

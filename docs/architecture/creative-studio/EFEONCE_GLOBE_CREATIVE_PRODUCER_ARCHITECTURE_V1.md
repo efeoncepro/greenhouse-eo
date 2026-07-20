@@ -36,9 +36,12 @@ Visibility Grader, campaña SKY). El Producer trae ese trabajo in-house sobre Gl
 - **Producer dentro del Workbench** — rechazado: acopla el MVP rápido al critical path profundo; pierde la
   ventaja de tiempo.
 - **EPIC nuevo** — rechazado: el Producer es parte de Globe. Vive como **cluster bajo EPIC-028**.
-- **Exponer el slug del proveedor al usuario** (como hace Higgsfield: "Seedream 5.0 Pro") — rechazado en la
-  superficie cliente por el invariante *"sin exponer costo vendor confidencial ni margen"*; se resuelve con
-  naming dual (ver §Boundary).
+- **Exponer el slug de wire del proveedor** (`bytedance/seedream/v5/pro/text-to-image`, endpoints de queue) —
+  rechazado en toda superficie: es plomería de ruteo y filtra el proveedor exacto. Vive solo en el adapter.
+  **Ojo (corrección 2026-07-20):** el *nombre* del modelo ("Seedream 5 Pro") **NO** es el slug — es una señal
+  de calidad legible, y mostrarlo **añade valor** (ancla de posicionamiento de la suite, patrón Higgsfield).
+  La V1 los agrupó por error; se separaron: nombre+versión del modelo = público; slug/costo/margen =
+  prohibidos; casa interna = operator-only (ver §Boundary).
 
 ## El modelo del Producer
 
@@ -98,16 +101,18 @@ prompt-first, no interpreta brief). **Sincroniza** projects durables con `1465` 
 ### Contratos reales del catálogo (TASK-1500, vigente)
 
 - **Tipos (wire SSOT):** `efeonce-globe/packages/contracts/src/producer-catalog.ts` —
-  `ProducerRouteDescriptorV1` (routeId · capability · `RouteNamingV1` dual · `RouteConstraintsV1` union
-  discriminada por `modality` image/video/audio · `RouteSpecialtyV1` · `audioCapable` · `RouteInputMode[]` ·
-  `fidelityContract?`), proyecciones `ProducerCatalogViewV1` / `ProducerCatalogListDataV1` /
+  `ProducerRouteDescriptorV1` (routeId · capability · `model: RouteModelIdentityV1 { name; version? }` **público**
+  · `house: string` **operator-only** · `RouteConstraintsV1` union discriminada por `modality` image/video/audio ·
+  `RouteSpecialtyV1` · `audioCapable` · `RouteInputMode[]` · `fidelityContract?`), proyecciones
+  `ProducerCatalogViewV1` (`model` siempre, `house?` solo operador) / `ProducerCatalogListDataV1` /
   `ProducerCatalogGetDataV1` (con `catalogVersion`), queries `ProducerCatalogListQueryV1` /
   `ProducerCatalogGetQueryV1`.
 - **Dato + motor:** `packages/domain/src/producer-catalog.ts` — `PRODUCER_ROUTE_CATALOG` (frozen, seed 4 rutas
-  ancladas a las fidelity routes vivas: `ref/still/rrss-v1`, `ref/motion/loop-v1`, `ref/audio/foley-v1`,
-  `ref/voice/tts-v1`) + `PRODUCER_CATALOG_VERSION`; drift guards con `throw` en carga (routeId único ·
-  capability ∈ `CREATIVE_CAPABILITIES` · modality-match · `audioCapable` coherente · no-slug-leak sobre
-  routeId y naming). Agregar una ruta = editar el array + versión; el motor no tiene `switch` por ruta.
+  ancladas a las fidelity routes vivas: `ref/still/rrss-v1` = Seedream · 5 Pro, `ref/motion/loop-v1` = Seedance ·
+  2.0, `ref/audio/foley-v1` = Seed Audio, `ref/voice/tts-v1` = ElevenLabs · Multilingual v2) +
+  `PRODUCER_CATALOG_VERSION`; drift guards con `throw` en carga (routeId único · capability ∈
+  `CREATIVE_CAPABILITIES` · modality-match · `audioCapable` coherente · no-slug-leak sobre routeId, `model.name`,
+  `model.version` y `house`). Agregar una ruta = editar el array + versión; el motor no tiene `switch` por ruta.
 - **Helpers in-process (SSOT de reuse):** `listProducerRoutes` / `getProducerRoute` /
   `resolveRouteConstraints` — lo que `TASK-1501` (validación de shape fail-closed pre-spend) y `TASK-1502`
   (`costo = f(ruta, shape)`) consumen directo, **sin re-dispatch** por el registry.
@@ -115,10 +120,12 @@ prompt-first, no interpreta brief). **Sincroniza** projects durables con `1465` 
   `globe.producer.catalog.read`; coverage `ui`/`mcp` `policy-blocked` (gate de `1505`), internas
   `available`, `sister-platform` `not-applicable`. Query malformada → `invalid_request`; routeId
   desconocido → `not_found` sin revelar existencia.
-- **Naming-view fail-closed (decisión):** la vista modelo-real se gobierna por la capability **dedicada**
-  `globe.producer.route.reveal_model` (no se reusa la autoridad del Lab: "correr experimentos" ≠ "ver
-  modelo-real"). `resolveNamingView` default `client`; la proyección client **omite** `naming.internal`.
-  Ambas capabilities granteadas al service principal interno (path operador) en `app.ts`.
+- **Audiencia fail-closed (decisión invertida 2026-07-20):** el **modelo (`model`) es público** en cualquier
+  audiencia — mostrar "Seedance · 2.0" al cliente es ancla de posicionamiento de la suite. Lo gateado es la
+  **casa** (`house`, taxonomía interna): `resolveRouteAudience` retorna `operator` solo con la capability
+  **dedicada** `globe.producer.route.reveal_house` (no se reusa la autoridad del Lab); default `client`, que
+  **omite** `house`. La capability y el grant al service principal (path operador) viven en `app.ts`. Nunca
+  salen el slug, el costo vendor ni el margen.
 - **SDK:** `listProducerRoutes(query?)` / `getProducerRoute(routeId)` en `packages/sdk`.
 
 ## Boundary / invariantes (heredados + nuevos)
@@ -127,9 +134,14 @@ Hereda todos los invariantes de Globe (`greenhouse-globe` skill + `EFEONCE_GLOBE
 
 - **Provider seam sagrado.** Toda capability nueva (frames, motion-control, change-voice, translate) se invoca
   **detrás del `CreativeProviderAdapter`**, nunca un SDK de proveedor directo en dominio/UI/MCP/CLI/tests.
-- **Catálogo con naming dual.** El slug del proveedor vive **solo dentro del adapter**. El catálogo expone dos
-  vistas: **modelo-real** (superficie interna operadores Efeonce) y **fidelidad-curada** (superficie cliente,
-  que nunca revela slug, costo vendor ni margen). `actualRoute` = contrato de fidelidad, no slug.
+- **Catálogo con naming triple + modelo público (decisión 2026-07-20).** El slug del proveedor vive **solo
+  dentro del adapter**. El catálogo separa tres identidades: (1) `routeId` (wire), (2) `model` = **nombre +
+  versión** del modelo real ("Seedance" · "2.0") **client-facing** — mostrar el modelo real **añade valor**:
+  es ancla de posicionamiento de la suite (el cliente enterprise sabe qué modelo da mejor calidad, patrón
+  Higgsfield), y no filtra economía porque (3) el **costo vendor y el margen nunca entran al catálogo**. La
+  **casa** (`house`, taxonomía interna de Efeonce) es **operator-only**, gateada por
+  `globe.producer.route.reveal_house`. `actualRoute` = contrato de fidelidad, no slug. La `version` es etiqueta
+  libre opcional (aguanta "2.0", "5 Pro", "Multilingual v2" o ausencia).
 - **La unidad de crédito es `ruta × output-shape`, nunca el modelo.** El estimate se computa de esa dimensión;
   un fallback nunca convierte provider/modelo en unidad de crédito.
 - **Multi-output explícito.** Un run omni emite `{video, audio}`; el manifest declara cada output con su
@@ -182,8 +194,10 @@ los primitivos compartidos**:
 
 - **NUNCA** un contrato de run plano por modalidad: el `PreparePayload` es discriminado por capability, con
   shape validado contra los constraints de la ruta, fail-closed pre-spend.
-- **NUNCA** exponer el slug del proveedor en la superficie cliente ni en el dominio; el slug vive solo en el
-  adapter; el catálogo usa naming dual.
+- **NUNCA** exponer el **slug del proveedor**, el **costo vendor** ni el **margen** en ninguna superficie; el
+  slug vive solo en el adapter. El **nombre + versión del modelo SÍ es público** (ancla de posicionamiento);
+  lo operator-only es la **casa** (`house`), gateada por `globe.producer.route.reveal_house`. No confundir
+  "nombre del modelo" (público) con "slug de wire" (prohibido).
 - **NUNCA** una capability nueva (frames/motion/change-voice/translate/omni) fuera del provider seam.
 - **NUNCA** computar la unidad de crédito por modelo; siempre `ruta × output-shape`.
 - **NUNCA** retornar bytes crudos de referencia por la API ni servir un asset cross-workspace en retrieval.
