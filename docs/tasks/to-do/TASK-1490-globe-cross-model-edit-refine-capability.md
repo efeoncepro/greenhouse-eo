@@ -29,7 +29,7 @@
 
 ## Summary
 
-Generalizar el edit/refine "sobre lo generado" a TODOS los modelos que aceptan edición, con una semántica de edit gobernada que rutee a los DOS paradigmas nativos de edición (stateful por sesión vs. reference-based) según el modelo, hilvanando el candidato previo en el nuevo experimento por el mismo seam del Model Lab. La implementación de referencia (Gemini Omni, edit stateful) ya quedó hecha; esta task extiende el patrón a Seedream/GPT-Image/Nano-Banana (imagen) y Kling/Seedance (video/extend).
+Generalizar el edit/refine "sobre lo generado" a TODOS los modelos que aceptan edición, con una semántica de edit gobernada que rutee a los DOS paradigmas nativos de edición (stateful por sesión vs. reference-based) según el modelo, hilvanando el candidato previo en el nuevo experimento por el mismo seam del Model Lab. La implementación de referencia (Gemini Omni, edit stateful) ya quedó hecha; esta task extiende el patrón a Seedream/GPT-Image/Nano-Banana (imagen) y Kling/Seedance (video/extend). Incluye además **múltiples referencias y referencias combinadas cross-modales** (p.ej. imagen + video juntas): el seam ya las transporta (`resolvedInputs` es un array de `ResolvedInputV1` con `mediaType`), pero varios adapters (Omni, Veo, rutas Fal de key único) sólo consumen la **primera** referencia y ninguno arma sets cross-modales todavía.
 
 ## Why This Task Exists
 
@@ -150,6 +150,12 @@ Reglas obligatorias:
 - Cablear los transports de edit por modelo (Omni ya dual-transport; Fal/Vertex reference-based reusan su transport).
 - Verificar en vivo un chain generate→edit por cada paradigma a través del seam; registrar evidencia.
 
+### Slice 4 — Múltiples referencias + referencias combinadas cross-modales
+
+- Hacer que cada adapter consuma TODAS las `resolvedInputs` cuando el modelo lo soporta (hoy Omni/Veo/rutas Fal de key único usan sólo `resolvedInputs[0]`; Vertex-imagen y Seedream-edit ya usan todas).
+- Soportar referencias combinadas cross-modales donde el modelo lo permite (p.ej. Omni `reference_to_video` con imagen + video juntos; el `input` Content[] admite entradas `image` y `video`).
+- Contrato: `resolvedInputs` ya es un array de `ResolvedInputV1` con `mediaType`; cada adapter mapea el set (con roles/precedencia si aplica, como el patrón STRUCTURE/IDENTITY/ANTI-REFERENCE de las skills de imagen) a su formato nativo, y falla closed si excede el máximo de refs del modelo.
+
 ## Out of Scope
 
 - La UI de "refinar candidato" (será una task `ui-ux` consumer separada).
@@ -213,7 +219,8 @@ Referencia de implementación (patrón a generalizar), repo `efeonce-globe`:
 - [ ] Un edit stateful cross-surface falla closed (regla contractual verificada por test).
 - [ ] El edit reference-based sólo cruza hash por la API (bytes resueltos server-side vía track B).
 - [ ] Spend fence cobra el edit como experimento nuevo; kill switch lo gobierna.
-- [ ] Evidencia en vivo: un chain generate→edit por cada paradigma a través del seam, con manifest + lineage.
+- [ ] Cada adapter consume TODAS las `resolvedInputs` (no sólo la primera) cuando el modelo lo soporta; refs combinadas cross-modales (imagen+video) funcionan donde el modelo lo permite (p.ej. Omni `reference_to_video`); falla closed si excede el máximo de refs del modelo.
+- [ ] Evidencia en vivo: un chain generate→edit por cada paradigma a través del seam, con manifest + lineage; y una generación multi-referencia (≥2 refs, con al menos un caso cross-modal).
 
 ## Verification
 
