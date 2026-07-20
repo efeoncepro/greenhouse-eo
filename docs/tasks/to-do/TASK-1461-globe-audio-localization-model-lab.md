@@ -18,6 +18,20 @@ Nota para las AC de consentimiento/rights y sincronía: el foley del micrófono 
 
 Actualización del Delta anterior (TASK-1486 dejaba audio `supports=false` en el adapter Vertex): **`TASK-1487` agregó el `FalCreativeAdapter` (code-complete) que SÍ sirve audio/voz** — `audio-generate` → ElevenLabs sound-effects, `speech-synthesize` → ElevenLabs TTS multilingual, por la queue API de Fal (secreto propio de Globe). Este carril audio pasa de "sin adapter" a **code-complete detrás de Fal** (`GLOBE_LAB_PROVIDER=fal`). El canary Fal billable en vivo es rollout gated (necesita el secreto Fal de Globe + verificación del slug ElevenLabs vigente). El fixture `glitch-microphone-foley` (audio-foley) ya puede evaluarse contra ElevenLabs una vez prendido el flag. — adapter de audio cerrado por TASK-1487.
 
+## Delta 2026-07-19 — Track B (hash→bytes) landed + primer canary audio en vivo (Seed Audio)
+
+**Track B (resolución hash→bytes) shipped** en `efeonce-globe` (commit `40c6a95`): el seam `InputResolverPort` resuelve el `authorizedInput` del brief `glitch-microphone-foley` (la ref de contacto) a bytes reales y lo adjunta al provider request. **El `inputs_unavailable` que bloqueaba el brief quedó cerrado**: el brief audio ya corre end-to-end contra el motor real. La capa completa de provenance/rights/retención sigue siendo TASK-1467.
+
+**Ajuste de slug (verificado en vivo):** `audio-generate` en Fal rutea a **`fal-ai/seed-audio`** (Seed Audio, input `prompt`), no a ElevenLabs sound-effects como decía el Delta previo de 1487. ElevenLabs sigue disponible para `speech-synthesize` (`fal-ai/elevenlabs/tts/multilingual-v2`).
+
+**Canary billable en vivo 2026-07-19** (golden brief `glitch-microphone-foley`, capability `audio-generate`, contrato `audio-foley`, por el path canónico command→registry→runner→adapter→track B):
+
+|Motor|Resultado|Modelo|Créditos|Latencia|Veredicto|
+|---|---|---|---|---|---|
+|**Fal**|✅ candidate_ready|`seed-audio`|6|~16s|`objective_pass_pending_human`|
+
+**Recommendation matrix audio (hoy):** **Fal Seed Audio es el motor de audio operativo** (`objective_pass_pending_human`), motor único (Vertex no sirve audio Google-nativo — `supports(audio)=false`; Chirp/Lyria = opción no implementada). El foley como **sonido-de-contacto** (golpe-y-rebote) y la sincronía/naturalidad son **criterios humanos declarados**, NO auto-puntuados; consent/license quedan declarados a nivel de fixture. El harness solo confirma output/cap/lineage/ruta/outcome; el verdict nunca es un "passed" creativo. — track B + canary por trabajo de esta sesión.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

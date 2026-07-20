@@ -18,6 +18,21 @@ Nota para Slice 3 y la AC "La matriz distingue canary, lab-ready y production-ca
 
 `TASK-1487` agregó el `FalCreativeAdapter` (code-complete): `video-generate`/`video-extend` también rutean a **Seedance 2.0** por Fal, además de Veo/Omni por Vertex. El lab motion ahora puede comparar Vertex vs Seedance **por contrato de fidelidad** (la evidencia `engine-selection-by-fidelity-contract` muestra que Seedance preserva mejor un set existente; Omni anima un ancla de lenguaje) — seleccionable con `GLOBE_LAB_PROVIDER=fal` vs `vertex`. Nota: video-extend (i2v) requiere una imagen de referencia → `inputs_unavailable` hasta la resolución hash→bytes (follow-up de 1487). Canary Fal billable gated. — motor alternativo agregado por TASK-1487.
 
+## Delta 2026-07-19 — Track B (hash→bytes) landed + primer canary motion en vivo → recommendation matrix
+
+**Track B (resolución hash→bytes) shipped** en `efeonce-globe` (commit `40c6a95`): el seam `InputResolverPort` inyectado en el `LabRunner` resuelve los `authorizedInputs` del golden brief a bytes reales (fixture resolver para test-fixtures; GCS keyless content-addressed para inputs reales) y los adjunta al provider request. **El `inputs_unavailable` que bloqueaba el ancla del brief `product-motion-loop` quedó cerrado**: el brief ya corre end-to-end contra motores reales. La capa completa de provenance/rights/retención sigue siendo TASK-1467.
+
+**Canary billable en vivo 2026-07-19** (golden brief `product-motion-loop`, capability `video-generate`, contrato `flexible-style`, por el path canónico command→registry→runner→adapter→track B):
+
+|Motor|Resultado|Modelo|Créditos|Latencia|Veredicto|
+|---|---|---|---|---|---|
+|**Fal**|✅ candidate_ready|`seedance-2.0`|20|~155s|`objective_pass_pending_human`|
+|**Vertex**|❌ 400 `invalid_request` (experimento `failed`, 0 attempts)|`gemini-omni-flash-preview`|—|<1s|—|
+
+**Hallazgo duro (corregido, commit `77d2949`):** `gemini-omni-flash-preview` **NO es invocable por `generateContent`** — Vertex responde 400: *"only supported in the Interactions API and cannot be called directly via generateContent"*. Veo tampoco usa `generateContent` (usa `predictLongRunning`/operations). Por lo tanto **el adapter Vertex basado en `generateContent` no puede servir video**; advertir `video-generate`/`video-extend` ahí era una capability falsa que hacía 400 en cada llamada. Se removió (`supports(video)=false`, misma frontera que audio). **Track B no tuvo culpa**: el ancla 1×1 se resolvió + inlineó correctamente; el modelo rechaza el método.
+
+**Recommendation matrix motion (hoy):** **Fal Seedance 2.0 es el motor motion operativo** (`objective_pass_pending_human`). El juicio de continuidad/actuación/cámara/audio son **criterios humanos declarados**, NO auto-puntuados (el harness solo confirma output/cap/lineage/ruta/outcome). Un adapter Vertex video dedicado (Veo `predictLongRunning` / Omni Interactions API) queda como **follow-up declarado** (no bloquea el lab: Seedance ya funciona). — track B + canary por trabajo de esta sesión.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
