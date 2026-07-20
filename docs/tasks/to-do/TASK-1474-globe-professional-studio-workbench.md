@@ -3,7 +3,7 @@
 ## Delta 2026-07-20
 
 - El primer primitivo compartido del Producer que este workbench consume quedó **cerrado por TASK-1500**
-  (complete): catálogo gobernado de rutas con naming dual fail-closed a cliente (la vista fidelidad-curada que
+  (complete): catálogo gobernado de rutas con **modelo público** (nombre+versión, ancla de posicionamiento — la vista que
   esta superficie usa) en `efeonce-globe/packages/domain/src/producer-catalog.ts`, readers
   `globe.producer.catalog.list`/`.get`.
 

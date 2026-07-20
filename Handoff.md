@@ -34,7 +34,11 @@
   nunca salen. **Rollout:** cambio aditivo read-only; el servicio Cloud Run `globe-studio-internal` NO se
   redespliega hasta que el operador autorice push + workflow manual — el reader queda alcanzable por las
   surfaces internas en el próximo deploy. Próximo paso del cluster: `TASK-1501` (run contract discriminado,
-  consume `resolveRouteConstraints`).
+  consume `resolveRouteConstraints`). **Barrido de gobernanza documental hecho (flota de agentes):** la skill
+  `greenhouse-globe` (ambas copias `.claude`/`.codex`, en sync) ganó el 4.º ejemplo trabajado (Producer Route
+  Catalog) + 2 reglas duras + triggers; `creative-studio/{README,DECISIONS_INDEX}` (SPEC-004 + ADR-003); y se
+  corrigió polaridad stale del naming en `DECISIONS_INDEX` raíz, `EPIC-028`, la tabla shipped del Producer arch,
+  `documentation/README`, y los planning docs de `1505` (wireframe/flow) `1474`/`1502`/`1504`.
 - **`TASK-1492` COMPLETE (repatriación documental Globe → Greenhouse).** La doc gobernante de Globe vive
   ahora en `greenhouse-eo` bajo `creative-studio/` (arquitectura, runbooks, funcional, manuales), + continuidad
   de runtime en `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md` y changelog en

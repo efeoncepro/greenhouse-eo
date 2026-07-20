@@ -35,7 +35,7 @@ contrato, no valores literales.
 │ └───────────────────────────────────────┘│ │ recipe │ │ recipe │ │ recipe │            │
 │                                           │ └────────┘ └────────┘ └────────┘            │
 │ Modo:   (por modalidad — ver paneles)     │  hover/focus → Asset Action Bar:            │
-│ Ruta:   [ Ruta curada ▾ ]  ⓘ HD·idiomas   │  [preview] [descargar] [★ favorito]         │
+│ Ruta:   [ Seedance · 2.0 ▾ ]  ⓘ HD·idiomas │  [preview] [descargar] [★ favorito]         │
 │                                           │  [usar como referencia] [↻ Recrear]         │
 │ Output-shape:  (tray discriminado)        │                                             │
 │   (image: Calidad · Proporción · Cantidad)│                                             │
@@ -98,7 +98,7 @@ Generar ✨N
 |---|---|---|---|
 | Modality band | cambia modalidad; muestra créditos (spend fence) y actor | Imagen · Video · Audio; balance disponible/reservado | catálogo `TASK-1500`; fence del run |
 | Prompt bar | prompt + referencias | texto; `+` agregar ref, `@` mencionar asset (private-ingest: hash + rights) | contrato `TASK-1501`; reference intelligence `TASK-1494` |
-| Route Selector | elige ruta curada; muestra constraints + specialty | ruta (naming dual: modelo-real curado; **sin slug**); ⓘ HD/idiomas/long-form/multi-speaker | catálogo `TASK-1500` |
+| Route Selector | elige ruta; muestra el modelo público + constraints + specialty | ruta (**modelo público**: nombre+versión, p.ej. "Seedance · 2.0"; **sin slug**); ⓘ HD/idiomas/long-form/multi-speaker | catálogo `TASK-1500` |
 | Output-Shape Tray | controles discriminados | image: quality/aspectRatio/count · video: resolution/duration/aspectRatio/audioMode/inputMode · audio: mode/voicePreset/sampleRate/format/speed/volume/pitch | contrato `TASK-1501` validado vs constraints `TASK-1500` |
 | Estimate + Generar | costo pre-spend + disparo | `✨N` (ruta × output-shape); CTA Generar | estimate reader `TASK-1502`; command `TASK-1501` |
 | Generation Feed | feed unificado cross-modal | grid de candidatos (badge modalidad, ruta curada, recipe) | feed/candidate readers `TASK-1498`/`TASK-1503` |
@@ -200,8 +200,10 @@ Generar ✨N
   existe sin param validado — la superficie es fail-closed por construcción.
 - El **feed es unificado cross-modal** (imagen/video/audio en una superficie), no tres feeds; Adaptive Card
   density absorbe ratios/duraciones dispares sin card wallpaper.
-- **Naming dual, sagrado:** la superficie muestra la ruta curada (modelo-real para operadores), nunca el slug;
-  costo vendor y margen nunca aparecen; `actualRoute` = contrato de fidelidad.
+- **Naming, sagrado (invariante invertido TASK-1500):** la superficie muestra el **modelo público** (nombre+versión,
+  p.ej. "Seedance · 2.0" — ancla de posicionamiento), **nunca el slug**; la **casa** interna (`house`) solo se
+  muestra a operadores con `globe.producer.route.reveal_house`; costo vendor y margen nunca aparecen; `actualRoute`
+  = contrato de fidelidad.
 - Las **capabilities nuevas** (`TASK-1504`) nacen visibles pero `policy-blocked`; el chassis no se rompe por una
   capability apagada.
 - Greenhouse gobierna registry/QA/promoción/evidencia; Globe posee runtime, primitives y datos — la UI no

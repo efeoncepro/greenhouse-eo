@@ -7,6 +7,13 @@
   `efeonce-globe/packages/domain/src/producer-catalog.ts` (drift guards abortan slug-leak/modality-mismatch).
   Los `RouteInputMode` ricos (`frames`, `motion-source`, `source-audio`, `mention`) ya están en el vocabulario
   de contracts; la ruta seed de video ya declara `frames`/`motion-source` como modos anunciados.
+- **⚠️ Invariante de naming INVERTIDO en TASK-1500 (supersede el body de este spec).** El cuerpo describe
+  "naming dual: modelo-real interno / fidelidad-curada cliente" — quedó **al revés**. Estado final: el **modelo
+  real (nombre+versión) es PÚBLICO/client-facing**; lo operator-only es la **casa** (`house`, capability
+  `globe.producer.route.reveal_house`). Lo que **sigue válido** (la mayoría de las menciones del body): el
+  **slug del proveedor y el vendor voice id viven SOLO dentro del adapter** y nunca salen — eso no cambió. El
+  voice-preset registry expone el nombre/preset público, nunca el vendor voice id. Al construir, re-derivar el
+  naming contra el contrato final de TASK-1500 (`RouteModelIdentityV1` + `house` + `reveal_house`).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE

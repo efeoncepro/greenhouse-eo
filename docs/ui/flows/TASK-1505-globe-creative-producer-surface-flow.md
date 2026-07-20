@@ -50,7 +50,7 @@ modos, el feed unificado y Recrear son estados de una misma consola. Cada nodo d
 
 1. Operador escribe prompt; opcionalmente agrega referencias (`+` upload / `@` mención) que cruzan como
    **hash + rights** (private-ingest), nunca bytes crudos.
-2. Elige **ruta** del catálogo (naming dual: ruta curada, sin slug); la UI muestra constraints + specialty (HD,
+2. Elige **ruta** del catálogo (**modelo público**: nombre+versión, p.ej. "Seedance · 2.0", sin slug; la casa interna solo la ve el operador); la UI muestra constraints + specialty (HD,
    idiomas) — reader de `TASK-1500`.
 3. Ajusta el **output-shape** `{ quality, aspectRatio, count }`; cada opción está acotada por los constraints de
    la ruta (fail-closed: no ofrece lo que la ruta no soporta) — contrato de `TASK-1501`.

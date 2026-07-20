@@ -6,6 +6,13 @@
   `PRODUCER_ROUTE_CATALOG` + `PRODUCER_CATALOG_VERSION` + helpers `getProducerRoute`/`resolveRouteConstraints`
   en `efeonce-globe/packages/domain/src/producer-catalog.ts`. El estimate consume el helper in-process
   (nunca re-dispatch); el catálogo NO lleva costo vendor ni margen — el pricing es de esta task.
+- **⚠️ Invariante de naming INVERTIDO en TASK-1500 (supersede el body de este spec).** El cuerpo de abajo
+  describe "naming dual (modelo-real interno / fidelidad-curada cliente)" y "vista modelo-real curado-only" —
+  eso quedó **al revés**. Estado final: el **modelo real (nombre+versión) es PÚBLICO/client-facing**; lo
+  operator-only es la **casa** (`house`, capability `globe.producer.route.reveal_house`). Lo que **sigue
+  válido** de este spec (la mayoría): el estimate NO debe exponer **slug de proveedor, costo vendor ni margen**
+  — eso nunca sale. Al construir, re-derivar el naming contra el contrato final de TASK-1500
+  (`RouteModelIdentityV1` + `resolveRouteAudience`), no contra la terminología "curado/modelo-real" del body.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE

@@ -86,7 +86,7 @@ fail-closed antes de reservar crédito**:
 
 | ID | Task | Qué es | Profile |
 |---|---|---|---|
-| **TASK-1500** ✅ | Governed Route/Model Catalog | reader con constraints (res/dur/sampleRate/format/count) + specialty + **naming dual** interno/fidelidad. La keystone. **Shipped 2026-07-20** (ver §Contratos reales del catálogo) | backend-data |
+| **TASK-1500** ✅ | Governed Route/Model Catalog | reader con constraints (res/dur/sampleRate/format/count) + specialty + **modelo público** (nombre+versión) + **casa interna** (`house`, operator-only vía `reveal_house`). La keystone. **Shipped 2026-07-20** (ver §Contratos reales del catálogo) | backend-data |
 | **TASK-1501** | Modality-Discriminated Run Contract | `PreparePayload` como union por capability + output-shape validados pre-spend (**absorbe `1495`**) | backend-data |
 | **TASK-1502** | Previewable Estimate reader | el `✨N` antes de gastar (extrae el estimate de dentro de `execute`; slice adelantado de `1469`) | backend-data |
 | **TASK-1503** | Governed Output Retrieval + Asset Actions | hash→bytes servible + download/preview/favorite/copy sobre el store content-addressed de `1490` | backend-data |
@@ -169,8 +169,9 @@ los primitivos compartidos**:
 
 ## Pilares (4-pillar)
 
-- **Safety:** kill switch heredado (default OFF); spend fence hard-cap pre-spend; naming dual protege
-  costo/margen en superficie cliente; contrato discriminado fail-closed; retrieval tenant-safe; capabilities
+- **Safety:** kill switch heredado (default OFF); spend fence hard-cap pre-spend; el catálogo expone el
+  modelo (nombre+versión) pero **nunca** slug/costo/margen y mantiene la casa operator-only, protegiendo la
+  economía en superficie cliente; contrato discriminado fail-closed; retrieval tenant-safe; capabilities
   nuevas nacen `policy-blocked` en surfaces ejecutables hasta gate.
 - **Robustness:** validación de shape contra constraints del catálogo antes de gastar; multi-output atómico
   (o todos los outputs o degradación honesta, nunca un candidato pagado a medias); private-ingest rechaza

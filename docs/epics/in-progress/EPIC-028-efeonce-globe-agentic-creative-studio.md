@@ -239,7 +239,9 @@ contrato discriminado por modalidad · `TASK-1502` estimate previewable · `TASK
 · `TASK-1504` capability expansion (frames, motion-control, change-voice, translate, omni multi-output,
 voice-preset) · `TASK-1505` Producer Surface (UI)**. Contrato de run = **discriminated union por modalidad**
 (diseñado para las 3 desde el día 1; impl incremental Image→Video→Audio), validado contra constraints del
-catálogo fail-closed pre-spend; **naming dual** (modelo-real interno / fidelidad-curada cliente); unidad de
+catálogo fail-closed pre-spend; **naming** (decisión invertida 2026-07-20): el **modelo real (nombre+versión)
+es PÚBLICO/client-facing** (ancla de posicionamiento), la **casa** (taxonomía interna) es **operator-only**
+(`globe.producer.route.reveal_house`), y slug/costo/margen **nunca** salen; unidad de
 crédito = ruta×shape, nunca el modelo. Reusa `1493/1494/1496/1497/1498` (primitivos compartidos), **absorbe
 `1495`** (formatos → output-shape), y `1499` queda como única exclusiva del Workbench. `TASK-1474` pasa a
 depender también de `1500–1503`. Spec canónica:
