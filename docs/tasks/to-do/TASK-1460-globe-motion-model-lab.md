@@ -33,6 +33,31 @@ Nota para Slice 3 y la AC "La matriz distingue canary, lab-ready y production-ca
 
 **Recommendation matrix motion (hoy):** **Fal Seedance 2.0 es el motor motion operativo** (`objective_pass_pending_human`). El juicio de continuidad/actuación/cámara/audio son **criterios humanos declarados**, NO auto-puntuados (el harness solo confirma output/cap/lineage/ruta/outcome). Un adapter Vertex video dedicado (Veo `predictLongRunning` / Omni Interactions API) queda como **follow-up declarado** (no bloquea el lab: Seedance ya funciona). — track B + canary por trabajo de esta sesión.
 
+## Delta 2026-07-20 — Veo + Omni video engines (Interactions API), live-verified matrix
+
+Cerrado el follow-up declarado en el Delta anterior ("adapter Vertex video dedicado"): `efeonce-globe` ahora tiene **dos adapters Vertex de video dedicados** que reemplazan el path `generateContent` removido (el video no se sirve por `generateContent`), realizando el seam `LabRunnerPort` sin tocar domain/contracts/transports. Ambos **verificados en vivo 2026-07-20** por el path canónico del Lab (command→registry→runner→adapter→track B) contra el golden brief motion `product-motion-loop`, cada uno `objective_pass_pending_human`:
+
+- **Veo** — `VertexVideoAdapter` (`../efeonce-globe/apps/creative-runner/src/vertex-video-adapter.ts`, commit `1d5635b` + fix `0e06fdc`): Vertex keyless (ADC) por el flujo long-running `:predictLongRunning` → `:fetchPredictOperation` → base64/GCS, que es exactamente el método que Veo exige (no `generateContent`). Modelo `veo-3.0-fast-generate-001` en `us-central1`. 32 créditos, MP4 real.
+- **Omni** — `VertexOmniAdapter` (`../efeonce-globe/apps/creative-runner/src/vertex-omni-adapter.ts`, commit `f56452a`): `gemini-omni-flash-preview` por la **Interactions API** (video reasoning-native, estado del arte). El GENERATE es keyless en Vertex (`aiplatform.googleapis.com/v1beta1/.../interactions`, Bearer ADC, sin key). 40 créditos.
+
+**Corte duro en el EDIT stateful (hallazgo en vivo):** el edit con estado (`previous_interaction_id` + `store`) **no** está disponible por el path keyless de Vertex — ahí devuelve 400 *"do not support previous_interaction_id"*. El edit requiere la superficie **Gemini API** (`generativelanguage`) + una API key (`globe-gemini-api-key`); OAuth es rechazado en esa superficie. El edit se verificó en vivo end-to-end ahí: create `store:true` → edit → 200 con video `completed`. La frontera para esta task: el adapter **soporta** edit, pero el seam one-shot del Lab todavía **no** hilvana el `interaction_id` por el dominio (follow-up: falta un command de edit que lo propague).
+
+**Recommendation matrix motion (hoy, seleccionable por ancla de fidelidad):** el Composite elige el motor de video por `GLOBE_LAB_VIDEO_ANCHOR` = `fal` (Seedance, default) | `vertex-video` (Veo) | `vertex-omni` (Omni), reemplazando la policy fija.
+
+|Motor|Modelo|Superficie|Créditos|Veredicto|
+|---|---|---|---|---|
+|**Omni**|`gemini-omni-flash-preview`|Interactions API (Vertex keyless)|40|`objective_pass_pending_human`|
+|**Veo**|`veo-3.0-fast-generate-001`|`predictLongRunning`/`fetchPredictOperation` (Vertex keyless)|32|`objective_pass_pending_human`|
+|**Seedance**|`seedance-2.0`|Fal queue|20|`objective_pass_pending_human`|
+
+El veredicto objetivo confirma output/cap/lineage/ruta/outcome; continuidad, actuación, cámara y audio siguen siendo **criterios humanos declarados**, nunca auto-`passed`.
+
+**Provisioning en vivo 2026-07-20:** `generativelanguage.googleapis.com` habilitado; secrets `globe-gemini-api-key` + `globe-fal-api-key` en Secret Manager con `secretAccessor` para la runtime-SA; Terraform `secrets.tf` + import blocks agregados (`tofu validate` OK; el `tofu apply` es paso de operador). El Fal key propio de Globe **retira la excepción del `greenhouse-fal-api-key` compartido a nivel de código**.
+
+**Hallazgo de billing (para no comprar de más):** el video de Omni **no tiene tier gratuito de API** ($0.10/s); la Gemini API cobra Prepay/Postpay + key y es la **única** superficie que hoy sirve el edit stateful; "Gemini Enterprise" per-seat es **NO relacionado** (no comprar). Recomendación: habilitar **Postpay** para evitar el corte en seco del Prepay a saldo $0.
+
+**Follow-ups abiertos:** deploy/Dockerfile de `studio-web`; un command de edit del Lab que propague `previous_interaction_id` por el dominio (el adapter ya soporta edit; el seam one-shot no expone el interaction id); paridad de edit stateful en Vertex (re-testear periódicamente); y provenance completa en TASK-1467. — Veo + Omni + matrix por trabajo de esta sesión.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

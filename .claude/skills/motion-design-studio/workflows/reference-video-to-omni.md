@@ -1,14 +1,25 @@
 # Reference-Video → Omni Enhance ⭐
 
-> **Estado:** validado — 2026-07-05 (spot AEO Grader, Slice 1).
+> **Estado:** técnica creativa validada — 2026-07-05 (spot AEO Grader, Slice 1). **Contrato de API
+> actualizado 2026-07-20:** la evidencia se produjo sobre `generateContent` (método **retirado**); la
+> técnica (referencia crisp → look cinematográfico) sigue vigente, pero hoy se invoca por la **Interactions
+> API** (ver el bloque "Cambio de API" abajo y `efeonce/GEMINI_OMNI_VERTEX.md §0/§4`).
 > **Evidencia:** `~/Documents/Efeonce-AEO-Spot/AEO-Slice1_Omni-cinematic.mp4`.
 
 ## La idea en una frase
 
 **Construyes tú una referencia crisp** (mockup HTML+Playwright, o un keyframe diseñado) **y se la pasas a
-Gemini Omni** como `inlineData` (imagen **o** video) + un prompt de "vuélvelo cinematográfico premium" →
+Gemini Omni** por la **Interactions API** (imagen de referencia como `{type:"image", data, mime_type}` en el
+`input`, tarea `image_to_video` / `reference_to_video`) + un prompt de "vuélvelo cinematográfico premium" →
 el resultado **eleva el look dramáticamente** (profundidad, glass, cámara, materiales, atmósfera) que un
-mockup plano no tiene. Es text-to-video **dirigido por una referencia fuerte**, no un prompt a ciegas.
+mockup plano no tiene. Es image-to-video **dirigido por una referencia fuerte**, no un prompt a ciegas.
+
+> **Cambio de API (2026-07-20):** Omni ya no acepta `generateContent`. La **generación desde una imagen de
+> referencia** corre en la **superficie Vertex KEYLESS** (ADC Bearer, sin API key) o Gemini-key. El viejo
+> patrón de pasar un **`video/mp4` como `inlineData`** para "enhance video→video" **quedó retirado con
+> `generateContent`**: hoy, si tu referencia es un video (p. ej. el Playwright), o (a) extrae un frame crisp
+> y entra por `image_to_video`, o (b) genera primero y **refina por edición stateful** (`previous_interaction_id`
+> + `store:true`) en la **superficie Gemini-key** — Vertex keyless no edita. Contrato: `efeonce/GEMINI_OMNI_VERTEX.md §0/§4`.
 
 ## Cuándo usarla
 
@@ -22,8 +33,12 @@ mockup plano no tiene. Es text-to-video **dirigido por una referencia fuerte**, 
    **grandes y claros**; fondo oscuro con "aire" para que Omni meta profundidad/reflejos.
 2. **Exporta:** UI → `ui-without-after-effects.md` (HTML + Playwright, mp4); escena → keyframe
    (`design-studio` / `greenhouse-ai-image-generator`).
-3. **Pasa a Omni** — `inlineData` `image/png` **o** `video/mp4` + el prompt de abajo. Contrato completo:
-   `efeonce/GEMINI_OMNI_VERTEX.md` (región `global` · `responseModalities:["TEXT","VIDEO"]` · `x-goog-user-project`).
+3. **Pasa a Omni por la Interactions API** — la imagen de referencia va como `{type:"image", data:BASE64,
+   mime_type:"image/png"}` dentro del `input`, con `generation_config.video_config.task:"image_to_video"`
+   (o `reference_to_video` si son 2–6 imágenes) + el prompt de abajo. Genera con `store:true` si vas a
+   refinar por edición stateful después. Contrato completo (endpoints, dos superficies, auth keyless vs.
+   API key): `efeonce/GEMINI_OMNI_VERTEX.md §0/§4`. **NO** uses el viejo `generateContent` /
+   `responseModalities` / `x-goog-user-project` — quedaron retirados.
 4. **Evalúa el output:** look ✅ — pero **micro-texto/logos se deforman** (no-determinista; ver gotchas).
 5. **Compón la UI/logos reales crisp ENCIMA** del plate Omni (o mezcla beats). **El plate da el look; el
    overlay da la exactitud.** Cierre obligatorio para todo texto/logo que sea el mensaje.

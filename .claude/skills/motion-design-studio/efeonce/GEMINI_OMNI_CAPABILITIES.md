@@ -2,10 +2,11 @@
 
 > **Tipo de documento:** Catálogo de capacidades + mapa de sinergia (agent-facing).
 > **Hermano de:** `GEMINI_OMNI_VERTEX.md` (contrato operativo: endpoint, auth, pricing, gotchas). **Este doc NO repite el contrato** — si necesitas invocarlo, lee ese. Acá está TODO lo que Omni *puede hacer* y **cómo combinarlo** con las skills de la familia "studio" para exprimirlo.
-> **Verificado as-of:** runtime base 2026-07-05 + edición persistida Glitch 2026-07-11 (`efeonce-group`, Vertex región `global`); docs oficiales Google reverificadas 2026-07-11.
+> **Verificado as-of:** migración a **Interactions API** live-verificada **2026-07-20** (`efeonce-globe`: generación t2v keyless por Vertex + edición stateful por Gemini-key, ambas `200 completed`); runtime histórico `generateContent` 2026-07-05 + edición persistida Glitch 2026-07-11 (`efeonce-group`, Vertex `global`), **ya no vigente como método de invocación**; docs oficiales Google reverificadas 2026-07-20.
 > **Idioma:** es-CL neutro (tuteo).
-> **Regla de volatilidad:** el modelo está en `PUBLIC_PREVIEW` (lanzado 2026-06-30). Todo lo marcado `⚠️ volátil` cambia semana a semana; reverifica antes de comprometer costo o pipeline. Google promete "longer durations / higher res coming soon", así que los techos (720p / 10 s) son lo primero que se moverá.
-> **Regla de honestidad:** distingo entre lo que **verificamos en vivo (✅)**, lo que está **documentado por Google (📄)**, lo que es **marketing/visión de terceros no confirmado (📣)** y lo que **no probamos (⬜)**. Varios sitios de terceros venden "4K nativo con audio y lip-sync en un solo pase" — eso es la **visión del modelo full**, NO el preview Flash que corre hoy (720p, sin lip-sync verificado). No confundas la valla publicitaria con el runtime.
+> **⚠️ Cambio de método (2026-07-20):** Omni **ya no se invoca por `generateContent`** — ese método devuelve `400 "…is only supported in the Interactions API and cannot be called directly via generateContent."` Ahora corre sobre la **Interactions API** (`POST …/interactions`, body snake_case), y hay **dos superficies distintas y NO intercambiables**: (1) **Vertex KEYLESS** (ADC Bearer, sin API key) sirve **solo GENERACIÓN** (`text_to_video`/`image_to_video`/`reference_to_video`); (2) **Gemini API con API KEY** (`generativelanguage.googleapis.com`) sirve la Interactions API **completa, incluida la EDICIÓN stateful** (`previous_interaction_id` + `store:true`). Contrato completo, endpoints y auth: `GEMINI_OMNI_VERTEX.md §0/§4`.
+> **Regla de volatilidad:** el modelo está en `PUBLIC_PREVIEW` (lanzado 2026-06-30). Todo lo marcado `⚠️ volátil` cambia semana a semana; reverifica antes de comprometer costo o pipeline. Google promete "longer durations / higher res coming soon", así que los techos (720p / 3–10 s) son lo primero que se moverá.
+> **Regla de honestidad:** distingo entre lo que **verificamos en vivo (✅)**, lo que está **documentado por Google (📄)**, lo que es **marketing/visión de terceros no confirmado (📣)** y lo que **no probamos (⬜)**. Varios sitios de terceros venden "4K nativo con audio y lip-sync en un solo pase" — eso es la **visión del modelo full**, NO el preview Flash que corre hoy (720p, sin lip-sync verificado). No confundas la valla publicitaria con el runtime. Ojo: las verificaciones ✅ de 2026-07-05 se hicieron sobre `generateContent` (ya retirado); la **capacidad** persiste, pero el **método** migró a Interactions — reverifica el shape antes de cablear.
 
 ---
 
@@ -13,7 +14,9 @@
 
 ### A.0 Qué es, en una línea
 
-Omni Flash es el modelo "any-to-any" de Google donde **el razonamiento de Gemini se une a la generación y edición de video**: entra cualquier combinación de texto + imagen + video, sale video con audio nativo, y lo puedes **iterar hablándole** (edición conversacional multi-turno). Analogía oficial: *"como Nano Banana, pero para video"*. Detalle conceptual de arquitectura (fusión Veo + Genie + Nano Banana) en `GEMINI_OMNI_VERTEX.md §1`.
+Omni Flash es el modelo "any-to-any" de Google donde **el razonamiento multimodal de Gemini se une a la generación y edición de video**: entra cualquier combinación de texto + imagen + video, sale video con audio nativo, y lo puedes **iterar hablándole** (edición conversacional multi-turno stateful). Analogía oficial: *"como Nano Banana, pero para video"*. Se invoca por la **Interactions API** (loop generar → editar), no por `generateContent`. Detalle conceptual de arquitectura (fusión Veo + Genie + Nano Banana) en `GEMINI_OMNI_VERTEX.md §1`; contrato de invocación en `§0/§4`.
+
+**Su diferenciador vs. un generador one-shot como Veo Fast** (`veo-3.0-fast-generate-001`, `predictLongRunning`, un solo pase sin conversación): Omni suma **edición conversacional stateful** (refinás el clip hablándole, encadenando por `previous_interaction_id`) + **razonamiento multimodal nativo** del mundo. Ambos están live-verificados para Globe; se eligen por trabajo, no por marca (router al final de PARTE A).
 
 ### A.1 Modalidades (entrada → salida) y combinaciones válidas
 
@@ -22,27 +25,27 @@ Omni Flash es el modelo "any-to-any" de Google donde **el razonamiento de Gemini
 | **Texto** | ✅ verificado | Video+audio+texto | Solo texto → `text_to_video` |
 | **Imagen** (`image/png`/`jpeg`, base64 inline) | ✅ verificado | Video+audio+texto | Texto + 1 imagen → `image_to_video` |
 | **Imagen ×2** (dos referencias) | ✅ **verificado** (mezcló estadio vacío + estadio con multitud en una toma) | Video+audio+texto | Texto + N imágenes → `reference_to_video` |
-| **Imagen 2–6** (tags `<IMAGE_REF_0>`…`<IMAGE_REF_5>`) | 📄 documentado (verificamos 2) | Video+audio+texto | `reference_to_video` |
-| **Video** (`video/mp4`, hasta 10 s observado en Interactions, base64 inline) | ✅ **verificado** (edición video-to-video real) | Video+audio+texto | Texto + video → `edit` / continuación |
+| **Imagen 2–6** (`{type:"image"}` en el `input`; docs usan tags `<IMAGE_REF_0>`…`<IMAGE_REF_5>`) | 📄 documentado (verificamos 2) | Video+audio+texto | `reference_to_video` |
+| **Video** (clip previo que Omni ya generó y persistió con `store:true`) | ✅ **verificado 2026-07-20** (edición stateful real por Gemini-key) | Video+audio+texto | `edit` vía `previous_interaction_id` (superficie **Gemini-key**; Vertex keyless → `400`) |
 | **Audio de referencia** | 📄 **NO soportado** en preview (*"uploading audio references is unsupported"*) | — | — |
 | **Múltiples videos de referencia** | 📄 NO soportado (solo 1 video ref) | — | — |
 | **URL de YouTube como fuente** | 📄 NO soportado | — | — |
 
-- **Salida siempre:** MP4 720p con **pista de audio AAC embebida** + un `part` de texto "thinking" (se ignora). En Vertex es obligatorio pedir `responseModalities: ["TEXT","VIDEO"]` (ver contrato).
+- **Salida siempre:** MP4 720p con **pista de audio AAC embebida** + un `step` de tipo `thought` (se ignora). El video sale en `steps[type='model_output'].content[type='video']` → `data` (base64, ≤4MB) o `uri` (>4MB). En la Interactions API el formato de salida se pide con `response_format:{type:"video", aspect_ratio:"16:9"|"9:16"}` (ver contrato §4). El viejo `responseModalities:["TEXT","VIDEO"]` era de `generateContent` — **ya no aplica**.
 - **La entrada de audio se compensa por texto:** no puedes pasar una pista, pero describes el audio deseado en el prompt y el modelo lo sintetiza.
-- **Nota de discrepancia:** algunos docs dicen que el video-ref "se acepta en el schema pero no se procesa bien todavía"; **nosotros SÍ obtuvimos edición video-to-video coherente** (mismo mundo, luz de amanecer agregada, cámara cambiada). Trátalo como funcional-con-caveat: prueba tu caso antes de escalar.
+- **Cómo se edita un video ahora:** el flujo canónico es **stateful** — generás con `store:true`, guardás el `interaction_id`, y editás encadenando `previous_interaction_id` en la superficie **Gemini-key** (Vertex keyless **no** edita: `previous_interaction_id` → `400`, `GET /interactions/{id}` → `500`). El viejo patrón de "pasar un `video/mp4` como `inlineData` a `generateContent`" **quedó retirado** junto con ese método. Editar videos **subidos** por el usuario sí existe pero está **bloqueado en EEA, Suiza y Reino Unido**.
 
 ### A.2 Tareas soportadas
 
 | Tarea | `video_config.task` | Qué hace | Estado |
 |---|---|---|---|
-| **Texto → video** | `text_to_video` | Genera clip desde prompt puro | ✅ (clip 10 s 720p 24 fps mp4) |
+| **Texto → video** | `text_to_video` | Genera clip desde prompt puro | ✅ (clip 3–10 s 720p 24 fps mp4; t2v keyless re-verificado 2026-07-20) |
 | **Imagen → video** | `image_to_video` | Anima una still / usa keyframe de inicio | ✅ (continuidad casi idéntica al still) |
 | **Referencia → video** | `reference_to_video` | Compone desde 2–6 imágenes (sujeto, entorno, estilo) | ✅ con 2 refs; 📄 hasta 6 |
-| **Editar video** | `edit` | Modifica un clip existente por lenguaje natural | ✅ (luz + cámara sobre clip previo, mismo mundo) |
+| **Editar video** | `edit` | Modifica un clip existente (stateful) por lenguaje natural | ✅ (stateful `previous_interaction_id` re-verificado 2026-07-20; **solo superficie Gemini-key**) |
 | **Extensión / interpolación de video** | — | Alargar o rellenar entre frames | 📄 **NO soportado** en preview |
 
-> En **Vertex/`generateContent` la tarea se INFIERE de las partes** que mandas (texto→t2v; texto+imagen→i2v; texto+video→edit). El parámetro explícito `video_config.task` es de la **Gemini API/Interactions**, no de Vertex. Ver `GEMINI_OMNI_VERTEX.md §2.3 / §4`.
+> En la **Interactions API la tarea se DECLARA explícita** con `generation_config.video_config.task` (`text_to_video` / `image_to_video` / `reference_to_video` / `edit`) — ya no se infiere de las partes como en el retirado `generateContent`. **Reparto por superficie:** la **generación** (`text_to_video`/`image_to_video`/`reference_to_video`) corre en **Vertex keyless** (o Gemini-key); la **edición** (`edit`) corre **solo en Gemini-key** con `previous_interaction_id` + `store:true`. Ver `GEMINI_OMNI_VERTEX.md §2.3 / §4`.
 
 ### A.3 Control creativo
 
@@ -55,7 +58,7 @@ Omni Flash es el modelo "any-to-any" de Google donde **el razonamiento de Gemini
 | **Iluminación** | Prompt en edición ("change the lighting to be more dramatic") | ✅ (agregamos luz de amanecer a un clip) |
 | **Aspecto** | `response_format.aspect_ratio`: `16:9` (default) / `9:16` | ✅ 16:9 (1280×720); 📄 9:16 |
 | **Resolución** | Sin selector | ✅ **720p único** verificado. Para 1080p/4k → Veo 3.1 |
-| **Duración** | Sin control | ✅ **10 s** verificado. "longer coming soon" ⚠️ volátil |
+| **Duración** | Sin control | ✅ **3–10 s** por request (10 s verificado). "longer coming soon" ⚠️ volátil |
 | **FPS** | Sin control | ✅ **24 fps** |
 | **Negative prompt** | Sin parámetro → **embébelo en el prompt** ("no text, no logos") | 📄 |
 | **Seed** | ❌ no existe → **no-determinismo**: misma prompt, clips distintos | 📄 para consistencia usa referencia fuerte, no seed |
@@ -92,9 +95,10 @@ Omni **genera imagen y sonido juntos en un solo pase de difusión** — el audio
 | **Voz / audio del clip** | ❌ | *"voice editing is not supported"* |
 | **Extender / interpolar** | ❌ | no soportado en preview |
 
-- **Multi-turno stateful:** encadenas ediciones con `previous_interaction_id` (Gemini API) — **recuerda el video** y aplica el cambio **preservando lo que no tocas**. Es el diferenciador central: iteras "hablándole" en vez de regenerar desde cero.
+- **Multi-turno stateful:** encadenas ediciones con `previous_interaction_id` en la **superficie Gemini-key** (`generativelanguage.googleapis.com`) — **recuerda el video** y aplica el cambio **preservando lo que no tocas**. Es el diferenciador central: iteras "hablándole" en vez de regenerar desde cero. **Requisitos duros:** el clip base tuvo que generarse con `store:true` (si `store:false`, no se puede editar/recuperar después); el preview aguanta **~3 ediciones secuenciales** encadenadas; la **retención del store** es **55 días en tier pago / 1 día en free**. La **superficie Vertex keyless NO edita**: `previous_interaction_id` → `400`, `GET /interactions/{id}` → `500`.
 - **Inpaint temporal:** implícito en "make X invisible / put Y on" — edición localizada que respeta el resto de los frames.
 - **⚠️ Restricción regional:** editar videos **subidos por el usuario** NO está disponible en EEA, Suiza y Reino Unido.
+- **⚠️ Generación de personas RAI-gated:** la generación/edición con personas está detrás de un allowlist RAI (Responsible AI) — no asumas acceso; verifica el gate del proyecto antes de comprometer un flujo con personajes humanos.
 - **Gate que no negocia:** `completed` prueba que el provider terminó, no que el plano conserva continuidad. Revisa el video entero a 1× y 0.5×, más contact sheet. Si sólo necesitas retime/orden, termina el mismo master; pero si el ajuste cambia una actuación física hero o un practical que debe vivir dentro del set, crea una toma integral nueva: no lo reconstruyas con overlay ni retime. Para foley nativo pedido expresamente, úsalo sólo como guía y conserva eventos que pasen su propio gate de escucha.
 
 ### A.6 Límites del nivel preview (Flash, 2026-07-05)
@@ -102,10 +106,14 @@ Omni **genera imagen y sonido juntos en un solo pase de difusión** — el audio
 | Límite | Valor | ⚠️ |
 |---|---|---|
 | Resolución máx | **720p (1280×720)** — sin selector | volátil (1080p/4k prometido) |
-| Duración máx | **10 s** por request | volátil ("longer soon") |
+| Duración | **3–10 s** por request (sin selector) | volátil ("longer soon") |
 | FPS | 24, fijo | — |
 | Nº imágenes de referencia | 2 ✅ / hasta 6 📄 | volátil |
-| Nº videos de referencia | 1; **10 s procesados en Interactions** durante el piloto Glitch | Verificar límite vigente antes de producción |
+| Nº videos de referencia | 1; encadenado por `previous_interaction_id` (Gemini-key) | Verificar límite vigente antes de producción |
+| Ediciones stateful encadenadas | **~3 secuenciales** en preview; requiere `store:true` | volátil |
+| Retención del store (para editar/recuperar) | **55 días pago / 1 día free** | volátil (política de preview) |
+| Edición | **solo superficie Gemini-key**; Vertex keyless no edita (`400`/`500`) | fijo mientras dure el split de superficies |
+| Generación de personas | **RAI-gated (allowlist)** — no asumas acceso | verificar gate del proyecto |
 | Audio de entrada | no soportado | volátil ("not yet") |
 | Extensión/interpolación | no soportado | volátil |
 | Idioma | **inglés pleno**; otros no evaluados | prueba es antes de confiar |
@@ -128,8 +136,8 @@ Omni **genera imagen y sonido juntos en un solo pase de difusión** — el audio
 | **Costo 720p** | $0.10/s | $0.10/s (Fast) | Créditos | Créditos | Créditos |
 
 **Qué hace Omni que otros no (tan bien):**
-1. **Editar el video hablándole, multi-turno, preservando el resto** — el resto regenera.
-2. **Componer una toma desde texto + varias imágenes + video simultáneos** con razonamiento del mundo.
+1. **Editar el video hablándole, multi-turno stateful, preservando el resto** (`previous_interaction_id`, superficie Gemini-key) — el resto regenera. Contra un one-shot como Veo Fast (`veo-3.0-fast-generate-001`, `predictLongRunning`, un solo pase sin conversación), este es el diferenciador de raíz.
+2. **Componer una toma desde texto + varias imágenes simultáneas** con **razonamiento multimodal del mundo** (linaje Genie/Gemini).
 3. **Audio nativo que entiende el contenido de la escena** (multitud vs. vacío) sin post.
 
 **Qué hacen otros que Omni no (todavía):**
@@ -137,24 +145,26 @@ Omni **genera imagen y sonido juntos en un solo pase de difusión** — el audio
 - **Runway/Kling:** control de cámara nombrado, storyboarding, workflow de equipo.
 - **Seedance:** calidad de generación pura #1 y coherencia audio-video por espacio.
 
-> **Regla de router:** si el valor está en **iterar/editar el video** o en **razonar el mundo desde inputs mixtos** → Omni. Si está en **calidad final, resolución alta, clip largo o cámara dirigida** → Veo/Kling/Runway. Ver también `../STUDIO_TOOLING.md §Router de producción`.
+> **Regla de router:** si el valor está en **iterar/editar el video hablándole (stateful)** o en **razonar el mundo desde inputs mixtos** → Omni (edit = superficie Gemini-key). Si está en **calidad final, resolución alta, clip largo, cámara dirigida o un render one-shot sin conversación** → Veo (`veo-3.0-fast-generate-001`, `predictLongRunning`) / Kling / Runway. Ver también `../STUDIO_TOOLING.md §Router de producción`.
 
 ### A.8 Tabla maestra "verificado ✅ / documentado 📄 / marketing 📣 / no probado ⬜"
 
 | Capacidad | Estado | Evidencia |
 |---|---|---|
-| text_to_video | ✅ | clip 10 s 720p 24 fps mp4 |
+| text_to_video | ✅ | clip 3–10 s 720p 24 fps mp4; keyless por Vertex re-verificado 2026-07-20 |
 | image_to_video (1 ref) | ✅ | continuidad casi idéntica al still |
 | **reference_to_video (2 imágenes)** | ✅ | mezcló estadio vacío + estadio con multitud en una toma |
 | reference_to_video (3–6 imágenes) | 📄 | tags `<IMAGE_REF_n>` en docs |
-| video como referencia / continuación | ✅ | clip mp4 inline como fuente |
-| **edición video-to-video** | ✅ | luz de amanecer + cambio de cámara, mismo mundo |
+| **generación keyless por Vertex (Interactions)** | ✅ | 2026-07-20: t2v ADC Bearer, sin API key → `200 completed`, MP4 inline ~3.5MB |
+| video como referencia / continuación | ✅ (histórico) | probado sobre `generateContent` (2026-07-05, método ya retirado); hoy la edición es stateful por `previous_interaction_id` |
+| **edición stateful (`edit` + `previous_interaction_id`)** | ✅ | 2026-07-20: por Gemini-key → `200 completed`; luz de amanecer + cambio de cámara, mismo mundo |
 | **audio nativo sincronizado y contextual** | ✅ | multitud −15.4 dB vs. vacío −16.8 dB; mp4 con pista AAC |
-| Vertex infiere la tarea por las partes | ✅ | texto→t2v, +imagen→i2v, +video→edit |
+| tarea declarada explícita (`video_config.task`, Interactions) | ✅ | `text_to_video`/`image_to_video`/`reference_to_video`/`edit` en el body snake_case |
 | iluminación editable | ✅ | verificado en edición |
 | cámara editable | ✅ | verificado en edición |
 | objetos / wardrobe / estilo editables | 📄 | ejemplos oficiales |
-| multi-turno stateful (`previous_interaction_id`) | 📄 | Interactions API |
+| multi-turno stateful (`previous_interaction_id`) | ✅ | Interactions API, superficie Gemini-key; re-verificado 2026-07-20 |
+| generación de personas | 📄 | **RAI-gated (allowlist)** — no probado por nosotros |
 | física / world simulation (Genie) | 📄 | *"intuitive understanding of physics"* |
 | SFX / foley / ambiente / música | 📄 | single-pass audio+video |
 | diálogo generado | 📄 / ⬜ | documentado, no probado |
@@ -169,22 +179,22 @@ Omni **genera imagen y sonido juntos en un solo pase de difusión** — el audio
 
 ## PARTE B — Mapa de sinergia con las skills "studio" (lo más importante)
 
-La tesis: **Omni casi nunca trabaja solo.** Deforma texto/logos, tapa a 720p, dura 10 s y su audio es scratch. Cada una de esas debilidades la **cubre una skill hermana**, y cada fortaleza de Omni **alimenta a las demás**. Acá está el cruce capacidad-por-capacidad.
+La tesis: **Omni casi nunca trabaja solo.** Deforma texto/logos, tapa a 720p, dura ≤10 s y su audio es scratch. Cada una de esas debilidades la **cubre una skill hermana**, y cada fortaleza de Omni **alimenta a las demás**. Acá está el cruce capacidad-por-capacidad.
 
 ### B.1 Tabla de sinergia — Capacidad Omni → skill que aporta/refina → cómo → resultado
 
 | Capacidad Omni | Skill que aporta el INPUT o refina el OUTPUT | Cómo se combinan | Resultado |
 |---|---|---|---|
-| **image_to_video / reference_to_video** | `design-studio` + `greenhouse-ai-image-generator` | Generas el **keyframe** exacto (KV, still on-brand) con la matriz de modelos de imagen (Nano Banana 2 Lite, GPT Image, Recraft, Flux, Ideogram) → lo pasas como `inlineData` a Omni | Video que **arranca del arte que tú controlas**, no de la lotería del prompt |
+| **image_to_video / reference_to_video** | `design-studio` + `greenhouse-ai-image-generator` | Generas el **keyframe** exacto (KV, still on-brand) con la matriz de modelos de imagen (Nano Banana 2 Lite, GPT Image, Recraft, Flux, Ideogram) → lo pasas como `{type:"image", data, mime_type}` en el `input` de la Interactions API (superficie **Vertex keyless** para generar) | Video que **arranca del arte que tú controlas**, no de la lotería del prompt |
 | **reference_to_video multi-imagen (2–6)** | `design-studio` | Generas N stills coherentes (sujeto + entorno + paleta) y los mandas juntos → Omni los compone en una toma | **Composición dirigida**: mezclas elementos (verificado: estadio vacío + con multitud) sin depender de que el prompt acierte |
 | **Reference-chaining (frame previo → i2v)** | `design-studio` (retoca el frame) + este estudio (`../workflows/reference-chaining.md`) | Extraes el **último frame** de la toma anterior, lo limpias/ajustas, y lo usas como referencia del beat siguiente | **Continuidad entre tomas** — cura la "desconexión" de clips text-to-video sueltos |
-| **edición conversacional multi-turno** | este estudio (dirección) + `../modules/06_EDITING_MONTAGE_PACING.md` + workflow E | Iteras una intención acotada, persistes el interaction ID y haces gate temporal; si el cambio es editorial, retimas el mismo master | Cobertura de una misma escena sin re-shoot, o finish controlado sin gastar un render nuevo |
+| **edición conversacional multi-turno (stateful)** | este estudio (dirección) + `../modules/06_EDITING_MONTAGE_PACING.md` + workflow E | Generás con `store:true`, iteras una intención acotada por `previous_interaction_id` (superficie **Gemini-key**), persistes el interaction ID y haces gate temporal; si el cambio es editorial, retimas el mismo master de forma determinista | Cobertura de una misma escena sin re-shoot, o finish controlado sin gastar un render nuevo |
 | **audio nativo contextual** | `audio-studio` (voz ElevenLabs/Seed Audio, música, SFX, mezcla, mastering, loudness) + `../modules/07_SOUND_MUSIC_DESIGN.md` | Usas el audio de Omni como **scratch** que ya trae ritmo/textura; si se necesita rescatar un foley, segmentas sus eventos y los montas sobre la placa aprobada → en `audio-studio` reemplazas VO, subes música con licencia, y **mezclas a loudness de entrega** (−14 LUFS web / −16 social) | Audio **final de calidad broadcast**, no el scratch generativo |
 | **techo 720p** | Magnific (MCP+API) + Higgsfield `upscale_video` + `../modules/08_COLOR_GRADE_FINISH.md` | **Video Sequence Enhancement** de Magnific (upscale frame-consistent, no frame-a-frame) sube el clip a 1080p/4K sin romper continuidad; grade en Resolve | Master en **1080p+**, color final, listo para entrega |
 | **deforma texto / logos / UI** | Playwright (UI crisp) + `../workflows/ui-without-after-effects.md` + `../workflows/hybrid-world-plus-ui.md` | Omni pinta el **plate cinematográfico de fondo** (atmósfera/cámara/profundidad); el **texto/logo/UI exacto** se compone encima como asset real (HTML+Playwright a 1280×720, o mograph AE) | Fondo cine + **micro-texto y logo nítidos y exactos** — nunca confías la exactitud al modelo |
 | **cámara solo por texto (sin presets)** | Higgsfield Cinema Studio (`../STUDIO_TOOLING.md`) | Si necesitas **cámara nombrada y repetible** (dolly, crash-zoom, orbit, focal length) → produces esa toma en Higgsfield; Omni queda para edición/mundo | Movimiento de cámara **dirigido y consistente** entre tomas |
 | **consistencia de personaje limitada** | Higgsfield **Soul ID** + `design-studio` | Entrenas el rostro en Soul ID (3–5 fotos) o generas un still canónico del personaje → lo pasas a Omni como referencia en cada toma | Personaje **reconocible** aun con el límite de Omni |
-| **duración 10 s** | este estudio (`../workflows/reference-chaining.md`) + `../modules/06` | Encadenas clips de 10 s (cada uno partiendo del frame anterior) y los montas | Piezas **más largas** hiladas por continuidad + corte |
+| **duración ≤10 s** | este estudio (`../workflows/reference-chaining.md`) + `../modules/06` | Encadenas clips de 3–10 s (cada uno partiendo del frame anterior) y los montas | Piezas **más largas** hiladas por continuidad + corte |
 | **formato/entrega** | `social-media-studio` | Tomas el master y adaptas duración, **safe-zones y aspecto por red** (9:16 vertical, 1:1, 16:9); Omni ya puede salir 9:16 de fábrica para acortar el paso | Corte **por red**, listo para publicar |
 | **VFX / composite** | `../modules/11_VFX_COMPOSITING.md` (Nuke/Fusion/AE, Mocha, Runway roto, Beeble relight) | Omni da el plate; el composite integra CGI, keying, cleanup, relight | Integración de precisión que Omni no hace |
 | **dirección / storyboard** | `../modules/04_STORYBOARD_ANIMATIC.md` + `templates/` | Validas ritmo en **animatic barato** ANTES de gastar créditos en tomas Omni | Menos quema de créditos; ritmo aprobado antes de producir |
@@ -216,18 +226,23 @@ El pipeline que exprime cada fortaleza y tapa cada debilidad. **Dirige el humano
    velocidad + coherencia de familia). 1–2 keyframes por beat: inicio (+ fin).
    → controlas el arte, no la lotería del prompt
 
-2. PRODUCE TOMAS  (Omni i2v / reference_to_video)
-   Pasa el/los keyframe(s) como inlineData → Omni anima.
+2. PRODUCE TOMAS  (Omni t2v / i2v / reference_to_video — Interactions API)
+   Genera con la Interactions API: keyframe como {type:"image", data, mime_type}
+   en el `input` → Omni anima. Superficie de GENERACIÓN = Vertex keyless (o Gemini-key).
+   Genera con store:true si vas a editar después.
    Multi-ref (2–6) cuando compones elementos en una toma.
-   Personaje → refuerza con Soul ID / still canónico.
+   Personaje → refuerza con Soul ID / still canónico (y ojo: personas RAI-gated).
    Cámara nombrada repetible → esa toma en Higgsfield Cinema Studio.
 
 3. CONTINUIDAD  (Omni reference-chaining — ../workflows/reference-chaining.md)
    Último frame de la toma N → referencia de la toma N+1 + prompt del beat.
-   → cura la desconexión entre clips de 10 s.
+   → cura la desconexión entre clips de 3–10 s.
 
-4. VARIACIONES / COBERTURA  (Omni edit multi-turno)
-   Sobre un clip elegido, itera hablándole: luz, cámara, wardrobe, estilo.
+4. VARIACIONES / COBERTURA  (Omni edit stateful — superficie Gemini-key)
+   Sobre un clip elegido (generado con store:true), itera hablándole por
+   previous_interaction_id: luz, cámara, wardrobe, estilo. ~3 ediciones
+   secuenciales en preview; el store retiene 55d pago / 1d free.
+   Vertex keyless NO edita → usa Gemini-key para este paso.
    → cobertura de la escena para editar con ritmo.
 
 4b. GATE TEMPORAL → RUTA CORRECTA  (`workflows/omni-in-place-edit-and-deterministic-finish.md`)
@@ -293,8 +308,9 @@ El pipeline que exprime cada fortaleza y tapa cada debilidad. **Dirige el humano
 - WaveSpeed — *Omni Flash vs Seedance 2.0 vs Kling 3.0*: https://wavespeed.ai/blog/posts/gemini-omni-flash-vs-seedance-2-kling-3/
 - Artificial Analysis Video Arena (Elo Seedance/Kling/Veo/Sora), vía Medium *"does it beat Seedance 2?"*: https://medium.com/ai-analytics-diaries/googles-omni-video-model-impressive-but-does-it-beat-seedance-2-1d2cd3d23dc2
 - Morphic / MindStudio / Artlist (audio nativo, lip-sync — **claims de terceros, marcados 📣**): https://morphic.com/resources/models/gemini-omni · https://www.mindstudio.ai/blog/what-is-gemini-omni-flash · https://artlist.io/blog/gemini-omni-flash/
-- **Verificación runtime propia** — `efeonce-group`, Vertex `global`, 2026-07-05 (ver `GEMINI_OMNI_VERTEX.md §9`).
-- **Contrato operativo hermano** (endpoint/auth/pricing/gotchas): `./GEMINI_OMNI_VERTEX.md`.
+- Gemini API — *Interactions API* (superficie oficial de Omni; reemplazó `generateContent`): https://ai.google.dev/gemini-api/docs/omni
+- **Verificación runtime propia** — migración a Interactions API `efeonce-globe` **2026-07-20** (t2v keyless Vertex + edit stateful Gemini-key); base histórica `efeonce-group`, Vertex `global`, 2026-07-05 sobre `generateContent` (método retirado). Detalle en `GEMINI_OMNI_VERTEX.md §0/§9`.
+- **Contrato operativo hermano** (endpoints, dos superficies, auth, pricing, gotchas): `./GEMINI_OMNI_VERTEX.md` — **fuente de verdad del contrato de invocación**.
 - **Pipeline del estudio**: `../STUDIO_TOOLING.md` · `../workflows/` · `../modules/06,07,08,09,10,11`.
 
 > Nota de método: los datos ✅ son verificación directa nuestra y **prevalecen** sobre docs/prensa si hay drift. Los 📣 son marketing de terceros describiendo el modelo full — no el preview Flash — y NO se prometen a cliente sin verificar. Reverifica lo ⚠️ volátil antes de cablear producción.
