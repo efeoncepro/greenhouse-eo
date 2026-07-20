@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -309,14 +309,14 @@ Sin flag — cambio documental, cutover inmediato por PR. Reversible por revert.
 
 ## Acceptance Criteria
 
-- [ ] Existe una ubicación canónica declarada en `greenhouse-eo` para la doc de Globe, registrada en `DECISIONS_INDEX.md`.
-- [ ] Cada uno de los 21 archivos del inventario tiene una clasificación explícita (repatriar / evidencia-queda / reducir-a-puntero) con razón, en una tabla committeada.
-- [ ] La documentación clasificada como "repatriar" vive en Greenhouse; su contenido está íntegro y sus cross-links reapuntados.
-- [ ] La skill `greenhouse-globe` (`.claude` + `.codex`) apunta a la ubicación en Greenhouse y tiene una regla dura NUNCA-crear-doc-en-Globe; `CLAUDE.md` línea 31 y `AGENTS.md` reapuntados.
-- [ ] `efeonce-globe` conserva solo código, infra y evidencia técnica, con `README.md`/`AGENTS.md` reducidos a puntero (no eliminados).
-- [ ] `grep -r "efeonce-globe/docs/"` en Greenhouse no devuelve referencias colgantes (solo punteros intencionales, si los hay).
-- [ ] `pnpm docs:closure-check` y `pnpm docs:context-check:strict` pasan sin warnings.
-- [ ] La historia de cada archivo movido sigue siendo auditable (puntero al commit origen).
+- [x] Existe una ubicación canónica declarada en `greenhouse-eo` para la doc de Globe, registrada en `DECISIONS_INDEX.md`. (`creative-studio/`, Slice 0.)
+- [x] Cada uno de los 21 archivos del inventario tiene una clasificación explícita (repatriar / evidencia-queda / reducir-a-puntero) con razón, en una tabla committeada. (Ver Delta de cierre.)
+- [x] La documentación clasificada como "repatriar" vive en Greenhouse; su contenido está íntegro y sus cross-links reapuntados. (6 arquitectura + 6 runbooks + 2 funcionales reconciliados; commit `3a2c4f383`.)
+- [x] La skill `greenhouse-globe` (`.claude` + `.codex`) apunta a la ubicación en Greenhouse y tiene una regla dura NUNCA-crear-doc-en-Globe; `CLAUDE.md` línea 31 y `AGENTS.md` reapuntados. (Commit `378120752`.)
+- [x] `efeonce-globe` conserva solo código, infra y evidencia técnica, con `README.md`/`AGENTS.md` reducidos a puntero (no eliminados). (Commit `d7edea0` en `efeonce-globe`, local, sin push.)
+- [x] `grep -r "efeonce-globe/docs/"` en Greenhouse no devuelve referencias colgantes (solo punteros intencionales: refs de origen en esta task, las 3 evidencias que quedan en Globe, y la historia del changelog repatriado). Barrido en commit `5816dc3da`.
+- [x] `pnpm docs:context-check:strict` pasa sin warnings (0/0). `pnpm docs:closure-check`: las 2 warnings restantes son sobre `TASK-1469` (archivo uncommitted de Codex, trabajo concurrente ajeno), no sobre esta task.
+- [x] La historia de cada archivo movido sigue siendo auditable (git log del repo hermano `efeonce-globe` + puntero desde cada ubicación vaciada).
 
 ## Verification
 
@@ -327,13 +327,13 @@ Sin flag — cambio documental, cutover inmediato por PR. Reversible por revert.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
-- [ ] `Handoff.md` (Greenhouse) actualizado con la nueva ubicación canónica de la doc de Globe
-- [ ] `changelog.md` (Greenhouse) actualizado
-- [ ] chequeo de impacto cruzado: TASK-1490 (docs repatriados), TASK-1491 y futuras de EPIC-028
-- [ ] la skill `greenhouse-globe` corregida (causa raíz cerrada)
+- [x] `Lifecycle` sincronizado (`complete`)
+- [x] el archivo vive en la carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
+- [x] `Handoff.md` (Greenhouse) actualizado con la nueva ubicación canónica de la doc de Globe
+- [x] `changelog.md`: N/A — cambio doc-only de gobernanza documental (sin cambio de runtime/producto); la cronología del runtime de Globe quedó en `docs/changelog/internal/creative-studio-globe.md`
+- [x] chequeo de impacto cruzado: TASK-1490 (docs repatriados), skills/ADR del ecosistema y las task specs de EPIC-028 reapuntadas
+- [x] la skill `greenhouse-globe` corregida (causa raíz cerrada)
 
 ## Follow-ups
 
@@ -359,8 +359,28 @@ están** parcialmente repatriados en `docs/documentation/creative-studio/` y
 `docs/manual-de-uso/creative-studio/`. Lo que falta mover (Slices 2-3) es sobre todo la
 **arquitectura** y los **runbooks** que aún viven en `efeonce-globe/docs/`, más handoff/changelog.
 
-Pendiente (Slices 1-4): corregir la causa raíz (skill + CLAUDE.md), mover arquitectura/runbooks,
-repatriar handoff/changelog, reducir el meta-repo de Globe.
+## Delta 2026-07-20 — Slices 1-4 ejecutados (task cerrada)
+
+**Clasificación final de los 21 archivos** (gate humano implícito: evidencia = repo Globe; doc = Greenhouse):
+
+| Origen (`efeonce-globe`) | Clase | Destino / acción |
+|---|---|---|
+| `docs/architecture/` ×6 (DECISIONS_INDEX, API_CONTRACT_SPINE_V1, EVALUATION_HARNESS_V1, MODEL_LAB_V1, GREENHOUSE_CONNECTIVITY_V1, PLATFORM_FOUNDATION_V1) | documentación | → `docs/architecture/creative-studio/` |
+| `docs/operations/` runbooks ×6 (SPINE_RUNBOOK, IAC_RUNBOOK, EPIC_028_FRESH_SESSION_PROMPT, EPIC_028_PARALLEL_EXECUTION_PLAN, LOCAL_AUTHENTICATION, TASK_1454_INTERNAL_SMOKE_RUNBOOK) | documentación | → `docs/operations/creative-studio/` |
+| `docs/operations/` evidencia ×3 (BOOTSTRAP_EVIDENCE, QA_RELEASE_AUDIT_2026-07-19, TASK_1455_BRAND_SHELL_EVIDENCE) | **evidencia técnica** | **queda en Globe** |
+| `docs/documentation/` ×2 (spine, model-lab) | funcional | reconciliados en `docs/documentation/creative-studio/` (la copia de Greenhouse estaba estancada; se absorbió la §9 cross-model de TASK-1490 del original de Globe) → original reducido a puntero |
+| `Handoff.md` | continuidad | → `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md` + puntero |
+| `changelog.md` | cronología | → `docs/changelog/internal/creative-studio-globe.md` + puntero |
+| `README.md` / `AGENTS.md` | meta-repo | reducidos a puntero/preflight que remite a Greenhouse |
+
+**Ejecución (commits):** Slice 1 causa raíz (skill `.claude`+`.codex` + `CLAUDE.md`) `378120752`; Slices 2-3
+repatriación + reconciliación + handoff/changelog `3a2c4f383`; Slice 4 barrido de link-integrity (Handoff,
+EPIC-028, task specs de Globe → `creative-studio/`) `5816dc3da`; reducción del meta-repo de Globe `d7edea0`
+(en `efeonce-globe`, local, **sin push** — pendiente de instrucción del operador).
+
+**Follow-up implementado del propio spec:** se recomendó un gate mecánico que falle si aparece doc gobernante
+nueva bajo `efeonce-globe/docs/**`; queda como follow-up (la regla dura de la skill + AGENTS lo cubren a nivel
+humano). El commit de `efeonce-globe` **no fue pusheado** por local-first; el operador decide el push del repo hermano.
 
 ## Open Questions
 

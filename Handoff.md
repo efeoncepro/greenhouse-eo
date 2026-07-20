@@ -21,6 +21,13 @@
 
 ## Pendientes inmediatos
 
+- **`TASK-1492` COMPLETE (repatriación documental Globe → Greenhouse).** La doc gobernante de Globe vive
+  ahora en `greenhouse-eo` bajo `creative-studio/` (arquitectura, runbooks, funcional, manuales), + continuidad
+  de runtime en `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md` y changelog en
+  `docs/changelog/internal/creative-studio-globe.md`. La skill `greenhouse-globe` + `CLAUDE.md` corrigieron la
+  causa raíz (regla dura: NUNCA doc gobernante en `efeonce-globe/docs/**`). **Pendiente de instrucción del
+  operador:** el commit de reducción del meta-repo en `efeonce-globe` (`d7edea0`, borra los docs repatriados,
+  deja solo código/infra/evidencia + punteros) está **local, sin push**. Push del repo hermano = decisión humana.
 - `TASK-1489` quedó registrada como foundation P0 de IaC GCP para Greenhouse. Orden obligatorio: inventario
   brownfield → ADR aceptada → scaffold/state/CI no mutante → plan con cero destroy/replace → apply supervisado
   opcional → cutover de ownership/drift. La task no autoriza apply por sí sola, no comparte state con Globe, no
