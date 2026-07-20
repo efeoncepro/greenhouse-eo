@@ -51,7 +51,7 @@ El broker reusable de `TASK-948` conserva `KORTEX_OPERATOR_SCOPE` y mensajes/pol
 - `docs/architecture/GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md`
 - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
 - `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
-- `../efeonce-globe/docs/architecture/GREENHOUSE_CONNECTIVITY_V1.md`
+- `docs/architecture/creative-studio/GREENHOUSE_CONNECTIVITY_V1.md`
 
 Reglas obligatorias:
 
@@ -72,7 +72,7 @@ Reglas obligatorias:
 - `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`
 - `docs/tasks/in-progress/TASK-948-greenhouse-identity-broker-kortex-sso.md`
 - `../efeonce-globe/AGENTS.md`
-- `../efeonce-globe/docs/operations/LOCAL_AUTHENTICATION.md`
+- `docs/operations/creative-studio/LOCAL_AUTHENTICATION.md`
 
 ## Dependencies & Impact
 

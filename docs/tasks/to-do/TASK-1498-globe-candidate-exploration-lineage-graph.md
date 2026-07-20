@@ -65,8 +65,8 @@ Revisar y respetar:
 - `docs/architecture/creative-studio/GLOBE_STUDIO_WORKBENCH_BACKEND_GAP_ANALYSIS_V1.md` — fuente del gap (categoría ②).
 - `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` — principio heredado/adaptado por Globe.
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
-- `../efeonce-globe/docs/architecture/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md` — spine de contratos (TASK-1481).
-- `../efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md` — dominio Model Lab + linaje.
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md` — spine de contratos (TASK-1481).
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md` — dominio Model Lab + linaje.
 
 Reglas obligatorias:
 
@@ -80,7 +80,7 @@ Reglas obligatorias:
 
 - `docs/tasks/TASK_PROCESS.md`
 - `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`
-- `../efeonce-globe/docs/operations/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`
+- `docs/operations/creative-studio/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`
 
 ## Dependencies & Impact
 
@@ -330,7 +330,7 @@ Cambio additive del dominio `efeonce-globe`, gateado por el kill switch del Lab 
 - [ ] `changelog.md` quedó actualizado si cambió comportamiento, estructura o protocolo visible
 - [ ] se ejecutó chequeo de impacto cruzado sobre otras tasks afectadas (en particular `TASK-1474`, cuya sección "Depends on"/"Already exists" se actualiza cuando estos readers existan)
 
-- [ ] Los tres readers quedaron documentados en `../efeonce-globe/docs/documentation/efeonce-globe-model-lab.md`.
+- [ ] Los tres readers quedaron documentados en `docs/documentation/creative-studio/efeonce-globe-model-lab.md`.
 
 ## Follow-ups
 

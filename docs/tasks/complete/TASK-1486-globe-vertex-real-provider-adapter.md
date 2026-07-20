@@ -49,9 +49,9 @@ TASK-1457 dejó el Model Lab operando con un `FakeReferenceAdapter` determiníst
 
 Revisar y respetar (en el repo hermano `efeonce-globe`, salvo indicación):
 
-- `efeonce-globe/docs/architecture/PLATFORM_FOUNDATION_V1.md` (invariantes 6, 9, 12: primer provider call por el seam; ejecución del Lab ≠ promoción de ruta)
-- `efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md` (SPEC-002: aggregate, spend fence, kill switch, provider seam)
-- `efeonce-globe/docs/architecture/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md` (SPEC-001: coverage, trusted context, errores canónicos)
+- `docs/architecture/creative-studio/PLATFORM_FOUNDATION_V1.md` (invariantes 6, 9, 12: primer provider call por el seam; ejecución del Lab ≠ promoción de ruta)
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md` (SPEC-002: aggregate, spend fence, kill switch, provider seam)
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md` (SPEC-001: coverage, trusted context, errores canónicos)
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md` (bridge Greenhouse↔Globe)
 
 Reglas obligatorias:
@@ -91,7 +91,7 @@ Reglas obligatorias:
 - `efeonce-globe/apps/creative-runner/src/vertex-adapter.test.ts` (nuevo) — tests con transporte mockeado.
 - `efeonce-globe/apps/creative-runner/src/index.ts` (export del adapter).
 - `efeonce-globe/apps/studio-web/src/app.ts` (provider-selection wiring: fake default; vertex detrás de `GLOBE_LAB_PROVIDER`).
-- `efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md` (§ provider real / routing) o un doc/adapter nuevo.
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md` (§ provider real / routing) o un doc/adapter nuevo.
 - `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `Handoff.md`, `changelog.md` (control plane Greenhouse).
 
 ## Current Repo State

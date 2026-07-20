@@ -49,8 +49,8 @@ TASK-1486 dejó el `VertexCreativeAdapter` code-complete + verificado en vivo pa
 
 Revisar y respetar (en el repo hermano `efeonce-globe`, salvo indicación):
 
-- `efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md` (SPEC-002: provider seam, § Realización del adapter real)
-- `efeonce-globe/docs/architecture/PLATFORM_FOUNDATION_V1.md` (invariantes 6, 9, 12)
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md` (SPEC-002: provider seam, § Realización del adapter real)
+- `docs/architecture/creative-studio/PLATFORM_FOUNDATION_V1.md` (invariantes 6, 9, 12)
 - `.claude/skills/greenhouse-globe/SKILL.md` (provider boundary: Fal solo non-Google allowlisted; nunca un modelo Google por Fal; nunca compartir secreto entre Globe y Greenhouse)
 - `.claude/skills/greenhouse-ai-image-generator/references/seedream-5-gpt-image-2-hybrid-production.md` + `.claude/skills/motion-design-studio/workflows/engine-selection-by-fidelity-contract.md` (slugs verificados + evidencia motor-por-contrato)
 
@@ -88,7 +88,7 @@ Reglas obligatorias:
 - `efeonce-globe/apps/creative-runner/src/fal-adapter.test.ts` + `composite-adapter.test.ts` (nuevos) — tests mockeados.
 - `efeonce-globe/apps/creative-runner/src/index.ts` (exports).
 - `efeonce-globe/apps/studio-web/src/app.ts` (provider-selection `fal`/`composite` + `GLOBE_FAL_API_KEY`).
-- `efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md` (§ provider real — Fal + Composite).
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md` (§ provider real — Fal + Composite).
 - `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `Handoff.md`, `changelog.md` (control plane Greenhouse).
 
 ## Current Repo State

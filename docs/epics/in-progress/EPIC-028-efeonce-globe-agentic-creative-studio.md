@@ -173,7 +173,7 @@ scopeados al workspace y con limitaciones declaradas. Capability `globe.lab.eval
 (motion) y `TASK-1461` (audio) quedan desbloqueadas en su dependencia de harness y consumen el comando
 `evaluate` + readers de reporte; `TASK-1463` (readiness registry) ya dispone del `EvaluationReportV1`
 versionado como artefacto de evidencia para sus transiciones de estado. Spec canónica:
-`efeonce-globe/docs/architecture/EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md`.
+`docs/architecture/creative-studio/EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md`.
 
 ## Delta 2026-07-19 — stack de proveedores real + recommendation matrix (TASK-1486/1487/1488/1459)
 
@@ -195,7 +195,7 @@ temporal)—; y la recommendation matrix compara motores objetivamente, pero **e
 creativo** (el craft sigue siendo decisión humana; promover una ruta a producción es un gate separado). Follow-ups
 abiertos: resolución hash→bytes (desbloquea labs input-bearing + motion/audio), key Fal propia de Globe, deploy de
 `studio-web` y routing por contrato de fidelidad dentro del Composite. Spec canónica: el provider seam del Model Lab en
-el repo hermano (`efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md`).
+el repo hermano (`docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md`).
 
 ## Delta 2026-07-20 — TASK-1490 complete (refinar un candidato es transversal, no de un proveedor)
 
@@ -222,4 +222,4 @@ este carril. `TASK-1467` (asset provenance, rights y private ingest) sigue `to-d
 construidas: el store content-addressed completo —lectura y escritura— y la postura `derived-internal`, que
 impide blanquear un derivado como material propio y arrastra los derechos del padre a sus descendientes. El
 rollout del servicio `globe-studio-internal` se ejecutó en esta sesión; el estado vigente vive en `Handoff.md`.
-Spec canónica: `efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md` → §"Edit / refine cross-model".
+Spec canónica: `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md` → §"Edit / refine cross-model".

@@ -54,9 +54,9 @@ Revisar y respetar:
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
 - `docs/tasks/complete/TASK-1464-globe-iac-keyless-platform-foundation.md`
 - `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md`
-- `../efeonce-globe/docs/architecture/PLATFORM_FOUNDATION_V1.md`
-- `../efeonce-globe/docs/operations/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`
-- `../efeonce-globe/docs/operations/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`
+- `docs/architecture/creative-studio/PLATFORM_FOUNDATION_V1.md`
+- `docs/operations/creative-studio/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`
+- `docs/operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`
 
 Reglas obligatorias:
 

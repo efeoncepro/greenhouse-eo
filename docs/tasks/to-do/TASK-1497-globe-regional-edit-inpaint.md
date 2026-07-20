@@ -81,7 +81,7 @@ Revisar y respetar:
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md`
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
-- `../efeonce-globe/docs/architecture/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md` (TASK-1481 spine: command/reader transport-neutral + coverage)
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md` (TASK-1481 spine: command/reader transport-neutral + coverage)
 - `.claude/skills/greenhouse-globe/SKILL.md` (boundary Globe↔Greenhouse, provider seam, track B / private-ingest)
 - `docs/tasks/complete/TASK-1490-globe-cross-model-edit-refine-capability.md` (el seam de edit que esta task extiende)
 

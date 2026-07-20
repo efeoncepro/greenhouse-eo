@@ -46,7 +46,7 @@ TASK-1454 dejó Globe accesible pero devuelve JSON después del login y no tiene
 
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md`
-- `../efeonce-globe/docs/architecture/GREENHOUSE_CONNECTIVITY_V1.md`
+- `docs/architecture/creative-studio/GREENHOUSE_CONNECTIVITY_V1.md`
 - `docs/ui/GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md`
 - `DESIGN.md`
 
@@ -63,7 +63,7 @@ Reglas obligatorias:
 - `docs/tasks/TASK_UI_UX_ADDENDUM.md`
 - `.codex/skills/greenhouse-ai-design-studio/SKILL.md`
 - `docs/ui/visual-directions/TASK-1455-globe-internal-launch-direction.md`
-- `../efeonce-globe/docs/operations/TASK_1454_INTERNAL_SMOKE_RUNBOOK.md`
+- `docs/operations/creative-studio/TASK_1454_INTERNAL_SMOKE_RUNBOOK.md`
 
 ## Dependencies & Impact
 

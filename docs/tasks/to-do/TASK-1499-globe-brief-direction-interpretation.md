@@ -59,8 +59,8 @@ Revisar y respetar:
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md`
 - `docs/architecture/creative-studio/GLOBE_STUDIO_WORKBENCH_BACKEND_GAP_ANALYSIS_V1.md` (fuente del gap — fila "Dirección")
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
-- `../efeonce-globe/docs/architecture/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md` (spine: trusted context, coverage, conformance; repatriación pendiente por TASK-1492)
-- `../efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md` (Model Lab: readers/commands, kill switch, spend fence; repatriación pendiente por TASK-1492)
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md` (spine: trusted context, coverage, conformance; repatriación pendiente por TASK-1492)
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md` (Model Lab: readers/commands, kill switch, spend fence; repatriación pendiente por TASK-1492)
 - `.claude/skills/greenhouse-globe/SKILL.md` (contrato de arquitectura de Globe; boundary Globe↔Greenhouse, provider seam sagrado)
 
 Reglas obligatorias:

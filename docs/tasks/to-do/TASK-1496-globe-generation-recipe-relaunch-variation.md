@@ -98,8 +98,8 @@ Revisar y respetar:
 - `docs/architecture/creative-studio/GLOBE_STUDIO_WORKBENCH_BACKEND_GAP_ANALYSIS_V1.md` (categoría ②, fila
   TASK-1496)
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-creative-studio.md` `[verificar path exacto del EPIC-028]`
-- (repo hermano) `../efeonce-globe/docs/architecture/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md`
-- (repo hermano) `../efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md`
+- (repo hermano) `docs/architecture/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md`
+- (repo hermano) `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md`
 - `docs/tasks/complete/TASK-1481-globe-api-contract-spine-cross-surface-harness.md`
 - `docs/tasks/complete/TASK-1490-globe-cross-model-edit-refine-capability.md`
 

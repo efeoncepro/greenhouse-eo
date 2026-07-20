@@ -85,7 +85,7 @@ Revisar y respetar:
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md`
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/architecture/creative-studio/GLOBE_STUDIO_WORKBENCH_BACKEND_GAP_ANALYSIS_V1.md` (categoría ②)
-- (repo hermano) `efeonce-globe/docs/architecture/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md`
+- (repo hermano) `docs/architecture/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md`
 - Skill `greenhouse-globe` (obligatoria al tocar el boundary Globe↔Greenhouse) + `arch-architect`
   (forma/decisiones del contrato).
 
@@ -197,7 +197,7 @@ Reglas obligatorias:
 
 - Contrato existente a respetar: `PrepareExperimentPayloadV1`, `GLOBE_LAB_COMMANDS`/`GLOBE_LAB_READERS`,
   `LAB_COVERAGE`, `TrustedCommandContextV1` (spine TASK-1481);
-  `efeonce-globe/docs/architecture/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md`.
+  `docs/architecture/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md`.
 - Contrato nuevo o modificado: (1) tipo `StructuredBriefV1` + `structuredBrief?` aditivo en
   `PrepareExperimentPayloadV1`; (2) `compileStructuredBrief` (dominio); (3) recipe-registry
   command (`globe.lab.recipe.save` `[nombre a confirmar]`) + reader (`globe.lab.recipe.list` /

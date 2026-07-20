@@ -91,7 +91,7 @@ Revisar y respetar:
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md`
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/epics/in-progress/EPIC-028-*.md`
-- (repo hermano) `efeonce-globe/docs/architecture/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md`
+- (repo hermano) `docs/architecture/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md`
 - `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
 
 Reglas obligatorias (boundary DURO — repetir de TASK-1481/1490):
@@ -212,7 +212,7 @@ Reglas obligatorias (boundary DURO — repetir de TASK-1481/1490):
 ### Contract surface
 
 - Contrato existente a respetar: `PrepareExperimentPayloadV1`, `CreativeCapability` y el harness de
-  coverage/conformance del spine (`efeonce-globe/docs/architecture/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md`).
+  coverage/conformance del spine (`docs/architecture/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md`).
 - Contrato nuevo o modificado:
   - Campo `targetFormat?` (o `aspectRatio?`) en `PrepareExperimentPayloadV1`, enum transport-neutral
     `1:1 | 4:5 | 16:9 | 9:16` [nombre exacto del campo y de los literales — proponer y verificar

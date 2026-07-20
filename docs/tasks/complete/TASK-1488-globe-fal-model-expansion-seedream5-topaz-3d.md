@@ -47,7 +47,7 @@ TASK-1487 dejó el adapter Fal con 7 capabilities pero apuntando modelos con slu
 
 ## Architecture Alignment
 
-- `efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md` (SPEC-002: provider seam, § Realización)
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md` (SPEC-002: provider seam, § Realización)
 - `.claude/skills/greenhouse-globe/SKILL.md` (provider boundary: Fal solo non-Google; secreto propio de Globe)
 - `.claude/skills/greenhouse-ai-image-generator/references/seedream-5-gpt-image-2-hybrid-production.md` + `.claude/skills/motion-design-studio/**` + `.claude/skills/audio-studio/**` (slugs tested — fuente de verdad)
 
@@ -81,7 +81,7 @@ Reglas obligatorias:
 - `efeonce-globe/apps/creative-runner/src/fal-adapter.ts` (`FAL_ROUTING` +3 + slugs corregidos).
 - `efeonce-globe/apps/creative-runner/src/index.ts` (`FAKE_CREDITS` +3).
 - `efeonce-globe/apps/creative-runner/src/fal-adapter.test.ts`.
-- `efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md` (§ expansión + canary Fal).
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md` (§ expansión + canary Fal).
 - `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md` (fix prefijo ByteDance).
 - `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `Handoff.md`, `changelog.md`.
 

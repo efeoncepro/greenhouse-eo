@@ -140,7 +140,7 @@
 
 - Refinar un candidato pasó a ser **una sola semántica** para todo modelo editable en `efeonce-globe`:
   `editFrom = { experimentId }`; el paradigma (stateful vs reference-based) lo resuelve el seam según qué
-  proveedor va a ejecutar. Spec: `efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md`.
+  proveedor va a ejecutar. Spec: `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md`.
 - **Hallazgo que cambió el alcance:** la task daba por hecho que track B ya permitía re-inyectar un output
   previo. Era falso — los adapters hasheaban los bytes de salida y los **descartaban**, así que el paradigma
   reference-based fallaba en runtime, no en compilación. Se sumó Slice 0 (retención de outputs) como

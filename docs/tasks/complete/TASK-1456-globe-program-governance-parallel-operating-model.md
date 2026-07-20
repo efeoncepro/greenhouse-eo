@@ -44,8 +44,8 @@ Un único control plane documental y operativo en Greenhouse, sin namespace de t
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md`
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
-- `../efeonce-globe/docs/architecture/PLATFORM_FOUNDATION_V1.md`
-- `../efeonce-globe/docs/operations/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`
+- `docs/architecture/creative-studio/PLATFORM_FOUNDATION_V1.md`
+- `docs/operations/creative-studio/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`
 
 ## Normative Docs
 
@@ -70,7 +70,7 @@ Un único control plane documental y operativo en Greenhouse, sin namespace de t
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
 - `docs/tasks/README.md`
 - `docs/tasks/TASK_ID_REGISTRY.md`
-- `../efeonce-globe/docs/operations/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`
+- `docs/operations/creative-studio/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`
 
 ## Current Repo State
 

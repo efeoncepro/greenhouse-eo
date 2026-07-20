@@ -102,8 +102,8 @@ CLI, workers, sister platforms y E2E, aunque varias surfaces permanezcan `policy
 - `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
 - `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
-- `../efeonce-globe/docs/architecture/PLATFORM_FOUNDATION_V1.md`
-- `../efeonce-globe/docs/architecture/GREENHOUSE_CONNECTIVITY_V1.md`
+- `docs/architecture/creative-studio/PLATFORM_FOUNDATION_V1.md`
+- `docs/architecture/creative-studio/GREENHOUSE_CONNECTIVITY_V1.md`
 
 ## Normative Docs
 
@@ -130,7 +130,7 @@ CLI, workers, sister platforms y E2E, aunque varias surfaces permanezcan `policy
 - `../efeonce-globe/packages/domain/`
 - `../efeonce-globe/packages/sdk/`
 - `../efeonce-globe/apps/studio-web/` sólo para private HTTP adapter/discovery y conformance fixtures.
-- `../efeonce-globe/docs/architecture/` sólo para el contrato implementado/evidencia.
+- `docs/architecture/creative-studio/` sólo para el contrato implementado/evidencia.
 
 ### Cross-task ownership boundary
 
