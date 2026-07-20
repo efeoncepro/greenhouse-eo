@@ -1,5 +1,13 @@
 # TASK-1504 — Producer Capability Expansion (video frames/motion · audio change-voice/translate · multi-output omni · voice-preset registry)
 
+## Delta 2026-07-20
+
+- El catálogo de rutas donde estas capabilities declaran sus rutas **ya existe** (TASK-1500 complete):
+  agregar una ruta = editar `PRODUCER_ROUTE_CATALOG` + subir `PRODUCER_CATALOG_VERSION` en
+  `efeonce-globe/packages/domain/src/producer-catalog.ts` (drift guards abortan slug-leak/modality-mismatch).
+  Los `RouteInputMode` ricos (`frames`, `motion-source`, `source-audio`, `mention`) ya están en el vocabulario
+  de contracts; la ruta seed de video ya declara `frames`/`motion-source` como modos anunciados.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

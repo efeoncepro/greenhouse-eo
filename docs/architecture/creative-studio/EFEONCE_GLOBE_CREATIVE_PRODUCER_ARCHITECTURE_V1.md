@@ -83,7 +83,7 @@ fail-closed antes de reservar crédito**:
 
 | ID | Task | Qué es | Profile |
 |---|---|---|---|
-| **TASK-1500** | Governed Route/Model Catalog | reader con constraints (res/dur/sampleRate/format/count) + specialty + **naming dual** interno/fidelidad. La keystone. | backend-data |
+| **TASK-1500** ✅ | Governed Route/Model Catalog | reader con constraints (res/dur/sampleRate/format/count) + specialty + **naming dual** interno/fidelidad. La keystone. **Shipped 2026-07-20** (ver §Contratos reales del catálogo) | backend-data |
 | **TASK-1501** | Modality-Discriminated Run Contract | `PreparePayload` como union por capability + output-shape validados pre-spend (**absorbe `1495`**) | backend-data |
 | **TASK-1502** | Previewable Estimate reader | el `✨N` antes de gastar (extrae el estimate de dentro de `execute`; slice adelantado de `1469`) | backend-data |
 | **TASK-1503** | Governed Output Retrieval + Asset Actions | hash→bytes servible + download/preview/favorite/copy sobre el store content-addressed de `1490` | backend-data |
@@ -94,6 +94,32 @@ fail-closed antes de reservar crédito**:
 `1497` (inpaint = una capability de edición), `1498` (exploración → feed unificado). **Absorbe** `1495`
 (formatos → output-shape de `1501`). **Único workbench-exclusivo:** `1499` (Dirección — el Producer es
 prompt-first, no interpreta brief). **Sincroniza** projects durables con `1465` (tenancy).
+
+### Contratos reales del catálogo (TASK-1500, vigente)
+
+- **Tipos (wire SSOT):** `efeonce-globe/packages/contracts/src/producer-catalog.ts` —
+  `ProducerRouteDescriptorV1` (routeId · capability · `RouteNamingV1` dual · `RouteConstraintsV1` union
+  discriminada por `modality` image/video/audio · `RouteSpecialtyV1` · `audioCapable` · `RouteInputMode[]` ·
+  `fidelityContract?`), proyecciones `ProducerCatalogViewV1` / `ProducerCatalogListDataV1` /
+  `ProducerCatalogGetDataV1` (con `catalogVersion`), queries `ProducerCatalogListQueryV1` /
+  `ProducerCatalogGetQueryV1`.
+- **Dato + motor:** `packages/domain/src/producer-catalog.ts` — `PRODUCER_ROUTE_CATALOG` (frozen, seed 4 rutas
+  ancladas a las fidelity routes vivas: `ref/still/rrss-v1`, `ref/motion/loop-v1`, `ref/audio/foley-v1`,
+  `ref/voice/tts-v1`) + `PRODUCER_CATALOG_VERSION`; drift guards con `throw` en carga (routeId único ·
+  capability ∈ `CREATIVE_CAPABILITIES` · modality-match · `audioCapable` coherente · no-slug-leak sobre
+  routeId y naming). Agregar una ruta = editar el array + versión; el motor no tiene `switch` por ruta.
+- **Helpers in-process (SSOT de reuse):** `listProducerRoutes` / `getProducerRoute` /
+  `resolveRouteConstraints` — lo que `TASK-1501` (validación de shape fail-closed pre-spend) y `TASK-1502`
+  (`costo = f(ruta, shape)`) consumen directo, **sin re-dispatch** por el registry.
+- **Readers gobernados:** `globe.producer.catalog.list` / `.get`, gateados por
+  `globe.producer.catalog.read`; coverage `ui`/`mcp` `policy-blocked` (gate de `1505`), internas
+  `available`, `sister-platform` `not-applicable`. Query malformada → `invalid_request`; routeId
+  desconocido → `not_found` sin revelar existencia.
+- **Naming-view fail-closed (decisión):** la vista modelo-real se gobierna por la capability **dedicada**
+  `globe.producer.route.reveal_model` (no se reusa la autoridad del Lab: "correr experimentos" ≠ "ver
+  modelo-real"). `resolveNamingView` default `client`; la proyección client **omite** `naming.internal`.
+  Ambas capabilities granteadas al service principal interno (path operador) en `app.ts`.
+- **SDK:** `listProducerRoutes(query?)` / `getProducerRoute(routeId)` en `packages/sdk`.
 
 ## Boundary / invariantes (heredados + nuevos)
 

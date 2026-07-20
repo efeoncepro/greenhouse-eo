@@ -6,6 +6,29 @@
 
 # Changelog
 
+## 2026-07-20 — TASK-1500: catálogo gobernado de rutas del Creative Producer (keystone del cluster)
+
+- **El catálogo de rutas nace como dato versionado** (`PRODUCER_ROUTE_CATALOG` + `PRODUCER_CATALOG_VERSION`
+  en `packages/domain/src/producer-catalog.ts`): 4 rutas seed ancladas a las fidelity routes vivas
+  (`ref/still/rrss-v1` · `ref/motion/loop-v1` · `ref/audio/foley-v1` · `ref/voice/tts-v1`), constraints
+  **discriminados por modalidad** (image/video/audio — una ruta image no puede portar `sampleRate` por
+  compilación), specialty, `audioCapable`, modos de input y **naming dual**. Agregar una ruta = editar dato.
+- **Drift guards con `throw` en carga:** routeId único, capability ∈ `CREATIVE_CAPABILITIES`, modality-match,
+  `audioCapable` coherente y **no-slug-leak** (prefijos vendor + hosts de endpoint + `/` prohibido en naming).
+  Un catálogo inválido es un build roto, nunca un catálogo servido.
+- **Readers gobernados** `globe.producer.catalog.list`/`.get` (capability `globe.producer.catalog.read`),
+  coverage `ui`/`mcp` `policy-blocked` hasta el gate de `TASK-1505`. **Naming-view fail-closed a cliente:**
+  la vista modelo-real exige la capability dedicada `globe.producer.route.reveal_model` (decisión: no se
+  reusa la autoridad del Lab) y la proyección client **omite** `naming.internal`. routeId desconocido →
+  `not_found` sin revelar existencia.
+- **Helpers in-process** `listProducerRoutes`/`getProducerRoute`/`resolveRouteConstraints`: la SSOT que
+  `TASK-1501` (validación de shape fail-closed pre-spend) y `TASK-1502` (estimate `costo = f(ruta, shape)`)
+  reusan sin re-dispatch. SDK tipado `listProducerRoutes`/`getProducerRoute`.
+- **Estado:** local-first en `main` de `efeonce-globe`, sin push; `pnpm check` + `pnpm build` verdes
+  (incluye E2E por el transporte api-mode real). El servicio desplegado toma el reader en el próximo deploy
+  autorizado. De paso: el test script de `@efeonce-globe/domain` ahora corre `evaluation.test.ts` (gap
+  preexistente).
+
 ## 2026-07-20 — TASK-1490 desplegada + verificada en el servicio + hardening de auth (api mode)
 
 - **Rollout ejecutado y verificado en el servicio desplegado.** El Model Lab se opera por **api mode**

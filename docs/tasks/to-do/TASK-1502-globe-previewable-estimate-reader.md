@@ -1,5 +1,12 @@
 # TASK-1502 — Previewable Estimate Reader
 
+## Delta 2026-07-20
+
+- La dimensión "ruta" para `costo = f(ruta, output-shape)` quedó **cerrada por TASK-1500** (complete):
+  `PRODUCER_ROUTE_CATALOG` + `PRODUCER_CATALOG_VERSION` + helpers `getProducerRoute`/`resolveRouteConstraints`
+  en `efeonce-globe/packages/domain/src/producer-catalog.ts`. El estimate consume el helper in-process
+  (nunca re-dispatch); el catálogo NO lleva costo vendor ni margen — el pricing es de esta task.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

@@ -1,5 +1,13 @@
 # TASK-1505 — Globe Creative Producer Surface (UI)
 
+## Delta 2026-07-20
+
+- El reader que esta UI consume **ya existe** (TASK-1500 complete): `globe.producer.catalog.list`/`.get`
+  (capability `globe.producer.catalog.read`), proyección `ProducerCatalogViewV1` con naming resuelto
+  server-side (vista client omite `naming.internal`) y `catalogVersion` para invalidar cache. Las surfaces
+  `ui`/`mcp` siguen `policy-blocked` — promoverlas es el gate de ESTA task (editar `PRODUCER_CATALOG_COVERAGE`
+  + broker grant de `globe.producer.catalog.read` a humanos).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-028`
-- Status real: `Diseno`
+- Status real: `Shipped 2026-07-20 (local-first, sin push)`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `TASK-1481`
@@ -189,11 +189,11 @@ Reglas obligatorias (heredadas del Producer + del spine):
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth (`PRODUCER_ROUTE_CATALOG` + tipos en contracts), contract surface (readers + helpers) y consumers (1501/1502/1505/1474) nombrados con paths reales.
-- [ ] Invariantes de dato (routeId único, capability válida, modality-match, no-slug-leak, naming fail-closed) explícitos y cubiertos por drift guards con `throw`.
-- [ ] Postura de migración/backfill/rollback explícita (none/none/revert PR).
-- [ ] Evidencia de runtime listada (`pnpm check`/`build` + dispatch + drift-guard test).
-- [ ] Errores canónicos (`not_found`/`invalid_request`/`policy_blocked`/`access_denied`), sin fuga de slug/costo/margen, naming-view fail-closed.
+- [x] Source of truth (`PRODUCER_ROUTE_CATALOG` + tipos en contracts), contract surface (readers + helpers) y consumers (1501/1502/1505/1474) nombrados con paths reales.
+- [x] Invariantes de dato (routeId único, capability válida, modality-match, no-slug-leak, naming fail-closed) explícitos y cubiertos por drift guards con `throw`.
+- [x] Postura de migración/backfill/rollback explícita (none/none/revert PR).
+- [x] Evidencia de runtime listada (`pnpm check`/`build` + dispatch + drift-guard test).
+- [x] Errores canónicos (`not_found`/`invalid_request`/`policy_blocked`/`access_denied`), sin fuga de slug/costo/margen, naming-view fail-closed.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -336,16 +336,16 @@ Cambio aditivo, gobernado por coverage `policy-blocked` en `ui`/`mcp` hasta el g
 
 ## Acceptance Criteria
 
-- [ ] `PRODUCER_ROUTE_CATALOG` existe como dato versionado (frozen) en `packages/domain/src/producer-catalog.ts`, con `PRODUCER_CATALOG_VERSION`, y agregar una ruta es editar el array (cero cambio en el motor del reader).
-- [ ] `ProducerRouteDescriptorV1` expone por ruta: `capability`, `constraints` (union discriminada por modalidad: resolución/duración/sampleRate/formato/count con límites), `specialty` (multi-speaker / emotion-tags / HD / long-form / idiomas), `audioCapable`, `inputModes` y `naming` dual (interno/cliente).
-- [ ] El slug del proveedor **no aparece** en ningún campo del catálogo; un drift guard con `throw` rechaza en carga cualquier naming/routeId que matchee un patrón de slug vendor.
-- [ ] Los readers `globe.producer.catalog.list` y `globe.producer.catalog.get` están registrados en el `CapabilityRegistry`, gateados por `globe.producer.catalog.read`, con coverage por las 8 `GLOBE_SURFACES` (`ui`/`mcp` `policy-blocked`; internas `available`; `sister-platform` `not-applicable`).
-- [ ] La vista de naming se resuelve server-side y es **fail-closed a cliente**: una autoridad no-operadora nunca recibe `naming.internal`; un `routeId` invisible/desconocido es `not_found`.
-- [ ] Los helpers in-process `getProducerRoute` / `resolveRouteConstraints` / `listProducerRoutes` están exportados desde el dominio y documentados como el SSOT que `TASK-1501` y `TASK-1502` reusan sin re-dispatch.
-- [ ] Drift guards con `throw` en carga: routeId único, `capability ∈ CREATIVE_CAPABILITIES`, modality-match, `audioCapable` coherente, no-slug-leak — cada uno con test en `node --test`.
-- [ ] Método(s) SDK tipados exponen `list`/`get` como cliente del mismo reader (parity).
-- [ ] `cd ../efeonce-globe && pnpm check && pnpm build` verde; conformance ejercita la coverage matrix del reader sin backdoor.
-- [ ] Errores canónicos verificados: `not_found` (routeId desconocido/invisible), `invalid_request` (query malformada), `policy_blocked` (surface no promovida), `access_denied` (sin capability). Sin fuga de slug/costo/margen.
+- [x] `PRODUCER_ROUTE_CATALOG` existe como dato versionado (frozen) en `packages/domain/src/producer-catalog.ts`, con `PRODUCER_CATALOG_VERSION`, y agregar una ruta es editar el array (cero cambio en el motor del reader).
+- [x] `ProducerRouteDescriptorV1` expone por ruta: `capability`, `constraints` (union discriminada por modalidad: resolución/duración/sampleRate/formato/count con límites), `specialty` (multi-speaker / emotion-tags / HD / long-form / idiomas), `audioCapable`, `inputModes` y `naming` dual (interno/cliente).
+- [x] El slug del proveedor **no aparece** en ningún campo del catálogo; un drift guard con `throw` rechaza en carga cualquier naming/routeId que matchee un patrón de slug vendor.
+- [x] Los readers `globe.producer.catalog.list` y `globe.producer.catalog.get` están registrados en el `CapabilityRegistry`, gateados por `globe.producer.catalog.read`, con coverage por las 8 `GLOBE_SURFACES` (`ui`/`mcp` `policy-blocked`; internas `available`; `sister-platform` `not-applicable`).
+- [x] La vista de naming se resuelve server-side y es **fail-closed a cliente**: una autoridad no-operadora nunca recibe `naming.internal`; un `routeId` invisible/desconocido es `not_found`.
+- [x] Los helpers in-process `getProducerRoute` / `resolveRouteConstraints` / `listProducerRoutes` están exportados desde el dominio y documentados como el SSOT que `TASK-1501` y `TASK-1502` reusan sin re-dispatch.
+- [x] Drift guards con `throw` en carga: routeId único, `capability ∈ CREATIVE_CAPABILITIES`, modality-match, `audioCapable` coherente, no-slug-leak — cada uno con test en `node --test`.
+- [x] Método(s) SDK tipados exponen `list`/`get` como cliente del mismo reader (parity).
+- [x] `cd ../efeonce-globe && pnpm check && pnpm build` verde; conformance ejercita la coverage matrix del reader sin backdoor.
+- [x] Errores canónicos verificados: `not_found` (routeId desconocido/invisible), `invalid_request` (query malformada), `policy_blocked` (surface no promovida), `access_denied` (sin capability). Sin fuga de slug/costo/margen.
 
 ## Verification
 
@@ -357,14 +357,14 @@ Cambio aditivo, gobernado por coverage `policy-blocked` en `ui`/`mcp` hasta el g
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` sincronizado con el cierre
-- [ ] `Handoff.md` actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` actualizado si cambió comportamiento, estructura o protocolo visible
-- [ ] chequeo de impacto cruzado ejecutado sobre `TASK-1501`, `TASK-1502`, `TASK-1504`, `TASK-1505`, `TASK-1474` (marcar el gap "no existe catálogo/constraints SSOT" como cerrado en cada una)
-- [ ] delta de cierre agregado a `EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md` (contratos de tipos + readers + helpers reales) y doc funcional/manual proporcional en `creative-studio/`
-- [ ] la nueva capability `globe.producer.catalog.read` quedó grantada a ≥1 principal real en el **mismo PR** (grant coverage; Globe: broker grant / service principal en `app.ts`)
+- [x] `Lifecycle` del markdown sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` sincronizado con el cierre
+- [x] `Handoff.md` actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` actualizado si cambió comportamiento, estructura o protocolo visible
+- [x] chequeo de impacto cruzado ejecutado sobre `TASK-1501`, `TASK-1502`, `TASK-1504`, `TASK-1505`, `TASK-1474` (marcar el gap "no existe catálogo/constraints SSOT" como cerrado en cada una)
+- [x] delta de cierre agregado a `EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md` (contratos de tipos + readers + helpers reales) y doc funcional/manual proporcional en `creative-studio/`
+- [x] la nueva capability `globe.producer.catalog.read` quedó grantada a ≥1 principal real en el **mismo PR** (grant coverage; Globe: broker grant / service principal en `app.ts`)
 
 ## Follow-ups
 

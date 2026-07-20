@@ -1,5 +1,13 @@
 # TASK-1501 — Globe Modality-Discriminated Run Contract
 
+## Delta 2026-07-20
+
+- El gap "no existe SSOT de constraints contra el cual validar el shape pre-spend" quedó **cerrado por TASK-1500**
+  (complete): consumir `resolveRouteConstraints(routeId)` / `getProducerRoute(routeId)` **in-process** desde
+  `efeonce-globe/packages/domain/src/producer-catalog.ts` (re-export en `@efeonce-globe/domain`), sin re-dispatch
+  por el registry. `RouteConstraintsV1` ya es union discriminada por `modality` en
+  `packages/contracts/src/producer-catalog.ts`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

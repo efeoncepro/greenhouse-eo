@@ -21,10 +21,17 @@
 
 ## Pendientes inmediatos
 
-- **`TASK-1500` in-progress (Producer Governed Route/Model Catalog, `EPIC-028`).** Implementación en el repo
-  hermano `../efeonce-globe` (`main`, local-first, sin push); en greenhouse-eo sólo lifecycle documental.
-  Objetivo: catálogo de rutas como dato versionado + readers `globe.producer.catalog.list/.get` + helpers
-  in-process (`resolveRouteConstraints`) que TASK-1501/1502 reusan. Naming dual fail-closed a cliente.
+- **`TASK-1500` COMPLETE (Producer Governed Route/Model Catalog, `EPIC-028`) — local-first, sin push.**
+  La keystone del cluster Producer quedó implementada en `../efeonce-globe` (`main`, 4 commits, `pnpm check` +
+  `build` verdes): catálogo como dato versionado (`PRODUCER_ROUTE_CATALOG`, 4 rutas seed / 3 modalidades) +
+  drift guards con `throw` (no-slug-leak incluido) + readers `globe.producer.catalog.list/.get` (`ui`/`mcp`
+  `policy-blocked` hasta el gate de `TASK-1505`) + naming dual fail-closed a cliente (vista modelo-real =
+  capability dedicada `globe.producer.route.reveal_model`, granteada al service principal junto con
+  `globe.producer.catalog.read`) + helpers in-process que `TASK-1501`/`1502` consumen sin re-dispatch + SDK
+  tipado. **Rollout:** cambio aditivo read-only; el servicio Cloud Run `globe-studio-internal` NO se
+  redespliega hasta que el operador autorice push + workflow manual — el reader queda alcanzable por las
+  surfaces internas en el próximo deploy. Próximo paso del cluster: `TASK-1501` (run contract discriminado,
+  consume `resolveRouteConstraints`).
 - **`TASK-1492` COMPLETE (repatriación documental Globe → Greenhouse).** La doc gobernante de Globe vive
   ahora en `greenhouse-eo` bajo `creative-studio/` (arquitectura, runbooks, funcional, manuales), + continuidad
   de runtime en `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md` y changelog en

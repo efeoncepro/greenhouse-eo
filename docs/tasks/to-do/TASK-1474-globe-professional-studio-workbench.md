@@ -2,6 +2,13 @@
 
 ## Delta 2026-07-20
 
+- El primer primitivo compartido del Producer que este workbench consume quedó **cerrado por TASK-1500**
+  (complete): catálogo gobernado de rutas con naming dual fail-closed a cliente (la vista fidelidad-curada que
+  esta superficie usa) en `efeonce-globe/packages/domain/src/producer-catalog.ts`, readers
+  `globe.producer.catalog.list`/`.get`.
+
+## Delta 2026-07-20
+
 - Se agregaron `TASK-1493`–`TASK-1499` al `Blocked by`: son los motores backend de cada panel del workbench
   (Prompt Studio, Style DNA, formatos, receta/variación, inpaint, exploración de candidatos, "Dirección").
   Sin ellos la surface nace hueca (paneles sin comando/reader que consumir). Fuente: el gap analysis del Studio
