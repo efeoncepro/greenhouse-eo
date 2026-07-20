@@ -21,6 +21,10 @@
 
 ## Pendientes inmediatos
 
+- **`TASK-1500` in-progress (Producer Governed Route/Model Catalog, `EPIC-028`).** Implementación en el repo
+  hermano `../efeonce-globe` (`main`, local-first, sin push); en greenhouse-eo sólo lifecycle documental.
+  Objetivo: catálogo de rutas como dato versionado + readers `globe.producer.catalog.list/.get` + helpers
+  in-process (`resolveRouteConstraints`) que TASK-1501/1502 reusan. Naming dual fail-closed a cliente.
 - **`TASK-1492` COMPLETE (repatriación documental Globe → Greenhouse).** La doc gobernante de Globe vive
   ahora en `greenhouse-eo` bajo `creative-studio/` (arquitectura, runbooks, funcional, manuales), + continuidad
   de runtime en `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md` y changelog en
