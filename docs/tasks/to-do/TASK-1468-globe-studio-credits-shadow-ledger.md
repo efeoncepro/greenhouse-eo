@@ -1,5 +1,20 @@
 # TASK-1468 — Globe Studio Credits Shadow Ledger
 
+## Delta 2026-07-20 — reconciliar el seam de estimate con TASK-1502 (complete)
+
+TASK-1502 (complete) shippeó un **estimate previewable de PROVEEDOR-COSTO** (`globe.lab.experiment.estimate` +
+`LabRunnerPort.estimate({ quote })`): `credits = f(ruta × output-shape)` desde el pricing del adapter (hoy el
+`FAKE_CREDITS` por capability; los reales varían por shape), apoyado en el **spend fence de seguridad (1457)**,
+NO en este ledger. Es una capa distinta de este kernel: 1468 es el **ledger durable** con **catálogo de rates
+INMUTABLE versionado**, allocations, balance, reservations y settlements (`estimateCredits`/`getCreditEstimate`).
+**Regla de reconciliación (al construir 1468):** debe haber **UN solo rate autoritativo**. El `estimateCredits`
+de este kernel **consume** el estimate de proveedor-costo de 1502 (o el rate catalog pasa a ser la fuente que
+1502 lee) — nunca reimplementar un cómputo de crédito paralelo, o el `✨N` del Producer (1502) y el
+`estimateCredits` del ledger **divergen**. Migrar la unidad `ruta × output-shape` desde el `FAKE_CREDITS`/adapter
+al rate catalog versionado de 1468, con rate pinning. El `withinDayCap` (declarado y NO poblado en 1502) se
+puebla desde el fence durable de este kernel. Sin colisión de nombres: `globe.lab.experiment.estimate` (Model
+Lab) ≠ `estimateCredits`/`getCreditEstimate` (credits) — son capabilities de capas distintas.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

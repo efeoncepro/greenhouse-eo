@@ -438,6 +438,12 @@ Cambio aditivo, gobernado por kill switch (`GLOBE_LAB_ENABLED` default OFF) + pr
 - **Delta a TASK-1469:** el estimate previewable queda entregado como slice adelantado; 1469 consume `LabRunnerPort.estimate` / `globe.lab.experiment.estimate` como su paso de estimate del run lifecycle durable, sin reimplementarlo.
 - **Estimate shape-aware en el fake:** hacer que `FakeReferenceAdapter.estimate` varie el costo por output-shape (hoy estable por capability) para que el `✨N` del fake sea demostrable sin motor real. Baja prioridad; los adapters reales ya varian por shape.
 - **Vista modelo-real del estimate (operadores internos):** si el operador Efeonce necesita ver el modelo-real junto al `✨N`, resolverlo por el catalogo (TASK-1500) keyeado por ruta, no agregando `model`/`provider` a esta proyeccion curada.
+- **Reconciliación del rate con TASK-1468 (seam de estimate):** el `estimatedCredits` de este reader es un
+  estimate de **proveedor-costo** (adapter pricing / `FAKE_CREDITS`), apoyado en el spend fence de seguridad. El
+  ledger durable (TASK-1468) tiene su propio `estimateCredits`/`getCreditEstimate` contra un rate catalog
+  inmutable versionado. Al construir 1468, su estimate debe **consumir** este (o el rate catalog pasa a ser la
+  fuente única que este reader lee) — nunca un cómputo paralelo, o el `✨N` y el estimate del ledger divergen.
+  Delta registrada en `docs/tasks/to-do/TASK-1468-*`.
 - **`withinDayCap` durable:** el fence es in-memory/per-process; cuando aterrice el ledger comercial (TASK-1468) / el fence durable, el `withinDayCap` debe leerse de la fuente durable.
 
 ## Delta YYYY-MM-DD
