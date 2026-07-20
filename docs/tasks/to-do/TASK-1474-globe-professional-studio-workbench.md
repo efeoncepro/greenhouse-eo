@@ -1,5 +1,13 @@
 # TASK-1474 — Globe Professional Studio Workbench
 
+## Delta 2026-07-20
+
+- Se agregaron `TASK-1493`–`TASK-1499` al `Blocked by`: son los motores backend de cada panel del workbench
+  (Prompt Studio, Style DNA, formatos, receta/variación, inpaint, exploración de candidatos, "Dirección").
+  Sin ellos la surface nace hueca (paneles sin comando/reader que consumir). Fuente: el gap analysis del Studio
+  Workbench (`docs/architecture/creative-studio/GLOBE_STUDIO_WORKBENCH_BACKEND_GAP_ANALYSIS_V1.md`). Si se
+  shippea por partes, hacerlo panel-por-panel detrás de flag; nunca renderizar un panel cuyo motor aún no existe.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
@@ -20,7 +28,7 @@
 - Status real: `Diseño gobernado; implementación pendiente`
 - Rank: `TBD`
 - Domain: `creative|ui|product`
-- Blocked by: `TASK-1468, TASK-1469, TASK-1472, TASK-1473, TASK-1485`
+- Blocked by: `TASK-1468, TASK-1469, TASK-1472, TASK-1473, TASK-1485, TASK-1493, TASK-1494, TASK-1495, TASK-1496, TASK-1497, TASK-1498, TASK-1499`
 - Branch: `task/TASK-1474-globe-professional-studio-workbench`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -59,7 +67,23 @@ Dar a operadores una experiencia creative-native de agencia, no un formulario de
 
 ### Depends on
 
-- `TASK-1468`, `TASK-1469`, `TASK-1472`, `TASK-1473` y `TASK-1485`.
+**Plataforma gobernada (lifecycle, créditos, review, parity, design system):**
+
+- `TASK-1468` (studio credits), `TASK-1469` (run lifecycle + submission fence), `TASK-1472` (review/release/delivery), `TASK-1473` (SDK/MCP parity), `TASK-1485` (Design System de Globe).
+
+**Motores backend de cada panel del workbench** (sin ellos la surface nace hueca — cada panel del diseño se quedaría sin comando/reader que consumir; ver `docs/architecture/creative-studio/GLOBE_STUDIO_WORKBENCH_BACKEND_GAP_ANALYSIS_V1.md`):
+
+- `TASK-1493` — Structured Brief + Recipe Registry → panel **Prompt Studio + Recetas**.
+- `TASK-1494` — Reference Intelligence / Style DNA → panel **Style DNA**.
+- `TASK-1495` — Target Formats + Multi-format Set → **selector de formatos + Set de key visuales**.
+- `TASK-1496` — Generation Recipe + Relaunch + Variation → **variar / relanzar reproducible**.
+- `TASK-1497` — Regional Edit / Inpaint → **retocar zona**.
+- `TASK-1498` — Candidate Exploration Readers + Lineage Graph → **dock de candidatos + mapa de exploración**.
+- `TASK-1499` — Brief Direction / Interpretation → **paso "Dirección"**.
+
+> Estos 7 no tienen por qué estar TODOS antes de un primer slice del workbench, pero cada panel visible que se
+> construya exige su motor ya disponible. Si se decide shippear el workbench por partes, hacerlo panel-por-panel
+> detrás de flag, nunca renderizar un panel cuyo backend (1493–1499) aún no existe.
 
 ### Blocks / Impacts
 
