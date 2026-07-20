@@ -16,7 +16,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -29,7 +29,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-028`
-- Status real: `Diseno`
+- Status real: `Shipped 2026-07-20 (local-first, sin push)`
 - Rank: `TBD`
 - Domain: `creative|ai|platform`
 - Blocked by: `TASK-1481, TASK-1500`
@@ -207,11 +207,11 @@ N/A — `Execution profile: backend-data`, `UI impact: none`. El contrato es con
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface y consumers nombrados con paths reales (`contracts:316`, `model-lab.ts:535`, `provider-contract:67`, `index.ts:260`).
-- [ ] Invariantes (discriminant, coherencia modalidad↔capability, fail-closed pre-spend, private-ingest, unidad de crédito, naming dual) explícitos y probados.
-- [ ] Posture de migración/rollback explícita y proporcional (additive-optional, revert PR).
-- [ ] Evidencia runtime: `pnpm check && pnpm build` verdes + canary hermético del threading image.
-- [ ] Errores canónicos (`invalid_request`) sin leak de constraints internos ni existencia de rutas cross-workspace.
+- [x] Source of truth, contract surface y consumers nombrados con paths reales (`contracts:316`, `model-lab.ts:535`, `provider-contract:67`, `index.ts:260`).
+- [x] Invariantes (discriminant, coherencia modalidad↔capability, fail-closed pre-spend, private-ingest, unidad de crédito, naming dual) explícitos y probados.
+- [x] Posture de migración/rollback explícita y proporcional (additive-optional, revert PR).
+- [x] Evidencia runtime: `pnpm check && pnpm build` verdes + canary hermético del threading image.
+- [x] Errores canónicos (`invalid_request`) sin leak de constraints internos ni existencia de rutas cross-workspace.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -390,13 +390,13 @@ Reconciliaciones de diseño (registrarlas si el implementador las cambia):
 
 ## Acceptance Criteria
 
-- [ ] `PrepareExperimentPayloadV1.output?: OutputShapeV1` existe, discriminado por `modality`, con **las 3 modalidades declaradas** (image/video/audio) y sus params de output-shape tipados según la spec fuente.
-- [ ] `validatePreparePayload` valida el shape contra los constraints de la ruta (`RouteCatalogPort` de TASK-1500) en `prepare`, **fail-closed antes de `fence.reserve`**: ruta desconocida, param fuera de rango/enum no soportado, y `output.modality` incoherente con `capability` → `invalid_request`.
-- [ ] El shape validado se persiste en `StoredExperimentRequestV1` y se hilvana al provider seam (`CreativeProviderRequestV1` + `toProviderRequest`); los adapters de imagen leen aspectRatio/quality/count del request (aspect ratio de TASK-1495 **absorbido** para image).
-- [ ] Private-ingest intacto: ningún selector transporta bytes; refs por `authorizedInputs`, edit por `editFrom`; no se rompe ninguna regla dura de TASK-1490.
-- [ ] Backward-compat: un `prepare` sin `output` conserva el comportamiento actual (tests existentes verdes).
-- [ ] Coverage/manifest sin cambios de surface (`ui`/`mcp` `policy-blocked`); la capability sigue siendo el único write path; naming dual respetado (sin slugs en dominio/contrato).
-- [ ] `cd ../efeonce-globe && pnpm check && pnpm build` verdes; tests `node --test` cubren happy + fail-closed por modalidad + backward-compat.
+- [x] `PrepareExperimentPayloadV1.output?: OutputShapeV1` existe, discriminado por `modality`, con **las 3 modalidades declaradas** (image/video/audio) y sus params de output-shape tipados según la spec fuente.
+- [x] `validatePreparePayload` valida el shape contra los constraints de la ruta (`RouteCatalogPort` de TASK-1500) en `prepare`, **fail-closed antes de `fence.reserve`**: ruta desconocida, param fuera de rango/enum no soportado, y `output.modality` incoherente con `capability` → `invalid_request`.
+- [x] El shape validado se persiste en `StoredExperimentRequestV1` y se hilvana al provider seam (`CreativeProviderRequestV1` + `toProviderRequest`); los adapters de imagen leen aspectRatio/quality/count del request (aspect ratio de TASK-1495 **absorbido** para image).
+- [x] Private-ingest intacto: ningún selector transporta bytes; refs por `authorizedInputs`, edit por `editFrom`; no se rompe ninguna regla dura de TASK-1490.
+- [x] Backward-compat: un `prepare` sin `output` conserva el comportamiento actual (tests existentes verdes).
+- [x] Coverage/manifest sin cambios de surface (`ui`/`mcp` `policy-blocked`); la capability sigue siendo el único write path; naming dual respetado (sin slugs en dominio/contrato).
+- [x] `cd ../efeonce-globe && pnpm check && pnpm build` verdes; tests `node --test` cubren happy + fail-closed por modalidad + backward-compat.
 
 ## Verification
 
@@ -407,14 +407,14 @@ Reconciliaciones de diseño (registrarlas si el implementador las cambia):
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` sincronizado con el cierre
-- [ ] `Handoff.md` actualizado con lo implementado, verificado y pendientes
-- [ ] `changelog.md` actualizado si cambió comportamiento/estructura/contrato visible
-- [ ] chequeo de impacto cruzado ejecutado (ver Follow-ups: TASK-1495, 1500, 1502, 1504, 1505)
-- [ ] Cierre documental en Greenhouse (nunca en `efeonce-globe/docs/**`): delta a `EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md` si el contrato final difiere del diseño; invocar `greenhouse-documentation-governor`
-- [ ] Delta de absorción agregado a `docs/tasks/to-do/TASK-1495-globe-target-formats-multiformat-set.md` (aspect ratio absorbido)
+- [x] `Lifecycle` del markdown sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` sincronizado con el cierre
+- [x] `Handoff.md` actualizado con lo implementado, verificado y pendientes
+- [x] `changelog.md` actualizado si cambió comportamiento/estructura/contrato visible
+- [x] chequeo de impacto cruzado ejecutado (ver Follow-ups: TASK-1495, 1500, 1502, 1504, 1505)
+- [x] Cierre documental en Greenhouse (nunca en `efeonce-globe/docs/**`): delta a `EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md` si el contrato final difiere del diseño; invocar `greenhouse-documentation-governor`
+- [x] Delta de absorción agregado a `docs/tasks/to-do/TASK-1495-globe-target-formats-multiformat-set.md` (aspect ratio absorbido)
 
 ## Follow-ups
 

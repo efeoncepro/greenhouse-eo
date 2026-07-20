@@ -8,6 +8,12 @@
   `ui`/`mcp` siguen `policy-blocked` — promoverlas es el gate de ESTA task (editar `PRODUCER_CATALOG_COVERAGE`
   + broker grant de `globe.producer.catalog.read` a humanos).
 
+
+- **Delta 2026-07-20 — TASK-1501 complete:** el `OutputShapeV1` (union discriminado por modalidad) sobre el que
+  esta UI renderiza los paneles ya existe y valida fail-closed pre-spend. Ningún control debe existir sin su param
+  en el union: la UI envía `output` en el payload no confiable y el dominio lo valida contra los constraints del
+  catálogo (TASK-1500). El modelo público (nombre+versión) sale del catálogo; el shape sale de este contrato.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

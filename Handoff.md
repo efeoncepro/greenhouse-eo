@@ -39,6 +39,17 @@
   Catalog) + 2 reglas duras + triggers; `creative-studio/{README,DECISIONS_INDEX}` (SPEC-004 + ADR-003); y se
   corrigió polaridad stale del naming en `DECISIONS_INDEX` raíz, `EPIC-028`, la tabla shipped del Producer arch,
   `documentation/README`, y los planning docs de `1505` (wireframe/flow) `1474`/`1502`/`1504`.
+- **`TASK-1501` COMPLETE (Modality-Discriminated Run Contract, `EPIC-028`) — local-first, sin push.**
+  4 slices en `../efeonce-globe` (`main`): `PrepareExperimentPayloadV1.output?: OutputShapeV1` (union por
+  modalidad, additive-optional, 3 modalidades día 1; image de punta a punta, video/audio declaradas+validadas
+  estructuralmente, su ejecución = TASK-1504) + `validateOutputShape` fail-closed en `prepare` **antes de
+  `fence.reserve`**, contra los constraints del catálogo (TASK-1500 reusado in-process vía `RouteCatalogPort.getRoute`
+  = `getProducerRoute`; el diseño proponía `constraintsFor` — reconciliado a `getRoute`) + threading image-first
+  al provider seam (**absorbe TASK-1495** aspect ratio para image; fal `num_images`/`aspect_ratio` marcado
+  `[verify live]`). `pnpm check` + `build` verdes (domain 85 + creative-runner 89 tests). Backward-compat: sin
+  `output` = comportamiento previo. Coverage sin cambios (`ui`/`mcp` `policy-blocked`). **Rollout:** aditivo,
+  sin redeploy hasta autorización. Próximo paso del cluster: `TASK-1502` (estimate `f(ruta,shape)`, ya puede
+  leer el shape) y `TASK-1504` (adapter reads video/audio).
 - **`TASK-1492` COMPLETE (repatriación documental Globe → Greenhouse).** La doc gobernante de Globe vive
   ahora en `greenhouse-eo` bajo `creative-studio/` (arquitectura, runbooks, funcional, manuales), + continuidad
   de runtime en `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md` y changelog en

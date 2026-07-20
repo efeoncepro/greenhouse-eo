@@ -14,6 +14,13 @@
   — eso nunca sale. Al construir, re-derivar el naming contra el contrato final de TASK-1500
   (`RouteModelIdentityV1` + `resolveRouteAudience`), no contra la terminología "curado/modelo-real" del body.
 
+
+- **Delta 2026-07-20 — TASK-1501 complete:** el `output` shape tipado (`OutputShapeV1`, discriminado por
+  modalidad) ya existe en `PrepareExperimentPayloadV1` y queda persistido en `StoredExperimentRequestV1`. El
+  estimate `costo = f(ruta, output-shape)` ya tiene el shape como **dimensión de primera clase** para leer. El
+  `RouteCatalogPort.getRoute(referenceRoute)` (impl `getProducerRoute`, in-process) es el mismo seam a reusar
+  para el estimate; el catálogo NO lleva costo vendor ni margen (el pricing es de esta task).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

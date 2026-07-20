@@ -15,6 +15,15 @@
   voice-preset registry expone el nombre/preset público, nunca el vendor voice id. Al construir, re-derivar el
   naming contra el contrato final de TASK-1500 (`RouteModelIdentityV1` + `house` + `reveal_house`).
 
+
+- **Delta 2026-07-20 — TASK-1501 complete:** el contrato de run ya declara y valida los selectores de video
+  (`inputMode`: elements/frames{hasEndFrame}/motion/edit) y audio (`mode`: voiceover/change-voice/translate{targetLang}),
+  validados fail-closed contra `route.inputModes` del catálogo. Esta task **solo cablea el provider** para leer
+  esos selectores en los adapters de video/audio (frames/motion/change-voice/translate/omni) — NO re-modela el
+  contrato. El threading image ya está hecho (`CreativeProviderRequestV1.quality/aspectRatio/count` +
+  `toProviderRequest`); replicar el patrón para resolution/durationSeconds/audioMode/sampleRate/format/speed/
+  volume/pitch en los adapters de video/audio, con verificación live de los field names del proveedor.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

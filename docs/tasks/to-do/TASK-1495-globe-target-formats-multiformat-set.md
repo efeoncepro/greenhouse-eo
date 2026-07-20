@@ -1,12 +1,15 @@
 # TASK-1495 — Globe Target Formats + Multi-format Set Generation
 
-## Delta 2026-07-20 — aspect ratio ABSORBIDO por TASK-1501
+## Delta 2026-07-20 — aspect ratio ABSORBIDO por TASK-1501 (✅ shipped)
 
-El **aspect ratio / formato objetivo de un run** (1:1, 4:5, 16:9, 9:16, …) queda **absorbido por
-`TASK-1501`** (Modality-Discriminated Run Contract): pasa a ser un campo del output-shape
-(`ImageOutputShapeV1.aspectRatio` / `VideoOutputShapeV1.aspectRatio`), validado contra los constraints
-de la ruta del catálogo gobernado (`TASK-1500`), en vez de un literal hardcodeado en la tabla de ruteo
-del adapter. Lo que **queda como scope propio de esta task**: el **FormatSet fan-out** — un brief → N
+El **aspect ratio / formato objetivo de un run** (1:1, 4:5, 16:9, 9:16, …) quedó **absorbido por
+`TASK-1501`** (Modality-Discriminated Run Contract, **complete 2026-07-20**): es un campo del output-shape
+(`ImageOutputShapeV1.aspectRatio` / `VideoOutputShapeV1.aspectRatio`), validado fail-closed contra los
+constraints de la ruta del catálogo gobernado (`TASK-1500`), en vez de un literal hardcodeado en la tabla
+de ruteo del adapter. Para **image** ya está hilvanado de punta a punta (contrato → `toProviderRequest` →
+fal image adapter `aspect_ratio`). Para **video** el campo existe en el contrato y se valida, pero su lectura
+en los adapters de video (reemplazar el hardcode de `vertex-video-adapter.ts`/`vertex-omni-adapter.ts`) es
+**TASK-1504**. Lo que **queda como scope propio de esta task**: el **FormatSet fan-out** — un brief → N
 formatos como **agregado gobernado** con estado/gasto/fence comunes (distinto del batch-de-N de un solo
 run, que va por `count` del output-shape de 1501). Al tomar esta task: re-scopearla al FormatSet, o
 cerrarla como superseded si el batch-de-N por `count` (1501) + la variación (1496) cubren el caso.

@@ -87,7 +87,7 @@ fail-closed antes de reservar crédito**:
 | ID | Task | Qué es | Profile |
 |---|---|---|---|
 | **TASK-1500** ✅ | Governed Route/Model Catalog | reader con constraints (res/dur/sampleRate/format/count) + specialty + **modelo público** (nombre+versión) + **casa interna** (`house`, operator-only vía `reveal_house`). La keystone. **Shipped 2026-07-20** (ver §Contratos reales del catálogo) | backend-data |
-| **TASK-1501** | Modality-Discriminated Run Contract | `PreparePayload` como union por capability + output-shape validados pre-spend (**absorbe `1495`**) | backend-data |
+| **TASK-1501** ✅ | Modality-Discriminated Run Contract | `PreparePayload` como union por capability + output-shape validados pre-spend (**absorbe `1495`**). **Shipped 2026-07-20** (ver §Contratos reales del run contract) | backend-data |
 | **TASK-1502** | Previewable Estimate reader | el `✨N` antes de gastar (extrae el estimate de dentro de `execute`; slice adelantado de `1469`) | backend-data |
 | **TASK-1503** | Governed Output Retrieval + Asset Actions | hash→bytes servible + download/preview/favorite/copy sobre el store content-addressed de `1490` | backend-data |
 | **TASK-1504** | Producer Capability Expansion | video frames + motion-control; audio change-voice + translate; multi-output omni; voice-preset registry — tras el provider seam | backend-data |
@@ -127,6 +127,36 @@ prompt-first, no interpreta brief). **Sincroniza** projects durables con `1465` 
   **omite** `house`. La capability y el grant al service principal (path operador) viven en `app.ts`. Nunca
   salen el slug, el costo vendor ni el margen.
 - **SDK:** `listProducerRoutes(query?)` / `getProducerRoute(routeId)` en `packages/sdk`.
+
+### Contratos reales del run contract (TASK-1501, vigente)
+
+- **Tipo (wire SSOT):** `efeonce-globe/packages/contracts/src/index.ts` — `OutputShapeV1 = ImageOutputShapeV1 |
+  VideoOutputShapeV1 | AudioOutputShapeV1`, **union discriminado por `modality`**, agregado como
+  `PrepareExperimentPayloadV1.output?` (**additive-optional**: un caller sin `output` conserva el comportamiento
+  previo). Image `{ quality, aspectRatio, count }`; video `{ inputMode(elements|frames{hasEndFrame}|motion|edit),
+  resolution, durationSeconds, aspectRatio, audioMode }`; audio `{ mode(voiceover|change-voice|translate{targetLang}),
+  voicePreset?, sampleRate, format, speed, volume, pitch }`. `prompt` sigue **top-level** (instrucción creativa /
+  script / instrucción de edit); los selectores **no transportan bytes** (refs por `authorizedInputs`, base de edit
+  por `editFrom`).
+- **Validación fail-closed pre-spend:** `validateOutputShape` corre dentro de `validatePreparePayload`
+  (`packages/domain/src/model-lab.ts`), en `prepare` — **estrictamente antes de `fence.reserve`** en
+  `executeExperiment`. Parseo estructural del payload no confiable + range-check contra los constraints de la ruta.
+  Rechazos → `invalid_request`: ruta desconocida, `route.capability ≠ payload.capability`, `output.modality`
+  incoherente con la ruta, param fuera de rango/enum, `inputMode`/`mode` no soportado por `route.inputModes`,
+  output malformado, y **sin catálogo cableado** (no se puede validar ⇒ se rechaza). Nunca coerción silenciosa.
+- **Frontera con TASK-1500 (reconciliación del port):** el diseño proponía
+  `RouteCatalogPort.constraintsFor(capability, referenceRoute)`; la firma real es
+  **`RouteCatalogPort.getRoute(referenceRoute): ProducerRouteDescriptorV1 | undefined`** (el descriptor ya trae
+  `capability` + `constraints` + `inputModes`, todo lo que la validación necesita). Impl de producción = el helper
+  in-process `getProducerRoute` de TASK-1500 (reuse SSOT, sin re-dispatch ni ciclo de módulos), cableado en
+  `app.ts`; los tests inyectan doubles. `catalog?` es opcional en `ModelLabDependencies` (un experimento sin
+  `output` no necesita catálogo; con `output` sin catálogo ⇒ fail-closed).
+- **Threading al provider seam (image-first):** `CreativeProviderRequestV1` gana `quality?`/`aspectRatio?`/`count?`;
+  `toProviderRequest` los hilvana desde `experiment.request.output` cuando `modality==='image'`. El fal image adapter
+  (Seedream) los lee (`num_images`/`aspect_ratio`, presence-guarded, `[verify live]`); **absorbe el aspect ratio de
+  TASK-1495 para image**. El threading de video/audio a sus adapters es TASK-1504.
+- **Coverage sin cambios:** misma capability (`globe.lab.experiment.run` / `globe.run.prepare`), `ui`/`mcp`
+  `policy-blocked`. La UI (1505), MCP, SDK y CLI consumen el MISMO command con el nuevo shape.
 
 ## Boundary / invariantes (heredados + nuevos)
 

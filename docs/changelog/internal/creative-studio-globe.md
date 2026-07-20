@@ -6,6 +6,29 @@
 
 # Changelog
 
+## 2026-07-20 — TASK-1501: contrato de run discriminado por modalidad (image→video→audio)
+
+- **`PrepareExperimentPayloadV1.output?: OutputShapeV1`** — union discriminado por `modality`, additive-optional,
+  **diseñado para las 3 modalidades día 1** (image implementada de punta a punta; video/audio declaradas +
+  validadas estructuralmente, su ejecución de capability es TASK-1504). `prompt` sigue top-level; los selectores
+  (`inputMode`/`mode`) no transportan bytes (refs por `authorizedInputs`, base de edit por `editFrom`).
+- **Validación fail-closed pre-spend:** `validateOutputShape` dentro de `validatePreparePayload`, en `prepare`,
+  **estrictamente antes de `fence.reserve`**. Parseo estructural del payload no confiable + range-check contra los
+  constraints de la ruta del catálogo (TASK-1500). Ruta desconocida, `route.capability≠payload.capability`,
+  modality incoherente, param fuera de rango/enum, `inputMode`/`mode` no soportado, output malformado, y **sin
+  catálogo cableado** → `invalid_request`. Nunca coerción silenciosa.
+- **Reconciliación del port con TASK-1500:** el diseño proponía `constraintsFor(capability, referenceRoute)`; la
+  firma real es `RouteCatalogPort.getRoute(referenceRoute): ProducerRouteDescriptorV1` (el descriptor ya trae
+  capability + constraints + inputModes). Impl de producción = `getProducerRoute` reusado in-process (SSOT, sin
+  re-dispatch ni ciclo de módulos); `catalog?` opcional en `ModelLabDependencies`.
+- **Threading image-first + absorción de TASK-1495:** `CreativeProviderRequestV1` gana `quality`/`aspectRatio`/
+  `count`; `toProviderRequest` los hilvana cuando `modality==='image'`; el fal image adapter (Seedream) los lee
+  (`num_images`/`aspect_ratio`, `[verify live]`). El aspect ratio deja de ser hardcode. Video/audio adapter reads
+  = TASK-1504.
+- **Estado:** local-first en `main` de `efeonce-globe`, sin push; `pnpm check` + `build` verdes (domain 85 tests,
+  creative-runner 89). Backward-compat: un `prepare` sin `output` conserva el comportamiento previo. Coverage sin
+  cambios (`ui`/`mcp` `policy-blocked`).
+
 ## 2026-07-20 — TASK-1500 (revisión): modelo público, casa interna (invariante invertido)
 
 - **Decisión de producto:** mostrar el modelo real al cliente **añade valor** — para el ICP de Globe (equipos
