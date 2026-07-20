@@ -143,7 +143,7 @@ Reglas al comparar:
 
 - Model Lab (base que estos proveedores enchufan): manual [`efeonce-globe-model-lab.md`](./efeonce-globe-model-lab.md).
 - Evaluation Harness (leer un reporte de eval en detalle): manual [`efeonce-globe-evaluation-harness.md`](./efeonce-globe-evaluation-harness.md).
-- Runbook operativo (repo hermano): [`efeonce-globe/docs/operations/EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md`](../../../../efeonce-globe/docs/operations/EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md) §7-bis (Model Lab) / §7-ter (Evaluation Harness).
-- Spec técnica canónica del Model Lab (SPEC-002): [`efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md`](../../../../efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md).
+- Runbook operativo (repo hermano): [`docs/operations/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md`](../../operations/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md) §7-bis (Model Lab) / §7-ter (Evaluation Harness).
+- Spec técnica canónica del Model Lab (SPEC-002): [`docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md`](../../architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md).
 - Documentación funcional (Greenhouse), en lenguaje simple: [`docs/documentation/creative-studio/efeonce-globe-model-lab.md`](../../documentation/creative-studio/efeonce-globe-model-lab.md).
 - Programa: [`EPIC-028`](../../epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md). Skill: `greenhouse-globe`.

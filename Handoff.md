@@ -90,7 +90,10 @@
   Globe** (retirar la excepción de la key compartida) + deploy del studio-web.
 - EPIC-028 avanza en tres carriles paralelos gobernados íntegramente por Greenhouse. `TASK-1456…1485` viven
   en `docs/tasks/to-do/`, pasan por hooks/lint/QA/handoff de este repo y pueden poseer paths de implementación
-  en el repositorio hermano. Globe conserva sólo arquitectura, runtime y evidencia técnica; no tiene registry
+  en el repositorio hermano. Globe conserva sólo **código, runtime, infra y evidencia técnica**; su
+  **documentación gobernante vive en Greenhouse** bajo `creative-studio/` (TASK-1492) — arquitectura en
+  `docs/architecture/creative-studio/`, runbooks en `docs/operations/creative-studio/`, y la **continuidad
+  de runtime de Globe** en `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`; no tiene registry
   ni namespace de tasks propio. `TASK-1456` cerró esta corrección; próxima wave: `TASK-1457`, `TASK-1458`
   y `TASK-1464`; `TASK-1459` puede integrar/probar still models apenas cierre el Lab gate, sin esperar ledger/workbench.
   Las specs separan ahora ownership: `TASK-1464` posee IaC/WIF/IAM/budgets/observabilidad y `TASK-1457` el

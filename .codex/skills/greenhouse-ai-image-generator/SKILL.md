@@ -91,7 +91,7 @@ pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (
   el que habilita el **edit cross-model**, p.ej. refinar un candidato de Seedream con Nano Banana). El set va
   siempre **edit base primero** (el orden es condicionamiento) y cada ruta **falla cerrado** al exceder su tope
   (`too_many_references`): truncar devuelve trabajo que parece correcto y no lo es. Contrato:
-  `efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md` §"Edit / refine cross-model".
+  `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md` §"Edit / refine cross-model".
 - Si se exigen cards, gráficos, ejes, microcopy, cifras o logos exactos, detener la generación y usar SVG o
   composición determinística. Una portada puede seguir siendo un problema vectorial.
 

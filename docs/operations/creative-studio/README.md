@@ -14,16 +14,26 @@ QA audits, brand-shell evidence) es de Globe.
 Ver el racional completo y el mapa doc↔repo en
 [`docs/architecture/creative-studio/README.md`](../../architecture/creative-studio/README.md).
 
-## Qué vive acá (se puebla con la repatriación — TASK-1492)
+## Runbooks (repatriado — TASK-1492)
 
-Runbooks operativos de Globe, repatriados desde `efeonce-globe/docs/operations/**`:
+Runbooks operativos de Globe, repatriados desde `efeonce-globe/docs/operations/**` (la historia previa
+es auditable en el git log del repo hermano):
 
-- API Contract Spine — runbook (cómo extender/llamar/verificar el spine)
-- IaC keyless — runbook (Terraform/OpenTofu, deploy sin llaves, protocolo de import)
-- Autenticación local + smoke internal-only
+- [EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md](EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md) — cómo extender/llamar/verificar el spine.
+- [EFEONCE_GLOBE_IAC_RUNBOOK_V1.md](EFEONCE_GLOBE_IAC_RUNBOOK_V1.md) — Terraform/OpenTofu, deploy keyless, protocolo de import.
+- [LOCAL_AUTHENTICATION.md](LOCAL_AUTHENTICATION.md) — autenticación local contra Globe (web/api mode).
+- [TASK_1454_INTERNAL_SMOKE_RUNBOOK.md](TASK_1454_INTERNAL_SMOKE_RUNBOOK.md) — smoke internal-only.
+- [EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md](EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md) — plan de ejecución paralela del EPIC-028.
+- [EPIC_028_FRESH_SESSION_PROMPT.md](EPIC_028_FRESH_SESSION_PROMPT.md) — prompt de arranque de sesión para trabajo sobre EPIC-028.
 
-> Mientras TASK-1492 no cierre, parte de estos runbooks sigue en `efeonce-globe/docs/operations/`.
-> Estado vigente de la repatriación: `Handoff.md`, no este índice.
+> **Evidencia técnica** de Globe (NO repatriada, queda en `efeonce-globe/docs/operations/`):
+> `BOOTSTRAP_EVIDENCE.md`, `QA_RELEASE_AUDIT_2026-07-19.md`, `TASK_1455_BRAND_SHELL_EVIDENCE.md` —
+> son evidencia de ejecución, propiedad de Globe por la regla del control plane.
+
+## Continuidad + cronología del runtime de Globe (repatriado — TASK-1492)
+
+- Continuidad activa del runtime (deploys, rollout, verificación en vivo, hardening): [GLOBE_RUNTIME_HANDOFF.md](GLOBE_RUNTIME_HANDOFF.md). El `Handoff.md` principal de Greenhouse referencia este archivo para el detalle de runtime de Globe.
+- Historia / changelog del runtime de Globe: [`docs/changelog/internal/creative-studio-globe.md`](../../changelog/internal/creative-studio-globe.md).
 
 ## Relacionados en Greenhouse
 

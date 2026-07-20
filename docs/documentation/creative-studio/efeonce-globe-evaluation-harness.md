@@ -4,13 +4,13 @@
 > **Version:** 1.0
 > **Creado:** 2026-07-19 por Claude (TASK-1458)
 > **Ultima actualizacion:** 2026-07-19 por Claude
-> **Documentacion tecnica:** [`efeonce-globe/docs/architecture/EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md`](../../../../efeonce-globe/docs/architecture/EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md) (repo hermano)
+> **Documentacion tecnica:** [`docs/architecture/creative-studio/EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md`](../../architecture/creative-studio/EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md)
 
 ## De qué se trata este documento
 
 Efeonce Globe es la **plataforma hermana de producción creativa** de Efeonce (imagen, video, audio). Greenhouse **no la hospeda**: la **gobierna**. Greenhouse es dueño de la identidad, el acceso deseado y el control de tareas/EPICs; Globe es dueño de su propio código, runtime, datos y evidencia creativa. Se integran como pares, sin compartir base de datos, sesión, buckets, secretos de proveedor ni acceso admin.
 
-Este documento explica, en lenguaje simple y **desde el punto de vista de Greenhouse**, qué es el **Evaluation Harness** que se construyó en `TASK-1458` y por qué importa. El detalle técnico completo vive en el repo `efeonce-globe` (enlaces al final): acá damos el mapa y el gobierno; allá vive la fuente canónica.
+Este documento explica, en lenguaje simple y **desde el punto de vista de Greenhouse**, qué es el **Evaluation Harness** que se construyó en `TASK-1458` y por qué importa. La spec técnica y esta documentación funcional viven en Greenhouse (control plane documental, EPIC-028); en el repo `efeonce-globe` solo vive el **código** que lo implementa (enlaces al final).
 
 ## Qué es el Evaluation Harness (en simple)
 
@@ -72,9 +72,9 @@ Cada evaluación produce un **reporte versionado** que registra la versión exac
 
 > **Detalle técnico y código (repo hermano `efeonce-globe`):**
 >
-> - Spec técnica canónica (SPEC-003): [`docs/architecture/EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md`](../../../../efeonce-globe/docs/architecture/EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md).
+> - Spec técnica canónica (SPEC-003): [`docs/architecture/EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md`](../../architecture/creative-studio/EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md).
 > - Motor de evaluación (golden briefs como dato, rúbricas, checks objetivos, comando `evaluate`, readers, store): [`packages/domain/src/evaluation.ts`](../../../../efeonce-globe/packages/domain/src/evaluation.ts).
-> - El Model Lab que este Harness **consume** (SPEC-002): [`docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md`](../../../../efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md).
+> - El Model Lab que este Harness **consume** (SPEC-002): [`docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md`](../../architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md).
 >
 > **Gobierno en Greenhouse:**
 >

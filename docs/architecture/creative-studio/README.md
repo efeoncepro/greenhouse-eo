@@ -37,19 +37,20 @@ Nunca se crea documentación gobernante nueva en `efeonce-globe/docs/**`.
 | Programa / EPIC | `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md` |
 | Continuidad + cronología | `Handoff.md` + `changelog.md` (modelo de contexto de Greenhouse) |
 
-## Índice de arquitectura (se puebla con la repatriación — TASK-1492)
+## Índice de arquitectura (repatriado — TASK-1492)
 
-La repatriación de la arquitectura que hoy vive en `efeonce-globe/docs/architecture/**` hacia este
-directorio está gobernada por **TASK-1492**. Documentos esperados acá al cerrar esa task:
+La arquitectura de Globe vive acá (repatriada de `efeonce-globe/docs/architecture/**` por TASK-1492;
+la historia previa es auditable en el git log del repo hermano):
 
-- API Contract Spine (el esqueleto de contratos server-side; TASK-1481)
-- Model Lab (sandbox gobernado: spend fence, private-ingest, kill switch, provider seam)
-- Evaluation Harness (golden briefs + rúbricas)
-- Platform Foundation (invariantes de la plataforma)
-- Greenhouse ↔ Globe Connectivity (identidad federada, WIF/ADC, auth de caller api-mode)
+- [PLATFORM_FOUNDATION_V1.md](PLATFORM_FOUNDATION_V1.md) — invariantes de la plataforma (monorepo Node 24, boundary Globe↔Greenhouse, surfaces).
+- [EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md](EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md) — el esqueleto de contratos server-side (Full API Parity, trusted context, coverage matrix; TASK-1481).
+- [EFEONCE_GLOBE_MODEL_LAB_V1.md](EFEONCE_GLOBE_MODEL_LAB_V1.md) — sandbox gobernado: spend fence, private-ingest, kill switch, provider seam (TASK-1457).
+- [EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md](EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md) — golden briefs + rúbricas + verdict pending-human (TASK-1458).
+- [GREENHOUSE_CONNECTIVITY_V1.md](GREENHOUSE_CONNECTIVITY_V1.md) — identidad federada, WIF/ADC, auth de caller api-mode (ADR-001).
+- [DECISIONS_INDEX.md](DECISIONS_INDEX.md) — índice de decisiones **scoped a Globe** (distinto del `docs/architecture/DECISIONS_INDEX.md` de Greenhouse).
+- [GLOBE_STUDIO_WORKBENCH_BACKEND_GAP_ANALYSIS_V1.md](GLOBE_STUDIO_WORKBENCH_BACKEND_GAP_ANALYSIS_V1.md) — brecha diseño↔backend del Studio Workbench (fuente de TASK-1493…1499).
 
-> Mientras TASK-1492 no cierre, parte de estos specs sigue físicamente en `efeonce-globe/docs/`.
-> El estado vigente de la repatriación se consulta en `Handoff.md`, no en este índice.
+Runbooks operativos de Globe: [`docs/operations/creative-studio/`](../../operations/creative-studio/README.md).
 
 ## Decisiones canónicas ya en Greenhouse
 

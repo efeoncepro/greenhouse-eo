@@ -206,7 +206,7 @@ promotion to production stays the separate gate from framework #10 above).
 
 Flow: decide the shape here → hand to `$greenhouse-globe` for the Globe structure → it
 hands back up if a new shape decision surfaces. Canonical specs:
-`efeonce-globe/docs/architecture/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md` (SPEC-001) +
+`docs/architecture/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md` (SPEC-001) +
 Greenhouse `EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_{DECISION,ARCHITECTURE}_V1.md` +
 `EPIC-028`. Mirrored on the Claude side (`arch-architect` ↔ `greenhouse-globe`).
 

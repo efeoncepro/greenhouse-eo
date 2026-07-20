@@ -4,7 +4,7 @@
 > **Version:** 1.0
 > **Creado:** 2026-07-19 por Claude (TASK-1464)
 > **Ultima actualizacion:** 2026-07-19 por Claude
-> **Documentacion tecnica:** [`efeonce-globe/docs/operations/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`](../../../../efeonce-globe/docs/operations/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md) (repo hermano)
+> **Documentacion tecnica:** [`docs/operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`](../../operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md) (repo hermano)
 
 ## De qué se trata este documento
 
@@ -49,9 +49,9 @@ Esta IaC **no despliega por sí sola** los servicios de la aplicación de Globe 
 
 > **Detalle técnico y operación (repo hermano `efeonce-globe`):**
 >
-> - Runbook de infraestructura (bootstrap del state bucket, init/plan/apply supervisado, GitHub WIF, smokes, rollback): [`docs/operations/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`](../../../../efeonce-globe/docs/operations/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md).
-> - Contrato de conectividad e identidad con Greenhouse: [`docs/architecture/GREENHOUSE_CONNECTIVITY_V1.md`](../../../../efeonce-globe/docs/architecture/GREENHOUSE_CONNECTIVITY_V1.md).
-> - Invariantes de fundación de la plataforma: [`docs/architecture/PLATFORM_FOUNDATION_V1.md`](../../../../efeonce-globe/docs/architecture/PLATFORM_FOUNDATION_V1.md).
+> - Runbook de infraestructura (bootstrap del state bucket, init/plan/apply supervisado, GitHub WIF, smokes, rollback): [`docs/operations/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`](../../operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md).
+> - Contrato de conectividad e identidad con Greenhouse: [`docs/architecture/GREENHOUSE_CONNECTIVITY_V1.md`](../../architecture/creative-studio/GREENHOUSE_CONNECTIVITY_V1.md).
+> - Invariantes de fundación de la plataforma: [`docs/architecture/PLATFORM_FOUNDATION_V1.md`](../../architecture/creative-studio/PLATFORM_FOUNDATION_V1.md).
 >
 > **Gobierno en Greenhouse:**
 >

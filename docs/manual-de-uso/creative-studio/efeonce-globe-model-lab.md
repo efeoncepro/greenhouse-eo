@@ -25,7 +25,7 @@ El **Model Lab** de Efeonce Globe (`TASK-1457`) es un banco de pruebas gobernado
 4. **Ver evidencia.** Lee los **manifiestos por intento**: ruta propuesta vs real, costo estimado y real, huellas de insumos y de resultado, línea de origen.
 5. **Cierra en Greenhouse:** lifecycle de la task, docs, handoff (el cierre documental es de Greenhouse).
 
-El **runbook operativo completo** (habilitación con el flag, el flujo real por SDK `prepareExperiment` / `executeExperiment` / `getExperimentEvidence`, los guardrails en acción y cómo agregar una ruta de proveedor real) está en el repo hermano: [`efeonce-globe/docs/operations/EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md`](../../../../efeonce-globe/docs/operations/EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md) **§7-bis (Model Lab)**. La infraestructura que lo sostiene (bucket privado, despliegue sin llaves, presupuesto) está en [`EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`](../../../../efeonce-globe/docs/operations/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md).
+El **runbook operativo completo** (habilitación con el flag, el flujo real por SDK `prepareExperiment` / `executeExperiment` / `getExperimentEvidence`, los guardrails en acción y cómo agregar una ruta de proveedor real) está en el repo hermano: [`docs/operations/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md`](../../operations/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md) **§7-bis (Model Lab)**. La infraestructura que lo sostiene (bucket privado, despliegue sin llaves, presupuesto) está en [`EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`](../../operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md).
 
 ## Qué significan los estados
 
@@ -54,8 +54,8 @@ El **runbook operativo completo** (habilitación con el flag, el flujo real por 
 
 - Operar los proveedores reales y comparar motores en una eval: [`efeonce-globe-model-lab-providers.md`](./efeonce-globe-model-lab-providers.md).
 - Evaluar un golden brief (Evaluation Harness): [`efeonce-globe-evaluation-harness.md`](./efeonce-globe-evaluation-harness.md).
-- Runbook operativo — correr un experimento paso a paso: [`efeonce-globe/docs/operations/EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md`](../../../../efeonce-globe/docs/operations/EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md) §7-bis.
-- Spec técnica canónica (nombre previsto): [`efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md`](../../../../efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md).
+- Runbook operativo — correr un experimento paso a paso: [`docs/operations/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md`](../../operations/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md) §7-bis.
+- Spec técnica canónica (nombre previsto): [`docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md`](../../architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md).
 - Documentación funcional (Greenhouse): [`docs/documentation/creative-studio/efeonce-globe-model-lab.md`](../../documentation/creative-studio/efeonce-globe-model-lab.md).
 - Infraestructura que lo sostiene: [`docs/documentation/creative-studio/efeonce-globe-infra-keyless.md`](../../documentation/creative-studio/efeonce-globe-infra-keyless.md).
 - Programa: [`EPIC-028`](../../epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md). Skill: `greenhouse-globe`.

@@ -73,7 +73,7 @@ mecanismo condiciona el ruteo. Dos paradigmas, no intercambiables:
 El set de referencias va **edit base primero** (el orden es condicionamiento) y cada ruta declara su tope; al
 excederlo debe **fallar cerrado**, nunca truncar — truncar devuelve trabajo plausible que no es el pedido.
 Dentro de la plataforma gobernada esto ya existe como una sola semántica de capability (`editFrom`, con el
-paradigma resuelto adentro y declarado en el manifest): `efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md`
+paradigma resuelto adentro y declarado en el manifest): `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md`
 §"Edit / refine cross-model".
 
 ## Contrato de salida del agente

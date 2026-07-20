@@ -34,7 +34,7 @@ operativo paso a paso — con snippets reales de código — vive en ese repo. A
 
 El **runbook operativo completo** (con el envelope JSON real para llamar por HTTP, el snippet del `GlobeClient`,
 la semántica de estados/errores, el troubleshooting y la lista de NUNCA) está en el repo hermano:
-[`efeonce-globe/docs/operations/EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md`](../../../../efeonce-globe/docs/operations/EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md).
+[`docs/operations/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md`](../../operations/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md).
 
 ## Qué significan los estados
 
@@ -62,6 +62,6 @@ la semántica de estados/errores, el troubleshooting y la lista de NUNCA) está 
 
 ## Referencias técnicas
 
-- Spec técnica canónica: [`efeonce-globe/docs/architecture/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md`](../../../../efeonce-globe/docs/architecture/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md) (SPEC-001).
+- Spec técnica canónica: [`docs/architecture/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md`](../../architecture/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md) (SPEC-001).
 - Documentación funcional (Greenhouse): [`docs/documentation/creative-studio/efeonce-globe-api-contract-spine.md`](../../documentation/creative-studio/efeonce-globe-api-contract-spine.md).
 - Programa: [`EPIC-028`](../../epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md). Skill: `greenhouse-globe`.

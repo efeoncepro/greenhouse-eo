@@ -42,7 +42,7 @@ La operación tiene tres verbos: **listar → evaluar → leer el reporte.**
 4. **Lee el reporte.** Con `client.getEvaluationReport(reportId)`. El reporte está **scopeado a tu workspace**: pedir un reporte de otro espacio de trabajo → `not_found` (no se revela que existe en otra parte). Cómo leerlo, en la sección de estados de abajo.
 5. **Cierra en Greenhouse:** lifecycle de la task, docs, handoff (el cierre documental es de Greenhouse).
 
-El **runbook operativo completo** (habilitación con el flag, el flujo real por SDK `listGoldenBriefs` / `evaluateGoldenBrief` / `getEvaluationReport`, los errores en acción y cómo agregar una ruta de proveedor real) está en el repo hermano: [`efeonce-globe/docs/operations/EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md`](../../../../efeonce-globe/docs/operations/EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md) **§7-ter (Evaluation Harness)**.
+El **runbook operativo completo** (habilitación con el flag, el flujo real por SDK `listGoldenBriefs` / `evaluateGoldenBrief` / `getEvaluationReport`, los errores en acción y cómo agregar una ruta de proveedor real) está en el repo hermano: [`docs/operations/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md`](../../operations/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md) **§7-ter (Evaluation Harness)**.
 
 ## Qué significan los estados y señales
 
@@ -84,9 +84,9 @@ Un reporte separa deliberadamente lo objetivo de lo humano. Léelo en ese orden.
 
 ## Referencias técnicas
 
-- Runbook operativo — evaluar un golden brief paso a paso: [`efeonce-globe/docs/operations/EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md`](../../../../efeonce-globe/docs/operations/EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md) §7-ter.
-- Spec técnica canónica (SPEC-003): [`efeonce-globe/docs/architecture/EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md`](../../../../efeonce-globe/docs/architecture/EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md).
-- Model Lab que este harness consume (SPEC-002): manual [`efeonce-globe-model-lab.md`](./efeonce-globe-model-lab.md) · spec [`efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md`](../../../../efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md).
+- Runbook operativo — evaluar un golden brief paso a paso: [`docs/operations/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md`](../../operations/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md) §7-ter.
+- Spec técnica canónica (SPEC-003): [`docs/architecture/creative-studio/EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md`](../../architecture/creative-studio/EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md).
+- Model Lab que este harness consume (SPEC-002): manual [`efeonce-globe-model-lab.md`](./efeonce-globe-model-lab.md) · spec [`docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md`](../../architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md).
 - Documentación funcional (Greenhouse) de este harness, en lenguaje simple: [`docs/documentation/creative-studio/efeonce-globe-evaluation-harness.md`](../../documentation/creative-studio/efeonce-globe-evaluation-harness.md).
 - Documentación funcional (Greenhouse) del Model Lab, para contexto de dominio: [`docs/documentation/creative-studio/efeonce-globe-model-lab.md`](../../documentation/creative-studio/efeonce-globe-model-lab.md).
 - Programa: [`EPIC-028`](../../epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md). Skill: `greenhouse-globe`.

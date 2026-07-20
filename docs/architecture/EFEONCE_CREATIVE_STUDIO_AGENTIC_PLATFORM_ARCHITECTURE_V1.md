@@ -98,7 +98,7 @@ El bootstrap usa un único proyecto GCP aislado, `efeonce-globe`, bajo la organi
 > Lab `efeonce-globe-lab-evidence`, remote state en `gs://efeonce-globe-tfstate`, budget/alertas opt-in y una alerta
 > anti-SA-key (invariante keyless). El `tofu apply` supervisado dio `23 imported, 13 added, 0 changed, 0 destroyed`
 > (identidad de `TASK-1454` adoptada sin un solo destroy/replace). Protocolo: el apply ocurre sólo tras un `plan` con
-> CERO destroy/replace. Runbook: `efeonce-globe/docs/operations/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`. Al trabajar sobre
+> CERO destroy/replace. Runbook: `docs/operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`. Al trabajar sobre
 > Globe, invocar la skill `greenhouse-globe`.
 
 ## 4. Core domain model
@@ -280,7 +280,7 @@ Nunca reciben un tool genérico `run_endpoint(endpoint, arbitrary_json)`.
 > auto-elige un ganador creativo** (craft = decisión humana; promover una ruta a producción sigue siendo un gate separado).
 > Pendientes: resolución hash→bytes (desbloquea input-bearing + motion/audio labs), key Fal propia de Globe, deploy de
 > `studio-web` y routing por contrato de fidelidad en el Composite. Spec canónica:
-> `efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md` (provider seam del Model Lab). Al trabajar sobre Globe,
+> `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md` (provider seam del Model Lab). Al trabajar sobre Globe,
 > invocar la skill `greenhouse-globe`.
 
 The Glitch intro becomes a canonical fixture: a practical `ON AIR` must be born in the scene, the finger performs a strike-and-rebound rather than a button press, and microphone foley must be evaluated as sound-of-contact. The router cannot silently replace this with an overlay or generic tap SFX. The RRSS micro-scenes are a different fixture: synthetic key visuals can be a flexible visual anchor and may route to a different video engine.
@@ -317,7 +317,7 @@ padre bajo una postura que un caller no puede declarar por sí mismo.
 > **Estado — `TASK-1490` (2026-07-20), verificado en vivo por el seam completo** en cuatro carriles:
 > reference-based, cross-model (Seedream → Nano Banana en Vertex), stateful (Gemini Omni) y referencias
 > combinadas imagen+vídeo. Contrato, rechazos previos a la reserva de gasto, invariantes de derechos y
-> evidencia: `efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md` → §"Edit / refine cross-model".
+> evidencia: `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md` → §"Edit / refine cross-model".
 
 ## 7. Credits and commercial boundary
 
@@ -382,7 +382,7 @@ transports. The semantic boundary is:
 > transport-neutral, coverage machine-readable de 3 estados (`missing` irrepresentable), errores canónicos
 > (`policy_blocked` ≠ `access_denied` ≠ `not_found`), private HTTP (`/v1/capabilities`, `/v1/commands`, `/v1/readers`)
 > + SDK tipado, y un conformance harness manifest-driven (HTTP≡SDK, anti-spoofing). Ships con una capability
-> inerte; las creativas quedan `policy-blocked` hasta su task. Spec canónica: `efeonce-globe/docs/architecture/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md`
+> inerte; las creativas quedan `policy-blocked` hasta su task. Spec canónica: `docs/architecture/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md`
 > (SPEC-001) + runbook y doc funcional en el mismo repo. Al implementar sobre Globe, invocar la skill `greenhouse-globe`.
 
 ```text
@@ -437,7 +437,7 @@ Las fases describen madurez del producto, no una waterfall de implementación. E
 `Lab-qualified` no equivale a `production_approved`. UI/MCP sólo consumen rutas que además cumplen aislamiento,
 idempotencia, estimate/reservation, approval token, rights/provider policy, eval calificada, observabilidad y
 rollback. El execution plan canónico vive en
-`efeonce-globe/docs/operations/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`.
+`docs/operations/creative-studio/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`.
 
 > **Estado — `TASK-1457` implementado (2026-07-19, fake canary).** El Model Lab es la primera capability de negocio
 > sobre el spine de `TASK-1481`: capability `globe.lab.experiment.run`, commands `prepare`/`execute`/`cancel` +
@@ -449,7 +449,7 @@ rollback. El execution plan canónico vive en
 > determinístico (cero red, cero gasto, cero infraestructura). El canary con **proveedor real** queda pendiente
 > —gated en `TASK-1464` + aprobación explícita— y falta adapter real, secretos de proveedor en Secret Manager,
 > Dockerfile de studio-web y `GLOBE_LAB_ENABLED=true` (default OFF). UI/MCP quedan `policy-blocked` hasta la
-> promoción. Spec canónica: `efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md`.
+> promoción. Spec canónica: `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md`.
 
 La gobernanza de ejecución no se desplaza con el runtime: Greenhouse conserva EPIC-028, `TASK-1456…1481`,
 task hooks, Plan Mode, lint, QA, lifecycle, cierre y handoff. Globe posee código, infraestructura, datos y
@@ -467,7 +467,7 @@ evidencia técnica; su plan operativo referencia las tasks canónicas y no crea 
 > y con limitaciones declaradas (proveedor fake, muestra única). Un report es evidencia técnica, **nunca** aprobación de
 > ruta (invariante 9) ni de artefacto (invariante 6). `ui`/`mcp` quedan `policy-blocked`; el juicio humano real y la
 > corrida contra proveedor real quedan pendientes del canary de SPEC-002. Spec canónica:
-> `efeonce-globe/docs/architecture/EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md`.
+> `docs/architecture/creative-studio/EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md`.
 
 | Phase | Outcome | Explicitly excluded |
 | --- | --- | --- |

@@ -222,4 +222,4 @@ state machine y el mismo manifest. La parity nace por construcción en vez de ag
 retención de outputs rompería la refinabilidad de todo candidato ya producido. **Confidence:** alta — verificado
 en vivo por el seam completo el 2026-07-20 (reference-based, cross-model, stateful y referencias combinadas
 imagen+vídeo). **Validated as of:** 2026-07-20. Detalle técnico:
-`efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md` → §"Edit / refine cross-model".
+`docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md` → §"Edit / refine cross-model".

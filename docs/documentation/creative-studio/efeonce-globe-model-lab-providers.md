@@ -4,13 +4,13 @@
 > **Version:** 1.1
 > **Creado:** 2026-07-19 por Claude (TASK-1486/1487/1488/1459)
 > **Ultima actualizacion:** 2026-07-20 por Claude (editar sobre lo generado + publicado interno)
-> **Documentacion tecnica:** [`efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md`](../../../../efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md) (repo hermano; §"Realización — VertexCreativeAdapter" y §"Segundo adapter — Fal + Composite")
+> **Documentacion tecnica:** [`docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md`](../../architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md) (§"Realización — VertexCreativeAdapter" y §"Segundo adapter — Fal + Composite")
 
 ## De qué se trata este documento
 
 Efeonce Globe es la **plataforma hermana de producción creativa** de Efeonce (imagen, video, audio, voz, 3D). Greenhouse **no la hospeda**: la **gobierna**. Greenhouse es dueño de la identidad, el acceso deseado y el control de tareas/EPICs; Globe es dueño de su propio código, runtime, datos, secretos de proveedor y evidencia creativa. Se integran como pares, sin compartir base de datos, sesión, buckets, secretos ni acceso admin.
 
-Este documento explica, en lenguaje simple y **desde el punto de vista de Greenhouse**, quiénes son los **proveedores reales** que ya se conectaron al [Model Lab](efeonce-globe-model-lab.md), qué modelos cubren cada capacidad, cómo se elige un proveedor y qué es la **matriz de recomendación**. El detalle técnico completo vive en el repo `efeonce-globe` (enlaces al final): acá damos el mapa funcional; allá vive la fuente canónica.
+Este documento explica, en lenguaje simple y **desde el punto de vista de Greenhouse**, quiénes son los **proveedores reales** que ya se conectaron al [Model Lab](efeonce-globe-model-lab.md), qué modelos cubren cada capacidad, cómo se elige un proveedor y qué es la **matriz de recomendación**. La spec técnica y esta documentación funcional viven en Greenhouse (control plane documental, EPIC-028); en el repo `efeonce-globe` solo vive el **código** de los adapters (enlaces al final).
 
 ## Qué cambió: del ensayo a proveedores reales (en simple)
 
@@ -105,7 +105,7 @@ Recordatorio de superficies y facturación: **generar** es keyless en Vertex; **
 
 > **Detalle técnico y código (repo hermano `efeonce-globe`):**
 >
-> - Spec técnica canónica — proveedores, routing tables, keyless/keyed, matriz: [`docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md`](../../../../efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md) (§"Realización — VertexCreativeAdapter", §"Segundo adapter — Fal + Composite").
+> - Spec técnica canónica — proveedores, routing tables, keyless/keyed, matriz: [`docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md`](../../architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md) (§"Realización — VertexCreativeAdapter", §"Segundo adapter — Fal + Composite").
 > - Adapter Vertex (keyless, `VERTEX_ROUTING`): [`apps/creative-runner/src/vertex-adapter.ts`](../../../../efeonce-globe/apps/creative-runner/src/vertex-adapter.ts).
 > - Adapter Fal (`FAL_ROUTING`, queue API): [`apps/creative-runner/src/fal-adapter.ts`](../../../../efeonce-globe/apps/creative-runner/src/fal-adapter.ts).
 > - Adapter Composite (routing por `supports()` + política): [`apps/creative-runner/src/composite-adapter.ts`](../../../../efeonce-globe/apps/creative-runner/src/composite-adapter.ts).

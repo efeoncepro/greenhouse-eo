@@ -12,3 +12,7 @@
 - [2026-07](2026-07.md)
 
 No volver a pegar historia completa en este índice.
+
+## Streams de plataformas hermanas
+
+- [Creative Studio / Efeonce Globe](creative-studio-globe.md) — changelog del runtime de Globe, repatriado por TASK-1492 (control plane documental en Greenhouse). Continuidad activa: `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
