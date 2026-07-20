@@ -1,19 +1,35 @@
-# Gemini Omni Flash en Vertex AI — referencia operativa
+# Gemini Omni Flash — referencia operativa (Interactions API)
 
 > **Tipo de documento:** Referencia técnica agent-facing (para operar Gemini Omni sin volver a investigar).
-> **Verificado as-of:** runtime base 2026-07-05 + edición persistida Glitch 2026-07-11 (`efeonce-group`, `global`); docs oficiales Google reverificadas 2026-07-11.
+> **Verificado as-of:** migración a Interactions API **2026-07-20** (`efeonce-globe`, Vertex keyless `global` + Gemini API con key) + edit cross-model / multi-referencia combinada **2026-07-20** (TASK-1490, live-verificado por el seam en ambas superficies); runtime histórico `generateContent` 2026-07-05 + edición persistida Glitch 2026-07-11 (`efeonce-group`, `global`), **ya no vigente**.
 > **Idioma:** es-CL neutro (tuteo).
 > **Regla de uso:** el modelo está en **PUBLIC_PREVIEW**. Todo dato marcado `(as-of 2026-07 — reverificar)` es volátil: confírmalo contra la fuente antes de comprometer costo o pipeline. Google lanzó el modelo el **2026-06-30**; el contrato cambia semana a semana.
+
+> **Actualización 2026-07-20 — Omni migró a la Interactions API.** `gemini-omni-flash-preview` **ya no es invocable por `generateContent`**: ese método devuelve `400 "gemini-omni-flash-preview is only supported in the Interactions API and cannot be called directly via generateContent."` Todo el contrato `:generateContent` + `responseModalities:["TEXT","VIDEO"]` que describía la versión anterior de este doc quedó **STALE**. El modelo ahora corre sobre `/interactions` en **dos superficies distintas y NO intercambiables**:
+> 1. **Vertex AI KEYLESS (GEAP)** — `POST …/v1beta1/projects/{project}/locations/{global|us-central1}/interactions`, auth **ADC/WIF Bearer** (sin API key, sin `x-goog-user-project`; el proyecto va en el path). Sirve **solo GENERACIÓN** (`text_to_video`, `image_to_video`). **No** sirve edición stateful: `previous_interaction_id` → `400 "…do not support previous_interaction_id"` y `GET /interactions/{id}` → `500`.
+> 2. **Gemini API (generativelanguage) con API KEY** — `POST https://generativelanguage.googleapis.com/v1beta/interactions?key=API_KEY`. **Rechaza OAuth** (`403 ACCESS_TOKEN_SCOPE_INSUFFICIENT`): exige API key. Sirve la **Interactions API completa**, incluida la **EDICIÓN stateful** (`previous_interaction_id` + `store:true`).
+> Las specs que siguen vigentes (720p · 24fps · audio nativo · SynthID/C2PA · ~$0.10/s) no cambiaron. Verificado en vivo 2026-07-20: generación t2v keyless por Vertex → `200 completed` (MP4 inline ~3.5MB) **y** edición stateful por Gemini-key → `200 completed`. Reverifica antes de cablear producción: sigue en preview.
+
+> **Actualización 2026-07-20 (TASK-1490) — el edit dejó de ser "una cosa de Omni".** Refinar un candidato es ahora una **semántica única** (`editFrom`) para todo modelo editable, y Omni es **uno de dos paradigmas**, no el dueño del concepto:
+>
+> - **Stateful** (Omni): el proveedor guarda la sesión y se encadena por su id (`previous_interaction_id`).
+> - **Reference-based** (todos los demás): el output del padre se re-inyecta como base. Es el que habilita el **cross-model** — un candidato de Omni puede refinarse desde otro motor, y un candidato de Seedream puede refinarse con Nano Banana.
+>
+> Consecuencias para quien lee este doc: (a) `previous_interaction_id` sigue siendo el mecanismo **del proveedor**, pero como **vocabulario de caller quedó deprecado** — en Globe se pide `editFrom` y el paradigma lo elige el runner según qué proveedor ejecuta; (b) un id de la superficie keyless **no es encadenable en ninguna parte** y quien lo certifica es el **adapter** (`providerRunChainable`), no la política; (c) `reference_to_video` acepta sets **combinados imagen+vídeo**, live-verificado en **ambas** superficies, **y exige al menos una imagen o audio** en el set (§4.7). Detalle de la semántica de plataforma: `efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md` §"Edit / refine cross-model" (cargar la skill `greenhouse-globe` para tocarlo).
 
 ---
 
 ## 0. TL;DR operativo (lo que necesitas para invocarlo hoy)
 
 - **Modelo:** `gemini-omni-flash-preview`.
-- **Dónde corre para nosotros:** Vertex AI, región **`global`** (NO `us-central1`, NO `us-east4` → ahí da `NOT_FOUND`). Verificado en `efeonce-group`.
-- **Método en Vertex:** clásico `generateContent`, con `generationConfig.responseModalities: ["TEXT","VIDEO"]` (ambas obligatorias).
-- **Salida verificada:** clip **10 s · 720p de lado corto · 24 fps · MP4**, base64 inline en `candidates[].content.parts[].inlineData` (`mimeType: video/mp4`) + un part de texto "thinking" que se ignora. Con referencia portrait se verificó `720×1280`; con landscape, `1280×720`.
-- **Entradas:** texto + imagen (`image/png`) + video (`video/mp4`) como `inlineData` → text/image/video-to-video con fuerte continuidad.
+- **Método (NUEVO):** **Interactions API** (`POST …/interactions`), NO `generateContent` (bloqueado con `400`). El `input` es polimórfico y todo el contrato es **snake_case**.
+- **Dos superficies, elige por tarea:**
+  - **Generar** (`text_to_video`, `image_to_video`) → **Vertex KEYLESS**: `POST https://aiplatform.googleapis.com/v1beta1/projects/<project>/locations/global/interactions`, auth **ADC/WIF Bearer** (sin API key, sin `x-goog-user-project`). También responde `us-central1` (host `us-central1-aiplatform.googleapis.com`).
+  - **Editar** (stateful, `previous_interaction_id` + `store:true`) → **Gemini API con KEY**: `POST https://generativelanguage.googleapis.com/v1beta/interactions?key=API_KEY`. Vertex keyless **no** edita.
+- **Body de generación:** `{ model, input, response_format:{type:"video", aspect_ratio:"16:9"|"9:16"}, generation_config:{video_config:{task:"text_to_video"|"image_to_video"|"reference_to_video"}}, background:false, store:<bool>, stream:false }`. `input` = un STRING (t2v) o un `Content[]` que admite **varias entradas y tipos mezclados** — `{type:"image",…}` (una o N), `{type:"text",…}` y hasta `{type:"video",…}` combinados (i2v / reference_to_video multi- y cross-referencia; ver §4.7).
+- **Body de edición (paradigma STATEFUL):** `{ model, previous_interaction_id, input:"<instrucción>", response_format, store:true }` (SIN `video_config.task`). El edit es una **cadena**: create con `store:true` → guardas el `id` → editas con `previous_interaction_id`; el resultado trae un **`id` nuevo, encadenable** (edit del edit). Un clip generado por Vertex keyless **no** es editable por esta vía → si vas a encadenar stateful, **genera también en Gemini-key** (§4.6).
+- **La otra vía de refinar (REFERENCE-BASED):** re-inyectar el clip del padre como referencia en un `reference_to_video`/`image_to_video` nuevo. No depende de ninguna sesión del proveedor, así que **funciona aunque el padre se haya generado keyless** y permite **cross-model** (refinar un candidato de Omni con otro motor y viceversa). Es la vía por defecto en Globe; la stateful se usa sólo cuando el proveedor ejecutante es el mismo que emitió el id (§4.6).
+- **Salida:** respuesta **síncrona unaria** (~35–60 s de bloqueo). `{ id, status:"completed"|..., steps:[{type:"thought"}, {type:"model_output", content:[{type:"video", mime_type:"video/mp4", data:<base64> | uri:<url>}]}], usage:{output_tokens_by_modality:[{modality:"video", tokens}]} }`. Extrae el video en `steps[].type==="model_output"` → `content[].type==="video"` → `data` (base64, **≤4MB inline**) o `uri` (>4MB; al uri de Gemini se le anexa la key para descargar). Clip **3–10 s · 720p lado corto · 24 fps · MP4 con audio**, `16:9` o `9:16`.
 - **Costo:** ~**$0.10 por segundo** de video 720p ($17.50/1M tokens de salida × 5.792 tokens/seg). Un clip de 10 s ≈ **$1.00**.
 - **Watermark:** SynthID invisible + C2PA Content Credentials, siempre, no desactivable.
 
@@ -43,7 +59,7 @@ Google no publica el detalle interno del modelo (tamaño, training data, mezcla 
 | Eje | Gemini 3.x Flash/Pro | Veo 3.1 (Fast) | **Gemini Omni Flash** |
 |---|---|---|---|
 | Salida primaria | Texto (+ imagen en variantes `*-image`) | Video con audio | **Video con audio + texto** |
-| Edición conversacional de video | No | Limitada (regen) | **Sí — multi-turno stateful** |
+| Edición conversacional de video | No | Limitada (regen) | **Sí — multi-turno stateful (solo superficie Gemini-key, no Vertex keyless)** |
 | Entrada video como referencia | Análisis/comprensión | Image-to-video | **Text/image/video-to-video con continuidad fuerte** |
 | Razonamiento del mundo | Sí (fuerte) | Débil | **Sí (heredado de Gemini)** |
 | Costo video 720p | n/a | $0.10/s | **$0.10/s** (paridad con Veo 3.1 Fast) |
@@ -56,28 +72,28 @@ Lectura práctica: **si necesitas video con una microescena que puede reinterpre
 
 ### 2.1 Entrada
 
-| Modalidad | Vertex (`generateContent`) — **verificado** | Gemini API (Interactions) — docs oficiales |
+| Modalidad | Interactions API — cómo va en el `input` | Estado |
 |---|---|---|
-| **Texto** | Sí (`parts[].text`) | Sí |
-| **Imagen** | Sí — `inlineData` `image/png` (verificado) / JPEG | Sí (base64 o Files API) |
-| **Video** | Sí — `inlineData` `video/mp4` (verificado) | Sí (Files API por URI) |
-| **Audio** | No documentado / no verificado | **No soportado** en el preview: *"Uploading audio references is unsupported in the current version"* |
+| **Texto** | STRING pelado (t2v) o `{type:"text", text}` dentro de `Content[]` | Verificado (Vertex keyless + Gemini-key) |
+| **Imagen** | `{type:"image", data:BASE64, mime_type:"image/png"}` (o `image/jpeg`) dentro de `Content[]`; **una o N** referencias | Verificado 2 refs (i2v / reference_to_video); hasta 6 documentado |
+| **Video** | Dos usos: (a) **referencia combinada** dentro del `input` como `{type:"video", …}` junto a imágenes (`reference_to_video`, §4.7); (b) **target de edición** encadenado por `previous_interaction_id` (edit, Gemini-key) | (a) **verificado en vivo 2026-07-20 en AMBAS superficies** (set mixto imagen+vídeo → `candidate_ready`); el set **no puede ser sólo vídeo** (§4.7). (b) verificado en la superficie Gemini-key |
+| **Audio** | — | **No soportado** en el preview: *"Uploading audio references is unsupported in the current version"* |
 
 `(as-of 2026-07 — reverificar)` El audio **de entrada** (referencia de audio) no está soportado en el preview de la Gemini API. El audio **de salida** sí se genera automáticamente. Fuente: [ai.google.dev/gemini-api/docs/omni](https://ai.google.dev/gemini-api/docs/omni).
 
 ### 2.2 Salida
 
-- **Video** (MP4 con audio integrado) — modalidad principal.
-- **Texto** — un part de "thinking"/razonamiento que acompaña la generación. En Vertex es **obligatorio pedir ambas** (`["TEXT","VIDEO"]`); el texto normalmente se descarta.
+- **Video** (MP4 con audio integrado) — modalidad principal. En la respuesta vive en `steps[].type==="model_output"` → `content[].type==="video"`.
+- **Texto** — el modelo emite un `step` de razonamiento (`type:"thought"`) antes del `model_output`; no es un video, se ignora al extraer.
 - **Audio** — no es una salida separada: viene embebido en el MP4, guiable por prompt.
 
 ### 2.3 Combinaciones soportadas (tareas)
 
-En la Gemini API la tarea se declara con `generation_config.video_config.task`: `text_to_video` · `image_to_video` · `reference_to_video` · `edit`. En Vertex/`generateContent` la tarea se **infiere de las partes** que mandas (solo texto → t2v; texto+imagen → i2v; texto+video → edición/continuación).
+En la Interactions API la tarea se declara **explícitamente** en `generation_config.video_config.task`: `text_to_video` · `image_to_video` · `reference_to_video` (todas de **generación**, disponibles en Vertex keyless y Gemini-key) · `edit` (**stateful**, solo Gemini-key, y **sin** `video_config.task`: se identifica por `previous_interaction_id`). Ya NO se infiere de las partes como hacía la ruta `generateContent`; hay que setear el `task` correcto según el shape del `input`. `reference_to_video` acepta **múltiples referencias y tipos combinados** (varias imágenes + un video en el mismo `input`, §4.7) pero **exige al menos una imagen o audio** en el set; `edit` es una **cadena** stateful cuyo resultado devuelve un `id` nuevo encadenable (§4.6) — y **no es la única forma de refinar**: la vía reference-based re-inyecta el output del padre como referencia y es la que permite cruzar de modelo (§4.6).
 
 ### 2.4 Excepción operativa: practical legible bloqueado (Glitch, 2026-07-11)
 
-En una corrida real de Glitch, el PNG íntegro con un practical `ON AIR` legible, su derivado 720p y un video que ya contenía ese practical devolvieron `promptFeedback.blockReason=OTHER` antes de producir candidato. No se aisló que la palabra sea el motivo único: un request **sólo de texto** sí generó un letrero `ON AIR` físico y correctamente integrado en el set. Trata esto como un bloqueo opaco de combinación de input, no como una regla de seguridad sobre todo texto.
+En una corrida real de Glitch (ruta `generateContent` histórica), el PNG íntegro con un practical `ON AIR` legible, su derivado 720p y un video que ya contenía ese practical se bloquearon antes de producir salida. No se aisló que la palabra sea el motivo único: un request **sólo de texto** sí generó un letrero `ON AIR` físico y correctamente integrado en el set. Trata esto como un bloqueo opaco de combinación de input, no como una regla de seguridad sobre todo texto. En la **Interactions API** el mismo bloqueo se manifiesta como `status:"failed"` sin `model_output` (RAI block, típicamente `PROHIBITED_CONTENT`); la generación de personas puede caer ahí hasta que el proyecto quede en allowlist.
 
 Cuando un elemento es diegético y narrativamente crítico, quedan prohibidos blur de entrada y recomposición posterior para eludir este bloqueo. Haz un probe mínimo una sola vez; si el mismo input vuelve a bloquearse, conserva el asset como dirección y genera el **plano completo** text-to-video, describiendo el elemento como practical físico desde el primer frame. Valida su perspectiva, oclusión, profundidad y lectura en el resultado. No uses ese fallback para logos, copy de UI o texto que deba ser exacto: éstos permanecen fuera de Omni.
 
@@ -87,104 +103,216 @@ Cuando un elemento es diegético y narrativamente crítico, quedan prohibidos bl
 
 | Parámetro | Valor | Fuente / estado |
 |---|---|---|
-| **Resolución** | **1280×720 (720p)** | Verificado runtime + pricing 720p. No hay selector de resolución expuesto. |
-| **Duración** | **10 s** por request | Verificado (10 s). Anuncio: *"longer durations coming soon"*. Sin parámetro de control. |
+| **Resolución** | **1280×720 (720p)** lado corto | Verificado runtime + pricing 720p. No hay selector de resolución expuesto. |
+| **Duración** | **3–10 s** por request | 720p. Anuncio: *"longer durations coming soon"*. Sin parámetro de control fino. |
 | **FPS** | **24 fps** | Verificado runtime. No user-configurable. |
 | **Audio junto al video** | **Sí**, embebido en el MP4, guiable por prompt | Docs + verificado |
-| **Aspect ratio** | `16:9` (default) y `9:16` | Docs Gemini API (`response_format.aspect_ratio`). En Vertex el clip verificado salió 1280×720 = 16:9. |
+| **Aspect ratio** | `16:9` (default) y `9:16` | `response_format.aspect_ratio`. En `edit` **no** se setea (lo hereda del input). |
 | **Cámara / consistencia** | Coherencia de escena y física; **limitación conocida** en consistencia de personaje ante cambios de escena/paneo | Anuncio + DeepMind |
-| **Image-to-video** | Sí (imagen de referencia → video) | Docs + verificado (`image/png` inline) |
-| **Video-to-video / reference-to-video** | Sí, con **fuerte continuidad** desde el clip de entrada | Verificado (`video/mp4` inline) |
-| **Edición conversacional multi-turno** | Sí — stateful; recuerda el contexto del video y aplica cambios preservando lo no tocado | Docs (Interactions API `previous_interaction_id`) |
+| **Image-to-video** | Sí — `task:"image_to_video"` con imagen base64 en el `input` | Verificado (Vertex keyless + Gemini-key) |
+| **Reference-to-video** | Sí, con **fuerte continuidad**; acepta **múltiples referencias** y **combinadas imagen+video** en el `input` (§4.7) | `task:"reference_to_video"` |
+| **Edición conversacional multi-turno** | Sí — stateful; recuerda el contexto del video y aplica cambios preservando lo no tocado; **cada edit devuelve un `id` nuevo encadenable** (§4.6) | **Solo Gemini-key** (`previous_interaction_id` + `store:true`); Vertex keyless NO edita. ~3 ediciones secuenciales en preview |
 
-> `(as-of 2026-07 — reverificar)` Ni resolución, ni fps, ni duración son configurables por parámetro en el preview. Si el pipeline necesita 1080p/4k o >10 s, **usa Veo 3.1** (que sí expone 720p/1080p/4k) y reserva Omni para el loop conversacional. Fuentes: [docs/omni](https://ai.google.dev/gemini-api/docs/omni), [blog Google](https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-omni-flash-nano-banana-2-lite/).
+> `(as-of 2026-07 — reverificar)` Ni resolución, ni fps, ni duración son configurables por parámetro fino en el preview. Si el pipeline necesita 1080p/4k o >10 s, **usa Veo 3.1** (que sí expone 720p/1080p/4k) y reserva Omni para el loop conversacional. Fuentes: [docs/omni](https://ai.google.dev/gemini-api/docs/omni), [blog Google](https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-omni-flash-nano-banana-2-lite/).
 
 ---
 
-## 4. API / contrato
+## 4. API / contrato — Interactions API
 
-Hay **dos superficies distintas** y NO son intercambiables. Documenta cuál usas.
+`gemini-omni-flash-preview` corre **solo por la Interactions API** (`POST …/interactions`). `generateContent` está bloqueado: devuelve `400 "gemini-omni-flash-preview is only supported in the Interactions API and cannot be called directly via generateContent."` — NO lo uses. Hay **dos superficies** de la Interactions API, distintas y NO intercambiables; elige por tarea (ver §4.0). Todo el contrato es **snake_case** y la llamada es **síncrona unaria** (~35–60 s de bloqueo por request).
 
-### 4.1 Vertex AI — `generateContent` (RUTA VERIFICADA, la nuestra)
+### 4.0 Elección de superficie (regla de decisión)
+
+| Necesitas | Superficie | Auth | Sirve `edit` |
+|---|---|---|---|
+| **Generar** (`text_to_video`, `image_to_video`, `reference_to_video`) | **Vertex AI KEYLESS (GEAP)** | ADC/WIF Bearer (scope `cloud-platform`); **sin** API key, **sin** `x-goog-user-project` | ❌ No — `previous_interaction_id` → `400 "…do not support previous_interaction_id"`; `GET /interactions/{id}` → `500` |
+| **Editar** (stateful) o generar y luego editar | **Gemini API (generativelanguage) con KEY** | `?key=API_KEY`; **rechaza OAuth** → `403 ACCESS_TOKEN_SCOPE_INSUFFICIENT` | ✅ Sí — Interactions API completa, incl. `previous_interaction_id` + `store:true` |
+
+Regla operativa Globe: **generar por Vertex keyless, editar por Gemini-key**. Es exactamente lo que hace el `VertexOmniAdapter` de `efeonce-globe` (ver §9.3).
+
+### 4.1 Vertex AI KEYLESS — generación (GEAP)
 
 ```
-POST https://aiplatform.googleapis.com/v1/projects/efeonce-group/locations/global/publishers/google/models/gemini-omni-flash-preview:generateContent
+POST https://aiplatform.googleapis.com/v1beta1/projects/<project>/locations/global/interactions
+# us-central1 también responde:
+POST https://us-central1-aiplatform.googleapis.com/v1beta1/projects/<project>/locations/us-central1/interactions
 ```
 
 Headers:
 ```
-Authorization: Bearer $(gcloud auth print-access-token)   # ADC
-x-goog-user-project: efeonce-group
+Authorization: Bearer $(gcloud auth print-access-token)   # ADC/WIF, scope cloud-platform
 Content-Type: application/json
 ```
 
-Body mínimo (text-to-video):
-```json
-{
-  "contents": [
-    { "role": "user", "parts": [ { "text": "<prompt>" } ] }
-  ],
-  "generationConfig": {
-    "responseModalities": ["TEXT", "VIDEO"]
-  }
-}
+**Reglas duras de la ruta keyless:**
+- **Sin API key** y **sin** `x-goog-user-project`: el proyecto va en el path (`projects/<project>`). Auth = Bearer OAuth/WIF.
+- Path con `v1beta1` (con el `1`), a diferencia de la ruta Gemini (`v1beta`).
+- Solo **generación** (`text_to_video`, `image_to_video`, `reference_to_video`). Cualquier `previous_interaction_id` → `400`; `GET /interactions/{id}` → `500`. Para editar, pasa a §4.2.
+- La API `aiplatform.googleapis.com` ya está habilitada en el proyecto.
+
+### 4.2 Gemini API con KEY — generación + edición stateful
+
 ```
-
-Body con referencia (image/video-to-video) — la referencia va como `inlineData` base64:
-```json
-{
-  "contents": [
-    { "role": "user", "parts": [
-      { "inlineData": { "mimeType": "image/png", "data": "<base64>" } },
-      { "text": "<instrucción de edición/continuación>" }
-    ] }
-  ],
-  "generationConfig": { "responseModalities": ["TEXT", "VIDEO"] }
-}
-```
-(Reemplaza `image/png` por `video/mp4` para video-to-video — ambos verificados.)
-
-**Reglas duras de la ruta Vertex:**
-- `responseModalities` **debe** traer `["TEXT","VIDEO"]`. Con solo una → **400**: *"requires both text and video response modalities"*.
-- Región **`global`**. Con `us-central1`/`us-east4` → **NOT_FOUND**.
-- Auth por ADC + `x-goog-user-project: efeonce-group` (sin el header, el billing/quota puede resolverse mal).
-- Respuesta **síncrona** (no long-running) en los clips de 10 s verificados.
-
-Forma de la respuesta verificada:
-```jsonc
-{
-  "candidates": [
-    { "content": { "parts": [
-        { "text": "…thinking… (ignorar)" },
-        { "inlineData": { "mimeType": "video/mp4", "data": "<base64 del MP4 10s·720p·24fps>" } }
-    ] } }
-  ],
-  "usageMetadata": {
-    "candidatesTokensDetails": [
-      { "modality": "VIDEO", "tokenCount": 57920 }   // = 5792 × 10 s
-    ]
-  }
-}
-```
-
-`launchStage: PUBLIC_PREVIEW`.
-
-### 4.2 Gemini API / AI Studio — Interactions API (ruta oficial de developers)
-
-La Gemini API pública **reemplazó** `generateContent` por la **Interactions API** para Omni:
-```
-POST https://generativelanguage.googleapis.com/v1beta/interactions
+POST https://generativelanguage.googleapis.com/v1beta/interactions?key=API_KEY
 # SDK google-genai: client.interactions.create(...)
 ```
-- `response_format`: `{ "type": "video", "aspect_ratio": "16:9"|"9:16" }` para generación. **En `task:'edit'` omite `aspect_ratio`: en Vertex devolvió `400 Aspect ratio cannot be set in response format for edit task`; el edit preserva el aspect del input.
-- `generation_config.video_config.task`: `text_to_video|image_to_video|reference_to_video|edit`.
-- Multi-turno stateful: encadena con `previous_interaction_id`.
-- Flags de performance: para una edición recuperable que puede tardar, usar `background:true` + `store:true` y polling por ID. `store=false` **desactiva** editar/recuperar ese video después.
-- Salida: `steps[type='model_output'].content[]` con `type:"video"`, `mime_type:"video/mp4"`, y `data` (base64) o `uri`. No busques recursivamente en toda la interacción: podrías extraer el `input` como falso output.
 
-**Parámetros NO soportados** (ambas rutas, preview): `system instructions`, `temperature`, `top_p`, `stop sequences`, `negativePrompt` (embébelo en lenguaje natural), `seed`, `fps`, `duration`, `resolution`, provisioned throughput.
+**Reglas duras de la ruta Gemini-key:**
+- **Exige API key** en `?key=`. Un Bearer OAuth → `403 ACCESS_TOKEN_SCOPE_INSUFFICIENT`.
+- Es la **única superficie que edita hoy**: `previous_interaction_id` + `store:true`.
+- `store` gobierna la recuperación/edición posterior. Retención del store: **55 días** (paid) / **1 día** (free). ~3 ediciones secuenciales en preview. `store:false` → no podrás editar/recuperar ese video después.
+- `background:true` + polling por ID para ediciones largas recuperables (opcional; la llamada base es síncrona).
 
-> Divergencia clave a recordar: **Vertex expone `generateContent`; la Gemini API expone Interactions**. Nuestro runtime usa Vertex/`generateContent`. Si portas código desde un ejemplo de AI Studio, **no asumas** que el shape (`response_format`, `interactions.create`) aplica en Vertex.
+### 4.3 Cuerpos de request (ejemplos)
+
+**`text_to_video`** — `input` es un STRING pelado:
+```json
+{
+  "model": "gemini-omni-flash-preview",
+  "input": "<prompt de texto describiendo la escena>",
+  "response_format": { "type": "video", "aspect_ratio": "16:9" },
+  "generation_config": { "video_config": { "task": "text_to_video" } },
+  "background": false,
+  "store": false,
+  "stream": false
+}
+```
+
+**`image_to_video`** (y `reference_to_video`) — `input` es un `Content[]`; la imagen va base64 en `data`:
+```json
+{
+  "model": "gemini-omni-flash-preview",
+  "input": [
+    { "type": "image", "data": "<base64 del PNG/JPEG>", "mime_type": "image/png" },
+    { "type": "text", "text": "<prompt de animación / continuidad>" }
+  ],
+  "response_format": { "type": "video", "aspect_ratio": "9:16" },
+  "generation_config": { "video_config": { "task": "image_to_video" } },
+  "store": false
+}
+```
+
+**`edit`** (STATEFUL — solo Gemini-key) — encadena con `previous_interaction_id`, **sin** `video_config.task` y **sin** `aspect_ratio` (lo hereda del input; setearlo → `400 "Aspect ratio cannot be set in response format for edit task"`):
+```json
+{
+  "model": "gemini-omni-flash-preview",
+  "previous_interaction_id": "<id de la interacción a editar>",
+  "input": "<instrucción de edición en lenguaje natural>",
+  "response_format": { "type": "video" },
+  "store": true
+}
+```
+
+Opcional en cualquier `response_format`: `"delivery": "uri"` para forzar entrega por URL en vez de base64 inline.
+
+### 4.4 Forma de la respuesta (ambas superficies)
+
+```jsonc
+{
+  "id": "<interaction id>",
+  "status": "completed",           // también: "failed" | "in_progress" | …
+  "steps": [
+    { "type": "thought" },         // razonamiento; NO es video, ignóralo
+    { "type": "model_output", "content": [
+      { "type": "video", "mime_type": "video/mp4", "data": "<base64 ≤4MB inline>" }
+      // >4MB: en vez de "data" viene "uri":"<url>" (al uri de Gemini hay que anexarle la key para descargar)
+    ] }
+  ],
+  "usage": {
+    "output_tokens_by_modality": [ { "modality": "video", "tokens": 57920 } ]  // = 5792 × 10 s
+  }
+}
+```
+
+**Extracción del video (contrato):** busca `steps[].type === "model_output"` → dentro, `content[].type === "video"` → toma `data` (base64) o `uri`. NO recorras recursivamente toda la interacción: podrías extraer la `image` del `input` como falso output. `status:"failed"` o `model_output` sin `video` = RAI block / falla de provider (no hay clip que rescatar).
+
+**Parámetros NO soportados** (ambas superficies, preview): `system instructions`, `temperature`, `top_p`, `stop sequences`, `negativePrompt` (embébelo en lenguaje natural), `seed`, `fps`, `duration`, `resolution`, provisioned throughput.
+
+> Divergencia clave a recordar (2026-07-20): **ambas superficies usan la Interactions API**; lo que cambia es (a) el host + versión de path (`aiplatform…/v1beta1/projects/…/interactions` keyless vs `generativelanguage…/v1beta/interactions?key=` con key), (b) la auth (Bearer vs API key) y (c) que **solo la ruta Gemini-key edita**. `generateContent` ya no aplica en ninguna. Si portas código viejo de este repo o un ejemplo de AI Studio, **no asumas** el shape `contents`/`responseModalities`.
+
+### 4.5 Facturación y superficies — evita comprar el producto equivocado
+
+- **GEAP = Gemini Enterprise Agent Platform** es el **rebrand de Vertex AI**. Es la superficie **keyless pay-as-you-go** (ADC/WIF, sin key). Hoy sirve **solo generación** de Omni; su facturación es la de Vertex/GEAP inference. Es la que usa Globe para generar.
+- **Gemini Developer API (generativelanguage)** = superficie con **API key**, facturación **Prepay/Postpay** de la Gemini API. Es la **única superficie que edita** Omni hoy. El video de Omni es **paid-only** (no hay free tier para video).
+- **"Gemini Enterprise" (per-seat)** es el producto **sucesor de Agentspace** (licencias por asiento), **NO tiene relación con la API de video** de Omni. **No lo compres** para operar Omni: la edición sale por Gemini Developer API con key, no por asientos.
+
+### 4.6 Refinar un candidato — los DOS paradigmas (stateful de Omni vs reference-based)
+
+Refinar no es una capacidad exclusiva de Omni. Hay **dos mecanismos** y elegir mal cuesta plata o hace fallar el run:
+
+| Paradigma | Cómo funciona | Cuándo aplica | Permite cross-model |
+|---|---|---|---|
+| **Stateful** (el de Omni) | El proveedor guarda la sesión; encadenas por su id (`previous_interaction_id`) | Sólo si el proveedor que ejecuta el edit es **el mismo** que emitió el id, **y** el id nació en una superficie que lo acepta | ❌ No |
+| **Reference-based** | El output del padre se **re-inyecta como referencia** en un request nuevo (`image_to_video` / `reference_to_video`) | Siempre que exista el output del padre en bytes | ✅ **Sí** |
+
+Regla de lectura: la cadena stateful es el **superpoder de Omni** para iterar barato sobre el mismo mundo; la reference-based es el **piso universal** que hace editable cualquier candidato, incluso uno generado keyless. En Globe el caller no elige: declara `editFrom` y el **runner** decide el paradigma con el único dato que sólo él tiene — qué proveedor va a ejecutar (§9.4).
+
+#### 4.6.1 La CADENA stateful (create store → id → previous_interaction_id)
+
+La edición stateful de Omni es **conversacional**: no regeneras desde cero, **encadenas turnos** sobre un video que el provider ya recuerda. El contrato mínimo es un ciclo de tres pasos, todo en la **superficie Gemini-key** (Vertex keyless NO participa de la cadena):
+
+1. **CREATE con `store:true`** — genera el clip base pidiendo persistencia. La respuesta trae su `id` (interaction id). Sin `store:true`, ese clip no se puede editar/recuperar después.
+2. **Guarda el `id`** — es el ancla de la cadena.
+3. **EDIT con `previous_interaction_id`** — manda la instrucción de edición como `input` (STRING en lenguaje natural), pasando `previous_interaction_id:<id del paso 1>`, **sin** `video_config.task` y **sin** `aspect_ratio` (lo hereda del input; setearlo → `400`). El modelo aplica el cambio **preservando lo que no tocaste**.
+
+**La cadena se extiende (edit del edit):** el resultado del EDIT devuelve **un `id` NUEVO, también encadenable** — verificado en vivo 2026-07-20. Para el turno siguiente pasas ese id nuevo como `previous_interaction_id`, y así iteras N veces "hablándole" al clip (el preview aguanta **~3 ediciones secuenciales**; el store retiene **55 días paid / 1 día free**).
+
+**Regla dura que corrige el atajo "genera Vertex, edita Gemini":** un clip generado por **Vertex keyless NO es encadenable statefully** — su `id` vive en una superficie que rechaza `previous_interaction_id` (`400 "…do not support previous_interaction_id"`) y `GET /interactions/{id}` (`500`). Un id keyless **no es encadenable en ninguna parte**, ni siquiera en la superficie Gemini: son backends distintos con namespaces de id distintos. Por lo tanto, **si quieres la cadena stateful, el CREATE también debe correr en Gemini-key** (`generativelanguage.googleapis.com`, con `store:true`). Vertex keyless queda para generación que no vas a encadenar statefully — lo cual **ya no significa "no editable"**: por reference-based ese candidato sigue siendo refinable (y cross-model).
+
+**Cómo se expresa esto en el seam de Globe (TASK-1490 — corrige la versión anterior de este párrafo):** el caller **ya no manda `previousInteractionId`** (quedó **deprecado**: era vocabulario de un modelo en una superficie, y es **mutuamente excluyente** con `editFrom` — mandar ambos es `invalid_request`, nunca precedencia). El caller declara `editFrom = { experimentId }`; el dominio resuelve el padre y deriva `editSource`; el **runner** elige paradigma comparando el proveedor ejecutante con el del padre, y el resultado queda registrado en `ExperimentAttemptManifestV1.editMode` (`stateful` | `reference`) — **nunca es un cambio silencioso**. La **encadenabilidad la certifica el ADAPTER**, no el dominio: reporta `providerRunChainable` junto a `providerRunSurface`, y el dominio lee un booleano sin aprender vocabulario de proveedor. Para tocar el `VertexOmniAdapter` o el seam, carga la skill `greenhouse-globe`.
+
+```jsonc
+// Turno 1 — CREATE chain-editable (Gemini-key, store:true)
+POST …/v1beta/interactions?key=API_KEY
+{ "model":"gemini-omni-flash-preview", "input":"<prompt>",
+  "response_format":{"type":"video","aspect_ratio":"16:9"},
+  "generation_config":{"video_config":{"task":"text_to_video"}}, "store":true }
+// → { id: "video-AAA", status:"completed", … }
+
+// Turno 2 — EDIT sobre video-AAA
+{ "model":"gemini-omni-flash-preview", "previous_interaction_id":"video-AAA",
+  "input":"cambia la luz a un amanecer dramático", "response_format":{"type":"video"}, "store":true }
+// → { id: "video-BBB", … }   ← id NUEVO, encadenable
+
+// Turno 3 — EDIT sobre video-BBB (edit del edit)
+{ …, "previous_interaction_id":"video-BBB", "input":"ahora órbita lenta de cámara", … }
+```
+
+### 4.7 Múltiples referencias + referencias combinadas (imagen + video)
+
+El `input` de la Interactions API es un **`Content[]`** — acepta **varias entradas** y **tipos mezclados** en la misma toma. No es "una imagen + un texto": puedes pasar N referencias y combinarlas para que Omni **componga desde el paquete mixto**:
+
+- **`{type:"image", data, mime_type}`** — una o varias imágenes de referencia (sujeto, entorno, estilo). `reference_to_video` soporta subject/style/multi-image (docs usan tags `<IMAGE_REF_0>`…`<IMAGE_REF_5>`; verificamos 2 refs mezclando dos mundos en una toma — estadio vacío + estadio con multitud).
+- **`{type:"text", text}`** — el prompt / dirección.
+- **`{type:"video", …}`** — referencia de **video dentro del propio `input`**, combinable con las imágenes: `reference_to_video` admite **referencias cruzadas imagen + video** (esto es distinto de la cadena `previous_interaction_id`, que sirve para **editar**, §4.6). **Live-verificado 2026-07-20 en AMBAS superficies** (keyless Vertex y Gemini-key): un set mixto imagen+vídeo en un mismo `reference_to_video` llega a `candidate_ready`.
+
+> **⚠️ Regla dura descubierta en vivo (2026-07-20): `reference_to_video` exige al menos una imagen o audio en el set.** Un set **sólo-vídeo** se rechaza con
+> `400 "At least one image or audio must be provided for reference_to_video"`.
+> Consecuencia práctica que hay que planificar: **refinar por referencia un candidato de VÍDEO en Omni no funciona con el vídeo solo** — el set necesita acompañarlo con al menos una imagen (un still del propio clip sirve como ancla). Como el `task` se deriva del set (un solo ref imagen → `image_to_video`; varios refs, o cualquier vídeo entre ellos → `reference_to_video`), un edit reference-based cuyo padre es un vídeo y que no aporta ninguna imagen cae exactamente en este rechazo. Llega como `provider_failed` (request rechazado), no como `provider_incomplete`.
+
+```json
+{
+  "model": "gemini-omni-flash-preview",
+  "input": [
+    { "type": "image", "data": "<base64 sujeto>",  "mime_type": "image/png" },
+    { "type": "image", "data": "<base64 entorno>", "mime_type": "image/png" },
+    { "type": "video", "data": "<base64/uri clip de estilo o movimiento>", "mime_type": "video/mp4" },
+    { "type": "text",  "text": "<rol de cada referencia + cuál manda en conflicto>" }
+  ],
+  "response_format": { "type": "video", "aspect_ratio": "16:9" },
+  "generation_config": { "video_config": { "task": "reference_to_video" } },
+  "store": true
+}
+```
+
+**Convención de roles (mirror de la de imagen):** nombra el rol de cada referencia en el texto (estructura / sujeto / entorno / estilo / anti-referencia) y declara cuál gana en conflicto — el modelo **no tiene peso negativo nativo**; el rol se dirige por lenguaje natural.
+
+**Consumo en Globe — TASK-1490 CERRADA (corrige el caveat anterior de este doc).** La versión previa decía que los adapters consumían **solo la PRIMERA referencia resuelta**; **ya no es cierto**. Los adapters consumen el set completo, con dos reglas duras:
+
+- **Orden: edit base primero.** El set va `[base del edit, …referencias del caller]` — el orden **es condicionamiento**, no cosmética.
+- **Tope por ruta, y falla CERRADO al excederlo** (`too_many_references`). Truncar devolvería trabajo que parece correcto y no lo es. En Omni el tope es **4 referencias** (cada una viaja inline en base64 dentro de un request síncrono, así que es un límite de payload tanto como de modelo).
+
+Esto cerró un bug real: una ruta Fal de URL única subía **todas** las referencias a su storage y después usaba sólo `urls[0]` — pagando los round-trips y descartando el resto en silencio.
 
 ---
 
@@ -192,15 +320,15 @@ POST https://generativelanguage.googleapis.com/v1beta/interactions
 
 | Superficie | Estado `(as-of 2026-07 — reverificar)` |
 |---|---|
-| **Gemini API (AI Studio)** | **GA del preview** desde 2026-06-30. Solo **paid tier** (no free tier). |
-| **Vertex AI** | El anuncio dijo "rolling out to Vertex AI in the coming weeks". **Ya responde en `efeonce-group` región `global`** (verificado 2026-07-05), aunque cobertura de prensa aún lo listaba como pendiente. Trátalo como **preview temprano en Vertex**. |
-| **Gemini Enterprise Agent Platform** | Sí (listado en el anuncio). |
-| Gemini app / Google Flow / YouTube Shorts | Sí (superficies de producto, no API). |
+| **Gemini API (generativelanguage, con key)** | **GA del preview** desde 2026-06-30. Solo **paid tier** (no free tier para video). Interactions API completa, incl. **edición** stateful. |
+| **Vertex AI keyless (GEAP)** | **Responde** por Interactions API en `global` y `us-central1` (verificado 2026-07-20 en `efeonce-globe`; `aiplatform.googleapis.com` habilitada). **Solo generación** — no edita. Trátalo como **preview** en Vertex. |
+| **Gemini app / Google Flow / YouTube Shorts** | Sí (superficies de producto, no API). |
 
-- **Launch stage:** `PUBLIC_PREVIEW` (verificado en Vertex).
-- **Regiones Vertex:** solo **`global`** confirmada; `us-central1` y `us-east4` → NOT_FOUND.
+- **Launch stage:** `PUBLIC_PREVIEW`.
+- **Regiones Vertex (Interactions):** `global` y `us-central1` responden; `us-east4` no. Reverifica antes de fijar región en un pipeline.
+- **Generación de personas:** puede caer en RAI block (`PROHIBITED_CONTENT`) hasta que el proyecto quede en allowlist.
 - **Idioma:** inglés (EN) plenamente soportado; otros idiomas **no evaluados**.
-- **Restricción regional de edición:** editar videos **subidos** por el usuario NO está disponible para EEA, Suiza y Reino Unido.
+- **Restricción regional de edición:** editar videos **subidos** por el usuario NO está disponible en EEA, Suiza y Reino Unido; editar videos **generados por el modelo** sí funciona ahí.
 - **Quotas / provisioned throughput:** provisioned throughput **no** disponible en preview. Quotas específicas no publicadas — asume límites de preview y maneja 429.
 
 ---
@@ -247,8 +375,13 @@ Fuente: [Gemini Developer API pricing](https://ai.google.dev/gemini-api/docs/pri
 
 | Gotcha | Detalle | Mitigación |
 |---|---|---|
-| **Techo 720p** | No hay selector de resolución; máx 1280×720 | Para HD/4k → Veo 3.1; o upscale posterior (Magnific / Topaz) |
-| **10 s máx** | Sin control de duración; "longer coming soon" | Encadena clips vía edición multi-turno; o stitch en post |
+| **`generateContent` bloqueado** | `400 "…only supported in the Interactions API and cannot be called directly via generateContent."` | Usa `/interactions` (§4). No portes código viejo con `contents`/`responseModalities` |
+| **Vertex keyless NO edita** | `previous_interaction_id` → `400`; `GET /interactions/{id}` → `500`. Además su `id` **no es encadenable en NINGUNA superficie** (namespaces distintos) | Para cadena stateful, genera Y edita en Gemini-key (§4.0/§4.6). Para refinar sin cadena, usa reference-based: funciona igual sobre un candidato keyless |
+| **`provider_incomplete` ≠ `provider_failed`** | Piden respuestas **opuestas**. `provider_incomplete` = el request fue **aceptado (2xx)** pero el modelo **declinó o fue filtrado** (sin vídeo usable). `provider_failed` = el **request fue rechazado** (`400 invalid_request`) | `incomplete` → **reformula el brief** / reintenta (el payload estaba bien). `failed` → **arregla el request** (task, shape, set de referencias). Confundirlos manda a cazar un bug de payload inexistente |
+| **`reference_to_video` sólo-vídeo rechazado** | `400 "At least one image or audio must be provided for reference_to_video"` (live 2026-07-20) | Suma al menos una imagen al set (un still del clip sirve de ancla). Afecta directo al refinar por referencia un candidato de vídeo (§4.7) |
+| **Tope de referencias — falla cerrado** | Pasado el tope de la ruta (Omni: **4**), el adapter lanza `too_many_references` en vez de truncar | Es intencional: truncar devuelve algo plausible que no es lo pedido. Recorta el set tú mismo y decide qué referencia sacrificas (§4.7) |
+| **Techo 720p** | No hay selector de resolución; máx 1280×720 lado corto | Para HD/4k → Veo 3.1; o upscale posterior (Magnific / Topaz) |
+| **3–10 s máx** | Sin control de duración fino; "longer coming soon" | Encadena clips vía edición multi-turno (Gemini-key); o stitch en post |
 | **Deforma texto/logos/UI** | Como todo modelo generativo de video, distorsiona tipografía, logotipos y UI fina | No pongas el wordmark Efeonce ni UI de producto renderizada por el modelo; compón el logo en post (AE) |
 | **No-determinismo** | Sin `seed` → misma prompt da clips distintos | Guarda el mejor take; para consistencia de marca usa referencia imagen/video fuerte |
 | **Filtros IP (`ip_detected`)** | Rechaza prompts/renders con propiedad intelectual protegida (personajes, marcas de terceros) | Prompts originales; nada de IP ajena |
@@ -256,31 +389,32 @@ Fuente: [Gemini Developer API pricing](https://ai.google.dev/gemini-api/docs/pri
 | **Audio de entrada no soportado** | No puedes pasar una pista de audio como referencia (preview) | Guía el audio por texto; edita audio en post (DaVinci) |
 | **Edit `audio-only` literal** | En el piloto Glitch fue rechazado pre-generación; el preview no ofrece una operación de mezcla/audio aislada | Si el operador pide textura Omni, formular una edición audiovisual localizada, revisar sus píxeles/transientes por separado y rescatar sólo ventanas de audio aprobadas sobre la placa visual determinista |
 | **Sin `negativePrompt`/`temperature`/`top_p`/system prompt** | Control fino ausente | Todo se dirige por lenguaje natural en el prompt |
-| **`store=false` rompe edición futura** (Gemini API) | Si generas sin persistir, no puedes editar ese clip después | Deja `store=true` si vas a iterar |
+| **`store=false` rompe edición futura** (Gemini-key) | Si generas sin persistir, no puedes editar ese clip después. Retención: 55 días paid / 1 día free | Deja `store=true` si vas a iterar (solo aplica en la ruta Gemini-key) |
+| **Edit `aspect_ratio` prohibido** | En `task:edit` setear `response_format.aspect_ratio` → `400 "Aspect ratio cannot be set…for edit task"` | Omítelo: el edit hereda el aspect del input |
+| **`403 ACCESS_TOKEN_SCOPE_INSUFFICIENT`** | Mandaste Bearer OAuth a la ruta Gemini (`generativelanguage`) | Esa ruta exige API key (`?key=`), no OAuth |
 | **`completed` no prueba continuidad** | Un edit puede devolver MP4 válido y aun así introducir bandas, drift o anatomía fuera de la zona pedida | Revisar el clip completo a 1×/0.5× + contact sheet antes de aceptarlo; registrar `provider completed` separado de `creative accepted` |
 | **Cambio sólo editorial** | Retime, repetición o freeze que no cambian la verdad física no requieren píxeles nuevos | Editar el mismo master de forma determinista; nunca usarlo para fingir actuación hero, practical diegético o texto integrado. Foley nativo sólo por petición explícita y siempre se recupera por eventos, no aceptando el video completo |
-| **Región Vertex** | Solo `global`; `us-central1`/`us-east4` → NOT_FOUND | Fija `locations/global` en el endpoint |
-| **EEA/CH/UK** | No se puede editar video subido por el usuario en esas regiones | Considera si el flujo cliente cae ahí |
+| **Región Vertex Interactions** | `global` y `us-central1` responden; `us-east4` no. Host = `{region}-aiplatform.googleapis.com` (o `aiplatform.googleapis.com` para `global`) | Fija `locations/global` (o `us-central1`) en el path |
+| **RAI block en personas** | Generar personas puede caer en `status:"failed"` (`PROHIBITED_CONTENT`) hasta allowlist del proyecto | Solicita allowlist; sin `model_output` no hay clip que rescatar |
+| **EEA/CH/UK** | No se puede editar video **subido** por el usuario en esas regiones (editar video generado por el modelo sí) | Considera si el flujo cliente cae ahí |
 
 ---
 
-## 9. Verificado en runtime (`efeonce-group`, 2026-07-05)
+## 9. Verificado en runtime
 
-Hechos comprobados por nosotros, no inferidos de docs:
+> **Transporte superado (2026-07-20):** las corridas 9.0/9.1/9.2 se hicieron por `generateContent` (`efeonce-group`, `global`) **antes** de que Google moviera Omni a la Interactions API. Ese endpoint + contrato (`contents`/`responseModalities`/`x-goog-user-project`) **ya no funciona** (400). Lo que sigue siendo verdad es el **comportamiento del modelo** que observamos (audio nativo, 9:16 desde referencia portrait, multi-referencia, deformación de texto, gate temporal del edit); reléelo como capacidad del modelo, no como shape de request. El transporte vigente y la evidencia fresca están en **§9.3 (2026-07-20)**.
+
+### 9.0 Corrida histórica `generateContent` (`efeonce-group`, 2026-07-05 — transporte muerto)
+
+Hechos comprobados por nosotros vía `generateContent` (endpoint hoy bloqueado):
 
 - **Modelo:** `gemini-omni-flash-preview`.
-- **Región:** **`global`** (única que responde; `us-central1` → NOT_FOUND).
-- **Endpoint:**
-  `POST https://aiplatform.googleapis.com/v1/projects/efeonce-group/locations/global/publishers/google/models/gemini-omni-flash-preview:generateContent`
-- **Contrato:** `generationConfig.responseModalities: ["TEXT","VIDEO"]` — **ambas obligatorias**; una sola → **400** *"requires both text and video response modalities"*.
-- **Auth:** ADC (`gcloud auth print-access-token`) + header `x-goog-user-project: efeonce-group`.
-- **Salida:** clip **10 s · 1280×720 · 24 fps · MP4**, base64 inline en `candidates[].content.parts[].inlineData` (`mimeType: video/mp4`) + un `part` de texto "thinking" (se ignora).
-- **Referencias:** acepta **imagen (`image/png`)** Y **video (`video/mp4`)** como `inlineData` → image/video-to-video con **fuerte continuidad** desde la fuente.
-- **usageMetadata:** `candidatesTokensDetails` modalidad `VIDEO` = **57.920 tokens** (5.792 × 10 s).
+- **Salida:** clip **10 s · 1280×720 · 24 fps · MP4** + un `part` de texto "thinking".
+- **Referencias:** aceptaba imagen (`image/png`) y video (`video/mp4`) como `inlineData` → image/video-to-video con **fuerte continuidad**.
+- **usageMetadata:** modalidad `VIDEO` = **57.920 tokens** (5.792 × 10 s) — la métrica de costo **persiste** en la Interactions API como `usage.output_tokens_by_modality`.
 - **launchStage:** `PUBLIC_PREVIEW`.
-- **Prioridad de disponibilidad:** ya operable en Vertex pese a que la comunicación pública lo daba como "coming weeks" — reverifica antes de cablear un cron/pipeline productivo.
 
-### 9.1 Capacidades probadas EN VIVO (no inferidas) — 2026-07-05
+### 9.1 Capacidades del modelo probadas EN VIVO (no inferidas) — 2026-07-05
 
 | Capacidad | Estado | Cómo se probó |
 |---|---|---|
@@ -294,12 +428,16 @@ Hechos comprobados por nosotros, no inferidos de docs:
 | Resolución | ⚠️ | siempre lado corto **720p** (720×1280 vertical o 1280×720 horizontal) |
 | Texto/logos/UI legibles | ❌ | los **deforma** (no confiar la exactitud a la IA → overlay real) |
 
+_Nota de transporte:_ la columna "Cómo se probó" describe el probe `generateContent` (`inlineData`/`parts`) hoy muerto. En la Interactions API la misma capacidad se pide con el `input` polimórfico + `video_config.task` (§4.3); la **capacidad** del modelo no cambió, sí la sintaxis.
+
 > **Implicaciones de máximo aprovechamiento:** (a) el **audio nativo** sirve como scratch/ambiente sin
 > pedirlo — `audio-studio` lo reemplaza/mejora para el master; (b) **9:16 nativo** con referencia portrait
 > → versiones sociales sin reframe; (c) **edición y multi-referencia** habilitan variaciones e inserción de
 > elementos manteniendo el mundo (continuidad). Mapa completo en `efeonce/GEMINI_OMNI_CAPABILITIES.md`.
 
 ### 9.2 Edit in-place recuperable + gate temporal — validado con caveat, 2026-07-11 (Glitch)
+
+> **Drift de transporte (2026-07-20):** esta corrida hizo el edit **sobre Vertex** (`vertexai:true`). Al reverificar el 2026-07-20, **Vertex keyless ya NO edita**: `previous_interaction_id` → `400 "…do not support previous_interaction_id"` y `GET /interactions/{id}` → `500`. **La edición stateful vive hoy solo en la ruta Gemini-key** (§4.0/§4.2). Los aprendizajes operativos de abajo (1–4) son transporte-agnósticos y siguen vigentes; el "cómo" del edit cambió de superficie.
 
 Una edición real del master de Glitch usó `@google/genai` con `vertexai:true`, proyecto `efeonce-group`,
 región `global`, `generation_config.video_config.task:'edit'`, `background:true` y `store:true`. La
@@ -321,20 +459,58 @@ y fondos porque introdujo artefactos después del primer segundo. El aprendizaje
 Receta y evidencia: `workflows/omni-in-place-edit-and-deterministic-finish.md` y
 `ai-generations/2026-07-11_glitch-microphone-intro/`.
 
-Snippet canónico de invocación (curl):
+### 9.3 Verificado por Interactions API — 2026-07-20 (`efeonce-globe`, transporte VIGENTE)
+
+Evidencia fresca sobre el transporte actual, comprobada en vivo (no inferida):
+
+- **`generateContent` bloqueado:** confirmado el `400 "gemini-omni-flash-preview is only supported in the Interactions API and cannot be called directly via generateContent."`
+- **Generación keyless por Vertex:** `text_to_video` por `POST …aiplatform.googleapis.com/v1beta1/projects/<project>/locations/global/interactions` con Bearer ADC (sin key, sin `x-goog-user-project`) → **`200 completed`**, MP4 inline **~3.5 MB** en `steps[].model_output.content[].video.data` (~36 s de bloqueo).
+- **Vertex keyless NO edita:** `previous_interaction_id` → `400 "…do not support previous_interaction_id"`; `GET /interactions/{id}` → `500`.
+- **Edición stateful por Gemini-key:** crear con `store:true` → editar con `previous_interaction_id` por `POST generativelanguage.googleapis.com/v1beta/interactions?key=API_KEY` → **`200 completed`** con video. OAuth en esta ruta → `403 ACCESS_TOKEN_SCOPE_INSUFFICIENT`.
+- **Retención store:** 55 días (paid) / 1 día (free); ~3 ediciones secuenciales en preview.
+
+Snippets canónicos (curl):
+
 ```bash
+# ── Generar (Vertex KEYLESS) ─────────────────────────────────────────────
 ACCESS_TOKEN=$(gcloud auth print-access-token)
 curl -sS -X POST \
-  "https://aiplatform.googleapis.com/v1/projects/efeonce-group/locations/global/publishers/google/models/gemini-omni-flash-preview:generateContent" \
+  "https://aiplatform.googleapis.com/v1beta1/projects/${PROJECT}/locations/global/interactions" \
   -H "Authorization: Bearer ${ACCESS_TOKEN}" \
-  -H "x-goog-user-project: efeonce-group" \
   -H "Content-Type: application/json" \
   -d '{
-    "contents": [{"role":"user","parts":[{"text":"<prompt>"}]}],
-    "generationConfig": {"responseModalities":["TEXT","VIDEO"]}
+    "model": "gemini-omni-flash-preview",
+    "input": "<prompt>",
+    "response_format": { "type": "video", "aspect_ratio": "16:9" },
+    "generation_config": { "video_config": { "task": "text_to_video" } },
+    "background": false, "store": false, "stream": false
   }'
-# → candidates[].content.parts[] : {text:"thinking"} + {inlineData:{mimeType:"video/mp4",data:"<base64>"}}
+# → { id, status:"completed", steps:[{type:"thought"},{type:"model_output",content:[{type:"video",mime_type:"video/mp4",data:"<base64>"}]}], usage:{output_tokens_by_modality:[{modality:"video",tokens:57920}]} }
+
+# ── Editar (Gemini API con KEY) ──────────────────────────────────────────
+curl -sS -X POST \
+  "https://generativelanguage.googleapis.com/v1beta/interactions?key=${API_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gemini-omni-flash-preview",
+    "previous_interaction_id": "<id del create con store:true>",
+    "input": "<instrucción de edición>",
+    "response_format": { "type": "video" },
+    "store": true
+  }'
 ```
+
+### 9.4 Integración Globe (`efeonce-globe`)
+
+El `VertexOmniAdapter` (`apps/creative-runner/src/vertex-omni-adapter.ts`) implementa exactamente esta separación: **genera keyless por Vertex** y **edita por Gemini-key**. La generación keyless quedó verificada a través del seam del Model Lab (brief golden de motion → `objective_pass_pending_human`, 40 créditos) **con ADC humana local** — no desde la runtime SA del servicio desplegado (ver el aviso de IAM al final de esta sección). Para trabajar ese adapter, cargar la skill `greenhouse-globe`.
+
+**`GLOBE_LAB_OMNI_EDITABLE` — default OFF, y no es un switch gratis.** Gobierna el `store:true` del generate de Omni (antes estaba **hardcodeado**, sacando **todo** generate de Omni del path keyless hacia facturación por API key sin que nadie lo hubiera decidido). Un generate **editable statefully** DEBE correr en la superficie Gemini —un id keyless no es encadenable en ninguna parte—, así que **prenderlo mueve TODO el generate de Omni fuera del keyless**, con el costo que eso implica. **Default OFF es seguro precisamente porque los outputs se retienen** content-addressed: el candidato sigue siendo refinable **por referencia** (y cross-model) igual. Prenderlo sólo si el carril stateful es el objetivo, sabiendo lo que se paga.
+
+**Evidencia en vivo por el seam (2026-07-20, TASK-1490)** — cuatro `candidate_ready` con lineage padre→hijo: reference-based (Seedream→Seedream, `editMode=reference`, `outputsRetained=true`); **cross-model** (Seedream → **Nano Banana/Vertex** por referencia); stateful (Omni `surface=gemini-api`, `chainable=true` → `editMode=stateful`); cross-modal (Omni `reference_to_video` con imagen + vídeo en un set). Estado al escribir esto: `code complete + verificado en vivo por el seam` — **pero los canaries corrieron con ADC humana local, NO con la service account del servicio desplegado**. El rollout de `globe-studio-internal` queda **pendiente**. Estado vigente: `Handoff.md` del repo `efeonce-globe`, **nunca** este doc.
+
+> **⚠️ No confundir "verificado en vivo" con "operativo desde el servicio" (gap real detectado 2026-07-20).** Al preparar el rollout apareció que `globe-studio-internal` corre como la SA `globe-web-runtime` y esa SA **no tiene ningún rol**: ni `aiplatform.user` —que la superficie **keyless de Vertex necesita** para el generate de Omni y para Veo— ni acceso al bucket `efeonce-globe-lab-evidence` (que se le había concedido a `globe-api-runtime`, otra SA). Es decir: **la keyless funciona hoy desde una ADC humana, no desde la runtime SA**; desde el servicio habría dado `403` en la primera llamada real. La corrección está en Terraform (`infra/terraform/{iam,storage}.tf`, plan 9 to add / 0 change / 0 destroy) **sin aplicar**. Lección transferible: un canary que corre con tu propia ADC **no prueba** que el servicio pueda hacer la misma llamada — la identidad es parte del contrato.
+
+**Lección de método que dejó esta task** (vale más que el código): dos defectos sólo aparecieron con gasto real, con la suite unitaria **verde en ambos**. (1) `providerRunChainable` se calculaba en el adapter y el runner **no lo copiaba al manifest** → todo edit stateful degradaba en silencio a reference; se detectó porque un run reportó `surface=gemini-api` junto a `chainable=false`, dos cosas que no pueden ser ciertas a la vez. (2) Todo fallo del runner colapsaba a `runner_error`, dejando el fallo más común de un edit indistinguible de cualquier otro. **Cuando nace un campo de evidencia, verifica que haga el viaje completo hasta el manifest: un test de adapter que lo afirma no prueba que llegue.**
 
 ---
 
@@ -345,16 +521,19 @@ Cuánto confiar en cada dato y con qué frecuencia reverificar (preview = todo s
 | Dato | Estabilidad | Reverificar |
 |---|---|---|
 | Model ID `gemini-omni-flash-preview` | Alta mientras dure el preview | Al pasar a GA (cambia el sufijo) |
-| Región Vertex `global` única | **Media** | Antes de cada pipeline nuevo (agregan regiones seguido) |
-| Contrato `responseModalities:["TEXT","VIDEO"]` (Vertex) | Media | Si migra a Interactions API en Vertex |
-| Interactions API (Gemini API pública) | Media | Docs cambian semana a semana en preview |
-| 720p · 10 s · 24 fps | **Baja** (Google promete "longer/soon") | Cada release; duración y resolución son lo primero que cambiará |
+| **Método = Interactions API** (`generateContent` bloqueado) | **Baja** — cambió el 2026-07-20 | Cada release del preview; la API está moviéndose |
+| Split de superficies (Vertex keyless genera / Gemini-key edita) | **Baja** | Cada vez que uses edit: Google podría habilitar edit en Vertex |
+| Id keyless **no encadenable en ninguna superficie** | Media | Si Google unifica namespaces de id, cambia la regla de §4.6 |
+| `reference_to_video` exige ≥1 imagen o audio en el set | **Baja** (restricción de preview) | Antes de diseñar un refine reference-based sobre vídeo (§4.7) |
+| Tope de 4 referencias en la ruta Omni | Media | Es límite nuestro de payload (inline base64), no publicado por Google |
+| Regiones Vertex Interactions (`global` + `us-central1`) | **Media** | Antes de cada pipeline nuevo (agregan regiones seguido) |
+| Shape del body (`input` polimórfico, `response_format`, `video_config.task`) | Media | Docs cambian semana a semana en preview |
+| 720p · 3–10 s · 24 fps | **Baja** (Google promete "longer/soon") | Cada release; duración y resolución son lo primero que cambiará |
 | Pricing $1.50 in / $17.50 out video / $0.10/s | Media | Antes de comprometer costo a cliente |
-| 5.792 tokens/seg 720p | Alta (verificado en usageMetadata) | Si cambian resolución base |
+| 5.792 tokens/seg 720p | Alta (verificado en `usage.output_tokens_by_modality`) | Si cambian resolución base |
 | Audio input no soportado | Media | Cada release (es un "not yet") |
 | SynthID + C2PA siempre | **Alta** | No cambia (política) |
 | launchStage PUBLIC_PREVIEW | Media | Al anuncio de GA |
-| Disponibilidad Vertex vs "coming weeks" | **Baja** | Cada vez que lo uses hasta que Google confirme GA en Vertex |
 
 ---
 
@@ -368,6 +547,8 @@ Cuánto confiar en cada dato y con qué frecuencia reverificar (preview = todo s
 - Gemini API — Models: https://ai.google.dev/gemini-api/docs/models
 - Vertex AI / Gemini Enterprise Agent Platform — inference & pricing: https://cloud.google.com/gemini-enterprise-agent-platform/generative-ai/pricing · https://docs.cloud.google.com/vertex-ai/generative-ai/docs/model-reference/inference
 - VentureBeat — "Google unveils Gemini Omni any-to-any model" / "Gemini Omni Flash hits the API" (contexto enterprise): https://venturebeat.com/technology/google-unveils-gemini-omni-any-to-any-ai-model-what-enterprises-should-know
-- **Verificación runtime propia** — `efeonce-group`, Vertex `global`, 2026-07-05.
+- **Verificación runtime propia (VIGENTE)** — Interactions API, `efeonce-globe`, Vertex keyless `global`/`us-central1` + Gemini API con key, **2026-07-20**.
+- **Verificación runtime propia (VIGENTE, TASK-1490)** — edit cross-model, multi-referencia, sets combinados imagen+vídeo en ambas superficies y el rechazo de `reference_to_video` sólo-vídeo, **2026-07-20** por el seam del Model Lab. Semántica de plataforma: `efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md` §"Edit / refine cross-model"; adapter: `apps/creative-runner/src/vertex-omni-adapter.ts`.
+- **Verificación runtime propia (histórica, transporte muerto)** — `generateContent`, `efeonce-group`, Vertex `global`, 2026-07-05 / edición Glitch 2026-07-11.
 
-> Nota de método: los datos de la sección 9 son verificación directa nuestra y **prevalecen** sobre docs/prensa si hay drift. El resto está marcado por volatilidad en la sección 10. Reverifica antes de cablear producción.
+> Nota de método: los datos de la sección 9 son verificación directa nuestra y **prevalecen** sobre docs/prensa si hay drift. Entre nuestras propias corridas, la **§9.3 (2026-07-20, Interactions API)** manda sobre las históricas §9.0–9.2 (`generateContent`, ya bloqueado). El resto está marcado por volatilidad en la sección 10. Reverifica antes de cablear producción.

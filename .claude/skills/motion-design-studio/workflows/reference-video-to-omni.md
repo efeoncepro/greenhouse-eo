@@ -19,7 +19,12 @@ mockup plano no tiene. Es image-to-video **dirigido por una referencia fuerte**,
 > patrón de pasar un **`video/mp4` como `inlineData`** para "enhance video→video" **quedó retirado con
 > `generateContent`**: hoy, si tu referencia es un video (p. ej. el Playwright), o (a) extrae un frame crisp
 > y entra por `image_to_video`, o (b) genera primero y **refina por edición stateful** (`previous_interaction_id`
-> + `store:true`) en la **superficie Gemini-key** — Vertex keyless no edita. Contrato: `efeonce/GEMINI_OMNI_VERTEX.md §0/§4`.
+> + `store:true`) en la **superficie Gemini-key** — Vertex keyless no edita, o (c) **refina por REFERENCIA**
+> re-inyectando el output del padre en un `reference_to_video` nuevo: no depende de sesión del proveedor,
+> funciona aunque el padre se haya generado keyless y permite **cruzar de modelo**. Ojo con (c): el set
+> `reference_to_video` **exige al menos una imagen o audio** — sólo-vídeo se rechaza con
+> `400 "At least one image or audio must be provided…"`, así que acompaña el clip con un still.
+> Contrato: `efeonce/GEMINI_OMNI_VERTEX.md §0/§4.6/§4.7`.
 
 ## Cuándo usarla
 

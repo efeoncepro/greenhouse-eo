@@ -293,6 +293,32 @@ The Glitch intro becomes a canonical fixture: a practical `ON AIR` must be born 
 4. Generate machine-readable QA evidence where useful (technical metadata, contact sheet, waveform, frame hash); human craft review remains decisive.
 5. Use time-limited signed URLs only after authorization. Asset events and logs carry identifiers, not public raw URLs.
 
+### Refinar un candidato (edit/refine) es transversal, no una feature de proveedor
+
+Refinar un candidato ya producido es una capacidad **transversal y transport-neutral** del contrato. El caller
+declara una sola intención —"refina el candidato que produjo la corrida X"— sin nombrar paradigma, sesión ni
+modelo; y un edit **no** es un command nuevo: es una corrida, con la misma autoridad, el mismo gate de gasto,
+la misma state machine y el mismo manifest inmutable. Existen dos paradigmas nativos y ninguno se expresa en
+el contrato:
+
+- **stateful** — el proveedor guarda la sesión y el edit se encadena por su id;
+- **reference-based** — el output del padre se re-inyecta como base del edit.
+
+El dominio resuelve el candidato padre server-side; el runner elige el paradigma según qué proveedor va a
+ejecutar —un handle de sesión sólo significa algo para quien lo emitió— y registra la elección en el manifest
+del intento: un cambio de paradigma es evidencia, nunca silencioso.
+
+**La retención de outputs es lo que hace posible el cross-model.** El punto 3 de la asset policy anterior
+(ingerir el output del proveedor a storage privado) deja de ser sólo custodia y pasa a ser habilitante: un
+candidato retenido content-addressed puede refinarse con **otro** motor, porque la referencia no depende de
+ninguna sesión del proveedor. Un derivado tampoco se blanquea como material propio: arrastra los derechos del
+padre bajo una postura que un caller no puede declarar por sí mismo.
+
+> **Estado — `TASK-1490` (2026-07-20), verificado en vivo por el seam completo** en cuatro carriles:
+> reference-based, cross-model (Seedream → Nano Banana en Vertex), stateful (Gemini Omni) y referencias
+> combinadas imagen+vídeo. Contrato, rechazos previos a la reserva de gasto, invariantes de derechos y
+> evidencia: `efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md` → §"Edit / refine cross-model".
+
 ## 7. Credits and commercial boundary
 
 Provider spend is an internal input; credits are the customer-facing unit of governed generative operations in

@@ -79,10 +79,19 @@ pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (
   preservado), Seedream 5 `edit` (array `image_urls` ordenado, cada URL con su rol y prioridad de conflicto) y la
   edición multi-imagen de GPT-Image-2 / Nano Banana (varias imágenes inline). Asigna a cada referencia un rol
   (`STRUCTURE`/`IDENTITY`/`MATERIAL`/`ANATOMY`/`ANTI-REFERENCE`) y declara cuál gana; nunca pidas "combinar" a
-  secas. En motion, los **MODELOS** (Gemini Omni `reference_to_video`) también aceptan multi-referencia **+ refs
-  combinadas imagen+video**, pero varios adapters de Globe (Omni/Veo/Fal single-key) hoy consumen **solo la
-  primera** referencia resuelta — el consumo completo de multi-/combined-ref es **TASK-1490**. Documenta y usa la
-  capacidad del modelo, pero no asumas que el adapter de motion la explota aún.
+  secas. En motion, Gemini Omni (`reference_to_video`) acepta multi-referencia **+ refs combinadas imagen+video**
+  en un mismo set — verificado en vivo 2026-07-20 en ambas superficies.
+- **Una referencia degenerada no es una referencia (verificado en vivo 2026-07-20).** Un PNG de 1×1 px lo rechaza
+  Gemini/Omni con `Failed to decode image data`. No uses un placeholder mínimo para "probar el camino" de un
+  edit: usa una imagen real pequeña. Ese fallo se parece a un bug de payload y no lo es.
+- **Sinergia — el mismo patrón ya existe como capability gobernada.** Fuera de banda decides rol y precedencia a
+  mano; dentro de la plataforma gobernada (Efeonce Globe · Model Lab) refinar un candidato es **una sola
+  semántica** (`editFrom = { experimentId }`) con dos paradigmas nativos: *stateful* (encadena por la sesión del
+  proveedor, sólo dentro del mismo proveedor) y *reference-based* (re-inyecta el output del padre como base — es
+  el que habilita el **edit cross-model**, p.ej. refinar un candidato de Seedream con Nano Banana). El set va
+  siempre **edit base primero** (el orden es condicionamiento) y cada ruta **falla cerrado** al exceder su tope
+  (`too_many_references`): truncar devuelve trabajo que parece correcto y no lo es. Contrato:
+  `efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md` §"Edit / refine cross-model".
 - Si se exigen cards, gráficos, ejes, microcopy, cifras o logos exactos, detener la generación y usar SVG o
   composición determinística. Una portada puede seguir siendo un problema vectorial.
 

@@ -59,6 +59,23 @@ revision y expiración. Aprobar una ruta, delivery o publicación permanece en u
 | Mastering | Topaz / Fal + post determinístico | DCC/humano cuando el detalle inventado sea riesgoso |
 | 3D/previs | Trellis 2 / Fal | Rodin / Fal para PBR/mesh |
 
+## Edit sobre un candidato ya generado
+
+`exact edit` sobre un output propio no es un generate con más prompt: es una operación **con base**, y su
+mecanismo condiciona el ruteo. Dos paradigmas, no intercambiables:
+
+- **Stateful** — encadena por el handle de sesión del proveedor. Sólo significa algo para quien lo emitió:
+  **no cruza de proveedor**.
+- **Reference-based** — re-inyecta el output del padre como base del edit. Es el único que habilita **edit
+  cross-model** (refinar un candidato de Seedream con Nano Banana) y exige que el output se haya **retenido**:
+  si el pipeline hashea los bytes y los descarta, el candidato no es refinable por nadie.
+
+El set de referencias va **edit base primero** (el orden es condicionamiento) y cada ruta declara su tope; al
+excederlo debe **fallar cerrado**, nunca truncar — truncar devuelve trabajo plausible que no es el pedido.
+Dentro de la plataforma gobernada esto ya existe como una sola semántica de capability (`editFrom`, con el
+paradigma resuelto adentro y declarado en el manifest): `efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md`
+§"Edit / refine cross-model".
+
 ## Contrato de salida del agente
 
 ```yaml

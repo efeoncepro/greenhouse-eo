@@ -16,7 +16,7 @@
 
 Omni Flash es el modelo "any-to-any" de Google donde **el razonamiento multimodal de Gemini se une a la generación y edición de video**: entra cualquier combinación de texto + imagen + video, sale video con audio nativo, y lo puedes **iterar hablándole** (edición conversacional multi-turno stateful). Analogía oficial: *"como Nano Banana, pero para video"*. Se invoca por la **Interactions API** (loop generar → editar), no por `generateContent`. Detalle conceptual de arquitectura (fusión Veo + Genie + Nano Banana) en `GEMINI_OMNI_VERTEX.md §1`; contrato de invocación en `§0/§4`.
 
-**Su diferenciador vs. un generador one-shot como Veo Fast** (`veo-3.0-fast-generate-001`, `predictLongRunning`, un solo pase sin conversación): Omni suma **edición conversacional stateful** (refinás el clip hablándole, encadenando por `previous_interaction_id`) + **razonamiento multimodal nativo** del mundo. Ambos están live-verificados para Globe; se eligen por trabajo, no por marca (router al final de PARTE A).
+**Su diferenciador vs. un generador one-shot como Veo Fast** (`veo-3.0-fast-generate-001`, `predictLongRunning`, un solo pase sin conversación): Omni suma **edición conversacional stateful** (refinas el clip hablándole, encadenando por `previous_interaction_id`) + **razonamiento multimodal nativo** del mundo. Ambos están live-verificados para Globe; se eligen por trabajo, no por marca (router al final de PARTE A).
 
 ### A.1 Modalidades (entrada → salida) y combinaciones válidas
 
@@ -26,7 +26,7 @@ Omni Flash es el modelo "any-to-any" de Google donde **el razonamiento multimoda
 | **Imagen** (`image/png`/`jpeg`, base64 inline) | ✅ verificado | Video+audio+texto | Texto + 1 imagen → `image_to_video` |
 | **Imagen ×2** (dos referencias) | ✅ **verificado** (mezcló estadio vacío + estadio con multitud en una toma) | Video+audio+texto | Texto + N imágenes → `reference_to_video` |
 | **Imagen 2–6** (`{type:"image"}` en el `input`; docs usan tags `<IMAGE_REF_0>`…`<IMAGE_REF_5>`) | 📄 documentado (verificamos 2) | Video+audio+texto | `reference_to_video` |
-| **Video como referencia combinada** (`{type:"video", …}` en el `input`, junto a imágenes) | 📄 soportado por el modelo — **consumo Globe = TASK-1490** | Video+audio+texto | `reference_to_video` (imagen+video **cruzados** en el mismo `input`) |
+| **Video como referencia combinada** (`{type:"video", …}` en el `input`, junto a imágenes) | ✅ **verificado en vivo 2026-07-20 en AMBAS superficies** (TASK-1490); el set **no puede ser sólo vídeo** | Video+audio+texto | `reference_to_video` (imagen+video **cruzados** en el mismo `input`) |
 | **Video** (clip previo que Omni ya generó y persistió con `store:true`) | ✅ **verificado 2026-07-20** (edición stateful real por Gemini-key) | Video+audio+texto | `edit` vía `previous_interaction_id` (superficie **Gemini-key**; Vertex keyless → `400`) |
 | **Audio de referencia** | 📄 **NO soportado** en preview (*"uploading audio references is unsupported"*) | — | — |
 | **Múltiples videos de referencia** | 📄 NO soportado (solo **1** video ref) — pero 1 video + N imágenes **combinadas** SÍ (fila anterior) | — | — |
@@ -34,7 +34,7 @@ Omni Flash es el modelo "any-to-any" de Google donde **el razonamiento multimoda
 
 - **Salida siempre:** MP4 720p con **pista de audio AAC embebida** + un `step` de tipo `thought` (se ignora). El video sale en `steps[type='model_output'].content[type='video']` → `data` (base64, ≤4MB) o `uri` (>4MB). En la Interactions API el formato de salida se pide con `response_format:{type:"video", aspect_ratio:"16:9"|"9:16"}` (ver contrato §4). El viejo `responseModalities:["TEXT","VIDEO"]` era de `generateContent` — **ya no aplica**.
 - **La entrada de audio se compensa por texto:** no puedes pasar una pista, pero describes el audio deseado en el prompt y el modelo lo sintetiza.
-- **Cómo se edita un video ahora (la CADENA):** el flujo canónico es **stateful** — generas con `store:true`, guardas el `interaction_id`, y editas encadenando `previous_interaction_id` en la superficie **Gemini-key**. **Cada edit devuelve un `id` NUEVO, también encadenable** (edit del edit): pasas ese id al turno siguiente e iteras ~3 veces "hablándole". **Corrección clave:** Vertex keyless **no** edita (`previous_interaction_id` → `400`, `GET /interactions/{id}` → `500`), y un clip **generado** por Vertex keyless **tampoco** es editable — su `id` vive en la superficie equivocada. Por eso, **si sabes que vas a editar/encadenar, genera también en Gemini-key** (Vertex keyless queda para generación one-shot que no vas a iterar). El viejo patrón de "pasar un `video/mp4` como `inlineData` a `generateContent`" **quedó retirado** junto con ese método. Editar videos **subidos** por el usuario sí existe pero está **bloqueado en EEA, Suiza y Reino Unido**. Contrato completo: `GEMINI_OMNI_VERTEX.md §4.6`.
+- **Cómo se edita un video ahora (la CADENA):** el flujo canónico es **stateful** — generas con `store:true`, guardas el `interaction_id`, y editas encadenando `previous_interaction_id` en la superficie **Gemini-key**. **Cada edit devuelve un `id` NUEVO, también encadenable** (edit del edit): pasas ese id al turno siguiente e iteras ~3 veces "hablándole". **Corrección clave:** Vertex keyless **no** edita (`previous_interaction_id` → `400`, `GET /interactions/{id}` → `500`), y un id emitido por keyless **no es encadenable en NINGUNA superficie** (namespaces distintos). Por eso, **si quieres la cadena stateful, genera también en Gemini-key**. **Pero (TASK-1490, 2026-07-20) "no encadenable" ya no significa "no editable":** el edit dejó de ser exclusivo de Omni — hay una semántica única (`editFrom`) con **dos paradigmas**, y el **reference-based** (re-inyectar el output del padre como referencia) refina cualquier candidato sin depender de sesión del proveedor, **incluso cross-model** (un candidato de Omni refinado por otro motor, o uno de Seedream refinado con Nano Banana). Vertex keyless queda para generación que no vas a encadenar statefully, no para "descartable". Detalle: `GEMINI_OMNI_VERTEX.md §4.6`. El viejo patrón de "pasar un `video/mp4` como `inlineData` a `generateContent`" **quedó retirado** junto con ese método. Editar videos **subidos** por el usuario sí existe pero está **bloqueado en EEA, Suiza y Reino Unido**. Contrato completo: `GEMINI_OMNI_VERTEX.md §4.6`.
 
 ### A.2 Tareas soportadas
 
@@ -42,7 +42,7 @@ Omni Flash es el modelo "any-to-any" de Google donde **el razonamiento multimoda
 |---|---|---|---|
 | **Texto → video** | `text_to_video` | Genera clip desde prompt puro | ✅ (clip 3–10 s 720p 24 fps mp4; t2v keyless re-verificado 2026-07-20) |
 | **Imagen → video** | `image_to_video` | Anima una still / usa keyframe de inicio | ✅ (continuidad casi idéntica al still) |
-| **Referencia → video** | `reference_to_video` | Compone desde 2–6 imágenes (sujeto, entorno, estilo) **+ referencia de video combinada** (imagen+video cruzados en el `input`) | ✅ con 2 refs img; 📄 hasta 6 img + video combinado (consumo Globe = TASK-1490) |
+| **Referencia → video** | `reference_to_video` | Compone desde 2–6 imágenes (sujeto, entorno, estilo) **+ referencia de video combinada** (imagen+video cruzados en el `input`). **Exige ≥1 imagen o audio en el set** — sólo-vídeo se rechaza | ✅ 2 refs img; ✅ **set combinado img+vídeo live 2026-07-20 en ambas superficies**; 📄 hasta 6 img |
 | **Editar video** | `edit` | Modifica un clip existente (stateful) por lenguaje natural; **encadenable** (cada edit → `id` nuevo) | ✅ (stateful `previous_interaction_id` re-verificado 2026-07-20; **solo superficie Gemini-key**) |
 | **Extensión / interpolación de video** | — | Alargar o rellenar entre frames | 📄 **NO soportado** en preview |
 
@@ -109,7 +109,7 @@ Omni **genera imagen y sonido juntos en un solo pase de difusión** — el audio
 | Resolución máx | **720p (1280×720)** — sin selector | volátil (1080p/4k prometido) |
 | Duración | **3–10 s** por request (sin selector) | volátil ("longer soon") |
 | FPS | 24, fijo | — |
-| Nº imágenes de referencia (en el `input`) | 2 ✅ / hasta 6 📄; **combinables con 1 video** en la misma toma (`reference_to_video`) | volátil; consumo Globe = TASK-1490 |
+| Nº imágenes de referencia (en el `input`) | 2 ✅ / hasta 6 📄; **combinables con 1 video** en la misma toma (`reference_to_video`) | volátil; el adapter de Globe lleva hasta **4 refs** y **falla cerrado** al excederlo (`too_many_references`), nunca trunca |
 | Nº videos de referencia (en el `input`) | **1** video, combinable con las imágenes (distinto del edit-chain) | Verificar límite vigente antes de producción |
 | Ediciones stateful encadenadas | **~3 secuenciales** en preview; requiere `store:true`; cada edit → `id` nuevo encadenable | volátil |
 | Retención del store (para editar/recuperar) | **55 días pago / 1 día free** | volátil (política de preview) |
@@ -156,7 +156,7 @@ Omni **genera imagen y sonido juntos en un solo pase de difusión** — el audio
 | image_to_video (1 ref) | ✅ | continuidad casi idéntica al still |
 | **reference_to_video (2 imágenes)** | ✅ | mezcló estadio vacío + estadio con multitud en una toma |
 | reference_to_video (3–6 imágenes) | 📄 | tags `<IMAGE_REF_n>` en docs |
-| **reference_to_video combinada (imagen + video en el `input`)** | 📄 | modelo admite refs cruzadas img+video; consumo Globe = TASK-1490 |
+| **reference_to_video combinada (imagen + video en el `input`)** | ✅ | live 2026-07-20 en **ambas** superficies (TASK-1490). El set **exige ≥1 imagen o audio**: sólo-vídeo → `400 "At least one image or audio must be provided for reference_to_video"` |
 | **generación keyless por Vertex (Interactions)** | ✅ | 2026-07-20: t2v ADC Bearer, sin API key → `200 completed`, MP4 inline ~3.5MB |
 | video como referencia / continuación | ✅ (histórico) | probado sobre `generateContent` (2026-07-05, método ya retirado); hoy la edición es stateful por `previous_interaction_id` |
 | **edición stateful (`edit` + `previous_interaction_id`)** | ✅ | 2026-07-20: por Gemini-key → `200 completed`; luz de amanecer + cambio de cámara, mismo mundo |
@@ -189,9 +189,9 @@ La tesis: **Omni casi nunca trabaja solo.** Deforma texto/logos, tapa a 720p, du
 | Capacidad Omni | Skill que aporta el INPUT o refina el OUTPUT | Cómo se combinan | Resultado |
 |---|---|---|---|
 | **image_to_video / reference_to_video** | `design-studio` + `greenhouse-ai-image-generator` | Generas el **keyframe** exacto (KV, still on-brand) con la matriz de modelos de imagen (Nano Banana 2 Lite, GPT Image, Recraft, Flux, Ideogram) → lo pasas como `{type:"image", data, mime_type}` en el `input` de la Interactions API (superficie **Vertex keyless** para generar) | Video que **arranca del arte que tú controlas**, no de la lotería del prompt |
-| **reference_to_video multi-imagen (2–6) + video combinado** | `design-studio` | Generas N stills coherentes (sujeto + entorno + paleta) — y opcionalmente sumas **un clip de estilo/movimiento** como `{type:"video"}` — y los mandas juntos en el `input` → Omni compone del paquete mixto. Cada ref lleva su rol + precedencia en el texto | **Composición dirigida** cross-modal (verificado 2 img: estadio vacío + con multitud) sin depender de que el prompt acierte. **Caveat:** el modelo lo soporta, pero los adapters de Globe hoy consumen solo la 1ª ref → **TASK-1490** |
+| **reference_to_video multi-imagen (2–6) + video combinado** | `design-studio` | Generas N stills coherentes (sujeto + entorno + paleta) — y opcionalmente sumas **un clip de estilo/movimiento** como `{type:"video"}` — y los mandas juntos en el `input` → Omni compone del paquete mixto. Cada ref lleva su rol + precedencia en el texto | **Composición dirigida** cross-modal (verificado 2 img: estadio vacío + con multitud; y set combinado img+vídeo live 2026-07-20). **TASK-1490 cerrada:** los adapters ya consumen el **set completo** (antes tomaban solo la 1ª ref) — orden **edit base primero**, tope 4, falla cerrado. El set **exige ≥1 imagen o audio** |
 | **Reference-chaining (frame previo → i2v)** | `design-studio` (retoca el frame) + este estudio (`../workflows/reference-chaining.md`) | Extraes el **último frame** de la toma anterior, lo limpias/ajustas, y lo usas como referencia del beat siguiente | **Continuidad entre tomas** — cura la "desconexión" de clips text-to-video sueltos |
-| **edición conversacional multi-turno (stateful, encadenable)** | este estudio (dirección) + `../modules/06_EDITING_MONTAGE_PACING.md` + workflow E | Generás **en Gemini-key** con `store:true` (no en Vertex keyless si vas a editar), iteras una intención acotada por `previous_interaction_id` (superficie **Gemini-key**); **cada edit devuelve un `id` nuevo** que encadenas al turno siguiente. Persistes el interaction ID y haces gate temporal; si el cambio es editorial, retimas el mismo master de forma determinista | Cobertura de una misma escena sin re-shoot, o finish controlado sin gastar un render nuevo |
+| **edición conversacional multi-turno (stateful, encadenable)** | este estudio (dirección) + `../modules/06_EDITING_MONTAGE_PACING.md` + workflow E | Generas **en Gemini-key** con `store:true` (sólo si quieres la cadena stateful; por referencia editas igual), iteras una intención acotada por `previous_interaction_id` (superficie **Gemini-key**); **cada edit devuelve un `id` nuevo** que encadenas al turno siguiente. Persistes el interaction ID y haces gate temporal; si el cambio es editorial, retimas el mismo master de forma determinista | Cobertura de una misma escena sin re-shoot, o finish controlado sin gastar un render nuevo |
 | **audio nativo contextual** | `audio-studio` (voz ElevenLabs/Seed Audio, música, SFX, mezcla, mastering, loudness) + `../modules/07_SOUND_MUSIC_DESIGN.md` | Usas el audio de Omni como **scratch** que ya trae ritmo/textura; si se necesita rescatar un foley, segmentas sus eventos y los montas sobre la placa aprobada → en `audio-studio` reemplazas VO, subes música con licencia, y **mezclas a loudness de entrega** (−14 LUFS web / −16 social) | Audio **final de calidad broadcast**, no el scratch generativo |
 | **techo 720p** | Magnific (MCP+API) + Higgsfield `upscale_video` + `../modules/08_COLOR_GRADE_FINISH.md` | **Video Sequence Enhancement** de Magnific (upscale frame-consistent, no frame-a-frame) sube el clip a 1080p/4K sin romper continuidad; grade en Resolve | Master en **1080p+**, color final, listo para entrega |
 | **deforma texto / logos / UI** | Playwright (UI crisp) + `../workflows/ui-without-after-effects.md` + `../workflows/hybrid-world-plus-ui.md` | Omni pinta el **plate cinematográfico de fondo** (atmósfera/cámara/profundidad); el **texto/logo/UI exacto** se compone encima como asset real (HTML+Playwright a 1280×720, o mograph AE) | Fondo cine + **micro-texto y logo nítidos y exactos** — nunca confías la exactitud al modelo |
@@ -232,12 +232,15 @@ El pipeline que exprime cada fortaleza y tapa cada debilidad. **Dirige el humano
 2. PRODUCE TOMAS  (Omni t2v / i2v / reference_to_video — Interactions API)
    Genera con la Interactions API: keyframe como {type:"image", data, mime_type}
    en el `input` → Omni anima. Superficie de GENERACIÓN = Vertex keyless (one-shot).
-   ⚠️ Si vas a EDITAR/encadenar después, genera en Gemini-key con store:true
-      (un clip generado por Vertex keyless NO es editable — su id vive en la
-      superficie equivocada). Vertex keyless queda para tomas que no vas a iterar.
+   ⚠️ Si vas a ENCADENAR STATEFUL despues, genera en Gemini-key con store:true
+      (un id keyless no es encadenable en NINGUNA superficie). Pero keyless ya no
+      significa "no editable": por REFERENCIA ese candidato sigue refinable, y
+      hasta desde otro motor (cross-model). Elige la cadena stateful solo si la
+      quieres; cuesta sacar todo el generate de Omni del path keyless.
    Multi-ref (2–6 imágenes) + hasta 1 video combinado ({type:"video"}) cuando
       compones elementos cross-modal en una toma (cada ref con su rol/precedencia).
-      El modelo lo soporta; el adapter de Globe hoy toma solo la 1ª ref → TASK-1490.
+      Verificado en vivo en ambas superficies; el adapter consume el set completo
+      (tope 4, falla cerrado). El set exige >=1 imagen o audio: solo-video se rechaza.
    Personaje → refuerza con Soul ID / still canónico (y ojo: personas RAI-gated).
    Cámara nombrada repetible → esa toma en Higgsfield Cinema Studio.
 

@@ -184,3 +184,42 @@ aporta valor y auditabilidad, pero no define por sí sola la banda de Studio Cre
 **Reversibility:** `two-way-but-slow` para cambiar providers/modelos; la separación del contrato de capability
 respecto del endpoint es obligatoria. **Confidence:** alta en provider routing y lifecycle; media en la
 clasificación creativa hasta completar bake-offs. **Validated as of:** 2026-07-19.
+
+---
+
+## Delta 2026-07-20 — refinar es transversal, y por eso el Studio debe retener sus propios outputs
+
+**Decisión aceptada.** Refinar un candidato ya producido es una **capacidad transversal de la plataforma**, no
+una feature de un proveedor. El contrato expone una sola intención transport-neutral —"refina el candidato que
+produjo la corrida X"— y el mecanismo nativo se resuelve server-side. Hay dos paradigmas y ninguno se nombra en
+el contrato: **stateful** (el proveedor guarda la sesión y el edit se encadena por su id) y **reference-based**
+(el output del padre se re-inyecta como base). El primero ata el refinamiento al proveedor que emitió la sesión;
+el segundo no depende de ninguna y es el que permite refinar con **otro** motor.
+
+**Es consecuencia de arquitectura, no de implementación.** El punto 5 de esta ADR —assets, linaje y créditos son
+dominio first-class— ya obligaba a conservar una copia durable autorizada de lo producido. Refinar cross-model
+convierte esa obligación en algo operativo: si el Studio no retiene los outputs de sus propias corridas de forma
+content-addressed, un candidato sólo puede refinarse con el proveedor que lo generó, y *own the durable record*
+queda como aspiración. La retención es la precondición de la soberanía de motor, no una optimización.
+
+Un edit tampoco es un command nuevo: es una corrida, con la misma autoridad, el mismo gate de gasto, la misma
+state machine y el mismo manifest. La parity nace por construcción en vez de agregarse después.
+
+### Invariantes que agrega
+
+- **NUNCA** exponer vocabulario de un proveedor en el contrato de refinamiento: un id de sesión de un modelo en
+  una superficie no es una semántica de plataforma.
+- **NUNCA** cambiar de paradigma en silencio; el modo con el que un edit se ejecutó es evidencia registrada en
+  el manifest del intento.
+- **NUNCA** encadenar un handle de sesión hacia un proveedor que no lo emitió, ni confiar en una referencia que
+  su propio adapter no certificó como encadenable.
+- **NUNCA** blanquear un derivado como material propio: la base de un edit arrastra los derechos del padre bajo
+  una postura que un caller no puede declarar.
+- **SIEMPRE** rechazar un refinamiento imposible antes de reservar gasto, nunca descubrirlo como error de
+  proveedor a mitad de una corrida ya pagada.
+
+**Reversibility:** `two-way-but-slow` — los dos paradigmas son intercambiables detrás del seam, pero retirar la
+retención de outputs rompería la refinabilidad de todo candidato ya producido. **Confidence:** alta — verificado
+en vivo por el seam completo el 2026-07-20 (reference-based, cross-model, stateful y referencias combinadas
+imagen+vídeo). **Validated as of:** 2026-07-20. Detalle técnico:
+`efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md` → §"Edit / refine cross-model".

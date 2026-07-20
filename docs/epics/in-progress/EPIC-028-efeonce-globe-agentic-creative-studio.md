@@ -196,3 +196,30 @@ creativo** (el craft sigue siendo decisión humana; promover una ruta a producci
 abiertos: resolución hash→bytes (desbloquea labs input-bearing + motion/audio), key Fal propia de Globe, deploy de
 `studio-web` y routing por contrato de fidelidad dentro del Composite. Spec canónica: el provider seam del Model Lab en
 el repo hermano (`efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md`).
+
+## Delta 2026-07-20 — TASK-1490 complete (refinar un candidato es transversal, no de un proveedor)
+
+`TASK-1490` queda **complete**: refinar un candidato del Model Lab dejó de ser específico de un modelo. El
+contrato expone **una sola semántica** (`editFrom = { experimentId }`, sin vocabulario de proveedor) y el
+mecanismo lo resuelve el seam entre los dos paradigmas nativos —**stateful** (se encadena la sesión que el
+proveedor guarda) y **reference-based** (el output del padre se re-inyecta como base)—. El dominio resuelve el
+padre server-side; el runner elige el paradigma con el único dato que sólo él tiene en ese momento —qué
+proveedor va a ejecutar— y la elección queda en `ExperimentAttemptManifestV1.editMode`, nunca como cambio
+silencioso. Un edit **no** es un command nuevo: es un experimento, con la misma autoridad
+(`globe.lab.experiment.run`), el mismo spend fence, la misma state machine y el mismo manifest inmutable.
+
+Lo que lo habilitó fue completar la **mitad de escritura** del store content-addressed: los adapters hasheaban
+los bytes de salida y los descartaban, así que el hash de un candidato no resolvía a nada y reference-based
+fallaba en runtime, no en compilación. Con el output ingest (espejo del resolver hash→bytes de track B) los
+outputs se retienen bajo el mismo `sha256` que publica el manifest, `outputsRetained` lo declara y un fallo de
+storage degrada honestamente en vez de destruir un candidato ya pagado. **Esa retención es la que hace posible
+el edit cross-model**, porque refinar por referencia no depende de ninguna sesión del proveedor. Verificado en
+vivo por el seam completo (2026-07-20) en cuatro carriles: reference-based, **cross-model** (Seedream → Nano
+Banana en Vertex), stateful (Omni) y referencias combinadas imagen+vídeo.
+
+Estado de dependientes: `TASK-1460` (motion) y `TASK-1461` (audio) ya estaban **complete** y no dependían de
+este carril. `TASK-1467` (asset provenance, rights y private ingest) sigue `to-do` y hereda dos piezas ya
+construidas: el store content-addressed completo —lectura y escritura— y la postura `derived-internal`, que
+impide blanquear un derivado como material propio y arrastra los derechos del padre a sus descendientes. El
+rollout del servicio `globe-studio-internal` se ejecutó en esta sesión; el estado vigente vive en `Handoff.md`.
+Spec canónica: `efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md` → §"Edit / refine cross-model".
