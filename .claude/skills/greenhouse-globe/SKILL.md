@@ -27,17 +27,22 @@ Esta es la regla que gobierna todo lo demás. Interiorízala antes de tocar cód
 ## Repos y primeras lecturas
 
 - La **skill** (este archivo, META: instrucciones para agentes) vive en `greenhouse-eo`: `.claude/skills/greenhouse-globe/SKILL.md` (Claude) y `.codex/skills/greenhouse-globe/SKILL.md` (Codex).
-- El **código** de Globe vive en el repo hermano `efeonce-globe` (por convención local `/Users/jreye/Documents/efeonce-globe`, GitHub `efeoncepro/efeonce-globe`).
+- El **código, infra y evidencia técnica** de Globe viven en el repo hermano `efeonce-globe` (por convención local `/Users/jreye/Documents/efeonce-globe`, GitHub `efeoncepro/efeonce-globe`).
+- **La documentación gobernante de Globe vive en `greenhouse-eo`** (control plane documental, EPIC-028 / TASK-1492), bajo la convención `creative-studio/`:
+  - Arquitectura + ADR: `docs/architecture/creative-studio/**` (índice: `docs/architecture/creative-studio/README.md`).
+  - Runbooks / operaciones: `docs/operations/creative-studio/**`.
+  - Doc funcional: `docs/documentation/creative-studio/**`. Manuales: `docs/manual-de-uso/creative-studio/**`. Modelo de negocio: `docs/business-models/creative-studio/**`.
 
 Antes de implementar, lee lo que la task necesite, en este orden:
 
-1. La `TASK-###` canónica en `../greenhouse-eo/docs/tasks/**` (Greenhouse es el control plane; ejecuta su hook / Plan Mode).
-2. En `efeonce-globe`: `README.md`, `AGENTS.md`, `Handoff.md`.
-3. Arquitectura de Globe: `docs/architecture/PLATFORM_FOUNDATION_V1.md`, `docs/architecture/GREENHOUSE_CONNECTIVITY_V1.md` (ADR-001), y `docs/operations/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`.
-4. El spine en código: `packages/contracts/src/index.ts`, `packages/domain/src/index.ts`, `apps/studio-web/src/dispatch.ts`, `apps/studio-web/src/app.ts`, `packages/sdk/src/index.ts`, `packages/provider-contract/src/index.ts`.
-5. En `greenhouse-eo`: el programa `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md` y sus ADR/arquitectura `EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_{DECISION,ARCHITECTURE}_V1.md`.
+1. La `TASK-###` canónica en `docs/tasks/**` (Greenhouse es el control plane; ejecuta su hook / Plan Mode).
+2. La **doc gobernante de Globe, en Greenhouse**: empieza por `docs/architecture/creative-studio/README.md` (índice + mapa doc↔repo) y de ahí la arquitectura vigente (`EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md`, `PLATFORM_FOUNDATION_V1.md`, `GREENHOUSE_CONNECTIVITY_V1.md` ADR-001, `EFEONCE_GLOBE_MODEL_LAB_V1.md`, `EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md`); runbooks/plan de ejecución en `docs/operations/creative-studio/**`.
+3. En `efeonce-globe` (solo runtime): `README.md`/`AGENTS.md` (reducidos a puntero, remiten aquí); el **código** del spine — `packages/contracts/src/index.ts`, `packages/domain/src/index.ts`, `apps/studio-web/src/dispatch.ts`, `apps/studio-web/src/app.ts`, `packages/sdk/src/index.ts`, `packages/provider-contract/src/index.ts`; la **infra** en `infra/terraform/`; la **evidencia técnica** en `docs/operations/` (bootstrap, QA audits, brand-shell).
+4. En `greenhouse-eo`: el programa `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md` y sus ADR/arquitectura `EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_{DECISION,ARCHITECTURE}_V1.md`.
 
-Si docs, task y runtime discrepan, manda la arquitectura vigente + el runtime verificado; actualiza la task/spec antes de implementar si el drift cambia un contrato.
+Si docs, task y runtime discrepan, manda la arquitectura vigente + el runtime verificado; actualiza la doc **en Greenhouse** (nunca en Globe) antes de implementar si el drift cambia un contrato.
+
+> **Regla dura (control plane documental, EPIC-028 / TASK-1492):** **NUNCA** crees ni mantengas documentación gobernante — arquitectura, ADR, runbooks, handoff, changelog, doc funcional — dentro de `efeonce-globe/docs/**` ni en su raíz. Toda esa doc vive en `greenhouse-eo` bajo `creative-studio/`. En `efeonce-globe` solo queda **código, infra (Terraform) y evidencia técnica** (bootstrap/QA/brand-shell), más `README.md`/`AGENTS.md` reducidos a puntero. El **cierre documental** de cualquier `TASK-###` de Globe se hace en Greenhouse, no en Globe.
 
 ## Monorepo y build system
 
