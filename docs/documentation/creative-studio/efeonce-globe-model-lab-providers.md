@@ -1,9 +1,9 @@
 # Efeonce Globe — Proveedores del Model Lab (Vertex + Fal + Composite, 10 capacidades)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-19 por Claude (TASK-1486/1487/1488/1459)
-> **Ultima actualizacion:** 2026-07-19 por Claude
+> **Ultima actualizacion:** 2026-07-20 por Claude (editar sobre lo generado + publicado interno)
 > **Documentacion tecnica:** [`efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md`](../../../../efeonce-globe/docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md) (repo hermano; §"Realización — VertexCreativeAdapter" y §"Segundo adapter — Fal + Composite")
 
 ## De qué se trata este documento
@@ -46,6 +46,14 @@ El vocabulario de capacidades creció a **10 verbos semánticos**. Estos son los
 
 Las **6 capacidades que parten de texto** (generar imagen, vectorizar, generar audio, sintetizar voz, generar 3D, generar video) se corrieron **de punta a punta** (el proveedor generó la pieza real y el Lab guardó su huella). Las **4 marcadas con †** necesitan un archivo de entrada (editar imagen, upscalear imagen/video, extender video): su ruta ya quedó **verificada**, pero su corrida completa **espera la resolución de huella→bytes** desde el bucket privado — hasta entonces responden "insumo no disponible" en vez de gastar a ciegas.
 
+## Editar sobre lo generado (encadenable)
+
+Además de generar desde cero, el Model Lab ahora permite **tomar un candidato ya generado y pedirle un cambio** ("edítalo") por el **mismo flujo gobernado**. El resultado no pisa al original: es un **nuevo candidato editado**, y como es otro candidato, se puede **volver a editar** — se encadena. Verificado en vivo el 2026-07-20: generar un video (guardándolo con `store`) → editarlo → obtener un **nuevo video editado**.
+
+Detalle de superficie: hoy el editar corre en la **superficie Gemini API** de Omni (con la llave propia de Globe `globe-gemini-api-key`). La superficie **keyless de Vertex genera pero no edita**; por eso, cuando se quiere un candidato editable, se genera en la superficie Gemini. Sigue siendo la misma pieza de siempre — un **candidato técnico, nunca una aprobación** — solo que ahora encadenable.
+
+Lo que **todavía no** cubre: generalizar el editar a los demás motores (Seedream, Seedance, Nano-Banana por referencia) y usar **varias referencias o referencias combinadas** — eso es `TASK-1490`.
+
 ## Cómo se elige el proveedor
 
 La elección **no la hace el autor del experimento nombrando un modelo** — eso está prohibido por diseño. El experimento sólo declara la **capacidad semántica** (el "qué"); el "con qué motor" lo decide un interruptor de runtime:
@@ -71,6 +79,14 @@ Ejemplo real (corrida del still golden brief, 2026-07-19): el mismo brief de ima
 
 La regla que hace honesta a esta matriz: **el sistema nunca elige un ganador solo.** Los dos resultados son **candidatos técnicos**, jamás una aprobación. La matriz ordena lo medible (costo, latencia) para informar la decisión, pero **el juicio creativo — cuál pieza sirve de verdad — lo reserva siempre a una persona**. "Candidato listo" no es "aprobado".
 
+## Publicado (interno)
+
+El **studio-web** del Model Lab, con los **motores reales enchufados** (Omni, Veo, Seedance), quedó **desplegado en Cloud Run** el 2026-07-20 como servicio **privado/interno** (`globe-studio-internal`). No es público ni tiene clientes.
+
+Estar desplegado **no significa estar gastando.** Los motores reales quedaron **apagados por defecto** (`GLOBE_LAB_PROVIDER=fake`): el servicio corre, pero **no dispara ninguna generación con costo por sí solo**. Prenderlos es una **decisión gobernada** — un humano tiene que hacer el flip de `GLOBE_LAB_ENABLED` + `GLOBE_LAB_PROVIDER` (a `vertex`/`fal`/`composite`) tras los gates.
+
+Recordatorio de superficies y facturación: **generar** es keyless en Vertex; **editar** pasa por la Gemini API con llave, que es **pay-as-you-go (US$0,10 por segundo, sin free tier)**. El plan **"Gemini Enterprise" por asiento NO sirve** para este uso — es facturación por uso de API, no per-seat.
+
 ## Cómo lo gobierna Greenhouse
 
 - **Greenhouse es el único control plane operativo:** registra `TASK-###`, dependencias, lifecycle, hooks, lint, QA, cierre documental y handoff — aunque el código de los adapters viva en `efeonce-globe`. Estos proveedores se implementaron bajo `TASK-1486` (Vertex), `TASK-1487` (Fal + Composite), `TASK-1488` (las 10 capacidades) y `TASK-1459` (still model lab + matriz de recomendación), gobernados por `EPIC-028`.
@@ -82,6 +98,7 @@ La regla que hace honesta a esta matriz: **el sistema nunca elige un ganador sol
 
 - **No gasta por defecto.** El runtime desplegado corre en `fake`; ningún proveedor real se activa salvo que un humano lo elija tras los gates.
 - **Las 4 capacidades con archivo de entrada** (editar imagen, upscalear imagen/video, extender video) tienen su ruta verificada pero su corrida completa **espera la resolución de huella→bytes** desde el bucket privado.
+- **El editar encadenable está verificado solo en Omni (video).** Generalizarlo a los demás motores (Seedream, Seedance, Nano-Banana por referencia) y soportar **varias referencias o referencias combinadas** es `TASK-1490`, aún pendiente.
 - **La llave de Fal es provisoria.** El canary Fal se verificó usando temporalmente la key existente del repo de Greenhouse (excepción documentada); Globe debe **provisionar su propia** `GLOBE_FAL_API_KEY` antes de cualquier uso sostenido.
 - **No hay registro contable de créditos comerciales.** El freno de gasto de hoy es un **fence de seguridad** en memoria (se reinicia con el proceso), no el ledger durable a prueba de pérdidas — esa es una capacidad aparte, aún pendiente.
 - **No auto-elige el mejor motor.** La matriz de recomendación compara lo medible; el juicio creativo es siempre un paso humano.

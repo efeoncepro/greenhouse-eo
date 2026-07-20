@@ -74,6 +74,15 @@ pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (
   prompt su rol: estructura, paleta, identidad, activo oficial o anti-referencia.
 - Una **anti-referencia** no tiene peso negativo nativo: es una instrucción semántica. Nombrar el rasgo excluido
   y revisar contaminación en la salida; si persiste, retirar la referencia o cambiar de método.
+- **Multi-referencia ordenada = patrón cross-model, no propio de este CLI.** La edición basada en referencias
+  acepta **VARIAS referencias ordenadas con rol + precedencia** en toda la matriz: este CLI (`--image` ×10, orden
+  preservado), Seedream 5 `edit` (array `image_urls` ordenado, cada URL con su rol y prioridad de conflicto) y la
+  edición multi-imagen de GPT-Image-2 / Nano Banana (varias imágenes inline). Asigna a cada referencia un rol
+  (`STRUCTURE`/`IDENTITY`/`MATERIAL`/`ANATOMY`/`ANTI-REFERENCE`) y declara cuál gana; nunca pidas "combinar" a
+  secas. En motion, los **MODELOS** (Gemini Omni `reference_to_video`) también aceptan multi-referencia **+ refs
+  combinadas imagen+video**, pero varios adapters de Globe (Omni/Veo/Fal single-key) hoy consumen **solo la
+  primera** referencia resuelta — el consumo completo de multi-/combined-ref es **TASK-1490**. Documenta y usa la
+  capacidad del modelo, pero no asumas que el adapter de motion la explota aún.
 - Si se exigen cards, gráficos, ejes, microcopy, cifras o logos exactos, detener la generación y usar SVG o
   composición determinística. Una portada puede seguir siendo un problema vectorial.
 

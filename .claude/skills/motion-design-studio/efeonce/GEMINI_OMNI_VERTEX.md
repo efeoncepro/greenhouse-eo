@@ -19,8 +19,8 @@
 - **Dos superficies, elige por tarea:**
   - **Generar** (`text_to_video`, `image_to_video`) → **Vertex KEYLESS**: `POST https://aiplatform.googleapis.com/v1beta1/projects/<project>/locations/global/interactions`, auth **ADC/WIF Bearer** (sin API key, sin `x-goog-user-project`). También responde `us-central1` (host `us-central1-aiplatform.googleapis.com`).
   - **Editar** (stateful, `previous_interaction_id` + `store:true`) → **Gemini API con KEY**: `POST https://generativelanguage.googleapis.com/v1beta/interactions?key=API_KEY`. Vertex keyless **no** edita.
-- **Body de generación:** `{ model, input, response_format:{type:"video", aspect_ratio:"16:9"|"9:16"}, generation_config:{video_config:{task:"text_to_video"|"image_to_video"|"reference_to_video"}}, background:false, store:<bool>, stream:false }`. `input` = un STRING (t2v) o un `Content[]` de `{type:"image", data, mime_type} + {type:"text", text}` (i2v / reference_to_video).
-- **Body de edición:** `{ model, previous_interaction_id, input:"<instrucción>", response_format, store:true }` (SIN `video_config.task`).
+- **Body de generación:** `{ model, input, response_format:{type:"video", aspect_ratio:"16:9"|"9:16"}, generation_config:{video_config:{task:"text_to_video"|"image_to_video"|"reference_to_video"}}, background:false, store:<bool>, stream:false }`. `input` = un STRING (t2v) o un `Content[]` que admite **varias entradas y tipos mezclados** — `{type:"image",…}` (una o N), `{type:"text",…}` y hasta `{type:"video",…}` combinados (i2v / reference_to_video multi- y cross-referencia; ver §4.7).
+- **Body de edición:** `{ model, previous_interaction_id, input:"<instrucción>", response_format, store:true }` (SIN `video_config.task`). El edit es una **cadena**: create con `store:true` → guardas el `id` → editas con `previous_interaction_id`; el resultado trae un **`id` nuevo, encadenable** (edit del edit). Un clip generado por Vertex keyless **no** es editable → si vas a editar, **genera también en Gemini-key** (§4.6).
 - **Salida:** respuesta **síncrona unaria** (~35–60 s de bloqueo). `{ id, status:"completed"|..., steps:[{type:"thought"}, {type:"model_output", content:[{type:"video", mime_type:"video/mp4", data:<base64> | uri:<url>}]}], usage:{output_tokens_by_modality:[{modality:"video", tokens}]} }`. Extrae el video en `steps[].type==="model_output"` → `content[].type==="video"` → `data` (base64, **≤4MB inline**) o `uri` (>4MB; al uri de Gemini se le anexa la key para descargar). Clip **3–10 s · 720p lado corto · 24 fps · MP4 con audio**, `16:9` o `9:16`.
 - **Costo:** ~**$0.10 por segundo** de video 720p ($17.50/1M tokens de salida × 5.792 tokens/seg). Un clip de 10 s ≈ **$1.00**.
 - **Watermark:** SynthID invisible + C2PA Content Credentials, siempre, no desactivable.
@@ -67,8 +67,8 @@ Lectura práctica: **si necesitas video con una microescena que puede reinterpre
 | Modalidad | Interactions API — cómo va en el `input` | Estado |
 |---|---|---|
 | **Texto** | STRING pelado (t2v) o `{type:"text", text}` dentro de `Content[]` | Verificado (Vertex keyless + Gemini-key) |
-| **Imagen** | `{type:"image", data:BASE64, mime_type:"image/png"}` (o `image/jpeg`) dentro de `Content[]` | Verificado (i2v / reference_to_video) |
-| **Video** | Referencia de video para editar: se encadena por `previous_interaction_id` (Gemini-key), no como parte del `input` | Verificado en la superficie Gemini-key |
+| **Imagen** | `{type:"image", data:BASE64, mime_type:"image/png"}` (o `image/jpeg`) dentro de `Content[]`; **una o N** referencias | Verificado 2 refs (i2v / reference_to_video); hasta 6 documentado |
+| **Video** | Dos usos: (a) **referencia combinada** dentro del `input` como `{type:"video", …}` junto a imágenes (`reference_to_video`, §4.7); (b) **target de edición** encadenado por `previous_interaction_id` (edit, Gemini-key) | (a) soportado por el modelo — consumo en Globe = TASK-1490; (b) verificado en la superficie Gemini-key |
 | **Audio** | — | **No soportado** en el preview: *"Uploading audio references is unsupported in the current version"* |
 
 `(as-of 2026-07 — reverificar)` El audio **de entrada** (referencia de audio) no está soportado en el preview de la Gemini API. El audio **de salida** sí se genera automáticamente. Fuente: [ai.google.dev/gemini-api/docs/omni](https://ai.google.dev/gemini-api/docs/omni).
@@ -81,7 +81,7 @@ Lectura práctica: **si necesitas video con una microescena que puede reinterpre
 
 ### 2.3 Combinaciones soportadas (tareas)
 
-En la Interactions API la tarea se declara **explícitamente** en `generation_config.video_config.task`: `text_to_video` · `image_to_video` · `reference_to_video` (todas de **generación**, disponibles en Vertex keyless y Gemini-key) · `edit` (**stateful**, solo Gemini-key, y **sin** `video_config.task`: se identifica por `previous_interaction_id`). Ya NO se infiere de las partes como hacía la ruta `generateContent`; hay que setear el `task` correcto según el shape del `input`.
+En la Interactions API la tarea se declara **explícitamente** en `generation_config.video_config.task`: `text_to_video` · `image_to_video` · `reference_to_video` (todas de **generación**, disponibles en Vertex keyless y Gemini-key) · `edit` (**stateful**, solo Gemini-key, y **sin** `video_config.task`: se identifica por `previous_interaction_id`). Ya NO se infiere de las partes como hacía la ruta `generateContent`; hay que setear el `task` correcto según el shape del `input`. `reference_to_video` acepta **múltiples referencias y tipos combinados** (varias imágenes + un video en el mismo `input`, §4.7); `edit` es una **cadena** stateful cuyo resultado devuelve un `id` nuevo encadenable (§4.6).
 
 ### 2.4 Excepción operativa: practical legible bloqueado (Glitch, 2026-07-11)
 
@@ -102,8 +102,8 @@ Cuando un elemento es diegético y narrativamente crítico, quedan prohibidos bl
 | **Aspect ratio** | `16:9` (default) y `9:16` | `response_format.aspect_ratio`. En `edit` **no** se setea (lo hereda del input). |
 | **Cámara / consistencia** | Coherencia de escena y física; **limitación conocida** en consistencia de personaje ante cambios de escena/paneo | Anuncio + DeepMind |
 | **Image-to-video** | Sí — `task:"image_to_video"` con imagen base64 en el `input` | Verificado (Vertex keyless + Gemini-key) |
-| **Reference-to-video** | Sí, con **fuerte continuidad** desde la(s) imagen(es) de referencia | `task:"reference_to_video"` |
-| **Edición conversacional multi-turno** | Sí — stateful; recuerda el contexto del video y aplica cambios preservando lo no tocado | **Solo Gemini-key** (`previous_interaction_id` + `store:true`); Vertex keyless NO edita. ~3 ediciones secuenciales en preview |
+| **Reference-to-video** | Sí, con **fuerte continuidad**; acepta **múltiples referencias** y **combinadas imagen+video** en el `input` (§4.7) | `task:"reference_to_video"` |
+| **Edición conversacional multi-turno** | Sí — stateful; recuerda el contexto del video y aplica cambios preservando lo no tocado; **cada edit devuelve un `id` nuevo encadenable** (§4.6) | **Solo Gemini-key** (`previous_interaction_id` + `store:true`); Vertex keyless NO edita. ~3 ediciones secuenciales en preview |
 
 > `(as-of 2026-07 — reverificar)` Ni resolución, ni fps, ni duración son configurables por parámetro fino en el preview. Si el pipeline necesita 1080p/4k o >10 s, **usa Veo 3.1** (que sí expone 720p/1080p/4k) y reserva Omni para el loop conversacional. Fuentes: [docs/omni](https://ai.google.dev/gemini-api/docs/omni), [blog Google](https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-omni-flash-nano-banana-2-lite/).
 
@@ -227,6 +227,62 @@ Opcional en cualquier `response_format`: `"delivery": "uri"` para forzar entrega
 - **GEAP = Gemini Enterprise Agent Platform** es el **rebrand de Vertex AI**. Es la superficie **keyless pay-as-you-go** (ADC/WIF, sin key). Hoy sirve **solo generación** de Omni; su facturación es la de Vertex/GEAP inference. Es la que usa Globe para generar.
 - **Gemini Developer API (generativelanguage)** = superficie con **API key**, facturación **Prepay/Postpay** de la Gemini API. Es la **única superficie que edita** Omni hoy. El video de Omni es **paid-only** (no hay free tier para video).
 - **"Gemini Enterprise" (per-seat)** es el producto **sucesor de Agentspace** (licencias por asiento), **NO tiene relación con la API de video** de Omni. **No lo compres** para operar Omni: la edición sale por Gemini Developer API con key, no por asientos.
+
+### 4.6 Edit conversacional stateful — la CADENA (create store → id → previous_interaction_id)
+
+La edición de Omni es **conversacional y stateful**: no regeneras desde cero, **encadenas turnos** sobre un video que el provider ya recuerda. El contrato mínimo es un ciclo de tres pasos, todo en la **superficie Gemini-key** (Vertex keyless NO participa de la cadena):
+
+1. **CREATE con `store:true`** — genera el clip base pidiendo persistencia. La respuesta trae su `id` (interaction id). Sin `store:true`, ese clip no se puede editar/recuperar después.
+2. **Guarda el `id`** — es el ancla de la cadena.
+3. **EDIT con `previous_interaction_id`** — manda la instrucción de edición como `input` (STRING en lenguaje natural), pasando `previous_interaction_id:<id del paso 1>`, **sin** `video_config.task` y **sin** `aspect_ratio` (lo hereda del input; setearlo → `400`). El modelo aplica el cambio **preservando lo que no tocaste**.
+
+**La cadena se extiende (edit del edit):** el resultado del EDIT devuelve **un `id` NUEVO, también encadenable** — verificado en vivo 2026-07-20. Para el turno siguiente pasas ese id nuevo como `previous_interaction_id`, y así iteras N veces "hablándole" al clip (el preview aguanta **~3 ediciones secuenciales**; el store retiene **55 días paid / 1 día free**).
+
+**Regla dura que corrige el atajo "genera Vertex, edita Gemini":** un clip generado por **Vertex keyless NO es editable** — su `id` vive en una superficie que rechaza `previous_interaction_id` (`400 "…do not support previous_interaction_id"`) y `GET /interactions/{id}` (`500`). Por lo tanto, **si sabes que vas a editar/encadenar, el CREATE también debe correr en la superficie Gemini-key** (`generativelanguage.googleapis.com`, con `store:true`). Vertex keyless queda solo para generación **one-shot que NO vas a iterar**. En Globe esto es el `VertexOmniAdapter` **dual-transport** + el **edit-command** del Model Lab: el seam arrastra `previousInteractionId` + `providerRunRef` (el `providerRunRef` identifica de qué interacción/superficie se encadena). Para tocar ese adapter, carga la skill `greenhouse-globe`.
+
+```jsonc
+// Turno 1 — CREATE chain-editable (Gemini-key, store:true)
+POST …/v1beta/interactions?key=API_KEY
+{ "model":"gemini-omni-flash-preview", "input":"<prompt>",
+  "response_format":{"type":"video","aspect_ratio":"16:9"},
+  "generation_config":{"video_config":{"task":"text_to_video"}}, "store":true }
+// → { id: "video-AAA", status:"completed", … }
+
+// Turno 2 — EDIT sobre video-AAA
+{ "model":"gemini-omni-flash-preview", "previous_interaction_id":"video-AAA",
+  "input":"cambia la luz a un amanecer dramático", "response_format":{"type":"video"}, "store":true }
+// → { id: "video-BBB", … }   ← id NUEVO, encadenable
+
+// Turno 3 — EDIT sobre video-BBB (edit del edit)
+{ …, "previous_interaction_id":"video-BBB", "input":"ahora órbita lenta de cámara", … }
+```
+
+### 4.7 Múltiples referencias + referencias combinadas (imagen + video)
+
+El `input` de la Interactions API es un **`Content[]`** — acepta **varias entradas** y **tipos mezclados** en la misma toma. No es "una imagen + un texto": puedes pasar N referencias y combinarlas para que Omni **componga desde el paquete mixto**:
+
+- **`{type:"image", data, mime_type}`** — una o varias imágenes de referencia (sujeto, entorno, estilo). `reference_to_video` soporta subject/style/multi-image (docs usan tags `<IMAGE_REF_0>`…`<IMAGE_REF_5>`; verificamos 2 refs mezclando dos mundos en una toma — estadio vacío + estadio con multitud).
+- **`{type:"text", text}`** — el prompt / dirección.
+- **`{type:"video", …}`** — referencia de **video dentro del propio `input`**, combinable con las imágenes: `reference_to_video` admite **referencias cruzadas imagen + video** (esto es distinto de la cadena `previous_interaction_id`, que sirve para **editar**, §4.6).
+
+```json
+{
+  "model": "gemini-omni-flash-preview",
+  "input": [
+    { "type": "image", "data": "<base64 sujeto>",  "mime_type": "image/png" },
+    { "type": "image", "data": "<base64 entorno>", "mime_type": "image/png" },
+    { "type": "video", "data": "<base64/uri clip de estilo o movimiento>", "mime_type": "video/mp4" },
+    { "type": "text",  "text": "<rol de cada referencia + cuál manda en conflicto>" }
+  ],
+  "response_format": { "type": "video", "aspect_ratio": "16:9" },
+  "generation_config": { "video_config": { "task": "reference_to_video" } },
+  "store": true
+}
+```
+
+**Convención de roles (mirror de la de imagen):** nombra el rol de cada referencia en el texto (estructura / sujeto / entorno / estilo / anti-referencia) y declara cuál gana en conflicto — el modelo **no tiene peso negativo nativo**; el rol se dirige por lenguaje natural.
+
+> **Caveat de consumo en Globe (TASK-1490):** el **MODELO** soporta multi-referencia + refs combinadas hoy, pero varios adapters de Globe (Omni / Veo / Fal single-key) consumen **solo la PRIMERA referencia resuelta** del seam. El consumo completo de multi-/combined-ref es **TASK-1490**. Documenta y usa la capacidad del modelo, pero **no asumas** que el adapter la explota hasta que cierre esa task.
 
 ---
 

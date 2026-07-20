@@ -1,9 +1,9 @@
 # Manual — Operar los proveedores del Model Lab de Efeonce Globe y comparar motores en una eval
 
 > **Tipo de documento:** Manual de uso / runbook (orientado al operador)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-19 por Claude (TASK-1486/1487/1488)
-> **Ultima actualizacion:** 2026-07-19 por Claude
+> **Ultima actualizacion:** 2026-07-20 por Claude (editar un candidato + servicio interno desplegado)
 
 ## Para qué sirve
 
@@ -21,6 +21,7 @@ Si todavía no operaste el Lab ni una eval, lee primero los manuales hermanos: [
 - **El kill switch manda sobre el motor.** `GLOBE_LAB_ENABLED` decide si **algún** experimento corre; `GLOBE_LAB_PROVIDER` solo decide **qué proveedor** ejecuta cuando sí corre. Con el Lab apagado, ningún motor corre (responde `policy_blocked`).
 - **Fake es gratis; los demás facturan.** El default `fake` es determinista, sin red y sin gasto. `vertex`, `fal` y `composite` hacen llamadas reales facturables — el tope de gasto duro por corrida (`hardCapCredits`) y el tope diario del espacio de trabajo (`GLOBE_LAB_DAILY_CAP_CREDITS`) siguen siendo tu freno.
 - **La primera llamada facturable entra solo por el seam.** El camino es siempre `command → adapter → runner`. Ningún SDK de proveedor se llama directo (ni por script, CLI, UI o MCP): el proveedor real se inyecta en el runner.
+- **El studio-web ya está desplegado (interno) — pero apagado.** Desde el 2026-07-20 el studio-web con los motores reales (Omni, Veo, Seedance) corre en Cloud Run como servicio **privado/interno** (`globe-studio-internal`). Está **desplegado con `GLOBE_LAB_PROVIDER=fake`**, así que **no gasta por sí solo**: prenderlo es una decisión tuya (flip de `GLOBE_LAB_ENABLED` + `GLOBE_LAB_PROVIDER`), no un efecto del deploy.
 
 ## Elegir el motor (`GLOBE_LAB_PROVIDER`)
 
@@ -73,6 +74,22 @@ Cada capacidad semántica del Lab está mapeada a un modelo verificado. El regis
 - Las capacidades que **ambos** cubren (imagen y video generación/edición) son un solapamiento y se resuelven con una **política explícita** (`DEFAULT_COMPOSITE_POLICY`), nunca por azar. Hoy esa política enruta imagen y video a **Vertex** (Google-native, keyless, verificado en vivo); Seedream/Seedance quedan alcanzables usando el motor `fal` directo.
 - El `poll` (seguimiento de la corrida) vuelve siempre al hijo que la produjo, así un espacio de trabajo que mezcló motores entre intentos se mantiene correcto.
 
+## Editar un candidato ya generado (encadenable)
+
+Ya no solo generas desde cero: puedes **tomar un candidato que el Lab produjo y pedirle un cambio**, por el **mismo flujo gobernado**. El resultado es un **candidato nuevo** (no pisa el original) y, como es otro candidato, lo puedes **volver a editar** — se encadena. Verificado en vivo el 2026-07-20 con video: generar → editar → nuevo video editado.
+
+Pasos:
+
+1. **Genera el candidato con `store`.** Para poder editarlo después, la corrida de generación tiene que **guardar la salida** (flag `store`), no solo devolverla. Sin eso, no hay pieza persistida a la cual apuntar el editar.
+2. **Apunta el editar a ese candidato.** El editar entra por el mismo `command → adapter → runner`, tomando como insumo el candidato guardado. No llamas ningún SDK: es el seam de siempre.
+3. **Recibe el candidato editado.** La salida es un **candidato nuevo**, encadenable (puedes editar el editado). Igual que en la generación, es un **candidato técnico, nunca una aprobación**.
+
+Notas de operación:
+
+- **Editar corre en la superficie Gemini API de Omni**, con la llave propia de Globe **`globe-gemini-api-key`**. La superficie **keyless de Vertex genera pero no edita**; por eso, cuando quieras un candidato editable, la generación se hace en la superficie Gemini (no en la keyless).
+- **Ojo con el costo del editar.** El editar vía Gemini API es **pay-as-you-go: US$0,10 por segundo, sin free tier**. El plan **"Gemini Enterprise" por asiento NO sirve** para esto (esto es facturación por uso de API, no per-seat). El tope de gasto por corrida y el diario siguen siendo tu freno.
+- **Alcance de hoy.** El editar encadenable está verificado en **Omni (video)**. Generalizarlo a los demás motores (Seedream, Seedance, Nano-Banana por referencia) y soportar **varias referencias o referencias combinadas** es `TASK-1490`, aún pendiente — no lo asumas disponible en otros motores.
+
 ## Correr una eval y leer la matriz de recomendación
 
 La eval se opera por el **Evaluation Harness** (manual [efeonce-globe-evaluation-harness.md](./efeonce-globe-evaluation-harness.md)): corre un **golden brief** por el camino real del Lab y emite un **reporte por intento** con checks objetivos + criterios humanos. La comparación de motores es el uso natural de esa capa: **corres el mismo golden brief (mismo `fixtureId` + `rubricId`) una vez por motor** (cambiando `GLOBE_LAB_PROVIDER`) y pones los reportes lado a lado.
@@ -113,6 +130,8 @@ Reglas al comparar:
 ## Problemas comunes
 
 - **"Puse `GLOBE_LAB_PROVIDER=vertex` pero no gasta / se comporta como simulador":** probablemente el valor efectivo cayó a `fake` (typo → fallback silencioso) o el Lab está apagado (`GLOBE_LAB_ENABLED` OFF, que manda sobre el motor). Verifica ambos.
+- **"El studio-web ya está desplegado, ¿por qué no genera con motor real?":** porque quedó desplegado en `fake` a propósito (servicio interno `globe-studio-internal`, 2026-07-20). El deploy **no** enciende motores; se encienden con el flip gobernado de `GLOBE_LAB_ENABLED` + `GLOBE_LAB_PROVIDER` tras los gates.
+- **"Quiero editar un candidato pero dice que no hay insumo":** la generación previa no guardó la salida. Vuelve a generar **con `store`** para que quede una pieza persistida a la cual apuntar el editar; recuerda que el editar corre en la superficie Gemini API (con `globe-gemini-api-key`), no en la keyless de Vertex.
 - **`fal`/`composite` no procede:** falta la key propia de Globe (`GLOBE_FAL_API_KEY`). El adaptador falla cerrado a propósito para que una corrida mal aprovisionada no siga.
 - **Vertex responde NOT_FOUND en video:** Omni Flash corre solo en región `global`. Cualquier otra región (`us-east4`, `us-central1`) da 404. Revisa la región del modelo, no el prompt.
 - **Un slug de Fal "no existe":** confírmalo con `POST {}` a `https://fal.run/<slug>` (404 = no existe, 422 = existe). Si es ByteDance (Seedream/Seedance), revisa que el slug esté **sin** el prefijo `fal-ai/`.
