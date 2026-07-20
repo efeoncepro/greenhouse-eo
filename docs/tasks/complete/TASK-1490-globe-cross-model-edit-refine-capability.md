@@ -316,6 +316,63 @@ flip**: `GLOBE_LAB_ENABLED=true` + `GLOBE_LAB_PROVIDER=composite` +
 el carril stateful, sabiendo que saca a Omni del keyless). La runtime SA necesita
 `storage.objectCreator` sobre ese bucket — el canary corrió con ADC humana.
 
+## Delta 2026-07-20 (fase 2 — rollout + hardening)
+
+Se ejercitó la capability contra el **servicio desplegado** (no sólo por el seam local) y emergieron
+cuatro cosas de rollout/seguridad. El estado de rollout vigente es `efeonce-globe/Handoff.md` (la
+cabina de mando); lo de abajo es el registro del hallazgo, no una afirmación de estado vivo.
+
+- **Dónde vive el Lab: api mode, no web.** El Model Lab se opera por **api mode**, servido por
+  `globe-api-internal` (revisión `globe-api-runtime`). Es el único servicio con un caller autorizado:
+  el **service principal** lleva `globe.lab.experiment.run`. En web mode (`globe-studio-internal`) el
+  principal humano lleva sólo `globe.studio.access` — el broker sister-platform de Greenhouse **no**
+  otorga la capability del Lab a humanos — así que ahí el Lab es inalcanzable (coverage
+  `ui: policy-blocked`). El caller real hoy es el bridge de Greenhouse actuando como service principal
+  (`greenhouse-globe-caller`); la promoción a surface `ui` es futura.
+- **Verificado en vivo contra el binario desplegado.** El chain generate → edit por referencia
+  (cross-model) corrió end-to-end contra `globe-api-internal` autenticado como `greenhouse-globe-caller`,
+  con la SA del servicio (`api_runtime`) escribiendo evidencia al bucket (`outputsRetained=true`) — no
+  sólo por el seam local. La concesión IAM para mintear ese token fue temporal y ya revocada.
+- **Hardening de auth en api mode (defense in depth, no parche).** La app devolvía el service principal
+  (con gasto real del Lab) **sin verificar el token del caller**, confiando sólo en el IAM de Cloud Run
+  (perímetro). Frágil: un servicio con `invokerIamDisabled=True` salta la verificación de invoker por
+  completo. Ahora la app **verifica el ID token del caller LOCALMENTE** con
+  `google-auth-library.verifyIdToken` contra las claves públicas de Google **cacheadas** (sin
+  round-trip por request; un primer intento con el endpoint `tokeninfo` se descartó por ser un SPOF
+  externo síncrono en el hot path), con **audience explícito** (`GLOBE_API_EXPECTED_AUDIENCE`,
+  multi-valor por los dos formatos de URL run.app) y **allowlist de SAs**
+  (`GLOBE_API_CALLER_SERVICE_ACCOUNTS`), ambos **fail-closed**. Símbolos nuevos en
+  `apps/studio-web/src/app.ts` (repo Globe): `IdTokenVerifier` (port), `createGoogleIdTokenVerifier`,
+  `verifyWorkloadCaller`. Contrato: `GREENHOUSE_CONNECTIVITY_V1.md`.
+- **El ID token va en `Authorization`, no `X-Serverless-Authorization`.** Cloud Run **consume**
+  `X-Serverless-Authorization` (no lo reenvía al contenedor) y **reenvía** `Authorization`. Como la app
+  ahora verifica el token una segunda vez, necesita **leerlo** → debe viajar en `Authorization`. El SDK
+  de Globe (`packages/sdk/src/index.ts`, `applyAuthMaterial`) se corrigió de `X-Serverless-Authorization`
+  a `Authorization` para el material `kind: 'cloud-run-id-token'`. Con el header viejo el perímetro
+  pasaba pero la app rechazaba al caller legítimo con **401**.
+  - **Consumidor Greenhouse (`src/lib/globe/client.ts`): delega 100 % en el SDK.** Construye
+    `GlobeClient` con `auth: createGoogleAdcIdTokenAuth(...)` (client.ts:89) y **no setea ningún header
+    de auth propio** (grep de `X-Serverless-Authorization` en `src/`+`scripts/` = 0). Hereda el header
+    correcto por construcción **cuando se re-vendorice el tarball del SDK** — no requiere cambio de
+    código en `client.ts`.
+  - ⚠️ **Bug latente a nivel de pin de dependencia (no en `client.ts`):** el tarball hoy pineado
+    (`vendor/efeonce-globe/efeonce-globe-sdk-0.1.0.tgz`, 19-jul) es **pre-fix** — su `applyAuthMaterial`
+    aún rutea `cloud-run-id-token` → `X-Serverless-Authorization`, y `createGoogleAdcIdTokenAuth` emite
+    exactamente ese `kind`. El health check (`/v1/health`, público) **no** se ve afectado; el impacto es
+    sobre **futuros dispatch calls** a `api-internal`, que darían **401** hasta re-vendorizar el SDK
+    desde el repo Globe corregido.
+- **`invokerIamDisabled: True` en `globe-studio-internal` (decisión pendiente, no bug).** Anterior a
+  esta sesión. Cloud Run no verifica el invoker del studio → alcanzable desde internet aunque su IAM
+  esté vacío. Coherente con que el studio es una app web con **SSO** (un browser no presenta ID token;
+  la auth es la sesión-cookie). `globe-api-internal` **no** lo tiene (anónimo → 403); la capa de app
+  aguanta (anónimo → 401 en commands/capabilities). Pendiente: gobernar el flag en IaC — los servicios
+  Cloud Run **no** están en Terraform hoy (los crea el workflow), así que nada previene drift.
+  Correlaciona con TASK-1489 (GCP IaC foundation, en `to-do`).
+- **IAM corregido (Terraform, aplicado, repo Globe).** `aiplatform.user` estaba en `web_runtime` (SA
+  equivocada); movido a `api_runtime` (donde el Lab corre). `api_runtime` ya tenía el bucket
+  (`objectAdmin`), lo que cubre el path api-internal del follow-up de `storage.objectCreator` abajo;
+  `web_runtime` conserva el bucket (create+read, nunca delete) para la futura promoción `ui`.
+
 ## Follow-ups
 
 - UI "refinar candidato" (task `ui-ux` consumer).
