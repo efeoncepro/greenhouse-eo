@@ -207,6 +207,29 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 - [ ] QA release auditor y documentation governor ejecutados.
 - [ ] Evidencia faltante queda declarada como `code complete, rollout pendiente` o bloqueo operativo.
 
+## Delta 2026-07-20 — el diseño evolucionó más allá de esta task; análisis de brecha
+
+El diseño `Globe Studio Workbench` (Claude Design) evolucionó **más allá** de esta task e incluye
+capacidades que no estaban en la idea original (Prompt Studio, Style DNA, formatos objetivo, inpaint,
+mapa de exploración, dirección, entre otras). Un análisis de 5 agentes mapeó cada capacidad del
+diseño contra el runtime real de `efeonce-globe` con evidencia `file:line`:
+**`docs/architecture/creative-studio/GLOBE_STUDIO_WORKBENCH_BACKEND_GAP_ANALYSIS_V1.md`**.
+
+Hallazgos load-bearing para esta task:
+- La tesis "thin client sobre commands existentes" **no es alcanzable hoy**: de ~32 acciones del
+  workbench, 7 tienen command/reader real y las 7 están `ui: policy-blocked`.
+- Los prerrequisitos ya declarados (`TASK-1466/1468/1469/1472/1473/1485`) siguen en `to-do`.
+- **Emergieron 7 capacidades backend sin task**, ahora creadas: `TASK-1493` (brief estructurado +
+  recetas), `TASK-1494` (Style DNA / análisis de referencias), `TASK-1495` (formatos + set),
+  `TASK-1496` (receta reproducible + variar + relanzar), `TASK-1497` (inpaint/edición regional),
+  `TASK-1498` (readers de exploración + grafo de linaje), `TASK-1499` (dirección). Esta task queda
+  bloqueada también por ellas para las superficies que las consumen.
+- **Ajuste barato de alto valor DENTRO de esta task** (backend ya construido, UI no lo expone):
+  exponer el **refinar cross-model** de TASK-1490 (elegir otro modelo para el hijo), `editMode` y
+  gatear "Refinar" por `outputsRetained`/`providerRunChainable`.
+
 ## Follow-ups
 
 - Las dependencias sucesoras se leen desde EPIC-028 y `docs/tasks/README.md`.
+- Actualizar el wireframe/flow de esta task cuando el diseño de Claude Design se estabilice (hoy va
+  por delante de los docs UI declarados).
