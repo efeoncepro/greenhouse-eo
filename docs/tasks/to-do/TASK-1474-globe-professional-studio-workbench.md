@@ -1,5 +1,9 @@
 # TASK-1474 — Globe Professional Studio Workbench
 
+## Delta 2026-07-20 — estimate previewable disponible (TASK-1502 complete)
+
+El paso de estimate/aprobación del workbench consume el mismo reader `globe.lab.experiment.estimate` (`LabEstimatePreviewV1`, curado) que el Producer — cero lógica de estimate duplicada por superficie.
+
 ## Delta 2026-07-20
 
 - El primer primitivo compartido del Producer que este workbench consume quedó **cerrado por TASK-1500**

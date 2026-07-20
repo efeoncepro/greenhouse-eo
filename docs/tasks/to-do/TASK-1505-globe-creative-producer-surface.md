@@ -1,5 +1,9 @@
 # TASK-1505 — Globe Creative Producer Surface (UI)
 
+## Delta 2026-07-20 — estimate reader listo (TASK-1502 complete)
+
+El `✨N` inline del botón Generate ya tiene su reader: `globe.lab.experiment.estimate` (SDK `estimateExperiment(query)`) devuelve `LabEstimatePreviewV1` (estimatedCredits + ruta de fidelidad + `withinHardCap` señal de presupuesto), read-only, sobre una tupla `(capability, referenceRoute, outputShape)` prospectiva — sin crear experimento ni reservar. La UI lo llama en cada cambio de shape sin efectos. Un shape fuera de constraints → `invalid_request`; sobre el hard cap → `withinHardCap:false` (mostrar 'excede tu tope', no bloquear). Nunca expone provider/model/costo/margen.
+
 ## Delta 2026-07-20
 
 - El reader que esta UI consume **ya existe** (TASK-1500 complete): `globe.producer.catalog.list`/`.get`

@@ -6,6 +6,25 @@
 
 # Changelog
 
+## 2026-07-20 — TASK-1502: estimate previewable (el `✨N` antes de gastar)
+
+- **Extracción del estimate:** `LabRunnerPort.estimate` pasó de `{ experiment }` a `{ quote: LabQuoteInputV1 }`
+  (tupla prospectiva `capability × route × outputShape?`). `execute` deriva el quote de su experimento persistido
+  (`quoteInputFromStored`), así el reader y `execute` comparten el MISMO cómputo de estimate — nunca duplicado.
+- **Reader gobernado `globe.lab.experiment.estimate`** (`GLOBE_LAB_READERS.estimate`, `LAB_COVERAGE`,
+  `requiredCapability GLOBE_LAB_EXPERIMENT_CAPABILITY`): **read-only** (no crea experimento, no `fence.reserve`,
+  no `transition` — spies que throwean lo prueban). Valida el `outputShape` fail-closed contra los constraints
+  del catálogo reusando `validateOutputShape` de TASK-1501 (`invalid_request`); kill switch OFF → `policy_blocked`.
+- **`withinHardCap` es señal, no rechazo:** un estimate sobre el hard cap **devuelve** `withinHardCap:false` (un
+  preview dice la verdad, no gasta ni bloquea). `withinDayCap?` queda declarado pero no poblado (el fence
+  in-memory per-process no es confiable entre réplicas; lo puebla el fence durable de TASK-1468).
+- **Proyección curada `LabEstimatePreviewV1`:** `✨N` (estimatedCredits) + ruta de fidelidad + duración +
+  withinHardCap; **omite** provider/model/slug, costo vendor y margen. Unidad de crédito = ruta × output-shape,
+  nunca el modelo (el fake sigue keyeado por capability — limitación documentada; los adapters reales varían por
+  shape vía TASK-1501). SDK `estimateExperiment(query)`.
+- **Estado:** local-first en `main` de `efeonce-globe`, sin push; `pnpm check` + `build` verdes (domain 94,
+  creative-runner 93). Es el slice adelantado de TASK-1469 (que consumirá el mismo `LabRunnerPort.estimate`).
+
 ## 2026-07-20 — TASK-1501: contrato de run discriminado por modalidad (image→video→audio)
 
 - **`PrepareExperimentPayloadV1.output?: OutputShapeV1`** — union discriminado por `modality`, additive-optional,

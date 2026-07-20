@@ -21,6 +21,13 @@
 
 ## Pendientes inmediatos
 
+- **`TASK-1506` TO-DO (Globe Frontend Hosting and Front Door Decision, `EPIC-028`) — ejecutar ahora.**
+  Gate P0 documental/arquitectónico creado tras auditar EPIC, runtime y opciones con una flota read-only. Decide
+  mediante ADR Cloud Run web/BFF + Global ALB versus Vercel web/BFF + Cloud Run API; fija el owner de
+  `globe.efeoncepro.com` y registra una task de implementación separada, sin mutar infraestructura/DNS/OAuth.
+  Debe cerrar antes de `TASK-1505`, del rollout UI de `1474`, del canary/cutover de callbacks de `1469` y de
+  publicar deep links en `1475`. Un dominio internal-only puede preceder `TASK-1480`; HA/clientes requieren
+  persistencia durable y Production sigue detrás de `1480` + release explícito.
 - **`TASK-1500` COMPLETE (Producer Governed Route/Model Catalog, `EPIC-028`) — local-first, sin push.**
   La keystone del cluster Producer quedó implementada en `../efeonce-globe` (`main`, 4 commits, `pnpm check` +
   `build` verdes): catálogo como dato versionado (`PRODUCER_ROUTE_CATALOG`, 4 rutas seed / 3 modalidades) +
@@ -52,6 +59,17 @@
   `output` = comportamiento previo. Coverage sin cambios (`ui`/`mcp` `policy-blocked`). **Rollout:** aditivo,
   sin redeploy hasta autorización. Próximo paso del cluster: `TASK-1502` (estimate `f(ruta,shape)`, ya puede
   leer el shape) y `TASK-1504` (adapter reads video/audio).
+- **`TASK-1502` COMPLETE (Previewable Estimate Reader, `EPIC-028`) — local-first, sin push.**
+  3 slices en `../efeonce-globe` (`main`): reader read-only `globe.lab.experiment.estimate` (el `✨N` antes de
+  gastar) — no crea experimento, no `fence.reserve`, no `transition` (spies que throwean lo prueban). El estimate
+  se **extrajo** de dentro de `execute` a un quote prospectivo (`LabRunnerPort.estimate({ quote: LabQuoteInputV1 })`);
+  `execute` y el reader comparten el MISMO cómputo vía `quoteInputFromStored`. Valida el `outputShape` fail-closed
+  reusando `validateOutputShape` de 1501; over-cap → `withinHardCap:false` (señal, no rechazo). Proyección curada
+  `LabEstimatePreviewV1` sin provider/model/costo/margen; `withinDayCap?` declarado pero no poblado (fence durable
+  = 1468). Fake keyeado por capability (limitación conocida; reales varían por shape). SDK `estimateExperiment`.
+  `pnpm check` + `build` verdes (domain 94, creative-runner 93). **Rollout:** aditivo read-only, sin redeploy hasta
+  autorización. Slice adelantado de `TASK-1469`, que consumirá el mismo estimate. Próximo del cluster: `TASK-1504`
+  (adapter reads video/audio) y `TASK-1503` (retrieval/asset actions).
 - **`TASK-1492` COMPLETE (repatriación documental Globe → Greenhouse).** La doc gobernante de Globe vive
   ahora en `greenhouse-eo` bajo `creative-studio/` (arquitectura, runbooks, funcional, manuales), + continuidad
   de runtime en `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md` y changelog en

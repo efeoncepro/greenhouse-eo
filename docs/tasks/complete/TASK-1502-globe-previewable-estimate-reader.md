@@ -29,7 +29,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -42,7 +42,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-028`
-- Status real: `Diseno`
+- Status real: `Shipped 2026-07-20 (local-first, sin push)`
 - Rank: `TBD`
 - Domain: `creative|ai|platform`
 - Blocked by: `TASK-1500, TASK-1501`
@@ -222,23 +222,23 @@ Reglas obligatorias (repetidas de la spec fuente y la skill, load-bearing aqui):
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface y consumers nombrados con paths/objetos reales (`globe.lab.experiment.estimate`, `LabRunnerPort.estimate`, `LabEstimatePreviewV1`).
-- [ ] Data invariants (read-only/idempotente, unidad = ruta×shape, naming dual, sin bytes), tenant boundary (`context.workspaceId`) y postura de idempotencia explicitas.
-- [ ] Migration/backfill/rollback posture explicita y proporcional (none / revert PR + flag).
-- [ ] Evidencia runtime listada (`pnpm check && pnpm build`, tests `node --test`, conformance).
-- [ ] Salida curada sin leaks (sin slug/provider-cost/margen/bytes); errores canonicos (`invalid_request`, `policy_blocked`).
+- [x] Source of truth, contract surface y consumers nombrados con paths/objetos reales (`globe.lab.experiment.estimate`, `LabRunnerPort.estimate`, `LabEstimatePreviewV1`).
+- [x] Data invariants (read-only/idempotente, unidad = ruta×shape, naming dual, sin bytes), tenant boundary (`context.workspaceId`) y postura de idempotencia explicitas.
+- [x] Migration/backfill/rollback posture explicita y proporcional (none / revert PR + flag).
+- [x] Evidencia runtime listada (`pnpm check && pnpm build`, tests `node --test`, conformance).
+- [x] Salida curada sin leaks (sin slug/provider-cost/margen/bytes); errores canonicos (`invalid_request`, `policy_blocked`).
 
 ## Capability Definition of Done — Full API Parity gate
 
 Aplica: introduce una **capability nueva** (reader gobernado de estimate).
 
-- [ ] **Logica en el primitive, no en la UI.** El estimate vive en `packages/domain` + `apps/creative-runner` (dominio/runner), no en la UI (1505).
-- [ ] **Modelada como reader/recurso, no como click-handler:** `globe.lab.experiment.estimate`, transport-neutral, sobre el `CapabilityRegistry`.
-- [ ] **Read** expuesto como reader canonico con authorization fina (`GLOBE_LAB_EXPERIMENT_CAPABILITY`, no admin-coarse), errores canonicos sanitizados y `correlationId`. **Sin write** (es read-only por diseno).
-- [ ] **Capability + coverage en el MISMO PR:** el reader nace con `LAB_COVERAGE` (declara las 8 surfaces; omitir una es error de compilacion) y la `requiredCapability` ya grantada al service principal del Lab.
-- [ ] **Camino programatico declarado:** surface `http` (`available`) + metodo SDK tipado; `mcp` `policy-blocked` hasta gate.
-- [ ] **Un primitive, muchos consumers:** UI (1505), Workbench (1474), Nexa/MCP, y el `execute` del Lab consumen el **mismo** `LabRunnerPort.estimate` — cero logica de estimate duplicada.
-- [ ] **Parity check = SI:** el estimate tiene contrato gobernado a nivel capability; todos los consumers lo operan por construccion. (Los writes de gasto real siguen en `execute` con su fence + aprobacion; el reader no muta.)
+- [x] **Logica en el primitive, no en la UI.** El estimate vive en `packages/domain` + `apps/creative-runner` (dominio/runner), no en la UI (1505).
+- [x] **Modelada como reader/recurso, no como click-handler:** `globe.lab.experiment.estimate`, transport-neutral, sobre el `CapabilityRegistry`.
+- [x] **Read** expuesto como reader canonico con authorization fina (`GLOBE_LAB_EXPERIMENT_CAPABILITY`, no admin-coarse), errores canonicos sanitizados y `correlationId`. **Sin write** (es read-only por diseno).
+- [x] **Capability + coverage en el MISMO PR:** el reader nace con `LAB_COVERAGE` (declara las 8 surfaces; omitir una es error de compilacion) y la `requiredCapability` ya grantada al service principal del Lab.
+- [x] **Camino programatico declarado:** surface `http` (`available`) + metodo SDK tipado; `mcp` `policy-blocked` hasta gate.
+- [x] **Un primitive, muchos consumers:** UI (1505), Workbench (1474), Nexa/MCP, y el `execute` del Lab consumen el **mismo** `LabRunnerPort.estimate` — cero logica de estimate duplicada.
+- [x] **Parity check = SI:** el estimate tiene contrato gobernado a nivel capability; todos los consumers lo operan por construccion. (Los writes de gasto real siguen en `execute` con su fence + aprobacion; el reader no muta.)
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -406,14 +406,14 @@ Cambio aditivo, gobernado por kill switch (`GLOBE_LAB_ENABLED` default OFF) + pr
 
 ## Acceptance Criteria
 
-- [ ] Existe el reader gobernado `globe.lab.experiment.estimate` (`GLOBE_LAB_READERS.estimate`), registrado en `registerModelLabCapabilities` con `requiredCapability: GLOBE_LAB_EXPERIMENT_CAPABILITY` y coverage `LAB_COVERAGE` (`ui`/`mcp` `policy-blocked`, `http`/`sdk`/`cli`/`worker`/`e2e` `available`, `sister-platform` `not-applicable`).
-- [ ] El reader devuelve `LabEstimatePreviewV1` con `estimatedCredits` (`✨N`) computado como `f(ruta × output-shape)` para una tupla **prospectiva**, **sin** crear experimento, **sin** `fence.reserve` y **sin** `transition` (verificado con spies sobre `store`/`fence` en test).
-- [ ] `LabRunnerPort.estimate` toma `LabQuoteInputV1` (quote prospectivo) y es el **unico** computo de estimate; `executeExperiment` deriva el quote de su `StoredExperimentV1` y llama el mismo metodo (estimate identico al camino previo, sin regresion de state machine).
-- [ ] Un output-shape fuera de los constraints de la ruta (TASK-1500) rechaza con `invalid_request` **antes** de devolver estimate, reutilizando el validador de TASK-1501; un `hardCapCredits` excedido **no** rechaza — devuelve el estimate con `withinHardCap:false`.
-- [ ] La proyeccion curada **no** contiene `provider`, `model`/slug, costo vendor ni margen (test de naming dual que lo asserta).
-- [ ] El estimate **nunca** resuelve bytes de referencia (referencias por hash solo); con kill switch OFF el reader devuelve `policy_blocked`.
-- [ ] Metodo SDK tipado del reader; conformance manifest-driven lo ejercita sin backdoor.
-- [ ] `cd ../efeonce-globe && pnpm check && pnpm build` verde.
+- [x] Existe el reader gobernado `globe.lab.experiment.estimate` (`GLOBE_LAB_READERS.estimate`), registrado en `registerModelLabCapabilities` con `requiredCapability: GLOBE_LAB_EXPERIMENT_CAPABILITY` y coverage `LAB_COVERAGE` (`ui`/`mcp` `policy-blocked`, `http`/`sdk`/`cli`/`worker`/`e2e` `available`, `sister-platform` `not-applicable`).
+- [x] El reader devuelve `LabEstimatePreviewV1` con `estimatedCredits` (`✨N`) computado como `f(ruta × output-shape)` para una tupla **prospectiva**, **sin** crear experimento, **sin** `fence.reserve` y **sin** `transition` (verificado con spies sobre `store`/`fence` en test).
+- [x] `LabRunnerPort.estimate` toma `LabQuoteInputV1` (quote prospectivo) y es el **unico** computo de estimate; `executeExperiment` deriva el quote de su `StoredExperimentV1` y llama el mismo metodo (estimate identico al camino previo, sin regresion de state machine).
+- [x] Un output-shape fuera de los constraints de la ruta (TASK-1500) rechaza con `invalid_request` **antes** de devolver estimate, reutilizando el validador de TASK-1501; un `hardCapCredits` excedido **no** rechaza — devuelve el estimate con `withinHardCap:false`.
+- [x] La proyeccion curada **no** contiene `provider`, `model`/slug, costo vendor ni margen (test de naming dual que lo asserta).
+- [x] El estimate **nunca** resuelve bytes de referencia (referencias por hash solo); con kill switch OFF el reader devuelve `policy_blocked`.
+- [x] Metodo SDK tipado del reader; conformance manifest-driven lo ejercita sin backdoor.
+- [x] `cd ../efeonce-globe && pnpm check && pnpm build` verde.
 
 ## Verification
 
@@ -424,14 +424,14 @@ Cambio aditivo, gobernado por kill switch (`GLOBE_LAB_ENABLED` default OFF) + pr
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` sincronizado con el cierre
-- [ ] `Handoff.md` actualizado con lo implementado, verificado y pendientes
-- [ ] `changelog.md` actualizado (cambio de contrato: nuevo reader + refactor del estimate port)
-- [ ] chequeo de impacto cruzado ejecutado sobre TASK-1500, 1501, 1505, 1474, 1469, 1468
-- [ ] cierre documental proporcional en Greenhouse (arquitectura Producer + funcional/manual si aplica), via `greenhouse-documentation-governor`; el codigo/evidencia tecnica quedan en `efeonce-globe`
-- [ ] verificado que la proyeccion curada no filtra slug/provider-cost/margen y que el reader no muta estado
+- [x] `Lifecycle` del markdown sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` sincronizado con el cierre
+- [x] `Handoff.md` actualizado con lo implementado, verificado y pendientes
+- [x] `changelog.md` actualizado (cambio de contrato: nuevo reader + refactor del estimate port)
+- [x] chequeo de impacto cruzado ejecutado sobre TASK-1500, 1501, 1505, 1474, 1469, 1468
+- [x] cierre documental proporcional en Greenhouse (arquitectura Producer + funcional/manual si aplica), via `greenhouse-documentation-governor`; el codigo/evidencia tecnica quedan en `efeonce-globe`
+- [x] verificado que la proyeccion curada no filtra slug/provider-cost/margen y que el reader no muta estado
 
 ## Follow-ups
 

@@ -1,5 +1,9 @@
 # TASK-1469 — Globe Governed Run Lifecycle, Submission Fence and Provider Completion
 
+## Delta 2026-07-20 — estimate previewable adelantado por TASK-1502 (complete)
+
+El paso de estimate del run lifecycle durable **ya existe** como slice adelantado (TASK-1502, complete): `LabRunnerPort.estimate({ quote: LabQuoteInputV1 })` + el reader read-only `globe.lab.experiment.estimate`. 1469 **consume** ese mismo cómputo de estimate como su paso de estimate, sin reimplementarlo; el `execute` ya deriva su quote vía `quoteInputFromStored`. El `withinDayCap` durable (hoy no poblado) se puebla cuando 1469/1468 aporten el fence durable.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

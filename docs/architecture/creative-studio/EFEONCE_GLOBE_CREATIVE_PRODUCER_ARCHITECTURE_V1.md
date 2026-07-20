@@ -88,7 +88,7 @@ fail-closed antes de reservar crédito**:
 |---|---|---|---|
 | **TASK-1500** ✅ | Governed Route/Model Catalog | reader con constraints (res/dur/sampleRate/format/count) + specialty + **modelo público** (nombre+versión) + **casa interna** (`house`, operator-only vía `reveal_house`). La keystone. **Shipped 2026-07-20** (ver §Contratos reales del catálogo) | backend-data |
 | **TASK-1501** ✅ | Modality-Discriminated Run Contract | `PreparePayload` como union por capability + output-shape validados pre-spend (**absorbe `1495`**). **Shipped 2026-07-20** (ver §Contratos reales del run contract) | backend-data |
-| **TASK-1502** | Previewable Estimate reader | el `✨N` antes de gastar (extrae el estimate de dentro de `execute`; slice adelantado de `1469`) | backend-data |
+| **TASK-1502** ✅ | Previewable Estimate reader | el `✨N` antes de gastar (extrae el estimate de dentro de `execute`; slice adelantado de `1469`). **Shipped 2026-07-20** (ver §Contratos reales del estimate) | backend-data |
 | **TASK-1503** | Governed Output Retrieval + Asset Actions | hash→bytes servible + download/preview/favorite/copy sobre el store content-addressed de `1490` | backend-data |
 | **TASK-1504** | Producer Capability Expansion | video frames + motion-control; audio change-voice + translate; multi-output omni; voice-preset registry — tras el provider seam | backend-data |
 | **TASK-1505** | Producer Surface (UI) | Image/Video/Audio: chassis + paneles por modalidad + feed unificado. El "antes de `1474`". | ui-ux |
@@ -167,6 +167,30 @@ prompt-first, no interpreta brief). **Sincroniza** projects durables con `1465` 
   **Absorbe el aspect ratio de TASK-1495 para image.** El threading de video/audio a sus adapters es TASK-1504.
 - **Coverage sin cambios:** misma capability (`globe.lab.experiment.run` / `globe.run.prepare`), `ui`/`mcp`
   `policy-blocked`. La UI (1505), MCP, SDK y CLI consumen el MISMO command con el nuevo shape.
+
+### Contratos reales del estimate (TASK-1502, vigente)
+
+- **Extracción del estimate a un quote prospectivo:** `LabRunnerPort.estimate` pasó de `{ experiment:
+  StoredExperimentV1 }` a `{ quote: LabQuoteInputV1 }` (`{ capability, route, outputShape?, inputHashes,
+  hardCapCredits? }` en `packages/contracts`). `execute` deriva el quote de su experimento persistido
+  (`quoteInputFromStored`), así el **reader y `execute` comparten el MISMO cómputo de estimate** — nunca
+  duplicado. `toProviderRequestFromQuote` arma un provider request no facturable (sin prompt/bytes/edit).
+- **Reader gobernado** `globe.lab.experiment.estimate` (`GLOBE_LAB_READERS.estimate`), registrado en
+  `registerModelLabCapabilities` con `LAB_COVERAGE` (`ui`/`mcp` `policy-blocked`) y `requiredCapability:
+  GLOBE_LAB_EXPERIMENT_CAPABILITY`. **Read-only**: no crea experimento, no `fence.reserve`, no `transition`
+  (verificado con spies que throwean en test).
+- **Fail-closed pre-spend, reusando TASK-1501:** el handler valida el `outputShape` (opcional, additive) contra
+  los constraints de la ruta del catálogo vía el **mismo `validateOutputShape`** — shape fuera de constraints /
+  ruta / capability desconocida → `invalid_request`; kill switch OFF → `policy_blocked`. Un `hardCapCredits`
+  excedido **no rechaza**: devuelve `withinHardCap:false` (señal de presupuesto, no error — un preview dice la
+  verdad, no gasta).
+- **Proyección curada `LabEstimatePreviewV1`:** expone `estimatedCredits` (`✨N`) + `referenceRoute` (contrato
+  de fidelidad, = `estimate.route`) + `estimatedDurationSeconds?` + `withinHardCap?`; **omite** `provider`,
+  `model`/slug, costo vendor y margen. `withinDayCap?` queda declarado pero **no poblado** (el fence in-memory
+  per-process no da una señal confiable entre réplicas; se puebla con el fence durable de `TASK-1468`).
+- **Unidad de crédito = `ruta × output-shape`, nunca el modelo.** El fake sigue keyeando por capability
+  (limitación conocida documentada); los adapters reales varían por shape vía el threading de `TASK-1501`.
+- **SDK:** `estimateExperiment(query)` en `packages/sdk`.
 
 ## Boundary / invariantes (heredados + nuevos)
 
