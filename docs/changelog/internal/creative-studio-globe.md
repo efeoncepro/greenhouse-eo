@@ -22,9 +22,10 @@
   capability + constraints + inputModes). Impl de producción = `getProducerRoute` reusado in-process (SSOT, sin
   re-dispatch ni ciclo de módulos); `catalog?` opcional en `ModelLabDependencies`.
 - **Threading image-first + absorción de TASK-1495:** `CreativeProviderRequestV1` gana `quality`/`aspectRatio`/
-  `count`; `toProviderRequest` los hilvana cuando `modality==='image'`; el fal image adapter (Seedream) los lee
-  (`num_images`/`aspect_ratio`, `[verify live]`). El aspect ratio deja de ser hardcode. Video/audio adapter reads
-  = TASK-1504.
+  `count`; `toProviderRequest` los hilvana cuando `modality==='image'`; el fal image adapter (Seedream v5/pro) los
+  lee con el schema **verificado contra la doc publicada de Fal**: `count → num_images`, y el aspect ratio neutral
+  → **`image_size` preset** (Seedream v5/pro NO tiene campo `aspect_ratio`; `16:9 → landscape_16_9`, etc.). El
+  aspect ratio deja de ser hardcode. Video/audio adapter reads = TASK-1504.
 - **Estado:** local-first en `main` de `efeonce-globe`, sin push; `pnpm check` + `build` verdes (domain 85 tests,
   creative-runner 89). Backward-compat: un `prepare` sin `output` conserva el comportamiento previo. Coverage sin
   cambios (`ui`/`mcp` `policy-blocked`).
