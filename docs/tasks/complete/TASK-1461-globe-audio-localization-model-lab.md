@@ -32,11 +32,20 @@ Actualización del Delta anterior (TASK-1486 dejaba audio `supports=false` en el
 
 **Recommendation matrix audio (hoy):** **Fal Seed Audio es el motor de audio operativo** (`objective_pass_pending_human`), motor único (Vertex no sirve audio Google-nativo — `supports(audio)=false`; Chirp/Lyria = opción no implementada). El foley como **sonido-de-contacto** (golpe-y-rebote) y la sincronía/naturalidad son **criterios humanos declarados**, NO auto-puntuados; consent/license quedan declarados a nivel de fixture. El harness solo confirma output/cap/lineage/ruta/outcome; el verdict nunca es un "passed" creativo. — track B + canary por trabajo de esta sesión.
 
+## Delta 2026-07-20 — CIERRE (complete): lab audio entregado + verificado en vivo
+
+El carril audio quedó **entregado y verificado en vivo** por el path canónico del Model Lab (command→registry→runner→adapter→track B), consumiendo el harness de TASK-1458. Evidencia:
+
+- **Adapter de audio real** (Slice 1): `audio-generate` → **Seed Audio** (`fal-ai/seed-audio`), `speech-synthesize` → ElevenLabs TTS multilingual, por el `FalCreativeAdapter` detrás del `LabRunner` — sin provider SDK directo desde CLI/UI/MCP/scripts/E2E; consent/license declarados a nivel de fixture (golden brief `glitch-microphone-foley`, `license`/`consent`/`permittedUse`), ningún consumer los omite (pasa por el command).
+- **Golden brief `glitch-microphone-foley` corrido** (Slices 2–3), verdict **`objective_pass_pending_human`**, Seed Audio 6cr, `candidate_ready`; el manifest conserva provider/model/version + lineage. track B resolvió la ref de contacto.
+
+**Frontera honesta (no overclaim):** los AC de "no clonar voz sin consentimiento", "licencia/restricciones de release" y "sincronía/rights insuficientes no se promueven" se cumplen **a nivel de declaración de fixture + gate de promoción downstream (TASK-1463)** — el lab produce los inputs objetivos; el juicio de foley como **sonido-de-contacto**, inteligibilidad, sincronía y naturalidad son **criterios humanos declarados**, nunca auto-puntuados. speech/dubbing/music quedan cableados vía ElevenLabs (`fal-ai/elevenlabs/*`) para su evaluación; producción/clientes externos siguen gated (`GLOBE_LAB_PROVIDER=fake` default). Gates: `pnpm check`+`build` verdes, `task:lint` template=1. — cerrado; contribuye a desbloquear TASK-1463.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -49,7 +58,7 @@ Actualización del Delta anterior (TASK-1486 dejaba audio `supports=false` en el
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Diseño gobernado; implementación pendiente`
+- Status real: `Complete — lab audio entregado (Seed Audio verificado en vivo); promoción = TASK-1463`
 - Rank: `TBD`
 - Domain: `creative|ai|audio`
 - Blocked by: `TASK-1457, TASK-1458`

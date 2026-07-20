@@ -58,11 +58,21 @@ El veredicto objetivo confirma output/cap/lineage/ruta/outcome; continuidad, act
 
 **Follow-ups abiertos:** deploy/Dockerfile de `studio-web`; un command de edit del Lab que propague `previous_interaction_id` por el dominio (el adapter ya soporta edit; el seam one-shot no expone el interaction id); paridad de edit stateful en Vertex (re-testear periódicamente); y provenance completa en TASK-1467. — Veo + Omni + matrix por trabajo de esta sesión.
 
+## Delta 2026-07-20 — CIERRE (complete): lab motion entregado + verificado en vivo
+
+El carril motion quedó **entregado y verificado en vivo** por el path canónico del Model Lab (command→registry→runner→adapter→track B), consumiendo el harness de TASK-1458 (no construyó otro). Evidencia:
+
+- **Adapters motion reales** (Slice 1): Veo (`VertexVideoAdapter`, keyless `:predictLongRunning`), Omni (`VertexOmniAdapter`, Interactions API keyless generate) y Seedance 2.0 (`FalCreativeAdapter`) — todos detrás del `LabRunner`, sin provider SDK directo desde CLI/UI/MCP/scripts/E2E.
+- **Golden brief `product-motion-loop` corrido contra los 3 motores** (Slices 2–3), **recommendation matrix en vivo**: Omni 40cr / Veo 32cr / Seedance 20cr — los tres `objective_pass_pending_human`. El manifest conserva provider/model/modelVersion/proposedRoute/actualRoute/authorizedInputHashes por attempt; **sin fallback silencioso** (`actualRoute==proposedRoute`, route_stable). Seedance 2.5 permanece fail-closed (no existe ruta verificable; se usa 2.0).
+- **track B** (hash→bytes) desbloqueó el ancla del brief; el edit conversacional (Omni) quedó como capability aparte (Lab edit-command, live-verified) + su generalización cross-model en **TASK-1490**.
+
+**Frontera honesta (no overclaim):** los AC "distinguir canary/lab-ready/production-candidate" y "fallos bloquean promoción" son **downstream de TASK-1463** (Model Promotion Registry) — este lab produce los **inputs objetivos** (output/cap/lineage/ruta/outcome + latencia/costo); la **promoción** y el juicio de craft (acción/anatomía/cámara/continuidad/audio) son **criterios humanos declarados**, nunca auto-puntuados (verdict jamás auto-`passed`). Producción/clientes externos siguen gated (`GLOBE_LAB_PROVIDER=fake` default; deploy interno apagado). Gates: `pnpm check`+`build` verdes (efeonce-globe), `task:lint` template=1. — cerrado; desbloquea TASK-1463.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -75,7 +85,7 @@ El veredicto objetivo confirma output/cap/lineage/ruta/outcome; continuidad, act
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Diseño gobernado; implementación pendiente`
+- Status real: `Complete — lab motion entregado + matriz en vivo (Omni/Veo/Seedance); promoción = TASK-1463`
 - Rank: `TBD`
 - Domain: `creative|ai|video`
 - Blocked by: `TASK-1457, TASK-1458`

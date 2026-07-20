@@ -10,6 +10,10 @@ Nota de frontera, alineada con el Goal ("separar probar de autorizar") y la AC "
 
 `TASK-1486` dejó el `VertexCreativeAdapter` code-complete: cuando el canary billable se prenda (`GLOBE_LAB_PROVIDER=vertex`, gated por su go-live checklist), los reportes de evaluación (TASK-1458) dejarán de declarar "proveedor fake" y llevarán `model`/`modelVersion` reales de Vertex + `actualCredits` del uso real. La promotion readiness registry debe seguir tratando el `EvaluationReportV1` como **evidencia objetiva** (no aprobación de craft ni de ruta): el verdict del harness nunca es un "passed" creativo, y `objective_pass_pending_human` no promueve por sí solo. La promoción de una ruta a producción sigue siendo un gate **separado** de ejecutarla en el Lab (invariante 9). — adapter real disponible por TASK-1486.
 
+## Delta 2026-07-20 — DESBLOQUEADA: sus 4 dependencias están complete
+
+`Blocked by: TASK-1458, TASK-1459, TASK-1460, TASK-1461` — **las 4 están `complete`**: TASK-1458 (harness de evals) + TASK-1459 (still matrix) cerradas antes; **TASK-1460 (motion) + TASK-1461 (audio) cerradas 2026-07-20** con recommendation matrices en vivo (Omni/Veo/Seedance motion; Seed Audio audio, todos `objective_pass_pending_human`). Esta task ya puede tomarse. Contrato claro que hereda: el harness produce el **veredicto objetivo** (`objective_fail | objective_pass_pending_human`, nunca auto-`passed`); la distinción **canary / lab-ready / production-candidate** y el bloqueo de promoción por craft/continuidad/audio/rights son **responsabilidad de esta task** (los labs entregan los inputs objetivos + los criterios humanos declarados, no la promoción). — desbloqueada por el cierre de TASK-1460/1461.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
