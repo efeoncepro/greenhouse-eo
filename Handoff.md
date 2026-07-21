@@ -29,8 +29,9 @@
   se reinstaló usando su Chrome autenticado; el token gobernado existente adquirió el scope sin rotación.
   Details/availability ya pasan: `GROUP_CALENDAR`, `isOffline=false`, Office 365, 30 min, `company` requerido,
   consentimiento legal y slots reales. Harness `scripts/hubspot/smoke-scheduler-booking.mjs` listo: inspect por
-  defecto, POST con doble guard, slot revalidado, cero retry y output redacted; guard probado sin booking. Antes
-  del booking aún faltan email de prueba y ventana de slot; el organizador se resuelve desde la scheduling page.
+  defecto, POST con doble guard, slot revalidado, cero retry y output redacted; guard probado sin booking. Un
+  POST vacío llegó a `VALIDATION_ERROR`, confirmando permiso write sin mutación. Antes del booking válido aún
+  faltan email de prueba y ventana de slot; el organizador se resuelve desde la scheduling page.
   `HubSpotMeetingEmbed` y landings permanecen intactos.
 
 - **`TASK-1506` COMPLETE (Globe Frontend Hosting and Front Door Decision, `EPIC-028`) — ADR-004, local-first sin push.**

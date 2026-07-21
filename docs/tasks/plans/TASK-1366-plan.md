@@ -23,6 +23,8 @@
   requerido, consentimiento legal habilitado y slots reales. El slug API incluye owner + leaf.
 - El harness quedó implementado y verificado en modo inspect; el guard de execute falla cerrado sin la
   confirmación literal y no realizó POST.
+- El POST inválido controlado alcanzó `VALIDATION_ERROR`, probando autorización del endpoint sin crear booking;
+  ya no existe incertidumbre de write scope para el smoke.
 
 ## Audit
 

@@ -45,6 +45,9 @@
 - **Harness fail-closed listo** — `scripts/hubspot/smoke-scheduler-booking.mjs` inspecciona details/availability
   por defecto y solo habilita POST con `--execute-booking` + confirmación literal + email/nombre/company/start
   explícitos. Valida el slot contra availability, no reintenta y solo emite evidencia allowlisted/digested.
+- **Write authorization alcanzable** — un POST con body vacío, deliberadamente incapaz de reservar, llegó a
+  la validación del endpoint y devolvió `VALIDATION_ERROR` en vez de `MISSING_SCOPES`. El token ya puede alcanzar
+  el contrato de booking; sigue pendiente el único POST válido con identidad/slot aprobados.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
