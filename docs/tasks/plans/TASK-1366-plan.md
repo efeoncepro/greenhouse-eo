@@ -161,3 +161,5 @@
 - Build `#27` desplegado, app reinstalada y scope efectivo sin rotación del secreto.
 - Permanece pendiente antes del booking: confirmar email de test y ventana de slot; el organizador lo resuelve
   la scheduling page sobre su único calendario Office 365 disponible.
+- Estado 2026-07-21: `operativamente bloqueado`. El repo contiene correos usados en smokes históricos, pero no
+  constituyen aprobación vigente para generar contacto, calendario, Teams e invitación reales.

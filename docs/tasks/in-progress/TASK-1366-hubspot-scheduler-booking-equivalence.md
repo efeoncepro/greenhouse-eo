@@ -70,7 +70,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-023`
-- Status real: `Details/availability PASS; booking espera email y slot aprobados`
+- Status real: `Operativamente bloqueado: booking espera email y franja aprobados`
 - Rank: `TBD`
 - Domain: `growth|public-site|crm`
 - Blocked by: `none`
