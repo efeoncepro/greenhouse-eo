@@ -191,6 +191,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Growth Forms portable renderer preview (TASK-1231) — child surface del Design System que monta el mismo core Web Component que WordPress/Astro renderizan en produccion, desde fixtures del render_contract; alcanzable desde el catalogo canonico /design-system.'
   },
   {
+    route: '/design-system/native-meeting-scheduler',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Native Meeting Scheduler preview (TASK-1510) — galeria interna del mismo renderer portable que usaran WordPress/Astro, con fixtures deterministas de confirmacion y recovery; alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
     route: '/design-system/handoff',
     parent: '/design-system',
     via: 'inline-link',

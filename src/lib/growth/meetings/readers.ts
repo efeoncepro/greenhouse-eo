@@ -17,12 +17,26 @@ const consentKey = (hasher: MeetingPrivacyHasher, providerId: string): string =>
 const slotId = (hasher: MeetingPrivacyHasher, startsAt: string, durationMinutes: number): string =>
   `slot_${hasher.hmac('booking', `${startsAt}:${durationMinutes}`).slice(0, 16)}`
 
+const calendarDateInTimezone = (startsAt: string, timezone: string): string => {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: timezone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(new Date(startsAt))
+
+  const value = (kind: string) => parts.find(part => part.type === kind)?.value ?? ''
+
+  return `${value('year')}-${value('month')}-${value('day')}`
+}
+
 export const readMeetingSchedulerConfig = async (input: {
   surfaceId: string
   schedulerKey?: string
   origin: string | null
   provider?: MeetingSchedulingProvider
   hasher?: MeetingPrivacyHasher
+  env?: NodeJS.ProcessEnv
 }): Promise<MeetingSchedulerConfig | null> => {
   const schedulerKey = input.schedulerKey ?? DEFAULT_SCHEDULER_KEY
   const surface = await getMeetingSurfaceAuthority(input.surfaceId, schedulerKey)
@@ -32,11 +46,12 @@ export const readMeetingSchedulerConfig = async (input: {
   const provider = input.provider ?? createHubSpotMeetingSchedulingProvider()
   const hasher = input.hasher ?? await resolveMeetingPrivacyHasher()
   const configuration = await provider.getConfiguration({ timezone: surface.defaultTimezone })
+  const turnstileSiteKey = input.env?.TURNSTILE_SITE_KEY?.trim() || process.env.TURNSTILE_SITE_KEY?.trim() || null
 
   return {
     schemaVersion: MEETING_SCHEDULER_SCHEMA_VERSION,
     schedulerKey,
-    state: 'available',
+    state: turnstileSiteKey ? 'available' : 'fallback_only',
     durationsMinutes: [configuration.meetingDurationMillis / 60_000],
     timezonePolicy: {
       defaultTimezone: surface.defaultTimezone,
@@ -57,6 +72,15 @@ export const readMeetingSchedulerConfig = async (input: {
         label: item.label,
         required: item.required,
       })),
+    },
+    security: {
+      captcha: {
+        provider: 'turnstile',
+        required: true,
+        siteKey: turnstileSiteKey,
+        action: 'meeting_booking',
+        execution: 'submit',
+      },
     },
     fallback: { enabled: true, url: surface.fallbackUrl },
   }
@@ -101,7 +125,7 @@ export const readMeetingAvailability = async (input: {
   const grouped = new Map<string, MeetingAvailability['days'][number]['slots']>()
 
   for (const slot of futureSlots) {
-    const date = slot.startsAt.slice(0, 10)
+    const date = calendarDateInTimezone(slot.startsAt, input.timezone)
     const slots = grouped.get(date) ?? []
 
     slots.push({

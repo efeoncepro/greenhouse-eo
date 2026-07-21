@@ -21,14 +21,20 @@
 
 ## Pendientes inmediatos
 
-- **`TASK-1509` IN-PROGRESS / `TASK-1510` TO-DO (Native Meeting Scheduler, `EPIC-023`).** El operador confirmó
-  productización y autorizó subagentes. Dos objetivos load-bearing: experiencia visual Time Horizon/Meeting Pass
-  de frontera y funnel GTM/GA4 completo, con `generate_lead` sólo desde recibo server-confirmed. **Foundation local
+- **`TASK-1509` / `TASK-1510` IN-PROGRESS (Native Meeting Scheduler, `EPIC-023`).** El operador confirmó
+  productización y autorizó subagentes. Dos objetivos load-bearing: calendario Efeonce moderno y funnel GTM/GA4
+  completo, con `generate_lead` sólo desde recibo server-confirmed. **Foundation local
   TASK-1509 ya está code-complete**: ADR aceptado, DTO/provider HubSpot estricto, ledger Growth dedicado con estados
   `ambiguous`/`provider_created_invalid`, HMAC+rate buckets, config/availability/book, Turnstile hostname/action,
   signals y contrato `gh_meeting_step_reached`; 26 tests focales + tsc + gates verdes. Pendiente antes de rollout:
   aplicar/probar migración en DB dev, concurrencia real, secret HMAC, binding activo y controlled booking/replay.
-  TASK-1510 posee Web Component/GVC/host. `book_meeting` de TASK-1431
+  TASK-1510 ya tiene renderer fixture-backed: Web Component vanilla, calendario mensual semántico + agenda diaria,
+  navegación de mes, formulario/Turnstile, recovery ambiguo, bundle ~50 KB y 11 tests. El GVC premium local
+  `2026-07-21T08-43-09_native-meeting-scheduler` pasó 1440/390, 24 frames, teclado/foco/reduced-motion/contraste,
+  enterprise rubric y runtime sin errores; sólo queda `baseline_stale` hasta aprobación humana. La dirección previa
+  Time Horizon fue rechazada por no leerse como calendario y quedó superseded. Pendientes: dossier staging de estados,
+  workspace GTM, host pilot y prueba DB/runtime de TASK-1509.
+  `book_meeting` de TASK-1431
   sigue navigation-only y no se toca. HubSpot Scheduler/Office 365/Teams siguen SoT; iframe/link permanece fallback
   hasta pilot y verificación. Trabajo en `develop`, sin branch/worktree; `docs/ui/creative-studio/` es ajeno y no se toca.
 

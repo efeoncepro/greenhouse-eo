@@ -2,15 +2,15 @@
 
 ## Flow Goal
 
-Move from measurable horizon exploration to a server-confirmed Meeting Pass while preserving timezone, accessibility, idempotency and fallback.
+Move from a measurable monthly-calendar selection to a server-confirmed meeting summary while preserving timezone, accessibility, idempotency and fallback.
 
 ## Happy Path
 
 ```text
-mount -> authorized config -> availability -> horizon/day -> slot
-  -> Meeting Pass selected -> details/consent -> local validation
+mount -> authorized config -> availability -> month/date -> daily slot
+  -> selected meeting summary -> details/consent -> local validation
   -> booking with stable key -> server receipt
-  -> confirmed Meeting Pass + gh_meeting_booking_confirmed
+  -> confirmed meeting summary + gh_meeting_booking_confirmed
 ```
 
 ## Measurement State Machine
@@ -28,7 +28,7 @@ mount -> authorized config -> availability -> horizon/day -> slot
 
 - Flag/config unavailable -> existing embed/link directly.
 - Availability timeout/empty -> user retry/bounded window/fallback.
-- Conflict -> preserve non-sensitive fields, refresh horizon, focus alert then first slot.
+- Conflict -> preserve non-sensitive fields, refresh the calendar, focus alert then first slot.
 - Validation/captcha -> keep valid selection, focus error, retry same intent after correction.
 - Definitive pre-dispatch failure -> no success/confirmation event; fallback remains available.
 - Offline/no Teams after provider dispatch or ambiguous write outcome -> processing/check-email recovery; never auto-create a fresh key, show immediate fallback, or emit confirmation.
@@ -36,7 +36,7 @@ mount -> authorized config -> availability -> horizon/day -> slot
 ## Focus and Navigation
 
 - Step transition focuses heading; back returns to selected slot.
-- Conflict focuses alert; success focuses confirmed-pass heading.
+- Conflict focuses alert; success focuses the confirmed-summary heading.
 - Browser Back/remount never replays POST.
 - Reduced motion does not change timing of semantic state/focus/telemetry.
 
@@ -57,6 +57,6 @@ mount -> authorized config -> availability -> horizon/day -> slot
 ## Design Decision Log
 
 - Three semantic stages live in one inline scene; no modal/drawer.
-- Meeting Pass persists selected intent and is the single visual bridge to confirmed conversion.
+- The selected meeting summary persists intent and is the single visual bridge to confirmed conversion.
 - Generic funnel event minimizes GTM tag sprawl; one confirmed event maps to key event.
 - Native invitation owns reschedule/cancel.

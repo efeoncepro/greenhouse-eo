@@ -332,6 +332,20 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-forms'
   },
   {
+    id: 'native-meeting-scheduler',
+    title: 'Native Meeting Scheduler',
+    description:
+      'Scheduler portable Efeonce (TASK-1510): experiencia nativa de disponibilidad, captura de datos, confirmacion y recovery seguro. Usa el mismo renderer en Greenhouse, WordPress y Astro; HubSpot sigue como fuente de verdad y GTM recibe un funnel sin PII.',
+    route: '/design-system/native-meeting-scheduler',
+    category: 'Patterns',
+    kind: 'Pattern',
+    status: 'Hardening',
+    owner: 'src/growth-meeting-renderer/*',
+    tags: ['growth', 'meetings', 'scheduler', 'web component', 'gtm', 'portable', 'hubspot'],
+    searchAliases: ['meeting scheduler', 'agenda', 'reservar reunion', 'hubspot meetings', 'gtm scheduler'],
+    icon: 'tabler-calendar-event'
+  },
+  {
     id: 'buttons',
     title: 'Buttons',
     description: 'Primitive para jerarquía de comandos, tono, iconos y estados async.',

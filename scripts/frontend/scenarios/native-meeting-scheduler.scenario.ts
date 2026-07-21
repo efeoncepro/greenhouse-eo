@@ -1,0 +1,171 @@
+import type { CaptureScenario } from '../lib/scenario'
+
+export const scenario: CaptureScenario = {
+  name: 'native-meeting-scheduler',
+  route: '/design-system/native-meeting-scheduler',
+  // The internal preview is deterministic and fixture-backed. These interactions
+  // never call the provider or persist a meeting.
+  mutating: true,
+  safeForCapture: true,
+  qualityProfile: 'premium',
+  viewport: { width: 1440, height: 1000 },
+  viewports: [
+    { name: 'desktop', width: 1440, height: 1000 },
+    { name: 'mobile', width: 390, height: 844 },
+  ],
+  initialHoldMs: 800,
+  finalHoldMs: 300,
+  readiness: {
+    selector: '[data-capture="native-meeting-scheduler"][data-phase="schedule"]',
+    selectors: [
+      '[data-capture="meeting-calendar"]',
+      '[data-capture="meeting-agenda"]',
+    ],
+    absentSelectors: ['.MuiSkeleton-root', '[data-testid="login-card"]', '[data-loading="true"]'],
+    waitForFonts: true,
+    postReadyDelayMs: 250,
+    timeout: 15000,
+  },
+  baseline: {
+    surfaceId: 'growth.native-meeting-scheduler',
+    requiredFrameLabels: [
+      'initial-calendar',
+      'time-selected',
+      'details-form',
+      'validation-recovery',
+      'confirmed-summary',
+    ],
+    requiredRegions: [
+      '[data-capture="native-meeting-scheduler"]',
+      '[data-capture="meeting-agenda"]',
+    ],
+  },
+  assertions: [
+    { kind: 'noLoginRedirect', reason: 'El preview interno requiere el actor GVC autenticado.' },
+    { kind: 'noErrorBoundary', reason: 'La evidencia premium no puede ser un error boundary.' },
+    { kind: 'visible', selector: '[data-capture="meeting-calendar"]', reason: 'El patrón mensual debe ser la región dominante.' },
+  ],
+  quality: {
+    accessibility: {
+      enabled: true,
+      includeSelector: '[data-capture="native-meeting-scheduler"]',
+      failOnViolations: true,
+    },
+    layout: {
+      enabled: true,
+      includeSelector: '[data-capture="native-meeting-scheduler"]',
+      minTargetSize: 24,
+      failOnViolations: true,
+    },
+    runtime: {
+      failOnConsoleError: true,
+      failOnPageError: true,
+      failOnHydrationWarning: true,
+      failOnHttpStatus: true,
+      ignoreUrlPatterns: ['/_next/', 'hot-update'],
+    },
+    keyboard: {
+      enabled: true,
+      failOnViolations: true,
+      reducedMotionCheck: true,
+      probes: [
+        {
+          name: 'calendar-day-selection',
+          startSelector: 'button.ghm-calendar-day',
+          keys: ['Enter'],
+          expectedFocusSelector: '.ghm-calendar-day[aria-pressed="true"]',
+          expectedVisibleSelector: '[data-capture="meeting-agenda"] .ghm-slot',
+          requireVisibleFocusRing: true,
+        },
+      ],
+    },
+    performance: {
+      enabled: true,
+      severity: 'error',
+      maxDomNodes: 2500,
+      maxRequests: 100,
+      maxTransferBytes: 25_000_000,
+      maxFcpMs: 6000,
+    },
+    enterpriseRubric: {
+      enabled: true,
+      includeSelector: '[data-capture="native-meeting-scheduler"]',
+      failOnViolations: true,
+      placeholderTerms: ['lorem', 'placeholder', 'todo'],
+      expectedDataCaptureRegions: [
+        'native-meeting-scheduler',
+        'meeting-agenda',
+      ],
+      requireSurfaceRecipeMarker: true,
+      maxUniformCards: 2,
+      maxNestedSurfaceDepth: 1,
+      maxContainedSurfacesInViewport: 3,
+      minHeadingScaleRatio: 1.3,
+    },
+  },
+  steps: [
+    { kind: 'wait', selector: '[data-capture="meeting-calendar"]', timeout: 15000 },
+    {
+      kind: 'mark',
+      label: 'initial-calendar',
+      clipSelector: '[data-capture="native-meeting-scheduler"]',
+      note: 'Mes completo, contexto y agenda diaria en una sola composición reconocible.',
+    },
+    {
+      kind: 'interaction',
+      interaction: {
+        name: 'calendar-date-selection',
+        action: { kind: 'click', selector: 'button.ghm-calendar-day' },
+        intent: 'Relacionar causalmente la fecha elegida con la agenda del día.',
+        frames: [
+          { label: 'date-selection-feedback', atMs: 0, clipSelector: '[data-capture="native-meeting-scheduler"]' },
+          { label: 'date-selection-settled', atMs: 180, clipSelector: '[data-capture="native-meeting-scheduler"]' },
+        ],
+        keyboardEquivalent: {
+          action: { kind: 'press', selector: 'button.ghm-calendar-day', key: 'Enter' },
+          expected: 'La fecha queda seleccionada y sus horarios permanecen disponibles.',
+        },
+        reducedMotion: 'capture',
+      },
+    },
+    { kind: 'click', selector: '.ghm-slot' },
+    {
+      kind: 'mark',
+      label: 'time-selected',
+      clipSelector: '[data-capture="native-meeting-scheduler"]',
+      note: 'Horario seleccionado y resumen inline antes de continuar.',
+    },
+    { kind: 'click', selector: '.ghm-agenda-action' },
+    { kind: 'wait', selector: '[data-capture="meeting-details"]', timeout: 5000 },
+    {
+      kind: 'mark',
+      label: 'details-form',
+      clipSelector: '[data-capture="native-meeting-scheduler"]',
+      note: 'Formulario etiquetado, resumen persistente y una sola acción mutante.',
+    },
+    { kind: 'click', selector: '.ghm-form-actions .ghm-primary' },
+    { kind: 'wait', selector: '.ghm-error-summary', timeout: 3000 },
+    {
+      kind: 'mark',
+      label: 'validation-recovery',
+      clipSelector: '[data-capture="native-meeting-scheduler"]',
+      note: 'Resumen y errores de campo permiten recuperación contextual.',
+    },
+    { kind: 'fill', selector: '[name="firstName"]', value: 'Humberly' },
+    { kind: 'fill', selector: '[name="lastName"]', value: 'Revisión' },
+    { kind: 'fill', selector: '[name="email"]', value: 'hhumberly@efeoncepro.com' },
+    { kind: 'fill', selector: '[name="company"]', value: 'Efeonce' },
+    { kind: 'click', selector: '.ghm-check-group input[type="checkbox"]' },
+    { kind: 'click', selector: '.ghm-form-actions .ghm-primary' },
+    { kind: 'wait', selector: '[data-phase="confirmed"]', timeout: 5000 },
+    {
+      kind: 'mark',
+      label: 'confirmed-summary',
+      clipSelector: '[data-capture="native-meeting-scheduler"]',
+      note: 'Confirmación fixture-backed; ninguna reunión real ni PII queda expuesta en la UI.',
+    },
+    { kind: 'mark', label: 'scheduler-full-page', fullPage: true },
+    { kind: 'click', selector: 'button:has-text("Verificando")', note: 'Restablece el fixture sin enviar una reserva.' },
+    { kind: 'wait', selector: '[data-capture="meeting-calendar"]', timeout: 5000 },
+  ],
+}

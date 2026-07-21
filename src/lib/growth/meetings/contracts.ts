@@ -1,5 +1,61 @@
 export const MEETING_SCHEDULER_SCHEMA_VERSION = 'growth-meeting-scheduler.v1' as const
 
+export const MEETING_GTM_EVENTS = {
+  stepReached: 'gh_meeting_step_reached',
+  bookingConfirmed: 'gh_meeting_booking_confirmed',
+} as const
+
+export const MEETING_STEPS = [
+  'viewed',
+  'availability_loaded',
+  'availability_failed',
+  'date_selected',
+  'slot_selected',
+  'details_started',
+  'validation_failed',
+  'booking_started',
+  'booking_failed',
+  'fallback_opened',
+] as const
+
+export const MEETING_AVAILABILITY_STATES = [
+  'available',
+  'empty',
+  'partial',
+  'fallback_only',
+  'degraded',
+  'unavailable',
+] as const
+
+export const MEETING_DAYS_AHEAD_BUCKETS = [
+  'same_day',
+  '1_3_days',
+  '4_7_days',
+  '8_14_days',
+  '15_30_days',
+  '31_plus_days',
+] as const
+
+export const MEETING_TIME_OF_DAY_BUCKETS = ['overnight', 'morning', 'afternoon', 'evening'] as const
+
+export const MEETING_TELEMETRY_PAYLOAD_KEYS = [
+  'meeting_step',
+  'scheduler_key',
+  'surface_id',
+  'placement',
+  'availability_state',
+  'days_ahead_bucket',
+  'time_of_day_bucket',
+  'error_category',
+  'renderer_version',
+  'contract_version',
+] as const
+
+export type MeetingStep = (typeof MEETING_STEPS)[number]
+export type MeetingAvailabilityState = (typeof MEETING_AVAILABILITY_STATES)[number]
+export type MeetingDaysAheadBucket = (typeof MEETING_DAYS_AHEAD_BUCKETS)[number]
+export type MeetingTimeOfDayBucket = (typeof MEETING_TIME_OF_DAY_BUCKETS)[number]
+
 export type MeetingSchedulerState = 'available' | 'fallback_only' | 'unavailable'
 
 export type MeetingFieldKey = 'first_name' | 'last_name' | 'email' | 'company'
@@ -31,6 +87,15 @@ export interface MeetingSchedulerConfig {
   consent: {
     processing: { required: true; policyVersion: string }
     communications: Array<{ consentKey: string; label: string; required: boolean }>
+  }
+  security: {
+    captcha: {
+      provider: 'turnstile'
+      required: true
+      siteKey: string | null
+      action: 'meeting_booking'
+      execution: 'submit'
+    }
   }
   fallback: {
     enabled: boolean

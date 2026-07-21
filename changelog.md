@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-21 — Scheduler nativo adopta calendario mensual (TASK-1510)
+
+- El prototipo portable reemplaza la dirección abstracta “Time Horizon” por un calendario mensual semántico,
+  agenda diaria y resumen inline; el GVC premium local pasó 24 frames en 1440 px y 390 px, teclado, foco, contraste,
+  reduced motion, enterprise rubric y cero errores runtime/overflow.
+- El funnel emite eventos allowlisted sin PII y reserva `gh_meeting_booking_confirmed` para un recibo confirmado
+  server-side. La activación pública sigue pendiente del dossier staging/full-state, preview/read-back de GTM,
+  runtime real de TASK-1509 y piloto gobernado; los flags permanecen apagados.
+
 ## 2026-07-21 — HubSpot Scheduler equivalence conditional pass (TASK-1366)
 
 - El spike de booking nativo probó en runtime calendario Office 365, Teams, contacto/reunión CRM y links

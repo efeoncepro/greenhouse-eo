@@ -42,6 +42,7 @@ flowchart LR
 ```
 
 - `GET config`: configuración browser-safe, sin link/user/provider IDs.
+- El config incluye sólo la site key pública y action fija de Turnstile; el secret permanece server-side. Sin site key, el estado es `fallback_only`.
 - `GET availability`: slots normalizados y acotados; no se persiste un calendario paralelo.
 - `POST book`: valida shape, surface/origin, Turnstile, límites, slot fresco, consentimiento e idempotencia antes de un único POST provider.
 - El token se resuelve sólo por `src/lib/hubspot/access-token.ts`.
