@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { createMeetingFixtureApi } from '../fixtures'
 import { MeetingRenderer } from '../renderer'
+import type { MeetingApiClient } from '../api-client'
 import type { MeetingTurnstilePort } from '../turnstile'
 
 const turnstile: MeetingTurnstilePort = {
@@ -14,13 +15,16 @@ const turnstile: MeetingTurnstilePort = {
   },
 }
 
-const mount = async (outcome: 'confirmed' | 'ambiguous' = 'confirmed') => {
+const mount = async (
+  outcome: 'confirmed' | 'ambiguous' = 'confirmed',
+  api: MeetingApiClient = createMeetingFixtureApi(outcome),
+) => {
   const host = document.createElement('div')
 
   document.body.append(host)
 
   const renderer = new MeetingRenderer(host, {
-    api: createMeetingFixtureApi(outcome),
+    api,
     turnstile,
     surfaceId: 'efeonce-public-site',
     schedulerKey: 'efeonce-discovery-30',
@@ -214,6 +218,34 @@ describe('MeetingRenderer', () => {
 
     expect(document.activeElement).toBe(host.querySelector('[data-date="2026-07-23"]'))
     expect(host.querySelectorAll('.ghm-calendar-day[tabindex="0"]')).toHaveLength(1)
+    renderer.destroy()
+  })
+
+  it('conserva la grilla y el contexto mensual cuando el mes siguiente no tiene horarios', async () => {
+    const fixtureApi = createMeetingFixtureApi()
+    const availability = vi.fn(fixtureApi.availability)
+
+    const { host, renderer } = await mount('confirmed', { ...fixtureApi, availability })
+    const next = host.querySelector<HTMLButtonElement>('[data-month-direction="next"]')!
+
+    next.click()
+
+    await vi.waitFor(() => expect(host.querySelector('.ghm-month-label')?.textContent).toBe('Agosto de 2026'))
+    expect(host.querySelector('.ghm-calendar')).not.toBeNull()
+    expect(host.querySelectorAll('.ghm-calendar-day--unavailable')).toHaveLength(31)
+    expect(host.querySelector('[data-capture="meeting-calendar-empty"]')?.textContent)
+      .toContain('No hay horarios disponibles en agosto de 2026.')
+    expect(host.querySelector('.ghm-calendar-empty-icon.tabler-calendar-off')).not.toBeNull()
+    expect(host.querySelector<HTMLButtonElement>('[data-month-direction="previous"]')?.disabled).toBe(false)
+    expect(host.querySelector<HTMLButtonElement>('[data-month-direction="next"]')?.disabled).toBe(true)
+    expect(document.activeElement).toBe(host.querySelector('.ghm-month-label'))
+    expect(availability).toHaveBeenLastCalledWith(expect.objectContaining({ monthOffset: 1 }))
+
+    host.querySelector<HTMLButtonElement>('[data-month-direction="previous"]')?.click()
+
+    await vi.waitFor(() => expect(host.querySelector('.ghm-month-label')?.textContent).toBe('Julio de 2026'))
+    expect(host.querySelectorAll('.ghm-calendar-day[data-date]')).toHaveLength(5)
+    expect(availability).toHaveBeenLastCalledWith(expect.objectContaining({ monthOffset: 0 }))
     renderer.destroy()
   })
 

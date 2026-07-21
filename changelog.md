@@ -53,6 +53,9 @@
   con disponibilidad real, Turnstile y un enlace directo de respaldo a HubSpot. El host usa el template normal de Ohio
   —no Canvas— y una corrección page-scoped para el margen del root Elementor; Playwright confirmó desktop y 390 px sin
   overflow ni errores de consola. No se promovió a Contacto/RRSS, no se publicó GTM ni se creó una reserva.
+- La navegación mensual ya no colapsa el calendario cuando HubSpot devuelve un mes sin slots: conserva el mes solicitado,
+  la grilla semántica completa, los controles de recuperación y un estado vacío específico. La regresión julio→agosto
+  quedó cubierta con 31 días no disponibles, restauración de foco y revisión visual desktop/390 sin overflow.
 - La UI elevó el calendario a `Calendar Command Center`: densidad por fecha, agenda agrupada por período, resumen
   vivo, formulario desktop de dos columnas, mobile compacto y motion causal/reduced-motion. GVC premium
   `2026-07-21T09-02-04_native-meeting-scheduler`: 24 frames, exit 0, runtime/enterprise/a11y/layout/performance verdes.

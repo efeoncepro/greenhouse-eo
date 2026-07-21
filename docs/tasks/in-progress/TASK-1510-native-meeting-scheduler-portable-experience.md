@@ -335,7 +335,7 @@ The renderer is a standalone custom element with an explicit state reducer. Rend
 - [x] UI artifacts pass readiness and preserve `UI ready: yes` before JSX.
 - [x] Monthly calendar/daily agenda is materially clearer than the rejected picker and validated visually at 1440/390.
 - [x] Renderer consumes only TASK-1509 browser contracts and contains no provider/store/server imports.
-- [ ] Full state inventory is accessible at desktop/390; the primary confirmed flow passes keyboard/reduced-motion/no-overflow locally, while empty/degraded/conflict/ambiguous remain pending in the staging dossier.
+- [ ] Full state inventory is accessible at desktop/390; confirmed and empty-month flows pass keyboard/no-overflow locally, while degraded/conflict/ambiguous remain pending in the staging dossier.
 - [x] `gh_meeting_step_reached` covers the local fixture funnel with strict generic parameters, valid pairs and no PII/exact slot.
 - [x] `gh_meeting_booking_confirmed` emits exactly once per server receipt in reducer/browser tests; GTM mapping/publish remains pending.
 - [x] GTM generic tags are built/read back/quick-previewed in disposable workspace 6; publish still requires explicit human confirmation and live evidence.
@@ -351,7 +351,7 @@ The renderer is a standalone custom element with an explicit state reducer. Rend
 - [x] `pnpm ui:flow-check --task TASK-1510`
 - [x] `pnpm ui:motion-check --task TASK-1510`
 - [x] `pnpm ui:readiness-check --task TASK-1510`
-- [x] Renderer focal suite: 34 passed across 7 files; broader server/a11y/telemetry/timezone evidence remains green; ESLint, TypeScript and production build pass.
+- [x] Renderer focal suite: 39 passed across 7 files; broader server/a11y/telemetry/timezone evidence remains green; ESLint, TypeScript and production build pass.
 - [x] `pnpm fe:capture native-meeting-scheduler --env=local` — premium, 1440×1000 + 390×844, 24 frames, exit 0; only `baseline_stale` warning pending human approval.
 - [x] `pnpm fe:capture:review .captures/2026-07-21T08-43-09_native-meeting-scheduler`
 - [x] Timezone/GVC recheck: `.captures/2026-07-21T09-45-48_native-meeting-scheduler`, 22 frames desktop/mobile, exit 0; labels and GMT offset fit without overflow.
@@ -380,6 +380,7 @@ The renderer is a standalone custom element with an explicit state reducer. Rend
 - [x] GTM workspace read-back/quick preview (`compilerError=false`, `syncOk=true`); browser `/g/collect` remains a live-host rollout gate.
 - [x] Runtime activation 2026-07-21: `GROWTH_NATIVE_MEETING_SCHEDULER_READ_ENABLED=true` + `GROWTH_NATIVE_MEETING_SCHEDULER_ENABLED=true` in staging/Production, fresh production deployment Ready, and pilot binding `fhsf-efeonce-lead-gen-web`/`discovery` switched to `active`. Public-origin config and availability returned 200 with visitor timezone `America/New_York`; no booking was created for this activation check.
 - [x] WordPress pilot 2026-07-21: `/agenda/` page `251583` published as `noindex` with `<efeonce-meeting-scheduler>` and direct HubSpot fallback. Live Playwright confirmed renderer/real slots/fallback in normal Ohio template, desktop + 390 px `overflow=0`, recipes `split|guided`, no console errors, and one allowlisted `gh_meeting_step_reached` dataLayer event without PII/exact slot; no booking or GTM publish was performed.
+- [x] Empty-month regression 2026-07-21: HubSpot returns zero August slots, but July→August now keeps `Agosto de 2026`, the semantic 31-day grid, month-specific recovery copy and bounded navigation. Vitest verifies focus restoration and return to July; local browser review at 1440/390 reports zero overflow and console errors.
 - [ ] `pnpm measurement:smoke` after approved publish.
 - [ ] `pnpm ops:lint --changed`
 - [x] `pnpm qa:gates --changed --agent codex --task TASK-1510 --ui --runtime --integration --docs` — advisory; rollout dependencies remain explicit.

@@ -76,7 +76,7 @@ overlays slots or form fields. Form fields use one column and 48 px controls.
 |---|---|---|---|---|
 | ready | Elige una fecha | Los días disponibles se pueden seleccionar. | date button | no realtime guarantee |
 | loading | Consultando disponibilidad | Estamos sincronizando la agenda. | none | structured skeleton |
-| empty | No hay horarios disponibles en este mes | Revisa el mes siguiente o abre la agenda alternativa. | Ver mes siguiente | honest |
+| empty | No hay horarios disponibles en {mes}. | La grilla y el mes solicitado permanecen visibles; prueba otro mes o abre la agenda alternativa. | Mes anterior/siguiente disponible + fallback | honest; never collapses calendar context |
 | partial | Disponibilidad limitada | Solo mostramos los horarios confirmados por el proveedor. | choose / fallback | explicit |
 | error | No pudimos actualizar la agenda | Conservamos una vía segura para reservar. | Reintentar / HubSpot | recovery |
 | denied | Esta agenda no está disponible aquí | Puedes continuar desde nuestra agenda alternativa. | Abrir agenda alternativa | no permission detail leak |
@@ -87,6 +87,7 @@ overlays slots or form fields. Form fields use one column and 48 px controls.
 - Heading order: renderer h2; calendar/form/confirmation h3.
 - Calendar: semantic table, caption, `th scope=col`, buttons only on available days.
 - Aria labels: full date on each available day; month navigation names month destination.
+- Empty months: retain the semantic month grid, expose `meeting-calendar-empty` and announce the month-specific status.
 - Focus notes: state changes focus the new h3; selected date remains `aria-pressed`; submit errors focus summary.
 - Color-independent states: available label/dot and selected shape plus `aria-pressed`.
 
@@ -118,7 +119,7 @@ overlays slots or form fields. Form fields use one column and 48 px controls.
 - Alternatives considered: week strip/density bars; grouped agenda cards.
 - Why this pattern: immediate calendar recognition and proven booking mental model.
 - Reuse / extend / new primitive: extend current renderer.
-- Open risks: sparse availability and month pagination need explicit states.
+- Sparse availability and month pagination use an explicit month-anchored empty state; they never remove the grid.
 
 ## Acceptance Checklist
 

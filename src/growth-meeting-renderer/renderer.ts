@@ -215,6 +215,17 @@ const shiftDateKey = (date: string, days: number): string => {
   return value.toISOString().slice(0, 10)
 }
 
+const monthReferenceDate = (date: Date, timezone: string, monthOffset: number): string => {
+  const current = dateKeyInTimezone(date, timezone)
+  const [year, month] = current.split('-').map(Number)
+  const reference = new Date(Date.UTC(year, month - 1 + monthOffset, 1))
+
+  return reference.toISOString().slice(0, 10)
+}
+
+const noSlotsForMonth = (referenceDate: string): string =>
+  copy.noSlotsForMonth.replace('{month}', monthLabel(referenceDate).toLocaleLowerCase('es-CL'))
+
 const fieldIcon = (key: keyof typeof FIELD_ICON_CLASS): HTMLElement => {
   const icon = element('i', `ghm-field-icon ${FIELD_ICON_CLASS[key]}`)
 
@@ -330,6 +341,8 @@ export class MeetingRenderer {
 
   private async loadMonth(monthOffset: number): Promise<void> {
     const config = this.state.config
+    const currentMonthOffset = this.state.availability?.monthOffset ?? 0
+    const focusDirection = monthOffset > currentMonthOffset ? 'next' : 'previous'
 
     if (!config || monthOffset < 0 || monthOffset > config.bookingWindow.maxMonthOffset) return
 
@@ -352,6 +365,14 @@ export class MeetingRenderer {
       if (generation !== this.generation) return
 
       this.transition({ type: 'loaded', config, availability })
+      queueMicrotask(() => {
+        const requestedControl = this.host.querySelector<HTMLButtonElement>(
+          `.ghm-month-button[data-month-direction="${focusDirection}"]:not(:disabled)`,
+        )
+
+        if (requestedControl) requestedControl.focus({ preventScroll: true })
+        else this.host.querySelector<HTMLElement>('.ghm-month-label')?.focus({ preventScroll: true })
+      })
     } catch {
       if (generation !== this.generation || this.abortController.signal.aborted) return
       this.transition({ type: 'load_failed' })
@@ -738,7 +759,11 @@ export class MeetingRenderer {
     root.dataset.capture = 'meeting-calendar'
     const header = element('div', 'ghm-calendar-panel-header')
     const days = this.state.availability?.days ?? []
-    const referenceDate = this.state.selectedDate ?? days[0]?.date
+    const monthOffset = this.state.availability?.monthOffset ?? 0
+
+    const referenceDate = this.state.selectedDate
+      ?? days[0]?.date
+      ?? monthReferenceDate(this.options.now?.() ?? new Date(), this.timezone(), monthOffset)
 
     const calendarIdentity = element('div', 'ghm-calendar-identity')
 
@@ -748,37 +773,31 @@ export class MeetingRenderer {
     )
     header.append(calendarIdentity)
 
-    if (referenceDate) {
-      const monthNavigation = element('div', 'ghm-month-navigation')
-      const previous = element('button', 'ghm-month-button')
-      const next = element('button', 'ghm-month-button')
-      const monthOffset = this.state.availability?.monthOffset ?? 0
-      const canGoNext = Boolean(this.state.availability?.hasMore) && monthOffset < (this.state.config?.bookingWindow.maxMonthOffset ?? 0)
+    const monthNavigation = element('div', 'ghm-month-navigation')
+    const previous = element('button', 'ghm-month-button')
+    const next = element('button', 'ghm-month-button')
+    const canGoNext = Boolean(this.state.availability?.hasMore) && monthOffset < (this.state.config?.bookingWindow.maxMonthOffset ?? 0)
 
-      previous.type = 'button'
-      previous.append(uiIcon('chevron-left'))
-      previous.setAttribute('aria-label', copy.previousMonth)
-      previous.disabled = monthOffset === 0
-      previous.addEventListener('click', () => void this.loadMonth(monthOffset - 1))
-      next.type = 'button'
-      next.append(uiIcon('chevron-right'))
-      next.setAttribute('aria-label', copy.nextMonth)
-      next.disabled = !canGoNext
-      next.addEventListener('click', () => void this.loadMonth(monthOffset + 1))
-      const visibleMonth = element('div', 'ghm-month-label', monthLabel(referenceDate))
+    previous.type = 'button'
+    previous.dataset.monthDirection = 'previous'
+    previous.append(uiIcon('chevron-left'))
+    previous.setAttribute('aria-label', `${copy.previousMonth}: ${monthLabel(monthReferenceDate(this.options.now?.() ?? new Date(), this.timezone(), monthOffset - 1))}`)
+    previous.disabled = monthOffset === 0
+    previous.addEventListener('click', () => void this.loadMonth(monthOffset - 1))
+    next.type = 'button'
+    next.dataset.monthDirection = 'next'
+    next.append(uiIcon('chevron-right'))
+    next.setAttribute('aria-label', `${copy.nextMonth}: ${monthLabel(monthReferenceDate(this.options.now?.() ?? new Date(), this.timezone(), monthOffset + 1))}`)
+    next.disabled = !canGoNext
+    next.addEventListener('click', () => void this.loadMonth(monthOffset + 1))
+    const visibleMonth = element('div', 'ghm-month-label', monthLabel(referenceDate))
 
-      visibleMonth.setAttribute('aria-live', 'polite')
-      monthNavigation.append(previous, visibleMonth, next)
-      header.append(monthNavigation)
-    }
+    visibleMonth.tabIndex = -1
+    visibleMonth.setAttribute('aria-live', 'polite')
+    monthNavigation.append(previous, visibleMonth, next)
+    header.append(monthNavigation)
 
     root.append(header)
-
-    if (!referenceDate) {
-      root.append(element('p', 'ghm-empty', copy.noSlots))
-
-      return root
-    }
 
     const availabilityByDate = new Map(days.map(day => [day.date, day]))
     const availableDates = days.filter(day => day.slots.length > 0).map(day => day.date).sort()
@@ -889,7 +908,23 @@ export class MeetingRenderer {
     densityLegend.append(element('span', 'ghm-density-dot'), element('span', undefined, copy.moreOptions))
     timezoneLens.append(uiIcon('world', 'ghm-timezone-icon'), element('span', undefined, formatMeetingTimezoneLabel(this.timezone(), this.options.now?.())))
     legend.append(densityLegend, timezoneLens)
-    root.append(table, legend)
+    root.append(table)
+
+    if (availableDates.length === 0) {
+      const empty = element('div', 'ghm-calendar-empty')
+
+      empty.dataset.capture = 'meeting-calendar-empty'
+      empty.setAttribute('role', 'status')
+      empty.append(
+        uiIcon('calendar-off', 'ghm-calendar-empty-icon'),
+        element('strong', 'ghm-calendar-empty-title', noSlotsForMonth(referenceDate)),
+        element('span', 'ghm-calendar-empty-body', copy.noSlotsHelp),
+      )
+      root.dataset.availabilityState = 'empty'
+      root.append(empty)
+    }
+
+    root.append(legend)
 
     return root
   }
@@ -1331,7 +1366,17 @@ export class MeetingRenderer {
       let previousPeriod: string | null = null
 
       slots.setAttribute('aria-label', copy.chooseTime)
-      if (!selectedDay?.slots.length) slots.append(element('p', 'ghm-empty', copy.noSlots))
+
+      if (!selectedDay?.slots.length) {
+        const referenceDate = this.state.availability?.days[0]?.date
+          ?? monthReferenceDate(
+            this.options.now?.() ?? new Date(),
+            this.timezone(),
+            this.state.availability?.monthOffset ?? 0,
+          )
+
+        slots.append(element('p', 'ghm-empty', noSlotsForMonth(referenceDate)))
+      }
 
       for (const availabilitySlot of selectedDay?.slots ?? []) {
         const period = timePeriod(availabilitySlot.startsAt, this.timezone())

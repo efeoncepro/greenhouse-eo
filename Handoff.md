@@ -50,6 +50,9 @@
   reales devolvieron 200 desde el origen permitido, incluida la resolución visitor-aware de `America/New_York`. El piloto aislado
   `https://efeoncepro.com/agenda/` (WP `251583`, `noindex`) monta el renderer nativo con slots reales y enlace HubSpot de
   respaldo; Playwright verificó desktop/390, `overflow=0` y consola limpia. No se creó un booking nuevo durante los checks.
+  HubSpot devuelve actualmente cero slots para agosto; el renderer ya conserva `Agosto de 2026`, la grilla de 31 días y
+  la navegación/estado vacío en vez de colapsar el calendario. La regresión julio→agosto pasa 39 pruebas del renderer y
+  revisión local desktop/390; su promoción y smoke live en `/agenda/` forman el release inmediato en curso.
   GTM workspace 6 sigue sin versión/publicación. No promover aún a Contacto/RRSS: primero booking controlado/replay y evidencia
   `/g/collect`; la publicación GTM requiere confirmación humana separada. Backups Elementor: `agenda_pilot_overflow_v1` y `agenda_pilot_template_v1`.
   HubSpot/Office 365/Teams siguen SoT. Trabajo en `develop`; `docs/ui/creative-studio/` es ajeno y no se toca.
