@@ -867,12 +867,18 @@ export class MeetingRenderer {
 
           button.setAttribute('aria-label', `${isToday ? `${copy.today}, ` : ''}${formatMeetingDate(date, this.timezone(), 'long')}, ${slotLabel}`)
           const meter = element('span', 'ghm-availability-meter')
+          const availability = element('span', 'ghm-calendar-available')
 
           meter.setAttribute('aria-hidden', 'true')
           meter.append(element('span'), element('span'), element('span'))
+          availability.setAttribute('aria-hidden', 'true')
+          availability.append(
+            element('span', 'ghm-calendar-available-count', String(day.slots.length)),
+            element('span', 'ghm-calendar-available-label', day.slots.length === 1 ? copy.optionSingular : copy.optionPlural),
+          )
           button.append(
             element('span', 'ghm-calendar-number', String(Number(date.slice(-2)))),
-            element('span', 'ghm-calendar-available', `${day.slots.length} ${day.slots.length === 1 ? copy.optionSingular : copy.optionPlural}`),
+            availability,
             meter,
           )
           if (isToday) button.append(element('span', 'ghm-today-label', copy.today))

@@ -210,6 +210,9 @@ describe('MeetingRenderer', () => {
     expect(host.querySelectorAll('.ghm-calendar-day[tabindex="0"]')).toHaveLength(1)
     expect(activeDate.dataset.date).toBe('2026-07-22')
     expect(activeDate.querySelector('.ghm-availability-meter')).not.toBeNull()
+    expect(activeDate.querySelector('.ghm-calendar-available')?.getAttribute('aria-hidden')).toBe('true')
+    expect(activeDate.querySelector('.ghm-calendar-available-count')?.textContent).toBe('3')
+    expect(activeDate.querySelector('.ghm-calendar-available-label')?.textContent).toBe('opciones')
     expect(activeDate.querySelector('.tabler-check')).not.toBeNull()
 
     activeDate.focus()

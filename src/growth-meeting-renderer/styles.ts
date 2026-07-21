@@ -275,10 +275,13 @@ export const MEETING_RENDERER_CSS = `
 }
 
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-calendar-available {
+  display: inline-flex;
+  gap: 0.3em;
   margin-top: 5px;
   color: var(--gh-meeting-accent-strong);
   font-size: 0.62rem;
   font-weight: 700;
+  line-height: 1.2;
 }
 
 :is(efeonce-meeting-scheduler, .ghm-scope) button.ghm-calendar-day[data-selected='true'] .ghm-calendar-available {
@@ -737,28 +740,6 @@ export const MEETING_RENDERER_CSS = `
   min-height: 54px;
   padding: 11px 14px 11px 18px;
   background: color-mix(in srgb, var(--gh-meeting-paper) 92%, transparent);
-}
-
-:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-slot::before {
-  content: '';
-  position: absolute;
-  inset: 11px auto 11px 7px;
-  width: 3px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--gh-meeting-accent-strong) 40%, transparent);
-  transform: scaleY(0.45);
-  transition: transform var(--gh-meeting-duration) var(--gh-meeting-ease),
-    background var(--gh-meeting-duration) var(--gh-meeting-ease);
-}
-
-:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-slot:hover::before,
-:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-slot[data-selected='true']::before {
-  background: var(--gh-meeting-accent);
-  transform: scaleY(1);
-}
-
-:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-slot[data-selected='true'] {
-  box-shadow: 0 10px 22px color-mix(in srgb, var(--gh-meeting-ink) 18%, transparent);
 }
 
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-selection {
@@ -1226,7 +1207,7 @@ export const MEETING_RENDERER_CSS = `
   color: var(--gh-meeting-ink);
   background: var(--gh-meeting-accent-soft);
   border-color: var(--gh-meeting-accent-strong);
-  box-shadow: inset 3px 0 0 var(--gh-meeting-accent-strong);
+  box-shadow: none;
 }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-slot[data-selected='true'] .ghm-slot-duration { color: var(--gh-meeting-accent-strong); }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-slot-check { margin-inline-start: auto; color: var(--gh-meeting-accent-strong); }
@@ -1534,6 +1515,17 @@ export const MEETING_RENDERER_CSS = `
   :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-today-label { display: none; }
   :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-availability-meter { width: 18px; margin-top: 4px; }
   :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-calendar-check { inset: 4px 4px auto auto; font-size: 0.66rem; }
+}
+
+@container (min-width: 651px) and (max-width: 1000px) {
+  :is(efeonce-meeting-scheduler, .ghm-scope) button.ghm-calendar-day { padding-inline: 6px; }
+  :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-calendar-available {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 1px;
+    width: 100%;
+    font-size: 0.56rem;
+  }
 }
 
 /* Confirmation shell v2 — light temporal workspace, no portal header or card stack. */
