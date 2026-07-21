@@ -53,8 +53,14 @@
   append-only; el modelo rico de workspace/members/grants queda **diferido** a follow-up. **`maxScale>1` depende de
   1465 Y 1468** (1465 = spend fence de seguridad durable; 1468 = credit ledger comercial). Plan en 5 slices (0
   Terraform Cloud SQL → 0b cliente DB + migraciones → 1 schema → 2 impls durables → 3 guard/wiring → 4 audit+tests).
-  Infra/código en `efeonce-globe`; gobernanza en Greenhouse. Próximo paso: aplicar el Terraform del Cloud SQL (plan
-  aditivo, apply autorizado por el operador).
+  Infra/código en `efeonce-globe`; gobernanza en Greenhouse.
+  **CODE COMPLETE + VERIFICADO EN VIVO (2026-07-21), deploy pendiente** — detalle completo en la spec (Delta
+  2026-07-21) y `GLOBE_RUNTIME_HANDOFF.md`. Las 5 slices están en `main` de `efeonce-globe` (3 commits), verificadas
+  contra Postgres 16.14 real, monorepo verde (`pnpm check`+`build`): Cloud SQL keyless + `packages/database` + bootstrap
+  `globe_owner` + migraciones + 6 tablas + los 5 stores durables detrás de sus ports (+ audit append-only) + wiring DI.
+  **Pendiente (gated, autorización del operador):** (1) redeploy `studio-web` con `GLOBE_POSTGRES_*` → verificar durable
+  post-restart; (2) sólo después, subir `maxScale>1` (HA de ADR-004). El servicio en ejecución sigue en memoria hasta
+  ese deploy; no marcar operativamente completo antes.
 - **`TASK-1507` TO-DO (Globe Internal Front Door — domain cutover, `EPIC-028`) — ejecutable ahora.**
   Sucesora de 1506/ADR-004, ya sin blocker. Implementa `globe.efeoncepro.com` vía **Global External ALB +
   serverless NEG** (`southamerica-west1`) → `globe-studio-internal`, managed cert + HTTP→HTTPS, `GLOBE_PUBLIC_BASE_URL`,
@@ -67,48 +73,11 @@
   vivos en Terraform con import/no-replace y protección de borrado, y reconcilia el workflow: Terraform gobierna
   ingress/runtime SA/env/scale/`invoker_iam_disabled`; `deploy-internal.yml` sólo image/revision. El plan post-deploy
   debe quedar convergido. Esta separación evita convertir el dominio en una migración brownfield de alto riesgo.
-- **`TASK-1500` COMPLETE (Producer Governed Route/Model Catalog, `EPIC-028`) — local-first, sin push.**
-  La keystone del cluster Producer quedó implementada en `../efeonce-globe` (`main`, 4 commits, `pnpm check` +
-  `build` verdes): catálogo como dato versionado (`PRODUCER_ROUTE_CATALOG`, 4 rutas seed / 3 modalidades) +
-  drift guards con `throw` (no-slug-leak incluido) + readers `globe.producer.catalog.list/.get` (`ui`/`mcp`
-  `policy-blocked` hasta el gate de `TASK-1505`) + naming dual fail-closed a cliente (vista modelo-real =
-  capability dedicada `globe.producer.route.reveal_model`, granteada al service principal junto con
-  `globe.producer.catalog.read`) + helpers in-process que `TASK-1501`/`1502` consumen sin re-dispatch + SDK
-  tipado. **Revisión post-ship (invariante invertido, decisión del operador):** el **modelo real es público**
-  (`model` = nombre + versión, p.ej. "Seedance · 2.0" — ancla de posicionamiento de la suite); lo operator-only
-  es la **casa** (`house`, taxonomía interna), gateada por `globe.producer.route.reveal_house`; slug/costo/margen
-  nunca salen. **Rollout:** cambio aditivo read-only; el servicio Cloud Run `globe-studio-internal` NO se
-  redespliega hasta que el operador autorice push + workflow manual — el reader queda alcanzable por las
-  surfaces internas en el próximo deploy. Próximo paso del cluster: `TASK-1501` (run contract discriminado,
-  consume `resolveRouteConstraints`). **Barrido de gobernanza documental hecho (flota de agentes):** la skill
-  `greenhouse-globe` (ambas copias `.claude`/`.codex`, en sync) ganó el 4.º ejemplo trabajado (Producer Route
-  Catalog) + 2 reglas duras + triggers; `creative-studio/{README,DECISIONS_INDEX}` (SPEC-004 + ADR-003); y se
-  corrigió polaridad stale del naming en `DECISIONS_INDEX` raíz, `EPIC-028`, la tabla shipped del Producer arch,
-  `documentation/README`, y los planning docs de `1505` (wireframe/flow) `1474`/`1502`/`1504`.
-- **`TASK-1501` COMPLETE (Modality-Discriminated Run Contract, `EPIC-028`) — local-first, sin push.**
-  4 slices en `../efeonce-globe` (`main`): `PrepareExperimentPayloadV1.output?: OutputShapeV1` (union por
-  modalidad, additive-optional, 3 modalidades día 1; image de punta a punta, video/audio declaradas+validadas
-  estructuralmente, su ejecución = TASK-1504) + `validateOutputShape` fail-closed en `prepare` **antes de
-  `fence.reserve`**, contra los constraints del catálogo (TASK-1500 reusado in-process vía `RouteCatalogPort.getRoute`
-  = `getProducerRoute`; el diseño proponía `constraintsFor` — reconciliado a `getRoute`) + threading image-first
-  al provider seam en **AMBOS** adapters de imagen (**absorbe TASK-1495** aspect ratio para image): Fal Seedream
-  v5/pro (`num_images` + `image_size` preset) y Vertex Nano Banana (`generationConfig.imageConfig.aspectRatio`),
-  **cada uno verificado contra la doc publicada de su proveedor** (sin gasto; el composite rutea image a Vertex por
-  default, por eso ambos). `pnpm check` + `build` verdes (domain 85 + creative-runner 93 tests). Backward-compat: sin
-  `output` = comportamiento previo. Coverage sin cambios (`ui`/`mcp` `policy-blocked`). **Rollout:** aditivo,
-  sin redeploy hasta autorización. Próximo paso del cluster: `TASK-1502` (estimate `f(ruta,shape)`, ya puede
-  leer el shape) y `TASK-1504` (adapter reads video/audio).
-- **`TASK-1502` COMPLETE (Previewable Estimate Reader, `EPIC-028`) — local-first, sin push.**
-  3 slices en `../efeonce-globe` (`main`): reader read-only `globe.lab.experiment.estimate` (el `✨N` antes de
-  gastar) — no crea experimento, no `fence.reserve`, no `transition` (spies que throwean lo prueban). El estimate
-  se **extrajo** de dentro de `execute` a un quote prospectivo (`LabRunnerPort.estimate({ quote: LabQuoteInputV1 })`);
-  `execute` y el reader comparten el MISMO cómputo vía `quoteInputFromStored`. Valida el `outputShape` fail-closed
-  reusando `validateOutputShape` de 1501; over-cap → `withinHardCap:false` (señal, no rechazo). Proyección curada
-  `LabEstimatePreviewV1` sin provider/model/costo/margen; `withinDayCap?` declarado pero no poblado (fence durable
-  = 1468). Fake keyeado por capability (limitación conocida; reales varían por shape). SDK `estimateExperiment`.
-  `pnpm check` + `build` verdes (domain 94, creative-runner 93). **Rollout:** aditivo read-only, sin redeploy hasta
-  autorización. Slice adelantado de `TASK-1469`, que consumirá el mismo estimate. Próximo del cluster: `TASK-1504`
-  (adapter reads video/audio) y `TASK-1503` (retrieval/asset actions).
+- **`TASK-1500`/`1501`/`1502` COMPLETE (cluster Producer: route catalog · run contract discriminado · estimate
+  previewable, `EPIC-028`) — en `../efeonce-globe` `main`, local-first sin push.** Detalle en sus specs `complete/`
+  + SPEC-004/005/006 de `creative-studio/DECISIONS_INDEX`. Naming: **modelo real público** (`model`=nombre+versión,
+  ancla de posicionamiento), `house` operator-only; slug/costo/margen nunca salen. Rollout: aditivo read-only, sin
+  redeploy hasta autorización.
 - **`TASK-1492` COMPLETE (repatriación documental Globe → Greenhouse).** La doc gobernante de Globe vive
   ahora en `greenhouse-eo` bajo `creative-studio/` (arquitectura, runbooks, funcional, manuales), + continuidad
   de runtime en `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md` y changelog en

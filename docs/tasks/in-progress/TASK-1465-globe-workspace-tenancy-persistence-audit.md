@@ -33,6 +33,35 @@ Discovery en `efeonce-globe` (3 recons read-only) fijó la realidad y el operado
 Las slices de Zone 3 abajo quedan recalibradas a este plan concreto. Fuera de alcance explícito: la entidad
 workspace + members + grants persistidos (task follow-up).
 
+## Delta 2026-07-21 — código completo + verificado en vivo; deploy del servicio pendiente
+
+Las 5 slices están implementadas en `efeonce-globe` (2 commits en `main`) y **verificadas contra Postgres 16.14 real**,
+con el monorepo entero verde (`pnpm check` + `pnpm build`):
+
+- **Slice 0** — Cloud SQL `globe-pg` (keyless IAM, connector-only) aplicado (`12 added / 0 destroyed`).
+- **Slice 0b/0c** — cliente `packages/database` (pool + tx) + bootstrap de roles (`globe_owner`, sin credencial
+  superusuario permanente) + runner de migraciones (idempotente).
+- **Slice 1** — schema durable: 6 tablas tenant-scoped (`experiments`, `evaluation_reports`, `human_sessions`,
+  `oauth_transactions`, `spend_fence_runs/days`, `audit_log`), owner `globe_owner`, DML keyless para las runtime SAs.
+- **Slice 2** — los 5 stores durables detrás de sus ports: `DurableExperimentStore`, `DurableEvaluationReportStore`,
+  `DurableSpendFence` (reserve/settle/release atómico cross-réplica), y el split del `InternalSmokeSessionStore` en
+  `SessionStorePort` async (memoria + durable). Aislamiento cross-tenant, idempotencia y caps verificados en vivo.
+- **Slice 3** — wiring por DI en `app.ts` (`main.ts` construye los stores durables cuando `GLOBE_POSTGRES_*` está
+  seteado) + guard relajado (`in-memory` solo en `internal_smoke`; durable puede arrancar en cualquier env). 39 tests
+  de studio-web verdes.
+- **Slice 4** — `DurableAuditLog` append-only + suite hermética `node --test`.
+
+**Rollout pendiente (Runtime Rollout Completion Gate).** El código está completo y verificado contra la DB viva, pero
+el **servicio Cloud Run `globe-studio-internal` NO está redesplegado** con `GLOBE_POSTGRES_INSTANCE_CONNECTION_NAME` /
+`GLOBE_POSTGRES_DATABASE` / `GLOBE_POSTGRES_USER` (el usuario IAM `web_runtime`), así que la instancia en ejecución
+sigue en memoria (`internal_smoke`). Pasos que faltan, gated y con autorización explícita del operador:
+1. Redeploy de `studio-web` (`deploy-internal.yml`, workflow_dispatch) con los env `GLOBE_POSTGRES_*` → verificar en
+   vivo que arranca durable (sesión/OAuth/experimentos persisten a través de un restart).
+2. **Sólo después**, subir `maxScale > 1` (el objetivo de HA que ADR-004 gatea en esta task) — es una acción separada
+   post-deploy-verificado, no parte de este código.
+
+Estado correcto hoy: **`code complete, rollout pendiente`** — no marcar operativamente completo hasta el deploy.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
