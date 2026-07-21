@@ -69,6 +69,8 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
 - `TASK-1464…1475`, `TASK-1482…1483`, `TASK-1485` — **plataforma gobernada:** IaC, tenancy, responsabilidad,
   rights/assets, kernel shadow credits, pools/grants/budgets, lifecycle transaccional, adapters promovidos,
   composición determinística, review/delivery, MCP, workbenches y proyección Greenhouse.
+  `TASK-1466` está completa sobre SPEC-008: migración Cloud SQL, deploy internal-only, smoke autenticado y readback
+  de assignment/audit pasaron. Satisface el contrato de responsabilidad por run; no habilita clientes externos.
 - `TASK-1476…1480` — **validación comercial:** demo/Sample Sprint managed, buyer discovery, 30–50 runs de
   calibración, pilotos por modo y commercial approval. `TASK-1480` no habilita clientes sin sign-off explícito.
 - `TASK-1484` — **monetización bloqueada:** implementa packages/billing/tax/revenue/payments sólo después de

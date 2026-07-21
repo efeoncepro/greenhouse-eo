@@ -21,6 +21,10 @@
 
 ## Pendientes inmediatos
 
+- **`TASK-1466` COMPLETE (`EPIC-028`).** SPEC-008 desplegada y verificada internal-only: migración Cloud SQL, dos
+  revisiones Ready, smoke auth/tenant/idempotency y readback de versiones+audit verdes. Detalle en
+  `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`; clientes externos y producción siguen bloqueados.
+
 - **`TASK-1509` / `TASK-1510` IN-PROGRESS (Native Meeting Scheduler, `EPIC-023`).** Objetivos load-bearing:
   TASK-1509 está code-complete; TASK-1510 entrega **Temporal Operations Desk** adaptable, timezone local, validación
   corporativa reactiva y confirmación receipt-gated sin PII. `open_meeting_scheduler` abre una instancia dialog/full-screen;

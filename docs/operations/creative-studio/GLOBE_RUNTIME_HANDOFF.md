@@ -8,6 +8,26 @@
 
 # Handoff
 
+## Active state — 2026-07-21 (TASK-1466 desplegada + verificada internal-only)
+
+SPEC-008 materializa `client-operated | co-operated | efeonce-managed` como accountability versionada —nunca como
+grant— mediante commands/readers Full API Parity, store Postgres append-only y audit atómico. Runtime commit
+`00fee5ded505` y fix del smoke `3baafde831563` están en `efeonce-globe/main`; `pnpm check && pnpm build` pasó.
+
+**Cloud SQL:** `0002_operating_responsibilities.sql` aplicada por el migrador IAM. El verifier live confirmó owner
+`globe_owner`, grants DML para `globe-api-runtime`/`globe-web-runtime` y siete constraints. **Cloud Run:** workflows
+`29858616172` (API) y `29858618168` (Studio) exitosos; revisiones Ready `globe-api-internal-00012-lcq` y
+`globe-studio-internal-00017-4sd`, imagen `00fee5ded505`, ambas en `maxScale=3`.
+
+**Smoke:** scope `task-1466-smoke-be28c266-4ff4-473d-9cec-2e286198bdc4`; auth ausente y audiencia incorrecta
+denegadas, assign v1, replay estable, replay conflictivo=409, change v2, effective/history y cross-workspace deny.
+Readback durable: dos versiones (`co-operated` → `efeonce-managed`) y dos auditorías correlacionadas en
+`greenhouse-org:efeonce`. El smoke requiere `--include-email` al mintear el ID token; el helper ya lo incorpora.
+Los grants temporales `serviceAccountTokenCreator` de proyecto y service account fueron revocados y verificados.
+
+La capacidad queda **operativa internal-only**. UI, MCP, clientes externos y producción comercial continúan bloqueados.
+El drift conocido de `deploy-internal.yml` sigue bajo TASK-1508: tras cada deploy verificar/restaurar `maxScale=3`.
+
 ## Active state — 2026-07-21 (TASK-1465: persistencia durable desplegada + verificada en vivo)
 
 **Globe deja de vivir en memoria.** `TASK-1465` le dio a Globe su primera base de datos durable y desplegó

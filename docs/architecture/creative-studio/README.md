@@ -44,6 +44,7 @@ la historia previa es auditable en el git log del repo hermano):
 
 - [PLATFORM_FOUNDATION_V1.md](PLATFORM_FOUNDATION_V1.md) — invariantes de la plataforma (monorepo Node 24, boundary Globe↔Greenhouse, surfaces).
 - [EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md](EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md) — el primer datastore durable de Globe (SPEC-007, TASK-1465): Cloud SQL `globe-pg` keyless (connector + IAM DB auth), role model `globe_owner` + gotcha PG16 restricted-superuser, 6 tablas tenant-scoped + `audit_log`, 5 stores durables detrás de sus ports (spend fence de **seguridad**, no el ledger comercial 1468). Desbloquea `maxScale > 1` (gate ADR-004).
+- [EFEONCE_GLOBE_OPERATING_RESPONSIBILITY_V1.md](EFEONCE_GLOBE_OPERATING_RESPONSIBILITY_V1.md) — modos operativos y accountability explícita (SPEC-008, TASK-1466): snapshots append-only por workspace/run, commands/readers Full API Parity, idempotencia, optimistic concurrency y audit atómico; nunca concede membership/grants/capabilities. Desplegada y verificada internal-only; clientes externos/producción bloqueados.
 - [EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md](EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md) — el esqueleto de contratos server-side (Full API Parity, trusted context, coverage matrix; TASK-1481).
 - [EFEONCE_GLOBE_MODEL_LAB_V1.md](EFEONCE_GLOBE_MODEL_LAB_V1.md) — sandbox gobernado: spend fence, private-ingest, kill switch, provider seam (TASK-1457).
 - [EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md](EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md) — golden briefs + rúbricas + verdict pending-human (TASK-1458).

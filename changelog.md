@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-21 — Globe materializa modos operativos y accountability versionada (TASK-1466)
+
+- Globe incorporó SPEC-008: assignments append-only por workspace/run para `client-operated`, `co-operated` y
+  `efeonce-managed`, ocho responsabilidades explícitas, contexto comercial sin pricing, commands/readers Full API
+  Parity, replay idempotente, optimistic concurrency y audit atómico. `pnpm check && pnpm build` pasó en
+  `efeonce-globe`; migración `0002` aplicada en Cloud SQL, deploys internos Ready y smoke autenticado confirmaron
+  assign/replay/conflict/change/readers, tenant denial y dos auditorías durables. Los grants temporales fueron revocados;
+  no se habilitaron UI, MCP, clientes externos ni producción comercial.
+
 ## 2026-07-21 — Scheduler completa foundation runtime y Temporal Operations Desk (TASK-1509/1510)
 
 - Growth CTA incorpora la acción aditiva `open_meeting_scheduler` sin alterar `book_meeting`: autoridad `surface + scheduler key`
@@ -763,12 +772,3 @@
   sources y el coaching del Customer Agent.
 - Los mirrors Codex/Claude y `SOURCES.md` quedan sincronizados para esta capacidad. No hubo cambios en portales,
   enrollments, automatizaciones, créditos ni envíos.
-
-## 2026-07-17 — Método de traducción editorial de metadata
-
-- `content-marketing-studio` suma un contrato load-on-demand para traducir una tesis técnica a H1, SEO/OG,
-  excerpt, descriptions, slug, categoría y tags con trabajos distintos. El método prioriza el problema que el
-  lector reconoce, somete la jerga a un gate explícito, evita taxonomía de una sola pieza y exige snapshot,
-  rollback y readback al mutar runtime.
-- La referencia quedó espejada para Codex/Claude; `copywriting` incorpora el sistema de titulares por superficie
-  y `seo-aeo` enlaza el método desde su contrato editorial manteniendo autoridad sobre intent/canonical/robots.
