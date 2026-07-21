@@ -6,6 +6,42 @@
 
 # Changelog
 
+## 2026-07-21 — TASK-1507: front door internal-only (Globe estrena dominio propio) — aplicado + verificado en vivo
+
+- **`globe.efeoncepro.com` es la URL estable del shell interno.** Global External ALB + serverless NEG
+  (`southamerica-west1`) → `globe-studio-internal`, IP global `8.233.189.79`, certificado administrado por Google
+  `ACTIVE` (issuer GTS `WR3`, vence `Oct 19 20:35:36 2026 GMT`) y 301 HTTP→HTTPS. `GLOBE_PUBLIC_BASE_URL` cortado al
+  dominio en la revisión `globe-studio-internal-00018-zkx` (100% del tráfico); ese valor es load-bearing porque
+  `apps/studio-web/src/app.ts` construye el callback como `new URL('/auth/callback', config.publicBaseUrl)`.
+- **El `*.run.app` dejó de ser alcanzable por browser.** Ingress del web en `internal-and-cloud-load-balancing`
+  (aplicado con `gcloud run services update --ingress`, no por Terraform: los servicios Cloud Run siguen fuera de
+  IaC y adoptarlos es `TASK-1508`, así que el valor queda **sin gobierno IaC** hasta entonces). Acceso directo por
+  `run.app` → 404; dominio por el ALB → 200 con el shell real y su propio `x-correlation-id`.
+- **Terraform aditivo puro** (`infra/terraform/front_door.tf`, nuevo): IP global, serverless NEG, backend service
+  (`EXTERNAL_MANAGED`, `enable_cdn = false` deliberado — es un shell SSO por sesión, cachearlo sería un bug de
+  correctitud), URL map, managed cert (`create_before_destroy`), target proxies y forwarding rules `:443`/`:80`.
+  Plan `11 to add, 0 to change, 0 to destroy`, cero recursos Cloud Run en el diff; `maxScale=3` no se tocó. El
+  carril HTTP-redirect falló el primer apply con `SERVICE_DISABLED` porque era la única raíz sin arista implícita a
+  `compute.googleapis.com`: se arregló la carrera en el HCL con un `depends_on` explícito, no reintentando a ciegas.
+- **Allowlist OAuth aditivo, no reemplazo.** Greenhouse ganó `updateSisterPlatformOAuthRedirectUris`
+  (`src/lib/sister-platforms/oauth-broker.ts`) + el CLI `pnpm sister-platform:redirect`: una transacción con
+  `SELECT ... FOR UPDATE` que toca sólo `redirect_uris`, reusa `normalizeRedirectUris`, es idempotente al agregar y
+  falla fuerte al remover un URI ausente. El seed vigente no servía (reemplazaba el array y rotaba el client
+  secret). El redirect `run.app` **se conserva** como camino de rollback.
+- **Orden de cutover invertido a propósito:** allowlist primero, `GLOBE_PUBLIC_BASE_URL` después. Un redirect URI es
+  inerte hasta que algo lo use; la env var al revés abre una ventana en la que `/auth/start` anuncia un callback
+  todavía no permitido. Smoke SSO de tres piernas (`scripts/smoke-human-federation.mjs`, calibrado contra el
+  `run.app` **antes** del cutover) verde antes y después del hardening de ingress.
+- **Costo:** ~US$18,25/mes fijo (forwarding rules globales) + ~US$0,024 por GiB servido (in+out), precios de la
+  Cloud Billing Catalog API al 2026-07-21; el certificado no tiene cargo. Al destruir el ALB, destruir también la IP
+  global (reservada y sin adjuntar factura como IP ociosa).
+- **Sigue internal-only.** No habilita Production, clientes externos ni marketing (`TASK-1480`).
+  `globe-api-internal` no recibe custom domain, sigue IAM-private (403 anónimo) y su audience se deriva de
+  `run.app`. **Siguiente:** `TASK-1508` (adopción brownfield de los servicios + single-writer deploy ownership).
+- **Docs:** spec `docs/tasks/complete/TASK-1507-globe-internal-front-door-alb-terraform.md`; decisión ADR-004
+  `docs/architecture/creative-studio/EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md`; continuidad
+  `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
+
 ## 2026-07-21 — TASK-1465: persistencia durable (Globe deja de vivir en memoria) — desplegada + verificada en vivo
 
 - **Primera base de datos durable de Globe.** Cloud SQL **`globe-pg`** (Postgres 16, `southamerica-west1`, tier

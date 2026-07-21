@@ -75,15 +75,19 @@
   durabilidad **probada en el servicio vivo** (`oauth_transaction` escrita por `web_runtime` keyless vía connector).
   Diferido: modelo workspace/members/grants (follow-up). **Follow-up drift trap → `TASK-1508`:** `deploy-internal.yml`
   aún hardcodea `--max-instances=1` (el próximo deploy por workflow resetea `maxScale`; persistir vía Terraform en 1508).
-- **`TASK-1507` TO-DO (Globe Internal Front Door — domain cutover, `EPIC-028`) — ejecutable ahora.**
-  Sucesora de 1506/ADR-004, ya sin blocker. Implementa `globe.efeoncepro.com` vía **Global External ALB +
-  serverless NEG** (`southamerica-west1`) → `globe-studio-internal`, managed cert + HTTP→HTTPS, `GLOBE_PUBLIC_BASE_URL`,
-  redirect allowlist del broker OAuth (`src/lib/sister-platforms/oauth-broker.ts`), endurece ingress a
-  `internal-and-cloud-load-balancing` y documenta el costo del ALB. `globe-api-internal` sigue IAM-private (audience
-  `run.app`). Se secuencia **antes del rollout
-  interno de `TASK-1505`**; hasta entonces la base URL estable es el `*.run.app` + SSO. Infra en `efeonce-globe`,
-  gobernanza en Greenhouse. La ADR **no** autoriza apply: eso lo ejecuta 1507 bajo su secuencia + rollback.
-- **`TASK-1508` TO-DO (Globe Cloud Run IaC + Deploy Ownership, `EPIC-028`) — después de 1507.** Adopta ambos servicios
+- **`TASK-1507` COMPLETE (Globe Internal Front Door — domain cutover, `EPIC-028`) — aplicada y verificada en vivo 2026-07-21.**
+  **La base URL estable del shell interno es `https://globe.efeoncepro.com`** (IP global `8.233.189.79`), servida vía
+  **Global External ALB + serverless NEG** (`southamerica-west1`) → `globe-studio-internal`, con managed cert `ACTIVE`
+  y 301 HTTP→HTTPS; `GLOBE_PUBLIC_BASE_URL` cortado al dominio (rev `globe-studio-internal-00018-zkx`). El ingress del
+  web quedó en `internal-and-cloud-load-balancing`, así que **el `*.run.app` ya no es alcanzable por browser** (404) y
+  sólo persiste en el allowlist OAuth como camino de rollback. Terraform aditivo puro (11 add / 0 change / 0 destroy,
+  cero recursos Cloud Run), `maxScale=3` sin tocarse, `globe-api-internal` sin custom domain / IAM-private / audience
+  `run.app`. En Greenhouse nació la primitive aditiva `updateSisterPlatformOAuthRedirectUris`
+  (`src/lib/sister-platforms/oauth-broker.ts`) + CLI `pnpm sister-platform:redirect`. Costo ~US$18,25/mes +
+  ~US$0,024/GiB. Desviaciones registradas: allowlist antes que env var, e ingress por `gcloud` (adopción IaC = 1508).
+  Sigue **internal-only**: no habilita Production ni clientes externos (`TASK-1480`). Detalle de runtime:
+  `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
+- **`TASK-1508` TO-DO (Globe Cloud Run IaC + Deploy Ownership, `EPIC-028`) — próximo paso ejecutable, blocker levantado.** Adopta ambos servicios
   vivos en Terraform con import/no-replace y protección de borrado, y reconcilia el workflow: Terraform gobierna
   ingress/runtime SA/env/scale/`invoker_iam_disabled`; `deploy-internal.yml` sólo image/revision. El plan post-deploy
   debe quedar convergido. Esta separación evita convertir el dominio en una migración brownfield de alto riesgo.

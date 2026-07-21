@@ -81,19 +81,25 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
   interno), fija el front door de `globe.efeoncepro.com` vía Global External ALB + serverless NEG, y deja el host
   del **frontend cliente comercial** como decisión diferida (revisit en `TASK-1505` + pre-`TASK-1480`). No mutó
   runtime/DNS/OAuth: eso lo implementa la sucesora `TASK-1507`.
-- `TASK-1507` — **implementación del front door internal-only.** Global External ALB + serverless NEG
-  (`southamerica-west1`) → `globe-studio-internal`, managed cert + HTTP→HTTPS, `globe.efeoncepro.com`,
-  `GLOBE_PUBLIC_BASE_URL`, redirect allowlist del broker OAuth e ingress `internal-and-cloud-load-balancing`.
-  `globe-api-internal` queda IAM-private (audience `run.app`). Ejecutable ahora: `TASK-1506` está completa.
-- `TASK-1508` — **Cloud Run IaC + deploy ownership.** Después del dominio, adopta los 2 servicios vivos mediante
-  import no destructivo y reconcilia Terraform con `deploy-internal.yml`: Terraform gobierna configuración estable;
-  el workflow sólo image/revision. Cierra drift de `invokerIamDisabled` sin mezclarlo con DNS. Blocked by `TASK-1507`.
+- `TASK-1507` — **front door internal-only IMPLEMENTADO (complete 2026-07-21).** `globe.efeoncepro.com` (IP global
+  `8.233.189.79`) sirve `globe-studio-internal` por Global External ALB + serverless NEG (`southamerica-west1`), con
+  managed cert `ACTIVE` y 301 HTTP→HTTPS; `GLOBE_PUBLIC_BASE_URL` cortado al dominio e ingress endurecido a
+  `internal-and-cloud-load-balancing`. `globe-api-internal` sigue IAM-private, sin custom domain y con audience
+  `run.app`. El redirect `run.app` se **conserva** en el allowlist como camino de rollback. Sigue siendo
+  internal-only: no habilita Production ni clientes externos.
+- `TASK-1508` — **siguiente: Cloud Run IaC + deploy ownership.** Con el dominio ya publicado, adopta los 2 servicios
+  vivos mediante import no destructivo y reconcilia Terraform con `deploy-internal.yml`: Terraform gobierna
+  configuración estable; el workflow sólo image/revision. Cierra el drift de `invokerIamDisabled`, el `maxScale`
+  (`--max-instances=1` hardcodeado) y el ingress —que hoy quedó fijado por `gcloud`, sin gobierno IaC— sin mezclarlo
+  con DNS. Su blocker (`TASK-1507`) ya está levantado.
 
 ### Front door ordering contract
 
-- `TASK-1506` cerró la decisión (ADR-004). `TASK-1507` implementa el custom domain **antes** del rollout interno de
-  `TASK-1505`, del rollout del workbench `TASK-1474`, del canary/cutover de callbacks de `TASK-1469` y de publicar
-  deep links en `TASK-1475`. Hasta que `TASK-1507` publique el dominio, la base URL estable es el `*.run.app` + SSO.
+- `TASK-1506` cerró la decisión (ADR-004) y `TASK-1507` la implementó: el custom domain quedó publicado **antes** del
+  rollout interno de `TASK-1505`, del rollout del workbench `TASK-1474`, del canary/cutover de callbacks de
+  `TASK-1469` y de publicar deep links en `TASK-1475`. **La base URL estable del shell interno es
+  `https://globe.efeoncepro.com` + SSO**; el `*.run.app` dejó de ser alcanzable por browser (ingress
+  `internal-and-cloud-load-balancing`) y sólo persiste en el allowlist OAuth como camino de rollback.
 - Un dominio internal-only puede implementarse (vía `TASK-1507`) sin esperar `TASK-1480`. La persistencia durable
   **ya aterrizó**: `TASK-1465` (complete, deployed + live-verified 2026-07-21) movió sesión/OAuth/experimentos/
   eval/spend-fence + un audit log append-only a Cloud SQL `globe-pg`, con lo que **se levantó el techo de HA** que
@@ -290,3 +296,29 @@ persistir el valor `maxScale` por Terraform (**`TASK-1508`**, el `deploy-interna
 `--max-instances=1`). Production/clientes externos siguen gateados por `TASK-1480`. Spec canónica:
 `docs/architecture/creative-studio/EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md` (SPEC-007) +
 `docs/tasks/complete/TASK-1465-globe-workspace-tenancy-persistence-audit.md`.
+
+## Delta 2026-07-21 — TASK-1507 complete (front door internal-only vivo; sigue TASK-1508)
+
+`TASK-1507` queda **complete, aplicada y verificada en vivo (2026-07-21)**: el shell interno de Globe ya no se
+alcanza por su hostname de Cloud Run. `globe.efeoncepro.com` (IP global `8.233.189.79`) se sirve por un Global
+External ALB + serverless NEG (`southamerica-west1`) hacia `globe-studio-internal`, con certificado administrado
+`ACTIVE`, 301 HTTP→HTTPS y `GLOBE_PUBLIC_BASE_URL` cortado al dominio; el ingress del web quedó en
+`internal-and-cloud-load-balancing`, así que el acceso directo por `*.run.app` devuelve 404 al browser. El plan
+Terraform fue aditivo puro (11 add / 0 change / 0 destroy, cero recursos Cloud Run) y `maxScale=3` no se tocó.
+`globe-api-internal` sigue sin custom domain, IAM-private (403 anónimo) y con audience derivada de `run.app`.
+
+En Greenhouse nació la primitive aditiva `updateSisterPlatformOAuthRedirectUris` (`oauth-broker.ts`) + el CLI
+`pnpm sister-platform:redirect`: el allowlist se amplía en una transacción tocando sólo `redirect_uris`, sin rotar
+el client secret ni reemplazar el array. El redirect `*.run.app` **se conserva** como camino de rollback.
+
+**Dos desviaciones respecto a la spec, registradas:** (1) el orden de cutover se invirtió —allowlist antes que
+`GLOBE_PUBLIC_BASE_URL`— porque un redirect es inerte hasta que algo lo usa, mientras que la env var al revés abre
+una ventana de SSO roto; (2) el ingress se endureció por `gcloud`, no por Terraform, porque los servicios Cloud Run
+no están en IaC y adoptarlos es `TASK-1508` — el valor **queda sin gobierno IaC hasta entonces**.
+
+Costo del front door: ~US$18,25/mes fijo + ~US$0,024 por GiB servido (in+out), con precios de la Cloud Billing
+Catalog API vigentes al 2026-07-21. **Siguiente paso ejecutable: `TASK-1508`** (adopción brownfield de los dos
+servicios + single-writer deploy ownership; ahí se pinean ingress, `maxScale` e `invokerIamDisabled`). El dominio
+es internal-only: **no** habilita Production ni clientes externos (gate `TASK-1480`). Spec:
+`docs/tasks/complete/TASK-1507-globe-internal-front-door-alb-terraform.md`; continuidad de runtime en
+`docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.

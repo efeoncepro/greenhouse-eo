@@ -7,6 +7,21 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-21 — Globe estrena front door internal-only en globe.efeoncepro.com (TASK-1507)
+
+- El shell interno de Globe pasa a servirse por `https://globe.efeoncepro.com` detrás de un Global External ALB +
+  serverless NEG (`southamerica-west1`), con certificado administrado activo y 301 HTTP→HTTPS; el ingress del web
+  quedó en `internal-and-cloud-load-balancing`, así que el hostname `*.run.app` dejó de ser alcanzable por browser y
+  sólo persiste en el allowlist OAuth como camino de rollback. El plan Terraform fue aditivo puro, sin tocar los
+  servicios Cloud Run ni `maxScale`, y `globe-api-internal` sigue sin custom domain, IAM-private y con audience
+  derivada de `run.app`. Sigue siendo internal-only: no habilita Production ni clientes externos.
+- Greenhouse ganó la primitive aditiva `updateSisterPlatformOAuthRedirectUris` en el broker de sister platforms + el
+  CLI `pnpm sister-platform:redirect`, que amplía el allowlist de redirect URIs en una transacción sin rotar el
+  client secret ni reemplazar el array. Fuente canónica:
+  [`docs/tasks/complete/TASK-1507-globe-internal-front-door-alb-terraform.md`](docs/tasks/complete/TASK-1507-globe-internal-front-door-alb-terraform.md)
+  y continuidad de runtime en
+  [`docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md).
+
 ## 2026-07-21 — Globe materializa modos operativos y accountability versionada (TASK-1466)
 
 - Globe incorporó SPEC-008: assignments append-only por workspace/run para `client-operated`, `co-operated` y

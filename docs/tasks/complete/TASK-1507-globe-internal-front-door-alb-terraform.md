@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Diseño; runtime internal-smoke vivo en Cloud Run, sin custom domain ni IaC de servicios`
+- Status real: `Front door vivo y verificado: globe.efeoncepro.com sirve por ALB con cert ACTIVE, ingress endurecido; IaC de servicios sigue en TASK-1508`
 - Rank: `TBD`
 - Domain: `ops`
 - Blocked by: `none`
@@ -61,6 +61,160 @@ SA `web_runtime`; api `ingress=all`, IAM-private, `maxScale=3`, SA `api_runtime`
 `globe` = **una** URI (`https://globe-studio-internal-818083690953.southamerica-west1.run.app/auth/callback`);
 `globe.efeoncepro.com` no resuelve (NS `ns24/ns25.hostgator.cl`).
 
+## Delta 2026-07-21 (cierre) — front door vivo y verificado en el runtime real
+
+El front door está **aplicado y verificado en vivo**. `globe.efeoncepro.com` es la URL estable del shell interno de
+Globe; el `*.run.app` dejó de ser alcanzable por browser. Sigue siendo **internal-only**: no es Production, no
+habilita clientes externos (gate `TASK-1480`) ni HA gobernada por IaC (`TASK-1508`).
+
+### Lo que quedó vivo
+
+- **Infra (nueva, en `../efeonce-globe/infra/terraform/front_door.tf`).** IP global `globe-studio-front-door-ip`
+  (EXTERNAL/IPV4), serverless NEG `globe-studio-internal-neg` (`southamerica-west1`, `cloud_run.service` como
+  literal — referenciar el recurso equivaldría a adoptar el servicio, que es `TASK-1508`), backend service
+  `globe-studio-front-door-backend` (`EXTERNAL_MANAGED`, `enable_cdn = false` deliberado: sirve un shell SSO
+  autenticado por sesión y cachearlo en el edge sería un bug de correctitud), URL map, managed cert
+  `globe-studio-front-door-cert` (`create_before_destroy`), target HTTPS proxy y forwarding rule `:443`, más el
+  carril de redirect HTTP→HTTPS (`url_map` con `https_redirect=true` + `MOVED_PERMANENTLY_DEFAULT` +
+  `strip_query=false`, target HTTP proxy y forwarding rule `:80`). Ambas forwarding rules `PREMIUM` +
+  `EXTERNAL_MANAGED`. También: `compute.googleapis.com` agregada a `local.enabled_services`, variable
+  `front_door_domain` (default `globe.efeoncepro.com`) y outputs `front_door_ip_address` / `front_door_domain` /
+  `front_door_certificate_name`.
+- **Apply real.** OpenTofu v1.12.4, provider `hashicorp/google` 6.50.0. Plan inicial `11 to add, 0 to change,
+  0 to destroy`, 65 recursos no-op, **cero** destroy/replace y **cero** recursos Cloud Run en el diff (verificado
+  sobre el plan JSON). El primer apply creó 8/11 y falló en los 3 del carril HTTP-redirect con `SERVICE_DISABLED`
+  sobre `compute.googleapis.com`: `google_compute_url_map.front_door_http_redirect` era la única raíz del grafo
+  sin arista implícita a la API (el carril HTTPS la alcanza transitivamente por backend service → NEG). Se arregló
+  **la carrera en el HCL** —`depends_on` explícito a `google_project_service.enabled["compute.googleapis.com"]`—,
+  no reintentando a ciegas. Segundo apply 3/3; plan post-apply `No changes` (convergido).
+- **DNS + TLS.** IP global `8.233.189.79`; A record `globe.efeoncepro.com` creado en HostGator (out-of-band).
+  Cert `ACTIVE` ~28 min después del DNS. Cert servido: `CN=globe.efeoncepro.com`, issuer `C=US, O=Google Trust
+  Services, CN=WR3`, `notBefore Jul 21 19:42:23 2026 GMT`, `notAfter Oct 19 20:35:36 2026 GMT`.
+- **Primitive aditiva de redirect allowlist (código nuevo en Greenhouse).**
+  `updateSisterPlatformOAuthRedirectUris` en `src/lib/sister-platforms/oauth-broker.ts`: aditiva/sustractiva, una
+  sola transacción con `SELECT ... FOR UPDATE`, toca **exclusivamente** la columna `redirect_uris` (nunca
+  `policy_json`, `allowed_scopes`, TTLs, `client_status` ni el token del consumer) y reusa `normalizeRedirectUris`
+  como única autoridad de validación. Idempotente al agregar (`changed=false`); **falla fuerte**
+  (`invalid_redirect_uri`) al remover un URI ausente, porque durante un cutover un no-op silencioso sobre una vista
+  stale es justo cómo sobrevive el callback equivocado; cliente desconocido → 404 `invalid_client`, nunca crea.
+  CLI genérico `pnpm sister-platform:redirect` (`scripts/sister-platform-oauth-redirect-uris.ts`,
+  `--client/--add/--remove/--apply`; sin `--apply` es dry-run). 11 tests en
+  `src/lib/sister-platforms/oauth-redirect-uris.test.ts`. La lógica vive en el broker y no en el script para que
+  una route/MCP/Nexa pueda operar el mismo cambio por la misma primitive (Full API Parity).
+- **Cutover.** Allowlist del cliente `globe`: de 1 URI (`…run.app/auth/callback`) a 2 (+
+  `https://globe.efeoncepro.com/auth/callback`). `GLOBE_PUBLIC_BASE_URL` del web pasó del `*.run.app` a
+  `https://globe.efeoncepro.com` con `gcloud run services update --update-env-vars` (nunca `--set-env-vars`,
+  destructivo) → revisión `globe-studio-internal-00018-zkx` sirviendo 100% del tráfico. Ese valor es load-bearing:
+  `apps/studio-web/src/app.ts` construye el callback como `new URL('/auth/callback', config.publicBaseUrl)`.
+- **Ingress endurecido.** `gcloud run services update globe-studio-internal --region southamerica-west1
+  --project efeonce-globe --ingress internal-and-cloud-load-balancing`. Acceso directo por `run.app` → 404;
+  dominio por el ALB → 200. `invokerIamDisabled` sigue `true` (correcto para un web con SSO: un browser no presenta
+  ID token) y `maxScale` sigue en 3, sin tocarse.
+- **Smoke de federación humana (código nuevo en Globe).** `efeonce-globe/scripts/smoke-human-federation.mjs`, par
+  humano de `smoke-private-api.mjs`. Recorre las tres piernas del login real (`/auth/start` → authorize de
+  Greenhouse con sesión → callback con la cookie de transacción → `/studio`) y asserta que el `redirect_uri`
+  anunciado pertenece al origen bajo prueba, PKCE S256 con `code_challenge`, `state` y `nonce` presentes y `state`
+  ecoado, que el authorize no redirige fuera del origen y que el callback emite cookie. `GLOBE_SMOKE_RESOLVE=host:ip`
+  fija la resolución sólo para ese proceso (equivalente a `curl --resolve`) sin debilitar ninguna aserción: SNI, CN
+  del cert, header `Host` y `redirect_uri` siguen viajando con el hostname real. Detalle técnico: `dns.setServers`
+  no sirve (el fetch de Node usa el resolver del SO vía `dns.lookup`); la vía correcta es interponer `dns.lookup`
+  devolviendo array cuando undici pide `all`. **Calibrado antes del cutover** contra el origen `run.app`
+  (`human_federation_ok`): así, si fallaba después, acusaba al cutover y no al instrumento.
+
+### Verificación runtime (lo que se ejercitó, y lo que no)
+
+- `http://globe.efeoncepro.com/` → **301** a `https://globe.efeoncepro.com:443/`.
+- `https://globe.efeoncepro.com/` → **200**, TLS válido (`ssl_verify_result=0`), HTTP/2, sirviendo el shell real
+  (`<title>Efeonce Globe — Internal creative studio</title>`) con su propio `x-correlation-id`: responde la app, no
+  una página del balanceador.
+- Smoke de federación humana contra el dominio: `human_federation_ok` **antes y después** del hardening de ingress.
+- Allowlist verificado contra el broker por tres vías (`GET /api/auth/sister-platforms/authorize`, que valida el
+  `redirect_uri` antes de mirar la sesión): **antes** → dominio `400 invalid_redirect_uri`, `run.app` `303`;
+  **después** → dominio `303`, `run.app` `303`, wildcard (`https://*.efeoncepro.com/auth/callback`) sigue `400
+  invalid_redirect_uri`.
+- `globe-api-internal`: anónimo → **403** antes y después; `GLOBE_API_EXPECTED_AUDIENCE` contiene los dos formatos
+  de URL `run.app` y **nunca** el dominio browser; su `GLOBE_PUBLIC_BASE_URL` es el placeholder
+  `https://globe-api-internal.invalid`; domain mappings en el proyecto: **0**; el NEG apunta sólo a
+  `globe-studio-internal`. **No re-ejercitado en esta task:** la pierna `200 al SA autorizado` del smoke de
+  workload (la API no se tocó; el criterio queda sin marcar por honestidad, no por bloqueo).
+- Gates Greenhouse: `pnpm test` 1366 archivos / 9858 tests, 0 fallos; `pnpm build` (producción) OK;
+  `pnpm local:check` limpio.
+- **Carril del apply:** corrió con `tofu` local (los commits de Globe quedaron sin push). La evidencia **no**
+  registra un apply por el carril OIDC→WIF del workflow, así que ese tramo del criterio queda sin marcar.
+
+### Trampa de diagnóstico que vale para el runbook
+
+Tras crear el A record el cert pasó a `managed.domainStatus = FAILED_NOT_VISIBLE`. **No era un error de
+configuración:** es el resultado guardado del primer intento de validación de Google, ocurrido antes de que
+existiera el registro; Google reintenta solo y el estado pasa a `ACTIVE` sin intervención. El descarte de causa
+real dio todo OK: NS autoritativos `ns24/ns25.hostgator.cl`, `8.8.8.8` y `1.1.1.1` devolviendo `8.233.189.79`, sin
+AAAA, sin CNAME, sin CAA en `efeoncepro.com`, cert adjunto al target-https-proxy, forwarding rule `:443` sobre la
+IP correcta y el ALB ya respondiendo 301 por el dominio real desde internet. Trampa secundaria: el resolver local
+del operador mantuvo **cache negativa** del nombre (el SOA de `efeoncepro.com` tiene minimum TTL 86400, así que un
+NXDOMAIN cacheado persiste ~24h) y `dscacheutil -flushcache` sin `sudo` no hace nada; el síntoma engañoso es `curl`
+devolviendo `status=000` sin `remote_ip`, como si el dominio no sirviera para nadie. Verificar siempre con
+`dig @8.8.8.8` y `curl --resolve` antes de concluir que algo está roto.
+
+### Costo
+
+Fuente: Cloud Billing Catalog API, servicio "Networking" (`E505-1604-58F8`), precios efectivos **2026-07-21**, USD.
+
+| Concepto | Precio | Aplica |
+|---|---|---|
+| Cloud Load Balancer Forwarding Rule Minimum Global | US$0.025/hora (~US$18,25/mes) | cubre las 5 primeras reglas globales; este front door usa 2 (`:443`, `:80`) |
+| Cloud Load Balancer Forwarding Rule Additional Global | US$0.010/hora | no aplica hoy |
+| Global External ALB Inbound/Outbound Data Processing (Santiago, `southamerica-west1`) | US$0.012/GiB cada uno | por tráfico servido |
+| Certificado administrado por Google | sin cargo | — |
+
+**Total fijo estimado: ~US$18,25/mes + ~US$0,024 por GiB servido (in+out).** Nota de rollback: destruir el ALB pero
+dejar la IP global reservada y sin adjuntar la empieza a facturar como IP estática ociosa — destruir la dirección
+junto con el resto.
+
+### Rollback vigente (camino verificado, no ejecutado)
+
+| Capa | Comando / acción | Tiempo |
+|---|---|---|
+| Ingress | `gcloud run services update globe-studio-internal --ingress all` | <10 min |
+| URL/OAuth | `--update-env-vars GLOBE_PUBLIC_BASE_URL=<run.app>`; el `run.app` sigue en el allowlist | <15 min |
+| DNS | quitar el A record en HostGator | <60 min (propagación) |
+| ALB | destruir selectivamente los recursos aditivos del front door, **incluida la IP global** | <30 min |
+
+### Open Question 2 — resuelta: el redirect `run.app` **se conserva**
+
+El `https://globe-studio-internal-818083690953.southamerica-west1.run.app/auth/callback` **queda en el allowlist**
+como camino de rollback documentado. Con el ingress endurecido ese origen ya no es alcanzable por browser, así que
+un código enviado ahí no llega a ninguna parte; removerlo obligaría a un segundo write en DB bajo presión durante
+un rollback. Si algún día se decide retirarlo:
+
+```bash
+pnpm sister-platform:redirect --client globe \
+  --remove https://globe-studio-internal-818083690953.southamerica-west1.run.app/auth/callback --apply
+```
+
+### Desviaciones respecto a la spec original (y por qué)
+
+1. **El orden de cutover se invirtió: allowlist primero, `GLOBE_PUBLIC_BASE_URL` después.** La spec ordenaba
+   cambiar la env var y luego agregar el redirect. Agregar un redirect URI es **inerte** hasta que algo lo use;
+   flipear `GLOBE_PUBLIC_BASE_URL` primero abriría una ventana en la que `/auth/start` anuncia un callback todavía
+   no permitido y el SSO queda roto. Secuencia ejecutada: allowlist ampliado (aditivo) → verificación de tres vías
+   contra el broker **antes** de tocar el runtime → cutover de la env var → smoke SSO end-to-end contra el dominio
+   → endurecimiento de ingress → re-smoke SSO. El §Scope y la §Production verification sequence quedaron corregidos
+   a este orden.
+2. **El ingress se endureció por `gcloud`, no por Terraform.** La spec decía "vía Terraform", pero los servicios
+   Cloud Run **no están en Terraform** y adoptarlos es explícitamente `TASK-1508`; `gcloud run services update
+   --ingress` era el único camino consistente con el scope. Consecuencia registrada: **el valor de ingress queda
+   sin gobernar por IaC hasta `TASK-1508`**. No es drift-trap del workflow (`deploy-internal.yml` no pasa
+   `--ingress` y `gcloud run deploy` preserva los ajustes a nivel servicio que no se especifican); el drift-trap
+   vivo sigue siendo `maxScale` (`--max-instances=1` hardcodeado), con workaround inmediato tras un deploy por
+   workflow: `gcloud run services update <servicio> --max-instances=3`.
+
+### Commits (locales, sin push)
+
+- `efeonce-globe` (`main`): `16919d9` (front door ALB + NEG), `cf5e4d1` (orden del URL map de redirect tras la
+  Compute API), `c6983aa` (smoke de federación humana), `614e983` (pin host→IP en el smoke).
+- `greenhouse-eo` (`develop`): `bbc694f81` (recalibración de baseline pre-ejecución), `c819c4a9f` (primitive aditiva
+  de redirect-URI allowlist).
+
 ## Why This Task Exists
 
 ADR-004 aceptó Cloud Run como web/BFF para la release internal-only y declaró explícitamente que **la ADR sola no
@@ -80,8 +234,8 @@ seguirían dependiendo del hostname `run.app`.
 - Cerrar el loop OAuth de federación humana con el nuevo dominio: `GLOBE_PUBLIC_BASE_URL` y el redirect-URI allowlist
   del cliente Globe en el broker de Greenhouse actualizados de forma exacta (sin wildcards), con smokes verdes de
   federación humana y de workload.
-- Endurecer el ingress del web a `internal-and-cloud-load-balancing` después del smoke por ALB, preservando
-  `maxScale=1`, y dejar `globe-api-internal` IAM-private con audience `run.app`.
+- Endurecer el ingress del web a `internal-and-cloud-load-balancing` después del smoke por ALB, sin tocar
+  `maxScale` (live=3), y dejar `globe-api-internal` IAM-private con audience `run.app`.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -143,18 +297,22 @@ Reglas obligatorias (de ADR-004, load-bearing):
 - Da a `TASK-1469` una public base URL HTTPS estable propia para su canary/cutover.
 - Habilita deep links canónicos de `TASK-1475`.
 - No habilita Production ni clientes externos (sigue bloqueado por `TASK-1480`).
-- No sube réplicas: HA sigue bloqueada por `TASK-1465` (stores durables).
+- No sube réplicas ni las baja: `TASK-1465` (stores durables) ya está complete y el `maxScale` live es 3;
+  gobernarlo por IaC es `TASK-1508`.
 - Desbloquea `TASK-1508`, que adopta los servicios Cloud Run en Terraform sin mezclar ese riesgo con el cutover DNS.
 
 ### Files owned
 
 - `../efeonce-globe/infra/terraform/front_door.tf` (nuevo — IP global, ALB, serverless NEG, managed cert, HTTP→HTTPS)
-  `[verificar]`
 - `../efeonce-globe/infra/terraform/variables.tf`, `outputs.tf`, `locals.tf`
+- `../efeonce-globe/scripts/smoke-human-federation.mjs` (nuevo — smoke SSO de las tres piernas del login humano)
 - `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`
-- El cambio de redirect-URI allowlist del cliente Globe es una **actualización de registro** en el broker de Greenhouse
-  (`src/lib/sister-platforms/oauth-broker.ts` es el mecanismo; el dato es la fila del cliente), no código nuevo de
-  broker. Confirmar en Discovery si el redirect allowlist se administra por API/command o por seed. `[verificar]`
+- El redirect-URI allowlist del cliente Globe es una **actualización de registro** en el broker de Greenhouse (el dato
+  es la fila del cliente). Discovery confirmó que se administraba por seed script, y que el seed vigente reemplazaba
+  el array y rotaba el client secret; por eso esta task agregó la primitive aditiva
+  `updateSisterPlatformOAuthRedirectUris` en `src/lib/sister-platforms/oauth-broker.ts` + el CLI delgado
+  `scripts/sister-platform-oauth-redirect-uris.ts` (`pnpm sister-platform:redirect`) + tests en
+  `src/lib/sister-platforms/oauth-redirect-uris.test.ts`.
 
 `GLOBE_PUBLIC_BASE_URL` y `GLOBE_API_EXPECTED_AUDIENCE`/`GLOBE_API_CALLER_SERVICE_ACCOUNTS` son env del runtime Globe
 (Cloud Run), no de Greenhouse. DNS de `efeoncepro.com` es out-of-band (HostGator).
@@ -165,9 +323,9 @@ Reglas obligatorias (de ADR-004, load-bearing):
 
 - `../efeonce-globe/infra/terraform/` gobierna WIF, `globe-deployer`, SAs (`web_runtime`/`api_runtime`), buckets, IAM,
   budgets y observabilidad — pero **no** los dos servicios Cloud Run (los crea el workflow `deploy-internal.yml`).
-- `globe-studio-internal`: `web`, `southamerica-west1`, `ingress=all`, `maxScale=1`, `invokerIamDisabled=True`, SA
+- `globe-studio-internal`: `web`, `southamerica-west1`, `ingress=all`, `maxScale=3`, `invokerIamDisabled=True`, SA
   `web_runtime`; autentica por sesión-cookie propia.
-- `globe-api-internal`: `api`, `southamerica-west1`, `ingress=all`, `maxScale=1`, IAM-private + verificación in-app de
+- `globe-api-internal`: `api`, `southamerica-west1`, `ingress=all`, `maxScale=3`, IAM-private + verificación in-app de
   ID token (`GLOBE_API_EXPECTED_AUDIENCE` + `GLOBE_API_CALLER_SERVICE_ACCOUNTS`), SA `api_runtime`.
 - Broker OAuth de sister platforms en `src/lib/sister-platforms/oauth-broker.ts` con redirect-URI allowlist exacto
   (rechaza wildcards, `errorCode: invalid_redirect_uri`).
@@ -246,11 +404,12 @@ Reglas obligatorias (de ADR-004, load-bearing):
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface y consumers nombrados con paths/objetos reales.
-- [ ] Invariantes de API-privada/redirect-exacto/maxScale explicitados y preservados.
-- [ ] Postura de rollback explícita por slice (ingress revert, URL/OAuth revert, ALB destruible).
-- [ ] Evidencia runtime listada (plan Terraform aditivo sin recursos Cloud Run, smokes federación humana + workload, curl HTTP/HTTPS del dominio).
-- [ ] Sin fuga de secretos; apply keyless; API privada intacta.
+- [x] Source of truth, contract surface y consumers nombrados con paths/objetos reales.
+- [x] Invariantes de API-privada/redirect-exacto/maxScale explicitados y preservados.
+- [x] Postura de rollback explícita por slice (ingress revert, URL/OAuth revert, ALB destruible).
+- [x] Evidencia runtime listada (plan Terraform aditivo sin recursos Cloud Run, smokes federación humana + workload, curl HTTP/HTTPS del dominio).
+- [ ] Sin fuga de secretos; apply keyless; API privada intacta. *(sin fuga de secretos y API privada intacta sí;
+      el apply corrió con `tofu` local y la evidencia no registra el carril OIDC→WIF — ver §Delta 2026-07-21 (cierre))*
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -281,18 +440,22 @@ Reglas obligatorias (de ADR-004, load-bearing):
 - Verificar propiedad de dominio y esperar `ACTIVE` del managed cert; confirmar `curl -I` con 301 HTTP→HTTPS y TLS
   válido; el web responde detrás del ALB (SSO redirect esperado, no error de red).
 
-### Slice 3 — Cutover de public base URL + OAuth redirect allowlist
+### Slice 3 — Cutover de OAuth redirect allowlist + public base URL (en ese orden)
 
-- Actualizar `GLOBE_PUBLIC_BASE_URL` del runtime web a `https://globe.efeoncepro.com` (env Cloud Run, con redeploy si
-  no toma en caliente).
-- Agregar el redirect URI exacto de `globe.efeoncepro.com` al cliente Globe en el broker OAuth de Greenhouse (sin
-  quitar el `run.app` hasta smoke verde; sin wildcards).
+- **Primero** agregar el redirect URI exacto de `globe.efeoncepro.com` al cliente Globe en el broker OAuth de
+  Greenhouse (aditivo, sin quitar el `run.app`, sin wildcards) y verificarlo contra el broker. Agregar un redirect
+  URI es inerte hasta que algo lo use; flipear la env var primero abriría una ventana en la que `/auth/start`
+  anuncia un callback todavía no permitido y el SSO queda roto.
+- **Después** actualizar `GLOBE_PUBLIC_BASE_URL` del runtime web a `https://globe.efeoncepro.com` (env Cloud Run,
+  con redeploy si no toma en caliente).
 - Smoke de federación humana: login SSO end-to-end contra `https://globe.efeoncepro.com` con PKCE/state/nonce OK.
 
 ### Slice 4 — Endurecer ingress + verificar API privada + cierre del dominio
 
-- Cambiar el ingress de `globe-studio-internal` a `internal-and-cloud-load-balancing` vía Terraform, **sólo tras**
-  confirmar que el ALB sirve el web (evita lockout).
+- Cambiar el ingress de `globe-studio-internal` a `internal-and-cloud-load-balancing` con
+  `gcloud run services update --ingress` (los servicios Cloud Run no están en Terraform; adoptarlos es
+  `TASK-1508`, así que el valor queda sin gobernar por IaC hasta entonces), **sólo tras** confirmar que el ALB
+  sirve el web (evita lockout).
 - Verificar que `globe-api-internal` sigue IAM-private: 403 anónimo, 200 al SA autorizado, audience `run.app` intacto,
   sin custom domain.
 - Actualizar el runtime handoff y dejar enlazada `TASK-1508` como dueña de la adopción IaC de servicios y del
@@ -316,19 +479,21 @@ domain mapping directo (Preview/region-limited) — ADR-004 §Alternatives. Comp
 global_address`, `google_compute_region_network_endpoint_group` (serverless, `southamerica-west1`, `cloud_run.service =
 globe-studio-internal`), `google_compute_backend_service`, `google_compute_url_map`, `google_compute_managed_ssl_
 certificate` (`globe.efeoncepro.com`), `google_compute_target_https_proxy`, y forwarding rules 443 + 80 (redirect a
-HTTPS). Confirmar tipos/atributos exactos contra la doc oficial vigente en Discovery `[verificar]`.
+HTTPS). Los tipos/atributos exactos quedaron verificados al ejecutar (provider `hashicorp/google` 6.50.0); el detalle
+del recurso aplicado está en §Delta 2026-07-21 (cierre).
 
 El plan Terraform de esta task debe contener sólo recursos aditivos del front door. Si intenta importar, cambiar,
 reemplazar o destruir `globe-studio-internal` o `globe-api-internal`, abortar: esa propiedad pertenece a `TASK-1508`.
 
 El orden de cutover es crítico para no dejar afuera al browser ni romper OAuth: primero el ALB sirve (Slices 1-2),
-después la URL/OAuth apuntan al dominio (Slice 3), y **al final** el ingress endurece (Slice 4). Invertir el orden
-—endurecer ingress antes de que el ALB sirva— deja el web inaccesible.
+después el allowlist admite el callback del dominio y recién entonces `GLOBE_PUBLIC_BASE_URL` apunta al dominio
+(Slice 3), y **al final** el ingress endurece (Slice 4). Invertir el orden —endurecer ingress antes de que el ALB
+sirva, o flipear la env var antes que el allowlist— deja el web inaccesible o el SSO roto.
 
 El redirect allowlist se administra en el broker de Greenhouse (`src/lib/sister-platforms/oauth-broker.ts`
-`normalizeRedirectUris` valida exactitud). Confirmar en Discovery si el registro del cliente se actualiza por
-command/API o por seed `[verificar]`; en ambos casos, agregar el URI de `globe.efeoncepro.com` sin remover el `run.app`
-hasta smoke verde, y sin wildcards (el broker los rechaza con `invalid_redirect_uri`).
+`normalizeRedirectUris` valida exactitud). Discovery confirmó que el registro se actualizaba por seed script; esta
+task extrajo la primitive aditiva `updateSisterPlatformOAuthRedirectUris` para agregar el URI de
+`globe.efeoncepro.com` sin remover el `run.app` y sin wildcards (el broker los rechaza con `invalid_redirect_uri`).
 
 ## Rollout Plan & Risk Matrix
 
@@ -337,10 +502,12 @@ autoriza esta task (no ADR-004 sola) sólo para el front door y su cutover; la a
 
 ### Slice ordering hard rule
 
-- Slice 1 (ALB/NEG/cert, sin DNS) → Slice 2 (DNS + cert ACTIVE) → Slice 3 (cutover URL + OAuth redirect + smoke humano)
-  → Slice 4 (endurecer ingress + verificar API privada + cierre).
+- Slice 1 (ALB/NEG/cert, sin DNS) → Slice 2 (DNS + cert ACTIVE) → Slice 3 (OAuth redirect **y luego** cutover URL +
+  smoke humano) → Slice 4 (endurecer ingress + verificar API privada + cierre).
 - **Slice 4 (endurecer ingress a `internal-and-cloud-load-balancing`) NUNCA antes de confirmar en Slice 2-3 que el ALB
   sirve el web.** Endurecer antes deja el browser sin acceso (lockout).
+- **Dentro del Slice 3, el allowlist va SIEMPRE antes de `GLOBE_PUBLIC_BASE_URL`.** El redirect es inerte hasta que
+  algo lo use; la env var al revés abre una ventana de SSO roto.
 - Un cambio/import/destroy sobre un servicio Cloud Run en el plan Terraform aborta la task y se deriva a `TASK-1508`.
 - El redirect `run.app` no se remueve hasta que el smoke del dominio nuevo esté verde (Slice 3).
 
@@ -360,7 +527,7 @@ autoriza esta task (no ADR-004 sola) sólo para el front door y su cutover; la a
 
 No hay feature flag de código. El "cutover" es la secuencia de red/DNS/OAuth de arriba, reversible por slice (revertir
 ingress, revertir `GLOBE_PUBLIC_BASE_URL`/redirect al `run.app`, destruir el ALB additive). Defaults fail-closed: la API
-sigue IAM-private; el web conserva SSO; `maxScale=1` intacto.
+sigue IAM-private; el web conserva SSO; el `maxScale` live (3) queda intacto porque esta task no lo toca.
 
 ### Rollback plan per slice
 
@@ -378,9 +545,11 @@ sigue IAM-private; el web conserva SSO; `maxScale=1` intacto.
 2. `apply` ALB/NEG/cert → cert en `PROVISIONING` esperado (sin DNS aún); `globe-api-internal` sin cambios.
 3. Crear DNS en HostGator (Slice 2) → esperar cert `ACTIVE`; `curl -I http://globe.efeoncepro.com` = redirect HTTPS y
    `curl -I https://globe.efeoncepro.com` = TLS OK + respuesta/redirect SSO esperado.
-4. Cutover `GLOBE_PUBLIC_BASE_URL` + agregar redirect exacto (Slice 3) → smoke federación humana: login SSO end-to-end
-   verde contra el dominio; `run.app` aún válido.
-5. Endurecer ingress a `internal-and-cloud-load-balancing` (Slice 4) → re-smoke humano por el ALB; verificar
+4. Agregar el redirect exacto al broker y verificarlo, y **recién después** cutover de `GLOBE_PUBLIC_BASE_URL`
+   (Slice 3; el orden inverso deja `/auth/start` anunciando un callback no permitido) → smoke federación humana:
+   login SSO end-to-end verde contra el dominio; `run.app` aún válido.
+5. Endurecer ingress a `internal-and-cloud-load-balancing` con `gcloud run services update --ingress` (Slice 4;
+   no por Terraform, ver §Slice 4) → re-smoke humano por el ALB; verificar
    `globe-api-internal`: 403 anónimo + 200 SA autorizado + audience `run.app`.
 6. Remover el redirect `run.app` del broker sólo si se decide; actualizar runbook + handoff; monitorear logs 48-72h.
 
@@ -397,17 +566,20 @@ sigue IAM-private; el web conserva SSO; `maxScale=1` intacto.
 
 ## Acceptance Criteria
 
-- [ ] `globe.efeoncepro.com` resuelve y sirve `globe-studio-internal` vía Global External ALB + serverless NEG
+- [x] `globe.efeoncepro.com` resuelve y sirve `globe-studio-internal` vía Global External ALB + serverless NEG
       (`southamerica-west1`), con managed cert `ACTIVE` y redirección HTTP→HTTPS (`curl -I` = 301 + TLS válido).
 - [ ] `globe-api-internal` no recibe custom domain, sigue IAM-private (403 anónimo, 200 al SA autorizado) y su audience
-      es `run.app`, no derivada del dominio browser.
-- [ ] El plan Terraform contiene sólo recursos aditivos del front door y no importa ni modifica servicios Cloud Run.
-- [ ] `globe-studio-internal` sirve por `internal-and-cloud-load-balancing` detrás del ALB, con su `maxScale` live
+      es `run.app`, no derivada del dominio browser. *(verificado: 403 anónimo antes y después, audience `run.app` en
+      sus dos formatos, cero domain mappings, NEG sólo al web; la pierna `200 al SA autorizado` no se re-ejercitó en
+      esta task — la API no se tocó)*
+- [x] El plan Terraform contiene sólo recursos aditivos del front door y no importa ni modifica servicios Cloud Run.
+- [x] `globe-studio-internal` sirve por `internal-and-cloud-load-balancing` detrás del ALB, con su `maxScale` live
       intacto (3; esta task no lo modifica).
-- [ ] `GLOBE_PUBLIC_BASE_URL = https://globe.efeoncepro.com` y el redirect URI exacto del cliente Globe está en el
+- [x] `GLOBE_PUBLIC_BASE_URL = https://globe.efeoncepro.com` y el redirect URI exacto del cliente Globe está en el
       broker (sin wildcards); smoke de federación humana verde (PKCE/state/nonce OK).
 - [ ] Ningún secreto impreso; el apply corrió keyless (OIDC→WIF); no se subieron réplicas ni se habilitó Production.
-- [ ] Costo fijo/mensual estimado del ALB documentado con fecha y fuente oficial; `GLOBE_RUNTIME_HANDOFF.md` actualizado
+      *(secretos, réplicas y Production sí verificados; el carril del apply fue `tofu` local, no OIDC→WIF)*
+- [x] Costo fijo/mensual estimado del ALB documentado con fecha y fuente oficial; `GLOBE_RUNTIME_HANDOFF.md` actualizado
       y `TASK-1508` enlazada como dueña de la adopción IaC/ownership de deploy.
 
 ## Verification
@@ -424,15 +596,16 @@ sigue IAM-private; el web conserva SSO; `maxScale=1` intacto.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla).
-- [ ] El archivo vive en la carpeta correcta (`to-do/` → `in-progress/` → `complete/`).
-- [ ] `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` sincronizados.
-- [ ] `docs/epics/in-progress/EPIC-028-...md` refleja el front door implementado.
-- [ ] `GLOBE_RUNTIME_HANDOFF.md` actualizado con el dominio y el pendiente explícito `TASK-1508`; ADR-004 referenciada
+- [x] `Lifecycle` del markdown sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla).
+- [x] El archivo vive en la carpeta correcta (`to-do/` → `in-progress/` → `complete/`).
+- [x] `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` sincronizados.
+- [x] `docs/epics/in-progress/EPIC-028-...md` refleja el front door implementado.
+- [x] `GLOBE_RUNTIME_HANDOFF.md` actualizado con el dominio y el pendiente explícito `TASK-1508`; ADR-004 referenciada
       como la decisión que esta task implementa.
 - [ ] `greenhouse-qa-release-auditor` y `greenhouse-documentation-governor` revisan el cierre.
-- [ ] Runtime Rollout Completion Gate: si el dominio/OAuth/ingress no quedaron aplicados y verificados en vivo, el
-      estado es `code complete, rollout pendiente`, no `complete`.
+- [x] Runtime Rollout Completion Gate: si el dominio/OAuth/ingress no quedaron aplicados y verificados en vivo, el
+      estado es `code complete, rollout pendiente`, no `complete`. *(dominio, cert, OAuth, `GLOBE_PUBLIC_BASE_URL` e
+      ingress aplicados y verificados en vivo el 2026-07-21 — ver §Delta 2026-07-21 (cierre))*
 
 ## Follow-ups
 
@@ -448,5 +621,9 @@ sigue IAM-private; el web conserva SSO; `maxScale=1` intacto.
   (Discovery 2026-07-21):** por **seed script**; no hay route admin de OAuth clients. Como el seed vigente reemplaza
   el array y rota el client secret, el Slice 3 extrae la primitive canónica aditiva en `oauth-broker.ts` + un script
   delgado. Ver §Delta 2026-07-21.
-- ¿Se remueve el redirect `run.app` tras el cutover, o se conserva como fallback interno? (Decidir en Slice 3 según
-  necesidad de smokes/agentes.)
+- ~~¿Se remueve el redirect `run.app` tras el cutover, o se conserva como fallback interno?~~ **RESUELTA
+  (cierre 2026-07-21): se conserva.** Es el camino de rollback documentado; con el ingress endurecido ese origen ya
+  no es alcanzable por browser, así que un código enviado ahí no llega a ninguna parte, y removerlo obligaría a un
+  segundo write en DB bajo presión durante un rollback. Comando de retiro, si algún día se decide:
+  `pnpm sister-platform:redirect --client globe --remove https://globe-studio-internal-818083690953.southamerica-west1.run.app/auth/callback --apply`.
+  Ver §Delta 2026-07-21 (cierre).

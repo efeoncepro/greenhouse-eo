@@ -8,6 +8,56 @@
 
 # Handoff
 
+## Active state — 2026-07-21 (TASK-1507: front door internal-only vivo)
+
+**La URL estable del shell interno de Globe es `https://globe.efeoncepro.com`.** Se sirve por un Global External
+Application Load Balancer + serverless NEG (`southamerica-west1`) hacia `globe-studio-internal`, con IP global
+`8.233.189.79`, certificado administrado por Google `ACTIVE` (`CN=globe.efeoncepro.com`, issuer `GTS WR3`, vence
+`Oct 19 20:35:36 2026 GMT`) y redirect 301 de HTTP a HTTPS. `GLOBE_PUBLIC_BASE_URL` quedó cortado al dominio en la
+revisión `globe-studio-internal-00018-zkx`, que sirve el 100% del tráfico.
+
+**El `*.run.app` ya no es alcanzable por browser.** El ingress del web quedó en
+`internal-and-cloud-load-balancing` (`gcloud run services update … --ingress`), así que el acceso directo por
+`https://globe-studio-internal-818083690953.southamerica-west1.run.app` devuelve **404** y el dominio por el ALB
+devuelve **200** con el shell real (`<title>Efeonce Globe — Internal creative studio</title>` + su propio
+`x-correlation-id`: responde la app, no el balanceador). Ese origen `run.app` **sigue en el allowlist OAuth** a
+propósito, como camino de rollback; retirarlo es un comando, no un incidente:
+`pnpm sister-platform:redirect --client globe --remove https://globe-studio-internal-818083690953.southamerica-west1.run.app/auth/callback --apply`.
+
+**Cómo se opera el allowlist ahora.** Greenhouse ganó la primitive aditiva
+`updateSisterPlatformOAuthRedirectUris` (`src/lib/sister-platforms/oauth-broker.ts`) + el CLI
+`pnpm sister-platform:redirect` (`--client/--add/--remove`, dry-run sin `--apply`): una transacción que toca sólo
+`redirect_uris`, sin rotar el client secret ni reemplazar el array — a diferencia del seed
+`seed-globe-internal-pilot.ts`, que hace ambas cosas y **no** sirve para un cutover. El SSO humano se verifica con
+`efeonce-globe/scripts/smoke-human-federation.mjs` (tres piernas: `/auth/start` → authorize → callback);
+`GLOBE_SMOKE_RESOLVE=host:ip` permite smokear un front door recién publicado desde un resolver con cache negativa
+sin debilitar ninguna aserción. Verde antes y después del hardening de ingress.
+
+**Riesgos abiertos.**
+
+- **El ingress no está gobernado por IaC.** Se fijó por `gcloud` porque los servicios Cloud Run siguen fuera de
+  Terraform; su gobierno es `TASK-1508`. No es drift-trap del workflow (`deploy-internal.yml` no pasa `--ingress`
+  y `gcloud run deploy` preserva lo no especificado), pero nada lo previene fuera de esa task.
+- **`maxScale` sí es drift-trap.** `deploy-internal.yml` hardcodea `--max-instances=1`: un deploy por ese workflow
+  baja el techo a 1. Valor vivo hoy: 3. Workaround inmediato tras un deploy:
+  `gcloud run services update <servicio> --max-instances=3`.
+- **Cache negativa de DNS.** El SOA de `efeoncepro.com` tiene minimum TTL 86400, así que un NXDOMAIN cacheado antes
+  de crear el registro persiste ~24h en el resolver local y `dscacheutil -flushcache` sin `sudo` no hace nada. El
+  síntoma engañoso es `curl` devolviendo `status=000` sin `remote_ip`. Verificar con `dig @8.8.8.8` y
+  `curl --resolve` antes de concluir que el dominio está roto.
+- **Costo fijo nuevo:** ~US$18,25/mes por las forwarding rules globales + ~US$0,024 por GiB servido (in+out),
+  precios de la Cloud Billing Catalog API al 2026-07-21. Si se destruye el ALB, destruir **también** la IP global:
+  reservada y sin adjuntar factura como IP estática ociosa.
+- **Sigue internal-only.** Publicar el dominio no habilita Production, clientes externos ni marketing: eso está
+  gateado por `TASK-1480`. `globe-api-internal` no recibe custom domain, sigue IAM-private (403 anónimo) y su
+  audience se deriva de `run.app`, nunca del dominio browser.
+
+**Próximo paso ejecutable: `TASK-1508`** — adoptar los dos servicios Cloud Run en Terraform por import/no-replace y
+dejar un solo escritor (Terraform gobierna configuración estable y seguridad; el workflow queda image/revision-only).
+Ahí se pinean `ingress`, `maxScale` e `invokerIamDisabled`. Spec de cierre del front door:
+`docs/tasks/complete/TASK-1507-globe-internal-front-door-alb-terraform.md`; decisión que implementa: ADR-004
+`docs/architecture/creative-studio/EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md`.
+
 ## Active state — 2026-07-21 (TASK-1466 desplegada + verificada internal-only)
 
 SPEC-008 materializa `client-operated | co-operated | efeonce-managed` como accountability versionada —nunca como
@@ -69,24 +119,23 @@ saneamiento de raíz (Terraform gobierna la config estable, el workflow queda im
 
 **Decisión (ADR-004, `EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md`).** Para la release
 internal-only, el web/BFF/SSO shell **se queda en Cloud Run** (servidor Node nativo; el target Next.js queda
-`superseded` para el shell interno) — migrar a Vercel se rechaza: no arregla el techo de HA (estado in-memory /
-`maxScale=1`, independiente de la nube) y parte el trust boundary sin beneficio interno. El **frontend cliente
-comercial** (`TASK-1505`+) es una superficie separada con host + framework **diferidos** (Vercel + Next.js sobre
-edge global es candidato vivo), a decidir cuando se construya la UI de 1505 y antes de `TASK-1480` Production;
-elegir Cloud Run para el shell interno **no** cierra esa puerta. Tres gates distintos, nunca mezclados: URL
-internal-only / HA (gated por stores durables `TASK-1465`, hard-block `maxScale > 1`) / Production externo
-(`TASK-1480`).
+`superseded` para el shell interno) — migrar a Vercel se rechaza: parte el trust boundary sin beneficio interno.
+El **frontend cliente comercial** (`TASK-1505`+) es una superficie separada con host + framework **diferidos**
+(Vercel + Next.js sobre edge global es candidato vivo), a decidir cuando se construya la UI de 1505 y antes de
+`TASK-1480` Production; elegir Cloud Run para el shell interno **no** cierra esa puerta. Tres gates distintos,
+nunca mezclados: URL internal-only / HA (gate `TASK-1465`, **ya cleared** — ver el bloque de persistencia durable) /
+Production externo (`TASK-1480`).
 
-**Front door → `TASK-1507` (registrada, `to-do`, ejecutable ahora).** `globe.efeoncepro.com` se sirve vía
-**Global External ALB + serverless NEG** (`southamerica-west1`) → `globe-studio-internal` (path GA, no domain
-mapping directo). `globe-api-internal` **nunca** recibe custom domain; sigue IAM-private con audience `run.app`.
-La task cubre ALB/TLS/DNS, `GLOBE_PUBLIC_BASE_URL`, OAuth redirect, smokes y finalmente endurece el ingress del web a
-`internal-and-cloud-load-balancing`. No espera el resto de EPIC-028 ni `TASK-1465`/`TASK-1480`.
+**Front door → `TASK-1507`: IMPLEMENTADO (complete 2026-07-21).** `globe.efeoncepro.com` se sirve vía **Global
+External ALB + serverless NEG** (`southamerica-west1`) → `globe-studio-internal` (path GA, no domain mapping
+directo), el ingress del web quedó en `internal-and-cloud-load-balancing` y `globe-api-internal` sigue sin custom
+domain, IAM-private y con audience `run.app`. Estado vigente, comandos y riesgos abiertos: ver el bloque
+**Active state — 2026-07-21 (TASK-1507: front door internal-only vivo)** al inicio de este archivo.
 
-**Cloud Run IaC + deploy ownership → `TASK-1508` (registrada, `to-do`, blocked by 1507).** Adopta los dos servicios
-vivos por import/no-replace y elimina la doble escritura: Terraform gobierna configuración estable y seguridad; el
-workflow `gcloud run deploy` queda image/revision-only. Ahí se pinea `invokerIamDisabled` (web `True`, api `False`).
-**Próximo paso ejecutable:** tomar `TASK-1507` ahora, antes del rollout interno de `TASK-1505`; luego `TASK-1508`.
+**Cloud Run IaC + deploy ownership → `TASK-1508` (registrada, `to-do`; su blocker `TASK-1507` ya está levantado).**
+Adopta los dos servicios vivos por import/no-replace y elimina la doble escritura: Terraform gobierna configuración
+estable y seguridad; el workflow `gcloud run deploy` queda image/revision-only. Ahí se pinean `invokerIamDisabled`
+(web `True`, api `False`), `maxScale` e `ingress`. **Próximo paso ejecutable: `TASK-1508`.**
 
 ## Active state — 2026-07-20 (TASK-1490 desplegada + verificada en el servicio + hardening de auth)
 
