@@ -121,8 +121,8 @@
    reserva con aprobación inmediata. Capturar únicamente IDs/booleanos/host y timestamps necesarios.
 5. **Equivalencia operativa.** Verificar `isOffline=false`, calendar event, Teams, invite, contacto/timeline y
    cancel/reschedule. Cancelar/limpiar según instrucción del operador.
-6. **Atribución.** Contrastar pérdida de UTK/UTM/content tracking con Tracking Plan; definir mitigación mínima
-   sin publicar GTM ni asumir CMP inexistente.
+6. **Atribución — completa.** Scheduler no porta UTK/UTM/content tracking; futura conversión server-confirmed
+   mapea a GA4 `generate_lead`, campaña allowlisted y Forms API opcional solo con consent/CMP + dedupe. Sin GTM.
 7. **Veredicto y cierre.** Actualizar PDR-009, primitive docs, task, índices, changelog/handoff; proponer task
    backend-data + UI si pasa o hardening del iframe si falla; correr gates proporcionales.
 

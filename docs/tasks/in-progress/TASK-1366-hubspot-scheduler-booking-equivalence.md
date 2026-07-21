@@ -294,6 +294,11 @@ Reglas obligatorias:
 - Definir cuales eventos son mid-funnel (`gh_cta_clicked`, `gh_meeting_*`) y cual seria conversion server-confirmed (`gh_meeting_booked` o GA4 recommended equivalente si aplica).
 - Actualizar el Tracking Plan solo si se define un evento nuevo; no publicar GTM.
 
+**Resultado intermedio 2026-07-21:** Slice documental completo. Scheduler no porta UTK/UTM/content tracking;
+la autoridad futura será confirmación server-side mapeada a GA4 `generate_lead`, con campaña allowlisted y sin
+PII. Forms API + `context.hutk` queda opcional y condicionado a CMP/consent + dedupe. No nace evento/runtime en
+este spike, por lo que no corresponde modificar el Tracking Plan ni publicar GTM.
+
 ### Slice 4 — Verdict + follow-up task split
 
 - Emitir un veredicto `pass | conditional pass | fail`.
@@ -421,7 +426,7 @@ El spike falla si:
 - [x] Availability read funciona o falla con error canonico documentado.
 - [ ] Booking smoke controlado produce evidencia redacted.
 - [ ] Se verifica `calendarEventId`, `isOffline`, Teams URL/ID, invite, calendario y HubSpot timeline.
-- [ ] Se documenta el impacto de `hubspotutk`/UTM/content tracking y mitigacion viable.
+- [x] Se documenta el impacto de `hubspotutk`/UTM/content tracking y mitigacion viable.
 - [ ] Se emite veredicto `pass | conditional pass | fail` con decision de next task.
 - [ ] No se inserta booking nativo en ninguna landing.
 - [ ] No se publica GTM.

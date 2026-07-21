@@ -32,7 +32,9 @@
   defecto, POST con doble guard, slot revalidado, cero retry y output redacted; guard probado sin booking. Un
   POST vacío llegó a `VALIDATION_ERROR`, confirmando permiso write sin mutación. Antes del booking válido aún
   faltan email de prueba y ventana de slot; el organizador se resuelve desde la scheduling page.
-  `HubSpotMeetingEmbed` y landings permanecen intactos.
+  Slice atribución cerrado: Scheduler no porta UTK/UTM/content tracking; futura autoridad server-confirmed
+  mapearía a GA4 `generate_lead`, con campaña allowlisted, y Forms API queda opcional solo con consent/CMP +
+  dedupe. No se tocó Tracking Plan/GTM. `HubSpotMeetingEmbed` y landings permanecen intactos.
 
 - **`TASK-1506` COMPLETE (Globe Frontend Hosting and Front Door Decision, `EPIC-028`) — ADR-004, local-first sin push.**
   Cerrada como policy: `EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md` (ADR-004) mantiene **Cloud Run**

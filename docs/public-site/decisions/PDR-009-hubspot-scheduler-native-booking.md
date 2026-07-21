@@ -27,6 +27,34 @@ La decision no autoriza reemplazar el iframe en ninguna landing todavia. Autoriz
 - La API de CRM Meetings (`/crm/v3/objects/meetings`) no reemplaza scheduling: registra/administra actividad de reunion, pero no debe asumirse como reserva de calendario ni generacion de Teams.
 - La Scheduler API no preserva por si sola el tracking nativo de UTK/UTM/content tracking como un embed/form HubSpot. La mitigacion propuesta es medicion Greenhouse/GTM + envio complementario por Forms API con `context.hutk` cuando aplique.
 
+## Evidencia intermedia TASK-1366 — 2026-07-21
+
+- El app `Efeonce Data Platform` fue desplegado/reinstalado con el scope mínimo
+  `scheduler.meetings.meeting-link.read`; el token estático gobernado existente adquirió el permiso sin rotación.
+- El slug API canónico es `efeoncepro/agenda-discovery` codificado como un solo segmento de path. El leaf
+  `agenda-discovery` aislado responde `slug does not exist`.
+- Details + availability están runtime-verificados: `GROUP_CALENDAR`, `isOffline=false`, un calendario
+  `OFFICE365`, duración 30 minutos, campo `company` obligatorio, consentimiento legal habilitado y slots reales.
+- Un POST vacío deliberadamente inválido llegó a `VALIDATION_ERROR`, no a `MISSING_SCOPES`: el token alcanza el
+  contrato write sin que esa prueba haya creado una reunión.
+- El booking válido, Teams, invite, timeline y cancel/reschedule siguen pendientes de una identidad/slot de
+  prueba aprobados; por eso aún no hay veredicto final.
+
+### Postura de atribución
+
+- Scheduler API no acepta `hubspotutk`, UTM ni content tracking en el payload, y tampoco expone una operación de
+  reprogramación. No se debe prometer paridad de atribución HubSpot nativa con el embed.
+- Los eventos de CTA/embed existentes siguen siendo mid-funnel. Una reserva solo se considera conversión cuando
+  el servidor recibe confirmación exitosa de Scheduler; al productizar, esa evidencia debe mapear a
+  `generate_lead` de GA4, no a un evento browser autorreportado ni a una nueva key event paralela.
+- El adapter futuro debe conservar server-side solo campaña allowlisted (`utm_*`, referrer, page, surface y
+  correlation), sin PII en `dataLayer`.
+- Forms API + `context.hutk` queda como mitigación opcional, no default: requiere consentimiento vigente,
+  deduplicación y una decisión explícita porque agrega actividad de form además del booking. Los hosts públicos
+  hoy no tienen CMP/Consent Mode default, por lo que no puede asumirse ese gate.
+- No se cambia `TRACKING-PLAN.md` todavía: esta task no crea runtime ni evento nuevo. La task de productización
+  deberá registrar el rail server-confirmed antes de publicar GTM/Measurement Protocol.
+
 Fuentes:
 
 - `https://developers.hubspot.com/docs/api-reference/latest/scheduler/meetings/create-meeting`
@@ -35,6 +63,7 @@ Fuentes:
 - `https://knowledge.hubspot.com/meetings-tool/use-meetings`
 - `https://developers.hubspot.com/docs/api-reference/legacy/crm/activities/meetings/guide`
 - `https://developers.hubspot.es/docs/api-reference/legacy/marketing/forms/v3-legacy/submit-data-authenticated`
+- `https://support.google.com/analytics/answer/9267735?hl=es-419`
 
 ## Pass/fail para reemplazar el widget
 
