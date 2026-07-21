@@ -67,7 +67,7 @@ At 390x844, the same hierarchy becomes a single focus flow rather than compresse
 
 - Primary: choose slot, then continue/reserve.
 - Secondary: timezone/window/retry.
-- Safety: HubSpot fallback, always reachable.
+- Safety: HubSpot fallback reachable before provider dispatch; suppressed after an ambiguous/invalid-created outcome to prevent duplicates.
 - No competing host CTA inside the scene.
 
 ## Visual Fidelity Mapping
@@ -112,7 +112,7 @@ At 390x844, the same hierarchy becomes a single focus flow rather than compresse
 - Validation: summary + field messages; pass remains.
 - Pending: “Confirmando tu reunión…”; pass becomes processing.
 - Success: “Tu reunión quedó agendada.”; confirmed pass + calendar/Teams/email expectation.
-- Offline/no Teams: never success; degraded/fallback.
+- Offline/no Teams after dispatch: never success; check-email/reconciliation state with no immediate second booking.
 
 ## Accessibility Contract
 
@@ -130,7 +130,7 @@ At 390x844, the same hierarchy becomes a single focus flow rather than compresse
 - Pieces: scene, signal rail, timezone lens, horizon, slots, step rail, fields, Meeting Pass, recovery/fallback.
 - Copy: `src/lib/copy/growth-meetings*` or nearest canonical growth dictionary.
 - Attributes: `api-base`, `surface`, `placement`, `locale`, `timezone`, `appearance`, `fallback-url`.
-- Telemetry: reducer actions emit `gh_meeting_interaction`; receipt transition emits `gh_meeting_booking_confirmed` once. No exact slot/PII/receipt/correlation in payload.
+- Telemetry: reducer actions emit `gh_meeting_step_reached`; the first receipt transition emits `gh_meeting_booking_confirmed` once. No exact slot/PII/receipt/correlation in payload.
 - Server-only: provider slug/credentials, PII policy, idempotency, attribution authority and receipts.
 
 ## GVC Scenario Plan

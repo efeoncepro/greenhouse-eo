@@ -29,7 +29,7 @@
 
 Construye `<efeonce-meeting-scheduler>`, una experiencia portable, rica y de frontera para elegir un horario y reservar mediante TASK-1509. La dirección visual “Time Horizon” convierte disponibilidad real en un paisaje temporal interactivo y transforma la selección en un `Meeting Pass` persistente que acompaña todo el flujo.
 
-Los dos resultados centrales son estética diferencial y medición GTM de extremo a extremo. El renderer emite un funnel allowlisted sin PII; sólo el recibo server-confirmed habilita `gh_meeting_booking_confirmed -> generate_lead`. El iframe/link sigue disponible como fallback inmediato.
+Los dos resultados centrales son estética diferencial y medición GTM de extremo a extremo. El renderer emite un funnel allowlisted sin PII; sólo la primera respuesta con recibo server-confirmed habilita `gh_meeting_booking_confirmed -> generate_lead`. El iframe/link sigue disponible como fallback pre-dispatch; un outcome ambiguo exige revisar el correo y nunca ofrece un segundo booking inmediato.
 
 ## Why This Task Exists
 
@@ -65,7 +65,7 @@ Reglas obligatorias:
 - El renderer sólo consume DTOs browser-safe; no importa provider SDK, secret, store o server-only modules.
 - No hay booking optimista. Success y `generate_lead` requieren el recibo server-confirmed.
 - WordPress/Think sólo configuran atributos allowlisted y placement; no duplican fields, booking, consent o telemetry.
-- El fallback queda accionable en pilot/degradación; esta task no toca `book_meeting`/Action Registry de TASK-1431.
+- El fallback queda accionable en pilot y degradación pre-dispatch. Después de `provider_dispatched`, un outcome ambiguo o booking provider-created-invalid bloquea un segundo intento/fallback inmediato; esta task no toca `book_meeting`/Action Registry de TASK-1431.
 
 ## Normative Docs
 
@@ -205,7 +205,7 @@ Reglas obligatorias:
 - Copy source: `src/lib/copy/growth-meetings*` or nearest existing growth dictionary confirmed in Discovery.
 - Reader / command: TASK-1509 config/availability/book only.
 - API parity: no UI-only write/success; server receipt gates confirmation.
-- Browser events: one generic `gh_meeting_interaction` family plus `gh_meeting_booking_confirmed`; strict parameter allowlist from TASK-1509.
+- Browser events: canonical `gh_meeting_step_reached` plus dataLayer-only `gh_meeting_booking_confirmed`; strict parameter allowlist from TASK-1509. GTM maps only the latter to `generate_lead` and never forwards the custom confirmation name to GA4.
 - GTM mapping: one generic GA4 tag for Tier B funnel; one conversion tag mapping confirmed to `generate_lead`; dimensions reuse surface/placement and add only governed scheduler interaction/stage fields.
 - States: complete State inventory, including ambiguous timeout and fallback.
 
@@ -332,7 +332,7 @@ The renderer is a standalone custom element with an explicit state reducer. Rend
 - [ ] Time Horizon/Meeting Pass is materially richer than the iframe/calendar baseline and meets the task-specific visual score floors.
 - [ ] Renderer consumes only TASK-1509 browser contracts and contains no provider/store/server imports.
 - [ ] Full state inventory is accessible at desktop/390, keyboard/reduced-motion complete and no-overflow.
-- [ ] `gh_meeting_interaction` covers the funnel with strict generic parameters and no PII/exact slot.
+- [ ] `gh_meeting_step_reached` covers the funnel with strict generic parameters, valid step/parameter pairs and no PII/exact slot.
 - [ ] `gh_meeting_booking_confirmed` emits exactly once per server receipt and alone maps to `generate_lead`.
 - [ ] GTM generic tags are built/read back/previewed; publish occurs only after explicit human confirmation and live evidence.
 - [ ] Governed public host retains actionable embed/link fallback and flag rollback.

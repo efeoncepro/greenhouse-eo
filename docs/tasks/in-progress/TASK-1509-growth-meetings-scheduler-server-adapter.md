@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-023`
-- Status real: `Diseno`
+- Status real: `Foundation code-complete local; DB concurrency/integration y rollout runtime pendientes`
 - Rank: `TBD`
 - Domain: `growth|public-site|crm|data`
 - Blocked by: `none`
@@ -151,17 +151,17 @@ Reglas obligatorias:
 ### Data model and invariants
 
 - No availability/meeting source-of-truth table.
-- Durable idempotency claim before provider write, keyed by opaque client key plus server digest of normalized email/slot/surface; raw email never appears in keys/logs/signals.
+- Durable idempotency claim before provider write, keyed by opaque client key plus HMAC/fingerprint de todos los campos semánticos normalizados; raw email nunca aparece en keys/logs/signals.
 - Same key+digest replays the public outcome; key+different digest rejects; concurrent claims produce at most one HubSpot write.
-- Claim states distinguish `pending|succeeded|failed_retryable|failed_terminal`; ambiguous timeout cannot fabricate success or auto-create a new key.
+- Claim states distinguish `claimed|failed_prewrite|provider_dispatched|succeeded|failed_terminal|ambiguous|provider_created_invalid`; sólo `failed_prewrite` puede reclaimarse automáticamente.
 - Store only minimum receipt/digests, surface, requested slot, safe outcome and timestamps under explicit retention.
 - Success requires online, exact slot, calendar event and valid Teams host; `webConferenceMeetingId` remains optional when Teams URL is valid.
-- Conversion receipt is unguessable, replay-safe and bound to one successful claim. It carries no PII and cannot authorize another booking.
+- Conversion receipt is unguessable, bound to one successful claim and stored only as a hash. A replay does not mint or re-enable a conversion receipt; it carries no PII and cannot authorize another booking.
 
 ### PII, policy and security
 
 - Reuse surface/origin authority; CORS never replaces server validation.
-- Require Turnstile for booking, rate-limit privacy-safe keys, bound availability range/cadence and reject unexpected fields.
+- Require Turnstile hostname/action for booking, atomic PostgreSQL rate-limit buckets over HMAC privacy-safe keys, bound availability range/cadence and reject unexpected fields.
 - Resolve HubSpot credentials only server-side; missing scope/config fails closed.
 - Booking-processing consent and optional marketing consent are separate; marketing defaults false.
 - Forms API/`hutk` remains OFF unless CMP/Consent Mode, dedupe and explicit policy approval exist.
@@ -183,9 +183,9 @@ Reglas obligatorias:
 
 ### Measurement
 
-- Tier B funnel: renderer emits generic `gh_meeting_interaction` with allowlisted `interaction`, `stage`, `surface_id`, `placement`, `scheduler_key`, `availability_state`, `days_ahead_bucket`, `time_of_day_bucket` and sanitized `error_category`.
-- Allowed `interaction`: `viewed|availability_loaded|date_selected|slot_selected|details_started|validation_failed|booking_started|booking_failed|fallback_opened`.
-- Tier A conversion: only a successful conversion receipt allows renderer event `gh_meeting_booking_confirmed`; GTM maps it to recommended GA4 event `generate_lead` and no other scheduler event is a key event.
+- Tier B funnel: renderer emits canonical `gh_meeting_step_reached` with allowlisted `meeting_step`, `surface_id`, `placement`, `scheduler_key`, `availability_state`, `days_ahead_bucket`, `time_of_day_bucket` and sanitized `error_category`.
+- Allowed `meeting_step`: `viewed|availability_loaded|availability_failed|date_selected|slot_selected|details_started|validation_failed|booking_started|booking_failed|fallback_opened`.
+- Tier A conversion mirror: only the first successful conversion receipt branch allows renderer event `gh_meeting_booking_confirmed`; GTM maps it to recommended GA4 `generate_lead` with `lead_source=meeting_booking`, does not forward the custom confirmation event, and no other scheduler event is a key event.
 - Exact slot, email, name, company, free text, receipt and correlation ID are excluded from `dataLayer`/GA4.
 - Tracking plan must define funnel/custom dimensions, dedupe semantics, measurement ID verification and `/g/collect`/Realtime evidence before publish.
 - GTM workspace changes follow propose -> preview -> human confirm -> publish; this task never silently publishes the container.
@@ -231,7 +231,7 @@ Reglas obligatorias:
 
 ## Detailed Spec
 
-The canonical capability is a provider-independent meetings contract with one HubSpot Scheduler adapter. Route handlers validate transport and delegate; the reader/command own policy and invariants. The idempotency claim and conversion receipt form one atomic operational boundary around the external write. Measurement receives only allowlisted state categories, while exact attendee and appointment facts remain inside the server/provider boundary. Architecture Slice 0 must finalize the concrete storage seam and endpoint schemas before implementation.
+The canonical capability is a provider-independent meetings contract with one HubSpot Scheduler adapter. Route handlers validate transport and delegate; the reader/command own policy and invariants. PostgreSQL and HubSpot do not form an atomic distributed boundary: durable pre-dispatch state and fail-closed reconciliation minimize duplicates without claiming exactly-once. Measurement receives only allowlisted state categories, while exact attendee and appointment facts remain inside the server/provider boundary.
 
 ## Rollout Plan & Risk Matrix
 
@@ -253,8 +253,8 @@ The canonical capability is a provider-independent meetings contract with one Hu
 
 ### Feature flags / cutover
 
-- Default OFF everywhere. Shadow verifies config/availability; pilot enables booking only on allowlisted surfaces.
-- Revert is flag OFF and renderer fallback; no calendar/data migration.
+- Default OFF everywhere. A read flag shadows config/availability; the booking flag enables writes only on allowlisted surfaces.
+- Revert is flag OFF and renderer fallback only before dispatch. `ambiguous`/`provider_created_invalid` never auto-open fallback because it could duplicate a real meeting.
 
 ### Rollback plan per slice
 
@@ -282,25 +282,25 @@ The canonical capability is a provider-independent meetings contract with one Hu
 
 ## Acceptance Criteria
 
-- [ ] Architecture names HubSpot as SoT and documents threat model, receipt, provider failure and fallback.
-- [ ] Config/availability return normalized browser-safe DTOs only for authorized surfaces.
-- [ ] Booking enforces surface/origin, Turnstile, limits, validation and consent without raw errors/secrets.
+- [x] Architecture names HubSpot as SoT and documents threat model, receipt, provider failure and fallback.
+- [x] Config/availability return normalized browser-safe DTOs only for authorized surfaces.
+- [x] Booking enforces surface/origin, Turnstile, limits, validation and consent without raw errors/secrets.
 - [ ] Concurrent/replayed requests create at most one booking; conflicting key reuse rejects.
-- [ ] Success is impossible for offline, missing calendar, mismatched slot or invalid Teams result.
-- [ ] Conversion receipt is opaque/replay-safe and carries no PII/provider IDs.
-- [ ] Tracking Plan defines the Tier B funnel and receipt-gated `generate_lead` rail with no PII/exact slot.
-- [ ] Flag/signals/rollback are registered default OFF.
+- [x] Success is impossible for offline, missing calendar, mismatched slot or invalid Teams result.
+- [x] Conversion receipt is opaque/replay-safe and carries no PII/provider IDs.
+- [x] Tracking Plan defines the Tier B funnel and receipt-gated `generate_lead` rail with no PII/exact slot.
+- [x] Flag/signals/rollback are registered default OFF.
 - [ ] Controlled runtime proof verifies HubSpot, Office 365, Teams and duplicate replay while embed remains available.
 
 ## Verification
 
-- [ ] `pnpm codex:task-hook TASK-1509`
-- [ ] `pnpm task:lint --task TASK-1509`
+- [x] `pnpm codex:task-hook TASK-1509`
+- [x] `pnpm task:lint` (TASK-1509/TASK-1510 changed set: zero errors/warnings)
 - [ ] Focused contract/concurrency/security/measurement tests.
 - [ ] `pnpm lint`
-- [ ] `pnpm tsc --noEmit`
+- [x] `pnpm tsc --noEmit`
 - [ ] Controlled redacted runtime smoke.
-- [ ] `pnpm ops:lint --changed`
+- [x] `pnpm ops:lint --changed`
 - [ ] `pnpm qa:gates --changed --agent codex`
 - [ ] `pnpm docs:closure-check`
 

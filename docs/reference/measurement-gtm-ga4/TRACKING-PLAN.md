@@ -70,6 +70,16 @@ Leyenda tagging: `✅` taggeado y verificado en GA4 · `⏳` pendiente · `n/a` 
 |---|---|---|---|---|---|---|---|
 | `social_meeting_embed` | hubspot_meetings_embed | `/servicios/redes-sociales/` · sección final CTA | ✅ `dataLayer` | `gh_meeting_embed_viewed`, `gh_meeting_embed_loaded`, `gh_meeting_embed_failed` → pendiente de tags GA4 | no | ⏳ pendiente | El iframe se lazy-load al abrir Reunión. Los UTMs de campaña viajan por la query de la página; `dataLayer` conserva CTA/surface sin PII. |
 
+### Native meeting scheduler (TASK-1509 / TASK-1510)
+
+| Surface id | Kind | Página / ubicación | Emite dataLayer | Evento GTM → GA4 | Key event | Tagging | Notas |
+|---|---|---|---|---|---|---|---|
+| `fhsf-efeonce-lead-gen-web` + binding `discovery` | native_meeting_scheduler | Efeonce público, placement por host | ✅ cuando renderer pilot esté activo | `gh_meeting_step_reached` → custom homónimo; `gh_meeting_booking_confirmed` → `generate_lead` con `lead_source=meeting_booking` | sólo `generate_lead` existente | ⏳ pendiente de TASK-1510 + GTM Preview | El custom `gh_meeting_booking_confirmed` NO se reenvía a GA4. Ledger `server_confirmed` es SoT; GA es mirror browser-reported y se reconcilia. Fallback iframe/link permanece. |
+
+Allowlist funnel: `meeting_step`, `scheduler_key`, `surface_id`, `placement`, `availability_state`, `days_ahead_bucket`, `time_of_day_bucket`, `error_category`. Se prohíben PII, valores de campos, slot/timestamp/timezone exactos, receipt, idempotency/correlation/provider IDs, Teams URL, raw UTMs/referrer/query y provider body/error. `stage` no existe: sería redundante y podría contradecir `meeting_step`.
+
+GTM pendiente: workspace descartable basado en versión publicada; reusar DLV `surface_id`/`placement`; crear DLVs `meeting_step`, `scheduler_key`, `availability_state`, `days_ahead_bucket`, `time_of_day_bucket`, `error_category`; 2 triggers y 2 tags dedicados. GA4: registrar esas 6 dimensiones event-scoped; no crear otro key event ni usar `transaction_id`. Publish sólo tras preview, evidencia `/g/collect`, confirmación humana y snapshot.
+
 ---
 
 ## Refrescar la lista desde la DB (SoT de definiciones)
