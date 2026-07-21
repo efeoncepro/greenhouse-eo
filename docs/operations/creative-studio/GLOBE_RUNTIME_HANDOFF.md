@@ -8,6 +8,27 @@
 
 # Handoff
 
+## Active state — 2026-07-21 (TASK-1508: Cloud Run bajo Terraform + cap de 1 instancia corregido)
+
+Los dos servicios Cloud Run **entraron a Terraform** por import brownfield, sin un solo destroy/replace, y
+`deploy-internal.yml` quedó reducido a desplegar **sólo la imagen**. Terraform gobierna ingress, invoker posture,
+runtime SA, env y secret refs, escala, recursos y el invoker IAM binding de la api; el workflow no vuelve a escribir
+configuración. Probado en vivo: un deploy real dejó el `tofu plan` en **No changes**.
+
+**El hallazgo que justifica leer esto:** ambos servicios estaban capados a **1 instancia efectiva**. Un servicio Cloud
+Run tiene ceiling a nivel servicio y a nivel revisión, y aplica **el menor**; el de servicio estaba en 1 mientras el de
+revisión decía 3, que es el que toda la doc venía citando. Nunca corrió más de una réplica, así que **el spend fence
+cross-réplica de `TASK-1465` jamás se ejercitó**. La causa: `--max-instances` escribe campos distintos según el
+subcomando (`run deploy` → servicio, `run services update` → revisión), de modo que el workaround que los manuales
+prescribían para "restaurar" el techo escribía el campo equivocado. Corregido a **3/3** y ambos campos bajo IaC
+(requiere provider `google` >= 7.x; el pin subió de `~> 6.0` a `~> 7.0`, verificado con 76 de 78 recursos en no-op).
+
+**Riesgos abiertos.** El spend fence cross-réplica sigue **sin ejercitar**: ahora es posible, pero nadie lo probó con
+>1 réplica. La §Production verification sequence de 1508 pide observar **dos** ciclos de deploy y se corrió uno.
+
+**Próximo paso ejecutable:** segundo ciclo de deploy con plan convergido, y cerrar 1508 (Slice 4 documental).
+`TASK-1480` (Production/clientes externos) sigue siendo el gate que nada de esto levanta.
+
 ## Active state — 2026-07-21 (TASK-1507: front door internal-only vivo)
 
 **La URL estable del shell interno de Globe es `https://globe.efeoncepro.com`.** Se sirve por un Global External

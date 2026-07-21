@@ -4,10 +4,21 @@
 
 `TASK-1507` cerró el 2026-07-21 y con eso cambian tres cosas del baseline que esta task importa:
 
-- **`maxScale` vivo es 3, no 1.** La spec de 1508 decía `maxScale=1` en seis lugares y lo pedía como valor a pinear
-  por Terraform. Es stale: `TASK-1465` (persistencia durable) está **complete** y limpió el gate de HA; ambos
-  servicios corren `maxScale=3` desde 2026-07-21, verificado antes y después de 1507. 1508 pinea el **valor vivo (3)**,
-  sin subirlo ni bajarlo. Pinear `maxScale=1` por IaC bajaría el techo vivo a la mitad en silencio.
+- **`maxScale` no era ni 1 ni 3: eran los dos a la vez, y el efectivo era 1.** Un servicio Cloud Run lleva un ceiling
+  **a nivel servicio** (`Service.scaling.maxInstanceCount`) y otro **a nivel revisión**
+  (`template.scaling.maxInstanceCount`), y **Cloud Run aplica el menor**. Ambos servicios tenían **servicio=1 /
+  revisión=3**, o sea techo efectivo **1** — mientras la spec original decía 1, el cierre de `TASK-1465` decía 3, y las
+  dos afirmaciones describían campos distintos sin saberlo. Ningún servicio de Globe corrió nunca más de una instancia,
+  así que **el spend fence cross-réplica que `TASK-1465` construyó jamás se ejercitó**.
+
+  La causa es la trampa que esta task existe para cerrar, en su forma más traicionera: **`--max-instances` escribe un
+  campo distinto según el subcomando** — `gcloud run deploy` (el workflow) escribía el de servicio, `gcloud run services
+  update` el de revisión. Por eso el workaround que varios docs prescribían para "restaurar" el techo tras un deploy era
+  inefectivo: escribía el campo equivocado y dejaba el efectivo en 1.
+
+  **Esta task corrige el techo a 3/3 efectivo**, con autorización explícita del operador (2026-07-21). No es "pinear el
+  valor vivo": es un **cambio funcional deliberado** que levanta un cap que nadie decidió y que mantenía sin ejercitar
+  una defensa de gasto ya construida. Terraform declara **ambos** campos para que ninguno pueda volver a derivar.
 - **El ingress quedó fijado por `gcloud`, sin gobierno IaC.** `globe-studio-internal` está en
   `internal-and-cloud-load-balancing` porque los servicios Cloud Run siguen fuera de Terraform; adoptarlos es
   justamente esta task. No es drift-trap del workflow (`deploy-internal.yml` no pasa `--ingress` y `gcloud run deploy`
@@ -18,13 +29,69 @@
 
 Blocker `TASK-1507` levantado 2026-07-21: `Blocked by` pasa a `none`.
 
+## Evidencia de ejecución — 2026-07-21 (Slices 2 y 3 aplicados en vivo)
+
+### Ownership por campo (Slice 1) — contrato vigente
+
+| Campo | Dueño | Dónde vive |
+|---|---|---|
+| `ingress` | Terraform | `cloud_run_services.tf` |
+| `invoker_iam_disabled` | Terraform | `cloud_run_services.tf` |
+| runtime service account | Terraform | `cloud_run_services.tf` |
+| env vars + secret refs | Terraform | `cloud_run_services.tf` (los secretos sólo como `secret_key_ref`) |
+| ceiling de escala (servicio **y** revisión) | Terraform | `cloud_run_services.tf` |
+| resources / timeout / concurrency / port | Terraform | `cloud_run_services.tf` |
+| `deletion_protection` | Terraform | `cloud_run_services.tf` |
+| invoker IAM binding de la api | Terraform | `google_cloud_run_v2_service_iam_member.api_invoker` |
+| **imagen del contenedor** | **workflow** | `deploy-internal.yml` |
+| `client` / `client_version` | nadie (metadata de la herramienta) | ignorado por `lifecycle.ignore_changes` |
+
+`ignore_changes` cubre exactamente tres entradas: la imagen, `client` y `client_version`. Los dos últimos no son
+configuración —Cloud Run los estampa con la herramienta que escribió último— y sin ignorarlos el plan quedaría
+permanentemente en rojo por algo cosmético, que es como un equipo aprende a dejar de leer planes. **Ampliar esa lista al
+contenedor o al template reabriría el drift de env, secretos, runtime SA y escala**, que es justo lo que esta task cierra.
+
+### Slice 2 — adopción brownfield (aplicado)
+
+- `tofu plan`: `2 to import, 0 to add, 2 to change, 0 to destroy`; **cero destroy/replace**. Los 2 cambios, explicados
+  campo por campo: `description` (adición) y `scaling.max_instance_count` **1 → 3** (la corrección del cap).
+- `tofu apply`: `2 imported, 0 added, 2 changed, 0 destroyed`. Plan posterior: **No changes**.
+- Binding invoker de la api adoptado aparte: `1 imported, 0 added, 0 changed, 0 destroyed`. Estaba vivo pero fuera de
+  IaC — era el único permiso entre internet y un service principal con autoridad de gasto, existiendo sólo como efecto
+  secundario de un `gcloud` manual.
+- Provider `~> 6.0` → `~> 7.0` (el ceiling a nivel servicio no existe en 6.x). Verificado sobre toda la config:
+  **76 de 78 recursos no-op** bajo la major nueva.
+- Postura preservada: web `INTERNAL_LOAD_BALANCER` + `invoker_iam_disabled=true`; api `ALL` + IAM-private.
+
+### Slice 3 — workflow image-only + prueba anti-drift (aplicado y probado)
+
+`deploy-internal.yml` pasó a `gcloud run deploy --image` y nada más. Deploy real ejecutado sobre
+`globe-studio-internal` (run `29872768853`, imagen `51ade01eda82`), y **el plan posterior quedó en `No changes`**:
+
+| Campo | Post-deploy |
+|---|---|
+| ingress | `INTERNAL_LOAD_BALANCER` ✅ |
+| `invokerIamDisabled` | `true` ✅ |
+| ceiling servicio / revisión | **3 / 3** ✅ (antes de este cambio, ese mismo deploy lo habría re-capado a 1) |
+| runtime SA | `web_runtime` ✅ |
+| env vars | 14 ✅ |
+| `client_version` | 560.0.0 → 568.0.0 (ignorado, por diseño) |
+
+Smokes post-deploy: federación humana por `https://globe.efeoncepro.com` → `human_federation_ok`; api anónimo → `403`;
+`run.app` del web → `404`.
+
+### Pendiente para cerrar
+
+- Segundo ciclo de deploy observado (la §Production verification sequence pide dos; se corrió uno).
+- Slice 4: runbook y handoff con el ownership por campo y la serialización apply/deploy.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -37,7 +104,7 @@ Blocker `TASK-1507` levantado 2026-07-21: `Blocked by` pasa a `none`.
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Diseño; servicios Cloud Run vivos fuera de Terraform y workflow gcloud como escritor de revisions`
+- Status real: `Slices 2-3 aplicados y verificados en vivo (servicios en Terraform, cap 1→3 corregido, workflow image-only con plan convergido); faltan 2.º ciclo de deploy y cierre documental`
 - Rank: `TBD`
 - Domain: `ops`
 - Blocked by: `none`
@@ -85,9 +152,9 @@ Reglas obligatorias:
 - Importar recursos vivos antes de aplicar; cualquier destroy/replace de un servicio aborta la ejecución.
 - Terraform y el workflow no pueden gobernar el mismo campo. `ignore_changes` se limita a la imagen/revisión que
   despliega el workflow; nunca se usa para ocultar drift amplio del template, seguridad, env o escala.
-- `globe-studio-internal`: `invoker_iam_disabled=true`, ingress `internal-and-cloud-load-balancing`, `maxScale=3`
+- `globe-studio-internal`: `invoker_iam_disabled=true`, ingress `internal-and-cloud-load-balancing`, ceiling **3 a nivel servicio Y a nivel revisión**
   (valor vivo verificado; `TASK-1465` complete limpió el gate de HA).
-- `globe-api-internal`: `invoker_iam_disabled=false`, IAM-private, audience `run.app`, `maxScale=3` (valor vivo
+- `globe-api-internal`: `invoker_iam_disabled=false`, IAM-private, audience `run.app`, ingress `all` (su caller llega por internet desde Vercel: endurecerlo cortaría la federación workload), ceiling 3/3 (valor vivo
   verificado; `TASK-1465` complete limpió el gate de HA).
 - Ningún secreto crudo entra a HCL, state, plan, logs o outputs; usar referencias de Secret Manager.
 
@@ -107,13 +174,13 @@ Reglas obligatorias:
 - `TASK-1507` completa: el dominio y el ingress final del web constituyen el baseline a importar.
 - Foundation IaC keyless `TASK-1464` y state remoto `gs://efeonce-globe-tfstate`.
 - Servicios vivos `globe-studio-internal` y `globe-api-internal` en `southamerica-west1`.
-- Provider `hashicorp/google`/`google-beta` `~> 6.0`; confirmar en Discovery la versión bloqueada que soporta
+- Provider `hashicorp/google`/`google-beta` **`~> 7.0`** (subido desde `~> 6.0` en esta task: el ceiling a nivel servicio `scaling.max_instance_count` **no existe** en 6.x. La major se verificó sobre toda la config: 76 de 78 recursos planean no-op). Ver en Discovery la versión que soporta
   `google_cloud_run_v2_service.invoker_iam_disabled`.
 
 ### Blocks / Impacts
 
 - Cierra el drift de Cloud Run pendiente en ADR-004 y el runbook de TASK-1464.
-- Deja una base reproducible para HA después de `TASK-1465`; no autoriza subir `maxScale` en esta task.
+- Deja una base reproducible para HA después de `TASK-1465` y **levanta el cap efectivo de 1 a 3**, con lo que el spend fence cross-réplica queda por fin ejercitable.
 - Cambia el contrato del workflow de deploy: ya no vuelve a declarar runtime SA, escala ni invoker policy.
 
 ### Files owned
@@ -172,7 +239,7 @@ Reglas obligatorias:
 
 - Entidades/tablas/views afectadas: `recursos GCP google_cloud_run_v2_service; sin tablas de dominio`
 - Invariantes que no se pueden romper:
-  - `web` conserva dominio/ALB, SSO, `maxScale=3` e invoker check deshabilitado en el servicio
+  - `web` conserva dominio/ALB, SSO, ceiling 3/3 e invoker check deshabilitado en el servicio
   - `api` conserva IAM perimeter + verificación in-app, audience `run.app` y `invoker_iam_disabled=false`
   - `ignore_changes` cubre sólo el campo de imagen/revisión propiedad del workflow
 - Tenant/space boundary: `sin cambio; workspace/identity permanecen server-derived`
@@ -251,7 +318,7 @@ Reglas obligatorias:
 ## Out of Scope
 
 - Crear o cambiar `globe.efeoncepro.com`, ALB, DNS, TLS, OAuth o ingress de cutover (`TASK-1507`).
-- Cambiar `maxScale` en cualquier dirección: el gate `TASK-1465` ya está cleared y los stores durables existen, así
+- Subir el ceiling **por encima de 3**: el gate `TASK-1465` ya está cleared y los stores durables existen, así
   que 1508 pinea el valor vivo (3) sin subirlo ni bajarlo. Un rollout HA que suba de 3 es una task aparte.
 - Migrar frontend/BFF, habilitar clientes externos o Production comercial (`TASK-1480`).
 - Cambiar código de dominio, API Contract Spine, providers creativos o capabilities.
@@ -322,7 +389,7 @@ completo antes de adoptar el siguiente. El tráfico y las URLs no cambian.
 
 - [ ] Ambos servicios están en Terraform sin destroy/replace y con protección contra borrado accidental.
 - [ ] Ownership por campo documentado y aplicado: Terraform config estable; workflow sólo image/revision.
-- [ ] `invoker_iam_disabled`, ingress, runtime SA, env/secret refs y `maxScale=3` (valor vivo) quedan pineados.
+- [x] `invoker_iam_disabled`, ingress, runtime SA, env/secret refs y el ceiling 3/3 quedan pineados por Terraform.
 - [ ] Deploy image-only genera revisión Ready, mantiene dominio/SSO/API privada y deja plan Terraform convergido.
 - [ ] `ignore_changes` cubre únicamente el path exacto de imagen; no oculta template/env/security/scale.
 - [ ] Runbook y handoff reflejan import, rollback, serialización y evidencia real.
@@ -347,11 +414,11 @@ completo antes de adoptar el siguiente. El tráfico y las URLs no cambian.
 
 ## Follow-ups
 
-- El gate `TASK-1465` (stores durables) ya está cleared; subir `maxScale` por encima del valor vivo (3) requiere de
+- Ejercitar por primera vez el spend fence cross-réplica, ahora que el cap efectivo dejó de ser 1. Subir el ceiling por encima de 3 requiere de
   todos modos una task de rollout HA explícita, no este import.
 - Cloud Armor/WAF y readiness externa siguen en `TASK-1480`.
 
 ## Open Questions
 
-- ¿La versión bloqueada del provider soporta `invoker_iam_disabled` en `google` o requiere `google-beta`?
+- ~~¿La versión del provider soporta `invoker_iam_disabled` en `google` o requiere `google-beta`?~~ **RESUELTA:** `google` 6.50.0 ya lo soporta como atributo top-level; no hace falta `google-beta`. Lo que SÍ obligó a subir a `~> 7.0` fue otro campo: el ceiling `scaling.max_instance_count` **a nivel servicio**.
 - ¿Qué path exacto de `lifecycle.ignore_changes` a `image` produce plan convergido sin ocultar otros campos del template?

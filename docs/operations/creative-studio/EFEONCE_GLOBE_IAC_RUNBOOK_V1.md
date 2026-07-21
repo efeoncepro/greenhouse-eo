@@ -477,3 +477,41 @@ parcial con `SERVICE_DISABLED`, y es **determinista para un proyecto nuevo** aun
   ADR-004 lo declara como regla dura anti-regresión: **NUNCA** leer "Cloud Run para el shell interno"
   como "Cloud Run para el frontend cliente comercial" — son superficies distintas
   ([`EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md`](../../architecture/creative-studio/EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md)).
+
+## Cloud Run bajo Terraform — ownership por campo (TASK-1508, aplicado 2026-07-21)
+
+Los dos servicios Cloud Run dejaron de estar fuera de IaC. El contrato es **un solo escritor por campo**:
+
+| Campo | Dueño |
+|---|---|
+| `ingress`, `invoker_iam_disabled`, runtime SA, env + secret refs, ceiling de escala, resources, timeout, concurrency, port, `deletion_protection`, invoker IAM binding de la api | **Terraform** (`infra/terraform/cloud_run_services.tf`) |
+| imagen del contenedor | **`deploy-internal.yml`** |
+| `client` / `client_version` | nadie: metadata de la herramienta, ignorada |
+
+`gcloud run deploy` preserva todo lo que no se le especifica, así que el workflow puede desplegar una imagen sin tocar
+configuración. **NUNCA agregues flags de configuración de vuelta al workflow**: cada uno recrea el problema de dos
+escritores que esta task cerró.
+
+### La trampa de los dos ceilings (leer antes de tocar escala)
+
+Un servicio Cloud Run tiene ceiling **a nivel servicio** (`Service.scaling.maxInstanceCount`) y **a nivel revisión**
+(`template.scaling.maxInstanceCount`), y **aplica el menor**. Peor: `--max-instances` escribe **un campo distinto según
+el subcomando** — `gcloud run deploy` el de servicio, `gcloud run services update` el de revisión.
+
+Eso produjo un cap silencioso: ambos servicios tenían servicio=1 / revisión=3, o sea techo efectivo **1**, mientras toda
+la documentación declaraba 3. El spend fence cross-réplica de `TASK-1465` nunca llegó a ejercitarse. Terraform ahora
+declara **los dos** campos; gobernarlos exige provider `google` **>= 7.x** (el de servicio no existe en 6.x).
+
+### Serialización apply / deploy
+
+`tofu apply` y el workflow de deploy **no se corren en simultáneo**: compiten por la misma revisión. Secuencia segura:
+esperar a que el deploy termine (`gh run watch`) y recién ahí planear/aplicar, o al revés.
+
+### Prueba anti-drift (repetirla ante cualquier cambio del workflow)
+
+1. Disparar `deploy-internal.yml` sobre un servicio.
+2. Esperar readiness y correr los smokes (`smoke-human-federation.mjs` por el dominio; api anónimo → 403).
+3. `tofu plan` → debe dar **No changes**. Cualquier otra cosa significa que el workflow volvió a escribir configuración.
+
+Evidencia de la primera corrida (run `29872768853`, imagen `51ade01eda82`): plan posterior **No changes**, con ingress,
+invoker posture, ceiling 3/3, runtime SA y las 14 env vars intactos.
