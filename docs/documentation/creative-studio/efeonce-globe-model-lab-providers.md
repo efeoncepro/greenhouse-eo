@@ -100,7 +100,7 @@ Recordatorio de superficies y facturación: **generar** es keyless en Vertex; **
 - **Las 4 capacidades con archivo de entrada** (editar imagen, upscalear imagen/video, extender video) tienen su ruta verificada pero su corrida completa **espera la resolución de huella→bytes** desde el bucket privado.
 - **El editar encadenable está verificado solo en Omni (video).** Generalizarlo a los demás motores (Seedream, Seedance, Nano-Banana por referencia) y soportar **varias referencias o referencias combinadas** es `TASK-1490`, aún pendiente.
 - **La llave de Fal es provisoria.** El canary Fal se verificó usando temporalmente la key existente del repo de Greenhouse (excepción documentada); Globe debe **provisionar su propia** `GLOBE_FAL_API_KEY` antes de cualquier uso sostenido.
-- **No hay registro contable de créditos comerciales.** El freno de gasto de hoy es un **fence de seguridad** en memoria (se reinicia con el proceso), no el ledger durable a prueba de pérdidas — esa es una capacidad aparte, aún pendiente.
+- **No hay registro contable de créditos comerciales.** El freno de gasto de hoy es un **fence de seguridad**, no el ledger durable a prueba de pérdidas — esa es una capacidad aparte, aún pendiente. Desde `TASK-1465` el fence de seguridad ya corre durable en producción (sus topes se guardan en Cloud SQL y sobreviven reinicios y réplicas); en modo de desarrollo/ensayo sigue viviendo en memoria y se reinicia con el proceso.
 - **No auto-elige el mejor motor.** La matriz de recomendación compara lo medible; el juicio creativo es siempre un paso humano.
 
 > **Detalle técnico y código (repo hermano `efeonce-globe`):**

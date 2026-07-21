@@ -8,6 +8,43 @@
 
 # Handoff
 
+## Active state — 2026-07-21 (TASK-1465: persistencia durable desplegada + verificada en vivo)
+
+**Globe deja de vivir en memoria.** `TASK-1465` le dio a Globe su primera base de datos durable y desplegó
+los dos servicios contra ella. Cloud SQL **`globe-pg`** (Postgres 16, `southamerica-west1`, tier chico,
+~US$15–30/mo fijo), **keyless**: la app autentica como **usuario IAM** por el conector de Cloud SQL (sin
+contraseñas en el runtime), sólo por conector (sin acceso de red directo). Es **de Globe**, nunca compartida
+con Greenhouse. La persistencia vive en `packages/database` (cliente + runner de migraciones); el setup de
+roles de una sola vez (`bootstrap.sql`) crea el rol dueño `globe_owner` y luego revuelve la contraseña de
+`postgres` — no queda contraseña de admin en pie.
+
+**Los cinco almacenes son durables** detrás de las mismas interfaces (drop-in, sin reescribir consumidores):
+experimentos, evaluaciones, el **spend fence** (ahora **atómico entre réplicas** — el freno de seguridad que
+recién habilita correr multi-réplica), sesiones + transacciones de OAuth, más una bitácora de auditoría
+append-only. Tablas del esquema `globe`: `experiments`, `evaluation_reports`, `human_sessions`,
+`oauth_transactions`, `spend_fence_runs`, `spend_fence_days`, `audit_log`.
+
+**Desplegado en vivo:** ambos servicios Cloud Run corren durables a **`maxScale=3`** (hasta 3 réplicas; bajan a
+cero cuando ociosos, ~US$0 extra) — `globe-studio-internal` (cáscara web/login) y `globe-api-internal` (API del
+Model Lab), **cada uno con su propio usuario IAM** de base. **Verificado en vivo:** golpear `/auth/start` en el
+servicio corriendo **persistió una fila `oauth_transactions` en Postgres** — evidencia real desde el servicio,
+no sólo por el seam local.
+
+**Fix de build (Dockerfile construye `packages/database`):** el Dockerfile no compilaba el paquete de
+persistencia; se corrigió para que la imagen incluya `packages/database`. Un servicio hace durable su runtime
+sólo si declara las tres `GLOBE_POSTGRES_INSTANCE_CONNECTION_NAME` / `GLOBE_POSTGRES_DATABASE` /
+`GLOBE_POSTGRES_USER` (el usuario IAM de runtime del servicio); si falta alguna, **arranca en memoria** — sólo
+permitido en el environment `internal_smoke`.
+
+**⚠️ Drift-trap conocido → `TASK-1508`.** `deploy-internal.yml` hoy **fija `--max-instances=1`** por hardcode,
+así que un redespliegue por ese workflow **baja el `maxScale` a 1** hasta que Terraform gobierne ese valor.
+Workaround inmediato tras un deploy por workflow: `gcloud run services update <servicio> --max-instances=3`. El
+saneamiento de raíz (Terraform gobierna la config estable, el workflow queda image/revision-only) es
+`TASK-1508`. **Diferido:** un modelo rico de workspace / members / grants. Docs: funcional
+[`docs/documentation/creative-studio/persistencia-durable-globe.md`], manual
+[`docs/manual-de-uso/creative-studio/operar-persistencia-globe.md`], spec
+`docs/architecture/creative-studio/EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md`.
+
 ## Active state — 2026-07-21 (front door e IaC separados: TASK-1507 → TASK-1508)
 
 **Decisión (ADR-004, `EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md`).** Para la release

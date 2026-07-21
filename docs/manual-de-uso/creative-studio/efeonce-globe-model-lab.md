@@ -40,14 +40,14 @@ El **runbook operativo completo** (habilitación con el flag, el flujo real por 
 - **NUNCA** trates `candidate_ready` como aprobación: la autorización de una pieza es un paso humano aparte.
 - **NUNCA** llames a un SDK de proveedor directo (ni por script/CLI/UI/MCP): todo pasa por command → adapter → runner. El proveedor real se inyecta en el runner, nunca se invoca por fuera.
 - **NUNCA** prendas el proveedor real sin credenciales federadas (WIF/ADC), bucket privado y alertas de presupuesto vivas (los deja la infra de `TASK-1464`).
-- **NUNCA** confundas el **spend fence** (freno de seguridad en memoria) con el registro contable de créditos comerciales (durable, capacidad aparte, aún pendiente).
+- **NUNCA** confundas el **spend fence** (freno de seguridad; durable en producción desde `TASK-1465`, en memoria en desarrollo/ensayo) con el registro contable de créditos comerciales (durable, capacidad aparte, aún pendiente).
 - **NUNCA** compartas base de datos, sesión, bucket, secreto ni rol admin entre Globe y Greenhouse; **NUNCA** crees un registry/namespace de tareas paralelo en Globe.
 
 ## Problemas comunes
 
 - **Todo experimento responde `policy_blocked`:** el Lab está apagado. Enciéndelo con `GLOBE_LAB_ENABLED=true` (piloto interno) o confirma que la surface que usas no está `policy-blocked` (hoy la UI y el MCP lo están a propósito, hasta la promoción de ruta).
 - **`day_cap_exceeded` aunque tu corrida es chica:** el freno diario del espacio de trabajo ya se consumió con corridas previas del día. Espera al reinicio del día (UTC) o ajusta `GLOBE_LAB_DAILY_CAP_CREDITS` para el piloto.
-- **El tope diario "se reinició solo":** esperado — el spend fence de hoy vive en memoria del proceso y se reinicia al reiniciar el servicio. Es un freno de seguridad, no el ledger durable.
+- **El tope diario "se reinició solo":** solo puede pasar en desarrollo/ensayo, donde el spend fence vive en memoria del proceso y se reinicia al reiniciar el servicio. **En producción no pasa**: desde `TASK-1465` el fence es durable (Cloud SQL) y el conteo diario sobrevive reinicios y réplicas. Sigue siendo un freno de seguridad, no el ledger comercial durable.
 - **No valida Globe con `pnpm local:check` de Greenhouse:** correcto, son toolchains distintos. Valida Globe con `pnpm check` / `pnpm build` dentro de `efeonce-globe`.
 
 ## Referencias técnicas

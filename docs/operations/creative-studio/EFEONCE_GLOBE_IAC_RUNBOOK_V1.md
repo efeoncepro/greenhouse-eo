@@ -19,7 +19,11 @@ el grant `aiplatform.user` de Vertex sobre **`api_runtime`** (la SA que corre el
 `api_runtime`, no `web_runtime`, porque el Lab sólo se autoriza al service principal de api mode
 —corregido durante el rollout de TASK-1490, `iam.tf::api_runtime_vertex`—),
 budget/alertas y una señal de observabilidad (alerta si se crea una SA key: invariante
-keyless). Los outputs versionados los consume TASK-1457; el Model Lab **no** duplica IaC.
+keyless), y **Cloud SQL `globe-pg`** — el datastore durable de Globe (`infra/terraform/cloud_sql.tf`,
+TASK-1465): la instancia Postgres 16 más sus 3 IAM DB users (`web_runtime`/`api_runtime`/`deployer`),
+los grants `cloudsql.client`/`cloudsql.instanceUser`, `sqladmin.googleapis.com` habilitado, PITR+backups
+y deletion protection; keyless IAM auth, connector-only (sin authorized networks). Los outputs
+versionados los consume TASK-1457; el Model Lab **no** duplica IaC.
 
 ## Regla de oro (por qué esto es supervisado)
 
@@ -112,5 +116,11 @@ Tras aplicar (que crea el pool/provider `github-actions`):
   browser no presenta ID token, y la capa de app aguanta anónimo → 401), mientras `globe-api-internal`
   **no** lo tiene (anónimo → 403 en el perímetro). Traer los servicios a IaC para fijar ese flag
   explícitamente es trabajo pendiente.
-- No crea Cloud SQL/tenancy (TASK-1465) ni secretos de provider (rollout del canary live).
+- **Cloud SQL `globe-pg` YA está en Terraform** (`cloud_sql.tf`, TASK-1465 — aplicado + live-verified
+  2026-07-21, plan `12 added / 0 destroyed`): la instancia durable de Globe, sus 3 IAM DB users y sus
+  grants los gobierna este IaC. Lo que **queda pendiente** es (a) traer las Cloud Run **services** de la
+  app a Terraform (TASK-1508 — cierra también el drift de `invokerIamDisabled`/ingress/scale y persiste
+  el `maxScale`) y (b) el **modelo rico de tenancy** (workspaces/members/grants), diferido. Arquitectura:
+  [`EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md`](../../architecture/creative-studio/EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md).
+- No crea secretos de provider (rollout del canary live).
 - No habilita producción ni clientes externos. `enable_budget` default OFF.

@@ -6,6 +6,32 @@
 
 # Changelog
 
+## 2026-07-21 — TASK-1465: persistencia durable (Globe deja de vivir en memoria) — desplegada + verificada en vivo
+
+- **Primera base de datos durable de Globe.** Cloud SQL **`globe-pg`** (Postgres 16, `southamerica-west1`, tier
+  chico, ~US$15–30/mo fijo), **keyless**: la app autentica como **usuario IAM** por el conector de Cloud SQL (sin
+  contraseñas en el runtime), sólo por conector (sin red directa). De Globe, nunca compartida con Greenhouse. La
+  persistencia vive en `packages/database` (cliente + runner de migraciones); el `bootstrap.sql` de una sola vez
+  crea el rol dueño `globe_owner` y luego revuelve la contraseña de `postgres` — sin contraseña de admin en pie.
+- **Los cinco almacenes durables detrás de las mismas interfaces (drop-in):** experimentos, evaluaciones, el
+  **spend fence** (ahora **atómico entre réplicas** — el freno de seguridad que recién habilita multi-réplica),
+  sesiones + transacciones de OAuth, más una bitácora de auditoría append-only. Tablas del esquema `globe`:
+  `experiments`, `evaluation_reports`, `human_sessions`, `oauth_transactions`, `spend_fence_runs`,
+  `spend_fence_days`, `audit_log`.
+- **Desplegado en vivo:** ambos servicios Cloud Run corren durables a **`maxScale=3`** (bajan a cero ociosos,
+  ~US$0 extra) — `globe-studio-internal` (web/login) y `globe-api-internal` (API del Model Lab), cada uno con su
+  **propio usuario IAM**. **Verificado en vivo:** golpear `/auth/start` en el servicio persistió una fila
+  `oauth_transactions` en Postgres — evidencia desde el servicio, no sólo por el seam local.
+- **Fix de build:** el Dockerfile ahora compila `packages/database`. Un servicio corre durable sólo si declara
+  `GLOBE_POSTGRES_INSTANCE_CONNECTION_NAME` / `GLOBE_POSTGRES_DATABASE` / `GLOBE_POSTGRES_USER`; si falta alguna,
+  arranca en memoria (sólo permitido en el environment `internal_smoke`).
+- **⚠️ Drift-trap → `TASK-1508`:** `deploy-internal.yml` hoy fija `--max-instances=1` por hardcode, así que un
+  redespliegue por ese workflow baja el `maxScale` a 1 hasta que Terraform gobierne el valor. **Diferido:** un
+  modelo rico de workspace / members / grants.
+- **Docs:** funcional `docs/documentation/creative-studio/persistencia-durable-globe.md`; manual
+  `docs/manual-de-uso/creative-studio/operar-persistencia-globe.md`; spec
+  `docs/architecture/creative-studio/EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md`.
+
 ## 2026-07-20 — TASK-1502: estimate previewable (el `✨N` antes de gastar)
 
 - **Extracción del estimate:** `LabRunnerPort.estimate` pasó de `{ experiment }` a `{ quote: LabQuoteInputV1 }`

@@ -112,7 +112,7 @@ El Model Lab tiene **tres frenos** independientes, y conviene verlos juntos:
 - **Tope diario por espacio de trabajo.** Aunque cada corrida quepa en su tope, un espacio no puede exceder un total diario. Este freno protege contra "muchas corridas chicas que suman demasiado".
 - **Interruptor de apagado (kill switch), apagado por defecto.** El Model Lab nace **apagado**. Mientras esté apagado, **cualquier** comando de experimento responde "bloqueado por política" — ni siquiera arranca. Se enciende a propósito, para el piloto interno, y se puede apagar en cualquier momento.
 
-Un matiz honesto sobre el presupuesto: hoy los topes viven en memoria del proceso y se reinician si el servicio se reinicia. Eso es aceptable para un Lab interno y acotado; es un **freno de seguridad**, no el registro contable de créditos comerciales (ese registro, durable y a prueba de pérdidas, llega en una tarea posterior). El freno de seguridad y el registro contable son dos cosas distintas a propósito.
+Un matiz honesto sobre el presupuesto: en modo de desarrollo/ensayo los topes viven en memoria del proceso y se reinician si el servicio se reinicia. **En producción ya no pasa**: desde `TASK-1465` los topes se guardan en una base de datos durable (Cloud SQL), así que sobreviven reinicios del servicio y varias copias corriendo a la vez. Aun así, ese freno **sigue siendo un freno de seguridad**, no el registro contable de créditos comerciales (ese registro, durable y a prueba de pérdidas, es una capacidad aparte y llega en una tarea posterior). El freno de seguridad y el registro contable son dos cosas distintas a propósito.
 
 ### 8. Cada quién ve solo lo suyo
 
@@ -171,7 +171,7 @@ Para ser exactos sobre el estado real de hoy:
 - Las 4 capacidades que necesitan un archivo de entrada (editar imagen, upscalear imagen/video, extender video) tienen su ruta verificada, pero su corrida de punta a punta espera la resolución de huella→bytes desde el bucket privado.
 - Está **apagado por defecto**; se enciende solo para el piloto interno.
 - **No hay clientes ni producción.** Es uso interno, gobernado por Greenhouse (programa EPIC-028).
-- El registro contable de créditos comerciales (durable, a prueba de pérdidas) es una capacidad aparte, aún pendiente — el spend fence de hoy es un **freno de seguridad** en memoria, no ese registro.
+- El registro contable de créditos comerciales (durable, a prueba de pérdidas) es una capacidad aparte, aún pendiente — el spend fence de hoy es un **freno de seguridad**, no ese registro. Desde `TASK-1465` ese freno ya corre durable en producción (sus topes se guardan en Cloud SQL y sobreviven reinicios y réplicas), pero sigue siendo un freno de seguridad, no el registro contable comercial.
 
 Lo que **sí** existe y quedó probado es **todo el mecanismo del experimento**: preparar con tope, ingesta privada por huella, estimar, frenar antes de gastar, reservar (con tope diario), correr, saldar y dejar evidencia por intento — todo sobre el mismo contrato central.
 
@@ -186,6 +186,7 @@ A eso se suma, desde `TASK-1490`, el **refinamiento de un candidato** con una so
 > Este documento explica en lenguaje simple; no reemplaza la especificación técnica. La documentación gobernante vive en Greenhouse (este árbol); en `efeonce-globe` solo queda el código. Para el contrato completo (máquina de estados del experimento, contrato de spend fence, manifiesto por intento, política de ingesta privada, seam de proveedor), consultar:
 >
 > - Especificación de arquitectura canónica: [EFEONCE_GLOBE_MODEL_LAB_V1.md](../../architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md).
+> - Persistencia durable (`TASK-1465`, Cloud SQL Postgres keyless IAM, wired en producción): [EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md](../../architecture/creative-studio/EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md).
 > - Runbook operativo — cómo correr un experimento paso a paso: [EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md](../../operations/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md) **§7-bis (Model Lab)** y **§7-bis-2 (refinar un candidato: flags, permisos y verificación)**.
 > - Runbook de infraestructura (bucket privado del Lab, despliegue sin llaves, presupuesto): [EFEONCE_GLOBE_IAC_RUNBOOK_V1.md](../../operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md).
 > - Camino central donde se enchufa el Lab: [efeonce-globe-api-contract-spine.md](efeonce-globe-api-contract-spine.md) e invariantes de fundación [PLATFORM_FOUNDATION_V1.md](../../architecture/creative-studio/PLATFORM_FOUNDATION_V1.md).
@@ -199,7 +200,7 @@ A eso se suma, desde `TASK-1490`, el **refinamiento de un candidato** con una so
 >
 > Código fuente relevante (repo hermano `efeonce-globe`):
 >
-> - Máquina de estados, comandos/readers, validación de payload e ingesta privada, store en memoria: [`packages/domain/src/model-lab.ts`](../../../../efeonce-globe/packages/domain/src/model-lab.ts).
+> - Máquina de estados, comandos/readers, validación de payload e ingesta privada, store en memoria (el doble de desarrollo; el store durable de `TASK-1465` vive en `packages/database`): [`packages/domain/src/model-lab.ts`](../../../../efeonce-globe/packages/domain/src/model-lab.ts).
 > - Spend fence (tope por corrida + tope diario, reservar/saldar/liberar): [`packages/domain/src/spend-fence.ts`](../../../../efeonce-globe/packages/domain/src/spend-fence.ts).
 > - Proveedor de ensayo determinístico, runner y elección del mecanismo de refinamiento (el único lugar donde se invoca un proveedor): [`apps/creative-runner/src/index.ts`](../../../../efeonce-globe/apps/creative-runner/src/index.ts).
 > - Retención de resultados (lo que hace posible refinar por referencia): [`apps/creative-runner/src/output-ingest.ts`](../../../../efeonce-globe/apps/creative-runner/src/output-ingest.ts).

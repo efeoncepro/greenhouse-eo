@@ -186,8 +186,11 @@ prompt-first, no interpreta brief). **Sincroniza** projects durables con `1465` 
   verdad, no gasta).
 - **Proyección curada `LabEstimatePreviewV1`:** expone `estimatedCredits` (`✨N`) + `referenceRoute` (contrato
   de fidelidad, = `estimate.route`) + `estimatedDurationSeconds?` + `withinHardCap?`; **omite** `provider`,
-  `model`/slug, costo vendor y margen. `withinDayCap?` queda declarado pero **no poblado** (el fence in-memory
-  per-process no da una señal confiable entre réplicas; se puebla con el fence durable de `TASK-1468`).
+  `model`/slug, costo vendor y margen. `withinDayCap?` queda declarado pero **no poblado** cuando el fence corre
+  in-memory per-process (el `LabSpendFence` no da una señal confiable entre réplicas). El fence durable que sí da
+  esa señal compartida entre réplicas es `DurableSpendFence`, shipado por **TASK-1465** y wired en producción
+  (Cloud SQL, keyless IAM, maxScale=3, ver [`EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md`](./EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md));
+  el credit ledger comercial durable sigue siendo `TASK-1468`, aparte.
 - **Unidad de crédito = `ruta × output-shape`, nunca el modelo.** El fake sigue keyeando por capability
   (limitación conocida documentada); los adapters reales varían por shape vía el threading de `TASK-1501`.
 - **SDK:** `estimateExperiment(query)` en `packages/sdk`.

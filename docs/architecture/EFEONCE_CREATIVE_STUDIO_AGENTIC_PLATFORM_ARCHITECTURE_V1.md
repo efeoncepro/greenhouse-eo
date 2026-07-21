@@ -469,6 +469,19 @@ evidencia técnica; su plan operativo referencia las tasks canónicas y no crea 
 > corrida contra proveedor real quedan pendientes del canary de SPEC-002. Spec canónica:
 > `docs/architecture/creative-studio/EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md`.
 
+---
+
+> **Estado — `TASK-1465` implementado (2026-07-21, deployed + live-verified).** Globe aterrizó su **primer datastore
+> durable**: un Cloud SQL `globe-pg` propio (Postgres 16, `southamerica-west1`, IAM keyless sobre el Cloud SQL
+> connector, provisto en Terraform). El §5 de esta arquitectura —*Durable operational store: Dedicated Cloud SQL for
+> PostgreSQL*— deja de ser sólo objetivo: seis tablas tenant-scoped + un `audit_log` append-only respaldan, detrás de
+> sus ports ya existentes, los cinco stores antes **in-memory / per-proceso** (sesiones, transacciones OAuth,
+> experimentos, reportes de evaluación y el spend fence de seguridad). Ambos servicios Cloud Run corren durable en
+> `maxScale=3`: esto **levanta el techo de HA** (`maxScale=1`) que ADR-004 hard-gateaba en esta task. **Queda
+> diferido:** el modelo rico de workspace/members/grants y el mecanismo exacto de tenancy PostgreSQL/RLS (§13);
+> persistir `maxScale` por IaC es `TASK-1508`. Spec canónica:
+> `docs/architecture/creative-studio/EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md`.
+
 | Phase | Outcome | Explicitly excluded |
 | --- | --- | --- |
 | 0 — foundation | New repo, project boundaries, tenant/auth, assets, ledger skeleton, audit/telemetry, provider contract, one internal template | Client access, payments, free canvas |

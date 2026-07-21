@@ -101,4 +101,25 @@ GitHub workflow so Terraform owns stable configuration/security while the workfl
 ## Open questions (deliberately not decided)
 
 - El **framework y host exactos del frontend cliente comercial** (Vercel + Next.js vs Cloud Run + framework) — decisión diferida a `TASK-1505` + pre-`TASK-1480`, con este ADR como el que la mantiene abierta.
-- Si el **store durable de sesión/OAuth** vive dentro de `TASK-1465` o en una child task nombrada — se resuelve al planificar 1465; `maxScale > 1` queda hard-gated hasta entonces.
+- Si el **store durable de sesión/OAuth** vive dentro de `TASK-1465` o en una child task nombrada — **resuelto por `TASK-1465`** (ver Delta 2026-07-21): vive en `TASK-1465` bajo `packages/database`, respaldado por Cloud SQL `globe-pg`; el hard-gate de `maxScale > 1` quedó satisfecho.
+
+## Delta 2026-07-21 — `TASK-1465` aterrizó persistencia durable; el gate de HA quedó cleared
+
+`TASK-1465` está **complete, deployed y live-verified (2026-07-21)**. El primer datastore durable de Globe —un Cloud
+SQL `globe-pg` propio (Postgres 16, `southamerica-west1`, IAM keyless sobre el Cloud SQL connector)— respalda ahora,
+detrás de sus ports ya existentes, los cinco stores que este ADR describió como in-memory / per-proceso (sesiones,
+transacciones OAuth, experimentos, reportes de evaluación y el spend fence de seguridad) más un audit log append-only.
+Ambos servicios Cloud Run corren durable en `maxScale=3`.
+
+**Esto satisface el gate de HA que este ADR hard-blockeaba.** El Context/Decision de arriba describe la realidad
+runtime **as-of 2026-07-20** (in-memory / `maxScale=1`, con `maxScale > 1` hard-gated en `TASK-1465`). Ese gate quedó
+**cleared**: el backend durable eliminó el techo in-memory y los servicios ya corren en `maxScale=3`. La **decisión**
+del ADR no cambia (internal-only en Cloud Run, frontend comercial diferido, front door vía `TASK-1507`); sólo se
+levantó el blocker de HA. Por la regla "never rewrite history" (Revisit triggers) el texto baseline se conserva como
+su snapshot 2026-07-20 y esta Delta registra el cambio de estado.
+
+**Sigue abierto (no lo cierra esta Delta):** el modelo rico de workspace/members/grants tenancy queda diferido;
+**gobernar el valor `maxScale` por IaC es `TASK-1508`** (el `deploy-internal.yml` aún hardcodea `--max-instances=1`,
+un drift-trap hasta que Terraform lo posea); y el acceso externo / Production sigue gateado por `TASK-1480`. Detalle:
+[`EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md`](EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md) (SPEC-007) +
+`docs/tasks/complete/TASK-1465-globe-workspace-tenancy-persistence-audit.md`.

@@ -92,10 +92,13 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
 - `TASK-1506` cerró la decisión (ADR-004). `TASK-1507` implementa el custom domain **antes** del rollout interno de
   `TASK-1505`, del rollout del workbench `TASK-1474`, del canary/cutover de callbacks de `TASK-1469` y de publicar
   deep links en `TASK-1475`. Hasta que `TASK-1507` publique el dominio, la base URL estable es el `*.run.app` + SSO.
-- Un dominio internal-only puede implementarse (vía `TASK-1507`) sin esperar `TASK-1480`, siempre con una sola
-  réplica mientras la sesión/OAuth siga en memoria. Alta disponibilidad o clientes requieren persistencia durable
-  (`TASK-1465`, hard-gate de `maxScale > 1`); Production/clientes externos permanecen bloqueados por `TASK-1480` y
-  un release explícito posterior. El host del frontend cliente comercial es una decisión diferida (ADR-004).
+- Un dominio internal-only puede implementarse (vía `TASK-1507`) sin esperar `TASK-1480`. La persistencia durable
+  **ya aterrizó**: `TASK-1465` (complete, deployed + live-verified 2026-07-21) movió sesión/OAuth/experimentos/
+  eval/spend-fence + un audit log append-only a Cloud SQL `globe-pg`, con lo que **se levantó el techo de HA** que
+  gateaba `maxScale > 1` — ambos servicios Cloud Run corren durable en `maxScale=3`. Gobernar el valor `maxScale`
+  por IaC es `TASK-1508` (el `deploy-internal.yml` aún hardcodea `--max-instances=1`). Production/clientes externos
+  permanecen bloqueados por `TASK-1480` y un release explícito posterior. El host del frontend cliente comercial es
+  una decisión diferida (ADR-004).
 - La adopción IaC de servicios no bloquea el dominio: `TASK-1508` ocurre después y no autoriza subir réplicas.
 
 ### Parallel execution contract
@@ -270,3 +273,18 @@ crédito = ruta×shape, nunca el modelo. Reusa `1493/1494/1496/1497/1498` (primi
 `1495`** (formatos → output-shape), y `1499` queda como única exclusiva del Workbench. `TASK-1474` pasa a
 depender también de `1500–1503`. Spec canónica:
 `docs/architecture/creative-studio/EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md`.
+
+## Delta 2026-07-21 — TASK-1465 complete (persistencia durable, techo de HA levantado)
+
+`TASK-1465` queda **complete, deployed + live-verified (2026-07-21)**: Globe pasó de no tener datastore (todo
+in-memory / per-proceso) a **durable**. Su primer datastore es un Cloud SQL `globe-pg` propio (Postgres 16,
+`southamerica-west1`, IAM keyless sobre el connector) provisto en Terraform. Los cinco stores antes en memoria
+—sesiones, transacciones OAuth, experimentos, reportes de evaluación y el spend fence de seguridad— más un audit
+log append-only ahora persisten detrás de sus ports; ambos servicios Cloud Run corren durable en `maxScale=3`.
+
+**Esto levanta el techo de HA** que ADR-004 (`TASK-1506`) hard-gateaba en esta task: el ceiling in-memory /
+`maxScale=1` ya no existe. **Queda diferido:** el modelo rico de workspace/members/grants tenancy (follow-up) y
+persistir el valor `maxScale` por Terraform (**`TASK-1508`**, el `deploy-internal.yml` aún hardcodea
+`--max-instances=1`). Production/clientes externos siguen gateados por `TASK-1480`. Spec canónica:
+`docs/architecture/creative-studio/EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md` (SPEC-007) +
+`docs/tasks/complete/TASK-1465-globe-workspace-tenancy-persistence-audit.md`.

@@ -308,7 +308,7 @@ Agregar una capability real (p. ej. `globe.run.prepare` con handler) es un proce
 | --- | --- | --- |
 | Replay **dedup con estado** (rechazar/reconciliar un replay real) | TASK-1457 (primera capability con estado) | El fixture inerte replayea determinístico porque no tiene estado; no hay dedup store |
 | Mapeo **ID-token → principal por identidad** (múltiples service identities, capabilities por caller) | TASK-1457 | `api` mode colapsa a un único `internalServicePrincipal`; la protección es IAM de Cloud Run |
-| **Tenancy store** (workspace/tenancy canónico de Globe) | TASK-1465 | Binding data-driven desde la org del broker (`greenhouse-org:<clientId>`), no un store |
+| **Tenancy / session store durable** (workspace/tenancy canónico de Globe, sesiones persistidas) | TASK-1465 (**shipped**, wired en prod) | `DurableSessionStore` sobre Cloud SQL (keyless IAM, maxScale=3), wired en prod; el binding data-driven desde la org del broker (`greenhouse-org:<clientId>`) se mantiene; `InternalSmokeSessionStore` queda como doble de `internal_smoke` |
 | Transportes dedicados **MCP / CLI / worker / sister-platform** | Tareas futuras por superficie | Declarados en coverage; el gate ejecutable es `coverage.http` hasta que exista su transporte |
 
 ## Scoring 4-pilar (honesto, con riesgo residual)
@@ -323,7 +323,7 @@ Parsers server-side que descartan campos espurios, fail-closed en `#authorize` (
 
 ### Resilience — Medio-Alto
 
-Toda respuesta lleva `correlationId` propagado extremo a extremo (request → context → result/error → audit), timeouts en el SDK (`AbortSignal.timeout` + `AbortSignal.any`), y un `SpineAuditEventV1` por dispatch que separa audit de telemetría operacional. Los errores nunca filtran bodies upstream. **Riesgo residual**: el store de sesión del piloto es in-memory (`InternalSmokeSessionStore`, solo `environment: 'internal_smoke'`), sin persistencia ni convergencia de revocación robusta; un reinicio pierde sesiones. Es intencional para el piloto interno, pero no es resiliente para producción — la persistencia y el tenancy store (TASK-1465) son prerequisito de rollout.
+Toda respuesta lleva `correlationId` propagado extremo a extremo (request → context → result/error → audit), timeouts en el SDK (`AbortSignal.timeout` + `AbortSignal.any`), y un `SpineAuditEventV1` por dispatch que separa audit de telemetría operacional. Los errores nunca filtran bodies upstream. **Riesgo residual**: en `internal_smoke` el store de sesión es in-memory (`InternalSmokeSessionStore`, solo `environment: 'internal_smoke'`), sin persistencia ni convergencia de revocación robusta; un reinicio pierde sesiones. **En producción esto ya no aplica**: **TASK-1465** shipó `DurableSessionStore` (Cloud SQL Postgres, keyless IAM) detrás del mismo puerto, wired en ambos servicios Cloud Run a `maxScale=3` — las sesiones sobreviven reinicios y réplicas (ver [`EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md`](./EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md)). La convergencia de revocación robusta sigue como refinamiento pendiente.
 
 ### Scalability — Medio-Alto
 

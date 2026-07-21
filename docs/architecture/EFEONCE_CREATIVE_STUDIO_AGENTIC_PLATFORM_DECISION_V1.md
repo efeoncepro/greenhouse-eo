@@ -7,7 +7,7 @@
 
 ## Architecture Decision 2026-07-11 — la capacidad creativa nace agentic y fuera de Greenhouse
 
-- **Status:** `Accepted / implementation started` — el repositorio y el proyecto GCP inicial existen; runtime, datos, credenciales y gasto de proveedores siguen gateados.
+- **Status:** `Accepted / implementation started` — el repositorio, el proyecto GCP y el **primer datastore durable** de Globe (Cloud SQL `globe-pg`, `TASK-1465` deployed + live-verified) existen; el modelo de datos rico de tenencia, la habilitación de clientes y el gasto comercial siguen gateados. Ver Delta 2026-07-21.
 - **Date:** 2026-07-11
 - **Owner:** Efeonce Creative Technology / Product
 - **Scope:** plataforma independiente para producir, revisar y operar imágenes, video, audio y, cuando corresponda, 3D. Incluye interfaz humana, agentes y MCP; no incluye el runtime de Greenhouse.
@@ -223,3 +223,25 @@ retención de outputs rompería la refinabilidad de todo candidato ya producido.
 en vivo por el seam completo el 2026-07-20 (reference-based, cross-model, stateful y referencias combinadas
 imagen+vídeo). **Validated as of:** 2026-07-20. Detalle técnico:
 `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md` → §"Edit / refine cross-model".
+
+---
+
+## Delta 2026-07-21 — el Studio ya es durable: aterrizó su primer datastore (TASK-1465)
+
+**Estado que cambia.** Este ADR nació con el runtime, los datos y las credenciales gateados y un `Validated as of:
+2026-07-19 — … sin workloads ni secretos`. Ese snapshot quedó atrás: `TASK-1465` está **complete, deployed y
+live-verified (2026-07-21)**. Globe pasó de **no tener base de datos** (todo in-memory / per-proceso) a **durable**.
+
+El §1 de la Decisión —*"Creative Studio tendrá … base de datos … propios"*— y el §5 —*"conserva una copia durable
+autorizada … ledger append-only"*— dejan de ser sólo objetivo: existe un Cloud SQL `globe-pg` propio (Postgres 16,
+`southamerica-west1`, IAM keyless sobre el connector, en Terraform) que respalda, detrás de sus ports ya existentes,
+los cinco stores antes en memoria (sesiones, transacciones OAuth, experimentos, reportes de evaluación y el spend
+fence de seguridad) más un audit log append-only. Ambos servicios Cloud Run corren durable en `maxScale=3`, lo que
+**levanta el techo de HA** que ADR-004 gateaba en esta task.
+
+**Sigue diferido (no lo abre esta Delta):** el modelo rico de workspace/members/grants persistido; el mecanismo
+exacto de tenancy PostgreSQL/RLS que la arquitectura dejó abierto; persistir `maxScale` por IaC (`TASK-1508`); y la
+habilitación de clientes/créditos comerciales, que sigue gateada por sus decisiones de legal/finanzas/derechos.
+**Confidence:** alta — verificado en vivo. **Validated as of:** 2026-07-21. Detalle técnico:
+[`creative-studio/EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md`](creative-studio/EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md)
+(SPEC-007) + `docs/tasks/complete/TASK-1465-globe-workspace-tenancy-persistence-audit.md`.

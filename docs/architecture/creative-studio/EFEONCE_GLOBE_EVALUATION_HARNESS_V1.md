@@ -23,7 +23,7 @@ Y como todo lo del Lab: no habilita producción. Un report es **evidencia técni
 Código canónico:
 
 - Contratos versionados (fidelity vocab, fixture/rubric/report, payload, capability/command/reader names): `packages/contracts/src/index.ts`
-- Motor de evaluación (fixtures como dato, rúbricas, checks objetivos, `evaluate` command, readers, registro, store in-memory): `packages/domain/src/evaluation.ts`
+- Motor de evaluación (fixtures como dato, rúbricas, checks objetivos, `evaluate` command, readers, registro, `InMemoryEvaluationReportStore` — doble de dev; el impl durable `DurableEvaluationReportStore` de TASK-1465 vive en `packages/database`): `packages/domain/src/evaluation.ts`
 - Helper programático que reusa el camino real del Lab: `runModelLabExperiment` en `packages/domain/src/model-lab.ts`
 - Wiring del runtime (reusa las deps del Lab + report store + grant del service principal): `apps/studio-web/src/app.ts`
 - Métodos SDK tipados: `packages/sdk/src/index.ts`
@@ -111,9 +111,9 @@ Idéntica al Model Lab: `ui` y `mcp` en `policy-blocked` (declaradas, gobernadas
 | Pilar | Cómo lo cumple |
 | --- | --- |
 | **Safety** | El verdict nunca auto-aprueba craft (`objective_pass_pending_human` exige revisión humana). Los fixtures declaran derechos; los inputs son sintéticos/internos. Reusa el kill switch + spend fence del Lab (una eval no puede gastar fuera del cap). Reports scopeados al workspace. |
-| **Robustness** | Checks objetivos deterministas sobre el manifest; separación dura objetivo/humano; rúbrica atada a su contrato de fidelidad (mismatch → `invalid_request`); fixture/rúbrica desconocidos → `not_found`; el store in-memory aísla por `workspace::reportId`. |
+| **Robustness** | Checks objetivos deterministas sobre el manifest; separación dura objetivo/humano; rúbrica atada a su contrato de fidelidad (mismatch → `invalid_request`); fixture/rúbrica desconocidos → `not_found`; el store aísla por `workspace::reportId` (el `InMemoryEvaluationReportStore` es el doble de dev; el `DurableEvaluationReportStore` de TASK-1465 corre wired en prod). |
 | **Resilience** | El harness degrada con el Lab: si el kill switch está OFF, `runModelLabExperiment` falla cerrado y la eval devuelve el error canónico. Las limitaciones se declaran en cada report (nada se presenta como más de lo que es). |
-| **Scalability** | Fixtures y rúbricas son dato: nuevos briefs/contratos no tocan el motor. El `EvaluationReportStorePort` abstrae la persistencia (in-memory hoy, durable después sin tocar el dominio). El motor de checks es una lista extensible de `ObjectiveCheckId`. |
+| **Scalability** | Fixtures y rúbricas son dato: nuevos briefs/contratos no tocan el motor. El `EvaluationReportStorePort` abstrae la persistencia: `InMemoryEvaluationReportStore` como doble de dev, y `DurableEvaluationReportStore` (TASK-1465, Cloud SQL keyless IAM) wired en producción, sin tocar el dominio. El motor de checks es una lista extensible de `ObjectiveCheckId`. |
 
 ## Reglas duras (NUNCA / SIEMPRE)
 
@@ -132,6 +132,6 @@ Idéntica al Model Lab: `ui` y `mcp` en `policy-blocked` (declaradas, gobernadas
 
 - El **juicio humano** en sí (la UI/flujo donde un revisor responde los `humanCriteria`) — hoy sólo se declaran; la surface `ui` está `policy-blocked`.
 - La corrida contra una **ruta de proveedor real** — depende del canary live de SPEC-002; hasta entonces los reports declaran la limitación "proveedor fake".
-- El **store durable** de reports por tenencia (hoy in-memory); el port ya está abstraído.
+- El **store durable** de reports por tenencia ya no está pendiente: **TASK-1465** shipó `DurableEvaluationReportStore` (Cloud SQL, keyless IAM) detrás del port ya abstraído, wired en prod; el `InMemoryEvaluationReportStore` queda como doble de dev. Ver [`EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md`](./EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md).
 - Un **golden brief de edit** (refinar un candidato como caso de prueba versionado) — el fixture no expresa intención de edit y el fake que corre la eval no retiene outputs; la receta para agregarlo está en `input_lineage_intact` más arriba.
 - **Agregación multi-muestra** / significancia estadística — hoy cada report es una muestra única y lo declara como limitación.
