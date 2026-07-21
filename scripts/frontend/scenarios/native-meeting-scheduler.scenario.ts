@@ -35,6 +35,8 @@ export const scenario: CaptureScenario = {
       'validation-recovery',
       'reactive-field-recovery',
       'corporate-email-rejection',
+      'server-confirmed-shell-resolution-confirmation-shell-transition',
+      'server-confirmed-shell-resolution-confirmation-shell-settled',
       'confirmed-summary',
     ],
     requiredRegions: [
@@ -173,7 +175,19 @@ export const scenario: CaptureScenario = {
     { kind: 'wait', selector: '.ghm-email-verification.is-success', timeout: 3000 },
     { kind: 'fill', selector: '[name="company"]', value: 'Efeonce' },
     { kind: 'click', selector: '.ghm-check-group input[type="checkbox"]' },
-    { kind: 'click', selector: '.ghm-form-actions .ghm-primary' },
+    {
+      kind: 'interaction',
+      interaction: {
+        name: 'server-confirmed-shell-resolution',
+        action: { kind: 'click', selector: '.ghm-form-actions .ghm-primary' },
+        intent: 'Recomponer el scheduler completo como comprobante sólo después de la confirmación del servidor.',
+        frames: [
+          { label: 'confirmation-shell-transition', atMs: 60, clipSelector: '[data-capture="native-meeting-scheduler"]' },
+          { label: 'confirmation-shell-settled', atMs: 620, clipSelector: '[data-capture="native-meeting-scheduler"]' },
+        ],
+        reducedMotion: 'skip',
+      },
+    },
     { kind: 'wait', selector: '[data-phase="confirmed"]', timeout: 5000 },
     {
       kind: 'mark',

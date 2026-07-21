@@ -35,6 +35,8 @@ const iconNames = [
   'calendar-check',
   'arrow-right',
   'circle-check',
+  'shield-check',
+  'calendar-cog',
   'alert-circle',
   'loader-2',
 ]

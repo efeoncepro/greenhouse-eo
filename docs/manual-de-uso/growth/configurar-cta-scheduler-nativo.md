@@ -16,6 +16,9 @@
 6. Verifica que el launcher no cambie de tamaño al abrir: desktop debe usar diálogo y móvil full-screen.
 7. Selecciona fecha y horario, cierra y vuelve a abrir. La misma selección debe permanecer.
 8. Verifica `greenhouse_cta_clicked`/`greenhouse_cta_action_started` y el funnel `gh_meeting_step_reached` sin PII. No debe existir conversión por abrir.
+9. Completa una reserva controlada y revisa la confirmación: debe reemplazar todo el calendario, mostrar fecha,
+   rango horario, zona y Teams, y no volver a ofrecer selección, fallback ni otra acción de booking.
+10. Comprueba que el foco llegue al título confirmado y que el email o receipt interno no aparezcan en DOM/dataLayer.
 
 ## Degradación y rollback
 

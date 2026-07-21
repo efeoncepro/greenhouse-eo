@@ -31,6 +31,10 @@
   recuperación inmediata mientras se corrige, consentimiento on-change y correo en fases sintaxis→verificación
   corporativa. El carril estable de estado combina copy, ARIA live y Tabler success/error/pending sin depender de color
   ni mover el layout. GVC `2026-07-21T11-37-07_native-meeting-scheduler` pasó 39 frames en 1440/820/390.
+- La confirmación dejó de ser una alerta dentro del calendario: un receipt server-confirmed recompone todo el shell,
+  muestra rango horario/zona/duración/Teams y próximos pasos sin PII ni IDs internos. La primera pasada de header oscuro
+  + card fue descartada por feedback visual; la dirección final usa una superficie luminosa continua, banda temporal
+  abierta y motion espacial/reduced-motion. GVC `2026-07-21T12-01-53_native-meeting-scheduler`: 45 frames, exit 0.
 
 - La migración dev quedó aplicada y leída de vuelta; un race live de PostgreSQL probó un único claim, conflicto
   semántico, replay único y cero residuo. Se provisionó el secreto HMAC dedicado con acceso del runtime y se verificó

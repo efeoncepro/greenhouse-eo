@@ -123,6 +123,18 @@ export const formatMeetingTimeWithOffset = (startsAt: string, timezone: string):
   return `${time}${offset ? ` ${offset}` : ''}`
 }
 
+export const formatMeetingTimeRangeWithOffset = (startsAt: string, endsAt: string, timezone: string): string => {
+  const start = formatTime(startsAt, timezone)
+  const end = formatTime(endsAt, timezone)
+
+  const offset = new Intl.DateTimeFormat('es-CL', {
+    timeZone: timezone,
+    timeZoneName: 'shortOffset',
+  }).formatToParts(new Date(startsAt)).find(part => part.type === 'timeZoneName')?.value ?? ''
+
+  return `${start}–${end}${offset ? ` ${offset}` : ''}`
+}
+
 const monthLabel = (date: string): string => {
   const formatted = new Intl.DateTimeFormat('es-CL', { month: 'long', year: 'numeric', timeZone: 'UTC' })
     .format(new Date(`${date.slice(0, 7)}-15T12:00:00Z`))
@@ -161,7 +173,10 @@ type FieldValidationState = 'neutral' | 'pending' | 'valid' | 'invalid'
 
 type MeetingSummarySlot = {
   startsAt: string
+  endsAt?: string
+  timezone?: string
   durationMinutes?: number
+  channel?: 'microsoft_teams'
 }
 
 const FIELD_ICON_CLASS: Record<'firstName' | 'lastName' | 'email' | 'company', string> = {
@@ -466,7 +481,9 @@ export class MeetingRenderer {
     if (this.state.phase === 'details') this.mountTurnstile(scene)
 
     if (this.previousPhase !== this.state.phase && ['details', 'confirmed', 'error', 'ambiguous'].includes(this.state.phase)) {
-      const focusSelector = this.state.phase === 'details' ? '.ghm-form-title' : '.ghm-message-title'
+      const focusSelector = this.state.phase === 'details'
+        ? '.ghm-form-title'
+        : this.state.phase === 'confirmed' ? '.ghm-confirmation-title' : '.ghm-message-title'
 
       queueMicrotask(() => scene.querySelector<HTMLElement>(focusSelector)?.focus())
     }
@@ -475,16 +492,32 @@ export class MeetingRenderer {
   private renderSignalRail(): HTMLElement {
     const rail = element('header', 'ghm-signal')
     const atmosphere = element('span', 'ghm-signal-atmosphere')
-    const eyebrow = element('p', 'ghm-eyebrow', copy.eyebrow)
-    const title = element('h2', 'ghm-title', this.layoutRecipe === 'guided' ? copy.compactTitle : copy.title)
+    const confirmed = this.state.phase === 'confirmed'
+    const eyebrow = element('p', 'ghm-eyebrow', confirmed ? copy.confirmedEyebrow : copy.eyebrow)
+
+    const title = element('h2', 'ghm-title', confirmed
+      ? copy.confirmedRailTitle
+      : this.layoutRecipe === 'guided' ? copy.compactTitle : copy.title)
 
     atmosphere.setAttribute('aria-hidden', 'true')
     title.tabIndex = -1
     title.dataset.ghmFocus = ''
     const liveStatus = element('div', 'ghm-live-status')
 
-    liveStatus.append(element('span', 'ghm-live-dot'), element('span', undefined, 'Disponibilidad sincronizada'))
-    rail.append(atmosphere, liveStatus, eyebrow, title, element('p', 'ghm-intro', copy.intro))
+    liveStatus.append(
+      element('span', 'ghm-live-dot'),
+      element('span', undefined, confirmed ? copy.confirmedRailStatus : 'Disponibilidad sincronizada'),
+    )
+    rail.append(atmosphere, liveStatus, eyebrow, title, element('p', 'ghm-intro', confirmed ? copy.confirmedRailBody : copy.intro))
+
+    if (confirmed) {
+      const assurance = element('div', 'ghm-confirmation-assurance')
+
+      assurance.append(uiIcon('shield-check', 'ghm-confirmation-assurance-icon'), element('span', undefined, 'Confirmación registrada de forma segura'))
+      rail.append(assurance)
+
+      return rail
+    }
 
     const facts = element('div', 'ghm-facts')
 
@@ -551,7 +584,7 @@ export class MeetingRenderer {
     }
 
     if (this.state.phase === 'confirmed') {
-      work.append(this.renderMessage(copy.confirmedTitle, copy.confirmedBody, 'success'))
+      work.append(this.renderConfirmation())
 
       return work
     }
@@ -607,6 +640,96 @@ export class MeetingRenderer {
     message.append(title, element('p', 'ghm-message-body', bodyText))
 
     return message
+  }
+
+  private renderConfirmation(): HTMLElement {
+    const appointment = this.state.confirmation?.appointment
+    const confirmation = element('section', 'ghm-confirmation')
+    const titleId = `ghm-${this.instanceId}-confirmation-title`
+
+    confirmation.dataset.capture = 'meeting-confirmation'
+    confirmation.setAttribute('role', 'status')
+    confirmation.setAttribute('aria-live', 'polite')
+    confirmation.setAttribute('aria-atomic', 'true')
+    confirmation.setAttribute('aria-labelledby', titleId)
+
+    const status = element('div', 'ghm-confirmation-status')
+    const iconShell = element('span', 'ghm-confirmation-icon-shell')
+
+    iconShell.append(uiIcon('circle-check', 'ghm-confirmation-icon'))
+    status.append(iconShell, element('span', 'ghm-confirmation-eyebrow', copy.confirmedEyebrow))
+
+    const title = element('h3', 'ghm-confirmation-title', copy.confirmedTitle)
+
+    title.id = titleId
+    title.tabIndex = -1
+    title.dataset.ghmFocus = ''
+    confirmation.append(status, title, element('p', 'ghm-confirmation-body', copy.confirmedBody))
+
+    if (appointment) confirmation.append(this.renderConfirmationReceipt(appointment))
+    if (this.layoutRecipe === 'guided') confirmation.append(this.renderConfirmationNextSteps())
+
+    return confirmation
+  }
+
+  private renderConfirmationReceipt(slot: MeetingSummarySlot): HTMLElement {
+    const timezone = slot.timezone ?? this.timezone()
+    const receipt = element('div', 'ghm-confirmation-receipt')
+    const label = element('span', 'ghm-receipt-label')
+
+    receipt.dataset.capture = 'meeting-confirmation-receipt'
+    label.append(uiIcon('calendar-check', 'ghm-receipt-label-icon'), element('span', undefined, copy.confirmedReceiptLabel))
+    receipt.append(
+      label,
+      element('strong', 'ghm-receipt-date', formatMeetingDate(slot.startsAt, timezone, 'long')),
+      element(
+        'span',
+        'ghm-receipt-time',
+        slot.endsAt
+          ? formatMeetingTimeRangeWithOffset(slot.startsAt, slot.endsAt, timezone)
+          : formatMeetingTimeWithOffset(slot.startsAt, timezone),
+      ),
+    )
+
+    const facts = element('div', 'ghm-receipt-facts')
+
+    for (const [iconName, labelText] of [
+      ['clock', `${slot.durationMinutes ?? 30} min`],
+      ['video', 'Microsoft Teams'],
+      ['world', formatMeetingTimezoneLabel(timezone, new Date(slot.startsAt))],
+    ]) {
+      const fact = element('span', 'ghm-receipt-fact')
+
+      fact.append(uiIcon(iconName, 'ghm-receipt-fact-icon'), element('span', undefined, labelText))
+      facts.append(fact)
+    }
+
+    receipt.append(facts)
+
+    return receipt
+  }
+
+  private renderConfirmationNextSteps(): HTMLElement {
+    const next = element('div', 'ghm-confirmation-next')
+    const list = element('ul', 'ghm-next-list')
+
+    next.dataset.capture = 'meeting-confirmation-next-steps'
+    next.append(element('h3', 'ghm-next-title', copy.confirmedNextTitle))
+
+    for (const [iconName, label] of [
+      ['mail', copy.confirmedNextEmail],
+      ['video', copy.confirmedNextTeams],
+      ['calendar-cog', copy.confirmedNextChanges],
+    ]) {
+      const item = element('li', 'ghm-next-item')
+
+      item.append(uiIcon(iconName, 'ghm-next-icon'), element('span', undefined, label))
+      list.append(item)
+    }
+
+    next.append(list, element('p', 'ghm-confirmation-help', copy.confirmedHelp))
+
+    return next
   }
 
   private renderCalendar(): HTMLElement {
@@ -1156,6 +1279,21 @@ export class MeetingRenderer {
     agenda.dataset.capture = 'meeting-agenda'
     agenda.setAttribute('aria-label', copy.chooseTime)
 
+    if (this.state.phase === 'confirmed') {
+      if (this.layoutRecipe === 'guided') {
+        agenda.hidden = true
+        agenda.setAttribute('aria-hidden', 'true')
+
+        return agenda
+      }
+
+      agenda.classList.add('ghm-confirmation-aside')
+      agenda.setAttribute('aria-label', copy.confirmedNextTitle)
+      agenda.append(this.renderConfirmationNextSteps())
+
+      return agenda
+    }
+
     if (this.state.phase === 'schedule') {
       const selectedDay = this.state.availability?.days.find(day => day.date === this.state.selectedDate)
 
@@ -1299,8 +1437,8 @@ export class MeetingRenderer {
     selectionHeader.append(uiIcon('calendar-check', 'ghm-selection-icon'), element('span', undefined, copy.selectedTime))
     selection.append(
       selectionHeader,
-      element('strong', 'ghm-agenda-date', formatMeetingDate(slot.startsAt, this.timezone(), 'long')),
-      element('span', 'ghm-agenda-time', formatMeetingTimeWithOffset(slot.startsAt, this.timezone())),
+      element('strong', 'ghm-agenda-date', formatMeetingDate(slot.startsAt, slot.timezone ?? this.timezone(), 'long')),
+      element('span', 'ghm-agenda-time', formatMeetingTimeWithOffset(slot.startsAt, slot.timezone ?? this.timezone())),
       element('span', 'ghm-agenda-meta', `${slot.durationMinutes ?? 30} min · Microsoft Teams`),
     )
 

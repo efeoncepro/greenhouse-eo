@@ -30,4 +30,9 @@ incompleto explica cómo corregirlo y, después, confirma la recuperación mient
 su formato y luego verifica de forma asíncrona que sea corporativo. Los estados siempre combinan icono, texto y semántica
 accesible, y la reserva permanece deshabilitada mientras el correo esté verificándose o rechazado.
 
+Cuando el servidor confirma el booking, el calendario completo se recompone como comprobante: desaparecen
+disponibilidad, stepper, fallback y acciones de reserva. La nueva superficie muestra el rango horario y la zona del
+appointment confirmado, duración, Teams y tres próximos pasos. No expone correo, identificadores del proveedor ni
+el receipt de conversión; tampoco afirma que el email ya fue entregado.
+
 Arquitectura: [Growth Meetings Scheduler](../../architecture/GREENHOUSE_GROWTH_MEETINGS_SCHEDULER_ARCHITECTURE_V1.md). Manual: [Configurar un CTA con scheduler nativo](../../manual-de-uso/growth/configurar-cta-scheduler-nativo.md).

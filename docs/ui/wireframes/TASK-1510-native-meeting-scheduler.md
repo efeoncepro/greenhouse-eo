@@ -157,6 +157,26 @@ The host supplies `activation-mode` and an optional maximum recipe. The componen
 | pending | “Confirmando tu reunión…” | retain the intent; never submit a new key |
 | success | “Tu reunión quedó agendada.” | show the server-confirmed summary and email/calendar expectation |
 
+## Confirmed shell
+
+Confirmation replaces the scheduler composition rather than occupying its former work plane.
+
+```text
+┌─────────────────────────────────────────────────────────────────────────┐
+│ RESERVA REGISTRADA │ TU REUNIÓN QUEDÓ AGENDADA      │ QUÉ SIGUE        │
+│                    │                                 │                   │
+│ Todo listo         │ TU CITA                         │ Correo            │
+│                    │ Miércoles 22 de julio           │ Teams             │
+│ Confirmación       │ 09:15–09:45 GMT-4              │ Cambios           │
+│ registrada de      │ 30 min · Teams · Tu horario    │                   │
+│ forma segura       │                                 │ Ayuda de entrega  │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+In `guided`, the dark completion header becomes compact and the temporal receipt plus next steps share one scroll
+owner. There is no independent agenda, sticky booking action or second primary CTA after confirmation. The host
+continues to own close/back behavior for dialog and full-screen envelopes.
+
 ## Accessibility contract
 
 - The launcher is a real button with a stable accessible name and visible focus.

@@ -1297,6 +1297,210 @@ export const MEETING_RENDERER_CSS = `
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='guided'] .ghm-facts { gap: 7px 16px; margin-top: 9px; }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='guided'] .ghm-steps { margin-top: 10px; }
 
+/* Meeting Confirmation Receipt — the entire scheduler resolves into one success shell. */
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-phase='confirmed'] {
+  position: relative;
+  min-height: 560px;
+  background: var(--gh-meeting-paper);
+  animation: ghm-confirmation-shell-enter 360ms var(--gh-meeting-ease) both;
+}
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-phase='confirmed']::after {
+  content: '';
+  position: absolute;
+  z-index: 8;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 28%, color-mix(in srgb, var(--gh-meeting-accent) 24%, transparent) 50%, transparent 72%);
+  transform: translateX(-115%);
+  animation: ghm-confirmation-sweep 560ms var(--gh-meeting-ease) both;
+}
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-phase='confirmed'] .ghm-signal {
+  justify-content: center;
+  background:
+    radial-gradient(circle at 18% 82%, color-mix(in srgb, var(--gh-meeting-accent) 17%, transparent), transparent 35%),
+    linear-gradient(155deg, var(--gh-meeting-ink-soft), var(--gh-meeting-ink) 72%);
+}
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-phase='confirmed'] .ghm-signal-atmosphere {
+  width: 310px;
+  opacity: 0.75;
+}
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-confirmation-assurance {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 34px;
+  padding-top: 18px;
+  border-top: 1px solid color-mix(in srgb, var(--gh-meeting-on-ink-strong) 14%, transparent);
+  color: var(--gh-meeting-on-ink-muted);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-confirmation-assurance-icon { color: var(--gh-meeting-accent); }
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-confirmation {
+  display: grid;
+  align-content: center;
+  max-width: 620px;
+  min-height: 100%;
+}
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-confirmation-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-confirmation-icon-shell {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  aspect-ratio: 1;
+  border: 1px solid color-mix(in srgb, var(--gh-meeting-success) 25%, transparent);
+  border-radius: 50%;
+  color: var(--gh-meeting-success);
+  background: color-mix(in srgb, var(--gh-meeting-accent-soft) 78%, var(--gh-meeting-paper));
+  box-shadow: 0 0 0 7px color-mix(in srgb, var(--gh-meeting-accent) 7%, transparent);
+}
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-confirmation-icon { font-size: 1.25rem; }
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-confirmation-eyebrow,
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-receipt-label {
+  color: var(--gh-meeting-accent-strong);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-confirmation-title {
+  max-width: 13ch;
+  margin: 0;
+  color: var(--gh-meeting-ink);
+  font-size: clamp(2rem, 3.6cqi, 3.6rem);
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-confirmation-body {
+  max-width: 56ch;
+  margin: 18px 0 28px;
+  color: var(--gh-meeting-muted);
+  font-size: 0.94rem;
+  line-height: 1.62;
+}
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-confirmation-receipt {
+  position: relative;
+  display: grid;
+  gap: 5px;
+  padding: 22px 24px;
+  border: 1px solid var(--gh-meeting-line);
+  border-inline-start: 4px solid var(--gh-meeting-accent-strong);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--gh-meeting-paper-alt) 72%, var(--gh-meeting-paper));
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--gh-meeting-ink) 7%, transparent);
+}
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-receipt-label { display: flex; align-items: center; gap: 7px; margin-bottom: 7px; }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-receipt-label-icon { color: var(--gh-meeting-success); }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-receipt-date { color: var(--gh-meeting-ink); font-size: 1rem; line-height: 1.35; }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-receipt-time {
+  color: var(--gh-meeting-ink);
+  font-size: clamp(1.65rem, 3cqi, 2.35rem);
+  font-variant-numeric: tabular-nums;
+  font-weight: 760;
+  letter-spacing: -0.035em;
+}
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-receipt-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-top: 10px;
+  padding-top: 13px;
+  border-top: 1px solid var(--gh-meeting-line);
+}
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-receipt-fact {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--gh-meeting-muted);
+  font-size: 0.75rem;
+}
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-receipt-fact-icon { color: var(--gh-meeting-accent-strong); }
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-confirmation-aside {
+  justify-content: center;
+  background: color-mix(in srgb, var(--gh-meeting-paper-alt) 72%, var(--gh-meeting-paper));
+}
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-confirmation-next { display: grid; align-content: center; width: 100%; }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-next-title {
+  margin: 0 0 24px;
+  color: var(--gh-meeting-ink);
+  font-size: 1.25rem;
+  letter-spacing: -0.025em;
+}
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-next-list { display: grid; gap: 18px; margin: 0; padding: 0; list-style: none; }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-next-item {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  color: var(--gh-meeting-text);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-next-icon {
+  margin-top: 3px;
+  color: var(--gh-meeting-accent-strong);
+  font-size: 1rem;
+}
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-confirmation-help {
+  margin: 24px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--gh-meeting-line);
+  color: var(--gh-meeting-muted);
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='guided'][data-phase='confirmed'] .ghm-signal {
+  padding: 24px 20px;
+}
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='guided'][data-phase='confirmed'] .ghm-live-status,
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='guided'][data-phase='confirmed'] .ghm-eyebrow,
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='guided'][data-phase='confirmed'] .ghm-intro,
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='guided'][data-phase='confirmed'] .ghm-confirmation-assurance { display: none; }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='guided'][data-phase='confirmed'] .ghm-work { padding: 30px 18px max(28px, var(--gh-meeting-host-bottom-inset)); }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='guided'][data-phase='confirmed'] .ghm-confirmation { min-height: 0; }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='guided'][data-phase='confirmed'] .ghm-confirmation-title { font-size: clamp(2rem, 9cqi, 2.45rem); }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='guided'][data-phase='confirmed'] .ghm-confirmation-body { margin-block: 16px 24px; font-size: 0.9rem; }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='guided'][data-phase='confirmed'] .ghm-confirmation-receipt { padding: 19px 20px; }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='guided'][data-phase='confirmed'] .ghm-receipt-time { font-size: clamp(1.45rem, 7.5cqi, 1.85rem); }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='guided'][data-phase='confirmed'] .ghm-confirmation-next { margin-top: 30px; padding-top: 26px; border-top: 1px solid var(--gh-meeting-line); }
+
+@keyframes ghm-confirmation-shell-enter {
+  from { opacity: 0.72; transform: scale(0.992); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes ghm-confirmation-sweep {
+  0% { opacity: 0; transform: translateX(-115%); }
+  28% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(115%); }
+}
+
 @container (max-width: 650px) {
   :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-calendar-footer { align-items: flex-start; flex-direction: column; }
   :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-calendar td { height: 50px; }
@@ -1308,6 +1512,195 @@ export const MEETING_RENDERER_CSS = `
   :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-today-label { display: none; }
   :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-availability-meter { width: 18px; margin-top: 4px; }
   :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-calendar-check { inset: 4px 4px auto auto; font-size: 0.66rem; }
+}
+
+/* Confirmation shell v2 — light temporal workspace, no portal header or card stack. */
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-phase='confirmed'] {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.52fr) minmax(440px, 1.38fr) minmax(260px, 0.78fr);
+  min-height: 590px;
+  background:
+    radial-gradient(circle at 55% 12%, color-mix(in srgb, var(--gh-meeting-accent) 9%, transparent), transparent 31%),
+    linear-gradient(120deg, var(--gh-meeting-paper), color-mix(in srgb, var(--gh-meeting-paper-alt) 58%, var(--gh-meeting-paper)));
+  animation: ghm-confirmation-resolve 420ms var(--gh-meeting-ease) both;
+}
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-phase='confirmed']::after { display: none; }
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-phase='confirmed'] .ghm-signal {
+  grid-column: 1;
+  grid-row: 1;
+  display: flex;
+  justify-content: space-between;
+  padding: 34px 28px;
+  border: 0;
+  border-inline-end: 1px solid color-mix(in srgb, var(--gh-meeting-accent-strong) 18%, var(--gh-meeting-line));
+  color: var(--gh-meeting-ink);
+  background:
+    radial-gradient(circle at 30% 88%, color-mix(in srgb, var(--gh-meeting-accent) 20%, transparent), transparent 36%),
+    color-mix(in srgb, var(--gh-meeting-accent-soft) 46%, var(--gh-meeting-paper));
+}
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-phase='confirmed'] .ghm-signal-atmosphere { display: none; }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-phase='confirmed'] .ghm-live-status {
+  display: inline-flex;
+  margin: 0;
+  color: var(--gh-meeting-accent-strong);
+}
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-phase='confirmed'] .ghm-eyebrow {
+  margin: auto 0 10px;
+  color: var(--gh-meeting-accent-strong);
+}
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-phase='confirmed'] .ghm-title {
+  max-width: 9ch;
+  color: var(--gh-meeting-ink);
+  font-size: clamp(1.55rem, 2cqi, 2.1rem);
+  line-height: 1.02;
+}
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-phase='confirmed'] .ghm-intro {
+  margin: 16px 0 0;
+  color: var(--gh-meeting-muted);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-confirmation-assurance {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-color: color-mix(in srgb, var(--gh-meeting-accent-strong) 18%, transparent);
+  color: var(--gh-meeting-muted);
+}
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-phase='confirmed'] .ghm-work {
+  grid-column: 2;
+  grid-row: 1;
+  padding: clamp(38px, 4cqi, 64px);
+  background: transparent;
+}
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-confirmation { max-width: 680px; }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-confirmation-status { margin-bottom: 18px; }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-confirmation-icon-shell {
+  width: 36px;
+  border: 0;
+  color: var(--gh-meeting-paper);
+  background-color: var(--gh-meeting-success);
+  box-shadow: 0 0 0 7px color-mix(in srgb, var(--gh-meeting-accent) 10%, transparent);
+}
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-confirmation-icon { font-size: 1.05rem; }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-confirmation-title {
+  max-width: 15ch;
+  font-size: clamp(2.35rem, 3.25cqi, 3.35rem);
+  line-height: 0.96;
+}
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-confirmation-body { margin-block: 16px 34px; }
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-confirmation-receipt {
+  display: grid;
+  gap: 6px;
+  padding: 25px 0 23px;
+  border: 0;
+  border-block: 1px solid var(--gh-meeting-line);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-confirmation-receipt::before {
+  content: '';
+  position: absolute;
+  inset: -1px auto auto 0;
+  width: 118px;
+  height: 2px;
+  background: var(--gh-meeting-accent-strong);
+  transform-origin: left;
+  animation: ghm-confirmation-line 520ms 120ms var(--gh-meeting-ease) both;
+}
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-receipt-label { margin-bottom: 10px; }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-receipt-date { font-size: 0.95rem; }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-receipt-time {
+  font-size: clamp(2.25rem, 3.5cqi, 3.75rem);
+  line-height: 1.02;
+}
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-receipt-facts { margin-top: 15px; padding-top: 15px; }
+
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-phase='confirmed'] .ghm-confirmation-aside {
+  grid-column: 3;
+  grid-row: 1;
+  display: flex;
+  justify-content: center;
+  padding: clamp(34px, 3.2cqi, 52px) clamp(26px, 2.8cqi, 44px);
+  border: 0;
+  border-inline-start: 1px solid var(--gh-meeting-line);
+  background: transparent;
+}
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-next-title { margin-bottom: 30px; font-size: 1.05rem; }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-next-list { gap: 24px; counter-reset: confirmation-step; }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-next-item {
+  position: relative;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 12px;
+  font-size: 0.78rem;
+}
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-next-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  inset: 24px auto -17px 8px;
+  width: 1px;
+  background: var(--gh-meeting-line);
+}
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-next-icon { color: var(--gh-meeting-success); }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-confirmation-help { margin-top: 30px; }
+
+@keyframes ghm-confirmation-resolve {
+  from { opacity: 0; clip-path: inset(0 0 7% 0 round var(--gh-meeting-radius)); transform: translateY(8px); }
+  to { opacity: 1; clip-path: inset(0 round var(--gh-meeting-radius)); transform: translateY(0); }
+}
+
+@keyframes ghm-confirmation-line {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@container (max-width: 980px) {
+  :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-phase='confirmed'] {
+    grid-template-columns: minmax(0, 1.35fr) minmax(250px, 0.75fr);
+    min-height: 0;
+  }
+  :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-phase='confirmed'] .ghm-signal {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px 24px;
+    padding: 22px 30px;
+    border-inline-end: 0;
+    border-block-end: 1px solid color-mix(in srgb, var(--gh-meeting-accent-strong) 18%, var(--gh-meeting-line));
+  }
+  :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-phase='confirmed'] .ghm-live-status,
+  :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-phase='confirmed'] .ghm-eyebrow,
+  :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-phase='confirmed'] .ghm-intro { display: none; }
+  :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-phase='confirmed'] .ghm-title { max-width: none; font-size: 1.45rem; }
+  :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-confirmation-assurance { margin: 0; padding: 0; border: 0; }
+  :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-phase='confirmed'] .ghm-work { grid-column: 1; grid-row: 2; }
+  :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-phase='confirmed'] .ghm-confirmation-aside { grid-column: 2; grid-row: 2; }
+}
+
+@container (max-width: 650px) {
+  :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-phase='confirmed'] { display: flex; }
+  :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='guided'][data-phase='confirmed'] .ghm-signal {
+    display: block;
+    padding: 18px 20px;
+    background: color-mix(in srgb, var(--gh-meeting-accent-soft) 52%, var(--gh-meeting-paper));
+  }
+  :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='guided'][data-phase='confirmed'] .ghm-title {
+    color: var(--gh-meeting-ink);
+    font-size: 1.25rem;
+  }
+  :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='guided'][data-phase='confirmed'] .ghm-work { padding: 30px 20px max(28px, var(--gh-meeting-host-bottom-inset)); }
+  :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='guided'][data-phase='confirmed'] .ghm-confirmation-title { font-size: clamp(2rem, 9cqi, 2.4rem); }
+  :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='guided'][data-phase='confirmed'] .ghm-confirmation-receipt { padding-inline: 0; }
+  :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='guided'][data-phase='confirmed'] .ghm-receipt-time { font-size: clamp(1.8rem, 9cqi, 2.35rem); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1327,7 +1720,8 @@ export const MEETING_RENDERER_CSS = `
   :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-slot,
   :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-input,
   :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-primary,
-  :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-secondary { border: 1px solid CanvasText; }
+  :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-secondary,
+  :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-confirmation-receipt { border: 1px solid CanvasText; }
   :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-calendar-day[data-selected='true'],
   :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-slot[data-selected='true'] { outline: 3px solid Highlight; }
 }

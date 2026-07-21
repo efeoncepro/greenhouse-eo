@@ -34,6 +34,12 @@
   ARIA live, sin layout shift y con reduced motion. GVC `.captures/2026-07-21T11-37-07_native-meeting-scheduler` pasó
   39 frames 1440/820/390; 73 pruebas del dominio, TypeScript, ESLint y build productivo verdes.
 
+  El estado confirmado ahora recompone el shell completo como **Meeting Confirmation Receipt**: retira calendario,
+  stepper, fallback y acciones; usa el appointment server-confirmed para fecha/rango/zona/duración/Teams y presenta
+  próximos pasos sin PII/receipt. La dirección pesada inicial fue descartada y sustituida por una superficie luminosa
+  continua con motion espacial y reduced-motion equivalente. GVC `.captures/2026-07-21T12-01-53_native-meeting-scheduler`
+  pasó 45 frames 1440/820/390. Sigue `code complete, rollout pendiente`.
+
   GTM workspace 6 pasó readback/quick preview con 10 DLVs, sin versión/publicación. Pendientes: deploy/read staging,
   dossier de estados reales, binding + controlled booking/replay, host pilot y publish/flags con confirmación humana.
   HubSpot/Office 365/Teams siguen SoT; iframe/link permanece fallback. Trabajo en `develop`; `docs/ui/creative-studio/`

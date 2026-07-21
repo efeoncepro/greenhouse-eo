@@ -246,7 +246,17 @@ describe('MeetingRenderer', () => {
 
     expect(host.dataset.ghmState).toBe('confirmed')
     expect(host.textContent).toContain('Tu reunión quedó agendada')
+    expect(host.textContent).toContain('09:15–09:45 GMT-4')
+    expect(host.textContent).toContain('Qué sigue')
+    expect(host.querySelector('[data-capture="meeting-confirmation-receipt"]')).not.toBeNull()
+    expect(host.querySelectorAll('[role="status"]')).toHaveLength(1)
+    expect(host.querySelector('.ghm-steps')).toBeNull()
+    expect(host.querySelector('.ghm-facts')).toBeNull()
+    expect(host.querySelector('.ghm-selection')).toBeNull()
+    expect(document.activeElement).toBe(host.querySelector('.ghm-confirmation-title'))
     expect(host.querySelector('.ghm-fallback')).toBeNull()
+    expect(host.textContent).not.toContain('ada@empresa.cl')
+    expect(host.textContent).not.toContain('preview-receipt')
 
     const conversion = (window as unknown as { dataLayer: Array<Record<string, unknown>> }).dataLayer
       .find(item => item.event === 'gh_meeting_booking_confirmed')
@@ -258,6 +268,26 @@ describe('MeetingRenderer', () => {
     expect(dateSelected).toMatchObject({ days_ahead_bucket: '1_3_days' })
     expect(JSON.stringify(conversion)).not.toContain('ada@empresa.cl')
     expect(conversion).not.toHaveProperty('conversionReceipt')
+    renderer.destroy()
+  })
+
+  it('recompone el shell completo en command con receipt y próximos pasos dedicados', async () => {
+    const { host, renderer } = await mount()
+
+    Object.defineProperty(host, 'getBoundingClientRect', {
+      configurable: true,
+      value: () => ({ width: 1280, height: 760, top: 0, right: 1280, bottom: 760, left: 0, x: 0, y: 0, toJSON() {} }),
+    })
+    renderer.updatePresentation({ activationMode: 'inline', maxRecipe: 'command' })
+    renderer.updatePresentation({ activationMode: 'inline', maxRecipe: 'command' })
+    await completeBooking(host)
+
+    expect(host.dataset.ghmRecipe).toBe('command')
+    expect(host.querySelector('.ghm-scene[data-phase="confirmed"]')).not.toBeNull()
+    expect(host.querySelector('.ghm-confirmation-aside [data-capture="meeting-confirmation-next-steps"]')).not.toBeNull()
+    expect(host.querySelector('.ghm-calendar-panel')).toBeNull()
+    expect(host.querySelector('.ghm-agenda-action')).toBeNull()
+    expect(host.querySelector('.ghm-confirmation-assurance .tabler-shield-check')).not.toBeNull()
     renderer.destroy()
   })
 

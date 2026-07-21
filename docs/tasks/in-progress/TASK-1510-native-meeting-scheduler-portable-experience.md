@@ -365,6 +365,9 @@ The renderer is a standalone custom element with an explicit state reducer. Rend
 - [x] CTA seam GVC `.captures/2026-07-21T11-22-29_growth-cta-native-meeting`: 10 frames, desktop/mobile, exit 0; launcher compacto, dialog/full-screen, teclado/reduced-motion y selección preservada al reabrir. Sólo `baseline_stale` pendiente de aprobación humana.
 - [x] Reactive validation GVC `.captures/2026-07-21T11-37-07_native-meeting-scheduler`: 39 frames en 1440/820/390, exit 0; neutral→invalid→valid, rechazo corporativo, teclado, reduced-motion, accessibility, layout, runtime y enterprise rubric verdes. Vitest focal 13/13, TypeScript (heap 8 GB), ESLint y bundle portable verdes.
 - [x] `pnpm fe:capture:review .captures/2026-07-21T11-37-07_native-meeting-scheduler` — dossier regenerado desde la captura aprobada.
+- [x] Confirmation shell GVC `.captures/2026-07-21T12-01-53_native-meeting-scheduler`: 45 frames en
+  1440/820/390, transition+settled, exit 0; el éxito reemplaza todo el scheduler, conserva foco/ARIA/reduced-motion,
+  no presenta overflow ni PII/receipt y pasa runtime/accessibility/layout/performance/enterprise rubric.
 - [ ] `pnpm fe:capture native-meeting-scheduler --env=staging`
 - [ ] `pnpm fe:capture:review <capture-dir>`
 - [ ] `pnpm ui:quality --task TASK-1510`

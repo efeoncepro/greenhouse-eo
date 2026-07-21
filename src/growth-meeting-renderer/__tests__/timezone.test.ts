@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatMeetingDate, formatMeetingTimeWithOffset, formatMeetingTimezoneLabel } from '../renderer'
+import {
+  formatMeetingDate,
+  formatMeetingTimeRangeWithOffset,
+  formatMeetingTimeWithOffset,
+  formatMeetingTimezoneLabel,
+} from '../renderer'
 
 describe('meeting timezone presentation', () => {
   it('preserva la fecha civil en zonas UTC+14', () => {
@@ -27,5 +32,13 @@ describe('meeting timezone presentation', () => {
 
     expect(label).toContain('Tu horario')
     expect(label).not.toContain('GMT+4 (GMT-4)')
+  })
+
+  it('presenta el rango confirmado con un único offset inequívoco', () => {
+    expect(formatMeetingTimeRangeWithOffset(
+      '2026-07-22T13:15:00.000Z',
+      '2026-07-22T13:45:00.000Z',
+      'America/Santiago',
+    )).toBe('09:15–09:45 GMT-4')
   })
 })

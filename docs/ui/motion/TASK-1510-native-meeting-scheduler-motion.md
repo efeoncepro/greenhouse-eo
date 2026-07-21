@@ -18,7 +18,9 @@ Motion clarifies calendar, timezone, selection and confirmation without delaying
 - Loading: layout-sized calendar skeleton uses a linear shimmer and stops under reduced motion.
 - Pending: summary changes to processing with restrained progress signal.
 - Conflict: summary changes to warning and returns attention to refreshed calendar; no shake.
-- Success: summary resolves to confirmed receipt; no confetti/countdown.
+- Success: the entire scheduler shell resolves to the confirmation composition only after the server-confirmed
+  reducer transition. A 360 ms opacity/scale settle establishes the new state and one 560 ms low-contrast sweep
+  crosses the complete shell; no calendar chrome remains, and there is no confetti/countdown.
 - CTA activation: backdrop fades in over 180 ms and the bounded paper settles with opacity/translate/scale over 260 ms. Mobile uses the same envelope at `100dvh`; resize between modes is direct. Only the envelope enters on reopen—the connected scheduler does not replay its scene entrance.
 
 ## Tokens and Performance
@@ -49,6 +51,9 @@ Motion clarifies calendar, timezone, selection and confirmation without delaying
 - Slot stagger/particles/confetti rejected because they weaken availability trust.
 - CSS-first preserves portability; all active transitions use transform/opacity and the renderer's governed token lane.
 - Reduced-motion and telemetry equivalence are closure gates.
+- Confirmation motion never gates focus, the live-region announcement or the exactly-once conversion event. Under
+  reduced motion both shell animations complete effectively immediately while the final DOM and focus target stay
+  identical.
 
 ## Evidence 2026-07-21
 

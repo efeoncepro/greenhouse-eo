@@ -113,3 +113,30 @@ stick only after the slot list in normal flow, never obscuring unreviewed slots 
 - The selected date and its time slots must share one visual relationship.
 - Desktop and 390 px must have no horizontal page overflow.
 - Booking confirmation reaches `dataLayer` once and contains no PII, provider ID or conversion receipt.
+
+## Confirmation direction — Meeting Confirmation Receipt
+
+The confirmed state is not a message card inside the active calendar. The whole scheduler shell resolves into a
+purpose-built confirmation surface after the server returns `outcome: confirmed`.
+
+### Directions compared
+
+- **Operational receipt — selected:** a calm completion rail, an exact temporal receipt and a short next-steps
+  lane. It makes the successful action verifiable and remains credible in enterprise contexts.
+- **Appointment pass — retained only as visual language:** useful temporal hierarchy, but ticket perforations,
+  QR-like ornament and consumer-event styling were rejected.
+- **Minimal acknowledgement — rejected:** a checkmark and generic “Listo” do not preserve enough date, timezone
+  or recovery context for a consequential booking.
+
+### Selected behavior
+
+- Availability, calendar controls, selected-slot chrome, fallback and progress steps leave the DOM on confirmation.
+- The server-confirmed start, end, duration, channel and appointment timezone drive the receipt; visitor form data,
+  provider IDs and conversion receipts never render.
+- Full and split recipes distribute completion context, receipt and next steps across the complete shell. Guided
+  presents the same information in one continuous document without a duplicate agenda region.
+- The shell uses one coordinated settle plus one restrained light sweep. No confetti, bounce, loop or motion-gated
+  conversion; reduced motion swaps state immediately.
+- Copy says the invitation is on its way rather than claiming that email delivery has already completed.
+- No image-generation asset is used: a decorative illustration would reduce information density and portability
+  without improving confirmation confidence.

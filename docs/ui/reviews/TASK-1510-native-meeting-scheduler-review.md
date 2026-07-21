@@ -7,6 +7,7 @@
 - Evidence: `.captures/2026-07-21T10-31-38_native-meeting-scheduler`
 - CTA seam evidence: `.captures/2026-07-21T11-22-29_growth-cta-native-meeting`
 - Reactive validation evidence: `.captures/2026-07-21T11-37-07_native-meeting-scheduler`
+- Confirmation-shell evidence: `.captures/2026-07-21T12-01-53_native-meeting-scheduler`
 
 ## Direction correction
 
@@ -67,6 +68,11 @@ Resolved during review:
 18. Replaced navigation, timezone, status, selection and CTA glyphs with the generated Tabler subset; removed the CSS data-SVG checkbox.
 19. Added progressive field validation: pristine fields stay neutral, blur reveals actionable feedback and corrected values recover immediately without another submit.
 20. Added stable status lanes and Tabler success/error/pending glyphs so validation is not color-only and never causes layout shift; email syntax and corporate verification remain distinct states.
+21. Replaced the generic success message and duplicated appointment summary with a full-shell `Meeting Confirmation
+    Receipt`: light continuous workspace, open temporal band, connected next-step sequence and no residual scheduler chrome.
+22. Rejected the first confirmation pass after operator review because its dark portal header, elevated receipt card and
+    rigid columns read as dated. The corrected direction removes the heavy header/card stack and uses restrained spatial
+    resolution motion with a direct reduced-motion equivalent.
 
 ## Visual evidence reviewed
 
@@ -84,6 +90,9 @@ Resolved during review:
 - Reactive validation: 39 frames across 1440×1000, 820×900 and 390×844; `validation-recovery`, `reactive-field-recovery`
   and `corporate-email-rejection` were inspected. No console/page/hydration/HTTP, accessibility, overflow, target-size,
   keyboard, reduced-motion, performance or enterprise-rubric findings.
+- Confirmation shell: `.captures/2026-07-21T12-01-53_native-meeting-scheduler`, 45 frames across 1440/820/390,
+  including transition and settled states. Exit 0; no runtime, accessibility, layout, target-size, keyboard,
+  reduced-motion, performance or enterprise-rubric findings. Confirmed frames were inspected directly.
 
 ## Measurement/privacy evidence
 
@@ -103,6 +112,6 @@ Resolved during review:
 ## Verdict
 
 `PASS` for enterprise visual quality. `CONDITIONAL PASS — code complete, rollout pendiente` for release QA: the
-primary adaptive calendar/agenda/details/confirmation flow and CTA seam pass premium local GVC, modern UI and accessibility
+primary adaptive calendar/agenda/details/full-shell confirmation flow and CTA seam pass premium local GVC, modern UI and accessibility
 bar. Production rollout remains gated on adapter deploy/read-back, real-host staging state evidence, explicit GTM
 publish approval and the governed host pilot.
