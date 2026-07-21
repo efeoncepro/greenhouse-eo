@@ -777,13 +777,3 @@
   `1200×1600`, ambas light/dark—. La gráfica mantiene una escala íntegra `0–100%`, muestra el cambio real de
   `2,75 pp`, explicita `611` Deals pendientes y sitúa el gate de KPI en `≥95%`. Los logos oficiales se verificaron
   desde los masters finales; todavía no se cargó ni integró en WordPress.
-
-## 2026-07-17 — Prospecting Agent: contrato reusable de implementación
-
-- `hubspot-solutions-partner` incorpora una referencia client-agnostic para evaluar e implementar Prospecting
-  Agent con separación explícita entre superficie general y beta Buying Signals/Contact Sourcing. Canoniza
-  readiness, plays/perfiles, sourcing, outreach, exclusiones, créditos, piloto, KPIs y gobierno humano. También
-  distingue entrenamiento comercial/grounding de fine-tuning y autoaprendizaje, comparándolo con las content
-  sources y el coaching del Customer Agent.
-- Los mirrors Codex/Claude y `SOURCES.md` quedan sincronizados para esta capacidad. No hubo cambios en portales,
-  enrollments, automatizaciones, créditos ni envíos.
