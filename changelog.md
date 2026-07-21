@@ -63,7 +63,9 @@
   la UI de HubSpot. Elementor se guardó vía `Document::save()` con backup
   `_gh_backup_before_agenda_native_only_20260721T170615Z`; el readback confirmó un host y cero enlaces HubSpot. HubSpot continúa
   como provider invisible de disponibilidad/reserva. Las 75 pruebas focales, typecheck, lint, build y GVC premium
-  `.captures/2026-07-21T17-02-42_native-meeting-scheduler` quedaron verdes; el bundle aguarda el release agrupado.
+  `.captures/2026-07-21T17-02-42_native-meeting-scheduler` quedaron verdes. PR #163 fue liberado en producción
+  (`fbe8a9c76a74`, run `29854833210`, manifest `released`); el smoke Chrome post-release confirmó cero enlaces/copy
+  HubSpot, la grilla completa de agosto y `overflow=0`, sin crear una reserva.
 - La UI elevó el calendario a `Calendar Command Center`: densidad por fecha, agenda agrupada por período, resumen
   vivo, formulario desktop de dos columnas, mobile compacto y motion causal/reduced-motion. GVC premium
   `2026-07-21T09-02-04_native-meeting-scheduler`: 24 frames, exit 0, runtime/enterprise/a11y/layout/performance verdes.
