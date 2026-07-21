@@ -14,6 +14,18 @@ production".
 This skill is intentionally conservative. Production release is a control-plane
 workflow, not a sequence of ad hoc deploy commands.
 
+> **Paridad obligatoria entre agentes.** `.codex/skills/greenhouse-production-release/SKILL.md`
+> y `.claude/skills/greenhouse-production-release/SKILL.md` describen el mismo control plane y
+> deben conservar los mismos pasos, hard rules y gates. Antes de cualquier promoción, preflight,
+> approval, rollback o drift recovery, el agente DEBE
+> **re-revisar el playbook de paso a producción** (`docs/operations/PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md`),
+> el runbook (`docs/operations/runbooks/production-release.md`) y la spec del
+> control plane (`docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`) en
+> cada paso a producción, y **NO operar de memoria**. La secuencia canónica
+> completa está en `## Canonical Release Path` más abajo; recórrela paso por
+> paso. Si los dos espejos divergen, es un bug: reconciliarlos en el mismo
+> change set (ver `## Skill Maintenance Contract`).
+
 Current watchdog posture as of 2026-05-24: `.github/workflows/production-release-watchdog.yml`
 is manual-only in repo until TASK-920 repairs the false-positive signal. The
 GitHub workflow is also `disabled_manually` as an emergency stop while `main`
@@ -29,7 +41,7 @@ Read only what the task needs, in this order:
 - `CLAUDE.md`
 - `project_context.md`
 - `Handoff.md`
-- **`docs/operations/PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md` — OBLIGATORIO si el orchestrator falló (no chasees el gate; lee el JSON output como diagnóstico)**
+- **`docs/operations/PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md` — re-revisar OBLIGATORIO en cada paso a producción, no operar de memoria. Si el orchestrator falló, leer el JSON output como diagnóstico — no chasees el gate.**
 - `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`
 - **`docs/operations/FEATURE_FLAG_STATE_LEDGER.md` — OBLIGATORIO en TODO paso a producción. Lee la `§ Pendientes de acción`: hay features `code-complete` cuyo flag default-OFF debe prenderse en prod junto a este release (a veces + migración/ops-worker). El deploy del código NO los activa — qué prender se lee de acá, no de la memoria.**
 - **`docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md` — OBLIGATORIO al cerrar TODO paso a producción. Registra agente, fecha, release ID, run ID, target SHA y tiempos.**
@@ -62,7 +74,7 @@ If rollback, watchdog, Azure, Vercel, or HubSpot is involved, also read:
 - Never infer that Azure or a worker "skipped" from the workflow name alone. Read the job summary/logs and verify Cloud Run `Ready=True` + `GIT_SHA` or watchdog OK. Azure `no_infra_diff` can be an expected no-op; worker revision drift is never a clean release closure.
 - Never rediscover common release conditions as if they were new incidents. Approvals, CI/smoke warnings on fresh squash commits, worker latency, Azure `no_infra_diff`, `ops-worker` change-gated no-op, and final transition runner queue are documented in the runbooks. If the user asks to measure timings, record phase durations while following the playbook.
 - Never close a production release without updating `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md`. The primary KPI is **agent end-to-end elapsed**, not manifest/workflow elapsed. Start the timer at the first release-related action, including reading, reviewing and analyzing. Required fields: agent name, date, release ID, orchestrator run ID, target SHA, agent E2E elapsed, phase breakdown, workflow elapsed, manifest elapsed, runtime-green elapsed, main blocker and learning.
-- **Never `git push` to `main` (including hotfixes, doc-only commits, or fixes "that don't affect workers") without immediately dispatching the canonical orchestrator `production-release.yml` with `target_sha=<HEAD del push>`.** Every commit on `main` MUST be tracked by a release manifest. The Vercel auto-deploy on `push:main` is NOT a release — only the manifest in `greenhouse_sync.release_manifests` reflects what production is supposed to be. **Anti-pattern detectado 2026-05-14**: Codex pushó 3 hotfixes directo a main (`982accaf`, `4fe799cf`, `cfea1784`) post un release ajeno; Vercel auto-deployó pero el manifest quedó en el SHA del release anterior → drift cosmético + audit trail roto.
+- **Never `git push` to `main` (including hotfixes, doc-only commits, or fixes "that don't affect workers") without immediately starting the bounded readiness watch and dispatching `production-release.yml` for `target_sha=<HEAD del push>` as soon as CI, CI Deep and Vercel production for that exact SHA are green.** Every commit on `main` MUST be tracked by a release manifest. The Vercel auto-deploy on `push:main` is NOT a release — only the manifest in `greenhouse_sync.release_manifests` reflects what production is supposed to be. Do not do unrelated work during this wait or leave the SHA untracked.
 - **Never cherry-pick to `main` a commit that also exists on `develop`.** Creates duplicate SHAs for the same logical change (caso real 2026-05-14: `fa5258a5/4fe799cf` mismo diff distinto SHA), confuses audit trail, breaks the exact mirror between develop/main. Canonical hotfix path: branch from `main` → fix → PR → merge → orchestrator dispatch → cherry-pick back to develop (not the other direction).
 - **Never assume "hotfix small, no orchestrator needed"** — the rule has zero exceptions outside break-glass. Even a typo fix to `main` requires orchestrator dispatch to keep manifest aligned. If the fix is too trivial for a release manifest, it's too trivial to push to `main` — merge to develop and wait for the next regular release.
 - **SIEMPRE revisar `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` (§ Pendientes de acción) al planear Y al cerrar un paso a producción.** Una feature `code-complete` mergeada a `main` queda **invisible** en prod si su flag `*_ENABLED` (default OFF) no se prende explícitamente — a veces además requiere su migración aplicada a prod (vía este release) y/o redeploy del ops-worker. El deploy del código NO prende flags. Qué flags prender con este release se lee del ledger, no de la memoria; tras prenderlos, actualizar el snapshot del ledger. **NUNCA** declarar un release `released` dejando un flag que debía prenderse en este release sin prender (queda como `degraded` o pendiente documentado).
@@ -83,7 +95,11 @@ The normal release path is:
    - The orchestrator expects `target_sha` to already exist on `main`.
    - Vercel production deploy is triggered by Git integration on push to `main`; the orchestrator waits for that deployment to be READY.
    - Worker Cloud Run production deploys are not triggered by `push:main`; the orchestrator owns them through `workflow_call`.
-5. Immediately dispatch the canonical orchestrator for that exact SHA:
+   - Immediately start a bounded readiness watch. Before the first dispatch, require `CI` and
+     `CI Deep Verification` for the exact main SHA to finish green and its Vercel Production
+     deployment to reach `READY`. Pending evidence is not a bypassable failure and should not burn
+     a failed orchestrator run.
+5. Dispatch the canonical orchestrator for that exact SHA as soon as those prerequisites are green:
 
 ```bash
 gh workflow run production-release.yml \
@@ -116,12 +132,11 @@ gh workflow run production-release.yml \
    - Vercel production READY
    - `/api/auth/health`
    - manifest transition to `released` or `degraded`
-8. Run or inspect watchdog after completion:
+8. Run or inspect watchdog after completion. The remote scheduled/manual workflow remains disabled;
+   use the local reader with the authenticated GitHub token:
 
 ```bash
-gh workflow run production-release-watchdog.yml --ref main \
-  -f enable_teams=false \
-  -f fail_on_error=true
+GITHUB_RELEASE_OBSERVER_TOKEN="$(gh auth token)" pnpm release:watchdog --json
 ```
 
 9. Verify Cloud Run `GIT_SHA` for mapped services when needed:
@@ -146,7 +161,7 @@ El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas r
 
 2. **Preflight `release_batch_policy=requires_break_glass` falso positivo.** El classifier usa diff *three-dot* (`origin/main...target`, merge-base) → resucita archivos ya desplegados en un release previo (ej. `services/ops-worker/deploy.sh`) como `cloud_release` irreversible. Confirmá el fantasma: `git diff origin/main..target -- <archivo>` = 0 líneas. Post-merge (target = HEAD de `main`) el batch-policy del orchestrator ve diff vacío y pasa. Fix de raíz pendiente = **ISSUE-114** (three-dot → two-dot).
 
-3. **`playwright_smoke` (0 runs) + `ci_green` (aún corriendo) en el squash commit fresco de `main`.** El smoke corre en `develop` (ya verde); el commit de `main` no tiene su propio smoke. Con solo *warnings* (sin errors), el preflight marca `readyToDeploy=false` salvo `bypass_preflight_reason` (≥20 chars → activa `--override-batch-policy --bypass-preflight-warnings`). Es el path canónico. **Mejor práctica:** esperá el CI de `main` verde ANTES de re-dispatchar, para que `ci_green` sea genuino y el bypass cubra solo el `playwright_smoke` inevitable. Documentá el motivo real (no genérico) en `bypass_preflight_reason`.
+3. **`playwright_smoke` (0 runs) + evidencia aún corriendo en el squash commit fresco de `main`.** El smoke corre en `develop` (ya verde); el commit de `main` no tiene su propio smoke. Antes del primer dispatch, esperar `CI`, `CI Deep Verification` y Vercel Production `READY` para el SHA exacto. Con esos prerequisitos verdes, un `bypass_preflight_reason` forense (≥20 chars) puede cubrir sólo la ausencia inevitable del smoke en el squash; nunca cubrir checks pendientes o fallidos.
 
 4. **ops-worker puede quedar con GIT_SHA rezagado tras el release — NO es drift si el diff runtime está vacío.** `ops-worker-deploy` es *change-gated*: si ningún worker-runtime-path cambió desde `EXPECTED_SHA`, salta el rebuild (`deploy_needed=false`) y el servicio conserva el SHA del último deploy que sí tocó código de worker (código idéntico al target, por diseño — ver el step de worker-drift del workflow). Si el watchdog final marca solo `ops-worker`, comparar Cloud Run `GIT_SHA` contra `target_sha` en rutas runtime; si `git diff --name-only <cloud_run_git_sha> <target_sha> -- package.json pnpm-lock.yaml tsconfig.json services/ops-worker scripts/ops-worker src/lib/ops src/lib/release` no devuelve archivos y Cloud Run está `Ready=True`, parar: documenta residual de label y **NO** fuerces redeploy para "alinear el label". Los otros 3 workers sí redeployan al target.
 
@@ -202,6 +217,12 @@ not replace the manifest store.
 ## Drift Recovery
 
 If watchdog reports `platform.release.worker_revision_drift`, do not guess.
+
+First distinguish drift from missing evidence. The local reader converts an absent/expired `gcloud`
+session or a failed Cloud Run query into `data_missing` (`warning`, `drift_count=0`); that does not
+prove revision drift and never authorizes a redeploy. Refresh authentication or use the orchestrator
+job logs/another authenticated read to establish `Ready=True` and `GIT_SHA`. Only a comparable SHA
+mismatch is confirmed drift.
 
 1. Read the latest manifest:
 

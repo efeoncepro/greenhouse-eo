@@ -139,11 +139,12 @@
     },
     {
       "id": "growth-public-site",
-      "triggers": ["growth", "SEO", "AEO", "form", "CTA", "GTM", "WordPress", "Kinsta"],
-      "skills": ["seo-aeo", "efeonce-public-site-wordpress", "greenhouse-gtm-ga4-operator"],
+      "triggers": ["growth", "SEO", "AEO", "form", "CTA", "GTM", "meeting", "scheduler", "agenda", "WordPress", "Kinsta"],
+      "skills": ["seo-aeo", "greenhouse-growth-forms", "greenhouse-growth-ctas", "greenhouse-growth-meetings", "greenhouse-gtm-ga4-operator", "efeonce-public-site-wordpress"],
       "sources": [
         "docs/public-site/README.md",
         "docs/context/00_INDEX.md",
+        "docs/architecture/GREENHOUSE_GROWTH_MEETINGS_SCHEDULER_ARCHITECTURE_V1.md",
         "docs/architecture/agent-invariants/PUBLIC_SITE_KINSTA_ACCESS_AGENT_INVARIANTS.md"
       ]
     },

@@ -13,7 +13,7 @@
   validada server-side, proyección browser-safe, lazy load consent-aware con Save-Data/2G, task surface dialog/full-screen,
   foco/scroll/escape gobernados, recuperación nativa y continuidad del mismo scheduler al cerrar/reabrir. El cockpit puede
   autorarla. GVC `.captures/2026-07-21T11-22-29_growth-cta-native-meeting` pasó desktop/mobile, 10 frames,
-  teclado/reduced-motion y continuidad al reabrir; rollout público y promoción de baseline siguen pendientes.
+  teclado/reduced-motion y continuidad al reabrir; ese checkpoint precedió el rollout nativo documentado más abajo.
 - La UI evolucionó a **Temporal Operations Desk**: dossier compacto, grilla mensual continua con gramática de
   hoy/selección/densidad, inspector de horarios y booking brief sin card-on-card. Se agregó foco roving y teclado
   de calendario, se eliminó el flash de 400 ms causado por la animación phase-wide y se unificó iconografía en el
@@ -47,10 +47,10 @@
 - El runtime del scheduler fue promovido y activado en staging y producción: ambos flags están ON y el binding piloto
   `fhsf-efeonce-lead-gen-web`/`discovery` quedó activo. Configuración y disponibilidad reales respondieron desde el
   origen público permitido y respetaron la zona del visitante (`America/New_York` en la verificación). La landing
-  pública todavía conserva el embed/link HubSpot mientras el runtime WordPress concurrente no se libera; no se publicó
-  GTM ni se creó una reserva adicional durante esta activación.
-- El piloto público aislado quedó disponible en `/agenda/` (WordPress `251583`, `noindex`): monta el scheduler nativo
-  con disponibilidad real, Turnstile y un enlace directo de respaldo a HubSpot. El host usa el template normal de Ohio
+  pública conservaba entonces el embed/link HubSpot mientras se completaba la mutación WordPress; el corte native-only
+  posterior se documenta más abajo. No se publicó GTM ni se creó una reserva durante esa activación.
+- El piloto público aislado quedó disponible en `/agenda/` (WordPress `251583`, `noindex`): montó inicialmente el scheduler
+  con disponibilidad real, Turnstile y un enlace de respaldo que fue retirado en el corte native-only posterior. El host usa el template normal de Ohio
   —no Canvas— y una corrección page-scoped para el margen del root Elementor; Playwright confirmó desktop y 390 px sin
   overflow ni errores de consola. No se promovió a Contacto/RRSS, no se publicó GTM ni se creó una reserva.
 - La navegación mensual ya no colapsa el calendario cuando HubSpot devuelve un mes sin slots: conserva el mes solicitado,
@@ -69,8 +69,11 @@
 - La UI elevó el calendario a `Calendar Command Center`: densidad por fecha, agenda agrupada por período, resumen
   vivo, formulario desktop de dos columnas, mobile compacto y motion causal/reduced-motion. GVC premium
   `2026-07-21T09-02-04_native-meeting-scheduler`: 24 frames, exit 0, runtime/enterprise/a11y/layout/performance verdes.
-- GTM workspace descartable ID 6 quedó compilado y sincronizado en preview con 8 DLVs allowlisted,
-  `gh_meeting_step_reached` y `generate_lead` receipt-gated. No se creó versión ni se publicó; flags y binding siguen OFF.
+- GTM workspace descartable ID 6 quedó compilado y sincronizado en preview con 10 DLVs allowlisted,
+  `gh_meeting_step_reached` y `generate_lead` receipt-gated. No se creó versión ni se publicó; los flags y el binding
+  del piloto están ON, de forma independiente al estado de publicación de GTM.
+- El cierre documental crea la skill dueña `greenhouse-growth-meetings` y alinea arquitectura/PDR, CTA, GTM, WordPress,
+  release, documentación funcional, manuales, tasks e índices con el contrato native-only y sus gates pendientes.
 
 ## 2026-07-21 — Scheduler adopta recipes adaptativas y atribución por intención (TASK-1510)
 

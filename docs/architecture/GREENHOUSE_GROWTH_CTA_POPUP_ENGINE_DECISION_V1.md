@@ -286,6 +286,61 @@ The canonical operator route is `/growth/ctas`, matching the runtime shipped by 
 - A CRM handoff has explicit consent, bounded write semantics, retry/audit ownership and a real consumer.
 - Multiple navigation kinds need a separate destination registry or provider-backed configuration.
 
+## Architecture Decision 2026-07-21 — Adapter CTA nativo para reuniones
+
+- Status: `Accepted`
+- Date: `2026-07-21`
+- Owner: Product / Growth / Public Site
+- Scope: `growth.cta` action registry, portable renderer task surface and Growth Meetings Scheduler handoff
+- Reversibility: `two-way`
+- Confidence: `high`
+- Validated as of: `2026-07-21`, release `fbe8a9c76a74`, orchestrator run `29854833210`
+
+### Context
+
+El contrato 2026-07-18 probó navegación gobernada hacia una agenda mediante `book_meeting`, pero TASK-1509 y
+TASK-1510 entregaron un consumidor real con idempotencia, anti-abuso, receipt, UI portable y medición propias. Cambiar
+silenciosamente `book_meeting` habría roto contratos publicados y habría convertido una acción de navegación en una
+aplicación stateful sin negociación de versión.
+
+### Decision
+
+El Action Registry incorpora `open_meeting_scheduler` como action kind aditivo y no navegacional. La policy declara
+exclusivamente `meetingSurfaceId` y `schedulerKey`; el servidor valida el binding y devuelve una proyección browser-safe.
+El CTA posee la activación y el focus boundary; el scheduler posee disponibilidad, formulario, booking, idempotencia,
+telemetría de funnel y conversión receipt-gated. `book_meeting` permanece navigation-only para compatibilidad legacy.
+
+La experiencia nativa no presenta iframe, link o agenda HubSpot como fallback. HubSpot continúa invisible detrás del
+adapter server-side y el rollback se ejecuta por flags, binding o versión. Los estados de carga, indisponibilidad y mes
+vacío se resuelven mediante `Reintentar`, mensajes explícitos y navegación mensual.
+
+### Alternatives Considered
+
+- Reinterpretar `book_meeting`: rechazado por romper semántica y cached clients.
+- Inyectar el enlace HubSpot si falla el bundle: rechazado porque bifurca la experiencia, medición y política anti-duplicado.
+- Duplicar un scheduler dentro del CTA renderer: rechazado porque separaría controller, idempotency y telemetry.
+
+### Consequences
+
+- El CTA compacto puede abrir una experiencia rica sin crecer inline ni perder estado al cerrar/reabrir.
+- El renderer CTA y el scheduler negocian una familia explícita y fallan cerrado ante contratos desconocidos.
+- `fallbackHref` puede persistir temporalmente sólo como compatibilidad de transporte; no es UI ni comportamiento.
+- Cada nueva superficie requiere binding, verificación propia y promoción gobernada; el piloto no gradúa Contacto/RRSS.
+
+### Runtime Contract
+
+- Registry/resolver: `src/lib/growth/ctas/action-registry.ts`.
+- CTA executor: `src/growth-cta-renderer/`.
+- Scheduler renderer: `src/growth-meeting-renderer/`.
+- Booking authority: `src/lib/growth/meetings/**` y `/api/public/growth/meetings/**`.
+- Canon de dominio: `GREENHOUSE_GROWTH_MEETINGS_SCHEDULER_ARCHITECTURE_V1.md`.
+
+### Revisit When
+
+- Un segundo scheduling provider requiera otra policy o capability.
+- La compatibilidad de cached clients permita retirar `fallbackHref` del transporte V1.
+- Una nueva superficie necesite otro activation mode fuera de `inline|dialog|full_screen|page`.
+
 ## Architecture Decision 2026-07-18 — CTA Experience System portable
 
 - Status: `Accepted`

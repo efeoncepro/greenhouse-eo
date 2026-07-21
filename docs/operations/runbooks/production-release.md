@@ -3,7 +3,7 @@
 > **Audience:** EFEONCE_ADMIN + DEVOPS_OPERATOR
 > **Spec canónico:** [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
 > **Source task:** TASK-848 V1 (parcial; V1.1 follow-ups en TASK-850..855)
-> **Last updated:** 2026-07-09
+> **Last updated:** 2026-07-21
 > **Timing ledger:** [PRODUCTION_RELEASE_TIMING_LEDGER.md](../PRODUCTION_RELEASE_TIMING_LEDGER.md)
 
 Este runbook es el contrato operativo para promover `develop` → `main` y para ejecutar rollback de emergencia.
@@ -52,27 +52,27 @@ runtime-green elapsed, desglose de fases, bloqueo principal y aprendizaje.
               └──────────────┬───────────────┘
                              ▼
               ┌──────────────────────────────┐
-              │ 2. Disparar orquestador      │
-              │    production-release.yml    │
+              │ 2. Esperar evidencia main    │
+              │ CI + CI Deep + Vercel READY  │
               └──────────────┬───────────────┘
                              ▼
               ┌──────────────────────────────┐
-              │ 3. Preflight TASK-850        │
+              │ 3. Disparar orquestador      │
+              │    para ese SHA exacto       │
+              └──────────────┬───────────────┘
+                             ▼
+              ┌──────────────────────────────┐
+              │ 4. Preflight TASK-850        │
               │    bloquea antes de deploy   │
               └──────────────┬───────────────┘
                              ▼
               ┌──────────────────────────────┐
-              │ 4. Aprobar gate Production   │
+              │ 5. Aprobar gate Production   │
               │    del orquestador           │
               └──────────────┬───────────────┘
                              ▼
               ┌──────────────────────────────┐
-              │ 5. Orquestador despliega     │
-              │    workers + espera Vercel   │
-              └──────────────┬───────────────┘
-                             ▼
-              ┌──────────────────────────────┐
-              │ 6. Health + manifest         │
+              │ 6. Deploy + health + manifest│
               │    released/degraded         │
               └──────────────────────────────┘
 ```
@@ -110,10 +110,10 @@ Output canonico: `ProductionPreflightV1` (versionado `contractVersion='productio
 
 **Leccion 2026-07-03 (TASK-1328):** si el `target_sha` acaba de llegar a `main`, el preflight puede fallar por carrera de evidencia (`ci_green` o `playwright_smoke` aun corriendo / sin run para ese SHA). Eso no se arregla cambiando el gate ni interpretando que Azure o workers "skippearon". La accion correcta es:
 
-1. Verificar si el check esta `in_progress` o si falta el smoke para el SHA exacto.
-2. Disparar/esperar el smoke o CI faltante.
-3. Reintentar el orquestador solo cuando la evidencia exista.
-4. Si se usa `bypass_preflight_reason`, dejar una razon forense concreta que diga que CI/smoke ya pasaron y que el bloqueo era latencia de GitHub Actions, no un bypass general.
+1. Iniciar un watch acotado inmediatamente despues de promover a `main`; no hacer trabajo no relacionado mientras el SHA quede sin release manifest.
+2. Antes del **primer** dispatch, esperar `CI`, `CI Deep Verification` y el deployment Vercel Production `READY`, todos para el SHA exacto de `main`.
+3. Disparar el orquestador solo cuando esa evidencia exista. Un check pendiente no es un warning elegible para bypass ni una razon para quemar un run fallido.
+4. Si se usa `bypass_preflight_reason`, dejar una razon forense concreta: los checks anteriores ya estan verdes y el bypass cubre solamente la ausencia inevitable del smoke de `develop` en el squash SHA de `main`.
 
 Si por algun motivo el CLI no esta disponible (e.g. local sin checkout, o auth expirada), la tabla manual abajo sirve como fallback documental. **Cualquier check rojo bloquea el release.**
 
@@ -130,6 +130,11 @@ Si por algun motivo el CLI no esta disponible (e.g. local sin checkout, o auth e
 | 9 | Reliability dashboard `/admin/operations` sin signals `error` | Inspeccionar UI | Sí |
 | 10 | WIF subjects GCP + Azure correctos | Sec 2.1 abajo | Sí (después de cualquier cambio infra) |
 | 11 | Batch size policy OK | Sec 2.2 abajo; V1.1 lo automatiza en TASK-850 | Sí |
+
+Despues del merge a `main` y antes del primer dispatch, sumar tres gates de
+readiness para el SHA exacto promovido: `CI` exitoso, `CI Deep Verification`
+exitoso y Vercel Production `READY`. La evidencia de `develop` no reemplaza
+estos gates de `main`, y un deployment Vercel de otro SHA tampoco.
 
 ### 2.1. Verificación WIF subjects (fallback manual)
 
@@ -207,7 +212,7 @@ El flujo de promoción por **squash-merge** hace que `main` (commits squash de r
 
 2. **Preflight `release_batch_policy=requires_break_glass` como falso positivo.** El classifier usa diff *three-dot* (`origin/main...target`, merge-base) → resucita archivos ya desplegados en un release previo (típicamente `services/ops-worker/deploy.sh`) como `cloud_release` irreversible. Confirmá el fantasma: `git diff origin/main..target -- <archivo>` = **0 líneas** (idéntico a prod). Post-merge, con `target` = HEAD de `main`, el batch-policy del orchestrator ve diff vacío y pasa. Fix de raíz pendiente = **ISSUE-114** (three-dot → two-dot).
 
-3. **`playwright_smoke` (0 runs) + `ci_green` (aún corriendo) como warnings en el commit fresco de `main`.** El smoke corre en `develop` (ya verde); el commit squash de `main` no tiene su propio smoke. Con solo *warnings* (sin errors), el preflight retorna `readyToDeploy=false` salvo `bypass_preflight_reason` (≥20 chars → activa `--override-batch-policy --bypass-preflight-warnings`). **Mejor práctica:** esperá el CI de `main` verde ANTES de re-dispatchar el orchestrator, para que `ci_green` sea genuino y el bypass cubra solo el `playwright_smoke` inevitable. Documentá el motivo real (no genérico).
+3. **`playwright_smoke` (0 runs) + evidencia aún corriendo en el commit fresco de `main`.** El smoke corre en `develop` (ya verde); el commit squash de `main` no tiene su propio smoke. Esperar `CI`, `CI Deep Verification` y Vercel Production `READY` para el SHA exacto **antes del primer dispatch**. Solo entonces `bypass_preflight_reason` (≥20 chars) puede cubrir la ausencia inevitable del smoke en el squash; nunca checks pendientes o fallidos. Documentar el motivo real, no uno generico.
 
 > El ops-worker que queda con GIT_SHA rezagado tras el release **no es drift** — ver §4.1 (change-gate `deploy_needed=false` cuando el código de worker no cambió).
 
@@ -276,7 +281,8 @@ No cerrar un release por intuicion de logs. Hay tres casos distintos:
 |---|---|---|
 | Azure job dice `no_infra_diff` / `no diff` | Skip esperado: el workflow hizo health/gating y no aplico Bicep porque no habia cambios infra. | Si el job termina `success` y no hay health failure. |
 | Worker job dice que no redeploya por runtime-equivalente | Skip esperado solo si el diff de rutas runtime entre el SHA servido y el `target_sha` es vacío. Caso tipico: `ops-worker` change-gated. | Si `Ready=True`, el diff runtime es vacío y queda documentado como residual de label, aunque el watchdog V1 siga marcando drift. |
-| Watchdog reporta `worker_revision_drift` | Drift real o evidencia insuficiente. El release no esta cerrado aunque el orquestador haya terminado. | No; recuperar drift y re-ejecutar watchdog. |
+| Watchdog reporta `worker_revision_drift` con `drift_count > 0` | Drift confirmado: existe un SHA comparable y no coincide. | No; recuperar drift y re-ejecutar watchdog. |
+| Watchdog reporta `data_missing` con `drift_count = 0` | Evidencia insuficiente: puede ser `gcloud` ausente/expirado o una consulta Cloud Run fallida. No prueba drift. | No cerrar aun; restaurar autenticacion o usar logs/evidencia autenticada, sin redeploy automatico. |
 
 Checklist concreto cuando el operador pregunta si un worker "se skippeo":
 
@@ -290,6 +296,7 @@ gcloud run services describe ico-batch-worker \
 
 Interpretacion:
 
+- `data_missing` con `drift_count=0` es un warning de observabilidad, no drift. Si la sesion local de `gcloud` esta ausente o expirada, reautenticar o consultar los logs del job del orquestador antes de decidir. No redeployar para corregir una falta de evidencia.
 - `ico-batch-worker` con deploy job ejecutado, health OK, `Ready=True` y watchdog synced = NO fue skippeado.
 - `ops-worker` con workflow que salta deploy por diff runtime y `GIT_SHA` viejo puede ser cierre valido si la comparacion de rutas runtime demuestra que el servicio servido es equivalente al target. No forzar redeploy solo para alinear el label.
 - La recuperacion canonica para drift real es rerun del orquestador para el mismo `target_sha`; si el orquestador esta bloqueado, usar workflow individual como break-glass aprobado. Direct `gcloud run deploy` local es ultimo recurso break-glass y debe quedar documentado con target SHA, revision, verificacion y watchdog final.

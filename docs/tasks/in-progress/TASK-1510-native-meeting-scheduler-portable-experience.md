@@ -40,7 +40,7 @@ El iframe funciona pero impone estética, pasos y scroll ajenos. Un simple calen
 - Entregar un Web Component host-neutral con calendario mensual, agenda diaria y resumen de reunión accesibles y responsive.
 - Instrumentar el funnel completo en GTM/GA4 con evento genérico + parámetros y cero PII.
 - Confirmar visualmente el booking sólo desde el recibo server-side de TASK-1509.
-- Pilotear un host público controlado con rollback instantáneo al embed/link.
+- Pilotear un host público controlado con rollback operativo por flags, binding, host backup o versión anterior; nunca mediante embed/link visible.
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
 
@@ -57,7 +57,7 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md`
 - `docs/architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_DECISION_V1.md`
 - `docs/public-site/decisions/PDR-009-hubspot-scheduler-native-booking.md`
-- `docs/tasks/to-do/TASK-1509-growth-meetings-scheduler-server-adapter.md`
+- `docs/tasks/in-progress/TASK-1509-growth-meetings-scheduler-server-adapter.md`
 
 Reglas obligatorias:
 
@@ -222,7 +222,7 @@ Reglas obligatorias:
 - Markers: `native-meeting-scheduler`, `meeting-calendar`, `meeting-agenda`, `meeting-details`, `meeting-summary`.
 - Assertions: no console/page errors, no PII in dataLayer, exact expected events once, `/g/collect` payloads, one primary action, focus destinations, 44px targets and `scrollWidth===clientWidth`.
 - Review dossier: `docs/ui/reviews/TASK-1510-native-meeting-scheduler-review.md`.
-- Baseline decision: the official HubSpot embed on the selected pilot surface is the functional/CRO baseline; the accepted monthly-calendar captures become the visual baseline after human approval. Time Horizon remains only as a negative comparison.
+- Baseline decision: the official HubSpot embed was the historical functional/CRO comparison during design; it is not a recovery path or current pilot UI. The accepted monthly-calendar captures are the native visual baseline. Time Horizon remains only as a negative comparison.
 
 ### Design decision log
 
@@ -300,8 +300,9 @@ The renderer is a standalone custom element with an explicit state reducer. Rend
 ### Feature flags / cutover
 
 - Consumes `GROWTH_NATIVE_MEETING_SCHEDULER_ENABLED`.
+- Los defaults de código son OFF. El estado operativo vigente tiene staging/Production ON sólo para el binding allowlisted de `/agenda/`; la graduación a otras superficies sigue pendiente.
 - OFF -> native surface unavailable/version rollback; shadow -> invisible/deterministic validation; pilot -> native on one allowlisted surface; graduation later.
-- Revert: flag OFF + host cache purge; no calendar/CRM data migration.
+- Revert: flag OFF + binding/host cache purge o versión anterior; no calendar/CRM data migration y ninguna derivación visible al provider.
 
 ### Rollback plan per slice
 
@@ -318,15 +319,16 @@ The renderer is a standalone custom element with an explicit state reducer. Rend
 3. Full state/a11y/telemetry suites.
 4. Staging real availability and native recovery.
 5. GTM workspace preview + browser dataLayer/`/g/collect`, no publish.
-6. Approved real booking and HubSpot/Outlook/Teams read-back.
-7. Human confirms GTM publish; create version/publish/snapshot/realtime verify.
-8. Pilot one surface; compare view->slot->details->confirmed/recovery and visual evidence before graduation.
+6. Pilot one isolated surface for read/UX/recovery evidence without creating a booking.
+7. Approved real booking and HubSpot/Outlook/Teams read-back plus live `/g/collect`.
+8. Human confirms GTM publish; create version/publish/snapshot/realtime verify.
+9. Compare view->slot->details->confirmed/recovery before graduating any additional surface.
 
 ### Out-of-band coordination required
 
 - Kinsta/public runtime rollout approval.
 - Approved recipient/time and optional inbox inspection.
-- Human first-fold acceptance, enterprise verdict, GTM publish and production flag flip.
+- Human first-fold acceptance, enterprise verdict and production flag flip are complete; booking evidence and GTM publish remain separate approvals.
 
 <!-- ZONE 4 — VERIFICATION & CLOSURE -->
 
@@ -389,16 +391,18 @@ The renderer is a standalone custom element with an explicit state reducer. Rend
 
 ## Closing Protocol
 
-- [ ] Keep `code complete, rollout pendiente` while GTM publish, public pilot or native-recovery evidence is pending.
+- [x] Keep lifecycle `in-progress` while controlled booking/replay, `/g/collect` evidence and GTM publish remain pending; public pilot and native-recovery evidence are complete.
 - [x] Runtime flag/binding, public pilot host and API evidence recorded in the feature-flag ledger, Handoff and changelog; GTM/booking evidence remains pending.
 - [ ] Never claim global iframe replacement from a single pilot.
 
 ## Definition of Done
 
-- [ ] Portable frontier renderer, complete flow/a11y, GTM funnel and premium evidence are complete.
+- [x] Portable frontier renderer, complete flow/a11y, local GTM funnel contract and premium evidence are complete.
 - [ ] Controlled booking and conversion measurement are runtime-verified with flag/version rollback.
 - [ ] Any wider graduation remains evidence-driven, one surface at a time.
 
 ## Follow-ups
 
-- After TASK-1431, graduate `hubspot_handoff` and additional public surfaces without changing navigation-only `book_meeting`.
+- Ejecutar el booking controlado/replay y read-back HubSpot/Outlook/Teams; capturar `/g/collect` sin PII ni slot exacto.
+- Publicar GTM sólo tras Preview/Tag Assistant, evidencia live y aprobación humana explícita.
+- Graduar `open_meeting_scheduler` una superficie a la vez; mantener `book_meeting` navigation-only y el scheduler native-only sin enlaces de recuperación al provider.

@@ -33,7 +33,10 @@ El **medio es el mensaje**: la landing debe *probar* craft técnico, no describi
 ### 4. Marca y conversión
 
 - **Lidera la masterbrand Efeonce** (Globe/Reach/Wave nunca solos; Globe Studio solo como "| Efeonce"). Beneficios antes que siglas (ICO/RpA/FTR solo en el bloque de prueba). Tuteo.
-- **CTA primario: "Agenda una reunión"** → HubSpot Meetings + UTM; fallback `/contacto/`+WhatsApp/mailto. CTA secundario "Mira cómo medimos" (apalanca la transparencia).
+- **CTA primario: "Agenda una reunión"** → `open_meeting_scheduler` cuando Agencia Creativa complete su gate de
+  surface/binding, booking y medición. La experiencia será native-only; `/contacto/`, WhatsApp o mail pueden existir
+  como canales editoriales independientes, no como fallback interno del scheduler. La candidata actual aún no está
+  promovida. CTA secundario "Mira cómo medimos" (apalanca la transparencia).
 - **Solo casos citables** (Sky +127% tráfico orgánico, Bresler +180% ventas digitales, Pinturas Berel retainer SEO+AEO).
 
 ## Consecuencias

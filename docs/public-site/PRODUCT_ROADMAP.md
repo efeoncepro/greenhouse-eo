@@ -145,16 +145,18 @@ capability dentro del sistema, no presentarse como agencia suelta.
  y del about-us (identidad). es-LATAM neutro `hreflang`-ready (pan-hispano, LATAM-first→EEUU→mundo).
  Ver [PDR-008](decisions/PDR-008-landing-agencia-marketing-digital-posicionamiento.md) +
  `docs/tasks/to-do/TASK-1358-landing-agencia.md`. Pendiente: art direction del hero + contrato de Motion +
- decisión del mecanismo del CTA "Agenda una reunión" (growth-form gobernado vs HubSpot Meetings) antes de `UI ready: yes`.
+ adopción de `open_meeting_scheduler` sólo cuando `/agencia` complete su propio gate de surface/binding, booking y medición;
+ el scheduler nativo es el mecanismo canónico, pero esta landing todavía no está promovida.
 
-- **PDR-009 + TASK-1366 — mecanismo transversal "Agenda una reunión"** (decisión de validación):
- antes de reemplazar el iframe oficial de HubSpot Meetings, Greenhouse debe probar si una UI propia puede
- reservar por HubSpot Scheduler API conservando side effects nativos: calendario Office 365, Teams, invitación
- al invitado, contacto/timeline/meeting en HubSpot y atribución medible sin PII en `dataLayer`. La implementación
- live de `/servicios/redes-sociales/` queda como fallback seguro mientras se ejecuta el spike. Ver
- [PDR-009](decisions/PDR-009-hubspot-scheduler-native-booking.md) +
- `docs/tasks/complete/TASK-1366-hubspot-scheduler-booking-equivalence.md`. El spike cerró `conditional pass`:
- equivalencia core probada; adapter/UI productivos siguen como follow-ups y el iframe permanece fallback.
+- **PDR-009 + TASK-1509/1510 — mecanismo transversal "Agenda una reunión"** (piloto nativo activo):
+ Greenhouse ya productizó `open_meeting_scheduler` sobre HubSpot Scheduler API conservando calendario Office 365,
+ Teams, contacto/reunión y un rail de medición sin PII. `/agenda/` es el piloto native-only; su recuperación ocurre
+ mediante reintento/navegación mensual y el rollback mediante flags, binding, backup o versión, nunca con un enlace
+ visible al provider. Ver [PDR-009](decisions/PDR-009-hubspot-scheduler-native-booking.md),
+ `docs/tasks/in-progress/TASK-1509-growth-meetings-scheduler-server-adapter.md` y
+ `docs/tasks/in-progress/TASK-1510-native-meeting-scheduler-portable-experience.md`. Pendientes: booking/replay
+ controlado, `/g/collect` y publicación GTM. Agencia, Agencia Creativa y HubSpot Services siguen sin promoción;
+ cada surface exige su propio gate y activación explícita. RRSS conserva su contrato legacy hasta migración formal.
 
 ## Next
 

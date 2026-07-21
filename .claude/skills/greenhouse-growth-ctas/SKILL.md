@@ -17,7 +17,8 @@ conversion prompts across public surfaces. CTAs are **authored, versioned and pu
 Greenhouse** (immutable published snapshots); a **server-side arbiter** decides what renders on each
 surface+route (the browser NEVER sees the candidate set or policy); a **portable renderer**
 (`<greenhouse-cta>`) paints the arbitrated contract on any host; actions route to governed
-destinations (V1: `open_growth_form`); and evidence lands in an **append-only Tier A conversion
+destinations (`open_growth_form`, governed navigation and the additive native
+`open_meeting_scheduler` task surface); and evidence lands in an **append-only Tier A conversion
 ledger** where only `server_confirmed` counts as conversion truth.
 
 > **Full API Parity:** a CTA is a capability with a governed programmatic contract
@@ -47,7 +48,8 @@ operador (/growth/ctas o API admin, capability growth.cta.*)
   → arbiter server-side por (surface, route): elegibilidad targeting (fail-closed) → priority
       → 0–1 interruptivo + N no-interruptivos, compilados browser-safe
   → <greenhouse-cta> pinta el contrato (variante visual elegida por cta_version.style_variant)
-  → click → open_growth_form monta <greenhouse-form> gobernado (jamás duplica el form)
+  → click → open_growth_form monta <greenhouse-form>, o open_meeting_scheduler abre la task surface
+      nativa; cada dominio conserva su command y su verdad de conversión
   → evidencia: dataLayer greenhouse_cta_* (direccional) + POST /events → ledger Tier A
       (browser_reported; solo server_confirmed es verdad de conversión)
   → GTM v4 reenvía a GA4 (tags por evento + DLVs; conversión sigue siendo generate_lead del form)
@@ -86,7 +88,9 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
   https sin credenciales/protocol-relative) / `open_think_tool` (PATH sobre hub gobernado
   `GROWTH_CTA_THINK_HUB_URL`∥`PUBLIC_GRADER_HUB_URL`∥think.efeoncepro.com + campaign context
   UTM-allowlisted strict) / `book_meeting` (https en `meetings*.hubspot.com` + env
-  `GROWTH_CTA_BOOKING_URL_HOSTS`; navegación-only, CERO write CRM),
+  `GROWTH_CTA_BOOKING_URL_HOSTS`; navegación-only, CERO write CRM) / `open_meeting_scheduler`
+  (binding activo por `meetingSurfaceId` + `schedulerKey`; familia `meeting_scheduler`, sin URL de
+  provider elegida por el autor),
   `ingest.ts` (pipeline forjable-hardened + routing Tier B + hooks dismiss/conversión),
   `commands.ts` (lifecycle + surfaces), `readers.ts` (arbitraje + suppression + kill switch),
   `suppression.ts` (decisión PURA: taxonomía + policy zod, fail-closed), `visitor-state.ts`
@@ -100,7 +104,9 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
   todo selector es `:is(greenhouse-cta, .ghc-scope)`; geometría del overlay en `.ghc-slidein`,
   density/card del interruptivo keyed por `[data-ghc-placement='slide_in']` — aplica igual en
   overlay y preview), `telemetry.ts` (espejo del SoT; sanitize allowlist antes de CustomEvent +
-  dataLayer), `action.ts` (monta el form, carga lazy del bundle forms), `fixtures.ts`
+  dataLayer), `action.ts` (monta el form, carga lazy del bundle forms), `meeting-action.ts` (task
+  surface nativa: carga lazy, dialog bounded/full-screen, una instancia conectada y recovery por
+  `Reintentar`), `fixtures.ts`
   (preview/tests, pairwise slide_in), **TASK-1429**: `slide-in.ts` (`SlideInController` — único
   interruptivo V1: no modal `role=complementary` sin `aria-modal`/trap, trigger gobernado del
   bundle dwell 8s O scroll 35%, apertura pasiva sin focus steal, Escape + focus return, dismiss
@@ -130,6 +136,12 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
   `scripts/growth/_sanity-cta-store-sql.ts` (SQL vivo vs PG).
 
 ## Estado de rollout (actualizar al cambiar)
+
+- **2026-07-21: quinta acción `open_meeting_scheduler` + piloto `/agenda/` RELEASED.** El Action
+  Registry y el renderer ya abren la experiencia nativa `meeting_scheduler`; el piloto público
+  de WordPress opera native-only, sin link ni iframe de fallback HubSpot. Pendiente para cerrar
+  el rollout end-to-end: booking controlado + replay idempotente, verificar `/g/collect` y
+  publicar/verificar GTM bajo aprobación explícita.
 
 - **2026-07-18 (TASK-1430): Cockpit operator CODE-COMPLETE (local, sin push).** `/growth/ctas` es
   master-detail con autoría gobernada de 8 pasos, preview harness del renderer real, kill switches
@@ -211,6 +223,12 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
   pone el motor — el autor jamás elige host) con campaign context UTM-allowlisted strict;
   `book_meeting` solo hosts de booking gobernados y es navegación-only (CERO write CRM por click —
   el adapter CRM es `hubspot_handoff`, demand-driven futuro).
+- **NUNCA** confundir `book_meeting` con `open_meeting_scheduler`: el primero conserva la navegación
+  legacy; el segundo abre la experiencia nativa y delega funnel/booking/receipt a
+  `greenhouse-growth-meetings`. `fallbackHref` puede persistir en la proyección V1 por compatibilidad
+  con clientes cacheados, pero el renderer actual NO lo consume ni renderiza. Falla de bundle/config,
+  estado `fallback_only` o mes vacío se recuperan con `Reintentar`/navegación mensual; jamás con un
+  link o iframe HubSpot visible.
 
 - **NUNCA** arbitrar/decidir política en el browser: el renderer recibe 0–1 interruptivo + N
   no-interruptivos YA resueltos; targeting/priority/suppression jamás cruzan al contrato.
@@ -268,6 +286,9 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
   gobernado. Boundary duro: forms es la autoridad de campos/validación/consent/conversión
   (`generate_lead` sigue siendo SU key event). Reusos permitidos: `readers.ts` (resolver el form) +
   `embed-key.ts` (crypto) + `public-submission` (abuse core). Nada más.
+- **`greenhouse-growth-meetings`** — autoridad de config/availability/booking, timezone visitante,
+  idempotencia y conversión receipt-gated de `open_meeting_scheduler`. CTA sólo posee launcher,
+  task surface y handoff; una apertura nunca equivale a un lead.
 - **`greenhouse-gtm-ga4-operator`** — construye/publica los tags de la familia `greenhouse_cta_*`
   y las custom dimensions GA4; este dominio define QUÉ se emite (SoT), aquel CÓMO se taggea.
   Registro obligatorio en TRACKING-PLAN §CTAs.

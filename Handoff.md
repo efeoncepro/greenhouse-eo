@@ -22,17 +22,9 @@
 ## Pendientes inmediatos
 
 - **`TASK-1509` / `TASK-1510` IN-PROGRESS (Native Meeting Scheduler, `EPIC-023`).** Objetivos load-bearing:
-  calendario Efeonce moderno y funnel GTM/GA4 con `generate_lead` sólo desde recibo server-confirmed. TASK-1509 está
-  code-complete y probada en dev (HubSpot provider/DTO, ledger, HMAC/rate limits, Turnstile y race live); TASK-1510
-  implementa **Temporal Operations Desk** con recetas `guided|split|command`, calendario/agenda semánticos, timezone
-  visitor-aware y fallback Santiago. El adapter CTA aditivo `open_meeting_scheduler` valida `surface + scheduler key`,
-  lazy-loads y abre diálogo desktop/full-screen móvil preservando una instancia; `book_meeting` sigue navigation-only.
-  GVC CTA `.captures/2026-07-21T11-22-29_growth-cta-native-meeting` pasó 10 frames desktop/mobile.
-
-  Formulario, copy y confirmación completa están cerrados en la task canónica: validación reactiva/corporativa,
-  iconos Tabler, receipt server-confirmed sin PII y motion/reduced-motion. GVC final
-  `.captures/2026-07-21T12-18-17_native-meeting-scheduler` pasó 45 frames en 1440/820/390; pruebas, TypeScript, ESLint
-  y build productivo verdes. GTM preserva allowlist + receipt gate y sigue sin publicar.
+  TASK-1509 está code-complete; TASK-1510 entrega **Temporal Operations Desk** adaptable, timezone local, validación
+  corporativa reactiva y confirmación receipt-gated sin PII. `open_meeting_scheduler` abre una instancia dialog/full-screen;
+  `book_meeting` sigue navigation-only. Pruebas, TypeScript, ESLint, build y GVC premium están verdes.
 
   Ambos flags están ON en staging/Production. El binding piloto `fhsf-efeonce-lead-gen-web`/`discovery` está `active`; config y disponibilidad
   reales devolvieron 200 desde el origen permitido, incluida la resolución visitor-aware de `America/New_York`. El piloto aislado
@@ -47,18 +39,18 @@
   HubSpot devuelve actualmente cero slots para agosto; el renderer ya conserva `Agosto de 2026`, la grilla de 31 días y
   el estado vacío en vez de colapsar el calendario; PR #162 (`ddd3094538e7`, run `29848667096`) ya liberó esa corrección.
   `ops-worker` permanece change-gated porque el diff desde `7da563613daf` no toca sus rutas runtime.
-  GTM workspace 6 sigue sin versión/publicación. No promover aún a Contacto/RRSS: primero booking controlado/replay y evidencia
-  `/g/collect`; la publicación GTM requiere confirmación humana separada. Backups Elementor: `agenda_pilot_overflow_v1`,
-  `agenda_pilot_template_v1` y `_gh_backup_before_agenda_native_only_20260721T170615Z`.
-  HubSpot/Office 365/Teams siguen SoT. Trabajo en `develop`; `docs/ui/creative-studio/` es ajeno y no se toca.
+  GTM workspace 6 sigue sin versión/publicación. No promover a Contacto/RRSS antes del booking/replay y `/g/collect`;
+  publicar GTM requiere confirmación humana separada. HubSpot/Office 365/Teams siguen SoT. La skill canónica nueva es
+  `greenhouse-growth-meetings`; arquitectura, PDR, CTA/GTM/release, manuales e índices quedaron sincronizados.
 
 - **`TASK-1366` COMPLETE / CONDITIONAL PASS (HubSpot Scheduler Booking Equivalence Spike, `EPIC-023`).**
   Build HubSpot `#27` desplegado/reinstalado con scope Scheduler mínimo y sin rotar el token gobernado. Booking
   real 2026-07-22 09:15–09:45 Chile verificado `isOffline=false`: `calendarEventId`/`contactId`, Teams, contacto +
   reunión CRM `SCHEDULED`, evento Office 365 del organizador, invitado correcto y links nativos de
   cancelación/reprogramación. El inbox invitado no se inspeccionó directamente y Scheduler no porta UTK/UTM;
-  esas condiciones pasan a productización. No cancelar la reunión salvo instrucción del operador. No cambió
-  ninguna landing/GTM; `HubSpotMeetingEmbed` permanece fallback. Canon:
+  esas condiciones pasan a productización. No cancelar la reunión salvo instrucción del operador. El spike no cambió
+  ninguna landing/GTM; su postura de fallback quedó superseded para `open_meeting_scheduler` por el rollout native-only,
+  sin alterar superficies legacy aún no migradas. Canon:
   `docs/tasks/complete/TASK-1366-hubspot-scheduler-booking-equivalence.md` + `PDR-009`.
 
 - **`TASK-1506` COMPLETE (Globe Frontend Hosting and Front Door Decision, `EPIC-028`) — ADR-004, local-first sin push.**

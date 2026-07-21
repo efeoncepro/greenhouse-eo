@@ -2,13 +2,19 @@
 
 ## Meta
 
-- Status: `draft`
+- Status: `draft — conversion contract amended 2026-07-21`
 - Owner task: `TASK-1350 — Landing pública "Agencia Creativa" (Efeonce · Design Engineer)`
 - Product Design asset: **PENDIENTE** — la dirección de arte del hero + KV se produce con `design-studio` → `fal.ai`/Higgsfield/Magnific/Adobe (Slice 1). `UI ready` se mantiene `no` hasta tenerla aprobada. Este wireframe fija **estructura, copy, estados y flujo**; no inventa la dirección visual.
 - Intended consumers: visitante público (CMO/Director de Marketing/CEO/Compras) en `efeoncepro.com`.
 - Copy source: contenido WordPress es-CL, validado con `greenhouse-ux-writing` + `docs/context/05_voz-tono-estilo.md` + `09_marca-agencia.md`. No `src/lib/copy/*` (no es portal).
 - Primitive decision: `new (one-off público)` — bloques de theme custom WordPress (no design system del portal); bundle Vite para el hero e islands.
 - UI ready target: `no` (hasta dirección de arte aprobada + contrato de Motion).
+
+> **Amendment vigente 2026-07-21 — prevalece para conversión.** La región de agenda usará Growth CTA
+> `open_meeting_scheduler` + `<efeonce-meeting-scheduler>` cuando esta landing complete su gate propio. La task
+> surface será native-only, sin iframe/link HubSpot ni fallback provider; error/mes vacío conservan calendario,
+> navegación y **Reintentar**. Agencia Creativa todavía no está promovida. Las referencias inferiores a embed y
+> fallback de contacto preservan el wireframe del candidato legacy de 2026-07-07 y no son instrucciones futuras.
 
 ## Brief
 

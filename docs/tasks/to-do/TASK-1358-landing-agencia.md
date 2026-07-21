@@ -68,9 +68,10 @@ Publicar en WordPress una landing `/agencia/` que:
 ### Depends on
 
 - Skill `efeonce-public-site-wordpress` (acceso WP/Kinsta, Ohio/Elementor, `Document::save()`).
-- Greenhouse Growth Forms: nuevo `form-key`/`surface`/slug para la reunión (`efeonce-agencia-reunion` o similar) `[a crear]`. HubSpot delivery `disabled` hasta cutover del dispatcher (TASK-1264) `[verificar]`.
+- Growth Meetings: crear/autorizar `meeting_surface_binding` y asignar `schedulerKey` para `/agencia` sólo durante
+  su rollout explícito. El piloto `/agenda/` no concede autoridad ni promoción automática a esta landing.
 - Assets: art direction del hero + sección firma (Slice 1); logos de clientes citables ya en `docs/assets/public-site/aeo-brand-logos/`.
-- Confirmación del operador sobre el mecanismo del CTA "Agenda una reunión" (ver Open Questions).
+- Aprobación del rollout de `open_meeting_scheduler` para esta surface, separada de la decisión ya cerrada sobre el mecanismo.
 
 ### Blocks / Impacts
 
@@ -120,15 +121,24 @@ Publicar en WordPress una landing `/agencia/` que:
 - Composition Shell: `no aplica` — sitio público WP, no shell del portal.
 - Primitive decision: `reuse` — patrones marketing `modern-ui` + rail TASK-1345; NUNCA primitives del portal.
 - Adaptive density / The Seam: `no aplica` (público).
-- Floating/Sidecar/Dialog decision: sin overlays modales; conversión inline (`#agenda`).
+- Floating/Sidecar/Dialog decision: el CTA abre el host gobernado de `open_meeting_scheduler`; dialog en desktop y
+  full-screen en móvil. Un `#agenda` editorial ancho puede alojar receta inline/page sin crear otro flujo.
 - Copy source: WordPress es-LATAM validado con `greenhouse-ux-writing` — NUNCA `src/lib/copy/*`.
 - Access impact: `none` (público, sin auth/entitlements).
 
 ### State inventory
-- Default: página completa con hero + secciones firma. Loading: chrome del bloque `#agenda` + skeleton del form. Empty: N/A (sin listas). Error: fallo del form → mensaje + fallback `mailto`/`/contacto/`. Degraded / partial: asset (logo/video) falla → colapsa a texto/fondo sólido, sin white-on-white. Permission denied: N/A. Long content: secciones stackeadas, sin overflow horizontal. Mobile / compact: stack + sticky CTA `.mcta` (se oculta en `#agenda`). Keyboard / focus: foco visible en CTAs/form, DOM order. Reduced motion: marquee/reveals detenidos, contenido completo.
+- Default: página completa con hero + secciones firma. Loading: launcher/shell estructural del scheduler. Empty: grilla
+  mensual semántica completa y navegación acotada aun con cero slots. Error: recuperación nativa con **Reintentar**;
+  nunca embed/link provider. Degraded / partial: un asset editorial falla → texto/fondo sólido; el scheduler conserva
+  su estado propio. Permission denied: N/A. Long content: secciones stackeadas, sin overflow horizontal. Mobile /
+  compact: stack + launcher que abre full-screen. Keyboard / focus: foco visible, modal contenido y restore al invocador.
+  Reduced motion: marquee/reveals detenidos y transiciones del scheduler equivalentes sin movimiento.
 
 ### Interaction contract
-- Primary interaction: click "Agenda una reunión" → scroll a `#agenda` → montar form. Hover / focus / active: sistema page-scoped `task-1358-cta-hover-system-v1` (anillo `:focus-visible`, no solo color; `.btn-light` en dark sections para no quedar white-on-white). Pending / disabled: botón submit disabled + feedback de latencia. Escape / click-away: N/A (no modal). Focus restore: al `success_card` tras submit. Latency feedback: spinner/estado en el botón. Toast / alert behavior: success/error inline del renderer (no toast global).
+- Primary interaction: click "Agenda una reunión" → `open_meeting_scheduler` abre una task surface nativa gobernada.
+  Hover / focus / active: sistema page-scoped `task-1358-cta-hover-system-v1`; foco visible sin depender sólo de color.
+  Pending / disabled: el scheduler gobierna loading/booking y evita doble submit. Escape cierra sólo cuando es seguro y
+  restaura foco al launcher. La confirmación reemplaza todo el shell; los errores permanecen inline, sin toast global.
 
 ### Motion & microinteractions
 - Motion primitive: `CSS` + IntersectionObserver — **NUNCA** `@/components/greenhouse/motion/**`, `useGreenhouseGSAP` ni Framer (son del portal, no del sitio público).
@@ -160,7 +170,7 @@ Publicar en WordPress una landing `/agencia/` que:
 - Alternatives considered: H1 literal "Agencia de Marketing Digital" (commodity, viola masterbrand); landing "partner de crecimiento" (keyword 0); about-us hace el job (mismatch de intención).
 - Why this pattern: PDR-002/008 (slug/title = keyword; hero = categoría diferenciada); reframe *no-es-X-es-Y* = Do canónico de voz.
 - Reuse / extend / new primitive: `reuse` (rail Ohio + Growth Forms).
-- Open risks: comprador SMB equivocado (mitiga anti-ICP); mecanismo del CTA "Agenda una reunión" sin precedente gobernado.
+- Open risks: comprador SMB equivocado (mitiga anti-ICP); promoción prematura de una surface sin booking/medición live.
 
 ### Visual verification
 - GVC scenario: Playwright live (portal GVC N/A).
@@ -200,7 +210,8 @@ Publicar en WordPress una landing `/agencia/` que:
 
 - Backup pre-mutación (snapshot `_elementor_data`/`_elementor_page_settings`/`_thumbnail_id`/metas Ohio).
 - Construir hero nativo Ohio (dark, full-bleed) + rail HTML gobernado full-bleed (`content_width=full`, padding 0) con las 12 secciones `.gh-agencia-*` + `data-capture`; dark sections con `clb__dark_section`; CTA hover system page-scoped; `template default`, **NO** `elementor_canvas`, sin header/wrapper override.
-- Embed `<greenhouse-form>` en `#agenda` (nuevo form-key/surface/slug, `diagnostic_premium`, Turnstile, consent; HubSpot destination `disabled` hasta cutover).
+- Integrar `open_meeting_scheduler` mediante el host/version de Growth CTA, con `meetingSurfaceId` + `schedulerKey`
+  y binding allowlisted. No copiar el renderer ni insertar iframe/link HubSpot en WordPress.
 - FAQ `<details name="task1358-faq">` + FAQPage JSON-LD (1:1 con las preguntas visibles); JSON-LD `Organization`+`Service`+`BreadcrumbList` (Yoast owns el resto).
 
 ### Slice 4 — SEO/entidad + nav + cross-linking
@@ -240,7 +251,7 @@ Discovery + art direction (S1) → copy + motion (S2) → build (S3) → SEO/nav
 | --- | --- | --- | --- |
 | Atraer comprador SMB (commodity) | Media | Alto | Anti-ICP en copy, sin precios, señales enterprise |
 | H1 suena commodity y diluye marca | Media | Alto | Reframe *no-es-X-es-Y* obligatorio; keyword en title, no en promesa |
-| CTA "Agenda una reunión" sin precedente gobernado | Alta | Medio | Resolver mecanismo (Open Q) antes de S3; default = growth-form gobernado |
+| Surface de agenda promovida sin evidencia propia | Alta | Medio | mantener Agencia OFF hasta binding, booking/replay y medición aprobados |
 | Lead capturado no fluye a HubSpot (delivery `disabled`) | Alta | Medio | Documentar; coordinar cutover dispatcher (TASK-1264); no prometer flujo hasta prender |
 | Overflow horizontal / dark section white-on-white (Ohio) | Media | Medio | `scrollWidth==clientWidth` + `clb__dark_section` + `.btn-light`; Playwright live |
 | Canibalización con `/servicios` o about-us | Baja | Medio | Roles distintos (PDR-008 IA); canonical limpio + cross-link |
@@ -264,7 +275,7 @@ Playwright live sobre preview → SEO preflight (canonical, JSON-LD válido, Hub
 
 ### Out-of-band coordination required
 
-- Operador: decisión del mecanismo del CTA "Agenda una reunión" (Open Q) + art direction del hero (S1).
+- Operador: aprobación del rollout de `open_meeting_scheduler` para Agencia + art direction del hero (S1).
 - Confirmar estado del cutover del dispatcher HubSpot (TASK-1264) para el flujo del lead.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -277,7 +288,8 @@ Playwright live sobre preview → SEO preflight (canonical, JSON-LD válido, Hub
 - [ ] Hero captura la categoría en `<title>`/meta y remata con el reframe growth-partner (no queda "somos una agencia digital" como promesa).
 - [ ] Full-service presentado como un motor incl. **performance marketing** como capability; cada capability enlaza su spoke cuando existe.
 - [ ] Diferenciador medible (ecosistema + ICO ilustrativo declarado) + casos citables (Sky/Bresler/Berel)
-- [ ] CTA "Agenda una reunión" funcional (mecanismo resuelto) + fallback `mailto`/`/contacto/`; CTA nunca muerto.
+- [ ] CTA "Agenda una reunión" usa `open_meeting_scheduler` sólo tras gate de esta surface; recuperación native-only,
+  sin fallback provider. Los canales `/contacto/`/mail/WhatsApp, si se mantienen, son secundarios independientes.
 - [ ] Copy es-LATAM neutro validado con `greenhouse-ux-writing`; beneficios antes que siglas; sin precios commodity.
 - [ ] JSON-LD `Organization`+`Service`+`BreadcrumbList`+`FAQPage` válido; FAQ 1:1 con lo visible.
 - [ ] `scrollWidth == clientWidth` en 1440/1280/390; contraste AA en dark sections; reduced-motion respetado.
@@ -312,6 +324,8 @@ Playwright live sobre preview → SEO preflight (canonical, JSON-LD válido, Hub
 
 ## Open Questions
 
-1. **Mecanismo del CTA "Agenda una reunión"** — ninguna landing viva lo tiene: ¿HubSpot Meetings embed (net-new, sin precedente gobernado, mayor riesgo) **o** `<greenhouse-form>` de solicitud de reunión in-page (patrón gobernado ya vivo, atribución+consent+Turnstile+dispatcher, menor riesgo)? Default propuesto = growth-form gobernado salvo decisión del operador. **Bloquea S3.**
+1. **Rollout del CTA "Agenda una reunión"** — el mecanismo está resuelto como `open_meeting_scheduler`, pero Agencia
+   permanece no promovida. Definir `meetingSurfaceId`/binding, ejecutar booking/replay y `/g/collect`, y obtener las
+   aprobaciones de flag/GTM antes de activarlo. **Bloquea el cutover de conversión, no el diseño editorial de S3.**
 2. **Nav global** — ¿"Agencia" entra como ítem top-level de nav, o solo como cross-link desde `/servicios` y hero? Afecta el reparto de link equity.
 3. **Slug** — confirmado `/agencia` (operador). ¿Se agrega un alias/redirect desde algún término más literal si el crawl encuentra equity previo?

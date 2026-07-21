@@ -71,7 +71,11 @@ El scope es **full-service** — creatividad y contenido, **performance marketin
 ### 4. Marca, conversión y CRO
 
 - **Lidera la masterbrand Efeonce.** Globe/Reach/Wave nunca solos; capabilities descritas, no siglas en los primeros 30s (`09` regla cardinal: beneficios antes que nombres). Tuteo es-CL neutro.
-- **CTA primario: "Agenda una reunión"** + UTM/atribución preservada; fallback `/contacto/` + WhatsApp/mailto. **Mecanismo a decidir en ejecución** (ninguna landing viva lo tiene aún): HubSpot Meetings embed (net-new, sin precedente gobernado) **vs** `<greenhouse-form>` de solicitud de reunión in-page (patrón gobernado ya vivo en SEO/desarrollo-web, menor riesgo). Preferencia por el path gobernado salvo decisión explícita del operador. **CTA secundario de bajo compromiso** (dos escalones, patrón `PDR-004/005/006`): *"Mira cómo operamos"* (video/tour del ecosistema) o el grader como diagnóstico gratis.
+- **CTA primario: "Agenda una reunión"** + atribución preservada. El mecanismo canónico ya resuelto es
+  `open_meeting_scheduler`; `/agencia` todavía no está promovida y debe obtener surface/binding, booking y medición
+  propios antes de activarlo. El scheduler es native-only, sin embed ni link HubSpot como recuperación. `/contacto/`,
+  WhatsApp o mail pueden ofrecerse como canales editoriales separados. **CTA secundario de bajo compromiso** (dos
+  escalones, patrón `PDR-004/005/006`): *"Mira cómo operamos"* (video/tour del ecosistema) o el grader como diagnóstico gratis.
 - **CRO (doctrina `growth-marketing-cro`):** el 80% del lift es **message-market fit + confianza**, no micro-ajustes. Orden: claridad de propuesta → prueba (casos citables + logos + 4 países + 90+ clientes) → objeciones (miedo a tercerizar = perder control → lo resuelve la visibilidad total) → CTA. **Velocidad/CWV y trust signals son palancas de conversión de primer orden** (cada +100ms ≈ −1% conversión; juicio de confianza en ~50ms). El grader es la **costura** top→bottom (nodo compartido, `PDR-003`), no se reconstruye.
 - **Web agéntica:** la landing nace con datos estructurados / JSON-LD `Organization`+`Service` y citabilidad (skill `seo-aeo`) para ser recuperada por motores de respuesta, no solo por humanos.
 
