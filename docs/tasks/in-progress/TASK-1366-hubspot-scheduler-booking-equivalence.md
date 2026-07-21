@@ -42,6 +42,9 @@
 - **Details + availability PASS** — el slug API real es `efeoncepro/agenda-discovery` (segmento codificado en
   path). Scheduler devuelve `GROUP_CALENDAR`, `isOffline=false`, un calendario `OFFICE365`, duración 30 minutos,
   `company` requerido, consentimiento legal habilitado y disponibilidad real. No se creó reunión.
+- **Harness fail-closed listo** — `scripts/hubspot/smoke-scheduler-booking.mjs` inspecciona details/availability
+  por defecto y solo habilita POST con `--execute-booking` + confirmación literal + email/nombre/company/start
+  explícitos. Valida el slot contra availability, no reintenta y solo emite evidencia allowlisted/digested.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -412,7 +415,7 @@ El spike falla si:
 
 - [ ] Se confirma el endpoint/version Scheduler API y payload requerido para `agenda-discovery`.
 - [ ] Se documenta si la scheduling page tiene Teams + Office 365 calendar conectados.
-- [ ] Availability read funciona o falla con error canonico documentado.
+- [x] Availability read funciona o falla con error canonico documentado.
 - [ ] Booking smoke controlado produce evidencia redacted.
 - [ ] Se verifica `calendarEventId`, `isOffline`, Teams URL/ID, invite, calendario y HubSpot timeline.
 - [ ] Se documenta el impacto de `hubspotutk`/UTM/content tracking y mitigacion viable.

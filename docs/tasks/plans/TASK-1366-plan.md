@@ -21,6 +21,8 @@
   efectivo con el token gobernado existente. No hubo rotación porque el mismo token adquirió el permiso.
 - Details/availability prueban `GROUP_CALENDAR`, `isOffline=false`, Office 365, duración 30 min, `company`
   requerido, consentimiento legal habilitado y slots reales. El slug API incluye owner + leaf.
+- El harness quedó implementado y verificado en modo inspect; el guard de execute falla cerrado sin la
+  confirmación literal y no realizó POST.
 
 ## Audit
 
@@ -111,8 +113,8 @@
    `hs project upload --account=48713323`, reinstalación y refresh del secreto; recibir organizador/email/slot.
 2. **Scope/read contract.** Modificar solo el app config gobernado, subirlo tras aprobación, guiar/verificar
    reinstalación y comprobar que el token nuevo resuelve details + availability. No booking en este slice.
-3. **Smoke harness seguro.** Crear `scripts/hubspot/smoke-scheduler-booking.mjs` solo si aporta reproducibilidad:
-   dry-run por defecto, payload desde env/flags, output allowlisted, guard de confirmación, cero retries de POST.
+3. **Smoke harness seguro — completo.** `scripts/hubspot/smoke-scheduler-booking.mjs`: inspect por defecto,
+   payload desde env, output allowlisted/digested, slot revalidado, guard literal y cero retries de POST.
 4. **Booking único.** Elegir un slot devuelto por availability, mostrar resumen sin PII y ejecutar una sola
    reserva con aprobación inmediata. Capturar únicamente IDs/booleanos/host y timestamps necesarios.
 5. **Equivalencia operativa.** Verificar `isOffline=false`, calendar event, Teams, invite, contacto/timeline y
