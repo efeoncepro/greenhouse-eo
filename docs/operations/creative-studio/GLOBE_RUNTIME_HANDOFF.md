@@ -23,11 +23,15 @@ subcomando (`run deploy` → servicio, `run services update` → revisión), de 
 prescribían para "restaurar" el techo escribía el campo equivocado. Corregido a **3/3** y ambos campos bajo IaC
 (requiere provider `google` >= 7.x; el pin subió de `~> 6.0` a `~> 7.0`, verificado con 76 de 78 recursos en no-op).
 
-**Riesgos abiertos.** El spend fence cross-réplica sigue **sin ejercitar**: ahora es posible, pero nadie lo probó con
->1 réplica. La §Production verification sequence de 1508 pide observar **dos** ciclos de deploy y se corrió uno.
+**Anti-drift probado en dos ciclos**, uno por servicio (runs `29872768853` web / `29875135147` api): ambos dejaron el
+`tofu plan` en **No changes**, con ingress, invoker posture, ceiling 3/3, runtime SA y env intactos. `TASK-1508` cerró.
 
-**Próximo paso ejecutable:** segundo ciclo de deploy con plan convergido, y cerrar 1508 (Slice 4 documental).
-`TASK-1480` (Production/clientes externos) sigue siendo el gate que nada de esto levanta.
+**Riesgo abierto (el único).** El spend fence cross-réplica sigue **sin ejercitar**: levantar el cap lo hizo posible por
+primera vez, pero probarlo exige concurrencia real contra el Model Lab, o sea gasto real de proveedor. Merece su propia
+autorización; nadie debería asumirlo verificado.
+
+**Próximo paso ejecutable:** `TASK-1505` (Producer surface) ya tiene su front door canónico. `TASK-1480`
+(Production/clientes externos) sigue siendo el gate que nada de esto levanta.
 
 ## Active state — 2026-07-21 (TASK-1507: front door internal-only vivo)
 

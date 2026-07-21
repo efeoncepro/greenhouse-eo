@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-21 — Cloud Run de Globe bajo Terraform y un cap de 1 instancia que nadie sabía que existía (TASK-1508)
+
+- Los dos servicios Cloud Run de Globe entraron a Terraform por import brownfield (cero destroy/replace) y
+  `deploy-internal.yml` quedó reducido a desplegar sólo la imagen: se acabó el doble escritor sobre ingress, runtime SA,
+  env, secretos y escala. Anti-drift probado en dos ciclos de deploy, uno por servicio, con `tofu plan` en `No changes`.
+- Adoptarlos destapó que ambos estaban capados a **1 instancia efectiva**: Cloud Run aplica el menor entre el ceiling a
+  nivel servicio y el de revisión, y `--max-instances` escribe uno u otro según el subcomando de `gcloud`. Corregido a
+  3/3 y ambos campos bajo IaC. Consecuencia registrada: el spend fence cross-réplica de `TASK-1465` nunca se ejercitó.
+- Spec: [`docs/tasks/complete/TASK-1508-globe-cloud-run-iac-deploy-ownership.md`](docs/tasks/complete/TASK-1508-globe-cloud-run-iac-deploy-ownership.md).
+
 ## 2026-07-21 — Globe estrena front door internal-only en globe.efeoncepro.com (TASK-1507)
 
 - El shell interno de Globe pasa a servirse por `https://globe.efeoncepro.com` detrás de un Global External ALB +
@@ -756,24 +766,3 @@
 - El cambio fue estrictamente aditivo: una propiedad, cero errores y ningún workflow, pipeline, formulario,
   reporte, record o backfill. Al cierre existen cero Deals poblados; adopción, requiredness por etapa y reporting
   deduplicado son slices futuros approval-gated, no capacidades declaradas como listas.
-
-## 2026-07-17 — Firma de marca para el sistema visual editorial
-
-- `content-marketing-studio` incorpora una política reutilizable para firmar hero/OG, diagramas y capturas con
-  activos oficiales, contraste y espacio de respeto, sin convertir el logo en watermark ni mezclarlo con marcas
-  de clientes o plataformas. Los mirrors Codex/Claude quedaron sincronizados.
-- El sistema visual del caso ANAM aplica la regla con el wordmark oficial de Efeonce; `ANAM-V02` fue regenerado,
-  revisado a resolución original y registrado con nuevos hashes. Una medición del tema Ohio descartó usar el
-  master vertical en desktop (`1483 px` de alto a ancho de columna): ahora existe variante horizontal `3:2` para
-  desktop/tablet y vertical `3:4` para móvil. La skill canoniza `<picture>` para art direction; su soporte en el
-  renderer sigue pendiente. No se subió a WordPress ni se publicó el post.
-- Se aclaró la frontera estilística: la regla reusable es una experiencia editorial integrada, no fondos ni
-  formas universales. El retiro de círculos/gradiente conserva el estilo de las infografías ANAM y queda limitado
-  a `ANAM-V02`–`V04`; otros artículos pueden usar sistemas visuales completamente distintos.
-- `ANAM-V02` ya materializa esa corrección: cuatro derivados determinísticos —desktop/mobile × light/dark—,
-  sin círculos ni gradiente de canvas, con cards y composición preservadas y logos oficiales positivo/negativo.
-  Masters y WebP fueron inspeccionados; la integración WordPress continúa pendiente.
-- `ANAM-V03` quedó producido como cuatro variantes determinísticas —horizontal `1600×900` y vertical
-  `1200×1600`, ambas light/dark—. La gráfica mantiene una escala íntegra `0–100%`, muestra el cambio real de
-  `2,75 pp`, explicita `611` Deals pendientes y sitúa el gate de KPI en `≥95%`. Los logos oficiales se verificaron
-  desde los masters finales; todavía no se cargó ni integró en WordPress.

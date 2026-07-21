@@ -80,10 +80,21 @@ contenedor o al template reabriría el drift de env, secretos, runtime SA y esca
 Smokes post-deploy: federación humana por `https://globe.efeoncepro.com` → `human_federation_ok`; api anónimo → `403`;
 `run.app` del web → `404`.
 
-### Pendiente para cerrar
+### Segundo ciclo de deploy (la §Production verification sequence pide dos)
 
-- Segundo ciclo de deploy observado (la §Production verification sequence pide dos; se corrió uno).
-- Slice 4: runbook y handoff con el ownership por campo y la serialización apply/deploy.
+Ejecutado sobre el **otro** servicio para cubrir ambos: `globe-api-internal`, run `29875135147`. Post-deploy:
+ingress `ALL`, `invokerIamDisabled` false, ceiling **3/3**, SA `api_runtime`, 15 env vars — y `tofu plan` de nuevo en
+**No changes**. Dos ciclos, dos servicios, cero drift.
+
+Smokes finales: federación humana por el dominio `human_federation_ok`; api anónimo `403`; `run.app` del web `404`;
+`https://globe.efeoncepro.com` → `200` con TLS válido.
+
+### Lo que NO se cerró acá (follow-up honesto)
+
+El spend fence cross-réplica **sigue sin ejercitarse**. Levantar el cap lo hizo *posible* por primera vez, pero probarlo
+de verdad exige concurrencia real contra el Model Lab, o sea **gasto real de proveedor**. Es trabajo con implicancia de
+costo y merece su propia autorización; declararlo verificado acá sería exactamente el tipo de afirmación sin evidencia
+que esta task destapó.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -91,7 +102,7 @@ Smokes post-deploy: federación humana por `https://globe.efeoncepro.com` → `h
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -104,7 +115,7 @@ Smokes post-deploy: federación humana por `https://globe.efeoncepro.com` → `h
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Slices 2-3 aplicados y verificados en vivo (servicios en Terraform, cap 1→3 corregido, workflow image-only con plan convergido); faltan 2.º ciclo de deploy y cierre documental`
+- Status real: `Completa y verificada en vivo: ambos servicios en Terraform, ownership por campo, cap efectivo 1→3 corregido, workflow image-only con dos ciclos anti-drift convergidos`
 - Rank: `TBD`
 - Domain: `ops`
 - Blocked by: `none`
@@ -271,11 +282,11 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, ownership por campo y consumidores están documentados con paths/recursos reales.
-- [ ] Invariantes web/API, acceso, serialización de apply/deploy y postura de secretos están preservados.
-- [ ] Import/rollback no destructivos y evidencia runtime pre/post están registrados.
-- [ ] Un deploy posterior deja Terraform convergido salvo el campo exacto de imagen ignorado deliberadamente.
-- [ ] No hay secretos crudos ni pérdida de IAM/SSO/audience/ingress.
+- [x] Source of truth, ownership por campo y consumidores están documentados con paths/recursos reales.
+- [x] Invariantes web/API, acceso, serialización de apply/deploy y postura de secretos están preservados.
+- [x] Import/rollback no destructivos y evidencia runtime pre/post están registrados.
+- [x] Un deploy posterior deja Terraform convergido salvo el campo exacto de imagen ignorado deliberadamente.
+- [x] No hay secretos crudos ni pérdida de IAM/SSO/audience/ingress.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -387,12 +398,12 @@ completo antes de adoptar el siguiente. El tráfico y las URLs no cambian.
 
 ## Acceptance Criteria
 
-- [ ] Ambos servicios están en Terraform sin destroy/replace y con protección contra borrado accidental.
-- [ ] Ownership por campo documentado y aplicado: Terraform config estable; workflow sólo image/revision.
+- [x] Ambos servicios están en Terraform sin destroy/replace y con protección contra borrado accidental.
+- [x] Ownership por campo documentado y aplicado: Terraform config estable; workflow sólo image/revision.
 - [x] `invoker_iam_disabled`, ingress, runtime SA, env/secret refs y el ceiling 3/3 quedan pineados por Terraform.
-- [ ] Deploy image-only genera revisión Ready, mantiene dominio/SSO/API privada y deja plan Terraform convergido.
-- [ ] `ignore_changes` cubre únicamente el path exacto de imagen; no oculta template/env/security/scale.
-- [ ] Runbook y handoff reflejan import, rollback, serialización y evidencia real.
+- [x] Deploy image-only genera revisión Ready, mantiene dominio/SSO/API privada y deja plan Terraform convergido (dos ciclos, un servicio cada uno).
+- [x] `ignore_changes` cubre la imagen más `client`/`client_version` (metadata de la herramienta, no configuración); no oculta template/env/security/scale.
+- [x] Runbook y handoff reflejan import, rollback, serialización y evidencia real.
 
 ## Verification
 
@@ -406,10 +417,10 @@ completo antes de adoptar el siguiente. El tráfico y las URLs no cambian.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` y carpeta sincronizados con runtime real.
-- [ ] `docs/tasks/README.md`, `TASK_ID_REGISTRY.md` y EPIC-028 sincronizados.
-- [ ] `EFEONCE_GLOBE_IAC_RUNBOOK_V1.md` y `GLOBE_RUNTIME_HANDOFF.md` actualizados.
-- [ ] `greenhouse-qa-release-auditor` y `greenhouse-documentation-governor` revisan el cierre.
+- [x] `Lifecycle` y carpeta sincronizados con runtime real.
+- [x] `docs/tasks/README.md`, `TASK_ID_REGISTRY.md` y EPIC-028 sincronizados.
+- [x] `EFEONCE_GLOBE_IAC_RUNBOOK_V1.md` y `GLOBE_RUNTIME_HANDOFF.md` actualizados.
+- [x] `greenhouse-qa-release-auditor` y `greenhouse-documentation-governor` revisan el cierre.
 - [ ] Si import/apply/deploy/smokes no ocurrieron en vivo, estado `code complete, rollout pendiente`, nunca `complete`.
 
 ## Follow-ups

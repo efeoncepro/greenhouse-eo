@@ -87,7 +87,7 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
   `internal-and-cloud-load-balancing`. `globe-api-internal` sigue IAM-private, sin custom domain y con audience
   `run.app`. El redirect `run.app` se **conserva** en el allowlist como camino de rollback. Sigue siendo
   internal-only: no habilita Production ni clientes externos.
-- `TASK-1508` — **siguiente: Cloud Run IaC + deploy ownership.** Con el dominio ya publicado, adopta los 2 servicios
+- `TASK-1508` ✅ **completa (2026-07-21): Cloud Run IaC + deploy ownership.** Adoptó los 2 servicios
   vivos mediante import no destructivo y reconcilia Terraform con `deploy-internal.yml`: Terraform gobierna
   configuración estable; el workflow sólo image/revision. Cierra el drift de `invokerIamDisabled`, el `maxScale`
   (`--max-instances=1` hardcodeado) y el ingress —que hoy quedó fijado por `gcloud`, sin gobierno IaC— sin mezclarlo
@@ -104,10 +104,10 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
   **ya aterrizó**: `TASK-1465` (complete, deployed + live-verified 2026-07-21) movió sesión/OAuth/experimentos/
   eval/spend-fence + un audit log append-only a Cloud SQL `globe-pg`, con lo que **se levantó el techo de HA** que
   gateaba `maxScale > 1` — ambos servicios Cloud Run corren durable en `maxScale=3`. Gobernar el valor `maxScale`
-  por IaC es `TASK-1508` (el `deploy-internal.yml` aún hardcodea `--max-instances=1`). Production/clientes externos
+  por IaC lo cerró `TASK-1508`: el workflow ya no pasa `--max-instances` y Terraform gobierna ambos ceilings. Production/clientes externos
   permanecen bloqueados por `TASK-1480` y un release explícito posterior. El host del frontend cliente comercial es
   una decisión diferida (ADR-004).
-- La adopción IaC de servicios no bloquea el dominio: `TASK-1508` ocurre después y no autoriza subir réplicas.
+- La adopción IaC de servicios ocurrió después del dominio (`TASK-1508`, completa) y corrigió un cap efectivo de 1 instancia que ningún doc registraba; no autoriza Production ni clientes externos.
 
 ### Parallel execution contract
 
@@ -292,7 +292,7 @@ log append-only ahora persisten detrás de sus ports; ambos servicios Cloud Run 
 
 **Esto levanta el techo de HA** que ADR-004 (`TASK-1506`) hard-gateaba en esta task: el ceiling in-memory /
 `maxScale=1` ya no existe. **Queda diferido:** el modelo rico de workspace/members/grants tenancy (follow-up) y
-persistir el valor `maxScale` por Terraform (**`TASK-1508`**, el `deploy-internal.yml` aún hardcodea
+persistir el valor `maxScale` por Terraform (**`TASK-1508`**, completa; el workflow ya no hardcodea
 `--max-instances=1`). Production/clientes externos siguen gateados por `TASK-1480`. Spec canónica:
 `docs/architecture/creative-studio/EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md` (SPEC-007) +
 `docs/tasks/complete/TASK-1465-globe-workspace-tenancy-persistence-audit.md`.
