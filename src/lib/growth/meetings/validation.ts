@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import type { MeetingBookingRequest } from './contracts'
+import { canonicalizeMeetingTimezone } from './timezone'
 
 const safeAttributionValue = z.string().trim().min(1).max(80).regex(/^[A-Za-z0-9._~-]+$/)
 
@@ -45,7 +46,11 @@ export const parseMeetingBookingRequest = (value: unknown): MeetingBookingReques
 
 export const normalizeMeetingBookingRequest = (input: MeetingBookingRequest): MeetingBookingRequest => ({
   ...input,
-  slot: { ...input.slot, startsAt: new Date(input.slot.startsAt).toISOString() },
+  slot: {
+    ...input.slot,
+    startsAt: new Date(input.slot.startsAt).toISOString(),
+    timezone: canonicalizeMeetingTimezone(input.slot.timezone) ?? input.slot.timezone,
+  },
   contact: {
     email: input.contact.email.trim().toLowerCase(),
     firstName: input.contact.firstName.trim(),

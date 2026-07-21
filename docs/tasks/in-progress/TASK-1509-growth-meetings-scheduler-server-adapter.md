@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-023`
-- Status real: `Foundation code-complete local; DB concurrency/integration y rollout runtime pendientes`
+- Status real: `Foundation code-complete; dev migration + live DB concurrency + provider read verified; controlled booking/rollout pending`
 - Rank: `TBD`
 - Domain: `growth|public-site|crm|data`
 - Blocked by: `none`
@@ -141,7 +141,7 @@ Reglas obligatorias:
 
 ### Contract surface
 
-- `GET /api/public/growth/meetings/config?surfaceId=...`: browser-safe duration, timezone policy, required fields/legal consent and fallback mode; no organizer/provider IDs.
+- `GET /api/public/growth/meetings/config?surfaceId=...&timezone=...`: browser-safe duration, visitor-resolved IANA timezone policy, required fields/legal consent and fallback mode; no organizer/provider IDs. Surface timezone is fallback, not a visitor allowlist.
 - `GET /api/public/growth/meetings/availability?surfaceId=...&timezone=...&monthOffset=...`: normalized bounded days/slots with explicit freshness/state.
 - `POST /api/public/growth/meetings/book`: slot/duration/timezone/locale, required contact/form fields, legal consent, surface/captcha, idempotency key and attribution envelope.
 - Public errors are a closed enum: `unavailable|slot_unavailable|validation_failed|captcha_failed|rate_limited|booking_rejected|provider_degraded`; never provider bodies/messages.
@@ -156,6 +156,8 @@ Reglas obligatorias:
 - Claim states distinguish `claimed|failed_prewrite|provider_dispatched|succeeded|failed_terminal|ambiguous|provider_created_invalid`; sólo `failed_prewrite` puede reclaimarse automáticamente.
 - Store only minimum receipt/digests, surface, requested slot, safe outcome and timestamps under explicit retention.
 - Success requires online, exact slot, calendar event and valid Teams host; `webConferenceMeetingId` remains optional when Teams URL is valid.
+- Config, availability and booking use one canonical visitor timezone; invalid zones fail before provider access and
+  the returned HubSpot `bookingTimezone` must match after IANA alias canonicalization.
 - Conversion receipt is unguessable, bound to one successful claim and stored only as a hash. A replay does not mint or re-enable a conversion receipt; it carries no PII and cannot authorize another booking.
 
 ### PII, policy and security
@@ -285,7 +287,7 @@ The canonical capability is a provider-independent meetings contract with one Hu
 - [x] Architecture names HubSpot as SoT and documents threat model, receipt, provider failure and fallback.
 - [x] Config/availability return normalized browser-safe DTOs only for authorized surfaces.
 - [x] Booking enforces surface/origin, Turnstile, limits, validation and consent without raw errors/secrets.
-- [ ] Concurrent/replayed requests create at most one booking; conflicting key reuse rejects.
+- [x] Concurrent/replayed requests create at most one booking; conflicting key reuse rejects.
 - [x] Success is impossible for offline, missing calendar, mismatched slot or invalid Teams result.
 - [x] Conversion receipt is opaque/replay-safe and carries no PII/provider IDs.
 - [x] Tracking Plan defines the Tier B funnel and receipt-gated `generate_lead` rail with no PII/exact slot.
@@ -296,7 +298,7 @@ The canonical capability is a provider-independent meetings contract with one Hu
 
 - [x] `pnpm codex:task-hook TASK-1509`
 - [x] `pnpm task:lint` (TASK-1509/TASK-1510 changed set: zero errors/warnings)
-- [ ] Focused contract/concurrency/security/measurement tests.
+- [x] Focused contract/concurrency/security/measurement tests.
 - [ ] `pnpm lint`
 - [x] `pnpm tsc --noEmit`
 - [ ] Controlled redacted runtime smoke.
@@ -315,6 +317,22 @@ The canonical capability is a provider-independent meetings contract with one Hu
 - [ ] Adapter, contracts, security/idempotency, receipt, tests, signals and measurement registry are complete.
 - [ ] A controlled real booking and replay prove runtime behavior.
 - [ ] Public replacement remains gated on TASK-1510 and GTM preview/publish evidence.
+
+## Runtime Evidence — 2026-07-21
+
+- Migration `20260721034500000_task-1509-growth-meeting-scheduler.sql` applied to dev Cloud SQL; all four
+  `greenhouse_growth.meeting_*` tables, unique claim/booking/receipt indexes and runtime-role grants read back.
+- Live PostgreSQL race test produced exactly one `claimed` and one `in_progress_or_unknown`; semantic key conflicts
+  rejected, successful replay count remained one, receipt count remained one and cleanup left zero test residue.
+- Canonical secret `growth-meeting-hmac-secret` provisioned in Secret Manager; `greenhouse-portal` received
+  secret-level `secretAccessor`, and the real `resolveMeetingPrivacyHasher()` consumer produced a 64-character digest.
+- HubSpot Scheduler inspect remained healthy: group calendar online, Office 365 provider, Teams-compatible contract,
+  30-minute duration and live availability present. No booking write was made in this read-only check.
+- Visitor-timezone inspect remained healthy with `America/Lima`: HubSpot returned 197 live 30-minute slots for the
+  same online Office 365 group calendar. Example instant `2026-07-21T13:15:00Z` renders 08:15 Lima / 09:15 Santiago,
+  proving one booking instant with local representations. No booking write was made.
+- GTM disposable workspace `task-1510-native-meeting-scheduler-1784624040208` (ID `6`) compiles and syncs in
+  `quick_preview`: eight allowlisted DLVs, two triggers and two GA4 tags. No version or publication occurred.
 
 ## Follow-ups
 

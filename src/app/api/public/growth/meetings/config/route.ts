@@ -21,6 +21,7 @@ export async function GET(request: Request) {
   const url = new URL(request.url)
   const surfaceId = url.searchParams.get('surfaceId')
   const schedulerKey = url.searchParams.get('schedulerKey') ?? undefined
+  const timezone = url.searchParams.get('timezone')
 
   if (!surfaceId) {
     return NextResponse.json({ outcome: 'error', error: { code: 'validation_failed' } }, { status: 400, headers })
@@ -30,6 +31,7 @@ export async function GET(request: Request) {
     const config = await readMeetingSchedulerConfig({
       surfaceId,
       schedulerKey,
+      timezone,
       origin: request.headers.get('origin'),
     })
 

@@ -15,21 +15,28 @@ import {
   timeOfDayBucket,
   type MeetingStepContext,
   type MeetingTelemetryAction,
-  type MeetingTelemetryBase,
+  type MeetingTelemetryIdentity,
   type MeetingTelemetryState,
 } from './telemetry'
 import type { MeetingTurnstileHandle, MeetingTurnstilePort } from './turnstile'
+import {
+  resolveMeetingLayout,
+  type MeetingActivationMode,
+  type MeetingLayoutRecipe,
+} from './layout'
 
 export interface MeetingRendererOptions {
   api: MeetingApiClient
   turnstile: MeetingTurnstilePort
-  telemetryBase: MeetingTelemetryBase
+  telemetryBase: MeetingTelemetryIdentity
   surfaceId: string
   schedulerKey: string
   requestedTimezone: string
   now?: () => Date
   dataLayerEnabled?: boolean
   emergencyFallbackUrl?: string | null
+  activationMode?: MeetingActivationMode
+  maxRecipe?: MeetingLayoutRecipe
 }
 
 const element = <K extends keyof HTMLElementTagNameMap>(
@@ -57,11 +64,13 @@ const idempotencyKey = (): string => {
   return `booking_${[...bytes].map(value => value.toString(16).padStart(2, '0')).join('')}`
 }
 
-const formatDate = (date: string, timezone: string, style: 'short' | 'long' = 'short'): string => {
+export const formatMeetingDate = (date: string, timezone: string, style: 'short' | 'long' = 'short'): string => {
+  const isInstant = date.includes('T')
+
   const formatted = new Intl.DateTimeFormat('es-CL', style === 'short'
-    ? { timeZone: timezone, weekday: 'short', day: 'numeric' }
-    : { timeZone: timezone, weekday: 'long', day: 'numeric', month: 'long' })
-    .format(new Date(date.includes('T') ? date : `${date}T12:00:00Z`))
+    ? { timeZone: isInstant ? timezone : 'UTC', weekday: 'short', day: 'numeric' }
+    : { timeZone: isInstant ? timezone : 'UTC', weekday: 'long', day: 'numeric', month: 'long' })
+    .format(new Date(isInstant ? date : `${date}T12:00:00Z`))
 
   return `${formatted.charAt(0).toUpperCase()}${formatted.slice(1)}`
 }
@@ -69,6 +78,50 @@ const formatDate = (date: string, timezone: string, style: 'short' | 'long' = 's
 const formatTime = (startsAt: string, timezone: string): string =>
   new Intl.DateTimeFormat('es-CL', { timeZone: timezone, hour: '2-digit', minute: '2-digit', hour12: false })
     .format(new Date(startsAt))
+
+const timePeriod = (startsAt: string, timezone: string): 'Mañana' | 'Tarde' | 'Noche' => {
+  const hour = Number(new Intl.DateTimeFormat('en-GB', {
+    timeZone: timezone,
+    hour: '2-digit',
+    hour12: false,
+  }).format(new Date(startsAt)))
+
+  if (hour < 12) return 'Mañana'
+  if (hour < 18) return 'Tarde'
+
+  return 'Noche'
+}
+
+export const formatMeetingTimezoneLabel = (timezone: string, at = new Date()): string => {
+  let name = timezone
+
+  try {
+    name = new Intl.DateTimeFormat('es-CL', { timeZone: timezone, timeZoneName: 'longGeneric' })
+      .formatToParts(at)
+      .find(part => part.type === 'timeZoneName')?.value ?? timezone
+  } catch {
+    // The server validates IANA zones; the identifier remains a safe fallback.
+  }
+
+  const displayName = `${name.charAt(0).toUpperCase()}${name.slice(1)}`
+
+  return `Tu horario · ${displayName}`
+}
+
+export const formatMeetingTimeWithOffset = (startsAt: string, timezone: string): string => {
+  const parts = new Intl.DateTimeFormat('es-CL', {
+    timeZone: timezone,
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZoneName: 'shortOffset',
+  }).formatToParts(new Date(startsAt))
+
+  const time = `${parts.find(part => part.type === 'hour')?.value ?? ''}:${parts.find(part => part.type === 'minute')?.value ?? ''}`
+  const offset = parts.find(part => part.type === 'timeZoneName')?.value ?? ''
+
+  return `${time}${offset ? ` ${offset}` : ''}`
+}
 
 const monthLabel = (date: string): string => {
   const formatted = new Intl.DateTimeFormat('es-CL', { month: 'long', year: 'numeric', timeZone: 'UTC' })
@@ -96,6 +149,21 @@ const calendarDates = (date: string): Array<string | null> => {
 const emailLooksValid = (value: string): boolean => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
 let rendererInstanceSequence = 0
 
+const FIELD_ICON_CLASS: Record<'firstName' | 'lastName' | 'email' | 'company', string> = {
+  firstName: 'tabler-user',
+  lastName: 'tabler-id',
+  email: 'tabler-mail',
+  company: 'tabler-building-skyscraper',
+}
+
+const fieldIcon = (key: keyof typeof FIELD_ICON_CLASS): HTMLElement => {
+  const icon = element('i', `ghm-field-icon ${FIELD_ICON_CLASS[key]}`)
+
+  icon.setAttribute('aria-hidden', 'true')
+
+  return icon
+}
+
 export class MeetingRenderer {
   private state: MeetingRendererState = initialMeetingRendererState()
   private telemetryState: MeetingTelemetryState = initialMeetingTelemetryState()
@@ -103,10 +171,19 @@ export class MeetingRenderer {
   private generation = 0
   private turnstileHandle: MeetingTurnstileHandle | null = null
   private viewedCleanup: (() => void) | null = null
+  private resizeObserver: ResizeObserver | null = null
   private previousPhase = this.state.phase
+  private layoutRecipe: MeetingLayoutRecipe = 'command'
+  private layoutInitialized = false
+  private activationMode: MeetingActivationMode
+  private maxRecipe: MeetingLayoutRecipe
+  private navigationView: 'calendar' | 'slots' = 'calendar'
   private readonly instanceId = ++rendererInstanceSequence
 
-  constructor(private readonly host: HTMLElement, private readonly options: MeetingRendererOptions) {}
+  constructor(private readonly host: HTMLElement, private readonly options: MeetingRendererOptions) {
+    this.activationMode = options.activationMode ?? 'inline'
+    this.maxRecipe = options.maxRecipe ?? 'command'
+  }
 
   async load(): Promise<void> {
     this.generation += 1
@@ -115,6 +192,8 @@ export class MeetingRenderer {
     this.abortController?.abort()
     this.abortController = new AbortController()
     this.state = initialMeetingRendererState()
+    this.navigationView = 'calendar'
+    this.observeLayout()
     this.render()
     this.observeViewed()
 
@@ -122,14 +201,13 @@ export class MeetingRenderer {
       const config = await this.options.api.config({
         surfaceId: this.options.surfaceId,
         schedulerKey: this.options.schedulerKey,
+        timezone: this.options.requestedTimezone,
         signal: this.abortController.signal,
       })
 
       if (generation !== this.generation) return
 
-      const timezone = config.timezonePolicy.allowedTimezones.includes(this.options.requestedTimezone)
-        ? this.options.requestedTimezone
-        : config.timezonePolicy.defaultTimezone
+      const timezone = config.timezonePolicy.resolvedTimezone
 
       const availability = config.state === 'available'
         ? await this.options.api.availability({
@@ -152,15 +230,6 @@ export class MeetingRenderer {
         },
       )
 
-      const firstSlot = availability?.days[0]?.slots[0]
-
-      if (firstSlot) {
-        this.telemetry({
-          type: 'step_reached',
-          step: 'date_selected',
-          context: { days_ahead_bucket: daysAheadBucket(firstSlot.startsAt, timezone, this.options.now?.() ?? new Date()) },
-        })
-      }
     } catch {
       if (generation !== this.generation || this.abortController.signal.aborted) return
 
@@ -183,6 +252,14 @@ export class MeetingRenderer {
     this.turnstileHandle = null
     this.viewedCleanup?.()
     this.viewedCleanup = null
+    this.resizeObserver?.disconnect()
+    this.resizeObserver = null
+  }
+
+  updatePresentation(input: { activationMode: MeetingActivationMode; maxRecipe: MeetingLayoutRecipe }): void {
+    this.activationMode = input.activationMode
+    this.maxRecipe = input.maxRecipe
+    this.applyLayout(this.host.getBoundingClientRect().width, this.host.getBoundingClientRect().height)
   }
 
   private async loadMonth(monthOffset: number): Promise<void> {
@@ -209,15 +286,6 @@ export class MeetingRenderer {
       if (generation !== this.generation) return
 
       this.transition({ type: 'loaded', config, availability })
-      const firstSlot = availability.days[0]?.slots[0]
-
-      if (firstSlot) {
-        this.telemetry({
-          type: 'step_reached',
-          step: 'date_selected',
-          context: { days_ahead_bucket: daysAheadBucket(firstSlot.startsAt, this.timezone(), this.options.now?.() ?? new Date()) },
-        })
-      }
     } catch {
       if (generation !== this.generation || this.abortController.signal.aborted) return
       this.transition({ type: 'load_failed' })
@@ -251,8 +319,57 @@ export class MeetingRenderer {
     }
   }
 
+  private observeLayout(): void {
+    this.resizeObserver?.disconnect()
+
+    const rect = this.host.getBoundingClientRect()
+
+    this.applyLayout(rect.width, rect.height)
+
+    if (typeof ResizeObserver === 'undefined') return
+
+    this.resizeObserver = new ResizeObserver(entries => {
+      const entry = entries.find(item => item.target === this.host)
+
+      if (entry) this.applyLayout(entry.contentRect.width, entry.contentRect.height)
+    })
+    this.resizeObserver.observe(this.host)
+  }
+
+  private applyLayout(width: number, height: number): void {
+    const next = resolveMeetingLayout({
+      width,
+      height,
+      current: this.layoutInitialized ? this.layoutRecipe : undefined,
+      maxRecipe: this.maxRecipe,
+    })
+
+    if (next === 'guided' && this.layoutRecipe !== 'guided' && this.state.selectedSlot) {
+      this.navigationView = 'slots'
+    }
+
+    this.layoutRecipe = next
+    this.layoutInitialized = true
+    this.host.dataset.ghmRecipe = next
+    this.host.dataset.ghmActivation = this.activationMode
+    this.updateScenePresentation()
+  }
+
+  private updateScenePresentation(): void {
+    const scene = this.host.querySelector<HTMLElement>('.ghm-scene')
+
+    if (!scene) return
+    scene.dataset.recipe = this.layoutRecipe
+    scene.dataset.activation = this.activationMode
+    scene.dataset.navigation = this.navigationView
+  }
+
   private telemetry(action: MeetingTelemetryAction): void {
-    const result = reduceMeetingTelemetry(this.telemetryState, this.options.telemetryBase, action)
+    const result = reduceMeetingTelemetry(this.telemetryState, {
+      ...this.options.telemetryBase,
+      presentation_variant: this.layoutRecipe,
+      activation_mode: this.activationMode,
+    }, action)
 
     this.telemetryState = result.state
 
@@ -270,7 +387,7 @@ export class MeetingRenderer {
 
   private selectedContext(slot = this.state.selectedSlot): MeetingStepContext {
     if (!slot || !this.state.config) return {}
-    const timezone = this.state.config.timezonePolicy.defaultTimezone
+    const timezone = this.timezone()
 
     return {
       days_ahead_bucket: daysAheadBucket(slot.startsAt, timezone, this.options.now?.() ?? new Date()),
@@ -288,6 +405,9 @@ export class MeetingRenderer {
     scene.dataset.capture = 'native-meeting-scheduler'
     scene.dataset.surfaceRecipe = 'public-meeting-calendar'
     scene.dataset.phase = this.state.phase
+    scene.dataset.recipe = this.layoutRecipe
+    scene.dataset.activation = this.activationMode
+    scene.dataset.navigation = this.navigationView
     scene.append(this.renderSignalRail(), this.renderWorkPlane(), this.renderAgenda())
     this.host.replaceChildren(scene)
     this.host.dataset.ghmState = this.state.phase
@@ -303,19 +423,21 @@ export class MeetingRenderer {
 
   private renderSignalRail(): HTMLElement {
     const rail = element('header', 'ghm-signal')
+    const atmosphere = element('span', 'ghm-signal-atmosphere')
     const eyebrow = element('p', 'ghm-eyebrow', copy.eyebrow)
     const title = element('h2', 'ghm-title', copy.title)
 
+    atmosphere.setAttribute('aria-hidden', 'true')
     title.tabIndex = -1
     title.dataset.ghmFocus = ''
-    rail.append(eyebrow, title, element('p', 'ghm-intro', copy.intro))
+    rail.append(atmosphere, eyebrow, title, element('p', 'ghm-intro', copy.intro))
 
     const facts = element('div', 'ghm-facts')
 
     facts.append(
       element('span', 'ghm-fact', `${this.state.config?.durationsMinutes[0] ?? 30} min`),
       element('span', 'ghm-fact', 'Microsoft Teams'),
-      element('span', 'ghm-fact', copy.timezoneLabel),
+      element('span', 'ghm-fact', formatMeetingTimezoneLabel(this.timezone(), this.options.now?.())),
     )
     rail.append(facts, this.renderStepRail())
 
@@ -496,12 +618,13 @@ export class MeetingRenderer {
           button.setAttribute('aria-pressed', String(date === this.state.selectedDate))
           const slotLabel = day.slots.length === 1 ? '1 horario disponible' : `${day.slots.length} horarios disponibles`
 
-          button.setAttribute('aria-label', `${formatDate(date, this.timezone(), 'long')}, ${slotLabel}`)
+          button.setAttribute('aria-label', `${formatMeetingDate(date, this.timezone(), 'long')}, ${slotLabel}`)
           button.append(
             element('span', 'ghm-calendar-number', String(Number(date.slice(-2)))),
-            element('span', 'ghm-calendar-available', copy.availableDay),
+            element('span', 'ghm-calendar-available', `${day.slots.length} ${day.slots.length === 1 ? 'hora' : 'horas'}`),
           )
           button.addEventListener('click', () => {
+            this.navigationView = 'slots'
             this.transition(
               { type: 'select_date', date },
               {
@@ -510,9 +633,13 @@ export class MeetingRenderer {
                 context: { days_ahead_bucket: daysAheadBucket(day.slots[0].startsAt, this.timezone(), this.options.now?.() ?? new Date()) },
               },
             )
-            queueMicrotask(() => this.host
-              .querySelector<HTMLButtonElement>('.ghm-calendar-day[aria-pressed="true"]')
-              ?.focus({ preventScroll: true }))
+            queueMicrotask(() => {
+              const focusTarget = this.layoutRecipe === 'guided'
+                ? this.host.querySelector<HTMLButtonElement>('.ghm-slot')
+                : this.host.querySelector<HTMLButtonElement>('.ghm-calendar-day[aria-pressed="true"]')
+
+              focusTarget?.focus({ preventScroll: true })
+            })
           })
           cell.append(button)
         } else {
@@ -529,7 +656,7 @@ export class MeetingRenderer {
     }
 
     table.append(body)
-    root.append(table, element('div', 'ghm-timezone-lens', copy.timezoneLabel))
+    root.append(table, element('div', 'ghm-timezone-lens', formatMeetingTimezoneLabel(this.timezone(), this.options.now?.())))
 
     return root
   }
@@ -607,6 +734,7 @@ export class MeetingRenderer {
     type = 'text',
   ): HTMLElement {
     const label = element('label', 'ghm-field')
+    const control = element('span', 'ghm-control')
     const input = element('input', 'ghm-input')
 
     input.name = key
@@ -620,7 +748,8 @@ export class MeetingRenderer {
     input.addEventListener('input', () => {
       this.state = reduceMeetingState(this.state, { type: 'form', values: { [key]: input.value } })
     })
-    label.append(element('span', 'ghm-label', labelText), input)
+    control.append(fieldIcon(key), input)
+    label.append(element('span', 'ghm-label', labelText), control)
 
     if (this.state.fieldErrors.includes(key)) {
       const error = element('span', 'ghm-field-error', key === 'email' ? copy.invalidEmail : copy.requiredField)
@@ -690,28 +819,63 @@ export class MeetingRenderer {
     if (this.state.phase === 'schedule') {
       const selectedDay = this.state.availability?.days.find(day => day.date === this.state.selectedDate)
 
-      agenda.append(element('span', 'ghm-agenda-kicker', copy.chooseTime))
+      const guidedBack = element('button', 'ghm-guided-back', copy.viewCalendar)
+
+      guidedBack.type = 'button'
+      guidedBack.addEventListener('click', () => {
+        this.navigationView = 'calendar'
+        this.updateScenePresentation()
+        queueMicrotask(() => this.host
+          .querySelector<HTMLButtonElement>('.ghm-calendar-day[aria-pressed="true"]')
+          ?.focus({ preventScroll: true }))
+      })
+      agenda.append(guidedBack, element('span', 'ghm-agenda-kicker', copy.chooseTime))
 
       if (selectedDay) {
         agenda.append(
-          element('h3', 'ghm-agenda-date', `${copy.timesFor} ${formatDate(selectedDay.date, this.timezone(), 'long').toLocaleLowerCase('es-CL')}`),
+          element('h3', 'ghm-agenda-date', `${copy.timesFor} ${formatMeetingDate(selectedDay.date, this.timezone(), 'long').toLocaleLowerCase('es-CL')}`),
           element('p', 'ghm-agenda-help', copy.chooseTimeHelp),
         )
       }
 
       const slots = element('div', 'ghm-slots')
 
+      const duplicateTimes = new Set(
+        (selectedDay?.slots ?? [])
+          .map(slot => formatTime(slot.startsAt, this.timezone()))
+          .filter((time, index, all) => all.indexOf(time) !== index),
+      )
+
+      let previousPeriod: string | null = null
+
       slots.setAttribute('aria-label', copy.chooseTime)
       if (!selectedDay?.slots.length) slots.append(element('p', 'ghm-empty', copy.noSlots))
 
       for (const availabilitySlot of selectedDay?.slots ?? []) {
+        const period = timePeriod(availabilitySlot.startsAt, this.timezone())
+
+        if (period !== previousPeriod) {
+          const group = element('span', 'ghm-slot-group', period)
+
+          group.setAttribute('aria-hidden', 'true')
+          slots.append(group)
+          previousPeriod = period
+        }
+
         const button = element('button', 'ghm-slot')
 
         button.type = 'button'
+        button.dataset.period = period.toLocaleLowerCase('es-CL')
         button.dataset.selected = String(availabilitySlot.slotId === this.state.selectedSlot?.slotId)
         button.setAttribute('aria-pressed', String(availabilitySlot.slotId === this.state.selectedSlot?.slotId))
         button.append(
-          element('strong', 'ghm-slot-time', formatTime(availabilitySlot.startsAt, this.timezone())),
+          element(
+            'strong',
+            'ghm-slot-time',
+            duplicateTimes.has(formatTime(availabilitySlot.startsAt, this.timezone()))
+              ? formatMeetingTimeWithOffset(availabilitySlot.startsAt, this.timezone())
+              : formatTime(availabilitySlot.startsAt, this.timezone()),
+          ),
           element('span', 'ghm-slot-duration', `${availabilitySlot.durationMinutes} min`),
         )
         button.addEventListener('click', () => {
@@ -737,10 +901,11 @@ export class MeetingRenderer {
       const selection = element('div', 'ghm-selection')
 
       selection.dataset.capture = 'meeting-summary'
+      selection.setAttribute('aria-live', 'polite')
       selection.append(
         element('span', 'ghm-selection-label', copy.selectedTime),
-        element('strong', 'ghm-agenda-date', formatDate(slot.startsAt, this.timezone(), 'long')),
-        element('span', 'ghm-agenda-time', formatTime(slot.startsAt, this.timezone())),
+        element('strong', 'ghm-agenda-date', formatMeetingDate(slot.startsAt, this.timezone(), 'long')),
+        element('span', 'ghm-agenda-time', formatMeetingTimeWithOffset(slot.startsAt, this.timezone())),
         element('span', 'ghm-agenda-meta', `${'durationMinutes' in slot ? slot.durationMinutes : 30} min · Microsoft Teams`),
       )
       agenda.append(selection)
@@ -887,8 +1052,6 @@ export class MeetingRenderer {
   private timezone(): string {
     const policy = this.state.config?.timezonePolicy
 
-    return policy?.allowedTimezones.includes(this.options.requestedTimezone)
-      ? this.options.requestedTimezone
-      : policy?.defaultTimezone ?? this.options.requestedTimezone
+    return policy?.resolvedTimezone ?? policy?.defaultTimezone ?? this.options.requestedTimezone
   }
 }

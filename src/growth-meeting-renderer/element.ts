@@ -3,14 +3,41 @@ import { MeetingRenderer } from './renderer'
 import { ensureMeetingStyles } from './styles'
 import { createMeetingTurnstilePort } from './turnstile'
 import { MEETING_RENDERER_VERSION } from './version'
+import { parseMeetingActivationMode, parseMeetingLayoutRecipe } from './layout'
+import { resolveMeetingTimezone } from '../lib/growth/meetings/timezone'
 
 export const MEETING_SCHEDULER_TAG = 'efeonce-meeting-scheduler'
 const DEFAULT_BASE_URL = 'https://greenhouse.efeoncepro.com'
-const DEFAULT_TIMEZONE = 'America/Santiago'
+const MEETING_ICON_STYLESHEET = '/growth-meetings/icons.css'
+
+export const ensureMeetingIconStyles = (doc: Document, baseUrl: string): void => {
+  const href = `${baseUrl.replace(/\/$/, '')}${MEETING_ICON_STYLESHEET}`
+
+  const exists = [...doc.querySelectorAll<HTMLLinkElement>('link[data-ghm-icon-styles]')]
+    .some(link => link.href === new URL(href, doc.baseURI).href)
+
+  if (exists) return
+
+  const link = doc.createElement('link')
+
+  link.rel = 'stylesheet'
+  link.href = href
+  link.dataset.ghmIconStyles = 'tabler'
+  doc.head.append(link)
+}
+
+const browserTimezone = (): string => {
+  try {
+    return resolveMeetingTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone, 'UTC')
+  } catch {
+    return 'UTC'
+  }
+}
 
 export class EfeonceMeetingSchedulerElement extends HTMLElement {
   static readonly observedAttributes = [
     'surface', 'scheduler-key', 'base-url', 'locale', 'timezone', 'placement', 'appearance',
+    'activation-mode', 'max-recipe',
   ]
 
   private renderer: MeetingRenderer | null = null
@@ -35,8 +62,19 @@ export class EfeonceMeetingSchedulerElement extends HTMLElement {
     this.renderer = null
   }
 
-  attributeChangedCallback(_name: string, previous: string | null, next: string | null): void {
-    if (previous !== next && this.isConnected) this.mount()
+  attributeChangedCallback(name: string, previous: string | null, next: string | null): void {
+    if (previous === next || !this.isConnected) return
+
+    if (name === 'activation-mode' || name === 'max-recipe' || name === 'appearance') {
+      this.renderer?.updatePresentation({
+        activationMode: parseMeetingActivationMode(this.getAttribute('activation-mode')),
+        maxRecipe: parseMeetingLayoutRecipe(this.getAttribute('max-recipe')),
+      })
+
+      return
+    }
+
+    this.mount()
   }
 
   private mount(): void {
@@ -48,14 +86,17 @@ export class EfeonceMeetingSchedulerElement extends HTMLElement {
     const surfaceId = this.getAttribute('surface')?.trim() || 'efeonce-public-site'
     const placement = this.getAttribute('placement')?.trim() || 'contact_scheduler'
 
+    ensureMeetingIconStyles(this.ownerDocument, baseUrl)
     this.internals?.states?.add('loading')
     this.renderer = new MeetingRenderer(this, {
       api: createMeetingApiClient(baseUrl),
       turnstile: createMeetingTurnstilePort(window),
       surfaceId,
       schedulerKey,
-      requestedTimezone: this.getAttribute('timezone')?.trim() || DEFAULT_TIMEZONE,
+      requestedTimezone: resolveMeetingTimezone(this.getAttribute('timezone'), browserTimezone()),
       emergencyFallbackUrl: this.emergencyFallbackUrl,
+      activationMode: parseMeetingActivationMode(this.getAttribute('activation-mode')),
+      maxRecipe: parseMeetingLayoutRecipe(this.getAttribute('max-recipe')),
       telemetryBase: {
         scheduler_key: schedulerKey,
         surface_id: surfaceId,

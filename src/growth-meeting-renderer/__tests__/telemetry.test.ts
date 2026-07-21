@@ -16,6 +16,8 @@ const base: MeetingTelemetryBase = {
   placement: 'contact_scheduler',
   renderer_version: '1.0.0',
   contract_version: 'growth-meeting-scheduler.v1',
+  presentation_variant: 'split',
+  activation_mode: 'dialog',
 }
 
 beforeEach(() => {
@@ -47,7 +49,12 @@ describe('meeting telemetry', () => {
     })
 
     expect(first.effects).toHaveLength(1)
-    expect(first.effects[0].payload).toMatchObject({ meeting_step: 'date_selected', days_ahead_bucket: '1_3_days' })
+    expect(first.effects[0].payload).toMatchObject({
+      meeting_step: 'date_selected',
+      days_ahead_bucket: '1_3_days',
+      presentation_variant: 'split',
+      activation_mode: 'dialog',
+    })
     expect(replay.effects).toHaveLength(0)
   })
 
@@ -84,5 +91,20 @@ describe('meeting telemetry', () => {
     }, { type: 'step_reached', step: 'viewed' })
 
     expect(result.effects).toHaveLength(0)
+  })
+
+  it('rechaza recipes y modos de activación fuera del contrato cerrado', () => {
+    const invalidRecipe = reduceMeetingTelemetry(initialMeetingTelemetryState(), {
+      ...base,
+      presentation_variant: 'mini' as 'guided',
+    }, { type: 'step_reached', step: 'viewed' })
+
+    const invalidActivation = reduceMeetingTelemetry(initialMeetingTelemetryState(), {
+      ...base,
+      activation_mode: 'popover' as 'dialog',
+    }, { type: 'step_reached', step: 'viewed' })
+
+    expect(invalidRecipe.effects).toHaveLength(0)
+    expect(invalidActivation.effects).toHaveLength(0)
   })
 })

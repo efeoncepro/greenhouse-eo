@@ -103,6 +103,49 @@ describe('meeting booking command', () => {
     expect(finalizeMeetingExecution).toHaveBeenCalledWith(expect.objectContaining({ state: 'succeeded' }))
   })
 
+  it('reserva en la zona del visitante aunque la surface tenga Santiago como default', async () => {
+    const meetingProvider = provider()
+
+    const visitorInput = {
+      ...input,
+      slot: { ...input.slot, timezone: 'America/Lima' },
+    }
+
+    vi.mocked(meetingProvider.book).mockResolvedValueOnce({
+      startsAt,
+      endsAt: '2026-07-22T13:45:00.000Z',
+      timezone: 'America/Lima',
+      meetingDurationMillis: 1_800_000,
+      channel: 'microsoft_teams',
+      providerEvidence: {
+        calendarEventId: 'private-calendar-id',
+        contactId: 'private-contact-id',
+        webConferenceUrl: 'https://teams.microsoft.com/private',
+      },
+    })
+
+    const result = await bookMeeting(visitorInput, context(meetingProvider))
+
+    expect(result).toMatchObject({ outcome: 'confirmed', appointment: { timezone: 'America/Lima' } })
+    expect(meetingProvider.getAvailability).toHaveBeenCalledWith(expect.objectContaining({ timezone: 'America/Lima' }))
+    expect(meetingProvider.book).toHaveBeenCalledWith(expect.objectContaining({ timezone: 'America/Lima' }))
+    expect(claimMeetingBooking).toHaveBeenCalledWith(expect.objectContaining({ requestedTimezone: 'America/Lima' }))
+  })
+
+  it('rechaza una zona inválida antes de consultar o escribir en HubSpot', async () => {
+    const meetingProvider = provider()
+
+    const result = await bookMeeting({
+      ...input,
+      slot: { ...input.slot, timezone: 'Mars/Olympus' },
+    }, context(meetingProvider))
+
+    expect(result).toMatchObject({ outcome: 'error', error: { code: 'validation_failed' } })
+    expect(meetingProvider.getConfiguration).not.toHaveBeenCalled()
+    expect(meetingProvider.getAvailability).not.toHaveBeenCalled()
+    expect(meetingProvider.book).not.toHaveBeenCalled()
+  })
+
   it('replays without a provider write or a second conversion receipt', async () => {
     const meetingProvider = provider()
 

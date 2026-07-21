@@ -19,7 +19,7 @@ export interface MeetingBookingPayload {
 }
 
 export interface MeetingApiClient {
-  config(input: { surfaceId: string; schedulerKey: string; signal?: AbortSignal }): Promise<MeetingSchedulerConfig>
+  config(input: { surfaceId: string; schedulerKey: string; timezone: string; signal?: AbortSignal }): Promise<MeetingSchedulerConfig>
   availability(input: {
     surfaceId: string
     schedulerKey: string
@@ -43,7 +43,13 @@ export const isMeetingSchedulerConfig = (value: unknown): value is MeetingSchedu
   if (!object(value) || value.schemaVersion !== MEETING_SCHEDULER_SCHEMA_VERSION) return false
   if (!string(value.schedulerKey) || !['available', 'fallback_only', 'unavailable'].includes(String(value.state))) return false
   if (!Array.isArray(value.durationsMinutes) || !value.durationsMinutes.every(finiteNumber)) return false
-  if (!object(value.timezonePolicy) || !string(value.timezonePolicy.defaultTimezone) || !Array.isArray(value.timezonePolicy.allowedTimezones)) return false
+  if (
+    !object(value.timezonePolicy) ||
+    !string(value.timezonePolicy.defaultTimezone) ||
+    !Array.isArray(value.timezonePolicy.allowedTimezones) ||
+    value.timezonePolicy.mode !== 'visitor' ||
+    !string(value.timezonePolicy.resolvedTimezone)
+  ) return false
   if (!Array.isArray(value.fields) || !object(value.consent) || !object(value.fallback) || !string(value.fallback.url)) return false
   if (!object(value.security) || !object(value.security.captcha)) return false
 
@@ -92,7 +98,11 @@ export const createMeetingApiClient = (baseUrl: string, fetcher: typeof fetch = 
 
   return {
     async config(input) {
-      const query = new URLSearchParams({ surfaceId: input.surfaceId, schedulerKey: input.schedulerKey })
+      const query = new URLSearchParams({
+        surfaceId: input.surfaceId,
+        schedulerKey: input.schedulerKey,
+        timezone: input.timezone,
+      })
 
       const response = await fetcher(`${base}/api/public/growth/meetings/config?${query}`, {
         signal: input.signal,

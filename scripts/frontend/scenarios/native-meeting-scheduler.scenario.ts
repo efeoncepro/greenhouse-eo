@@ -19,7 +19,6 @@ export const scenario: CaptureScenario = {
     selector: '[data-capture="native-meeting-scheduler"][data-phase="schedule"]',
     selectors: [
       '[data-capture="meeting-calendar"]',
-      '[data-capture="meeting-agenda"]',
     ],
     absentSelectors: ['.MuiSkeleton-root', '[data-testid="login-card"]', '[data-loading="true"]'],
     waitForFonts: true,
@@ -37,7 +36,6 @@ export const scenario: CaptureScenario = {
     ],
     requiredRegions: [
       '[data-capture="native-meeting-scheduler"]',
-      '[data-capture="meeting-agenda"]',
     ],
   },
   assertions: [
@@ -54,7 +52,7 @@ export const scenario: CaptureScenario = {
     layout: {
       enabled: true,
       includeSelector: '[data-capture="native-meeting-scheduler"]',
-      minTargetSize: 24,
+      minTargetSize: 44,
       failOnViolations: true,
     },
     runtime: {
@@ -73,7 +71,7 @@ export const scenario: CaptureScenario = {
           name: 'calendar-day-selection',
           startSelector: 'button.ghm-calendar-day',
           keys: ['Enter'],
-          expectedFocusSelector: '.ghm-calendar-day[aria-pressed="true"]',
+          expectedFocusSelector: ':is(.ghm-slot, .ghm-calendar-day[aria-pressed="true"])',
           expectedVisibleSelector: '[data-capture="meeting-agenda"] .ghm-slot',
           requireVisibleFocusRing: true,
         },
@@ -125,7 +123,7 @@ export const scenario: CaptureScenario = {
           action: { kind: 'press', selector: 'button.ghm-calendar-day', key: 'Enter' },
           expected: 'La fecha queda seleccionada y sus horarios permanecen disponibles.',
         },
-        reducedMotion: 'capture',
+        reducedMotion: 'skip',
       },
     },
     { kind: 'click', selector: '.ghm-slot' },

@@ -68,6 +68,8 @@ export interface MeetingSchedulerConfig {
   timezonePolicy: {
     defaultTimezone: string
     allowedTimezones: string[]
+    mode: 'visitor'
+    resolvedTimezone: string
   }
   localePolicy: {
     defaultLocale: 'es'

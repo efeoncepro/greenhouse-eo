@@ -45,9 +45,14 @@ flowchart LR
 - El config incluye sólo la site key pública y action fija de Turnstile; el secret permanece server-side. Sin site key, el estado es `fallback_only`.
 - `GET availability`: slots normalizados y acotados; no se persiste un calendario paralelo.
 - `POST book`: valida shape, surface/origin, Turnstile, límites, slot fresco, consentimiento e idempotencia antes de un único POST provider.
+- La zona de presentación/reserva es la IANA detectada en el navegador. `defaultTimezone` de la surface es sólo
+  fallback seguro cuando la detección falla; nunca actúa como allowlist del visitante. Config, availability y book
+  usan la misma zona canónica y el adapter exige equivalencia canónica de `bookingTimezone` en la respuesta.
+- Sólo se aceptan nombres IANA válidos y acotados; aliases como `US/Pacific` se canonizan antes de comparar. Fechas
+  date-only se preservan como fecha civil y horas repetidas por DST incluyen offset para seguir siendo inequívocas.
 - El token se resuelve sólo por `src/lib/hubspot/access-token.ts`.
 - El adapter tolera campos vendor aditivos pero falla cerrado si falta o cambia un campo utilizado.
-- Éxito exige `isOffline=false`, slot/duración/timezone exactos, `calendarEventId`, `contactId` y URL HTTPS con host exacto `teams.microsoft.com`.
+- Éxito exige `isOffline=false`, slot/duración/timezone canónica exactos, `calendarEventId`, `contactId` y URL HTTPS con host exacto `teams.microsoft.com`.
 - La UI no recibe provider IDs ni Teams URL; la invitación oficial es el canal de acceso a la reunión.
 
 ### State machine e idempotencia
@@ -131,3 +136,101 @@ El secret HMAC es obligatorio en producción. Los buckets de rate limit se consu
 - `form_host_surface` se generalice a un registry canónico de public surfaces.
 - Aparezca un segundo provider de scheduling.
 - La reconciliación muestre GA > server o una tasa material de outcomes ambiguos.
+
+## Architecture Decision 2026-07-21 — Adaptive presentation recipes
+
+### Status and scope
+
+- Status: `Accepted` for TASK-1510 implementation.
+- Scope: presentation and host integration only. TASK-1509 remains the single booking, privacy, idempotency and receipt authority.
+- Confidence: high for the separation of concerns; medium for the initial size thresholds until the public pilot is measured.
+- Reversibility: recipe thresholds and host activation modes are two-way decisions. Duplicating booking state across independent renderers is rejected because it creates one-way product and measurement debt.
+
+### Decision
+
+The scheduler is one product capability with one controller and several presentation recipes. It does not scale a desktop composition down, and a compact Growth CTA never expands into a large inline application after activation.
+
+Three independent axes replace a combinatorial `appearance` attribute:
+
+1. **Domain phase:** availability, slot selection, details, pending, confirmed or recovery. This is the authoritative state machine and survives every layout change.
+2. **Host activation mode:** `inline`, `dialog`, `full_screen` or `page`. The host owns placement, focus boundary and close behavior.
+3. **Resolved layout recipe:** `launcher`, `guided`, `split` or `command`. The component resolves this from its container and available height; the host may set a maximum recipe but may not force overflow.
+
+```mermaid
+flowchart TD
+  H["MeetingSchedulerHost\nCTA · embed · page"] --> E["Activation envelope\ninline · dialog · full_screen · page"]
+  E --> C["MeetingSchedulerController\nsingle reducer + effects + intent"]
+  C --> R["Recipe resolver\ncontainer fit + host ceiling"]
+  R --> L["Launcher"]
+  R --> G["Guided"]
+  R --> S["Split"]
+  R --> M["Command"]
+  C --> A["TASK-1509 API client\nconfig · availability · book"]
+  C --> T["Allowlisted telemetry"]
+```
+
+### Product recipes
+
+Thresholds are initial hypotheses, expressed against the component container rather than the viewport. They must be tuned with GVC at real host widths and zoom levels.
+
+| Recipe | Initial fit | Product behavior | Appropriate hosts |
+|---|---:|---|---|
+| `launcher` | below 320 px or collapsed CTA | Promise, duration/platform context and one action. No calendar and no availability fetch by default. | Narrow Growth CTA, banner, editorial rail |
+| `guided` | 320–559 px | One task plane at a time: date → slots → details. A compact date strip leads the flow and “Ver mes” exposes the semantic month calendar. | Mobile/full-screen surface, narrow embed |
+| `split` | 560–959 px | Month and selected-day agenda together; context compresses into an operational header. | Dialog, medium embed, tablet |
+| `command` | 960 px+ with sufficient height | Context rail, month and agenda visible as the current Calendar Command Center. | Full-width section or dedicated page |
+
+Pure CSS container queries own layout-only changes. A bounded `ResizeObserver` may select a different semantic recipe when the information architecture changes; it calls a pure resolver with hysteresis to avoid oscillation near a threshold. A resize never creates a new booking intent, emits a funnel step, clears form data or remounts provider/Turnstile effects.
+
+### Growth CTA integration
+
+- The CTA engine owns the launcher and task surface. The scheduler owns the booking flow inside it.
+- `book_meeting` remains navigation-only under its current contract. Native activation requires a separately versioned adapter/action; it must not silently change existing CTA behavior.
+- Narrow hosts open a bounded accessible dialog on desktop and a full-screen dialog on mobile. The parent CTA keeps its original dimensions.
+- Wide editorial hosts may choose `inline`, but the recipe resolver still clamps the requested maximum to actual fit.
+- The scheduler bundle and availability request load on activation or strong user intent, not on every collapsed CTA impression. Optional prefetch must respect Save-Data.
+- Once the provider request is dispatched, closing hides rather than destroys the controller. Reopening exposes pending, check-email or terminal state and cannot silently produce a second intent.
+
+### Controller and view contract
+
+`MeetingSchedulerController` owns normalized config/availability, selected date and slot, attendee draft, stable idempotency key, command status, Turnstile lifecycle, telemetry dedupe and the server-confirmed receipt transition. Views are stateless projections with typed user intents:
+
+- `LauncherView`
+- `GuidedSchedulerView`
+- `SplitSchedulerView`
+- `CommandCenterView`
+- shared `CalendarGrid`, `DateStrip`, `SlotAgenda`, `AppointmentSummary`, `BookingDetailsForm` and `RecoverySurface`
+
+Recipes must not have separate reducers, API clients or booking commands. User-entered PII remains only in memory; presentation switching does not persist it to browser storage.
+
+### Accessibility and motion
+
+- The dialog envelope follows the modal-dialog focus contract: focus enters the surface, Tab remains contained, Escape closes when safe and focus returns to the invoker.
+- Logical heading and reading order remain equivalent across recipes. Selected date, slot and focused control survive a recipe change.
+- The compact recipe cannot hide bookable dates without a discoverable “Ver mes” path.
+- Sticky actions must not obscure the focused element, errors, fallback or legal copy.
+- Activation and phase changes use transform/opacity and directional motion only when forward/back semantics are real. Reduced motion uses an instant change or restrained crossfade.
+- A tiny CTA never morphs spatially into the full scheduler; the envelope transition establishes the new task context first.
+
+### Measurement amendment
+
+Before GTM publish, add two safe, low-cardinality dimensions:
+
+- `presentation_variant`: `launcher|guided|split|command`
+- `activation_mode`: `inline|dialog|full_screen|page`
+
+They describe exposure context, not identity. A recipe change is diagnostic state, not a funnel step. Funnel dedupe belongs to the controller and booking intent, so rerendering or resizing cannot emit `date_selected`, `slot_selected` or confirmation again. Defaulting to the first available date may aid display, but it must not emit `date_selected` until the user acts.
+
+### Consequences and rejected alternatives
+
+- **Benefit:** the same scheduler can live in Growth CTA, dialog, embedded content or a complete page without product forks.
+- **Benefit:** host teams compose placement while booking correctness and analytics remain centralized.
+- **Cost:** recipe resolution and focus continuity require explicit tests beyond ordinary responsive CSS.
+- **Rejected:** shrinking the three-plane desktop view into a card; it preserves pixels, not usability.
+- **Rejected:** expanding the CTA inline after click; it causes layout shift and turns a small host into an unexpected application.
+- **Rejected:** independent compact and full scheduler components; their state, consent, idempotency and telemetry would drift.
+- **Rejected:** viewport media queries as the primary resolver; an embedded component must respond to its containing surface.
+
+### Verification matrix
+
+Each recipe is captured at its lower bound, midpoint and one pixel around a threshold, plus 200% zoom where practical. GVC must verify keyboard flow, focus return, reduced motion, zero horizontal overflow, stable selection across resize and exactly-once telemetry. The current `appearance` observation without recipe consumption and full `replaceChildren` rendering are implementation gaps, not the target architecture.

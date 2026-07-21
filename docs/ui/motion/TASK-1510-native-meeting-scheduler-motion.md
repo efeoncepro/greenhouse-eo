@@ -6,11 +6,15 @@ Motion clarifies calendar, timezone, selection and confirmation without delaying
 
 ## Motion Map
 
-- Scene entry: context, month and daily agenda resolve as one composition; no slot stagger.
+- Scene/step entry: the work plane uses a 400 ms opacity + 10 px causal settle; natural/no-JS state remains visible.
 - Month change: direct calendar replacement with explicit controls and stable focus.
 - Timezone lens: labels shift/crossfade while selection invalidates or recalculates explicitly.
-- Slot -> summary: short state transition preserves date/time continuity.
+- Slot -> summary: 400 ms opacity/translate/scale settle preserves date/time continuity; `aria-live` carries the same meaning without motion.
 - Step change: task plane crossfade/short translate; selected summary remains anchored.
+- Recipe change: direct geometry recomposition on resize; no funnel-signaling choreography and no controller remount.
+- Guided date -> slots: the calendar gives way to the agenda and focus lands on the first visible slot; Back restores the selected date.
+- Form focus: the control rises by 1 px, the icon gains semantic accent and the focus halo settles around the complete field; error state remains independent of motion.
+- Loading: layout-sized calendar skeleton uses a linear shimmer and stops under reduced motion.
 - Pending: summary changes to processing with restrained progress signal.
 - Conflict: summary changes to warning and returns attention to refreshed calendar; no shake.
 - Success: summary resolves to confirmed receipt; no confetti/countdown.
@@ -39,5 +43,11 @@ Motion clarifies calendar, timezone, selection and confirmation without delaying
 
 - Causal state motion selected to support continuity without decorative effects.
 - Slot stagger/particles/confetti rejected because they weaken availability trust.
-- CSS-first preserves portability; WAAPI is a bounded exception for a causal summary transition.
+- CSS-first preserves portability; all active transitions use transform/opacity and the renderer's governed token lane.
 - Reduced-motion and telemetry equivalence are closure gates.
+
+## Evidence 2026-07-21
+
+- Premium GVC `2026-07-21T09-35-05_native-meeting-scheduler`: desktop + 390 px, 22 frames, exit 0.
+- Calendar selection captured at immediate, settled and keyboard states; the keyboard probe repeats under reduced motion.
+- Runtime errors `0/0/0/0`; enterprise rubric, accessibility, focus, layout and performance gates pass.

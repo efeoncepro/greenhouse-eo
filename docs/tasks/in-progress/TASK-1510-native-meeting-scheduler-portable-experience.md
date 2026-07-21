@@ -12,12 +12,12 @@
 - Execution profile: `ui-ux`
 - UI impact: `flow`
 - UI ready: `yes`
-- Wireframe: `docs/ui/wireframes/TASK-1510-native-meeting-calendar.md`
+- Wireframe: `docs/ui/wireframes/TASK-1510-native-meeting-scheduler.md`
 - Flow: `docs/ui/flows/TASK-1510-native-meeting-scheduler-flow.md`
 - Motion: `docs/ui/motion/TASK-1510-native-meeting-scheduler-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-023`
-- Status real: `Renderer de calendario portable validado localmente; GTM workspace, host pilot y runtime proof de TASK-1509 pendientes`
+- Status real: `Renderer adaptativo guided|split|command y GTM workspace preview verificados; adapter CTA, host pilot y aprobación/publish siguen pendientes`
 - Rank: `TBD`
 - Domain: `growth|public-site|ui`
 - Blocked by: `none`
@@ -80,7 +80,7 @@ Reglas obligatorias:
 - `docs/reference/measurement-gtm-ga4/05-gtm-api-v2-tag-shapes.md`
 - `docs/reference/measurement-gtm-ga4/LEARNINGS.md`
 - `docs/ui/visual-directions/TASK-1510-native-meeting-calendar-direction.md`
-- `docs/ui/wireframes/TASK-1510-native-meeting-calendar.md`
+- `docs/ui/wireframes/TASK-1510-native-meeting-scheduler.md`
 - `docs/ui/flows/TASK-1510-native-meeting-scheduler-flow.md`
 - `docs/ui/motion/TASK-1510-native-meeting-scheduler-motion.md`
 
@@ -155,14 +155,14 @@ Reglas obligatorias:
 - Surface: Web Component embebible con demo deterministic y primer host público gobernado.
 - Composition Shell: `no aplica` — public portable experience; el host conserva su shell editorial.
 - Primitive decision: `new` — `<efeonce-meeting-scheduler>` como public host-adapter reusable; no private Greenhouse primitive.
-- Adaptive density / The Seam: `aplica` — desktop presenta contexto + calendario mensual + agenda diaria; 390px se convierte en un flujo de una columna completamente inline.
-- Floating/Sidecar/Dialog decision: sin modal, floating surface ni summary sticky; ningún panel puede ocultar fechas, slots o campos.
+- Adaptive density / The Seam: `aplica` — un controlador conserva el intent y resuelve recetas `launcher|guided|split|command` por tamaño de contenedor, no por viewport.
+- Floating/Sidecar/Dialog decision: un Growth CTA angosto permanece launcher y abre una task surface accesible (`dialog` desktop, `full_screen` mobile); un host editorial ancho puede usar `inline` o `page`. El CTA nunca se expande en un scheduler gigante.
 - Copy source: `src/lib/copy/*`; no strings de error/success en hosts.
 - Access impact: `none`; surface/origin/anti-abuse los gobierna TASK-1509.
 
 ### State inventory
 
-- Default: calendario mensual estable con timezone, fechas disponibles y agenda del día seleccionado.
+- Default: calendario mensual estable en la zona IANA detectada del visitante, fechas disponibles y agenda del día seleccionado; la zona de la surface sólo cubre detección ausente/inválida.
 - Loading: skeleton estructural de calendario; sin fechas o slots falsos.
 - Empty: mes sin disponibilidad con navegación bounded y fallback.
 - Error: recovery inline, provider-safe, retry y fallback.
@@ -170,10 +170,10 @@ Reglas obligatorias:
 - Slot conflict: el resumen entra a warning, preserva datos no sensibles, refresca calendario y devuelve foco.
 - Validation: summary + field-level messages; la selección se preserva.
 - Booking pending: el resumen cambia a processing, CTA bloqueada, sin auto-retry.
-- Success: el resumen se transforma en recibo confirmado con fecha/timezone/duration/Teams expectation; cero IDs.
+- Success: el resumen se transforma en recibo confirmado con fecha/zona local/duración/expectativa Teams; cero IDs.
 - Permission denied: surface inválida degrada a fallback genérico.
 - Long content: timezone/legal/copy envuelven sin romper calendario, agenda o resumen.
-- Mobile / compact: mes completo de siete columnas, agenda debajo, resumen inline y targets >=44px; cero overlay/overflow.
+- Mobile / compact: receta `guided` con una decisión por plano, strip de fechas y acceso explícito a “Ver mes”; el mes semántico no desaparece. Targets >=44px y cero overflow.
 - Keyboard / focus: tabla con caption/headers, botones sólo en días disponibles, slots cronológicos, foco visible y restauración a heading/error.
 - Reduced motion: same information architecture, instant transformations, no meaning lost.
 
@@ -182,7 +182,7 @@ Reglas obligatorias:
 - Primary interaction: inspect month -> select date/slot -> inspect summary -> details/consent -> reserve -> confirmed summary.
 - Hover / focus / active: available/selected states use interactivity, shape, text/dot and border, never color alone.
 - Pending / disabled: disabled reason visible; stable idempotency key throughout intent.
-- Escape / click-away: no overlays.
+- Escape / click-away: el host de diálogo contiene/restaura foco y permite cierre seguro. Tras dispatch, cerrar oculta pero no destruye el controlador ni habilita un segundo booking.
 - Focus restore: step heading; conflict alert then first available slot; back returns to selected slot; success heading.
 - Latency feedback: causal status; after 8s show “seguimos confirmando” without resubmitting.
 - Toast / alert behavior: primary state inline/live region; no host toast duplication.
@@ -191,7 +191,7 @@ Reglas obligatorias:
 
 - Motion primitive: tokenized CSS only for short selection/state continuity.
 - Enter / exit: calendar, agenda and steps use direct or short state transitions; no decorative entrance.
-- Layout morph: selected slot becomes an inline summary; the same document order is preserved at 390px.
+- Layout morph: selected slot becomes an inline summary; CTA activation establishes a new task surface and never morphs the small host into a large inline application.
 - Stagger: subtle only for contextual labels, never slots.
 - Timing / easing token: canonical public motion tokens; no scattered literal timings/easings.
 - Reduced-motion fallback: direct state swap and equivalent focus/live-region behavior.
@@ -200,13 +200,13 @@ Reglas obligatorias:
 ### Implementation mapping
 
 - Surface: `src/growth-meeting-renderer/**`; deterministic demo host + approved staging public host.
-- Primitive / variant / kind: new `<efeonce-meeting-scheduler appearance="calendar|bare">`.
-- Internal components: scene shell, context rail, timezone label, semantic month table, daily agenda, step rail, attendee fields, selected summary and recovery/fallback.
+- Primitive / variant / kind: new `<efeonce-meeting-scheduler activation-mode="inline|dialog|full_screen|page" max-recipe="guided|split|command">`; resolved recipe is container-driven and is not a host-forced appearance.
+- Internal components: scene shell, context rail, visitor timezone label, semantic month table, daily agenda, step rail, attendee fields, selected summary and recovery/fallback.
 - Copy source: `src/lib/copy/growth-meetings*` or nearest existing growth dictionary confirmed in Discovery.
 - Reader / command: TASK-1509 config/availability/book only.
 - API parity: no UI-only write/success; server receipt gates confirmation.
 - Browser events: canonical `gh_meeting_step_reached` plus dataLayer-only `gh_meeting_booking_confirmed`; strict parameter allowlist from TASK-1509. GTM maps only the latter to `generate_lead` and never forwards the custom confirmation name to GA4.
-- GTM mapping: one generic GA4 tag for Tier B funnel; one conversion tag mapping confirmed to `generate_lead`; dimensions reuse surface/placement and add only governed scheduler interaction/stage fields.
+- GTM mapping: one generic GA4 tag for Tier B funnel; one conversion tag mapping confirmed to `generate_lead`; add allowlisted `presentation_variant` and `activation_mode` before publish. Resize/recipe changes are diagnostic context, never funnel steps.
 - States: complete State inventory, including ambiguous timeout and fallback.
 
 ### GVC scenario plan
@@ -232,6 +232,7 @@ Reglas obligatorias:
 - Reuse / extend / new: new portable public adapter; reuse tokens/control/a11y/telemetry patterns; no private primitive or page-local form.
 - Measurement decision: generic interaction event + parameterized funnel; only receipt-gated confirmed maps to key event.
 - Open risks: real provider latency and exact host constraints require staging evidence after TASK-1509.
+- Implementation debt found 2026-07-21: `appearance` is observed but does not resolve a view, full `replaceChildren` can break focus/state continuity, and automatic first-date selection currently emits `date_selected` without user intent. Adaptive implementation must resolve these before pilot.
 
 ### Visual verification
 
@@ -347,9 +348,12 @@ The renderer is a standalone custom element with an explicit state reducer. Rend
 - [x] `pnpm ui:flow-check --task TASK-1510`
 - [x] `pnpm ui:motion-check --task TASK-1510`
 - [x] `pnpm ui:readiness-check --task TASK-1510`
-- [x] Renderer/a11y/telemetry/parity tests: 11 focal tests + ESLint + TypeScript.
+- [x] Renderer/server/a11y/telemetry/timezone/icon tests: 64 passed, 1 skipped + ESLint + TypeScript.
 - [x] `pnpm fe:capture native-meeting-scheduler --env=local` — premium, 1440×1000 + 390×844, 24 frames, exit 0; only `baseline_stale` warning pending human approval.
 - [x] `pnpm fe:capture:review .captures/2026-07-21T08-43-09_native-meeting-scheduler`
+- [x] Timezone/GVC recheck: `.captures/2026-07-21T09-45-48_native-meeting-scheduler`, 22 frames desktop/mobile, exit 0; labels and GMT offset fit without overflow.
+- [x] Los campos usan el subset canónico Iconify/Tabler (`user|id|mail|building-skyscraper`) generado en build; no contienen SVG manual ni dependen del CSS del host.
+- [x] Iconography GVC recheck: `.captures/2026-07-21T09-52-43_native-meeting-scheduler`, 22 frames desktop/mobile, exit 0; `tabler-mail` y el set completo revisados visualmente.
 - [ ] `pnpm fe:capture native-meeting-scheduler --env=staging`
 - [ ] `pnpm fe:capture:review <capture-dir>`
 - [ ] `pnpm ui:quality --task TASK-1510`

@@ -23,20 +23,33 @@
 
 - **`TASK-1509` / `TASK-1510` IN-PROGRESS (Native Meeting Scheduler, `EPIC-023`).** El operador confirmó
   productización y autorizó subagentes. Dos objetivos load-bearing: calendario Efeonce moderno y funnel GTM/GA4
-  completo, con `generate_lead` sólo desde recibo server-confirmed. **Foundation local
-  TASK-1509 ya está code-complete**: ADR aceptado, DTO/provider HubSpot estricto, ledger Growth dedicado con estados
+  completo, con `generate_lead` sólo desde recibo server-confirmed. **Foundation TASK-1509 ya está code-complete y
+  probada contra dev**: ADR aceptado, DTO/provider HubSpot estricto, ledger Growth dedicado con estados
   `ambiguous`/`provider_created_invalid`, HMAC+rate buckets, config/availability/book, Turnstile hostname/action,
-  signals y contrato `gh_meeting_step_reached`; 26 tests focales + tsc + gates verdes. Pendiente antes de rollout:
-  aplicar/probar migración en DB dev, concurrencia real, secret HMAC, binding activo y controlled booking/replay.
-  TASK-1510 ya tiene renderer fixture-backed: Web Component vanilla, calendario mensual semántico + agenda diaria,
-  navegación de mes, formulario/Turnstile, recovery ambiguo, bundle ~50 KB y 11 tests. El GVC premium local
-  `2026-07-21T08-43-09_native-meeting-scheduler` pasó 1440/390, 24 frames, teclado/foco/reduced-motion/contraste,
-  enterprise rubric y runtime sin errores; sólo queda `baseline_stale` hasta aprobación humana. La dirección previa
-  Time Horizon fue rechazada por no leerse como calendario y quedó superseded. Pendientes: dossier staging de estados,
-  workspace GTM, host pilot y prueba DB/runtime de TASK-1509.
+  signals y contrato `gh_meeting_step_reached`. La migración dev está aplicada; el race live produjo un solo claim,
+  conflictos/replay correctos y cero residuo; el secret HMAC dedicado + IAM runtime resuelve por el consumer real;
+  HubSpot Scheduler read está saludable. TASK-1510 adoptó **Calendar Command Center adaptativo**: un controller,
+  recipes `guided|split|command` resueltas por contenedor con hysteresis, navegación progresiva móvil, calendario
+  mensual semántico, agenda por período y formulario/Turnstile. `activation-mode`/`max-recipe` ya no remontan el
+  intent; `date_selected` sólo nace de acción humana. El GVC premium local
+  `2026-07-21T09-35-05_native-meeting-scheduler` pasó 1440/390, 22 frames, targets 44 px, teclado/foco,
+  reduced-motion/contraste/performance, enterprise rubric y runtime sin errores; no se promovió baseline sin
+  aprobación humana. GTM workspace ID 6 pasó readback + quick_preview con 10 DLVs, incluidas
+  `presentation_variant`/`activation_mode`, sin versión/publicación. Pendientes: adapter CTA versionado
+  dialog/full-screen, deploy/read staging, dossier staging, binding activo + controlled booking/replay, host pilot y publish
+  GTM/flag flips con confirmaciones humanas propias.
   `book_meeting` de TASK-1431
   sigue navigation-only y no se toca. HubSpot Scheduler/Office 365/Teams siguen SoT; iframe/link permanece fallback
   hasta pilot y verificación. Trabajo en `develop`, sin branch/worktree; `docs/ui/creative-studio/` es ajeno y no se toca.
+
+  **Timezone visitor-aware cerrada localmente:** el componente detecta la zona IANA del navegador y config,
+  availability y booking la conservan hasta HubSpot; `America/Santiago` queda sólo como fallback de la surface.
+  El adapter canoniza aliases, rechaza zonas inválidas antes del provider y valida `bookingTimezone`; la UI evita
+  drift de date-only y desambigua horas repetidas por DST. HubSpot read-only respondió 197 slots reales para
+  `America/Lima` sobre el mismo calendario Office 365; el ejemplo `13:15Z` equivale a 08:15 Lima / 09:15 Santiago.
+  Los campos migraron de SVG manual a un subset portable Iconify/Tabler generado en build. Suite focal: 64 passed,
+  1 skipped; typecheck/lint verdes; GVC `2026-07-21T09-52-43_native-meeting-scheduler` pasó 22 frames
+  desktop/mobile con iconografía revisada. No hubo booking ni mutación externa.
 
 - **`TASK-1366` COMPLETE / CONDITIONAL PASS (HubSpot Scheduler Booking Equivalence Spike, `EPIC-023`).**
   Build HubSpot `#27` desplegado/reinstalado con scope Scheduler mínimo y sin rotar el token gobernado. Booking

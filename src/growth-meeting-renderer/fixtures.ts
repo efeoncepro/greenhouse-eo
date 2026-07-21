@@ -15,6 +15,8 @@ export const meetingConfigFixture = (): MeetingSchedulerConfig => ({
   timezonePolicy: {
     defaultTimezone: 'America/Santiago',
     allowedTimezones: ['America/Santiago'],
+    mode: 'visitor',
+    resolvedTimezone: 'America/Santiago',
   },
   localePolicy: { defaultLocale: 'es', allowedLocales: ['es'] },
   bookingWindow: { maxMonthOffset: 2 },

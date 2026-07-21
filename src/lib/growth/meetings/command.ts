@@ -10,6 +10,7 @@ import { resolveMeetingPrivacyHasher, type MeetingPrivacyHasher } from './privac
 import { createHubSpotMeetingSchedulingProvider } from './provider/hubspot'
 import { MeetingProviderError, type MeetingSchedulingProvider } from './provider/types'
 import { buildMeetingConsentKey } from './readers'
+import { isSupportedMeetingTimezone } from './timezone'
 import {
   claimMeetingBooking,
   finalizeMeetingExecution,
@@ -144,7 +145,7 @@ export const bookMeeting = async (
     return error('unavailable', 'open_fallback', false)
   }
 
-  if (input.slot.timezone !== surface.defaultTimezone || input.locale !== surface.defaultLocale) {
+  if (!isSupportedMeetingTimezone(input.slot.timezone) || input.locale !== surface.defaultLocale) {
     return error('validation_failed', 'refresh_availability', false)
   }
 

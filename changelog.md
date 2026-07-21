@@ -7,6 +7,36 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-21 — Scheduler completa foundation runtime y Calendar Command Center (TASK-1509/1510)
+
+- El scheduler dejó de imponer `America/Santiago`: detecta la zona IANA del visitante y la propaga de forma
+  consistente por config, availability y booking de HubSpot. Santiago queda como fallback de surface. Se agregó
+  canonicalización de aliases, rechazo pre-provider de zonas inválidas, validación de `bookingTimezone` y cobertura
+  de DST/date-only. Los campos usan ahora un subset portable Iconify/Tabler generado en build, sin SVG manual;
+  64 pruebas focales, typecheck y lint verdes.
+
+- La migración dev quedó aplicada y leída de vuelta; un race live de PostgreSQL probó un único claim, conflicto
+  semántico, replay único y cero residuo. Se provisionó el secreto HMAC dedicado con acceso del runtime y se verificó
+  el resolver canónico; HubSpot Scheduler continúa online sobre Office 365 con disponibilidad real.
+- La UI elevó el calendario a `Calendar Command Center`: densidad por fecha, agenda agrupada por período, resumen
+  vivo, formulario desktop de dos columnas, mobile compacto y motion causal/reduced-motion. GVC premium
+  `2026-07-21T09-02-04_native-meeting-scheduler`: 24 frames, exit 0, runtime/enterprise/a11y/layout/performance verdes.
+- GTM workspace descartable ID 6 quedó compilado y sincronizado en preview con 8 DLVs allowlisted,
+  `gh_meeting_step_reached` y `generate_lead` receipt-gated. No se creó versión ni se publicó; flags y binding siguen OFF.
+
+## 2026-07-21 — Scheduler adopta recipes adaptativas y atribución por intención (TASK-1510)
+
+- El renderer separó estado de booking, modo de activación y layout. Resuelve `guided|split|command` desde su propio
+  contenedor con hysteresis; cambios de `activation-mode`/`max-recipe` conservan nodos, selección e intent.
+- La receta `guided` presenta calendario y agenda como planos progresivos con retorno/foco semántico. Se eliminó el
+  `date_selected` automático y los eventos incorporan `presentation_variant` + `activation_mode` allowlisted.
+- Los datos del asistente usan ahora controles icon-led de 56 px, estados focus/error integrados y consentimientos
+  modernos con hit area real de 44 px; el CTA guiado dejó de cubrir el resumen en móvil.
+- GVC premium local `2026-07-21T09-35-05_native-meeting-scheduler` pasó 22 frames desktop/mobile con targets de
+  44 px, teclado, reduced motion, layout, a11y, performance y enterprise rubric verdes.
+- GTM workspace descartable ID 6 fue actualizado a 10 DLVs y ambos tags; readback/quick preview quedaron verdes.
+  Continúa sin versión ni publicación. `book_meeting` permanece navigation-only; el adapter CTA nativo será un kind nuevo.
+
 ## 2026-07-21 — Scheduler nativo adopta calendario mensual (TASK-1510)
 
 - El prototipo portable reemplaza la dirección abstracta “Time Horizon” por un calendario mensual semántico,

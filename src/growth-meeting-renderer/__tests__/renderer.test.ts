@@ -43,6 +43,7 @@ const mount = async (outcome: 'confirmed' | 'ambiguous' = 'confirmed') => {
 }
 
 const completeBooking = async (host: HTMLElement) => {
+  ;(host.querySelector('.ghm-calendar-day[aria-pressed="true"]') as HTMLButtonElement).click()
   ;(host.querySelector('.ghm-slot') as HTMLButtonElement).click()
   ;(host.querySelector('.ghm-agenda .ghm-primary') as HTMLButtonElement).click()
 
@@ -70,6 +71,40 @@ beforeEach(() => {
 })
 
 describe('MeetingRenderer', () => {
+  it('no atribuye la fecha preseleccionada hasta una acción humana', async () => {
+    const { host, renderer } = await mount()
+    const dataLayer = (window as unknown as { dataLayer: Array<Record<string, unknown>> }).dataLayer
+
+    expect(dataLayer.filter(item => item.meeting_step === 'date_selected')).toHaveLength(0)
+    ;(host.querySelector('.ghm-calendar-day[aria-pressed="true"]') as HTMLButtonElement).click()
+    expect(dataLayer.filter(item => item.meeting_step === 'date_selected')).toHaveLength(1)
+    expect(dataLayer.find(item => item.meeting_step === 'date_selected')).toMatchObject({
+      presentation_variant: 'guided',
+      activation_mode: 'inline',
+    })
+    renderer.destroy()
+  })
+
+  it('cambia recipe sin reconstruir el DOM ni perder selección', async () => {
+    const { host, renderer } = await mount()
+
+    ;(host.querySelector('.ghm-calendar-day[aria-pressed="true"]') as HTMLButtonElement).click()
+    ;(host.querySelector('.ghm-slot') as HTMLButtonElement).click()
+    const selectedSlot = host.querySelector<HTMLButtonElement>('.ghm-slot[aria-pressed="true"]')!
+
+    Object.defineProperty(host, 'getBoundingClientRect', {
+      configurable: true,
+      value: () => ({ width: 760, height: 700, top: 0, right: 760, bottom: 700, left: 0, x: 0, y: 0, toJSON() {} }),
+    })
+    renderer.updatePresentation({ activationMode: 'dialog', maxRecipe: 'split' })
+
+    expect(host.dataset.ghmRecipe).toBe('split')
+    expect(host.dataset.ghmActivation).toBe('dialog')
+    expect(host.querySelector('.ghm-slot[aria-pressed="true"]')).toBe(selectedSlot)
+    expect(host.querySelector('[data-navigation="slots"]')).not.toBeNull()
+    renderer.destroy()
+  })
+
   it('muestra errores locales y enfoca el resumen después de validar', async () => {
     const { host, renderer } = await mount()
 
@@ -84,6 +119,22 @@ describe('MeetingRenderer', () => {
     expect(host.querySelectorAll('.ghm-field-error')).toHaveLength(5)
     expect(document.activeElement).toBe(host.querySelector('.ghm-error-summary'))
     expect(host.querySelector("[name='email']")?.getAttribute('aria-describedby')).toContain('email-error')
+    renderer.destroy()
+  })
+
+  it('usa el subset canónico Iconify/Tabler para los campos, sin SVG manual', async () => {
+    const { host, renderer } = await mount()
+
+    ;(host.querySelector('.ghm-slot') as HTMLButtonElement).click()
+    ;(host.querySelector('.ghm-agenda-action') as HTMLButtonElement).click()
+    await Promise.resolve()
+
+    expect(host.querySelectorAll('.ghm-field-icon')).toHaveLength(4)
+    expect(host.querySelector('.ghm-field-icon.tabler-user')).not.toBeNull()
+    expect(host.querySelector('.ghm-field-icon.tabler-id')).not.toBeNull()
+    expect(host.querySelector('.ghm-field-icon.tabler-mail')).not.toBeNull()
+    expect(host.querySelector('.ghm-field-icon.tabler-building-skyscraper')).not.toBeNull()
+    expect(host.querySelector('svg.ghm-field-icon')).toBeNull()
     renderer.destroy()
   })
 

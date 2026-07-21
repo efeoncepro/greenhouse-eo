@@ -1,11 +1,14 @@
+import { createRequire } from 'node:module'
 import { mkdir, writeFile, copyFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { build } from 'esbuild'
+import { getIcons, getIconsCSS } from '@iconify/utils'
 
 const scriptsDir = dirname(fileURLToPath(import.meta.url))
 const repoRoot = resolve(scriptsDir, '..')
+const require = createRequire(import.meta.url)
 const channelArg = process.argv.find(argument => argument.startsWith('--channel='))
 const channel = channelArg ? channelArg.split('=')[1] : 'preview'
 
@@ -17,8 +20,22 @@ if (!['preview', 'beta', 'stable'].includes(channel)) {
 const outDir = resolve(repoRoot, 'public/growth-meetings')
 const entry = resolve(repoRoot, 'src/growth-meeting-renderer/index.ts')
 const outFile = resolve(outDir, `renderer-${channel}.js`)
+const iconNames = ['user', 'id', 'mail', 'building-skyscraper']
 
 await mkdir(outDir, { recursive: true })
+
+const tabler = require('@iconify/json/json/tabler.json')
+
+const meetingIcons = getIcons(tabler, iconNames)
+
+if (!meetingIcons) {
+  console.error('[renderer:meeting:build] no se pudo resolver el subset Iconify/Tabler')
+  process.exit(1)
+}
+
+const iconCss = getIconsCSS(meetingIcons, iconNames, { iconSelector: '.tabler-{name}' })
+
+await writeFile(resolve(outDir, 'icons.css'), iconCss, 'utf8')
 
 const result = await build({
   entryPoints: [entry],
@@ -43,3 +60,4 @@ await writeFile(
 )
 
 console.log(`[renderer:meeting:build] OK → public/growth-meetings/renderer-${channel}.js (${(bytes / 1024).toFixed(1)} KB)`)
+console.log(`[renderer:meeting:build] Iconify/Tabler subset → public/growth-meetings/icons.css (${iconNames.length} icons)`)

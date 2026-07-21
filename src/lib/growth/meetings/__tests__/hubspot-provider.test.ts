@@ -112,6 +112,79 @@ describe('HubSpot meeting scheduling provider', () => {
     })
   })
 
+  it('envía la zona del visitante en query y body del booking', async () => {
+    const startsAt = '2026-07-22T13:15:00.000Z'
+
+    const fetcher = vi.fn().mockResolvedValue(jsonResponse({
+      isOffline: false,
+      calendarEventId: 'calendar-secret',
+      contactId: 123,
+      webConferenceUrl: 'https://teams.microsoft.com/l/meetup-join/example',
+      bookingTimezone: 'America/Lima',
+      start: Date.parse(startsAt),
+      end: Date.parse(startsAt) + 1_800_000,
+      duration: 1_800_000,
+    }))
+
+    vi.stubGlobal('fetch', fetcher)
+    const provider = createHubSpotMeetingSchedulingProvider({ getAccessToken: async () => 'secret' })
+
+    await provider.book({
+      startsAt,
+      meetingDurationMillis: 1_800_000,
+      timezone: 'America/Lima',
+      locale: 'es',
+      email: 'person@example.com',
+      firstName: 'Ada',
+      lastName: 'Lovelace',
+      company: 'Analytical Engines',
+      likelyAvailableUserIds: ['42'],
+      legalConsentResponses: [],
+    })
+
+    expect(fetcher).toHaveBeenCalledWith(
+      expect.stringContaining('?timezone=America%2FLima'),
+      expect.objectContaining({ body: expect.stringContaining('"timezone":"America/Lima"') }),
+    )
+  })
+
+  it('compara aliases IANA por su zona canónica', async () => {
+    const startsAt = '2026-07-22T13:15:00.000Z'
+
+    const fetcher = vi.fn().mockResolvedValue(jsonResponse({
+      isOffline: false,
+      calendarEventId: 'calendar-secret',
+      contactId: 123,
+      webConferenceUrl: 'https://teams.microsoft.com/l/meetup-join/example',
+      bookingTimezone: 'America/Los_Angeles',
+      start: Date.parse(startsAt),
+      end: Date.parse(startsAt) + 1_800_000,
+      duration: 1_800_000,
+    }))
+
+    vi.stubGlobal('fetch', fetcher)
+    const provider = createHubSpotMeetingSchedulingProvider({ getAccessToken: async () => 'secret' })
+
+    const result = await provider.book({
+      startsAt,
+      meetingDurationMillis: 1_800_000,
+      timezone: 'US/Pacific',
+      locale: 'es',
+      email: 'person@example.com',
+      firstName: 'Ada',
+      lastName: 'Lovelace',
+      company: 'Analytical Engines',
+      likelyAvailableUserIds: ['42'],
+      legalConsentResponses: [],
+    })
+
+    expect(result.timezone).toBe('America/Los_Angeles')
+    expect(fetcher).toHaveBeenCalledWith(
+      expect.stringContaining('?timezone=America%2FLos_Angeles'),
+      expect.objectContaining({ body: expect.stringContaining('"timezone":"America/Los_Angeles"') }),
+    )
+  })
+
   it('fails closed when HubSpot returns an invalid conference host', async () => {
     const startsAt = '2026-07-22T13:15:00.000Z'
 

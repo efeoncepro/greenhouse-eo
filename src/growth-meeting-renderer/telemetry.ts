@@ -11,12 +11,17 @@ import {
   type MeetingTimeOfDayBucket,
 } from './contract'
 
-export interface MeetingTelemetryBase {
+export interface MeetingTelemetryIdentity {
   scheduler_key: string
   surface_id: string
   placement: string
   renderer_version: string
   contract_version: string
+}
+
+export interface MeetingTelemetryBase extends MeetingTelemetryIdentity {
+  presentation_variant: 'guided' | 'split' | 'command'
+  activation_mode: 'inline' | 'dialog' | 'full_screen' | 'page'
 }
 
 export interface MeetingStepContext {
@@ -63,6 +68,8 @@ const errorCategories = new Set<string>([
 
 const slug = /^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/
 const version = /^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/
+const presentationVariants = new Set(['guided', 'split', 'command'])
+const activationModes = new Set(['inline', 'dialog', 'full_screen', 'page'])
 
 const sanitizeBase = (base: MeetingTelemetryBase): Record<string, string> | null => {
   if (
@@ -70,7 +77,9 @@ const sanitizeBase = (base: MeetingTelemetryBase): Record<string, string> | null
     !slug.test(base.surface_id) ||
     !slug.test(base.placement) ||
     !version.test(base.renderer_version) ||
-    !version.test(base.contract_version)
+    !version.test(base.contract_version) ||
+    !presentationVariants.has(base.presentation_variant) ||
+    !activationModes.has(base.activation_mode)
   ) return null
 
   return { ...base }

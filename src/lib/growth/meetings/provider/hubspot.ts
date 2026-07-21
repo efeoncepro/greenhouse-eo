@@ -5,6 +5,7 @@ import { createHash } from 'node:crypto'
 import { z } from 'zod'
 
 import { getHubSpotAccessToken } from '@/lib/hubspot/access-token'
+import { canonicalizeMeetingTimezone } from '@/lib/growth/meetings/timezone'
 
 import {
   MeetingProviderError,
@@ -173,10 +174,13 @@ export const createHubSpotMeetingSchedulingProvider = (options: {
   return {
     async getConfiguration({ timezone, signal }): Promise<ProviderConfiguration> {
       const token = await getAccessToken()
+      const requestedTimezone = canonicalizeMeetingTimezone(timezone)
+
+      if (!requestedTimezone) throw new MeetingProviderError('schema_drift', false)
 
       const raw = await requestJson(
         token,
-        `${API_BASE}/${encodeSlug(slug)}?timezone=${encodeURIComponent(timezone)}`,
+        `${API_BASE}/${encodeSlug(slug)}?timezone=${encodeURIComponent(requestedTimezone)}`,
         { method: 'GET', signal },
         false,
       )
@@ -221,10 +225,13 @@ export const createHubSpotMeetingSchedulingProvider = (options: {
 
     async getAvailability({ timezone, monthOffset, meetingDurationMillis, signal }): Promise<ProviderAvailability> {
       const token = await getAccessToken()
+      const requestedTimezone = canonicalizeMeetingTimezone(timezone)
+
+      if (!requestedTimezone) throw new MeetingProviderError('schema_drift', false)
 
       const raw = await requestJson(
         token,
-        `${API_BASE}/availability-page/${encodeSlug(slug)}?timezone=${encodeURIComponent(timezone)}&monthOffset=${monthOffset}`,
+        `${API_BASE}/availability-page/${encodeSlug(slug)}?timezone=${encodeURIComponent(requestedTimezone)}&monthOffset=${monthOffset}`,
         { method: 'GET', signal },
         false,
       )
@@ -258,10 +265,13 @@ export const createHubSpotMeetingSchedulingProvider = (options: {
 
     async book(input: ProviderBookingInput, options): Promise<ProviderBookingOutcome> {
       const token = await getAccessToken()
+      const requestedTimezone = canonicalizeMeetingTimezone(input.timezone)
+
+      if (!requestedTimezone) throw new MeetingProviderError('degraded_booking', false)
 
       const raw = await requestJson(
         token,
-        API_BASE,
+        `${API_BASE}?timezone=${encodeURIComponent(requestedTimezone)}`,
         {
           method: 'POST',
           signal: options?.signal,
@@ -279,7 +289,7 @@ export const createHubSpotMeetingSchedulingProvider = (options: {
             slug,
             startTime: input.startsAt,
             locale: input.locale,
-            timezone: input.timezone,
+            timezone: requestedTimezone,
           }),
         },
         true,
@@ -293,9 +303,10 @@ export const createHubSpotMeetingSchedulingProvider = (options: {
       const endsAt = toIso(parsed.data.end)
       const conferenceUrl = new URL(parsed.data.webConferenceUrl)
       const expectedEnd = Date.parse(input.startsAt) + input.meetingDurationMillis
+      const bookingTimezone = canonicalizeMeetingTimezone(parsed.data.bookingTimezone)
 
       if (
-        parsed.data.bookingTimezone !== input.timezone ||
+        bookingTimezone !== requestedTimezone ||
         parsed.data.duration !== input.meetingDurationMillis ||
         startsAt !== new Date(input.startsAt).toISOString() ||
         Date.parse(endsAt) !== expectedEnd ||
@@ -308,7 +319,7 @@ export const createHubSpotMeetingSchedulingProvider = (options: {
       return {
         startsAt,
         endsAt,
-        timezone: parsed.data.bookingTimezone,
+        timezone: bookingTimezone,
         meetingDurationMillis: parsed.data.duration,
         channel: 'microsoft_teams',
         providerEvidence: {

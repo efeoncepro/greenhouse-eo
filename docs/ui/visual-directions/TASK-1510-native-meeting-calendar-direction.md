@@ -15,11 +15,11 @@ truth; the renderer only presents governed availability and sends a single idemp
 
 ## Benchmarked directions
 
-### A. Monthly calendar + daily agenda — selected
+### A. Calendar Command Center — selected
 
 - Three-part desktop composition: meeting context, full month, selected-day slots.
 - Calendar semantics remain visible: month/year, weekday headers, complete week rows, unavailable dates, selected date.
-- The selected slot becomes a compact appointment summary beside the calendar.
+- Availability density is visible inside each bookable date; the selected slot becomes a compact appointment summary beside the calendar.
 - Closest to the stable mental model used by Calendly, Cal.com and Google appointment schedules.
 
 ### B. Horizontal week strip + density bars — rejected
@@ -36,12 +36,12 @@ truth; the renderer only presents governed availability and sends a single idemp
 
 ## Art direction
 
-- Editorial Efeonce context panel in deep ink, but subordinate to the calendar.
-- Paper-like calendar surface with strong typographic month label and quiet grid.
+- Editorial Efeonce context panel in deep ink with a restrained orbital motif, but subordinate to the calendar.
+- Paper-like calendar surface with strong typographic month label, quiet grid and one controlled depth hierarchy.
 - Availability uses shape + label + contrast, never color alone.
 - Selected date is a filled circle; today/available/selected states remain distinguishable.
-- Time slots are a vertical agenda, not pills floating without a date relationship.
-- No charts, density bars, glass effects or decorative gradients.
+- Time slots form a real daily agenda grouped as morning/afternoon/evening, not pills floating without a date relationship.
+- Subtle gradients are allowed only to connect agenda/selection state; no glass effects, particles or decorative spectacle.
 
 ## Modern web mapping
 
@@ -67,8 +67,9 @@ the repo contract reserves FullCalendar for calendar visualization. Do not add R
 ## Decision
 
 Implement direction A as the sole active visual thesis: context rail, complete monthly calendar and selected-day
-agenda in one inline scene. Preserve the renderer/state/telemetry foundation, but remove the horizontal day strip,
-density bars and sticky ticket treatment. The user selects a date and time before the only mutating action.
+agenda in one inline scene. Preserve the renderer/state/telemetry foundation, but remove the horizontal day strip
+and abstract density bars. The user selects a date and time before the only mutating action; selection depth and
+motion must preserve the spatial relationship date → daily agenda → appointment summary.
 
 ## Desktop target
 
@@ -78,9 +79,10 @@ agenda sits directly beside it; contact details replace the calendar work plane 
 
 ## Mobile target
 
-At 390×844 the composition transforms to context, complete seven-column month, daily agenda, selected summary and
-details in document order. Calendar dates remain at least 48 px tall. No sticky panel overlays slots or fields, and
-the page/component must satisfy `scrollWidth === clientWidth`.
+At 390×844 the composition transforms to compact context, complete seven-column month, two-column daily agenda,
+selected summary and details in document order. Calendar dates remain at least 48 px tall. The contextual CTA may
+stick only after the slot list in normal flow, never obscuring unreviewed slots or fields; the component must satisfy
+`scrollWidth === clientWidth`.
 
 ## Token mapping
 

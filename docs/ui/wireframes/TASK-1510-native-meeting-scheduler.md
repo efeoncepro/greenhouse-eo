@@ -1,155 +1,200 @@
-# TASK-1510 — Native Meeting Scheduler Wireframe
+# TASK-1510 — Adaptive Meeting Scheduler Wireframes
 
 ## Product Design Source
 
 - Visual direction mode: `repo-native-benchmark`
-- Product Design asset: `docs/ui/visual-directions/TASK-1510-native-meeting-scheduler-direction.md`
-- Selected direction: Time Horizon.
+- Product Design asset: `docs/ui/visual-directions/TASK-1510-native-meeting-calendar-direction.md`
+- Selected direction: Calendar Command Center with adaptive recipes.
 - Desktop target: 1440x1000.
 - Mobile target: 390x844.
 
-## Purpose
+## Product decision
 
-Turn real availability into a memorable, measurable scheduling experience that ends only on a server-confirmed HubSpot/Teams booking.
+The selected direction is **Calendar Command Center**, delivered through adaptive recipes rather than one responsive composition. The scheduler keeps one controller and booking intent while the host and container determine how much of the calendar is visible at once.
+
+- Visual direction: `docs/ui/visual-directions/TASK-1510-native-meeting-calendar-direction.md`
+- Architecture: `docs/architecture/GREENHOUSE_GROWTH_MEETINGS_SCHEDULER_ARCHITECTURE_V1.md#architecture-decision-2026-07-21--adaptive-presentation-recipes`
+- Target hosts: narrow Growth CTA, dialog/full-screen task surface, embedded section and full page.
+
+## Launcher — collapsed Growth CTA
+
+The launcher is not a miniature scheduler. It preserves the CTA footprint and delays availability/bundle work until activation or strong intent.
+
+```text
+┌──────────────────────────┐
+│ Hablemos de tu desafío   │
+│ 30 min · Microsoft Teams │
+│ [Ver horarios →]         │
+└──────────────────────────┘
+             │ activate
+             ▼
+   dialog desktop / full-screen mobile
+```
 
 ## Desktop Target
 
-At 1440x1000, the conversion region reads as one immersive instrument with three coordinated planes. The horizon owns the widest area; the signal rail grounds purpose and the Meeting Pass carries persistent commitment. The first fold exposes real days/slots and one primary action without iframe scroll or nested-card wallpaper.
+At 1440x1000 a full section resolves to `command`: context, semantic month and selected-day agenda remain simultaneously visible. In a desktop dialog the same controller normally resolves to `split`, avoiding a three-plane composition when the dialog cannot sustain it. The host owns the dialog, backdrop, scroll boundary and focus return.
 
-### Wireframe
+## Guided — narrow task surface
+
+One decision plane appears at a time. The date strip is an efficient default, while “Ver mes” preserves calendar recognition and access to every bookable date.
 
 ```text
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ SIGNAL RAIL       │ TIME HORIZON                             │ MEETING PASS  │
-│                   │  Santiago GMT-4   [timezone lens]        │               │
-│ Hablemos de       │  ─────────────────────────────────────   │  MIÉ 22       │
-│ tu próximo        │  Mar 21   Mié 22   Jue 23   Vie 24      │  09:30        │
-│ desafío           │  ▂▅▇       ▇▅▃      ▃▆▅      ▅▇▂         │  30 min        │
-│                   │                                          │  Teams         │
-│ 30 min            │  09:00  09:30  10:30  11:00  15:00     │               │
-│ Microsoft Teams   │             [selected slot]              │ [Continuar]   │
-│                   │                                          │               │
-│ Horario · Datos · Confirmación                              │ Agenda HubSpot│
-└──────────────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────┐
+│ [←] Agenda una reunión  [×]  │
+│ 30 min · Teams · GMT-4       │
+│ Horario — Datos — Confirmar  │
+│                              │
+│ JULIO 2026          [Ver mes]│
+│ [Mar 21] [Mié 22] [Jue 23]  │
+│                              │
+│ Mañana · 3 horas             │
+│ [09:00] [09:30]              │
+│ [10:30] [11:00]              │
+│                              │
+│ Mié 22 · 09:30 · 30 min      │
+│ [Continuar]                  │
+│ Usar agenda HubSpot          │
+└──────────────────────────────┘
 ```
 
-The density bars are textual/visual summaries of returned availability, not fabricated estimates. On step 2 the slot field becomes required fields while horizon/pass remain. On success, the pass becomes the confirmation receipt.
+At the details phase, date and time collapse into the persistent appointment summary. Back restores the selected slot and focus. A dispatched booking survives closing/reopening the task surface.
 
 ## Mobile Target
 
-At 390x844, the same hierarchy becomes a single focus flow rather than compressed desktop. Narrative facts collapse into one line, the horizon is a bounded tactile control, and the Meeting Pass becomes component-scoped sticky context above the CTA. The document width never exceeds the viewport.
+At 390x844 the Growth CTA remains a compact launcher and opens a `full_screen` task surface. The scheduler resolves to `guided`, has a single vertical scroll owner and exposes one decision plane at a time. The selected appointment remains visible without covering fields, errors, consent or fallback.
 
-### Wireframe
+## Split — medium surface
 
 ```text
-┌──────────────────────────────────┐
-│ Hablemos de tu próximo desafío   │
-│ 30 min · Teams · Santiago GMT-4  │
-│ Horario — Datos — Confirmación   │
-│                                  │
-│ TIME HORIZON                 [>] │
-│ [21 ▂▅] [22 ▇▅] [23 ▃▆] [24 ▅▇] │
-│                                  │
-│ [09:00] [09:30]                  │
-│ [10:30] [11:00]                  │
-│ [15:00] [16:00]                  │
-│                                  │
-│ ┌ MEETING PASS ────────────────┐ │
-│ │ MIÉ 22 · 09:30 · 30 min     │ │
-│ │ Santiago · Teams             │ │
-│ └──────────────────────────────┘ │
-│ [Continuar]                     │
-│ Usar agenda HubSpot             │
-└──────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│ Agenda una reunión · 30 min · Teams · Tu horario local   │
+│ Horario — Datos — Confirmación                            │
+├──────────────────────────────┬───────────────────────────┤
+│ JULIO 2026          [‹] [›]  │ MIÉRCOLES 22 · 3 horas   │
+│ Lu Ma Mi Ju Vi Sá Do         │ Mañana                   │
+│        1  2  3  4  5         │ [09:00] [09:30]          │
+│  6  7  8  9 10 11 12         │ [10:30] [11:00]          │
+│ 13 14 15 16 17 18 19         │ Tarde                    │
+│ 20 21[22]23 24 25 26         │ [15:00] [16:00]          │
+│ 27 28 29 30 31               │                           │
+│                              │ Mié 22 · 09:30 · 30 min  │
+│                              │ [Continuar]               │
+└──────────────────────────────┴───────────────────────────┘
 ```
+
+## Command — full section/page
+
+```text
+┌─────────────────────────────────────────────────────────────────────────┐
+│ CONTEXTO            │ JULIO 2026                         │ AGENDA        │
+│                     │ [‹]                         [›]     │ MIÉRCOLES 22  │
+│ Hablemos de tu      │ Lu Ma Mi Ju Vi Sá Do               │ 3 horas       │
+│ próximo desafío     │        1  2  3  4  5               │               │
+│                     │  6  7  8  9 10 11 12               │ Mañana       │
+│ 30 min              │ 13 14 15 16 17 18 19               │ 09:00  09:30 │
+│ Microsoft Teams     │ 20 21[22]23 24 25 26               │ 10:30  11:00 │
+│ Tu horario · Lima   │ 27 28 29 30 31                     │               │
+│                     │                                     │ [Continuar]  │
+└─────────────────────┴─────────────────────────────────────┴───────────────┘
+```
+
+## Resolution rules
+
+| Container fit | Recipe | Host behavior |
+|---:|---|---|
+| `<320 px` or collapsed | `launcher` | No inline calendar; activate a task surface |
+| `320–559 px` | `guided` | One task plane; date strip plus full-month disclosure |
+| `560–959 px` | `split` | Month and agenda together |
+| `>=960 px` and sufficient height | `command` | Context, month and agenda together |
+
+The host supplies `activation-mode` and an optional maximum recipe. The component resolves the actual recipe from its container with hysteresis. Width changes preserve date, slot, details, focus and command status and never emit funnel events by themselves.
 
 ## Action Hierarchy
 
-- Primary: choose slot, then continue/reserve.
-- Secondary: timezone/window/retry.
-- Safety: HubSpot fallback reachable before provider dispatch; suppressed after an ambiguous/invalid-created outcome to prevent duplicates.
-- No competing host CTA inside the scene.
+- Primary: select a real slot, then continue/reserve.
+- Secondary: navigate month, reveal full month or go back. La zona se detecta del dispositivo y se muestra de forma explícita.
+- Safety: HubSpot fallback remains available before provider dispatch and is suppressed after ambiguous/provider-created-invalid outcomes.
+- Closing a dialog before dispatch may retain the in-memory draft for the same activation session. After dispatch it must retain the controller and block duplicate booking.
+- The CTA host never introduces a competing primary action inside the scheduler.
 
 ## Visual Fidelity Mapping
 
-- The Time Horizon uses returned availability density as data-led emphasis; no invented heatmap or decorative graph.
-- Large time numerals use Efeonce public typography tokens and remain readable under zoom/long locale strings.
-- Navy/ink establishes scene depth, teal marks selection/primary action, and semantic tokens own warning/error/degraded states.
-- Meeting Pass is one elevated plane, not another card stack; field step uses a quiet neutral work plane.
-- Calendar/clock/globe/Teams icons come from the governed icon set. Motion follows the dedicated contract and shared public tokens.
+- The semantic month remains the defining calendar primitive; the guided strip is a navigation shortcut, never an abstract replacement.
+- Calendar Command Center depth, selected-state signal, availability counts and time-of-day groupings carry across recipes without multiplying cards.
+- Context compresses before the task controls do: operational facts become one line in `guided`, a header in `split` and a dedicated rail in `command`.
+- Typography, ink/navy depth, teal selection and semantic warning/error colors use the public Efeonce tokens.
+- Motion communicates activation, forward/back navigation, selection and server-confirmed resolution; resize is visually quiet.
 
 ## Copy Ledger
 
 | Element | Visible copy intent | Canonical owner |
 |---|---|---|
-| Scene title | “Hablemos de tu próximo desafío” or approved service-context variant | `src/lib/copy/growth-meetings*` |
-| Operational facts | duration, Teams and timezone labels derived from config | renderer formatter + canonical nouns |
+| Launcher | “Agenda una reunión” plus duration/platform expectation | `src/lib/copy/growth-meetings*` |
+| Scene title | “Hablemos de tu próximo desafío” or approved contextual variant | growth-meetings copy |
+| Operational facts | duration, Teams and timezone derived from safe config | renderer formatter + canonical nouns |
 | Steps | “Horario”, “Tus datos”, “Confirmación” | growth-meetings copy |
+| Month disclosure | “Ver mes” | growth-meetings copy |
 | Primary CTA | continue/reserve according to state | growth-meetings copy |
 | Fallback | “Usar agenda HubSpot” with honest context | growth-meetings copy |
-| Error/success | generic recovery and confirmed receipt wording | growth-meetings copy; never host JSX |
+| Error/success | generic recovery and confirmed receipt wording | growth-meetings copy; never host markup |
 
 ## State Copy
 
 | State | Visible copy | Recovery behavior |
 |---|---|---|
-| ready | “Elige el horario que mejor te acomode.” | select day/slot or change timezone |
-| loading | “Sincronizando horarios disponibles…” | wait; after bounded timeout expose retry and fallback |
-| empty | “No hay horarios en esta ventana.” | move to next bounded window or use fallback |
-| partial | “Mostramos la disponibilidad más reciente; confirma para validar el horario.” | booking command revalidates; fallback remains available |
-| error | “La agenda no está respondiendo ahora.” | retry by user action or use fallback |
-| denied | “No podemos abrir esta agenda desde aquí.” | show safe HubSpot link; expose no policy/provider detail |
-| conflict | “Ese horario acaba de ocuparse. Elige otro.” | refresh horizon and focus first available slot |
-| pending | “Confirmando tu reunión…” | keep stable intent; never auto-submit a new key |
-| success | “Tu reunión quedó agendada.” | show confirmed Meeting Pass and calendar/Teams expectation |
+| ready | “Elige el horario que mejor te acomode.” | select a date/slot or reveal the full month |
+| loading | “Sincronizando horarios disponibles…” | wait; after a bounded timeout expose retry and fallback |
+| empty | “No hay horarios en esta ventana.” | navigate to the next bounded window or use fallback |
+| partial | “Mostramos la disponibilidad más reciente; confirma para validar el horario.” | booking revalidates; fallback remains pre-dispatch |
+| error | “La agenda no está respondiendo ahora.” | user-driven retry or safe fallback |
+| denied | “No podemos abrir esta agenda desde aquí.” | safe HubSpot link without policy/provider detail |
+| conflict | “Ese horario acaba de ocuparse. Elige otro.” | refresh and return focus to valid availability |
+| pending | “Confirmando tu reunión…” | retain the intent; never submit a new key |
+| success | “Tu reunión quedó agendada.” | show the server-confirmed summary and email/calendar expectation |
 
-## State and Copy Inventory
+## Accessibility contract
 
-- Loading: “Sincronizando horarios disponibles…” with honest horizon skeleton.
-- Empty: “No hay horarios en esta ventana.” with next window/fallback.
-- Degraded: “La agenda no está respondiendo ahora.” with retry/fallback.
-- Conflict: “Ese horario acaba de ocuparse. Elige otro.”; pass shifts to warning.
-- Validation: summary + field messages; pass remains.
-- Pending: “Confirmando tu reunión…”; pass becomes processing.
-- Success: “Tu reunión quedó agendada.”; confirmed pass + calendar/Teams/email expectation.
-- Offline/no Teams after dispatch: never success; check-email/reconciliation state with no immediate second booking.
+- The launcher is a real button with a stable accessible name and visible focus.
+- Dialog/full-screen activation moves focus to the scheduler heading, contains Tab, supports safe Escape and restores focus to the launcher.
+- Calendar grid, date strip and slots expose equivalent names and selected states; color is never the only signal.
+- Recipe changes preserve logical reading order and move focus only when the focused control no longer exists, to its semantic counterpart.
+- Sticky mobile actions do not cover the focused field, error summary, consent or fallback.
+- Targets are at least 44 px; no recipe introduces page-level horizontal scrolling.
 
-## Accessibility Contract
+## Motion contract
 
-- Horizon summaries supplement, never replace, semantic day/slot buttons.
-- Selected/availability states use text/icon/border/shape, not color alone.
-- Headings/focus announce steps; error summary focuses first invalid field.
-- Status uses live regions; exact timezone is always spoken/readable.
-- Targets >=44px; bounded horizontal horizon does not create page overflow.
+- Launcher activation establishes the new task surface; the CTA does not morph into a large inline block.
+- Guided forward/back transitions may be directional because they communicate progress. Resize transitions are restrained and never imply a funnel step.
+- Selection feedback is short and causal. Pending and confirmed states replace content only after reducer transitions.
+- Reduced motion reaches the same state immediately or with a short opacity change.
 
-## Implementation Mapping
+## Implementation mapping
 
-- Bundle: `src/growth-meeting-renderer/**`.
-- Host: `<efeonce-meeting-scheduler appearance="horizon">`.
-- Contracts: TASK-1509 config/availability/book only.
-- Pieces: scene, signal rail, timezone lens, horizon, slots, step rail, fields, Meeting Pass, recovery/fallback.
-- Copy: `src/lib/copy/growth-meetings*` or nearest canonical growth dictionary.
-- Attributes: `api-base`, `surface`, `placement`, `locale`, `timezone`, `appearance`, `fallback-url`.
-- Telemetry: reducer actions emit `gh_meeting_step_reached`; the first receipt transition emits `gh_meeting_booking_confirmed` once. No exact slot/PII/receipt/correlation in payload.
-- Server-only: provider slug/credentials, PII policy, idempotency, attribution authority and receipts.
+- Host/envelope: Growth CTA adapter or public page integration.
+- Controller: one reducer/effects owner in `src/growth-meeting-renderer/**`.
+- Views: `LauncherView`, `GuidedSchedulerView`, `SplitSchedulerView`, `CommandCenterView`.
+- Shared pieces: `CalendarGrid`, `DateStrip`, `SlotAgenda`, `AppointmentSummary`, `BookingDetailsForm`, `RecoverySurface`.
+- Browser attributes: `api-base`, `surface`, `placement`, `locale`, `timezone`, `activation-mode`, `max-recipe`, `fallback-url`.
+- Telemetry dimensions proposed before GTM publish: `presentation_variant` and `activation_mode`. A fit change is not a step.
+- Server-only: provider configuration, secrets, PII policy, idempotency, receipt and conversion authority.
 
 ## GVC Scenario Plan
 
-- Scenario: `scripts/frontend/scenarios/native-meeting-scheduler.scenario.ts`.
-- Deterministic local route + approved staging host.
-- Viewports: 1440x1000 and 390x844.
-- Desktop evidence: full first fold and every critical state at 1440 px width.
 - Quality profile: `premium`.
-- `qualityProfile: 'premium'`, keyboard probes and `reducedMotionCheck: true`.
-- Captures: cinematic first fold, horizon selection, Meeting Pass, validation, pending, confirmed, conflict, degraded/fallback and compact transform.
+- Desktop evidence: 1440x1000 full-section `command` and desktop-dialog `split`.
+- Mobile evidence: 390x844 CTA launcher → `full_screen` → `guided`.
+- Recipe bounds: 319, 320, 559, 560, 959, 960 px container widths, plus representative production hosts.
+- Viewports: 390x844 and 1440x1000, including dialog/full-screen activation and 200% zoom where practical.
+- Assertions: no horizontal overflow; stable selection and form values across resize; focus enter/contain/return; reduced motion parity; exactly-once user-driven funnel events; no PII; no availability request from a passive launcher.
+- Scroll-width evidence: every frame must satisfy `scrollWidth === clientWidth` for both page and task-surface scroll owners.
 - Review dossier: `docs/ui/reviews/TASK-1510-native-meeting-scheduler-review.md`.
-- Baseline decision: official HubSpot embed on the chosen pilot surface is the functional/CRO baseline; Time Horizon direction is the visual fidelity baseline.
-- Assert one primary action, focus destinations, 44px targets, `scrollWidth === clientWidth`, expected dataLayer event exactly once, no PII and correct `/g/collect` mapping.
+- Baseline decision: `.captures/2026-07-21T09-02-04_native-meeting-scheduler` remains current review evidence for `command` and compact styling, but is not promoted until human approval and does not yet validate the adaptive host contract.
 
 ## Design Decision Log
 
-- Time Horizon selected over Calendar Console and Conversational Orbit.
-- New portable adapter selected; no CompositionShell/private primitive/page-local form.
-- Measurement boundaries align with reducer states; no DOM-derived telemetry.
-- Meeting Pass provides shared visual and measurement authority from selection to confirmed receipt.
-- Embed/link remains a safety action throughout pilot and degradation.
+- Selected: one controller plus adaptive recipes and host-owned task surface.
+- Rejected: Time Horizon; it did not read as a calendar.
+- Rejected: a shrunken three-column calendar inside a narrow CTA.
+- Rejected: inline CTA expansion after click because it causes layout shift and an unexpectedly large interaction.
+- Rejected: independent compact/full components because booking, consent, recovery and measurement would drift.

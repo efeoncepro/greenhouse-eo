@@ -6,6 +6,7 @@ import type { MeetingAvailability, MeetingSchedulerConfig } from './contracts'
 import { MEETING_SCHEDULER_SCHEMA_VERSION } from './contracts'
 import { resolveMeetingPrivacyHasher, type MeetingPrivacyHasher } from './privacy'
 import { getMeetingSurfaceAuthority } from './store'
+import { canonicalizeMeetingTimezone, resolveMeetingTimezone } from './timezone'
 
 const DEFAULT_SCHEDULER_KEY = 'discovery'
 const MAX_MONTH_OFFSET = 2
@@ -34,6 +35,7 @@ export const readMeetingSchedulerConfig = async (input: {
   surfaceId: string
   schedulerKey?: string
   origin: string | null
+  timezone?: string | null
   provider?: MeetingSchedulingProvider
   hasher?: MeetingPrivacyHasher
   env?: NodeJS.ProcessEnv
@@ -45,8 +47,10 @@ export const readMeetingSchedulerConfig = async (input: {
 
   const provider = input.provider ?? createHubSpotMeetingSchedulingProvider()
   const hasher = input.hasher ?? await resolveMeetingPrivacyHasher()
-  const configuration = await provider.getConfiguration({ timezone: surface.defaultTimezone })
-  const turnstileSiteKey = input.env?.TURNSTILE_SITE_KEY?.trim() || process.env.TURNSTILE_SITE_KEY?.trim() || null
+  const resolvedTimezone = resolveMeetingTimezone(input.timezone, surface.defaultTimezone)
+  const configuration = await provider.getConfiguration({ timezone: resolvedTimezone })
+  const env = input.env ?? process.env
+  const turnstileSiteKey = env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() || env.TURNSTILE_SITE_KEY?.trim() || null
 
   return {
     schemaVersion: MEETING_SCHEDULER_SCHEMA_VERSION,
@@ -55,7 +59,9 @@ export const readMeetingSchedulerConfig = async (input: {
     durationsMinutes: [configuration.meetingDurationMillis / 60_000],
     timezonePolicy: {
       defaultTimezone: surface.defaultTimezone,
-      allowedTimezones: [surface.defaultTimezone],
+      allowedTimezones: [resolvedTimezone],
+      mode: 'visitor',
+      resolvedTimezone,
     },
     localePolicy: { defaultLocale: 'es', allowedLocales: ['es'] },
     bookingWindow: { maxMonthOffset: MAX_MONTH_OFFSET },
@@ -98,12 +104,13 @@ export const readMeetingAvailability = async (input: {
 }): Promise<MeetingAvailability | null> => {
   const schedulerKey = input.schedulerKey ?? DEFAULT_SCHEDULER_KEY
   const surface = await getMeetingSurfaceAuthority(input.surfaceId, schedulerKey)
+  const timezone = canonicalizeMeetingTimezone(input.timezone)
 
   if (
     !surface ||
     !input.origin ||
     !surface.origins.includes(input.origin) ||
-    input.timezone !== surface.defaultTimezone ||
+    !timezone ||
     !Number.isInteger(input.monthOffset) ||
     input.monthOffset < 0 ||
     input.monthOffset > MAX_MONTH_OFFSET
@@ -111,10 +118,10 @@ export const readMeetingAvailability = async (input: {
 
   const provider = input.provider ?? createHubSpotMeetingSchedulingProvider()
   const hasher = input.hasher ?? await resolveMeetingPrivacyHasher()
-  const config = await provider.getConfiguration({ timezone: input.timezone })
+  const config = await provider.getConfiguration({ timezone })
 
   const availability = await provider.getAvailability({
-    timezone: input.timezone,
+    timezone,
     monthOffset: input.monthOffset,
     meetingDurationMillis: config.meetingDurationMillis,
   })
@@ -125,7 +132,7 @@ export const readMeetingAvailability = async (input: {
   const grouped = new Map<string, MeetingAvailability['days'][number]['slots']>()
 
   for (const slot of futureSlots) {
-    const date = calendarDateInTimezone(slot.startsAt, input.timezone)
+    const date = calendarDateInTimezone(slot.startsAt, timezone)
     const slots = grouped.get(date) ?? []
 
     slots.push({
@@ -140,7 +147,7 @@ export const readMeetingAvailability = async (input: {
   return {
     schemaVersion: MEETING_SCHEDULER_SCHEMA_VERSION,
     schedulerKey,
-    timezone: input.timezone,
+    timezone,
     monthOffset: input.monthOffset,
     fetchedAt: now.toISOString(),
     expiresAt: new Date(now.valueOf() + AVAILABILITY_TTL_MS).toISOString(),

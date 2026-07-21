@@ -24,7 +24,6 @@ const EMBED_SNIPPET = `<efeonce-meeting-scheduler
   scheduler-key="efeonce-discovery-30"
   surface="efeonce-public-site"
   placement="contact_scheduler"
-  timezone="America/Santiago"
   base-url="https://greenhouse.efeoncepro.com"
 >
   <a href="https://meetings.hubspot.com/efeonce">Abrir agenda segura</a>
