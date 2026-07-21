@@ -60,13 +60,30 @@ sigue en memoria (`internal_smoke`). Pasos que faltan, gated y con autorización
 2. **Sólo después**, subir `maxScale > 1` (el objetivo de HA que ADR-004 gatea en esta task) — es una acción separada
    post-deploy-verificado, no parte de este código.
 
-Estado correcto hoy: **`code complete, rollout pendiente`** — no marcar operativamente completo hasta el deploy.
+## Delta 2026-07-21 (rollout) — OPERATIVAMENTE COMPLETA, verificada en el servicio vivo
+
+El rollout de deploy se ejecutó y verificó en vivo (operador autorizó push + deploy):
+
+- **Ambos servicios Cloud Run desplegados durables** (código durable + `GLOBE_POSTGRES_*`): `globe-studio-internal`
+  (rev `00015`, usuario IAM `web_runtime`) y `globe-api-internal` (rev `00010`, usuario IAM `api_runtime`). Fix del
+  `Dockerfile` de studio-web para construir/bundlear `@efeonce-globe/database` (+ pg/connector).
+- **Durabilidad probada en el servicio vivo:** `GET /auth/start` en `globe-studio-internal` → HTTP 303 + una fila
+  `oauth_transaction` persistida en Postgres **por el servicio corriendo como `web_runtime`, keyless vía connector +
+  IAM**. El write path durable funciona end-to-end en producción interna.
+- **`maxScale = 3` en ambos** (HA real: réplicas comparten el mismo Postgres; el spend fence durable es atómico
+  cross-réplica). `min = 0` → scale-to-zero, costo incremental ~US$0 (el techo no cuesta, el uso sí).
+
+**Follow-up (drift trap, para `TASK-1508`):** `deploy-internal.yml` todavía hardcodea `--max-instances=1`, así que el
+**próximo** deploy por el workflow resetearía `maxScale` a 1. El valor persistente debe gobernarse por Terraform
+(`TASK-1508`, deploy ownership — remueve scale del workflow). Hasta entonces, un redeploy re-sube el techo en vivo.
+
+Estado: **operativamente completa** — durabilidad entregada, desplegada y verificada en vivo; HA habilitada.
 
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`

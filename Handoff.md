@@ -21,6 +21,13 @@
 
 ## Pendientes inmediatos
 
+- **`TASK-1509` IN-PROGRESS / `TASK-1510` TO-DO (Native Meeting Scheduler, `EPIC-023`).** El operador confirmó
+  productización y autorizó subagentes. Dos objetivos load-bearing: experiencia visual Time Horizon/Meeting Pass
+  de frontera y funnel GTM/GA4 completo, con `generate_lead` sólo desde recibo server-confirmed. TASK-1509 posee
+  adapter/policy/idempotencia/receipt/medición; TASK-1510 posee Web Component/GVC/host. `book_meeting` de TASK-1431
+  sigue navigation-only y no se toca. HubSpot Scheduler/Office 365/Teams siguen SoT; iframe/link permanece fallback
+  hasta pilot y verificación. Trabajo en `develop`, sin branch/worktree; `docs/ui/creative-studio/` es ajeno y no se toca.
+
 - **`TASK-1366` COMPLETE / CONDITIONAL PASS (HubSpot Scheduler Booking Equivalence Spike, `EPIC-023`).**
   Build HubSpot `#27` desplegado/reinstalado con scope Scheduler mínimo y sin rotar el token gobernado. Booking
   real 2026-07-22 09:15–09:45 Chile verificado `isOffline=false`: `calendarEventId`/`contactId`, Teams, contacto +
@@ -38,22 +45,16 @@
   + Next.js sobre edge global = candidato vivo, a decidir al construir 1505 y antes de `TASK-1480`). Tres gates
   distintos: URL internal-only / HA (gate `TASK-1465`, hard-block `maxScale > 1`) / Production (`TASK-1480`). Sin
   mutar runtime/DNS/OAuth. Detalle de runtime: `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
-- **`TASK-1465` IN-PROGRESS (Globe Workspace/Tenancy/Persistence/Audit, `EPIC-028`) — core de HA, local-first sin push.**
-  Recalibrada (Delta 2026-07-20) tras Discovery: **Globe hoy no tiene DB alguna** (todo in-memory; la app se niega a
-  arrancar fuera de `internal_smoke` por `globe_memory_store_forbidden`). El operador autorizó **provisionar un Cloud
-  SQL Postgres propio de Globe** (tier `db-g1-small`, ZONAL, keyless IAM, ~US$15–30/mes) y acotó el alcance al **core
-  de HA**: DB + durabilidad de los 5 stores (sesiones, OAuth txns, experiments, eval reports, spend fence) + audit
-  append-only; el modelo rico de workspace/members/grants queda **diferido** a follow-up. **`maxScale>1` depende de
-  1465 Y 1468** (1465 = spend fence de seguridad durable; 1468 = credit ledger comercial). Plan en 5 slices (0
-  Terraform Cloud SQL → 0b cliente DB + migraciones → 1 schema → 2 impls durables → 3 guard/wiring → 4 audit+tests).
-  Infra/código en `efeonce-globe`; gobernanza en Greenhouse.
-  **CODE COMPLETE + VERIFICADO EN VIVO (2026-07-21), deploy pendiente** — detalle completo en la spec (Delta
-  2026-07-21) y `GLOBE_RUNTIME_HANDOFF.md`. Las 5 slices están en `main` de `efeonce-globe` (3 commits), verificadas
-  contra Postgres 16.14 real, monorepo verde (`pnpm check`+`build`): Cloud SQL keyless + `packages/database` + bootstrap
-  `globe_owner` + migraciones + 6 tablas + los 5 stores durables detrás de sus ports (+ audit append-only) + wiring DI.
-  **Pendiente (gated, autorización del operador):** (1) redeploy `studio-web` con `GLOBE_POSTGRES_*` → verificar durable
-  post-restart; (2) sólo después, subir `maxScale>1` (HA de ADR-004). El servicio en ejecución sigue en memoria hasta
-  ese deploy; no marcar operativamente completo antes.
+- **`TASK-1465` COMPLETE (operativa) (Globe Workspace/Tenancy/Persistence/Audit, `EPIC-028`) — desplegada + verificada en vivo.**
+  Globe pasó de **cero DB / todo in-memory** a **durable de verdad**. Detalle en la spec `complete/` (Deltas
+  2026-07-21) + `GLOBE_RUNTIME_HANDOFF.md`. Entregado en `efeonce-globe main` (4 commits, pusheados) + gobernanza en
+  Greenhouse: Cloud SQL `globe-pg` keyless IAM (~US$15–30/mes) + `packages/database` (pool/tx/connector) + bootstrap
+  `globe_owner` (sin credencial superusuario permanente) + migraciones + 6 tablas tenant-scoped + los **5 stores
+  durables** detrás de sus ports (Experiment/EvalReport/**SpendFence atómico cross-réplica**/Session/OAuth) + audit
+  append-only + wiring DI. **Rollout en vivo:** ambos servicios Cloud Run desplegados durables + `maxScale=3`;
+  durabilidad **probada en el servicio vivo** (`oauth_transaction` escrita por `web_runtime` keyless vía connector).
+  Diferido: modelo workspace/members/grants (follow-up). **Follow-up drift trap → `TASK-1508`:** `deploy-internal.yml`
+  aún hardcodea `--max-instances=1` (el próximo deploy por workflow resetea `maxScale`; persistir vía Terraform en 1508).
 - **`TASK-1507` TO-DO (Globe Internal Front Door — domain cutover, `EPIC-028`) — ejecutable ahora.**
   Sucesora de 1506/ADR-004, ya sin blocker. Implementa `globe.efeoncepro.com` vía **Global External ALB +
   serverless NEG** (`southamerica-west1`) → `globe-studio-internal`, managed cert + HTTP→HTTPS, `GLOBE_PUBLIC_BASE_URL`,
