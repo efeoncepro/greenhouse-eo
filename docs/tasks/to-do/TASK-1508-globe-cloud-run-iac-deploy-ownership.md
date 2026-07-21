@@ -1,5 +1,23 @@
 # TASK-1508 — Globe Cloud Run IaC and Deploy Ownership
 
+## Delta 2026-07-21 — TASK-1507 complete: baseline recalibrado
+
+`TASK-1507` cerró el 2026-07-21 y con eso cambian tres cosas del baseline que esta task importa:
+
+- **`maxScale` vivo es 3, no 1.** La spec de 1508 decía `maxScale=1` en seis lugares y lo pedía como valor a pinear
+  por Terraform. Es stale: `TASK-1465` (persistencia durable) está **complete** y limpió el gate de HA; ambos
+  servicios corren `maxScale=3` desde 2026-07-21, verificado antes y después de 1507. 1508 pinea el **valor vivo (3)**,
+  sin subirlo ni bajarlo. Pinear `maxScale=1` por IaC bajaría el techo vivo a la mitad en silencio.
+- **El ingress quedó fijado por `gcloud`, sin gobierno IaC.** `globe-studio-internal` está en
+  `internal-and-cloud-load-balancing` porque los servicios Cloud Run siguen fuera de Terraform; adoptarlos es
+  justamente esta task. No es drift-trap del workflow (`deploy-internal.yml` no pasa `--ingress` y `gcloud run deploy`
+  preserva lo no especificado), pero nada lo previene hasta que 1508 lo pinee.
+- **El baseline a importar creció.** El front door aditivo de 1507 agregó `infra/terraform/front_door.tf` y sumó
+  `compute.googleapis.com` a `local.enabled_services`. Ambos ya están en state y deben tratarse como parte del
+  baseline convergido, no como diff a explicar.
+
+Blocker `TASK-1507` levantado 2026-07-21: `Blocked by` pasa a `none`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -22,7 +40,7 @@
 - Status real: `Diseño; servicios Cloud Run vivos fuera de Terraform y workflow gcloud como escritor de revisions`
 - Rank: `TBD`
 - Domain: `ops`
-- Blocked by: `TASK-1507`
+- Blocked by: `none`
 - Branch: `task/TASK-1508-globe-cloud-run-iac-deploy-ownership`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -67,15 +85,17 @@ Reglas obligatorias:
 - Importar recursos vivos antes de aplicar; cualquier destroy/replace de un servicio aborta la ejecución.
 - Terraform y el workflow no pueden gobernar el mismo campo. `ignore_changes` se limita a la imagen/revisión que
   despliega el workflow; nunca se usa para ocultar drift amplio del template, seguridad, env o escala.
-- `globe-studio-internal`: `invoker_iam_disabled=true`, ingress `internal-and-cloud-load-balancing`, `maxScale=1`.
-- `globe-api-internal`: `invoker_iam_disabled=false`, IAM-private, audience `run.app`, `maxScale=1`.
+- `globe-studio-internal`: `invoker_iam_disabled=true`, ingress `internal-and-cloud-load-balancing`, `maxScale=3`
+  (valor vivo verificado; `TASK-1465` complete limpió el gate de HA).
+- `globe-api-internal`: `invoker_iam_disabled=false`, IAM-private, audience `run.app`, `maxScale=3` (valor vivo
+  verificado; `TASK-1465` complete limpió el gate de HA).
 - Ningún secreto crudo entra a HCL, state, plan, logs o outputs; usar referencias de Secret Manager.
 
 ## Normative Docs
 
 - `docs/tasks/complete/TASK-1506-globe-frontend-hosting-front-door-decision.md`
-- `docs/tasks/to-do/TASK-1507-globe-internal-front-door-alb-terraform.md`
-- `docs/tasks/in-progress/TASK-1465-globe-workspace-tenancy-persistence-audit.md`
+- `docs/tasks/complete/TASK-1507-globe-internal-front-door-alb-terraform.md`
+- `docs/tasks/complete/TASK-1465-globe-workspace-tenancy-persistence-audit.md`
 - `docs/operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`
 - `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
@@ -152,7 +172,7 @@ Reglas obligatorias:
 
 - Entidades/tablas/views afectadas: `recursos GCP google_cloud_run_v2_service; sin tablas de dominio`
 - Invariantes que no se pueden romper:
-  - `web` conserva dominio/ALB, SSO, `maxScale=1` e invoker check deshabilitado en el servicio
+  - `web` conserva dominio/ALB, SSO, `maxScale=3` e invoker check deshabilitado en el servicio
   - `api` conserva IAM perimeter + verificación in-app, audience `run.app` y `invoker_iam_disabled=false`
   - `ignore_changes` cubre sólo el campo de imagen/revisión propiedad del workflow
 - Tenant/space boundary: `sin cambio; workspace/identity permanecen server-derived`
@@ -231,7 +251,8 @@ Reglas obligatorias:
 ## Out of Scope
 
 - Crear o cambiar `globe.efeoncepro.com`, ALB, DNS, TLS, OAuth o ingress de cutover (`TASK-1507`).
-- Subir `maxScale > 1` o implementar stores durables (`TASK-1465`).
+- Cambiar `maxScale` en cualquier dirección: el gate `TASK-1465` ya está cleared y los stores durables existen, así
+  que 1508 pinea el valor vivo (3) sin subirlo ni bajarlo. Un rollout HA que suba de 3 es una task aparte.
 - Migrar frontend/BFF, habilitar clientes externos o Production comercial (`TASK-1480`).
 - Cambiar código de dominio, API Contract Spine, providers creativos o capabilities.
 
@@ -301,7 +322,7 @@ completo antes de adoptar el siguiente. El tráfico y las URLs no cambian.
 
 - [ ] Ambos servicios están en Terraform sin destroy/replace y con protección contra borrado accidental.
 - [ ] Ownership por campo documentado y aplicado: Terraform config estable; workflow sólo image/revision.
-- [ ] `invoker_iam_disabled`, ingress, runtime SA, env/secret refs y `maxScale=1` quedan pineados correctamente.
+- [ ] `invoker_iam_disabled`, ingress, runtime SA, env/secret refs y `maxScale=3` (valor vivo) quedan pineados.
 - [ ] Deploy image-only genera revisión Ready, mantiene dominio/SSO/API privada y deja plan Terraform convergido.
 - [ ] `ignore_changes` cubre únicamente el path exacto de imagen; no oculta template/env/security/scale.
 - [ ] Runbook y handoff reflejan import, rollback, serialización y evidencia real.
@@ -326,7 +347,8 @@ completo antes de adoptar el siguiente. El tráfico y las URLs no cambian.
 
 ## Follow-ups
 
-- Subir `maxScale` sólo después de stores durables (`TASK-1465`) y una task de rollout HA explícita.
+- El gate `TASK-1465` (stores durables) ya está cleared; subir `maxScale` por encima del valor vivo (3) requiere de
+  todos modos una task de rollout HA explícita, no este import.
 - Cloud Armor/WAF y readiness externa siguen en `TASK-1480`.
 
 ## Open Questions

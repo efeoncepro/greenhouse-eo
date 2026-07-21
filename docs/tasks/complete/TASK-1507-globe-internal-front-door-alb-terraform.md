@@ -206,7 +206,7 @@ pnpm sister-platform:redirect --client globe \
    sin gobernar por IaC hasta `TASK-1508`**. No es drift-trap del workflow (`deploy-internal.yml` no pasa
    `--ingress` y `gcloud run deploy` preserva los ajustes a nivel servicio que no se especifican); el drift-trap
    vivo sigue siendo `maxScale` (`--max-instances=1` hardcodeado), con workaround inmediato tras un deploy por
-   workflow: `gcloud run services update <servicio> --max-instances=3`.
+   workflow. El drift-trap quedó **cerrado por `TASK-1508`**: el workflow ya no pasa `--max-instances` y Terraform gobierna los dos ceilings (servicio y revisión). Cuidado con el workaround viejo `gcloud run services update <servicio> --max-instances=3`: escribía el ceiling de **revisión**, no el de **servicio**, y Cloud Run aplica el menor — así que dejaba el techo efectivo en 1 aparentando haberlo restaurado.
 
 ### Commits (locales, sin push)
 

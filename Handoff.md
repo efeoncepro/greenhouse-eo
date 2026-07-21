@@ -60,10 +60,11 @@
 - **`TASK-1506` COMPLETE (Globe Frontend Hosting and Front Door Decision, `EPIC-028`) — ADR-004, local-first sin push.**
   Cerrada como policy: `EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md` (ADR-004) mantiene **Cloud Run**
   como web/BFF/SSO para la release internal-only (servidor **Node nativo**; Next.js `superseded` para el shell
-  interno) y **rechaza migrar a Vercel** (no arregla el techo HA in-memory/`maxScale=1` y parte el trust boundary).
+  interno) y **rechaza migrar a Vercel** (no arregla el techo HA in-memory y parte el trust boundary).
   El **frontend cliente comercial** (`TASK-1505`+) es superficie separada con host + framework **diferidos** (Vercel
   + Next.js sobre edge global = candidato vivo, a decidir al construir 1505 y antes de `TASK-1480`). Tres gates
-  distintos: URL internal-only / HA (gate `TASK-1465`, hard-block `maxScale > 1`) / Production (`TASK-1480`). Sin
+  distintos: URL internal-only / HA (gate `TASK-1465`, **ya cleared**; valor vivo `maxScale=3`, gobierno por IaC en
+  `TASK-1508`) / Production (`TASK-1480`). Sin
   mutar runtime/DNS/OAuth. Detalle de runtime: `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
 - **`TASK-1465` COMPLETE (operativa) (Globe Workspace/Tenancy/Persistence/Audit, `EPIC-028`) — desplegada + verificada en vivo.**
   Globe pasó de **cero DB / todo in-memory** a **durable de verdad**. Detalle en la spec `complete/` (Deltas

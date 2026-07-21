@@ -167,9 +167,13 @@ anuncia un callback todavía no permitido y el SSO queda roto. Primero el allowl
    El CLI (`scripts/sister-platform-oauth-redirect-uris.ts`) es genérico —sirve `globe` y `kortex`— y
    envuelve `updateSisterPlatformOAuthRedirectUris` (`src/lib/sister-platforms/oauth-broker.ts`):
    aditiva/sustractiva, una sola transacción con `SELECT ... FOR UPDATE`, tocando **exclusivamente** la
-   columna `redirect_uris`. La lógica vive en el broker y no en el script **a propósito**: el CLI es sólo
-   un entry point, así que una route, un tool MCP o Nexa pueden operar el mismo cambio por la misma
-   primitive (camino de Full API Parity abierto, no cerrado). **NUNCA** usar el seed
+   columna `redirect_uris`. Re-correr `--add` con un URI ya presente es **no-op** (`changed=false` en el
+   output), así que reintentar es seguro si no quedó claro si el `--apply` llegó a escribir: leer `changed`
+   y `redirectUris` del JSON en vez de ir a mirar la DB a mano en medio de un cutover. Un `--client`
+   inexistente da `404 invalid_client` y nunca crea el cliente. La lógica vive en el broker y no en el
+   script **a propósito**: el CLI es sólo un entry point, así que una route, un tool MCP o Nexa pueden
+   operar el mismo cambio por la misma primitive (camino de Full API Parity abierto, no cerrado).
+   **NUNCA** usar el seed
    `scripts/seed-globe-internal-pilot.ts` para un cutover: pasa `redirectUris: [uri]` (reemplaza el array,
    borrando el `run.app`) y `rotateToken: true` (rota el client secret y rompe el SSO vivo). Estado
    resultante del cliente `globe` en `greenhouse_core.sister_platform_oauth_clients`: de 1 URI
@@ -205,15 +209,20 @@ anuncia un callback todavía no permitido y el SSO queda roto. Primero el allowl
 
    ```bash
    cd efeonce-globe
+   # Sólo si el deployment Greenhouse tiene SSO de Vercel:
+   export GREENHOUSE_VERCEL_BYPASS=<bypass>
+
    GLOBE_WEB_BASE_URL=https://globe.efeoncepro.com \
      GREENHOUSE_BASE_URL=<deployment Greenhouse> \
      GREENHOUSE_AGENT_SECRET=<AGENT_AUTH_SECRET> \
-     GREENHOUSE_VERCEL_BYPASS=<bypass> \
      node scripts/smoke-human-federation.mjs
    ```
 
-   Esperado: `result: human_federation_ok`. `GREENHOUSE_AGENT_EMAIL` y `GLOBE_SMOKE_RESOLVE` son
-   opcionales; los otros cuatro son obligatorios y el script falla con `<VAR>_missing` si faltan.
+   Esperado: `result: human_federation_ok`. `GLOBE_WEB_BASE_URL`, `GREENHOUSE_BASE_URL` y
+   `GREENHOUSE_AGENT_SECRET` son obligatorias y el script falla con `<VAR>_missing` si faltan.
+   `GREENHOUSE_VERCEL_BYPASS` es opcional: sólo hace falta cuando el deployment Greenhouse está protegido
+   por SSO de Vercel (si va vacía, el header no se manda). `GREENHOUSE_AGENT_EMAIL` (default
+   `agent@greenhouse.efeonce.org`) y `GLOBE_SMOKE_RESOLVE` también son opcionales.
    **Calibrar antes de confiar:** este smoke se corrió primero contra el origen `run.app` **antes** del
    cutover —el mismo comando con `GLOBE_WEB_BASE_URL` apuntando al `run.app`— y pasó
    (`human_federation_ok`). Así, si fallaba después, acusaba al cutover y no al instrumento. Un smoke sin
@@ -247,7 +256,7 @@ para un servicio web con SSO: un browser no presenta ID token, la app autentica 
 dirección**. Drift-trap conocido y **no** resuelto por esta task: `deploy-internal.yml` hardcodea
 `--max-instances=1`, así que un deploy por ese workflow bajaría `maxScale` a 1 hasta que Terraform lo
 gobierne (TASK-1508); workaround inmediato tras un deploy:
-`gcloud run services update <servicio> --max-instances=3`.
+El drift-trap quedó **cerrado por `TASK-1508`**: el workflow ya no pasa `--max-instances` y Terraform gobierna los dos ceilings (servicio y revisión). Cuidado con el workaround viejo `gcloud run services update <servicio> --max-instances=3`: escribía el ceiling de **revisión**, no el de **servicio**, y Cloud Run aplica el menor — así que dejaba el techo efectivo en 1 aparentando haberlo restaurado.
 
 **Qué sobrevive un redeploy por workflow y qué no** — vale clasificarlo explícitamente, porque el valor
 más load-bearing del cutover es una env var y la pregunta obvia es si un deploy la pisa:
@@ -422,7 +431,7 @@ parcial con `SERVICE_DISABLED`, y es **determinista para un proyecto nuevo** aun
 | **revocation** | quitar el binding `github_deployer` (o suspender el provider) y re-dispatch | auth falla; restaurar reingresa acceso |
 | **budget** | con `enable_budget=true`, forzar gasto de prueba o bajar el umbral | alerta a los notification channels |
 | **front door** (TASK-1507) | `curl -sSI http://globe.efeoncepro.com/` y `curl -sSI https://globe.efeoncepro.com/`; para TLS, `curl -sS -o /dev/null -w 'status=%{http_code} tls=%{ssl_verify_result}\n' https://globe.efeoncepro.com/` | HTTP → `301` a `https://globe.efeoncepro.com:443/`; HTTPS → `200` con `ssl_verify_result=0` y HTTP/2. Si el `status` vuelve `000` **sin `remote_ip`**, es el resolver local, no el front door — ver [§ la trampa](#la-trampa-cache-negativa-del-resolver-local). |
-| **federación humana** (TASK-1507) | `node scripts/smoke-human-federation.mjs` desde `efeonce-globe`, con las 4 env vars obligatorias (comando completo en el [paso 6](#secuencia-apply-verificada)) | `result: human_federation_ok`. Calibrar contra el origen `run.app` antes de confiar en una corrida contra el dominio. |
+| **federación humana** (TASK-1507) | `node scripts/smoke-human-federation.mjs` desde `efeonce-globe`, con las 3 env vars obligatorias (comando completo en el [paso 6](#secuencia-apply-verificada)) | `result: human_federation_ok`. Calibrar contra el origen `run.app` antes de confiar en una corrida contra el dominio. |
 
 `terraform-check.yml` corre `fmt -check` + `validate` en cada PR que toca `infra/terraform/**`.
 

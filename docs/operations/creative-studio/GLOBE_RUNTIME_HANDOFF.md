@@ -40,7 +40,7 @@ sin debilitar ninguna aserción. Verde antes y después del hardening de ingress
   y `gcloud run deploy` preserva lo no especificado), pero nada lo previene fuera de esa task.
 - **`maxScale` sí es drift-trap.** `deploy-internal.yml` hardcodea `--max-instances=1`: un deploy por ese workflow
   baja el techo a 1. Valor vivo hoy: 3. Workaround inmediato tras un deploy:
-  `gcloud run services update <servicio> --max-instances=3`.
+  El drift-trap quedó **cerrado por `TASK-1508`**: el workflow ya no pasa `--max-instances` y Terraform gobierna los dos ceilings (servicio y revisión). Cuidado con el workaround viejo `gcloud run services update <servicio> --max-instances=3`: escribía el ceiling de **revisión**, no el de **servicio**, y Cloud Run aplica el menor — así que dejaba el techo efectivo en 1 aparentando haberlo restaurado.
 - **Cache negativa de DNS.** El SOA de `efeoncepro.com` tiene minimum TTL 86400, así que un NXDOMAIN cacheado antes
   de crear el registro persiste ~24h en el resolver local y `dscacheutil -flushcache` sin `sudo` no hace nada. El
   síntoma engañoso es `curl` devolviendo `status=000` sin `remote_ip`. Verificar con `dig @8.8.8.8` y
@@ -108,7 +108,7 @@ permitido en el environment `internal_smoke`.
 
 **⚠️ Drift-trap conocido → `TASK-1508`.** `deploy-internal.yml` hoy **fija `--max-instances=1`** por hardcode,
 así que un redespliegue por ese workflow **baja el `maxScale` a 1** hasta que Terraform gobierne ese valor.
-Workaround inmediato tras un deploy por workflow: `gcloud run services update <servicio> --max-instances=3`. El
+El drift-trap quedó **cerrado por `TASK-1508`**: el workflow ya no pasa `--max-instances` y Terraform gobierna los dos ceilings (servicio y revisión). Cuidado con el workaround viejo `gcloud run services update <servicio> --max-instances=3`: escribía el ceiling de **revisión**, no el de **servicio**, y Cloud Run aplica el menor — así que dejaba el techo efectivo en 1 aparentando haberlo restaurado. El
 saneamiento de raíz (Terraform gobierna la config estable, el workflow queda image/revision-only) es
 `TASK-1508`. **Diferido:** un modelo rico de workspace / members / grants. Docs: funcional
 [`docs/documentation/creative-studio/persistencia-durable-globe.md`], manual

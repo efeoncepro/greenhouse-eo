@@ -29,7 +29,7 @@ There is no ADR that decides where `globe.efeoncepro.com` terminates or which st
 
 3. **The commercial client-facing frontend (`TASK-1505` Producer surface and beyond) is a SEPARATE surface with a DEFERRED host + framework decision.** It does not exist yet. Because the commercial product serves international enterprise marketing teams, a client-facing **Next.js frontend on a global edge/CDN host (Vercel is a live, best-in-class candidate; Greenhouse already runs there)**, talking to the private GCP API, is an explicitly open option — to be decided **when `TASK-1505`'s client UI is built and its framework chosen, and before `TASK-1480` Production**, not by migrating the internal shell today. Choosing Cloud Run now for the internal shell does **not** foreclose this: the commercial frontend is built once, on the host chosen then, and the private API stays in GCP either way.
 
-4. **Front door.** The internal-only stable URL is the existing `*.run.app` URL + SSO now (it is already stable HTTPS, enough for `TASK-1469`'s OAuth callback / canary base URL). The custom domain `globe.efeoncepro.com` is delivered by the successor task (`TASK-1507`) via a **Global External Application Load Balancer + serverless NEG (`southamerica-west1`) → `globe-studio-internal`** with a managed certificate and HTTP→HTTPS — the GA path for a Cloud Run custom domain (direct Cloud Run domain mappings are Preview/region-limited). `globe-api-internal` **never** receives a custom domain and stays IAM-private with its `run.app` audience. The custom domain is sequenced **before the internal rollout of `TASK-1505`**, not eagerly.
+4. **Front door.** The internal-only stable URL is the existing `*.run.app` URL + SSO now (it is already stable HTTPS, enough for `TASK-1469`'s OAuth callback / canary base URL). The custom domain `globe.efeoncepro.com` was delivered by the successor task (`TASK-1507`, applied + live-verified 2026-07-21 — see the Delta at the end) via a **Global External Application Load Balancer + serverless NEG (`southamerica-west1`) → `globe-studio-internal`** with a managed certificate and HTTP→HTTPS — the GA path for a Cloud Run custom domain (direct Cloud Run domain mappings are Preview/region-limited). `globe-api-internal` **never** receives a custom domain and stays IAM-private with its `run.app` audience. The custom domain is sequenced **before the internal rollout of `TASK-1505`**, not eagerly.
 
 5. **Three distinct gates — never conflated:**
    - **Internal-only stable URL:** may ship after this ADR + the successor task's plan, with SSO/capabilities, `maxScale=1` and explicit rollback. **Not** Production, HA or external access.
@@ -123,3 +123,44 @@ su snapshot 2026-07-20 y esta Delta registra el cambio de estado.
 un drift-trap hasta que Terraform lo posea); y el acceso externo / Production sigue gateado por `TASK-1480`. Detalle:
 [`EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md`](EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md) (SPEC-007) +
 `docs/tasks/complete/TASK-1465-globe-workspace-tenancy-persistence-audit.md`.
+
+## Delta 2026-07-21 — `TASK-1507` implementó el front door
+
+`TASK-1507` **aplicó y verificó en vivo** el front door internal-only que el item 4 de la Decision describía en futuro.
+`globe.efeoncepro.com` se sirve por un Global External Application Load Balancer con certificado administrado por
+Google y redirect HTTP→HTTPS, a través de un serverless NEG en `southamerica-west1` hacia `globe-studio-internal`.
+Once recursos en `infra/terraform/front_door.tf` (plan `11 to add, 0 to change, 0 to destroy`, CERO destroy/replace y
+CERO Cloud Run en el diff), IP global `8.233.189.79`, DNS `A` creado a mano en HostGator, certificado `ACTIVE`.
+Verificado: `http://` → `301`; `https://` → `200` con TLS válido sobre HTTP/2 sirviendo el shell real de Globe.
+
+**El contrato de la tarea sucesora quedó cumplido salvo un tramo declarado sin marcar.** Los ítems que este ADR le
+exigió a `TASK-1507` —IP global, ALB + serverless NEG apuntando **sólo** a `globe-studio-internal`, certificado
+administrado, HTTP→HTTPS, DNS en HostGator, actualización de `GLOBE_PUBLIC_BASE_URL`, el cambio exacto del redirect
+allowlist en el broker de Greenhouse, smoke de federación humana (`human_federation_ok` antes y después del
+hardening), ingress final `internal-and-cloud-load-balancing`, modelo de costo y rollback— están entregados y
+verificados, con una excepción declarada: la pierna `200 al SA autorizado` del smoke de workload **NO** se
+re-ejercitó —la API no se tocó y siguió respondiendo `403` anónimo antes y después—, así que ese tramo del contrato
+queda sin marcar. `globe-api-internal` siguió IAM-private (anónimo → `403` antes y después), sin custom
+domain, con su audience derivada de `run.app` y nunca del dominio browser; domain mappings en el proyecto: 0.
+
+Dos precisiones que la ejecución fijó y conviene registrar acá:
+
+- **El orden del cutover se invirtió a propósito:** primero el allowlist, después la env var. Agregar un redirect URI
+  es inerte hasta que algo lo use; flipear `GLOBE_PUBLIC_BASE_URL` primero abriría una ventana con el SSO roto.
+- **La Open Question del allowlist quedó resuelta:** se administra por seed script, sin route admin de OAuth clients, y
+  ese mecanismo no servía para un cutover (reemplazaba el array y rotaba el client secret). `TASK-1507` agregó la
+  primitive aditiva/sustractiva `updateSisterPlatformOAuthRedirectUris` en el broker de Greenhouse, con el CLI
+  `pnpm sister-platform:redirect` como entry point.
+
+**Lo que este ADR fijó y NO cambió el cutover:** `maxScale` no se tocó en ninguna dirección (quedó en `3`, ya sin el
+gate de HA por `TASK-1465`; la spec de `TASK-1507` que pedía "preservar `maxScale=1`" estaba stale) y
+`invokerIamDisabled` sigue `true` en el web, coherente con un servicio con SSO por cookie.
+
+**Sigue abierto (no lo cierra esta Delta):** gobernar por IaC el `ingress` y el `maxScale` de las Cloud Run services es
+**`TASK-1508`** —el ingress se aplicó con `gcloud` porque los servicios no están en Terraform, y `deploy-internal.yml`
+todavía hardcodea `--max-instances=1`—; el acceso externo / Production sigue gateado por **`TASK-1480`**; y el host +
+framework del frontend cliente comercial sigue **diferido** por este mismo ADR (Vercel + Next.js candidato vivo), a
+decidir con `TASK-1505` y antes de `TASK-1480`. Un dominio internal-only no es Producción, HA ni acceso de clientes
+externos. Por la regla "never rewrite history" el texto baseline se conserva como su snapshot 2026-07-20. Arquitectura:
+[`EFEONCE_GLOBE_INTERNAL_FRONT_DOOR_V1.md`](EFEONCE_GLOBE_INTERNAL_FRONT_DOOR_V1.md) (SPEC-009) · runbook:
+[`EFEONCE_GLOBE_IAC_RUNBOOK_V1.md` § Front door internal-only](../../operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md#front-door-internal-only-task-1507).

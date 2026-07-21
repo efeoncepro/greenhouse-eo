@@ -252,6 +252,7 @@ Para que la prueba sirva, el request tiene que ir completo (`response_type=code`
 
 - callback no permitido: responde `400` con `invalid_redirect_uri`
 - callback permitido y request completa: responde `303` (te manda a login o de vuelta a la app)
+- un callback con comodin: sigue respondiendo `400` con `invalid_redirect_uri` (control: confirma que la lista no se volvio permisiva)
 
 Es decir, se puede verificar sin necesidad de iniciar sesion. Un request incompleto contra un callback que ya esta permitido devuelve `400` con otro codigo (`unsupported_response_type`), y con el broker apagado devuelve `404` con `broker_disabled`: ninguno de los dos dice nada sobre la lista.
 

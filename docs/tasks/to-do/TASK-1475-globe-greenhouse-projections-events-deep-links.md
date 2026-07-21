@@ -1,12 +1,19 @@
 # TASK-1475 — Globe Greenhouse Projections, Events and Deep Links
 
+## Delta 2026-07-21 — TASK-1507 complete: gate del custom domain levantado
+
+El custom domain ya está publicado: los deep links se construyen sobre `https://globe.efeoncepro.com`. El `*.run.app`
+ya no es alcanzable por browser (404, ingress `internal-and-cloud-load-balancing`) y sólo persiste en el allowlist
+OAuth como rollback, así que tampoco sirve para pruebas internas por browser. Supersede la restricción del Delta
+2026-07-20 de más abajo. El host del frontend cliente comercial sigue siendo una decisión diferida (ADR-004).
+
 ## Delta 2026-07-20 — la URL canónica de los deep links la fija TASK-1507 (front door)
 
 Los deep links de esta task deben construirse sobre el front door canónico de Globe, no sobre un `*.run.app`
 efímero. **ADR-004** (`TASK-1506`, complete) fijó ese front door y **`TASK-1507`** publica `https://globe.efeoncepro.com`
-vía Global External ALB → `globe-studio-internal`. Regla: no publicar deep links con dominio canónico hasta que
-`TASK-1507` cierre el custom domain; mientras tanto, el `*.run.app` + SSO sirve para pruebas internas. El host del
-frontend cliente comercial es una decisión diferida (ADR-004) — no asumir dominio comercial acá.
+vía Global External ALB → `globe-studio-internal`. **1507 cerró el 2026-07-21** y ese gate quedó levantado: los deep
+links se construyen sobre el dominio canónico (ver el Delta 2026-07-21). El host del frontend cliente comercial es una
+decisión diferida (ADR-004) — no asumir dominio comercial acá.
 
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 

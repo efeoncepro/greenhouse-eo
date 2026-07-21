@@ -1,11 +1,19 @@
 # TASK-1505 — Globe Creative Producer Surface (UI)
 
+## Delta 2026-07-21 — TASK-1507 complete: prerrequisito de front door cerrado
+
+El prerrequisito de front door quedó cerrado el 2026-07-21: `TASK-1507` está complete y el shell interno se sirve en
+`https://globe.efeoncepro.com` (Global External ALB + serverless NEG → `globe-studio-internal`). El `*.run.app` ya no
+es alcanzable por browser (404, ingress `internal-and-cloud-load-balancing`). También queda stale la "una sola
+réplica" del Delta 2026-07-20: `TASK-1465` está complete y el valor vivo es `maxScale=3`. El gate de Production
+externo (`TASK-1480`) y la decisión diferida de host para el frontend cliente comercial siguen intactos.
+
 ## Delta 2026-07-20 — front door (ADR-004 / TASK-1507) debe preceder el rollout interno de esta UI
 
 **ADR-004** (`TASK-1506`, complete) fijó que el shell interno de Globe se queda en Cloud Run (Node nativo) y que el
 custom domain `https://globe.efeoncepro.com` lo publica **`TASK-1507`** vía Global External ALB + serverless NEG. El
-rollout interno de esta superficie va **después** de que `TASK-1507` cierre el front door. Dos consecuencias: (1)
-esta UI es un thin client del shell interno (una sola réplica, `maxScale=1` hasta `TASK-1465`); (2) el **host del
+rollout interno de esta superficie va **después** de que `TASK-1507` cierre el front door — cerrado el 2026-07-21,
+ver el Delta de arriba. Dos consecuencias: (1) esta UI es un thin client del shell interno; (2) el **host del
 frontend cliente comercial** (cuando esta superficie se abra a clientes) es una **decisión diferida** por ADR-004 —
 Vercel + Next.js sobre edge global es candidato vivo, a decidir al construir esta UI y antes de `TASK-1480`. No
 asumir que "Cloud Run para el shell interno" implica Cloud Run para la superficie cliente comercial.
