@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-21 — HubSpot Scheduler equivalence conditional pass (TASK-1366)
+
+- El spike de booking nativo probó en runtime calendario Office 365, Teams, contacto/reunión CRM y links
+  nativos de cancelación/reprogramación mediante Scheduler `2026-03`; el harness fail-closed mantiene PII/IDs
+  redacted y no otorga consentimiento de marketing opcional.
+- `HubSpotMeetingEmbed` sigue como fallback: no hubo cambio de landing/GTM. La productización posterior debe
+  cubrir adapter server-side, idempotencia/abuso, atribución consentida, observabilidad y QA del inbox invitado.
+  Canon: `docs/tasks/complete/TASK-1366-hubspot-scheduler-booking-equivalence.md` + `PDR-009`.
+
 ## 2026-07-20 — Globe: edit/refine cross-model generalizado (TASK-1490)
 
 - Refinar un candidato del Model Lab pasó a ser **una sola semántica** para todo modelo editable
@@ -700,17 +709,3 @@
 - Customer Agent gestionado y arquitectura RevOps/automatización/paneles quedaron registrados como dos servicios
   separados y reutilizables, con ANAM `19893546` como implementación de referencia y los informes Word como
   evidencia detallada.
-
-## 2026-07-17 — Backpressure de webhooks Notion con Cloud Tasks
-
-- Se agregó un path asíncrono opt-in para `notion-tasks-demo` y
-  `notion-status-transitions`: HMAC antes del ACK, Cloud Tasks como recibo durable,
-  worker OIDC y procesamiento posterior reutilizando el inbox/handlers canónicos.
-- Cloud Tasks quedó provisionado en `us-east4` con concurrencia global 5 y queue
-  activa (`RUNNING`). Vercel staging/production tiene la configuración no
-  sensible; el kill-switch quedó `true` en Production y `false` en staging.
-- La capacidad fue desplegada a producción en el release `416b12ad140c` y pasó
-  health/control-plane. El rollout posterior quedó activo en el deployment
-  `dpl_DkdnLEUFwY3MvxyD9VncYwqzQNj1`: canary OIDC deduplicado, prueba pública
-  firmada `queued:true`, backlog cero, health `200` y PostgreSQL estable en 10
-  conexiones observadas. Con esto los bursts se absorben sin comprar PgBouncer.

@@ -52,6 +52,20 @@
   destinatario con `MeetingsBookingCreatedError.BLOCKED_EMAIl`. Solicitudes diagnósticas no reservables aislaron
   el subcódigo sin crear reunión ni exponer el correo. Se requiere otro email aprobado antes de repetir el smoke.
 
+## Delta 2026-07-21 — Booking y veredicto final
+
+- **Booking PASS con destinatario alternativo aprobado** — Scheduler creó una reunión real para el 2026-07-22,
+  09:15–09:45 `America/Santiago`, con `isOffline=false`, `calendarEventId` y `contactId` presentes, y URL host
+  `teams.microsoft.com`. Los IDs quedaron solo como digests en la evidencia local.
+- **Read-back CRM PASS** — el contacto existe, tiene una reunión asociada, la actividad quedó `SCHEDULED`, y
+  start/end/location coinciden con la respuesta de Scheduler.
+- **Outlook/Teams PASS** — Playwright sobre la sesión autenticada verificó el evento en el calendario Office 365
+  del organizador, Teams como ubicación, asistente correcto en estado `sin respuesta` y links nativos de
+  reprogramación/cancelación en las notas. No se canceló porque el operador no pidió cleanup.
+- **Veredicto `CONDITIONAL PASS`** — Scheduler preserva los side effects core. La condición no bloquea el spike:
+  el inbox del invitado no se inspeccionó directamente y la API no porta UTK/UTM/content tracking ni reschedule.
+  El iframe permanece como fallback hasta productizar adapter, atribución, anti-duplicación y abuso controlado.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -60,7 +74,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -73,7 +87,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-023`
-- Status real: `Operativamente bloqueado: HubSpot bloquea el email aprobado; espera destinatario alternativo`
+- Status real: `Complete — conditional pass; booking core verificado y productización diferida`
 - Rank: `TBD`
 - Domain: `growth|public-site|crm`
 - Blocked by: `none`
@@ -155,7 +169,7 @@ Reglas obligatorias:
 ### Files owned
 
 - `docs/public-site/decisions/PDR-009-hubspot-scheduler-native-booking.md`
-- `docs/tasks/in-progress/TASK-1366-hubspot-scheduler-booking-equivalence.md`
+- `docs/tasks/complete/TASK-1366-hubspot-scheduler-booking-equivalence.md`
 - `docs/architecture/public-site/PRIMITIVES.md`
 - `docs/reference/measurement-gtm-ga4/TRACKING-PLAN.md`
 - `docs/reference/measurement-gtm-ga4/04-greenhouse-gh-event-convention.md`
@@ -198,8 +212,8 @@ Reglas obligatorias:
   adicional.
 - Build impact: ninguno para el runtime actual; el smoke usa Node/HTTPS y no agrega SDK pesado, filesystem
   input ni global entrypoint.
-- Extraction blocker: scopes e instalación de la app HubSpot, token gobernado, ownership de Scheduling Page,
-  calendario Office 365 y configuración Teams del organizador.
+- Extraction blocker: ninguno para el spike; la productización sigue gated por adapter server-side, controles de
+  idempotencia/abuso, atribución consentida y QA del inbox invitado.
 
 ## Backend/Data Contract
 
@@ -255,11 +269,11 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -343,6 +357,20 @@ El spike puede pasar condicionado si el booking funciona, pero faltan mitigacion
 - Reschedule/cancel no es API-first, pero el invite/HubSpot email contiene links nativos suficientes.
 - La respuesta no trae un campo secundario, pero el portal/calendario/Teams demuestran la creacion real.
 
+### Veredicto final
+
+`CONDITIONAL PASS`. El booking conservó calendario, Teams, contacto y actividad CRM. El evento del organizador
+incluye al invitado y los links nativos de reprogramación/cancelación. La condición es de productización: la
+Scheduler API no transporta atribución UTK/UTM/content, no ofrece reschedule API-first y el inbox del invitado no
+fue inspeccionado directamente. Ninguna landing, GTM o runtime público cambió.
+
+Documentación proporcional del spike:
+
+- Técnica: este contrato, `PDR-009`, `PRIMITIVES.md` y el harness versionado.
+- Funcional: `PDR-009` explica alcance, fallback, side effects y límites.
+- Manual: §Production verification sequence + §Verification son el runbook del smoke no productivo.
+- La capacidad productiva futura deberá crear/actualizar sus tres capas propias al implementar el adapter.
+
 ### Fail criteria
 
 El spike falla si:
@@ -424,37 +452,56 @@ El spike falla si:
 
 ## Acceptance Criteria
 
-- [ ] Se confirma el endpoint/version Scheduler API y payload requerido para `agenda-discovery`.
-- [ ] Se documenta si la scheduling page tiene Teams + Office 365 calendar conectados.
+- [x] Se confirma el endpoint/version Scheduler API y payload requerido para `agenda-discovery`.
+- [x] Se documenta si la scheduling page tiene Teams + Office 365 calendar conectados.
 - [x] Availability read funciona o falla con error canonico documentado.
-- [ ] Booking smoke controlado produce evidencia redacted.
-- [ ] Se verifica `calendarEventId`, `isOffline`, Teams URL/ID, invite, calendario y HubSpot timeline.
+- [x] Booking smoke controlado produce evidencia redacted.
+- [x] Se verifica `calendarEventId`, `isOffline`, Teams URL, invitado en el evento, calendario y HubSpot timeline.
 - [x] Se documenta el impacto de `hubspotutk`/UTM/content tracking y mitigacion viable.
-- [ ] Se emite veredicto `pass | conditional pass | fail` con decision de next task.
-- [ ] No se inserta booking nativo en ninguna landing.
-- [ ] No se publica GTM.
-- [ ] No queda PII cruda en docs, logs o diffs.
+- [x] Se emite veredicto `conditional pass` con decisión de next task.
+- [x] No se inserta booking nativo en ninguna landing.
+- [x] No se publica GTM.
+- [x] No queda PII cruda en docs, logs o diffs.
 
 ## Verification
 
 - `pnpm task:lint --task TASK-1366`
 - `pnpm ops:lint --changed`
-- `pnpm docs:closure-check -- docs/public-site/decisions/PDR-009-hubspot-scheduler-native-booking.md docs/tasks/in-progress/TASK-1366-hubspot-scheduler-booking-equivalence.md`
+- `pnpm docs:closure-check -- docs/public-site/decisions/PDR-009-hubspot-scheduler-native-booking.md docs/tasks/complete/TASK-1366-hubspot-scheduler-booking-equivalence.md`
 - `node --check scripts/hubspot/smoke-scheduler-booking.mjs` si se crea script JS.
 - Smoke HubSpot Scheduler API documentado con evidencia redacted.
 - Verificacion manual HubSpot UI + calendario + Teams + email invite.
 
+### Evidencia ejecutada 2026-07-21
+
+| Gate | Resultado |
+| --- | --- |
+| Scheduler details + availability + booking | PASS; booking online, 30 min, IDs presentes, Teams host allowlisted |
+| CRM read-back | PASS; contacto + una reunión asociada, `SCHEDULED`, start/end/location coincidentes |
+| Outlook organizer calendar | PASS; evento visible, Teams, organizador e invitado correctos, links nativos |
+| Inbox del invitado | No inspeccionado directamente; Outlook registra al asistente `sin respuesta` |
+| `node --check` + ESLint focal | PASS |
+| `pnpm task:lint --task TASK-1366` | PASS, 0 errors/warnings |
+| `pnpm ops:lint --changed` | PASS, 0 errors/warnings |
+| `pnpm qa:gates --changed --agent codex --task TASK-1366 --integration --runtime --security --docs` | PASS advisory; evidencia live satisface integración/runtime/security |
+| `pnpm docs:closure-check` | PASS, 0 warnings |
+| `pnpm docs:context-check:strict` | PASS después de rotación canónica del changelog |
+
+QA verdict: `CONDITIONAL PASS`. Closure state: `complete`. No blocker de runtime del spike; follow-ups son
+productización separada. No se ejecutó build/worker/cron porque el delta propio es harness local + scope externo
+ya desplegado + documentación, sin imports de runtime, worker, flag, migración ni release Greenhouse.
+
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] `PDR-009` quedo actualizado con el veredicto final
-- [ ] `docs/architecture/public-site/PRIMITIVES.md` quedo alineado con fallback/camino nativo
-- [ ] se abrio follow-up task si el veredicto requiere productizacion o hardening
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `PDR-009` quedo actualizado con el veredicto final
+- [x] `docs/architecture/public-site/PRIMITIVES.md` quedo alineado con fallback/camino nativo
+- [x] se propusieron follow-up tasks para productización; la reserva de IDs requiere intake separado
 
 ## Follow-ups
 
@@ -464,7 +511,4 @@ El spike falla si:
 
 ## Open Questions
 
-- Que email de prueba y slot exacto usara el smoke?
-- La scheduling page `agenda-discovery` requiere campos legales/consent que no podamos mapear fuera del iframe?
-- HubSpot devuelve o expone links de cancelacion/reprogramacion cuando el booking se hace por API?
-- Conviene enviar una Forms API submission con `hutk` antes del booking o basta la atribucion Greenhouse/GTM?
+- Resueltas para el spike. La productización decidirá CMP/Forms API y verificará entrega en el inbox invitado.

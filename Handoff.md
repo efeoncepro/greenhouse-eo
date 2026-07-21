@@ -21,21 +21,14 @@
 
 ## Pendientes inmediatos
 
-- **`TASK-1366` IN-PROGRESS / OPERATIVAMENTE BLOQUEADA (HubSpot Scheduler Booking Equivalence Spike, `EPIC-023`).**
-  Discovery 2026-07-21 confirmó ownership libre, Scheduling Page pública accesible y secreto canónico sano,
-  pero Scheduler responde `403 MISSING_SCOPES`: el app del portal `48713323` no declara
-  `scheduler.meetings.meeting-link.read`. No hubo booking ni mutación HubSpot. Antes de continuar se requiere
-  El operador aprobó el plan y autorizó el scope mínimo. Build HubSpot `#27` fue validado/desplegado y la app
-  se reinstaló usando su Chrome autenticado; el token gobernado existente adquirió el scope sin rotación.
-  Details/availability ya pasan: `GROUP_CALENDAR`, `isOffline=false`, Office 365, 30 min, `company` requerido,
-  consentimiento legal y slots reales. Harness `scripts/hubspot/smoke-scheduler-booking.mjs` listo: inspect por
-  defecto, POST con doble guard, slot revalidado, cero retry y output redacted; guard probado sin booking. Un
-  POST vacío llegó a `VALIDATION_ERROR`, confirmando permiso write sin mutación. Antes del booking válido aún
-  faltan email de prueba y ventana de slot; el organizador se resuelve desde la scheduling page.
-  Slice atribución cerrado: Scheduler no porta UTK/UTM/content tracking; futura autoridad server-confirmed
-  mapearía a GA4 `generate_lead`, con campaña allowlisted, y Forms API queda opcional solo con consent/CMP +
-  dedupe. Bloqueo único: email de prueba + franja aprobados; no reutilizar correos históricos por inferencia.
-  No se tocó Tracking Plan/GTM. `HubSpotMeetingEmbed` y landings permanecen intactos.
+- **`TASK-1366` COMPLETE / CONDITIONAL PASS (HubSpot Scheduler Booking Equivalence Spike, `EPIC-023`).**
+  Build HubSpot `#27` desplegado/reinstalado con scope Scheduler mínimo y sin rotar el token gobernado. Booking
+  real 2026-07-22 09:15–09:45 Chile verificado `isOffline=false`: `calendarEventId`/`contactId`, Teams, contacto +
+  reunión CRM `SCHEDULED`, evento Office 365 del organizador, invitado correcto y links nativos de
+  cancelación/reprogramación. El inbox invitado no se inspeccionó directamente y Scheduler no porta UTK/UTM;
+  esas condiciones pasan a productización. No cancelar la reunión salvo instrucción del operador. No cambió
+  ninguna landing/GTM; `HubSpotMeetingEmbed` permanece fallback. Canon:
+  `docs/tasks/complete/TASK-1366-hubspot-scheduler-booking-equivalence.md` + `PDR-009`.
 
 - **`TASK-1506` COMPLETE (Globe Frontend Hosting and Front Door Decision, `EPIC-028`) — ADR-004, local-first sin push.**
   Cerrada como policy: `EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md` (ADR-004) mantiene **Cloud Run**
