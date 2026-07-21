@@ -1,4 +1,4 @@
-# TASK-1507 — Globe Internal Front Door (Global ALB + Terraform adoption)
+# TASK-1507 — Globe Internal Front Door (Global ALB + domain cutover)
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -9,7 +9,7 @@
 - Lifecycle: `to-do`
 - Priority: `P1`
 - Impact: `Muy alto`
-- Effort: `Alto`
+- Effort: `Medio`
 - Type: `implementation`
 - Execution profile: `backend-data`
 - UI impact: `none`
@@ -22,7 +22,7 @@
 - Status real: `Diseño; runtime internal-smoke vivo en Cloud Run, sin custom domain ni IaC de servicios`
 - Rank: `TBD`
 - Domain: `ops`
-- Blocked by: `TASK-1506`
+- Blocked by: `none`
 - Branch: `task/TASK-1507-globe-internal-front-door-alb-terraform`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -32,21 +32,21 @@
 Implementar el front door internal-only de Efeonce Globe que decidió ADR-004 (`TASK-1506`): un Global External
 Application Load Balancer + serverless NEG (`southamerica-west1`) hacia `globe-studio-internal`, certificado
 administrado y HTTP→HTTPS, para servir `globe.efeoncepro.com`; actualizar `GLOBE_PUBLIC_BASE_URL` y el redirect-URI
-allowlist del broker OAuth de Greenhouse; endurecer el ingress del web a `internal-and-cloud-load-balancing`; y meter
-los servicios Cloud Run vivos bajo Terraform (ingress/env/scale + `invokerIamDisabled`), cerrando el drift de IaC.
-`globe-api-internal` queda IAM-private con audience `run.app`, sin custom domain ni exposición browser.
+allowlist del broker OAuth de Greenhouse; y endurecer el ingress del web a `internal-and-cloud-load-balancing`.
+`globe-api-internal` queda IAM-private con audience `run.app`, sin custom domain ni exposición browser. La adopción
+brownfield de los servicios Cloud Run y la reconciliación del workflow de deploy se separan en `TASK-1508`.
 
 ## Why This Task Exists
 
 ADR-004 aceptó Cloud Run como web/BFF para la release internal-only y declaró explícitamente que **la ADR sola no
-autoriza apply**: todo el cambio de runtime, DNS, TLS, OAuth e IaC es responsabilidad de esta task sucesora. Hoy
+autoriza apply**: el cambio de front door, DNS, TLS, OAuth e ingress es responsabilidad de esta task sucesora. Hoy
 `globe.efeoncepro.com` no resuelve, la public base URL apunta al `*.run.app`, y los dos servicios Cloud Run
-(`globe-studio-internal`, `globe-api-internal`) están **fuera de Terraform** — sólo identidades/WIF/buckets/IAM/budget/
-observabilidad están gobernados —, de modo que `invokerIamDisabled`, ingress, env y scale son mutables por consola y
-propensos a drift (`EFEONCE_GLOBE_IAC_RUNBOOK_V1.md` §"Qué NO hace"). Además el web corre con `ingress=all` +
-`invokerIamDisabled=True`: browser-reachable, pero sin la protección de red que el ALB permite (`internal-and-cloud-
-load-balancing`). Sin esta task, el dominio no puede publicarse, el canary de `TASK-1469` no tiene una base URL HTTPS
-estable propia, y el rollout interno de `TASK-1505` arrancaría sobre un `run.app` no gobernado por IaC.
+(`globe-studio-internal`, `globe-api-internal`) están **fuera de Terraform**, pero adoptar servicios vivos mientras el
+workflow sigue ejecutando `gcloud run deploy` abre una segunda fuente de escritura sobre imagen/configuración. Esa
+deuda requiere su propio plan no-destructivo y queda en `TASK-1508`; no bloquea publicar el dominio. El web corre con
+`ingress=all` + `invokerIamDisabled=True`: browser-reachable, pero sin la protección de red que el ALB permite
+(`internal-and-cloud-load-balancing`). Sin esta task, el dominio no puede publicarse y los callbacks/deep links
+seguirían dependiendo del hostname `run.app`.
 
 ## Goal
 
@@ -55,9 +55,8 @@ estable propia, y el rollout interno de `TASK-1505` arrancaría sobre un `run.ap
 - Cerrar el loop OAuth de federación humana con el nuevo dominio: `GLOBE_PUBLIC_BASE_URL` y el redirect-URI allowlist
   del cliente Globe en el broker de Greenhouse actualizados de forma exacta (sin wildcards), con smokes verdes de
   federación humana y de workload.
-- Meter `globe-studio-internal` y `globe-api-internal` bajo Terraform (import de recursos vivos; gobierno de
-  ingress/env/scale + pin de `invokerIamDisabled`) y endurecer el ingress del web a `internal-and-cloud-load-balancing`,
-  dejando `globe-api-internal` IAM-private con audience `run.app`.
+- Endurecer el ingress del web a `internal-and-cloud-load-balancing` después del smoke por ALB, preservando
+  `maxScale=1`, y dejar `globe-api-internal` IAM-private con audience `run.app`.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -90,13 +89,13 @@ Reglas obligatorias (de ADR-004, load-bearing):
 
 ## Normative Docs
 
-- `docs/tasks/in-progress/TASK-1506-globe-frontend-hosting-front-door-decision.md`
+- `docs/tasks/complete/TASK-1506-globe-frontend-hosting-front-door-decision.md`
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
 - `docs/operations/creative-studio/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`
 - `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`
 - `docs/operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`
 - `docs/tasks/complete/TASK-1464-globe-iac-keyless-platform-foundation.md`
-- `docs/tasks/to-do/TASK-1465-globe-workspace-tenancy-persistence-audit.md`
+- `docs/tasks/in-progress/TASK-1465-globe-workspace-tenancy-persistence-audit.md`
 - `docs/tasks/to-do/TASK-1469-globe-governed-run-lifecycle-submission-fence.md`
 - `docs/tasks/to-do/TASK-1480-globe-commercial-external-readiness-gate.md`
 - `docs/tasks/to-do/TASK-1505-globe-creative-producer-surface.md`
@@ -120,15 +119,13 @@ Reglas obligatorias (de ADR-004, load-bearing):
 - Habilita deep links canónicos de `TASK-1475`.
 - No habilita Production ni clientes externos (sigue bloqueado por `TASK-1480`).
 - No sube réplicas: HA sigue bloqueada por `TASK-1465` (stores durables).
+- Desbloquea `TASK-1508`, que adopta los servicios Cloud Run en Terraform sin mezclar ese riesgo con el cutover DNS.
 
 ### Files owned
 
-- `../efeonce-globe/infra/terraform/services.tf` (nuevo — import de los 2 Cloud Run services) `[verificar]`
 - `../efeonce-globe/infra/terraform/front_door.tf` (nuevo — IP global, ALB, serverless NEG, managed cert, HTTP→HTTPS)
   `[verificar]`
-- `../efeonce-globe/infra/terraform/imports.tf` (import blocks de los servicios vivos)
 - `../efeonce-globe/infra/terraform/variables.tf`, `outputs.tf`, `locals.tf`
-- `docs/operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md` (actualizar §"Qué NO hace" al adoptar servicios)
 - `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`
 - El cambio de redirect-URI allowlist del cliente Globe es una **actualización de registro** en el broker de Greenhouse
   (`src/lib/sister-platforms/oauth-broker.ts` es el mecanismo; el dato es la fila del cliente), no código nuevo de
@@ -154,7 +151,8 @@ Reglas obligatorias (de ADR-004, load-bearing):
 ### Gap
 
 - No existe ALB, IP global, serverless NEG ni managed cert; `globe.efeoncepro.com` no tiene front door.
-- Los servicios Cloud Run no están bajo Terraform: `invokerIamDisabled`, ingress, env y scale son ungoverned/drift-prone.
+- Los servicios Cloud Run no están bajo Terraform; esa adopción y el conflicto de ownership con el workflow quedan
+  explícitamente en `TASK-1508`.
 - El web usa `ingress=all` (browser-reachable directo por `run.app`) en vez de `internal-and-cloud-load-balancing`
   detrás del ALB.
 - El redirect allowlist del cliente Globe y `GLOBE_PUBLIC_BASE_URL` aún no contemplan `globe.efeoncepro.com`.
@@ -166,7 +164,7 @@ Reglas obligatorias (de ADR-004, load-bearing):
 - Future candidate home: `remain-shared`
 - Boundary: `front door browser de Globe (ALB→serverless NEG→globe-studio-internal) + redirect allowlist del broker; sin mover dominio creativo a Greenhouse`
 - Server/browser split: `browser sólo entra por el ALB/dominio del web; OAuth/session/BFF server-side; globe-api-internal IAM-private service-to-service, sin browser`
-- Build impact: `none en código de app; Terraform agrega recursos de red (ALB/NEG/cert/IP) e importa 2 Cloud Run services`
+- Build impact: `none en código de app; Terraform agrega sólo recursos de red (ALB/NEG/cert/IP)`
 - Extraction blocker: `OAuth callback + redirect allowlist acoplados al broker de Greenhouse; session store in-memory (gate 1465); WIF project scoping; API audience run.app`
 
 ## Backend/Data Contract
@@ -175,14 +173,14 @@ Reglas obligatorias (de ADR-004, load-bearing):
 
 - Backend rigor: `backend-critical`
 - Impacto principal: `integration`
-- Source of truth afectado: `Terraform de Globe (infra/terraform) + cliente OAuth Globe en el broker de Greenhouse + env Cloud Run + DNS HostGator`
+- Source of truth afectado: `Terraform del front door Globe + cliente OAuth Globe en el broker de Greenhouse + env/ingress Cloud Run + DNS HostGator`
 - Consumidores afectados: `browser humano (SSO shell), TASK-1469 canary, TASK-1475 deep links, TASK-1505 rollout interno`
 - Runtime target: `production` (infra GCP de Globe; internal-only, no Production comercial)
 
 ### Contract surface
 
 - Contrato existente a respetar: `ADR-004 (§Successor task contract, §Hard rules); ADR-001 GREENHOUSE_CONNECTIVITY_V1 (redirect allowlist exacto + PKCE); EFEONCE_GLOBE_IAC_RUNBOOK_V1`
-- Contrato nuevo o modificado: `front door HTTPS globe.efeoncepro.com (ALB); redirect URI del cliente Globe; GLOBE_PUBLIC_BASE_URL; ingress del web; Terraform-managed Cloud Run services`
+- Contrato nuevo o modificado: `front door HTTPS globe.efeoncepro.com (ALB); redirect URI del cliente Globe; GLOBE_PUBLIC_BASE_URL; ingress del web`
 - Backward compatibility: `gated` — el `*.run.app` sigue válido durante cutover; el ingress endurece a `internal-and-cloud-load-balancing` sólo tras verificar que el ALB sirve
 - Full API parity: `N/A — no capability` (infra/front door; no introduce ni modifica una capability de negocio del spine)
 
@@ -193,14 +191,14 @@ Reglas obligatorias (de ADR-004, load-bearing):
   - `globe-api-internal nunca recibe custom domain ni exposición browser; audience run.app, IAM-private`
   - `redirect URIs exactos, sin wildcards; PKCE S256 + state + nonce preservados`
   - `maxScale=1 de globe-studio-internal (gate TASK-1465); esta task no sube réplicas`
-  - `invokerIamDisabled queda pineado por Terraform: True mientras el web use sesión-cookie; el hardening de ingress no lo cambia sin verificar acceso`
+  - `invokerIamDisabled no cambia en esta task: True en web y False en api; TASK-1508 lo pineará por Terraform`
 - Tenant/space boundary: `federación humana provee identidad Greenhouse a Globe como broker; el ALB no cambia el trust boundary (una sola nube GCP)`
-- Idempotency/concurrency: `Terraform apply idempotente; import de servicios vivos vía import blocks (plan debe mostrar 0 replacements/destroy sobre los servicios)`
+- Idempotency/concurrency: `Terraform apply idempotente sobre recursos nuevos del front door; no importa ni adopta servicios vivos`
 - Audit/outbox/history: `Terraform state + plan como evidencia; smokes de federación humana/workload como verificación; sin event de dominio`
 
 ### Migration, backfill and rollout
 
-- Migration posture: `none` (DB); infra additive: agregar red (ALB/NEG/cert/IP) + import de servicios existentes
+- Migration posture: `none` (DB); infra additive: agregar red (ALB/NEG/cert/IP), sin importar servicios existentes
 - Default state: `el custom domain se publica sólo tras smoke verde; el ingress endurece a internal-and-cloud-load-balancing como último paso, tras confirmar que el ALB sirve`
 - Backfill plan: `N/A — no data backfill`
 - Rollback path: `revertir ingress del web a all (restaura acceso directo run.app); apuntar GLOBE_PUBLIC_BASE_URL + redirect al run.app; el ALB es additive y destruible sin tocar el servicio`
@@ -215,18 +213,18 @@ Reglas obligatorias (de ADR-004, load-bearing):
 
 ### Runtime evidence
 
-- Local checks: `cd ../efeonce-globe && pnpm check` (si toca código); `terraform validate` + `terraform plan` (0 destroy sobre servicios)
+- Local checks: `cd ../efeonce-globe && pnpm check` (si toca código); `terraform validate` + `terraform plan` (sólo recursos aditivos del front door; 0 cambios sobre servicios Cloud Run)
 - DB/runtime checks: `gcloud run services describe` read-only pre/post; `curl -I` del dominio (301 HTTP→HTTPS + 200/302 SSO); resolución DNS + cert válido
 - Integration checks: smoke de federación humana (login SSO end-to-end contra `globe.efeoncepro.com`) + smoke de workload federation (`globe-api-internal` sigue respondiendo 403 anónimo y 200 al SA autorizado)
 - Reliability signals/logs: Cloud Run request logs + ALB logs; verificar que `globe-api-internal` no aparece browser-reachable
-- Production verification sequence: ver §Rollout Plan (secuencia canónica: import → red → DNS/cert → cutover URL/OAuth → smokes → hardening ingress)
+- Production verification sequence: ver §Rollout Plan (secuencia canónica: red → DNS/cert → cutover URL/OAuth → smokes → hardening ingress)
 
 ### Acceptance criteria additions
 
 - [ ] Source of truth, contract surface y consumers nombrados con paths/objetos reales.
 - [ ] Invariantes de API-privada/redirect-exacto/maxScale explicitados y preservados.
 - [ ] Postura de rollback explícita por slice (ingress revert, URL/OAuth revert, ALB destruible).
-- [ ] Evidencia runtime listada (plan Terraform sin destroy sobre servicios, smokes federación humana + workload, curl del dominio).
+- [ ] Evidencia runtime listada (plan Terraform aditivo sin recursos Cloud Run, smokes federación humana + workload, curl HTTP/HTTPS del dominio).
 - [ ] Sin fuga de secretos; apply keyless; API privada intacta.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -241,31 +239,23 @@ Reglas obligatorias (de ADR-004, load-bearing):
 
 ## Scope
 
-### Slice 1 — Adoptar los Cloud Run services en Terraform (import, sin mutación)
-
-- Escribir los recursos `google_cloud_run_v2_service` (o el tipo vigente) para `globe-studio-internal` y
-  `globe-api-internal` en `services.tf`, reflejando el estado vivo verificado (región, ingress, env, scale,
-  `invokerIamDisabled`, SA), con `import` blocks en `imports.tf`.
-- `terraform plan` debe mostrar **cero** replace/destroy sobre los servicios (sólo adopción de estado). Corregir el HCL
-  hasta que el plan sea no-op sobre los servicios antes de cualquier apply.
-- Pin explícito de `invokerIamDisabled` por servicio (web: `True` mientras use sesión-cookie; api: `False`), cerrando
-  el drift documentado en el runbook.
-
-### Slice 2 — Front door: IP global + ALB + serverless NEG + managed cert (sin DNS aún)
+### Slice 1 — Front door: IP global + ALB + serverless NEG + managed cert (sin DNS aún)
 
 - Terraform para IP global estática, serverless NEG (`southamerica-west1`) hacia `globe-studio-internal`, backend
   service, URL map, target HTTPS proxy con certificado administrado para `globe.efeoncepro.com`, y forwarding rules
   HTTP→HTTPS.
 - El NEG apunta **sólo** a `globe-studio-internal`. `globe-api-internal` no entra al ALB.
-- Aún sin cutover de DNS: el cert queda `PROVISIONING` hasta que el dominio resuelva (Slice 3).
+- Aún sin cutover de DNS: el cert queda `PROVISIONING` hasta que el dominio resuelva (Slice 2).
+- Documentar el costo fijo/mensual estimado del front door y sus supuestos de tráfico con precios oficiales
+  vigentes al ejecutar la task.
 
-### Slice 3 — DNS + provisión de certificado (out-of-band + verificación)
+### Slice 2 — DNS + provisión de certificado (out-of-band + verificación)
 
 - Crear el registro DNS de `globe.efeoncepro.com` → IP global en HostGator (coordinación out-of-band).
 - Verificar propiedad de dominio y esperar `ACTIVE` del managed cert; confirmar `curl -I` con 301 HTTP→HTTPS y TLS
   válido; el web responde detrás del ALB (SSO redirect esperado, no error de red).
 
-### Slice 4 — Cutover de public base URL + OAuth redirect allowlist
+### Slice 3 — Cutover de public base URL + OAuth redirect allowlist
 
 - Actualizar `GLOBE_PUBLIC_BASE_URL` del runtime web a `https://globe.efeoncepro.com` (env Cloud Run, con redeploy si
   no toma en caliente).
@@ -273,14 +263,14 @@ Reglas obligatorias (de ADR-004, load-bearing):
   quitar el `run.app` hasta smoke verde; sin wildcards).
 - Smoke de federación humana: login SSO end-to-end contra `https://globe.efeoncepro.com` con PKCE/state/nonce OK.
 
-### Slice 5 — Endurecer ingress + verificar API privada + cierre IaC
+### Slice 4 — Endurecer ingress + verificar API privada + cierre del dominio
 
 - Cambiar el ingress de `globe-studio-internal` a `internal-and-cloud-load-balancing` vía Terraform, **sólo tras**
   confirmar que el ALB sirve el web (evita lockout).
 - Verificar que `globe-api-internal` sigue IAM-private: 403 anónimo, 200 al SA autorizado, audience `run.app` intacto,
   sin custom domain.
-- Actualizar el runbook IaC (§"Qué NO hace" pierde la excepción de servicios) y el runtime handoff; least-privilege
-  audit de `web_runtime`/`api_runtime` documentado.
+- Actualizar el runtime handoff y dejar enlazada `TASK-1508` como dueña de la adopción IaC de servicios y del
+  least-privilege/ownership audit del workflow.
 
 ## Out of Scope
 
@@ -288,6 +278,8 @@ Reglas obligatorias (de ADR-004, load-bearing):
 - Implementar persistencia durable, ejecución async, workbench, Producer UI o deep links.
 - Habilitar Production, clientes externos, pricing o publicación (gate `TASK-1480`).
 - Dar a `globe-api-internal` custom domain o exposición browser.
+- Importar o adoptar los servicios Cloud Run en Terraform, pinear su configuración o modificar el workflow de deploy
+  (`TASK-1508`).
 - Migrar el web a Vercel/Next.js o decidir el host del frontend cliente comercial (decisión diferida por ADR-004).
 - Cambiar el modelo de federación/broker de identidad (sólo se agrega un redirect URI exacto).
 
@@ -300,12 +292,11 @@ globe-studio-internal`), `google_compute_backend_service`, `google_compute_url_m
 certificate` (`globe.efeoncepro.com`), `google_compute_target_https_proxy`, y forwarding rules 443 + 80 (redirect a
 HTTPS). Confirmar tipos/atributos exactos contra la doc oficial vigente en Discovery `[verificar]`.
 
-El import de los servicios vivos debe ser no-op: cualquier `-/+` (replace) sobre `globe-studio-internal` o
-`globe-api-internal` es inaceptable (destruiría el servicio). Usar `terraform plan` iterativo hasta 0 destroy/replace
-sobre esos recursos; sólo entonces `apply`.
+El plan Terraform de esta task debe contener sólo recursos aditivos del front door. Si intenta importar, cambiar,
+reemplazar o destruir `globe-studio-internal` o `globe-api-internal`, abortar: esa propiedad pertenece a `TASK-1508`.
 
-El orden de cutover es crítico para no dejar afuera al browser ni romper OAuth: primero el ALB sirve (Slice 2-3),
-después la URL/OAuth apuntan al dominio (Slice 4), y **al final** el ingress endurece (Slice 5). Invertir el orden
+El orden de cutover es crítico para no dejar afuera al browser ni romper OAuth: primero el ALB sirve (Slices 1-2),
+después la URL/OAuth apuntan al dominio (Slice 3), y **al final** el ingress endurece (Slice 4). Invertir el orden
 —endurecer ingress antes de que el ALB sirva— deja el web inaccesible.
 
 El redirect allowlist se administra en el broker de Greenhouse (`src/lib/sister-platforms/oauth-broker.ts`
@@ -316,28 +307,27 @@ hasta smoke verde, y sin wildcards (el broker los rechaza con `invalid_redirect_
 ## Rollout Plan & Risk Matrix
 
 Task de infra crítica cross-runtime: muta red GCP, DNS, OAuth redirect e ingress de un servicio vivo. El apply lo
-autoriza esta task (no ADR-004 sola) y ocurre bajo la secuencia canónica de abajo, con rollback por slice.
+autoriza esta task (no ADR-004 sola) sólo para el front door y su cutover; la adopción de servicios queda fuera.
 
 ### Slice ordering hard rule
 
-- Slice 1 (import IaC, no-op) → Slice 2 (ALB/NEG/cert, sin DNS) → Slice 3 (DNS + cert ACTIVE) → Slice 4 (cutover URL +
-  OAuth redirect + smoke humano) → Slice 5 (endurecer ingress + verificar API privada + cierre IaC).
-- **Slice 5 (endurecer ingress a `internal-and-cloud-load-balancing`) NUNCA antes de confirmar en Slice 3-4 que el ALB
+- Slice 1 (ALB/NEG/cert, sin DNS) → Slice 2 (DNS + cert ACTIVE) → Slice 3 (cutover URL + OAuth redirect + smoke humano)
+  → Slice 4 (endurecer ingress + verificar API privada + cierre).
+- **Slice 4 (endurecer ingress a `internal-and-cloud-load-balancing`) NUNCA antes de confirmar en Slice 2-3 que el ALB
   sirve el web.** Endurecer antes deja el browser sin acceso (lockout).
-- El import de servicios (Slice 1) debe ser plan no-op antes de cualquier `apply`; un replace/destroy sobre un servicio
-  vivo aborta la task.
-- El redirect `run.app` no se remueve hasta que el smoke del dominio nuevo esté verde (Slice 4).
+- Un cambio/import/destroy sobre un servicio Cloud Run en el plan Terraform aborta la task y se deriva a `TASK-1508`.
+- El redirect `run.app` no se remueve hasta que el smoke del dominio nuevo esté verde (Slice 3).
 
 ### Risk matrix
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
-| `terraform import` genera replace/destroy de un servicio vivo | Cloud Run / IaC | high | plan iterativo hasta 0 destroy sobre servicios; nunca apply con `-/+` sobre ellos | plan muestra `-/+` o `destroy` en `globe-studio-internal`/`globe-api-internal` |
-| Endurecer ingress antes de que el ALB sirva deja el web sin acceso | Cloud Run web | high | Slice 5 sólo tras smoke verde del ALB (Slice 3-4); rollback a `ingress=all` | 403/timeout browser tras el cambio de ingress |
+| El plan del front door intenta adoptar o mutar un servicio vivo | Cloud Run / IaC | high | scope Terraform aditivo; abortar y derivar ownership/import a TASK-1508 | plan menciona cambios sobre `globe-studio-internal`/`globe-api-internal` |
+| Endurecer ingress antes de que el ALB sirva deja el web sin acceso | Cloud Run web | high | Slice 4 sólo tras smoke verde del ALB (Slices 2-3); rollback a `ingress=all` | 403/timeout browser tras el cambio de ingress |
 | Redirect allowlist mal formado rompe login SSO | OAuth / identity | medium | URI exacto sin wildcard; conservar `run.app` hasta smoke verde; PKCE/state/nonce preservados | `invalid_redirect_uri` en el broker; login SSO falla |
 | `globe-api-internal` queda browser-reachable o pierde audience | Security / API privada | low | API fuera del NEG; verificación 403 anónimo + audience run.app post-apply | anónimo obtiene 200; audience derivado del dominio browser |
 | Managed cert no provisiona (DNS/propiedad) | TLS / DNS | medium | verificar registro DNS + propiedad antes de cutover; esperar `ACTIVE` | cert atascado en `PROVISIONING`; TLS handshake falla |
-| Drift IaC persiste si el import queda incompleto | Cloud/IaC | medium | pin explícito de ingress/env/scale/`invokerIamDisabled`; runbook actualizado | consola muta un campo no representado en state |
+| Drift de servicios persiste después del dominio | Cloud/IaC | medium | deuda explícita, separada y bloqueante de HA en TASK-1508 | Terraform y `gcloud run deploy` siguen como escritores no reconciliados |
 | Interpretar el dominio internal-only como Production | Product/Ops | medium | ADR-004 gates separados; handoff explícito; sin quitar SSO ni gate 1480 | cliente externo o marketing usa el dominio como GA |
 
 ### Feature flags / cutover
@@ -350,20 +340,21 @@ sigue IAM-private; el web conserva SSO; `maxScale=1` intacto.
 
 | Slice | Rollback | Tiempo | Reversible? |
 |---|---|---|---|
-| Slice 1 (import IaC) | `terraform state rm` de los servicios (vuelven a ungoverned, sin tocar runtime) | <30 min | sí |
-| Slice 2 (ALB/NEG/cert) | `terraform destroy` selectivo del front door (additive, no toca el servicio) | <30 min | sí |
-| Slice 3 (DNS/cert) | remover el registro DNS en HostGator; el dominio deja de resolver | <60 min (propagación) | sí |
-| Slice 4 (URL/OAuth) | `GLOBE_PUBLIC_BASE_URL` + redirect vuelven al `run.app` (env + broker); redeploy si aplica | <15 min | sí |
-| Slice 5 (ingress) | ingress del web vuelve a `all` (restaura acceso directo `run.app`) | <10 min | sí |
+| Slice 1 (ALB/NEG/cert) | destruir selectivamente sólo los recursos aditivos del front door | <30 min | sí |
+| Slice 2 (DNS/cert) | remover el registro DNS en HostGator; el dominio deja de resolver | <60 min (propagación) | sí |
+| Slice 3 (URL/OAuth) | `GLOBE_PUBLIC_BASE_URL` + redirect vuelven al `run.app` (env + broker); redeploy si aplica | <15 min | sí |
+| Slice 4 (ingress) | ingress del web vuelve a `all` (restaura acceso directo `run.app`) | <10 min | sí |
 
 ### Production verification sequence
 
-1. `terraform plan` (Slice 1) → verificar **0 destroy/replace** sobre los servicios; recién ahí `apply`.
-2. `apply` Slice 2 (ALB/NEG/cert) → cert en `PROVISIONING` esperado (sin DNS aún); `globe-api-internal` sin cambios.
-3. Crear DNS en HostGator (Slice 3) → esperar cert `ACTIVE`; `curl -I https://globe.efeoncepro.com` = 301/302 + TLS OK.
-4. Cutover `GLOBE_PUBLIC_BASE_URL` + agregar redirect exacto (Slice 4) → smoke federación humana: login SSO end-to-end
+1. `terraform plan` (Slice 1) → verificar recursos aditivos del front door y **0 cambios** sobre servicios Cloud Run;
+   recién ahí `apply`.
+2. `apply` ALB/NEG/cert → cert en `PROVISIONING` esperado (sin DNS aún); `globe-api-internal` sin cambios.
+3. Crear DNS en HostGator (Slice 2) → esperar cert `ACTIVE`; `curl -I http://globe.efeoncepro.com` = redirect HTTPS y
+   `curl -I https://globe.efeoncepro.com` = TLS OK + respuesta/redirect SSO esperado.
+4. Cutover `GLOBE_PUBLIC_BASE_URL` + agregar redirect exacto (Slice 3) → smoke federación humana: login SSO end-to-end
    verde contra el dominio; `run.app` aún válido.
-5. Endurecer ingress a `internal-and-cloud-load-balancing` (Slice 5) → re-smoke humano por el ALB; verificar
+5. Endurecer ingress a `internal-and-cloud-load-balancing` (Slice 4) → re-smoke humano por el ALB; verificar
    `globe-api-internal`: 403 anónimo + 200 SA autorizado + audience `run.app`.
 6. Remover el redirect `run.app` del broker sólo si se decide; actualizar runbook + handoff; monitorear logs 48-72h.
 
@@ -384,23 +375,23 @@ sigue IAM-private; el web conserva SSO; `maxScale=1` intacto.
       (`southamerica-west1`), con managed cert `ACTIVE` y redirección HTTP→HTTPS (`curl -I` = 301 + TLS válido).
 - [ ] `globe-api-internal` no recibe custom domain, sigue IAM-private (403 anónimo, 200 al SA autorizado) y su audience
       es `run.app`, no derivada del dominio browser.
-- [ ] Los dos servicios Cloud Run están bajo Terraform; `terraform plan` es no-op sobre ellos (0 destroy/replace) y
-      `invokerIamDisabled`/ingress/env/scale quedan pineados por IaC.
+- [ ] El plan Terraform contiene sólo recursos aditivos del front door y no importa ni modifica servicios Cloud Run.
 - [ ] `globe-studio-internal` sirve por `internal-and-cloud-load-balancing` detrás del ALB, con `maxScale=1` intacto.
 - [ ] `GLOBE_PUBLIC_BASE_URL = https://globe.efeoncepro.com` y el redirect URI exacto del cliente Globe está en el
       broker (sin wildcards); smoke de federación humana verde (PKCE/state/nonce OK).
 - [ ] Ningún secreto impreso; el apply corrió keyless (OIDC→WIF); no se subieron réplicas ni se habilitó Production.
-- [ ] Runbook IaC (§"Qué NO hace") y `GLOBE_RUNTIME_HANDOFF.md` actualizados; least-privilege audit documentado.
+- [ ] Costo fijo/mensual estimado del ALB documentado con fecha y fuente oficial; `GLOBE_RUNTIME_HANDOFF.md` actualizado
+      y `TASK-1508` enlazada como dueña de la adopción IaC/ownership de deploy.
 
 ## Verification
 
-- `cd ../efeonce-globe && terraform -chdir=infra/terraform validate && terraform -chdir=infra/terraform plan` (0 destroy
-  sobre servicios)
+- `cd ../efeonce-globe && terraform -chdir=infra/terraform validate && terraform -chdir=infra/terraform plan` (sólo
+  front door; 0 cambios sobre servicios Cloud Run)
 - `cd ../efeonce-globe && pnpm check` si toca código de app (esperado: no toca app)
 - `gcloud run services describe globe-studio-internal --region southamerica-west1` (read-only, pre/post) — ingress,
   scale, `invokerIamDisabled`
 - `gcloud run services describe globe-api-internal --region southamerica-west1` — IAM-private, audience, sin domain
-- `curl -I https://globe.efeoncepro.com` (301 HTTP→HTTPS, TLS válido)
+- `curl -I http://globe.efeoncepro.com` (redirect HTTPS) + `curl -I https://globe.efeoncepro.com` (TLS válido + SSO)
 - Smoke federación humana (login SSO end-to-end) + smoke workload federation (403 anónimo / 200 SA) contra el dominio
 - `pnpm task:lint --task TASK-1507`, `pnpm ops:lint --changed`, `pnpm docs:closure-check`
 
@@ -410,8 +401,8 @@ sigue IAM-private; el web conserva SSO; `maxScale=1` intacto.
 - [ ] El archivo vive en la carpeta correcta (`to-do/` → `in-progress/` → `complete/`).
 - [ ] `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` sincronizados.
 - [ ] `docs/epics/in-progress/EPIC-028-...md` refleja el front door implementado.
-- [ ] `EFEONCE_GLOBE_IAC_RUNBOOK_V1.md` y `GLOBE_RUNTIME_HANDOFF.md` actualizados con la adopción de servicios y el
-      dominio; ADR-004 referenciada como la decisión que esta task cierra.
+- [ ] `GLOBE_RUNTIME_HANDOFF.md` actualizado con el dominio y el pendiente explícito `TASK-1508`; ADR-004 referenciada
+      como la decisión que esta task implementa.
 - [ ] `greenhouse-qa-release-auditor` y `greenhouse-documentation-governor` revisan el cierre.
 - [ ] Runtime Rollout Completion Gate: si el dominio/OAuth/ingress no quedaron aplicados y verificados en vivo, el
       estado es `code complete, rollout pendiente`, no `complete`.
@@ -419,6 +410,7 @@ sigue IAM-private; el web conserva SSO; `maxScale=1` intacto.
 ## Follow-ups
 
 - Cloud Armor / WAF sobre el ALB si se endurece la postura antes de exposición externa (`TASK-1480`).
+- Adopción brownfield de los servicios Cloud Run + single-writer deploy ownership (`TASK-1508`).
 - Store durable de sesión/OAuth para levantar `maxScale > 1` (`TASK-1465`).
 - Decisión de host + framework del frontend cliente comercial (diferida por ADR-004, revisit en `TASK-1505` +
   pre-`TASK-1480`).
@@ -426,5 +418,5 @@ sigue IAM-private; el web conserva SSO; `maxScale=1` intacto.
 ## Open Questions
 
 - ¿El redirect allowlist del cliente Globe se actualiza por command/API del broker o por seed? (Discovery `[verificar]`.)
-- ¿Se remueve el redirect `run.app` tras el cutover, o se conserva como fallback interno? (Decidir en Slice 4 según
+- ¿Se remueve el redirect `run.app` tras el cutover, o se conserva como fallback interno? (Decidir en Slice 3 según
   necesidad de smokes/agentes.)

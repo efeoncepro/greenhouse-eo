@@ -8,7 +8,7 @@
 
 # Handoff
 
-## Active state — 2026-07-20 (TASK-1506 cerrada — ADR-004 frontend hosting + front door; TASK-1507 registrada)
+## Active state — 2026-07-21 (front door e IaC separados: TASK-1507 → TASK-1508)
 
 **Decisión (ADR-004, `EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md`).** Para la release
 internal-only, el web/BFF/SSO shell **se queda en Cloud Run** (servidor Node nativo; el target Next.js queda
@@ -20,16 +20,16 @@ elegir Cloud Run para el shell interno **no** cierra esa puerta. Tres gates dist
 internal-only / HA (gated por stores durables `TASK-1465`, hard-block `maxScale > 1`) / Production externo
 (`TASK-1480`).
 
-**Front door + IaC → `TASK-1507` (registrada, `to-do`, blocked by 1506).** `globe.efeoncepro.com` se sirve vía
+**Front door → `TASK-1507` (registrada, `to-do`, ejecutable ahora).** `globe.efeoncepro.com` se sirve vía
 **Global External ALB + serverless NEG** (`southamerica-west1`) → `globe-studio-internal` (path GA, no domain
 mapping directo). `globe-api-internal` **nunca** recibe custom domain; sigue IAM-private con audience `run.app`.
-`TASK-1507` también mete los 2 Cloud Run services **bajo Terraform** (ingress/env/scale + pin de
-`invokerIamDisabled`) y endurece el ingress del web a `internal-and-cloud-load-balancing`.
+La task cubre ALB/TLS/DNS, `GLOBE_PUBLIC_BASE_URL`, OAuth redirect, smokes y finalmente endurece el ingress del web a
+`internal-and-cloud-load-balancing`. No espera el resto de EPIC-028 ni `TASK-1465`/`TASK-1480`.
 
-**Esto resuelve la "Decisión pendiente — `invokerIamDisabled`" de abajo:** el flag deja de ser drift ungoverned
-porque `TASK-1507` lo pinea en IaC (web: `True` mientras use sesión-cookie; api: `False` con verificación in-app).
-La ADR **no** autoriza apply: el runtime/DNS/OAuth/infra lo ejecuta `TASK-1507` bajo su propia secuencia y rollback.
-**Próximo paso ejecutable:** tomar `TASK-1507` (no antes del rollout interno de `TASK-1505`).
+**Cloud Run IaC + deploy ownership → `TASK-1508` (registrada, `to-do`, blocked by 1507).** Adopta los dos servicios
+vivos por import/no-replace y elimina la doble escritura: Terraform gobierna configuración estable y seguridad; el
+workflow `gcloud run deploy` queda image/revision-only. Ahí se pinea `invokerIamDisabled` (web `True`, api `False`).
+**Próximo paso ejecutable:** tomar `TASK-1507` ahora, antes del rollout interno de `TASK-1505`; luego `TASK-1508`.
 
 ## Active state — 2026-07-20 (TASK-1490 desplegada + verificada en el servicio + hardening de auth)
 

@@ -39,14 +39,18 @@
   Terraform Cloud SQL → 0b cliente DB + migraciones → 1 schema → 2 impls durables → 3 guard/wiring → 4 audit+tests).
   Infra/código en `efeonce-globe`; gobernanza en Greenhouse. Próximo paso: aplicar el Terraform del Cloud SQL (plan
   aditivo, apply autorizado por el operador).
-- **`TASK-1507` TO-DO (Globe Internal Front Door — Global ALB + Terraform adoption, `EPIC-028`) — próximo pendiente.**
-  Sucesora de 1506/ADR-004 (blocked by 1506). Implementa `globe.efeoncepro.com` vía **Global External ALB +
+- **`TASK-1507` TO-DO (Globe Internal Front Door — domain cutover, `EPIC-028`) — ejecutable ahora.**
+  Sucesora de 1506/ADR-004, ya sin blocker. Implementa `globe.efeoncepro.com` vía **Global External ALB +
   serverless NEG** (`southamerica-west1`) → `globe-studio-internal`, managed cert + HTTP→HTTPS, `GLOBE_PUBLIC_BASE_URL`,
   redirect allowlist del broker OAuth (`src/lib/sister-platforms/oauth-broker.ts`), endurece ingress a
-  `internal-and-cloud-load-balancing` y mete los 2 Cloud Run services **bajo Terraform** (cierra el drift de
-  `invokerIamDisabled`). `globe-api-internal` sigue IAM-private (audience `run.app`). Se secuencia **antes del rollout
+  `internal-and-cloud-load-balancing` y documenta el costo del ALB. `globe-api-internal` sigue IAM-private (audience
+  `run.app`). Se secuencia **antes del rollout
   interno de `TASK-1505`**; hasta entonces la base URL estable es el `*.run.app` + SSO. Infra en `efeonce-globe`,
   gobernanza en Greenhouse. La ADR **no** autoriza apply: eso lo ejecuta 1507 bajo su secuencia + rollback.
+- **`TASK-1508` TO-DO (Globe Cloud Run IaC + Deploy Ownership, `EPIC-028`) — después de 1507.** Adopta ambos servicios
+  vivos en Terraform con import/no-replace y protección de borrado, y reconcilia el workflow: Terraform gobierna
+  ingress/runtime SA/env/scale/`invoker_iam_disabled`; `deploy-internal.yml` sólo image/revision. El plan post-deploy
+  debe quedar convergido. Esta separación evita convertir el dominio en una migración brownfield de alto riesgo.
 - **`TASK-1500` COMPLETE (Producer Governed Route/Model Catalog, `EPIC-028`) — local-first, sin push.**
   La keystone del cluster Producer quedó implementada en `../efeonce-globe` (`main`, 4 commits, `pnpm check` +
   `build` verdes): catálogo como dato versionado (`PRODUCER_ROUTE_CATALOG`, 4 rutas seed / 3 modalidades) +

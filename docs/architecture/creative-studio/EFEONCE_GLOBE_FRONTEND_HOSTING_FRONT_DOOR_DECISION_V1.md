@@ -6,7 +6,7 @@
 - Confidence: High for the internal-only Cloud Run decision; the commercial frontend host is intentionally left open with a named revisit trigger
 - Reversibility: Two-way for the internal release (a Global External Application Load Balancer is additive and revertible to the `run.app` URL); the commercial-frontend host decision is kept open on purpose
 - Owners: Efeonce Globe platform + Greenhouse control plane (decision/governance). Successor-task out-of-band owners: GCP/billing + infra, DNS `efeoncepro.com` (HostGator), OAuth broker/redirect allowlist (Greenhouse), Product/Security for the internal-vs-Production gate
-- Related: `GREENHOUSE_CONNECTIVITY_V1.md` (ADR-001), `PLATFORM_FOUNDATION_V1.md`, `EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`, `TASK-1506` (this decision), `TASK-1507` (successor implementation), `TASK-1465` (durable persistence), `TASK-1480` (external readiness), `TASK-1505` (Producer surface)
+- Related: `GREENHOUSE_CONNECTIVITY_V1.md` (ADR-001), `PLATFORM_FOUNDATION_V1.md`, `EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`, `TASK-1506` (this decision), `TASK-1507` (domain/front-door cutover), `TASK-1508` (Cloud Run IaC/deploy ownership), `TASK-1465` (durable persistence), `TASK-1480` (external readiness), `TASK-1505` (Producer surface)
 
 ## Context (verified baseline)
 
@@ -36,7 +36,9 @@ There is no ADR that decides where `globe.efeoncepro.com` terminates or which st
    - **Scalability / HA:** requires durable stores (sessions, OAuth transactions, experiments, evaluations, spend fence) + async execution **before** `maxScale > 1`. Gated by `TASK-1465` (workspace tenancy/persistence), which is the home of the durable session/OAuth store under `apps/studio-web` (or an explicitly named child task); `maxScale > 1` is hard-gated on it.
    - **External access / Production:** requires `TASK-1480` + a dedicated rollout + legal/security/finance/ops evidence.
 
-6. **The successor implementation task (`TASK-1507`)** owns all runtime/infra changes and brings the Cloud Run **services into Terraform** (governing ingress/env/scale and pinning `invokerIamDisabled`), closing the IaC drift follow-up. This ADR authorizes **no** apply.
+6. **Successor implementation is split by blast radius.** `TASK-1507` owns the additive ALB/TLS/DNS/OAuth/domain
+   cutover and final web ingress. `TASK-1508` separately brings the Cloud Run **services into Terraform**, reconciles
+   Terraform with the image-deploy workflow and pins stable service configuration. This ADR authorizes **no** apply.
 
 ## Alternatives considered
 
@@ -54,9 +56,10 @@ There is no ADR that decides where `globe.efeoncepro.com` terminates or which st
 
 - The internal release proceeds on Cloud Run with the Node server; no cross-cloud migration, no new runtime to secure.
 - The commercial-frontend host stays an **open, named decision** — future agents must not read "Cloud Run for the internal shell" as "Cloud Run for the commercial client UI."
-- `TASK-1507` must be registered before any front-door/ALB/DNS/OAuth work; this ADR alone authorizes no apply.
+- `TASK-1507` must govern any front-door/ALB/DNS/OAuth work; this ADR alone authorizes no apply.
 - `maxScale > 1` is hard-blocked until durable stores land (`TASK-1465`); the in-memory ceiling is documented as the real HA blocker, not the hosting cloud.
-- The Cloud Run services enter Terraform in `TASK-1507`, closing the `invokerIamDisabled`/ingress drift follow-up.
+- The Cloud Run services enter Terraform in `TASK-1508`, after the domain cutover, closing the
+  `invokerIamDisabled`/deploy-ownership drift follow-up without coupling it to DNS.
 - The `web_runtime` provider-permission concern raised in the task brief is already closed (the erroneous `aiplatform.user` grant was moved to `api_runtime`); `TASK-1507` still audits least-privilege before any broader rollout.
 
 ## Revisit triggers
@@ -66,15 +69,23 @@ There is no ADR that decides where `globe.efeoncepro.com` terminates or which st
 - **Custom domain:** implement (via `TASK-1507`) before `TASK-1505`'s internal rollout.
 - Supersede this ADR with a new one if any trigger fires; never rewrite history.
 
-## Successor task contract (TASK-1507)
+## Successor task contract (TASK-1507 + TASK-1508)
 
-`TASK-1507` (implementation, internal-only front door) must deliver, with no apply authorized by this ADR alone: global IP, Global External ALB + serverless NEG (`southamerica-west1`) → `globe-studio-internal` only, managed certificate, HTTP→HTTPS, DNS for `globe.efeoncepro.com` on HostGator, `GLOBE_PUBLIC_BASE_URL` update, the exact OAuth callback + redirect-allowlist change in the Greenhouse broker, smokes (human federation + workload federation), then harden `globe-studio-internal` ingress to `internal-and-cloud-load-balancing`; bring the Cloud Run services into Terraform (ingress/env/scale + `invokerIamDisabled`), least-privilege audit, observability, cost model and rollback. `globe-api-internal` stays IAM-private, `run.app` audience.
+`TASK-1507` (implementation, internal-only front door) must deliver, with no apply authorized by this ADR alone:
+global IP, Global External ALB + serverless NEG (`southamerica-west1`) → `globe-studio-internal` only, managed
+certificate, HTTP→HTTPS, DNS for `globe.efeoncepro.com` on HostGator, `GLOBE_PUBLIC_BASE_URL` update, the exact OAuth
+callback + redirect-allowlist change in the Greenhouse broker, smokes (human federation + workload federation), final
+web ingress `internal-and-cloud-load-balancing`, cost model and rollback. `globe-api-internal` stays IAM-private with
+its `run.app` audience.
+
+`TASK-1508` then adopts both Cloud Run services into Terraform with import/no-replace discipline and reconciles the
+GitHub workflow so Terraform owns stable configuration/security while the workflow owns only image/revision deploys.
 
 ## 4-pillar scoring
 
 - **Safety:** one trust boundary (GCP) for the internal release; the API stays IAM-private; the ALB path (successor) lets the web move to ingress `internal-and-cloud-load-balancing`, removing the `invokerIamDisabled=True` + `ingress=all` soft spot. The commercial-frontend deferral prevents a premature cross-cloud auth surface.
 - **Robustness:** the decision is documental (no runtime mutation, fail-closed). It names the in-memory/`maxScale=1` ceiling explicitly and hard-gates `maxScale > 1` on durable stores, so "scalable" is never claimed of an in-memory backend.
-- **Resilience:** reversion is explicit per horizon (revert the ALB to `run.app`; supersede the ADR for the commercial-frontend decision). The IaC-drift follow-up is assigned to the successor task, so `invokerIamDisabled` stops being ungoverned.
+- **Resilience:** reversion is explicit per horizon (revert the ALB to `run.app`; supersede the ADR for the commercial-frontend decision). The IaC-drift follow-up is isolated in `TASK-1508`, so importing services cannot endanger the DNS cutover.
 - **Scalability:** the cheapest path to scale (Cloud Run horizontal, once stores are durable) with no premature migration; the commercial frontend host stays open so the client product can adopt a global edge/CDN when it is actually built.
 
 ## Hard rules (anti-regression)

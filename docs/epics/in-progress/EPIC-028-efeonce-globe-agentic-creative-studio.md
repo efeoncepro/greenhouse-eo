@@ -81,9 +81,11 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
   runtime/DNS/OAuth: eso lo implementa la sucesora `TASK-1507`.
 - `TASK-1507` — **implementación del front door internal-only.** Global External ALB + serverless NEG
   (`southamerica-west1`) → `globe-studio-internal`, managed cert + HTTP→HTTPS, `globe.efeoncepro.com`,
-  `GLOBE_PUBLIC_BASE_URL`, redirect allowlist del broker OAuth, ingress `internal-and-cloud-load-balancing`, y
-  adopción Terraform de los 2 Cloud Run services (cierra el drift de `invokerIamDisabled`). `globe-api-internal`
-  queda IAM-private (audience `run.app`). Blocked by `TASK-1506`.
+  `GLOBE_PUBLIC_BASE_URL`, redirect allowlist del broker OAuth e ingress `internal-and-cloud-load-balancing`.
+  `globe-api-internal` queda IAM-private (audience `run.app`). Ejecutable ahora: `TASK-1506` está completa.
+- `TASK-1508` — **Cloud Run IaC + deploy ownership.** Después del dominio, adopta los 2 servicios vivos mediante
+  import no destructivo y reconcilia Terraform con `deploy-internal.yml`: Terraform gobierna configuración estable;
+  el workflow sólo image/revision. Cierra drift de `invokerIamDisabled` sin mezclarlo con DNS. Blocked by `TASK-1507`.
 
 ### Front door ordering contract
 
@@ -94,6 +96,7 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
   réplica mientras la sesión/OAuth siga en memoria. Alta disponibilidad o clientes requieren persistencia durable
   (`TASK-1465`, hard-gate de `maxScale > 1`); Production/clientes externos permanecen bloqueados por `TASK-1480` y
   un release explícito posterior. El host del frontend cliente comercial es una decisión diferida (ADR-004).
+- La adopción IaC de servicios no bloquea el dominio: `TASK-1508` ocurre después y no autoriza subir réplicas.
 
 ### Parallel execution contract
 
