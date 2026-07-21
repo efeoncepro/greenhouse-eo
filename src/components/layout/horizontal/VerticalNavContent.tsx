@@ -23,6 +23,9 @@ import useHorizontalNav from '@menu/hooks/useHorizontalNav'
 
 // Util Imports
 import { mapHorizontalToVerticalMenu } from '@menu/utils/menuUtils'
+import { getMicrocopy } from '@/lib/copy'
+
+const microcopy = getMicrocopy()
 
 const StyledBoxForShadow = styled('div')(({ theme }) => ({
   top: 60,
@@ -72,6 +75,8 @@ const VerticalNavContent = ({ children }: ChildrenType) => {
           <Logo variant='sidebar' />
         </Link>
         <NavCollapseIcons
+          closeLabel={microcopy.aria.closeMenu}
+          toggleLabel={microcopy.aria.toggleSidebar}
           lockedIcon={<i className='tabler-circle-dot text-xl' />}
           unlockedIcon={<i className='tabler-circle text-xl' />}
           closeIcon={<i className='tabler-x text-xl' />}

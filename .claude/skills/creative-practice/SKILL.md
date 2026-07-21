@@ -1,29 +1,17 @@
 ---
 name: creative-practice
 description: >-
-  Operador comercial de la práctica CREATIVA de Efeonce: cómo se VENDE, se
-  PRICEA, se scopea, se descalifica, se prospecta y se retiene el servicio
-  creativo (marca/identidad, key visual, campaña, audiovisual, social, contenido
-  creativo). NO es la skill del oficio — el oficio vive en `design-studio`,
-  `motion-design-studio`, `audio-studio`, `social-media-studio`, `copywriting`,
-  `content-marketing-studio`. Cubre: la venta de CAPACIDAD GOBERNADA (squad en
-  FTE) en vez de horas o piezas, la rate card de capacidad con loaded cost real,
-  el piso de margen bloqueante, el SOW creativo (rondas de revisión, derechos de
-  uso, change order, scope creep), las métricas de delivery como compromiso
-  contractual (OTD/FTR/RpA — y su doble filo), displacement contra el in-house /
-  el holding / Superside / el freelancer / "lo hago con IA", el pitch process y
-  la política de spec work, credenciales y casos citables, retención y expansión.
-  Triggers: "vender creatividad", "vender diseño", "precio de una campaña",
-  "cuánto cobramos por el squad", "rate card", "tarifario", "retainer creativo",
-  "SOW creativo", "rondas de revisión", "derechos de uso", "buyout", "cesión de
-  derechos", "scope creep", "cotizar campaña", "propuesta creativa", "pitch",
-  "spec work", "el cliente quiere ver ideas gratis", "competimos con Superside",
-  "el cliente tiene equipo interno", "el cliente dice que lo hace con IA",
-  "credenciales", "case study", "portafolio", "descuento", "el cliente dice que
-  es caro", "squad creativo", "FTE dedicado", "staff augmentation creativo".
-type: skill
-user-invocable: true
-argument-hint: "[la pregunta comercial o la pieza que necesitas]"
+  Operador comercial de la práctica creativa de Efeonce: oferta, pricing, scope,
+  SOW, descalificación, pitch, retención y expansión para marca, campaña,
+  audiovisual, social y contenido creativo. Usar al vender o cotizar Managed
+  Squad, Staff Augmentation, Studio Access, On-Going, On-Demand, Sample Sprint o
+  Creative Studio; al definir Studio/Globe Credits, pools, consumo por pieza,
+  refunds o top-ups; y ante preguntas de rate card, retainer, derechos, buyout,
+  rondas, change order, scope creep, descuentos, spec work o competencia. Cubre
+  tres ejes comerciales, cinco líneas de ingreso, capacidad gobernada, loaded
+  cost, margen, créditos generativos, accountability y OTD/FTR/RpA. No enseña el
+  oficio creativo: para ejecución usar los studios de diseño, motion, audio,
+  social, copywriting y contenido.
 ---
 
 # Creative Practice — el negocio, no el oficio
@@ -123,8 +111,10 @@ modelo tradicional **está roto o va a estarlo**.
 > Y cuando la IA te comprime el entregable 3-4×, **tu propio ahorro se convierte en el argumento del cliente
 > para pagarte menos.**
 
-🔴 **Regla:** en esta práctica **no se vende la hora, y no se vende la pieza suelta.**
-**Se vende capacidad (FTE de squad) y outcome.** → `modules/04_PRICING.md`.
+🔴 **Regla:** en esta práctica **no se vende la hora, y no se vende la pieza suelta.** Managed Squad vende
+**capacidad gobernada/outcome**; Studio Access vende **gobierno/acceso + operaciones generativas**; Staff
+Augmentation vende **perfil/dedicación bajo dirección cliente**. → `modules/03_OFERTA.md` +
+`modules/14_STUDIO_CREDITS.md`.
 
 ### (b) 🎯 El comprador NO quiere reemplazar su equipo — quiere que su equipo rinda
 
@@ -204,35 +194,40 @@ Dos cosas que el SEO no tiene y el creativo sí, y que **ninguna** de nuestras s
    **tiene que costar MÁS.** *(Hoy hacemos lo contrario.)* → `ANTIPATTERNS.md` 🩸
 5. 🔴 **NUNCA cierres bajo el 45% de margen bruto.** **Piso aprobado por el dueño (2026-07-13).**
    No es una guía: **es la regla.** El piso se **computa**, no se siente. → `modules/04_PRICING.md` § 4.
-6. 🔴 **NUNCA descuentes la línea de plataforma/gobierno** *(portal, métricas, reportería)*. Costo marginal ≈ 0
-   **y es lo único que el freelancer, el in-house y Superside no pueden darle.** Descontarla es regalar margen
-   puro **y devaluar tu único diferenciador. Descuenta capacidad. Nunca el gobierno.**
+6. 🔴 **NUNCA descuentes la línea de plataforma/gobierno** *(workspace, policy, ledger, seguridad,
+   observabilidad, métricas y soporte base)* sin reducir explícitamente su alcance. Tiene costo operativo real y
+   sostiene control, transparencia y switching cost. **Descuenta capacidad o alcance; nunca finjas que el
+   gobierno cuesta cero.**
+7. 🔴 **NUNCA conviertas Studio Credits en precio por pieza, hora, token, dólar o pass-through del provider.**
+   Un credit mide una operación generativa gobernada; la pieza sólo explica un escenario. Sin shadow ledger,
+   p50/p95 y commercial approval no existe equivalencia pública, package, top-up ni checkout. **Provider-neutral
+   no significa provider-oculto:** muestra modelo/version y fallback reales; reserva costo, margen, keys y prompt/IP.
 
 **Alcance**
 
-7. 🔴 **NUNCA firmes "rondas ilimitadas" ni "hasta que quede bien".** Un alcance sin borde es cómo mueren las
+8. 🔴 **NUNCA firmes "rondas ilimitadas" ni "hasta que quede bien".** Un alcance sin borde es cómo mueren las
    agencias. **2-3 rondas incluidas, la 4ª es change order.** → `modules/05_SCOPE_SOW.md`.
-8. 🔴 **NUNCA cedas derechos perpetuos, exclusivos e ilimitados dentro del fee base.** Es **2-3× el trabajo
+9. 🔴 **NUNCA cedas derechos perpetuos, exclusivos e ilimitados dentro del fee base.** Es **2-3× el trabajo
    regalado**. El uso se cotiza aparte, o se acota (canal / territorio / plazo).
-9. 🔴 **NUNCA aceptes un brief sin owner del lado del cliente.** Sin una persona que apruebe, no hay ronda 1:
+10. 🔴 **NUNCA aceptes un brief sin owner del lado del cliente.** Sin una persona que apruebe, no hay ronda 1:
    hay rondas infinitas. **Es causal de descalificación.** → `modules/08_DESCALIFICACION.md`.
 
 **Verdad**
 
-10. 🔴 **NUNCA prometas una métrica de negocio que no controlamos** *(ventas, awareness, share)*. Comprometemos
+11. 🔴 **NUNCA prometas una métrica de negocio que no controlamos** *(ventas, awareness, share)*. Comprometemos
     **delivery** (OTD/FTR/cycle time), no el resultado de mercado del cliente.
-11. 🔴 **NUNCA muestres en un pitch una superficie del portal que no existe.** `Creative Hub`, `ROI Reports`,
+12. 🔴 **NUNCA muestres en un pitch una superficie del portal que no existe.** `Creative Hub`, `ROI Reports`,
     `Exports`, `CVR trimestral` **están sembrados en el registry pero NO tienen página.** Prometerlos es humo.
     → `efeonce/ESTADO_ACTUAL.md`.
-12. 🔴 **NUNCA cites las cifras de fricción de ICO** *(21 hrs/sem, 68% bottlenecks, 30% del contenido nunca se
+13. 🔴 **NUNCA cites las cifras de fricción de ICO** *(21 hrs/sem, 68% bottlenecks, 30% del contenido nunca se
     activa)*. **Están pendientes de auditoría de fuente.** Si no está en `SOURCES.md`, no se dice.
-13. 🔴 **NUNCA hagas spec work gratis sin pasar por la política.** → `modules/10_PITCH.md` § 4.
+14. 🔴 **NUNCA hagas spec work gratis sin pasar por la política.** → `modules/10_PITCH.md` § 4.
 
 **Fronteras**
 
-14. 🔴 **NUNCA reinventes el método de venta** (`commercial-expert`) ni el motion GTM (`gtm-architect`).
+15. 🔴 **NUNCA reinventes el método de venta** (`commercial-expert`) ni el motion GTM (`gtm-architect`).
     Esta skill aporta el **dominio**, no el **método**.
-15. 🔴 **NUNCA reimplementes el oficio.** Acá se vende; en los studios se hace.
+16. 🔴 **NUNCA reimplementes el oficio.** Acá se vende; en los studios se hace.
 
 ---
 
@@ -242,7 +237,7 @@ Dos cosas que el SEO no tiene y el creativo sí, y que **ninguna** de nuestras s
 |---|---|
 | 🔴 **El mercado 2026** — la hora muerta, el in-housing, la grieta entre el holding y la suscripción | **`modules/01_MERCADO.md`** |
 | **El comprador** — CMO/Head of Growth/Brand Manager + procurement + 🎯 **el creative lead in-house** *(aliado o verdugo)* | **`modules/02_COMPRADOR.md`** |
-| **La oferta** — las 4 modalidades y qué es "una unidad de capacidad" | **`modules/03_OFERTA.md`** |
+| **La oferta** — delivery model × engagement form × operating mode y qué es una unidad de capacidad | **`modules/03_OFERTA.md`** |
 | 🎯 **Precio, rate card de capacidad, loaded cost, piso, descuentos** *(+ el 🩸 hallazgo del loaded cost)* | **`modules/04_PRICING.md`** |
 | 🎯 **El SOW creativo** — rondas, derechos de uso, change order, scope creep. **El módulo que más margen protege** | **`modules/05_SCOPE_SOW.md`** |
 | **La cuña** — el diagnóstico que se regala *(Grader + auditoría de KV + diagnóstico de operación creativa)* | **`modules/06_CUNA.md`** |
@@ -253,6 +248,7 @@ Dos cosas que el SEO no tiene y el creativo sí, y que **ninguna** de nuestras s
 | 🔴 **Las métricas como compromiso** — qué se firma como SLA vs qué se muestra. **El arma de doble filo** | **`modules/11_METRICAS_COMPROMISO.md`** |
 | **Retención y expansión** — el 70% del motor comercial, el QBR creativo, el switching cost por capacidad | **`modules/12_RETENCION_EXPANSION.md`** |
 | **Prospección** — la lista, las señales de compra, el ritmo | **`modules/13_PROSPECCION.md`** |
+| 🔴 **Studio Credits** — cinco líneas de ingreso, unidad, shadow calibration, lifecycle, refunds y ejemplos por pieza | **`modules/14_STUDIO_CREDITS.md`** |
 | 🔴 **El estado real de la práctica** — qué podemos prometer y qué sería mentir | **`efeonce/ESTADO_ACTUAL.md`** |
 | **Qué se puede afirmar y con qué evidencia** *(+ § Datos que NO se citan)* | **`SOURCES.md`** |
 | 🔴 **Lo que NUNCA se hace** *(+ los bugs vivos marcados 🩸)* | **`ANTIPATTERNS.md`** |
@@ -275,6 +271,7 @@ Dos cosas que el SEO no tiene y el creativo sí, y que **ninguna** de nuestras s
 | **`commercial-expert`** | **El método de venta.** | Discovery (MEDDPICC), JOLT, Challenger, negociación, forecast, doctrina ASaaS. Esta skill pone el **dominio creativo** encima. |
 | **`greenhouse-talent-people-operator`** | 🎯 **El squad.** | `references/client-squad-design.md` + `templates/squad-blueprint.md`. **El dimensionamiento del pod y el loaded cost salen de ahí.** Esta skill los **precia**. |
 | **`greenhouse-finance-accounting-operator`** | **La economía.** | Loaded cost real, cargas, overhead, el cotizador. 🔴 **El piso sale de acá, no de la intuición.** |
+| **Creative Studio Business/Credit Model** | **El canon económico.** | `docs/business-models/creative-studio/*`. Esta skill lo aplica a discovery/propuesta/SOW; no inventa precio público ni condiciones financieras. |
 | **`gtm-architect`** | **El motion.** | Si la práctica necesita cambiar de motion (ABM, partner-led, PLG). |
 | **`efeonce-agency`** | **La doctrina.** | ASaaS, masterbrand único, switching cost por capacidad. **El Manifesto gana.** |
 | **`deck-studio`** | **El deck.** | La propuesta se compone ahí. Esta skill es *consumer*. |
@@ -298,3 +295,5 @@ y hasta dónde llega* → **es de acá.**
 4. ¿Vas a citar un caso o mostrar el portal? → **`efeonce/ESTADO_ACTUAL.md`.** Hay superficies que no existen.
 5. ¿Vas a citar un dato de mercado? → **`SOURCES.md`**, y si no está: **verifícalo con WebSearch.**
 6. ¿Es una decisión de método de venta genérica? → **es de `commercial-expert`**, no de acá.
+7. ¿Hay Creative Studio/credits? → declara los **tres ejes**, separa las **cinco líneas**, carga
+   `modules/14_STUDIO_CREDITS.md` y verifica si el modelo está sólo en shadow/piloto o comercialmente aprobado.

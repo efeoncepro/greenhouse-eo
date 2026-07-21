@@ -177,6 +177,9 @@ Before exclusion from deployment context:
 - Roadmap runtime filesystem reads must be replaced by a materialized index or another governed projection.
 - `full-version/` must remain reference-only and must not be imported by active code.
 - operational scripts must declare whether they are app build inputs, service build inputs or local tooling.
+- Cloud Run build units and local filesystem dependencies follow
+  [`GREENHOUSE_WORKER_BUILD_CONTRACT_V1.md`](GREENHOUSE_WORKER_BUILD_CONTRACT_V1.md); a `file:` dependency is
+  not complete until Docker/Cloud Build contexts, triggers, integrity and all consuming stages are verified.
 - `.vercelignore` changes must be fail-safe and verified against output tracing.
 
 ## 9. Local developer experience contract

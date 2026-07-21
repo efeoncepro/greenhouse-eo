@@ -1,0 +1,113 @@
+{
+  "stage": "layout-design-generative-finish",
+  "results": [
+    {
+      "id": "16x9",
+      "stage": "finish",
+      "topology": {
+        "kind": "star",
+        "anchorRevision": 1,
+        "derivationParent": "anchor"
+      },
+      "anchorId": "high-frequency-anchor-v1",
+      "source": "work/plates/high-frequency-plate-3x1-source.png",
+      "sourceSha256": "1bb95b5a376b22fde2500aa3ea01654c49133016790976232d284ef1bcd05ab4",
+      "preparedInputSha256": "4762549f418c3ac10ffb9b32b88997d662c15f8b9d9b4a7b42f7e2adc92f2aeb",
+      "transport": "ephemeral JPEG data URI; prepared working copy not persisted",
+      "output": "work/layout-design/finished/high-frequency-layout-finish-16x9.png",
+      "model": "bytedance/seedream/v5/pro/edit",
+      "requestId": "019f7811-2847-74b1-b3ec-a538553ad464",
+      "providerLatencyMs": 111857,
+      "wallClockMs": 114168,
+      "startedAt": "2026-07-19T01:50:16.244Z",
+      "completedAt": "2026-07-19T01:52:10.412Z",
+      "seed": null,
+      "width": 2048,
+      "height": 1152,
+      "bytes": 4006689,
+      "sha256": "cc6e65b3d3764aef2c83cb79be5832816dbc409ff352fd03953995c06ae6250c",
+      "estimatedCostUsd": 0.0675,
+      "delta": "material integration and premium photographic cohesion only",
+      "locks": [
+        "one complete bird",
+        "pose and geometry",
+        "copy field",
+        "navy palette",
+        "tile-wake trajectory"
+      ],
+      "prompt": "IMAGE 1 is both STRUCTURE and IDENTITY and wins every conflict. Apply one finishing delta only: improve material integration and premium photographic cohesion. Refine feather micro-contrast, translucent chromatic tile surfaces, one coherent right-side rim light, subtle atmospheric depth and controlled near-to-far falloff. Preserve exactly one hummingbird, its exact pose, scale, coordinates, complete anatomy, silhouette, right-facing beak, wing geometry and tail. Preserve the left 46 percent as a calm dark low-detail copy field and keep all bright fragments outside it. Keep the deep navy palette and the same tile-wake trajectory. LOCK EVERYTHING ELSE. No text, letters, numbers, logo, watermark, UI, frame, second bird, cloned body, extra wing, detached feather, new object, heavy glow, plastic smoothing or crop change."
+    },
+    {
+      "id": "4x5",
+      "stage": "finish",
+      "topology": {
+        "kind": "star",
+        "anchorRevision": 1,
+        "derivationParent": "anchor"
+      },
+      "anchorId": "high-frequency-anchor-v1",
+      "source": "work/plates/high-frequency-plate-4x5-source.png",
+      "sourceSha256": "07ceae9a76c0c99194ce5cecf732b00812a68d2d63f8afdec99d51ca668a3f39",
+      "preparedInputSha256": "427c2b8300d170e233b1050a8e45771ef1c18a6509700d2b2231c6d7af872e5a",
+      "transport": "ephemeral JPEG data URI; prepared working copy not persisted",
+      "output": "work/layout-design/finished/high-frequency-layout-finish-4x5.png",
+      "model": "bytedance/seedream/v5/pro/edit",
+      "requestId": "019f7812-e753-7d63-bee8-fec78bbee117",
+      "providerLatencyMs": 116431,
+      "wallClockMs": 118555,
+      "startedAt": "2026-07-19T01:52:10.735Z",
+      "completedAt": "2026-07-19T01:54:09.290Z",
+      "seed": null,
+      "width": 1536,
+      "height": 1920,
+      "bytes": 5572794,
+      "sha256": "954d51dc3a58939155e9751cc5da9f7a47a07646be3efcb7b0d485d00aaa30b3",
+      "estimatedCostUsd": 0.135,
+      "delta": "material integration and premium photographic cohesion only",
+      "locks": [
+        "one complete bird",
+        "pose and geometry",
+        "copy field",
+        "navy palette",
+        "tile-wake trajectory"
+      ],
+      "prompt": "IMAGE 1 is both STRUCTURE and IDENTITY and wins every conflict. Apply one finishing delta only: improve material integration and premium photographic cohesion. Refine feather micro-contrast, translucent chromatic tile surfaces, one coherent right-side rim light, subtle atmospheric depth and controlled near-to-far falloff. Preserve exactly one hummingbird, its exact pose, scale, coordinates, complete anatomy, silhouette, right-facing beak, wing geometry and tail. Preserve the upper-left copy field from x=6 to 68 percent and y=18 to 51 percent as calm, dark and low-detail; keep bright fragments and the bird outside that field. Keep the deep navy palette and the same tile-wake trajectory. LOCK EVERYTHING ELSE. No text, letters, numbers, logo, watermark, UI, frame, second bird, cloned body, extra wing, detached feather, new object, heavy glow, plastic smoothing or crop change."
+    },
+    {
+      "id": "9x16",
+      "stage": "finish",
+      "topology": {
+        "kind": "star",
+        "anchorRevision": 1,
+        "derivationParent": "anchor"
+      },
+      "anchorId": "high-frequency-anchor-v1",
+      "source": "work/plates/high-frequency-plate-9x16-source.png",
+      "sourceSha256": "4a48f2871a3976b63b08f2703b9bf50424ede2b91f058c6236c102c3b8623dda",
+      "preparedInputSha256": "c552be77778a11be4b104b31e1aa77f3e72a99c2736d65b1ed70b31fb43a26e3",
+      "transport": "ephemeral JPEG data URI; prepared working copy not persisted",
+      "output": "work/layout-design/finished/high-frequency-layout-finish-9x16.png",
+      "model": "bytedance/seedream/v5/pro/edit",
+      "requestId": "019f7814-b5b4-72f3-9575-4a311eac7c8a",
+      "providerLatencyMs": 129109,
+      "wallClockMs": 131324,
+      "startedAt": "2026-07-19T01:54:09.524Z",
+      "completedAt": "2026-07-19T01:56:20.848Z",
+      "seed": null,
+      "width": 1152,
+      "height": 2048,
+      "bytes": 4129872,
+      "sha256": "454ef8bee726f574c25ae31186dab42f96819f52a989e68d72c083f218326fa7",
+      "estimatedCostUsd": 0.0675,
+      "delta": "material integration and premium photographic cohesion only",
+      "locks": [
+        "one complete bird",
+        "pose and geometry",
+        "copy field",
+        "navy palette",
+        "tile-wake trajectory"
+      ],
+      "prompt": "IMAGE 1 is both STRUCTURE and IDENTITY and wins every conflict. Apply one finishing delta only: improve material integration and premium photographic cohesion. Refine feather micro-contrast, translucent chromatic tile surfaces, one coherent right-side rim light, subtle atmospheric depth and controlled near-to-far falloff. Preserve exactly one hummingbird, its exact pose, scale, coordinates, complete anatomy, silhouette, right-facing beak, wing geometry and tail. Preserve the copy field from x=6 to 65 percent and y=20 to 50 percent as calm, dark and low-detail; keep bright fragments and the bird outside that field. Preserve the top 12 percent and bottom 20 percent interface-safe zones. Keep the deep navy palette and the same tile-wake trajectory. LOCK EVERYTHING ELSE. No text, letters, numbers, logo, watermark, UI, frame, second bird, cloned body, extra wing, detached feather, new object, heavy glow, plastic smoothing or crop change."
+    }
+  ]
+}

@@ -858,3 +858,107 @@ El primer placement interruptivo del §10 y el sistema de experiencia del §15 e
 - **Preview `/growth/ctas`**: matriz de density (mismo fixture a 3 anchos) + demo VIVO del overlay (`SlideInController` immediate) + fixtures pairwise (`slideIn`/`Spotlight`/`Minimal`/`LongCopy`/`UnknownAppearance`). GVC `task-1429-growth-cta-interruptive-placement` (1440+390) mirado: density matrix, overlay open/escaped, appearances, long copy. El loop cazó 2 bugs reales pre-merge (destroy cross-instance bajo StrictMode; density rules ancladas a la clase del overlay).
 
 Fuera de esta entrega: primer CTA slide_in REAL publicado (surface/copy/trigger = decisión del operador; ningún CTA interruptivo existe aún — el placement amplio sigue gateado por enforcement ON, §24), popup_modal/floating_button, action kinds nuevos (TASK-1431), cockpit (TASK-1430).
+
+## 26. Delta 2026-07-18 — Rollout productivo de §24+§25 (release `d5db8b568`)
+
+Release `d5db8b568` (manifest `released`, orquestador run 29651461496) llevó TASK-1428+1429 a producción:
+
+- **Suppression enforcement ON**: `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` activo en staging y
+  Production, verificado E2E post-release (dismiss ⇒ exclusión por visitante; visitante fresco ve;
+  sin identidad ⇒ solo embedded eligible).
+- **Kill switches operativos en producción**: ciclo engage ⇒ `engineState: 'killed'` ⇒ release ⇒
+  restaurado, verificado en runtime real sin redeploy; la ventana efectiva quedó como documenta §24.
+- **Renderer 1.1.0 en producción** enviando identidad pseudónima consent-aware: el visitor state de
+  §24 opera con visitantes reales.
+- **`viewed` visibility-gated activo** (IO ≥50% + dwell) en producción; el corte de serie está
+  registrado en TRACKING-PLAN §CTAs.
+- **Pendiente**: primera campaña `slide_in` real (decisión de operador) + monitor 7d de señales
+  `growth.cta.*` hasta 2026-07-25.
+
+Con esto, las fases 1-3 de §18 están productivas; quedan cockpit (TASK-1430) y Action Registry (TASK-1431).
+
+## 27. Delta 2026-07-18 — TASK-1431: Action Registry + navegación gobernada (fase 4 de §18, code complete)
+
+Implementa el amendment de §12 (V1 action-registry boundary). **Estado: code complete en develop
+local — rollout pendiente** (push/release + bundle en hosts; ninguna CTA con action nueva publicada).
+
+- **Registry canónico** en `src/lib/growth/ctas/action-registry.ts` (server-only): un entry por kind
+  con policy schema (zod), resolver, proyección browser-safe y metadata; `resolveCtaAction()`
+  (action-router) queda como fachada estable que delega — publish gate y render path fail-closed
+  para kinds sin entry por la misma puerta. Metadata read-only browser-safe por kind
+  (`CTA_ACTION_KIND_METADATA` en `contracts.ts`: executionFamily · destinationExpectation ·
+  navigationContext · supportsInlineContinuation · requiredPolicyFields · failureReasons ·
+  telemetryKind) — consumible por cockpit (TASK-1430)/preview/tests sin server-only; JAMÁS contiene
+  appearance/placement/density/copy/asset.
+- **Taxonomía canónica de fallo** (reemplaza `form_not_resolvable` interno): `action_policy_invalid`
+  · `action_kind_unsupported` · `action_destination_invalid` · `action_destination_unavailable`.
+- **Unión V1**: `open_growth_form` (sin cambios de shape); `link_url` (root-relative o https; sin
+  protocolos peligrosos/credenciales/protocol-relative `//`·`/\`); `open_think_tool` (policy guarda
+  un PATH; el host lo resuelve el motor — hub gobernado `GROWTH_CTA_THINK_HUB_URL` ∥
+  `PUBLIC_GRADER_HUB_URL` ∥ `think.efeoncepro.com`; campaign context SOLO UTM-allowlisted `.strict()`);
+  y `book_meeting` (https en `meetings*.hubspot.com` más extras por `GROWTH_CTA_BOOKING_URL_HOSTS`;
+  navegación-only, cero write CRM). Proyección navigate browser-safe: `kind + href + newContext`
+  (opt-in del autor, default same-context).
+- **Executor por familia** (renderer `1.2.0`): `growth_form` conserva botón + form slot; `navigate`
+  renderiza **`<a href>` real** (semántica nativa: middle-click/cmd-click, historial, copy-link,
+  a11y de link) — externo/newContext lleva `rel='noopener noreferrer'`, newContext `target=_blank` +
+  affordance sr-only (`Se abre en una pestaña nueva`). Telemetría `clicked` sale ANTES de navegar
+  (ingest `keepalive`); pending single-dispatch accesible (`aria-disabled` + `role=status`) con
+  recovery acotado 4s (`navigation_stalled`); kind desconocido/href fuera de contrato ⇒ fail-closed
+  sin card (`action_unsupported`/`action_destination_invalid`) — un contrato más nuevo que el bundle
+  nunca adivina destino. Parity server↔renderer: familias (`CTA_ACTION_KIND_FAMILIES` ↔
+  `RENDERER_ACTION_FAMILIES`) + asignabilidad compile-time existente.
+- **Sin cambios de telemetría SoT**: cero eventos/params nuevos; `action_kind` (param existente)
+  ahora puede portar los 4 valores. Sin migración (`action_policy_json` JSONB + `action_kind` TEXT).
+- **Contract posture**: `greenhouse-growth-cta-popup.v1` se mantiene (ramas aditivas). Regla de
+  rollout: **ninguna CTA con action nueva se publica hasta que el bundle 1.2.0 esté desplegado en los
+  hosts objetivo**; un bundle viejo que reciba una rama nueva falla closed (evidencia:
+  `action_unsupported` en telemetría).
+- `dismiss` sigue como control/suppression del renderer; `download_asset`/`embed_growth_form`/
+  `hubspot_handoff` permanecen demand-driven (§12).
+
+## 28. Delta 2026-07-18 — TASK-1430: cockpit operator de autoría/reporting (code complete)
+
+- **`/growth/ctas` es el cockpit operator completo** (evoluciona la gobernanza de §TASK-1340):
+  master-detail sobre CompositionShell `split` (lead sobre el shell; nueva prop data-driven
+  `splitTemplateColumns` en la primitive — override de proporción de lanes, jamás un sistema de
+  regiones paralelo), inventario con filtros/navegación por teclado, detalle con lifecycle
+  completo (incluye `deprecate`/`archive` que la vista previa no exponía), kill switches
+  operables (global + per-surface, reason ≥5 chars auditado, `getKillSwitchState` +
+  `listKillSwitchAudit` en el page server), preview del renderer canónico y autoría gobernada
+  de 8 pasos en drawer (intención→placement→apariencia→contenido→acción→segmentación→preview→
+  revisión). Autoridad visual: proyecto Claude Design "Cockpit de CTAs" con tokens del theme
+  (navy Think = `customColors.midnight/deepAzure`; cero HEX inline).
+- **Métricas de marketing server-resolved (pedido explícito del operador):** reader canónico
+  `getCtaMarketingMetrics(ctaId, windowDays=30)` en `readers.ts` — impressions = rollup Tier B
+  `viewed` (`summarizeViewedExposureWindows`, browser-observed), clicks = ledger `clicked`
+  accepted, conversions = ledger `form_submitted|action_completed` **solo `server_confirmed`**
+  (los breadcrumbs `error` jamás cuentan); CTR/tasa de conversión + deltas ventana-a-ventana se
+  computan SERVER-side (la UI jamás deriva rates). Guard de cobertura: `coverage=
+  'impressions_undercounted'` cuando clicks>viewed en la ventana (tracking Tier B más nuevo que
+  el ledger) ⇒ la UI muestra conteos + nota, nunca un % físicamente imposible. Wired aditivo a
+  `CtaDetailVm.metrics` con degradación honesta (`null` = región parcial; lifecycle operable).
+- **Command surface:** `authorDraftCta` acepta `suppressionPolicy` opcional (validado con
+  `ctaSuppressionPolicySchema`; detail `suppression_policy_invalid`) — el paso de segmentación
+  del cockpit persiste la postura (antes el store recibía `{}` siempre). `CtaVersionVm` expone
+  `suppressionPolicy` + `visualAssetRef`; `CtaSummaryVm` expone `latestPlacement/StyleVariant/
+  ActionKind` (editar = versión nueva preserva todo; el publish deprecia la anterior, §7).
+- **Semántica del engine flag en el plano admin:** los **GET** admin (list/detail/surfaces/
+  kill-switch) y el **POST author** ya NO se gatean por `GROWTH_CTA_ENGINE_ENABLED` — el flag
+  gobierna la **exposición pública**, no la lectura de gobernanza ni el drafting (un draft no se
+  arbitra). Lifecycle (`publish/pause/resume/deprecate/archive`) y surfaces POST siguen gated.
+  El kill switch POST ya operaba sin flag (§24) — ahora su GET también.
+- **Binding surface↔CTA:** predicado canónico `surfaceAllowsCtaSlug(allowedSlugs, slug)` en
+  `contracts.ts` (allowlist vacía = admite todos; misma regla del store en
+  `listPublishedCandidates`) — el cockpit muestra bindings read-only; mutar allowlist sigue
+  siendo API-only (fuera de scope V1 del cockpit).
+- **Preview parity:** el harness monta el CORE del renderer (`.ghc-scope`, `inertNavigation`)
+  con un contract construido del draft (`buildPreviewContract`, mirror browser-safe); density
+  derivada por las container queries reales (badge con umbrales 560/400); esquema claro/oscuro
+  vía `color-scheme` (resuelve `light-dark()` nativo); matriz pairwise con `ScaledFrame`
+  (escala visual manteniendo px CSS ⇒ density verdadera); degradación del mount **bloquea la
+  revisión** (paridad no probada = no se envía).
+- GVC: `task-1430-growth-cta-cockpit` (desktop 1440, 17 frames) + `task-1430-growth-cta-cockpit-mobile`
+  (390, 9 frames; detalle = drawer canónico del shell). Sin flag nuevo, sin migración, sin
+  cambios de telemetría SoT. Task: `docs/tasks/in-progress/TASK-1430-*.md` (rollout: push +
+  smoke staging pendientes).

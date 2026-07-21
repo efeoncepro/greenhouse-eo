@@ -39,6 +39,8 @@ Cada generador tiene **sus términos**, y **no son iguales**:
 5. **Likeness/voz de persona real → release** (`06`); cuidado con leyes anti-deepfake.
 6. **Disclosure al cliente** cuando un entregable es (parcial/totalmente) generado por IA, y disclosure al público cuando la regulación/plataforma lo exija (`08`).
 7. **No metas datos personales/confidenciales del cliente** en herramientas IA sin gobernanza (privacidad `01`-`04` + `greenhouse-secret-hygiene`).
+8. **Studio Credits no son una licencia de IP.** La wallet mide consumo generativo; copyright, cesión, exclusividad, stock, música, likeness y voz se documentan y valorizan por separado.
+9. **Versiona la evidencia del proveedor.** Conserva proveedor/modelo, plan y versión de términos aplicables, provenance, intervención humana, prompts/inputs permitidos y releases. Un cambio de proveedor o términos puede cambiar el riesgo aunque la tarifa en créditos no cambie.
 
 ## En el contrato con el cliente
 
@@ -54,6 +56,7 @@ Cada generador tiene **sus términos**, y **no son iguales**:
 - [ ] Warranties/indemnidad del contrato ajustadas a la realidad IA (`05`).
 - [ ] Disclosure al cliente (y al público si aplica) (`08`).
 - [ ] Sin PII/confidencial en herramientas IA sin gobernanza.
+- [ ] Studio Credits separados de licencias, releases y pass-throughs; provenance y términos del proveedor versionados.
 
 ## Hand-off
 

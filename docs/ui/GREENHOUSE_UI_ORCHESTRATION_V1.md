@@ -7,13 +7,19 @@ Este documento existe para que la seleccion de UI no dependa de memoria individu
 
 ## Tesis
 
-Greenhouse no necesita un agente que "disene libremente".
+Greenhouse necesita dirección de producto y arte con **libertad acotada**:
+divergir en dos o tres composiciones reales, seleccionar una tesis visual y
+converger a AXIS, recipes, primitives y evidencia. El agente no pinta CSS
+arbitrario, pero tampoco reduce un diseño a la composición MUI más segura.
 
-Greenhouse necesita un orquestador que haga cuatro cosas bien:
-- leer una solicitud de interfaz
-- normalizarla a un brief operativo
-- mapearla a una familia de patrones permitidos
-- decir donde debe vivir la implementacion en el repo
+El orquestador canónico `greenhouse-ai-design-studio`:
+
+- normaliza la solicitud;
+- persiste o genera dirección visual;
+- selecciona recipe y first-fold;
+- mapea intención a tokens/primitives;
+- implementa estados y motion;
+- critica evidencia desktop/mobile hasta pasar el bar premium.
 
 ## Alcance
 
@@ -46,6 +52,8 @@ Este sistema no decide:
 - `docs/ui/GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md`: catalogo curado de patrones permitidos
 - `docs/ui/GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`: formato de normalizacion de solicitudes
 - `project_context.md`: estado operativo del repo y librerias activas
+- `docs/ui/GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md`: dirección,
+  readiness, evidencia y score visual
 
 ## Problema que resuelve
 
@@ -142,32 +150,45 @@ Si la solicitud normalizada cae en `shared_product_ui` y requiere una superficie
 
 ## Flujo de orquestacion
 
+Ninguna lista paralela de skills sustituye el orden y checkpoints de
+`greenhouse-ai-design-studio`.
+
 1. Confirmar fase, surface y actor
 - revisar si la fase actual permite construir esa vista o si primero falta modelar datos
 
-2. Normalizar la solicitud
+2. Persistir o generar dirección visual
+- usar modo `source-led` o `repo-native-benchmark`
+- comparar dos o tres direcciones y registrar selección/rechazos
+
+3. Normalizar la solicitud
 - usar `docs/ui/GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`
 - el prompt original del agente upstream se trata como insumo, no como verdad cerrada
 
-3. Inspeccionar la realidad local
+4. Inspeccionar la realidad local
 - revisar componentes ya existentes en `src/components/greenhouse/*`
 - revisar composicion actual de la ruta en `src/views/greenhouse/**`
 - revisar tipos y contratos server-side relevantes
 
-4. Elegir familia de patron
+5. Elegir surface recipe y familia de patron
 - primero seleccionar familia
 - despues seleccionar instancia concreta del catalogo
 
-5. Consultar `full-version` solo despues de elegir familia
+6. Consultar `full-version` sólo si aporta una referencia concreta
 - inspeccionar solo la referencia necesaria
 - no abrir paginas demo completas si el patron ya quedo decidido
 
-6. Decidir destino de implementacion
+7. Decidir destino de implementacion
 - `src/components/greenhouse/*` si la primitive repetira
 - `src/views/greenhouse/<modulo>/*` si la composicion es modulo-especifica
 - `src/views/greenhouse/admin/**` si es una superficie admin local todavia no reusable
 
-7. Emitir recomendacion operativa
+8. Contratar first-fold, responsive, action hierarchy, states y motion.
+
+9. Implementar first-fold y revisar desktop/mobile antes del wiring exhaustivo.
+
+10. Implementar, capturar dossier GVC premium, puntuar e iterar.
+
+11. Emitir recomendacion/veredicto operativo
 - patron principal
 - alternativa aceptable si existe
 - referencias `full-version`

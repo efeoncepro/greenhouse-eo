@@ -40,7 +40,7 @@
 - **Seed**: semilla que fija/varía una generación; misma seed = resultado reproducible.
 - **Inpaint / outpaint**: editar una zona interna / extender el lienzo.
 - **Upscale**: subir resolución/detalle (ej. Magnific). **Reference / @ reference**: guiar la
-  generación con imágenes de referencia (Seedance soporta hasta 50 + audio).
+  generación con referencias (Seedance 2.0 admite hasta 9 imágenes, 3 videos y 3 audios; máximo 12 archivos).
 - **Región edit**: re-dibujar parte de un frame sin tocar el resto.
 - **AI disclosure**: revelar cuando una imagen IA podría confundirse con foto real, si el contexto lo
   exige. "Ante la duda, revela."
@@ -54,7 +54,7 @@
 - **Recraft**: **vectores editables reales** (logos/iconos/packaging).
 - **Ideogram**: texto-en-imagen (posters/thumbnails).
 - **FLUX.2**: realismo + params de cámara.
-- **Seedance** (2.0/2.5): video top con control por referencias (ByteDance).
+- **Seedance 2.0**: video ByteDance con control por referencias. **2.5** permanece bloqueado/no verificado en Fal.
 - **Veo 3.1**: video broadcast/cine (Google). **Kling 3.0**: video económico. **Gemini Omni**:
   video multimodal con edición conversacional. **Sora 2**: deprecado (no usar).
 

@@ -1,40 +1,6 @@
 ---
 name: digital-marketing
-description: >-
-  Skill experta y robusta de Marketing Digital (canales, craft y campañas) al
-  estado del arte 2026. Úsala para planear, ejecutar y auditar marketing por
-  canal: marca y arquitectura de mensaje en digital, content marketing (estrategia
-  editorial, formatos, distribución, thought leadership, GEO como canal), paid
-  media / performance advertising (Google/Meta/LinkedIn/TikTok, PMax/Advantage+,
-  programmatic, retargeting, estructura de cuenta, bidding, presupuesto/pacing,
-  creative testing, signal loss post-cookie, IA en pauta), social orgánico +
-  comunidad (creator/influencer economy, dark social, community-led), creatividad
-  y video (creative-as-targeting, hooks, UGC, IA creativa), email marketing y
-  marketing automation como canal (newsletters, nurture/drip, segmentación, MAP),
-  campañas integradas y GTM launches (PR digital, influencer, ABM), martech y
-  marketing ops (stack, CDP, first-party data, taxonomía UTM, tag management,
-  reporting) e IA en marketing (generativo, agentes, gobernanza/brand safety).
-  COMPLEMENTARIA pero DISTINTA de growth-marketing-cro: Digital Marketing TRAE y
-  ENGANCHA a la audiencia por canales; Growth+CRO la CONVIERTE, ACTIVA, RETIENE y
-  MIDE como sistema. Delega a growth-marketing-cro (CRO/conversión, experimentación,
-  activación, retención, arquitectura de atribución/tracking, loops, PLG), a seo-aeo
-  (SEO técnico/AEO/GEO por-motor/schema), a commercial-expert (pricing/pipeline/
-  quote-to-cash), a efeonce-agency (doctrina marca/GTM/ASaaS), a efeonce-public-site-
-  wordpress (publishing + AI Content Factory) y a greenhouse-email (plantillas/entrega
-  runtime). Incluye overlay Efeonce/Greenhouse. Triggers: "marketing digital",
-  "campaña", "campaign brief", "paid media", "pauta", "publicidad", "Google Ads",
-  "Meta Ads", "Facebook Ads", "Instagram Ads", "LinkedIn Ads", "TikTok Ads",
-  "programmatic", "PMax", "Performance Max", "Advantage+", "retargeting",
-  "remarketing", "ROAS", "CPM", "CPC", "CPA", "content marketing", "calendario de
-  contenido", "content calendar", "thought leadership", "social media", "redes
-  sociales", "community", "comunidad", "influencer", "creator", "UGC", "creative",
-  "ad creative", "video marketing", "email marketing", "newsletter", "nurture",
-  "drip", "marketing automation", "MAP", "campaña integrada", "GTM launch",
-  "lanzamiento", "ABM", "account-based marketing", "digital PR", "martech", "CDP",
-  "first-party data", "UTM", "media mix", "brand awareness", "IA en marketing",
-  "generative marketing", "agentic marketing".
-user-invocable: true
-argument-hint: "[canal/campaña o pregunta específica — ej: 'plan de paid media para /aeo-2', 'campaña de lanzamiento del grader', 'calendario de contenido del blog', 'estrategia de LinkedIn B2B']"
+description: Diseña, ejecuta y audita marketing digital por canales y campañas. Use for paid media, social, content, email, creative testing, video, integrated campaigns, martech y AI marketing; separa media spend de Creative Studio production y delega conversión/atribución a Growth+CRO.
 ---
 
 # Marketing Digital — Skill operativa 2026
@@ -149,7 +115,7 @@ mide cada canal. Nunca saltes a "hagamos TikTok" sin objetivo/audiencia/mensaje.
 | **Content marketing**: estrategia editorial, formatos, distribución, repurposing, thought leadership, content-led demand, GEO como canal | `modules/02_CONTENT_MARKETING.md` — para **ejecución profunda del motor de contenidos** (content ops/pipeline, producción, atomización, formatos, medición contenido→pipeline, Content Factory) → skill **`content-marketing-studio`** |
 | **Paid media / performance advertising**: Google/Meta/LinkedIn/TikTok, PMax/Advantage+, programmatic, retargeting, cuentas, bidding, presupuesto, creative testing, signal loss, IA | `modules/03_PAID_MEDIA.md` ⭐ |
 | **Social orgánico + comunidad** (nivel canal/estrategia): rol de social en el mix, calendario dentro de la campaña integrada | `modules/04_ORGANIC_SOCIAL_COMMUNITY.md` — para **ejecución profunda por red** (algoritmos/formatos/comunidad/creator/social commerce/producción + programar con Metricool) → skill **`social-media-studio`** |
-| **Creatividad y video**: creative strategy, creative-as-targeting, hooks, formatos, video-first, UGC ads, IA creativa | `modules/05_CREATIVE_VIDEO.md` |
+| **Creatividad y video**: creative strategy, creative-as-targeting, hooks, formatos, video-first, UGC ads, IA creativa | `modules/05_CREATIVE_VIDEO.md`; producción/credits → skills Creative Studio |
 | **Email marketing / automation como canal**: newsletters, campañas, nurture/drip, segmentación, MAP | `modules/06_EMAIL_MARKETING_AUTOMATION.md` |
 | **Campañas integradas / GTM launches**: orquestación multicanal, messaging architecture, calendarios, presupuesto, PR digital, influencer, **ABM** | `modules/07_INTEGRATED_CAMPAIGNS.md` |
 | **Martech / marketing ops**: stack, CDP, first-party data, **taxonomía UTM/campaña**, tag management, reporting, consolidación | `modules/08_MARTECH_MARKETING_OPS.md` |
@@ -250,3 +216,8 @@ marketing), **nómbralo y encadena** a la skill dueña.
    sin oversight = riesgo de marca, legal y de confianza. Ética por diseño (`ANTIPATTERNS`).
 8. **Diversifica canales.** El monocanal es frágil. Portafolio > apuesta única al algoritmo
    de una plataforma.
+9. **Pauta no es producción y producción no es una pieza tarifaria.** En campañas con Creative Studio separa
+   media spend/activation de Studio Credits y regístralo como pass-through/plan de medios dentro de la quinta
+   línea. Digital Marketing define hipótesis, matriz y canal;
+   las skills de producción estiman operaciones generativas bajo Studio Credits. Layout, edición, QA y export
+   determinísticos consumen 0 credits, pero tienen costo humano; rights/creator/whitelisting quedan separados.

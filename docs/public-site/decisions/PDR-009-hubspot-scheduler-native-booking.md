@@ -1,9 +1,9 @@
 # PDR-009 — Booking nativo con HubSpot Scheduler API
 
 > **Tipo:** Product Decision Record para conversiones del sitio publico.
-> **Estado:** Accepted — direction for validation, no runtime cutover.
+> **Estado:** Accepted — conditional pass; no runtime cutover.
 > **Fecha:** 2026-07-08.
-> **Task:** [`TASK-1366`](../../tasks/to-do/TASK-1366-hubspot-scheduler-booking-equivalence.md).
+> **Task:** [`TASK-1366`](../../tasks/complete/TASK-1366-hubspot-scheduler-booking-equivalence.md).
 > **Superficies afectadas:** `efeoncepro.com`, `think.efeoncepro.com`, Growth CTA engine, landings publicas con CTA "Agenda una reunion".
 
 ## Contexto
@@ -27,6 +27,46 @@ La decision no autoriza reemplazar el iframe en ninguna landing todavia. Autoriz
 - La API de CRM Meetings (`/crm/v3/objects/meetings`) no reemplaza scheduling: registra/administra actividad de reunion, pero no debe asumirse como reserva de calendario ni generacion de Teams.
 - La Scheduler API no preserva por si sola el tracking nativo de UTK/UTM/content tracking como un embed/form HubSpot. La mitigacion propuesta es medicion Greenhouse/GTM + envio complementario por Forms API con `context.hutk` cuando aplique.
 
+## Evidencia final TASK-1366 — 2026-07-21
+
+- El app `Efeonce Data Platform` fue desplegado/reinstalado con el scope mínimo
+  `scheduler.meetings.meeting-link.read`; el token estático gobernado existente adquirió el permiso sin rotación.
+- El slug API canónico es `efeoncepro/agenda-discovery` codificado como un solo segmento de path. El leaf
+  `agenda-discovery` aislado responde `slug does not exist`.
+- Details + availability están runtime-verificados: `GROUP_CALENDAR`, `isOffline=false`, un calendario
+  `OFFICE365`, duración 30 minutos, campo `company` obligatorio, consentimiento legal habilitado y slots reales.
+- El primer email aprobado fue rechazado por política de HubSpot con `MeetingsBookingCreatedError.BLOCKED_EMAIl`;
+  el harness expone subcategoría/context keys sin registrar valores. Un destinatario alternativo fue aprobado.
+- El booking controlado devolvió `isOffline=false`, `calendarEventId` y `contactId` presentes, start/end correctos
+  y `webConferenceUrl` con host `teams.microsoft.com`; `webConferenceMeetingId` no fue necesario.
+- El read-back CRM confirmó contacto, reunión asociada, outcome `SCHEDULED` y Teams como location.
+- Outlook autenticado confirmó el evento 09:15–09:45 en el calendario del organizador, el invitado correcto en
+  estado `sin respuesta`, Teams y links nativos de reprogramación/cancelación en notas.
+
+### Postura de atribución
+
+- Scheduler API no acepta `hubspotutk`, UTM ni content tracking en el payload, y tampoco expone una operación de
+  reprogramación. No se debe prometer paridad de atribución HubSpot nativa con el embed.
+- Los eventos de CTA/embed existentes siguen siendo mid-funnel. Una reserva solo se considera conversión cuando
+  el servidor recibe confirmación exitosa de Scheduler; al productizar, esa evidencia debe mapear a
+  `generate_lead` de GA4, no a un evento browser autorreportado ni a una nueva key event paralela.
+- El adapter futuro debe conservar server-side solo campaña allowlisted (`utm_*`, referrer, page, surface y
+  correlation), sin PII en `dataLayer`.
+- Forms API + `context.hutk` queda como mitigación opcional, no default: requiere consentimiento vigente,
+  deduplicación y una decisión explícita porque agrega actividad de form además del booking. Los hosts públicos
+  hoy no tienen CMP/Consent Mode default, por lo que no puede asumirse ese gate.
+- No se cambia `TRACKING-PLAN.md` todavía: esta task no crea runtime ni evento nuevo. La task de productización
+  deberá registrar el rail server-confirmed antes de publicar GTM/Measurement Protocol.
+
+### Veredicto
+
+`CONDITIONAL PASS`. La Scheduler API preserva los side effects core que justificaban el spike: calendario,
+Teams, contacto y actividad CRM. La evidencia del organizador muestra al invitado y los links nativos; el inbox
+del destinatario no se inspeccionó directamente. La condición de productización es implementar un adapter
+server-side con idempotencia, abuso/rate-limit, consentimiento/atribución, observabilidad y QA de entrega.
+
+Este veredicto habilita planificar el adapter; no autoriza insertar booking nativo ni retirar el iframe.
+
 Fuentes:
 
 - `https://developers.hubspot.com/docs/api-reference/latest/scheduler/meetings/create-meeting`
@@ -35,6 +75,7 @@ Fuentes:
 - `https://knowledge.hubspot.com/meetings-tool/use-meetings`
 - `https://developers.hubspot.com/docs/api-reference/legacy/crm/activities/meetings/guide`
 - `https://developers.hubspot.es/docs/api-reference/legacy/marketing/forms/v3-legacy/submit-data-authenticated`
+- `https://support.google.com/analytics/answer/9267735?hl=es-419`
 
 ## Pass/fail para reemplazar el widget
 
@@ -63,8 +104,9 @@ Si cualquiera de los puntos core falla, se mantiene el widget oficial y se invie
 
 ## Consecuencias
 
-- `HubSpotMeetingEmbed` sigue vigente como primitive candidata/fallback.
-- El action router futuro de `growth.cta` puede graduar `book_meeting` solo despues del spike.
+- `HubSpotMeetingEmbed` sigue vigente como primitive candidata/fallback hasta el rollout del adapter.
+- El action router futuro de `growth.cta` puede agregar un adapter nuevo (`native_booking`/`hubspot_handoff`),
+  sin cambiar el `book_meeting` navigation-only existente.
 - Las landings con open question de mecanismo CTA (`/agencia`, creativa, HubSpot, redes) ganan una decision comun en vez de resolver meeting por pagina.
 - La medicion de booking debe ser Greenhouse-first: `gh_cta_clicked`, eventos de meeting, conversion server-confirmed y reconciliacion con HubSpot/GA4.
 
@@ -80,4 +122,4 @@ Si cualquiera de los puntos core falla, se mantiene el widget oficial y se invie
 - Growth CTA engine: `docs/architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_DECISION_V1.md`
 - Public Site primitives: `docs/architecture/public-site/PRIMITIVES.md`
 - Tracking plan: `docs/reference/measurement-gtm-ga4/TRACKING-PLAN.md`
-- Task de validacion: `docs/tasks/to-do/TASK-1366-hubspot-scheduler-booking-equivalence.md`
+- Task de validacion: `docs/tasks/complete/TASK-1366-hubspot-scheduler-booking-equivalence.md`

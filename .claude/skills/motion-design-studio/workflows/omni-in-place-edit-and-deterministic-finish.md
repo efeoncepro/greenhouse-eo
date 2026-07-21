@@ -2,6 +2,8 @@
 
 > **Estado:** validado sólo para ajustes editoriales que no cambian la verdad física del plano. La recuperación Glitch V2 (2026-07-11) delimita una excepción importante.
 >
+> **⚠️ Cambio de API (2026-07-20):** la **edición Omni migró a la Interactions API** y ahora vive **solo en la superficie Gemini-key** (`generativelanguage.googleapis.com/v1beta/interactions?key=…`), con `previous_interaction_id` + `store:true`. La **Vertex KEYLESS no edita** (`previous_interaction_id` → `400`; `GET /interactions/{id}` → `500`) — sirve solo generación. El piloto Glitch (`@google/genai` con `vertexai:true` sobre `generateContent`) usó un camino **ya retirado**; el aprendizaje operativo (clasificar el cambio, gate temporal, finish determinista) **sigue vigente**, pero el contrato de invocación cambió. Ver `../efeonce/GEMINI_OMNI_VERTEX.md §0/§4`.
+>
 > **Evidencia:** `ai-generations/2026-07-11_glitch-microphone-intro/pilot-retrospective.md` y [recovery-plan-v2-integral-practical-and-foley.md](../../../../ai-generations/2026-07-11_glitch-microphone-intro/recovery-plan-v2-integral-practical-and-foley.md). El candidato I está rechazado creativamente.
 >
 > **Límite de confianza:** una edición Omni persistente fue procesada y recuperada, pero se **rechazó** por artefactos de continuidad. El finish determinista sirve para montaje reversible sobre una actuación ya válida; **no** valida simular una actuación física ni insertar un practical diegético después. Revalidar disponibilidad, parámetros y pricing de Omni antes de cada producción.
@@ -46,8 +48,8 @@
 
 1. Verificar duración, fps, dimensiones, audio y hash del master. Guardar un export de rollback.
 2. Escribir un prompt de una sola intención: **qué cambia, cuándo cambia, qué se preserva y qué no debe aparecer**. No combinar cámara, anatomía, estilo, señal y tipografía en un mismo pedido.
-3. Usar `@google/genai` sobre Vertex `global`; para una edición que puede tardar, crear la interacción con `background:true` y `store:true`, y hacer polling por ID.
-4. Para `task:'edit'`, **no enviar `response_format.aspect_ratio`**: en Glitch devolvió `400 Aspect ratio cannot be set in response format for edit task`. El edit preserva el aspect del input.
+3. Editar es **stateful** y corre en la **superficie Gemini-key** (`POST https://generativelanguage.googleapis.com/v1beta/interactions?key=API_KEY`) encadenando `previous_interaction_id` — la Vertex keyless **no** edita (`400`). El clip base tuvo que generarse con `store:true`; el preview aguanta ~3 ediciones secuenciales y el store retiene 55 días (pago) / 1 día (free). Para una edición que puede tardar, crea la interacción con `background:true` + `store:true` y haz polling por ID.
+4. Para `task:'edit'`, **no enviar `response_format.aspect_ratio`**: devolvió `400 Aspect ratio cannot be set in response format for edit task`. El edit preserva el aspect del input.
 5. Extraer video sólo de `steps[type='model_output'].content[type='video']`; no recorrer recursivamente la interacción, porque podrías escribir el video de entrada como falso output.
 
 ### 2. Gate de recuperación y revisión temporal

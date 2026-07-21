@@ -21,7 +21,8 @@ import {
   axisChartDirectional,
   axisChartDirectionalDark
 } from './axis-chart'
-import { axisMain } from './axis-tokens'
+import { axisMain, axisOpacity, axisRamp } from './axis-tokens'
+import { greenhouseSecondaryPalette } from './axis-secondary'
 
 import { axisSemanticHex, axisSemanticPalette } from './axis-semantic'
 
@@ -42,6 +43,40 @@ describe('AXIS semantic SoT (axisSemanticHex)', () => {
     expect(axisSemanticHex.warning).toBe(axisSemanticPalette.warning.main)
     expect(axisSemanticHex.error).toBe(axisSemanticPalette.error.main)
     expect(axisSemanticHex.info).toBe(axisSemanticPalette.info.main)
+  })
+})
+
+describe('Greenhouse Tidal Teal secondary SoT', () => {
+  it('pins the approved 100→900 ramp and 500 anchor', () => {
+    expect(axisRamp.secondary).toEqual({
+      100: '#ddf9f5',
+      200: '#b5f0e8',
+      300: '#79e0d4',
+      400: '#3bcbbd',
+      500: '#12afa2',
+      600: '#0c9188',
+      700: '#0b726c',
+      800: '#0a5955',
+      900: '#083f3d'
+    })
+    expect(axisMain.secondary).toBe('#12afa2')
+  })
+
+  it('pins the canonical opacity scale from secondary-500', () => {
+    expect(axisOpacity.secondary).toEqual({
+      8: '#12afa214',
+      16: '#12afa229',
+      24: '#12afa23d',
+      32: '#12afa252',
+      38: '#12afa261'
+    })
+  })
+
+  it('maps semantic roles per mode instead of reusing one low-contrast value', () => {
+    expect(greenhouseSecondaryPalette).toEqual({
+      light: { main: '#0b726c', light: '#12afa2', dark: '#0a5955', contrastText: '#FFFFFF' },
+      dark: { main: '#3bcbbd', light: '#79e0d4', dark: '#12afa2', contrastText: '#022A4E' }
+    })
   })
 })
 

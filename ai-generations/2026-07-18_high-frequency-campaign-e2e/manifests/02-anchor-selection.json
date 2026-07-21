@@ -1,0 +1,19 @@
+{
+  "stage": "select",
+  "selectedTerritory": "t02-chromatic-wake",
+  "selectedSource": "work/territories/t02-chromatic-wake.png",
+  "score": 27,
+  "maximumScore": 30,
+  "decision": "Strongest visual translation of one high-standard creative direction scaling into many campaign assets.",
+  "developmentRisk": "The lower-left chromatic wake competes with copy; reserve the upper-left field during Pro development.",
+  "rejected": [
+    {
+      "territory": "t01-iridescent-precision",
+      "reason": "Best beauty/craft result but weaker explicit scale mechanism."
+    },
+    {
+      "territory": "t03-modular-orbit",
+      "reason": "Clear multi-format metaphor but too close to generic glass-UI language."
+    }
+  ]
+}

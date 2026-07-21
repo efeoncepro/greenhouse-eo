@@ -1,9 +1,6 @@
 ---
 name: greenhouse-public-private-tenders
-description: Operador experto de licitaciones públicas y privadas (Chile a fondo + LATAM como matriz). Úsala para descubrir, calificar (bid/no-bid), preparar, cotizar, garantizar, presentar y hacer seguimiento de licitaciones y RFP/RFQ/RFI. Cubre Ley 19.886 + reforma 21.634, ChileCompra/Mercado Público, modalidades (Licitación Pública/Privada, Trato Directo, Convenio Marco, Compra Ágil), códigos de procedimiento (L1/LE/LP/LS/COT), bases administrativas y técnicas, criterios de evaluación, garantías (seriedad/fiel cumplimiento), inhabilidades e integridad, matriz de portales LATAM (SECOP, SEACE, PNCP, CompraNet, COMPR.AR…), y tenders privados/corporativos (Ariba, Coupa, Fieldglass, Achilles/SICEP). Alimenta el módulo runtime RESEARCH-007 y se apoya en commercial-expert, copywriting, finance-accounting-operator, talent-people-operator y task-planner. Triggers: "licitación", "licitaciones", "mercado público", "chilecompra", "convenio marco", "compra ágil", "trato directo", "bases administrativas/técnicas", "garantía de seriedad", "fiel cumplimiento", "bid/no-bid", "RFP", "RFQ", "RFI", "propuesta técnica", "oferta económica", "SECOP", "SEACE", "PNCP", "CompraNet", "adjudicación", "oferente".
-type: skill
-user-invocable: true
-argument-hint: "[país/etapa del bid o pregunta concreta]"
+description: Opera licitaciones públicas y privadas en Chile y LATAM desde discovery y bid/no-bid hasta propuesta, pricing, garantías, presentación y seguimiento. Use for RFP/RFQ/RFI, Mercado Público, oferta técnica/económica, Managed Squad, Studio Access y Studio Credits dentro de un bid.
 ---
 
 # greenhouse-public-private-tenders — Operador de Licitaciones
@@ -85,6 +82,7 @@ En una licitación de contenidos **todas las ofertas dicen lo mismo** ("optimiza
 6. **Human-in-control en la presentación.** La skill/agente **prepara** el paquete; **nunca** envía una oferta ni firma sin confirmación humana explícita. No almacenar credenciales ni cookies de los portales.
 7. **Evidence-first.** Toda clasificación (fit, monto, plazo, riesgo) cita el campo/documento que la sustenta (nombre vs bases técnicas vs items). Nombre pesa menos que bases técnicas.
 8. **es-CL neutro, tuteo.** Sin voseo ni modismos rioplatenses. Copy visible pasa por `copywriting` / `greenhouse-ux-writing`.
+9. **Creative Studio se cotiza por capas, no por una falsa tarifa por pieza.** Si el bid incluye producción generativa, separa acceso/gobernanza, capacidad humana, Studio Credits, implementación/IP y derechos/licencias/pass-through. El precio total exigido por las bases puede consolidarse hacia afuera, pero la hoja económica interna conserva las cinco líneas y su margen.
 
 9. **El deal vive en un workspace canónico (el "DSR interno").** Arráncalo con `pnpm tender:new <slug>`: carpeta con `bases/` (RFP) · `research/` (investigación 🔒) · `oferta-tecnica.md` (fuente + ledger de evidencia) · `deck-plan.json` · `artifact-manifest.json` (piezas vivas por enlace) · `anexos/` · `*-INTERNO`. El discriminador que manda es **audiencia**: `research/` + `*-INTERNO` **nunca** cruzan al cliente. Las fuentes son archivos git (NO `proposal_assets`); el aggregate `Proposal` referencia la carpeta por `proposal_id`. Contrato: `docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md`.
 
@@ -98,6 +96,7 @@ Esta skill **decide y estructura**; delega el craft especializado. Declara siemp
 | Qué servicios puede ofertar Efeonce, matching de rubro/BU | `efeonce-agency` | El catálogo de servicios y las BU (Globe/Wave/Reach…) son de agency; acá se usan para el fit |
 | Redacción persuasiva de la propuesta | `copywriting` | Esta skill define QUÉ va y la estructura; copywriting el CÓMO se escribe |
 | Garantías, costeo, cashflow, factoring, indexación UF/UTM, margen | `greenhouse-finance-accounting-operator` | Loaded cost y tesorería son de finance; acá se consumen para el precio/garantía |
+| Creative Studio, Studio Credits y estimaciones por pieza | `efeonce-agency` + `creative-practice` + `greenhouse-finance-accounting-operator` | El bid traduce el alcance; el modelo canónico define créditos y Finance aprueba equivalencias/margen |
 | Equipo, CVs, competencias para la oferta técnica | `greenhouse-talent-people-operator` | El staffing/competencias es de talent; acá se ensamblan en el anexo técnico |
 | Convertir un "GO" en trabajo operable | `greenhouse-task-planner` | Un GO genera un capture plan/TASK-### con plazos y owners |
 | Pipeline comercial y bid desk | `hubspot-greenhouse-bridge` + `notion-platform` | La oportunidad vive como deal (HubSpot) y como ficha de bid (Notion/módulo) |
@@ -128,55 +127,3 @@ Esta skill **decide y estructura**; delega el craft especializado. Declara siemp
 | `compliance-riesgo-integridad.md` | Checklist de admisibilidad, inhabilidades, probidad/conflicto de interés, subcontratación, PI/confidencialidad, multas y sanciones |
 | `data-sources-apis.md` | API Mercado Público v1 (ticket DCCP) + Compra Ágil v2 Beta, adjuntos WebForms, POC `scripts/research/mercadopublico-poc/`, conexión al módulo RESEARCH-007, MCP Legal Data Hunter, HubSpot/Notion |
 | `proposal-studio-runtime.md` | **El runtime SHIPPED (TASK-1392/1393/1391 + 1415, 2026-07-12→16)**: cómo USAR el pipeline completo (Proposal → evidencia → manifest → render job gobernado → `artifact-worker` → PDF versionado en asset store → ver/descargar en el portal) y cómo EVOLUCIONARLO (costuras: catálogo nuevo, outputTarget, brand pack, fase agéntica con el molde propose→confirm→execute, **un chapter-author nuevo** — implementar la interface de `proposals/authoring/`, jamás tocarla —, failure codes, constraints del RFP) — lo primero que lee un agente nuevo que va a tocar el motor |
-
-## Reglas duras (hard rules)
-
-1. **Nada de norma/umbral/plazo/monto como verdad eterna.** El derecho de compras cambia (Chile: **Ley 21.634/2023** modernizó la 19.886; Compra Ágil pasó de 30 a **100 UTM**; LATAM reforma seguido). Cita la fuente y su año, y recomienda verificar la versión vigente antes de actuar. Si no puedes verificar, dilo explícito.
-2. **Admisibilidad primero.** Antes de invertir horas en la oferta, corre el checklist de requisitos excluyentes + inhabilidades (`compliance-riesgo-integridad.md`). El error #1 que deja a Efeonce fuera es un anexo/declaración jurada faltante o una garantía mal constituida — no el precio.
-3. **Nunca un GO sin margen proyectado sobre loaded cost.** Alinea con el ASaaS Manifesto (`commercial-expert` overlay: "nunca SOW sin loaded cost + margen"). Un score de fit alto con margen negativo es un NO-BID.
-4. **No identidades paralelas.** La oportunidad extiende el modelo canónico 360: `public_opportunity → deal → quote → SOW → delivery`. El comprador público mapea a `organization/account`. Ver `data-sources-apis.md` + `arch-architect`.
-5. **Señales no canónicas ≠ servicios.** Los hits de medios/PR/influencers/staff-aug que aún no son servicio canónico del catálogo se guardan como `signals`, **nunca** dentro de `servicios_matched` (hallazgo TASK-673).
-6. **Human-in-control en la presentación.** La skill/agente **prepara** el paquete; **nunca** envía una oferta ni firma sin confirmación humana explícita. No almacenar credenciales ni cookies de los portales.
-7. **Evidence-first.** Toda clasificación (fit, monto, plazo, riesgo) cita el campo/documento que la sustenta (nombre vs bases técnicas vs items). Nombre pesa menos que bases técnicas.
-8. **es-CL neutro, tuteo.** Sin voseo ni modismos rioplatenses. Copy visible pasa por `copywriting` / `greenhouse-ux-writing`.
-
-## Sinergias — tabla de hand-off
-
-Esta skill **decide y estructura**; delega el craft especializado. Declara siempre a quién pasas la posta:
-
-| Necesitas… | Delega en | Frontera |
-|---|---|---|
-| Estrategia de deal, pricing/packaging, ASaaS doctrine, ICP Globe | `commercial-expert` (+ overlay Efeonce) | Esta skill trae la oportunidad; commercial-expert decide el motion comercial |
-| Qué servicios puede ofertar Efeonce, matching de rubro/BU | `efeonce-agency` | El catálogo de servicios y las BU (Globe/Wave/Reach…) son de agency; acá se usan para el fit |
-| Redacción persuasiva de la propuesta | `copywriting` | Esta skill define QUÉ va y la estructura; copywriting el CÓMO se escribe |
-| Garantías, costeo, cashflow, factoring, indexación UF/UTM, margen | `greenhouse-finance-accounting-operator` | Loaded cost y tesorería son de finance; acá se consumen para el precio/garantía |
-| Equipo, CVs, competencias para la oferta técnica | `greenhouse-talent-people-operator` | El staffing/competencias es de talent; acá se ensamblan en el anexo técnico |
-| Convertir un "GO" en trabajo operable | `greenhouse-task-planner` | Un GO genera un capture plan/TASK-### con plazos y owners |
-| Pipeline comercial y bid desk | `hubspot-greenhouse-bridge` + `notion-platform` | La oportunidad vive como deal (HubSpot) y como ficha de bid (Notion/módulo) |
-| Frontera del runtime (schema, ingesta, objeto canónico) | `arch-architect` (overlay) + `greenhouse-backend` | Esta skill NO diseña tablas; declara el contrato y delega |
-| Rubro de servicios de marketing/SEO/AEO en la licitación | `seo-aeo` / `digital-marketing` | Solo si la licitación pide esos servicios; para calibrar fit y propuesta técnica |
-
-## Postura y estilo de salida
-
-- **Opinada y accionable.** No listas académicas de opciones: recomienda la jugada, con el porqué.
-- **Estructura por etapa.** Si el usuario está en discovery, no le des el manual de adjudicación; responde a su etapa y ofrece el siguiente paso.
-- **Checklist antes que prosa** para admisibilidad, anexos y plazos (son binarios y load-bearing).
-- **Cierra con el hand-off.** Termina indicando qué skill/owner toma la siguiente posta.
-
-## Mapa de companions
-
-| Archivo | Contenido |
-|---|---|
-| `bid-construction-playbook.md` | **Método end-to-end (director de orquesta):** las 10 fases para construir una propuesta completa (intake→admisibilidad→bid/no-bid→contexto→alcance→squad→pricing→redacción→económica→export→presentación) + qué skill entra en cada fase + regla de documentación viva |
-| `chile-publico-marco-legal.md` | Ley 19.886 + reforma 21.634, Reglamento DS 250, DCCP/ChileCompra, inhabilidades art. 4, ChileProveedores, Contraloría/toma de razón, Tribunal de Contratación Pública, recursos |
-| `chile-publico-operativo.md` | Modalidades y códigos (L1/LE/LP/LS, privadas, trato directo, Convenio Marco, Compra Ágil COT), bases admin+técnicas, criterios ponderados, foro, apertura, evaluación, adjudicación, garantías |
-| `bid-lifecycle-go-no-go.md` | Pipeline canónico discovered→screened→triage→evaluate→plan-bid→submit→reconcile; scoring explicable (10 componentes) + decision bands; matcher hygiene (falsos positivos) |
-| `pricing-garantias-finance.md` | Costeo (cost-plus vs valor) sobre loaded cost, indexación UF/UTM, instrumentos de garantía y su costo/cashflow, plazos de pago del Estado, factoring |
-| `propuesta-tecnica-economica.md` | Estructura de la oferta (técnica/económica/administrativa), matriz de cumplimiento, anexos y declaraciones juradas, armado del equipo/casos |
-| `deck-visual-system.md` | **Sistema visual del deck:** el deck se **compone** desde un catálogo cerrado de **28 plantillas** (2026-07-14: +TeamGalleryFull — roster de fotos reales, resolver `squad-person` allowlist cerrada; enlaces `https://` clickeables en el PDF; agenda con páginas derivadas) (nunca freehand) + las 5 reglas del molde (degradado vibrante — **nunca navy plano** · tipografía sin Black/900 · safe-area · íconos Solar · glass milky) + el **selector determinista** (`registry.json`, 1 content-type → 1 plantilla) + **3D icons clay** (curar > generar; 3 filtros) + **guardrail de fotos del equipo** (fotos reales, **nunca caras IA**) + render HTML→Chromium |
-| `latam-portales-matriz.md` | Por país (CL, CO, PE, BR, MX, AR, PA, CR, EC, UY): portal, órgano rector, ley, registro de proveedor, particularidades, madurez de API |
-| `privado-rfp-lifecycle.md` | Tenders corporativos vendor-side: RFI/RFP/RFQ y cuándo es cuál, sourcing events, evaluación por el comprador, shortlist, negociación/BAFO, reverse auction, cómo ganar, diferencias con lo público |
-| `privado-plataformas-sectores.md` | E-procurement (SAP Ariba, Coupa, Jaggaer, GEP, Oracle, SAP Fieldglass/VMS), precalificación y registros (Achilles, SICEP, REPRO, TVEC privado), y playbooks por sector (minería, energía, retail, banca, telco, salud privada) |
-| `compliance-riesgo-integridad.md` | Checklist de admisibilidad, inhabilidades, probidad/conflicto de interés, subcontratación, PI/confidencialidad, multas y sanciones |
-| `data-sources-apis.md` | API Mercado Público v1 (ticket DCCP) + Compra Ágil v2 Beta, adjuntos WebForms, POC `scripts/research/mercadopublico-poc/`, conexión al módulo RESEARCH-007, MCP Legal Data Hunter, HubSpot/Notion |
-| `proposal-studio-runtime.md` | **El runtime SHIPPED (TASK-1392/1393/1391, 2026-07-12)**: cómo USAR el pipeline completo (Proposal → evidencia → manifest → render job gobernado → `artifact-worker` → PDF en asset store) y cómo EVOLUCIONARLO (costuras: catálogo nuevo, outputTarget, brand pack, fase agéntica con el molde propose→confirm→execute, failure codes, constraints del RFP) — lo primero que lee un agente nuevo que va a tocar el motor |

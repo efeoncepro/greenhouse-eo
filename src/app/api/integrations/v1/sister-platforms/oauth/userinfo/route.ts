@@ -40,7 +40,8 @@ export async function GET(request: Request) {
     return NextResponse.json(result.identity, {
       status: 200,
       headers: {
-        'cache-control': 'no-store'
+        'cache-control': 'no-store',
+        'x-correlation-id': result.correlationId
       }
     })
   } catch (error) {

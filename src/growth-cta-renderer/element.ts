@@ -19,6 +19,7 @@ import { CtaContractLoadError, fetchArbitratedContracts, postCtaEvent, type CtaA
 import type { CtaRenderContractMirror } from './contract'
 import { resolveCtaSystemCopy } from './copy'
 import { openGrowthForm } from './action'
+import { MeetingActivationController } from './meeting-action'
 import { CtaRenderer } from './renderer'
 import { observeVisibleOnce, SlideInController } from './slide-in'
 import { ensureStylesInjected } from './styles'
@@ -51,6 +52,7 @@ export class GreenhouseCtaElement extends HTMLElement {
   private slideIn: SlideInController | null = null
   private viewedCleanup: (() => void) | null = null
   private loaded = false
+  private meetingControllers = new Map<string, MeetingActivationController>()
 
   static get version(): string {
     return RENDERER_VERSION
@@ -84,6 +86,7 @@ export class GreenhouseCtaElement extends HTMLElement {
     this.renderer = null
     this.slideIn?.destroy()
     this.slideIn = null
+    this.disposeMeetingControllers()
   }
 
   attributeChangedCallback(): void {
@@ -164,7 +167,7 @@ export class GreenhouseCtaElement extends HTMLElement {
     contract: CtaRenderContractMirror,
     identity: CtaVisitorIdentity,
     pageUri: string | undefined,
-  ): (eventKind: 'viewed' | 'clicked' | 'dismissed' | 'form_opened' | 'form_submitted' | 'error', extra?: { formSubmissionId?: string; reason?: string }) => void {
+  ): (eventKind: 'viewed' | 'clicked' | 'action_started' | 'dismissed' | 'form_opened' | 'form_submitted' | 'error', extra?: { formSubmissionId?: string; reason?: string }) => void {
     return (eventKind, extra) =>
       void postCtaEvent(config, {
         ctaSlug: contract.cta.slug,
@@ -183,22 +186,71 @@ export class GreenhouseCtaElement extends HTMLElement {
       })
   }
 
+  private meetingControllerFor(config: CtaApiConfig, contract: CtaRenderContractMirror): MeetingActivationController | null {
+    const action = contract.action
+
+    if (action.kind !== 'open_meeting_scheduler') return null
+
+    const key = contract.cta.ctaVersionId
+    const existing = this.meetingControllers.get(key)
+
+    if (existing) return existing
+
+    const controller = new MeetingActivationController({
+      doc: document,
+      action,
+      baseUrl: config.baseUrl,
+      locale: this.getAttribute('locale'),
+      colorScheme: this.getAttribute('color-scheme'),
+      placement: `growth_cta_${contract.placement}`,
+      copy: resolveCtaSystemCopy(this.getAttribute('locale') ?? undefined),
+    })
+
+    this.meetingControllers.set(key, controller)
+
+    return controller
+  }
+
+  private taskPrimaryFor(
+    config: CtaApiConfig,
+    contract: CtaRenderContractMirror,
+  ): (invoker: HTMLButtonElement) => Promise<boolean> {
+    return invoker => this.meetingControllerFor(config, contract)?.open(invoker) ?? Promise.resolve(false)
+  }
+
+  private taskIntentFor(config: CtaApiConfig, contract: CtaRenderContractMirror): () => void {
+    return () => { void this.meetingControllerFor(config, contract)?.prewarm() }
+  }
+
+  private disposeMeetingControllers(): void {
+    for (const controller of this.meetingControllers.values()) controller.dispose()
+    this.meetingControllers.clear()
+  }
+
   private primaryFor(
     config: CtaApiConfig,
     contract: CtaRenderContractMirror,
     getRenderer: () => CtaRenderer | null,
   ): (slot: HTMLElement) => Promise<boolean> {
-    return slot =>
-      openGrowthForm({
+    return slot => {
+      const action = contract.action
+
+      // TASK-1431: solo la familia growth_form ejecuta este callback; la familia
+      // navigate vive en el renderer (anchor nativo) y jamás llega acá. Defensivo:
+      // un mismatch retorna false (el renderer restaura el CTA fail-closed).
+      if (action.kind !== 'open_growth_form') return Promise.resolve(false)
+
+      return openGrowthForm({
         doc: document,
         slot,
-        action: contract.action,
+        action,
         baseUrl: config.baseUrl,
         formSurfaceId: this.getAttribute('form-surface'),
         locale: this.getAttribute('locale'),
         colorScheme: this.getAttribute('color-scheme'),
         onSubmitted: formSubmissionId => getRenderer()?.notifyFormSubmitted(formSubmissionId),
       })
+    }
   }
 
   private async load(): Promise<void> {
@@ -273,6 +325,8 @@ export class GreenhouseCtaElement extends HTMLElement {
         ctaLocation: this.getAttribute('cta-location') ?? undefined,
         pageUri,
         onPrimary: this.primaryFor(config, embeddedContract, () => this.renderer),
+        onTaskPrimary: this.taskPrimaryFor(config, embeddedContract),
+        onTaskIntent: this.taskIntentFor(config, embeddedContract),
         onIngest: this.ingestFor(config, embeddedContract, identity, pageUri),
         emitViewedOnRender: false,
       })
@@ -303,6 +357,8 @@ export class GreenhouseCtaElement extends HTMLElement {
         ctaLocation: this.getAttribute('cta-location') ?? undefined,
         pageUri,
         onPrimary: this.primaryFor(config, interruptiveContract, () => controller?.activeRenderer ?? null),
+        onTaskPrimary: this.taskPrimaryFor(config, interruptiveContract),
+        onTaskIntent: this.taskIntentFor(config, interruptiveContract),
         onIngest: this.ingestFor(config, interruptiveContract, identity, pageUri),
       })
 

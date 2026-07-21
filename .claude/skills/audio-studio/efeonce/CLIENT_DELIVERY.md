@@ -4,6 +4,7 @@
 > Globe son **equipos de marketing enterprise internacionales** (aerolíneas, bancos, manufactura) —
 > exigen multi-marca, jingles/sonic identity con aprobaciones formales, **licencia limpia** y
 > **dubbing multi-idioma**. Esto NO es lo mismo que producir para la marca Efeonce (`EFEONCE_OVERLAY.md`).
+> Para credits, rights y accountability carga `../modules/11_STUDIO_CREDITS_AND_RIGHTS.md`.
 
 ## Qué cambia respecto a producción propia
 
@@ -25,8 +26,18 @@
 - **NUNCA** uses música/voz IA sin **licencia comercial clara** para un entregable de cliente (música →
   ElevenLabs Music; verifica términos de cualquier otro modelo).
 - **NUNCA** clones una voz (talento, ejecutivo, celebridad) sin **consentimiento explícito y documentado**.
-- **SIEMPRE** dimensiona y comunica el gasto de créditos IA antes de producir a volumen (dubbing multi-idioma
-  puede escalar rápido).
+- **SIEMPRE** estima, reserva y obtiene approval por operación/segundos/idioma/tier/attempt antes de volumen
+  (dubbing multi-idioma puede escalar rápido).
+- **NUNCA** cobres credits por pieza/hora, edición, mix/master, loudness, stems/export o retry técnico.
+- **NUNCA** escondas voz, música, sync/master, territorio, plazo, exclusividad o buyout dentro de credits.
+
+## Modelo, modo y accountability
+
+- `Managed Squad` es modelo comercial; `efeonce-managed` es modo de run. Staff Augmentation sigue bajo
+  dirección cliente y no hereda outcome SLA.
+- `co-operated` exige owner por guion, generación, mezcla, rights y delivery; “ambos” sin owner no sirve.
+- `client-operated` conserva controls/policy/soporte pactados, no accountability por el resultado creativo.
+- Credits son mode-neutral; la misma operación usa la misma banda. Capacidad y accountability se cobran aparte.
 
 ## Flujo de delivery (resumen)
 

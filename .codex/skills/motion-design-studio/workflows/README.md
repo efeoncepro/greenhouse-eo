@@ -34,6 +34,7 @@
 | **Living Social Wall Clips** | micro-clips vivos por formato social (UGC/Reel/Historia/Creador) sin caer en pan/zoom de stills | **validado** 2026-07-08 | `living-social-wall-clips.md` |
 | **Omni in-place edit → deterministic finish** | editar un clip existente con Omni sólo si faltan píxeles; si no, retime/composite/foley sobre el mismo master | **validado con caveat** 2026-07-11 | `omni-in-place-edit-and-deterministic-finish.md` |
 | **Selección por contrato de fidelidad** | elegir Omni, Seedance o post según reinterpretación permitida, practical y física; no por canal | **evidencia limitada** 2026-07-11 | `engine-selection-by-fidelity-contract.md` |
+| **Clean shot → deterministic 15/10/6 family** | convertir un shot 5–10 s + stills exactos en masters 15/10/6 con arco propio, format wall y audio medido | **validado** 2026-07-18 | `single-shot-to-deterministic-campaign-hero.md` |
 
 ## Estructura estándar de un workflow
 

@@ -63,8 +63,8 @@ está calculado sobre **sueldo bruto** y no sobre **costo empresa**, el precio d
 > 🔴 **Antes de descontar un peso, confirma el loaded cost con `greenhouse-finance-accounting-operator`.**
 
 **Y si igual no alcanza:** **baja el alcance, nunca el precio con el mismo alcance.**
-**Y nunca descuentes la línea de plataforma/gobierno** — es costo marginal ≈ 0 **y es lo único que el
-freelancer, el in-house y Superside no pueden darle.**
+**Y nunca descuentes la línea de plataforma/gobierno sin reducir alcance/SLA** — tiene costo operativo
+asignado y sostiene control, transparencia y switching cost.
 
 ### 🔴 Causal 7 — el creative lead in-house que no está en la mesa
 

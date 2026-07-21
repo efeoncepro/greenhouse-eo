@@ -252,6 +252,15 @@ de composición. Las piezas vivas (Radiografía, informe del Grader) que aliment
 sólidas **y** punteadas, incluso si una fase ocupa una sola unidad. La geometría real decide si cabe y el
 composer falla cerrado si se recortaría. Contrato operativo: [`composition.md`](composition.md#timelinefull--cronograma-data-driven).
 
+### Frontera con Creative Studio y Studio Credits
+
+Un deck no cuesta créditos por lámina. Storyline, copy, selección de template, composición, gráficos
+determinísticos, render PDF/PPTX, export y QA consumen capacidad/gobierno y devengan **0 Studio Credits**. Si una
+lámina incorpora un hero, imagen, clip o voz generados, sólo esas operaciones generativas gobernadas se
+estiman/reservan/liquidan en Creative Studio. Reutilizar un anchor aprobado o derivar el PDF no crea consumo.
+Derechos de stock, talento, música, likeness y licencias se cotizan aparte. Canon:
+`docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md`.
+
 ---
 
 ## Router — qué cargar según lo que estés haciendo
@@ -283,6 +292,7 @@ composer falla cerrado si se recortaría. Contrato operativo: [`composition.md`]
 | `design-studio` · `greenhouse-ai-image-generator` | **dirección de arte** e imagen | ⚠️ **NUNCA** generar con IA la cara de una persona real del equipo. Ver `evidence-integrity.md`. |
 | `research-benchmark-operator` · `seo-aeo` | la **evidencia medida** | Alimentan las láminas de diagnóstico. Sin `evidenceRef`, la cifra no entra. |
 | `arch-architect` | la arquitectura del **motor y los catálogos** | El ADR del Artifact Composer manda. |
+| Creative Studio / Efeonce Globe | las operaciones generativas y su ledger | El deck sigue siendo composición determinística; no convertir slides ni horas en créditos. |
 
 **⚠️ NO** `greenhouse-ux-writing` — esa gobierna el **microcopy del portal** (`src/lib/copy`), que es
 otra cosa. Cablearla acá es un error.
@@ -309,6 +319,8 @@ está en el catálogo → lane de Adobe / `design-studio`. **No se mezclan.**
   BBC lo rastreó hasta un sitio SEO que citaba 25 personas abandonando webs en 2008.)*
 - **NUNCA** dibujes una lámina freehand. Se **compone** desde el catálogo. Si no hay plantilla, hay un
   **gap de catálogo**, no una licencia.
+- **NUNCA** cotices Studio Credits por lámina, deck, hora de autoría, render o export. Sólo una capability
+  generativa gobernada y ejecutada puede devengar créditos.
 - **NUNCA** verifiques las anotaciones /Link de un PDF con grep sobre sus bytes: pdf-lib comprime en
   object streams y el regex no ve adentro — **se cuenta vía API** (`page.node.Annots()`). Un enlace
   prometido que no llegó al PDF es evidencia inalcanzable para el comité.

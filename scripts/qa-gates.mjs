@@ -164,7 +164,12 @@ const DOMAIN_DEFS = [
     ],
     codexSkills: ['software-architect-2026', 'vercel-operations'],
     claudeSkills: ['arch-architect'],
-    commands: ['pnpm worker:runtime-deps-gate', 'pnpm vercel-cron-gate', 'pnpm exec vitest run <worker-or-cron-tests>'],
+    commands: [
+      'pnpm worker:build-contract-gate',
+      'pnpm worker:runtime-deps-gate',
+      'pnpm vercel-cron-gate',
+      'pnpm exec vitest run <worker-or-cron-tests>',
+    ],
     blockers: ['Async behavior needs scheduler/worker/env/dead-letter/health evidence or explicit rollout pending.'],
   },
   {

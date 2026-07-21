@@ -18,6 +18,13 @@
 - **Assets requeridos:** (qué + qué studio de asset)
 - **Descubribilidad:** keywords/entidad objetivo (input `seo-aeo`)
 
+## Creative Studio run (sólo si aplica)
+- **Delivery / engagement / operating mode:**
+- **Operation map generativo:** (imagen/video/audio/transformaciones realmente requeridas)
+- **Rate version + estimate/reservation refs:** (IDs/rango; nunca precio o equivalencia por pieza)
+- **Pasos 0 Studio Credits:** (draft/copy/curaduría/layout/QA/publicación/distribución/reuse)
+- **Derechos/pass-through separados:** (stock/talento/voz/música/likeness/territorio/plazo)
+
 ## Salida (obligatorio antes de publicar)
 - **Plan de distribución (POE):** (→ `05`)
 - **Mapa de átomos:** (→ `04`)

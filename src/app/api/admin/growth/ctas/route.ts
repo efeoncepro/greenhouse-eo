@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server'
 import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
 import { can } from '@/lib/entitlements/runtime'
 import { authorDraftCta } from '@/lib/growth/ctas/commands'
-import { isCtaEngineEnabled } from '@/lib/growth/ctas/flags'
 import { listCtasAdmin } from '@/lib/growth/ctas/readers'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { requireInternalTenantContext } from '@/lib/tenant/authorization'
@@ -23,8 +22,6 @@ export async function GET() {
   const { tenant, errorResponse } = await requireInternalTenantContext()
 
   if (!tenant) return errorResponse ?? canonicalErrorResponse('unauthorized')
-
-  if (!isCtaEngineEnabled()) return canonicalErrorResponse('growth_cta_engine_disabled')
 
   if (!can(tenant, 'growth.cta.read', 'read', 'tenant')) {
     return canonicalErrorResponse('forbidden', { extra: { requiredCapability: 'growth.cta.read' } })
@@ -46,8 +43,8 @@ export async function POST(request: Request) {
 
   if (!tenant) return errorResponse ?? canonicalErrorResponse('unauthorized')
 
-  if (!isCtaEngineEnabled()) return canonicalErrorResponse('growth_cta_engine_disabled')
-
+  // TASK-1430: autorar un draft no expone nada público — no se gatea por el engine
+  // flag (los drafts no se arbitran; publish/pause siguen gated por lifecycle).
   if (!can(tenant, 'growth.cta.author', 'execute', 'tenant')) {
     return canonicalErrorResponse('forbidden', { extra: { requiredCapability: 'growth.cta.author' } })
   }

@@ -699,3 +699,77 @@ export const summarizeConversionEvents = async (ctaId: string): Promise<CtaConve
 
   return rows.map(row => ({ eventKind: row.event_kind, trustLevel: row.trust_level, total: row.total }))
 }
+
+/**
+ * TASK-1430 — conteos del ledger Tier A por ventana (actual vs previa) para las
+ * métricas de marketing del cockpit. Solo `ingest_status='accepted'`; el reader
+ * decide qué kinds cuentan como conversión (server_confirmed, jamás `error`).
+ */
+export interface CtaEventWindowCount {
+  window: 'current' | 'previous'
+  eventKind: string
+  trustLevel: string
+  total: number
+}
+
+export const summarizeConversionEventWindows = async (
+  ctaId: string,
+  windowDays: number,
+): Promise<CtaEventWindowCount[]> => {
+  const rows = await query<{
+    window_key: 'current' | 'previous'
+    event_kind: string
+    trust_level: string
+    total: number
+  }>(
+    `SELECT CASE WHEN created_at > NOW() - ($2 || ' days')::interval THEN 'current' ELSE 'previous' END AS window_key,
+            event_kind, trust_level, COUNT(*)::int AS total
+       FROM greenhouse_growth.cta_conversion_event
+      WHERE cta_id = $1
+        AND ingest_status = 'accepted'
+        AND created_at > NOW() - ($3 || ' days')::interval
+      GROUP BY 1, 2, 3`,
+    [ctaId, String(windowDays), String(windowDays * 2)],
+  )
+
+  return rows.map(row => ({
+    window: row.window_key,
+    eventKind: row.event_kind,
+    trustLevel: row.trust_level,
+    total: row.total,
+  }))
+}
+
+/**
+ * TASK-1430 — conteos del ledger DESDE un instante (ventana alineada de rates:
+ * cuando el tracking de impresiones nació después que el de clics, el CTR
+ * honesto se computa solo sobre el tramo donde AMBAS señales existen).
+ */
+export const summarizeAlignedEventCounts = async (
+  ctaId: string,
+  sinceIso: string,
+): Promise<Array<{ eventKind: string; trustLevel: string; total: number }>> => {
+  const rows = await query<{ event_kind: string; trust_level: string; total: number }>(
+    `SELECT event_kind, trust_level, COUNT(*)::int AS total
+       FROM greenhouse_growth.cta_conversion_event
+      WHERE cta_id = $1
+        AND ingest_status = 'accepted'
+        AND created_at >= $2::timestamptz
+      GROUP BY event_kind, trust_level`,
+    [ctaId, sinceIso],
+  )
+
+  return rows.map(row => ({ eventKind: row.event_kind, trustLevel: row.trust_level, total: row.total }))
+}
+
+/** Timestamp del último evento accepted de un CTA (freshness del panel de métricas). */
+export const getLastAcceptedEventAt = async (ctaId: string): Promise<string | null> => {
+  const rows = await query<{ last_at: string | null }>(
+    `SELECT MAX(created_at)::text AS last_at
+       FROM greenhouse_growth.cta_conversion_event
+      WHERE cta_id = $1 AND ingest_status = 'accepted'`,
+    [ctaId],
+  )
+
+  return rows[0]?.last_at ?? null
+}

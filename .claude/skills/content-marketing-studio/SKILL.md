@@ -58,6 +58,12 @@ recuperación y medición. Nunca prometas enlaces.
 carga `references/metadata-translation-method.md`. Separa el problema que el lector ya reconoce del concepto
 técnico que la pieza enseña; no conviertas jerga ni taxonomía de una sola pieza en peaje de entrada.
 
+**Routing Creative Studio / Efeonce Globe:** si los assets se producen mediante Creative Studio, carga
+`docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md`. El artículo, ebook,
+newsletter o átomo no es la unidad: estima cada operación generativa de media y separa copy, layout,
+curaduría, QA, publicación y distribución como capacidad/gobierno con 0 Studio Credits. No inventes bandas,
+precio por crédito ni equivalencias por pieza.
+
 ## Intake (correr SIEMPRE antes de recomendar)
 
 - **Objetivo**: ¿awareness, demanda/generación, autoridad/thought leadership, activación, retención? Cada uno cambia formato, tono y distribución.
@@ -110,6 +116,9 @@ Carga selectiva: no traigas los 7 módulos de una.
 10. **Metadata es un sistema de superficies.** H1, SEO title, OG title, excerpt y descriptions comparten tesis,
     pero no se copian mecánicamente. Prioriza en la entrada el problema que la audiencia reconoce; enseña la
     jerga dentro, salvo que sea parte comprobada del intent. No crees categorías o tags para una sola pieza.
+11. **El content plan no es un credit plan.** Un pillar y sus N átomos pueden reutilizar assets sin inferencia.
+    Cobra/estima operaciones generativas reales, no cantidad de piezas, palabras, slides u horas; derechos y
+    pass-through siempre van separados.
 
 ## Tabla de sinergias (nombra y encadena el hand-off)
 

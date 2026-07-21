@@ -1,0 +1,166 @@
+{
+  "stage": "deterministic-motion-post",
+  "renderer": "ffmpeg xfade + official deterministic end card",
+  "results": [
+    {
+      "id": "master-9x16",
+      "kind": "master",
+      "formatId": "9x16",
+      "brandMode": "brand-light",
+      "channelMode": "digital-motion",
+      "source": "work/motion/high-frequency-omni-clean-9x16-8s-v1.mp4",
+      "endcard": "delivery/9x16/high-frequency-m01-meta-story-reel-9x16-v1.jpg",
+      "output": "delivery/motion/high-frequency-m01-brand-light-master-9x16-10s-v1.mp4",
+      "poster": "delivery/motion/high-frequency-m01-brand-light-master-9x16-10s-v1-poster.jpg",
+      "durationSeconds": 10,
+      "motionSeconds": 8,
+      "deterministicEndcardSeconds": 2,
+      "bytes": 3716762,
+      "sha256": "84deb90a6e72bff440b30c8623c38f48e593d939e92a0b077d0ea05ede7c717c",
+      "posterSha256": "b5fc34661bfc517d505d356f68845e547200f5cbb31485bae0031a95387084bb",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "width": 720,
+            "height": 1280,
+            "r_frame_rate": "24/1"
+          },
+          {
+            "index": 1,
+            "codec_name": "aac",
+            "r_frame_rate": "0/0"
+          }
+        ],
+        "format": {
+          "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+          "duration": "10.000000",
+          "size": "3716762"
+        }
+      }
+    },
+    {
+      "id": "bumper-9x16",
+      "kind": "bumper",
+      "formatId": "9x16",
+      "brandMode": "brand-light",
+      "channelMode": "digital-motion",
+      "source": "work/motion/high-frequency-omni-clean-9x16-8s-v1.mp4",
+      "endcard": "delivery/9x16/high-frequency-m01-meta-story-reel-9x16-v1.jpg",
+      "output": "delivery/motion/high-frequency-m01-brand-light-bumper-9x16-6s-v1.mp4",
+      "poster": "delivery/motion/high-frequency-m01-brand-light-bumper-9x16-6s-v1-poster.jpg",
+      "durationSeconds": 6,
+      "motionSeconds": 4,
+      "deterministicEndcardSeconds": 2,
+      "bytes": 2020167,
+      "sha256": "ea0f2b8421a338e2d43a32da66015f83f128fa129dbbac699c127dfaf4f10626",
+      "posterSha256": "4e315699aa6ae40450b8c672f506dbcea921e34fee9a4aa99a899284d72b360d",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "width": 720,
+            "height": 1280,
+            "r_frame_rate": "24/1"
+          },
+          {
+            "index": 1,
+            "codec_name": "aac",
+            "r_frame_rate": "0/0"
+          }
+        ],
+        "format": {
+          "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+          "duration": "6.000000",
+          "size": "2020167"
+        }
+      }
+    },
+    {
+      "id": "master-16x9",
+      "kind": "master",
+      "formatId": "16x9",
+      "brandMode": "brand-light",
+      "channelMode": "digital-motion",
+      "source": "work/motion/high-frequency-omni-clean-16x9-8s-v1.mp4",
+      "endcard": "delivery/16x9/high-frequency-m01-digital-landscape-16x9-v1.jpg",
+      "output": "delivery/motion/high-frequency-m01-brand-light-master-16x9-10s-v1.mp4",
+      "poster": "delivery/motion/high-frequency-m01-brand-light-master-16x9-10s-v1-poster.jpg",
+      "durationSeconds": 10,
+      "motionSeconds": 8,
+      "deterministicEndcardSeconds": 2,
+      "bytes": 3900773,
+      "sha256": "432c2c8d80ef1e09a0f3c0765cc2ddcf232ff12344fba7b739277b4f26815e98",
+      "posterSha256": "5ad511182514fdfcbcaaea7c3c9fcb98caf87e24730024522fb59a18de3b83f8",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "width": 1280,
+            "height": 720,
+            "r_frame_rate": "24/1"
+          },
+          {
+            "index": 1,
+            "codec_name": "aac",
+            "r_frame_rate": "0/0"
+          }
+        ],
+        "format": {
+          "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+          "duration": "10.000000",
+          "size": "3900773"
+        }
+      }
+    },
+    {
+      "id": "bumper-16x9",
+      "kind": "bumper",
+      "formatId": "16x9",
+      "brandMode": "brand-light",
+      "channelMode": "digital-motion",
+      "source": "work/motion/high-frequency-omni-clean-16x9-8s-v1.mp4",
+      "endcard": "delivery/16x9/high-frequency-m01-digital-landscape-16x9-v1.jpg",
+      "output": "delivery/motion/high-frequency-m01-brand-light-bumper-16x9-6s-v1.mp4",
+      "poster": "delivery/motion/high-frequency-m01-brand-light-bumper-16x9-6s-v1-poster.jpg",
+      "durationSeconds": 6,
+      "motionSeconds": 4,
+      "deterministicEndcardSeconds": 2,
+      "bytes": 2021049,
+      "sha256": "1b466dc7d8d31db114239558b8a81626f9176149772a01265556b7956d48070a",
+      "posterSha256": "d0427f61698c85a8d3f2c5ced071baa2276f5a84fd4958cc25372f45b442afb6",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "width": 1280,
+            "height": 720,
+            "r_frame_rate": "24/1"
+          },
+          {
+            "index": 1,
+            "codec_name": "aac",
+            "r_frame_rate": "0/0"
+          }
+        ],
+        "format": {
+          "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+          "duration": "6.000000",
+          "size": "2021049"
+        }
+      }
+    }
+  ]
+}

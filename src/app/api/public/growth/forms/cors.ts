@@ -97,7 +97,7 @@ export const publicFormsCorsHeaders = async (request: Request, methods: string):
     if (allowed.has(origin)) {
       headers['Access-Control-Allow-Origin'] = origin
       headers['Access-Control-Allow-Methods'] = methods
-      headers['Access-Control-Allow-Headers'] = 'content-type, accept'
+      headers['Access-Control-Allow-Headers'] = 'content-type, accept, idempotency-key'
       headers['Access-Control-Max-Age'] = '86400'
     }
   }

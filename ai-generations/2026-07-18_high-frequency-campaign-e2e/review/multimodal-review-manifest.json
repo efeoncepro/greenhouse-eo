@@ -1,0 +1,194 @@
+[
+  {
+    "id": "m01-4x5",
+    "index": 1,
+    "title": "M01 · 4x5 · meta-feed",
+    "src": "../delivery/4x5/high-frequency-m01-meta-feed-4x5-v1.jpg",
+    "href": "../delivery/4x5/high-frequency-m01-meta-feed-4x5-v1.jpg",
+    "prompt": "ALTA FRECUENCIA. ALTO ESTÁNDAR. — Producción creativa a escala, sin bajar el nivel."
+  },
+  {
+    "id": "m02-4x5",
+    "index": 2,
+    "title": "M02 · 4x5 · meta-feed",
+    "src": "../delivery/4x5/high-frequency-m02-meta-feed-4x5-v1.jpg",
+    "href": "../delivery/4x5/high-frequency-m02-meta-feed-4x5-v1.jpg",
+    "prompt": "PRODUCE MÁS. SIN BAJAR EL NIVEL. — Una dirección. Todos los formatos."
+  },
+  {
+    "id": "m03-4x5",
+    "index": 3,
+    "title": "M03 · 4x5 · meta-feed",
+    "src": "../delivery/4x5/high-frequency-m03-meta-feed-4x5-v1.jpg",
+    "href": "../delivery/4x5/high-frequency-m03-meta-feed-4x5-v1.jpg",
+    "prompt": "UNA IDEA. TODA LA CAMPAÑA. — El sistema escala. El criterio se mantiene."
+  },
+  {
+    "id": "m01-9x16",
+    "index": 4,
+    "title": "M01 · 9x16 · meta-story-reel",
+    "src": "../delivery/9x16/high-frequency-m01-meta-story-reel-9x16-v1.jpg",
+    "href": "../delivery/9x16/high-frequency-m01-meta-story-reel-9x16-v1.jpg",
+    "prompt": "ALTA FRECUENCIA. ALTO ESTÁNDAR. — Producción creativa a escala, sin bajar el nivel."
+  },
+  {
+    "id": "m02-9x16",
+    "index": 5,
+    "title": "M02 · 9x16 · meta-story-reel",
+    "src": "../delivery/9x16/high-frequency-m02-meta-story-reel-9x16-v1.jpg",
+    "href": "../delivery/9x16/high-frequency-m02-meta-story-reel-9x16-v1.jpg",
+    "prompt": "PRODUCE MÁS. SIN BAJAR EL NIVEL. — Una dirección. Todos los formatos."
+  },
+  {
+    "id": "m03-9x16",
+    "index": 6,
+    "title": "M03 · 9x16 · meta-story-reel",
+    "src": "../delivery/9x16/high-frequency-m03-meta-story-reel-9x16-v1.jpg",
+    "href": "../delivery/9x16/high-frequency-m03-meta-story-reel-9x16-v1.jpg",
+    "prompt": "UNA IDEA. TODA LA CAMPAÑA. — El sistema escala. El criterio se mantiene."
+  },
+  {
+    "id": "m01-3x1",
+    "index": 7,
+    "title": "M01 · 3x1 · display-banner",
+    "src": "../delivery/3x1/high-frequency-m01-display-banner-3x1-v1.jpg",
+    "href": "../delivery/3x1/high-frequency-m01-display-banner-3x1-v1.jpg",
+    "prompt": "ALTA FRECUENCIA. ALTO ESTÁNDAR. — Producción creativa a escala, sin bajar el nivel."
+  },
+  {
+    "id": "m02-3x1",
+    "index": 8,
+    "title": "M02 · 3x1 · display-banner",
+    "src": "../delivery/3x1/high-frequency-m02-display-banner-3x1-v1.jpg",
+    "href": "../delivery/3x1/high-frequency-m02-display-banner-3x1-v1.jpg",
+    "prompt": "PRODUCE MÁS. SIN BAJAR EL NIVEL. — Una dirección. Todos los formatos."
+  },
+  {
+    "id": "m03-3x1",
+    "index": 9,
+    "title": "M03 · 3x1 · display-banner",
+    "src": "../delivery/3x1/high-frequency-m03-display-banner-3x1-v1.jpg",
+    "href": "../delivery/3x1/high-frequency-m03-display-banner-3x1-v1.jpg",
+    "prompt": "UNA IDEA. TODA LA CAMPAÑA. — El sistema escala. El criterio se mantiene."
+  },
+  {
+    "id": "m01-16x9",
+    "index": 10,
+    "title": "M01 · 16x9 · digital-landscape",
+    "src": "../delivery/16x9/high-frequency-m01-digital-landscape-16x9-v1.jpg",
+    "href": "../delivery/16x9/high-frequency-m01-digital-landscape-16x9-v1.jpg",
+    "prompt": "ALTA FRECUENCIA. ALTO ESTÁNDAR. — Producción creativa a escala, sin bajar el nivel."
+  },
+  {
+    "id": "m02-16x9",
+    "index": 11,
+    "title": "M02 · 16x9 · digital-landscape",
+    "src": "../delivery/16x9/high-frequency-m02-digital-landscape-16x9-v1.jpg",
+    "href": "../delivery/16x9/high-frequency-m02-digital-landscape-16x9-v1.jpg",
+    "prompt": "PRODUCE MÁS. SIN BAJAR EL NIVEL. — Una dirección. Todos los formatos."
+  },
+  {
+    "id": "m03-16x9",
+    "index": 12,
+    "title": "M03 · 16x9 · digital-landscape",
+    "src": "../delivery/16x9/high-frequency-m03-digital-landscape-16x9-v1.jpg",
+    "href": "../delivery/16x9/high-frequency-m03-digital-landscape-16x9-v1.jpg",
+    "prompt": "UNA IDEA. TODA LA CAMPAÑA. — El sistema escala. El criterio se mantiene."
+  },
+  {
+    "id": "m01-a2",
+    "index": 13,
+    "title": "M01 · a2 · print-poster-proof",
+    "src": "../delivery/a2/high-frequency-m01-print-poster-proof-a2-v1.jpg",
+    "href": "../delivery/a2/high-frequency-m01-print-poster-proof-a2-v1.jpg",
+    "prompt": "ALTA FRECUENCIA. ALTO ESTÁNDAR. — Producción creativa a escala, sin bajar el nivel."
+  },
+  {
+    "id": "m02-a2",
+    "index": 14,
+    "title": "M02 · a2 · print-poster-proof",
+    "src": "../delivery/a2/high-frequency-m02-print-poster-proof-a2-v1.jpg",
+    "href": "../delivery/a2/high-frequency-m02-print-poster-proof-a2-v1.jpg",
+    "prompt": "PRODUCE MÁS. SIN BAJAR EL NIVEL. — Una dirección. Todos los formatos."
+  },
+  {
+    "id": "m03-a2",
+    "index": 15,
+    "title": "M03 · a2 · print-poster-proof",
+    "src": "../delivery/a2/high-frequency-m03-print-poster-proof-a2-v1.jpg",
+    "href": "../delivery/a2/high-frequency-m03-print-poster-proof-a2-v1.jpg",
+    "prompt": "UNA IDEA. TODA LA CAMPAÑA. — El sistema escala. El criterio se mantiene."
+  },
+  {
+    "id": "m01-ooh-3x1",
+    "index": 16,
+    "title": "M01 · ooh-3x1 · static-ooh-proof",
+    "src": "../delivery/ooh-3x1/high-frequency-m01-static-ooh-proof-ooh-3x1-v1.jpg",
+    "href": "../delivery/ooh-3x1/high-frequency-m01-static-ooh-proof-ooh-3x1-v1.jpg",
+    "prompt": "ALTA FRECUENCIA. ALTO ESTÁNDAR. — Producción creativa a escala, sin bajar el nivel."
+  },
+  {
+    "id": "m02-ooh-3x1",
+    "index": 17,
+    "title": "M02 · ooh-3x1 · static-ooh-proof",
+    "src": "../delivery/ooh-3x1/high-frequency-m02-static-ooh-proof-ooh-3x1-v1.jpg",
+    "href": "../delivery/ooh-3x1/high-frequency-m02-static-ooh-proof-ooh-3x1-v1.jpg",
+    "prompt": "PRODUCE MÁS. SIN BAJAR EL NIVEL. — Una dirección. Todos los formatos."
+  },
+  {
+    "id": "m03-ooh-3x1",
+    "index": 18,
+    "title": "M03 · ooh-3x1 · static-ooh-proof",
+    "src": "../delivery/ooh-3x1/high-frequency-m03-static-ooh-proof-ooh-3x1-v1.jpg",
+    "href": "../delivery/ooh-3x1/high-frequency-m03-static-ooh-proof-ooh-3x1-v1.jpg",
+    "prompt": "UNA IDEA. TODA LA CAMPAÑA. — El sistema escala. El criterio se mantiene."
+  },
+  {
+    "id": "motion-master-9x16",
+    "index": 19,
+    "title": "MASTER · 9x16 · 10s",
+    "src": "../delivery/motion/high-frequency-m01-brand-light-master-9x16-10s-v1-poster.jpg",
+    "href": "../delivery/motion/high-frequency-m01-brand-light-master-9x16-10s-v1.mp4",
+    "prompt": "Gemini Omni clean motion + deterministic M01 end card · brand-light"
+  },
+  {
+    "id": "motion-bumper-9x16",
+    "index": 20,
+    "title": "BUMPER · 9x16 · 6s",
+    "src": "../delivery/motion/high-frequency-m01-brand-light-bumper-9x16-6s-v1-poster.jpg",
+    "href": "../delivery/motion/high-frequency-m01-brand-light-bumper-9x16-6s-v1.mp4",
+    "prompt": "Gemini Omni clean motion + deterministic M01 end card · brand-light"
+  },
+  {
+    "id": "motion-master-16x9",
+    "index": 21,
+    "title": "MASTER · 16x9 · 10s",
+    "src": "../delivery/motion/high-frequency-m01-brand-light-master-16x9-10s-v1-poster.jpg",
+    "href": "../delivery/motion/high-frequency-m01-brand-light-master-16x9-10s-v1.mp4",
+    "prompt": "Gemini Omni clean motion + deterministic M01 end card · brand-light"
+  },
+  {
+    "id": "motion-bumper-16x9",
+    "index": 22,
+    "title": "BUMPER · 16x9 · 6s",
+    "src": "../delivery/motion/high-frequency-m01-brand-light-bumper-16x9-6s-v1-poster.jpg",
+    "href": "../delivery/motion/high-frequency-m01-brand-light-bumper-16x9-6s-v1.mp4",
+    "prompt": "Gemini Omni clean motion + deterministic M01 end card · brand-light"
+  },
+  {
+    "id": "motion-hero-9x16-15s",
+    "index": 23,
+    "title": "HERO · 9x16 · 15s",
+    "src": "../delivery/motion/high-frequency-m01-brand-light-hero-9x16-15s-v1-poster.jpg",
+    "href": "../delivery/motion/high-frequency-m01-brand-light-hero-9x16-15s-v1.mp4",
+    "prompt": "Gemini Omni clean motion + deterministic M01 end card · brand-light"
+  },
+  {
+    "id": "motion-hero-16x9-15s",
+    "index": 24,
+    "title": "HERO · 16x9 · 15s",
+    "src": "../delivery/motion/high-frequency-m01-brand-light-hero-16x9-15s-v1-poster.jpg",
+    "href": "../delivery/motion/high-frequency-m01-brand-light-hero-16x9-15s-v1.mp4",
+    "prompt": "Gemini Omni clean motion + deterministic M01 end card · brand-light"
+  }
+]

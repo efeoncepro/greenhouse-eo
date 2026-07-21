@@ -28,11 +28,37 @@ export interface CtaContentMirror {
   footnote?: string
 }
 
-export interface CtaRenderActionMirror {
+export interface CtaRenderOpenGrowthFormActionMirror {
   kind: 'open_growth_form'
   formSlug: string
   formKey?: string
 }
+
+/** Kinds de la familia `navigate` (TASK-1431) — espejo de `CTA_NAVIGATE_ACTION_KINDS`. */
+export type CtaNavigateActionKindMirror = 'link_url' | 'open_think_tool' | 'book_meeting'
+
+/**
+ * Acción de navegación YA resuelta server-side (TASK-1431): href validado (https
+ * absoluta o path root-relative) + hint de contexto. El executor re-valida el href
+ * (defensa en profundidad) y falla closed ante cualquier cosa fuera del contrato.
+ */
+export interface CtaRenderNavigateActionMirror {
+  kind: CtaNavigateActionKindMirror
+  href: string
+  newContext: boolean
+}
+
+export interface CtaRenderOpenMeetingSchedulerActionMirror {
+  kind: 'open_meeting_scheduler'
+  meetingSurfaceId: string
+  schedulerKey: string
+  fallbackHref: string
+}
+
+export type CtaRenderActionMirror =
+  | CtaRenderOpenGrowthFormActionMirror
+  | CtaRenderNavigateActionMirror
+  | CtaRenderOpenMeetingSchedulerActionMirror
 
 export interface CtaRenderContractMirror {
   contractVersion: string

@@ -62,6 +62,7 @@
 - Live region / status behavior:
 - Color-independent state:
 - Motion-independent meaning:
+- Intermediate-frame contrast: `AA preserved|not applicable` — evidence / technique
 - Error/destructive stability:
 
 ## Performance Guardrails
@@ -83,6 +84,7 @@
 - Required frame labels:
 - Required `data-capture` markers:
 - Assertions:
+- Intermediate-frame axe/contrast evidence:
 - Reduced-motion evidence:
 
 ## Design Decision Log

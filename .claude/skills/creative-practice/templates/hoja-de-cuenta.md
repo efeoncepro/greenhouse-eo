@@ -190,8 +190,8 @@ munición que le falta a esta cuña. Hoy solo tenemos verificado el estándar de
       ☐ **Sí** ☐ **No → 🔴 NO SE VA. No es negociación: es aritmética** *(causal de descalificación 4)*
 - [ ] **Si no alcanza: ¿hay pivote honesto?** ☐ **Menos alcance de verdad** *(menos lanes, menos FTE, menos
       marcas)* ☐ **Sample Sprint acotado** ☐ **No hay pivote**
-- [ ] 🔴 **NUNCA el mismo alcance más barato.** 🔴 **NUNCA descontar la línea de plataforma/gobierno**
-      *(costo marginal ≈ 0, **y es lo único que el freelancer, el in-house y Superside no pueden darle**)*.
+- [ ] 🔴 **NUNCA el mismo alcance más barato.** 🔴 **NUNCA descontar plataforma/gobierno sin reducir
+      alcance/SLA** *(tiene costo operativo asignado y sostiene control, transparencia y switching cost)*.
 
 🩸 [VERIFICAR — **hallazgo abierto, y es bloqueante antes de cotizar**: no está confirmado si el
 `loaded_monthly_cost_usd` del squad se computa sobre **sueldo bruto** o sobre **costo empresa**. En Chile el

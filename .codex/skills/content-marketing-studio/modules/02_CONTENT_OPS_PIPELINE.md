@@ -18,6 +18,15 @@ Toda pieza recorre el mismo flujo. Cada estación tiene entrada, dueño y criter
 
 **Regla dura:** una pieza no está "lista" en PUBLISH. Está lista cuando DISTRIBUTE y MEASURE tienen plan asignado. Publicar sin distribuir es el antipatrón #1.
 
+### Ledger económico cuando el asset usa Creative Studio
+
+El pipeline editorial y el ledger de créditos son capas distintas. En `ASSET`, mapear las operaciones
+generativas de imagen/video/audio y ejecutar `estimate → reservation → approval`; después de REVIEW, cerrar
+`settlement | release | refund adjustment` según outcome. `DRAFT`, curaduría, factcheck, layout, copy, QA,
+publicación, distribución, medición y reuse de un asset aprobado devengan **0 Studio Credits**, aunque consuman
+capacidad/gobierno. Un fallo técnico no se cobra dos veces; un cambio editorial posterior a un output válido
+abre un nuevo estimate. No usar “1 artículo” o “1 átomo” como unidad de crédito.
+
 ## El brief es el contrato (no se produce sin brief)
 
 Nada entra a DRAFT sin brief. El brief evita el desperdicio más caro: producir la pieza equivocada. Mínimo:
@@ -88,6 +97,8 @@ Un checklist de review protege la marca y la barra de originalidad:
 - [ ] Gate de REVIEW con insight/voz/factcheck/brand safety/descubribilidad/distribución.
 - [ ] Cadencia con lead times, WIP limit y buffer editorial.
 - [ ] DISTRIBUTE + MEASURE con plan **antes** de publicar.
+- [ ] Si hubo Creative Studio, operation map + estimate/reservation/settlement son trazables y los pasos
+      determinísticos/humanos no fueron imputados como Studio Credits.
 
 ## Cross-links
 

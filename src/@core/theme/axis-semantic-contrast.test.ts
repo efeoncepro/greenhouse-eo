@@ -13,7 +13,7 @@
  */
 import { describe, expect, it } from 'vitest'
 
-import { resolveSecondaryPalette } from './axis-secondary'
+import { greenhouseSecondaryPalette } from './axis-secondary'
 import { axisSemanticPalette, axisSemanticSubValues } from './axis-semantic'
 import { AA_NORMAL_TEXT, contrastRatio } from './contrast'
 
@@ -81,18 +81,27 @@ describe('AXIS semantic sub-values contrast gate (WCAG 2.2 AA — TASK-1053 Fase
   })
 })
 
-describe('AXIS secondary brand contrast gate (TASK-1053 A1b)', () => {
-  // secondary.main drives tonal/outlined TEXT (~241 usages, 0 contained) → it is the
-  // text/border color and must clear AA on white. The crisp green main (#4b8405) is
-  // barely AA (4.56:1); this guard breaks CI if a future ramp tweak drops it below.
-  it('secondary.main is AA (>=4.5:1) with its contrastText (white)', () => {
-    const { main, contrastText } = resolveSecondaryPalette()
+describe('Greenhouse Tidal Teal secondary contrast gate', () => {
+  it.each(['light', 'dark'] as const)('%s secondary.main is AA with contrastText', mode => {
+    const { main, contrastText } = greenhouseSecondaryPalette[mode]
     const ratio = contrastRatio(main, contrastText)
 
     expect(
       ratio,
       `secondary: contrast(main ${main}, contrastText ${contrastText}) = ${ratio.toFixed(2)}:1 < ${AA_NORMAL_TEXT}`
     ).toBeGreaterThanOrEqual(AA_NORMAL_TEXT)
+  })
+
+  it('light secondary.main is AA as text/border on white', () => {
+    expect(contrastRatio(greenhouseSecondaryPalette.light.main, '#ffffff')).toBeGreaterThanOrEqual(
+      AA_NORMAL_TEXT
+    )
+  })
+
+  it('dark secondary.main is AA as text/border on the dark surface', () => {
+    expect(contrastRatio(greenhouseSecondaryPalette.dark.main, DARK_SURFACE)).toBeGreaterThanOrEqual(
+      AA_NORMAL_TEXT
+    )
   })
 })
 

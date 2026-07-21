@@ -900,6 +900,7 @@ export interface AriaCopy {
   sortAscending: string
   sortDescending: string
   searchInput: string
+  openSearch: string
   filterInput: string
   paginationPrev: string
   paginationNext: string
@@ -910,6 +911,8 @@ export interface AriaCopy {
   rowActions: string
   moreActions: string
   notifications: string
+  markAllNotificationsRead: string
+  markAllNotificationsUnread: string
   userMenu: string
   language: string
   theme: string

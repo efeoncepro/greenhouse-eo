@@ -222,6 +222,33 @@ Motivo: el doble dynamic produjo manifests/chunks huérfanos en Turbopack dev (`
 
 Diagnóstico rápido para casos similares: si local queda en `Compiling...`, revisar CPU/proceso, comparar `curl -I` vs browser real y usar Playwright console/network filtrando `_next/static/chunks`, HMR y 404. Si aparece un chunk huérfano, comparar `.next/dev/**/react-loadable-manifest.json` con `.next/dev/static/chunks` y buscar fronteras `dynamic()`/imports nested en wrappers compartidos. `pnpm clean` solo confirma; el fix vive en el owner canónico del wrapper.
 
+## Surface system — recipes + composed primitives (TASK-1453)
+
+El `surface-system` reduce el salto entre una primitive atómica y una pantalla completa. Es una capa compuesta sobre `CompositionShell`, card-density, GreenhouseButton/Chip y MUI/Vuexy; no crea otro layout runtime.
+
+Primitives oficiales:
+
+- `SurfaceRecipe`: ejecuta los seis recipes oficiales sobre `CompositionShell`, resuelve `kind` a composición y entrega planos de lectura explícitos para las regiones sostenidas. El canvas `background.default` queda como gutter; inventarios, detalle, decisiones y metadata viven en los work planes del recipe. Kinds `operationalWorkbench`, `listDetail`, `commandCenter`, `reviewStudio`, `analyticsReport`, `settingsFlow`.
+- `WorkbenchHeader`: orientación, tesis, estado, una acción primaria y `supporting` integrado cuando la señal pertenece al mismo plano. Kinds `workbench`, `commandCenter`, `report`, `settings`.
+- `SignalStrip`: hasta tres señales explicadas; variants `operational`, `narrative`, `exception`, `integrated`. `integrated` elimina la KPI card separada y condensa honestamente en mobile.
+- `InventoryList` + `SelectionRow`: navegación/selección con estado, foco y densidad adaptativa. `InventoryList variant='rail'` crea navegación abierta sin card exterior; sólo la selección activa puede elevarse.
+- `DetailHero`: identidad y estado del objeto activo; variants `entity`, `evidence`, `report`.
+- `ContextCommandBar`: decisión contextual; variants `contextual`, `review`, `settings`.
+- `OperationalSection`: sección adaptable con jerarquía estable; variants `standard`, `quiet`, `emphasized`, `open`, `band`. `open` agrupa con tipografía/divisores sin chrome y `band` separa una zona transversal; `standard` no es wrapper universal.
+- `PreviewStage`: chrome gobernado para artefacto, evidencia o runtime live.
+
+Las seis composiciones están documentadas en [`docs/ui/recipes/`](../../ui/recipes/README.md): operational workbench, list-detail, command center, review studio, analytics/report y settings/flow. El mapping recipe→CompositionShell vive en `SURFACE_RECIPE_COMPOSITIONS`; el consumer usa `<SurfaceRecipe kind='…' />` y no copia JSX estructural. `/growth/ctas` es el benchmark de no regresión del workbench operacional: el recipe puede elevar su sustrato, pero no degradar la composición madura del consumer.
+
+Todas las primitives compuestas declaran `data-ui-surface` (`open|contained|selected|band|immersive|stage|floating`) para que GVC audite economía de superficies reales aunque el DOM no use `MuiCard`/`MuiPaper`.
+
+Reglas duras:
+
+- UI nueva debe elegir una receta o documentar por qué ninguna aplica.
+- Cards/rows nuevos nacen `density='auto'`; la señal principal sobrevive `condensed/peek`.
+- Un header tiene como máximo una primaria; las demás acciones bajan de énfasis.
+- El consumer no construye forks locales llamados `SectionCard`, `HeaderCard`, `DetailPanel` o `PreviewCard` si la primitive compuesta cubre el rol.
+- Lab canónico: `/design-system/surface-recipes`; scenario GVC: `premium-ui-surface-recipes` desktop + 390 px.
+
 ## Tipografía, tokens y color de las primitives
 
 Las primitives consumen el SoT, nunca valores inline:

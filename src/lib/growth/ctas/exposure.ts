@@ -148,8 +148,14 @@ export interface CtaExposureSummaryRow {
   estimatedCount: number
 }
 
-/** Resumen diario de exposición (ventana acotada) para cockpit TASK-1430 y signals. */
-export const summarizeCtaExposure = async (windowDays: number): Promise<CtaExposureSummaryRow[]> => {
+/**
+ * Resumen diario de exposición (ventana acotada) para cockpit TASK-1430 y signals.
+ * `ctaId` opcional acota el rollup a un CTA (panel de detalle del cockpit).
+ */
+export const summarizeCtaExposure = async (
+  windowDays: number,
+  ctaId?: string | null,
+): Promise<CtaExposureSummaryRow[]> => {
   const rows = await query<{
     bucket_date: string
     cta_id: string | null
@@ -167,9 +173,10 @@ export const summarizeCtaExposure = async (windowDays: number): Promise<CtaExpos
             SUM(estimated_count)::numeric AS estimated_count
        FROM greenhouse_growth.cta_exposure_rollup
       WHERE bucket_start > NOW() - ($1 || ' days')::interval
+        AND ($2::text IS NULL OR cta_id::text = $2::text)
       GROUP BY 1, 2, 3, 4, 5, 6, 7
       ORDER BY 1 DESC, 4, 5`,
-    [String(windowDays)],
+    [String(windowDays), ctaId ?? null],
   )
 
   return rows.map(row => ({
@@ -183,6 +190,49 @@ export const summarizeCtaExposure = async (windowDays: number): Promise<CtaExpos
     observedCount: row.observed_count,
     estimatedCount: Number(row.estimated_count),
   }))
+}
+
+/**
+ * TASK-1430 — impresiones `viewed` de un CTA por ventana (actual vs previa).
+ * Insumo del reader de métricas de marketing (`getCtaMarketingMetrics`): las
+ * impresiones son Tier B browser-observed (rollup agregado), por eso el reader
+ * las etiqueta `browser_reported` — jamás verdad de conversión.
+ */
+export interface CtaViewedWindowCount {
+  window: 'current' | 'previous'
+  viewed: number
+  lastBucketAt: string | null
+}
+
+export const summarizeViewedExposureWindows = async (
+  ctaId: string,
+  windowDays: number,
+): Promise<CtaViewedWindowCount[]> => {
+  const rows = await query<{ window_key: 'current' | 'previous'; viewed: number; last_bucket_at: string | null }>(
+    `SELECT CASE WHEN bucket_start > NOW() - ($2 || ' days')::interval THEN 'current' ELSE 'previous' END AS window_key,
+            COALESCE(SUM(observed_count), 0)::int AS viewed,
+            MAX(bucket_start)::text AS last_bucket_at
+       FROM greenhouse_growth.cta_exposure_rollup
+      WHERE cta_id::text = $1::text
+        AND exposure_kind = 'viewed'
+        AND bucket_start > NOW() - ($3 || ' days')::interval
+      GROUP BY 1`,
+    [ctaId, String(windowDays), String(windowDays * 2)],
+  )
+
+  return rows.map(row => ({ window: row.window_key, viewed: row.viewed, lastBucketAt: row.last_bucket_at }))
+}
+
+/** Primer bucket `viewed` de un CTA — ancla de la ventana alineada de rates (TASK-1430). */
+export const getFirstViewedBucketAt = async (ctaId: string): Promise<string | null> => {
+  const rows = await query<{ first_at: string | null }>(
+    `SELECT MIN(bucket_start)::text AS first_at
+       FROM greenhouse_growth.cta_exposure_rollup
+      WHERE cta_id::text = $1::text AND exposure_kind = 'viewed'`,
+    [ctaId],
+  )
+
+  return rows[0]?.first_at ?? null
 }
 
 /** Test-only: resetea el contador de purga oportunista. */

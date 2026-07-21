@@ -1,9 +1,11 @@
 # DOCUMENTATION_OPERATING_MODEL_V1.md
 
 ## Objetivo
+
 Reducir duplicacion documental sin perder continuidad, trazabilidad ni contexto para producto, UI y deploy.
 
 ## Regla base
+
 Cada cambio debe documentarse, pero no cada documento debe repetir la historia completa.
 
 La calidad de solucion no debe duplicarse en cada spec. La fuente canonica transversal es `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`: soluciones seguras, robustas, resilientes y escalables por defecto; workarounds solo temporales, reversibles y documentados.
@@ -34,6 +36,7 @@ Una task o cierre no debe declararse `complete` si falta una de las tres capas p
 ## Layout del repo
 
 ### 1. Raiz operativa
+
 - `README.md`
 - `AGENTS.md`
 - `CONTRIBUTING.md`
@@ -44,8 +47,10 @@ Una task o cierre no debe declararse `complete` si falta una de las tres capas p
 - Esta raiz queda reservada para onboarding GitHub y continuidad operativa entre agentes.
 
 ### 2. Carpeta `docs/`
+
 - Aqui viven specs, roadmap, tasks y guias especializadas.
 - La taxonomia vigente es:
+  - `docs/business-models/`
   - `docs/services/`
   - `docs/architecture/`
   - `docs/api/`
@@ -61,11 +66,11 @@ Una task o cierre no debe declararse `complete` si falta una de las tres capas p
 
 ## Diferencia entre las tres capas
 
-| Capa | Audiencia principal | Pregunta que responde | Donde vive |
-| --- | --- | --- | --- |
-| Tecnica | devs, agentes, operadores tecnicos, auditorias | Como esta construido y que contratos no se deben romper | `docs/architecture/`, `docs/api/`, ADRs, specs tecnicas |
-| Funcional | producto, operaciones, soporte, liderazgo, clientes internos | Que hace, por que existe y como se comporta | `docs/documentation/<dominio>/` |
-| Manual de uso | usuario-operador, soporte, agentes ejecutores | Como lo uso o diagnostico paso a paso | `docs/manual-de-uso/<dominio>/` |
+| Capa          | Audiencia principal                                          | Pregunta que responde                                   | Donde vive                                              |
+| ------------- | ------------------------------------------------------------ | ------------------------------------------------------- | ------------------------------------------------------- |
+| Tecnica       | devs, agentes, operadores tecnicos, auditorias               | Como esta construido y que contratos no se deben romper | `docs/architecture/`, `docs/api/`, ADRs, specs tecnicas |
+| Funcional     | producto, operaciones, soporte, liderazgo, clientes internos | Que hace, por que existe y como se comporta             | `docs/documentation/<dominio>/`                         |
+| Manual de uso | usuario-operador, soporte, agentes ejecutores                | Como lo uso o diagnostico paso a paso                   | `docs/manual-de-uso/<dominio>/`                         |
 
 ### Capa adicional para servicios comercializables
 
@@ -77,6 +82,17 @@ de las tres capas obligatorias y no debe duplicar su detalle técnico u operativ
 `docs/services/` tampoco es el catálogo runtime de productos/componentes de Greenhouse ni un objeto CRM. Precios
 y términos comerciales siguen viviendo en propuestas/contratos; la ficha define el servicio operable.
 
+### Capa de modelos de negocio
+
+`docs/business-models/` es el source of truth de cómo una oferta crea, entrega y captura valor: ICP/JTBD,
+taxonomía de delivery y engagement, arquitectura de ingresos, unidad de cobro, unit economics, riesgo, derechos,
+validación y gates comerciales. Su contrato e índice viven en `docs/business-models/README.md`.
+
+Esta capa no sustituye `docs/services/`: el business model explica la economía completa; la ficha de servicio
+explica qué resultado y responsabilidad asume Efeonce frente al cliente. Tampoco sustituye Finance/CPQ,
+propuestas o contratos: cifras por cliente, aprobaciones de margen, impuestos y términos transaccionales viven
+en sus dueños operativos. `docs/context/` puede resumir el modelo y debe enlazarlo, no duplicarlo.
+
 No mezclar las capas:
 
 - la documentacion funcional no debe convertirse en diagrama de schema;
@@ -87,17 +103,22 @@ No mezclar las capas:
 ## Estructura canonica
 
 ### 1. Documento maestro
+
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - Aqui viven principios, decisiones estables, fases y contratos de producto.
 - No registrar aqui el detalle de cada turno.
 
 ### 2. Contexto operativo
+
 - `project_context.md`
 - Aqui vive el estado actual del repo, stack, rutas, librerias activas, deploy y restricciones.
 - Debe responder: que existe hoy, que se usa hoy, que sigue pendiente hoy.
+- Es un router de estado durable: no acepta secciones `Delta`, diarios por task ni listas exhaustivas de
+  features. El detalle vive en su source of truth y aqui queda un pointer solo si cambia como opera el agente.
 - La especializacion canonica para `project_context.md` + `Handoff.md` + `Handoff.archive.md` vive en `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md`.
 
 ### 3. Continuidad de turno
+
 - `Handoff.md`
 - Aqui solo deben quedar:
   - objetivo del turno
@@ -105,39 +126,55 @@ No mezclar las capas:
   - validacion
   - riesgos o pendientes
 - Formato corto. No duplicar arquitectura.
-- Si hace falta conservar historia detallada, moverla a `Handoff.archive.md` y dejar en `Handoff.md` solo el estado activo.
-- No borrar historia auditable para reducir tamano: preservar en `Handoff.archive.md`, task complete, issue resuelto o doc canonica, y dejar puntero corto cuando siga siendo relevante.
+- Si hace falta conservar historia detallada, moverla a `docs/operations/agent-context-history/` y dejar en
+  `Handoff.archive.md` un indice y en `Handoff.md` solo el estado activo.
+- No borrar historia auditable para reducir tamano: preservar snapshot/shard con manifest cuando aplique,
+  task complete, issue resuelto o doc canonica, y dejar puntero corto cuando siga siendo relevante.
 
 ### 4. Registro de cambios
+
 - `changelog.md`
 - Solo cambios de comportamiento, estructura o workflow.
 - Una o pocas lineas por cambio real.
+- Es una ventana reciente, no el archivo historico completo: maximo 60 entradas, 2.000 lineas y ~60.000 tokens
+  estimados. Son techos de seguridad, no objetivos de relleno.
+- El historial interno vive bajo `docs/changelog/internal/`: el primer corte conserva un snapshot byte-for-byte
+  con manifest SHA-256 y las rotaciones posteriores crean shards mensuales con hash por entrada.
+- La rotacion canonica es `pnpm docs:context-rotate --apply`; el dry-run omite `--apply`. El proceso debe ser
+  idempotente, mantener entradas completas y abortar la reescritura si detecta una edicion concurrente.
+- Buscar historia por keyword en el indice/snapshots; una entrada antigua es evidencia secundaria y no reemplaza
+  task, issue, ADR, arquitectura ni runtime vigente.
 
 ### 5. Guias especializadas
+
 - Docs tematicas como:
   - `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
   - `docs/ui/SKY_TENANT_EXECUTIVE_SLICE_V1.md`
 - Deben contener contrato y decisiones de su dominio, no repetir contexto general del repo.
 
 ### 5.a. Documentacion funcional
+
 - `docs/documentation/`
 - Aqui vive la descripcion funcional de dominios, modulos y capacidades.
 - Es obligatoria para toda capacidad Greenhouse y debe enlazar su documentacion tecnica y manual de uso cuando existan.
 - Debe explicar el comportamiento en lenguaje de producto/operacion, no el codigo.
 
 ### 5.b. Manuales de uso
+
 - `docs/manual-de-uso/`
 - Aqui viven los pasos accionables para operar, configurar, validar o diagnosticar una capacidad.
 - Son obligatorios para toda capacidad que una persona o agente deba ejecutar, monitorear, configurar o resolver.
 - Deben enlazar documentacion funcional y tecnica; no duplicarlas.
 
 ### 5.0. Calidad de solucion transversal
+
 - `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`
 - Aqui vive la regla anti-parche para todos los agentes y dominios.
 - Otros documentos deben enlazar esta fuente cuando necesiten reforzar el criterio, no copiar definiciones largas.
 - Si un dominio necesita criterios adicionales, debe extender esta regla con constraints especificos sin rebajar el baseline.
 
 ### 5.0.bis. Architecture Decision Records
+
 - `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md`
 - Aqui vive la politica canonica de ADRs para Greenhouse.
 - `docs/architecture/DECISIONS_INDEX.md` es el indice maestro de decisiones aceptadas.
@@ -153,6 +190,7 @@ No mezclar las capas:
 - Si una task cambia source of truth, schema, access model, auth/session, finance/payroll/accounting semantics, events/outbox/webhooks, APIs externas, cloud/deploy/secrets, UI platform o runtime projections compartidas, debe identificar o crear/proponer ADR antes de implementar.
 
 ### 5.1. Auditorias tecnicas y operativas
+
 - `docs/audits/`
 - Aqui viven auditorias reutilizables, fechadas y versionadas sobre sistemas, pipelines, contracts o runtime slices.
 - Una auditoria captura el estado observado en una fecha y debe incluir scope, conclusiones y riesgos.
@@ -166,12 +204,15 @@ No mezclar las capas:
   - documenta el estado observado y puede servir para priorizar o abrir tasks/issues derivados
 
 ### 6. Changelog curado
+
 - `docs/changelog/CLIENT_CHANGELOG.md`
 - Aqui vive el changelog client-facing del producto.
 - No debe duplicar el detalle tecnico de `changelog.md`.
 - Solo debe registrar cambios visibles para usuarios, canales de release y disponibilidad real de capacidades.
+- No participa de la rotacion del changelog interno y conserva su governance client-facing independiente.
 
 ### 7. Programas operativos
+
 - `docs/epics/`
 - Aqui viven los programas `EPIC-###` cuando el trabajo cruza varios dominios o requiere varias tasks hijas.
 - El contrato canónico de lifecycle y relación epic -> task vive en:
@@ -181,6 +222,7 @@ No mezclar las capas:
 ## Regla de compresion
 
 Cuando un cambio toque varios documentos:
+
 - escribir el detalle completo una sola vez en el documento canonico correcto
 - en los otros documentos dejar solo el delta y una referencia al documento canonico
 - si el cambio es una decision arquitectonica, el detalle de decision vive en el ADR o seccion ADR y los demas documentos enlazan ese contrato
@@ -188,25 +230,30 @@ Cuando un cambio toque varios documentos:
 ## Plantilla minima por cambio
 
 ### README
+
 - una linea de estado si cambia stack, enfoque o referencia principal
 - si cambia la taxonomia documental o aparece una auditoria relevante nueva, enlazarla desde `docs/README.md`
 
 ### project_context
-- que tecnologia o libreria se activo
-- donde vive
-- para que se usara
-- que decision arquitectonica nueva cambia el contrato operativo vigente, con link al ADR o indice
+
+- actualizar solo si una tecnologia, source of truth, runtime constraint o decision cambia de forma durable
+  como los agentes deben operar
+- dejar nombre + proposito + pointer; no copiar el detalle ni registrar un delta por cada implementacion
 
 ### Handoff
+
 - que se hizo
 - que se valido
 - que queda pendiente
 - que ADR se acepto, supersedio o quedo pendiente, si aplica
+- omitir el cierre si ya esta plenamente representado por task/changelog y no aporta continuidad activa
 
 ### changelog
+
 - una linea de impacto
 
 ### Triple documentacion
+
 - documentacion tecnica actualizada o creada
 - documentacion funcional actualizada o creada
 - manual de uso actualizado o creado
@@ -215,6 +262,7 @@ Cuando un cambio toque varios documentos:
 ## Regla para UI y librerias
 
 Para cambios de UI, charts, iconos o assets:
+
 - dejar la regla visual o de seleccion en la doc especializada o skill correspondiente
 - dejar en `project_context.md` solo la fuente de verdad de librerias y wrappers activos
 - no repetir listas largas de componentes en todos los documentos
@@ -222,6 +270,7 @@ Para cambios de UI, charts, iconos o assets:
 ## Regla para tokens
 
 La documentacion debe:
+
 - maximizar referencias cortas
 - minimizar texto duplicado
 - evitar explicar el mismo cambio con redacciones distintas en 4 archivos

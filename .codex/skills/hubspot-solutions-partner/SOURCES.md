@@ -120,6 +120,31 @@ lo que sugiere que escala por seat. **Confírmalo con el rep antes de cotizar.**
 Los bloques ✅ del catálogo legal: Pro = +5.000 por USD 250 (escalonado a la baja); Ent = +10.000 por USD 100 (→USD 60).
 **Los saltos son escalonados, no lineales**: un Pro que pasa de 2.000 a 2.001 contactos salta **+USD 250/mo**.
 
+### Email y secuencias por API ✅ — as-of 2026-07-19
+
+| Pregunta | Claim verificable |
+|---|---|
+| ¿Marketing Hub Starter envía marketing email directo por API? | **No.** Publicar/despublicar exige Enterprise o Transactional Email Add-On; el add-on sólo se vende para Marketing Pro/Enterprise. |
+| ¿Starter puede gatillar un follow-up desde una integración? | **Sí, sólo desde una submission real:** Forms Submission API → workflow simple del formulario → marketing email. El contacto debe ser marketing contact. |
+| ¿Sales Hub Professional envía un email 1:1 arbitrario por API? | **No hay endpoint público documentado.** Email Activities registra actividad y `SEND_EMAIL` abre el compositor; ninguno envía headlessly. |
+| ¿Sales Hub Professional dispara una secuencia por API? | **Sí.** `POST /automation/sequences/2026-03/enrollments`; requiere seat, inbox conectado, acceso/permisos y scopes `automation.sequences.read` + `automation.sequences.enrollments.write`. |
+| ¿Cómo aproximar un único sales email programático? | Secuencia aprobada de un solo email + enrollment API; nunca disfrazar una campaña masiva como outreach 1:1. |
+
+Sales Hub Professional: **500 emails de secuencia por usuario/24 h rolling**; bulk enrollment, máximo
+**3 envíos/minuto**. Un límite custom o del proveedor puede ser menor. Operación y guardrails:
+`../hubspot-as-a-service/references/email-api-routing.md`.
+
+✅ [Marketing Email API](https://developers.hubspot.com/docs/api-reference/latest/marketing/marketing-emails/guide) ·
+[Transactional/Single-Send API](https://developers.hubspot.com/docs/api-reference/latest/marketing/transactional-emails/guide) ·
+[Form automations](https://knowledge.hubspot.com/forms/form-automations) ·
+[Forms submission](https://developers.hubspot.com/docs/api-reference/legacy/marketing/forms/v3-legacy/submit-data-unauthenticated) ·
+[Sequences API](https://developers.hubspot.com/docs/api-reference/latest/automation/sequences/guide) ·
+[Sequence enrollment](https://developers.hubspot.com/docs/api-reference/latest/automation/sequences/enroll-contact) ·
+[sending limits](https://knowledge.hubspot.com/connected-email/sales-email-send-limits) ·
+[CRM Email Activities](https://developers.hubspot.com/docs/api-reference/latest/crm/activities/emails/guide) ·
+[CRM `SEND_EMAIL`](https://developers.hubspot.com/docs/apps/developer-platform/add-features/ui-extensions/ui-components/crm-action-components/overview) ·
+[Product & Services Catalog](https://legal.hubspot.com/hubspot-product-and-services-catalog)
+
 ### Seats ✅
 Core (pagado, USD 45–USD 75) · Sales · Service · **Revenue** (requerido para crear/editar quotes) ·
 **View-Only (USD 0)** · **Partner Seat (USD 0)**.

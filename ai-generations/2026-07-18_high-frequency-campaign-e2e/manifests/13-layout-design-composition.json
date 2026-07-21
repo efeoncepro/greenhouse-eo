@@ -1,0 +1,251 @@
+{
+  "stage": "layout-design-deterministic-composition",
+  "renderer": "sharp + fontkit outlined Poppins",
+  "logo": "public/branding/logo-negative.svg",
+  "contactSheet": "review/layout-design-pilot-contact-sheet.jpg",
+  "results": [
+    {
+      "id": "16x9",
+      "anchorId": "high-frequency-anchor-v1",
+      "anchorRevision": 1,
+      "topology": {
+        "kind": "star",
+        "derivationParent": "anchor"
+      },
+      "brandMode": "branded",
+      "channelMode": "digital-static",
+      "sourcePlate": "work/layout-design/finished/high-frequency-layout-finish-16x9.png",
+      "sourcePlateSha256": "cc6e65b3d3764aef2c83cb79be5832816dbc409ff352fd03953995c06ae6250c",
+      "underlay": "work/layout-design/composition/16x9-underlay.png",
+      "copyOverlay": "work/layout-design/composition/16x9-copy.svg",
+      "output": "delivery/layout-design/high-frequency-layout-design-16x9-v1.jpg",
+      "width": 1920,
+      "height": 1080,
+      "format": "jpeg",
+      "colourspace": "srgb",
+      "bytes": 617452,
+      "sha256": "b61043e82f44190d53c3c60ab94143c67d91b7570156ae2076e14d0eb7eb6ac7",
+      "copyField": {
+        "x": 0.0458,
+        "y": 0.22,
+        "width": 0.43,
+        "height": 0.48
+      },
+      "exactCopy": {
+        "kicker": "PRODUCCIÓN CREATIVA · SISTEMA 01",
+        "headline": [
+          "ALTA FRECUENCIA.",
+          "ALTO ESTÁNDAR."
+        ],
+        "support": "Producción creativa a escala, sin bajar el nivel.",
+        "url": "efeoncepro.com"
+      },
+      "layout": {
+        "logo": {
+          "left": 88,
+          "top": 70,
+          "width": 245
+        },
+        "kicker": {
+          "x": 116,
+          "y": 275,
+          "size": 18,
+          "tracking": 2.2
+        },
+        "rail": {
+          "x": 88,
+          "y": 252,
+          "width": 6,
+          "height": 186
+        },
+        "headline": {
+          "x": 116,
+          "y": 390,
+          "size": 79,
+          "gap": 92,
+          "tracking": -1.2
+        },
+        "support": {
+          "x": 116,
+          "y": 650,
+          "size": 29,
+          "maxWidth": 560,
+          "gap": 42
+        },
+        "url": {
+          "x": 88,
+          "y": 996,
+          "size": 24
+        },
+        "rule": {
+          "x": 88,
+          "y": 946,
+          "width": 250,
+          "height": 2
+        }
+      }
+    },
+    {
+      "id": "4x5",
+      "anchorId": "high-frequency-anchor-v1",
+      "anchorRevision": 1,
+      "topology": {
+        "kind": "star",
+        "derivationParent": "anchor"
+      },
+      "brandMode": "branded",
+      "channelMode": "digital-static",
+      "sourcePlate": "work/layout-design/finished/high-frequency-layout-finish-4x5.png",
+      "sourcePlateSha256": "954d51dc3a58939155e9751cc5da9f7a47a07646be3efcb7b0d485d00aaa30b3",
+      "underlay": "work/layout-design/composition/4x5-underlay.png",
+      "copyOverlay": "work/layout-design/composition/4x5-copy.svg",
+      "output": "delivery/layout-design/high-frequency-layout-design-4x5-v1.jpg",
+      "width": 1080,
+      "height": 1350,
+      "format": "jpeg",
+      "colourspace": "srgb",
+      "bytes": 393209,
+      "sha256": "9ae888981f74828928a09ff5c034c320e11592a4942ac1d9c7ff8789f3c1bddf",
+      "copyField": {
+        "x": 0.063,
+        "y": 0.18,
+        "width": 0.61,
+        "height": 0.33
+      },
+      "exactCopy": {
+        "kicker": "PRODUCCIÓN CREATIVA · SISTEMA 01",
+        "headline": [
+          "ALTA FRECUENCIA.",
+          "ALTO ESTÁNDAR."
+        ],
+        "support": "Producción creativa a escala, sin bajar el nivel.",
+        "url": "efeoncepro.com"
+      },
+      "layout": {
+        "logo": {
+          "left": 70,
+          "top": 62,
+          "width": 220
+        },
+        "kicker": {
+          "x": 98,
+          "y": 252,
+          "size": 15,
+          "tracking": 1.8
+        },
+        "rail": {
+          "x": 70,
+          "y": 232,
+          "width": 5,
+          "height": 158
+        },
+        "headline": {
+          "x": 98,
+          "y": 345,
+          "size": 66,
+          "gap": 78,
+          "tracking": -1
+        },
+        "support": {
+          "x": 98,
+          "y": 548,
+          "size": 25,
+          "maxWidth": 510,
+          "gap": 36
+        },
+        "url": {
+          "x": 70,
+          "y": 1268,
+          "size": 21
+        },
+        "rule": {
+          "x": 70,
+          "y": 1225,
+          "width": 210,
+          "height": 2
+        }
+      }
+    },
+    {
+      "id": "9x16",
+      "anchorId": "high-frequency-anchor-v1",
+      "anchorRevision": 1,
+      "topology": {
+        "kind": "star",
+        "derivationParent": "anchor"
+      },
+      "brandMode": "branded",
+      "channelMode": "digital-static",
+      "sourcePlate": "work/layout-design/finished/high-frequency-layout-finish-9x16.png",
+      "sourcePlateSha256": "454ef8bee726f574c25ae31186dab42f96819f52a989e68d72c083f218326fa7",
+      "underlay": "work/layout-design/composition/9x16-underlay.png",
+      "copyOverlay": "work/layout-design/composition/9x16-copy.svg",
+      "output": "delivery/layout-design/high-frequency-layout-design-9x16-v1.jpg",
+      "width": 1080,
+      "height": 1920,
+      "format": "jpeg",
+      "colourspace": "srgb",
+      "bytes": 566929,
+      "sha256": "d719e4b6614f946cc0aefc1113de106e87d58ceca5fc3c85734198c73130261d",
+      "copyField": {
+        "x": 0.065,
+        "y": 0.2,
+        "width": 0.58,
+        "height": 0.3
+      },
+      "exactCopy": {
+        "kicker": "PRODUCCIÓN CREATIVA · SISTEMA 01",
+        "headline": [
+          "ALTA FRECUENCIA.",
+          "ALTO ESTÁNDAR."
+        ],
+        "support": "Producción creativa a escala, sin bajar el nivel.",
+        "url": "efeoncepro.com"
+      },
+      "layout": {
+        "logo": {
+          "left": 72,
+          "top": 235,
+          "width": 230
+        },
+        "kicker": {
+          "x": 100,
+          "y": 420,
+          "size": 15,
+          "tracking": 1.8
+        },
+        "rail": {
+          "x": 72,
+          "y": 398,
+          "width": 5,
+          "height": 174
+        },
+        "headline": {
+          "x": 100,
+          "y": 520,
+          "size": 69,
+          "gap": 82,
+          "tracking": -1
+        },
+        "support": {
+          "x": 100,
+          "y": 735,
+          "size": 26,
+          "maxWidth": 520,
+          "gap": 38
+        },
+        "url": {
+          "x": 72,
+          "y": 1492,
+          "size": 23
+        },
+        "rule": {
+          "x": 72,
+          "y": 1445,
+          "width": 230,
+          "height": 2
+        }
+      }
+    }
+  ]
+}

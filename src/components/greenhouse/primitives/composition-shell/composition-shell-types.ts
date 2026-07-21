@@ -119,6 +119,8 @@ export interface CompositionShellProps {
    * colapsa `primary` a drawer en compact (`masterDetail`). Default `'Detalle'`.
    */
   detailLabel?: string
+  /** Label accesible del control que cierra el drawer temporal en compact. */
+  drawerCloseLabel?: string
   /**
    * ID estable opcional para escopar view-transition-name por instancia sin depender de `useId`.
    * Útil en surfaces SSR donde el árbol puede montar widgets de terceros/MUI con IDs propios.
@@ -148,6 +150,13 @@ export interface CompositionShellProps {
   onTelemetry?: (event: CompositionShellTelemetryEvent) => void
   /** Etiqueta de origen para los eventos de telemetry (qué surface). */
   telemetrySource?: string
+  /**
+   * TASK-1430 — override data-driven de las columnas del grid en layouts `split`
+   * (misma vía que la config canónica; NUNCA un sistema de regiones paralelo).
+   * Útil cuando la proporción primary/aside del dominio difiere del default
+   * (ej. cockpit CTA: detalle más ancho que el inventario). Ignorado en `stack`.
+   */
+  splitTemplateColumns?: Partial<Record<'xs' | 'sm' | 'md' | 'lg', string>>
   /** sx passthrough opcional para el contenedor raíz. */
   className?: string
 }

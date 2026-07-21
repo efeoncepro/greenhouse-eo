@@ -13,7 +13,7 @@ import { verticalLayoutClasses } from '@layouts/utils/layoutClasses'
 import { getGreenhouseNavigationCopy } from '@/config/greenhouse-navigation-copy'
 import { GH_MESSAGES } from '@/lib/copy/client-portal'
 
-const INTERNAL_ROUTE_PREFIXES = ['/agency', '/finance', '/hr', '/people', '/delivery', '/admin', '/ai-tooling']
+const INTERNAL_ROUTE_PREFIXES = ['/agency', '/finance', '/hr', '/people', '/delivery', '/admin', '/ai-tooling', '/growth', '/design-system']
 
 const FooterContent = () => {
   const { isBreakpointReached } = useVerticalNav()

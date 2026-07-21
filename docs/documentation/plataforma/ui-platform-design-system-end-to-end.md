@@ -1,11 +1,11 @@
 # UI Platform y Design System end-to-end
 
 > **Tipo de documento:** Documentacion funcional
-> **Version:** 1.0
+> **Version:** 1.2
 > **Creado:** 2026-06-15 por Codex
 > **Modulo:** UI Platform / AXIS / Design System / GVC
-> **Rutas principales:** `/admin/design-system`, `/admin/design-system/colors`, `/admin/design-system/composition-shell`, `/admin/design-system/card-density`, `/admin/design-system/nexa-*`
-> **Arquitectura relacionada:** `docs/architecture/ui-platform/README.md`, `docs/architecture/ui-platform/PRIMITIVES.md`, `docs/architecture/GREENHOUSE_UI_PRIMITIVE_VARIANTS_DECISION_V1.md`, `docs/architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md`
+> **Rutas principales:** `/admin/design-system`, `/design-system/surface-recipes`, `/admin/design-system/colors`, `/admin/design-system/composition-shell`, `/admin/design-system/card-density`, `/admin/design-system/nexa-*`
+> **Arquitectura relacionada:** `docs/architecture/ui-platform/README.md`, `docs/architecture/ui-platform/PRIMITIVES.md`, `docs/architecture/GREENHOUSE_PREMIUM_AGENTIC_UI_DELIVERY_DECISION_V1.md`, `docs/architecture/GREENHOUSE_UI_PRIMITIVE_VARIANTS_DECISION_V1.md`, `docs/architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md`
 
 ## Para que sirve
 
@@ -38,10 +38,20 @@ DB agregada:
 | Primitives | `src/components/greenhouse/primitives/**` |
 | Patterns | `docs/architecture/ui-platform/PATTERNS.md` |
 | UI governance | `docs/architecture/ui-platform/GOVERNANCE.md` |
+| Dirección y aceptación premium | `docs/ui/GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md` |
+| Recipes de superficie | `docs/ui/recipes/**` + `/design-system/surface-recipes` |
 | Catalogo vivo | `/admin/design-system` |
 | Captura visual | GVC `pnpm fe:capture` |
 | Figma linking | Figma node store + route `/admin/design-system/figma-link` |
 | Handoff producto -> DEV | `docs/documentation/plataforma/design-handoff-control-plane.md` + `/design-system/handoff` |
+
+## Contrato funcional del color secondary
+
+Greenhouse usa **Tidal Teal** como color secondary para acciones de apoyo, selección contextual y énfasis de marca subordinado. No comunica éxito: los resultados positivos y estados saludables siguen usando `success` emerald. Tampoco reemplaza Core Blue como acción primaria ni `info` para mensajes informativos.
+
+El color cambia de intensidad por modo para conservar jerarquía y contraste: en superficies claras se presenta como petrol profundo; en dark mode usa un teal más luminoso con tinta Midnight. Los componentes no eligen esos pasos manualmente: Buttons, Chips y cualquier consumer de producto reciben la decisión desde `theme.palette.secondary.*`.
+
+La referencia viva es `/admin/design-system/colors`, complementada por los labs de Buttons y Chips. La decisión y sus límites viven en `GREENHOUSE_SECONDARY_TEAL_COLOR_DECISION_V1.md`; AXIS Figma permanece pendiente de reconciliación y no puede sobrescribir este override durante una regeneración.
 
 ## Reglas operativas
 
@@ -55,10 +65,24 @@ DB agregada:
 - GSAP directo no se importa en views; se usa Motion primitive.
 - UI visible requiere GVC o evidencia visual equivalente.
 
+## Cómo nace una superficie premium
+
+El flujo ya no comienza eligiendo cards. Comienza con una tesis visual y termina con evidencia:
+
+1. La Visual Direction define tono, jerarquía, ritmo, densidad, contraste espacial, responsive y momento dominante.
+2. `SurfaceRecipe` traduce esa intención a regiones del Composition Shell y primitives compuestas; sus work planes sostienen inventarios, detalle, metadata y decisiones para que el canvas gris funcione como gutter, no como superficie de lectura.
+3. Las superficies se declaran por función: `open`, `contained`, `band`, `immersive`, `stage`, `selected` o `floating`.
+4. El first fold normal admite como máximo tres superficies `contained`. Una card necesita una frontera semántica; no se usa como wrapper por defecto.
+5. Mobile recompone la jerarquía y la acción principal; no serializa el desktop en una columna de cards.
+6. GVC premium y el scorecard de catorce dimensiones deciden la aceptación. Tokens correctos o build verde no bastan.
+
+Los pisos visuales son media `≥4.5/5`, ninguna dimensión `<4/5` y `≥4.5` en jerarquía, economía de superficies, impacto visual, fidelidad y resistencia genérica. Card wallpaper, ausencia de un momento visual dominante o una captura mobile convertida en stack uniforme son bloqueantes.
+
 ## Que hace automatico Greenhouse
 
 - Lints/gates detectan drift de contrato visual, rutas y primitives.
 - GVC captura frames/video/aria snapshots.
+- GVC cuenta superficies `contained`, detecta nesting semántico y geometría repetitiva, y produce un dossier de catorce dimensiones.
 - Route reachability valida surfaces internas.
 - Figma node store conserva links y eventos para nodos gobernados.
 - Design Handoff crea el primer snapshot Figma cuando registra un handoff de producto allowlisted.
@@ -78,6 +102,7 @@ DB agregada:
 - Que es Primitive + Variants + Kinds?
 - Como valido visualmente con GVC?
 - Donde vive la paleta AXIS?
+- Que diferencia secondary Tidal Teal de primary, info y success?
 - Que no debo copiar literal desde Figma?
 - Como agrego una primitive al catalogo?
 - Como paso un nodo Figma de producto a DEV con evidencia?
@@ -89,5 +114,9 @@ DB agregada:
 - `docs/architecture/ui-platform/PRIMITIVES.md`
 - `docs/architecture/ui-platform/PATTERNS.md`
 - `docs/architecture/ui-platform/GOVERNANCE.md`
+- `docs/ui/GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md`
+- `docs/ui/recipes/README.md`
+- `docs/ui/reviews/README.md`
 - `docs/manual-de-uso/plataforma/captura-visual-playwright.md`
+- `docs/manual-de-uso/plataforma/operar-ui-platform-design-system.md`
 - `docs/manual-de-uso/plataforma/validar-contrato-visual-design-md.md`

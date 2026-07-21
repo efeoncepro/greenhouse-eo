@@ -153,7 +153,8 @@ capability dentro del sistema, no presentarse como agencia suelta.
  al invitado, contacto/timeline/meeting en HubSpot y atribución medible sin PII en `dataLayer`. La implementación
  live de `/servicios/redes-sociales/` queda como fallback seguro mientras se ejecuta el spike. Ver
  [PDR-009](decisions/PDR-009-hubspot-scheduler-native-booking.md) +
- `docs/tasks/to-do/TASK-1366-hubspot-scheduler-booking-equivalence.md`.
+ `docs/tasks/complete/TASK-1366-hubspot-scheduler-booking-equivalence.md`. El spike cerró `conditional pass`:
+ equivalencia core probada; adapter/UI productivos siguen como follow-ups y el iframe permanece fallback.
 
 ## Next
 

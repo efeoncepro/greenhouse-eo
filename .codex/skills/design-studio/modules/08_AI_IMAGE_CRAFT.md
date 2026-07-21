@@ -46,30 +46,37 @@ Cierra siempre en `templates/image-prompt-sheet.md` — no dejes el prompt suelt
 ## 2. Selección de modelo por tarea *(as-of 2026-07 — MUY volátil, reverificar mensual)*
 
 > Todo este cuadro cambia por mes. Es un mapa de *fortalezas/debilidades relativas*, no un
-> ranking eterno. La **matriz completa y canónica vive en `SOURCES.md`** (con precios y links);
+> ranking eterno. La **matriz completa y canónica vive en `modules/14_ENTERPRISE_CREATIVE_MODEL_ROUTING.md`**
+> y en su registry machine-readable;
 > acá va la versión de trabajo. Antes de recomendar un modelo, reverifica.
 
 ### 2.1 Modelos de IMAGEN
 
 | Modelo | Fuerte en | Débil en | Cuándo usarlo |
 |---|---|---|---|
-| **Nano Banana Pro** (Gemini 3 Pro Image, Vertex) | **texto legible en imagen**, 4K <10s, físico, razonamiento, enterprise-safe | "alma" estética < Midjourney | default de marketing con copy en la imagen; disponible en Vertex `efeonce-group` |
+| **Gemini 2.5 Flash Image** (Vertex) | contexto, multirreferencia y edición conversacional bajo gobierno GCP | texto final y composición exacta siguen fuera del raster | ruta Google `core`; todo Google va directo por GCP |
+| **Gemini 3.1 Flash Image** (Vertex) | contexto/multirreferencia con calidad/latencia | modelo base GA; 4K/video-input pueden seguir preview | `core` estratégico tras eval; directo GCP |
+| **Gemini 3 Pro Image** (Vertex) | edición razonada/acabado premium | mayor coste/latencia | specialist premium directo GCP |
+| **Gemini 3.1 Flash Lite Image** (Vertex) | volumen y baja latencia | lifecycle corto | scale directo GCP con refresh gate |
 | **GPT Image 2** (OpenAI) | realismo, fidelidad al prompt, edición, texto, uso diario (top general) | estilo cinematográfico < MJ | default realista y de publishing diario; el repo ya lo usa (personaje Nexa) |
+| **Seedream 5 Lite** (ByteDance vía fal.ai) | divergencia material rápida y barata, refs/edición de volumen | continuidad/anatomía de campaña antes del anchor | abrir 8–16 territorios y descartar barato |
+| **Seedream 5 Pro** (ByteDance vía fal.ai) | riqueza material, color, atmósfera, fusión multirreferencia y edición regional semántica | layout extremo menos obediente en el benchmark; sin máscara/layers públicos | desarrollar el mundo visual y hacer art direction regional |
 | **Midjourney v7** | **estética/dirección de arte**, cinematográfico, surreal/pictórico, concept | texto-en-imagen, control literal | mood boards, editorial, hero de alto concepto |
 | **FLUX.2 Pro / 1.1 Pro** | calidad técnica, realismo, velocidad (~4.5s), **params de cámara** (focal/DoF/ángulo) | estética "de autor" | pre-viz de film/VFX, storyboard, realismo comercial; open-weight/self-host |
-| **Ideogram 3** | **texto-en-imagen** (posters, thumbnails, headlines) | fotorrealismo fino | piezas donde el titular vive dentro de la imagen |
-| **Recraft v4** | **vectores editables reales** (logos, iconos, mascotas, packaging) que escalan en Illustrator | fotorrealismo | cuando el entregable ES un asset de diseño escalable/editable |
-| **Adobe Firefly** | commercially-safe, edición de foto real en Photoshop, capas | estética < MJ | trabajo de cliente que exige licencia limpia + retoque |
-| **Imagen 4** (Vertex) | texto, calidad Google, enterprise | menos "carácter" | alternativa Vertex enterprise en `efeonce-group` |
+| **Ideogram 4** | **texto-en-imagen** (posters, thumbnails, headlines) | fotorrealismo fino | explorar lettering; el release tipográfico sigue siendo determinístico |
+| **Recraft v4.1** | **vectores editables reales** (iconos, ilustración, sistemas) que escalan en Illustrator | fotorrealismo | cuando el entregable ES un SVG escalable/editable; logo final requiere validación humana |
+| **Adobe Firefly** | workbench de edición/generación integrado con Adobe | ruta externa `watch`; términos/indemnidad dependen del endpoint y cliente | retoque asistido sólo tras rights review |
+| ~~**Imagen 4**~~ (Vertex) | legacy | **deprecado; migración oficial a Gemini 2.5 Flash Image** | no usar en trabajo nuevo |
 
 ### 2.2 Modelos de VIDEO / motion *(design-studio dirige; producción → `social-media-studio` + Higgsfield)*
 
 | Modelo | Fuerte en | Débil en | Cuándo usarlo |
 |---|---|---|---|
-| **Seedance 2.0 / 2.5** (ByteDance) | **#1 arena** (sobre Veo/Kling), movimiento fluido, animación de personaje, **hasta 50 refs + audio ref**, edición por región, 4K, 30s nativo (2.5), barato (~$0.06/s, fast ~$0.022/s) | vivid/alto contraste (menos editorial), físico complejo, texto fino, manos, multitud | control compositivo máximo con referencias; social punchy; presupuesto ajustado |
-| **Veo 3.1** (Google) | broadcast-ready, frame rate de cine, consistencia | precio (~$0.10/s) | entregable de calidad broadcast/cine |
-| **Kling 3.0** | mejor **relación precio/valor** en generación directa | control fino, refs | video simple y económico |
-| **Gemini Omni / Omni Flash** (Google, Vertex) | multimodal (texto/imagen/audio/video → video), **edición conversacional multi-turn** con consistencia de personaje/físico; fusiona render Veo + edición Nano Banana | ecosistema nuevo | edición iterativa conversacional preservando contexto entre pasos |
+| **Seedance 2.0** (ByteDance/Fal) | hasta 9 imágenes + 3 videos + 3 audios, native audio, 4–15 s y reference-to-video | requiere QA de acción, anatomía y continuidad | toma nueva o continuidad controlada por referencias; Seedance 2.5 no está verificado |
+| **Veo 3.1 / Fast** (Google Vertex) | ruta premium/broadcast y ruta de escala GCP | costo/cupo y duración por endpoint | premium y scale; nunca vía Fal |
+| **Kling 3 Pro/4K** (Fal) | first/last frame, elements, multi-shot y 4K | audio/idioma y concurrencia por endpoint | especialista 4K/control |
+| **PixVerse V6** (Fal) | 1080p, audio, camera controls y buen costo/volumen | límites 1080p/duración | variantes social a escala |
+| **Gemini Omni Flash** (Google Vertex) | reference/video edit + audio en un contexto | preview, 720p, máximo 10 s | `canary` conversacional con fallback |
 | ~~**Sora 2** (OpenAI)~~ | físico/consistencia | **DEPRECADO** — API deprecada 2026-03-24, shutdown 2026-09-24 | **NO** basar nada nuevo en él |
 
 ### 2.3 Post-proceso y herramientas de mano
@@ -87,7 +94,12 @@ Cierra siempre en `templates/image-prompt-sheet.md` — no dejes el prompt suelt
 - **Vector/logo/icono/mascota escalable y editable** → Recraft.
 - **Realismo + control de cámara / storyboard** → FLUX.2.
 - **Realista diario / edición fiel** → GPT Image 2.
-- **Cliente con licencia limpia + Photoshop** → Adobe Firefly.
+- **Divergencia de campaña barata** → Seedream 5 Lite.
+- **Material/color/atmósfera o región semántica** → Seedream 5 Pro.
+- **Campaña multi-modelo** → cargar `modules/12_HYBRID_IMAGE_CAMPAIGN_PRODUCTION.md`; usar
+  Seedream para abrir/desarrollar y GPT para organizar/extender/reparar cuando ese routing
+  corresponda al contrato, no como regla rígida de marca.
+- **Cliente con Photoshop/Adobe workflow** → Firefly sólo después de revisar términos, indemnidad y derechos del endpoint.
 - **Ya elegiste el frame y falta resolución** → Magnific (upscale).
 - **UI de Greenhouse** → nada de esto: `greenhouse-ai-image-generator`.
 
@@ -147,10 +159,12 @@ completa es dinero y azar; la edición es cirugía barata.
 
 ## 6. Gasto y disciplina (puente a `modules/09`)
 
-Generar cuesta créditos. **Dimensiona antes de producir en volumen.** Diverge barato en
+Generar tiene costo variable y, dentro de Creative Studio, devenga Studio Credits sólo por la operación
+generativa gobernada. **Dimensiona antes de producir en volumen.** Diverge barato en
 miniaturas, elige, *después* subes calidad/cantidad de la elegida. No sacas 20 variantes en
 4K de una dirección sin validar; sacas 12 miniaturas, eliges 2, y esas 2 van a 4K + upscale.
-Gobernanza completa del gasto en `modules/09` y `efeonce/STUDIO_TOOLING.md`.
+No confundas vendor spend con créditos, ni cobres la pieza, curaduría o QA como inferencia. Gobernanza completa
+del gasto en `modules/09` y `efeonce/STUDIO_TOOLING.md`.
 
 ---
 

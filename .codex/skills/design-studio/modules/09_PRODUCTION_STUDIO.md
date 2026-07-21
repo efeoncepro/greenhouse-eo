@@ -37,7 +37,7 @@ criterio. El loop es corto y barato en las primeras vueltas (miniaturas), caro s
 | Destino del asset | Mano / herramienta | Regla |
 |---|---|---|
 | **UI de Greenhouse** (icono, empty state, banner, hero de producto, PNG transparente, edición) | **`greenhouse-ai-image-generator`** | Helper canónico + DESIGN.md/AXIS + QA de transparencia. **NUNCA** por fuera. |
-| **Marketing / campaña / concepto** (afiche, social, hero de landing, mood) | Nano Banana / Midjourney / Ideogram / Firefly / Higgsfield / Magnific vía MCP (`modules/08` §2) | design-studio dirige; la herramienta produce. |
+| **Marketing / campaña / concepto** (afiche, social, hero de landing, mood) | Secuencia de manos según operación: Seedream Lite/Pro, GPT Image 2, Nano Banana, Midjourney, Ideogram, Firefly, Higgsfield o Magnific (`modules/08` y `modules/12`) | design-studio dirige el linaje; cada herramienta cambia un delta y preserva el anchor. |
 | **Logo real de tercero / marca de pago** | **`greenhouse-digital-brand-asset-designer`** | **NUNCA** dibujar de memoria. |
 | **Craft final humano** (retoque fino, ilustración propietaria, print) | Persona del equipo creativo | Handoff con spec + refs (§4). |
 | **Motion / identidad kinética** | Dirige acá → implementa **`motion-design`** | El estado estático se resuelve primero. |
@@ -72,10 +72,11 @@ medias**. El handoff mínimo:
   `templates/asset-delivery-spec.md`.
 - **Qué NO tocar** (invariantes de marca): logo, proporciones, colores institucionales.
 
-## 5. Gasto gobernado
+## 5. Gasto gobernado y Studio Credits
 
-Producir con IA **cuesta créditos**. Dimensiona antes de producir en volumen — no rifes en
-alta calidad sin haber validado dirección barata primero.
+Producir con IA tiene costo variable; en Creative Studio se gobierna con **Studio Credits por operación
+generativa**, no por pieza, hora, llamada API o provider. Dimensiona antes de producir en volumen y no rifes en
+alta calidad sin haber validado dirección primero.
 
 **Escalera de costo (barato → caro), no la saltes:**
 
@@ -85,10 +86,17 @@ alta calidad sin haber validado dirección barata primero.
 4. **Edición dirigida** (inpaint/outpaint) del ganador — más barato que regenerar.
 5. **Upscale/enhance** solo del frame final (`modules/08` §4).
 
+En campañas multi-modelo, costo y azar también se controlan en los relevos: aprobar un anchor
+antes de derivar, ejecutar en paralelo sólo ramas independientes y registrar first-pass
+compliance. Cargar `modules/12_HYBRID_IMAGE_CAMPAIGN_PRODUCTION.md`.
+
 > **Regla dura (dimensionar antes de volumen).** No saques **20 variantes en 4K** de una
 > dirección sin validar. Saca ~12 miniaturas, elige 2, *esas* van a alta + upscale. La
 > virality/iteración vive en la fase barata; el gasto vive al final, sobre lo ya decidido.
-> Antes de una tanda grande, estima créditos y confírmalo (ver `efeonce/STUDIO_TOOLING.md`).
+> Antes de una tanda grande, ejecuta `estimate → reservation → approval`; después registra attempts y cierra
+> con `settlement | release | refund adjustment` (ver `efeonce/STUDIO_TOOLING.md`). Un retry técnico no se cobra
+> dos veces. Layout, copy, composición, export, QA y finishing determinístico consumen capacidad/gobierno, pero
+> devengan 0 Studio Credits.
 
 ## 6. Regla de intención → tokens (el borde con la UI)
 
@@ -110,7 +118,7 @@ CLAUDE.md · UI Platform).
 > - [ ] ¿El asset fue **ruteado por destino** (§2), no por herramienta preferida?
 > - [ ] Si es **UI de Greenhouse**, ¿lo produjo `greenhouse-ai-image-generator`?
 > - [ ] Si es **logo real**, ¿pasó por `greenhouse-digital-brand-asset-designer`?
-> - [ ] ¿Divergí barato antes de producir en alta (§5)? ¿Estimé créditos antes del volumen?
+> - [ ] ¿Divergí barato antes de producir en alta (§5)? ¿Estimé y reservé Studio Credits por operación antes del volumen?
 > - [ ] ¿Audité contra brief y marca (`modules/05`) antes de declarar listo?
 > - [ ] Si va a UI, ¿la intención se mapeó a **tokens AXIS**, sin HEX/px crudos?
 > - [ ] Si hay craft humano, ¿entregué spec + refs + assets base (§4)?
@@ -121,5 +129,5 @@ CLAUDE.md · UI Platform).
 
 > **Cierre.** Production Studio es la mano que ejecuta *sin reinventar la mano*. Dirige el
 > concepto, rutea por destino, delega la producción canónica, gobierna el gasto y mapea la
-> intención a tokens. Detalle operativo + herramientas conectadas + estimación de créditos en
+> intención a tokens. Detalle operativo + herramientas conectadas + estimación de Studio Credits en
 > `efeonce/STUDIO_TOOLING.md`.

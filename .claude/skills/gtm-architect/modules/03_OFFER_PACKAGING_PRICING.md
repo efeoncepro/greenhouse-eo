@@ -20,6 +20,18 @@ Elige el **eje de valor** que mejor alinea precio con el valor que recibe el cli
 - **Híbrido** (base + variable) — común en 2026.
 Regla: **cobra por el eje que crece con el valor del cliente**, no por tu costo. (Costeo/loaded cost/márgenes → `finance`; regla ASaaS: nunca retainer sin scope + telemetría + revisión.)
 
+## Aplicación canónica: Creative Studio
+
+Antes de diseñar tiers o motion, carga `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md` y su Credit Model. La arquitectura de oferta tiene tres ejes independientes:
+
+- **delivery model:** Managed Squad, Staff Augmentation, Studio Access o híbrido explícito por lanes;
+- **engagement form:** On-Going, On-Demand o Sample Sprint;
+- **operating mode por corrida:** `efeonce-managed`, `co-operated` o `client-operated`.
+
+El packaging combina cinco líneas visibles: acceso/gobernanza, capacidad humana, Studio Credits, implementación/IP y derechos/licencias/pass-through. Studio Credits son un medidor de uso generativo gobernado; no son piezas, horas, dinero, tokens ni derechos.
+
+Recomendación de rollout: vender primero contratos guiados con shadow ledger y presupuestos estimados, observar mix y dispersión por capability, y recién después decidir tiers, top-ups, expiración/rollover o self-serve. No lanzar pricing público, equivalencia monetaria ni checkout mientras Finance/Commercial no hayan aprobado la calibración. Los ejemplos por pieza explican consumo estimado; no constituyen un tarifario inmutable.
+
 ## Pricing como palanca de motion (2026)
 El precio decide la motion (`04`): **ACV < ~$5K → self-serve/PLG · $10–50K → hybrid/product-led sales · > $50K → sales-led**. Si quieres motion PLG, necesitas un **punto de entrada self-serve** (free/trial/wedge barato). Si vas sales-led, el pricing es negociado y con anclas.
 
@@ -34,6 +46,7 @@ Una **oferta-wedge** entra barato/rápido resolviendo un dolor agudo, y **abre l
 - [ ] Pricing **coherente con la motion** deseada (`04`).
 - [ ] Alineado con doctrina ASaaS (scope + telemetría + economía unitaria).
 - [ ] Márgenes/loaded cost validados con `finance`.
+- [ ] Si es Creative Studio: tres ejes y cinco líneas preservados; derechos separados; equivalencias públicas respaldadas por shadow ledger y aprobación.
 
 ## Cross-links
 - Motion que el pricing habilita → `04`; economía (LTV/CAC/payback) → `07`; wedge en la demanda → `05`.

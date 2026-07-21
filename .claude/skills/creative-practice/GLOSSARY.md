@@ -48,12 +48,37 @@ solo art director).** Elegir mal el comparable es **auto-descontarse.**
 **Staff augmentation** — el cliente **dirige**; nosotros aportamos la persona *(vía Deel)*. **Otro producto,
 otro precio, otro riesgo.** 🔴 **Cobrar un Managed Squad a precio de staff-aug es regalar el gobierno.**
 
-**Las tres capas** — toda oferta creativa tiene: **capacidad** *(descontable bajando alcance)* + **gobierno**
-*(🔴 NUNCA descontable)* + **derechos de uso** *(se cotizan aparte)*.
+**Studio Access** — modelo de delivery donde el cliente compra acceso gobernado a workspace, templates,
+memoria, controls, ledger y soporte pactado. No incluye por defecto dirección, curation, QA managed ni SLA de
+outcome.
 
-**Capa de gobierno** — portal, OTD/FTR/RpA, reportería, account lead único, QA. **Costo marginal ≈ 0 y es lo
-único que el freelancer, el in-house y Superside no pueden dar.** 🔴 **Descontarla es regalar margen puro y
-devaluar el moat en el mismo movimiento.**
+**Los tres ejes** — taxonomía ortogonal: **modelo de delivery** *(Managed Squad · Staff Augmentation · Studio
+Access · híbrido)* × **forma de engagement** *(On-Going · On-Demand · Sample Sprint)* × **modo operativo por
+run/lane** *(`efeonce-managed` · `co-operated` · `client-operated`)*. Ningún eje se infiere de otro.
+
+**Modo operativo** — asignación de autoridad en un run/lane. `efeonce-managed` no es sinónimo de Managed
+Squad; `co-operated` exige owner por etapa; `client-operated` no es Managed Squad con descuento.
+
+**Las cinco líneas económicas** — **gobierno/plataforma** *(🔴 no descontable)* + **capacidad humana** +
+**Studio Credits** + **implementación/IP** + **derechos/licencias/pass-through**. Separarlas impide doble cobro
+y hace visible quién absorbe cada riesgo.
+
+**Studio Credit** — operación generativa gobernada, semántica, provider-neutral, mode-neutral y auditable. No
+es pieza, hora, token, dólar, provider call, licencia ni FTE. Nombre conceptual/contractual provisional; nombre
+técnico recomendado `studio_credit`. → `modules/14_STUDIO_CREDITS.md`.
+
+**Globe Credits** — etiqueta pública posible sólo si Efeonce Globe se aprueba como nombre público. No se usa
+en paralelo con Studio Credits ni como moneda/token en V1.
+
+**Shadow ledger** — cálculo de estimate/reservation/settlement sobre runs reales **sin facturar**, usado para
+calibrar bandas, p50/p95, refunds y margen antes del commercial approval.
+
+**Credit rate version** — versión inmutable de equivalencias por capability/quality tier. Se fija al reservar;
+un cambio futuro no recalcula transacciones históricas.
+
+**Capa de gobierno** — workspace, policy, ledger, memoria, seguridad, observabilidad, métricas y soporte
+base. Tiene costo operativo y de plataforma asignado; no incluye Account Lead, dirección creativa, curation ni
+QA, que viven en capacidad humana. 🔴 **Reducirla exige reducir alcance/SLA, nunca declararla costo cero.**
 
 **Sample Sprint** — la puerta de entrada acotada *(pilot / trial / poc / discovery)*. Con aprobación, costo
 real, guard anti-zombie y lineage al contrato. 🎯 **No se regala: se acota.**

@@ -10,6 +10,7 @@ import Typography from '@mui/material/Typography'
 import type { SxProps, Theme } from '@mui/material/styles'
 
 import { axisNeutral, axisRamp } from '@core/theme/axis-tokens'
+import { greenhouseSecondaryPalette } from '@core/theme/axis-secondary'
 import { axisSemanticHex, axisSemanticPalette, axisSemanticSubValues } from '@core/theme/axis-semantic'
 
 import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
@@ -44,8 +45,8 @@ const tones: { label: string; value: PreviewTone }[] = [
 
 const axisPreviewTone = {
   default: axisNeutral.light.snackbar,
-  primary: axisSemanticHex.success,
-  secondary: axisRamp.primary[500],
+  primary: axisRamp.primary[500],
+  secondary: greenhouseSecondaryPalette.light.main,
   error: axisSemanticHex.error,
   warning: axisSemanticHex.warning,
   info: axisSemanticHex.info,
@@ -60,6 +61,12 @@ const axisPreviewContrastText = {
   info: axisSemanticPalette.info.contrastText,
   success: axisSemanticPalette.success.contrastText
 } as const satisfies Record<Exclude<PreviewTone, 'default'>, string>
+
+const getPreviewTone = (tone: PreviewTone, mode: PreviewMode) =>
+  tone === 'secondary' ? greenhouseSecondaryPalette[mode].main : axisPreviewTone[tone]
+
+const getPreviewContrastText = (tone: Exclude<PreviewTone, 'default'>, mode: PreviewMode) =>
+  tone === 'secondary' ? greenhouseSecondaryPalette[mode].contrastText : axisPreviewContrastText[tone]
 
 const hexToRgb = (hex: string) => {
   const value = hex.replace('#', '')
@@ -88,9 +95,9 @@ const isFeedbackPreviewTone = (tone: PreviewTone): tone is (typeof FEEDBACK_PREV
 
 const getAxisChipSx = (variant: GreenhouseChipVariant, tone: PreviewTone, mode: PreviewMode): SxProps<Theme> => {
   const neutral = axisNeutral[mode]
-  const main = axisPreviewTone[tone]
+  const main = getPreviewTone(tone, mode)
   const isDefault = tone === 'default'
-  const solidText = isDefault ? neutral.textPrimary : axisPreviewContrastText[tone]
+  const solidText = isDefault ? neutral.textPrimary : getPreviewContrastText(tone, mode)
   const defaultFill = alphaHex(neutral.textPrimary, mode === 'dark' ? 0.12 : 0.08)
   const defaultLabel = alphaHex(neutral.textPrimary, mode === 'dark' ? 0.1 : 0.08)
   const defaultText = neutral.textPrimary
@@ -225,7 +232,7 @@ const PreviewChip = ({
   <GreenhouseChip
     label='Chip'
     variant={variant}
-    tone={tone === 'default' ? 'default' : tone === 'secondary' ? 'primary' : tone === 'primary' ? 'success' : tone}
+    tone={tone}
     size={size}
     kind={closable ? 'input' : avatar ? 'identity' : 'attribute'}
     avatarSrc={avatar ? FIGMA_AVATAR_SRC : undefined}

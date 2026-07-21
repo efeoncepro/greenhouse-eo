@@ -6,7 +6,7 @@
  * viaja como header en el GET y en el body del POST, igual que registró TASK-1339.
  * Fail-closed: cualquier error de red/HTTP en el GET ⇒ el card no se muestra.
  */
-import type { ArbitratedRenderResultMirror } from './contract'
+import type { ArbitratedRenderResultMirror, CtaRenderActionMirror } from './contract'
 import type { CtaVisitorIdentity } from './visitor'
 
 export interface CtaApiConfig {
@@ -79,7 +79,7 @@ export interface CtaIngestEventInput {
   placement?: string
   trigger?: string
   variantId?: string
-  actionKind?: 'open_growth_form'
+  actionKind?: CtaRenderActionMirror['kind']
   visitorKey?: string
   sessionKey?: string
   consentState?: 'granted' | 'denied' | 'unknown'

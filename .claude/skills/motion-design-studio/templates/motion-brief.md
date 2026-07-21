@@ -47,7 +47,10 @@
 - **Mano de producción.** [IA · humano (AE/Blender/DaVinci) · híbrido — y por qué] — ver `modules/10_PRODUCTION_STUDIO.md`
 - **Consistencia de personaje/marca.** [aplica Soul ID / refs / mascota Nexa: sí/no] — `efeonce/EFEONCE_OVERLAY.md`
 - **Assets de partida.** [KV / logo / stills / footage / brand kit disponibles y dónde]
-- **Presupuesto de créditos IA (tope).** [Nº aprox. de tomas × chunks × modelo · tope de gasto] — gasto gobernado, `SKILL.md` §4
+- **Plan de operaciones generativas.** [capability × segundos × quality/fidelity tier × candidates/attempts × fallback]
+- **Estimate de Studio Credits.** [rango · `credit_rate_version` · reservation máxima] · **Budget approver:** [persona]
+- **Modo operativo / accountability.** [`efeonce-managed` · `co-operated` · `client-operated`] · **operator of record:** [persona] · **rights authority:** [persona]
+- **Trabajo 0 credits.** [storyboard/animatic/edición/conform/mix/master/export determinísticos; cómo se financia la capacidad]
 
 ## 7. Entregables
 
@@ -67,6 +70,7 @@
 - [ ] Objetivo y mensaje clave únicos, no una lista difusa
 - [ ] Tipo de pieza, duración y destino definidos (no "un video lindo")
 - [ ] Referencias Y anti-referencias declaradas
-- [ ] Mano de producción decidida con presupuesto de créditos si hay IA
+- [ ] Mano de producción decidida; operaciones generativas estimadas por duración/tier/attempt, no por pieza/hora
+- [ ] Reservation/approval bounds y responsables explícitos; rights/licencias separados de credits
 - [ ] Criterio de éxito medible o juzgable, no "que quede bueno"
 - [ ] Owner y aprobadores por hito nombrados

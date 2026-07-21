@@ -59,6 +59,10 @@ export const launchCaptureSession = async (opts: LaunchOptions): Promise<Launche
 
   const context = await browser.newContext({
     ...(devicePreset ?? {}),
+    // GVC injects secret-masking CSS and axe-core into the isolated browser
+    // context. Strict production-like CSPs must remain intact on the target;
+    // bypassing CSP here affects only this disposable evidence session.
+    bypassCSP: true,
     storageState: opts.envConfig.storageStatePath,
     viewport: effectiveViewport,
     deviceScaleFactor: devicePreset?.deviceScaleFactor ?? opts.deviceScaleFactor ?? 2,

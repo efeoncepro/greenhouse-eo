@@ -1,0 +1,28 @@
+{
+  "taskId": "TASK-####",
+  "scenario": "scenario-name",
+  "reviewedAt": "YYYY-MM-DD",
+  "reviewer": "human-or-agent",
+  "evidence": {
+    "desktop": "scripts/frontend/baselines/<surface-id>/desktop__<frame>.png",
+    "mobile": "scripts/frontend/baselines/<surface-id>/mobile__<frame>.png",
+    "dossier": "docs/ui/reviews/TASK-####-short-slug.review.md"
+  },
+  "dimensions": {
+    "hierarchy": { "score": 0, "rationale": "", "evidence": "", "nextAction": "" },
+    "proportions": { "score": 0, "rationale": "", "evidence": "", "nextAction": "" },
+    "rhythm": { "score": 0, "rationale": "", "evidence": "", "nextAction": "" },
+    "density": { "score": 0, "rationale": "", "evidence": "", "nextAction": "" },
+    "depth": { "score": 0, "rationale": "", "evidence": "", "nextAction": "" },
+    "surfaceEconomy": { "score": 0, "rationale": "", "evidence": "", "nextAction": "" },
+    "visualImpact": { "score": 0, "rationale": "", "evidence": "", "nextAction": "" },
+    "typography": { "score": 0, "rationale": "", "evidence": "", "nextAction": "" },
+    "color": { "score": 0, "rationale": "", "evidence": "", "nextAction": "" },
+    "iconography": { "score": 0, "rationale": "", "evidence": "", "nextAction": "" },
+    "responsive": { "score": 0, "rationale": "", "evidence": "", "nextAction": "" },
+    "motion": { "score": 0, "rationale": "", "evidence": "", "nextAction": "" },
+    "fidelity": { "score": 0, "rationale": "", "evidence": "", "nextAction": "" },
+    "genericTemplateResistance": { "score": 0, "rationale": "", "evidence": "", "nextAction": "" }
+  },
+  "verdict": "revise|pass"
+}

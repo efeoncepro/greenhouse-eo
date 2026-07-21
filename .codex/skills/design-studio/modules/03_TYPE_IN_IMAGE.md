@@ -74,7 +74,7 @@ Estructura mínima de lecturas (el ojo entra por una, no por cuatro):
 3. **Subhead / bajada** (aclara).
 4. **Body / detalle** (fecha, lugar, condiciones).
 5. **CTA / cierre** (acción).
-6. **Legal / créditos** (mínimo legible).
+6. **Legal / créditos autorales o de atribución** (mínimo legible; no confundir con Studio Credits).
 
 Reglas de dirección: **un** nivel-1; salto de tamaño claro entre niveles (contraste de escala,
 no escalones tímidos); agrupa por proximidad (`modules/01 §3`); alinea todo a un eje. Los

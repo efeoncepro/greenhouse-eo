@@ -1,33 +1,18 @@
 /**
- * AXIS secondary brand-role layer — TASK-1034 (secondary green adoption).
+ * Greenhouse secondary brand-role layer — Tidal Teal (2026-07-18).
  *
- * AXIS defines `secondary` as the green ramp (`Color Efeonce/Secundary/*`),
- * NOT the legacy Efeonce azure (`#023c70`, which does not exist in AXIS). The
- * runtime is re-adopting the AXIS secondary, gated behind a rollout flag so the
- * azure→green change ships DORMANT and is flipped only after GVC sign-off.
+ * `secondary` is intentionally distinct from both primary/info blue and success
+ * emerald. The primitive ramp lives in `axis-tokens`; this layer maps it to
+ * mode-aware functional roles:
  *
- * --- Which STEP is the functional `main` (the "no todo es lime claro" point) ---
- * The AXIS secondary ramp spans bright lime (100-500: #c6ff7e → #6ec207) into
- * deep green/teal (600-900: #1d9d72 → #03593d). The Greenhouse runtime renders
- * `color="secondary"` almost entirely as TONAL (208) / OUTLINED (33) — never
- * contained (0). In MUI tonal/outlined, `main` drives the TEXT/BORDER color. The
- * bright lime `#6ec207` as text fails legibility (~1.8:1 on a light tint → candy,
- * illegible). So — mirroring the error.main = error-800 a11y decision — the
- * functional `main` is the deep green AXIS secondary-700 `#138760` (white text
- * 4.9:1 ✅; legible as tonal/outlined text on light surfaces). The bright lime
- * lives as `light` for tints/accents. This is the AA-grounded, "use the deeper
- * scale" application — not bright lime everywhere.
+ * - light: 700 ink/fill + white text (5.77:1), 500 accent, 800 active;
+ * - dark: 400 ink/fill + Midnight text (7.25:1), 300 accent, 500 active.
  *
- * Contained secondary (rare/none today) = deep green #138760 + white text (clean,
- * AA). Tonal = light green tint + deep green text. Outlined = deep green border+text.
+ * The dark mapping is deliberate: reusing 700 on charcoal would make outlined
+ * controls and text too quiet. The emergency build-time kill switch can revert
+ * both modes to the legacy Efeonce azure, but Tidal Teal is canonical/default.
  *
- * Flag: NEXT_PUBLIC_AXIS_SECONDARY_LIME_ENABLED — KILL-SWITCH (default ON since the
- * adopt decision). AXIS green is the canonical secondary; the env var only reverts
- * to legacy azure in an emergency.
- *   unset / anything but 'false'  → AXIS green secondary (canonical, default)
- *   'false'                       → legacy Efeonce azure secondary (emergency revert)
- *
- * Theme-build-time flag (same class as the AXIS neutrals flag; NOT a DB flag).
+ * Decision: GREENHOUSE_SECONDARY_TEAL_COLOR_DECISION_V1.md.
  */
 
 import { axisRamp } from './axis-tokens'
@@ -39,9 +24,11 @@ export type SecondaryRole = {
   contrastText: string
 }
 
-/** Build-time kill-switch. Default ON → AXIS green secondary; env='false' reverts. */
-export const isAxisSecondaryLimeEnabled = (): boolean =>
-  process.env.NEXT_PUBLIC_AXIS_SECONDARY_LIME_ENABLED !== 'false'
+export type SecondaryPaletteMode = 'light' | 'dark'
+
+/** Build-time kill-switch. Default ON → Tidal Teal; env='false' reverts. */
+export const isGreenhouseSecondaryTealEnabled = (): boolean =>
+  process.env.NEXT_PUBLIC_GREENHOUSE_SECONDARY_TEAL_ENABLED !== 'false'
 
 /**
  * Legacy secondary — EXACT current runtime values (Efeonce azure). Flag OFF must
@@ -54,18 +41,21 @@ const legacySecondary = {
   contrastText: '#FFFFFF'
 } as const satisfies SecondaryRole
 
-/**
- * AXIS secondary — functional main = secondary-700 (deep green, AA-legible as
- * tonal/outlined text); light = secondary-500 (lime accent for tints); dark =
- * secondary-800 (hover/active). contrastText white (deep green carries white AA).
- */
-const axisSecondary = {
-  main: axisRamp.secondary[700], // TASK-1053 A1b: #4b8405 — crisp green ink, white 4.56:1 AA (era teal #138760)
-  light: axisRamp.secondary[500], // #6ec207 — lime accent / tint base (sin cambio)
-  dark: axisRamp.secondary[800], // TASK-1053 A1b: #396504 — deeper green hover/active (era #0c7250)
-  contrastText: '#FFFFFF'
-} as const satisfies SecondaryRole
+export const greenhouseSecondaryPalette = {
+  light: {
+    main: axisRamp.secondary[700],
+    light: axisRamp.secondary[500],
+    dark: axisRamp.secondary[800],
+    contrastText: '#FFFFFF'
+  },
+  dark: {
+    main: axisRamp.secondary[400],
+    light: axisRamp.secondary[300],
+    dark: axisRamp.secondary[500],
+    contrastText: '#022A4E'
+  }
+} as const satisfies Record<SecondaryPaletteMode, SecondaryRole>
 
 /** Resolve the active secondary role per the rollout flag. */
-export const resolveSecondaryPalette = (): SecondaryRole =>
-  isAxisSecondaryLimeEnabled() ? axisSecondary : legacySecondary
+export const resolveSecondaryPalette = (mode: SecondaryPaletteMode = 'light'): SecondaryRole =>
+  isGreenhouseSecondaryTealEnabled() ? greenhouseSecondaryPalette[mode] : legacySecondary

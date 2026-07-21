@@ -26,6 +26,13 @@
 - **Formatos/ratios por canal:** ______  · **Subtítulos/caption:** ______
 - **CTA(s):** ______
 
-## 6. Medición creativa
+## 6. Frontera de producción y presupuesto
+- **Modelo de delivery / forma de engagement / modo operativo:** ______ / ______ / ______
+- **Operation map generativo:** ______ *(delegar estimate/reservation al Studio; no convertir variante en credit)*
+- **Trabajo determinístico/humano:** copy · layout · edición · subtítulos · QA · export → ______
+- **Rights separados:** creator/talent · voz/likeness · música/stock · whitelisting/territorio → ______
+- **Media spend + platform fees de pauta:** ______ *(nunca Studio Credits)*
+
+## 7. Medición creativa
 - **Hook rate / retention / CTR / CPA por variante:** ______
 - **Aprendizajes a documentar (qué hook/ángulo ganó):** ______

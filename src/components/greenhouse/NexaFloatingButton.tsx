@@ -474,7 +474,7 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
           {panelContent}
         </Drawer>
       ) : (
-        <Fade in={open}>
+        <Fade in={open} unmountOnExit>
           <Box
             sx={{
               position: 'fixed',

@@ -1,0 +1,22 @@
+handoff: lite-to-pro
+source_asset: work/territories/t02-chromatic-wake.png
+reference_role: identity-and-structure
+locked:
+  - exactly one hummingbird
+  - right-facing forward flight
+  - one head, torso and tail
+  - chromatic tile wake as the scale metaphor
+  - deep navy environment
+develop:
+  - premium iridescent material finish
+  - coherent wake concentrated center-right
+  - quiet upper-left copy field
+  - edge-safe full-body silhouette
+forbidden:
+  - generated text, logo or watermark
+  - cloned bird or duplicated anatomy
+  - UI, screens or literal factory imagery
+acceptance:
+  - readable at thumbnail size
+  - upper-left remains calm enough for deterministic copy
+  - output is a textless campaign plate

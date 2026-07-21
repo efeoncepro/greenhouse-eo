@@ -18,6 +18,7 @@ RUN corepack enable && corepack prepare "pnpm@${PNPM_VERSION}" --activate && npm
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml ./
+COPY vendor/ ./vendor/
 RUN pnpm install --frozen-lockfile --ignore-scripts
 
 COPY tsconfig.json ./
@@ -77,6 +78,7 @@ RUN corepack enable && corepack prepare "pnpm@${PNPM_VERSION}" --activate
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml ./
+COPY vendor/ ./vendor/
 RUN pnpm install --frozen-lockfile --ignore-scripts --prod
 
 COPY --from=builder /app/dist/server.mjs ./dist/server.mjs

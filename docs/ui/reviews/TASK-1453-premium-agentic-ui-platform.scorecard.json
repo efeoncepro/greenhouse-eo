@@ -1,0 +1,98 @@
+{
+  "taskId": "TASK-1453",
+  "scenario": "premium-ui-surface-recipes",
+  "reviewedAt": "2026-07-18",
+  "reviewer": "Codex + GVC premium evidence",
+  "evidence": {
+    "desktop": "scripts/frontend/baselines/design-system.surface-recipes/desktop__workbench-first-fold.png",
+    "mobile": "scripts/frontend/baselines/design-system.surface-recipes/mobile__report-first-fold.png",
+    "dossier": "docs/ui/reviews/TASK-1453-premium-agentic-ui-platform.review.md"
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.7,
+      "rationale": "Each archetype exposes purpose, dominant signal and primary decision within the first fold without equal-weight controls.",
+      "evidence": "desktop workbench/report/settings first-fold baselines",
+      "nextAction": ""
+    },
+    "proportions": {
+      "score": 4.5,
+      "rationale": "Workbench ownership, editorial report width and focused settings measure remain balanced across desktop and compact layouts.",
+      "evidence": "desktop__workbench-first-fold.png + mobile__settings-first-fold.png",
+      "nextAction": ""
+    },
+    "rhythm": {
+      "score": 4.6,
+      "rationale": "Tokenized spacing creates deliberate pauses between context, signals, evidence and commands while maintaining scan continuity.",
+      "evidence": "desktop and mobile full-page durable baselines",
+      "nextAction": ""
+    },
+    "density": {
+      "score": 4.5,
+      "rationale": "The surface system keeps operational density high without truncating the key datum and adapts cards through the shared density contract.",
+      "evidence": "workbench and settings desktop/mobile baselines",
+      "nextAction": ""
+    },
+    "depth": {
+      "score": 4.7,
+      "rationale": "Base, open rail, selected row, immersive stage and floating command use distinct semantic elevation roles instead of uniform shadows.",
+      "evidence": "desktop__workbench-first-fold.png",
+      "nextAction": ""
+    },
+    "surfaceEconomy": {
+      "score": 4.8,
+      "rationale": "Signals are integrated, inventory and evidence sections are open, and only selected, immersive, stage or floating roles receive chrome.",
+      "evidence": "desktop workbench/report/settings first-fold baselines + data-ui-surface enterprise probe",
+      "nextAction": ""
+    },
+    "visualImpact": {
+      "score": 4.7,
+      "rationale": "The workbench hero and production stage, editorial report narrative, and asymmetric settings impact panel create task-native focal moments.",
+      "evidence": "three desktop first-fold baselines + three mobile first-fold baselines",
+      "nextAction": ""
+    },
+    "typography": {
+      "score": 4.7,
+      "rationale": "Editorial headings, operational labels, metrics and supporting copy form distinct roles with stable measure and strong legibility.",
+      "evidence": "mobile__report-first-fold.png + desktop__settings-first-fold.png",
+      "nextAction": ""
+    },
+    "color": {
+      "score": 4.6,
+      "rationale": "Navy and azure establish product identity while semantic green, amber and blue remain tied to status and evidence roles.",
+      "evidence": "all first-fold baselines + zero axe contrast findings",
+      "nextAction": ""
+    },
+    "iconography": {
+      "score": 4.5,
+      "rationale": "Icons consistently reinforce status, signal type and action with aligned tiles, labels and color-independent semantics.",
+      "evidence": "signal rails and selection rows across durable baselines",
+      "nextAction": ""
+    },
+    "responsive": {
+      "score": 4.5,
+      "rationale": "At 390px every recipe recomposes into a coherent narrative, preserves touch targets and reports exact zero page overflow.",
+      "evidence": "16 mobile baselines + scrollWidth=clientWidth=390",
+      "nextAction": ""
+    },
+    "motion": {
+      "score": 4.7,
+      "rationale": "Causal selection, recalculation and chart motion use canonical tokens, keyboard parity, reduced-motion equivalence and AA intermediate frames.",
+      "evidence": "selection/recalculation feedback, settled, keyboard and reduced-motion baselines",
+      "nextAction": ""
+    },
+    "fidelity": {
+      "score": 4.7,
+      "rationale": "The repo-native direction survives token and primitive mapping across three distinct archetypes without literal framework defaults.",
+      "evidence": "visual direction contract + all first-fold baselines",
+      "nextAction": ""
+    },
+    "genericTemplateResistance": {
+      "score": 4.6,
+      "rationale": "Workbench ownership, editorial reporting and impact-led settings each have a recognizable composition beyond generic KPI-card dashboards.",
+      "evidence": "three archetype first-fold baselines + enterprise rubric pass",
+      "nextAction": ""
+    }
+  },
+  "verdict": "pass"
+}

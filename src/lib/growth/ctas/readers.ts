@@ -10,10 +10,17 @@ import 'server-only'
 
 import { verifyEmbedKeySecret } from '@/lib/growth/forms/embed-key'
 
+import { captureWithDomain } from '@/lib/observability/capture'
+
 import { resolveCtaAction } from './action-router'
 import { arbitrateCandidates, isRouteEligible, resolvePriorityScore, type ArbiterCandidate } from './arbiter'
 import type { ArbitratedRenderResult, CtaSuppressionDecision, CtaVisitorContext } from './contracts'
-import { recordCtaExposureBatch, type RecordExposureInput } from './exposure'
+import {
+  getFirstViewedBucketAt,
+  recordCtaExposureBatch,
+  summarizeViewedExposureWindows,
+  type RecordExposureInput,
+} from './exposure'
 import {
   isCtaEngineEnabled,
   isCtaSuppressionEnforcementEnabled,
@@ -26,12 +33,15 @@ import {
   type CtaDefinitionRow,
   type CtaVersionRow,
   getCtaDefinitionById,
+  getLastAcceptedEventAt,
   getSurfaceBindingById,
   listCtaDefinitions,
   listPublishedCandidates,
   listSurfaceBindings,
   listVersionsForCta,
   recordServerErrorEventOncePerDay,
+  summarizeAlignedEventCounts,
+  summarizeConversionEventWindows,
   summarizeConversionEvents,
 } from './store'
 import { evaluateCtaSuppression, parseSuppressionPolicy } from './suppression'
@@ -253,11 +263,20 @@ export interface CtaSummaryVm {
   latestVersionId: string | null
   latestVersionStatus: string | null
   publishedVersionId: string | null
+  /** TASK-1430: ejes de la última versión para inventario del cockpit (filtros/íconos). */
+  latestPlacement: string | null
+  latestStyleVariant: string | null
+  latestActionKind: string | null
 }
 
 const toSummaryVm = (definition: CtaDefinitionRow, versions: CtaVersionRow[]): CtaSummaryVm => {
   const latest = versions[0] ?? null
   const published = versions.find(version => version.status === 'published') ?? null
+
+  const actionPolicy =
+    latest?.action_policy_json && typeof latest.action_policy_json === 'object'
+      ? (latest.action_policy_json as Record<string, unknown>)
+      : null
 
   return {
     ctaId: definition.cta_id,
@@ -272,6 +291,9 @@ const toSummaryVm = (definition: CtaDefinitionRow, versions: CtaVersionRow[]): C
     latestVersionId: latest?.cta_version_id ?? null,
     latestVersionStatus: latest?.status ?? null,
     publishedVersionId: published?.cta_version_id ?? null,
+    latestPlacement: latest?.placement ?? null,
+    latestStyleVariant: latest?.style_variant ?? null,
+    latestActionKind: typeof actionPolicy?.kind === 'string' ? actionPolicy.kind : null,
   }
 }
 
@@ -298,15 +320,180 @@ export interface CtaVersionVm {
   content: unknown
   actionPolicy: unknown
   targetingPolicy: unknown
+  /** TASK-1430: la postura de supresión autorada viaja al cockpit (editar = versión nueva la preserva). */
+  suppressionPolicy: unknown
   priorityPolicy: unknown
+  visualAssetRef: string | null
   publishedAt: Date | null
   createdAt: Date
+}
+
+// ─── Métricas de marketing (TASK-1430, instrucción del operador) ─────────────
+
+/** Conteo por ventana con variación % ventana-a-ventana (null si la previa fue 0). */
+export interface CtaMetricWindowValue {
+  current: number
+  previous: number
+  deltaPct: number | null
+}
+
+/** Rate 0–1 por ventana con delta en puntos porcentuales (null si el denominador es 0). */
+export interface CtaRateWindowValue {
+  current: number | null
+  previous: number | null
+  deltaPp: number | null
+}
+
+/**
+ * Métricas de marketing de un CTA, resueltas ÍNTEGRAMENTE server-side (la UI
+ * jamás deriva rates/deltas — regla de la task). Fuentes y trust:
+ * - `impressions` = rollup Tier B `viewed` (browser-observed, agregado horario).
+ * - `clicks` = ledger Tier A `clicked` accepted (`browser_reported`).
+ * - `conversions` = ledger `form_submitted`/`action_completed` con
+ *   `trust_level='server_confirmed'` (la ÚNICA verdad de conversión; los
+ *   breadcrumbs `error` server_confirmed jamás cuentan).
+ * - `ctr` = clicks/impressions (browser-derived) · `conversionRate` =
+ *   conversions/impressions (numerador server_confirmed sobre viewed browser).
+ */
+export interface CtaMarketingMetricsVm {
+  windowDays: number
+  impressions: CtaMetricWindowValue
+  clicks: CtaMetricWindowValue
+  conversions: CtaMetricWindowValue
+  ctr: CtaRateWindowValue
+  conversionRate: CtaRateWindowValue
+  /**
+   * Cobertura de los RATES (determinada server-side, jamás en la UI):
+   * - `ok`: el tracking de impresiones cubre toda la ventana; rates ventana completa.
+   * - `aligned_partial`: las impresiones nacieron DENTRO de la ventana (Tier B más
+   *   nuevo que el ledger) — CTR/tasa se computan sobre la VENTANA ALINEADA
+   *   (clics/conversiones desde `coverageSince` ÷ impresiones). Los conteos de las
+   *   cards siguen siendo ventana completa; la UI explica el ancla.
+   * - `impressions_undercounted`: incluso alineado clicks > impressions (sampling/
+   *   asimetrías) — un % sería imposible; la UI muestra conteos + nota.
+   */
+  coverage: 'ok' | 'aligned_partial' | 'impressions_undercounted'
+  /** Ancla de la ventana alineada (primer bucket viewed) cuando coverage=aligned_partial. */
+  coverageSince: string | null
+  lastEventAt: string | null
+}
+
+const CONVERSION_EVENT_KINDS = ['form_submitted', 'action_completed'] as const
+
+const toWindowValue = (current: number, previous: number): CtaMetricWindowValue => ({
+  current,
+  previous,
+  deltaPct: previous > 0 ? ((current - previous) / previous) * 100 : null,
+})
+
+const toRateValue = (
+  numerator: CtaMetricWindowValue,
+  denominator: CtaMetricWindowValue,
+): CtaRateWindowValue => {
+  const current = denominator.current > 0 ? numerator.current / denominator.current : null
+  const previous = denominator.previous > 0 ? numerator.previous / denominator.previous : null
+
+  return {
+    current,
+    previous,
+    deltaPp: current !== null && previous !== null ? (current - previous) * 100 : null,
+  }
+}
+
+export const getCtaMarketingMetrics = async (
+  ctaId: string,
+  windowDays = 30,
+): Promise<CtaMarketingMetricsVm> => {
+  const [eventWindows, viewedWindows, lastEventAt, firstViewedAt] = await Promise.all([
+    summarizeConversionEventWindows(ctaId, windowDays),
+    summarizeViewedExposureWindows(ctaId, windowDays),
+    getLastAcceptedEventAt(ctaId),
+    getFirstViewedBucketAt(ctaId),
+  ])
+
+  const sumEvents = (window: 'current' | 'previous', predicate: (row: { eventKind: string; trustLevel: string }) => boolean) =>
+    eventWindows
+      .filter(row => row.window === window && predicate(row))
+      .reduce((total, row) => total + row.total, 0)
+
+  const isClick = (row: { eventKind: string }) => row.eventKind === 'clicked'
+
+  const isConversion = (row: { eventKind: string; trustLevel: string }) =>
+    row.trustLevel === 'server_confirmed' &&
+    (CONVERSION_EVENT_KINDS as readonly string[]).includes(row.eventKind)
+
+  const viewedFor = (window: 'current' | 'previous') =>
+    viewedWindows.find(row => row.window === window)?.viewed ?? 0
+
+  const lastBucketAt = viewedWindows
+    .map(row => row.lastBucketAt)
+    .filter((value): value is string => value !== null)
+    .sort()
+    .at(-1) ?? null
+
+  const impressions = toWindowValue(viewedFor('current'), viewedFor('previous'))
+  const clicks = toWindowValue(sumEvents('current', isClick), sumEvents('previous', isClick))
+  const conversions = toWindowValue(sumEvents('current', isConversion), sumEvents('previous', isConversion))
+
+  const freshness = [lastEventAt, lastBucketAt].filter((value): value is string => value !== null).sort().at(-1) ?? null
+
+  // Cobertura de rates: si el tracking de impresiones nació DENTRO de la ventana,
+  // el CTR honesto se computa sobre la ventana ALINEADA (desde el primer bucket
+  // viewed) — "si tienes clics e impresiones, tienes CTR", pero sobre el tramo
+  // donde AMBAS señales existen. Los conteos de cards siguen siendo ventana completa.
+  const windowStartMs = Date.now() - windowDays * 24 * 60 * 60 * 1000
+  const firstViewedMs = firstViewedAt ? Date.parse(firstViewedAt) : null
+  const partialCoverage = firstViewedMs !== null && firstViewedMs > windowStartMs
+
+  let ctr = toRateValue(clicks, impressions)
+  let conversionRate = toRateValue(conversions, impressions)
+  let coverage: CtaMarketingMetricsVm['coverage'] = clicks.current > impressions.current ? 'impressions_undercounted' : 'ok'
+  let coverageSince: string | null = null
+
+  if (partialCoverage && impressions.current > 0 && firstViewedAt) {
+    const aligned = await summarizeAlignedEventCounts(ctaId, firstViewedAt)
+    const alignedClicks = aligned.filter(isClick).reduce((total, row) => total + row.total, 0)
+    const alignedConversions = aligned.filter(isConversion).reduce((total, row) => total + row.total, 0)
+
+    if (alignedClicks <= impressions.current) {
+      ctr = { current: alignedClicks / impressions.current, previous: null, deltaPp: null }
+      conversionRate = { current: alignedConversions / impressions.current, previous: null, deltaPp: null }
+      coverage = 'aligned_partial'
+      coverageSince = firstViewedAt
+    } else {
+      coverage = 'impressions_undercounted'
+    }
+  } else if (partialCoverage) {
+    // Aún sin impresiones: rates null (el guard clásico decide el label).
+    coverage = clicks.current > 0 ? 'impressions_undercounted' : 'ok'
+  }
+
+  // Con cobertura undercounted el VM jamás porta un rate físicamente imposible
+  // (contrato limpio: la UI no debe depender de "saber ocultarlo").
+  if (coverage === 'impressions_undercounted') {
+    ctr = { current: null, previous: null, deltaPp: null }
+    conversionRate = { current: null, previous: null, deltaPp: null }
+  }
+
+  return {
+    windowDays,
+    impressions,
+    clicks,
+    conversions,
+    ctr,
+    conversionRate,
+    coverage,
+    coverageSince,
+    lastEventAt: freshness,
+  }
 }
 
 export interface CtaDetailVm {
   summary: CtaSummaryVm
   versions: CtaVersionVm[]
   conversion: CtaConversionSummary[]
+  /** null = lectura de métricas degradada (la UI muestra región parcial; lifecycle sigue operable). */
+  metrics: CtaMarketingMetricsVm | null
 }
 
 /** Detalle admin (server-side; incluye policies — jamás cruza al browser público). */
@@ -318,8 +505,18 @@ export const getCtaDetailAdmin = async (ctaId: string): Promise<CtaDetailVm | nu
   const versions = await listVersionsForCta(ctaId)
   const conversion = await summarizeConversionEvents(ctaId)
 
+  let metrics: CtaMarketingMetricsVm | null = null
+
+  try {
+    metrics = await getCtaMarketingMetrics(ctaId)
+  } catch (error) {
+    // Degradación honesta: el detalle sigue operable sin métricas (región parcial).
+    captureWithDomain(error, 'growth', { tags: { source: 'cta_marketing_metrics_reader' } })
+  }
+
   return {
     summary: toSummaryVm(definition, versions),
+    metrics,
     versions: versions.map(version => ({
       ctaVersionId: version.cta_version_id,
       version: version.version,
@@ -330,7 +527,9 @@ export const getCtaDetailAdmin = async (ctaId: string): Promise<CtaDetailVm | nu
       content: version.content_json,
       actionPolicy: version.action_policy_json,
       targetingPolicy: version.targeting_policy_json,
+      suppressionPolicy: version.suppression_policy_json,
       priorityPolicy: version.priority_policy_json,
+      visualAssetRef: version.visual_asset_ref,
       publishedAt: version.published_at,
       createdAt: version.created_at,
     })),

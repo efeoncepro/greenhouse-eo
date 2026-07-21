@@ -1,6 +1,6 @@
 ---
 name: gtm-architect
-description: Arquitecto de Go-to-Market (GTM) al estado del arte 2026 — la capa de ESTRATEGIA + ORQUESTACIÓN que decide a quién, con qué posicionamiento, con qué motion y por qué canales sale una oferta al mercado, y coordina los motores (venta, demanda, contenido, inteligencia, medición). Cubre selección de mercado/segmento e ICP, positioning y category design, offer/packaging/pricing strategy, la decisión de GTM motion (sales-led / PLG / product-led sales / marketing-led / partner-ecosystem-led / community-led), estrategia de demanda + orquestación full-funnel/bow-tie, launch planning, GTM metrics & economics (CAC/LTV/payback/magic number/NRR/pipeline), operating model + cadencia, y GTM como servicio para clientes. Doble audiencia (Efeonce + clientes). NO reemplaza a commercial-expert (motor de venta + doctrina ASaaS): GTM decide/orquesta, commercial ejecuta. Sinergias directas con commercial-expert, efeonce-agency, research-benchmark-operator, digital-marketing, growth-marketing-cro, content-marketing-studio, seo-aeo, greenhouse-gtm-ga4-operator, copywriting, legal-privacy-ip-operator, greenhouse-public-private-tenders. Triggers: "go-to-market", "GTM", "estrategia de mercado", "salir al mercado", "posicionamiento", "positioning", "category design", "categoría", "ICP", "segmento", "beachhead", "wedge", "packaging", "pricing strategy", "modelo de pricing", "motion", "PLG", "product-led", "sales-led", "product-led sales", "ecosystem-led", "community-led", "canal de adquisición", "launch", "lanzamiento", "demand gen", "bow-tie", "funnel", "CAC", "LTV", "payback", "magic number", "NRR", "pipeline", "signal-based", "GTM plan".
+description: Diseña y orquesta Go-to-Market para Efeonce y clientes. Use for ICP, posicionamiento, category design, offer, packaging, pricing strategy, GTM motion, canales, launch, demand, métricas, Creative Studio y Studio Credits; delega la ejecución comercial y de canales en sus skills dueñas.
 ---
 
 # gtm-architect — Arquitecto de Go-to-Market (2026)
@@ -64,6 +64,7 @@ Verificado vía web, **as-of 2026-07** (reverificar — ver Paso 2):
 6. **Un GTM plan siempre trae owners + cadencia + métricas.** Estrategia sin operating model es un PDF muerto (`08`).
 7. **Entrada a mercado con due diligence legal.** Nuevo país/segmento → privacidad/contratos (`legal-privacy-ip-operator`); licitaciones como canal → `greenhouse-public-private-tenders`.
 8. **es-CL neutro, tuteo.**
+9. **Creative Studio mantiene tres ejes y cinco líneas.** Al definir su GTM no colapses delivery model, engagement form y operating mode; tampoco vendas Studio Credits como piezas, horas, dinero o derechos. El modelo canónico en `docs/business-models/creative-studio/` gobierna la oferta; GTM decide segmento, packaging, motion y rollout dentro de ese contrato.
 
 ## Tabla de sinergias — GTM como conductor
 
@@ -78,6 +79,7 @@ Verificado vía web, **as-of 2026-07** (reverificar — ver Paso 2):
 | **Demanda orgánica/IA + wedge (AI Visibility Grader)** | **`seo-aeo`** | GTM decide el wedge; seo-aeo lo hace descubrible |
 | **Medición / atribución / CRM runtime** | **`greenhouse-gtm-ga4-operator`** + HubSpot | GTM define qué medir; ellos el runtime |
 | **Craft del mensaje / narrativa de launch** | **`copywriting`** | GTM define la messaging house; copywriting escribe |
+| **Creative Studio / Studio Credits** | `efeonce-agency` + `creative-practice` + `greenhouse-finance-accounting-operator` | GTM diseña segmentación, packaging y motion; el modelo canónico define el producto y Finance aprueba economía/equivalencias |
 | **Entrada a mercados (privacidad/contratos)** | **`legal-privacy-ip-operator`** | Legal fija el deber; GTM la estrategia |
 | **Licitaciones como canal GTM (sector público/privado)** | **`greenhouse-public-private-tenders`** | GTM decide usarlo; tenders lo opera |
 | **Captura (forms/lead magnets)** | **`greenhouse-growth-forms`** | GTM decide el wedge; forms el runtime |

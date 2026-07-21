@@ -48,6 +48,8 @@ Leyenda tagging: `✅` taggeado y verificado en GA4 · `⏳` pendiente · `n/a` 
 ## CTAs
 
 > **Dos rails, deslinde explícito (TASK-1340):** (a) el **motor Growth CTA** (`<greenhouse-cta>`, TASK-1339/1340) emite la familia canónica **`greenhouse_cta_*`** del arch spec `GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1` §13 — namespace deliberado, distinto del interno `growth.cta.*`; SoT en código: `CTA_GTM_EVENT_NAMES` + `CTA_TELEMETRY_ALLOWED_PAYLOAD_KEYS` (`src/lib/growth/ctas/contracts.ts`, espejo en el renderer con parity test). (b) el rail **legacy ad-hoc `gh_cta_clicked`** de los widgets WordPress pre-motor (redes-sociales) sigue vivo tal cual (deprecar-no-renombrar, doc 04 §7); NO se armonizan. Misma disciplina en ambos: evento genérico + identidad por parámetro (`cta_id`/`cta_slug`/`cta_location`), nunca un evento por superficie/posición; ningún click de CTA es key event (doc 04 §3b).
+>
+> **Delta 2026-07-18 (TASK-1431, code complete — rollout pendiente):** el param existente **`action_kind`** ahora puede portar 4 valores (`open_growth_form` | `link_url` | `open_think_tool` | `book_meeting`). CERO eventos/params nuevos: un CTA de navegación emite `greenhouse_cta_viewed`/`clicked`/`dismissed`/`error` (no hay `form_opened`/`form_submitted` para navigate; el `clicked` sale ANTES de navegar con ingest `keepalive`). El destino (URL) JAMÁS viaja en telemetría — solo `action_kind` allowlisted. `book_meeting` es navegación-only: ningún click crea Meeting/Contact/Deal, así que no existe evento de conversión browser para ese kind.
 
 > **Corte de semántica `greenhouse_cta_viewed` (TASK-1429, 2026-07-18):** `viewed` pasa de dispararse **al montar** el card (baseline TASK-1427: mount = viewed) a dispararse **cuando el card ES visible** — IntersectionObserver ≥50% + dwell 300ms, una sola vez (`notifyViewed`). Aplica a embedded Y slide_in en el bundle ≥ `1.1.0`. Efecto esperado en series: `greenhouse_cta_viewed` BAJA para placements below-the-fold (medición más honesta, no regresión del motor). Además `viewed` ahora también entra al ingest server como **Tier B** (rollup agregado `cta_exposure_rollup`, TASK-1428) — jamás al ledger de conversión. Sin cambios de nombres de eventos ni params (SoT intacto; los tags GTM v4 publicados siguen válidos).
 
@@ -67,6 +69,16 @@ Leyenda tagging: `✅` taggeado y verificado en GA4 · `⏳` pendiente · `n/a` 
 | Surface id | Kind | Página / ubicación | Emite dataLayer | Evento GTM → GA4 | Key event | Tagging | Notas |
 |---|---|---|---|---|---|---|---|
 | `social_meeting_embed` | hubspot_meetings_embed | `/servicios/redes-sociales/` · sección final CTA | ✅ `dataLayer` | `gh_meeting_embed_viewed`, `gh_meeting_embed_loaded`, `gh_meeting_embed_failed` → pendiente de tags GA4 | no | ⏳ pendiente | El iframe se lazy-load al abrir Reunión. Los UTMs de campaña viajan por la query de la página; `dataLayer` conserva CTA/surface sin PII. |
+
+### Native meeting scheduler (TASK-1509 / TASK-1510)
+
+| Surface id | Kind | Página / ubicación | Emite dataLayer | Evento GTM → GA4 | Key event | Tagging | Notas |
+|---|---|---|---|---|---|---|---|
+| `fhsf-efeonce-lead-gen-web` + binding `discovery` | native_meeting_scheduler | Efeonce público, placement por host | ✅ cuando renderer pilot esté activo | `gh_meeting_step_reached` → custom homónimo; `gh_meeting_booking_confirmed` → `generate_lead` con `lead_source=meeting_booking` | sólo `generate_lead` existente | ⏳ workspace 6 previewado; publish/pilot pendientes | El custom `gh_meeting_booking_confirmed` NO se reenvía a GA4. Auditoría 2026-07-21: identidad semántica independiente del copy, cero PII/slot exacto y conversión sólo con receipt server-confirmed. Ledger `server_confirmed` es SoT; GA es mirror browser-reported y se reconcilia. Fallback iframe/link permanece. |
+
+Allowlist funnel: `meeting_step`, `scheduler_key`, `surface_id`, `placement`, `availability_state`, `days_ahead_bucket`, `time_of_day_bucket`, `error_category`. Se prohíben PII, valores de campos, slot/timestamp/timezone exactos, receipt, idempotency/correlation/provider IDs, Teams URL, raw UTMs/referrer/query y provider body/error. `stage` no existe: sería redundante y podría contradecir `meeting_step`.
+
+GTM pendiente: workspace descartable basado en versión publicada; reusar DLV `surface_id`/`placement`; crear DLVs `meeting_step`, `scheduler_key`, `availability_state`, `days_ahead_bucket`, `time_of_day_bucket`, `error_category`; 2 triggers y 2 tags dedicados. GA4: registrar esas 6 dimensiones event-scoped; no crear otro key event ni usar `transaction_id`. Publish sólo tras preview, evidencia `/g/collect`, confirmación humana y snapshot.
 
 ---
 

@@ -1,49 +1,24 @@
 /**
- * TASK-1339 — Growth CTA engine: action router (solo `open_growth_form` en V1).
+ * TASK-1339 → TASK-1431 — Growth CTA engine: action router (fachada estable).
  *
- * Resuelve la política de acción de una versión contra el contrato PUBLICADO de
- * Growth Forms vía su reader canónico. Boundary duro (arch §12/§20): el CTA guarda
- * SOLO la relación (`formRef`); NUNCA copia field schema, validación ni consent —
- * el form sigue siendo la autoridad del submit. La resolución se usa en dos puntos:
- * el gate de publish (un CTA no publica apuntando a un form que no resuelve) y el
- * read path del arbiter (un form despublicado saca al CTA de render + breadcrumb
- * `form_handoff_failed`).
+ * Desde TASK-1431 la resolución vive en el Action Registry (`action-registry.ts`):
+ * un entry por kind con schema de policy, resolver server-side y proyección
+ * browser-safe. Esta fachada conserva el contrato que consumen el gate de publish
+ * (un CTA no publica con acción no resoluble) y el read path del arbiter (una
+ * acción que no resuelve saca al CTA de render + breadcrumb) — boundary arch §12
+ * intacto: el CTA guarda SOLO relaciones/destinos gobernados, nunca duplica al
+ * dominio destino.
  */
 import 'server-only'
 
-import { getPublishedRenderContractByRef } from '@/lib/growth/forms/readers'
+import { type CtaActionResolution, resolveRegisteredCtaAction } from './action-registry'
 
-import { type CtaRenderAction, ctaActionPolicySchema } from './contracts'
-
-export type ResolveCtaActionResult =
-  | { ok: true; action: CtaRenderAction }
-  | { ok: false; reason: 'action_policy_invalid' | 'action_kind_unsupported' | 'form_not_resolvable' }
+export type ResolveCtaActionResult = CtaActionResolution
 
 /**
- * Valida la action policy persistida y resuelve el target browser-safe.
- * Para `open_growth_form`: el form debe tener versión published viva; devolvemos
- * slug + form_key estables (lo único que el renderer necesita para montar
- * `<greenhouse-form>`; el form trae su propio contrato por su propia ruta pública).
+ * Valida la action policy persistida contra el registry y resuelve el target
+ * browser-safe. Fail-closed: kind sin entry registrado ⇒ `action_kind_unsupported`
+ * (jamás un fallback silencioso a link genérico).
  */
-export const resolveCtaAction = async (actionPolicyJson: unknown): Promise<ResolveCtaActionResult> => {
-  const policy = ctaActionPolicySchema.safeParse(actionPolicyJson ?? {})
-
-  if (!policy.success) return { ok: false, reason: 'action_policy_invalid' }
-
-  if (policy.data.kind !== 'open_growth_form') {
-    return { ok: false, reason: 'action_kind_unsupported' }
-  }
-
-  const formContract = await getPublishedRenderContractByRef(policy.data.formRef)
-
-  if (!formContract) return { ok: false, reason: 'form_not_resolvable' }
-
-  return {
-    ok: true,
-    action: {
-      kind: 'open_growth_form',
-      formSlug: formContract.form.slug,
-      formKey: formContract.form.formKey,
-    },
-  }
-}
+export const resolveCtaAction = async (actionPolicyJson: unknown): Promise<ResolveCtaActionResult> =>
+  resolveRegisteredCtaAction(actionPolicyJson)

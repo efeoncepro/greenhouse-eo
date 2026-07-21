@@ -1,7 +1,7 @@
 'use client'
 
 // React Imports
-import type { HTMLAttributes, ReactElement } from 'react'
+import type { ButtonHTMLAttributes, ReactElement } from 'react'
 
 // Hook Imports
 import useVerticalNav from '../../hooks/useVerticalNav'
@@ -11,17 +11,19 @@ import CloseIcon from '../../svg/Close'
 import RadioCircleIcon from '../../svg/RadioCircle'
 import RadioCircleMarkedIcon from '../../svg/RadioCircleMarked'
 
-type NavCollapseIconsProps = HTMLAttributes<HTMLSpanElement> & {
+type NavCollapseIconsProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   closeIcon?: ReactElement
   lockedIcon?: ReactElement
   unlockedIcon?: ReactElement
   onClick?: () => void
   onClose?: () => void
+  closeLabel?: string
+  toggleLabel?: string
 }
 
 const NavCollapseIcons = (props: NavCollapseIconsProps) => {
   // Props
-  const { closeIcon, lockedIcon, unlockedIcon, onClick, onClose, ...rest } = props
+  const { closeIcon, lockedIcon, unlockedIcon, onClick, onClose, closeLabel, toggleLabel, ...rest } = props
 
   // Hooks
   const { isCollapsed, collapseVerticalNav, isBreakpointReached, toggleVerticalNav } = useVerticalNav()
@@ -50,29 +52,35 @@ const NavCollapseIcons = (props: NavCollapseIconsProps) => {
   return (
     <>
       {isBreakpointReached ? (
-        <span role='button' tabIndex={0} style={{ display: 'flex', cursor: 'pointer' }} onClick={handleClose} {...rest}>
+        <button
+          type='button'
+          aria-label={closeLabel}
+          style={{ display: 'grid', placeItems: 'center', inlineSize: 24, blockSize: 24, padding: 0, border: 0, background: 'transparent', color: 'inherit', cursor: 'pointer' }}
+          onClick={handleClose}
+          {...rest}
+        >
           {closeIcon ?? <CloseIcon />}
-        </span>
+        </button>
       ) : isCollapsed ? (
-        <span
-          role='button'
-          tabIndex={0}
-          style={{ display: 'flex', cursor: 'pointer' }}
+        <button
+          type='button'
+          aria-label={toggleLabel}
+          style={{ display: 'grid', placeItems: 'center', inlineSize: 24, blockSize: 24, padding: 0, border: 0, background: 'transparent', color: 'inherit', cursor: 'pointer' }}
           onClick={() => handleClick('lock')}
           {...rest}
         >
           {unlockedIcon ?? <RadioCircleIcon />}
-        </span>
+        </button>
       ) : (
-        <span
-          role='button'
-          tabIndex={0}
-          style={{ display: 'flex', cursor: 'pointer' }}
+        <button
+          type='button'
+          aria-label={toggleLabel}
+          style={{ display: 'grid', placeItems: 'center', inlineSize: 24, blockSize: 24, padding: 0, border: 0, background: 'transparent', color: 'inherit', cursor: 'pointer' }}
           onClick={() => handleClick('unlock')}
           {...rest}
         >
           {lockedIcon ?? <RadioCircleMarkedIcon />}
-        </span>
+        </button>
       )}
     </>
   )

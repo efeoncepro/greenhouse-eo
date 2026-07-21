@@ -277,7 +277,7 @@ export const GH_COLORS = {
   chart: {
     // Brand/semantic named series — derive del AXIS SoT (TASK-1034 + TASK-1053).
     primary: axisMain.primary, // #0375db (era literal hardcodeado)
-    secondary: axisMain.secondary, // verde de marca (era el stale #024c8f de dirección D, sin consumers)
+    secondary: axisMain.secondary, // Tidal Teal brand secondary; distinct from success emerald
     success: axisSemanticHex.success,
     warning: axisSemanticHex.warning,
     error: axisSemanticHex.error,

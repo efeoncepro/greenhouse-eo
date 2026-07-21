@@ -223,3 +223,25 @@ pnpm test:e2e:staging -- tests/e2e/smoke/finance-cash-out-bank-reflection.spec.t
 | `ETIMEDOUT` fetching bypass   | Vercel CLI token expired                   | Run `vercel login` to refresh                                                           |
 | Script finds no bypass entry  | `protectionBypass` empty in API response   | SSO Protection may be disabled — verify in Vercel project settings                      |
 | Bypass works but auth fails   | Agent user not in PG                       | Verify `user-agent-e2e-001` exists in `greenhouse_core.users` on staging DB             |
+| Staging serves OLD code       | Alias `env-staging` pinned (ISSUE-123)     | Tooling auto-resolves latest deployment; NEVER "fix" with `vercel alias set` (see below) |
+
+## 10. Delta 2026-07-18 — ISSUE-123: resolución por deployment vigente (el alias ya no es la verdad)
+
+El alias `greenhouse-eo-env-staging-….vercel.app` puede quedar **fijado a un deployment viejo**: un
+`vercel alias set` manual lo saca de la gestión automática de Vercel y cada deploy posterior lo deja
+rezagado (bug class ISSUE-123 — recurrió 2026-07-17 y 2× 2026-07-18; el "fix" manual ERA la causa).
+
+Contrato vigente del tooling de agentes:
+
+- **`resolveStagingAccess()`** (`scripts/lib/vercel-staging-access.mjs`) resuelve el **último
+  deployment staging `READY` vía Vercel API** (`resolveLatestStagingDeploymentUrl`; filtro real:
+  `customEnvironment.slug === 'staging'` — los custom envs llegan con `target: null`). El alias es
+  SOLO fallback (sin token/API caída) con warning ruidoso. Prioridad: `STAGING_URL` explícito >
+  deployment vigente > alias.
+- **`pnpm staging:url`** imprime la URL vigente para componer con cualquier herramienta:
+  `STAGING_URL=$(pnpm --silent staging:url) pnpm fe:capture <scenario> --env=staging`.
+- **GVC** (`scripts/frontend/lib/env.ts`) acepta `STAGING_URL` y usa **storageState por host** (las
+  cookies de sesión no cruzan subdominios `.vercel.app`; reusar el state del alias contra otra URL
+  redirige a `/login`).
+- **NUNCA** re-apuntar el alias con `vercel alias set` — refuerza el pin. El des-pin es
+  `vercel alias rm` + verificar que el próximo deploy lo re-ata solo (runbook en ISSUE-123).

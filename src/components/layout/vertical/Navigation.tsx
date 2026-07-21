@@ -26,10 +26,13 @@ import navigationCustomStyles from '@core/styles/vertical/navigationCustomStyles
 
 // Brand tokens
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { getMicrocopy } from '@/lib/copy'
 
 type Props = {
   mode: Mode
 }
+
+const microcopy = getMicrocopy()
 
 const StyledBoxForShadow = styled('div')(({ theme }) => ({
   top: 60,
@@ -61,7 +64,7 @@ const Navigation = (props: Props) => {
   const shadowRef = useRef(null)
 
   // Vars
-  const { isCollapsed, isHovered, collapseVerticalNav, isBreakpointReached } = verticalNavOptions
+  const { isCollapsed, isHovered, collapseVerticalNav, isBreakpointReached, isToggled, toggleVerticalNav } = verticalNavOptions
   const isSemiDark = settings.semiDark
 
   const currentMode = muiMode === 'system' ? muiSystemMode : muiMode || mode
@@ -92,6 +95,18 @@ const Navigation = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings.layout])
 
+  useEffect(() => {
+    if (!isBreakpointReached || !isToggled) return
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') toggleVerticalNav(false)
+    }
+
+    document.addEventListener('keydown', closeOnEscape)
+
+    return () => document.removeEventListener('keydown', closeOnEscape)
+  }, [isBreakpointReached, isToggled, toggleVerticalNav])
+
   return (
      
     // Sidebar Vertical Menu
@@ -114,6 +129,8 @@ const Navigation = (props: Props) => {
         </Link>
         {!(isCollapsed && !isHovered) && (
           <NavCollapseIcons
+            closeLabel={microcopy.aria.closeMenu}
+            toggleLabel={microcopy.aria.toggleSidebar}
             lockedIcon={<i className='tabler-circle-dot text-xl' />}
             unlockedIcon={<i className='tabler-circle text-xl' />}
             closeIcon={<i className='tabler-x text-xl' />}

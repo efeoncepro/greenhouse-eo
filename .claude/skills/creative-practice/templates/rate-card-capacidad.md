@@ -28,7 +28,11 @@ precio_venta_rol (100% dedic)  =  loaded_cost_rol × (1 + buffer) / (1 − marge
 
 precio_línea                   =  precio_venta_rol × % de dedicación del rol
 
-precio_squad                   =  Σ precio_línea  +  capa de gobierno
+precio_total                   =  gobierno/plataforma
+                               +  capacidad humana
+                               +  Studio Credits
+                               +  implementación/IP
+                               +  derechos/licencias/pass-through
 ```
 
 **Con el piso vigente (45%):** `/ (1 − 0,45)` = **× 1,8182**
@@ -77,23 +81,53 @@ gente, que es destruir el activo que estás vendiendo.**
 
 ---
 
-## 4. La capa de gobierno — 🔴 la línea que NUNCA se descuenta
+## 4. Arquitectura de cinco líneas
+
+### 4.1 Gobierno/plataforma — 🔴 nunca se descuenta
 
 | Componente | Incluido |
 |---|---|
 | Acceso al portal *(OTD · FTR · RpA · cycle time · stuck assets, por proyecto, con tendencia)* | ✅ |
 | Reportería mensual | ✅ |
-| Account lead único | ✅ |
-| QA / dirección creativa *(estándar de marca)* | ✅ |
+| Policy, ledger, seguridad y observabilidad | ✅ |
+| Soporte base y operación de plataforma asignada | ✅ |
 | **Valor de la capa** | **{{monto}}** |
 
-> 🔴 **Costo marginal ≈ 0 — y es lo ÚNICO que el freelancer, el in-house y Superside no pueden darle.**
-> **Descontarla es regalar margen puro y devaluar el moat en el mismo movimiento.**
-> **Descuenta capacidad. Nunca descuentes el gobierno.**
+> 🔴 **Tiene costo operativo real y asignado, y sostiene control, transparencia y switching cost.**
+> **Un descuento exige reducir alcance/SLA; nunca declares que gobierno cuesta cero.**
 
 ---
 
-## 5. Derechos de uso — se cotizan APARTE
+### 4.2 Capacidad humana
+
+Corresponde al subtotal del squad dimensionado en §2. Account Lead, dirección, curation, QA, producción y
+delivery management viven acá; nunca se imputan a gobierno ni se vuelven a esconder dentro de Studio Credits.
+
+### 4.3 Studio Credits — sólo consumo generativo
+
+| Campo | Valor |
+|---|---|
+| Estado | {{shadow / piloto aprobado / commercially approved}} |
+| Pool/envelope | {{}} |
+| Capability scope | {{image/video/audio classes + quality tiers}} |
+| `credit_rate_version` | {{}} |
+| Evidencia de calibración | {{N runs · p50/p75/p95 · estimate accuracy}} |
+| Retry/refund reserve | {{}} |
+| Budget approver / cap | {{}} |
+| Revenue / costo variable esperado | {{}} / {{}} |
+
+🔴 **No derives esta línea desde una pieza o el precio de lista de un provider.** Requiere shadow ledger,
+bandas semánticas versionadas, margen total ≥45% y commercial approval. → `modules/14_STUDIO_CREDITS.md`.
+
+### 4.4 Implementación/IP
+
+| Componente | Milestone/aceptación | Valor |
+|---|---|---:|
+| Onboarding / Brand Profile | {{}} | {{}} |
+| Templates/workflows | {{portable / proprietary / shared}} | {{}} |
+| Integración/training | {{}} | {{}} |
+
+### 4.5 Derechos de uso y pass-through — aparte
 
 | Dimensión | Lo que pide el cliente | Multiplicador ⚠️ | Valor |
 |---|---|---|---|
@@ -110,7 +144,7 @@ estructurar la conversación y defender el número, NO para citarlos como autori
 
 ---
 
-## 6. El número final
+## 5. El número final
 
 | | Monto | Nota |
 |---|---|---|
@@ -119,13 +153,16 @@ estructurar la conversación y defender el número, NO para citarlos como autori
 | **Costo + buffer** | {{}} | |
 | 🔴 **PISO** *(÷ 0,55)* | **{{}}** | **Bajo esto no se firma. Es aritmética.** |
 | **Capa de gobierno** | {{}} | 🔴 no descontable |
+| **Capacidad humana** | {{}} | squad dimensionado; sin doble imputación |
+| **Studio Credits** | {{}} | sólo si rate/pool aprobados; no precio por pieza |
+| **Implementación/IP** | {{}} | milestone/aceptación |
 | **Derechos de uso** | {{}} | |
 | 🎯 **Precio de lista** | **{{}}** | Anclado al **valor** y al **comparable correcto** |
 | **Margen de negociación** | **{{lista − piso}}** | 🔴 **Se calcula ANTES de la reunión. Nunca durante.** |
 
 ---
 
-## 7. Sanity check contra el comparable ✅
+## 6. Sanity check contra el comparable ✅
 
 **Antes de mandar el número, míralo al lado de lo que el cliente tiene como alternativa:**
 
@@ -144,7 +181,7 @@ comparable equivocado** *(la agencia digital CL de CLP 600k–2,5M)*. → `modul
 
 ---
 
-## 8. Checklist de salida
+## 7. Checklist de salida
 
 - [ ] Loaded cost **confirmado con finance** 🩸
 - [ ] Buffer **declarado y justificado**
@@ -154,6 +191,10 @@ comparable equivocado** *(la agencia digital CL de CLP 600k–2,5M)*. → `modul
 - [ ] `margin-health` **en verde** en el cotizador
 - [ ] La oferta **NO publica** precio por rol ni por pieza
 - [ ] Gobierno **cotizado y marcado no descontable**
+- [ ] Cinco líneas económicas **separadas**, aunque alguna sea cero/no aplicable
+- [ ] Credits calibrados con shadow data/version, sin pieza/provider como unidad
+- [ ] Refund/retry reserve, support incremental y p95 incluidos sin doble imputación
+- [ ] Commercial approval confirmado antes de precio público/top-up/rollover/expiry
 - [ ] Derechos de uso **cotizados aparte**
 - [ ] Supuesto de **FX** declarado *(si es multianual con costos en USD)*
 - [ ] **Sanity check contra el comparable correcto** hecho

@@ -168,6 +168,8 @@ export const getSisterPlatformOAuthStaleClientConfigSignal = async (): Promise<R
             OR (consumer.expires_at IS NOT NULL AND consumer.expires_at <= NOW())
             OR cardinality(client.redirect_uris) = 0
             OR NOT ('openid' = ANY(client.allowed_scopes))
+            OR client.policy_json IS NULL
+            OR jsonb_typeof(client.policy_json) <> 'object'
           )
       `
     )

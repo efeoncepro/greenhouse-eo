@@ -19,6 +19,11 @@ export interface CaptchaVerification {
   reason: string
 }
 
+export interface CaptchaExpectations {
+  expectedHostname?: string
+  expectedAction?: string
+}
+
 export interface CaptchaVerifier {
   verify(token: string | null, remoteIp: string | null): Promise<CaptchaVerification>
 }
@@ -29,7 +34,10 @@ const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/sit
 const isProduction = (env: NodeJS.ProcessEnv): boolean => env.VERCEL_ENV === 'production' || env.NODE_ENV === 'production'
 
 /** Verifier canónico Turnstile con bypass dev / fail-closed prod. */
-export const turnstileCaptchaVerifier = (env: NodeJS.ProcessEnv = process.env): CaptchaVerifier => ({
+export const turnstileCaptchaVerifier = (
+  env: NodeJS.ProcessEnv = process.env,
+  expectations: CaptchaExpectations = {},
+): CaptchaVerifier => ({
   async verify(token, remoteIp) {
     const secret = env[TURNSTILE_SECRET_ENV]
 
@@ -50,9 +58,19 @@ export const turnstileCaptchaVerifier = (env: NodeJS.ProcessEnv = process.env): 
       if (remoteIp) body.set('remoteip', remoteIp)
 
       const response = await fetch(TURNSTILE_VERIFY_URL, { method: 'POST', body })
-      const data = (await response.json()) as { success?: boolean }
+      const data = (await response.json()) as { success?: boolean; hostname?: string; action?: string }
 
-      return data.success === true ? { ok: true, reason: 'verified' } : { ok: false, reason: 'rejected' }
+      if (data.success !== true) return { ok: false, reason: 'rejected' }
+
+      if (expectations.expectedHostname && data.hostname !== expectations.expectedHostname) {
+        return { ok: false, reason: 'hostname_mismatch' }
+      }
+
+      if (expectations.expectedAction && data.action !== expectations.expectedAction) {
+        return { ok: false, reason: 'action_mismatch' }
+      }
+
+      return { ok: true, reason: 'verified' }
     } catch {
       // Error de red al verificar → fail-closed (no asumir humano).
       return { ok: false, reason: 'verify_error' }

@@ -116,6 +116,8 @@ Capturá mockup y runtime, luego compará con `pnpm fe:capture:diff <mockup-run>
 
 El `baseline` ahora es un contrato verificable + hay gates `quality.*` opt-in (warning-first):
 
+Para UI nueva posterior a TASK-1453, declarar `qualityProfile: 'premium'`. El perfil activa ausencia de loading/error/login, accessibility/layout/runtime/keyboard/performance/rubric en modo bloqueante y exige probes de teclado + `reducedMotionCheck`. Los overrides solo pueden endurecer o adaptar presupuestos explícitos; no se usa `premium` para maquillar un scenario diagnóstico.
+
 ```ts
 baseline: {
   surfaceId: 'agency.organizations.list',   // home durable: scripts/frontend/baselines/<surfaceId>/

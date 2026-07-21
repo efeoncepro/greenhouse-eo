@@ -28,6 +28,9 @@ import './styles.css'
 
 // Data Imports
 import { GOVERNANCE_SECTIONS, VIEW_REGISTRY, type GovernanceSection } from '@/lib/admin/view-access-catalog'
+import { getMicrocopy } from '@/lib/copy'
+
+const microcopy = getMicrocopy()
 
 type Item = {
   id: string
@@ -226,12 +229,12 @@ const NavSearch = () => {
   return (
     <>
       {isBreakpointReached || settings.layout === 'horizontal' ? (
-        <IconButton className='text-textPrimary' onClick={() => setOpen(true)}>
+        <IconButton aria-label={microcopy.aria.openSearch} className='text-textPrimary' onClick={() => setOpen(true)}>
           <i className='tabler-search text-2xl' />
         </IconButton>
       ) : (
         <div className='flex items-center gap-2 cursor-pointer' onClick={() => setOpen(true)}>
-          <IconButton className='text-textPrimary' onClick={() => setOpen(true)}>
+          <IconButton aria-label={microcopy.aria.openSearch} className='text-textPrimary' onClick={() => setOpen(true)}>
             <i className='tabler-search text-2xl' />
           </IconButton>
           <div className='whitespace-nowrap select-none text-textDisabled'>Buscar ⌘K</div>

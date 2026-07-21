@@ -4,7 +4,8 @@
 
 - Status: `draft | ready-for-implementation | implemented`
 - Owner task:
-- Product Design asset:
+- Product Design asset: `docs/ui/visual-directions/TASK-####-short-slug-direction.md|durable source path`
+- Visual direction mode: `source-led|repo-native-benchmark`
 - Intended consumers:
 - Copy source:
 - Primitive decision:
@@ -17,6 +18,30 @@
 - Job to be done:
 - Primary decision signal:
 - Non-goals:
+
+## Desktop Target — 1440×1000
+
+[First-fold reading order, dominant region, contextual relationship, action
+placement, density and intended fold.]
+
+## Mobile Target — 390×844
+
+[How the composition transforms—not merely shrinks—including context, command
+placement, density, touch/focus and overflow.]
+
+## Action Hierarchy
+
+- Primary:
+- Secondary:
+- Destructive:
+- Selection vs action:
+- Pending / disabled:
+
+## Visual Fidelity Mapping
+
+| Source cue | Greenhouse token / primitive / recipe | Intent preserved | Literal value rejected |
+|---|---|---|---|
+|  |  |  |  |
 
 ## Layout Skeleton
 
@@ -68,6 +93,7 @@
 - Scenario file:
 - Route:
 - Viewports:
+- Quality profile: `premium`
 - Required steps:
 - Required captures:
 - Required `data-capture` markers:
@@ -75,6 +101,8 @@
 - Scroll-width checks:
 - Accessibility/focus checks:
 - Reduced-motion evidence:
+- Review dossier: `required`
+- Baseline: `surfaceId|required after direction approval|not required — documented ui-lite reason`
 
 ## Design Decision Log
 

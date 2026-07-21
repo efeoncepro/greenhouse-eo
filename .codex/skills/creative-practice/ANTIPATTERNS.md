@@ -226,12 +226,19 @@ es una ventaja competitiva que se protege callándola.**
 | **Cotizar sin pasar por el cotizador** | Un precio sin loaded cost es una corazonada con decimales |
 | **Vender horas o "bolsa de horas"** | Pones tu costo en la factura para que te lo negocien. Y la IA lo desploma |
 | **Publicar precio por pieza o por rol** | Le entregas la calculadora para comoditizarte |
-| **Descontar la capa de gobierno** *(portal, métricas, reportería)* | Costo marginal ≈ 0 y es tu **único** diferenciador. Descontarlo es regalar margen puro **y** devaluar el moat |
+| **Descontar la capa de gobierno sin bajar alcance/SLA** *(workspace, policy, ledger, observabilidad, soporte base)* | Tiene costo operativo asignado y sostiene control/transparencia. Descontarla sin rediseñar el servicio erosiona margen y devalúa el moat |
 | **Cerrar bajo el 45%** | No es voluntad: **es aritmética**. Un cliente bajo el piso es una deuda con tu equipo |
 | **Decir "déjame ver qué puedo hacer"** ante un pedido de descuento | Enseña que el precio era negociable desde el inicio. A partir de ahí, **todo lo que digas vale menos** |
 | **Bajar el precio sin bajar el alcance** | Es la definición operativa de regalar margen |
 | **Cobrar un Managed Squad a precio de staff-aug** | Regalas la parte que más vale: **el gobierno** |
 | **Cotizar multianual en CLP con costos en USD sin buffer de FX** | El margen se evapora sin que nadie lo vea hasta el cierre del año |
+| **Vender Studio Credits como pieza, hora, token, dólar o provider call** | Destruye la unidad semántica, expone volatilidad ajena y revive pricing commodity |
+| **Derivar precio público desde bandas ilustrativas o list prices de vendors** | Sin shadow data, p50/p95 y approvals es falsa precisión, no pricing |
+| **Cobrar un retry técnico, error Efeonce, reuse o export determinístico** | Cobra dos veces o inventa consumo donde no hubo inferencia elegible |
+| **Esconder dirección, QA, soporte base o derechos dentro del credit** | Impide auditar margen y crea doble imputación opaca |
+| **Ofrecer top-ups, rollover, expiración, checkout o “ilimitado” sin commercial approval** | Crea obligaciones contables/legales y riesgo de margen que V1 no autoriza |
+| **Usar Studio Credits y Globe Credits en paralelo** | Confunde unidad, marca y ledger; V1 usa Studio Credits de forma provisional |
+| **Mezclar los tres ejes en un enum/modalidad única** | Hace imposible asignar dirección, precio y accountability por lane/run |
 
 ---
 

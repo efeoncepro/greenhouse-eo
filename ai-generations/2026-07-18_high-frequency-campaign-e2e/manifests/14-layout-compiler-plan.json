@@ -1,0 +1,230 @@
+{
+  "schema": "campaign-layout-plan.v1",
+  "generatedAt": "2026-07-19T08:08:41.120Z",
+  "compilerMode": "deterministic-no-provider-calls",
+  "campaignId": "high-frequency-layout-design",
+  "contract": {
+    "path": "brief/layout-compiler-v1.yaml",
+    "sha256": "a1cb72925cc18e2f3dd718677f16829eec61c2e2d538d4683bec7f94dc699727"
+  },
+  "runRoot": ".",
+  "anchor": {
+    "id": "high-frequency-anchor-v1",
+    "revision": 1,
+    "evidence": {
+      "exists": true,
+      "path": "work/anchor/high-frequency-anchor-v1.png",
+      "sha256": "95f6ac28d302d3ea178db54de1a1ef91100e6595fc3ebc842bdaa1a574cac4f3",
+      "bytes": 5904403
+    },
+    "locks": [
+      "exactly one complete hummingbird",
+      "right-facing beak and approved anatomy",
+      "deep navy field with cyan, mint and violet modular wake",
+      "one coherent right-side rim light"
+    ]
+  },
+  "brand": {
+    "mode": "branded",
+    "logo": {
+      "exists": true,
+      "path": "../../public/branding/logo-negative.svg",
+      "sha256": "f221fc925c15cddad307a81362a0ec948e1b850fc6679a49a1bc88bad2eb6b3f",
+      "bytes": 4380
+    },
+    "fonts": {
+      "medium": {
+        "exists": true,
+        "path": "../../src/assets/fonts/Poppins-Medium.ttf",
+        "sha256": "90373e7d838d32468438fc3e152dca0bdb12edcab99ea639f158790b1ba1fd05",
+        "bytes": 158576
+      },
+      "bold": {
+        "exists": true,
+        "path": "../../src/assets/fonts/Poppins-Bold.ttf",
+        "sha256": "983676516167748b74de6f4771fb384c664fd913acb8b471122ecacf5da5ea6c",
+        "bytes": 155996
+      },
+      "extra_bold": {
+        "exists": true,
+        "path": "../../src/assets/fonts/Poppins-ExtraBold.ttf",
+        "sha256": "d4c43b933d37c951df952d0ad274d965a9d2c5f82cb41f031b76e3f1d94b0cc1",
+        "bytes": 15708
+      }
+    }
+  },
+  "channelMode": "digital-static",
+  "checkpoints": {
+    "anchor": "approved",
+    "layout": "approved",
+    "finishes": {
+      "16x9": "approved",
+      "4x5": "approved",
+      "9x16": "approved"
+    },
+    "humanRelease": "approved"
+  },
+  "missingRequiredInputs": [],
+  "formats": [
+    {
+      "id": "16x9",
+      "ratio": "16:9",
+      "canvas": {
+        "width": 1920,
+        "height": 1080
+      },
+      "grid": {
+        "columns": 12,
+        "margin_pct": 4.58,
+        "gutter_pct": 2
+      },
+      "sourcePlate": {
+        "exists": true,
+        "path": "work/plates/high-frequency-plate-3x1-source.png",
+        "sha256": "1bb95b5a376b22fde2500aa3ea01654c49133016790976232d284ef1bcd05ab4",
+        "bytes": 3403113
+      },
+      "finishedPlate": {
+        "exists": true,
+        "path": "work/layout-design/finished/high-frequency-layout-finish-16x9.png",
+        "sha256": "cc6e65b3d3764aef2c83cb79be5832816dbc409ff352fd03953995c06ae6250c",
+        "bytes": 4006689
+      },
+      "baseline": {
+        "exists": true,
+        "path": "delivery/layout-design/high-frequency-layout-design-16x9-v1.jpg",
+        "sha256": "b61043e82f44190d53c3c60ab94143c67d91b7570156ae2076e14d0eb7eb6ac7",
+        "bytes": 617452
+      },
+      "output": "delivery/layout-compiler/high-frequency-layout-design-16x9-v1.jpg",
+      "finish": {
+        "status": "approved",
+        "executor": "bytedance/seedream/v5/pro/edit",
+        "delta": "improve material integration, atmospheric depth and micro-detail only",
+        "input_policy": "clean plate only; no final copy, logo, CTA or legal"
+      },
+      "copyField": {
+        "x": 0.0458,
+        "y": 0.22,
+        "width": 0.43,
+        "height": 0.48
+      },
+      "safeZones": {
+        "top": 0.04,
+        "right": 0.04,
+        "bottom": 0.04,
+        "left": 0.04
+      }
+    },
+    {
+      "id": "4x5",
+      "ratio": "4:5",
+      "canvas": {
+        "width": 1080,
+        "height": 1350
+      },
+      "grid": {
+        "columns": 8,
+        "margin_pct": 6.3,
+        "gutter_pct": 2.5
+      },
+      "sourcePlate": {
+        "exists": true,
+        "path": "work/plates/high-frequency-plate-4x5-source.png",
+        "sha256": "07ceae9a76c0c99194ce5cecf732b00812a68d2d63f8afdec99d51ca668a3f39",
+        "bytes": 4921325
+      },
+      "finishedPlate": {
+        "exists": true,
+        "path": "work/layout-design/finished/high-frequency-layout-finish-4x5.png",
+        "sha256": "954d51dc3a58939155e9751cc5da9f7a47a07646be3efcb7b0d485d00aaa30b3",
+        "bytes": 5572794
+      },
+      "baseline": {
+        "exists": true,
+        "path": "delivery/layout-design/high-frequency-layout-design-4x5-v1.jpg",
+        "sha256": "9ae888981f74828928a09ff5c034c320e11592a4942ac1d9c7ff8789f3c1bddf",
+        "bytes": 393209
+      },
+      "output": "delivery/layout-compiler/high-frequency-layout-design-4x5-v1.jpg",
+      "finish": {
+        "status": "approved",
+        "executor": "bytedance/seedream/v5/pro/edit",
+        "delta": "improve material integration, atmospheric depth and micro-detail only",
+        "input_policy": "clean plate only; no final copy, logo, CTA or legal"
+      },
+      "copyField": {
+        "x": 0.063,
+        "y": 0.18,
+        "width": 0.61,
+        "height": 0.33
+      },
+      "safeZones": {
+        "top": 0.04,
+        "right": 0.04,
+        "bottom": 0.04,
+        "left": 0.05
+      }
+    },
+    {
+      "id": "9x16",
+      "ratio": "9:16",
+      "canvas": {
+        "width": 1080,
+        "height": 1920
+      },
+      "grid": {
+        "columns": 6,
+        "margin_pct": 6.5,
+        "gutter_pct": 3
+      },
+      "sourcePlate": {
+        "exists": true,
+        "path": "work/plates/high-frequency-plate-9x16-source.png",
+        "sha256": "4a48f2871a3976b63b08f2703b9bf50424ede2b91f058c6236c102c3b8623dda",
+        "bytes": 3477137
+      },
+      "finishedPlate": {
+        "exists": true,
+        "path": "work/layout-design/finished/high-frequency-layout-finish-9x16.png",
+        "sha256": "454ef8bee726f574c25ae31186dab42f96819f52a989e68d72c083f218326fa7",
+        "bytes": 4129872
+      },
+      "baseline": {
+        "exists": true,
+        "path": "delivery/layout-design/high-frequency-layout-design-9x16-v1.jpg",
+        "sha256": "d719e4b6614f946cc0aefc1113de106e87d58ceca5fc3c85734198c73130261d",
+        "bytes": 566929
+      },
+      "output": "delivery/layout-compiler/high-frequency-layout-design-9x16-v1.jpg",
+      "finish": {
+        "status": "approved",
+        "executor": "bytedance/seedream/v5/pro/edit",
+        "delta": "improve material integration, atmospheric depth and micro-detail only",
+        "input_policy": "clean plate only; no final copy, logo, CTA or legal"
+      },
+      "copyField": {
+        "x": 0.065,
+        "y": 0.2,
+        "width": 0.58,
+        "height": 0.3
+      },
+      "safeZones": {
+        "top": 0.12,
+        "right": 0.05,
+        "bottom": 0.2,
+        "left": 0.06
+      }
+    }
+  ],
+  "gates": [
+    "anchor",
+    "layout",
+    "finish",
+    "craft",
+    "format",
+    "technical",
+    "human_release"
+  ],
+  "status": "ready_to_compile"
+}

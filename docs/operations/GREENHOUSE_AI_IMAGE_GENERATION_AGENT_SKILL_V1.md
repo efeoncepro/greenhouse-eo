@@ -3,7 +3,8 @@
 > **Tipo:** operating guide para agentes
 > **Estado:** Accepted
 > **Creado:** 2026-06-01
-> **Fuentes externas verificadas:** OpenAI developer docs, 2026-06-01
+> **Ultima actualizacion:** 2026-07-19
+> **Fuentes externas verificadas:** OpenAI developer docs y fichas oficiales Fal.ai, 2026-07-18
 
 ## Purpose
 
@@ -20,6 +21,10 @@ Fuentes oficiales consultadas:
 - OpenAI Images API reference: `https://developers.openai.com/api/reference/resources/images`
 - OpenAI API overview/auth: `https://developers.openai.com/api/reference/overview`
 - OpenAI Cookbook GPT Image prompting guide: `https://developers.openai.com/cookbook/examples/multimodal/image-gen-1.5-prompting_guide`
+- Fal Seedream 5.0 Lite: `https://fal.ai/models/fal-ai/bytedance/seedream/v5/lite/text-to-image`
+- Fal Seedream 5.0 Lite Edit: `https://fal.ai/models/fal-ai/bytedance/seedream/v5/lite/edit`
+- Fal Seedream 5.0 Pro: `https://fal.ai/models/fal-ai/bytedance/seedream/v5/pro/text-to-image`
+- Fal Seedream 5.0 Pro Edit: `https://fal.ai/models/fal-ai/bytedance/seedream/v5/pro/edit`
 
 Facts operativos vigentes al 2026-06-01:
 
@@ -377,6 +382,72 @@ Before calling an asset done:
 6. Reject assets with fake text, accidental logos, watermarks, cut-off subjects, muddy edges, inconsistent lighting, or background residue.
 7. For UI-visible changes, use Greenhouse Visual Capture (`pnpm fe:capture` or `pnpm fe:capture:review`) when the asset is placed in an actual surface.
 8. Do not commit draft generations unless the user explicitly wants an exploration set.
+
+## Multimodal Campaign Production: Seedream 5 + GPT Image 2 + Gemini Omni
+
+La unidad de diseño no es el modelo aislado: es la **secuencia de manos**. Para campañas still/motion y
+digital/offline a escala, usar por defecto:
+
+`brand/channel -> diverge -> develop -> anchor -> organize -> extend -> animate -> compose/post -> prepress -> release`
+
+- **Seedream 5 Lite:** divergencia rápida, búsqueda de familias visuales y variaciones de un lenguaje.
+- **Seedream 5 Pro:** desarrollo de materialidad, color, atmósfera, energía y continuidad visual de una dirección seleccionada.
+- **GPT Image 2:** organización espacial, instrucciones complejas, reparación localizada, adaptación de formatos y creación de campos de copy.
+- **Gemini Omni Flash:** motion 9:16/16:9 desde un clean plate, audio nativo y edición conversacional.
+- **Composición determinista:** texto, logos, claims, legal, grillas y exports finales. Un modelo generativo no es la fuente de verdad tipográfica.
+
+El paso `anchor` es obligatorio antes de escalar. Debe aprobar identidad, silueta, paleta, sistema de luz, fondo, zona de copy y invariantes protegidos. Desde ese anchor se derivan todas las piezas en una topología estrella; no se encadenan treinta derivados entre sí.
+
+Cada relevo debe registrar el contrato `model-handoff-contract.yaml`: origen, destino, operación, referencia, regiones editables, invariantes protegidos, formato de trabajo, criterio de aceptación, aprobadores y `target_executor`. El siguiente modelo recibe una tarea de edición acotada, no un brief creativo abierto.
+
+Dos relevos reales quedaron verificados el 2026-07-18:
+
+1. **GPT Image 2 -> Seedream 5 Pro:** GPT fijó anatomía y composición; Seedream elevó atmósfera y color conservando estructura. Correlación de bordes `0.9212`, MAE normalizado `0.0926` y cromaticidad media `+12.1%` relativa.
+2. **Seedream 5 Pro -> GPT Image 2:** Seedream creó el sistema de material/energía; GPT lo convirtió en banner `3:1` con un solo cuerpo y campo de copy. El seleccionado obtuvo `4.67/5`, con `48%` del lienzo reservado como campo limpio. Tres intentos previos enseñaron que anatomía temporal y escala deben expresarse con límites duros, no con “aproximadamente”.
+
+Para pasar una imagen local de GPT a Fal sin hacerla pública, iniciar un upload temporal `fal-cdn-v3`, subir por el `upload_url` devuelto y entregar el `file_url` efímero a Seedream. No persistir esa URL en manifests. No ampliar IAM ni hacer público un bucket para resolver el puente.
+
+Canon detallado:
+
+- `.codex/skills/greenhouse-ai-image-generator/references/seedream-5-gpt-image-2-hybrid-production.md`
+- `.codex/skills/design-studio/modules/12_HYBRID_IMAGE_CAMPAIGN_PRODUCTION.md`
+- `.codex/skills/design-studio/templates/model-handoff-contract.yaml`
+- `docs/operations/GREENHOUSE_MULTIMODAL_CAMPAIGN_PRODUCTION_V1.md`
+
+Worked example E2E:
+
+- `ai-generations/2026-07-18_high-frequency-campaign-e2e/`
+- valida `3 territorios Lite -> 1 anchor Pro -> 3 plates GPT Image 2 -> 18 stills -> 2 masters motion 10 s + 2 bumpers 6 s`;
+- prueba que el primer render no es un gate suficiente: la inspección visual detectó copy sobre el sujeto y una violación de safe zones antes del release;
+- incluye digital, A2/OOH proof-only, motion, modos de marca, handoffs, prompts, usage/costo, hashes, matrices,
+  QA, contact sheets, package creativo y un flujo reutilizable de activación/aprendizaje.
+
+**Regla aprendida y bloqueante:** un clip de duración mínima usado para comprobar acceso, codec, identidad o
+handoff es un `technical-probe`, nunca una pieza de campaña. Motion profesional debe declarar su familia de
+entrega —al menos master y cutdown en los ratios acordados—, arco temporal, end card, audio, poster, captions/
+muted comprehension y QA. Un límite de modelo no autoriza llamar “spot” a un smoke test.
+
+### Layout Design & Finishing
+
+Para sets estáticos con alta exigencia compositiva, no pedir al modelo que invente y termine simultáneamente el
+anuncio. Después del anchor, fijar un layout contract por ratio y separar:
+
+- `clean_plate`: sujeto, ambiente, material y luz;
+- `optical_underlay` y `campaign_hook`: integración y sistema gráfico;
+- `type` y `brand`: copy, logo, CTA, legal y locale exactos;
+- `channel`: crop, safe zone, color, tamaño, compresión o prepress.
+
+Seedream Pro cierra material/luz/color/atmósfera; GPT Image 2 cierra geometría/safe zones/región protegida. El
+modelo recibe sólo el clean plate y un delta. Figma/Adobe/código/Sharp compone la pieza final. Nunca se reenvía
+el anuncio compuesto al modelo. Detener la inferencia cuando el scorecard no mejora o el siguiente delta es
+determinístico.
+
+Canon y evidencia:
+
+- `.codex/skills/design-studio/modules/13_LAYOUT_DESIGN_AND_FINISHING.md`;
+- `.codex/skills/design-studio/templates/layout-design-contract.yaml`;
+- `docs/documentation/ai-tooling/layout-design-and-finishing.md`;
+- `ai-generations/2026-07-18_high-frequency-campaign-e2e/brief/layout-design-pilot.md`.
 
 ## Safety And Governance
 

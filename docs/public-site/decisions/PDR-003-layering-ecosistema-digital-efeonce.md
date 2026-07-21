@@ -54,7 +54,7 @@ EJE B — PLATAFORMAS / BACKBONES  ("con qué operas por dentro" + "qué más ve
   • Runtime Greenhouse    PG + BQ, modelo canónico 360, Nexa, entitlements
   • Kortex                CRM / datos comercial (peer system + producto vendible)
   • Verk                  analítica (producto)
-  • Efeonce Creative Studio (nombre de trabajo)  producción creativa agentic: UI + MCP,
+  • Efeonce Globe / Creative Studio  producción creativa agentic: UI + MCP,
        assets/runs/review/créditos; peer runtime, no módulo Greenhouse
   • Pipelines             Notion↔BQ, HubSpot↔BQ, ops-worker
 ```
@@ -105,7 +105,7 @@ EJE B — PLATAFORMAS / BACKBONES  ("con qué operas por dentro" + "qué más ve
   pipeline) y (b) producto vendible del portfolio. Peer system: Greenhouse lo
   **observa y le pide comandos gobernados**, no lo absorbe (contrato sister
   platforms + reader/command adapter, TASK-1162/1164).
-- **Efeonce Creative Studio vive en el eje B**, no como una página nueva de
+- **Efeonce Globe / Creative Studio vive en el eje B**, no como una página nueva de
   Greenhouse ni como una sub-marca pública por defecto. Es la capability creativa
   agentic de Efeonce: sus surfaces humanas, MCP y agentes consumen un mismo
   contrato; Greenhouse puede converger entregables aprobados por integración, pero
@@ -160,3 +160,13 @@ EJE B — PLATAFORMAS / BACKBONES  ("con qué operas por dentro" + "qué más ve
 - Glitch/blog: `docs/documentation/public-site/glitch-drop-gutenberg-block.md`.
 - Think (docs): [`docs/think/README.md`](../../think/README.md).
 - Bow-tie / funnel: skill `commercial-expert` (overlay GH) + `spec/Arquitectura_BowTie_Efeonce_v1_1.md`.
+
+## Delta 2026-07-18 — Glitch numerado y Glitch táctico
+
+- Status del delta: `Proposed`; aceptación y contrato operativo en `TASK-1440` / `EPIC-031`.
+- Glitch conserva una edición numerada semanal (`weeklyEdition`) y un formato destacado de noticia única (`glitchFlash`) sin número.
+- La cadencia editorial vigente es producción los lunes a las 09:00 `America/Santiago` para la ficha planificada del martes.
+- Daily y Flash son modos internos de discovery/staging: no escriben WordPress. Solo Weekly genera un draft privado por calendario; una candidata Daily/Flash llega a `glitchFlash` únicamente después de promoción explícita y auditable.
+- Notion conserva el calendario visible y los placeholders numerados; Greenhouse opera el pipeline agéntico y WordPress recibe el draft gobernado.
+- La autonomía V1 termina en WordPress `private`. Publicar exige autorización humana explícita.
+- Arquitectura y fuentes de verdad: `docs/architecture/GREENHOUSE_GLITCH_AGENTIC_EDITORIAL_PIPELINE_DECISION_V1.md`.

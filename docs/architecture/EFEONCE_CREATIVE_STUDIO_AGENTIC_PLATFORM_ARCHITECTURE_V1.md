@@ -1,7 +1,8 @@
-# Efeonce Creative Studio — Agentic Platform Architecture V1
+# Efeonce Globe — Creative Studio Agentic Platform Architecture V1
 
-> **Estado:** arquitectura objetivo aprobada por dirección; implementación pendiente de EPIC-028.
+> **Estado:** arquitectura objetivo aprobada; bootstrap inicial ejecutado y foundation runtime pendiente de EPIC-028.
 > **ADR:** [Efeonce Creative Studio: plataforma agentic peer con paridad UI + MCP](EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md)
+> **Business model:** [Creative Studio Business Model V1](../business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md) + [Studio Credit Model V1](../business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md)
 > **Audiencia:** Creative Technology, producto, operaciones creativas y futuros integradores de Efeonce.
 > **Principio rector:** una capacidad operable por una persona debe ser operable por un agente autorizado mediante el mismo contrato gobernado.
 > **Investigación de producto:** [RESEARCH-009 — Creative Operations y workflows agentic](../research/RESEARCH-009-creative-operations-agentic-workflows.md) registra el landscape y las hipótesis de bootstrap; no modifica esta ADR ni autoriza runtime nuevo.
@@ -9,7 +10,7 @@
 
 ## 1. Resultado que se está construyendo
 
-Creative Studio no es una galería de prompts ni un SaaS de generación. Es el **sistema operativo de producción creativa asistida** de Efeonce: convierte una intención aprobable en una corrida trazable de imagen, video, audio o 3D; conserva su evidencia; y deja al equipo y, luego, al cliente operar la misma capacidad desde UI, MCP o agentes. La persona creativa trabaja con briefs, referencias, tratamientos, candidatos y decisiones; la ingeniería del workflow permanece como infraestructura.
+Efeonce Globe no es una galería de prompts ni un SaaS de generación. Es el **sistema operativo de producción creativa asistida** de Efeonce: convierte una intención aprobable en una corrida trazable de imagen, video, audio o 3D; conserva su evidencia; y deja al equipo y, luego, al cliente operar la misma capacidad desde UI, MCP o agentes. Creative Studio es su descriptor funcional. La persona creativa trabaja con briefs, referencias, tratamientos, candidatos y decisiones; la ingeniería del workflow permanece como infraestructura.
 
 La primera oferta es interna. El modelo de datos, autorización, presupuesto y asset rights nace listo para workspaces de cliente, pero ningún cliente se habilita hasta completar los gates de EPIC-028.
 
@@ -66,7 +67,7 @@ Greenhouse's identity/organization can be linked through an explicit external bi
 Start as a **modular monolith with a separate worker deployable**, not microservices:
 
 ```text
-efeonce-creative/                         # new private repository
+efeonce-globe/                            # private repository
   apps/studio-web/                         # Next.js UI + BFF/API + MCP transport
   apps/creative-runner/                    # TypeScript worker entrypoint / Cloud Run Job
   packages/domain/                         # commands, readers, policies, state machines
@@ -87,7 +88,18 @@ efeonce-creative/                         # new private repository
 | Secrets and identity | Secret Manager + least-privilege service accounts | Provider keys are never available to UI/MCP clients. |
 | Telemetry | OpenTelemetry traces/metrics/logs plus domain run events | Correlates human, agent, MCP, worker and provider attempts. |
 
-The target is separate GCP projects (for example `efeonce-creative-dev` and `efeonce-creative-prod`) under Efeonce governance. Project/billing/security approval is a bootstrap gate, not assumed provisioned by this document.
+El bootstrap usa un único proyecto GCP aislado, `efeonce-globe`, bajo la organización y billing de Efeonce. Esta postura inicial no mezcla Globe con Greenhouse: separa runtime, IAM, datos, storage y secretos por proyecto. Un proyecto productivo separado se crea sólo cuando el primer release sea reproducible por IaC y tenga presupuesto, seguridad, backup, rollback y promoción de secretos aprobados.
+
+> **Estado — `TASK-1464` IaC aplicada en vivo (2026-07-19).** La reproducibilidad por IaC ya existe:
+> `infra/terraform/` codifica la foundation del proyecto no productivo `efeonce-globe`. Los recursos vivos de
+> `TASK-1454` (4 service accounts, WIF de Vercel, Artifact Registry, IAM del deployer, bucket de Cloud Build) se
+> adoptan con **import blocks** —sin recrear nada—, y se agrega la foundation nueva: GitHub WIF para deploy keyless
+> (OIDC → WIF → deployer, sin service-account keys), deployer `run.admin` + act-as, bucket privado de evidencia del
+> Lab `efeonce-globe-lab-evidence`, remote state en `gs://efeonce-globe-tfstate`, budget/alertas opt-in y una alerta
+> anti-SA-key (invariante keyless). El `tofu apply` supervisado dio `23 imported, 13 added, 0 changed, 0 destroyed`
+> (identidad de `TASK-1454` adoptada sin un solo destroy/replace). Protocolo: el apply ocurre sólo tras un `plan` con
+> CERO destroy/replace. Runbook: `docs/operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`. Al trabajar sobre
+> Globe, invocar la skill `greenhouse-globe`.
 
 ## 4. Core domain model
 
@@ -180,13 +192,36 @@ actor + workspace scope + capability + idempotency key + command payload
 
 Reads are policy-filtered projections. Commands have explicit idempotency and return a stable result or an in-progress/replay response; clients never retry by duplicating provider spend.
 
+### Full API Parity birth contract
+
+Parity is a Definition of Done at the **capability** boundary, not a transport added after UI. Every capability
+task must deliver or extend:
+
+1. versioned serializable schemas in `packages/contracts`;
+2. a transport-neutral command/reader primitive in `packages/domain`;
+3. trusted actor/workspace context derived by server auth/binding, separated from untrusted caller payload;
+4. authorization, idempotency/concurrency, audit, canonical errors and observable result/status;
+5. a private versioned HTTP mapping and typed SDK path where the capability is executable;
+6. a machine-readable coverage record for UI, SDK, MCP/agent, CLI/runbook, worker/event, sister platform and E2E;
+7. conformance tests proving every enabled surface reaches the same primitive and audit record.
+
+`available`, `policy-blocked` and `not-applicable` are valid per-surface states. `missing` is not a valid
+closure state for an executable business capability. This does **not** imply a public API or simultaneous client
+exposure: Model Lab may be internal-only and MCP/UI may remain `policy-blocked` until route promotion. It does
+mean that the first billable provider canary is invoked through the canonical API/SDK or conformance harness,
+never by direct provider calls from UI, MCP, CLI or task scripts.
+
+The first spine and spoofing-negative harness are owned by `TASK-1481`; `TASK-1457` proves it with the first
+safe model canary. Capability tasks extend the spine themselves. `TASK-1473` packages/publishes SDK and MCP
+adapters and certifies cross-surface equivalence; it is not where parity or business logic first appears.
+
 ### Surface parity matrix
 
 | Capability | UI | MCP / agent | Control point |
 | --- | --- | --- | --- |
 | Browse templates, assets and run history | Reader API | Read-only tool/resource | Workspace and asset policy |
 | Prepare brief/reference pack | Form calls `prepareRun` | `creative.prepare_run` | Validation, rights/classification check |
-| Estimate model route and credit spend | UI estimate | `creative.estimate_run` | Router and commercial policy |
+| Estimate model route and credit spend | UI estimate with provider/model/version, readiness, limitations and fallback | `creative.estimate_run` | Router and commercial policy |
 | Reserve and submit a run | Approval dialog | `creative.submit_run` with one-time approval token | Role, budget, idempotency, credit reservation |
 | Follow run/review evidence | Run detail | `creative.get_run` / `creative.get_asset` | Scoped projection only |
 | Request changes or branch an attempt | Review surface | `creative.branch_run` | Lineage and review policy |
@@ -205,9 +240,48 @@ The MCP server is a thin protocol adapter. It validates the caller's issued iden
 
 ## 6. Media production and provider routing
 
+El portafolio curado, lifecycle y states de incorporación viven en
+[Enterprise Model Portfolio V1](EFEONCE_CREATIVE_STUDIO_ENTERPRISE_MODEL_PORTFOLIO_V1.md); los agentes leen el
+[Capability Registry V1](EFEONCE_CREATIVE_STUDIO_CAPABILITY_REGISTRY_V1.json). En V1.1 es un inventario de
+research y candidatos exactos, no una allowlist ejecutable ni un marketplace libre. Sólo el registry runtime
+del Studio puede marcar una route/version como `production_approved` después de adapter, eval, policy y carga.
+
+**Provider policy:** cualquier modelo nativo de Google se ejecuta sólo en Google Cloud/Vertex AI; no se enruta
+por Fal. Fal atiende modelos no-Google y utilidades especializadas allowlisted. OpenAI se consume directo. El
+compositor determinístico permanece bajo ownership del Studio.
+
 `ProviderAdapter` is a capability interface, not a generic lowest-common-denominator wrapper. A template declares what it needs: input/output modality, reference count, camera/action constraint, exact-text sensitivity, foley/audio requirement, allowed transformations, latency ceiling and budget tier.
 
-The router returns a **route proposal**: chosen provider/model, input adapter plan, expected credit range, known limitations and fallback policy. It stores that proposal with the run so it can be audited when a model or pricing changes.
+The router returns a **route proposal**: chosen provider/model/version, readiness, input adapter plan, expected
+credit range, known limitations and fallback policy. UI and MCP expose that route before spend approval; this
+transparency is part of the product value, not an internal-only diagnostic. Each provider attempt records and
+exposes the route actually used. If fallback executes a different route, the run shows proposed and actual
+routes without rewriting history. Provider-neutral credits therefore mean stable capability pricing, not a
+hidden model.
+
+Cada route candidate tiene dos ejes: `portfolio_tier` (`core | core-scale | specialist | canary | watch |
+deprecated | blocked`) y `readiness` (`research_verified | adapter_verified | eval_qualified |
+production_approved`). Ausencia de readiness explícito equivale a no ejecutable. Un template y un agente
+seleccionan una capability semántica estable y parámetros autorizados; el router resuelve una route candidate.
+Nunca reciben un tool genérico `run_endpoint(endpoint, arbitrary_json)`.
+
+> **Estado — stack de proveedores real implementado (2026-07-19, verificado en vivo).** El `ProviderAdapter` de esta
+> sección ya tiene implementaciones reales detrás del `creative-runner`, verificadas contra cuentas de proveedor en vivo.
+> `TASK-1486` entrega el `VertexCreativeAdapter` (Google-native por Vertex AI, **keyless** vía ADC/WIF). `TASK-1487`
+> agrega el `FalCreativeAdapter` (non-Google, queue API) y el `CompositeProviderAdapter`, que rutea entre Vertex y Fal por
+> `supports()` + política de proveedor (Google-native → Vertex; non-Google → Fal), materializando la Provider policy de
+> arriba. `TASK-1488` cierra 10 capabilities con modelos verificados en vivo (Seedream 5, Recraft, Topaz, Seedance, Seed
+> Audio, ElevenLabs, Rodin 3D; regla dura: los IDs de modelos ByteDance sin prefijo `fal-ai/`). `TASK-1459` convierte el
+> Still Model Lab en una **recommendation matrix** real (Vertex Nano Banana vs Fal Seedream comparados por
+> costo/latencia/objetivo) y corrige un bug de `route_stable`. Invariantes materializados: el ruteo capability→modelo vive
+> **dentro del adapter** (no en policy de dominio); `actualRoute` es la ruta del contrato de fidelidad, no el slug; keyless
+> para Google-native y keyed-con-secreto-propio para el resto, **nunca un secreto compartido Globe↔Greenhouse** (la key Fal
+> compartida del canary es excepción temporal); y la matrix compara motores objetivamente, pero **el harness nunca
+> auto-elige un ganador creativo** (craft = decisión humana; promover una ruta a producción sigue siendo un gate separado).
+> Pendientes: resolución hash→bytes (desbloquea input-bearing + motion/audio labs), key Fal propia de Globe, deploy de
+> `studio-web` y routing por contrato de fidelidad en el Composite. Spec canónica:
+> `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md` (provider seam del Model Lab). Al trabajar sobre Globe,
+> invocar la skill `greenhouse-globe`.
 
 The Glitch intro becomes a canonical fixture: a practical `ON AIR` must be born in the scene, the finger performs a strike-and-rebound rather than a button press, and microphone foley must be evaluated as sound-of-contact. The router cannot silently replace this with an overlay or generic tap SFX. The RRSS micro-scenes are a different fixture: synthetic key visuals can be a flexible visual anchor and may route to a different video engine.
 
@@ -219,9 +293,41 @@ The Glitch intro becomes a canonical fixture: a practical `ON AIR` must be born 
 4. Generate machine-readable QA evidence where useful (technical metadata, contact sheet, waveform, frame hash); human craft review remains decisive.
 5. Use time-limited signed URLs only after authorization. Asset events and logs carry identifiers, not public raw URLs.
 
+### Refinar un candidato (edit/refine) es transversal, no una feature de proveedor
+
+Refinar un candidato ya producido es una capacidad **transversal y transport-neutral** del contrato. El caller
+declara una sola intención —"refina el candidato que produjo la corrida X"— sin nombrar paradigma, sesión ni
+modelo; y un edit **no** es un command nuevo: es una corrida, con la misma autoridad, el mismo gate de gasto,
+la misma state machine y el mismo manifest inmutable. Existen dos paradigmas nativos y ninguno se expresa en
+el contrato:
+
+- **stateful** — el proveedor guarda la sesión y el edit se encadena por su id;
+- **reference-based** — el output del padre se re-inyecta como base del edit.
+
+El dominio resuelve el candidato padre server-side; el runner elige el paradigma según qué proveedor va a
+ejecutar —un handle de sesión sólo significa algo para quien lo emitió— y registra la elección en el manifest
+del intento: un cambio de paradigma es evidencia, nunca silencioso.
+
+**La retención de outputs es lo que hace posible el cross-model.** El punto 3 de la asset policy anterior
+(ingerir el output del proveedor a storage privado) deja de ser sólo custodia y pasa a ser habilitante: un
+candidato retenido content-addressed puede refinarse con **otro** motor, porque la referencia no depende de
+ninguna sesión del proveedor. Un derivado tampoco se blanquea como material propio: arrastra los derechos del
+padre bajo una postura que un caller no puede declarar por sí mismo.
+
+> **Estado — `TASK-1490` (2026-07-20), verificado en vivo por el seam completo** en cuatro carriles:
+> reference-based, cross-model (Seedream → Nano Banana en Vertex), stateful (Gemini Omni) y referencias
+> combinadas imagen+vídeo. Contrato, rechazos previos a la reserva de gasto, invariantes de derechos y
+> evidencia: `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md` → §"Edit / refine cross-model".
+
 ## 7. Credits and commercial boundary
 
-Provider spend is an internal input; credits are the customer-facing unit of an Efeonce capability. The ledger allows a credit price to include direction, template/IP, storage, review, support and margin instead of pretending it is a pass-through token.
+Provider spend is an internal input; credits are the customer-facing unit of governed generative operations in
+an Efeonce capability, not a pass-through token or vendor-cost mirror.
+
+La política económica vigente refina esta frontera: Studio Credits miden sólo operaciones generativas
+gobernadas. Dirección, capacidad, gobierno, implementación/IP, deterministic finishing y derechos viven en
+líneas separadas; el precio total sí puede empaquetarlas sin ocultar su economía. Canon:
+[Studio Credit Model V1](../business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md).
 
 ```text
 allocation → estimate → reservation hold → approval → execution
@@ -247,6 +353,10 @@ allocation → estimate → reservation hold → approval → execution
 
 Each run produces a correlated record across API, agent/MCP call, queue dispatch, worker, provider attempt, storage ingest and review. Required dimensions include `workspace_id`, `project_id`, `run_id`, `operating_mode`, responsibility assignment IDs, `template_version`, `provider`, `model`, `attempt`, `actor_type`, `credit_reservation_id` and error class (never raw secret or public asset URL).
 
+The user-facing projection includes provider, model display name, exact version/readiness and fallback history.
+It excludes provider credentials, privileged endpoints, confidential vendor cost, Efeonce margin and internal
+prompt/IP fields not included in the approved transparency policy.
+
 ### Quality gates
 
 | Gate | Automated evidence | Human decision |
@@ -260,9 +370,20 @@ Each run produces a correlated record across API, agent/MCP call, queue dispatch
 
 Golden fixtures begin with the validated RRSS workflow and the Glitch recovery record. A provider/model is not promoted simply because it returned `completed`; it needs documented performance on the fidelity contract it claims to serve.
 
-## 10. Initial public/private API shape
+## 10. Initial private API shape
 
-All external programmatic routes are versioned and authenticated. The exact OpenAPI/MCP schema is a bootstrap task; this is the semantic boundary:
+All programmatic routes are versioned and authenticated. `TASK-1481` owns the minimal machine-readable
+contract spine, trusted-context envelope and conformance harness; `TASK-1457` adds the Model Lab experiment
+contract, `TASK-1469` stabilizes the production run lifecycle and `TASK-1473` publishes/certifies SDK/MCP
+transports. The semantic boundary is:
+
+> **Estado — `TASK-1481` implementado (2026-07-19).** El contract spine existe y está verde en el repo
+> hermano `efeonce-globe`: separación untrusted payload / trusted context branded server-side, `CapabilityRegistry`
+> transport-neutral, coverage machine-readable de 3 estados (`missing` irrepresentable), errores canónicos
+> (`policy_blocked` ≠ `access_denied` ≠ `not_found`), private HTTP (`/v1/capabilities`, `/v1/commands`, `/v1/readers`)
+> + SDK tipado, y un conformance harness manifest-driven (HTTP≡SDK, anti-spoofing). Ships con una capability
+> inerte; las creativas quedan `policy-blocked` hasta su task. Spec canónica: `docs/architecture/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md`
+> (SPEC-001) + runbook y doc funcional en el mismo repo. Al implementar sobre Globe, invocar la skill `greenhouse-globe`.
 
 ```text
 GET  /v1/templates
@@ -305,6 +426,61 @@ sequenceDiagram
 ```
 
 ## 12. Phased delivery and deliberate non-goals
+
+Las fases describen madurez del producto, no una waterfall de implementación. EPIC-028 se ejecuta en paralelo:
+
+- Model Lab prueba rutas reales desde el inicio bajo credenciales gobernadas, hard spend cap, rights de inputs,
+  manifest inmutable, ingest privado, aprobación humana y kill switch;
+- la plataforma construye tenancy, assets, responsibilities, shadow ledger, commands, workers y surfaces;
+- validación comercial empieza con evidencia y un Sample Sprint `efeonce-managed`, sin esperar Studio Access.
+
+`Lab-qualified` no equivale a `production_approved`. UI/MCP sólo consumen rutas que además cumplen aislamiento,
+idempotencia, estimate/reservation, approval token, rights/provider policy, eval calificada, observabilidad y
+rollback. El execution plan canónico vive en
+`docs/operations/creative-studio/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`.
+
+> **Estado — `TASK-1457` implementado (2026-07-19, fake canary).** El Model Lab es la primera capability de negocio
+> sobre el spine de `TASK-1481`: capability `globe.lab.experiment.run`, commands `prepare`/`execute`/`cancel` +
+> readers `get`/`status`/`evidence`, state machine del experimento
+> (`prepared → estimated → reserved → running → candidate_ready | failed | cancelled`) con autoridad derivada
+> server-side, hard spend fence (`LabSpendFence`, aborta antes de gastar; cap por run y por workspace/día-UTC),
+> private-ingest (los inputs cruzan la API sólo como content hash + rights declarados, nunca bytes crudos), kill
+> switch fail-closed (fuerza `policy_blocked`) y el provider seam probado end-to-end con un `FakeReferenceAdapter`
+> determinístico (cero red, cero gasto, cero infraestructura). El canary con **proveedor real** queda pendiente
+> —gated en `TASK-1464` + aprobación explícita— y falta adapter real, secretos de proveedor en Secret Manager,
+> Dockerfile de studio-web y `GLOBE_LAB_ENABLED=true` (default OFF). UI/MCP quedan `policy-blocked` hasta la
+> promoción. Spec canónica: `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md`.
+
+La gobernanza de ejecución no se desplaza con el runtime: Greenhouse conserva EPIC-028, `TASK-1456…1481`,
+task hooks, Plan Mode, lint, QA, lifecycle, cierre y handoff. Globe posee código, infraestructura, datos y
+evidencia técnica; su plan operativo referencia las tasks canónicas y no crea un segundo backlog.
+
+> **Estado — `TASK-1458` implementado (2026-07-19, fake canary).** El Golden Briefs & Evaluation Harness (SPEC-003)
+> es la capa versionada que convierte un intento del Model Lab en evidencia repetible por contrato de fidelidad:
+> capability `globe.lab.evaluation.run` sobre el mismo spine de `TASK-1481`, comando `evaluate` + readers `fixtures`/`report`.
+> **Consume** el Model Lab (`runModelLabExperiment`) —no reimplementa ejecución, spend fence ni provider seam— para
+> correr golden briefs versionados con derechos declarados (still `rrss-key-visual-still`, motion `product-motion-loop`,
+> audio `glitch-microphone-foley`; fixtures y rúbricas son **dato**) y puntúa el manifest con checks objetivos
+> deterministas (`output_present`, `within_hard_cap`, `input_lineage_intact`, `route_stable`, `outcome_candidate`),
+> separados de los criterios humanos declarados (nunca auto-respondidos). El verdict **nunca** es un "passed" creativo:
+> sólo `objective_fail` u `objective_pass_pending_human`. Emite un `EvaluationReportV1` versionado, scopeado al workspace
+> y con limitaciones declaradas (proveedor fake, muestra única). Un report es evidencia técnica, **nunca** aprobación de
+> ruta (invariante 9) ni de artefacto (invariante 6). `ui`/`mcp` quedan `policy-blocked`; el juicio humano real y la
+> corrida contra proveedor real quedan pendientes del canary de SPEC-002. Spec canónica:
+> `docs/architecture/creative-studio/EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md`.
+
+---
+
+> **Estado — `TASK-1465` implementado (2026-07-21, deployed + live-verified).** Globe aterrizó su **primer datastore
+> durable**: un Cloud SQL `globe-pg` propio (Postgres 16, `southamerica-west1`, IAM keyless sobre el Cloud SQL
+> connector, provisto en Terraform). El §5 de esta arquitectura —*Durable operational store: Dedicated Cloud SQL for
+> PostgreSQL*— deja de ser sólo objetivo: seis tablas tenant-scoped + un `audit_log` append-only respaldan, detrás de
+> sus ports ya existentes, los cinco stores antes **in-memory / per-proceso** (sesiones, transacciones OAuth,
+> experimentos, reportes de evaluación y el spend fence de seguridad). Ambos servicios Cloud Run corren durable en
+> `maxScale=3`: esto **levanta el techo de HA** (`maxScale=1`) que ADR-004 hard-gateaba en esta task. **Queda
+> diferido:** el modelo rico de workspace/members/grants y el mecanismo exacto de tenancy PostgreSQL/RLS (§13);
+> persistir `maxScale` por IaC es `TASK-1508`. Spec canónica:
+> `docs/architecture/creative-studio/EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md`.
 
 | Phase | Outcome | Explicitly excluded |
 | --- | --- | --- |

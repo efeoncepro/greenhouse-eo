@@ -2,8 +2,8 @@
 
 > **Tesis.** Este módulo es **cómo se produce**: la orquestación que ata el craft (01–08) y el
 > pipeline IA (09) en un loop de producción real, decide **qué mano** hace cada toma (humano / IA /
-> híbrido) y **gobierna el gasto y la entrega**. El estudio es *director, no dictador*: dirige y
-> cura; la IA acelera; el humano hace el finish y **aprueba** antes de gastar créditos y de publicar.
+> híbrido) y **gobierna el gasto y la entrega**. La frontera económica completa — operación generativa,
+> lifecycle, retry, rights y ejemplos — vive en `modules/13_STUDIO_CREDITS_AND_ACCOUNTABILITY.md`.
 
 > Ejecución real, herramientas conectadas y credenciales: `efeonce/STUDIO_TOOLING.md`. Cierra con
 > `templates/motion-delivery-spec.md`. Frescura: el craft del loop es estable; las **herramientas IA**
@@ -58,9 +58,9 @@ idear → storyboard → animatic → producir → editar → finalizar → entr
 | **Finalizar** | Sonido + grade + finishing + upscale + render | `modules/07/08` · `templates/sound-design-brief.md` |
 | **Entregar** | Master + versiones por destino + spec | `modules/08` · `templates/motion-delivery-spec.md` |
 
-- **El animatic es el punto de control barato.** Corregir timing y estructura en el animatic cuesta
-  minutos; corregirlo después de producir tomas IA cuesta créditos y re-tiradas. **Aprobá el animatic
-  antes de producir.**
+- **El animatic es el punto de control barato.** Corregir timing y estructura en un animatic manual o
+  determinístico consume `0 credits` (pero sí capacidad); corregirlo después de producir tomas IA puede
+  exigir nuevas operaciones/branches. **Aprobá el animatic antes de producir.**
 - **No saltees fases hacia adelante.** Producir sin storyboard/animatic aprobado = generar tomas que
   el edit va a descartar (gasto de créditos tirado).
 
@@ -112,11 +112,12 @@ idear → storyboard → animatic → producir → editar → finalizar → entr
 
 ## 4. Regla dura — gasto gobernado + confirmación humana
 
-**Producir/renderizar/upscalear con IA cuesta créditos. Entregar/publicar pasa SIEMPRE por
-confirmación humana.** No es negociable:
+**Sólo la operación generativa gobernada cuesta credits; render/composición/edición determinísticos no.
+Entregar/publicar pasa SIEMPRE por confirmación humana.** No es negociable:
 
-1. **Dimensioná antes del volumen.** Estimá segundos × costo/s del modelo (`modules/09 §1/§10`) +
-   upscales. Presentá el estimado **antes** de generar en masa.
+1. **Dimensioná antes del volumen.** Descompone por capability, segundos, tier, controls, attempts y
+   upscales generativos; presenta rango de credits con rate version. Costo vendor es input interno, no
+   equivalencia comercial (`modules/13`).
 2. **Prueba → validación → volumen.** Genera una toma o pocas variantes, que un humano valide
    calidad/consistencia/marca, y **recién ahí** el volumen. Nunca generar toda la pieza a ciegas.
 3. **Chunks, no clips largos** (`modules/09 §7`) — controla deriva y gasto de re-tiradas.
@@ -124,6 +125,8 @@ confirmación humana.** No es negociable:
    entregar/publicar** el master. El estudio dirige y propone; el humano aprueba y dispara.
 5. **El juicio de marca no se delega al modelo.** Curaduría, look final y aprobación son humanos.
    Ilustraciones propietarias / mascota Nexa con disciplina de marca (`efeonce/EFEONCE_OVERLAY.md`).
+6. **Liquida con evidencia.** Settlement sólo después de candidate/review según policy; libera el hold
+   sobrante y registra refunds técnicos como ajuste append-only. Un cambio creativo crea nuevo estimate.
 
 > Este es el mismo patrón "propose → confirm → execute" que rige el resto del ecosistema: el modelo
 > propone tomas, el humano confirma, y solo entonces se ejecuta el gasto o la publicación.
@@ -165,7 +168,7 @@ Documenta todo en `templates/motion-delivery-spec.md`. Un handoff sin spec produ
 - [ ] Concepto/brief aprobado (`motion-brief.md`).
 - [ ] Storyboard + **animatic aprobado antes de producir** (punto de control barato).
 - [ ] Ruteo por toma decidido (humano / IA / híbrido) con criterio §2.
-- [ ] Gasto IA dimensionado y **aprobado** antes del volumen; prueba validada primero.
+- [ ] Gasto IA descompuesto por operación/duración/tier/attempt, reservado y **aprobado** antes del volumen.
 - [ ] Consistencia de personaje/producto fijada upstream (`modules/09 §4`).
 - [ ] Edición cerrada (`edit-decision-list.md`), ritmo y continuidad OK (`modules/06`).
 - [ ] Cada edit IA `completed` pasó revisión 1×, 0.5× y contact sheet; provider status y aprobación creativa quedaron separados.
@@ -175,6 +178,8 @@ Documenta todo en `templates/motion-delivery-spec.md`. Un handoff sin spec produ
 - [ ] Master + versiones por destino, QC en pantalla real de cada versión.
 - [ ] Marca correcta (Efeonce ≠ Greenhouse), disclosure IA si aplica.
 - [ ] **Confirmación humana antes de entregar/publicar.**
+- [ ] Settlement/release/refund clasificado; retries técnicos no se cobraron y cambios creativos tienen branch/estimate.
+- [ ] Derechos de voz, música, likeness, talento y stock están separados del saldo de credits.
 - [ ] `motion-delivery-spec.md` completa y adjunta al entregable.
 
 > **Cierre:** todo trabajo de producción termina con un artefacto de `templates/` (no prosa). La

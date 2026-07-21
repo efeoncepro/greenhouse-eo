@@ -4,6 +4,7 @@
 > Globe son **equipos de marketing enterprise internacionales** (aerolíneas, bancos, manufactura) —
 > exigen multi-marca, films con aprobaciones formales, licencia limpia y localización.
 > Esto NO es lo mismo que producir para la marca Efeonce (`EFEONCE_OVERLAY.md`).
+> Para consumo y accountability carga `../modules/13_STUDIO_CREDITS_AND_ACCOUNTABILITY.md`.
 
 ## Qué cambia respecto a producción propia
 
@@ -26,6 +27,17 @@
 - **NUNCA** uses un modelo IA o una pista musical sin licencia comercial clara para un entregable de cliente.
 - **NUNCA** improvises trend-jacking en marcas reguladas sin aprobación.
 - **SIEMPRE** dimensiona y comunica el gasto de créditos IA antes de producir a volumen para un cliente.
+- **NUNCA** cobres credits por número de piezas/horas, render/export/cutdown determinístico o retry técnico.
+- **NUNCA** incluyas voz, likeness, música, stock, territorio, plazo, exclusividad o buyout dentro de credits.
+
+## Modelo, modo y accountability
+
+- `Managed Squad` es modelo comercial; `efeonce-managed` es modo de un run. No son sinónimos.
+- Staff Augmentation sigue client-directed y no hereda outcome SLA. Una configuración híbrida separa lanes,
+  owner, precio y responsabilidad.
+- `co-operated` exige un operator of record por etapa; “ambos” sin owner no es válido.
+- Los credits son mode-neutral: una misma operación consume la misma banda. Capacidad, soporte y
+  accountability cambian por otra línea económica.
 
 ## Flujo de delivery (resumen)
 

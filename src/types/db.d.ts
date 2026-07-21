@@ -3601,6 +3601,7 @@ export interface GreenhouseCoreSisterPlatformAuthorizationCodes {
   consume_failure_count: Generated<number>;
   consumed_at: Timestamp | null;
   consumed_by_consumer_id: string | null;
+  correlation_id: string | null;
   created_at: Generated<Timestamp>;
   expires_at: Timestamp;
   hash_algorithm: Generated<string>;
@@ -3677,13 +3678,19 @@ export interface GreenhouseCoreSisterPlatformConsumers {
 }
 
 export interface GreenhouseCoreSisterPlatformOauthAccessTokens {
+  correlation_id: string | null;
   created_at: Generated<Timestamp>;
   expires_at: Timestamp;
   hash_algorithm: Generated<string>;
   identity_profile_id: string | null;
   last_used_at: Timestamp | null;
   metadata_json: Generated<Json>;
+  /**
+   * TASK-1454: non-sensitive canonical reason for explicit token revocation.
+   */
+  revocation_reason: string | null;
   revoked_at: Timestamp | null;
+  revoked_by_user_id: string | null;
   scopes: string[];
   sister_platform_authorization_code_id: string | null;
   sister_platform_consumer_id: string;
@@ -3697,6 +3704,7 @@ export interface GreenhouseCoreSisterPlatformOauthAccessTokens {
 
 export interface GreenhouseCoreSisterPlatformOauthAuditLog {
   client_id: string | null;
+  correlation_id: string | null;
   created_at: Generated<Timestamp>;
   duration_ms: Generated<number>;
   error_code: string | null;
@@ -3730,6 +3738,10 @@ export interface GreenhouseCoreSisterPlatformOauthClients {
   deprecated_by_user_id: string | null;
   issue_identity_inline: Generated<boolean>;
   metadata_json: Generated<Json>;
+  /**
+   * TASK-1454: versioned, fail-closed audience/scope/claims/revocation policy evaluated generically by the broker.
+   */
+  policy_json: Json | null;
   redirect_uris: string[];
   require_pkce: Generated<boolean>;
   sister_platform_consumer_id: string;
@@ -7137,6 +7149,67 @@ export interface GreenhouseGrowthLeadPiiRevealAudit {
   reason: string;
   submission_id: string;
   user_agent: string | null;
+}
+
+export interface GreenhouseGrowthMeetingBookingExecution {
+  attribution_json: Generated<Json>;
+  booking_fingerprint: string;
+  completed_at: Timestamp | null;
+  conversion_receipt_hash: string | null;
+  created_at: Generated<Timestamp>;
+  digest_key_version: string;
+  email_hmac: string;
+  execution_id: Generated<string>;
+  idempotency_key_hmac: string;
+  ip_hmac: string | null;
+  provider_dispatched_at: Timestamp | null;
+  receipt_consumed_at: Timestamp | null;
+  reconciled_at: Timestamp | null;
+  replay_count: Generated<number>;
+  request_fingerprint: string;
+  requested_duration_ms: number;
+  requested_locale: string;
+  requested_start_at: Timestamp;
+  requested_timezone: string;
+  retain_until: Generated<Timestamp>;
+  safe_error_category: string | null;
+  safe_outcome: string | null;
+  scheduler_key: string;
+  state: Generated<string>;
+  surface_id: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseGrowthMeetingRateLimitBucket {
+  action: string;
+  bucket_start: Timestamp;
+  digest_key_version: string;
+  hit_count: Generated<number>;
+  scheduler_key: string;
+  subject_hmac: string;
+  subject_kind: string;
+  surface_id: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseGrowthMeetingRuntimeRollup {
+  bucket_start: Timestamp;
+  metric_kind: string;
+  observed_count: Generated<number>;
+  scheduler_key: string;
+  surface_id: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseGrowthMeetingSurfaceBinding {
+  created_at: Generated<Timestamp>;
+  default_locale: Generated<string>;
+  default_timezone: Generated<string>;
+  fallback_url: string;
+  scheduler_key: string;
+  status: Generated<string>;
+  surface_id: string;
+  updated_at: Generated<Timestamp>;
 }
 
 export interface GreenhouseGrowthNormalizedFindings {
@@ -11810,6 +11883,10 @@ export interface DB {
   "greenhouse_growth.grader_runs": GreenhouseGrowthGraderRuns;
   "greenhouse_growth.grader_scores": GreenhouseGrowthGraderScores;
   "greenhouse_growth.lead_pii_reveal_audit": GreenhouseGrowthLeadPiiRevealAudit;
+  "greenhouse_growth.meeting_booking_execution": GreenhouseGrowthMeetingBookingExecution;
+  "greenhouse_growth.meeting_rate_limit_bucket": GreenhouseGrowthMeetingRateLimitBucket;
+  "greenhouse_growth.meeting_runtime_rollup": GreenhouseGrowthMeetingRuntimeRollup;
+  "greenhouse_growth.meeting_surface_binding": GreenhouseGrowthMeetingSurfaceBinding;
   "greenhouse_growth.normalized_findings": GreenhouseGrowthNormalizedFindings;
   "greenhouse_growth.prompt_packs": GreenhouseGrowthPromptPacks;
   "greenhouse_growth.provider_observations": GreenhouseGrowthProviderObservations;

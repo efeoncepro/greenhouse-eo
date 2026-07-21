@@ -35,8 +35,6 @@ description: >-
   "DaVinci", "VFX", "efectos visuales", "compositing", "rotoscoping", "roto", "green screen",
   "chroma", "keying", "tracking", "matchmove", "CGI", "Nuke", "Fusion", "Mocha", "Houdini",
   "simulación", "matte painting", "reel", "sizzle", "trailer".
-user-invocable: true
-argument-hint: "[tarea o pregunta — ej: 'dirige un brand film de 30s para el grader', 'storyboard del title sequence de Glitch', 'anima el logo Efeonce', 'qué modelo IA para un spot cinematográfico con personaje consistente', 'audita este motion']"
 ---
 
 # Motion Design Studio — Animación cinematográfica/broadcast 2026
@@ -72,7 +70,8 @@ argument-hint: "[tarea o pregunta — ej: 'dirige un brand film de 30s para el g
 
 1. **Clasifica la intención** (§2). ¿Es producción cinematográfica/broadcast? Si es motion de UI
    runtime, **delega** (§5) y para.
-2. **Carga el módulo o módulos** que apliquen (§3). No cargues los 11 — carga lo justo.
+2. **Carga el módulo o módulos** que apliquen (§3). No cargues todos — carga lo justo. Si la tarea
+   estima, reserva, explica o liquida Studio Credits, carga siempre el módulo 13.
 3. **Chequea frescura**: si vas a nombrar un modelo IA de video, feature o pipeline, reverifica
    (`SOURCES.md`).
 4. **Si hay que ejecutar** (dirigir/producir/editar/finalizar), abre `efeonce/STUDIO_TOOLING.md`
@@ -123,7 +122,8 @@ argument-hint: "[tarea o pregunta — ej: 'dirige un brand film de 30s para el g
 | 09 | `modules/09_AI_VIDEO_PIPELINE.md` | dirigir el pipeline IA (modelos, image-to-video, cámara, consistencia) |
 | 10 | `modules/10_PRODUCTION_STUDIO.md` | orquestar humano/IA/híbrido + gasto gobernado + handoff |
 | 11 | `modules/11_VFX_COMPOSITING.md` | compositing, keying, roto, tracking/matchmove, CGI, simulaciones, AI-VFX |
-| 12 | `modules/12_CREATIVE_WORKFLOWS.md` | elegir una receta validada y decidir entre edición Omni y post determinista |
+| 12 | `modules/12_CREATIVE_WORKFLOWS.md` | elegir receta validada; clean shot→15/10/6; routing Omni/Seedance/post |
+| 13 | `modules/13_STUDIO_CREDITS_AND_ACCOUNTABILITY.md` | créditos por operación/duración/tier/attempt, lifecycle, retries, ejemplos reel/spot/cutdown y accountability |
 
 ## 4. La mano de ejecución (por qué es "studio")
 
@@ -138,10 +138,16 @@ Cierra el loop **idear → storyboard → animatic → producir → editar → f
 - **Producir (humano)**: After Effects (mograph/compositing), Blender/C4D (3D), Nuke/Fusion
   (compositing/VFX), Mocha (tracking), Houdini (FX/simulaciones) — handoff con spec (`modules/11`).
 - **Editar + finalizar**: montaje, sonido, color grade, render, entrega (`modules/06`, `07`, `08`, `10`).
+- **Profusionar una campaña motion**: desde un clean shot aprobado, construir 15/10/6 como tres argumentos
+  editoriales con copy/logo exactos y audio medido (`workflows/single-shot-to-deterministic-campaign-hero.md`).
+  Omni sirve para microescena reinterpretada; Seedance 2.0 sólo para una toma/acción/continuidad nueva que
+  preserve el mundo. Timing, crop, safe zone, copy/logo, grade, foley y mezcla pertenecen a post.
 
-> **Regla dura (director, no dictador).** El estudio **decide y dirige**, pero **producir/renderizar
-> con IA cuesta créditos** (gasto gobernado) y **entregar/publicar pasa SIEMPRE por confirmación
-> humana**. La IA acelera; el humano dirige y hace el finish. El juicio de marca no se delega al modelo.
+> **Regla dura (director, no dictador).** El estudio **decide y dirige**. Las **operaciones
+> generativas gobernadas** consumen créditos según duración/tier/attempt; storyboard, animatic, edición,
+> conform, mix/master y export determinísticos consumen **0 credits** aunque sí requieren capacidad.
+> Todo spend sigue `estimate → reservation → approval → execution → settlement/release/refund`, y
+> entregar/publicar pasa SIEMPRE por confirmación humana. Ver módulo 13.
 
 ## 5. Boundaries duros (lo que esta skill NO hace)
 
@@ -150,6 +156,8 @@ Cierra el loop **idear → storyboard → animatic → producir → editar → f
 - **NUNCA** produzcas la imagen fija / KV acá → `design-studio` (esta skill lo anima).
 - **NUNCA** afirmes qué modelo/feature/pipeline de video IA domina de memoria. Reverifica (§Frescura).
 - **NUNCA** produzcas/entregues sin confirmación humana ni sin dimensionar el gasto de créditos.
+- **NUNCA** cotices credits por pieza/hora, conviertas costo vendor en credits, cobres un retry técnico o
+  escondas derechos de voz/música/likeness en el saldo. Usa `modules/13` y el rate versionado del Studio.
 - **NUNCA** uses IA que confunda con real sin criterio de disclosure cuando aplique, ni la mascota
   Nexa / ilustraciones propietarias de Efeonce como si fueran stock. Ver `efeonce/EFEONCE_OVERLAY.md`.
 - **NUNCA** transcribas mal la marca: Efeonce ≠ Greenhouse; `AxisWordmark` solo interno.
@@ -192,6 +200,8 @@ Cada apuesta con su volatilidad en `SOURCES.md`:
   no es una receta ejecutable.
 - `modules/12_CREATIVE_WORKFLOWS.md` — router compacto de esas recetas y de la regla: un output de IA
   completado es candidato técnico, no aprobación creativa.
+- `modules/13_STUDIO_CREDITS_AND_ACCOUNTABILITY.md` — frontera económica audiovisual: operación vs.
+  pieza, lifecycle, retries, modos y ejemplos ilustrativos de reel/spot/cutdown.
 - `spot-studio/SPOT_STUDIO.md` — **sistema de producción de spots** (IA + humano): pipeline por etapas +
   gates que garantizan el acabado final + lanes (UI-crisp/Omni/product-real) + checklists (animatic gate,
   finish pre-flight) + 4 pilares. Léelo al producir un **spot/brand film completo** (no una toma suelta).

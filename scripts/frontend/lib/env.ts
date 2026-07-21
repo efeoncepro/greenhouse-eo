@@ -58,9 +58,21 @@ export const resolveEnvConfig = (env: CaptureEnv): EnvConfig => {
         throw new Error('VERCEL_AUTOMATION_BYPASS_SECRET ausente en .env.local — requerido para staging captures')
       }
 
+      // STAGING_URL (ISSUE-123): mismo override que scripts/staging-request.mjs — apunta la
+      // captura a la URL directa de un deployment cuando el alias env-staging está rezagado.
+      // Uso canónico: STAGING_URL=$(pnpm --silent staging:url) pnpm fe:capture ... --env=staging
+      const baseUrl = process.env.STAGING_URL ?? STAGING_VERCEL_URL
+
+      // storageState POR HOST: las cookies de sesión no cruzan subdominios .vercel.app —
+      // reusar el state del alias contra otra URL redirige a /login (visto 2026-07-18).
+      const host = new URL(baseUrl).hostname
+
+      const storageStatePath =
+        baseUrl === STAGING_VERCEL_URL ? '.auth/storageState.staging.json' : `.auth/storageState.staging-${host}.json`
+
       return {
-        baseUrl: STAGING_VERCEL_URL,
-        storageStatePath: '.auth/storageState.staging.json',
+        baseUrl,
+        storageStatePath,
         agentEmail,
         bypassSecret,
         isProduction: false

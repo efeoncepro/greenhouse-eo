@@ -9,6 +9,7 @@
       "type": "static",
       "requiredScopes": [
         "oauth",
+        "scheduler.meetings.meeting-link.read",
 
         "crm.objects.contacts.read",
         "crm.objects.contacts.write",

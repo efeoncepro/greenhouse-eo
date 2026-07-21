@@ -4,16 +4,26 @@ Load when the task is **assembling a delivery team to assign to a client** — a
 
 > **One-line boundary.** Workforce-planning decides *whether and how* to cover a need; this module designs *the squad that covers it for a specific client*; finance prices the dedication × loaded cost; commercial sets margin/packaging; contracting/legal drafts the contract; payroll owns pay. You design the **capability shape**, never the money or the contract.
 
-## The two engagement modes (pick one per engagement)
+## Delivery model (declare one, or split an explicit hybrid by lanes)
 
-Efeonce sells talent to clients in two shapes. Naming them correctly changes the whole design, the accountability and the pricing.
+The delivery model says **what the client buys and who is accountable for delivery**. It is independent from the engagement form (On-Going, On-Demand, Sample Sprint) and from the Creative Studio operating mode used for a particular generative run.
 
-| Mode | What the client buys | Who directs the work | Accountability | When it fits |
+| Delivery model | What the client buys | Who directs the work | Accountability | Talent boundary |
 |---|---|---|---|---|
 | **Managed Squad / Delivery Pod** (default, ASaaS-native) | an **outcome/service** delivered by an Efeonce-run cross-functional pod | **Efeonce** (via an Account Lead + delivery leads) | Efeonce owns delivery, quality and SLA | retainers, RFPs/licitaciones, "run this capability for us" (e.g. blog/SEO, performance, brand) |
 | **Staff Augmentation** | **named role(s)** embedded into the client's team | the **client** directs the day-to-day | shared; client owns the plan, Efeonce owns the person's quality/continuity | "we need a senior X for N months", capacity overflow, client already has the operating system |
+| **Studio Access** | governed access to the Creative Studio suite and its generative capabilities | client or agreed operators, per entitlement | client owns briefs/approvals under the contract; Efeonce owns platform governance, not squad delivery | not a talent sale; add human capacity only through a separately scoped Managed Squad or Staff Augmentation lane |
 
 **Rule:** a **licitación / RFP that buys a *service*** (nobody is naming individuals) is a **Managed Squad**, not staff-aug — even if the bases never say "squad". Model it as a pod Efeonce runs to an SLA. Reserve staff-aug for when the client explicitly wants bodies embedded under their direction. The ASaaS doctrine (`efeonce-agency`) favors Managed Squad: Efeonce sells the operating system + outcome, not headcount.
+
+An engagement may be **hybrid by lanes**, for example: Efeonce runs the brand lane as a Managed Squad, one media specialist is embedded as Staff Augmentation, and the client uses Studio Access for self-service variants. Record each lane, owner and accountability separately; never label the whole engagement “hybrid” without the lane map.
+
+### Do not confuse delivery model with the other two axes
+
+- **Engagement form** controls the commercial cadence: `on-going`, `on-demand`, or `sample-sprint`.
+- **Studio operating mode** controls who operates an individual governed run: `efeonce-managed`, `co-operated`, or `client-operated`.
+- `efeonce-managed` does **not** mean Managed Squad. A client can buy Studio Access and still ask Efeonce to operate a specific run; a Managed Squad can also execute some runs co-operated with the client.
+- Talent owns the human capacity shape. Creative Studio credits, platform access, operating permissions and generative run accounting belong to the Creative Studio business/credit model and Commercial/Finance owners.
 
 ## Anatomy of a squad (the five things every blueprint declares)
 
@@ -125,6 +135,7 @@ Pre-baked squads speed up proposals. Each is a default role mix + dedication ran
 | **Runtime demand** creation | produce a `TalentDemand` (stakeholder=`client`, fulfillment=`staff_augmentation`/managed) → `greenhouse-runtime.md` |
 | **Contract** of a staff-aug engagement | Workforce Contracting Studio + legal |
 | **Pay** of any member | `greenhouse-payroll-auditor` — never here |
+| **Studio Credits / access / operating-mode rules** | `efeonce-agency` + `creative-practice`; canonical model in `docs/business-models/creative-studio/` |
 
 ## Runtime binding (Greenhouse)
 
@@ -140,6 +151,8 @@ Pre-baked squads speed up proposals. Each is a default role mix + dedication ran
 - **NEVER** name real individuals to a client **without their consent**; default external representation is **role + seniority** (+ anonymized CV if needed). Treat any named-person data with the masked/reveal/audit rigor of employee PII.
 - **NEVER** compute pay/comp here (→ payroll) or margin/price here (→ commercial); design the shape, hand the numbers over.
 - **NEVER** call a *service* bid "staff augmentation" — if nobody is naming embedded bodies under client direction, it's a **Managed Squad**.
+- **NEVER** use `efeonce-managed`, `co-operated`, or `client-operated` as synonyms for Managed Squad, hybrid delivery, or Staff Augmentation; they classify a Studio run, not the commercial delivery model.
+- **NEVER** attach an implicit squad to Studio Access. Human capacity is a separately declared lane with its own delivery model, accountability and loaded cost.
 - **ALWAYS** declare per member: role, seniority, % dedication, reporting line; and for the pod: total FTE, the single Account Lead, the RACI grid and the synergy map.
 - **ALWAYS** derive dedication from scope→hours→FTE with the assumption stated, not from a wish.
 

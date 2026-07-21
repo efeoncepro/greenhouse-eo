@@ -93,7 +93,7 @@ describe('GET /api/public/growth/ai-visibility/run/[handle] — browser status c
     expect(res.status).toBe(204)
     expect(res.headers.get('Access-Control-Allow-Origin')).toBe(THINK_ORIGIN)
     expect(res.headers.get('Access-Control-Allow-Methods')).toBe('GET, OPTIONS')
-    expect(res.headers.get('Access-Control-Allow-Headers')).toBe('content-type, accept')
+    expect(res.headers.get('Access-Control-Allow-Headers')).toBe('content-type, accept, idempotency-key')
   })
 
   it('fail-closed: origin desconocido no recibe ACAO aunque el DTO sea público', async () => {

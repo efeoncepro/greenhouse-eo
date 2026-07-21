@@ -1,36 +1,6 @@
 ---
 name: social-media-studio
-description: >-
-  Skill experta y de EJECUCIÓN de Social Media al estado del arte 2026 — el
-  "estudio" que idea, produce, publica, escucha, gestiona comunidad y mide social
-  plataforma-por-plataforma. Dos manos: (1) conocimiento profundo de la mecánica
-  real de cada red (algoritmos y señales de ranking, formatos y su craft, social
-  search/AEO-social, social commerce, creator/UGC, community management, escucha
-  y trend-jacking, analítica nativa), y (2) capacidad de producción (orquesta
-  Metricool para programar/analizar, Higgsfield para video/imagen/audio/UGC,
-  greenhouse-ai-image-generator + Figma/Express para estáticos y carruseles),
-  cerrando el loop idear→producir→programar→medir→iterar. COMPLEMENTARIA pero
-  DISTINTA de digital-marketing: digital-marketing decide social como UN canal
-  del mix (nivel estrategia/campaña); social-media-studio es el ESPECIALISTA de
-  ejecución profunda por red. Delega a digital-marketing (mix de canales, campaña
-  integrada, paid programático), a growth-marketing-cro (conversión/CRO,
-  experimentación, atribución/funnel, retención), a copywriting (craft fino de
-  texto/voz), a seo-aeo (SEO técnico + AEO por-motor LLM/schema), a
-  commercial-expert (pricing/pipeline), a efeonce-agency (doctrina marca/GTM/ASaaS)
-  y a los generadores visuales (greenhouse-ai-image-generator / higgsfield-* /
-  greenhouse-digital-brand-asset-designer) para producir el asset concreto.
-  Incluye overlay Efeonce (canales propios Think/Glitch/grader) y capa de delivery
-  para clientes Globe. Triggers: "social media", "redes sociales", "Instagram",
-  "Reels", "TikTok", "LinkedIn", "YouTube", "Shorts", "carrusel", "carousel",
-  "story", "stories", "community management", "comunidad", "engagement", "hook",
-  "guion de video", "video corto", "short-form", "long-form", "UGC", "creator",
-  "influencer", "trend", "trend-jacking", "social listening", "escucha social",
-  "social search", "AEO social", "social commerce", "TikTok Shop", "live shopping",
-  "calendario de redes", "programar posts", "Metricool", "reporte de redes",
-  "share of voice social", "algoritmo de Instagram/TikTok/LinkedIn", "cadencia de
-  publicación", "content pillars", "batch de contenido".
-user-invocable: true
-argument-hint: "[red/tarea o pregunta — ej: 'plan de 30 días para LinkedIn del grader', 'guion de Reel para el lanzamiento', 'auditar nuestro Instagram', 'estrategia de TikTok Shop', 'matriz de community management']"
+description: Diseña y opera social media por plataforma para estrategia editorial, producción, publicación, community, listening, medición, creator/UGC y formatos de Instagram, TikTok, LinkedIn, YouTube y otros. Use for Studio Credits y derechos dentro de producción social; no reemplaza la estrategia de canales.
 ---
 
 # Social Media Studio — Skill operativa 2026
@@ -73,6 +43,9 @@ argument-hint: "[red/tarea o pregunta — ej: 'plan de 30 días para LinkedIn de
    `efeonce/EFEONCE_OVERLAY.md` / `efeonce/CLIENT_DELIVERY.md`.
 6. **Cierra con un artefacto** de `templates/` (brief, calendario, guion, reporte…),
    no con prosa suelta.
+7. Si la producción corre por Creative Studio / Efeonce Globe, carga el Business Model y Credit Model desde
+   `efeonce/CLIENT_DELIVERY.md`: la pieza social no es la unidad de crédito; identifica las operaciones
+   generativas y separa layout/copy/export/QA, capacidad y derechos.
 
 ## 2. Árbol de decisión (a qué skill pertenece)
 
@@ -146,6 +119,8 @@ herramientas conectadas (detalle en `efeonce/STUDIO_TOOLING.md`):
 - **NUNCA** produzcas copy visible en el portal Greenhouse sin pasar por
   `greenhouse-ux-writing` + `src/lib/copy/*` (eso es copy de producto, no social).
 - **NUNCA** transcribas la marca: Efeonce ≠ Greenhouse. Ver `efeonce/EFEONCE_OVERLAY.md`.
+- **NUNCA** cotices Studio Credits por post, slide, Reel u hora. Estima sólo operaciones generativas
+  gobernadas; composición, copy, publicación, QA y medición se financian por capacidad/gobierno.
 
 ## 6. Doctrina 2026 (lo que hay que creer este año)
 

@@ -48,6 +48,17 @@
 - **Grade final.** [LUT aplicada · corrección por toma resuelta en DaVinci] — `modules/08`
 - **Grano / textura.** [film grain final aplicado sobre el grade, no antes]
 
+## Conciliación del run de Studio
+
+| Campo | Valor |
+|---|---|
+| Run / rate version | [run_id · credit_rate_version] |
+| Estimate / reservation | [rango · hold aprobado] |
+| Settlement / release / refund | [consumo elegible · remanente liberado · ajuste y causa] |
+| Attempts | [ID · duración/tier · outcome · técnico o cambio creativo] |
+| Trabajo determinístico (`0 credits`) | [edit · conform · mix/master · captions · exports/cutdowns] |
+| Rights separados | [voz/likeness · música/sync/master · stock/talento · territorio/plazo/buyout] |
+
 ## Checklist de pre-entrega
 
 - [ ] Cada destino tiene su archivo con el formato exacto de la tabla (no un master reetiquetado)
@@ -59,3 +70,5 @@
 - [ ] Versiones de idioma con M&E / doblaje revisadas
 - [ ] QC final mirado en el device de destino (no solo en el monitor de edición)
 - [ ] Entrega/publicación pasa por confirmación humana (`SKILL.md` §4)
+- [ ] Credits conciliados por operación/attempt; ningún render/export/cutdown determinístico fue cobrado
+- [ ] Retry técnico/refund y cambio creativo/branch están diferenciados; rights no se ocultaron en credits

@@ -91,8 +91,8 @@ Cliente que NO entra al portal:
    reza.** *(Un dashboard sin guía es un dashboard que se abre una vez.)*
 3. 🔴 **Si a los 30 días nadie entró, es una alerta comercial**, no un detalle de adopción.
    **Es la señal más grave de este módulo.** *(§ 6.)*
-4. 🔴 **Nunca descuentes la línea de plataforma/gobierno.** Costo marginal ≈ 0, **y es lo único que el
-   freelancer, el in-house y Superside no pueden darle.** **Descontarla es descontar la retención.**
+4. 🔴 **Nunca descuentes la línea de plataforma/gobierno sin reducir alcance/SLA.** Tiene costo operativo
+   asignado y sostiene control, transparencia y switching cost. **Descontarla sin rediseño erosiona la retención.**
 
 ---
 

@@ -51,6 +51,11 @@ export default [
       // arte). Es material de trabajo, no código de producto — nunca se lintea (un script WIP
       // de otra sesión acá no debe bloquear el pre-push de todos).
       'ai-generations/**',
+      // Output gitignorado de GVC (`pnpm fe:capture`) + material de trabajo creativo ad-hoc
+      // (scripts WIP de otra sesión acá no deben bloquear el pre-push de todos — 2026-07-19).
+      '.captures/**',
+      // Scratch efímero de smokes/diagnósticos (TASK-1454/1455 y similares) — mismo criterio.
+      '.tmp/**',
       'full-version/**',
       'demo-configs/**',
       '.claude/**',

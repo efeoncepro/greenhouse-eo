@@ -29,6 +29,19 @@ anuncio. Implicaciones:
 - **Cadencia de refresh:** el creativo se fatiga (frequency sube, CTR baja); ten un pipeline de
   reposición, no una tanda única.
 
+### Frontera económica y de producción de la variant factory
+
+La matriz define hipótesis y volumen; no convierte cada variante en unidad tarifaria. Si la ejecuta Efeonce
+Creative Studio, desglosa acceso/gobernanza, capacidad humana, Studio Credits, implementación/IP y
+rights/licencias/pass-through. Sólo las operaciones generativas gobernadas pasan por
+`estimate → reservation → approval → execution → settlement/release/refund`; recomposición, copy, edición,
+subtítulos, layout, export y QA determinísticos consumen 0 Studio Credits pero se financian como capacidad o
+implementación. Media spend, platform fees de ads, creator/talent, whitelisting y derechos no entran al wallet.
+
+Hand-off por craft: visual → `design-studio`/`greenhouse-ai-image-generator`; motion/video →
+`motion-design-studio`; audio/VO → `audio-studio`; social/UGC → `social-media-studio`; business/credits →
+`creative-practice` + canon en `docs/business-models/creative-studio/`.
+
 ## 4. UGC y creator-style (confianza que convierte)
 
 - **UGC/creator-style ads** rinden porque **parecen hechos por una persona para otras**,
@@ -74,6 +87,7 @@ anuncio. Implicaciones:
 - [ ] UGC/creator-style donde la confianza importa; autenticidad > sobre-producción.
 - [ ] IA para escalar testing/volumen, con brand safety y disclosure.
 - [ ] Métricas creativas (hook rate/retention) + conversión de variante; aprendizajes documentados.
+- [ ] Producción, media spend y rights separados; operation map y estimate de credits delegados al Studio.
 
 ## Cross-links
 

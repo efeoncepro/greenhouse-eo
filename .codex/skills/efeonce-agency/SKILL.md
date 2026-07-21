@@ -1,11 +1,11 @@
 ---
 name: efeonce-agency
-description: Contexto de negocio, marca, GTM y modelo ASaaS de Efeonce Group (la agencia) para que toda feature/decisión de Greenhouse apunte en la dirección del negocio. Invocar ANTES de proponer, priorizar o construir cualquier cosa que toque producto, UX/copy visible, naming, métricas, ICO, HubSpot/Account 360, onboarding/experiencia de cliente, GTM, marca, switching cost, tiers/ASaaS o estrategia comercial. Triggers léxicos — Efeonce, agencia, North Star, switching cost, Revenue Enabled, ASaaS, ICO, Loop Marketing, GTM, ICP, buyer persona, JTBD, Kortex, Verk, Creative Studio, Nexa, Pulse, Bow-tie, NRR, cross-sell, "vale la pena esta feature", "a qué tier pertenece", voz/tono, glosario de métricas, RpA/OTD/FTR naming, casos (Sky/Bresler/Berel/SSilva), Globe/Reach/Wave, marca/branding del portal.
+description: Contexto de negocio, marca, GTM y modelo ASaaS de Efeonce Group (la agencia) para que toda feature/decisión de Greenhouse apunte en la dirección del negocio. Invocar ANTES de proponer, priorizar o construir cualquier cosa que toque producto, UX/copy visible, naming, métricas, ICO, HubSpot/Account 360, onboarding/experiencia de cliente, GTM, marca, switching cost, tiers/ASaaS, Creative Studio/Studio Credits o estrategia comercial. Triggers léxicos — Efeonce, agencia, North Star, switching cost, Revenue Enabled, ASaaS, ICO, Loop Marketing, GTM, ICP, buyer persona, JTBD, Kortex, Verk, Creative Studio, Studio Credits, Globe Credits, Managed Squad, Staff Augmentation, Studio Access, Nexa, Pulse, Bow-tie, NRR, cross-sell, "vale la pena esta feature", "a qué tier pertenece", voz/tono, glosario de métricas, RpA/OTD/FTR naming, casos (Sky/Bresler/Berel/SSilva), Globe/Reach/Wave, marca/branding del portal.
 ---
 
 # Efeonce Agency — Contexto de negocio para construir Greenhouse
 
-> **Ecosistema digital Efeonce — layering canónico** (SSOT: `docs/public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md`; índice `docs/public-site/`). Dos ejes ortogonales: **superficies** front-of-house (por audiencia/etapa de funnel — **adquisición** como continuo bow-tie: `Think` = demand-gen + nurturing top-of-funnel [blog *Marketing con Manzanitas* → *Glitch* newsletter semanal IA/Marketing/Negocios + tools *AI Visibility Grader*/ebooks/webinars/podcast + YouTube/social] · sitio `efeoncepro.com` = demand-capture + conversión; **experiencia** con dos caras: cliente [sky → `experiencia.efeoncepro.com` + Experiencia Efeonce: aprendizaje, networking, contenido, tools, comunidad y memoria] y operador [cockpit Greenhouse]) que consumen **plataformas/backbones** (runtime Greenhouse PG+BQ/360, **Kortex** = CRM peer system + producto, Verk, **Efeonce Creative Studio** = producción creativa agentic peer con UI + MCP). El grader es la costura top→bottom. Cargar PDR-003 al razonar sobre superficies, capas, hosts o dónde nace una capacidad del ecosistema.
+> **Ecosistema digital Efeonce — layering canónico** (SSOT: `docs/public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md`; índice `docs/public-site/`). Dos ejes ortogonales: **superficies** front-of-house (por audiencia/etapa de funnel — **adquisición** como continuo bow-tie: `Think` = demand-gen + nurturing top-of-funnel [blog *Marketing con Manzanitas* → *Glitch* newsletter semanal IA/Marketing/Negocios + tools *AI Visibility Grader*/ebooks/webinars/podcast + YouTube/social] · sitio `efeoncepro.com` = demand-capture + conversión; **experiencia** con dos caras: cliente [sky → `experiencia.efeoncepro.com` + Experiencia Efeonce: aprendizaje, networking, contenido, tools, comunidad y memoria] y operador [cockpit Greenhouse]) que consumen **plataformas/backbones** (runtime Greenhouse PG+BQ/360, **Kortex** = CRM peer system + producto, Verk, **Efeonce Globe / Creative Studio** = producción creativa agentic peer con UI + MCP). El grader es la costura top→bottom. Cargar PDR-003 al razonar sobre superficies, capas, hosts o dónde nace una capacidad del ecosistema.
 
 Esta skill es el **router + doctrina destilada** del context pack de negocio de Efeonce Group. Su trabajo: que cualquier agente (Claude o Codex) entienda *para qué existe Greenhouse en el negocio* antes de tocar producto, copy, métricas o estrategia, y sepa **qué archivo canónico leer** según la tarea.
 
@@ -86,11 +86,38 @@ Antes de construir, poder responder **sí a ≥1 verde** y **no a todas las roja
  - **Greenhouse** = el hub (lo nuestro): experiencia del cliente + operaciones internas. Genera el switching cost. ~77% madurez ASaaS.
  - **Kortex** = CRM Intelligence sobre HubSpot (manifests YAML, agente Claude). `portal_id → space_id`. Alimenta Account 360.
  - **Verk** = Content + Distribution OS (Surround Map™). `brand_id → greenhouse_space_id`. Embed card en el dashboard.
- - **Efeonce Creative Studio** *(nombre de trabajo)* = producción creativa agentic de imagen/video/audio: la persona trabaja con brief/referencias/candidatos/review y el sistema compila workflows; UI y MCP consumen el mismo contrato. Un solo runtime soporta `efeonce-managed`, `co-operated` y `client-operated` con responsabilidades por run y autonomía según riesgo. Primero interno, luego cliente gobernado; no es una quinta modalidad comercial ni “Managed Squad más barato”. EPIC-028; runtime separado de Greenhouse.
+ - **Efeonce Globe** *(Creative Studio)* = plataforma interna de la vertical Globe para producción creativa agentic de imagen/video/audio: la persona trabaja con brief/referencias/candidatos/review y el sistema compila workflows; UI y MCP consumen el mismo contrato. Un solo runtime soporta `efeonce-managed`, `co-operated` y `client-operated` con responsabilidades por run y autonomía según riesgo. Primero interno, luego cliente gobernado; no es submarca pública por defecto, quinta modalidad comercial ni “Managed Squad más barato”. EPIC-028; runtime separado de Greenhouse.
  - Regla: cada plataforma opera sola; **cuando el cliente está en el ecosistema completo, Greenhouse es donde todo converge.** No acoplar Greenhouse al runtime de Kortex/Verk/Creative Studio; consumir sólo contratos/proyecciones autorizadas.
 - **ASaaS (Agency Service as a Software)**: el servicio de agencia empaquetado como producto de software. 6 directrices: acceso permanente · datos en vivo · experiencia estandarizada · **valor acumulativo (el historial es feature)** · **switching cost creciente (North Star)** · monetización recurrente (tier pricing Basic/Pro/Enterprise = capability flags por tenant).
 
 > Detalle: `01_quienes-somos` · `03_ecosistema-producto` · `04_greenhouse-producto` · `07_ico` · `14_modelo-negocio-asaas`.
+
+---
+
+## Creative Studio — contrato económico que no se mezcla
+
+El canon vive en `docs/business-models/creative-studio/`; esta skill sólo conserva el frame ASaaS:
+
+1. **Modelo de delivery:** Managed Squad · Staff Augmentation · Studio Access · híbrido por lanes.
+2. **Forma de engagement:** On-Going · On-Demand · Sample Sprint.
+3. **Modo operativo por run/lane:** `efeonce-managed` · `co-operated` · `client-operated`.
+
+Managed Squad no es Staff Augmentation ni `efeonce-managed`. El primero vende gobierno/accountability; el
+segundo aporta perfiles bajo dirección del cliente; el tercero sólo asigna autoridad en una ejecución.
+
+Creative Studio separa cinco líneas: **gobierno/plataforma + capacidad humana + Studio Credits +
+implementación/IP + derechos/licencias/pass-through**. Studio Credits sólo representan operaciones
+generativas gobernadas: nunca pieza, hora, token, dólar, provider cost, QA o derecho. La misma operación
+consume la misma banda en todos los modos; cambia el fee humano/accountability.
+
+**Estado V1:** `Approved for validation`. Primero shadow ledger sobre 30–50 runs, p50/p95, estimate accuracy,
+refund taxonomy y margen total ≥45%. No publicar conversión crédito-dinero, packages, top-ups, expiración,
+rollover, checkout o “ilimitado” sin commercial approval de Finance, Legal/IP, Product/Architecture/Security,
+Operations/Creative Practice y Leadership.
+
+Para venta/pricing/SOW y ejemplos por pieza cargar `creative-practice/modules/14_STUDIO_CREDITS.md`. Las piezas
+sirven para explicar composición; nunca se vuelven la unidad tarifaria. Naming provisional: **Studio Credits**;
+no usar `Globe Credits` en paralelo.
 
 ---
 
@@ -147,7 +174,7 @@ El copy es producto: un microcopy genérico rompe la marca tanto como un bug rom
 - **Pulse Dashboard** = motor de detección de cross-sell (Motor 1). Construirlo/mejorarlo es de las features de mayor leverage comercial.
 - **Bow-tie / HubSpot:** sync a nivel **empresa** (`company_id ↔ space_id`). El motion (`is_in_expansion`, `is_in_renewal`, `is_at_risk`, `is_advocate`) se modela como **booleanos sobre el lifecycle stage**, NUNCA como stage que reemplace `active_account`. NRR >110% es la métrica reina. **No inventar stages ni properties** — usar los internal names exactos de `11`.
 - **Experiencia = sistema, no portal de métricas.** Artefactos de producto con peso de marca directo: **Ecosystem Tour** (primer login guiado, el "wow" = ver sus métricas ICO) · **Feedback Review en vivo** (dentro del portal, no PPT) · **Ecosystem Learning Layer** (contenido/tools/webinars/podcast/social conectados al journey) · **"Tu año con Efeonce"** (reporte de renovación autogenerado = máximo switching cost) · **Protocolo de transparencia con datos** (en tensión, mostrar Stuck Assets/Cycle Time/OTD% caído).
-- **Posicionamiento público de la capability creativa (Globe):** partner de **producción que escala** el output de equipos de marketing/creativos in-house mid-market/enterprise (no reemplazo, sin perder control) + **Time-to-Market medible** como ventaja competitiva (output de la cadena de eficiencia ICO: FTR guardrail → RpA↓ → ciclo↓ → TTM↓ → Revenue Enabled; "producir más rápido sin perder calidad, probado con el número") + ejecución **Design Engineer** (arte+color+ingeniería, assets con el stack IA propio). Lidera Efeonce; CTA "Agenda una reunión". Decisión canónica: **[PDR-004](./././docs/public-site/decisions/PDR-004-landing-agencia-creativa-posicionamiento.md)** (ejecución `TASK-1350`). Sustrato en `07_ico` (TTM) · `13` (Globe ICP1/ICP3) · `09_marca-agencia`.
+- **Posicionamiento público de la capability creativa (Globe):** partner de **producción que escala** el output de equipos de marketing/creativos in-house mid-market/enterprise (no reemplazo, sin perder control) + **Time-to-Market medible** como ventaja competitiva (output de la cadena de eficiencia ICO: FTR guardrail → RpA↓ → ciclo↓ → TTM↓ → Revenue Enabled; "producir más rápido sin perder calidad, probado con el número") + ejecución **Design Engineer** (arte+color+ingeniería, assets con el stack IA propio). Lidera Efeonce; CTA "Agenda una reunión". Decisión canónica: **[PDR-004](../../../docs/public-site/decisions/PDR-004-landing-agencia-creativa-posicionamiento.md)** (ejecución `TASK-1350`). Sustrato en `07_ico` (TTM) · `13` (Globe ICP1/ICP3) · `09_marca-agencia`.
 
 > Detalle: `02_gtm` · `08_estrategia-comercial` · `09_marca-agencia` · `10_experiencia-cliente` · `11_hubspot-bowtie` · `13_icp-buyer-personas-jtbd`.
 
@@ -169,6 +196,7 @@ El copy es producto: un microcopy genérico rompe la marca tanto como un bug rom
 | Tocar sync HubSpot, Account 360, lifecycle stages o properties | `11_hubspot-bowtie` |
 | Definir ICP, buyer persona, JTBD o prioridad por job del cliente | `13_icp-buyer-personas-jtbd` |
 | Evaluar ASaaS, tiers, switching cost, self-service o monetización | `14_modelo-negocio-asaas` |
+| Definir Business Model/packaging/credits de Creative Studio | `14_modelo-negocio-asaas` + `03_ecosistema-producto` + `docs/business-models/creative-studio/*` + skill `creative-practice` |
 | Entender competencia, benchmark de industria (Barómetro La Vulca), quiénes son los competidores en Chile y el baseline para mejorar la agencia | `15_panorama-competitivo-benchmark-industria` |
 
 ---

@@ -24,6 +24,9 @@ on:
       - 'services/_shared/**'
       - 'package.json'
       - 'pnpm-lock.yaml'
+      - '.dockerignore'
+      - '.gcloudignore'
+      - 'vendor/**'
       - 'tsconfig.json'
       - 'src/lib/sync/**'
       # TASK-1210 — ops-worker hosts /nubox/sync + /nubox/quotes-hot-sync which run

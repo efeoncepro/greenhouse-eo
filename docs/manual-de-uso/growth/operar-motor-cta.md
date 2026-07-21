@@ -1,9 +1,9 @@
 # Operar el motor de CTAs (`/growth/ctas` + API)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-07-17 por Claude (TASK-1339)
-> **Ultima actualizacion:** 2026-07-18 por Claude (rollout a producción: gobernanza en Growth, embed en hosts, medición GTM live)
+> **Ultima actualizacion:** 2026-07-18 por Claude (TASK-1431: acciones de navegación gobernada en el authoring — code complete, rollout pendiente)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md)
 > **Skill de dominio (agentes):** `greenhouse-growth-ctas`
 
@@ -13,7 +13,7 @@ Definir, publicar, pausar, embeber y medir CTAs/popups gobernados en las superfi
 
 ## Estado vigente (2026-07-18)
 
-Motor **encendido en staging y producción**. Primer CTA (`ai-visibility-report-followup`) **live** en el reporte AI Visibility de Think **y en WordPress** (página de prueba `efeoncepro.com/greenhouse-cta-prueba/`, noindex, `cta-location=wp_test_page` — decisión del operador: validar en test page antes del placement amplio). Medición GTM/GA4 **publicada y verificada E2E en ambos hosts** (dataLayer + `/g/collect` + ingest + ledger + forja 403; TASK-1427). Pendientes: placement amplio en WP (decisión post-validación) y ventana steady-state de 7 días de los signals.
+Motor **encendido en staging y producción**. Primer CTA (`ai-visibility-report-followup`) **live** en el reporte AI Visibility de Think **y en WordPress** (página de prueba `efeoncepro.com/greenhouse-cta-prueba/`, noindex, `cta-location=wp_test_page` — decisión del operador: validar en test page antes del placement amplio). Medición GTM/GA4 **publicada y verificada E2E en ambos hosts** (dataLayer + `/g/collect` + ingest + ledger + forja 403; TASK-1427). Con el release `d5db8b568` (2026-07-18, TASK-1428/1429): **enforcement de suppression ON en staging y Production** (ya no es shadow; verificado E2E en ambos ambientes), **kill switches global/per-surface operativos en producción** (engage → `engineState:"killed"` → release verificado live, sin redeploy) y placement **`slide_in` disponible** (preview + demo en `/growth/ctas`), todavía **sin campaña interruptiva publicada** — publicarla es decisión de negocio del operador (surface/copy/trigger). Pendientes: placement amplio en WP (decisión post-validación), primera campaña interruptiva y ventana de monitoreo de 7 días de los signals `growth.cta.*` en `/admin/operations` (hasta 2026-07-25).
 
 **Rollback de la página de prueba WP:** borrar la página id `251561` (`wp post delete 251561 --force` vía `pnpm public-website:wpcli`) — no se tocó tema ni plugin.
 
@@ -32,7 +32,18 @@ Motor **encendido en staging y producción**. Primer CTA (`ai-visibility-report-
 
 ## Crear y publicar un CTA (API admin)
 
-1. `POST /api/admin/growth/ctas` con slug, name, purpose, placement, content (eyebrow/headline/body/ctaLabel/dismissLabel/footnote), `styleVariant` opcional (`default`|`spotlight`|`minimal`), `actionPolicy: { kind: 'open_growth_form', formRef: '<slug-o-form-key>' }`, targeting (`routes` glob) y priority. Crea la versión **draft**.
+1. `POST /api/admin/growth/ctas` con slug, name, purpose, placement, content (eyebrow/headline/body/ctaLabel/dismissLabel/footnote), `styleVariant` opcional (`default`|`spotlight`|`minimal`), `actionPolicy` (ver tabla), targeting (`routes` glob) y priority. Crea la versión **draft**.
+
+   **Acciones disponibles (`actionPolicy`, TASK-1431 — registro cerrado; un kind fuera del registro no publica):**
+
+   | Kind | Shape | Reglas del destino |
+   | --- | --- | --- |
+   | `open_growth_form` | `{ kind, formRef: '<slug-o-form-key>' }` | El form debe estar **publicado** en Growth Forms |
+   | `link_url` | `{ kind, url, openInNewContext? }` | Solo path interno (`/algo`) o HTTPS; sin `javascript:`/`data:`, sin `//host`, sin credenciales embebidas |
+   | `open_think_tool` | `{ kind, toolPath: '/brand-visibility', campaignUtm?: { source/medium/campaign/term/content }, openInNewContext? }` | `toolPath` es un **path del hub Think** (el host lo pone el motor — nunca lo elige el autor); sin `?`/`#` propios; contexto de campaña SOLO por UTM permitidas |
+   | `book_meeting` | `{ kind, meetingUrl, openInNewContext? }` | Solo HTTPS en hosts de agenda gobernados (`meetings*.hubspot.com`; extras vía env `GROWTH_CTA_BOOKING_URL_HOSTS`). **Navegación pura: cero write CRM por click** |
+
+   **Expectation integrity (regla de autoría):** el `ctaLabel`/footnote debe describir la acción real — "Agendar" abre la agenda (no promete reunión creada), "Ver X" navega. Nunca un label de descarga/resultado que el kind no ejecuta. `openInNewContext` default `false` (mismo contexto).
 2. `POST /api/admin/growth/ctas/{ctaId}/lifecycle` con `{ action: 'submit_review', ctaVersionId }` y luego `{ action: 'publish', ctaVersionId }` (o desde la UI).
 3. Para editar un CTA vivo: autora una **versión nueva** (paso 1 con el mismo slug) y publícala — nunca se edita la publicada.
 4. **Registrar la medición**: fila del CTA en `docs/reference/measurement-gtm-ga4/TRACKING-PLAN.md` §CTAs (obligatorio; los tags GTM de la familia ya cubren todo CTA nuevo — se distinguen por `cta_slug`).
@@ -109,16 +120,38 @@ El renderer ya sabe montar el interruptivo del arbitraje (0–1 por página): un
 entra desde el borde en desktop y desde abajo en móvil, tras un trigger gobernado (8 s en página o
 35 % de scroll, lo primero). No roba el foco al aparecer; Escape lo cierra; el cierre persiste
 server-side ANTES de la animación de salida y no reaparece en la sesión. La densidad
-(`full|condensed|peek`) se adapta al ancho del propio panel. Para **usarlo en una campaña real**:
-autorar una versión con `placement: "slide_in"` (API admin o cockpit futuro), publicarla y
-allowlistearla en la surface — con `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` **ON** en ese
-environment (gate duro: sin enforcement no hay caps reales). Preview y demo vivo en `/growth/ctas`.
+(`full|condensed|peek`) se adapta al ancho del propio panel. Para **usarlo en una campaña real**
+solo falta autorar una versión con `placement: "slide_in"` (API admin o cockpit futuro), publicarla
+y allowlistearla en la surface — el gate de enforcement ya está cumplido
+(`GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` ON en staging y Production: los caps interruptivos
+son reales). Preview y demo vivo en `/growth/ctas`.
 Si el host tiene CMP, declarar `consent-state="granted"` en el snippet habilita la memoria durable
 del visitante; sin consent, la ventana es de sesión.
 
-## Suppression y frequency capping (TASK-1428 — hoy en shadow)
+## Suppression y frequency capping (TASK-1428 — enforcement ACTIVO)
 
-El motor decide server-side si un visitante debe volver a ver un CTA: dismiss reciente (cooldown default 14 días), conversión verificada, o tope de impresiones interruptivas (per-CTA 2/24h + global 3/día por visitante). Con `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` OFF (estado actual) la decisión solo se **registra** (shadow) sin alterar lo que se muestra; el flip a ON activa la exclusión real. La policy por versión vive en `suppression_policy_json` (vacía = defaults conservadores). Sin consentimiento del visitante no se guarda estado durable: la ventana es de sesión (48 h) y los placements interruptivos directamente no se muestran a visitantes sin identidad.
+El motor decide server-side si un visitante debe volver a ver un CTA y, con `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` **ON en staging y Production** (estado actual desde el release `d5db8b568`), esa decisión **ya excluye del render**: dismiss reciente (cooldown default 14 días), conversión verificada, o tope de impresiones interruptivas (per-CTA 2/24h + global 3/día por visitante). Verificado E2E en ambos ambientes: un visitante que descarta un CTA queda excluido (`nonInterruptive: []`), un visitante fresco sí lo ve, y sin identidad el embedded sigue eligible (el fallback conservador solo suprime interruptivos). La policy por versión vive en `suppression_policy_json` (vacía = defaults conservadores). Sin consentimiento del visitante no se guarda estado durable: la ventana es de sesión (48 h) y los placements interruptivos directamente no se muestran a visitantes sin identidad. Volver a shadow es poner el flag en `false` en el environment correspondiente (<5 min, sin deploy).
+
+## Usar el cockpit (TASK-1430)
+
+1. Entra a `/growth/ctas` (menú Growth → CTAs). A la izquierda está el inventario; a la derecha,
+   el detalle del CTA seleccionado. En pantallas angostas el detalle se abre como panel.
+2. **Crear un CTA:** botón «Crear CTA» → recorre los 8 pasos. En «Acción» las opciones y campos
+   vienen del registro canónico (formulario, URL, herramienta Think, agendador). En «Vista
+   previa» mueve el ancho del contenedor para ver el morph full → condensed → peek y prueba
+   esquema claro/oscuro y ambos hosts. «Revisión» lista los bloqueos; el envío queda
+   deshabilitado hasta resolverlos. El resultado siempre lo confirma el servidor.
+3. **Editar:** «Editar y previsualizar» crea una VERSIÓN nueva (la publicada es inmutable);
+   al publicar, la anterior se deprecia sola.
+4. **Publicar/pausar/reanudar/deprecar/archivar:** desde la barra del detalle, con confirmación.
+   Con el motor apagado en el ambiente, estas acciones quedan deshabilitadas (leer y autorar
+   borradores sí funciona).
+5. **Kill switch:** «Activar kill switch» (global, en la card) o por superficie (en la lista de
+   superficies). Pide un motivo (mínimo 5 caracteres) y queda auditado. Liberar reanuda la
+   exposición según el ciclo de vida vigente.
+6. **Resultados:** revisa los 30 días con deltas. Solo `server_confirmed` es conversión real;
+   si ves «Sin datos» en CTR/tasa con una nota de cobertura, es honestidad del sistema (las
+   impresiones aún no cubren la ventana), no un bug.
 
 ## Qué no hacer
 
@@ -129,14 +162,14 @@ El motor decide server-side si un visitante debe volver a ver un CTA: dismiss re
 - **No** publicar tags al container GTM sin preview + confirmación humana.
 - **No** dejar un kill switch engaged sin dueño: es un estado de emergencia visible (signal en warning), no una pausa de largo plazo — para retiros planificados usar `pause`/`deprecate` del lifecycle.
 - **No** borrar filas de `cta_kill_switch_event` (append-only; es el audit del stop de emergencia).
-- **No** prender `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` en producción sin la ventana de shadow-compare en staging (secuencia del rollout de TASK-1428).
+- **No** apagar `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` (hoy ON en staging y Production) sin registrar el cambio en el Feature Flag State Ledger — volver a shadow es válido ante un incidente, pero debe quedar con dueño y motivo.
 
 ## Problemas comunes
 
 | Síntoma | Causa probable | Qué hacer |
 | --- | --- | --- |
 | El CTA no aparece en el host | Motor apagado en ese ambiente, CTA no publicado, ruta fuera del targeting, o surface/embed key mal configurada | Chip de estado en `/growth/ctas`; probar `GET /render` con la surface real; revisar el signal de forja |
-| Publish rechaza con `growth_cta_action_not_resolvable` | El form de destino no está publicado | Publicar el Growth Form primero |
+| Publish rechaza con `growth_cta_action_not_resolvable` | El form de destino no está publicado (`action_destination_unavailable`), el destino no pasa la gobernanza (`action_destination_invalid`: protocolo/host/credenciales/path fuera del contrato), la policy no cumple el shape del kind (`action_policy_invalid`) o el kind no está registrado (`action_kind_unsupported`) | Revisar `blockingReasons` de la respuesta; corregir la policy o publicar el Growth Form primero |
 | Signal `surface_unauthorized_attempt` > 0 | Ingest forjado o host mal configurado (embed key/origin) | Revisar el host; si es ataque, rotar embed key |
 | Signal `form_handoff_failed` > 0 | Un CTA publicado apunta a un form despublicado | Pausar el CTA o republicar el form |
 | Eventos no llegan a GA4 | Consent denied, tag sin propagar (CDN toma minutos), o lag del realtime | Verificar `/g/collect` con consent granted (LEARNINGS de medición); no concluir por el realtime |

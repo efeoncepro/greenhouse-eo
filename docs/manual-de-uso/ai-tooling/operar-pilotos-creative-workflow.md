@@ -1,4 +1,4 @@
-# Operar pilotos de Creative Workflow con motores de video IA
+# Operar pilotos de Creative Workflow con motores de media IA
 
 > Tipo de documento: Manual de uso operativo
 >
@@ -6,9 +6,47 @@
 
 ## Para qué sirve
 
-Este manual permite a un operador o agente ejecutar un piloto creativo de imagen a video de forma reproducible, con gasto controlado y evidencia suficiente para distinguir una falla de capacidad de un bloqueo de entrada. No presupone que Gemini Omni sea el motor de toda toma: la selección depende del contrato de fidelidad de la referencia, la física de la acción y la interpretación que el proyecto permite.
+Este manual permite a un operador o agente ejecutar un piloto creativo de imagen o video de forma reproducible, con gasto controlado y evidencia suficiente para distinguir una falla de capacidad de un bloqueo de entrada. No presupone que un solo motor gobierne toda la pieza: la selección depende de la operación, del contrato de fidelidad de la referencia y de las invariantes aprobadas.
 
-El referente ejecutado es la intro Glitch El micrófono se abre. Su retrospectivo canónico vive en ai-generations/2026-07-11_glitch-microphone-intro/pilot-retrospective.md.
+## Piloto híbrido de imagen Seedream 5 ↔ GPT Image 2
+
+1. Declarar formatos, mensajes, cantidad de piezas, roles de aprobación, presupuesto y `target_executor` de cada relevo.
+2. Usar Seedream Lite para divergencia o GPT Image 2 para una primera estructura, según la incertidumbre principal.
+3. Seleccionar y aprobar un anchor. Registrar identidad, silueta, paleta, luz, fondo, safe zones e invariantes.
+4. Completar `.codex/skills/design-studio/templates/model-handoff-contract.yaml` antes de cambiar de modelo.
+5. Pasar a Seedream Pro sólo para desarrollar materialidad/atmósfera, o a GPT Image 2 sólo para organizar, adaptar o reparar. Repetir en el prompt todo lo que no debe cambiar.
+6. Probar un mensaje completo en todos los formatos antes del lote. Para 30 piezas, usar anchors por mensaje y derivar en estrella.
+7. Revisar el 100% de thumbnails y checks técnicos; inspeccionar a tamaño completo una muestra representativa por mensaje y formato. Anatomía, número de sujetos, copy field, crop y contraste son gates, no observaciones.
+8. Componer texto, logo, legal y export final con una herramienta determinista declarada. Para ratios mayores a `3:1`, preferir composición externa sobre generación full-frame.
+
+Si GPT duplica un sujeto para representar movimiento, declarar “exactamente un cuerpo, una cabeza y una cola; sólo las alas repiten fases desde un hombro común”. Si una corrección de escala se sobrepasa, usar límites duros de margen o porcentaje máximo, no “aproximadamente”. Si Seedream altera estructura, reducir la región editable y volver al último anchor aprobado.
+
+Para transferir una salida local de GPT a Fal, usar upload temporal con ACL restrictiva; no hacer público un
+bucket GCS ni ampliar permisos. Registrar hash/lineage sin persistir tokens de URL y traer el output de inmediato
+al storage privado. `X-Fal-Store-IO: 0` reduce retención del payload, pero no vuelve privado un archivo CDN.
+
+Los referentes ejecutados son la intro Glitch `El micrófono se abre` y la campaña multimodal
+`ai-generations/2026-07-18_high-frequency-campaign-e2e/`. El primero prueba continuidad física/practical;
+el segundo prueba familia de campaña, format wall, mezcla y release creativo sin activación.
+
+## Producir la familia motion 15/10/6
+
+1. Preparar un clean plate aprobado por ratio, sin copy ni logo.
+2. Generar con Gemini Omni **una sola toma continua de 8 s** para `9:16` y otra para `16:9`. Guardar audio
+   nativo, prompt, request ID, hash y `ffprobe`; no pedir todavía 15/10/6 al modelo.
+3. Aprobar identidad, acción, cámara, continuidad, primer/medio/último frame y audio útil de cada single-shot.
+4. Construir determinísticamente, por ratio:
+   - hero 15 s: toma aprobada + montaje de stills reales + end card de 2,5 s;
+   - master 10 s: 8 s de motion + end card de 2 s;
+   - bumper 6 s: 4 s seleccionados + end card de 2 s.
+5. El format wall sólo puede usar piezas finales reales del release y registrar sus paths/hashes. No generar
+   miniaturas ficticias, UI falsa ni formatos que no existan.
+6. Mezclar audio fuera del modelo. Para el piloto web/social: target `−16 LUFS` integrado, ceiling `≤ −1 dBTP`,
+   AAC 48 kHz. Medir y después escuchar con audífonos y parlante de teléfono. Como referencia, los heroes
+   validados midieron `−16,3/−16,4 LUFS` y `−2,0/−2,2 dBFS` de peak.
+7. No abrir una nueva generación por trim, hold, orden, grade, end card, copy, format wall o loudness.
+8. Usar Seedance 2.0 sólo si falta una toma, ángulo, blocking o continuidad física que no existe en el master
+   aprobado. Documentar qué píxel/actuación falta y volver a revisar el take completo.
 
 ## Antes de ejecutar
 
@@ -16,9 +54,25 @@ El referente ejecutado es la intro Glitch El micrófono se abre. Su retrospectiv
 2. Crear una corrida versionada bajo ai-generations con brief, secuencia, storyboard, motion y sonido, manifest y renderer.
 3. Mantener el key visual original como fuente canónica. No sobrescribirlo ni usar el storyboard multipanel como input.
 4. Validar dirección, duración, formato, acción, audio y límite de gasto antes de llamar al modelo.
-5. Elegir el motor mediante el gate `ancla visual flexible` vs `identidad de set`; no decidir por canal ni precio aislado. Ver [Selección de motor por contrato de fidelidad](../../../.codex/skills/motion-design-studio/workflows/engine-selection-by-fidelity-contract.md).
+5. Elegir la mano mediante el gate `el master ya contiene la toma/física` vs `falta una toma, ángulo o continuidad física`; no decidir por canal ni precio aislado. Ver [Selección de motor por contrato de fidelidad](../../../.codex/skills/motion-design-studio/workflows/engine-selection-by-fidelity-contract.md).
 6. Si se usará Omni/Vertex, autenticar ambos caminos de Google Cloud: gcloud auth login y gcloud auth application-default login. Si se usará Fal, comprobar saldo y credencial en Secret Manager sin exponerla.
 7. Ejecutar primero el modo plan. Ningún plan debe llamar al proveedor.
+
+### Preflight enterprise del provider
+
+1. Resolver una `capability` estable y una `route_id` exacta desde el registry; nunca entregar endpoint + JSON
+   arbitrario a un agente. El registry de research no ejecuta por sí solo.
+2. Confirmar `readiness=production_approved`, schema hash, owner, fecha de revisión, región, licencia, asset
+   classification allowlist, retención, fallback y evidencia de eval. Si falta uno, detener.
+3. Google nativo va directo a Google Cloud/Vertex; no seleccionar su réplica Fal.
+4. Obtener pricing/usage vivo y guardar snapshot, moneda/FX, TTL y supuestos. Estimar costo fully-loaded por
+   candidato aprobado, no un precio hardcodeado por request/segundo.
+5. Pedir un approval token single-use ligado a plan hash, actor, workspace, route, hashes de inputs, cantidad,
+   resolución/duración, región, costo máximo, fallbacks, policy revision y expiración.
+6. Verificar privacidad con la matriz `classification × provider × endpoint × region × retention × territory`.
+   Material restringido, biométrico, M&A, regulado o no publicado falla cerrado.
+7. El runner debe usar submission fence/outbox/idempotencia, lease/heartbeat, reconciliación, DLQ y recuperación
+   de reservas huérfanas. Si no puede probar que un retry no duplica gasto, no reintentar automáticamente.
 
 ### Exploración no es producción
 
@@ -35,12 +89,13 @@ La persona creativa no tiene que traducir su intención a nodos. Durante el pilo
 | Condición creativa | Primera mano | Evidencia |
 | --- | --- | --- |
 | Stills ficticios de una campaña: pueden reinterpretarse dentro del mismo lenguaje visual; no tienen copy ni practical exacto | Gemini Omni image-to-video | RRSS: `gpt-image-2` generó ocho key visuals; Omni animó seis referencias y se publicaron beats de cuatro segundos. |
-| El key visual ya es la verdad de un set/producto/practical y debe mantener identidad espacial | Seedance image/reference-to-video | Glitch S conservó correctamente set, paleta y practical; el take sigue rechazado por gesto/foley, no por diseño. |
-| Una toma requiere blocking, timing o cámara espacial preplaneada, y el look final puede reinterpretarse | Seedance reference-to-video con previs 3D exportada + keyframe | Capacidad externa documentada; exige endpoint con referencias de video y una prueba aislada. No es receta interna validada ni habilita reutilizar el blocking 3D rechazado de Glitch. |
+| El master aprobado ya contiene actuación, ángulo e identidad; sólo cambian duración, orden, hold, grade, firma o audio | Edición determinista / mograph | La campaña del colibrí produjo la familia 15/10/6 desde dos single-shots Omni sin costo generativo incremental. |
+| Falta una toma, ángulo, blocking o continuidad física que no existe en el material | Seedance 2.0 image/reference-to-video, como fallback | Glitch necesitaba una actuación física nueva; conservar set y cumplir gesto siguieron siendo gates separados. |
+| Una toma nueva requiere cámara espacial preplaneada y el look final puede reinterpretarse | Seedance 2.0 reference-to-video con previs 3D exportada + keyframe | Capacidad externa documentada; exige endpoint con referencias de video y una prueba aislada. No es receta interna validada ni habilita reutilizar el blocking 3D rechazado de Glitch. |
 | Se necesita explorar una acción inexistente mediante conversación y el plano tolera reinterpretación | Gemini Omni edit/generation | El resultado siempre pasa revisión temporal completa. |
-| Sólo cambian ritmo, orden, trim, hold, grade o copy no diegético exacto | Edición determinista / mograph | No se generan píxeles ni se simula una física ausente. |
 
-El canal no decide: un video de RRSS puede ser excelente con Omni si parte de un paquete de imágenes flexible, y una intro vertical puede requerir Seedance si el set es una identidad que no debe rediseñarse.
+El canal no decide. Tampoco basta “identidad de set” para regenerar: primero se pregunta si la toma y la física
+ya existen. Omni puede crear el single-shot flexible; Seedance 2.0 sólo cubre la toma/ángulo/continuidad ausente.
 
 ### Cuando la referencia es una previs 3D
 
@@ -89,7 +144,9 @@ No se debe intentar desactivar filtros, ocultar contenido sensible ni presentar 
 2. Revisar el gesto a velocidad real, media velocidad y frame a frame.
 3. Rechazar dedos extra, anatomía inestable, penetración de objetos, texto inventado, cámara no dirigida o señal que antecede al contacto.
 4. Puntuar el take usando una rúbrica persistente.
-5. Si se requiere un cambio sobre el clip ya producido, usar primero edición video-a-video persistente y guardar el identificador de interacción. Revisar el video entero: una respuesta completada no equivale a continuidad aprobada.
+5. Si se requiere un cambio sobre el clip, clasificarlo antes de llamar un modelo: montaje/finish existente va a
+   edición determinista; cambio localizado que necesita píxeles puede usar una interacción persistente; una
+   nueva toma/ángulo/continuidad física va al fallback Seedance 2.0. Revisar siempre el video entero.
 6. Si la edición generativa deriva cámara, anatomía o textura, rechazarla. Cuando las poses correctas ya existen en el video, usar una corrección determinista y reversible de timing/orden; no generar otro plano sólo por reordenar el gesto. Si el gesto físico es el significado del plano y la fuente no lo contiene, crear una toma integral nueva: no simularlo por retime.
 7. Componer texto/logos no diegéticos desde sus assets reales. No pedir al modelo que reconstruya tipografía legible; documentar la región, fuente y hash usados. No componer en post un practical que deba pertenecer al mundo del video: se valida dentro de la toma o se rechaza.
 8. Si el contrato pide foley controlado, el audio nativo de Omni se trata como guía. Un edit literal `audio-only` puede fallar; una edición audiovisual localizada puede aportar eventos útiles pero sus píxeles deben pasar QA por separado. Para un contacto físico específico, preferir/cotejar foley aislado que conserve material + acción + fuerza + espacio; sincronizado no equivale a creíble.
@@ -97,10 +154,18 @@ No se debe intentar desactivar filtros, ocultar contenido sensible ni presentar 
 
 ### Cómo elegir entre editar con Omni y editar el clip existente
 
-1. **Faltan píxeles o una acción que no existe:** usar una interacción Omni persistente, una instrucción acotada y guardar su ID. No incluir `aspect_ratio` en una tarea `edit` si el proveedor ya preserva el formato del input.
-2. **Sólo cambia el montaje:** para repetir un gesto ya correcto, cambiar pausas, reordenar beats o hacer hold/freeze, trabajar sobre el mismo master con un editor determinista. No abrir otra generación. Texto/logo no diegético y foley pueden montarse después; un practical de set o una actuación física que aún no existe requieren una toma nueva. Si el operador pide textura de foley nativo Omni, usarla sólo como guía de audio y conservar eventos que pasen escucha, no sus píxeles por defecto.
-3. En ambos casos, revisar el resultado entero a velocidad real, 0,5× y por frames; un MP4 disponible sólo es candidato técnico.
-4. Todo texto/logo/practical exacto sale del asset canónico con su hash registrado. El video IA puede ser el plate, nunca la fuente de verdad tipográfica.
+1. **Cambio localizado que necesita píxeles y tolera reinterpretación:** usar una interacción Omni persistente,
+   una instrucción acotada y guardar su ID. No incluir `aspect_ratio` en una tarea `edit` si el proveedor ya
+   preserva el formato del input.
+2. **Falta una toma, ángulo o continuidad física completa:** usar Seedance 2.0 como fallback con la referencia
+   aprobada. No simular una actuación ausente mediante retime.
+3. **Sólo cambia el montaje:** para repetir un gesto ya correcto, cambiar pausas, reordenar beats, construir la
+   familia 15/10/6 o hacer hold/freeze, trabajar sobre el mismo master con un editor determinista. Texto/logo
+   no diegético, format wall y foley pueden montarse después.
+4. En todos los casos, revisar el resultado entero a velocidad real, 0,5× y por frames; un MP4 disponible sólo
+   es candidato técnico.
+5. Todo texto/logo/practical exacto sale del asset canónico con su hash registrado. El video IA puede ser el
+   plate, nunca la fuente de verdad tipográfica.
 
 ## Cierre y archivo
 
@@ -110,6 +175,13 @@ No se debe intentar desactivar filtros, ocultar contenido sensible ni presentar 
 4. Al aprobarse, archivar los binarios mediante el flujo gobernado de media y registrar URI, hash, tamaño y propietario.
 5. Registrar costo confirmado sólo cuando el ledger o proveedor lo permita; no inferir monto por tokens.
 
+### Creative release no es activación
+
+Cerrar assets y QA permite registrar `creative_release_complete`; no autoriza medios. Mantener
+`activationStatus: not_activated` hasta aprobar audiencia, landing, UTMs, pixel/CAPI, conversión, presupuesto,
+trafficking, legal, experimento y escucha final por dispositivo. No usar `completado` como sinónimo de campaña
+publicada.
+
 ## Referencias
 
 - Documentación funcional: docs/documentation/ai-tooling/estudio-de-flujos-creativos.md
@@ -117,3 +189,6 @@ No se debe intentar desactivar filtros, ocultar contenido sensible ni presentar 
 - Piloto Glitch: ai-generations/2026-07-11_glitch-microphone-intro/
 - Ruta vigente Glitch: ai-generations/2026-07-11_glitch-microphone-intro/recovery-plan-v2-integral-practical-and-foley.md
 - Evidencia rechazada del take I: ai-generations/2026-07-11_glitch-microphone-intro/review/take-i-percussive-tap-on-air-gemini-foley-review.md
+- Campaña multimodal 15/10/6: ai-generations/2026-07-18_high-frequency-campaign-e2e/
+- Contrato técnico de campaña: docs/operations/GREENHOUSE_MULTIMODAL_CAMPAIGN_PRODUCTION_V1.md
+- Método Layout Design & Finishing: docs/manual-de-uso/ai-tooling/producir-layout-design-y-finishing.md

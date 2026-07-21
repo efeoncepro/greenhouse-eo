@@ -1,0 +1,173 @@
+{
+  "schemaVersion": "greenhouse-agent-context-router.v1",
+  "canonicalDecision": "docs/architecture/GREENHOUSE_AGENT_CONTEXT_ROUTER_DECISION_V1.md",
+  "fallbackSnapshot": "docs/operations/agent-context-history/2026-07-19/AGENTS.legacy.md",
+  "domains": [
+    {
+      "id": "architecture-modularity",
+      "triggers": ["architecture", "boundary", "schema ownership", "EPIC-027", "deployable"],
+      "skills": ["software-architect-2026"],
+      "sources": [
+        "docs/architecture/GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md",
+        "docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md"
+      ]
+    },
+    {
+      "id": "ui-platform",
+      "triggers": ["UI", "layout", "interaction", "motion", "primitive", "Figma", "responsive"],
+      "skills": ["greenhouse-ai-design-studio", "greenhouse-product-ui-architect", "greenhouse-portal-ui-implementer"],
+      "sources": [
+        "docs/architecture/agent-invariants/UI_PLATFORM_AGENT_INVARIANTS.md",
+        "docs/architecture/agent-invariants/UI_FEATURE_AGENT_INVARIANTS.md",
+        "docs/architecture/ui-platform/README.md",
+        "docs/ui/GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md",
+        "DESIGN.md"
+      ]
+    },
+    {
+      "id": "visual-browser-qa",
+      "triggers": ["URL", "browser", "capture", "screenshot", "GVC", "visual QA"],
+      "skills": ["greenhouse-browser-diagnostics", "greenhouse-qa-release-auditor"],
+      "sources": [
+        "docs/architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md",
+        "docs/manual-de-uso/plataforma/captura-visual-playwright.md"
+      ]
+    },
+    {
+      "id": "release-cloud-secrets",
+      "triggers": ["release", "main", "deploy", "secret", "environment", "Cloud Run", "Vercel"],
+      "skills": ["greenhouse-production-release", "greenhouse-secret-hygiene"],
+      "sources": [
+        "docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md",
+        "docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md",
+        "docs/architecture/GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md",
+        "docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md"
+      ]
+    },
+    {
+      "id": "ops-reliability",
+      "triggers": ["cron", "worker", "Teams", "reliability", "Platform Health", "incident"],
+      "skills": ["teams-bot-platform", "greenhouse-qa-release-auditor"],
+      "sources": ["docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md"]
+    },
+    {
+      "id": "postgres-data",
+      "triggers": ["PostgreSQL", "migration", "SQL", "reader", "date math"],
+      "skills": ["software-architect-2026"],
+      "sources": [
+        "docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md",
+        "docs/architecture/agent-invariants/SQL_DATE_MATH_AGENT_INVARIANTS.md"
+      ]
+    },
+    {
+      "id": "backend-api-events",
+      "triggers": ["API", "command", "reader", "outbox", "webhook", "Full API Parity"],
+      "skills": ["software-architect-2026"],
+      "sources": [
+        "docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md",
+        "docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md",
+        "docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md"
+      ]
+    },
+    {
+      "id": "finance",
+      "triggers": ["finance", "ledger", "bank", "FX", "CLP", "payments", "accounting"],
+      "skills": ["greenhouse-finance-accounting-operator"],
+      "sources": ["docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md"]
+    },
+    {
+      "id": "payroll-workforce",
+      "triggers": ["payroll", "workforce", "leave", "participation", "finiquito", "receipt"],
+      "skills": ["greenhouse-payroll-auditor"],
+      "sources": [
+        "docs/architecture/agent-invariants/PAYROLL_WORKFORCE_AGENT_INVARIANTS.md",
+        "docs/architecture/agent-invariants/PAYROLL_LEGAL_DOCS_AGENT_INVARIANTS.md"
+      ]
+    },
+    {
+      "id": "hiring-talent",
+      "triggers": ["hiring", "ATS", "candidate", "vacancy", "talent"],
+      "skills": ["greenhouse-talent-people-operator"],
+      "sources": ["docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md"]
+    },
+    {
+      "id": "identity-access",
+      "triggers": ["identity", "role", "session", "capability", "entitlement", "access"],
+      "skills": ["software-architect-2026"],
+      "sources": [
+        "docs/architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md",
+        "docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md",
+        "docs/architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md"
+      ]
+    },
+    {
+      "id": "organization-client",
+      "triggers": ["organization", "client portal", "Account 360", "onboarding"],
+      "skills": ["greenhouse-product-ui-architect"],
+      "sources": ["docs/architecture/agent-invariants/ORG_CLIENT_AGENT_INVARIANTS.md"]
+    },
+    {
+      "id": "knowledge-nexa",
+      "triggers": ["Knowledge", "Nexa", "retrieval", "agent action"],
+      "skills": ["greenhouse-nexa-conversational"],
+      "sources": ["docs/architecture/agent-invariants/KNOWLEDGE_NEXA_AGENT_INVARIANTS.md"]
+    },
+    {
+      "id": "notion",
+      "triggers": ["Notion", "work management", "source sync", "teamspace"],
+      "skills": ["notion-platform"],
+      "sources": ["docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md"]
+    },
+    {
+      "id": "hubspot",
+      "triggers": ["HubSpot", "CRM", "services intake", "deal", "company"],
+      "skills": ["hubspot-greenhouse-bridge", "hubspot-as-a-service"],
+      "sources": [
+        "docs/architecture/GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md",
+        "docs/architecture/agent-invariants/INTEGRATIONS_INFRA_AGENT_INVARIANTS.md"
+      ]
+    },
+    {
+      "id": "business-models",
+      "triggers": ["business model", "modelo de negocio", "pricing", "packaging", "credits", "créditos", "Managed Squad", "Staff Augmentation"],
+      "skills": ["efeonce-agency", "creative-practice"],
+      "sources": [
+        "docs/business-models/README.md",
+        "docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md",
+        "docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md"
+      ]
+    },
+    {
+      "id": "growth-public-site",
+      "triggers": ["growth", "SEO", "AEO", "form", "CTA", "GTM", "WordPress", "Kinsta"],
+      "skills": ["seo-aeo", "efeonce-public-site-wordpress", "greenhouse-gtm-ga4-operator"],
+      "sources": [
+        "docs/public-site/README.md",
+        "docs/context/00_INDEX.md",
+        "docs/architecture/agent-invariants/PUBLIC_SITE_KINSTA_ACCESS_AGENT_INVARIANTS.md"
+      ]
+    },
+    {
+      "id": "aeo-xray-think",
+      "triggers": ["Radiografía AEO", "aeo-xray", "efeonce-think"],
+      "skills": ["seo-aeo", "seo-aeo-practice", "astro"],
+      "sources": ["docs/think/radiografia-aeo-architecture.md"]
+    },
+    {
+      "id": "commercial-tenders",
+      "triggers": ["licitación", "tender", "proposal", "Artifact Composer", "deck"],
+      "skills": ["greenhouse-public-private-tenders", "deck-studio"],
+      "sources": ["docs/architecture/agent-invariants/COMMERCIAL_TENDERS_AGENT_INVARIANTS.md"]
+    },
+    {
+      "id": "documentation-context",
+      "triggers": ["documentation", "handoff", "project context", "agent rule", "closure"],
+      "skills": ["greenhouse-documentation-governor"],
+      "sources": [
+        "docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md",
+        "docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md",
+        "docs/architecture/GREENHOUSE_AGENT_CONTEXT_ROUTER_DECISION_V1.md"
+      ]
+    }
+  ]
+}

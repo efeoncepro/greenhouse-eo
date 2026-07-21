@@ -274,6 +274,20 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-layout-board-split'
   },
   {
+    id: 'surface-recipes',
+    title: 'Surface recipes',
+    description:
+      'Seis composiciones canónicas y ocho primitives compuestas para que una interfaz nueva nazca con jerarquía, densidad adaptable, estados y motion gobernados. El Lab recorre workbench, reporte ejecutivo y configuración.',
+    route: '/design-system/surface-recipes',
+    category: 'Patterns',
+    kind: 'Pattern',
+    status: 'Canonical',
+    owner: 'Greenhouse AI Design Studio',
+    tags: ['premium UI', 'recipes', 'workbench', 'report', 'settings', 'agentic UI', 'composition'],
+    searchAliases: ['surface recipes', 'premium ui', 'operational workbench', 'analytics report', 'settings flow'],
+    icon: 'tabler-layout-dashboard'
+  },
+  {
     id: 'card-density',
     title: 'Adaptive card density',
     description:
@@ -316,6 +330,20 @@ const CATALOG_ITEMS: CatalogItem[] = [
       'wordpress astro'
     ],
     icon: 'tabler-forms'
+  },
+  {
+    id: 'native-meeting-scheduler',
+    title: 'Native Meeting Scheduler',
+    description:
+      'Scheduler portable Efeonce (TASK-1510): experiencia nativa de disponibilidad, captura de datos, confirmacion y recovery seguro. Usa el mismo renderer en Greenhouse, WordPress y Astro; HubSpot sigue como fuente de verdad y GTM recibe un funnel sin PII.',
+    route: '/design-system/native-meeting-scheduler',
+    category: 'Patterns',
+    kind: 'Pattern',
+    status: 'Hardening',
+    owner: 'src/growth-meeting-renderer/*',
+    tags: ['growth', 'meetings', 'scheduler', 'web component', 'gtm', 'portable', 'hubspot'],
+    searchAliases: ['meeting scheduler', 'agenda', 'reservar reunion', 'hubspot meetings', 'gtm scheduler'],
+    icon: 'tabler-calendar-event'
   },
   {
     id: 'buttons',

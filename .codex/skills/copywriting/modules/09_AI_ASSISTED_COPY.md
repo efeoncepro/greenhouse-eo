@@ -63,6 +63,14 @@ El humano es responsable y hace lo que el modelo no puede:
 - **No publiques claims generados sin verificar** (riesgo legal/marca).
 - **Divulga** cuando corresponda; respeta PII/consentimiento en research.
 
+## 8. Frontera con Studio Credits
+
+El trabajo de esta skill —research, ideación, draft, edición, transcreación, factcheck y aprobación— se financia
+por capacidad/gobierno y devenga **0 Studio Credits**. No se cobra por palabra, variante, pieza u hora mediante
+el ledger de créditos. Si en el futuro una operación de texto se incorpora como `specialist_inference` al
+catálogo de Creative Studio, sólo esa capability versionada puede estimarse/reservarse/liquidarse; una llamada
+LLM ad hoc o el costo del provider no crea por sí sola una unidad comercial.
+
 ## Checklist de salida
 
 - [ ] IA usada para acelerar (research/ideación/draft/variantes), no para publicar crudo.
@@ -70,6 +78,7 @@ El humano es responsable y hace lo que el modelo no puede:
 - [ ] Tells del AI-slop cazados y editados (§4).
 - [ ] Cada dato/claim verificado por un humano responsable.
 - [ ] Especificidad real agregada; suena a la marca, no al modelo.
+- [ ] El uso de IA no se convirtió en Studio Credits salvo capability gobernada y rate version aprobadas.
 
 ## Cross-links
 

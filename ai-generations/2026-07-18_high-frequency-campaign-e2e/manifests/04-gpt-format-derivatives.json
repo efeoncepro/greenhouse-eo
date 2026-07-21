@@ -1,0 +1,114 @@
+{
+  "stage": "derive-formats",
+  "sourceSha256": "95f6ac28d302d3ea178db54de1a1ef91100e6595fc3ebc842bdaa1a574cac4f3",
+  "results": [
+    {
+      "id": "plate-4x5",
+      "source": "work/anchor/high-frequency-anchor-v1.png",
+      "sourceSha256": "95f6ac28d302d3ea178db54de1a1ef91100e6595fc3ebc842bdaa1a574cac4f3",
+      "output": "work/plates/high-frequency-plate-4x5-source.png",
+      "operation": "edit",
+      "model": "gpt-image-2",
+      "requestedModel": "gpt-image-2",
+      "modelFallbackReason": null,
+      "size": "1536x2048",
+      "quality": "high",
+      "format": "png",
+      "background": "opaque",
+      "width": 1536,
+      "height": 2048,
+      "bytes": 4921325,
+      "sha256": "07ceae9a76c0c99194ce5cecf732b00812a68d2d63f8afdec99d51ca668a3f39",
+      "usage": {
+        "input_tokens": 1708,
+        "input_tokens_details": {
+          "image_tokens": 1505,
+          "text_tokens": 203
+        },
+        "output_tokens": 8892,
+        "output_tokens_details": {
+          "image_tokens": 8892,
+          "text_tokens": 0
+        },
+        "total_tokens": 10600
+      },
+      "secretSource": "secret_manager",
+      "startedAt": "2026-07-18T23:25:19.535Z",
+      "completedAt": "2026-07-18T23:27:18.952Z",
+      "wallClockMs": 119416,
+      "prompt": "Use IMAGE 1 as the locked campaign anchor and preserve its exact visual language: one anatomically credible hummingbird, right-facing fast flight, premium blue-emerald-violet iridescence, deep navy atmosphere, and one coherent chromatic tile wake representing a single idea multiplying into many assets. Recompose it for a vertical social feed master that will be center-cropped from 3:4 to 4:5. Keep exactly one complete bird on the right half, fully inside an 8 percent edge margin. Keep the upper-left and left-center 44 percent calm, dark and low-detail for later deterministic Spanish typography. The wake may cross the lower-left but must not enter the upper-left copy field. Maintain one light direction, crisp eye and beak, premium editorial realism, subtle grain and a strong thumbnail silhouette. Do not add or render text, letters, numbers, logos, watermarks, UI, frames, a second bird, duplicated anatomy or detached feathers."
+    },
+    {
+      "id": "plate-9x16",
+      "source": "work/anchor/high-frequency-anchor-v1.png",
+      "sourceSha256": "95f6ac28d302d3ea178db54de1a1ef91100e6595fc3ebc842bdaa1a574cac4f3",
+      "output": "work/plates/high-frequency-plate-9x16-source.png",
+      "operation": "edit",
+      "model": "gpt-image-2",
+      "requestedModel": "gpt-image-2",
+      "modelFallbackReason": null,
+      "size": "1152x2048",
+      "quality": "high",
+      "format": "png",
+      "background": "opaque",
+      "width": 1152,
+      "height": 2048,
+      "bytes": 3477137,
+      "sha256": "4a48f2871a3976b63b08f2703b9bf50424ede2b91f058c6236c102c3b8623dda",
+      "usage": {
+        "input_tokens": 1707,
+        "input_tokens_details": {
+          "image_tokens": 1505,
+          "text_tokens": 202
+        },
+        "output_tokens": 5650,
+        "output_tokens_details": {
+          "image_tokens": 5650,
+          "text_tokens": 0
+        },
+        "total_tokens": 7357
+      },
+      "secretSource": "secret_manager",
+      "startedAt": "2026-07-18T23:27:18.952Z",
+      "completedAt": "2026-07-18T23:28:56.240Z",
+      "wallClockMs": 97288,
+      "prompt": "Use IMAGE 1 as the locked campaign anchor and preserve its exact visual language: one anatomically credible hummingbird, right-facing fast flight, premium blue-emerald-violet iridescence, deep navy atmosphere, and one coherent chromatic tile wake representing a single idea multiplying into many assets. Recompose for a 9:16 Stories/Reels master. Keep exactly one complete bird in the middle-right, away from the top 12 percent and bottom 20 percent interface-safe zones, with the full beak, wings and tail visible. Reserve a calm dark copy field from approximately x=8–52 percent and y=22–60 percent. Keep bright tiles out of that field and concentrate the wake behind/below the bird. Maintain one light direction, premium editorial realism, subtle grain and a strong thumbnail silhouette. Do not add or render text, letters, numbers, logos, watermarks, UI, frames, a second bird, duplicated anatomy or detached feathers."
+    },
+    {
+      "id": "plate-3x1",
+      "source": "work/anchor/high-frequency-anchor-v1.png",
+      "sourceSha256": "95f6ac28d302d3ea178db54de1a1ef91100e6595fc3ebc842bdaa1a574cac4f3",
+      "output": "work/plates/high-frequency-plate-3x1-source.png",
+      "operation": "edit",
+      "model": "gpt-image-2",
+      "requestedModel": "gpt-image-2",
+      "modelFallbackReason": null,
+      "size": "2048x1152",
+      "quality": "high",
+      "format": "png",
+      "background": "opaque",
+      "width": 2048,
+      "height": 1152,
+      "bytes": 3403113,
+      "sha256": "1bb95b5a376b22fde2500aa3ea01654c49133016790976232d284ef1bcd05ab4",
+      "usage": {
+        "input_tokens": 1732,
+        "input_tokens_details": {
+          "image_tokens": 1505,
+          "text_tokens": 227
+        },
+        "output_tokens": 5650,
+        "output_tokens_details": {
+          "image_tokens": 5650,
+          "text_tokens": 0
+        },
+        "total_tokens": 7382
+      },
+      "secretSource": "secret_manager",
+      "startedAt": "2026-07-18T23:28:56.240Z",
+      "completedAt": "2026-07-18T23:30:22.431Z",
+      "wallClockMs": 86191,
+      "prompt": "Use IMAGE 1 as the locked campaign anchor and preserve its exact visual language: one anatomically credible hummingbird, right-facing fast flight, premium blue-emerald-violet iridescence, deep navy atmosphere, and one coherent chromatic tile wake representing a single idea multiplying into many assets. Recompose as a wide 16:9 source designed to be center-cropped to a 3:1 campaign banner: all essential content must stay inside the central horizontal band between y=22 and y=78 percent. Put exactly one complete bird in the right 42 percent, with full beak, wings and tail inside that central band and at least 7 percent horizontal edge margin. Reserve the left 48 percent as a calm dark low-detail copy field. Keep the chromatic wake mainly in the middle-right and away from the left copy field. Maintain one light direction, premium editorial realism, subtle grain and immediate legibility at small size. Do not add or render text, letters, numbers, logos, watermarks, UI, frames, a second bird, duplicated anatomy or detached feathers."
+    }
+  ]
+}

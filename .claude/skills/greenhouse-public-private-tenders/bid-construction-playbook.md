@@ -75,12 +75,14 @@ Uso correcto:
 
 ### Fase 5 — Diseño del squad (Managed Squad)
 - Diseña el **equipo que se asigna al cliente**: roles, seniority, % dedicación, jerarquía, RACI y sinergias. Un servicio licitado = **Managed Squad** (Efeonce opera), no staff-aug.
+- Si las bases compran roles embebidos bajo dirección del cliente, clasifica esa lane como **Staff Augmentation**. Si compran acceso gobernado a la suite, clasifícala como **Studio Access**. Un híbrido se desglosa por lanes; no se usa como etiqueta opaca. Mantén aparte la forma de engagement y el modo operativo de cada corrida.
 - De cara al cliente: **rol + seniority** (sin nombres, salvo consentimiento). Internamente: mapeo a roles de nómina para trazar el loaded cost.
 - **Output:** squad blueprint (interno) + tabla de equipo para la §Equipo de la propuesta.
 - *Skill:* `greenhouse-talent-people-operator` → `references/client-squad-design.md` + `templates/squad-blueprint.md`.
 
 ### Fase 6 — Pricing (cost-plus sobre loaded cost real)
 - Levanta el **loaded cost real** desde nómina Greenhouse (`greenhouse_payroll`) por rol × dedicación. Aplica overhead + terceros.
+- Si hay Creative Studio, agrega el desglose de cinco líneas y el presupuesto de Studio Credits del companion. Las “piezas” del pliego son unidades de presentación: internamente se modelan como capacidad + operaciones generativas + determinismo/QA + derechos, sin prometer una equivalencia perpetua pieza↔crédito.
 - **Piso = cost-plus**; en **licitación privada con diferenciación fuerte, precio hacia el valor** (no subvalorar por tener un equipo eficiente). Define margen recomendado, **precio lista** y **piso de negociación (walk-away)**.
 - Absorbe en el margen: comisión de la plataforma (Wherex) + colchón de penalidad.
 - **Output:** oferta económica con precio lista, valor por unidad adicional y walk-away.

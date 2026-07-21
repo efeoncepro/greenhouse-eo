@@ -77,7 +77,15 @@
 - **Restricciones de marca:** [SSOT, AXIS, ilustraciones propietarias, `AxisWordmark` solo interno]
 - **Legales / disclosure:** [uso de IA, derechos de imagen, marcas de terceros]
 
-## 9. Criterio de éxito (el juez)
+## 9. Creative Studio run (sólo si aplica)
+
+- **Delivery / engagement / operating mode:** [Managed Squad|Staff Augmentation|Studio Access|hybrid] · [On-Going|On-Demand|Sample Sprint] · [efeonce-managed|co-operated|client-operated]
+- **Operation map generativo:** [exploración / anchor / transformaciones / upscale realmente requeridos]
+- **Rate version + estimate/reservation refs:** [IDs/rango; no precio ni equivalencia improvisada]
+- **Pasos 0 Studio Credits:** [dirección / curaduría / layout / copy / QA / export / reuse]
+- **Derechos/pass-through separados:** [stock / talento / likeness / música / territorio / plazo / buyout]
+
+## 10. Criterio de éxito (el juez)
 
 - [ ] Comunica el mensaje clave en [1s / 3s] sin leer copy.
 - [ ] La jerarquía tiene un solo nivel-1 claro.

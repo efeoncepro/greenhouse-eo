@@ -39,7 +39,7 @@
 - **Whitelisting / spark ads (correr paid desde SU handle):** `[sí/no + duración]`
 - **Territorio + vigencia:** `[dónde + por cuánto tiempo]`
 - **Exclusividad de categoría:** `[sí/no + con qué competidores no puede colaborar]`
-- **Crédito / cómo lo nombramos:** `[…]`
+- **Crédito autoral / atribución pública (no Studio Credits):** `[…]`
 
 ## Plazos
 - **Kickoff:** `[fecha]` · **Primer corte / borrador:** `[fecha]`

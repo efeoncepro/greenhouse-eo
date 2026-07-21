@@ -1,9 +1,9 @@
 # Motor de CTAs y Popups — `growth.cta`
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.6
 > **Creado:** 2026-07-17 por Claude (TASK-1339)
-> **Ultima actualizacion:** 2026-07-18 por Claude (TASK-1429: primer placement interruptivo `slide_in` no modal + CTA Experience System + identidad pseudónima consent-aware en el renderer)
+> **Ultima actualizacion:** 2026-07-18 por Claude (TASK-1431: Action Registry + navegación gobernada — code complete, rollout pendiente)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md)
 > **Skill de dominio:** `greenhouse-growth-ctas` (Claude + Codex; se actualiza con cada cambio del motor)
 
@@ -16,13 +16,14 @@ El motor de CTAs es el sistema que decide **qué invitación a la acción (promp
 - La primera rebanada está **live en las dos superficies**: el CTA `ai-visibility-report-followup` ("¿Cómo ve la IA a tu marca?") se muestra al final del **reporte público de AI Visibility en Think** (`think.efeoncepro.com/brand-visibility/r/…`) y en la **página de prueba de WordPress** (`efeoncepro.com/greenhouse-cta-prueba/`, no indexable — el operador decidió validar en una página de prueba antes del despliegue amplio).
 - El flag `GROWTH_CTA_ENGINE_ENABLED` está **encendido en staging y producción**.
 - La medición está **completa y verificada de extremo a extremo en ambos hosts** (TASK-1427): eventos en el dataLayer, hits reales llegando a GA4, registro server-side en el ledger y rechazo comprobado de credenciales forjadas.
-- Falta por decisión del negocio: el **placement amplio en WordPress** (qué páginas, tras validar la prueba), el placement **interruptivo** (popup/slide-in) y el cockpit de autoría visual (hoy se autora por API/CLI).
+- Con el release de hoy (`d5db8b568`) también están **en producción**: el **respeto al visitante (suppression) operando de verdad** — el motor ya no repite un CTA a quien lo descartó, dentro de su ventana —, los **frenos de emergencia** (kill switch global y por superficie, verificados en vivo sin necesidad de deploy) y el formato **slide-in** listo en el motor.
+- Falta por decisión del negocio: el **placement amplio en WordPress** (qué páginas, tras validar la prueba), **publicar la primera campaña interruptiva** (el formato slide-in ya está listo; falta elegir superficie, mensaje y momento) y el cockpit de autoría visual (hoy se autora por API/CLI).
 
 ## Cómo funciona (en simple)
 
 1. **Un CTA se define y se versiona.** Cada versión tiene su texto, su ubicación (embebido, banner…), su **variante visual** (`default`, `spotlight` con gradiente de marca, `minimal` editorial — es un dato de la versión, no código), su acción y sus reglas de dónde aparece. Una versión publicada **no se puede editar**: cualquier cambio crea una versión nueva. Así siempre se sabe exactamente qué vio el visitante.
 2. **El servidor decide qué se muestra.** Cuando una página pregunta "¿qué CTA va aquí?", Greenhouse evalúa las reglas y responde con el resultado ya resuelto: **a lo sumo un prompt interruptivo** más los no-interruptivos que apliquen. El navegador nunca ve las reglas ni los candidatos descartados. Si nada aplica (o el motor está apagado), la página no muestra nada — jamás un card roto.
-3. **La acción abre un Growth Form.** La única acción de esta etapa es abrir un formulario del motor Growth Forms (el del AI Visibility Grader). El CTA solo guarda la referencia al form — nunca copia sus campos, validación ni consentimiento; la conversión "de verdad" sigue siendo del formulario (`generate_lead`).
+3. **La acción es un destino gobernado, elegido de un registro cerrado (TASK-1431).** Cada versión declara UNA acción de un registro tipado con 4 opciones: **abrir un Growth Form** (`open_growth_form` — el CTA solo guarda la referencia al form, nunca copia campos/validación/consentimiento; la conversión "de verdad" sigue siendo del formulario), **navegar a un enlace** (`link_url` — solo rutas internas o HTTPS, sin protocolos peligrosos ni credenciales), **abrir una herramienta de Think** (`open_think_tool` — el autor elige el *path* dentro del hub gobernado `think.efeoncepro.com`, jamás un host arbitrario; el contexto de campaña viaja solo por UTM permitidas) o **abrir la agenda** (`book_meeting` — solo hosts de agendamiento gobernados como HubSpot Meetings; es navegación pura: **ningún click crea contactos, negocios ni reuniones en el CRM**). Una acción inválida o de un tipo no registrado **no se puede publicar ni renderizar**. En el navegador, las acciones de navegación son un **enlace real** (funciona abrir en pestaña nueva, copiar el link, el historial y el teclado); los destinos externos llevan protección `noopener` y, si abren pestaña nueva, se le anuncia al lector de pantalla.
 4. **La evidencia se guarda con desconfianza sana.** Lo que reporta el navegador queda marcado como `browser_reported` (direccional); solo lo confirmado por el servidor (`server_confirmed`) cuenta como conversión en reportes. Los intentos forjados (superficie o versión falsa, credencial inválida) se **rechazan y quedan registrados** sin datos personales — alimentan la señal de seguridad.
 5. **Todo se mide.** Cada vista/click/cierre/apertura de form emite un evento `greenhouse_cta_*` al dataLayer (con una lista blanca dura de parámetros, sin PII) y además se registra server-side en el ledger. GTM los reenvía a GA4, donde se reportan por `cta_slug`/`cta_location`/`placement`.
 
@@ -36,6 +37,33 @@ La superficie de gobernanza vive en el **menú Growth** (junto a AEO y Forms), v
 - ejecuta el **lifecycle**: enviar a revisión, publicar (con confirmación — deprecia la versión anterior), **pausar** (freno de emergencia: deja de mostrarse en ~2 minutos) y reanudar;
 - ve las **surfaces registradas** (hosts autorizados con sus origins y credencial — nunca el secreto);
 - usa el **preview del renderer** con las variantes visuales, tal cual se ve en un host público.
+
+## El cockpit del operador (TASK-1430)
+
+`/growth/ctas` dejó de ser una lista con preview: es un cockpit completo de dos paneles.
+
+- **Inventario (izquierda):** busca por nombre/slug/campaña, filtra por estado y ubicación, y
+  navega con las flechas del teclado. Cada card muestra la ubicación, la acción y en qué
+  superficies puede aparecer.
+- **Detalle (derecha):** el CTA seleccionado con su preview real (el mismo renderer de
+  producción), sus resultados de marketing, sus superficies, su segmentación/supresión, su
+  historial de versiones y los controles de ciclo de vida (editar, enviar a revisión, publicar,
+  pausar, reanudar, deprecar, archivar) con confirmación.
+- **Resultados:** impresiones, clics, conversiones, CTR y tasa de conversión de los últimos 30
+  días con comparación contra la ventana anterior. Cada número dice su nivel de confianza:
+  `browser_reported` (lo que reportó el navegador) o `server_confirmed` (la única verdad de
+  conversión). Si el conteo de impresiones aún no cubre el período (es más nuevo que el de
+  clics), el cockpit muestra los conteos y explica por qué no muestra tasas — nunca un
+  porcentaje imposible.
+- **Crear/editar CTA:** un recorrido guiado de 8 pasos (intención → ubicación → apariencia →
+  contenido → acción → segmentación → vista previa → revisión). No hay canvas libre, ni colores,
+  ni CSS: se compone por ejes gobernados y la densidad se deriva sola. La vista previa monta el
+  renderer real bajo distintos anchos, esquema claro/oscuro y hosts (Think/WordPress), y si el
+  preview no puede montar, la revisión queda bloqueada (sin paridad probada no se envía).
+- **Kill switch:** detiene la exposición global o por superficie al instante, sin redeploy, con
+  motivo obligatorio y auditoría visible (quién, cuándo, por qué).
+
+> Detalle técnico: `docs/architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md` §28.
 
 ## Quién puede operarlo
 
@@ -66,7 +94,7 @@ publicada: encenderla es una decisión del operador (elegir superficie, mensaje 
 
 ## Respeto al visitante (suppression) y frenos de emergencia — TASK-1428
 
-El motor recuerda de forma pseudónima (solo hashes, nunca datos personales) si un visitante ya cerró un CTA, ya convirtió, o ya vio demasiados prompts interruptivos — y decide en el servidor no volver a mostrárselo dentro de la ventana correspondiente. Sin consentimiento del visitante el recuerdo dura solo la sesión, y los formatos interruptivos directamente no se muestran a visitantes sin identidad. Hoy esta decisión corre **en shadow**: se registra qué se habría suprimido, sin cambiar lo que se muestra; el enforcement se activa por flag tras comparar.
+El motor recuerda de forma pseudónima (solo hashes, nunca datos personales) si un visitante ya cerró un CTA, ya convirtió, o ya vio demasiados prompts interruptivos — y decide en el servidor no volver a mostrárselo dentro de la ventana correspondiente. Sin consentimiento del visitante el recuerdo dura solo la sesión, y los formatos interruptivos directamente no se muestran a visitantes sin identidad. Desde el release del 2026-07-18 esta decisión está **activa en staging y producción** (verificada con visitantes de prueba en ambos ambientes): el motor ya no le muestra un CTA a quien lo descartó, dentro de su ventana.
 
 La exposición masiva (cuántas veces se mostró/suprimió/vio un CTA) se guarda **agregada por hora** en una tabla analítica aparte — nunca infla el ledger de conversión. Y ante un incidente, el operador puede apagar el motor completo o una sola superficie **al instante y sin deploy** (kill switch con auditoría de quién/cuándo/por qué); mientras esté activo, una señal en warning lo hace visible.
 

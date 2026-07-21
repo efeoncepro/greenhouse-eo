@@ -9,7 +9,8 @@ overrides: modern-ui
 
 This file **overrides** the global `modern-ui` skill's defaults when working inside the `greenhouse-eo` repository. When there's a conflict between the global skill and this overlay, **this overlay wins**.
 
-**Load order**: read global `modern-ui/SKILL.md` first → then read this overlay → then apply rules.
+**Load order**: if a global `modern-ui/SKILL.md` exists, read it first and let
+this overlay win. If it is unavailable, this overlay is standalone; do not stop.
 
 ## Why this overlay exists
 
@@ -27,6 +28,15 @@ This overlay pins Greenhouse-specific decisions so agents don't drift from the e
 - **Component wrappers**: `src/@core/components/mui/` (use these, never raw MUI)
 
 ## Pinned decisions (OVERRIDES global modern-ui)
+
+### 0. Premium delivery contract
+
+For new or materially redesigned product UI, use
+`greenhouse-ai-design-studio` as the single orchestrator and
+`docs/ui/GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md` as the quality contract.
+Persist a visual direction, select a surface recipe, pass substantive readiness,
+review the first fold, and close with GVC premium desktop/mobile plus a scorecard.
+Token compliance alone is not visual acceptance.
 
 ### 1. Font families — Geist + Poppins ONLY (NOT DM Sans, NOT Inter)
 
@@ -174,8 +184,21 @@ If this overlay says X but runtime says Y, **runtime wins** and this overlay mus
 
 **Historical drift catch (2026-05-12)**: this overlay v1.0 pinned "DM Sans + Poppins" because TASK-488 canonized that combo. TASK-566 / EPIC-004 (Delta 2026-05-01) pivoted to Geist + Poppins but this overlay wasn't updated, causing an agent to re-recommend DM Sans 11 days later. Lesson: when a Greenhouse runtime pivot happens, update the corresponding skill overlay in the same PR.
 
+## Claude Design (.dc.html) → Greenhouse (gate — lección TASK-1430)
+
+Al implementar un mock de **Claude Design** (proyectos claude.ai/design, archivos `.dc.html`):
+el mock usa su PROPIO design system (vars `--radius-*`, `--surface`, `--elevation-*`, HEX
+literales). **NUNCA transcribir sus estilos inline a `sx`** — eso produjo el "wireframe look"
+del cockpit de CTAs (radii off-scale, Box+borde en vez de Card, spacing arbitrario, ALL-CAPS
+técnicos) pese a tener un mock rico. El mock define estructura/jerarquía/flujo/riqueza; la piel
+sale SIEMPRE del sistema. **Tabla de traducción obligatoria + checklist pre-JSX:**
+`docs/architecture/ui-platform/CLAUDE_DESIGN_TO_GREENHOUSE_BRIDGE.md`. Además: todo scenario
+GVC de una vista nueva declara `quality.layout` + `quality.runtime` + `quality.enterpriseRubric`
+(el wireframe-look pasó el gate porque el rubric es opt-in y no estaba declarado).
+
 ## Version
 
+- **v1.2** — 2026-07-18 — Added Claude Design → Greenhouse bridge gate (TASK-1430 post-mortem: mock rico ≠ resultado rico si se transcribe en vez de componer; bridge doc + rubric obligatorio en scenarios de vistas nuevas).
 - **v1.1** — 2026-05-12 — Corrected font canon: Geist (body+UI) + Poppins (display h1-h4). DM Sans flagged as deprecated. Added "How to detect canonical drift" section.
 - **v1.0** — 2026-04-19 — Initial overlay (TASK-488). Pinned 10 decisions, 8 anti-patterns, 2 checklists. **Outdated**: pinned DM Sans which was later deprecated.
 

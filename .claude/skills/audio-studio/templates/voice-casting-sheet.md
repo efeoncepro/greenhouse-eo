@@ -21,11 +21,11 @@
 
 ## 2. Opciones a comparar
 
-| # | Fuente | Voz / talento | Modelo (si IA) | Costo/créditos | Licencia/consentimiento |
+| # | Fuente | Voz / talento | Modelo (si IA) | Operación/segundos/tier/attempts + estimate | Licencia/consentimiento |
 |---|---|---|---|---|---|
 | A | [humano] | [talento] | — | [honorario] | [contrato de cesión] |
-| B | [IA] | [voz — ej. "Rachel"] | [ElevenLabs v3 · Seed Audio · Higgsfield] | [créditos] | [licencia de la voz] |
-| C | [IA — clonada] | [voz clonada de ___] | [IVC · PVC] | [créditos] | [**consentimiento del dueño** — sí/no] |
+| B | [IA] | [voz — ej. "Rachel"] | [ElevenLabs v3 · Seed Audio · Higgsfield] | [segmento · duración · tier · candidates · rango/rate version] | [licencia de la voz] |
+| C | [IA — clonada] | [voz clonada de ___] | [IVC · PVC] | [segmento · duración · tier · candidates · rango/rate version] | [**consentimiento del dueño** — sí/no] |
 
 ## 3. Muestras a comparar
 

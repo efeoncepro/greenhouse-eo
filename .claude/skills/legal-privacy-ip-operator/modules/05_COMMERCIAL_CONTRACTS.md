@@ -48,6 +48,22 @@ El "derecho comercial" que le importa a una agencia es sobre todo **derecho de c
 
 Si un freelancer produce parte del entregable, **su contrato debe ceder la IP a Efeonce** (o a quien corresponda), o Efeonce no puede transferirla al cliente. Cadena de IP rota = no puedes entregar limpio. Asegura el **flow-down** de cesión de derechos + confidencialidad + no infracción. Detalle en `06`.
 
+## Schedule contractual de Creative Studio y Studio Credits
+
+Cuando el SOW incluye Creative Studio, adjunta un schedule específico y no lo reduzcas a “N piezas”. El schedule debe declarar, como mínimo:
+
+- los tres ejes por separado: modelo de entrega (Managed Squad / Staff Augmentation / Studio Access / híbrido por lanes), forma de engagement (On-Going / On-Demand / Sample Sprint) y modos operativos permitidos por corrida (`efeonce-managed`, `co-operated`, `client-operated`);
+- las cinco líneas económicas separadas: acceso/gobernanza, capacidad humana, Studio Credits, implementación/IP y derechos/licencias/pass-through;
+- que un Studio Credit es una unidad contractual de consumo generativo gobernado, no moneda, hora, pieza, token de proveedor ni derecho adquirido sobre un proveedor específico;
+- catálogo/versionado aplicable y el flujo `estimate → reserve → approve → execute → settle/release/refund`, incluyendo quién puede aprobar y límites de gasto;
+- tratamiento de fallas: error técnico, del proveedor o de Efeonce libera/reembolsa; output válido seguido por cambio de dirección creativa constituye nueva solicitud, estimación o change order;
+- asignación inicial, vigencia, expiración, rollover, top-ups, sobregiro, suspensión, terminación y export/devolución de datos, solo en la medida en que Commercial y Finance hayan aprobado esas políticas;
+- SLA/soporte, aceptación y QA del entregable, sin convertir los créditos en garantía de resultado creativo o de negocio;
+- límites de responsabilidad e indemnidades coherentes con los proveedores y el modo operativo real;
+- anexo de derechos para stock, música, tipografías, talento, imagen, likeness y voz. El consumo de créditos por sí solo no transfiere esos derechos.
+
+No publiques ni contractualices una equivalencia monetaria, expiración o breakage todavía provisional. La redacción final y su tratamiento por jurisdicción requieren validación de abogado habilitado; revenue recognition e impuestos se entregan a Finance.
+
 ## Checklist de revisión de contrato
 
 - [ ] ¿MSA + SOW o documento único? Alcance claro (qué sí / qué no).
@@ -61,6 +77,7 @@ Si un freelancer produce parte del entregable, **su contrato debe ceder la IP a 
 - [ ] Terminación y qué sobrevive.
 - [ ] Firma electrónica válida en la jurisdicción (ZapSign vía adapter).
 - [ ] Cadena de IP con vendors/freelancers asegurada.
+- [ ] Si hay Creative Studio: ejes, wallet/ledger, autorizaciones, fallas/refunds, change requests, terminación y derechos separados están expresos.
 
 ## Hand-off
 

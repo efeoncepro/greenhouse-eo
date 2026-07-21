@@ -30,6 +30,27 @@
 - **SIEMPRE** sepa cada cliente su cuenta/marca en Metricool (`getBrandSettings` primero) para
   no cruzar contenido entre clientes.
 
+## Contrato comercial y de créditos
+
+Declarar tres ejes, sin inferir uno desde otro: modelo de delivery (`Managed Squad`, `Staff Augmentation`,
+`Studio Access` o híbrido), engagement (`On-Going`, `On-Demand`, `Sample Sprint`) y modo del run/lane
+(`efeonce-managed`, `co-operated`, `client-operated`). Managed Squad no equivale a `efeonce-managed`; Staff
+Augmentation sigue client-directed. Canon:
+`docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md`.
+
+La pieza no es la unidad de Studio Credits:
+
+| Pieza | Operaciones que pueden devengar | Trabajo con 0 Studio Credits |
+| --- | --- | --- |
+| Post estático desde KV aprobado | ninguna si no existe nueva inferencia | copy, layout, export, QA y publicación |
+| Carrusel desde un anchor | generar/transformar el anchor cuando corresponda | componer N slides y ratios desde templates |
+| Reel desde still aprobado | clips, voz, SFX o lip-sync generativos aprobados | edición, cutdowns, captions, end card y mastering |
+| Adaptación de formato | outpaint/reframe generativo sólo si se ejecuta | crop/recomposición/export determinístico |
+
+Usa `estimate → reservation → approval → execution → settlement | release | refund adjustment`. Un error
+técnico sin output útil no se cobra dos veces; un cambio de dirección tras output válido abre nuevo branch.
+Creator/UGC, whitelisting, música, voz, likeness, territorio, plazo y paid usage son derechos separados.
+
 ## Localización (clientes internacionales)
 
 Los clientes Globe operan en múltiples mercados. El social se **localiza**, no se traduce

@@ -1,0 +1,392 @@
+# TASK-1428 — Growth CTA suppression, exposure and kill switches
+
+## Delta 2026-07-18 (cierre) — RELEASED a producción
+
+- **Release `d5db8b568` (PR #159 + #160, orquestador run `29651461496`, manifest `released`
+  16:23Z)** llevó esta task a producción junto con TASK-1429.
+- **Enforcement `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` ON en staging + Production**,
+  verificado E2E post-release con visitante real sintético: dismiss → exclusión del mismo visitor;
+  visitante fresco sigue viendo el CTA; sin identidad = solo embedded eligible. `engineState: ok`.
+- **Kill switch operativo en producción** (global/per-surface, efecto sin redeploy, verificado
+  dentro del TTL del render contract).
+- Fila del flag en `FEATURE_FLAG_STATE_LEDGER.md` en estado final (ON staging + Production);
+  §Pendientes de acción de esta task cerrados.
+- **Task complete.** Queda la ventana de monitor 7d de señales `growth.cta.*` hasta 2026-07-25
+  (seguimiento en TASK-1427), pendiente de negocio, no de ingeniería.
+
+## Delta 2026-07-18 — Slices 1-3 CODE-COMPLETE (shadow); rollout pendiente
+
+- **Implementado y committeado en develop local (SIN push)**: migración aditiva `20260718131956294`
+  (`cta_visitor_state` + `cta_exposure_rollup` + `cta_kill_switch_event`, aplicada a la instancia con
+  DO-block anti pre-up-marker verde) · decisión pura de suppression (`suppression.ts`, taxonomía completa
+  de la spec + policy zod defaults conservadores, fail-closed) · visitor state consent-aware
+  (`visitor-state.ts`: visitor durable solo con consent granted, session fallback 48h, claim atómico
+  FOR UPDATE multi-tab determinista, purga oportunista) · Tier B (`exposure.ts`: rollup agregado horario
+  fail-open + sampling + breadcrumb backpressure; `viewed` browser entra por la misma cadena de defensa
+  del ingest y NUNCA toca el ledger) · hooks de ingest (dismiss persiste al aceptar; `already_converted`
+  SOLO con `formSubmissionId` verificado vía `isSubmissionServerAccepted` de forms/readers) · kill switch
+  global/per-surface (`kill-switch.ts` + `GET/POST /api/admin/growth/ctas/kill-switch`, capability
+  `growth.cta.pause` reutilizada, estado en DB + outbox `growth.cta.kill_switch_changed`, SIEMPRE
+  enforced) · render público con headers de visitor context + `engineState: ok|killed` aditivo · signals
+  `kill_switch_active`/`priority_collision`/`event_ingest_backpressure` cableados.
+- **Verificación**: `pnpm test` full 9684 verdes · `pnpm build` prod OK · typecheck/lint 0 err · SQL vivo
+  contra PG real (`scripts/growth/_sanity-cta-suppression-sql.ts`: claim `[true,true,false]`, upserts
+  idempotentes, rollup increment, DISTINCT ON kill state; writes limpiados).
+- **Decisiones de discovery (Open Questions resueltas)**: Tier B = opción §9.4-3 (rollup PG agregado,
+  adapter aislado para futuro sink BQ) · kill switch append-only (estado = último evento por scope) ·
+  cero capabilities nuevas (`pause` es la autoridad §16.3) · fallback sin identity = interruptivos
+  suprimidos `consent_or_identity_limited` · ventana compuesta del kill: efecto server inmediato, el
+  cache CORS 90s NO la alarga (origins ya permitidos reciben `killed`), domina la cadencia de fetch del
+  renderer.
+- **Estado honesto: `code complete, rollout pendiente`** — falta: push a develop → deploy staging →
+  ventana shadow-compare → flip `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` staging + smoke kill switch
+  live sin redeploy (secuencia §Production verification) → prod gradual + monitor 7d. El renderer AÚN no
+  envía visitor keys (TASK-1429); el fallback conservador cubre el estado actual. Ledger:
+  fila + §Pendientes de acción registradas.
+
+## Delta 2026-07-18 (2ª sesión) — rollout staging ejecutado; smoke live cazó y cerró un bug real
+
+- **Push a develop + deploy staging HECHOS.** Smoke live contra el deployment staging (visitor sintético,
+  página de prueba WP): render con visitor headers → `engineState: ok` + CTA · `dismissed` 202 →
+  `cta_visitor_state` con filas visitor+session (consent granted) · render post-dismiss INTACTO (shadow) +
+  rollup `suppressed/dismissed enforced=false` (evidencia del shadow-compare) · `viewed` 202 → rollup
+  browser (jamás el ledger).
+- **Kill switch verificado live SIN redeploy** (per-surface WP, ventana <60s en página noindex): engage →
+  `{"interruptive":null,"nonInterruptive":[],"engineState":"killed"}` + estado/audit admin correctos →
+  release → CTA restaurado. La surface Think (tráfico real) nunca se tocó.
+- **El smoke cazó un bug real que ningún test con mocks podía ver**: el engage vía API daba 502 porque
+  `SELECT … FOR UPDATE` exige privilegio UPDATE y `greenhouse_runtime` solo tiene SELECT/INSERT en la tabla
+  append-only (por diseño). Fix `3bb0d0779`: `pg_advisory_xact_lock` por scope (el grant NO se amplió);
+  misma semántica idempotente-observable; re-verificado bajo el usuario runtime real.
+- **Pendiente (1 comando del operador + secuencia):** flip staging
+  (`printf 'true' | vercel env add GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED staging` + redeploy —
+  `vercel env add` quedó bloqueado por permisos del agente en esta sesión) → smoke enforcement (dismiss
+  excluye al mismo visitor; visitante fresco sigue viendo el CTA) → prod gradual + monitor 7d. Con el
+  renderer actual (sin visitor keys) el flip NO cambia el tráfico real — el gate duro es para TASK-1429.
+
+<!-- ZONE 0 — IDENTITY & TRIAGE -->
+
+## Status
+
+- Lifecycle: `complete`
+- Priority: `P1`
+- Impact: `Muy alto`
+- Effort: `Alto`
+- Type: `implementation`
+- Execution profile: `backend-data`
+- UI impact: `none`
+- UI ready: `n/a`
+- Wireframe: `none`
+- Flow: `none`
+- Motion: `none`
+- Backend impact: `migration`
+- Epic: `EPIC-023`
+- Status real: `Definida`
+- Rank: `2`
+- Domain: `growth|data|ops`
+- Blocked by: `none`
+- Branch: `task/TASK-1428-growth-cta-suppression-exposure-kill-switches`
+- Legacy ID: `none`
+- GitHub Issue: `none`
+
+## Summary
+
+Completa el data plane V1 del motor CTA con visitor state pseudónimo, suppression/frequency capping server-side, exposición Tier B fuera del ledger OLTP de conversión y kill switches global/per-surface operables sin redeploy. Extiende signals y conserva el browser como fuente no confiable.
+
+## Why This Task Exists
+
+La foundation actual arbitra y registra conversiones Tier A, pero todavía no puede limitar exposición por visitante ni detener una surface dentro del cache TTL. Lanzar placements interruptivos sin estas defensas sería una regresión de privacidad y experiencia; además, `viewed/eligible/suppressed` no debe inflar `cta_conversion_event`.
+
+## Goal
+
+- Suppression/frequency cap determinista y server-side antes de arbitrar.
+- Una UX de exposición elegante: dismiss inmediato, no reapertura sorprendente, conversión-aware suppression y estado consistente entre placements/surfaces dentro del límite de privacidad.
+- Tier B analítico/sampled separado del ledger de conversión.
+- Kill switch global/per-surface con command/reader/API, audit y signals.
+
+<!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
+
+## Architecture Alignment
+
+- `docs/architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_CANONICAL_PATTERNS_V1.md`
+
+Reglas obligatorias:
+
+- Browser events siguen `untrusted`; personalization requiere consentimiento explícito.
+- Conversion truth queda en Tier A; exposición alta va a Tier B sampled/analítico.
+- Kill switches no dependen de deploy y deben invalidar/evitar cache stale dentro del TTL documentado.
+- El TTL efectivo del kill switch incluye TODOS los caches del read path: el resolver CORS in-memory (`src/app/api/public/growth/ctas/cors.ts`, TTL 90s stale-while-revalidate) y cualquier `Cache-Control` del render endpoint — documentar la ventana compuesta y verificarla en el smoke.
+- No almacenar identificadores crudos, PII o fingerprinting invasivo.
+- La ausencia de visitor identity/consent no autoriza exposición ilimitada: debe existir un fallback conservador de sesión/surface documentado.
+- Suppression gobierna elegibilidad; el renderer solo representa `eligible|suppressed|capped|killed` y nunca reconstruye ventanas localmente.
+
+## Normative Docs
+
+- `src/lib/growth/ctas/**`
+- `migrations/20260718001431135_task-1339-growth-cta-foundation.sql`
+- `docs/tasks/complete/TASK-1339-growth-cta-engine-foundation.md`
+- `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`
+
+## Dependencies & Impact
+
+### Depends on
+
+- Foundation `growth.cta` y schema `greenhouse_growth.cta_*` de TASK-1339.
+- Política de consentimiento vigente del renderer/ingest.
+
+### Blocks / Impacts
+
+- Bloquea rollout interruptivo TASK-1429 y controles de kill switch en TASK-1430.
+- Cambia arbiter, render API, commands/readers, schema y reliability plane.
+
+### Files owned
+
+- `src/lib/growth/ctas/**`
+- `src/app/api/admin/growth/ctas/**`
+- `src/app/api/public/growth/ctas/**`
+- `src/lib/reliability/queries/growth-cta-*.ts`
+- `migrations/*task-1428-growth-cta-suppression*.sql`
+- `src/types/db.d.ts`
+
+## Current Repo State
+
+### Already exists
+
+- Arbiter server-side, surface binding, priority, Tier A ledger, rate limit/idempotency y lifecycle commands.
+- Pausa por versión y flag global por redeploy.
+
+### Gap
+
+- Sin visitor-state/frequency cap, Tier B, kill switch instantáneo global/per-surface ni signals de collision/backpressure/kill-switch.
+
+## Modular Placement Contract
+
+- Topology impact: `cross-runtime`
+- Current home: `src/lib/growth/ctas/**` + Postgres + APIs Next.js
+- Future candidate home: `domain-package`
+- Boundary: commands/readers/arbiter/events `growth.cta`; routes/UI son adapters
+- Server/browser split: policy/identity/state server-only; browser contract no expone candidatos ni reglas
+- Build impact: sin SDK pesado nuevo; cualquier sink analítico queda aislado por adapter
+- Extraction blocker: transacción Postgres, auth/capabilities y sink analítico
+
+## Backend/Data Contract
+
+### Backend/data brief
+
+- Backend rigor: `backend-critical`
+- Impacto principal: `migration`
+- Source of truth afectado: `greenhouse_growth.cta_*` + sink Tier B gobernado
+- Consumidores afectados: render API, renderer, admin/Nexa/MCP, reliability
+- Runtime target: `staging|production`
+
+### Contract surface
+
+- Contrato existente a respetar: `greenhouse-growth-cta-popup.v1`, readers/commands `src/lib/growth/ctas`
+- Contrato nuevo o modificado: visitor state, suppression decision, kill-switch commands/readers y exposure event adapter
+- Backward compatibility: `compatible|gated`
+- Full API parity: UI/agentes operan kill switches y leen estado mediante commands/readers canónicos
+
+### Data model and invariants
+
+- Entidades/tablas/views afectadas: definir aditivamente en discovery; no reutilizar `cta_conversion_event` para exposure
+- Invariantes que no se pueden romper:
+  - 0–1 interruptivo por arbitraje y frequency cap aplicado antes del render
+  - solo `server_confirmed` alimenta conversion truth
+  - visitor key es pseudónima/rotatable y consent-aware
+  - dismiss confirmado impide reapertura del mismo CTA/placement durante la ventana efectiva
+  - conversión server-confirmed puede suprimir prompts equivalentes/menos avanzados según policy explícita; nunca por heurística browser
+  - kill switch gana sobre eligibility/cache local y produce `killed`, no un falso `dismissed`
+- Tenant/space boundary: surface binding + scope global/per-surface; admin por `growth.cta.*`
+- Idempotency/concurrency: upsert/transaction o lock para ventanas; commands reintentables
+- Audit/outbox/history: cambios de kill switch auditados + outbox; exposure sampled con retención explícita
+
+### Migration, backfill and rollout
+
+- Migration posture: `additive`
+- Default state: frequency cap/suppression shadow; kill switches inactivos
+- Backfill plan: ninguno sobre visitantes históricos
+- Rollback path: flag/estado shadow + revert adapters; tablas aditivas pueden quedar dormidas
+- External coordination: definir sink/retención y aplicar migrations/redeploy
+
+### Security and access
+
+- Auth/access gate: admin session + capabilities `growth.cta.pause/read`; público por surface binding
+- Sensitive data posture: sin PII; hashes con rotación/retención
+- Error contract: canónico/sanitizado + `captureWithDomain`
+- Abuse/rate-limit posture: cuotas, sampling, bot filtering y fail-open/fail-closed explícito por decisión
+
+### Runtime evidence
+
+- Local checks: focal tests arbiter/store/commands/APIs
+- DB/runtime checks: migration status + concurrencia/frequency smoke PG real
+- Integration checks: render repetido por visitor/surface y kill switch sin redeploy
+- Reliability signals/logs: render/ingest/backpressure/collision/kill-switch-active
+- Production verification sequence: shadow → compare → staging enforcement → production gradual
+
+### Acceptance criteria additions
+
+- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
+- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+
+## Capability Definition of Done
+
+- [ ] Kill switch/suppression logic lives in domain commands/readers/arbiter, not UI.
+- [ ] Read/write paths have fine authorization, idempotency, audit/outbox and canonical errors.
+- [ ] Existing `growth.cta.*` capabilities/grants are reused or extended with coverage tests.
+- [ ] Product API/admin routes expose the same primitive to UI/Nexa/MCP.
+- [ ] Propose→confirm→execute applies to mutating kill switches.
+
+<!-- ZONE 2 — PLAN MODE intentionally empty -->
+
+<!-- ZONE 3 — EXECUTION SPEC -->
+
+## Detailed Spec
+
+Implementar primero el modelo durable de visitor state, suppression y controles; después conectar el arbiter y el ingest Tier B; finalmente exponer readers/commands gobernados para consumidores UI/runtime. La política vive en `growth.cta`, las superficies solo envían contexto verificable y ningún evento browser se trata como conversión confiable.
+
+### Visitor-experience policy
+
+La task debe definir y probar una taxonomía de razones estable, al menos:
+
+- `dismissed`: decisión explícita del visitante;
+- `frequency_capped`: ventana/límite alcanzado;
+- `already_converted`: evidencia Tier A server-confirmed compatible con la policy;
+- `higher_priority_selected`: otro interruptivo ganó arbitraje;
+- `surface_killed|global_killed`: retiro operativo;
+- `consent_or_identity_limited`: no existe base permitida para state duradero/personalización;
+- `placement_not_supported`: host/viewport/renderer channel incompatible;
+- `policy_invalid|runtime_degraded`: fail-closed o fallback definido.
+
+El browser recibe solo el outcome mínimo necesario; nunca ventana exacta, prioridad, candidate set, hashes o
+razón interna sensible. Telemetría Tier B usa reason class allowlisted para comprender exposición sin revelar
+policy.
+
+### Frequency and re-entry semantics
+
+- Dismiss explícito persiste antes de completar la salida visual; la UX no depende de `animationend`.
+- Un refresh, resize, route transition SPA o re-mount del custom element no reinicia la ventana.
+- Múltiples tabs/concurrent renders resuelven de manera determinista; como máximo uno obtiene exposición
+  interruptiva cuando la policy así lo exige.
+- Fallo del sink Tier B no debe producir una tormenta de reaparición; se define fail-open/fail-closed separando
+  analytics de suppression state.
+- Sin consentimiento para state duradero, el sistema aplica como mínimo un cap conservador de sesión/surface sin
+  crear fingerprint persistente.
+- `already_converted` solo usa evidencia compatible y server-confirmed; un click o navegación browser-reported no
+  suprime permanentemente como conversión.
+- Kill global/per-surface invalida contratos dentro del SLA/TTL y evita mount/foco/entrance; restore no causa
+  aparición inmediata fuera del trigger original.
+
+### Contract consumed by renderer/cockpit
+
+Readers/DTOs deben permitir a TASK-1429/1430 distinguir, sin recalcular:
+
+- outcome `eligible|suppressed|capped|killed`;
+- reason class sanitizada;
+- scope `cta|placement|surface|global` cuando sea seguro;
+- effective/observed timestamp y freshness/TTL para operación;
+- next-eligible hint solo si no filtra policy ni facilita evasión de caps;
+- kill switch actor/reason/audit visible solo al operador autorizado, nunca al browser.
+
+## Scope
+
+### Slice 1 — Visitor state and suppression
+
+- Define consent-aware pseudonymous state, frequency windows and server-side decision.
+- Define reason taxonomy, dismiss/conversion/re-entry/concurrency semantics and privacy-safe fallback.
+- Integrate with arbiter in shadow first; add collision/suppression evidence and refresh/remount/multi-tab tests.
+
+### Slice 2 — Tier B exposure
+
+- Separate `eligible/suppressed/viewed` from conversion OLTP through sampled/analytical adapter.
+- Define retention, bot filtering, backpressure and reconciliation identifiers.
+
+### Slice 3 — Kill switches and signals
+
+- Add global/per-surface command/read/API, audit/outbox and cache behavior.
+- Register/test missing signals and run live no-redeploy disable/restore smoke.
+
+## Out of Scope
+
+- Renderer popup/slide-in, cockpit UI, experiments/winner selection y nuevos action kinds.
+
+## Rollout Plan & Risk Matrix
+
+### Slice ordering hard rule
+
+- Visitor-state schema → shadow decisions → Tier B adapter → kill switches/signals → enforcement gradual.
+
+### Risk matrix
+
+| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
+|---|---|---:|---|---|
+| Sobre-suppression elimina conversiones | arbiter | medium | shadow compare + defaults conservadores | suppression/collision |
+| Exposure satura OLTP/sink | data | medium | Tier B + sampling/backpressure | ingest backpressure |
+| Kill switch stale por cache | runtime | medium | TTL/invalidation + smoke | kill-switch-active/render |
+| Visitor state invade privacidad | public | low | pseudónimo, consentimiento, retención | privacy audit |
+
+### Feature flags / cutover
+
+- Introducir flag shadow/enforcement si el contrato vigente no tiene control equivalente; default OFF.
+- Kill switch se persiste como estado operativo, no env var.
+
+### Rollback plan per slice
+
+| Slice | Rollback | Tiempo | Reversible? |
+|---|---|---:|---|
+| Visitor state | enforcement OFF; revert reader | <5 min | si |
+| Tier B | disable adapter/sampling | <5 min | si |
+| Kill switches | restore state/revert command | <5 min | si |
+
+### Production verification sequence
+
+1. Migration y smoke PG staging.
+2. Shadow compare sin cambiar renders.
+3. Tier B low-volume + backpressure test.
+4. Kill switch staging disable/restore sin redeploy.
+5. Enforcement gradual en producción y monitor siete días.
+
+### Out-of-band coordination required
+
+- Aprobación de retención/sink analítico y rollout productivo.
+
+<!-- ZONE 4 — VERIFICATION & CLOSING -->
+
+## Acceptance Criteria
+
+- [ ] Frequency capping/suppression es server-side, consent-aware y probado bajo concurrencia.
+- [ ] Dismiss persiste antes de exit visual y refresh/remount/resize/SPA navigation no reabre dentro de la ventana.
+- [ ] Sin consentimiento/state durable existe fallback conservador sin fingerprinting ni exposición ilimitada.
+- [ ] `already_converted` usa solo evidencia compatible `server_confirmed`; browser click/navigation no genera suppression permanente falsa.
+- [ ] Renderer/cockpit reciben outcome/reason/freshness mínimos y no policy, candidate set, hashes ni ventanas sensibles.
+- [ ] Tier B no escribe exposure de alto volumen en `cta_conversion_event`.
+- [ ] Kill switches global/per-surface detienen render dentro del TTL sin redeploy y son reversibles.
+- [ ] Browser data sigue untrusted y conversion truth solo usa `server_confirmed`.
+- [ ] Commands/readers/APIs, access, audit/outbox, errors y capability coverage pasan.
+- [ ] Signals requeridas quedan visibles y probadas con runtime real.
+- [ ] Migration, rollback y flags/estado operativo están documentados.
+
+## Verification
+
+- `pnpm exec vitest run src/lib/growth/ctas src/app/api/public/growth/ctas src/app/api/admin/growth/ctas`
+- `pnpm migrate:status`
+- `pnpm task:lint --task TASK-1428`
+- `pnpm qa:gates --changed --agent codex --task TASK-1428 --runtime --data --security`
+
+## Closing Protocol
+
+- [ ] Lifecycle/carpeta/README/registry/EPIC-023 sincronizados.
+- [ ] Arquitectura/ADR, Handoff y changelog actualizados según docs governor.
+- [ ] QA Release Auditor sin blockers y smoke staging/productivo documentado.
+- [ ] Chequeo de impacto cruzado sobre TASK-1429/1430 completado.
+- [ ] Skill `greenhouse-growth-ctas` actualizada en el MISMO change set (Skill Maintenance Contract: estado de rollout, contratos, hard rules que cambien).
+
+## Follow-ups
+
+- TASK-1429 consume suppression/kill switches para el placement interruptivo.
+- TASK-1430 expone su operación en el cockpit.

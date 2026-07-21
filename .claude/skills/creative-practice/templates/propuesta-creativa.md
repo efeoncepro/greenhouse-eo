@@ -8,6 +8,8 @@
 > 2. El alcance sale de `templates/sow-creativo.md`. 🔴 **Sin cap de rondas y derechos de uso, no hay alcance.**
 > 3. Lo que se puede prometer sale de `efeonce/ESTADO_ACTUAL.md`. 🔴 **Hay superficies que NO existen.**
 > 4. El deck se compone en `deck-studio` + Artifact Composer. **La fuente es el repo, nunca el PDF.**
+> 5. Si hay Creative Studio/credits, cargar `modules/14_STUDIO_CREDITS.md`. 🔴 **Las bandas ilustrativas no
+>    son tarifa y no habilitan precio público.**
 
 ---
 
@@ -47,6 +49,17 @@ resume, no se repite entero.**)*
 ---
 
 ## 3. Lo que proponemos
+
+### Configuración comercial
+
+| Eje | Selección | Implicación |
+|---|---|---|
+| **Modelo de delivery** | {{Managed Squad / Staff Augmentation / Studio Access / hybrid por lanes}} | {{quién dirige y responde}} |
+| **Forma de engagement** | {{On-Going / On-Demand / Sample Sprint}} | {{duración/vehículo}} |
+| **Modo por lane/run** | {{efeonce-managed / co-operated / client-operated}} | {{operator · approver · failure owner}} |
+
+🔴 `Managed Squad`, `Staff Augmentation` y `efeonce-managed` no son sinónimos. Si es híbrido, repetir la tabla
+por lane y separar owner, SLA y líneas económicas.
 
 ### El equipo
 
@@ -125,9 +138,21 @@ el valor del gobierno — y en la renovación compara por precio como si fuéram
 
 ## 6. Inversión
 
-| Plan | Alcance | Valor mensual *(neto)* |
-|---|---|---|
-| {{}} | {{}} | **{{}}** |
+| Línea económica | Alcance | Valor neto |
+|---|---|---:|
+| Gobierno/plataforma | {{workspace, policy, ledger, memoria, soporte base}} | **{{}}** |
+| Capacidad humana | {{squad/lanes/dedicación/outcome}} | **{{}}** |
+| Studio Credits *(si aplica)* | {{pool/envelope + capability scope; nunca precio por pieza}} | **{{}}** |
+| Implementación/IP | {{onboarding, Brand Profile, templates, integración, training}} | **{{}}** |
+| Derechos/licencias/pass-through | {{stock, talento, voz, música, territorio, plazo, exclusividad}} | **{{}}** |
+| **Total** | | **{{}}** |
+
+**Contrato de credits *(si aplica)*:** {{saldo/pool · estimate como rango · reservation · budget approver ·
+settlement/release/refund · rate version · no-charge work · failure owner}}.
+
+🔴 No escribir `1 credit = $X`, top-up, rollover, expiración o “ilimitado” mientras no exista commercial
+approval documentado. Una pieza puede consumir cero o muchas operaciones; los ejemplos por pieza sólo explican
+composición.
 
 **Condiciones:** {{moneda · impuestos · reajuste · pago · facturación · duración · validez}}
 
@@ -138,6 +163,10 @@ el valor del gobierno — y en la renovación compara por precio como si fuéram
 - [ ] Si hay ad-hoc: ¿cuesta **MÁS** que el marginal del plan? 🩸
 - [ ] Si hay plan mayor: ¿**NO está dominado** por el menor + ad-hoc? 🩸
 - [ ] ¿Los **derechos de uso** están como línea propia?
+- [ ] ¿Se separan las **cinco líneas económicas** sin doble imputación?
+- [ ] Si hay credits: ¿pool, lifecycle, refund owner y trabajo sin credits están explicados?
+- [ ] ¿No se convirtió una pieza o provider call en unidad tarifaria?
+- [ ] ¿La oferta está dentro del estado comercial permitido *(shadow/piloto/commercially approved)*?
 - [ ] Si es multianual con costos en USD: ¿**buffer de FX** o cláusula de reajuste?
 
 ---
@@ -163,6 +192,8 @@ de fuentes distintas y no reconciliadas. **Cite una, con su fuente.**
 - [ ] ¿El **precio** salió del cotizador, y está sobre el piso?
 - [ ] ¿El **alcance** tiene cap de rondas, definición de ronda, reloj de feedback y owner del brief?
 - [ ] ¿Los **derechos de uso** están acotados y cotizados?
+- [ ] ¿La combinación de **delivery model × engagement form × operating mode** está declarada?
+- [ ] ¿Las cinco líneas económicas están separadas y los credits no esconden humanos/derechos?
 - [ ] ¿La sección de **métricas** NO compromete umbrales sin baseline?
 - [ ] ¿**Ninguna** superficie prometida es de las que no existen?
 - [ ] ¿**Ningún** dato citado está fuera de `SOURCES.md`?

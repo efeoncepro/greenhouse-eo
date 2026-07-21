@@ -75,8 +75,18 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
   `CTA_GTM_EVENT_NAMES` + `CTA_TELEMETRY_ALLOWED_PAYLOAD_KEYS` + outbox constants), `store.ts`
   (SQL + outbox in-tx; ojo: `query()` de `@/lib/db` retorna `rows` directo, NO `{rows}`),
   `arbiter.ts` (matcher glob-lite + priority + 0–1 interruptivo; targeting ausente/inválido =
-  NO elegible, fail-closed), `render-contract.ts` (compiler browser-safe), `action-router.ts`
-  (SOLO `open_growth_form`, resuelve vía `getPublishedRenderContractByRef` de forms),
+  NO elegible, fail-closed), `render-contract.ts` (compiler browser-safe), **TASK-1431**: `action-registry.ts`
+  (Action Registry canónico server-only — un entry por kind: policy schema zod + resolver +
+  proyección browser-safe; metadata pública `CTA_ACTION_KIND_METADATA` vive en `contracts.ts`,
+  browser-safe para cockpit/preview/tests; taxonomía de fallo `action_policy_invalid|
+  action_kind_unsupported|action_destination_invalid|action_destination_unavailable`) y
+  `action-router.ts` (fachada estable `resolveCtaAction` → delega al registry; publish gate y
+  render path fail-closed por la misma puerta). Kinds V1: `open_growth_form` (via
+  `getPublishedRenderContractByRef` de forms) + navegación gobernada `link_url` (root-relative o
+  https sin credenciales/protocol-relative) / `open_think_tool` (PATH sobre hub gobernado
+  `GROWTH_CTA_THINK_HUB_URL`∥`PUBLIC_GRADER_HUB_URL`∥think.efeoncepro.com + campaign context
+  UTM-allowlisted strict) / `book_meeting` (https en `meetings*.hubspot.com` + env
+  `GROWTH_CTA_BOOKING_URL_HOSTS`; navegación-only, CERO write CRM),
   `ingest.ts` (pipeline forjable-hardened + routing Tier B + hooks dismiss/conversión),
   `commands.ts` (lifecycle + surfaces), `readers.ts` (arbitraje + suppression + kill switch),
   `suppression.ts` (decisión PURA: taxonomía + policy zod, fail-closed), `visitor-state.ts`
@@ -100,13 +110,47 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
   localStorage SOLO con `consent-state="granted"`; guard local de dismiss por sesión — defensa
   en profundidad, la autoridad de suppression es server-side TASK-1428).
   Build: `pnpm renderer:cta:build` → `public/growth-cta/renderer-<canal>.js` (prebuild lo corre).
-- Gobernanza: `src/app/(dashboard)/growth/ctas/` + `GrowthCtasGovernanceView` (copy
-  `GH_GROWTH_CTA_OPERATOR` en `src/lib/copy/growth.ts`).
+- Gobernanza/cockpit (TASK-1430): `src/app/(dashboard)/growth/ctas/` + `GrowthCtasGovernanceView`
+  (orquestador CompositionShell `split` + lead) con `src/views/greenhouse/growth/ctas/cockpit/`:
+  `cta-cockpit-meta.ts` (draft model + builders payload/preview-contract; presentación de enums
+  canónicos — cero enum paralelo), `CtaInventoryPanel` (filtros + listbox ↑↓), `CtaDetailPanel`
+  (lifecycle bar + kill switch global/surface con reason auditado + métricas con trust tags +
+  bindings vía `surfaceAllowsCtaSlug` + supresión + versiones), `CtaAuthoringDrawer` (8 pasos;
+  submit → `POST /api/admin/growth/ctas`, server-confirmed) y `CtaPreviewHarness` (renderer
+  canónico bajo harness: scrubber density 560/400, esquema claro/oscuro vía `colorScheme`, hosts
+  Think navy/WP, matriz pairwise con `ScaledFrame`, degradación bloquea revisión). Copy
+  `GH_GROWTH_CTA_OPERATOR(.cockpit)` en `src/lib/copy/growth.ts`. Métricas de marketing:
+  `getCtaMarketingMetrics` (readers.ts; Tier B viewed + ledger, rates/deltas SERVER-side,
+  `coverage='impressions_undercounted'` cuando clicks>viewed — la UI muestra conteos, jamás un
+  % imposible) wired a `CtaDetailVm.metrics`. `authorDraftCta` acepta `suppressionPolicy`
+  (validado `ctaSuppressionPolicySchema`). GETs admin + POST author NO se gatean por
+  `GROWTH_CTA_ENGINE_ENABLED` (el flag gobierna exposición pública; lifecycle sigue gated).
 - GTM build: `scripts/gtm/build-cta-events-workspace.ts` (workspace→preview→publish gobernado).
 - Seed/smoke: `scripts/growth/seed-cta-ai-visibility-followup.ts --smoke` ·
   `scripts/growth/_sanity-cta-store-sql.ts` (SQL vivo vs PG).
 
 ## Estado de rollout (actualizar al cambiar)
+
+- **2026-07-18 (TASK-1430): Cockpit operator CODE-COMPLETE (local, sin push).** `/growth/ctas` es
+  master-detail con autoría gobernada de 8 pasos, preview harness del renderer real, kill switches
+  operables (global/surface, reason auditado), métricas de marketing server-side (CTR/tasas con
+  trust tags y guard de cobertura — pedido explícito del operador) y bindings read-only
+  (`surfaceAllowsCtaSlug`; mutación de allowlist sigue API-only). Autoridad visual: proyecto
+  Claude Design "Cockpit de CTAs" traducido a tokens (primitive nueva autorizada:
+  `splitTemplateColumns` override en CompositionShell). GVC `task-1430-growth-cta-cockpit`
+  (desktop) + `-mobile` (390) mirados. Sin flag nuevo, sin migración, sin telemetría nueva.
+  Rollout pendiente: push/release + smoke staging.
+
+- **2026-07-18 (TASK-1431): Action Registry + navegación gobernada CODE-COMPLETE (local, sin push).**
+  Registry tipado (`action-registry.ts`) con `open_growth_form` + `link_url`/`open_think_tool`/
+  `book_meeting`; executor del renderer por familia `growth_form|navigate` — navigate = `<a href>`
+  REAL (rel seguro, `target=_blank` opt-in + affordance sr-only, pending single-dispatch accesible,
+  recovery 4s `navigation_stalled`, fail-closed `action_unsupported` ante kind desconocido). Bundle
+  `1.2.0-preview.1`; fixtures navigate + preview inerte en `/growth/ctas`; GVC
+  `task-1431-growth-cta-actions` mirado (1440/390). SIN migración; telemetría SoT intacta
+  (`action_kind` porta 4 valores — TRACKING-PLAN §CTAs delta). **Rollout pendiente**: push/release,
+  bundle 1.2.0 desplegado en hosts ANTES de publicar cualquier CTA con action nueva (bundle viejo
+  falla closed), smoke staging de destinos reales. Arch delta §27.
 
 - **2026-07-18: PRIMERA REBANADA EN PRODUCCIÓN (released).** Flag `GROWTH_CTA_ENGINE_ENABLED` ON
   en staging + Production (solo Vercel lo lee). CTA `ai-visibility-report-followup` published,
@@ -123,6 +167,14 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
   (hasta 2026-07-25). Pendiente: placement AMPLIO WP (decisión del operador post-validación;
   recomendado posts del blog vía `the_content` en `ohio-child`), placement interruptivo, cockpit
   de autoría, más acciones.
+- **2026-07-18 (release `d5db8b568`, PR #159+#160): TASK-1428 + TASK-1429 EN PRODUCCIÓN.**
+  Enforcement de suppression **ON en staging y Production** (verificado E2E post-release:
+  visitante dismissed → excluido; fresco → ve; `engineState: ok`). Kill switches operativos en
+  prod (mismo código verificado live en staging: engage→killed→release sin redeploy). El
+  renderer `1.1.0` envía identidad pseudónima — el loop de suppression opera con visitantes
+  reales. Manifest `released`; watchdog con residual conocido `ops-worker` (label, diff runtime
+  vacío). Ventana monitor 7d `growth.cta.*` hasta 2026-07-25. Pendiente de negocio: primera
+  campaña `slide_in` real (surface/copy/trigger = decisión del operador; el motor está listo).
 - **2026-07-18 (TASK-1429): slide_in interruptivo + Experience System CODE-COMPLETE (local).**
   El renderer monta el interruptivo 0–1 del arbiter vía `SlideInController` (bundle `1.1.0`);
   envía la identidad pseudónima por headers al render/ingest (TASK-1428 cierra el loop: dismiss/
@@ -145,6 +197,20 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
   enforcement staging + smoke kill switch sin redeploy → prod gradual (ledger §Pendientes).
 
 ## Hard rules (anti-regression — arch §20 + aprendizajes de implementación)
+
+- **NUNCA** (TASK-1431) agregar un action kind sin su entry completo: enum en `contracts.ts` +
+  metadata browser-safe + entry del registry (schema+resolver) + espejo/executor del renderer
+  JUNTOS (parity test de familias revienta si divergen). Un kind sin entry NO publica NI renderiza.
+- **NUNCA** (TASK-1431) renderizar una acción navigate como `<button>` con `location.assign`: es un
+  `<a href>` REAL (semántica nativa). Externo/newContext lleva `rel='noopener noreferrer'`;
+  `target=_blank` SOLO por opt-in del autor (`openInNewContext`) + affordance sr-only. La
+  telemetría `clicked` sale ANTES de navegar (ingest `keepalive`) y el destino (URL) JAMÁS viaja
+  en telemetría — solo `action_kind` allowlisted.
+- **NUNCA** (TASK-1431) resolver un destino fuera de la gobernanza: `link_url` solo root-relative o
+  https sin credenciales (anti `//host` y `/\host`); `open_think_tool` guarda un PATH (el host lo
+  pone el motor — el autor jamás elige host) con campaign context UTM-allowlisted strict;
+  `book_meeting` solo hosts de booking gobernados y es navegación-only (CERO write CRM por click —
+  el adapter CRM es `hubspot_handoff`, demand-driven futuro).
 
 - **NUNCA** arbitrar/decidir política en el browser: el renderer recibe 0–1 interruptivo + N
   no-interruptivos YA resueltos; targeting/priority/suppression jamás cruzan al contrato.

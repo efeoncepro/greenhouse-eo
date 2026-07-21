@@ -179,6 +179,7 @@ import { getGrowthAiVisibilityProbeSignals } from './queries/growth-ai-visibilit
 import { getGrowthAiVisibilityPublicIntakeSignals } from './queries/growth-ai-visibility-public-intake-signals'
 import { getGrowthAiVisibilityPublicDeliverySignals } from './queries/growth-ai-visibility-public-delivery-signals'
 import { getGrowthCtaSignals } from './queries/growth-cta-signals'
+import { getGrowthMeetingSignals } from './queries/growth-meeting-signals'
 import { getGrowthFormsSignals } from './queries/growth-forms-signals'
 import { getGrowthFormsEmailSignals } from './queries/growth-forms-email-signals'
 import { getGrowthFormsHubspotSignals } from './queries/growth-forms-hubspot-signals'
@@ -651,6 +652,7 @@ interface ReliabilityOverviewSources {
   growthAiVisibilityPublicDelivery?: ReliabilitySignal[] | null
   growthForms?: ReliabilitySignal[] | null
   growthCta?: ReliabilitySignal[] | null
+  growthMeeting?: ReliabilitySignal[] | null
   growthFormsEmail?: ReliabilitySignal[] | null
   growthFormsHubspot?: ReliabilitySignal[] | null
   growthFormsPii?: ReliabilitySignal[] | null
@@ -1083,6 +1085,7 @@ export const buildReliabilityOverview = (
     ...(sources.growthAiVisibilityPublicDelivery ?? []),
     ...(sources.growthForms ?? []),
     ...(sources.growthCta ?? []),
+    ...(sources.growthMeeting ?? []),
     ...(sources.growthFormsEmail ?? []),
     ...(sources.growthFormsHubspot ?? []),
     ...(sources.growthFormsPii ?? []),
@@ -1524,6 +1527,12 @@ export const getReliabilityOverview = async (
     preloadedSources.growthCta !== undefined
       ? preloadedSources.growthCta
       : await getGrowthCtaSignals().catch(() => null)
+
+  // TASK-1509 — Native meeting scheduler provider/idempotency health.
+  const growthMeeting =
+    preloadedSources.growthMeeting !== undefined
+      ? preloadedSources.growthMeeting
+      : await getGrowthMeetingSignals().catch(() => null)
 
   // TASK-1254 — Gate de correo corporativo (rechazos + leads sospechosos).
   const growthFormsEmail =
@@ -2526,6 +2535,7 @@ export const getReliabilityOverview = async (
     growthAiVisibilityPublicDelivery,
     growthForms,
     growthCta,
+    growthMeeting,
     growthFormsEmail,
     growthFormsHubspot,
     growthFormsPii,

@@ -23,36 +23,40 @@ This operating model establishes the AI Product Design Studio stack for Greenhou
 
 ## Skill Stack
 
-### Global Skills
+### Canonical orchestrator
 
-- `product-design-architect-2026`: product pattern, Product UI ADR, state/action/responsive model.
-- `ai-ui-generation-director`: Lovable/Stitch-like generation directions and structured prompts.
-- `microinteraction-systems-architect`: motion, feedback, async, reduced-motion and state transitions.
-- `frontend-product-implementation-reviewer`: React/Next/frontend implementation fit.
-- `visual-regression-product-critic`: screenshot critique and score-based iteration.
+- `greenhouse-ai-design-studio` owns the end-to-end sequence, artifacts,
+  checkpoints and acceptance gate.
 
-### Greenhouse Overlays
+### Available specialist lanes
 
-- `greenhouse-product-ui-architect`: maps global decisions to Greenhouse primitives and rules.
-- `greenhouse-ai-design-studio`: orchestrates the end-to-end design/build/screenshot loop.
-- `greenhouse-ui-enterprise-review`: final product-quality gate.
+- `ai-ui-generation-director`: controlled visual directions.
+- `greenhouse-product-ui-architect`: pattern, recipe, shell and primitives.
+- `modern-ui-greenhouse-overlay`: tokens, typography and current craft.
+- `greenhouse-portal-ui-implementer`: repo implementation.
+- `greenhouse-vuexy-ui-expert`: Vuexy/MUI reference and reuse.
+- `greenhouse-ux-content-accessibility`: copy, states and accessibility.
+- `greenhouse-microinteractions-auditor`: motion and feedback.
+- `greenhouse-ui-review`: implementation/pattern compliance.
+- `greenhouse-ui-enterprise-review`: final evidence-backed gate.
+- `greenhouse-browser-diagnostics`: browser/runtime evidence.
+
+Do not require missing global skills. The orchestrator handles an unavailable
+specialty using canonical docs and records the fallback.
 
 ## Canonical Flow
 
-1. Capture product intent and user job.
-2. Classify the surface.
-3. Choose pattern family.
-4. Define first-fold reading order.
-5. Define state model.
-6. Define action model.
-7. Define responsive model.
-8. Define microinteraction model.
-9. Map to Greenhouse primitives.
-10. If the primitive is reusable, define official variants and domain kinds.
-11. Implement or mock up.
-12. Capture screenshots.
-13. Run enterprise review.
-14. Verify and commit.
+1. Classify rigor and persist an external or repo-native direction.
+2. Compare two or three directions; select one and record rejections.
+3. Choose surface recipe and first-fold reading/action model.
+4. Define state, responsive, accessibility and motion models.
+5. Map to Shell, primitives, variants/kinds and tokens.
+6. Pass substantive readiness.
+7. Implement/review desktop/mobile first fold.
+8. Complete behavior, states, access and data integration.
+9. Capture/review GVC premium evidence.
+10. Score fourteen dimensions, including surface economy and visual impact, and iterate to threshold.
+11. Run implementation + enterprise reviews and verification.
 
 ## Primitive + Variants + Kinds Method
 

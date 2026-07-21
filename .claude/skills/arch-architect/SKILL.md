@@ -55,6 +55,75 @@ mechanics here, and don't let the `astro` skill make an SSOT / blast-radius call
 alone. (Codex mirrors this contract: `software-architect-2026` ↔ `astro` under
 `.codex/skills/`.)
 
+## Compose with the `greenhouse-globe` skill (Efeonce Globe / Creative Studio / EPIC-028)
+
+When a design or review touches **Efeonce Globe** — the sibling creative-production
+platform (`efeonce-globe` repo, governed by Greenhouse under EPIC-028) — **compose
+with the `greenhouse-globe` skill**. It owns the Globe-specific runtime: the Node 24
+native-TS monorepo, the API Contract Spine (TASK-1481: trusted context vs untrusted
+payload, `CapabilityRegistry`, three-state coverage, canonical errors, conformance
+harness), the capability-extension flow (TASK-1457…1480), the provider boundary
+(`provider-contract` → `creative-runner`), and the Globe↔Greenhouse ownership line.
+
+Bidirectional handoff:
+
+- **This skill decides the SHAPE** — reversibility / blast-radius, 4-pillar scoring,
+  domain boundaries and the sister-platform line (Greenhouse owns identity/desired
+  access/governance and the `TASK-###`/EPIC control plane; Globe owns
+  code/runtime/data/creative evidence — never share DB/session/bucket/provider
+  secret/admin role), canonical primitive vs new entity, whether a capability needs a
+  governed contract (Full API Parity by birth). "Sister platform vs Greenhouse module"
+  is decided here (it's already decided: Globe is a peer — see the Creative Studio ADR).
+- **The `greenhouse-globe` skill fills the IMPLEMENTATION** — how to extend the spine
+  (schemas in `packages/contracts` → `registry.registerCommand` → flip coverage
+  policy-blocked→available → handler via `provider-contract`/`creative-runner` → typed
+  SDK method → grant → manifest-driven harness), the build/toolchain (`pnpm check` /
+  `pnpm build` in `efeonce-globe`, `node --test`, import-extension convention), and the
+  trusted-context / dispatch mechanics.
+
+**Two worked examples now live on the spine, and the second is an architecture pattern
+worth stealing.** The Model Lab (TASK-1457) is the first — a capability with external state
++ a provider behind it. The **Evaluation Harness** (TASK-1458, SPEC-003,
+`EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md`, capability `globe.lab.evaluation.run`) is the
+second, and it demonstrates **capability-consumes-capability**: it never reimplements
+experiment execution — it reuses the Lab through an exported domain helper
+(`runModelLabExperiment`, the real `prepare→execute` path with every guardrail), never
+re-dispatching through the registry from inside a handler and never duplicating the logic.
+Its golden briefs + rubrics are **versioned data** flowing through one engine (no `switch`
+per fixture — two distinct fidelity contracts, one engine). And it draws the line the eval
+discipline demands: `objectiveChecks` (automatic, deterministic) stay separate from
+`humanCriteria` (declared, never auto-scored); the verdict is only
+`objective_fail | objective_pass_pending_human` — never a creative "passed", never "model X
+is globally better" — and reports are versioned, workspace-scoped, with limitations
+declared. **This is framework #10 (eval-driven AI design) as a Globe primitive:** promoting
+a model route to production is a gate SEPARATE from running it in the Lab, and the evidence
+for that promotion is an evaluation report per fidelity contract.
+
+**The provider stack behind the runner is itself a pattern worth stealing (TASK-1486…1488, 1459).**
+A `CreativeProviderAdapter` is minted **per vendor** behind the `creative-runner`: `VertexCreativeAdapter`
+(TASK-1486, Google-native via Vertex, **keyless** through ADC/WIF, verified live) and `FalCreativeAdapter`
+(TASK-1487, non-Google, queue API), exposing capabilities verified against **live provider accounts, not marketing
+claims** (TASK-1488: Seedream 5 / Recraft / Topaz / Seedance / Seed Audio / ElevenLabs / Rodin 3D — with vendor
+quirks like ByteDance model IDs carrying no `fal-ai/` prefix). Two shape rules generalize to any provider design:
+(a) **capability→model routing lives INSIDE the adapter, never in domain policy** — a template/agent selects a stable
+semantic capability and the adapter resolves the concrete model + vendor quirk; and (b) `actualRoute` is the
+**fidelity-contract route, not the raw provider slug** (a `route_stable` bug fixed in TASK-1459). Secrets follow the
+sister-platform line: **keyless for Google-native (own project's ADC/WIF), keyed-with-its-own-secret for everything
+else — never a secret shared between Globe and Greenhouse** (the shared Fal canary key is a declared, temporary
+exception). The **`CompositeProviderAdapter`** (TASK-1487) is the router: it fans a capability across adapters by
+`supports()` + provider policy (Google-native → Vertex, non-Google → Fal). This is where **eval-driven design
+(framework #10) turns concrete for creative work**: the Still Model Lab **recommendation matrix** (TASK-1459) compares
+engines *objectively* — Vertex Nano Banana vs Fal Seedream by cost/latency/objective — yet craft stays a human call and
+**the harness never auto-elects a creative winner**; the matrix informs the human, it never promotes a route (route
+promotion to production stays the separate gate from framework #10 above).
+
+Flow: **decide the shape here → hand to `greenhouse-globe` for the Globe-specific
+structure → it hands back up if a new shape decision surfaces.** Canonical specs:
+`docs/architecture/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md` (SPEC-001) +
+Greenhouse `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_{DECISION,ARCHITECTURE}_V1.md`
++ `docs/epics/in-progress/EPIC-028-*.md`. (Codex mirrors this: `software-architect-2026`
+↔ `greenhouse-globe` under `.codex/skills/`.)
+
 ## Pinned decisions (OVERRIDES global arch-architect)
 
 ### 1. Canonical 360 extension is mandatory

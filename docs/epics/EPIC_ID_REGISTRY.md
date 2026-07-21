@@ -41,9 +41,14 @@ Registro canónico de asignación de IDs `EPIC-###` para evitar colisiones y ren
 | `EPIC-025` | `to-do` | `docs/epics/to-do/EPIC-025-vivir-el-why-cocreacion-educacion-cliente.md` |
 | `EPIC-026` | `complete` | `docs/epics/complete/EPIC-026-greenhouse-modular-build-runtime-decoupling.md` |
 | `EPIC-027` | `in-progress` | `docs/epics/in-progress/EPIC-027-greenhouse-build-cost-recovery-decomposition.md` |
-| `EPIC-028` | `to-do` | `docs/epics/to-do/EPIC-028-efeonce-creative-studio-agentic-platform.md` |
+| `EPIC-028` | `in-progress` | `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md` |
 | `EPIC-029` | `to-do` | `docs/epics/to-do/EPIC-029-tender-proposal-studio-agentic-authoring.md` |
+| `EPIC-030` | `to-do` | `docs/epics/to-do/EPIC-030-greenhouse-link-hub-control-plane.md` |
+| `EPIC-031` | `to-do` | `docs/epics/to-do/EPIC-031-glitch-agentic-editorial-pipeline.md` |
+| `EPIC-032` | `to-do` | `docs/epics/to-do/EPIC-032-notion-work-management-control-plane.md` |
+| `EPIC-033` | `complete` | `docs/epics/complete/EPIC-033-premium-agentic-ui-platform.md` |
+| `EPIC-034` | `to-do` | `docs/epics/to-do/EPIC-034-growth-promotions-orchestration.md` |
 
 ## Siguiente ID disponible
 
-- `EPIC-030`
+- `EPIC-035`

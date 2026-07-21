@@ -170,4 +170,43 @@ describe('frontend capture scenario DSL', () => {
       quality: { keyboard: { enabled: true, probes: [{ name: 'bad', keys: [] }] } }
     })).toThrow('requiere keys')
   })
+
+  it('expands premium quality defaults and accepts explicit keyboard/reduced-motion evidence', () => {
+    const scenario: CaptureScenario = {
+      ...baseScenario([{ kind: 'mark', label: 'a' }]),
+      qualityProfile: 'premium',
+      quality: {
+        keyboard: {
+          enabled: true,
+          reducedMotionCheck: true,
+          probes: [{ name: 'primary-flow', keys: ['Tab', 'Enter'] }]
+        }
+      }
+    }
+
+    expect(() => validateScenario(scenario)).not.toThrow()
+    expect(scenario.quality?.layout?.enabled).toBe(true)
+    expect(scenario.quality?.layout?.failOnViolations).toBe(true)
+    expect(scenario.quality?.runtime?.failOnConsoleError).toBe(true)
+    expect(scenario.quality?.enterpriseRubric?.failOnViolations).toBe(true)
+    expect(scenario.quality?.performance?.severity).toBe('error')
+  })
+
+  it('rejects premium quality without keyboard and reduced-motion evidence', () => {
+    expect(() => validateScenario({
+      ...baseScenario([{ kind: 'mark', label: 'a' }]),
+      qualityProfile: 'premium'
+    })).toThrow('quality.keyboard.enabled')
+
+    expect(() => validateScenario({
+      ...baseScenario([{ kind: 'mark', label: 'a' }]),
+      qualityProfile: 'premium',
+      quality: {
+        keyboard: {
+          enabled: true,
+          probes: [{ name: 'primary-flow', keys: ['Tab'] }]
+        }
+      }
+    })).toThrow('reducedMotionCheck:true')
+  })
 })

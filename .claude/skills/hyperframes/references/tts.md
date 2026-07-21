@@ -2,6 +2,11 @@
 
 Generate speech audio locally using Kokoro-82M (no API key, runs on CPU).
 
+For Efeonce Creative Studio/Globe, read [studio-credits.md](studio-credits.md): the CLI does not implement the
+credit ledger. A governed synthetic-voice operation still needs estimate/reservation/approval and consent/
+license checks; do not infer credits from command count, characters, CPU time or exported files. Captions,
+mixing and deterministic exports consume `0 Studio Credits` but still require capacity and review.
+
 ## Voice Selection
 
 Match voice to content. Default is `af_heart`.
@@ -73,3 +78,11 @@ npx hyperframes transcribe narration.wav  # → transcript.json with word-level 
 
 - Python 3.8+ with `kokoro-onnx` and `soundfile`
 - Model downloads on first use (~311 MB + ~27 MB voices, cached in `~/.cache/hyperframes/tts/`)
+
+## Rights and delivery gate
+
+- Verify that the selected voice/model permits the intended commercial use; record source and terms.
+- Never imitate or clone an identifiable person without explicit documented consent.
+- A generated file is a candidate, not an approved delivery. A human must review pronunciation,
+  performance, disclosure and rights before publication.
+- Voice/likeness, territory, term and buyout remain outside Studio Credits.

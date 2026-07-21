@@ -1,0 +1,515 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-07-19T11:51:48.739Z",
+  "run": "ai-generations/2026-07-18_high-frequency-campaign-e2e",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-07-18_high-frequency-campaign-e2e",
+  "totalBytes": 148861636,
+  "fileCount": 84,
+  "files": [
+    {
+      "path": "delivery/16x9/high-frequency-m01-digital-landscape-16x9-v1.jpg",
+      "sizeBytes": 371748,
+      "sha256": "78db0010d710bae483a92e69b4c7c5fcf0ca9d31058952725f0df5ea0ad55f28",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/16x9/high-frequency-m01-digital-landscape-16x9-v1.jpg"
+    },
+    {
+      "path": "delivery/16x9/high-frequency-m02-digital-landscape-16x9-v1.jpg",
+      "sizeBytes": 365834,
+      "sha256": "58f320b97d130c9886f9edf33772b1c7c930bb2899d21ded3e0a400fae09a86a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/16x9/high-frequency-m02-digital-landscape-16x9-v1.jpg"
+    },
+    {
+      "path": "delivery/16x9/high-frequency-m03-digital-landscape-16x9-v1.jpg",
+      "sizeBytes": 363707,
+      "sha256": "56496b3de6af95f4c3dcb9d0c2befa527f871a0a527f3bfca727feffd3034a77",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/16x9/high-frequency-m03-digital-landscape-16x9-v1.jpg"
+    },
+    {
+      "path": "delivery/3x1/high-frequency-m01-display-banner-3x1-v1.jpg",
+      "sizeBytes": 246517,
+      "sha256": "318532465dfb783d3c3e9bb9de163b11422e7fbb1ed72ccc3cb3669fa4d86338",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/3x1/high-frequency-m01-display-banner-3x1-v1.jpg"
+    },
+    {
+      "path": "delivery/3x1/high-frequency-m02-display-banner-3x1-v1.jpg",
+      "sizeBytes": 244376,
+      "sha256": "b5f5862650adbd7458c1713338bb324230463b831d583908cf0b61dee51ccdac",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/3x1/high-frequency-m02-display-banner-3x1-v1.jpg"
+    },
+    {
+      "path": "delivery/3x1/high-frequency-m03-display-banner-3x1-v1.jpg",
+      "sizeBytes": 242293,
+      "sha256": "d7f45a99ed7c639498fc241579808025ff6da3925f60ef9fd74714602bdd3de1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/3x1/high-frequency-m03-display-banner-3x1-v1.jpg"
+    },
+    {
+      "path": "delivery/4x5/high-frequency-m01-meta-feed-4x5-v1.jpg",
+      "sizeBytes": 329043,
+      "sha256": "02e17bc7e07ca238b673f1acb3c6f2497a8bf5867d07d1ff3f06407a385e91ae",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/4x5/high-frequency-m01-meta-feed-4x5-v1.jpg"
+    },
+    {
+      "path": "delivery/4x5/high-frequency-m02-meta-feed-4x5-v1.jpg",
+      "sizeBytes": 326180,
+      "sha256": "adbd2634ed5d9305417a5f23f0e0a5598e6519b2588b2df580c85fc9ed0408b8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/4x5/high-frequency-m02-meta-feed-4x5-v1.jpg"
+    },
+    {
+      "path": "delivery/4x5/high-frequency-m03-meta-feed-4x5-v1.jpg",
+      "sizeBytes": 322840,
+      "sha256": "99f01e03abf290659151d65f8194ce737b41c674926de5730b1be7ce0ac2d8a1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/4x5/high-frequency-m03-meta-feed-4x5-v1.jpg"
+    },
+    {
+      "path": "delivery/9x16/high-frequency-m01-meta-story-reel-9x16-v1.jpg",
+      "sizeBytes": 393506,
+      "sha256": "c79cc2253748e6d6c19d8f248a7b7a2e6eeca1077cc86827319a9bc800657999",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/9x16/high-frequency-m01-meta-story-reel-9x16-v1.jpg"
+    },
+    {
+      "path": "delivery/9x16/high-frequency-m02-meta-story-reel-9x16-v1.jpg",
+      "sizeBytes": 390511,
+      "sha256": "6c5d2f4684a13c40f2e0ed7b006dcb62532ef08fb60def4dbfca96b4e291a467",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/9x16/high-frequency-m02-meta-story-reel-9x16-v1.jpg"
+    },
+    {
+      "path": "delivery/9x16/high-frequency-m03-meta-story-reel-9x16-v1.jpg",
+      "sizeBytes": 387356,
+      "sha256": "31534a725821b2444db44cc7e57730611b6ac3f79203cb0e225ead0d96a8edb0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/9x16/high-frequency-m03-meta-story-reel-9x16-v1.jpg"
+    },
+    {
+      "path": "delivery/a2/high-frequency-m01-print-poster-proof-a2-v1.jpg",
+      "sizeBytes": 2524840,
+      "sha256": "602af9b0e4c4c7e95d4732f60cf495d62addf2d7ab55a5e5d39a5eb8f5ae7e1a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/a2/high-frequency-m01-print-poster-proof-a2-v1.jpg"
+    },
+    {
+      "path": "delivery/a2/high-frequency-m02-print-poster-proof-a2-v1.jpg",
+      "sizeBytes": 2512281,
+      "sha256": "1a319429cdc9efe5037af3810022205d4aaf390b20d00d168c333058bb7c7f14",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/a2/high-frequency-m02-print-poster-proof-a2-v1.jpg"
+    },
+    {
+      "path": "delivery/a2/high-frequency-m03-print-poster-proof-a2-v1.jpg",
+      "sizeBytes": 2509906,
+      "sha256": "eadce45bb81625a16647f7c030fdfc0686795ddb362ca4f300def39bbe57f3fe",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/a2/high-frequency-m03-print-poster-proof-a2-v1.jpg"
+    },
+    {
+      "path": "delivery/layout-compiler/high-frequency-layout-design-16x9-v1.jpg",
+      "sizeBytes": 618198,
+      "sha256": "fd3d6699b2683343cb17b5cf50b3800fe89e0d2fefc2ab4f73a054e45db04abc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/layout-compiler/high-frequency-layout-design-16x9-v1.jpg"
+    },
+    {
+      "path": "delivery/layout-compiler/high-frequency-layout-design-4x5-v1.jpg",
+      "sizeBytes": 393694,
+      "sha256": "61bae6b5e48f1fd6bbe682ca4f53612cc10bd32ebaac3cde969802e4586c5957",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/layout-compiler/high-frequency-layout-design-4x5-v1.jpg"
+    },
+    {
+      "path": "delivery/layout-compiler/high-frequency-layout-design-9x16-v1.jpg",
+      "sizeBytes": 567628,
+      "sha256": "39bf12701a7b55ce5d5045a623c30e2cac3cc9e182ea13215f5491a34a3c127f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/layout-compiler/high-frequency-layout-design-9x16-v1.jpg"
+    },
+    {
+      "path": "delivery/layout-design/high-frequency-layout-design-16x9-v1.jpg",
+      "sizeBytes": 617452,
+      "sha256": "b61043e82f44190d53c3c60ab94143c67d91b7570156ae2076e14d0eb7eb6ac7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/layout-design/high-frequency-layout-design-16x9-v1.jpg"
+    },
+    {
+      "path": "delivery/layout-design/high-frequency-layout-design-4x5-v1.jpg",
+      "sizeBytes": 393209,
+      "sha256": "9ae888981f74828928a09ff5c034c320e11592a4942ac1d9c7ff8789f3c1bddf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/layout-design/high-frequency-layout-design-4x5-v1.jpg"
+    },
+    {
+      "path": "delivery/layout-design/high-frequency-layout-design-9x16-v1.jpg",
+      "sizeBytes": 566929,
+      "sha256": "d719e4b6614f946cc0aefc1113de106e87d58ceca5fc3c85734198c73130261d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/layout-design/high-frequency-layout-design-9x16-v1.jpg"
+    },
+    {
+      "path": "delivery/motion/high-frequency-m01-brand-light-bumper-16x9-6s-v1-poster.jpg",
+      "sizeBytes": 120372,
+      "sha256": "d0427f61698c85a8d3f2c5ced071baa2276f5a84fd4958cc25372f45b442afb6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/motion/high-frequency-m01-brand-light-bumper-16x9-6s-v1-poster.jpg"
+    },
+    {
+      "path": "delivery/motion/high-frequency-m01-brand-light-bumper-16x9-6s-v1.mp4",
+      "sizeBytes": 2021049,
+      "sha256": "1b466dc7d8d31db114239558b8a81626f9176149772a01265556b7956d48070a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/motion/high-frequency-m01-brand-light-bumper-16x9-6s-v1.mp4"
+    },
+    {
+      "path": "delivery/motion/high-frequency-m01-brand-light-bumper-9x16-6s-v1-poster.jpg",
+      "sizeBytes": 126164,
+      "sha256": "4e315699aa6ae40450b8c672f506dbcea921e34fee9a4aa99a899284d72b360d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/motion/high-frequency-m01-brand-light-bumper-9x16-6s-v1-poster.jpg"
+    },
+    {
+      "path": "delivery/motion/high-frequency-m01-brand-light-bumper-9x16-6s-v1.mp4",
+      "sizeBytes": 2020167,
+      "sha256": "ea0f2b8421a338e2d43a32da66015f83f128fa129dbbac699c127dfaf4f10626",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/motion/high-frequency-m01-brand-light-bumper-9x16-6s-v1.mp4"
+    },
+    {
+      "path": "delivery/motion/high-frequency-m01-brand-light-hero-16x9-15s-v1-poster.jpg",
+      "sizeBytes": 213532,
+      "sha256": "e46c68ade50ec20b289477619f36cd526f96a9ed8ee17575e2e3a09dcfd90c99",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/motion/high-frequency-m01-brand-light-hero-16x9-15s-v1-poster.jpg"
+    },
+    {
+      "path": "delivery/motion/high-frequency-m01-brand-light-hero-16x9-15s-v1.mp4",
+      "sizeBytes": 9102832,
+      "sha256": "629fc52b45b4dfeed6e6e19526a27a8861011d0c0b02bdabe869c34f87dba49d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/motion/high-frequency-m01-brand-light-hero-16x9-15s-v1.mp4"
+    },
+    {
+      "path": "delivery/motion/high-frequency-m01-brand-light-hero-9x16-15s-v1-poster.jpg",
+      "sizeBytes": 221122,
+      "sha256": "6fe51037be3d95192049e1e2472d61dab4d7fdd9388920be51c6d6adb9312986",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/motion/high-frequency-m01-brand-light-hero-9x16-15s-v1-poster.jpg"
+    },
+    {
+      "path": "delivery/motion/high-frequency-m01-brand-light-hero-9x16-15s-v1.mp4",
+      "sizeBytes": 8773447,
+      "sha256": "492e4fb08fe6a040f6c358510e769cbe11302a481023e3bac24c7a2ee5e9a29e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/motion/high-frequency-m01-brand-light-hero-9x16-15s-v1.mp4"
+    },
+    {
+      "path": "delivery/motion/high-frequency-m01-brand-light-master-16x9-10s-v1-poster.jpg",
+      "sizeBytes": 121214,
+      "sha256": "5ad511182514fdfcbcaaea7c3c9fcb98caf87e24730024522fb59a18de3b83f8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/motion/high-frequency-m01-brand-light-master-16x9-10s-v1-poster.jpg"
+    },
+    {
+      "path": "delivery/motion/high-frequency-m01-brand-light-master-16x9-10s-v1.mp4",
+      "sizeBytes": 3900773,
+      "sha256": "432c2c8d80ef1e09a0f3c0765cc2ddcf232ff12344fba7b739277b4f26815e98",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/motion/high-frequency-m01-brand-light-master-16x9-10s-v1.mp4"
+    },
+    {
+      "path": "delivery/motion/high-frequency-m01-brand-light-master-9x16-10s-v1-poster.jpg",
+      "sizeBytes": 126202,
+      "sha256": "b5fc34661bfc517d505d356f68845e547200f5cbb31485bae0031a95387084bb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/motion/high-frequency-m01-brand-light-master-9x16-10s-v1-poster.jpg"
+    },
+    {
+      "path": "delivery/motion/high-frequency-m01-brand-light-master-9x16-10s-v1.mp4",
+      "sizeBytes": 3716762,
+      "sha256": "84deb90a6e72bff440b30c8623c38f48e593d939e92a0b077d0ea05ede7c717c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/motion/high-frequency-m01-brand-light-master-9x16-10s-v1.mp4"
+    },
+    {
+      "path": "delivery/ooh-3x1/high-frequency-m01-static-ooh-proof-ooh-3x1-v1.jpg",
+      "sizeBytes": 1528719,
+      "sha256": "ba2b13849b0cf3cb54f76dee8d49167c009dbd5b71d499737deeff81afc96446",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/ooh-3x1/high-frequency-m01-static-ooh-proof-ooh-3x1-v1.jpg"
+    },
+    {
+      "path": "delivery/ooh-3x1/high-frequency-m02-static-ooh-proof-ooh-3x1-v1.jpg",
+      "sizeBytes": 1528466,
+      "sha256": "cf2564fc07ef58534940a19a7951cd0ac1a14b81563c5ad329268a6b0bd3c01d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/ooh-3x1/high-frequency-m02-static-ooh-proof-ooh-3x1-v1.jpg"
+    },
+    {
+      "path": "delivery/ooh-3x1/high-frequency-m03-static-ooh-proof-ooh-3x1-v1.jpg",
+      "sizeBytes": 1519542,
+      "sha256": "ab387e99a7632abe49d1b6d0a676d04c8019e80f869d699ddc5064a513d69af2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/ooh-3x1/high-frequency-m03-static-ooh-proof-ooh-3x1-v1.jpg"
+    },
+    {
+      "path": "review/campaign-contact-sheet.jpg",
+      "sizeBytes": 856070,
+      "sha256": "6bd7ee011def509b68c107032baf41df54b3500407b0d52d4e2b4c444f96f2a3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/review/campaign-contact-sheet.jpg"
+    },
+    {
+      "path": "review/layout-compiler-contact-sheet.jpg",
+      "sizeBytes": 193542,
+      "sha256": "9acdd36a31941fbdb1173e42dfa8b8abfe5a85f7e60892a6a89f9cef030c039f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/review/layout-compiler-contact-sheet.jpg"
+    },
+    {
+      "path": "review/layout-design-pilot-contact-sheet.jpg",
+      "sizeBytes": 282148,
+      "sha256": "e9a5469d5f2a91323fc22d9b57cbbd2f7aa06767a7d1006b9c691cf2554f79ed",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/review/layout-design-pilot-contact-sheet.jpg"
+    },
+    {
+      "path": "review/motion-bumper-16x9-contact-sheet.jpg",
+      "sizeBytes": 30069,
+      "sha256": "dbd88d5a0f312e7e8ee55bb2379ae1331ca71bc0327f9334da97812063fed3c9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/review/motion-bumper-16x9-contact-sheet.jpg"
+    },
+    {
+      "path": "review/motion-bumper-9x16-contact-sheet.jpg",
+      "sizeBytes": 43020,
+      "sha256": "c8ba6947a30fbd52bd06f5f80d933179a9c5bb514703954780fbdd8de6bfc13a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/review/motion-bumper-9x16-contact-sheet.jpg"
+    },
+    {
+      "path": "review/motion-hero-16x9-15s-contact-sheet.jpg",
+      "sizeBytes": 181239,
+      "sha256": "0c9d0e8d71bf6a2fb46e261f8a3a683740812c5b10d9a9c1929c938cc872c6d3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/review/motion-hero-16x9-15s-contact-sheet.jpg"
+    },
+    {
+      "path": "review/motion-hero-9x16-15s-contact-sheet.jpg",
+      "sizeBytes": 169603,
+      "sha256": "53097d0c6bf740ea8249ba0fb27c6ad036de8a71637e3d226315a10d1155db84",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/review/motion-hero-9x16-15s-contact-sheet.jpg"
+    },
+    {
+      "path": "review/motion-master-16x9-contact-sheet.jpg",
+      "sizeBytes": 57488,
+      "sha256": "f2446112ac59dd848cc623e49fc6222e1903a0c7f7f53cfbeec7037a07c55325",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/review/motion-master-16x9-contact-sheet.jpg"
+    },
+    {
+      "path": "review/motion-master-9x16-contact-sheet.jpg",
+      "sizeBytes": 65830,
+      "sha256": "a46886dd1d4a5cf4ebc11687407c310c833cfd42a2404dd21c1659e42cab5328",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/review/motion-master-9x16-contact-sheet.jpg"
+    },
+    {
+      "path": "review/omni-clean-16x9-contact-sheet.jpg",
+      "sizeBytes": 50395,
+      "sha256": "a452ab30af02b5dbb0dbd1e7183583a6b91665461307e114420251eddddb6da4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/review/omni-clean-16x9-contact-sheet.jpg"
+    },
+    {
+      "path": "review/omni-clean-9x16-contact-sheet.jpg",
+      "sizeBytes": 66910,
+      "sha256": "8b912bf11b0249ceaf19a06b0817795a3bee8945bc14d596c8e6100e3f78def0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/review/omni-clean-9x16-contact-sheet.jpg"
+    },
+    {
+      "path": "review/omni-frames/frame-01.jpg",
+      "sizeBytes": 19124,
+      "sha256": "6b6a6ffc84c8f38a205105f4ba87e93c77c3fd5a83bcef83f52823f75b0c21f4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/review/omni-frames/frame-01.jpg"
+    },
+    {
+      "path": "review/omni-frames/frame-02.jpg",
+      "sizeBytes": 26010,
+      "sha256": "ba19ef570a653817abc0da67da509f53e0cc67c9bb168b8d0569df3daf47f918",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/review/omni-frames/frame-02.jpg"
+    },
+    {
+      "path": "review/omni-frames/frame-03.jpg",
+      "sizeBytes": 38621,
+      "sha256": "8b35c1f6ec6013ef413b04d2ba92a70e7613a5b8d90c4df98ea8f746d77f854e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/review/omni-frames/frame-03.jpg"
+    },
+    {
+      "path": "review/omni-motion-contact-sheet.jpg",
+      "sizeBytes": 51715,
+      "sha256": "eb4dcb585d5336acf04b9483f534c9830f2592cbf505045911ccc0a5c45fc861",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/review/omni-motion-contact-sheet.jpg"
+    },
+    {
+      "path": "work/anchor/high-frequency-anchor-v1.png",
+      "sizeBytes": 5904403,
+      "sha256": "95f6ac28d302d3ea178db54de1a1ef91100e6595fc3ebc842bdaa1a574cac4f3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/anchor/high-frequency-anchor-v1.png"
+    },
+    {
+      "path": "work/layout-compiler/editable/16x9-underlay.png",
+      "sizeBytes": 3701413,
+      "sha256": "230768667f251a9c492bc35cec8ee2336744e70926d61500c8020b9889fd073c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/layout-compiler/editable/16x9-underlay.png"
+    },
+    {
+      "path": "work/layout-compiler/editable/4x5-underlay.png",
+      "sizeBytes": 2625508,
+      "sha256": "a36f340d5dd84e20595acd555bc37bd81bf7c28d008ad1f1cb246d7ab418fec9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/layout-compiler/editable/4x5-underlay.png"
+    },
+    {
+      "path": "work/layout-compiler/editable/9x16-underlay.png",
+      "sizeBytes": 3614203,
+      "sha256": "a8695390f69d2a88dce3a31e6e4d2372bf10ebd7ec708e88dae38d738f6d918b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/layout-compiler/editable/9x16-underlay.png"
+    },
+    {
+      "path": "work/layout-design/composition/16x9-underlay.png",
+      "sizeBytes": 3696038,
+      "sha256": "88870f407106a89f033efb8d50007a8b857ccda5ca6df5f373a40b2428dd7b53",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/layout-design/composition/16x9-underlay.png"
+    },
+    {
+      "path": "work/layout-design/composition/4x5-underlay.png",
+      "sizeBytes": 2629832,
+      "sha256": "fa24b5d8f26f2c84a4e02089c66ee0879cfe2823860cae4fb9535f411d2d2407",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/layout-design/composition/4x5-underlay.png"
+    },
+    {
+      "path": "work/layout-design/composition/9x16-underlay.png",
+      "sizeBytes": 3621577,
+      "sha256": "f7ff4975681a238cfcf351cbb4e6c3a135e938e2e2b70a0eda839eaf91e44f8e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/layout-design/composition/9x16-underlay.png"
+    },
+    {
+      "path": "work/layout-design/finished/high-frequency-layout-finish-16x9.png",
+      "sizeBytes": 4006689,
+      "sha256": "cc6e65b3d3764aef2c83cb79be5832816dbc409ff352fd03953995c06ae6250c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/layout-design/finished/high-frequency-layout-finish-16x9.png"
+    },
+    {
+      "path": "work/layout-design/finished/high-frequency-layout-finish-4x5.png",
+      "sizeBytes": 5572794,
+      "sha256": "954d51dc3a58939155e9751cc5da9f7a47a07646be3efcb7b0d485d00aaa30b3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/layout-design/finished/high-frequency-layout-finish-4x5.png"
+    },
+    {
+      "path": "work/layout-design/finished/high-frequency-layout-finish-9x16.png",
+      "sizeBytes": 4129872,
+      "sha256": "454ef8bee726f574c25ae31186dab42f96819f52a989e68d72c083f218326fa7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/layout-design/finished/high-frequency-layout-finish-9x16.png"
+    },
+    {
+      "path": "work/motion/hero-15s/16x9/high-frequency-hero-16x9-15s-preliminary.mp4",
+      "sizeBytes": 9216928,
+      "sha256": "6a3b8cefa71187f08eab9c7f9f33bb34c706e6ea65e0f4da1b616c45523f5a68",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/motion/hero-15s/16x9/high-frequency-hero-16x9-15s-preliminary.mp4"
+    },
+    {
+      "path": "work/motion/hero-15s/16x9/high-frequency-hero-16x9-15s-rough.mp4",
+      "sizeBytes": 3590962,
+      "sha256": "1af768462a56b41b8e3269b10574cdbc76012920698ee85dfe5128e24f4a28a8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/motion/hero-15s/16x9/high-frequency-hero-16x9-15s-rough.mp4"
+    },
+    {
+      "path": "work/motion/hero-15s/16x9/sh01-motion.mp4",
+      "sizeBytes": 2703955,
+      "sha256": "0b0b6d7b4bf3147116494dc1039bd57b11277c1149e151388b5b60231abcb7d5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/motion/hero-15s/16x9/sh01-motion.mp4"
+    },
+    {
+      "path": "work/motion/hero-15s/16x9/sh02-m02.mp4",
+      "sizeBytes": 286530,
+      "sha256": "35f0339e9b0f77056cb36a374774c741090f093de7a624915e0b3898d1ee98c3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/motion/hero-15s/16x9/sh02-m02.mp4"
+    },
+    {
+      "path": "work/motion/hero-15s/16x9/sh03-m03.mp4",
+      "sizeBytes": 286519,
+      "sha256": "c1b8b39936050e5f309abe377f45fdce994b0dfb15841ed5fee5c40671c03698",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/motion/hero-15s/16x9/sh03-m03.mp4"
+    },
+    {
+      "path": "work/motion/hero-15s/16x9/sh04-format-wall.mp4",
+      "sizeBytes": 172653,
+      "sha256": "41bec8e0702746b144c580e92fa34c0836512338415415ab70bb5a494e409650",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/motion/hero-15s/16x9/sh04-format-wall.mp4"
+    },
+    {
+      "path": "work/motion/hero-15s/16x9/sh05-endcard.mp4",
+      "sizeBytes": 266802,
+      "sha256": "ae9e60060ce9eb1464b41647fa827d4dc5a5ba06a28da5db079edeaa2257dd2b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/motion/hero-15s/16x9/sh05-endcard.mp4"
+    },
+    {
+      "path": "work/motion/hero-15s/9x16/high-frequency-hero-9x16-15s-preliminary.mp4",
+      "sizeBytes": 8890100,
+      "sha256": "ef199eef537175eb8466801174f59994f95d4a9412d382d886f7e228a877c4fd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/motion/hero-15s/9x16/high-frequency-hero-9x16-15s-preliminary.mp4"
+    },
+    {
+      "path": "work/motion/hero-15s/9x16/high-frequency-hero-9x16-15s-rough.mp4",
+      "sizeBytes": 3451932,
+      "sha256": "5c3b5bbb33c296a8c42c00c973946b3493ec051f6014e6a2c9760613753c863f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/motion/hero-15s/9x16/high-frequency-hero-9x16-15s-rough.mp4"
+    },
+    {
+      "path": "work/motion/hero-15s/9x16/sh01-motion.mp4",
+      "sizeBytes": 2608897,
+      "sha256": "33a682e3ca99a272757c7d0d521a25fda7a3de706a39592d6cf788a1235532c8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/motion/hero-15s/9x16/sh01-motion.mp4"
+    },
+    {
+      "path": "work/motion/hero-15s/9x16/sh02-m02.mp4",
+      "sizeBytes": 296809,
+      "sha256": "f4344e39b20c34b60e0ddf67cb9e109654f0a3ea7f07a0408bb5f3b69b718189",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/motion/hero-15s/9x16/sh02-m02.mp4"
+    },
+    {
+      "path": "work/motion/hero-15s/9x16/sh03-m03.mp4",
+      "sizeBytes": 295302,
+      "sha256": "74c5cbb12bf1d03443d7cc090e735f3f18466eaaeb08a48d77df7f37e7081901",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/motion/hero-15s/9x16/sh03-m03.mp4"
+    },
+    {
+      "path": "work/motion/hero-15s/9x16/sh04-format-wall.mp4",
+      "sizeBytes": 122836,
+      "sha256": "0fade17528edfad54953cd85e7fa7988e0647b2c2e2b5bb29efa7e7df6514754",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/motion/hero-15s/9x16/sh04-format-wall.mp4"
+    },
+    {
+      "path": "work/motion/hero-15s/9x16/sh05-endcard.mp4",
+      "sizeBytes": 277073,
+      "sha256": "139580938c549df30566ea7f01737b6f8d33ccb94c9c26b147232a3cd42a3ebe",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/motion/hero-15s/9x16/sh05-endcard.mp4"
+    },
+    {
+      "path": "work/motion/high-frequency-off-brand-omni-9x16-v1.mp4",
+      "sizeBytes": 723336,
+      "sha256": "9bdac7bafbc01aac0726e969942d38f227b62bd0a137d2e56ed80e8d5e2b6dbe",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/motion/high-frequency-off-brand-omni-9x16-v1.mp4"
+    },
+    {
+      "path": "work/motion/high-frequency-omni-clean-16x9-8s-v1.mp4",
+      "sizeBytes": 2284733,
+      "sha256": "c6369ee25eab6cdd316278f12c4f1123fb1b324f2111dc1ef85922a941e39388",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/motion/high-frequency-omni-clean-16x9-8s-v1.mp4"
+    },
+    {
+      "path": "work/motion/high-frequency-omni-clean-9x16-8s-v1.mp4",
+      "sizeBytes": 2103001,
+      "sha256": "c6cf1b58fee3ac4c8f392e2da16962383dff94d5ad08a3c4922ad298b10e6137",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/motion/high-frequency-omni-clean-9x16-8s-v1.mp4"
+    },
+    {
+      "path": "work/plates/high-frequency-plate-3x1-source.png",
+      "sizeBytes": 3403113,
+      "sha256": "1bb95b5a376b22fde2500aa3ea01654c49133016790976232d284ef1bcd05ab4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/plates/high-frequency-plate-3x1-source.png"
+    },
+    {
+      "path": "work/plates/high-frequency-plate-4x5-source.png",
+      "sizeBytes": 4921325,
+      "sha256": "07ceae9a76c0c99194ce5cecf732b00812a68d2d63f8afdec99d51ca668a3f39",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/plates/high-frequency-plate-4x5-source.png"
+    },
+    {
+      "path": "work/plates/high-frequency-plate-9x16-source.png",
+      "sizeBytes": 3477137,
+      "sha256": "4a48f2871a3976b63b08f2703b9bf50424ede2b91f058c6236c102c3b8623dda",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/plates/high-frequency-plate-9x16-source.png"
+    },
+    {
+      "path": "work/territories/t01-iridescent-precision.png",
+      "sizeBytes": 1145459,
+      "sha256": "cb63efa52aff61be9bc6b2f0f90e06c5b0b93a359438385c2f475f728c2d82bf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/territories/t01-iridescent-precision.png"
+    },
+    {
+      "path": "work/territories/t02-chromatic-wake.png",
+      "sizeBytes": 4496748,
+      "sha256": "5a5aafc396d9fc547a306f9aad9789d972ea06d55e60d9fb7e4202b2f2bd9e57",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/territories/t02-chromatic-wake.png"
+    },
+    {
+      "path": "work/territories/t03-modular-orbit.png",
+      "sizeBytes": 2476962,
+      "sha256": "a640c559b5b3cedc982303f3f544d7b6deb26e7abe7bfadc8b31a6624747b715",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/work/territories/t03-modular-orbit.png"
+    }
+  ]
+}

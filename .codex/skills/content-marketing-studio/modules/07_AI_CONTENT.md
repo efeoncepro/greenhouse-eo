@@ -41,6 +41,9 @@ Efeonce tiene un **AI Content Factory** en el repo (`src/lib/public-site/content
 
 - Imagen/video/audio generativo para las piezas → studios de asset (`design-studio`, `motion-design-studio`, `audio-studio`) + `greenhouse-ai-image-generator`. El **Content Factory de media / Media Foundry** (provider-neutral) es la primitive de media; opérala vía su skill/runtime, no inventes generación ad-hoc.
 - Los assets IA siguen las mismas reglas: brand safety, coherencia de marca, revisión humana.
+- El draft, reescritura, atomización textual y QA editorial de esta skill no se convierten en Studio Credits por
+  palabra o pieza. Cuando un asset usa una capability generativa gobernada del Studio, esa operación se estima,
+  reserva y liquida en su lane; provider spend no es la unidad client-facing.
 
 ## Agentes de contenido (frontera)
 
@@ -53,6 +56,8 @@ Efeonce tiene un **AI Content Factory** en el repo (`src/lib/public-site/content
 - [ ] Barra de **insight original** mantenida (no slop).
 - [ ] Content Factory/media **operado vía su skill dueña**, nunca reimplementado ni output crudo.
 - [ ] Brand safety + confidencialidad respetados.
+- [ ] Si se usó Creative Studio, sólo las operaciones generativas gobernadas devengaron Studio Credits; copy,
+      curaduría, QA, publicación y distribución quedaron en capacidad/gobierno.
 
 ## Cross-links
 

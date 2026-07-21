@@ -47,6 +47,13 @@ Content Marketing Studio es dueño de:
 
 Encadenar el craft visual a `greenhouse-ai-image-generator`, `imagegen` o `design-studio`, según el runtime y el tipo de asset. Encadenar publicación a la skill del CMS o sitio. No crear un cliente de imagen, uploader o flujo de publicación paralelo.
 
+Cuando el runtime sea Creative Studio / Efeonce Globe, conservar además un operation map económico asociado al
+run. El manifest editorial sigue gobernando función, lineage y QA; no se transforma en pricing table. La
+generación/transformación auditable puede devengar Studio Credits; prompt writing, selección, metadata, crop,
+layout, copy, export, QA, upload y verificación pública devengan 0 Studio Credits y se financian por
+capacidad/gobierno. Canon:
+`docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md`.
+
 ## 2. Intake visual mínimo
 
 Antes de proponer conceptos, reunir:
@@ -427,3 +434,5 @@ Veredictos: `PASS`, `CONDITIONAL PASS` o `BLOCK`. Un gate bloqueado no se compen
 - [ ] Continuidad visual y legibilidad sobreviven body, mobile, card y social thumbnail.
 - [ ] La superficie pública pasa desktop/mobile, `200`, metadata social, layout y performance.
 - [ ] El estado final distingue producción cerrada, integración pendiente y publicación verificada.
+- [ ] Si corrió en Creative Studio, el run conserva estimate/reservation/settlement/refund por operación sin
+      convertir cantidad de assets, placements o derivados en créditos.

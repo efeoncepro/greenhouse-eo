@@ -1,0 +1,20 @@
+[
+  {
+    "id": "16x9",
+    "model": "bytedance/seedream/v5/pro/edit",
+    "prompt": "IMAGE 1 is both STRUCTURE and IDENTITY and wins every conflict. Apply one finishing delta only: improve material integration and premium photographic cohesion. Refine feather micro-contrast, translucent chromatic tile surfaces, one coherent right-side rim light, subtle atmospheric depth and controlled near-to-far falloff. Preserve exactly one hummingbird, its exact pose, scale, coordinates, complete anatomy, silhouette, right-facing beak, wing geometry and tail. Preserve the left 46 percent as a calm dark low-detail copy field and keep all bright fragments outside it. Keep the deep navy palette and the same tile-wake trajectory. LOCK EVERYTHING ELSE. No text, letters, numbers, logo, watermark, UI, frame, second bird, cloned body, extra wing, detached feather, new object, heavy glow, plastic smoothing or crop change.",
+    "estimatedCostUsd": 0.0675
+  },
+  {
+    "id": "4x5",
+    "model": "bytedance/seedream/v5/pro/edit",
+    "prompt": "IMAGE 1 is both STRUCTURE and IDENTITY and wins every conflict. Apply one finishing delta only: improve material integration and premium photographic cohesion. Refine feather micro-contrast, translucent chromatic tile surfaces, one coherent right-side rim light, subtle atmospheric depth and controlled near-to-far falloff. Preserve exactly one hummingbird, its exact pose, scale, coordinates, complete anatomy, silhouette, right-facing beak, wing geometry and tail. Preserve the upper-left copy field from x=6 to 68 percent and y=18 to 51 percent as calm, dark and low-detail; keep bright fragments and the bird outside that field. Keep the deep navy palette and the same tile-wake trajectory. LOCK EVERYTHING ELSE. No text, letters, numbers, logo, watermark, UI, frame, second bird, cloned body, extra wing, detached feather, new object, heavy glow, plastic smoothing or crop change.",
+    "estimatedCostUsd": 0.135
+  },
+  {
+    "id": "9x16",
+    "model": "bytedance/seedream/v5/pro/edit",
+    "prompt": "IMAGE 1 is both STRUCTURE and IDENTITY and wins every conflict. Apply one finishing delta only: improve material integration and premium photographic cohesion. Refine feather micro-contrast, translucent chromatic tile surfaces, one coherent right-side rim light, subtle atmospheric depth and controlled near-to-far falloff. Preserve exactly one hummingbird, its exact pose, scale, coordinates, complete anatomy, silhouette, right-facing beak, wing geometry and tail. Preserve the copy field from x=6 to 65 percent and y=20 to 50 percent as calm, dark and low-detail; keep bright fragments and the bird outside that field. Preserve the top 12 percent and bottom 20 percent interface-safe zones. Keep the deep navy palette and the same tile-wake trajectory. LOCK EVERYTHING ELSE. No text, letters, numbers, logo, watermark, UI, frame, second bird, cloned body, extra wing, detached feather, new object, heavy glow, plastic smoothing or crop change.",
+    "estimatedCostUsd": 0.0675
+  }
+]

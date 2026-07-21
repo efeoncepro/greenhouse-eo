@@ -1,6 +1,6 @@
 # GREENHOUSE_SEMANTIC_COLOR_SYSTEM_DECISION_V1
 
-> **Status:** Accepted (2026-06-08)
+> **Status:** Accepted (2026-06-08); secondary-green clause superseded 2026-07-18
 > **Date:** 2026-06-08
 > **Owner:** UI Platform / Design System
 > **Scope:** Brand color spine, feedback semantics, neutrals, chart categorical palette, dark mode derivation, design-token governance
@@ -11,6 +11,10 @@
 > **Canonical values:** `docs/tasks/in-progress/TASK-1053-feedback-semantic-color-system-direction-d.md` §"Paleta APROBADA"
 > **Implementation task:** `docs/tasks/in-progress/TASK-1053-feedback-semantic-color-system-direction-d.md`
 > **Accepted by:** operador (Julio), sesión 2026-06-08 ("me quedé con tu propuesta completa, me encantó").
+
+> **Supersession note (2026-07-18):** item 3 (lime/green as brand secondary) is superseded by
+> `GREENHOUSE_SECONDARY_TEAL_COLOR_DECISION_V1.md`. Primary, feedback semantics, neutrals and chart
+> governance from this decision remain in force.
 
 ## Context
 
@@ -27,7 +31,7 @@ El overhaul de color de Greenhouse (TASK-1053) adopta la dirección **Restraint 
 
 1. **Accent / primary = `#0375DB`** (vibrante, AA blanco 4.6:1). Es el color de acción (CTA · links · foco · activo · chart single-series). **NO se oscurece** (se descarta `#024C8F`) y **NO se desacopla** en un token `action` separado — el primary, bien elegido, ES el acento.
 2. **Navy = `#023C70` = accent-800**: el step oscuro del MISMO azul, solo para shell/header institucional. No es un hue aparte → elimina el crowding de azules.
-3. **Un solo verde de marca**: pop `#6EC207` + ink crisp `#4B8405`. El **olivo `#3E7A12` se elimina** (2 verdes, no 3: brand-lime + success-emerald).
+3. **[Superseded 2026-07-18]** Un solo verde de marca: pop `#6EC207` + ink crisp `#4B8405`. Greenhouse now uses Tidal Teal for secondary; success remains the only semantic emerald.
 4. **Orange `#FF6500` = sub-brand (Reach)**, fuera del UI diario (no warning, no CTA).
 5. **Semánticas de feedback intactas** (info `#1F6FD4` · success `#157F47` · warning `#FFB703` · error `#DC2E39`) con sus 6 sub-valores (`fill`/`onFill`/`ink`/`tint`/`border`/`dark-fg`), AA en light + dark. Warning = señal de tránsito (texto oscuro).
 6. **Neutrales = Greenhouse gray invariante** (`#97939e` family). El slate del mockup NO se adopta.

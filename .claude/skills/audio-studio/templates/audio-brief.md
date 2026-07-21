@@ -42,7 +42,10 @@
 
 - **Ruta de producción:** [humano · IA · híbrido]
 - **Voz:** [talento humano · IA (modelo + voz)] · **Música:** [compositor · IA (modelo)] · **SFX:** [foley/librería · IA]
-- **Presupuesto de créditos IA:** [nº aprox de créditos / costo estimado] · **aprobado por:** [quién]
+- **Plan generativo:** [capability × segundos × idioma/voice/music/SFX tier × variantes/attempts × fallback]
+- **Estimate de Studio Credits:** [rango · `credit_rate_version` · reservation máxima] · **budget approver:** [quién]
+- **Modo/accountability:** [`efeonce-managed` · `co-operated` · `client-operated`] · **operator of record:** [quién] · **rights authority:** [quién]
+- **Trabajo 0 credits:** [dirección/edición/cleanup/mix/master/export; cómo se financia la capacidad]
 - **Herramientas previstas:** [ElevenLabs · Seed Audio · Suno/Udio · Higgsfield · Adobe enhance · DAW humano]
 
 ## 6. Licencia y consentimiento (BLOQUEANTE)
@@ -68,4 +71,5 @@
 - **Quién aprueba la entrega final:** [nombre — confirmación humana obligatoria antes de publicar]
 
 > **Antes de producir:** brief cerrado · licencia verificada · consentimiento (si clonas) ·
-> gasto de créditos dimensionado y aprobado. Si falta uno, no se produce.
+> operaciones generativas estimadas por duración/tier/attempt, reservation aprobada y trabajo determinístico/
+> rights separados. Si falta uno, no se produce.

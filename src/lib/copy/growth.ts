@@ -1048,5 +1048,449 @@ export const GH_GROWTH_CTA_OPERATOR = {
     slideInDemoCta: 'Probar el slide-in en vivo',
     slideInDemoAria: 'Abrir una demo del slide-in interruptivo sobre esta página',
     slideInDemoHint: 'Abre el overlay real (no modal): pruébalo con Escape, cierre y foco. El estado de cierre dura la sesión.'
+  },
+  // ── TASK-1430 — cockpit operator (master-detail + authoring gobernado) ──
+  cockpit: {
+    breadcrumbs: { growth: 'Growth', ctas: 'CTAs' },
+    subtitle: 'Autoría, ciclo de vida, superficies y resultados del motor de CTAs.',
+    refresh: 'Actualizar',
+    create: 'Crear CTA',
+    createAria: 'Crear un CTA nuevo con autoría gobernada',
+    summary: {
+      published: 'publicados',
+      review: 'en revisión',
+      draft: 'borradores',
+      paused: 'pausados',
+      singular: {
+        published: 'publicado',
+        review: 'en revisión',
+        draft: 'borrador',
+        paused: 'pausado'
+      }
+    },
+    inventory: {
+      searchLabel: 'Buscar CTAs',
+      searchPlaceholder: 'Buscar por nombre, slug o campaña…',
+      searchAria: 'Buscar CTAs en el inventario',
+      statusFilterLabel: 'Estado',
+      statusFilterAria: 'Filtrar por estado',
+      placementFilterLabel: 'Ubicación',
+      placementFilterAria: 'Filtrar por ubicación',
+      allStatuses: 'Todos los estados',
+      allPlacements: 'Toda ubicación',
+      keyboardHint: '↑↓ para navegar',
+      summaryCount: (count: number) => `${count} ${count === 1 ? 'CTA en inventario' : 'CTAs en inventario'}`,
+      resultOne: 'CTA',
+      resultMany: 'CTAs',
+      resultFiltered: 'filtrados',
+      resultTotal: 'en total',
+      listAria: 'Inventario de CTAs',
+      noSurface: 'Sin superficie',
+      signalConversions: 'Conversiones',
+      signalNoData: 'Sin datos',
+      trustHint: 'Conversiones server-confirmed · CTR browser',
+      emptyFilteredTitle: 'Sin resultados con estos filtros',
+      emptyFilteredBody: 'Revisa la búsqueda o limpia los filtros para ver todo el inventario.',
+      clearFilters: 'Limpiar filtros',
+      errorTitle: 'No pudimos cargar el inventario',
+      errorBody: 'La lectura del inventario falló. El detalle y el ciclo de vida no se ven afectados.',
+      retry: 'Reintentar'
+    },
+    empty: {
+      title: 'Aún no tienes CTAs',
+      body: 'Los CTAs invitan a tu audiencia al siguiente paso —descargar un informe, agendar una demo o retomar una herramienta— sin tocar código ni JSON.',
+      cta: 'Crear tu primer CTA',
+      asideTitle: 'El detalle aparecerá aquí',
+      asideBody: 'Cuando crees tu primer CTA verás aquí su preview con el renderer real, sus resultados y los controles de ciclo de vida.'
+    },
+    denied: {
+      title: 'No tienes acceso a este detalle',
+      body: 'Ver y operar CTAs requiere la capability growth.cta.read. Pídele acceso a quien administra Growth.',
+      readOnlyHint: 'Tu acceso es de solo lectura: puedes ver inventario y resultados, pero no autorar ni cambiar el ciclo de vida.'
+    },
+    noSelection: {
+      title: 'Selecciona un CTA',
+      body: 'Elige un CTA del inventario para ver su detalle, resultados y controles de ciclo de vida.'
+    },
+    detail: {
+      regionAria: 'Detalle del CTA seleccionado',
+      closeAria: 'Cerrar el detalle del CTA',
+      loadError: 'No pudimos cargar el detalle. Intenta de nuevo.',
+      retry: 'Reintentar',
+      edit: 'Editar y previsualizar',
+      editAria: 'Editar este CTA como versión nueva y previsualizarla',
+      moreAria: 'Más acciones de ciclo de vida',
+      lifecycleBarAria: 'Acciones de ciclo de vida del CTA',
+      versionCurrent: 'actual',
+      metaUpdated: 'actualizado',
+      openPreview: 'Abrir matriz',
+      previewTitle: 'Preview del renderer',
+      previewSubtitle: 'Mismo CSS y contrato que producción · densidad derivada',
+      diagnosticsNote: 'Estos badges son diagnóstico del cockpit — no llegan al visitante.',
+      diag: {
+        surface: 'superficie',
+        placement: 'ubicación',
+        appearance: 'apariencia',
+        density: 'densidad',
+        densityDerived: 'derivada',
+        action: 'acción',
+        renderer: 'renderer',
+        contract: 'contrato',
+        kind: 'intención'
+      }
+    },
+    metrics: {
+      title: 'Resultados',
+      windowLabel: 'Ventana de 30 días',
+      updated: 'actualizado',
+      neverMeasured: 'sin eventos aún',
+      impressions: 'Impresiones',
+      clicks: 'Clics',
+      conversions: 'Conversiones',
+      ctr: 'CTR',
+      conversionRate: 'Tasa de conversión',
+      trustBrowser: 'reporte del navegador',
+      trustServer: 'confirmada por el servidor',
+      deltaVsPrev: 'vs. ventana anterior',
+      deltaNew: 'primera ventana',
+      rateNoData: 'Sin datos aún',
+      coverageUndercounted:
+        'Cobertura parcial: el conteo de impresiones empezó después que el de clics, así que las tasas aún no son confiables. Se muestran los conteos.',
+      coverageAligned:
+        'Los conteos cubren toda la ventana; el CTR y la tasa se calculan desde {date}, cuando empezó el conteo de impresiones (ventana alineada, sin comparación previa aún).',
+      partialTitle: 'Resultados no disponibles',
+      partialBody: 'La lectura de resultados no respondió. El ciclo de vida sigue operable.',
+      enforcementOn: 'enforcement activo',
+      enforcementShadow: 'supresión en shadow',
+      conversionTruthHint: 'Solo la conversión confirmada por el servidor cuenta como verdad; el CTR viene del reporte del navegador.'
+    },
+    kill: {
+      title: 'Kill switch gobernado',
+      scopeGlobal: 'Global',
+      scopeSurface: 'Superficie',
+      globalOffDesc: 'Detiene todos los CTAs en todas las superficies al instante, sin redeploy. Requiere growth.cta.pause.',
+      globalOnDesc: 'Motor detenido globalmente. Ningún CTA se muestra en ninguna superficie.',
+      surfaceOnDesc: 'Superficie detenida: sus visitantes no ven ningún CTA.',
+      engage: 'Activar kill switch',
+      release: 'Liberar',
+      engageConfirmTitle: '¿Detener {scope} con kill switch?',
+      engageConfirmBody:
+        'La exposición se detiene de inmediato y queda auditada (quién, cuándo y por qué). Se libera cuando tú lo decidas, sin redeploy.',
+      releaseConfirmTitle: '¿Liberar el kill switch de {scope}?',
+      releaseConfirmBody: 'La exposición se reanuda según el ciclo de vida vigente de cada CTA.',
+      reasonLabel: 'Motivo',
+      reasonPlaceholder: 'ej. rendimiento bajo el umbral acordado',
+      reasonHelper: 'Obligatorio (mínimo 5 caracteres). Queda en la auditoría.',
+      auditTitle: 'Auditoría',
+      auditEngaged: 'activó',
+      auditReleased: 'liberó',
+      stateActive: 'Detenido',
+      stateInactive: 'Operando',
+      affectsCta: 'Este CTA está detenido por el kill switch — no se muestra aunque esté publicado.'
+    },
+    surfaces: {
+      title: 'Superficies y bindings',
+      bound: 'Vinculada',
+      unbound: 'Sin vincular',
+      boundHint: 'La allowlist de la superficie admite este CTA.',
+      unboundHint: 'La allowlist de la superficie no incluye este slug. El binding se administra vía la API admin.',
+      killed: 'Detenida',
+      channelLabel: 'canal'
+    },
+    targeting: {
+      title: 'Segmentación y supresión',
+      routes: 'Rutas objetivo',
+      excludeRoutes: 'Rutas excluidas',
+      noExclusions: 'Sin exclusiones',
+      cooldown: 'Descarte',
+      cooldownValue: 'Oculta {days} días tras descartar',
+      frequencyCap: 'Cap de frecuencia',
+      frequencyCapValue: '{max} por ventana de {hours} h',
+      afterConversion: 'Tras convertir',
+      afterConversionOn: 'Se deja de mostrar',
+      afterConversionOff: 'Sigue mostrándose'
+    },
+    versions: {
+      title: 'Historial de versiones',
+      current: 'Versión actual',
+      publishedAt: 'publicada'
+    },
+    lifecycle: {
+      deprecate: 'Deprecar',
+      archive: 'Archivar',
+      deprecateConfirmTitle: '¿Deprecar «{name}»?',
+      deprecateConfirmBody: 'Deja de estar disponible para publicarse. El historial y los resultados se conservan.',
+      archiveConfirmTitle: '¿Archivar «{name}»?',
+      archiveConfirmBody: 'Sale del inventario operativo. Esta es la última etapa del ciclo de vida.',
+      resumeConfirmTitle: '¿Reanudar «{name}»?',
+      resumeConfirmBody: 'La versión pausada vuelve a publicarse y a mostrarse en sus superficies.',
+      busyPublish: 'Publicando…',
+      busyPause: 'Pausando…',
+      busyResume: 'Reanudando…',
+      busyGeneric: 'Aplicando…'
+    },
+    author: {
+      titleNew: 'Nuevo CTA',
+      titleEdit: 'Editar CTA',
+      subtitleNew: 'Autoría gobernada · sin canvas libre',
+      subtitleEdit: 'Autoría gobernada · crea una versión nueva',
+      dialogAria: 'Autoría de CTA',
+      dirtyBadge: 'Cambios sin guardar',
+      closeAria: 'Cerrar la autoría',
+      draftSummaryTitle: 'Borrador',
+      back: 'Atrás',
+      next: 'Continuar',
+      nextToPreview: 'Ir a vista previa',
+      nextToReview: 'Ir a revisión',
+      cancel: 'Cancelar',
+      submitNew: 'Enviar a revisión',
+      submitEdit: 'Guardar y enviar a revisión',
+      submitting: 'Enviando…',
+      discardTitle: '¿Descartar los cambios?',
+      discardBody: 'Tienes cambios sin guardar en este borrador. Si cierras ahora se perderán.',
+      discardConfirm: 'Descartar cambios',
+      discardCancel: 'Seguir editando',
+      stepRailAria: 'Pasos de la autoría',
+      steps: {
+        intent: { label: 'Intención', hint: 'Tipo de experiencia' },
+        placement: { label: 'Ubicación', hint: 'Placement' },
+        appearance: { label: 'Apariencia', hint: 'Énfasis' },
+        content: { label: 'Contenido', hint: 'Anatomía + asset' },
+        action: { label: 'Acción', hint: 'Registro' },
+        targeting: { label: 'Segmentación', hint: 'Supresión' },
+        preview: { label: 'Vista previa', hint: 'Matriz' },
+        review: { label: 'Revisión', hint: 'Checklist' }
+      },
+      intent: {
+        title: 'Intención',
+        subtitle: 'Elige la semántica de autoría. Define el checklist de expectativa y evidencia — no genera copy automática.',
+        evidenceLabel: 'Evidencia requerida:',
+        kinds: {
+          report_followup: {
+            label: 'Seguimiento de informe',
+            desc: 'Retoma a quien vio un informe y ofrece el siguiente paso.',
+            evidence: 'Requiere referencia al informe o dato visto.'
+          },
+          lead_magnet: {
+            label: 'Imán de leads',
+            desc: 'Ofrece un recurso o diagnóstico a cambio de contacto.',
+            evidence: 'Requiere un recurso real y expectativa clara de entrega.'
+          },
+          tool_continuation: {
+            label: 'Continuación de herramienta',
+            desc: 'Invita a retomar una tarea o herramienta iniciada.',
+            evidence: 'Requiere un destino que retome el estado guardado.'
+          },
+          meeting: {
+            label: 'Reunión',
+            desc: 'Agenda una conversación de 30 minutos con el equipo de Efeonce.',
+            evidence: 'Requiere un destino de agenda válido y gobernado.'
+          }
+        }
+      },
+      placement: {
+        title: 'Ubicación',
+        subtitle: 'Solo placements soportados por el renderer. El nivel de interrupción define las defensas obligatorias.',
+        interruptiveBadge: 'interruptivo',
+        kinds: {
+          embedded: { label: 'Embedded', desc: 'Vive dentro de un dock del host (ej. el bookend de un informe). No interrumpe.' },
+          inline_banner: { label: 'Banner inline', desc: 'Se inserta en el flujo del contenido. No interrumpe.' },
+          sticky_banner: { label: 'Banner fijo', desc: 'Barra persistente en la superficie. Interruptivo: exige defensas.' },
+          slide_in: { label: 'Slide-in', desc: 'Entra desde una esquina sin bloquear la lectura. Interruptivo: exige defensas.' },
+          popup_modal: { label: 'Modal', desc: 'Centrado sobre el contenido. Máxima interrupción: exige defensas.' },
+          floating_button: { label: 'Botón flotante', desc: 'Botón persistente en una esquina. No interrumpe.' }
+        }
+      },
+      appearance: {
+        title: 'Apariencia',
+        subtitle: 'Énfasis y contraste dentro de tokens aprobados. Sin color picker, sin CSS, sin control de spacing.',
+        kinds: {
+          default: { label: 'Default', desc: 'Énfasis equilibrado y contraste estándar.' },
+          spotlight: { label: 'Spotlight', desc: 'Máximo énfasis: acento y elevación de marca.' },
+          minimal: { label: 'Minimal', desc: 'Discreto y editorial. Ideal para placements inline.' }
+        }
+      },
+      content: {
+        title: 'Contenido',
+        subtitle: 'La anatomía del CTA con límites y guía contextual. Se refleja en vivo en la vista previa.',
+        name: 'Nombre interno',
+        namePlaceholder: 'ej. Descarga informe SEO Q2',
+        nameHelper: 'Identifica el CTA en el inventario. No lo ve el visitante.',
+        eyebrow: 'Eyebrow (opcional)',
+        eyebrowPlaceholder: 'ej. Informe listo',
+        headline: 'Headline',
+        headlinePlaceholder: 'ej. Tu informe SEO del Q2 ya está disponible',
+        headlineHelper: 'Debe sobrevivir en densidad peek. Sé concreto y honesto con la promesa.',
+        body: 'Cuerpo (opcional)',
+        bodyPlaceholder: 'Explica el valor en una frase.',
+        ctaLabel: 'Label del botón',
+        ctaLabelPlaceholder: 'ej. Descargar informe',
+        dismissLabel: 'Label de descarte',
+        dismissLabelPlaceholder: 'ej. Ahora no',
+        footnote: 'Footnote (opcional)',
+        footnotePlaceholder: 'ej. PDF · 14 páginas · sin costo',
+        assetTitle: 'Asset visual',
+        assetDesc: 'Referencia gobernada; nunca texto esencial embebido en la imagen.',
+        assetPresent: 'Con referencia',
+        assetNone: 'Sin asset',
+        assetRefLabel: 'Referencia del asset',
+        assetRefPlaceholder: 'ej. asset://informes/seo-q2'
+      },
+      action: {
+        title: 'Acción',
+        subtitle: 'Las opciones y campos vienen del registro de acciones. El cockpit no mantiene un enum paralelo.',
+        kindLabel: 'Tipo de acción',
+        expectationLabel: 'Expectativa de destino:',
+        fieldHelper: 'Se valida server-side; la integridad label ↔ acción se revisa antes de publicar.',
+        newContextLabel: 'Abrir en pestaña nueva',
+        newContextHelper: 'Solo para destinos externos. El visitante lo verá anunciado por accesibilidad.',
+        kinds: {
+          open_growth_form: {
+            label: 'Abrir formulario',
+            expectation: 'Monta el formulario gobernado de Growth sin salir de la página.',
+            field: 'Referencia del formulario',
+            placeholder: 'ej. ai-visibility-grader'
+          },
+          link_url: {
+            label: 'Ir a una URL',
+            expectation: 'Navega a una ruta propia o una URL https gobernada.',
+            field: 'URL o ruta',
+            placeholder: 'ej. /recursos/guia-pricing'
+          },
+          open_think_tool: {
+            label: 'Abrir herramienta Think',
+            expectation: 'Lleva a una herramienta del hub Think (el motor pone el host).',
+            field: 'Ruta de la herramienta',
+            placeholder: 'ej. /brand-visibility'
+          },
+          book_meeting: {
+            label: 'Abrir agenda externa',
+            expectation: 'Abre una agenda externa para elegir fecha y hora.',
+            field: 'URL del agendador',
+            placeholder: 'ej. https://meetings.hubspot.com/…'
+          },
+          open_meeting_scheduler: {
+            label: 'Abrir agenda integrada',
+            expectation: 'Muestra una agenda adaptativa sin sacar al visitante de la página.',
+            field: 'Surface de reuniones',
+            placeholder: 'ej. efeonce-public-site',
+            secondaryField: 'Scheduler key',
+            secondaryPlaceholder: 'ej. efeonce-discovery-30',
+            secondaryHelper: 'Ambos identificadores deben tener un binding activo; no se exponen IDs del proveedor.'
+          }
+        } as Record<string, { label: string; expectation: string; field: string; placeholder: string; secondaryField?: string; secondaryPlaceholder?: string; secondaryHelper?: string }>
+      },
+      targeting: {
+        title: 'Segmentación y supresión',
+        subtitle: 'Consume los contratos canónicos. Un placement interruptivo no avanza sin postura de supresión válida.',
+        interruptiveWarning:
+          'Este placement es interruptivo: exige cap de frecuencia, respeto al descarte y postura de kill switch para pasar a revisión.',
+        routes: 'Rutas objetivo',
+        routesHelper: 'Globs separados por coma. /** = todas las rutas de la superficie.',
+        excludeRoutes: 'Rutas excluidas',
+        excludeRoutesHelper: 'Opcional. El CTA nunca aparece en estas rutas.',
+        cooldownDays: 'Descarte: días de silencio',
+        cooldownHelper: 'Tras descartar, el CTA se oculta esta cantidad de días.',
+        maxImpressions: 'Máx. impresiones por ventana',
+        windowHours: 'Ventana (horas)',
+        afterConversion: 'Dejar de mostrar tras convertir',
+        afterConversionDesc: 'Con la conversión confirmada server-side, el CTA se retira solo.'
+      },
+      preview: {
+        title: 'Vista previa',
+        subtitle: 'El renderer canónico bajo harnesses de host, contenedor y preferencia. Cobertura pairwise + casos frontera, no todo el producto cartesiano.',
+        hostLabel: 'Superficie (host)',
+        hostThink: 'Think',
+        hostWordpress: 'WordPress',
+        themeLabel: 'Esquema',
+        themeLight: 'Claro',
+        themeDark: 'Oscuro',
+        contentLabel: 'Contenido',
+        contentNominal: 'Nominal',
+        contentLong: 'Largo',
+        contentMinimal: 'Mínimo',
+        assetLabel: 'Asset',
+        assetPresent: 'Con referencia',
+        assetMissing: 'Sin asset',
+        widthLabel: 'Ancho del contenedor',
+        widthDensityPrefix: 'densidad',
+        widthHint: 'La densidad es un resultado del renderer, nunca un override de autoría. Muévela para ver el morph full → condensed → peek.',
+        presetFull: 'Full',
+        presetCondensed: 'Condensed',
+        presetPeek: 'Peek',
+        interactHint: 'El preview es interactivo e inerte: haz clic en el botón para ver pending/formulario sin salir del portal.',
+        remount: 'Remontar',
+        focusPrimary: 'Enfocar botón',
+        simulateFail: 'Simular fallo de preview',
+        restoreRenderer: 'Restaurar renderer',
+        degradedTitle: 'El renderer canónico no montó',
+        degradedBody: 'No podemos probar paridad con producción. La revisión queda bloqueada hasta resolverlo.',
+        failClosedNote: 'Ante un error real, el visitante no ve nada (fail-closed): jamás un card roto.',
+        matrixTitle: 'Casos frontera (pairwise)',
+        matrixAria: 'Matriz de casos frontera del preview',
+        badgesNote: 'Estos badges son diagnóstico del cockpit — no llegan al visitante.',
+        suppressedEvidenceTitle: 'No se muestra',
+        suppressedEvidenceBody: 'Suprimido por cap de frecuencia o descarte reciente. Evidencia read-only del motor.',
+        failClosedTitle: 'El renderer no montó este contrato (fail-closed)',
+        failClosedBody:
+          'La acción no resuelve un destino gobernado o el contrato no es válido: el visitante no vería nada. Corrige la acción en una versión nueva.'
+      },
+      review: {
+        title: 'Revisión',
+        subtitle: 'Contrato, superficie, accesibilidad, copy ↔ acción, supresión y paridad antes de enviar a revisión.',
+        readyTitle: 'Listo para enviar a revisión',
+        readyBody: 'Todas las comprobaciones de paridad y gobierno pasan.',
+        blockedOne: 'bloqueo por resolver',
+        blockedMany: 'bloqueos por resolver',
+        blockedBody: 'Corrige los puntos marcados; el envío está deshabilitado.',
+        serverNote: 'El resultado final lo confirma el servidor al enviar: acá no hay verdad optimista.',
+        checks: {
+          action: {
+            label: 'Acción registrada y con destino',
+            ok: 'La acción es válida en el registro y tiene destino definido.',
+            fail: 'Selecciona una acción del registro y completa su destino en el paso Acción.'
+          },
+          copyMatch: {
+            label: 'El copy coincide con la acción',
+            ok: 'El label del botón coincide con lo que hace la acción.',
+            fail: 'El label promete algo distinto a lo que hace la acción «{action}». Alinea label ↔ acción.'
+          },
+          interruptive: {
+            label: 'Defensas de interrupción',
+            ok: 'Cap de frecuencia, respeto al descarte y postura de kill switch configurados.',
+            okNotNeeded: 'Placement no interruptivo: sin requisito de supresión.',
+            fail: 'Un placement interruptivo no pasa a revisión sin cap, descarte y kill switch. Complétalos en Segmentación.'
+          },
+          anatomy: {
+            label: 'Anatomía sobrevive toda densidad',
+            ok: 'Headline, acción y descarte permanecen en full → condensed → peek.',
+            fail: 'Falta headline, label de acción o label de descarte para las densidades compactas.'
+          },
+          asset: {
+            label: 'Asset y fallback',
+            ok: 'El asset tiene referencia gobernada o la anatomía no lo requiere.',
+            fail: 'Un imán de leads necesita una referencia de asset real; sin ella la promesa queda coja.'
+          },
+          limits: {
+            label: 'Límites de copy',
+            ok: 'Todos los campos están dentro de sus límites.',
+            fail: 'Hay campos sobre el límite: {fields}.'
+          },
+          parity: {
+            label: 'Paridad de preview',
+            ok: 'El preview monta el renderer canónico; sin drift con el contrato público.',
+            fail: 'El harness no pudo montar el renderer canónico; no se puede probar paridad con producción.'
+          }
+        }
+      }
+    },
+    toasts: {
+      created: 'CTA enviado a revisión. Publícalo desde el detalle cuando lo apruebes.',
+      newVersion: 'Versión nueva enviada a revisión, server-confirmed.',
+      refreshed: 'Lecturas canónicas al día.',
+      killEngaged: 'Kill switch activado. La exposición se detuvo.',
+      killReleased: 'Kill switch liberado. La exposición se reanuda según el ciclo de vida.',
+      invalidInput: 'El borrador tiene campos inválidos: {details}.'
+    }
   }
 } as const

@@ -77,3 +77,20 @@
 - **Mocap markerless**: motion capture sin traje, desde 1 cámara (Wonder Dynamics / Autodesk Flow Studio).
 - **Relighting**: cambiar/recuperar la luz de un video en post (Beeble).
 - **VFX invisible**: la regla de oro — el mejor VFX no se nota. Si se ve el efecto, falló.
+
+## Creative Studio — economía gobernada
+
+- **Studio Credit**: unidad provider-neutral de una operación generativa gobernada; no es dinero, token,
+  hora, pieza, licencia ni costo de proveedor.
+- **Capability / quality tier / attempt**: operación semántica prometida, banda de calidad/fidelidad y cada
+  intento auditable. En video, duración, tier y attempts son drivers del estimate.
+- **Estimate / reservation / settlement**: rango informativo; hold idempotente aprobado; y consumo elegible
+  conciliado después de review. **Release** libera remanente; **refund adjustment** compensa sin borrar historia.
+- **Retry técnico vs cambio creativo**: falla provider/plataforma/spec objetiva no se cobra dos veces; una
+  nueva dirección tras output válido crea branch y estimate nuevos.
+- **Mode-neutral credits**: la misma operación consume la misma banda en `efeonce-managed`, `co-operated`
+  y `client-operated`; capacidad y accountability se cobran por otra línea.
+- **Deterministic finishing**: edición, conform, grade, mix/master, overlays, captions, render/export y
+  cutdowns sin nueva inferencia consumen `0 credits`, aunque sí capacidad.
+- **Rights outside credits**: voz/likeness, música, stock, talento, sync/master, territorio, plazo,
+  exclusividad y buyout nunca se compran con saldo.

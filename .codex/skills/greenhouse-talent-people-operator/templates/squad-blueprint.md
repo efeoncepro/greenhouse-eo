@@ -5,7 +5,10 @@
 ## 0. Encabezado
 
 - **Cliente / engagement:** <nombre>
-- **Modo:** Managed Squad · / · Staff Augmentation *(elegir; un servicio/RFP = Managed Squad)*
+- **Modelo de entrega:** Managed Squad · / · Staff Augmentation *(Studio Access no usa este blueprint salvo que tenga una lane humana separada)*
+- **Forma de engagement:** On-Going · / · On-Demand · / · Sample Sprint
+- **Lane dentro de un híbrido (si aplica):** <lane + accountability; no escribir solo “híbrido”>
+- **Modo operativo del Studio (solo si aplica):** efeonce-managed · / · co-operated · / · client-operated *(no reemplaza el modelo de entrega)*
 - **Alcance que dimensiona el squad:** <entregables clave por período — ej. "8 artículos/mes + SEO/AEO + multimedia + reportería">
 - **Total FTE dedicado:** <~X,X FTE>
 - **Account Lead (interlocutor único):** <rol + seniority>
