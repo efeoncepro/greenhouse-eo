@@ -17,6 +17,7 @@
 export const RENDERER_GTM_EVENTS = {
   viewed: 'greenhouse_cta_viewed',
   clicked: 'greenhouse_cta_clicked',
+  actionStarted: 'greenhouse_cta_action_started',
   dismissed: 'greenhouse_cta_dismissed',
   formOpened: 'greenhouse_cta_form_opened',
   formSubmitted: 'greenhouse_cta_form_submitted',

@@ -60,7 +60,13 @@ export type CtaSurfaceStatus = (typeof CTA_SURFACE_STATUSES)[number]
  * demand-driven — extender este enum + `action-registry.ts` + el espejo del renderer
  * JUNTOS (un kind sin entry registrado no publica ni renderiza: fail-closed).
  */
-export const CTA_ACTION_KINDS = ['open_growth_form', 'link_url', 'open_think_tool', 'book_meeting'] as const
+export const CTA_ACTION_KINDS = [
+  'open_growth_form',
+  'link_url',
+  'open_think_tool',
+  'book_meeting',
+  'open_meeting_scheduler',
+] as const
 export type CtaActionKind = (typeof CTA_ACTION_KINDS)[number]
 
 /** Kinds de la familia `navigate` (proyección href + newContext; executor anchor nativo). */
@@ -74,11 +80,11 @@ export type CtaNavigateActionKind = (typeof CTA_NAVIGATE_ACTION_KINDS)[number]
  * in-place; `navigate` es navegación real del browser (anchor nativo). El renderer
  * dispatchea SOLO por familia — nunca lógica por-kind duplicada en cada consumer.
  */
-export const CTA_ACTION_EXECUTION_FAMILIES = ['growth_form', 'navigate'] as const
+export const CTA_ACTION_EXECUTION_FAMILIES = ['growth_form', 'navigate', 'meeting_scheduler'] as const
 export type CtaActionExecutionFamily = (typeof CTA_ACTION_EXECUTION_FAMILIES)[number]
 
 /** Expectativa de destino (expectation integrity: el label debe coincidir con esto). */
-export const CTA_ACTION_DESTINATION_EXPECTATIONS = ['form', 'internal_page', 'think_tool', 'booking_page'] as const
+export const CTA_ACTION_DESTINATION_EXPECTATIONS = ['form', 'internal_page', 'think_tool', 'booking_page', 'scheduler'] as const
 export type CtaActionDestinationExpectation = (typeof CTA_ACTION_DESTINATION_EXPECTATIONS)[number]
 
 /** Política de contexto de navegación. Default seguro: mismo contexto; `new_context_allowed` solo habilita el opt-in del autor, nunca lo impone. */
@@ -156,6 +162,16 @@ export const CTA_ACTION_KIND_METADATA: Readonly<Record<CtaActionKind, CtaActionK
     failureReasons: ['action_policy_invalid', 'action_destination_invalid'],
     telemetryKind: 'book_meeting',
   },
+  open_meeting_scheduler: {
+    kind: 'open_meeting_scheduler',
+    executionFamily: 'meeting_scheduler',
+    destinationExpectation: 'scheduler',
+    navigationContext: 'same_context',
+    supportsInlineContinuation: false,
+    requiredPolicyFields: ['meetingSurfaceId', 'schedulerKey'],
+    failureReasons: ['action_policy_invalid', 'action_destination_invalid', 'action_destination_unavailable'],
+    telemetryKind: 'open_meeting_scheduler',
+  },
 }
 
 /** Espejo browser-safe kind→familia para el executor (parity test contra la metadata). */
@@ -164,6 +180,7 @@ export const CTA_ACTION_KIND_FAMILIES: Readonly<Record<CtaActionKind, CtaActionE
   link_url: 'navigate',
   open_think_tool: 'navigate',
   book_meeting: 'navigate',
+  open_meeting_scheduler: 'meeting_scheduler',
 }
 
 /** Tier A — evidencia de conversión audit-grade (arch §9.4). Exposición (eligible/suppressed/viewed) es Tier B, FUERA de este ledger. */
@@ -263,6 +280,18 @@ export const ctaBookMeetingPolicySchema = z.object({
 export type CtaBookMeetingPolicy = z.infer<typeof ctaBookMeetingPolicySchema>
 
 /**
+ * Adapter nativo de agenda. La policy guarda sólo la autoridad lógica del
+ * scheduler; el resolver comprueba que el binding esté activo y proyecta un
+ * fallback gobernado. No expone IDs de HubSpot ni credenciales.
+ */
+export const ctaOpenMeetingSchedulerPolicySchema = z.object({
+  kind: z.literal('open_meeting_scheduler'),
+  meetingSurfaceId: z.string().regex(/^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/),
+  schedulerKey: z.string().regex(/^[a-z0-9][a-z0-9_-]{2,63}$/),
+})
+export type CtaOpenMeetingSchedulerPolicy = z.infer<typeof ctaOpenMeetingSchedulerPolicySchema>
+
+/**
  * Unión discriminada de action policies (TASK-1431). El shape por kind vive junto a
  * su entry del registry (`action-registry.ts` = SoT de validación server-side); esta
  * unión existe para tipado/authoring. NUNCA cruza al browser.
@@ -272,6 +301,7 @@ export const ctaActionPolicySchema = z.discriminatedUnion('kind', [
   ctaLinkUrlPolicySchema,
   ctaOpenThinkToolPolicySchema,
   ctaBookMeetingPolicySchema,
+  ctaOpenMeetingSchedulerPolicySchema,
 ])
 export type CtaActionPolicy = z.infer<typeof ctaActionPolicySchema>
 
@@ -423,6 +453,13 @@ export const ctaRenderLinkUrlActionSchema = buildNavigateRenderActionSchema('lin
 export const ctaRenderOpenThinkToolActionSchema = buildNavigateRenderActionSchema('open_think_tool')
 export const ctaRenderBookMeetingActionSchema = buildNavigateRenderActionSchema('book_meeting')
 
+export const ctaRenderOpenMeetingSchedulerActionSchema = z.object({
+  kind: z.literal('open_meeting_scheduler'),
+  meetingSurfaceId: z.string().min(1).max(80),
+  schedulerKey: z.string().min(3).max(64),
+  fallbackHref: z.string().url().max(CTA_ACTION_DESTINATION_MAX),
+})
+
 export type CtaRenderNavigateAction =
   | z.infer<typeof ctaRenderLinkUrlActionSchema>
   | z.infer<typeof ctaRenderOpenThinkToolActionSchema>
@@ -438,6 +475,7 @@ export const ctaRenderActionSchema = z.discriminatedUnion('kind', [
   ctaRenderLinkUrlActionSchema,
   ctaRenderOpenThinkToolActionSchema,
   ctaRenderBookMeetingActionSchema,
+  ctaRenderOpenMeetingSchedulerActionSchema,
 ])
 export type CtaRenderAction = z.infer<typeof ctaRenderActionSchema>
 
@@ -548,6 +586,7 @@ export type CtaIngestRejectionReason = (typeof CTA_INGEST_REJECTION_REASONS)[num
 export const CTA_GTM_EVENT_NAMES = [
   'greenhouse_cta_viewed',
   'greenhouse_cta_clicked',
+  'greenhouse_cta_action_started',
   'greenhouse_cta_dismissed',
   'greenhouse_cta_form_opened',
   'greenhouse_cta_form_submitted',

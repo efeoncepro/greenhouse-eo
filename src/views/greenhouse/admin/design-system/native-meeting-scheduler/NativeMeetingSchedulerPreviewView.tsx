@@ -5,11 +5,17 @@ import { useEffect, useRef, useState } from 'react'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
+import GlobalStyles from '@mui/material/GlobalStyles'
 import Stack from '@mui/material/Stack'
 import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Typography from '@mui/material/Typography'
 
+import { CTA_FIXTURES } from '@/growth-cta-renderer/fixtures'
+import { MeetingActivationController } from '@/growth-cta-renderer/meeting-action'
+import { CtaRenderer } from '@/growth-cta-renderer/renderer'
+import { resolveCtaSystemCopy } from '@/growth-cta-renderer/copy'
+import { ensureStylesInjected as ensureCtaStyles } from '@/growth-cta-renderer/styles'
 import { createMeetingFixtureApi, type MeetingFixtureOutcome } from '@/growth-meeting-renderer/fixtures'
 import { MeetingRenderer } from '@/growth-meeting-renderer/renderer'
 import { ensureMeetingStyles } from '@/growth-meeting-renderer/styles'
@@ -70,11 +76,97 @@ const SchedulerCanvas = ({ outcome }: { outcome: MeetingFixtureOutcome }) => {
   return <div ref={hostRef} className='ghm-scope' data-capture='native-meeting-scheduler-canvas' />
 }
 
+const GrowthCtaSchedulerSeam = ({ outcome }: { outcome: MeetingFixtureOutcome }) => {
+  const hostRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    const host = hostRef.current
+
+    if (!host) return
+
+    ensureCtaStyles(document)
+    ensureMeetingStyles(document)
+
+    const contract = CTA_FIXTURES.nativeMeetingScheduler.build()
+
+    if (contract.action.kind !== 'open_meeting_scheduler') return
+
+    const controller = new MeetingActivationController({
+      doc: document,
+      action: contract.action,
+      baseUrl: window.location.origin,
+      placement: 'growth_cta_preview',
+      copy: resolveCtaSystemCopy(),
+      createSchedulerElement: doc => {
+        const element = doc.createElement('div')
+
+        element.className = 'ghm-scope'
+        element.setAttribute('data-capture', 'growth-cta-native-scheduler')
+
+        const meeting = new MeetingRenderer(element, {
+          api: createMeetingFixtureApi(outcome),
+          turnstile: {
+            mount({ onToken }) {
+              onToken('preview-captcha-token')
+
+              return { destroy() {} }
+            },
+          },
+          surfaceId: 'greenhouse-design-system',
+          schedulerKey: 'efeonce-discovery-30',
+          requestedTimezone: 'America/Santiago',
+          emergencyFallbackUrl: 'https://meetings.hubspot.com/efeonce',
+          now: () => new Date('2026-07-21T12:00:00.000Z'),
+          activationMode: 'dialog',
+          telemetryBase: {
+            scheduler_key: 'efeonce-discovery-30', surface_id: 'greenhouse-design-system',
+            placement: 'growth_cta_preview', renderer_version: 'preview', contract_version: 'growth-meeting-scheduler.v1',
+          },
+        })
+
+        void meeting.load()
+
+        return { element, dispose: () => meeting.destroy() }
+      },
+    })
+
+    const renderer = new CtaRenderer({
+      root: host,
+      contract,
+      copy: resolveCtaSystemCopy(),
+      telemetry: { emit: () => undefined },
+      onPrimary: async () => false,
+      onTaskPrimary: invoker => controller.open(invoker),
+      onTaskIntent: () => { void controller.prewarm() },
+      onIngest: () => undefined,
+    })
+
+    host.classList.add('ghc-scope')
+    renderer.render()
+
+    return () => {
+      renderer.destroy()
+      controller.dispose()
+    }
+  }, [outcome])
+
+  return <div ref={hostRef} data-capture='growth-cta-meeting-launcher' />
+}
+
 const NativeMeetingSchedulerPreviewView = () => {
   const [outcome, setOutcome] = useState<MeetingFixtureOutcome>('confirmed')
 
   return (
-    <Box
+    <>
+      <GlobalStyles
+        styles={{
+          '@media (max-width: 650px)': {
+            '.ts-vertical-layout-header': { display: 'none !important' },
+            '[data-capture="dashboard-floating-actions"]': { display: 'none !important' }
+          }
+        }}
+      />
+      <Box
       sx={{
         p: { xs: 2, md: 4 },
         width: { xs: 'calc(100dvw - 24px)', md: '100%' },
@@ -110,6 +202,18 @@ const NativeMeetingSchedulerPreviewView = () => {
         </ToggleButtonGroup>
       </Stack>
 
+      <Card variant='outlined' sx={{ mb: 4, borderRadius: theme => `${theme.shape.customBorderRadius.lg}px` }} data-capture='growth-cta-scheduler-seam'>
+        <CardContent>
+          <Typography variant='overline' color='primary'>Growth CTA synergy</Typography>
+          <Typography variant='h6' sx={{ mb: 0.5 }}>Launcher compacto, agenda rica bajo demanda</Typography>
+          <Typography variant='body2' color='text.secondary' sx={{ mb: 3, maxWidth: 760 }}>
+            El CTA conserva su tamaño. En desktop abre un diálogo y en móvil una task surface full-screen; cerrar y
+            reabrir mantiene el mismo flujo en memoria.
+          </Typography>
+          <GrowthCtaSchedulerSeam outcome={outcome} />
+        </CardContent>
+      </Card>
+
       <SchedulerCanvas key={outcome} outcome={outcome} />
 
       <Card
@@ -131,7 +235,8 @@ const NativeMeetingSchedulerPreviewView = () => {
           </Box>
         </CardContent>
       </Card>
-    </Box>
+      </Box>
+    </>
   )
 }
 

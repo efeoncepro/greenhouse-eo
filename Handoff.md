@@ -21,39 +21,23 @@
 
 ## Pendientes inmediatos
 
-- **`TASK-1509` / `TASK-1510` IN-PROGRESS (Native Meeting Scheduler, `EPIC-023`).** El operador confirmó
-  productización y autorizó subagentes. Dos objetivos load-bearing: calendario Efeonce moderno y funnel GTM/GA4
-  completo, con `generate_lead` sólo desde recibo server-confirmed. **Foundation TASK-1509 ya está code-complete y
-  probada contra dev**: ADR aceptado, DTO/provider HubSpot estricto, ledger Growth dedicado con estados
-  `ambiguous`/`provider_created_invalid`, HMAC+rate buckets, config/availability/book, Turnstile hostname/action,
-  signals y contrato `gh_meeting_step_reached`. La migración dev está aplicada; el race live produjo un solo claim,
-  conflictos/replay correctos y cero residuo; el secret HMAC dedicado + IAM runtime resuelve por el consumer real;
-  HubSpot Scheduler read está saludable. TASK-1510 adoptó **Calendar Command Center adaptativo**: un controller,
-  recipes `guided|split|command` resueltas por contenedor con hysteresis, navegación progresiva móvil, calendario
-  mensual semántico, agenda por período y formulario/Turnstile. `activation-mode`/`max-recipe` ya no remontan el
-  intent; `date_selected` sólo nace de acción humana. El GVC premium local
-  `2026-07-21T09-35-05_native-meeting-scheduler` pasó 1440/390, 22 frames, targets 44 px, teclado/foco,
-  reduced-motion/contraste/performance, enterprise rubric y runtime sin errores; no se promovió baseline sin
-  aprobación humana. GTM workspace ID 6 pasó readback + quick_preview con 10 DLVs, incluidas
-  `presentation_variant`/`activation_mode`, sin versión/publicación. Pendientes: adapter CTA versionado
-  dialog/full-screen, deploy/read staging, dossier staging, binding activo + controlled booking/replay, host pilot y publish
-  GTM/flag flips con confirmaciones humanas propias.
-  `book_meeting` de TASK-1431
-  sigue navigation-only y no se toca. HubSpot Scheduler/Office 365/Teams siguen SoT; iframe/link permanece fallback
-  hasta pilot y verificación. Trabajo en `develop`, sin branch/worktree; `docs/ui/creative-studio/` es ajeno y no se toca.
+- **`TASK-1509` / `TASK-1510` IN-PROGRESS (Native Meeting Scheduler, `EPIC-023`).** Objetivos load-bearing:
+  calendario Efeonce moderno y funnel GTM/GA4 con `generate_lead` sólo desde recibo server-confirmed. TASK-1509 está
+  code-complete y probada en dev (HubSpot provider/DTO, ledger, HMAC/rate limits, Turnstile y race live); TASK-1510
+  implementa **Temporal Operations Desk** con recetas `guided|split|command`, calendario/agenda semánticos, timezone
+  visitor-aware y fallback Santiago. El adapter CTA aditivo `open_meeting_scheduler` valida `surface + scheduler key`,
+  lazy-loads y abre diálogo desktop/full-screen móvil preservando una instancia; `book_meeting` sigue navigation-only.
+  GVC CTA `.captures/2026-07-21T11-22-29_growth-cta-native-meeting` pasó 10 frames desktop/mobile.
 
-  **Timezone visitor-aware cerrada localmente:** el componente detecta la zona IANA del navegador y config,
-  availability y booking la conservan hasta HubSpot; `America/Santiago` queda sólo como fallback de la surface.
-  El adapter canoniza aliases, rechaza zonas inválidas antes del provider y valida `bookingTimezone`; la UI evita
-  drift de date-only y desambigua horas repetidas por DST. HubSpot read-only respondió 197 slots reales para
-  `America/Lima` sobre el mismo calendario Office 365; el ejemplo `13:15Z` equivale a 08:15 Lima / 09:15 Santiago.
-  Los campos migraron de SVG manual a un subset portable Iconify/Tabler generado en build. Suite focal: 70 passed,
-  1 skipped; typecheck/lint verdes; GVC `2026-07-21T09-52-43_native-meeting-scheduler` pasó 22 frames
-  desktop/mobile con iconografía revisada. El scheduler reutiliza ahora el gate canónico de correo corporativo de
-  Growth Forms: endpoint debounced autorizado/rate-limited en UI y revalidación fail-closed dentro del command antes
-  de CAPTCHA, disponibilidad, claim o HubSpot; sin listas duplicadas ni PII en telemetría. GVC
-  `2026-07-21T10-03-00_native-meeting-scheduler` pasó 24 frames desktop/mobile e incluye rechazo corporativo.
-  Build productivo verde. No hubo booking ni mutación externa.
+  El formulario ahora valida progresivamente `neutral → invalid/pending → valid`: blur activa feedback, la corrección
+  revalida al escribir, email separa sintaxis/política corporativa y consentimiento responde al cambio. Copy + Tabler +
+  ARIA live, sin layout shift y con reduced motion. GVC `.captures/2026-07-21T11-37-07_native-meeting-scheduler` pasó
+  39 frames 1440/820/390; 73 pruebas del dominio, TypeScript, ESLint y build productivo verdes.
+
+  GTM workspace 6 pasó readback/quick preview con 10 DLVs, sin versión/publicación. Pendientes: deploy/read staging,
+  dossier de estados reales, binding + controlled booking/replay, host pilot y publish/flags con confirmación humana.
+  HubSpot/Office 365/Teams siguen SoT; iframe/link permanece fallback. Trabajo en `develop`; `docs/ui/creative-studio/`
+  es ajeno y no se toca.
 
 - **`TASK-1366` COMPLETE / CONDITIONAL PASS (HubSpot Scheduler Booking Equivalence Spike, `EPIC-023`).**
   Build HubSpot `#27` desplegado/reinstalado con scope Scheduler mínimo y sin rotar el token gobernado. Booking

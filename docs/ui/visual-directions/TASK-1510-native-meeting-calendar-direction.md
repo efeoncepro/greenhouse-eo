@@ -15,20 +15,26 @@ truth; the renderer only presents governed availability and sends a single idemp
 
 ## Benchmarked directions
 
-### A. Calendar Command Center — selected
+### A. Temporal Operations Desk — selected (2026 premium pass)
 
-- Three-part desktop composition: meeting context, full month, selected-day slots.
+- Three-part desktop composition: compact meeting context, full month workspace, selected-day availability rail.
 - Calendar semantics remain visible: month/year, weekday headers, complete week rows, unavailable dates, selected date.
-- Availability density is visible inside each bookable date; the selected slot becomes a compact appointment summary beside the calendar.
+- Availability density is visible inside each bookable date through a restrained three-level meter; the selected slot becomes a compact booking brief beside the calendar.
 - Closest to the stable mental model used by Calendly, Cal.com and Google appointment schedules.
 
-### B. Horizontal week strip + density bars — rejected
+### B. Editorial Concierge — rejected after implemented baseline review
+
+- The large dark narrative rail and atmospheric treatment created a strong campaign impression.
+- It consumed too much first-fold space, made the scheduler feel promotional and weakened productive density.
+- The implemented baseline showed that more decorative depth did not improve date/time comparison.
+
+### C. Horizontal week strip + density bars — rejected
 
 - Fast when the user already understands the product.
 - Read as an availability carousel, not as a calendar.
 - Density bars created visual novelty without improving the booking decision.
 
-### C. Agenda-only grouped date cards — rejected for primary desktop
+### D. Agenda-only grouped date cards — rejected for primary desktop
 
 - Strong mobile fallback and useful for extremely sparse availability.
 - Weak month context and poor scan of distance between dates.
@@ -36,12 +42,13 @@ truth; the renderer only presents governed availability and sends a single idemp
 
 ## Art direction
 
-- Editorial Efeonce context panel in deep ink with a restrained orbital motif, but subordinate to the calendar.
-- Paper-like calendar surface with strong typographic month label, quiet grid and one controlled depth hierarchy.
+- Compact Efeonce context rail in deep ink; brand atmosphere is reduced to one quiet edge glow and never competes with controls.
+- Paper-like calendar workspace with a strong typographic month label, continuous grid rhythm and one controlled depth hierarchy.
 - Availability uses shape + label + contrast, never color alone.
-- Selected date is a filled circle; today/available/selected states remain distinguishable.
+- Selected date is a contained cell state with an explicit mark; today, availability density, focus and selection remain distinguishable.
 - Time slots form a real daily agenda grouped as morning/afternoon/evening, not pills floating without a date relationship.
-- Subtle gradients are allowed only to connect agenda/selection state; no glass effects, particles or decorative spectacle.
+- The selected appointment is a structured booking brief, not a gradient hero card.
+- Subtle gradients are allowed only as ambient surface tint; no glass effects, particles, giant pills or decorative spectacle.
 
 ## Modern web mapping
 
@@ -66,10 +73,10 @@ the repo contract reserves FullCalendar for calendar visualization. Do not add R
 
 ## Decision
 
-Implement direction A as the sole active visual thesis: context rail, complete monthly calendar and selected-day
-agenda in one inline scene. Preserve the renderer/state/telemetry foundation, but remove the horizontal day strip
-and abstract density bars. The user selects a date and time before the only mutating action; selection depth and
-motion must preserve the spatial relationship date → daily agenda → appointment summary.
+Implement direction A as the sole active visual thesis: compact command rail, dense monthly workspace and structured
+availability rail in one inline scene. Preserve the renderer/state/telemetry foundation and adaptive recipes. The user
+selects a date and time before the only mutating action; selection depth and motion preserve the spatial relationship
+date → daily agenda → booking brief without replaying an entrance animation for the entire scene.
 
 ## Desktop target
 
@@ -90,7 +97,7 @@ stick only after the slot list in normal flow, never obscuring unreviewed slots 
 - Calendar/agenda surfaces: `--gh-meeting-paper`, `--gh-meeting-paper-alt`, `--gh-meeting-line*`.
 - Available/selected/action: `--gh-meeting-accent*` plus border, label/dot and `aria-pressed`.
 - State: `--gh-meeting-danger|warning|success`; never use semantic color as decorative differentiation.
-- Geometry/motion: `--gh-meeting-radius*`, `--gh-meeting-shadow`, 200 ms canonical duration and decelerated easing.
+- Geometry/motion: moderate 10–18 px radii, restrained shadow, 140 ms hover and 200 ms causal selection with decelerated easing.
 
 ## Anti-patterns
 

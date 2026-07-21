@@ -20,7 +20,24 @@ if (!['preview', 'beta', 'stable'].includes(channel)) {
 const outDir = resolve(repoRoot, 'public/growth-meetings')
 const entry = resolve(repoRoot, 'src/growth-meeting-renderer/index.ts')
 const outFile = resolve(outDir, `renderer-${channel}.js`)
-const iconNames = ['user', 'id', 'mail', 'building-skyscraper']
+
+const iconNames = [
+  'user',
+  'id',
+  'mail',
+  'building-skyscraper',
+  'clock',
+  'video',
+  'world',
+  'chevron-left',
+  'chevron-right',
+  'check',
+  'calendar-check',
+  'arrow-right',
+  'circle-check',
+  'alert-circle',
+  'loader-2',
+]
 
 await mkdir(outDir, { recursive: true })
 

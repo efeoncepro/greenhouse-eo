@@ -168,4 +168,24 @@ export const CTA_FIXTURES: Record<string, { label: string; build: () => CtaRende
         },
       }),
   },
+  nativeMeetingScheduler: {
+    label: 'open_meeting_scheduler (task surface nativa)',
+    build: () =>
+      base({
+        slug: 'native-meeting-scheduler',
+        action: {
+          kind: 'open_meeting_scheduler',
+          meetingSurfaceId: 'efeonce-public-site',
+          schedulerKey: 'efeonce-discovery-30',
+          fallbackHref: 'https://meetings.hubspot.com/efeonce/diagnostico',
+        },
+        content: {
+          eyebrow: 'Conversemos',
+          headline: 'Encuentra un horario sin salir de esta página',
+          body: 'La agenda se adapta a tu zona horaria y al espacio disponible.',
+          ctaLabel: 'Ver disponibilidad',
+          dismissLabel: 'Ahora no',
+        },
+      }),
+  },
 }

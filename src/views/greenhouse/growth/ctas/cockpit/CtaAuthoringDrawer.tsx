@@ -70,19 +70,21 @@ export interface ReviewCheck {
   detail: string
 }
 
-const PROMISE_RULES: Array<{ pattern: RegExp; expectedKind: string }> = [
-  { pattern: /agend|reuni[oó]n|demo|llamada/i, expectedKind: 'book_meeting' },
-  { pattern: /suscr[ií]b|reg[ií]str|formulario/i, expectedKind: 'open_growth_form' },
+const PROMISE_RULES: Array<{ pattern: RegExp; expectedKinds: string[] }> = [
+  { pattern: /agend|reuni[oó]n|demo|llamada/i, expectedKinds: ['book_meeting', 'open_meeting_scheduler'] },
+  { pattern: /suscr[ií]b|reg[ií]str|formulario/i, expectedKinds: ['open_growth_form'] },
 ]
 
 export const buildReviewChecks = (draft: CtaAuthoringDraft, previewDegraded: boolean): ReviewCheck[] => {
   const C = A.review.checks
   const metadata = CTA_ACTION_KIND_METADATA[draft.actionKind]
   const actionLabel = A.action.kinds[draft.actionKind]?.label ?? draft.actionKind
-  const destinationOk = draft.actionDestination.trim().length > 0
+
+  const destinationOk = draft.actionDestination.trim().length > 0 &&
+    (draft.actionKind !== 'open_meeting_scheduler' || draft.actionSecondaryDestination.trim().length > 0)
 
   const promiseRule = PROMISE_RULES.find(rule => rule.pattern.test(draft.content.ctaLabel))
-  const copyMatchOk = !promiseRule || promiseRule.expectedKind === draft.actionKind
+  const copyMatchOk = !promiseRule || promiseRule.expectedKinds.includes(draft.actionKind)
 
   const interruptive = isInterruptivePlacement(draft.placement)
 
@@ -340,7 +342,8 @@ const CtaAuthoringDrawer = ({ open, existingSlug, initialDraft, onClose, onSubmi
       )
     }
 
-    if (fromStep === 4) return draft.actionDestination.trim().length > 0
+    if (fromStep === 4) return draft.actionDestination.trim().length > 0 &&
+      (draft.actionKind !== 'open_meeting_scheduler' || draft.actionSecondaryDestination.trim().length > 0)
 
     if (fromStep === 5) {
       if (!interruptive) return true
@@ -609,6 +612,7 @@ const CtaAuthoringDrawer = ({ open, existingSlug, initialDraft, onClose, onSubmi
                       patch(next => {
                         next.actionKind = kind
                         next.actionDestination = ''
+                        next.actionSecondaryDestination = ''
                       })
                     }
                   />
@@ -628,7 +632,18 @@ const CtaAuthoringDrawer = ({ open, existingSlug, initialDraft, onClose, onSubmi
               value={draft.actionDestination}
               onChange={event => patch(next => (next.actionDestination = event.target.value))}
             />
-            {draft.actionKind !== 'open_growth_form' ? (
+            {draft.actionKind === 'open_meeting_scheduler' ? (
+              <CustomTextField
+                fullWidth
+                required
+                label={actionCopy?.secondaryField ?? 'Scheduler key'}
+                placeholder={actionCopy?.secondaryPlaceholder ?? 'ej. efeonce-discovery-30'}
+                helperText={actionCopy?.secondaryHelper ?? A.action.fieldHelper}
+                value={draft.actionSecondaryDestination}
+                onChange={event => patch(next => (next.actionSecondaryDestination = event.target.value))}
+              />
+            ) : null}
+            {draft.actionKind !== 'open_growth_form' && draft.actionKind !== 'open_meeting_scheduler' ? (
               <Stack
                 direction='row'
                 alignItems='center'

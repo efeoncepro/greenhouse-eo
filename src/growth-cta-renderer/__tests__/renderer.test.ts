@@ -9,6 +9,8 @@ import { RENDERER_GTM_EVENTS, type RendererGtmEvent, type TelemetryPayload } fro
 const makeRenderer = (overrides: {
   fixture?: keyof typeof CTA_FIXTURES
   onPrimary?: (slot: HTMLElement) => Promise<boolean>
+  onTaskPrimary?: (invoker: HTMLButtonElement) => Promise<boolean>
+  onTaskIntent?: () => void
   emitViewedOnRender?: boolean
 } = {}) => {
   const root = document.createElement('greenhouse-cta') as HTMLElement
@@ -26,6 +28,8 @@ const makeRenderer = (overrides: {
     ctaLocation: 'report_followup',
     pageUri: '/blog/post',
     onPrimary: overrides.onPrimary ?? (async () => true),
+    onTaskPrimary: overrides.onTaskPrimary,
+    onTaskIntent: overrides.onTaskIntent,
     onIngest: (eventKind, extra) => ingested.push({ eventKind, extra: extra as Record<string, unknown> | undefined }),
     emitViewedOnRender: overrides.emitViewedOnRender,
   })
@@ -141,6 +145,39 @@ describe('CtaRenderer', () => {
     expect(resolveVisualUrl('/images/x.webp')).toBe('/images/x.webp')
     expect(resolveVisualUrl('gs://bucket/x.webp')).toBeNull()
     expect(resolveVisualUrl(undefined)).toBeNull()
+  })
+
+  it('scheduler nativo abre una task surface sin reemplazar ni expandir el CTA', async () => {
+    const opened = vi.fn(async () => true)
+    const intent = vi.fn()
+
+    const { root, renderer, emitted, ingested } = makeRenderer({
+      fixture: 'nativeMeetingScheduler',
+      onTaskPrimary: opened,
+      onTaskIntent: intent,
+    })
+
+    renderer.render()
+    const primary = root.querySelector('.ghc-primary') as HTMLButtonElement
+
+    primary.dispatchEvent(new Event('focus'))
+    primary.click()
+    await vi.waitFor(() => expect(opened).toHaveBeenCalledTimes(1))
+
+    expect(intent).toHaveBeenCalledTimes(1)
+    expect(root.dataset.ghcState).toBe('visible')
+    expect(root.querySelector('.ghc-form-slot')).toBeNull()
+    expect(emitted.map(item => item.event)).toEqual([
+      RENDERER_GTM_EVENTS.viewed,
+      RENDERER_GTM_EVENTS.clicked,
+      RENDERER_GTM_EVENTS.actionStarted,
+    ])
+    expect(ingested.map(item => item.eventKind)).toEqual(['viewed', 'clicked', 'action_started'])
+
+    primary.click()
+    await vi.waitFor(() => expect(opened).toHaveBeenCalledTimes(2))
+    expect(emitted.filter(item => item.event === RENDERER_GTM_EVENTS.clicked)).toHaveLength(1)
+    expect(emitted.filter(item => item.event === RENDERER_GTM_EVENTS.actionStarted)).toHaveLength(1)
   })
 })
 

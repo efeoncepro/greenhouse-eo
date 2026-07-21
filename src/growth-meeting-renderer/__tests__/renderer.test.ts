@@ -118,8 +118,70 @@ describe('MeetingRenderer', () => {
 
     expect(host.querySelectorAll('.ghm-field-error')).toHaveLength(5)
     expect(document.activeElement).toBe(host.querySelector('.ghm-error-summary'))
-    expect(host.querySelector("[name='email']")?.getAttribute('aria-describedby')).toContain('email-error')
+    expect(host.querySelector("[name='email']")?.getAttribute('aria-describedby')).toContain('email-feedback')
     renderer.destroy()
+  })
+
+  it('valida progresivamente al salir del campo y confirma la corrección mientras se escribe', async () => {
+    const { host, renderer } = await mount()
+
+    ;(host.querySelector('.ghm-slot') as HTMLButtonElement).click()
+    ;(host.querySelector('.ghm-agenda-action') as HTMLButtonElement).click()
+
+    const firstName = host.querySelector<HTMLInputElement>("[name='firstName']")!
+    const field = firstName.closest<HTMLElement>('.ghm-field')!
+    const feedback = field.querySelector<HTMLElement>('.ghm-field-feedback')!
+
+    expect(field.dataset.validation).toBe('neutral')
+    expect(firstName.getAttribute('aria-invalid')).toBe('false')
+
+    firstName.dispatchEvent(new Event('blur'))
+
+    expect(field.dataset.validation).toBe('invalid')
+    expect(feedback.textContent).toBe('Este campo es obligatorio.')
+    expect(field.querySelector('.tabler-alert-circle')).not.toBeNull()
+
+    firstName.value = 'Ada'
+    firstName.dispatchEvent(new Event('input', { bubbles: true }))
+
+    expect(field.dataset.validation).toBe('valid')
+    expect(firstName.getAttribute('aria-invalid')).toBe('false')
+    expect(feedback.textContent).toBe('Listo.')
+    expect(field.querySelector('.tabler-circle-check')).not.toBeNull()
+    renderer.destroy()
+  })
+
+  it('separa la validación sintáctica del correo de la verificación corporativa', async () => {
+    vi.useFakeTimers()
+
+    const { host, renderer } = await mount()
+
+    ;(host.querySelector('.ghm-slot') as HTMLButtonElement).click()
+    ;(host.querySelector('.ghm-agenda-action') as HTMLButtonElement).click()
+
+    const email = host.querySelector<HTMLInputElement>("[name='email']")!
+    const field = email.closest<HTMLElement>('.ghm-field')!
+
+    email.value = 'correo-incompleto'
+    email.dispatchEvent(new Event('input', { bubbles: true }))
+    email.dispatchEvent(new Event('blur'))
+
+    expect(field.dataset.validation).toBe('invalid')
+    expect(field.textContent).toContain('Escribe un correo válido.')
+
+    email.value = 'ada@empresa.cl'
+    email.dispatchEvent(new Event('input', { bubbles: true }))
+
+    expect(field.dataset.validation).toBe('pending')
+    expect(field.textContent).toContain('Verificando correo de trabajo')
+    expect(field.querySelector('.tabler-loader-2')).not.toBeNull()
+
+    await vi.advanceTimersByTimeAsync(450)
+
+    expect(field.dataset.validation).toBe('valid')
+    expect(field.textContent).toContain('Correo corporativo verificado.')
+    renderer.destroy()
+    vi.useRealTimers()
   })
 
   it('usa el subset canónico Iconify/Tabler para los campos, sin SVG manual', async () => {
@@ -135,6 +197,23 @@ describe('MeetingRenderer', () => {
     expect(host.querySelector('.ghm-field-icon.tabler-mail')).not.toBeNull()
     expect(host.querySelector('.ghm-field-icon.tabler-building-skyscraper')).not.toBeNull()
     expect(host.querySelector('svg.ghm-field-icon')).toBeNull()
+    renderer.destroy()
+  })
+
+  it('expone navegación roving de calendario con flechas y estados no basados sólo en color', async () => {
+    const { host, renderer } = await mount()
+    const activeDate = host.querySelector<HTMLButtonElement>('.ghm-calendar-day[tabindex="0"]')!
+
+    expect(host.querySelectorAll('.ghm-calendar-day[tabindex="0"]')).toHaveLength(1)
+    expect(activeDate.dataset.date).toBe('2026-07-22')
+    expect(activeDate.querySelector('.ghm-availability-meter')).not.toBeNull()
+    expect(activeDate.querySelector('.tabler-check')).not.toBeNull()
+
+    activeDate.focus()
+    activeDate.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }))
+
+    expect(document.activeElement).toBe(host.querySelector('[data-date="2026-07-23"]'))
+    expect(host.querySelectorAll('.ghm-calendar-day[tabindex="0"]')).toHaveLength(1)
     renderer.destroy()
   })
 

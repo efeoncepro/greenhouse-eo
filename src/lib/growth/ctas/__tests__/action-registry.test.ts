@@ -8,8 +8,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
  */
 
 const formsReadersMock = vi.hoisted(() => ({ getPublishedRenderContractByRef: vi.fn() }))
+const meetingStoreMock = vi.hoisted(() => ({ getMeetingSurfaceAuthority: vi.fn() }))
 
 vi.mock('@/lib/growth/forms/readers', () => formsReadersMock)
+vi.mock('@/lib/growth/meetings/store', () => meetingStoreMock)
 
 import {
   CTA_ACTION_KINDS,
@@ -285,5 +287,46 @@ describe('book_meeting — booking host gobernado, navegación-only', () => {
     } finally {
       vi.unstubAllEnvs()
     }
+  })
+})
+
+describe('open_meeting_scheduler — adapter nativo gobernado', () => {
+  it('proyecta sólo autoridad browser-safe y fallback validado', async () => {
+    meetingStoreMock.getMeetingSurfaceAuthority.mockResolvedValue({
+      surfaceId: 'efeonce-public-site',
+      schedulerKey: 'efeonce-discovery-30',
+      fallbackUrl: 'https://meetings.hubspot.com/efeonce/diagnostico',
+      origins: ['https://efeoncepro.com'],
+      defaultTimezone: 'America/Santiago',
+      defaultLocale: 'es',
+    })
+
+    await expect(resolveCtaAction({
+      kind: 'open_meeting_scheduler',
+      meetingSurfaceId: 'efeonce-public-site',
+      schedulerKey: 'efeonce-discovery-30',
+    })).resolves.toEqual({
+      ok: true,
+      action: {
+        kind: 'open_meeting_scheduler',
+        meetingSurfaceId: 'efeonce-public-site',
+        schedulerKey: 'efeonce-discovery-30',
+        fallbackHref: 'https://meetings.hubspot.com/efeonce/diagnostico',
+      },
+    })
+  })
+
+  it('falla closed si no existe binding activo o el fallback no es gobernado', async () => {
+    meetingStoreMock.getMeetingSurfaceAuthority.mockResolvedValueOnce(null)
+    await expect(resolveCtaAction({
+      kind: 'open_meeting_scheduler', meetingSurfaceId: 'efeonce-public-site', schedulerKey: 'efeonce-discovery-30',
+    })).resolves.toEqual({ ok: false, reason: 'action_destination_unavailable' })
+
+    meetingStoreMock.getMeetingSurfaceAuthority.mockResolvedValueOnce({
+      surfaceId: 'efeonce-public-site', schedulerKey: 'efeonce-discovery-30', fallbackUrl: 'https://evil.example/x',
+    })
+    await expect(resolveCtaAction({
+      kind: 'open_meeting_scheduler', meetingSurfaceId: 'efeonce-public-site', schedulerKey: 'efeonce-discovery-30',
+    })).resolves.toEqual({ ok: false, reason: 'action_destination_invalid' })
   })
 })

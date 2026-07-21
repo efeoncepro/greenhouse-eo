@@ -17,6 +17,7 @@ import 'server-only'
 import { z } from 'zod'
 
 import { getPublishedRenderContractByRef } from '@/lib/growth/forms/readers'
+import { getMeetingSurfaceAuthority } from '@/lib/growth/meetings/store'
 
 import {
   CTA_ACTION_KIND_METADATA,
@@ -29,6 +30,7 @@ import {
   ctaBookMeetingPolicySchema,
   ctaLinkUrlPolicySchema,
   ctaOpenGrowthFormPolicySchema,
+  ctaOpenMeetingSchedulerPolicySchema,
   ctaOpenThinkToolPolicySchema,
 } from './contracts'
 
@@ -235,6 +237,30 @@ const resolveBookMeeting = async (policy: z.output<typeof ctaBookMeetingPolicySc
   }
 }
 
+const resolveOpenMeetingScheduler = async (
+  policy: z.output<typeof ctaOpenMeetingSchedulerPolicySchema>,
+): Promise<CtaActionResolution> => {
+  const authority = await getMeetingSurfaceAuthority(policy.meetingSurfaceId, policy.schedulerKey)
+
+  if (!authority) return { ok: false, reason: 'action_destination_unavailable' }
+
+  const fallback = validateGovernedDestination(authority.fallbackUrl)
+
+  if (!fallback.ok || fallback.url === null || !isGovernedBookingHost(fallback.url.hostname)) {
+    return { ok: false, reason: 'action_destination_invalid' }
+  }
+
+  return {
+    ok: true,
+    action: {
+      kind: 'open_meeting_scheduler',
+      meetingSurfaceId: authority.surfaceId,
+      schedulerKey: authority.schedulerKey,
+      fallbackHref: fallback.href,
+    },
+  }
+}
+
 // ─── Registry exhaustivo (Record por kind — TS obliga a cubrir el enum) ────────
 
 export const CTA_ACTION_REGISTRY: Readonly<Record<CtaActionKind, CtaActionRegistryEntry>> = {
@@ -250,6 +276,11 @@ export const CTA_ACTION_REGISTRY: Readonly<Record<CtaActionKind, CtaActionRegist
     resolveOpenThinkTool,
   ),
   book_meeting: registryEntry(CTA_ACTION_KIND_METADATA.book_meeting, ctaBookMeetingPolicySchema, resolveBookMeeting),
+  open_meeting_scheduler: registryEntry(
+    CTA_ACTION_KIND_METADATA.open_meeting_scheduler,
+    ctaOpenMeetingSchedulerPolicySchema,
+    resolveOpenMeetingScheduler,
+  ),
 }
 
 // ─── Resolución canónica (única puerta: publish gate + render path) ───────────

@@ -197,6 +197,16 @@ Pure CSS container queries own layout-only changes. A bounded `ResizeObserver` m
 - The scheduler bundle and availability request load on activation or strong user intent, not on every collapsed CTA impression. Optional prefetch must respect Save-Data.
 - Once the provider request is dispatched, closing hides rather than destroys the controller. Reopening exposes pending, check-email or terminal state and cannot silently produce a second intent.
 
+#### Native adapter contract (implemented locally 2026-07-21)
+
+- `open_meeting_scheduler` is the additive CTA action kind for native activation. `book_meeting` remains an anchor-only compatibility path.
+- Its server policy contains only `meetingSurfaceId` and `schedulerKey`. The registry requires an active `meeting_surface_binding`, validates its HubSpot fallback and projects `{ meetingSurfaceId, schedulerKey, fallbackHref }`; provider IDs, secrets, origins and PII never enter the render contract.
+- Its execution family is `meeting_scheduler`. The portable CTA renderer lazy-loads `/growth-meetings/renderer-latest.js` only after activation or strong intent; focus/hover prewarm respects Save-Data and 2G and never fetches configuration or availability.
+- One native `<dialog>` owns backdrop, inert/focus containment, Escape, scroll lock and focus return. It is bounded on desktop and becomes `100dvh` full-screen with safe-area padding below 640 px.
+- Closing calls `dialog.close()` and keeps the same `<efeonce-meeting-scheduler>` connected. State, telemetry dedupe, form draft and command/idempotency lifecycle survive reopen; disposal occurs only when the CTA host leaves the document or the contract is replaced.
+- CTA emits `clicked` and `action_started` once for the handoff. The scheduler remains the only funnel and receipt-gated conversion authority, preventing a surface open from becoming a false lead.
+- Authoring uses two explicit governed fields (`meetingSurfaceId`, `schedulerKey`) and never accepts arbitrary provider configuration.
+
 ### Controller and view contract
 
 `MeetingSchedulerController` owns normalized config/availability, selected date and slot, attendee draft, stable idempotency key, command status, Turnstile lifecycle, telemetry dedupe and the server-confirmed receipt transition. Views are stateless projections with typed user intents:

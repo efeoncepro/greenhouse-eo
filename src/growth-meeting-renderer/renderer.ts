@@ -151,9 +151,17 @@ const normalizedEmail = (value: string): string => value.trim().toLowerCase()
 let rendererInstanceSequence = 0
 
 type EmailVerificationState = {
-  status: 'idle' | 'verifying' | 'accepted' | 'rejected' | 'degraded'
+  status: 'idle' | 'queued' | 'verifying' | 'accepted' | 'rejected' | 'degraded'
   email: string
   result?: Extract<MeetingEmailVerificationResult, { outcome: 'ok' }>
+}
+
+type MeetingFormFieldKey = 'firstName' | 'lastName' | 'email' | 'company' | 'processingAccepted'
+type FieldValidationState = 'neutral' | 'pending' | 'valid' | 'invalid'
+
+type MeetingSummarySlot = {
+  startsAt: string
+  durationMinutes?: number
 }
 
 const FIELD_ICON_CLASS: Record<'firstName' | 'lastName' | 'email' | 'company', string> = {
@@ -161,6 +169,35 @@ const FIELD_ICON_CLASS: Record<'firstName' | 'lastName' | 'email' | 'company', s
   lastName: 'tabler-id',
   email: 'tabler-mail',
   company: 'tabler-building-skyscraper',
+}
+
+const uiIcon = (name: string, className = 'ghm-icon'): HTMLElement => {
+  const icon = element('i', `${className} tabler-${name}`)
+
+  icon.setAttribute('aria-hidden', 'true')
+
+  return icon
+}
+
+const dateKeyInTimezone = (date: Date, timezone: string): string => {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: timezone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(date)
+
+  const value = (type: Intl.DateTimeFormatPartTypes): string => parts.find(part => part.type === type)?.value ?? ''
+
+  return `${value('year')}-${value('month')}-${value('day')}`
+}
+
+const shiftDateKey = (date: string, days: number): string => {
+  const value = new Date(`${date}T12:00:00Z`)
+
+  value.setUTCDate(value.getUTCDate() + days)
+
+  return value.toISOString().slice(0, 10)
 }
 
 const fieldIcon = (key: keyof typeof FIELD_ICON_CLASS): HTMLElement => {
@@ -188,6 +225,7 @@ export class MeetingRenderer {
   private emailVerification: EmailVerificationState = { status: 'idle', email: '' }
   private emailVerifyTimer: ReturnType<typeof setTimeout> | null = null
   private emailVerifyController: AbortController | null = null
+  private readonly touchedFields = new Set<MeetingFormFieldKey>()
   private readonly instanceId = ++rendererInstanceSequence
 
   constructor(private readonly host: HTMLElement, private readonly options: MeetingRendererOptions) {
@@ -202,6 +240,7 @@ export class MeetingRenderer {
     this.abortController?.abort()
     this.abortController = new AbortController()
     this.state = initialMeetingRendererState()
+    this.touchedFields.clear()
     this.resetEmailVerification()
     this.navigationView = 'calendar'
     this.observeLayout()
@@ -437,20 +476,29 @@ export class MeetingRenderer {
     const rail = element('header', 'ghm-signal')
     const atmosphere = element('span', 'ghm-signal-atmosphere')
     const eyebrow = element('p', 'ghm-eyebrow', copy.eyebrow)
-    const title = element('h2', 'ghm-title', copy.title)
+    const title = element('h2', 'ghm-title', this.layoutRecipe === 'guided' ? copy.compactTitle : copy.title)
 
     atmosphere.setAttribute('aria-hidden', 'true')
     title.tabIndex = -1
     title.dataset.ghmFocus = ''
-    rail.append(atmosphere, eyebrow, title, element('p', 'ghm-intro', copy.intro))
+    const liveStatus = element('div', 'ghm-live-status')
+
+    liveStatus.append(element('span', 'ghm-live-dot'), element('span', undefined, 'Disponibilidad sincronizada'))
+    rail.append(atmosphere, liveStatus, eyebrow, title, element('p', 'ghm-intro', copy.intro))
 
     const facts = element('div', 'ghm-facts')
 
-    facts.append(
-      element('span', 'ghm-fact', `${this.state.config?.durationsMinutes[0] ?? 30} min`),
-      element('span', 'ghm-fact', 'Microsoft Teams'),
-      element('span', 'ghm-fact', formatMeetingTimezoneLabel(this.timezone(), this.options.now?.())),
-    )
+    for (const [iconName, label] of [
+      ['clock', `${this.state.config?.durationsMinutes[0] ?? 30} min`],
+      ['video', 'Microsoft Teams'],
+      ['world', formatMeetingTimezoneLabel(this.timezone(), this.options.now?.())],
+    ]) {
+      const fact = element('span', 'ghm-fact')
+
+      fact.append(uiIcon(iconName, 'ghm-fact-icon'), element('span', undefined, label))
+      facts.append(fact)
+    }
+
     rail.append(facts, this.renderStepRail())
 
     return rail
@@ -467,6 +515,7 @@ export class MeetingRenderer {
 
       item.dataset.active = String(index === phaseIndex)
       item.dataset.complete = String(index < phaseIndex)
+      if (index === phaseIndex) item.setAttribute('aria-current', 'step')
       steps.append(item)
     }
 
@@ -487,6 +536,15 @@ export class MeetingRenderer {
     }
 
     if (this.state.phase === 'details' || this.state.phase === 'submitting') {
+      const slot = this.state.confirmation?.appointment ?? this.state.selectedSlot
+
+      if (this.layoutRecipe === 'guided' && slot) {
+        const brief = element('div', 'ghm-mobile-appointment')
+
+        brief.append(element('span', 'ghm-agenda-kicker', copy.meetingSummary), this.renderSelection(slot))
+        work.append(brief)
+      }
+
       work.append(this.renderDetails())
 
       return work
@@ -559,24 +617,35 @@ export class MeetingRenderer {
     const days = this.state.availability?.days ?? []
     const referenceDate = this.state.selectedDate ?? days[0]?.date
 
-    header.append(element('div', 'ghm-calendar-panel-title', copy.calendarTitle))
+    const calendarIdentity = element('div', 'ghm-calendar-identity')
+
+    calendarIdentity.append(
+      element('span', 'ghm-calendar-eyebrow', 'Disponibilidad'),
+      element('div', 'ghm-calendar-panel-title', copy.calendarTitle),
+    )
+    header.append(calendarIdentity)
 
     if (referenceDate) {
       const monthNavigation = element('div', 'ghm-month-navigation')
-      const previous = element('button', 'ghm-month-button', '←')
-      const next = element('button', 'ghm-month-button', '→')
+      const previous = element('button', 'ghm-month-button')
+      const next = element('button', 'ghm-month-button')
       const monthOffset = this.state.availability?.monthOffset ?? 0
       const canGoNext = Boolean(this.state.availability?.hasMore) && monthOffset < (this.state.config?.bookingWindow.maxMonthOffset ?? 0)
 
       previous.type = 'button'
+      previous.append(uiIcon('chevron-left'))
       previous.setAttribute('aria-label', copy.previousMonth)
       previous.disabled = monthOffset === 0
       previous.addEventListener('click', () => void this.loadMonth(monthOffset - 1))
       next.type = 'button'
+      next.append(uiIcon('chevron-right'))
       next.setAttribute('aria-label', copy.nextMonth)
       next.disabled = !canGoNext
       next.addEventListener('click', () => void this.loadMonth(monthOffset + 1))
-      monthNavigation.append(previous, element('div', 'ghm-month-label', monthLabel(referenceDate)), next)
+      const visibleMonth = element('div', 'ghm-month-label', monthLabel(referenceDate))
+
+      visibleMonth.setAttribute('aria-live', 'polite')
+      monthNavigation.append(previous, visibleMonth, next)
       header.append(monthNavigation)
     }
 
@@ -589,6 +658,13 @@ export class MeetingRenderer {
     }
 
     const availabilityByDate = new Map(days.map(day => [day.date, day]))
+    const availableDates = days.filter(day => day.slots.length > 0).map(day => day.date).sort()
+
+    const rovingDate = this.state.selectedDate && availableDates.includes(this.state.selectedDate)
+      ? this.state.selectedDate
+      : availableDates[0]
+
+    const today = dateKeyInTimezone(this.options.now?.() ?? new Date(), this.timezone())
     const table = element('table', 'ghm-calendar')
     const caption = element('caption', 'ghm-visually-hidden', `${copy.calendarRegion}: ${monthLabel(referenceDate)}`)
     const head = element('thead')
@@ -624,17 +700,32 @@ export class MeetingRenderer {
           cell.append(element('span', 'ghm-calendar-blank'))
         } else if (day?.slots.length) {
           const button = element('button', 'ghm-calendar-day')
+          const availabilityLevel = day.slots.length >= 6 ? 'high' : day.slots.length >= 3 ? 'medium' : 'low'
+          const isToday = date === today
 
           button.type = 'button'
+          button.tabIndex = date === rovingDate ? 0 : -1
+          button.dataset.date = date
+          button.dataset.today = String(isToday)
+          button.dataset.availability = availabilityLevel
           button.dataset.selected = String(date === this.state.selectedDate)
           button.setAttribute('aria-pressed', String(date === this.state.selectedDate))
+          if (isToday) button.setAttribute('aria-current', 'date')
           const slotLabel = day.slots.length === 1 ? '1 horario disponible' : `${day.slots.length} horarios disponibles`
 
-          button.setAttribute('aria-label', `${formatMeetingDate(date, this.timezone(), 'long')}, ${slotLabel}`)
+          button.setAttribute('aria-label', `${isToday ? 'Hoy, ' : ''}${formatMeetingDate(date, this.timezone(), 'long')}, ${slotLabel}`)
+          const meter = element('span', 'ghm-availability-meter')
+
+          meter.setAttribute('aria-hidden', 'true')
+          meter.append(element('span'), element('span'), element('span'))
           button.append(
             element('span', 'ghm-calendar-number', String(Number(date.slice(-2)))),
-            element('span', 'ghm-calendar-available', `${day.slots.length} ${day.slots.length === 1 ? 'hora' : 'horas'}`),
+            element('span', 'ghm-calendar-available', `${day.slots.length} ${day.slots.length === 1 ? 'opción' : 'opciones'}`),
+            meter,
           )
+          if (isToday) button.append(element('span', 'ghm-today-label', 'Hoy'))
+          if (date === this.state.selectedDate) button.append(uiIcon('check', 'ghm-calendar-check'))
+          button.addEventListener('keydown', event => this.handleCalendarKeydown(event, date, availableDates))
           button.addEventListener('click', () => {
             this.navigationView = 'slots'
             this.transition(
@@ -668,9 +759,54 @@ export class MeetingRenderer {
     }
 
     table.append(body)
-    root.append(table, element('div', 'ghm-timezone-lens', formatMeetingTimezoneLabel(this.timezone(), this.options.now?.())))
+    const legend = element('div', 'ghm-calendar-footer')
+    const densityLegend = element('span', 'ghm-density-legend')
+    const timezoneLens = element('div', 'ghm-timezone-lens')
+
+    densityLegend.append(element('span', 'ghm-density-dot'), element('span', undefined, 'Más opciones disponibles'))
+    timezoneLens.append(uiIcon('world', 'ghm-timezone-icon'), element('span', undefined, formatMeetingTimezoneLabel(this.timezone(), this.options.now?.())))
+    legend.append(densityLegend, timezoneLens)
+    root.append(table, legend)
 
     return root
+  }
+
+  private handleCalendarKeydown(event: KeyboardEvent, date: string, availableDates: string[]): void {
+    let targetDate: string | undefined
+
+    if (event.key === 'ArrowLeft') targetDate = shiftDateKey(date, -1)
+    else if (event.key === 'ArrowRight') targetDate = shiftDateKey(date, 1)
+    else if (event.key === 'ArrowUp') targetDate = shiftDateKey(date, -7)
+    else if (event.key === 'ArrowDown') targetDate = shiftDateKey(date, 7)
+    else if (event.key === 'Home') targetDate = shiftDateKey(date, -(new Date(`${date}T12:00:00Z`).getUTCDay() + 6) % 7)
+    else if (event.key === 'End') targetDate = shiftDateKey(date, 6 - ((new Date(`${date}T12:00:00Z`).getUTCDay() + 6) % 7))
+    else if (event.key === 'PageUp' || event.key === 'PageDown') {
+      event.preventDefault()
+      const offset = this.state.availability?.monthOffset ?? 0
+
+      void this.loadMonth(offset + (event.key === 'PageUp' ? -1 : 1))
+
+      return
+    } else return
+
+    event.preventDefault()
+    const direction = targetDate < date ? -1 : 1
+
+    const candidate = direction < 0
+      ? [...availableDates].reverse().find(item => item <= targetDate)
+      : availableDates.find(item => item >= targetDate)
+
+    const fallback = direction < 0
+      ? [...availableDates].reverse().find(item => item < date)
+      : availableDates.find(item => item > date)
+
+    const next = candidate ?? fallback
+
+    if (!next) return
+    const buttons = this.host.querySelectorAll<HTMLButtonElement>('.ghm-calendar-day[data-date]')
+
+    for (const button of buttons) button.tabIndex = button.dataset.date === next ? 0 : -1
+    this.host.querySelector<HTMLButtonElement>(`.ghm-calendar-day[data-date="${next}"]`)?.focus()
   }
 
   private renderDetails(): HTMLElement {
@@ -756,47 +892,86 @@ export class MeetingRenderer {
     input.required = true
     input.maxLength = key === 'email' ? 254 : key === 'company' ? 160 : 80
     input.value = this.state.form[key]
-    input.setAttribute('aria-invalid', String(this.state.fieldErrors.includes(key)))
-    if (this.state.fieldErrors.includes(key)) input.setAttribute('aria-describedby', `ghm-${this.instanceId}-${key}-error`)
+    const invalid = this.state.fieldErrors.includes(key)
+    const feedback = element('span', `ghm-field-feedback${key === 'email' ? ' ghm-email-verification' : ''}`)
+    const statusIcon = uiIcon('circle-check', 'ghm-validation-icon')
+
+    label.dataset.validation = invalid ? 'invalid' : 'neutral'
+    feedback.id = `ghm-${this.instanceId}-${key}-feedback`
+    feedback.setAttribute('aria-live', 'polite')
+    input.setAttribute('aria-invalid', String(invalid))
+    input.setAttribute('aria-describedby', feedback.id)
     input.addEventListener('input', () => {
       this.state = reduceMeetingState(this.state, { type: 'form', values: { [key]: input.value } })
-      this.patchClearedFieldError(key, input)
       if (key === 'email') this.scheduleEmailVerification(input.value)
+      else if (this.touchedFields.has(key)) this.patchFieldValidation(key)
+      this.patchErrorSummary()
     })
-    control.append(fieldIcon(key), input)
-    label.append(element('span', 'ghm-label', labelText), control)
+    input.addEventListener('blur', () => {
+      this.touchedFields.add(key)
+      this.patchFieldValidation(key)
 
-    if (this.state.fieldErrors.includes(key)) {
-      const error = element('span', 'ghm-field-error', key === 'email' ? copy.invalidEmail : copy.requiredField)
-
-      error.id = `ghm-${this.instanceId}-${key}-error`
-      label.append(error)
-    }
-
-    if (key === 'email') {
-      const verification = element('span', 'ghm-email-verification')
-
-      verification.id = `ghm-${this.instanceId}-email-verification`
-      label.append(verification)
-      queueMicrotask(() => this.patchEmailVerificationDom())
-    }
+      if (key === 'email' && emailLooksValid(normalizedEmail(input.value))) {
+        this.scheduleEmailVerification(input.value, true)
+      }
+    })
+    control.append(fieldIcon(key), input, statusIcon)
+    label.append(element('span', 'ghm-label', labelText), control, feedback)
+    queueMicrotask(() => this.patchFieldValidation(key, false))
 
     return label
   }
 
-  private patchClearedFieldError(key: string, control: HTMLElement): void {
-    if (this.state.fieldErrors.includes(key)) return
+  private fieldError(key: MeetingFormFieldKey): string | null {
+    if (key === 'processingAccepted') return this.state.form.processingAccepted ? null : copy.consentRequired
+    const value = this.state.form[key].trim()
 
-    const errorId = `ghm-${this.instanceId}-${key}-error`
+    if (!value) return copy.requiredField
+    if (key === 'email' && !emailLooksValid(value)) return copy.invalidEmail
 
-    control.closest('.ghm-field, .ghm-check-group')?.querySelector(`[id="${errorId}"]`)?.remove()
-    const describedBy = new Set((control.getAttribute('aria-describedby') ?? '').split(/\s+/).filter(Boolean))
+    return null
+  }
 
-    describedBy.delete(errorId)
-    control.setAttribute('aria-invalid', 'false')
-    if (describedBy.size) control.setAttribute('aria-describedby', [...describedBy].join(' '))
-    else control.removeAttribute('aria-describedby')
+  private patchFieldValidation(key: MeetingFormFieldKey, announce = true): void {
+    const input = this.host.querySelector<HTMLInputElement>(`[name='${key}']`)
+    const wrap = input?.closest<HTMLElement>('.ghm-field, .ghm-check-group')
+    const feedback = wrap?.querySelector<HTMLElement>('.ghm-field-feedback')
 
+    if (!input || !wrap || !feedback) return
+
+    const forcedInvalid = this.state.fieldErrors.includes(key)
+    const hasInteraction = this.touchedFields.has(key) || forcedInvalid
+    const error = hasInteraction ? this.fieldError(key) : null
+    let validation: FieldValidationState = 'neutral'
+    let message = key === 'email' && !hasInteraction ? copy.emailHint : ''
+
+    if (error) {
+      validation = 'invalid'
+      message = error
+    } else if (hasInteraction) {
+      validation = 'valid'
+      message = key === 'processingAccepted' ? copy.consentAccepted : copy.fieldReady
+    }
+
+    wrap.dataset.validation = validation
+    input.setAttribute('aria-invalid', String(validation === 'invalid'))
+    feedback.className = `ghm-field-feedback${key === 'email' ? ' ghm-email-verification' : ''}${validation === 'invalid' ? ' ghm-field-error' : ''}`
+    feedback.textContent = message
+    if (!announce) feedback.setAttribute('aria-live', 'off')
+    else feedback.setAttribute('aria-live', 'polite')
+    this.patchValidationIcon(wrap, validation)
+  }
+
+  private patchValidationIcon(wrap: HTMLElement, validation: FieldValidationState): void {
+    const icon = wrap.querySelector<HTMLElement>('.ghm-validation-icon')
+
+    if (!icon) return
+    const name = validation === 'invalid' ? 'alert-circle' : validation === 'pending' ? 'loader-2' : 'circle-check'
+
+    icon.className = `ghm-validation-icon tabler-${name}`
+  }
+
+  private patchErrorSummary(): void {
     if (this.state.fieldErrors.length === 0) this.host.querySelector('.ghm-error-summary')?.remove()
   }
 
@@ -808,17 +983,23 @@ export class MeetingRenderer {
     this.emailVerification = { status: 'idle', email: '' }
   }
 
-  private scheduleEmailVerification(value: string): void {
+  private scheduleEmailVerification(value: string, immediate = false): void {
     if (this.emailVerifyTimer) clearTimeout(this.emailVerifyTimer)
     this.emailVerifyController?.abort()
     this.emailVerifyController = null
 
     const email = normalizedEmail(value)
 
-    this.emailVerification = { status: 'idle', email }
+    this.emailVerification = { status: emailLooksValid(email) ? 'queued' : 'idle', email }
     this.patchEmailVerificationDom()
 
     if (!emailLooksValid(email)) return
+
+    if (immediate) {
+      void this.runEmailVerification(email)
+
+      return
+    }
 
     this.emailVerifyTimer = setTimeout(() => {
       this.emailVerifyTimer = null
@@ -871,7 +1052,7 @@ export class MeetingRenderer {
 
   private patchEmailVerificationDom(): void {
     const input = this.host.querySelector<HTMLInputElement>("[name='email']")
-    const status = this.host.querySelector<HTMLElement>('.ghm-email-verification')
+    const status = input?.closest('.ghm-field')?.querySelector<HTMLElement>('.ghm-email-verification')
     const submit = this.host.querySelector<HTMLButtonElement>('.ghm-form-actions .ghm-primary')
 
     if (!input || !status) return
@@ -879,37 +1060,38 @@ export class MeetingRenderer {
     const state = this.emailVerification
     const applies = state.email === normalizedEmail(input.value)
     const rejected = applies && state.status === 'rejected'
-    const verifying = applies && state.status === 'verifying'
+    const verifying = applies && (state.status === 'queued' || state.status === 'verifying')
     const accepted = applies && state.status === 'accepted'
 
-    status.className = 'ghm-email-verification'
-    status.removeAttribute('role')
-    status.textContent = ''
+    status.className = `ghm-field-feedback ghm-email-verification${rejected ? ' ghm-field-error' : ''}`
+    status.setAttribute('aria-live', 'polite')
+    const wrap = input.closest<HTMLElement>('.ghm-field')
 
     if (verifying) {
       status.classList.add('is-verifying')
-      status.setAttribute('role', 'status')
       status.textContent = copy.verifyingEmail
     } else if (rejected) {
       status.classList.add('is-error')
-      status.setAttribute('role', 'alert')
       status.textContent = state.result?.reasonCode === 'email_disposable'
         ? copy.disposableEmail
         : `${copy.corporateEmail}${state.result?.suggestion ? ` ¿Quisiste decir ${state.result.suggestion}?` : ''}`
     } else if (accepted) {
       status.classList.add('is-success')
-      status.setAttribute('role', 'status')
       status.textContent = copy.emailVerified
+    } else {
+      this.patchFieldValidation('email')
+
+      return
     }
 
     input.setAttribute('aria-invalid', String(this.state.fieldErrors.includes('email') || rejected))
-    const describedBy = new Set((input.getAttribute('aria-describedby') ?? '').split(/\s+/).filter(Boolean))
 
-    if (verifying || rejected || accepted) describedBy.add(status.id)
-    else describedBy.delete(status.id)
+    if (wrap) {
+      const validation: FieldValidationState = rejected ? 'invalid' : verifying ? 'pending' : 'valid'
 
-    if (describedBy.size) input.setAttribute('aria-describedby', [...describedBy].join(' '))
-    else input.removeAttribute('aria-describedby')
+      wrap.dataset.validation = validation
+      this.patchValidationIcon(wrap, validation)
+    }
 
     if (submit && this.state.phase !== 'submitting') submit.disabled = verifying || rejected
   }
@@ -922,23 +1104,27 @@ export class MeetingRenderer {
     input.type = 'checkbox'
     input.checked = checked
     input.required = true
-    input.setAttribute('aria-invalid', String(this.state.fieldErrors.includes(key)))
-    if (this.state.fieldErrors.includes(key)) input.setAttribute('aria-describedby', `ghm-${this.instanceId}-${key}-error`)
+    const invalid = this.state.fieldErrors.includes(key)
+    const feedback = element('span', 'ghm-field-feedback')
+
+    group.dataset.validation = invalid ? 'invalid' : 'neutral'
+    feedback.id = `ghm-${this.instanceId}-${key}-feedback`
+    feedback.setAttribute('aria-live', 'polite')
+    input.name = key
+    input.setAttribute('aria-invalid', String(invalid))
+    input.setAttribute('aria-describedby', feedback.id)
     input.addEventListener('change', () => {
       this.state = reduceMeetingState(this.state, { type: 'form', values: { [key]: input.checked } })
-      this.patchClearedFieldError(key, input)
+      this.touchedFields.add(key)
+      this.patchFieldValidation(key)
+      this.patchErrorSummary()
     })
     label.append(input, element('span', undefined, labelText))
 
     group.append(label)
 
-    if (this.state.fieldErrors.includes(key)) {
-      const error = element('span', 'ghm-field-error', copy.consentRequired)
-
-      error.id = `ghm-${this.instanceId}-${key}-error`
-      error.setAttribute('role', 'alert')
-      group.append(error)
-    }
+    group.append(feedback)
+    queueMicrotask(() => this.patchFieldValidation(key, false))
 
     return group
   }
@@ -973,9 +1159,10 @@ export class MeetingRenderer {
     if (this.state.phase === 'schedule') {
       const selectedDay = this.state.availability?.days.find(day => day.date === this.state.selectedDate)
 
-      const guidedBack = element('button', 'ghm-guided-back', copy.viewCalendar)
+      const guidedBack = element('button', 'ghm-guided-back')
 
       guidedBack.type = 'button'
+      guidedBack.append(uiIcon('chevron-left'), element('span', undefined, copy.viewCalendar))
       guidedBack.addEventListener('click', () => {
         this.navigationView = 'calendar'
         this.updateScenePresentation()
@@ -983,12 +1170,15 @@ export class MeetingRenderer {
           .querySelector<HTMLButtonElement>('.ghm-calendar-day[aria-pressed="true"]')
           ?.focus({ preventScroll: true }))
       })
-      agenda.append(guidedBack, element('span', 'ghm-agenda-kicker', copy.chooseTime))
+      const availabilityStatus = element('div', 'ghm-agenda-status')
+
+      availabilityStatus.append(element('span', 'ghm-live-dot'), element('span', undefined, 'Agenda actualizada'))
+      agenda.append(guidedBack, availabilityStatus, element('span', 'ghm-agenda-kicker', copy.chooseTime))
 
       if (selectedDay) {
         agenda.append(
           element('h3', 'ghm-agenda-date', `${copy.timesFor} ${formatMeetingDate(selectedDay.date, this.timezone(), 'long').toLocaleLowerCase('es-CL')}`),
-          element('p', 'ghm-agenda-help', copy.chooseTimeHelp),
+          element('p', 'ghm-agenda-help', `${selectedDay.slots.length} ${selectedDay.slots.length === 1 ? 'horario disponible' : 'horarios disponibles'} · ${copy.chooseTimeHelp}`),
         )
       }
 
@@ -1032,6 +1222,7 @@ export class MeetingRenderer {
           ),
           element('span', 'ghm-slot-duration', `${availabilitySlot.durationMinutes} min`),
         )
+        if (availabilitySlot.slotId === this.state.selectedSlot?.slotId) button.append(uiIcon('check', 'ghm-slot-check'))
         button.addEventListener('click', () => {
           this.transition(
             { type: 'select_slot', slot: availabilitySlot },
@@ -1045,25 +1236,15 @@ export class MeetingRenderer {
       }
 
       agenda.append(slots)
-    } else {
+    } else if (!(this.layoutRecipe === 'guided' && ['details', 'submitting'].includes(this.state.phase))) {
       agenda.append(element('span', 'ghm-agenda-kicker', copy.meetingSummary))
     }
 
     const slot = this.state.confirmation?.appointment ?? this.state.selectedSlot
 
-    if (slot) {
-      const selection = element('div', 'ghm-selection')
-
-      selection.dataset.capture = 'meeting-summary'
-      selection.setAttribute('aria-live', 'polite')
-      selection.append(
-        element('span', 'ghm-selection-label', copy.selectedTime),
-        element('strong', 'ghm-agenda-date', formatMeetingDate(slot.startsAt, this.timezone(), 'long')),
-        element('span', 'ghm-agenda-time', formatMeetingTimeWithOffset(slot.startsAt, this.timezone())),
-        element('span', 'ghm-agenda-meta', `${'durationMinutes' in slot ? slot.durationMinutes : 30} min · Microsoft Teams`),
-      )
-      agenda.append(selection)
-    } else if (this.state.phase !== 'schedule') {
+    if (slot && !(this.layoutRecipe === 'guided' && ['details', 'submitting'].includes(this.state.phase))) {
+      agenda.append(this.renderSelection(slot))
+    } else if (this.state.phase !== 'schedule' && !(this.layoutRecipe === 'guided' && ['details', 'submitting'].includes(this.state.phase))) {
       agenda.append(element('p', 'ghm-agenda-empty', copy.selected))
     }
 
@@ -1076,6 +1257,7 @@ export class MeetingRenderer {
 
       button.type = 'button'
       button.setAttribute('aria-disabled', String(!this.state.selectedSlot))
+      if (this.state.selectedSlot) button.append(uiIcon('arrow-right', 'ghm-action-icon'))
       button.addEventListener('click', () => {
         if (!this.state.selectedSlot) return
         this.transition(
@@ -1106,6 +1288,23 @@ export class MeetingRenderer {
     }
 
     return agenda
+  }
+
+  private renderSelection(slot: MeetingSummarySlot): HTMLElement {
+    const selection = element('div', 'ghm-selection')
+    const selectionHeader = element('span', 'ghm-selection-label')
+
+    selection.dataset.capture = 'meeting-summary'
+    selection.setAttribute('aria-live', 'polite')
+    selectionHeader.append(uiIcon('calendar-check', 'ghm-selection-icon'), element('span', undefined, copy.selectedTime))
+    selection.append(
+      selectionHeader,
+      element('strong', 'ghm-agenda-date', formatMeetingDate(slot.startsAt, this.timezone(), 'long')),
+      element('span', 'ghm-agenda-time', formatMeetingTimeWithOffset(slot.startsAt, this.timezone())),
+      element('span', 'ghm-agenda-meta', `${slot.durationMinutes ?? 30} min · Microsoft Teams`),
+    )
+
+    return selection
   }
 
   private mountTurnstile(scene: HTMLElement): void {
@@ -1146,6 +1345,10 @@ export class MeetingRenderer {
     const errors = this.validate()
 
     if (errors.length > 0) {
+      for (const field of errors) {
+        if (field !== 'captchaToken') this.touchedFields.add(field as MeetingFormFieldKey)
+      }
+
       this.transition(
         { type: 'validation_failed', fields: errors },
         { type: 'step_reached', step: 'validation_failed', context: { error_category: 'validation_failed' } },

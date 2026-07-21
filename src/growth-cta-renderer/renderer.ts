@@ -47,8 +47,12 @@ export interface CtaRendererOptions {
   pageUri?: string
   /** Callback del primary (el módulo action monta el form). Retorna false si no pudo abrir. */
   onPrimary: (slot: HTMLElement) => Promise<boolean>
+  /** Adapter de task surface para el scheduler nativo; no muta las dimensiones del CTA. */
+  onTaskPrimary?: (invoker: HTMLButtonElement) => Promise<boolean>
+  /** Strong intent: precarga sólo el bundle, nunca config/disponibilidad. */
+  onTaskIntent?: () => void
   /** Ingest (fire-and-forget). Tier A + `viewed` Tier B (TASK-1428). El caller inyecta el binding surface+key. */
-  onIngest: (eventKind: 'viewed' | 'clicked' | 'dismissed' | 'form_opened' | 'form_submitted' | 'error', extra?: { formSubmissionId?: string; reason?: string }) => void
+  onIngest: (eventKind: 'viewed' | 'clicked' | 'action_started' | 'dismissed' | 'form_opened' | 'form_submitted' | 'error', extra?: { formSubmissionId?: string; reason?: string }) => void
   /**
    * TASK-1429 — el slide-in retiene el DOM al descartar para que el exit CSS
    * (`allow-discrete` → display:none) pinte; el embedded sigue limpiando al instante.
@@ -194,9 +198,10 @@ export class CtaRenderer {
     // Dispatch por FAMILIA (TASK-1431): growth_form conserva el botón + form slot;
     // navigate es un anchor `<a href>` REAL (middle-click/cmd-click, historial,
     // copy-link, a11y de link nativas) — jamás un botón con location.assign.
-    const primary =
-      navigateAction !== null
-        ? this.buildNavigatePrimary(navigateAction, contract.content.ctaLabel, copy, card)
+    const primary = navigateAction !== null
+      ? this.buildNavigatePrimary(navigateAction, contract.content.ctaLabel, copy, card)
+      : family === 'meeting_scheduler'
+        ? this.buildTaskPrimary(contract.content.ctaLabel, card)
         : this.buildFormPrimary(contract.content.ctaLabel, card)
 
     actions.appendChild(primary)
@@ -257,6 +262,68 @@ export class CtaRenderer {
     primary.addEventListener('click', () => void this.handlePrimary(primary, card))
 
     return primary
+  }
+
+  private taskPending = false
+  private taskClickedEmitted = false
+  private taskStartedEmitted = false
+
+  private buildTaskPrimary(label: string, card: HTMLElement): HTMLButtonElement {
+    const primary = this.doc.createElement('button')
+
+    primary.type = 'button'
+    primary.className = 'ghc-primary'
+    primary.dataset.ghcActionFamily = 'meeting_scheduler'
+    primary.textContent = label
+    primary.addEventListener('focus', () => this.options.onTaskIntent?.())
+    primary.addEventListener('pointerenter', () => this.options.onTaskIntent?.(), { once: true })
+    primary.addEventListener('click', () => void this.handleTaskPrimary(primary, card))
+
+    return primary
+  }
+
+  private async handleTaskPrimary(primary: HTMLButtonElement, card: HTMLElement): Promise<void> {
+    if (this.destroyed || this.taskPending) return
+
+    if (!this.taskClickedEmitted) {
+      this.taskClickedEmitted = true
+      this.options.telemetry.emit(RENDERER_GTM_EVENTS.clicked, this.basePayload())
+      this.options.onIngest('clicked')
+    }
+
+    this.taskPending = true
+    primary.disabled = true
+
+    const status = this.doc.createElement('span')
+
+    status.className = 'ghc-sr-only'
+    status.setAttribute('role', 'status')
+    status.textContent = this.options.copy.schedulerOpeningAria
+    card.appendChild(status)
+
+    const opened = await this.options.onTaskPrimary?.(primary) ?? false
+
+    status.remove()
+    this.taskPending = false
+    primary.disabled = false
+
+    if (this.destroyed) return
+
+    if (!opened) {
+      this.options.telemetry.emit(RENDERER_GTM_EVENTS.error, {
+        ...this.basePayload(),
+        reason_class: 'scheduler_handoff_failed',
+      })
+      this.options.onIngest('error', { reason: 'scheduler_handoff_failed' })
+
+      return
+    }
+
+    if (!this.taskStartedEmitted) {
+      this.taskStartedEmitted = true
+      this.options.telemetry.emit(RENDERER_GTM_EVENTS.actionStarted, this.basePayload())
+      this.options.onIngest('action_started')
+    }
   }
 
   /**

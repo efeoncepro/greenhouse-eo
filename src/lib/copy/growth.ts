@@ -1368,8 +1368,17 @@ export const GH_GROWTH_CTA_OPERATOR = {
             expectation: 'Abre el calendario gobernado para agendar.',
             field: 'URL del agendador',
             placeholder: 'ej. https://meetings.hubspot.com/…'
+          },
+          open_meeting_scheduler: {
+            label: 'Abrir agenda nativa',
+            expectation: 'Abre una task surface adaptativa sin sacar al visitante de la página.',
+            field: 'Surface de reuniones',
+            placeholder: 'ej. efeonce-public-site',
+            secondaryField: 'Scheduler key',
+            secondaryPlaceholder: 'ej. efeonce-discovery-30',
+            secondaryHelper: 'Ambos identificadores deben tener un binding activo; no se exponen IDs del proveedor.'
           }
-        } as Record<string, { label: string; expectation: string; field: string; placeholder: string }>
+        } as Record<string, { label: string; expectation: string; field: string; placeholder: string; secondaryField?: string; secondaryPlaceholder?: string; secondaryHelper?: string }>
       },
       targeting: {
         title: 'Segmentación y supresión',

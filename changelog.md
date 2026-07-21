@@ -7,8 +7,18 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-## 2026-07-21 — Scheduler completa foundation runtime y Calendar Command Center (TASK-1509/1510)
+## 2026-07-21 — Scheduler completa foundation runtime y Temporal Operations Desk (TASK-1509/1510)
 
+- Growth CTA incorpora la acción aditiva `open_meeting_scheduler` sin alterar `book_meeting`: autoridad `surface + scheduler key`
+  validada server-side, proyección browser-safe, lazy load consent-aware con Save-Data/2G, task surface dialog/full-screen,
+  foco/scroll/escape gobernados, fallback HubSpot y continuidad del mismo scheduler al cerrar/reabrir. El cockpit puede
+  autorarla. GVC `.captures/2026-07-21T11-22-29_growth-cta-native-meeting` pasó desktop/mobile, 10 frames,
+  teclado/reduced-motion y continuidad al reabrir; rollout público y promoción de baseline siguen pendientes.
+- La UI evolucionó a **Temporal Operations Desk**: dossier compacto, grilla mensual continua con gramática de
+  hoy/selección/densidad, inspector de horarios y booking brief sin card-on-card. Se agregó foco roving y teclado
+  de calendario, se eliminó el flash de 400 ms causado por la animación phase-wide y se unificó iconografía en el
+  subset Tabler sin SVG inline. GVC premium `2026-07-21T10-31-38_native-meeting-scheduler`: 36 frames command/split/guided,
+  exit 0 y score enterprise 4.66/5; baseline/rollout continúan sujetos a aprobación humana.
 - El scheduler dejó de imponer `America/Santiago`: detecta la zona IANA del visitante y la propaga de forma
   consistente por config, availability y booking de HubSpot. Santiago queda como fallback de surface. Se agregó
   canonicalización de aliases, rechazo pre-provider de zonas inválidas, validación de `bookingTimezone` y cobertura
@@ -17,6 +27,10 @@
 - El formulario heredó la política anti-correo-personal/desechable de Growth Forms sin duplicar listas: feedback
   debounced y accesible en cliente, endpoint gobernado por surface/origin + rate limit y revalidación autoritativa
   dentro del booking antes de CAPTCHA, disponibilidad, ledger o HubSpot. El correo no entra a URL ni telemetría.
+- La validación del formulario ahora es progresiva y reactiva: campos vírgenes neutrales, error accionable al blur,
+  recuperación inmediata mientras se corrige, consentimiento on-change y correo en fases sintaxis→verificación
+  corporativa. El carril estable de estado combina copy, ARIA live y Tabler success/error/pending sin depender de color
+  ni mover el layout. GVC `2026-07-21T11-37-07_native-meeting-scheduler` pasó 39 frames en 1440/820/390.
 
 - La migración dev quedó aplicada y leída de vuelta; un race live de PostgreSQL probó un único claim, conflicto
   semántico, replay único y cero residuo. Se provisionó el secreto HMAC dedicado con acceso del runtime y se verificó
@@ -724,30 +738,3 @@
   rollback y readback al mutar runtime.
 - La referencia quedó espejada para Codex/Claude; `copywriting` incorpora el sistema de titulares por superficie
   y `seo-aeo` enlaza el método desde su contrato editorial manteniendo autoridad sobre intent/canonical/robots.
-
-## 2026-07-17 — Método de utilidad citable para contenido enlazable
-
-- `content-marketing-studio` incorpora un contrato reusable para link earning/citación: identificar usuario y
-  trabajo de la cita, diseñar un objeto reutilizable, sostenerlo con evidencia/límites, publicarlo como pasaje
-  HTML enlazable, validarlo con pares y medir su circulación a 30/60/90 días. Se agregó template y mirror
-  Codex/Claude; `seo-aeo` consume el método desde off-page y mantiene la regla de no garantizar backlinks.
-- El brief del caso ANAM es la primera aplicación: Escala de confianza `KPI oficial / Diagnóstico / Piloto`,
-  checklist público, evidencia negativa y Definition of Done de citabilidad. No hubo write en WordPress.
-
-## 2026-07-17 — Customer Agent: canon de Workflows y bots
-
-- Las skills espejo de HubSpot as a Service distinguen `Deployment > Workflows and bots` como enrutamiento
-  selectivo de conversaciones, separado de knowledge, acciones del Customer Agent y `Run Agent` en workflows.
-  Se agregó el contrato de diseño/QA y el patrón ANAM por intención sin afirmar ni activar un despliegue live.
-- Se canonizó además el mapa 2026 de capacidades no exploradas —reply recommendations, permisos Contact, acciones
-  API, QA contextual, analítica/coaching, rollout escalonado y multicanal— con estados de evidencia, límites de
-  seguridad y un backlog ANAM que mantiene betas, writes y publicación bajo aprobación separada.
-
-## 2026-07-17 — Catálogo de servicios Efeonce y dos servicios HubSpot as a Service
-
-- Se creó `docs/services/` como capa canónica para definir resultados, alcance, entregables, responsabilidades,
-  evidencia y continuidad de servicios operables, sin confundirlos con arquitectura, manuales, propuestas,
-  catálogos runtime u objetos CRM.
-- Customer Agent gestionado y arquitectura RevOps/automatización/paneles quedaron registrados como dos servicios
-  separados y reutilizables, con ANAM `19893546` como implementación de referencia y los informes Word como
-  evidencia detallada.

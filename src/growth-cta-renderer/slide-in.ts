@@ -79,6 +79,8 @@ export interface SlideInControllerOptions {
   ctaLocation?: string
   pageUri?: string
   onPrimary: CtaRendererOptions['onPrimary']
+  onTaskPrimary?: CtaRendererOptions['onTaskPrimary']
+  onTaskIntent?: CtaRendererOptions['onTaskIntent']
   onIngest: CtaRendererOptions['onIngest']
   /** `immediate` = abre sin trigger (preview/GVC/tests); default = trigger gobernado. */
   triggerMode?: 'default' | 'immediate'
@@ -182,6 +184,8 @@ export class SlideInController {
       ctaLocation: this.options.ctaLocation,
       pageUri: this.options.pageUri,
       onPrimary: this.options.onPrimary,
+      onTaskPrimary: this.options.onTaskPrimary,
+      onTaskIntent: this.options.onTaskIntent,
       onIngest: this.options.onIngest,
       retainDomOnDismiss: true,
       emitViewedOnRender: false,

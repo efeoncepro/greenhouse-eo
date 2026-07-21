@@ -21,7 +21,7 @@ const FORMS_DEFINE_TIMEOUT_MS = 8000
 
 // ─── Familias de ejecución (TASK-1431) ────────────────────────────────────────
 
-export type RendererActionFamily = 'growth_form' | 'navigate'
+export type RendererActionFamily = 'growth_form' | 'navigate' | 'meeting_scheduler'
 
 /**
  * Espejo browser-safe de `CTA_ACTION_KIND_FAMILIES` (SoT server en
@@ -33,6 +33,7 @@ export const RENDERER_ACTION_FAMILIES = {
   link_url: 'navigate',
   open_think_tool: 'navigate',
   book_meeting: 'navigate',
+  open_meeting_scheduler: 'meeting_scheduler',
 } as const satisfies Record<CtaRenderActionMirror['kind'], RendererActionFamily>
 
 /** Familia del action o `null` para un kind desconocido (contrato más nuevo que el bundle ⇒ fail-closed, jamás adivinar destino). */

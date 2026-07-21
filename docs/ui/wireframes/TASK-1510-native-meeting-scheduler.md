@@ -4,13 +4,13 @@
 
 - Visual direction mode: `repo-native-benchmark`
 - Product Design asset: `docs/ui/visual-directions/TASK-1510-native-meeting-calendar-direction.md`
-- Selected direction: Calendar Command Center with adaptive recipes.
+- Selected direction: Temporal Operations Desk with adaptive recipes.
 - Desktop target: 1440x1000.
 - Mobile target: 390x844.
 
 ## Product decision
 
-The selected direction is **Calendar Command Center**, delivered through adaptive recipes rather than one responsive composition. The scheduler keeps one controller and booking intent while the host and container determine how much of the calendar is visible at once.
+The selected direction is **Temporal Operations Desk**, delivered through adaptive recipes rather than one responsive composition. The scheduler keeps one controller and booking intent while the host and container determine how much of the calendar is visible at once. The 2026 premium pass compresses narrative chrome, increases calendar density and turns the agenda into an operational availability rail.
 
 - Visual direction: `docs/ui/visual-directions/TASK-1510-native-meeting-calendar-direction.md`
 - Architecture: `docs/architecture/GREENHOUSE_GROWTH_MEETINGS_SCHEDULER_ARCHITECTURE_V1.md#architecture-decision-2026-07-21--adaptive-presentation-recipes`
@@ -85,6 +85,10 @@ At 390x844 the Growth CTA remains a compact launcher and opens a `full_screen` t
 
 ## Command — full section/page
 
+The command recipe uses a compact 240–280 px event dossier, a flexible temporal canvas and a 320–360 px booking
+inspector. The month grid is the dominant work surface; the selected appointment is a band inside the inspector,
+not a nested hero card.
+
 ```text
 ┌─────────────────────────────────────────────────────────────────────────┐
 │ CONTEXTO            │ JULIO 2026                         │ AGENDA        │
@@ -121,7 +125,7 @@ The host supplies `activation-mode` and an optional maximum recipe. The componen
 ## Visual Fidelity Mapping
 
 - The semantic month remains the defining calendar primitive; the guided strip is a navigation shortcut, never an abstract replacement.
-- Calendar Command Center depth, selected-state signal, availability counts and time-of-day groupings carry across recipes without multiplying cards.
+- Temporal Operations Desk density, selected-state signal, availability levels and time-of-day groupings carry across recipes without multiplying cards.
 - Context compresses before the task controls do: operational facts become one line in `guided`, a header in `split` and a dedicated rail in `command`.
 - Typography, ink/navy depth, teal selection and semantic warning/error colors use the public Efeonce tokens.
 - Motion communicates activation, forward/back navigation, selection and server-confirmed resolution; resize is visually quiet.
@@ -189,11 +193,14 @@ The host supplies `activation-mode` and an optional maximum recipe. The componen
 - Assertions: no horizontal overflow; stable selection and form values across resize; focus enter/contain/return; reduced motion parity; exactly-once user-driven funnel events; no PII; no availability request from a passive launcher.
 - Scroll-width evidence: every frame must satisfy `scrollWidth === clientWidth` for both page and task-surface scroll owners.
 - Review dossier: `docs/ui/reviews/TASK-1510-native-meeting-scheduler-review.md`.
+- Native CTA seam: `scripts/frontend/scenarios/growth-cta-native-meeting.scenario.ts` captures the unchanged launcher footprint, desktop dialog/mobile full-screen envelope and preserved selection after close/reopen.
 - Baseline decision: `.captures/2026-07-21T09-02-04_native-meeting-scheduler` remains current review evidence for `command` and compact styling, but is not promoted until human approval and does not yet validate the adaptive host contract.
 
 ## Design Decision Log
 
 - Selected: one controller plus adaptive recipes and host-owned task surface.
+- Selected in premium pass: compact dossier + temporal canvas + booking inspector; operational density replaces the oversized editorial rail.
+- Rejected after baseline review: Editorial Concierge, because the large slogan, orbital decoration and nested summary card read as campaign UI rather than a planning tool.
 - Rejected: Time Horizon; it did not read as a calendar.
 - Rejected: a shrunken three-column calendar inside a narrow CTA.
 - Rejected: inline CTA expansion after click because it causes layout shift and an unexpectedly large interaction.

@@ -63,6 +63,7 @@ export const ACTION_ICON: Record<CtaActionKind, string> = {
   link_url: 'tabler-external-link',
   open_think_tool: 'tabler-tool',
   book_meeting: 'tabler-calendar-plus',
+  open_meeting_scheduler: 'tabler-calendar-event',
 }
 
 /** Compatible con GreenhouseChip.tone Y con statusTone del surface-system (sin `secondary`). */
@@ -106,6 +107,8 @@ export interface CtaAuthoringDraft {
   actionKind: CtaActionKind
   /** Valor del campo requerido por el kind (url/formRef/toolPath/meetingUrl). */
   actionDestination: string
+  /** Segundo identificador gobernado para adapters compuestos (scheduler key). */
+  actionSecondaryDestination: string
   actionNewContext: boolean
   targeting: {
     routes: string
@@ -129,6 +132,7 @@ export const newAuthoringDraft = (): CtaAuthoringDraft => ({
   visualAssetRef: '',
   actionKind: 'link_url',
   actionDestination: '',
+  actionSecondaryDestination: '',
   actionNewContext: false,
   targeting: { routes: '/**', excludeRoutes: '' },
   suppression: { dismissCooldownDays: 14, suppressAfterConversion: true, maxImpressionsPerWindow: 2, windowHours: 24 },
@@ -277,6 +281,7 @@ export const draftFromVersion = (
     visualAssetRef,
     actionKind,
     actionDestination: destinationField ? asString(action[destinationField]) : '',
+    actionSecondaryDestination: actionKind === 'open_meeting_scheduler' ? asString(action.schedulerKey) : '',
     actionNewContext: action.openInNewContext === true,
     targeting: {
       routes: Array.isArray(targeting.routes) ? (targeting.routes as string[]).join(', ') : '/**',
@@ -314,7 +319,12 @@ export const buildAuthorPayload = (draft: CtaAuthoringDraft, existingSlug: strin
   const actionPolicy: Record<string, unknown> = { kind: draft.actionKind }
 
   if (destinationField) actionPolicy[destinationField] = draft.actionDestination.trim()
-  if (draft.actionKind !== 'open_growth_form') actionPolicy.openInNewContext = draft.actionNewContext
+
+  if (draft.actionKind === 'open_meeting_scheduler') {
+    actionPolicy.schedulerKey = draft.actionSecondaryDestination.trim()
+  } else if (draft.actionKind !== 'open_growth_form') {
+    actionPolicy.openInNewContext = draft.actionNewContext
+  }
 
   const content: Record<string, unknown> = {
     headline: draft.content.headline.trim(),
@@ -361,9 +371,15 @@ export const buildPreviewContract = (
   const headline = draft.content.headline.trim() || 'Título del CTA'
   const metadata = CTA_ACTION_KIND_METADATA[draft.actionKind]
 
-  const action: CtaRenderContractMirror['action'] =
-    metadata.executionFamily === 'growth_form'
-      ? { kind: 'open_growth_form', formSlug: draft.actionDestination.trim() || 'preview-form' }
+  const action: CtaRenderContractMirror['action'] = metadata.executionFamily === 'growth_form'
+    ? { kind: 'open_growth_form', formSlug: draft.actionDestination.trim() || 'preview-form' }
+    : metadata.executionFamily === 'meeting_scheduler'
+      ? {
+          kind: 'open_meeting_scheduler',
+          meetingSurfaceId: draft.actionDestination.trim() || 'efeonce-public-site',
+          schedulerKey: draft.actionSecondaryDestination.trim() || 'efeonce-discovery-30',
+          fallbackHref: 'https://meetings.hubspot.com/efeonce/diagnostico',
+        }
       : {
           kind: draft.actionKind as Exclude<CtaActionKind, 'open_growth_form'>,
           href:
@@ -371,7 +387,7 @@ export const buildPreviewContract = (
               ? `https://think.efeoncepro.com${draft.actionDestination.trim() || '/'}`
               : draft.actionDestination.trim() || '/',
           newContext: draft.actionNewContext,
-        }
+        } as CtaRenderContractMirror['action']
 
   return {
     contractVersion: RENDERER_CONTRACT_VERSION,

@@ -17,7 +17,7 @@
 - Motion: `docs/ui/motion/TASK-1510-native-meeting-scheduler-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-023`
-- Status real: `Renderer adaptativo guided|split|command, correo corporativo y GTM workspace preview verificados; adapter CTA, host pilot y aprobación/publish siguen pendientes`
+- Status real: `Temporal Operations Desk y adapter Growth CTA nativo code-complete localmente; GVC seam, staging host, pilot y aprobación/publish GTM siguen pendientes`
 - Rank: `TBD`
 - Domain: `growth|public-site|ui`
 - Blocked by: `none`
@@ -168,8 +168,8 @@ Reglas obligatorias:
 - Error: recovery inline, provider-safe, retry y fallback.
 - Degraded / partial: freshness/availability no autoritativa se rotula; no simula slots.
 - Slot conflict: el resumen entra a warning, preserva datos no sensibles, refresca calendario y devuelve foco.
-- Validation: summary + field-level messages; la selección se preserva.
-- Corporate email: verificación debounced con estado pending/success/error, copy específico para personal/desechable y submit inactivo durante un veredicto pendiente o rechazado; una degradación de red no suplanta la autoridad server-side de TASK-1509.
+- Validation: progresiva y reactiva; un campo virgen permanece neutral, el blur activa validación y una corrección posterior actualiza error/éxito mientras se escribe. El resumen aparece sólo al intentar continuar, los mensajes tienen región live estable y la selección se preserva.
+- Corporate email: separa sintaxis local de verificación corporativa asíncrona con estados pending/success/error, copy específico para personal/desechable y submit inactivo durante un veredicto pendiente o rechazado; blur verifica inmediatamente y el input usa debounce. Una degradación de red no suplanta la autoridad server-side de TASK-1509.
 - Booking pending: el resumen cambia a processing, CTA bloqueada, sin auto-retry.
 - Success: el resumen se transforma en recibo confirmado con fecha/zona local/duración/expectativa Teams; cero IDs.
 - Permission denied: surface inválida degrada a fallback genérico.
@@ -226,7 +226,8 @@ Reglas obligatorias:
 
 ### Design decision log
 
-- Selected “Monthly Calendar + Daily Agenda”: calendar recognition is immediate; month context and chronological times stay visibly connected.
+- Selected “Temporal Operations Desk”: compact dossier, continuous monthly canvas and booking inspector keep calendar recognition immediate while increasing productive density.
+- Rejected after baseline review “Editorial Concierge”: the large narrative rail and nested gradient summary felt promotional rather than enterprise/task-native.
 - Rejected “Time Horizon”: abstract week strip and density bars did not read as a calendar.
 - Rejected “Calendar Console”: polished but administrative, dense and aesthetically incremental.
 - Rejected “Conversational Scheduler”: novel but hides comparison, adds turns and weakens keyboard/recovery.
@@ -339,6 +340,7 @@ The renderer is a standalone custom element with an explicit state reducer. Rend
 - [x] `gh_meeting_booking_confirmed` emits exactly once per server receipt in reducer/browser tests; GTM mapping/publish remains pending.
 - [ ] GTM generic tags are built/read back/previewed; publish occurs only after explicit human confirmation and live evidence.
 - [ ] Governed public host retains actionable embed/link fallback and flag rollback.
+- [x] Growth CTA exposes an additive `open_meeting_scheduler` action; `book_meeting` remains navigation-only. The native adapter lazy-loads, uses dialog/full-screen activation and preserves one connected scheduler across close/reopen.
 - [ ] One controlled native booking verifies renderer -> adapter -> HubSpot/Outlook/Teams and `/g/collect`/GA4 evidence.
 
 ## Verification
@@ -349,12 +351,20 @@ The renderer is a standalone custom element with an explicit state reducer. Rend
 - [x] `pnpm ui:flow-check --task TASK-1510`
 - [x] `pnpm ui:motion-check --task TASK-1510`
 - [x] `pnpm ui:readiness-check --task TASK-1510`
-- [x] Renderer/server/a11y/telemetry/timezone/icon tests: 64 passed, 1 skipped + ESLint + TypeScript.
+- [x] Renderer focal suite: 34 passed across 7 files; broader server/a11y/telemetry/timezone evidence remains green; ESLint, TypeScript and production build pass.
 - [x] `pnpm fe:capture native-meeting-scheduler --env=local` — premium, 1440×1000 + 390×844, 24 frames, exit 0; only `baseline_stale` warning pending human approval.
 - [x] `pnpm fe:capture:review .captures/2026-07-21T08-43-09_native-meeting-scheduler`
 - [x] Timezone/GVC recheck: `.captures/2026-07-21T09-45-48_native-meeting-scheduler`, 22 frames desktop/mobile, exit 0; labels and GMT offset fit without overflow.
 - [x] Los campos usan el subset canónico Iconify/Tabler (`user|id|mail|building-skyscraper`) generado en build; no contienen SVG manual ni dependen del CSS del host.
 - [x] Iconography GVC recheck: `.captures/2026-07-21T09-52-43_native-meeting-scheduler`, 22 frames desktop/mobile, exit 0; `tabler-mail` y el set completo revisados visualmente.
+- [x] Premium 2026 pass GVC: `.captures/2026-07-21T10-31-38_native-meeting-scheduler`, 36 frames command/split/guided,
+  exit 0; no runtime/accessibility/layout/performance/enterprise-rubric findings. The immediate date-selection frame
+  remains visible, targets are >=44 px and reduced-motion reaches the same state.
+- [x] Enterprise UI scorecard: average 4.66/5, no dimension <4 and key premium dimensions >=4.5; visual verdict `PASS`.
+- [x] CTA/scheduler contract suite: 171 tests across 25 files; action-registry/parity, lazy task-surface lifecycle, reopen continuity and responsive activation pass. TypeScript and focal ESLint pass.
+- [x] CTA seam GVC `.captures/2026-07-21T11-22-29_growth-cta-native-meeting`: 10 frames, desktop/mobile, exit 0; launcher compacto, dialog/full-screen, teclado/reduced-motion y selección preservada al reabrir. Sólo `baseline_stale` pendiente de aprobación humana.
+- [x] Reactive validation GVC `.captures/2026-07-21T11-37-07_native-meeting-scheduler`: 39 frames en 1440/820/390, exit 0; neutral→invalid→valid, rechazo corporativo, teclado, reduced-motion, accessibility, layout, runtime y enterprise rubric verdes. Vitest focal 13/13, TypeScript (heap 8 GB), ESLint y bundle portable verdes.
+- [x] `pnpm fe:capture:review .captures/2026-07-21T11-37-07_native-meeting-scheduler` — dossier regenerado desde la captura aprobada.
 - [ ] `pnpm fe:capture native-meeting-scheduler --env=staging`
 - [ ] `pnpm fe:capture:review <capture-dir>`
 - [ ] `pnpm ui:quality --task TASK-1510`
@@ -362,7 +372,7 @@ The renderer is a standalone custom element with an explicit state reducer. Rend
 - [ ] `pnpm measurement:smoke` after approved publish.
 - [ ] `pnpm ops:lint --changed`
 - [x] `pnpm qa:gates --changed --agent codex --task TASK-1510 --ui --runtime --integration --docs` — advisory; rollout dependencies remain explicit.
-- [x] `pnpm docs:closure-check` — no blocking finding; functional/client docs intentionally wait for public activation.
+- [x] `pnpm docs:closure-check` — no blocking finding; arquitectura, documentación funcional, manual, review y handoff están presentes. El changelog cliente espera la activación pública.
 
 ## Closing Protocol
 

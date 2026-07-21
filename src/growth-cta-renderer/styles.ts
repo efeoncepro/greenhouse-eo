@@ -234,14 +234,14 @@ greenhouse-cta, .ghc-scope {
 :is(greenhouse-cta, .ghc-scope) .ghc-dismiss {
   appearance: none;
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 6px;
+  right: 6px;
   border: 0;
   cursor: pointer;
-  width: 28px;
-  height: 28px;
-  min-width: 24px;
-  min-height: 24px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -426,6 +426,104 @@ greenhouse-cta, .ghc-scope {
   border: 0;
 }
 
+/* ── Native meeting task surface ────────────────────────────────────── */
+dialog.ghc-meeting-surface {
+  width: min(1180px, calc(100vw - 48px));
+  max-width: none;
+  height: min(860px, calc(100dvh - 48px));
+  max-height: none;
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  color: #172033;
+  background: #f7f9fc;
+  border: 1px solid color-mix(in srgb, #023c70 18%, #dce3ec);
+  border-radius: 24px;
+  box-shadow: 0 32px 90px rgba(9, 30, 66, 0.28), 0 2px 8px rgba(9, 30, 66, 0.12);
+  overscroll-behavior: contain;
+  animation: ghc-meeting-enter 260ms cubic-bezier(.2, .8, .2, 1) both;
+}
+
+dialog.ghc-meeting-surface::backdrop {
+  background: color-mix(in srgb, #06182b 72%, transparent);
+  backdrop-filter: blur(10px) saturate(.85);
+  animation: ghc-meeting-backdrop 180ms ease-out both;
+}
+
+.ghc-meeting-frame { display: grid; grid-template-rows: auto minmax(0, 1fr); height: 100%; min-height: 0; }
+.ghc-meeting-toolbar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 76px;
+  padding: 14px 18px 14px 24px;
+  background: color-mix(in srgb, #fff 90%, transparent);
+  border-bottom: 1px solid #e1e7ef;
+  backdrop-filter: blur(18px);
+}
+.ghc-meeting-kicker { display: block; color: #52708f; font: 700 .7rem/1.2 inherit; letter-spacing: .1em; text-transform: uppercase; }
+.ghc-meeting-heading { margin: 4px 0 0; color: #172033; font: 750 clamp(1rem, 2vw, 1.25rem)/1.2 inherit; letter-spacing: -.02em; }
+.ghc-meeting-close {
+  appearance: none;
+  min-width: 72px;
+  min-height: 44px;
+  padding: 0 16px;
+  color: #26364d;
+  background: #fff;
+  border: 1px solid #d7e0ea;
+  border-radius: 999px;
+  box-shadow: 0 1px 2px rgba(9, 30, 66, .08);
+  cursor: pointer;
+  font: 650 .84rem/1 inherit;
+  transition: transform 160ms cubic-bezier(.2,0,0,1), border-color 160ms ease, box-shadow 160ms ease;
+}
+.ghc-meeting-close:hover { border-color: #9eb5cc; box-shadow: 0 6px 18px rgba(9,30,66,.12); transform: translateY(-1px); }
+.ghc-meeting-close:focus-visible, .ghc-meeting-fallback:focus-visible { outline: 3px solid #38a9ff; outline-offset: 3px; }
+.ghc-meeting-stage { min-width: 0; min-height: 0; overflow: auto; padding: 18px; scrollbar-gutter: stable; }
+.ghc-meeting-stage > efeonce-meeting-scheduler { min-width: 0; }
+.ghc-meeting-loading, .ghc-meeting-recovery {
+  display: grid;
+  place-content: center;
+  gap: 16px;
+  min-height: 420px;
+  padding: 32px;
+  color: #526175;
+  text-align: center;
+}
+.ghc-meeting-loading::before {
+  content: '';
+  width: 36px;
+  height: 36px;
+  margin-inline: auto;
+  border: 3px solid #d7e4f0;
+  border-top-color: #0375db;
+  border-radius: 50%;
+  animation: ghc-meeting-spin .75s linear infinite;
+}
+.ghc-meeting-fallback { display: inline-flex; justify-self: center; padding: 12px 18px; color: #fff; background: #023c70; border-radius: 10px; font-weight: 700; text-decoration: none; }
+
+dialog.ghc-meeting-surface[data-full-screen] {
+  width: 100vw;
+  height: 100dvh;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+}
+dialog.ghc-meeting-surface[data-full-screen] .ghc-meeting-toolbar {
+  min-height: 68px;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 10px 18px;
+}
+dialog.ghc-meeting-surface[data-full-screen] .ghc-meeting-stage {
+  padding: 10px 10px calc(12px + env(safe-area-inset-bottom, 0px));
+}
+
+@keyframes ghc-meeting-enter { from { opacity: 0; transform: translateY(10px) scale(.985); } to { opacity: 1; transform: none; } }
+@keyframes ghc-meeting-backdrop { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ghc-meeting-spin { to { transform: rotate(1turn); } }
+
 /* ── Reduced motion: estado final directo, cero transform/animación ──── */
 @media (prefers-reduced-motion: reduce) {
   :is(greenhouse-cta, .ghc-scope) .ghc-card { animation: none; }
@@ -433,6 +531,8 @@ greenhouse-cta, .ghc-scope {
   :is(greenhouse-cta, .ghc-scope) .ghc-primary, :is(greenhouse-cta, .ghc-scope) .ghc-dismiss { transition: none; }
   /* Slide-in: sin travel — aparece/desaparece en estado final (semántica intacta). */
   :is(greenhouse-cta, .ghc-scope).ghc-slidein { transition: none; translate: none; }
+  dialog.ghc-meeting-surface, dialog.ghc-meeting-surface::backdrop, .ghc-meeting-loading::before { animation: none; }
+  .ghc-meeting-close { transition: none; }
 }
 
 /* ── Forced colors (Windows high contrast) ───────────────────────────── */

@@ -11,6 +11,7 @@ export const scenario: CaptureScenario = {
   viewport: { width: 1440, height: 1000 },
   viewports: [
     { name: 'desktop', width: 1440, height: 1000 },
+    { name: 'split', width: 820, height: 900 },
     { name: 'mobile', width: 390, height: 844 },
   ],
   initialHoldMs: 800,
@@ -32,6 +33,7 @@ export const scenario: CaptureScenario = {
       'time-selected',
       'details-form',
       'validation-recovery',
+      'reactive-field-recovery',
       'corporate-email-rejection',
       'confirmed-summary',
     ],
@@ -152,6 +154,13 @@ export const scenario: CaptureScenario = {
     },
     { kind: 'fill', selector: '[name="firstName"]', value: 'Humberly' },
     { kind: 'fill', selector: '[name="lastName"]', value: 'Revisión' },
+    { kind: 'wait', selector: '.ghm-field[data-validation="valid"] [name="firstName"]', timeout: 2000 },
+    {
+      kind: 'mark',
+      label: 'reactive-field-recovery',
+      clipSelector: '[data-capture="meeting-details"]',
+      note: 'Los campos corregidos confirman validez inline sin esperar un nuevo submit ni mover el layout.',
+    },
     { kind: 'fill', selector: '[name="email"]', value: 'persona@gmail.com' },
     { kind: 'wait', selector: '.ghm-email-verification.is-error', timeout: 3000 },
     {

@@ -48,7 +48,17 @@ export interface CtaRenderNavigateActionMirror {
   newContext: boolean
 }
 
-export type CtaRenderActionMirror = CtaRenderOpenGrowthFormActionMirror | CtaRenderNavigateActionMirror
+export interface CtaRenderOpenMeetingSchedulerActionMirror {
+  kind: 'open_meeting_scheduler'
+  meetingSurfaceId: string
+  schedulerKey: string
+  fallbackHref: string
+}
+
+export type CtaRenderActionMirror =
+  | CtaRenderOpenGrowthFormActionMirror
+  | CtaRenderNavigateActionMirror
+  | CtaRenderOpenMeetingSchedulerActionMirror
 
 export interface CtaRenderContractMirror {
   contractVersion: string

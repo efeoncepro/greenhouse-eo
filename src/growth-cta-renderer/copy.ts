@@ -17,6 +17,14 @@ export interface CtaSystemCopy {
   loadingAria: string
   /** aria-live al montar el form (feedback perceptible sin animación). */
   formOpeningAria: string
+  /** aria-live al abrir la task surface de agenda. */
+  schedulerOpeningAria: string
+  schedulerKicker: string
+  schedulerHeading: string
+  schedulerClose: string
+  schedulerLoading: string
+  schedulerLoadFailed: string
+  schedulerFallback: string
   /** role=status durante el dispatch de una acción navigate (TASK-1431). */
   navigatingAria: string
   /** sr-only dentro del anchor cuando la navegación abre nuevo contexto (TASK-1431). */
@@ -28,6 +36,13 @@ const ES_CL: CtaSystemCopy = {
   dismissAria: 'Cerrar este aviso',
   loadingAria: 'Cargando contenido…',
   formOpeningAria: 'Abriendo el formulario…',
+  schedulerOpeningAria: 'Abriendo la agenda…',
+  schedulerKicker: 'Efeonce · Agenda en vivo',
+  schedulerHeading: 'Agenda una conversación',
+  schedulerClose: 'Cerrar',
+  schedulerLoading: 'Preparando disponibilidad en tu zona horaria…',
+  schedulerLoadFailed: 'No pudimos cargar la agenda interactiva.',
+  schedulerFallback: 'Abrir agenda alternativa',
   navigatingAria: 'Abriendo el enlace…',
   newTabAria: 'Se abre en una pestaña nueva',
 }
