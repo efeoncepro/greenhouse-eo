@@ -13,7 +13,10 @@
   consistente por config, availability y booking de HubSpot. Santiago queda como fallback de surface. Se agregó
   canonicalización de aliases, rechazo pre-provider de zonas inválidas, validación de `bookingTimezone` y cobertura
   de DST/date-only. Los campos usan ahora un subset portable Iconify/Tabler generado en build, sin SVG manual;
-  64 pruebas focales, typecheck y lint verdes.
+  70 pruebas focales, typecheck, lint y build productivo verdes.
+- El formulario heredó la política anti-correo-personal/desechable de Growth Forms sin duplicar listas: feedback
+  debounced y accesible en cliente, endpoint gobernado por surface/origin + rate limit y revalidación autoritativa
+  dentro del booking antes de CAPTCHA, disponibilidad, ledger o HubSpot. El correo no entra a URL ni telemetría.
 
 - La migración dev quedó aplicada y leída de vuelta; un race live de PostgreSQL probó un único claim, conflicto
   semántico, replay único y cero residuo. Se provisionó el secreto HMAC dedicado con acceso del runtime y se verificó

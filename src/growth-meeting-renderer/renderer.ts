@@ -1,4 +1,4 @@
-import type { MeetingApiClient, MeetingBookingPayload } from './api-client'
+import type { MeetingApiClient, MeetingBookingPayload, MeetingEmailVerificationResult } from './api-client'
 import type { MeetingPublicErrorCode } from './contract'
 import { GH_GROWTH_MEETINGS_COPY as copy } from './copy'
 import {
@@ -147,7 +147,14 @@ const calendarDates = (date: string): Array<string | null> => {
 }
 
 const emailLooksValid = (value: string): boolean => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+const normalizedEmail = (value: string): string => value.trim().toLowerCase()
 let rendererInstanceSequence = 0
+
+type EmailVerificationState = {
+  status: 'idle' | 'verifying' | 'accepted' | 'rejected' | 'degraded'
+  email: string
+  result?: Extract<MeetingEmailVerificationResult, { outcome: 'ok' }>
+}
 
 const FIELD_ICON_CLASS: Record<'firstName' | 'lastName' | 'email' | 'company', string> = {
   firstName: 'tabler-user',
@@ -178,6 +185,9 @@ export class MeetingRenderer {
   private activationMode: MeetingActivationMode
   private maxRecipe: MeetingLayoutRecipe
   private navigationView: 'calendar' | 'slots' = 'calendar'
+  private emailVerification: EmailVerificationState = { status: 'idle', email: '' }
+  private emailVerifyTimer: ReturnType<typeof setTimeout> | null = null
+  private emailVerifyController: AbortController | null = null
   private readonly instanceId = ++rendererInstanceSequence
 
   constructor(private readonly host: HTMLElement, private readonly options: MeetingRendererOptions) {
@@ -192,6 +202,7 @@ export class MeetingRenderer {
     this.abortController?.abort()
     this.abortController = new AbortController()
     this.state = initialMeetingRendererState()
+    this.resetEmailVerification()
     this.navigationView = 'calendar'
     this.observeLayout()
     this.render()
@@ -254,6 +265,7 @@ export class MeetingRenderer {
     this.viewedCleanup = null
     this.resizeObserver?.disconnect()
     this.resizeObserver = null
+    this.resetEmailVerification()
   }
 
   updatePresentation(input: { activationMode: MeetingActivationMode; maxRecipe: MeetingLayoutRecipe }): void {
@@ -720,7 +732,8 @@ export class MeetingRenderer {
     back.disabled = this.state.phase === 'submitting'
     back.addEventListener('click', () => this.transition({ type: 'back' }))
     submit.type = 'submit'
-    submit.disabled = this.state.phase === 'submitting'
+    submit.disabled = this.state.phase === 'submitting' || this.emailVerification.status === 'verifying' ||
+      this.emailVerification.status === 'rejected'
     actions.append(back, submit)
     form.append(actions)
 
@@ -747,6 +760,8 @@ export class MeetingRenderer {
     if (this.state.fieldErrors.includes(key)) input.setAttribute('aria-describedby', `ghm-${this.instanceId}-${key}-error`)
     input.addEventListener('input', () => {
       this.state = reduceMeetingState(this.state, { type: 'form', values: { [key]: input.value } })
+      this.patchClearedFieldError(key, input)
+      if (key === 'email') this.scheduleEmailVerification(input.value)
     })
     control.append(fieldIcon(key), input)
     label.append(element('span', 'ghm-label', labelText), control)
@@ -758,7 +773,145 @@ export class MeetingRenderer {
       label.append(error)
     }
 
+    if (key === 'email') {
+      const verification = element('span', 'ghm-email-verification')
+
+      verification.id = `ghm-${this.instanceId}-email-verification`
+      label.append(verification)
+      queueMicrotask(() => this.patchEmailVerificationDom())
+    }
+
     return label
+  }
+
+  private patchClearedFieldError(key: string, control: HTMLElement): void {
+    if (this.state.fieldErrors.includes(key)) return
+
+    const errorId = `ghm-${this.instanceId}-${key}-error`
+
+    control.closest('.ghm-field, .ghm-check-group')?.querySelector(`[id="${errorId}"]`)?.remove()
+    const describedBy = new Set((control.getAttribute('aria-describedby') ?? '').split(/\s+/).filter(Boolean))
+
+    describedBy.delete(errorId)
+    control.setAttribute('aria-invalid', 'false')
+    if (describedBy.size) control.setAttribute('aria-describedby', [...describedBy].join(' '))
+    else control.removeAttribute('aria-describedby')
+
+    if (this.state.fieldErrors.length === 0) this.host.querySelector('.ghm-error-summary')?.remove()
+  }
+
+  private resetEmailVerification(): void {
+    if (this.emailVerifyTimer) clearTimeout(this.emailVerifyTimer)
+    this.emailVerifyTimer = null
+    this.emailVerifyController?.abort()
+    this.emailVerifyController = null
+    this.emailVerification = { status: 'idle', email: '' }
+  }
+
+  private scheduleEmailVerification(value: string): void {
+    if (this.emailVerifyTimer) clearTimeout(this.emailVerifyTimer)
+    this.emailVerifyController?.abort()
+    this.emailVerifyController = null
+
+    const email = normalizedEmail(value)
+
+    this.emailVerification = { status: 'idle', email }
+    this.patchEmailVerificationDom()
+
+    if (!emailLooksValid(email)) return
+
+    this.emailVerifyTimer = setTimeout(() => {
+      this.emailVerifyTimer = null
+      void this.runEmailVerification(email)
+    }, 450)
+  }
+
+  private async runEmailVerification(email: string): Promise<boolean | null> {
+    if (this.emailVerifyTimer) clearTimeout(this.emailVerifyTimer)
+    this.emailVerifyTimer = null
+
+    const currentEmail = normalizedEmail(this.state.form.email)
+
+    if (!emailLooksValid(email) || email !== currentEmail) return false
+
+    this.emailVerifyController?.abort()
+    const controller = new AbortController()
+
+    this.emailVerifyController = controller
+    this.emailVerification = { status: 'verifying', email }
+    this.patchEmailVerificationDom()
+
+    const result = await this.options.api.verifyEmail({
+      surfaceId: this.options.surfaceId,
+      schedulerKey: this.options.schedulerKey,
+      email,
+      signal: controller.signal,
+    })
+
+    if (controller.signal.aborted || normalizedEmail(this.state.form.email) !== email) return null
+
+    this.emailVerifyController = null
+
+    if (result.outcome !== 'ok') {
+      this.emailVerification = { status: 'degraded', email }
+      this.patchEmailVerificationDom()
+
+      return null
+    }
+
+    this.emailVerification = {
+      status: result.accepted ? 'accepted' : 'rejected',
+      email,
+      result,
+    }
+    this.patchEmailVerificationDom()
+
+    return result.accepted
+  }
+
+  private patchEmailVerificationDom(): void {
+    const input = this.host.querySelector<HTMLInputElement>("[name='email']")
+    const status = this.host.querySelector<HTMLElement>('.ghm-email-verification')
+    const submit = this.host.querySelector<HTMLButtonElement>('.ghm-form-actions .ghm-primary')
+
+    if (!input || !status) return
+
+    const state = this.emailVerification
+    const applies = state.email === normalizedEmail(input.value)
+    const rejected = applies && state.status === 'rejected'
+    const verifying = applies && state.status === 'verifying'
+    const accepted = applies && state.status === 'accepted'
+
+    status.className = 'ghm-email-verification'
+    status.removeAttribute('role')
+    status.textContent = ''
+
+    if (verifying) {
+      status.classList.add('is-verifying')
+      status.setAttribute('role', 'status')
+      status.textContent = copy.verifyingEmail
+    } else if (rejected) {
+      status.classList.add('is-error')
+      status.setAttribute('role', 'alert')
+      status.textContent = state.result?.reasonCode === 'email_disposable'
+        ? copy.disposableEmail
+        : `${copy.corporateEmail}${state.result?.suggestion ? ` ¿Quisiste decir ${state.result.suggestion}?` : ''}`
+    } else if (accepted) {
+      status.classList.add('is-success')
+      status.setAttribute('role', 'status')
+      status.textContent = copy.emailVerified
+    }
+
+    input.setAttribute('aria-invalid', String(this.state.fieldErrors.includes('email') || rejected))
+    const describedBy = new Set((input.getAttribute('aria-describedby') ?? '').split(/\s+/).filter(Boolean))
+
+    if (verifying || rejected || accepted) describedBy.add(status.id)
+    else describedBy.delete(status.id)
+
+    if (describedBy.size) input.setAttribute('aria-describedby', [...describedBy].join(' '))
+    else input.removeAttribute('aria-describedby')
+
+    if (submit && this.state.phase !== 'submitting') submit.disabled = verifying || rejected
   }
 
   private checkbox(key: 'processingAccepted', labelText: string, checked: boolean): HTMLElement {
@@ -773,6 +926,7 @@ export class MeetingRenderer {
     if (this.state.fieldErrors.includes(key)) input.setAttribute('aria-describedby', `ghm-${this.instanceId}-${key}-error`)
     input.addEventListener('change', () => {
       this.state = reduceMeetingState(this.state, { type: 'form', values: { [key]: input.checked } })
+      this.patchClearedFieldError(key, input)
     })
     label.append(input, element('span', undefined, labelText))
 
@@ -997,6 +1151,21 @@ export class MeetingRenderer {
         { type: 'step_reached', step: 'validation_failed', context: { error_category: 'validation_failed' } },
       )
       queueMicrotask(() => this.host.querySelector<HTMLElement>('.ghm-error-summary')?.focus())
+
+      return
+    }
+
+    const email = normalizedEmail(this.state.form.email)
+    const alreadyAccepted = this.emailVerification.status === 'accepted' && this.emailVerification.email === email
+    const corporate = alreadyAccepted ? true : await this.runEmailVerification(email)
+
+    if (corporate === false) {
+      this.telemetry({
+        type: 'step_reached',
+        step: 'validation_failed',
+        context: { error_category: 'validation_failed' },
+      })
+      this.host.querySelector<HTMLInputElement>("[name='email']")?.focus()
 
       return
     }

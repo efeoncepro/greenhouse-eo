@@ -5,6 +5,7 @@ import { randomBytes } from 'node:crypto'
 import { turnstileCaptchaVerifier, type CaptchaVerifier } from '@/lib/growth/public-submission/captcha'
 
 import type { MeetingBookingConfirmed, MeetingBookingRequest, MeetingPublicError } from './contracts'
+import { verifyMeetingEmail, type MeetingEmailVerificationVerdict } from './email-verification'
 import { isNativeMeetingSchedulerEnabled } from './flags'
 import { resolveMeetingPrivacyHasher, type MeetingPrivacyHasher } from './privacy'
 import { createHubSpotMeetingSchedulingProvider } from './provider/hubspot'
@@ -126,6 +127,7 @@ export const bookMeeting = async (
     provider?: MeetingSchedulingProvider
     hasher?: MeetingPrivacyHasher
     captchaVerifier?: CaptchaVerifier
+    emailVerifier?: (email: unknown) => Promise<MeetingEmailVerificationVerdict>
     now?: Date
   },
 ): Promise<BookingResult> => {
@@ -150,6 +152,16 @@ export const bookMeeting = async (
   }
 
   if (Date.parse(input.slot.startsAt) <= now.valueOf()) return error('slot_unavailable', 'refresh_availability', true)
+
+  let emailVerdict: MeetingEmailVerificationVerdict
+
+  try {
+    emailVerdict = await (context.emailVerifier ?? verifyMeetingEmail)(input.contact.email)
+  } catch {
+    return error('provider_degraded', 'open_fallback', true)
+  }
+
+  if (!emailVerdict.accepted) return error('validation_failed', 'retry', false)
 
   const captcha = context.captchaVerifier ?? turnstileCaptchaVerifier(env, {
     expectedHostname: new URL(context.origin).hostname,

@@ -44,7 +44,12 @@ flowchart LR
 - `GET config`: configuración browser-safe, sin link/user/provider IDs.
 - El config incluye sólo la site key pública y action fija de Turnstile; el secret permanece server-side. Sin site key, el estado es `fallback_only`.
 - `GET availability`: slots normalizados y acotados; no se persiste un calendario paralelo.
+- `POST verify-email`: adapter browser-safe y rate-limited que reutiliza la política y datasets canónicos de
+  Growth Forms para feedback debounced. Requiere la misma surface/origin; nunca es la autoridad final.
 - `POST book`: valida shape, surface/origin, Turnstile, límites, slot fresco, consentimiento e idempotencia antes de un único POST provider.
+- `POST book` reejecuta el gate corporativo después de autorizar la surface y antes de Turnstile, lectura de
+  disponibilidad, claim o write. Correo personal/desechable falla cerrado como `validation_failed`; una falla del
+  verificador degrada al fallback y nunca concede una aprobación implícita.
 - La zona de presentación/reserva es la IANA detectada en el navegador. `defaultTimezone` de la surface es sólo
   fallback seguro cuando la detección falla; nunca actúa como allowlist del visitante. Config, availability y book
   usan la misma zona canónica y el adapter exige equivalencia canónica de `bookingTimezone` en la respuesta.
@@ -87,6 +92,7 @@ stateDiagram-v2
 | Timeout con outcome desconocido | estado `ambiguous`, reconcile-before-retry |
 | Bypass de origin/CORS | surface activa + binding + Origin exacto; CORS no concede autoridad |
 | Bots o burst concurrente | Turnstile con action/hostname + buckets PostgreSQL atómicos |
+| Correo personal/desechable o bypass del browser | policy canónica Growth Forms + revalidación server-side pre-provider |
 | Enumeración de email/IP | HMAC-SHA256 con secret versionado y domain separation |
 | PII en logs/analytics | categorías cerradas; negative tests; no payload/body/provider message |
 | Conversión forjada en consola | GA es mirror browser-reported; ledger server-confirmed es SoT de reconciliación |

@@ -89,7 +89,17 @@ export const reduceMeetingState = (state: MeetingRendererState, action: MeetingS
     case 'select_date': return { ...state, phase: 'schedule', selectedDate: action.date, selectedSlot: null, idempotencyKey: null }
     case 'select_slot': return { ...state, selectedSlot: action.slot, idempotencyKey: null, publicError: null }
     case 'details': return state.selectedSlot ? { ...state, phase: 'details', idempotencyKey: action.idempotencyKey, fieldErrors: [] } : state
-    case 'form': return { ...state, form: { ...state.form, ...action.values }, fieldErrors: [] }
+
+    case 'form': {
+      const changed = new Set(Object.keys(action.values))
+
+      return {
+        ...state,
+        form: { ...state.form, ...action.values },
+        fieldErrors: state.fieldErrors.filter(field => !changed.has(field)),
+      }
+    }
+
     case 'captcha': return { ...state, captchaToken: action.token }
     case 'validation_failed': return { ...state, phase: 'details', fieldErrors: action.fields }
     case 'submit': return { ...state, phase: 'submitting', publicError: null }

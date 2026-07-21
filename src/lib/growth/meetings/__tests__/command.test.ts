@@ -67,6 +67,14 @@ const context = (meetingProvider: MeetingSchedulingProvider) => ({
   provider: meetingProvider,
   hasher,
   captchaVerifier: { verify: vi.fn().mockResolvedValue({ ok: true, reason: 'verified' }) },
+  emailVerifier: vi.fn().mockResolvedValue({
+    accepted: true,
+    syntaxValid: true,
+    isCorporate: true,
+    isDisposable: false,
+    suggestion: null,
+    reasonCode: null,
+  }),
   now: new Date('2026-07-21T12:00:00.000Z'),
 })
 
@@ -143,6 +151,31 @@ describe('meeting booking command', () => {
     expect(result).toMatchObject({ outcome: 'error', error: { code: 'validation_failed' } })
     expect(meetingProvider.getConfiguration).not.toHaveBeenCalled()
     expect(meetingProvider.getAvailability).not.toHaveBeenCalled()
+    expect(meetingProvider.book).not.toHaveBeenCalled()
+  })
+
+  it('rechaza correo personal antes de CAPTCHA, disponibilidad, claim o escritura en HubSpot', async () => {
+    const meetingProvider = provider()
+    const bookingContext = context(meetingProvider)
+
+    bookingContext.emailVerifier = vi.fn().mockResolvedValue({
+      accepted: false,
+      syntaxValid: true,
+      isCorporate: false,
+      isDisposable: false,
+      suggestion: null,
+      reasonCode: 'email_not_corporate',
+    })
+
+    const result = await bookMeeting({
+      ...input,
+      contact: { ...input.contact, email: 'persona@gmail.com' },
+    }, bookingContext)
+
+    expect(result).toMatchObject({ outcome: 'error', error: { code: 'validation_failed' } })
+    expect(bookingContext.captchaVerifier.verify).not.toHaveBeenCalled()
+    expect(meetingProvider.getConfiguration).not.toHaveBeenCalled()
+    expect(claimMeetingBooking).not.toHaveBeenCalled()
     expect(meetingProvider.book).not.toHaveBeenCalled()
   })
 

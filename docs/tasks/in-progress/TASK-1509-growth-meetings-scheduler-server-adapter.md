@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-023`
-- Status real: `Foundation code-complete; dev migration + live DB concurrency + provider read verified; controlled booking/rollout pending`
+- Status real: `Foundation code-complete, incluido gate canónico de correo corporativo; dev migration + live DB concurrency + provider read verified; controlled booking/rollout pending`
 - Rank: `TBD`
 - Domain: `growth|public-site|crm|data`
 - Blocked by: `none`
@@ -144,6 +144,7 @@ Reglas obligatorias:
 - `GET /api/public/growth/meetings/config?surfaceId=...&timezone=...`: browser-safe duration, visitor-resolved IANA timezone policy, required fields/legal consent and fallback mode; no organizer/provider IDs. Surface timezone is fallback, not a visitor allowlist.
 - `GET /api/public/growth/meetings/availability?surfaceId=...&timezone=...&monthOffset=...`: normalized bounded days/slots with explicit freshness/state.
 - `POST /api/public/growth/meetings/book`: slot/duration/timezone/locale, required contact/form fields, legal consent, surface/captcha, idempotency key and attribution envelope.
+- `POST /api/public/growth/meetings/verify-email`: veredicto browser-safe, rate-limited y autorizado por surface/origin para feedback debounced; la autoridad se reejecuta dentro de `book` antes de CAPTCHA, disponibilidad, claim o write.
 - Public errors are a closed enum: `unavailable|slot_unavailable|validation_failed|captcha_failed|rate_limited|booking_rejected|provider_degraded`; never provider bodies/messages.
 - Success returns only browser-needed appointment facts plus an opaque one-time `conversionReceipt`; no contact/calendar identifiers.
 - Provider endpoints: Scheduler API 2026-03 details/availability and booking; slug stays server configuration.
@@ -163,6 +164,7 @@ Reglas obligatorias:
 ### PII, policy and security
 
 - Reuse surface/origin authority; CORS never replaces server validation.
+- Reuse the canonical Growth Forms `verifyEmail` policy and its free/disposable-domain datasets; do not fork lists. Personal/disposable emails fail closed with `validation_failed`, and neither endpoint logs or returns the raw email.
 - Require Turnstile hostname/action for booking, atomic PostgreSQL rate-limit buckets over HMAC privacy-safe keys, bound availability range/cadence and reject unexpected fields.
 - Resolve HubSpot credentials only server-side; missing scope/config fails closed.
 - Booking-processing consent and optional marketing consent are separate; marketing defaults false.

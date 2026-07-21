@@ -502,6 +502,13 @@ export const MEETING_RENDERER_CSS = `
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-check input[aria-invalid='true']::before { border-color: var(--gh-meeting-danger); }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-check > span { padding-block: 8px; }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-field-error { margin: 0; color: var(--gh-meeting-danger); font-size: 0.76rem; line-height: 1.4; }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-email-verification { min-height: 1.1em; margin: 0; font-size: 0.76rem; line-height: 1.4; color: var(--gh-meeting-muted); }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-email-verification:empty { display: none; }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-email-verification.is-error { color: var(--gh-meeting-danger); }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-email-verification.is-success { color: var(--gh-meeting-success, #177245); }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-email-verification.is-verifying::before { content: ''; display: inline-block; width: 0.65em; height: 0.65em; margin-inline-end: 0.45em; border: 1.5px solid currentColor; border-inline-end-color: transparent; border-radius: 50%; animation: ghm-spin 700ms linear infinite; }
+@keyframes ghm-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-email-verification.is-verifying::before { animation: none; } }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-form-actions { display: flex; justify-content: space-between; gap: 12px; }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-error-summary { padding: 12px 14px; border-inline-start: 3px solid var(--gh-meeting-danger); color: var(--gh-meeting-danger); background: color-mix(in srgb, var(--gh-meeting-danger) 7%, transparent); }
 

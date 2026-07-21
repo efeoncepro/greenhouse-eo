@@ -17,7 +17,7 @@
 - Motion: `docs/ui/motion/TASK-1510-native-meeting-scheduler-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-023`
-- Status real: `Renderer adaptativo guided|split|command y GTM workspace preview verificados; adapter CTA, host pilot y aprobación/publish siguen pendientes`
+- Status real: `Renderer adaptativo guided|split|command, correo corporativo y GTM workspace preview verificados; adapter CTA, host pilot y aprobación/publish siguen pendientes`
 - Rank: `TBD`
 - Domain: `growth|public-site|ui`
 - Blocked by: `none`
@@ -169,6 +169,7 @@ Reglas obligatorias:
 - Degraded / partial: freshness/availability no autoritativa se rotula; no simula slots.
 - Slot conflict: el resumen entra a warning, preserva datos no sensibles, refresca calendario y devuelve foco.
 - Validation: summary + field-level messages; la selección se preserva.
+- Corporate email: verificación debounced con estado pending/success/error, copy específico para personal/desechable y submit inactivo durante un veredicto pendiente o rechazado; una degradación de red no suplanta la autoridad server-side de TASK-1509.
 - Booking pending: el resumen cambia a processing, CTA bloqueada, sin auto-retry.
 - Success: el resumen se transforma en recibo confirmado con fecha/zona local/duración/expectativa Teams; cero IDs.
 - Permission denied: surface inválida degrada a fallback genérico.

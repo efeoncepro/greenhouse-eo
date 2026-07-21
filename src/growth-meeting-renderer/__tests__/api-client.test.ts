@@ -14,6 +14,34 @@ const payload = {
 }
 
 describe('meeting API client', () => {
+  it('verifica el correo contra la surface gobernada sin exponerlo en la URL', async () => {
+    const fetcher = vi.fn(async () => new Response(JSON.stringify({
+      outcome: 'ok',
+      accepted: false,
+      syntaxValid: true,
+      isCorporate: false,
+      isDisposable: false,
+      suggestion: null,
+      reasonCode: 'email_not_corporate',
+    }), { status: 200, headers: { 'content-type': 'application/json' } })) as unknown as typeof fetch
+
+    const result = await createMeetingApiClient('https://greenhouse.example', fetcher).verifyEmail({
+      surfaceId: 'efeonce-public-site',
+      schedulerKey: 'efeonce-discovery-30',
+      email: 'persona@gmail.com',
+    })
+
+    expect(result).toMatchObject({ outcome: 'ok', accepted: false, reasonCode: 'email_not_corporate' })
+    expect(fetcher).toHaveBeenCalledWith(
+      'https://greenhouse.example/api/public/growth/meetings/verify-email',
+      expect.objectContaining({
+        method: 'POST',
+        body: expect.stringContaining('persona@gmail.com'),
+      }),
+    )
+    expect(String(vi.mocked(fetcher).mock.calls[0]?.[0])).not.toContain('persona@gmail.com')
+  })
+
   it('envía la zona detectada al resolver config', async () => {
     const config = (await import('../fixtures')).meetingConfigFixture()
 

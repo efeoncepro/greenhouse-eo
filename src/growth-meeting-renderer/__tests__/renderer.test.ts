@@ -62,7 +62,7 @@ const completeBooking = async (host: HTMLElement) => {
 
   consent.click()
   ;(host.querySelector('.ghm-form') as HTMLFormElement).requestSubmit()
-  await vi.waitFor(() => expect(host.dataset.ghmState).not.toBe('submitting'))
+  await vi.waitFor(() => expect(['details', 'submitting']).not.toContain(host.dataset.ghmState))
 }
 
 beforeEach(() => {
@@ -136,6 +136,28 @@ describe('MeetingRenderer', () => {
     expect(host.querySelector('.ghm-field-icon.tabler-building-skyscraper')).not.toBeNull()
     expect(host.querySelector('svg.ghm-field-icon')).toBeNull()
     renderer.destroy()
+  })
+
+  it('bloquea un correo personal con feedback inline antes de reservar', async () => {
+    vi.useFakeTimers()
+
+    const { host, renderer } = await mount()
+
+    ;(host.querySelector('.ghm-slot') as HTMLButtonElement).click()
+    ;(host.querySelector('.ghm-agenda-action') as HTMLButtonElement).click()
+
+    const email = host.querySelector<HTMLInputElement>("[name='email']")!
+
+    email.value = 'persona@gmail.com'
+    email.dispatchEvent(new Event('input', { bubbles: true }))
+    await vi.advanceTimersByTimeAsync(450)
+
+    expect(host.querySelector('.ghm-email-verification')?.textContent).toContain('correo de tu empresa')
+    expect(email.getAttribute('aria-invalid')).toBe('true')
+    expect(host.querySelector<HTMLButtonElement>('.ghm-form-actions .ghm-primary')?.disabled).toBe(true)
+
+    renderer.destroy()
+    vi.useRealTimers()
   })
 
   it('completa la reserva y emite la conversión sin PII ni receipt', async () => {

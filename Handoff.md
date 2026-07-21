@@ -47,9 +47,13 @@
   El adapter canoniza aliases, rechaza zonas inválidas antes del provider y valida `bookingTimezone`; la UI evita
   drift de date-only y desambigua horas repetidas por DST. HubSpot read-only respondió 197 slots reales para
   `America/Lima` sobre el mismo calendario Office 365; el ejemplo `13:15Z` equivale a 08:15 Lima / 09:15 Santiago.
-  Los campos migraron de SVG manual a un subset portable Iconify/Tabler generado en build. Suite focal: 64 passed,
+  Los campos migraron de SVG manual a un subset portable Iconify/Tabler generado en build. Suite focal: 70 passed,
   1 skipped; typecheck/lint verdes; GVC `2026-07-21T09-52-43_native-meeting-scheduler` pasó 22 frames
-  desktop/mobile con iconografía revisada. No hubo booking ni mutación externa.
+  desktop/mobile con iconografía revisada. El scheduler reutiliza ahora el gate canónico de correo corporativo de
+  Growth Forms: endpoint debounced autorizado/rate-limited en UI y revalidación fail-closed dentro del command antes
+  de CAPTCHA, disponibilidad, claim o HubSpot; sin listas duplicadas ni PII en telemetría. GVC
+  `2026-07-21T10-03-00_native-meeting-scheduler` pasó 24 frames desktop/mobile e incluye rechazo corporativo.
+  Build productivo verde. No hubo booking ni mutación externa.
 
 - **`TASK-1366` COMPLETE / CONDITIONAL PASS (HubSpot Scheduler Booking Equivalence Spike, `EPIC-023`).**
   Build HubSpot `#27` desplegado/reinstalado con scope Scheduler mínimo y sin rotar el token gobernado. Booking

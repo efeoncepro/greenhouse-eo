@@ -18,6 +18,18 @@ export interface MeetingBookingPayload {
   attribution?: { placement?: string; pagePath?: string }
 }
 
+export type MeetingEmailVerificationResult =
+  | {
+      outcome: 'ok'
+      accepted: boolean
+      syntaxValid: boolean
+      isCorporate: boolean
+      isDisposable: boolean
+      suggestion: string | null
+      reasonCode: 'email_format' | 'email_not_corporate' | 'email_disposable' | null
+    }
+  | { outcome: 'unavailable' | 'rate_limited' | 'error' }
+
 export interface MeetingApiClient {
   config(input: { surfaceId: string; schedulerKey: string; timezone: string; signal?: AbortSignal }): Promise<MeetingSchedulerConfig>
   availability(input: {
@@ -27,6 +39,12 @@ export interface MeetingApiClient {
     monthOffset: number
     signal?: AbortSignal
   }): Promise<MeetingAvailability>
+  verifyEmail(input: {
+    surfaceId: string
+    schedulerKey: string
+    email: string
+    signal?: AbortSignal
+  }): Promise<MeetingEmailVerificationResult>
   book(input: MeetingBookingPayload, idempotencyKey: string, signal?: AbortSignal): Promise<MeetingBookingConfirmed | MeetingPublicError>
 }
 
@@ -136,6 +154,50 @@ export const createMeetingApiClient = (baseUrl: string, fetcher: typeof fetch = 
       if (!response.ok || !isMeetingAvailability(data)) throw new Error('meeting_availability_unavailable')
 
       return data
+    },
+
+    async verifyEmail(input) {
+      let response: Response
+
+      try {
+        response = await fetcher(`${base}/api/public/growth/meetings/verify-email`, {
+          method: 'POST',
+          signal: input.signal,
+          cache: 'no-store',
+          headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            surfaceId: input.surfaceId,
+            schedulerKey: input.schedulerKey,
+            email: input.email,
+          }),
+        })
+      } catch {
+        return { outcome: 'error' }
+      }
+
+      if (response.status === 404) return { outcome: 'unavailable' }
+      if (response.status === 429) return { outcome: 'rate_limited' }
+
+      let data: unknown
+
+      try {
+        data = await parseJson(response)
+      } catch {
+        return { outcome: 'error' }
+      }
+
+      if (!response.ok || !object(data) || data.outcome !== 'ok') return { outcome: 'error' }
+
+      return {
+        outcome: 'ok',
+        accepted: data.accepted === true,
+        syntaxValid: data.syntaxValid === true,
+        isCorporate: data.isCorporate === true,
+        isDisposable: data.isDisposable === true,
+        suggestion: string(data.suggestion) ? data.suggestion : null,
+        reasonCode: data.reasonCode === 'email_format' || data.reasonCode === 'email_not_corporate' ||
+          data.reasonCode === 'email_disposable' ? data.reasonCode : null,
+      }
     },
 
     async book(input, idempotencyKey, signal) {

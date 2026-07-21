@@ -94,6 +94,29 @@ export const createMeetingFixtureApi = (outcome: MeetingFixtureOutcome = 'confir
   async availability() {
     return meetingAvailabilityFixture()
   },
+  async verifyEmail({ email }) {
+    const personal = /@(gmail|outlook|hotmail|yahoo)\./i.test(email)
+
+    return personal
+      ? {
+          outcome: 'ok' as const,
+          accepted: false,
+          syntaxValid: true,
+          isCorporate: false,
+          isDisposable: false,
+          suggestion: null,
+          reasonCode: 'email_not_corporate' as const,
+        }
+      : {
+          outcome: 'ok' as const,
+          accepted: true,
+          syntaxValid: true,
+          isCorporate: true,
+          isDisposable: false,
+          suggestion: null,
+          reasonCode: null,
+        }
+  },
   async book() {
     if (outcome === 'confirmed') return meetingConfirmedFixture()
 
