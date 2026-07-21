@@ -17,7 +17,7 @@
 - Motion: `docs/ui/motion/TASK-1510-native-meeting-scheduler-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-023`
-- Status real: `Temporal Operations Desk y adapter Growth CTA nativo promovidos; flags staging/Production y binding piloto activos con config/availability reales. El host WordPress nativo, GVC live, booking controlado y publish GTM siguen pendientes.`
+- Status real: `Temporal Operations Desk y adapter Growth CTA nativo promovidos; flags staging/Production y binding piloto activos. El host WordPress aislado /agenda está live con disponibilidad real y fallback; siguen pendientes booking controlado, evidencia de medición y publish GTM.`
 - Rank: `TBD`
 - Domain: `growth|public-site|ui`
 - Blocked by: `none`
@@ -339,7 +339,7 @@ The renderer is a standalone custom element with an explicit state reducer. Rend
 - [x] `gh_meeting_step_reached` covers the local fixture funnel with strict generic parameters, valid pairs and no PII/exact slot.
 - [x] `gh_meeting_booking_confirmed` emits exactly once per server receipt in reducer/browser tests; GTM mapping/publish remains pending.
 - [x] GTM generic tags are built/read back/quick-previewed in disposable workspace 6; publish still requires explicit human confirmation and live evidence.
-- [ ] Governed public host retains actionable embed/link fallback and flag rollback.
+- [x] Host público gobernado de piloto en `https://efeoncepro.com/agenda/` (WP `251583`, `noindex`) conserva enlace directo HubSpot y rollback por flags/binding o backups Elementor; no sustituye todavía Contacto/RRSS.
 - [x] Growth CTA exposes an additive `open_meeting_scheduler` action; `book_meeting` remains navigation-only. The native adapter lazy-loads, uses dialog/full-screen activation and preserves one connected scheduler across close/reopen.
 - [ ] One controlled native booking verifies renderer -> adapter -> HubSpot/Outlook/Teams and `/g/collect`/GA4 evidence.
 
@@ -379,6 +379,7 @@ The renderer is a standalone custom element with an explicit state reducer. Rend
 - [ ] `pnpm ui:quality --task TASK-1510`
 - [x] GTM workspace read-back/quick preview (`compilerError=false`, `syncOk=true`); browser `/g/collect` remains a live-host rollout gate.
 - [x] Runtime activation 2026-07-21: `GROWTH_NATIVE_MEETING_SCHEDULER_READ_ENABLED=true` + `GROWTH_NATIVE_MEETING_SCHEDULER_ENABLED=true` in staging/Production, fresh production deployment Ready, and pilot binding `fhsf-efeonce-lead-gen-web`/`discovery` switched to `active`. Public-origin config and availability returned 200 with visitor timezone `America/New_York`; no booking was created for this activation check.
+- [x] WordPress pilot 2026-07-21: `/agenda/` page `251583` published as `noindex` with `<efeonce-meeting-scheduler>` and direct HubSpot fallback. Live Playwright confirmed renderer/real slots/fallback in normal Ohio template, desktop + 390 px `overflow=0`, recipes `split|guided`, no console errors, and one allowlisted `gh_meeting_step_reached` dataLayer event without PII/exact slot; no booking or GTM publish was performed.
 - [ ] `pnpm measurement:smoke` after approved publish.
 - [ ] `pnpm ops:lint --changed`
 - [x] `pnpm qa:gates --changed --agent codex --task TASK-1510 --ui --runtime --integration --docs` — advisory; rollout dependencies remain explicit.
@@ -387,7 +388,7 @@ The renderer is a standalone custom element with an explicit state reducer. Rend
 ## Closing Protocol
 
 - [ ] Keep `code complete, rollout pendiente` while GTM publish, public pilot or fallback evidence is pending.
-- [x] Runtime flag/binding activation and API evidence recorded in the feature-flag ledger, Handoff and changelog; host/GTM/booking evidence remains pending.
+- [x] Runtime flag/binding, public pilot host and API evidence recorded in the feature-flag ledger, Handoff and changelog; GTM/booking evidence remains pending.
 - [ ] Never claim global iframe replacement from a single pilot.
 
 ## Definition of Done

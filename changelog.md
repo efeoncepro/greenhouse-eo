@@ -49,6 +49,10 @@
   origen público permitido y respetaron la zona del visitante (`America/New_York` en la verificación). La landing
   pública todavía conserva el embed/link HubSpot mientras el runtime WordPress concurrente no se libera; no se publicó
   GTM ni se creó una reserva adicional durante esta activación.
+- El piloto público aislado quedó disponible en `/agenda/` (WordPress `251583`, `noindex`): monta el scheduler nativo
+  con disponibilidad real, Turnstile y un enlace directo de respaldo a HubSpot. El host usa el template normal de Ohio
+  —no Canvas— y una corrección page-scoped para el margen del root Elementor; Playwright confirmó desktop y 390 px sin
+  overflow ni errores de consola. No se promovió a Contacto/RRSS, no se publicó GTM ni se creó una reserva.
 - La UI elevó el calendario a `Calendar Command Center`: densidad por fecha, agenda agrupada por período, resumen
   vivo, formulario desktop de dos columnas, mobile compacto y motion causal/reduced-motion. GVC premium
   `2026-07-21T09-02-04_native-meeting-scheduler`: 24 frames, exit 0, runtime/enterprise/a11y/layout/performance verdes.

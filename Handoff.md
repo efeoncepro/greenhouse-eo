@@ -46,13 +46,12 @@
   canónico. La auditoría GTM preservó eventos/allowlist y el receipt gate; no hubo publish.
   GVC final `.captures/2026-07-21T12-18-17_native-meeting-scheduler` pasó 45 frames en 1440/820/390, exit 0.
 
-  La base runtime ya está promovida (release production `0c06dbf510f2-0b0007ec-0775-4206-a3fb-6cbe8d80c9f8`) y ambos flags
-  están ON en staging/Production. El binding piloto `fhsf-efeonce-lead-gen-web`/`discovery` está `active`; config y disponibilidad
-  reales devolvieron 200 desde el origen permitido, incluida la resolución visitor-aware de `America/New_York`. No se creó un
-  booking nuevo durante el flip. GTM workspace 6 sigue sin versión/publicación. El host nativo de WordPress queda bloqueado por
-  cambios concurrentes sin liberar en `efeonce-public-site-runtime`; la landing continúa deliberadamente con embed/link HubSpot
-  como fallback. Próximo paso: liberar/aislar ese runtime, aplicar su widget host gobernado y recién entonces ejecutar GVC live,
-  booking controlado/replay y evidencia `/g/collect`; la publicación GTM requiere confirmación humana separada.
+  Ambos flags están ON en staging/Production. El binding piloto `fhsf-efeonce-lead-gen-web`/`discovery` está `active`; config y disponibilidad
+  reales devolvieron 200 desde el origen permitido, incluida la resolución visitor-aware de `America/New_York`. El piloto aislado
+  `https://efeoncepro.com/agenda/` (WP `251583`, `noindex`) monta el renderer nativo con slots reales y enlace HubSpot de
+  respaldo; Playwright verificó desktop/390, `overflow=0` y consola limpia. No se creó un booking nuevo durante los checks.
+  GTM workspace 6 sigue sin versión/publicación. No promover aún a Contacto/RRSS: primero booking controlado/replay y evidencia
+  `/g/collect`; la publicación GTM requiere confirmación humana separada. Backups Elementor: `agenda_pilot_overflow_v1` y `agenda_pilot_template_v1`.
   HubSpot/Office 365/Teams siguen SoT. Trabajo en `develop`; `docs/ui/creative-studio/` es ajeno y no se toca.
 
 - **`TASK-1366` COMPLETE / CONDITIONAL PASS (HubSpot Scheduler Booking Equivalence Spike, `EPIC-023`).**
