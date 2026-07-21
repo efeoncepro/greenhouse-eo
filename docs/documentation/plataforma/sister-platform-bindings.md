@@ -1,9 +1,9 @@
 # Sister Platform Bindings
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-04-11 por Codex (TASK-375)
-> **Ultima actualizacion:** 2026-05-28 por Codex (TASK-948 Kortex SSO broker)
+> **Ultima actualizacion:** 2026-07-21 por Claude (TASK-1507 CLI de redirect allowlist)
 > **Documentacion tecnica:** `docs/architecture/GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`
 
 ---
@@ -193,6 +193,77 @@ Flags de rollout:
 - Kortex: `KORTEX_GREENHOUSE_SSO_ENABLED=false` por default.
 
 Rollback operativo: apagar primero `KORTEX_GREENHOUSE_SSO_ENABLED`; si hace falta, apagar tambien `GREENHOUSE_SISTER_PLATFORM_OAUTH_ENABLED`. El bridge de password queda como break-glass hasta cerrar el cutover.
+
+## Cambiar el redirect allowlist de un cliente OAuth
+
+El carril de SSO no acepta comodines: cada plataforma hermana tiene una lista exacta de callbacks permitidos. Si la app hermana cambia de dominio, ese callback nuevo no funciona hasta que alguien lo agrega a la lista.
+
+Para eso existe un comando dedicado:
+
+```bash
+pnpm sister-platform:redirect --client globe --add https://globe.efeoncepro.com/auth/callback
+```
+
+Sin `--apply` el comando es un **dry-run**: no escribe nada y solo imprime la lista actual y como quedaria. Recien cuando agregas `--apply` toca la base de datos:
+
+```bash
+pnpm sister-platform:redirect --client globe --add https://globe.efeoncepro.com/auth/callback --apply
+```
+
+Tambien sirve para retirar un callback que ya no se usa:
+
+```bash
+pnpm sister-platform:redirect --client globe --remove https://<origen-anterior>/auth/callback --apply
+```
+
+El comando es generico: `--client` acepta cualquier cliente OAuth de plataforma hermana registrado, hoy `globe` y `kortex`.
+
+### Que toca y que no toca
+
+Toca una sola cosa: la lista de callbacks permitidos.
+
+No toca:
+
+- el token del consumer ni el client secret vivo
+- los scopes OAuth permitidos
+- la policy del cliente ni sus tiempos de expiracion
+- el estado del cliente (`active`, `suspended`, `deprecated`)
+
+Por eso este es el camino correcto para un cliente que ya esta en uso, y **no** volver a correr el seed de piloto: el seed esta pensado para crear el cliente desde cero, reemplaza la lista completa y ademas rota el token, lo que cortaria el login mientras esta ocurriendo el cambio.
+
+### Que pasa si te equivocas
+
+El comando falla en vez de dejar algo raro:
+
+- si intentas quitar un callback que no esta en la lista, falla. Eso quiere decir que estas mirando una lista vieja.
+- si el resultado dejaria la lista vacia, falla.
+- si el callback tiene un comodin (`*`) o no es HTTPS (salvo `localhost`), falla.
+- si el cliente no existe, falla con "no encontrado"; nunca lo crea por accidente.
+
+Agregar dos veces el mismo callback no rompe nada: la segunda vez no cambia nada.
+
+### Como confirmar que quedo bien
+
+La lista real la valida el broker, asi que la forma correcta de confirmar no es mirar la tabla sino preguntarle al broker. El endpoint `/api/auth/sister-platforms/authorize` revisa el callback **antes** de mirar si hay sesion:
+
+- callback no permitido: responde `400` con `invalid_redirect_uri`
+- callback permitido: responde `303` (te manda a login o de vuelta a la app)
+
+Es decir, se puede verificar sin necesidad de iniciar sesion.
+
+### Orden correcto durante un cambio de dominio
+
+1. agregar el callback nuevo (la lista crece, el viejo sigue funcionando)
+2. verificar contra el broker que el nuevo ya responde `303`
+3. recien ahi cambiar el dominio que la app hermana anuncia
+4. probar el login completo
+5. retirar el callback viejo solo cuando ya no se necesite como camino de vuelta
+
+Hacerlo al reves deja una ventana en la que la app hermana manda a la gente a un callback que todavia no esta permitido, y el login queda roto.
+
+### Quien lo puede operar hoy
+
+Hoy es un comando de operador con acceso a la base de datos: no hay pantalla ni endpoint para esto. La logica no vive en el script sino en la plataforma, justamente para que mas adelante una API, un tool MCP o Nexa puedan hacer el mismo cambio sin reescribir las reglas. Antes de abrirlo por API faltan dos cosas: registrar quien hizo el cambio y definir que permiso lo habilita.
 
 ## Quien deberia tocarlo
 

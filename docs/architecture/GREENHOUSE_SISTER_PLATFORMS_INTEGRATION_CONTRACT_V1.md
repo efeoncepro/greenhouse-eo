@@ -1,9 +1,9 @@
 # Greenhouse Sister Platforms Integration Contract V1
 
 > **Tipo de documento:** Spec de arquitectura
-> **Version:** 1.0 (delta 2026-05-15 §9.5)
+> **Version:** 1.0 (deltas 2026-05-15 §9.5, 2026-05-28 §15, 2026-07-21 §15.5)
 > **Creado:** 2026-04-11
-> **Ultima actualizacion:** 2026-05-15 — TASK-884 agrega clausula §9.5 governance formal de acceso cross-platform
+> **Ultima actualizacion:** 2026-07-21 — TASK-1507 agrega clausula §15.5 administracion del redirect allowlist
 > **Scope:** Greenhouse y plataformas hermanas del ecosistema Efeonce
 > **Docs relacionados:** `GREENHOUSE_ARCHITECTURE_V1.md`, `GREENHOUSE_REPO_ECOSYSTEM_V1.md`, `GREENHOUSE_KORTEX_VISUAL_PRESET_V1.md`, `GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`, `GREENHOUSE_ECOSYSTEM_ACCESS_CONTROL_PLANE_V1.md`, `TASK-265`, `TASK-039`
 
@@ -622,3 +622,36 @@ Antes de habilitar este carril en produccion, la task consumidora debe verificar
 - login Greenhouse con credenciales/otros providers existentes sigue funcionando.
 - SCIM/Entra provisioning contract sigue sano en modo read-only o smoke controlado.
 - no hay diff no documentado en provider config, callbacks, cookies, claims globales ni app registration.
+
+### 15.5 Administracion del redirect allowlist
+
+> Delta 2026-07-21 — TASK-1507 agrega la primitive canónica para mover el allowlist de redirect URIs de un cliente OAuth de plataforma hermana ya vivo. Es una capacidad de Greenhouse, no de una plataforma consumidora concreta.
+
+El §15.2 prohíbe wildcards, así que el allowlist es una lista exacta: cambiar el origen desde el que una plataforma hermana hace login exige un write en `greenhouse_core.sister_platform_oauth_clients.redirect_uris`. Hasta esta task ese write sólo existía dentro de los seed scripts de provisioning (`scripts/seed-globe-internal-pilot.ts`, `scripts/seed-kortex-sister-platform-pilot.ts`), y ninguno sirve para un cliente en uso.
+
+**Por qué no el upsert completo.** `upsertSisterPlatformOAuthClient` reemplaza la fila entera: el caller debe reafirmar `policy_json`, `allowed_scopes`, `code_ttl_seconds`, `access_token_ttl_seconds`, `require_pkce` e `issue_identity_inline`. Cualquiera de esos valores que haya derivado desde el último seed se reescribe en silencio con lo que el caller creía vigente. Un cambio de allowlist no puede tener ese blast radius.
+
+**Por qué no el seed.** Además de reemplazar la fila, los seeds pasan el allowlist como reemplazo total (`redirectUris: [uri]`, que borraría el callback todavía en uso) y rotan el token del consumer, lo que invalidaría el client secret vivo justo durante el cutover.
+
+**La primitive.** `updateSisterPlatformOAuthRedirectUris` (`src/lib/sister-platforms/oauth-broker.ts`) es aditiva/sustractiva y opera sobre un cliente existente:
+
+- Una sola transacción: `SELECT ... FOR UPDATE` sobre la fila del cliente y un `UPDATE` que toca exclusivamente `redirect_uris` y `updated_at`. Nunca `policy_json`, `allowed_scopes`, TTLs, `require_pkce`, `client_status` ni el token del consumer.
+- `normalizeRedirectUris` queda como única autoridad de validación, la misma que aplica el upsert: rechaza wildcards, exige HTTPS salvo `localhost`/`127.0.0.1`, deduplica y nunca deja el allowlist vacío.
+- Agregar un URI ya presente es no-op (`changed=false`), lo que hace seguro re-ejecutar.
+- Quitar un URI que **no** está en el allowlist falla fuerte (`invalid_redirect_uri`) en vez de hacer no-op silencioso: durante un cutover, un no-op sobre una vista stale es exactamente cómo sobrevive el callback equivocado.
+- Agregar y quitar el mismo URI en una llamada falla (`invalid_redirect_uri`); un cliente inexistente devuelve 404 `invalid_client` y nunca lo crea.
+- Devuelve `{ client, previousRedirectUris, redirectUris, changed }`, de modo que el caller puede diffear lo que había contra lo que quedó sin releer.
+
+Cobertura: `src/lib/sister-platforms/oauth-redirect-uris.test.ts` (11 casos).
+
+**Reglas duras:**
+
+- **NUNCA** mover el allowlist de un cliente OAuth vivo con `upsertSisterPlatformOAuthClient` ni re-corriendo un seed de provisioning. Los seeds son para parir un cliente desde cero.
+- **NUNCA** reemplazar el array completo durante un cutover de origen. El allowlist crece primero (origen nuevo aditivo), y el origen viejo se retira recién cuando el smoke del nuevo está verde.
+- **NUNCA** relajar la validación para un caso puntual: el §15.2 no admite wildcards y `normalizeRedirectUris` es el único lugar donde esa regla vive.
+- **SIEMPRE** verificar el allowlist contra el broker y no contra la DB. `GET /api/auth/sister-platforms/authorize` valida el `redirect_uri` **antes** de mirar la sesión, así que discrimina sin necesitar login: un origen no allowlisted responde `400 invalid_redirect_uri` y uno allowlisted responde `303`. Ese es el contrato observable del allowlist.
+- **SIEMPRE** conservar el origen anterior en el allowlist mientras exista como camino de rollback documentado, y retirarlo por un write explícito cuando deje de serlo.
+
+**Estado 2026-07-21.** El cliente `globe` tiene dos redirect URIs: el callback del dominio del front door interno y el callback `run.app` previo, conservado deliberadamente como camino de rollback (con el ingress endurecido ese origen ya no es alcanzable por browser, así que quitarlo obligaría a un segundo write en DB bajo presión durante un rollback).
+
+**Camino de Full API Parity.** Hoy la primitive se opera por CLI (`pnpm sister-platform:redirect`, `scripts/sister-platform-oauth-redirect-uris.ts`), genérico por `--client` y con dry-run por defecto. No existe route admin de clientes OAuth: `/api/admin/integrations/sister-platform-bindings*` cubre bindings, no clientes del broker. La lógica vive deliberadamente en el broker y no en el script, así que una route, un tool MCP o Nexa pueden ejecutar el mismo cambio por la misma primitive sin reimplementar validación ni semántica transaccional; el script sólo parsea flags, imprime la proyección y delega. Para exponerla como contrato programático faltan dos piezas declaradas y no implementadas: (1) audit trail — la primitive acepta `actorUserId` pero hoy **no** lo persiste, y §10.3 exige poder auditar el caller de todo consumo cross-platform relevante; (2) la capability/entitlement que gobierne quién puede mover un allowlist. Ambas son requisito de la route, no del CLI, que corre con credenciales de operador y deja rastro en el shell.
