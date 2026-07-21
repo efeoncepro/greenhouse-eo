@@ -400,7 +400,7 @@ export const MEETING_RENDERER_CSS = `
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-primary[aria-disabled='true'] { opacity: 0.5; cursor: not-allowed; }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-secondary { color: var(--gh-meeting-text); background: transparent; border-color: var(--gh-meeting-line-strong); }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-agenda-action { width: 100%; margin-top: 16px; }
-:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-fallback { display: inline-flex; align-items: center; align-self: center; min-height: 44px; margin-top: 8px; color: var(--gh-meeting-muted); font-size: 0.76rem; text-underline-offset: 4px; }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-retry { justify-self: start; margin-top: 18px; }
 
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-form { display: grid; gap: 18px; }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
@@ -839,8 +839,7 @@ export const MEETING_RENDERER_CSS = `
   :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-agenda-help,
   :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-slots { grid-column: 1; }
   :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-selection,
-  :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-agenda-action,
-  :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-fallback { grid-column: 2; }
+  :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-agenda-action { grid-column: 2; }
   :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-selection { grid-row: 1 / span 4; margin-top: 0; }
 }
 

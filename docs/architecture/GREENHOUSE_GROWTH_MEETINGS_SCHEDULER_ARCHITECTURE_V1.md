@@ -1,6 +1,6 @@
 # GREENHOUSE GROWTH MEETINGS SCHEDULER ARCHITECTURE V1
 
-## Architecture Decision 2026-07-21 — Scheduler nativo con boundary seguro y fallback HubSpot
+## Architecture Decision 2026-07-21 — Scheduler nativo con boundary seguro
 
 - Status: Accepted
 - Date: 2026-07-21
@@ -19,7 +19,7 @@ La escritura externa no es transaccional ni documenta idempotencia nativa. Un ti
 
 ### Decision
 
-Greenhouse ofrece un contrato provider-neutral, con HubSpot Scheduler como adapter inicial y fuente de verdad de configuración, disponibilidad y reserva. El browser sólo consume DTOs allowlisted. La scheduling page y el iframe/link oficial continúan como fallback y rollback.
+Greenhouse ofrece un contrato provider-neutral, con HubSpot Scheduler como adapter inicial y fuente de verdad de configuración, disponibilidad y reserva. El browser sólo consume DTOs allowlisted. El iframe/link oficial no forma parte de la experiencia nativa; los estados de recuperación permanecen en el producto y el rollback se ejecuta mediante flags/versiones.
 
 La idempotencia usa un ledger dedicado `greenhouse_growth.meeting_booking_execution`; no reutiliza `greenhouse_core.api_platform_command_executions`. El ledger genérico no admite una principal pública anónima, su CHECK no admite lane `public` y su estado `failed` se puede reclamar, lo que sería inseguro después de un write ambiguo.
 
@@ -36,20 +36,19 @@ flowchart LR
   L --> H["HubSpot Scheduler adapter"]
   H --> O["Office 365 + Teams"]
   H --> C["HubSpot Contact + Meeting"]
-  R -. "fallback pre-dispatch" .-> E["Embed/link HubSpot"]
   L --> M["Server-confirmed reconciliation"]
   R --> G["dataLayer / GTM / GA4 browser-reported mirror"]
 ```
 
 - `GET config`: configuración browser-safe, sin link/user/provider IDs.
-- El config incluye sólo la site key pública y action fija de Turnstile; el secret permanece server-side. Sin site key, el estado es `fallback_only`.
+- El config incluye sólo la site key pública y action fija de Turnstile; el secret permanece server-side. El estado legacy `fallback_only` se presenta como indisponibilidad recuperable con reintento, nunca como enlace externo.
 - `GET availability`: slots normalizados y acotados; no se persiste un calendario paralelo.
 - `POST verify-email`: adapter browser-safe y rate-limited que reutiliza la política y datasets canónicos de
   Growth Forms para feedback debounced. Requiere la misma surface/origin; nunca es la autoridad final.
 - `POST book`: valida shape, surface/origin, Turnstile, límites, slot fresco, consentimiento e idempotencia antes de un único POST provider.
 - `POST book` reejecuta el gate corporativo después de autorizar la surface y antes de Turnstile, lectura de
   disponibilidad, claim o write. Correo personal/desechable falla cerrado como `validation_failed`; una falla del
-  verificador degrada al fallback y nunca concede una aprobación implícita.
+  verificador falla cerrado y nunca concede una aprobación implícita.
 - La zona de presentación/reserva es la IANA detectada en el navegador. `defaultTimezone` de la surface es sólo
   fallback seguro cuando la detección falla; nunca actúa como allowlist del visitante. Config, availability y book
   usan la misma zona canónica y el adapter exige equivalencia canónica de `bookingTimezone` en la respuesta.
@@ -79,7 +78,7 @@ stateDiagram-v2
 - El request fingerprint cubre todos los campos semánticos normalizados, incluido consentimiento; no sólo email y slot.
 - Una unique adicional por booking fingerprint bloquea un segundo key para la misma reserva cuando ya puede existir side effect.
 - Sólo `failed_prewrite` es reclaimable automáticamente.
-- `ambiguous` y `provider_created_invalid` requieren reconciliación humana/provider; no abren fallback automático porque eso puede duplicar la reunión.
+- `ambiguous` y `provider_created_invalid` requieren reconciliación humana/provider; no habilitan otra vía de reserva porque eso puede duplicar la reunión.
 - El receipt es aleatorio, se persiste sólo como hash y se entrega únicamente en la primera respuesta confirmada. Un replay conserva el outcome pero no vuelve a habilitar la emisión de conversión.
 - No existe atomicidad distribuida entre PostgreSQL y HubSpot. El ledger reduce el riesgo mediante transiciones durables y fail-closed; no promete exactamente-once absoluto ante una caída posterior al provider y anterior al commit final.
 
@@ -102,7 +101,7 @@ El secret HMAC es obligatorio en producción. Los buckets de rate limit se consu
 ### Measurement contract
 
 - Funnel no-conversión: `gh_meeting_step_reached` → evento GA4 custom del mismo nombre, nunca key event.
-- `meeting_step`: `viewed|availability_loaded|availability_failed|date_selected|slot_selected|details_started|validation_failed|booking_started|booking_failed|fallback_opened`.
+- `meeting_step`: `viewed|availability_loaded|availability_failed|date_selected|slot_selected|details_started|validation_failed|booking_started|booking_failed`. `fallback_opened` permanece reservado sólo para compatibilidad histórica y el renderer nativo ya no lo emite.
 - Conversión: `gh_meeting_booking_confirmed` existe sólo en `dataLayer`; GTM lo transforma a `generate_lead` con `lead_source=meeting_booking` y no envía además el custom a GA4.
 - `stage` se rechaza porque duplica `meeting_step` y permite pares contradictorios.
 - Parámetros allowlisted: `meeting_step`, `scheduler_key`, `surface_id`, `placement`, `availability_state`, `days_ahead_bucket`, `time_of_day_bucket`, `error_category`; `renderer_version` y `contract_version` se validan en el renderer pero no requieren dimensión.
@@ -124,7 +123,7 @@ El secret HMAC es obligatorio en producción. Los buckets de rate limit se consu
 - Costo: schema y reconciliación dedicados para una escritura externa no transaccional.
 - Riesgo residual: una caída entre respuesta válida de HubSpot y commit final puede dejar `provider_dispatched`; se bloquea el retry y se resuelve por read-back/manual.
 - Lock-in acotado: el contrato público es provider-neutral, pero el adapter V1 valida la configuración Efeonce `GROUP_CALENDAR` + Office 365 + Teams.
-- No hay backfill. Rollback es flags OFF y fallback; nunca se elimina una reunión como rollback técnico.
+- No hay backfill. Rollback es flags OFF o versión anterior; nunca se elimina una reunión como rollback técnico.
 
 ### Rollout
 
@@ -132,7 +131,7 @@ El secret HMAC es obligatorio en producción. Los buckets de rate limit se consu
 2. Contratos/provider y suites locales.
 3. Schema additive + shadow de config/availability.
 4. Booking controlado y replay con read-back HubSpot/Outlook/Teams.
-5. TASK-1510 + GTM Preview, manteniendo fallback.
+5. TASK-1510 + GTM Preview, con recuperación nativa por reintento/navegación.
 6. Pilot allowlisted; producción sólo tras evidencia y confirmaciones humanas de flag/GTM.
 
 ### Revisit When
@@ -200,7 +199,7 @@ Pure CSS container queries own layout-only changes. A bounded `ResizeObserver` m
 #### Native adapter contract (implemented locally 2026-07-21)
 
 - `open_meeting_scheduler` is the additive CTA action kind for native activation. `book_meeting` remains an anchor-only compatibility path.
-- Its server policy contains only `meetingSurfaceId` and `schedulerKey`. The registry requires an active `meeting_surface_binding`, validates its HubSpot fallback and projects `{ meetingSurfaceId, schedulerKey, fallbackHref }`; provider IDs, secrets, origins and PII never enter the render contract.
+- Its server policy contains only `meetingSurfaceId` and `schedulerKey`. The registry requires an active `meeting_surface_binding`. `fallbackHref` remains temporarily in the V1 transport projection for cached-client compatibility, but current renderers neither render nor consume it; provider IDs, secrets, origins and PII never enter the experience.
 - Its execution family is `meeting_scheduler`. The portable CTA renderer lazy-loads `/growth-meetings/renderer-latest.js` only after activation or strong intent; focus/hover prewarm respects Save-Data and 2G and never fetches configuration or availability.
 - One native `<dialog>` owns backdrop, inert/focus containment, Escape, scroll lock and focus return. It is bounded on desktop and becomes `100dvh` full-screen with safe-area padding below 640 px.
 - Closing calls `dialog.close()` and keeps the same `<efeonce-meeting-scheduler>` connected. State, telemetry dedupe, form draft and command/idempotency lifecycle survive reopen; disposal occurs only when the CTA host leaves the document or the contract is replaced.
@@ -224,7 +223,7 @@ Recipes must not have separate reducers, API clients or booking commands. User-e
 - The dialog envelope follows the modal-dialog focus contract: focus enters the surface, Tab remains contained, Escape closes when safe and focus returns to the invoker.
 - Logical heading and reading order remain equivalent across recipes. Selected date, slot and focused control survive a recipe change.
 - The compact recipe cannot hide bookable dates without a discoverable “Ver mes” path.
-- Sticky actions must not obscure the focused element, errors, fallback or legal copy.
+- Sticky actions must not obscure the focused element, errors, retry controls or legal copy.
 - Activation and phase changes use transform/opacity and directional motion only when forward/back semantics are real. Reduced motion uses an instant change or restrained crossfade.
 - A tiny CTA never morphs spatially into the full scheduler; the envelope transition establishes the new task context first.
 

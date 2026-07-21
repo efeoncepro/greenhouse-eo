@@ -76,10 +76,10 @@ overlays slots or form fields. Form fields use one column and 48 px controls.
 |---|---|---|---|---|
 | ready | Elige una fecha | Los días disponibles se pueden seleccionar. | date button | no realtime guarantee |
 | loading | Consultando disponibilidad | Estamos sincronizando la agenda. | none | structured skeleton |
-| empty | No hay horarios disponibles en {mes}. | La grilla y el mes solicitado permanecen visibles; prueba otro mes o abre la agenda alternativa. | Mes anterior/siguiente disponible + fallback | honest; never collapses calendar context |
-| partial | Disponibilidad limitada | Solo mostramos los horarios confirmados por el proveedor. | choose / fallback | explicit |
-| error | No pudimos actualizar la agenda | Conservamos una vía segura para reservar. | Reintentar / HubSpot | recovery |
-| denied | Esta agenda no está disponible aquí | Puedes continuar desde nuestra agenda alternativa. | Abrir agenda alternativa | no permission detail leak |
+| empty | No hay horarios disponibles en {mes}. | La grilla y el mes solicitado permanecen visibles; prueba otro mes. | Mes anterior/siguiente disponible | honest; never collapses calendar context |
+| partial | Disponibilidad limitada | Solo mostramos los horarios confirmados por el proveedor. | Elegir horario | explicit |
+| error | No pudimos actualizar la agenda | Intenta nuevamente. Si el problema continúa, vuelve a intentarlo más tarde. | Reintentar | recovery stays native |
+| denied | Esta agenda no está disponible aquí | Intenta nuevamente cuando la agenda esté habilitada. | Reintentar | no permission detail leak |
 | success | Tu reunión está confirmada | Enviaremos la invitación con el enlace de Microsoft Teams al correo de trabajo. | none | no provider IDs |
 
 ## Accessibility Contract
@@ -108,7 +108,7 @@ overlays slots or form fields. Form fields use one column and 48 px controls.
 - Route: internal preview and deterministic public harness
 - Viewports: 1440×1000 and 390×844
 - Required captures: calendar ready, time selected, details, confirmed, ambiguous, conflict
-- Assertions: no PII/receipt in dataLayer; one confirmation event; no direct fallback in ambiguous
+- Assertions: no PII/receipt in dataLayer; one confirmation event; no HubSpot link in any state
 - Scroll-width checks: page and scheduler `scrollWidth === clientWidth`
 - Accessibility/focus checks: keyboard selection, visible focus, reduced motion
 - Review dossier: required

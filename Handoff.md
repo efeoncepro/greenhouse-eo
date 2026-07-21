@@ -36,8 +36,11 @@
 
   Ambos flags están ON en staging/Production. El binding piloto `fhsf-efeonce-lead-gen-web`/`discovery` está `active`; config y disponibilidad
   reales devolvieron 200 desde el origen permitido, incluida la resolución visitor-aware de `America/New_York`. El piloto aislado
-  `https://efeoncepro.com/agenda/` (WP `251583`, `noindex`) monta el renderer nativo con slots reales y enlace HubSpot de
-  respaldo; Playwright verificó desktop/390, `overflow=0` y consola limpia. No se creó un booking nuevo durante los checks.
+  `https://efeoncepro.com/agenda/` (WP `251583`, `noindex`) monta el renderer nativo con slots reales. La decisión de producto
+  es **native-only**: WordPress ya no contiene enlaces visibles a HubSpot y el renderer/adapter reemplaza cualquier recuperación
+  externa por navegación mensual o `Reintentar`; HubSpot permanece únicamente como provider server-side. La mutación Elementor
+  quedó respaldada en `_gh_backup_before_agenda_native_only_20260721T170615Z`, con readback de un host y cero links HubSpot.
+  El cambio de bundle está validado localmente y pendiente de este release agrupado. No se creó un booking nuevo durante los checks.
   HubSpot devuelve actualmente cero slots para agosto; el renderer ya conserva `Agosto de 2026`, la grilla de 31 días y
   la navegación/estado vacío en vez de colapsar el calendario. La regresión julio→agosto pasa 39 pruebas del renderer y
   revisión local desktop/390. El fix fue liberado por PR #162 en el release
@@ -46,7 +49,8 @@
   y `overflow=0`. No se creó una reserva durante el smoke. El residual de label de `ops-worker` es change-gated:
   `7da563613daf..ddd3094538e7` no cambia ninguna ruta runtime del worker, por lo que no corresponde redeploy.
   GTM workspace 6 sigue sin versión/publicación. No promover aún a Contacto/RRSS: primero booking controlado/replay y evidencia
-  `/g/collect`; la publicación GTM requiere confirmación humana separada. Backups Elementor: `agenda_pilot_overflow_v1` y `agenda_pilot_template_v1`.
+  `/g/collect`; la publicación GTM requiere confirmación humana separada. Backups Elementor: `agenda_pilot_overflow_v1`,
+  `agenda_pilot_template_v1` y `_gh_backup_before_agenda_native_only_20260721T170615Z`.
   HubSpot/Office 365/Teams siguen SoT. Trabajo en `develop`; `docs/ui/creative-studio/` es ajeno y no se toca.
 
 - **`TASK-1366` COMPLETE / CONDITIONAL PASS (HubSpot Scheduler Booking Equivalence Spike, `EPIC-023`).**

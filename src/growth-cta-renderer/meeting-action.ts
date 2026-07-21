@@ -40,6 +40,9 @@ const ensureMeetingBundle = (doc: Document, baseUrl: string): Promise<boolean> =
 
       return true
     } catch {
+      doc.querySelector<HTMLScriptElement>(`script[src="${src}"][data-ghc-meeting-bundle]`)?.remove()
+      loads.delete(src)
+
       return false
     }
   })()
@@ -256,18 +259,18 @@ export class MeetingActivationController {
     if (!loaded) {
       const recovery = this.options.doc.createElement('div')
       const message = this.options.doc.createElement('p')
-      const fallback = this.options.doc.createElement('a')
+      const retry = this.options.doc.createElement('button')
 
       recovery.className = 'ghc-meeting-recovery'
       message.textContent = this.options.copy.schedulerLoadFailed
-      fallback.className = 'ghc-meeting-fallback'
-      fallback.href = this.options.action.fallbackHref
-      fallback.rel = 'noopener noreferrer'
-      fallback.textContent = this.options.copy.schedulerFallback
-      recovery.append(message, fallback)
+      retry.className = 'ghc-meeting-retry'
+      retry.type = 'button'
+      retry.textContent = this.options.copy.schedulerRetry
+      retry.addEventListener('click', () => void this.retryMountScheduler())
+      recovery.append(message, retry)
       stage.replaceChildren(recovery)
       this.options.onLoadError?.()
-      fallback.focus()
+      retry.focus()
 
       return false
     }
@@ -283,18 +286,27 @@ export class MeetingActivationController {
     scheduler.setAttribute('locale', this.options.locale ?? 'es-CL')
     scheduler.setAttribute('placement', this.options.placement)
     if (this.options.colorScheme) scheduler.setAttribute('color-scheme', this.options.colorScheme)
-
-    const fallback = this.options.doc.createElement('a')
-
-    fallback.href = this.options.action.fallbackHref
-    fallback.textContent = this.options.copy.schedulerFallback
-    scheduler.appendChild(fallback)
     this.scheduler = scheduler
     this.syncPresentation()
     stage.replaceChildren(scheduler)
     this.focusWhenReady()
 
     return true
+  }
+
+  private async retryMountScheduler(): Promise<void> {
+    const stage = this.dialog?.querySelector<HTMLElement>('.ghc-meeting-stage')
+
+    if (!stage) return
+
+    const loading = this.options.doc.createElement('div')
+
+    loading.className = 'ghc-meeting-loading'
+    loading.setAttribute('role', 'status')
+    loading.textContent = this.options.copy.schedulerLoading
+    stage.replaceChildren(loading)
+    this.openPromise = this.mountScheduler()
+    await this.openPromise
   }
 
   private readonly syncPresentation = (): void => {

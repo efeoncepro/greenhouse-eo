@@ -2,7 +2,7 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { createMeetingFixtureApi } from '../fixtures'
+import { createMeetingFixtureApi, meetingConfigFixture } from '../fixtures'
 import { MeetingRenderer } from '../renderer'
 import type { MeetingApiClient } from '../api-client'
 import type { MeetingTurnstilePort } from '../turnstile'
@@ -29,7 +29,6 @@ const mount = async (
     surfaceId: 'efeonce-public-site',
     schedulerKey: 'efeonce-discovery-30',
     requestedTimezone: 'America/Santiago',
-    emergencyFallbackUrl: 'https://meetings.hubspot.com/efeonce',
     dataLayerEnabled: true,
     now: () => new Date('2026-07-21T12:00:00.000Z'),
     telemetryBase: {
@@ -235,6 +234,8 @@ describe('MeetingRenderer', () => {
     expect(host.querySelectorAll('.ghm-calendar-day--unavailable')).toHaveLength(31)
     expect(host.querySelector('[data-capture="meeting-calendar-empty"]')?.textContent)
       .toContain('No hay horarios disponibles en agosto de 2026.')
+    expect(host.textContent).not.toContain('agenda alternativa')
+    expect(host.querySelector('a[href*="meetings.hubspot.com"]')).toBeNull()
     expect(host.querySelector('.ghm-calendar-empty-icon.tabler-calendar-off')).not.toBeNull()
     expect(host.querySelector<HTMLButtonElement>('[data-month-direction="previous"]')?.disabled).toBe(false)
     expect(host.querySelector<HTMLButtonElement>('[data-month-direction="next"]')?.disabled).toBe(true)
@@ -246,6 +247,29 @@ describe('MeetingRenderer', () => {
     await vi.waitFor(() => expect(host.querySelector('.ghm-month-label')?.textContent).toBe('Julio de 2026'))
     expect(host.querySelectorAll('.ghm-calendar-day[data-date]')).toHaveLength(5)
     expect(availability).toHaveBeenLastCalledWith(expect.objectContaining({ monthOffset: 0 }))
+    renderer.destroy()
+  })
+
+  it('recupera una agenda temporalmente no disponible sin enviar al usuario a HubSpot', async () => {
+    const fixtureApi = createMeetingFixtureApi()
+    let configCalls = 0
+
+    const config = vi.fn(async () => ({
+      ...meetingConfigFixture(),
+      state: configCalls++ === 0 ? 'fallback_only' as const : 'available' as const,
+    }))
+
+    const { host, renderer } = await mount('confirmed', { ...fixtureApi, config })
+
+    expect(host.dataset.ghmState).toBe('fallback_only')
+    expect(host.textContent).toContain('Intenta nuevamente')
+    expect(host.querySelector('a[href*="meetings.hubspot.com"]')).toBeNull()
+
+    host.querySelector<HTMLButtonElement>('.ghm-retry')?.click()
+
+    await vi.waitFor(() => expect(host.dataset.ghmState).toBe('schedule'))
+    expect(config).toHaveBeenCalledTimes(2)
+    expect(host.querySelector('.ghm-calendar')).not.toBeNull()
     renderer.destroy()
   })
 
