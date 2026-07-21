@@ -74,6 +74,9 @@ async function hubspotRequest(token, url, init = {}) {
       httpStatus: response.status,
       providerStatus: typeof body?.status === 'string' ? body.status : null,
       providerCategory: typeof body?.category === 'string' ? body.category : null,
+      providerSubCategory: typeof body?.subCategory === 'string' ? body.subCategory : null,
+      providerContextKeys:
+        body?.context && typeof body.context === 'object' ? Object.keys(body.context).sort() : [],
       correlationIdPresent: Boolean(body?.correlationId),
     })
   }
@@ -152,37 +155,38 @@ function bookingInput(details, availability, duration) {
     throw new SmokeError('selected_slot_not_available', { startTime })
   }
 
-  const users = (details?.allUsersBusyTimes ?? [])
-    .filter(item => item?.isOffline === false && item?.meetingsUser?.id)
-    .map(item => String(item.meetingsUser.id))
+  const availableUsers = (details?.allUsersBusyTimes ?? [])
+    .filter(item => item?.isOffline === false && item?.meetingsUser?.userId)
 
-  if (users.length === 0) throw new SmokeError('calendar_missing')
+  if (availableUsers.length === 0) throw new SmokeError('calendar_missing')
 
   const communicationConsentCheckboxes =
     details?.customParams?.legalConsentOptions?.communicationConsentCheckboxes ?? []
 
   const legalConsentResponses = communicationConsentCheckboxes.map(item => ({
     communicationTypeId: String(item.communicationTypeId),
-    consented: true,
+    consented: item?.required === true,
   }))
 
   if (details?.customParams?.legalConsentEnabled && legalConsentResponses.length === 0) {
     throw new SmokeError('legal_consent_contract_missing')
   }
 
-  return {
+  const payload = {
     duration,
     email: requiredEnv('HUBSPOT_TEST_EMAIL'),
     firstName: requiredEnv('HUBSPOT_TEST_FIRST_NAME'),
     lastName: requiredEnv('HUBSPOT_TEST_LAST_NAME'),
     formFields: [{ name: 'company', value: requiredEnv('HUBSPOT_TEST_COMPANY') }],
     legalConsentResponses,
-    likelyAvailableUserIds: users,
+    likelyAvailableUserIds: availableUsers.map(item => String(item.meetingsUser.userId)),
     slug: process.env.HUBSPOT_SCHEDULER_SLUG?.trim() || DEFAULT_SLUG,
     startTime: new Date(startMillis).toISOString(),
     locale: process.env.HUBSPOT_TEST_LOCALE?.trim() || 'es',
     timezone: process.env.HUBSPOT_TEST_TIMEZONE?.trim() || DEFAULT_TIMEZONE,
   }
+
+  return payload
 }
 
 function bookingSummary(booking) {

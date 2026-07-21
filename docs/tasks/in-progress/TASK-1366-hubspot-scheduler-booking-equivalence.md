@@ -47,7 +47,10 @@
   explícitos. Valida el slot contra availability, no reintenta y solo emite evidencia allowlisted/digested.
 - **Write authorization alcanzable** — un POST con body vacío, deliberadamente incapaz de reservar, llegó a
   la validación del endpoint y devolvió `VALIDATION_ERROR` en vez de `MISSING_SCOPES`. El token ya puede alcanzar
-  el contrato de booking; sigue pendiente el único POST válido con identidad/slot aprobados.
+  el contrato de booking.
+- **Booking bloqueado por política de email** — el operador aprobó identidad y franja, pero HubSpot rechazó el
+  destinatario con `MeetingsBookingCreatedError.BLOCKED_EMAIl`. Solicitudes diagnósticas no reservables aislaron
+  el subcódigo sin crear reunión ni exponer el correo. Se requiere otro email aprobado antes de repetir el smoke.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -70,7 +73,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-023`
-- Status real: `Operativamente bloqueado: booking espera email y franja aprobados`
+- Status real: `Operativamente bloqueado: HubSpot bloquea el email aprobado; espera destinatario alternativo`
 - Rank: `TBD`
 - Domain: `growth|public-site|crm`
 - Blocked by: `none`
