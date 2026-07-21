@@ -55,7 +55,9 @@
   overflow ni errores de consola. No se promovió a Contacto/RRSS, no se publicó GTM ni se creó una reserva.
 - La navegación mensual ya no colapsa el calendario cuando HubSpot devuelve un mes sin slots: conserva el mes solicitado,
   la grilla semántica completa, los controles de recuperación y un estado vacío específico. La regresión julio→agosto
-  quedó cubierta con 31 días no disponibles, restauración de foco y revisión visual desktop/390 sin overflow.
+  quedó cubierta con 31 días no disponibles, restauración de foco y revisión visual desktop/390 sin overflow. PR #162
+  fue liberado en producción (`ddd3094538e7`, run `29848667096`); el smoke en la sesión Chrome autenticada del operador
+  confirmó agosto completo en `https://efeoncepro.com/agenda/`, sin crear una reserva ni publicar GTM.
 - La UI elevó el calendario a `Calendar Command Center`: densidad por fecha, agenda agrupada por período, resumen
   vivo, formulario desktop de dos columnas, mobile compacto y motion causal/reduced-motion. GVC premium
   `2026-07-21T09-02-04_native-meeting-scheduler`: 24 frames, exit 0, runtime/enterprise/a11y/layout/performance verdes.
