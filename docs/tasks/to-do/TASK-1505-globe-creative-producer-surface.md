@@ -1,5 +1,15 @@
 # TASK-1505 — Globe Creative Producer Surface (UI)
 
+## Delta 2026-07-20 — front door (ADR-004 / TASK-1507) debe preceder el rollout interno de esta UI
+
+**ADR-004** (`TASK-1506`, complete) fijó que el shell interno de Globe se queda en Cloud Run (Node nativo) y que el
+custom domain `https://globe.efeoncepro.com` lo publica **`TASK-1507`** vía Global External ALB + serverless NEG. El
+rollout interno de esta superficie va **después** de que `TASK-1507` cierre el front door. Dos consecuencias: (1)
+esta UI es un thin client del shell interno (una sola réplica, `maxScale=1` hasta `TASK-1465`); (2) el **host del
+frontend cliente comercial** (cuando esta superficie se abra a clientes) es una **decisión diferida** por ADR-004 —
+Vercel + Next.js sobre edge global es candidato vivo, a decidir al construir esta UI y antes de `TASK-1480`. No
+asumir que "Cloud Run para el shell interno" implica Cloud Run para la superficie cliente comercial.
+
 ## Delta 2026-07-20 — estimate reader listo (TASK-1502 complete)
 
 El `✨N` inline del botón Generate ya tiene su reader: `globe.lab.experiment.estimate` (SDK `estimateExperiment(query)`) devuelve `LabEstimatePreviewV1` (estimatedCredits + ruta de fidelidad + `withinHardCap` señal de presupuesto), read-only, sobre una tupla `(capability, referenceRoute, outputShape)` prospectiva — sin crear experimento ni reservar. La UI lo llama en cada cambio de shape sin efectos. Un shape fuera de constraints → `invalid_request`; sobre el hard cap → `withinHardCap:false` (mostrar 'excede tu tope', no bloquear). Nunca expone provider/model/costo/margen.

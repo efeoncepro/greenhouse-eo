@@ -8,6 +8,29 @@
 
 # Handoff
 
+## Active state — 2026-07-20 (TASK-1506 cerrada — ADR-004 frontend hosting + front door; TASK-1507 registrada)
+
+**Decisión (ADR-004, `EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md`).** Para la release
+internal-only, el web/BFF/SSO shell **se queda en Cloud Run** (servidor Node nativo; el target Next.js queda
+`superseded` para el shell interno) — migrar a Vercel se rechaza: no arregla el techo de HA (estado in-memory /
+`maxScale=1`, independiente de la nube) y parte el trust boundary sin beneficio interno. El **frontend cliente
+comercial** (`TASK-1505`+) es una superficie separada con host + framework **diferidos** (Vercel + Next.js sobre
+edge global es candidato vivo), a decidir cuando se construya la UI de 1505 y antes de `TASK-1480` Production;
+elegir Cloud Run para el shell interno **no** cierra esa puerta. Tres gates distintos, nunca mezclados: URL
+internal-only / HA (gated por stores durables `TASK-1465`, hard-block `maxScale > 1`) / Production externo
+(`TASK-1480`).
+
+**Front door + IaC → `TASK-1507` (registrada, `to-do`, blocked by 1506).** `globe.efeoncepro.com` se sirve vía
+**Global External ALB + serverless NEG** (`southamerica-west1`) → `globe-studio-internal` (path GA, no domain
+mapping directo). `globe-api-internal` **nunca** recibe custom domain; sigue IAM-private con audience `run.app`.
+`TASK-1507` también mete los 2 Cloud Run services **bajo Terraform** (ingress/env/scale + pin de
+`invokerIamDisabled`) y endurece el ingress del web a `internal-and-cloud-load-balancing`.
+
+**Esto resuelve la "Decisión pendiente — `invokerIamDisabled`" de abajo:** el flag deja de ser drift ungoverned
+porque `TASK-1507` lo pinea en IaC (web: `True` mientras use sesión-cookie; api: `False` con verificación in-app).
+La ADR **no** autoriza apply: el runtime/DNS/OAuth/infra lo ejecuta `TASK-1507` bajo su propia secuencia y rollback.
+**Próximo paso ejecutable:** tomar `TASK-1507` (no antes del rollout interno de `TASK-1505`).
+
 ## Active state — 2026-07-20 (TASK-1490 desplegada + verificada en el servicio + hardening de auth)
 
 ### Dónde vive el Lab (corrección de rollout)

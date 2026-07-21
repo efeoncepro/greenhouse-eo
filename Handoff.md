@@ -21,13 +21,32 @@
 
 ## Pendientes inmediatos
 
-- **`TASK-1506` TO-DO (Globe Frontend Hosting and Front Door Decision, `EPIC-028`) — ejecutar ahora.**
-  Gate P0 documental/arquitectónico creado tras auditar EPIC, runtime y opciones con una flota read-only. Decide
-  mediante ADR Cloud Run web/BFF + Global ALB versus Vercel web/BFF + Cloud Run API; fija el owner de
-  `globe.efeoncepro.com` y registra una task de implementación separada, sin mutar infraestructura/DNS/OAuth.
-  Debe cerrar antes de `TASK-1505`, del rollout UI de `1474`, del canary/cutover de callbacks de `1469` y de
-  publicar deep links en `1475`. Un dominio internal-only puede preceder `TASK-1480`; HA/clientes requieren
-  persistencia durable y Production sigue detrás de `1480` + release explícito.
+- **`TASK-1506` COMPLETE (Globe Frontend Hosting and Front Door Decision, `EPIC-028`) — ADR-004, local-first sin push.**
+  Cerrada como policy: `EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md` (ADR-004) mantiene **Cloud Run**
+  como web/BFF/SSO para la release internal-only (servidor **Node nativo**; Next.js `superseded` para el shell
+  interno) y **rechaza migrar a Vercel** (no arregla el techo HA in-memory/`maxScale=1` y parte el trust boundary).
+  El **frontend cliente comercial** (`TASK-1505`+) es superficie separada con host + framework **diferidos** (Vercel
+  + Next.js sobre edge global = candidato vivo, a decidir al construir 1505 y antes de `TASK-1480`). Tres gates
+  distintos: URL internal-only / HA (gate `TASK-1465`, hard-block `maxScale > 1`) / Production (`TASK-1480`). Sin
+  mutar runtime/DNS/OAuth. Detalle de runtime: `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
+- **`TASK-1465` IN-PROGRESS (Globe Workspace/Tenancy/Persistence/Audit, `EPIC-028`) — core de HA, local-first sin push.**
+  Recalibrada (Delta 2026-07-20) tras Discovery: **Globe hoy no tiene DB alguna** (todo in-memory; la app se niega a
+  arrancar fuera de `internal_smoke` por `globe_memory_store_forbidden`). El operador autorizó **provisionar un Cloud
+  SQL Postgres propio de Globe** (tier `db-g1-small`, ZONAL, keyless IAM, ~US$15–30/mes) y acotó el alcance al **core
+  de HA**: DB + durabilidad de los 5 stores (sesiones, OAuth txns, experiments, eval reports, spend fence) + audit
+  append-only; el modelo rico de workspace/members/grants queda **diferido** a follow-up. **`maxScale>1` depende de
+  1465 Y 1468** (1465 = spend fence de seguridad durable; 1468 = credit ledger comercial). Plan en 5 slices (0
+  Terraform Cloud SQL → 0b cliente DB + migraciones → 1 schema → 2 impls durables → 3 guard/wiring → 4 audit+tests).
+  Infra/código en `efeonce-globe`; gobernanza en Greenhouse. Próximo paso: aplicar el Terraform del Cloud SQL (plan
+  aditivo, apply autorizado por el operador).
+- **`TASK-1507` TO-DO (Globe Internal Front Door — Global ALB + Terraform adoption, `EPIC-028`) — próximo pendiente.**
+  Sucesora de 1506/ADR-004 (blocked by 1506). Implementa `globe.efeoncepro.com` vía **Global External ALB +
+  serverless NEG** (`southamerica-west1`) → `globe-studio-internal`, managed cert + HTTP→HTTPS, `GLOBE_PUBLIC_BASE_URL`,
+  redirect allowlist del broker OAuth (`src/lib/sister-platforms/oauth-broker.ts`), endurece ingress a
+  `internal-and-cloud-load-balancing` y mete los 2 Cloud Run services **bajo Terraform** (cierra el drift de
+  `invokerIamDisabled`). `globe-api-internal` sigue IAM-private (audience `run.app`). Se secuencia **antes del rollout
+  interno de `TASK-1505`**; hasta entonces la base URL estable es el `*.run.app` + SSO. Infra en `efeonce-globe`,
+  gobernanza en Greenhouse. La ADR **no** autoriza apply: eso lo ejecuta 1507 bajo su secuencia + rollback.
 - **`TASK-1500` COMPLETE (Producer Governed Route/Model Catalog, `EPIC-028`) — local-first, sin push.**
   La keystone del cluster Producer quedó implementada en `../efeonce-globe` (`main`, 4 commits, `pnpm check` +
   `build` verdes): catálogo como dato versionado (`PRODUCER_ROUTE_CATALOG`, 4 rutas seed / 3 modalidades) +

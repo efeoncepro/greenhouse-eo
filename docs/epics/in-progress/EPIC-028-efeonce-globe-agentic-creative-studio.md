@@ -73,17 +73,27 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
   calibración, pilotos por modo y commercial approval. `TASK-1480` no habilita clientes sin sign-off explícito.
 - `TASK-1484` — **monetización bloqueada:** implementa packages/billing/tax/revenue/payments sólo después de
   un `commercial_decision_record` aplicable; tampoco habilita cobros/clientes sin rollout posterior.
-- `TASK-1506` — **frontend hosting and front door decision.** Gate P0 anterior al primer Studio funcional y a
-  cualquier custom domain: decide mediante ADR Cloud Run+Global ALB versus Vercel web/BFF+Cloud Run API, fija el
-  owner de `globe.efeoncepro.com` y registra una task de implementación separada. No muta runtime, DNS ni OAuth.
+- `TASK-1506` — **frontend hosting and front door decision (RESUELTA — ADR-004).** Gate P0 cerrado: la ADR
+  `EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md` mantiene Cloud Run como web/BFF para la release
+  internal-only (rechaza migrar a Vercel), adopta el servidor Node nativo (Next.js `superseded` para el shell
+  interno), fija el front door de `globe.efeoncepro.com` vía Global External ALB + serverless NEG, y deja el host
+  del **frontend cliente comercial** como decisión diferida (revisit en `TASK-1505` + pre-`TASK-1480`). No mutó
+  runtime/DNS/OAuth: eso lo implementa la sucesora `TASK-1507`.
+- `TASK-1507` — **implementación del front door internal-only.** Global External ALB + serverless NEG
+  (`southamerica-west1`) → `globe-studio-internal`, managed cert + HTTP→HTTPS, `globe.efeoncepro.com`,
+  `GLOBE_PUBLIC_BASE_URL`, redirect allowlist del broker OAuth, ingress `internal-and-cloud-load-balancing`, y
+  adopción Terraform de los 2 Cloud Run services (cierra el drift de `invokerIamDisabled`). `globe-api-internal`
+  queda IAM-private (audience `run.app`). Blocked by `TASK-1506`.
 
 ### Front door ordering contract
 
-- Ejecutar `TASK-1506` ahora, antes de implementar `TASK-1505`, del rollout del workbench `TASK-1474`, del
-  canary/cutover de callbacks de `TASK-1469` y de publicar deep links en `TASK-1475`.
-- Un dominio internal-only puede implementarse después de la ADR sin esperar `TASK-1480`, siempre con una sola
-  réplica mientras la sesión/OAuth siga en memoria. Alta disponibilidad o clientes requieren persistencia durable;
-  Production/clientes externos permanecen bloqueados por `TASK-1480` y un release explícito posterior.
+- `TASK-1506` cerró la decisión (ADR-004). `TASK-1507` implementa el custom domain **antes** del rollout interno de
+  `TASK-1505`, del rollout del workbench `TASK-1474`, del canary/cutover de callbacks de `TASK-1469` y de publicar
+  deep links en `TASK-1475`. Hasta que `TASK-1507` publique el dominio, la base URL estable es el `*.run.app` + SSO.
+- Un dominio internal-only puede implementarse (vía `TASK-1507`) sin esperar `TASK-1480`, siempre con una sola
+  réplica mientras la sesión/OAuth siga en memoria. Alta disponibilidad o clientes requieren persistencia durable
+  (`TASK-1465`, hard-gate de `maxScale > 1`); Production/clientes externos permanecen bloqueados por `TASK-1480` y
+  un release explícito posterior. El host del frontend cliente comercial es una decisión diferida (ADR-004).
 
 ### Parallel execution contract
 

@@ -1,21 +1,46 @@
-# TASK-1475 — Globe Greenhouse Projections, Events and Deep Links
+# TASK-1465 — Globe Workspace, Tenancy, Persistence and Audit
 
-## Delta 2026-07-20 — la URL canónica de los deep links la fija TASK-1507 (front door)
+## Delta 2026-07-20 — ADR-004 designa esta task como el gate durable de HA de Globe
 
-Los deep links de esta task deben construirse sobre el front door canónico de Globe, no sobre un `*.run.app`
-efímero. **ADR-004** (`TASK-1506`, complete) fijó ese front door y **`TASK-1507`** publica `https://globe.efeoncepro.com`
-vía Global External ALB → `globe-studio-internal`. Regla: no publicar deep links con dominio canónico hasta que
-`TASK-1507` cierre el custom domain; mientras tanto, el `*.run.app` + SSO sirve para pruebas internas. El host del
-frontend cliente comercial es una decisión diferida (ADR-004) — no asumir dominio comercial acá.
+**ADR-004** (`TASK-1506`, complete) fija que `globe-studio-internal` NO puede subir `maxScale > 1` mientras
+sesiones, transacciones OAuth, experimentos, evaluaciones y spend fence sigan en memoria — y hard-gatea ese salto en
+**esta task**. Dos implicancias load-bearing: (1) el **store durable de sesión/OAuth** del shell interno vive dentro
+del alcance de 1465 (bajo `apps/studio-web`) o en una child task explícitamente nombrada — resolverlo al planificar;
+(2) `TASK-1507` (front door) preserva `maxScale=1` a propósito y no toca este gate. HA de Globe = esta task, no el
+hosting.
+
+## Delta 2026-07-20 — recalibración de ejecución (Discovery + decisiones del operador)
+
+Discovery en `efeonce-globe` (3 recons read-only) fijó la realidad y el operador aprobó el rumbo:
+
+- **No existe DB alguna hoy** — 0 pg/CloudSQL/ORM/migraciones; `packages/database` es stub de 14 líneas
+  solo-tipos; Terraform sólo provisiona buckets GCS. La app se niega a arrancar fuera de `internal_smoke`
+  (`apps/studio-web/src/app.ts:278` → `throw 'globe_memory_store_forbidden'`). Por eso todo está en memoria:
+  **no hay dónde escribir**.
+- **Datastore decidido (operador):** un **Cloud SQL Postgres** propio de Globe (jamás compartido con Greenhouse),
+  tier chico (`db-g1-small`, ZONAL, sin HA), **keyless** (runtime SAs autentican como usuarios IAM de Postgres vía
+  el Cloud SQL connector; cero password en el path). Costo fijo aceptado (~US$15–30/mes). Alternativa Firestore
+  (scale-to-zero) descartada por el fence transaccional + consistencia con el stack Postgres.
+- **Alcance decidido (operador): sólo el core de HA.** Provisionar la DB + hacer durables los 5 stores detrás de
+  sus ports actuales + **spend fence durable** (para que `maxScale>1` no quede además colgado de `TASK-1468`) +
+  audit append-only mínimo + relajar el guard `globe_memory_store_forbidden` para el path durable. El **modelo rico
+  de workspace/members/grants persistidos se DIFIERE** a una task follow-up (hoy el `workspaceId` =
+  `greenhouse-org:<clientId>` derivado del broker funciona para el piloto interno).
+- **Límite con TASK-1468 (registrado):** 1465 hace durable el **spend fence de seguridad** (reserve/settle/release
+  cross-réplica atómico, requisito de correctitud a `maxScale>1`); 1468 construye encima el **credit ledger comercial**
+  append-only. No se conflacionan.
+
+Las slices de Zone 3 abajo quedan recalibradas a este plan concreto. Fuera de alcance explícito: la entidad
+workspace + members + grants persistidos (task follow-up).
 
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
-- Impact: `Alto`
-- Effort: `Medio`
+- Impact: `Muy alto`
+- Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `backend-data`
 - UI impact: `none`
@@ -23,19 +48,19 @@ frontend cliente comercial es una decisión diferida (ADR-004) — no asumir dom
 - Wireframe: `none`
 - Flow: `none`
 - Motion: `none`
-- Backend impact: `webhook`
+- Backend impact: `migration`
 - Epic: `EPIC-028`
 - Status real: `Diseño gobernado; implementación pendiente`
 - Rank: `TBD`
-- Domain: `platform|integration|greenhouse`
-- Blocked by: `TASK-1472, TASK-1473`
-- Branch: `task/TASK-1475-globe-greenhouse-projections-events-deep-links`
+- Domain: `platform|data|identity`
+- Blocked by: `TASK-1464, TASK-1481`
+- Branch: `task/TASK-1465-globe-workspace-tenancy-persistence-audit`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-Publicar proyecciones versionadas, eventos y deep links de Globe para Greenhouse sin compartir DB, sesión, secretos ni lógica de dominio.
+Implementar workspace tenancy, persistencia, commands/readers y audit append-only como base del dominio Globe.
 
 ## Why This Task Exists
 
@@ -43,7 +68,7 @@ EPIC-028 exige que integración de modelos, plataforma gobernada y validación c
 
 ## Goal
 
-Hacer Globe alcanzable y observable desde Greenhouse conservando fronteras de producto.
+Aislar cada workspace y disponer de primitives server-side antes de construir el workbench.
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
 
@@ -67,7 +92,7 @@ Hacer Globe alcanzable y observable desde Greenhouse conservando fronteras de pr
 
 ### Depends on
 
-- `TASK-1472`, `TASK-1473`.
+- `TASK-1464`, `TASK-1481`.
 
 ### Blocks / Impacts
 
@@ -76,10 +101,9 @@ Hacer Globe alcanzable y observable desde Greenhouse conservando fronteras de pr
 
 ### Files owned
 
+- `../efeonce-globe/packages/database/`
+- `../efeonce-globe/packages/domain/`
 - `../efeonce-globe/packages/contracts/`
-- `../efeonce-globe/packages/sdk/`
-- `src/lib/sister-platforms/`
-- `src/app/api/platform/`
 
 ## Current Repo State
 
@@ -97,7 +121,7 @@ Hacer Globe alcanzable y observable desde Greenhouse conservando fronteras de pr
 - Topology impact: `cross-runtime`
 - Current home: `Efeonce Globe como plataforma hermana; Greenhouse como control plane operativo/documental`
 - Future candidate home: `remain-shared`
-- Boundary: `Globe Greenhouse Projections, Events and Deep Links`
+- Boundary: `Globe Workspace, Tenancy, Persistence and Audit`
 - Server/browser split: `secrets, providers y writes server-only; contratos serializables y consumidores explícitos`
 - Build impact: `Globe valida su runtime; Greenhouse valida task, docs, integraciones y proyecciones en scope`
 - Extraction blocker: `ninguno: el runtime ya nace fuera del monolito Greenhouse`
@@ -107,7 +131,7 @@ Hacer Globe alcanzable y observable desde Greenhouse conservando fronteras de pr
 ### Backend/data brief
 
 - Backend rigor: `backend-critical`
-- Impacto principal: `webhook`
+- Impacto principal: `migration`
 - Source of truth afectado: `Globe para runtime creativo; Greenhouse conserva sólo gobierno TASK/EPIC y proyecciones explícitas`
 - Consumidores afectados: `Globe UI, creative runner, SDK/MCP y Greenhouse sólo cuando exista contrato versionado`
 - Runtime target: `sibling-service`
@@ -115,9 +139,9 @@ Hacer Globe alcanzable y observable desde Greenhouse conservando fronteras de pr
 ### Contract surface
 
 - Contrato existente a respetar: `EPIC-028, arquitectura agentic de Globe y provider contracts versionados`
-- Contrato nuevo o modificado: `versioned projection/event/deep-link schemas and a thin Greenhouse SDK consumer`
+- Contrato nuevo o modificado: `workspace/member/grant commands and readers, tenant-scoped API schemas and capability coverage`
 - Backward compatibility: `gated`
-- Full API parity: `ecosystem adapter consumes Globe SDK/contracts; no duplicated Globe policy or database projection logic in Greenhouse`
+- Full API parity: `workspace/grant primitives extienden TASK-1481 y se prueban por private API/SDK antes de UI/MCP`
 
 ### Data model and invariants
 
@@ -160,17 +184,47 @@ Hacer Globe alcanzable y observable desde Greenhouse conservando fronteras de pr
 
 ## Scope
 
-### Slice 1
+Recalibrado (Delta 2026-07-20) al **core de HA**. Cada slice es un entregable committeable en `efeonce-globe`.
 
-- Definir projection/event/deep-link contracts versionados.
+### Slice 0 — Datastore Cloud SQL (Terraform)
 
-### Slice 2
+- `infra/terraform/cloud_sql.tf`: `google_sql_database_instance` Postgres 16, `southamerica-west1`, tier
+  `db-g1-small`, ZONAL, `cloudsql.iam_authentication=on`, connector-only (ipv4 sin authorized networks, SSL),
+  backups + PITR 7d, `deletion_protection` + `prevent_destroy`.
+- `google_sql_database` `globe`; `google_sql_user` IAM (keyless) para `api_runtime`, `web_runtime`, `deployer`.
+- `sqladmin.googleapis.com` en `enabled_services`; roles `cloudsql.client` + `cloudsql.instanceUser` a los 3 SAs.
+- Outputs `postgres_instance_connection_name` / `postgres_database_name`. `tofu validate` + `plan` aditivo (0
+  destroy/replace de identidad viva) → apply.
 
-- Implementar publisher/consumer idempotente con WIF.
+### Slice 0b — Cliente DB real + tooling de migración
 
-### Slice 3
+- `packages/database`: cliente Postgres real detrás del connector Cloud SQL (IAM auth keyless), pool per-runtime,
+  impl de `TransactionPort`, y un migrador SQL-first mínimo (Node nativo, sin ORM pesado). Config por env
+  (`GLOBE_POSTGRES_INSTANCE_CONNECTION_NAME` / `GLOBE_POSTGRES_DATABASE`), server-only.
 
-- Probar freshness, replay, deny, revoke y degradación.
+### Slice 1 — Schema durable tenant-scoped
+
+- Migraciones para: `experiments`, `evaluation_reports`, `human_sessions`, `oauth_transactions`,
+  `spend_fence` (runs + day-caps), `audit_log` (append-only). Toda tabla lleva `workspace_id`; keys/índices por
+  `(workspace_id, id)`; columnas `expires_at` para sesiones/OAuth; CHECK/constraints de invariantes.
+
+### Slice 2 — Impls durables detrás de los ports
+
+- Impls Postgres de `ExperimentStorePort`, `EvaluationReportStorePort`, `SpendFencePort` (reserve/settle/release
+  atómico cross-réplica), y partir `InternalSmokeSessionStore` en `SessionStorePort` + `OAuthTransactionStorePort`
+  durables. Sin tocar callsites (los ports ya toman `workspaceId`).
+
+### Slice 3 — Wiring + relajar el guard
+
+- `apps/studio-web/src/app.ts`: inyectar las impls durables cuando hay DB configurada; relajar
+  `globe_memory_store_forbidden` para permitir el path durable fuera de `internal_smoke` (in-memory sigue vetado
+  para prod). `maxScale=1` se mantiene (subirlo es decisión posterior, no de esta task).
+
+### Slice 4 — Audit append-only + tests negativos
+
+- Sink de audit durable append-only (actor/correlation/decisión/estado/error sanitizado; sin secretos/PII) cableado
+  en el dispatch. Tests negativos: aislamiento cross-tenant (get de otro workspace → miss), idempotencia,
+  reserve/settle bajo concurrencia, expiración de sesión/OAuth.
 
 ## Out of Scope
 
@@ -180,7 +234,7 @@ Hacer Globe alcanzable y observable desde Greenhouse conservando fronteras de pr
 
 ## Detailed Spec
 
-La ejecución comienza desde Greenhouse con `pnpm codex:task-hook TASK-1475 --develop` cuando el operador apruebe su goal. El plan puede modificar el repositorio hermano en los paths owned, pero lifecycle, checkpoints, QA y cierre permanecen en esta spec canónica.
+La ejecución comienza desde Greenhouse con `pnpm codex:task-hook TASK-1465 --develop` cuando el operador apruebe su goal. El plan puede modificar el repositorio hermano en los paths owned, pero lifecycle, checkpoints, QA y cierre permanecen en esta spec canónica.
 
 ## Rollout Plan & Risk Matrix
 
@@ -192,7 +246,7 @@ La ejecución comienza desde Greenhouse con `pnpm codex:task-hook TASK-1475 --de
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
-| Acoplamiento oculto o proyección stale | Globe/Greenhouse | medium | gate binario, allowlist, audit y rollback antes de ampliar | consumer depende de schema interno Globe |
+| Fuga cross-tenant o lógica duplicada | Globe/Greenhouse | medium | gate binario, allowlist, audit y rollback antes de ampliar | query sin workspace predicate |
 | Deriva entre task y runtime | documentation | medium | task hook, checkpoint, QA y closure en Greenhouse | cambio Globe sin evidencia TASK |
 | Habilitación accidental externa | security/commercial | low | internal-only, deny tests y sign-off separado | actor externo obtiene acceso |
 
@@ -220,17 +274,16 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 
 ## Acceptance Criteria
 
-- [ ] Greenhouse no accede a la DB ni secretos de Globe.
-- [ ] Eventos soportan replay sin duplicar efectos.
-- [ ] Deep links preservan tenant/capability sin tokens en URL.
-- [ ] Contract tests cubren schema version, replay/deprecation, freshness y ausencia de imports Globe internos
-      fuera del SDK/contracts.
+- [ ] Toda fila y operación queda ligada a studio_workspace_id.
+- [ ] Tests negativos demuestran ausencia de acceso cross-tenant.
+- [ ] UI, SDK y agentes consumen los mismos commands/readers.
+- [ ] Negative paths demuestran que HTTP/SDK/body/headers no pueden elegir otro workspace ni elevar grants.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
 - [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
 
 ## Verification
 
-- `pnpm task:lint --task TASK-1475`
+- `pnpm task:lint --task TASK-1465`
 - `pnpm ops:lint --changed`
 - `pnpm qa:gates --changed`
 - `pnpm docs:closure-check`

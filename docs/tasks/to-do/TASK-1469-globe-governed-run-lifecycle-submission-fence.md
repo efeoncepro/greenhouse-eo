@@ -4,6 +4,14 @@
 
 El paso de estimate del run lifecycle durable **ya existe** como slice adelantado (TASK-1502, complete): `LabRunnerPort.estimate({ quote: LabQuoteInputV1 })` + el reader read-only `globe.lab.experiment.estimate`. 1469 **consume** ese mismo cómputo de estimate como su paso de estimate, sin reimplementarlo; el `execute` ya deriva su quote vía `quoteInputFromStored`. El `withinDayCap` durable (hoy no poblado) se puebla cuando 1469/1468 aporten el fence durable.
 
+## Delta 2026-07-20 — public base URL HTTPS estable la define TASK-1507 (front door)
+
+La `External coordination: public base URL HTTPS estable` que este task exige para los callbacks Fal/OpenAI y el
+canary ya tiene owner: **ADR-004** (`TASK-1506`, complete) fijó el front door y **`TASK-1507`** (sucesora) implementa
+`https://globe.efeoncepro.com` vía Global External ALB + serverless NEG → `globe-studio-internal`. Hasta que 1507
+publique el dominio, la base URL estable es el `*.run.app` + SSO (ya sirve como callback/canary base). No inventar
+un dominio propio ni asumir Vercel: el host del shell interno es Cloud Run (ADR-004).
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
