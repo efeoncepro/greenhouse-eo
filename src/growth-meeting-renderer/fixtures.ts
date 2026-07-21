@@ -72,6 +72,14 @@ export const meetingAvailabilityFixture = (): MeetingAvailability => ({
   ],
 })
 
+export const meetingEmptyAvailabilityFixture = (monthOffset = 1): MeetingAvailability => ({
+  ...meetingAvailabilityFixture(),
+  monthOffset,
+  hasMore: false,
+  state: 'empty',
+  days: [],
+})
+
 export const meetingConfirmedFixture = (): MeetingBookingConfirmed => ({
   outcome: 'confirmed',
   appointment: {
@@ -91,8 +99,8 @@ export const createMeetingFixtureApi = (outcome: MeetingFixtureOutcome = 'confir
   async config() {
     return meetingConfigFixture()
   },
-  async availability() {
-    return meetingAvailabilityFixture()
+  async availability({ monthOffset }) {
+    return monthOffset === 0 ? meetingAvailabilityFixture() : meetingEmptyAvailabilityFixture(monthOffset)
   },
   async verifyEmail({ email }) {
     const personal = /@(gmail|outlook|hotmail|yahoo)\./i.test(email)

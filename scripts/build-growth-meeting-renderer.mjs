@@ -33,6 +33,7 @@ const iconNames = [
   'chevron-right',
   'check',
   'calendar-check',
+  'calendar-off',
   'arrow-right',
   'circle-check',
   'shield-check',

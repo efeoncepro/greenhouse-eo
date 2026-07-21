@@ -29,27 +29,21 @@
   lazy-loads y abre diálogo desktop/full-screen móvil preservando una instancia; `book_meeting` sigue navigation-only.
   GVC CTA `.captures/2026-07-21T11-22-29_growth-cta-native-meeting` pasó 10 frames desktop/mobile.
 
-  El formulario ahora valida progresivamente `neutral → invalid/pending → valid`: blur activa feedback, la corrección
-  revalida al escribir, email separa sintaxis/política corporativa y consentimiento responde al cambio. Copy + Tabler +
-  ARIA live, sin layout shift y con reduced motion. GVC `.captures/2026-07-21T11-37-07_native-meeting-scheduler` pasó
-  39 frames 1440/820/390; 73 pruebas del dominio, TypeScript, ESLint y build productivo verdes.
+  Formulario, copy y confirmación completa están cerrados en la task canónica: validación reactiva/corporativa,
+  iconos Tabler, receipt server-confirmed sin PII y motion/reduced-motion. GVC final
+  `.captures/2026-07-21T12-18-17_native-meeting-scheduler` pasó 45 frames en 1440/820/390; pruebas, TypeScript, ESLint
+  y build productivo verdes. GTM preserva allowlist + receipt gate y sigue sin publicar.
 
-  El estado confirmado ahora recompone el shell completo como **Meeting Confirmation Receipt**: retira calendario,
-  stepper, fallback y acciones; usa el appointment server-confirmed para fecha/rango/zona/duración/Teams y presenta
-  próximos pasos sin PII/receipt. La dirección pesada inicial fue descartada y sustituida por una superficie luminosa
-  continua con motion espacial y reduced-motion equivalente. GVC `.captures/2026-07-21T12-01-53_native-meeting-scheduler`
-  pasó 45 frames 1440/820/390. Sigue `code complete, rollout pendiente`.
-
-  La pasada final de copy/UX writing/CRO/comercial reemplazó jerga interna y exposición de proveedor por tareas,
-  expectativas y recuperaciones concretas: conversación de 30 min por Teams, zona horaria local, correo de empresa,
-  `Reservar horario` y confirmación que previene duplicados. Los textos dinámicos también viven en el diccionario
-  canónico. La auditoría GTM preservó eventos/allowlist y el receipt gate; no hubo publish.
-  GVC final `.captures/2026-07-21T12-18-17_native-meeting-scheduler` pasó 45 frames en 1440/820/390, exit 0.
-
-  GTM workspace 6 pasó readback/quick preview con 10 DLVs, sin versión/publicación. Pendientes: deploy/read staging,
-  dossier de estados reales, binding + controlled booking/replay, host pilot y publish/flags con confirmación humana.
-  HubSpot/Office 365/Teams siguen SoT; iframe/link permanece fallback. Trabajo en `develop`; `docs/ui/creative-studio/`
-  es ajeno y no se toca.
+  Ambos flags están ON en staging/Production. El binding piloto `fhsf-efeonce-lead-gen-web`/`discovery` está `active`; config y disponibilidad
+  reales devolvieron 200 desde el origen permitido, incluida la resolución visitor-aware de `America/New_York`. El piloto aislado
+  `https://efeoncepro.com/agenda/` (WP `251583`, `noindex`) monta el renderer nativo con slots reales y enlace HubSpot de
+  respaldo; Playwright verificó desktop/390, `overflow=0` y consola limpia. No se creó un booking nuevo durante los checks.
+  HubSpot devuelve actualmente cero slots para agosto; el renderer ya conserva `Agosto de 2026`, la grilla de 31 días y
+  la navegación/estado vacío en vez de colapsar el calendario. La regresión julio→agosto pasa 39 pruebas del renderer y
+  revisión local desktop/390; su promoción y smoke live en `/agenda/` forman el release inmediato en curso.
+  GTM workspace 6 sigue sin versión/publicación. No promover aún a Contacto/RRSS: primero booking controlado/replay y evidencia
+  `/g/collect`; la publicación GTM requiere confirmación humana separada. Backups Elementor: `agenda_pilot_overflow_v1` y `agenda_pilot_template_v1`.
+  HubSpot/Office 365/Teams siguen SoT. Trabajo en `develop`; `docs/ui/creative-studio/` es ajeno y no se toca.
 
 - **`TASK-1366` COMPLETE / CONDITIONAL PASS (HubSpot Scheduler Booking Equivalence Spike, `EPIC-023`).**
   Build HubSpot `#27` desplegado/reinstalado con scope Scheduler mínimo y sin rotar el token gobernado. Booking

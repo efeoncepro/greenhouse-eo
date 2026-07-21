@@ -1168,6 +1168,29 @@ export const MEETING_RENDERER_CSS = `
   gap: 14px;
   margin-top: 14px;
 }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-calendar-empty {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 3px 10px;
+  align-items: center;
+  margin-top: 14px;
+  padding: 13px 15px;
+  border: 1px solid color-mix(in srgb, var(--gh-meeting-line-strong) 58%, transparent);
+  border-radius: 11px;
+  color: var(--gh-meeting-text);
+  background: color-mix(in srgb, var(--gh-meeting-paper-alt) 82%, transparent);
+}
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-calendar-empty-icon {
+  grid-row: 1 / span 2;
+  color: var(--gh-meeting-accent-strong);
+  font-size: 1.2rem;
+}
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-calendar-empty-title { font-size: 0.82rem; }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-calendar-empty-body {
+  color: var(--gh-meeting-muted);
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-density-legend,
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-timezone-lens {
   display: inline-flex;
