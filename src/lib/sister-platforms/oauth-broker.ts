@@ -522,6 +522,119 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
   return client
 }
 
+/**
+ * Adjust ONLY the redirect-URI allowlist of an existing OAuth client (TASK-1507).
+ *
+ * A domain cutover has to add the new callback while the old one keeps working, then drop the old
+ * one once the smoke is green. `upsertSisterPlatformOAuthClient` cannot express that: it replaces
+ * the whole row, so the caller has to restate policy, scopes and TTLs, and any value that drifted
+ * since it was last seeded would be silently rewritten. Seed scripts also rotate the consumer
+ * token alongside the client, which would invalidate the live secret mid-cutover.
+ *
+ * So this touches exactly one column, inside one transaction, reusing `normalizeRedirectUris` as
+ * the single validation authority (no wildcards, HTTPS outside localhost, never empty). Adding a
+ * URI that is already allowed is a no-op, which makes re-running it safe.
+ */
+export const updateSisterPlatformOAuthRedirectUris = async (input: {
+  clientId: string
+  add?: string[]
+  remove?: string[]
+  actorUserId?: string | null
+}) => {
+  const clientId = input.clientId.trim().toLowerCase()
+
+  if (!clientId) {
+    throw new SisterPlatformOAuthError('clientId is required.', { errorCode: 'invalid_client' })
+  }
+
+  const add = (input.add ?? []).map(uri => uri.trim()).filter(Boolean)
+  const remove = (input.remove ?? []).map(uri => uri.trim()).filter(Boolean)
+
+  if (add.length === 0 && remove.length === 0) {
+    throw new SisterPlatformOAuthError('At least one redirect URI to add or remove is required.', {
+      errorCode: 'invalid_request'
+    })
+  }
+
+  // Removing a URI that is not currently allowed means the caller is working from a stale picture
+  // of the allowlist — during a cutover that is exactly when a silent no-op is dangerous.
+  const overlap = add.filter(uri => remove.includes(uri))
+
+  if (overlap.length > 0) {
+    throw new SisterPlatformOAuthError('A redirect URI cannot be added and removed in the same call.', {
+      errorCode: 'invalid_redirect_uri'
+    })
+  }
+
+  let previousRedirectUris: string[] = []
+  let nextRedirectUris: string[] = []
+
+  await withTransaction(async pgClient => {
+    const existing = await pgClient.query<{ oauth_client_id: string; redirect_uris: string[] | null }>(
+      `
+        SELECT sister_platform_oauth_client_id AS oauth_client_id, redirect_uris
+        FROM greenhouse_core.sister_platform_oauth_clients
+        WHERE lower(client_id) = lower($1)
+        LIMIT 1
+        FOR UPDATE
+      `,
+      [clientId]
+    )
+
+    const row = existing.rows[0]
+
+    if (!row) {
+      throw new SisterPlatformOAuthError('OAuth client not found.', {
+        statusCode: 404,
+        errorCode: 'invalid_client'
+      })
+    }
+
+    previousRedirectUris = normalizeStringArray(row.redirect_uris, [])
+
+    const missing = remove.filter(uri => !previousRedirectUris.includes(uri))
+
+    if (missing.length > 0) {
+      throw new SisterPlatformOAuthError('Redirect URI to remove is not in the allowlist.', {
+        errorCode: 'invalid_redirect_uri'
+      })
+    }
+
+    const merged = [...previousRedirectUris.filter(uri => !remove.includes(uri)), ...add]
+
+    // Throws when the result would be empty, contains a wildcard, or is not HTTPS outside
+    // localhost — the same authority `upsertSisterPlatformOAuthClient` applies.
+    nextRedirectUris = normalizeRedirectUris(merged)
+
+    await pgClient.query(
+      `
+        UPDATE greenhouse_core.sister_platform_oauth_clients
+        SET redirect_uris = $2::text[], updated_at = CURRENT_TIMESTAMP
+        WHERE sister_platform_oauth_client_id = $1
+      `,
+      [row.oauth_client_id, nextRedirectUris]
+    )
+  })
+
+  const client = await loadSisterPlatformOAuthClient(clientId)
+
+  if (!client) {
+    throw new SisterPlatformOAuthError('Unable to reload OAuth client after redirect URI update.', {
+      statusCode: 500,
+      errorCode: 'client_reload_failed'
+    })
+  }
+
+  return {
+    client,
+    previousRedirectUris,
+    redirectUris: nextRedirectUris,
+    changed:
+      previousRedirectUris.length !== nextRedirectUris.length ||
+      previousRedirectUris.some((uri, index) => uri !== nextRedirectUris[index])
+  }
+}
+
 const assertClientActive = (client: SisterPlatformOAuthClient) => {
   if (client.clientStatus !== 'active') {
     throw new SisterPlatformOAuthError('OAuth client is not active.', {
