@@ -44,6 +44,11 @@
 - La migración dev quedó aplicada y leída de vuelta; un race live de PostgreSQL probó un único claim, conflicto
   semántico, replay único y cero residuo. Se provisionó el secreto HMAC dedicado con acceso del runtime y se verificó
   el resolver canónico; HubSpot Scheduler continúa online sobre Office 365 con disponibilidad real.
+- El runtime del scheduler fue promovido y activado en staging y producción: ambos flags están ON y el binding piloto
+  `fhsf-efeonce-lead-gen-web`/`discovery` quedó activo. Configuración y disponibilidad reales respondieron desde el
+  origen público permitido y respetaron la zona del visitante (`America/New_York` en la verificación). La landing
+  pública todavía conserva el embed/link HubSpot mientras el runtime WordPress concurrente no se libera; no se publicó
+  GTM ni se creó una reserva adicional durante esta activación.
 - La UI elevó el calendario a `Calendar Command Center`: densidad por fecha, agenda agrupada por período, resumen
   vivo, formulario desktop de dos columnas, mobile compacto y motion causal/reduced-motion. GVC premium
   `2026-07-21T09-02-04_native-meeting-scheduler`: 24 frames, exit 0, runtime/enterprise/a11y/layout/performance verdes.

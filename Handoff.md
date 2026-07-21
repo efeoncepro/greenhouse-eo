@@ -46,10 +46,14 @@
   canónico. La auditoría GTM preservó eventos/allowlist y el receipt gate; no hubo publish.
   GVC final `.captures/2026-07-21T12-18-17_native-meeting-scheduler` pasó 45 frames en 1440/820/390, exit 0.
 
-  GTM workspace 6 pasó readback/quick preview con 10 DLVs, sin versión/publicación. Pendientes: deploy/read staging,
-  dossier de estados reales, binding + controlled booking/replay, host pilot y publish/flags con confirmación humana.
-  HubSpot/Office 365/Teams siguen SoT; iframe/link permanece fallback. Trabajo en `develop`; `docs/ui/creative-studio/`
-  es ajeno y no se toca.
+  La base runtime ya está promovida (release production `0c06dbf510f2-0b0007ec-0775-4206-a3fb-6cbe8d80c9f8`) y ambos flags
+  están ON en staging/Production. El binding piloto `fhsf-efeonce-lead-gen-web`/`discovery` está `active`; config y disponibilidad
+  reales devolvieron 200 desde el origen permitido, incluida la resolución visitor-aware de `America/New_York`. No se creó un
+  booking nuevo durante el flip. GTM workspace 6 sigue sin versión/publicación. El host nativo de WordPress queda bloqueado por
+  cambios concurrentes sin liberar en `efeonce-public-site-runtime`; la landing continúa deliberadamente con embed/link HubSpot
+  como fallback. Próximo paso: liberar/aislar ese runtime, aplicar su widget host gobernado y recién entonces ejecutar GVC live,
+  booking controlado/replay y evidencia `/g/collect`; la publicación GTM requiere confirmación humana separada.
+  HubSpot/Office 365/Teams siguen SoT. Trabajo en `develop`; `docs/ui/creative-studio/` es ajeno y no se toca.
 
 - **`TASK-1366` COMPLETE / CONDITIONAL PASS (HubSpot Scheduler Booking Equivalence Spike, `EPIC-023`).**
   Build HubSpot `#27` desplegado/reinstalado con scope Scheduler mínimo y sin rotar el token gobernado. Booking

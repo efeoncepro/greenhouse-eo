@@ -17,7 +17,7 @@
 - Motion: `docs/ui/motion/TASK-1510-native-meeting-scheduler-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-023`
-- Status real: `Temporal Operations Desk y adapter Growth CTA nativo code-complete localmente; GVC seam, staging host, pilot y aprobación/publish GTM siguen pendientes`
+- Status real: `Temporal Operations Desk y adapter Growth CTA nativo promovidos; flags staging/Production y binding piloto activos con config/availability reales. El host WordPress nativo, GVC live, booking controlado y publish GTM siguen pendientes.`
 - Rank: `TBD`
 - Domain: `growth|public-site|ui`
 - Blocked by: `none`
@@ -378,6 +378,7 @@ The renderer is a standalone custom element with an explicit state reducer. Rend
 - [ ] `pnpm fe:capture:review <capture-dir>`
 - [ ] `pnpm ui:quality --task TASK-1510`
 - [x] GTM workspace read-back/quick preview (`compilerError=false`, `syncOk=true`); browser `/g/collect` remains a live-host rollout gate.
+- [x] Runtime activation 2026-07-21: `GROWTH_NATIVE_MEETING_SCHEDULER_READ_ENABLED=true` + `GROWTH_NATIVE_MEETING_SCHEDULER_ENABLED=true` in staging/Production, fresh production deployment Ready, and pilot binding `fhsf-efeonce-lead-gen-web`/`discovery` switched to `active`. Public-origin config and availability returned 200 with visitor timezone `America/New_York`; no booking was created for this activation check.
 - [ ] `pnpm measurement:smoke` after approved publish.
 - [ ] `pnpm ops:lint --changed`
 - [x] `pnpm qa:gates --changed --agent codex --task TASK-1510 --ui --runtime --integration --docs` — advisory; rollout dependencies remain explicit.
@@ -386,7 +387,7 @@ The renderer is a standalone custom element with an explicit state reducer. Rend
 ## Closing Protocol
 
 - [ ] Keep `code complete, rollout pendiente` while GTM publish, public pilot or fallback evidence is pending.
-- [ ] Record bundle/host/flag/GTM version, GVC dossier, scorecard, funnel and booking evidence in Handoff/changelog.
+- [x] Runtime flag/binding activation and API evidence recorded in the feature-flag ledger, Handoff and changelog; host/GTM/booking evidence remains pending.
 - [ ] Never claim global iframe replacement from a single pilot.
 
 ## Definition of Done
