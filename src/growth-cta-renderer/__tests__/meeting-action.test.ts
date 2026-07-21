@@ -51,6 +51,8 @@ describe('MeetingActivationController', () => {
     expect(document.documentElement.style.overflow).toBe('hidden')
     expect(scheduler.getAttribute('activation-mode')).toBe('dialog')
     expect(scheduler.getAttribute('scheduler-key')).toBe('efeonce-discovery-30')
+    expect(scheduler.querySelector('a')).toBeNull()
+    expect(dialog.textContent).not.toContain('agenda alternativa')
 
     controller.close()
     expect(document.documentElement.style.overflow).toBe('')

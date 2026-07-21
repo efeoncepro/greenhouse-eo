@@ -54,7 +54,7 @@ One decision plane appears at a time. The date strip is an efficient default, wh
 │                              │
 │ Mié 22 · 09:30 · 30 min      │
 │ [Continuar]                  │
-│ Abrir agenda alternativa     │
+│ Reintentar                   │
 └──────────────────────────────┘
 ```
 
@@ -62,7 +62,7 @@ At the details phase, date and time collapse into the persistent appointment sum
 
 ## Mobile Target
 
-At 390x844 the Growth CTA remains a compact launcher and opens a `full_screen` task surface. The scheduler resolves to `guided`, has a single vertical scroll owner and exposes one decision plane at a time. The selected appointment remains visible without covering fields, errors, consent or fallback.
+At 390x844 the Growth CTA remains a compact launcher and opens a `full_screen` task surface. The scheduler resolves to `guided`, has a single vertical scroll owner and exposes one decision plane at a time. The selected appointment remains visible without covering fields, errors, consent or retry controls.
 
 ## Split — medium surface
 
@@ -118,7 +118,7 @@ The host supplies `activation-mode` and an optional maximum recipe. The componen
 
 - Primary: select a real slot, then continue/reserve.
 - Secondary: navigate month, reveal full month or go back. La zona se detecta del dispositivo y se muestra de forma explícita.
-- Safety: HubSpot fallback remains available before provider dispatch and is suppressed after ambiguous/provider-created-invalid outcomes.
+- Safety: recovery remains native; after ambiguous/provider-created-invalid outcomes the UI blocks another booking path and asks the user to check email.
 - Closing a dialog before dispatch may retain the in-memory draft for the same activation session. After dispatch it must retain the controller and block duplicate booking.
 - The CTA host never introduces a competing primary action inside the scheduler.
 
@@ -140,7 +140,7 @@ The host supplies `activation-mode` and an optional maximum recipe. The componen
 | Steps | “Fecha y hora”, “Tus datos”, “Confirmación” | growth-meetings copy |
 | Month disclosure | “Ver mes” | growth-meetings copy |
 | Primary CTA | continue/reserve according to state | growth-meetings copy |
-| Fallback | “Abrir agenda alternativa” with honest provider-neutral context | growth-meetings copy |
+| Recovery | “Reintentar” after a load/config failure | growth-meetings copy |
 | Error/success | generic recovery and confirmed receipt wording | growth-meetings copy; never host markup |
 
 ## State Copy
@@ -148,11 +148,11 @@ The host supplies `activation-mode` and an optional maximum recipe. The componen
 | State | Visible copy | Recovery behavior |
 |---|---|---|
 | ready | “Elige una fecha” / “Elige una hora” | select a date/slot or reveal the full month |
-| loading | “Buscando horarios disponibles…” | wait; after a bounded timeout expose retry and fallback |
-| empty | “No hay horarios disponibles en este mes.” | navigate to the next bounded window or use fallback |
-| partial | “Mostramos la disponibilidad más reciente; confirma para validar el horario.” | booking revalidates; fallback remains pre-dispatch |
-| error | “No pudimos cargar la agenda.” | user-driven retry or safe fallback |
-| denied | “No podemos abrir esta agenda desde aquí.” | safe HubSpot link without policy/provider detail |
+| loading | “Buscando horarios disponibles…” | wait; after a bounded timeout expose retry |
+| empty | “No hay horarios disponibles en este mes.” | navigate to another bounded month |
+| partial | “Mostramos la disponibilidad más reciente; confirma para validar el horario.” | booking revalidates before write |
+| error | “No pudimos cargar la agenda.” | user-driven retry in the same surface |
+| denied | “No podemos abrir esta agenda desde aquí.” | retry after the host/configuration is corrected |
 | conflict | “Ese horario ya no está disponible. Elige otro para continuar.” | refresh and return focus to valid availability |
 | pending | “Reservando tu horario…” | retain the intent; never submit a new key |
 | success | “Tu reunión está confirmada.” | show the server-confirmed summary and email/calendar expectation |
@@ -183,7 +183,7 @@ continues to own close/back behavior for dialog and full-screen envelopes.
 - Dialog/full-screen activation moves focus to the scheduler heading, contains Tab, supports safe Escape and restores focus to the launcher.
 - Calendar grid, date strip and slots expose equivalent names and selected states; color is never the only signal.
 - Recipe changes preserve logical reading order and move focus only when the focused control no longer exists, to its semantic counterpart.
-- Sticky mobile actions do not cover the focused field, error summary, consent or fallback.
+- Sticky mobile actions do not cover the focused field, error summary, consent or retry control.
 - Targets are at least 44 px; no recipe introduces page-level horizontal scrolling.
 
 ## Motion contract
@@ -199,7 +199,7 @@ continues to own close/back behavior for dialog and full-screen envelopes.
 - Controller: one reducer/effects owner in `src/growth-meeting-renderer/**`.
 - Views: `LauncherView`, `GuidedSchedulerView`, `SplitSchedulerView`, `CommandCenterView`.
 - Shared pieces: `CalendarGrid`, `DateStrip`, `SlotAgenda`, `AppointmentSummary`, `BookingDetailsForm`, `RecoverySurface`.
-- Browser attributes: `api-base`, `surface`, `placement`, `locale`, `timezone`, `activation-mode`, `max-recipe`, `fallback-url`.
+- Browser attributes: `api-base`, `surface`, `placement`, `locale`, `timezone`, `activation-mode`, `max-recipe`.
 - Telemetry dimensions proposed before GTM publish: `presentation_variant` and `activation_mode`. A fit change is not a step.
 - Server-only: provider configuration, secrets, PII policy, idempotency, receipt and conversion authority.
 

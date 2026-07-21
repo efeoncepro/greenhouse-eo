@@ -1,7 +1,7 @@
 # PDR-009 — Booking nativo con HubSpot Scheduler API
 
 > **Tipo:** Product Decision Record para conversiones del sitio publico.
-> **Estado:** Accepted — conditional pass; no runtime cutover.
+> **Estado:** Accepted — scheduler nativo activo; HubSpot queda como proveedor server-side, no como UI alternativa.
 > **Fecha:** 2026-07-08.
 > **Task:** [`TASK-1366`](../../tasks/complete/TASK-1366-hubspot-scheduler-booking-equivalence.md).
 > **Superficies afectadas:** `efeoncepro.com`, `think.efeoncepro.com`, Growth CTA engine, landings publicas con CTA "Agenda una reunion".
@@ -14,9 +14,9 @@ El operador pregunto si el widget es la unica via o si Greenhouse puede crear un
 
 ## Decision
 
-Efeonce tratara el widget oficial como **fallback seguro vigente**, pero validara una alternativa preferida: una UI propia de booking que llame server-side a **HubSpot Scheduler API** sobre la misma scheduling page.
+Efeonce usa una UI propia de booking que llama server-side a **HubSpot Scheduler API** sobre la misma scheduling page. HubSpot conserva configuración, disponibilidad, calendario, Teams y CRM como fuente técnica; su iframe o scheduling page no forman parte de la experiencia de recuperación del scheduler nativo.
 
-La decision no autoriza reemplazar el iframe en ninguna landing todavia. Autoriza un spike controlado para confirmar equivalencia operativa real en el portal Efeonce.
+La decisión inicial autorizó un spike controlado. La evidencia de TASK-1366 y el rollout de TASK-1509/1510 cerraron esa condición el 2026-07-21. Desde esa fecha, los estados vacío, degradado o de carga se resuelven dentro del scheduler mediante navegación mensual, reintento y mensajes explícitos. El rollback es operativo por flags/versiones, no una salida visible a HubSpot.
 
 ## Research sintetico
 
@@ -90,7 +90,7 @@ La UI nativa solo puede avanzar si `TASK-1366` prueba con una reunion controlada
 - El comportamiento de cancelacion/reprogramacion queda entendido y documentado.
 - La medicion no manda PII al `dataLayer`.
 
-Si cualquiera de los puntos core falla, se mantiene el widget oficial y se invierte en mejorar su contenedor/scroll/fallback.
+Si cualquiera de los puntos core deja de cumplirse, se desactiva o revierte el scheduler nativo mediante el control plane. No se deriva al visitante al widget de HubSpot desde el flujo.
 
 ## Guardrails
 
@@ -104,7 +104,7 @@ Si cualquiera de los puntos core falla, se mantiene el widget oficial y se invie
 
 ## Consecuencias
 
-- `HubSpotMeetingEmbed` sigue vigente como primitive candidata/fallback hasta el rollout del adapter.
+- `HubSpotMeetingEmbed` deja de ser fallback de la experiencia nativa. Puede persistir únicamente en superficies legacy todavía no migradas.
 - El action router futuro de `growth.cta` puede agregar un adapter nuevo (`native_booking`/`hubspot_handoff`),
   sin cambiar el `book_meeting` navigation-only existente.
 - Las landings con open question de mecanismo CTA (`/agencia`, creativa, HubSpot, redes) ganan una decision comun en vez de resolver meeting por pagina.

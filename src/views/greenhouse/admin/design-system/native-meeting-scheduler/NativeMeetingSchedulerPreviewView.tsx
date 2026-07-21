@@ -31,9 +31,7 @@ const EMBED_SNIPPET = `<efeonce-meeting-scheduler
   surface="efeonce-public-site"
   placement="contact_scheduler"
   base-url="https://greenhouse.efeoncepro.com"
->
-  <a href="https://meetings.hubspot.com/efeonce">Abrir agenda segura</a>
-</efeonce-meeting-scheduler>
+></efeonce-meeting-scheduler>
 <script src="https://greenhouse.efeoncepro.com/growth-meetings/renderer-stable.js" defer></script>`
 
 const SchedulerCanvas = ({ outcome }: { outcome: MeetingFixtureOutcome }) => {
@@ -57,7 +55,6 @@ const SchedulerCanvas = ({ outcome }: { outcome: MeetingFixtureOutcome }) => {
       surfaceId: 'greenhouse-design-system',
       schedulerKey: 'efeonce-discovery-30',
       requestedTimezone: 'America/Santiago',
-      emergencyFallbackUrl: 'https://meetings.hubspot.com/efeonce',
       now: () => new Date('2026-07-21T12:00:00.000Z'),
       telemetryBase: {
         scheduler_key: 'efeonce-discovery-30',
@@ -115,7 +112,6 @@ const GrowthCtaSchedulerSeam = ({ outcome }: { outcome: MeetingFixtureOutcome })
           surfaceId: 'greenhouse-design-system',
           schedulerKey: 'efeonce-discovery-30',
           requestedTimezone: 'America/Santiago',
-          emergencyFallbackUrl: 'https://meetings.hubspot.com/efeonce',
           now: () => new Date('2026-07-21T12:00:00.000Z'),
           activationMode: 'dialog',
           telemetryBase: {

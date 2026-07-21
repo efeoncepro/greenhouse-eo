@@ -11,7 +11,7 @@
 
 - Growth CTA incorpora la acción aditiva `open_meeting_scheduler` sin alterar `book_meeting`: autoridad `surface + scheduler key`
   validada server-side, proyección browser-safe, lazy load consent-aware con Save-Data/2G, task surface dialog/full-screen,
-  foco/scroll/escape gobernados, fallback HubSpot y continuidad del mismo scheduler al cerrar/reabrir. El cockpit puede
+  foco/scroll/escape gobernados, recuperación nativa y continuidad del mismo scheduler al cerrar/reabrir. El cockpit puede
   autorarla. GVC `.captures/2026-07-21T11-22-29_growth-cta-native-meeting` pasó desktop/mobile, 10 frames,
   teclado/reduced-motion y continuidad al reabrir; rollout público y promoción de baseline siguen pendientes.
 - La UI evolucionó a **Temporal Operations Desk**: dossier compacto, grilla mensual continua con gramática de
@@ -55,7 +55,15 @@
   overflow ni errores de consola. No se promovió a Contacto/RRSS, no se publicó GTM ni se creó una reserva.
 - La navegación mensual ya no colapsa el calendario cuando HubSpot devuelve un mes sin slots: conserva el mes solicitado,
   la grilla semántica completa, los controles de recuperación y un estado vacío específico. La regresión julio→agosto
-  quedó cubierta con 31 días no disponibles, restauración de foco y revisión visual desktop/390 sin overflow.
+  quedó cubierta con 31 días no disponibles, restauración de foco y revisión visual desktop/390 sin overflow. PR #162
+  fue liberado en producción (`ddd3094538e7`, run `29848667096`); el smoke en la sesión Chrome autenticada del operador
+  confirmó agosto completo en `https://efeoncepro.com/agenda/`, sin crear una reserva ni publicar GTM.
+- El scheduler pasa a una experiencia **native-only** en todos sus tamaños y activaciones: se eliminaron el enlace hijo y el
+  respaldo visible de `/agenda/`, y tanto el renderer portable como Growth CTA resuelven fallas mediante `Reintentar`, sin abrir
+  la UI de HubSpot. Elementor se guardó vía `Document::save()` con backup
+  `_gh_backup_before_agenda_native_only_20260721T170615Z`; el readback confirmó un host y cero enlaces HubSpot. HubSpot continúa
+  como provider invisible de disponibilidad/reserva. Las 75 pruebas focales, typecheck, lint, build y GVC premium
+  `.captures/2026-07-21T17-02-42_native-meeting-scheduler` quedaron verdes; el bundle aguarda el release agrupado.
 - La UI elevó el calendario a `Calendar Command Center`: densidad por fecha, agenda agrupada por período, resumen
   vivo, formulario desktop de dos columnas, mobile compacto y motion causal/reduced-motion. GVC premium
   `2026-07-21T09-02-04_native-meeting-scheduler`: 24 frames, exit 0, runtime/enterprise/a11y/layout/performance verdes.

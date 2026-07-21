@@ -24,7 +24,7 @@ export interface CtaSystemCopy {
   schedulerClose: string
   schedulerLoading: string
   schedulerLoadFailed: string
-  schedulerFallback: string
+  schedulerRetry: string
   /** role=status durante el dispatch de una acción navigate (TASK-1431). */
   navigatingAria: string
   /** sr-only dentro del anchor cuando la navegación abre nuevo contexto (TASK-1431). */
@@ -42,7 +42,7 @@ const ES_CL: CtaSystemCopy = {
   schedulerClose: 'Cerrar agenda',
   schedulerLoading: 'Buscando horarios en tu zona horaria…',
   schedulerLoadFailed: 'No pudimos cargar la agenda.',
-  schedulerFallback: 'Abrir agenda alternativa',
+  schedulerRetry: 'Reintentar',
   navigatingAria: 'Abriendo el enlace…',
   newTabAria: 'Se abre en una pestaña nueva',
 }

@@ -481,7 +481,7 @@ dialog.ghc-meeting-surface::backdrop {
   transition: transform 160ms cubic-bezier(.2,0,0,1), border-color 160ms ease, box-shadow 160ms ease;
 }
 .ghc-meeting-close:hover { border-color: #9eb5cc; box-shadow: 0 6px 18px rgba(9,30,66,.12); transform: translateY(-1px); }
-.ghc-meeting-close:focus-visible, .ghc-meeting-fallback:focus-visible { outline: 3px solid #38a9ff; outline-offset: 3px; }
+.ghc-meeting-close:focus-visible, .ghc-meeting-retry:focus-visible { outline: 3px solid #38a9ff; outline-offset: 3px; }
 .ghc-meeting-stage { min-width: 0; min-height: 0; overflow: auto; padding: 18px; scrollbar-gutter: stable; }
 .ghc-meeting-stage > efeonce-meeting-scheduler { min-width: 0; }
 .ghc-meeting-loading, .ghc-meeting-recovery {
@@ -503,7 +503,20 @@ dialog.ghc-meeting-surface::backdrop {
   border-radius: 50%;
   animation: ghc-meeting-spin .75s linear infinite;
 }
-.ghc-meeting-fallback { display: inline-flex; justify-self: center; padding: 12px 18px; color: #fff; background: #023c70; border-radius: 10px; font-weight: 700; text-decoration: none; }
+.ghc-meeting-retry {
+  appearance: none;
+  display: inline-flex;
+  justify-self: center;
+  min-height: 44px;
+  padding: 12px 18px;
+  color: #fff;
+  background: #023c70;
+  border: 1px solid #023c70;
+  border-radius: 10px;
+  cursor: pointer;
+  font: 700 .88rem/1 inherit;
+}
+.ghc-meeting-retry:hover { background: #02599f; border-color: #02599f; }
 
 dialog.ghc-meeting-surface[data-full-screen] {
   width: 100vw;

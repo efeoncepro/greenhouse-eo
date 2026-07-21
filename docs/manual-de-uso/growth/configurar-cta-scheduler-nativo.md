@@ -3,7 +3,7 @@
 ## Antes de empezar
 
 - Debe existir un `meeting_surface_binding` activo para la pareja `meetingSurfaceId + schedulerKey`.
-- La surface debe autorizar el origin del host y mantener una URL fallback de HubSpot gobernada.
+- La surface debe autorizar el origin del host. HubSpot opera sólo detrás del adapter server-side.
 - El renderer de meetings debe estar disponible en el mismo origen Greenhouse que sirve el CTA.
 
 ## Configuración
@@ -17,13 +17,13 @@
 7. Selecciona fecha y horario, cierra y vuelve a abrir. La misma selección debe permanecer.
 8. Verifica `greenhouse_cta_clicked`/`greenhouse_cta_action_started` y el funnel `gh_meeting_step_reached` sin PII. No debe existir conversión por abrir.
 9. Completa una reserva controlada y revisa la confirmación: debe reemplazar todo el calendario, mostrar fecha,
-   rango horario, zona y Teams, y no volver a ofrecer selección, fallback ni otra acción de booking.
+   rango horario, zona y Teams, y no volver a ofrecer selección ni otra acción de booking.
 10. Comprueba que el foco llegue al título confirmado y que el email o receipt interno no aparezcan en DOM/dataLayer.
 
 ## Degradación y rollback
 
-- Si no carga la agenda nativa, usa el enlace **Abrir agenda alternativa** y revisa bundle/CSP/origin binding.
+- Si no carga la agenda nativa, usa **Reintentar** y revisa bundle/CSP/origin binding si el problema persiste.
 - Para rollback, publica o reasigna la versión anterior `book_meeting`; no cambies la semántica de ese kind.
-- No borres el fallback hasta completar piloto, booking controlado, observación GTM/GA4 y aprobación de rollout.
+- No agregues enlaces directos a HubSpot dentro del scheduler o su superficie de recuperación.
 
 Contrato funcional: [Scheduler de reuniones nativo](../../documentation/growth/scheduler-reuniones-nativo.md). Arquitectura: [Growth Meetings Scheduler](../../architecture/GREENHOUSE_GROWTH_MEETINGS_SCHEDULER_ARCHITECTURE_V1.md).

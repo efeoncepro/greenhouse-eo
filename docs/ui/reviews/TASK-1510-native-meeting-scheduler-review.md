@@ -80,7 +80,7 @@ Resolved during review:
   enterprise rubric pass, no console/page/hydration/HTTP errors and only the expected missing durable-baseline warning.
 - Desktop `1440×1000`: full monthly grid is the dominant region; agenda is visually attached to selected date.
 - Split `820×900`: compact dossier and 60/40 calendar/inspector composition preserve density without squeezing controls.
-- Mobile `390×844`: `guided` opens on a full seven-column month, advances to the grouped agenda and keeps the booking brief before attendee fields; fallback remains after the form actions.
+- Mobile `390×844`: `guided` opens on a full seven-column month, advances to the grouped agenda and keeps the booking brief before attendee fields; recovery remains inside the scheduler and no HubSpot link is exposed.
 - Immediate date-selection frame remains fully visible; the prior phase-wide opacity flash is gone.
 - Details desktop uses a two-column enterprise form; mobile returns to one column with persistent labels, consent and booking brief.
 - Browser check: `body.scrollWidth === body.clientWidth` and scheduler `scrollWidth === clientWidth` at 390 px.

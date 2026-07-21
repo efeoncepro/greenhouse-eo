@@ -34,7 +34,6 @@ export interface MeetingRendererOptions {
   requestedTimezone: string
   now?: () => Date
   dataLayerEnabled?: boolean
-  emergencyFallbackUrl?: string | null
   activationMode?: MeetingActivationMode
   maxRecipe?: MeetingLayoutRecipe
 }
@@ -501,7 +500,7 @@ export class MeetingRenderer {
 
     if (this.state.phase === 'details') this.mountTurnstile(scene)
 
-    if (this.previousPhase !== this.state.phase && ['details', 'confirmed', 'error', 'ambiguous'].includes(this.state.phase)) {
+    if (this.previousPhase !== this.state.phase && ['details', 'confirmed', 'error', 'ambiguous', 'fallback_only'].includes(this.state.phase)) {
       const focusSelector = this.state.phase === 'details'
         ? '.ghm-form-title'
         : this.state.phase === 'confirmed' ? '.ghm-confirmation-title' : '.ghm-message-title'
@@ -617,13 +616,13 @@ export class MeetingRenderer {
     }
 
     if (this.state.phase === 'fallback_only') {
-      work.append(this.renderMessage(copy.genericError, copy.fallbackOnly, 'neutral'))
+      work.append(this.renderLoadRecovery('neutral'))
 
       return work
     }
 
     if (this.state.phase === 'error' && !this.state.availability) {
-      work.append(this.renderMessage(copy.genericError, copy.fallbackOnly, 'warning'))
+      work.append(this.renderLoadRecovery('warning'))
 
       return work
     }
@@ -659,6 +658,17 @@ export class MeetingRenderer {
     title.tabIndex = -1
     title.dataset.ghmFocus = ''
     message.append(title, element('p', 'ghm-message-body', bodyText))
+
+    return message
+  }
+
+  private renderLoadRecovery(kind: 'neutral' | 'warning'): HTMLElement {
+    const message = this.renderMessage(copy.genericError, copy.unavailableHelp, kind)
+    const retry = element('button', 'ghm-secondary ghm-retry', copy.retry)
+
+    retry.type = 'button'
+    retry.addEventListener('click', () => void this.load())
+    message.append(retry)
 
     return message
   }
@@ -1449,25 +1459,6 @@ export class MeetingRenderer {
         )
       })
       agenda.append(button)
-    }
-
-    const fallbackUrl = this.state.config?.fallback.url ?? this.options.emergencyFallbackUrl
-
-    if (fallbackUrl && !['submitting', 'ambiguous', 'confirmed'].includes(this.state.phase)) {
-      const fallback = element('a', 'ghm-fallback', copy.fallback)
-
-      fallback.href = fallbackUrl
-      fallback.target = '_blank'
-      fallback.rel = 'noopener noreferrer'
-      fallback.addEventListener('click', () => this.telemetry({
-        type: 'step_reached',
-        step: 'fallback_opened',
-        context: {
-          availability_state: this.state.phase === 'fallback_only' ? 'fallback_only' : undefined,
-          error_category: this.state.phase === 'error' ? 'provider_degraded' : undefined,
-        },
-      }))
-      agenda.append(fallback)
     }
 
     return agenda

@@ -41,7 +41,6 @@ export class EfeonceMeetingSchedulerElement extends HTMLElement {
   ]
 
   private renderer: MeetingRenderer | null = null
-  private emergencyFallbackUrl: string | null = null
   private internals: ElementInternals | null = null
 
   constructor() {
@@ -50,10 +49,6 @@ export class EfeonceMeetingSchedulerElement extends HTMLElement {
   }
 
   connectedCallback(): void {
-    if (!this.emergencyFallbackUrl) {
-      this.emergencyFallbackUrl = this.querySelector<HTMLAnchorElement>('a[href]')?.href ?? null
-    }
-
     this.mount()
   }
 
@@ -94,7 +89,6 @@ export class EfeonceMeetingSchedulerElement extends HTMLElement {
       surfaceId,
       schedulerKey,
       requestedTimezone: resolveMeetingTimezone(this.getAttribute('timezone'), browserTimezone()),
-      emergencyFallbackUrl: this.emergencyFallbackUrl,
       activationMode: parseMeetingActivationMode(this.getAttribute('activation-mode')),
       maxRecipe: parseMeetingLayoutRecipe(this.getAttribute('max-recipe')),
       telemetryBase: {
