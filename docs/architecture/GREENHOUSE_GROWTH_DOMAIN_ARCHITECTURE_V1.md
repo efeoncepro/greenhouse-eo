@@ -5,7 +5,7 @@
 > Version: V1
 > Fecha: 2026-06-24
 > Owner: Product / Platform Architecture / GTM
-> Initial resident capabilities: `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`, `GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md`
+> Resident capability architecture includes AI Visibility, Public Forms, CTA & Popup, Meetings and Promotions.
 
 ## 1. Purpose
 
@@ -163,6 +163,23 @@ growth.cta.<signal>
 
 The renderer strategy mirrors the Growth Forms precedent: a framework-light host-DOM renderer with thin wrappers for WordPress, Astro, Think and Greenhouse preview. The default is not iframe because host GTM/dataLayer measurement is part of the product contract.
 
+### 6.4 Promotions
+
+Promotions is the Growth-owned offer orchestration layer above specialist delivery capabilities. It owns the objective, typed offer reference, audience/context policy, flight, rich creative portfolio, cross-surface delivery plan, cross-CTA pressure and outcome attribution.
+
+It does not own CTA presentation/actions, form schemas/submissions, meeting bookings, tool outcomes, media binaries/rights ledgers or Commercial workflows. A published delivery composes immutable Promotion, creative and CTA versions against a canonical Growth surface. Rich content is a typed/versioned manifest; dynamic content resolves only through registered server-side providers with browser-safe projections and deterministic fallbacks.
+
+Canonical placement:
+
+```text
+src/lib/growth/promotions/
+greenhouse_growth.promotion_*
+growth.promotions.*
+growth.promotions.<signal>
+```
+
+Promotions is deliberately not `ads` and not the future `campaign` aggregate. A future Campaign may coordinate multiple Promotions, but `campaign_slug` remains attribution context until that domain is designed. Full API Parity is mandatory from the first vertical slice: UI, Nexa, MCP/agents, API Platform and runbooks consume the same commands/readers/projections.
+
 ## 7. Lifecycle: pre-pipeline to commercial handoff
 
 Growth-owned lifecycle:
@@ -231,6 +248,19 @@ Initial planned CTA capabilities:
 | `growth.cta.actions.manage` | Manage action routing to Growth Forms, assets, Think tools, meetings or HubSpot handoff. |
 | `growth.cta.experiments.manage` | Manage variant assignment and experiment metadata. |
 
+Initial planned Promotions capabilities:
+
+| Capability | Purpose |
+| --- | --- |
+| `growth.promotions.read` | Read definitions, versions, previews, performance and health. |
+| `growth.promotions.author` | Author draft offer, creative and delivery contracts. |
+| `growth.promotions.review` | Review content, rights, targeting, actions and measurement. |
+| `growth.promotions.publish` | Publish, deprecate and archive immutable contracts. |
+| `growth.promotions.pause` | Pause/resume and operate kill switches independently of publish authority. |
+| `growth.promotions.assets.manage` | Bind approved media references and rights snapshots. |
+| `growth.promotions.providers.manage` | Govern allowlisted dynamic-content bindings. |
+| `growth.promotions.results.read` | Read trust-labelled cross-capability outcomes and freshness. |
+
 Do not create these future families until a concrete capability needs them.
 
 ## 9. Data posture
@@ -255,6 +285,8 @@ Default classification:
 - form submissions: restricted/confidential by default, with consent snapshot and retention policy.
 - CTA telemetry: pseudonymous behavioral evidence by default; no raw PII in browser events, `dataLayer`, `CustomEvent.detail`, logs or query strings.
 - CTA targeting inputs: coarse, consent-aware and allowlisted; raw personal identifiers, inferred sensitive attributes and opaque third-party segments are forbidden in V1.
+- Promotion creative/content: confidential until published; creator content requires provenance, consent/release, usage rights and expiry.
+- Promotion dynamic projections: allowlisted and browser-safe; raw PII, secrets and internal targeting/candidate sets are forbidden.
 
 Growth must avoid storing unnecessary personal data in prompts sent to providers. Brand/company facts are usually enough; personal names/emails should not be sent to AI providers unless a future reviewed use case requires it.
 
@@ -275,6 +307,7 @@ Initial signal families:
 - CTA measurement health: `growth.cta.event_ingest_error_rate`, `growth.cta.gtm_event_missing`;
 - CTA action health: `growth.cta.action_failed`, `growth.cta.form_handoff_failed`;
 - CTA governance health: `growth.cta.surface_unauthorized_attempt`, `growth.cta.experiment_srm_detected`, `growth.cta.priority_collision`.
+- Promotion health: `growth.promotions.render_error_rate`, `growth.promotions.dynamic_provider_error_rate`, `growth.promotions.asset_unavailable`, `growth.promotions.rights_expiring`, `growth.promotions.outcome_reconciliation_lag`, `growth.promotions.api_parity_gap`.
 
 The domain should be visible in Ops/Reliability like other first-class Greenhouse modules once runtime work begins.
 
@@ -325,6 +358,8 @@ Revisit this domain boundary if:
 - `GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md`
 - `GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_DECISION_V1.md`
 - `GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md`
+- `GREENHOUSE_GROWTH_PROMOTIONS_DECISION_V1.md`
+- `GREENHOUSE_GROWTH_PROMOTIONS_ARCHITECTURE_V1.md`
 - `GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
 - `GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_DECISION_V1.md`
 - `docs/context/02_gtm.md`
