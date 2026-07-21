@@ -1,7 +1,7 @@
 # Efeonce Globe — Persistencia durable (deja de vivir en la memoria)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-21 por Claude (TASK-1465)
 > **Ultima actualizacion:** 2026-07-21 por Claude
 > **Documentacion tecnica:** [`docs/architecture/creative-studio/EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md`](../../architecture/creative-studio/EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md)
@@ -45,7 +45,7 @@ Lo importante es que **no es un plan teórico**: se desplegó y se verificó en 
 
 - **No es el ledger de créditos comerciales.** El spend fence durable es un **freno de seguridad** (aborta antes de gastar de más), no el **registro contable** de créditos comerciales. Ese ledger comercial es una capacidad aparte, todavía pendiente. No confundir uno con el otro.
 - **No trae el modelo rico de espacios de trabajo / miembros / permisos.** Un modelo detallado de workspace, members y grants queda **diferido** a una tarea posterior.
-- **No blinda el escalado por sí sola.** El workflow `deploy-internal.yml` hoy **fija `--max-instances=1`** por hardcode, así que un redespliegue por ese workflow **vuelve a bajar el techo a 1 réplica** hasta que Terraform gobierne ese valor. Ese saneamiento es la `TASK-1508` (drift-trap). Ver el manual para la señal y el workaround.
+- **No blindaba el escalado por sí sola.** Al cerrar esta capacidad, `deploy-internal.yml` hardcodeaba `--max-instances=1`. La `TASK-1508` (completa, 2026-07-21) lo cerró: el workflow pasa sólo `--image` y Terraform gobierna los dos topes (servicio y revisión, ambos en 3). No hay workaround que correr.
 
 > **Detalle técnico y operación:**
 >

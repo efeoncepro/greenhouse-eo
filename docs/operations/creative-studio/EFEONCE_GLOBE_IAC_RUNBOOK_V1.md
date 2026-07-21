@@ -14,8 +14,36 @@
 > CERO destroy/replace y CERO recursos Cloud Run en el diff (verificado sobre el plan JSON). El primer
 > apply creó 8/11 y falló en los 3 del carril HTTP-redirect por propagación de `compute.googleapis.com`;
 > la carrera se corrigió **en el HCL**, no reintentando a ciegas, y el segundo apply cerró 3/3 con un
-> `plan` posterior en "No changes". Herramienta: OpenTofu v1.12.4, provider `hashicorp/google` 6.50.0.
+> `plan` posterior en "No changes". Herramienta **de ese apply**: OpenTofu v1.12.4, provider
+> `hashicorp/google` 6.50.0 — el pin vigente del carril es **`~> 7.0`**, ver el Delta de TASK-1508.
 > **Validado:** 2026-07-21. Sigue siendo internal-only: no habilita Producción, HA ni clientes externos.
+>
+> **Delta 2026-07-21 (TASK-1508):** los **dos servicios Cloud Run** entraron a Terraform por import
+> brownfield (`2 imported, 2 changed, 0 destroyed`), junto con el invoker binding de la api
+> (`greenhouse-globe-caller` → `roles/run.invoker`). El pin del provider `hashicorp/google` subió de
+> `~> 6.0` a **`~> 7.0`** (`infra/terraform/versions.tf`, también para `google-beta`): el ceiling a nivel
+> servicio (`scaling.max_instance_count`) **no existe en 6.x**. Bajo la major nueva, 76 de 78 recursos
+> quedaron no-op. Desde esta task `deploy-internal.yml` pasa **sólo `--image`** y el `ignore_changes` cubre
+> exactamente tres entradas: la imagen, `client` y `client_version` (metadata de la herramienta que
+> escribió último, no configuración). La prueba anti-drift se ejecutó en **dos ciclos**, uno por servicio
+> (runs `29872768853` web / `29875135147` api), y ambos dejaron `tofu plan` en **No changes**. Detalle en
+> [§ Cloud Run bajo Terraform](#cloud-run-bajo-terraform--ownership-por-campo-task-1508-aplicado-2026-07-21).
+> **Validado:** 2026-07-21. Sigue siendo internal-only: no habilita Producción, HA ni clientes externos.
+
+## Frontera con el manual del operador (SoT por audiencia)
+
+Hay **dos documentos vivos** sobre esta misma superficie y no compiten: se reparten por audiencia.
+
+| Documento | Carril | Es el SoT de |
+|---|---|---|
+| **Este runbook** (`docs/operations/creative-studio/`) | **IaC** | Plan / apply / import / rollback de infraestructura, ownership por campo, invariantes de scope del state, modelo de costo, reglas derivadas del grafo Terraform. |
+| [Manual — Operar el front door interno de Efeonce Globe](../../manual-de-uso/creative-studio/operar-front-door-globe.md) | **Operador** | El procedimiento paso a paso: verificar que el dominio está sano, correr el smoke SSO, mover el allowlist de redirect URIs, diagnosticar el certificado, **endurecer o restaurar el ingress** y ejecutar el rollback por slice. |
+
+**Regla de edición:** donde el manual ya cubre el paso a paso operativo, este runbook lo **referencia** en
+vez de duplicarlo. Lo que se queda acá es lo que sólo tiene sentido con el state de Terraform en la mano:
+qué campo gobierna quién, qué **no** puede aparecer en un plan y por qué. La secuencia de cutover de
+TASK-1507 se conserva más abajo como **registro de lo que se ejecutó** (evidencia de la task), no como el
+procedimiento a repetir: para operar, el SoT es el manual.
 
 ## Qué gobierna este IaC
 
@@ -36,10 +64,16 @@ versionados los consume TASK-1457; el Model Lab **no** duplica IaC.
 Desde TASK-1507 gobierna además el **front door internal-only** (`infra/terraform/front_door.tf`): la IP
 global estática, el serverless NEG de `southamerica-west1`, el backend service, los dos url maps
 (HTTPS + redirect), el certificado administrado por Google para `globe.efeoncepro.com`, los dos proxies y
-las dos forwarding rules (`:443` y `:80`). Es plomería de red **aditiva**: las Cloud Run **services** de la
-app siguen fuera de este state (las crea el workflow keyless) y adoptarlas es TASK-1508. El registro DNS
+las dos forwarding rules (`:443` y `:80`). Es plomería de red **aditiva**. El registro DNS
 `A` vive fuera de Terraform, en HostGator. Detalle de operación en
 [§ Front door internal-only](#front-door-internal-only-task-1507).
+
+Desde TASK-1508 gobierna además los **dos servicios Cloud Run** de la app
+(`infra/terraform/cloud_run_services.tf`), adoptados por import brownfield: `ingress`,
+`invoker_iam_disabled`, runtime SA, env + secret refs, ceilings de escala (servicio **y** revisión),
+resources, timeout, concurrency, port, `deletion_protection` y el invoker IAM binding de la api. El
+workflow keyless dejó de escribir configuración y sólo despliega la **imagen**. Contrato campo por campo en
+[§ Cloud Run bajo Terraform](#cloud-run-bajo-terraform--ownership-por-campo-task-1508-aplicado-2026-07-21).
 
 ## Regla de oro (por qué esto es supervisado)
 
@@ -113,9 +147,11 @@ rechazó.
 
 Dos invariantes de scope, ambos load-bearing:
 
-- **Las Cloud Run services no están en este state.** Si un plan de este archivo muestra un
-  create/import/replace/destroy tocando `globe-studio-internal` o `globe-api-internal`, **PARAR**: eso es
-  TASK-1508.
+- **Las Cloud Run services no las gobierna este archivo.** El NEG referencia `globe-studio-internal` como
+  **string literal**, a propósito. Desde TASK-1508 los servicios sí viven en el state, pero su dueño es
+  `cloud_run_services.tf`: si un cambio acotado a `front_door.tf` produce un diff sobre
+  `globe-studio-internal` o `globe-api-internal`, es un error de referencia y no un cambio esperado —
+  **PARAR** y revisar el HCL.
 - **`globe-api-internal` nunca entra al NEG**, nunca recibe custom domain y nunca queda browser-reachable.
   Sigue IAM-private (anónimo → 403, antes y después del cutover), con `GLOBE_API_EXPECTED_AUDIENCE` en los
   dos formatos de URL `run.app` y **nunca** el dominio browser; su `GLOBE_PUBLIC_BASE_URL` es el
@@ -129,7 +165,7 @@ respuestas son por sesión; cachearlas en el edge sería un bug de correctitud, 
 | Recurso Terraform | Nombre en GCP | Nota |
 |---|---|---|
 | `google_compute_global_address.front_door` | `globe-studio-front-door-ip` | `EXTERNAL`, `IPV4`. Asignada: `8.233.189.79` (output `front_door_ip_address`). |
-| `google_compute_region_network_endpoint_group.studio_web` | `globe-studio-internal-neg` | `SERVERLESS`, región `southamerica-west1`. `cloud_run.service` es el **string literal** `"globe-studio-internal"`: referenciarlo como recurso sería adoptarlo (TASK-1508). |
+| `google_compute_region_network_endpoint_group.studio_web` | `globe-studio-internal-neg` | `SERVERLESS`, región `southamerica-west1`. `cloud_run.service` es el **string literal** `"globe-studio-internal"`: referenciarlo como recurso lo adoptaría **desde este archivo**, y su dueño es `cloud_run_services.tf` (TASK-1508). |
 | `google_compute_backend_service.studio_web` | `globe-studio-front-door-backend` | `EXTERNAL_MANAGED`, `enable_cdn = false`. |
 | `google_compute_url_map.front_door` | `globe-studio-front-door` | Host único, backend único, sin path rules. |
 | `google_compute_managed_ssl_certificate.front_door` | `globe-studio-front-door-cert` | `lifecycle { create_before_destroy = true }`: un managed cert no se edita in place, cambiar su lista de dominios fuerza reemplazo. |
@@ -145,6 +181,12 @@ antes del cambio), `variables.tf` (`front_door_domain`, default `globe.efeoncepr
 (`front_door_ip_address`, `front_door_domain`, `front_door_certificate_name`).
 
 ### Secuencia apply verificada
+
+> Esto es el **registro de lo que se ejecutó** en el cutover del 2026-07-21, no el procedimiento a repetir.
+> Para operar —verificar el dominio, correr el smoke, mover el allowlist— el SoT es el
+> [manual del operador](../../manual-de-uso/creative-studio/operar-front-door-globe.md), con la guarda sobre
+> sus secciones stale anotada en [§ Frontera con el manual](#frontera-con-el-manual-del-operador-sot-por-audiencia). Acá se
+> conservan las decisiones de orden y las trampas que sólo se entienden con el state en la mano.
 
 El orden importa y **se invirtió deliberadamente** respecto de la spec original, que pedía cambiar
 `GLOBE_PUBLIC_BASE_URL` y después ampliar el allowlist de redirect. Agregar un redirect URI es inerte
@@ -235,10 +277,12 @@ anuncia un callback todavía no permitido y el SSO queda roto. Primero el allowl
      --ingress internal-and-cloud-load-balancing
    ```
 
-   **Contradicción de la spec que hay que registrar:** la spec decía "vía Terraform", pero las Cloud Run
-   services no están en Terraform y adoptarlas es explícitamente TASK-1508; `gcloud` era el único camino
-   consistente con el scope. Pinear el ingress por IaC queda para esa task. Verificado: acceso directo por
-   `run.app` → `404` (bloqueado); dominio por el ALB → `200`.
+   **Contradicción de la spec que hay que registrar:** la spec decía "vía Terraform", pero al momento del
+   cutover las Cloud Run services no estaban en Terraform y adoptarlas era explícitamente TASK-1508;
+   `gcloud` era el único camino consistente con el scope de entonces. **Pinear el ingress por IaC lo cerró
+   TASK-1508**: hoy el valor lo gobierna `cloud_run_services.tf` y un `gcloud run services update
+   --ingress` sería un segundo escritor. Verificado en su momento: acceso directo por `run.app` → `404`
+   (bloqueado); dominio por el ALB → `200`.
 8. **Re-smoke SSO post-hardening.** Mismo comando del paso 6, sin cambiar una sola env var:
    `human_federation_ok` antes y después del endurecimiento.
 
@@ -250,26 +294,38 @@ responde la app, no una página del balanceador.
 
 **Lo que este cutover NO tocó:** `invokerIamDisabled` sigue `true` en `globe-studio-internal` (correcto
 para un servicio web con SSO: un browser no presenta ID token, la app autentica por su cookie) y
-`maxScale` sigue en **3**, verificado antes y después. La spec de TASK-1507 decía "preservar
-`maxScale=1`" y estaba **stale**: TASK-1465 está complete y limpió el gate de HA; ambos servicios corren
-`maxScale=3` desde 2026-07-21. El invariante correcto es que TASK-1507 **no toca `maxScale` en ninguna
-dirección**. Drift-trap conocido y **no** resuelto por esta task: `deploy-internal.yml` hardcodea
-`--max-instances=1`, así que un deploy por ese workflow bajaría `maxScale` a 1 hasta que Terraform lo
-gobierne (TASK-1508); workaround inmediato tras un deploy:
-El drift-trap quedó **cerrado por `TASK-1508`**: el workflow ya no pasa `--max-instances` y Terraform gobierna los dos ceilings (servicio y revisión). Cuidado con el workaround viejo `gcloud run services update <servicio> --max-instances=3`: escribía el ceiling de **revisión**, no el de **servicio**, y Cloud Run aplica el menor — así que dejaba el techo efectivo en 1 aparentando haberlo restaurado.
+`maxScale` no se tocó en ninguna dirección. La verificación de entonces leyó el ceiling de **revisión** y
+reportó 3; el efectivo era **1** (servicio=1 / revisión=3) — ver
+[§ la trampa de los dos ceilings](#la-trampa-de-los-dos-ceilings-leer-antes-de-tocar-escala).
+TASK-1508 lo corrigió a 3/3. La spec de TASK-1507 decía "preservar
+`maxScale=1`" y estaba **stale**: TASK-1465 está complete y limpió el gate de HA. El invariante correcto
+es que TASK-1507 **no toca `maxScale` en ninguna dirección**.
 
-**Qué sobrevive un redeploy por workflow y qué no** — vale clasificarlo explícitamente, porque el valor
-más load-bearing del cutover es una env var y la pregunta obvia es si un deploy la pisa:
+**Qué sobrevive un redeploy por workflow (estado vigente, post TASK-1508)** — la pregunta obvia tras el
+cutover es si un deploy pisa la configuración, porque el valor más load-bearing es una env var. Hoy la
+respuesta es uniforme, y por una razón estructural: **`deploy-internal.yml` ya no pasa ningún flag de
+configuración — pasa sólo `--image`**. **Ya no queda drift-trap de workflow**, porque Terraform gobierna la
+configuración (`cloud_run_services.tf`) y el workflow sólo despliega la imagen.
 
 | Ajuste | ¿Lo pasa `deploy-internal.yml`? | Efecto de un redeploy |
 |---|---|---|
-| `GLOBE_PUBLIC_BASE_URL` | **No** — el workflow no pasa `--set-env-vars` ni `--update-env-vars` | **Sobrevive.** El cutover de Slice 3b no se deshace solo. |
-| `--ingress` | No | Sobrevive (`internal-and-cloud-load-balancing` se mantiene). |
-| `--max-instances` | **Sí**, hardcodeado en `--min-instances=0 --max-instances=1` | **Se pisa a 1.** Único drift-trap activo del workflow. |
+| `GLOBE_PUBLIC_BASE_URL` (y el resto de env + secret refs) | No | **Sobrevive.** El cutover de Slice 3b no se deshace solo. |
+| `ingress` | No | **Sobrevive.** `globe-studio-internal` en `internal-and-cloud-load-balancing`; `globe-api-internal` en `all` — **deliberado**, su perímetro es IAM + verificación in-app del ID token, endurecerlo cortaría la federación workload. |
+| Ceiling de escala (servicio **y** revisión) | No | **Sobrevive en 3/3.** Terraform declara los dos campos — ver [§ la trampa de los dos ceilings](#la-trampa-de-los-dos-ceilings-leer-antes-de-tocar-escala). |
+| `invoker_iam_disabled`, runtime SA, resources, timeout, concurrency, port | No | **Sobreviven.** Dueño único: Terraform. |
+| Imagen del contenedor | **Sí — es lo único que pasa** | Se actualiza. Es el propósito del workflow y el único campo del que es dueño. |
 
-La razón de fondo es la misma en las tres filas: `gcloud run deploy` preserva los ajustes a nivel servicio
-que **no** se especifican en el comando. Por eso lo que el workflow no menciona queda intacto, y lo único
-que hay que vigilar tras un dispatch es `maxScale`.
+La razón de fondo es la misma en todas las filas: `gcloud run deploy` preserva los ajustes a nivel servicio
+que **no** se especifican en el comando, y el comando ya no especifica ninguno. **Pero la prueba de que eso
+se sostiene no es leer el YAML, sino el plan convergido post-deploy:** desplegar, esperar readiness y correr
+`tofu plan` debe dar **No changes**. Esa es la verificación canónica ante cualquier cambio del workflow —
+procedimiento en [§ prueba anti-drift](#prueba-anti-drift-repetirla-ante-cualquier-cambio-del-workflow).
+
+**NUNCA** "restaurar" el ceiling con `gcloud run services update <servicio> --max-instances=3`. Ese
+workaround —prescrito mientras el drift-trap estuvo abierto— era **inefectivo**: escribía el ceiling de
+**revisión**, no el de **servicio**, y Cloud Run aplica el menor, así que dejaba el techo efectivo en 1
+aparentando haberlo restaurado. Hoy además sería un segundo escritor sobre un campo que gobierna Terraform.
+Si hace falta cambiar la escala, se cambia en el HCL y se aplica.
 
 ### Modelo de costo
 
@@ -308,11 +364,28 @@ incidente.
 | 1 | **Ingress** (precondición de 2) | `gcloud run services update globe-studio-internal --region southamerica-west1 --project efeonce-globe --ingress all` | <10 min — restaura el acceso directo por `run.app`. |
 | 2 | **URL / OAuth** | `gcloud run services update globe-studio-internal --region southamerica-west1 --project efeonce-globe --update-env-vars GLOBE_PUBLIC_BASE_URL=https://globe-studio-internal-818083690953.southamerica-west1.run.app` | <15 min — el `run.app` sigue en el allowlist, así que no hace falta escribir en la DB. |
 | 3 | **DNS** | Quitar el registro `A` de `globe.efeoncepro.com` en HostGator (out-of-band). | <60 min por propagación. |
-| 4 | **ALB** | `git revert` de **los dos** commits de `front_door.tf` — `16919d9` (Slice 1) **y** `cf5e4d1` (el `depends_on`) — + `tofu plan` → leer → `tofu apply`. Destruir la **IP global** junto con el resto (ver nota de costo). | Según plan. |
+| 4 | **ALB** | Retirar el **HCL del front door** (contenido de `16919d9` + `cf5e4d1`, que son una unidad) + `tofu plan` → leer → `tofu apply`. Destruir la **IP global** junto con el resto (ver nota de costo). **No es un `git revert` a ciegas** — ver abajo. | Según plan. |
 
 Los commits del paso 4 son **dos y se revierten juntos**: revertir sólo `16919d9` deja huérfano el fix de
 `cf5e4d1`, y revertir sólo `cf5e4d1` reabre la carrera con `compute.googleapis.com` descrita en
 [§ regla derivada](#regla-derivada--una-raíz-del-grafo-sin-arista-hacia-google_project_service).
+
+**El paso 4 NO es un `git revert` a ciegas.** `16919d9` introdujo `variable "front_door_domain"`, y desde
+`TASK-1508` también la referencia `cloud_run_services.tf` (`GLOBE_PUBLIC_BASE_URL`). Revertir el commit borraría
+la variable dejando viva la referencia: `tofu plan` **aborta** con `Reference to undeclared input variable` y ni
+siquiera produce plan. Al llegar al paso 4 hay que **editar `cloud_run_services.tf` para que
+`GLOBE_PUBLIC_BASE_URL` no dependa de `var.front_door_domain`** y recién entonces retirar el HCL del front door
+junto con la variable. Los dos commits siguen siendo la unidad de contenido; lo que cambia es que se aplica como
+edición reconciliada, no como revert automático. Y si los pasos 1-2 se hicieron con `gcloud`, releer el plan
+antes de aplicar: aplicar sin reconciliar, con el ALB ya destruido, es outage total.
+
+**Consecuencia de TASK-1508 sobre los pasos 1 y 2:** ambos escriben campos que hoy **gobierna Terraform**
+(`ingress` y las env vars viven en `cloud_run_services.tf`). Usar `gcloud` ahí sigue siendo el camino
+correcto **como maniobra de emergencia** —es lo más rápido para recuperar acceso— pero deja drift
+deliberado: el siguiente `tofu plan` va a mostrar esos campos volviendo al valor del HCL. Regla de cierre
+del rollback: una vez estabilizado, **reconciliar el HCL con el estado que se quiere conservar y aplicar**,
+o el próximo apply deshace el rollback. Un plan con esos campos en diff justo después de un rollback no es
+un error del state: es la evidencia de que falta reconciliar.
 
 El `run.app` se conserva en el allowlist **a propósito**: con el ingress endurecido ese origen ya no es
 alcanzable por browser, así que un código enviado ahí no llega a ninguna parte, y quitarlo obligaría a un
@@ -442,29 +515,25 @@ parcial con `SERVICE_DISABLED`, y es **determinista para un proyecto nuevo** aun
 - **GitHub WIF**: quitar el pool/provider o el binding del deployer → CI pierde acceso;
   no afecta el runtime.
 - **Budget/observabilidad**: `count`/flags → 0 recursos.
-- **Front door**: revierte por slice (ingress → env var → DNS → ALB), sin desarmar el balanceador para
-  recuperar el acceso. Comandos exactos en
-  [§ Rollback por slice](#rollback-por-slice).
+- **Front door**: es una **secuencia ordenada** (ingress → env var/OAuth → DNS → ALB), no un menú, y no hace
+  falta desarmar el balanceador para recuperar el acceso. Comandos exactos, precondición del paso 1 y regla
+  de reconciliación posterior en [§ Rollback por slice](#rollback-por-slice); el procedimiento del operador
+  vive en el [manual](../../manual-de-uso/creative-studio/operar-front-door-globe.md).
 - El state vive versionado en `gs://efeonce-globe-tfstate` (rollback de state posible).
 
 ## Qué NO hace este IaC
 
-- No aprovisiona las Cloud Run services de la app (las despliega el workflow keyless).
-  **Follow-up de IaC (pendiente):** como esos servicios no están en Terraform, su configuración de
-  invoker —incluido `invokerIamDisabled`— queda **sin gobernar**, y nada previene drift. Hoy
-  `globe-studio-internal` tiene `invokerIamDisabled=true` (coherente con ser app web con SSO: un
-  browser no presenta ID token, y la capa de app aguanta anónimo → 401), mientras `globe-api-internal`
-  **no** lo tiene (anónimo → 403 en el perímetro). Traer los servicios a IaC para fijar ese flag
-  explícitamente es trabajo pendiente. **Delta TASK-1507:** el front door **sí** está en Terraform, pero
-  el `--ingress internal-and-cloud-load-balancing` de `globe-studio-internal` se aplicó con `gcloud`
-  —único camino consistente con el scope, porque el servicio no está en este state—, así que el valor de
-  ingress sigue **sin gobernar por IaC** hasta TASK-1508. Lo mismo el `maxScale=3`, que además tiene un
-  drift-trap activo: `deploy-internal.yml` hardcodea `--max-instances=1`.
+- No construye ni publica la **imagen** de las Cloud Run services: eso lo hace el workflow keyless
+  (`deploy-internal.yml`), y es el único campo del que ese workflow es dueño. La **configuración** de los
+  dos servicios sí la gobierna este IaC desde TASK-1508 — `ingress`, `invoker_iam_disabled`, runtime SA,
+  env + secret refs y los ceilings de escala dejaron de estar sin gobernar. La postura de invoker es
+  deliberadamente **asimétrica** y ahora está declarada en el HCL: `globe-studio-internal` con
+  `invokerIamDisabled=true` (coherente con ser app web con SSO: un browser no presenta ID token, y la capa
+  de app aguanta anónimo), y `globe-api-internal` **sin** ese flag (anónimo → `403` en el perímetro IAM).
 - **Cloud SQL `globe-pg` YA está en Terraform** (`cloud_sql.tf`, TASK-1465 — aplicado + live-verified
   2026-07-21, plan `12 added / 0 destroyed`): la instancia durable de Globe, sus 3 IAM DB users y sus
-  grants los gobierna este IaC. Lo que **queda pendiente** es (a) traer las Cloud Run **services** de la
-  app a Terraform (TASK-1508 — cierra también el drift de `invokerIamDisabled`/ingress/scale y persiste
-  el `maxScale`) y (b) el **modelo rico de tenancy** (workspaces/members/grants), diferido. Arquitectura:
+  grants los gobierna este IaC. Lo que **queda pendiente** es el **modelo rico de tenancy**
+  (workspaces/members/grants), diferido. Arquitectura:
   [`EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md`](../../architecture/creative-studio/EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md).
 - **No gobierna el DNS.** El registro `A` de `globe.efeoncepro.com` → `8.233.189.79` se crea a mano en
   HostGator, fuera de Terraform. Un `plan` limpio no prueba que el nombre resuelva.
@@ -488,6 +557,14 @@ Los dos servicios Cloud Run dejaron de estar fuera de IaC. El contrato es **un s
 | imagen del contenedor | **`deploy-internal.yml`** |
 | `client` / `client_version` | nadie: metadata de la herramienta, ignorada |
 
+- **`ingress` no es "un campo, un valor": los dos servicios difieren a propósito.** `globe-studio-internal`
+  va en `internal-and-cloud-load-balancing` (su único camino de browser es el ALB), pero
+  `globe-api-internal` va en **`all`**, y eso es **deliberado**
+  (`infra/terraform/cloud_run_services.tf`): su caller es Greenhouse corriendo en Vercel, que llega **por
+  internet y no desde una VPC**, así que endurecerlo cortaría la federación workload. Su perímetro no es el
+  ingress sino **IAM** (`invoker_iam_disabled` en `false`, anónimo → `403`) más la verificación in-app del
+  ID token, con audiencia derivada del `run.app`. **NUNCA** lo endurezcas por analogía con el servicio web.
+
 `gcloud run deploy` preserva todo lo que no se le especifica, así que el workflow puede desplegar una imagen sin tocar
 configuración. **NUNCA agregues flags de configuración de vuelta al workflow**: cada uno recrea el problema de dos
 escritores que esta task cerró.
@@ -499,8 +576,11 @@ Un servicio Cloud Run tiene ceiling **a nivel servicio** (`Service.scaling.maxIn
 el subcomando** — `gcloud run deploy` el de servicio, `gcloud run services update` el de revisión.
 
 Eso produjo un cap silencioso: ambos servicios tenían servicio=1 / revisión=3, o sea techo efectivo **1**, mientras toda
-la documentación declaraba 3. El spend fence cross-réplica de `TASK-1465` nunca llegó a ejercitarse. Terraform ahora
-declara **los dos** campos; gobernarlos exige provider `google` **>= 7.x** (el de servicio no existe en 6.x).
+la documentación declaraba 3. El spend fence cross-réplica de `TASK-1465` nunca llegó a ejercitarse — ejercitarlo es
+**`TASK-1512`**. **TASK-1508 corrigió el techo a 3/3** y puso ambos campos bajo Terraform, así que el drift-trap está
+cerrado. Gobernarlos exige provider `google` **>= 7.x** (el campo a nivel servicio no existe en 6.x): por eso
+`infra/terraform/versions.tf` fija **`~> 7.0`** para `google` y `google-beta`, y ése es el pin vigente del carril IaC.
+Bajo esa major, 76 de 78 recursos quedaron no-op.
 
 ### Serialización apply / deploy
 
@@ -512,6 +592,9 @@ esperar a que el deploy termine (`gh run watch`) y recién ahí planear/aplicar,
 1. Disparar `deploy-internal.yml` sobre un servicio.
 2. Esperar readiness y correr los smokes (`smoke-human-federation.mjs` por el dominio; api anónimo → 403).
 3. `tofu plan` → debe dar **No changes**. Cualquier otra cosa significa que el workflow volvió a escribir configuración.
+
+Ese plan convergido es **la** evidencia de que el workflow no tiene drift-trap; la lectura del YAML no basta. Se ejecutó
+en **dos ciclos, uno por servicio** (runs `29872768853` web y `29875135147` api) y ambos dieron **No changes**.
 
 Evidencia de la primera corrida (run `29872768853`, imagen `51ade01eda82`): plan posterior **No changes**, con ingress,
 invoker posture, ceiling 3/3, runtime SA y las 14 env vars intactos.

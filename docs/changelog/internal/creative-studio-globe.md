@@ -6,6 +6,30 @@
 
 # Changelog
 
+## 2026-07-21 — TASK-1508: Cloud Run bajo IaC + ownership por campo
+
+- **Los dos servicios Cloud Run entraron a Terraform por import brownfield:** `2 imported / 2 changed / 0 destroyed`.
+  El invoker binding de la api (`greenhouse-globe-caller` → `roles/run.invoker`) también quedó declarado en IaC, así que
+  el perímetro de `globe-api-internal` deja de vivir out-of-band.
+- **Bump de provider `hashicorp/google` `~> 6.0` → `~> 7.0`:** el ceiling a nivel servicio
+  (`scaling.max_instance_count`) no existe en 6.x, así que sin el bump el campo no era declarable. Verificado que
+  **76 de 78 recursos quedan no-op** bajo la major nueva.
+- **`deploy-internal.yml` quedó image-only.** Ya no pasa `--service-account`, `--no-allow-unauthenticated`,
+  `--min-instances` ni `--max-instances`: **pasa sólo `--image`**. El workflow deja de ser un segundo escritor sobre
+  campos que gobierna Terraform.
+- **`ignore_changes` acotado a tres entradas:** la imagen, `client` y `client_version` (estos dos son metadata de la
+  herramienta que escribió último, no configuración). Todo lo demás lo gobierna el HCL.
+- **El bug de los dos ceilings, corregido.** Un servicio Cloud Run lleva ceiling **a nivel servicio** y **a nivel
+  revisión**, y **Cloud Run aplica el menor**: ambos servicios estaban en servicio=1 / revisión=3, así que el techo
+  **efectivo era 1**. La causa es que `--max-instances` escribe un campo distinto según el subcomando (`gcloud run
+  deploy` → servicio; `gcloud run services update` → revisión), por lo que el workaround de "restaurar el techo tras un
+  deploy" que la doc prescribía era **inefectivo**. Corregido a **3/3** y ambos campos bajo Terraform.
+- **Anti-drift probado en dos ciclos**, uno por servicio (runs `29872768853` web / `29875135147` api): ambos dejaron
+  `tofu plan` en **No changes**.
+- **Consecuencia registrada:** como nunca hubo más de una réplica, el **spend fence cross-réplica de `TASK-1465` jamás
+  se ejercitó**. Ejercitarlo es **`TASK-1512`**, con gasto real de proveedor y su propia autorización.
+- **Sigue internal-only.** Nada de esto habilita Production, HA gobernada como tal ni clientes externos (`TASK-1480`).
+
 ## 2026-07-21 — TASK-1507: front door internal-only (Globe estrena dominio propio) — aplicado + verificado en vivo
 
 - **`globe.efeoncepro.com` es la URL estable del shell interno.** Global External ALB + serverless NEG
@@ -37,7 +61,8 @@
   global (reservada y sin adjuntar factura como IP ociosa).
 - **Sigue internal-only.** No habilita Production, clientes externos ni marketing (`TASK-1480`).
   `globe-api-internal` no recibe custom domain, sigue IAM-private (403 anónimo) y su audience se deriva de
-  `run.app`. **Siguiente:** `TASK-1508` (adopción brownfield de los servicios + single-writer deploy ownership).
+  `run.app`. **Continuó en:** `TASK-1508` (adopción brownfield de los servicios + single-writer deploy ownership;
+  completa el mismo día — ver la entrada de arriba).
 - **Docs:** spec `docs/tasks/complete/TASK-1507-globe-internal-front-door-alb-terraform.md`; decisión ADR-004
   `docs/architecture/creative-studio/EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md`; continuidad
   `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
@@ -61,9 +86,11 @@
 - **Fix de build:** el Dockerfile ahora compila `packages/database`. Un servicio corre durable sólo si declara
   `GLOBE_POSTGRES_INSTANCE_CONNECTION_NAME` / `GLOBE_POSTGRES_DATABASE` / `GLOBE_POSTGRES_USER`; si falta alguna,
   arranca en memoria (sólo permitido en el environment `internal_smoke`).
-- **⚠️ Drift-trap → `TASK-1508`:** `deploy-internal.yml` hoy fija `--max-instances=1` por hardcode, así que un
-  redespliegue por ese workflow baja el `maxScale` a 1 hasta que Terraform gobierne el valor. **Diferido:** un
-  modelo rico de workspace / members / grants.
+- **⚠️ Drift-trap → `TASK-1508` (cerrado ese mismo día):** `deploy-internal.yml` hardcodeaba `--max-instances=1`.
+  `TASK-1508` descubrió además que el `maxScale=3` reportado acá era el ceiling **de revisión**: el de **servicio**
+  seguía en 1 y Cloud Run aplica el menor, así que el techo efectivo **era 1**. Corregido a **3/3**, ambos campos bajo
+  Terraform y workflow image-only. Consecuencia: el spend fence cross-réplica nunca se ejercitó → `TASK-1512`.
+  **Diferido:** un modelo rico de workspace / members / grants.
 - **Docs:** funcional `docs/documentation/creative-studio/persistencia-durable-globe.md`; manual
   `docs/manual-de-uso/creative-studio/operar-persistencia-globe.md`; spec
   `docs/architecture/creative-studio/EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md`.

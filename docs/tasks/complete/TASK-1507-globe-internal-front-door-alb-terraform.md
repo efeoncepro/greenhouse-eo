@@ -205,8 +205,25 @@ pnpm sister-platform:redirect --client globe \
    --ingress` era el único camino consistente con el scope. Consecuencia registrada: **el valor de ingress queda
    sin gobernar por IaC hasta `TASK-1508`**. No es drift-trap del workflow (`deploy-internal.yml` no pasa
    `--ingress` y `gcloud run deploy` preserva los ajustes a nivel servicio que no se especifican); el drift-trap
-   vivo sigue siendo `maxScale` (`--max-instances=1` hardcodeado), con workaround inmediato tras un deploy por
-   workflow. El drift-trap quedó **cerrado por `TASK-1508`**: el workflow ya no pasa `--max-instances` y Terraform gobierna los dos ceilings (servicio y revisión). Cuidado con el workaround viejo `gcloud run services update <servicio> --max-instances=3`: escribía el ceiling de **revisión**, no el de **servicio**, y Cloud Run aplica el menor — así que dejaba el techo efectivo en 1 aparentando haberlo restaurado.
+   vivo al cerrar esta task **era** el ceiling de escala (`--max-instances=1` hardcodeado). Ambas cosas quedaron
+   **cerradas por `TASK-1508`**: adoptó los servicios en Terraform (el `ingress` pasó a estar gobernado por IaC) y
+   dejó el workflow image-only, con los dos ceilings —servicio y revisión— declarados en Terraform. El workaround
+   que esta task daba por bueno (`gcloud run services update <servicio> --max-instances=3`) era **inefectivo**:
+   escribía el ceiling de **revisión**, no el de **servicio**, y Cloud Run aplica el menor, así que dejaba el techo
+   efectivo en 1 aparentando haberlo restaurado.
+
+### Delta 2026-07-21 (corrección de historia) — `maxScale` no era 3: el efectivo era 1
+
+El §Delta de recalibración pre-ejecución afirma "`maxScale` ya no es 1" y el §cierre dice "`maxScale` sigue en 3, sin
+tocarse". Las dos leían el ceiling **de revisión**. `TASK-1508` verificó que el ceiling **de servicio** seguía en 1 en
+ambos servicios y que **Cloud Run aplica el menor**, así que el techo efectivo **era 1** — y la afirmación correcta de
+esta task es que **no tocó el ceiling en ninguna dirección** (cierto), no que el valor vivo fuera 3. `TASK-1508` lo
+corrigió a **3/3** y puso ambos campos bajo Terraform (provider `hashicorp/google` `~> 6.0` → `~> 7.0`, porque el
+ceiling a nivel servicio no existe en 6.x). Consecuencia registrada: el spend fence cross-réplica de `TASK-1465` nunca
+se ejercitó → **`TASK-1512`**.
+
+Segunda corrección menor de esta misma spec: el plan Terraform dio `11 to add` pero `infra/terraform/front_door.tf`
+tiene **diez** recursos; el 11.º es la habilitación de `compute.googleapis.com`, que vive en `locals.tf`.
 
 ### Commits (locales, sin push)
 
@@ -610,7 +627,11 @@ sigue IAM-private; el web conserva SSO; el `maxScale` live (3) queda intacto por
 ## Follow-ups
 
 - Cloud Armor / WAF sobre el ALB si se endurece la postura antes de exposición externa (`TASK-1480`).
-- Adopción brownfield de los servicios Cloud Run + single-writer deploy ownership (`TASK-1508`).
+- Adopción brownfield de los servicios Cloud Run + single-writer deploy ownership (`TASK-1508`, **complete**;
+  corrigió además el ceiling efectivo de 1 a 3/3).
+- Ejercitar por primera vez el spend fence cross-réplica ahora que el cap es 3 (`TASK-1512`, `to-do`).
+- Gobernanza de la primitive de redirect allowlist que nació acá — audit trail persistido + capability + route/MCP
+  (`TASK-1513`, `to-do`; hueco declarado en `GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md` §15.5).
 - Store durable de sesión/OAuth para levantar `maxScale > 1` (`TASK-1465`).
 - Decisión de host + framework del frontend cliente comercial (diferida por ADR-004, revisit en `TASK-1505` +
   pre-`TASK-1480`).

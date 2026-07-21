@@ -270,7 +270,7 @@ Hacerlo al reves deja una ventana en la que la app hermana manda a la gente a un
 
 Hoy es un comando de operador con acceso a la base de datos: no hay pantalla ni endpoint para esto. La logica no vive en el script sino en la plataforma, justamente para que mas adelante una API, un tool MCP o Nexa puedan hacer el mismo cambio sin reescribir las reglas. Antes de abrirlo por API faltan dos cosas: registrar quien hizo el cambio y definir que permiso lo habilita.
 
-El comando acepta la variable `SISTER_PLATFORM_ACTOR_USER_ID` para nombrar al operador (por defecto `system`), pero hoy ese dato **no queda guardado en ninguna parte**: se pasa y se descarta. O sea, la trazabilidad real del cambio sigue siendo el historial del propio operador, no la plataforma. Cerrar ese hueco y definir el permiso son trabajo de una task de seguimiento todavia no creada.
+El comando acepta la variable `SISTER_PLATFORM_ACTOR_USER_ID` para nombrar al operador (por defecto `system`), pero hoy ese dato **no queda guardado en ninguna parte**: se pasa y se descarta. O sea, la trazabilidad real del cambio sigue siendo el historial del propio operador, no la plataforma. Cerrar ese hueco, definir el permiso y abrir la operacion por API/MCP es `TASK-1513` (Sister Platform Redirect Allowlist Governance), ya creada y en `to-do`.
 
 > Detalle tecnico: el contrato de la primitive, sus garantias transaccionales y las reglas duras estan en [GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md](../../architecture/GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md) §15.5. Codigo: `src/lib/sister-platforms/oauth-broker.ts` (`updateSisterPlatformOAuthRedirectUris`) y `scripts/sister-platform-oauth-redirect-uris.ts`.
 

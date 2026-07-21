@@ -18,6 +18,11 @@
 
 - Trabajo local concurrente: coordinar ownership antes de tocar archivos ya modificados.
 - Las sesiones archivadas pueden describir estados superseded. Revalidar cualquier conclusión histórica.
+- **Globe (`EPIC-028`) — único riesgo abierto: el spend fence cross-réplica sigue sin ejercitarse (`TASK-1512`).**
+  El ceiling efectivo estuvo en 1 hasta `TASK-1508`, así que el freno de gasto atómico de `TASK-1465` es correcto por
+  construcción y por tests, pero su camino de contención bajo row locks nunca corrió con >1 réplica; ejercitarlo exige
+  concurrencia real contra el Model Lab (gasto de proveedor, autorización propia). El dominio está vivo y verificado;
+  Production, HA gobernada y clientes externos siguen gateados por `TASK-1480`.
 
 ## Pendientes inmediatos
 
@@ -40,6 +45,10 @@
   `fbe8a9c76a74-4aee6089-fec9-45b7-8b70-5ba16a84cfa9` (run `29854833210`, estado `released`). El smoke
   post-release en la sesión Chrome autenticada confirmó `/agenda/` sin enlaces ni copy de fallback HubSpot,
   cuadrícula completa de agosto, estado vacío específico y `overflow=0`; no se creó un booking durante los checks.
+  El host WordPress quedó refinado como focused booking canvas: header navegable, un solo H1, sin sidebar/breadcrumbs
+  ni prefooter, y con el footer global completo sin overrides de agenda. La evidencia final
+  `.captures/2026-07-21T23-44-01-104Z_agenda-focused-booking-canvas` pasa 1440/820/390, overflow, teclado,
+  reduced motion y cero errores; backup `_gh_backup_before_agenda_global_footer_restore_20260721T234352Z`.
   HubSpot devuelve actualmente cero slots para agosto; el renderer ya conserva `Agosto de 2026`, la grilla de 31 días y
   el estado vacío en vez de colapsar el calendario; PR #162 (`ddd3094538e7`, run `29848667096`) ya liberó esa corrección.
   `ops-worker` permanece change-gated porque el diff desde `7da563613daf` no toca sus rutas runtime.
@@ -57,41 +66,33 @@
   sin alterar superficies legacy aún no migradas. Canon:
   `docs/tasks/complete/TASK-1366-hubspot-scheduler-booking-equivalence.md` + `PDR-009`.
 
-- **`TASK-1506` COMPLETE (Globe Frontend Hosting and Front Door Decision, `EPIC-028`) — ADR-004, local-first sin push.**
-  Cerrada como policy: `EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md` (ADR-004) mantiene **Cloud Run**
-  como web/BFF/SSO para la release internal-only (servidor **Node nativo**; Next.js `superseded` para el shell
-  interno) y **rechaza migrar a Vercel** (no arregla el techo HA in-memory y parte el trust boundary).
-  El **frontend cliente comercial** (`TASK-1505`+) es superficie separada con host + framework **diferidos** (Vercel
-  + Next.js sobre edge global = candidato vivo, a decidir al construir 1505 y antes de `TASK-1480`). Tres gates
-  distintos: URL internal-only / HA (gate `TASK-1465`, **ya cleared**; valor vivo `maxScale=3`, gobierno por IaC en
-  `TASK-1508`) / Production (`TASK-1480`). Sin
-  mutar runtime/DNS/OAuth. Detalle de runtime: `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
-- **`TASK-1465` COMPLETE (operativa) (Globe Workspace/Tenancy/Persistence/Audit, `EPIC-028`) — desplegada + verificada en vivo.**
-  Globe pasó de **cero DB / todo in-memory** a **durable de verdad**. Detalle en la spec `complete/` (Deltas
-  2026-07-21) + `GLOBE_RUNTIME_HANDOFF.md`. Entregado en `efeonce-globe main` (4 commits, pusheados) + gobernanza en
-  Greenhouse: Cloud SQL `globe-pg` keyless IAM (~US$15–30/mes) + `packages/database` (pool/tx/connector) + bootstrap
-  `globe_owner` (sin credencial superusuario permanente) + migraciones + 6 tablas tenant-scoped + los **5 stores
-  durables** detrás de sus ports (Experiment/EvalReport/**SpendFence atómico cross-réplica**/Session/OAuth) + audit
-  append-only + wiring DI. **Rollout en vivo:** ambos servicios Cloud Run desplegados durables + `maxScale=3`;
-  durabilidad **probada en el servicio vivo** (`oauth_transaction` escrita por `web_runtime` keyless vía connector).
-  Diferido: modelo workspace/members/grants (follow-up). **Follow-up drift trap → `TASK-1508`:** `deploy-internal.yml`
-  aún hardcodea `--max-instances=1` (el próximo deploy por workflow resetea `maxScale`; persistir vía Terraform en 1508).
-- **`TASK-1507` COMPLETE (Globe Internal Front Door — domain cutover, `EPIC-028`) — aplicada y verificada en vivo 2026-07-21.**
-  **La base URL estable del shell interno es `https://globe.efeoncepro.com`** (IP global `8.233.189.79`), servida vía
-  **Global External ALB + serverless NEG** (`southamerica-west1`) → `globe-studio-internal`, con managed cert `ACTIVE`
-  y 301 HTTP→HTTPS; `GLOBE_PUBLIC_BASE_URL` cortado al dominio (rev `globe-studio-internal-00018-zkx`). El ingress del
-  web quedó en `internal-and-cloud-load-balancing`, así que **el `*.run.app` ya no es alcanzable por browser** (404) y
-  sólo persiste en el allowlist OAuth como camino de rollback. Terraform aditivo puro (11 add / 0 change / 0 destroy,
-  cero recursos Cloud Run), `maxScale=3` sin tocarse, `globe-api-internal` sin custom domain / IAM-private / audience
-  `run.app`. En Greenhouse nació la primitive aditiva `updateSisterPlatformOAuthRedirectUris`
-  (`src/lib/sister-platforms/oauth-broker.ts`) + CLI `pnpm sister-platform:redirect`. Costo ~US$18,25/mes +
-  ~US$0,024/GiB. Desviaciones registradas: allowlist antes que env var, e ingress por `gcloud` (adopción IaC = 1508).
-  Sigue **internal-only**: no habilita Production ni clientes externos (`TASK-1480`). Detalle de runtime:
+- **`TASK-1506` COMPLETE (ADR-004 — Globe Frontend Hosting and Front Door Decision, `EPIC-028`).**
+  Mantiene **Cloud Run** como web/BFF/SSO del shell interno (Node nativo; Next.js `superseded` ahí) y rechaza migrar
+  a Vercel. El **frontend cliente comercial** (`TASK-1505`+) es superficie separada con host + framework **diferidos**
+  — no leer "Cloud Run para el shell interno" como "Cloud Run para el cliente". Tres gates distintos: URL
+  internal-only / HA (cleared) / Production (`TASK-1480`). Spec:
+  `docs/architecture/creative-studio/EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md`.
+- **`TASK-1465` COMPLETE (Globe Workspace/Tenancy/Persistence/Audit, `EPIC-028`) — desplegada + verificada en vivo.**
+  Globe pasó de **cero DB / todo in-memory** a durable: Cloud SQL `globe-pg` keyless IAM + `packages/database` + los
+  **5 stores** detrás de sus ports (incluido el spend fence atómico) + audit append-only. Durabilidad probada en el
+  servicio vivo. Detalle: `EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md` + `GLOBE_RUNTIME_HANDOFF.md`.
+  Diferido: modelo workspace/members/grants (`TASK-1511`). **Corrección de historia:** el `maxScale=3` que esta task
+  reportó era el ceiling de revisión; el efectivo era 1 hasta que `TASK-1508` lo corrigió a 3/3 (detalle en su spec).
+- **`TASK-1507` COMPLETE (Globe Internal Front Door, `EPIC-028`) — aplicada y verificada en vivo 2026-07-21.**
+  **La base URL estable del shell interno es `https://globe.efeoncepro.com`** (Global External ALB + serverless NEG →
+  `globe-studio-internal`, cert `ACTIVE`, 301 HTTP→HTTPS). El ingress del web quedó en
+  `internal-and-cloud-load-balancing`, así que **el `*.run.app` ya no es alcanzable por browser** (404) y sólo
+  persiste en el allowlist OAuth como camino de rollback. `globe-api-internal` sigue IAM-private, sin custom domain
+  y con audience `run.app`. Arquitectura: `docs/architecture/creative-studio/EFEONCE_GLOBE_INTERNAL_FRONT_DOOR_V1.md`
+  (SPEC-009). Operación y rollback: `docs/manual-de-uso/creative-studio/operar-front-door-globe.md`. Runtime:
   `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
-- **`TASK-1508` TO-DO (Globe Cloud Run IaC + Deploy Ownership, `EPIC-028`) — próximo paso ejecutable, blocker levantado.** Adopta ambos servicios
-  vivos en Terraform con import/no-replace y protección de borrado, y reconcilia el workflow: Terraform gobierna
-  ingress/runtime SA/env/scale/`invoker_iam_disabled`; `deploy-internal.yml` sólo image/revision. El plan post-deploy
-  debe quedar convergido. Esta separación evita convertir el dominio en una migración brownfield de alto riesgo.
+- **`TASK-1508` COMPLETE (Globe Cloud Run IaC + Deploy Ownership, `EPIC-028`) — aplicada y probada en vivo 2026-07-21.**
+  Los dos servicios Cloud Run entraron a Terraform (import brownfield, cero destroy/replace) y `deploy-internal.yml`
+  quedó reducido a desplegar **sólo la imagen**; anti-drift probado en dos ciclos con `tofu plan` en `No changes`.
+  Corrigió un **cap efectivo de 1 instancia** que ningún doc registraba: Cloud Run aplica el menor entre el ceiling de
+  servicio y el de revisión, y `--max-instances` escribe uno u otro según el subcomando. Hoy 3/3 y ambos bajo IaC
+  (provider `~> 7.0`). **Riesgo abierto:** el spend fence cross-réplica sigue **sin ejercitarse** (`TASK-1512`).
+  Carril IaC: `docs/operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`.
 - **`TASK-1500`/`1501`/`1502` COMPLETE (cluster Producer: route catalog · run contract discriminado · estimate
   previewable, `EPIC-028`) — en `../efeonce-globe` `main`, local-first sin push.** Detalle en sus specs `complete/`
   + SPEC-004/005/006 de `creative-studio/DECISIONS_INDEX`. Naming: **modelo real público** (`model`=nombre+versión,

@@ -1,10 +1,10 @@
 # Manual — Operar el front door interno de Efeonce Globe
 
 > **Tipo de documento:** Manual de uso / runbook (orientado al operador)
-> **Version:** 1.0
+> **Version:** 1.2
 > **Creado:** 2026-07-21 por Claude (TASK-1507)
 > **Ultima actualizacion:** 2026-07-21 por Claude
-> **Documentación técnica:** [`EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md`](../../architecture/creative-studio/EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md) (ADR-004)
+> **Documentación técnica:** [`EFEONCE_GLOBE_INTERNAL_FRONT_DOOR_V1.md`](../../architecture/creative-studio/EFEONCE_GLOBE_INTERNAL_FRONT_DOOR_V1.md) (SPEC-009)
 
 ## Para qué sirve
 
@@ -15,8 +15,14 @@ El front door es **internal-only**. Tener un dominio propio **no** lo convierte 
 ## Antes de empezar
 
 - **Dónde vive cada cosa:** el Terraform del front door y el smoke de federación viven en el repo hermano `efeonce-globe` (por convención local `../efeonce-globe`, archivo `infra/terraform/front_door.tf`, script `scripts/smoke-human-federation.mjs`). El allowlist de redirect URIs y su CLI viven en **Greenhouse** (`pnpm sister-platform:redirect`). La documentación gobernante vive siempre en `greenhouse-eo`.
+- **Frontera con el runbook de IaC (quién manda sobre qué).** El procedimiento está repartido por **audiencia**, no duplicado:
+  - **Este manual es el SoT del procedimiento del operador**: verificar el dominio, correr el smoke, mover el allowlist, endurecer o restaurar el ingress, diagnosticar el certificado y ejecutar el rollback. Si estás resolviendo algo bajo presión, el orden lo manda este documento.
+  - **[`EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`](../../operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md) es el SoT del carril IaC**: `tofu plan` / `apply`, import brownfield, lectura del state y la forma del HCL. Todo lo que toque Terraform se ejecuta con ese runbook al lado.
+  - **[`EFEONCE_GLOBE_INTERNAL_FRONT_DOOR_V1.md`](../../architecture/creative-studio/EFEONCE_GLOBE_INTERNAL_FRONT_DOOR_V1.md) (SPEC-009) es el SoT del contrato**: por qué el front door es así y qué invariantes no se negocian.
+
+  Donde este manual ya cubre un paso, el runbook lo **referencia** en vez de repetirlo, y viceversa. Si encuentras el mismo procedimiento escrito en dos lados y dicen cosas distintas, gana el SoT de esa audiencia y el otro se corrige — no elijas el que te convenga.
 - **Skill obligatoria:** invoca **`greenhouse-globe`** antes de tocar el repo de Globe o el boundary Globe↔Greenhouse.
-- **Herramientas:** `gcloud` autenticado sobre el proyecto `efeonce-globe`; OpenTofu (`tofu` v1.12.4, provider `hashicorp/google` 6.50.0) para la infra; `pnpm` dentro de `greenhouse-eo` para el CLI del allowlist; `node` dentro de `efeonce-globe` para el smoke.
+- **Herramientas:** `gcloud` autenticado sobre el proyecto `efeonce-globe`; OpenTofu (`tofu` v1.12.4) con el provider `hashicorp/google` pineado en `~> 7.0` por `infra/terraform/versions.tf` (subió de `~> 6.0` en `TASK-1508`: el ceiling a nivel servicio no existe en 6.x) para la infra; `pnpm` dentro de `greenhouse-eo` para el CLI del allowlist; `node` dentro de `efeonce-globe` para el smoke.
 - **Datos fijos del front door:**
 
   | Dato | Valor |
@@ -145,6 +151,8 @@ gcloud run services update globe-studio-internal \
 
 Ese valor es load-bearing: `apps/studio-web/src/app.ts` construye el callback como `new URL('/auth/callback', config.publicBaseUrl)` en `/auth/start`. Usa **siempre** `--update-env-vars`, nunca `--set-env-vars` (destructivo). Cierra con el smoke del paso 2.
 
+> ⚠️ Las env vars de estos servicios hoy las declara Terraform (`infra/terraform/cloud_run_services.tf`): un flip por `gcloud` deja **drift deliberado** y no queda cerrado hasta reconciliar el HCL con el valor que se quiere conservar y aplicar ([`EFEONCE_GLOBE_IAC_RUNBOOK_V1.md` § Rollback por slice](../../operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md#rollback-por-slice)).
+
 ### 4. Diagnosticar el certificado cuando queda en `FAILED_NOT_VISIBLE`
 
 `FAILED_NOT_VISIBLE` en `managed.domainStatus` **no es, por sí solo, un error de configuración**: es el resultado guardado del **primer** intento de validación de Google, que suele ocurrir antes de que exista el registro DNS. Google reintenta solo y el estado pasa a `ACTIVE` sin intervención (en la puesta en marcha del 2026-07-21 tardó ~28 minutos desde la creación del `A`).
@@ -187,6 +195,8 @@ gcloud run services update globe-studio-internal \
   --ingress internal-and-cloud-load-balancing
 ```
 
+> ⚠️ El `ingress` hoy lo declara Terraform (`infra/terraform/cloud_run_services.tf`): este comando es un **segundo escritor** y deja drift deliberado, así que no queda cerrado hasta reconciliar el HCL y aplicar ([`EFEONCE_GLOBE_IAC_RUNBOOK_V1.md` § Rollback por slice](../../operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md#rollback-por-slice)).
+
 Verificación esperada — las dos vías, en este orden:
 
 ```bash
@@ -198,33 +208,51 @@ curl -sS -o /dev/null -w 'run_app=%{http_code}\n' \
 curl -sS -o /dev/null -w 'alb=%{http_code}\n' https://globe.efeoncepro.com/
 ```
 
-Cierra con el smoke del paso 2 contra el dominio: en la puesta en marcha del 2026-07-21 dio `human_federation_ok` **antes y después** del endurecimiento. El endurecimiento tampoco toca `invokerIamDisabled` (sigue `true`) ni `maxScale` (sigue `3`).
+Cierra con el smoke del paso 2 contra el dominio: en la puesta en marcha del 2026-07-21 dio `human_federation_ok` **antes y después** del endurecimiento. El endurecimiento tampoco toca `invokerIamDisabled` (sigue `true`) ni los topes de escala, que hoy gobierna Terraform (paso 6).
 
-**Por qué con `gcloud` y no por Terraform.** La spec original de `TASK-1507` decía "vía Terraform", pero los servicios Cloud Run **no están bajo IaC**: el Terraform del front door referencia `globe-studio-internal` como string literal en el NEG, justamente para **no** adoptar el servicio. Adoptar Cloud Run —y pinear ahí el `ingress`— es explícitamente **`TASK-1508`**. Hasta entonces `gcloud` es el único camino consistente con el scope. Para revertir al acceso directo por `run.app`, `--ingress all` (paso 7).
+**Por qué se hizo con `gcloud` y qué gobierna hoy.** La spec original de `TASK-1507` decía "vía Terraform", pero al momento del cutover los servicios Cloud Run todavía no estaban adoptados: el Terraform del front door referenciaba `globe-studio-internal` como string literal en el NEG, justamente para **no** adoptar el servicio, y `gcloud` era el único camino consistente con el scope de entonces. **`TASK-1508` lo cerró**: hoy los dos servicios están bajo IaC y el `ingress` lo gobierna `infra/terraform/cloud_run_services.tf`, así que un `gcloud run services update --ingress` es un **segundo escritor** sobre un campo declarado en el HCL (ver el aviso de arriba y el cierre obligatorio del paso 7). Para revertir al acceso directo por `run.app`, `--ingress all` (paso 7).
 
-### 6. Restaurar `maxScale` después de un deploy (drift-trap conocido)
+### 6. El ceiling de escala (drift-trap CERRADO por `TASK-1508`)
 
-`TASK-1507` **no toca `maxScale` en ninguna dirección**. El baseline correcto de ambos servicios es **3** desde 2026-07-21 (`TASK-1465` cerró el gate de HA que antes obligaba a 1).
+`TASK-1507` **no tocó `maxScale` en ninguna dirección**. Quien gobierna el techo de réplicas de ambos servicios es Terraform, desde que **`TASK-1508`** los adoptó (2026-07-21).
 
-El drift-trap: **`deploy-internal.yml` hardcodea `--max-instances=1`**, así que un deploy por ese workflow baja el `maxScale` a 1 en silencio. **Después de cada deploy por ese workflow**, verifica y restaura:
+Un servicio Cloud Run tiene ceiling **a nivel servicio** y **a nivel revisión**, y **Cloud Run aplica el menor**. Hoy ambos están en **3/3** en los dos servicios y los gobierna `infra/terraform/cloud_run_services.tf`. Además, **`deploy-internal.yml` pasa sólo `--image`**: un redeploy por ese workflow ya no pisa la escala, así que **no hay nada que restaurar después de un deploy**.
 
-```bash
-gcloud run services update globe-studio-internal \
-  --region southamerica-west1 --project efeonce-globe --max-instances=3
-```
+> **NUNCA** "restaures" el ceiling con `gcloud run services update <servicio> --max-instances=3`. Ese subcomando escribe el ceiling **de revisión**, no el de servicio; como Cloud Run aplica el menor, el comando **aparenta** restaurar y deja el techo efectivo en 1. Era exactamente el workaround inefectivo que este manual prescribía, y hoy además sería un segundo escritor sobre un campo que gobierna Terraform. Si hace falta cambiar la escala, **se cambia en el HCL y se aplica**.
 
-El saneamiento de raíz —que Terraform gobierne ese valor y el workflow deje de pisarlo— es **`TASK-1508`**. El **ingress no es drift-trap** de ese workflow: `deploy-internal.yml` no pasa `--ingress`, y `gcloud run deploy` preserva los ajustes a nivel servicio que no se especifican.
+Consecuencia registrada: mientras el techo efectivo estuvo en 1 nunca hubo más de una réplica, así que el **spend fence cross-réplica de `TASK-1465` nunca se ejercitó**. Ejercitarlo es **`TASK-1512`**.
+
+El **ingress no es drift-trap** de ese workflow: `deploy-internal.yml` no pasa `--ingress`, y `gcloud run deploy` preserva los ajustes a nivel servicio que no se especifican.
 
 ### 7. Rollback por slice
 
-Cada slice se revierte por separado, de menor a mayor blast radius. Tiempos estimados:
+**Es una secuencia, no un menú.** Los pasos están ordenados de la recuperación más barata a la más lenta, **se ejecutan en orden** y **te detienes en el primero que resuelva**. No hace falta desarmar el ALB para recuperar el acceso: los dos primeros pasos restauran el login sin tocar DNS ni Terraform.
 
-| Slice | Cómo revertir | Tiempo estimado |
-| --- | --- | --- |
-| Ingress endurecido | `gcloud run services update globe-studio-internal --region southamerica-west1 --project efeonce-globe --ingress all` — restaura el acceso directo por `run.app`; para volver al estado endurecido, paso 5 | < 10 min |
-| URL / OAuth | `gcloud run services update globe-studio-internal --region southamerica-west1 --project efeonce-globe --update-env-vars GLOBE_PUBLIC_BASE_URL=<url run.app>` — el `run.app` **ya está** en el allowlist, no hace falta escribir en la base | < 15 min |
-| DNS | quitar el registro `A` en HostGator | < 60 min (propagación) |
-| ALB | destruir selectivamente los recursos aditivos del front door, **incluida la dirección IP global** | según apply |
+> ⚠️ **Precondición que no es opcional: el paso 1 (ingress) es requisito del paso 2.**
+> Revertir sólo `GLOBE_PUBLIC_BASE_URL` con el ingress todavía en `internal-and-cloud-load-balancing` **empeora el estado en vez de arreglarlo**: el `run.app` sigue respondiendo `404` —lo bloquea el ingress, no la env var— y el dominio, que sí sigue sirviendo por el ALB, pasa a anunciar en `/auth/start` un callback que el browser no puede alcanzar. Así que el login queda roto por el lado que antes funcionaba. **El paso 2 por sí solo no es un rollback, es un segundo incidente.**
+
+| Orden | Slice | Cómo revertir | Ventana |
+| --- | --- | --- | --- |
+| 1 | **Ingress endurecido** (precondición de 2) | `gcloud run services update globe-studio-internal --region southamerica-west1 --project efeonce-globe --ingress all` — restaura el acceso directo por `run.app`; para volver al estado endurecido, paso 5 | < 10 min |
+| 2 | **URL / OAuth** | `gcloud run services update globe-studio-internal --region southamerica-west1 --project efeonce-globe --update-env-vars GLOBE_PUBLIC_BASE_URL=<url run.app>` — el `run.app` **ya está** en el allowlist, no hace falta escribir en la base | < 15 min |
+| 3 | **DNS** | Quitar el registro `A` de `globe.efeoncepro.com` en HostGator (out-of-band) | < 60 min (propagación) |
+| 4 | **ALB** | Revertir el **HCL del front door** — el contenido de `16919d9` (Slice 1) **y** `cf5e4d1` (el `depends_on`), que forman una unidad — y destruir la **IP global**; después `tofu plan` → **leer el plan** → `tofu apply`. **NO es un `git revert` a ciegas:** ver la nota de abajo | Según plan |
+
+**Cierre obligatorio del rollback.** Los pasos 1 y 2 escriben campos que hoy **gobierna Terraform** (`ingress` y las env vars, en `infra/terraform/cloud_run_services.tf`). Usar `gcloud` sigue siendo **correcto como maniobra de emergencia** —es lo más rápido para recuperar el acceso—, pero deja **drift deliberado**: un `tofu plan` que muestre esos campos en diff justo después **no es un error del state**, es la evidencia de que falta reconciliar. **El rollback no está cerrado hasta reconciliar el HCL con el estado que se quiere conservar y aplicar**; si no, el próximo apply deshace el rollback en silencio. Carril completo: [`EFEONCE_GLOBE_IAC_RUNBOOK_V1.md` § Rollback por slice](../../operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md#rollback-por-slice).
+
+**Por qué el paso 4 no es un `git revert` a ciegas.** `16919d9` introdujo `variable "front_door_domain"`, y
+desde `TASK-1508` la referencia también `infra/terraform/cloud_run_services.tf` (`GLOBE_PUBLIC_BASE_URL`).
+Un `git revert` de ese commit borraría la variable dejando viva la referencia, y `tofu plan` **aborta** con
+`Reference to undeclared input variable` — ni siquiera produce plan, en medio de un rollback. El orden correcto
+lo resuelve solo si se respeta la secuencia: **el paso 2 ya dejó de usar el dominio**, así que al llegar al
+paso 4 hay que **editar `cloud_run_services.tf` para que `GLOBE_PUBLIC_BASE_URL` no dependa de
+`var.front_door_domain`** (o hacerlo en la misma edición) y recién ahí retirar el HCL del front door junto con
+la variable. Los dos commits siguen siendo la unidad de contenido a revertir —revertir sólo `16919d9` deja
+huérfano el fix de `cf5e4d1`, y sólo `cf5e4d1` reabre la carrera con `compute.googleapis.com`—, pero se aplica
+como edición reconciliada, no como revert automático.
+
+**Si los pasos 1-2 se hicieron con `gcloud`, releé el plan antes de aplicar.** Aplicar sin reconciliar, con el
+ALB ya destruido, es outage total. Y el paso 4 se ejecuta **por Terraform**, nunca destruyendo recursos a mano desde la consola o con `gcloud`: un destroy manual driftea el state y deja el siguiente `plan` mintiendo. Carril IaC completo (plan/apply/state): [`EFEONCE_GLOBE_IAC_RUNBOOK_V1.md` § Rollback por slice](../../operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md#rollback-por-slice).
 
 Por eso el callback `run.app` se conserva deliberadamente en el allowlist: es el camino de rollback documentado y evita tener que escribir en la base bajo presión. Con el ingress endurecido ese origen no es alcanzable por browser, así que un código enviado ahí no llega a ninguna parte.
 
@@ -240,7 +268,7 @@ Por eso el callback `run.app` se conserva deliberadamente en el allowlist: es el
 - **`run.app` directo → `404`:** correcto tras endurecer el ingress a `internal-and-cloud-load-balancing` (paso 5). El único camino de browser es el ALB.
 - **`globe-api-internal` anónimo → `403`:** correcto, antes y después. La API sigue IAM-privada, su `GLOBE_API_EXPECTED_AUDIENCE` contiene los dos formatos de URL `run.app` y **nunca** el dominio de browser; su `GLOBE_PUBLIC_BASE_URL` es el placeholder `https://globe-api-internal.invalid`.
 - **`invokerIamDisabled=true` en `globe-studio-internal`:** correcto para un servicio web con SSO — un browser no presenta ID token; la app autentica por su cookie de sesión.
-- **`maxScale=3`:** baseline vigente en ambos servicios. Un `1` después de un deploy es el drift-trap del paso 6, no un cambio intencional.
+- **`maxScale=3`:** baseline vigente en ambos servicios, en el ceiling de servicio y en el de revisión (3/3), gobernado por Terraform. Ver el paso 6.
 - **Smoke: `"result": "human_federation_ok"`:** las tres piernas del login pasaron contra el deployment real.
 
 ## Qué no hacer
@@ -260,9 +288,9 @@ Por eso el callback `run.app` se conserva deliberadamente en el allowlist: es el
 
 - **`curl` da `status=000` sin `remote_ip`, pero el dominio funciona para el resto:** tu resolver mantiene **cache negativa**. El `SOA` de `efeoncepro.com` tiene `minimum` 86400, así que un `NXDOMAIN` cacheado antes de crear el registro persiste ~24 h. Ojo: `dscacheutil -flushcache` **sin sudo no hace nada**. Verifica con `dig @8.8.8.8` y trabaja con `curl --resolve` o `GLOBE_SMOKE_RESOLVE=globe.efeoncepro.com:8.233.189.79` hasta que expire.
 - **El certificado quedó en `FAILED_NOT_VISIBLE`:** sigue la secuencia de seis chequeos del paso 4. Si todos pasan, espera: Google reintenta solo y el estado pasa a `ACTIVE` (~28 min en la puesta en marcha). No recrees el certificado.
-- **Después del cutover el SSO rebota con `invalid_redirect_uri`:** el `redirect_uri` que Globe anuncia no está en el allowlist. Pasó el orden invertido (env var antes que allowlist). Corre el dry-run del paso 3 para ver el estado real, agrega el URI con `--apply` y re-corre el smoke. Si necesitas volver ya, revierte `GLOBE_PUBLIC_BASE_URL` al `run.app` (< 15 min): ese callback sigue permitido.
+- **Después del cutover el SSO rebota con `invalid_redirect_uri`:** el `redirect_uri` que Globe anuncia no está en el allowlist. Pasó el orden invertido (env var antes que allowlist). Corre el dry-run del paso 3 para ver el estado real, agrega el URI con `--apply` y re-corre el smoke. Si necesitas volver ya, usa el rollback del paso 7 **en orden** —ingress primero, después `GLOBE_PUBLIC_BASE_URL`—: ese callback `run.app` sigue permitido, pero revertir sólo la env var con el ingress endurecido deja el `run.app` en `404` y rompe también el dominio.
 - **El apply de Terraform falla con `SERVICE_DISABLED` sobre `compute.googleapis.com`:** la API se acaba de habilitar y no propagó. No reintentes a ciegas: el recurso afectado es `google_compute_url_map.front_door_http_redirect`, la única raíz del grafo sin arista implícita hacia la API (el carril HTTPS la alcanza transitivamente vía backend service → NEG). Ya lleva un `depends_on` explícito a `google_project_service.enabled["compute.googleapis.com"]`; si el error reaparece en otro recurso nuevo, arregla la carrera en el HCL con la misma forma.
-- **`maxScale` volvió a 1 después de un deploy:** esperado y conocido, `deploy-internal.yml` hardcodea `--max-instances=1`. Restaura a 3 con el comando del paso 6. La solución de raíz es `TASK-1508`.
+- **`maxScale` volvió a 1 después de un deploy:** ya no pasa. `deploy-internal.yml` pasa sólo `--image` y Terraform declara los dos ceilings en 3/3 (cerrado por `TASK-1508`). Si un plan muestra el ceiling en diff, alguien escribió por fuera del HCL — reconciliar, no "restaurar" con `gcloud`.
 - **`--remove` falla con `invalid_redirect_uri`:** por diseño. Ese URI no estaba en el allowlist, y el CLI prefiere fallar fuerte antes que hacer un no-op silencioso sobre una vista desactualizada. Corre el dry-run para ver la lista vigente y copia el URI exacto.
 - **El acceso directo por `run.app` da 404:** correcto tras el endurecimiento de ingress (paso 5). Entra por `https://globe.efeoncepro.com/`. Si necesitas el acceso directo de vuelta (rollback), usa `--ingress all`.
 - **El `run.app` volvió a responder (no da 404):** el ingress quedó en `all` — por un rollback que nadie revirtió o por un servicio reconstruido. Vuelve a endurecerlo con el comando del paso 5. Ojo: **no** es drift del workflow (`deploy-internal.yml` no pasa `--ingress`).
@@ -270,11 +298,12 @@ Por eso el callback `run.app` se conserva deliberadamente en el allowlist: es el
 
 ## Referencias técnicas
 
-- Decisión canónica (ADR-004): [`EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md`](../../architecture/creative-studio/EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md).
+- **Contrato canónico del front door (SPEC-009)** — SoT de los invariantes, incluido el rollback como secuencia: [`EFEONCE_GLOBE_INTERNAL_FRONT_DOOR_V1.md`](../../architecture/creative-studio/EFEONCE_GLOBE_INTERNAL_FRONT_DOOR_V1.md).
+- Decisión de hosting (ADR-004): [`EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md`](../../architecture/creative-studio/EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md).
 - Continuidad de runtime en vivo: [`GLOBE_RUNTIME_HANDOFF.md`](../../operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md).
-- Infraestructura keyless y qué gobierna Terraform hoy: [`EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`](../../operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md).
-- Persistencia durable (origen del baseline `maxScale=3`): [`operar-persistencia-globe.md`](./operar-persistencia-globe.md).
+- **Carril IaC** (plan/apply/import/state) y qué gobierna Terraform hoy: [`EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`](../../operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md).
+- Persistencia durable (la capacidad que levantó el pin de 1 réplica en memoria): [`operar-persistencia-globe.md`](./operar-persistencia-globe.md).
 - Contrato de plataformas hermanas / broker OAuth: [`GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md`](../../architecture/GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md).
-- Tasks relacionadas: `TASK-1506` (decisión), `TASK-1507` (este front door), `TASK-1508` (Cloud Run bajo IaC — cierra el drift-trap de `maxScale`), `TASK-1480` (gate de acceso externo / Production), `TASK-1465` (persistencia durable).
+- Tasks relacionadas: `TASK-1506` (decisión), `TASK-1507` (este front door), `TASK-1508` (Cloud Run bajo IaC — cerró el drift-trap del ceiling de escala), `TASK-1512` (ejercitar el spend fence cross-réplica), `TASK-1480` (gate de acceso externo / Production), `TASK-1465` (persistencia durable).
 - Documentación funcional (lenguaje simple): [`dominio-interno-globe.md`](../../documentation/creative-studio/dominio-interno-globe.md).
 - Programa: [`EPIC-028`](../../epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md). Skill: `greenhouse-globe`.

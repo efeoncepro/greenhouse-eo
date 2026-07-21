@@ -9,6 +9,9 @@ del alcance de 1465 (bajo `apps/studio-web`) o en una child task explícitamente
 (2) `TASK-1507` (front door) preserva `maxScale=1` a propósito y no toca este gate. HA de Globe = esta task, no el
 hosting.
 
+> **Leer antes de citar esta task sobre escala:** el §Delta 2026-07-21 (corrección de historia), al final de este
+> bloque de deltas, corrige la lectura del ceiling. El techo efectivo fue **1** hasta `TASK-1508`.
+
 ## Delta 2026-07-20 — recalibración de ejecución (Discovery + decisiones del operador)
 
 Discovery en `efeonce-globe` (3 recons read-only) fijó la realidad y el operador aprobó el rumbo:
@@ -78,6 +81,30 @@ El rollout de deploy se ejecutó y verificó en vivo (operador autorizó push + 
 (`TASK-1508`, deploy ownership — remueve scale del workflow). Hasta entonces, un redeploy re-sube el techo en vivo.
 
 Estado: **operativamente completa** — durabilidad entregada, desplegada y verificada en vivo; HA habilitada.
+
+## Delta 2026-07-21 (corrección de historia) — el `maxScale = 3` de arriba era el ceiling de revisión
+
+`TASK-1508` descubrió que el bloque anterior leyó el campo equivocado y **el techo efectivo era 1**, no 3. Un servicio
+Cloud Run lleva un ceiling **a nivel servicio** (`Service.scaling.maxInstanceCount`) y otro **a nivel revisión**
+(`template.scaling.maxInstanceCount`), y **Cloud Run aplica el menor**. Ambos servicios quedaron en **servicio=1 /
+revisión=3**: esta task reportó el 3 de revisión, la spec de `TASK-1507` citaba el 1 de servicio, y las dos
+afirmaciones describían campos distintos sin saberlo. La causa es que **`--max-instances` escribe un campo distinto
+según el subcomando** (`gcloud run deploy` → servicio; `gcloud run services update` → revisión), así que el workaround
+que el follow-up de arriba implicaba —"un redeploy re-sube el techo en vivo"— era **inefectivo**.
+
+Consecuencias para esta task, en pasado:
+
+- Ningún servicio de Globe corrió nunca más de una instancia, así que el **spend fence atómico cross-réplica** que esta
+  task construyó **jamás se ejercitó**. Es correcto por construcción y por tests, pero su camino de contención bajo row
+  locks nunca corrió con >1 réplica. Ejercitarlo es **`TASK-1512`**
+  (`docs/tasks/to-do/TASK-1512-globe-cross-replica-spend-fence-exercise.md`) y exige gasto real de proveedor, con su
+  propia autorización.
+- El drift-trap está **cerrado**: `TASK-1508` corrigió el techo a **3/3**, declaró ambos campos en Terraform y dejó
+  `deploy-internal.yml` en image-only (ya no pasa `--max-instances`). Nada hay que "restaurar" a mano tras un deploy.
+
+La durabilidad entregada por esta task no cambia; lo que cambia es que **lo que `TASK-1508` habilitó es el techo de 3
+réplicas** — condición necesaria, no HA. HA gobernada como tal sigue gateada por `TASK-1480`, y el camino cross-réplica
+del fence sigue sin ejercitarse (`TASK-1512`), así que nadie debe asumirlo verificado.
 
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 

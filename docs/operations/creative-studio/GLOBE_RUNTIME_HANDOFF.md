@@ -26,9 +26,12 @@ prescribían para "restaurar" el techo escribía el campo equivocado. Corregido 
 **Anti-drift probado en dos ciclos**, uno por servicio (runs `29872768853` web / `29875135147` api): ambos dejaron el
 `tofu plan` en **No changes**, con ingress, invoker posture, ceiling 3/3, runtime SA y env intactos. `TASK-1508` cerró.
 
-**Riesgo abierto (el único).** El spend fence cross-réplica sigue **sin ejercitar**: levantar el cap lo hizo posible por
-primera vez, pero probarlo exige concurrencia real contra el Model Lab, o sea gasto real de proveedor. Merece su propia
-autorización; nadie debería asumirlo verificado.
+**Riesgo abierto (el único): `TASK-1512`.** El spend fence cross-réplica sigue **sin ejercitar**: levantar el cap lo
+hizo posible por primera vez, pero probarlo exige concurrencia real contra el Model Lab, o sea gasto real de proveedor.
+Merece su propia autorización; nadie debería asumirlo verificado. Spec:
+`docs/tasks/to-do/TASK-1512-globe-cross-replica-spend-fence-exercise.md`.
+
+**Doc stale detectada y corregida (2026-07-21).** El manual del front door quedó brevemente stale tras `TASK-1508` (prescribía un workaround de `maxScale` que ya no aplicaba); se corrigió en el mismo cierre y hoy es el SoT del procedimiento del operador. Sin deuda pendiente.
 
 **Próximo paso ejecutable:** `TASK-1505` (Producer surface) ya tiene su front door canónico. `TASK-1480`
 (Production/clientes externos) sigue siendo el gate que nada de esto levanta.
@@ -58,14 +61,22 @@ propósito, como camino de rollback; retirarlo es un comando, no un incidente:
 `GLOBE_SMOKE_RESOLVE=host:ip` permite smokear un front door recién publicado desde un resolver con cache negativa
 sin debilitar ninguna aserción. Verde antes y después del hardening de ingress.
 
-**Riesgos abiertos.**
+**Riesgos abiertos (estado al cierre de 1507; ambos primeros quedaron cerrados por `TASK-1508`).**
 
-- **El ingress no está gobernado por IaC.** Se fijó por `gcloud` porque los servicios Cloud Run siguen fuera de
-  Terraform; su gobierno es `TASK-1508`. No es drift-trap del workflow (`deploy-internal.yml` no pasa `--ingress`
-  y `gcloud run deploy` preserva lo no especificado), pero nada lo previene fuera de esa task.
-- **`maxScale` sí es drift-trap.** `deploy-internal.yml` hardcodea `--max-instances=1`: un deploy por ese workflow
-  baja el techo a 1. Valor vivo hoy: 3. Workaround inmediato tras un deploy:
-  El drift-trap quedó **cerrado por `TASK-1508`**: el workflow ya no pasa `--max-instances` y Terraform gobierna los dos ceilings (servicio y revisión). Cuidado con el workaround viejo `gcloud run services update <servicio> --max-instances=3`: escribía el ceiling de **revisión**, no el de **servicio**, y Cloud Run aplica el menor — así que dejaba el techo efectivo en 1 aparentando haberlo restaurado.
+- **El ingress no estaba gobernado por IaC.** Se fijó por `gcloud` porque los servicios Cloud Run seguían fuera de
+  Terraform. No era drift-trap del workflow (`deploy-internal.yml` no pasa `--ingress` y `gcloud run deploy` preserva
+  lo no especificado). **Cerrado:** `TASK-1508` adoptó los servicios y Terraform gobierna el `ingress`.
+- **El ceiling de escala sí era drift-trap — y peor de lo que se creía.** `deploy-internal.yml` hardcodeaba
+  `--max-instances=1`. Lo que ningún doc registraba: ese flag escribe el ceiling **de servicio** desde `gcloud run
+  deploy` y el **de revisión** desde `gcloud run services update`, y Cloud Run aplica **el menor** — así que el techo
+  efectivo **era 1** aunque la revisión dijera 3, y el workaround `gcloud run services update … --max-instances=3`
+  que varios manuales prescribían era **inefectivo**: escribía el campo equivocado y aparentaba restaurarlo.
+  **Cerrado:** `TASK-1508` corrigió el techo a **3/3**, puso ambos campos bajo Terraform y dejó el workflow
+  image-only. Consecuencia registrada: el spend fence cross-réplica nunca se ejercitó → `TASK-1512`.
+- **Hueco de gobernanza de la primitive de redirect allowlist → `TASK-1513`.** `updateSisterPlatformOAuthRedirectUris`
+  acepta `actorUserId` pero no lo persiste, no hay capability que declare quién puede mover un allowlist y no existe
+  route/MCP: es CLI-only por diseño hasta que `TASK-1513` cierre las tres piezas
+  (`GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md` §15.5).
 - **Cache negativa de DNS.** El SOA de `efeoncepro.com` tiene minimum TTL 86400, así que un NXDOMAIN cacheado antes
   de crear el registro persiste ~24h en el resolver local y `dscacheutil -flushcache` sin `sudo` no hace nada. El
   síntoma engañoso es `curl` devolviendo `status=000` sin `remote_ip`. Verificar con `dig @8.8.8.8` y
@@ -77,9 +88,10 @@ sin debilitar ninguna aserción. Verde antes y después del hardening de ingress
   gateado por `TASK-1480`. `globe-api-internal` no recibe custom domain, sigue IAM-private (403 anónimo) y su
   audience se deriva de `run.app`, nunca del dominio browser.
 
-**Próximo paso ejecutable: `TASK-1508`** — adoptar los dos servicios Cloud Run en Terraform por import/no-replace y
-dejar un solo escritor (Terraform gobierna configuración estable y seguridad; el workflow queda image/revision-only).
-Ahí se pinean `ingress`, `maxScale` e `invokerIamDisabled`. Spec de cierre del front door:
+**Continuó en `TASK-1508` (complete 2026-07-21)** — adoptó los dos servicios Cloud Run en Terraform por
+import/no-replace y dejó un solo escritor (Terraform gobierna configuración estable y seguridad; el workflow quedó
+image-only). Ahí quedaron pineados `ingress`, ambos ceilings de escala e `invokerIamDisabled`; ver el bloque
+**Active state — 2026-07-21 (TASK-1508 …)** al inicio de este archivo. Spec de cierre del front door:
 `docs/tasks/complete/TASK-1507-globe-internal-front-door-alb-terraform.md`; decisión que implementa: ADR-004
 `docs/architecture/creative-studio/EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md`.
 
@@ -101,7 +113,9 @@ Readback durable: dos versiones (`co-operated` → `efeonce-managed`) y dos audi
 Los grants temporales `serviceAccountTokenCreator` de proyecto y service account fueron revocados y verificados.
 
 La capacidad queda **operativa internal-only**. UI, MCP, clientes externos y producción comercial continúan bloqueados.
-El drift conocido de `deploy-internal.yml` sigue bajo TASK-1508: tras cada deploy verificar/restaurar `maxScale=3`.
+El drift conocido de `deploy-internal.yml` quedó **cerrado por `TASK-1508`**: el workflow es image-only y Terraform
+gobierna ambos ceilings, así que ya no hay nada que "restaurar" a mano tras un deploy. El `maxScale=3` que se leía en
+esas revisiones era el ceiling de revisión; el de servicio seguía en 1, y el efectivo era el menor.
 
 ## Active state — 2026-07-21 (TASK-1465: persistencia durable desplegada + verificada en vivo)
 
@@ -119,11 +133,12 @@ recién habilita correr multi-réplica), sesiones + transacciones de OAuth, más
 append-only. Tablas del esquema `globe`: `experiments`, `evaluation_reports`, `human_sessions`,
 `oauth_transactions`, `spend_fence_runs`, `spend_fence_days`, `audit_log`.
 
-**Desplegado en vivo:** ambos servicios Cloud Run corren durables a **`maxScale=3`** (hasta 3 réplicas; bajan a
-cero cuando ociosos, ~US$0 extra) — `globe-studio-internal` (cáscara web/login) y `globe-api-internal` (API del
-Model Lab), **cada uno con su propio usuario IAM** de base. **Verificado en vivo:** golpear `/auth/start` en el
-servicio corriendo **persistió una fila `oauth_transactions` en Postgres** — evidencia real desde el servicio,
-no sólo por el seam local.
+**Desplegado en vivo:** ambos servicios Cloud Run corren durables — `globe-studio-internal` (cáscara web/login) y
+`globe-api-internal` (API del Model Lab), **cada uno con su propio usuario IAM** de base; bajan a cero cuando están
+ociosos (~US$0 extra). **Verificado en vivo:** golpear `/auth/start` en el servicio corriendo **persistió una fila
+`oauth_transactions` en Postgres** — evidencia real desde el servicio, no sólo por el seam local. *(Corrección de
+historia: este bloque reportó `maxScale=3`, que era el ceiling de revisión. El de servicio seguía en 1 y Cloud Run
+aplica el menor, así que el techo efectivo **era 1**; `TASK-1508` lo corrigió a 3/3.)*
 
 **Fix de build (Dockerfile construye `packages/database`):** el Dockerfile no compilaba el paquete de
 persistencia; se corrigió para que la imagen incluya `packages/database`. Un servicio hace durable su runtime
@@ -131,11 +146,13 @@ sólo si declara las tres `GLOBE_POSTGRES_INSTANCE_CONNECTION_NAME` / `GLOBE_POS
 `GLOBE_POSTGRES_USER` (el usuario IAM de runtime del servicio); si falta alguna, **arranca en memoria** — sólo
 permitido en el environment `internal_smoke`.
 
-**⚠️ Drift-trap conocido → `TASK-1508`.** `deploy-internal.yml` hoy **fija `--max-instances=1`** por hardcode,
-así que un redespliegue por ese workflow **baja el `maxScale` a 1** hasta que Terraform gobierne ese valor.
-El drift-trap quedó **cerrado por `TASK-1508`**: el workflow ya no pasa `--max-instances` y Terraform gobierna los dos ceilings (servicio y revisión). Cuidado con el workaround viejo `gcloud run services update <servicio> --max-instances=3`: escribía el ceiling de **revisión**, no el de **servicio**, y Cloud Run aplica el menor — así que dejaba el techo efectivo en 1 aparentando haberlo restaurado. El
-saneamiento de raíz (Terraform gobierna la config estable, el workflow queda image/revision-only) es
-`TASK-1508`. **Diferido:** un modelo rico de workspace / members / grants. Docs: funcional
+**⚠️ Drift-trap que este bloque registró — ya cerrado por `TASK-1508`.** `deploy-internal.yml` hardcodeaba
+`--max-instances=1`, y el workaround que varios manuales prescribían tras un deploy
+(`gcloud run services update <servicio> --max-instances=3`) era **inefectivo**: escribía el ceiling de **revisión**,
+no el de **servicio**, y Cloud Run aplica el menor, así que dejaba el techo efectivo en 1 aparentando haberlo
+restaurado. `TASK-1508` corrigió el techo a **3/3**, puso ambos ceilings bajo Terraform y dejó el workflow
+image-only, así que ya no hay drift que vigilar ni workaround que correr.
+**Diferido:** un modelo rico de workspace / members / grants. Docs: funcional
 [`docs/documentation/creative-studio/persistencia-durable-globe.md`], manual
 [`docs/manual-de-uso/creative-studio/operar-persistencia-globe.md`], spec
 `docs/architecture/creative-studio/EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md`.
@@ -157,10 +174,11 @@ directo), el ingress del web quedó en `internal-and-cloud-load-balancing` y `gl
 domain, IAM-private y con audience `run.app`. Estado vigente, comandos y riesgos abiertos: ver el bloque
 **Active state — 2026-07-21 (TASK-1507: front door internal-only vivo)** al inicio de este archivo.
 
-**Cloud Run IaC + deploy ownership → `TASK-1508` (registrada, `to-do`; su blocker `TASK-1507` ya está levantado).**
-Adopta los dos servicios vivos por import/no-replace y elimina la doble escritura: Terraform gobierna configuración
-estable y seguridad; el workflow `gcloud run deploy` queda image/revision-only. Ahí se pinean `invokerIamDisabled`
-(web `True`, api `False`), `maxScale` e `ingress`. **Próximo paso ejecutable: `TASK-1508`.**
+**Cloud Run IaC + deploy ownership → `TASK-1508`: COMPLETE (2026-07-21).** Adoptó los dos servicios vivos por
+import/no-replace y eliminó la doble escritura: Terraform gobierna configuración estable y seguridad; el workflow
+`gcloud run deploy` quedó image-only. Ahí quedaron pineados `invokerIamDisabled` (web `True`, api `False`), los dos
+ceilings de escala (servicio y revisión, ambos en 3) e `ingress`. Detalle y evidencia: el bloque
+**Active state — 2026-07-21 (TASK-1508 …)** al inicio de este archivo.
 
 ## Active state — 2026-07-20 (TASK-1490 desplegada + verificada en el servicio + hardening de auth)
 

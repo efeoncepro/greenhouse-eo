@@ -88,10 +88,13 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
   `run.app`. El redirect `run.app` se **conserva** en el allowlist como camino de rollback. Sigue siendo
   internal-only: no habilita Production ni clientes externos.
 - `TASK-1508` ✅ **completa (2026-07-21): Cloud Run IaC + deploy ownership.** Adoptó los 2 servicios
-  vivos mediante import no destructivo y reconcilia Terraform con `deploy-internal.yml`: Terraform gobierna
-  configuración estable; el workflow sólo image/revision. Cierra el drift de `invokerIamDisabled`, el `maxScale`
-  (`--max-instances=1` hardcodeado) y el ingress —que hoy quedó fijado por `gcloud`, sin gobierno IaC— sin mezclarlo
-  con DNS. Su blocker (`TASK-1507`) ya está levantado.
+  vivos mediante import no destructivo (`2 imported / 2 changed / 0 destroyed`) + el invoker binding de la api, y
+  reconcilió Terraform con `deploy-internal.yml`: Terraform gobierna configuración estable; el workflow quedó
+  **image-only** (sólo `--image`). Cerró el drift de `invokerIamDisabled`, del ingress y de la escala. **Corrigió
+  además un cap efectivo de 1 instancia que ningún doc registraba:** `--max-instances` escribe el ceiling de servicio
+  desde `run deploy` y el de revisión desde `run services update`, Cloud Run aplica el menor y ambos servicios estaban
+  en servicio=1 / revisión=3 — corregido a **3/3**, con ambos campos en Terraform (provider `google` `~> 6.0` →
+  `~> 7.0`). Anti-drift probado en dos ciclos, uno por servicio, ambos con `tofu plan` en `No changes`.
 
 ### Front door ordering contract
 
@@ -103,8 +106,9 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
 - Un dominio internal-only puede implementarse (vía `TASK-1507`) sin esperar `TASK-1480`. La persistencia durable
   **ya aterrizó**: `TASK-1465` (complete, deployed + live-verified 2026-07-21) movió sesión/OAuth/experimentos/
   eval/spend-fence + un audit log append-only a Cloud SQL `globe-pg`, con lo que **se levantó el techo de HA** que
-  gateaba `maxScale > 1` — ambos servicios Cloud Run corren durable en `maxScale=3`. Gobernar el valor `maxScale`
-  por IaC lo cerró `TASK-1508`: el workflow ya no pasa `--max-instances` y Terraform gobierna ambos ceilings. Production/clientes externos
+  gateaba `maxScale > 1` — ambos servicios Cloud Run corren durable. El ceiling quedó gobernado por IaC recién con
+  `TASK-1508`, que además destapó que el techo efectivo **era 1** (servicio=1 / revisión=3, Cloud Run aplica el menor)
+  y lo corrigió a **3/3**: el workflow ya no pasa `--max-instances` y Terraform gobierna ambos ceilings. Production/clientes externos
   permanecen bloqueados por `TASK-1480` y un release explícito posterior. El host del frontend cliente comercial es
   una decisión diferida (ADR-004).
 - La adopción IaC de servicios ocurrió después del dominio (`TASK-1508`, completa) y corrigió un cap efectivo de 1 instancia que ningún doc registraba; no autoriza Production ni clientes externos.
@@ -288,12 +292,14 @@ depender también de `1500–1503`. Spec canónica:
 in-memory / per-proceso) a **durable**. Su primer datastore es un Cloud SQL `globe-pg` propio (Postgres 16,
 `southamerica-west1`, IAM keyless sobre el connector) provisto en Terraform. Los cinco stores antes en memoria
 —sesiones, transacciones OAuth, experimentos, reportes de evaluación y el spend fence de seguridad— más un audit
-log append-only ahora persisten detrás de sus ports; ambos servicios Cloud Run corren durable en `maxScale=3`.
+log append-only ahora persisten detrás de sus ports; ambos servicios Cloud Run corren durable.
 
 **Esto levanta el techo de HA** que ADR-004 (`TASK-1506`) hard-gateaba en esta task: el ceiling in-memory /
-`maxScale=1` ya no existe. **Queda diferido:** el modelo rico de workspace/members/grants tenancy (follow-up) y
-persistir el valor `maxScale` por Terraform (**`TASK-1508`**, completa; el workflow ya no hardcodea
-`--max-instances=1`). Production/clientes externos siguen gateados por `TASK-1480`. Spec canónica:
+`maxScale=1` ya no existe. **Corrección de historia (`TASK-1508`):** el `maxScale=3` que 1465 reportó era el ceiling
+**de revisión**; el de **servicio** seguía en 1 y Cloud Run aplica el menor, así que el techo efectivo **era 1** hasta
+que `TASK-1508` (completa) lo corrigió a **3/3** y puso ambos campos en Terraform. Consecuencia: el spend fence
+cross-réplica nunca se ejercitó — es **`TASK-1512`**. **Queda diferido:** el modelo rico de workspace/members/grants
+tenancy (follow-up). Production/clientes externos siguen gateados por `TASK-1480`. Spec canónica:
 `docs/architecture/creative-studio/EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md` (SPEC-007) +
 `docs/tasks/complete/TASK-1465-globe-workspace-tenancy-persistence-audit.md`.
 

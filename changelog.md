@@ -87,6 +87,7 @@
   con disponibilidad real, Turnstile y un enlace de respaldo que fue retirado en el corte native-only posterior. El host usa el template normal de Ohio
   —no Canvas— y una corrección page-scoped para el margen del root Elementor; Playwright confirmó desktop y 390 px sin
   overflow ni errores de consola. No se promovió a Contacto/RRSS, no se publicó GTM ni se creó una reserva.
+- El host de `/agenda/` se refinó como focused booking canvas conservando la navegación y el footer global completo del sitio: un H1, sin title/breadcrumb/sidebar heredados y sin prefooter. Se retiraron 35 reglas locales que alteraban el footer. La captura final `.captures/2026-07-21T23-44-01-104Z_agenda-focused-booking-canvas` validó 1440/820/390, `scrollWidth===clientWidth`, teclado, reduced motion y cero errores; no hubo booking, GTM publish, release ni commit.
 - La navegación mensual ya no colapsa el calendario cuando HubSpot devuelve un mes sin slots: conserva el mes solicitado,
   la grilla semántica completa, los controles de recuperación y un estado vacío específico. La regresión julio→agosto
   quedó cubierta con 31 días no disponibles, restauración de foco y revisión visual desktop/390 sin overflow. PR #162

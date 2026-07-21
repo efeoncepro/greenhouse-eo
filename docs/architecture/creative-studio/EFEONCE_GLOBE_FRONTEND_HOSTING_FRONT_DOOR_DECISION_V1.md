@@ -120,7 +120,8 @@ su snapshot 2026-07-20 y esta Delta registra el cambio de estado.
 
 **Sigue abierto (no lo cierra esta Delta):** el modelo rico de workspace/members/grants tenancy queda diferido;
 **gobernar el valor `maxScale` por IaC es `TASK-1508`** (el `deploy-internal.yml` aún hardcodea `--max-instances=1`,
-un drift-trap hasta que Terraform lo posea); y el acceso externo / Production sigue gateado por `TASK-1480`. Detalle:
+un drift-trap hasta que Terraform lo posea) — *cerrado el 2026-07-21, ver la Delta `TASK-1507` más abajo: el workflow
+ya no pasa `--max-instances`*; y el acceso externo / Production sigue gateado por `TASK-1480`. Detalle:
 [`EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md`](EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md) (SPEC-007) +
 `docs/tasks/complete/TASK-1465-globe-workspace-tenancy-persistence-audit.md`.
 
@@ -129,7 +130,8 @@ un drift-trap hasta que Terraform lo posea); y el acceso externo / Production si
 `TASK-1507` **aplicó y verificó en vivo** el front door internal-only que el item 4 de la Decision describía en futuro.
 `globe.efeoncepro.com` se sirve por un Global External Application Load Balancer con certificado administrado por
 Google y redirect HTTP→HTTPS, a través de un serverless NEG en `southamerica-west1` hacia `globe-studio-internal`.
-Once recursos en `infra/terraform/front_door.tf` (plan `11 to add, 0 to change, 0 to destroy`, CERO destroy/replace y
+**Diez** recursos en `infra/terraform/front_door.tf` (plan `11 to add, 0 to change, 0 to destroy`: el add número once es
+la habilitación de `compute.googleapis.com`, que vive en `locals.tf` y **no** en `front_door.tf`; CERO destroy/replace y
 CERO Cloud Run en el diff), IP global `8.233.189.79`, DNS `A` creado a mano en HostGator, certificado `ACTIVE`.
 Verificado: `http://` → `301`; `https://` → `200` con TLS válido sobre HTTP/2 sirviendo el shell real de Globe.
 
@@ -141,7 +143,10 @@ hardening), ingress final `internal-and-cloud-load-balancing`, modelo de costo y
 verificados, con una excepción declarada: la pierna `200 al SA autorizado` del smoke de workload **NO** se
 re-ejercitó —la API no se tocó y siguió respondiendo `403` anónimo antes y después—, así que ese tramo del contrato
 queda sin marcar. `globe-api-internal` siguió IAM-private (anónimo → `403` antes y después), sin custom
-domain, con su audience derivada de `run.app` y nunca del dominio browser; domain mappings en el proyecto: 0.
+domain, con su audience derivada de `run.app` y nunca del dominio browser; domain mappings en el proyecto: 0. **Su
+`ingress` tampoco se tocó y sigue en `all` a propósito:** el perímetro de la API es exclusivamente IAM + verificación
+in-app del ID token, NO el ingress. Endurecerlo por analogía con el web cortaría la federación workload, porque su
+caller es Greenhouse en Vercel y llega por internet, no desde una VPC.
 
 Dos precisiones que la ejecución fijó y conviene registrar acá:
 
@@ -152,13 +157,17 @@ Dos precisiones que la ejecución fijó y conviene registrar acá:
   primitive aditiva/sustractiva `updateSisterPlatformOAuthRedirectUris` en el broker de Greenhouse, con el CLI
   `pnpm sister-platform:redirect` como entry point.
 
-**Lo que este ADR fijó y NO cambió el cutover:** `maxScale` no se tocó en ninguna dirección (quedó en `3`, ya sin el
-gate de HA por `TASK-1465`; la spec de `TASK-1507` que pedía "preservar `maxScale=1`" estaba stale) y
-`invokerIamDisabled` sigue `true` en el web, coherente con un servicio con SSO por cookie.
+**Lo que este ADR fijó y NO cambió el cutover:** `maxScale` no se tocó en ninguna dirección (la spec de `TASK-1507` que
+pedía "preservar `maxScale=1`" estaba stale, ya sin el gate de HA por `TASK-1465`) y `invokerIamDisabled` sigue `true`
+en el web, coherente con un servicio con SSO por cookie. Precisión posterior: lo que el cutover leyó como `3` era el
+techo de **revisión**, mientras el de **servicio** seguía en `1` y Cloud Run aplica el **menor** —o sea, el techo
+efectivo era 1—; `TASK-1508` corrigió ambos niveles a `3`.
 
-**Sigue abierto (no lo cierra esta Delta):** gobernar por IaC el `ingress` y el `maxScale` de las Cloud Run services es
-**`TASK-1508`** —el ingress se aplicó con `gcloud` porque los servicios no están en Terraform, y `deploy-internal.yml`
-todavía hardcodea `--max-instances=1`—; el acceso externo / Production sigue gateado por **`TASK-1480`**; y el host +
+**Cerrado después de esta Delta:** gobernar por IaC el `ingress` y el `maxScale` de las Cloud Run services era
+**`TASK-1508`** y quedó hecho — ambos servicios entraron a Terraform por import brownfield, el techo quedó gobernado en
+sus dos niveles y `deploy-internal.yml` ya no pasa `--max-instances` (pasa sólo `--image`).
+
+**Sigue abierto (no lo cierra esta Delta):** el acceso externo / Production sigue gateado por **`TASK-1480`**; y el host +
 framework del frontend cliente comercial sigue **diferido** por este mismo ADR (Vercel + Next.js candidato vivo), a
 decidir con `TASK-1505` y antes de `TASK-1480`. Un dominio internal-only no es Producción, HA ni acceso de clientes
 externos. Por la regla "never rewrite history" el texto baseline se conserva como su snapshot 2026-07-20. Arquitectura:

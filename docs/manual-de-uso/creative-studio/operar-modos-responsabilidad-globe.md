@@ -55,8 +55,8 @@ opaco como evidencia y comprueba que existen exactamente las versiones/auditorí
 - `authentication_required`: verifica que el ID token tenga audiencia exacta y `--include-email`.
 - `access_denied`: revisa caller allowlist, capability y workspace binding; no concedas acceso desde la asignación.
 - `conflict`: no recicles una llave para otra intención; relee la versión actual antes de reintentar un change.
-- Tras `deploy-internal.yml`, revisa ambos servicios: el workflow puede bajar `maxScale` a 1. Restáuralo a 3 hasta que
-  TASK-1508 elimine ese drift.
+- El tope de réplicas lo gobierna Terraform desde `TASK-1508` y `deploy-internal.yml` pasa sólo `--image`: no hay nada
+  que restaurar tras un deploy, y `gcloud run services update --max-instances` sería un segundo escritor.
 - Para rollback, deshabilita/revierte el wiring; conserva tabla, versiones y auditorías.
 
 ## Referencias

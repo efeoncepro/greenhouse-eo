@@ -3,10 +3,10 @@
 - Decision: SPEC-009
 - Status: Accepted and implemented — applied + live-verified internal-only (TASK-1507)
 - Validated: 2026-07-21 (live: `http://globe.efeoncepro.com/` → `301`; `https://globe.efeoncepro.com/` → `200` with valid TLS over HTTP/2 serving the real Globe shell; SSO federation smoke `human_federation_ok` before and after the ingress hardening)
-- Confidence: High for the ALB topology, the `globe-api-internal` boundary, the cutover ordering and the cost model; the ingress value and `maxScale` are live but **not** governed by IaC yet (TASK-1508)
+- Confidence: High for the ALB topology, the `globe-api-internal` boundary, the cutover ordering and the cost model; the ingress value was applied out-of-band by this slice and is governed by IaC since TASK-1508, which also corrected the service-level `maxScale` ceiling to 3 and put both ceiling levels under Terraform
 - Reversibility: Two-way and **sliced** — ingress, `GLOBE_PUBLIC_BASE_URL`, DNS and the ALB revert in an ordered sequence (ingress → env var → DNS → ALB), stopping at the first slice that resolves; recovering access does not require dismantling the load balancer
 - Owners: Efeonce Globe platform (Terraform, Cloud Run runtime, smokes) + Greenhouse control plane (OAuth broker + redirect allowlist primitive, governance). Out-of-band: DNS `efeoncepro.com` on HostGator
-- Related: `EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md` (ADR-004 — the decision this implements), `GREENHOUSE_CONNECTIVITY_V1.md` (ADR-001 — human vs workload federation), `EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md` (SPEC-007), `PLATFORM_FOUNDATION_V1.md`, `docs/operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md` (§ Front door internal-only — the operable procedure), `TASK-1507`, `TASK-1508` (Cloud Run services into Terraform), `TASK-1480` (external readiness gate), `TASK-1505` (Producer surface)
+- Related: `EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md` (ADR-004 — the decision this implements), `GREENHOUSE_CONNECTIVITY_V1.md` (ADR-001 — human vs workload federation), `EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md` (SPEC-007), `PLATFORM_FOUNDATION_V1.md`, `docs/operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md` (§ Front door internal-only — the operable procedure), `docs/manual-de-uso/creative-studio/operar-front-door-globe.md` (manual — cómo operarlo, verificarlo y diagnosticarlo), `docs/documentation/creative-studio/dominio-interno-globe.md` (documentación funcional — qué es el dominio interno en lenguaje simple), `TASK-1507`, `TASK-1508` (Cloud Run services into Terraform), `TASK-1480` (external readiness gate), `TASK-1505` (Producer surface)
 
 ## Decision
 
@@ -17,9 +17,10 @@ is the implementation of ADR-004 item 4, delivered by its named successor task w
 
 The front door is **additive network plumbing**. It creates no new runtime, no new trust boundary and no new identity:
 the SSO shell keeps authenticating by its own session cookie against the Greenhouse broker (ADR-001), the private API
-keeps its own perimeter, and the Cloud Run services themselves stay outside this Terraform state. What changed for the
-runtime is exactly one value — the public base URL the shell announces as its OAuth callback — plus the service's
-ingress, which now only accepts traffic from the load balancer.
+keeps its own perimeter, and the Cloud Run services were outside this Terraform state when this slice shipped —
+TASK-1508 later adopted them into the same root module; the NEG still targets the web service by name, not by resource
+reference. What changed for the runtime is exactly one value — the public base URL the shell announces as its OAuth
+callback — plus the service's ingress, which now only accepts traffic from the load balancer.
 
 An internal-only domain is **not** Production, **not** HA and **not** external client access. It resolves a stable
 hostname for internal humans ahead of the TASK-1505 rollout; the Production/external gate stays with TASK-1480.
@@ -63,14 +64,16 @@ about during incidents. It is bounded: the load balancer holds no state and no p
 
 ## The ALB in Terraform
 
-Eleven resources in `infra/terraform/front_door.tf` (Globe repo), applied with OpenTofu v1.12.4 and provider
-`hashicorp/google` 6.50.0. The plan read `11 to add, 0 to change, 0 to destroy`, with 65 no-op resources, **zero**
-destroy/replace and **zero** Cloud Run resources in the diff (verified over the plan JSON).
+**Ten** resources in `infra/terraform/front_door.tf` (Globe repo), applied with OpenTofu v1.12.4 and provider
+`hashicorp/google` 6.50.0. The plan read `11 to add, 0 to change, 0 to destroy`: ten of those additions are the
+resources tabulated below and the eleventh is the enablement of `compute.googleapis.com`, which lives in `locals.tf`
+and **not** in `front_door.tf`. The plan carried 65 no-op resources, **zero** destroy/replace and **zero** Cloud Run
+resources in the diff (verified over the plan JSON).
 
 | Resource | Name in GCP | Architectural note |
 | --- | --- | --- |
 | `google_compute_global_address.front_door` | `globe-studio-front-door-ip` | `EXTERNAL`, `IPV4`. Assigned `8.233.189.79`. |
-| `google_compute_region_network_endpoint_group.studio_web` | `globe-studio-internal-neg` | `SERVERLESS`, `southamerica-west1`. `cloud_run.service` is the **string literal** `"globe-studio-internal"` — referencing the service as a resource would adopt it into this state, which is TASK-1508. |
+| `google_compute_region_network_endpoint_group.studio_web` | `globe-studio-internal-neg` | `SERVERLESS`, `southamerica-west1`. `cloud_run.service` is the **string literal** `"globe-studio-internal"` — referencing the service as a resource would pull it into this file's graph. The services are governed by their own Terraform resources since TASK-1508; the literal is kept on purpose so a front-door plan never touches them. |
 | `google_compute_backend_service.studio_web` | `globe-studio-front-door-backend` | `EXTERNAL_MANAGED`, `enable_cdn = false`. |
 | `google_compute_url_map.front_door` | `globe-studio-front-door` | One host, one backend, no path rules. |
 | `google_compute_managed_ssl_certificate.front_door` | `globe-studio-front-door-cert` | `lifecycle { create_before_destroy = true }` — a managed certificate is not editable in place; changing its domain list forces replacement. |
@@ -89,8 +92,8 @@ the name resolves.
 **CDN is off on purpose.** The front door serves an SSO shell whose responses are per-session; caching them at the edge
 would be a correctness bug, not an optimization. `enable_cdn = false` is a contract, not a default left unset.
 
-**Graph-root rule (derived from a real partial apply).** The first apply created 8 of 11 resources and failed on the
-three of the HTTP-redirect lane with `SERVICE_DISABLED` on `compute.googleapis.com`: the API was enabled in that same
+**Graph-root rule (derived from a real partial apply).** The first apply created 8 of the 11 planned additions and
+failed on the three of the HTTP-redirect lane with `SERVICE_DISABLED` on `compute.googleapis.com`: the API was enabled in that same
 apply and had not propagated. `google_compute_url_map.front_door_http_redirect` was the only graph root **without an
 implicit edge** to the enablement — the HTTPS lane reaches it transitively (forwarding rule → proxy → url map → backend
 service → NEG, and the NEG does depend on `google_project_service`). The race was fixed **in the HCL** with an explicit
@@ -108,6 +111,11 @@ preference. The private API never becomes browser-reachable:
   project: **0**, before and after.
 - **Perimeter unchanged.** Anonymous access to `globe-api-internal` returned `403` before and after the cutover; the
   service stays IAM-private with in-app ID-token verification on top.
+- **Its ingress was not touched, and must not be hardened by analogy with the web service.** `globe-api-internal` stays
+  on **`ingress=all`** deliberately: its perimeter is **exclusively IAM plus in-app verification of the ID token**, not
+  ingress. Its caller is Greenhouse running on Vercel, which reaches it over the public internet and not from a VPC, so
+  restricting ingress to internal/load-balancer traffic would cut the workload federation. The web service and the API
+  close their perimeter by different instruments on purpose; copying one onto the other breaks the lane that works.
 - **Audience is derived from `run.app`, never from the browser domain.** `GLOBE_API_EXPECTED_AUDIENCE` holds the two
   `run.app` URL formats and **never** `globe.efeoncepro.com`. Its own `GLOBE_PUBLIC_BASE_URL` is the placeholder
   `https://globe-api-internal.invalid` — a value chosen so that any code path that tries to build a public URL for the
@@ -249,7 +257,17 @@ balancer.
 | 1 | **Ingress** (precondition of 2) | `gcloud run services update globe-studio-internal … --ingress all` | <10 min — restores direct `run.app` access. |
 | 2 | **URL / OAuth** | `--update-env-vars GLOBE_PUBLIC_BASE_URL=<run.app>` | <15 min — the `run.app` URI is still in the allowlist, so no database write is needed. |
 | 3 | **DNS** | Remove the `A` record on HostGator (out-of-band). | <60 min for propagation. |
-| 4 | **ALB** | `git revert` of **both** `front_door.tf` commits — `16919d9` (Slice 1) **and** `cf5e4d1` (the `depends_on`) — together → `tofu plan` → read → `tofu apply`. Destroy the **global IP** with the rest (see the cost note). | Per plan. |
+| 4 | **ALB** | Retire the **front-door HCL** (the content of `16919d9` + `cf5e4d1`, which are one unit) → `tofu plan` → read → `tofu apply`. Destroy the **global IP** with the rest (see the cost note). **Not a blind `git revert`** — see below. | Per plan. |
+
+**Slices 1 and 2 write fields that Terraform owns since `TASK-1508`.** Both the ingress and `GLOBE_PUBLIC_BASE_URL`
+live in `cloud_run_services.tf`, and `lifecycle.ignore_changes` covers **only** `template[0].containers[0].image`,
+`client` and `client_version` — not those two. The `gcloud` commands above are therefore **emergency writes over
+IaC-governed fields**: they are the correct path because they are the fastest, but the rollback is not closed until the
+HCL is reconciled with the state you intend to keep and applied, or the next `tofu apply` undoes it silently. A plan
+showing those fields in the diff right after a rollback is **not** a state error, it is pending reconciliation. The
+operable procedure — full commands included — is owned by the runbook
+[§ Rollback por slice](../../operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md#rollback-por-slice), which is
+its **SoT**; this table records the ordering contract, not the recipe.
 
 **The precondition is not optional.** Slice 1 (ingress) is a **requirement of slice 2** whenever the goal is to
 recover access through `run.app`. Reverting only `GLOBE_PUBLIC_BASE_URL` while ingress is still
@@ -261,19 +279,33 @@ a rollback, it is a second incident. Slice 4's two commits are likewise reverted
 described in the [graph-root rule](#the-alb-in-terraform). Operable procedure and full commands: runbook
 [§ Rollback por slice](../../operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md#rollback-por-slice).
 
+**Step 4 is NOT a blind `git revert`.** `16919d9` introduced `variable "front_door_domain"`, and since
+`TASK-1508` `cloud_run_services.tf` also references it (`GLOBE_PUBLIC_BASE_URL`). Reverting that commit would
+drop the variable while the reference stays alive, so `tofu plan` **aborts** with
+`Reference to undeclared input variable` — it does not even produce a plan. At step 4, first **edit
+`cloud_run_services.tf` so `GLOBE_PUBLIC_BASE_URL` no longer depends on `var.front_door_domain`**, then retire
+the front-door HCL together with the variable. Both commits remain the unit of content; what changes is that it
+is applied as a reconciled edit, not an automatic revert. If steps 1-2 were done with `gcloud`, re-read the plan
+before applying: applying unreconciled with the ALB already destroyed is a full outage.
+
 The ordering is the point: the two fastest slices restore login without touching DNS or Terraform, which is why the
 `run.app` origin is preserved in the allowlist rather than cleaned up eagerly.
 
 ## What this front door does not change
 
-- **`maxScale` is untouched, in either direction.** The TASK-1507 spec said "preserve `maxScale=1`" and was **stale**:
-  TASK-1465 is complete and cleared the HA gate, and both services have run `maxScale=3` since 2026-07-21. Verified 3
-  before and 3 after. Known drift trap **not** closed here: `deploy-internal.yml` hardcodes `--max-instances=1`, so a
-  deploy through that workflow would drop `maxScale` back to 1 until Terraform owns it (TASK-1508); immediate
-  The drift-trap is **closed by `TASK-1508`**: the workflow no longer passes `--max-instances` and Terraform governs both ceilings (service and revision). Beware the old workaround `gcloud run services update <service> --max-instances=3`: it wrote the **revision** ceiling, not the **service** one, and Cloud Run enforces the lesser — so it left the effective ceiling at 1 while appearing to restore it.
+- **`maxScale` was untouched by this slice, in either direction.** The TASK-1507 spec said "preserve `maxScale=1`" and
+  was **stale**: TASK-1465 is complete and cleared the HA gate. What this slice read as `3` before and after was the
+  **revision-level** ceiling (`template.scaling.maxInstanceCount`); the **service-level** ceiling
+  (`Service.scaling.maxInstanceCount`) was still `1`, and Cloud Run enforces the **lesser** — so the effective ceiling
+  was 1 while it looked like 3. `TASK-1508` corrected both levels to `3` and put both under Terraform, which closed the
+  drift trap: `deploy-internal.yml` no longer passes `--max-instances` (it passes only `--image`). Beware the old
+  workaround `gcloud run services update <service> --max-instances=3`: `--max-instances` writes a **different field
+  depending on the subcommand** (`gcloud run deploy` → service, `gcloud run services update` → revision), so that
+  command wrote the revision ceiling and left the effective ceiling at 1 while appearing to restore it.
 - **Ingress is not a workflow drift trap.** `deploy-internal.yml` does not pass `--ingress`, and `gcloud run deploy`
-  preserves service-level settings it is not told to change. It *is* an IaC gap: the value was applied with `gcloud`
-  because the Cloud Run services are not in Terraform, and pinning it by IaC is TASK-1508.
+  preserves service-level settings it is not told to change. It *was* an IaC gap — the value was applied with `gcloud`
+  because the Cloud Run services were not in Terraform — and `TASK-1508` closed it by adopting both services into
+  Terraform, where the ingress value now lives.
 - **`invokerIamDisabled` stays `true`** on `globe-studio-internal` — correct for a web service with SSO, since a
   browser presents no ID token and the app authenticates by its own cookie.
 - **No gate moves.** An internal-only hostname is not Production, not HA and not external client access (TASK-1480).
@@ -301,9 +333,10 @@ The ordering is the point: the two fastest slices restore login without touching
 
 ## Open items / still deferred
 
-- **Ingress and `maxScale` under IaC → TASK-1508.** Both are live-correct and ungoverned: the front door is in
-  Terraform, but the Cloud Run **services** are not. Until they are, the ingress value is out-of-band and `maxScale=3`
-  carries the `--max-instances=1` drift trap from `deploy-internal.yml`.
+- **Ingress and `maxScale` under IaC — closed by `TASK-1508`, no longer open.** When this slice shipped both were
+  live-applied and ungoverned (the front door was in Terraform, the Cloud Run **services** were not). `TASK-1508`
+  adopted both services by brownfield import (2 imported / 2 changed / 0 destroyed), governs the ingress value and both
+  ceiling levels, and reduced `deploy-internal.yml` to `--image` only.
 - **DNS stays outside Terraform.** The `A` record is created by hand on HostGator; a clean plan does not prove the name
   resolves.
 - **External access / Production → TASK-1480.** Unchanged by this slice.
@@ -321,6 +354,10 @@ The ordering is the point: the two fastest slices restore login without touching
 
 - **NUNCA** darle a `globe-api-internal` un custom domain, una entrada en el NEG ni exposición browser. El NEG apunta
   **sólo** a `globe-studio-internal`. Domain mappings en el proyecto: 0, y así debe seguir.
+- **NUNCA** "endurecer" el `ingress` de `globe-api-internal` por analogía con el web. Su ingress es **`all`** a propósito
+  y no se tocó: su perímetro es **exclusivamente IAM + verificación in-app del ID token**, NO el ingress. Su caller es
+  Greenhouse en Vercel y llega por internet, no desde una VPC — restringirlo a tráfico interno/LB corta la federación
+  workload.
 - **NUNCA** derivar `GLOBE_API_EXPECTED_AUDIENCE` del dominio browser. La audience se deriva de los dos formatos de URL
   `run.app`; el `GLOBE_PUBLIC_BASE_URL` de la API es el placeholder `https://globe-api-internal.invalid` a propósito,
   para que cualquier path que intente construirle una URL pública falle fuerte en vez de inventarla.
@@ -343,7 +380,8 @@ The ordering is the point: the two fastest slices restore login without touching
   cachearlas en el edge es un bug de correctitud, no una optimización.
 - **NUNCA** referenciar las Cloud Run services como recurso de Terraform en `front_door.tf` — el NEG usa el **string
   literal** `"globe-studio-internal"`. Si un plan de ese archivo muestra create/import/replace/destroy tocando
-  `globe-studio-internal` o `globe-api-internal`, **PARAR**: eso es TASK-1508.
+  `globe-studio-internal` o `globe-api-internal`, **PARAR**: desde `TASK-1508` esos servicios los gobiernan sus propios
+  recursos de Terraform, nunca `front_door.tf`.
 - **SIEMPRE** darle `depends_on` explícito hacia su `google_project_service` a todo recurso que sea **raíz del grafo**
   (que no referencie a otro recurso del mismo servicio) cuando la API se habilita en el mismo apply. El síntoma de la
   omisión es un primer apply parcial con `SERVICE_DISABLED`, y el segundo apply lo esconde en vez de arreglarlo.
@@ -355,8 +393,11 @@ The ordering is the point: the two fastest slices restore login without touching
   smoke SSO, `GLOBE_SMOKE_RESOLVE=host:ip`.
 - **SIEMPRE** calibrar el smoke de federación humana contra el origen anterior **antes** del cutover. Un smoke sin
   calibrar no es evidencia: si falla después, no se puede distinguir el cutover del instrumento.
-- **NUNCA** tocar `maxScale` desde este carril, ni darlo por persistido. TASK-1507 no lo mueve en ninguna dirección;
-  `deploy-internal.yml` hardcodea `--max-instances=1`, así que `maxScale=3` es frágil hasta TASK-1508.
+- **NUNCA** tocar `maxScale` desde este carril: `TASK-1507` no lo mueve en ninguna dirección, y desde `TASK-1508` el
+  techo lo gobierna Terraform en sus **dos** niveles (servicio y revisión), con `deploy-internal.yml` pasando sólo
+  `--image`. **NUNCA** "restaurar" el techo con `gcloud run services update … --max-instances=N`: ese subcomando
+  escribe el nivel **revisión**, Cloud Run aplica el **menor** de los dos, y el arreglo queda inefectivo aunque parezca
+  aplicado.
 - **NUNCA** quitar el redirect URI `run.app` del allowlist mientras siga siendo el camino de rollback documentado.
 - **NUNCA** tratar el rollback como un menú: es una **secuencia** (ingress → env var → DNS → ALB) y se detiene en el
   primero que resuelva. El paso 1 (ingress) es **requisito del paso 2**: revertir sólo `GLOBE_PUBLIC_BASE_URL` con el

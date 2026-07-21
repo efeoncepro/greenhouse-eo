@@ -8,6 +8,14 @@
 - Owners: Efeonce Globe platform (datastore, role model, stores) + Greenhouse control plane (governance)
 - Related: `PLATFORM_FOUNDATION_V1.md`, `GREENHOUSE_CONNECTIVITY_V1.md` (ADR-001), `EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md` (ADR-004 — the HA gate this unblocks), `EFEONCE_GLOBE_MODEL_LAB_V1.md` (spend fence + experiment aggregate), `EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md` (evaluation reports), `docs/operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md` (the IaC that provisions the instance), `TASK-1465`, `TASK-1468` (deferred commercial ledger), `TASK-1508` (Cloud Run services into Terraform + `maxScale` persistence)
 
+## Delta 2026-07-21 — the reported `maxScale=3` was the REVISION ceiling (corrected by TASK-1508)
+
+Every `maxScale=3` claim in this spec (the Decision below, § Deploy topology, § 4-pillar scoring) read the **revision** ceiling (`template.scaling.maxInstanceCount`). A Cloud Run service also carries a **service-level** ceiling (`Service.scaling.maxInstanceCount`) and **Cloud Run applies the lower of the two**; both services were still at service=1, so the **effective ceiling was 1**. The cause: `--max-instances` writes a different field depending on the subcommand (`gcloud run deploy` → service; `gcloud run services update` → revision), which is why the "restore it after a deploy" workaround this spec implied was **ineffective**.
+
+**TASK-1508 (complete 2026-07-21) brought both services into Terraform, governs BOTH ceilings and left `deploy-internal.yml` image-only** (it passes only `--image`), so the drift trap is closed and there is nothing to restore by hand after a deploy. Corrected state: 3/3 on both services, under IaC.
+
+Consequence to carry forward: because no service ever ran more than one replica, the **cross-replica spend fence this task built was never exercised** — correct by construction and by tests, but its contention path under row locks never ran with >1 replica. Exercising it is **TASK-1512**.
+
 ## Decision
 
 Efeonce Globe gets its **first durable datastore**: a Globe-owned Cloud SQL Postgres instance (`globe-pg`), reached **keyless** over the Cloud SQL connector with IAM database authentication, hosting five durable stores behind the ports the domain already declared. Before this, sessions, OAuth transactions, experiments, evaluation reports and the spend fence were in-memory / per-process — which is exactly why the internal release was pinned to `maxScale=1`. Landing durable persistence **removes that ceiling**: `maxScale > 1` was hard-gated on this task by ADR-004, and the gate is now open (both services run durable at `maxScale=3` live).
@@ -50,7 +58,7 @@ Both Cloud Run services and the migration runner reach the same instance through
 | Ownership | Globe-owned; **never** shared with Greenhouse |
 | Provisioning | Terraform — `infra/terraform/cloud_sql.tf` (plan `12 added / 0 destroyed`) |
 
-IAM/enablement provisioned alongside the instance: three IAM database users — `web_runtime`, `api_runtime`, `deployer` — plus the `cloudsql.client` / `cloudsql.instanceUser` grants their service accounts need to connect, and `sqladmin.googleapis.com` enabled on the project. This is all in `cloud_sql.tf`, so it is governed IaC and not drift-prone (unlike the Cloud Run services, which are not yet in Terraform — see [Open items](#open-items--still-deferred)).
+IAM/enablement provisioned alongside the instance: three IAM database users — `web_runtime`, `api_runtime`, `deployer` — plus the `cloudsql.client` / `cloudsql.instanceUser` grants their service accounts need to connect, and `sqladmin.googleapis.com` enabled on the project. This is all in `cloud_sql.tf`, so it is governed IaC and not drift-prone (the Cloud Run services were not in Terraform when this task shipped; TASK-1508 adopted them — see the Delta above).
 
 ## Keyless connector access model
 
@@ -127,7 +135,6 @@ The `DurableSpendFence` is a **safety** control: it bounds how much a run/day ca
 ## Open items / still deferred
 
 - **Rich workspace / members / grants tenancy model** — deferred. Tables carry tenant scope, but the governance objects around workspaces are a later task.
-- **Persist `maxScale` in Terraform → TASK-1508.** Drift trap: `deploy-internal.yml` hardcodes `--max-instances=1`, so the **next workflow deploy would reset `maxScale` back to 1** and silently re-pin the services. The live `maxScale=3` is currently out-of-band. `TASK-1508` (Cloud Run deploy/IaC ownership) persists the scale by bringing the Cloud Run **services into Terraform** — the same task that closes the `invokerIamDisabled`/ingress drift from the IaC runbook's §"Qué NO hace".
 - **Regional HA** — the instance is ZONAL; regional/HA is a separate cost/gate decision, not required by this slice.
 - **Provider secrets** — still a separate rollout (canary), out of scope here.
 
@@ -140,6 +147,6 @@ The `DurableSpendFence` is a **safety** control: it bounds how much a run/day ca
 - **SIEMPRE** correr migraciones bajo `SET ROLE globe_owner` y registrarlas en `globe._migrations`, para que lo creado quede owned por el rol central y herede los grants a los runtime users. La migración que crea el schema owned depende de que `postgres` se una a `globe_owner` primero (gotcha PG16 restricted-superuser).
 - **NUNCA** confundir el **spend fence** (`DurableSpendFence`, control de seguridad, `spend_fence_runs`/`spend_fence_days`) con el **ledger comercial de créditos** (TASK-1468, diferido). El fence protege a Efeonce de overspend; el ledger contabiliza el crédito del cliente. No exponer el fence como contabilidad comercial.
 - **NUNCA** permitir stores in-memory fuera de `internal_smoke`. Con `GLOBE_POSTGRES_*` seteado, la app resuelve stores durables; el guard relajado permite in-memory **solo** en `internal_smoke`. Ninguna superficie real corre sobre estado volátil.
-- **NUNCA** subir/rebajar `maxScale` de las Cloud Run services por out-of-band y darlo por persistido. `deploy-internal.yml` hardcodea `--max-instances=1`; el próximo deploy del workflow **resetea** el `maxScale` en silencio. La persistencia del scale es TASK-1508 (servicios a Terraform). Hasta entonces, tratar `maxScale=3` como frágil.
+- **NUNCA** subir/rebajar el `maxScale` de las Cloud Run services por out-of-band. Desde `TASK-1508` los dos ceilings (servicio y revisión) están declarados en Terraform y `deploy-internal.yml` pasa sólo `--image`: un `gcloud run services update --max-instances` sería un segundo escritor sobre un campo gobernado por IaC y, además, escribe el ceiling **de revisión** —Cloud Run aplica el menor—, así que aparenta funcionar sin mover el techo efectivo. Si el techo tiene que cambiar, se cambia en el HCL y se aplica.
 - **SIEMPRE** que el build de la imagen toque `apps/studio-web`, verificar que el Dockerfile compila el paquete `@efeonce-globe/database`; sin él, el cliente durable no llega al artefacto desplegado.
 - **SIEMPRE** mantener el scope tenant/workspace explícito en toda tabla y todo command/store (invariante 1 de foundation), aun cuando el modelo rico de workspaces/members/grants siga diferido.

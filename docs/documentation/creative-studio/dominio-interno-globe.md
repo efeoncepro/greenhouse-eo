@@ -1,9 +1,9 @@
 # Efeonce Globe — El dominio interno (una sola puerta de entrada)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-21 por Claude (TASK-1507)
-> **Ultima actualizacion:** 2026-07-21 por Claude
+> **Ultima actualizacion:** 2026-07-21 por Claude (delta TASK-1508: Cloud Run bajo IaC + tope de replicas corregido)
 > **Documentacion tecnica:** [`docs/architecture/creative-studio/EFEONCE_GLOBE_INTERNAL_FRONT_DOOR_V1.md`](../../architecture/creative-studio/EFEONCE_GLOBE_INTERNAL_FRONT_DOOR_V1.md) (SPEC-009)
 
 ## De qué se trata este documento
@@ -78,7 +78,7 @@ Una nota que evita una sorpresa: si algún día se desarma esta puerta, hay que 
 - **Greenhouse es el único control plane operativo:** registra la `TASK-1507`, su lifecycle, QA, cierre documental y handoff — aunque la infraestructura de la puerta y el runtime vivan en `efeonce-globe`, gobernados por `EPIC-028`.
 - **Globe conserva su infraestructura y sus secretos.** Greenhouse **no comparte** con Globe base de datos, sesión, bucket, secreto de proveedor, clave de service account ni rol admin. La puerta vive del lado de Globe; Greenhouse la gobierna, no la opera por dentro.
 - **La lista de retornos autorizados del login sí vive en Greenhouse**, porque es Greenhouse quien identifica a las personas. Se modifica por una primitive de plataforma —no editando la base a mano— y esa misma primitive queda disponible para que mañana la opere una API, un tool o Nexa, no solo la línea de comandos.
-- **El cierre de la puerta vieja está aplicado a mano sobre el servicio, no por infraestructura como código.** Se ajustó con `gcloud` porque los servicios de Cloud Run todavía no están en Terraform, y adoptarlos es **`TASK-1508`**. Hoy ese ajuste sobrevive a los redespliegues, pero ponerlo bajo código —igual que el número de réplicas— sigue pendiente de esa task.
+- **El cierre de la puerta vieja ya está bajo infraestructura como código.** Al cerrar `TASK-1507` ese ajuste estaba aplicado a mano con `gcloud`, porque los servicios de Cloud Run todavía no estaban en Terraform. **`TASK-1508` (completa, 2026-07-21) los adoptó**, así que hoy tanto el cierre de la puerta vieja como el número de réplicas están escritos en código y el pipeline de despliegue ya no puede pisarlos.
 - **Todo es interno.** No hay producción ni clientes: esta puerta sostiene el piloto interno de Globe.
 
 > **Detalle técnico:** contrato de gobierno del ecosistema en [`PLATFORM_FOUNDATION_V1.md`](../../architecture/creative-studio/PLATFORM_FOUNDATION_V1.md) y [`GREENHOUSE_CONNECTIVITY_V1.md`](../../architecture/creative-studio/GREENHOUSE_CONNECTIVITY_V1.md); estado de runtime en vivo en [`GLOBE_RUNTIME_HANDOFF.md`](../../operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md).
@@ -91,7 +91,7 @@ Tener un dominio bonito es justo el tipo de señal que se malinterpreta. Para qu
 - **No es acceso para clientes.** Ningún cliente entra por aquí. El acceso externo tiene su propio gate: **`TASK-1480`**, con evidencia legal, de seguridad, de finanzas y de operaciones. Este cambio no lo adelanta ni lo reemplaza.
 - **No habilita nada comercial.** No autoriza ofrecer, vender, demostrar públicamente ni comunicar Globe como producto disponible.
 - **No decide dónde vivirá el frontend del producto comercial.** Esa decisión sigue **abierta a propósito**. "Cloud Run para la cáscara interna" **no** significa "Cloud Run para la interfaz de clientes": son superficies distintas y la del producto comercial se decide cuando se construya.
-- **No cambia el escalado.** Este trabajo no tocó cuántas réplicas corre Globe, en ninguna dirección. Gobernar ese valor por infraestructura como código es **`TASK-1508`**; hasta entonces sigue vivo el drift-trap del pipeline de despliegue descrito en la documentación de persistencia durable.
+- **No cambia el escalado.** Este trabajo no tocó cuántas réplicas corre Globe, en ninguna dirección. Quien sí lo tocó fue **`TASK-1508`** (completa, 2026-07-21): descubrió que un servicio de Cloud Run tiene **dos** topes de réplicas —uno del servicio y otro de la versión desplegada—, que manda el más bajo, y que ambos servicios estaban con tope efectivo de **una sola réplica** aunque la documentación dijera tres. Lo corrigió a **tres y tres** y dejó los dos valores escritos en código, con lo que el drift-trap del pipeline de despliegue quedó cerrado.
 
 > **Detalle técnico:** los tres gates que la decisión mantiene separados (URL interna estable · escalabilidad/HA · acceso externo y producción) y la decisión diferida del frontend comercial, en [`EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md`](../../architecture/creative-studio/EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md) (secciones *Decision* y *Hard rules*).
 
