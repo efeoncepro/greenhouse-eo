@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -35,6 +35,31 @@ administrado y HTTP→HTTPS, para servir `globe.efeoncepro.com`; actualizar `GLO
 allowlist del broker OAuth de Greenhouse; y endurecer el ingress del web a `internal-and-cloud-load-balancing`.
 `globe-api-internal` queda IAM-private con audience `run.app`, sin custom domain ni exposición browser. La adopción
 brownfield de los servicios Cloud Run y la reconciliación del workflow de deploy se separan en `TASK-1508`.
+
+## Delta 2026-07-21 — baseline recalibration pre-execution
+
+Discovery verificó el runtime y la doc vigentes antes de ejecutar. Cuatro supuestos de la spec original
+quedaron desactualizados o incompletos; se corrigen acá y en el cuerpo, sin cambiar el alcance:
+
+1. **`maxScale` ya no es 1.** `TASK-1465` (persistencia durable) está **complete** y limpió el gate de HA
+   (ADR-004 §Delta 2026-07-21). Ambos servicios corren **`maxScale=3`** verificado en vivo. El invariante
+   correcto de esta task es **"no toca `maxScale`"** (queda como está), no "preserva 1". Gobernar ese valor
+   por IaC sigue siendo `TASK-1508` (el workflow hardcodea `--max-instances=1`).
+2. **`compute.googleapis.com` NO está habilitada** en `efeonce-globe` (verificado: `PERMISSION_DENIED`).
+   Es prerequisito de todo el front door y se agrega a `local.enabled_services` en el Slice 1.
+3. **Open Question 1 resuelta: el redirect allowlist se administra por *seed script*, no por API/command.**
+   No existe route admin de OAuth clients (sólo `sister-platform-bindings`). Pero el seed vigente
+   (`scripts/seed-globe-internal-pilot.ts`) **no sirve tal cual** para esto: pasa `redirectUris: [uri]`
+   (reemplaza el array → borraría el `run.app`) y hace `rotateToken: true` (rotaría el client secret y
+   rompería el SSO vivo). El Slice 3 extrae la **primitive canónica aditiva** en el broker + un script
+   delgado que la invoca — reusable luego por route/Nexa (Full API Parity), no lógica dentro de un script.
+4. **El ingress NO es drift-trap del workflow.** `deploy-internal.yml` no pasa `--ingress`, así que el
+   endurecimiento del Slice 4 sobrevive redeploys del workflow; el drift-trap conocido es `maxScale`.
+
+Estado live verificado 2026-07-21: web `ingress=all`, `invokerIamDisabled=true`, `maxScale=3`,
+SA `web_runtime`; api `ingress=all`, IAM-private, `maxScale=3`, SA `api_runtime`; allowlist del cliente
+`globe` = **una** URI (`https://globe-studio-internal-818083690953.southamerica-west1.run.app/auth/callback`);
+`globe.efeoncepro.com` no resuelve (NS `ns24/ns25.hostgator.cl`).
 
 ## Why This Task Exists
 
@@ -81,8 +106,8 @@ Reglas obligatorias (de ADR-004, load-bearing):
 - `globe-api-internal` **nunca** recibe custom domain ni exposición browser: queda IAM-private y su Google ID-token
   audience se deriva de su URL `run.app`, jamás del dominio browser.
 - El redirect URI allowlist del broker es exacto, sin wildcards (`oauth-broker.ts` rechaza wildcards por diseño).
-- No subir `maxScale > 1` de `globe-studio-internal`: sesiones/OAuth/experimentos/eval/spend-fence siguen en memoria
-  (gate `TASK-1465`). Esta task preserva `maxScale=1`.
+- No cambiar `maxScale` de `globe-studio-internal`. El gate `TASK-1465` quedó cleared (stores durables) y el valor
+  live es `maxScale=3`; esta task **no lo toca** en ninguna dirección. Gobernarlo por IaC es `TASK-1508`.
 - Un dominio internal-only no es Production ni acceso de clientes externos (gate `TASK-1480`).
 - Globe conserva runtime, datos, secretos y ejecución propios; Greenhouse sólo aporta el broker OAuth (federación) y el
   gobierno documental. No se comparte DB, cookie ni credencial de provider.
@@ -95,7 +120,7 @@ Reglas obligatorias (de ADR-004, load-bearing):
 - `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`
 - `docs/operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`
 - `docs/tasks/complete/TASK-1464-globe-iac-keyless-platform-foundation.md`
-- `docs/tasks/in-progress/TASK-1465-globe-workspace-tenancy-persistence-audit.md`
+- `docs/tasks/complete/TASK-1465-globe-workspace-tenancy-persistence-audit.md`
 - `docs/tasks/to-do/TASK-1469-globe-governed-run-lifecycle-submission-fence.md`
 - `docs/tasks/to-do/TASK-1480-globe-commercial-external-readiness-gate.md`
 - `docs/tasks/to-do/TASK-1505-globe-creative-producer-surface.md`
@@ -190,7 +215,7 @@ Reglas obligatorias (de ADR-004, load-bearing):
 - Invariantes que no se pueden romper:
   - `globe-api-internal nunca recibe custom domain ni exposición browser; audience run.app, IAM-private`
   - `redirect URIs exactos, sin wildcards; PKCE S256 + state + nonce preservados`
-  - `maxScale=1 de globe-studio-internal (gate TASK-1465); esta task no sube réplicas`
+  - `esta task no cambia maxScale de globe-studio-internal (live=3 tras TASK-1465); gobernarlo por IaC es TASK-1508`
   - `invokerIamDisabled no cambia en esta task: True en web y False en api; TASK-1508 lo pineará por Terraform`
 - Tenant/space boundary: `federación humana provee identidad Greenhouse a Globe como broker; el ALB no cambia el trust boundary (una sola nube GCP)`
 - Idempotency/concurrency: `Terraform apply idempotente sobre recursos nuevos del front door; no importa ni adopta servicios vivos`
@@ -241,6 +266,7 @@ Reglas obligatorias (de ADR-004, load-bearing):
 
 ### Slice 1 — Front door: IP global + ALB + serverless NEG + managed cert (sin DNS aún)
 
+- Habilitar `compute.googleapis.com` vía `local.enabled_services` (prerequisito verificado: hoy está deshabilitada).
 - Terraform para IP global estática, serverless NEG (`southamerica-west1`) hacia `globe-studio-internal`, backend
   service, URL map, target HTTPS proxy con certificado administrado para `globe.efeoncepro.com`, y forwarding rules
   HTTP→HTTPS.
@@ -274,7 +300,7 @@ Reglas obligatorias (de ADR-004, load-bearing):
 
 ## Out of Scope
 
-- Subir `maxScale > 1` o cualquier réplica adicional (gate `TASK-1465`).
+- Cambiar `maxScale` en cualquier dirección (queda como está, live=3; gobernarlo por IaC es `TASK-1508`).
 - Implementar persistencia durable, ejecución async, workbench, Producer UI o deep links.
 - Habilitar Production, clientes externos, pricing o publicación (gate `TASK-1480`).
 - Dar a `globe-api-internal` custom domain o exposición browser.
@@ -376,7 +402,8 @@ sigue IAM-private; el web conserva SSO; `maxScale=1` intacto.
 - [ ] `globe-api-internal` no recibe custom domain, sigue IAM-private (403 anónimo, 200 al SA autorizado) y su audience
       es `run.app`, no derivada del dominio browser.
 - [ ] El plan Terraform contiene sólo recursos aditivos del front door y no importa ni modifica servicios Cloud Run.
-- [ ] `globe-studio-internal` sirve por `internal-and-cloud-load-balancing` detrás del ALB, con `maxScale=1` intacto.
+- [ ] `globe-studio-internal` sirve por `internal-and-cloud-load-balancing` detrás del ALB, con su `maxScale` live
+      intacto (3; esta task no lo modifica).
 - [ ] `GLOBE_PUBLIC_BASE_URL = https://globe.efeoncepro.com` y el redirect URI exacto del cliente Globe está en el
       broker (sin wildcards); smoke de federación humana verde (PKCE/state/nonce OK).
 - [ ] Ningún secreto impreso; el apply corrió keyless (OIDC→WIF); no se subieron réplicas ni se habilitó Production.
@@ -417,6 +444,9 @@ sigue IAM-private; el web conserva SSO; `maxScale=1` intacto.
 
 ## Open Questions
 
-- ¿El redirect allowlist del cliente Globe se actualiza por command/API del broker o por seed? (Discovery `[verificar]`.)
+- ~~¿El redirect allowlist del cliente Globe se actualiza por command/API del broker o por seed?~~ **RESUELTA
+  (Discovery 2026-07-21):** por **seed script**; no hay route admin de OAuth clients. Como el seed vigente reemplaza
+  el array y rota el client secret, el Slice 3 extrae la primitive canónica aditiva en `oauth-broker.ts` + un script
+  delgado. Ver §Delta 2026-07-21.
 - ¿Se remueve el redirect `run.app` tras el cutover, o se conserva como fallback interno? (Decidir en Slice 3 según
   necesidad de smokes/agentes.)
