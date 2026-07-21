@@ -35,6 +35,11 @@
   muestra rango horario/zona/duración/Teams y próximos pasos sin PII ni IDs internos. La primera pasada de header oscuro
   + card fue descartada por feedback visual; la dirección final usa una superficie luminosa continua, banda temporal
   abierta y motion espacial/reduced-motion. GVC `2026-07-21T12-01-53_native-meeting-scheduler`: 45 frames, exit 0.
+- Una auditoría final de copy, UX writing, CRO y criterio comercial centralizó también los textos dinámicos y reemplazó
+  jerga interna por acciones y expectativas verificables: conversación de 30 min por Teams, zona horaria local, correo
+  de empresa, recuperación accionable y `Reservar horario`. La revisión GTM mantuvo identidad semántica independiente
+  del copy, cero PII/slot exacto y `generate_lead` sólo desde recibo server-confirmed; workspace 6 sigue sin publicar.
+  GVC final `2026-07-21T12-18-17_native-meeting-scheduler`: 45 frames en 1440/820/390, exit 0.
 
 - La migración dev quedó aplicada y leída de vuelta; un race live de PostgreSQL probó un único claim, conflicto
   semántico, replay único y cero residuo. Se provisionó el secreto HMAC dedicado con acceso del runtime y se verificó

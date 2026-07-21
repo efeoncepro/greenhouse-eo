@@ -1283,7 +1283,7 @@ export const GH_GROWTH_CTA_OPERATOR = {
           },
           meeting: {
             label: 'Reunión',
-            desc: 'Agenda una demo, llamada o evento con el equipo.',
+            desc: 'Agenda una conversación de 30 minutos con el equipo de Efeonce.',
             evidence: 'Requiere un destino de agenda válido y gobernado.'
           }
         }
@@ -1364,14 +1364,14 @@ export const GH_GROWTH_CTA_OPERATOR = {
             placeholder: 'ej. /brand-visibility'
           },
           book_meeting: {
-            label: 'Agendar reunión',
-            expectation: 'Abre el calendario gobernado para agendar.',
+            label: 'Abrir agenda externa',
+            expectation: 'Abre una agenda externa para elegir fecha y hora.',
             field: 'URL del agendador',
             placeholder: 'ej. https://meetings.hubspot.com/…'
           },
           open_meeting_scheduler: {
-            label: 'Abrir agenda nativa',
-            expectation: 'Abre una task surface adaptativa sin sacar al visitante de la página.',
+            label: 'Abrir agenda integrada',
+            expectation: 'Muestra una agenda adaptativa sin sacar al visitante de la página.',
             field: 'Surface de reuniones',
             placeholder: 'ej. efeonce-public-site',
             secondaryField: 'Scheduler key',

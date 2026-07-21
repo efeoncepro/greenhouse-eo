@@ -40,6 +40,12 @@
   continua con motion espacial y reduced-motion equivalente. GVC `.captures/2026-07-21T12-01-53_native-meeting-scheduler`
   pasó 45 frames 1440/820/390. Sigue `code complete, rollout pendiente`.
 
+  La pasada final de copy/UX writing/CRO/comercial reemplazó jerga interna y exposición de proveedor por tareas,
+  expectativas y recuperaciones concretas: conversación de 30 min por Teams, zona horaria local, correo de empresa,
+  `Reservar horario` y confirmación que previene duplicados. Los textos dinámicos también viven en el diccionario
+  canónico. La auditoría GTM preservó eventos/allowlist y el receipt gate; no hubo publish.
+  GVC final `.captures/2026-07-21T12-18-17_native-meeting-scheduler` pasó 45 frames en 1440/820/390, exit 0.
+
   GTM workspace 6 pasó readback/quick preview con 10 DLVs, sin versión/publicación. Pendientes: deploy/read staging,
   dossier de estados reales, binding + controlled booking/replay, host pilot y publish/flags con confirmación humana.
   HubSpot/Office 365/Teams siguen SoT; iframe/link permanece fallback. Trabajo en `develop`; `docs/ui/creative-studio/`

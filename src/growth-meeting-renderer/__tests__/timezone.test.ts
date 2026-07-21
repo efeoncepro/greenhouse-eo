@@ -30,7 +30,7 @@ describe('meeting timezone presentation', () => {
   it('usa el nombre IANA localizado sin inferir ciudades ni offsets con signo invertido', () => {
     const label = formatMeetingTimezoneLabel('Etc/GMT+4', new Date('2026-07-21T12:00:00.000Z'))
 
-    expect(label).toContain('Tu horario')
+    expect(label).toContain('Tu zona horaria')
     expect(label).not.toContain('GMT+4 (GMT-4)')
   })
 

@@ -338,7 +338,7 @@ The renderer is a standalone custom element with an explicit state reducer. Rend
 - [ ] Full state inventory is accessible at desktop/390; the primary confirmed flow passes keyboard/reduced-motion/no-overflow locally, while empty/degraded/conflict/ambiguous remain pending in the staging dossier.
 - [x] `gh_meeting_step_reached` covers the local fixture funnel with strict generic parameters, valid pairs and no PII/exact slot.
 - [x] `gh_meeting_booking_confirmed` emits exactly once per server receipt in reducer/browser tests; GTM mapping/publish remains pending.
-- [ ] GTM generic tags are built/read back/previewed; publish occurs only after explicit human confirmation and live evidence.
+- [x] GTM generic tags are built/read back/quick-previewed in disposable workspace 6; publish still requires explicit human confirmation and live evidence.
 - [ ] Governed public host retains actionable embed/link fallback and flag rollback.
 - [x] Growth CTA exposes an additive `open_meeting_scheduler` action; `book_meeting` remains navigation-only. The native adapter lazy-loads, uses dialog/full-screen activation and preserves one connected scheduler across close/reopen.
 - [ ] One controlled native booking verifies renderer -> adapter -> HubSpot/Outlook/Teams and `/g/collect`/GA4 evidence.
@@ -368,10 +368,16 @@ The renderer is a standalone custom element with an explicit state reducer. Rend
 - [x] Confirmation shell GVC `.captures/2026-07-21T12-01-53_native-meeting-scheduler`: 45 frames en
   1440/820/390, transition+settled, exit 0; el éxito reemplaza todo el scheduler, conserva foco/ARIA/reduced-motion,
   no presenta overflow ni PII/receipt y pasa runtime/accessibility/layout/performance/enterprise rubric.
+- [x] Copy/UX writing/CRO/commercial audit: all scheduler strings are canonicalized, provider-neutral where appropriate,
+  action-led, recovery-oriented and aligned to the 30-minute Microsoft Teams expectation. GTM audit reconfirmed stable
+  semantic event identity, no copy-derived parameters, no PII/exact slot and `generate_lead` only from a server receipt.
+- [x] Final copy GVC `.captures/2026-07-21T12-18-17_native-meeting-scheduler`: 45 frames at 1440/820/390, exit 0;
+  revised strings fit without clipping/overflow and validation, confirmation, keyboard, reduced-motion and enterprise
+  rubric remain green. The immediately prior cold-build capture exceeded local FCP only; the warm canonical rerun passed.
 - [ ] `pnpm fe:capture native-meeting-scheduler --env=staging`
 - [ ] `pnpm fe:capture:review <capture-dir>`
 - [ ] `pnpm ui:quality --task TASK-1510`
-- [ ] GTM workspace read-back/quick preview + Playwright dataLayer/`/g/collect`.
+- [x] GTM workspace read-back/quick preview (`compilerError=false`, `syncOk=true`); browser `/g/collect` remains a live-host rollout gate.
 - [ ] `pnpm measurement:smoke` after approved publish.
 - [ ] `pnpm ops:lint --changed`
 - [x] `pnpm qa:gates --changed --agent codex --task TASK-1510 --ui --runtime --integration --docs` — advisory; rollout dependencies remain explicit.

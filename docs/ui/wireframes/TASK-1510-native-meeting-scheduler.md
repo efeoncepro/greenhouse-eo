@@ -41,9 +41,9 @@ One decision plane appears at a time. The date strip is an efficient default, wh
 
 ```text
 ┌──────────────────────────────┐
-│ [←] Agenda una reunión  [×]  │
+│ [←] Elige tu horario     [×]  │
 │ 30 min · Teams · GMT-4       │
-│ Horario — Datos — Confirmar  │
+│ Fecha y hora — Datos — Confirmación │
 │                              │
 │ JULIO 2026          [Ver mes]│
 │ [Mar 21] [Mié 22] [Jue 23]  │
@@ -54,7 +54,7 @@ One decision plane appears at a time. The date strip is an efficient default, wh
 │                              │
 │ Mié 22 · 09:30 · 30 min      │
 │ [Continuar]                  │
-│ Usar agenda HubSpot          │
+│ Abrir agenda alternativa     │
 └──────────────────────────────┘
 ```
 
@@ -68,8 +68,8 @@ At 390x844 the Growth CTA remains a compact launcher and opens a `full_screen` t
 
 ```text
 ┌──────────────────────────────────────────────────────────┐
-│ Agenda una reunión · 30 min · Teams · Tu horario local   │
-│ Horario — Datos — Confirmación                            │
+│ Conversación con Efeonce · 30 min · Teams · zona local   │
+│ Fecha y hora — Datos — Confirmación                       │
 ├──────────────────────────────┬───────────────────────────┤
 │ JULIO 2026          [‹] [›]  │ MIÉRCOLES 22 · 3 horas   │
 │ Lu Ma Mi Ju Vi Sá Do         │ Mañana                   │
@@ -98,7 +98,7 @@ not a nested hero card.
 │                     │  6  7  8  9 10 11 12               │ Mañana       │
 │ 30 min              │ 13 14 15 16 17 18 19               │ 09:00  09:30 │
 │ Microsoft Teams     │ 20 21[22]23 24 25 26               │ 10:30  11:00 │
-│ Tu horario · Lima   │ 27 28 29 30 31                     │               │
+│ Tu zona horaria · Lima │ 27 28 29 30 31                  │               │
 │                     │                                     │ [Continuar]  │
 └─────────────────────┴─────────────────────────────────────┴───────────────┘
 ```
@@ -134,28 +134,28 @@ The host supplies `activation-mode` and an optional maximum recipe. The componen
 
 | Element | Visible copy intent | Canonical owner |
 |---|---|---|
-| Launcher | “Agenda una reunión” plus duration/platform expectation | `src/lib/copy/growth-meetings*` |
-| Scene title | “Hablemos de tu próximo desafío” or approved contextual variant | growth-meetings copy |
+| Launcher | “Conversemos sobre tu próximo desafío” plus duration/platform expectation | `src/lib/copy/growth-meetings*` |
+| Scene title | “Conversemos sobre tu próximo desafío” or approved contextual variant | growth-meetings copy |
 | Operational facts | duration, Teams and timezone derived from safe config | renderer formatter + canonical nouns |
-| Steps | “Horario”, “Tus datos”, “Confirmación” | growth-meetings copy |
+| Steps | “Fecha y hora”, “Tus datos”, “Confirmación” | growth-meetings copy |
 | Month disclosure | “Ver mes” | growth-meetings copy |
 | Primary CTA | continue/reserve according to state | growth-meetings copy |
-| Fallback | “Usar agenda HubSpot” with honest context | growth-meetings copy |
+| Fallback | “Abrir agenda alternativa” with honest provider-neutral context | growth-meetings copy |
 | Error/success | generic recovery and confirmed receipt wording | growth-meetings copy; never host markup |
 
 ## State Copy
 
 | State | Visible copy | Recovery behavior |
 |---|---|---|
-| ready | “Elige el horario que mejor te acomode.” | select a date/slot or reveal the full month |
-| loading | “Sincronizando horarios disponibles…” | wait; after a bounded timeout expose retry and fallback |
-| empty | “No hay horarios en esta ventana.” | navigate to the next bounded window or use fallback |
+| ready | “Elige una fecha” / “Elige una hora” | select a date/slot or reveal the full month |
+| loading | “Buscando horarios disponibles…” | wait; after a bounded timeout expose retry and fallback |
+| empty | “No hay horarios disponibles en este mes.” | navigate to the next bounded window or use fallback |
 | partial | “Mostramos la disponibilidad más reciente; confirma para validar el horario.” | booking revalidates; fallback remains pre-dispatch |
-| error | “La agenda no está respondiendo ahora.” | user-driven retry or safe fallback |
+| error | “No pudimos cargar la agenda.” | user-driven retry or safe fallback |
 | denied | “No podemos abrir esta agenda desde aquí.” | safe HubSpot link without policy/provider detail |
-| conflict | “Ese horario acaba de ocuparse. Elige otro.” | refresh and return focus to valid availability |
-| pending | “Confirmando tu reunión…” | retain the intent; never submit a new key |
-| success | “Tu reunión quedó agendada.” | show the server-confirmed summary and email/calendar expectation |
+| conflict | “Ese horario ya no está disponible. Elige otro para continuar.” | refresh and return focus to valid availability |
+| pending | “Reservando tu horario…” | retain the intent; never submit a new key |
+| success | “Tu reunión está confirmada.” | show the server-confirmed summary and email/calendar expectation |
 
 ## Confirmed shell
 
@@ -163,13 +163,13 @@ Confirmation replaces the scheduler composition rather than occupying its former
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────┐
-│ RESERVA REGISTRADA │ TU REUNIÓN QUEDÓ AGENDADA      │ QUÉ SIGUE        │
+│ HORARIO RESERVADO  │ TU REUNIÓN ESTÁ CONFIRMADA     │ QUÉ SIGUE        │
 │                    │                                 │                   │
-│ Todo listo         │ TU CITA                         │ Correo            │
+│ Todo listo         │ FECHA Y HORA                    │ Correo            │
 │                    │ Miércoles 22 de julio           │ Teams             │
-│ Confirmación       │ 09:15–09:45 GMT-4              │ Cambios           │
-│ registrada de      │ 30 min · Teams · Tu horario    │                   │
-│ forma segura       │                                 │ Ayuda de entrega  │
+│ Reserva registrada │ 09:15–09:45 GMT-4              │ Cambios           │
+│                    │ 30 min · Teams · zona horaria  │                   │
+│                    │                                 │ Ayuda de entrega  │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 

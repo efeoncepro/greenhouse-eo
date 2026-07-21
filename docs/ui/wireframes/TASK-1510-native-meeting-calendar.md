@@ -33,7 +33,7 @@ overlays slots or form fields. Form fields use one column and 48 px controls.
 
 ## Action Hierarchy
 
-- Primary: `Elegir este horario` / `Agendar reunión`
+- Primary: `Continuar con {hora}` / `Reservar horario`
 - Secondary: `Volver al calendario`
 - Destructive: none
 - Selection vs action: selecting a date or time never books; submit is the only mutation
@@ -65,10 +65,10 @@ overlays slots or form fields. Form fields use one column and 48 px controls.
 |---|---|---|---|---|
 | `growth.meeting.calendar.title` | calendar | Elige una fecha | month/year | task-led |
 | `growth.meeting.calendar.available` | day | Disponible | date | non-color state cue |
-| `growth.meeting.agenda.title` | agenda | Horarios para {date} | formatted date | binds slots to date |
-| `growth.meeting.agenda.select` | agenda | Elige un horario | none | empty selection instruction |
+| `growth.meeting.agenda.title` | agenda | Horarios del {date} | formatted date | binds slots to date |
+| `growth.meeting.agenda.select` | agenda | Elige una hora | none | empty selection instruction |
 | `growth.meeting.action.choose` | agenda | Continuar con {time} | time | selection, not mutation |
-| `growth.meeting.action.book` | details | Agendar reunión | none | sole mutation |
+| `growth.meeting.action.book` | details | Reservar horario | none | sole mutation |
 
 ## State Copy
 
@@ -76,11 +76,11 @@ overlays slots or form fields. Form fields use one column and 48 px controls.
 |---|---|---|---|---|
 | ready | Elige una fecha | Los días disponibles se pueden seleccionar. | date button | no realtime guarantee |
 | loading | Consultando disponibilidad | Estamos sincronizando la agenda. | none | structured skeleton |
-| empty | No hay horarios en este mes | Revisa el mes siguiente o abre la agenda segura. | Ver mes siguiente | honest |
+| empty | No hay horarios disponibles en este mes | Revisa el mes siguiente o abre la agenda alternativa. | Ver mes siguiente | honest |
 | partial | Disponibilidad limitada | Solo mostramos los horarios confirmados por el proveedor. | choose / fallback | explicit |
 | error | No pudimos actualizar la agenda | Conservamos una vía segura para reservar. | Reintentar / HubSpot | recovery |
-| denied | Esta agenda no está disponible aquí | El enlace o la superficie no están autorizados para reservas nativas. | Abrir agenda segura | no permission detail leak |
-| success | Tu reunión quedó agendada | La invitación y Teams llegarán por correo. | none | no provider IDs |
+| denied | Esta agenda no está disponible aquí | Puedes continuar desde nuestra agenda alternativa. | Abrir agenda alternativa | no permission detail leak |
+| success | Tu reunión está confirmada | Enviaremos la invitación con el enlace de Microsoft Teams al correo de trabajo. | none | no provider IDs |
 
 ## Accessibility Contract
 

@@ -79,17 +79,17 @@ const formatTime = (startsAt: string, timezone: string): string =>
   new Intl.DateTimeFormat('es-CL', { timeZone: timezone, hour: '2-digit', minute: '2-digit', hour12: false })
     .format(new Date(startsAt))
 
-const timePeriod = (startsAt: string, timezone: string): 'Mañana' | 'Tarde' | 'Noche' => {
+const timePeriod = (startsAt: string, timezone: string): string => {
   const hour = Number(new Intl.DateTimeFormat('en-GB', {
     timeZone: timezone,
     hour: '2-digit',
     hour12: false,
   }).format(new Date(startsAt)))
 
-  if (hour < 12) return 'Mañana'
-  if (hour < 18) return 'Tarde'
+  if (hour < 12) return copy.morning
+  if (hour < 18) return copy.afternoon
 
-  return 'Noche'
+  return copy.evening
 }
 
 export const formatMeetingTimezoneLabel = (timezone: string, at = new Date()): string => {
@@ -105,7 +105,7 @@ export const formatMeetingTimezoneLabel = (timezone: string, at = new Date()): s
 
   const displayName = `${name.charAt(0).toUpperCase()}${name.slice(1)}`
 
-  return `Tu horario · ${displayName}`
+  return `${copy.timezonePrefix} · ${displayName}`
 }
 
 export const formatMeetingTimeWithOffset = (startsAt: string, timezone: string): string => {
@@ -506,14 +506,14 @@ export class MeetingRenderer {
 
     liveStatus.append(
       element('span', 'ghm-live-dot'),
-      element('span', undefined, confirmed ? copy.confirmedRailStatus : 'Disponibilidad sincronizada'),
+      element('span', undefined, confirmed ? copy.confirmedRailStatus : copy.availabilitySynced),
     )
     rail.append(atmosphere, liveStatus, eyebrow, title, element('p', 'ghm-intro', confirmed ? copy.confirmedRailBody : copy.intro))
 
     if (confirmed) {
       const assurance = element('div', 'ghm-confirmation-assurance')
 
-      assurance.append(uiIcon('shield-check', 'ghm-confirmation-assurance-icon'), element('span', undefined, 'Confirmación registrada de forma segura'))
+      assurance.append(uiIcon('shield-check', 'ghm-confirmation-assurance-icon'), element('span', undefined, copy.confirmationAssurance))
       rail.append(assurance)
 
       return rail
@@ -523,7 +523,7 @@ export class MeetingRenderer {
 
     for (const [iconName, label] of [
       ['clock', `${this.state.config?.durationsMinutes[0] ?? 30} min`],
-      ['video', 'Microsoft Teams'],
+      ['video', copy.meetingPlatform],
       ['world', formatMeetingTimezoneLabel(this.timezone(), this.options.now?.())],
     ]) {
       const fact = element('span', 'ghm-fact')
@@ -695,7 +695,7 @@ export class MeetingRenderer {
 
     for (const [iconName, labelText] of [
       ['clock', `${slot.durationMinutes ?? 30} min`],
-      ['video', 'Microsoft Teams'],
+      ['video', copy.meetingPlatform],
       ['world', formatMeetingTimezoneLabel(timezone, new Date(slot.startsAt))],
     ]) {
       const fact = element('span', 'ghm-receipt-fact')
@@ -743,7 +743,7 @@ export class MeetingRenderer {
     const calendarIdentity = element('div', 'ghm-calendar-identity')
 
     calendarIdentity.append(
-      element('span', 'ghm-calendar-eyebrow', 'Disponibilidad'),
+      element('span', 'ghm-calendar-eyebrow', copy.calendarEyebrow),
       element('div', 'ghm-calendar-panel-title', copy.calendarTitle),
     )
     header.append(calendarIdentity)
@@ -834,19 +834,19 @@ export class MeetingRenderer {
           button.dataset.selected = String(date === this.state.selectedDate)
           button.setAttribute('aria-pressed', String(date === this.state.selectedDate))
           if (isToday) button.setAttribute('aria-current', 'date')
-          const slotLabel = day.slots.length === 1 ? '1 horario disponible' : `${day.slots.length} horarios disponibles`
+          const slotLabel = `${day.slots.length} ${day.slots.length === 1 ? copy.slotSingular : copy.slotPlural}`
 
-          button.setAttribute('aria-label', `${isToday ? 'Hoy, ' : ''}${formatMeetingDate(date, this.timezone(), 'long')}, ${slotLabel}`)
+          button.setAttribute('aria-label', `${isToday ? `${copy.today}, ` : ''}${formatMeetingDate(date, this.timezone(), 'long')}, ${slotLabel}`)
           const meter = element('span', 'ghm-availability-meter')
 
           meter.setAttribute('aria-hidden', 'true')
           meter.append(element('span'), element('span'), element('span'))
           button.append(
             element('span', 'ghm-calendar-number', String(Number(date.slice(-2)))),
-            element('span', 'ghm-calendar-available', `${day.slots.length} ${day.slots.length === 1 ? 'opción' : 'opciones'}`),
+            element('span', 'ghm-calendar-available', `${day.slots.length} ${day.slots.length === 1 ? copy.optionSingular : copy.optionPlural}`),
             meter,
           )
-          if (isToday) button.append(element('span', 'ghm-today-label', 'Hoy'))
+          if (isToday) button.append(element('span', 'ghm-today-label', copy.today))
           if (date === this.state.selectedDate) button.append(uiIcon('check', 'ghm-calendar-check'))
           button.addEventListener('keydown', event => this.handleCalendarKeydown(event, date, availableDates))
           button.addEventListener('click', () => {
@@ -886,7 +886,7 @@ export class MeetingRenderer {
     const densityLegend = element('span', 'ghm-density-legend')
     const timezoneLens = element('div', 'ghm-timezone-lens')
 
-    densityLegend.append(element('span', 'ghm-density-dot'), element('span', undefined, 'Más opciones disponibles'))
+    densityLegend.append(element('span', 'ghm-density-dot'), element('span', undefined, copy.moreOptions))
     timezoneLens.append(uiIcon('world', 'ghm-timezone-icon'), element('span', undefined, formatMeetingTimezoneLabel(this.timezone(), this.options.now?.())))
     legend.append(densityLegend, timezoneLens)
     root.append(table, legend)
@@ -1277,7 +1277,7 @@ export class MeetingRenderer {
     const agenda = element('aside', 'ghm-agenda')
 
     agenda.dataset.capture = 'meeting-agenda'
-    agenda.setAttribute('aria-label', copy.chooseTime)
+    agenda.setAttribute('aria-label', copy.timeRegion)
 
     if (this.state.phase === 'confirmed') {
       if (this.layoutRecipe === 'guided') {
@@ -1310,13 +1310,13 @@ export class MeetingRenderer {
       })
       const availabilityStatus = element('div', 'ghm-agenda-status')
 
-      availabilityStatus.append(element('span', 'ghm-live-dot'), element('span', undefined, 'Agenda actualizada'))
+      availabilityStatus.append(element('span', 'ghm-live-dot'), element('span', undefined, copy.agendaUpdated))
       agenda.append(guidedBack, availabilityStatus, element('span', 'ghm-agenda-kicker', copy.chooseTime))
 
       if (selectedDay) {
         agenda.append(
           element('h3', 'ghm-agenda-date', `${copy.timesFor} ${formatMeetingDate(selectedDay.date, this.timezone(), 'long').toLocaleLowerCase('es-CL')}`),
-          element('p', 'ghm-agenda-help', `${selectedDay.slots.length} ${selectedDay.slots.length === 1 ? 'horario disponible' : 'horarios disponibles'} · ${copy.chooseTimeHelp}`),
+          element('p', 'ghm-agenda-help', `${selectedDay.slots.length} ${selectedDay.slots.length === 1 ? copy.slotSingular : copy.slotPlural} · ${copy.chooseTimeHelp}`),
         )
       }
 
@@ -1439,7 +1439,7 @@ export class MeetingRenderer {
       selectionHeader,
       element('strong', 'ghm-agenda-date', formatMeetingDate(slot.startsAt, slot.timezone ?? this.timezone(), 'long')),
       element('span', 'ghm-agenda-time', formatMeetingTimeWithOffset(slot.startsAt, slot.timezone ?? this.timezone())),
-      element('span', 'ghm-agenda-meta', `${slot.durationMinutes ?? 30} min · Microsoft Teams`),
+      element('span', 'ghm-agenda-meta', `${slot.durationMinutes ?? 30} min · ${copy.meetingPlatform}`),
     )
 
     return selection

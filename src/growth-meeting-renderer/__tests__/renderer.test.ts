@@ -138,7 +138,7 @@ describe('MeetingRenderer', () => {
     firstName.dispatchEvent(new Event('blur'))
 
     expect(field.dataset.validation).toBe('invalid')
-    expect(feedback.textContent).toBe('Este campo es obligatorio.')
+    expect(feedback.textContent).toBe('Completa este campo.')
     expect(field.querySelector('.tabler-alert-circle')).not.toBeNull()
 
     firstName.value = 'Ada'
@@ -167,19 +167,19 @@ describe('MeetingRenderer', () => {
     email.dispatchEvent(new Event('blur'))
 
     expect(field.dataset.validation).toBe('invalid')
-    expect(field.textContent).toContain('Escribe un correo válido.')
+    expect(field.textContent).toContain('Escribe un correo con formato nombre@empresa.com.')
 
     email.value = 'ada@empresa.cl'
     email.dispatchEvent(new Event('input', { bubbles: true }))
 
     expect(field.dataset.validation).toBe('pending')
-    expect(field.textContent).toContain('Verificando correo de trabajo')
+    expect(field.textContent).toContain('Verificando tu correo de empresa')
     expect(field.querySelector('.tabler-loader-2')).not.toBeNull()
 
     await vi.advanceTimersByTimeAsync(450)
 
     expect(field.dataset.validation).toBe('valid')
-    expect(field.textContent).toContain('Correo corporativo verificado.')
+    expect(field.textContent).toContain('Correo de empresa verificado.')
     renderer.destroy()
     vi.useRealTimers()
   })
@@ -231,7 +231,7 @@ describe('MeetingRenderer', () => {
     email.dispatchEvent(new Event('input', { bubbles: true }))
     await vi.advanceTimersByTimeAsync(450)
 
-    expect(host.querySelector('.ghm-email-verification')?.textContent).toContain('correo de tu empresa')
+    expect(host.querySelector('.ghm-email-verification')?.textContent).toContain('correo de empresa')
     expect(email.getAttribute('aria-invalid')).toBe('true')
     expect(host.querySelector<HTMLButtonElement>('.ghm-form-actions .ghm-primary')?.disabled).toBe(true)
 
@@ -245,7 +245,7 @@ describe('MeetingRenderer', () => {
     await completeBooking(host)
 
     expect(host.dataset.ghmState).toBe('confirmed')
-    expect(host.textContent).toContain('Tu reunión quedó agendada')
+    expect(host.textContent).toContain('Tu reunión está confirmada')
     expect(host.textContent).toContain('09:15–09:45 GMT-4')
     expect(host.textContent).toContain('Qué sigue')
     expect(host.querySelector('[data-capture="meeting-confirmation-receipt"]')).not.toBeNull()
@@ -322,7 +322,7 @@ describe('MeetingRenderer', () => {
     await renderer.load()
     await completeBooking(host)
 
-    expect(host.textContent).toContain('Ese horario acaba de ocuparse')
+    expect(host.textContent).toContain('Ese horario ya no está disponible')
     expect(host.textContent).toContain('Actualizar horarios')
     renderer.destroy()
   })

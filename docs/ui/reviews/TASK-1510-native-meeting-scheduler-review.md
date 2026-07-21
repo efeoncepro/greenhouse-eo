@@ -93,6 +93,9 @@ Resolved during review:
 - Confirmation shell: `.captures/2026-07-21T12-01-53_native-meeting-scheduler`, 45 frames across 1440/820/390,
   including transition and settled states. Exit 0; no runtime, accessibility, layout, target-size, keyboard,
   reduced-motion, performance or enterprise-rubric findings. Confirmed frames were inspected directly.
+- Final copy/CRO/commercial pass: `.captures/2026-07-21T12-18-17_native-meeting-scheduler`, 45 frames across
+  1440/820/390, exit 0. Calendar, actionable validation and full-shell confirmation were inspected directly;
+  revised labels and recovery copy fit without clipping or overflow and the enterprise rubric remains green.
 
 ## Measurement/privacy evidence
 

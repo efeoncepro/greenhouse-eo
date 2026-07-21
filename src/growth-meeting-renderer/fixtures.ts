@@ -28,7 +28,7 @@ export const meetingConfigFixture = (): MeetingSchedulerConfig => ({
   ],
   consent: {
     processing: { required: true, policyVersion: '2026-07-21' },
-    communications: [{ consentKey: 'growth_updates', label: 'Quiero recibir ideas y novedades de Efeonce.', required: false }],
+    communications: [{ consentKey: 'growth_updates', label: 'Quiero recibir contenidos y novedades de Efeonce.', required: false }],
   },
   security: {
     captcha: {
