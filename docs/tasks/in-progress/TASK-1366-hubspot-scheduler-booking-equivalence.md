@@ -21,6 +21,28 @@
   `context.hutk` no puede asumir un consent gate existente; el diseño debe declarar la postura
   vigente y qué cambia si se instala CMP.
 
+## Delta 2026-07-21 — Discovery de ejecución
+
+- **Scope faltante confirmado en runtime** — el secreto canónico `hubspot-access-token` existe, su versión
+  vigente está habilitada y su shape pasó los chequeos de higiene sin revelar el valor. Un `GET` redacted
+  contra Scheduler para `agenda-discovery` respondió `403 MISSING_SCOPES`; no se intentó ningún booking.
+- **App canónica confirmada** — `app-hsmeta.json` tiene `crm.objects.appointments.read/write` como scopes
+  opcionales, pero no declara `scheduler.meetings.meeting-link.read`. La prueba de disponibilidad queda
+  bloqueada hasta aprobar el cambio mínimo de scope, subir el proyecto al portal `48713323`, reinstalar la
+  app y actualizar el token gobernado.
+- **Ownership libre** — no existe branch ni PR activo para `TASK-1366`; la ejecución permanece secuencial en
+  la branch compartida `develop`, sin cambiar de rama por iniciativa propia y preservando trabajo ajeno.
+- **Checkpoint humano pendiente** — por ser `P1`/esfuerzo `Medio` y porque el smoke crea calendario, Teams,
+  contacto e invitación reales, no se ejecuta Slice 2 sin aprobación del plan, autorización explícita del
+  cambio de scope/reinstalación y datos de prueba aprobados.
+- **Scope efectivo 2026-07-21** — el operador autorizó el cambio mínimo; `hs project validate` pasó, build
+  HubSpot `#27` quedó desplegado y la app fue reinstalada desde la sesión autenticada. El token gobernado
+  existente conservó identidad y adquirió el scope, por lo que no fue necesario copiarlo ni crear una nueva
+  versión del secreto.
+- **Details + availability PASS** — el slug API real es `efeoncepro/agenda-discovery` (segmento codificado en
+  path). Scheduler devuelve `GROUP_CALENDAR`, `isOffline=false`, un calendario `OFFICE365`, duración 30 minutos,
+  `company` requerido, consentimiento legal habilitado y disponibilidad real. No se creó reunión.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -29,7 +51,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -42,7 +64,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-023`
-- Status real: `Diseno`
+- Status real: `Details/availability PASS; booking espera email y slot aprobados`
 - Rank: `TBD`
 - Domain: `growth|public-site|crm`
 - Blocked by: `none`
@@ -80,8 +102,8 @@ Revisar y respetar:
 - `docs/reference/measurement-gtm-ga4/04-greenhouse-gh-event-convention.md`
 - `docs/reference/measurement-gtm-ga4/TRACKING-PLAN.md`
 - `docs/epics/to-do/EPIC-023-growth-cta-popup-cro-engine.md`
-- `docs/tasks/to-do/TASK-1339-growth-cta-engine-foundation.md`
-- `docs/tasks/to-do/TASK-1340-growth-cta-portable-renderer-surfaces.md`
+- `docs/tasks/complete/TASK-1339-growth-cta-engine-foundation.md`
+- `docs/tasks/complete/TASK-1340-growth-cta-portable-renderer-surfaces.md`
 
 Reglas obligatorias:
 
@@ -124,7 +146,7 @@ Reglas obligatorias:
 ### Files owned
 
 - `docs/public-site/decisions/PDR-009-hubspot-scheduler-native-booking.md`
-- `docs/tasks/to-do/TASK-1366-hubspot-scheduler-booking-equivalence.md`
+- `docs/tasks/in-progress/TASK-1366-hubspot-scheduler-booking-equivalence.md`
 - `docs/architecture/public-site/PRIMITIVES.md`
 - `docs/reference/measurement-gtm-ga4/TRACKING-PLAN.md`
 - `docs/reference/measurement-gtm-ga4/04-greenhouse-gh-event-convention.md`
@@ -152,11 +174,29 @@ Reglas obligatorias:
 - No hay decision fundada para reemplazar el iframe en WordPress o Think.
 - El impacto real de perder UTK/content tracking nativo del embed aun no esta cuantificado ni mitigado.
 
+## Modular Placement Contract
+
+- Topology impact: `tooling`
+- Current home: `scripts/hubspot/**` para un smoke redacted y no enlazado al runtime; la Scheduling Page y
+  sus side effects siguen siendo source of truth externo de HubSpot.
+- Future candidate home: `domain-package` — una productización posterior puede vivir bajo
+  `src/lib/growth/meetings/**`, pero esta task no autoriza crear ese runtime.
+- Boundary: Scheduler API `meeting-links/book` + readers de details/availability como contrato externo; los
+  consumidores futuros autorizados serían CTAs públicos, Think y Growth CTA mediante un adapter server-side
+  nuevo (`native_booking`/`hubspot_handoff`), nunca el `book_meeting` navigation-only de TASK-1431.
+- Server/browser split: token, llamadas Scheduler, redacción, retry/idempotencia y confirmación viven solo
+  server-side; el browser futuro recibe DTOs allowlisted de disponibilidad/confirmación sin secretos ni PII
+  adicional.
+- Build impact: ninguno para el runtime actual; el smoke usa Node/HTTPS y no agrega SDK pesado, filesystem
+  input ni global entrypoint.
+- Extraction blocker: scopes e instalación de la app HubSpot, token gobernado, ownership de Scheduling Page,
+  calendario Office 365 y configuración Teams del organizador.
+
 ## Backend/Data Contract
 
 ### Backend/data brief
 
-- Backend rigor: `backend-standard`
+- Backend rigor: `backend-critical`
 - Impacto principal: `integration`
 - Source of truth afectado: `HubSpot Scheduling Page agenda-discovery + future growth.meetings adapter`
 - Consumidores afectados: `public-site CTAs`, `Think`, `Growth CTA engine`, `GTM/GA4`, `HubSpot CRM`
@@ -385,7 +425,7 @@ El spike falla si:
 
 - `pnpm task:lint --task TASK-1366`
 - `pnpm ops:lint --changed`
-- `pnpm docs:closure-check -- docs/public-site/decisions/PDR-009-hubspot-scheduler-native-booking.md docs/tasks/to-do/TASK-1366-hubspot-scheduler-booking-equivalence.md`
+- `pnpm docs:closure-check -- docs/public-site/decisions/PDR-009-hubspot-scheduler-native-booking.md docs/tasks/in-progress/TASK-1366-hubspot-scheduler-booking-equivalence.md`
 - `node --check scripts/hubspot/smoke-scheduler-booking.mjs` si se crea script JS.
 - Smoke HubSpot Scheduler API documentado con evidencia redacted.
 - Verificacion manual HubSpot UI + calendario + Teams + email invite.

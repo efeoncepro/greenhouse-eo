@@ -3,7 +3,7 @@
 > **Tipo:** Product Decision Record para conversiones del sitio publico.
 > **Estado:** Accepted — direction for validation, no runtime cutover.
 > **Fecha:** 2026-07-08.
-> **Task:** [`TASK-1366`](../../tasks/to-do/TASK-1366-hubspot-scheduler-booking-equivalence.md).
+> **Task:** [`TASK-1366`](../../tasks/in-progress/TASK-1366-hubspot-scheduler-booking-equivalence.md).
 > **Superficies afectadas:** `efeoncepro.com`, `think.efeoncepro.com`, Growth CTA engine, landings publicas con CTA "Agenda una reunion".
 
 ## Contexto
@@ -80,4 +80,4 @@ Si cualquiera de los puntos core falla, se mantiene el widget oficial y se invie
 - Growth CTA engine: `docs/architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_DECISION_V1.md`
 - Public Site primitives: `docs/architecture/public-site/PRIMITIVES.md`
 - Tracking plan: `docs/reference/measurement-gtm-ga4/TRACKING-PLAN.md`
-- Task de validacion: `docs/tasks/to-do/TASK-1366-hubspot-scheduler-booking-equivalence.md`
+- Task de validacion: `docs/tasks/in-progress/TASK-1366-hubspot-scheduler-booking-equivalence.md`

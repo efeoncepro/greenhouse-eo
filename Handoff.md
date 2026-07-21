@@ -21,6 +21,16 @@
 
 ## Pendientes inmediatos
 
+- **`TASK-1366` IN-PROGRESS (HubSpot Scheduler Booking Equivalence Spike, `EPIC-023`) — checkpoint humano pendiente.**
+  Discovery 2026-07-21 confirmó ownership libre, Scheduling Page pública accesible y secreto canónico sano,
+  pero Scheduler responde `403 MISSING_SCOPES`: el app del portal `48713323` no declara
+  `scheduler.meetings.meeting-link.read`. No hubo booking ni mutación HubSpot. Antes de continuar se requiere
+  El operador aprobó el plan y autorizó el scope mínimo. Build HubSpot `#27` fue validado/desplegado y la app
+  se reinstaló usando su Chrome autenticado; el token gobernado existente adquirió el scope sin rotación.
+  Details/availability ya pasan: `GROUP_CALENDAR`, `isOffline=false`, Office 365, 30 min, `company` requerido,
+  consentimiento legal y slots reales. Antes del booking aún faltan email de prueba y ventana de slot; el
+  organizador se resuelve desde la scheduling page. `HubSpotMeetingEmbed` y landings permanecen intactos.
+
 - **`TASK-1506` COMPLETE (Globe Frontend Hosting and Front Door Decision, `EPIC-028`) — ADR-004, local-first sin push.**
   Cerrada como policy: `EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md` (ADR-004) mantiene **Cloud Run**
   como web/BFF/SSO para la release internal-only (servidor **Node nativo**; Next.js `superseded` para el shell
