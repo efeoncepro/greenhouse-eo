@@ -123,7 +123,7 @@ del fence sigue sin ejercitarse (`TASK-1512`), así que nadie debe asumirlo veri
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-028`
-- Status real: `Diseño gobernado; implementación pendiente`
+- Status real: `Complete; desplegada y verificada en vivo (2026-07-21). Persistencia durable operando en ambos servicios Cloud Run`
 - Rank: `TBD`
 - Domain: `platform|data|identity`
 - Blocked by: `TASK-1464, TASK-1481`

@@ -917,8 +917,12 @@ SCIM/payroll/finance). Rollback = flag OFF + revert PR.
 
 ## Follow-ups
 
-- **TASK-1465**: persistir favorites + referencias (`AssetAnnotationStorePort` durable) al aterrizar
-  la tenancy store.
+- ~~**TASK-1465**: persistir favorites + referencias (`AssetAnnotationStorePort` durable) al aterrizar
+  la tenancy store.~~ **RESUELTO dentro de esta misma task (2026-07-22).** El diferimiento ya no tenía
+  destinatario: `TASK-1465` había shipeado sin cubrir estas anotaciones, y con los servicios en 3
+  réplicas un store in-memory no queda "volátil" sino **no determinista**. Se implementó
+  `DurableProducerAssetStore` + migración `0003_producer_asset_annotations.sql`, wired en `main.ts`.
+  Ver §Delta 2026-07-22, punto 1.
 - **TASK-1501/1504**: aceptar `ProducerReferenceHandleV1` (`derived-internal`) en el run discriminado.
 - Range requests / seeking parcial de video, thumbnails, transcodes de preview.
 - Rate-limit explícito del serving + signal de grants emitidos vs redimidos.
