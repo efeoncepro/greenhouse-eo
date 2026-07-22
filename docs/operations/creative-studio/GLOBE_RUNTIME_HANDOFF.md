@@ -8,6 +8,141 @@
 
 # Handoff
 
+## Active state — 2026-07-22 (TASK-1503: output side del Producer vivo en `globe-api-internal`)
+
+**Lo que hace usable una pieza ya generada quedó operativo.** `TASK-1503` shipeó el *output side* del
+Creative Producer: recuperación gobernada de un output (descarga/preview con bytes reales) más las dos
+acciones sobre la pieza — marcarla favorita y copiarla como referencia. Capability
+`globe.producer.assets.operate` (llevó `GLOBE_CAPABILITIES` de 11 a 12 entradas), **gasto cero**. Deliberadamente **no**
+reusa `globe.lab.experiment.run`: descargar lo que ya produjiste no debe implicar poder facturarle a un
+proveedor, así que la autorización de recuperar vive fuera de la capability de gasto. Ids: readers
+`GLOBE_PRODUCER_ASSET_READERS` = `globe.producer.output.get` / `globe.producer.asset.list`; commands
+`GLOBE_PRODUCER_ASSET_COMMANDS` = `globe.producer.asset.favorite` /
+`globe.producer.asset.copyAsReference`. Es un **mapa propio**, separado de `GLOBE_PRODUCER_READERS` (ese
+es el catálogo de `TASK-1500` y responde a otra capability). SDK:
+`getProducerOutput` / `listProducerAssets` / `favoriteProducerAsset` / `copyProducerAssetAsReference`.
+
+**Vive en `globe-api-internal` por AUTORIDAD, no por despliegue** — la misma razón por la que vive ahí el
+Model Lab (ver *Dónde vive el Lab* en el bloque de `TASK-1490`). La ruta está en el mismo binario que
+corre en ambos modos (`apps/studio-web/src/app.ts`); lo que la hace alcanzable sólo en api mode es quién
+lleva la capability: en web mode el principal humano la recibe del broker de Greenhouse, que **no** otorga
+`globe.producer.assets.operate`. Desplegar el web no habilita nada; el gate es `TASK-1505`.
+
+### Qué está vivo
+
+- **Servicio `globe-api-internal`, revisión `globe-api-internal-00017-xfm`, imagen `:b12451db2d6e`**,
+  desplegada por el camino sancionado: workflow `deploy-internal.yml`, run `29908442357`
+  (OIDC → WIF → `globe-deployer`), checkout limpio de `main`.
+- **El workflow escribió sólo la imagen.** La revisión conserva runtime SA `api_runtime`, concurrency 20 y
+  **maxScale 3**: el drift-trap que cerró `TASK-1508` sigue cerrado. `tofu plan` → **No changes** antes y
+  después del deploy.
+- **Cobertura `PRODUCER_ASSETS_COVERAGE`:** `http` / `sdk` / `cli` / `worker` / `e2e` **available**;
+  `ui` / `mcp` **`policy-blocked`** (gate de `TASK-1505`, no se movió); `sister-platform` `not-applicable`.
+- **Re-verificado contra `00017-xfm` (7/7):** retrieval gobernado sirviendo bytes reales (820.868 B,
+  `image/png`, `private, no-store`), invariante cross-workspace viva (`not_found`), anónimo → `403`, y las
+  anotaciones presentes en Cloud SQL. Gasto cero: la pieza era preexistente.
+
+### Config viva del servicio — las tres variables del output side
+
+- **`GLOBE_PRODUCER_ASSETS_ENABLED`** — kill switch. Su estado real es la variable Terraform
+  `producer_assets_enabled`, **default `true` en `infra/terraform/variables.tf`, o sea en git**.
+  Deliberadamente **no** en `terraform.tfvars` (gitignoreado): un flag cuyo estado real vive en un archivo
+  sin trackear tiene el mismo problema de estado efímero que moverlo con `gcloud`, sólo que mejor
+  disfrazado. Probado: `tofu plan` **sin** `terraform.tfvars` → No changes.
+- **`GLOBE_PRODUCER_GRANT_SECRET`** — clave HMAC del pase de recuperación. Secret Manager
+  `globe-producer-grant-secret`; **contenedor y accessor en Terraform (`secrets.tf`), valor out-of-band**
+  (v1, 64 bytes, cero saltos de línea). El `secretAccessor` es **sólo para `api_runtime`**: `web_runtime`
+  no tiene consumidor hasta el gate de `TASK-1505`, así que no se le dio. Sin el secreto el mint degrada a
+  `dependency_unavailable` — **fail-closed**: no existe camino que sirva bytes sin firma.
+- **`GLOBE_PRODUCER_GRANT_TTL_SECONDS`** — **no está seteada en el servicio** (ni en Terraform ni en la
+  revisión): el TTL efectivo son los `300` s del default en código (`readStudioRuntimeConfig`, rango
+  aceptado 30–900). Es la única de las tres que un `describe` de la revisión **no** muestra; si aparece
+  algún día, alguien la seteó fuera de Terraform.
+
+### Estado durable: migración `0003`
+
+`0003_producer_asset_annotations.sql` está **aplicada** en `globe-pg` (las dos tablas existen y
+`globe._migrations` la lista). Las anotaciones viven en `DurableProducerAssetStore`
+(`packages/database/src/stores/producer-asset-store.ts`) detrás del `AssetAnnotationStorePort` del dominio,
+no en memoria. **Delta al spec:** esto estaba diferido a `TASK-1465`, que shipeó sin cubrirlo; con los
+servicios en 3 réplicas (`TASK-1508`) un store in-memory no queda "volátil" sino **no determinista**. Por
+lo mismo la idempotencia vive en SQL (`ON CONFLICT DO NOTHING` + re-lectura) y no en un read-then-write:
+entre réplicas, "revisar y después insertar" es una carrera cuyo síntoma visible es un `referenceId`
+duplicado o una estrella re-fechada. `rights='derived-internal'` es un **CHECK**, no una convención.
+
+### Cómo leer una falla (la degradación es deliberada)
+
+- **`not_found` no significa "faltó un dato".** Todo rechazo de autoridad colapsa ahí: workspace ajeno, id
+  desconocido, hash que sólo fue *input*, candidato no retenido — indistinguibles desde afuera. El store es
+  content-addressed y **tenant-blind** (un bucket para todos los workspaces, el nombre del objeto **es** el
+  hash) y guarda tanto outputs como bytes de referencias private-ingest, así que cualquier respuesta más
+  fina sería un oráculo para sondear un bucket compartido. La autoridad la pone el dominio:
+  `authorizeOwnedOutput` (`packages/domain/src/producer-assets.ts`) gatea contra el **mismo**
+  `ExperimentStorePort` del Lab y matchea sólo `outputHashes` de un attempt `outcome==='candidate_ready'`
+  con `outputsRetained===true`; nunca consulta `authorizedInputHashes`.
+- **`dependency_unavailable` sí es un problema de lectura** y es retryable: cualquier `OutputRetrievalError`
+  del seam GCS (`not_found` / `unreadable` / `integrity_mismatch`) degrada ahí. Nunca 200 con cuerpo vacío y
+  deliberadamente **nunca `not_found`**: el dominio acaba de certificar que el candidato existe, y
+  contradecir el descriptor manda a un operador a cazar un fantasma. Regla de lectura: `not_found` = "no es
+  tuyo o no es recuperable"; `dependency_unavailable` = "es tuyo y existe, falló la lectura".
+- **La ruta re-ejecuta la autorización después de verificar el pase** (defense in depth): un candidato que
+  dejó de ser recuperable deja de ser servible aunque su grant siga vivo. Orden en
+  `GET /v1/outputs/:sha256?experiment=&grant=&disposition=`: kill switch → `resolveDispatchPrincipal` →
+  verify del grant → `deriveTrustedContext` (workspace tomado de los claims) → `authorizeOwnedOutput` →
+  stream con `Content-Disposition` de filename neutro (`globe-<hash12>.<ext>`, sin vendor) y
+  `Cache-Control: private, no-store`. Reusa el mismo helper del reader y el mismo `handlerErrorToApiCode`:
+  un primitivo, dos transportes, sin política duplicada.
+- **El pase no es un bearer autosuficiente.** Opaco, server-minted, **firmado (HMAC-SHA256) no cifrado**
+  —sus claims son cosas que el caller ya sabe—, bound a `(workspaceId, experimentId, sha256, disposition)`,
+  TTL corto, verify **stateless** y comparación en tiempo constante. Viaja en query porque la UI necesita un
+  `src` directo, y eso no abre un hueco porque la ruta autentica **antes** y re-chequea propiedad
+  **después**. Nunca se loggea ni entra a un audit event: si aparece en un log, eso es el incidente.
+- **Acciones:** `favorite` toma el estado deseado explícito (nunca toggle ciego) y conserva el timestamp
+  original en un repeat. `copyAsReference` certifica `ProducerReferenceHandleV1` con
+  `rights:'derived-internal'` —**inforjable**, un caller no puede declararlo— y hereda `parentRights` por
+  `inheritedDerivedRights`, la misma función del edit base del Lab, para que un ancestro `licensed` no deje
+  de restringir en una de las dos derivaciones. Falla cerrado **antes** de mintear si el medio no es
+  referenciable (`model-3d`). Cero bytes por la API, cero crédito.
+
+### Rollback real
+
+- **Apagar la capacidad:** `producer_assets_enabled = false` en `infra/terraform/variables.tf` + `apply`.
+  No por `gcloud` ni por `terraform.tfvars`: el estado del flag vive en git, y así el próximo plan no lo
+  revierte solo.
+- **Cortar los pases ya emitidos:** rotar `globe-producer-grant-secret` (versión nueva) invalida todos los
+  grants vivos. No hay estado que limpiar porque el verify es stateless, y el radio del corte queda acotado
+  por el TTL (≤300 s por defecto).
+- Ninguna de las dos toca bytes ni anotaciones: apagar la capacidad no borra piezas, favoritos ni handles.
+- Procedimiento paso a paso, canario de verificación y diagnóstico:
+  [`docs/manual-de-uso/creative-studio/operar-retrieval-assets-globe.md`](../../manual-de-uso/creative-studio/operar-retrieval-assets-globe.md).
+
+### Gates hacia comercial (identificados, no inventados)
+
+- **Humano interno en el shell web → `TASK-1505`:** grant del broker + flip de `ui`/`mcp`. Hoy una persona
+  no puede usar esto, y no es un pendiente de configuración.
+- **Cliente externo / comercial → `TASK-1480`**, bloqueada por `TASK-1477`, `TASK-1478`, `TASK-1479` y
+  `TASK-1482` (que va sobre `TASK-1468`). Las cinco en `to-do`.
+- **Runtime no-interno — sin dueño declarado.** `readStudioRuntimeConfig` **lanza**
+  `globe_environment_not_internal_smoke` para cualquier valor distinto de `internal_smoke`, así que hoy no
+  existe forma de bootear un runtime comercial. `TASK-1480` no lo menciona. `internal_smoke` es el estadio
+  actual del runtime, **no** el techo del producto.
+- **Contabilidad comercial:** el spend fence es de **seguridad**, no ledger (`TASK-1468` → `TASK-1482`).
+- **Riesgos abiertos:** el de `TASK-1508` (`TASK-1512`, spend fence cross-réplica sin ejercitar) sigue
+  vigente, y ya no está solo: se le suma el gap sin dueño del runtime no-interno.
+
+### Lecciones de método (transferibles)
+
+1. Los scripts `test` de cada package de `efeonce-globe` **enumeran archivos a mano**. Un test nuevo que no
+   se registra **nunca corre**, y la suite queda verde por no haber mirado. Al agregar un test, registrarlo.
+2. Un `execute` síncrono puede exceder el timeout de transporte del **cliente** y completar bien en el
+   **servidor**. Leerlo como fallo y reintentar gasta créditos de nuevo: leer el estado antes de reintentar.
+3. Un negativo private-ingest con un hash **inexistente** prueba muchísimo menos que uno con un hash que sí
+   está en el store como input. La versión válida declara el output retenido de una corrida como input de
+   otra y agrega el control de que el output propio de esa corrida **sí** se sirve.
+4. Acceso privilegiado temporal: grant acotado → verificar → revocar → **verificar el corte**, sin asumir
+   que la revocación propagó. En este rollout fueron tres ventanas de `tokenCreator` y tres cortes
+   verificados.
+
 ## Active state — 2026-07-21 (TASK-1508: Cloud Run bajo Terraform + cap de 1 instancia corregido)
 
 Los dos servicios Cloud Run **entraron a Terraform** por import brownfield, sin un solo destroy/replace, y
@@ -194,6 +329,16 @@ primer rollout prendió los flags en `studio-web` (inertes) y dio `aiplatform.us
 `GLOBE_LAB_ENABLED=true` · `GLOBE_LAB_PROVIDER=composite` ·
 `GLOBE_LAB_INPUT_BUCKET=efeonce-globe-lab-evidence` · `GLOBE_LAB_OMNI_EDITABLE=false` ·
 `GLOBE_LAB_DAILY_CAP_CREDITS=200`. `studio-web` quedó con el Lab **apagado** (`fake`, disabled).
+
+*(Delta 2026-07-22 — `TASK-1503`: ese mismo servicio suma hoy el output side del Producer con **dos**
+variables seteadas en la revisión, `GLOBE_PRODUCER_ASSETS_ENABLED=true` · `GLOBE_PRODUCER_GRANT_SECRET` =
+`secretRef:globe-producer-grant-secret:latest`, y corre la revisión `globe-api-internal-00017-xfm`. La
+tercera variable del output side, `GLOBE_PRODUCER_GRANT_TTL_SECONDS`, **no está seteada acá**: el TTL
+efectivo son los 300 s del default en código, así que un `describe` de esta revisión muestra dos, no tres.
+Vive acá por el mismo motivo que el Lab —quién lleva la capability, no dónde se desplegó el binario—,
+aunque a diferencia del Lab su capability es de gasto cero.
+Detalle, rollback y gates: el bloque **Active state — 2026-07-22 (TASK-1503 …)** al inicio de este
+archivo.)*
 
 ### Verificado en vivo contra el servicio desplegado (no sólo por el seam local)
 

@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Bootstrap de repositorio y proyecto GCP completado; foundation runtime en construcción`
+- Status real: `Runtime interno vivo (front door + Cloud Run bajo IaC + persistencia durable); el output side del Creative Producer opera por API en internal_smoke; superficie humana (TASK-1505) y habilitación externa (TASK-1480) pendientes`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `Efeonce Creative Technology / Product`
@@ -75,6 +75,16 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
   calibración, pilotos por modo y commercial approval. `TASK-1480` no habilita clientes sin sign-off explícito.
 - `TASK-1484` — **monetización bloqueada:** implementa packages/billing/tax/revenue/payments sólo después de
   un `commercial_decision_record` aplicable; tampoco habilita cobros/clientes sin rollout posterior.
+- `TASK-1500…1505` — **Creative Producer (superficie hermana del Workbench).** `TASK-1500` (catálogo de rutas
+  gobernado), `TASK-1501` (contrato discriminado por modalidad) y `TASK-1502` (estimate previewable) quedaron
+  completas el 2026-07-20. `TASK-1503` ✅ **completa (2026-07-22) y viva en el runtime interno:** el output side
+  —traer los bytes de un candidato ya generado, marcarlo favorito y copiarlo como referencia— bajo la capability
+  propia `globe.producer.assets.operate`, de **gasto cero** y deliberadamente separada de
+  `globe.lab.experiment.run`. Corre en `globe-api-internal` rev `00017-xfm` con
+  `GLOBE_PRODUCER_ASSETS_ENABLED=true` (default en git), el secreto HMAC `globe-producer-grant-secret` con
+  accessor sólo a `api_runtime` y la migración `0003` aplicada; `ui`/`mcp` siguen `policy-blocked`. `TASK-1504`
+  (capability expansion) y `TASK-1505` (Producer Surface) siguen `to-do`: `TASK-1505` es el gate del humano
+  interno y no habilita clientes externos.
 - `TASK-1506` — **frontend hosting and front door decision (RESUELTA — ADR-004).** Gate P0 cerrado: la ADR
   `EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md` mantiene Cloud Run como web/BFF para la release
   internal-only (rechaza migrar a Vercel), adopta el servidor Node nativo (Next.js `superseded` para el shell
@@ -156,7 +166,7 @@ precios públicos y wallet self-serve permanecen posteriores a la calibración y
 - [ ] Existe al menos una prueba `efeonce-managed` y una simulación co-operated/client-operated sobre el mismo template/run contract, con responsabilidades, escalamiento y métricas diferenciadas.
 - [ ] Existe un set de fixtures/evals que incluye al menos un caso de set/practical + actuación/foley y uno de microescena flexible; la selección de motor queda explicable.
 - [ ] Integración sister-platform se limita a contrato versionado/documentado y no introduce base de datos, sesión o secret compartido.
-- [ ] Habilitar a un cliente, pago/tax o publicación automática permanece bloqueado hasta sus decisiones de legal/finance/rights y sus tasks de rollout.
+- [ ] Habilitar a un cliente, pago/tax o publicación automática permanece bloqueado hasta sus decisiones de legal/finance/rights y sus tasks de rollout. Además existe un bloqueo duro en código **sin dueño declarado**: `readStudioRuntimeConfig` lanza `globe_environment_not_internal_smoke` para cualquier `GLOBE_ENVIRONMENT` distinto de `internal_smoke`, así que hoy no existe forma de bootear un runtime comercial (detectado en `TASK-1503`; `TASK-1480` no lo menciona y ninguna task lo sostiene).
 
 ## Non-goals
 
@@ -328,3 +338,103 @@ servicios + single-writer deploy ownership; ahí se pinean ingress, `maxScale` e
 es internal-only: **no** habilita Production ni clientes externos (gate `TASK-1480`). Spec:
 `docs/tasks/complete/TASK-1507-globe-internal-front-door-alb-terraform.md`; continuidad de runtime en
 `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
+
+## Delta 2026-07-22 — TASK-1503 complete (el output side del Creative Producer, vivo en el runtime interno)
+
+`TASK-1503` queda **complete, desplegada y verificada en vivo (2026-07-22)**: el Creative Producer deja de
+terminar en "la pieza existe" y pasa a hacerla **usable**. Cierra el output side —traer los bytes de un
+candidato ya generado, marcarlo favorito y copiarlo como referencia para un refine— con **gasto cero** bajo una
+capability propia, `globe.producer.assets.operate` (la que llevó `GLOBE_CAPABILITIES` de 11 a 12 entradas). No reusa
+`globe.lab.experiment.run` a propósito: esa autoridad es de gasto y vive en el workload principal, y descargar
+lo que uno ya produjo no debe implicar poder facturarle a un proveedor. Los ids viven en un mapa propio
+(`GLOBE_PRODUCER_ASSET_READERS` = `output`/`assets`, `GLOBE_PRODUCER_ASSET_COMMANDS` =
+`favorite`/`copyAsReference`), separado del `GLOBE_PRODUCER_READERS` del catálogo de `TASK-1500`, que responde
+a otra capability: conflacionarlos habría metido dos autoridades en un mismo vocabulario.
+
+**La pieza load-bearing es `authorizeOwnedOutput`.** El store es content-addressed y **tenant-blind** —el
+nombre del objeto ES el hash, un bucket para todos los workspaces— y guarda tanto outputs como bytes de
+referencias private-ingest, así que la autoridad no puede venir del store: la pone el dominio, gateando contra
+`store.get(workspaceId, experimentId)` —el **mismo** `ExperimentStorePort` del Lab, no un índice paralelo— y
+matcheando sólo `outputHashes` de un attempt con `outcome==='candidate_ready'` y `outputsRetained===true`;
+nunca consulta `authorizedInputHashes`. Todo rechazo de propiedad colapsa a `not_found`: cross-workspace, id desconocido,
+hash que sólo fue input y candidato no retenido quedan indistinguibles desde afuera. Cualquier respuesta más
+fina sería un oráculo para sondear un bucket compartido.
+
+El acceso se materializa con un **grant opaco server-minted** (`RetrievalGrantSignerPort` + HMAC-SHA256),
+firmado y no cifrado —sus claims son cosas que el caller ya sabe—, atado a
+`(workspaceId, experimentId, sha256, disposition)` con TTL corto (300 s por defecto, rango 30–900),
+verificación stateless y comparación en tiempo constante. Viaja en query porque la UI necesita un `src`
+directo, y eso no abre un hueco porque **no es un bearer autosuficiente**: `GET /v1/outputs/:sha256` autentica
+antes y **re-ejecuta `authorizeOwnedOutput` después** —defense in depth: un candidato que dejó de ser
+recuperable deja de ser servible aunque el grant siga vivo—, luego sirve con `Content-Type` del objeto real,
+`Content-Disposition` de nombre neutro (`globe-<hash12>.<ext>`, sin vendor) y
+`Cache-Control: private, no-store`. El kill switch corre primero y outranks al grant. El grant nunca se loggea
+ni entra a un audit event. La ruta reusa el mismo helper del reader y el mismo `handlerErrorToApiCode` del
+dispatch: un primitivo, dos transportes, sin política duplicada.
+
+**La degradación es deliberada:** cualquier `OutputRetrievalError` (`not_found` / `unreadable` /
+`integrity_mismatch`) colapsa a `dependency_unavailable` retryable. Nunca 200 con cuerpo vacío, y nunca
+`not_found`: el dominio acaba de certificar que el candidato existe, y contradecir el descriptor mandaría a un
+operador a cazar un fantasma. El seam de lectura (`OutputRetrievalPort` / `GcsOutputRetrieval`) es el **tercer**
+lector del store —distinto de `GcsInputResolver`, que alimenta a un provider dentro de un run pagado, detrás
+del fence—, usa el mismo bucket, el mismo token keyless (ADC/WIF) y el mismo naming que `GcsOutputIngest`, y
+re-verifica `sha256(bytes)` contra lo declarado antes de devolver.
+
+Las **asset actions** no mueven bytes por la API ni consumen crédito: `favorite` toma el estado deseado
+explícito —nunca un toggle ciego— y conserva el timestamp original en un repeat; `copyAsReference` certifica un
+`ProducerReferenceHandleV1` con `rights:'derived-internal'` **inforjable** —un caller no puede declararlo— y
+`parentRights` heredado por `inheritedDerivedRights`, la misma función que usa el edit base del Lab, para que
+un ancestro `licensed` no deje de restringir en una sola de las dos derivaciones; falla cerrado antes de
+mintear si el medio no es referenciable (`model-3d`). `ProducerOutputMediaType`
+(`image|video|audio|model-3d`) es propio y no es `LabInputMediaType` (`image|video|audio|text`): el `mediaType`
+se deriva de la capability semántica del run, pero el `Content-Type` servido sale del objeto real, así un run
+multi-output no miente en el cable.
+
+**Delta al spec, con su razón:** las anotaciones quedaron **durables** en lugar de in-memory. El spec las
+difería a `TASK-1465`, que ya shipeó sin cubrirlas, y con los servicios en 3 réplicas (`TASK-1508`) un store
+in-memory no queda "volátil" sino **no determinista** —una estrella escrita en una réplica es invisible en
+otra—. Entró `AssetAnnotationStorePort` + `DurableProducerAssetStore` + migración
+`0003_producer_asset_annotations.sql`, con la idempotencia en SQL (`ON CONFLICT DO NOTHING` + re-lectura) y no
+en un read-then-write, que entre réplicas es una carrera cuyo síntoma visible es un `referenceId` duplicado o
+una estrella re-fechada; `rights='derived-internal'` es un CHECK, no una convención.
+
+**Runtime vivo:** servicio `globe-api-internal`, revisión `00017-xfm`, imagen `:b12451db2d6e`, desplegada por
+`deploy-internal.yml` (run `29908442357`, OIDC→WIF→`globe-deployer`), con `tofu plan` en **No changes** y la
+revisión conservando `maxScale 3` —el drift-trap que cerró `TASK-1508` sigue cerrado—.
+`GLOBE_PRODUCER_ASSETS_ENABLED` es variable Terraform (`producer_assets_enabled`) con default **true en git**
+(`variables.tf`) y no en el `terraform.tfvars` gitignoreado: un flag cuyo estado real vive en un archivo sin
+trackear es el mismo problema de estado efímero que moverlo con `gcloud`, mejor disfrazado.
+`GLOBE_PRODUCER_GRANT_SECRET` vive en Secret Manager (`globe-producer-grant-secret`; contenedor y accessor en
+Terraform, valor out-of-band) con accessor **sólo a `api_runtime`** —`web_runtime` no tiene consumidor hasta el
+gate de `TASK-1505`— y sin él el mint degrada fail-closed a `dependency_unavailable`. La capability vive en el
+servicio API y **no** en el web por **autoridad, no por despliegue**: en modo web las capabilities de una
+persona salen del broker de Greenhouse, que no otorga `globe.producer.assets.operate`.
+Coverage `PRODUCER_ASSETS_COVERAGE`: `ui`/`mcp` `policy-blocked`; `http`/`sdk`/`cli`/`worker`/`e2e`
+`available`; `sister-platform` `not-applicable`. SDK: `getProducerOutput` / `listProducerAssets` /
+`favoriteProducerAsset` / `copyProducerAssetAsReference`.
+
+**Gates hacia comercial (identificados, no inventados).** Para que esta capability le sirva a un **humano
+interno** falta `TASK-1505`: el broker de Greenhouse debe otorgar la capability y hay que flipear `ui`/`mcp`.
+Para **cliente externo** manda `TASK-1480`, bloqueada por `TASK-1477`, `TASK-1478`, `TASK-1479` y `TASK-1482`
+(sobre `TASK-1468`) — las cinco en `to-do`. La contabilidad comercial sigue siendo el carril
+`TASK-1468` → `TASK-1482`: el spend fence es de **seguridad**, no ledger; el retrieval es gasto cero y no lo
+necesita, el Producer completo sí.
+
+**Dependencia identificada sin dueño.** `readStudioRuntimeConfig` **lanza**
+`globe_environment_not_internal_smoke` para cualquier `GLOBE_ENVIRONMENT` distinto de `internal_smoke`, de modo
+que hoy no existe forma de bootear un runtime comercial. Ninguna task del programa sostiene ese ensanche y
+`TASK-1480` no lo menciona: es un bloqueo duro en código sin dueño declarado, y las otras cuatro dependencias
+de `TASK-1480` pueden avanzar en paralelo sin resolverlo, pero ninguna lo resuelve. Queda registrado acá como
+lo que es —una dependencia detectada, no una task ni un dueño asignado— hasta que el programa decida quién la
+toma. `internal_smoke` es el **estadio actual del runtime**, no el techo del producto.
+
+**Lecciones de método que dejó este rollout** y que aplican al resto del programa: los scripts `test` de cada
+package de `efeonce-globe` enumeran archivos a mano, así que un test nuevo no registrado nunca corre y la suite
+queda verde por no haber mirado; un `execute` síncrono puede exceder el timeout de transporte del **cliente** y
+completar bien en el **servidor**, así que leerlo como fallo y reintentar gasta créditos de nuevo —hay que leer
+el estado antes—; un negativo private-ingest con un hash inexistente prueba muchísimo menos que uno con un hash
+que sí está en el store como input, y la versión válida declara el output retenido de una corrida como input de
+otra y agrega el control de que el output propio de esa corrida sí se sirve; y el acceso privilegiado temporal
+se opera como grant acotado → verificar → revocar → **verificar el corte**, sin asumir que la revocación
+propagó. Spec: `docs/tasks/complete/TASK-1503-globe-governed-output-retrieval-asset-actions.md` +
+`docs/architecture/creative-studio/EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md`.

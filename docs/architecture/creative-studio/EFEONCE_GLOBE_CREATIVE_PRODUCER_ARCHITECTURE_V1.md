@@ -201,7 +201,7 @@ El **output side**: lo que hace *usable* una pieza ya generada. Se apoya en el s
 dejó `TASK-1490` (write half) y agrega su **espejo servible** gobernado.
 
 - **Capability propia, de gasto cero:** `globe.producer.assets.operate` (`GLOBE_PRODUCER_ASSETS_CAPABILITY`,
-  12.ª de `GLOBE_CAPABILITIES`). **Deliberadamente NO** reusa `globe.lab.experiment.run`: esa es autoridad de
+  la que llevó `GLOBE_CAPABILITIES` de 11 a 12 entradas). **Deliberadamente NO** reusa `globe.lab.experiment.run`: esa es autoridad de
   **gasto** y vive en el principal workload (api-mode), mientras que descargar o marcar lo que ya produjiste
   debe ser alcanzable por un humano sin conferir jamás la capacidad de facturar a un proveedor. Ids en su
   propio mapa (`GLOBE_PRODUCER_ASSET_READERS` / `..._COMMANDS`), separado de `GLOBE_PRODUCER_READERS` (el
@@ -211,7 +211,7 @@ dejó `TASK-1490` (write half) y agrega su **espejo servible** gobernado.
   outputs como bytes de referencias private-ingest**. La autoridad no puede venir de ahí: viene del dominio,
   gateando contra `store.get(workspaceId, experimentId)` (el **mismo** `ExperimentStorePort` del Lab, no un
   índice paralelo) y matcheando **sólo** `outputHashes` de un attempt `candidate_ready` con
-  `outputsRetained === true`. **NUNCA** consulta `authorizedInputHashes`. Todo rechazo colapsa a
+  `outputsRetained === true`. **NUNCA** consulta `authorizedInputHashes`. Todo rechazo **de propiedad** colapsa a
   `capability_not_found → not_found` — cross-workspace, id desconocido, hash que sólo fue input y candidato no
   retenido son **indistinguibles desde afuera**; cualquier respuesta más fina es un oráculo para sondear un
   bucket compartido.
@@ -226,8 +226,9 @@ dejó `TASK-1490` (write half) y agrega su **espejo servible** gobernado.
   **stateless** en tiempo constante. **No es un bearer autosuficiente**: viaja en query porque la UI necesita
   un `src` directo, y eso es aceptable precisamente porque la ruta autentica **antes** y re-chequea propiedad
   **después**. Nunca se loggea ni entra a un audit event.
-- **Ruta de transporte `GET /v1/outputs/:sha256?experiment=…&grant=…&disposition=…`** (`app.ts`): kill switch →
-  auth (`resolveDispatchPrincipal`) → **gate 1** grant (HMAC + expiry + claims) → **gate 2**
+- **Ruta de transporte `GET /v1/outputs/:sha256?experiment=…&grant=…&disposition=…`** (`app.ts`): auth
+  (`resolveDispatchPrincipal`, **en el router**, antes de entrar a `serveOutput`) → kill switch →
+  **gate 1** grant (HMAC + expiry + claims) → **gate 2**
   `deriveTrustedContext(workspaceSelection = claims.workspaceId)` (un grant filtrado a otro usuario autenticado
   no resuelve) → **gate 3** `authorizeOwnedOutput` **re-ejecutado** (un candidato que dejó de ser recuperable
   deja de ser servible aunque el grant siga vivo) → stream con `Content-Type` + `Content-Disposition`
@@ -371,7 +372,9 @@ los primitivos compartidos**:
 - **NUNCA** retornar bytes crudos de referencia por la API ni servir un asset cross-workspace en retrieval.
 - **NUNCA** autorizar un retrieval contra el store de objetos (es tenant-blind y guarda outputs **y** bytes de
   referencias de entrada): la puerta es `authorizeOwnedOutput` contra los `outputHashes` retenidos que el
-  workspace posee, y **jamás** contra `authorizedInputHashes`. Todo rechazo colapsa a `not_found`.
+  workspace posee, y **jamás** contra `authorizedInputHashes`. Todo rechazo **de propiedad** colapsa a
+  `not_found` — el carve-out deliberado es el grant forjado/vencido, que es `access_denied`: no probar
+  autorización no dice nada sobre si el asset existe.
 - **NUNCA** duplicar la política de autorización dentro de la ruta de serving: reusa el mismo helper del
   reader (un primitivo, dos transportes) y re-chequéalo en la redención, además de verificar el grant.
 - **NUNCA** devolver `200` con cuerpo vacío ni `not_found` cuando el store falla en retrieval: degrada a
