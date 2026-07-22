@@ -111,6 +111,8 @@ async function main() {
   })
 
   const { upsertSisterPlatformOAuthClient } = await import('@/lib/sister-platforms/oauth-broker')
+  const { buildGlobeOAuthGrantContract } = await import('@/lib/sister-platforms/globe-oauth-grants')
+  const grantContract = buildGlobeOAuthGrantContract('producer')
 
   const oauthClient = await upsertSisterPlatformOAuthClient({
     sisterPlatformConsumerId: consumer.consumer.consumerId,
@@ -118,23 +120,12 @@ async function main() {
     clientName: 'Efeonce Globe Internal Studio',
     clientStatus,
     redirectUris: [redirectUri],
-    allowedScopes: ['openid', 'profile', 'email', 'globe.studio.access'],
+    allowedScopes: grantContract.allowedScopes,
     codeTtlSeconds: 300,
     accessTokenTtlSeconds: 300,
     requirePkce: true,
     issueIdentityInline: true,
-    policy: {
-      schemaVersion: '1',
-      audience: { tenantTypes: ['efeonce_internal'] },
-      requiredScopes: ['openid', 'globe.studio.access'],
-      capabilityScopes: ['globe.studio.access'],
-      claims: { includeGreenhouseRoles: false },
-      revocation: {
-        mode: 'userinfo_revalidation',
-        revalidateAfterSeconds: 60,
-        requireOnPrivilegedAction: true
-      }
-    },
+    policy: grantContract.policy,
     metadata: { source: 'scripts/seed-globe-internal-pilot.ts', taskId: 'TASK-1454' },
     actorUserId
   })

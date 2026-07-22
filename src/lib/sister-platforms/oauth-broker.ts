@@ -159,6 +159,12 @@ export type UpsertSisterPlatformOAuthClientInput = {
   actorUserId?: string | null
 }
 
+export type UpdateSisterPlatformOAuthGrantPolicyInput = {
+  clientId: string
+  allowedScopes: string[]
+  policy: SisterPlatformOAuthPolicyV1
+}
+
 export class SisterPlatformOAuthError extends Error {
   statusCode: number
   errorCode: string
@@ -634,6 +640,117 @@ export const updateSisterPlatformOAuthRedirectUris = async (input: {
       previousRedirectUris.some((uri, index) => uri !== nextRedirectUris[index])
   }
 }
+
+/**
+ * Replace ONLY the scopes + capability policy of an existing OAuth client.
+ *
+ * This is the grant-policy counterpart to `updateSisterPlatformOAuthRedirectUris`: an active
+ * sister-platform client cannot be safely promoted with the full upsert because doing so would
+ * restate and potentially overwrite its redirect allowlist, TTLs, status and metadata. The pilot
+ * seed also rotates the consumer credential, which is explicitly forbidden for a grant rollout.
+ *
+ * Calling this function again with the returned previous values is the rollback. No authorization
+ * code, access token, consumer credential or redirect URI is read or changed here.
+ */
+export const updateSisterPlatformOAuthGrantPolicy = async (
+  input: UpdateSisterPlatformOAuthGrantPolicyInput
+) => {
+  const clientId = input.clientId.trim().toLowerCase()
+
+  if (!clientId) {
+    throw new SisterPlatformOAuthError('clientId is required.', { errorCode: 'invalid_client' })
+  }
+
+  const allowedScopes = normalizeAllowedScopes(input.allowedScopes)
+  const policy = parseSisterPlatformOAuthPolicy(input.policy)
+
+  assertSisterPlatformOAuthPolicyScopes(policy, allowedScopes)
+
+  let previousAllowedScopes: string[] = []
+  let previousPolicy: SisterPlatformOAuthPolicyV1 | undefined
+  let changed = false
+
+  await withTransaction(async pgClient => {
+    const existing = await pgClient.query<{
+      oauth_client_id: string
+      allowed_scopes: string[] | null
+      policy_json: unknown
+    }>(
+      `
+        SELECT sister_platform_oauth_client_id AS oauth_client_id, allowed_scopes, policy_json
+        FROM greenhouse_core.sister_platform_oauth_clients
+        WHERE lower(client_id) = lower($1)
+        LIMIT 1
+        FOR UPDATE
+      `,
+      [clientId]
+    )
+
+    const row = existing.rows[0]
+
+    if (!row) {
+      throw new SisterPlatformOAuthError('OAuth client not found.', {
+        statusCode: 404,
+        errorCode: 'invalid_client'
+      })
+    }
+
+    previousAllowedScopes = normalizeStringArray(row.allowed_scopes, DEFAULT_ALLOWED_SCOPES)
+
+    try {
+      previousPolicy = parseSisterPlatformOAuthPolicy(row.policy_json)
+      assertSisterPlatformOAuthPolicyScopes(previousPolicy, previousAllowedScopes)
+    } catch (error) {
+      if (error instanceof SisterPlatformOAuthPolicyError) {
+        throw new SisterPlatformOAuthError('OAuth client policy is unavailable.', {
+          statusCode: 503,
+          errorCode: error.errorCode
+        })
+      }
+
+      throw error
+    }
+
+    changed =
+      !sameStringArray(previousAllowedScopes, allowedScopes) ||
+      JSON.stringify(previousPolicy) !== JSON.stringify(policy)
+
+    if (!changed) return
+
+    await pgClient.query(
+      `
+        UPDATE greenhouse_core.sister_platform_oauth_clients
+        SET
+          allowed_scopes = $2::text[],
+          policy_json = $3::jsonb,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE sister_platform_oauth_client_id = $1
+      `,
+      [row.oauth_client_id, allowedScopes, JSON.stringify(policy)]
+    )
+  })
+
+  const client = await loadSisterPlatformOAuthClient(clientId)
+
+  if (!client) {
+    throw new SisterPlatformOAuthError('Unable to reload OAuth client after grant policy update.', {
+      statusCode: 500,
+      errorCode: 'client_reload_failed'
+    })
+  }
+
+  return {
+    client,
+    previousAllowedScopes,
+    previousPolicy: previousPolicy as SisterPlatformOAuthPolicyV1,
+    allowedScopes,
+    policy,
+    changed
+  }
+}
+
+const sameStringArray = (left: readonly string[], right: readonly string[]) =>
+  left.length === right.length && left.every((value, index) => value === right[index])
 
 const assertClientActive = (client: SisterPlatformOAuthClient) => {
   if (client.clientStatus !== 'active') {

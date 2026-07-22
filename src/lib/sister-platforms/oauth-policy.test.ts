@@ -8,11 +8,18 @@ import {
   SisterPlatformOAuthPolicyError
 } from './oauth-policy'
 
+const globeCapabilities = [
+  'globe.studio.access',
+  'globe.producer.catalog.read',
+  'globe.lab.experiment.run',
+  'globe.producer.assets.operate'
+] as const
+
 const globePolicyInput = {
   schemaVersion: '1',
   audience: { tenantTypes: ['efeonce_internal'] },
-  requiredScopes: ['openid', 'globe.studio.access'],
-  capabilityScopes: ['globe.studio.access'],
+  requiredScopes: ['openid', ...globeCapabilities],
+  capabilityScopes: [...globeCapabilities],
   claims: { includeGreenhouseRoles: false },
   revocation: {
     mode: 'userinfo_revalidation',
@@ -30,12 +37,12 @@ describe('sister platform OAuth policy', () => {
         active: true,
         status: 'active',
         tenantType: 'efeonce_internal',
-        requestedScopes: ['openid', 'profile', 'email', 'globe.studio.access']
+        requestedScopes: ['openid', 'profile', 'email', ...globeCapabilities]
       })
     ).toEqual({ allowed: true })
-    expect(resolveSisterPlatformOAuthCapabilities(policy, ['openid', 'globe.studio.access'])).toEqual([
-      'globe.studio.access'
-    ])
+    expect(resolveSisterPlatformOAuthCapabilities(policy, ['openid', ...globeCapabilities])).toEqual(
+      globeCapabilities
+    )
   })
 
   it('denies a client tenant even when the caller requests the Globe scope', () => {
@@ -46,7 +53,7 @@ describe('sister platform OAuth policy', () => {
         active: true,
         status: 'active',
         tenantType: 'client',
-        requestedScopes: ['openid', 'globe.studio.access']
+        requestedScopes: ['openid', ...globeCapabilities]
       })
     ).toEqual({ allowed: false, errorCode: 'audience_not_allowed' })
   })

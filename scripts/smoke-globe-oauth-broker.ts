@@ -26,6 +26,8 @@ const redirectUri = requireEnv('GLOBE_OAUTH_REDIRECT_URI')
 
 async function main() {
   const broker = await import('@/lib/sister-platforms/oauth-broker')
+  const { buildGlobeOAuthGrantContract } = await import('@/lib/sister-platforms/globe-oauth-grants')
+  const grantContract = buildGlobeOAuthGrantContract('producer')
   const { getTenantAccessRecordForAgent } = await import('@/lib/tenant/access')
   const tenant = await getTenantAccessRecordForAgent('agent@greenhouse.efeonce.org')
 
@@ -43,7 +45,7 @@ async function main() {
   requestUrl.searchParams.set('client_id', 'globe')
   requestUrl.searchParams.set('redirect_uri', redirectUri)
   requestUrl.searchParams.set('response_type', 'code')
-  requestUrl.searchParams.set('scope', 'openid profile email globe.studio.access')
+  requestUrl.searchParams.set('scope', grantContract.allowedScopes.join(' '))
   requestUrl.searchParams.set('state', randomBytes(24).toString('base64url'))
   requestUrl.searchParams.set('nonce', randomBytes(24).toString('base64url'))
   requestUrl.searchParams.set('code_challenge', challenge(verifier))
@@ -149,7 +151,9 @@ async function main() {
     JSON.stringify({
       internalIdentityAllowed:
         initialUserinfo.identity.organization.tenantType === 'efeonce_internal' &&
-        initialUserinfo.identity.capabilities.includes('globe.studio.access') &&
+        grantContract.policy.capabilityScopes.every(capability =>
+          initialUserinfo.identity.capabilities.includes(capability)
+        ) &&
         initialUserinfo.identity.roles.length === 0,
       replayDenied,
       explicitlyRevokedCount: explicitRevocation.revokedCount,
