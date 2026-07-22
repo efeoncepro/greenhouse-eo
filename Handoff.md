@@ -53,26 +53,16 @@
   revisiones Ready, smoke auth/tenant/idempotency y readback de versiones+audit verdes. Detalle en
   `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`; clientes externos y producción siguen bloqueados.
 
-- **`TASK-1509` / `TASK-1510` IN-PROGRESS (Native Meeting Scheduler, `EPIC-023`).** Objetivos load-bearing:
-  TASK-1509 está code-complete; TASK-1510 entrega **Temporal Operations Desk** adaptable, timezone local, validación
-  corporativa reactiva y confirmación receipt-gated sin PII. `open_meeting_scheduler` abre una instancia dialog/full-screen;
-  `book_meeting` sigue navigation-only. Pruebas, TypeScript, ESLint, build y GVC premium están verdes.
+- **`TASK-1509` / `TASK-1510` IN-PROGRESS (Native Meeting Scheduler, `EPIC-023`).** TASK-1509 está code-complete y
+  `/agenda/` (WP `251583`, `noindex`) opera native-only con flags ON y binding piloto `active`. El release inmutable
+  `2fbea2b39b555c5762e6` pasó GVC live 2048/1440/820/390, overflow, teclado y reduced motion; no se creó booking.
+  Greenhouse sigue como API y HubSpot/Office 365/Teams como SoT. GTM workspace 6 no está publicado; Contacto/RRSS
+  siguen gateados por booking/replay, `/g/collect` y autorización GTM. Evidencia y detalle viven en TASK-1510.
 
-  Ambos flags están ON en staging/Production y el binding piloto está `active`. `/agenda/` (WP `251583`, `noindex`)
-  opera native-only: sin fallback visible a HubSpot, con header/footer globales, un H1 y canvas enfocado. El carril
-  `command` ya no recorta la órbita ni `Conversemos`, y usa el glifo monocromo de Teams. GVC live pasó
-  2048/1440/820/390, overflow, teclado y reduced motion; no se creó un booking durante esos checks.
-  El loader estable vive en `efeonce-public-renderers`; renderer e iconos comparten el release inmutable
-  `2fbea2b39b555c5762e6` y Greenhouse queda como API. HubSpot actualmente devuelve cero slots para agosto, por lo que
-  el renderer conserva mes, grilla y estado vacío. Backups, runs y capturas quedan en TASK-1510 y su arquitectura.
-  GTM workspace 6 sigue sin versión/publicación. No promover a Contacto/RRSS antes del booking/replay y `/g/collect`;
-  publicar GTM requiere confirmación humana separada. HubSpot/Office 365/Teams siguen SoT. La skill canónica nueva es
-  `greenhouse-growth-meetings`; arquitectura, PDR, CTA/GTM/release, manuales e índices quedaron sincronizados.
-  **Decisión posterior 2026-07-22:** `EPIC-035` formaliza Efeonce Embed Runtime para Forms/CTAs/Meetings. Firebase
-  Hosting es target detrás de `assets.efeoncepro.com`, pero no está provisionado ni live: primero se corrige la carrera
-  manifest/asset del carril Vercel, luego spike WIF+preview→clone+rollback y dual-publish. Vercel permanece fallback.
-  Canon: `GREENHOUSE_EFEONCE_EMBED_RUNTIME_{DELIVERY_DECISION,ARCHITECTURE}_V1.md`. Ejecución registrada en cinco
-  unidades secuenciales: `TASK-1514` foundation → `1515` Firebase → `1516` Meetings → `1517` Forms → `1518` CTA/cierre.
+  **Decisión 2026-07-22:** `EPIC-035` formaliza Embed Runtime para Forms/CTAs/Meetings. TASK-1515 habilita Firebase en
+  el proyecto existente `efeonce-group` y crea un Hosting site/publisher dedicados; no crea proyecto paralelo. La
+  mutación Firebase no es completamente reversible, aunque el cutover sí. Vercel permanece fallback. Canon:
+  `GREENHOUSE_EFEONCE_EMBED_RUNTIME_{DELIVERY_DECISION,ARCHITECTURE}_V1.md`; ejecución `TASK-1514`→`1518`.
 
 - **`TASK-1366` COMPLETE / CONDITIONAL PASS (HubSpot Scheduler Booking Equivalence Spike, `EPIC-023`).**
   Build HubSpot `#27` desplegado/reinstalado con scope Scheduler mínimo y sin rotar el token gobernado. Booking

@@ -48,7 +48,8 @@ Registro canónico de asignación de IDs `EPIC-###` para evitar colisiones y ren
 | `EPIC-032` | `to-do` | `docs/epics/to-do/EPIC-032-notion-work-management-control-plane.md` |
 | `EPIC-033` | `complete` | `docs/epics/complete/EPIC-033-premium-agentic-ui-platform.md` |
 | `EPIC-034` | `to-do` | `docs/epics/to-do/EPIC-034-growth-promotions-orchestration.md` |
+| `EPIC-035` | `to-do` | `docs/epics/to-do/EPIC-035-efeonce-embed-runtime.md` |
 
 ## Siguiente ID disponible
 
-- `EPIC-035`
+- `EPIC-036`

@@ -1,6 +1,6 @@
 # Public Renderer Artifact Delivery Decision V1
 
-- Status: Accepted
+- Status: Superseded by [Efeonce Embed Runtime Delivery Decision V1](GREENHOUSE_EFEONCE_EMBED_RUNTIME_DELIVERY_DECISION_V1.md)
 - Date: 2026-07-22
 - Owner: Growth / Public Site / Platform
 - Scope: portable public renderers; first adopter is Growth Meetings
