@@ -12,7 +12,18 @@ const globeCapabilities = [
   'globe.studio.access',
   'globe.producer.catalog.read',
   'globe.lab.experiment.run',
-  'globe.producer.assets.operate'
+  'globe.producer.assets.operate',
+  'globe.producer.library.read',
+  'globe.producer.library.manage',
+  'globe.producer.library.export',
+  'globe.producer.review.read',
+  'globe.producer.review.decide',
+  'globe.producer.comment.manage',
+  'globe.producer.share.manage',
+  'globe.voice.preset.manage',
+  'globe.lab.recipe.author',
+  'globe.credits.read',
+  'globe.credits.estimate'
 ] as const
 
 const globePolicyInput = {
@@ -40,9 +51,7 @@ describe('sister platform OAuth policy', () => {
         requestedScopes: ['openid', 'profile', 'email', ...globeCapabilities]
       })
     ).toEqual({ allowed: true })
-    expect(resolveSisterPlatformOAuthCapabilities(policy, ['openid', ...globeCapabilities])).toEqual(
-      globeCapabilities
-    )
+    expect(resolveSisterPlatformOAuthCapabilities(policy, ['openid', ...globeCapabilities])).toEqual(globeCapabilities)
   })
 
   it('denies a client tenant even when the caller requests the Globe scope', () => {

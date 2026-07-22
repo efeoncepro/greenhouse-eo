@@ -8,19 +8,31 @@ export const GLOBE_OIDC_SCOPES = ['openid', 'profile', 'email'] as const
 export const GLOBE_SHELL_CAPABILITY_SCOPES = ['globe.studio.access'] as const
 
 /**
- * Exact internal Producer grant for TASK-1519's broker slice.
+ * Exact internal Producer grant. This is the non-operator creative role: it can create,
+ * organize, review and share its workspace's outputs, but cannot purge assets, administer
+ * commercial credit, reveal provider-house classification or promote models.
  *
  * Deliberately excluded:
  * - `globe.producer.route.reveal_house` (operator-only classification)
  * - `globe.lab.evaluation.run` (evaluation harness, not Producer)
- * - `globe.voice.preset.manage` (promote only when its owner is runtime-ready)
  * - every MCP capability/surface
  */
 export const GLOBE_PRODUCER_CAPABILITY_SCOPES = [
   'globe.studio.access',
   'globe.producer.catalog.read',
   'globe.lab.experiment.run',
-  'globe.producer.assets.operate'
+  'globe.producer.assets.operate',
+  'globe.producer.library.read',
+  'globe.producer.library.manage',
+  'globe.producer.library.export',
+  'globe.producer.review.read',
+  'globe.producer.review.decide',
+  'globe.producer.comment.manage',
+  'globe.producer.share.manage',
+  'globe.voice.preset.manage',
+  'globe.lab.recipe.author',
+  'globe.credits.read',
+  'globe.credits.estimate'
 ] as const
 
 export type GlobeOAuthGrantMode = 'shell-only' | 'producer'

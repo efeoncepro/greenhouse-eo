@@ -7,15 +7,12 @@ const mockPgQuery = vi.fn()
 
 vi.mock('@/lib/db', () => ({
   query: (...args: unknown[]) => mockQuery(...args),
-  withTransaction: async (fn: (client: { query: typeof mockPgQuery }) => Promise<unknown>) =>
-    fn({ query: mockPgQuery })
+  withTransaction: async (fn: (client: { query: typeof mockPgQuery }) => Promise<unknown>) => fn({ query: mockPgQuery })
 }))
 
-const {
-  GLOBE_PRODUCER_CAPABILITY_SCOPES,
-  buildGlobeOAuthGrantContract,
-  updateGlobeOAuthGrantContract
-} = await import('./globe-oauth-grants')
+const { GLOBE_PRODUCER_CAPABILITY_SCOPES, buildGlobeOAuthGrantContract, updateGlobeOAuthGrantContract } = await import(
+  './globe-oauth-grants'
+)
 
 const SHELL_CONTRACT = buildGlobeOAuthGrantContract('shell-only')
 const PRODUCER_CONTRACT = buildGlobeOAuthGrantContract('producer')
@@ -68,22 +65,39 @@ beforeEach(() => {
 })
 
 describe('Globe OAuth grant contract', () => {
-  it('defines exactly shell + catalog + experiment run + assets', () => {
+  it('defines the complete non-operator Producer surface without destructive or admin grants', () => {
     expect(GLOBE_PRODUCER_CAPABILITY_SCOPES).toEqual([
       'globe.studio.access',
       'globe.producer.catalog.read',
       'globe.lab.experiment.run',
-      'globe.producer.assets.operate'
+      'globe.producer.assets.operate',
+      'globe.producer.library.read',
+      'globe.producer.library.manage',
+      'globe.producer.library.export',
+      'globe.producer.review.read',
+      'globe.producer.review.decide',
+      'globe.producer.comment.manage',
+      'globe.producer.share.manage',
+      'globe.voice.preset.manage',
+      'globe.lab.recipe.author',
+      'globe.credits.read',
+      'globe.credits.estimate'
     ])
-    expect(PRODUCER_CONTRACT.policy.requiredScopes).toEqual([
-      'openid',
-      ...GLOBE_PRODUCER_CAPABILITY_SCOPES
-    ])
+    expect(PRODUCER_CONTRACT.policy.requiredScopes).toEqual(['openid', ...GLOBE_PRODUCER_CAPABILITY_SCOPES])
 
     for (const forbidden of [
-      'globe.voice.preset.manage',
       'globe.producer.route.reveal_house',
       'globe.lab.evaluation.run',
+      'globe.producer.library.delete',
+      'globe.credits.allocate',
+      'globe.credits.reserve',
+      'globe.credits.settle',
+      'globe.credits.adjust',
+      'globe.credits.pool.manage',
+      'globe.credits.grant.issue',
+      'globe.credits.policy.manage',
+      'globe.credits.budget.manage',
+      'globe.model-readiness.promote',
       'globe.mcp.access'
     ]) {
       expect(PRODUCER_CONTRACT.allowedScopes).not.toContain(forbidden)

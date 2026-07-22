@@ -13,6 +13,7 @@ import {
   SisterPlatformOAuthPolicyError,
   type SisterPlatformOAuthPolicyV1
 } from './oauth-policy'
+import { resolveGlobeOAuthWorkspaceBindings, type GlobeOAuthWorkspaceBindingV1 } from './oauth-workspace-bindings'
 
 type OAuthClientRow = {
   oauth_client_id: string
@@ -108,6 +109,7 @@ export type SisterPlatformOAuthIdentityPayload = {
     clientName: string
     tenantType: 'client' | 'efeonce_internal'
   }
+  workspaceBindings?: readonly GlobeOAuthWorkspaceBindingV1[]
 }
 
 export type OAuthRequestAuditMetadata = {
@@ -246,7 +248,9 @@ const normalizeRedirectUris = (value: string[]) => {
 }
 
 const normalizeAllowedScopes = (value: string[] | undefined) => {
-  const scopes = Array.from(new Set((value?.length ? value : DEFAULT_ALLOWED_SCOPES).map(scope => scope.trim()).filter(Boolean)))
+  const scopes = Array.from(
+    new Set((value?.length ? value : DEFAULT_ALLOWED_SCOPES).map(scope => scope.trim()).filter(Boolean))
+  )
 
   if (!scopes.includes('openid')) scopes.unshift('openid')
 
@@ -271,8 +275,7 @@ const generateAuthorizationCode = () => `ghspoac_${randomBytes(32).toString('bas
 
 const generateAccessToken = () => `ghspoat_${randomBytes(48).toString('base64url')}`
 
-const buildPkceChallenge = (codeVerifier: string) =>
-  createHash('sha256').update(codeVerifier).digest('base64url')
+const buildPkceChallenge = (codeVerifier: string) => createHash('sha256').update(codeVerifier).digest('base64url')
 
 const mapOAuthClient = (row: OAuthClientRow): SisterPlatformOAuthClient => {
   const allowedScopes = normalizeStringArray(row.allowed_scopes, DEFAULT_ALLOWED_SCOPES)
@@ -652,9 +655,7 @@ export const updateSisterPlatformOAuthRedirectUris = async (input: {
  * Calling this function again with the returned previous values is the rollback. No authorization
  * code, access token, consumer credential or redirect URI is read or changed here.
  */
-export const updateSisterPlatformOAuthGrantPolicy = async (
-  input: UpdateSisterPlatformOAuthGrantPolicyInput
-) => {
+export const updateSisterPlatformOAuthGrantPolicy = async (input: UpdateSisterPlatformOAuthGrantPolicyInput) => {
   const clientId = input.clientId.trim().toLowerCase()
 
   if (!clientId) {
@@ -878,28 +879,61 @@ export const buildSisterPlatformOAuthIdentityPayload = ({
   tenant,
   client,
   requestedScopes,
+  expiresAt,
+  workspaceBindings
+}: {
+  tenant: TenantAccessRecord
+  client: SisterPlatformOAuthClient
+  requestedScopes: string[]
+  expiresAt: string
+  workspaceBindings?: readonly GlobeOAuthWorkspaceBindingV1[]
+}): SisterPlatformOAuthIdentityPayload => {
+  const identity: SisterPlatformOAuthIdentityPayload = {
+    sub: `greenhouse:user:${tenant.userId}`,
+    email: tenant.email,
+    name: tenant.fullName,
+    tenantId: getOAuthTenantId(tenant),
+    identityProfileId: tenant.identityProfileId,
+    roles: client.policy.claims.includeGreenhouseRoles ? tenant.roleCodes : [],
+    capabilities: resolveSisterPlatformOAuthCapabilities(client.policy, requestedScopes),
+    issuedAt: new Date().toISOString(),
+    expiresAt,
+    organization: {
+      clientId: tenant.clientId,
+      clientName: tenant.clientName,
+      tenantType: tenant.tenantType
+    }
+  }
+
+  if (client.sisterPlatformKey === 'globe' && workspaceBindings) {
+    identity.workspaceBindings = workspaceBindings
+  }
+
+  return identity
+}
+
+export const buildBrokerSisterPlatformOAuthIdentityPayload = async ({
+  tenant,
+  client,
+  requestedScopes,
   expiresAt
 }: {
   tenant: TenantAccessRecord
   client: SisterPlatformOAuthClient
   requestedScopes: string[]
   expiresAt: string
-}): SisterPlatformOAuthIdentityPayload => ({
-  sub: `greenhouse:user:${tenant.userId}`,
-  email: tenant.email,
-  name: tenant.fullName,
-  tenantId: getOAuthTenantId(tenant),
-  identityProfileId: tenant.identityProfileId,
-  roles: client.policy.claims.includeGreenhouseRoles ? tenant.roleCodes : [],
-  capabilities: resolveSisterPlatformOAuthCapabilities(client.policy, requestedScopes),
-  issuedAt: new Date().toISOString(),
-  expiresAt,
-  organization: {
-    clientId: tenant.clientId,
-    clientName: tenant.clientName,
-    tenantType: tenant.tenantType
-  }
-})
+}): Promise<SisterPlatformOAuthIdentityPayload> => {
+  const workspaceBindings =
+    client.sisterPlatformKey === 'globe' ? await resolveGlobeOAuthWorkspaceBindings(tenant) : undefined
+
+  return buildSisterPlatformOAuthIdentityPayload({
+    tenant,
+    client,
+    requestedScopes,
+    expiresAt,
+    workspaceBindings
+  })
+}
 
 export const recordSisterPlatformOAuthAuditEvent = async ({
   client,
@@ -1411,7 +1445,7 @@ export const consumeSisterPlatformAuthorizationCode = async ({
     correlationId: result.correlationId,
     expiresIn: client.accessTokenTtlSeconds,
     scopes: result.requestedScopes,
-    identity: buildSisterPlatformOAuthIdentityPayload({
+    identity: await buildBrokerSisterPlatformOAuthIdentityPayload({
       tenant: result.tenant,
       client,
       requestedScopes: result.requestedScopes,
@@ -1530,7 +1564,7 @@ export const resolveSisterPlatformOAuthUserinfo = async ({
     client,
     accessTokenId: row.access_token_id,
     correlationId: row.correlation_id ?? auditMetadata.correlationId,
-    identity: buildSisterPlatformOAuthIdentityPayload({
+    identity: await buildBrokerSisterPlatformOAuthIdentityPayload({
       tenant,
       client,
       requestedScopes,
@@ -1573,9 +1607,7 @@ const normalizeRevocationReason = (value: string) => {
   return normalized
 }
 
-export const revokeSisterPlatformOAuthAccessTokens = async (
-  input: RevokeSisterPlatformOAuthTokensInput
-) => {
+export const revokeSisterPlatformOAuthAccessTokens = async (input: RevokeSisterPlatformOAuthTokensInput) => {
   const client = await loadSisterPlatformOAuthClient(input.clientId)
 
   if (!client) {
@@ -1643,9 +1675,7 @@ export const revokeSisterPlatformOAuthAccessTokens = async (
   return { clientId: client.clientId, correlationId, revokedCount: revoked.length }
 }
 
-export const setSisterPlatformOAuthClientStatus = async (
-  input: SetSisterPlatformOAuthClientStatusInput
-) => {
+export const setSisterPlatformOAuthClientStatus = async (input: SetSisterPlatformOAuthClientStatusInput) => {
   const current = await loadSisterPlatformOAuthClient(input.clientId)
 
   if (!current) {
