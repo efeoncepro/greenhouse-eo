@@ -492,3 +492,43 @@ jobs/outbox durables. `TASK-1504` está `in-progress` solo local y no desplegada
 `TASK-1519` (human bridge), `TASK-1520` (library/collections/bulk) y `TASK-1521` (runtime comercial, resolviendo el
 anterior gap sin dueño). `TASK-1505` integra por slices sobre esas unidades y sobre `1467/1469/1472/1493/1494/
 1496/1497/1498/1511/1512`, preservando el target y mostrando estados honestos hasta que cada contract esté vivo.
+
+## Delta 2026-07-22 — Producer verificado en vivo end-to-end; gaps de superficie repartidos a sus dueños
+
+Se manejó el Producer de punta a punta por el SSO federado contra los servicios desplegados con una sesión de
+agente autenticada. **Lo que quedó vivo esta sesión** (fixes desplegados en `978b202`→`9ef2d21`): el cliente
+browser ahora manda `x-idempotency-key` (toda escritura moría 400 en el BFF), `isBrokerIdentity` deriva el
+workspace interno de `tenantId` (el guard sobre `clientId` daba 502 a **todo** login interno), la query de
+tarifas dejó de tener columna ambigua, y el recibo de idempotencia del ledger se llavea por comando (migración
+`0023`, aplicada y con readback). El split-brain web/api se cerró (ambos servicios mismo SHA). El workspace
+interno se fondeó con 500k créditos por el spine gobernado `globe.credits.allocate` (tokenCreator temporal
+otorgado → usado → **revocado y corte verificado**). La UI pasó de **401** a **crear runs reales**
+(`state: prepared`).
+
+**Los cuatro gaps "Codex dejó controles sin cablear" quedaron repartidos a su dueño real** (Deltas registrados
+en cada task; se rechazó crear un namespace de superficie paralelo — es la deuda que la auditoría marcó):
+
+1. **Estimate antes de generar es código muerto** — `requestEstimate()`/`estimateIsCurrent()` sin callers; un
+   test blinda su ausencia y otro certifica una llamada dentro de la función muerta. Dueño **TASK-1505** (el
+   reader ya existe, TASK-1502; falta el cableado + retirar los asserts que lo bloquean).
+2. **Style DNA nace vacío para siempre** — `analyze` exige dos puertos sin implementación en el repo, no
+   inyectados en `app.ts`. Dueño **TASK-1494** (`to-do`).
+3. **6 de 9 modos del composer muertos** por `GLOBE_ASSET_PROVENANCE_ENABLED=false`, con sus botones pintados
+   habilitados (gate contra la capability equivocada). Dueño **TASK-1467** (`in-progress`).
+4. **Seed, prompt negativo y breakpoint 390 px ausentes** (+ markers GVC `producer-seed`/`producer-shape`/
+   `producer-asset-actions`). Dueño **TASK-1505**. Se corrigieron en TASK-1505 dos ACs marcados `[x]` en falso
+   (estados incl. estimating; 390 px) — nueve ACs se habían flipeado en un cambio no commiteado que además
+   cargaba el veredicto `BLOCK`.
+
+**Por qué el Producer todavía 409 con el ledger fondeado (y por qué NO es un bug):** el compilador rechaza
+`route_not_promoted` porque el registro de model-readiness está vacío (0 rutas promovidas). La promoción es un
+**gate humano de dos pasos por diseño** (`requireHuman`; maker/promoter distintos; evidencia de proveedor real,
+no `fake`) — el control que hace el producto vendible, no un defecto. Decisión del operador (CEO/dueño):
+autoridad única para el workspace interno; queda **pendiente un ADR** que convierta la separación
+maker/promoter en **política por workspace** (default `true`, `false` sólo para el workspace interno de Efeonce,
+`requireHuman` intacto), para no borrar el control que aplicará a los workspaces de cliente. Ese ADR + el grant
+de operador de readiness en el broker de Greenhouse es el siguiente paso ejecutable para que el Producer genere.
+
+**Producto comercial (no piloto):** el runtime sigue clavado en `internal_smoke` por `readStudioRuntimeConfig`;
+habilitar cobro/clientes externos es **TASK-1521** (runtime comercial) + **TASK-1480** (readiness comercial,
+bloqueada por 1477/1478/1479/1482) — ninguna empezada. Esa es la distancia real a comercial, no la UI.

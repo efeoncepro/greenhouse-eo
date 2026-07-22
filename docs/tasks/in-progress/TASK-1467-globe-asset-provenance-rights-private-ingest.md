@@ -286,3 +286,16 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Follow-ups
 
 - Las dependencias sucesoras se leen desde EPIC-028 y `docs/tasks/README.md`.
+
+## Delta 2026-07-22 — gate en vivo del composer del Producer (TASK-1505)
+
+Verificado contra el runtime desplegado: `GLOBE_ASSET_PROVENANCE_ENABLED=false` en **ambos** servicios
+(`globe-api-internal` / `globe-studio-internal`). El handler de ingest binario devuelve `policy_blocked`
+en su **primera línea**, antes de autenticar (`apps/studio-web/src/app.ts:1143`), y `main.ts:173` no
+cablea `privateAssetStorage`/scanner/c2pa/rights con el flag apagado. Consecuencia sobre la superficie
+aprobada de **TASK-1505**: mueren **6 de los 9 modos** del composer que dependen de referencias —imagen
+con referencias, video Elementos/Cuadros/Movimiento, audio Cambiar voz/Traducir—. Agravante de honestidad
+que hereda TASK-1505: esos botones **se pintan habilitados** porque su gate es `globe.lab.experiment.prepare`
+(`coverage.ui='available'`), no la capability de ingest. Prender esta task (flag + storage/scanner/rights +
+buckets/IAM/secrets + canary) es prerrequisito de que esos modos funcionen; hasta entonces TASK-1505 debe
+mostrarlos como gated, no enabled.

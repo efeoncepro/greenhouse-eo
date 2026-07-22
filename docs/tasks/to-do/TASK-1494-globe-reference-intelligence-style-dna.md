@@ -575,3 +575,16 @@ proporcional (backend-standard), no crítica.
 - **¿El conditioning modula prompt (texto) o params del proveedor (p.ej. reference-strength nativo)?**
   Depende de qué exponga cada modelo; el compilador server-side debe degradar a instrucción textual
   cuando el modelo no tenga un parámetro nativo de fuerza de estilo/paleta.
+
+## Delta 2026-07-22 — Style DNA nace vacío en la superficie viva del Producer (TASK-1505)
+
+Verificado contra el runtime desplegado: el botón **Style DNA** de la superficie aprobada de TASK-1505
+(`producer-ui.ts:124`) se pinta **habilitado** (`coverage.ui='available'`) y abre un picker **vacío**. La
+causa está acá: el comando raíz `analyze` (`packages/domain/src/reference-intelligence.ts:362-365`) exige
+dos puertos —`ReferenceAssetIdentityPort` y `ReferenceAnalysisExecutorPort`— que **no tienen ninguna
+implementación en el repo** (`grep` sólo devuelve las declaraciones) y que `apps/studio-web/src/app.ts:815-821`
+**no inyecta** (pasa sólo `{store, now, newId}`). Cascada: sin `analyze` no hay profile → `createStyle`
+siempre `not_found` → `producer_styles` y `reference_profiles` están **vacías en la base viva**. Esta task
+(hoy `to-do`) es prerrequisito de que Style DNA funcione; implica escribir esos dos adapters (identidad de
+asset + ejecutor de análisis, presumiblemente sobre el mismo seam de provider del Lab) e inyectarlos. Hasta
+entonces TASK-1505 debe mostrar Style DNA como gated, no enabled.

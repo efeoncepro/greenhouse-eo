@@ -377,10 +377,13 @@ Backend capability tasks may advance in parallel, but a UI control is promoted f
 - [x] Primitive lookup records `reuse|extend|new`; no parallel component/pattern is introduced without registry contract.
 - [x] Full API parity holds for every business action; no provider/DB/storage/budget/review/share logic exists in browser components.
 - [x] Copy is centralized in Globe and covers every required state/action/error/aria label.
-- [x] Loading, empty, estimating, generating, ready, failed, degraded, policy/budget blocked, permission, long-content, mobile and reduced-motion states are covered.
+- [ ] Loading, empty, estimating, generating, ready, failed, degraded, policy/budget blocked, permission, long-content, mobile and reduced-motion states are covered. <!-- Reverted 2026-07-22: no `estimating` state — `requestEstimate()`/`estimateIsCurrent()` are dead code; gated modes render enabled. See Delta. -->
+- [ ] The composer shows the estimated cost before generating (route × output-shape), from a current server estimate, and the primary `Generate` action is gated on that estimate. <!-- Added 2026-07-22 from live audit. -->
+- [ ] Seed control (lock / numeric input / reroll) and negative-prompt field are wired, not permanently disabled stubs; their GVC markers (`producer-seed`, `producer-shape`, `producer-asset-actions`) exist. <!-- Added 2026-07-22. -->
+- [ ] Every mode button reflects its real authority: a mode whose enabling capability is off (asset provenance / references) renders as gated, never enabled. <!-- Added 2026-07-22 from live audit. -->
 - [x] Progress is attempt/state honest and C2PA/provenance is evidence-backed.
 - [x] Tabs, dialogs, viewer, selection, bulk actions, delete confirmation, live regions and focus restore pass keyboard/accessibility review.
-- [x] Desktop and every 390 px overlay satisfy `scrollWidth <= clientWidth`.
+- [ ] Desktop and every 390 px overlay satisfy `scrollWidth <= clientWidth`. <!-- Reverted 2026-07-22: no 390 px breakpoint exists (breakpoints stop at 430 px). See Delta. -->
 - [ ] GVC premium desktop/mobile/reduced-motion captures and review dossier exist; scorecard average is `>=4.5`, every dimension `>=4`, critical/source fidelity dimensions `>=4.5`.
 - [ ] `greenhouse-ui-review` and `greenhouse-ui-enterprise-review` return no `BLOCK` before closure.
 
@@ -412,3 +415,56 @@ Backend capability tasks may advance in parallel, but a UI control is promoted f
 
 - Confirm final internal route name during Plan Mode; `/producer` is the current candidate.
 - Confirm whether source visual assets beyond the HTML must also be versioned for reproducible source rendering; the HTML hash remains the minimum immutable baseline.
+
+## Delta 2026-07-22 — Approved-surface parity gaps (live-verified against the deployed runtime)
+
+The Producer was driven end to end through the federated SSO against the live services
+(`globe-studio-internal` / `globe-api-internal`, revision `978b202`→`9ef2d21`) with an authenticated
+agent session. The surface loads, authenticates, mounts, resolves the 10-route catalog and **creates
+real runs** (`state: prepared`). That closed the transport: three bugs were fixed and deployed this
+session — the browser client now sends `x-idempotency-key` (every write used to die 400 at the BFF),
+`isBrokerIdentity` derives the internal workspace from `tenantId` (the `clientId` guard 502'd every
+internal login), and the credit ledger replay receipt is keyed by command (migration `0023`). The
+internal workspace was funded (500k credits) through the governed `globe.credits.allocate` spine.
+
+What Codex scaffolded but did **not** cable — the honest gap list, each mapped to its owner. This task
+owns the surface-wiring items; the backend-enablement items are owned elsewhere and are declared as
+dependencies, not duplicated here.
+
+1. **Estimate before generate is dead code (this task).** `requestEstimate()` (`producer-controller.ts:1377`)
+   and `estimateIsCurrent()` (`:2933`) have zero callers; the composer never shows cost before spending,
+   which violates the approved invariant "Costo estimado antes de gastar · ruta × formato". Worse,
+   `producer-controller.test.ts:69-70` pins the absence (forbids the estimate button) and `:42` asserts
+   `client.estimate(payload)` by reading text **inside the dead function** — a test certifying a call
+   nobody makes. Fix: wire the estimate control + gate `Generate` on a current server estimate, and
+   retire the blocking assertions. The reader itself exists (TASK-1502); only the wiring is missing.
+2. **Seed control and negative prompt are permanently-disabled stubs (this task).** Seed renders only a
+   title + "Podrás fijarlo cuando la ruta publique este control" (`producer-ui.ts:126-128`); the negative
+   field is `<input disabled data-producer-advanced="negative">` with no reader in the controller.
+   Missing GVC markers: `producer-seed`, `producer-shape`, `producer-asset-actions` (`grep` → 0).
+3. **No 390 px breakpoint (this task).** Declared breakpoints stop at 430 px; AC-11 cannot be met and its
+   `[x]` was reverted above. `producer-ui.test.ts` only asserts a `max-width` media query exists, not the
+   value.
+4. **Gated modes render as enabled buttons (this task — honesty bug).** Modes whose real enabler is off
+   (references / asset provenance) gate on `globe.lab.experiment.prepare` (`coverage.ui='available'`)
+   instead of the ingest capability, so 6 of the 9 composer modes present enabled affordances that fail
+   on use. The surface must reflect the mode's actual authority.
+
+**Dependencies (not owned here) that also gate the approved surface:**
+
+- **Style DNA → TASK-1494.** `analyze` requires two ports (`ReferenceAssetIdentityPort`,
+  `ReferenceAnalysisExecutorPort`) that have no implementation in the repo and are not injected in
+  `app.ts:815-821`. The button renders enabled and opens an empty picker; `producer_styles` /
+  `reference_profiles` are empty in the live DB. Delta recorded on TASK-1494.
+- **References / 6 of 9 modes → TASK-1467.** `GLOBE_ASSET_PROVENANCE_ENABLED=false` in both live services;
+  the binary-ingest handler returns `policy_blocked` before it authenticates (`app.ts:1143`). Delta
+  recorded on TASK-1467.
+- **Governed generation (why the button still 409s) → TASK-1463.** With the ledger funded, `execute`
+  still fails `conflict` because the model-readiness registry is empty (0 promoted routes); the compiler
+  rejects `route_not_promoted` before any provider call. Promotion is a two-step human gate by design
+  (`requireHuman`, distinct maker/promoter, non-fake evidence) — the commercial control, not a bug. The
+  policy-per-workspace decision (single-authority internal workspace) is pending an ADR.
+
+This Delta corrects the record: nine acceptance criteria were flipped to `[x]` in an uncommitted change
+that also carried the `BLOCK` verdict (scorecard fidelity 3.8, avg 4.39). The surface is not closed;
+its honest state is the list above.
