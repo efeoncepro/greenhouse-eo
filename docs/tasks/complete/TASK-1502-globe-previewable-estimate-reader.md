@@ -1,5 +1,19 @@
 # TASK-1502 — Previewable Estimate Reader
 
+## Delta 2026-07-22
+
+Cerrado por `TASK-1504` (code-complete, código en `efeonce-globe`, sin push):
+
+- **El estimate ya ve la forma de video y audio, no sólo la de imagen.** El helper que hilvana el
+  output-shape quedó **compartido** entre la ruta de run y la de estimate, así que el `✨N` se computa sobre
+  la misma forma que después ejecuta el run. Elimina el riesgo de divergencia "se estimó una forma y se
+  ejecutó otra" para las modalidades que hasta ahora sólo estaban declaradas en el contrato.
+- El catálogo que este reader consume subió a `1.1.0` con 4 rutas nuevas (`ref/video/frames-v1`,
+  `ref/video/motion-v1`, `ref/voice/change-v1`, `ref/voice/translate-v1`); el estimate las lee por el mismo
+  helper in-process, sin re-dispatch y sin cómputo paralelo.
+- **Sigue abierto:** el follow-up del estimate shape-aware en el `FakeReferenceAdapter` (el fake sigue
+  estable por capability) y el umbral de batch-of-N para video/audio.
+
 ## Delta 2026-07-20
 
 - La dimensión "ruta" para `costo = f(ruta, output-shape)` quedó **cerrada por TASK-1500** (complete):

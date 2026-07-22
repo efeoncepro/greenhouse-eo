@@ -1,5 +1,24 @@
 # TASK-1503 — Governed Output Retrieval + Asset Actions
 
+## Delta 2026-07-22 — multi-output (TASK-1504)
+
+`TASK-1504` (code-complete, código en `efeonce-globe`, sin push) cambia dos supuestos de esta task:
+
+- **El manifest ahora sí lleva el tipo por pieza.** La open question "mimeType autoritativo" se resolvió acá
+  con *objeto GCS + default por `mediaType`, el manifest no lo lleva*; el manifest ahora declara
+  `outputs?: LabOutputDescriptorV1[]` con `{ sha256, mediaType, mimeType, retained }`. El `mediaType` deja de
+  derivarse **sólo** de la capability: para un run multi-output (por ejemplo video + audio) el dominio puede
+  informar el tipo real de cada pieza en vez de un fallback único por capability, así que el `Content-Type`
+  servido es honesto sin depender de que el objeto GCS traiga su `content-type`. El objeto real sigue siendo
+  la fuente autoritativa; lo que mejora es el fallback.
+- **La retención pasa a ser por-output.** `LabOutputDescriptorV1.retained` la declara pieza por pieza; el
+  `outputsRetained` plano contra el que este retrieval hace su gate se conserva **por compatibilidad**. Al
+  tocar `authorizeOwnedOutput`, verificar contra qué se está comprobando la retención antes de asumir que el
+  campo plano sigue siendo suficiente para un attempt con varias piezas.
+- Sin cambio en la invariante dura: el retrieval sigue matcheando **sólo** outputs propios y **nunca**
+  `authorizedInputHashes`. `resolveEditSource` (encadenamiento) tampoco toma ya `outputHashes[0]`: elige el
+  output **por modalidad** desde la capability hija.
+
 ## Runtime evidence 2026-07-22 — rollout ejecutado en el runtime interno
 
 **Estado honesto: operativo en el runtime interno por el service principal. NO es rollout
