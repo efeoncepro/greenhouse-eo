@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-028`
-- Status real: `Implementación backend en curso dentro del goal Producer aprobado`
+- Status real: `Code complete en Globe (commit 6756c3b); migración 0004 y smoke runtime pendientes`
 - Rank: `TBD`
 - Domain: `creative|ai`
 - Blocked by: `none`
@@ -47,7 +47,7 @@ Sin estos readers el operador puede abrir un candidato conocido pero no puede de
 
 - Un reader `list` que enumere experimentos del workspace del caller, paginado y filtrable por estado/capability, sin filtrarse jamás a otro workspace.
 - Un reader `children` (índice inverso del linaje) que devuelva los descendientes directos de un `experimentId`, y un reader de grafo que proyecte ancestros + descendientes como nodos/aristas navegables con profundidad acotada.
-- Readers gobernados con Full API Parity: mismo contrato para HTTP/SDK/CLI/worker/e2e; `ui` y `mcp` nacen `policy-blocked` hasta la promoción de ruta; kill switch fail-closed; cero lógica de negocio en el consumer.
+- Readers gobernados con Full API Parity: mismo contrato para HTTP/SDK/CLI/worker/e2e; `ui` consume por el bridge humano seguro de TASK-1519 y `mcp` permanece `policy-blocked`; kill switch fail-closed; cero lógica de negocio en el consumer.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -74,7 +74,7 @@ Reglas obligatorias:
 - **El provider seam es sagrado:** estos readers no invocan ningún provider ni SDK; sólo proyectan registros ya almacenados. No tocar `apps/creative-runner/**` salvo lectura.
 - **Read-only:** ningún reader muta estado, ni acuña experimentos, ni reordena linaje. La cadena `lineage` del manifest es append-only y no se reescribe.
 - **Tenant-safe absoluto:** todo read se deriva del `workspaceId` del principal autenticado (`AuthenticatedPrincipalV1.workspaceBindings`), nunca de un campo del request. Un id de otro workspace o inexistente responde `not_found`, nunca revela existencia cross-workspace (mismo patrón que `requireOwnedExperiment`, `../efeonce-globe/packages/domain/src/model-lab.ts:479-483`).
-- **Full API Parity de nacimiento:** contrato transport-neutral en `@efeonce-globe/contracts` + registro con `coverage` sobre todas las `GLOBE_SURFACES`; `ui`/`mcp` en `policy-blocked` como el resto del Lab (`LAB_COVERAGE`, `../efeonce-globe/packages/domain/src/model-lab.ts:120-129`).
+- **Full API Parity de nacimiento:** contrato transport-neutral en `@efeonce-globe/contracts` + registro con `coverage` sobre todas las `GLOBE_SURFACES`; `ui` está disponible sólo detrás de TASK-1519 y `mcp` permanece `policy-blocked` (`LAB_COVERAGE`).
 
 ## Normative Docs
 
@@ -121,7 +121,7 @@ Reglas obligatorias:
 - Topology impact: `cross-runtime`
 - Current home: `../efeonce-globe` (packages `@efeonce-globe/contracts` + `@efeonce-globe/domain`; runtime `apps/studio-web`)
 - Future candidate home: `remain-shared`
-- Boundary: readers canónicos `globe.lab.experiment.list` / `.children` / `.tree` sobre `CapabilityRegistry`; consumers autorizados = HTTP/SDK/CLI/worker/e2e (`ui`/`mcp` `policy-blocked`). Ningún consumer accede al `ExperimentStorePort` directo.
+- Boundary: readers canónicos `globe.lab.experiment.list` / `.children` / `.tree` sobre `CapabilityRegistry`; consumers autorizados = HTTP/SDK/CLI/worker/e2e y UI mediante TASK-1519 (`mcp` `policy-blocked`). Ningún consumer accede al `ExperimentStorePort` directo.
 - Server/browser split: readers, store y resolución de linaje son 100% server-side; el browser sólo recibe el `ReaderResultV1` filtrado por política. Ningún secreto ni byte crudo cruza.
 - Build impact: `none` — sin dependencias pesadas ni filesystem inputs; sólo tipos y lógica de proyección en paquetes existentes.
 - Extraction blocker: `none` — la task no crea `apps/*` ni `packages/*` nuevos; vive en los paquetes existentes de `efeonce-globe`.
@@ -162,7 +162,7 @@ Reglas obligatorias:
 ### Migration, backfill and rollout
 
 - Migration posture: `additive` (si el store persistente necesita índice `parent_experiment_id`, es columna/índice additivo; `[verificar]` contra el store real).
-- Default state: `read-only` con `ui`/`mcp` `policy-blocked` hasta promoción de ruta.
+- Default state: `read-only`; UI disponible sólo con bridge+BFF habilitado y `mcp` `policy-blocked`.
 - Backfill plan: si el store persistente ya guarda `editFrom`/`parentExperimentId`, el índice inverso se deriva sin backfill; si falta el campo, backfill idempotente que lo puebla desde `request.editFrom` de cada registro (dry-run → apply por workspace). `[verificar]` necesidad real.
 - Rollback path: `revert PR` + kill switch del Lab (`LabKillSwitchPort`) fail-closes los readers nuevos junto al resto.
 - External coordination: `none` — repo-only del dominio `efeonce-globe`; sin secrets, env vars nuevas obligatorias ni provider config.
@@ -196,7 +196,7 @@ Reglas obligatorias:
 - [ ] **Modelada como reader/recurso, no como fetch acoplado a la pantalla:** tres readers canónicos sobre `CapabilityRegistry`.
 - [ ] **Read expuesto como reader canónico** con envelope, workspace scope y projection policy-filtered. No hay write en esta task (readers puros).
 - [ ] **Capability + grant:** reusa `GLOBE_LAB_EXPERIMENT_CAPABILITY` (mismo grant que `get`/`status`/`evidence`); no introduce grant nuevo. Si el owner del grant model exige uno separado para list/tree, registrarlo en el mismo PR. `[verificar]`.
-- [ ] **Camino programático declarado:** HTTP + SDK + CLI + worker + e2e `available`; `ui`/`mcp` `policy-blocked` con deuda documentada (promoción de ruta = follow-up del workbench).
+- [x] **Camino programático declarado:** HTTP + SDK + CLI + worker + e2e `available`; `ui` disponible por TASK-1519 y `mcp` `policy-blocked`.
 - [ ] **Write apto para `propose → confirm → execute`:** `N/A — readers puros`, sin mutación.
 - [ ] **Un primitive, muchos consumers:** dock, Mapa, SDK, CLI y e2e consumen el mismo contrato; cero lógica duplicada.
 - [ ] **Parity check = SÍ:** los readers tienen contrato gobernado a nivel capability; todo consumer los opera por construcción.
@@ -255,7 +255,7 @@ Additional acceptance evidence:
 
 ### Slice 3 — Reader handlers + registro
 
-- Registrar los tres readers en `registerModelLabCapabilities` con `requiredCapability: GLOBE_LAB_EXPERIMENT_CAPABILITY` y `coverage` = `LAB_COVERAGE` (ui/mcp `policy-blocked`).
+- Registrar los tres readers en `registerModelLabCapabilities` con `requiredCapability: GLOBE_LAB_EXPERIMENT_CAPABILITY` y `coverage` = `LAB_COVERAGE` (UI disponible por TASK-1519; MCP bloqueado).
 - Handlers workspace-scoped: derivan `context.workspaceId`; validan `limit`/`maxDepth` contra topes; un id ajeno/inexistente → `not_found` sin disclosure.
 - `assertLabEnabled(deps)` (kill switch) fail-closes los tres readers.
 
@@ -271,7 +271,7 @@ Additional acceptance evidence:
 - Scoring/verdict de candidatos (el harness nunca auto-puntúa) → evaluation harness existente.
 - Cualquier command o write (variar/relanzar/inpaint) → `TASK-1496`/`TASK-1497`.
 - La UI del dock y del Mapa (consumidora) → `TASK-1474`.
-- Promoción de ruta `ui`/`mcp` a `available` (queda `policy-blocked`).
+- Promoción MCP (permanece fuera de scope); UI ya usa la ruta gobernada de TASK-1519.
 
 ## Detailed Spec
 
@@ -283,7 +283,7 @@ Additional acceptance evidence:
 
 ## Rollout Plan & Risk Matrix
 
-Cambio additive del dominio `efeonce-globe`, gateado por el kill switch del Lab y con `ui`/`mcp` `policy-blocked` hasta gate. Sin migración destructiva, sin backfill mutante, sin write. Rollback = revert PR + flag OFF.
+Cambio aditivo del dominio `efeonce-globe`, gateado por el kill switch del Lab y el bridge UI de TASK-1519; MCP permanece bloqueado. Sin migración destructiva ni write de negocio. Rollback = revert + flag OFF.
 
 ### Slice ordering hard rule
 
@@ -301,7 +301,7 @@ Cambio additive del dominio `efeonce-globe`, gateado por el kill switch del Lab 
 
 ### Feature flags / cutover
 
-- Sin flag nuevo obligatorio: los readers heredan el `LabKillSwitchPort` existente (fail-close global del Lab) y nacen `ui`/`mcp` `policy-blocked`. Cutover a `available` en `ui`/`mcp` es promoción de ruta gobernada por el workbench (fuera de esta task). Revert: revert PR.
+- Sin flag nuevo obligatorio: los readers heredan el `LabKillSwitchPort` existente. UI requiere además el rollout independiente del bridge TASK-1519; MCP continúa `policy-blocked`. Revert: revert + flag OFF.
 
 ### Rollback plan per slice
 
@@ -329,14 +329,14 @@ Cambio additive del dominio `efeonce-globe`, gateado por el kill switch del Lab 
 
 ## Acceptance Criteria
 
-- [ ] `globe.lab.experiment.list` enumera experimentos del workspace del caller, paginado por cursor estable y filtrable por `state`/`capability`, sin filtrarse a otro workspace.
-- [ ] `globe.lab.experiment.children` devuelve los descendientes directos de un `experimentId` derivados del índice inverso de `editFrom`/`lineage`.
-- [ ] `globe.lab.experiment.tree` proyecta ancestros + descendientes como `nodes`/`edges` con `maxDepth` acotado y `truncated` explícito cuando se corta.
-- [ ] Un `experimentId` de otro workspace o inexistente responde `not_found` en los tres readers, sin revelar existencia.
-- [ ] Las projections excluyen credenciales, costo vendor-confidencial, margen, bytes crudos y URLs públicas.
-- [ ] Los tres readers declaran `coverage` completa sobre `GLOBE_SURFACES` con `ui`/`mcp` `policy-blocked`; el conformance harness pasa.
-- [ ] El kill switch del Lab fail-closes los tres readers.
-- [ ] `cd ../efeonce-globe && pnpm check && pnpm build` verde con los tests focales nuevos.
+- [x] `globe.lab.experiment.list` enumera experimentos del workspace del caller, paginado por cursor estable y filtrable por estado, capability, modalidad, favorito, colección y búsqueda allowlisted, sin filtrarse a otro workspace.
+- [x] `globe.lab.experiment.children` devuelve los descendientes directos de un `experimentId` derivados del índice inverso de `editFrom`/`lineage`.
+- [x] `globe.lab.experiment.tree` proyecta ancestros + descendientes como `nodes`/`edges` con `maxDepth`/nodos acotados y `truncated` explícito.
+- [x] Un `experimentId` de otro workspace o inexistente responde `not_found`, sin revelar existencia.
+- [x] Las projections excluyen credenciales, costo vendor-confidencial, margen, bytes crudos, provider slugs y URLs públicas.
+- [x] Los tres readers declaran coverage completa: `ui` disponible por el bridge humano de TASK-1519; `mcp` sigue `policy-blocked`; el conformance harness pasa.
+- [x] El kill switch del Lab fail-closes los tres readers.
+- [x] `cd ../efeonce-globe && pnpm check && pnpm build` verde con los tests focales nuevos.
 
 ## Verification
 
@@ -344,6 +344,8 @@ Cambio additive del dominio `efeonce-globe`, gateado por el kill switch del Lab 
 - `cd ../efeonce-globe && pnpm build`
 - `cd ../efeonce-globe && pnpm test` (focal: `packages/domain/src/model-lab.test.ts`)
 - Ejercicio manual: sembrar padre + hijos + nietos, verificar `list` paginado, `children` directos, `tree` con truncado, y aislamiento cross-workspace.
+
+Evidencia local 2026-07-22: Globe commit `6756c3b`; `pnpm check` y `pnpm build` verdes. La migración aditiva `packages/database/migrations/0004_candidate_feed_lineage.sql` está versionada pero no aplicada; el lifecycle permanece `in-progress` hasta migrate + smoke.
 
 ## Closing Protocol
 
