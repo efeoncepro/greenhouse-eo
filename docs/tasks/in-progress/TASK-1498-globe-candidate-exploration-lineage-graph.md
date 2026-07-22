@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-028`
-- Status real: `Diseño`
+- Status real: `Implementación backend en curso dentro del goal Producer aprobado`
 - Rank: `TBD`
 - Domain: `creative|ai`
 - Blocked by: `none`
