@@ -2,8 +2,8 @@
 
 - Status: Target architecture; implementation tracked by `EPIC-035`
 - Date: 2026-07-22
-- Owner: Growth / Public Site / Platform
-- Decision: [Efeonce Embed Runtime Delivery Decision V1](GREENHOUSE_EFEONCE_EMBED_RUNTIME_DELIVERY_DECISION_V1.md)
+- Owner: Platform Engineering (accountable); Growth/Public Site (product acceptance); Security/Cloud (IAM acceptance)
+- Decision: [Efeonce Embed Runtime Delivery and Isolation Decision V2](GREENHOUSE_EFEONCE_EMBED_RUNTIME_DELIVERY_DECISION_V2.md)
 - Consumers: Efeonce WordPress, Think/Astro and future explicitly registered public hosts
 
 ## 1. Purpose
@@ -24,14 +24,14 @@ This document governs static delivery, compatibility, host integration, release,
 
 ## 3. Architectural Principles
 
-1. **Control plane is not delivery plane.** Greenhouse governs; Firebase Hosting distributes bytes.
+1. **Control plane is not delivery plane.** Greenhouse governs; the selected static provider distributes bytes.
 2. **One protocol, independent products.** Share loaders, manifest schema and gates, not bundle lifecycle.
 3. **Build once, promote exact bytes.** Rebuild on production promotion is forbidden.
 4. **Immutable assets, explicit mutable pointers.** Mutability is restricted to channel and health metadata.
 5. **Host-owned page concerns.** GTM, CMP, consent UI, navigation and global layout remain with WordPress/Astro.
 6. **Server truth beats browser claims.** Renderer events aid measurement; server ledgers confirm conversion.
 7. **Fail contained.** A blocked or incompatible renderer must not break the host page.
-8. **Provider exit is a normal operation.** Public contracts never expose Firebase-specific APIs.
+8. **Provider exit is a normal operation.** Public contracts never expose provider-specific APIs.
 
 ## 4. System Context
 
@@ -39,16 +39,16 @@ This document governs static delivery, compatibility, host integration, release,
 flowchart LR
   GH["Greenhouse control plane\nsource, APIs, contracts, ledgers"]
   CI["GitHub Actions\nprotected promotion + WIF"]
-  FB["Firebase Hosting Classic\nsecondary site · shared efeonce-group\nassets.efeoncepro.com"]
+  DELIVERY["Selected static delivery plane\nVercel hardened or Firebase dedicated project\nassets.efeoncepro.com"]
   WP["WordPress / efeoncepro.com"]
   THINK["Think / Astro"]
   GTM["Host GTM + CMP"]
   HS["HubSpot / Teams providers\nserver-side only"]
 
   GH -->|source + release inputs| CI
-  CI -->|immutable fleet snapshot| FB
-  WP -->|loader + manifest + assets| FB
-  THINK -->|loader + manifest + assets| FB
+  CI -->|immutable fleet snapshot| DELIVERY
+  WP -->|loader + manifest + assets| DELIVERY
+  THINK -->|loader + manifest + assets| DELIVERY
   WP -->|API commands/readers| GH
   THINK -->|API commands/readers| GH
   GH -->|provider adapters| HS
@@ -67,13 +67,13 @@ flowchart LR
 - release policy, compatibility matrix, kill switches and health signals;
 - canonical preview data and real-host verification scenarios.
 
-### 5.2 Firebase Hosting owns
+### 5.2 Selected delivery plane owns
 
 - static JS/CSS/JSON delivery through `assets.efeoncepro.com`;
-- CDN caching, TLS/custom-domain termination, preview channels and version history;
-- no server functions, database, authentication, PII, tokens or business decisions.
-- The secondary Hosting site is a delivery boundary, not a security project boundary; IAM, billing, quotas and
-  project Owners/Editors remain shared with `efeonce-group`.
+- CDN caching, TLS/custom-domain termination, preview/deployment history and rollback primitives;
+- no server functions, database, authentication, PII, tokens or business decisions;
+- an isolated publisher and resource boundary proven by `TASK-1515`. If Firebase wins, the boundary is a dedicated
+  GCP project under the existing Efeonce organization and billing account, not a Hosting site inside `efeonce-group`.
 
 ### 5.3 Host applications own
 
@@ -106,7 +106,7 @@ Logical layout:
 /health.json
 ```
 
-Each product has its own `releaseId`, renderer semantic version, channel pointer and rollback history. A shared Hosting deployment is a **fleet snapshot**: promoting one product changes only its pointer and adds its immutable release while carrying forward the unchanged products and retained historical releases.
+Each product has its own `releaseId`, renderer semantic version, channel pointer and rollback history. A shared provider deployment is a **fleet snapshot**: promoting one product changes only its pointer and adds its immutable release while carrying forward the unchanged products and retained historical releases.
 
 No build may delete every previous release. Each live snapshot retains at minimum:
 
@@ -212,31 +212,44 @@ The release race is prevented structurally: the new live fleet snapshot includes
 flowchart LR
   A["Build one product"] --> B["Validate manifest, hashes, size"]
   B --> C["Compose retained fleet snapshot"]
-  C --> D["Deploy Firebase preview channel"]
+  C --> D["Deploy provider preview/candidate"]
   D --> E["WordPress + Think synthetics"]
   E --> F["baseFleetDigest == current live digest"]
   F --> G["Protected human promotion gate"]
-  G --> H["Exact hosting:clone to live"]
+  G --> H["Promote exact candidate bytes to live"]
   H --> I["Live health + real-host smoke"]
   I --> J["Evidence + release receipt"]
 ```
 
 ### 11.1 Identity and provenance
 
-- GitHub Actions authenticates through OIDC to Google Workload Identity Federation.
+- GitHub Actions uses the provider's short-lived/federated identity path; Firebase uses OIDC to Google Workload
+  Identity Federation. Long-lived general-purpose deploy credentials are forbidden in either option.
 - Long-lived service-account JSON keys are forbidden.
-- The deploy principal receives only the Firebase Hosting permissions required by the approved project/site.
-- Production uses a protected GitHub environment and records actor, source SHA, workflow run, preview channel, fleet digest and promoted Firebase version.
-- The approved project is `efeonce-group`. TASK-1515 enables Firebase and provisions a dedicated Hosting site while
-  reusing the existing organization, billing and WIF boundary. Discovery verifies the exact site ID and least-privilege
-  IAM bindings; it does not create a parallel GCP project.
+- The deploy principal receives only the permissions required by the approved delivery project/site.
+- Production uses one exact protected GitHub environment and records actor, source SHA, workflow run, candidate,
+  provider version/deployment, fleet digest and approval.
+- Provider identity is bound to the exact repository plus approved workflow/environment/ref subject, not merely to
+  the repository. The current general GCP deployer is not reused.
+- `TASK-1515` selects and provisions the delivery plane. No Firebase enablement in `efeonce-group` is authorized. If
+  Firebase wins, it uses a dedicated project in the existing organization/billing account and a dedicated publisher.
 
-### 11.2 Rollback
+### 11.2 Concurrency and promotion integrity
 
-Per-product rollback is not a native Firebase rollback: it composes a new fleet snapshot from current live, points
-only the affected product to a previously verified release, deploys it to preview, runs the minimum smoke and clones
-it to live after the concurrency gate. Full-site rollback clones a prior site version and reverts all products; it is
-reserved for fleet-wide pipeline corruption.
+- The live fleet has one CI concurrency group across all products.
+- Immediately before promotion, the publisher re-reads the live fleet digest under that lock and rejects a stale
+  `baseFleetDigest`; the candidate must then be recomposed and reverified.
+- The provider operation, live readback and release receipt occur in the same serialized workflow. The receipt records
+  pre/post digests and provider deployment/version.
+- `baseFleetDigest` is optimistic concurrency evidence, not an atomic compare-and-swap. Routine manual production
+  writes are forbidden; bootstrap and break-glass identities are separate and audited.
+
+### 11.3 Rollback
+
+Per-product rollback composes a new fleet snapshot from current live, points only the affected product to a previously
+verified release, runs the minimum smoke and promotes exact candidate bytes after the concurrency gate. Full-fleet
+rollback restores a prior provider version/deployment and reverts all products; it is reserved for fleet-wide pipeline
+corruption. Cross-provider fallback has a separate RTO because host configuration or DNS may be involved.
 
 ## 12. Compatibility Policy
 
@@ -283,15 +296,22 @@ Minimum signals:
 - CTA→Form and CTA→Meeting composition success;
 - dataLayer event presence and consent-aware measurement request;
 - rollback drill age and last known verified release;
-- Firebase transfer/storage cost and budget threshold.
+- provider transfer/storage/build cost and budget threshold;
+- host-side loader error plus external synthetic availability, because a loader that never executes cannot self-report.
 
 Initial targets:
 
 - static asset availability: 99.9% monthly;
 - loader-to-first-render p95: under 1.5 seconds on the agreed mobile test profile, excluding API-dependent content;
-- no renderer-caused horizontal page overflow at 390 px;
+- approved visual-only change reaches preview in at most 5 minutes and live in at most 10 minutes after approval,
+  without a Greenhouse application build or release;
+- no renderer-caused horizontal page overflow at 2048, 1440, 820 or 390 px;
 - rollback to a previously verified release: under 15 minutes from decision;
 - zero release promotions without both host fixtures passing.
+
+Each target has an accountable owner and executable evidence: Platform owns release/availability/recovery, Growth owns
+visual and conversion acceptance, Security/Cloud owns publisher isolation, and Finance/Platform reviews provider cost
+monthly. A breached release or recovery gate freezes further promotion until disposition is recorded.
 
 ## 16. Verification Matrix
 
@@ -306,7 +326,7 @@ Every product promotion runs applicable rows:
 | CTA → Meetings                               | Required when bound | Required            |
 | Keyboard-only, focus order and visible focus | Required            | Required            |
 | `prefers-reduced-motion`                     | Required            | Required            |
-| 390 px and desktop overflow                  | Required            | Required            |
+| 2048/1440/820/390 px overflow               | Required            | Required            |
 | GTM/dataLayer with consent states            | Required            | Required            |
 | Loader blocked/incompatible/timeout          | Required            | Required            |
 | Rollback to previous release                 | One live-like host  | One live-like host  |
@@ -317,8 +337,9 @@ The measured compressed fleet is approximately 76 KB: Forms 35,453 bytes, CTA 14
 
 Operational thresholds:
 
-- existing `efeonce-group` billing/Blaze posture; no billing relink;
-- Hosting SKU/transfer/storage view plus project-wide alerts as secondary defense, not a site budget;
+- provider cost is measured from the same fleet size and traffic assumptions before selection;
+- if Firebase wins, its project remains under the existing organization/billing account with provider-specific
+  Hosting SKU/transfer/storage visibility and alerts;
 - monthly provider comparison after 250 GB transfer;
 - architecture review if traffic, number of products or release retention makes snapshot composition slow or expensive.
 
@@ -338,16 +359,17 @@ Operational thresholds:
 - inventory host CSS/DOM dependencies;
 - build WordPress and Think fixtures plus telemetry/consent tests.
 
-### F2 — Firebase spike
+### F2 — Delivery-plane selection and gated provisioning
 
-- enable Firebase in `efeonce-group` and provision a dedicated Hosting site with neutral-domain candidate;
-- prove WIF, preview deployment, exact clone, headers, rollback and cost export;
-- run Meetings without changing the production stable URL;
-- record go/no-go evidence.
+- compare hardened Vercel and Firebase Hosting in a dedicated GCP project with one fleet artifact and traffic model;
+- prove protected single-writer promotion, least privilege, headers, rollback, neutral-domain compatibility and cost;
+- record the provider verdict and accepted evidence before any irreversible provisioning;
+- if Firebase wins, provision only the dedicated project/site/publisher under the existing organization and billing;
+- never enable Firebase in `efeonce-group` from this phase.
 
 ### F3 — Dual-publish Meetings
 
-- publish identical Meetings release to Vercel and Firebase;
+- publish identical Meetings release to Vercel and the selected candidate plane when they differ;
 - compare hashes, rendering, GTM and API behavior;
 - switch `assets.efeoncepro.com` only after an observed soak;
 - preserve Vercel rollback and the old loader URL.
@@ -377,7 +399,7 @@ Operational thresholds:
 | Bad product renderer              | Other product pointers unchanged                              | Per-product rollback snapshot                                   |
 | Bad common loader                 | Host recovery UI; old cached loader remains compatible        | Full-site rollback                                              |
 | Manifest references missing asset | Promotion gate fails; retained releases prevent live race     | Restore fleet snapshot, then fix composer                       |
-| Firebase outage or IAM failure    | No host business state lost; current assets may remain cached | Freeze promotion; use verified Vercel fallback if threshold met |
+| Delivery-provider outage or IAM failure | No host business state lost; current assets may remain cached | Freeze promotion; use verified alternate-provider fallback if threshold met |
 | Greenhouse API incompatibility    | Renderer shows controlled unavailable state                   | Roll back renderer or API within compatibility window           |
 | GTM blocked                       | Booking/submission still operates                             | Browser metrics degrade; server ledger remains truth            |
 | Host CSS drift                    | Fixture/GVC gate blocks promotion                             | Revert host adapter or renderer contract change                 |
@@ -386,10 +408,10 @@ Operational thresholds:
 
 ### What breaks in 12 months?
 
-A single fleet snapshot composer may become cumbersome as products and retained releases grow. The shared GCP project
-is the main blast-radius risk: more Hosting sites inside `efeonce-group` do not isolate IAM or billing. Revisit a
-dedicated project when more teams/third-party consumers, compliance, repeated IAM conflicts, autonomous releases or
-project-level quota/SLA boundaries appear.
+A single fleet snapshot composer may become cumbersome as products and retained releases grow. The selected provider
+can also become a hidden control-plane dependency if production writes escape the protected workflow. Revisit product
+sharding or a new delivery boundary when more teams/third-party consumers, compliance, repeated IAM conflicts,
+autonomous releases or project-level quota/SLA boundaries appear.
 
 ### What breaks in 36 months?
 
@@ -401,7 +423,9 @@ Teams may confuse shared delivery with shared product ownership. Keep product ma
 
 ### Lock-in
 
-Firebase-specific configuration exists in the pipeline, but runtime artifacts are plain JS/CSS/JSON and public URLs use a neutral domain. A provider migration should require pipeline/infra change, not host markup or product code change.
+Provider-specific configuration may exist only in the pipeline/infra layer; runtime artifacts are plain JS/CSS/JSON
+and public URLs use a neutral domain. A provider migration should require pipeline/infra change, not host markup or
+product code change.
 
 ### Observability gap
 
@@ -412,6 +436,8 @@ CDN health cannot prove booking/submission or GTM success. Real-host synthetics 
 - [Growth Public Forms Engine Architecture V1](GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md)
 - [Growth CTA & Popup Engine Architecture V1](GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md)
 - [Growth Meetings Scheduler Architecture V1](GREENHOUSE_GROWTH_MEETINGS_SCHEDULER_ARCHITECTURE_V1.md)
+- [Efeonce Embed Runtime Delivery and Isolation Decision V2](GREENHOUSE_EFEONCE_EMBED_RUNTIME_DELIVERY_DECISION_V2.md)
+- [Efeonce Embed Runtime Delivery Decision V1](GREENHOUSE_EFEONCE_EMBED_RUNTIME_DELIVERY_DECISION_V1.md) — superseded historical decision
 - [Public Renderer Artifact Delivery Decision V1](GREENHOUSE_PUBLIC_RENDERER_ARTIFACT_DELIVERY_DECISION_V1.md) — superseded historical decision
 - [Greenhouse Release Control Plane V1](GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
 - [EPIC-035 — Efeonce Embed Runtime](../epics/to-do/EPIC-035-efeonce-embed-runtime.md)

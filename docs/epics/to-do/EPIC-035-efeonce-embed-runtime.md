@@ -6,10 +6,10 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Arquitectura aceptada; TASK-1514..1518 registradas, ejecución pendiente`
+- Status real: `Dirección portable aceptada; provider selection y ejecución pendientes`
 - Rank: `TBD`
 - Domain: `cross-domain`
-- Owner: `unassigned`
+- Owner: `Platform Engineering` (accountable); `Growth/Public Site` (product acceptance); `Security/Cloud` (IAM acceptance)
 - Branch: `epic/EPIC-035-efeonce-embed-runtime`
 - GitHub Issue: `none`
 
@@ -17,8 +17,8 @@
 
 Construye la plataforma portable de distribución para Growth Forms, CTAs y Meetings, consumible por WordPress y
 Think/Astro sin depender del release de la aplicación Greenhouse. Greenhouse conserva control, APIs y verdad
-transaccional; un Hosting site secundario dedicado dentro del proyecto compartido `efeonce-group` es el delivery plane
-objetivo detrás de `assets.efeoncepro.com`, con Vercel como carril de migración y fallback.
+transaccional; `assets.efeoncepro.com` es la frontera pública neutral y `TASK-1515` selecciona con evidencia entre
+Vercel endurecido y Firebase Hosting en un proyecto GCP dedicado bajo la misma organización/facturación.
 
 ## Why This Epic Exists
 
@@ -30,14 +30,15 @@ No cabe en una task. Requiere estabilizar el carril actual, formalizar protocolo
 
 - Forms, CTAs y Meetings se publican de forma independiente del deploy de Greenhouse mediante un protocolo común y artefactos inmutables.
 - WordPress y Think/Astro consumen `assets.efeoncepro.com` y separan claramente `asset-base-url` de `api-base-url`.
-- Firebase Hosting pasa a ser delivery plane sólo después de un spike con go/no-go y dual-publish verificable; Vercel sigue siendo fallback reversible.
+- El delivery plane se elige entre Vercel endurecido y Firebase Hosting en proyecto GCP dedicado mediante un gate
+  comparable; no se habilita Firebase en `efeonce-group`.
 - CTA resuelve Forms/Meetings mediante registry/manifest, sin URLs Vercel o Greenhouse hardcoded.
 - Cada producto tiene promoción exacta, rollback, compatibilidad N/N-1, sintéticos reales, costo y evidencia operativa.
 - GTM/CMP permanecen host-owned y los ledgers de Greenhouse conservan la verdad de conversiones.
 
 ## Architecture Alignment
 
-- `docs/architecture/GREENHOUSE_EFEONCE_EMBED_RUNTIME_DELIVERY_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_EFEONCE_EMBED_RUNTIME_DELIVERY_DECISION_V2.md`
 - `docs/architecture/GREENHOUSE_EFEONCE_EMBED_RUNTIME_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md`
@@ -50,8 +51,8 @@ No cabe en una task. Requiere estabilizar el carril actual, formalizar protocolo
 ## Child Tasks
 
 - `TASK-1514` — Foundation: race hardening Vercel, protocol V1, fleet retention, receipts y fixtures host.
-- `TASK-1515` — Firebase Hosting delivery plane en `efeonce-group`: site/billing/IAM, dominio neutral y promoción
-  keyless exacta.
+- `TASK-1515` — Delivery-plane selection y provisioning gateado: Vercel endurecido vs Firebase en proyecto GCP
+  dedicado, identidad keyless, dominio neutral y promoción exacta.
 - `TASK-1516` — Meetings dual-publish, real-host soak, neutral-domain cutover y rollback.
 - `TASK-1517` — Forms independent release, WordPress/Think migration y submission/abuse/legacy verification.
 - `TASK-1518` — CTA registry/cutover, composition matrix y cierre de legacy/SLO/costos/runbooks del fleet.
@@ -67,43 +68,42 @@ No cabe en una task. Requiere estabilizar el carril actual, formalizar protocolo
 
 ## Delivery Strategy
 
-Secuencia obligatoria: estabilizar Vercel → protocolo/fixtures → spike Firebase → dual-publish Meetings → Forms → CTA → retirement. CTA migra después de Forms y Meetings porque compone ambos. Un fallo del spike no bloquea el objetivo funcional: el protocolo continúa sobre Vercel y la decisión se reabre con evidencia.
+Secuencia obligatoria de cutover: estabilizar Vercel/protocolo/fixtures → seleccionar y provisionar delivery plane →
+dual-publish Meetings → Forms → CTA → retirement. Forms y CTA pueden preparar release/compatibilidad después de
+`TASK-1514`, pero sus cutovers esperan el pilot Meetings; CTA corta al final porque compone ambos.
 
-`TASK-1515` reutiliza el proyecto GCP aprobado `efeonce-group` y crea/configura un Hosting site dedicado. No autoriza
-un proyecto paralelo, credenciales persistentes ni ampliaciones IAM no justificadas. No hay release, DNS cutover ni
-retiro de Vercel implícito por crear este epic.
-
-EPIC-035 acepta explícitamente que habilitar Firebase en `efeonce-group` es una mutación de infraestructura no
-completamente reversible. El cutover del renderer sigue siendo reversible; borrar el proyecto o el Hosting site nunca
-es rollback. IAM, billing y quotas continúan compartidos y se compensan con secondary site, publisher dedicado,
-custom role, WIF exact-subject y promoción concurrency-safe.
+`TASK-1515` comienza con discovery no mutante y un checkpoint de decisión. Sólo después puede endurecer el Vercel
+existente o, si Firebase gana, crear un proyecto GCP dedicado dentro de la organización y billing existentes. No
+autoriza Firebase en `efeonce-group`, credenciales persistentes, DNS cutover, consumer cutover ni retiro de Vercel.
 
 ## Exit Criteria
 
 - [ ] La carrera manifest/asset de Meetings está eliminada y una prueba demuestra que el release anterior sigue resolviendo durante promoción/rollback.
 - [ ] El protocolo V1 valida product/version/source/API range/dependencies/hashes y separa asset/API base URLs.
-- [ ] GitHub Actions publica con OIDC/WIF, ambiente protegido, mínimo privilegio y receipt trazable; no existen llaves JSON persistentes.
-- [ ] Before/after inventory registra APIs, IAM, service accounts, labels y API keys/restricciones del Firebase
-  enablement; el deployer general de `efeonce-group` no se reutiliza.
+- [ ] GitHub Actions publica con identidad corta/federada, ambiente protegido exacto, mínimo privilegio y receipt
+  trazable; no existen llaves JSON persistentes ni se reutiliza el deployer general de `efeonce-group`.
+- [ ] La selección Vercel/Firebase conserva una matriz comparable de seguridad, promoción, rollback, costo y carga
+  operativa; si Firebase gana, el before/after inventory cubre el proyecto dedicado, APIs, IAM, SAs, labels y keys.
 - [ ] `assets.efeoncepro.com` sirve TLS, headers, channels y releases conforme al contrato sin exponer vendor URLs a hosts.
-- [ ] Preview verificado se clona exactamente a live y existe rollback probado bajo 15 minutos.
+- [ ] El candidate verificado se promueve como bytes exactos a live y existe rollback probado bajo 15 minutos.
 - [ ] Una promoción stale cuyo `baseFleetDigest` difiere del live actual se rechaza y recompone; full-site rollback y
   per-product recomposition se prueban como operaciones distintas.
 - [ ] WordPress y Think/Astro pasan la matriz de Forms, CTA, Meetings, CTA→Form y CTA→Meetings que aplique.
-- [ ] Cada renderer pasa 390 px/desktop, `scrollWidth === clientWidth`, teclado, foco visible y reduced motion.
+- [ ] Cada renderer pasa 2048/1440/820/390 px, `scrollWidth === clientWidth`, teclado, foco visible y reduced motion.
 - [ ] GTM/dataLayer y CMP se verifican sin PII; accepted submissions y confirmed bookings reconcilian con ledgers server-side.
 - [ ] CTA no contiene URLs hardcoded o derivadas de Vercel/Greenhouse para cargar Forms o Meetings.
 - [ ] Host styling usa sólo tokens/parts/slots documentados o mantiene un contrato explícito versionado.
-- [ ] Costos y transferencia son observables; Blaze y alertas iniciales están configurados y documentados.
-- [ ] Costos Hosting son observables por SKU/transfer/storage; las alertas del proyecto compartido no se presentan como
-  budget aislado del site ni deshabilitan billing automáticamente.
+- [ ] Un cambio visual aprobado llega a preview en ≤5 min y a live en ≤10 min después de aprobación, sin build/release
+  de la aplicación Greenhouse; receipt y owner permiten medirlo.
+- [ ] Costos, transferencia y carga operativa del provider son observables; si Firebase gana, Hosting se mide por
+  SKU/transfer/storage en el proyecto dedicado y ningún budget deshabilita billing automáticamente.
 - [ ] Legacy shims, compatibilidad N/N-1, retiro y fallback Vercel tienen ventana, owner, señal de uso y rollback.
 - [ ] Docs técnicas, funcionales y runbook permiten publicar, promover, diagnosticar y revertir cada producto sin conocimiento tribal.
 
 ## Non-goals
 
-- Mover APIs, submissions, bookings, targeting, consent ledgers o PII a Firebase.
-- Usar Cloud Functions, Firestore, Firebase Auth o Cloud Run para servir renderers estáticos.
+- Mover APIs, submissions, bookings, targeting, consent ledgers o PII al delivery provider.
+- Usar Cloud Functions, Firestore, Firebase Auth, App Hosting o Cloud Run para servir renderers estáticos.
 - Crear un megabundle o una versión única de Forms, CTAs y Meetings.
 - Reescribir la UI/product logic de los tres renderers como parte de la migración de delivery.
 - Reemplazar GTM/CMP del host o convertir eventos browser en verdad transaccional.
@@ -111,9 +111,15 @@ custom role, WIF exact-subject y promoción concurrency-safe.
 
 ## Delta 2026-07-22
 
-Epic creado tras investigación de mercado, auditoría del runtime existente y revisión arquitectónica. Formaliza Firebase Hosting como target condicionado a spike y mantiene Vercel como carril reversible. La creación documental no provisiona cloud, no modifica runtime y no ejecuta releases.
+Epic creado tras investigación de mercado, auditoría del runtime existente y revisión arquitectónica. La creación documental no provisiona cloud, no modifica runtime y no ejecuta releases.
 
 ## Delta 2026-07-22 — Execution package
 
 El operador aprobó compactar el programa en cinco tasks secuenciales (`TASK-1514`..`TASK-1518`). Los workstreams de
 fixtures y retirement se integran respectivamente en foundation y fleet closure; no nacen tasks paraguas adicionales.
+
+## Delta 2026-07-22 — Architecture assurance correction
+
+El ADR V2 conserva el runtime neutral, suspende el supuesto de Firebase dentro de `efeonce-group` y convierte
+`TASK-1515` en un gate Vercel-vs-Firebase dedicado con provisioning posterior a la decisión. Se asignan owners por
+concern, SLO de lead time, single-writer promotion y matriz visual 2048/1440/820/390. Cero mutaciones cloud/runtime.

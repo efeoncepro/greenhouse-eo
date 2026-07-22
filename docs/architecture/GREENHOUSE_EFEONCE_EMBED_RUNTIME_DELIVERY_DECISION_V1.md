@@ -1,6 +1,6 @@
 # Efeonce Embed Runtime Delivery Decision V1
 
-- Status: Accepted — target architecture; rollout gated by EPIC-035
+- Status: Superseded by [Efeonce Embed Runtime Delivery and Isolation Decision V2](GREENHOUSE_EFEONCE_EMBED_RUNTIME_DELIVERY_DECISION_V2.md)
 - Date: 2026-07-22
 - Owner: Growth / Public Site / Platform
 - Scope: portable Forms, CTAs and Meetings renderers across WordPress, Think/Astro and future approved hosts
@@ -8,6 +8,7 @@
 - Reversibility: runtime/provider cutover is two-way; enabling Firebase on shared `efeonce-group` is a one-way
   infrastructure mutation; deleting the project/site is never rollback
 - Supersedes: [Public Renderer Artifact Delivery Decision V1](GREENHOUSE_PUBLIC_RENDERER_ARTIFACT_DELIVERY_DECISION_V1.md)
+- Superseded by: [Efeonce Embed Runtime Delivery and Isolation Decision V2](GREENHOUSE_EFEONCE_EMBED_RUNTIME_DELIVERY_DECISION_V2.md)
 
 ## Context
 

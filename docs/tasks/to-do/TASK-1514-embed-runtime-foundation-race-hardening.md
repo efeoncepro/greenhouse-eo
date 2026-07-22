@@ -7,7 +7,7 @@
 - Lifecycle: `to-do`
 - Priority: `P0`
 - Impact: `Muy alto`
-- Effort: `Medio`
+- Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `backend-data`
 - UI impact: `none`
@@ -29,7 +29,7 @@
 
 Estabiliza el carril Vercel vigente de Meetings y materializa el protocolo común de Efeonce Embed Runtime: manifests
 tipados, releases retenidos, fleet snapshots, separación API/assets y fixtures host. El objetivo inmediato es hacer
-imposible la carrera manifest→asset antes de sumar Firebase o migrar otros productos.
+imposible la carrera manifest→asset antes de seleccionar/provisionar otro delivery plane o migrar productos.
 
 ## Why This Task Exists
 
@@ -47,7 +47,7 @@ común y mezclan el origen de API con el de assets. Migrar ese estado a otro CDN
 
 ## Architecture Alignment
 
-- `docs/architecture/GREENHOUSE_EFEONCE_EMBED_RUNTIME_DELIVERY_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_EFEONCE_EMBED_RUNTIME_DELIVERY_DECISION_V2.md`
 - `docs/architecture/GREENHOUSE_EFEONCE_EMBED_RUNTIME_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_PUBLIC_RENDERER_ARTIFACT_DELIVERY_DECISION_V1.md`
 - `docs/architecture/GREENHOUSE_GROWTH_MEETINGS_SCHEDULER_ARCHITECTURE_V1.md`
@@ -76,7 +76,9 @@ Reglas obligatorias:
 
 ### Blocks / Impacts
 
-- Bloquea `TASK-1515`, `TASK-1516`, `TASK-1517` y `TASK-1518`.
+- Bloquea la mutación/provisioning de `TASK-1515` y los cutovers de `TASK-1516`..`1518`. Discovery no mutante de
+  provider/IAM/costos puede avanzar en paralelo; Forms/CTA pueden inventariar compatibilidad, pero no implementar el
+  protocolo antes de congelar V1.
 - Cambia el contrato de artifact build/release, no la UI del scheduler.
 
 ### Files owned
@@ -208,7 +210,8 @@ incluido. El test de carrera debe ejecutar el interleaving real y no limitarse a
 
 ### Slice ordering hard rule
 
-- Slice 1 → Slice 2 → Slice 3. Firebase no inicia hasta cerrar la carrera y congelar protocolo V1.
+- Slice 1 → Slice 2 → Slice 3. Ningún provisioning de delivery plane inicia hasta cerrar la carrera y congelar
+  protocolo V1; sólo discovery read-only de `TASK-1515` puede correr en paralelo.
 
 ### Risk matrix
 
@@ -234,12 +237,12 @@ Sin feature flag de producto. El channel manifest sigue siendo el control de pro
 
 1. Build determinista local dos veces y comparar digests.
 2. Verificar carrera simulada y hashes/SRI.
-3. Desplegar preview Vercel sin mover stable.
+3. Desplegar preview Vercel sin mover stable y medir el tiempo desde candidate aprobado hasta preview disponible.
 4. Ejecutar fixtures WordPress/Think y conservar receipt.
 
 ### Out-of-band coordination required
 
-N/A — no cloud/DNS/live mutation en esta task.
+La preview Vercel es la única mutación cloud autorizada y no mueve alias stable, DNS ni consumers live.
 
 <!-- ZONE 4 — VERIFICATION & CLOSING -->
 
@@ -251,6 +254,10 @@ N/A — no cloud/DNS/live mutation en esta task.
 - [ ] `api-base-url` y `asset-base-url` no se derivan uno del otro.
 - [ ] Fixtures WordPress y Think cubren loader sano, bloqueado, incompatible y timeout.
 - [ ] Health/receipt prueban assets, source SHA y fleet digest, no sólo release ID.
+- [ ] Actions/CLI están versionadas o pinneadas, el lockfile es respetado y cada asset live puede mapearse a source
+  SHA, digest, workflow protegido y aprobación.
+- [ ] Fixtures registran 2048/1440/820/390, teclado, foco, reduced motion y `scrollWidth === clientWidth`.
+- [ ] El release receipt permite medir preview ≤5 min y confirmar que no hubo Greenhouse application release.
 - [ ] No cambia UI ni fuentes de verdad de Forms/CTA/Meetings.
 
 ## Verification
@@ -268,5 +275,5 @@ N/A — no cloud/DNS/live mutation en esta task.
 
 ## Follow-ups
 
-- `TASK-1515` — Firebase delivery plane.
+- `TASK-1515` — delivery-plane selection and gated provisioning.
 - `TASK-1516` — Meetings dual-publish/cutover.

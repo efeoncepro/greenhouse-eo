@@ -19,17 +19,24 @@
 
 ## 2026-07-22 — Efeonce Embed Runtime formalizado como programa portable (EPIC-035)
 
+- Assurance arquitectónica posterior supersede la ubicación cloud de V1 sin abandonar el runtime: el ADR V2 obliga a
+  endurecer primero Vercel y hace que `TASK-1515` compare Vercel endurecido con Firebase Hosting en un proyecto GCP
+  dedicado bajo la misma organización/billing. Firebase en `efeonce-group` queda no autorizado; dedicated project no
+  significa otra cuenta ni otro control plane.
+- El epic/tasks agregan owner por concern, checkpoint humano antes de provisioning, identidad exacta de workflow,
+  single-writer con relectura live, sintaxis Firebase correcta, provenance, SLO visual-to-preview/live, synthetics
+  externos y matriz 2048/1440/820/390. `TASK-1517` sube a esfuerzo Alto por el coupling de deep selectors.
 - Forms, CTAs y Meetings dejan de tratarse como tres problemas de publicación separados: el ADR y la arquitectura
   nuevos definen un protocolo común, releases independientes, `assets.efeoncepro.com` como origen neutral y
-  Greenhouse como control/API/data plane. Firebase Hosting es el target estático; no recibe PII, bookings, submissions
-  ni lógica server-side.
+  Greenhouse como control/API/data plane. El provider seleccionado no recibe PII, bookings, submissions ni lógica
+  server-side.
 - La decisión no afirma un cutover: primero corrige la carrera manifest→asset del carril Vercel de Meetings, luego
-  exige spike Firebase con OIDC/WIF, preview→clone exacto, rollback y costo, seguido por dual-publish. Vercel permanece
-  como fallback y los legacy URLs conservan shims durante una ventana declarada.
-- `EPIC-035` ordena la ejecución en cinco tasks registradas: `TASK-1514` foundation, `1515` Firebase keyless, `1516`
+  exige scorecard/provider checkpoint, promoción exacta, rollback y costo, seguido por dual-publish. Vercel permanece
+  como current/fallback rail hasta que la evidencia determine otra cosa y los legacy URLs conservan shims.
+- `EPIC-035` ordena la ejecución en cinco tasks registradas: `TASK-1514` foundation, `1515` provider gate/keyless, `1516`
   Meetings, `1517` Forms y `1518` CTA/fleet closure; incluyen fixtures WordPress + Think/Astro, GTM/CMP, teclado,
   reduced motion, overflow y verdad server-side. No se provisionó cloud, cambió DNS ni ejecutó release.
-- Canon: [`GREENHOUSE_EFEONCE_EMBED_RUNTIME_DELIVERY_DECISION_V1.md`](docs/architecture/GREENHOUSE_EFEONCE_EMBED_RUNTIME_DELIVERY_DECISION_V1.md),
+- Canon: [`GREENHOUSE_EFEONCE_EMBED_RUNTIME_DELIVERY_DECISION_V2.md`](docs/architecture/GREENHOUSE_EFEONCE_EMBED_RUNTIME_DELIVERY_DECISION_V2.md),
   [`GREENHOUSE_EFEONCE_EMBED_RUNTIME_ARCHITECTURE_V1.md`](docs/architecture/GREENHOUSE_EFEONCE_EMBED_RUNTIME_ARCHITECTURE_V1.md) y
   [`EPIC-035`](docs/epics/to-do/EPIC-035-efeonce-embed-runtime.md).
 

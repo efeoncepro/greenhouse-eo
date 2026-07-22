@@ -66,10 +66,9 @@
   Greenhouse sigue como API y HubSpot/Office 365/Teams como SoT. GTM workspace 6 no está publicado; Contacto/RRSS
   siguen gateados por booking/replay, `/g/collect` y autorización GTM. Evidencia y detalle viven en TASK-1510.
 
-  **Decisión 2026-07-22:** `EPIC-035` formaliza Embed Runtime para Forms/CTAs/Meetings. TASK-1515 habilita Firebase en
-  el proyecto existente `efeonce-group` y crea un Hosting site/publisher dedicados; no crea proyecto paralelo. La
-  mutación Firebase no es completamente reversible, aunque el cutover sí. Vercel permanece fallback. Canon:
-  `GREENHOUSE_EFEONCE_EMBED_RUNTIME_{DELIVERY_DECISION,ARCHITECTURE}_V1.md`; ejecución `TASK-1514`→`1518`.
+  **Decisión corregida 2026-07-22:** `EPIC-035`/ADR V2 mantiene el runtime neutral; `TASK-1514` endurece Vercel y
+  `TASK-1515` decide Vercel vs Firebase dedicado antes de provisionar. Firebase en `efeonce-group` queda no autorizado;
+  cero cambios cloud/DNS/runtime. Ejecución `TASK-1514`→`1518`.
 
 - **`TASK-1366` COMPLETE / CONDITIONAL PASS (HubSpot Scheduler Booking Equivalence Spike, `EPIC-023`).**
   Build HubSpot `#27` desplegado/reinstalado con scope Scheduler mínimo y sin rotar el token gobernado. Booking

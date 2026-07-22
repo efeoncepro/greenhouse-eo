@@ -17,10 +17,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-035`
-- Status real: `Diseño; bloqueada por Forms migration`
+- Status real: `Registry/release prep inicia tras TASK-1514; composition cutover bloqueado por TASK-1516/1517`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `TASK-1517`
+- Blocked by: `TASK-1514 para registry/release prep; TASK-1516 y TASK-1517 para composition cutover`
 - Branch: `task/TASK-1518-growth-cta-embed-runtime-fleet-closure`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -93,7 +93,7 @@ Reglas obligatorias:
 
 - CTA renderer portable, Action Registry, telemetry, Think host y admin preview.
 - Forms/Meetings product contracts y neutral loaders tras tasks previas.
-- Fleet protocol, Firebase plane y rollback probados.
+- Fleet protocol, selected delivery plane y rollback probados antes del cutover.
 
 ### Gap
 
@@ -159,7 +159,7 @@ Reglas obligatorias:
 - Local checks: `CTA renderer/action/meeting/telemetry tests`
 - DB/runtime checks: `read-only reconciliation de CTA Tier A, submission y booking según escenarios aprobados`
 - Integration checks: `direct CTA, CTA→Form, CTA→Meetings en WordPress/Think`
-- Reliability signals/logs: `dependency/load/action + legacy traffic + Firebase cost/rollback age`
+- Reliability signals/logs: `dependency/load/action + legacy traffic + provider cost/rollback age`
 - Production verification sequence: `dual-publish → composition matrix → cutover → rollback → legacy retirement`
 
 ### Acceptance criteria additions
@@ -257,7 +257,7 @@ CTA channel/host config es el switch. Legacy shims se mantienen hasta cero tráf
 ## Verification
 
 - Suites `src/growth-cta-renderer/__tests__` y contract/telemetry parity.
-- Composition GVC desktop/390, teclado, reduced motion, overflow=0.
+- Composition GVC 2048/1440/820/390, teclado, foco, reduced motion, `scrollWidth === clientWidth`.
 - `pnpm local:check`, `pnpm task:lint --task TASK-1518`, `pnpm ops:lint --changed`.
 
 ## Closing Protocol

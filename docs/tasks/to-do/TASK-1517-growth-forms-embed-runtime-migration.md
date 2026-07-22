@@ -7,7 +7,7 @@
 - Lifecycle: `to-do`
 - Priority: `P1`
 - Impact: `Muy alto`
-- Effort: `Medio`
+- Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `backend-data`
 - UI impact: `none`
@@ -17,10 +17,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-035`
-- Status real: `Diseño; bloqueada por Meetings cutover`
+- Status real: `Release/compatibility prep inicia tras TASK-1514; consumer cutover bloqueado por TASK-1515/1516`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `TASK-1516`
+- Blocked by: `TASK-1514 para release prep; TASK-1515 y TASK-1516 para consumer cutover`
 - Branch: `task/TASK-1517-growth-forms-embed-runtime-migration`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -57,6 +57,8 @@ Reglas obligatorias:
 - Turnstile/origin/CORS se prueban en ambos hosts; nunca se relajan para facilitar CDN.
 - Renderer no carga GTM; eventos host-owned y sin PII.
 - No cambio visual intencional ni deep selector nuevo.
+- Los deep selectors existentes se inventarían por host y se clasifican `remove | token/part | versioned compatibility`;
+  no se cambia markup interno hasta cerrar esa matriz.
 
 ## Normative Docs
 
@@ -67,13 +69,13 @@ Reglas obligatorias:
 ### Depends on
 
 - `TASK-1514` protocol/fixtures.
-- `TASK-1515` Firebase plane.
-- `TASK-1516` cutover pattern probado.
+- `TASK-1515` selected delivery plane para cutover.
+- `TASK-1516` cutover/rollback pattern probado; no bloquea Slice 1 después de `TASK-1514`.
 
 ### Blocks / Impacts
 
-- Bloquea `TASK-1518`, porque CTA compone Forms.
-- Afecta plugin WordPress y cuatro docks Think.
+- Bloquea el composition cutover de `TASK-1518`, porque CTA compone Forms; CTA release/registry prep puede avanzar.
+- Afecta plugin WordPress y tres docks Forms de Think.
 
 ### Files owned
 
@@ -91,13 +93,15 @@ Reglas obligatorias:
 
 - Renderer portable, contracts/tests, Turnstile, telemetry y hosts reales.
 - API/ledger autoritativos separados del bundle.
-- Firebase platform y protocolo probados por tasks anteriores.
+- Delivery plane seleccionado y protocolo probados por tasks anteriores al cutover.
 
 ### Gap
 
 - Bundle stable mutable se produce en Greenhouse prebuild.
 - WordPress/Think consumen URL Greenhouse directa.
 - No hay Forms release/channel/rollback independiente ni legacy usage signal.
+- Los hosts conservan styling acoplado a clases internas `.ghf-*`; el inventario cross-renderer halló 123 referencias
+  `.ghf-*`/`.ghc-*`/`.ghm-*`, por lo que el contrato de compatibilidad es parte del cutover y no cleanup opcional.
 
 ## Modular Placement Contract
 
@@ -142,7 +146,7 @@ Reglas obligatorias:
 - Migration posture: `none`
 - Default state: `shadow` — dual-publish Forms
 - Backfill plan: `N/A`
-- Rollback path: `legacy renderer URL + previous Firebase release`
+- Rollback path: `legacy renderer URL + previous selected-provider release`
 - External coordination: `WordPress/Think deploys, controlled submission, release approval`
 
 ### Security and access
@@ -176,6 +180,8 @@ Reglas obligatorias:
 
 - Emitir manifest/release/channel V1 y dual-publish sin cambiar consumers.
 - Separar stable artifact de Greenhouse prebuild; conservar preview para Design System/local.
+- Inventariar deep selectors WordPress/Think y cerrar su matriz `remove | token/part | versioned compatibility` antes
+  de cualquier markup interno.
 
 ### Slice 2 — Host migration and real submissions
 
@@ -248,12 +254,13 @@ Host loader/channel actúa como switch; shim legacy permanece hasta cero uso obs
 - [ ] Valid/invalid submit, consent, Turnstile y CORS pasan en ambos hosts.
 - [ ] Telemetry no contiene PII y ledger confirma accepted submission.
 - [ ] GVC no muestra regresión, overflow ni fallo teclado/reduced motion.
+- [ ] No queda deep selector no inventariado: cada dependencia tiene contrato, reemplazo o evidencia de retiro.
 - [ ] Rollback funciona y legacy retirement depende de uso observado.
 
 ## Verification
 
 - Suites `src/growth-forms-renderer/__tests__` y contract parity.
-- Host GVC desktop/390, teclado, reduced motion, overflow=0.
+- Host GVC 2048/1440/820/390, teclado, foco, reduced motion, `scrollWidth === clientWidth`.
 - `pnpm local:check`, `pnpm task:lint --task TASK-1517`, `pnpm docs:closure-check`.
 
 ## Closing Protocol
