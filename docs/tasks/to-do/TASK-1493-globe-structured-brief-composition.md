@@ -24,7 +24,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `creative|ai|platform`
-- Blocked by: `TASK-1481`
+- Blocked by: `none`
 - Branch: `task/TASK-1493-globe-structured-brief-composition`
 - Legacy ID: `none`
 - GitHub Issue: `none`

@@ -24,7 +24,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `creative|ai`
-- Blocked by: `TASK-1481, TASK-1490`
+- Blocked by: `none`
 - Branch: `task/TASK-1494-globe-reference-intelligence-style-dna`
 - Legacy ID: `none`
 - GitHub Issue: `none`
