@@ -269,6 +269,32 @@ dejó `TASK-1490` (write half) y agrega su **espejo servible** gobernado.
   `copyProducerAssetAsReference`. El conformance harness ejercita el output side por HTTP **y** SDK y compara
   la proyección — parity demostrada, no declarada.
 
+### Estado de runtime y camino comercial (TASK-1503, 2026-07-22)
+
+**Vivo hoy:** la capability está **operativa** en `globe-api-internal` (rev `00016-8dr`,
+`GLOBE_PRODUCER_ASSETS_ENABLED=true`, secreto v1 activo, migración `0003` aplicada), verificada con
+retrieval real de bytes, los tres negativos y el negativo private-ingest en forma precisa (un hash que
+sí está en el bucket, declarado como input de otra corrida ⇒ `not_found`, con control de que el output
+propio de esa misma corrida sí se sirve).
+
+Vive en el servicio **api** y no en el web por **autoridad**, no por despliegue: la capability viaja en
+el service principal, y en modo `web` las capabilities salen del broker de Greenhouse, que no otorga
+`globe.producer.assets.operate` a humanos. Eso es el gate de `TASK-1505`.
+
+**`internal_smoke` es el estadio actual del runtime, no el techo del producto.** Los gates reales
+hacia uso comercial, con dueño:
+
+| Gate | Qué falta | Dueño |
+|---|---|---|
+| Humano interno (shell web) | broker grant + flip de `ui`/`mcp` | `TASK-1505` |
+| Cliente externo / comercial | readiness gate completo | `TASK-1480` ← `TASK-1477` · `TASK-1478` · `TASK-1479` · `TASK-1482` (sobre `TASK-1468`) — **las 5 en `to-do`** |
+| Runtime no-interno | `readStudioRuntimeConfig` lanza `globe_environment_not_internal_smoke`: no hay forma de bootear un runtime comercial | **SIN DUEÑO declarado** — `TASK-1480` no lo menciona |
+| Contabilidad comercial | el spend fence es de seguridad, no ledger (retrieval es gasto cero y no lo necesita; el Producer completo sí) | `TASK-1468` → `TASK-1482` |
+
+El ensanche del enum de entorno es un **bloqueo duro en código sin dueño**: las otras cuatro
+dependencias de `TASK-1480` pueden avanzar en paralelo, pero ninguna lo resuelve. Es el candidato
+natural a próximo paso ejecutable del programa comercial.
+
 ## Boundary / invariantes (heredados + nuevos)
 
 Hereda todos los invariantes de Globe (`greenhouse-globe` skill + `EFEONCE_GLOBE_MODEL_LAB_V1.md`), y agrega:

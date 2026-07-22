@@ -7,7 +7,23 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-## 2026-07-22 — Globe ya deja sacar lo que produce, y la puerta la pone el dominio (TASK-1503)
+## 2026-07-22 — Efeonce Embed Runtime formalizado como programa portable (EPIC-035)
+
+- Forms, CTAs y Meetings dejan de tratarse como tres problemas de publicación separados: el ADR y la arquitectura
+  nuevos definen un protocolo común, releases independientes, `assets.efeoncepro.com` como origen neutral y
+  Greenhouse como control/API/data plane. Firebase Hosting es el target estático; no recibe PII, bookings, submissions
+  ni lógica server-side.
+- La decisión no afirma un cutover: primero corrige la carrera manifest→asset del carril Vercel de Meetings, luego
+  exige spike Firebase con OIDC/WIF, preview→clone exacto, rollback y costo, seguido por dual-publish. Vercel permanece
+  como fallback y los legacy URLs conservan shims durante una ventana declarada.
+- `EPIC-035` ordena la ejecución en cinco tasks registradas: `TASK-1514` foundation, `1515` Firebase keyless, `1516`
+  Meetings, `1517` Forms y `1518` CTA/fleet closure; incluyen fixtures WordPress + Think/Astro, GTM/CMP, teclado,
+  reduced motion, overflow y verdad server-side. No se provisionó cloud, cambió DNS ni ejecutó release.
+- Canon: [`GREENHOUSE_EFEONCE_EMBED_RUNTIME_DELIVERY_DECISION_V1.md`](docs/architecture/GREENHOUSE_EFEONCE_EMBED_RUNTIME_DELIVERY_DECISION_V1.md),
+  [`GREENHOUSE_EFEONCE_EMBED_RUNTIME_ARCHITECTURE_V1.md`](docs/architecture/GREENHOUSE_EFEONCE_EMBED_RUNTIME_ARCHITECTURE_V1.md) y
+  [`EPIC-035`](docs/epics/to-do/EPIC-035-efeonce-embed-runtime.md).
+
+## 2026-07-22 — Globe ya deja sacar lo que produce, y la puerta la pone el dominio (TASK-1503, live)
 
 - El Creative Producer estrena su **output side**: un reader gobernado devuelve una ficha de la pieza más un
   pase HMAC efímero (**nunca bytes en el JSON**), y `GET /v1/outputs/:sha256` canjea ese pase para streamear
@@ -24,9 +40,16 @@
 - Delta al spec: las anotaciones quedaron **durables** (migración `0003`) en vez de in-memory. El spec las
   difería a `TASK-1465`, que ya shipeó sin cubrirlas, y con los servicios en 3 réplicas un store en memoria no
   es "volátil" sino no determinista: una estrella escrita en una réplica es invisible en otra.
-- `ui`/`mcp` nacen `policy-blocked` y el flag `GLOBE_PRODUCER_ASSETS_ENABLED` default OFF: **código completo,
-  rollout pendiente** (falta crear `GLOBE_PRODUCER_GRANT_SECRET`, declarar los env en Terraform, aplicar la
-  migración y correr el canary con sus tres negativos).
+- **Desplegado y ACTIVO el mismo día** en `globe-api-internal` (rev `00016-8dr`): secreto HMAC creado
+  out-of-band, migración `0003` aplicada, env y kill switch gobernados en Terraform — el flag vive en el
+  default de la variable, en git, y no en un `terraform.tfvars` gitignoreado (probado planeando sin él).
+  Canario 14/14 con bytes reales servidos, más el negativo private-ingest en su forma precisa: un hash que
+  **sí** está en el bucket y que el workspace declaró como *input* responde `not_found`, mientras el output
+  propio de esa misma corrida sí se sirve. La impersonación necesaria para el canario se otorgó y revocó en
+  dos ventanas acotadas, con el corte verificado.
+- Lo que **no** cambió: `ui`/`mcp` siguen `policy-blocked` (gate de `TASK-1505`) y el uso comercial/externo
+  sigue siendo un programa aparte (`TASK-1480` ← 1477/1478/1479/1482). Hallazgo del rollout: ampliar
+  `GLOBE_ENVIRONMENT` más allá de `internal_smoke` es un bloqueo duro en código **sin dueño declarado**.
 - Spec: [`docs/tasks/complete/TASK-1503-globe-governed-output-retrieval-asset-actions.md`](docs/tasks/complete/TASK-1503-globe-governed-output-retrieval-asset-actions.md).
 
 ## 2026-07-21 — Cloud Run de Globe bajo Terraform y un cap de 1 instancia que nadie sabía que existía (TASK-1508)
@@ -780,13 +803,3 @@
   `Renovado`, `No renovado` y `No aplica / Desestimado`; creación y requiredness quedaron gobernados sin mover
   registros históricos. Las ocho tareas de acompañamiento por entrada futura a etapa siguen diseñadas pero no
   publicadas, evitando una ola retrospectiva sin contrato de owner/vencimiento/notificación.
-
-## 2026-07-17 — Método de infografía editorial determinística
-
-- `content-marketing-studio` incorpora una referencia reusable para producir infografías con copy, datos y marca
-  exactos mediante `contrato -> SVG accesible -> Chromium/PNG master -> WebP -> QA original/contextual -> manifest`.
-  Incluye art direction responsive/light-dark, espera de fuentes y assets, hashes, provenance, accesibilidad y
-  separación explícita entre producción visual completa e integración/publicación.
-- `design-studio` enruta estas piezas al método y conserva la dirección de composición; `dataviz-design` sigue
-  siendo dueño del encoding analítico complejo. La estética de ANAM queda como precedente local, no como regla
-  global. Referencia y routing quedaron espejados para Codex/Claude.

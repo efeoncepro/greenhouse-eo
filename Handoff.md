@@ -26,14 +26,28 @@
 
 ## Pendientes inmediatos
 
-- **`TASK-1503` CODE COMPLETE, ROLLOUT PENDIENTE (`EPIC-028`, cluster Creative Producer).** Output side del
-  Producer (retrieval gobernado + favorite/copyAsReference) verificado local en `efeonce-globe`: `pnpm check` +
-  `pnpm build` verdes, 318 tests. **Nada prendido en runtime y sin push**: los commits viven en `main` local de
-  `efeonce-globe`. Antes de operarlo hacen falta 5 pasos en orden (secreto HMAC → migración `0003` → env **en
-  Terraform**, no `gcloud` → IAM de lectura del bucket → canary con sus 3 negativos): runbook
-  `docs/manual-de-uso/creative-studio/operar-retrieval-assets-globe.md`. `ui`/`mcp` siguen `policy-blocked`
-  hasta el gate de `TASK-1505`, que además debe hacer que el broker otorgue `globe.producer.assets.operate` a
-  humanos web.
+- **`TASK-1503` COMPLETE y ACTIVA en el runtime interno (`EPIC-028`, cluster Creative Producer).** El
+  output side del Producer (retrieval gobernado + favorite/copyAsReference) está **operativo** en
+  `globe-api-internal` rev `00016-8dr`: `GLOBE_PRODUCER_ASSETS_ENABLED=true`, secreto
+  `globe-producer-grant-secret` v1 activo, migración `0003` aplicada, todo gobernado en Terraform (el
+  flag vive en el default de la variable, **en git**; verificado planeando sin `terraform.tfvars`).
+  Canario 14/14 con bytes reales servidos + los tres negativos, más el negativo private-ingest en su
+  forma **precisa** (hash que sí está en el bucket, declarado como input de otra corrida ⇒ `not_found`,
+  con control de que el output propio de esa corrida sí se sirve). Post-cleanup 7/7. La impersonación
+  del canario se otorgó y revocó en dos ventanas acotadas; policy final de `greenhouse-globe-caller@`
+  = sólo `workloadIdentityUser` de Vercel. Gasto: 20 créditos contra un cap de 200.
+  **Quién la usa hoy:** el service principal por las vías internas. Una persona en el shell web todavía
+  no — el broker no le otorga la capability y `ui`/`mcp` siguen `policy-blocked`: ese es el gate de
+  `TASK-1505`. Runbook: `docs/manual-de-uso/creative-studio/operar-retrieval-assets-globe.md`.
+
+- **Globe hacia comercial — gates vigentes y un bloqueo SIN DUEÑO (hallazgo del rollout de `TASK-1503`).**
+  `internal_smoke` es el estadio actual del runtime, no el techo del producto. Camino real:
+  `TASK-1505` (humano interno: broker grant + flip de `ui`/`mcp`) y, para cliente externo, `TASK-1480`
+  bloqueada por `TASK-1477`/`1478`/`1479`/`1482` (sobre `TASK-1468`) — las cinco en `to-do`.
+  **Lo que nadie sostiene:** `readStudioRuntimeConfig` lanza `globe_environment_not_internal_smoke`
+  para cualquier valor distinto, así que hoy **no existe forma de bootear un runtime comercial**, y
+  `TASK-1480` no lo menciona. Las otras cuatro dependencias pueden avanzar en paralelo pero ninguna lo
+  resuelve: es el candidato natural a próximo paso ejecutable del programa comercial.
 
 - **`TASK-1466` COMPLETE (`EPIC-028`).** SPEC-008 desplegada y verificada internal-only: migración Cloud SQL, dos
   revisiones Ready, smoke auth/tenant/idempotency y readback de versiones+audit verdes. Detalle en
@@ -44,34 +58,21 @@
   corporativa reactiva y confirmación receipt-gated sin PII. `open_meeting_scheduler` abre una instancia dialog/full-screen;
   `book_meeting` sigue navigation-only. Pruebas, TypeScript, ESLint, build y GVC premium están verdes.
 
-  Ambos flags están ON en staging/Production. El binding piloto `fhsf-efeonce-lead-gen-web`/`discovery` está `active`; config y disponibilidad
-  reales devolvieron 200 desde el origen permitido, incluida la resolución visitor-aware de `America/New_York`. El piloto aislado
-  `https://efeoncepro.com/agenda/` (WP `251583`, `noindex`) monta el renderer nativo con slots reales. La decisión de producto
-  es **native-only**: WordPress ya no contiene enlaces visibles a HubSpot y el renderer/adapter reemplaza cualquier recuperación
-  externa por navegación mensual o `Reintentar`; HubSpot permanece únicamente como provider server-side. La mutación Elementor
-  quedó respaldada en `_gh_backup_before_agenda_native_only_20260721T170615Z`, con readback de un host y cero links HubSpot.
-  El bundle native-only fue liberado por PR #163 en `fbe8a9c76a74` mediante el release
-  `fbe8a9c76a74-4aee6089-fec9-45b7-8b70-5ba16a84cfa9` (run `29854833210`, estado `released`). El smoke
-  post-release en la sesión Chrome autenticada confirmó `/agenda/` sin enlaces ni copy de fallback HubSpot,
-  cuadrícula completa de agosto, estado vacío específico y `overflow=0`; no se creó un booking durante los checks.
-  El host WordPress quedó refinado como focused booking canvas: header navegable, un solo H1, sin sidebar/breadcrumbs
-  ni prefooter, y con el footer global completo sin overrides de agenda. La evidencia final
-  `.captures/2026-07-21T23-44-01-104Z_agenda-focused-booking-canvas` pasa 1440/820/390, overflow, teclado,
-  reduced motion y cero errores; backup `_gh_backup_before_agenda_global_footer_restore_20260721T234352Z`.
-  El polish del carril `command` elimina la órbita recortada, conserva sólo glow tonal estático,
-  evita el corte de `Conversemos` y usa el glifo monocromo gobernado de Teams en turquesa, sin fondo morado. Evidencia
-  GVC `.captures/2026-07-22T00-40-24_native-meeting-scheduler` (45 frames, 1440/820/390) más
-  `.captures/manual/TASK-1510-scheduler-rail/reference-2048-v2.png` a 2048×1135. Ya está live mediante el proyecto estático
-  aislado `efeonce-public-renderers`: `/agenda/` carga el loader estable, renderer e iconos comparten release inmutable
-  `2fbea2b39b555c5762e6`, y Greenhouse queda sólo como API. La promoción/rollback por alias ya no exige release de la app.
-  Backup Elementor `_gh_backup_before_agenda_public_renderer_20260722T075004Z`; evidencia live
-  `.captures/2026-07-22-agenda-public-renderer` en 2048/1440/820/390, sin bundle legacy, overflow ni errores.
-  HubSpot devuelve actualmente cero slots para agosto; el renderer ya conserva `Agosto de 2026`, la grilla de 31 días y
-  el estado vacío en vez de colapsar el calendario; PR #162 (`ddd3094538e7`, run `29848667096`) ya liberó esa corrección.
-  `ops-worker` permanece change-gated porque el diff desde `7da563613daf` no toca sus rutas runtime.
+  Ambos flags están ON en staging/Production y el binding piloto está `active`. `/agenda/` (WP `251583`, `noindex`)
+  opera native-only: sin fallback visible a HubSpot, con header/footer globales, un H1 y canvas enfocado. El carril
+  `command` ya no recorta la órbita ni `Conversemos`, y usa el glifo monocromo de Teams. GVC live pasó
+  2048/1440/820/390, overflow, teclado y reduced motion; no se creó un booking durante esos checks.
+  El loader estable vive en `efeonce-public-renderers`; renderer e iconos comparten el release inmutable
+  `2fbea2b39b555c5762e6` y Greenhouse queda como API. HubSpot actualmente devuelve cero slots para agosto, por lo que
+  el renderer conserva mes, grilla y estado vacío. Backups, runs y capturas quedan en TASK-1510 y su arquitectura.
   GTM workspace 6 sigue sin versión/publicación. No promover a Contacto/RRSS antes del booking/replay y `/g/collect`;
   publicar GTM requiere confirmación humana separada. HubSpot/Office 365/Teams siguen SoT. La skill canónica nueva es
   `greenhouse-growth-meetings`; arquitectura, PDR, CTA/GTM/release, manuales e índices quedaron sincronizados.
+  **Decisión posterior 2026-07-22:** `EPIC-035` formaliza Efeonce Embed Runtime para Forms/CTAs/Meetings. Firebase
+  Hosting es target detrás de `assets.efeoncepro.com`, pero no está provisionado ni live: primero se corrige la carrera
+  manifest/asset del carril Vercel, luego spike WIF+preview→clone+rollback y dual-publish. Vercel permanece fallback.
+  Canon: `GREENHOUSE_EFEONCE_EMBED_RUNTIME_{DELIVERY_DECISION,ARCHITECTURE}_V1.md`. Ejecución registrada en cinco
+  unidades secuenciales: `TASK-1514` foundation → `1515` Firebase → `1516` Meetings → `1517` Forms → `1518` CTA/cierre.
 
 - **`TASK-1366` COMPLETE / CONDITIONAL PASS (HubSpot Scheduler Booking Equivalence Spike, `EPIC-023`).**
   Build HubSpot `#27` desplegado/reinstalado con scope Scheduler mínimo y sin rotar el token gobernado. Booking

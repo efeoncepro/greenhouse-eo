@@ -1,5 +1,73 @@
 # TASK-1503 — Governed Output Retrieval + Asset Actions
 
+## Runtime evidence 2026-07-22 — rollout ejecutado en el runtime interno
+
+**Estado honesto: operativo en el runtime interno por el service principal. NO es rollout
+comercial** (ver §Camino comercial abajo).
+
+| Paso | Evidencia |
+|---|---|
+| Código en `main` | `51ade01..b12451d` (8 commits + IaC), pusheado |
+| Baseline IaC | `tofu plan` → **No changes** antes de tocar nada |
+| Migración `0003` | aplicada 08:29Z; `globe._migrations` la lista y las 2 tablas existen |
+| Secreto HMAC | `globe-producer-grant-secret` v1 creado out-of-band; 64 bytes, **0 saltos de línea** |
+| IAM | `secretAccessor` **sólo** a `api_runtime` (mínima); bucket ya tenía `objectAdmin` |
+| Imagen | Cloud Build `0aa28952` SUCCESS → `globe-api-internal:99d7b69c9195` |
+| Deploy | image-only; `tofu plan` post-deploy → **No changes** (anti-drift de TASK-1508 sostenido) |
+| Contrato con flag OFF | 5/5: 4 capabilities publicadas, `ui`/`mcp` `policy-blocked`, todo `policy_blocked` |
+| Flag ON | `producer_assets_enabled = true` en el default de la variable (**en git**), rev `00016-8dr` |
+| Canario | **14/14** — bytes reales servidos (820.868 B PNG, `image/png`, `inline; filename="globe-939669f9b5c5.png"`, `private, no-store`) |
+| Negativo 1 | experimento cross-workspace → `not_found` |
+| Negativo 2 (preciso) | hash **que sí está en el bucket** y que el workspace declaró como **input** → `not_found`, con control: el output propio del mismo experimento **sí** se sirve |
+| Negativo 3 | grant manipulado → `403 access_denied`; sin auth → `403` |
+| Grant temporal (2 ventanas) | `tokenCreator` sobre `greenhouse-globe-caller@`: 08:44:19Z→**08:50:56Z** (canario) y 08:55:14Z→**08:57:32Z** (verificación post-cleanup). Cortes verificados 08:52:01Z y 08:59:00Z; policy final = sólo `workloadIdentityUser` de Vercel |
+| Anti-drift final | `tofu plan` **sin `terraform.tfvars`** → No changes (el estado del flag vive en git) |
+
+### Post-cleanup — la capacidad queda ACTIVA (verificado 08:56Z, 7/7)
+
+Por decisión del operador el flag y el secreto **no se revierten**: la capacidad queda operativa en
+el runtime disponible. Verificado con el grant temporal ya revocado y reabierto sólo para esto:
+
+- Revisión live `globe-api-internal-00016-8dr` Ready; `GLOBE_PRODUCER_ASSETS_ENABLED = true`;
+  `GLOBE_PRODUCER_GRANT_SECRET` = `secretRef:globe-producer-grant-secret:latest`, versión 1 `enabled`.
+- Las 4 capabilities siguen publicadas; `ui`/`mcp` siguen `policy-blocked` (el gate de `TASK-1505`
+  no se movió); `http`/`sdk`/`cli`/`worker`/`e2e` `available`.
+- **Retrieval gobernado de punta a punta:** descriptor + grant → redención → **820.868 B**
+  `image/png`, `private, no-store`. Gasto cero (pieza preexistente).
+- La invariante sigue viva, no sólo el camino feliz: cross-workspace → `not_found`.
+- Anotaciones legibles por el contrato **y** presentes en Cloud SQL (1 favorite + 1 referencia
+  `derived-internal`/`internal-owned`), o sea sobrevivieron al cierre de la ventana.
+- Perímetro intacto: anónimo → `403`.
+
+Experimentos del canario: `b8df1277…` (generate, 10 créditos) y `d4c94d16…` (reference-conditioned,
+10 créditos) — 20 créditos reales contra un cap diario de 200.
+
+Dos cosas que el canario enseñó y que no salían de los tests:
+
+1. **`execute` puede exceder el timeout de transporte del cliente y completar igual en el servidor.**
+   Verlo como fallo y reintentar habría gastado créditos de nuevo. Un canario debe leer el estado
+   antes de reejecutar.
+2. **El negativo private-ingest sólo prueba lo que dice si el hash existe de verdad en el store.**
+   La primera pasada usó un hash inexistente — mismo código de respuesta, garantía mucho más débil.
+   La versión válida declara el output retenido de una corrida como *input* de otra.
+
+## Camino comercial — gates vigentes (identificados, no inventados)
+
+`internal_smoke` es el **estadio actual del runtime**, no el techo del producto. Lo que hoy separa a
+esta capability de un uso comercial, con dueño explícito:
+
+| Gate | Qué falta | Dueño |
+|---|---|---|
+| Humano interno (shell web) | El broker de Greenhouse no otorga `globe.producer.assets.operate` a humanos, y `ui`/`mcp` siguen `policy-blocked` | **`TASK-1505`** |
+| Cliente externo / comercial | Readiness gate completo | **`TASK-1480`**, bloqueada por `TASK-1477` (buyer discovery), `TASK-1478` (shadow calibration + unit economics), `TASK-1479` (operating mode pilot), `TASK-1482` (credit pools/grants/budget admin, sobre `TASK-1468` shadow ledger) — **las 5 en `to-do`** |
+| Runtime no-interno | `readStudioRuntimeConfig` **lanza** `globe_environment_not_internal_smoke` para cualquier valor distinto: hoy no existe forma de bootear un runtime comercial | **SIN DUEÑO** — ninguna task lo declara, `TASK-1480` no lo menciona |
+| Contabilidad comercial | El spend fence es de **seguridad**, no ledger. Retrieval es gasto cero y no lo necesita; el Producer completo sí | `TASK-1468` → `TASK-1482` |
+
+**Siguiente paso ejecutable hacia comercial:** asignar dueño al ensanche del enum de entorno — es un
+bloqueo duro en código que ninguna task sostiene, y las otras cuatro dependencias de `TASK-1480`
+pueden avanzar en paralelo sin él, pero ninguna lo resuelve. Para que *esta* capability le sirva a
+una persona (paso previo y menor), el siguiente es `TASK-1505`.
+
 ## Delta 2026-07-22 — ejecución (decisiones que se apartan del spec, con su razón)
 
 1. **Persistencia durable en vez de in-memory** (autorizado por el operador). El spec difería las
@@ -65,7 +133,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-028`
-- Status real: `Complete (code); rollout pendiente`
+- Status real: `Complete; operativo en runtime interno (api). Comercial gateado por TASK-1505/1480`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `TASK-1490`

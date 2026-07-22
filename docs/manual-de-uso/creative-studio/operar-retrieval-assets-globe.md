@@ -7,6 +7,20 @@
 > **Doc funcional:** [efeonce-globe-producer-retrieval-assets.md](../../documentation/creative-studio/efeonce-globe-producer-retrieval-assets.md)
 > **Doc tecnica:** [EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md](../../architecture/creative-studio/EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md)
 
+## Estado actual (2026-07-22)
+
+**La capacidad está ACTIVA en el runtime interno** (`globe-api-internal`, revisión `00016-8dr`):
+`GLOBE_PRODUCER_ASSETS_ENABLED=true`, secreto `globe-producer-grant-secret` v1 `enabled`, migración
+`0003` aplicada. Verificado en vivo: retrieval gobernado sirviendo bytes reales, los tres negativos
+y el negativo private-ingest en su forma precisa.
+
+Quién puede usarla hoy: **el service principal** por las vías internas (HTTP/SDK/CLI/worker/E2E). Una
+persona en el shell web todavía **no**: el broker no le otorga `globe.producer.assets.operate` y
+`ui`/`mcp` siguen `policy-blocked` — eso es el gate de `TASK-1505`, no un pendiente de este manual.
+
+Lo que sigue abajo es el procedimiento de operación: sirve para reproducir el rollout en otro
+runtime, para diagnosticar, y para el rollback.
+
 ## Para qué sirve
 
 Prender, verificar y diagnosticar el **lado de salida** del Creative Producer: descargar/previsualizar una
@@ -14,55 +28,63 @@ pieza generada, marcarla como favorita y certificarla como referencia reutilizab
 
 ## Antes de empezar
 
-Estado de fábrica: **apagado**. Para operarlo hacen falta tres cosas en el servicio Cloud Run
-`globe-studio-internal` (y, si se opera por la vía workload, también en `globe-api-internal`):
+El servicio que sirve esta capacidad es **`globe-api-internal`**, no el web. La razón no es de
+despliegue sino de autoridad: la capability viaja en el service principal, y en modo `web` las
+capabilities de una persona salen del broker de Greenhouse, que hoy no otorga
+`globe.producer.assets.operate`. Ponerla en el web sería un permiso sin consumidor.
 
 | Variable | Qué es | Default | Requisito |
 |---|---|---|---|
-| `GLOBE_PRODUCER_ASSETS_ENABLED` | Interruptor de la capacidad | `false` | Prenderlo para operar |
-| `GLOBE_PRODUCER_GRANT_SECRET` | Clave HMAC que firma los pases de descarga | ausente | **Obligatoria**: sin ella nada se puede servir |
+| `GLOBE_PRODUCER_ASSETS_ENABLED` | Interruptor de la capacidad | `false` (variable `producer_assets_enabled`) | Prenderlo para operar |
+| `GLOBE_PRODUCER_GRANT_SECRET` | Clave HMAC que firma los pases | ausente | **Obligatoria**: sin ella nada se sirve |
 | `GLOBE_PRODUCER_GRANT_TTL_SECONDS` | Duración del pase | `300` | Opcional (rango 30-900) |
 
-Además:
+Además: `GLOBE_LAB_INPUT_BUCKET` ya está en el servicio y `api_runtime` ya tiene `objectAdmin` sobre
+ese bucket; y la migración `0003_producer_asset_annotations.sql` debe estar aplicada (las marcas y
+referencias son durables).
 
-- El bucket ya existe (`GLOBE_LAB_INPUT_BUCKET`); confirmá que la service account de runtime tiene
-  **lectura** (`storage.objects.get`) sobre él.
-- La migración `0003_producer_asset_annotations.sql` debe estar aplicada (las marcas y referencias son
-  durables; sin ella los comandos fallan al escribir).
+> ⚠️ `GLOBE_PRODUCER_GRANT_SECRET` **no es un flag de rollout**: es requisito de operación. Sin él el
+> sistema no se rompe en silencio — responde `dependency_unavailable`, que es lo correcto: un servicio
+> que no puede firmar no debe entregar algo con forma de pase.
 
-> ⚠️ `GLOBE_PRODUCER_GRANT_SECRET` **no es un flag de rollout**: es requisito de operación. Sin él el sistema
-> no se rompe silenciosamente — responde `dependency_unavailable`, que es lo correcto: un servicio que no
-> puede firmar no debe entregar algo que parezca un pase.
+## Paso a paso — prender en un runtime
 
-## Paso a paso — prender en staging
+1. **Contenedor del secreto + accessor, en Terraform** (`infra/terraform/secrets.tf`). El accessor va
+   **solo** a `api_runtime`: `web_runtime` no tiene consumidor hasta el gate de `TASK-1505`.
 
-1. **Crear el secreto** (valor aleatorio, escalar crudo, sin comillas ni saltos de línea):
-
-   ```bash
-   openssl rand -hex 32 | tr -d '\n' | \
-     gcloud secrets create globe-producer-grant-secret --data-file=- --project efeonce-globe
-   gcloud secrets add-iam-policy-binding globe-producer-grant-secret \
-     --member "serviceAccount:globe-web-runtime@efeonce-globe.iam.gserviceaccount.com" \
-     --role roles/secretmanager.secretAccessor --project efeonce-globe
-   ```
-
-2. **Aplicar la migración** (como cualquier migración de Globe, corre como `globe_owner`).
-
-3. **Declarar las variables en Terraform** (`infra/terraform/cloud_run_services.tf`) y aplicar.
-
-   > ⚠️ Desde `TASK-1508` la configuración de los servicios Cloud Run vive en Terraform. Moverla con
-   > `gcloud run services update --update-env-vars` funciona **hasta el próximo `tofu apply`, que la borra en
-   > silencio**. Si por urgencia lo hacés con `gcloud`, reflejalo en HCL **antes** del siguiente apply.
-   > Y **nunca** uses `--set-env-vars`: reemplaza el set completo.
-
-4. **Verificar el contrato antes de prender.** Con la capacidad todavía apagada, `/v1/capabilities` ya debe
-   listar las cuatro entradas nuevas con `ui` y `mcp` en `policy-blocked`:
+2. **El valor del secreto, out-of-band.** Nunca a HCL, a state ni a git. Escalar crudo, sin salto de
+   línea final (`printf %s`, no `echo`):
 
    ```bash
-   pnpm --dir ../efeonce-globe exec node scripts/smoke-private-api.mjs   # o el equivalente autenticado
+   printf %s "$(openssl rand -base64 48)" | \
+     gcloud secrets versions add globe-producer-grant-secret --data-file=- --project efeonce-globe
    ```
 
-5. **Prender** `GLOBE_PRODUCER_ASSETS_ENABLED=true` y correr el canary (abajo).
+   Verificá la forma sin revelar el valor: `… versions access latest | wc -c` (64) y que no tenga
+   saltos de línea.
+
+3. **Aplicar la migración** (corre como `globe_owner`; el migrator es un usuario IAM de Cloud SQL):
+
+   ```bash
+   cd packages/database && GLOBE_POSTGRES_INSTANCE_CONNECTION_NAME=efeonce-globe:southamerica-west1:globe-pg \
+     GLOBE_POSTGRES_DATABASE=globe GLOBE_MIGRATOR_USER=<tu-usuario-iam> node scripts/migrate.mjs
+   ```
+
+4. **Desplegar la imagen que trae el código.** Terraform ignora el campo `image` a propósito; sin
+   este paso el flag apunta a un binario que no conoce la capacidad. Es image-only: **ningún** otro
+   flag de configuración (ver `deploy-internal.yml`).
+
+5. **Declarar los env en Terraform con el flag en `false`** y aplicar. Verificá el contrato *antes*
+   de prender: `/v1/capabilities` debe listar las 4 entradas con `ui`/`mcp` en `policy-blocked`, y
+   todo path debe responder `policy_blocked`.
+
+6. **Prender**: `producer_assets_enabled = true` en `variables.tf` — **en git**, no en un
+   `terraform.tfvars` gitignoreado. Un flag cuyo estado real vive en un archivo sin trackear es el
+   mismo problema de estado efímero que moverlo con `gcloud`, mejor disfrazado. Comprobalo planeando
+   sin `terraform.tfvars`: debe dar `No changes`.
+
+7. **Canario** (abajo). Requiere impersonar la caller SA; si es un grant temporal, revocalo al
+   terminar y verificá el corte.
 
 ## Verificación (canary)
 
@@ -109,16 +131,18 @@ Con una pieza real ya generada (un golden brief que haya retenido su salida):
 
 | Síntoma | Causa probable | Diagnóstico |
 |---|---|---|
-| Todo responde `policy_blocked` | Interruptor apagado en la revisión activa | `gcloud run services describe globe-studio-internal --region southamerica-west1` y mirar la revisión **activa**, no el último deploy |
-| La ficha responde `dependency_unavailable` | Falta el secreto o el `secretAccessor` | Verificar el binding IAM de la SA de runtime |
+| Todo responde `policy_blocked` | Interruptor apagado en la revisión activa | `gcloud run services describe globe-api-internal --region southamerica-west1` y mirar la revisión **activa**, no el último deploy |
+| La ficha responde `dependency_unavailable` | Falta el secreto, su versión, o el `secretAccessor` de `api_runtime` | `gcloud secrets versions list globe-producer-grant-secret` + el binding IAM |
 | El canje responde `dependency_unavailable` con la ficha OK | El bucket no responde o falta `storage.objects.get` | Probar la lectura del objeto con la SA de runtime |
 | La marca de favorito "se va" entre recargas | Migración `0003` no aplicada, o el servicio corriendo sin `GLOBE_POSTGRES_*` (cae a memoria) | Revisar `globe._migrations` y las variables de Postgres del servicio |
 | El `referenceId` cambia en cada intento | Se está leyendo un servicio sin persistencia durable | Igual que arriba: sin DB, cada réplica responde distinto |
 
 ## Rollback
 
-`GLOBE_PRODUCER_ASSETS_ENABLED=false` + redeploy (< 5 min). No hay estado que revertir: las anotaciones son
-aditivas y el depósito es de solo lectura en este camino.
+`producer_assets_enabled = false` en `variables.tf` + `tofu apply` (< 5 min). No hay estado que revertir:
+las anotaciones son aditivas y el depósito es de sólo lectura en este camino. Rotar el secreto invalida
+los pases vivos, pero el radio está acotado por el TTL (300 s): las redenciones fallan a lo sumo esa
+ventana y se recupera pidiendo una ficha nueva.
 
 ## Referencias técnicas
 

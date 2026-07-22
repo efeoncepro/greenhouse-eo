@@ -71,6 +71,17 @@ el espacio de trabajo de quien pregunta realmente produjo**.
 | **Bloqueado por política** | La capacidad está apagada en ese ambiente | Es una decisión operativa: ver el manual de uso |
 | **Dependencia no disponible** | El depósito no respondió, o falta la clave de firma | Reintentar; si persiste, es un tema de operación |
 
+## Qué está operativo hoy
+
+Está **encendida y funcionando** en el entorno interno de Globe: se probó en vivo generando una pieza
+real, descargándola por el camino gobernado y confirmando que un asset de otro cliente y un material
+de referencia responden "no encontrado".
+
+Lo que todavía **no** existe es la puerta para personas: quien entra por la web aún no recibe el
+permiso, así que hoy la usan los sistemas internos, no un humano desde una pantalla. Eso llega con la
+superficie del Producer (`TASK-1505`). Y el uso por parte de clientes externos es un programa aparte
+(`TASK-1480` y sus dependencias), no un interruptor.
+
 ## Quién puede usarla
 
 Requiere la autoridad `globe.producer.assets.operate`. Es **propia y de gasto cero**: deliberadamente **no** es
