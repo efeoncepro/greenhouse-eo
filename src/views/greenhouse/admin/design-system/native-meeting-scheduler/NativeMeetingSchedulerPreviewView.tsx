@@ -32,7 +32,7 @@ const EMBED_SNIPPET = `<efeonce-meeting-scheduler
   placement="contact_scheduler"
   base-url="https://greenhouse.efeoncepro.com"
 ></efeonce-meeting-scheduler>
-<script src="https://greenhouse.efeoncepro.com/growth-meetings/renderer-stable.js" defer></script>`
+<script src="https://efeonce-public-renderers.vercel.app/loader.js" defer></script>`
 
 const SchedulerCanvas = ({ outcome }: { outcome: MeetingFixtureOutcome }) => {
   const hostRef = useRef<HTMLDivElement | null>(null)

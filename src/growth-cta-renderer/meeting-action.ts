@@ -1,7 +1,7 @@
 import type { CtaRenderOpenMeetingSchedulerActionMirror } from './contract'
 import type { CtaSystemCopy } from './copy'
 
-const MEETING_BUNDLE_PATH = '/growth-meetings/renderer-latest.js'
+export const MEETING_RENDERER_LOADER_URL = 'https://efeonce-public-renderers.vercel.app/loader.js'
 const MEETING_ELEMENT_TAG = 'efeonce-meeting-scheduler'
 const MEETING_DEFINE_TIMEOUT_MS = 10_000
 const MOBILE_QUERY = '(max-width: 639px)'
@@ -9,11 +9,11 @@ const MOBILE_QUERY = '(max-width: 639px)'
 const bundleLoads = new WeakMap<Document, Map<string, Promise<boolean>>>()
 const scrollLocks = new WeakMap<Document, { count: number; previousOverflow: string }>()
 
-const ensureMeetingBundle = (doc: Document, baseUrl: string): Promise<boolean> => {
+const ensureMeetingBundle = (doc: Document): Promise<boolean> => {
   if (typeof customElements === 'undefined') return Promise.resolve(false)
   if (customElements.get(MEETING_ELEMENT_TAG)) return Promise.resolve(true)
 
-  const src = `${baseUrl.replace(/\/$/, '')}${MEETING_BUNDLE_PATH}`
+  const src = MEETING_RENDERER_LOADER_URL
   const loads = bundleLoads.get(doc) ?? new Map<string, Promise<boolean>>()
 
   bundleLoads.set(doc, loads)
@@ -125,7 +125,7 @@ export class MeetingActivationController {
       return Promise.resolve(false)
     }
 
-    return ensureMeetingBundle(this.options.doc, this.options.baseUrl)
+    return ensureMeetingBundle(this.options.doc)
   }
 
   async open(invoker: HTMLElement): Promise<boolean> {
@@ -248,7 +248,7 @@ export class MeetingActivationController {
   private async mountScheduler(): Promise<boolean> {
     const loaded = this.options.createSchedulerElement
       ? true
-      : await ensureMeetingBundle(this.options.doc, this.options.baseUrl)
+      : await ensureMeetingBundle(this.options.doc)
 
     if (this.disposed) return false
 

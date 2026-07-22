@@ -28,6 +28,7 @@ Motion clarifies calendar, timezone, selection and confirmation without delaying
 - Canonical tokens: 80 ms press, 140 ms hover, 200 ms selection and 280 ms one-time scene entry; no scattered literal timings.
 - Prefer transform/opacity and CSS; WAAPI only for a bounded summary transition if it measurably improves continuity.
 - No continuous particles, parallax, scroll-jacking or layout-height animation that loses focus.
+- The command-rail edge glow is static; no orbit, aurora loop or decorative motion is rendered.
 - Never animate a phase-wide calendar selector after `select_date` or `select_slot`; full scene replacement must remain visually continuous.
 - Performance budget and `prefers-reduced-motion` are verified on the real WordPress host.
 

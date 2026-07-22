@@ -19,4 +19,17 @@ describe('meeting scheduler element assets', () => {
     expect(stylesheets[0]?.href).toBe('https://greenhouse.example/growth-meetings/icons.css')
     expect(stylesheets[0]?.rel).toBe('stylesheet')
   })
+
+  it('respeta el stylesheet inmutable que instala el loader estable', () => {
+    const artifact = document.createElement('link')
+
+    artifact.dataset.ghmIconStyles = 'artifact'
+    artifact.dataset.ghmIconRelease = 'abc123'
+    artifact.href = 'https://assets.example/releases/abc123/icons.css'
+    document.head.append(artifact)
+    ensureMeetingIconStyles(document, 'https://greenhouse.example')
+
+    expect(document.querySelectorAll('link[data-ghm-icon-styles]')).toHaveLength(1)
+    expect(artifact.href).toContain('/releases/abc123/icons.css')
+  })
 })

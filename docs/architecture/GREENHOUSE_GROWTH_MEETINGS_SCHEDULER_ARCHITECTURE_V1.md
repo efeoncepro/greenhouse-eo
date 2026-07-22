@@ -198,6 +198,8 @@ Thresholds are initial hypotheses, expressed against the component container rat
 | `split` | 560–959 px | Month and selected-day agenda together; context compresses into an operational header. | Dialog, medium embed, tablet |
 | `command` | 960 px+ with sufficient height | Context rail, month and agenda visible as the current Calendar Command Center. | Full-width section or dedicated page |
 
+The `command` context rail uses a static full-bleed tonal edge glow only: no clipped orbit or decorative motion node. Its title preserves whole-word wrapping, and Microsoft Teams is represented by the governed monochrome `tabler-brand-teams` mark in the rail accent color, without a contained purple background or generic video glyph.
+
 Pure CSS container queries own layout-only changes. A bounded `ResizeObserver` may select a different semantic recipe when the information architecture changes; it calls a pure resolver with hysteresis to avoid oscillation near a threshold. A resize never creates a new booking intent, emits a funnel step, clears form data or remounts provider/Turnstile effects.
 
 ### Growth CTA integration
@@ -213,7 +215,7 @@ Pure CSS container queries own layout-only changes. A bounded `ResizeObserver` m
 
 - `open_meeting_scheduler` is the additive CTA action kind for native activation. `book_meeting` remains an anchor-only compatibility path.
 - Its server policy contains only `meetingSurfaceId` and `schedulerKey`. The registry requires an active `meeting_surface_binding`. `fallbackHref` remains temporarily in the V1 transport projection for cached-client compatibility, but current renderers neither render nor consume it; provider IDs, secrets, origins and PII never enter the experience.
-- Its execution family is `meeting_scheduler`. The portable CTA renderer lazy-loads `/growth-meetings/renderer-latest.js` only after activation or strong intent; focus/hover prewarm respects Save-Data and 2G and never fetches configuration or availability.
+- Its execution family is `meeting_scheduler`. The portable CTA renderer lazy-loads `https://efeonce-public-renderers.vercel.app/loader.js` only after activation or strong intent; focus/hover prewarm respects Save-Data and 2G and never fetches configuration or availability. The API `base-url` remains Greenhouse. Artifact delivery, atomic promotion and rollback follow [Public Renderer Artifact Delivery V1](GREENHOUSE_PUBLIC_RENDERER_ARTIFACT_DELIVERY_DECISION_V1.md).
 - One native `<dialog>` owns backdrop, inert/focus containment, Escape, scroll lock and focus return. It is bounded on desktop and becomes `100dvh` full-screen with safe-area padding below 640 px.
 - Closing calls `dialog.close()` and keeps the same `<efeonce-meeting-scheduler>` connected. State, telemetry dedupe, form draft and command/idempotency lifecycle survive reopen; disposal occurs only when the CTA host leaves the document or the contract is replaced.
 - CTA emits `clicked` and `action_started` once for the handoff. The scheduler remains the only funnel and receipt-gated conversion authority, preventing a surface open from becoming a false lead.

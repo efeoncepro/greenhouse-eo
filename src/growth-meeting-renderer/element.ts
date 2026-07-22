@@ -11,6 +11,8 @@ const DEFAULT_BASE_URL = 'https://greenhouse.efeoncepro.com'
 const MEETING_ICON_STYLESHEET = '/growth-meetings/icons.css'
 
 export const ensureMeetingIconStyles = (doc: Document, baseUrl: string): void => {
+  if (doc.querySelector('link[data-ghm-icon-styles="artifact"][data-ghm-icon-release]')) return
+
   const href = `${baseUrl.replace(/\/$/, '')}${MEETING_ICON_STYLESHEET}`
 
   const exists = [...doc.querySelectorAll<HTMLLinkElement>('link[data-ghm-icon-styles]')]

@@ -53,6 +53,16 @@
   de calendario, se eliminó el flash de 400 ms causado por la animación phase-wide y se unificó iconografía en el
   subset Tabler sin SVG inline. GVC premium `2026-07-21T10-31-38_native-meeting-scheduler`: 36 frames command/split/guided,
   exit 0 y score enterprise 4.66/5; baseline/rollout continúan sujetos a aprobación humana.
+- El carril amplio dejó de dibujar la órbita decorativa recortada: conserva sólo un resplandor tonal estático, amplía
+  el espacio para mantener `Conversemos` completo y usa la marca monocroma gobernada de Microsoft Teams en turquesa,
+  sin el disco morado de las variantes contenidas. La evidencia
+  GVC `.captures/2026-07-22T00-40-24_native-meeting-scheduler` pasó 45 frames en 1440/820/390; el suplemento
+  `.captures/manual/TASK-1510-scheduler-rail/reference-2048-v2.png` cubre 2048×1135. Teclado, reduced motion y overflow están verdes;
+- El renderer público quedó desacoplado del release de Greenhouse. El proyecto estático dedicado
+  `efeonce-public-renderers` publica JS+CSS content-addressed con hashes/SRI, cache inmutable, puntero estable revalidado,
+  promoción por alias y rollback directo. `/agenda/` consume el loader estable y mantiene Greenhouse sólo como API;
+  un `prebuild` o deploy no relacionado ya no puede cambiar su estética. Release live inicial `2fbea2b39b555c5762e6`,
+  backup Elementor `_gh_backup_before_agenda_public_renderer_20260722T075004Z`.
 - El scheduler dejó de imponer `America/Santiago`: detecta la zona IANA del visitante y la propaga de forma
   consistente por config, availability y booking de HubSpot. Santiago queda como fallback de surface. Se agregó
   canonicalización de aliases, rechazo pre-provider de zonas inválidas, validación de `bookingTimezone` y cobertura

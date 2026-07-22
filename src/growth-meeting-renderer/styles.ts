@@ -65,7 +65,7 @@ export const MEETING_RENDERER_CSS = `
 
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene {
   display: grid;
-  grid-template-columns: minmax(220px, 0.7fr) minmax(430px, 1.45fr) minmax(280px, 0.85fr);
+  grid-template-columns: minmax(270px, 0.7fr) minmax(440px, 1.45fr) minmax(300px, 0.85fr);
   min-height: 650px;
   scroll-margin-top: 96px;
   border: 1px solid color-mix(in srgb, var(--gh-meeting-ink) 16%, transparent);
@@ -603,23 +603,9 @@ export const MEETING_RENDERER_CSS = `
   overflow: hidden;
 }
 
-:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-signal > *:not(.ghm-signal-atmosphere) {
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-signal > * {
   position: relative;
   z-index: 1;
-}
-
-:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-signal-atmosphere {
-  position: absolute;
-  inset: auto -90px -70px auto;
-  width: 240px;
-  aspect-ratio: 1;
-  border: 1px solid color-mix(in srgb, var(--gh-meeting-accent) 35%, transparent);
-  border-radius: 50%;
-  background: radial-gradient(circle, color-mix(in srgb, var(--gh-meeting-accent) 13%, transparent), transparent 62%);
-  box-shadow:
-    0 0 0 28px color-mix(in srgb, var(--gh-meeting-accent) 4%, transparent),
-    0 0 0 72px color-mix(in srgb, var(--gh-meeting-accent) 2%, transparent);
-  pointer-events: none;
 }
 
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-step { position: relative; }
@@ -827,7 +813,6 @@ export const MEETING_RENDERER_CSS = `
 @container (max-width: 650px) {
   :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene { display: block; min-height: 0; border-radius: 18px; overflow: hidden; }
   :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-signal { padding: 22px 20px 20px; border-inline-end: 0; }
-  :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-signal-atmosphere { inset: auto -100px -130px auto; opacity: 0.72; }
   :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-eyebrow { margin-bottom: 10px; }
   :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-title { max-width: 12ch; font-size: clamp(2rem, 9cqi, 2.5rem); line-height: 0.96; }
   :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-intro { max-width: 34ch; margin: 13px 0; font-size: 0.86rem; line-height: 1.5; }
@@ -865,7 +850,7 @@ export const MEETING_RENDERER_CSS = `
 
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='command'] {
   display: grid;
-  grid-template-columns: minmax(220px, 0.7fr) minmax(430px, 1.45fr) minmax(280px, 0.85fr);
+  grid-template-columns: minmax(270px, 0.7fr) minmax(440px, 1.45fr) minmax(300px, 0.85fr);
   min-height: 650px;
 }
 
@@ -893,8 +878,7 @@ export const MEETING_RENDERER_CSS = `
 }
 
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='split'] .ghm-eyebrow,
-:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='split'] .ghm-intro,
-:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='split'] .ghm-signal-atmosphere { display: none; }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='split'] .ghm-intro { display: none; }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='split'] .ghm-title { max-width: none; font-size: clamp(1.45rem, 3cqi, 2.1rem); }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='split'] .ghm-facts { align-self: center; margin: 0; }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='split'] .ghm-steps { grid-column: 1 / -1; grid-template-columns: repeat(3, 1fr); margin-top: 10px; }
@@ -920,7 +904,6 @@ export const MEETING_RENDERER_CSS = `
   border-inline-end: 0;
 }
 
-:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='guided'] .ghm-signal-atmosphere,
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='guided'] .ghm-eyebrow,
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='guided'] .ghm-intro { display: none; }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='guided'] .ghm-title { max-width: none; font-size: clamp(1.6rem, 8cqi, 2.1rem); line-height: 1.02; }
@@ -976,7 +959,7 @@ export const MEETING_RENDERER_CSS = `
 
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene,
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-recipe='command'] {
-  grid-template-columns: minmax(230px, 0.58fr) minmax(470px, 1.52fr) minmax(310px, 0.9fr);
+  grid-template-columns: minmax(270px, 0.64fr) minmax(440px, 1.46fr) minmax(300px, 0.9fr);
   min-height: 610px;
   background: var(--gh-meeting-paper);
 }
@@ -984,7 +967,7 @@ export const MEETING_RENDERER_CSS = `
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-signal {
   padding: clamp(24px, 2.4cqi, 34px);
   background:
-    linear-gradient(160deg, color-mix(in srgb, var(--gh-meeting-ink-soft) 48%, transparent), transparent 52%),
+    radial-gradient(ellipse 125% 58% at 108% 104%, color-mix(in srgb, var(--gh-meeting-accent) 10%, transparent), transparent 62%),
     var(--gh-meeting-ink);
 }
 
@@ -1015,9 +998,12 @@ export const MEETING_RENDERER_CSS = `
 }
 
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-title {
-  max-width: 11ch;
-  font-size: clamp(1.75rem, 2.35cqi, 2.65rem);
-  line-height: 1.02;
+  max-width: none;
+  font-size: clamp(1.75rem, 2.15cqi, 2.35rem);
+  line-height: 1.04;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
 }
 
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-intro {
@@ -1030,6 +1016,11 @@ export const MEETING_RENDERER_CSS = `
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-fact { gap: 10px; font-size: 0.76rem; }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-fact::before { display: none; }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-fact-icon { color: var(--gh-meeting-accent); font-size: 0.98rem; }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-teams-mark {
+  color: var(--gh-meeting-accent);
+  font-size: 1.08rem;
+  flex: 0 0 auto;
+}
 
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-steps { gap: 0; margin-top: 24px; }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-step {
@@ -1326,11 +1317,6 @@ export const MEETING_RENDERER_CSS = `
     linear-gradient(155deg, var(--gh-meeting-ink-soft), var(--gh-meeting-ink) 72%);
 }
 
-:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-phase='confirmed'] .ghm-signal-atmosphere {
-  width: 310px;
-  opacity: 0.75;
-}
-
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-confirmation-assurance {
   display: flex;
   align-items: center;
@@ -1555,7 +1541,6 @@ export const MEETING_RENDERER_CSS = `
     color-mix(in srgb, var(--gh-meeting-accent-soft) 46%, var(--gh-meeting-paper));
 }
 
-:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-phase='confirmed'] .ghm-signal-atmosphere { display: none; }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-scene[data-phase='confirmed'] .ghm-live-status {
   display: inline-flex;
   margin: 0;

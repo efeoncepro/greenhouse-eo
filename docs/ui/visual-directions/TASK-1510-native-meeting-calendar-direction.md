@@ -42,7 +42,9 @@ truth; the renderer only presents governed availability and sends a single idemp
 
 ## Art direction
 
-- Compact Efeonce context rail in deep ink; brand atmosphere is reduced to one quiet edge glow and never competes with controls.
+- Compact Efeonce context rail in deep ink; brand atmosphere is one full-bleed tonal edge glow, never a clipped orbit/ring or a separate decorative node.
+- The command rail preserves complete-word wrapping for `Conversemos`; its width and type scale must not create orphan letters.
+- Microsoft Teams context uses the governed monochrome `tabler-brand-teams` mark in the rail accent color, without a purple contained background and without falling back to a generic video glyph.
 - Paper-like calendar workspace with a strong typographic month label, continuous grid rhythm and one controlled depth hierarchy.
 - Availability uses shape + label + contrast, never color alone.
 - Selected date is a contained cell state with an explicit mark; today, availability density, focus and selection remain distinguishable.

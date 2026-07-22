@@ -511,7 +511,6 @@ export class MeetingRenderer {
 
   private renderSignalRail(): HTMLElement {
     const rail = element('header', 'ghm-signal')
-    const atmosphere = element('span', 'ghm-signal-atmosphere')
     const confirmed = this.state.phase === 'confirmed'
     const eyebrow = element('p', 'ghm-eyebrow', confirmed ? copy.confirmedEyebrow : copy.eyebrow)
 
@@ -519,7 +518,6 @@ export class MeetingRenderer {
       ? copy.confirmedRailTitle
       : this.layoutRecipe === 'guided' ? copy.compactTitle : copy.title)
 
-    atmosphere.setAttribute('aria-hidden', 'true')
     title.tabIndex = -1
     title.dataset.ghmFocus = ''
     const liveStatus = element('div', 'ghm-live-status')
@@ -528,7 +526,7 @@ export class MeetingRenderer {
       element('span', 'ghm-live-dot'),
       element('span', undefined, confirmed ? copy.confirmedRailStatus : copy.availabilitySynced),
     )
-    rail.append(atmosphere, liveStatus, eyebrow, title, element('p', 'ghm-intro', confirmed ? copy.confirmedRailBody : copy.intro))
+    rail.append(liveStatus, eyebrow, title, element('p', 'ghm-intro', confirmed ? copy.confirmedRailBody : copy.intro))
 
     if (confirmed) {
       const assurance = element('div', 'ghm-confirmation-assurance')
@@ -543,12 +541,12 @@ export class MeetingRenderer {
 
     for (const [iconName, label] of [
       ['clock', `${this.state.config?.durationsMinutes[0] ?? 30} min`],
-      ['video', copy.meetingPlatform],
+      ['brand-teams', copy.meetingPlatform],
       ['world', formatMeetingTimezoneLabel(this.timezone(), this.options.now?.())],
     ]) {
       const fact = element('span', 'ghm-fact')
 
-      fact.append(uiIcon(iconName, 'ghm-fact-icon'), element('span', undefined, label))
+      fact.append(uiIcon(iconName, iconName === 'brand-teams' ? 'ghm-fact-icon ghm-teams-mark' : 'ghm-fact-icon'), element('span', undefined, label))
       facts.append(fact)
     }
 

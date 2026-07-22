@@ -25,6 +25,8 @@ El CTA permanece compacto. En desktop abre un diálogo bounded y en móvil una s
 
 El mismo controlador proyecta recetas `guided`, `split` o `command` según la caja disponible. Cambiar tamaño o cerrar/reabrir no crea otro booking intent ni repite pasos del funnel.
 
+En la receta amplia, el carril contextual conserva palabras completas —incluido “Conversemos”— y usa la marca monocroma oficial de Microsoft Teams en el mismo acento turquesa del carril, sin disco morado. El fondo oscuro puede llevar un resplandor tonal estático, pero no órbitas recortadas ni animación decorativa.
+
 Un mes sin disponibilidad no colapsa el calendario. La grilla conserva el mes solicitado y todos sus días como no
 disponibles, junto con un estado vacío específico y navegación acotada hacia otros meses. En la verificación live del
 2026-07-21 HubSpot devolvió cero slots para agosto, y `/agenda/` mantuvo `Agosto de 2026` y sus 31 días.

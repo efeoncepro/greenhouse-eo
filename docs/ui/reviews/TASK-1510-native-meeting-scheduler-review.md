@@ -77,6 +77,8 @@ Resolved during review:
 22. Rejected the first confirmation pass after operator review because its dark portal header, elevated receipt card and
     rigid columns read as dated. The corrected direction removes the heavy header/card stack and uses restrained spatial
     resolution motion with a direct reduced-motion equivalent.
+23. Removed the clipped command-rail orbit, retained only a static tonal edge glow, widened the rail enough to keep
+    `Conversemos` intact and replaced the generic video glyph with the governed monochrome Microsoft Teams mark.
 
 ## Visual evidence reviewed
 
@@ -104,6 +106,11 @@ Resolved during review:
   1440/820/390, exit 0. The release exposes no HubSpot link/copy, preserves retry/month navigation and keeps the full
   semantic August grid when availability is empty. Authenticated Chrome smoke on `/agenda/` confirmed `overflow=0`
   without creating a booking.
+- Command-rail local polish: premium GVC `.captures/2026-07-22T00-40-24_native-meeting-scheduler` passed 45 frames
+  at 1440×1000, 820×900 and 390×844. Supplemental `.captures/manual/TASK-1510-scheduler-rail/reference-2048-v2.png` covers the exact
+  2048×1135 reference size. The wide title preserves `Conversemos` as one line box, the monochrome Teams glyph shares
+  the rail accent color without a contained purple background, the clipped orbit is absent and document/scheduler
+  overflow remains zero. Keyboard selection and reduced-motion parity pass at 820/390. Rollout remains pending.
 
 ## Measurement/privacy evidence
 

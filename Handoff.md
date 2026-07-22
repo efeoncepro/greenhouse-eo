@@ -49,6 +49,14 @@
   ni prefooter, y con el footer global completo sin overrides de agenda. La evidencia final
   `.captures/2026-07-21T23-44-01-104Z_agenda-focused-booking-canvas` pasa 1440/820/390, overflow, teclado,
   reduced motion y cero errores; backup `_gh_backup_before_agenda_global_footer_restore_20260721T234352Z`.
+  El polish del carril `command` elimina la órbita recortada, conserva sólo glow tonal estático,
+  evita el corte de `Conversemos` y usa el glifo monocromo gobernado de Teams en turquesa, sin fondo morado. Evidencia
+  GVC `.captures/2026-07-22T00-40-24_native-meeting-scheduler` (45 frames, 1440/820/390) más
+  `.captures/manual/TASK-1510-scheduler-rail/reference-2048-v2.png` a 2048×1135. Ya está live mediante el proyecto estático
+  aislado `efeonce-public-renderers`: `/agenda/` carga el loader estable, renderer e iconos comparten release inmutable
+  `2fbea2b39b555c5762e6`, y Greenhouse queda sólo como API. La promoción/rollback por alias ya no exige release de la app.
+  Backup Elementor `_gh_backup_before_agenda_public_renderer_20260722T075004Z`; evidencia live
+  `.captures/2026-07-22-agenda-public-renderer` en 2048/1440/820/390, sin bundle legacy, overflow ni errores.
   HubSpot devuelve actualmente cero slots para agosto; el renderer ya conserva `Agosto de 2026`, la grilla de 31 días y
   el estado vacío en vez de colapsar el calendario; PR #162 (`ddd3094538e7`, run `29848667096`) ya liberó esa corrección.
   `ops-worker` permanece change-gated porque el diff desde `7da563613daf` no toca sus rutas runtime.

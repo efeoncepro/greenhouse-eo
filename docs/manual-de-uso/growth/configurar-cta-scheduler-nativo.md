@@ -19,6 +19,7 @@
 9. Completa una reserva controlada y revisa la confirmación: debe reemplazar todo el calendario, mostrar fecha,
    rango horario, zona y Teams, y no volver a ofrecer selección ni otra acción de booking.
 10. Comprueba que el foco llegue al título confirmado y que el email o receipt interno no aparezcan en DOM/dataLayer.
+11. En un host ancho, revisa que “Conversemos” no corte letras, que el carril no muestre aros recortados y que la marca monocroma de Teams aparezca sin fondo morado. Repite a 820 px y 390 px verificando `scrollWidth === clientWidth`.
 
 ## Degradación y rollback
 

@@ -74,6 +74,24 @@ beforeEach(() => {
 })
 
 describe('MeetingRenderer', () => {
+  it('usa el logo monocromo de Teams y no renderiza la órbita decorativa recortada', async () => {
+    const { host, renderer } = await mount()
+
+    Object.defineProperty(host, 'getBoundingClientRect', {
+      configurable: true,
+      value: () => ({ width: 1280, height: 760, top: 0, right: 1280, bottom: 760, left: 0, x: 0, y: 0, toJSON() {} }),
+    })
+    renderer.updatePresentation({ activationMode: 'inline', maxRecipe: 'command' })
+    renderer.updatePresentation({ activationMode: 'inline', maxRecipe: 'command' })
+    const teamsMark = host.querySelector<HTMLElement>('.ghm-teams-mark')
+
+    expect(host.querySelector('.ghm-signal-atmosphere')).toBeNull()
+    expect(teamsMark?.classList.contains('tabler-brand-teams')).toBe(true)
+    expect(teamsMark?.getAttribute('aria-hidden')).toBe('true')
+    expect(host.querySelector('.ghm-fact img')).toBeNull()
+    renderer.destroy()
+  })
+
   it('no atribuye la fecha preseleccionada hasta una acción humana', async () => {
     const { host, renderer } = await mount()
     const dataLayer = (window as unknown as { dataLayer: Array<Record<string, unknown>> }).dataLayer
