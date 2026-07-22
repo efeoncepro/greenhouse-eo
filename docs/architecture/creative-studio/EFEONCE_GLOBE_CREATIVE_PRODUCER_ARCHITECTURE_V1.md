@@ -501,6 +501,38 @@ los primitivos compartidos**:
    solo después de migrations/secrets/rollback/smoke y sign-off se abre acceso externo.
 8. **Workbench:** `TASK-1474` consume los mismos primitivos y agrega brief/dirección; no duplica Producer.
 
+## Materialización 2026-07-22 — runtime local integrado
+
+La arquitectura ya está materializada localmente en `efeonce-globe` como un vertical slice completo, sin cambiar
+sus boundaries:
+
+- `studio-web` entrega `/producer` como cliente humano source-led. Renderer, controller y client sólo consumen
+  commands/readers del spine; no poseen provider routing, tenancy, ledger, rights, review ni storage authority.
+- TASK-1519 implementa el bridge same-origin con delegación request-bound y surface enforcement; el browser no
+  conoce la API privada ni una service credential.
+- El catálogo separa rutas prompt-only de rutas genuinamente referenciales. `ref/still/reference-v1` enruta
+  `image-edit` a Fal Seedream Edit (1–10 imágenes) y `ref/motion/reference-v1` enruta `video-generate` a Vertex
+  Omni (1–4 imágenes/videos). Domain valida count/media/capability en estimate y prepare, antes de reserva/spend.
+- Los bytes referenciales se resuelven server-side desde handles content-addressed autorizados. El request público
+  conserva handles/hash/rights; manifest y lineage guardan `authorizedInputHashes`; ninguna URL de storage o byte
+  cruza la API JSON.
+- Library, generation recipes/Style DNA, durable run lifecycle, credits/admin, persisted tenancy y
+  review/comments/share tienen stores/migrations y primitives transport-neutral. La UI degrada o bloquea por
+  coverage/evidencia; no fabrica balance, progress, approval, C2PA ni disponibilidad.
+- El plano productivo se ejecuta en Jobs one-shot keyless: uno reclama/submite/reconcilia runs y exports con
+  leases renovables/fenced; otro procesa asset governance en orden malware → C2PA → rights. El callback Fal entra
+  por un relay público estrecho que preserva bytes/firma hacia la API IAM-private, donde identidad, JWS y replay se
+  verifican nuevamente.
+- Rutas/circuitos y políticas de derechos exactas por ruta/proveedor/modelo/versión son control-plane operator-only.
+  Outputs generados y derivados capturan términos/policy/route/parent digests y fallan cerrado antes de elegibilidad.
+- Evidencia visual canónica: `docs/ui/reviews/TASK-1505/`. Evidencia de código: `pnpm check` y `pnpm build` verdes
+  en Globe el 2026-07-22.
+
+Este checkpoint es **code complete local**, no rollout. Las migrations `0004…0019`, secrets, buckets/IAM,
+broker grants, flags, Scheduler/Jobs, provider access y canarios reales continúan siendo parte del cierre
+operativo. El dry-run vivo por los commands/readers del Producer falló cerrado contra el SHA antiguo desplegado y
+consumió cero créditos. No se promueve entorno comercial ni se modifica el gate de TASK-1521.
+
 ## Hard rules (anti-regresión)
 
 - **NUNCA** un contrato de run plano por modalidad: el `PreparePayload` es discriminado por capability, con

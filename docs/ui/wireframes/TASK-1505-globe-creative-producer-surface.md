@@ -282,7 +282,7 @@ Capability gaps are implementation dependencies, not permission to narrow the ap
 
 ## GVC Scenario Plan
 
-- Scenario file: `docs/ui/captures/scenarios/TASK-1505-globe-creative-producer-surface.json` (to create during implementation).
+- Scenario file: `scripts/frontend/scenarios/globe-creative-producer.scenario.ts`.
 - Route: internal Producer route selected by Globe information architecture, expected `/producer` unless architecture records another path.
 - Viewports: `1440×1000` and `390×844`.
 - Quality profile: `premium`.

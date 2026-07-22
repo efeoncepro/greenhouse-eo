@@ -20,7 +20,7 @@
 - Status real: `Diseño gobernado; runtime no-internal continúa bloqueado por contrato y readiness`
 - Rank: `TBD`
 - Domain: `creative|platform|identity|finance|ops`
-- Blocked by: `none (la implementación puede avanzar; la promoción comercial exige todos los gates nombrados)`
+- Blocked by: `none`
 - Branch: `task/TASK-1521-globe-commercial-runtime-enablement`
 - Legacy ID: `none`
 - GitHub Issue: `none`

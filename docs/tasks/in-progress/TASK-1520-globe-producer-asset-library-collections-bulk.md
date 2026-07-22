@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -17,13 +17,23 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-028`
-- Status real: `Diseño gobernado; persistencia y primitives pendientes`
+- Status real: `Code complete local; migración, secret, bucket/IAM y grants pendientes`
 - Rank: `TBD`
 - Domain: `creative|data|storage|platform`
-- Blocked by: `TASK-1467, TASK-1498, TASK-1503`
+- Blocked by: `none`
 - Branch: `task/TASK-1520-globe-producer-asset-library-collections-bulk`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Checkpoint 2026-07-22 — library runtime code complete
+
+- Se registraron 6 commands y 5 readers para feed/biblioteca durable, cursor estable, búsqueda/filtros/sort,
+  collections/series, move, bulk con resultados parciales, trash/restore y export privado content-addressed.
+- La autoridad compone outputs + Provenance; no crea un segundo source of truth. Purge sigue siendo solicitud
+  gobernada y no borra físicamente por click.
+- Verificación local integrada en `pnpm check`/`pnpm build`; la UI TASK-1505 consume las mismas primitives.
+- Rollout pendiente: migration `0010`, `GLOBE_LIBRARY_CONFIRMATION_SECRET`, bucket
+  `GLOBE_LIBRARY_EXPORT_BUCKET`, IAM privado y grants `library.read/manage/export/delete`.
 
 ## Summary
 

@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,10 +21,10 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-028`
-- Status real: `Diseno`
+- Status real: `Implementación en ejecución sobre el edit seam vigente; rollout permanece gated por provider/runtime`
 - Rank: `TBD`
 - Domain: `creative|ai`
-- Blocked by: `TASK-1490`
+- Blocked by: `none`
 - Branch: `task/TASK-1497-globe-regional-edit-inpaint`
 - Legacy ID: `none`
 - GitHub Issue: `none`

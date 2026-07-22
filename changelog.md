@@ -7,6 +7,24 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-22 — Globe Producer aprobado implementado localmente sin recortar el diseño
+
+- `efeonce-globe/apps/studio-web` materializa el baseline completo de TASK-1505: composer cross-modal,
+  referencias privadas, rutas/shapes/estimate/hard cap, Style DNA, library editorial, viewer/compare,
+  recreate/inpaint, bulk, créditos, review/comments/share, estados honestos, command palette y onboarding.
+- La revisión source-led restauró paleta, jerarquía, superficies, Tabler self-hosted, wordmark/isotype Globe,
+  logo Efeonce oficial, hero/masonry, motion y microinteracciones. Evidencia desktop/390/reduced-motion y score
+  enterprise 4.69/5: `docs/ui/reviews/TASK-1505/`.
+- La UI no oculta deuda con un botón decorativo: referencias image/video usan rutas genuinas separadas, policy
+  count/media pre-spend, handles autorizados, resolución de bytes server-side y lineage por hash. Compare quedó
+  alineado al reader `globe.lab.experiment.get`; el input de cantidad oculto salió del recorrido de foco.
+- El runtime local completo pasa `pnpm check` y `pnpm build` (Studio 138/138, Domain 248/248, Creative Runner
+  183/183 dentro del full check). TASK-1504 queda reconocida como code-complete local; TASK-1519/1520/1522 y
+  TASK-1505 mantienen lifecycle `in-progress` porque rollout no está aplicado.
+- Estado operativo honesto: faltan migrations `0010…0016`, secrets, buckets/IAM, grants, flags,
+  scheduler/worker, acceso de proveedores y canarios internal. No hubo deploy, provider spend ni promoción
+  comercial; TASK-1521 sigue siendo el gate externo.
+
 ## 2026-07-22 — Globe Producer rebaselined al diseño aprobado completo
 
 - El HTML aprobado de Claude Design quedó versionado como baseline source-led ejecutable bajo
@@ -808,10 +826,3 @@
   de pipeline, Calidad de Datos, Service/renovación, KPI oficiales, Customer Agent, facturación y Tickets/SLA.
   Cada frente explicita owner, dependencias, aprobación y exit gate; el cambio es documental y no autoriza ni
   ejecuta nuevos writes en HubSpot.
-
-## 2026-07-17 — Borrador privado del artículo Customer Agent de ANAM
-
-- El segundo artículo de la serie ANAM quedó integrado como post privado `251432`, con autor Julio Reyes,
-  categoría HubSpot, `noindex`, featured/OG y tres diagramas responsive light/dark desde Media Library.
-- La validación autoral, inspección profunda, acceso anónimo `404` y QA visual desktop/móvil pasaron. La revisión
-  autenticada del template Ohio y cualquier publicación continúan pendientes y requieren un paso separado.

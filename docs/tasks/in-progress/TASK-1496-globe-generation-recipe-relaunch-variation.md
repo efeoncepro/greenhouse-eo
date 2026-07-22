@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,10 +21,10 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-028`
-- Status real: `Diseño gobernado; contrato de receta, comandos variate/relaunch y captura de receta efectiva pendientes de implementar en efeonce-globe`
+- Status real: `Implementación en ejecución sobre brief/recipe y runner ya disponibles; rollout permanece gated por migraciones/runtime del Producer`
 - Rank: `TBD`
 - Domain: `creative|ai`
-- Blocked by: `TASK-1481 (spine, complete) + TASK-1490 (edit seam, complete)`
+- Blocked by: `none`
 - Branch: `task/TASK-1496-globe-generation-recipe-relaunch-variation`
 - Legacy ID: `none`
 - GitHub Issue: `none`

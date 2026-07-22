@@ -110,7 +110,13 @@ function mapBindingRow(
 function legacyCurrentWorkspace(
   tenant: TenantAccessRecord
 ): (Omit<GlobeOAuthWorkspaceBindingV1, 'isPrimary'> & Readonly<{ preferred: boolean }>) | null {
-  const workspaceId = normalizeWorkspaceId(`greenhouse-org:${tenant.clientId}`)
+  const clientId = tenant.clientId?.trim()
+
+  // A missing legacy scope is absence of authority, not an empty workspace suffix.
+  // Explicit broker bindings remain the preferred source and are resolved above.
+  if (!clientId) return null
+
+  const workspaceId = normalizeWorkspaceId(`greenhouse-org:${clientId}`)
 
   if (!workspaceId) return null
 

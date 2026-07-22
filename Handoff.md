@@ -13,23 +13,29 @@
 - Colas canónicas de trabajo: [tasks](docs/tasks/README.md), [epics](docs/epics/README.md),
   [mini-tasks](docs/mini-tasks/README.md) e [issues](docs/issues/README.md). La ventana de sesiones no reemplaza
   esos índices ni debe ocultar trabajo activo más antiguo.
-- La skill Codex `software-architect-2026` fue robustecida end-to-end el 2026-07-22: método year-neutral,
-  progressive disclosure, assurance agentic/distribuida, catálogo de fuentes, validator y evals ciegas. Canon:
-  `docs/architecture/GREENHOUSE_SOFTWARE_ARCHITECT_SKILL_GOVERNANCE_V1.md`. La skill Claude no fue modificada por
-  decisión explícita del operador.
+- La gobernanza de `software-architect-2026` está en
+  `docs/architecture/GREENHOUSE_SOFTWARE_ARCHITECT_SKILL_GOVERNANCE_V1.md`.
 
 ## Riesgos abiertos
 
 - Trabajo local concurrente: coordinar ownership antes de tocar archivos ya modificados.
-- Las sesiones archivadas pueden describir estados superseded. Revalidar cualquier conclusión histórica.
-- **Globe (`EPIC-028`) — el diseño aprobado del Producer ya está rebaselined, pero no está implementado.**
-  Baseline: `docs/ui/visual-sources/TASK-1505/`. `ADR-005` y `TASK-1505` preservan el target completo.
-  Secuencia: `TASK-1519` (in-progress, ejecución autorizada 2026-07-22) → jobs/ingest/tenancy → UI → library/economía/colaboración → `TASK-1521`.
-  Este cierre es documental; no agregó capacidad runtime.
+- **Globe (`EPIC-028`) — Producer code complete local, rollout pendiente.** Baseline aprobado:
+  `docs/ui/visual-sources/TASK-1505/`; evidencia premium: `docs/ui/reviews/TASK-1505/`. La UI completa,
+  bridge, jobs/ingest/tenancy, library, economía y colaboración pasan `pnpm check && pnpm build`. No está vivo:
+  faltan migrations `0004…0019`, secrets, buckets/IAM, grants, flags, workers/providers y canarios internal.
 - **Globe — el spend fence cross-réplica sigue sin ejercitarse (`TASK-1512`).** El ceiling efectivo estuvo en 1
   hasta `TASK-1508`; falta probar la contención con >1 réplica y gasto autorizado.
 
 ## Pendientes inmediatos
+
+- **Globe Producer aprobado — checkpoint local 2026-07-22.** `TASK-1505` conserva la UI completa, logos oficiales,
+  motion y funciones aprobadas; desktop/390 px, teclado, reduced motion y score visual `4.74/5` están verdes.
+  Referencias, library, créditos y review/share usan contratos reales. El cierre local incluye Studio 154/154,
+  Domain 265/265, Runner 201/201, Database 70/70 y 24 contratos IaC; workers one-shot, callback Fal, rutas/circuitos
+  operator-only y rights authority llegan hasta `0019`. El dry-run vivo por los mismos commands/readers de la UI
+  falló cerrado (`authentication_required`) contra el SHA desplegado antiguo y consumió cero créditos. Estado:
+  `code complete, rollout pendiente`; desplegar por `1519/1467/1469/1511/1520/1522` y mantener cerrado el acceso
+  comercial.
 
 - **`TASK-1503` COMPLETE y ACTIVA en el runtime interno (`EPIC-028`, cluster Creative Producer).** El
   output side del Producer (retrieval gobernado + favorite/copyAsReference) está **operativo** en
@@ -44,9 +50,9 @@
   con control de que el output propio de esa corrida sí se sirve). Post-cleanup 7/7 y re-verificación 7/7 sobre la revisión de CI. La impersonación se otorgó y revocó
   en tres ventanas acotadas, con corte verificado en cada una; policy final de
   `greenhouse-globe-caller@` = sólo `workloadIdentityUser` de Vercel. Gasto: 20 créditos contra un cap de 200.
-  **Quién la usa hoy:** el service principal por las vías internas. Una persona en el shell web todavía
-  no — el broker no le otorga la capability y `ui`/`mcp` siguen `policy-blocked`: el bridge, grants y
-  enforcement pertenecen a `TASK-1519`; `TASK-1505` integra después la UI aprobada. Runbook:
+  **Quién la usa hoy:** el service principal por las vías internas. El bridge y la UI ya están integrados en
+  local, pero una persona en el shell desplegado aún no recibe sus grants; `ui` sigue cerrada hasta el rollout
+  de `TASK-1519`. Runbook:
   `docs/manual-de-uso/creative-studio/operar-retrieval-assets-globe.md`.
 
 - **Globe hacia comercial — gates vigentes y bloqueo de entorno ahora con dueño (`TASK-1521`).**

@@ -1,13 +1,27 @@
-# TASK-1470 — Globe Production Provider Router
+# TASK-1463 — Globe Model Promotion and Readiness Registry
+
+## Delta 2026-07-19 — TASK-1458 complete: el artefacto de evidencia para promoción ya existe
+
+`TASK-1458` (Golden Briefs & Evaluation Harness, SPEC-003) quedó **complete** (fake canary). Es una de las cuatro dependencias directas de esta task (`TASK-1458, 1459, 1460, 1461`) y aporta el **artefacto de evidencia** que las transiciones de estado del registry referencian: el `EvaluationReportV1` versionado (con `fixtureVersion` + `rubricVersion` + `schemaVersion`), scopeado al workspace del caller y con sus **limitaciones declaradas** (proveedor fake, muestra única). Esto alimenta directamente las AC "Cambio de estado exige evidencia y actor autorizado" y los `evidence refs` de los commands `propose`/`promote`/`pause`/`retire`.
+
+Nota de frontera, alineada con el Goal ("separar probar de autorizar") y la AC "Sólo rutas promoted pueden llegar al router productivo": un report es **evidencia técnica, nunca una aprobación de ruta** (invariante 9) ni de artefacto (invariante 6), y su verdict nunca es un "passed" creativo (sólo `objective_fail` u `objective_pass_pending_human`). El registry debe seguir exigiendo revisión humana + actor autorizado por encima del report objetivo; un `objective_pass_pending_human` **no** autoriza promover por sí solo. — cerrado por trabajo en TASK-1458.
+
+## Delta 2026-07-19 — TASK-1486: adapter real Vertex disponible (code-complete, rollout gated)
+
+`TASK-1486` dejó el `VertexCreativeAdapter` code-complete: cuando el canary billable se prenda (`GLOBE_LAB_PROVIDER=vertex`, gated por su go-live checklist), los reportes de evaluación (TASK-1458) dejarán de declarar "proveedor fake" y llevarán `model`/`modelVersion` reales de Vertex + `actualCredits` del uso real. La promotion readiness registry debe seguir tratando el `EvaluationReportV1` como **evidencia objetiva** (no aprobación de craft ni de ruta): el verdict del harness nunca es un "passed" creativo, y `objective_pass_pending_human` no promueve por sí solo. La promoción de una ruta a producción sigue siendo un gate **separado** de ejecutarla en el Lab (invariante 9). — adapter real disponible por TASK-1486.
+
+## Delta 2026-07-20 — DESBLOQUEADA: sus 4 dependencias están complete
+
+`Blocked by: TASK-1458, TASK-1459, TASK-1460, TASK-1461` — **las 4 están `complete`**: TASK-1458 (harness de evals) + TASK-1459 (still matrix) cerradas antes; **TASK-1460 (motion) + TASK-1461 (audio) cerradas 2026-07-20** con recommendation matrices en vivo (Omni/Veo/Seedance motion; Seed Audio audio, todos `objective_pass_pending_human`). Esta task ya puede tomarse. Contrato claro que hereda: el harness produce el **veredicto objetivo** (`objective_fail | objective_pass_pending_human`, nunca auto-`passed`); la distinción **canary / lab-ready / production-candidate** y el bloqueo de promoción por craft/continuidad/audio/rights son **responsabilidad de esta task** (los labs entregan los inputs objetivos + los criterios humanos declarados, no la promoción). — desbloqueada por el cierre de TASK-1460/1461.
 
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
-- Effort: `Alto`
+- Effort: `Medio`
 - Type: `implementation`
 - Execution profile: `backend-data`
 - UI impact: `none`
@@ -15,19 +29,19 @@
 - Wireframe: `none`
 - Flow: `none`
 - Motion: `none`
-- Backend impact: `integration`
+- Backend impact: `command`
 - Epic: `EPIC-028`
-- Status real: `Diseño gobernado; implementación pendiente`
+- Status real: `Código completo y verificado; migración 0015, secretos/attestations y rollout productivo pendientes`
 - Rank: `TBD`
-- Domain: `creative|ai|platform`
-- Blocked by: `TASK-1463, TASK-1467, TASK-1468, TASK-1469`
-- Branch: `task/TASK-1470-globe-production-provider-router`
+- Domain: `creative|platform|data`
+- Blocked by: `none`
+- Branch: `task/TASK-1463-globe-model-promotion-readiness-registry`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-Promover adapters validados y resolver rutas por fidelity contract, rights, readiness, budget y policy, con fallbacks explícitos.
+Crear un registry versionado de rutas con estados lab-only, candidate, promoted, paused y retired, respaldados por evidencia y rollback.
 
 ## Why This Task Exists
 
@@ -35,7 +49,7 @@ EPIC-028 exige que integración de modelos, plataforma gobernada y validación c
 
 ## Goal
 
-Elegir el motor adecuado por caso sin acoplar UI o agentes a un provider.
+Separar claramente probar un modelo de autorizarlo para producción.
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
 
@@ -59,7 +73,7 @@ Elegir el motor adecuado por caso sin acoplar UI o agentes a un provider.
 
 ### Depends on
 
-- `TASK-1463`, `TASK-1467`, `TASK-1468`, `TASK-1469`.
+- `TASK-1458`, `TASK-1459`, `TASK-1460`, `TASK-1461`.
 
 ### Blocks / Impacts
 
@@ -69,8 +83,9 @@ Elegir el motor adecuado por caso sin acoplar UI o agentes a un provider.
 ### Files owned
 
 - `../efeonce-globe/packages/provider-contract/`
-- `../efeonce-globe/apps/creative-runner/`
+- `../efeonce-globe/packages/contracts/`
 - `../efeonce-globe/packages/domain/`
+- `../efeonce-globe/packages/sdk/`
 
 ## Current Repo State
 
@@ -88,7 +103,7 @@ Elegir el motor adecuado por caso sin acoplar UI o agentes a un provider.
 - Topology impact: `cross-runtime`
 - Current home: `Efeonce Globe como plataforma hermana; Greenhouse como control plane operativo/documental`
 - Future candidate home: `remain-shared`
-- Boundary: `Globe Production Provider Router`
+- Boundary: `Globe Model Promotion and Readiness Registry`
 - Server/browser split: `secrets, providers y writes server-only; contratos serializables y consumidores explícitos`
 - Build impact: `Globe valida su runtime; Greenhouse valida task, docs, integraciones y proyecciones en scope`
 - Extraction blocker: `ninguno: el runtime ya nace fuera del monolito Greenhouse`
@@ -97,8 +112,8 @@ Elegir el motor adecuado por caso sin acoplar UI o agentes a un provider.
 
 ### Backend/data brief
 
-- Backend rigor: `backend-critical`
-- Impacto principal: `integration`
+- Backend rigor: `backend-standard`
+- Impacto principal: `command`
 - Source of truth afectado: `Globe para runtime creativo; Greenhouse conserva sólo gobierno TASK/EPIC y proyecciones explícitas`
 - Consumidores afectados: `Globe UI, creative runner, SDK/MCP y Greenhouse sólo cuando exista contrato versionado`
 - Runtime target: `sibling-service`
@@ -106,9 +121,9 @@ Elegir el motor adecuado por caso sin acoplar UI o agentes a un provider.
 ### Contract surface
 
 - Contrato existente a respetar: `EPIC-028, arquitectura agentic de Globe y provider contracts versionados`
-- Contrato nuevo o modificado: `internal route-proposal/estimate domain service consumed only by run commands and typed projections`
+- Contrato nuevo o modificado: `list/get readiness readers y propose/promote/pause/retire commands con evidence refs`
 - Backward compatibility: `gated`
-- Full API parity: `router is internal business logic; surfaces receive route proposal through run contracts, never a generic provider tool`
+- Full API parity: `registry API/SDK y futuros UI/MCP consumen los mismos readers/commands; promotion nunca es edit directo de config`
 
 ### Data model and invariants
 
@@ -153,18 +168,15 @@ Elegir el motor adecuado por caso sin acoplar UI o agentes a un provider.
 
 ### Slice 1
 
-- Implementar resolver provider-neutral y adapter interface productiva sobre rutas exactas; ausencia de
-  provider, model ID, versión o readiness verificables equivale a ruta no ejecutable.
+- Definir schema de capability/readiness y evidencia requerida.
 
 ### Slice 2
 
-- Aplicar readiness, rights, budget, region y capability constraints.
+- Implementar list/get readers y resolución fail-closed por route/version.
 
 ### Slice 3
 
-- Agregar fallbacks declarativos, circuit breakers y observabilidad, conservando propuesta, aprobación y
-  ruta real por attempt. Una ruta `blocked/unverified` —incluido Seedance 2.5 mientras mantenga ese estado— no
-  puede entrar al set productivo por alias, marketing name o wrapper de tercero.
+- Agregar propose/promote/pause/retire commands capability-gated, idempotentes y auditables.
 
 ## Out of Scope
 
@@ -174,7 +186,7 @@ Elegir el motor adecuado por caso sin acoplar UI o agentes a un provider.
 
 ## Detailed Spec
 
-La ejecución comienza desde Greenhouse con `pnpm codex:task-hook TASK-1470 --develop` cuando el operador apruebe su goal. El plan puede modificar el repositorio hermano en los paths owned, pero lifecycle, checkpoints, QA y cierre permanecen en esta spec canónica.
+La ejecución comienza desde Greenhouse con `pnpm codex:task-hook TASK-1463 --develop` cuando el operador apruebe su goal. El plan puede modificar el repositorio hermano en los paths owned, pero lifecycle, checkpoints, QA y cierre permanecen en esta spec canónica.
 
 ## Rollout Plan & Risk Matrix
 
@@ -186,7 +198,7 @@ La ejecución comienza desde Greenhouse con `pnpm codex:task-hook TASK-1470 --de
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
-| Routing opaco o degradación de calidad | Globe/Greenhouse | medium | gate binario, allowlist, audit y rollback antes de ampliar | actual route difiere sin decision record |
+| Promoción implícita por disponibilidad del provider | Globe/Greenhouse | medium | gate binario, allowlist, audit y rollback antes de ampliar | ejecución productiva de ruta no promoted |
 | Deriva entre task y runtime | documentation | medium | task hook, checkpoint, QA y closure en Greenhouse | cambio Globe sin evidencia TASK |
 | Habilitación accidental externa | security/commercial | low | internal-only, deny tests y sign-off separado | actor externo obtiene acceso |
 
@@ -214,18 +226,17 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 
 ## Acceptance Criteria
 
-- [ ] Provider/model/version propuesto y real son visibles en history.
-- [ ] Ruta no promoted o incompatible falla cerrado.
-- [ ] Fallback nunca es silencioso ni cambia la unidad de crédito.
-- [ ] La promoción exige model ID/endpoint exactos, evidencia de eval y provenance contractual; un nombre
-  comercial por sí solo no satisface el gate.
-- [ ] No existe router API/MCP genérico ni consumer que seleccione endpoint/model ID fuera del run primitive.
+- [ ] Sólo rutas promoted pueden llegar al router productivo.
+- [ ] Cambio de estado exige evidencia y actor autorizado.
+- [ ] Versiones nuevas no heredan readiness automáticamente.
+- [ ] Promotion/pause/retire sólo ocurren por commands; API/SDK/conformance prueban allow/deny/replay y el
+      mismo evidence-linked audit.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
 - [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
 
 ## Verification
 
-- `pnpm task:lint --task TASK-1470`
+- `pnpm task:lint --task TASK-1463`
 - `pnpm ops:lint --changed`
 - `pnpm qa:gates --changed`
 - `pnpm docs:closure-check`

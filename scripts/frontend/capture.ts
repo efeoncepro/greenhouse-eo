@@ -27,6 +27,7 @@ import { collectPerformanceSnapshot, derivePerformanceFindings } from './lib/per
 import { runScenario } from './lib/recorder'
 import { writeCaptureReport } from './lib/report'
 import { attachRuntimeCollectors, deriveRuntimeFindings } from './lib/runtime-collector'
+import { deriveAssetResponseFindings } from './lib/asset-integrity'
 import { applySecretMask, assertSafeOutputPath, enforceProductionGate } from './lib/safety'
 import type { CaptureScenario, CaptureViewportVariant } from './lib/scenario'
 import { uploadCaptureToGcs } from './lib/upload'
@@ -244,7 +245,10 @@ const runOneCapture = async ({
     }
 
     runtimeSummary = runtimeCollector.summarize()
-    outcome.qualityFindings.push(...deriveRuntimeFindings(runtimeCollector.raw(), scenario.quality?.runtime))
+    const runtimeRaw = runtimeCollector.raw()
+
+    outcome.qualityFindings.push(...deriveRuntimeFindings(runtimeRaw, scenario.quality?.runtime))
+    outcome.qualityFindings.push(...deriveAssetResponseFindings(runtimeRaw.assetMimeMismatches ?? [], scenario.quality?.assets))
 
     performanceSummary = await collectPerformanceSnapshot(session.page)
     outcome.qualityFindings.push(...derivePerformanceFindings(performanceSummary, scenario.quality?.performance))

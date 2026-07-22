@@ -6,12 +6,23 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Runtime interno API vivo hasta TASK-1503; TASK-1504 está in-progress solo local y no desplegada. El Producer humano aprobado requiere bridge/surface enforcement (TASK-1519), backend/data restante y TASK-1505; runtime comercial requiere TASK-1521 + readiness TASK-1480.`
+- Status real: `El vertical slice completo del Producer aprobado está code-complete y verificado localmente —UI source-led, bridge humano, generación multimodal, referencias, library, edición, créditos y review/share—, pero el runtime interno desplegado sigue vivo sólo hasta TASK-1503. El rollout requiere migrations, secrets, IAM/grants, flags, workers/providers y canaries; el runtime comercial sigue bloqueado por TASK-1521 + readiness TASK-1480.`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `Efeonce Creative Technology / Product`
 - Branch: `main` en el repositorio hermano
 - GitHub Issue: `TBD — backlog operativo en https://github.com/efeoncepro/efeonce-globe`
+
+### Checkpoint 2026-07-22 — Producer integrado localmente
+
+- La UI aprobada de `TASK-1505` dejó de ser intención: está implementada con su riqueza visual y funcional,
+  motion/reduced-motion, responsive 390 px, teclado, viewer, compare, inpaint, library, budgets, referencias,
+  presets/Style DNA, créditos y review/share. La auditoría visual source-led obtuvo `4.69/5` y `PASS`.
+- `TASK-1504`, `TASK-1519`, `TASK-1520` y `TASK-1522` están integradas y verdes en local sobre contracts
+  reales. Esta evidencia no equivale a rollout: despliegue, migrations, secrets, IAM/grants, flags, workers,
+  provider canaries y smoke humano permanecen pendientes y se declaran como gate operativo.
+- La secuencia vigente ya no es “recortar la UI hasta lo que soporte el backend”, sino desplegar por capas las
+  capabilities que la UI aprobada consume, preservando fail-closed, lineage, idempotencia y control de gasto.
 
 ## Summary
 
@@ -84,16 +95,19 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
   `globe.lab.experiment.run`. Corre en `globe-api-internal` rev `00017-xfm` con
   `GLOBE_PRODUCER_ASSETS_ENABLED=true` (default en git), el secreto HMAC `globe-producer-grant-secret` con
   accessor sólo a `api_runtime` y la migración `0003` aplicada; `ui`/`mcp` siguen `policy-blocked`.
-  `TASK-1504` está **in-progress solo en el repo local**: slices Image/Video/Audio existen, pero no están
-  desplegadas y faltan multi-output per-output, voice presets durables, canary y rollout. `TASK-1505` posee la
+  `TASK-1504` está **code-complete y verificada localmente**: Image/Video/Audio, multi-output y presets viven
+  sobre contratos gobernados; despliegue y provider canaries siguen pendientes. `TASK-1505` implementa la
   **superficie aprobada completa**, no un MVP recortado: composer, library/viewer, collections/batch, budgets,
-  provenance/lineage, collaboration/share y operator UX. Se integra por slices y no habilita clientes externos.
+  provenance/lineage, collaboration/share y operator UX. Está validada localmente y no habilita clientes externos.
 - `TASK-1519` — **Producer Human Execution Bridge + Surface Enforcement.** Desbloquea browser humano por
   `studio-web` same-origin BFF hacia la API IAM-private, con broker grants, delegación actor/workspace,
-  correlation/idempotency y enforcement real de `surface=ui` separado del coverage manifest.
+  correlation/idempotency y enforcement real de `surface=ui` separado del coverage manifest. Está code-complete
+  localmente; faltan secret/env, broker grants, IAM invoker, flags y smoke/revocación sobre el runtime desplegado.
 - `TASK-1520` — **Producer Asset Library, Collections + Bulk Operations.** Proyección paginada de generations,
   annotations y lineage; collections y commands batch idempotentes/auditados. Reusa retrieval/lineage y no crea
-  un segundo source of truth.
+  un segundo source of truth. Está code-complete localmente; faltan migration, bucket/secret/IAM/grants y smoke.
+- `TASK-1522` — **Review, comments + share foundation.** Comments, estados de review y enlaces gobernados están
+  integrados localmente; faltan migration, secret/grants y verificación sobre el runtime desplegado.
 - `TASK-1521` — **Globe Commercial Runtime Environment Enablement.** Posee el bloqueo actual que impide bootear
   fuera de `internal_smoke`: environment contract, isolation/config, secrets, migrations, rollback y evidencia.
 - `TASK-1506` — **frontend hosting and front door decision (RESUELTA — ADR-004).** Gate P0 cerrado: la ADR
@@ -147,19 +161,20 @@ Esto habilita vender primero un **Sample Sprint Efeonce-managed** basado en una 
 opera Globe internamente y el cliente compra capacidad/outcome gobernado. `Studio Access`, operación cliente,
 precios públicos y wallet self-serve permanecen posteriores a la calibración y aprobación comercial.
 
-### Producer execution order (target aprobado)
+### Producer execution order (vigente tras integración local)
 
-1. Canonizar el baseline aprobado y mantener `TASK-1505` como integración completa, no como interpretación
-   reducida del backend disponible.
-2. Ejecutar `TASK-1519` (human bridge + grants + surface enforcement) como gate P0 del browser.
-3. En paralelo cerrar `TASK-1504`, `TASK-1469` (durable jobs/outbox/idempotency/cancel/progress/reconcile),
-   `TASK-1467` (upload/provenance) y `TASK-1511` (tenancy/bindings); probar cross-réplica en `TASK-1512`.
-4. Integrar `TASK-1505` por vertical slices Image → Video → Audio sobre contracts reales, verificando desktop,
-   390 px, teclado, reduced motion, overflow y GVC; toda dependencia abierta se muestra como estado honesto.
-5. Completar iteration/library con `TASK-1493/1494/1496/1497/1498` + `TASK-1520`; luego economía y
-   colaboración con `TASK-1468→1482` + `TASK-1472`.
-6. Habilitar environment comercial por `TASK-1521`, converger readiness `1477/1478/1479/1480` y abrir acceso
-   externo solo con migrations/secrets/rollback/smoke/sign-off completos.
+1. Congelar el baseline aprobado y su scorecard como gate de regresión: ningún rollout puede sustituir assets,
+   motion, microinteracciones o estados por versiones empobrecidas.
+2. Aplicar, en orden y con rollback, las migrations de tenancy/lifecycle/readiness, library/recipes/créditos y
+   review/share; después provisionar buckets, secrets y service accounts sin compartir credenciales.
+3. Activar `TASK-1519`: delegación actor/workspace, broker grants, origin allowlist, IAM invoker y enforcement
+   `surface=ui`; verificar expiración/revocación, correlation e idempotencia con smoke humano autenticado.
+4. Activar workers, callbacks y reconciliation de `TASK-1469`; habilitar el provider router y referencias sólo
+   después de ADC/WIF, provider secrets, budgets y content-addressed ingest. Ejecutar canaries billables acotados.
+5. Desplegar `studio-web` con la UI aprobada y ejecutar GVC desktop + 390 px, teclado, reduced motion, overflow,
+   viewer/compare/inpaint, library, credits y review/share contra el runtime real.
+6. Completar release/delivery y observabilidad, rollback y recuperación; sólo entonces declarar el Producer
+   internal-only operativo. `TASK-1521` + `1477/1478/1479/1480` siguen siendo gates para acceso comercial.
 7. `TASK-1474` monta el Workbench brief-first sobre los mismos primitivos; no los duplica.
 
 ## Existing Related Work

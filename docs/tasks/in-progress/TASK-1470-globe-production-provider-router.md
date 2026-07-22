@@ -1,27 +1,26 @@
-# TASK-1463 — Globe Model Promotion and Readiness Registry
+# TASK-1470 — Globe Production Provider Router
 
-## Delta 2026-07-19 — TASK-1458 complete: el artefacto de evidencia para promoción ya existe
+## Checkpoint 2026-07-22 — compilador exacto code-complete, composición/rollout pendientes
 
-`TASK-1458` (Golden Briefs & Evaluation Harness, SPEC-003) quedó **complete** (fake canary). Es una de las cuatro dependencias directas de esta task (`TASK-1458, 1459, 1460, 1461`) y aporta el **artefacto de evidencia** que las transiciones de estado del registry referencian: el `EvaluationReportV1` versionado (con `fixtureVersion` + `rubricVersion` + `schemaVersion`), scopeado al workspace del caller y con sus **limitaciones declaradas** (proveedor fake, muestra única). Esto alimenta directamente las AC "Cambio de estado exige evidencia y actor autorizado" y los `evidence refs` de los commands `propose`/`promote`/`pause`/`retire`.
+El hook canónico se reabrió después de verificar que TASK-1463/1467/1468/1469 están code-complete. En Globe se
+añadió `ExactProductionRouteCompiler`, consumido por el scheduler durable de TASK-1469. El compilador liga una
+ruta ya estimada a la revisión `promoted` exacta, binding provider/model/version/endpoint, derechos durables,
+región permitida, budget approval/reservation y estado de circuit breaker. Persiste una decisión sanitizada y
+un snapshot con ruta propuesta/real. No selecciona fallback: un circuito abierto obliga a proponer, estimar y
+aprobar otra ruta para que el cambio nunca altere silenciosamente la unidad de crédito.
 
-Nota de frontera, alineada con el Goal ("separar probar de autorizar") y la AC "Sólo rutas promoted pueden llegar al router productivo": un report es **evidencia técnica, nunca una aprobación de ruta** (invariante 9) ni de artefacto (invariante 6), y su verdict nunca es un "passed" creativo (sólo `objective_fail` u `objective_pass_pending_human`). El registry debe seguir exigiendo revisión humana + actor autorizado por encima del report objetivo; un `objective_pass_pending_human` **no** autoriza promover por sí solo. — cerrado por trabajo en TASK-1458.
-
-## Delta 2026-07-19 — TASK-1486: adapter real Vertex disponible (code-complete, rollout gated)
-
-`TASK-1486` dejó el `VertexCreativeAdapter` code-complete: cuando el canary billable se prenda (`GLOBE_LAB_PROVIDER=vertex`, gated por su go-live checklist), los reportes de evaluación (TASK-1458) dejarán de declarar "proveedor fake" y llevarán `model`/`modelVersion` reales de Vertex + `actualCredits` del uso real. La promotion readiness registry debe seguir tratando el `EvaluationReportV1` como **evidencia objetiva** (no aprobación de craft ni de ruta): el verdict del harness nunca es un "passed" creativo, y `objective_pass_pending_human` no promueve por sí solo. La promoción de una ruta a producción sigue siendo un gate **separado** de ejecutarla en el Lab (invariante 9). — adapter real disponible por TASK-1486.
-
-## Delta 2026-07-20 — DESBLOQUEADA: sus 4 dependencias están complete
-
-`Blocked by: TASK-1458, TASK-1459, TASK-1460, TASK-1461` — **las 4 están `complete`**: TASK-1458 (harness de evals) + TASK-1459 (still matrix) cerradas antes; **TASK-1460 (motion) + TASK-1461 (audio) cerradas 2026-07-20** con recommendation matrices en vivo (Omni/Veo/Seedance motion; Seed Audio audio, todos `objective_pass_pending_human`). Esta task ya puede tomarse. Contrato claro que hereda: el harness produce el **veredicto objetivo** (`objective_fail | objective_pass_pending_human`, nunca auto-`passed`); la distinción **canary / lab-ready / production-candidate** y el bloqueo de promoción por craft/continuidad/audio/rights son **responsabilidad de esta task** (los labs entregan los inputs objetivos + los criterios humanos declarados, no la promoción). — desbloqueada por el cierre de TASK-1460/1461.
+Estado honesto: **código del compilador completo y verificado; composición productiva y rollout pendientes**.
+Faltan la implementación productiva de los ports de binding/circuit decisions, result drivers y el canary
+internal-only antes de activar `GLOBE_GOVERNED_RUNS_ENABLED`.
 
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
-- Effort: `Medio`
+- Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `backend-data`
 - UI impact: `none`
@@ -29,19 +28,19 @@ Nota de frontera, alineada con el Goal ("separar probar de autorizar") y la AC "
 - Wireframe: `none`
 - Flow: `none`
 - Motion: `none`
-- Backend impact: `command`
+- Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Diseño gobernado; implementación pendiente`
+- Status real: `En ejecución dentro del goal aprobado de TASK-1505; foundations code-complete, rollout downstream permanece pendiente`
 - Rank: `TBD`
-- Domain: `creative|platform|data`
-- Blocked by: `TASK-1458, TASK-1459, TASK-1460, TASK-1461`
-- Branch: `task/TASK-1463-globe-model-promotion-readiness-registry`
+- Domain: `creative|ai|platform`
+- Blocked by: `none`
+- Branch: `task/TASK-1470-globe-production-provider-router`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-Crear un registry versionado de rutas con estados lab-only, candidate, promoted, paused y retired, respaldados por evidencia y rollback.
+Promover adapters validados y resolver rutas por fidelity contract, rights, readiness, budget y policy, con fallbacks explícitos.
 
 ## Why This Task Exists
 
@@ -49,7 +48,7 @@ EPIC-028 exige que integración de modelos, plataforma gobernada y validación c
 
 ## Goal
 
-Separar claramente probar un modelo de autorizarlo para producción.
+Elegir el motor adecuado por caso sin acoplar UI o agentes a un provider.
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
 
@@ -73,7 +72,10 @@ Separar claramente probar un modelo de autorizarlo para producción.
 
 ### Depends on
 
-- `TASK-1458`, `TASK-1459`, `TASK-1460`, `TASK-1461`.
+- `TASK-1463`, `TASK-1467`, `TASK-1468`, `TASK-1469`.
+- Resolución 2026-07-22: las cuatro foundations están code-complete y verificadas localmente. Esta task puede
+  integrar sus ports durables; la promoción live sigue condicionada a migraciones, secretos, adapters externos y
+  canary de cada owner, sin fallback degradado.
 
 ### Blocks / Impacts
 
@@ -83,9 +85,8 @@ Separar claramente probar un modelo de autorizarlo para producción.
 ### Files owned
 
 - `../efeonce-globe/packages/provider-contract/`
-- `../efeonce-globe/packages/contracts/`
+- `../efeonce-globe/apps/creative-runner/`
 - `../efeonce-globe/packages/domain/`
-- `../efeonce-globe/packages/sdk/`
 
 ## Current Repo State
 
@@ -103,7 +104,7 @@ Separar claramente probar un modelo de autorizarlo para producción.
 - Topology impact: `cross-runtime`
 - Current home: `Efeonce Globe como plataforma hermana; Greenhouse como control plane operativo/documental`
 - Future candidate home: `remain-shared`
-- Boundary: `Globe Model Promotion and Readiness Registry`
+- Boundary: `Globe Production Provider Router`
 - Server/browser split: `secrets, providers y writes server-only; contratos serializables y consumidores explícitos`
 - Build impact: `Globe valida su runtime; Greenhouse valida task, docs, integraciones y proyecciones en scope`
 - Extraction blocker: `ninguno: el runtime ya nace fuera del monolito Greenhouse`
@@ -112,8 +113,8 @@ Separar claramente probar un modelo de autorizarlo para producción.
 
 ### Backend/data brief
 
-- Backend rigor: `backend-standard`
-- Impacto principal: `command`
+- Backend rigor: `backend-critical`
+- Impacto principal: `integration`
 - Source of truth afectado: `Globe para runtime creativo; Greenhouse conserva sólo gobierno TASK/EPIC y proyecciones explícitas`
 - Consumidores afectados: `Globe UI, creative runner, SDK/MCP y Greenhouse sólo cuando exista contrato versionado`
 - Runtime target: `sibling-service`
@@ -121,9 +122,9 @@ Separar claramente probar un modelo de autorizarlo para producción.
 ### Contract surface
 
 - Contrato existente a respetar: `EPIC-028, arquitectura agentic de Globe y provider contracts versionados`
-- Contrato nuevo o modificado: `list/get readiness readers y propose/promote/pause/retire commands con evidence refs`
+- Contrato nuevo o modificado: `internal route-proposal/estimate domain service consumed only by run commands and typed projections`
 - Backward compatibility: `gated`
-- Full API parity: `registry API/SDK y futuros UI/MCP consumen los mismos readers/commands; promotion nunca es edit directo de config`
+- Full API parity: `router is internal business logic; surfaces receive route proposal through run contracts, never a generic provider tool`
 
 ### Data model and invariants
 
@@ -162,21 +163,56 @@ Separar claramente probar un modelo de autorizarlo para producción.
 - [ ] Auth, tenant isolation, idempotencia, observabilidad y rollback tienen evidencia proporcional al riesgo.
 
 <!-- ZONE 2 — PLAN MODE: se completa al tomar la task -->
+
+## Audit 2026-07-22
+
+### Supuestos correctos
+
+- El scheduler durable de TASK-1469 ya expone `GovernedRouteCompilerPort` y conserva el snapshot por attempt.
+- Readiness exacta, provenance/rights y ledger/budget ya poseen ports durables reutilizables.
+
+### Supuestos desactualizados
+
+- La task seguía declarando bloqueadores aunque sus cuatro foundations ya estaban code-complete; el gate se
+  corrigió sin declarar rollout live.
+- El composite adapter anterior elegía por capability/policy y mantenía ownership de polling en memoria; no es
+  autoridad productiva multi-réplica ni sustituye readiness/budget/rights.
+
+### Código reutilizado
+
+- `GovernedModelLabScheduler`, `ModelReadinessStorePort`, `AssetProvenanceStorePort`,
+  `ProductionBudgetAuthorityPort` y el lifecycle durable; no se creó un endpoint/router genérico.
+
+### Riesgos y blast radius
+
+- Provider submission y créditos: fail-closed; cualquier dependencia ausente bloquea antes del write externo.
+- La composición live queda apagada hasta tener ports productivos, secrets, migrations y canary verificado.
+
+## Plan de ejecución vigente
+
+1. Contrato/compilador exacto y pruebas negativas — **completado**.
+2. Persistencia multi-réplica de bindings, circuit state y decision history — pendiente.
+3. Composición con scheduler/finalizer/result drivers y configuración fail-closed — pendiente.
+4. Sandbox/allowlist interna, canary presupuestado, observabilidad y rollback — pendiente.
+5. QA, cierre documental y habilitación explícita de downstream — pendiente.
 <!-- ZONE 3 — EXECUTION SPEC -->
 
 ## Scope
 
 ### Slice 1
 
-- Definir schema de capability/readiness y evidencia requerida.
+- Implementar resolver provider-neutral y adapter interface productiva sobre rutas exactas; ausencia de
+  provider, model ID, versión o readiness verificables equivale a ruta no ejecutable.
 
 ### Slice 2
 
-- Implementar list/get readers y resolución fail-closed por route/version.
+- Aplicar readiness, rights, budget, region y capability constraints.
 
 ### Slice 3
 
-- Agregar propose/promote/pause/retire commands capability-gated, idempotentes y auditables.
+- Agregar fallbacks declarativos, circuit breakers y observabilidad, conservando propuesta, aprobación y
+  ruta real por attempt. Una ruta `blocked/unverified` —incluido Seedance 2.5 mientras mantenga ese estado— no
+  puede entrar al set productivo por alias, marketing name o wrapper de tercero.
 
 ## Out of Scope
 
@@ -186,7 +222,7 @@ Separar claramente probar un modelo de autorizarlo para producción.
 
 ## Detailed Spec
 
-La ejecución comienza desde Greenhouse con `pnpm codex:task-hook TASK-1463 --develop` cuando el operador apruebe su goal. El plan puede modificar el repositorio hermano en los paths owned, pero lifecycle, checkpoints, QA y cierre permanecen en esta spec canónica.
+La ejecución comienza desde Greenhouse con `pnpm codex:task-hook TASK-1470 --develop` cuando el operador apruebe su goal. El plan puede modificar el repositorio hermano en los paths owned, pero lifecycle, checkpoints, QA y cierre permanecen en esta spec canónica.
 
 ## Rollout Plan & Risk Matrix
 
@@ -198,7 +234,7 @@ La ejecución comienza desde Greenhouse con `pnpm codex:task-hook TASK-1463 --de
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
-| Promoción implícita por disponibilidad del provider | Globe/Greenhouse | medium | gate binario, allowlist, audit y rollback antes de ampliar | ejecución productiva de ruta no promoted |
+| Routing opaco o degradación de calidad | Globe/Greenhouse | medium | gate binario, allowlist, audit y rollback antes de ampliar | actual route difiere sin decision record |
 | Deriva entre task y runtime | documentation | medium | task hook, checkpoint, QA y closure en Greenhouse | cambio Globe sin evidencia TASK |
 | Habilitación accidental externa | security/commercial | low | internal-only, deny tests y sign-off separado | actor externo obtiene acceso |
 
@@ -226,17 +262,18 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 
 ## Acceptance Criteria
 
-- [ ] Sólo rutas promoted pueden llegar al router productivo.
-- [ ] Cambio de estado exige evidencia y actor autorizado.
-- [ ] Versiones nuevas no heredan readiness automáticamente.
-- [ ] Promotion/pause/retire sólo ocurren por commands; API/SDK/conformance prueban allow/deny/replay y el
-      mismo evidence-linked audit.
+- [ ] Provider/model/version propuesto y real son visibles en history.
+- [ ] Ruta no promoted o incompatible falla cerrado.
+- [ ] Fallback nunca es silencioso ni cambia la unidad de crédito.
+- [ ] La promoción exige model ID/endpoint exactos, evidencia de eval y provenance contractual; un nombre
+  comercial por sí solo no satisface el gate.
+- [ ] No existe router API/MCP genérico ni consumer que seleccione endpoint/model ID fuera del run primitive.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
 - [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
 
 ## Verification
 
-- `pnpm task:lint --task TASK-1463`
+- `pnpm task:lint --task TASK-1470`
 - `pnpm ops:lint --changed`
 - `pnpm qa:gates --changed`
 - `pnpm docs:closure-check`

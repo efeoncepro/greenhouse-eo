@@ -1,0 +1,280 @@
+- generic [active] [ref=f12e1] [box=0,0,390,4260]:
+  - link "Saltar al contenido" [ref=f12e2] [cursor=pointer] [box=12,-65,176,43]:
+    - /url: "#producer-main"
+  - generic [ref=f12e3] [box=0,0,390,4260]:
+    - banner [ref=f12e4] [box=0,0,390,66]:
+      - link "Globe. Producer" [ref=f12e5] [cursor=pointer] [box=18,17,93,35]:
+        - /url: /producer
+        - generic [ref=f12e6] [box=54,21,57,27]:
+          - strong [ref=f12e7] [box=54,21,46,15]:
+            - text: Globe
+            - emphasis [ref=f12e8] [box=97,18,4,21]: .
+          - generic [ref=f12e9] [box=54,39,57,8]: Producer
+      - navigation "Modalidad creativa" [ref=f12e10] [box=127,11,185,47]:
+        - tablist [ref=f12e11] [box=146,11,147,47]:
+          - tab "Imagen" [selected] [ref=f12e12] [cursor=pointer] [box=151,16,44,38]:
+            - generic [ref=f12e13] [box=157,27,16,16]: 
+          - tab "Video" [ref=f12e14] [cursor=pointer] [box=197,16,44,38]:
+            - generic [ref=f12e15] [box=204,27,16,16]: 
+          - tab "Audio" [ref=f12e16] [cursor=pointer] [box=244,16,44,38]:
+            - generic [ref=f12e17] [box=251,27,16,16]: 
+      - generic [ref=f12e18] [box=328,13,44,44]:
+        - group [ref=f12e19] [box=328,13,44,44]:
+          - generic "Créditos y presupuesto" [ref=f12e20] [cursor=pointer] [box=328,13,44,44]:
+            - generic [ref=f12e21] [box=335,19,30,30]: 
+            - text: 
+          - text: 
+        - text:  欄  
+    - main [ref=f12e23] [box=0,66,390,3979]:
+      - region [ref=f12e24] [box=14,80,362,1445]:
+        - generic [ref=f12e25] [box=15,81,360,1221]:
+          - generic [ref=f12e26] [box=28,94,334,53]:
+            - generic [ref=f12e27] [box=28,94,187,53]:
+              - text: Composer
+              - heading "Genera una imagen" [level=1] [ref=f12e28] [box=28,118,187,29]
+            - generic [ref=f12e29] [box=267,94,95,30]:
+              - generic [ref=f12e30] [box=278,101,17,16]: 
+              - generic [ref=f12e31] [box=301,102,50,14]: Imagen
+          - generic [ref=f12e32] [box=28,160,334,270]:
+            - generic [ref=f12e33] [box=42,173,1,1]: Prompt
+            - textbox "Prompt" [ref=f12e34] [box=43,174,304,104]:
+              - /placeholder: Describe lo que quieres crear
+            - generic [ref=f12e35] [box=206,171,145,44]:
+              - button "Prompts recientes" [ref=f12e36] [cursor=pointer] [box=206,171,44,44]:
+                - generic [ref=f12e37] [box=214,185,16,16]: 
+              - button "Mejorar" [ref=f12e40] [cursor=pointer] [box=255,171,95,44]:
+                - generic [ref=f12e41] [box=266,185,16,16]: 
+            - text: 
+            - region [ref=f12e44] [box=43,285,304,132]:
+              - generic [ref=f12e45] [box=43,294,304,15]:
+                - heading "Referencias" [level=2] [ref=f12e46] [box=43,294,67,15]
+                - generic [ref=f12e47] [box=328,294,19,14]: 0/4
+              - generic [ref=f12e48] [box=43,319,304,56]:
+                - generic [ref=f12e50] [box=43,319,243,56]
+                - group [ref=f12e54] [box=293,319,54,54]
+              - paragraph [ref=f12e57] [box=43,386,304,32]: Origen, derechos, influencia y anclaje se validan antes del spend.
+          - generic "Sugerencias" [ref=f12e58] [box=26,443,339,223]:
+            - generic [ref=f12e59] [box=26,443,339,18]:
+              - generic [ref=f12e60] [box=26,443,16,16]: 
+              - text: Sugerencias
+            - button "Retrato editorial con luz de ventana" [ref=f12e61] [box=26,467,212,45]:
+              - generic [ref=f12e62] [box=36,481,16,16]: 
+              - text: Retrato editorial con luz de ventana
+            - button "Producto flotando sobre fondo prisma" [ref=f12e63] [box=26,518,224,45]:
+              - generic [ref=f12e64] [box=36,532,16,16]: 
+              - text: Producto flotando sobre fondo prisma
+            - button "Ilustración isométrica de una ciudad" [ref=f12e65] [box=26,569,214,45]:
+              - generic [ref=f12e66] [box=36,583,16,16]: 
+              - text: Ilustración isométrica de una ciudad
+            - button "Textura macro con gotas de rocío" [ref=f12e67] [box=26,620,202,45]:
+              - generic [ref=f12e68] [box=36,634,16,16]: 
+              - text: Textura macro con gotas de rocío
+          - group [ref=f12e69] [box=28,680,334,249]:
+            - text: −
+            - group [ref=f12e70] [box=28,680,334,32]:
+              - generic "Excluir del resultado Opcional" [ref=f12e71] [cursor=pointer] [box=28,680,198,32]:
+                - generic [ref=f12e72] [box=40,688,16,16]: 
+                - generic [ref=f12e73] [box=62,689,107,14]: Excluir del resultado
+                - generic [ref=f12e74] [box=175,690,39,13]: Opcional
+            - region [ref=f12e75] [box=28,712,334,176]:
+              - heading "Estilo · preset" [level=2] [ref=f12e77] [box=28,712,76,15]
+              - generic "Preset visual" [ref=f12e78] [box=28,737,334,108]:
+                - button "Ninguno" [pressed] [ref=f12e79] [cursor=pointer] [box=28,737,64,32]
+                - button "Cinemático" [ref=f12e81] [cursor=pointer] [box=98,737,93,32]
+                - button "Fotográfico" [ref=f12e84] [cursor=pointer] [box=197,737,94,32]
+                - button "Editorial" [ref=f12e87] [cursor=pointer] [box=28,775,77,32]
+                - button "3D render" [ref=f12e90] [cursor=pointer] [box=111,775,86,32]
+                - button "Ilustración" [ref=f12e93] [cursor=pointer] [box=203,775,89,32]
+                - button "Producto" [ref=f12e96] [cursor=pointer] [box=28,813,82,32]
+                - button "Neón" [ref=f12e99] [cursor=pointer] [box=116,813,62,32]
+                - button "Analógico" [ref=f12e102] [cursor=pointer] [box=184,813,86,32]
+              - button "Abrir Style DNA gobernado" [ref=f12e105] [cursor=pointer] [box=28,855,113,32]:
+                - generic [ref=f12e106] [box=40,863,16,16]: 
+                - generic [ref=f12e107] [box=62,864,56,15]: Style DNA
+            - region [ref=f12e109] [box=28,888,334,41]:
+              - heading "Seed" [level=2] [ref=f12e111] [box=28,888,29,15]
+              - paragraph [ref=f12e112] [box=28,913,334,16]: Podrás fijarlo cuando la ruta publique este control.
+          - region "Modo" [box=28,942,334,0]:       倫 
+          - generic [ref=f12e113] [box=28,955,334,333]:
+            - region [ref=f12e114] [box=28,956,334,130]:
+              - heading "Ruta y modelo" [level=2] [ref=f12e116] [box=39,967,80,15]
+              - text:  
+              - generic [ref=f12e117] [box=39,990,312,85]:
+                - generic [ref=f12e118] [box=39,990,312,16]: Ruta y modelo
+                - combobox "Ruta y modelo" [ref=f12e119] [box=38,989,1,44]
+                - group [ref=f12e120] [box=39,1016,312,59]
+            - generic [ref=f12e129] [box=28,1096,334,192]:
+              - tabpanel "Imagen" [ref=f12e130] [box=28,1096,334,192]:
+                - heading "Formato de salida" [level=2] [ref=f12e132] [box=28,1100,99,15]
+                - text:   
+                - generic [ref=f12e133] [box=28,1123,334,166]
+              - text:                  
+        - generic [ref=f12e170] [box=15,1302,360,222]:
+          - text:  
+          - generic [ref=f12e171] [box=33,1315,324,195]:
+            - generic [ref=f12e172] [box=33,1315,324,16]: Límite máximo de créditos para este run
+            - spinbutton "Límite máximo de créditos para este run" [ref=f12e173] [box=33,1341,324,44]
+            - paragraph [ref=f12e174] [box=33,1395,324,33]: Debes definirlo antes de estimar. No se toma desde un saldo local.
+            - status [ref=f12e175] [box=33,1439,324,17]: Estima esta configuración antes de generar.
+            - generic [ref=f12e176] [box=33,1466,324,44]:
+              - button "Estimar costo" [disabled] [ref=f12e177] [box=33,1466,131,44]
+              - button "Generar" [disabled] [ref=f12e178] [box=173,1466,184,44]
+      - region [ref=f12e179] [box=14,1543,362,2488]:
+        - generic [ref=f12e180] [box=14,1546,362,157]:
+          - generic [ref=f12e181] [box=16,1546,357,45]:
+            - heading "Mis generaciones" [level=2] [ref=f12e182] [box=16,1546,357,28]
+            - generic [ref=f12e183] [box=16,1576,357,15]: 7 de 7 piezas
+          - generic [ref=f12e184] [box=16,1608,357,96]:
+            - button [ref=f12e185] [cursor=pointer] [box=16,1608,48,45]:
+              - generic [ref=f12e186] [box=27,1622,16,16]: 
+            - button "Vista cómoda" [ref=f12e188] [cursor=pointer] [box=71,1608,36,45]:
+              - generic [ref=f12e189] [box=81,1622,16,16]: 
+            - button "Agrupar series" [ref=f12e190] [cursor=pointer] [box=113,1608,36,45]:
+              - generic [ref=f12e191] [box=123,1622,16,16]: 
+            - button [ref=f12e192] [cursor=pointer] [box=155,1608,38,45]:
+              - generic [ref=f12e193] [box=166,1622,16,16]: 
+            - generic [ref=f12e194] [box=16,1659,357,45]:
+              - generic [ref=f12e195] [box=28,1670,16,16]: 
+              - generic [ref=f12e196] [box=15,1658,1,1]: Buscar en tus generaciones
+              - searchbox "Buscar en tus generaciones" [ref=f12e197] [box=16,1659,357,45]
+            - button "Recientes" [ref=f12e198] [cursor=pointer] [box=199,1608,96,45]:
+              - generic [ref=f12e199] [box=210,1622,16,16]: 
+              - text: Recientes
+            - button "Cómo funciona Producer" [ref=f12e200] [cursor=pointer] [box=301,1608,36,45]:
+              - generic [ref=f12e201] [box=311,1622,16,16]: 
+        - generic "Controles de biblioteca" [ref=f12e203] [box=14,1709,362,94]:
+          - group "Filtros de biblioteca" [ref=f12e204] [box=14,1709,362,94]:
+            - button [pressed] [ref=f12e205] [cursor=pointer] [box=18,1713,115,41]:
+              - generic [ref=f12e206] [box=68,1726,16,16]: 
+            - button [ref=f12e207] [cursor=pointer] [box=137,1713,115,41]:
+              - generic [ref=f12e208] [box=187,1726,16,16]: 
+            - button [ref=f12e209] [cursor=pointer] [box=257,1713,115,41]:
+              - generic [ref=f12e210] [box=306,1726,16,16]: 
+            - button [ref=f12e211] [cursor=pointer] [box=18,1758,115,41]:
+              - generic [ref=f12e212] [box=68,1771,16,16]: 
+            - button [ref=f12e213] [cursor=pointer] [box=137,1758,115,41]:
+              - generic [ref=f12e214] [box=187,1771,16,16]: 
+        - generic [ref=f12e216] [box=14,1815,362,2217]:
+          - article [ref=f12e217] [box=14,1815,362,336]:
+            - generic [ref=f12e218] [box=15,1816,360,334]:
+              - img "Vista previa de exp-approved-1" [ref=f12e219] [box=15,1816,360,334]
+              - generic [ref=f12e220] [box=187,1860,16,65]: 
+              - generic [ref=f12e222] [box=29,1830,111,28]:
+                - generic [ref=f12e223] [box=41,1836,17,16]: 
+                - generic [ref=f12e224] [box=64,1837,64,14]: Destacada
+              - generic [ref=f12e225] [box=147,1830,76,25]:
+                - generic [ref=f12e226] [box=155,1834,16,16]: 
+                - generic [ref=f12e227] [box=176,1835,39,14]: Imagen
+              - generic [ref=f12e228] [box=237,1830,86,25]: Candidato listo
+              - button "Seleccionar exp-approved-1" [ref=f12e229] [cursor=pointer] [box=322,1824,45,45]:
+                - generic [ref=f12e230] [box=337,1838,16,16]: 
+            - generic [box=15,1988,360,161]:
+              - generic [ref=f12e231] [box=35,2006,208,26]:
+                - generic [ref=f12e232] [box=35,2006,26,26]: S
+                - strong [ref=f12e233] [box=67,2012,52,14]: Seedream
+                - generic [ref=f12e234] [box=126,2012,31,15]: 5 Pro
+                - text: 
+              - heading "Retrato editorial con luz azul" [level=3] [ref=f12e235] [box=35,2037,223,24]
+              - paragraph [ref=f12e236] [box=35,2067,159,14]: 1 salida · 6 créditos · 22-07-2026
+              - generic [ref=f12e237] [box=60,2087,271,45]:
+                - button "Recrear desde recipe" [ref=f12e238] [cursor=pointer] [box=60,2087,112,45]
+                - button "Ver candidato" [ref=f12e241] [cursor=pointer] [box=180,2087,45,45]
+                - button "Descargar candidato" [ref=f12e243] [cursor=pointer] [box=233,2087,45,45]
+                - button "Quitar de favoritos" [ref=f12e245] [cursor=pointer] [box=286,2087,45,45]
+          - generic [ref=f12e247] [box=14,2167,362,1865]:
+            - article [ref=f12e248] [box=14,2167,362,297]:
+              - generic [ref=f12e249] [box=15,2168,360,208]:
+                - generic [ref=f12e251] [box=187,2182,16,48]: 
+                - generic [ref=f12e253] [box=331,2332,44,44]: 
+                - generic [ref=f12e255] [box=24,2342,67,25]
+                - generic [ref=f12e258] [box=237,2177,86,25]: Candidato listo
+                - button "Seleccionar exp-approved-2" [ref=f12e259] [cursor=pointer] [box=322,2176,45,45]
+              - generic [ref=f12e261] [box=15,2376,360,87]:
+                - generic [ref=f12e262] [box=27,2385,337,26]
+                - heading "Movimiento cinematográfico de producto" [level=3] [ref=f12e266] [box=27,2417,331,17]
+                - paragraph [ref=f12e267] [box=27,2439,331,13]: 1 salida · 8 créditos · 22-07-2026
+                - generic [ref=f12e268] [box=176,2313,190,45]
+            - article [ref=f12e277] [box=14,2477,362,297]:
+              - generic [ref=f12e278] [box=15,2478,360,208]:
+                - generic [ref=f12e279] [box=187,2498,16,48]: 
+                - generic [ref=f12e282] [box=24,2652,67,25]
+                - generic [ref=f12e285] [box=237,2488,86,25]: Candidato listo
+                - button "Seleccionar exp-approved-3" [ref=f12e286] [cursor=pointer] [box=322,2486,45,45]
+              - generic [ref=f12e288] [box=15,2686,360,87]:
+                - generic [ref=f12e289] [box=27,2696,337,26]
+                - heading "Locución cálida de campaña" [level=3] [ref=f12e293] [box=27,2728,331,17]
+                - paragraph [ref=f12e294] [box=27,2750,331,13]: 1 salida · 10 créditos · 22-07-2026
+                - generic [ref=f12e295] [box=176,2624,190,45]
+            - article [ref=f12e304] [box=14,2788,362,297]:
+              - generic [ref=f12e305] [box=15,2789,360,208]:
+                - img "Vista previa de exp-approved-4" [ref=f12e306] [box=15,2789,360,208]
+                - generic [ref=f12e307] [box=187,2816,16,48]: 
+                - generic [ref=f12e309] [box=24,2963,76,25]
+                - generic [ref=f12e312] [box=237,2799,86,25]: Candidato listo
+                - button "Seleccionar exp-approved-4" [ref=f12e313] [cursor=pointer] [box=322,2797,45,45]
+              - generic [ref=f12e315] [box=15,2997,360,87]:
+                - generic [ref=f12e316] [box=27,3007,337,26]
+                - heading "Objeto flotante sobre prisma" [level=3] [ref=f12e320] [box=27,3039,331,17]
+                - paragraph [ref=f12e321] [box=27,3061,331,13]: 1 salida · 12 créditos · 22-07-2026
+                - generic [ref=f12e322] [box=176,2935,190,45]
+            - article [ref=f12e331] [box=14,3099,362,297]:
+              - generic [ref=f12e332] [box=15,3100,360,208]:
+                - generic [ref=f12e334] [box=187,3114,16,48]: 
+                - generic [ref=f12e336] [box=331,3264,44,44]: 
+                - generic [ref=f12e338] [box=24,3274,67,25]
+                - generic [ref=f12e341] [box=237,3110,86,25]: Candidato listo
+                - button "Seleccionar exp-approved-5" [ref=f12e342] [cursor=pointer] [box=322,3108,45,45]
+              - generic [ref=f12e344] [box=15,3308,360,87]:
+                - generic [ref=f12e345] [box=27,3318,337,26]
+                - heading "Ciudad isométrica al amanecer" [level=3] [ref=f12e349] [box=27,3350,331,17]
+                - paragraph [ref=f12e350] [box=27,3372,331,13]: 1 salida · 14 créditos · 22-07-2026
+                - generic [ref=f12e351] [box=176,3246,190,45]
+            - article [ref=f12e360] [box=14,3410,362,297]:
+              - generic [ref=f12e361] [box=15,3411,360,208]:
+                - generic [ref=f12e362] [box=187,3491,16,48]: 
+                - generic [ref=f12e393] [box=24,3585,67,25]
+                - generic [ref=f12e396] [box=203,3420,120,25]: Generación degradada
+                - button "Seleccionar exp-approved-6" [ref=f12e397] [cursor=pointer] [box=322,3419,45,45]
+                - status [ref=f12e399] [box=15,3411,360,208]
+              - generic [ref=f12e405] [box=15,3619,360,87]:
+                - generic [ref=f12e406] [box=27,3629,337,26]
+                - heading "Recuperación de candidato" [level=3] [ref=f12e410] [box=27,3660,331,17]
+                - paragraph [ref=f12e411] [box=27,3683,331,13]: 0 salidas · 16 créditos · 22-07-2026
+                - generic [ref=f12e412] [box=176,3557,190,45]
+            - article [ref=f12e421] [box=14,3721,362,297]:
+              - generic [ref=f12e422] [box=15,3722,360,208]:
+                - img "Vista previa de exp-approved-7" [ref=f12e423] [box=15,3722,360,208]
+                - generic [ref=f12e424] [box=187,3748,16,48]: 
+                - generic [ref=f12e426] [box=24,3895,76,25]
+                - generic [ref=f12e429] [box=237,3731,86,25]: Candidato listo
+                - button "Seleccionar exp-approved-7" [ref=f12e430] [cursor=pointer] [box=322,3730,45,45]
+              - generic [ref=f12e432] [box=15,3930,360,87]:
+                - generic [ref=f12e433] [box=27,3939,337,26]
+                - heading "Textura macro de marca" [level=3] [ref=f12e437] [box=27,3971,331,17]
+                - paragraph [ref=f12e438] [box=27,3993,331,13]: 1 salida · 18 créditos · 22-07-2026
+                - generic [ref=f12e439] [box=176,3867,190,45]
+    - complementary "Ejecución actual" [ref=f12e448] [box=0,777,390,67]:
+      - generic [ref=f12e449] [box=14,798,225,26]:
+        - generic [ref=f12e450] [box=14,803,16,16]: 
+        - generic [ref=f12e451] [box=38,798,110,26]:
+          - generic [ref=f12e452] [box=38,798,110,12]: Ruta seleccionada
+          - strong [ref=f12e453] [box=38,810,110,14]: Elige una ruta curada
+      - button "Generar —" [disabled] [ref=f12e454] [box=251,789,126,44]:
+        - generic [ref=f12e455] [box=263,803,16,16]: 
+        - generic [ref=f12e456] [box=286,803,46,16]: Generar
+        - generic [ref=f12e457] [box=339,801,25,21]: —
+    - contentinfo [ref=f12e458] [box=0,4045,390,139]:
+      - img "Efeonce" [ref=f12e460] [box=20,4062,74,17]
+      - status [ref=f12e461] [box=20,4127,350,42]:
+        - generic [ref=f12e463] [box=38,4127,173,15]: Producer listo para configuración
+        - generic [ref=f12e464] [box=20,4154,334,15]:
+          - text: "Referencia de soporte:"
+          - code [ref=f12e465] [box=142,4155,88,13]: gvc-task-1505
+      - navigation "Legal" [ref=f12e466] [box=20,4096,350,15]:
+        - link "Políticas de privacidad" [ref=f12e467] [cursor=pointer] [box=20,4096,117,15]:
+          - /url: https://efeonce.com/privacidad
+        - link "Términos" [ref=f12e468] [cursor=pointer] [box=149,4096,48,15]:
+          - /url: /legal/terms
+    - paragraph [ref=f12e469] [box=-1,4184,1,1]: Esta capacidad forma parte del Producer aprobado, pero su contrato todavía no está habilitado para este espacio.
+    - text:                                 
+    - paragraph [ref=f12e470] [box=-1,4183,1,1]: Imagen

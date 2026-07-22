@@ -23,7 +23,7 @@ Follow-up concreto heredado: la runtime SA necesita `storage.objectCreator` sobr
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -36,7 +36,7 @@ Follow-up concreto heredado: la runtime SA necesita `storage.objectCreator` sobr
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Diseño gobernado; implementación pendiente`
+- Status real: `Código y wiring local completos; rollout externo y canary pendientes`
 - Rank: `TBD`
 - Domain: `creative|legal|storage`
 - Blocked by: `none`

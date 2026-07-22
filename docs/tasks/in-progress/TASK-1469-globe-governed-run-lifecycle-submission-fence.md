@@ -23,7 +23,7 @@ canary ya tiene owner: **ADR-004** (`TASK-1506`, complete) fijó el front door y
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -36,10 +36,10 @@ canary ya tiene owner: **ADR-004** (`TASK-1506`, complete) fijó el front door y
 - Motion: `none`
 - Backend impact: `webhook`
 - Epic: `EPIC-028`
-- Status real: `Diseño gobernado; implementación pendiente`
+- Status real: `Código completo y verificado; composición productiva espera el compilador exacto de TASK-1470 y rollout de providers`
 - Rank: `TBD`
 - Domain: `creative|platform|ops`
-- Blocked by: `TASK-1465, TASK-1466, TASK-1467, TASK-1468, TASK-1482`
+- Blocked by: `none`
 - Branch: `task/TASK-1469-globe-governed-run-lifecycle-submission-fence`
 - Legacy ID: `none`
 - GitHub Issue: `none`

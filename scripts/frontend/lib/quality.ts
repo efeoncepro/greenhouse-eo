@@ -5,8 +5,9 @@ import AxeBuilder from '@axe-core/playwright'
 import type { Page } from 'playwright'
 
 import { analyzeLayoutIntegrity } from './layout-integrity'
+import { analyzeImageIntegrity } from './asset-integrity'
 import type { CaptureFinding } from './manifest'
-import type { CaptureAccessibilityQualityOptions, CaptureLayoutQualityOptions } from './scenario'
+import type { CaptureAccessibilityQualityOptions, CaptureAssetQualityOptions, CaptureLayoutQualityOptions } from './scenario'
 
 export interface FrameQualityOptions {
   frameLabel: string
@@ -18,6 +19,7 @@ export interface FrameQualityOptions {
   fullPage?: boolean
   accessibility?: CaptureAccessibilityQualityOptions
   layout?: CaptureLayoutQualityOptions
+  assets?: CaptureAssetQualityOptions
 }
 
 const DEFAULT_AXE_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22a', 'wcag22aa']
@@ -224,6 +226,10 @@ export const analyzeFrameQuality = async (page: Page, options: FrameQualityOptio
 
   if (options.layout?.enabled) {
     findings.push(...await analyzeLayoutIntegrity(page, frameLabel, options.layout))
+  }
+
+  if (options.assets?.enabled) {
+    findings.push(...await analyzeImageIntegrity(page, frameLabel, options.assets))
   }
 
   return findings

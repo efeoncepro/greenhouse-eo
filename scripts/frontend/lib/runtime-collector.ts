@@ -14,6 +14,7 @@ import type { Page } from 'playwright'
 import { FINDING_CODES } from './failure-taxonomy'
 import type { CaptureFinding, RuntimeSummary } from './manifest'
 import type { CaptureRuntimeQualityOptions } from './scenario'
+import { inspectAssetResponse, type AssetMimeMismatch, type AssetResponseLike } from './asset-integrity'
 
 const MAX_SAMPLES = 10
 const MAX_MESSAGE_LEN = 500
@@ -48,6 +49,7 @@ export interface RuntimeRaw {
   pageErrors: string[]
   hydrationWarnings: string[]
   httpFailures: Array<{ url: string; status: number; resourceType: string }>
+  assetMimeMismatches?: AssetMimeMismatch[]
 }
 
 export interface RuntimeCollector {
@@ -61,6 +63,7 @@ export const attachRuntimeCollectors = (page: Page): RuntimeCollector => {
   const pageErrors: string[] = []
   const hydrationWarnings: string[] = []
   const httpFailures: Array<{ url: string; status: number; resourceType: string }> = []
+  const assetMimeMismatches: AssetMimeMismatch[] = []
 
   const onConsole = (msg: { type(): string; text(): string }): void => {
     const type = msg.type()
@@ -81,7 +84,17 @@ export const attachRuntimeCollectors = (page: Page): RuntimeCollector => {
     pageErrors.push(sanitizeRuntimeMessage(err.message || String(err)))
   }
 
-  const onResponse = (res: { status(): number; url(): string; request(): { resourceType(): string } }): void => {
+  const onResponse = (res: AssetResponseLike): void => {
+    const assetMismatch = inspectAssetResponse(res)
+
+    if (assetMismatch && !assetMimeMismatches.some(issue =>
+      issue.url === assetMismatch.url &&
+      issue.resourceType === assetMismatch.resourceType &&
+      issue.contentType === assetMismatch.contentType
+    )) {
+      assetMimeMismatches.push(assetMismatch)
+    }
+
     const status = res.status()
 
     if (status < 400) return
@@ -108,7 +121,7 @@ export const attachRuntimeCollectors = (page: Page): RuntimeCollector => {
       hydrationWarningSamples: hydrationWarnings.slice(0, MAX_SAMPLES),
       httpFailureSamples: httpFailures.slice(0, MAX_SAMPLES)
     }),
-    raw: (): RuntimeRaw => ({ consoleErrors, pageErrors, hydrationWarnings, httpFailures }),
+    raw: (): RuntimeRaw => ({ consoleErrors, pageErrors, hydrationWarnings, httpFailures, assetMimeMismatches }),
     dispose: (): void => {
       page.off('console', onConsole)
       page.off('pageerror', onPageError)

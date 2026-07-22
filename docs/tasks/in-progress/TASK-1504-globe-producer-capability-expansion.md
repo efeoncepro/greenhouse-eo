@@ -55,17 +55,34 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-028`
-- Status real: `Diseno`
+- Status real: `Code complete local; rollout y canarios facturables pendientes`
 - Rank: `TBD`
 - Domain: `creative|ai|platform`
-- Blocked by: `TASK-1481, TASK-1500, TASK-1490`
+- Blocked by: `none`
 - Branch: `task/TASK-1504-globe-producer-capability-expansion`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Checkpoint 2026-07-22 — implementación de Claude integrada y verificada
+
+- `video-frames`, `video-motion-control`, `audio-change-voice` y `audio-translate` existen en contracts, catálogo,
+  dominio y adapters reales; sus selectores/inputs fallan cerrado antes del spend.
+- El manifest declara outputs individuales con modalidad, MIME, hash y retención; los adapters Omni preservan
+  video + audio y `resolveEditSource` selecciona por modalidad.
+- El voice-preset registry es tenant-safe, idempotente, con rights obligatorios para clones y vendor id confinado
+  al adapter.
+- La integración de `TASK-1505` corrigió la ruta reference-video para declarar el selector canónico `elements`,
+  que Vertex Omni consume explícitamente; el control ya no falla por vocabulario divergente.
+- El reader de voice presets está promovido localmente a `ui=available` bajo
+  `globe.voice.preset.manage`; MCP continúa `policy-blocked` y el rollout humano depende de `TASK-1519`.
+- La integración completa pasa `pnpm check` y `pnpm build`; los tests de Domain y Creative Runner cubren estas
+  capabilities sin gasto.
+- La task permanece `in-progress`: faltan secretos/provider config, promoción exacta y canario facturable humano
+  por capability. Código terminado no equivale a capability viva.
+
 ## Summary
 
-Suma al Creative Producer las capabilities que el chassis compartido todavía no tiene, todas **detrás del provider seam** (`CreativeProviderAdapter`, nunca un SDK de proveedor directo), exactamente el patrón de los adapters reales `TASK-1486/1487/1488`: **video** — `video-frames` (keyframe start/end) y `video-motion-control` (motion transfer); **audio** — `audio-change-voice` (speech-to-speech) y `audio-translate` (dub/localización); **multi-output omni** — un run que emite `{video, audio}` con **cada output declarado por su `sha256`** en el manifest (rompe el supuesto "1 experimento = 1 output" del contrato actual, hay que modelarlo); y un **voice-preset registry** (voces reutilizables/clonadas, con naming dual — el slug de voz del proveedor vive solo en el adapter). Cada capability nace gobernada y **fail-closed pre-spend**, con `ui`/`mcp` `policy-blocked` hasta gate.
+Suma al Creative Producer las capabilities que el chassis compartido todavía no tiene, todas **detrás del provider seam** (`CreativeProviderAdapter`, nunca un SDK de proveedor directo), exactamente el patrón de los adapters reales `TASK-1486/1487/1488`: **video** — `video-frames` (keyframe start/end) y `video-motion-control` (motion transfer); **audio** — `audio-change-voice` (speech-to-speech) y `audio-translate` (dub/localización); **multi-output omni** — un run que emite `{video, audio}` con **cada output declarado por su `sha256`** en el manifest (rompe el supuesto "1 experimento = 1 output" del contrato actual, hay que modelarlo); y un **voice-preset registry** (voces reutilizables/clonadas, con naming dual — el slug de voz del proveedor vive solo en el adapter). Cada capability nace gobernada y **fail-closed pre-spend**; el gate UI se promueve sólo con entitlement y bridge de `TASK-1505/1519`, mientras MCP permanece bloqueado.
 
 ## Why This Task Exists
 

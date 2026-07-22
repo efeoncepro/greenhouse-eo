@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -17,10 +17,10 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-028`
-- Status real: `Diseño gobernado; implementación pendiente`
+- Status real: `Implementación en ejecución sobre el ledger append-only de TASK-1468; rollout permanece gated por migraciones/runtime`
 - Rank: `TBD`
 - Domain: `finance|creative|data|reliability`
-- Blocked by: `TASK-1481, TASK-1465, TASK-1466, TASK-1468`
+- Blocked by: `none`
 - Branch: `task/TASK-1482-globe-credit-pools-grants-budget-administration`
 - Legacy ID: `none`
 - GitHub Issue: `none`

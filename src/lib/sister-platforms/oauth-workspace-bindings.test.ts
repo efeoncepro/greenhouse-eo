@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type { TenantAccessRecord } from '@/lib/tenant/access'
+
 vi.mock('server-only', () => ({}))
 vi.mock('@/lib/db', () => ({ query: vi.fn() }))
 
@@ -12,7 +14,7 @@ const tenant = {
   clientName: 'Efeonce · Marca',
   organizationId: 'org-efeonce',
   spaceId: 'space-efeonce'
-} as never
+} as unknown as TenantAccessRecord
 
 const row = (overrides: Record<string, unknown> = {}) => ({
   external_scope_id: 'greenhouse-org:efeonce',
@@ -92,6 +94,12 @@ describe('Globe OAuth workspace bindings projection', () => {
     await expect(resolveGlobeOAuthWorkspaceBindings(tenant, query)).resolves.toEqual([
       { workspaceId: 'greenhouse-org:efeonce', displayName: 'Efeonce · Marca', kind: 'internal', isPrimary: true }
     ])
+  })
+
+  it('fails closed instead of projecting an empty legacy workspace suffix', async () => {
+    query.mockResolvedValue([])
+
+    await expect(resolveGlobeOAuthWorkspaceBindings({ ...tenant, clientId: '' } as never, query)).resolves.toEqual([])
   })
 
   it('drops malformed external ids and never exposes binding metadata or subject data', async () => {

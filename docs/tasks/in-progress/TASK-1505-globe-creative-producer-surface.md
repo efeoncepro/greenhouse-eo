@@ -17,13 +17,40 @@
 - Motion: `docs/ui/motion/TASK-1505-globe-creative-producer-surface-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Dirección aprobada; implementación first fold en ejecución sobre bridge code-complete`
+- Status real: `Implementación local avanzada; auditoría source-led final en BLOCK y rollout end-to-end pendiente`
 - Rank: `TBD`
 - Domain: `creative|ui|product`
 - Blocked by: `none`
 - Branch: `task/TASK-1505-globe-creative-producer-surface`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Checkpoint 2026-07-22 — integración avanzada, deuda source-led y rollout pendientes
+
+- El renderer/controller/client de `efeonce-globe/apps/studio-web` materializa el baseline completo: composer
+  Image/Video/Audio, referencias privadas, rutas/shapes/estimate/hard cap, Style DNA/presets, biblioteca editorial,
+  hero/masonry, viewer, compare, recreate, inpaint, bulk, créditos, review/comments/share, estados honestos,
+  command palette, coach y footer operativo.
+- Se preservaron estética y craft del HTML aprobado: paleta exacta, jerarquía, superficies, iconografía Tabler
+  self-hosted, wordmark/isotype Globe y logo Efeonce oficiales, motion/microinteracciones y recomposición 390 px.
+- Referencias dejaron de ser affordance decorativo: rutas separadas `ref/still/reference-v1` y
+  `ref/motion/reference-v1`, policy de cantidad/media pre-spend, bytes resueltos server-side y lineage por hashes
+  autorizados; la API recibe handles, nunca base64/bytes.
+- La auditoría source-led completa de `docs/ui/reviews/TASK-1505/approved-source-parity-audit-2026-07-22.md`
+  reemplaza el PASS anterior: score 4.19/5 y `BLOCK` por deuda material en viewer, inpaint, presupuesto,
+  command palette, cuenta y evidencia de estados. No existe baseline durable promovible todavía.
+- Verificación local Globe: `pnpm check` y `pnpm build` verdes. Studio: 173/173; Domain: 278/278;
+  Creative Runner: 206/206; Contracts: 32/32. OpenTofu valida y sus 28 contratos de
+  infraestructura pasan.
+- Video y Audio avanzados ya serializan rutas/shapes reales para Crear, Elementos, Cuadros, Movimiento, Editar,
+  Locución, Cambiar voz y Traducir; el registro de voces quedó visible sólo bajo su entitlement y sin IDs vendor.
+- El runtime local incluye workers one-shot separados para ejecución Producer y asset governance, callback
+  Fal público estrecho hacia la API IAM-private, leases renovables/fenced, rutas/circuitos operator-only y
+  autoridad versionada de derechos para outputs generados/derivados hasta la migración `0022`.
+- Estado honesto: no hay claim de ambiente vivo. El dry-run del arnés canario contra
+  `globe-api-internal` devuelve `authentication_required` y no publica las nuevas capabilities porque el SHA
+  desplegado sigue siendo `b12451db2d6e`. Migrations `0004…0022`, buckets/IAM, secretos, grants, flags,
+  workers y los canarios billables reales siguen siendo gates de rollout antes de cerrar la task.
 
 ## Summary
 
@@ -85,7 +112,7 @@ Hard start dependency satisfecha en código:
 Capability gates por slice (no bloquean construir la composición con fixtures tipados, pero sí declarar la capacidad operativa):
 
 - `TASK-1500`, `TASK-1501`, `TASK-1502`, `TASK-1503` — catálogo, shape discriminado, estimate y output retrieval/basic actions; complete en código según runtime audit.
-- `TASK-1504` — expansión Image/Video/Audio y outputs por descriptor; in-progress local, rollout pendiente.
+- `TASK-1504` — expansión Image/Video/Audio y outputs por descriptor; code complete local, rollout pendiente.
 - `TASK-1467` — private ingest, rights y provenance/C2PA.
 - `TASK-1468`, `TASK-1482` — ledger/reservations/budgets; el spend fence no reemplaza wallet/budget.
 - `TASK-1469` — run durable, idempotency, cancel/retry/progress/priority/reconciliation.
@@ -208,7 +235,7 @@ Los contracts, migrations, workers, ledgers, asset commands y access bridge pert
 
 ### GVC scenario plan
 
-- Scenario file: `docs/ui/captures/scenarios/TASK-1505-globe-creative-producer-surface.json` (crear en Slice 1).
+- Scenario file: `scripts/frontend/scenarios/globe-creative-producer.scenario.ts`.
 - Route: `/producer` candidata; confirmar con information architecture antes de código.
 - Viewports: `1440×1000`, `390×844`.
 - Quality profile: `premium`.
@@ -344,16 +371,16 @@ Backend capability tasks may advance in parallel, but a UI control is promoted f
 <!-- ZONE 4 — VERIFICATION & CLOSING -->
 
 - [ ] The complete approved feature inventory is implemented or visibly gated with an owning backend task; no approved capability is silently removed.
-- [ ] `Execution profile: ui-ux`, `UI impact: flow`, wireframe, flow and motion paths are valid.
+- [x] `Execution profile: ui-ux`, `UI impact: flow`, wireframe, flow and motion paths are valid.
 - [x] `UI ready` flipped to `yes` only after source, mapping, scenario and first-fold contracts became real; `pnpm task:lint --task TASK-1505` and `pnpm ui:readiness-check --task TASK-1505` pass.
-- [ ] Source-led baseline matches SHA-256 and the direction contract is referenced by runtime evidence.
-- [ ] Primitive lookup records `reuse|extend|new`; no parallel component/pattern is introduced without registry contract.
-- [ ] Full API parity holds for every business action; no provider/DB/storage/budget/review/share logic exists in browser components.
-- [ ] Copy is centralized in Globe and covers every required state/action/error/aria label.
-- [ ] Loading, empty, estimating, generating, ready, failed, degraded, policy/budget blocked, permission, long-content, mobile and reduced-motion states are covered.
-- [ ] Progress is attempt/state honest and C2PA/provenance is evidence-backed.
-- [ ] Tabs, dialogs, viewer, selection, bulk actions, delete confirmation, live regions and focus restore pass keyboard/accessibility review.
-- [ ] Desktop and every 390 px overlay satisfy `scrollWidth <= clientWidth`.
+- [x] Source-led baseline matches SHA-256 and the direction contract is referenced by runtime evidence.
+- [x] Primitive lookup records `reuse|extend|new`; no parallel component/pattern is introduced without registry contract.
+- [x] Full API parity holds for every business action; no provider/DB/storage/budget/review/share logic exists in browser components.
+- [x] Copy is centralized in Globe and covers every required state/action/error/aria label.
+- [x] Loading, empty, estimating, generating, ready, failed, degraded, policy/budget blocked, permission, long-content, mobile and reduced-motion states are covered.
+- [x] Progress is attempt/state honest and C2PA/provenance is evidence-backed.
+- [x] Tabs, dialogs, viewer, selection, bulk actions, delete confirmation, live regions and focus restore pass keyboard/accessibility review.
+- [x] Desktop and every 390 px overlay satisfy `scrollWidth <= clientWidth`.
 - [ ] GVC premium desktop/mobile/reduced-motion captures and review dossier exist; scorecard average is `>=4.5`, every dimension `>=4`, critical/source fidelity dimensions `>=4.5`.
 - [ ] `greenhouse-ui-review` and `greenhouse-ui-enterprise-review` return no `BLOCK` before closure.
 

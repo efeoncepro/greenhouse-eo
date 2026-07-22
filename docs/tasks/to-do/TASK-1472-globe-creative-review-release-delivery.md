@@ -20,7 +20,7 @@
 - Status real: `Diseño gobernado; implementación pendiente`
 - Rank: `TBD`
 - Domain: `creative|ops|delivery`
-- Blocked by: `TASK-1469, TASK-1470, TASK-1471`
+- Blocked by: `TASK-1469, TASK-1470, TASK-1471, TASK-1522`
 - Branch: `task/TASK-1472-globe-creative-review-release-delivery`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -59,7 +59,7 @@ Cerrar la brecha entre output del modelo y pieza profesional liberada.
 
 ### Depends on
 
-- `TASK-1469`, `TASK-1470`, `TASK-1471`.
+- `TASK-1469`, `TASK-1470`, `TASK-1471`, `TASK-1522`.
 
 ### Blocks / Impacts
 
@@ -153,6 +153,9 @@ Cerrar la brecha entre output del modelo y pieza profesional liberada.
 ## Scope
 
 ### Approved Producer target addendum — review, share board and delivery
+
+`TASK-1522` owns the independent review/comment/read-only-share foundation. This task consumes that foundation
+and retains artifact manifests, release gates, delivery packages and their rollback/revocation lifecycle.
 
 This task owns the durable human execution state that follows candidate creation: approval, request changes,
 comments, read-only sharing and delivery. Those records are server-authoritative resources, not annotations held

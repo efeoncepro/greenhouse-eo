@@ -17,13 +17,32 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-028`
-- Status real: `Discovery cerrada y ejecución autorizada; bridge, grants y enforcement en implementación`
+- Status real: `Code complete local; rollout IAM/env/secret/grants y smoke humano pendientes`
 - Rank: `TBD`
 - Domain: `creative|platform|identity|security`
 - Blocked by: `none`
 - Branch: `task/TASK-1519-globe-producer-human-execution-bridge`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Checkpoint 2026-07-22 — bridge code complete, rollout pendiente
+
+- `studio-web` implementa browser → BFF same-origin/CSRF → delegación HMAC request-bound → API IAM-private con
+  `surface=ui`; el browser no recibe credenciales de workload ni autoridad para actor/workspace/capabilities.
+- El verificador separa caller BFF delegado de caller workload interno, valida audience, TTL, method/path/body,
+  capability, correlation e idempotency y falla cerrado ante spoofing/replay.
+- El output privado conserva streaming/range, grant en header, `no-store`, ownership tenant-safe y errores
+  sanitizados; upload privado conserva bytes y autoridad server-side.
+- Evidencia local incluida en `pnpm check`: conformance, CSRF, BFF sin delegación, workspace/surface spoofing,
+  direct-private-call y bootstrap del Producer verdes.
+- IaC local ahora modela los dominios purpose-separated de UI, credits, library/export, readiness, share y voces;
+  el deployer sólo recibe `cloudscheduler.viewer`, y Jobs/Schedulers nacen con gates independientes y pausa por
+  defecto para permitir smoke manual antes de periodicidad.
+- Auditoría read-only del runtime vivo: API `b12451db`, web `51ade01` y migraciones sólo `0001…0003`; no existen
+  todavía BFF flag/env/IAM live, versiones de secretos nuevas, buckets/jobs/schedulers ni grants humanos efectivos.
+- Pendiente antes del cierre: publicar env/secret de delegación, grants broker, allowlists/origins, IAM invoker,
+  migrar hasta `0022`, habilitar el flag en staging/internal y ejecutar smoke humano positivo +
+  negativos/revocación contra runtime vivo.
 
 ## Summary
 

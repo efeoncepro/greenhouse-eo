@@ -37,7 +37,7 @@ The current runtime has a strong API Contract Spine, route catalog, discriminate
 
 - `TASK-1505` becomes an integration surface over multiple backend/data dependencies, not a standalone frontend task.
 - `TASK-1519` owns the human bridge, grants and enforceable UI surface path; `TASK-1469` owns durable run lifecycle; `TASK-1520` owns the library/collections/bulk-operation projection; `TASK-1521` owns commercial runtime enablement.
-- Existing tasks remain owners for ingest/provenance (`TASK-1467`), ledger/budgets (`TASK-1468`/`TASK-1482`), recipes/reference intelligence/recreate/inpaint/feed (`TASK-1493`/`1494`/`1496`/`1497`/`1498`), collaboration/release/share (`TASK-1472`), tenancy (`TASK-1511`) and cross-replica proof (`TASK-1512`).
+- Existing tasks remain owners for ingest/provenance (`TASK-1467`), ledger/budgets (`TASK-1468`/`TASK-1482`), recipes/reference intelligence/recreate/inpaint/feed (`TASK-1493`/`1494`/`1496`/`1497`/`1498`), review/comments/read-only share foundation (`TASK-1522`), release/delivery (`TASK-1472`), tenancy (`TASK-1511`) and cross-replica proof (`TASK-1512`).
 - The first internal slice can ship before commercial readiness, but only with explicit unavailable states for target workflows whose backend owners are still open.
 - The BFF becomes security-sensitive: it needs delegation tests, audit correlation, CSRF/session protections, bounded payloads and no secret/raw-error leakage.
 

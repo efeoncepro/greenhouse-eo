@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { deriveRuntimeFindings, sanitizeRuntimeMessage, type RuntimeRaw } from './runtime-collector'
+import { attachRuntimeCollectors, deriveRuntimeFindings, sanitizeRuntimeMessage, type RuntimeRaw } from './runtime-collector'
 
 const emptyRaw = (): RuntimeRaw => ({ consoleErrors: [], pageErrors: [], hydrationWarnings: [], httpFailures: [] })
 
@@ -56,5 +56,36 @@ describe('deriveRuntimeFindings', () => {
     )
 
     expect(findings).toEqual([])
+  })
+})
+
+describe('attachRuntimeCollectors asset integration', () => {
+  it('collects and deduplicates 2xx asset MIME mismatches', () => {
+    const listeners = new Map<string, (value: never) => void>()
+
+    const page = {
+      on: (event: string, listener: (value: never) => void) => listeners.set(event, listener),
+      off: () => undefined
+    }
+
+    const collector = attachRuntimeCollectors(page as never)
+
+    const response = {
+      status: () => 200,
+      url: () => 'https://x.test/isotipo.svg?signature=secret',
+      headers: () => ({ 'content-type': 'text/html; charset=utf-8' }),
+      request: () => ({ resourceType: () => 'image' })
+    }
+
+    listeners.get('response')?.(response as never)
+    listeners.get('response')?.(response as never)
+
+    expect(collector.raw().assetMimeMismatches).toEqual([
+      expect.objectContaining({
+        url: 'https://x.test/isotipo.svg',
+        resourceType: 'image',
+        contentType: 'text/html'
+      })
+    ])
   })
 })

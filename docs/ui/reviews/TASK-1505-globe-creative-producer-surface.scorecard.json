@@ -1,0 +1,101 @@
+{
+  "schemaVersion": "1",
+  "taskId": "TASK-1505",
+  "surface": "Globe Creative Producer",
+  "reviewedAt": "2026-07-22",
+  "baseline": {
+    "path": "docs/ui/visual-sources/TASK-1505/approved-prototype.dc.html",
+    "sha256": "7d0d689b7daeb6e409ae01c1bf478d700ea09059e0f20f7da3c85a53bb10e93f"
+  },
+  "verdict": "BLOCK",
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.3,
+      "rationale": "Composer, controles y feed vacío conservan la jerarquía aprobada; los estados ricos aún no tienen evidencia publicada.",
+      "evidence": ".captures/2026-07-22T18-10-21_globe-creative-producer/01-desktop/frames/01-producer-first-fold.png"
+    },
+    "proportions": {
+      "score": 4.3,
+      "rationale": "La retícula desktop y la recomposición mobile mantienen proporciones robustas; falta observar dialogs y feed rico.",
+      "evidence": ".captures/2026-07-22T18-10-21_globe-creative-producer/"
+    },
+    "rhythm": {
+      "score": 4.1,
+      "rationale": "La cadencia del composer fue compactada y se acerca al source; cards ready y dialogs no quedan demostrados por el fixture vacío.",
+      "evidence": "docs/ui/reviews/TASK-1505/approved-source-parity-audit-2026-07-22.md"
+    },
+    "density": {
+      "score": 4,
+      "rationale": "La densidad del composer y toolbar es coherente; persiste deuda menor en indicadores permanentes de cards que la GVC vacía no permite juzgar.",
+      "evidence": "docs/ui/reviews/TASK-1505/approved-source-parity-audit-2026-07-22.md"
+    },
+    "depth": {
+      "score": 4.6,
+      "rationale": "Aurora, halo reactivo, halo persistente de edición, focus, glass y sombras producen la profundidad aprobada.",
+      "evidence": ".captures/2026-07-22T18-10-21_globe-creative-producer/01-desktop/frames/06-composer-edit-mode-light-edit-mode-feedback.png"
+    },
+    "surfaceEconomy": {
+      "score": 4.5,
+      "rationale": "La composición mantiene el composer como superficie primaria y evita card wallpaper; la economía de estados ricos sigue pendiente de evidencia.",
+      "evidence": ".captures/2026-07-22T18-10-21_globe-creative-producer/01-desktop/frames/10-producer-full-page.png"
+    },
+    "visualImpact": {
+      "score": 4.5,
+      "rationale": "La luz, paleta, marcas oficiales e iconografía visible sostienen un impacto distintivo; falta observar el feed rico y los dialogs.",
+      "evidence": ".captures/2026-07-22T18-10-21_globe-creative-producer/01-desktop/frames/01-producer-first-fold.png"
+    },
+    "typography": {
+      "score": 4.4,
+      "rationale": "Poppins, Geist, tracking y cifras tabulares mantienen la lectura aprobada en desktop y mobile.",
+      "evidence": ".captures/2026-07-22T18-10-21_globe-creative-producer/"
+    },
+    "color": {
+      "score": 4.5,
+      "rationale": "Los tokens, gradientes, cian de interacción y acento naranja coinciden con el source aprobado.",
+      "evidence": ".captures/2026-07-22T18-10-21_globe-creative-producer/01-desktop/frames/02-composer-reactive-light-composer-light-feedback.png"
+    },
+    "iconography": {
+      "score": 4.8,
+      "rationale": "El fixture contract-backed sirve y renderiza los SVG oficiales, Tabler y sus fuentes con MIME y nosniff verificados.",
+      "evidence": ".captures/2026-07-22T18-10-21_globe-creative-producer/"
+    },
+    "responsive": {
+      "score": 4.4,
+      "rationale": "El runtime corrige el overflow del source y recompone a una columna; falta capturar dialogs y popovers ricos en 390 px.",
+      "evidence": ".captures/2026-07-22T18-10-21_globe-creative-producer/02-mobile/frames/10-producer-full-page.png"
+    },
+    "motion": {
+      "score": 4.6,
+      "rationale": "La GVC demuestra halo reactivo, foco, persistencia de edición y reduced motion; falta evidencia rica de dialogs y cards.",
+      "evidence": ".captures/2026-07-22T18-10-21_globe-creative-producer/"
+    },
+    "fidelity": {
+      "score": 3.8,
+      "rationale": "El source cerró los gaps funcionales materiales y los assets del fixture están correctos, pero la suite vacía no demuestra los estados ricos ni generación real por la UI.",
+      "evidence": "docs/ui/reviews/TASK-1505/approved-source-parity-audit-2026-07-22.md"
+    },
+    "genericTemplateResistance": {
+      "score": 4.6,
+      "rationale": "Composer multimodal, Style DNA, media masonry, lineage y motion mantienen una identidad Globe específica.",
+      "evidence": "docs/ui/reviews/TASK-1505/approved-source-parity-audit-2026-07-22.md"
+    }
+  },
+  "evidence": {
+    "desktop": ".captures/2026-07-22T18-10-21_globe-creative-producer/01-desktop/frames/10-producer-full-page.png",
+    "mobile": ".captures/2026-07-22T18-10-21_globe-creative-producer/02-mobile/frames/10-producer-full-page.png",
+    "dossier": "docs/ui/reviews/TASK-1505/README.md",
+    "additional": [
+      "docs/ui/reviews/TASK-1505/runtime-desktop-budget-popover.png",
+      "docs/ui/reviews/TASK-1505/runtime-desktop-compare.png",
+      "docs/ui/reviews/TASK-1505/runtime-mobile-390-reduced-motion.png",
+      "docs/ui/reviews/TASK-1505/runtime-mobile-390.aria.md",
+      ".captures/2026-07-22T18-10-21_globe-creative-producer/"
+    ]
+  },
+  "runtimeScope": "source audit plus local contract-backed GVC of empty first-fold, assets, halo/edit motion, keyboard, reduced motion and responsive layout; not a staging-live claim and rich durable states remain uncaptured",
+  "blockers": [
+    "Capturar viewer, inpaint, presupuesto, command palette, cuenta y todos los modos con datos durables en desktop y 390 px.",
+    "Ejecutar generación real de Imagen, Video y Audio por los commands usados por la UI y verificar output, provenance, ledger y recovery.",
+    "No promover baseline hasta que la suite rica pase contra la fuente aprobada, no contra el runtime vacío."
+  ]
+}

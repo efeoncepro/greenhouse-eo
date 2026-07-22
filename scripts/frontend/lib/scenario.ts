@@ -117,6 +117,17 @@ export interface CaptureRuntimeQualityOptions {
   ignoreConsolePatterns?: string[]
 }
 
+export interface CaptureAssetQualityOptions {
+  /** Activa MIME checks de CSS/image/font y decode checks de <img>. */
+  enabled?: boolean
+  /** Si false, conserva evidencia como warning. Premium usa error. */
+  failOnViolations?: boolean
+  /** Regex (string) de URLs de assets deliberadamente ignoradas. */
+  ignoreUrlPatterns?: string[]
+  /** Máximo de espera por image.decode() antes de tratar un lazy asset como pendiente. */
+  decodeTimeoutMs?: number
+}
+
 export interface CaptureKeyboardProbe {
   /** kebab-case; nombra el frame keyboard-<name>. */
   name: string
@@ -187,6 +198,7 @@ export interface CaptureQualityOptions {
   accessibility?: CaptureAccessibilityQualityOptions
   layout?: CaptureLayoutQualityOptions
   runtime?: CaptureRuntimeQualityOptions
+  assets?: CaptureAssetQualityOptions
   keyboard?: CaptureKeyboardQualityOptions
   performance?: CapturePerformanceQualityOptions
   enterpriseRubric?: CaptureEnterpriseRubricOptions
@@ -329,6 +341,7 @@ const mergeQuality = (base: CaptureQualityOptions, override?: CaptureQualityOpti
   accessibility: { ...base.accessibility, ...override?.accessibility },
   layout: { ...base.layout, ...override?.layout },
   runtime: { ...base.runtime, ...override?.runtime },
+  assets: { ...base.assets, ...override?.assets },
   keyboard: override?.keyboard ?? base.keyboard,
   performance: { ...base.performance, ...override?.performance },
   enterpriseRubric: { ...base.enterpriseRubric, ...override?.enterpriseRubric }
@@ -354,6 +367,11 @@ export const resolveCaptureQualityProfile = (
       failOnPageError: true,
       failOnHydrationWarning: true,
       failOnHttpStatus: blocking
+    },
+    assets: {
+      enabled: true,
+      failOnViolations: blocking,
+      decodeTimeoutMs: 1500
     },
     performance: {
       enabled: true,

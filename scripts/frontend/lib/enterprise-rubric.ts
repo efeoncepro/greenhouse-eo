@@ -52,10 +52,17 @@ export const analyzeEnterpriseRubric = async (
 
         if (!root) return issues
 
-        const text = (root.innerText || '').toLowerCase()
+        const rawText = root.innerText || ''
+        const text = rawText.toLowerCase()
 
         for (const term of placeholderTerms) {
-          if (new RegExp(`\\b${term}\\b`, 'i').test(text)) {
+          // `todo` is an ordinary Spanish word ("Todo el feed"). Preserve the
+          // code-review marker without flagging legitimate localized copy.
+          const matches = term.toLowerCase() === 'todo'
+            ? /\bTODO\b/.test(rawText)
+            : new RegExp(`\\b${term}\\b`, 'i').test(text)
+
+          if (matches) {
             issues.push({
               code: 'enterprise_placeholder_text',
               message: `Texto placeholder \"${term}\" visible en la superficie.`
@@ -178,8 +185,18 @@ export const analyzeEnterpriseRubric = async (
           })
         }
 
-        const heading = root.querySelector('h1, [role=\"heading\"][aria-level=\"1\"], h2') as HTMLElement | null
-        const bodyText = root.querySelector('p, .MuiTypography-body1, .MuiTypography-body2') as HTMLElement | null
+        function isRendered(el: Element): boolean {
+          const style = getComputedStyle(el)
+
+          if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) === 0) return false
+
+          const rect = el.getBoundingClientRect()
+
+          return rect.width > 0 && rect.height > 0
+        }
+
+        const heading = Array.from(root.querySelectorAll<HTMLElement>('h1, [role=\"heading\"][aria-level=\"1\"], h2')).find(isRendered) ?? null
+        const bodyText = Array.from(root.querySelectorAll<HTMLElement>('p, .MuiTypography-body1, .MuiTypography-body2')).find(isRendered) ?? null
 
         if (heading && bodyText) {
           const headingSize = Number.parseFloat(getComputedStyle(heading).fontSize)

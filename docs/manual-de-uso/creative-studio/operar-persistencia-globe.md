@@ -21,7 +21,12 @@ La persistencia durable de Globe (`TASK-1465`) le da a Efeonce Globe su **primer
 
 ### 1. Correr las migraciones
 
-Las migraciones son archivos `*.sql` numerados, **idempotentes**, registradas en la tabla `globe._migrations`, y se aplican como el rol dueño `globe_owner`. Desde `efeonce-globe`, con el connection name de la instancia y un usuario IAM migrador (que sea miembro de `globe_owner`) en el entorno:
+Las migraciones son archivos `*.sql` numerados, **idempotentes**, registradas en `globe._migrations` y se
+aplican como `globe_owner`. Las migraciones nuevas guardan además el SHA-256 del SQL: si un archivo ya aplicado
+cambia, el runner aborta con `globe_migration_checksum_mismatch` en vez de omitirlo por nombre. Las entradas
+históricas `0001…0003`, anteriores a este control, se reportan como `legacy without checksum` y no se presentan
+como verificadas. Desde `efeonce-globe`, con el connection name y un usuario IAM migrador miembro de
+`globe_owner`:
 
 ```bash
 # dentro de ../efeonce-globe
@@ -30,7 +35,8 @@ GLOBE_MIGRATOR_USER=<tu usuario IAM, miembro de globe_owner> \
 node packages/database/scripts/migrate.mjs
 ```
 
-El runner aplica sólo lo pendiente y deja constancia en `globe._migrations`. Correrlo dos veces no rompe ni duplica nada (idempotente).
+El runner aplica sólo lo pendiente y deja constancia en `globe._migrations`. Correrlo dos veces no duplica nada;
+editar una migración ya aplicada está prohibido y exige una migración forward nueva.
 
 ### 2. Bootstrap de roles (una sola vez, aparte)
 

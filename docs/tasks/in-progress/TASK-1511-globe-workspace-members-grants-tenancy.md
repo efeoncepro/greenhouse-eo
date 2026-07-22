@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -19,10 +19,10 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-028`
-- Status real: `Diseño; follow-up diferido de TASK-1465; requiere ADR de boundary antes de implementar`
+- Status real: `Implementación en ejecución; ADR de boundary se resolverá antes del schema/runtime y rollout queda pendiente`
 - Rank: `TBD`
 - Domain: `platform|data|identity`
-- Blocked by: `none` (TASK-1465 completa; requiere decisión de boundary — ver Open Questions)
+- Blocked by: `none`
 - Branch: `task/TASK-1511-globe-workspace-members-grants-tenancy`
 - Legacy ID: `none`
 - GitHub Issue: `none`

@@ -19,7 +19,7 @@ Lab) ≠ `estimateCredits`/`getCreditEstimate` (credits) — son capabilities de
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -32,7 +32,7 @@ Lab) ≠ `estimateCredits`/`getCreditEstimate` (credits) — son capabilities de
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-028`
-- Status real: `Diseño gobernado; implementación pendiente`
+- Status real: `Kernel y wiring local completos; migración y rollout comercial pendientes`
 - Rank: `TBD`
 - Domain: `finance|creative|data`
 - Blocked by: `none`
