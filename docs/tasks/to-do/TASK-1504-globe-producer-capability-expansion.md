@@ -1,5 +1,15 @@
 # TASK-1504 — Producer Capability Expansion (video frames/motion · audio change-voice/translate · multi-output omni · voice-preset registry)
 
+## Delta 2026-07-22
+
+- `TASK-1503` **complete** — el retrieval gobernado y las asset actions ya existen (siguen fuera del
+  scope de esta task, como declara su §Out of Scope). Lo que sí cambia acá: `copyAsReference`
+  **produce** `ProducerReferenceHandleV1` (`rights: 'derived-internal'` + `parentRights` heredado por
+  `inheritedDerivedRights`). La **aceptación** de ese handle como input de frames / motion-control /
+  change-voice sigue siendo contrato de esta task; `TASK-1503` sólo lo certifica y mintea.
+- Al aceptarlo, respetar la regla que ya es única: un derivado **nunca** se blanquea a
+  `internal-owned`, y un ancestro `licensed` sigue restringiendo aguas abajo.
+
 ## Delta 2026-07-20
 
 - El catálogo de rutas donde estas capabilities declaran sus rutas **ya existe** (TASK-1500 complete):

@@ -26,6 +26,15 @@
 
 ## Pendientes inmediatos
 
+- **`TASK-1503` CODE COMPLETE, ROLLOUT PENDIENTE (`EPIC-028`, cluster Creative Producer).** Output side del
+  Producer (retrieval gobernado + favorite/copyAsReference) verificado local en `efeonce-globe`: `pnpm check` +
+  `pnpm build` verdes, 318 tests. **Nada prendido en runtime y sin push**: los commits viven en `main` local de
+  `efeonce-globe`. Antes de operarlo hacen falta 5 pasos en orden (secreto HMAC → migración `0003` → env **en
+  Terraform**, no `gcloud` → IAM de lectura del bucket → canary con sus 3 negativos): runbook
+  `docs/manual-de-uso/creative-studio/operar-retrieval-assets-globe.md`. `ui`/`mcp` siguen `policy-blocked`
+  hasta el gate de `TASK-1505`, que además debe hacer que el broker otorgue `globe.producer.assets.operate` a
+  humanos web.
+
 - **`TASK-1466` COMPLETE (`EPIC-028`).** SPEC-008 desplegada y verificada internal-only: migración Cloud SQL, dos
   revisiones Ready, smoke auth/tenant/idempotency y readback de versiones+audit verdes. Detalle en
   `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`; clientes externos y producción siguen bloqueados.
@@ -455,23 +464,13 @@
 
 ## Sesión 2026-07-18 — TASK-1431 Growth CTA Action Registry (CODE COMPLETE, rollout pendiente)
 
-> `/implement-task 1431` — develop local-first, SIN push. **Slices 1-3 implementados y commiteados**
-> (`registry + metadata browser-safe` → `resolvers de navegación gobernada` → `executor por familia
-> con <a href> real`). Registry en `action-registry.ts` (server-only; fachada `resolveCtaAction`
-> intacta para publish gate + render path, fail-closed ante kind sin entry); kinds V1:
-> `open_growth_form` (sin cambios) + `link_url`/`open_think_tool`/`book_meeting` con validación
-> anti open-redirect (https/root-relative, sin credenciales, Think = path sobre hub gobernado +
-> UTM strict, booking = hosts HubSpot Meetings + env). Renderer `1.2.0-preview.1`: navigate =
-> anchor nativo (rel seguro, `target=_blank` opt-in + sr-only hint, clicked ANTES de navegar con
-> keepalive, pending accesible + recovery 4s `navigation_stalled`, fail-closed `action_unsupported`).
-> **Evidencia**: 122 tests focales + 9728 full suite verdes, build prod OK, lint/tsc OK,
-> `task:lint`/`ui:*-check` limpios, GVC `task-1431-growth-cta-actions` 1440/390 MIRADO (frames +
-> aria: rol link nativo, affordance pestaña nueva, pending `[disabled]`+status). Docs: arch §27 +
-> funcional 1.6 + manual 1.3 + TRACKING-PLAN §CTAs + skill 2 espejos. Sin migración; sin flag nuevo.
-> **Preview local**: `pnpm dev` → `http://localhost:3000/growth/ctas` (fixtures navigate + pending
-> demo inerte). **Rollout pendiente** (por eso la task sigue in-progress): push/release, bundle
-> 1.2.0 desplegado en hosts ANTES de publicar cualquier CTA con action nueva, smoke staging de
-> destinos reales. Ninguna CTA nueva publicada.
+> Code-complete local-first, sin push: registry server-only y navegación gobernada para
+> `open_growth_form`, `link_url`, `open_think_tool` y `book_meeting`; renderer
+> `1.2.0-preview.1` fail-closed, accesible y protegido contra open redirects. Evidencia: 122 tests
+> focales + 9728 full suite, build/lint/tsc/gates UI verdes y GVC 1440/390 revisado. El contrato y
+> la evidencia completa viven en `docs/tasks/in-progress/TASK-1431-growth-cta-action-registry.md`.
+> **Rollout pendiente:** push/release, desplegar el bundle en hosts y ejecutar smoke staging de
+> destinos reales antes de publicar acciones nuevas; ninguna CTA nueva fue publicada.
 
 ## Sesión 2026-07-18 — EPIC-031 Delta Daily/Flash/Weekly + Glitch Desk
 

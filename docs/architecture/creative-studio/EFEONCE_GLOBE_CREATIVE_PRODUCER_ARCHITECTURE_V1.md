@@ -89,7 +89,7 @@ fail-closed antes de reservar crédito**:
 | **TASK-1500** ✅ | Governed Route/Model Catalog | reader con constraints (res/dur/sampleRate/format/count) + specialty + **modelo público** (nombre+versión) + **casa interna** (`house`, operator-only vía `reveal_house`). La keystone. **Shipped 2026-07-20** (ver §Contratos reales del catálogo) | backend-data |
 | **TASK-1501** ✅ | Modality-Discriminated Run Contract | `PreparePayload` como union por capability + output-shape validados pre-spend (**absorbe `1495`**). **Shipped 2026-07-20** (ver §Contratos reales del run contract) | backend-data |
 | **TASK-1502** ✅ | Previewable Estimate reader | el `✨N` antes de gastar (extrae el estimate de dentro de `execute`; slice adelantado de `1469`). **Shipped 2026-07-20** (ver §Contratos reales del estimate) | backend-data |
-| **TASK-1503** | Governed Output Retrieval + Asset Actions | hash→bytes servible + download/preview/favorite/copy sobre el store content-addressed de `1490` | backend-data |
+| **TASK-1503** ✅ | Governed Output Retrieval + Asset Actions | hash→bytes servible + download/preview/favorite/copy sobre el store content-addressed de `1490`. **Shipped 2026-07-22** (ver §Contratos reales del retrieval) | backend-data |
 | **TASK-1504** | Producer Capability Expansion | video frames + motion-control; audio change-voice + translate; multi-output omni; voice-preset registry — tras el provider seam | backend-data |
 | **TASK-1505** | Producer Surface (UI) | Image/Video/Audio: chassis + paneles por modalidad + feed unificado. El "antes de `1474`". | ui-ux |
 
@@ -195,6 +195,80 @@ prompt-first, no interpreta brief). **Sincroniza** projects durables con `1465` 
   (limitación conocida documentada); los adapters reales varían por shape vía el threading de `TASK-1501`.
 - **SDK:** `estimateExperiment(query)` en `packages/sdk`.
 
+### Contratos reales del retrieval + asset actions (TASK-1503, vigente)
+
+El **output side**: lo que hace *usable* una pieza ya generada. Se apoya en el store content-addressed que
+dejó `TASK-1490` (write half) y agrega su **espejo servible** gobernado.
+
+- **Capability propia, de gasto cero:** `globe.producer.assets.operate` (`GLOBE_PRODUCER_ASSETS_CAPABILITY`,
+  12.ª de `GLOBE_CAPABILITIES`). **Deliberadamente NO** reusa `globe.lab.experiment.run`: esa es autoridad de
+  **gasto** y vive en el principal workload (api-mode), mientras que descargar o marcar lo que ya produjiste
+  debe ser alcanzable por un humano sin conferir jamás la capacidad de facturar a un proveedor. Ids en su
+  propio mapa (`GLOBE_PRODUCER_ASSET_READERS` / `..._COMMANDS`), separado de `GLOBE_PRODUCER_READERS` (el
+  catálogo responde a otra capability; un vocabulario que cruza dos autoridades es como una se ensancha).
+- **La pieza load-bearing — `authorizeOwnedOutput`** (`packages/domain/src/producer-assets.ts`). El store es
+  **tenant-blind** (el nombre del objeto ES el hash, un bucket para todos los workspaces) y contiene **tanto
+  outputs como bytes de referencias private-ingest**. La autoridad no puede venir de ahí: viene del dominio,
+  gateando contra `store.get(workspaceId, experimentId)` (el **mismo** `ExperimentStorePort` del Lab, no un
+  índice paralelo) y matcheando **sólo** `outputHashes` de un attempt `candidate_ready` con
+  `outputsRetained === true`. **NUNCA** consulta `authorizedInputHashes`. Todo rechazo colapsa a
+  `capability_not_found → not_found` — cross-workspace, id desconocido, hash que sólo fue input y candidato no
+  retenido son **indistinguibles desde afuera**; cualquier respuesta más fina es un oráculo para sondear un
+  bucket compartido.
+- **Reader `globe.producer.output.get` → `ProducerOutputHandleV1`:** descriptor (`experimentId`, `attemptId`,
+  `sha256`, `mediaType`, `mimeType`, `disposition`) + **grant efímero**. **Cero bytes en el JSON**, cero URL
+  firmada, cero bucket, cero identidad de proveedor. `mediaType` se deriva de la capability semántica del run
+  (única evidencia del manifest); el `Content-Type` servido sale del objeto real, así un run multi-output no
+  miente en el cable (tipado por-output = `TASK-1467`).
+- **El grant** (`RetrievalGrantSignerPort`, impl HMAC-SHA256 en `apps/studio-web/src/retrieval-grant.ts`):
+  opaco, server-minted, **firmado no cifrado** (sus claims son cosas que el caller ya sabe), bound a
+  `(workspaceId, experimentId, sha256, disposition)` con TTL corto (default 300 s), verificación
+  **stateless** en tiempo constante. **No es un bearer autosuficiente**: viaja en query porque la UI necesita
+  un `src` directo, y eso es aceptable precisamente porque la ruta autentica **antes** y re-chequea propiedad
+  **después**. Nunca se loggea ni entra a un audit event.
+- **Ruta de transporte `GET /v1/outputs/:sha256?experiment=…&grant=…&disposition=…`** (`app.ts`): kill switch →
+  auth (`resolveDispatchPrincipal`) → **gate 1** grant (HMAC + expiry + claims) → **gate 2**
+  `deriveTrustedContext(workspaceSelection = claims.workspaceId)` (un grant filtrado a otro usuario autenticado
+  no resuelve) → **gate 3** `authorizeOwnedOutput` **re-ejecutado** (un candidato que dejó de ser recuperable
+  deja de ser servible aunque el grant siga vivo) → stream con `Content-Type` + `Content-Disposition`
+  (filename neutro `globe-<hash12>.<ext>`, sin vendor) + `Cache-Control: private, no-store`. Es un transporte
+  **fino**: reusa el **mismo** helper del reader y el **mismo** `handlerErrorToApiCode` — un primitivo, dos
+  transportes, sin política duplicada.
+- **Degradación honesta:** cualquier `OutputRetrievalError` (`not_found` / `unreadable` / `integrity_mismatch`)
+  ⇒ `dependency_unavailable` (retryable). **Nunca** `200` con cuerpo vacío, y **deliberadamente nunca**
+  `not_found`: el dominio acaba de certificar que el candidato existe, así que contradecir el descriptor
+  mandaría a un operador a cazar un fantasma.
+- **Seam de lectura `OutputRetrievalPort` / `GcsOutputRetrieval`** (`apps/creative-runner/src/output-retrieval.ts`):
+  mismo bucket, mismo token keyless (ADC/WIF) y mismo naming que `GcsOutputIngest`; re-verifica
+  `sha256(bytes) === declarado` **antes** de devolver. Es el tercer lector del store, distinto de
+  `GcsInputResolver` (ese alimenta a un provider dentro de un run pagado, detrás del fence).
+- **Asset actions, idempotentes por construcción:** `globe.producer.asset.favorite` toma el **estado deseado
+  explícito** (nunca toggle ciego) y conserva el timestamp original en un repeat;
+  `globe.producer.asset.copyAsReference` certifica `ProducerReferenceHandleV1` con
+  `rights: 'derived-internal'` (**inforjable**: un caller no puede declararlo) + `parentRights` heredado por
+  `inheritedDerivedRights` — **la misma** función que usa el edit base del Lab, para que un ancestro `licensed`
+  no deje de restringir en una de las dos derivaciones. Falla cerrado **antes de mintear** si el medio no es
+  referenciable (`model-3d`). Cero bytes por la API, cero crédito: el run que después consuma la referencia lo
+  tarifa `TASK-1502` por `ruta × shape`. Reader `globe.producer.asset.list` para el feed.
+- **Persistencia durable** (delta al spec de la task, que la difería a `TASK-1465`): `TASK-1465` ya shipeó y no
+  cubrió estas anotaciones, y `TASK-1508` dejó los servicios en **3 réplicas** — un store in-memory no queda
+  "volátil" sino **no determinista** (una estrella escrita en una réplica es invisible en otra). Se implementó
+  `AssetAnnotationStorePort` con doble in-memory + `DurableProducerAssetStore` (`packages/database`) sobre la
+  migración `0003_producer_asset_annotations.sql`; la idempotencia vive en SQL (`ON CONFLICT … DO NOTHING` +
+  re-lectura), porque entre réplicas un "chequeá y después insertá" es una carrera cuyo síntoma visible es un
+  `referenceId` duplicado o una estrella re-fechada. `rights = 'derived-internal'` es un `CHECK`, no una
+  convención.
+- **Coverage `PRODUCER_ASSETS_COVERAGE`:** `ui`/`mcp` `policy-blocked` (gate de `TASK-1505`, que además hace
+  que el broker grantee la capability a humanos web), `http`/`sdk`/`cli`/`worker`/`e2e` `available`,
+  `sister-platform` `not-applicable`. Grant al service principal en el mismo PR.
+- **Flags:** `GLOBE_PRODUCER_ASSETS_ENABLED` (default **OFF** ⇒ `policy_blocked` en reader, commands y ruta) y
+  `GLOBE_PRODUCER_GRANT_SECRET` (Secret Manager; sin él el mint degrada a `dependency_unavailable` — es
+  requisito de operación, no flag de rollout). TTL configurable con `GLOBE_PRODUCER_GRANT_TTL_SECONDS`
+  (default 300, rango 30-900).
+- **SDK:** `getProducerOutput` / `listProducerAssets` / `favoriteProducerAsset` /
+  `copyProducerAssetAsReference`. El conformance harness ejercita el output side por HTTP **y** SDK y compara
+  la proyección — parity demostrada, no declarada.
+
 ## Boundary / invariantes (heredados + nuevos)
 
 Hereda todos los invariantes de Globe (`greenhouse-globe` skill + `EFEONCE_GLOBE_MODEL_LAB_V1.md`), y agrega:
@@ -269,6 +343,16 @@ los primitivos compartidos**:
 - **NUNCA** una capability nueva (frames/motion/change-voice/translate/omni) fuera del provider seam.
 - **NUNCA** computar la unidad de crédito por modelo; siempre `ruta × output-shape`.
 - **NUNCA** retornar bytes crudos de referencia por la API ni servir un asset cross-workspace en retrieval.
+- **NUNCA** autorizar un retrieval contra el store de objetos (es tenant-blind y guarda outputs **y** bytes de
+  referencias de entrada): la puerta es `authorizeOwnedOutput` contra los `outputHashes` retenidos que el
+  workspace posee, y **jamás** contra `authorizedInputHashes`. Todo rechazo colapsa a `not_found`.
+- **NUNCA** duplicar la política de autorización dentro de la ruta de serving: reusa el mismo helper del
+  reader (un primitivo, dos transportes) y re-chequéalo en la redención, además de verificar el grant.
+- **NUNCA** devolver `200` con cuerpo vacío ni `not_found` cuando el store falla en retrieval: degrada a
+  `dependency_unavailable` (retryable) e integridad re-verificada antes de servir.
+- **NUNCA** dejar que un caller declare `derived-internal` ni blanquear un derivado a `internal-owned`: el
+  handle lo certifica la plataforma y arrastra `parentRights` por `inheritedDerivedRights` (una sola regla,
+  compartida con el edit base del Lab).
 - **NUNCA** descartar un output de un run multi-output sin declararlo en el manifest.
 - **SIEMPRE** una capability del Producer nace con Full API Parity (command/reader transport-neutral +
   coverage matrix), `ui`/`mcp` `policy-blocked` hasta gate.

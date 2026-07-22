@@ -1,5 +1,22 @@
 # TASK-1505 — Globe Creative Producer Surface (UI)
 
+## Delta 2026-07-22
+
+- `TASK-1503` **complete** — el output side ya existe y es consumible: reader
+  `globe.producer.output.get` (ficha + grant HMAC efímero, **sin bytes**), ruta
+  `GET /v1/outputs/:sha256` (redime el grant, re-chequea propiedad, streamea con
+  `Content-Type`/`Content-Disposition`), commands `globe.producer.asset.favorite`
+  (idempotente por estado deseado) y `globe.producer.asset.copyAsReference`
+  (`ProducerReferenceHandleV1` con `derived-internal` + `parentRights` heredado), reader
+  `globe.producer.asset.list`. Capability `globe.producer.assets.operate` (gasto cero, **no** es
+  la del Lab); SDK: `getProducerOutput` / `listProducerAssets` / `favoriteProducerAsset` /
+  `copyProducerAssetAsReference`.
+- **Lo que cambia para esta task:** `ui`/`mcp` del output side nacen `policy-blocked`. El gate de
+  `TASK-1505` debe (a) voltear ese coverage y (b) hacer que el broker otorgue
+  `globe.producer.assets.operate` a los humanos web — sin (b), la UI queda con contrato pero sin
+  autoridad. El flag `GLOBE_PRODUCER_ASSETS_ENABLED` y el secreto `GLOBE_PRODUCER_GRANT_SECRET`
+  siguen pendientes de rollout.
+
 ## Delta 2026-07-21 — TASK-1507 complete: prerrequisito de front door cerrado
 
 El prerrequisito de front door quedó cerrado el 2026-07-21: `TASK-1507` está complete y el shell interno se sirve en

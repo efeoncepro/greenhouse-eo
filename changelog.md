@@ -7,6 +7,28 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-22 — Globe ya deja sacar lo que produce, y la puerta la pone el dominio (TASK-1503)
+
+- El Creative Producer estrena su **output side**: un reader gobernado devuelve una ficha de la pieza más un
+  pase HMAC efímero (**nunca bytes en el JSON**), y `GET /v1/outputs/:sha256` canjea ese pase para streamear
+  los bytes con `Content-Type`/`Content-Disposition`. Además `favorite` (idempotente por estado deseado) y
+  `copyAsReference` (certifica `derived-internal` con los derechos del padre heredados, cero bytes y cero
+  gasto), bajo la capability propia `globe.producer.assets.operate` — deliberadamente **no** la del Model Lab,
+  que es de gasto.
+- La parte que importa: el depósito es **content-addressed y tenant-blind**, y guarda piezas producidas **y**
+  bytes de referencias de entrada de todos los workspaces mezclados. Así que la autorización no puede vivir
+  ahí: vive en `authorizeOwnedOutput`, que gatea contra los `outputHashes` retenidos que el workspace posee y
+  **nunca** contra `authorizedInputHashes`. Todo rechazo colapsa a `not_found` — cualquier respuesta más fina
+  sería un oráculo para sondear un bucket compartido. La ruta de serving reusa ese mismo helper en vez de
+  copiar la política.
+- Delta al spec: las anotaciones quedaron **durables** (migración `0003`) en vez de in-memory. El spec las
+  difería a `TASK-1465`, que ya shipeó sin cubrirlas, y con los servicios en 3 réplicas un store en memoria no
+  es "volátil" sino no determinista: una estrella escrita en una réplica es invisible en otra.
+- `ui`/`mcp` nacen `policy-blocked` y el flag `GLOBE_PRODUCER_ASSETS_ENABLED` default OFF: **código completo,
+  rollout pendiente** (falta crear `GLOBE_PRODUCER_GRANT_SECRET`, declarar los env en Terraform, aplicar la
+  migración y correr el canary con sus tres negativos).
+- Spec: [`docs/tasks/complete/TASK-1503-globe-governed-output-retrieval-asset-actions.md`](docs/tasks/complete/TASK-1503-globe-governed-output-retrieval-asset-actions.md).
+
 ## 2026-07-21 — Cloud Run de Globe bajo Terraform y un cap de 1 instancia que nadie sabía que existía (TASK-1508)
 
 - Los dos servicios Cloud Run de Globe entraron a Terraform por import brownfield (cero destroy/replace) y
@@ -768,12 +790,3 @@
 - `design-studio` enruta estas piezas al método y conserva la dirección de composición; `dataviz-design` sigue
   siendo dueño del encoding analítico complejo. La estética de ANAM queda como precedente local, no como regla
   global. Referencia y routing quedaron espejados para Codex/Claude.
-
-## 2026-07-17 — ANAM: geografía de ejecución LATAM en Deal
-
-- El portal ANAM `19893546` incorporó `Países de ejecución` (`ef_paises_de_ejecucion`) como multiselección Deal
-  de 20 países LATAM, creada mediante release gobernado de Kortex y verificada por readback directo de HubSpot.
-  Complementa `Región` (`zona`) para ejecución chilena y mantiene separada la sede de Company.
-- El cambio fue estrictamente aditivo: una propiedad, cero errores y ningún workflow, pipeline, formulario,
-  reporte, record o backfill. Al cierre existen cero Deals poblados; adopción, requiredness por etapa y reporting
-  deduplicado son slices futuros approval-gated, no capacidades declaradas como listas.
