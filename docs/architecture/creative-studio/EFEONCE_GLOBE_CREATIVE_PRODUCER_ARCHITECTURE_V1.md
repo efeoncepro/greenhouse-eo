@@ -270,6 +270,49 @@ dejó `TASK-1490` (write half) y agrega su **espejo servible** gobernado.
   `copyProducerAssetAsReference`. El conformance harness ejercita el output side por HTTP **y** SDK y compara
   la proyección — parity demostrada, no declarada.
 
+### Contratos reales de las capabilities nuevas (TASK-1504, vigente)
+
+Las cuatro capabilities que el Producer necesitaba, el modelado multi-output y el registro de voces.
+**Code-complete y verde en local; el canario facturable por capability es gate humano pendiente.**
+
+- **Wire SSOT:** `CREATIVE_CAPABILITIES` pasa de 10 a **14** — `video-frames`, `video-motion-control`,
+  `audio-change-voice`, `audio-translate`. `GLOBE_CAPABILITIES` pasa de 12 a **13** con
+  `globe.voice.preset.manage`.
+- **Motores verificados EN VIVO (no de memoria), 2026-07-22.** Lo que el probe corrigió:
+
+  | Capability | Motor | Evidencia |
+  |---|---|---|
+  | `video-frames` | **Veo 2.0** (`veo-2.0-generate-001`, keyless Vertex) | acepta y valida `lastFrame`; **Veo 3.0 fast y 3.0 estándar responden "The request is not supported by this model"**; los ids 3.1 preview no existen en el proyecto |
+  | `video-motion-control` | Seedance 2.0 `reference-to-video` (Fal) | 422; campos `video_urls[]`/`image_urls[]`/`resolution`/`aspect_ratio`/`duration` (string)/`generate_audio` |
+  | `audio-change-voice` | ElevenLabs **Voice Changer** (Fal) | 422; campos `audio_url`\*, `voice`, `output_format`. **`fal-ai/elevenlabs/speech-to-speech` — el nombre por el que se conoce este modelo — NO existe (404)** |
+  | `audio-translate` | ElevenLabs **Dubbing** (Fal) | 422; `target_lang`\* + `audio_url` |
+
+  Descartado y documentado: `fal-ai/vidu/q1/start-end-to-video` **existe** y es ruta futura de alta
+  fidelidad, pero **exige ambos keyframes** ⇒ no puede servir `hasEndFrame:false`, un estado que el
+  contrato de run declara. `lastFrame` es **dato de ruta** (`supportsLastFrame`), así que mover la
+  interpolación a un motor nuevo es cambiar un id en la tabla, no reescribir el adapter.
+- **Multi-output:** `ExperimentAttemptManifestV1.outputs?: LabOutputDescriptorV1[]`
+  (`{ sha256, mediaType, mimeType, retained }`), aditivo. Retención **por output** (un fallo de storage
+  ya no desconoce los outputs que sí se guardaron); el flag plano `outputsRetained` queda como compat y
+  es `true` **sólo si todos** se retuvieron. `resolveEditSource` elige **por modalidad y desde la
+  capability HIJA** — antes leía `outputHashes[0]`, así que refinar "el video" de un `{video,audio}`
+  podía entregarle al modelo la pista de audio.
+- **Voice preset registry:** command `globe.voice.preset.register` + readers `list`/`get`, capability y
+  grant en el mismo PR, coverage `ui`/`mcp` `policy-blocked`. Cuatro identidades separadas: `presetId`
+  (workspace-scoped), `displayName` (cliente), `catalogVoice` (clave curada de Efeonce, lo que viaja al
+  seam) y el **vendor voice id, sólo en la voice-map del adapter**. Cross-workspace y desconocido son el
+  mismo `not_found`. Un clon sin `rights` se rechaza; un clon sin voz curada resuelve a nada y el run
+  falla cerrado en vez de usar la voz por defecto.
+- **Fail-closed pre-spend nuevo:** `assertInputModeSatisfied` cuenta referencias **por tipo de medio**
+  antes del fence. La validación de shape sólo probaba que la ruta *declara* el modo; nunca que el caller
+  aportó lo que ese modo *consume*.
+- **Bug fail-open preexistente cerrado:** `ref/motion/loop-v1` declaraba `frames` y `motion-source`, pero
+  su capability resuelve a un motor text-to-video sin campo de referencia ⇒ los keyframes declarados se
+  **descartaban en silencio después de reservar crédito**. Ambos modos se mudaron a las rutas dedicadas.
+  Catálogo en `1.1.0`, 8 rutas.
+- **SDK:** `registerVoicePreset` / `listVoicePresets` / `getVoicePreset`. El conformance harness es
+  manifest-driven, así que ejercita los tres descriptores nuevos sin cambios.
+
 ### Estado de runtime y camino comercial (TASK-1503, 2026-07-22)
 
 **Vivo hoy:** la capability está **operativa** en `globe-api-internal` (rev `00016-8dr`,
