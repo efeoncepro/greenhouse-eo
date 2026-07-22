@@ -314,6 +314,26 @@ Aplica: esta task **modifica** la capability de edit (`image-edit` vía `editFro
 
 ## Scope
 
+### Approved Producer target addendum — inpaint interaction contract
+
+The approved Producer exposes replace, add and remove intents over a user-authored mask. The canonical command
+must express those intents without vendor vocabulary: replace/add require a bounded prompt, while remove may use
+an empty prompt only when the selected route supports semantic removal.
+
+- Mask ingest uses a private, content-addressed object handle with verified dimensions/media type, workspace scope
+  and short retention. Raw mask bytes/object coordinates never appear in the public command or asset feed.
+- Capability/route compatibility and an estimate occur before commercial reservation/provider submission. An
+  unsupported intent or malformed/empty mask fails closed without spend.
+- Every output is a derived asset with source candidate, mask hash/evidence, intent, effective prompt/recipe,
+  rights/provenance inheritance and an immutable parent lineage edge.
+- Idempotency covers mask+intent+prompt+source version; retries cannot produce an untracked second edit.
+
+Additional acceptance evidence:
+
+- [ ] Replace/add/remove validation and route-compatibility negatives fail before spend.
+- [ ] Mask lifecycle/authorization tests prove no cross-workspace access or raw mask exposure.
+- [ ] Result provenance identifies the source and edit scope while keeping the mask itself private.
+
 ### Slice 1 — Vocabulario canónico de región/máscara + evidencia `editScope`
 
 - En `packages/contracts/src/index.ts`: extender `LabEditFromV1` a `{ experimentId; region?: LabEditRegionV1 }`

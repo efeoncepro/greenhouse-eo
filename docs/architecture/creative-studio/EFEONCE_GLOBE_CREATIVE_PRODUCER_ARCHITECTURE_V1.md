@@ -10,18 +10,20 @@
 Efeonce Globe expone **dos superficies sobre el mismo backend**:
 
 - **Creative Producer** (esta spec): producción **atómica** de piezas sueltas — una imagen, un video, un
-  audio — **low-ceremony, prompt-first, model-first**. El bucle es `prompt (+refs) → ruta → shape → Generate
-  (costo visible) → feed de candidatos → Recreate/descargar`. Es el MVP de valor rápido y el que un operador
-  de Efeonce usa el día 1.
+  audio — **low-ceremony, prompt-first, model-first**. El bucle primario es `prompt (+refs) → ruta → shape →
+  Generate (costo visible) → candidatos → iterar/organizar/revisar/compartir`. La superficie aprobada incluye
+  biblioteca cross-modal, colecciones, operaciones batch, provenance/lineage, budgets, colaboración y sharing;
+  `low-ceremony` describe el punto de entrada, no un recorte funcional.
 - **Professional Studio Workbench** (`TASK-1474`): la capa de **agencia**, brief-first (brief → dirección →
   estimate → aprobación → candidatos → delivery). Va **encima** del Producer.
 
 **El Producer se construye ANTES del Workbench**, por dos razones estructurales:
 
-1. **Salta el critical path de plataforma.** No necesita aprobación humana (`1469`), delivery (`1472`),
-   parity cert (`1473`) ni el ledger comercial (`1468/1482`). Solo necesita spine (`1481` ✅) + Model Lab
-   (`1457` ✅) + spend fence (✅, seguridad interna) + ~5 primitivos nuevos. Entrega valor en una fracción del
-   tiempo del Workbench.
+1. **Desacopla la entrada creativa del brief de agencia.** Un primer slice interno puede operar sobre spine,
+   Model Lab, catálogo, estimate y retrieval ya disponibles, pero el target aprobado completo sí requiere
+   lifecycle durable (`1469`), ingest/provenance (`1467`), ledger/budgets (`1468/1482`), colaboración/share
+   (`1472`), tenancy (`1511`) y las proyecciones del Producer. Entrega valor incremental sin mentir sobre la
+   completitud del producto.
 2. **Construye los primitivos compartidos** que el Workbench también consume (catálogo de rutas, contrato
    discriminado, estimate previewable, retrieval, feed). Cuando `1474` llegue, esos primitivos ya existen.
 
@@ -36,12 +38,45 @@ Visibility Grader, campaña SKY). El Producer trae ese trabajo in-house sobre Gl
 - **Producer dentro del Workbench** — rechazado: acopla el MVP rápido al critical path profundo; pierde la
   ventaja de tiempo.
 - **EPIC nuevo** — rechazado: el Producer es parte de Globe. Vive como **cluster bajo EPIC-028**.
+- **Implementar solo lo ya soportado por backend y recortar la UI aprobada** — rechazado: el diseño aprobado
+  gobierna el target; las dependencias técnicas cambian la secuencia, no el alcance de producto.
 - **Exponer el slug de wire del proveedor** (`bytedance/seedream/v5/pro/text-to-image`, endpoints de queue) —
   rechazado en toda superficie: es plomería de ruteo y filtra el proveedor exacto. Vive solo en el adapter.
   **Ojo (corrección 2026-07-20):** el *nombre* del modelo ("Seedream 5 Pro") **NO** es el slug — es una señal
   de calidad legible, y mostrarlo **añade valor** (ancla de posicionamiento de la suite, patrón Higgsfield).
   La V1 los agrupó por error; se separaron: nombre+versión del modelo = público; slug/costo/margen =
   prohibidos; casa interna = operator-only (ver §Boundary).
+
+### Baseline de producto aprobado y autoridad de cambio
+
+El [source de Claude Design aprobado](../../ui/visual-sources/TASK-1505/approved-prototype.dc.html) para
+`TASK-1505` es una **especificación visual source-led del target completo**, no evidencia decorativa. Su
+inventario funcional y su copia/versionado canónico viven en
+[`docs/ui/visual-sources/TASK-1505/`](../../ui/visual-sources/TASK-1505/README.md) y con la task.
+El runtime debe darle vida conservando Image/Video/Audio composer, referencias/derechos, route/model/shape,
+estimate y budgets, feed/biblioteca unificada, búsqueda/filtros/densidad, series/colecciones, viewer y acciones
+por candidato, provenance/lineage/C2PA verificable, batch, review/comentarios/aprobación, share board read-only,
+onboarding, command palette, shortcuts y selección de tenant.
+
+Las entregas pueden ser vertical slices, pero toda capacidad todavía no operativa debe aparecer como estado
+honesto con task dueña; no se elimina del target ni se simula en memoria. Un cambio material al alcance exige
+aprobación explícita de Product/Design y una nueva versión del baseline. La decisión de autoridad, bridge humano
+y ejecución durable está en
+[`EFEONCE_GLOBE_PRODUCER_HUMAN_EXECUTION_DECISION_V1.md`](EFEONCE_GLOBE_PRODUCER_HUMAN_EXECUTION_DECISION_V1.md).
+
+### Baseline runtime verificado (2026-07-22)
+
+- **Desplegado:** spine, auth base, catálogo, contrato discriminado, estimate, Model Lab y output side de
+  `TASK-1503`; el web visible sigue siendo un shell/foundation y no existe `/producer` funcional.
+- **Local, no desplegado:** `TASK-1504` está `in-progress`; slices Image/Video/Audio existen en la rama local,
+  pero faltan multi-output per-output descriptors, voice presets durables y canary/deploy. No contar código
+  local como capacidad viva.
+- **Bloqueo humano:** el principal web recibe `globe.studio.access`, no las capabilities de Lab/catálogo/assets.
+  `ui: policy-blocked` en coverage no implementa por sí solo un path seguro ni prueba la surface real.
+- **Bloqueo de ejecución:** el runner sigue síncrono/in-process; cancellation/progress/retry/priority/reconcile
+  y la idempotencia cross-réplica de submission requieren el lifecycle durable de `TASK-1469`.
+- **Bloqueos de dominio:** no existen aún upload privado completo, feed de generations, collections/batch,
+  ledger/budgets, colaboración/share, tenancy comercial ni boot de un environment no `internal_smoke`.
 
 ## El modelo del Producer
 
@@ -90,13 +125,19 @@ fail-closed antes de reservar crédito**:
 | **TASK-1501** ✅ | Modality-Discriminated Run Contract | `PreparePayload` como union por capability + output-shape validados pre-spend (**absorbe `1495`**). **Shipped 2026-07-20** (ver §Contratos reales del run contract) | backend-data |
 | **TASK-1502** ✅ | Previewable Estimate reader | el `✨N` antes de gastar (extrae el estimate de dentro de `execute`; slice adelantado de `1469`). **Shipped 2026-07-20** (ver §Contratos reales del estimate) | backend-data |
 | **TASK-1503** ✅ | Governed Output Retrieval + Asset Actions | hash→bytes servible + download/preview/favorite/copy sobre el store content-addressed de `1490`. **Shipped 2026-07-22** (ver §Contratos reales del retrieval) | backend-data |
-| **TASK-1504** | Producer Capability Expansion | video frames + motion-control; audio change-voice + translate; multi-output omni; voice-preset registry — tras el provider seam | backend-data |
-| **TASK-1505** | Producer Surface (UI) | Image/Video/Audio: chassis + paneles por modalidad + feed unificado. El "antes de `1474`". | ui-ux |
+| **TASK-1504** 🟡 | Producer Capability Expansion | `in-progress`, slices Image/Video/Audio solo locales: video frames + motion-control; audio change-voice + translate; faltan multi-output tipado por output, voice-preset durable, canary y deploy | backend-data |
+| **TASK-1505** | Producer Surface (UI) | Superficie aprobada completa: composer Image/Video/Audio + biblioteca, viewer, collections/batch, budgets, provenance, collaboration/share y operator UX; integración por vertical slices, sin recortar el baseline | ui-ux |
+| **TASK-1519** | Producer Human Execution Bridge + Surface Enforcement | browser → same-origin BFF → IAM-private API; broker grants humanos, delegación actor/workspace y enforcement de surface | backend-critical |
+| **TASK-1520** | Producer Asset Library, Collections + Bulk Operations | projection/reader del feed real, collections, búsqueda y commands batch idempotentes/auditados | backend-data |
+| **TASK-1521** | Globe Commercial Runtime Environment Enablement | contrato de environment no-interno, aislamiento/config/secrets/migrations/rollback y readiness evidence | backend-critical |
 
-**Reusa** `1493` (recipe/preset), `1494` (reference intelligence), `1496` (recreate/variación/batch),
-`1497` (inpaint = una capability de edición), `1498` (exploración → feed unificado). **Absorbe** `1495`
-(formatos → output-shape de `1501`). **Único workbench-exclusivo:** `1499` (Dirección — el Producer es
-prompt-first, no interpreta brief). **Sincroniza** projects durables con `1465` (tenancy).
+**Reusa** `1493` (recipe/preset y prompt assistance versionable), `1494` (reference intelligence), `1496`
+(recreate/variación), `1497` (inpaint = capability de edición), `1498` (exploración/lineage que alimenta el feed),
+`1467` (ingest/rights/provenance), `1468/1482` (ledger/budgets) y `1472` (review/share/delivery). **Absorbe**
+`1495` (formatos → output-shape de `1501`). `1520` posee la proyección de biblioteca, collections y bulk
+operations; no duplica lineage ni retrieval. **Único workbench-exclusivo:** `1499` (Dirección — el Producer es
+prompt-first, no interpreta brief). Projects durables dependen ahora de `1511` (workspace/tenant binding rico),
+no de `1465`, que ya cerró la persistencia base.
 
 ### Contratos reales del catálogo (TASK-1500, vigente)
 
@@ -330,14 +371,60 @@ hacia uso comercial, con dueño:
 
 | Gate | Qué falta | Dueño |
 |---|---|---|
-| Humano interno (shell web) | broker grant + flip de `ui`/`mcp` | `TASK-1505` |
+| Humano interno (shell web) | same-origin BFF, broker grants, delegación y enforcement de surface; luego integración UI | `TASK-1519` → `TASK-1505` |
 | Cliente externo / comercial | readiness gate completo | `TASK-1480` ← `TASK-1477` · `TASK-1478` · `TASK-1479` · `TASK-1482` (sobre `TASK-1468`) — **las 5 en `to-do`** |
-| Runtime no-interno | `readStudioRuntimeConfig` lanza `globe_environment_not_internal_smoke`: no hay forma de bootear un runtime comercial | **SIN DUEÑO declarado** — `TASK-1480` no lo menciona |
+| Runtime no-interno | `readStudioRuntimeConfig` lanza `globe_environment_not_internal_smoke`: no hay forma de bootear un runtime comercial | `TASK-1521` → `TASK-1480` |
 | Contabilidad comercial | el spend fence es de seguridad, no ledger (retrieval es gasto cero y no lo necesita; el Producer completo sí) | `TASK-1468` → `TASK-1482` |
 
-El ensanche del enum de entorno es un **bloqueo duro en código sin dueño**: las otras cuatro
-dependencias de `TASK-1480` pueden avanzar en paralelo, pero ninguna lo resuelve. Es el candidato
-natural a próximo paso ejecutable del programa comercial.
+El ensanche del entorno era un **bloqueo duro en código sin dueño**; `TASK-1521` pasa a poseer el contrato,
+rollout y evidencia. Las otras dependencias de `TASK-1480` pueden avanzar en paralelo, pero ninguna sustituye
+esa unidad.
+
+## Target runtime del Producer aprobado
+
+```text
+browser
+  -> studio-web same-origin (session/CSRF, surface=ui server-derived)
+  -> BFF workload identity + human delegation verified server-side
+  -> globe-api-internal (IAM + ID-token verification)
+  -> CapabilityRegistry / policies / idempotency
+  -> Postgres transaction: run intent + reservation + outbox
+  -> creative-runner durable job -> provider adapter
+  -> run/output/library/ledger/review projections -> readers/UI
+```
+
+### Human bridge y enforcement
+
+- El browser **nunca** llama la API IAM-private ni recibe credenciales de workload. `studio-web` conserva el
+  origen SSO y actúa como BFF fino; business logic, policies y state machines siguen en el spine.
+- El broker debe otorgar explícitamente, por workspace y audiencia, `globe.lab.experiment.run`,
+  `globe.producer.catalog.read`, `globe.producer.assets.operate` y, solo para operadores autorizados,
+  `globe.producer.route.reveal_house`. `globe.studio.access` no implica ninguna de ellas.
+- El bridge preserva `actorId`, `workspaceId`, `correlationId` e `idempotencyKey` en una delegación
+  server-derived/auditable. Ningún campo del body puede inventar actor, workspace, capability o surface.
+- Coverage sigue declarando disponibilidad; el enforcement real vive en el adapter/dispatch de ingreso. El
+  endpoint HTTP genérico no puede autodeclararse `ui`, y cada path tiene tests positivos y negativos.
+
+### Durable execution y honestidad de estado
+
+- Submit persiste intent + reservation + outbox/job handoff de forma transaccional. El worker posee la llamada
+  al provider y settlement/release; reintentos no nacen del browser.
+- Cancel, retry, priority, timeout recovery y reconciliation son transiciones explícitas. Un timeout cliente
+  primero lee estado; jamás re-ejecuta a ciegas un command con gasto.
+- Progress granular existe solo con evidencia del provider. Si no existe, la UI muestra estados coarse honestos
+  (`queued`, `running`, `finalizing`) y timestamps; no fabrica porcentajes desde un timer.
+
+### Data products del target
+
+- Upload/reference: initiate/finalize, hash/integridad, MIME/tamaño, malware/safety, rights/consent y lifecycle.
+- Output manifest: descriptor por output (media type, MIME, hash, retention/provenance), apto para omni.
+- Library: projection paginada de generations + annotations + lineage; collections y batch son commands
+  idempotentes con política/audit, no mutaciones locales del browser.
+- Ledger/budgets: reservas y saldos salen del kernel comercial; el spend fence no se presenta como wallet.
+- Provenance/C2PA: una insignia se afirma solo con evidencia verificada; ausencia/fallo se muestra como
+  `unverified`/`unavailable`, nunca como claim automático.
+- Collaboration/share: review, comments, approval/request-changes y share boards read-only tienen policies,
+  revocation/expiry, audit y proyección propias.
 
 ## Boundary / invariantes (heredados + nuevos)
 
@@ -371,8 +458,9 @@ Hereda todos los invariantes de Globe (`greenhouse-globe` skill + `EFEONCE_GLOBE
 El Producer **no compite** con la lane de plataforma ni con el Workbench; **corre en paralelo** y **adelanta
 los primitivos compartidos**:
 
-- **No depende del critical path de 6 niveles** (`1465→1466→1468→1482→1469→1470→1472→…`). Solo del spine +
-  Model Lab (ambos ✅) + los 5 primitivos nuevos.
+- **No depende del brief/dirección del Workbench** para comenzar. El slice interno de generación puede avanzar
+  sobre spine + Model Lab, pero el target aprobado se completa contra sus owners de tenancy, jobs, ledger,
+  provenance, library y collaboration; no se usa una falsa independencia para recortar scope.
 - **6 de las 7 tasks del Workbench (`1493–1498`) son en realidad primitivos compartidos**; construir el
   Producer las materializa. Solo `1499` (Dirección) es exclusiva del Workbench.
 - **`1474` (Workbench) pasa a depender de los primitivos del Producer** (`1500–1503`): también consume el
@@ -395,12 +483,23 @@ los primitivos compartidos**:
 
 ## Secuencia (roadmap por slices)
 
-1. **TASK-1500 + TASK-1501** (catálogo + contrato) — la keystone; desbloquea todo. Listas ya (spine + lab ✅).
-2. **TASK-1502 + TASK-1503 + TASK-1504** — estimate, retrieval, capabilities; en paralelo tras la keystone.
-3. **TASK-1505 (UI)** — el Producer Surface, consume 1500–1504; entregable de valor rápido. Impl **Image →
-   Video → Audio**.
-4. **Sync**: projects durables cuando aterrice `1465`; el ledger comercial cuando lo exija un cliente (`1468`).
-5. **Feeds `1474`**: los primitivos 1500–1503 quedan listos para el Workbench.
+1. **Freeze contractual:** baseline source-led aprobado + `TASK-1505` reespecificada; `1500–1503` se mantienen
+   como foundation desplegada y `1504` como código local `in-progress`, no como runtime vivo.
+2. **Desbloqueo humano P0 (`TASK-1519`):** aceptar/cablear el bridge same-origin, grants humanos, delegation y
+   enforcement real de surface. Sin esto no existe Producer usable desde browser.
+3. **Ejecución/data P0 en paralelo:** cerrar `TASK-1504` (incluido per-output + voice presets durables),
+   `TASK-1469` (jobs/outbox/idempotencia/cancel/progress/reconcile), `TASK-1467` (upload/provenance) y
+   `TASK-1511` (tenant/workspace bindings). Ejercitar concurrencia en `TASK-1512`.
+4. **Primer vertical slice interno:** `TASK-1505` Image sobre readers/commands reales, seguido de Video y Audio;
+   incluir estados honestos para capabilities target aún bloqueadas. Verificar desktop + 390 px, teclado,
+   reduced motion, scroll y GVC antes de promover cada slice.
+5. **Biblioteca e iteración:** `TASK-1493/1494/1496/1497/1498` + `TASK-1520` materializan recipes/prompts,
+   references, recreate/inpaint/lineage y library/collections/bulk; integrar viewer y batch en `1505`.
+6. **Economía y colaboración:** `TASK-1468→1482` provee ledger/budgets; `TASK-1472` provee review,
+   comments/approval y share/revocation. Integrar sin second balance ni browser state como SSOT.
+7. **Comercial:** `TASK-1521` habilita el runtime environment gobernado y converge con `1477/1478/1479/1480`;
+   solo después de migrations/secrets/rollback/smoke y sign-off se abre acceso externo.
+8. **Workbench:** `TASK-1474` consume los mismos primitivos y agrega brief/dirección; no duplica Producer.
 
 ## Hard rules (anti-regresión)
 
@@ -426,14 +525,20 @@ los primitivos compartidos**:
   handle lo certifica la plataforma y arrastra `parentRights` por `inheritedDerivedRights` (una sola regla,
   compartida con el edit base del Lab).
 - **NUNCA** descartar un output de un run multi-output sin declararlo en el manifest.
+- **NUNCA** recortar el baseline aprobado para ajustarlo al backend actual: crear/corregir la unidad dueña y
+  entregar por slices con estados honestos.
+- **NUNCA** permitir que el browser invoque directamente la API IAM-private, elija su trusted surface o porte
+  una service credential; el path humano es same-origin BFF con delegación verificada.
+- **NUNCA** fabricar progress, provenance/C2PA, ledger balance o approval desde timers/constantes/estado local.
 - **SIEMPRE** una capability del Producer nace con Full API Parity (command/reader transport-neutral +
   coverage matrix), `ui`/`mcp` `policy-blocked` hasta gate.
 
 ## Open questions
 
-- Naming exacto de la superficie ("Producer" vs "Studio" vs "Create") y su ruta.
+- La superficie aprobada se llama **Producer**; queda por formalizar solo la ruta canónica (`/producer` es la
+  candidata) y su navegación dentro del shell.
 - ¿El voice-preset registry (`1504`) es un asset propio o extiende el treatment registry de `1493`?
 - Umbral de batch-of-N por modalidad (image permite 1–4; video/audio ¿cuánto, dado el costo?).
-- ¿El feed unificado cross-modal (`1498` extendido) necesita su propio reader o compone los readers por
-  modalidad? Resolver en `1498`/`1505`.
+- El feed unificado necesita una proyección/reader paginado propio que componga generations, annotations y
+  lineage sin query N+1; `TASK-1520` define schema e índices, reusando `1498` como owner de lineage.
 - Contabilidad del costo del Producer interno vs el ledger comercial `1468` (hoy: fence de seguridad; clientes: diferido).

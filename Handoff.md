@@ -22,11 +22,12 @@
 
 - Trabajo local concurrente: coordinar ownership antes de tocar archivos ya modificados.
 - Las sesiones archivadas pueden describir estados superseded. Revalidar cualquier conclusión histórica.
-- **Globe (`EPIC-028`) — único riesgo abierto: el spend fence cross-réplica sigue sin ejercitarse (`TASK-1512`).**
-  El ceiling efectivo estuvo en 1 hasta `TASK-1508`, así que el freno de gasto atómico de `TASK-1465` es correcto por
-  construcción y por tests, pero su camino de contención bajo row locks nunca corrió con >1 réplica; ejercitarlo exige
-  concurrencia real contra el Model Lab (gasto de proveedor, autorización propia). El dominio está vivo y verificado;
-  Production, HA gobernada y clientes externos siguen gateados por `TASK-1480`.
+- **Globe (`EPIC-028`) — el diseño aprobado del Producer ya está rebaselined, pero no está implementado.**
+  Baseline: `docs/ui/visual-sources/TASK-1505/`. `ADR-005` y `TASK-1505` preservan el target completo.
+  Secuencia: `TASK-1519` (in-progress, ejecución autorizada 2026-07-22) → jobs/ingest/tenancy → UI → library/economía/colaboración → `TASK-1521`.
+  Este cierre es documental; no agregó capacidad runtime.
+- **Globe — el spend fence cross-réplica sigue sin ejercitarse (`TASK-1512`).** El ceiling efectivo estuvo en 1
+  hasta `TASK-1508`; falta probar la contención con >1 réplica y gasto autorizado.
 
 ## Pendientes inmediatos
 
@@ -44,17 +45,18 @@
   en tres ventanas acotadas, con corte verificado en cada una; policy final de
   `greenhouse-globe-caller@` = sólo `workloadIdentityUser` de Vercel. Gasto: 20 créditos contra un cap de 200.
   **Quién la usa hoy:** el service principal por las vías internas. Una persona en el shell web todavía
-  no — el broker no le otorga la capability y `ui`/`mcp` siguen `policy-blocked`: ese es el gate de
-  `TASK-1505`. Runbook: `docs/manual-de-uso/creative-studio/operar-retrieval-assets-globe.md`.
+  no — el broker no le otorga la capability y `ui`/`mcp` siguen `policy-blocked`: el bridge, grants y
+  enforcement pertenecen a `TASK-1519`; `TASK-1505` integra después la UI aprobada. Runbook:
+  `docs/manual-de-uso/creative-studio/operar-retrieval-assets-globe.md`.
 
-- **Globe hacia comercial — gates vigentes y un bloqueo SIN DUEÑO (hallazgo del rollout de `TASK-1503`).**
+- **Globe hacia comercial — gates vigentes y bloqueo de entorno ahora con dueño (`TASK-1521`).**
   `internal_smoke` es el estadio actual del runtime, no el techo del producto. Camino real:
-  `TASK-1505` (humano interno: broker grant + flip de `ui`/`mcp`) y, para cliente externo, `TASK-1480`
+  `TASK-1519` (bridge humano, grants + enforcement) → `TASK-1505` (integración UI) y, para cliente externo, `TASK-1480`
   bloqueada por `TASK-1477`/`1478`/`1479`/`1482` (sobre `TASK-1468`) — las cinco en `to-do`.
-  **Lo que nadie sostiene:** `readStudioRuntimeConfig` lanza `globe_environment_not_internal_smoke`
-  para cualquier valor distinto, así que hoy **no existe forma de bootear un runtime comercial**, y
-  `TASK-1480` no lo menciona. Las otras cuatro dependencias pueden avanzar en paralelo pero ninguna lo
-  resuelve: es el candidato natural a próximo paso ejecutable del programa comercial.
+  `readStudioRuntimeConfig` lanza `globe_environment_not_internal_smoke` para cualquier valor distinto, así que
+  hoy **no existe forma de bootear un runtime comercial**. `TASK-1521` posee ahora environment contract,
+  isolation/config, migrations/secrets, rollback y evidencia; las otras dependencias pueden avanzar en paralelo,
+  pero ninguna la sustituye.
 
 - **`TASK-1466` COMPLETE (`EPIC-028`).** SPEC-008 desplegada y verificada internal-only: migración Cloud SQL, dos
   revisiones Ready, smoke auth/tenant/idempotency y readback de versiones+audit verdes. Detalle en

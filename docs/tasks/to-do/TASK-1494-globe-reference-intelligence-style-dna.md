@@ -332,6 +332,30 @@ Reglas obligatorias:
 
 ## Scope
 
+### Approved Producer target addendum — styles, presets and auto-route policy
+
+This task also owns the reusable styles/presets and Style DNA projections consumed by Producer. A style/preset is
+a versioned workspace resource whose application compiles into the governed brief/conditioning contract; it is
+not an arbitrary provider payload saved by the browser.
+
+- Provide create/version/list/get/materialize semantics for styles/presets, including provenance, reference
+  rights, author and compatibility metadata.
+- Style DNA remains evidence with confidence/unsupported states; applying it records the exact profile/version and
+  strength in the effective recipe.
+- Add a read-only auto-route recommendation policy that evaluates the governed catalog against prompt, modality,
+  style/reference and policy signals. It returns a recommendation with bounded reasons and constraints, but does
+  not reserve, execute or silently fall back.
+- Persist/audit recommended route, human-selected route and actual executed route as separate facts. UI contracts
+  expose public model labels and estimates, never provider slugs, vendor cost or margin.
+- Route execution and modality availability remain owned by their respective catalog/run owners and `TASK-1504`;
+  this task does not add providers or modalities.
+
+Additional acceptance evidence:
+
+- [ ] Styles/presets are versioned, tenant-safe and materialize identically across supported consumers.
+- [ ] Auto-route recommendation is deterministic for a pinned catalog/policy version and performs no spend.
+- [ ] Recommended, selected and actual route are distinguishable in contract, persistence and audit evidence.
+
 ### Slice 1 — Contrato `ReferenceProfileV1` + capability de análisis en el spine
 
 - Definir en `packages/contracts` la forma canónica del perfil: `ReferenceProfileV1` con `palette`

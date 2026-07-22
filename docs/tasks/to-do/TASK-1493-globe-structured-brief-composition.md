@@ -297,6 +297,28 @@ Reglas obligatorias:
 
 ## Scope
 
+### Approved Producer target addendum — recipes, prompt history and enhance
+
+The Producer consumes this task as the authority for reusable recipes and prompt evolution. Add a durable,
+workspace-scoped prompt history reader and an `enhance prompt` command that returns a proposal; enhancement never
+silently rewrites the submitted prompt or starts a run.
+
+- Prompt history is bounded, paginated and scoped by trusted actor/workspace context. It records the accepted
+  prompt/structured brief, recipe/version references and correlation evidence without leaking provider prompts or
+  secrets.
+- Enhance returns proposed text/structured deltas plus method/model/policy version evidence. The human must accept
+  the proposal explicitly before it becomes run input; rejection leaves the original unchanged.
+- Enhancement routes through the governed provider/policy seam, with rate/spend controls and deterministic
+  fallback to an honest unavailable state. No UI-only prompt mutation or direct vendor SDK is allowed.
+- Recipe create/version/list/materialize remains canonical here and is reusable by Producer, Workbench and API
+  consumers through the same commands/readers.
+
+Additional acceptance evidence:
+
+- [ ] History pagination and access tests prove actor/workspace isolation and bounded retention.
+- [ ] Enhance is idempotent for the same request key, produces a reviewable proposal and never dispatches a run.
+- [ ] Accepting a proposal captures its source/version in the effective recipe and audit trail.
+
 ### Slice 1 — Tipos de brief estructurado (contrato transport-neutral)
 
 - `BriefIngredientKind` (enum: `subject`|`style`|`light`|`framing`|`mood`|`palette`) y

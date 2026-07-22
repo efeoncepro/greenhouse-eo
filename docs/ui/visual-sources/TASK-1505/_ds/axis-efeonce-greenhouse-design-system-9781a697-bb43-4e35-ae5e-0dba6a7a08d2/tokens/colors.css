@@ -1,0 +1,99 @@
+/* ===========================================================================
+   AXIS · Color tokens
+   Source of truth: greenhouse-eo/DESIGN.md front-matter (mirror of the live MUI
+   theme). Greenhouse is built on bright neutral surfaces, deep structural blues,
+   and one strong accent at a time. Core Blue is the default product energy;
+   green/amber/crimson are controlled signals, never a rainbow.
+   =========================================================================== */
+
+:root {
+  /* --- Brand · Efeonce / Greenhouse logo colors ------------------------- */
+  --brand-navy: #004070;        /* Efeonce institutional wordmark + "house" */
+  --brand-green: #6ec207;       /* Greenhouse leaf / "green" + isotype accent */
+  --brand-green-deep: #4b8405;  /* AA-legible green for text/fills */
+
+  /* --- Primary · Core Blue (canonical CTA + active state) --------------- */
+  --primary: #0375db;
+  --primary-light: #3691e3;
+  --primary-dark: #024c8f;
+  --primary-tonal: #d7e9f9;     /* soft fill behind dark text */
+  --on-primary: #ffffff;
+
+  /* --- Secondary · AXIS green (structural / intentional action) --------- */
+  --secondary: #4b8405;         /* secondary-700 — crisp, AA on white (4.56:1) */
+  --secondary-light: #6ec207;   /* secondary-500 — bright lime, TINT/accent only */
+  --secondary-dark: #396504;    /* secondary-800 — hover / active */
+  --on-secondary: #ffffff;
+
+  /* --- Info ------------------------------------------------------------- */
+  --info: #1f6fd4;
+  --on-info: #ffffff;
+
+  /* --- Semantic · feedback (semantic only, never decorative) ------------ */
+  --success: #157f47;           /* AA on white 5.05:1 */
+  --warning: #ffb703;           /* uses DARK ink — white fails AA on amber */
+  --error: #dc2e39;             /* AA on white 4.6:1 */
+  --on-success: #ffffff;
+  --on-warning: #2f2b3d;
+  --on-error: #ffffff;
+
+  /* Tonal feedback (soft surface + AA ink — the default chip/alert look).
+     NEVER use the solid --warning/--error as a TEXT color; use the ink. */
+  --success-tonal: #e3f3ea;
+  --success-ink: #0f6b3b;
+  --warning-tonal: #fff4d6;
+  --warning-ink: #8a5a00;
+  --error-tonal: #fbe1e3;
+  --error-ink: #b71f29;
+  --info-tonal: #e0edfb;
+  --info-ink: #1a5cae;
+
+  /* --- Neutrals · light mode (AXIS) ------------------------------------- */
+  --neutral: #f8f7fa;           /* app-shell body background */
+  --surface: #ffffff;           /* card / paper */
+  --surface-alt: #fafafa;       /* quiet inset / striped row */
+  --text-primary: #2f2b3d;      /* ink */
+  --text-secondary: #6b6876;    /* secondary copy / metadata */
+  --text-disabled: #a7a5ae;     /* disabled — also the brand slogan grey #848484 family */
+  --border-subtle: #dbdbdb;     /* 1px card border + dividers */
+  --border-strong: #c4c3cc;
+
+  /* --- Neutrals · dark mode (AXIS) -------------------------------------- */
+  --background-dark: #25293c;   /* dark app-shell body */
+  --surface-dark: #2f3349;      /* dark paper */
+  --text-primary-dark: #e1def5;
+  --text-secondary-dark: #acabc1;
+  --border-dark: #44485e;
+
+  /* --- Data-storytelling semaphore (KPI health — distinct from UI feedback)
+     Per UX_WRITING_RESEARCH §15. Pair color with icon + text, never color alone. */
+  --semaphore-optimal: #6ec207;
+  --semaphore-attention: #ff6500;
+  --semaphore-critical: #bb1954;
+
+  /* --- Chart series · "Deep-bright" categorical (self-contained, NOT brand)
+     A chart series must never be mistaken for a UI status color. */
+  --chart-1: #5145e0;  /* indigo */
+  --chart-2: #1fba85;  /* verde */
+  --chart-3: #fb7a00;  /* naranja */
+  --chart-4: #d633c9;  /* magenta */
+  --chart-5: #3cc9f0;  /* cian */
+  --chart-6: #9be036;  /* lima */
+  /* directional (finance / deltas) */
+  --chart-positive: #3dba5d;
+  --chart-caution: #f0a526;
+  --chart-negative: #ff4d49;
+  --chart-neutral: #94a3b8;
+
+  /* === Semantic aliases (consume these in product UI) ==================== */
+  --app-bg: var(--neutral);
+  --surface-card: var(--surface);
+  --surface-sunken: var(--surface-alt);
+  --text-body: var(--text-primary);
+  --text-muted: var(--text-secondary);
+  --text-link: var(--primary);
+  --action-primary: var(--primary);
+  --action-primary-hover: var(--primary-dark);
+  --focus-ring: var(--primary);
+  --divider: var(--border-subtle);
+}

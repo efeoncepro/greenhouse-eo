@@ -7,6 +7,23 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-22 — Globe Producer rebaselined al diseño aprobado completo
+
+- El HTML aprobado de Claude Design quedó versionado como baseline source-led ejecutable bajo
+  `docs/ui/visual-sources/TASK-1505/`, con procedencia y hashes. `TASK-1505`, wireframe, flow, motion y dirección
+  visual preservan el producto completo: composer Image/Video/Audio, library/viewer, collections/batch,
+  budgets, provenance/lineage, review/share y operator UX. `UI ready` continúa `no` hasta runtime, scenario,
+  dossier, baseline promovido y evidencia premium desktop/390 px.
+- `ADR-005`, la arquitectura del Creative Producer y `EPIC-028` separan el target aprobado del estado runtime:
+  `TASK-1500…1503` están disponibles, `TASK-1504` sigue local/in-progress y no desplegada; el browser aún no
+  tiene bridge ni capabilities humanas. Se adopta browser → same-origin `studio-web` BFF → API IAM-private,
+  delegación server-derived, surface enforcement fail-closed y jobs/outbox durables para gasto.
+- El backlog distribuye el gap sin duplicar ownership: `TASK-1519` human bridge/enforcement, `TASK-1520`
+  library/collections/bulk y `TASK-1521` runtime comercial; se reespecifican `1467/1469/1472/1493/1494/1496/
+  1497/1498` para ingest/provenance, jobs, collaboration, recipes, styles, recreate, inpaint y feed/lineage.
+- No se implementó ni desplegó runtime en este ajuste. La secuencia recomendada quedó canónica en `EPIC-028` y
+  la arquitectura del Producer.
+
 ## 2026-07-22 — Skill de arquitectura gobernada y evaluable
 
 - `software-architect-2026` conserva su identificador por compatibilidad, pero adopta un método year-neutral y
@@ -64,9 +81,9 @@
   **sí** está en el bucket y que el workspace declaró como *input* responde `not_found`, mientras el output
   propio de esa misma corrida sí se sirve. La impersonación necesaria para el canario se otorgó y revocó en
   dos ventanas acotadas, con el corte verificado.
-- Lo que **no** cambió: `ui`/`mcp` siguen `policy-blocked` (gate de `TASK-1505`) y el uso comercial/externo
+- Lo que **no** cambió: `ui`/`mcp` siguen `policy-blocked` (bridge/enforcement en `TASK-1519`, integración UI en `TASK-1505`) y el uso comercial/externo
   sigue siendo un programa aparte (`TASK-1480` ← 1477/1478/1479/1482). Hallazgo del rollout: ampliar
-  `GLOBE_ENVIRONMENT` más allá de `internal_smoke` es un bloqueo duro en código **sin dueño declarado**.
+  `GLOBE_ENVIRONMENT` más allá de `internal_smoke` era un bloqueo duro en código sin dueño; ahora lo posee `TASK-1521`.
 - Spec: [`docs/tasks/complete/TASK-1503-globe-governed-output-retrieval-asset-actions.md`](docs/tasks/complete/TASK-1503-globe-governed-output-retrieval-asset-actions.md).
 
 ## 2026-07-21 — Cloud Run de Globe bajo Terraform y un cap de 1 instancia que nadie sabía que existía (TASK-1508)
@@ -798,15 +815,3 @@
   categoría HubSpot, `noindex`, featured/OG y tres diagramas responsive light/dark desde Media Library.
 - La validación autoral, inspección profunda, acceso anónimo `404` y QA visual desktop/móvil pasaron. La revisión
   autenticada del template Ohio y cualquier publicación continúan pendientes y requieren un paso separado.
-
-## 2026-07-17 — Escenas editoriales de producto: método agnóstico y skin contextual
-
-- `design-studio` suma un módulo espejo Codex/Claude para auditar referencias desde sus assets originales,
-  construir escenas de producto con gráficos determinísticos, gobernar referencias positivas/negativas y validar
-  `16:9`/`1:1`/responsive. `content-marketing-studio`, `greenhouse-ai-image-generator` y el runbook editorial
-  consumen el mismo contrato.
-- La gramática de dashboards/escenas queda agnóstica al tema. Las paletas de plataforma se tratan como skins
-  locales: vino/lavanda/naranja puede contextualizar un artículo sobre HubSpot, pero no se convierte en branding
-  Efeonce ni default para RevOps, CRM o futuros artículos.
-- La portada ANAM V6 quedó registrada con source, master, derivados, crop y auditoría; después fue seleccionada
-  e integrada en la publicación con QA live.

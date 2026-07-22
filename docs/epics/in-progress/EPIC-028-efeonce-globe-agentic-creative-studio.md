@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Runtime interno vivo (front door + Cloud Run bajo IaC + persistencia durable); el output side del Creative Producer opera por API en internal_smoke; superficie humana (TASK-1505) y habilitación externa (TASK-1480) pendientes`
+- Status real: `Runtime interno API vivo hasta TASK-1503; TASK-1504 está in-progress solo local y no desplegada. El Producer humano aprobado requiere bridge/surface enforcement (TASK-1519), backend/data restante y TASK-1505; runtime comercial requiere TASK-1521 + readiness TASK-1480.`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `Efeonce Creative Technology / Product`
@@ -49,6 +49,7 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
 - [Creative Studio Business Model V1](../../business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md)
 - [Studio Credit Model V1](../../business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md)
 - [Globe Design System Governance Decision V1](../../architecture/EFEONCE_GLOBE_DESIGN_SYSTEM_GOVERNANCE_DECISION_V1.md)
+- [Globe Producer — Human Execution + Approved Product Target Decision V1](../../architecture/creative-studio/EFEONCE_GLOBE_PRODUCER_HUMAN_EXECUTION_DECISION_V1.md)
 
 ## Child Tasks
 
@@ -82,9 +83,19 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
   propia `globe.producer.assets.operate`, de **gasto cero** y deliberadamente separada de
   `globe.lab.experiment.run`. Corre en `globe-api-internal` rev `00017-xfm` con
   `GLOBE_PRODUCER_ASSETS_ENABLED=true` (default en git), el secreto HMAC `globe-producer-grant-secret` con
-  accessor sólo a `api_runtime` y la migración `0003` aplicada; `ui`/`mcp` siguen `policy-blocked`. `TASK-1504`
-  (capability expansion) y `TASK-1505` (Producer Surface) siguen `to-do`: `TASK-1505` es el gate del humano
-  interno y no habilita clientes externos.
+  accessor sólo a `api_runtime` y la migración `0003` aplicada; `ui`/`mcp` siguen `policy-blocked`.
+  `TASK-1504` está **in-progress solo en el repo local**: slices Image/Video/Audio existen, pero no están
+  desplegadas y faltan multi-output per-output, voice presets durables, canary y rollout. `TASK-1505` posee la
+  **superficie aprobada completa**, no un MVP recortado: composer, library/viewer, collections/batch, budgets,
+  provenance/lineage, collaboration/share y operator UX. Se integra por slices y no habilita clientes externos.
+- `TASK-1519` — **Producer Human Execution Bridge + Surface Enforcement.** Desbloquea browser humano por
+  `studio-web` same-origin BFF hacia la API IAM-private, con broker grants, delegación actor/workspace,
+  correlation/idempotency y enforcement real de `surface=ui` separado del coverage manifest.
+- `TASK-1520` — **Producer Asset Library, Collections + Bulk Operations.** Proyección paginada de generations,
+  annotations y lineage; collections y commands batch idempotentes/auditados. Reusa retrieval/lineage y no crea
+  un segundo source of truth.
+- `TASK-1521` — **Globe Commercial Runtime Environment Enablement.** Posee el bloqueo actual que impide bootear
+  fuera de `internal_smoke`: environment contract, isolation/config, secrets, migrations, rollback y evidencia.
 - `TASK-1506` — **frontend hosting and front door decision (RESUELTA — ADR-004).** Gate P0 cerrado: la ADR
   `EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md` mantiene Cloud Run como web/BFF para la release
   internal-only (rechaza migrar a Vercel), adopta el servidor Node nativo (Next.js `superseded` para el shell
@@ -136,6 +147,21 @@ Esto habilita vender primero un **Sample Sprint Efeonce-managed** basado en una 
 opera Globe internamente y el cliente compra capacidad/outcome gobernado. `Studio Access`, operación cliente,
 precios públicos y wallet self-serve permanecen posteriores a la calibración y aprobación comercial.
 
+### Producer execution order (target aprobado)
+
+1. Canonizar el baseline aprobado y mantener `TASK-1505` como integración completa, no como interpretación
+   reducida del backend disponible.
+2. Ejecutar `TASK-1519` (human bridge + grants + surface enforcement) como gate P0 del browser.
+3. En paralelo cerrar `TASK-1504`, `TASK-1469` (durable jobs/outbox/idempotency/cancel/progress/reconcile),
+   `TASK-1467` (upload/provenance) y `TASK-1511` (tenancy/bindings); probar cross-réplica en `TASK-1512`.
+4. Integrar `TASK-1505` por vertical slices Image → Video → Audio sobre contracts reales, verificando desktop,
+   390 px, teclado, reduced motion, overflow y GVC; toda dependencia abierta se muestra como estado honesto.
+5. Completar iteration/library con `TASK-1493/1494/1496/1497/1498` + `TASK-1520`; luego economía y
+   colaboración con `TASK-1468→1482` + `TASK-1472`.
+6. Habilitar environment comercial por `TASK-1521`, converger readiness `1477/1478/1479/1480` y abrir acceso
+   externo solo con migrations/secrets/rollback/smoke/sign-off completos.
+7. `TASK-1474` monta el Workbench brief-first sobre los mismos primitivos; no los duplica.
+
 ## Existing Related Work
 
 - Pilotos y evidencia: `ai-generations/2026-07-11_glitch-microphone-intro/` y el workflow RRSS documentado en sus manifests/retrospectivos.
@@ -166,7 +192,10 @@ precios públicos y wallet self-serve permanecen posteriores a la calibración y
 - [ ] Existe al menos una prueba `efeonce-managed` y una simulación co-operated/client-operated sobre el mismo template/run contract, con responsabilidades, escalamiento y métricas diferenciadas.
 - [ ] Existe un set de fixtures/evals que incluye al menos un caso de set/practical + actuación/foley y uno de microescena flexible; la selección de motor queda explicable.
 - [ ] Integración sister-platform se limita a contrato versionado/documentado y no introduce base de datos, sesión o secret compartido.
-- [ ] Habilitar a un cliente, pago/tax o publicación automática permanece bloqueado hasta sus decisiones de legal/finance/rights y sus tasks de rollout. Además existe un bloqueo duro en código **sin dueño declarado**: `readStudioRuntimeConfig` lanza `globe_environment_not_internal_smoke` para cualquier `GLOBE_ENVIRONMENT` distinto de `internal_smoke`, así que hoy no existe forma de bootear un runtime comercial (detectado en `TASK-1503`; `TASK-1480` no lo menciona y ninguna task lo sostiene).
+- [ ] Habilitar a un cliente, pago/tax o publicación automática permanece bloqueado hasta sus decisiones de
+      legal/finance/rights y sus tasks de rollout. `TASK-1521` posee el bloqueo duro actual:
+      `readStudioRuntimeConfig` rechaza cualquier `GLOBE_ENVIRONMENT` distinto de `internal_smoke`; debe entregar
+      contrato de environment, aislamiento, migrations/secrets/rollback y evidencia antes de `TASK-1480`.
 
 ## Non-goals
 
@@ -438,3 +467,13 @@ otra y agrega el control de que el output propio de esa corrida sí se sirve; y 
 se opera como grant acotado → verificar → revocar → **verificar el corte**, sin asumir que la revocación
 propagó. Spec: `docs/tasks/complete/TASK-1503-globe-governed-output-retrieval-asset-actions.md` +
 `docs/architecture/creative-studio/EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md`.
+
+## Delta 2026-07-22 — Producer aprobado rebaselined contra runtime real
+
+El source de Claude Design de `TASK-1505` queda reconocido como target de producto completo y aprobado; el
+backend debe darle vida sin convertir sus gaps en recortes de UI. `ADR-005` fija browser → same-origin BFF →
+IAM-private API, grants/delegación humana y surface enforcement fail-closed, además del paso de ejecución cara a
+jobs/outbox durables. `TASK-1504` está `in-progress` solo local y no desplegada. Se agregan owners explícitos:
+`TASK-1519` (human bridge), `TASK-1520` (library/collections/bulk) y `TASK-1521` (runtime comercial, resolviendo el
+anterior gap sin dueño). `TASK-1505` integra por slices sobre esas unidades y sobre `1467/1469/1472/1493/1494/
+1496/1497/1498/1511/1512`, preservando el target y mostrando estados honestos hasta que cada contract esté vivo.

@@ -1,0 +1,59 @@
+/* ===========================================================================
+   AXIS · Typography tokens
+   Two active families only: Poppins for controlled display moments, Geist for
+   everything else (body, tables, forms, chips, buttons, IDs, KPI values).
+   Numeric runs use Geist with tabular-nums — never a monospace family.
+   Sizes are rem (scale with the user's font-size preference; WCAG 1.4.4).
+   Weight roles: 400 body · 600 labels/titles/buttons · 700 strong · 800 display/KPI.
+   =========================================================================== */
+
+:root {
+  /* --- Families -------------------------------------------------------- */
+  --font-display: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-numeric: "Geist", system-ui, sans-serif; /* with font-feature-settings "tnum" 1 */
+
+  /* --- Weight roles ---------------------------------------------------- */
+  --fw-regular: 400;     /* @kind font */
+  --fw-semibold: 600;    /* @kind font */
+  --fw-bold: 700;        /* @kind font */
+  --fw-extrabold: 800;   /* @kind font */
+  --fw-black: 900;       /* @kind font */ /* brand slogan only */
+
+  /* --- Display scale · Poppins (controlled moments only) --------------- */
+  --type-headline-display-size: 2rem;       --type-headline-display-weight: 800; --type-headline-display-lh: 1.25;
+  --type-headline-lg-size: 1.5rem;          --type-headline-lg-weight: 700;      --type-headline-lg-lh: 1.25;
+  --type-headline-md-size: 1.25rem;         --type-headline-md-weight: 600;      --type-headline-md-lh: 1.25;
+  --type-page-title-size: 1.25rem;          --type-page-title-weight: 600;       --type-page-title-lh: 1.4;
+  --type-surface-hero-size: 2.125rem;       --type-surface-hero-weight: 600;     --type-surface-hero-lh: 1.15;
+  --type-surface-hero-size-mobile: 1.75rem;
+
+  /* --- Text scale · Geist --------------------------------------------- */
+  --type-section-title-size: 1rem;          --type-section-title-weight: 600;    --type-section-title-lh: 1.5;
+  --type-label-lg-size: 1rem;               --type-label-lg-weight: 600;
+  --type-label-md-size: 0.875rem;           --type-label-md-weight: 600;         --type-label-md-lh: 1.5;
+  --type-label-sm-size: 0.8125rem;          --type-label-sm-weight: 600;
+  --type-body-lg-size: 1rem;                --type-body-lg-weight: 400;          --type-body-lg-lh: 1.5;
+  --type-body-md-size: 0.875rem;            --type-body-md-weight: 400;          --type-body-md-lh: 1.5;
+  --type-body-sm-size: 0.8125rem;           --type-body-sm-weight: 400;          --type-body-sm-lh: 1.45; --type-body-sm-ls: 0.03em;
+  --type-disclosure-size: 0.75rem;          --type-disclosure-weight: 400;       --type-disclosure-lh: 1.45; --type-disclosure-ls: 0.03em;
+  --type-overline-size: 0.75rem;            --type-overline-weight: 600;         --type-overline-lh: 1.167; --type-overline-ls: 0.08em;
+
+  /* --- Numeric (Geist + tabular-nums) --------------------------------- */
+  --type-numeric-id-size: 0.875rem;         --type-numeric-id-weight: 600;       --type-numeric-id-ls: 0.01em;
+  --type-numeric-amount-size: 0.8125rem;    --type-numeric-amount-weight: 700;
+  --type-kpi-size: 1.75rem;                 --type-kpi-weight: 800;              --type-kpi-lh: 1.05;
+}
+
+/* --- Optional helper classes (foundations specimens / quick prototypes) --- */
+.t-headline-display { font-family: var(--font-display); font-size: var(--type-headline-display-size); font-weight: var(--type-headline-display-weight); line-height: var(--type-headline-display-lh); color: var(--text-primary); }
+.t-headline-lg { font-family: var(--font-display); font-size: var(--type-headline-lg-size); font-weight: var(--type-headline-lg-weight); line-height: var(--type-headline-lg-lh); color: var(--text-primary); }
+.t-page-title { font-family: var(--font-display); font-size: var(--type-page-title-size); font-weight: var(--type-page-title-weight); line-height: var(--type-page-title-lh); color: var(--text-primary); }
+.t-surface-hero { font-family: var(--font-display); font-size: var(--type-surface-hero-size); font-weight: var(--type-surface-hero-weight); line-height: var(--type-surface-hero-lh); color: var(--text-primary); }
+.t-section-title { font-family: var(--font-sans); font-size: var(--type-section-title-size); font-weight: var(--type-section-title-weight); line-height: var(--type-section-title-lh); color: var(--text-primary); }
+.t-body-lg { font-family: var(--font-sans); font-size: var(--type-body-lg-size); font-weight: var(--type-body-lg-weight); line-height: var(--type-body-lg-lh); color: var(--text-primary); }
+.t-body-md { font-family: var(--font-sans); font-size: var(--type-body-md-size); font-weight: var(--type-body-md-weight); line-height: var(--type-body-md-lh); color: var(--text-primary); }
+.t-body-sm { font-family: var(--font-sans); font-size: var(--type-body-sm-size); line-height: var(--type-body-sm-lh); letter-spacing: var(--type-body-sm-ls); color: var(--text-secondary); }
+.t-overline { font-family: var(--font-sans); font-size: var(--type-overline-size); font-weight: var(--type-overline-weight); line-height: var(--type-overline-lh); letter-spacing: var(--type-overline-ls); text-transform: uppercase; color: var(--text-secondary); }
+.t-kpi { font-family: var(--font-numeric); font-size: var(--type-kpi-size); font-weight: var(--type-kpi-weight); line-height: var(--type-kpi-lh); font-feature-settings: "tnum" 1; color: var(--text-primary); }
+.t-numeric { font-family: var(--font-numeric); font-feature-settings: "tnum" 1; }

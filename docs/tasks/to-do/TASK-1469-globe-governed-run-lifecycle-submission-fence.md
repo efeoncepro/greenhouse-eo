@@ -67,8 +67,8 @@ mismo mecanismo de completion.
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md`
 - `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` — principio heredado/adaptado por Globe.
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
-- `../efeonce-globe/docs/architecture/PLATFORM_FOUNDATION_V1.md`
-- `../efeonce-globe/docs/operations/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`
+- `docs/architecture/creative-studio/PLATFORM_FOUNDATION_V1.md`
+- `docs/operations/creative-studio/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`
 
 ## Normative Docs
 
@@ -206,6 +206,34 @@ mismo mecanismo de completion.
 <!-- ZONE 3 — EXECUTION SPEC -->
 
 ## Scope
+
+### Approved Producer target addendum — durable execution orchestration
+
+This task owns the durable run/job lifecycle required by the approved Producer surface. The submission boundary
+MUST transactionally persist run intent, the applicable reservation reference and an outbox/job handoff before a
+worker can spend. A browser retry, replica restart or ambiguous timeout cannot create a second provider spend.
+
+- Persist `runId`, `jobId`, attempt, route snapshot, priority, idempotency key and correlation identifiers; dispatch
+  occurs from an outbox/queue worker, never from the request process after an uncommitted response.
+- Model progress as honest lifecycle phase/attempt/provider evidence. An elapsed-time animation or invented
+  percentage is prohibited. When no granular evidence exists, expose a coarse state.
+- Cancellation distinguishes requested, provider-confirmed and terminal cancellation. It releases/settles only
+  according to authoritative execution evidence and records late provider completion safely.
+- Retry is policy-bounded and attempt-aware. Priority changes are governed commands with audit, queue eligibility
+  checks and no ability to bypass budget, rights, route or approval gates.
+- A reconciler detects orphaned dispatches, missing callbacks, duplicate callbacks and timed-out attempts, and can
+  be invoked by a guarded operator path. Replay remains idempotent across replicas.
+- Status/list projections expose the fields needed by `TASK-1498`, `TASK-1519` and the Producer feed without
+  exposing provider errors or vendor-cost data.
+- Commercial reservation/settlement remains owned by `TASK-1468`/`TASK-1482`. This task consumes their authority;
+  it does not redefine balances, pricing or credit currency.
+
+Additional acceptance evidence:
+
+- [ ] Crash-after-commit and retry-after-timeout tests prove one durable job and no duplicate provider spend.
+- [ ] Cancel, retry, priority and reconcile commands are idempotent, capability-gated and audit-correlated.
+- [ ] Progress tests prove no fabricated percentage and preserve an explicit unknown/coarse state.
+- [ ] Duplicate/late completion converges to one terminal run and one settlement/release decision.
 
 ### Slice 1 — Lifecycle durable y correlación
 

@@ -216,6 +216,30 @@ Reglas obligatorias:
 
 ## Scope
 
+### Approved Producer target addendum — unified feed and query projection
+
+Extend the read model into the canonical unified Producer feed over assets and runs. It remains read-only and
+tenant-scoped: mutations for favorites/collections/bulk operations belong to `TASK-1503`/`TASK-1520` and are only
+reflected here after their authoritative writes.
+
+- Return a stable, cursor-paginated summary with modality, lifecycle/status, route/model public label, recipe,
+  timestamps, favorite/collection projection, approval state and immediate lineage identifiers.
+- Support bounded search plus allowlisted filters/sorts for modality, status, collection and favorite. Unknown or
+  unsupported predicates fail explicitly; they never trigger unbounded scans or client-side cross-workspace
+  enumeration.
+- Feed/run/asset identifiers and cursors are opaque. Query scope derives from trusted context, and stable ordering
+  includes a deterministic tie-breaker.
+- Series/hero/grouping can be rendered by the client only from deterministic projection fields. Durable series and
+  membership ownership belongs to `TASK-1520`; this task does not create a competing write model.
+- Lineage readers continue to expose bounded graph depth and honest missing/archived nodes without rewriting the
+  append-only provenance chain.
+
+Additional acceptance evidence:
+
+- [ ] Feed pagination has no duplicates/gaps under stable data and preserves tenant isolation under every filter.
+- [ ] Search/filter/sort are allowlisted and bounded with query-plan/performance evidence at the target fixture size.
+- [ ] Collection/favorite/approval/lineage changes converge into the projection without owning their writes.
+
 ### Slice 1 — Contract surface (readers + projections)
 
 - Agregar a `GLOBE_LAB_READERS` los wire identifiers `list`, `children`, `tree` (`@efeonce-globe/contracts/src/index.ts`).

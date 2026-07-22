@@ -346,6 +346,27 @@ Reglas obligatorias:
 
 ## Scope
 
+### Approved Producer target addendum — recreate and governed variations
+
+Producer's recreate action MUST materialize the candidate's immutable effective recipe snapshot, including route,
+model, seed/effective parameters, inputs, rights and lineage. A later preset/catalog change cannot rewrite that
+historical recipe.
+
+- Recreate/relaunch mints a new run and lineage edge while preserving the source recipe/version evidence. Any
+  caller override is an explicit typed delta; unsupported parameters are reported, never silently ignored.
+- Variation strength is a bounded domain value normalized server-side into governed recipe deltas. Fan-out count,
+  aggregate estimate/reservation and concurrency are policy-bounded before submission.
+- Each child has its own idempotent run/attempt and lineage, while the batch reports partial success explicitly;
+  failure of one child neither erases completed siblings nor causes them to be resubmitted.
+- A route/model change is an explicit cross-model edit through the existing edit seam from `TASK-1490`, with
+  compatibility and estimate checks. It is not classified as deterministic recreate.
+
+Additional acceptance evidence:
+
+- [ ] Recreate from an old candidate uses its captured effective recipe despite current catalog/preset changes.
+- [ ] Variation strength and fan-out reject out-of-policy values before reservation/provider submission.
+- [ ] Partial batch retry only schedules missing/retryable children and preserves lineage for completed children.
+
 ### Slice 1 — Generation Recipe: contrato + captura de receta efectiva
 
 - En `packages/contracts/src/index.ts`: definir `LabGenerationRecipeV1` (transport-neutral;
