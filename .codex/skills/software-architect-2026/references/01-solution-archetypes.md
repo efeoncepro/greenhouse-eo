@@ -4,6 +4,10 @@ A solution archetype is a pattern that defines, by its nature, most of the archi
 
 This file lists 13 archetypes. Most real systems blend 2-3. Always name the **primary** archetype (the one whose risks dominate) and any **secondaries** (the ones whose patterns also apply).
 
+## Contents
+
+Usage; B2B SaaS; agentic AI; data platform; headless content; internal tool; event-driven; mobile; edge AI; CRM/workflow; marketplace; developer tool; API/BFF; operating-system hybrid; multi-archetype classification.
+
 ## How to use this reference
 
 For each candidate archetype, check:
@@ -34,7 +38,7 @@ Don't force-fit. If a system genuinely doesn't fit any archetype, it's probably 
 - **Tier exhaustion** (the chosen multi-tenancy pattern doesn't scale to enterprise customers — see `06-multi-tenancy.md` for tiered isolation)
 - **Customization sprawl** (per-tenant feature flags become unmanageable)
 
-**Stack signature 2026**: Postgres with RLS for shared schema, OR Postgres schema-per-tenant for mid-market, OR DB-per-tenant for enterprise. Auth with tenant claim in JWT. Per-tenant rate limits at the API gateway. OTel with `tenant_id` propagated via baggage across all spans.
+**Shape hypotheses to evaluate**: shared, partitioned, stamped, or dedicated serving planes; explicit tenant membership and authorization; isolation across every substrate; per-tenant quotas and cost attribution; privacy-safe tenant correlation in telemetry. Do not select database topology or telemetry propagation from the archetype alone.
 
 **Critical questions to answer in the ADR**:
 - Pool, schema, or silo? Or tiered (mix)?
@@ -66,7 +70,7 @@ Don't force-fit. If a system genuinely doesn't fit any archetype, it's probably 
 - **Cognitive debt** (humans stop understanding what the agent does or why)
 - **Permission scope creep** (agents accumulate access over time)
 
-**Stack signature 2026**: Layered agent architecture (perception / reasoning / memory / actuation). MCP for tool exposure. OTel + Langfuse or LangSmith for tracing. Eval harness in CI (Promptfoo, Braintrust, Langfuse evals). Multi-model routing (smaller models for cheap tasks, frontier model for hard reasoning). Sandboxed execution for any agent that runs code.
+**Shape hypotheses to evaluate**: deterministic workflow before open-ended agent; bounded runtime/checkpoints; explicit principal and tool policy; eval harness; privacy-safe tracing; sandboxed side effects; MCP/A2A only when interoperability needs justify them. Load `16-agentic-systems-assurance.md` before choosing tools.
 
 **Critical questions to answer in the ADR**:
 - What autonomy tier does each workflow run at?
@@ -98,7 +102,7 @@ See `references/04-ai-native-patterns.md` for depth.
 - **Schema drift** (source system changes break downstream silently)
 - **Vendor lock-in** (platform-specific SQL dialects, proprietary table formats)
 
-**Stack signature 2026**: Open table format (Apache Iceberg) where vendor-neutrality matters. dbt or SQLMesh for transformations. Orchestrator (Airflow, Dagster, Cloud Scheduler + Cloud Run for simple cases). Semantic layer (Cube, Looker, native dbt semantic) when consumers are analysts/BI. Materialized views or incremental models for cost control. Freshness SLAs as observable metrics.
+**Shape hypotheses to evaluate**: separate operational authority from analytical serving when workloads diverge; versioned data contracts; observable freshness/quality; lineage; owned semantic layer; incremental materialization; open formats only when portability value exceeds operating cost.
 
 **Critical questions to answer in the ADR**:
 - What's the read pattern (dashboards, ad-hoc, ML training, embedded analytics)?
@@ -127,7 +131,7 @@ See `references/04-ai-native-patterns.md` for depth.
 - **Image / asset cost** (CDN bandwidth bills)
 - **CMS lock-in** (custom field configurations are hard to migrate)
 
-**Stack signature 2026**: Astro 6 or Next.js 16 (ISR + RSC) for the front. Headless CMS (WordPress, Sanity, Contentful, Payload). CDN (Vercel, Cloudflare, Netlify). Image optimization at the edge. Sitemap and structured data generated at build. Preview branches that mirror production behavior.
+**Shape hypotheses to evaluate**: rendering and invalidation selected from content freshness/traffic; CMS contract separated from delivery; preview parity; CDN/cache strategy; image budget; structured data and accessibility verified in the published artifact.
 
 **Critical questions to answer in the ADR**:
 - ISR or full SSG? (Trade-off: build time vs cache invalidation complexity)
@@ -155,7 +159,7 @@ See `references/04-ai-native-patterns.md` for depth.
 - **Production write paths from the admin tool** (a single bug can corrupt production data)
 - **Auth bypass** (someone shares a session, or a service account becomes a backdoor)
 
-**Stack signature 2026**: Same web framework as the main product (or Retool/Refine for prototype-grade tools). RBAC with explicit role definitions. Audit log table that every write goes through. Two-person approval for destructive actions. Sandboxed read-only mode for new admins.
+**Shape hypotheses to evaluate**: reuse the product platform where it reduces cognitive load; explicit view/entitlement separation; governed commands; immutable audit evidence; step-up or multi-party approval proportional to irreversible actions; safe read-only/degraded modes.
 
 **Critical questions to answer in the ADR**:
 - What roles exist, and what can each do?
@@ -183,7 +187,7 @@ See `references/04-ai-native-patterns.md` for depth.
 - **Backpressure cascade** (slow consumer brings down producer)
 - **Ordering bugs** (events arrive in wrong order, derived state is wrong)
 
-**Stack signature 2026**: Postgres LISTEN/NOTIFY for small scale. Pusher / Ably / Soketi for managed websocket. NATS / Kafka / Redpanda for higher throughput. SSE for one-way push (notifications). Outbox pattern for reliable event publishing from transactional systems.
+**Shape hypotheses to evaluate**: choose push/poll and broker from latency, fan-out, ordering, durability, replay, and operator capacity; use transactional publication when state and event must agree; require bounded queues, backpressure, idempotency, and repair.
 
 **Critical questions to answer in the ADR**:
 - Push to client (websocket, SSE, polling)?
@@ -211,7 +215,7 @@ See `references/04-ai-native-patterns.md` for depth.
 - **Battery and data cost** (unhappy users uninstall fast)
 - **Native module fragility** (a third-party native lib breaks on next OS version)
 
-**Stack signature 2026**: React Native + Expo (managed workflow), or Flutter for high-polish UI control. EAS Build / EAS Submit for CI/CD. Expo Updates for OTA. Sentry for crash reporting. API versioning that supports multi-version clients.
+**Shape hypotheses to evaluate**: native versus cross-platform from device capabilities/team skills; offline state and conflict policy; multi-version API compatibility; observability and release/rollback within store/OTA constraints.
 
 **Critical questions to answer in the ADR**:
 - Single platform or both? (Flutter and RN both go cross-platform; native still wins for some categories)
@@ -239,7 +243,7 @@ See `references/04-ai-native-patterns.md` for depth.
 - **Cost surprises** (per-invocation pricing × user fanout)
 - **Privacy assumptions broken** (data crosses regions you didn't expect)
 
-**Stack signature 2026**: Cloudflare Workers AI, Vercel Edge Functions, AWS Lambda@Edge. Quantized small models (Llama 3.2, Phi 3, Gemini Nano) for on-device. WASM for portable inference. Edge-friendly observability (Workers Logpush, Vercel Edge Logs).
+**Shape hypotheses to evaluate**: execute near users/devices only when latency, privacy, availability, or egress evidence justifies distribution; quantify placement, model/artifact size, update, observability, consistency, and fallback constraints before selecting a platform.
 
 **Critical questions to answer in the ADR**:
 - What's the latency budget per request?
@@ -267,7 +271,7 @@ See `references/04-ai-native-patterns.md` for depth.
 - **Permission complexity** (object-level, field-level, per-team — easy to get wrong)
 - **Custom code in the CRM that nobody owns** (admin leaves, code rots)
 
-**Stack signature 2026**: Native CRM platform (HubSpot, Salesforce) for the system-of-record. UI extensions (HubSpot Developer Platform 2025.2+, Salesforce LWC). Sync via webhooks + reconciliation cron. Bi-directional sync only when truly needed (it's expensive). Reverse ETL (Hightouch, Census) for sending data into the CRM from the warehouse.
+**Shape hypotheses to evaluate**: declare field/object authority; use webhooks plus reconciliation where delivery is not authoritative; minimize bidirectional ownership; preserve identity, lineage, rate-limit, replay, and manual-repair contracts.
 
 **Critical questions to answer in the ADR**:
 - What's the system-of-record for each object? (Don't have two)
@@ -295,7 +299,7 @@ See `references/04-ai-native-patterns.md` for depth.
 - **Trust collapse** (a single bad incident scares one side away)
 - **Fraud at scale** (fake listings, fake reviews, payment fraud)
 
-**Stack signature 2026**: Stripe Connect for marketplace payments. Search infrastructure (Typesense, Meilisearch, Algolia). Review and reputation system. Identity verification (Persona, Stripe Identity). Two distinct app surfaces, sometimes shared backend.
+**Shape hypotheses to evaluate**: separate buyer/seller journeys and entitlements; ledger and settlement authority; search/matching quality; trust/safety and dispute workflows; identity verification; liquidity/network-effect instrumentation.
 
 **Critical questions to answer in the ADR**:
 - Who is the primary user (which side has more pain without the platform)?
@@ -323,7 +327,7 @@ See `references/04-ai-native-patterns.md` for depth.
 - **Bad release** (a buggy v2.3.4 hits all users instantly via auto-update)
 - **Telemetry backlash** (devs find out about telemetry they didn't expect)
 
-**Stack signature 2026**: Rust or Go for compiled CLIs (single binary, fast startup). TypeScript on Bun for npm-distributed CLIs. Test on all three OS in CI. Release via GitHub Releases + Homebrew tap + npm + cargo. Telemetry via opt-in env var.
+**Shape hypotheses to evaluate**: distribution and runtime from target environments; stable machine-readable output and exit codes; cross-platform tests; signed/provenanced releases; explicit offline and telemetry/privacy posture.
 
 **Critical questions to answer in the ADR**:
 - What's the install path on each OS?
@@ -351,7 +355,7 @@ See `references/04-ai-native-patterns.md` for depth.
 - **N+1 over the API** (consumers force chatty patterns)
 - **Auth model fragility** (token rotation, scope creep, short-lived vs long-lived debates)
 
-**Stack signature 2026**: Hono / Fastify / Elysia for performant Node APIs. OpenAPI as the source of truth, with code generation for SDKs. Versioning via URL prefix or header. Rate limit at the gateway. MCP server alongside REST when AI consumers exist.
+**Shape hypotheses to evaluate**: contract-first API with explicit owner/lifecycle; protocol selected from consumers and quality scenarios; consistent errors, idempotency, pagination, quotas, compatibility and contract tests; MCP only when agent interoperability has concrete consumers.
 
 **Critical questions to answer in the ADR**:
 - REST, GraphQL, gRPC, or a mix?
@@ -379,7 +383,7 @@ See `references/04-ai-native-patterns.md` for depth.
 - **Schema sprawl** (every new module adds tables; cross-cutting concerns weaken)
 - **Audit gaps** (something happened in the system, no one can reconstruct what or why)
 
-**Stack signature 2026**: Modular monolith with clear domain boundaries (schemas in Postgres, modules in code). BigQuery / Snowflake as the canonical analytical store. ETL/CDC pipelines from operational systems. AI layer for assistance and automation. Strong RBAC, audit log, and multi-tenant scaffolding.
+**Shape hypotheses to evaluate**: domain boundaries and ownership before deployable boundaries; explicit operational/analytical sources of truth; governed integration and projections; view/entitlement access model; audit and tenancy across substrates; AI only where it adds measured value.
 
 **Critical questions to answer in the ADR**:
 - Modular monolith or microservices? (Modular monolith almost always wins until proven otherwise)

@@ -1,299 +1,179 @@
 ---
 name: software-architect-2026
-description: Senior software architect for 2026 reality. Produces ADRs, C4 diagrams, stack recommendations, trade-off matrices, component specs, threat models, cost estimates, and migration plans. Triggers on "design", "architect", "stack", "should I use X or Y", "how would you build", "audit my system", "plan to migrate", "what would break". Forces 2026 research validation, surfaces cognitive debt, reversibility, vendor lock-in, multi-tenancy tier evolution, AI autonomy mismatch, and observability gaps. Includes optional Efeonce overlay for Greenhouse/Kortex/Verk work.
+description: Design, audit, evolve, migrate, and assure software architecture using evidence, explicit quality attributes, stakeholder concerns, decision records, operational readiness, and implementation handoffs. Use for system design, architecture reviews, stack or build-vs-buy decisions, brownfield modernization, distributed/data/multi-tenant/AI systems, reliability or recovery design, C4/views, ADRs, threat models, cost models, and questions such as "how should we structure this?" or "what will break?". Do not use for isolated coding fixes, routine commands, or documentation edits with no architectural decision.
 ---
 
-# Software Architect 2026
+# Software Architect
 
-A skill that turns Codex into a senior software architect for the 2026 reality: AI-native systems, agentic workflows, MCP as substrate, and a return to engineering fundamentals (zero-trust, DORA, testability) precisely because AI accelerates everything else.
+Produce architecture that is understandable, testable, operable, and able to evolve. Treat the year in the skill name as a compatibility identifier, not as evidence that a claim is current.
 
-This skill is not a stack cheat sheet. It is a workflow that forces the right questions, validates assumptions against current 2026 reality (via mandatory research), and produces decision-grade artifacts that survive the next 36 months.
+## Resolve authority first
 
-## Core mental model
+1. Read repository instructions, active work artifacts, accepted decisions, domain architecture, and verified code/schema/runtime before applying generic guidance.
+2. Treat this skill as method and decision support, not as a competing source of truth.
+3. When working in Efeonce or Greenhouse, load `efeonce-overlay/router.md`. Apply the overlay as localization after the generic architecture pass.
+4. Mark conflicts, missing evidence, and stale canon explicitly. Never repair them by inventing a contract.
 
-Architecture is the accumulation of one-way decisions. Two-way doors get optimized later; one-way doors define the system forever. A 2026 architect's job is to:
+## Use this mental model
 
-1. **Distinguish** which decisions are reversible (cheap to revisit) from those that are not (expensive to undo).
-2. **Defer** the reversible ones until evidence demands a choice.
-3. **Document** the irreversible ones rigorously, with confidence level, and the conditions under which they should be reconsidered.
-4. **Validate** any "current best practice" claim against actual 2026 reality — model versions, framework releases, vendor pricing, and ecosystem maturity move faster than memory.
-5. **Surface** the second-order risks the team is not asking about: cognitive debt from AI-generated code, multi-tenancy tier exhaustion, vendor lock-in from convenience, observability gaps that hide failures.
+Treat architecture as all of the following:
 
-The skill is opinionated about *process*, neutral about *technology*. Stack recommendations always come with a "validated as of YYYY-MM-DD" tag and an instruction to verify before committing.
+- a description of an entity in its environment, shaped by stakeholders and their concerns;
+- a set of structural, behavioral, deployment, data, and socio-technical views that answer those concerns;
+- a portfolio of consequential decisions, constraints, principles, and trade-offs;
+- an evolving system governed through evidence, fitness functions, conformance checks, and review triggers.
 
-## When to trigger this skill
+Use reversibility to allocate effort, not to define architecture. Spend more evidence and review on decisions with high blast radius, weak rollback, regulated impact, or long-lived coupling.
 
-Trigger whenever the user is making, evaluating, or revisiting an architectural decision — even when the framing is casual. Specifically:
+## Select a mode
 
-- "Design / architect / build / structure X"
-- "What stack should I use for X"
-- "Should I use X or Y"
-- "How would you approach X"
-- "Audit / review / evaluate my system"
-- "Plan to migrate from X to Y"
-- "What would break if X"
-- "Is this the right approach"
-- "What am I missing"
-
-Do NOT trigger for: pure coding tasks (write a function, fix a bug), pure documentation tasks (write a README), or operational questions (how do I run X command).
-
-## Workflow
-
-The skill enforces an 8-step workflow. Each step produces output. Skipping steps is allowed only when the user explicitly asks for a single artifact (e.g., "just write me an ADR for choosing Postgres").
-
-### Step 0 — Detect mode
-
-Identify which mode applies:
-
-| Mode | Trigger phrases | Default outputs |
+| Mode | Use when | Minimum outcome |
 |---|---|---|
-| **New design** | "design", "build", "architect from scratch" | Archetype classification, C4 L1+L2, ADRs, stack recos, component specs |
-| **Audit** | "audit", "review", "what's wrong with" | Risk inventory, ADRs for past decisions (retroactive), migration plan if needed |
-| **Migration** | "migrate", "move from X to Y", "replace X" | Strangler-fig plan, ADR for new state, risk inventory, sequencing |
-| **Decision** | "should I use X or Y" | Single ADR with trade-off matrix |
-| **Stack pick** | "what stack for X" | Stack recommendation with validation evidence + ADRs for one-way picks |
+| Discovery | Intent, constraints, owners, or current state are unclear | Concern register, unknowns, evidence plan |
+| New design | A capability or system needs a target shape | Views selected by concern, decisions, quality scenarios, roadmap |
+| Audit | A real system must be evaluated | Evidence-backed findings, risk ranking, conformance gaps, remediation |
+| Decision | Alternatives must be compared | Drivers, trade-off matrix, ADR, revisit triggers |
+| Migration | Current and target states differ materially | Baseline/target/gap, transition states, reconciliation, rollback |
+| Assurance | Build/launch/recovery readiness is in question | Quality, security, operations, cost, recovery, and evidence verdict |
 
-If the mode is ambiguous, ask one clarifying question. Don't ask three.
+If the mode changes during discovery, say so. Do not force a full design bundle for a narrow decision.
 
-### Step 1 — Capture intent
+## Follow the architecture loop
 
-Ask at most three questions. The minimum viable input is:
+### 1. Frame the entity and intent
 
-1. **What problem does this solve, and for whom?** (one sentence)
-2. **What's the expected scale in 12 months?** (orders of magnitude — 100, 10k, 1M users? GB or TB of data? RPS?)
-3. **What are the hard constraints?** (existing systems to integrate with, compliance, budget ceiling, team size, deadline)
+Identify the entity of interest, problem, beneficiaries, business outcome, boundaries, environment, lifecycle stage, and authority to decide. Search project context before asking questions.
 
-If the user is in a project context with project knowledge, search it before asking — the answer may already exist. If memories indicate Efeonce context, also search for the Efeonce overlay (see `efeonce-overlay/README.md`).
+Ask at most three load-bearing questions at a time. Prefer:
 
-### Step 2 — Classify
+1. Which user or business outcome must this enable?
+2. What scale, criticality, and failure impact must it handle?
+3. Which constraints cannot be violated: regulation, integration, budget, team, deadline, residency, or existing decisions?
 
-Match the solution to one or more **archetypes** from `references/01-solution-archetypes.md`. Most real solutions blend 2-3 archetypes (e.g., Greenhouse is "B2B SaaS multi-tenant" + "data platform" + "internal tool"). Name the primary archetype and any secondaries.
+Separate facts, hard constraints, preferences, aspirations, assumptions, and unknowns.
 
-Each archetype has a signature: typical stack shape, dominant risks, and pre-decided trade-offs. Use that signature to skip questions that the archetype already answers.
+### 2. Register stakeholders, concerns, and decision rights
 
-### Step 3 — Research (mandatory, never optional)
+Capture the people who build, operate, secure, fund, use, acquire, maintain, govern, or assess the system when relevant. Map each material concern to an owner, priority, acceptance authority, evidence, and view that will answer it.
 
-Use `references/12-research-protocol.md`. The protocol is not optional even when the answer "feels obvious" — the AI/cloud/framework landscape moves fast enough that 18-month-old knowledge is often wrong on specifics (versions, prices, ecosystem maturity, deprecations).
+Load `references/13-architecture-description-evolution.md` and use `templates/stakeholder-concern-register.md` for non-trivial work.
 
-Minimum research:
+### 3. Establish evidence and baseline
 
-- **Verify framework / language / runtime versions** via official changelogs (not aggregator blogs). Confirm what is *stable* vs *canary/experimental*.
-- **Verify cloud / vendor pricing tier** the recommendation assumes. Pricing changes; free tiers shrink.
-- **Verify community health** (GitHub commits in last 90 days, npm downloads trend, last release).
-- **For AI features**: verify model availability, current pricing, context window, rate limits.
+For brownfield work, inspect code, schemas, dependencies, runtime configuration, telemetry, incidents, costs, and current ownership. Distinguish observed state from inferred state.
 
-Document what you verified and when. Every stack claim in your output should be traceable to a source.
+For current technology, pricing, regulatory, protocol, vendor, model, or ecosystem claims, follow `references/12-research-protocol.md` and cite primary sources with a validation date. Never infer operational truth from documentation alone.
 
-### Step 4 — Map constraints
+### 4. Classify shape, criticality, and quality attributes
 
-Constraints determine which decisions are forced and which are open. Classify each constraint:
+Select one primary and up to two secondary archetypes from `references/01-solution-archetypes.md`; treat their stack signatures as hypotheses, never defaults.
 
-- **Hard** (cannot violate): regulatory, contractual, integration with system X
-- **Soft** (preferable to honor): team familiarity, existing tooling, hosting standardization
-- **Aspirational** (nice to have): "we'd like to be on the latest version of Y"
+Classify workload criticality and prioritize three to five architecturally significant quality attributes. Express each important attribute as a measurable scenario: source, stimulus, environment, affected artifact, response, and response measure. Reject adjectives such as “secure”, “scalable”, or “highly available” without a scenario or explicit exploratory status.
 
-Soft and aspirational constraints get traded away when needed. Hard constraints define the design space.
+### 5. Select views and alternatives by concern
 
-### Step 5 — Generate artifacts
+Choose only views that answer registered concerns. Typical views include context, container, runtime/dynamic, deployment, data, integration/event, security/trust boundary, operations/recovery, and socio-technical ownership.
 
-Generate the artifacts the user asked for, using templates from `templates/`. The default artifact bundle by mode:
+For consequential choices:
 
-- **New design**: C4 L1 (context) + C4 L2 (containers) + 3-5 ADRs for one-way decisions + stack recommendation + risk inventory
-- **Audit**: Risk inventory ranked by impact × likelihood × time-to-bite + retroactive ADRs for the top 3-5 implicit decisions + migration plan if any risk is critical
-- **Migration**: Current-state diagram + target-state diagram + strangler-fig sequencing + ADR for the migration approach + rollback plan
-- **Decision**: One ADR with trade-off matrix and confidence level
-- **Stack pick**: Stack recommendation table + ADRs for the one-way picks (database, auth, deployment target)
+- state decision drivers and dealbreakers;
+- compare viable alternatives, including “do nothing”, managed/buy, and simpler non-AI/non-distributed baselines when applicable;
+- expose cross-pillar trade-offs rather than maximizing every quality attribute;
+- classify reversibility and define exit or migration posture;
+- avoid precision unsupported by measurements.
 
-ADRs always include: **status, context, decision, alternatives considered, consequences, reversibility (one-way / two-way), confidence (low/medium/high), validated-as-of date, supersedes/superseded-by links if applicable**. See `templates/adr.md`.
+Use `references/03-decision-frameworks.md` and the relevant templates.
 
-### Step 6 — Self-critique pass (mandatory, never optional)
+### 6. Design contracts and failure behavior
 
-Before delivering, run the self-critique pass. Read what you wrote and answer, in writing, in the artifact:
+Define source-of-truth ownership, interfaces, identity/authorization boundaries, data lifecycle, consistency, timeouts, retry ownership, idempotency, ordering, backpressure, degradation, reconciliation, and recovery where applicable.
 
-1. **What breaks in 12 months?** Most likely failure mode at the next scale level.
-2. **What breaks in 36 months?** When the assumptions in this design no longer hold.
-3. **What's the cognitive debt risk?** Will the team that runs this in 18 months understand why it was built this way? (Especially if AI agents wrote significant portions.)
-4. **What's locked in?** Which vendor / framework / pattern would cost more than 1 quarter of effort to replace?
-5. **What's not observable?** Where could a failure happen silently?
-6. **What's the AI-specific risk?** If the system uses LLMs: prompt injection, runaway cost, autonomy mismatch, hallucination blast radius.
-7. **What's the regional / compliance gap?** Especially for LATAM systems: data residency, Ley 21.719 (Chile), LGPD (Brasil).
+Load:
 
-If any of these reveals a flaw, fix the artifact. Don't ship and then mention it.
+- `references/05-data-architecture.md` for operational/analytical data and lineage;
+- `references/06-multi-tenancy.md` for tenant isolation and tier evolution;
+- `references/14-quality-reliability-platform.md` for quality, SRE, platform, recovery, FinOps, sustainability, and supply-chain assurance;
+- `references/15-distributed-integration-contracts.md` for distributed, API, event, webhook, and integration contracts;
+- `references/16-agentic-systems-assurance.md` for AI/agent runtime, autonomy, MCP/A2A, evals, memory, guardrails, telemetry, and cost.
 
-### Step 7 — Handoff
+### 7. Evaluate and make evolution executable
 
-Deliver. If the user has the Efeonce overlay active, also produce a TASK-compatible component spec using `efeonce-overlay/handoff-to-task.md`. Otherwise produce a generic component spec from `templates/component-spec.md`.
+Evaluate the design against every high-priority concern and quality scenario. Record accepted risk, waiver owner/expiry, contradictions between views, and missing evidence.
 
-End with a short "what to verify before implementing" list — things the implementing agent or human should re-check (versions, pricing, integrations) because between architecture and implementation, reality may have moved.
+Connect important quality scenarios to fitness functions with mechanism, threshold, cadence, owner, evidence, and response. Define baseline, target, gaps, transition states, rollout, rollback, decommissioning, and review triggers. A future candidate home or technology is metadata, not authorization to create it.
 
-## Compose with the `astro` skill (Astro / static-site / efeonce-think work)
+### 8. Self-critique and hand off
 
-When a design or review touches an **Astro** property — `efeonce-think` (AI
-Visibility report hub), `efeonce-web` (public marketing), or any static/island
-front-end — **compose directly with the `$astro` skill** (`.codex/skills/astro`).
-Bidirectional handoff contract:
+Before delivery, answer:
 
-- **This skill decides the SHAPE** — reversibility, 4-pillar / one-way-door
-  analysis, SSOT & domain boundaries (the *dumb-render* line: efeonce-think
-  renders, the Greenhouse headless model computes — never invert), canonical
-  primitive vs new entity, schema/migration, multi-tenant exposure, and whether a
-  capability needs a governed contract (Full API Parity — e.g. the AEO grader form
-  as a governed write-path). "Static vs SSR" as a structural call starts here.
-- **The `astro` skill fills the IMPLEMENTATION** — `output`/`prerender`, island
-  boundaries + `client:*`, Content Layer modeling, Astro Actions/endpoints,
-  adapter + deploy, View Transitions, perf/cache wiring.
+- What fails at the next scale level and under partial dependency failure?
+- What becomes invalid in 12 and 36 months?
+- Which control plane, credential, operator, or dependency may be unavailable during recovery?
+- What creates tenant, privacy, security, supply-chain, or compliance exposure?
+- What is locked in, unobservable, unowned, or cognitively expensive?
+- What is the cost per useful outcome and its dominant sensitivity?
+- If AI is present, why is it preferable to a deterministic baseline, how is autonomy bounded, and what evidence permits promotion?
 
-Flow: decide the shape here → hand to `$astro` for the Astro structure → it hands
-back up if a new shape decision surfaces. The same contract is mirrored on the
-Claude side (`arch-architect` ↔ `astro`).
+Deliver decisions, unresolved risks, evidence gaps, implementation boundaries, verification, rollout/rollback, owners, and revisit triggers. Distinguish `design complete`, `build ready`, `launch ready`, and `recovery proven`.
 
-## Compose with the `greenhouse-globe` skill (Efeonce Globe / Creative Studio / EPIC-028)
+## Scale artifacts to risk
 
-When a design or review touches **Efeonce Globe** — the sibling creative-production
-platform (`efeonce-globe` repo, governed by Greenhouse under EPIC-028) — **compose
-with the `$greenhouse-globe` skill** (`.codex/skills/greenhouse-globe`). Bidirectional
-handoff:
+| Level | Suitable for | Typical artifacts |
+|---|---|---|
+| Decision note | Reversible, local choice | Drivers, decision, consequences, review trigger |
+| Solution outline | One bounded capability | Concern register, selected views, quality scenarios, ADRs, rollout |
+| Full architecture description | Cross-domain or high-coupling system | Viewpoint/view register, correspondence, contracts, roadmap, evaluation |
+| Assurance case | Regulated, safety/security critical, or high-blast-radius system | Claims, evidence, risk acceptance, conformance and recovery proof |
 
-- **This skill decides the SHAPE** — reversibility / blast-radius, 4-pillar scoring,
-  domain boundaries and the sister-platform line (Greenhouse owns identity / desired
-  access / governance and the `TASK-###`/EPIC control plane; Globe owns
-  code / runtime / data / creative evidence — never share DB / session / bucket /
-  provider secret / admin role), canonical primitive vs new entity, and whether a
-  capability needs a governed contract (Full API Parity by birth). Globe-as-peer is
-  already decided (Creative Studio ADR).
-- **The `greenhouse-globe` skill fills the IMPLEMENTATION** — how to extend the API
-  Contract Spine (TASK-1481: schemas in `packages/contracts` → `registry.registerCommand`
-  → flip coverage policy-blocked→available → handler via `provider-contract` /
-  `creative-runner` → typed SDK method → grant → manifest-driven harness), the
-  build/toolchain (`pnpm check` / `pnpm build` in `efeonce-globe`, `node --test`,
-  import-extension convention), and trusted-context / dispatch mechanics.
+Do not create diagrams, ADR counts, or sections merely to satisfy a bundle. Every artifact must answer a concern or prove a gate.
 
-**Two worked examples now live on the spine, and the second is an architecture pattern
-worth stealing.** The Model Lab (TASK-1457) is the first — a capability with external state
-+ a provider behind it. The **Evaluation Harness** (TASK-1458, SPEC-003,
-`EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md`, capability `globe.lab.evaluation.run`) is the
-second, and it demonstrates **capability-consumes-capability**: it never reimplements
-experiment execution — it reuses the Lab through an exported domain helper
-(`runModelLabExperiment`, the real `prepare→execute` path with every guardrail), never
-re-dispatching through the registry from inside a handler and never duplicating the logic.
-Its golden briefs + rubrics are **versioned data** flowing through one engine (no `switch`
-per fixture — two distinct fidelity contracts, one engine). And it draws the line the eval
-discipline demands: `objectiveChecks` (automatic, deterministic) stay separate from
-`humanCriteria` (declared, never auto-scored); the verdict is only
-`objective_fail | objective_pass_pending_human` — never a creative "passed", never "model X
-is globally better" — and reports are versioned, workspace-scoped, with limitations
-declared. **This is framework #10 (eval-driven AI design) as a Globe primitive:** promoting
-a model route to production is a gate SEPARATE from running it in the Lab, and the evidence
-for that promotion is an evaluation report per fidelity contract.
+## Resource routing
 
-**The provider stack behind the runner is itself a pattern worth stealing (TASK-1486…1488, 1459).**
-A `CreativeProviderAdapter` is minted **per vendor** behind the `creative-runner`: `VertexCreativeAdapter`
-(TASK-1486, Google-native via Vertex, **keyless** through ADC/WIF, verified live) and `FalCreativeAdapter`
-(TASK-1487, non-Google, queue API), exposing capabilities verified against **live provider accounts, not marketing
-claims** (TASK-1488: Seedream 5 / Recraft / Topaz / Seedance / Seed Audio / ElevenLabs / Rodin 3D — with vendor
-quirks like ByteDance model IDs carrying no `fal-ai/` prefix). Two shape rules generalize to any provider design:
-(a) **capability→model routing lives INSIDE the adapter, never in domain policy** — a template/agent selects a stable
-semantic capability and the adapter resolves the concrete model + vendor quirk; and (b) `actualRoute` is the
-**fidelity-contract route, not the raw provider slug** (a `route_stable` bug fixed in TASK-1459). Secrets follow the
-sister-platform line: **keyless for Google-native (own project's ADC/WIF), keyed-with-its-own-secret for everything
-else — never a secret shared between Globe and Greenhouse** (the shared Fal canary key is a declared, temporary
-exception). The **`CompositeProviderAdapter`** (TASK-1487) is the router: it fans a capability across adapters by
-`supports()` + provider policy (Google-native → Vertex, non-Google → Fal). This is where **eval-driven design
-(framework #10) turns concrete for creative work**: the Still Model Lab **recommendation matrix** (TASK-1459) compares
-engines *objectively* — Vertex Nano Banana vs Fal Seedream by cost/latency/objective — yet craft stays a human call and
-**the harness never auto-elects a creative winner**; the matrix informs the human, it never promotes a route (route
-promotion to production stays the separate gate from framework #10 above).
-
-Flow: decide the shape here → hand to `$greenhouse-globe` for the Globe structure → it
-hands back up if a new shape decision surfaces. Canonical specs:
-`docs/architecture/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md` (SPEC-001) +
-Greenhouse `EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_{DECISION,ARCHITECTURE}_V1.md` +
-`EPIC-028`. Mirrored on the Claude side (`arch-architect` ↔ `greenhouse-globe`).
-
-## What this skill explicitly does NOT do
-
-- **Does not write production code by default.** It produces decision-grade specs that humans or implementation agents execute. If the user asks Codex to implement after the architecture pass, switch back to the repo's normal implementation workflow and obey `AGENTS.md`.
-- **Does not pick the latest framework for novelty.** "New" is not a virtue. Stability, ecosystem maturity, and team capacity matter more.
-- **Does not skip research.** Even if you "know" Next.js 16 is stable, verify before recommending. The penalty for outdated info in architecture is much higher than for outdated info in code.
-- **Does not produce single-paragraph "architectures".** If the user wants a one-liner, ask them what decision they're actually making and produce the right artifact for that decision.
-- **Does not pretend AI is a separate concern.** AI is a layer of the architecture, not an appendix. Treat MCP, autonomy tiers, evals, and observability for LLM calls as first-class concerns whenever the system uses LLMs.
-
-## Reference files (when to load)
-
-Load only what's needed for the current task. Do not pre-load all references.
-
-| File | Load when |
+| Resource | Load when |
 |---|---|
-| `references/01-solution-archetypes.md` | Always (Step 2) |
-| `references/02-stack-matrix-2026.md` | Stack picks, when validating recommendations |
-| `references/03-decision-frameworks.md` | Whenever writing ADRs or trade-off matrices |
-| `references/04-ai-native-patterns.md` | System has any LLM, agent, or AI feature |
-| `references/05-data-architecture.md` | OLTP/OLAP design, pipelines, vector stores |
-| `references/06-multi-tenancy.md` | Multi-tenant SaaS or platform |
-| `references/07-security-compliance.md` | Always for Step 6 self-critique; deeper load when handling PII or regulated data |
-| `references/08-observability.md` | Always at Step 5; deeper load when system has agents or distributed services |
-| `references/09-cost-modeling.md` | When user asks for cost estimate, or scale > 10k users |
-| `references/10-cognitive-debt.md` | Always at Step 6 self-critique |
-| `references/11-migration-evolution.md` | Migration mode |
-| `references/12-research-protocol.md` | Always (Step 3) |
+| `references/02-stack-matrix-2026.md` | Generating options only; revalidate every concrete choice |
+| `references/04-ai-native-patterns.md` | Quick AI pattern selection; use reference 16 for assurance |
+| `references/07-security-compliance.md` | Threat, privacy, identity, regulated-data, or assurance work |
+| `references/08-observability.md` | Signals, SLOs, telemetry, incidents, or distributed/AI runtime |
+| `references/09-cost-modeling.md` | Cost, unit economics, or scale-sensitive decisions |
+| `references/10-cognitive-debt.md` | Ownership, maintainability, generated code, or self-critique |
+| `references/11-migration-evolution.md` | Migration, coexistence, cutover, rollback, or decommissioning |
+| `references/12-research-protocol.md` | Always for temporally unstable claims |
+| `references/13-architecture-description-evolution.md` | Non-trivial design, audit, viewpoints, quality, or governance |
+| `references/14-quality-reliability-platform.md` | Quality, cloud/platform, SRE, DR, FinOps, sustainability, supply chain |
+| `references/15-distributed-integration-contracts.md` | APIs, events, messaging, webhooks, distributed state, integration |
+| `references/16-agentic-systems-assurance.md` | Any AI, agent, MCP/A2A, eval, memory/RAG, or autonomy decision |
+| `references/17-source-governance-maintenance.md` | Maintaining, reviewing, or updating this skill |
 
-## Templates (when to use)
+Use templates as starting structures, not mandatory prose. Run the matching checklist before claiming design/build/launch readiness.
 
-| File | Used in |
-|---|---|
-| `templates/adr.md` | Every one-way decision |
-| `templates/architecture-spec.md` | New design mode, full document |
-| `templates/c4-mermaid.md` | C4 L1, L2, L3 diagrams |
-| `templates/tradeoff-matrix.md` | Inside ADRs and stack picks |
-| `templates/threat-model-stride.md` | Security review |
-| `templates/component-spec.md` | Handoff to implementation agents |
-| `templates/cost-estimate.md` | Cost modeling |
+## Efeonce and skill composition
 
-## Checklists (when to run)
+Within Greenhouse/Efeonce, load `efeonce-overlay/router.md`, then the domain skill and canonical documents selected by `AGENTS.md`. Use `greenhouse-task-planner` for canonical task creation rather than copying task templates into architecture outputs.
 
-| File | Run at |
-|---|---|
-| `checklists/pre-design.md` | Before Step 5 |
-| `checklists/pre-build.md` | Before handoff |
-| `checklists/pre-launch.md` | When user asks "are we ready for prod" |
-| `checklists/ai-feature.md` | Whenever the system has any LLM/agent feature |
-| `checklists/cognitive-debt.md` | Step 6 self-critique, always |
+Compose with specialized skills after deciding the architectural shape. In particular:
 
-## Efeonce overlay (opt-in)
+- hand Astro/static-site implementation to `astro` after boundaries and contracts are decided;
+- hand Efeonce Globe implementation to `greenhouse-globe` while preserving the sister-platform boundary;
+- hand UI, finance, payroll, legal, identity, cloud, data, growth, or release details to the routed specialist.
 
-If the user's context indicates Efeonce Group (Greenhouse, Kortex, Verk, IDD methodology, TASK system, ICO Engine, Nexa, etc.), activate the overlay in `efeonce-overlay/`. The overlay:
+If a specialist uncovers a new one-way decision, return to this workflow.
 
-- Reuses Efeonce conventions (domain-per-schema, `@/lib/db`, reuse-before-create, ICO Engine as sole metrics source, **Full API Parity + Nexa total operability + canonical consumers** — `efeonce-overlay/conventions.md` §13)
-- Defaults stack picks to Efeonce stack (Next.js 16/PostgreSQL/BigQuery/Vercel/Vertex AI for Greenhouse, Anthropic API for Kortex, etc.)
-- Outputs component specs in TASK_TEMPLATE_v2 format compatible with Claude Code and Codex agents
-- Maps the architecture work to IDD's Strategy phase
+## Maintain and validate the skill
 
-The overlay is **opt-in**, not default. Generic architecture work happens first; the overlay is applied last to localize outputs to Efeonce conventions. This prevents the skill from over-fitting recommendations to one organization's stack.
+Do not treat embedded dates, versions, products, laws, or prices as self-validating. Use `references/source-catalog.json` and run:
 
-When this skill runs inside the Greenhouse repo, `AGENTS.md`, `project_context.md`, `Handoff.md`, and the active task/process docs remain the operational source of truth. If an overlay reference conflicts with current repo instructions, follow the repo instructions and call out the drift.
+```bash
+python3 .codex/skills/software-architect-2026/scripts/validate_architecture_skill.py
+python3 /Users/jreye/.codex/skills/.system/skill-creator/scripts/quick_validate.py .codex/skills/software-architect-2026
+```
 
-### Greenhouse EPIC-026 transitional rule
+For substantive changes, execute the blind protocol under `evals/software-architect-2026/` against a frozen baseline. Do not approve a richer prompt that regresses safety, routing, proportionality, provenance, or context cost.
 
-Read `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md` before designing or reviewing new Greenhouse capabilities. New work stays in the current topology but is extraction-ready: domain primitive first, browser/server split, thin adapters, explicit build inputs and extraction blockers. Require the task's `## Modular Placement Contract`. A candidate home is metadata, not permission to create `apps/*`, `packages/*`, a service or a repository.
+## Boundaries
 
-## Tone and style
-
-Direct, decision-oriented, evidence-backed. Write the way a senior architect speaks in a design review: clear claims, named trade-offs, owned recommendations, explicit uncertainty when present.
-
-- Use Spanish LATAM with English code-switching when the user does (Efeonce default).
-- Use English when the user starts in English.
-- Avoid filler ("As an AI...", "I would suggest..."). Just say what you'd do.
-- Confidence labels are explicit: "high confidence", "medium confidence — verify pricing", "low confidence — research needed".
-- Cite sources when making claims about current 2026 reality.
-
-## What "good output" looks like
-
-A user reading the output should be able to:
-
-1. Implement the architecture without asking follow-up questions for 80% of the work.
-2. Defend the decisions in a design review with the trade-offs and alternatives written down.
-3. Know exactly which decisions to revisit when assumptions change (because reversibility and confidence are flagged).
-4. Spot the risks before they bite (because Step 6 surfaced them).
-5. Hand the spec to a coding agent and get a working slice without architecture rework.
-
-If the output doesn't meet that bar, iterate before delivering.
+- Do not implement production code unless the user separately authorizes implementation and the repository workflow allows it.
+- Do not equate a diagram with an architecture or a code change with operational readiness.
+- Do not recommend novelty, microservices, Kubernetes, event sourcing, AI agents, MCP, multi-region, or polyglot persistence without evidence that their benefits exceed their operating cost.
+- Do not claim legal compliance, certification, standards conformance, recovery proof, or production readiness from design intent alone.
+- Do not capture private chain-of-thought; record observable decisions, evidence, policy outcomes, actions, and results.

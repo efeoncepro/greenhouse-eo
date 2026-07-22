@@ -2,11 +2,15 @@
 
 This reference is loaded in **migration mode** (the user wants to move from system X to system Y) or whenever a design must accommodate evolution from a current state to a target state. Migrations are the most under-architected work in software — they get squeezed because they're not new features, but they fail loudly when done badly.
 
-The 2026 reality: most teams are doing some flavor of migration most of the time. Cloud platforms shift, frameworks deprecate, AI capabilities reshape what's possible. The skill needed isn't "execute one migration" — it's "design for continuous evolution."
+Treat migration as continuous system evolution: platforms shift, dependencies deprecate, constraints change, and old/new states often coexist longer than planned.
+
+## Contents
+
+Incremental principle; strangler; branch by abstraction; dual write/read; feature flags; schema/cloud/framework/AI migrations; rewrite trap; sequencing; rollback; communication; architecture output.
 
 ## The principle: incremental over big-bang
 
-A 2026 architect almost never recommends a big-bang rewrite. The reasons:
+Prefer incremental migration unless a documented constraint makes coexistence riskier than replacement. Common reasons:
 
 - The old system has knowledge encoded in it (edge cases, regulatory quirks, performance optimizations) that takes years to rediscover
 - Big-bang migrations under-deliver: 50% of features in 200% of time is the optimistic case

@@ -1,7 +1,7 @@
 interface:
-  display_name: "Software Architect 2026"
-  short_description: "Design, audit, migrate, and document modern software architecture decisions."
-  default_prompt: "Use $software-architect-2026 to evaluate this architecture decision, validate current assumptions, surface risks, and produce ADRs or implementation-ready specs."
+  display_name: "Software Architect"
+  short_description: "Design and assure evidence-based, evolvable software architecture."
+  default_prompt: "Use $software-architect-2026 to frame stakeholder concerns, validate current evidence, compare architectural options, define measurable quality and operational contracts, and produce proportional decision-ready artifacts."
 
 policy:
   allow_implicit_invocation: true

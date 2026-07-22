@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-22 — Skill de arquitectura gobernada y evaluable
+
+- `software-architect-2026` conserva su identificador por compatibilidad, pero adopta un método year-neutral y
+  progresivamente revelado: concerns, quality scenarios, vistas, contratos distribuidos, fitness functions,
+  operabilidad y assurance de sistemas agentic.
+- Se reemplazan defaults volátiles por resolución basada en evidencia, catálogo de fuentes con fechas de revisión,
+  validator local y un harness externo de 16 escenarios/64 criterios para regresión ciega. La skill de Claude no
+  se modifica y mantiene governance independiente.
+- Canon: [`GREENHOUSE_SOFTWARE_ARCHITECT_SKILL_GOVERNANCE_V1.md`](docs/architecture/GREENHOUSE_SOFTWARE_ARCHITECT_SKILL_GOVERNANCE_V1.md).
+
 ## 2026-07-22 — Efeonce Embed Runtime formalizado como programa portable (EPIC-035)
 
 - Forms, CTAs y Meetings dejan de tratarse como tres problemas de publicación separados: el ADR y la arquitectura
@@ -793,13 +803,3 @@
   Efeonce ni default para RevOps, CRM o futuros artículos.
 - La portada ANAM V6 quedó registrada con source, master, derivados, crop y auditoría; después fue seleccionada
   e integrada en la publicación con QA live.
-
-## 2026-07-17 — ANAM: gobierno de pipelines Growth y Renovación
-
-- En el portal ANAM `19893546`, Deal ahora exige Company al crear y ya no recibe fecha de cierre automática a
-  60 días. Growth sólo se crea ordinariamente en `Potencial 10%`; las etapas posteriores exigen `Paso siguiente`,
-  datos quote-to-award y motivo de cierre según corresponda. `Radar 0%` y sus diez Deals permanecieron intactos.
-- Renovación conservó IDs/probabilidades y adoptó siete etapas semánticas desde `Por revisar` hasta los resultados
-  `Renovado`, `No renovado` y `No aplica / Desestimado`; creación y requiredness quedaron gobernados sin mover
-  registros históricos. Las ocho tareas de acompañamiento por entrada futura a etapa siguen diseñadas pero no
-  publicadas, evitando una ola retrospectiva sin contrato de owner/vencimiento/notificación.

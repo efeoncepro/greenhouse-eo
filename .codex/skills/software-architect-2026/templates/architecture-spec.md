@@ -1,6 +1,6 @@
 # Architecture Spec: [System name]
 
-> Master architectural document for a system. Used in **new design** mode. Lives in the repo at `docs/architecture/architecture.md` (or per-system at `docs/architecture/<system>.md`). Updated as the architecture evolves; changes should be reflected in new ADRs as well.
+> Decision-oriented architecture description for a system or bounded change. Used in **new design** mode and adapted proportionally. Store it in the repository's canonical architecture location; link to source artifacts rather than forcing one “master document.” Material decision changes require the repository's ADR/change-governance process.
 
 ## Metadata
 
@@ -10,6 +10,12 @@
 - **Last updated**: YYYY-MM-DD
 - **Version**: vX.Y (bump on substantive updates)
 - **Related ADRs**: link to the ADR log
+- **Entity of interest / scope**: [system, product, enterprise, or bounded change]
+- **Architecture owner**: [accountable person/team]
+- **Operational owners**: [teams]
+- **Decision authority / approvers**: [roles]
+- **Validated as of**: YYYY-MM-DD
+- **Review triggers**: [events that require reassessment]
 
 ## 1. Problem statement
 
@@ -36,6 +42,20 @@
 - **Secondaries**: [archetype #M — name], [archetype #K — name]
 - **Why this classification**: [brief rationale]
 
+## 3A. Stakeholders, concerns, and architecture drivers
+
+> Use the [stakeholder and concern register](./stakeholder-concern-register.md) for the full register. Keep only the load-bearing summary here.
+
+| Stakeholder / role | Decision rights | Critical concerns | Addressed by |
+|---|---|---|---|
+| [role] | [approve/advise/operate/affected] | [CON-IDs] | [view/ADR/QS/link] |
+
+### Ranked architecture drivers
+
+1. [business outcome, constraint, or QS/CON ID]
+2. [driver]
+3. [driver]
+
 ## 4. Constraints
 
 ### Hard constraints (cannot violate)
@@ -57,19 +77,35 @@
 - **Geographic distribution**: [single region / multi-region / global]
 - **Growth rate assumed**: [% per quarter]
 
+## 5A. Quality goals, scenarios, and ASRs
+
+> Use the [quality-scenarios template](./quality-scenarios.md). “Scalable”, “secure”, or “available” without a workload, environment, threshold, window, and measurement source is not decision-grade.
+
+| ID | Quality scenario / ASR | Measure | Architecture impact | Evidence / owner | Review trigger |
+|---|---|---|---|---|---|
+| QS-001 | [usage/change/failure/attack scenario] | [threshold + window] | [tactic/boundary/ADR] | [test/query/drill; team] | [event] |
+
 ## 6. Architecture (high level)
 
-### 6.1 Context diagram (C4 Level 1)
+### 6.0 Viewpoint selection
 
-> One diagram showing the system in its environment: who uses it, what external systems it interacts with. See `templates/c4-mermaid.md`.
+> Select views from stakeholder concerns; do not generate every C4 level by habit. See [Architecture Description and Evolution](../references/13-architecture-description-evolution.md) and the [C4/Mermaid template](./c4-mermaid.md).
+
+| Viewpoint / view | Audience | Concern IDs | Model kind / analysis | Owner | Status / known gaps | Review trigger |
+|---|---|---|---|---|---|---|
+| [name] | [roles] | CON-001 | [C4/sequence/table + method] | [team] | [current/gap] | [event] |
+
+### 6.1 Context diagram (C4 Level 1, when selected)
+
+> When this viewpoint addresses a registered concern, show the system in its environment: who uses it and which external systems it interacts with. See the [C4/Mermaid template](./c4-mermaid.md).
 
 ```mermaid
 [Mermaid C4 Level 1 here]
 ```
 
-### 6.2 Container diagram (C4 Level 2)
+### 6.2 Container diagram (C4 Level 2, when selected)
 
-> One diagram showing the major components inside the system and how they communicate.
+> When selected, show the major applications/data stores inside the system boundary and how they communicate.
 
 ```mermaid
 [Mermaid C4 Level 2 here]
@@ -77,7 +113,19 @@
 
 ### 6.3 Component diagram (C4 Level 3) — for the most complex containers only
 
-> Optional. Include only for the 1-2 containers complex enough to warrant decomposition.
+> Optional. Include only for containers whose internal decomposition answers a material concern.
+
+### 6.4 Runtime, deployment, information, and other selected views
+
+> Add only views that address registered concerns: critical sequences/failure paths, runtime topology/recovery, data flow/lineage, security/trust boundaries, cost, or evolution.
+
+### 6.5 Correspondence and consistency
+
+| From element / view | Relationship | To element / view | Consistency rule | Verification | Owner |
+|---|---|---|---|---|---|
+| [container] | deployed as | [runtime target] | [expected mapping] | automated / manual / unverified | [team] |
+
+> At minimum reconcile deployables, data flows, public interfaces, ownership, critical scenarios/tactics, and accepted ADRs across views. Record known contradictions as open issues.
 
 ## 7. Stack and infrastructure
 
@@ -85,8 +133,8 @@
 
 | Layer | Choice | Rationale (link to ADR) |
 |---|---|---|
-| Language / runtime | [e.g., TypeScript / Node 22] | ADR-NNNN |
-| Frontend framework | [e.g., Next.js 16] | ADR-NNNN |
+| Language / runtime | [verified supported runtime] | ADR-NNNN |
+| Frontend framework | [verified supported option] | ADR-NNNN |
 | Backend framework | [e.g., Next.js API routes / Hono] | ADR-NNNN |
 | OLTP database | [e.g., PostgreSQL 16] | ADR-NNNN |
 | OLAP database | [e.g., BigQuery] | ADR-NNNN |
@@ -95,7 +143,7 @@
 | Observability | [OTel + backend] | ADR-NNNN |
 | AI provider(s) | [if applicable] | ADR-NNNN |
 
-> All stack choices linked to their ADRs. Validated dates on each ADR.
+> Link architecturally significant choices to ADRs. Routine, reversible implementation choices may link to lighter evidence instead. Date any claim that depends on changeable external facts.
 
 ### 7.2 External dependencies
 
@@ -207,6 +255,14 @@ For each AI-powered workflow:
 ### Regional / compliance gaps
 [Especially LATAM if applicable: Ley 21.719 Chile, LGPD Brasil]
 
+## 14A. Socio-technical ownership
+
+| Boundary / capability | Accountable team | Lifecycle responsibilities | Dependencies / interaction mode | Cognitive-load or handoff risk | Change signal |
+|---|---|---|---|---|---|
+| [boundary] | [team] | design / build / operate / secure / evolve / retire | collaboration / x-as-a-service / facilitating / other | [risk] | [signal to revisit boundary/topology] |
+
+> Treat Conway effects as evidence to examine. Do not infer that a deployable or team split is desirable without viable ownership, communication paths, and operational capacity.
+
 ## 15. Implementation plan
 
 > High-level phases. Detailed work breakdown lives in TASK docs (or equivalent), not here.
@@ -220,6 +276,22 @@ For each AI-powered workflow:
 - [Estimated time]
 
 ### Phase N
+
+## 15A. Evaluation, conformance, and evolution
+
+> Use the [fitness-functions template](./fitness-functions.md) for the portfolio. Connect critical scenarios and architecture rules to credible feedback.
+
+| Rule / scenario | Evaluation mechanism | Threshold / expected result | Cadence / gate | Owner | Failure action / exception expiry |
+|---|---|---|---|---|---|
+| [QS/ADR/correspondence] | [test/query/drill/review] | [measure] | [PR/deploy/runtime/date] | [team] | [block/alert/rollback/review] |
+
+### Change triggers and procedure
+
+- **Reconvene architecture review when**: [assumption, threshold, incident, regulation, vendor, ownership, repeated exception, or migration milestone]
+- **Who convenes / decides**: [owner and authority]
+- **Artifacts that must change together**: [views, ADRs, scenarios, contracts, runbooks]
+- **Baseline / target / transition / rollback states**: [links]
+- **Deprecation and retirement path**: [trigger, owner, evidence]
 
 ## 16. Open questions
 

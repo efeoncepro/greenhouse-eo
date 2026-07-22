@@ -2,7 +2,11 @@
 
 This protocol exists because architecture recommendations made from memory go stale fast. Versions change. Vendors raise prices. Frameworks deprecate features. A library that was healthy 12 months ago may have lost its maintainer. An LLM model that was state-of-the-art six months ago may now be more expensive than a better alternative.
 
-The protocol forces validation against current 2026 reality before claims enter the architecture spec. It is not optional. The cost of a wrong recommendation in code is one PR; the cost of a wrong recommendation in architecture is months.
+The protocol forces validation against current evidence before temporal claims enter an architecture artifact. It is not optional for facts that can change.
+
+## Contents
+
+Research triggers; source hierarchy; query patterns; archetype checks; evidence format; conflicting/insufficient evidence; research budget; maintenance of embedded knowledge.
 
 ## When to research
 
@@ -140,9 +144,9 @@ Different archetypes have different things that go stale. Use these checklists.
 
 Every claim that depends on current reality should have a source and a date. Use this format inside the artifact:
 
-> **Claim**: Next.js 16 is stable as of October 2025 with Turbopack as default bundler.
-> **Source**: nextjs.org/blog/next-16
-> **Validated**: 2026-05-08
+> **Claim**: Framework X release Y is supported for the intended production mode.
+> **Source**: official release/support documentation URL
+> **Validated**: YYYY-MM-DD
 
 For ADRs specifically, the **Validated as of** field captures the most recent validation date for the ADR's claims.
 

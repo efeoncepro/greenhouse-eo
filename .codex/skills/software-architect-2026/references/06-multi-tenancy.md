@@ -4,13 +4,17 @@ This reference is loaded when the system serves multiple customer organizations 
 
 The core decision: how isolated do tenants need to be from each other, and at what cost?
 
+## Contents
+
+Isolation patterns; tier evolution; tenant context; database enforcement; noisy neighbors; lifecycle; migration; audit; anti-patterns; architecture output.
+
 ## The three patterns
 
 | Pattern | Isolation | Cost | Operational complexity | When to choose |
 |---|---|---|---|---|
-| **Pool (shared schema)** | Weakest | Lowest | Lowest | Many small tenants, low compliance requirements, cost-sensitive |
-| **Bridge (schema-per-tenant)** | Medium | Medium | Medium | Mid-market customers with moderate compliance |
-| **Silo (database-per-tenant)** | Strongest | Highest | Highest | Enterprise customers, strict regulatory requirements |
+| **Pool (shared substrate)** | Logical controls within shared infrastructure | Usually lower | Usually lower | Workloads whose isolation scenarios are satisfied by shared controls |
+| **Bridge / stamp** | Dedicated partitions or deployment stamps | Medium | Medium | Tiered isolation, regional placement, or bounded failure domains |
+| **Silo** | Dedicated serving/data plane | Usually higher | Usually higher | Contractual or threat-model requirements that shared controls cannot satisfy |
 
 ### Pool: shared schema with tenant_id
 
@@ -26,8 +30,6 @@ All tenants share the same tables. A `tenant_id` (or `organization_id`, `space_i
 - Noisy-neighbor risk: one tenant's query can degrade others
 - Schema changes affect everyone; you can't have one tenant on a slightly different version
 - Tenant-level encryption is hard; everything shares the same encryption key
-
-**Real-world**: most B2B SaaS at <5k tenants is pool. HubSpot, Slack at moderate scale, most consumer-facing SaaS use pool.
 
 ### Bridge: schema-per-tenant
 
@@ -45,8 +47,6 @@ Each tenant has its own PostgreSQL schema (or MySQL database) inside a shared da
 - Still shares the database engine; tenant load can affect others
 - Cross-tenant queries (admin views, billing) require joins across schemas
 
-**Real-world**: mid-market B2B SaaS where ~100-500 tenants is the order of magnitude. Many vertical SaaS use this pattern.
-
 ### Silo: database-per-tenant
 
 Each tenant has its own database (or its own database server). Hard isolation at the engine level.
@@ -63,9 +63,7 @@ Each tenant has its own database (or its own database server). Hard isolation at
 - Onboarding a new tenant requires database provisioning (slow, complex)
 - Cross-tenant analytics requires aggregating from N databases
 
-**Real-world**: enterprise SaaS with strict compliance (SOC 2 Type II, HIPAA, FINRA), or vertical SaaS where each customer is a large account.
-
-## The tiered pattern (the 2026 maturity)
+## Tiered isolation
 
 In practice, scaled SaaS platforms use **tiered isolation**: pool for the majority, bridge or silo for enterprise tenants who pay more and demand more isolation.
 
@@ -74,9 +72,9 @@ In practice, scaled SaaS platforms use **tiered isolation**: pool for the majori
 | Free / Basic | Pool | Lowest cost; tenant accepts shared infra |
 | Professional / Growth | Pool with stricter quotas | Same infra; better resource isolation |
 | Enterprise | Bridge or Silo | Higher price tier; tenant gets isolation |
-| Regulated industries | Silo (often per region) | Highest price; data residency guarantees |
+| Contract-specific | Pattern proven by the threat model and contract | Isolation and residency evidence match the obligation |
 
-**Critical**: design the tier-graduation path from day one. Migrating a customer from pool to silo is a 1-2 month project per tenant if you didn't design for it.
+**Critical**: design the tier-graduation path before selling a tier that requires it. Migration effort must be estimated from representative data, dependencies, and recovery tests rather than a generic duration.
 
 The architectural pattern that enables tier-graduation:
 
@@ -98,7 +96,7 @@ The tenant_id is a claim in the JWT issued at login. Every request has the JWT i
 1. Sets it on a request-local context object, OR
 2. Sets a session variable in Postgres for RLS to use
 
-This is the default for most modern B2B SaaS.
+Treat a tenant claim as untrusted input until the server validates issuer, audience, session, membership, expiry, and the requested tenant context. A claim is not the authorization decision by itself.
 
 **JWT structure**:
 ```json
@@ -122,31 +120,18 @@ Combines with JWT — JWT has the user; URL has the tenant; middleware verifies 
 
 Web app tracks tenant context in the session cookie. Common in single-page apps with traditional session auth.
 
-## Postgres Row-Level Security (RLS): the safety net
+## Database enforcement
 
-RLS is the database-level enforcement that no row leaks across tenants. The pattern:
+Use database-level isolation such as row-level security when it matches the verified access model and the team can prove its session/transaction semantics. Do not invent a session variable, bypass role, or policy name from this reference.
 
-```sql
--- Enable RLS on every tenant-scoped table
-ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+For any chosen mechanism verify:
 
--- Define a policy that filters by current tenant
-CREATE POLICY tenant_isolation ON orders
-  FOR ALL
-  USING (tenant_id = current_setting('app.current_tenant')::uuid);
-
--- Application sets the session variable per request
-SET app.current_tenant = 'tenant-uuid-here';
-```
-
-**Critical gotchas**:
-- Enabling RLS without creating policies **silently blocks all rows** (everyone sees nothing)
-- Policies must be enabled for every role that queries the table (including the application's role)
-- The `BYPASSRLS` attribute on a role disables RLS — admin/migration roles that have this can leak across tenants
-- `current_setting` returns empty string if unset; cast to UUID will fail (good — fail closed)
-- Test with a non-superuser role; superuser bypasses RLS by default
-
-**Best practice**: every tenant-scoped table has RLS enabled with a policy. The application sets `app.current_tenant` on every transaction. Migrations run as a role with `BYPASSRLS`. Every other operational role has RLS active.
+- tenant context is derived from trusted server-side membership/authorization;
+- missing, invalid, or stale context fails closed;
+- connection pooling cannot leak session state between requests;
+- owners, administrative roles, migrations, replicas, and maintenance paths have explicit behavior;
+- cross-tenant support/reporting paths use separate capabilities and audit;
+- tests run with the actual non-superuser/non-owner role and transaction model.
 
 **Test for tenant leakage** in CI:
 - Create two test tenants
@@ -221,7 +206,7 @@ Pattern: a single `audit_log` table with RLS policies. Or a separate audit DB if
 ## Common multi-tenant anti-patterns
 
 - **Trusting application-layer filtering only** — works until a developer forgets a `WHERE` clause. Use RLS as a backstop.
-- **Assuming tenant_id is always present** — middleware bug = no tenant context = `current_setting` returns empty = some queries return ALL tenants. Test for this.
+- **Assuming tenant context is always present** — missing or stale context must fail closed at every serving substrate and be covered by negative tests.
 - **Cross-tenant features built quickly without thinking** — admin views, "all-tenant" reports, support tooling. These often need to bypass RLS, which means they need their own audit and access controls.
 - **Migrating one tenant breaks others** — schema migration on a single tenant in bridge/silo accidentally runs against shared resources.
 - **Pricing tiers don't match the architecture** — the marketing team sells "dedicated infrastructure" while the architecture is pool with quotas.
@@ -236,9 +221,12 @@ When designing a multi-tenant system, the spec must answer:
 - [ ] **Tenancy pattern**: pool / bridge / silo / tiered
 - [ ] **If tiered**: what tier corresponds to what isolation, and what are the graduation triggers?
 - [ ] **Tenant context propagation**: JWT claims, URL routing, middleware contract
-- [ ] **Database-level isolation**: RLS policies (even when the app filters); coverage tested
+- [ ] **Database-level isolation**: verified mechanism and negative coverage; RLS only when the domain access model selects it
 - [ ] **Noisy-neighbor controls**: rate limits, query timeouts, connection pool quotas
-- [ ] **Per-tenant observability**: tenant_id propagated to OTel via baggage; per-tenant dashboards
+- [ ] **Per-tenant observability**: opaque, minimized, allowlisted correlation; no PII or authorization via OTel Baggage; cardinality/privacy tested
+- [ ] **Substrate isolation matrix**: compute, database, cache, object store, search/vector, queues/jobs, telemetry, and AI context
+- [ ] **Identity model**: multi-membership, role/entitlement lifecycle, revocation, and service/agent principals
+- [ ] **Recovery/export/delete**: tenant-scoped proof, dependency order, and audit
 - [ ] **Onboarding flow**: who triggers it, what happens, recovery from failure
 - [ ] **Suspension and deletion policies**: with retention requirements
 - [ ] **Audit logging**: per-tenant, queryable, retained

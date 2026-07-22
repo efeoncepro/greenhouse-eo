@@ -13,6 +13,10 @@
 - Colas canónicas de trabajo: [tasks](docs/tasks/README.md), [epics](docs/epics/README.md),
   [mini-tasks](docs/mini-tasks/README.md) e [issues](docs/issues/README.md). La ventana de sesiones no reemplaza
   esos índices ni debe ocultar trabajo activo más antiguo.
+- La skill Codex `software-architect-2026` fue robustecida end-to-end el 2026-07-22: método year-neutral,
+  progressive disclosure, assurance agentic/distribuida, catálogo de fuentes, validator y evals ciegas. Canon:
+  `docs/architecture/GREENHOUSE_SOFTWARE_ARCHITECT_SKILL_GOVERNANCE_V1.md`. La skill Claude no fue modificada por
+  decisión explícita del operador.
 
 ## Riesgos abiertos
 

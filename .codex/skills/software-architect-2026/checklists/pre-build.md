@@ -1,119 +1,58 @@
-# Pre-Build Checklist
+# Pre-build gate
 
-> Run before handing off the design to an implementation agent (Claude Code, Codex) or to engineers. The goal: ensure the design is precise enough to be implemented without re-design, and that the implementer has what they need.
+Run before handing architecture to implementers. Apply each relevant item as `pass | gap | deferred | N/A` with evidence. The design is implementable only when no build-blocking decision is delegated accidentally to the implementation team.
 
-## Architecture artifacts complete
+## 1. Shape and ownership — blocking
 
-- [ ] **Architecture spec** exists with the system's overall design (templates/architecture-spec.md)
-- [ ] **C4 L1 + L2 diagrams** present and current
-- [ ] **C4 L3 diagrams** for the 1-2 most complex containers (if needed)
-- [ ] **Sequence diagrams** for the 2-5 most critical flows
-- [ ] **Data model** documented: schemas, ownership, RLS policies for multi-tenant tables
-- [ ] **API surface** defined: endpoints, methods, auth, request/response shapes
+- [ ] Architecture/spec identifies scope, non-goals, current/target state, boundaries, sources of truth, and owners.
+- [ ] Critical flows have the smallest useful diagrams (context/container, sequence/state/data as applicable).
+- [ ] Major decisions have ADRs with alternatives, consequences, reversibility, confidence, validation date, and revisit triggers.
+- [ ] Each substantive component has purpose, inputs/outputs, behaviors, edge cases, NFRs, dependencies, and acceptance evidence.
+- [ ] Open questions have owner/date and cannot change the implementation shape after work starts.
+- [ ] Build order, blockers, migration sequencing, rollout units, and rollback boundaries are explicit.
 
-## Decisions documented
+## 2. Contracts and data — blocking when applicable
 
-- [ ] **All major decisions captured as ADRs** with confidence and reversibility levels
-- [ ] **Stack choices linked to ADRs** in the architecture spec
-- [ ] **Trade-off matrices** included for the non-obvious choices
-- [ ] **Open questions list** explicit; each has an owner and target resolution date
+- [ ] API/event/webhook/data contracts define schemas, examples, security, versioning, compatibility, and deprecation.
+- [ ] Consistency, transaction, concurrency, timeout, retry, idempotency, deduplication, ordering, replay, and uncertain-outcome semantics are explicit.
+- [ ] Data ownership, model, migrations, backfill, validation, retention, deletion, and reconciliation are specified.
+- [ ] Tenant scope and isolation cover storage, cache, queue, object, index, telemetry, admin, replay, and export paths.
+- [ ] Contract tests and fixtures include duplicates, delay, reordering, malformed/unauthorized input, version skew, and dependency failure where relevant.
+- [ ] Use `templates/distributed-contract.md` for every material distributed boundary.
 
-## Component specs
+## 3. Security and supply chain — proportional blocking
 
-- [ ] **One spec per substantive component** to be built
-- [ ] **Each spec covers**: purpose, scope/non-goals, inputs/outputs, behavior, edge cases, data model, API surface, NFRs, observability, security, testing
-- [ ] **Edge cases enumerated** in each spec — not "TBD"
-- [ ] **Idempotency contracts** explicit for any component that can be retried
+- [ ] Threat model covers trust boundaries, abuse cases, authentication, authorization, least privilege, and audit.
+- [ ] Data classification drives encryption, secrets, logging/redaction, access, retention, residency, and vendor handling.
+- [ ] Emergency/support access is scoped, time-bounded, auditable, and revocable.
+- [ ] Dependency/SBOM, source/build provenance, artifact identity/signing/verification, vulnerability/license policy, and patch owner match the risk.
+- [ ] CI/CD identities, third-party build actions, registries, and deployment approvals have explicit trust and rollback controls.
 
-## Conventions and guardrails
+## 4. Quality, reliability, and operations — blocking for production paths
 
-- [ ] **Repo conventions documented** (CONSTITUTION or equivalent) and the agent will load them
-- [ ] **Naming conventions** clear (file structure, IDs, variable patterns)
-- [ ] **Error handling patterns** consistent and documented
-- [ ] **Test patterns** documented (unit, integration, E2E)
-- [ ] **Reuse-before-create reminders** explicit in the spec for shared concerns (DB layer, auth, caching)
+- [ ] Measurable quality scenarios and fitness functions cover critical correctness, latency, availability, durability, freshness, and accessibility needs.
+- [ ] SLOs, measurement points, error-budget policy, capacity assumptions, quotas, and overload behavior are specified.
+- [ ] Failure modes cover dependency loss/slowness, correlated failure, resource exhaustion, poison work, stale/partial data, and recovery.
+- [ ] RTO/RPO, backup/restore, restoration order, failover/failback, reconciliation, and exercise plan match criticality.
+- [ ] Deployment, progressive delivery if used, rollback/roll-forward, config/secret changes, runbooks, on-call/support, and incident ownership are defined.
+- [ ] `templates/operational-readiness.md` is complete for critical or externally operated workloads.
 
-## Security verified
+## 5. Observability, cost, and sustainability — proportional
 
-- [ ] **Threat model** done for new system or substantively changed feature
-- [ ] **AuthN/Z model** specified (RBAC scopes, tenant context, JWT structure)
-- [ ] **Data classification** applied: what's PII / restricted / confidential
-- [ ] **Encryption** specified at rest, in transit, field-level for restricted data
-- [ ] **Secrets management** specified — where they live, how rotated
-- [ ] **Audit logging** specified — what events, retention, access
-- [ ] **For AI features**: prompt injection mitigations, sandboxing, scope review
+- [ ] User-centered SLIs map to traces, metrics, logs, dashboards, alerts, owners, and runbooks.
+- [ ] Context propagation uses allowlisted opaque/non-PII values; Baggage is never authorization and is scrubbed at trust boundaries.
+- [ ] Telemetry access, redaction, sampling, cardinality, retention, deletion, residency, and cost budgets are specified.
+- [ ] Cost model includes useful unit, fixed/variable/step costs, allocation, budget/forecast, anomaly response, and exit costs.
+- [ ] Unnecessary compute/storage/transfer and idle environments are addressed; sustainability claims have boundary, metric, and uncertainty.
 
-## Multi-tenancy verified (if applicable)
+## 6. Implementer-ready verification — blocking
 
-- [ ] **Tenant context propagation** specified (middleware, JWT claims, baggage)
-- [ ] **RLS policies** specified for every tenant-scoped table
-- [ ] **Cross-tenant operations** identified (admin views, reports) with their own access controls
-- [ ] **Noisy-neighbor controls** specified (rate limits, query timeouts, pool quotas)
-- [ ] **Tier-graduation path** specified if tiered isolation
+- [ ] Repository/runtime conventions and reuse candidates are linked, not paraphrased from memory.
+- [ ] Acceptance criteria and test strategy cover unit, contract, integration, end-to-end, performance, recovery, security, accessibility, and operational evidence proportionally.
+- [ ] Environment, feature flag, migration, secret/config, dependency, worker/cron/webhook, and test-data prerequisites are explicit.
+- [ ] Each “done” claim distinguishes code complete, deployed, migrated, exercised, and live-verified.
+- [ ] Self-critique covers next scale, 36-month assumptions, cognitive debt, lock-in, blind spots, AI/regional gaps, and retirement.
 
-## Observability planned
+## Exit rule
 
-- [ ] **OTel instrumentation strategy** specified
-- [ ] **Tenant ID propagation** via baggage if multi-tenant
-- [ ] **SLOs** defined for critical endpoints / workflows
-- [ ] **Alert hierarchy** defined: pages vs tickets vs dashboards
-- [ ] **AI-specific observability** specified (Langfuse / LangSmith / equivalent)
-- [ ] **Cost observability** specified (per service, per tenant, per AI workflow)
-
-## Cost ceilings (if cost-significant)
-
-- [ ] **Estimated monthly cost** documented with assumptions
-- [ ] **Cost ceiling alerts** specified at thresholds (50%, 80%, 100%)
-- [ ] **Per-AI-workflow cost ceiling** with kill-switch behavior
-- [ ] **Validated-as-of** date on pricing assumptions
-
-## Migration plan (if applicable)
-
-- [ ] **Current state diagram** exists
-- [ ] **Target state diagram** exists
-- [ ] **Migration approach** specified (strangler / branch by abstraction / dual-write)
-- [ ] **Phase-by-phase rollback plan** for each step
-- [ ] **Verification criteria** per phase: what proves the new path works
-- [ ] **Communication plan** for affected users
-
-## Dependencies and sequencing
-
-- [ ] **Build order** specified: which components or migrations come first
-- [ ] **Blocking dependencies** identified (database migrations, infra setup, third-party integrations)
-- [ ] **Parallel work streams** identified where possible
-- [ ] **Critical path** clear
-
-## Implementation owner has what they need
-
-- [ ] **Clear acceptance criteria** per component (Given/When/Then if Efeonce-style)
-- [ ] **Scope explicitly bounded** — implementer doesn't need to make architectural decisions
-- [ ] **Test strategy** documented so implementer knows what proves "done"
-- [ ] **Rollout / deployment instructions** specified
-
-## Handoff communication
-
-- [ ] **Implementation agent or engineer briefed** on the spec
-- [ ] **Questions surfaced and answered** before implementation starts (or marked as `[NEEDS CLARIFICATION]`)
-- [ ] **Reviewers identified** for the implementation PR
-- [ ] **Architect available** for clarification during implementation (not "throw it over the wall")
-
-## Self-critique done (Step 6)
-
-- [ ] **Cognitive debt risk** assessed (per `references/10-cognitive-debt.md`)
-- [ ] **Reversibility** flagged for any one-way decisions
-- [ ] **Vendor lock-in** identified and acknowledged
-- [ ] **AI-specific risks** flagged (prompt injection, autonomy mismatch, cost runaway)
-- [ ] **Compliance gaps** flagged (especially LATAM if applicable)
-- [ ] **What breaks at next scale level** documented
-- [ ] **What breaks in 36 months** documented
-
----
-
-## What to do with unchecked items
-
-- **For Architecture artifacts / Component specs gaps**: the design isn't ready to hand off. Complete the spec.
-- **For Conventions gaps**: write them down before the agent starts. Agents follow conventions they see; if they don't see them, they invent.
-- **For Security / observability / cost gaps**: these should never be punted to implementation phase. The implementer will skip them. Get them in the spec.
-- **For Open questions** still open: don't pretend they're resolved. Mark `[NEEDS CLARIFICATION]` and resolve before implementation goes deep.
-
-A spec that fails this checklist will produce an implementation that requires re-work. Better to take an extra day completing the spec than to take an extra month re-implementing.
+Block handoff for unresolved source-of-truth, security/isolation, destructive migration, contract, irreversible decision, or production recovery gaps. Defer only bounded work that cannot invalidate the shape; record owner, date, trigger, and rollout restriction.

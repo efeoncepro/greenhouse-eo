@@ -72,7 +72,7 @@ For each category, list the relevant threats and mitigations. Skip categories th
 |---|---|---|
 | User denies destructive action | Audit log of every state-changing action with user, timestamp, before/after | |
 | Admin denies privileged action | Same audit log with elevated retention; separate audit DB if compliance requires | |
-| AI agent acts and humans can't reconstruct why | Structured trace per agent run; tool call log; reasoning chain captured in observability | |
+| AI agent acts and humans can't reconstruct the observable decision path | Trace run, authorized inputs, model/prompt/tool/policy versions, action intent, approval, tool result, external effect, and outcome; do not capture private chain-of-thought | |
 
 ### I — Information disclosure
 

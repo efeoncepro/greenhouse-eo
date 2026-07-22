@@ -1,12 +1,16 @@
 # Security and Compliance
 
-This reference is loaded for the Step 6 self-critique pass on every design, and deeper when handling PII, financial data, health data, or any regulated data. In 2026, security is non-negotiable; the new dimension is that AI agents have permission-hungry profiles and need defense-in-depth treatment.
+Load this reference for security self-critique and go deeper when handling personal, financial, health, regulated, or agent-accessible data. AI agents require the same identity and defense-in-depth discipline as other principals, plus controls for untrusted context and tool-mediated effects.
 
 The principle: **assume breach**. Design so that when (not if) something fails, the blast radius is bounded and the failure is observable.
 
-## The 2026 baseline (zero-trust applied)
+## Contents
 
-Tech Radar Vol 34 elevated zero-trust architecture from "consider" to "non-negotiable". The principles:
+Zero trust; authentication; authorization; secrets; data classification; encryption; compliance routing; STRIDE; AI security; supply chain; security observability; architecture output.
+
+## Zero-trust baseline
+
+Apply these principles proportionally to the threat model:
 
 1. **Never trust, always verify**: every request carries identity and is authorized at the boundary it crosses
 2. **Identity-based**: services and users have identities; trust flows from identity, not network position

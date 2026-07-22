@@ -3,13 +3,27 @@
 The C4 model has four levels:
 
 1. **Context (L1)**: the system in its environment — users, external systems
-2. **Container (L2)**: major components inside the system (deployable units)
-3. **Component (L3)**: pieces inside a container
+2. **Container (L2)**: major applications and data stores inside the system boundary
+3. **Component (L3)**: responsibilities and collaborators inside one container
 4. **Code (L4)**: classes / functions — usually skipped in architecture docs
 
-This skill uses **L1 always, L2 always, L3 selectively** (only for the most complex containers). L4 is generated from code, not designed.
+Select levels by stakeholder concerns and the decisions the diagram must support. L1 and L2 are common starting points, but neither is mandatory when it adds no decision value. Use L3 selectively; use L4 only when a code-level model answers a live concern, preferably deriving it from code.
 
-Mermaid is the default rendering — it lives in markdown, renders in GitHub / GitLab / VS Code preview / mkdocs, and is editable as text. No tool lock-in.
+Mermaid is the default text format when the target renderer supports the required syntax. C4 support varies by Mermaid version and host: verify rendering in the actual publication path and provide a `flowchart` fallback when needed.
+
+## Select diagrams by concerns
+
+| Concern / decision | Useful view or model | Usually unnecessary |
+|---|---|---|
+| Purpose, users, system boundary, external dependencies | C4 context | Component/code detail |
+| Deployable/data-store responsibilities and calls | C4 container | Every internal module |
+| Internal responsibility or dependency hotspot | C4 component for that container | Full-system L3 |
+| Critical interaction, state, concurrency, failure path | Sequence/dynamic/state | More static boxes |
+| Runtime placement, zones, scaling, recovery | Deployment view | Logical component detail |
+| Information movement, classification, lineage | Data-flow model | C4 alone |
+| Team ownership, handoffs, cognitive load | Ownership overlay/table | Inferring teams from boxes |
+
+Before drawing, record: **audience**, **concern IDs**, **decision supported**, **owner**, **validated date**, and **review trigger**. State what the diagram intentionally omits.
 
 ## Level 1: Context diagram
 
@@ -62,7 +76,7 @@ flowchart LR
 
 ## Level 2: Container diagram
 
-Shows: the major components inside the system. A container is anything that runs as its own process — frontend, backend, database, worker, scheduler.
+Shows: the major applications and data stores inside the system boundary. In C4, a container is a separately runnable/deployable unit or data store—not necessarily an operating-system process, Docker container, or “component.”
 
 ```mermaid
 C4Container
@@ -71,7 +85,7 @@ C4Container
     Person(user, "User", "")
 
     System_Boundary(system, "System Name") {
-        Container(web, "Web App", "Next.js 16, TypeScript", "Server-rendered UI; admin and user views")
+        Container(web, "Web App", "Verified web runtime", "Server-rendered UI; admin and user views")
         Container(api, "API", "Hono, TypeScript", "REST + MCP endpoints")
         Container(worker, "Background Worker", "Cloud Run", "Cron jobs, queue consumers")
         ContainerDb(db, "Postgres OLTP", "PostgreSQL 16 with RLS", "Operational data; multi-tenant")
@@ -97,7 +111,7 @@ C4Container
 - `ContainerQueue(id, ...)` — a queue or message broker
 - `System_Boundary(id, "label") { ... }` — groups containers within a system
 
-For systems too large for one diagram, split L2 by domain (e.g., one diagram per major bounded context).
+For systems too large for one diagram, use a landscape or split views by a concern-relevant scope. Preserve stable names and explicit cross-view links so the split does not hide dependencies.
 
 ## Level 3: Component diagram (selective use)
 
@@ -107,7 +121,7 @@ Use only for the 1-2 most complex containers — typically the API or the core s
 C4Component
     title Component Diagram - API Container
 
-    Container(web, "Web App", "Next.js 16")
+    Container(web, "Web App", "Verified web runtime")
 
     Container_Boundary(api, "API") {
         Component(auth, "Auth Middleware", "JWT verification, tenant context propagation")
@@ -189,7 +203,7 @@ Show how containers map to infrastructure.
 ```mermaid
 flowchart TB
     subgraph Vercel
-        web_prod[Web App<br/>Next.js 16]
+        web_prod[Web App<br/>verified web runtime]
     end
 
     subgraph GCP
@@ -216,13 +230,35 @@ flowchart TB
     worker --> bq
 ```
 
+## View metadata and correspondence
+
+Add this compact header beside every durable diagram:
+
+```markdown
+- Viewpoint / model kind: [e.g. deployment / Mermaid flowchart]
+- Audience and concerns: [roles; CON-001, QS-002]
+- Scope and omissions: [boundary; intentional omissions]
+- Owner / validated: [team; YYYY-MM-DD]
+- Sources: [code, IaC, runtime inventory, ADRs]
+- Review trigger: [boundary, deployable, ownership, or topology change]
+```
+
+For load-bearing relationships, keep a correspondence table:
+
+| From element | Relationship | To element | Rule / expected consistency | Verification | Owner |
+|---|---|---|---|---|---|
+| [container] | deployed as | [runtime node] | exactly one active target per environment | [IaC query/manual] | [team] |
+
+Map every deployable to an operational owner. Map every critical external relationship to a protocol/contract, trust classification, failure policy, and observable signal. Record known inconsistencies instead of silently reconciling diagrams.
+
 ## Skill behavior with C4 diagrams
 
 When generating C4 diagrams:
 
-1. **Always produce L1 and L2** for new design mode. L1 shows context; L2 shows the system internals.
-2. **Use L3 sparingly** — only for the 1-2 most complex containers. Most systems don't need L3 in the spec.
-3. **Use sequence diagrams** for the 2-5 most critical user-facing flows. They explain what static C4 can't.
-4. **Use Mermaid by default**: it lives in the repo, renders in most tools, and is editable as text. Only suggest external tools (Structurizr, Lucidchart, draw.io) if the user explicitly asks for richer fidelity.
-5. **Keep diagrams legible**: ~7-10 elements per diagram is the upper bound. More than that and you should split.
-6. **Update diagrams as the architecture changes**: stale diagrams are worse than no diagrams. Treat them as living documentation, version-controlled with the code.
+1. **Select views from registered concerns.** Explain why each diagram exists and which audience/decision it serves.
+2. **Use L1 and L2 when they add value.** They are sufficient for many systems, not compulsory for every scoped decision.
+3. **Use L3 sparingly** — only where internal decomposition answers a material concern. Most systems do not need full L3 coverage.
+4. **Use dynamic models selectively** for critical flows, including failure, recovery, and trust-boundary paths—not an arbitrary count of user-facing sequences.
+5. **Verify notation and rendering.** Include title, scope, element types, labeled relationships, direction, protocol where relevant, and a legend for non-obvious notation.
+6. **Optimize legibility for the audience.** Split when density or mixed abstraction obscures the concern; do not enforce a universal element count.
+7. **Govern durable diagrams.** Name sources, owner, correspondence checks, validated date, and change triggers. A stale diagram is a known issue to resolve or retire, not evidence.
