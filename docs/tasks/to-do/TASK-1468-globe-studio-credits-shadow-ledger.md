@@ -35,7 +35,7 @@ Lab) ≠ `estimateCredits`/`getCreditEstimate` (credits) — son capabilities de
 - Status real: `Diseño gobernado; implementación pendiente`
 - Rank: `TBD`
 - Domain: `finance|creative|data`
-- Blocked by: `TASK-1481, TASK-1465, TASK-1466`
+- Blocked by: `none`
 - Branch: `task/TASK-1468-globe-studio-credits-shadow-ledger`
 - Legacy ID: `none`
 - GitHub Issue: `none`

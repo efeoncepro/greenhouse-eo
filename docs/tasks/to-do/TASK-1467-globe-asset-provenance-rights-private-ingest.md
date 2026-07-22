@@ -39,7 +39,7 @@ Follow-up concreto heredado: la runtime SA necesita `storage.objectCreator` sobr
 - Status real: `Diseño gobernado; implementación pendiente`
 - Rank: `TBD`
 - Domain: `creative|legal|storage`
-- Blocked by: `TASK-1464, TASK-1465`
+- Blocked by: `none`
 - Branch: `task/TASK-1467-globe-asset-provenance-rights-private-ingest`
 - Legacy ID: `none`
 - GitHub Issue: `none`
