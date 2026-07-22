@@ -20,7 +20,7 @@ comercial** (ver §Camino comercial abajo).
 | Negativo 1 | experimento cross-workspace → `not_found` |
 | Negativo 2 (preciso) | hash **que sí está en el bucket** y que el workspace declaró como **input** → `not_found`, con control: el output propio del mismo experimento **sí** se sirve |
 | Negativo 3 | grant manipulado → `403 access_denied`; sin auth → `403` |
-| Grant temporal (2 ventanas) | `tokenCreator` sobre `greenhouse-globe-caller@`: 08:44:19Z→**08:50:56Z** (canario) y 08:55:14Z→**08:57:32Z** (verificación post-cleanup). Cortes verificados 08:52:01Z y 08:59:00Z; policy final = sólo `workloadIdentityUser` de Vercel |
+| Grant temporal (3 ventanas) | `tokenCreator` sobre `greenhouse-globe-caller@`: 08:44:19→**08:50:56Z** (canario), 08:55:14→**08:57:32Z** (post-cleanup) y 09:41:21→**09:43:04Z** (revisión de CI). Cortes verificados 08:52:01Z, 08:59:00Z y 09:43:59Z; policy final = sólo `workloadIdentityUser` de Vercel |
 | Anti-drift final | `tofu plan` **sin `terraform.tfvars`** → No changes (el estado del flag vive en git) |
 
 ### Post-cleanup — la capacidad queda ACTIVA (verificado 08:56Z, 7/7)
@@ -38,6 +38,23 @@ el runtime disponible. Verificado con el grant temporal ya revocado y reabierto 
 - Anotaciones legibles por el contrato **y** presentes en Cloud SQL (1 favorite + 1 referencia
   `derived-internal`/`internal-owned`), o sea sobrevivieron al cierre de la ventana.
 - Perímetro intacto: anónimo → `403`.
+
+### Reposición por CI (2026-07-22 09:35Z) — procedencia auditable
+
+El rollout se ejecutó con Cloud Build + `run deploy --image` desde la máquina del operador, porque el
+token de `gh` estaba inválido y re-autenticar es interactivo. Recuperado el token, se repuso la imagen
+por el camino sancionado (`deploy-internal.yml`, OIDC→WIF→`globe-deployer`, checkout limpio de `main`):
+
+- Run `29908442357` **success** → revisión **`globe-api-internal-00017-xfm`** con
+  `globe-api-internal:b12451db2d6e`.
+- **Mismo binario:** el único diff entre `99d7b69` y `b12451d` son 3 archivos de `infra/terraform/`, y
+  el Dockerfile no copia `infra/`. Distinto tag, contenido de app idéntico.
+- **El workflow escribió sólo la imagen:** la revisión conserva `api_runtime`, concurrency 20 y
+  **maxScale 3** — el drift-trap que cerró `TASK-1508` (el workflow viejo reseteaba el techo a 1) sigue
+  cerrado. `tofu plan` → **No changes**.
+- Flag y secret ref intactos; la revisión alcanzó `Ready`, lo que prueba que el secret ref resolvió.
+- **Retrieval gobernado re-verificado contra `00017-xfm`: 7/7**, con bytes reales (820.868 B) y la
+  invariante cross-workspace viva. Gasto cero (pieza preexistente).
 
 Experimentos del canario: `b8df1277…` (generate, 10 créditos) y `d4c94d16…` (reference-conditioned,
 10 créditos) — 20 créditos reales contra un cap diario de 200.

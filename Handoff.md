@@ -35,11 +35,14 @@
   `globe-api-internal` rev `00016-8dr`: `GLOBE_PRODUCER_ASSETS_ENABLED=true`, secreto
   `globe-producer-grant-secret` v1 activo, migración `0003` aplicada, todo gobernado en Terraform (el
   flag vive en el default de la variable, **en git**; verificado planeando sin `terraform.tfvars`).
+  La imagen viva se repuso por el workflow sancionado (`deploy-internal.yml` run `29908442357`, rev
+  **`00017-xfm`**, `:b12451db2d6e`) tras recuperarse el token de `gh`: procedencia CI keyless, mismo
+  binario, `maxScale 3` conservado y `tofu plan` en No changes.
   Canario 14/14 con bytes reales servidos + los tres negativos, más el negativo private-ingest en su
   forma **precisa** (hash que sí está en el bucket, declarado como input de otra corrida ⇒ `not_found`,
-  con control de que el output propio de esa corrida sí se sirve). Post-cleanup 7/7. La impersonación
-  del canario se otorgó y revocó en dos ventanas acotadas; policy final de `greenhouse-globe-caller@`
-  = sólo `workloadIdentityUser` de Vercel. Gasto: 20 créditos contra un cap de 200.
+  con control de que el output propio de esa corrida sí se sirve). Post-cleanup 7/7 y re-verificación 7/7 sobre la revisión de CI. La impersonación se otorgó y revocó
+  en tres ventanas acotadas, con corte verificado en cada una; policy final de
+  `greenhouse-globe-caller@` = sólo `workloadIdentityUser` de Vercel. Gasto: 20 créditos contra un cap de 200.
   **Quién la usa hoy:** el service principal por las vías internas. Una persona en el shell web todavía
   no — el broker no le otorga la capability y `ui`/`mcp` siguen `policy-blocked`: ese es el gate de
   `TASK-1505`. Runbook: `docs/manual-de-uso/creative-studio/operar-retrieval-assets-globe.md`.
