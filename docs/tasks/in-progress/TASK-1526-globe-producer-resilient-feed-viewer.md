@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -17,11 +17,11 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Ready to start; consume TASK-1525 complete runtime base and close approved UI/UX parity`
+- Status real: `Code complete local in efeonce-globe 2b7842c; rollout/smoke humano pendiente`
 - Rank: `TBD`
 - Domain: `creative|ui|reliability`
 - Blocked by: `none`
-- Branch: `task/TASK-1526-globe-producer-resilient-feed-viewer`
+- Branch: `develop` (operador pidió continuar sin branch nueva)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -230,6 +230,32 @@ Reglas obligatorias:
 - Quality threshold: `average >= 4.2; floor >= 3; fidelity/template resistance >= 4`
 
 <!-- ZONE 2 — PLAN MODE: se completa al tomar la task. -->
+
+## Active Execution Log
+
+### 2026-07-23 — Local implementation committed
+
+- Greenhouse lifecycle tomado en `develop` por instrucción del operador; sin branch nueva.
+- Subagentes autorizados por el operador; ejecución consolidada con ownership separado y revisión del agente raíz.
+- `efeonce-globe` commit: `2b7842c` (`fix(studio): harden producer feed previews`), pushed to `main`.
+- Implementado:
+  - active runs proyectados como cards inline `data-capture="producer-run-card"` sobre la card existente, sin la barra singleton `producer-state-generating`;
+  - preview boundary por card: placeholder local, cache/revocación por `(experimentId, sha256)`, error local y defensa contra `img` sin `src`;
+  - selección keyed sin `renderFeed(state.feed)`, sin reconstruir cards ni refetchear previews sanos;
+  - títulos con preferencia por `displayTitle` client-safe; viewer ya no usa UUID en el alt de imagen;
+  - tests source-level para bloquear regresiones de alt UUID, media boundary, selección sin rebuild y run card inline.
+- Validación local:
+  - `pnpm --filter @efeonce-globe/studio-web test -- --runInBand` → pass, 212 tests.
+  - `pnpm check` en `efeonce-globe` → pass.
+  - `pnpm build` en `efeonce-globe` → pass.
+  - `git diff --check` en `efeonce-globe` → pass.
+  - `pnpm task:lint --task TASK-1526` → pass.
+  - `pnpm ui:wireframe-check --task TASK-1526` → pass.
+  - `pnpm ui:flow-check --task TASK-1526` → pass.
+  - `pnpm ops:lint --changed` → pass.
+  - `pnpm docs:closure-check` → pass.
+- Pendiente para cerrar acceptance: deploy internal, CI verde, smoke humano same-tab con usuario CEO en Chrome existente,
+  imagen/video/audio visibles y reproducibles, descarga verificada sin disparos accidentales, desktop + 390 px / GVC.
 
 <!-- ZONE 3 — EXECUTION SPEC -->
 

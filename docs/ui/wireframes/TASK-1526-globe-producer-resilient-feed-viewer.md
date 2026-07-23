@@ -2,7 +2,8 @@
 
 ## Visual Direction Contract
 
-- Source duradero: surface `/producer` desplegada y visual source de `TASK-1505`.
+- Source duradero: surface `/producer` desplegada.
+- Fuente visual aprobada: `docs/ui/visual-sources/TASK-1505/approved-prototype.dc.html`.
 - Direction mode: `repo-native-benchmark`.
 - Decisión: conservar Editorial Creative Desk; extender la card existente, no crear una barra o modal paralelo.
 - Targets: desktop `1440×1000` y compact `390×844`.

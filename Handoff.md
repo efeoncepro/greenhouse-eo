@@ -27,9 +27,10 @@
 - **Globe — runtime fix desplegado:** Studio `f9839ee` y Worker `8d7ecb1` cerraron reauth/viewer,
   supersedieron 6 reconciles, estabilizaron queue age en `0` y aplicaron severidades. Evidencia:
   `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
-- **Globe Producer — feed live backend cerrado; UI aprobada pendiente:** `TASK-1525` está complete internal-only
-  en `ed5e993`; smoke same-tab reader `200` devolvió 10 items image/audio/video. `TASK-1526` cierra cards,
-  viewer, reauth UX y comparación contra la UI aprobada.
+- **Globe Producer — feed live backend cerrado; UI aprobada en ejecución (`TASK-1526`):** `TASK-1525` está
+  complete internal-only en `ed5e993`; smoke same-tab reader `200` devolvió 10 items image/audio/video.
+  `TASK-1526` tomó ownership en `develop` para cerrar cards, viewer, reauth UX y comparación contra la fuente
+  visual aprobada `docs/ui/visual-sources/TASK-1505/approved-prototype.dc.html`.
 - **Globe — promoción/media:** auditoría live `0/7` ready. `TASK-1527` está en checkpoint humano; `TASK-1528…1529`
   poseen derivados+Range y GC. No fabricar/heredar evidencia.
 
@@ -41,7 +42,15 @@
   Plan: `docs/tasks/plans/TASK-1521-plan.md`.
 
 - **`TASK-1525` COMPLETE.** Reader live `ed5e993`; CI/deploy final verdes; Chrome same-tab sesión/reader `200`
-  con 10 items reales. Siguiente: `TASK-1526`; no declarar UX aprobada ni commercial readiness desde esta task.
+  con 10 items reales. Base backend/feed cerrada; no declarar UX aprobada ni commercial readiness desde esta task.
+
+- **`TASK-1526` IN-PROGRESS.** Ejecutar en `develop` (sin branch nueva por instrucción del operador). Scope:
+  consumer UI sobre `TASK-1525`: cards inline keyed/concurrentes, render incremental, media aislada,
+  reauth explícita, viewer y paridad con `docs/ui/visual-sources/TASK-1505/approved-prototype.dc.html`.
+  Código local committed+pushed en `efeonce-globe` `2b7842c`: elimina barra singleton, corrige preview sin `src`/alt UUID,
+  selección sin rebuild y `displayTitle` client-safe. Evidencia local verde: `pnpm check`, `pnpm build`,
+  `studio-web` 212 tests, task/ops/docs gates. Pendiente: CI/deploy internal y smoke humano same-tab en Chrome CEO;
+  no declarar UX aprobada ni commercial readiness antes de esa evidencia.
 
 - **`TASK-1527` IN-PROGRESS (P0, checkpoint humano).** Plan:
   `docs/tasks/plans/TASK-1527-plan.md`. Aceptar primero el delta de rights workspace-scoped + saga durable;
