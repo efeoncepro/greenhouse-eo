@@ -19,35 +19,24 @@
 ## Riesgos abiertos
 
 - Trabajo local concurrente: coordinar ownership antes de tocar archivos ya modificados.
-- **Globe Producer internal-only:** `TASK-1519` y `TASK-1511` complete; `TASK-1505` desplegada. `TASK-1511` materializó
-  `efeonce-internal` en shadow con broker/operator separados y 15/15 grants acotados; enforced espera reconciliador
-  continuo desde Greenhouse dev. Style DNA/generación/export/review positivos esperan asset y readiness reales.
+- **Globe Producer internal-only:** el camino humano ya generó y recuperó Image/Video/Audio reales en tres rutas
+  promovidas; feed/viewer y Asset Governance funcionan. El catálogo tiene 10 rutas: las otras 7 requieren
+  promoción/canario exactos. Una sesión realmente expirada aún degrada a `401/403` con error genérico.
 - **Globe — el spend fence cross-réplica sigue sin ejercitarse (`TASK-1512`).** El dry-run vivo estimó 32 créditos,
-  pero tenancy/readiness fallaron cerrado y no hubo autorización de gasto; no ejecutar el scheduler/worker pagado.
+  y luego hubo gasto real gobernado; la prueba específica de contención cross-réplica sigue pendiente.
+- **Globe — observabilidad:** cinco outbox `reconcile` quedaron `pending` aunque sus runs están `completed`, lo que
+  infla queue age. Las alertas de failure no tienen severity IaC y muestran `No severity`.
 
 ## Pendientes inmediatos
 
-- **`TASK-1521` IN-PROGRESS.** La UI produjo un PNG real; Asset Governance quedó pendiente por lease expirado.
-  ADR-006 V2 exige `members[]` completo, semantic revision separada de freshness, suspensión de omitidos y grants
-  append-only. Implementar V2 + reconciler periódico antes de reanudar schedulers por IaC; clientes externos
-  siguen gateados por `TASK-1480`. Plan: `docs/tasks/plans/TASK-1521-plan.md`.
+- **`TASK-1521` IN-PROGRESS.** El Producer interno ya produjo las tres modalidades y governance promovió un asset;
+  esto no habilita el runtime comercial. Resolver sesión expirada, outbox stale/alertas, siete promociones y la
+  arquitectura de derivados/streaming/visibilidad/GC; clientes externos siguen gateados por `TASK-1480`.
+  Plan: `docs/tasks/plans/TASK-1521-plan.md`.
 
-- **`TASK-1503` COMPLETE y ACTIVA en el runtime interno (`EPIC-028`, cluster Creative Producer).** El
-  output side del Producer (retrieval gobernado + favorite/copyAsReference) está **operativo** en
-  `globe-api-internal` rev `00016-8dr`: `GLOBE_PRODUCER_ASSETS_ENABLED=true`, secreto
-  `globe-producer-grant-secret` v1 activo, migración `0003` aplicada, todo gobernado en Terraform (el
-  flag vive en el default de la variable, **en git**; verificado planeando sin `terraform.tfvars`).
-  La imagen viva se repuso por el workflow sancionado (`deploy-internal.yml` run `29908442357`, rev
-  **`00017-xfm`**, `:b12451db2d6e`) tras recuperarse el token de `gh`: procedencia CI keyless, mismo
-  binario, `maxScale 3` conservado y `tofu plan` en No changes.
-  Canario 14/14 con bytes reales servidos + los tres negativos, más el negativo private-ingest en su
-  forma **precisa** (hash que sí está en el bucket, declarado como input de otra corrida ⇒ `not_found`,
-  con control de que el output propio de esa corrida sí se sirve). Post-cleanup 7/7 y re-verificación 7/7 sobre la revisión de CI. La impersonación se otorgó y revocó
-  en tres ventanas acotadas, con corte verificado en cada una; policy final de
-  `greenhouse-globe-caller@` = sólo `workloadIdentityUser` de Vercel. Gasto: 20 créditos contra un cap de 200.
-  **Quién la usa hoy:** el service principal por las vías internas. El bridge y la UI ya están integrados en
-  local, pero una persona en el shell desplegado aún no recibe sus grants; `ui` sigue cerrada hasta el rollout
-  de `TASK-1519`. Runbook:
+- **`TASK-1503` COMPLETE y ACTIVA internal-only.** Retrieval, favorite y copy-as-reference funcionan en API y UI
+  por grants/BFF; el bucket continúa privado y tenant-blind. Estado mutable y evidencia:
+  `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`; operación:
   `docs/manual-de-uso/creative-studio/operar-retrieval-assets-globe.md`.
 
 - **Globe hacia comercial — gates vigentes y bloqueo de entorno ahora con dueño (`TASK-1521`).**

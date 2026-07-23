@@ -17,7 +17,7 @@
 - Motion: `docs/ui/motion/TASK-1505-globe-creative-producer-surface-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Desplegada internal-only y smoke humano verde; generación positiva bloqueada por readiness/tenancy`
+- Status real: `Operativa internal-only en 3 rutas promovidas; sesión expirada, outbox stale y 7 promociones pendientes`
 - Rank: `TBD`
 - Domain: `creative|ui|product`
 - Blocked by: `none`
@@ -40,7 +40,19 @@
 - Estado honesto: `code complete, rollout pendiente`. No hubo deploy, migrations, IAM, grants, flags, workers,
   provider canary ni gasto; esos gates permanecen en sus tasks dueñas.
 
-## Checkpoint 2026-07-23 — superficie desplegada y dry-run vivo sin gasto
+## Checkpoint 2026-07-23 — generación y viewer reales desde la UI
+
+- El registry durable promovió tres rutas exactas con separación humana: Seedream 5 Pro, Seedance 2.0 y
+  ElevenLabs Multilingual v2. El catálogo contiene 10 rutas; las otras 7 no se consideran listas.
+- Cloud SQL registra 5 runs completados. Image, Video y Audio generaron bytes reales; el feed hidrató 9 outputs y
+  los tres medios se recuperaron con `200`. El video exacto se reprodujo en browser como MP4 1280×720.
+- `dcc9a89` corrige hidratación por `(experimentId, sha256)`, `94d1718` selección/render del viewer y `b7adef3`
+  refresh single-flight + retry único para CSRF rotado. CI/deploy keyless quedaron verdes.
+- La task permanece `in-progress`: una sesión realmente expirada aún produce `401/403` y error genérico; cinco
+  reconciles obsoletos inflan queue age; faltan las otras siete promociones y la decisión de derivados/streaming/
+  visibilidad governance antes del cierre completo del target.
+
+### Checkpoint anterior: dry-run vivo sin gasto
 
 - API y Studio se desplegaron por los workflows keyless canónicos; el front door conserva HTTP `301`, HTTPS
   `200` y la API anónima `403`. Migraciones `0001…0023` quedaron limpias.

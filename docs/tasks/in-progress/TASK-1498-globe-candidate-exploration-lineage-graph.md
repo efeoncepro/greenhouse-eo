@@ -21,13 +21,21 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-028`
-- Status real: `Code complete en Globe (commit 6756c3b); migración 0004 y smoke runtime pendientes`
+- Status real: `Desplegada internal-only; feed hidrata outputs reales, pero visibilidad governance y escala siguen abiertas`
 - Rank: `TBD`
 - Domain: `creative|ai`
 - Blocked by: `none`
 - Branch: `task/TASK-1498-globe-candidate-exploration-lineage-graph`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Checkpoint 2026-07-23 — feed real y frontera pendiente
+
+- Migraciones `0001…0023` están aplicadas. El feed hidrató nueve outputs usando identidad exacta
+  `(experimentId, sha256)` y `attempts[].outputs`.
+- No existe aún una política canónica que decida si el feed muestra assets `candidate_ready` mientras governance
+  está pendiente/rejected. La proyección paginada debe incorporar esa decisión y evitar N+1.
+- Previews siguen usando originales; derivados y streaming se resolverán por ADR/delta, no dentro de este reader.
 
 ## Summary
 

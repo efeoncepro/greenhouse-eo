@@ -10,6 +10,7 @@
 ## Shards mensuales incrementales
 
 - [2026-07](2026-07.md)
+- [Rotación 2026-07-17](2026-07-17-rotation.md)
 
 No volver a pegar historia completa en este índice.
 

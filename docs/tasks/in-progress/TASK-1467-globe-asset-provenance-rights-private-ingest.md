@@ -36,7 +36,7 @@ Follow-up concreto heredado: la runtime SA necesita `storage.objectCreator` sobr
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Worker y storage/IAM operativos internal-only; ingest/rights authority y canary positivo bloqueados`
+- Status real: `Governance de outputs generados operativa internal-only; private ingest y política de visibilidad siguen gateados`
 - Rank: `TBD`
 - Domain: `creative|legal|storage`
 - Blocked by: `none`
@@ -47,6 +47,17 @@ Follow-up concreto heredado: la runtime SA necesita `storage.objectCreator` sobr
 ## Summary
 
 Crear ingest privado, asset lineage, licencias, consentimientos, retención y policy checks para referencias, inputs y outputs.
+
+## Checkpoint 2026-07-23 — clasificación C2PA y recuperación de proyección desplegadas
+
+- `645c143` distingue media válida sin manifest (`unverified/c2pa_manifest_absent`) de formato unsupported y
+  dependency failure. Sólo `Trusted` habilita provenance verificada.
+- `a5ef907` preserva autoridad durable de rights y aplica una revisión terminal pendiente antes de crear otra;
+  requeue/replay siguen idempotentes y versionados.
+- El Job desplegado por digest ejecutó `claimed=3`, `applied=3`, `promoted=1`, `failed=0`. Esto habilita governance
+  de outputs generados internal-only; no habilita private ingest ni acceso comercial.
+- Siguen abiertos la política feed `owner-only pending` vs `eligible-only`, GC/reconciliación de objetos huérfanos
+  y metadata governance de rewrite same-key.
 
 ## Checkpoint 2026-07-23 — worker de governance operativo; capability aún cerrada
 

@@ -6,14 +6,24 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `El vertical slice completo del Producer aprobado está code-complete y verificado localmente —UI source-led, bridge humano, generación multimodal, referencias, library, edición, créditos y review/share—, pero el runtime interno desplegado sigue vivo sólo hasta TASK-1503. El rollout requiere migrations, secrets, IAM/grants, flags, workers/providers y canaries; el runtime comercial sigue bloqueado por TASK-1521 + readiness TASK-1480.`
+- Status real: `Producer operativo internal-only en 3 rutas promovidas con Image/Video/Audio reales; 7 rutas, sesión expirada, outbox/alertas y runtime comercial siguen abiertos`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `Efeonce Creative Technology / Product`
 - Branch: `main` en el repositorio hermano
 - GitHub Issue: `TBD — backlog operativo en https://github.com/efeoncepro/efeonce-globe`
 
-### Checkpoint 2026-07-22 — Producer integrado localmente
+### Checkpoint 2026-07-23 — plataforma interna funcional, no GA
+
+- El flujo humano BFF→API→worker→provider→GCS→governance→feed/viewer produjo y reprodujo Image, Video y Audio.
+- El catálogo tiene 10 rutas; sólo tres están promovidas durablemente. Las demás no heredan readiness.
+- Asset Governance corrige clasificación sin C2PA y recuperación de proyección. El Job aplicó 3 trabajos,
+  promovió 1 y falló 0.
+- Persisten gaps concretos: reauth de sesión realmente expirada, cinco reconciles stale/queue age, severidades de
+  alertas, siete promociones y ADR de derivados/streaming/visibilidad/GC.
+- Clientes externos/Production permanecen cerrados por `TASK-1480` y dependencias.
+
+#### Checkpoint anterior: Producer integrado localmente
 
 - La UI aprobada de `TASK-1505` dejó de ser intención: está implementada con su riqueza visual y funcional,
   motion/reduced-motion, responsive 390 px, teclado, viewer, compare, inpaint, library, budgets, referencias,

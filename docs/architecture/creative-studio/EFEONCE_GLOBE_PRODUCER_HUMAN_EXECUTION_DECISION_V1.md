@@ -6,13 +6,20 @@
 - **Scope:** Creative Producer human surface, `apps/studio-web`, Globe API Contract Spine, broker grants, run orchestration and Producer projections
 - **Reversibility:** two-way-but-slow
 - **Confidence:** high for the trust boundary and product target; medium for the final storage/projection decomposition until the owning tasks complete Discovery
-- **Validated as of:** 2026-07-22 against the approved Claude Design source and the local/deployed `efeonce-globe` runtime
+- **Validated as of:** 2026-07-23 against the approved source and the deployed `efeonce-globe` runtime
 
 ## Context
 
 The [approved Claude Design source](../../ui/visual-sources/TASK-1505/approved-prototype.dc.html) for `TASK-1505` is the complete target product experience, not a loose moodboard or a disposable prototype. It extends the original prompt-first Producer into a production surface with Image/Video/Audio composition, references and rights, estimate and budgets, unified library, collections, batch operations, candidate inspection and lineage, review/collaboration, read-only sharing and operator conveniences.
 
-The current runtime has a strong API Contract Spine, route catalog, discriminated output shape, estimate and governed output retrieval. However, the human web principal currently receives only `globe.studio.access`; Producer capabilities remain unavailable to the browser. The private API is protected by Cloud Run IAM plus in-app ID-token verification, while a browser cannot safely manufacture a workload identity. Coverage declarations such as `ui: policy-blocked` are metadata and conformance inputs; they are not, by themselves, runtime enforcement of which surface invoked a handler. Execution is also still synchronous/in-process rather than a durable job lifecycle.
+At decision time the human web principal received only `globe.studio.access`; that historical gap motivated this
+ADR. `TASK-1519` has since implemented and live-verified the same-origin bridge, scoped broker grants, surface
+enforcement and durable execution path without exposing workload identity to the browser. The trust boundary below
+remains normative.
+
+The current operational gap is session recovery: a valid session with rotated CSRF is refreshed single-flight and
+retried once, but a truly missing/expired session returns `401` and still needs an explicit reauthentication CTA.
+That state must never be presented as missing media or silently retried as a spend command.
 
 ## Decision
 

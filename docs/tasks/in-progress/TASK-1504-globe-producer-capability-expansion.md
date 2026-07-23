@@ -55,7 +55,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-028`
-- Status real: `Code complete local; rollout y canarios facturables pendientes`
+- Status real: `Desplegada internal-only; ruta base video canariada, capacidades avanzadas aún requieren canarios propios`
 - Rank: `TBD`
 - Domain: `creative|ai|platform`
 - Blocked by: `none`
@@ -63,7 +63,15 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
-## Checkpoint 2026-07-22 — implementación de Claude integrada y verificada
+## Checkpoint 2026-07-23 — rollout parcial honesto
+
+- El runtime y catálogo incluyen frames, motion-control, change-voice, translate, multi-output y voice presets.
+- La ruta base de video Seedance y la ruta TTS ElevenLabs fueron promovidas/canariadas desde Producer, pero eso no
+  certifica las capacidades avanzadas por transitividad.
+- Frames, motion-control, change-voice, translate y combinaciones multi-output continúan sujetas a fuente
+  gobernada, revisión exacta y canario propio. La task no cierra por el éxito de tres rutas base.
+
+### Checkpoint anterior: implementación integrada y verificada
 
 - `video-frames`, `video-motion-control`, `audio-change-voice` y `audio-translate` existen en contracts, catálogo,
   dominio y adapters reales; sus selectores/inputs fallan cerrado antes del spend.

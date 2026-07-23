@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Ejecución activa; Producer humano generó un candidato real, pero la automatización durable y el runtime comercial continúan bloqueados por tenancy V1 y gates de promoción`
+- Status real: `Producer interno multimodal operativo; runtime comercial externo sigue bloqueado por gates, observabilidad y promoción incompleta`
 - Rank: `TBD`
 - Domain: `creative|platform|identity|finance|ops`
 - Blocked by: `none`
@@ -44,7 +44,16 @@ operativo.
 - Integrar evidencia de identity/tenant, ledger y providers sin duplicar sus sources of truth.
 - Promotion preflight, canary, rollback y live verification que mantengan `internal ready` separado de `commercial ready`.
 
-## Checkpoint 2026-07-23 — intake y defecto estructural de tenancy
+## Checkpoint 2026-07-23 — internal-only operativo, comercial todavía cerrado
+
+- Image, Video y Audio generaron/recuperaron outputs desde la UI en tres rutas promovidas. Esto valida el camino
+  interno, no un ambiente comercial.
+- Permanecen abiertas siete promociones exactas, UX de reautenticación por sesión expirada, cinco reconciles stale,
+  severidad/diagnóstico de alertas y la decisión de delivery multimedia a escala.
+- `TASK-1480` y sus dependencias continúan siendo el gate externo. No ampliar audiencia, clientes ni Production por
+  el éxito del canario interno.
+
+### Checkpoint anterior: intake y defecto estructural de tenancy
 
 - El flujo humano autenticado alcanzó `estimate → generate → candidate_ready` con un output PNG real y gasto
   liquidado por el carril gobernado. Esto demuestra el seam de Producer, pero **no** habilita por sí solo un

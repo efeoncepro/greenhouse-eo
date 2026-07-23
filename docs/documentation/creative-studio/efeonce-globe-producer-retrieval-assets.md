@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-07-22 por Claude (TASK-1503)
-> **Ultima actualizacion:** 2026-07-22 por Claude (TASK-1503)
+> **Ultima actualizacion:** 2026-07-23 (TASK-1503/TASK-1505/TASK-1519)
 > **Documentacion tecnica:** [EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md](../../architecture/creative-studio/EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md)
 
 ## Qué es y para qué sirve
@@ -77,10 +77,16 @@ Está **encendida y funcionando** en el entorno interno de Globe: se probó en v
 real, descargándola por el camino gobernado y confirmando que un asset de otro cliente y un material
 de referencia responden "no encontrado".
 
-Lo que todavía **no** existe es la puerta para personas: quien entra por la web aún no recibe el
-permiso, así que hoy la usan los sistemas internos, no un humano desde una pantalla. Eso llega con la
-superficie del Producer (`TASK-1505`). Y el uso por parte de clientes externos es un programa aparte
-(`TASK-1480` y sus dependencias), no un interruptor.
+`TASK-1519` abrió la puerta humana internal-only mediante BFF same-origin. Image, Video y Audio se recuperaron
+desde el feed/viewer con descriptor y grant; el browser no conoce GCS ni recibe una URL del proveedor. El header
+`x-globe-retrieval-grant` es el transporte principal y una Blob URL local alimenta `<img>`, `<video>` o `<audio>`.
+
+Si `/v1/session` responde `401`, el problema es sesión ausente/expirada, no storage. Hoy el modal puede terminar
+mostrando una recuperación genérica; el siguiente paso correcto es reautenticar, conservar el correlation ID y
+mejorar el CTA. Si la sesión sigue viva pero rotó CSRF por otra pestaña, el cliente refresca y reintenta una sola
+vez.
+
+El uso por clientes externos sigue siendo un programa aparte (`TASK-1480` y dependencias), no un interruptor.
 
 ## Quién puede usarla
 
@@ -88,9 +94,9 @@ Requiere la autoridad `globe.producer.assets.operate`. Es **propia y de gasto ce
 la autoridad del Model Lab, que permite gastar con proveedores. Descargar lo que ya produjiste no debe implicar
 poder facturar.
 
-Hoy la tiene el **principal de servicio** (las vías internas: HTTP, SDK, CLI, worker, pruebas E2E). Las
-superficies **interfaz** y **MCP** nacen apagadas hasta el gate de la superficie del Producer (`TASK-1505`),
-que es también cuando se le entrega la autoridad a las personas que entran por la web.
+La tienen el principal de servicio y las personas internal-only con grants Producer acotados. La UI no obtiene
+capacidad de gasto por poder descargar: ejecución y output-side conservan capabilities separadas. MCP y clientes
+externos permanecen sujetos a sus propios gates.
 
 ## Relacionados
 

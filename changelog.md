@@ -13,6 +13,19 @@
   La mutación quedó respaldada en Elementor, purgada en Kinsta y verificada live en escritorio y 390 px sin
   errores ni desbordes; el scheduler, booking y GTM no cambiaron.
 
+## 2026-07-23 — Globe Producer genera las tres modalidades y cierra dos causas raíz
+
+- El Producer internal-only generó y recuperó Image, Video y Audio reales desde la UI; cinco runs terminaron,
+  el feed hidrató nueve outputs y el viewer sirvió/reprodujo media desde GCS privado por grants gobernados.
+- El catálogo publica 10 rutas, pero sólo Seedream 5 Pro, Seedance 2.0 y ElevenLabs Multilingual v2 están
+  promovidas durablemente. Las otras siete conservan su gate de evidencia/revisión/binding/canario.
+- Se corrigieron hidratación del feed, selección/render del viewer y recuperación de una sesión aún válida cuyo
+  CSRF rotó. Una sesión realmente expirada sigue necesitando CTA de reautenticación.
+- Asset Governance dejó de tratar media válida sin manifest C2PA como outage y ahora recupera proyecciones
+  terminales sin perder rights. El Job desplegado aplicó 3 trabajos, promovió 1 y falló 0.
+- Continúan abiertas cinco reconciliaciones stale que inflan queue age, severidades de alertas, las siete
+  promociones y un ADR para derivados/streaming/visibilidad governance/GC. Clientes externos siguen cerrados.
+
 ## 2026-07-23 — Globe Producer promovido hasta sus gates reales internal-only
 
 - `TASK-1519` quedó completa: el bridge humano browser → BFF same-origin → API IAM-private tiene IAM/env/secrets,
@@ -824,24 +837,3 @@
 - El manifest y el sistema visual del artículo quedaron sincronizados con los assets v2 y la publicación live.
   `content-marketing-studio` añade `explanatoryDelta` como gate ejecutable para evitar infografías decorativas o
   redundantes; la regla se sincronizó para Codex/Claude sin convertir la estética HubSpot en default.
-
-## 2026-07-17 — Gate de entrega para sistemas visuales editoriales
-
-- `content-marketing-studio` exige ahora un `deliveryContract` machine-readable por `conceptId`: viewport,
-  tratamiento light/dark, canvas transparente/opaco, origen del skin y justificación. La regla quedó sincronizada para Codex y
-  Claude; decisiones como una sola composición o un único tema siguen permitidas, pero ya no pueden ser defaults
-  silenciosos.
-- El comando compartido `pnpm content:visual-manifest:lint -- <manifest.json>` bloquea art direction sin variantes
-  desktop/móvil, contratos light/dark incompletos y transparencia sin verificación técnica de alpha. El manifest
-  del Customer Agent de ANAM ya pasa el gate con hero opaco y tres diagramas transparentes en cuatro variantes.
-- Los skins se clasifican como Efeonce core, contextual de plataforma/cliente o específico de campaña. El
-  vinotinto/coral de esta portada queda limitado al contexto HubSpot y no se convierte en default editorial.
-
-## 2026-07-17 — Mantenimiento directo de plugins del sitio público WordPress
-
-- Se actualizaron en `efeoncepro.com` AI 1.2.0, Contact Form 7/Mailchimp 0.9.81.03, Elementor 4.1.5,
-  Elementor Pro 4.1.3, HubSpot 11.3.65, Jetpack 16.0.1, Spectra 2.20.0 y SVG Support 2.5.17. Se verificaron
-  arranque de WordPress, plugins críticos activos, ausencia de mantenimiento/error PHP y rutas públicas clave.
-- Essential Addons for Elementor 6.7.0 produjo un paquete incompleto sin `autoload.php`; se restauró de inmediato
-  la versión 6.6.10 desde el snapshot previo. Su actualización queda pendiente hasta que el proveedor publique
-  un paquete íntegro o pueda probarse fuera de producción.

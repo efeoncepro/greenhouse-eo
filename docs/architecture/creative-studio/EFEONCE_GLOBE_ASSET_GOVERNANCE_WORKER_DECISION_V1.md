@@ -1,7 +1,7 @@
 # Efeonce Globe — Asynchronous Asset Governance Worker Decision V1
 
 - Decision: ADR-007
-- Status: Accepted for internal implementation; rollout and live canaries gated
+- Status: Implemented internal-only; broader rollout and commercial canaries gated
 - Date: 2026-07-22
 - Owners: Efeonce Globe platform, security and creative operations
 - Implements: TASK-1467; enables TASK-1505
@@ -94,3 +94,16 @@ The approved Producer can keep its rich upload, provenance and reusable-library 
 heavy verification is instant. The topology adds a separately deployable worker, operational alerts and signature/
 trust-policy maintenance, but makes processing scalable, recoverable and independently securable. Rollback disables
 new claims and scheduler invocation while preserving quarantined assets, durable jobs and evidence for recovery.
+
+## Implementation evidence — 2026-07-23
+
+- `c2patool` 0.26.60 returns nonzero `No claim found` for valid MP4/MP3 without a manifest. The adapter now maps
+  that exact outcome to `unverified/c2pa_manifest_absent`; truly unsupported media stays `unsupported` and unknown
+  failures remain fail-closed/retryable.
+- Projection recovery no longer erases durable rights authority. The worker first applies any terminal governance
+  revision not yet projected, then decides whether a new revision is needed; re-enqueue remains revisioned and
+  idempotent.
+- The keyless Job image tagged `a5ef90756ba2` is deployed by immutable digest. Execution
+  `globe-asset-governance-kn549` completed with `claimed=3`, `applied=3`, `promoted=1`, `failed=0`.
+- This proves generated-output governance internal-only. It does not open private ingest or clients externos, and
+  it does not settle the feed-visibility policy for assets still pending/rejected.

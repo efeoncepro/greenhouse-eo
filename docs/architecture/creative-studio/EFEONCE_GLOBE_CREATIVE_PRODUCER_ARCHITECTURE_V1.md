@@ -64,7 +64,10 @@ aprobación explícita de Product/Design y una nueva versión del baseline. La d
 y ejecución durable está en
 [`EFEONCE_GLOBE_PRODUCER_HUMAN_EXECUTION_DECISION_V1.md`](EFEONCE_GLOBE_PRODUCER_HUMAN_EXECUTION_DECISION_V1.md).
 
-### Baseline runtime verificado (2026-07-22)
+### Baseline runtime verificado (2026-07-22, snapshot histórico)
+
+Este bloque explica el punto de partida del rollout. El estado vigente está en
+`Materialización 2026-07-23 — runtime interno operativo con gaps explícitos`.
 
 - **Desplegado:** spine, auth base, catálogo, contrato discriminado, estimate, Model Lab y output side de
   `TASK-1503`; el web visible sigue siendo un shell/foundation y no existe `/producer` funcional.
@@ -534,10 +537,51 @@ sus boundaries:
   teclado y reduced motion, score enterprise 4.72/5 sin blockers. Evidencia de código: `pnpm check` y
   `pnpm build` verdes en Globe el 2026-07-22.
 
-Este checkpoint es **code complete local**, no rollout. Las migrations `0004…0019`, secrets, buckets/IAM,
-broker grants, flags, Scheduler/Jobs, provider access y canarios reales continúan siendo parte del cierre
-operativo. El dry-run vivo por los commands/readers del Producer falló cerrado contra el SHA antiguo desplegado y
-consumió cero créditos. No se promueve entorno comercial ni se modifica el gate de TASK-1521.
+Este párrafo describe el checkpoint local del 2026-07-22 y queda superseded por el rollout interno del
+2026-07-23. No se promueve por ello un entorno comercial ni se modifica el gate de `TASK-1480`.
+
+## Materialización 2026-07-23 — runtime interno operativo con gaps explícitos
+
+- `TASK-1519` materializó el bridge humano. La sesión autenticada llega por BFF same-origin a la API IAM-private,
+  con actor/workspace/surface server-derived, CSRF y delegación auditables.
+- El catálogo `1.2.0` publica **10 rutas**: 2 Image, 4 Video y 4 Audio. El registry durable tiene **3 rutas exactas
+  promovidas y con binding/circuito productivo interno cerrado**: Seedream 5 Pro, Seedance 2.0 y ElevenLabs
+  Multilingual v2. Las otras 7 no se consideran listas por aparecer en catálogo: requieren reporte, revisión
+  humana, propuesta, promoción, binding, circuito y canario propios.
+- Cinco runs internos llegaron a `completed`. Image, Video y Audio produjeron bytes reales; el feed hidrató nueve
+  outputs y el viewer sirvió los tres medios por el camino gobernado. El video observado fue MP4 1280×720,
+  reproducible en browser.
+- Los originales residen en el bucket privado de evidencia, content-addressed por SHA-256. La DB conserva
+  manifest, ownership, MIME, tamaño, lineage y estado; una URL del proveedor no es la fuente del feed.
+- El cliente recupera descriptor + grant, canjea por same-origin con `x-globe-retrieval-grant`, crea una Blob URL
+  local y la revoca al cambiar/cerrar. Un epoch por selección evita que una respuesta tardía de A sobrescriba B.
+- La recuperación de una **sesión todavía válida cuyo CSRF rotó** usa refresh single-flight y un único retry
+  preservando body/correlation/idempotency. Una sesión realmente ausente/expirada devuelve `401`; hoy el viewer
+  degrada a un error genérico. Falta reautenticación/CTA explícita y un smoke que pruebe esa transición.
+- Asset Governance está desplegado. Media válida sin Content Credentials se clasifica honestamente
+  `unverified/c2pa_manifest_absent`; no se reporta como outage. El worker también reconcilia una revisión terminal
+  no proyectada antes de fabricar otra y recupera derechos desde autoridad durable. La ejecución
+  `globe-asset-governance-kn549` aplicó 3 trabajos, promovió 1 y falló 0.
+- La observabilidad del Producer Worker aún tiene deuda: cinco eventos `reconcile` quedaron `pending` aunque sus
+  runs están `completed`, por lo que `queueOldestAgeSeconds` mide trabajo no reclamable y genera ruido. La solución
+  debe terminalizar/superseder esos eventos al completar y calcular edad sólo sobre trabajo reclamable, con backfill
+  gobernado; nunca `UPDATE` manual.
+
+### Decisión pendiente para entrega multimedia a escala
+
+El almacenamiento original en GCS es correcto, pero no completa una arquitectura de preview:
+
+1. cards/viewer todavía consumen el original; faltan thumbnails, posters, transcodes y waveform/peaks;
+2. el backend puede materializar el objeto completo antes de responder Range, por lo que no existe streaming
+   extremo-a-extremo verificable para video/audio grandes;
+3. `candidate_ready` y `retained` no fijan por sí solos si un asset pendiente/rechazado por governance puede
+   aparecer en feed; debe decidirse una política explícita, al menos `owner-only pending` versus `eligible-only`;
+4. si GCS termina y el registro DB falla pueden quedar objetos huérfanos; hace falta inventory reconciliation/GC;
+5. un rewrite same-key con `412` no puede asumirse como prueba de que metadata governance quedó sincronizada.
+
+Antes de implementar estos puntos se requiere ADR/delta de arquitectura con contratos de derivados, serving
+Range/streaming, cache privado, visibilidad por governance, idempotencia, retención y reconciliación. No se corrige
+con URLs públicas, carga completa en el browser ni excepciones por modalidad.
 
 ## Hard rules (anti-regresión)
 

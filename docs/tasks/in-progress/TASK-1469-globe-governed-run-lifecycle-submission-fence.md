@@ -36,7 +36,7 @@ canary ya tiene owner: **ADR-004** (`TASK-1506`, complete) fijó el front door y
 - Motion: `none`
 - Backend impact: `webhook`
 - Epic: `EPIC-028`
-- Status real: `Worker durable desplegado internal-only; ejecución real bloqueada por tenancy/readiness y gasto no autorizado`
+- Status real: `Worker durable ejecuta runs reales; 5 reconciles terminales stale mantienen queue age incorrecta`
 - Rank: `TBD`
 - Domain: `creative|platform|ops`
 - Blocked by: `none`
@@ -49,7 +49,15 @@ canary ya tiene owner: **ADR-004** (`TASK-1506`, complete) fijó el front door y
 Implementar lifecycle transaccional estimate → reserve → approve → submit → complete/reconcile → candidate →
 review → settle/release con queue, approval token, submission fence y completion drivers por proveedor.
 
-## Checkpoint 2026-07-23 — worker desplegado; scheduler pausado
+## Checkpoint 2026-07-23 — ejecución real y deuda de reconciliación
+
+- El Scheduler/worker procesó 5 runs hasta `completed`; Image, Video y Audio publicaron outputs recuperables.
+- Quedaron 5 eventos outbox `reconcile` en `pending` con runs ya terminales. El worker reclama cero, pero
+  `queueOldestAgeSeconds` sigue creciendo y genera ruido operativo.
+- Cierre robusto: terminalizar/superseder el reconcile al completar, medir edad sólo sobre trabajo reclamable y
+  backfill gobernado. No limpiar por SQL manual ni ocultar la señal subiendo el threshold.
+
+### Checkpoint anterior: worker desplegado; scheduler pausado
 
 - El workflow keyless `29973093343` publicó el Producer Worker por digest inmutable; Cloud Run Job quedó en
   topología `1×1`, con SA/Cloud SQL/storage/secrets mínimos y scheduler `PAUSED`.

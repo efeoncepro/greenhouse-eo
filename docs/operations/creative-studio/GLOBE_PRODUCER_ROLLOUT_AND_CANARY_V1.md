@@ -56,3 +56,6 @@ simular recuperación. Confirmar que API/web vuelven al baseline y que ninguna c
 Registrar SHA, digests, revisiones, migrations, commands/correlation IDs sanitizados, créditos estimados/gastados,
 hashes de outputs, resultado de governance y capturas. `TASK-1505` sólo puede cerrar cuando los tres assets se ven y
 operan en la UI por el mismo camino de commands/readers.
+
+Estado live y gaps: [GLOBE_RUNTIME_HANDOFF.md](GLOBE_RUNTIME_HANDOFF.md). Triage de alertas:
+[GLOBE_PRODUCER_ALERT_TRIAGE_V1.md](GLOBE_PRODUCER_ALERT_TRIAGE_V1.md).

@@ -1,7 +1,7 @@
 # Usar Efeonce Globe Creative Producer
 
-> Estado actual: rollout interno pendiente. Este manual describe la experiencia aprobada que quedará disponible en
-> `https://globe.efeoncepro.com/producer` para personas con grants Producer.
+> Estado actual: operativo internal-only en `https://globe.efeoncepro.com/producer` para personas con grants
+> Producer. No equivale a acceso comercial externo.
 
 ## Crear un activo
 
@@ -48,3 +48,16 @@ expirable y revocable; el token no aparece en query strings ni logs. No entregue
 
 Ante un error, conserva el correlation ID y no repitas un command de gasto si la respuesta fue ambigua: consulta
 primero el reader del experimento.
+
+## Si un asset existe pero el viewer no abre
+
+1. Comprueba si la cabecera todavía muestra una sesión válida. Un `401` de `/v1/session` exige volver a iniciar
+   sesión; no significa que el archivo se haya perdido.
+2. Tras reautenticar, vuelve a abrir la pieza desde el feed. El cliente renueva descriptor/grant y no reutiliza una
+   Blob URL anterior.
+3. Si persiste con sesión válida, conserva correlation ID y hora. `403` del reader apunta a sesión/CSRF/autoridad;
+   `dependency_unavailable` después del descriptor apunta al serving/integridad.
+4. No recargues ni reenvíes el command de generación para “recuperar” una vista previa: eso puede duplicar gasto.
+
+La recuperación automática cubre CSRF rotado mientras la sesión sigue viva y hace un solo retry. El CTA explícito
+para una sesión realmente expirada sigue siendo deuda conocida.

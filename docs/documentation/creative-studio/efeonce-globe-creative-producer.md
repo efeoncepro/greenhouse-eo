@@ -33,10 +33,18 @@ autoridad del workspace y los mantiene cerrados si la capability está apagada, 
 
 ## Estado vigente
 
-El código y la UI están completos y verificados localmente. El runtime interno desplegado todavía usa un SHA
-anterior y mantiene apagados el bridge humano, Jobs y provider real. Por eso el estado correcto es
-`code complete, rollout pendiente`: no operativo ni disponible para clientes hasta completar el runbook y los
-canarios reales.
+El Producer está **operativo internal-only** para personas autorizadas. Desde la UI se generaron y recuperaron
+Image, Video y Audio reales; el feed hidrató nueve outputs y el viewer sirvió los tres medios. El catálogo expone
+10 rutas, pero hoy sólo tres rutas/modelos tienen promoción durable, binding, circuito y canario: que una ruta
+aparezca en catálogo no significa que esté habilitada.
+
+Los originales se alojan en GCS privado por hash; el bucket no autoriza acceso. Globe valida workspace, ownership,
+estado e integridad antes de servirlos mediante un grant corto same-origin. Una sesión válida con CSRF rotado se
+recupera automáticamente; una sesión realmente expirada todavía necesita un CTA de reautenticación más claro.
+
+Continúan abiertos la limpieza semántica de reconciliaciones obsoletas que inflan la edad de cola, la promoción
+independiente de las otras siete rutas y la arquitectura de derivados/streaming para previews grandes. Clientes
+externos y Production siguen bloqueados por los gates comerciales; internal-only no equivale a GA.
 
 Arquitectura: [Creative Producer V1](../../architecture/creative-studio/EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md).
 Manual: [usar Creative Producer](../../manual-de-uso/creative-studio/usar-creative-producer-globe.md).

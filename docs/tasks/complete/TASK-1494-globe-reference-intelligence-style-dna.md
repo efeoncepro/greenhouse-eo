@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-028`
-- Status real: `Desplegado internal-only; canary positivo operativamente bloqueado`
+- Status real: `Desplegado internal-only; ya existe asset gobernado, canary Style DNA positivo sigue pendiente`
 - Rank: `TBD`
 - Domain: `creative|ai`
 - Blocked by: `none`

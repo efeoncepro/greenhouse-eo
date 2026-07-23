@@ -3,20 +3,19 @@
 > **Tipo de documento:** Manual de uso / runbook
 > **Version:** 1.0
 > **Creado:** 2026-07-22 por Claude (TASK-1503)
-> **Ultima actualizacion:** 2026-07-22 por Claude (TASK-1503)
+> **Ultima actualizacion:** 2026-07-23 (TASK-1503/TASK-1505/TASK-1519)
 > **Doc funcional:** [efeonce-globe-producer-retrieval-assets.md](../../documentation/creative-studio/efeonce-globe-producer-retrieval-assets.md)
 > **Doc tecnica:** [EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md](../../architecture/creative-studio/EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md)
 
-## Estado actual (2026-07-22)
+## Estado actual (2026-07-23)
 
-**La capacidad está ACTIVA en el runtime interno** (`globe-api-internal`, revisión `00016-8dr`):
-`GLOBE_PRODUCER_ASSETS_ENABLED=true`, secreto `globe-producer-grant-secret` v1 `enabled`, migración
-`0003` aplicada. Verificado en vivo: retrieval gobernado sirviendo bytes reales, los tres negativos
-y el negativo private-ingest en su forma precisa.
+**La capacidad está ACTIVA en el runtime interno.** La revisión exacta es dato mutable y se consulta en
+`GLOBE_RUNTIME_HANDOFF.md`/Cloud Run; no se opera desde un número congelado en este manual.
+`GLOBE_PRODUCER_ASSETS_ENABLED=true`, el secreto gobernado y las migraciones están aplicados. Image, Video y Audio
+se sirvieron desde el feed/viewer; los negativos tenant/private-ingest continúan fail-closed.
 
-Quién puede usarla hoy: **el service principal** por las vías internas (HTTP/SDK/CLI/worker/E2E). Una
-persona en el shell web todavía **no**: el broker no le otorga `globe.producer.assets.operate` y
-`ui`/`mcp` siguen `policy-blocked` — eso es el gate de `TASK-1505`, no un pendiente de este manual.
+Quién puede usarla hoy: el service principal por vías internas y personas internal-only autorizadas a través del
+BFF same-origin. Esto no abre MCP ni clientes externos.
 
 Lo que sigue abajo es el procedimiento de operación: sirve para reproducir el rollout en otro
 runtime, para diagnosticar, y para el rollback.
@@ -28,10 +27,8 @@ pieza generada, marcarla como favorita y certificarla como referencia reutilizab
 
 ## Antes de empezar
 
-El servicio que sirve esta capacidad es **`globe-api-internal`**, no el web. La razón no es de
-despliegue sino de autoridad: la capability viaja en el service principal, y en modo `web` las
-capabilities de una persona salen del broker de Greenhouse, que hoy no otorga
-`globe.producer.assets.operate`. Ponerla en el web sería un permiso sin consumidor.
+Los bytes los sirve **`globe-api-internal`**; el browser entra por `studio-web`/BFF same-origin. La capability no se
+duplica en el web: el bridge deriva autoridad humana y llama la API IAM-private con workload identity.
 
 | Variable | Qué es | Default | Requisito |
 |---|---|---|---|
@@ -118,8 +115,8 @@ Con una pieza real ya generada (un golden brief que haya retenido su salida):
 ## Qué NO hacer
 
 - **No** loggear el `retrievalGrant` (ni en query, ni en audit, ni en un ticket). Es un bearer de vida corta.
-- **No** prender `ui` ni `mcp` en el coverage: eso es el gate de `TASK-1505`, que además exige que el broker
-  otorgue `globe.producer.assets.operate` a personas web.
+- **No** inferir que MCP o clientes externos están habilitados porque la UI internal-only funciona; cada surface
+  mantiene su gate y grants propios.
 - **No** darle a esta capacidad la autoridad del Model Lab (`globe.lab.experiment.run`): es de **gasto**, y
   descargar no debe implicar poder facturar.
 - **No** "arreglar" un `dependency_unavailable` devolviendo `not_found`: manda a cazar un problema de datos
@@ -136,6 +133,8 @@ Con una pieza real ya generada (un golden brief que haya retenido su salida):
 | El canje responde `dependency_unavailable` con la ficha OK | El bucket no responde o falta `storage.objects.get` | Probar la lectura del objeto con la SA de runtime |
 | La marca de favorito "se va" entre recargas | Migración `0003` no aplicada, o el servicio corriendo sin `GLOBE_POSTGRES_*` (cae a memoria) | Revisar `globe._migrations` y las variables de Postgres del servicio |
 | El `referenceId` cambia en cada intento | Se está leyendo un servicio sin persistencia durable | Igual que arriba: sin DB, cada réplica responde distinto |
+| El viewer falla pero el objeto existe | `/v1/session` devuelve `401`, o reader `403` tras perder sesión | Reautenticar y repetir sólo el reader; no regenerar ni reintentar un command de gasto |
+| La alerta de queue age persiste con runs completos | Eventos `reconcile` terminales quedaron `pending` aunque ya no son reclamables | Aplicar reconciliación/backfill gobernado y corregir la métrica; nunca `UPDATE` manual |
 
 ## Rollback
 

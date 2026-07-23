@@ -8,28 +8,62 @@
 
 # Handoff
 
-## Active state — 2026-07-23 (Producer rollout internal-only hasta gates gobernados)
+## Active state — 2026-07-23 (Producer interno genera y reproduce; cierre comercial aún no)
 
-`TASK-1519` está **complete**: secret/env de delegación+CSRF, IAM invoker del BFF, broker grants y redirects están
-vivos; smoke humano browser→BFF→API IAM-private, spoofing/workspace/CSRF negatives y revocation rehearsal pasan.
-Las migraciones `0001…0023` están aplicadas. API/Studio conservan perimeter 403/301/200 y OpenTofu termina en
-`No changes`.
+### Runtime e identidad
 
-Runtime actual: tenancy `shadow`; el binding canónico `efeonce-internal` fue materializado y verificado en vivo con
-broker/operator separados y 15/15 grants acotados. El bootstrap expiró y no es autoridad permanente: no promover a
-`enforced` hasta que exista un reconciliador continuo desde Greenhouse dev. Library writes+bulk ON con create/trash
-y partial `not-found` verificados; export/purge OFF.
-Producer Worker está desplegado y su scheduler PAUSED. Asset Governance Job usa digest
-`sha256:2860c6ff691613e48ab9b328334deb965c2e3b60e3c1b348f4c24804d8d5d32c`; la ejecución
-`globe-asset-governance-vvshv` completó con cola vacía y su scheduler no existe.
+- `TASK-1519` está **complete**: browser → BFF same-origin → API IAM-private opera con delegación, CSRF,
+  actor/workspace/surface server-derived, IAM y grants acotados. Las migraciones `0001…0023` están aplicadas.
+- Globe `main` está en `b7adef31a349`. CI y deploy keyless
+  [30007670862](https://github.com/efeoncepro/efeonce-globe/actions/runs/30007670862) pasaron.
+  Studio sirve `globe-studio-internal-00048-m4z` al 100%; API sirve
+  `globe-api-internal-00049-7gw` al 100%.
+- El front door conserva HTTP `301`, HTTPS `200`; API anónima permanece `403`. Clientes externos/Production
+  siguen bloqueados por `TASK-1480` y gates comerciales. Internal-only no equivale a GA.
 
-El dry-run autenticado de `TASK-1505` verificó catálogo/routes/circuits/rights/estimates (32 créditos totales),
-pero tenancy efectiva respondió `access_denied` y readiness `not_found` para Image/Video/Audio. No se ejecutó
-provider, no hubo gasto y no debe arrancarse el worker pagado. Provenance continúa OFF porque falta la autoridad
-privada de rights inicial; el Asset Governance Job live `globe-asset-governance-hpfn6` quedó vacío
-(`claimed=0`, `created=0`, `failed=0`). Style DNA, export, review/share positivo y `TASK-1512` esperan inputs
-gobernados y, para la prueba de contención, autorización explícita de gasto. Clientes externos/Production continúan
-bloqueados por `TASK-1521` y gates sucesores.
+### Producer, catálogo y media
+
+- El catálogo `1.2.0` contiene **10 rutas** (2 Image, 4 Video, 4 Audio). Sólo **3 rutas exactas** están promovidas
+  durablemente, con bindings habilitados y circuitos cerrados: Seedream 5 Pro (`ref/still/rrss-v1`), Seedance 2.0
+  (`ref/motion/loop-v1`) y ElevenLabs Multilingual v2 (`ref/voice/tts-v1`). Las otras 7 requieren su propia
+  evidencia, revisión humana, propuesta, promoción, binding, circuito y canario.
+- Cloud SQL registra 5 runs `completed`. Image, Video y Audio produjeron outputs reales; el feed llegó a 9 piezas y
+  los tres medios se sirvieron con `200`. El video exacto
+  `3c6683c7-83dc-46d6-9f11-5c5f21fd13ce` se reprodujo como MP4 1280×720, duración 4.041667 s.
+- El bucket privado `efeonce-globe-lab-evidence` contiene 26 objetos / 48,866,088 bytes (~46.60 MiB). Los objetos
+  son content-addressed por SHA-256; ownership, manifest, MIME, lineage y estado viven en Postgres/dominio. La UI no
+  depende de URLs del proveedor.
+- `dcc9a89` hidrata el feed por identidad exacta; `94d1718` corrige selección/render del viewer; `b7adef3`
+  recupera sesión válida con CSRF rotado mediante refresh single-flight y un retry. La secuencia live fue
+  reader `403` → session `200` → reader `200` → output `200`.
+- Gap vigente: cuando la sesión está realmente ausente/expirada, `/v1/session` devuelve `401` y los readers `403`;
+  el modal aún puede mostrar un error genérico de recuperación. Reautenticar recupera el acceso, pero falta CTA
+  explícita + smoke de expiración. No regenerar el asset ni reintentar un command de gasto.
+
+### Asset Governance y alertas
+
+- `645c143` clasifica MP4/MP3 válidos sin Content Credentials como
+  `unverified/c2pa_manifest_absent`, no como dependencia caída. `a5ef907` reconcilia revisiones terminales no
+  proyectadas y conserva autoridad durable de rights.
+- El Job usa el digest `sha256:23103b5712f035a120a1c84c53d6913710a66535c7ead7f8112ea60bdd345770`
+  (tag `a5ef90756ba2`). La ejecución `globe-asset-governance-kn549` terminó verde:
+  `claimed=3`, `applied=3`, `promoted=1`, `failed=0`.
+- El Producer Worker ejecuta por Scheduler y completa normalmente, pero quedaron **5 outbox `reconcile` en
+  `pending`** para runs ya `completed`; no son trabajo útil y elevan `queueOldestAgeSeconds` por sobre el umbral.
+  Debe terminalizarlos/supersederlos al completar y medir edad sólo sobre trabajo reclamable, con backfill
+  gobernado; nunca SQL manual.
+- Las políticas de Monitoring de failure no declaran `severity`, por eso el correo muestra “No severity”. Además
+  una sola entrada `globe_worker_failed` dispara threshold `>0` con duración cero. Triage:
+  [`GLOBE_PRODUCER_ALERT_TRIAGE_V1.md`](GLOBE_PRODUCER_ALERT_TRIAGE_V1.md).
+
+### Gaps arquitectónicos que no se resuelven con parches UI
+
+- No hay derivados de preview (thumbnail/poster/transcode/waveform/peaks); cards/viewer consumen originales.
+- Range no es todavía streaming extremo-a-extremo si el backend materializa el objeto completo.
+- Falta fijar si feed muestra `owner-only pending` o sólo `eligible`; `candidate_ready` no equivale a governance
+  elegible.
+- Falta reconciliación/GC de objetos huérfanos y verificación de metadata cuando un rewrite same-key devuelve
+  `412`. Estos cuatro puntos requieren ADR/delta antes de implementación.
 
 ## Active state — 2026-07-22 (TASK-1494: Style DNA desplegado; canary positivo bloqueado)
 
@@ -548,25 +582,17 @@ raíz en vez de sólo detectarlo.
 
 ## Immediate next step
 
-1. The spine (`TASK-1481`), the Model Lab (`TASK-1457`), the evaluation harness (`TASK-1458`), the IaC foundation
-   (`TASK-1464`), the real provider stack (`TASK-1486/1487/1488`) and the still recommendation matrix (`TASK-1459`)
-   are all complete, with the Vertex and Fal canaries verified live through the sanctioned seam. `GLOBE_LAB_PROVIDER`
-   stays `fake` by default and the durable runtime is not yet deployed;
-2. The video engines are now real: dedicated `VertexVideoAdapter` (Veo `predictLongRunning`/`fetchPredictOperation`)
-   and `VertexOmniAdapter` (Omni Interactions API) landed and were **verified live 2026-07-20** (32 cr / 40 cr, both
-   `objective_pass_pending_human`), and the Composite selects video by the `GLOBE_LAB_VIDEO_ANCHOR` fidelity anchor —
-   closing the "dedicated Vertex video adapter" + "fidelity selector" follow-ups from 07-19. Globe's own
-   `globe-fal-api-key` is provisioned (retiring the borrowed `greenhouse-fal-api-key` at the code level), and
-   `globe-gemini-api-key` + `generativelanguage.googleapis.com` are live for the edit surface. Remaining: run
-   `tofu apply` for `secrets.tf`; ship a `studio-web` deploy / Dockerfile; add a Lab **edit command** that threads
-   `previous_interaction_id` through the domain (the adapter supports stateful edit on the Gemini API surface, the
-   one-shot seam does not surface the interaction id yet); re-test Vertex stateful-edit parity periodically; and land
-   TASK-1467 full provenance;
-3. only then, behind the explicit canary approval and a low hard cap, flip `GLOBE_LAB_ENABLED` / `GLOBE_LAB_PROVIDER`
-   in the deployed runtime and revert to `fake` after the smoke;
-4. replace temporary vendored SDK tarballs with an authorized private registry path before release;
-5. rotate the pre-existing Greenhouse operations DB credential in a separate approved checkpoint;
-6. configure GitHub WIF and reduce the bootstrap administrator's standing Owner privilege before a broader release.
+1. Implementar recuperación explícita de sesión expirada: CTA/login preservando destino, error tipado y smoke
+   humano que pruebe `401 → reauth → feed/viewer`, sin repetir commands de gasto.
+2. Cerrar la semántica del outbox: terminalizar/superseder `reconcile` al completar un run, calcular queue age sólo
+   sobre trabajo reclamable y ejecutar backfill gobernado de los 5 eventos stale.
+3. Corregir observabilidad: severidades IaC explícitas, payload de fallo con referencia/correlación saneada y
+   runbook/alertas que distingan evento aislado, cola stale e incidente persistente.
+4. Promover las otras 7 rutas sólo con evidencia exacta y separación maker/promoter; mantener publicadas pero
+   bloqueadas mientras no tengan revisión, binding, circuito y canario propios.
+5. Autorizar un ADR/delta para derivados, Range/streaming, visibilidad por governance y reconciliación/GC de GCS.
+6. Mantener clientes externos/Production cerrados hasta `TASK-1480` y sus dependencias; no interpretar el éxito
+   internal-only como promoción comercial.
 
 Fresh-session handoff prompt: [`EPIC_028_FRESH_SESSION_PROMPT.md`](docs/operations/EPIC_028_FRESH_SESSION_PROMPT.md).
 

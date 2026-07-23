@@ -31,7 +31,7 @@ Nota de frontera, alineada con el Goal ("separar probar de autorizar") y la AC "
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-028`
-- Status real: `Código completo y verificado; migración 0015, secretos/attestations y rollout productivo pendientes`
+- Status real: `Operativo internal-only para 3 rutas promovidas; 7 rutas del catálogo siguen sin promoción exacta`
 - Rank: `TBD`
 - Domain: `creative|platform|data`
 - Blocked by: `none`
@@ -42,6 +42,15 @@ Nota de frontera, alineada con el Goal ("separar probar de autorizar") y la AC "
 ## Summary
 
 Crear un registry versionado de rutas con estados lab-only, candidate, promoted, paused y retired, respaldados por evidencia y rollback.
+
+## Checkpoint 2026-07-23 — primeras promociones durables
+
+- Hay tres rutas/modelos `promoted`: Seedream 5 Pro para Image, Seedance 2.0 para Video y ElevenLabs Multilingual
+  v2 para Audio/TTS. Sus bindings están enabled y sus circuitos closed.
+- El catálogo `1.2.0` tiene 10 rutas. Las cinco revisiones aprobadas observadas corresponden a esas mismas tres
+  identidades exactas; no representan cinco modelos distintos.
+- Las otras siete rutas requieren reporte de evaluación, revisión humana firmada, propuesta, promoción por actor
+  independiente, binding/circuito y canario. La task sigue `in-progress`; catálogo no equivale a readiness.
 
 ## Why This Task Exists
 

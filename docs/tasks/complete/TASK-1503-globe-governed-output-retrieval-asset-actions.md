@@ -169,13 +169,20 @@ una persona (paso previo y menor), el siguiente es `TASK-1505`.
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-028`
-- Status real: `Complete; operativo en runtime interno (api). Comercial gateado por TASK-1505/1480`
+- Status real: `Complete; operativo en API y UI internal-only. Comercial externo gateado por TASK-1480`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `TASK-1490`
 - Branch: `task/TASK-1503-globe-governed-output-retrieval-asset-actions`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Checkpoint 2026-07-23 — consumidor humano habilitado
+
+- `TASK-1519` habilitó el BFF same-origin y grants humanos acotados. Image, Video y Audio se recuperaron por
+  descriptor + grant, header privado y Blob URL local.
+- Una sesión válida con CSRF rotado se recupera y reintenta una vez. Una sesión realmente expirada requiere
+  reautenticación explícita; el asset permanece en GCS y no debe regenerarse.
 
 ## Summary
 
