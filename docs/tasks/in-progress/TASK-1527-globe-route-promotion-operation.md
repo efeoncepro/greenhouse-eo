@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -89,7 +89,8 @@ Reglas obligatorias:
 - `../efeonce-globe/packages/domain/src/production-promotion-operation.ts`
 - `../efeonce-globe/packages/database/migrations/`
 - `../efeonce-globe/packages/database/src/stores/production-promotion-operation-store.ts`
-- wiring API/SDK/worker y tests focales del mismo aggregate
+- `../efeonce-globe/packages/{contracts,domain,database}/src/**generated-rights-polic**`
+- wiring API/SDK/worker/IaC y tests focales del mismo aggregate
 
 ## Current Repo State
 
@@ -101,6 +102,9 @@ Reglas obligatorias:
 ### Gap
 
 - No existe operation id, lock coordinador, phase history, recovery worker ni reader de estado.
+- `generated_rights_policies` es global, sin `workspace_id`; sus readers ignoran trusted context y el adapter de
+  readiness sólo compara una versión de env. Antes de promoción comercial debe convertirse en policy
+  workspace-scoped y resolverse server-side por tuple/digest exactos.
 - Pause/retire y rights supersession/revocation no tienen una ruta operable completa para rollback semántico.
 - No hay señal para promoción parcial o estancada.
 
@@ -147,7 +151,8 @@ Reglas obligatorias:
 
 - Migration posture: `additive`
 - Default state: `disabled`
-- Backfill plan: `ninguno; no se infieren operaciones históricas`
+- Backfill plan: `no se infieren operaciones históricas; las policies existentes se asignan sólo al workspace
+  interno conocido mediante expand/migrate verificado antes de retirar el default de compatibilidad`
 - Rollback path: `flag OFF; circuit open; binding disabled; conservar historial`
 - External coordination: grants separados, deploy API/worker y rehearsal con operator/checker
 
@@ -189,11 +194,12 @@ Reglas obligatorias:
 
 ### Slice 1 — Contract and persistence
 
-- Definir aggregate, phases, evidence refs, migration y store append-only.
+- Aceptar el delta ADR; volver `generated_rights_policies` workspace-scoped; definir aggregate, phases,
+  evidence refs, migration y store append-only.
 
 ### Slice 2 — Commands, readers and separation
 
-- Implementar start/advance/fail/rollback/read/list con capabilities y actor separation.
+- Implementar commands por fase, readers, evidence authorities server-side y actor separation.
 
 ### Slice 3 — Recovery and signals
 
@@ -247,6 +253,7 @@ Asignar identities/grants separados y sign-off humano para canary facturable.
 
 ## Acceptance Criteria
 
+- [ ] Rights policy/readers son workspace-scoped y readiness resuelve policy exacta; no basta una versión de env.
 - [ ] Cada fase tiene precondiciones de readback y actor/capability propias.
 - [ ] Una falla inyectada tras cada command se reanuda o revierte sin SQL manual.
 - [ ] Rollback siempre abre circuito antes de deshabilitar binding.
@@ -260,6 +267,17 @@ Asignar identities/grants separados y sign-off humano para canary facturable.
 - `pnpm build`
 - migration/store/domain/API/SDK tests focales
 - rehearsal internal con dos identities
+
+## Plan
+
+- [`TASK-1527-plan.md`](../plans/TASK-1527-plan.md)
+
+## Audit
+
+- Goal activo: cierre robusto de `TASK-1521`; `TASK-1527` es su build unit de promotion/recovery.
+- Branch: excepción autorizada `develop`; no se creó branch/worktree.
+- Subagentes: tres auditorías read-only de persistence, API/capabilities y recovery/observability; cero edits.
+- Checkpoint derivado: `human` (`P0` + esfuerzo `Alto`). No se escribe runtime antes de aprobación.
 
 ## Closing Protocol
 

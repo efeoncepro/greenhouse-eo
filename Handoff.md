@@ -29,8 +29,9 @@
   `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
 - **Globe Producer — feed/títulos aún no convergen en vivo:** es proyección cliente congelada, no provider activo.
   `TASK-1525` crea el reader durable y `TASK-1526` sus cards/títulos; sesión y viewer multimodal ya están cerrados.
-- **Globe — promoción/media:** auditoría live `0/7` ready; `TASK-1527…1529` poseen promotion/recovery,
-  derivados+Range y GC. No fabricar/heredar evidencia.
+- **Globe — promoción/media:** auditoría live `0/7` ready. `TASK-1527` fue tomada en `develop` y está en
+  checkpoint humano; discovery detectó rights globales/no tenant-scoped y verificación readiness sólo por versión
+  de env. `TASK-1528…1529` poseen derivados+Range y GC. No fabricar/heredar evidencia.
 
 ## Pendientes inmediatos
 
@@ -42,8 +43,9 @@
 - **`TASK-1525` / `TASK-1526` TO-DO (P0).** Reader live server-authoritative primero; cards keyed, títulos y
   render incremental después. `TASK-1521` sólo consume evidencia.
 
-- **`TASK-1527` / `TASK-1528` / `TASK-1529` TO-DO (P0).** Ejecutar promotion operation/recovery, luego
-  derivados+Range y lifecycle/GC. Seed Audio sigue internal-only; Omni requiere `TASK-1504/1470`.
+- **`TASK-1527` IN-PROGRESS (P0, checkpoint humano).** Plan:
+  `docs/tasks/plans/TASK-1527-plan.md`. Aceptar primero el delta de rights workspace-scoped + saga durable;
+  luego implementar. `TASK-1528`/`TASK-1529` siguen to-do. Seed Audio permanece internal-only.
 
 - **`TASK-1503` COMPLETE y ACTIVA internal-only.** Retrieval, favorite y copy-as-reference funcionan en API y UI
   por grants/BFF; el bucket continúa privado y tenant-blind. Estado mutable y evidencia:
