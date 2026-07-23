@@ -14,12 +14,14 @@
 
 - `TASK-1519` está **complete**: browser → BFF same-origin → API IAM-private opera con delegación, CSRF,
   actor/workspace/surface server-derived, IAM y grants acotados. Las migraciones `0001…0023` están aplicadas.
-- Globe `main` está en `f9839ee4260b`. CI
-  [30016235049](https://github.com/efeoncepro/efeonce-globe/actions/runs/30016235049), deploy Studio
-  [30016248480](https://github.com/efeoncepro/efeonce-globe/actions/runs/30016248480) y deploy Worker
-  [30015312280](https://github.com/efeoncepro/efeonce-globe/actions/runs/30015312280) pasaron.
-  Studio sirve `globe-studio-internal-00050-m5n` al 100%; API sirve
-  `globe-api-internal-00049-7gw` al 100%.
+- Globe `main` está en `eac1730a898b817a6202b5ae309fb60dfce0062a`. CI
+  [30036793089](https://github.com/efeoncepro/efeonce-globe/actions/runs/30036793089), deploy API
+  [30036836510](https://github.com/efeoncepro/efeonce-globe/actions/runs/30036836510) y deploy Studio
+  [30036838868](https://github.com/efeoncepro/efeonce-globe/actions/runs/30036838868) pasaron. Studio sirve
+  `globe-studio-internal-00059-2db` al 100%; API sirve `globe-api-internal-00058-hqx` al 100%.
+  Los deploy attempts [30036800428](https://github.com/efeoncepro/efeonce-globe/actions/runs/30036800428) y
+  [30036802712](https://github.com/efeoncepro/efeonce-globe/actions/runs/30036802712) fallaron antes de build por
+  `target_sha` corto y fueron supersedidos por los runs verdes con SHA completo.
 - El front door conserva HTTP `301`, HTTPS `200`; API anónima permanece `403`. Clientes externos/Production
   siguen bloqueados por `TASK-1480` y gates comerciales. Internal-only no equivale a GA.
 
@@ -68,8 +70,12 @@
   existente `/producer`: `/v1/session` `200`, reader `200`, `count=10`, `modalities=["image","audio","video"]`,
   `watermark=true`, primer item `Seedream · 5 Pro`; tras refresh, DOM `complete`, `Mis generaciones` presente,
   `Seedream · 5 Pro`/`ElevenLabs` presentes, sin `Generación en curso` ni fallback gigante `Vista previa de <uuid>`
-  en el primer fold. `TASK-1526` consume la proyección y debe cerrar cards/títulos/render incremental, viewer
-  multimodal, reauth UX completa y comparación contra la UI aprobada. No declara comercial ready.
+  en el primer fold. `TASK-1526` quedó complete internal-only en `eac1730`: cards inline keyed, previews aisladas,
+  selección estable, títulos client-safe y watcher acotado hasta terminalización. Smoke humano same-tab en Chrome CEO:
+  una generación image nueva apareció inline, progresó sin reload `queued → running → completed`, terminó con preview
+  blob `2048×2048`, `uuidFallback=0`, `broken=0` y título propio; viewer Image/Audio/Video quedó
+  `producerViewerState=ready`, audio/video reprodujeron silenciados (`played=true`) y no apareció `No tienes acceso`
+  ni retry visible. No declara comercial ready.
 
 ### Asset Governance y alertas
 
@@ -101,7 +107,7 @@
   inventory→mark→grace/holds→dry-run/apply con generation preconditions. La decisión no implementa sus build units
   ni permite declarar commercial ready.
 - Ownership ejecutable: `TASK-1528` deriva/transforma/sirve Range; `TASK-1529` inventaría/marca/aplica GC;
-  `TASK-1525` materializa feed live y `TASK-1526` consume la proyección. `TASK-1527` coordina promoción/recovery.
+  `TASK-1525` materializa feed live y `TASK-1526` consume la proyección en UI. `TASK-1527` coordina promoción/recovery.
 
 ## Active state — 2026-07-22 (TASK-1494: Style DNA desplegado; canary positivo bloqueado)
 

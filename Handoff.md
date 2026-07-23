@@ -27,8 +27,7 @@
 - **Globe — runtime fix desplegado:** Studio `f9839ee` y Worker `8d7ecb1` cerraron reauth/viewer,
   supersedieron 6 reconciles, estabilizaron queue age en `0` y aplicaron severidades. Evidencia:
   `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
-- **Globe Producer:** `TASK-1525` complete en `ed5e993`; `TASK-1526` ejecuta UX contra
-  `docs/ui/visual-sources/TASK-1505/approved-prototype.dc.html`.
+- **Globe Producer:** `TASK-1525` complete en `ed5e993`; `TASK-1526` complete en `eac1730`.
 - **Globe — promoción/media:** auditoría live `0/7` ready. `TASK-1527` está en checkpoint humano; `TASK-1528…1529`
   poseen derivados+Range y GC. No fabricar/heredar evidencia.
 
@@ -41,9 +40,10 @@
 
 - **`TASK-1525` COMPLETE.** Reader live `ed5e993`; CI/deploy final verdes; base backend/feed cerrada.
 
-- **`TASK-1526` IN-PROGRESS.** En `develop`. Código Globe `2b7842c` pushed: cards inline,
-  preview boundary, selección sin rebuild y `displayTitle`; local verde. Pendiente: deploy internal + smoke
-  same-tab Chrome CEO; no declarar UX aprobada/commercial readiness.
+- **`TASK-1526` COMPLETE internal-only.** Globe `eac1730` desplegado: Studio
+  `globe-studio-internal-00059-2db`, API `globe-api-internal-00058-hqx`; CI/deploy verdes. Smoke Chrome CEO:
+  generación inline convergió sin reload, títulos/preview OK, viewer imagen/audio/video `ready` y reproducible.
+  No declara UX comercial completa ni commercial readiness; `TASK-1527…1529` siguen siendo gates.
 
 - **`TASK-1527` IN-PROGRESS (P0, checkpoint humano).** Plan:
   `docs/tasks/plans/TASK-1527-plan.md`. Aceptar primero el delta de rights workspace-scoped + saga durable;

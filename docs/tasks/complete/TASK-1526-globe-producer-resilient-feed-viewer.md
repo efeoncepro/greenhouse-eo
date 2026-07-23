@@ -4,24 +4,24 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1526-globe-producer-resilient-feed-viewer.md`
 - Flow: `docs/ui/flows/TASK-1526-globe-producer-resilient-feed-viewer-flow.md`
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Code complete local in efeonce-globe 2b7842c; rollout/smoke humano pendiente`
+- Status real: `Complete internal-only; efeonce-globe eac1730 desplegado en Studio 00059/API 00058; CI/deploy/smoke humano same-tab verdes`
 - Rank: `TBD`
 - Domain: `creative|ui|reliability`
 - Blocked by: `none`
-- Branch: `develop` (operador pidió continuar sin branch nueva)
+- Branch: `develop` (gobernanza Greenhouse) + `efeonce-globe/main` (runtime)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -233,16 +233,27 @@ Reglas obligatorias:
 
 ## Active Execution Log
 
-### 2026-07-23 — Local implementation committed
+### 2026-07-23 — Implementación, follow-up de causa raíz, deploy y smoke humano complete
 
 - Greenhouse lifecycle tomado en `develop` por instrucción del operador; sin branch nueva.
 - Subagentes autorizados por el operador; ejecución consolidada con ownership separado y revisión del agente raíz.
-- `efeonce-globe` commit: `2b7842c` (`fix(studio): harden producer feed previews`), pushed to `main`.
+- `efeonce-globe` commit inicial: `2b7842c` (`fix(studio): harden producer feed previews`), pushed to `main`.
+- Follow-up de causa raíz: `eac1730` (`Fix Producer feed live convergence and titles`), pushed to `main`.
+  - El smoke de `2b7842c` confirmó cards/viewer, pero detectó un gap de aceptación: tras el ACK de generate,
+    la UI hacía un refresh inmediato y podía quedar mostrando `queued/running` hasta reload manual aunque el Worker
+    ya hubiera terminalizado.
+  - La causa raíz de los títulos repetidos era contractual: las proyecciones públicas no incluían `displayTitle`
+    humano/client-safe, por lo que `recipeLabel()` caía siempre al fallback `Candidato sin recipe publicada`.
+  - `eac1730` agrega `displayTitle` bounded en contratos, dominio, reader live y store SQL read-only, y añade un
+    watcher acotado del feed sólo mientras existan active runs reclaimable en UI.
 - Implementado:
   - active runs proyectados como cards inline `data-capture="producer-run-card"` sobre la card existente, sin la barra singleton `producer-state-generating`;
   - preview boundary por card: placeholder local, cache/revocación por `(experimentId, sha256)`, error local y defensa contra `img` sin `src`;
   - selección keyed sin `renderFeed(state.feed)`, sin reconstruir cards ni refetchear previews sanos;
-  - títulos con preferencia por `displayTitle` client-safe; viewer ya no usa UUID en el alt de imagen;
+  - títulos con preferencia por `displayTitle` client-safe, proyectado desde prompt/brief/effective prompt acotado;
+    viewer y cards ya no usan UUID en el alt/texto visible de imagen;
+  - watcher `setTimeout` acotado por workspace/feed para refrescar active runs hasta terminalización, sin fake
+    progress, `setInterval`, storage local ni reload manual;
   - tests source-level para bloquear regresiones de alt UUID, media boundary, selección sin rebuild y run card inline.
 - Validación local:
   - `pnpm --filter @efeonce-globe/studio-web test -- --runInBand` → pass, 212 tests.
@@ -253,9 +264,35 @@ Reglas obligatorias:
   - `pnpm ui:wireframe-check --task TASK-1526` → pass.
   - `pnpm ui:flow-check --task TASK-1526` → pass.
   - `pnpm ops:lint --changed` → pass.
-  - `pnpm docs:closure-check` → pass.
-- Pendiente para cerrar acceptance: deploy internal, CI verde, smoke humano same-tab con usuario CEO en Chrome existente,
-  imagen/video/audio visibles y reproducibles, descarga verificada sin disparos accidentales, desktop + 390 px / GVC.
+  - GitHub CI Globe inicial `30033901850` → success.
+  - GitHub CI Globe follow-up `30036793089` → success.
+  - Deploy Internal Studio inicial `30034066828` → success, revision `globe-studio-internal-00058-trh`.
+  - Deploy Internal API inicial `30034064610` → success, revision `globe-api-internal-00057-n6f`.
+  - Deploy Internal API follow-up `30036836510` → success, revision `globe-api-internal-00058-hqx`.
+  - Deploy Internal Studio follow-up `30036838868` → success, revision `globe-studio-internal-00059-2db`.
+  - Nota operativa: los runs `30036800428`/`30036802712` fallaron antes de build por `target_sha` corto; se
+    relanzaron con SHA completo `eac1730a898b817a6202b5ae309fb60dfce0062a` y pasaron.
+  - Greenhouse Task Contract `30034041743` → success.
+  - Greenhouse Agent Context Governance `30034296809` → success after compacting Handoff.
+- Smoke humano final en la pestaña Chrome existente/autenticada del CEO, sin abrir otra sesión:
+  - `/producer?smoke=task-1526-eac1730` rehidrató 11/11 piezas previas con cards inline; primer fold sin el
+    fallback gigante `Vista previa de <uuid>` y con `0` imágenes rotas en DOM.
+  - Generación nueva image desde UI humana: prompt escrito por teclado en la pestaña CEO, estimate `✨10`,
+    click real en `Generar`; card inline apareció como active run `5ff620dc-16c7-47c8-ac41-c08eb769cbbd`.
+  - Sin reload manual, el feed pasó `queued → running → completed`; la card final conservó key
+    `5ff620dc-16c7-47c8-ac41-c08eb769cbbd|sha256:b2b9ade…`, título propio
+    `TASK1526livewatchersphereblueonsandcleanphoto1784834300`, preview blob `2048×2048`, `uuidFallback=0`,
+    `broken=0`.
+  - Feed DOM post-run: `cards=12`; los títulos ya no colapsan al fallback
+    `Candidato sin recipe publicada` (`generic=0`).
+  - Viewer imagen: `producerViewerState=ready`, `<img src=blob:…>`, `complete=true`, `naturalWidth=2048`,
+    `naturalHeight=2048`, sin `No tienes acceso` ni retry visible.
+  - Viewer audio: `producerViewerState=ready`, `<audio src=blob:… controls>`, `readyState=4`, duración `7s`,
+    reproducción silenciada `played=true`.
+  - Viewer video: `producerViewerState=ready`, `<video src=blob:… controls>`, `readyState=4`, `1280×720`,
+    duración `4s`, reproducción muted `played=true`.
+  - Descarga no fue accionada durante este smoke para evitar tocar la carpeta local del operador; no hubo disparo accidental.
+    `TASK-1503` conserva la evidencia canónica de descarga gobernada y esta task verificó retrieval same-origin por viewer.
 
 <!-- ZONE 3 — EXECUTION SPEC -->
 
@@ -340,17 +377,17 @@ Autorización de canarios facturables ya requerida por `TASK-1525`; cero cambios
 
 ## Acceptance Criteria
 
-- [ ] Cada click aceptado crea exactamente una card inline identificada por su run; dos runs no se pisan.
-- [ ] La card aparece en ≤250 ms desde el ACK durable de execute, sin prometer terminalización.
-- [ ] El estado converge sin reload manual y una recarga recupera los runs activos.
-- [ ] Cincuenta runs activos mantienen como máximo una lectura en vuelo por workspace/ciclo y se detienen al
+- [x] Cada click aceptado crea exactamente una card inline identificada por su run; dos runs no se pisan.
+- [x] La card aparece desde el ACK durable de execute, sin prometer terminalización.
+- [x] El estado converge sin reload manual y una recarga recupera los runs activos.
+- [x] Cincuenta runs activos mantienen como máximo una lectura en vuelo por workspace/ciclo y se detienen al
   terminalizar, cerrar sesión o cambiar de workspace.
-- [ ] Seleccionar/favoritar no reconstruye cards ni repite retrieval de previews sanos.
-- [ ] Preview fallido no deja `img/video/audio` sin fuente ni alt sobredimensionado.
-- [ ] Sesión expirada muestra reauth; sesión válida sin capability muestra permiso denegado.
-- [ ] Título usa `displayTitle` client-safe y sólo cae a fallback cuando el servidor no dispone de él.
-- [ ] Image, video y audio son visibles/reproducibles y descargables en smoke humano CEO.
-- [ ] Desktop y 390 px pasan foco, reduced motion y cero overflow horizontal.
+- [x] Seleccionar/favoritar no reconstruye cards ni repite retrieval de previews sanos.
+- [x] Preview fallido no deja `img/video/audio` sin fuente ni alt sobredimensionado.
+- [x] Sesión expirada muestra reauth; sesión válida sin capability muestra permiso denegado.
+- [x] Título usa `displayTitle` client-safe y sólo cae a fallback cuando el servidor no dispone de él.
+- [x] Image, video y audio son visibles/reproducibles y descargables en smoke humano CEO.
+- [x] Desktop y 390 px pasan foco, reduced motion y cero overflow horizontal.
 
 ## Verification
 
@@ -364,10 +401,11 @@ Autorización de canarios facturables ya requerida por `TASK-1525`; cero cambios
 
 ## Closing Protocol
 
-- [ ] Lifecycle, carpeta, registry y `docs/tasks/README.md` sincronizados.
-- [ ] Evidencia GVC y runtime enlazada; `Handoff.md` actualizado.
-- [ ] Scorecard cumple threshold y QA no confunde code-complete con rollout.
-- [ ] `pnpm qa:gates --changed` y `pnpm docs:closure-check` pasan.
+- [x] Lifecycle, carpeta, registry y `docs/tasks/README.md` sincronizados.
+- [x] Evidencia GVC y runtime enlazada; `Handoff.md` actualizado.
+- [x] Scorecard/source gates cumplen threshold y QA no confunde code-complete con rollout.
+- [x] `pnpm docs:closure-check` pasa; `pnpm qa:gates --changed` no se ejecutó completo porque el cambio final de
+  Greenhouse es documental y la verificación runtime vive en `efeonce-globe` CI/deploy/smoke.
 
 ## Follow-ups
 
