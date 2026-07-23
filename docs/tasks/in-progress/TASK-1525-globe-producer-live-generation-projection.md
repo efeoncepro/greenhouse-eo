@@ -17,11 +17,11 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-028`
-- Status real: `Code local verificado; rollout/runtime pendiente`
+- Status real: `Pushed + CI verde; deploy bloqueado por precondición de migración`
 - Rank: `TBD`
 - Domain: `creative|api|reliability`
 - Blocked by: `none`
-- Branch: `task/TASK-1525-globe-producer-live-generation-projection`
+- Branch: `../efeonce-globe main` + `greenhouse-eo develop`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -298,8 +298,16 @@ Verificación local ejecutada:
 
 Estado honesto: el reader está code-complete local y desbloquea `TASK-1526`, pero todavía faltan deploy interno,
 flag/canary, smoke humano y consumo UI resiliente. No declara completitud comercial ni promueve rutas. El código
-queda en el commit local `c361e07` de `../efeonce-globe`, compartido con cambios de promotion/recovery porque el
-operador pidió no aislar y empujar desde el worktree actual; push/CI/deploy quedan como siguiente gate operativo.
+quedó pusheado en `c361e0710ad4398a506c3f0b7a460ee3ab3ec4bf` de `../efeonce-globe`, compartido con cambios de
+promotion/recovery porque el operador pidió no aislar y empujar desde el worktree actual. CI Globe
+`30025567295` pasó verde; Greenhouse develop `e41310fda` pasó gates `30025663684`, `30025661896`,
+`30025662005` y CI `30025661984`.
+
+Deploy interno detenido gobernadamente: migration plan `30026663546` para `c361e0710ad4398a506c3f0b7a460ee3ab3ec4bf`
+reportó pendientes `0026_workspace_generated_rights_policies.sql` y
+`0027_production_promotion_operations.sql`, con precondición `generatedRightsPolicyWorkspace.ready=false`
+(`total=6`, `unambiguous=3`, `unresolved=3`). No aplicar ni desplegar este commit hasta resolver esa precondición
+o separar/revertir el bloque promotion/recovery; el reader TASK-1525 por sí mismo no requiere migración.
 
 ### Rollback plan per slice
 

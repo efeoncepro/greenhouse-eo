@@ -58,8 +58,13 @@
   `globe.producer.feed.live.list|changes`: unión `active-run | terminal-run | retained-asset`, cursor opaco con
   paginación `older` y cambios `newer`, store SQL batch sin writes/N+1 y flag
   `GLOBE_PRODUCER_LIVE_FEED_ENABLED` fail-closed. Validado localmente con typecheck/tests de contracts/domain/database
-  y `studio-web`. Pendiente antes de declararlo operativo: commit aislado, CI, deploy interno, flag/canary y smoke
-  humano. `TASK-1526` consume esa proyección para cards/títulos/render incremental y comparación contra la UI aprobada.
+  y `studio-web`. El commit `c361e0710ad4398a506c3f0b7a460ee3ab3ec4bf` fue empujado a Globe `main` y CI
+  `30025567295` pasó verde; Greenhouse `e41310fda` también pasó CI/gates. No desplegar todavía: el mismo commit
+  incluye promotion/recovery y el plan `Migrate Internal Database` `30026663546` reportó pendientes
+  `0026_workspace_generated_rights_policies.sql` y `0027_production_promotion_operations.sql` con
+  `generatedRightsPolicyWorkspace.ready=false` (`total=6`, `unambiguous=3`, `unresolved=3`). Resolver esa
+  precondición o separar/revertir promotion/recovery antes de aplicar migraciones y deploy interno. `TASK-1526`
+  consume la proyección para cards/títulos/render incremental y comparación contra la UI aprobada.
 
 ### Asset Governance y alertas
 
@@ -614,8 +619,9 @@ raíz en vez de sólo detectarlo.
    cerrar terms/fixture/report/review/proposal/canary exactos. Priorizar Seed Audio sólo como internal-evaluation.
 2. Ejecutar `TASK-1528` y luego `TASK-1529`; verificar derivados, Range/load y GC. El original privado no
    sustituye esa arquitectura.
-3. Ejecutar `TASK-1525` y después `TASK-1526` para convergencia live, títulos client-safe y render incremental;
-   no reabrir el fix ya desplegado de sesión/viewer.
+3. Cerrar el bloqueo de deploy de `TASK-1525`: resolver `generatedRightsPolicyWorkspace.ready=false` para aplicar
+   `0026/0027`, o separar promotion/recovery del commit `c361e071`. Después deploy interno con flag fail-closed,
+   canary/smoke y `TASK-1526` para convergencia live, títulos client-safe y render incremental.
 4. Mantener clientes externos/Production cerrados hasta `TASK-1480` y sus dependencias; no interpretar el éxito
    internal-only como promoción comercial.
 
