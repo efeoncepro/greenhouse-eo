@@ -420,6 +420,7 @@ export const MEETING_RENDERER_CSS = `
   align-self: start;
   gap: 8px;
   min-width: 0;
+  margin: 0;
 }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-label { color: var(--gh-meeting-muted); font-size: 0.74rem; font-weight: 760; letter-spacing: 0.02em; }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-control {
