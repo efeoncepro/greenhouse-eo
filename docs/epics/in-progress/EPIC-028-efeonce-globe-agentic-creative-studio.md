@@ -108,6 +108,12 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
   por policy/Legal. Reusa retrieval/lineage y no crea un segundo source of truth.
 - `TASK-1522` — **Review, comments + share foundation.** Migration, secret y grants están desplegados; el smoke
   positivo permanece bloqueado porque aún no existe un output owned/elegible producido por el carril gobernado.
+- `TASK-1523` — **Creative Suite Experience Logic and Information Architecture.** Policy ui-platform que
+  contractualiza el Creative Loop común, la relación Producer prompt-first ↔ Workbench brief-first, el rol
+  agentic `propose→approve→execute→judge` y los gates humanos, sin crear backend ni runtime paralelo.
+- `TASK-1524` — **Commercial Login Cinematic Threshold.** Evoluciona la puerta anónima internal-only a una
+  apertura comercial poster-first `One Idea, Many Forms`, con master desktop/mobile, pausa, reduced motion,
+  progressive enhancement y OAuth/session existentes intactos; promoción sigue gateada por `TASK-1521/1480`.
 - `TASK-1521` — **Globe Commercial Runtime Environment Enablement.** Posee el bloqueo actual que impide bootear
   fuera de `internal_smoke`: environment contract, isolation/config, secrets, migrations, rollback y evidencia.
 - `TASK-1506` — **frontend hosting and front door decision (RESUELTA — ADR-004).** Gate P0 cerrado: la ADR
