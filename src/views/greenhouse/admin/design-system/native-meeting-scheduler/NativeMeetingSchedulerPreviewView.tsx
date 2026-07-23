@@ -19,6 +19,7 @@ import { ensureStylesInjected as ensureCtaStyles } from '@/growth-cta-renderer/s
 import { createMeetingFixtureApi, type MeetingFixtureOutcome } from '@/growth-meeting-renderer/fixtures'
 import { MeetingRenderer } from '@/growth-meeting-renderer/renderer'
 import { ensureMeetingStyles } from '@/growth-meeting-renderer/styles'
+import type { MeetingTurnstilePort } from '@/growth-meeting-renderer/turnstile'
 
 const OUTCOMES: Record<MeetingFixtureOutcome, string> = {
   confirmed: 'Confirmado',
@@ -34,6 +35,16 @@ const EMBED_SNIPPET = `<efeonce-meeting-scheduler
 ></efeonce-meeting-scheduler>
 <script src="https://efeonce-public-renderers.vercel.app/loader.js" defer></script>`
 
+const previewTurnstile: MeetingTurnstilePort = {
+  mount() {
+    return {
+      execute: async () => 'preview-captcha-token',
+      reset() {},
+      destroy() {},
+    }
+  },
+}
+
 const SchedulerCanvas = ({ outcome }: { outcome: MeetingFixtureOutcome }) => {
   const hostRef = useRef<HTMLDivElement | null>(null)
 
@@ -45,13 +56,7 @@ const SchedulerCanvas = ({ outcome }: { outcome: MeetingFixtureOutcome }) => {
 
     const renderer = new MeetingRenderer(host, {
       api: createMeetingFixtureApi(outcome),
-      turnstile: {
-        mount({ onToken }) {
-          onToken('preview-captcha-token')
-
-          return { destroy() {} }
-        },
-      },
+      turnstile: previewTurnstile,
       surfaceId: 'greenhouse-design-system',
       schedulerKey: 'efeonce-discovery-30',
       requestedTimezone: 'America/Santiago',
@@ -102,13 +107,7 @@ const GrowthCtaSchedulerSeam = ({ outcome }: { outcome: MeetingFixtureOutcome })
 
         const meeting = new MeetingRenderer(element, {
           api: createMeetingFixtureApi(outcome),
-          turnstile: {
-            mount({ onToken }) {
-              onToken('preview-captcha-token')
-
-              return { destroy() {} }
-            },
-          },
+          turnstile: previewTurnstile,
           surfaceId: 'greenhouse-design-system',
           schedulerKey: 'efeonce-discovery-30',
           requestedTimezone: 'America/Santiago',

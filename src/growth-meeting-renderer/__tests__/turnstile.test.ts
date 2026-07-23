@@ -7,14 +7,11 @@ import {
   resetMeetingTurnstileLoaderForTests,
 } from '../turnstile'
 
-const turnstileWindow = () => window as Window & {
-  turnstile?: {
-    render(container: HTMLElement, options: Record<string, unknown>): string | number
-    execute(widgetId: string | number): void
-    remove(widgetId: string | number): void
-    reset(widgetId: string | number): void
-  }
-}
+type TurnstileTestWindow = NonNullable<Parameters<typeof createMeetingTurnstilePort>[0]>
+type TurnstileTestApi = NonNullable<TurnstileTestWindow['turnstile']>
+type TurnstileTestRenderOptions = Parameters<TurnstileTestApi['render']>[1]
+
+const turnstileWindow = () => window as TurnstileTestWindow
 
 describe('meeting Turnstile port', () => {
   afterEach(() => {
@@ -26,16 +23,16 @@ describe('meeting Turnstile port', () => {
 
   it('loads and executes Turnstile only when a booking requests a token', async () => {
     const container = document.createElement('div')
-    let renderOptions: Record<string, unknown> = {}
+    let renderOptions: TurnstileTestRenderOptions | undefined
 
-    const render = vi.fn((_container: HTMLElement, options: Record<string, unknown>) => {
+    const render = vi.fn((_container: HTMLElement, options: TurnstileTestRenderOptions) => {
       renderOptions = options
 
       return 'meeting-widget'
     })
 
     const execute = vi.fn(() => {
-      ;(renderOptions.callback as (token: string) => void)('meeting-token')
+      renderOptions?.callback('meeting-token')
     })
 
     const handle = createMeetingTurnstilePort(turnstileWindow()).mount({
@@ -71,7 +68,7 @@ describe('meeting Turnstile port', () => {
   })
 
   it('rejects an active token request when the widget reports an error', async () => {
-    let renderOptions: Record<string, unknown> = {}
+    let renderOptions: TurnstileTestRenderOptions | undefined
 
     turnstileWindow().turnstile = {
       render: vi.fn((_container, options) => {
@@ -80,7 +77,7 @@ describe('meeting Turnstile port', () => {
         return 'meeting-widget'
       }),
       execute: vi.fn(() => {
-        ;(renderOptions['error-callback'] as () => void)()
+        renderOptions?.['error-callback']()
       }),
       remove: vi.fn(),
       reset: vi.fn(),
