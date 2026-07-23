@@ -8,6 +8,28 @@
 
 # Handoff
 
+## Active state — 2026-07-22 (TASK-1494: Style DNA desplegado; canary positivo bloqueado)
+
+`efeonce-globe` ya implementa los puertos que faltaban para que Reference Intelligence deje de ser una
+proyección vacía: identidad tenant-safe desde asset provenance, análisis gobernado por el provider seam Vertex,
+paleta determinística local, spend fence/kill switch, caché por workspace+hash+versión y wiring en `studio-web`.
+El commit `a5e1289355770abd1a927a6d078dc042b7c29c91` fue pusheado a Globe `main`; CI `29966815213` pasó. El plan
+de migración `29966823795` confirmó `0009_reference_intelligence_style_dna.sql` aplicada y esquema limpio, sin
+pendientes ni checksum mismatch. Deploys canónicos: API `29966942819` →
+`globe-api-internal-00030-xkf` (`sha256:ab72f93d…`, 100%) y Studio `29966944103` →
+`globe-studio-internal-00031-vwz` (`sha256:123d472a…`, 100%). Perímetros: API anónima 403; front door Studio
+HTTP 301/HTTPS 200.
+
+Configuración live verificada sin exponer secretos: `GLOBE_LAB_ENABLED=true`, provider `composite`, bucket
+privado `efeonce-globe-lab-evidence`, cap diario 200 y caller dedicado. Los negativos live devolvieron
+`404 not_found` para asset ausente, `400 invalid_request` para versión inventada y `403 access_denied` para
+workspace ajeno. La lista de provenance devolvió cero assets. Por ello no se pudo probar `miss → hit` ni el
+settlement único de 4 créditos. Ingesta privada está OFF y Model Readiness no tiene promociones firmadas para
+crear un asset por canary; no deben eludirse. Próximo paso: cuando el flujo gobernado normal produzca una imagen
+interna elegible, ejecutar [el runbook de Style DNA](../../manual-de-uso/creative-studio/operar-reference-intelligence-style-dna.md).
+El grant temporal `serviceAccountTokenCreator` del operador fue revocado y la política IAM volvió a contener
+solo los subjects WIF de development/staging. Estado: **desplegado internal-only; canary positivo operativamente bloqueado**.
+
 ## Active state — 2026-07-22 (TASK-1503: output side del Producer vivo en `globe-api-internal`)
 
 **Lo que hace usable una pieza ya generada quedó operativo.** `TASK-1503` shipeó el *output side* del

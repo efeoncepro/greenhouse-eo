@@ -10,9 +10,12 @@
 3. Escribe el prompt y, si corresponde, agrega referencias privadas. Una referencia no queda utilizable hasta que
    su ingest y derechos estén listos.
 4. Selecciona modo, preset, ruta/modelo y shape. En Video, `Editar` requiere un asset fuente elegible.
-5. Define un límite máximo de créditos y selecciona `Estimar`.
-6. Revisa costo, restricciones y vigencia del estimate. Selecciona `Generar` sólo si el límite sigue vigente.
-7. Sigue el estado durable en la biblioteca. Cerrar el browser no cancela el run.
+5. Si necesitas reproducibilidad, bloquea la seed y ajusta su valor o usa reroll. Agrega un negative prompt sólo
+   como restricción creativa; no incluyas secretos ni instrucciones de proveedor.
+6. Define un límite máximo de créditos y selecciona `Calcular costo`.
+7. Revisa costo, restricciones y vigencia del estimate. `Generar` se habilita sólo con una cotización vigente;
+   cambiar prompt, shape, seed o negative prompt obliga a calcular nuevamente.
+8. Sigue el estado durable en la biblioteca. Cerrar el browser no cancela el run.
 
 El halo azul del composer responde al hover/puntero y al foco; al activar un modo de edición permanece encendido para
 indicar que el composer está condicionado por un asset fuente. Con `prefers-reduced-motion` conserva la señal de
@@ -35,6 +38,8 @@ expirable y revocable; el token no aparece en query strings ni logs. No entregue
 ## Estados que no deben confundirse
 
 - `policy-blocked`: la capability existe, pero no está habilitada para esta superficie/persona.
+- Modo deshabilitado: el workspace no tiene autoridad de assets/provenance confirmada; no intentes eludirlo con
+  otra ruta o un identificador externo.
 - `dependency_unavailable`: una dependencia real no respondió; reintentar puede ser válido.
 - `quarantined` / governance pendiente: los bytes existen, pero todavía no son elegibles.
 - `candidate_ready`: la generación terminó y el output fue retenido; no implica aprobación humana ni derechos

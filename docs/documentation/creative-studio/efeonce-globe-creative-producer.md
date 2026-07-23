@@ -9,6 +9,8 @@ un backend está apagado; la UI muestra su estado real y el dueño que debe habi
 
 - Componer por modalidad con prompt, presets, referencias, ruta/modelo público y shape válido.
 - Estimar créditos antes de reservar o gastar; el operador fija un hard cap explícito.
+- Bloquear o regenerar una seed reproducible y declarar restricciones negativas; ambos cambios invalidan el
+  estimate anterior para evitar generar con una cotización desactualizada.
 - Ejecutar runs durables y ver sus estados/attempts reales, sin porcentajes derivados de timers del browser.
 - Recuperar image/video/audio por grants efímeros y validar integridad content-addressed.
 - Explorar feed, lineage, series, collections, selección y operaciones batch.
@@ -25,6 +27,9 @@ Cada output generado se ingiere por stream, se registra content-addressed y entr
 ejecuta malware, C2PA y rights en orden. C2PA sólo se muestra como verificado ante un resultado explícito `Trusted`;
 la presencia de un manifest no basta. Las políticas de derechos son exactas por ruta/proveedor/modelo/versión y los
 derivados heredan restricciones de sus padres.
+
+Los modos que necesitan referencias o provenance no se habilitan por apariencia: el Producer consulta la
+autoridad del workspace y los mantiene cerrados si la capability está apagada, denegada o degradada.
 
 ## Estado vigente
 

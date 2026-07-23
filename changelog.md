@@ -7,6 +7,18 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-22 — Globe Style DNA desplegado internal-only
+
+- TASK-1494 completa el carril local de Reference Intelligence: identidad tenant-safe desde provenance,
+  resolución privada content-addressed, paleta determinística versionada y análisis semántico Vertex por el
+  mismo `CreativeProviderAdapter`, detrás de spend fence y kill switch.
+- La versión de análisis queda fijada por contrato para impedir cache-busting; command/reader, perfiles,
+  conditioning, estilos versionados y auto-route conservan Full API Parity, derechos y errores saneados.
+- Suites, build, CI, migración y despliegues canónicos pasan en `a5e128935577`; API/Studio sirven el 100% y los
+  negativos live validan `not_found`, `invalid_request` y aislamiento cross-workspace. El canary positivo queda
+  bloqueado honestamente porque el workspace no tiene assets gobernados elegibles; no se eluden ingesta,
+  readiness ni rights para fabricar uno.
+
 ## 2026-07-22 — Globe Producer aprobado implementado localmente sin recortar el diseño
 
 - `efeonce-globe/apps/studio-web` materializa el baseline completo de TASK-1505: composer cross-modal,
@@ -14,12 +26,15 @@
   recreate/inpaint, bulk, créditos, review/comments/share, estados honestos, command palette y onboarding.
 - La revisión source-led restauró paleta, jerarquía, superficies, Tabler self-hosted, wordmark/isotype Globe,
   logo Efeonce oficial, hero/masonry, motion y microinteracciones. Evidencia desktop/390/reduced-motion y score
-  enterprise 4.69/5: `docs/ui/reviews/TASK-1505/`.
+  enterprise 4.72/5: `docs/ui/reviews/TASK-1505/`.
+- El composer ahora exige estimate vigente antes de generar, conserva conditioning, incorpora seed
+  lock/input/reroll y negative prompt, y mantiene seis modos asset-dependent fail-closed mediante el reader de
+  provenance del workspace.
 - La UI no oculta deuda con un botón decorativo: referencias image/video usan rutas genuinas separadas, policy
   count/media pre-spend, handles autorizados, resolución de bytes server-side y lineage por hash. Compare quedó
   alineado al reader `globe.lab.experiment.get`; el input de cantidad oculto salió del recorrido de foco.
-- El runtime local completo pasa `pnpm check` y `pnpm build` (Studio 138/138, Domain 248/248, Creative Runner
-  183/183 dentro del full check). TASK-1504 queda reconocida como code-complete local; TASK-1519/1520/1522 y
+- El runtime local completo pasa `pnpm check` y `pnpm build` (Studio Web 185/185 dentro del full check).
+  TASK-1504 queda reconocida como code-complete local; TASK-1519/1520/1522 y
   TASK-1505 mantienen lifecycle `in-progress` porque rollout no está aplicado.
 - Estado operativo honesto: faltan migrations `0010…0016`, secrets, buckets/IAM, grants, flags,
   scheduler/worker, acceso de proveedores y canarios internal. No hubo deploy, provider spend ni promoción
@@ -819,10 +834,3 @@
 - La publicación tuvo snapshot/rollback, guards de identidad, fingerprint, taxonomía y media, purge Kinsta y QA
   live desktop/móvil. Pasaron robots, schema, social metadata, TOC, imágenes, links, overflow y el crop cuadrado
   real del archivo.
-
-## 2026-07-17 — ANAM: backlog operativo y criterios de cierre
-
-- Se consolidó en una fuente canónica el trabajo abierto posterior al rollout comercial: automatizaciones y QA
-  de pipeline, Calidad de Datos, Service/renovación, KPI oficiales, Customer Agent, facturación y Tickets/SLA.
-  Cada frente explicita owner, dependencias, aprobación y exit gate; el cambio es documental y no autoriza ni
-  ejecuta nuevos writes en HubSpot.

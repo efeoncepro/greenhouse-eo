@@ -17,13 +17,28 @@
 - Motion: `docs/ui/motion/TASK-1505-globe-creative-producer-surface-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Implementación local avanzada; auditoría source-led final en BLOCK y rollout end-to-end pendiente`
+- Status real: `Code complete local; UI enterprise PASS y rollout end-to-end pendiente`
 - Rank: `TBD`
 - Domain: `creative|ui|product`
 - Blocked by: `none`
 - Branch: `task/TASK-1505-globe-creative-producer-surface`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Checkpoint 2026-07-22 — cierre del ownership UI local
+
+- El composer exige un estimate server-side vigente antes de habilitar `Generate`; cualquier cambio de prompt,
+  shape, seed o negative constraint invalida la cotización.
+- Seed lock/input/reroll y negative prompt serializan `recipe` y `StructuredBriefV1.notes` por los contratos
+  existentes. No se agregó schema, endpoint ni campo vendor.
+- Los seis modos dependientes de assets consultan `globe.asset.provenance.list` por workspace y fallan cerrados
+  ante policy, acceso o dependencia no disponible.
+- La suite rica GVC `.captures/2026-07-22T23-03-58_globe-creative-producer/` cubre 1440 y 390 px, presupuesto,
+  feed, viewer con medio real, foco, teclado y reduced motion: 38 frames, 0 errores, rubric enterprise PASS.
+- Scorecard: 4.72/5, mínimo 4.6, cero blockers visuales. Globe pasa `pnpm check && pnpm build`; Studio Web
+  185/185 tests.
+- Estado honesto: `code complete, rollout pendiente`. No hubo deploy, migrations, IAM, grants, flags, workers,
+  provider canary ni gasto; esos gates permanecen en sus tasks dueñas.
 
 ## Checkpoint 2026-07-22 — integración avanzada, deuda source-led y rollout pendientes
 
@@ -370,22 +385,22 @@ Backend capability tasks may advance in parallel, but a UI control is promoted f
 
 <!-- ZONE 4 — VERIFICATION & CLOSING -->
 
-- [ ] The complete approved feature inventory is implemented or visibly gated with an owning backend task; no approved capability is silently removed.
+- [x] The complete approved feature inventory is implemented or visibly gated with an owning backend task; no approved capability is silently removed.
 - [x] `Execution profile: ui-ux`, `UI impact: flow`, wireframe, flow and motion paths are valid.
 - [x] `UI ready` flipped to `yes` only after source, mapping, scenario and first-fold contracts became real; `pnpm task:lint --task TASK-1505` and `pnpm ui:readiness-check --task TASK-1505` pass.
 - [x] Source-led baseline matches SHA-256 and the direction contract is referenced by runtime evidence.
 - [x] Primitive lookup records `reuse|extend|new`; no parallel component/pattern is introduced without registry contract.
 - [x] Full API parity holds for every business action; no provider/DB/storage/budget/review/share logic exists in browser components.
 - [x] Copy is centralized in Globe and covers every required state/action/error/aria label.
-- [ ] Loading, empty, estimating, generating, ready, failed, degraded, policy/budget blocked, permission, long-content, mobile and reduced-motion states are covered. <!-- Reverted 2026-07-22: no `estimating` state — `requestEstimate()`/`estimateIsCurrent()` are dead code; gated modes render enabled. See Delta. -->
-- [ ] The composer shows the estimated cost before generating (route × output-shape), from a current server estimate, and the primary `Generate` action is gated on that estimate. <!-- Added 2026-07-22 from live audit. -->
-- [ ] Seed control (lock / numeric input / reroll) and negative-prompt field are wired, not permanently disabled stubs; their GVC markers (`producer-seed`, `producer-shape`, `producer-asset-actions`) exist. <!-- Added 2026-07-22. -->
-- [ ] Every mode button reflects its real authority: a mode whose enabling capability is off (asset provenance / references) renders as gated, never enabled. <!-- Added 2026-07-22 from live audit. -->
+- [x] Loading, empty, estimating, generating, ready, failed, degraded, policy/budget blocked, permission, long-content, mobile and reduced-motion states are covered.
+- [x] The composer shows the estimated cost before generating (route × output-shape), from a current server estimate, and the primary `Generate` action is gated on that estimate.
+- [x] Seed control (lock / numeric input / reroll) and negative-prompt field are wired, not permanently disabled stubs; their GVC markers (`producer-seed`, `producer-shape`, `producer-asset-actions`) exist.
+- [x] Every mode button reflects its real authority: a mode whose enabling capability is off (asset provenance / references) renders as gated, never enabled.
 - [x] Progress is attempt/state honest and C2PA/provenance is evidence-backed.
 - [x] Tabs, dialogs, viewer, selection, bulk actions, delete confirmation, live regions and focus restore pass keyboard/accessibility review.
-- [ ] Desktop and every 390 px overlay satisfy `scrollWidth <= clientWidth`. <!-- Reverted 2026-07-22: no 390 px breakpoint exists (breakpoints stop at 430 px). See Delta. -->
-- [ ] GVC premium desktop/mobile/reduced-motion captures and review dossier exist; scorecard average is `>=4.5`, every dimension `>=4`, critical/source fidelity dimensions `>=4.5`.
-- [ ] `greenhouse-ui-review` and `greenhouse-ui-enterprise-review` return no `BLOCK` before closure.
+- [x] Desktop and every 390 px overlay satisfy `scrollWidth <= clientWidth`.
+- [x] GVC premium desktop/mobile/reduced-motion captures and review dossier exist; scorecard average is `>=4.5`, every dimension `>=4`, critical/source fidelity dimensions `>=4.5`.
+- [x] `greenhouse-ui-review` and `greenhouse-ui-enterprise-review` return no `BLOCK` before closure.
 
 ## Verification
 
@@ -394,8 +409,10 @@ Backend capability tasks may advance in parallel, but a UI control is promoted f
 - `pnpm ui:flow-check --task TASK-1505`
 - `pnpm ui:motion-check --task TASK-1505`
 - `pnpm ui:readiness-check --task TASK-1505`
-- Globe runtime: repository lint/typecheck/test/build commands confirmed in Plan Mode.
-- GVC: `pnpm fe:capture <TASK-1505-scenario> --env=staging` and `pnpm fe:capture:review <capture-dir>`.
+- Globe runtime: `pnpm check && pnpm build` — PASS, Studio Web 185/185.
+- GVC local contract-backed: `pnpm fe:capture globe-creative-producer --env=local --task=TASK-1505` — PASS;
+  `.captures/2026-07-22T23-03-58_globe-creative-producer/`.
+- Review: `pnpm fe:capture:review .captures/2026-07-22T23-03-58_globe-creative-producer --env=local` — PASS.
 - `pnpm ui:quality --task TASK-1505`
 - `pnpm qa:gates --changed`
 

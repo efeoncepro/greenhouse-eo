@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -21,11 +21,11 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-028`
-- Status real: `Diseno`
+- Status real: `Desplegado internal-only; canary positivo operativamente bloqueado`
 - Rank: `TBD`
 - Domain: `creative|ai`
 - Blocked by: `none`
-- Branch: `task/TASK-1494-globe-reference-intelligence-style-dna`
+- Branch: `develop` (Greenhouse docs) / `main` (Globe shared checkout; no branch switch)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -158,7 +158,7 @@ Reglas obligatorias:
   (capability nueva o método/port de análisis en el adapter).
 - (repo `efeonce-globe`) `apps/creative-runner/src/**` — la resolución de la referencia para análisis
   + el despacho al adapter de visión.
-- `docs/tasks/to-do/TASK-1494-globe-reference-intelligence-style-dna.md`
+- `docs/tasks/complete/TASK-1494-globe-reference-intelligence-style-dna.md`
 
 ## Current Repo State
 
@@ -312,12 +312,12 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface y consumers nombrados con paths reales del repo `efeonce-globe`.
-- [ ] Invariantes (determinismo por `sha256`, honestidad del score, no-bytes-por-wire, no-SDK-directo)
+- [x] Source of truth, contract surface y consumers nombrados con paths reales del repo `efeonce-globe`.
+- [x] Invariantes (determinismo por `sha256`, honestidad del score, no-bytes-por-wire, no-SDK-directo)
       y boundary tenant/workspace explícitos.
-- [ ] Postura de migración/rollback aditiva y proporcional (flag OFF + coverage policy-blocked).
-- [ ] Evidencia runtime listada para el análisis y el conditioning (canary por el seam).
-- [ ] Errores canónicos saneados; sin fuga de bytes crudos, output de proveedor ni secreto.
+- [x] Postura de migración/rollback aditiva y proporcional (flag OFF; activación dependiente de runtime).
+- [x] Evidencia runtime listada para el análisis y el conditioning; canary vivo queda documentado como rollout pendiente.
+- [x] Errores canónicos saneados; sin fuga de bytes crudos, output de proveedor ni secreto.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -352,9 +352,9 @@ not an arbitrary provider payload saved by the browser.
 
 Additional acceptance evidence:
 
-- [ ] Styles/presets are versioned, tenant-safe and materialize identically across supported consumers.
-- [ ] Auto-route recommendation is deterministic for a pinned catalog/policy version and performs no spend.
-- [ ] Recommended, selected and actual route are distinguishable in contract, persistence and audit evidence.
+- [x] Styles/presets are versioned, tenant-safe and materialize identically across supported consumers.
+- [x] Auto-route recommendation is deterministic for a pinned catalog/policy version and performs no spend.
+- [x] Recommended, selected and actual route are distinguishable in contract, persistence and audit evidence.
 
 ### Slice 1 — Contrato `ReferenceProfileV1` + capability de análisis en el spine
 
@@ -516,24 +516,44 @@ proporcional (backend-standard), no crítica.
 
 ## Acceptance Criteria
 
-- [ ] Existe `ReferenceProfileV1` (paleta + `styleDescriptors` con `score∈[0,1]` + composición),
+- [x] Existe `ReferenceProfileV1` (paleta + `styleDescriptors` con `score∈[0,1]` + composición),
       transport-neutral y determinista por `sha256`.
-- [ ] El command `globe.lab.reference.analyze` y el reader `globe.lab.reference.profile.get` están
-      registrados en el spine con coverage `ui: policy-blocked` / `mcp: policy-blocked`, resto
-      `available`.
-- [ ] El análisis semántico se despacha SOLO por `CreativeProviderAdapter` (cero SDK de proveedor
+- [x] El command `globe.lab.reference.analyze` y el reader `globe.lab.reference.profile.get` están
+      registrados en el spine; `ui` está `available` por la promoción de TASK-1505 y `mcp` permanece
+      `policy-blocked`.
+- [x] El análisis semántico se despacha SOLO por `CreativeProviderAdapter` (cero SDK de proveedor
       directo); el carril de paleta es determinista y local (sin proveedor, sin fence).
-- [ ] La referencia se resuelve a bytes SOLO server-side por el `InputResolverPort` content-addressed;
+- [x] La referencia se resuelve a bytes SOLO server-side por el `InputResolverPort` content-addressed;
       ni bytes ni output crudo del proveedor cruzan el contrato.
-- [ ] Un mismo `sha256` retorna el perfil cacheado sin re-gastar el spend fence (idempotencia).
-- [ ] `PrepareExperimentPayloadV1` acepta `referenceConditioning` (`match-palette`/`match-composition`
+- [x] Un mismo `sha256` retorna el perfil cacheado sin re-gastar el spend fence (idempotencia).
+- [x] `PrepareExperimentPayloadV1` acepta `referenceConditioning` (`match-palette`/`match-composition`
       + `styleStrength∈[0,1]`); se compila server-side a la instrucción del proveedor; sin el campo el
       path se comporta como hoy.
-- [ ] `prepare` con `profileRef` inexistente/ajeno falla closed con error canónico saneado.
-- [ ] `cd ../efeonce-globe && pnpm check && pnpm build` verdes; canary por el seam verificado (o
-      documentado `code complete, rollout pendiente` si el canary queda gated).
+- [x] `prepare` con `profileRef` inexistente/ajeno falla closed con error canónico saneado.
+- [x] `cd ../efeonce-globe && pnpm check && pnpm build` verdes; despliegue internal-only y negativos
+      live verificados. El canary positivo queda bloqueado por ausencia de un asset gobernado elegible.
 
 ## Verification
+
+### Evidencia de cierre 2026-07-22
+
+- `efeonce-globe`: `pnpm check && pnpm build` PASS; creative-runner 213/213 y Studio Web 188/188.
+- Smoke canónico local: command `globe.lab.reference.analyze` + reader
+  `globe.lab.reference.profile.get` por HTTP con autoridad derivada, sin red ni gasto.
+- Negativos: versión caller-selected rechazada antes de identity/cache; asset cross-workspace/no elegible,
+  dependency/provider failure, JSON semántico inválido y kill switch fallan cerrados y saneados.
+- DB seam: store/migration `0009` tenant-scoped; workflow plan `29966823795` confirmó `applied`,
+  `pending=[]`, `checksumMismatches=[]` y `clean=true` en Cloud SQL.
+- ADR gate: SPEC-002 gobierna el seam del Model Lab; la operación opcional del adapter implementa esa decisión
+  aditiva/reversible y no requiere un ADR paralelo.
+- Runtime: commit `a5e1289355770abd1a927a6d078dc042b7c29c91`, CI `29966815213`, deploy API
+  `29966942819` (`globe-api-internal-00030-xkf`) y Studio `29966944103`
+  (`globe-studio-internal-00031-vwz`), ambos Ready y al 100%.
+- Negativos live: asset ausente `404 not_found`, versión no aprobada `400 invalid_request` y selección
+  cross-workspace `403 access_denied`; el workspace interno reportó cero assets de provenance.
+- QA operativo: `BLOCK` sólo para el canary positivo. La implementación y el despliegue están completos,
+  pero no se puede demostrar `miss → hit` ni gasto único sin un asset de imagen gobernado elegible. Audit:
+  [`TASK-1494-qa-release-audit-2026-07-22.md`](../../audits/TASK-1494-qa-release-audit-2026-07-22.md).
 
 - `cd ../efeonce-globe && pnpm check && pnpm build`
 - `pnpm task:lint --task TASK-1494` (Greenhouse — lifecycle/estructura)
@@ -542,16 +562,16 @@ proporcional (backend-standard), no crítica.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedó sincronizado con el estado real (`in-progress` al tomarla,
+- [x] `Lifecycle` del markdown quedó sincronizado con el estado real (`in-progress` al tomarla,
       `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedó sincronizado con el cierre
-- [ ] `Handoff.md` (Greenhouse) quedó actualizado; el estado de rollout vivo del runtime se registra
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedó sincronizado con el cierre
+- [x] `Handoff.md` (Greenhouse) quedó actualizado; el estado de rollout vivo del runtime se registra
       en `efeonce-globe/Handoff.md`
-- [ ] `changelog.md` quedó actualizado si cambió comportamiento/contrato visible
-- [ ] se ejecutó chequeo de impacto cruzado (TASK-1474 consumer, TASK-1493 coordinación del brief)
+- [x] `changelog.md` quedó actualizado si cambió comportamiento/contrato visible
+- [x] se ejecutó chequeo de impacto cruzado (TASK-1474 consumer, TASK-1493 coordinación del brief)
 
-- [ ] Documentación del contrato `ReferenceProfileV1` + conditioning sincronizada en la spec de Model
+- [x] Documentación del contrato `ReferenceProfileV1` + conditioning sincronizada en la spec de Model
       Lab / Creative Studio (triple documentación proporcional)
 
 ## Follow-ups
@@ -588,3 +608,13 @@ siempre `not_found` → `producer_styles` y `reference_profiles` están **vacía
 (hoy `to-do`) es prerrequisito de que Style DNA funcione; implica escribir esos dos adapters (identidad de
 asset + ejecutor de análisis, presumiblemente sobre el mismo seam de provider del Lab) e inyectarlos. Hasta
 entonces TASK-1505 debe mostrar Style DNA como gated, no enabled.
+
+## Closure 2026-07-22 — adapters, wiring y rollout internal implementados
+
+El hallazgo anterior queda resuelto en código: `GovernedReferenceAssetIdentityResolver` y
+`GovernedReferenceAnalysisExecutor` están implementados e inyectados por el composition root. `0009` está
+aplicada, el provider `composite`, bucket, kill switch y cap están presentes, y API/Studio ejecutan el SHA
+`a5e128935577` al 100%. La superficie sigue sin datos porque el workspace vivo contiene cero assets gobernados;
+la ingesta privada está apagada y el canary de generación no tiene promociones humanas de Model Readiness.
+Crear o saltarse autoridad para fabricar una referencia violaría los controles de Globe. Estado honesto:
+**desplegado internal-only; canary positivo operativamente bloqueado**.

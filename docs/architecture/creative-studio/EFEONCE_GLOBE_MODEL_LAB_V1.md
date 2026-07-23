@@ -438,6 +438,53 @@ Dos defectos que sólo el gasto real reveló, ambos con suite unitaria en verde:
 se calculaba y no se propagaba (todo edit stateful degradaba en silencio), y todo fallo del runner
 colapsaba a `runner_error` (el fallo más común de un edit era indistinguible de cualquier otro).
 
+## Extensión Reference Intelligence / Style DNA (TASK-1494)
+
+TASK-1494 extiende SPEC-002 sin abrir un segundo carril de proveedor. El primitive transport-neutral vive en
+`packages/contracts/src/reference-intelligence.ts` y `packages/domain/src/reference-intelligence.ts`; Studio
+solo compone puertos y los transportes HTTP/SDK/CLI/worker siguen heredando el spine.
+
+### Decisión y límites
+
+- La operación semántica es un método tipado opcional de `CreativeProviderAdapter`; no existe cliente Vertex,
+  Gemini o Fal en dominio ni en un handler de UI. `VertexCreativeAdapter` es el único adapter implementado para
+  esta operación y usa el `VertexTransport` keyless existente.
+- El caller envía `referenceAssetId` y la versión fija
+  `style-dna-gemini-2.5-flash-v1`. No puede elegir un modelo ni inventar versiones para romper la caché.
+- `GovernedReferenceAssetIdentityResolver` deriva hash, rights y elegibilidad desde
+  `AssetProvenanceStorePort.getAsset(workspaceId, assetId)`. Nunca lee ni retorna un storage handle.
+- `GovernedReferenceAnalysisExecutor` resuelve bytes por `InputResolverPort`, revalida hash/MIME, extrae la
+  paleta localmente y recién después de un estimate puro reserva el spend fence antes de la llamada semántica.
+- La paleta usa decode/normalización server-only con `sharp` y un histograma RGB fijo de 4 bits por canal,
+  orden estable y pesos normalizados. `paletteAlgorithmVersion=sharp-rgb-histogram-v1` hace explícita su
+  evolución; la semántica viene como JSON estricto saneado y el score permanece confianza `[0,1]`.
+- Caché y leases se indexan por `workspaceId + referenceSha256 + analysisModelVersion`; los perfiles, estilos,
+  versiones y hechos de ruta permanecen tenant-scoped en las tablas de la migración `0009`.
+- El conditioning materializa texto provider-neutral server-side. Los parámetros nativos de estilo no se usan
+  hasta que exista una ruta verificada que los soporte; el browser solo puede seleccionar una versión inmutable
+  de estilo, no suministrar prompts compilados ni payloads de proveedor.
+
+### Composición y degradación
+
+`apps/studio-web/src/app.ts` compone identidad desde el store de provenance y análisis únicamente cuando existe
+un bucket privado y `GLOBE_LAB_PROVIDER` es `vertex` o `composite`. Sin store, bytes privados, proveedor real o
+kill switch, la capability sigue publicada pero responde `dependency_unavailable`/`policy_blocked`; nunca crea
+un perfil plausible. `mcp` permanece `policy-blocked`; `ui` está declarada `available` por el contrato del
+Producer, pero su uso real depende de grants y rollout del runtime.
+
+La decisión queda gobernada por SPEC-002 y su provider seam ya aceptado. No se crea otro ADR: la alternativa
+seleccionada es aditiva, reversible y fue el checkpoint de TASK-1494; cambiar de seam, modelo de identidad o
+algoritmo de paleta sí exige reabrir la decisión.
+
+### Estado de rollout al 2026-07-22
+
+Código, suites herméticas, migración `0009`, configuración no secreta y despliegue internal-only están
+completos en el SHA `a5e128935577`. `globe-api-internal-00030-xkf` y
+`globe-studio-internal-00031-vwz` sirven el 100%; la API conserva perímetro anónimo 403. Los negativos live
+confirmaron asset ausente, versión no aprobada y selección cross-workspace fail-closed. El canary positivo de
+caché/gasto sigue **operativamente bloqueado** porque el workspace no posee ningún asset gobernado elegible;
+no se modifica ingesta, readiness ni rights para fabricar evidencia.
+
 ## Invariantes duros (NUNCA / SIEMPRE)
 
 - **NUNCA** invocar un proveedor fuera del `LabRunnerPort` → `CreativeProviderAdapter`. UI, MCP, CLI, task scripts y E2E tienen prohibida la llamada directa (invariante 12). El dominio y los transportes no importan provider/DB/storage.

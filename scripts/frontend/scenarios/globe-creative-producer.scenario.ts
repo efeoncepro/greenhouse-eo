@@ -4,6 +4,7 @@ export const scenario: CaptureScenario = {
   name: 'globe-creative-producer',
   route: '/producer',
   safeForCapture: true,
+  mutating: true,
   qualityProfile: 'premium',
   viewport: { width: 1440, height: 1000 },
   viewports: [
@@ -14,7 +15,7 @@ export const scenario: CaptureScenario = {
   finalHoldMs: 350,
   readiness: {
     selector: '[data-capture="producer-console"]',
-    selectors: ['[data-capture="producer-composer"]', '[data-capture="producer-prompt-bar"]', '[data-capture="producer-feed"]'],
+    selectors: ['[data-capture="producer-composer"]', '[data-capture="producer-prompt-bar"]', '[data-capture="producer-feed"][data-producer-feed-status="ready"]', '[data-producer-candidate-kind="hero"]'],
     absentSelectors: ['[data-testid="login-card"]', '[data-loading="true"]'],
     waitForFonts: true,
     postReadyDelayMs: 450,
@@ -23,7 +24,7 @@ export const scenario: CaptureScenario = {
   },
   baseline: {
     surfaceId: 'globe.creative-producer-surface',
-    requiredFrameLabels: ['producer-first-fold', 'credits-rich-panel-credits-feedback', 'credits-rich-panel-credits-settled', 'composer-reactive-light-composer-light-feedback', 'composer-reactive-light-composer-light-settled', 'composer-edit-mode-light-edit-mode-feedback', 'composer-edit-mode-light-edit-mode-settled', 'producer-full-page'],
+    requiredFrameLabels: ['producer-first-fold', 'composer-governed-ready', 'credits-rich-panel-credits-feedback', 'credits-rich-panel-credits-settled', 'composer-reactive-light-composer-light-feedback', 'composer-reactive-light-composer-light-settled', 'viewer-rich-state-viewer-feedback', 'viewer-rich-state-viewer-settled', 'composer-edit-mode-light-edit-mode-feedback', 'composer-edit-mode-light-edit-mode-settled', 'producer-full-page'],
     requiredRegions: ['[data-capture="producer-composer"]', '[data-capture="producer-feed"]', '[data-capture="producer-estimate"]'],
     maskSelectors: ['[data-producer-credit-free]'],
     maxDiffRatio: 0.08,
@@ -33,6 +34,7 @@ export const scenario: CaptureScenario = {
     { kind: 'noErrorBoundary', reason: 'La superficie aprobada no puede capturarse sobre un error.' },
     { kind: 'visible', selector: '[data-capture="producer-composer"]', reason: 'El composer es la región primaria aprobada.' },
     { kind: 'visible', selector: '[data-capture="producer-feed"]', reason: 'La biblioteca editorial debe permanecer en la composición.' },
+    { kind: 'visible', selector: '[data-producer-candidate-kind="hero"]', reason: 'El fixture contractual debe demostrar un estado editorial rico, no un empty state.' },
   ],
   quality: {
     accessibility: { enabled: true, includeSelector: '[data-capture="producer-console"]', failOnViolations: true },
@@ -53,7 +55,7 @@ export const scenario: CaptureScenario = {
       includeSelector: '[data-capture="producer-console"]',
       failOnViolations: true,
       placeholderTerms: ['lorem', 'fake', 'todo'],
-      expectedDataCaptureRegions: ['producer-console', 'producer-composer', 'producer-prompt-bar', 'producer-feed', 'producer-estimate'],
+      expectedDataCaptureRegions: ['producer-console', 'producer-composer', 'producer-prompt-bar', 'producer-seed', 'producer-shape', 'producer-feed', 'producer-estimate'],
       maxUniformCards: 4,
       maxNestedSurfaceDepth: 2,
       maxContainedSurfacesInViewport: 5,
@@ -63,6 +65,13 @@ export const scenario: CaptureScenario = {
   steps: [
     { kind: 'wait', selector: '[data-capture="producer-composer"]', timeout: 20000 },
     { kind: 'mark', label: 'producer-first-fold', note: 'Composer, estimate y biblioteca comparten el primer fold aprobado.' },
+    { kind: 'fill', selector: '#producer-prompt', value: 'Campaña editorial de producto translúcido sobre un paisaje azul profundo' },
+    { kind: 'click', selector: '.negative-control>summary' },
+    { kind: 'fill', selector: '[data-producer-advanced="negative"]', value: 'marcas de agua, texto ilegible, anatomía deformada' },
+    { kind: 'click', selector: '[data-producer-seed-lock]' },
+    { kind: 'click', selector: '[data-producer-action="estimate"]' },
+    { kind: 'wait', selector: '[data-producer-action="generate"]:not(:disabled)', timeout: 12000 },
+    { kind: 'mark', label: 'composer-governed-ready', selector: '[data-capture="producer-composer"]', note: 'Prompt, restricción negativa, seed fijo y estimate vigente habilitan Generate sin gastar.' },
     {
       kind: 'interaction',
       interaction: {
@@ -77,7 +86,14 @@ export const scenario: CaptureScenario = {
         reducedMotion: 'capture',
       },
     },
-    { kind: 'click', selector: '[data-capture="producer-budget"] summary', note: 'Cierra créditos antes de validar la iluminación del composer.' },
+    { kind: 'click', selector: '[data-capture="producer-budget"] summary', note: 'Cierra créditos antes de abrir el viewer.' },
+    { kind: 'click', selector: '[data-producer-candidate-kind="hero"] button[aria-label="Ver candidato"]' },
+    { kind: 'wait', selector: '#producer-viewer-dialog[open]', timeout: 12000 },
+    { kind: 'sleep', ms: 80 },
+    { kind: 'mark', label: 'viewer-rich-state-viewer-feedback', selector: '#producer-viewer-dialog', note: 'El viewer proyecta preview privado, recipe, ruta, evidencia, provenance y revisión.' },
+    { kind: 'sleep', ms: 340 },
+    { kind: 'mark', label: 'viewer-rich-state-viewer-settled', selector: '#producer-viewer-dialog', note: 'Estado asentado del viewer rico y sus acciones gobernadas.' },
+    { kind: 'click', selector: '#producer-viewer-dialog .media-stage>.dialog-close', note: 'Cierra el viewer antes de validar otros modos.' },
     {
       kind: 'interaction',
       interaction: {

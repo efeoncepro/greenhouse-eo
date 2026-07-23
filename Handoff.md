@@ -19,23 +19,20 @@
 ## Riesgos abiertos
 
 - Trabajo local concurrente: coordinar ownership antes de tocar archivos ya modificados.
-- **Globe (`EPIC-028`) — Producer code complete local, rollout pendiente.** Baseline aprobado:
-  `docs/ui/visual-sources/TASK-1505/`; evidencia premium: `docs/ui/reviews/TASK-1505/`. La UI completa,
-  bridge, jobs/ingest/tenancy, library, economía y colaboración pasan `pnpm check && pnpm build`. No está vivo:
-  faltan migrations `0004…0019`, secrets, buckets/IAM, grants, flags, workers/providers y canarios internal.
+- **TASK-1494:** desplegada internal-only en `a5e128935577`; canary bloqueado por provenance vacío. Ver runbook.
+- **Globe (`EPIC-028`) — Producer code complete local, rollout pendiente.** TASK-1505 cerró estimate pre-spend,
+  seed/negative prompt, autoridad fail-closed y 390 px; `pnpm check && pnpm build` y GVC 4.72/5 pasan. No está
+  vivo: faltan migrations, secrets, buckets/IAM, grants, flags, workers/providers y canarios internal. Canon:
+  task + `docs/ui/reviews/TASK-1505/`.
 - **Globe — el spend fence cross-réplica sigue sin ejercitarse (`TASK-1512`).** El ceiling efectivo estuvo en 1
   hasta `TASK-1508`; falta probar la contención con >1 réplica y gasto autorizado.
 
 ## Pendientes inmediatos
 
-- **Globe Producer aprobado — checkpoint local 2026-07-22.** `TASK-1505` conserva la UI completa, logos oficiales,
-  motion y funciones aprobadas; desktop/390 px, teclado, reduced motion y score visual `4.74/5` están verdes.
-  Referencias, library, créditos y review/share usan contratos reales. El cierre local incluye Studio 154/154,
-  Domain 265/265, Runner 201/201, Database 70/70 y 24 contratos IaC; workers one-shot, callback Fal, rutas/circuitos
-  operator-only y rights authority llegan hasta `0019`. El dry-run vivo por los mismos commands/readers de la UI
-  falló cerrado (`authentication_required`) contra el SHA desplegado antiguo y consumió cero créditos. Estado:
-  `code complete, rollout pendiente`; desplegar por `1519/1467/1469/1511/1520/1522` y mantener cerrado el acceso
-  comercial.
+- **Globe Producer — siguiente paso.** GVC final
+  `.captures/2026-07-22T23-03-58_globe-creative-producer/`: 38 frames, 0 errores, rubric PASS; Studio 185/185 y
+  monorepo verde. El dry-run vivo falló cerrado (`authentication_required`) contra el SHA antiguo y gastó cero.
+  Desplegar por `1519/1467/1469/1511/1520/1522`; mantener cerrado el acceso comercial.
 
 - **`TASK-1503` COMPLETE y ACTIVA en el runtime interno (`EPIC-028`, cluster Creative Producer).** El
   output side del Producer (retrieval gobernado + favorite/copyAsReference) está **operativo** en

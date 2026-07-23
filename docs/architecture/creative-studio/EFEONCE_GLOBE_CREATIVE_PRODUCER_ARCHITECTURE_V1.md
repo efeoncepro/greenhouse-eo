@@ -516,6 +516,11 @@ sus boundaries:
 - Los bytes referenciales se resuelven server-side desde handles content-addressed autorizados. El request público
   conserva handles/hash/rights; manifest y lineage guardan `authorizedInputHashes`; ninguna URL de storage o byte
   cruza la API JSON.
+- El controller conserva `structuredBrief`, `style` y `recipe` hasta `prepare`; seed sólo entra como recipe
+  reproducible al bloquearlo y el negative prompt se compila server-side como constraint del brief. `Generate`
+  exige un estimate vigente y todo cambio de input lo invalida antes de gasto.
+- La autoridad de modos dependientes de assets se prueba con el reader tenant-scoped
+  `globe.asset.provenance.list`; errores de policy, acceso o dependencia mantienen los controles cerrados.
 - Library, generation recipes/Style DNA, durable run lifecycle, credits/admin, persisted tenancy y
   review/comments/share tienen stores/migrations y primitives transport-neutral. La UI degrada o bloquea por
   coverage/evidencia; no fabrica balance, progress, approval, C2PA ni disponibilidad.
@@ -525,8 +530,9 @@ sus boundaries:
   verifican nuevamente.
 - Rutas/circuitos y políticas de derechos exactas por ruta/proveedor/modelo/versión son control-plane operator-only.
   Outputs generados y derivados capturan términos/policy/route/parent digests y fallan cerrado antes de elegibilidad.
-- Evidencia visual canónica: `docs/ui/reviews/TASK-1505/`. Evidencia de código: `pnpm check` y `pnpm build` verdes
-  en Globe el 2026-07-22.
+- Evidencia visual canónica: `docs/ui/reviews/TASK-1505/`; GVC local rica de 38 frames en desktop/390 px,
+  teclado y reduced motion, score enterprise 4.72/5 sin blockers. Evidencia de código: `pnpm check` y
+  `pnpm build` verdes en Globe el 2026-07-22.
 
 Este checkpoint es **code complete local**, no rollout. Las migrations `0004…0019`, secrets, buckets/IAM,
 broker grants, flags, Scheduler/Jobs, provider access y canarios reales continúan siendo parte del cierre
