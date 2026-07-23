@@ -223,6 +223,28 @@ describe('MeetingRenderer', () => {
     renderer.destroy()
   })
 
+  it('agrupa consentimientos con semántica compacta y copy localizado', async () => {
+    const { host, renderer } = await mount()
+
+    ;(host.querySelector('.ghm-slot') as HTMLButtonElement).click()
+    ;(host.querySelector('.ghm-agenda-action') as HTMLButtonElement).click()
+    await Promise.resolve()
+
+    const consents = host.querySelector<HTMLFieldSetElement>('.ghm-consents')!
+    const checks = consents.querySelectorAll<HTMLInputElement>("input[type='checkbox']")
+
+    expect(consents.tagName).toBe('FIELDSET')
+    expect(consents.querySelector('legend')?.textContent).toBe('Privacidad y comunicaciones')
+    expect(checks).toHaveLength(2)
+    expect(checks[0]?.name).toBe('processingAccepted')
+    expect(checks[0]?.required).toBe(true)
+    expect(checks[1]?.name).toBe('communications')
+    expect(checks[1]?.required).toBe(false)
+    expect(consents.textContent).toContain('Quiero recibir contenidos y novedades de Efeonce. (opcional)')
+    expect(consents.textContent).not.toContain('I agree to receive')
+    renderer.destroy()
+  })
+
   it('expone navegación roving de calendario con flechas y estados no basados sólo en color', async () => {
     const { host, renderer } = await mount()
     const activeDate = host.querySelector<HTMLButtonElement>('.ghm-calendar-day[tabindex="0"]')!

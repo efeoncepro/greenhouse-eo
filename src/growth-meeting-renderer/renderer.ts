@@ -159,6 +159,7 @@ const calendarDates = (date: string): Array<string | null> => {
 
 const emailLooksValid = (value: string): boolean => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
 const normalizedEmail = (value: string): string => value.trim().toLowerCase()
+const LEGACY_ENGLISH_COMMUNICATION_CONSENT = 'I agree to receive other communications from Efeonce Group.'
 let rendererInstanceSequence = 0
 
 type EmailVerificationState = {
@@ -1017,13 +1018,16 @@ export class MeetingRenderer {
     form.append(fields)
 
     const processing = this.checkbox('processingAccepted', copy.processingConsent, this.state.form.processingAccepted)
+    const consents = element('fieldset', 'ghm-consents')
+    const consentLegend = element('legend', 'ghm-visually-hidden', copy.consentGroup)
 
-    form.append(processing)
+    consents.append(consentLegend, processing)
 
     for (const consent of this.state.config?.consent.communications ?? []) {
-      form.append(this.communicationCheckbox(consent.consentKey, consent.label))
+      consents.append(this.communicationCheckbox(consent.consentKey, consent.label, consent.required))
     }
 
+    form.append(consents)
     form.append(element('div', 'ghm-turnstile'))
 
     if (this.state.fieldErrors.includes('captchaToken')) {
@@ -1123,7 +1127,7 @@ export class MeetingRenderer {
       message = error
     } else if (hasInteraction) {
       validation = 'valid'
-      message = key === 'processingAccepted' ? copy.consentAccepted : copy.fieldReady
+      message = key === 'processingAccepted' ? '' : copy.fieldReady
     }
 
     wrap.dataset.validation = validation
@@ -1302,11 +1306,20 @@ export class MeetingRenderer {
     return group
   }
 
-  private communicationCheckbox(consentKey: string, labelText: string): HTMLElement {
+  private communicationCheckbox(consentKey: string, labelText: string, required: boolean): HTMLElement {
     const label = element('label', 'ghm-check')
     const input = element('input')
 
+    const localizedLabel = labelText.trim() === LEGACY_ENGLISH_COMMUNICATION_CONSENT
+      ? copy.communicationConsent
+      : labelText
+
+    const visibleLabel = required ? localizedLabel : `${localizedLabel} ${copy.optional}`
+
     input.type = 'checkbox'
+    input.name = 'communications'
+    input.value = consentKey
+    input.required = required
     input.checked = this.state.form.communicationKeys.includes(consentKey)
     input.addEventListener('change', () => {
       const values = new Set(this.state.form.communicationKeys)
@@ -1318,7 +1331,7 @@ export class MeetingRenderer {
         values: { communicationKeys: [...values] },
       })
     })
-    label.append(input, element('span', undefined, labelText))
+    label.append(input, element('span', undefined, visibleLabel))
 
     return label
   }

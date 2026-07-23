@@ -406,8 +406,21 @@ export const MEETING_RENDERER_CSS = `
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-retry { justify-self: start; margin-top: 18px; }
 
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-form { display: grid; gap: 18px; }
-:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-field { display: grid; gap: 8px; min-width: 0; }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  column-gap: 14px;
+  row-gap: 12px;
+}
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-field {
+  display: grid;
+  grid-template-rows: auto 56px minmax(1.1em, auto);
+  align-content: start;
+  align-self: start;
+  gap: 8px;
+  min-width: 0;
+}
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-label { color: var(--gh-meeting-muted); font-size: 0.74rem; font-weight: 760; letter-spacing: 0.02em; }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-control {
   position: relative;
@@ -500,47 +513,41 @@ export const MEETING_RENDERER_CSS = `
   border-color: color-mix(in srgb, var(--gh-meeting-accent-strong) 56%, var(--gh-meeting-line-strong));
 }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-field[data-validation='invalid'] .ghm-field-icon { color: var(--gh-meeting-danger); }
-:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-check { display: flex; align-items: flex-start; min-height: 44px; gap: 8px; color: var(--gh-meeting-muted); font-size: 0.82rem; line-height: 1.32; cursor: pointer; }
-:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-check-group { display: grid; gap: 2px; }
-:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-check input {
-  appearance: none;
-  flex: 0 0 44px;
-  width: 44px;
-  min-width: 44px;
-  height: 44px;
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-consents {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
   margin: 0;
+  padding: 0;
   border: 0;
-  border-radius: 12px;
-  background-color: transparent;
-  background-image: linear-gradient(var(--gh-meeting-paper), var(--gh-meeting-paper));
-  background-position: center;
-  background-size: 24px 24px;
-  background-repeat: no-repeat;
-  box-shadow: inset 0 0 0 1.5px transparent;
+}
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-check {
+  display: flex;
+  align-items: flex-start;
+  min-height: 44px;
+  gap: 12px;
+  padding-block: 10px;
+  color: var(--gh-meeting-muted);
+  font-size: 0.82rem;
+  line-height: 1.32;
   cursor: pointer;
 }
-:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-check input::before {
-  content: '';
-  display: block;
-  width: 24px;
-  height: 24px;
-  margin: 10px;
-  border: 1.5px solid var(--gh-meeting-line-strong);
-  border-radius: 7px;
-  background: var(--gh-meeting-paper);
-  transition: border-color var(--gh-meeting-duration) var(--gh-meeting-ease), background var(--gh-meeting-duration) var(--gh-meeting-ease), box-shadow var(--gh-meeting-duration) var(--gh-meeting-ease);
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-check-group { display: grid; gap: 0; }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-check input {
+  appearance: auto;
+  flex: 0 0 20px;
+  width: 20px;
+  min-width: 20px;
+  height: 20px;
+  margin: 1px 0 0;
+  accent-color: var(--gh-meeting-accent-strong);
+  cursor: pointer;
 }
-:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-check input:checked::before {
-  border-color: var(--gh-meeting-accent-strong);
-  background: var(--gh-meeting-accent);
-  box-shadow: 0 5px 14px color-mix(in srgb, var(--gh-meeting-accent-strong) 24%, transparent);
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-check-group[data-validation='invalid'] .ghm-check input {
+  outline: 2px solid var(--gh-meeting-danger);
+  outline-offset: 2px;
 }
-:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-check-group[data-validation='invalid'] .ghm-check input::before {
-  border-color: var(--gh-meeting-danger);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gh-meeting-danger) 10%, transparent);
-}
-:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-check-group[data-validation='valid'] .ghm-check input::before { border-color: var(--gh-meeting-success, #177245); }
-:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-check > span { padding-block: 5px; }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-check > span { padding: 0; }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-turnstile {
   position: absolute;
   inline-size: 1px;
@@ -559,6 +566,13 @@ export const MEETING_RENDERER_CSS = `
   transition: color 160ms var(--gh-meeting-ease), opacity 160ms var(--gh-meeting-ease), transform 180ms var(--gh-meeting-ease);
 }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-field-feedback:empty { opacity: 0; }
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-consents .ghm-field-feedback:empty {
+  display: none;
+  min-height: 0;
+}
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-consents .ghm-field-feedback:not(:empty) {
+  margin-inline-start: 32px;
+}
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-field[data-validation='valid'] .ghm-field-feedback,
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-check-group[data-validation='valid'] .ghm-field-feedback { color: var(--gh-meeting-success, #177245); }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-field[data-validation='invalid'] .ghm-field-feedback,
@@ -1228,31 +1242,6 @@ export const MEETING_RENDERER_CSS = `
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-secondary { border-radius: 11px; }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-agenda-action { justify-content: space-between; gap: 12px; }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-action-icon { font-size: 1rem; }
-
-:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-check input {
-  appearance: none;
-  position: relative;
-  flex: 0 0 44px;
-  width: 44px;
-  min-width: 44px;
-  height: 44px;
-  margin: 0;
-  background: none;
-  box-shadow: none;
-}
-:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-check input:checked::before {
-  background: var(--gh-meeting-accent);
-}
-:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-check input:checked::after {
-  content: '';
-  position: absolute;
-  inset: 16px auto auto 16px;
-  width: 12px;
-  height: 7px;
-  border-inline-start: 2px solid var(--gh-meeting-ink);
-  border-block-end: 2px solid var(--gh-meeting-ink);
-  transform: rotate(-45deg);
-}
 
 @media (hover: hover) and (pointer: fine) {
   :is(efeonce-meeting-scheduler, .ghm-scope) button.ghm-calendar-day:not([data-selected='true']):hover {
