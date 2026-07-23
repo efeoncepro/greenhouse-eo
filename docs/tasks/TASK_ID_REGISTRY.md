@@ -1604,7 +1604,8 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-1529` | `to-do` | **Globe Media Lifecycle and Orphan Garbage Collection.** EPIC-028; backend-data/cron; backend-critical; P0/Alto; bloqueada por TASK-1528. Inventory→mark→grace/holds→dry-run/apply con generation preconditions, receipts y restore rehearsal; cero SQL/delete manual. | `docs/tasks/to-do/TASK-1529-globe-media-lifecycle-orphan-gc.md` |
 | `TASK-1530` | `to-do` | **Globe Creative Prompt Engineer Foundation.** EPIC-028; backend-data/command; backend-critical; P1/Muy alto/Alto. Agente vendor-neutral `understand→strategize→compile→validate`, profiles versionados, structured outcome, safety/evals y model promotion con Full API Parity. | `docs/tasks/to-do/TASK-1530-globe-creative-prompt-engineer-foundation.md` |
 | `TASK-1531` | `to-do` | **Globe Creative Prompt Studio Experience.** EPIC-028; ui-ux/flow + command consumer; ui-standard; P1/Alto/Medio; bloqueada por TASK-1530. Editorial Workbench inline con creative read, target lens, proposal, provenance, warnings, estados async robustos y GVC premium. | `docs/tasks/to-do/TASK-1531-globe-creative-prompt-studio-experience.md` |
+| `TASK-1532` | `to-do` | **Globe One-Click Generate with Automatic Credit Estimate.** EPIC-028; ui-ux/interaction + command consumer; ui-standard/backend-standard; P1/Alto/Medio. Reemplaza `Calcular costo` + `Generar` por un CTA único con estimate background/on-click, revalidación server-side, single-flight, idempotencia y transparencia de créditos. | `docs/tasks/to-do/TASK-1532-globe-one-click-generate-automatic-estimate.md` |
 
 ## Siguiente ID disponible
 
-`TASK-1532`
+`TASK-1533`
