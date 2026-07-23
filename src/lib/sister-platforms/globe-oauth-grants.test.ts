@@ -81,7 +81,9 @@ describe('Globe OAuth grant contract', () => {
       'globe.voice.preset.manage',
       'globe.lab.recipe.author',
       'globe.credits.read',
-      'globe.credits.estimate'
+      'globe.credits.estimate',
+      'globe.model-readiness.review',
+      'globe.model-readiness.propose'
     ])
     expect(PRODUCER_CONTRACT.policy.requiredScopes).toEqual(['openid', ...GLOBE_PRODUCER_CAPABILITY_SCOPES])
 

@@ -32,7 +32,12 @@ export const GLOBE_PRODUCER_CAPABILITY_SCOPES = [
   'globe.voice.preset.manage',
   'globe.lab.recipe.author',
   'globe.credits.read',
-  'globe.credits.estimate'
+  'globe.credits.estimate',
+  // Internal creative operators may review evidence and propose an exact model
+  // version. Promotion remains outside the Producer grant and is completed by
+  // Globe's independent control-plane checker.
+  'globe.model-readiness.review',
+  'globe.model-readiness.propose'
 ] as const
 
 export type GlobeOAuthGrantMode = 'shell-only' | 'producer'
