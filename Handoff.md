@@ -67,7 +67,9 @@
   `/agenda/` (WP `251583`, `noindex`) opera native-only con flags ON y binding piloto `active`. El release inmutable
   `2fbea2b39b555c5762e6` pasó GVC live 2048/1440/820/390, overflow, teclado y reduced motion; no se creó booking.
   Greenhouse sigue como API y HubSpot/Office 365/Teams como SoT. GTM workspace 6 no está publicado; Contacto/RRSS
-  siguen gateados por booking/replay, `/g/collect` y autorización GTM. Evidencia y detalle viven en TASK-1510.
+  siguen gateados por booking/replay, `/g/collect` y autorización GTM. El 2026-07-23 el kicker del host se afinó a
+  `Reunión de 30 minutos` con backup Elementor, purge Kinsta y evidencia live 1440/390 sin overflow. Evidencia y
+  detalle viven en TASK-1510.
 
   **Decisión corregida 2026-07-22:** `EPIC-035`/ADR V2 mantiene el runtime neutral; `TASK-1514` endurece Vercel y
   `TASK-1515` decide Vercel vs Firebase dedicado antes de provisionar. Firebase en `efeonce-group` queda no autorizado;

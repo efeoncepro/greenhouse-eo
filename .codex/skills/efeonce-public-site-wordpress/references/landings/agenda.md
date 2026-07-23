@@ -25,6 +25,10 @@
 
 - Elementor backups: `_gh_backup_before_agenda_pilot_overflow_v1`, `_gh_backup_before_agenda_pilot_template_v1`, `_gh_backup_before_agenda_focused_canvas_20260721T230411Z` and `_gh_backup_before_agenda_global_footer_restore_20260721T234352Z`.
 - Artifact-lane migration backup: `_gh_backup_before_agenda_public_renderer_20260722T075004Z`.
+- Hero kicker copy update 2026-07-23: the HTML host now says `Reunión de 30 minutos` instead of the redundant
+  `Efeonce · conversación inicial`. Elementor backup:
+  `_gh_backup_before_agenda_kicker_copy_20260723T103650Z`; post-save Elementor data SHA-256
+  `40d07267a232dcb370ca4f805fdfbe8826e256e1fdd56dd85114c679c7ce0b99`.
 - Fast runtime rollback: scheduler flags OFF and binding `fhsf-efeonce-lead-gen-web`/`discovery` to `paused`; page rollback restores the Elementor backup or unpublishes page `251583`.
 - Live evidence 2026-07-21: scheduler and real availability loaded; desktop and 390 px resolved `split|guided` with
   `overflow=0` and no console errors. Native-only host mutation removed both direct HubSpot links with backup

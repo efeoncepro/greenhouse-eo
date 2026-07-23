@@ -7,6 +7,12 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-23 — Agenda pública aclara la duración de la reunión
+
+- `/agenda/` reemplaza la etiqueta redundante `Efeonce · conversación inicial` por `Reunión de 30 minutos`.
+  La mutación quedó respaldada en Elementor, purgada en Kinsta y verificada live en escritorio y 390 px sin
+  errores ni desbordes; el scheduler, booking y GTM no cambiaron.
+
 ## 2026-07-23 — Globe Producer promovido hasta sus gates reales internal-only
 
 - `TASK-1519` quedó completa: el bridge humano browser → BFF same-origin → API IAM-private tiene IAM/env/secrets,
