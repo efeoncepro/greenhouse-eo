@@ -1,7 +1,7 @@
 # Efeonce Globe — Persisted Tenancy Projection Decision V1
 
 - Decision: ADR-006
-- Status: Accepted for internal shadow implementation; rollout gated
+- Status: Accepted with V2 reconciliation correction; implementation and rollout gated
 - Date: 2026-07-22
 - Owners: Greenhouse identity/control plane and Efeonce Globe platform
 - Implements: TASK-1511
@@ -108,3 +108,92 @@ Globe gains scalable, auditable multi-member tenancy without becoming an identit
 depends on reconciliation freshness, so expiry and drift signals are operational requirements. The model intentionally
 does not answer organizational-role questions; consumers needing those facts query Greenhouse through its governed
 boundary rather than copying them into Globe.
+
+## Delta 2026-07-23 — V2 workspace-complete reconciliation
+
+### Defect discovered in V1
+
+The V1 snapshot carries one singular `member` and treats `brokerRevision`, fingerprint and short-lived
+`issuedAt`/`expiresAt` evidence as one reconciliation unit. That shape can materialize a first shadow member, but
+it cannot safely operate a commercial multi-member workspace:
+
+- refreshing a lease can be mistaken for a semantic desired-access mutation, or a stable semantic revision can
+  conflict only because its timestamps changed;
+- reconciling members one at a time provides no authoritative workspace-complete set, so omission cannot mean
+  revocation and stale memberships may survive until an incidental expiry;
+- a worker that requires a fresh active workspace can lose discovery when no continuous reconciler rewrites the
+  lease, even though the broker's desired-access state did not change;
+- grants cannot converge safely for every member unless removals are explicit, ordered and preserved as history.
+
+Extending the lease or inserting a special internal workspace would hide these defects. It is rejected as a
+fragile exception because it would preserve the same ambiguity for every later workspace.
+
+### V2 decision
+
+The broker reconciliation command accepts one authoritative, workspace-complete snapshot:
+
+```text
+WorkspaceTenancySnapshotV2
+  brokerBindingId
+  bindingState
+  semanticRevision
+  semanticFingerprint
+  lease { issuedAt, renewedAt, expiresAt }
+  members[] {
+    identityIssuer
+    identitySubject
+    state
+    effectiveAt
+    expiresAt?
+    desiredCapabilities[]
+  }
+```
+
+The following rules are normative:
+
+1. **`members[]` is a complete set, not a patch.** It contains every subject that should retain projected
+   membership for the workspace at `semanticRevision`. Subjects present in the prior accepted projection and
+   omitted from the new complete set are suspended atomically in the same reconciliation transaction. Omission
+   never deletes history and never leaves authority active.
+2. **Semantic revision and lease freshness are independent.** `semanticRevision` advances only when binding,
+   membership state or desired capabilities change. `semanticFingerprint` is computed from that canonical,
+   sorted semantic payload and excludes lease timestamps. An equal revision plus equal fingerprint may renew the
+   lease idempotently; an equal revision plus a different fingerprint conflicts; a lower revision is rejected.
+3. **Freshness remains fail-closed.** Lease renewal may extend authority only within the bounded broker policy.
+   An expired workspace/member/grant authorizes nothing. The reconciler must run periodically before expiry and
+   expose lag/expiry signals; a manual one-shot is diagnostic evidence, not the operating model.
+4. **Omission suspension is explicit and reversible only by newer authority.** An omitted member gets a
+   suspension revision and audit evidence. Reactivation requires a later semantic revision that includes the
+   subject explicitly; lease renewal alone cannot reactivate it.
+5. **Grants remain bounded and append-only.** For each included member, active local grants are the intersection
+   with that member's `desiredCapabilities`. A capability removed or a member omitted appends a
+   revoked/superseded grant revision atomically; rows are never updated in place or deleted. Operator-authored
+   creative grants may narrow the set but can never exceed it.
+6. **Workspace suspension dominates.** A suspended binding atomically suspends all projected members and
+   supersedes their active grants regardless of the member array, while preserving append-only audit history.
+
+### V2 transaction and concurrency contract
+
+- One command owns one workspace transaction and takes optimistic `expectedVersion` or an equivalent
+  workspace-scoped lock.
+- Canonical sorting/deduplication of subjects and capabilities happens before fingerprinting; duplicate subjects,
+  unknown capabilities, mixed issuers or partial snapshots are rejected.
+- A successful semantic reconcile and every lease renewal use distinct idempotency keys and correlated audit
+  events. Lease renewal does not manufacture grant revisions when the semantic fingerprint is unchanged.
+- Readers and workers consume only the latest accepted semantic projection whose independent lease is fresh.
+  They never derive authority from a display label, hard-coded tenant or scheduler configuration.
+
+### Additional fitness functions
+
+- A two-member snapshot followed by a complete snapshot containing one member leaves the omitted member suspended
+  and with no active effective grant in the same commit.
+- Repeated lease renewals at one semantic revision do not change membership/grant history or aggregate semantic
+  version.
+- Equal semantic revision/equal fingerprint/different lease is idempotent; equal revision/different fingerprint
+  is a conflict.
+- A periodic reconciler keeps an unchanged workspace discoverable without creating semantic churn.
+- Removing one desired capability appends its revocation and cannot affect another member or workspace.
+- No bootstrap, internal label or manual SQL path may bypass these rules.
+
+V2 supersedes only the V1 reconciliation shape and revision/freshness semantics. The ownership boundary, effective
+authority intersection, no-parallel-identity rule, tenant isolation and external promotion gates remain unchanged.

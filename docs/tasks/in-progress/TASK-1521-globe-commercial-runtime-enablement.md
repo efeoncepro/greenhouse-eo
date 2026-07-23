@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Muy alto`
@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Diseño gobernado; runtime no-internal continúa bloqueado por contrato y readiness`
+- Status real: `Ejecución activa; Producer humano generó un candidato real, pero la automatización durable y el runtime comercial continúan bloqueados por tenancy V1 y gates de promoción`
 - Rank: `TBD`
 - Domain: `creative|platform|identity|finance|ops`
 - Blocked by: `none`
@@ -43,6 +43,21 @@ operativo.
 - Contrato versionado de etapas/runtime no-internal con validación fail-closed y configuración aislada.
 - Integrar evidencia de identity/tenant, ledger y providers sin duplicar sus sources of truth.
 - Promotion preflight, canary, rollback y live verification que mantengan `internal ready` separado de `commercial ready`.
+
+## Checkpoint 2026-07-23 — intake y defecto estructural de tenancy
+
+- El flujo humano autenticado alcanzó `estimate → generate → candidate_ready` con un output PNG real y gasto
+  liquidado por el carril gobernado. Esto demuestra el seam de Producer, pero **no** habilita por sí solo un
+  runtime comercial ni satisface los gates de promoción de esta task.
+- La finalización automática del asset quedó detenida porque el worker de governance no descubre un workspace
+  elegible: la proyección existente tiene lease expirado y el contrato de ADR-006 V1 no puede reconciliar de forma
+  segura un workspace multi-member completo.
+- ADR-006 adopta un delta V2: snapshots workspace-complete con `members[]`, revisión semántica separada de la
+  freshness del lease, suspensión fail-closed de miembros omitidos y grants/revocaciones append-only acotados por
+  el desired access del broker.
+- La ejecución sigue abierta. El siguiente slice debe implementar y probar V2, productizar la reconciliación
+  periódica y recién entonces reanudar workers/schedulers con readback y rollback gobernados.
+- Plan activo: [`docs/tasks/plans/TASK-1521-plan.md`](../plans/TASK-1521-plan.md).
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
 
@@ -283,4 +298,7 @@ Decisión de hosting/front door, GCP/IAM/DNS, OAuth, provider credentials/accoun
 
 ## Open Questions
 
-- Slice 0 debe resolver el host/front door y vocabulario exacto de etapas; esta task no inventa esa decisión.
+- El defecto de reconciliación de tenancy queda resuelto arquitectónicamente por el delta V2 de ADR-006; su
+  implementación y evidencia live siguen pendientes.
+- Slice 0 aún debe resolver el host/front door y vocabulario exacto de etapas comerciales; esta task no inventa
+  esa decisión ni abre clientes externos antes de `TASK-1480`.

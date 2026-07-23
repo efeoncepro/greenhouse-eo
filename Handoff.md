@@ -27,9 +27,10 @@
 
 ## Pendientes inmediatos
 
-- **Globe Producer — siguiente paso.** Productizar reconciliación continua Greenhouse dev → Globe; luego attestations
-  humanas de Model Readiness y un asset provenance/rights elegible. El governance job `hpfn6` terminó vacío. Sólo
-  entonces ejecutar Style DNA, export/review/share y `TASK-1512` con autorización de gasto. Schedulers pausados.
+- **`TASK-1521` IN-PROGRESS.** La UI produjo un PNG real; Asset Governance quedó pendiente por lease expirado.
+  ADR-006 V2 exige `members[]` completo, semantic revision separada de freshness, suspensión de omitidos y grants
+  append-only. Implementar V2 + reconciler periódico antes de reanudar schedulers por IaC; clientes externos
+  siguen gateados por `TASK-1480`. Plan: `docs/tasks/plans/TASK-1521-plan.md`.
 
 - **`TASK-1503` COMPLETE y ACTIVA en el runtime interno (`EPIC-028`, cluster Creative Producer).** El
   output side del Producer (retrieval gobernado + favorite/copyAsReference) está **operativo** en
