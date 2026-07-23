@@ -42,7 +42,7 @@
 
 - **`TASK-1525` COMPLETE.** Reader live `ed5e993`; CI/deploy final verdes; base backend/feed cerrada.
 
-- **`TASK-1526` COMPLETE.** `eac1730` y `2b7842c` cerraron la reconciliación keyed y continuidad visual del feed/viewer: la selección deja de reconstruir cards, previews/cache persisten por run, la UI conserva foco/media en refresh/filtros/búsqueda/orden y los títulos son client-safe. No sustituye `TASK-1528` ni declara commercial readiness.
+- **`TASK-1526` COMPLETE.** `eac1730` y `2b7842c` cerraron la reconciliación keyed y continuidad visual del feed/viewer: la selección deja de reconstruir cards, previews/cache persisten por run, la UI conserva foco/media en refresh/filtros/búsqueda/orden y los títulos son client-safe. No sustituye `TASK-1528` ni declara commercial readiness. Residual de rollout cerrado 2026-07-23: Studio desplegado en `7ac0ded` (run `30049251368`, rev `00061-7n7`, 100% tráfico); API queda correcta en `eac1730` (los fixes finales sólo tocan `studio-web`).
 
 - **`TASK-1527` IN-PROGRESS (P0, checkpoint humano).** Plan:
   `docs/tasks/plans/TASK-1527-plan.md`. Aceptar primero el delta de rights workspace-scoped + saga durable;

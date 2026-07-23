@@ -328,6 +328,16 @@ Reglas obligatorias:
   - Descarga no fue accionada durante este smoke para evitar tocar la carpeta local del operador; no hubo disparo accidental.
     `TASK-1503` conserva la evidencia canónica de descarga gobernada y esta task verificó retrieval same-origin por viewer.
 
+### 2026-07-23 — Rollout residual cerrado: Studio desplegado en `7ac0ded`
+
+- Auditoría post-cierre detectó que `globe-studio-internal` seguía en `325abac` y la API en `eac1730`, pese a que
+  la corrección aceptada citaba `7ac0ded` (los fixes `b938fd2`+`7ac0ded` de completed-run pending transitions
+  tocan sólo `apps/studio-web`; la API no los necesita).
+- Deploy Internal (keyless) run `30049251368` → success con SHA completo
+  `7ac0dedd19755f9874b633136509f26a55338e01`; revisión `globe-studio-internal-00061-7n7` con 100% de tráfico,
+  imagen `:7ac0dedd1975`. Front door `globe.efeoncepro.com/producer` responde `401` anónimo (fail-closed correcto).
+- Con esto el runtime interno queda alineado con el cierre: Studio `7ac0ded`, API `eac1730`.
+
 <!-- ZONE 3 — EXECUTION SPEC -->
 
 ## Scope
