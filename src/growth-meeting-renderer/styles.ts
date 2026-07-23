@@ -535,14 +535,44 @@ export const MEETING_RENDERER_CSS = `
 }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-check-group { display: grid; gap: 0; }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-check input {
-  appearance: auto;
+  appearance: none;
+  display: grid;
+  place-content: center;
   flex: 0 0 20px;
   width: 20px;
   min-width: 20px;
   height: 20px;
   margin: 1px 0 0;
-  accent-color: var(--gh-meeting-accent-strong);
+  border: 1.5px solid var(--gh-meeting-line-strong);
+  border-radius: 6px;
+  background: var(--gh-meeting-paper);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--gh-meeting-ink) 8%, transparent);
   cursor: pointer;
+  transition:
+    border-color var(--gh-meeting-duration) var(--gh-meeting-ease),
+    background-color var(--gh-meeting-duration) var(--gh-meeting-ease),
+    box-shadow var(--gh-meeting-duration) var(--gh-meeting-ease);
+}
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-check input::before {
+  content: '';
+  width: 10px;
+  height: 6px;
+  border-inline-start: 2px solid var(--gh-meeting-paper);
+  border-block-end: 2px solid var(--gh-meeting-paper);
+  opacity: 0;
+  transform: translateY(-1px) rotate(-45deg) scale(0.7);
+  transition:
+    opacity var(--gh-meeting-duration) var(--gh-meeting-ease),
+    transform var(--gh-meeting-duration) var(--gh-meeting-ease);
+}
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-check input:checked {
+  border-color: var(--gh-meeting-accent-strong);
+  background: var(--gh-meeting-accent-strong);
+  box-shadow: 0 4px 10px color-mix(in srgb, var(--gh-meeting-accent-strong) 22%, transparent);
+}
+:is(efeonce-meeting-scheduler, .ghm-scope) .ghm-check input:checked::before {
+  opacity: 1;
+  transform: translateY(-1px) rotate(-45deg) scale(1);
 }
 :is(efeonce-meeting-scheduler, .ghm-scope) .ghm-check-group[data-validation='invalid'] .ghm-check input {
   outline: 2px solid var(--gh-meeting-danger);
