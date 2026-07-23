@@ -21,7 +21,7 @@
 - Trabajo local concurrente: coordinar ownership antes de tocar archivos ya modificados.
 - **Globe Producer internal-only:** el camino humano ya generó y recuperó Image/Video/Audio reales en tres rutas
   promovidas; feed/viewer y Asset Governance funcionan. El catálogo tiene 10 rutas: las otras 7 requieren
-  promoción/canario exactos. Una sesión realmente expirada aún degrada a `401/403` con error genérico.
+  evidencia/promoción/canario exactos. La reautenticación visible y el viewer multimodal ya están desplegados.
 - **Globe — el spend fence cross-réplica sigue sin ejercitarse (`TASK-1512`).** El dry-run vivo estimó 32 créditos,
   y luego hubo gasto real gobernado; la prueba específica de contención cross-réplica sigue pendiente.
 - **Globe — runtime fix desplegado:** Studio `f9839ee` y Worker `8d7ecb1` cerraron reauth/viewer,
@@ -29,6 +29,8 @@
   `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
 - **Globe Producer — feed/títulos aún no convergen en vivo:** es proyección cliente congelada, no provider activo.
   `TASK-1525` crea el reader durable y `TASK-1526` sus cards/títulos; sesión y viewer multimodal ya están cerrados.
+- **Globe — promoción/media:** auditoría live `0/7` ready; `TASK-1527…1529` poseen promotion/recovery,
+  derivados+Range y GC. No fabricar/heredar evidencia.
 
 ## Pendientes inmediatos
 
@@ -37,11 +39,11 @@
   arquitectura de derivados/streaming/visibilidad/GC; clientes externos siguen gateados por `TASK-1480`.
   Plan: `docs/tasks/plans/TASK-1521-plan.md`.
 
-- **`TASK-1525` / `TASK-1526` TO-DO (P0, vinculadas).** Primero materializar un reader compuesto
-  server-authoritative de runs activos/terminales + assets retenidos, con identity/revision/cursor y título
-  client-safe; después reemplazar la barra global por cards keyed concurrentes, render incremental, media local,
-  reauth visible y E2E humano Image/Video/Audio. `TASK-1505` conserva el target UI; `TASK-1521` sólo consume la
-  evidencia y no declara commercial readiness.
+- **`TASK-1525` / `TASK-1526` TO-DO (P0).** Reader live server-authoritative primero; cards keyed, títulos y
+  render incremental después. `TASK-1521` sólo consume evidencia.
+
+- **`TASK-1527` / `TASK-1528` / `TASK-1529` TO-DO (P0).** Ejecutar promotion operation/recovery, luego
+  derivados+Range y lifecycle/GC. Seed Audio sigue internal-only; Omni requiere `TASK-1504/1470`.
 
 - **`TASK-1503` COMPLETE y ACTIVA internal-only.** Retrieval, favorite y copy-as-reference funcionan en API y UI
   por grants/BFF; el bucket continúa privado y tenant-blind. Estado mutable y evidencia:

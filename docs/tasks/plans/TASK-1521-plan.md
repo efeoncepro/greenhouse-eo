@@ -173,6 +173,11 @@ subagente cambia branch, hace push o toca archivos de otro carril.
 
 - Promover cada una de las siete rutas pendientes sólo con review/proposal/binding/circuit/canary independiente;
   no inferir readiness por modelo, provider o modalidad.
+- La auditoría durable del 2026-07-23 confirmó `0/7` listas para promoción canónica. Seis tienen soporte técnico
+  durable pero faltan terms/fixture/report/review/proposal/canary exactos; Gemini Omni carece además de
+  composición, driver durable, secret/IAM del worker y región autorizada.
+- `TASK-1527` implementa el aggregate durable que coordina identities separadas y recovery. El tooling inmediato
+  queda fail-closed en `stage → promote → activate`, con `rollback` circuit-first y readback antes de activación.
 - Implementar perfiles versionados y aislados para config, IAM, secrets, DB/storage, sessions, providers,
   observability y migrations.
 - Integrar gates de ledger/provider/readiness desde sus owners, sin duplicarlos.
@@ -209,5 +214,6 @@ ADR-008 documentan tenancy y media delivery. El corte `f9839ee` cerró sesión e
 el Worker `8d7ecb1` supersedió seis reconciles terminales de forma gobernada y estabilizó queue age en cero; las
 severidades live quedaron `ERROR/WARNING`. Siguen pendientes la implementación completa de ADR-008, siete
 promociones exactas, el gate 0B de commercial stage, aislamiento, restore/rollback y promotion. La convergencia
-live/títulos queda en `TASK-1525`→`TASK-1526`. TASK-1521 permanece `in-progress`; no hay base para declarar la
+live/títulos queda en `TASK-1525`→`TASK-1526`; promotion/recovery en `TASK-1527`; derivados/Range en
+`TASK-1528`; lifecycle/GC en `TASK-1529`. TASK-1521 permanece `in-progress`; no hay base para declarar la
 plataforma comercialmente completa.

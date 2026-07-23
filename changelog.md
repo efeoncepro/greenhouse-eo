@@ -19,12 +19,15 @@
   el feed hidrató nueve outputs y el viewer sirvió/reprodujo media desde GCS privado por grants gobernados.
 - El catálogo publica 10 rutas, pero sólo Seedream 5 Pro, Seedance 2.0 y ElevenLabs Multilingual v2 están
   promovidas durablemente. Las otras siete conservan su gate de evidencia/revisión/binding/canario.
-- Se corrigieron hidratación del feed, selección/render del viewer y recuperación de una sesión aún válida cuyo
-  CSRF rotó. Una sesión realmente expirada sigue necesitando CTA de reautenticación.
+- Se corrigieron hidratación/selección/render del viewer, modalidad multimedia y recuperación de sesión/CSRF.
+  Una sesión realmente expirada muestra CTA de reautenticación y vuelve al feed sin repetir gasto.
 - Asset Governance dejó de tratar media válida sin manifest C2PA como outage y ahora recupera proyecciones
   terminales sin perder rights. El Job desplegado aplicó 3 trabajos, promovió 1 y falló 0.
-- Continúan abiertas cinco reconciliaciones stale que inflan queue age, severidades de alertas, las siete
-  promociones y un ADR para derivados/streaming/visibilidad governance/GC. Clientes externos siguen cerrados.
+- El worker supersedió seis reconciliaciones terminales mediante primitive gobernada, queue age quedó en cero
+  sobre trabajo reclamable y las alertas quedaron `failure=ERROR`, `queue age=WARNING`.
+- La auditoría de promoción confirmó que 0/7 rutas pendientes cumplen hoy todos los gates. El tooling separa
+  `stage|promote|activate|rollback`; `TASK-1527…1529` poseen operación durable, derivados/Range y lifecycle/GC.
+  Clientes externos siguen cerrados.
 
 ## 2026-07-23 — Globe Producer promovido hasta sus gates reales internal-only
 

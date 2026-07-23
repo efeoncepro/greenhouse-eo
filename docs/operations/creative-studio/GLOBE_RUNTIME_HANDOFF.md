@@ -29,6 +29,14 @@
   durablemente, con bindings habilitados y circuitos cerrados: Seedream 5 Pro (`ref/still/rrss-v1`), Seedance 2.0
   (`ref/motion/loop-v1`) y ElevenLabs Multilingual v2 (`ref/voice/tts-v1`). Las otras 7 requieren su propia
   evidencia, revisión humana, propuesta, promoción, binding, circuito y canario.
+- Readback Cloud SQL del 2026-07-23 confirma que reports/reviews/readiness/bindings/circuits/rights sólo existen
+  para esas tres rutas. De las siete pendientes, seis tienen ejecución durable posible tras cerrar evidencia;
+  Gemini Omni no tiene provider driver/allowlist/result driver ni secret/IAM del Worker. Voice Changer/Dubbing
+  carecen además de `fidelityContract`. Seed Audio tiene fixture y terms packet, pero sólo para evaluación interna
+  sin entrega a cliente.
+- `scripts/producer-ui-canary-lib.mjs` publica la matriz exacta de siete blockers y ya no permite un batch
+  todopoderoso: `stage`, `promote`, `activate` y `rollback` son fases separadas; activation exige readback de
+  readiness promoted, binding disabled, circuit open y rights exactos; rollback abre circuito primero.
 - Cloud SQL registra al menos 6 runs `completed`. Image, Video y Audio produjeron outputs reales; el feed llegó a
   10 piezas y
   los tres medios se sirvieron con `200`. El video exacto
@@ -77,6 +85,8 @@
   reautorizante con Range `206/416` y backpressure, feed `pending` owner-only sin bytes hasta `eligible`, y GC
   inventory→mark→grace/holds→dry-run/apply con generation preconditions. La decisión no implementa sus build units
   ni permite declarar commercial ready.
+- Ownership ejecutable: `TASK-1528` deriva/transforma/sirve Range; `TASK-1529` inventaría/marca/aplica GC;
+  `TASK-1525` materializa feed live y `TASK-1526` consume la proyección. `TASK-1527` coordina promoción/recovery.
 
 ## Active state — 2026-07-22 (TASK-1494: Style DNA desplegado; canary positivo bloqueado)
 
@@ -595,10 +605,10 @@ raíz en vez de sólo detectarlo.
 
 ## Immediate next step
 
-1. Promover las otras 7 rutas sólo con evidencia exacta y separación maker/promoter; mantener publicadas pero
-   bloqueadas mientras no tengan revisión, binding, circuito y canario propios.
-2. Implementar ADR-008 por build units independientes y verificar derivados, Range/load, visibilidad y GC; el
-   original privado no sustituye esa arquitectura.
+1. Ejecutar `TASK-1527` para persistir/reanudar la operación multi-principal; no promover ninguna de las 7 hasta
+   cerrar terms/fixture/report/review/proposal/canary exactos. Priorizar Seed Audio sólo como internal-evaluation.
+2. Ejecutar `TASK-1528` y luego `TASK-1529`; verificar derivados, Range/load y GC. El original privado no
+   sustituye esa arquitectura.
 3. Ejecutar `TASK-1525` y después `TASK-1526` para convergencia live, títulos client-safe y render incremental;
    no reabrir el fix ya desplegado de sesión/viewer.
 4. Mantener clientes externos/Production cerrados hasta `TASK-1480` y sus dependencias; no interpretar el éxito

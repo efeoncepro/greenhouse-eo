@@ -359,6 +359,23 @@ Decisión de hosting/front door, GCP/IAM/DNS, OAuth, provider credentials/accoun
 - Estado honesto: **internal ready en estos gates; TASK-1521 sigue in-progress**. No se probaron las siete rutas
   restantes, el perfil comercial/aislamiento, derivados/Range/GC, restore ni rollback comercial.
 
+### Auditoría de promoción exacta — 2026-07-23
+
+- Cloud SQL confirma que sólo las tres rutas base tienen `evaluation report → signed review → candidate/promoted`,
+  rights exactos, binding y circuito. Para las otras siete no existen aún esos artefactos; no se fabricaron ni se
+  heredaron por provider/familia.
+- Seis rutas tienen adapter/endpoint/result driver durable, pero carecen de evidencia/fixture/canary exactos.
+  `ref/motion/reference-v1` tiene además un bloqueo estructural: Gemini Omni no está compuesto en el worker
+  gobernado, no tiene endpoint/result driver durable, secret/IAM del worker ni región `global` autorizada.
+- Voice Changer y Dubbing no declaran todavía `fidelityContract`; Seed Audio es la ruta más cercana, con fixture y
+  terms packet exactos, pero sus restricciones siguen `internal-evaluation-only` y `no-client-delivery`.
+- El tooling Globe ahora publica una matriz machine-readable de las siete rutas y separa controles en fases
+  least-privilege: `stage` (rights → binding disabled → circuit open), `promote` (checker independiente),
+  `activate` (readback → binding enabled → circuit closed) y `rollback` (circuit open → binding disabled).
+  El aggregate durable/recovery queda en `TASK-1527`.
+- Build units registrados: `TASK-1527` promoción/recovery, `TASK-1528` derivados/Range y `TASK-1529`
+  lifecycle/orphan GC. `TASK-1525`/`TASK-1526` conservan feed y UI.
+
 ## Closing Protocol
 
 - [ ] Lifecycle/carpeta, README, Handoff, changelog y architecture/decision index se sincronizaron al cerrar.
@@ -368,6 +385,9 @@ Decisión de hosting/front door, GCP/IAM/DNS, OAuth, provider credentials/accoun
 ## Follow-ups
 
 - `TASK-1480` mantiene el gate de readiness externo y recibe la evidencia, no se duplica.
+- `TASK-1527` posee la operación durable de promoción y rollback.
+- `TASK-1528` y `TASK-1529` implementan los build units separados de media delivery y GC de ADR-008.
+- `TASK-1525` y `TASK-1526` poseen proyección live y feed/viewer; no se duplican aquí.
 
 ## Open Questions
 
