@@ -89,6 +89,7 @@ export const createMeetingTurnstilePort = (win: TurnstileWindow = window): Meeti
         widgetId = loadedApi.render(input.container, {
           sitekey: input.siteKey,
           action: input.action,
+          size: input.container.clientWidth < 300 ? 'compact' : 'flexible',
           callback: input.onToken,
           'expired-callback': input.onExpired,
           'error-callback': input.onExpired,

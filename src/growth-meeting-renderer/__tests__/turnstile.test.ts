@@ -27,6 +27,8 @@ describe('meeting Turnstile port', () => {
     const onToken = vi.fn()
     const onExpired = vi.fn()
 
+    Object.defineProperty(container, 'clientWidth', { value: 420 })
+
     const render = vi.fn((container: HTMLElement, options: Record<string, unknown>) => {
       void container
       void options
@@ -62,10 +64,44 @@ describe('meeting Turnstile port', () => {
     expect(render).toHaveBeenCalledWith(container, expect.objectContaining({
       sitekey: 'site-key',
       action: 'meeting_booking',
+      size: 'flexible',
       callback: onToken,
       'expired-callback': onExpired,
       'error-callback': onExpired,
     }))
+  })
+
+  it('uses the compact widget when the form cannot fit the normal width', async () => {
+    const container = document.createElement('div')
+
+    const render = vi.fn((container: HTMLElement, options: Record<string, unknown>) => {
+      void container
+      void options
+
+      return 'meeting-widget'
+    })
+
+    Object.defineProperty(container, 'clientWidth', { value: 240 })
+    turnstileWindow().turnstile = {
+      render,
+      remove: vi.fn((widgetId: string | number) => {
+        void widgetId
+      }),
+      reset: vi.fn((widgetId: string | number) => {
+        void widgetId
+      }),
+    }
+
+    createMeetingTurnstilePort(turnstileWindow()).mount({
+      container,
+      siteKey: 'site-key',
+      action: 'meeting_booking',
+      onToken: vi.fn(),
+      onExpired: vi.fn(),
+    })
+    await Promise.resolve()
+
+    expect(render).toHaveBeenCalledWith(container, expect.objectContaining({ size: 'compact' }))
   })
 
   it('does not render a widget when the host is destroyed while the API loads', async () => {
