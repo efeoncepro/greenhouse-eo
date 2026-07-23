@@ -285,9 +285,21 @@ Verificación local ejecutada:
 - `pnpm --filter @efeonce-globe/studio-web test` ✅
 - `pnpm check` en `../efeonce-globe` ✅
 - `pnpm build` en `../efeonce-globe` ✅
+- `git diff --check` en `../efeonce-globe` ✅
+- `pnpm task:lint --task TASK-1525` ✅
+- `pnpm docs:closure-check` ✅
+- `pnpm docs:context-check:strict` ✅
+- `pnpm ops:lint --changed` ✅
+- `pnpm qa:gates --changed` ✅ advisory sin bloqueos
+- `git diff --check` en `greenhouse-eo` ✅
+- `pnpm exec tsc --noEmit` en `greenhouse-eo` ✅
+- `pnpm migrate:status` en `greenhouse-eo` ⚠️ no ejecutado por proxy local apagado
+  (`ECONNREFUSED 127.0.0.1:15432`); no hay migración Greenhouse en esta task.
 
 Estado honesto: el reader está code-complete local y desbloquea `TASK-1526`, pero todavía faltan deploy interno,
-flag/canary, smoke humano y consumo UI resiliente. No declara completitud comercial ni promueve rutas.
+flag/canary, smoke humano y consumo UI resiliente. No declara completitud comercial ni promueve rutas. El código
+queda en el commit local `c361e07` de `../efeonce-globe`, compartido con cambios de promotion/recovery porque el
+operador pidió no aislar y empujar desde el worktree actual; push/CI/deploy quedan como siguiente gate operativo.
 
 ### Rollback plan per slice
 
