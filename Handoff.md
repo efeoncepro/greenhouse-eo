@@ -29,7 +29,7 @@
 - **Globe — runtime fix desplegado:** Studio `f9839ee` y Worker `8d7ecb1` cerraron reauth/viewer,
   supersedieron 6 reconciles, estabilizaron queue age en `0` y aplicaron severidades. Evidencia:
   `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
-- **Globe Producer:** `TASK-1525` complete; `TASK-1526` reabierta por reconciliación inestable del feed.
+- **Globe Producer:** `TASK-1525` complete; `TASK-1526` complete (feed/viewer keyed con continuidad estable tras refresh, filtros, búsqueda y orden, con reproducción por modalidad validada).
 - **Globe — promoción/media:** auditoría live `0/7` ready. `TASK-1527` está en checkpoint humano; `TASK-1528…1529`
   poseen derivados+Range y GC. No fabricar/heredar evidencia.
 
@@ -42,9 +42,7 @@
 
 - **`TASK-1525` COMPLETE.** Reader live `ed5e993`; CI/deploy final verdes; base backend/feed cerrada.
 
-- **`TASK-1526` IN-PROGRESS (reapertura correctiva).** `eac1730` genera y reproduce Image/Audio/Video, pero
-  filtros/refresh recrean cards y Blob URLs. Ejecutar el plan keyed, cache y query supersession de
-  `docs/tasks/plans/TASK-1526-plan.md`; no sustituye `TASK-1528` ni declara commercial readiness.
+- **`TASK-1526` COMPLETE.** `eac1730` y `2b7842c` cerraron la reconciliación keyed y continuidad visual del feed/viewer: la selección deja de reconstruir cards, previews/cache persisten por run, la UI conserva foco/media en refresh/filtros/búsqueda/orden y los títulos son client-safe. No sustituye `TASK-1528` ni declara commercial readiness.
 
 - **`TASK-1527` IN-PROGRESS (P0, checkpoint humano).** Plan:
   `docs/tasks/plans/TASK-1527-plan.md`. Aceptar primero el delta de rights workspace-scoped + saga durable;

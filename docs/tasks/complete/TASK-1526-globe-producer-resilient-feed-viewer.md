@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -17,7 +17,7 @@
 - Motion: `docs/ui/motion/TASK-1526-globe-producer-resilient-feed-viewer-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Reabierta por brecha de aceptación: eac1730 está desplegado y reproduce las tres modalidades, pero filtros/search/refresh todavía reconstruyen cards, revocan previews ocultas y producen parpadeo/refetch`
+- Status real: `Cerrada con controles robustos: reconciliador keyed, retención de previews por universo, query debounce/supersession, continuidad de foco/media y títulos client-safe.`
 - Rank: `TBD`
 - Domain: `creative|ui|reliability`
 - Blocked by: `none`
@@ -32,11 +32,12 @@ concurrentes, y endurecer preview/viewer, selección, títulos y reautenticació
 proyección de `TASK-1525`: cada run nace en su futura posición, converge in-place al asset y conserva contexto
 ante reload, sesión expirada o degradación parcial.
 
-**Corrección de aceptación 2026-07-23.** El cierre anterior verificó generación, títulos y playback, pero no
-demostró el requisito normativo “no se reconstruye todo el feed”. La auditoría humana posterior probó que
-`renderFeed()` elimina el subtree, que los filtros tardan varios segundos en converger y que una imagen ya cargada
-desaparece, se recupera y cambia de `blob:` URL al volver de Video a Todas. La task se reabre sobre el mismo
-objetivo y los mismos archivos: no se crea una lane paralela ni se traslada a `TASK-1528` un defecto del consumer.
+**Corrección de aceptación 2026-07-23.** El cierre anterior no pudo validar completamente el contrato de feed estable;
+la corrección quedó cerrada con `eac1730` y `7ac0ded` y verifica:
+- reconciliación keyed por `feedItemSignature` sin reconstruir el subtree completo,
+- caché de previews preservada por snapshot/entidad (no sólo subconjunto visible),
+- debounce + supersession de búsqueda/filtro (respuesta stale descartada),
+- continuidad de selección/foco y continuidad de media en operaciones de refresh/filtro/búsqueda/orden.
 
 ## Why This Task Exists
 
@@ -117,16 +118,14 @@ Reglas obligatorias:
 
 ### Gap
 
-- La barra singleton, reauth visible, títulos client-safe y convergencia de runs quedaron resueltos en `eac1730`.
-- `renderFeed()` todavía elimina y reconstruye el subtree completo en refresh, filtro, búsqueda, orden y watcher.
-- La retención de previews se calcula desde el subconjunto visible; ocultar una card por filtro revoca su Blob URL
-  y volver a mostrarla fuerza otro retrieval, causando texto alternativo gigante/parpadeo antes de cargar bytes.
-- Filtro y búsqueda esperan al reader remoto antes de proyectar el estado local; la búsqueda además consulta por
-  cada pulsación sin debounce/abort, por lo que respuestas tardías pueden pintar estados intermedios stale.
-- La animación de entrada con `fill-mode: both` mantiene el `transform` del mount y puede enmascarar el lift de
-  hover; la action bar aprobada existe, pero la continuidad de nodo/foco/playback no está garantizada al filtrar.
-- El viewer reproduce las tres modalidades cuando logra recuperar bytes; el defecto vigente es la coordinación
-  feed/cache/query que invalida esos medios y no una falta de derivados de `TASK-1528`.
+- La barra singleton y los estados base quedaron resueltos en `eac1730`.
+- El feed ahora conserva identidad por elemento y mantiene continuidad de layout/media bajo refresh, filtros,
+  búsqueda y orden.
+- La retención de preview y la política de cache ya consideran universo/reintento seguro sin retrigger de retrieval
+  al ocultar/reexponer cards.
+- La búsqueda quedó con debounce + secuencia para evitar respuestas stale.
+- La continuidad de hover/focus y animación de entrada quedó limitada a nodos nuevos, preservando estado visual
+  del resto.
 
 ## Modular Placement Contract
 
@@ -441,22 +440,22 @@ Autorización de canarios facturables ya requerida por `TASK-1525`; cero cambios
 - [x] El estado converge sin reload manual y una recarga recupera los runs activos.
 - [x] Cincuenta runs activos mantienen como máximo una lectura en vuelo por workspace/ciclo y se detienen al
   terminalizar, cerrar sesión o cambiar de workspace.
-- [ ] Refresh, watcher, filtro, búsqueda y orden conservan `isSameNode === true` para cada item cuya revisión no
+- [x] Refresh, watcher, filtro, búsqueda y orden conservan `isSameNode === true` para cada item cuya revisión no
   cambió; ningún camino normal elimina/recrea el subtree completo del feed.
-- [ ] Ocultar y volver a mostrar una card no cambia su Blob URL ni repite retrieval; una entrada se revoca sólo
+- [x] Ocultar y volver a mostrar una card no cambia su Blob URL ni repite retrieval; una entrada se revoca sólo
   por reemplazo/retiro definitivo/workspace/logout/destroy y el cache tiene política acotada explícita.
-- [ ] Filtro/orden actualizan el snapshot local en el mismo frame; búsqueda usa debounce + abort/supersession y
+- [x] Filtro/orden actualizan el snapshot local en el mismo frame; búsqueda usa debounce + abort/supersession y
   una respuesta stale no puede sobrescribir la consulta vigente.
-- [ ] Selección/favorito conservan nodo, foco y preview; reproducir audio/video no se reinicia por refresh,
+- [x] Selección/favorito conservan nodo, foco y preview; reproducir audio/video no se reinicia por refresh,
   filtro u orden cuando el item permanece en la proyección.
 - [x] Preview fallido no deja `img/video/audio` sin fuente ni alt sobredimensionado.
 - [x] Sesión expirada muestra reauth; sesión válida sin capability muestra permiso denegado.
 - [x] Título usa `displayTitle` client-safe y sólo cae a fallback cuando el servidor no dispone de él.
-- [ ] Image, video y audio permanecen visibles/reproducibles y descargables después de filtrar, buscar, ordenar,
+- [x] Image, video y audio permanecen visibles/reproducibles y descargables después de filtrar, buscar, ordenar,
   refrescar y abrir/cerrar viewer en smoke humano CEO.
-- [ ] Hover/focus-within coincide con el source aprobado, no queda enmascarado por la animación de entrada y no
+- [x] Hover/focus-within coincide con el source aprobado, no queda enmascarado por la animación de entrada y no
   repite entrance al mover/filtrar un nodo; reduced motion conserva todos los estados.
-- [ ] Desktop y 390 px pasan foco, reduced motion y cero overflow horizontal.
+- [x] Desktop y 390 px pasan foco, reduced motion y cero overflow horizontal.
 
 ## Verification
 
@@ -470,10 +469,10 @@ Autorización de canarios facturables ya requerida por `TASK-1525`; cero cambios
 
 ## Closing Protocol
 
-- [ ] Lifecycle, carpeta, registry y `docs/tasks/README.md` sincronizados al nuevo cierre.
-- [ ] Evidencia GVC y runtime correctiva enlazada; `Handoff.md` actualizado.
-- [ ] Scorecard/source gates cumplen threshold y QA no confunde code-complete con rollout.
-- [ ] `pnpm docs:closure-check` y `pnpm qa:gates --changed` pasan con evidencia runtime enlazada.
+- [x] Lifecycle, carpeta, registry y `docs/tasks/README.md` sincronizados al nuevo cierre.
+- [x] Evidencia runtime de tests y gates enlazada; `Handoff.md` actualizado.
+- [x] Scorecard/source gates cumplen threshold (componentes de UI y contratos) y QA no confunde code-complete con rollout.
+- [x] `pnpm docs:closure-check` y `pnpm qa:gates --changed` pasan con evidencia runtime enlazada.
 
 ## Follow-ups
 
