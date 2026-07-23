@@ -3,7 +3,7 @@
 - Decision: SPEC-007
 - Status: Accepted and implemented — deployed + live-verified (TASK-1465)
 - Validated: 2026-07-21 (live against Cloud SQL Postgres 16.14; an `oauth_transaction` persisted by `web_runtime` keyless)
-- Confidence: High for the durable stores, the keyless access model and the role model; the rich workspace/members/grants tenancy model is intentionally deferred
+- Confidence: High for the durable stores, keyless access model and role model; the rich workspace/members/grants projection was delivered by TASK-1511 and live-verified in internal shadow
 - Reversibility: Mixed — the Cloud SQL instance and the schema are costly to replace once data lands; the store wiring is a two-way door (a `GLOBE_POSTGRES_*`-gated swap back to in-memory exists for `internal_smoke`)
 - Owners: Efeonce Globe platform (datastore, role model, stores) + Greenhouse control plane (governance)
 - Related: `PLATFORM_FOUNDATION_V1.md`, `GREENHOUSE_CONNECTIVITY_V1.md` (ADR-001), `EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md` (ADR-004 — the HA gate this unblocks), `EFEONCE_GLOBE_MODEL_LAB_V1.md` (spend fence + experiment aggregate), `EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md` (evaluation reports), `docs/operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md` (the IaC that provisions the instance), `TASK-1465`, `TASK-1468` (deferred commercial ledger), `TASK-1508` (Cloud Run services into Terraform + `maxScale` persistence)
@@ -22,7 +22,9 @@ Efeonce Globe gets its **first durable datastore**: a Globe-owned Cloud SQL Post
 
 The datastore is Globe's, never Greenhouse's. Greenhouse remains the ecosystem control plane (identity, desired access, sister-platform bindings); Globe owns its own data, schema and persistence, consistent with the `PLATFORM_FOUNDATION_V1.md` ownership table and the ADR-001 rule that Greenhouse and Globe never share a database.
 
-This slice deliberately does **not** deliver the rich workspace/members/grants tenancy model. Tables carry an explicit tenant/workspace scope (per foundation invariant 1), but the governance objects around workspaces are a later task.
+This original slice deliberately did **not** deliver the rich workspace/members/grants tenancy model. TASK-1511
+subsequently delivered it as the ADR-006 broker projection: Greenhouse remains authority for identity and desired
+access, while Globe owns only bounded creative-operation grants.
 
 ## System topology
 
@@ -134,7 +136,9 @@ The `DurableSpendFence` is a **safety** control: it bounds how much a run/day ca
 
 ## Open items / still deferred
 
-- **Rich workspace / members / grants tenancy model** — deferred. Tables carry tenant scope, but the governance objects around workspaces are a later task.
+- **Continuous tenancy enforcement** — TASK-1511 delivered and verified the rich projection in internal shadow.
+  Promotion to `enforced` remains gated by a continuous Greenhouse dev reconciler; the expired bootstrap is not
+  permanent authority.
 - **Regional HA** — the instance is ZONAL; regional/HA is a separate cost/gate decision, not required by this slice.
 - **Provider secrets** — still a separate rollout (canary), out of scope here.
 

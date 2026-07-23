@@ -352,8 +352,9 @@ log append-only ahora persisten detrás de sus ports; ambos servicios Cloud Run 
 `maxScale=1` ya no existe. **Corrección de historia (`TASK-1508`):** el `maxScale=3` que 1465 reportó era el ceiling
 **de revisión**; el de **servicio** seguía en 1 y Cloud Run aplica el menor, así que el techo efectivo **era 1** hasta
 que `TASK-1508` (completa) lo corrigió a **3/3** y puso ambos campos en Terraform. Consecuencia: el spend fence
-cross-réplica nunca se ejercitó — es **`TASK-1512`**. **Queda diferido:** el modelo rico de workspace/members/grants
-tenancy (follow-up). Production/clientes externos siguen gateados por `TASK-1480`. Spec canónica:
+cross-réplica nunca se ejercitó — es **`TASK-1512`**. El modelo rico de workspace/members/grants fue entregado por
+**`TASK-1511`** y verificado internal-only en shadow; `enforced` espera reconciliación continua. Production/clientes
+externos siguen gateados por `TASK-1480`. Spec canónica:
 `docs/architecture/creative-studio/EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md` (SPEC-007) +
 `docs/tasks/complete/TASK-1465-globe-workspace-tenancy-persistence-audit.md`.
 

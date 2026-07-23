@@ -19,7 +19,7 @@
 ## Riesgos abiertos
 
 - Trabajo local concurrente: coordinar ownership antes de tocar archivos ya modificados.
-- **Globe Producer internal-only:** `TASK-1519` complete y `TASK-1505` desplegada. `TASK-1511` materializó
+- **Globe Producer internal-only:** `TASK-1519` y `TASK-1511` complete; `TASK-1505` desplegada. `TASK-1511` materializó
   `efeonce-internal` en shadow con broker/operator separados y 15/15 grants acotados; enforced espera reconciliador
   continuo desde Greenhouse dev. Style DNA/generación/export/review positivos esperan asset y readiness reales.
 - **Globe — el spend fence cross-réplica sigue sin ejercitarse (`TASK-1512`).** El dry-run vivo estimó 32 créditos,
@@ -92,7 +92,7 @@
   Globe pasó de **cero DB / todo in-memory** a durable: Cloud SQL `globe-pg` keyless IAM + `packages/database` + los
   **5 stores** detrás de sus ports (incluido el spend fence atómico) + audit append-only. Durabilidad probada en el
   servicio vivo. Detalle: `EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md` + `GLOBE_RUNTIME_HANDOFF.md`.
-  Diferido: modelo workspace/members/grants (`TASK-1511`). **Corrección de historia:** el `maxScale=3` que esta task
+  El modelo workspace/members/grants fue entregado después por `TASK-1511`. **Corrección de historia:** el `maxScale=3` que esta task
   reportó era el ceiling de revisión; el efectivo era 1 hasta que `TASK-1508` lo corrigió a 3/3 (detalle en su spec).
 - **`TASK-1507` COMPLETE (Globe Internal Front Door, `EPIC-028`) — aplicada y verificada en vivo 2026-07-21.**
   **La base URL estable del shell interno es `https://globe.efeoncepro.com`** (Global External ALB + serverless NEG →

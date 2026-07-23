@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-028`
-- Status real: `Proyección desplegada en shadow; drift observado y enforcement bloqueado hasta reconciliar broker`
+- Status real: `Completa y verificada internal-only en shadow; enforcement continuo queda como rollout posterior`
 - Rank: `TBD`
 - Domain: `platform|data|identity`
 - Blocked by: `none`
@@ -187,21 +187,21 @@ Reglas obligatorias (boundary Globe↔Greenhouse):
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface y consumers nombrados con paths/objetos reales.
-- [ ] Invariantes (tenant isolation, no-identidad-paralela, no-sobre-otorgar-vs-broker, grants append-only) explícitos.
-- [ ] Migración additive + rollback (flag OFF + drop aditivo) explícitos.
-- [ ] Evidencia runtime/DB listada (migración + readback + tests negativos de aislamiento + smoke de reconciliación).
-- [ ] Dominio sensible (access-control) con errores canónicos + audit + sin fuga cross-workspace.
+- [x] Source of truth, contract surface y consumers nombrados con paths/objetos reales.
+- [x] Invariantes (tenant isolation, no-identidad-paralela, no-sobre-otorgar-vs-broker, grants append-only) explícitos.
+- [x] Migración additive + rollback (flag OFF + drop aditivo) explícitos.
+- [x] Evidencia runtime/DB listada (migración + readback + tests negativos de aislamiento + smoke de reconciliación).
+- [x] Dominio sensible (access-control) con errores canónicos + audit + sin fuga cross-workspace.
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] Lógica en el primitive (`packages/domain` command/reader), no en la UI.
-- [ ] Modelada como aggregate `workspace` + commands (crear workspace / agregar member / otorgar grant) + readers, no click-handler.
-- [ ] Read = reader canónico; write = command con semantics + authorization fina (capability) + idempotencia + audit + errores canónicos.
-- [ ] Capability + grant en el mismo PR (registry del spine + grant al principal correcto + coverage).
-- [ ] Camino programático declarado: HTTP/SDK del spine (UI/MCP consumen por construcción).
-- [ ] Write apto para `propose → confirm → execute` si un actor humano/LLM lo dispara.
-- [ ] Un primitive, muchos consumers: cero lógica duplicada por consumer.
+- [x] Lógica en el primitive (`packages/domain` command/reader), no en la UI.
+- [x] Modelada como aggregate `workspace` + commands (crear workspace / agregar member / otorgar grant) + readers, no click-handler.
+- [x] Read = reader canónico; write = command con semantics + authorization fina (capability) + idempotencia + audit + errores canónicos.
+- [x] Capability + grant en el mismo PR (registry del spine + grant al principal correcto + coverage).
+- [x] Camino programático declarado: HTTP/SDK del spine (UI/MCP consumen por construcción).
+- [x] Write apto para `propose → confirm → execute` si un actor humano/LLM lo dispara.
+- [x] Un primitive, muchos consumers: cero lógica duplicada por consumer.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -291,13 +291,13 @@ Local (`pnpm check` + tests negativos) → migración aplicada + readback en Pos
 
 ## Acceptance Criteria
 
-- [ ] Existe una ADR aceptada de boundary (Globe proyecta vs posee) antes de cualquier schema.
-- [ ] Existe un agregado `workspace` persistido (id-bearing) + `members` + `grants` en la DB durable, tenant-scoped, con migración aditiva (no toca las tablas de TASK-1465).
-- [ ] Los primitives nacen con command/reader transport-neutral + capability + grant + coverage + conformance (Full API Parity); UI/MCP/SDK los consumen por construcción.
-- [ ] La reconciliación con el broker es aditiva y compatible: la derivación string actual sigue funcionando con el flag OFF; un grant Globe-side nunca sobre-otorga respecto al desired-access-state del broker.
-- [ ] Tests negativos demuestran ausencia de acceso/elevación cross-tenant y de identidad paralela.
-- [ ] Todo cambio de member/grant queda en el audit append-only; errores canónicos sin fuga cross-workspace.
-- [ ] No se habilitan producción ni clientes externos.
+- [x] Existe una ADR aceptada de boundary (Globe proyecta vs posee) antes de cualquier schema.
+- [x] Existe un agregado `workspace` persistido (id-bearing) + `members` + `grants` en la DB durable, tenant-scoped, con migración aditiva (no toca las tablas de TASK-1465).
+- [x] Los primitives nacen con command/reader transport-neutral + capability + grant + coverage + conformance (Full API Parity); UI/MCP/SDK los consumen por construcción.
+- [x] La reconciliación con el broker es aditiva y compatible: la derivación string actual sigue funcionando con el flag OFF; un grant Globe-side nunca sobre-otorga respecto al desired-access-state del broker.
+- [x] Tests negativos demuestran ausencia de acceso/elevación cross-tenant y de identidad paralela.
+- [x] Todo cambio de member/grant queda en el audit append-only; errores canónicos sin fuga cross-workspace.
+- [x] No se habilitan producción ni clientes externos.
 
 ## Verification
 
@@ -325,19 +325,19 @@ Local (`pnpm check` + tests negativos) → migración aplicada + readback en Pos
   grants activos `15`, expiración `2026-07-23T03:17:34.818Z`. La impersonación humana fue temporal y quedó
   revocada en ambas service accounts (`0/0`). El Asset Governance Job `globe-asset-governance-hpfn6` terminó
   exitosamente y vacío (`claimed=0`, `created=0`, `failed=0`).
-- Estado honesto: **code complete, rollout shadow verificado; enforcement pendiente**. No se promueve a
+- Estado honesto: **complete internal-only en shadow; enforcement continuo pendiente de un rollout posterior**. No se promueve a
   `enforced` porque falta un reconciliador continuo Greenhouse dev → Globe que renueve snapshots/revocaciones sin
   intervención. El bootstrap corto ya expiró y no se usa como autoridad permanente. Production y clientes externos
   siguen bloqueados.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` y carpeta sincronizados con el estado real.
-- [ ] `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md` y EPIC-028 sincronizados.
-- [ ] ADR de boundary registrada en `creative-studio/DECISIONS_INDEX.md`; SPEC-007 referenciada/extendida.
-- [ ] `GLOBE_RUNTIME_HANDOFF.md` + doc funcional/manual si cambia comportamiento operable.
-- [ ] `greenhouse-qa-release-auditor` y `greenhouse-documentation-governor` revisan el cierre.
-- [ ] Runtime Rollout Completion Gate: si el flag no está flipeado/verificado en vivo, reportar `code complete, rollout pendiente`.
+- [x] `Lifecycle` y carpeta sincronizados con el estado real.
+- [x] `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md` y EPIC-028 sincronizados.
+- [x] ADR de boundary registrada en `creative-studio/DECISIONS_INDEX.md`; SPEC-007 referenciada/extendida.
+- [x] `GLOBE_RUNTIME_HANDOFF.md` + doc funcional/manual si cambia comportamiento operable.
+- [x] `greenhouse-qa-release-auditor` y `greenhouse-documentation-governor` revisan el cierre.
+- [x] Runtime Rollout Completion Gate: `shadow` fue flipeado y verificado en vivo; `enforced` permanece fuera de este cierre hasta tener reconciliación continua.
 
 ## Follow-ups
 
