@@ -40,6 +40,8 @@ on:
       - 'src/lib/finance/apply-payroll-reliquidation-delta.ts'
       - 'src/lib/email/**'
       - 'src/lib/integrations/**'
+      - 'src/lib/globe/**'
+      - 'src/lib/google-credentials.ts'
       - 'src/lib/space-notion/**'
       # TASK-742 — ops-worker hosts the auth-providers smoke lane and consumes
       # the readiness/secrets stack, so changes here must trigger a redeploy.
@@ -208,6 +210,8 @@ jobs:
               src/lib/finance/apply-payroll-reliquidation-delta.ts \
               src/lib/email \
               src/lib/integrations \
+              src/lib/globe \
+              src/lib/google-credentials.ts \
               src/lib/space-notion \
               src/lib/auth \
               src/lib/auth-secrets.ts \

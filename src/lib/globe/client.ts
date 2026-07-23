@@ -7,7 +7,12 @@ import {
 } from '@efeonce-globe/sdk/google-auth'
 import { GoogleAuth } from 'google-auth-library'
 
-import { createVercelWifGoogleIdTokenClientFactory, isVercelRuntime } from '@/lib/google-credentials'
+import {
+  createAmbientImpersonatedGoogleIdTokenClientFactory,
+  createVercelWifGoogleIdTokenClientFactory,
+  isVercelRuntime
+} from '@/lib/google-credentials'
+import type { GlobeTenancyReconcileCommand } from './tenancy-reconciler'
 
 export type GreenhouseGlobeCredentialSource = 'wif' | 'ambient_adc'
 
@@ -31,6 +36,7 @@ export class GreenhouseGlobeConfigurationError extends Error {
     | 'globe_url_invalid'
     | 'globe_wif_config_invalid'
     | 'globe_production_forbidden'
+    | 'globe_sdk_command_unavailable'
 
   constructor(code: GreenhouseGlobeConfigurationError['code']) {
     super(code)
@@ -55,7 +61,13 @@ export function readGreenhouseGlobeClientConfig(
   }
 
   if (!isVercelRuntime(env)) {
-    return { baseUrl, audience, projectId, credentialSource: 'ambient_adc' }
+    return {
+      baseUrl,
+      audience,
+      projectId,
+      credentialSource: 'ambient_adc',
+      serviceAccountEmail: env.GLOBE_GCP_SERVICE_ACCOUNT_EMAIL?.trim() || undefined
+    }
   }
 
   const workloadIdentityProvider = env.GLOBE_GCP_WORKLOAD_IDENTITY_PROVIDER?.trim()
@@ -93,11 +105,41 @@ export function createGreenhouseGlobeClient(
   }
 }
 
+/** Canonical typed SDK seam for the continuous tenancy reconciler. */
+export function createGreenhouseGlobeTenancyReconcileCommand(
+  env: NodeJS.ProcessEnv = process.env,
+  dependencies: GreenhouseGlobeClientDependencies = {}
+): GlobeTenancyReconcileCommand {
+  const { client } = createGreenhouseGlobeClient(env, dependencies)
+
+  if (typeof client.reconcileTenancyProjection !== 'function') {
+    throw new GreenhouseGlobeConfigurationError('globe_sdk_command_unavailable')
+  }
+
+  return async input => {
+    await client.reconcileTenancyProjection(
+      { snapshot: input.snapshot },
+      {
+        workspaceId: input.workspaceId,
+        idempotencyKey: input.idempotencyKey,
+        correlationId: input.correlationId
+      }
+    )
+  }
+}
+
 function createGoogleIdTokenClientFactory(
   config: GreenhouseGlobeClientConfig,
   env: NodeJS.ProcessEnv
 ): GoogleIdTokenClientFactory {
   if (config.credentialSource === 'ambient_adc') {
+    if (config.serviceAccountEmail) {
+      return createAmbientImpersonatedGoogleIdTokenClientFactory({
+        projectId: config.projectId,
+        serviceAccountEmail: config.serviceAccountEmail
+      })
+    }
+
     return new GoogleAuth({ projectId: config.projectId })
   }
 

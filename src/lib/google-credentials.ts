@@ -362,6 +362,39 @@ export const createVercelWifGoogleIdTokenClientFactory = ({
   }
 }
 
+export const createAmbientImpersonatedGoogleIdTokenClientFactory = ({
+  projectId,
+  serviceAccountEmail
+}: {
+  projectId: string
+  serviceAccountEmail: string
+}) => {
+  const normalizedProjectId = projectId.trim()
+  const normalizedServiceAccountEmail = serviceAccountEmail.trim()
+
+  if (!normalizedProjectId || !normalizedServiceAccountEmail) {
+    throw new Error('Ambient service account impersonation is not fully configured')
+  }
+
+  return {
+    async getIdTokenClient() {
+      const sourceClient = await new GoogleAuth({
+        projectId: normalizedProjectId,
+        scopes: ['https://www.googleapis.com/auth/cloud-platform']
+      }).getClient()
+
+      const impersonated = new Impersonated({
+        sourceClient,
+        targetPrincipal: normalizedServiceAccountEmail,
+        targetScopes: ['https://www.googleapis.com/auth/cloud-platform'],
+        lifetime: 900
+      })
+
+      return { idTokenProvider: impersonated }
+    }
+  }
+}
+
 const getWorkloadIdentityAuthClient = ({
   env = process.env,
   scopes
