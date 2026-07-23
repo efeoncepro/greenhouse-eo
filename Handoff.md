@@ -27,8 +27,9 @@
 - **Globe — runtime fix desplegado:** Studio `f9839ee` y Worker `8d7ecb1` cerraron reauth/viewer,
   supersedieron 6 reconciles, estabilizaron queue age en `0` y aplicaron severidades. Evidencia:
   `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
-- **Globe Producer — feed/títulos aún no convergen en UI:** `TASK-1525` ya está desplegada internal-only
-  (`be372d3`, flag live-feed ON). Smoke humano bloqueado por `/v1/session` `401`; `TASK-1526` cierra reauth/cards.
+- **Globe Producer — feed live backend cerrado; UI aprobada pendiente:** `TASK-1525` está complete internal-only
+  en `ed5e993`; smoke same-tab reader `200` devolvió 10 items image/audio/video. `TASK-1526` cierra cards,
+  viewer, reauth UX y comparación contra la UI aprobada.
 - **Globe — promoción/media:** auditoría live `0/7` ready. `TASK-1527` está en checkpoint humano; `TASK-1528…1529`
   poseen derivados+Range y GC. No fabricar/heredar evidencia.
 
@@ -39,9 +40,8 @@
   arquitectura de derivados/streaming/visibilidad/GC; clientes externos siguen gateados por `TASK-1480`.
   Plan: `docs/tasks/plans/TASK-1521-plan.md`.
 
-- **`TASK-1525` IN-PROGRESS / runtime base desplegada; E2E humano pendiente por sesión.** Reader live `be372d3`,
-  CI/deploy verdes. Smoke local bloqueado por IAM TokenCreator; Chrome humano responde `/v1/session` `401`.
-  Siguiente: `TASK-1526`; no declarar E2E humano hasta sesión válida y canary image/video/audio.
+- **`TASK-1525` COMPLETE.** Reader live `ed5e993`; CI/deploy final verdes; Chrome same-tab sesión/reader `200`
+  con 10 items reales. Siguiente: `TASK-1526`; no declarar UX aprobada ni commercial readiness desde esta task.
 
 - **`TASK-1527` IN-PROGRESS (P0, checkpoint humano).** Plan:
   `docs/tasks/plans/TASK-1527-plan.md`. Aceptar primero el delta de rights workspace-scoped + saga durable;

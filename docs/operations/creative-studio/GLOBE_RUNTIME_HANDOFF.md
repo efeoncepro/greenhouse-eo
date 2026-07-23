@@ -53,20 +53,23 @@
   el viewer real. `f9839ee` corrige además el fallback de modalidad: si el output retenido no repite `mediaType`,
   el viewer usa la modalidad client-safe del item; el SHA desplegado materializó exactamente `img`, `video` y
   `audio`, visibles con controles para Video/Audio, y las tres descargas mostraron confirmación autorizada.
-- Gap separado: la UI todavía no consume la proyección live ni converge cards/títulos desde servidor. `TASK-1525`
-  ya dejó desplegada internal-only la base server-authoritative del reader durable
-  `globe.producer.feed.live.list|changes`: unión `active-run | terminal-run | retained-asset`, cursor opaco con
-  paginación `older` y cambios `newer`, store SQL batch sin writes/N+1 y flag
-  `GLOBE_PRODUCER_LIVE_FEED_ENABLED` fail-closed. Secuencia cerrada el 2026-07-23: recovery gobernado de policies
-  `30027548034` (`6/6` unambiguous, `0` unresolved), migración `0026/0027` `30027634439` (`pending=[]`),
-  flag Terraform `2d75909`, grant/parity fix `be372d38d7b100635c35e33c5a314119ef8df48c`, CI remoto
-  `30028588436` verde, deploy API `30028776603` → `globe-api-internal-00054-ddl`, deploy Studio
-  `30028776662` → `globe-studio-internal-00055-bgm`, ambos con imagen `be372d38d7b1`, tráfico 100% y
-  `GLOBE_PRODUCER_LIVE_FEED_ENABLED=true`. Verificación local: `pnpm check`, `pnpm build`, suite `studio-web`
-  211/211 incluyendo `TASK-1525 producer live feed over the studio-web transport`. Smoke live pendiente por
-  autoridad externa: direct API local no puede impersonar `greenhouse-globe-caller` (`iam.serviceAccounts.getAccessToken`
-  denegado) y la pestaña Chrome humana en `/producer` devolvió `/v1/session` `401`. `TASK-1526` consume la
-  proyección y debe cerrar reauth visible, cards/títulos/render incremental y comparación contra la UI aprobada.
+- Gap separado: la UI todavía debe reemplazar su consumer/feed visual por la proyección live y converger cards,
+  selección y viewer contra la UI aprobada. `TASK-1525` quedó **complete internal-only** como base
+  server-authoritative del reader durable `globe.producer.feed.live.list|changes`: unión
+  `active-run | terminal-run | retained-asset`, cursor opaco con paginación `older` y cambios `newer`, store SQL
+  batch sin writes/N+1, flag `GLOBE_PRODUCER_LIVE_FEED_ENABLED` fail-closed y errores DB sanitizados. Secuencia
+  cerrada el 2026-07-23: recovery gobernado de policies `30027548034` (`6/6` unambiguous, `0` unresolved),
+  migración `0026/0027` `30027634439` (`pending=[]`), flag Terraform `2d75909`, grant/parity fix
+  `be372d38d7b100635c35e33c5a314119ef8df48c`, hardening SQL `bd63b42`, fix de precedencia/alias runtime
+  `ed5e9933696e40234b28391c8ea726f16a4e5f22`, CI final `30030871101` verde, deploy API `30031056615` →
+  `globe-api-internal-00056-jqc`, deploy Studio `30031059039` → `globe-studio-internal-00057-pnx`, ambos con
+  imagen `ed5e9933696e`, tráfico 100% y `GLOBE_PRODUCER_LIVE_FEED_ENABLED=true`. Reproducción read-only contra
+  Cloud SQL local: `ok:true`, `count=2`, primer retained asset con output. Smoke humano final en la pestaña Chrome
+  existente `/producer`: `/v1/session` `200`, reader `200`, `count=10`, `modalities=["image","audio","video"]`,
+  `watermark=true`, primer item `Seedream · 5 Pro`; tras refresh, DOM `complete`, `Mis generaciones` presente,
+  `Seedream · 5 Pro`/`ElevenLabs` presentes, sin `Generación en curso` ni fallback gigante `Vista previa de <uuid>`
+  en el primer fold. `TASK-1526` consume la proyección y debe cerrar cards/títulos/render incremental, viewer
+  multimodal, reauth UX completa y comparación contra la UI aprobada. No declara comercial ready.
 
 ### Asset Governance y alertas
 
@@ -622,8 +625,8 @@ raíz en vez de sólo detectarlo.
 2. Ejecutar `TASK-1528` y luego `TASK-1529`; verificar derivados, Range/load y GC. El original privado no
    sustituye esa arquitectura.
 3. Ejecutar `TASK-1526`: consumir `globe.producer.feed.live.list|changes`, reemplazar la barra singleton por cards
-   keyed y resolver reauth visible. El smoke humano live de `TASK-1525` está bloqueado hoy por `/v1/session` `401`
-   en la pestaña Chrome autenticada; no usar otro Chrome ni simular sesión.
+   keyed, resolver reauth visible y alinear el feed/viewer con la UI aprobada. `TASK-1525` ya tiene smoke humano
+   same-tab `200`; no usar otro Chrome ni simular sesión.
 4. Mantener clientes externos/Production cerrados hasta `TASK-1480` y sus dependencias; no interpretar el éxito
    internal-only como promoción comercial.
 

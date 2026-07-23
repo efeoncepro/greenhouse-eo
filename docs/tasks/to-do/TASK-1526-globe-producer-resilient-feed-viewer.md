@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Ready to start; consume TASK-1525 runtime base`
+- Status real: `Ready to start; consume TASK-1525 complete runtime base and close approved UI/UX parity`
 - Rank: `TBD`
 - Domain: `creative|ui|reliability`
 - Blocked by: `none`
@@ -80,8 +80,9 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-1525` — proyección live server-authoritative ya desplegada internal-only; E2E humano pendiente por
-  `/v1/session` `401`, a cerrar en esta UI.
+- `TASK-1525` — proyección live server-authoritative complete internal-only; smoke humano same-tab `200` con
+  10 items reales image/audio/video. Esta task posee el consumer UI/UX: cards keyed, viewer, reauth visible y
+  comparación contra la UI aprobada.
 - `TASK-1505` — surface, controller y GVC existentes.
 - `TASK-1519` — BFF/session recovery.
 - `TASK-1503` — retrieval/download gobernados.

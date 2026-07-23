@@ -114,7 +114,7 @@
 
 - `docs/architecture/creative-studio/EFEONCE_GLOBE_PRODUCER_HUMAN_EXECUTION_DECISION_V1.md` — delta ADR-005.
 - `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md` — estado real tras implementación/verificación.
-- `docs/tasks/in-progress/TASK-1525-globe-producer-live-generation-projection.md` — plan/evidencia.
+- `docs/tasks/complete/TASK-1525-globe-producer-live-generation-projection.md` — plan/evidencia.
 - `Handoff.md` — continuidad activa.
 - `../efeonce-globe/packages/contracts/package.json` — export/script test focal.
 - `../efeonce-globe/packages/contracts/src/index.ts` — export mínimo si se requiere por consumers existentes.

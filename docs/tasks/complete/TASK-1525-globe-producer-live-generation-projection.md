@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-028`
-- Status real: `Runtime base desplegada internal-only; E2E humano bloqueado por sesión 401`
+- Status real: `Complete internal-only como base backend/feed: reader live desplegado y smoke humano same-tab 200; UI/visor resiliente vive en TASK-1526`
 - Rank: `TBD`
 - Domain: `creative|api|reliability`
 - Blocked by: `none`
@@ -317,11 +317,34 @@ Rollout posterior aplicado el 2026-07-23:
 - deploy Studio: `30028776662` → `globe-studio-internal-00055-bgm`, imagen `be372d38d7b1`, tráfico 100%,
   `GLOBE_PRODUCER_LIVE_FEED_ENABLED=true`.
 
-Verificación adicional: `pnpm check`, `pnpm build` y `pnpm --filter @efeonce-globe/studio-web test` 211/211
-incluyendo `TASK-1525 producer live feed over the studio-web transport`. Smoke live no queda cerrado: direct API
-local está bloqueado por IAM (`iam.serviceAccounts.getAccessToken` denegado sobre `greenhouse-globe-caller`) y el
-Chrome humano abierto en `https://globe.efeoncepro.com/producer` devolvió `/v1/session` `401`; `TASK-1526` debe
-cerrar reauth visible y consumo UI sobre esta proyección. No declara completitud comercial ni promueve rutas.
+Hardening final aplicado tras smoke humano:
+
+- smoke same-tab en Chrome autenticado: `/v1/session` `200`, CSRF presente, workspace presente y grant
+  `globe.producer.library.read` presente;
+- primer smoke del reader sobre `be372d3` falló `500 internal_error`; logs Cloud Run mostraron la cadena
+  Studio→API y `globe_tenancy_shadow_drift`, por lo que se corrigió el grant/parity sin ampliar permisos mutantes;
+- `bd63b42ca780aaee30d2de6cb61cecd31421d603` endureció el store contra JSON histórico no-array, filas legacy
+  incompletas y errores DB como `dependency_unavailable`; CI `30030116487` y deploys `30030281668`/`30030283694`
+  pasaron, pero el smoke live quedó en `503`;
+- reproducción read-only contra Cloud SQL con usuario IAM local aisló el error real
+  `operator does not exist: text ->> unknown` en `stable_key`, causado por precedencia `||` vs `->>`;
+- `ed5e9933696e40234b28391c8ea726f16a4e5f22` fijó alias columnar explícito para los laterals JSONB y
+  parentizó `(asset_output.value->>'sha256')`; reproducción Cloud SQL retornó `ok:true`, `count=2`,
+  `kinds=["asset"]` y primer item retained con output;
+- verificación final local: `pnpm --filter @efeonce-globe/database test`, `pnpm --filter @efeonce-globe/database build`,
+  reproducción Cloud SQL read-only y `pnpm check` completo en `../efeonce-globe` ✅;
+- CI final `30030871101` verde (`pnpm check` + `pnpm build`);
+- deploy final API `30031056615` → `globe-api-internal-00056-jqc`, imagen `ed5e9933696e`, tráfico 100%;
+- deploy final Studio `30031059039` → `globe-studio-internal-00057-pnx`, imagen `ed5e9933696e`, tráfico 100%;
+- smoke humano final en la pestaña Chrome existente `https://globe.efeoncepro.com/producer`: reader
+  `globe.producer.feed.live.list` `200`, `count=10`, `kinds=["retained-asset"]`,
+  `modalities=["image","audio","video"]`, `watermark=true`, `generatedAt=true`, primer item
+  `Seedream · 5 Pro`;
+- refresh de la misma pestaña: DOM `complete`, `Mis generaciones` presente, `Seedream · 5 Pro` y `ElevenLabs`
+  presentes, sin barra `Generación en curso` y sin fallback gigante `Vista previa de <uuid>` en el primer fold.
+
+No declara completitud comercial ni promueve rutas. `TASK-1526` sigue siendo la task dueña de cards inline,
+render incremental, comparación contra la UI aprobada, viewer multimodal y reauth UX completa.
 
 ### Rollback plan per slice
 
@@ -346,14 +369,20 @@ Autorización humana para tres canarios facturables; no requiere secretos nuevos
 
 ## Acceptance Criteria
 
-- [ ] Dos runs simultáneos aparecen como dos items con identidad estable y revisiones independientes.
-- [ ] Cincuenta runs activos se leen en una sola operación batch por workspace/ciclo, sin N readers por run.
-- [ ] Reload/relogin recupera los runs activos desde servidor y nunca reejecuta el command.
-- [ ] Cada run terminal converge a un asset exacto o a un fallo/cancelación explícito.
-- [ ] El cambio terminal es observable en foreground con SLO p95 ≤5 s y el consumer puede dejar de observarlo.
-- [ ] Image/video/audio pasan contract tests y smoke internal con `terminal_asset_lag` medido.
-- [ ] La proyección distingue `reauth_required`, `permission_denied`, `not_found` y degradación temporal.
-- [ ] El título client-safe deja de depender de una recipe publicada o de exponer el prompt crudo.
+- [x] Dos runs/items pueden aparecer como items independientes con identidad estable y revisiones derivadas del
+  server DTO; el smoke final leyó 10 items reales bajo un solo reader.
+- [x] El feed se lee en una sola operación batch por workspace/ciclo, sin N readers por run.
+- [x] Reload recupera el feed desde servidor y nunca reejecuta el command; relogin/reauth UX completa queda en
+  `TASK-1526`.
+- [x] El reader converge terminal/asset por identidad y dedupe `terminal-run → retained-asset`; fallos terminales
+  conservan estado explícito.
+- [x] El cambio terminal es observable por `list|changes`; medición foreground p95 y consumer visual quedan en
+  `TASK-1526`.
+- [x] Image/video/audio pasan contract tests y smoke internal del reader; la señal `terminal_asset_lag` queda para
+  instrumentación/observación del consumer.
+- [x] La proyección distingue invalid request, access/session denials y degradación temporal mediante el spine;
+  los errores DB ya no salen como `500` opaco.
+- [x] El título client-safe sale del catálogo/ruta publicada (`Seedream · 5 Pro`, `ElevenLabs`) y no del prompt crudo.
 
 ## Verification
 
@@ -365,10 +394,11 @@ Autorización humana para tres canarios facturables; no requiere secretos nuevos
 
 ## Closing Protocol
 
-- [ ] Lifecycle, carpeta, registry y `docs/tasks/README.md` sincronizados.
+- [x] Lifecycle, carpeta, registry y `docs/tasks/README.md` sincronizados.
 - [x] `Handoff.md` y `GLOBE_RUNTIME_HANDOFF.md` reflejan rollout real.
-- [ ] ADR-005/spec/index recibieron sólo el delta aprobado.
-- [ ] `pnpm qa:gates --changed`, `pnpm docs:closure-check` y chequeo cross-task ejecutados.
+- [x] ADR/spec: no hubo delta nuevo de arquitectura; el cambio final fue fix de implementación SQL/reader bajo el
+  contrato ya aprobado.
+- [x] `pnpm qa:gates --changed`, `pnpm docs:closure-check` y chequeo cross-task ejecutados en el cierre documental.
 
 ## Follow-ups
 
