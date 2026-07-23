@@ -30,7 +30,8 @@
 Convertir el enhancer existente de Globe en un **Creative Prompt Engineer** gobernado: un agente especialista
 capaz de comprender intención creativa, preservar restricciones, razonar sobre medio y operación, y compilar una
 propuesta específica para la ruta/modelo generativo elegido. El LLM es un motor sustituible; la competencia vive
-en contratos, perfiles versionados, herramientas, validadores, evals y políticas de promoción.
+en contratos, perfiles versionados, herramientas, validadores, evals y políticas de promoción. El agente absorbe
+la ingeniería del prompt sin reclamar la autoría de la idea.
 
 ## Why This Task Exists
 
@@ -43,6 +44,10 @@ operación edit/refine.
 “Mejorar” no debe significar adornar texto. Debe significar traducir una intención humana a una especificación
 creativa deliberada, compatible con el target y auditable, sin inventar hechos, derechos, marcas o decisiones
 irreversibles.
+
+La doctrina canónica coloca al equipo creativo como protagonista, al operador como punto de vista y al agente
+como guía/compilador. Por eso una propuesta técnicamente superior que diluye intención, oculta inferencias o
+reduce opciones creativas no es una mejora.
 
 ## Goal
 
@@ -63,6 +68,8 @@ Revisar y respetar:
 - `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md`
 - `docs/architecture/creative-studio/EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md`
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md`
+- `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md`
+- `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
 - `docs/architecture/DECISIONS_INDEX.md`
 
@@ -71,6 +78,8 @@ Reglas:
 - Globe es plataforma hermana: runtime/código en `../efeonce-globe`; gobierno documental en Greenhouse.
 - El browser declara contexto creativo client-safe; route/profile/provider authority se resuelve server-side.
 - El agente propone. Nunca reemplaza el original ni ejecuta media sin aceptación/acción humana separada.
+- El equipo/workspace conserva autoría; el outcome distingue `aportado|derivado|sugerido` y nunca confunde
+  compatibilidad técnica con una decisión de gusto.
 - No se promete “garantizar mejores resultados”: se prueba utilidad probable, fidelidad y compatibilidad.
 - No se captura chain-of-thought. Sólo intención resumida, decisiones observables, advertencias, evidencia y output.
 - Si el nuevo contrato convierte profiles/evals en source of truth compartido, Discovery propone ADR antes de código.
@@ -240,7 +249,8 @@ Reglas:
 - Golden sets separados para Image, Video y Audio, incluyendo edit/refine, texto literal, personajes/productos,
   restricciones negativas, prompts mínimos, contradictorios y multilingües.
 - Rubric: intent fidelity, constraint preservation, target compatibility, creative specificity, non-invention,
-  usefulness, latency y cost. Quality judge calibrado con revisión humana y checks determinísticos.
+  usefulness, creative latitude, provenance completeness, latency y cost. Quality judge calibrado con revisión
+  humana y checks determinísticos.
 - Comparar candidatos por la misma suite; promote/rollback por profile con evidencia y threshold explícito.
 - Registrar fallos de regresión y dataset version sin almacenar contenido cliente como eval fixture.
 
@@ -296,6 +306,8 @@ y rollback probado. Un modelo fuerte generalista sin profiles/evals no constituy
 
 - [ ] Existe contrato explícito `CreativePromptEngineer` vendor-neutral y versionado.
 - [ ] El outcome V2 separa intención, propuesta, decisiones, provenance, preservación y advertencias.
+- [ ] Evals rechazan propuestas que mejoran sintaxis/target fit pero degradan intención, creative latitude o
+  atribución de autoría.
 - [ ] Profiles cubren Image/Video/Audio y operaciones promovidas con compatibilidad de catálogo.
 - [ ] Pipeline y validators preservan literals/constraints y bloquean injection/policy leakage.
 - [ ] Al menos dos candidatos comparables pasan la misma suite antes de decidir default, o se documenta por qué

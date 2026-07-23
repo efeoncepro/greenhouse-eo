@@ -31,6 +31,9 @@ Transformar el botón `Mejorar` en una experiencia rica de **Creative Prompt Stu
 usuario verá qué intención entendió el agente, para qué target preparó la propuesta, qué restricciones preservó,
 qué decisiones sugirió y qué requiere revisión, manteniendo el original intacto hasta aceptar.
 
+La experiencia trata al operador como autor y punto de vista, no como supervisor de una caja negra: Globe guía,
+explica y reduce carga técnica; el workspace conserva memoria, autoridad y decisión.
+
 ## Why This Task Exists
 
 En producción se observó una espera aproximada de 36 segundos sin feedback; el control parece roto. La propuesta
@@ -60,6 +63,8 @@ y valiosa sin convertir el composer en chat ni card wall.
 
 - `.codex/skills/greenhouse-ai-design-studio/SKILL.md`
 - `.codex/skills/greenhouse-globe/SKILL.md`
+- `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md`
+- `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md`
 - `docs/ui/visual-directions/TASK-1531-globe-creative-prompt-studio-direction.md`
 - `docs/ui/wireframes/TASK-1531-globe-creative-prompt-studio.md`
 - `docs/ui/flows/TASK-1531-globe-creative-prompt-studio-flow.md`
@@ -309,6 +314,10 @@ creative decisions, assumptions y warnings. Provenance usa `aportado|derivado|su
 El browser mantiene una signature de source+target+composer context. Si cambia, la respuesta anterior puede
 reconciliarse pero no sustituye el estado actual.
 
+La jerarquía visual mantiene source e intención por encima del modelo/proveedor. La ruta se muestra cuando
+explica una diferencia material, pero el affordance principal sigue siendo decidir sobre la propuesta, no operar
+la maquinaria.
+
 ## Rollout Plan & Risk Matrix
 
 | Riesgo | Mitigation | Evidence |
@@ -328,6 +337,7 @@ reconciliarse pero no sustituye el estado actual.
 
 - [ ] First fold desktop/mobile es aceptado antes del wiring completo.
 - [ ] Creative read, target, proposal, provenance, preservation y warnings son legibles.
+- [ ] La jerarquía mantiene al original/decisión humana como foco y no convierte provider/model en protagonista.
 - [ ] Original cambia sólo tras accept; edit/reject/error lo preservan.
 - [ ] Pending aparece <100 ms perceptibles y un fingerprint produce un request activo.
 - [ ] Slow/error/denied/partial/stale tienen recovery honesto.

@@ -47,6 +47,7 @@ TASK-1505 está sobrecargada e in-progress; este slice tiene ownership, verifica
 - Confirmación adicional sólo ante policy/costo material, no para cada run.
 - Latencia, insuficiencia, stale state y unknown outcome tienen recovery honesto.
 - Una propuesta aceptada por TASK-1531 invalida el estimate anterior y dispara uno nuevo sin acción manual.
+- El sistema absorbe la ceremonia técnica de calcular; el operador conserva costo visible y la decisión de gastar.
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
 
@@ -63,6 +64,7 @@ TASK-1505 está sobrecargada e in-progress; este slice tiene ownership, verifica
 - `.codex/skills/greenhouse-globe/SKILL.md`
 - `.codex/skills/greenhouse-ai-design-studio/SKILL.md`
 - `docs/architecture/creative-studio/EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md`
+- `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md`
 - `docs/tasks/TASK_UI_UX_ADDENDUM.md`
 - `docs/tasks/TASK_BACKEND_DATA_ADDENDUM.md`
 - `docs/ui/wireframes/TASK-1532-globe-one-click-generate.md`
@@ -330,6 +332,7 @@ parpadeante, requests inútiles y una carrera entre el texto original y la propu
 ## Acceptance Criteria
 
 - [ ] Existe exactamente un CTA primario; no aparece `Calcular costo`.
+- [ ] Eliminar la ceremonia manual no oculta estimate, cambio material, saldo insuficiente ni autoridad de gasto.
 - [ ] Generate permanece accionable con payload válido aunque estimate esté stale/missing.
 - [ ] Background estimate usa debounce, single-flight y stale-response protection.
 - [ ] Pending/preview/reject de TASK-1531 no disparan estimates; `accept` invalida el anterior y calcula exactamente

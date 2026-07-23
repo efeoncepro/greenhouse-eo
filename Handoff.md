@@ -8,13 +8,15 @@
 - Branch compartida: `develop`. Antes de editar, ejecutar `git status --short` y no asumir árbol limpio.
 - El checkout contiene trabajo paralelo de Campaign Layout Compiler / producción creativa que fue preservado
   exactamente en el snapshot del corte; no revertir ni reescribir esos cambios.
-- Estado de producto, arquitectura y rollout: usar las tasks/epics/issues y documentos canónicos enlazados por
-  cada sesión. Una entrada histórica nunca prevalece sobre código, schema o runtime verificados.
+- Estado y decisiones vigentes: usar tasks/epics/issues y canon enlazado; la historia no prevalece sobre
+  código, schema ni runtime verificados.
 - Colas canónicas de trabajo: [tasks](docs/tasks/README.md), [epics](docs/epics/README.md),
   [mini-tasks](docs/mini-tasks/README.md) e [issues](docs/issues/README.md). La ventana de sesiones no reemplaza
   esos índices ni debe ocultar trabajo activo más antiguo.
 - La gobernanza de `software-architect-2026` está en
   `docs/architecture/GREENHOUSE_SOFTWARE_ARCHITECT_SKILL_GOVERNANCE_V1.md`.
+- Globe formalizó autoría humana en Business Model V1.1/ADRs; `TASK-1530…1534` siguen `to-do` y B2B2B continúa
+  como hipótesis sin acceso.
 
 ## Riesgos abiertos
 

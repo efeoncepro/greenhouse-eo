@@ -1605,7 +1605,9 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-1530` | `to-do` | **Globe Creative Prompt Engineer Foundation.** EPIC-028; backend-data/command; backend-critical; P1/Muy alto/Alto. Agente vendor-neutral `understand→strategize→compile→validate`, profiles versionados, structured outcome, safety/evals y model promotion con Full API Parity. | `docs/tasks/to-do/TASK-1530-globe-creative-prompt-engineer-foundation.md` |
 | `TASK-1531` | `to-do` | **Globe Creative Prompt Studio Experience.** EPIC-028; ui-ux/flow + command consumer; ui-standard; P1/Alto/Medio; bloqueada por TASK-1530. Editorial Workbench inline con creative read, target lens, proposal, provenance, warnings, estados async robustos y GVC premium. | `docs/tasks/to-do/TASK-1531-globe-creative-prompt-studio-experience.md` |
 | `TASK-1532` | `to-do` | **Globe One-Click Generate with Automatic Credit Estimate.** EPIC-028; ui-ux/interaction + command consumer; ui-standard/backend-standard; P1/Alto/Medio. Reemplaza `Calcular costo` + `Generar` por un CTA único con estimate background/on-click, revalidación server-side, single-flight, idempotencia y transparencia de créditos. | `docs/tasks/to-do/TASK-1532-globe-one-click-generate-automatic-estimate.md` |
+| `TASK-1533` | `to-do` | **Globe Voice Ideation Intake Foundation.** EPIC-028; backend-data/command; backend-critical; P1/Muy alto/Alto. STT vendor-neutral y acotado, audio transitorio con evidencia de eliminación, privacidad/seguridad/evals y Full API Parity; bloquea TASK-1534. | `docs/tasks/to-do/TASK-1533-globe-voice-ideation-intake-foundation.md` |
+| `TASK-1534` | `to-do` | **Globe Voice-to-Creative-Prompt Experience.** EPIC-028; ui-ux/flow + command consumer; ui-standard; P1/Alto/Medio; bloqueada por TASK-1533. Micrófono contextual + Thought Capsule + handoffs de inserción literal o propuesta creativa. | `docs/tasks/to-do/TASK-1534-globe-voice-to-creative-prompt-experience.md` |
 
 ## Siguiente ID disponible
 
-`TASK-1533`
+`TASK-1535`

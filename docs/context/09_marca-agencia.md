@@ -51,6 +51,21 @@ El **switching cost NO nace de dejar al cliente dependiente y a oscuras** (el ju
 
 > **Este bloque es el SSOT del Why/Golden Circle de Efeonce.** El resto de los docs (`01`, `05`, `10`, `14`) y la skill `efeonce-agency` lo **citan**, no lo recopian. Si difieren, manda este bloque.
 
+### Doctrina narrativa de Creative Studio
+
+En la historia de Globe, el héroe no es la IA ni Efeonce. **El equipo creativo es protagonista** y el operador
+activo es el punto de vista desde el que se vive la experiencia. El Head of Creative/Brand conserva autoridad;
+el CMO patrocina el outcome; Globe funciona como guía y sistema; los modelos son maquinaria intercambiable.
+
+El enemigo es la fragmentación aplicada a crear: trabajo repetitivo, traducción entre herramientas, parámetros,
+retries, costos opacos, pérdida de contexto y campañas que dependen de actos heroicos. La promesa no es fabricar
+más piezas con menos personas. Es que el equipo invierta más atención en intención, exploración, dirección y
+decisión, mientras el sistema resuelve la complejidad técnica con evidencia.
+
+Regla de lenguaje: “clase mundial” describe un estándar interno de craft y verificación, no un claim externo
+autosuficiente. Hacia el mercado se demuestra con mecanismos —original preservado, decisiones trazables,
+provenance, rutas visibles, revisión humana, memoria y resultados aprobados— en vez de superlativos.
+
 ### Ambición de escala y diferenciador defendible
 
 La ambición de Efeonce es **LATAM-first, no LATAM-limited**: construir una agencia grande y reconocida en toda Latinoamérica desde el inicio, preparada para servir después a EEUU hispano, mercados en inglés y otros mercados internacionales. La presencia LATAM es una ventaja operativa/cultural y una prueba de ejecución multi-país; **no es el techo de la categoría**.
@@ -207,4 +222,5 @@ ICO y el ecosistema de producto no son solo operaciones — son **experiencia de
 
 *Fuente: Arquitectura de Marca & Messaging Framework v1.0 + Marca Agencia Estrategia Completa v1.2. Los Thought Territories T1–T5 (contenido/LinkedIn) viven en el doc de marca; T6 = ASaaS / futuro de la agencia.*
 
-*Última verificación de drift contra runtime: 2026-06-09 (TASK-1064) — sin claims de runtime hardcodeados; targets/fechas comerciales son intencionales.*
+*Última verificación de drift contra runtime: 2026-07-23 — doctrina de autoría Creative Studio reconciliada con
+el business model V1.1; sin claims de runtime hardcodeados.*

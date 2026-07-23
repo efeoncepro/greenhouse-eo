@@ -18,7 +18,7 @@ Indice maestro de la documentacion no operativa del repo.
 
 - [Índice y contrato de Business Models](business-models/README.md)
 - [Template canónico](business-models/BUSINESS_MODEL_TEMPLATE.md)
-- [Creative Studio — Business Model V1](business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md)
+- [Creative Studio — Business Model V1.1](business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md)
 - [Creative Studio — Studio Credit Model V1](business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md)
 - Esta categoría define propuesta de valor, taxonomía comercial, arquitectura de ingresos, unidad económica,
   riesgos y validación. No reemplaza servicios, CPQ/Finance, propuestas ni contratos.

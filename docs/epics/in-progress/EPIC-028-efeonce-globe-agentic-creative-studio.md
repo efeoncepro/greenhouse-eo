@@ -46,6 +46,12 @@ Este programa convierte esos aprendizajes en una capability de agencia acumulabl
 
 El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prueba craft en operación managed, convierte patrones validados en templates, habilita autonomía cliente en trabajo repetible y conserva el contexto para que Efeonce absorba excepciones, picos y producción de alta incertidumbre sin reiniciar el proyecto.
 
+La doctrina de experiencia es explícita: el equipo creativo es protagonista, el operador activo es el punto de
+vista y Globe es guía/sistema. La plataforma devuelve tiempo a intención, exploración, dirección y decisión al
+absorber prompt engineering, routing, parámetros, restricciones, estimate, retries y trazabilidad. No autoasume
+gusto, rights, presupuesto, aprobación ni publicación. “Clase mundial” es un gate interno respaldado por
+evidencia, no una garantía de marketing.
+
 ## Outcome
 
 - Existe un repositorio y runtime propios de Creative Studio con tenancy, assets, ledger, auditoría y workers aislados de Greenhouse.
@@ -56,9 +62,13 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
   incluyendo readiness, limitaciones y fallbacks, sin exponer secretos, costo vendor confidencial ni margen.
 - El mismo run soporta `client-operated`, `co-operated` y `efeonce-managed` mediante responsabilidades y entitlements explícitos; cambiar de modo conserva brief, assets, lineage, review y ledger.
 - La UI principal permite trabajar en lenguaje creativo y compila decisiones aprobadas en templates/runs; un canvas DAG queda como authoring avanzado, no onboarding universal.
+- Toda asistencia creativa preserva el source y distingue `aportado|derivado|sugerido`; el operador puede aceptar,
+  editar o rechazar sin que una inferencia se convierta silenciosamente en autoría.
 - La primera plantilla curada de media funciona con provider routing basado en contrato de fidelidad y gates creativos/económicos verificables.
 - Greenhouse/Verk/Think consumen sólo proyecciones, eventos o deep links versionados cuando corresponde; no bases de datos, secrets ni lógica compartida.
 - La plataforma queda preparada para habilitar clientes y créditos comerciales sin rediseñar identidad, autorización o modelo de costos.
+- Equipos de otras agencias sólo pueden explorarse como hipótesis B2B2B dentro de modos/modelos existentes y
+  después de cerrar tenancy agencia→cliente final, confidencialidad, rights, brand authority y economics.
 
 ## Architecture Alignment
 

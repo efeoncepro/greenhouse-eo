@@ -7,6 +7,17 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-23 — Globe formaliza autoría humana y propósito creativo
+
+- Creative Studio Business Model V1.1 fija al equipo creativo como protagonista, al operador como punto de vista
+  y a Globe como guía que absorbe prompt engineering, routing, parámetros, estimate, retries y trazabilidad sin
+  asumir gusto, derechos, presupuesto, aprobación ni publicación.
+- El modelo económico no cambia: la doctrina fortalece gobierno/plataforma, capacidad humana e IP y conserva
+  Studio Credits como operaciones gobernadas. Otras agencias quedan como hipótesis B2B2B con gates de tenancy,
+  confidencialidad, rights, marca, accountability y margen; no nace un cuarto modelo ni acceso externo.
+- ADRs, EPIC-028, contexto de producto/marca/ICP/ASaaS y las tasks `1530…1534` quedan alineados a la misma
+  experiencia: source preservado, provenance visible y aceptación humana.
+
 ## 2026-07-23 — Agenda pública aclara la duración de la reunión
 
 - `/agenda/` reemplaza la etiqueta redundante `Efeonce · conversación inicial` por `Reunión de 30 minutos`.
@@ -831,12 +842,3 @@
   (timestamptz llegaba como `Date` bajo cast `as string` → 500 con data real; normalizado a ISO — también
   cubría a `/aeo` cliente). GVC desktop+mobile mirado con data real (Sky Airlines/Grupo Berel), scroll
   horizontal 0. Estado: code complete, rollout pendiente (push/staging/prod por instrucción del operador).
-
-## 2026-07-17 — Cierre de aprendizaje editorial del Customer Agent ANAM
-
-- El runbook agentic de blogposts incorpora un scan de lenguaje de lifecycle, clasificación explícita del alcance
-  de cada claim, gate problem-aware del primer viewport y el estado honesto del tooling de publicación/QA todavía
-  acotado por caso.
-- El manifest y el sistema visual del artículo quedaron sincronizados con los assets v2 y la publicación live.
-  `content-marketing-studio` añade `explanatoryDelta` como gate ejecutable para evitar infografías decorativas o
-  redundantes; la regla se sincronizó para Codex/Claude sin convertir la estética HubSpot en default.

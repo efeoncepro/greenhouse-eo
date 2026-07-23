@@ -44,6 +44,28 @@
 
 > Para producto: **BP1, BP2, BP5 y BP6 son los usuarios primarios del portal.** Son quienes se logean. El dashboard tiene que responder *su* pregunta en los primeros 10 segundos (revenue para BP1, foto unificada para BP2, fuente de verdad para BP5, gobernanza/RpA para BP6).
 
+### Roles de producto en Creative Studio
+
+Creative Studio no reduce el buying committee a una sola “persona usuaria”:
+
+- **Protagonista:** el equipo creativo/marketing que debe producir mejor como sistema.
+- **Punto de vista:** BP6 o el operador activo —designer, producer, marketer o director de arte— que idea,
+  configura, explora y selecciona.
+- **Autoridad creativa:** Head of Creative/Brand o aprobador designado; no se infiere del rol que ejecuta.
+- **Sponsor económico:** BP1/BP2 y Procurement/Finance según el engagement.
+- **Guía:** Globe, que absorbe ingeniería y conserva memoria sin reclamar autoría.
+
+La experiencia debe hacer al operador más capaz sin depender de sobrecarga individual: el usuario es héroe de la
+interacción, pero el producto elimina la necesidad de actos heroicos para entregar.
+
+### Segmento candidato — equipos de otras agencias
+
+Otras agencias **no se agregan a los 12 ICPs vigentes** todavía. Son una hipótesis B2B2B separada para equipos
+creativos con múltiples cuentas, picos de demanda y presión de consistencia. Antes de promoverla se validan
+tenancy agencia→cliente final, confidencialidad, derechos, aprobación de marca, atribución
+`white-label|endorsed`, accountability y economics. No se crea una modalidad nueva: cualquier piloto usaría
+`Studio Access`, `co-operated` o `client-operated` bajo los gates del business model.
+
 ---
 
 ## Jobs-to-be-Done (los que más informan producto)
@@ -112,4 +134,5 @@ Cada job mapea a una capacidad del portal. Esto es lo accionable:
 
 *Fuente: doc de Segmentación Comercial — ICPs, Buyer Personas & JTBD (mar-2026). El doc fuente tiene las 11 dimensiones de los 12 ICPs y los JTBD de las 4 unidades; aquí se destiló lo que informa producto.*
 
-*Última verificación de drift contra runtime: 2026-06-09 (TASK-1064) — sin claims de runtime hardcodeados; targets/fechas comerciales son intencionales.*
+*Última verificación de drift contra runtime: 2026-07-23 — roles Creative Studio y la hipótesis B2B2B quedan
+alineados al business model V1.1 sin modificar los 12 ICPs vigentes.*

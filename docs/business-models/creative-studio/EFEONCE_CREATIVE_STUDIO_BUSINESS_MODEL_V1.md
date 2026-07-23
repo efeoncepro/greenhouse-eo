@@ -4,9 +4,9 @@
 > **Owner:** Efeonce Strategy + Creative Practice + Efeonce Globe Product
 > **Economic owner:** Finance
 > **Contract/IP owner:** Legal + Creative Practice
-> **Version:** 1.0
+> **Version:** 1.1
 > **Date:** 2026-07-19
-> **Validated as of:** 2026-07-19
+> **Validated as of:** 2026-07-23
 > **Review cadence:** mensual durante piloto; trimestral después de commercial approval
 > **Decision:** [Creative Studio Business Model Decision V1](../../architecture/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_DECISION_V1.md)
 > **Credit policy:** [Studio Credit Model V1](EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md)
@@ -16,6 +16,11 @@
 
 Creative Studio comercializa una sola plataforma de producción creativa gobernada que combina software,
 capacidad humana e infraestructura generativa. No vende prompts, tokens, horas ni una fábrica de piezas.
+
+Su propósito es devolver a los equipos creativos el espacio de pensar, explorar, dirigir y decidir, mientras
+Globe absorbe la ingeniería necesaria para convertir esa intención en ejecuciones reproducibles y de calidad
+profesional. El valor no está en reemplazar criterio por automatización, sino en quitarle al criterio la carga
+de operar modelos, sintaxis, parámetros, referencias, restricciones, retries, costos y trazabilidad.
 
 El cliente puede comprar tres cosas distintas, solas o combinadas con fronteras explícitas:
 
@@ -50,7 +55,7 @@ Las herramientas generativas bajan el costo marginal de producir una variante, p
 selección de modelos, consistencia, retries, derechos, QA, trazabilidad y riesgo de que el sistema produzca más
 ruido que capacidad útil.
 
-Creative Studio resuelve cinco jobs:
+Creative Studio resuelve seis jobs:
 
 | Job | Resultado esperado | Mecanismo demostrable |
 | --- | --- | --- |
@@ -59,8 +64,36 @@ Creative Studio resuelve cinco jobs:
 | Saber qué ocurre y cuánto cuesta | Transparencia y forecast | estimate, ruta/modelo visible, reservation, ledger, costo real y telemetría |
 | Repetir lo que funcionó sin empezar de cero | Memoria acumulativa | templates versionados, assets, decisiones y rechazos |
 | Ganar autonomía sin asumir complejidad innecesaria | Cliente más capaz | progresión managed → co-operated → client-operated por evidencia |
+| Recuperar tiempo y atención para crear | Menos trabajo técnico improductivo sin perder autoría | captura de intención, Creative Prompt Engineering, defaults gobernados, estimate automático y revisión humana |
 
-### 2.2 ICP y buying committee
+### 2.2 Doctrina de autoría y roles narrativos
+
+Creative Studio distingue protagonismo, autoridad y operación:
+
+| Rol en la experiencia | Quién lo ocupa | Qué conserva |
+| --- | --- | --- |
+| **Protagonista** | el equipo creativo que persigue un resultado de marca | propósito, dirección, gusto y decisión colectiva |
+| **Punto de vista** | el operador activo —designer, producer, marketer o director de arte— | intención, exploración, selección y control del momento |
+| **Autoridad creativa** | Head of Creative/Brand o quien el workspace designe | coherencia de marca y aprobación final |
+| **Sponsor económico** | CMO/Marketing Director y, cuando aplique, Procurement/Finance | presupuesto, riesgo y outcome de negocio |
+| **Guía y sistema** | Globe + el método Efeonce | traducción, propuesta, memoria, policy, trazabilidad y ejecución gobernada |
+| **Maquinaria** | modelos, providers y parámetros | capacidad técnica intercambiable; nunca protagonismo ni autoridad |
+
+La interfaz puede seguir la mirada del operador sin convertir el producto en una herramienta individualista:
+las decisiones, comentarios, templates, memoria y aprobaciones pertenecen al workspace y al equipo. El operador
+es héroe de la interacción, pero Globe debe eliminar la necesidad de trabajo heroico para sacar cada campaña.
+
+Invariantes de autoría:
+
+- Globe distingue lo aportado, lo derivado y lo sugerido; nunca presenta una inferencia como decisión humana.
+- El original permanece visible y recuperable hasta que una persona acepte una propuesta.
+- El sistema automatiza preparación y complejidad técnica, no gusto, derechos, presupuesto, aprobación ni
+  publicación.
+- Los providers son transparentes cuando afectan la decisión, pero no ocupan el centro de la experiencia.
+- “Clase mundial” es un estándar interno verificable mediante craft, evals, review, provenance y calidad del
+  resultado; no un superlativo público sin evidencia.
+
+### 2.3 ICP y buying committee
 
 **ICP primario:** equipos de marketing/creatividad mid-market y enterprise con demanda recurrente, múltiples
 formatos/mercados, equipo in-house y sensibilidad de marca/derechos.
@@ -79,6 +112,23 @@ staff-aug con accountability managed.
 | Usuarios: designers/producers/marketers | velocidad, referencias, templates, review y menor trabajo repetitivo |
 | Procurement/Finance | unidad de compra, límites, forecast, margen, facturación y refunds |
 | Legal/Brand Safety | IP, licencias, likeness/voice, territorio, plazo, subprocesadores y evidencia |
+
+### 2.4 Hipótesis B2B2B: equipos creativos de otras agencias
+
+Los equipos de otras agencias son un **segmento candidato para validación**, no un ICP aprobado ni una cuarta
+modalidad comercial. Encajan potencialmente en `Studio Access`, `co-operated` o `client-operated` porque sufren
+la misma carga de routing, consistencia, trazabilidad y picos de producción, pero operan para un cliente final.
+
+Antes de incorporarlos al ICP o habilitar acceso se debe probar:
+
+- tenancy y permisos agencia → cliente final → proyecto, sin inferir acceso por relación comercial;
+- confidencialidad, aislamiento, derechos, portfolio y uso de outputs entre cuentas;
+- autoridad de marca y aprobación del cliente final;
+- experiencia `white-label|endorsed` y atribución contractual;
+- economics de margen, soporte y responsabilidad sin canibalizar Managed Squad.
+
+Esta hipótesis no crea packaging, precio, entitlement ni acceso externo. Su validación se registra como lane
+separada y no sustituye las entrevistas del ICP primario.
 
 ## 3. Taxonomía canónica: tres ejes, no una lista plana
 
@@ -160,6 +210,22 @@ operator, inputs, output, deadline, approver, budget y failure owner.
 
 El cliente gana talento específico bajo su dirección. Creative Studio puede ser una herramienta disponible para
 ese perfil si el entitlement lo permite, pero no cambia quién dirige ni crea accountability managed.
+
+### Cómo esta doctrina mejora el modelo económico
+
+La autoría humana refuerza, no contradice, las cinco líneas de ingreso:
+
+- hace defendible el fee de gobierno/plataforma porque el cliente compra menos carga operativa y más memoria,
+  policy y continuidad;
+- eleva el valor de capacidad humana desde “operar herramientas” hacia dirección, criterio, curation y
+  excepciones;
+- mantiene Studio Credits como medición de operaciones gobernadas, sin vender prompts ni ocultar trabajo humano;
+- convierte Creative Prompt Engineering, templates y recetas validadas en IP acumulativa y reusable;
+- mejora retención por capacidad + memoria: el equipo aprende y conserva sus decisiones, no queda atrapado por
+  una caja negra.
+
+Por eso Globe no compite por ser la generación más barata. Compite por aumentar la proporción de tiempo creativo
+útil, la consistencia y la velocidad aprobada de un equipo profesional con economics sostenibles.
 
 ## 5. Arquitectura de ingresos
 
@@ -339,6 +405,10 @@ costo o tasa de escalamiento lo justifican. El objetivo es autonomía segura, no
 - template reuse y time-to-success;
 - porcentaje de runs con RACI/rights completos;
 - support minutes por successful run.
+- porcentaje de propuestas aceptadas, editadas y rechazadas por Creative Prompt Engineering;
+- tiempo desde intención inicial hasta brief/prompt aceptado;
+- porcentaje de decisiones con provenance `aportado|derivado|sugerido` completo;
+- tiempo técnico evitado, medido por ceremonia eliminada y no por autopercepción aislada.
 
 ### Economía
 
@@ -373,8 +443,14 @@ SLA por aparecer en el portal.
 
 - 5–8 entrevistas con CMO/Head of Creative/Brand/Procurement;
 - probar comprensión de los tres ejes y de cada línea de ingreso;
+- probar la doctrina “equipo protagonista, Globe guía” y si la reducción de trabajo técnico aumenta
+  willingness-to-pay sin activar miedo a reemplazo;
 - usar willingness-to-pay por package/outcome, no preguntar “cuánto pagarías por un crédito”;
 - registrar objeciones de control, lock-in, IP y forecast.
+
+La hipótesis B2B2B se valida aparte con 2–3 entrevistas de liderazgo/operación de agencia y revisión
+Legal/Security. No cuenta como evidencia del ICP primario ni habilita un package hasta cerrar los gates de
+tenancy, derechos, marca y margen.
 
 **Gate:** 70%+ clasifica correctamente Managed Squad vs Staff Augmentation vs Studio Access sin ayuda.
 
@@ -409,6 +485,8 @@ en `docs/services/` y habilitación externa en EPIC-028.
 | modelo demasiado complejo para ventas | inmediato | configurador de tres preguntas y packages descriptivos |
 | cognitive debt del modelo | 12 meses | taxonomía única, glossary, ejemplos, owner y revisión trimestral |
 | lock-in percibido como hostil | 12 meses | exportabilidad de assets/evidencia cliente; IP Efeonce explícita, no oculta |
+| automatización desplaza autoría o devalúa al equipo | inmediato | original preservado, provenance, propuesta separada, aprobación humana y métricas de aceptación/rechazo |
+| agencias introducen fuga de información o responsabilidad difusa | inmediato | hipótesis separada; tenancy B2B2B, rights, RACI, white-label y economics antes de acceso |
 
 ## 14. Decisiones abiertas
 
@@ -423,6 +501,7 @@ No están decididos:
 - SLOs de plataforma y SLAs managed;
 - portabilidad de templates específicos;
 - disponibilidad regional y términos de subprocesadores.
+- si otras agencias superan los gates B2B2B y pasan de hipótesis a ICP/packaging aprobado.
 
 Cada decisión requiere owner, evidencia, fecha y actualización de este modelo o de su submodelo.
 

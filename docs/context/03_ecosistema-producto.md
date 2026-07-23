@@ -9,7 +9,7 @@ Efeonce tiene cuatro plataformas de software propietario, en distinta madurez:
 | **Greenhouse** | Experiencia de cliente + operaciones internas | Clientes activos de servicio Efeonce | B2B directo (parte del servicio) | Operativo (~77% madurez ASaaS) |
 | **Kortex** | CRM Intelligence Platform (sobre HubSpot) | Fase 1: clientes Efeonce Digital. Fase 2: agencias HubSpot (B2B2B) | B2B2B → HubSpot Marketplace | Operativo (validado en producción) |
 | **Verk** | Content + Distribution Operating System | Fase 1: interno. Fase 2: empresas con 20+ piezas/mes (B2B standalone) | B2B standalone | P0 en construcción |
-| **Efeonce Globe** *(Creative Studio)* | Producción creativa agentic: imagen, video, audio, assets, review y créditos | Fase 1: equipo Efeonce. Fase 2: equipos creativos/marketing de clientes | Capability Efeonce operada en modo managed, co-operated o client-operated; acceso B2B futuro y gobernado | Foundation en construcción: repo + GCP creados, runtime pendiente (EPIC-028) |
+| **Efeonce Globe** *(Creative Studio)* | Producción creativa agentic: imagen, video, audio, assets, review y créditos | Fase 1: equipo Efeonce. Fase 2: equipos creativos/marketing de clientes | Capability Efeonce operada en modo managed, co-operated o client-operated; acceso B2B futuro y gobernado | Operativo internal-only en tres rutas; acceso comercial/cliente sigue gateado (EPIC-028) |
 
 **Por qué cuatro plataformas independientes y no un monolito:** ICP y ritmo de producto distintos; narrativa ASaaS más potente (ecosistema de producto, no "agencia con portal"); independencia técnica (Globe no hereda el runtime pesado de Greenhouse; Verk no hereda su test coverage; Kortex no depende del ciclo de releases de Verk); patrón ya probado (Kortex corre como plataforma independiente con integración bidireccional con Greenhouse).
 
@@ -53,6 +53,15 @@ Capability para dirigir y operar generación de imagen, video, audio y extension
 
 La interfaz primaria habla el lenguaje de una persona creativa: brief, referencias, tratamiento, candidatos, variantes, feedback y aprobación. El sistema compila esas decisiones en un workflow ejecutable; no exige diseñar nodos ni conocer providers. Un canvas técnico queda como authoring avanzado cuando la evidencia lo justifique.
 
+**Propósito de producto:** devolverle al equipo el espacio rico de pensar, explorar, dirigir y decidir, y asumir
+por debajo la ingeniería necesaria para lograr un resultado profesional. El equipo creativo es protagonista; el
+operador activo es el punto de vista; Globe es guía/sistema; los modelos son maquinaria. La UI no debe pedirle a
+la persona que actúe como prompt engineer, router de proveedores, calculadora de créditos ni operadora de retries.
+
+Eso no significa ocultar el sistema. Globe expone costo, ruta/modelo, provenance, restricciones, incertidumbre y
+fallback cuando cambian una decisión material, y conserva el original hasta aceptación. Automatiza fricción y
+repetición; no automatiza silenciosamente gusto, derechos, presupuesto, aprobación o publicación.
+
 ### Modelo operativo
 
 | Modo | Quién opera | Qué conserva el cliente | Qué responde Efeonce |
@@ -76,6 +85,11 @@ Business Model V1](../business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BU
 - Arquitectura/ADR: `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_*.md`.
 
 El flywheel de producto y servicio es deliberado: Efeonce opera y valida craft → el Studio conserva el patrón → el cliente gana autonomía sobre trabajo repetible → el uso produce evidencia → Efeonce absorbe complejidad, excepciones y picos → los templates mejoran. El acceso cliente no canibaliza la agencia: desplaza valor desde repetición manual hacia dirección, sistemas creativos, QA y capacidad elástica.
+
+Los equipos creativos de otras agencias son una hipótesis B2B2B de validación, no un ICP ni un modo adicional.
+Antes de habilitarlos deben resolverse tenancy agencia→cliente final, confidencialidad, rights, brand authority,
+white-label/endorsed, accountability y margen. El canon vive en el
+[Creative Studio Business Model V1.1](../business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md).
 
 ---
 
@@ -141,4 +155,6 @@ Cada plataforma productiza un tipo de servicio distinto:
 
 *Fuente: Efeonce Product Ecosystem v1.0 (documento ancla — prevalece sobre downstream en conflictos de arquitectura de producto).*
 
-*Última verificación de drift contra runtime: 2026-07-19 — Efeonce Globe tiene repositorio y proyecto GCP inicial, pero no workloads, datos, secretos ni acceso cliente; sus tres modos operativos siguen siendo contrato objetivo. Targets/fechas comerciales son intencionales.*
+*Última verificación de drift contra runtime: 2026-07-23 — Efeonce Globe opera internal-only con Producer,
+persistencia y tres rutas promovidas; clientes externos y la hipótesis B2B2B siguen gateados por EPIC-028.
+Targets/fechas comerciales son intencionales.*
