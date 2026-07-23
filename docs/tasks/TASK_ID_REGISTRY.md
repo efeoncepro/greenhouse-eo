@@ -1597,7 +1597,9 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-1522` | `in-progress` | **Globe Review, Comments and Read-only Share Foundation.** EPIC-028; backend-data/command; backend-critical; P1/Alto. Migration/secret/grants desplegados; smoke positivo bloqueado por ausencia de output owned elegible. | `docs/tasks/in-progress/TASK-1522-globe-review-comments-share-foundation.md` |
 | `TASK-1523` | `to-do` | **Globe Creative Suite Experience Logic and Information Architecture.** EPIC-028; policy/ui-ux/flow; ui-platform; P0/Medio. Define Creative Loop, IA, rol agentic, gates humanos y contratos visual/flow/motion comunes para Producer y Workbench, sin backend ni runtime nuevo. | `docs/tasks/to-do/TASK-1523-globe-creative-suite-experience-logic.md` |
 | `TASK-1524` | `to-do` | **Globe Commercial Login Cinematic Threshold.** EPIC-028; implementation/ui-ux/motion; ui-standard; P0/Alto. Evoluciona la puerta internal-only a Login comercial poster-first con `One Idea, Many Forms`, master desktop/mobile, reduced motion y auth existente intacta. | `docs/tasks/to-do/TASK-1524-globe-commercial-login-cinematic-threshold.md` |
+| `TASK-1525` | `to-do` | **Globe Producer Live Generation Projection.** EPIC-028; backend-data/reader; backend-critical; P0/Alto. Proyección browser-safe y reanudable que une runs activos, terminales y assets retenidos por identidad/revisión estable, elimina joins N+1 y hace observable la convergencia sin replay de gasto. | `docs/tasks/to-do/TASK-1525-globe-producer-live-generation-projection.md` |
+| `TASK-1526` | `to-do` | **Globe Producer Resilient Feed and Viewer.** EPIC-028; ui-ux/flow; ui-standard; P0/Alto; bloqueada por TASK-1525. Sustituye la barra singleton por cards inline keyed, render incremental, media aislada, títulos estables y reautenticación visible; exige E2E humano Image/Video/Audio. | `docs/tasks/to-do/TASK-1526-globe-producer-resilient-feed-viewer.md` |
 
 ## Siguiente ID disponible
 
-`TASK-1525`
+`TASK-1527`

@@ -14,9 +14,11 @@
 
 - `TASK-1519` está **complete**: browser → BFF same-origin → API IAM-private opera con delegación, CSRF,
   actor/workspace/surface server-derived, IAM y grants acotados. Las migraciones `0001…0023` están aplicadas.
-- Globe `main` está en `b7adef31a349`. CI y deploy keyless
-  [30007670862](https://github.com/efeoncepro/efeonce-globe/actions/runs/30007670862) pasaron.
-  Studio sirve `globe-studio-internal-00048-m4z` al 100%; API sirve
+- Globe `main` está en `f9839ee4260b`. CI
+  [30016235049](https://github.com/efeoncepro/efeonce-globe/actions/runs/30016235049), deploy Studio
+  [30016248480](https://github.com/efeoncepro/efeonce-globe/actions/runs/30016248480) y deploy Worker
+  [30015312280](https://github.com/efeoncepro/efeonce-globe/actions/runs/30015312280) pasaron.
+  Studio sirve `globe-studio-internal-00050-m5n` al 100%; API sirve
   `globe-api-internal-00049-7gw` al 100%.
 - El front door conserva HTTP `301`, HTTPS `200`; API anónima permanece `403`. Clientes externos/Production
   siguen bloqueados por `TASK-1480` y gates comerciales. Internal-only no equivale a GA.
@@ -27,7 +29,8 @@
   durablemente, con bindings habilitados y circuitos cerrados: Seedream 5 Pro (`ref/still/rrss-v1`), Seedance 2.0
   (`ref/motion/loop-v1`) y ElevenLabs Multilingual v2 (`ref/voice/tts-v1`). Las otras 7 requieren su propia
   evidencia, revisión humana, propuesta, promoción, binding, circuito y canario.
-- Cloud SQL registra 5 runs `completed`. Image, Video y Audio produjeron outputs reales; el feed llegó a 9 piezas y
+- Cloud SQL registra al menos 6 runs `completed`. Image, Video y Audio produjeron outputs reales; el feed llegó a
+  10 piezas y
   los tres medios se sirvieron con `200`. El video exacto
   `3c6683c7-83dc-46d6-9f11-5c5f21fd13ce` se reprodujo como MP4 1280×720, duración 4.041667 s.
 - El bucket privado `efeonce-globe-lab-evidence` contiene 26 objetos / 48,866,088 bytes (~46.60 MiB). Los objetos
@@ -36,9 +39,14 @@
 - `dcc9a89` hidrata el feed por identidad exacta; `94d1718` corrige selección/render del viewer; `b7adef3`
   recupera sesión válida con CSRF rotado mediante refresh single-flight y un retry. La secuencia live fue
   reader `403` → session `200` → reader `200` → output `200`.
-- Gap vigente: cuando la sesión está realmente ausente/expirada, `/v1/session` devuelve `401` y los readers `403`;
-  el modal aún puede mostrar un error genérico de recuperación. Reautenticar recupera el acceso, pero falta CTA
-  explícita + smoke de expiración. No regenerar el asset ni reintentar un command de gasto.
+- `8d7ecb1` tipa una sesión realmente ausente/expirada como `authentication_required`, expone reautenticación
+  visible, conserva sólo destino/output efímero same-origin y nunca repite commands de gasto. El smoke humano con
+  el usuario CEO recorrió dos veces `sesión expirada → Entrar nuevamente → /producer`, rehidrató 10 piezas y abrió
+  el viewer real. `f9839ee` corrige además el fallback de modalidad: si el output retenido no repite `mediaType`,
+  el viewer usa la modalidad client-safe del item; el SHA desplegado materializó exactamente `img`, `video` y
+  `audio`, visibles con controles para Video/Audio, y las tres descargas mostraron confirmación autorizada.
+- Gap separado: la UI todavía no observa en vivo la transición del run y el título client-safe no está publicado;
+  `TASK-1525` posee la proyección durable y `TASK-1526` sus cards/títulos/render incremental.
 
 ### Asset Governance y alertas
 
@@ -48,22 +56,27 @@
 - El Job usa el digest `sha256:23103b5712f035a120a1c84c53d6913710a66535c7ead7f8112ea60bdd345770`
   (tag `a5ef90756ba2`). La ejecución `globe-asset-governance-kn549` terminó verde:
   `claimed=3`, `applied=3`, `promoted=1`, `failed=0`.
-- El Producer Worker ejecuta por Scheduler y completa normalmente, pero quedaron **5 outbox `reconcile` en
-  `pending`** para runs ya `completed`; no son trabajo útil y elevan `queueOldestAgeSeconds` por sobre el umbral.
-  Debe terminalizarlos/supersederlos al completar y medir edad sólo sobre trabajo reclamable, con backfill
-  gobernado; nunca SQL manual.
-- Las políticas de Monitoring de failure no declaran `severity`, por eso el correo muestra “No severity”. Además
-  una sola entrada `globe_worker_failed` dispara threshold `>0` con duración cero. Triage:
+- `8d7ecb1` comparte una sola definición SQL de trabajo reclamable entre claim y queue age, supersede el reconcile
+  hermano al checkpoint/finalización y ejecuta recuperación bounded/idempotente/auditada desde el Worker. El primer
+  tick desplegado terminalizó **6** residuos históricos —los 5 documentados más el run nuevo observado durante el
+  diagnóstico— con `superseded_by_terminal_state`; reportó `queueOldestAgeSeconds=0`. El tick siguiente confirmó
+  `supersededReconciles=0` y queue age `0`. No se ejecutó SQL manual.
+- Las políticas vivas declaran `globe_worker_failed=ERROR` y `queue_age=WARNING`. El evento aislado sigue siendo
+  accionable; `CRITICAL` queda reservado para indisponibilidad sostenida o riesgo de gasto/tenant. Triage:
   [`GLOBE_PRODUCER_ALERT_TRIAGE_V1.md`](GLOBE_PRODUCER_ALERT_TRIAGE_V1.md).
 
-### Gaps arquitectónicos que no se resuelven con parches UI
+### Gaps arquitectónicos decididos, todavía no implementados
 
 - No hay derivados de preview (thumbnail/poster/transcode/waveform/peaks); cards/viewer consumen originales.
 - Range no es todavía streaming extremo-a-extremo si el backend materializa el objeto completo.
 - Falta fijar si feed muestra `owner-only pending` o sólo `eligible`; `candidate_ready` no equivale a governance
   elegible.
 - Falta reconciliación/GC de objetos huérfanos y verificación de metadata cuando un rewrite same-key devuelve
-  `412`. Estos cuatro puntos requieren ADR/delta antes de implementación.
+  `412`.
+- ADR-008 ya fija esos boundaries: originales privados/inmutables, derivados first-class versionados, gateway
+  reautorizante con Range `206/416` y backpressure, feed `pending` owner-only sin bytes hasta `eligible`, y GC
+  inventory→mark→grace/holds→dry-run/apply con generation preconditions. La decisión no implementa sus build units
+  ni permite declarar commercial ready.
 
 ## Active state — 2026-07-22 (TASK-1494: Style DNA desplegado; canary positivo bloqueado)
 
@@ -582,16 +595,13 @@ raíz en vez de sólo detectarlo.
 
 ## Immediate next step
 
-1. Implementar recuperación explícita de sesión expirada: CTA/login preservando destino, error tipado y smoke
-   humano que pruebe `401 → reauth → feed/viewer`, sin repetir commands de gasto.
-2. Cerrar la semántica del outbox: terminalizar/superseder `reconcile` al completar un run, calcular queue age sólo
-   sobre trabajo reclamable y ejecutar backfill gobernado de los 5 eventos stale.
-3. Corregir observabilidad: severidades IaC explícitas, payload de fallo con referencia/correlación saneada y
-   runbook/alertas que distingan evento aislado, cola stale e incidente persistente.
-4. Promover las otras 7 rutas sólo con evidencia exacta y separación maker/promoter; mantener publicadas pero
+1. Promover las otras 7 rutas sólo con evidencia exacta y separación maker/promoter; mantener publicadas pero
    bloqueadas mientras no tengan revisión, binding, circuito y canario propios.
-5. Autorizar un ADR/delta para derivados, Range/streaming, visibilidad por governance y reconciliación/GC de GCS.
-6. Mantener clientes externos/Production cerrados hasta `TASK-1480` y sus dependencias; no interpretar el éxito
+2. Implementar ADR-008 por build units independientes y verificar derivados, Range/load, visibilidad y GC; el
+   original privado no sustituye esa arquitectura.
+3. Ejecutar `TASK-1525` y después `TASK-1526` para convergencia live, títulos client-safe y render incremental;
+   no reabrir el fix ya desplegado de sesión/viewer.
+4. Mantener clientes externos/Production cerrados hasta `TASK-1480` y sus dependencias; no interpretar el éxito
    internal-only como promoción comercial.
 
 Fresh-session handoff prompt: [`EPIC_028_FRESH_SESSION_PROMPT.md`](docs/operations/EPIC_028_FRESH_SESSION_PROMPT.md).

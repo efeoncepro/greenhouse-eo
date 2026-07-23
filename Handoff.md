@@ -24,8 +24,11 @@
   promoción/canario exactos. Una sesión realmente expirada aún degrada a `401/403` con error genérico.
 - **Globe — el spend fence cross-réplica sigue sin ejercitarse (`TASK-1512`).** El dry-run vivo estimó 32 créditos,
   y luego hubo gasto real gobernado; la prueba específica de contención cross-réplica sigue pendiente.
-- **Globe — observabilidad:** cinco outbox `reconcile` quedaron `pending` aunque sus runs están `completed`, lo que
-  infla queue age. Las alertas de failure no tienen severity IaC y muestran `No severity`.
+- **Globe — runtime fix desplegado:** Studio `f9839ee` y Worker `8d7ecb1` cerraron reauth/viewer,
+  supersedieron 6 reconciles, estabilizaron queue age en `0` y aplicaron severidades. Evidencia:
+  `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
+- **Globe Producer — feed/títulos aún no convergen en vivo:** es proyección cliente congelada, no provider activo.
+  `TASK-1525` crea el reader durable y `TASK-1526` sus cards/títulos; sesión y viewer multimodal ya están cerrados.
 
 ## Pendientes inmediatos
 
@@ -33,6 +36,12 @@
   esto no habilita el runtime comercial. Resolver sesión expirada, outbox stale/alertas, siete promociones y la
   arquitectura de derivados/streaming/visibilidad/GC; clientes externos siguen gateados por `TASK-1480`.
   Plan: `docs/tasks/plans/TASK-1521-plan.md`.
+
+- **`TASK-1525` / `TASK-1526` TO-DO (P0, vinculadas).** Primero materializar un reader compuesto
+  server-authoritative de runs activos/terminales + assets retenidos, con identity/revision/cursor y título
+  client-safe; después reemplazar la barra global por cards keyed concurrentes, render incremental, media local,
+  reauth visible y E2E humano Image/Video/Audio. `TASK-1505` conserva el target UI; `TASK-1521` sólo consume la
+  evidencia y no declara commercial readiness.
 
 - **`TASK-1503` COMPLETE y ACTIVA internal-only.** Retrieval, favorite y copy-as-reference funcionan en API y UI
   por grants/BFF; el bucket continúa privado y tenant-blind. Estado mutable y evidencia:
