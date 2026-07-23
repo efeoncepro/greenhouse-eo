@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Diseño; el fence existe y es atómico por construcción, pero nunca corrió con más de una réplica`
+- Status real: `Preflight vivo completo; corrida bloqueada por tenancy/readiness y gasto no autorizado`
 - Rank: `TBD`
 - Domain: `ops`
 - Blocked by: `none`
@@ -33,6 +33,14 @@ Ejercitar por primera vez el **spend fence cross-réplica** de Globe con concurr
 que `TASK-1508` levantó el cap efectivo de 1 a 3 instancias. El fence es la defensa que aborta un run *antes* de gastar
 y su atomicidad bajo row locks es justo lo que un fence in-memory no podía dar; hasta hoy esa propiedad está **probada
 por construcción y por tests, pero nunca por ejecución concurrente real**.
+
+## Checkpoint 2026-07-23 — preflight sin gasto; no ejecutable todavía
+
+- El dry-run autenticado confirmó catálogo, routes/circuits/rights y estimates; total máximo observado: 32 créditos.
+- Tenancy efectiva respondió `access_denied` y Model Readiness `not_found` para Image/Video/Audio. No existe una
+  corrida elegible que pueda producir contención real entre réplicas.
+- No hay autorización humana explícita para gasto de proveedor en esta prueba. Se mantiene `to-do`, sin fake que
+  pretenda demostrar evidencia horizontal live y sin relajar kill switch, cap o fence.
 
 ## Why This Task Exists
 

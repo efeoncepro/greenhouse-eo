@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-028`
-- Status real: `Code complete local; rollout IAM/env/secret/grants y smoke humano pendientes`
+- Status real: `Completa y verificada internal-only; no habilita entorno comercial`
 - Rank: `TBD`
 - Domain: `creative|platform|identity|security`
 - Blocked by: `none`
@@ -43,6 +43,17 @@
 - Pendiente antes del cierre: publicar env/secret de delegación, grants broker, allowlists/origins, IAM invoker,
   migrar hasta `0022`, habilitar el flag en staging/internal y ejecutar smoke humano positivo +
   negativos/revocación contra runtime vivo.
+
+## Checkpoint 2026-07-23 — rollout y revocación verificados
+
+- Secret/env de delegación y CSRF, IAM invoker del BFF, broker grants, origins/redirects y flag quedaron aplicados
+  internal-only; migraciones `0001…0023` están limpias.
+- Un humano autenticado ejecutó readers/commands por browser → BFF same-origin → API IAM-private. El runtime
+  derivó actor/workspace, ignoró spoofing y negó workspace ajeno, CSRF ausente y caller sin delegación.
+- El rehearsal retiró los scopes esperados, comprobó la denegación y restauró el mismo allowlist sin rotar
+  credenciales ni perder redirects. El smoke positivo posterior volvió a pasar.
+- OpenTofu terminó en `No changes`; API anónima sigue `403`. Esto cierra sólo el bridge internal-only:
+  `TASK-1521` continúa siendo el gate de clientes externos/Production.
 
 ## Summary
 
@@ -286,10 +297,10 @@ Broker OAuth/grants, Cloud Run IAM, origin/redirect allowlist y secrets/env de r
 
 ## Acceptance Criteria
 
-- [ ] Un humano autorizado ejecuta una capability Producer vía BFF y recibe resultado canónico correlacionado.
-- [ ] Usuario sin grant, workspace ajeno, surface spoofed, CSRF/replay y direct-private-call fallan cerrado.
-- [ ] Revocación, IAM, env/secrets y rollback tienen evidencia runtime sin secretos en logs.
-- [ ] No se duplicó lógica de negocio, ledger, tenancy ni modalidades.
+- [x] Un humano autorizado ejecuta una capability Producer vía BFF y recibe resultado canónico correlacionado.
+- [x] Usuario sin grant, workspace ajeno, surface spoofed, CSRF/replay y direct-private-call fallan cerrado.
+- [x] Revocación, IAM, env/secrets y rollback tienen evidencia runtime sin secretos en logs.
+- [x] No se duplicó lógica de negocio, ledger, tenancy ni modalidades.
 
 ## Verification
 
@@ -299,9 +310,9 @@ Broker OAuth/grants, Cloud Run IAM, origin/redirect allowlist y secrets/env de r
 
 ## Closing Protocol
 
-- [ ] Lifecycle/carpeta, README, Handoff y changelog se sincronizaron al cerrar.
-- [ ] ADR/arquitectura se actualizaron sólo si Discovery cambió una frontera aceptada.
-- [ ] Evidencia negativa y rollback quedaron adjuntos; internal ≠ commercial.
+- [x] Lifecycle/carpeta, README, Handoff y changelog se sincronizaron al cerrar.
+- [x] ADR/arquitectura se actualizaron sólo si Discovery cambió una frontera aceptada.
+- [x] Evidencia negativa y rollback quedaron adjuntos; internal ≠ commercial.
 
 ## Follow-ups
 

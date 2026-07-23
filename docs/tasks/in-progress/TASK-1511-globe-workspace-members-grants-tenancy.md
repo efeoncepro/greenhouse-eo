@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-028`
-- Status real: `Implementación en ejecución; ADR de boundary se resolverá antes del schema/runtime y rollout queda pendiente`
+- Status real: `Proyección desplegada en shadow; drift observado y enforcement bloqueado hasta reconciliar broker`
 - Rank: `TBD`
 - Domain: `platform|data|identity`
 - Blocked by: `none`
@@ -30,6 +30,15 @@
 ## Summary
 
 Construir el modelo **rico de tenancy persistido** de Globe — la entidad `workspace` de primera clase + `members` + `grants` (role/capability assignments) — sobre el datastore durable que dejó `TASK-1465`, reemplazando el `workspaceId` string derivado del broker (`greenhouse-org:<clientId>`) por un agregado persistido, **sin crear una identidad paralela a la de Greenhouse** (que sigue siendo el broker de identidad de ecosistema y de los workspace/client bindings).
+
+## Checkpoint 2026-07-23 — shadow live, enforcement aún no elegible
+
+- `GLOBE_TENANCY_MODE=shadow` quedó gobernado en Git y aplicado a API/Studio; la migración y los contracts
+  tenant-safe están vivos sin habilitar clientes externos.
+- El smoke humano BFF sigue verde, pero el runtime emitió `globe_tenancy_shadow_drift`: el broker aún no ha
+  reconciliado la proyección durable del workspace interno.
+- Por ello `enforced` permanece bloqueado. Promoverlo ahora negaría el piloto o incentivaría una identidad
+  paralela; no se creó bypass ni grant local que contradiga al broker.
 
 ## Why This Task Exists
 

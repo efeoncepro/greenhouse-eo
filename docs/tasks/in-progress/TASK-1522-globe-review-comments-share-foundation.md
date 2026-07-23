@@ -15,7 +15,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-028`
-- Status real: `Código completo y verificado; migration apply, grants y smoke internal-only pendientes`
+- Status real: `Migration/secret/grants desplegados; smoke positivo bloqueado por ausencia de output elegible`
 - Rank: `wip`
 - Domain: `creative|review|collaboration|security`
 - Blocked by: `none`
@@ -58,6 +58,14 @@ Suite Studio actual: 134/134.
 
 Pendiente de rollout: provisionar/montar el secret purpose-separated, aplicar migración `0016`, otorgar las cuatro
 capabilities al broker humano autorizado y ejecutar smokes allow/deny/replay/revoke/expiry.
+
+## Checkpoint 2026-07-23 — runtime listo, evidencia positiva aún bloqueada
+
+- Migración `0016`, secret purpose-separated, accessor y capabilities del bridge están aplicados en el runtime
+  internal-only; las suites y el conformance local permanecen verdes.
+- No existe un output owned/elegible nuevo porque Model Readiness y provenance siguen cerrados. Sin ese input no
+  se puede probar honestamente approve/comment/share/revoke/expiry en vivo.
+- La task permanece `in-progress`; no se inventó un output ni se amplió el share a clientes externos.
 
 ## Why This Task Exists
 

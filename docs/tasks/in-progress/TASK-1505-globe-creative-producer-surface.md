@@ -17,7 +17,7 @@
 - Motion: `docs/ui/motion/TASK-1505-globe-creative-producer-surface-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Code complete local; UI enterprise PASS y rollout end-to-end pendiente`
+- Status real: `Desplegada internal-only y smoke humano verde; generación positiva bloqueada por readiness/tenancy`
 - Rank: `TBD`
 - Domain: `creative|ui|product`
 - Blocked by: `none`
@@ -39,6 +39,18 @@
   185/185 tests.
 - Estado honesto: `code complete, rollout pendiente`. No hubo deploy, migrations, IAM, grants, flags, workers,
   provider canary ni gasto; esos gates permanecen en sus tasks dueñas.
+
+## Checkpoint 2026-07-23 — superficie desplegada y dry-run vivo sin gasto
+
+- API y Studio se desplegaron por los workflows keyless canónicos; el front door conserva HTTP `301`, HTTPS
+  `200` y la API anónima `403`. Migraciones `0001…0023` quedaron limpias.
+- El SSO humano y el BFF ejecutaron capabilities reales con actor/workspace server-derived; los negativos de
+  workspace ajeno, actor spoofed y CSRF fallaron cerrado.
+- El canary autenticado confirmó catálogo, rutas, circuitos, rights y estimates para Image/Video/Audio. El costo
+  total estimado fue 32 créditos, pero `execute` no corrió: tenancy efectiva devolvió `access_denied` y las tres
+  readiness attestations `not_found`.
+- La UI sigue mostrando esos modos como gated, que es el comportamiento aceptado. `TASK-1505` permanece
+  `in-progress` porque aún no existe evidencia operacional positiva para todas las capacidades aprobadas.
 
 ## Checkpoint 2026-07-22 — integración avanzada, deuda source-led y rollout pendientes
 

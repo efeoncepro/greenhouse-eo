@@ -7,6 +7,20 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-23 — Globe Producer promovido hasta sus gates reales internal-only
+
+- `TASK-1519` quedó completa: el bridge humano browser → BFF same-origin → API IAM-private tiene IAM/env/secrets,
+  grants, CSRF, spoofing/workspace denial y revocación verificados en vivo sin exponer credenciales.
+- Migraciones `0001…0023`, Producer Worker y Asset Governance Job quedaron desplegados por workflows keyless con
+  imágenes inmutables; governance procesó una cola vacía en verde y ambos schedulers permanecen cerrados/pausados.
+- Tenancy avanzó a `shadow` y registró drift del broker, por lo que `enforced` no se habilitó. Library writes y
+  bulk sí avanzaron con smoke durable/partial-failure; export y purge permanecen OFF.
+- La superficie Producer está desplegada y su dry-run vivo estimó 32 créditos, pero no ejecutó proveedores:
+  readiness no tiene attestations y tenancy efectiva negó acceso. Provenance, Style DNA, review/share positivo y
+  la contención cross-réplica siguen bloqueados sin inputs reales o autorización; cero gasto en esta etapa.
+- Globe `main` y Greenhouse `develop` pasan suites/build, CI y OpenTofu `No changes`; Production y clientes
+  externos permanecen explícitamente fuera de alcance.
+
 ## 2026-07-22 — Globe Style DNA desplegado internal-only
 
 - TASK-1494 completa el carril local de Reference Intelligence: identidad tenant-safe desde provenance,
@@ -825,12 +839,3 @@
 - Essential Addons for Elementor 6.7.0 produjo un paquete incompleto sin `autoload.php`; se restauró de inmediato
   la versión 6.6.10 desde el snapshot previo. Su actualización queda pendiente hasta que el proveedor publique
   un paquete íntegro o pueda probarse fuera de producción.
-
-## 2026-07-17 — Publicación del caso ANAM con portada product-story V6
-
-- El artículo `Un dashboard no arregla un proceso comercial` quedó publicado en la categoría HubSpot con autor
-  Julio Reyes, canonical estable y contenido preservado. La portada SVG product-story usa media `251415` como
-  featured y `251416` como Open Graph/Twitter.
-- La publicación tuvo snapshot/rollback, guards de identidad, fingerprint, taxonomía y media, purge Kinsta y QA
-  live desktop/móvil. Pasaron robots, schema, social metadata, TOC, imágenes, links, overflow y el crop cuadrado
-  real del archivo.

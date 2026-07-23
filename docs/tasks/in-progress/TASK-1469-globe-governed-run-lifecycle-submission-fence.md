@@ -36,7 +36,7 @@ canary ya tiene owner: **ADR-004** (`TASK-1506`, complete) fijó el front door y
 - Motion: `none`
 - Backend impact: `webhook`
 - Epic: `EPIC-028`
-- Status real: `Código completo y verificado; composición productiva espera el compilador exacto de TASK-1470 y rollout de providers`
+- Status real: `Worker durable desplegado internal-only; ejecución real bloqueada por tenancy/readiness y gasto no autorizado`
 - Rank: `TBD`
 - Domain: `creative|platform|ops`
 - Blocked by: `none`
@@ -48,6 +48,15 @@ canary ya tiene owner: **ADR-004** (`TASK-1506`, complete) fijó el front door y
 
 Implementar lifecycle transaccional estimate → reserve → approve → submit → complete/reconcile → candidate →
 review → settle/release con queue, approval token, submission fence y completion drivers por proveedor.
+
+## Checkpoint 2026-07-23 — worker desplegado; scheduler pausado
+
+- El workflow keyless `29973093343` publicó el Producer Worker por digest inmutable; Cloud Run Job quedó en
+  topología `1×1`, con SA/Cloud SQL/storage/secrets mínimos y scheduler `PAUSED`.
+- Migraciones `0001…0023` están aplicadas y el runtime API/Studio sirve el SHA desplegado con perimeter checks
+  verdes. No se ejecutó el worker sobre trabajos pagados porque tenancy efectiva y Model Readiness fallan cerrado.
+- El dry-run de Producer autenticado estimó 32 créditos para Image/Video/Audio y no llamó `execute`; readiness
+  devolvió `not_found` para las tres modalidades. No hubo gasto ni intento de bypass.
 
 ## Why This Task Exists
 

@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-028`
-- Status real: `Code complete local; migración, secret, bucket/IAM y grants pendientes`
+- Status real: `Writes y bulk operativos internal-only; export y purge permanecen cerrados`
 - Rank: `TBD`
 - Domain: `creative|data|storage|platform`
 - Blocked by: `none`
@@ -34,6 +34,15 @@
 - Verificación local integrada en `pnpm check`/`pnpm build`; la UI TASK-1505 consume las mismas primitives.
 - Rollout pendiente: migration `0010`, `GLOBE_LIBRARY_CONFIRMATION_SECRET`, bucket
   `GLOBE_LIBRARY_EXPORT_BUCKET`, IAM privado y grants `library.read/manage/export/delete`.
+
+## Checkpoint 2026-07-23 — writes y bulk promovidos con smoke humano
+
+- Migración `0010`, secrets purpose-separated, bucket/IAM y grants quedaron aplicados. El flag de writes se
+  promovió primero y el de bulk después, ambos gobernados en Git y verificados por OpenTofu.
+- El smoke humano creó y movió a trash una entrada durable. El bulk exigió confirmation token y devolvió un
+  resultado parcial honesto `not-found` para un asset inexistente; no convirtió el fallo en éxito agregado.
+- `GLOBE_LIBRARY_EXPORT_ENABLED=false` permanece cerrado porque no existe un asset real elegible para probar
+  queue, bytes e integridad de export. `GLOBE_LIBRARY_PURGE_ENABLED=false` permanece cerrado por policy/Legal.
 
 ## Summary
 

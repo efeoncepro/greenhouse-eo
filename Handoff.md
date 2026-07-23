@@ -19,20 +19,18 @@
 ## Riesgos abiertos
 
 - Trabajo local concurrente: coordinar ownership antes de tocar archivos ya modificados.
-- **TASK-1494:** desplegada internal-only en `a5e128935577`; canary bloqueado por provenance vacío. Ver runbook.
-- **Globe (`EPIC-028`) — Producer code complete local, rollout pendiente.** TASK-1505 cerró estimate pre-spend,
-  seed/negative prompt, autoridad fail-closed y 390 px; `pnpm check && pnpm build` y GVC 4.72/5 pasan. No está
-  vivo: faltan migrations, secrets, buckets/IAM, grants, flags, workers/providers y canarios internal. Canon:
-  task + `docs/ui/reviews/TASK-1505/`.
-- **Globe — el spend fence cross-réplica sigue sin ejercitarse (`TASK-1512`).** El ceiling efectivo estuvo en 1
-  hasta `TASK-1508`; falta probar la contención con >1 réplica y gasto autorizado.
+- **Globe Producer internal-only:** `TASK-1519` quedó complete; `TASK-1505` está desplegada y el bridge humano,
+  migrations `0001…0023`, workers y library writes+bulk tienen evidencia viva. Provenance/Style DNA, generación
+  positiva, export, review/share positivo y tenancy enforced siguen cerrados por gates reales, no por código local.
+- **Globe — el spend fence cross-réplica sigue sin ejercitarse (`TASK-1512`).** El dry-run vivo estimó 32 créditos,
+  pero tenancy/readiness fallaron cerrado y no hubo autorización de gasto; no ejecutar el scheduler/worker pagado.
 
 ## Pendientes inmediatos
 
-- **Globe Producer — siguiente paso.** GVC final
-  `.captures/2026-07-22T23-03-58_globe-creative-producer/`: 38 frames, 0 errores, rubric PASS; Studio 185/185 y
-  monorepo verde. El dry-run vivo falló cerrado (`authentication_required`) contra el SHA antiguo y gastó cero.
-  Desplegar por `1519/1467/1469/1511/1520/1522`; mantener cerrado el acceso comercial.
+- **Globe Producer — siguiente paso.** Resolver primero inputs gobernados: reconciliar broker→tenancy para salir
+  de shadow drift y publicar attestations reales de Model Readiness; luego habilitar rights authority/provenance
+  y producir el primer asset elegible. Sólo entonces ejecutar Style DNA, export, review/share y `TASK-1512` con
+  autorización explícita de gasto. Schedulers siguen pausados; acceso comercial permanece cerrado.
 
 - **`TASK-1503` COMPLETE y ACTIVA en el runtime interno (`EPIC-028`, cluster Creative Producer).** El
   output side del Producer (retrieval gobernado + favorite/copyAsReference) está **operativo** en

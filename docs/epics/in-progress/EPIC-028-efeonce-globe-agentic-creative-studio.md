@@ -99,15 +99,15 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
   sobre contratos gobernados; despliegue y provider canaries siguen pendientes. `TASK-1505` implementa la
   **superficie aprobada completa**, no un MVP recortado: composer, library/viewer, collections/batch, budgets,
   provenance/lineage, collaboration/share y operator UX. Está validada localmente y no habilita clientes externos.
-- `TASK-1519` — **Producer Human Execution Bridge + Surface Enforcement.** Desbloquea browser humano por
+- `TASK-1519` — ✅ **Producer Human Execution Bridge + Surface Enforcement.** Browser humano operativo por
   `studio-web` same-origin BFF hacia la API IAM-private, con broker grants, delegación actor/workspace,
-  correlation/idempotency y enforcement real de `surface=ui` separado del coverage manifest. Está code-complete
-  localmente; faltan secret/env, broker grants, IAM invoker, flags y smoke/revocación sobre el runtime desplegado.
-- `TASK-1520` — **Producer Asset Library, Collections + Bulk Operations.** Proyección paginada de generations,
-  annotations y lineage; collections y commands batch idempotentes/auditados. Reusa retrieval/lineage y no crea
-  un segundo source of truth. Está code-complete localmente; faltan migration, bucket/secret/IAM/grants y smoke.
-- `TASK-1522` — **Review, comments + share foundation.** Comments, estados de review y enlaces gobernados están
-  integrados localmente; faltan migration, secret/grants y verificación sobre el runtime desplegado.
+  correlation/idempotency y enforcement real de `surface=ui`. IAM/env/secrets, smoke negativo y revocación
+  quedaron verificados internal-only; no habilita entorno comercial.
+- `TASK-1520` — **Producer Asset Library, Collections + Bulk Operations.** Writes y bulk están operativos
+  internal-only con smoke durable y partial failure honesto. Export permanece OFF sin asset elegible; purge OFF
+  por policy/Legal. Reusa retrieval/lineage y no crea un segundo source of truth.
+- `TASK-1522` — **Review, comments + share foundation.** Migration, secret y grants están desplegados; el smoke
+  positivo permanece bloqueado porque aún no existe un output owned/elegible producido por el carril gobernado.
 - `TASK-1521` — **Globe Commercial Runtime Environment Enablement.** Posee el bloqueo actual que impide bootear
   fuera de `internal_smoke`: environment contract, isolation/config, secrets, migrations, rollback y evidencia.
 - `TASK-1506` — **frontend hosting and front door decision (RESUELTA — ADR-004).** Gate P0 cerrado: la ADR

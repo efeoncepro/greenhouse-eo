@@ -8,6 +8,26 @@
 
 # Handoff
 
+## Active state — 2026-07-23 (Producer rollout internal-only hasta gates gobernados)
+
+`TASK-1519` está **complete**: secret/env de delegación+CSRF, IAM invoker del BFF, broker grants y redirects están
+vivos; smoke humano browser→BFF→API IAM-private, spoofing/workspace/CSRF negatives y revocation rehearsal pasan.
+Las migraciones `0001…0023` están aplicadas. API/Studio conservan perimeter 403/301/200 y OpenTofu termina en
+`No changes`.
+
+Runtime actual: tenancy `shadow` con `globe_tenancy_shadow_drift` observado (no promover a `enforced` hasta que el
+broker reconcilie); library writes+bulk ON con create/trash y partial `not-found` verificados; export/purge OFF.
+Producer Worker está desplegado y su scheduler PAUSED. Asset Governance Job usa digest
+`sha256:2860c6ff691613e48ab9b328334deb965c2e3b60e3c1b348f4c24804d8d5d32c`; la ejecución
+`globe-asset-governance-vvshv` completó con cola vacía y su scheduler no existe.
+
+El dry-run autenticado de `TASK-1505` verificó catálogo/routes/circuits/rights/estimates (32 créditos totales),
+pero tenancy efectiva respondió `access_denied` y readiness `not_found` para Image/Video/Audio. No se ejecutó
+provider, no hubo gasto y no debe arrancarse el worker pagado. Provenance continúa OFF porque falta la autoridad
+privada de rights inicial; Style DNA, export, review/share positivo y `TASK-1512` esperan inputs gobernados y, para
+la prueba de contención, autorización explícita de gasto. Clientes externos/Production continúan bloqueados por
+`TASK-1521` y gates sucesores.
+
 ## Active state — 2026-07-22 (TASK-1494: Style DNA desplegado; canary positivo bloqueado)
 
 `efeonce-globe` ya implementa los puertos que faltaban para que Reference Intelligence deje de ser una

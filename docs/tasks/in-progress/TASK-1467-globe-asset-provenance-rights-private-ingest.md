@@ -36,7 +36,7 @@ Follow-up concreto heredado: la runtime SA necesita `storage.objectCreator` sobr
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Código y wiring local completos; rollout externo y canary pendientes`
+- Status real: `Worker y storage/IAM operativos internal-only; ingest/rights authority y canary positivo bloqueados`
 - Rank: `TBD`
 - Domain: `creative|legal|storage`
 - Blocked by: `none`
@@ -47,6 +47,19 @@ Follow-up concreto heredado: la runtime SA necesita `storage.objectCreator` sobr
 ## Summary
 
 Crear ingest privado, asset lineage, licencias, consentimientos, retención y policy checks para referencias, inputs y outputs.
+
+## Checkpoint 2026-07-23 — worker de governance operativo; capability aún cerrada
+
+- El Job `globe-asset-governance` quedó provisionado con imagen inmutable
+  `sha256:2860c6ff691613e48ab9b328334deb965c2e3b60e3c1b348f4c24804d8d5d32c`, SA dedicada,
+  Cloud SQL keyless, storage mínimo, alertas y scheduler ausente por diseño.
+- La ejecución manual `globe-asset-governance-vvshv` terminó verde y reportó una cola vacía; ClamAV actualizó
+  firmas en el volumen escribible del Job. El intento previo falló cerrado y originó la corrección del argumento
+  `--datadir`, cubierta por tests.
+- `GLOBE_ASSET_PROVENANCE_ENABLED=false` permanece gobernado en ambos servicios. Falta una autoridad privada
+  real para la evidencia inicial de rights; el worker asíncrono no sustituye ese gate request-path.
+- No se fabricó un asset ni se habilitó Style DNA: provenance sigue vacío y el canary positivo permanece
+  operativamente bloqueado. Clientes externos y Production siguen fuera de alcance.
 
 ## Why This Task Exists
 
