@@ -75,7 +75,14 @@
   una generación image nueva apareció inline, progresó sin reload `queued → running → completed`, terminó con preview
   blob `2048×2048`, `uuidFallback=0`, `broken=0` y título propio; viewer Image/Audio/Video quedó
   `producerViewerState=ready`, audio/video reprodujeron silenciados (`played=true`) y no apareció `No tienes acceso`
-  ni retry visible. No declara comercial ready.
+  ni retry visible.
+- **Corrección de aceptación 2026-07-23:** ese smoke no ejercitó invariancia de nodo/cache durante filtros,
+  búsqueda, orden y refresh. Auditoría humana posterior en la misma pestaña CEO probó Todas→Video con
+  convergencia tardía `12→3` y Video→Todas con desaparición/reaparición de una imagen, nueva Blob URL y retrieval
+  repetido. El código confirma que `renderFeed()` reemplaza el subtree y que la cache se poda con el subconjunto
+  filtrado. `TASK-1526` vuelve a `in-progress` para un reconciler keyed real, lifecycle de cache acotado y query
+  coordinator con debounce/supersession. `eac1730` sigue siendo el runtime vivo hasta un deploy correctivo verde.
+  No declara comercial ready.
 
 ### Asset Governance y alertas
 
@@ -630,9 +637,9 @@ raíz en vez de sólo detectarlo.
    cerrar terms/fixture/report/review/proposal/canary exactos. Priorizar Seed Audio sólo como internal-evaluation.
 2. Ejecutar `TASK-1528` y luego `TASK-1529`; verificar derivados, Range/load y GC. El original privado no
    sustituye esa arquitectura.
-3. Ejecutar `TASK-1526`: consumir `globe.producer.feed.live.list|changes`, reemplazar la barra singleton por cards
-   keyed, resolver reauth visible y alinear el feed/viewer con la UI aprobada. `TASK-1525` ya tiene smoke humano
-   same-tab `200`; no usar otro Chrome ni simular sesión.
+3. Continuar `TASK-1526` reabierta: reemplazar el renderer replace-all por reconciliación DOM keyed, desacoplar
+   cache de previews del filtro y coordinar filtro/search/orden sin respuestas stale; conservar reauth/títulos/
+   viewer ya verificados. Validar en el Chrome existente, nunca otra sesión ni una descarga incidental.
 4. Mantener clientes externos/Production cerrados hasta `TASK-1480` y sus dependencias; no interpretar el éxito
    internal-only como promoción comercial.
 

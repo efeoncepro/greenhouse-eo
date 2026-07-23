@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `complete`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -14,10 +14,10 @@
 - UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1526-globe-producer-resilient-feed-viewer.md`
 - Flow: `docs/ui/flows/TASK-1526-globe-producer-resilient-feed-viewer-flow.md`
-- Motion: `none`
+- Motion: `docs/ui/motion/TASK-1526-globe-producer-resilient-feed-viewer-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Complete internal-only; efeonce-globe eac1730 desplegado en Studio 00059/API 00058; CI/deploy/smoke humano same-tab verdes`
+- Status real: `Reabierta por brecha de aceptación: eac1730 está desplegado y reproduce las tres modalidades, pero filtros/search/refresh todavía reconstruyen cards, revocan previews ocultas y producen parpadeo/refetch`
 - Rank: `TBD`
 - Domain: `creative|ui|reliability`
 - Blocked by: `none`
@@ -31,6 +31,12 @@ Reemplazar la barra global efímera del Producer por cards de generación integr
 concurrentes, y endurecer preview/viewer, selección, títulos y reautenticación. La UI será un thin client de la
 proyección de `TASK-1525`: cada run nace en su futura posición, converge in-place al asset y conserva contexto
 ante reload, sesión expirada o degradación parcial.
+
+**Corrección de aceptación 2026-07-23.** El cierre anterior verificó generación, títulos y playback, pero no
+demostró el requisito normativo “no se reconstruye todo el feed”. La auditoría humana posterior probó que
+`renderFeed()` elimina el subtree, que los filtros tardan varios segundos en converger y que una imagen ya cargada
+desaparece, se recupera y cambia de `blob:` URL al volver de Video a Todas. La task se reabre sobre el mismo
+objetivo y los mismos archivos: no se crea una lane paralela ni se traslada a `TASK-1528` un defecto del consumer.
 
 ## Why This Task Exists
 
@@ -111,10 +117,16 @@ Reglas obligatorias:
 
 ### Gap
 
-- Singleton global, sin múltiples runs ni convergencia.
-- `renderFeed()` reemplaza el subtree completo; selección dispara refetch de previews.
-- Media se monta antes de tener bytes y no tiene placeholder/error boundary local.
-- Viewer no diferencia reauth de permiso; title hydration pierde metadata client-safe.
+- La barra singleton, reauth visible, títulos client-safe y convergencia de runs quedaron resueltos en `eac1730`.
+- `renderFeed()` todavía elimina y reconstruye el subtree completo en refresh, filtro, búsqueda, orden y watcher.
+- La retención de previews se calcula desde el subconjunto visible; ocultar una card por filtro revoca su Blob URL
+  y volver a mostrarla fuerza otro retrieval, causando texto alternativo gigante/parpadeo antes de cargar bytes.
+- Filtro y búsqueda esperan al reader remoto antes de proyectar el estado local; la búsqueda además consulta por
+  cada pulsación sin debounce/abort, por lo que respuestas tardías pueden pintar estados intermedios stale.
+- La animación de entrada con `fill-mode: both` mantiene el `transform` del mount y puede enmascarar el lift de
+  hover; la action bar aprobada existe, pero la continuidad de nodo/foco/playback no está garantizada al filtrar.
+- El viewer reproduce las tres modalidades cuando logra recuperar bytes; el defecto vigente es la coordinación
+  feed/cache/query que invalida esos medios y no una falta de derivados de `TASK-1528`.
 
 ## Modular Placement Contract
 
@@ -233,6 +245,29 @@ Reglas obligatorias:
 
 ## Active Execution Log
 
+### 2026-07-23 — Reapertura correctiva por evidencia humana
+
+- Auditoría del source aprobado
+  `docs/ui/visual-sources/TASK-1505/approved-prototype.dc.html` contra el runtime `eac1730` y el HTML original
+  conservado por el operador en `Documents/Globe/Producer`.
+- Evidencia en la pestaña Chrome existente/autenticada del CEO:
+  - Todas → Video dejó 12 cards visibles antes de converger a 3 aproximadamente 5 s después;
+  - Video → Todas retiró una imagen ya cargada, la repuso aproximadamente 2,2 s después y cambió su `blob:` URL;
+  - no se abrió otra sesión/perfil y no se accionó descarga.
+- Causa raíz verificada en código:
+  - `renderFeed()` remueve `[data-producer-runtime-feed]` y vuelve a crear todas las cards;
+  - `releaseCardPreviewCache(retainedPreviewKeys(items))` conserva sólo las keys filtradas;
+  - búsqueda dispara refresh remoto por cada `input`, sin debounce ni descarte de respuestas stale;
+  - `candidate-enter ... both` puede conservar el transform de entrada y competir con hover.
+- Ownership:
+  - esta corrección de reconciliación keyed, cache/query y continuidad interactiva permanece en `TASK-1526`;
+  - la paridad funcional/visual completa del baseline aprobado permanece en `TASK-1505`;
+  - thumbnails/posters/transcodes/waveforms y Range real permanecen en `TASK-1528`;
+  - promoción al registry reusable de Globe permanece en `TASK-1485`, después de estabilizar un segundo consumer.
+- ADR resolution: ADR-005 ya gobierna el target aprobado y ADR-008 gobierna derivados/serving. Esta corrección
+  no cambia source of truth, schema, auth ni API pública; no requiere un ADR nuevo.
+- Checkpoint P0/Alto: el operador confirmó “primero documenta y luego ejecuta” el 2026-07-23.
+
 ### 2026-07-23 — Implementación, follow-up de causa raíz, deploy y smoke humano complete
 
 - Greenhouse lifecycle tomado en `develop` por instrucción del operador; sin branch nueva.
@@ -300,26 +335,38 @@ Reglas obligatorias:
 
 ### Slice 1 — Keyed feed reconciler
 
-- Mantener un mapa por identidad y actualizar sólo cards cambiadas.
+- Mantener un mapa por identidad con nodo + revisión renderizada y actualizar sólo cards nuevas o realmente
+  cambiadas; filtro, búsqueda, orden y selección mueven/ocultan nodos existentes.
 - Insertar active card desde el receipt y rehidratar todo desde el reader tras reload.
 - Coordinar una sola observación batch por workspace: long-poll/change cursor acotado, con jitter/backoff,
   pausa hidden/offline y `AbortController` en cambio de workspace/logout; no un timer por run.
+- Conservar identidad DOM comprobable (`isSameNode`) para items no modificados durante refresh, filtros y orden.
 
 ### Slice 2 — Media y selección resilientes
 
 - Separar DOM de metadata, media loading, media ready y media error.
 - Selección actualiza atributos/controles sin `renderFeed()` ni refetch.
-- Revocar Blob URLs al reemplazar/remover/destroy.
+- Mantener cache por `(experimentId, sha256)` independiente del subconjunto visible; ocultar/reordenar nunca
+  revoca ni vuelve a recuperar un preview sano.
+- Revocar Blob URLs sólo al reemplazar el hash, retirar definitivamente el item, cambiar workspace/logout o
+  destruir el controller; aplicar límite/LRU explícito si el reader puede exceder la ventana retenida.
 
 ### Slice 3 — Viewer, sesión y títulos
 
 - Reauth visible con retorno al mismo viewer/card.
 - Distinguir reauth, permiso, not-found y temporal; hidratar `displayTitle`.
+- Proyectar filtro y orden inmediatamente sobre el snapshot local; reconciliar después con reader remoto.
+- Debounce acotado de búsqueda, cancelación/supersession de consultas y descarte por secuencia para que una
+  respuesta anterior nunca sobreescriba el criterio vigente.
+- Preservar foco, selección y playback cuando el item continúa visible; si deja de estarlo, aplicar el fallback
+  de foco documentado sin cerrar o reiniciar el viewer por un render incidental.
 
 ### Slice 4 — E2E y rollout
 
 - Dos runs concurrentes y cada modalidad en desktop/mobile.
 - Preview, reproducción y descarga; reload y sesión expirada durante ejecución.
+- Medir requests de preview, estabilidad de nodo y latencia de filtro/search con controles de red lentos.
+- Validar hover/focus-within y reduced motion: mount ocurre una sola vez; filtrar/reordenar no repite entrada.
 
 ## Out of Scope
 
@@ -330,11 +377,23 @@ Reglas obligatorias:
 
 ## Detailed Spec
 
-El feed mantiene nodos keyed y aplica patches por revisión. Al recibir el receipt se crea una card optimistic
-sólo respecto de presencia, usando los IDs y el estado devueltos por el servidor; la autoridad posterior siempre
-es el reader. Cuando llega el asset terminal, el mismo nodo cambia de variante y monta media tras recuperar bytes.
-Un error media sustituye únicamente el slot visual por fallback compacto. Selección modifica `aria-selected`,
-toolbar y state local, sin reconstruir cards. Reauth conserva la intención de navegación, no el command de gasto.
+El feed mantiene un registro por key estable con `node`, revisión renderizada, media state y última presencia
+autoritativa. La reconciliación compara el DTO y parchea sólo el item cuya revisión o descriptor cambió; reordenar
+usa los mismos nodos y filtrar cambia visibilidad/orden sin destruirlos. Al recibir el receipt se crea una card
+optimistic sólo respecto de presencia, usando los IDs y el estado devueltos por el servidor; la autoridad
+posterior siempre es el reader. Cuando llega el asset terminal, el mismo nodo cambia de variante y monta media
+tras recuperar bytes. Un error media sustituye únicamente el slot visual por fallback compacto.
+
+La cache de preview no se deriva de `filteredItems`: un filtro no equivale a que el asset abandonó el feed. Sus
+entradas se retiran sólo cuando desaparecen de la ventana autoritativa, cambia el hash/workspace o el controller
+se destruye. El coordinador de consultas aplica filtro/orden local en el mismo frame, debouncea búsqueda y usa
+secuencia/abort para ignorar respuestas obsoletas. Selección modifica `aria-selected`, toolbar y state local, sin
+reconstruir cards. Reauth conserva la intención de navegación, no el command de gasto.
+
+Motion sigue siendo CSS incidental y causal: la entrada corre sólo al crear un nodo; hover/focus-within revela
+acciones y lift sin competir con un `animation-fill-mode` persistente. No se introduce Native View Transitions en
+esta corrección: primero se estabilizan keys, foco y playback; cualquier transición compartida futura deberá
+tener contrato propio de `TASK-1505`/`TASK-1485`.
 
 ## Rollout Plan & Risk Matrix
 
@@ -382,12 +441,22 @@ Autorización de canarios facturables ya requerida por `TASK-1525`; cero cambios
 - [x] El estado converge sin reload manual y una recarga recupera los runs activos.
 - [x] Cincuenta runs activos mantienen como máximo una lectura en vuelo por workspace/ciclo y se detienen al
   terminalizar, cerrar sesión o cambiar de workspace.
-- [x] Seleccionar/favoritar no reconstruye cards ni repite retrieval de previews sanos.
+- [ ] Refresh, watcher, filtro, búsqueda y orden conservan `isSameNode === true` para cada item cuya revisión no
+  cambió; ningún camino normal elimina/recrea el subtree completo del feed.
+- [ ] Ocultar y volver a mostrar una card no cambia su Blob URL ni repite retrieval; una entrada se revoca sólo
+  por reemplazo/retiro definitivo/workspace/logout/destroy y el cache tiene política acotada explícita.
+- [ ] Filtro/orden actualizan el snapshot local en el mismo frame; búsqueda usa debounce + abort/supersession y
+  una respuesta stale no puede sobrescribir la consulta vigente.
+- [ ] Selección/favorito conservan nodo, foco y preview; reproducir audio/video no se reinicia por refresh,
+  filtro u orden cuando el item permanece en la proyección.
 - [x] Preview fallido no deja `img/video/audio` sin fuente ni alt sobredimensionado.
 - [x] Sesión expirada muestra reauth; sesión válida sin capability muestra permiso denegado.
 - [x] Título usa `displayTitle` client-safe y sólo cae a fallback cuando el servidor no dispone de él.
-- [x] Image, video y audio son visibles/reproducibles y descargables en smoke humano CEO.
-- [x] Desktop y 390 px pasan foco, reduced motion y cero overflow horizontal.
+- [ ] Image, video y audio permanecen visibles/reproducibles y descargables después de filtrar, buscar, ordenar,
+  refrescar y abrir/cerrar viewer en smoke humano CEO.
+- [ ] Hover/focus-within coincide con el source aprobado, no queda enmascarado por la animación de entrada y no
+  repite entrance al mover/filtrar un nodo; reduced motion conserva todos los estados.
+- [ ] Desktop y 390 px pasan foco, reduced motion y cero overflow horizontal.
 
 ## Verification
 
@@ -401,11 +470,10 @@ Autorización de canarios facturables ya requerida por `TASK-1525`; cero cambios
 
 ## Closing Protocol
 
-- [x] Lifecycle, carpeta, registry y `docs/tasks/README.md` sincronizados.
-- [x] Evidencia GVC y runtime enlazada; `Handoff.md` actualizado.
-- [x] Scorecard/source gates cumplen threshold y QA no confunde code-complete con rollout.
-- [x] `pnpm docs:closure-check` pasa; `pnpm qa:gates --changed` no se ejecutó completo porque el cambio final de
-  Greenhouse es documental y la verificación runtime vive en `efeonce-globe` CI/deploy/smoke.
+- [ ] Lifecycle, carpeta, registry y `docs/tasks/README.md` sincronizados al nuevo cierre.
+- [ ] Evidencia GVC y runtime correctiva enlazada; `Handoff.md` actualizado.
+- [ ] Scorecard/source gates cumplen threshold y QA no confunde code-complete con rollout.
+- [ ] `pnpm docs:closure-check` y `pnpm qa:gates --changed` pasan con evidencia runtime enlazada.
 
 ## Follow-ups
 
