@@ -1,4 +1,8 @@
+type TurnstileWidgetId = string | number
+
 export interface MeetingTurnstileHandle {
+  execute(): Promise<string>
+  reset(): void
   destroy(): void
 }
 
@@ -7,21 +11,31 @@ export interface MeetingTurnstilePort {
     container: HTMLElement
     siteKey: string
     action: string
-    onToken(token: string): void
-    onExpired(): void
   }): MeetingTurnstileHandle | null
 }
 
+interface TurnstileRenderOptions {
+  sitekey: string
+  action: string
+  appearance: 'interaction-only'
+  execution: 'execute'
+  callback(token: string): void
+  'expired-callback'(): void
+  'error-callback'(): void
+}
+
 interface TurnstileApi {
-  render(container: HTMLElement, options: Record<string, unknown>): string | number
-  remove?(widgetId: string | number): void
-  reset?(widgetId: string | number): void
+  render(container: HTMLElement, options: TurnstileRenderOptions): TurnstileWidgetId
+  execute(widgetId: TurnstileWidgetId): void
+  remove?(widgetId: TurnstileWidgetId): void
+  reset(widgetId: TurnstileWidgetId): void
 }
 
 type TurnstileWindow = Window & { turnstile?: TurnstileApi }
 
 const SCRIPT_ID = 'greenhouse-meeting-turnstile-script'
 const SCRIPT_SRC = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
+const TOKEN_TIMEOUT_MS = 15_000
 
 let loadPromise: Promise<TurnstileApi> | null = null
 
@@ -78,36 +92,88 @@ export const resetMeetingTurnstileLoaderForTests = (): void => {
 export const createMeetingTurnstilePort = (win: TurnstileWindow = window): MeetingTurnstilePort => ({
   mount(input) {
     let api: TurnstileApi | null = null
-    let widgetId: string | number | null = null
+    let widgetId: TurnstileWidgetId | null = null
     let destroyed = false
+    let pending: {
+      resolve(token: string): void
+      reject(error: Error): void
+      timeout: ReturnType<typeof setTimeout>
+    } | null = null
 
-    void loadTurnstile(win)
-      .then(loadedApi => {
-        if (destroyed) return
+    input.container.setAttribute('aria-hidden', 'true')
 
-        api = loadedApi
-        widgetId = loadedApi.render(input.container, {
-          sitekey: input.siteKey,
-          action: input.action,
-          size: input.container.clientWidth < 300 ? 'compact' : 'flexible',
-          callback: input.onToken,
-          'expired-callback': input.onExpired,
-          'error-callback': input.onExpired,
-        })
+    const rejectToken = (error: Error): void => {
+      if (!pending) return
+
+      const current = pending
+
+      clearTimeout(current.timeout)
+      pending = null
+      current.reject(error)
+    }
+
+    const resolveToken = (token: string): void => {
+      if (!pending) return
+
+      const current = pending
+
+      clearTimeout(current.timeout)
+      pending = null
+      if (token) current.resolve(token)
+      else current.reject(new Error('turnstile_token_empty'))
+    }
+
+    const ensureWidget = async (): Promise<TurnstileApi> => {
+      if (destroyed) throw new Error('turnstile_destroyed')
+      if (api && widgetId !== null) return api
+
+      const loadedApi = await loadTurnstile(win)
+
+      if (destroyed) throw new Error('turnstile_destroyed')
+
+      api = loadedApi
+      widgetId = loadedApi.render(input.container, {
+        sitekey: input.siteKey,
+        action: input.action,
+        appearance: 'interaction-only',
+        execution: 'execute',
+        callback: resolveToken,
+        'expired-callback': () => rejectToken(new Error('turnstile_token_expired')),
+        'error-callback': () => rejectToken(new Error('turnstile_token_failed')),
       })
-      .catch(() => {
-        if (!destroyed) input.onExpired()
-      })
+
+      return loadedApi
+    }
 
     return {
+      execute: async () => {
+        const loadedApi = await ensureWidget()
+
+        if (pending) rejectToken(new Error('turnstile_execute_interrupted'))
+
+        return new Promise<string>((resolve, reject) => {
+          const timeout = setTimeout(() => {
+            pending = null
+            reject(new Error('turnstile_token_timeout'))
+          }, TOKEN_TIMEOUT_MS)
+
+          pending = { resolve, reject, timeout }
+          loadedApi.execute(widgetId!)
+        })
+      },
+      reset: () => {
+        if (api && widgetId !== null) api.reset(widgetId)
+      },
       destroy: () => {
         destroyed = true
+        rejectToken(new Error('turnstile_destroyed'))
+
         if (!api || widgetId === null) return
 
         try {
           api.remove?.(widgetId)
         } catch {
-          api.reset?.(widgetId)
+          api.reset(widgetId)
         }
       },
     }

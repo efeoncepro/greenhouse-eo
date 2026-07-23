@@ -239,6 +239,7 @@ export class MeetingRenderer {
   private abortController: AbortController | null = null
   private generation = 0
   private turnstileHandle: MeetingTurnstileHandle | null = null
+  private submissionPending = false
   private viewedCleanup: (() => void) | null = null
   private resizeObserver: ResizeObserver | null = null
   private previousPhase = this.state.phase
@@ -1034,13 +1035,13 @@ export class MeetingRenderer {
 
     const actions = element('div', 'ghm-form-actions')
     const back = element('button', 'ghm-secondary', copy.back)
-    const submit = element('button', 'ghm-primary', this.state.phase === 'submitting' ? copy.processing : copy.reserve)
+    const submit = element('button', 'ghm-primary', this.state.phase === 'submitting' || this.submissionPending ? copy.processing : copy.reserve)
 
     back.type = 'button'
     back.disabled = this.state.phase === 'submitting'
     back.addEventListener('click', () => this.transition({ type: 'back' }))
     submit.type = 'submit'
-    submit.disabled = this.state.phase === 'submitting' || this.emailVerification.status === 'verifying' ||
+    submit.disabled = this.state.phase === 'submitting' || this.submissionPending || this.emailVerification.status === 'verifying' ||
       this.emailVerification.status === 'rejected'
     actions.append(back, submit)
     form.append(actions)
@@ -1495,12 +1496,6 @@ export class MeetingRenderer {
       container,
       siteKey: captcha.siteKey,
       action: captcha.action,
-      onToken: token => {
-        this.state = reduceMeetingState(this.state, { type: 'captcha', token })
-      },
-      onExpired: () => {
-        this.state = reduceMeetingState(this.state, { type: 'captcha', token: null })
-      },
     })
   }
 
@@ -1512,13 +1507,12 @@ export class MeetingRenderer {
     if (!emailLooksValid(this.state.form.email.trim())) errors.push('email')
     if (!this.state.form.company.trim()) errors.push('company')
     if (!this.state.form.processingAccepted) errors.push('processingAccepted')
-    if (!this.state.captchaToken) errors.push('captchaToken')
 
     return errors
   }
 
   private async submit(): Promise<void> {
-    if (!this.state.selectedSlot || !this.state.config || !this.state.idempotencyKey) return
+    if (this.submissionPending || !this.state.selectedSlot || !this.state.config || !this.state.idempotencyKey) return
 
     const errors = this.validate()
 
@@ -1551,6 +1545,34 @@ export class MeetingRenderer {
       return
     }
 
+    this.submissionPending = true
+    const submitButton = this.host.querySelector<HTMLButtonElement>('.ghm-form-actions .ghm-primary')
+    const backButton = this.host.querySelector<HTMLButtonElement>('.ghm-form-actions .ghm-secondary')
+
+    if (submitButton) {
+      submitButton.disabled = true
+      submitButton.textContent = copy.processing
+    }
+
+    if (backButton) backButton.disabled = true
+
+    let captchaToken: string
+
+    try {
+      if (!this.turnstileHandle) throw new Error('turnstile_unavailable')
+      captchaToken = await this.turnstileHandle.execute()
+    } catch {
+      this.submissionPending = false
+      this.turnstileHandle?.reset()
+      this.transition(
+        { type: 'validation_failed', fields: ['captchaToken'] },
+        { type: 'step_reached', step: 'validation_failed', context: { error_category: 'validation_failed' } },
+      )
+      queueMicrotask(() => this.host.querySelector<HTMLElement>('.ghm-error-summary')?.focus())
+
+      return
+    }
+
     const selectedContext = this.selectedContext()
 
     this.transition(
@@ -1577,7 +1599,7 @@ export class MeetingRenderer {
         processingAccepted: this.state.form.processingAccepted,
         communicationKeys: this.state.form.communicationKeys,
       },
-      captchaToken: this.state.captchaToken ?? '',
+      captchaToken,
       attribution: {
         placement: this.options.telemetryBase.placement,
         pagePath: typeof location !== 'undefined' ? location.pathname : '/',
@@ -1585,6 +1607,8 @@ export class MeetingRenderer {
     }
 
     const result = await this.options.api.book(payload, this.state.idempotencyKey)
+
+    this.submissionPending = false
 
     if (result.outcome === 'confirmed') {
       this.telemetry({ type: 'booking_confirmed', response: result, context: selectedContext })

@@ -8,10 +8,12 @@ import type { MeetingApiClient } from '../api-client'
 import type { MeetingTurnstilePort } from '../turnstile'
 
 const turnstile: MeetingTurnstilePort = {
-  mount({ onToken }) {
-    onToken('preview-captcha-token')
-
-    return { destroy() {} }
+  mount() {
+    return {
+      execute: async () => 'preview-captcha-token',
+      reset() {},
+      destroy() {},
+    }
   },
 }
 
