@@ -6,7 +6,8 @@
 - Mode: `standard`
 - Checkpoint: `human` (`P0`, esfuerzo `Alto`)
 - Branch: `develop` por instrucción del operador; no crear branch/worktree.
-- Estado: `pendiente de aprobación humana`; no se inicia runtime antes del checkpoint.
+- Estado: `aprobado por el operador el 2026-07-23`; implementación autorizada sin promover rutas ni declarar
+  commercial readiness.
 
 ## Discovery summary
 

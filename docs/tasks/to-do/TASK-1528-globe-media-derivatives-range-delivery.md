@@ -41,7 +41,7 @@ versionados, workers idempotentes y serving que reautorice cada solicitud.
 
 - Persistir intents/records de derivados con recipe/version, source generation y digest.
 - Producir derivados por workers acotados, reintentables e independientes.
-- Servir bytes autorizados con Range `206/416`, MIME/length correctos y backpressure.
+- Servir bytes autorizados desde GCS con Range nativo `206/416`, MIME/length correctos y backpressure.
 - Medir lag, fallos, throughput y cache hit sin exponer originales pending.
 
 ## Architecture Alignment
@@ -57,6 +57,10 @@ Reglas obligatorias:
 - Transform worker, serving gateway y governance worker conservan ownership separado.
 - Same-key `412` exige readback hash/metadata; jamás overwrite.
 - Cada request Range reautoriza workspace/asset/visibility; signed URLs durables no llegan al browser.
+- La identidad exacta del derivado incluye `workspace + source asset + source object generation + source sha256 +
+  media profile + recipe id/version + output mime`; cambiar cualquiera crea otro record/key.
+- El browser obtiene un media ticket corto, session-bound, audience-bound y no reutilizable entre workspace/asset;
+  el ticket no sustituye la reautorización server-side ni contiene un URL durable de GCS.
 
 ## Normative Docs
 
@@ -122,9 +126,9 @@ Reglas obligatorias:
 
 - Entidades/tablas/views afectadas: intents/records/attempts aditivos
 - Invariantes que no se pueden romper:
-  - source generation y recipe version fijan identidad;
+  - source generation, source digest, profile y recipe version fijan identidad exacta;
   - un derivado nunca reemplaza el original;
-  - `412` sólo acepta readback equivalente;
+  - `412` sólo acepta readback equivalente en generation, hash, size, MIME y metadata canónica;
   - pending/rejected no sirve bytes.
 - Tenant/space boundary: trusted context + asset authority
 - Idempotency/concurrency: content key + source generation + recipe version + lease
@@ -140,7 +144,7 @@ Reglas obligatorias:
 
 ### Security and access
 
-- Auth/access gate: session/service capability + visibility vigente
+- Auth/access gate: session/service capability + visibility y governance eligibility vigentes en cada request
 - Sensitive data posture: bytes privados, sin signed URL durable
 - Error contract: `range_invalid|not_ready|access_denied|temporarily_unavailable`
 - Abuse/rate-limit posture: bounds, concurrency, byte/time caps y backpressure
@@ -150,7 +154,8 @@ Reglas obligatorias:
 - Local checks: deterministic recipes, `412`, replay y parser Range
 - DB/runtime checks: migrations/readback y leases
 - Integration checks: Image thumbnail, Video poster/transcode y Audio waveform
-- Reliability signals/logs: derivative lag/failure/backlog y range throughput/errors
+- Reliability signals/logs: derivative lag/failure/backlog, bytes/latencia por perfil, Range `200/206/416`,
+  authorization denials, upstream read amplification, memoria/stream aborts y cache hit/miss
 - Production verification sequence: shadow metadata → allowlist → canaries → load/soak
 
 ### Acceptance criteria additions
@@ -173,15 +178,20 @@ Reglas obligatorias:
 
 ### Slice 1 — Derivative contract and schema
 
-- Intents, records, recipes, source generation y history.
+- Intents, records, recipes, source generation/digest, identidad exacta por perfil y history.
 
 ### Slice 2 — Transform workers
 
-- Thumbnail/poster/transcode/waveform con leases, caps y result verification.
+- Perfiles mínimos explícitos y versionados:
+  - imagen: thumbnail card y preview viewer con dimensiones, fit, calidad y MIME;
+  - video: poster y transcode preview con dimensiones, codec/container, bitrate/fps/audio policy;
+  - audio: waveform bins y preview stream con sample rate/channels/codec/container.
+- Workers con leases, caps y result verification; ningún perfil queda implícito en defaults de librería.
 
 ### Slice 3 — Range gateway
 
-- `200/206/416`, conditional headers, backpressure y authorization por request.
+- Media ticket efímero session-bound y `200/206/416` nativo contra GCS, conditional headers, cancelación,
+  backpressure y authorization/eligibility por request. No `arrayBuffer()` ni Blob completo en gateway/cards.
 
 ### Slice 4 — Canary and load
 
@@ -231,10 +241,13 @@ Revisión de codecs/images, límites Cloud Run y costo de storage/egress.
 ## Acceptance Criteria
 
 - [ ] Las tres modalidades producen derivados versionados verificables.
-- [ ] Range entrega `206` válido y `416` correcto, sin bufferizar archivos completos.
+- [ ] Cada perfil tiene identidad, dimensiones/codec/calidad y output MIME versionados; no depende de defaults.
+- [ ] Range entrega `206` válido y `416` correcto extremo-a-extremo desde GCS, sin descargar o bufferizar el
+      archivo completo en servidor ni en cards.
 - [ ] Pending/rejected/cross-workspace nunca sirve bytes.
-- [ ] Replay y `412` no sobrescriben ni duplican.
-- [ ] Load test demuestra memoria acotada y backpressure.
+- [ ] Media tickets expiran, están ligados a sesión/audience/workspace/asset y fallan ante revocación o drift.
+- [ ] Replay y `412` no sobrescriben ni duplican; readback compara generation/hash/size/MIME/metadata.
+- [ ] Load test demuestra memoria acotada, cancelación, backpressure y read amplification acotado.
 
 ## Verification
 

@@ -53,8 +53,13 @@
   el viewer real. `f9839ee` corrige además el fallback de modalidad: si el output retenido no repite `mediaType`,
   el viewer usa la modalidad client-safe del item; el SHA desplegado materializó exactamente `img`, `video` y
   `audio`, visibles con controles para Video/Audio, y las tres descargas mostraron confirmación autorizada.
-- Gap separado: la UI todavía no observa en vivo la transición del run y el título client-safe no está publicado;
-  `TASK-1525` posee la proyección durable y `TASK-1526` sus cards/títulos/render incremental.
+- Gap separado: la UI todavía no observa en vivo la transición del run y el título client-safe no está publicado
+  en el consumer. `TASK-1525` ya tiene implementación local verificada del reader durable
+  `globe.producer.feed.live.list|changes`: unión `active-run | terminal-run | retained-asset`, cursor opaco con
+  paginación `older` y cambios `newer`, store SQL batch sin writes/N+1 y flag
+  `GLOBE_PRODUCER_LIVE_FEED_ENABLED` fail-closed. Validado localmente con typecheck/tests de contracts/domain/database
+  y `studio-web`. Pendiente antes de declararlo operativo: commit aislado, CI, deploy interno, flag/canary y smoke
+  humano. `TASK-1526` consume esa proyección para cards/títulos/render incremental y comparación contra la UI aprobada.
 
 ### Asset Governance y alertas
 

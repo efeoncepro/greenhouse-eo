@@ -31,6 +31,27 @@ That state must never be presented as missing media or silently retried as a spe
 6. **The approved target is backed by first-class domain contracts.** Upload/reference ingest, per-output descriptors, feed/library, collections, batch actions, budgets/ledger, provenance/C2PA claims, review/comments/approval, read-only share boards and durable tenancy each require owning commands/readers, policies, persistence and audit. They do not live as browser-only state or click-handler endpoints.
 7. **Runtime stages remain explicit.** Internal human enablement is separate from commercial enablement. A commercial environment requires its own governed runtime contract, isolation/configuration, migration/secret/flag plan, rollback and live evidence; changing `GLOBE_ENVIRONMENT` is not a UI rollout side effect.
 
+## Delta — 2026-07-23, TASK-1525 Live Producer Feed
+
+The Producer feed is not a browser-local projection of retained library assets. A governed run is part of the
+durable foreground feed from creation until it either resolves to an exact retained output or to an explicit terminal
+failure/cancellation. The approved product target therefore requires a server-authoritative reader that unifies
+`active-run`, `terminal-run` and `retained-asset` items under stable `(workspaceId, runId, experimentId)` identity.
+
+The canonical live contract is:
+
+- `globe.producer.feed.live.list` for initial/recovery pagination using an older-page cursor;
+- `globe.producer.feed.live.changes` for foreground resumption using a newer-change watermark;
+- `displayTitle` derived from client-safe route/model metadata, never from prompt text and never from a missing
+  recipe as a permanent title;
+- retained output media remains served only through the governed output retrieval path; the feed reader does not
+  mint signed URLs, expose provider payloads or download bytes.
+
+Error semantics also stay separated. `authentication_required` belongs to reauthentication UX, not to missing media.
+`not_found`, `access_denied` and `dependency_unavailable` must not collapse into a generic broken preview. `TASK-1526`
+owns the visible cards/viewer consumer of this reader, including the approved UI/UX delta against the Claude Design
+source; `TASK-1525` owns only the durable projection and app/runtime wiring.
+
 ## Alternatives Considered
 
 - **Browser calls `globe-api-internal` directly.** Rejected: a browser cannot hold the workload identity and would collapse the current IAM/private-API boundary.

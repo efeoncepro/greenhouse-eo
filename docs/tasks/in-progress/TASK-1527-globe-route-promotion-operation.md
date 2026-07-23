@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Diseno`
+- Status real: `Code complete local; rollout, worker/recovery, identities/grants, deploy y rehearsal live pendientes`
 - Rank: `TBD`
 - Domain: `creative|ops|security`
 - Blocked by: `none`
@@ -101,10 +101,13 @@ Reglas obligatorias:
 
 ### Gap
 
-- No existe operation id, lock coordinador, phase history, recovery worker ni reader de estado.
-- `generated_rights_policies` es global, sin `workspace_id`; sus readers ignoran trusted context y el adapter de
-  readiness sólo compara una versión de env. Antes de promoción comercial debe convertirse en policy
-  workspace-scoped y resolverse server-side por tuple/digest exactos.
+- Código local en `../efeonce-globe` ya define operation id, phase history, CAS, leases/fencing, commands/readers,
+  store durable, migration aditiva y wiring API/BFF para publicar el aggregate. Sigue pendiente desplegarlo,
+  aplicar/verificar migrations en Cloud SQL, asignar grants separados, habilitar worker/recovery, señales y ensayos
+  live.
+- `generated_rights_policies` ya fue expandido localmente a workspace-scoped con readers por trusted context y
+  recovery plan; commercial rollout permanece bloqueado hasta verificar la migración/backfill en el ambiente exacto
+  y retirar cualquier compatibilidad no comercial.
 - Pause/retire y rights supersession/revocation no tienen una ruta operable completa para rollback semántico.
 - No hay señal para promoción parcial o estancada.
 
@@ -165,7 +168,7 @@ Reglas obligatorias:
 
 ### Runtime evidence
 
-- Local checks: state-machine, CAS, replay, actor separation y failure injection
+- Local checks: state-machine, CAS, replay, actor separation, API registry wiring y failure injection
 - DB/runtime checks: migrate/readback y operación parcial recuperada sin SQL manual
 - Integration checks: una ruta internal-only stage→rollback y otra stage→canary_passed
 - Reliability signals/logs: `promotion_operation_stalled|partial|rollback_failed`
@@ -173,11 +176,11 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
 ## Capability Definition of Done — Full API Parity gate
 
@@ -185,6 +188,10 @@ Reglas obligatorias:
 - [ ] SDK/CLI/API usan el mismo aggregate y no reconstruyen fases.
 - [ ] Worker recovery usa la misma primitive que el operador.
 - [ ] Replays, stale CAS, wrong actor y cross-workspace tienen negativos.
+
+Checkpoint local 2026-07-23: commands/readers, capabilities y coverage están implementados y publicados por
+`createStudioApp`; grants/identities/IaC y worker recovery siguen pendientes, por eso el DoD de parity no se marca
+complete.
 
 <!-- ZONE 2 — PLAN MODE -->
 
@@ -263,10 +270,15 @@ Asignar identities/grants separados y sign-off humano para canary facturable.
 
 ## Verification
 
-- `pnpm check`
-- `pnpm build`
-- migration/store/domain/API/SDK tests focales
-- rehearsal internal con dos identities
+- `../efeonce-globe`: `pnpm --filter @efeonce-globe/studio-web typecheck` ✅
+- `../efeonce-globe`: `pnpm --filter @efeonce-globe/studio-web test` ✅ 210/210
+- `../efeonce-globe`: `pnpm --filter @efeonce-globe/contracts test` ✅ 35/35
+- `../efeonce-globe`: `pnpm --filter @efeonce-globe/domain test` ✅ 298/298
+- `../efeonce-globe`: `pnpm --filter @efeonce-globe/database test` ✅ 96/96
+- `../efeonce-globe`: `pnpm check` ✅
+- `../efeonce-globe`: `pnpm build` ✅
+- Pendiente: migration/readback live, worker recovery con lease/fence, stage→rollback y stage→canary con identities
+  separadas.
 
 ## Plan
 
@@ -278,6 +290,11 @@ Asignar identities/grants separados y sign-off humano para canary facturable.
 - Branch: excepción autorizada `develop`; no se creó branch/worktree.
 - Subagentes: tres auditorías read-only de persistence, API/capabilities y recovery/observability; cero edits.
 - Checkpoint derivado: `human` (`P0` + esfuerzo `Alto`). No se escribe runtime antes de aprobación.
+- Checkpoint humano aprobado por el operador el `2026-07-23`; autoriza implementación del aggregate, migration,
+  capabilities, identities y recovery, pero no autoriza promover rutas sin evidencia independiente.
+- Implementación local posterior al checkpoint: `production-promotion-operation` quedó cableado en API/BFF, `main.ts`
+  instancia `DurableProductionPromotionOperationStore`, `dispatch.ts` mapea errores sanitizados y el port
+  `readRights` recibe la identidad exacta para evitar readback inventado o memoria de proceso.
 
 ## Closing Protocol
 

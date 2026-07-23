@@ -43,6 +43,8 @@ separado, con grace, holds, inventario y generación exacta.
 - Marcar candidatos con reason, generation, evidence refs, grace y holds.
 - Aplicar lotes allowlisted con generation preconditions y receipts append-only.
 - Detectar autoridad sin bytes, bytes sin autoridad y derivados superseded.
+- Bloquear el delete si cualquier referencia durable vigente alcanza el objeto, aunque provenga de otro
+  subdominio o de una operación en curso.
 
 ## Architecture Alignment
 
@@ -56,6 +58,9 @@ Reglas obligatorias:
 - DB conserva autoridad; GCS conserva bytes y generation, no ownership.
 - Apply usa generation precondition; mismatch vuelve a inventario.
 - No delete manual, wildcard ni cascada opaca.
+- Maker y checker son principals distintos: quien crea/aprueba el plan no puede habilitar ni ejecutar su apply.
+- El orden de apply es `derivados verificados → originales elegibles`; nunca se borra un original antes de
+  cerrar/cancelar todos sus derivados.
 
 ## Normative Docs
 
@@ -124,6 +129,9 @@ Reglas obligatorias:
   - hold o nueva referencia cancela elegibilidad;
   - apply con generation distinta no borra;
   - originales activos y derivados vigentes nunca son candidatos.
+- Referencias bloqueantes mínimas: asset authority, derivative intent/record/attempt, feed projection, share/export,
+  active viewer/media ticket, review/proposal/canary evidence, run/attempt/output, retention/legal hold, GC
+  rollback/restore receipt y cualquier job no terminal.
 - Tenant/space boundary: authority por workspace; inventory global sólo service principal
 - Idempotency/concurrency: scan/plan/apply ids, leases y generation preconditions
 - Audit/outbox/history: marks/cancelaciones/deletes append-only
@@ -138,7 +146,7 @@ Reglas obligatorias:
 
 ### Security and access
 
-- Auth/access gate: service principal dedicado + operator approval para apply
+- Auth/access gate: service principal dedicado + maker-checker con capabilities separadas para plan, approval y apply
 - Sensitive data posture: object refs/digests; no bytes ni secrets en logs
 - Error contract: códigos sanitizados por drift/hold/precondition
 - Abuse/rate-limit posture: batch caps, cooldown, kill switch y quota
@@ -171,7 +179,8 @@ Reglas obligatorias:
 
 ### Slice 1 — Inventory and classifier
 
-- Snapshot paginado DB/GCS y clasificación exacta.
+- Snapshot paginado DB/GCS, grafo completo de referencias y clasificación exacta. La cobertura del inventario
+  queda registrada por cursor/rango/bucket y no se infiere de un listado parcial.
 
 ### Slice 2 — Marks, grace and holds
 
@@ -179,7 +188,8 @@ Reglas obligatorias:
 
 ### Slice 3 — Apply and recovery
 
-- Delete con generation preconditions, receipts, retry y kill switch.
+- Apply maker-checker; delete primero de derivados y luego originales, ambos con generation preconditions,
+  receipts, retry, cooldown y kill switch. Conflictos de integridad escalan y nunca se reinterpretan como éxito.
 
 ### Slice 4 — Rehearsal and rollout
 
@@ -229,7 +239,10 @@ Legal/retention/hold policy, IAM de delete y restore rehearsal.
 ## Acceptance Criteria
 
 - [ ] Dry-run lista reason, authority, generation, grace y hold para cada candidato.
-- [ ] Apply no borra ante generation mismatch, nueva referencia o hold.
+- [ ] Dry-run prueba cobertura de todas las referencias bloqueantes y del inventario completo de su scope.
+- [ ] Apply no borra ante generation mismatch, metadata/hash drift, nueva referencia, ticket activo o hold.
+- [ ] Maker, checker y service principal de apply son distintos y sus capabilities no se solapan.
+- [ ] Derivados se eliminan y verifican antes que el original; un fallo detiene esa rama del plan.
 - [ ] Un retry no duplica receipts ni amplía allowlist.
 - [ ] Fixture delete/restore se ensaya antes de objetos reales.
 - [ ] Orphans y authority-without-bytes son observables.

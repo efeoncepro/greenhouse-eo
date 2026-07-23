@@ -21,16 +21,17 @@ reintentar o modificar estado.
    - **cola stale/no reclamable:** run terminal pero outbox `reconcile` sigue `pending`;
    - **incidente persistente:** nuevas ejecuciones fallan o trabajo reclamable no avanza.
 
-## Caso conocido del 2026-07-23
+## Estado verificado del 2026-07-23
 
 - La policy de failure dispara con un solo `globe_worker_failed`, threshold `>0` y duración cero.
-- Terraform no declara `severity`; por eso el correo muestra **No severity**. Eso es deuda de observabilidad, no
-  ausencia de impacto.
-- Cinco runs quedaron `completed`, pero cinco eventos `reconcile` continuaron `pending` con
-  `provider_still_pending`. El worker no los reclama y la edad de cola sigue creciendo. No regenerar outputs ni
-  reiniciar a ciegas.
-- La corrección robusta es terminalizar/superseder el reconcile al completar, medir edad sólo sobre trabajo
-  reclamable y ejecutar un backfill por command/reconciler versionado. **Nunca** `UPDATE` manual.
+- Las policies vivas declaran failure=`ERROR` y queue age=`WARNING`.
+- Se terminalizaron mediante reconciler gobernado seis residuos `reconcile` —los cinco originales más uno
+  observado durante el diagnóstico— y queue age quedó en `0` contando sólo trabajo reclamable. No se usó SQL.
+- El source pendiente de desplegar emite `globe_worker_failed` como JSON estructurado con
+  `severity=ERROR`, `classification`, `safeCode` allowlisted y referencias saneadas opcionales. Nunca serializa
+  raw error, URL, token ni secreto. Hasta ese deploy, el evento live anterior conserva payload plano.
+- No regenerar outputs ni reiniciar a ciegas. Ante una nueva cola stale, usar el command/reconciler versionado;
+  **nunca** `UPDATE` manual.
 
 ## Asset Governance / C2PA
 
@@ -55,8 +56,9 @@ Registrar policy/condition, ventana UTC, revisión/digest, execution/correlation
 claimed/applied/failed/retried, edad reclamable antes/después y acción de rollback/backfill. La alerta sólo se
 cierra cuando la causa dejó de producir señal; silenciarla o subir umbral no corrige una cola semanticamente stale.
 
-## Deuda IaC
+## Severidad y escalamiento
 
-Asignar severidades explícitas y consistentes: failure persistente `ERROR`/`CRITICAL`, queue age `WARNING`, Asset
-Governance failure o firmas stale `CRITICAL`. El payload de fallo debe incluir referencia saneada a ejecución y
-correlación, nunca raw error ni secreto.
+`globe_worker_failed` aislado es `ERROR`; queue age es `WARNING`. Escalar a `CRITICAL` sólo ante indisponibilidad
+sostenida, riesgo de gasto repetido, cruce de tenant, corrupción/pérdida de evidencia o incapacidad de rollback.
+Asset Governance failure o firmas stale persistentes son `CRITICAL`. El payload de fallo sólo puede incluir
+referencia saneada a ejecución/correlación, nunca raw error ni secreto.

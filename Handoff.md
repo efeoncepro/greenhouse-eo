@@ -29,9 +29,8 @@
   `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
 - **Globe Producer — feed/títulos aún no convergen en vivo:** es proyección cliente congelada, no provider activo.
   `TASK-1525` crea el reader durable y `TASK-1526` sus cards/títulos; sesión y viewer multimodal ya están cerrados.
-- **Globe — promoción/media:** auditoría live `0/7` ready. `TASK-1527` fue tomada en `develop` y está en
-  checkpoint humano; discovery detectó rights globales/no tenant-scoped y verificación readiness sólo por versión
-  de env. `TASK-1528…1529` poseen derivados+Range y GC. No fabricar/heredar evidencia.
+- **Globe — promoción/media:** auditoría live `0/7` ready. `TASK-1527` está en checkpoint humano; `TASK-1528…1529`
+  poseen derivados+Range y GC. No fabricar/heredar evidencia.
 
 ## Pendientes inmediatos
 
@@ -40,8 +39,9 @@
   arquitectura de derivados/streaming/visibilidad/GC; clientes externos siguen gateados por `TASK-1480`.
   Plan: `docs/tasks/plans/TASK-1521-plan.md`.
 
-- **`TASK-1525` / `TASK-1526` TO-DO (P0).** Reader live server-authoritative primero; cards keyed, títulos y
-  render incremental después. `TASK-1521` sólo consume evidencia.
+- **`TASK-1525` IN-PROGRESS / code local verificado; rollout pendiente.** Reader live listo en `../efeonce-globe`.
+  Falta commit aislado, CI, deploy, canary/smoke y consumer `TASK-1526` (cards/títulos/UI aprobada). `TASK-1521`
+  sólo consume evidencia.
 
 - **`TASK-1527` IN-PROGRESS (P0, checkpoint humano).** Plan:
   `docs/tasks/plans/TASK-1527-plan.md`. Aceptar primero el delta de rights workspace-scoped + saga durable;

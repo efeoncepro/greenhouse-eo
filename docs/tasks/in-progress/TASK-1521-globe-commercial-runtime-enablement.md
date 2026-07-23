@@ -49,6 +49,10 @@ operativo.
 
 - Image, Video y Audio generaron/recuperaron outputs desde la UI en tres rutas promovidas. Esto valida el camino
   interno, no un ambiente comercial.
+- `TASK-1527` quedó code-complete local para el aggregate de promoción: contract/domain/database, rights
+  workspace-scoped, store durable, wiring API/BFF, store en `main.ts` y error mapping sanitizado pasan `pnpm check`
+  + `pnpm build` en `../efeonce-globe`. Esto no promueve rutas ni habilita comercial readiness: faltan deploy,
+  migration/readback live, worker recovery, identities/grants separados, señales y rehearsals stage→rollback/canary.
 - Permanecen abiertas siete promociones exactas, UX de reautenticación por sesión expirada, cinco reconciles stale,
   severidad/diagnóstico de alertas y la implementación del delivery multimedia a escala.
 - ADR-008 ya decide el boundary: original privado inmutable, derivados versionados, Range real, feed
@@ -336,7 +340,7 @@ Decisión de hosting/front door, GCP/IAM/DNS, OAuth, provider credentials/accoun
 - [ ] Thumbnail/poster/transcode/waveform, Range real y feed visibility cumplen ADR-008 para las tres modalidades.
 - [ ] Orphan GC prueba inventory, dry-run, grace/holds, generation preconditions y apply auditado sin SQL manual.
 - [ ] Las diez rutas tienen review/proposal/binding/circuit/canary exacto; una ruta no hereda evidencia de otra.
-- [x] `globe_worker_failed` tiene severidad/condición accionable y payload/runbook verificados.
+- [ ] `globe_worker_failed` tiene severidad/condición accionable y payload/runbook verificados.
 - [ ] IAM/secrets/data/storage/providers están aislados y verificados sin exponer valores.
 - [ ] Canary, recovery/restore y rollback tienen evidencia live; `TASK-1480` consume el pack antes del readiness final.
 
@@ -353,6 +357,8 @@ Decisión de hosting/front door, GCP/IAM/DNS, OAuth, provider credentials/accoun
 - Worker `main=8d7ecb189185`; deploy `30015312280` verde. Primer tick: `supersededReconciles=6`,
   `queueOldestAgeSeconds=0`; siguiente tick: `0/0`. No hubo SQL manual.
 - Monitoring live: `Globe Producer worker: failure=ERROR`; `queue age=WARNING`.
+- Source Globe implementa payload JSON saneado y métrica por `jsonPayload.event + severity=ERROR`; tests locales
+  verdes. El criterio permanece abierto hasta desplegar IaC/worker y verificar un evento live.
 - Smoke humano en la pestaña Chrome autenticada del CEO: dos recuperaciones
   `sesión expirada → Entrar nuevamente → /producer`, feed de 10 piezas, viewer final con un `img`, un `video`
   visible con controles y un `audio` visible con controles; las tres descargas publicaron confirmación.
