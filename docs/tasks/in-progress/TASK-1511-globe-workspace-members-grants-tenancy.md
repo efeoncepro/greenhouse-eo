@@ -307,6 +307,29 @@ Local (`pnpm check` + tests negativos) → migración aplicada + readback en Pos
 - Smoke del trusted-context derivation reconciliado sin romper el path actual
 - `pnpm task:lint --task TASK-1511`, `pnpm ops:lint --changed`, `pnpm docs:closure-check`
 
+## Runtime evidence — 2026-07-22/23
+
+- ADR-006 quedó aceptada antes del schema. Migraciones Globe `0001…0023` están aplicadas y el aggregate
+  workspace/member/grant opera sobre Cloud SQL con audit append-only y aislamiento tenant-scoped.
+- Globe `main` publicó `1a0651d` y `0279e13`; CI, `pnpm check`, `pnpm build`, tests de tenancy y los 30 contratos
+  Terraform quedaron verdes. La API se desplegó por el workflow keyless a la revisión
+  `globe-api-internal-00038-*`, con API anónima `403` y 100% de tráfico.
+- Terraform creó `globe-tenancy-operator@efeonce-globe.iam.gserviceaccount.com`, limitado en aplicación a
+  `globe.tenancy.read/manage`, separado del broker (`reconcile`, sin `manage`) y sin capabilities de Lab, Producer
+  ni créditos. Plan/apply: `2 add / 1 change / 0 destroy`; segunda convergencia: `0 add / 1 change / 0 destroy`;
+  plan final sin drift.
+- El control plane quedó ligado por configuración al binding canónico Greenhouse dev `efeonce-internal`; el
+  caller genérico conserva el alias legado y no hereda esa autoridad. OAuth dev emitió el sujeto opaco y 15
+  capabilities desde `dev-greenhouse.efeoncepro.com`; no se usó Production para el bootstrap.
+- Smoke live: broker revision `1784776354849`, workspace `shadow`, member `active`, desired capabilities `15`,
+  grants activos `15`, expiración `2026-07-23T03:17:34.818Z`. La impersonación humana fue temporal y quedó
+  revocada en ambas service accounts (`0/0`). El Asset Governance Job `globe-asset-governance-hpfn6` terminó
+  exitosamente y vacío (`claimed=0`, `created=0`, `failed=0`).
+- Estado honesto: **code complete, rollout shadow verificado; enforcement pendiente**. No se promueve a
+  `enforced` porque falta un reconciliador continuo Greenhouse dev → Globe que renueve snapshots/revocaciones sin
+  intervención. El bootstrap corto ya expiró y no se usa como autoridad permanente. Production y clientes externos
+  siguen bloqueados.
+
 ## Closing Protocol
 
 - [ ] `Lifecycle` y carpeta sincronizados con el estado real.

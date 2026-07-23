@@ -19,18 +19,17 @@
 ## Riesgos abiertos
 
 - Trabajo local concurrente: coordinar ownership antes de tocar archivos ya modificados.
-- **Globe Producer internal-only:** `TASK-1519` quedó complete; `TASK-1505` está desplegada y el bridge humano,
-  migrations `0001…0023`, workers y library writes+bulk tienen evidencia viva. Provenance/Style DNA, generación
-  positiva, export, review/share positivo y tenancy enforced siguen cerrados por gates reales, no por código local.
+- **Globe Producer internal-only:** `TASK-1519` complete y `TASK-1505` desplegada. `TASK-1511` materializó
+  `efeonce-internal` en shadow con broker/operator separados y 15/15 grants acotados; enforced espera reconciliador
+  continuo desde Greenhouse dev. Style DNA/generación/export/review positivos esperan asset y readiness reales.
 - **Globe — el spend fence cross-réplica sigue sin ejercitarse (`TASK-1512`).** El dry-run vivo estimó 32 créditos,
   pero tenancy/readiness fallaron cerrado y no hubo autorización de gasto; no ejecutar el scheduler/worker pagado.
 
 ## Pendientes inmediatos
 
-- **Globe Producer — siguiente paso.** Resolver primero inputs gobernados: reconciliar broker→tenancy para salir
-  de shadow drift y publicar attestations reales de Model Readiness; luego habilitar rights authority/provenance
-  y producir el primer asset elegible. Sólo entonces ejecutar Style DNA, export, review/share y `TASK-1512` con
-  autorización explícita de gasto. Schedulers siguen pausados; acceso comercial permanece cerrado.
+- **Globe Producer — siguiente paso.** Productizar reconciliación continua Greenhouse dev → Globe; luego attestations
+  humanas de Model Readiness y un asset provenance/rights elegible. El governance job `hpfn6` terminó vacío. Sólo
+  entonces ejecutar Style DNA, export/review/share y `TASK-1512` con autorización de gasto. Schedulers pausados.
 
 - **`TASK-1503` COMPLETE y ACTIVA en el runtime interno (`EPIC-028`, cluster Creative Producer).** El
   output side del Producer (retrieval gobernado + favorite/copyAsReference) está **operativo** en
