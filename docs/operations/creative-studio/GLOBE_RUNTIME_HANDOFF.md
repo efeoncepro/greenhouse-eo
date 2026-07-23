@@ -53,18 +53,20 @@
   el viewer real. `f9839ee` corrige además el fallback de modalidad: si el output retenido no repite `mediaType`,
   el viewer usa la modalidad client-safe del item; el SHA desplegado materializó exactamente `img`, `video` y
   `audio`, visibles con controles para Video/Audio, y las tres descargas mostraron confirmación autorizada.
-- Gap separado: la UI todavía no observa en vivo la transición del run y el título client-safe no está publicado
-  en el consumer. `TASK-1525` ya tiene implementación local verificada del reader durable
+- Gap separado: la UI todavía no consume la proyección live ni converge cards/títulos desde servidor. `TASK-1525`
+  ya dejó desplegada internal-only la base server-authoritative del reader durable
   `globe.producer.feed.live.list|changes`: unión `active-run | terminal-run | retained-asset`, cursor opaco con
   paginación `older` y cambios `newer`, store SQL batch sin writes/N+1 y flag
-  `GLOBE_PRODUCER_LIVE_FEED_ENABLED` fail-closed. Validado localmente con typecheck/tests de contracts/domain/database
-  y `studio-web`. El commit `c361e0710ad4398a506c3f0b7a460ee3ab3ec4bf` fue empujado a Globe `main` y CI
-  `30025567295` pasó verde; Greenhouse `e41310fda` también pasó CI/gates. No desplegar todavía: el mismo commit
-  incluye promotion/recovery y el plan `Migrate Internal Database` `30026663546` reportó pendientes
-  `0026_workspace_generated_rights_policies.sql` y `0027_production_promotion_operations.sql` con
-  `generatedRightsPolicyWorkspace.ready=false` (`total=6`, `unambiguous=3`, `unresolved=3`). Resolver esa
-  precondición o separar/revertir promotion/recovery antes de aplicar migraciones y deploy interno. `TASK-1526`
-  consume la proyección para cards/títulos/render incremental y comparación contra la UI aprobada.
+  `GLOBE_PRODUCER_LIVE_FEED_ENABLED` fail-closed. Secuencia cerrada el 2026-07-23: recovery gobernado de policies
+  `30027548034` (`6/6` unambiguous, `0` unresolved), migración `0026/0027` `30027634439` (`pending=[]`),
+  flag Terraform `2d75909`, grant/parity fix `be372d38d7b100635c35e33c5a314119ef8df48c`, CI remoto
+  `30028588436` verde, deploy API `30028776603` → `globe-api-internal-00054-ddl`, deploy Studio
+  `30028776662` → `globe-studio-internal-00055-bgm`, ambos con imagen `be372d38d7b1`, tráfico 100% y
+  `GLOBE_PRODUCER_LIVE_FEED_ENABLED=true`. Verificación local: `pnpm check`, `pnpm build`, suite `studio-web`
+  211/211 incluyendo `TASK-1525 producer live feed over the studio-web transport`. Smoke live pendiente por
+  autoridad externa: direct API local no puede impersonar `greenhouse-globe-caller` (`iam.serviceAccounts.getAccessToken`
+  denegado) y la pestaña Chrome humana en `/producer` devolvió `/v1/session` `401`. `TASK-1526` consume la
+  proyección y debe cerrar reauth visible, cards/títulos/render incremental y comparación contra la UI aprobada.
 
 ### Asset Governance y alertas
 
@@ -619,9 +621,9 @@ raíz en vez de sólo detectarlo.
    cerrar terms/fixture/report/review/proposal/canary exactos. Priorizar Seed Audio sólo como internal-evaluation.
 2. Ejecutar `TASK-1528` y luego `TASK-1529`; verificar derivados, Range/load y GC. El original privado no
    sustituye esa arquitectura.
-3. Cerrar el bloqueo de deploy de `TASK-1525`: resolver `generatedRightsPolicyWorkspace.ready=false` para aplicar
-   `0026/0027`, o separar promotion/recovery del commit `c361e071`. Después deploy interno con flag fail-closed,
-   canary/smoke y `TASK-1526` para convergencia live, títulos client-safe y render incremental.
+3. Ejecutar `TASK-1526`: consumir `globe.producer.feed.live.list|changes`, reemplazar la barra singleton por cards
+   keyed y resolver reauth visible. El smoke humano live de `TASK-1525` está bloqueado hoy por `/v1/session` `401`
+   en la pestaña Chrome autenticada; no usar otro Chrome ni simular sesión.
 4. Mantener clientes externos/Production cerrados hasta `TASK-1480` y sus dependencias; no interpretar el éxito
    internal-only como promoción comercial.
 

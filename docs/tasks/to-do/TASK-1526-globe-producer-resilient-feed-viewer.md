@@ -17,10 +17,10 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Diseno`
+- Status real: `Ready to start; consume TASK-1525 runtime base`
 - Rank: `TBD`
 - Domain: `creative|ui|reliability`
-- Blocked by: `TASK-1525`
+- Blocked by: `none`
 - Branch: `task/TASK-1526-globe-producer-resilient-feed-viewer`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -80,7 +80,8 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-1525` — proyección live server-authoritative.
+- `TASK-1525` — proyección live server-authoritative ya desplegada internal-only; E2E humano pendiente por
+  `/v1/session` `401`, a cerrar en esta UI.
 - `TASK-1505` — surface, controller y GVC existentes.
 - `TASK-1519` — BFF/session recovery.
 - `TASK-1503` — retrieval/download gobernados.

@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-028`
-- Status real: `Pushed + CI verde; deploy bloqueado por precondición de migración`
+- Status real: `Runtime base desplegada internal-only; E2E humano bloqueado por sesión 401`
 - Rank: `TBD`
 - Domain: `creative|api|reliability`
 - Blocked by: `none`
@@ -296,18 +296,32 @@ Verificación local ejecutada:
 - `pnpm migrate:status` en `greenhouse-eo` ⚠️ no ejecutado por proxy local apagado
   (`ECONNREFUSED 127.0.0.1:15432`); no hay migración Greenhouse en esta task.
 
-Estado honesto: el reader está code-complete local y desbloquea `TASK-1526`, pero todavía faltan deploy interno,
-flag/canary, smoke humano y consumo UI resiliente. No declara completitud comercial ni promueve rutas. El código
-quedó pusheado en `c361e0710ad4398a506c3f0b7a460ee3ab3ec4bf` de `../efeonce-globe`, compartido con cambios de
-promotion/recovery porque el operador pidió no aislar y empujar desde el worktree actual. CI Globe
-`30025567295` pasó verde; Greenhouse develop `e41310fda` pasó gates `30025663684`, `30025661896`,
-`30025662005` y CI `30025661984`.
+Estado honesto inicial: el reader quedó code-complete local y pusheado en
+`c361e0710ad4398a506c3f0b7a460ee3ab3ec4bf`, compartido con promotion/recovery porque el operador pidió no aislar
+y empujar desde el worktree actual. CI Globe `30025567295` pasó verde; Greenhouse develop `e41310fda` pasó gates
+`30025663684`, `30025661896`, `30025662005` y CI `30025661984`. El primer plan de deploy quedó detenido
+gobernadamente: `30026663546` reportó pendientes `0026/0027` y `generatedRightsPolicyWorkspace.ready=false`
+(`total=6`, `unambiguous=3`, `unresolved=3`).
 
-Deploy interno detenido gobernadamente: migration plan `30026663546` para `c361e0710ad4398a506c3f0b7a460ee3ab3ec4bf`
-reportó pendientes `0026_workspace_generated_rights_policies.sql` y
-`0027_production_promotion_operations.sql`, con precondición `generatedRightsPolicyWorkspace.ready=false`
-(`total=6`, `unambiguous=3`, `unresolved=3`). No aplicar ni desplegar este commit hasta resolver esa precondición
-o separar/revertir el bloque promotion/recovery; el reader TASK-1525 por sí mismo no requiere migración.
+Rollout posterior aplicado el 2026-07-23:
+
+- recovery gobernado de workspaces para generated rights policies: `30027548034`, `6/6` unambiguous, `0`
+  unresolved;
+- migración interna: `30027634439`, `0026/0027` aplicadas, `pending=[]`;
+- flag Terraform versionado: `2d75909c7de1a5fd64fcbadab05978e1ff02b478`;
+- fix de grant/parity para que el internal caller pueda ejercer el reader live por HTTP/SDK/CLI/E2E:
+  `be372d38d7b100635c35e33c5a314119ef8df48c`;
+- CI remoto: `30028588436` verde (`pnpm check` + `pnpm build`);
+- deploy API: `30028776603` → `globe-api-internal-00054-ddl`, imagen `be372d38d7b1`, tráfico 100%,
+  `GLOBE_PRODUCER_LIVE_FEED_ENABLED=true`;
+- deploy Studio: `30028776662` → `globe-studio-internal-00055-bgm`, imagen `be372d38d7b1`, tráfico 100%,
+  `GLOBE_PRODUCER_LIVE_FEED_ENABLED=true`.
+
+Verificación adicional: `pnpm check`, `pnpm build` y `pnpm --filter @efeonce-globe/studio-web test` 211/211
+incluyendo `TASK-1525 producer live feed over the studio-web transport`. Smoke live no queda cerrado: direct API
+local está bloqueado por IAM (`iam.serviceAccounts.getAccessToken` denegado sobre `greenhouse-globe-caller`) y el
+Chrome humano abierto en `https://globe.efeoncepro.com/producer` devolvió `/v1/session` `401`; `TASK-1526` debe
+cerrar reauth visible y consumo UI sobre esta proyección. No declara completitud comercial ni promueve rutas.
 
 ### Rollback plan per slice
 
@@ -352,7 +366,7 @@ Autorización humana para tres canarios facturables; no requiere secretos nuevos
 ## Closing Protocol
 
 - [ ] Lifecycle, carpeta, registry y `docs/tasks/README.md` sincronizados.
-- [ ] `Handoff.md` y `GLOBE_RUNTIME_HANDOFF.md` reflejan rollout real.
+- [x] `Handoff.md` y `GLOBE_RUNTIME_HANDOFF.md` reflejan rollout real.
 - [ ] ADR-005/spec/index recibieron sólo el delta aprobado.
 - [ ] `pnpm qa:gates --changed`, `pnpm docs:closure-check` y chequeo cross-task ejecutados.
 
