@@ -111,7 +111,13 @@ async function main() {
   })
 
   const { upsertSisterPlatformOAuthClient } = await import('@/lib/sister-platforms/oauth-broker')
-  const { buildGlobeOAuthGrantContract } = await import('@/lib/sister-platforms/globe-oauth-grants')
+
+  const {
+    GLOBE_OAUTH_ACCESS_TOKEN_TTL_SECONDS,
+    GLOBE_OAUTH_CODE_TTL_SECONDS,
+    buildGlobeOAuthGrantContract
+  } = await import('@/lib/sister-platforms/globe-oauth-grants')
+
   const grantContract = buildGlobeOAuthGrantContract('producer')
 
   const oauthClient = await upsertSisterPlatformOAuthClient({
@@ -121,8 +127,8 @@ async function main() {
     clientStatus,
     redirectUris: [redirectUri],
     allowedScopes: grantContract.allowedScopes,
-    codeTtlSeconds: 300,
-    accessTokenTtlSeconds: 300,
+    codeTtlSeconds: GLOBE_OAUTH_CODE_TTL_SECONDS,
+    accessTokenTtlSeconds: GLOBE_OAUTH_ACCESS_TOKEN_TTL_SECONDS,
     requirePkce: true,
     issueIdentityInline: true,
     policy: grantContract.policy,

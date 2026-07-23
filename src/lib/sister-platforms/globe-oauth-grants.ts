@@ -1,9 +1,12 @@
 import 'server-only'
 
 import type { SisterPlatformOAuthPolicyV1 } from './oauth-policy'
-import { updateSisterPlatformOAuthGrantPolicy } from './oauth-broker'
+import { updateSisterPlatformOAuthGrantPolicy, updateSisterPlatformOAuthTokenTtls } from './oauth-broker'
 
 export const GLOBE_OIDC_SCOPES = ['openid', 'profile', 'email'] as const
+export const GLOBE_OAUTH_CODE_TTL_SECONDS = 5 * 60
+export const GLOBE_OAUTH_ACCESS_TOKEN_TTL_SECONDS = 8 * 60 * 60
+export const GLOBE_OAUTH_REVALIDATE_AFTER_SECONDS = 5 * 60
 
 export const GLOBE_SHELL_CAPABILITY_SCOPES = ['globe.studio.access'] as const
 
@@ -56,7 +59,7 @@ export const buildGlobeOAuthGrantContract = (mode: GlobeOAuthGrantMode) => {
     claims: { includeGreenhouseRoles: false },
     revocation: {
       mode: 'userinfo_revalidation',
-      revalidateAfterSeconds: 60,
+      revalidateAfterSeconds: GLOBE_OAUTH_REVALIDATE_AFTER_SECONDS,
       requireOnPrivilegedAction: true
     }
   }
@@ -72,3 +75,10 @@ export const updateGlobeOAuthGrantContract = async (mode: GlobeOAuthGrantMode) =
     ...contract
   })
 }
+
+export const updateGlobeOAuthSessionContract = async () =>
+  updateSisterPlatformOAuthTokenTtls({
+    clientId: 'globe',
+    codeTtlSeconds: GLOBE_OAUTH_CODE_TTL_SECONDS,
+    accessTokenTtlSeconds: GLOBE_OAUTH_ACCESS_TOKEN_TTL_SECONDS
+  })

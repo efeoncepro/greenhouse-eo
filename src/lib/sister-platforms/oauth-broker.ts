@@ -167,6 +167,12 @@ export type UpdateSisterPlatformOAuthGrantPolicyInput = {
   policy: SisterPlatformOAuthPolicyV1
 }
 
+export type UpdateSisterPlatformOAuthTokenTtlsInput = {
+  clientId: string
+  codeTtlSeconds?: number
+  accessTokenTtlSeconds?: number
+}
+
 export class SisterPlatformOAuthError extends Error {
   statusCode: number
   errorCode: string
@@ -181,6 +187,9 @@ export class SisterPlatformOAuthError extends Error {
 
 const CODE_PREFIX_LENGTH = 18
 const TOKEN_PREFIX_LENGTH = 18
+const AUTHORIZATION_CODE_TTL_MAX_SECONDS = 10 * 60
+
+export const OAUTH_ACCESS_TOKEN_TTL_MAX_SECONDS = 8 * 60 * 60
 const DEFAULT_ALLOWED_SCOPES = ['openid', 'profile', 'email']
 const CORRELATION_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/
 
@@ -402,8 +411,8 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
   const clientStatus = input.clientStatus ?? 'active'
   const redirectUris = normalizeRedirectUris(input.redirectUris)
   const allowedScopes = normalizeAllowedScopes(input.allowedScopes)
-  const codeTtlSeconds = normalizeTtl(input.codeTtlSeconds, 300, 60, 600)
-  const accessTokenTtlSeconds = normalizeTtl(input.accessTokenTtlSeconds, 300, 60, 900)
+  const codeTtlSeconds = normalizeTtl(input.codeTtlSeconds, 300, 60, AUTHORIZATION_CODE_TTL_MAX_SECONDS)
+  const accessTokenTtlSeconds = normalizeTtl(input.accessTokenTtlSeconds, 300, 60, OAUTH_ACCESS_TOKEN_TTL_MAX_SECONDS)
   const policy = parseSisterPlatformOAuthPolicy(input.policy)
 
   assertSisterPlatformOAuthPolicyScopes(policy, allowedScopes)
@@ -641,6 +650,113 @@ export const updateSisterPlatformOAuthRedirectUris = async (input: {
     changed:
       previousRedirectUris.length !== nextRedirectUris.length ||
       previousRedirectUris.some((uri, index) => uri !== nextRedirectUris[index])
+  }
+}
+
+/**
+ * Replace ONLY the token lifetimes of an existing OAuth client.
+ *
+ * This gives live sister-platform clients a non-destructive way to move from smoke-test TTLs to
+ * working-session TTLs. It deliberately leaves redirect URIs, grant scopes, policy, client status,
+ * metadata and consumer credentials untouched.
+ */
+export const updateSisterPlatformOAuthTokenTtls = async (input: UpdateSisterPlatformOAuthTokenTtlsInput) => {
+  const clientId = input.clientId.trim().toLowerCase()
+
+  if (!clientId) {
+    throw new SisterPlatformOAuthError('clientId is required.', { errorCode: 'invalid_client' })
+  }
+
+  const hasCodeTtl = input.codeTtlSeconds !== undefined && input.codeTtlSeconds !== null
+  const hasAccessTokenTtl = input.accessTokenTtlSeconds !== undefined && input.accessTokenTtlSeconds !== null
+
+  if (!hasCodeTtl && !hasAccessTokenTtl) {
+    throw new SisterPlatformOAuthError('At least one token TTL is required.', {
+      errorCode: 'invalid_ttl'
+    })
+  }
+
+  const requestedCodeTtlSeconds = hasCodeTtl
+    ? normalizeTtl(input.codeTtlSeconds, 300, 60, AUTHORIZATION_CODE_TTL_MAX_SECONDS)
+    : undefined
+
+  const requestedAccessTokenTtlSeconds = hasAccessTokenTtl
+    ? normalizeTtl(input.accessTokenTtlSeconds, 300, 60, OAUTH_ACCESS_TOKEN_TTL_MAX_SECONDS)
+    : undefined
+
+  let previousCodeTtlSeconds = 300
+  let previousAccessTokenTtlSeconds = 300
+  let codeTtlSeconds = 300
+  let accessTokenTtlSeconds = 300
+  let changed = false
+
+  await withTransaction(async pgClient => {
+    const existing = await pgClient.query<{
+      oauth_client_id: string
+      code_ttl_seconds: number
+      access_token_ttl_seconds: number
+    }>(
+      `
+        SELECT
+          sister_platform_oauth_client_id AS oauth_client_id,
+          code_ttl_seconds,
+          access_token_ttl_seconds
+        FROM greenhouse_core.sister_platform_oauth_clients
+        WHERE lower(client_id) = lower($1)
+        LIMIT 1
+        FOR UPDATE
+      `,
+      [clientId]
+    )
+
+    const row = existing.rows[0]
+
+    if (!row) {
+      throw new SisterPlatformOAuthError('OAuth client not found.', {
+        statusCode: 404,
+        errorCode: 'invalid_client'
+      })
+    }
+
+    previousCodeTtlSeconds = Number(row.code_ttl_seconds || 300)
+    previousAccessTokenTtlSeconds = Number(row.access_token_ttl_seconds || 300)
+    codeTtlSeconds = requestedCodeTtlSeconds ?? previousCodeTtlSeconds
+    accessTokenTtlSeconds = requestedAccessTokenTtlSeconds ?? previousAccessTokenTtlSeconds
+    changed =
+      previousCodeTtlSeconds !== codeTtlSeconds ||
+      previousAccessTokenTtlSeconds !== accessTokenTtlSeconds
+
+    if (!changed) return
+
+    await pgClient.query(
+      `
+        UPDATE greenhouse_core.sister_platform_oauth_clients
+        SET
+          code_ttl_seconds = $2,
+          access_token_ttl_seconds = $3,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE sister_platform_oauth_client_id = $1
+      `,
+      [row.oauth_client_id, codeTtlSeconds, accessTokenTtlSeconds]
+    )
+  })
+
+  const client = await loadSisterPlatformOAuthClient(clientId)
+
+  if (!client) {
+    throw new SisterPlatformOAuthError('Unable to reload OAuth client after token TTL update.', {
+      statusCode: 500,
+      errorCode: 'client_reload_failed'
+    })
+  }
+
+  return {
+    client,
+    previousCodeTtlSeconds,
+    previousAccessTokenTtlSeconds,
+    codeTtlSeconds,
+    accessTokenTtlSeconds,
+    changed
   }
 }
 

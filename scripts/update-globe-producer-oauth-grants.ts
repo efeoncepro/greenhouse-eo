@@ -21,9 +21,14 @@ async function main() {
 
   const { loadSisterPlatformOAuthClient } = await import('@/lib/sister-platforms/oauth-broker')
 
-  const { buildGlobeOAuthGrantContract, updateGlobeOAuthGrantContract } = await import(
-    '@/lib/sister-platforms/globe-oauth-grants'
-  )
+  const {
+    GLOBE_OAUTH_ACCESS_TOKEN_TTL_SECONDS,
+    GLOBE_OAUTH_CODE_TTL_SECONDS,
+    GLOBE_OAUTH_REVALIDATE_AFTER_SECONDS,
+    buildGlobeOAuthGrantContract,
+    updateGlobeOAuthGrantContract,
+    updateGlobeOAuthSessionContract
+  } = await import('@/lib/sister-platforms/globe-oauth-grants')
 
   const current = await loadSisterPlatformOAuthClient('globe')
 
@@ -39,6 +44,12 @@ async function main() {
         clientId: current.clientId,
         currentAllowedScopes: current.allowedScopes,
         targetAllowedScopes: target.allowedScopes,
+        currentCodeTtlSeconds: current.codeTtlSeconds,
+        targetCodeTtlSeconds: GLOBE_OAUTH_CODE_TTL_SECONDS,
+        currentAccessTokenTtlSeconds: current.accessTokenTtlSeconds,
+        targetAccessTokenTtlSeconds: GLOBE_OAUTH_ACCESS_TOKEN_TTL_SECONDS,
+        currentRevalidateAfterSeconds: current.policy.revocation.revalidateAfterSeconds,
+        targetRevalidateAfterSeconds: GLOBE_OAUTH_REVALIDATE_AFTER_SECONDS,
         redirectUrisPreserved: current.redirectUris,
         clientStatusPreserved: current.clientStatus,
         credentialRotated: false
@@ -48,18 +59,25 @@ async function main() {
     return
   }
 
-  const result = await updateGlobeOAuthGrantContract(mode)
+  const sessionResult = await updateGlobeOAuthSessionContract()
+  const grantResult = await updateGlobeOAuthGrantContract(mode)
 
   console.log(
     JSON.stringify({
       apply: true,
       mode,
-      clientId: result.client.clientId,
-      previousAllowedScopes: result.previousAllowedScopes,
-      allowedScopes: result.allowedScopes,
-      changed: result.changed,
-      redirectUrisPreserved: result.client.redirectUris,
-      clientStatusPreserved: result.client.clientStatus,
+      clientId: grantResult.client.clientId,
+      previousAllowedScopes: grantResult.previousAllowedScopes,
+      allowedScopes: grantResult.allowedScopes,
+      grantChanged: grantResult.changed,
+      previousCodeTtlSeconds: sessionResult.previousCodeTtlSeconds,
+      codeTtlSeconds: sessionResult.codeTtlSeconds,
+      previousAccessTokenTtlSeconds: sessionResult.previousAccessTokenTtlSeconds,
+      accessTokenTtlSeconds: sessionResult.accessTokenTtlSeconds,
+      sessionChanged: sessionResult.changed,
+      revalidateAfterSeconds: grantResult.policy.revocation.revalidateAfterSeconds,
+      redirectUrisPreserved: grantResult.client.redirectUris,
+      clientStatusPreserved: grantResult.client.clientStatus,
       credentialRotated: false
     })
   )

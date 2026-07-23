@@ -10,9 +10,15 @@ vi.mock('@/lib/db', () => ({
   withTransaction: async (fn: (client: { query: typeof mockPgQuery }) => Promise<unknown>) => fn({ query: mockPgQuery })
 }))
 
-const { GLOBE_PRODUCER_CAPABILITY_SCOPES, buildGlobeOAuthGrantContract, updateGlobeOAuthGrantContract } = await import(
-  './globe-oauth-grants'
-)
+const {
+  GLOBE_OAUTH_ACCESS_TOKEN_TTL_SECONDS,
+  GLOBE_OAUTH_CODE_TTL_SECONDS,
+  GLOBE_OAUTH_REVALIDATE_AFTER_SECONDS,
+  GLOBE_PRODUCER_CAPABILITY_SCOPES,
+  buildGlobeOAuthGrantContract,
+  updateGlobeOAuthGrantContract,
+  updateGlobeOAuthSessionContract
+} = await import('./globe-oauth-grants')
 
 const SHELL_CONTRACT = buildGlobeOAuthGrantContract('shell-only')
 const PRODUCER_CONTRACT = buildGlobeOAuthGrantContract('producer')
@@ -22,7 +28,7 @@ const REDIRECT_URIS = [
   'https://globe.efeoncepro.com/auth/callback'
 ]
 
-const clientRow = (contract = PRODUCER_CONTRACT) => ({
+const clientRow = (contract = PRODUCER_CONTRACT, overrides: Record<string, unknown> = {}) => ({
   oauth_client_id: 'spoauth-client-globe',
   consumer_id: 'spc-globe',
   sister_platform_key: 'globe',
@@ -39,7 +45,8 @@ const clientRow = (contract = PRODUCER_CONTRACT) => ({
   require_pkce: true,
   issue_identity_inline: true,
   policy_json: contract.policy,
-  metadata_json: { preserved: true }
+  metadata_json: { preserved: true },
+  ...overrides
 })
 
 const primeTransaction = (contract: typeof SHELL_CONTRACT) => {
@@ -50,6 +57,25 @@ const primeTransaction = (contract: typeof SHELL_CONTRACT) => {
         oauth_client_id: 'spoauth-client-globe',
         allowed_scopes: contract.allowedScopes,
         policy_json: contract.policy
+      }
+    ]
+  })
+}
+
+const primeTtlTransaction = ({
+  codeTtlSeconds = 300,
+  accessTokenTtlSeconds = 300
+}: {
+  codeTtlSeconds?: number
+  accessTokenTtlSeconds?: number
+} = {}) => {
+  mockPgQuery.mockReset()
+  mockPgQuery.mockResolvedValueOnce({
+    rows: [
+      {
+        oauth_client_id: 'spoauth-client-globe',
+        code_ttl_seconds: codeTtlSeconds,
+        access_token_ttl_seconds: accessTokenTtlSeconds
       }
     ]
   })
@@ -86,6 +112,7 @@ describe('Globe OAuth grant contract', () => {
       'globe.model-readiness.propose'
     ])
     expect(PRODUCER_CONTRACT.policy.requiredScopes).toEqual(['openid', ...GLOBE_PRODUCER_CAPABILITY_SCOPES])
+    expect(PRODUCER_CONTRACT.policy.revocation.revalidateAfterSeconds).toBe(GLOBE_OAUTH_REVALIDATE_AFTER_SECONDS)
 
     for (const forbidden of [
       'globe.producer.route.reveal_house',
@@ -138,6 +165,50 @@ describe('Globe OAuth grant contract', () => {
     }
 
     expect(result.client.redirectUris).toEqual(REDIRECT_URIS)
+  })
+
+  it('extends the Globe OAuth session contract without changing grants, redirects or credentials', async () => {
+    primeTtlTransaction()
+    mockQuery.mockResolvedValue([
+      clientRow(PRODUCER_CONTRACT, {
+        code_ttl_seconds: GLOBE_OAUTH_CODE_TTL_SECONDS,
+        access_token_ttl_seconds: GLOBE_OAUTH_ACCESS_TOKEN_TTL_SECONDS
+      })
+    ])
+
+    const result = await updateGlobeOAuthSessionContract()
+    const update = updateStatement()
+    const statement = String(update?.[0])
+
+    expect(result.previousCodeTtlSeconds).toBe(300)
+    expect(result.previousAccessTokenTtlSeconds).toBe(300)
+    expect(result.codeTtlSeconds).toBe(GLOBE_OAUTH_CODE_TTL_SECONDS)
+    expect(result.accessTokenTtlSeconds).toBe(GLOBE_OAUTH_ACCESS_TOKEN_TTL_SECONDS)
+    expect(result.changed).toBe(true)
+    expect(update?.[1]).toEqual([
+      'spoauth-client-globe',
+      GLOBE_OAUTH_CODE_TTL_SECONDS,
+      GLOBE_OAUTH_ACCESS_TOKEN_TTL_SECONDS
+    ])
+
+    expect(statement).toContain('code_ttl_seconds')
+    expect(statement).toContain('access_token_ttl_seconds')
+
+    for (const untouched of ['redirect_uris', 'allowed_scopes', 'policy_json', 'client_status', 'metadata_json', 'token_hash']) {
+      expect(statement).not.toContain(untouched)
+    }
+  })
+
+  it('keeps the Globe OAuth session contract idempotent once the working-session TTL is active', async () => {
+    primeTtlTransaction({
+      codeTtlSeconds: GLOBE_OAUTH_CODE_TTL_SECONDS,
+      accessTokenTtlSeconds: GLOBE_OAUTH_ACCESS_TOKEN_TTL_SECONDS
+    })
+
+    const result = await updateGlobeOAuthSessionContract()
+
+    expect(result.changed).toBe(false)
+    expect(updateStatement()).toBeUndefined()
   })
 
   it('is idempotent when the Producer contract is already active', async () => {
