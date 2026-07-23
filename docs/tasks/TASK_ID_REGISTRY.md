@@ -1602,7 +1602,8 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-1527` | `in-progress` | **Globe Route Promotion Operation and Recovery.** EPIC-028; backend-data/integration; backend-critical; P0/Alto. Plan en checkpoint humano: saga durable, rights workspace-scoped, evidence authorities server-side, recovery y rollback circuit-first; no fabrica evidencia. | `docs/tasks/in-progress/TASK-1527-globe-route-promotion-operation.md` |
 | `TASK-1528` | `to-do` | **Globe Media Derivatives and Range Delivery.** EPIC-028; backend-data/integration; backend-critical; P0/Muy alto. Build units ADR-008 para thumbnails/posters/transcodes/waveforms, workers separados y gateway autorizado con Range 206/416, backpressure y memoria acotada. | `docs/tasks/to-do/TASK-1528-globe-media-derivatives-range-delivery.md` |
 | `TASK-1529` | `to-do` | **Globe Media Lifecycle and Orphan Garbage Collection.** EPIC-028; backend-data/cron; backend-critical; P0/Alto; bloqueada por TASK-1528. Inventory→mark→grace/holds→dry-run/apply con generation preconditions, receipts y restore rehearsal; cero SQL/delete manual. | `docs/tasks/to-do/TASK-1529-globe-media-lifecycle-orphan-gc.md` |
+| `TASK-1530` | `to-do` | **Globe Model-Aware Prompt Enhancement and Responsive UX.** EPIC-028; backend-data/command con UI interaction híbrida justificada; backend-standard + ui-standard; P1/Alto/Medio. Extiende `globe.lab.prompt.*` con target route/catalog, perfiles versionados Image/Video/Audio, evals y feedback pending/ready/error accesible; conserva propose→accept/reject, idempotencia y prompt original. | `docs/tasks/to-do/TASK-1530-globe-model-aware-prompt-enhancement.md` |
 
 ## Siguiente ID disponible
 
-`TASK-1530`
+`TASK-1531`
