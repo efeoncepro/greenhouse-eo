@@ -1624,7 +1624,8 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-1549` | `to-do` | **Globe Storyboard Studio Client Rollout and API Parity Certification.** EPIC-028; backend-data/integration; backend-critical; P1/Muy alto/Alto. Flags, grants/invites, privacy/retention, canaries, recovery and staged rollout. | `docs/tasks/to-do/TASK-1549-globe-storyboard-client-rollout-api-parity.md` |
 | `TASK-1550` | `to-do` | **Globe Storyboard Realization Orchestrator and Multi-Shot Production Plan.** EPIC-028; backend-data/integration; backend-critical; P1/Muy alto/Alto. Compila revisiones aprobadas en ProductionPlans durables, DAG multi-shot, unidades humanas, recovery y coordinación gobernada con Producer. | `docs/tasks/to-do/TASK-1550-globe-storyboard-realization-orchestrator.md` |
 | `TASK-1551` | `to-do` | **Globe Identity Avatar Parity.** EPIC-028; backend-data/api + ui-lite; P1/Alto/Medio. Proyección OAuth aditiva, media self-only y BFF same-origin para mostrar el avatar canónico Greenhouse en Globe con fallback de iniciales; no comparte Graph/GCS/cookies/DB. | `docs/tasks/to-do/TASK-1551-globe-identity-avatar-parity.md` |
+| `TASK-1552` | `to-do` | **Globe Producer Composer Focused Creation.** EPIC-028; ui-ux/layout; ui-standard; P1/Alto/Medio. Recomposición prompt-first con progressive disclosure, modalidades específicas, CTA de TASK-1532 y GVC premium desktop/mobile; sin backend nuevo ni ocultar créditos. | `docs/tasks/to-do/TASK-1552-globe-producer-composer-focused-creation.md` |
 
 ## Siguiente ID disponible
 
-`TASK-1552`
+`TASK-1553`
