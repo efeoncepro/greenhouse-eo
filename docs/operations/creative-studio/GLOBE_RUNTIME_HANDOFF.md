@@ -26,6 +26,16 @@ Continúa el estado LATE de abajo. Nuevo desde entonces (todo en `efeonce-globe`
   `capability` no por ruta y el compiler ancla a `estimate.model` (`production-route-compiler.ts:154-171`);
   además **OpenAI no tiene lane de producción** (`governed-production-composition.ts:71`). Detalle + plan en
   `docs/tasks/in-progress/TASK-1535-*.md` §"Progress & Findings — 2026-07-24".
+  - **Formalizado ahora en ADR-013 (`TASK-1553` Slice 1, 2026-07-24):**
+    `EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md`. `estimate.model` = función de `routeId` (adapters
+    re-llavean `*_ROUTING` capacidad→ruta; fallback por-capacidad solo sin ruta; **hard-fail** si la ruta declarada
+    no tiene entry — nunca fallback silencioso al modelo equivocado). **SSOT por concern:** tabla del adapter =
+    identidad ejecutable + slug (el Lab canarea desde ahí antes de existir binding); binding = estado de promoción +
+    snapshot **derivado**; señal `producer.route.binding_model_mismatch` (steady=0) vigila el drift. Update = bump en
+    mismo `routeId`; add = `routeId` nuevo; lineage `providerId` inmutable por `routeId`. Slices 2-5 (código en
+    `efeonce-globe`) siguen pendientes: seedear los adapters con los valores actuales (0 regresión), agregar rutas
+    (NB Pro / GPT Image 2 / 1.5; NB2 gateado por allowlist), composite per-route, bindings + endpoint allowlist,
+    canary por modelo. OpenAI production sigue bloqueado por el verifier faltante.
 - **Canary facturable — evidencia REAL 2026-07-24:** worker redeployado en `main` (`a6dd117`, img `d3c5aebc…`);
   se flipeó `GLOBE_LAB_PROVIDER=vertex` (worker+api rev `00076-kgr`), el dispatch end-to-end del Lab quedó **bloqueado
   por el break-glass IAM** (`tokenCreator` sobre `greenhouse-globe-caller` lo rechazó el classifier — nunca se concedió,

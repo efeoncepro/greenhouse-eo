@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -318,7 +318,7 @@ resolución (ya es por-ruta).
 - [ ] Semántica update (bump de versión en la ruta) vs add (ruta nueva) explícita y documentada; el catálogo público sin slugs (drift guard verde).
 - [ ] Invariante de consistencia `binding.modelId == estimate.model == readiness.route.modelId` se mantiene con resolución por-ruta.
 - [ ] Evidencia runtime por modelo (canary por el Lab) listada; región `global` para Vertex image.
-- [ ] ADR de resolución por-ruta indexado en `DECISIONS_INDEX`.
+- [x] ADR de resolución por-ruta indexado en `DECISIONS_INDEX`. **DONE (Slice 1, 2026-07-24):** ADR-013 = `docs/architecture/creative-studio/EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md`, indexado en `DECISIONS_INDEX.md` + `creative-studio/README.md`.
 
 ## Verification
 
@@ -347,5 +347,13 @@ resolución (ya es por-ruta).
 
 - ¿La selección de modelo es **explícita** por el usuario (selector) o Globe **elige el mejor** por tipo de encargo con
   el modelo como secundario? Define la forma del selector en TASK-1552 y si el catálogo expone "recomendado por defecto".
+  **RESUELTA (ADR-013, Slice 1):** el catálogo expone `recommendedDefault?: routeId` (metadata aditiva, pública, nombra
+  ruta no slug); la selección explícita es el contrato primario; preserva Seedream como default vivo de imagen sin
+  decisión. La FORMA del selector queda a TASK-1552 — ambas UX funcionan sin cambio de backend.
 - ¿La resolución por-ruta del adapter lee el `providerModelId` del **binding** (fuente única) o de una tabla route→model
   **dentro del adapter**? El binding como fuente única evita duplicar el mapeo; decidir en el ADR (Slice 1).
+  **RESUELTA (ADR-013, Slice 1):** binario falso. SSOT por concern — la **tabla del adapter** (re-llaveada
+  capacidad→`routeId`) es fuente única de identidad ejecutable + slug (el Lab canarea desde ahí antes de existir
+  binding, sin forzar un append DB para explorar); el **binding** es fuente de estado de promoción y lleva un
+  **snapshot derivado** (nunca un `modelId` inventado), fail-closed por `exactReport`/`resolveExact` + señal
+  `producer.route.binding_model_mismatch` (steady=0). Sin duplicación, sin drift.

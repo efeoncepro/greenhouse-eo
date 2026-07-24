@@ -17,21 +17,19 @@
   `docs/architecture/GREENHOUSE_SOFTWARE_ARCHITECT_SKILL_GOVERNANCE_V1.md`.
 - Globe formalizó autoría humana en Business Model V1.1/ADRs; `TASK-1530…1534` siguen `to-do` y B2B2B continúa
   como hipótesis sin acceso.
-- **Globe promoción comercial por atestación (ADR-010, `TASK-1535`) — LIVE, un gate abierto.** Desplegado y
-  probado en vivo (api `00074-fwv`, web `00067-9n8` con toast fix): atestación por modelo (`requireHuman`,
-  inmutable por digest, global), lane automatizada (principal separado, fail-closed, deriva de la atestación),
-  canary de lane verificado, 2 atestaciones comerciales firmadas por el CEO. Slices 5 (golden briefs 6 rutas + 3
-  rúbricas + 2 contratos de fidelidad; Globe `f62c2e4`, domain 337/0) y 6 (doc funcional + manual + ADR status)
-  cerrados. **Único pendiente:** el **canary facturable** (acceptance) — implica **gasto real** / promoción a
-  cliente real; requiere autorización explícita, no autónomo. Task `in-progress` por ese gate. Detalle en
-  changelog 2026-07-24 + [ADR-010](docs/architecture/creative-studio/EFEONCE_GLOBE_COMMERCIAL_PROMOTION_ATTESTATION_DECISION_V1.md).
-  Regla dura: scopes del broker OAuth = rollout de 3 pasos (permite → pide → exige) o se cae el login.
-- **Globe flota multi-modelo (dirección CEO 2026-07-24) — `TASK-1553` (to-do) + EPIC-028 corregido.** Mejores modelos
-  coexistiendo, sin sustituir: **update** (bump de versión) ≠ **add** (modelo/tier nuevo, coexiste). Canary real: Nano
-  Banana Pro (`gemini-3-pro-image`) **genera imágenes reales** vía `global`; NB2 (`gemini-3.1-flash-image`) 404 (falta
-  allowlist, ask a Google). Gap: 2 modelos del mismo proveedor = **resolución por-ruta** en adapters → `TASK-1553`
-  (selector UI = `TASK-1552`). **Bloqueado:** el classifier bloquea ediciones de código en Globe → el operador las
-  habilita. Detalle: skill `greenhouse-globe` §"Flota de modelos" + `TASK-1553` + `TASK-1535` §"Canary path".
+- **Globe promoción comercial por atestación (ADR-010, `TASK-1535`) — LIVE, un gate abierto.** Atestación por modelo
+  y lane automatizada desplegadas y probadas en vivo (2 atestaciones firmadas por el CEO); Slices 5-6 cerrados.
+  **Único pendiente:** el **canary facturable** (acceptance) — gasto real / promoción a cliente real → requiere
+  autorización explícita, **no autónomo**. Task `in-progress` por ese gate. Detalle: changelog 2026-07-24 +
+  [ADR-010](docs/architecture/creative-studio/EFEONCE_GLOBE_COMMERCIAL_PROMOTION_ATTESTATION_DECISION_V1.md) +
+  `GLOBE_RUNTIME_HANDOFF.md`. Regla dura viva: scopes del broker OAuth = rollout de 3 pasos (permite → pide → exige)
+  o se cae el login.
+- **Globe flota multi-modelo — `TASK-1553` (in-progress).** **Slice 1 DONE (2026-07-24): ADR-013**
+  (`EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md`, indexado) — resolución por-ruta (`estimate.model` =
+  f(`routeId`)), update (mismo `routeId`) ≠ add (`routeId` nuevo), catálogo sin slug + `recommendedDefault`
+  (Seedream sigue default; selector = TASK-1552). **Slices 2-5 = código en `efeonce-globe`** (adapters/catálogo/
+  composite/bindings/canary) **pendientes**; NB2 espera allowlist Google, OpenAI production espera verifier.
+  **Bloqueado:** el classifier bloquea ediciones de código en Globe → el operador las habilita. Detalle: ADR-013.
 
 ## Riesgos abiertos
 
@@ -110,33 +108,22 @@
   UTK/UTM e inbox invitado. No cancelar la reunión salvo instrucción. Canon:
   `docs/tasks/complete/TASK-1366-hubspot-scheduler-booking-equivalence.md` + `PDR-009`.
 
-- **`TASK-1506` COMPLETE (ADR-004 — Globe Frontend Hosting and Front Door Decision, `EPIC-028`).**
-  Mantiene **Cloud Run** como web/BFF/SSO del shell interno (Node nativo; Next.js `superseded` ahí) y rechaza migrar
-  a Vercel. El **frontend cliente comercial** (`TASK-1505`+) es superficie separada con host + framework **diferidos**
-  — no leer "Cloud Run para el shell interno" como "Cloud Run para el cliente". Tres gates distintos: URL
-  internal-only / HA (cleared) / Production (`TASK-1480`). Spec:
-  `docs/architecture/creative-studio/EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md`.
-- **`TASK-1465` COMPLETE (Globe Workspace/Tenancy/Persistence/Audit, `EPIC-028`) — desplegada + verificada en vivo.**
-  Globe pasó de **cero DB / todo in-memory** a durable: Cloud SQL `globe-pg` keyless IAM + `packages/database` + los
-  **5 stores** detrás de sus ports (incluido el spend fence atómico) + audit append-only. Durabilidad probada en el
-  servicio vivo. Detalle: `EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md` + `GLOBE_RUNTIME_HANDOFF.md`.
-  El modelo workspace/members/grants fue entregado después por `TASK-1511`. **Corrección de historia:** el `maxScale=3` que esta task
-  reportó era el ceiling de revisión; el efectivo era 1 hasta que `TASK-1508` lo corrigió a 3/3 (detalle en su spec).
-- **`TASK-1507` COMPLETE (Globe Internal Front Door, `EPIC-028`) — aplicada y verificada en vivo 2026-07-21.**
-  **La base URL estable del shell interno es `https://globe.efeoncepro.com`** (Global External ALB + serverless NEG →
-  `globe-studio-internal`, cert `ACTIVE`, 301 HTTP→HTTPS). El ingress del web quedó en
-  `internal-and-cloud-load-balancing`, así que **el `*.run.app` ya no es alcanzable por browser** (404) y sólo
-  persiste en el allowlist OAuth como camino de rollback. `globe-api-internal` sigue IAM-private, sin custom domain
-  y con audience `run.app`. Arquitectura: `docs/architecture/creative-studio/EFEONCE_GLOBE_INTERNAL_FRONT_DOOR_V1.md`
-  (SPEC-009). Operación y rollback: `docs/manual-de-uso/creative-studio/operar-front-door-globe.md`. Runtime:
-  `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
-- **`TASK-1508` COMPLETE (Globe Cloud Run IaC + Deploy Ownership, `EPIC-028`) — aplicada y probada en vivo 2026-07-21.**
-  Los dos servicios Cloud Run entraron a Terraform (import brownfield, cero destroy/replace) y `deploy-internal.yml`
-  quedó reducido a desplegar **sólo la imagen**; anti-drift probado en dos ciclos con `tofu plan` en `No changes`.
-  Corrigió un **cap efectivo de 1 instancia** que ningún doc registraba: Cloud Run aplica el menor entre el ceiling de
-  servicio y el de revisión, y `--max-instances` escribe uno u otro según el subcomando. Hoy 3/3 y ambos bajo IaC
-  (provider `~> 7.0`). **Riesgo abierto:** el spend fence cross-réplica sigue **sin ejercitarse** (`TASK-1512`).
-  Carril IaC: `docs/operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`.
+- **`TASK-1506` COMPLETE (ADR-004 — Globe Frontend Hosting/Front Door).** Cloud Run es el shell interno web/BFF/SSO
+  (Node nativo; Next.js `superseded` ahí), rechaza Vercel. El **frontend cliente comercial** (`TASK-1505`+) es
+  superficie separada con host+framework **diferidos** — **no leer "Cloud Run interno" como "Cloud Run para el
+  cliente"**. Spec: `EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md`.
+- **`TASK-1465` COMPLETE (Globe Workspace/Tenancy/Persistence/Audit) — live.** Globe pasó de **todo in-memory** a
+  durable: Cloud SQL `globe-pg` keyless IAM + `packages/database` + los **5 stores** tras sus ports (spend fence
+  atómico) + audit append-only. Workspace/members/grants los entregó `TASK-1511`. Detalle:
+  `EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md` + `GLOBE_RUNTIME_HANDOFF.md`.
+- **`TASK-1507` COMPLETE (Globe Internal Front Door, SPEC-009) — live 2026-07-21.** Base URL estable del shell
+  interno = `https://globe.efeoncepro.com` (ALB + serverless NEG); **el `*.run.app` ya no es alcanzable por browser**
+  (404, sólo rollback en allowlist OAuth); `globe-api-internal` sigue IAM-private. Detalle:
+  `INTERNAL_FRONT_DOOR_V1.md` y `GLOBE_RUNTIME_HANDOFF.md`.
+- **`TASK-1508` COMPLETE (Globe Cloud Run IaC + Deploy Ownership) — live 2026-07-21.** Ambos servicios bajo Terraform
+  (import brownfield, cero destroy/replace); `deploy-internal.yml` despliega sólo la imagen; anti-drift `tofu plan`
+  `No changes`. Corrigió un cap efectivo de 1 instancia (hoy 3/3). **Riesgo abierto:** spend fence cross-réplica sin
+  ejercitarse (`TASK-1512`). Carril IaC: `EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`.
 - **`TASK-1500`/`1501`/`1502` COMPLETE (cluster Producer: route catalog · run contract discriminado · estimate
   previewable, `EPIC-028`) — en `../efeonce-globe` `main`, local-first sin push.** Detalle en sus specs `complete/`
   + SPEC-004/005/006 de `creative-studio/DECISIONS_INDEX`. Naming: **modelo real público** (`model`=nombre+versión,
