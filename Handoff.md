@@ -24,12 +24,12 @@
   [ADR-010](docs/architecture/creative-studio/EFEONCE_GLOBE_COMMERCIAL_PROMOTION_ATTESTATION_DECISION_V1.md) +
   `GLOBE_RUNTIME_HANDOFF.md`. Regla dura viva: scopes del broker OAuth = rollout de 3 pasos (permite → pide → exige)
   o se cae el login.
-- **Globe flota multi-modelo — `TASK-1553` (in-progress).** **Slices 1-3 DONE (2026-07-24):** ADR-013 + resolución
-  por-ruta en los 3 adapters (seedeados = 0 regresión; fallback por-capacidad solo sin entry) + catálogo v1.3.0 con 3
-  rutas image nuevas (Nano Banana Pro, GPT Image 2, GPT Image 1.5) + `recommendedDefault` (Seedream sigue default) +
-  composite por-ruta. Code-complete en `efeonce-globe` `main`; `pnpm check` + `pnpm build` verdes, 236/236 + test 2.º
-  consumidor. **Rollout-pending (Slices 4-5):** bindings + endpoint allowlist + promoción, canary facturable,
-  allowlist Google (NB2), verifier OpenAI, atestación CEO por modelo. Detalle: ADR-013.
+- **Globe flota multi-modelo — `TASK-1553` (in-progress).** ADR-013 + resolución por-ruta + catálogo v1.3.0 (NB Pro,
+  GPT Image 2/1.5) + composite por-ruta. **Desplegado + live-verificado** (Codex 2026-07-24): catálogo live `1.3.0`
+  incluye `ref/still/nanobanana-pro-v1`, env en `composite` (0 regresión), ruta price-eada (migr. `0031`), atestación
+  CEO NB Pro ✅. **Único blocker del canary: cap de presupuesto gobernado del Lab** (`withinDayCap=false`) → sin
+  promoción. Falta: aprobar budget → canary 10cr → promover. NB2 espera Google, GPT Image el verifier OpenAI. Detalle:
+  `GLOBE_RUNTIME_HANDOFF.md`.
 
 ## Riesgos abiertos
 
