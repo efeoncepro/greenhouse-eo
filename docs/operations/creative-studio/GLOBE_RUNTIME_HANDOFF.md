@@ -43,11 +43,39 @@ crear secret **Globe-owned `globe-openai-api-key`** (contenedor+accessor en Terr
 valor de Greenhouse). Vertex → **keyless** (ADC/WIF, runtime SA `aiplatform.user`); **NO** crear API key (rompe el invariante).
 El único key Vertex-adjacent es `globe-gemini-api-key` (edit stateful), ya existente.
 
-**Rollout pendiente (NO está vivo):** (1) migración `0030` en `globe-pg`; (2) secret `GLOBE_MODEL_RIGHTS_ATTESTATION_SECRET`;
-(3) grant broker-side `globe.model-rights.attest` al reviewer; (4) **Slice 4 apply** (lane principal + route-binding vía
-routing/rights authorities); (5) OpenAI adapter + `globe-openai-api-key`; (6) golden briefs de rutas pendientes + nuevos modelos;
-(7) deploy (workflow_dispatch) + **el CEO firma las ~O(proveedores) attestations** (Vertex/OpenAI/Fal) — único paso humano
-irreducible; (8) canary facturable por clase de ruta. Ninguna ruta comercial nueva está promovida.
+**Slice 4 apply (el lane que promueve) MERGEADO en `main` (`3e7ca75`, build + 13 tests, revisado línea por línea):**
+command `globe.production-promotion.auto-lane.promote` — handler fail-closed de 7 pasos: parse → resolver workspace kind
+**server-side** (tenancy projection, nunca caller-declared; unknown→deny) → verificar firma de la attestation → re-leer y
+re-chequear el eval report objetivo contra la ruta exacta → techo/elegibilidad → publicar rights policy derivada
+(workspace-scoped, fingerprint idempotente time-independent) + **habilitar** el route binding existente (nunca fabrica
+endpoint/region; already-enabled=no-op) → resultado curado (sin slug/costo/margen). Workload class **disjunto**
+`globe:service:promotion-auto-lane` (anti-overlap) con `[auto-lane, model-rights.read, asset-rights-policy.manage,
+production-routing.manage]` — nunca la saga humana, nunca el break-glass genérico. Arregló un gap latente: los errores de
+model-commercial-rights + lane no estaban mapeados en `dispatch.ts`. **Gap honesto (fail-closed, seguro):** la tenancy
+projection NO persiste `kind` todavía → el resolver da undefined → el lane DENIEGA hasta una migración que lo agregue.
+
+**Secrets provisionados (Terraform + seeded, targeted-apply, live):** `globe-openai-api-key` (Globe-owned, valor del de
+Greenhouse) + `globe-model-rights-attestation-secret` (HMAC random). Ambos con accessor a `api_runtime`.
+
+**Estado: TODO EL CÓDIGO de ADR-010 está completo, verificado y pusheado (ambos repos). NADA comercial está promovido/vivo.**
+El lane es correcto y está gateado; para que promueva de verdad falta el rollout operativo + el paso humano. Runbook exacto
+del rollout restante (deliberado, no rusheado):
+
+1. **Tenancy `kind` migration** (follow-up): persistir `kind` en `tenancy_workspaces.projection` (hoy vive sólo en el
+   `BrokerWorkspaceBinding` de sesión). Sin esto el lane siempre deniega. Es la única pieza de código que falta para que el
+   lane funcione.
+2. **cloud_run_services.tf**: agregar `GLOBE_MODEL_RIGHTS_ATTESTATION_SECRET` (+ `GLOBE_OPENAI_API_KEY` cuando exista el
+   adapter) al env map de secrets del api; agregar `GLOBE_CONTROL_PLANE_BREAK_GLASS="false"` al env plano del api para
+   **reconciliar el drift gcloud pre-existente** (hoy `tofu plan` quiere removerlo — no-op de comportamiento). `tofu plan` →
+   leer → `tofu apply`.
+3. **Deploy** (`gh workflow run deploy-internal.yml` / workflow_dispatch): sube el nuevo image + **corre la migración `0030`**
+   (verificar el mecanismo de migración: startup vs step). Ship gateado/inerte sin grants.
+4. **Grants**: `GLOBE_PROMOTION_AUTO_LANE_CALLER_SERVICE_ACCOUNTS` = SA del auto-lane; broker grant `globe.model-rights.attest`
+   al reviewer humano (entitlement Greenhouse). Pre-bindear (disabled) la ruta objetivo en el workspace destino.
+5. **HUMANO irreducible**: **el CEO firma la attestation por proveedor** (Vertex/OpenAI/Fal comercial) con la evidencia ya
+   ensamblada — `requireHuman` rechaza un service principal por diseño; es el control que se vende, no lo puedo firmar yo.
+6. **Canary facturable** por clase de ruta a través del lane; verificar postura aplicada = atestiguada + negativo
+   internal-eval→client.
 
 
 
