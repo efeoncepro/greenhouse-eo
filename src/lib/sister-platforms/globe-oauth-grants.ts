@@ -40,7 +40,13 @@ export const GLOBE_PRODUCER_CAPABILITY_SCOPES = [
   // version. Promotion remains outside the Producer grant and is completed by
   // Globe's independent control-plane checker.
   'globe.model-readiness.review',
-  'globe.model-readiness.propose'
+  'globe.model-readiness.propose',
+  // ADR-010 (TASK-1535): sign a model's commercial-rights attestation (a legal
+  // license fact, requireHuman + evidence-anchored + immutable + audited server-side)
+  // and read attestations. This is the human authority that lets the automated lane
+  // promote without per-route signing; promotion/activation stay outside this grant.
+  'globe.model-rights.attest',
+  'globe.model-rights.read'
 ] as const
 
 export type GlobeOAuthGrantMode = 'shell-only' | 'producer'

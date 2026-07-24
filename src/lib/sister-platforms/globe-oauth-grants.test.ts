@@ -109,7 +109,9 @@ describe('Globe OAuth grant contract', () => {
       'globe.credits.read',
       'globe.credits.estimate',
       'globe.model-readiness.review',
-      'globe.model-readiness.propose'
+      'globe.model-readiness.propose',
+      'globe.model-rights.attest',
+      'globe.model-rights.read'
     ])
     expect(PRODUCER_CONTRACT.policy.requiredScopes).toEqual(['openid', ...GLOBE_PRODUCER_CAPABILITY_SCOPES])
     expect(PRODUCER_CONTRACT.policy.revocation.revalidateAfterSeconds).toBe(GLOBE_OAUTH_REVALIDATE_AFTER_SECONDS)
