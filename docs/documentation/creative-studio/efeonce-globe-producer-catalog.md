@@ -1,9 +1,9 @@
 # Efeonce Globe — Catálogo gobernado de rutas del Creative Producer
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-07-20 por Claude (TASK-1500)
-> **Ultima actualizacion:** 2026-07-20 por Claude (TASK-1500 — modelo público, casa interna)
+> **Ultima actualizacion:** 2026-07-24 por Claude (TASK-1553 — catálogo multi-modelo + resolución por-ruta)
 > **Documentacion tecnica:** [EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md](../../architecture/creative-studio/EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md)
 
 ## Qué es y para qué sirve
@@ -31,3 +31,13 @@ Sin catálogo, la superficie del Producer tendría que adivinar qué opciones of
 - **Las superficies UI y MCP nacen apagadas** (`policy-blocked`) hasta el gate de la superficie del Producer (`TASK-1505`); las superficies internas (HTTP/SDK/CLI/worker/E2E) están disponibles.
 
 > Detalle técnico: tipos en `efeonce-globe/packages/contracts/src/producer-catalog.ts`; dato + guards + helpers + lectores en `efeonce-globe/packages/domain/src/producer-catalog.ts`; métodos SDK `listProducerRoutes` / `getProducerRoute`.
+
+## Varios modelos por capacidad (multi-modelo, TASK-1553)
+
+La dirección del negocio es **usar los mejores modelos del mercado e ir agregándolos, sin que uno reemplace a otro**. El catálogo lo permite tratando **cada modelo/tier como una ruta**: hoy conviven, como imagen, Seedream, Nano Banana Pro, GPT Image 2 y GPT Image 1.5 (y Nano Banana 2 queda declarada, a la espera de que Google habilite el acceso). Dos ideas simples lo sostienen:
+
+- **El modelo se elige por la ruta, no por la capacidad.** Antes, "generar imagen" resolvía a un único modelo fijo; ahora cada ruta resuelve a su propio modelo, así dos modelos del mismo proveedor (GPT Image 2 **y** 1.5; Nano Banana Pro **y** 2) pueden coexistir y elegirse. El nombre del modelo sigue siendo público (señal de calidad); el identificador de proveedor (el *slug*) nunca entra al catálogo.
+- **Actualizar ≠ agregar.** *Actualizar* un modelo es subir su versión **dentro de la misma ruta** (reemplaza). *Agregar* un modelo/tier es una **ruta nueva** que coexiste con las demás. Nunca se cambia el proveedor/linaje de una ruta existente para "reusarla" como otro modelo — eso sería sustituir un modelo por otro a escondidas, y está prohibido.
+- **Recomendado por defecto.** El catálogo puede declarar, por capacidad, una **ruta recomendada por defecto** (hoy, imagen → Seedream), para que quien no elija explícitamente conserve el comportamiento actual. La selección explícita sigue siendo el contrato principal; la forma del selector visible es trabajo de `TASK-1552`.
+
+> Detalle técnico: decisión y contrato en [ADR-013 — Route-Based Model Resolution](../../architecture/creative-studio/EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md). Resolución por-ruta en los adapters (`efeonce-globe/apps/creative-runner/src/{openai,vertex,fal}-adapter.ts`), política del composite por-ruta (`composite-adapter.ts`), rutas + `recommendedDefault` en `packages/domain/src/producer-catalog.ts`. Una ruta nueva es **inerte hasta promoverse** (readiness `promoted` + binding `enabled`).

@@ -31,11 +31,18 @@ Continúa el estado LATE de abajo. Nuevo desde entonces (todo en `efeonce-globe`
     re-llavean `*_ROUTING` capacidad→ruta; fallback por-capacidad solo sin ruta; **hard-fail** si la ruta declarada
     no tiene entry — nunca fallback silencioso al modelo equivocado). **SSOT por concern:** tabla del adapter =
     identidad ejecutable + slug (el Lab canarea desde ahí antes de existir binding); binding = estado de promoción +
-    snapshot **derivado**; señal `producer.route.binding_model_mismatch` (steady=0) vigila el drift. Update = bump en
-    mismo `routeId`; add = `routeId` nuevo; lineage `providerId` inmutable por `routeId`. Slices 2-5 (código en
-    `efeonce-globe`) siguen pendientes: seedear los adapters con los valores actuales (0 regresión), agregar rutas
-    (NB Pro / GPT Image 2 / 1.5; NB2 gateado por allowlist), composite per-route, bindings + endpoint allowlist,
-    canary por modelo. OpenAI production sigue bloqueado por el verifier faltante.
+    snapshot **derivado**; señal `producer.route.binding_model_mismatch` (steady=0, pendiente de cablear). Update =
+    bump en mismo `routeId`; add = `routeId` nuevo; lineage `providerId` inmutable por `routeId`.
+  - **Slices 2-3 CODE-COMPLETE en `efeonce-globe` `main` (2026-07-24):** resolución por-ruta en los 3 adapters
+    (`{openai,vertex,fal}-adapter.ts` — tabla `*_ROUTING_BY_ROUTE` primaria, fallback por-capacidad solo sin entry,
+    hard-fail si ninguna; seedeados con los valores actuales = 0 regresión), catálogo `v1.3.0` con 3 rutas image nuevas
+    (`ref/still/nanobanana-pro-v1`, `ref/still/openai-v2`, `ref/still/openai-v1-5`; NB2 declarada, gateada por Google) +
+    `PRODUCER_RECOMMENDED_DEFAULTS` (image → Seedream), composite image por-ruta (`selectImageProvider`). Gates:
+    `pnpm check` + `pnpm build` verdes, 236/236 creative-runner + `route-based-model-resolution.test.ts` (2.º consumidor:
+    `openai-v2`→`gpt-image-2` ≠ `openai-v1-5`→`gpt-image-1.5`). **Rollout-pending (Slices 4-5):** bindings + endpoint
+    allowlist + promoción por modelo, canary facturable (gasto real, out-of-band), señal wire-up, allowlist Google (NB2),
+    verifier OpenAI para su lane de producción, atestación CEO por modelo. Doc funcional + manual (receta "agregar un
+    modelo") actualizados en `docs/{documentation,manual-de-uso}/creative-studio/efeonce-globe-producer-catalog.md`.
 - **Canary facturable — evidencia REAL 2026-07-24:** worker redeployado en `main` (`a6dd117`, img `d3c5aebc…`);
   se flipeó `GLOBE_LAB_PROVIDER=vertex` (worker+api rev `00076-kgr`), el dispatch end-to-end del Lab quedó **bloqueado
   por el break-glass IAM** (`tokenCreator` sobre `greenhouse-globe-caller` lo rechazó el classifier — nunca se concedió,

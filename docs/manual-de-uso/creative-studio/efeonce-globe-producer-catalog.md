@@ -1,9 +1,9 @@
 # Manual — Leer y ampliar el catálogo de rutas del Creative Producer
 
 > **Tipo de documento:** Manual de uso / runbook (orientado al operador)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-07-20 por Claude (TASK-1500)
-> **Ultima actualizacion:** 2026-07-20 por Claude (TASK-1500 — modelo público, casa interna)
+> **Ultima actualizacion:** 2026-07-24 por Claude (TASK-1553 — receta "agregar un modelo")
 
 ## Para qué sirve
 
@@ -54,8 +54,26 @@ Por HTTP es `POST /v1/readers` con `reader: 'globe.producer.catalog.list'` o `'g
 - **`policy_blocked`:** estás despachando por una surface no promovida (`ui`/`mcp`).
 - **Falla la carga con `globe_producer_catalog_*`:** un guard rechazó la edición de dato — leer el código del error (duplicate_route / unknown_capability / modality_mismatch / audio_incoherent / slug_leak / constraints_invalid).
 
+## Agregar un modelo al catálogo (multi-modelo, TASK-1553)
+
+Sumar un modelo/tier nuevo (que **coexiste**, no reemplaza) es una secuencia acotada y gobernada. Cada paso es aditivo y reversible por *revert*; la ruta queda **inerte hasta promoverse**, así que agregarla no cambia nada en producción hasta el gate humano.
+
+1. **Ruta pública en el catálogo** — agregá una entrada `ProducerRouteDescriptorV1` en `PRODUCER_ROUTE_CATALOG` (`packages/domain/src/producer-catalog.ts`): `routeId` nuevo, `model` = nombre + versión **público** (ej. `{ name: 'Nano Banana', version: 'Pro' }`), `capability`, `constraints`, `house`. Subí `PRODUCER_CATALOG_VERSION`. **Sin slug** — el guard de carga rompe el build si se filtra.
+2. **Entrada en el adapter** — agregá `ADAPTER_ROUTING_BY_ROUTE[routeId] = { model/slug, modelVersion, region… }` en el adapter del proveedor (`{openai,vertex,fal}-adapter.ts`). Acá vive el *slug* real, una sola vez, detrás de la frontera. Vertex image usa `region: 'global'`.
+3. **Política del composite** — asegurá que el prefijo de la ruta resuelva al proveedor dueño (`ref/still/openai-*` → openai, `ref/still/nanobanana-*` → vertex, resto → fal por defecto).
+4. **Allowlist de endpoint** — agregá la entrada de endpoint de producción atada a la ruta exacta (`governed-production-composition.ts`). *Rollout-pending: OpenAI no tiene lane de producción todavía (falta el verifier); Nano Banana 2 espera el allowlist de Google.*
+5. **Binding** — `globe.production-routing.route.append` con la identidad de wire (append, no `enabled`). La ruta queda canary-able pero inerte para producción.
+6. **Canary → atestación → promoción** — canary por el Lab (output real, MIME/hash), atestación comercial por modelo ([ADR-010](../../architecture/creative-studio/EFEONCE_GLOBE_COMMERCIAL_PROMOTION_ATTESTATION_DECISION_V1.md)), promoción por la saga [ADR-009](../../architecture/creative-studio/EFEONCE_GLOBE_ROUTE_PROMOTION_OPERATION_DECISION_V1.md) (prende `enabled` + readiness `promoted`).
+
+**Actualizar** un modelo (no agregar) = subir `modelVersion` en la **misma** `routeId` (pasos 1-2 sobre la ruta existente + binding nuevo). **Nunca** cambies el `providerId`/linaje de una `routeId` existente para reusarla como otro modelo: eso es una sustitución silenciosa, prohibida por diseño.
+
+Los pasos 1-3 son código (gates `pnpm check` + `pnpm build` verdes); los pasos 4-6 son el **rollout gobernado** (canary + atestación + promoción, con gasto real y decisión humana).
+
+> Detalle técnico: [ADR-013 — Route-Based Model Resolution](../../architecture/creative-studio/EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md).
+
 ## Referencias técnicas
 
 - Arquitectura: [EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md](../../architecture/creative-studio/EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md)
+- Decisión multi-modelo: [EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md](../../architecture/creative-studio/EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md) (ADR-013)
 - Funcional: [efeonce-globe-producer-catalog.md](../../documentation/creative-studio/efeonce-globe-producer-catalog.md)
-- Código: `efeonce-globe/packages/{contracts,domain}/src/producer-catalog.ts` · SDK `packages/sdk/src/index.ts`
+- Código: `efeonce-globe/packages/{contracts,domain}/src/producer-catalog.ts` · adapters `apps/creative-runner/src/{openai,vertex,fal,composite}-adapter.ts` · SDK `packages/sdk/src/index.ts`
