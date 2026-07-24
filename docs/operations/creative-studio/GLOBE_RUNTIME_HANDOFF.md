@@ -8,7 +8,29 @@
 
 # Handoff
 
-## Active state — 2026-07-23 (Producer interno genera y reproduce; cierre comercial aún no)
+## Active state — 2026-07-24 (ADR-010 / TASK-1535 Slice 1: model commercial rights attestation authority — code complete, rollout pendiente)
+
+**Contexto (directiva CEO 2026-07-24):** Globe es producto comercial; el equipo (y clientes vía Efeonce)
+necesita amplitud de modelos de frontera comercializables sin firmar readiness por ruta × workspace. ADR-010
+reubica la firma humana a la **licencia por modelo** (O(modelos), no O(rutas × workspaces)) y automatiza la
+promoción por ruta. Decisión + roadmap: `EFEONCE_GLOBE_COMMERCIAL_PROMOTION_ATTESTATION_DECISION_V1.md` (ADR-010);
+task `TASK-1535` (in-progress).
+
+**Slice 1 mergeado en `efeonce-globe` `main` (pnpm check + build verdes; 6 tests nuevos):** autoridad
+**Model Commercial Rights Attestation** — command `globe.model-rights.attest.record` (`requireHuman`, firmado
+server-side, anclado a `providerTermsRef` + `providerTermsDigest`), readers `.get`/`.list`, `verifyModelCommercialRights`,
+`deriveEffectiveRestrictions` (sólo aprieta). Migración `0030` (tabla **global, no tenant-scoped** — la licencia es un
+hecho de control-plane, por eso O(modelos); append-only, inmutable por `(provider,model,version,terms_digest)`). Store
+durable idempotente en dos ejes. Capabilities nuevas: `globe.model-rights.attest`/`.read` (+ `globe.production-promotion.auto-lane`
+reservada para Slice 4). `.read` granteada al internal caller; **attest es broker-side human-only** (grant al reviewer =
+paso de rollout Greenhouse, aún no hecho).
+
+**Rollout pendiente (NO está vivo):** (1) migración `0030` aplicar en `globe-pg`; (2) secret `GLOBE_MODEL_RIGHTS_ATTESTATION_SECRET`;
+(3) grant broker-side `globe.model-rights.attest` al reviewer humano; (4) Slices 2-4 (derivación→publish, techo por
+workspace, lane automatizado); (5) Slice 5 = evidencia real de términos + golden briefs + **el CEO firma las ~O(proveedores)
+attestations** (Vertex/OpenAI/Fal comerciales) — único paso humano irreducible. Ninguna ruta comercial nueva está promovida.
+
+
 
 ### Runtime e identidad
 
