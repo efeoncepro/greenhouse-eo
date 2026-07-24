@@ -594,3 +594,37 @@ de operador de readiness en el broker de Greenhouse es el siguiente paso ejecuta
 **Producto comercial (no piloto):** el runtime sigue clavado en `internal_smoke` por `readStudioRuntimeConfig`;
 habilitar cobro/clientes externos es **TASK-1521** (runtime comercial) + **TASK-1480** (readiness comercial,
 bloqueada por 1477/1478/1479/1482) — ninguna empezada. Esa es la distancia real a comercial, no la UI.
+
+## Delta 2026-07-24 — principio faltante: catálogo multi-modelo extensible y elegible (best-in-class, coexistente)
+
+El epic planteaba **provider routing por contrato de fidelidad** + recommendation matrix (TASK-1459) + stack de
+proveedores (TASK-1486/87/88), pero **NO** plantaba un principio de producto que la dirección hizo explícito el
+2026-07-24: **Globe corre los mejores modelos del mercado, coexistiendo y creciendo en el tiempo — sin que uno
+sustituya a otro.** Se agrega como principio del epic:
+
+- **Catálogo multi-modelo extensible:** varios modelos por capacidad (imagen, y por diseño video/audio) coexisten como
+  **rutas gobernadas elegibles**. Agregar un modelo nuevo es un **paso chico y gobernado** (entrada de catálogo + binding),
+  no una reescritura ni una sustitución.
+- **Update ≠ Add (dos operaciones distintas):** *update* = bump de versión dentro de la misma ruta/lineaje (reemplaza:
+  ej. Gemini 2.5→3, gpt-image-1→2); *add* = modelo/tier distinto = ruta nueva que **coexiste** (ej. Seedream ≠ Nano
+  Banana; GPT Image 1.5 **y** 2; Nano Banana Pro **y** 2). Regla uniforme para todos los proveedores.
+- **Compatibilidad con el non-goal "no declarar un modelo 'mejor' globalmente":** el catálogo **ofrece** los mejores;
+  la **selección** es explícita del operador (selector, TASK-1552) o por contrato de fidelidad / recommendation matrix
+  (TASK-1459) — nunca un "mejor global".
+
+**Gap de implementación (real, no cubierto por ninguna child task):** hoy los adapters resuelven el modelo **por
+capacidad** (`OPENAI_ROUTING[capability]`, `VERTEX_ROUTING[capability]`) y el composite rutea imagen a **un** proveedor
+por capacidad, así que **dos modelos del mismo proveedor no pueden coexistir** — el compiler ancla a `estimate.model` y
+un binding al segundo modelo da `route_binding_missing`. Se requiere **resolución de modelo por-ruta** en los adapters.
+Vehículo: **`TASK-1553` — Globe Extensible Multi-Model Provider Catalog + Route-Based Model Resolution** (backend-data
+foundation; el selector de UI es su consumer TASK-1552).
+
+**Evidencia viva (TASK-1535, 2026-07-24):** Nano Banana Pro (`gemini-3-pro-image`) **genera imágenes reales** en el
+proyecto Globe vía endpoint `global`; Nano Banana 2 (`gemini-3.1-flash-image`) pendiente de allowlist del proyecto
+(ask a Google). Los defaults de adapter ya se actualizaron a los frontier (updates legítimos), sin borrar Seedream.
+
+### Outcome (adición)
+
+- Globe opera un **catálogo multi-modelo extensible de best-in-class** (imagen/video/audio) donde los modelos
+  coexisten como rutas elegibles; **agregar** un modelo es un paso gobernado y **actualizar** (versión) es distinto de
+  **sumar** (modelo nuevo); la selección es explícita o por contrato de fidelidad, nunca "mejor global".
