@@ -7,6 +7,25 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-24 — Globe: promoción comercial por atestación (ADR-010) — golden briefs + docs (TASK-1535)
+
+- **Slice 5 (fleet enablement) — golden briefs para las 6 rutas reference-conditioned pendientes:**
+  `ref/still/reference-v1`, `ref/motion/reference-v1`, `ref/video/frames-v1`, `ref/video/motion-v1`,
+  `ref/voice/change-v1`, `ref/voice/translate-v1`. Se agregaron 3 rúbricas (`preserve-set-v1`,
+  `voice-transform-v1`, `voice-translation-v1`) y 2 contratos de fidelidad aditivos (`voice-transform`,
+  `voice-translation`) al enum — todos los consumers validan membresía, ninguno hace switch exhaustivo. Cada
+  fixture lleva una referencia sintética `rights: 'test-fixture'` (aceptada sin puerto de assets, el caso del
+  harness). El test del **segundo consumidor** corre las 6 end-to-end y asserta que la referencia autorizada
+  **sobrevive** al manifiesto puntuado (`input_lineage_intact`). Globe `pnpm check` (domain 337/0) + build verde.
+  Commit Globe `f62c2e4`.
+- **Slice 6 (docs closure):** doc funcional [`efeonce-globe-promocion-comercial-atestacion.md`](docs/documentation/creative-studio/efeonce-globe-promocion-comercial-atestacion.md)
+  + manual [`operar-promocion-comercial-atestacion-globe.md`](docs/manual-de-uso/creative-studio/operar-promocion-comercial-atestacion-globe.md),
+  ambos indexados. Triple documentación completa (ADR-010 técnica + funcional + manual).
+- **Pendiente (único gate abierto de TASK-1535):** el **canary facturable** (acceptance criterion de evidencia
+  runtime) implica **gasto real** de proveedor y/o promoción comercial a un workspace de cliente real — requiere
+  autorización explícita del operador; no se ejecuta de forma autónoma. La lane ya se probó en vivo con proveedor
+  interno (canary de lane + 2 atestaciones comerciales firmadas por el CEO). Task sigue `in-progress` por este gate.
+
 ## 2026-07-24 — Globe formaliza Storyboard Studio y Narrative Preproduction
 
 - ADR-012/SPEC-012 establecen Storyboard Studio como surface propia, no como capability aislada de Producer o
@@ -831,24 +850,3 @@
 - Una auditoría posterior corrigió el estado v7: el PASS existente cubre archivo/seguridad, pero no demuestra
   todavía legibilidad al ancho CSS, geometría del delivery trazado ni CLS/currentSrc. El draft sigue privado y
   queda `contextual_v7_qa_pending`; no se declara listo para publicación.
-
-## 2026-07-18 — TASK-1340: Growth CTA Portable Renderer + capa GTM + gobernanza en Growth (code complete, shadow)
-
-- Renderer portable `<greenhouse-cta>` (`src/growth-cta-renderer/**`, vanilla TS 22,6KB, hermano del
-  forms-renderer): light DOM + ElementInternals, espejo del contrato v1 con parity test, capa visual
-  rica y versátil (tokens `--gh-cta-*` re-tematizables, 3 style variants por dato
-  default/spotlight/minimal, slot visual, dark/bare, container queries, skeleton anti-CLS,
-  reduced-motion), action `open_growth_form` montando el `<greenhouse-form>` gobernado (carga lazy +
-  join submission), fail-closed en público. Build esbuild → `public/growth-cta/renderer-<canal>.js`
-  (prebuild). El loop GVC atrapó un drift real de paridad preview↔público → selectores unificados
-  `:is(greenhouse-cta, .ghc-scope)` (paridad por construcción).
-- **Capa GTM** (nota del operador): familia `greenhouse_cta_*` → dataLayer del host con allowlist
-  dura sin PII (SoT server + espejo renderer + parity test), fila TRACKING-PLAN §CTAs con spec
-  turnkey de tags GA4 para el flip y deslinde del rail legacy `gh_cta_clicked`; publish al container
-  SOLO gobernado (workspace→preview→confirmación humana).
-- **Gobernanza en el menú Growth** (nota del operador): `/growth/ctas` (viewCode
-  `gestion.growth_ctas` + seed aplicada; roles operador growth) con inventario + lifecycle
-  (publish/pause/resume, estado honesto con flag OFF) + surfaces + preview de variantes; GVC
-  desktop/mobile mirado. Island Think `GrowthCtaDock.astro` commiteada en rama local de
-  `efeonce-think` (PR a señal); embed WP documentado. Master flow EPIC-023 creado. Flag
-  `GROWTH_CTA_ENGINE_ENABLED` sigue OFF: flip turnkey documentado en el ledger.

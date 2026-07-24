@@ -17,6 +17,15 @@
   `docs/architecture/GREENHOUSE_SOFTWARE_ARCHITECT_SKILL_GOVERNANCE_V1.md`.
 - Globe formalizó autoría humana en Business Model V1.1/ADRs; `TASK-1530…1534` siguen `to-do` y B2B2B continúa
   como hipótesis sin acceso.
+- **Globe promoción comercial por atestación (ADR-010, `TASK-1535`) — LIVE, un gate abierto.** Desplegado y
+  probado en vivo (api `00074-fwv`, web `00067-9n8` con toast fix): atestación por modelo (`requireHuman`,
+  inmutable por digest, global), lane automatizada (principal separado, fail-closed, deriva de la atestación),
+  canary de lane verificado, 2 atestaciones comerciales firmadas por el CEO. Slices 5 (golden briefs 6 rutas + 3
+  rúbricas + 2 contratos de fidelidad; Globe `f62c2e4`, domain 337/0) y 6 (doc funcional + manual + ADR status)
+  cerrados. **Único pendiente:** el **canary facturable** (acceptance) — implica **gasto real** / promoción a
+  cliente real; requiere autorización explícita, no autónomo. Task `in-progress` por ese gate. Detalle en
+  changelog 2026-07-24 + [ADR-010](docs/architecture/creative-studio/EFEONCE_GLOBE_COMMERCIAL_PROMOTION_ATTESTATION_DECISION_V1.md).
+  Regla dura: scopes del broker OAuth = rollout de 3 pasos (permite → pide → exige) o se cae el login.
 
 ## Riesgos abiertos
 
