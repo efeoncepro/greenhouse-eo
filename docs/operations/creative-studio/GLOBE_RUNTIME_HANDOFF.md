@@ -17,8 +17,7 @@
 - **Decisión de diseño:** el ceiling ADR-010 por `kind` se HEREDA de la promoción (un binding sólo queda `enabled` tras
   pasar el ceiling), así el reader no re-deriva `kind` (evita el muro `resolveKind=undefined` de la proyección de
   tenancy 0013) y no puede marcar `available` nada no promovido+enabled. Sin slug en la proyección (view pública).
-- **Rollout-pending:** deploy del reader (api/worker) + readback runtime contra una ruta promovida real (Nano Banana
-  Pro tras ADR-009). El "cada modelo funcionando en el Producer + prueba UI" es el gate del programa: TASK-1554 (backend)
+- **Rollout-pending:** readback runtime contra una ruta promovida real (Nano Banana Pro tras ADR-009). El "cada modelo funcionando en el Producer + prueba UI" es el gate del programa: TASK-1554 (backend)
   → TASK-1555 (selector UI) → promociones ADR-009 → verificación GVC/Playwright.
 
 ## Active state — 2026-07-24 (TASK-1553 latest; canary green, promotion pending)
@@ -31,8 +30,10 @@
 - The requested 5000-credit grant returned canonical `409 conflict`; no direct ledger mutation or bypass was used. The existing governed 10-credit grant funded the canary.
 - Lab canary `a258dda8-ea6e-4a34-94f0-4cd9ca301d17` completed `candidate_ready`: 10 credits, `gemini-3-pro-image`, route `ref/still/nanobanana-pro-v1`, `global`, `image/png`, 1,111,472 bytes, SHA-256 `sha256:9e9edaf59cb927610d043e3af3cac9b90c321ed48e55eb34ec0300c72dc429cf`; retrieval HTTP 200 independently matched the hash.
 - The governed scheduler attempt correctly stopped before provider execution because ADR-009 binding/readiness is not promoted. No ADR-009 promotion was attempted without the required readiness/review evidence.
-- All temporary IAM grants were revoked and read back absent; API is restored to governed + composite defaults and worker to composite. Current status: **code complete, canary green, rollout parcial/bloqueado**, not complete.
-- Next step: execute ADR-009 review→propose→promote→activate with the required readiness evidence, then verify `binding.modelId == estimate.model == readiness.route.modelId` and only then enable the route.
+- Globe `main` `c3b6bf4a89ff40c1713cc07255d22b91e9ff97e9` is deployed: API run `30129902342` and worker run `30129904260` are green. The live `globe.producer.fleet.list` readback for `greenhouse-org:efeonce` reports Nano Banana Pro `gated/not_promoted`; Seedream, Seedance loop and ElevenLabs TTS remain `available`; OpenAI is `blocked/provider_verifier_pending`.
+- All temporary IAM grants were revoked and read back absent; API is restored to governed + composite defaults and worker to composite. The ADR-009 attempt stopped before mutation because the exact readiness/binding records and the separate promotion identities were not available from this environment (`iam.serviceAccounts.getAccessToken` denied). Current status: **code complete, canary green, rollout parcial/bloqueado**, not complete.
+- The canonical 5000-credit grant still returns `409 conflict` despite active pool and fresh idempotency/source identifiers. Code inspection found no one-active-grant guard; ISSUE-124 is open to identify the precise conflict phase with safe observability. No direct ledger mutation or bypass was used.
+- Next step: obtain the governed promotion identities and the signed readiness review/proposal, then execute ADR-009 review→propose→promote→activate with exact readback `binding.modelId == estimate.model == readiness.route.modelId`; only then expect Nano Banana Pro to become `available` in the fleet reader.
 
 ## Active state — 2026-07-24 LATEST (TASK-1535 — golden briefs + frontier fleet defaults; canary facturable abierto)
 
