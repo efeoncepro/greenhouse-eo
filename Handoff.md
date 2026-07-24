@@ -44,9 +44,16 @@
 
 - **`TASK-1526` COMPLETE.** `eac1730` y `2b7842c` cerraron la reconciliación keyed y continuidad visual del feed/viewer: la selección deja de reconstruir cards, previews/cache persisten por run, la UI conserva foco/media en refresh/filtros/búsqueda/orden y los títulos son client-safe. No sustituye `TASK-1528` ni declara commercial readiness. Residual de rollout cerrado 2026-07-23: Studio desplegado en `7ac0ded` (run `30049251368`, rev `00061-7n7`, 100% tráfico); API queda correcta en `eac1730` (los fixes finales sólo tocan `studio-web`).
 
-- **`TASK-1527` IN-PROGRESS (P0, checkpoint humano).** Plan:
-  `docs/tasks/plans/TASK-1527-plan.md`. Aceptar primero el delta de rights workspace-scoped + saga durable;
-  luego implementar. `TASK-1528`/`TASK-1529` siguen to-do. Seed Audio permanece internal-only.
+- **`TASK-1527` IN-PROGRESS (P0, rollout live avanzado 2026-07-23/24).** Aggregate + flag ON + recovery worker
+  + señales + identities disjuntas + canary authority desplegados internal-only (`ffe4102…ff24093`, migración
+  `0028`, tofu `No changes`). Rehearsal stage→rollback ✅ (atrapó y corrigió colisión de idempotency keys por
+  fase) y recovery autónomo del worker ✅ (`promotion_recovery_deadline`, señal ERROR emitida). Con el flag ON
+  el caller genérico ya NO porta `production-routing.manage`/`asset-rights-policy.manage`. **Pendiente:** ruta
+  image con binding disabled+circuit open (residuo del rehearsal; restaurar vía flag OFF→caller→flag ON, el
+  tokenCreator del caller lo bloquea el permission classifier — comando en el reporte al operador) y saga
+  promote-from-candidate con la primera ruta con evidencia real. Hallazgo: `model-readiness.pause` human-only
+  sin superficie operable (follow-up). tokenCreator temporales revocados con corte verificado.
+  Plan: `docs/tasks/plans/TASK-1527-plan.md`. `TASK-1528`/`TASK-1529` siguen to-do.
 
 - **`TASK-1503` COMPLETE y ACTIVA internal-only.** Retrieval, favorite y copy-as-reference funcionan en API y UI
   por grants/BFF; el bucket continúa privado y tenant-blind. Estado mutable y evidencia:

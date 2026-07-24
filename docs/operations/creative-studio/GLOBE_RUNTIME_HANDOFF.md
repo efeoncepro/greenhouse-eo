@@ -84,6 +84,30 @@
   coordinator con debounce/supersession. `eac1730` sigue siendo el runtime vivo hasta un deploy correctivo verde.
   No declara comercial ready.
 
+### Route Promotion Saga (TASK-1527, live 2026-07-23/24)
+
+- **Flag ON** (`GLOBE_PRODUCTION_PROMOTION_OPERATIONS_ENABLED=true`, Terraform `variables.tf`): api rev
+  `00063-z7d` (imagen `ca211af1e474`), worker digest `a2bf785c492d`+. Migración `0028` aplicada (`pending=[]`).
+  Con el flag ON el caller genérico **ya no porta** `production-routing.manage` ni `asset-rights-policy.manage`
+  (break-glass `GLOBE_CONTROL_PLANE_BREAK_GLASS` separado, default off, sin proyección Terraform).
+- Identities disjuntas vivas: `globe-promotion-routing` (plan-stage/activate/rollback),
+  `globe-promotion-promoter` (promote), `globe-promotion-checker` (canary-attest) — SAs + invokers + allowlists
+  en Terraform; overlap denegado in-app. Worker recovery in-process (`globe:service:promotion-recovery`).
+- Observabilidad viva: `globe_promotion_partial` (ERROR, verificado emitido), `globe_promotion_rollback_failed`
+  (CRITICAL), queue age WARNING >900s sobre `promotionQueueOldestAgeSeconds` del evento `globe_worker_completed`
+  (verificado `0` post-batch).
+- Rehearsals: stage→rollback ✅ (op `promotion_ebb9a676…`, rolled_back rev 5) y recovery autónomo ✅
+  (op `promotion_87922b94…`, `promotion_recovery_deadline`, sin SQL manual). El rehearsal atrapó y corrigió una
+  colisión de idempotency keys stage↔rollback (`f66b24c`: `promotion:{op}:{phase}:{step}` + readback-first).
+- **Estado pendiente**: la ruta image `ref/still/rrss-v1` quedó **binding disabled (rev 2→3) + circuit open**
+  por los rollbacks del rehearsal — el Producer NO puede generar image hasta restaurarla. Restauración
+  gobernada: flag OFF (Terraform) → `appendProductionRoute(enabled:true)` + `transitionProviderCircuit(closed)`
+  con `greenhouse-globe-caller` → flag ON. Video/audio no fueron tocadas.
+- Hallazgo: `model-readiness.pause` es human-only por diseño y sin superficie operable (tenancy-operator porta
+  la capability desde `ca211af` pero el 403 por actor-type es correcto). El saga promote-from-candidate se
+  ejercita con la primera ruta real de las 7 pendientes.
+- tokenCreator temporales del rehearsal: otorgados → usados → **revocados con corte verificado**.
+
 ### Asset Governance y alertas
 
 - `645c143` clasifica MP4/MP3 válidos sin Content Credentials como

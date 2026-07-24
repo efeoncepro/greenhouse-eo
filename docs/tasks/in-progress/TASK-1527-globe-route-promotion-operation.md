@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Code complete local; rollout, worker/recovery, identities/grants, deploy y rehearsal live pendientes`
+- Status real: `Desplegado internal-only con flag ON: recovery worker + señales + identities disjuntas + canary authority vivos; rehearsal stage→rollback y recovery autónomo verificados live; restauración de binding image + saga promote-from-candidate pendientes`
 - Rank: `TBD`
 - Domain: `creative|ops|security`
 - Blocked by: `none`
@@ -195,6 +195,37 @@ complete.
 
 <!-- ZONE 2 — PLAN MODE -->
 
+### 2026-07-23/24 — Rollout live + rehearsals 1-2 + hallazgos (ejecución autorizada expresamente)
+
+- **Código remanente implementado y pushed** (`ffe4102`, fixes `f66b24c`/`ca211af`/`ff24093`, CI verde):
+  flag `GLOBE_PRODUCTION_PROMOTION_OPERATIONS_ENABLED` (mutations→`policy_blocked`, readers shadow),
+  lane de recovery en el worker (scan cross-workspace bajo policy RLS de migración `0028`, claim
+  `SKIP LOCKED`+fencing, `recover` canónico), `DurableProductionPromotionCanaryAuthority` (run gobernado
+  post-activación + output retenido + governance `eligible`, server-side), 3 clases workload disjuntas
+  (`promotion-routing|promoter|checker`) con retiro de `production-routing.manage`/`asset-rights-policy.manage`
+  del caller genérico al prender el flag, SDK tipado (11 métodos), CLI por fase
+  (`scripts/production-promotion-cli.mjs`), grants DB del worker en sync exacto SQL↔verifier.
+- **Rollout aplicado**: migración `0028` (`pending=[]`), prepare grants `ready:true`, `tofu apply`
+  12 add/3 change/0 destroy → `No changes`; deploys api/studio/worker success; shadow verification con flag
+  OFF (reader `200 []`, `start`→`policy_blocked`); flag ON aplicado (api rev `00061-cdc`→`00063-z7d`).
+- **Rehearsal 1 (stage→rollback) ✅** con identity `promotion-routing`: `controls_staged` rev 3 (binding
+  disabled rev 2, circuit open rev 2, rights readback exacto) → `rolled_back` rev 5. **Atrapó un defecto
+  real**: las claves de idempotencia de circuit/binding no discriminaban fase (stage vs rollback colisionaban
+  y el rollback quedaba atascado en `rolling_back`). Fix conforme ADR (`promotion:{op}:{phase}:{step}` +
+  readback-first en `executeRollback`), test actualizado, redesplegado (`f66b24c`).
+- **Rehearsal 2 (recovery autónomo) ✅**: op `promotion_87922b94…` con deadline 2 min quedó `rolled_back`
+  con `safeCode=promotion_recovery_deadline` **sin intervención** (worker tick + lease + fencing). Señal
+  `globe_promotion_partial` (ERROR) emitida como jsonPayload; el evento `globe_worker_completed` lleva el
+  resumen de la lane + `promotionQueueOldestAgeSeconds=0` post-batch. Métricas/alertas Terraform vivas.
+- **Hallazgo de diseño (follow-up)**: `model-readiness.pause` es human-only por diseño y no tiene superficie
+  humana operable (403 correcto con tenancy-operator aunque se le agregó la capability `ca211af`). El saga
+  completo promote-from-paused no es ejercitable sin fabricar camino; el path real (promote-from-**candidate**)
+  se ejercitará con la primera de las 7 rutas cuando exista su evidencia real (prohibido fabricarla).
+- **Pendiente inmediato**: la ruta image quedó binding disabled + circuit open (residuo esperado del
+  rehearsal). Restauración por carril gobernado: flag OFF vía Terraform → re-enable binding + close circuit
+  con `greenhouse-globe-caller` (requiere tokenCreator del operador, bloqueado por el permission classifier)
+  → flag ON. Los 4 tokenCreator temporales del rehearsal fueron **revocados y el corte verificado**.
+
 <!-- ZONE 3 — EXECUTION SPEC -->
 
 ## Scope
@@ -277,8 +308,9 @@ Asignar identities/grants separados y sign-off humano para canary facturable.
 - `../efeonce-globe`: `pnpm --filter @efeonce-globe/database test` ✅ 96/96
 - `../efeonce-globe`: `pnpm check` ✅
 - `../efeonce-globe`: `pnpm build` ✅
-- Pendiente: migration/readback live, worker recovery con lease/fence, stage→rollback y stage→canary con identities
-  separadas.
+- Migration/readback live ✅ (`0028` pending=[]); worker recovery con lease/fence ✅ (rehearsal 2 autónomo);
+  stage→rollback con identity separada ✅ (rehearsal 1). Pendiente: restauración binding image y
+  stage→promote→activate→canary con la primera ruta candidate real.
 
 ## Plan
 
