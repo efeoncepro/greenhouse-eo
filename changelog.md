@@ -7,6 +7,19 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-24 — Globe: derivados de media versionados + entrega por Range (TASK-1528)
+
+- ADR-008 build units 1-3 desplegados y verificados internal-only (SPEC-010): 6 perfiles gobernados de media
+  (image thumb/preview, video poster/transcode 720p, audio waveform-peaks/AAC), cada parámetro explícito, con
+  identidad exacta inmutable — cambiar cualquier componente crea un record nuevo, nunca sobrescribe.
+- Nuevo Cloud Run Job `globe-media-derivatives` (`apps/media-derivatives`, ffmpeg pinneado por versión) que produce
+  las versiones con leases/fencing y upload content-addressed a un bucket separado con `ifGenerationMatch=0` +
+  reconciliación de 412. Nuevo gateway `GET /v1/media/:sha256` con Range 200/206/416 nativo (passthrough a GCS, sin
+  buffer) y media tickets principal-bound (secreto propio, TTL 120s).
+- Migración `0029`; flags `GLOBE_MEDIA_DERIVATIVES_ENABLED`/`GLOBE_MEDIA_RANGE_GATEWAY_ENABLED` ON post-canary;
+  `tofu plan` No changes. Canary con imagen/video/audio reales: 6 ready/0 failed, Range/negativos/idempotencia
+  probados. Desbloquea TASK-1529 (orphan GC). No habilita comercial (TASK-1480). El original nunca se toca.
+
 ## 2026-07-23 — Globe formaliza autoría humana y propósito creativo
 
 - Creative Studio Business Model V1.1 fija al equipo creativo como protagonista, al operador como punto de vista
@@ -827,18 +840,3 @@
   `wordpress` + `think`; smoke e2e verde contra PG dev (render sin leak de policy, ingest idempotente,
   forja rechazada y persistida). Flag `GROWTH_CTA_ENGINE_ENABLED` default OFF (ledger); flip coordinado
   con TASK-1340 (renderer), que queda desbloqueada por el contrato publicado.
-
-## 2026-07-17 — TASK-1276: AEO Operator View (Growth + Account 360) — code complete local
-
-- Vista operador del programa AEO (nodos S8-S12 del EPIC-020), implementada desde el mockup aprobado de
-  Claude Design "AEO Operator View": cockpit `/growth/aeo` (KPIs + tabla score/tier/último run + filter
-  pills por motion + targets de cross-sell), detalle `/growth/aeo/[organizationId]` (banda de cliente +
-  reuso del workbench masterDetail de TASK-1248 vía extensiones aditivas `chrome`/`plan`), control de
-  estado del Plan AEO (5 estados TASK-1275, reason obligatorio en blocked/dismissed, a11y completo),
-  picker de run operador agrupado por motion (TASK-1277), composer de envío + Lead HubSpot con consent
-  gate (TASK-1279, flag OFF) y facet "AEO" en el Organization Workspace (Account 360).
-- viewCode `gestion.growth_aeo` + seed migration (roles operador; NUNCA client\_\*) + nav Growth; el facet
-  reusa la capability `report.read_operator` (sin capability nueva). Bugfix raíz en el store del grader
-  (timestamptz llegaba como `Date` bajo cast `as string` → 500 con data real; normalizado a ISO — también
-  cubría a `/aeo` cliente). GVC desktop+mobile mirado con data real (Sky Airlines/Grupo Berel), scroll
-  horizontal 0. Estado: code complete, rollout pendiente (push/staging/prod por instrucción del operador).

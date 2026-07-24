@@ -387,6 +387,66 @@ Los scripts `test` de cada package **enumeran los archivos a mano**. `src/voice-
 Snapshot histórico del 2026-07-22: kill switch OFF, provider fake y canarios pendientes. El estado actual se
 consulta en Runtime Handoff. Los probes de gasto cero siguen probando sólo forma/existencia, nunca calidad.
 
+## El séptimo ejemplo — Media derivatives + Range gateway (TASK-1528): versiones livianas versionadas + serving por tramos
+
+Los ejemplos anteriores **producen** piezas o exponen sus bytes completos. TASK-1528 implementa los **build units
+1-3 de ADR-008** ([`EFEONCE_GLOBE_MEDIA_DERIVATIVES_V1.md`](../../../docs/architecture/creative-studio/EFEONCE_GLOBE_MEDIA_DERIVATIVES_V1.md),
+SPEC-010): derivados de media versionados producidos por un worker separado + un gateway que sirve **un solo
+Range** re-autorizando cada request. Vive en `packages/{contracts,domain}/src/media-derivatives.ts`,
+`packages/database/src/stores/media-derivative-store.ts` + `migrations/0029_media_derivatives.sql`, el worker
+dedicado `apps/media-derivatives/**` (segundo Cloud Run Job con binario nativo, patrón asset-governance/ADR-007),
+y el gateway `serveMedia` + ruta `/v1/media/` + `apps/studio-web/src/media-ticket.ts`. Desplegado y
+canary-verificado internal-only.
+
+**Identidad exacta e inmutable** (cambiar cualquier componente crea otro record/objeto, nunca overwrite):
+`(workspaceId, sourceSha256, sourceObjectGeneration, profileId, profileVersion, transformerVersion, outputMime)`.
+
+**Perfiles = DATA gobernada** (`GLOBE_MEDIA_DERIVATIVE_PROFILES`), 6 en v1, cada parámetro EXPLÍCITO — nada
+depende de defaults de ffmpeg. Bumpear un valor = nueva `profileVersion` (los viejos → `superseded`); bumpear el
+binario/args de ffmpeg = nueva `MEDIA_TRANSFORMER_VERSION`.
+
+**El worker** (`apps/media-derivatives`, debian + ffmpeg pinneado por versión) claima intents con lease+fencing
+`SKIP LOCKED`, descarga el source **PINNED a la generation de la identidad** (drift = fallo permanente, nunca un
+re-target silencioso), corre planes ffmpeg deterministas por perfil (+ waveform peaks post-procesando el PCM), y
+sube content-addressed al **bucket SEPARADO de derivados** con `ifGenerationMatch=0` + reconciliación de same-key
+`412` por readback (nombre=hash+size igual ⇒ idempotente; mismatch ⇒ integrity conflict). Un record terminal por
+identidad.
+
+**El gateway** `GET /v1/media/:sha256` es un **authority gateway, no un byte buffer**: autentica → verifica el
+**media ticket principal-bound** → re-corre `authorizeOwnedOutput` AHORA → resuelve la representación READY
+(original o `profileId@version`) → passthrough de UN Range a GCS con backpressure (`GcsOutputRetrieval.openByteStream`).
+200/206/416 nativo, sin arrayBuffer/Blob/base64; multipart 400. Errores honestos: storage/no-ready →
+`dependency_unavailable`, nunca `internal_error` ni 200 vacío.
+
+**El media ticket** (`media-ticket.ts`, secreto propio `globe-media-ticket-secret`, TTL 120s) es HMAC firmado,
+atado a `workspace+experiment+sourceSha256+representation+disposition+principalId`, y **NO es bearer
+autosuficiente**: el gateway exige que el principal AUTENTICADO matchee el binding. La `representation` pinea
+original vs derivado exacto (un ticket de poster no trae el original). El mint es un reader gobernado
+(`globe.media.derivative.ticket`); el BFF reenvía `x-globe-media-ticket`.
+
+**Reglas duras de este dominio:**
+- **NUNCA** transformar media en el web/BFF ni en el gateway (ADR-008): la transformación vive SOLO en el Job
+  `apps/media-derivatives`. El gateway sólo autoriza + streamea.
+- **NUNCA** servir bytes bufferizando el objeto completo (`arrayBuffer`/`Blob`/base64): el tamaño del objeto no
+  puede determinar la memoria del request. Se pasa UN Range a GCS y se pipea con backpressure. Multipart → 400.
+- **NUNCA** guardar un derivado junto al original ni con su object key: bucket separado
+  `efeonce-globe-media-derivatives`, content-addressed. El worker tiene storage **get/create SIN delete** (el
+  delete guarded es TASK-1529); el gateway (`api_runtime`) tiene **read-only** sobre ese bucket.
+- **NUNCA** sobrescribir un derivado: same-key `412` se reconcilia por readback (idempotente o integrity
+  conflict). **NUNCA** re-targetear si el source cambió de generation: es fallo permanente.
+- **NUNCA** cambiar un valor de perfil sin bumpear `profileVersion`, ni bumpear el pin de ffmpeg del Dockerfile sin
+  bumpear `MEDIA_TRANSFORMER_VERSION` (los bytes cambiarían bajo una identidad sin cambiar — el build falla loud si
+  el pin no existe en trixie). Verificado en vivo: el pin drifteado lo atrapó el build antes de producir nada.
+- **NUNCA** tratar el media ticket como bearer: el gateway re-autentica, exige match del principal y re-corre
+  ownership por request. El secreto del ticket es propio (no reusar el retrieval grant) y nunca se loggea.
+- **SIEMPRE** resolver la generation del source y el ownership server-side (`authorizeOwnedOutput`, el MISMO
+  primitive de TASK-1503); el request command falla-closed a `policy_blocked` con `GLOBE_MEDIA_DERIVATIVES_ENABLED`
+  OFF y el gateway con `GLOBE_MEDIA_RANGE_GATEWAY_ENABLED` OFF.
+
+**Estado de rollout**: build units 1-3 desplegados internal-only; feed/viewer (TASK-1526) y orphan GC (TASK-1529,
+desbloqueada) son build units separados; comercial gated por TASK-1480. El estado vivo (revisiones/flags) se
+consulta en `GLOBE_RUNTIME_HANDOFF.md` § Media Derivatives, nunca en esta skill.
+
 ## Provider boundary
 
 - **El primer provider call *billable* entra por el mismo seam que las surfaces posteriores:** API/SDK o conformance harness → command/reader canónico → provider adapter (`packages/provider-contract`) → runner (`apps/creative-runner`). **NUNCA** un provider SDK directo desde UI/MCP/CLI/scripts/tests.
@@ -578,6 +638,8 @@ Sus propiedades importan y son deliberadas: aditiva/sustractiva, **una sola tran
 - **SIEMPRE** que una capability nueva toque estado externo o un provider, sigue el patrón del Model Lab: ports en el dominio + impls inyectadas desde transporte/runner + dobles en tests + state machine + error de dominio mapeado a su API code (p.ej. `InvalidExperimentRequestError → invalid_request`).
 - **SIEMPRE** que enchufes un motor real, hazlo reemplazando el `CreativeProviderAdapter` detrás del runner — sin tocar el dominio ni el command — siguiendo los adapters reales: Vertex keyless (ADC/WIF), Fal con key propia de Globe (`GLOBE_FAL_API_KEY`, `status_url`/`response_url` de la queue), Composite por `supports()` + política para el overlap; el default de `GLOBE_LAB_PROVIDER` sigue siendo `fake` (hermético) hasta prender un motor por env, y el `actualRoute` reportado es el route del contrato de fidelidad, nunca el slug.
 - **SIEMPRE** usá la superficie **keyless** (ADC/WIF, runtime SA) para **GENERATE** de video — Veo (`:predictLongRunning`) y Omni generate (Interactions keyless en `aiplatform`); reservá la API key `globe-gemini-api-key` **solo** para el **edit stateful** de Omni (`generativelanguage`). El ancla `GLOBE_LAB_VIDEO_ANCHOR` (`fal`|`vertex-video`|`vertex-omni`, default `fal`) es **fidelity-aware**: `preserve-set` → Seedance; `anchor`/`flexible` → el motor ancla elegido; el harness nunca auto-gana un motor (todo verdict `objective_pass_pending_human`).
+
+- **NUNCA** transformes media fuera del Job `apps/media-derivatives` (TASK-1528/ADR-008): el web/BFF y el gateway JAMÁS transforman; **NUNCA** sirvas bytes bufferizando el objeto completo (arrayBuffer/Blob/base64) — el gateway `GET /v1/media/:sha256` pasa UN Range a GCS y pipea con backpressure (200/206/416; multipart 400); **NUNCA** guardes un derivado junto al original (bucket separado content-addressed, worker con get/create SIN delete, gateway read-only); **NUNCA** sobrescribas un derivado (same-key 412 = readback idempotente o integrity conflict) ni cambies un valor de perfil sin bumpear `profileVersion`, ni el pin de ffmpeg del Dockerfile sin bumpear `MEDIA_TRANSFORMER_VERSION`; **NUNCA** trates el media ticket (`globe-media-ticket-secret`, TTL 120s, principal-bound) como bearer — el gateway re-autentica + re-corre `authorizeOwnedOutput` por request. Detalle: `EFEONCE_GLOBE_MEDIA_DERIVATIVES_V1.md` (SPEC-010).
 
 ## Sinergias y gobierno
 
