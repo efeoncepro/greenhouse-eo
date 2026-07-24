@@ -8,6 +8,16 @@
 
 # Handoff
 
+## Active state — 2026-07-24 (TASK-1553 rollout attempt; safe rollback, governed budget blocker)
+
+- Worker deploy `deploy-producer-worker.yml` run `30121176824` succeeded for Globe `main` SHA `5482a60a6c79b740a698a2cce9eb357b9c2f6080`; the immutable worker image was deployed and verified.
+- The API had not yet consumed the catalog code, so `deploy-internal.yml` run `30121490254` deployed `globe-api-internal` at the same SHA. Live catalog readback is `1.3.0` and includes `ref/still/nanobanana-pro-v1`.
+- Terraform temporarily applied `GLOBE_LAB_PROVIDER=vertex` to both API and worker, with `GLOBE_LAB_ENABLED=true`; after the canary attempt it was reverted via Terraform to `composite` in both runtimes. Both applies were 2 in-place changes, 0 add, 0 destroy. Current safe default is restored.
+- Break-glass `roles/iam.serviceAccountTokenCreator` was granted only on `greenhouse-globe-caller` to the operator, the ID token was minted with `--include-email`, and the grant was revoked. IAM readback verified the operator subject is absent; the pre-existing Greenhouse portal grant remains unchanged.
+- Migration `0031_add_nanobanana_pro_credit_rates.sql` was applied through the canonical database migrator (`1 applied`, `30 already applied`), adding standard/HD rates for the supported Nano Banana Pro image shapes. The live estimate then resolved the route at 10 credits.
+- Canary result: the governed estimate returned `withinDayCap=false`; the live balance was 500,008 available credits, but the active monthly policy already had 92 credits spent, so the additional 10-credit canary was correctly denied by the governed budget policy. Prepare/execute did not run; therefore no real Lab output MIME/hash is asserted and ADR-009 promotion was intentionally not attempted. This is **code complete, rollout pendiente**, not complete.
+- Next step: obtain the governed budget-policy approval/capacity for one 10-credit canary, then repeat estimate→prepare→execute→output retrieval, capture MIME/hash, and promote only after exact identity readback (`binding.modelId == estimate.model == readiness.route.modelId`).
+
 ## Active state — 2026-07-24 LATEST (TASK-1535 — golden briefs + frontier fleet defaults; canary facturable abierto)
 
 Continúa el estado LATE de abajo. Nuevo desde entonces (todo en `efeonce-globe` `main`):
