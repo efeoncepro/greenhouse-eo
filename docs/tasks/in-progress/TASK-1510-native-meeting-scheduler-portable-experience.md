@@ -41,7 +41,7 @@ El iframe funciona pero impone estética, pasos y scroll ajenos. Un simple calen
 - Instrumentar el funnel completo en GTM/GA4 con evento genérico + parámetros y cero PII.
 - Confirmar visualmente el booking sólo desde el recibo server-side de TASK-1509.
 - Pilotear un host público controlado con rollback operativo por flags, binding, host backup o versión anterior; nunca mediante embed/link visible.
-- Graduar Growth CTA hacia `open_meeting_scheduler` mediante versiones inmutables y evidencia real, sin redefinir ni eliminar el action legacy `book_meeting`.
+- Graduar todas las CTA de reuniones de Efeonce hacia `open_meeting_scheduler` mediante versiones inmutables y evidencia real; `book_meeting` queda sólo como compatibilidad técnica temporal, nunca como experiencia pública o fallback.
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
 
@@ -69,7 +69,8 @@ Reglas obligatorias:
 - No hay booking optimista. Success y `generate_lead` requieren el recibo server-confirmed.
 - WordPress/Think sólo configuran atributos allowlisted y placement; no duplican fields, booking, consent o telemetry.
 - Los estados de carga/degradación ofrecen recuperación nativa por reintento o navegación mensual. Después de `provider_dispatched`, un outcome ambiguo o booking provider-created-invalid bloquea otro intento o vía de reserva.
-- `book_meeting` conserva el contrato navigation-only de TASK-1431. Esta task no lo reutiliza como booking nativo: recomienda `open_meeting_scheduler` para authoring nuevo y migra usos existentes sólo mediante una nueva versión de CTA.
+- `book_meeting` conserva temporalmente el contrato navigation-only de TASK-1431 para no romper clientes históricos, pero no se ofrece para authoring nuevo ni se sirve como experiencia de reunión en superficies públicas de Efeonce.
+- Toda CTA de reunión nueva usa `open_meeting_scheduler`. Los usos existentes de `book_meeting` se migran o retiran mediante una nueva versión de CTA; una superficie incompatible queda sin CTA de reunión hasta soportar el runtime nativo.
 - Las versiones publicadas de CTA son inmutables. No existe migración global automática ni cambio silencioso de action kind.
 
 ## Normative Docs
@@ -277,11 +278,11 @@ Reglas obligatorias:
 ### Slice 5 — Growth CTA native-meeting graduation
 
 - Inventariar CTAs draft/published que usan `book_meeting`, su host, versión, destino y capacidad de cargar el scheduler nativo.
-- Mantener `book_meeting` como fallback legacy de navegación para hosts incompatibles o rollback; no mutar versiones publicadas.
-- Hacer inequívoco en el cockpit que `book_meeting` abre una agenda externa y que `open_meeting_scheduler` abre la agenda integrada; recomendar el action nativo para authoring nuevo cuando exista un binding activo.
+- Retirar `book_meeting` de las opciones de authoring nuevo y rotularlo como action legacy/deprecado sólo donde sea necesario administrar versiones históricas.
+- Hacer inequívoco en el cockpit que la única experiencia vigente de reunión de Efeonce es `open_meeting_scheduler`; un binding o bundle incompatible bloquea la publicación en vez de ofrecer una agenda externa.
 - Crear una nueva versión CTA con `open_meeting_scheduler`, binding/surface allowlisted y bundle compatible para el primer host aprobado.
 - Probar CTA -> task surface -> reserva real -> recibo -> HubSpot/Outlook/Teams -> dataLayer/`/g/collect`, sin PII ni slot exacto.
-- Graduar una superficie a la vez después de evidencia y aprobación; rollback por versión CTA, binding, flag y bundle anterior.
+- Graduar una superficie a la vez después de evidencia y aprobación; rollback por versión CTA nativa anterior, binding, flag, bundle anterior o pausa de la CTA, nunca mediante `book_meeting`.
 
 ## Out of Scope
 
@@ -295,7 +296,7 @@ Reglas obligatorias:
 
 The renderer is a standalone custom element with an explicit state reducer. Rendering, accessibility and telemetry consume the same typed actions so visual state and measurement cannot drift. The month table is a date-selection surface over normalized availability, not an event-management calendar. The selected-meeting summary may enter `confirmed` only from TASK-1509's successful conversion receipt. Hosts provide placement/configuration attributes; they never fork the flow or inject provider links.
 
-Growth CTA conserva dos contratos deliberadamente distintos: `book_meeting` resuelve una navegación gobernada hacia una agenda externa y no reserva; `open_meeting_scheduler` activa la task surface nativa y sí puede completar la reserva mediante TASK-1509. El cockpit debe comunicar esa diferencia antes de publicar. La graduación se ejecuta creando una versión CTA nueva, validando compatibilidad de bundle/binding y conservando la versión anterior como rollback; nunca se reinterpreta una versión ya publicada.
+Growth CTA conserva dos contratos técnicos distintos durante la migración: `book_meeting` resuelve una navegación gobernada hacia una agenda externa y no reserva; `open_meeting_scheduler` activa la task surface nativa y completa la reserva mediante TASK-1509. Sin embargo, la política de producto de Efeonce admite sólo el segundo en experiencias públicas vigentes. El cockpit no ofrece `book_meeting` para authoring nuevo y bloquea la publicación nativa cuando falta compatibilidad de bundle/binding. La graduación crea una versión CTA nueva y conserva una versión nativa anterior o la pausa como rollback; nunca reinterpreta una versión publicada ni expone HubSpot al usuario.
 
 ## Rollout Plan & Risk Matrix
 
@@ -361,9 +362,10 @@ Growth CTA conserva dos contratos deliberadamente distintos: `book_meeting` resu
 - [x] GTM generic tags are built/read back/quick-previewed in disposable workspace 6; publish still requires explicit human confirmation and live evidence.
 - [x] Host público gobernado de piloto en `https://efeoncepro.com/agenda/` (WP `251583`, `noindex`) usa exclusivamente la experiencia nativa y conserva rollback operativo por flags/binding o backups Elementor; no sustituye todavía Contacto/RRSS.
 - [x] Growth CTA exposes an additive `open_meeting_scheduler` action; `book_meeting` remains navigation-only. The native adapter lazy-loads, uses dialog/full-screen activation and preserves one connected scheduler across close/reopen.
-- [ ] El cockpit distingue “agenda externa” de “agenda integrada”, recomienda `open_meeting_scheduler` para authoring nuevo con binding activo y no presenta `book_meeting` como reserva nativa.
-- [ ] Existe un inventario verificable de CTAs que usan `book_meeting`, con decisión `migrate | retain legacy | retire` por versión/superficie y sin mutaciones in-place.
+- [ ] El cockpit no ofrece `book_meeting` para authoring nuevo; las versiones históricas lo muestran como legacy/deprecado y toda nueva CTA de reunión exige `open_meeting_scheduler` con binding activo.
+- [ ] Existe un inventario verificable de CTAs que usan `book_meeting`, con decisión `migrate | retire` por versión/superficie y sin mutaciones in-place.
 - [ ] Una versión CTA nueva con `open_meeting_scheduler` completa el flujo CTA -> scheduler -> booking controlado -> recibo y mantiene rollback por versión/binding/flag.
+- [ ] Ninguna superficie pública vigente de Efeonce renderiza un link/iframe HubSpot ni usa `book_meeting` como fallback; ante incompatibilidad, la CTA se bloquea, pausa o revierte a una versión nativa.
 - [ ] One controlled native booking verifies renderer -> adapter -> HubSpot/Outlook/Teams and `/g/collect`/GA4 evidence.
 
 ## Verification
@@ -385,7 +387,7 @@ Growth CTA conserva dos contratos deliberadamente distintos: `book_meeting` resu
   remains visible, targets are >=44 px and reduced-motion reaches the same state.
 - [x] Enterprise UI scorecard: average 4.66/5, no dimension <4 and key premium dimensions >=4.5; visual verdict `PASS`.
 - [x] CTA/scheduler contract suite: 171 tests across 25 files; action-registry/parity, lazy task-surface lifecycle, reopen continuity and responsive activation pass. TypeScript and focal ESLint pass.
-- [ ] Action-registry/cockpit tests prueban que `book_meeting` continúa navigation-only, que `open_meeting_scheduler` exige surface/binding compatible y que las labels no prometen una reserva que el action no ejecuta.
+- [ ] Action-registry/cockpit tests prueban que `book_meeting` continúa navigation-only sólo por compatibilidad, no puede seleccionarse para authoring nuevo y `open_meeting_scheduler` exige surface/binding compatible.
 - [x] CTA seam GVC `.captures/2026-07-21T11-22-29_growth-cta-native-meeting`: 10 frames, desktop/mobile, exit 0; launcher compacto, dialog/full-screen, teclado/reduced-motion y selección preservada al reabrir. Sólo `baseline_stale` pendiente de aprobación humana.
 - [x] Reactive validation GVC `.captures/2026-07-21T11-37-07_native-meeting-scheduler`: 39 frames en 1440/820/390, exit 0; neutral→invalid→valid, rechazo corporativo, teclado, reduced-motion, accessibility, layout, runtime y enterprise rubric verdes. Vitest focal 13/13, TypeScript (heap 8 GB), ESLint y bundle portable verdes.
 - [x] `pnpm fe:capture:review .captures/2026-07-21T11-37-07_native-meeting-scheduler` — dossier regenerado desde la captura aprobada.
@@ -435,5 +437,5 @@ Growth CTA conserva dos contratos deliberadamente distintos: `book_meeting` resu
 
 - Ejecutar el booking controlado/replay y read-back HubSpot/Outlook/Teams; capturar `/g/collect` sin PII ni slot exacto.
 - Publicar GTM sólo tras Preview/Tag Assistant, evidencia live y aprobación humana explícita.
-- Completar inventario/matriz de migración de CTAs `book_meeting`; crear versiones nuevas, nunca editar versiones publicadas.
-- Graduar `open_meeting_scheduler` una superficie a la vez; mantener `book_meeting` navigation-only y el scheduler native-only sin enlaces de recuperación al provider. TASK-1518 cierra después la migración/paridad del fleet de embeds.
+- Completar inventario/matriz `migrate | retire` de CTAs `book_meeting`; crear versiones nuevas, nunca editar versiones publicadas.
+- Graduar `open_meeting_scheduler` una superficie a la vez; mantener `book_meeting` sólo como compatibilidad técnica transitoria y el scheduler native-only sin enlaces de recuperación al provider. TASK-1518 cierra después la migración/paridad del fleet de embeds.
