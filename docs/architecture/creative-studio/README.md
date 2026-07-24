@@ -3,6 +3,12 @@
 > **Este es el hogar canónico de la documentación de arquitectura de Efeonce Globe / Creative Studio.**
 > La documentación de Globe vive en **`greenhouse-eo`**, no en el repo hermano `efeonce-globe`.
 
+> 🛰️ **Ledger de la flota de modelos (leer PRIMERO antes de asumir que un modelo no está integrado):**
+> [`../../operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md`](../../operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md)
+> — qué modelo/proveedor está integrado, en qué carril (Model Lab vs producción gobernada), validado cuándo y qué
+> falta para llevarlo al Producer. Vertex (imagen/Veo/Omni), Fal, ElevenLabs y el resto están integrados y validados
+> en vivo desde 2026-07-19/20; evita re-descubrirlo por forense.
+
 ## Por qué la doc vive acá y no en `efeonce-globe`
 
 EPIC-028 fija la frontera del ecosistema:

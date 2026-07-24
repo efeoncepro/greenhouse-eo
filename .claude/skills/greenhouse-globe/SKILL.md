@@ -17,6 +17,14 @@ flags, rutas promovidas, canarios y bloqueos— vive en
 `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`; nunca se infiere desde un número histórico de esta
 skill.
 
+> **LEER PRIMERO antes de asumir que un modelo/proveedor "no está" o "hay que integrarlo":**
+> `docs/operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md` — el **ledger canónico de la flota de modelos**
+> (qué modelo/proveedor está integrado, en qué **carril** — Model Lab vs producción gobernada —, validado cuándo y
+> con qué evidencia, y qué falta para llevarlo al Producer). Los proveedores del Lab (Vertex imagen/Veo/Omni, Fal
+> Seedream/Seedance, ElevenLabs, etc.) están integrados y validados en vivo desde 2026-07-19/20 — **no re-integrar**;
+> lo que suele faltar es el **driver gobernado + promoción ADR-009** por ruta. Actualizá ese ledger al integrar,
+> validar o promover cualquier modelo.
+
 ## Producer UI + media gobernada — contrato operativo
 
 - El flujo humano es `browser autenticado → BFF same-origin → API IAM-private`. Persona, workspace, surface,
