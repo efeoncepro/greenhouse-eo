@@ -35,14 +35,15 @@
 
 ## Pendientes inmediatos
 
-- **`TASK-1521` IN-PROGRESS.** El Producer interno ya produjo las tres modalidades y governance promovió un asset;
-  esto no habilita el runtime comercial. Resolver sesión expirada, outbox stale/alertas, siete promociones y la
-  arquitectura de derivados/streaming/visibilidad/GC; clientes externos siguen gateados por `TASK-1480`.
-  Plan: `docs/tasks/plans/TASK-1521-plan.md`.
+- **`TASK-1521` IN-PROGRESS.** Producer interno produjo las 3 modalidades y governance promovió un asset; no
+  habilita runtime comercial. Pendiente: sesión expirada, outbox stale/alertas, siete promociones (derivados/
+  streaming ya los cerró `TASK-1528`). Clientes externos gateados por `TASK-1480`. Plan: `docs/tasks/plans/TASK-1521-plan.md`.
 
-- **`TASK-1525` COMPLETE.** Reader live `ed5e993`; CI/deploy final verdes; base backend/feed cerrada.
+- **`TASK-1525` COMPLETE.** Reader live `ed5e993`; base backend/feed cerrada.
 
-- **`TASK-1526` COMPLETE.** `eac1730` y `2b7842c` cerraron la reconciliación keyed y continuidad visual del feed/viewer: la selección deja de reconstruir cards, previews/cache persisten por run, la UI conserva foco/media en refresh/filtros/búsqueda/orden y los títulos son client-safe. No sustituye `TASK-1528` ni declara commercial readiness. Residual de rollout cerrado 2026-07-23: Studio desplegado en `7ac0ded` (run `30049251368`, rev `00061-7n7`, 100% tráfico); API queda correcta en `eac1730` (los fixes finales sólo tocan `studio-web`).
+- **`TASK-1526` COMPLETE.** Reconciliación keyed + continuidad del feed/viewer (foco/media estables en refresh/
+  filtros/búsqueda/orden, títulos client-safe); Studio desplegado en `7ac0ded`, API `eac1730`. Detalle en su
+  task file.
 
 - **`TASK-1527` IN-PROGRESS (P0, rollout live avanzado 2026-07-23/24).** Aggregate + flag ON + recovery worker
   + señales + identities disjuntas + canary authority desplegados internal-only (`ffe4102…ff24093`, migración
@@ -72,30 +73,21 @@
   isolation/config, migrations/secrets, rollback y evidencia; las otras dependencias pueden avanzar en paralelo,
   pero ninguna la sustituye.
 
-- **`TASK-1466` COMPLETE (`EPIC-028`).** SPEC-008 desplegada y verificada internal-only: migración Cloud SQL, dos
-  revisiones Ready, smoke auth/tenant/idempotency y readback de versiones+audit verdes. Detalle en
-  `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`; clientes externos y producción siguen bloqueados.
+- **`TASK-1466` COMPLETE (`EPIC-028`).** SPEC-008 desplegada y verificada internal-only. Detalle en
+  `GLOBE_RUNTIME_HANDOFF.md`.
 
-- **`TASK-1509` / `TASK-1510` IN-PROGRESS (Native Meeting Scheduler, `EPIC-023`).** TASK-1509 está code-complete y
-  `/agenda/` (WP `251583`, `noindex`) opera native-only con flags ON y binding piloto `active`. El release inmutable
-  `2fbea2b39b555c5762e6` pasó GVC live 2048/1440/820/390, overflow, teclado y reduced motion; no se creó booking.
-  Greenhouse sigue como API y HubSpot/Office 365/Teams como SoT. GTM workspace 6 no está publicado; Contacto/RRSS
-  siguen gateados por booking/replay, `/g/collect` y autorización GTM. El 2026-07-23 el kicker del host se afinó a
-  `Reunión de 30 minutos` con backup Elementor, purge Kinsta y evidencia live 1440/390 sin overflow. Evidencia y
-  detalle viven en TASK-1510.
+- **`TASK-1509` / `TASK-1510` IN-PROGRESS (Native Meeting Scheduler, `EPIC-023`).** `/agenda/` (WP `251583`,
+  `noindex`) opera native-only con flags ON y binding piloto `active`; release `2fbea2b39b555…` pasó GVC live.
+  Greenhouse = API; HubSpot/Office 365/Teams = SoT. GTM workspace 6 sin publicar; Contacto/RRSS gateados por
+  booking/replay/`/g/collect`. Evidencia y detalle viven en TASK-1510.
 
   **Decisión corregida 2026-07-22:** `EPIC-035`/ADR V2 mantiene el runtime neutral; `TASK-1514` endurece Vercel y
   `TASK-1515` decide Vercel vs Firebase dedicado antes de provisionar. Firebase en `efeonce-group` queda no autorizado;
   cero cambios cloud/DNS/runtime. Ejecución `TASK-1514`→`1518`.
 
 - **`TASK-1366` COMPLETE / CONDITIONAL PASS (HubSpot Scheduler Booking Equivalence Spike, `EPIC-023`).**
-  Build HubSpot `#27` desplegado/reinstalado con scope Scheduler mínimo y sin rotar el token gobernado. Booking
-  real 2026-07-22 09:15–09:45 Chile verificado `isOffline=false`: `calendarEventId`/`contactId`, Teams, contacto +
-  reunión CRM `SCHEDULED`, evento Office 365 del organizador, invitado correcto y links nativos de
-  cancelación/reprogramación. El inbox invitado no se inspeccionó directamente y Scheduler no porta UTK/UTM;
-  esas condiciones pasan a productización. No cancelar la reunión salvo instrucción del operador. El spike no cambió
-  ninguna landing/GTM; su postura de fallback quedó superseded para `open_meeting_scheduler` por el rollout native-only,
-  sin alterar superficies legacy aún no migradas. Canon:
+  Booking real verificado `isOffline=false` (CRM/Teams/Office 365/links nativos); productización pendiente de
+  UTK/UTM e inbox invitado. No cancelar la reunión salvo instrucción. Canon:
   `docs/tasks/complete/TASK-1366-hubspot-scheduler-booking-equivalence.md` + `PDR-009`.
 
 - **`TASK-1506` COMPLETE (ADR-004 — Globe Frontend Hosting and Front Door Decision, `EPIC-028`).**
