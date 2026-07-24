@@ -57,6 +57,80 @@ conceder a un cliente un derecho comercial que la licencia del proveedor no conc
 - La flota objetivo promovida por el lane (internal primero, comercial después de que el CEO firme las ~O(proveedores)
   attestations), con evidencia real de términos y golden briefs por ruta.
 
+## Progress & Findings — 2026-07-24 (durable handoff; leer antes de continuar)
+
+**Estado:** Slices 1–4 shipped + desplegados + probados en vivo (api rev `00074-fwv`, web `00067-9n8`).
+Slice 5 (fleet) y el **canary facturable** parcialmente hechos; Slice 6 (docs) cerrado. La task sigue
+`in-progress` por el canary facturable y la familia frontier completa.
+
+### Hecho y pusheado (repo `efeonce-globe` main)
+
+- Autoridad de atestación por modelo + lane automatizada + techo por workspace: **live**, con canary de
+  lane verificado y **2 atestaciones comerciales firmadas por el CEO** (Vertex + Seed Audio).
+- **Golden briefs Slice 5** (commit `f62c2e4`): 6 rutas reference-conditioned + 3 rúbricas
+  (`preserve-set-v1`, `voice-transform-v1`, `voice-translation-v1`) + 2 contratos de fidelidad aditivos
+  (`voice-transform`, `voice-translation`) en `packages/contracts/src/index.ts`. Test del **segundo
+  consumidor** corre las 6 end-to-end (`packages/domain/src/evaluation.test.ts`). domain 337/0 + build.
+- **Defaults frontier corregidos** (los IDs viejos estaban cableados):
+  - OpenAI `gpt-image-1` → **`gpt-image-2`** (snapshot `2026-04-21`), commit `acb0776`
+    (`apps/creative-runner/src/openai-adapter.ts:100`). Pricing marcado `PROVISIONAL` (era de gpt-image-1).
+  - Vertex Nano Banana `gemini-2.5-flash-image` → **`gemini-3-pro-image`** (Nano Banana Pro), commit `46ab5ab`
+    (`apps/creative-runner/src/vertex-adapter.ts:103`, image-generate + image-edit).
+  - Evidencia de atestación cubre ambas familias (commit `a6dd117`, `scripts/evidence/{openai-gpt-image,vertex-generative}-commercial-terms.json`).
+- **Docs Slice 6** (repo `greenhouse-eo`, commit `dcf2c0293`): doc funcional
+  `docs/documentation/creative-studio/efeonce-globe-promocion-comercial-atestacion.md` + manual
+  `docs/manual-de-uso/creative-studio/operar-promocion-comercial-atestacion-globe.md`, ambos indexados.
+
+### Mapa de modelos frontier objetivo (decisión del operador/CEO, 2026-07-24)
+
+Familia frontier completa por proveedor, **2 modelos selectables cada una**; excluir viejos + Lite:
+
+| Familia | Miembro | Model ID | Estado |
+|---|---|---|---|
+| OpenAI | GPT Image 2 (top) | `gpt-image-2` | ✅ default |
+| OpenAI | GPT Image 1.5 | `gpt-image-1.5` | ⏳ 2.º selectable (código) |
+| Nano Banana | Pro (top) | `gemini-3-pro-image` | ✅ default |
+| Nano Banana | 2 / Flash | `gemini-3.1-flash-image` | ⏳ 2.º selectable (código) |
+
+**Excluidos a propósito:** `gpt-image-1`, `gemini-2.5-flash-image`, `gemini-3.1-flash-lite-image` (NB2 **Lite**).
+
+### Hallazgo de arquitectura load-bearing (corrige un supuesto previo)
+
+Exponer el **2.º modelo selectable por proveedor NO es data — es un slice de CÓDIGO.** Mapeo verificado:
+- Los adapters resuelven el modelo **por `capability`**, no por ruta: `OPENAI_ROUTING[capability]`
+  (`openai-adapter.ts:100`) y `VERTEX_ROUTING[capability]` (`vertex-adapter.ts:103`). El compiler ancla
+  todo a `estimate.model` (`apps/creative-runner/src/production-route-compiler.ts:154-171`): un binding a
+  `gpt-image-1.5`/`gemini-3.1-flash-image` con el adapter emitiendo el top da
+  `route_binding_missing`/`route_identity_mismatch` → **denegado**, no ejecuta en el 2.º modelo.
+- **OpenAI no tiene lane de producción:** `apps/studio-web/src/governed-production-composition.ts:71` lanza
+  `globe_governed_openai_official_verifier_missing`; el allowlist (`:183-241`) solo tiene Fal + Veo, y
+  `allowedRegions=['us-central1']` mientras las rutas image de Vertex usan `region:'global'`.
+- **Slice de código necesario** (diseñar con `arch-architect`): (a) resolución de modelo **por-ruta** en
+  los adapters; (b) `routeId`s nuevos en `packages/domain/src/producer-catalog.ts` (sin slug — drift guard
+  lo rompe); (c) entradas de endpoint allowlist por modelo + región `global`; (d) binding vía
+  `globe.production-routing.route.append` (cap `globe.production-routing.manage`); (e) promoción con
+  evidencia de eval real (ADR-009 review→propose→promote, o el lane ADR-010).
+
+### Canary facturable (acceptance criterion abierto) + gates
+
+- **gpt-image-2**: canary-able por el path del **Lab** (gasto real, llave `globe-openai-api-key`). Requiere
+  flip `GLOBE_LAB_ENABLED=true` + `GLOBE_LAB_PROVIDER=openai` en **api-internal Y el Job creative-runner**
+  (SoT Terraform `infra/terraform/`; update en vivo + declarar o se pierde al deploy). Driver: break-glass
+  token con `--include-email` (como el canary de la lane).
+- **gemini-3-pro-image / gemini-3.1-flash-image**: **PREVIEW + allowlist de Vertex.** El acceso del proyecto
+  Globe **solo se confirma corriéndolo por el runtime de Globe** (WIF SA) — probe desde creds de usuario da
+  404 en todo (hasta el 2.5 vigente), señal inútil. Si da `model_unavailable`, es gap de allowlist (se pide
+  a Google), no fixeable desde el repo.
+- **Atestación por modelo:** cada uno de los 4 necesita su firma humana (ADR-010, `requireHuman`) antes de
+  comercializarse. Evidencia lista en `scripts/evidence/`. El CEO firma en la UI (Command-K → atestar).
+- **Pricing:** los créditos del adapter OpenAI están `PROVISIONAL` (calibrados a gpt-image-1) — reverificar
+  contra el pricing real de gpt-image-2 (más caro) en el canary.
+
+### Regla dura grabada
+
+Cambiar scopes del broker OAuth Greenhouse↔Globe es rollout de **3 pasos** (broker permite → cliente pide →
+broker exige) o se cae el login de todos (pasó en vivo el 2026-07-24, revertido).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
      ═══════════════════════════════════════════════════════════ -->

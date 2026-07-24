@@ -8,6 +8,30 @@
 
 # Handoff
 
+## Active state — 2026-07-24 LATEST (TASK-1535 — golden briefs + frontier fleet defaults; canary facturable abierto)
+
+Continúa el estado LATE de abajo. Nuevo desde entonces (todo en `efeonce-globe` `main`):
+- **Golden briefs Slice 5 (pushed `f62c2e4`):** 6 rutas reference-conditioned + 3 rúbricas
+  (`preserve-set-v1`, `voice-transform-v1`, `voice-translation-v1`) + 2 contratos de fidelidad aditivos
+  (`voice-transform`, `voice-translation`). Test del **segundo consumidor** corre las 6 end-to-end. domain 337/0.
+- **Toast fix (pushed `41a2a18`, web rev `00067-9n8` desplegado):** el éxito de atestación sale como toast
+  arriba-derecha (auto-dismiss) + cierra el modal, ya no el `<p>` enterrado.
+- **Defaults frontier corregidos** (los IDs viejos estaban cableados; decisión CEO 2026-07-24): OpenAI
+  `gpt-image-1`→**`gpt-image-2`** (`acb0776`), Vertex Nano Banana `gemini-2.5-flash-image`→**`gemini-3-pro-image`**
+  (Nano Banana Pro, `46ab5ab`). Evidencia de ambas familias en `a6dd117`. Excluidos: `gpt-image-1`,
+  `gemini-2.5-flash-image`, `gemini-3.1-flash-lite-image` (NB2 **Lite**).
+- **Docs (Greenhouse `dcf2c0293`):** doc funcional + manual de creative-studio del flujo atestación+lane, indexados.
+- **Hallazgo load-bearing (corrige un supuesto):** exponer el **2.º modelo selectable por proveedor**
+  (`gpt-image-1.5` + `gemini-3.1-flash-image`) es **slice de CÓDIGO**, no data — los adapters resuelven por
+  `capability` no por ruta y el compiler ancla a `estimate.model` (`production-route-compiler.ts:154-171`);
+  además **OpenAI no tiene lane de producción** (`governed-production-composition.ts:71`). Detalle + plan en
+  `docs/tasks/in-progress/TASK-1535-*.md` §"Progress & Findings — 2026-07-24".
+- **Canary facturable (acceptance abierto):** `gpt-image-2` corre por el Lab (gasto real, key Globe) tras flip
+  `GLOBE_LAB_ENABLED=true`+`GLOBE_LAB_PROVIDER=openai` en **api-internal Y el Job creative-runner** (SoT Terraform).
+  Nano Banana Gemini-3 es **PREVIEW+allowlist de Vertex** — el acceso del proyecto Globe solo se confirma por el
+  runtime de Globe (probe user-cred da 404 en todo, inútil); si `model_unavailable`, gap de allowlist (se pide a Google).
+  Cada modelo frontier necesita su atestación humana (ADR-010) antes de comercializar; pricing OpenAI `PROVISIONAL`.
+
 ## Active state — 2026-07-24 LATE (ADR-010 / TASK-1535 — LIVE + canary-verified end-to-end)
 
 **ADR-010 está VIVO y probado end-to-end.** No es code-complete pendiente: la autoridad de atestación, el lane
