@@ -24,6 +24,16 @@
   Effectiveness y paquetes de export se habilitan por slice, y exports `policy-blocked` no frenan el primer piloto.
   No hubo cambios de runtime ni habilitación externa.
 
+## 2026-07-24 — Globe separa la paridad de avatar canónico de Producer
+
+- `TASK-1551` extrae el avatar de cuenta de `TASK-1505`: Greenhouse seguirá siendo el único source of truth de la
+  foto sincronizada desde Entra/Graph y Globe la consumirá mediante descriptor OAuth, reader self-only y BFF
+  same-origin.
+- El contrato prohíbe hardcode, copias de la foto, acceso browser-side a Graph/GCS/URLs privadas y lookups por
+  user id arbitrario. Trigger y panel usarán la foto cuando exista e iniciales como fallback.
+- Es planificación/contrato, no implementación ni deploy. `TASK-1505` recupera un cierre propio de Producer; la
+  evidencia de avatar queda aislada en `TASK-1551`.
+
 ## 2026-07-24 — ANAM publica ajustes del agente, backlog comercial y metas nativas
 
 - Las directrices de Seguimiento y Calidad y el handoff neutral del Customer Agent fueron publicadas; la landing
@@ -842,10 +852,3 @@
   desktop/mobile mirado. Island Think `GrowthCtaDock.astro` commiteada en rama local de
   `efeonce-think` (PR a señal); embed WP documentado. Master flow EPIC-023 creado. Flag
   `GROWTH_CTA_ENGINE_ENABLED` sigue OFF: flip turnkey documentado en el ledger.
-
-## 2026-07-18 — Contrato operativo GSC API, Platform Properties e indexación
-
-- `seo-aeo` documenta capacidades/scopes reales de Search Console API, el retiro del sitemap ping, el límite de
-  Indexing API y el canary obligatorio antes de asumir paridad API para Platform Properties.
-- El runbook y las skills espejo del sitio público separan el gate de publicación (URL rastreable + sitemap con
-  `lastmod` honesto) del seguimiento asíncrono de indexación. `TASK-1426` conserva la implementación pendiente.

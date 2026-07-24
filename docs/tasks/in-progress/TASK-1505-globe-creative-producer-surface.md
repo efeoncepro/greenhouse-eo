@@ -17,7 +17,7 @@
 - Motion: `docs/ui/motion/TASK-1505-globe-creative-producer-surface-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Operativa internal-only en 3 rutas promovidas; sesión expirada, outbox stale y 7 promociones pendientes`
+- Status real: `Operativa internal-only en 3 rutas promovidas; sesión expirada y 7 promociones pendientes`
 - Rank: `TBD`
 - Domain: `creative|ui|product`
 - Blocked by: `none`
@@ -166,6 +166,8 @@ Capability gates por slice (no bloquean construir la composición con fixtures t
 - Prima primitives/patterns compartidos por `TASK-1474` Workbench, sin compartir su layout brief-first.
 - Hace visible deuda backend que debe permanecer en su task dueña; no autoriza endpoints ad hoc para “hacer funcionar el botón”.
 - La promoción cliente/comercial y su host/runtime quedan fuera de esta task interna hasta el gate dueño.
+- La paridad de avatar de identidad es explícitamente out-of-scope y la posee `TASK-1551`; no bloquea el cierre
+  de la surface Producer.
 
 ### Files owned
 

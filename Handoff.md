@@ -23,7 +23,8 @@
 - Trabajo local concurrente: coordinar ownership antes de tocar archivos ya modificados.
 - **Globe Producer internal-only:** el camino humano ya generó y recuperó Image/Video/Audio reales en tres rutas
   promovidas; feed/viewer y Asset Governance funcionan. El catálogo tiene 10 rutas: las otras 7 requieren
-  evidencia/promoción/canario exactos. La reautenticación visible y el viewer multimodal ya están desplegados.
+  promoción exacta. Reauth/viewer están desplegados; `TASK-1551` posee el avatar canónico Greenhouse→Globe por
+  broker/BFF con iniciales fallback, aún sin implementación; ya no bloquea `TASK-1505`.
 - **Globe — spend fence cross-réplica pendiente (`TASK-1512`).** Hubo dry-run y gasto gobernado; falta prueba de
   contención cross-réplica.
 - **Globe — runtime fix desplegado:** Studio `f9839ee` y Worker `8d7ecb1` cerraron reauth/viewer,
