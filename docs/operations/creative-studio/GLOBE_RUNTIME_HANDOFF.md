@@ -99,10 +99,10 @@
 - Rehearsals: stage→rollback ✅ (op `promotion_ebb9a676…`, rolled_back rev 5) y recovery autónomo ✅
   (op `promotion_87922b94…`, `promotion_recovery_deadline`, sin SQL manual). El rehearsal atrapó y corrigió una
   colisión de idempotency keys stage↔rollback (`f66b24c`: `promotion:{op}:{phase}:{step}` + readback-first).
-- **Estado pendiente**: la ruta image `ref/still/rrss-v1` quedó **binding disabled (rev 2→3) + circuit open**
-  por los rollbacks del rehearsal — el Producer NO puede generar image hasta restaurarla. Restauración
-  gobernada: flag OFF (Terraform) → `appendProductionRoute(enabled:true)` + `transitionProviderCircuit(closed)`
-  con `greenhouse-globe-caller` → flag ON. Video/audio no fueron tocadas.
+- **Ruta image RESTAURADA (2026-07-24)**: binding `enabled` rev 3 + circuito `closed` rev 3, vía carril
+  gobernado (flag OFF por Terraform → `appendProductionRoute`/`transitionProviderCircuit` con
+  `greenhouse-globe-caller` → flag ON, api rev `00065-g67`, `tofu plan` No changes). El tokenCreator del
+  caller fue otorgado→usado→revocado con corte verificado. Video/audio nunca fueron tocadas.
 - Hallazgo: `model-readiness.pause` es human-only por diseño y sin superficie operable (tenancy-operator porta
   la capability desde `ca211af` pero el 403 por actor-type es correcto). El saga promote-from-candidate se
   ejercita con la primera ruta real de las 7 pendientes.

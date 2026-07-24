@@ -48,10 +48,9 @@
   + señales + identities disjuntas + canary authority desplegados internal-only (`ffe4102…ff24093`, migración
   `0028`, tofu `No changes`). Rehearsal stage→rollback ✅ (atrapó y corrigió colisión de idempotency keys por
   fase) y recovery autónomo del worker ✅ (`promotion_recovery_deadline`, señal ERROR emitida). Con el flag ON
-  el caller genérico ya NO porta `production-routing.manage`/`asset-rights-policy.manage`. **Pendiente:** ruta
-  image con binding disabled+circuit open (residuo del rehearsal; restaurar vía flag OFF→caller→flag ON, el
-  tokenCreator del caller lo bloquea el permission classifier — comando en el reporte al operador) y saga
-  promote-from-candidate con la primera ruta con evidencia real. Hallazgo: `model-readiness.pause` human-only
+  el caller genérico ya NO porta `production-routing.manage`/`asset-rights-policy.manage`. **Ruta image RESTAURADA** (binding enabled rev 3 + circuit closed rev 3, carril gobernado,
+  api rev `00065-g67`, tofu No changes, tokenCreator caller revocado con corte verificado). **Queda:** saga
+  promote-from-candidate con la primera ruta con evidencia real (no fabricable). Hallazgo: `model-readiness.pause` human-only
   sin superficie operable (follow-up). tokenCreator temporales revocados con corte verificado.
   Plan: `docs/tasks/plans/TASK-1527-plan.md`. `TASK-1528`/`TASK-1529` siguen to-do.
 

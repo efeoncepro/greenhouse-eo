@@ -221,10 +221,14 @@ complete.
   humana operable (403 correcto con tenancy-operator aunque se le agregó la capability `ca211af`). El saga
   completo promote-from-paused no es ejercitable sin fabricar camino; el path real (promote-from-**candidate**)
   se ejercitará con la primera de las 7 rutas cuando exista su evidencia real (prohibido fabricarla).
-- **Pendiente inmediato**: la ruta image quedó binding disabled + circuit open (residuo esperado del
-  rehearsal). Restauración por carril gobernado: flag OFF vía Terraform → re-enable binding + close circuit
-  con `greenhouse-globe-caller` (requiere tokenCreator del operador, bloqueado por el permission classifier)
-  → flag ON. Los 4 tokenCreator temporales del rehearsal fueron **revocados y el corte verificado**.
+- **Restauración completada (2026-07-24, autorizada expresamente)**: ruta image de vuelta operativa —
+  binding `enabled` rev 3 + circuito `closed` rev 3 vía carril gobernado (flag OFF Terraform →
+  `appendProductionRoute`/`transitionProviderCircuit` con `greenhouse-globe-caller` → flag ON, api rev
+  `00065-g67`, `tofu plan` No changes). tokenCreator del caller otorgado→usado→revocado, corte verificado.
+  Worker post-ciclo: lane promotion limpia (`claimed:0`, `promotionQueueOldestAgeSeconds:0`).
+- **Queda para cierre definitivo de la task**: ejercitar `stage→promote→activate→canary_passed` con la
+  primera de las 7 rutas reales cuando exista su evidencia (candidate + review firmada + rights + canary
+  facturable con sign-off); dar superficie humana operable a `model-readiness.pause` (follow-up).
 
 <!-- ZONE 3 — EXECUTION SPEC -->
 
