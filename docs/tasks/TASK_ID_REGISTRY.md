@@ -1626,7 +1626,8 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-1551` | `to-do` | **Globe Identity Avatar Parity.** EPIC-028; backend-data/api + ui-lite; P1/Alto/Medio. Proyección OAuth aditiva, media self-only y BFF same-origin para mostrar el avatar canónico Greenhouse en Globe con fallback de iniciales; no comparte Graph/GCS/cookies/DB. | `docs/tasks/to-do/TASK-1551-globe-identity-avatar-parity.md` |
 | `TASK-1552` | `to-do` | **Globe Producer Composer Focused Creation.** EPIC-028; ui-ux/layout; ui-standard; P1/Alto/Medio. Recomposición prompt-first con progressive disclosure, modalidades específicas, CTA de TASK-1532 y GVC premium desktop/mobile; sin backend nuevo ni ocultar créditos. | `docs/tasks/to-do/TASK-1552-globe-producer-composer-focused-creation.md` |
 | `TASK-1553` | `to-do` | **Globe Extensible Multi-Model Provider Catalog + Route-Based Model Resolution.** EPIC-028; backend-data/integration; P1/Alto/Alto. Catálogo multi-modelo extensible y elegible (best-in-class coexistiendo); resolución de modelo por-ruta en adapters para N modelos por proveedor; semántica update-vs-add. Foundation del selector UI (TASK-1552). | `docs/tasks/to-do/TASK-1553-globe-extensible-multi-model-provider-catalog.md` |
+| `TASK-1554` | `to-do` | **Globe Producer Model Fleet Availability Projection.** EPIC-028; backend-data/reader; backend-standard; P1/Alto/Medio. Reader gobernado availability-aware (catálogo × readiness/binding → `available|gated|blocked` por ruta × workspace + `recommendedDefault`); Full API Parity (un primitive, consumers selector/Nexa/MCP) para exponer toda la flota data-driven. Foundation backend del selector; UI = TASK-1555. | `docs/tasks/to-do/TASK-1554-globe-producer-fleet-availability-projection.md` |
 
 ## Siguiente ID disponible
 
-`TASK-1554`
+`TASK-1555`
