@@ -1,7 +1,11 @@
 # Efeonce Globe — Commercial Promotion via Rights Attestation Decision V1
 
 - Decision: ADR-010
-- Status: Accepted; implementation and rollout gated (TASK-1535)
+- Status: Accepted and implemented — deployed + canary-verified live (TASK-1535, 2026-07-24). The CEO signed the
+  first attestations (Vertex commercial + Seed Audio) via the Command-K modal; the automated lane promoted `foley-v1`
+  end-to-end (binding enabled + derived rights = attested posture). Enabling the human attest scope required a 3-step
+  zero-downtime broker/client rollout after a one-shot add briefly denied all Globe login (see §Delta). Live state
+  (attestations, promoted routes, flags) in `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
 - Date: 2026-07-24
 - Owners: Efeonce Globe platform, creative operations, security & commercial
 - Implements through: `TASK-1535` (under EPIC-028)
@@ -196,3 +200,26 @@ guarantees:
    for the pending routes + new frontier models, run the lane end to end (one billable canary per route class),
    internal-only first then commercial workspaces once the CEO signs the O(providers) attestations.
 6. **Docs closure** — index ADR-010 + SPEC-011, update the greenhouse-globe skill, functional + manual docs, handoff.
+
+## Delta 2026-07-24 — implemented, deployed, canary-verified live (+ the SSO scope-rollout lesson)
+
+- **Built + deployed (both services live):** attestation authority + automated lane + Command-K attest modal +
+  config-governed workspace-kind resolver. Migration `0030` applied; `globe-openai-api-key` +
+  `globe-model-rights-attestation-secret` provisioned; dedicated disjoint `globe-promotion-auto-lane` SA wired.
+- **Human sign path proven:** the CEO signed the first attestations (Vertex commercial `t/t/t`; Seed Audio, first
+  internal-eval `f/f/f`, then a **corrected commercial re-attestation** `t/t/f` after verifying that Seed Audio 1.0 is
+  now a publicly listed ByteDance model on Fal with commercial use — the prior "internal-eval-only" evidence was
+  captured during its unlisted preview and was stale; a license change is a NEW attestation under a new digest).
+- **Lane canary end-to-end:** the auto-lane SA created a disabled `foley-v1` binding (rev1) and `auto-lane.promote`
+  enabled it (rev2) + published the derived rights policy — `appliedRestrictions` exactly matched the attested grant
+  (posture applied = posture attested). Zero per-route human signing.
+- **🔴 The load-bearing lesson (do not repeat):** the broker enforces `capabilityScopes ⊆ requiredScopes` and both
+  repos hardcode their scope lists (`GLOBE_PRODUCER_CAPABILITY_SCOPES` ↔ `PRODUCER_HUMAN_CAPABILITY_SCOPES`). Adding
+  `globe.model-rights.attest` to the broker in one shot made it *required* while the deployed Globe client did not
+  request it → the broker **denied all Globe login**. The correct enablement is a **3-step zero-downtime rollout**:
+  (1) broker adds it to `allowedScopes` only; (2) the Globe client requests it (deploy); (3) the broker moves it into
+  `capabilityScopes`+`requiredScopes` — each step preserving `requiredScopes ⊆ requested ⊆ allowedScopes`, verified
+  against the live `/auth/start` and broker `authorize` between steps. Captured in the `greenhouse-globe` skill.
+- **Remaining fleet steps (scoped, non-blocking):** golden briefs for the 6 pending routes (+ rubrics for
+  `preserve-set` and the voice change/translate contracts); a billable OpenAI/commercial-client-workspace canary; the
+  functional + manual docs.

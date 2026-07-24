@@ -8,6 +8,28 @@
 
 # Handoff
 
+## Active state — 2026-07-24 LATE (ADR-010 / TASK-1535 — LIVE + canary-verified end-to-end)
+
+**ADR-010 está VIVO y probado end-to-end.** No es code-complete pendiente: la autoridad de atestación, el lane
+automatizado, el modal de Command-K y el resolver de workspace-kind están desplegados (api + web) y verificados.
+- **Attestations firmadas por el CEO (live):** `fal/seed-audio/v1` internal-eval (`mcra_a6002ca5`, f/f/f) y luego la
+  **re-atestación comercial** (`t/t/f`, digest `sha256:203d7f31…`) tras verificar que Seed Audio 1.0 ya es modelo
+  público comercial en Fal (la evidencia internal-eval era de su preview, stale). Vertex comercial (`mcra_012dfc4a`).
+  Evidencia corregida: `scripts/evidence/fal-seed-audio-commercial-terms.json`.
+- **Canary del lane VERIFICADO:** el SA `globe-promotion-auto-lane` (creado + wireado en Terraform) creó el binding
+  disabled de `foley-v1` (rev1) y `auto-lane.promote` lo habilitó (rev2) + publicó la rights policy derivada
+  (`internal-evaluation-only + no-client-delivery + no-sublicense` para la internal; comercial = solo `no-sublicense`).
+  **Postura aplicada = postura atestada.** Break-glass tokenCreator temporal revocado + corte verificado.
+- **Grant SSO habilitado con rollout de 3 pasos CERO-DOWNTIME** (tras que un add de un solo paso tumbó todo el login):
+  broker allow → Globe client request → broker require. En `develop`: commits `697776e5` (paso1) → `14d00cf7` (paso3);
+  Globe client paso2 en `main` `40325e4`. **NUNCA** agregar un capability scope del broker de Globe en un solo paso.
+- **OpenAI adapter** (`gpt-image-1`, key Globe-owned) mergeado en `main` (`c4f5469`), hermético verde, no desplegado aún.
+- **Flags/env live en el api:** `GLOBE_MODEL_RIGHTS_ATTESTATION_SECRET`, `GLOBE_WORKSPACE_KIND_CLASSIFICATIONS={greenhouse-org:efeonce:internal}`,
+  `GLOBE_PROMOTION_AUTO_LANE_CALLER_SERVICE_ACCOUNTS=globe-promotion-auto-lane@…`. Migración `0030` aplicada.
+- **Pendiente (scoped, no bloqueante):** golden briefs de las 6 rutas restantes (+ rubrics preserve-set / voice
+  change-translate); canary comercial a un workspace `client` (clasificar + pre-bind); canary facturable de OpenAI
+  (verificar pricing constants del adapter antes); doc funcional + manual del flujo de atestación.
+
 ## Active state — 2026-07-24 (ADR-010 / TASK-1535 Slice 1: model commercial rights attestation authority — code complete, rollout pendiente)
 
 **Contexto (directiva CEO 2026-07-24):** Globe es producto comercial; el equipo (y clientes vía Efeonce)

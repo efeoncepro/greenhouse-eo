@@ -449,6 +449,82 @@ original vs derivado exacto (un ticket de poster no trae el original). El mint e
 desbloqueada) son build units separados; comercial gated por TASK-1480. El estado vivo (revisiones/flags) se
 consulta en `GLOBE_RUNTIME_HANDOFF.md` § Media Derivatives, nunca en esta skill.
 
+## El octavo ejemplo — Commercial promotion via rights attestation (ADR-010 / TASK-1535): la firma humana en la unidad correcta
+
+Los ejemplos anteriores generan/promueven piezas. ADR-010 resuelve **cómo comercializar amplitud de modelos de
+frontera sin firmar readiness por ruta × workspace**. La clave no es "internal vs comercial": es que la firma humana
+estaba en la **unidad equivocada** (O(rutas × workspaces)). El fix la reubica a los dos hechos que **de verdad**
+exigen juicio humano — la **licencia por modelo** (O(modelos), en la práctica O(proveedores)) y el **artefacto que
+se entrega al cliente** (candidate→approval, ya existente) — y automatiza lo que era toil. Doc: ADR-010
+`EFEONCE_GLOBE_COMMERCIAL_PROMOTION_ATTESTATION_DECISION_V1.md`. Verificado en vivo end-to-end 2026-07-24 (el CEO
+firmó, el lane promovió `foley-v1`).
+
+**Dos piezas (SSOT + derivación).** (1) **Model Commercial Rights Attestation** — autoridad nueva, `requireHuman`,
+UNA VEZ por modelo, anclada a evidencia durable (`providerTermsRef` + `providerTermsDigest` sha256 + reviewer + el
+grant exacto: `commercialUse`/`clientDelivery`/`sublicensable`). Es un **hecho de control-plane GLOBAL, no dato de
+tenant** — por eso la tabla `model_commercial_rights_attestations` NO es workspace-RLS'd (el lane, corriendo como
+service workspace, debe leer una attestation firmada desde el workspace interno), y por eso es O(modelos). Inmutable
+por `(provider, model, version, termsDigest)`; un cambio de licencia es una attestation NUEVA (nuevo digest), el
+`getLatest` devuelve la más reciente. Vive en `packages/{contracts,domain}/src/model-commercial-rights.ts` + store
+`packages/database/src/stores/model-commercial-rights-store.ts` + migración `0030`. (2) **Automated lane** — command
+`globe.production-promotion.auto-lane.promote` (`packages/domain/src/commercial-promotion-lane.ts`), principal de
+servicio **disjunto** `globe:service:promotion-auto-lane` (workload class con `[auto-lane, model-rights.read,
+asset-rights-policy.manage, production-routing.manage]`, anti-overlap con routing/promoter/checker). Handler
+fail-closed de 7 pasos: parse → resolver workspace **kind** server-side → verificar firma de attestation → re-leer +
+re-chequear el eval report objetivo contra la ruta exacta → techo/elegibilidad → publicar rights derivados + habilitar
+el binding existente → resultado curado (sin slug/costo/margen).
+
+**El lane es un mecanismo DISTINTO, NO la saga ADR-009.** Descubrimiento load-bearing: el `promoteProductionPromotion`
+de la saga está **hardwired a un review humano firmado** (`resolveReview` + `validateReview` maker≠reviewer≠promoter)
+— ese review ES el control SoD vendible del régimen humano-craft. El régimen comercial **NO enruta por la saga y NO la
+relaja**; el lane deriva la elegibilidad (attestation verificada + eval objetivo + techo) — la pieza que legítimamente
+reemplaza la firma por ruta. **Promotion ≠ delivery**: promover hace la ruta *available*; cada artefacto client-bound
+sigue pasando candidate→aprobación humana. **La attestation es SSOT; toda postura de derechos es una DERIVACIÓN**
+(`deriveEffectiveRestrictions`, sólo aprieta). Techo por workspace fail-closed: una ruta internal-eval-only NUNCA se
+promueve a un workspace `client`.
+
+**Workspace kind: config-governed, NO del broker snapshot.** El `BrokerTenancySnapshotV1/V2` firmado **NO lleva
+`kind`** (es member-focused); cambiar ese contrato de federación firmado es out-of-scope. El kind se resuelve
+server-side desde `GLOBE_WORKSPACE_KIND_CLASSIFICATIONS` (env, JSON `workspaceId→kind`, `ConfigWorkspaceKindResolver`
+en `apps/studio-web/src/workspace-kind-resolver.ts`), **fail-closed on miss** (unknown → deny). Cada client workspace
+es un entry EXPLÍCITO — defensa en profundidad, nunca caller-declared. (El `DurableWorkspaceKindResolver` sobre
+`tenancy_workspaces.projection` queda como future path si el broker algún día lleva kind.)
+
+### 🔴 La lección que MÁS importa — el grant SSO acopla dos repos y rompió el login
+
+Habilitar `globe.model-rights.attest` para el humano **causó una caída de TODO el login de Globe**, y la causa raíz es
+una regla del broker que un agente futuro DEBE conocer:
+
+- **El broker impone `capabilityScopes ⊆ requiredScopes`** (`src/lib/sister-platforms/oauth-policy.ts`): un scope no
+  puede ser "otorgable pero opcional" — si lo otorgás, es REQUERIDO. Y **ambos repos hardcodean su lista de scopes**:
+  Greenhouse `GLOBE_PRODUCER_CAPABILITY_SCOPES` (`globe-oauth-grants.ts`) ↔ Globe `PRODUCER_HUMAN_CAPABILITY_SCOPES`
+  (`apps/studio-web/src/app.ts`). Agregar attest SÓLO en el broker lo volvió required; el cliente desplegado no lo
+  pedía → el broker **denegó todo login** ("Acceso no disponible / tu sesión no cumple la política de acceso").
+- El **fix correcto es un rollout de 3 pasos CERO-DOWNTIME**, en orden, verificando login entre cada uno: **(1)
+  Broker: attest a `allowedScopes` SOLAMENTE** (buffer transicional — permitido, aún no required/capability) → login
+  intacto; **(2) Globe client: `PRODUCER_HUMAN_CAPABILITY_SCOPES` pide attest**, deploy → login intacto (permitido,
+  aún no otorgado); **(3) Broker: mover attest a `capabilityScopes`+`requiredScopes`** → login intacto (el cliente ya
+  lo pide) y el token ahora carga la capability. Cada paso mantiene `requiredScopes ⊆ lo-que-pide-el-cliente ⊆
+  allowedScopes` por construcción.
+- **NUNCA** agregues un capability scope al grant del broker de Globe en un solo movimiento. **NUNCA** lo agregues al
+  broker antes de que el cliente Globe desplegado lo pida (ni al cliente antes de que el broker lo permita). Verificá
+  el `/auth/start` real (`curl` el redirect, mirá el `scope=`) antes del paso 3, y el broker `authorize` (303-accept
+  vs 400 invalid_scope). El script del grant es `scripts/update-globe-producer-oauth-grants.ts` (dry-run sin `--apply`;
+  corre contra greenhouse-pg vía **proxy** con `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=` vacío para deshabilitar
+  el connector que cuelga).
+
+### El canary (verificado en vivo) + fleet
+
+Canary honesto cero-spend-nuevo: reusar un eval existente (`foley-v1` / `fal`/`seed-audio`/`v1`, report
+`objective_pass` en `greenhouse-org:efeonce`). El auto-lane SA (impersonado con tokenCreator temporal + `--include-email`
+en el ID token, break-glass revocado con corte verificado) creó el binding disabled (rev1) y el `auto-lane.promote` lo
+habilitó (rev2) + publicó `appliedRestrictions` = la postura derivada de la attestation — **postura aplicada =
+atestada**. Fleet: el **OpenAI adapter** (`apps/creative-runner/src/openai-adapter.ts`, gpt-image-1, key Globe-owned
+`globe-openai-api-key` NUNCA la de Greenhouse, `image-generate` only fail-closed) enchufa en el mismo seam. Evidencia
+de términos en `scripts/evidence/*-commercial-terms.json` (Vertex, OpenAI, Fal Seed Audio) — **as-of, `reviewerMustVerify`,
+la stale se supersede con nuevo digest**. Estado vivo (attestations, rutas promovidas, flags, canarios): SIEMPRE
+`GLOBE_RUNTIME_HANDOFF.md`, nunca esta skill.
+
 ## Provider boundary
 
 - **El primer provider call *billable* entra por el mismo seam que las surfaces posteriores:** API/SDK o conformance harness → command/reader canónico → provider adapter (`packages/provider-contract`) → runner (`apps/creative-runner`). **NUNCA** un provider SDK directo desde UI/MCP/CLI/scripts/tests.
