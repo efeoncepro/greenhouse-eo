@@ -20,7 +20,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `creative-studio`
-- Blocked by: `TASK-1543`, `TASK-1544`, `TASK-1546`
+- Blocked by: `TASK-1543`
 - Branch: `task/TASK-1548-globe-storyboard-exports-interoperability`
 - Legacy ID: `none`
 
@@ -66,7 +66,9 @@ Reglas obligatorias:
 
 ### Depends on
 
-- TASK-1543, TASK-1544 and TASK-1546.
+- Hard foundation: TASK-1543 exact revision and access contract.
+- Slice gate: TASK-1544 only for comments/annotations export.
+- Slice gate: TASK-1546 only for mixed-origin handoff package export.
 
 ### Blocks / Impacts
 
@@ -176,11 +178,13 @@ Reglas obligatorias:
 
 ### Slice 2 — PDF and CSV
 
-- Deterministic storyboard PDF and shot-list CSV with exact revision identity.
+- Deterministic storyboard PDF and shot-list CSV can ship from TASK-1543 revision truth without waiting for
+  collaboration or cross-domain handoffs.
 
 ### Slice 3 — Review and handoff packages
 
-- Export authorized comments/annotations and mixed-origin handoff data with redaction rules.
+- Add authorized comments/annotations after TASK-1544 and mixed-origin handoff data after TASK-1546, each with
+  independent redaction and coverage gates.
 
 ### Slice 4 — Adapter seam and evidence
 
@@ -199,7 +203,8 @@ manifest and versioned rendering inputs, and blocks renderer work until font/lic
 
 ### Slice ordering hard rule
 
-Manifest/access → deterministic PDF/CSV → review/handoff redaction → adapter seam.
+Manifest/access → deterministic PDF/CSV. Review export joins after TASK-1544; handoff export joins after
+TASK-1546. Neither blocks the core PDF/CSV lane or forces an unavailable format to report `available`.
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 | --- | --- | --- | --- | --- |

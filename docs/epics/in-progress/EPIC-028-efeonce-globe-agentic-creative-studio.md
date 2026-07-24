@@ -164,7 +164,9 @@ evidencia, no una garantía de marketing.
   Video Effectiveness; `TASK-1547` implementa Brief/Outline/Guion/Storyboard/Review sobre Structured Sequence
   Canvas; `TASK-1548` entrega exports determinísticos; `TASK-1549` gobierna flags, grants/invites, privacidad,
   recovery, canarios y rollout. Storyboard no ejecuta modelos ni post-producción: Producer y Video Effectiveness
-  conservan autoridad y consumen una revisión narrativa exacta.
+  conservan autoridad y consumen una revisión narrativa exacta. El grafo es parallel-first: el primer fold de
+  `TASK-1547` usa fixtures desde los contratos aceptados; `TASK-1546/1548` aplican gates por slice y los exports
+  no bloquean el primer piloto de `TASK-1549` mientras permanezcan `policy-blocked`.
 - `TASK-1521` — **Globe Commercial Runtime Environment Enablement.** Posee el bloqueo actual que impide bootear
   fuera de `internal_smoke`: environment contract, isolation/config, secrets, migrations, rollback y evidencia.
 - `TASK-1506` — **frontend hosting and front door decision (RESUELTA — ADR-004).** Gate P0 cerrado: la ADR

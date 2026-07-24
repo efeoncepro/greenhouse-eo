@@ -20,7 +20,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `ops`
-- Blocked by: `TASK-1521`, `TASK-1543`, `TASK-1544`, `TASK-1545`, `TASK-1546`, `TASK-1547`, `TASK-1548`
+- Blocked by: `TASK-1521`, `TASK-1543`, `TASK-1544`, `TASK-1545`, `TASK-1546`, `TASK-1547`
 - Branch: `task/TASK-1549-globe-storyboard-client-rollout-api-parity`
 - Legacy ID: `none`
 
@@ -68,7 +68,9 @@ Reglas obligatorias:
 
 ### Depends on
 
-- TASK-1521, TASK-1543–1548 and program external gate TASK-1480.
+- TASK-1521 and TASK-1543–1547 for the first scoped client pilot.
+- TASK-1548 is optional for the first pilot: unavailable export formats remain explicitly `policy-blocked`.
+- TASK-1480 remains the program-level gate for broader external rollout.
 
 ### Blocks / Impacts
 
@@ -184,7 +186,8 @@ Reglas obligatorias:
 
 ### Slice 3 — Parity/product canaries
 
-- Exercise author/client/agent/Producer/Video Effectiveness/export and programmatic surfaces.
+- Exercise author/client/agent/Producer/Video Effectiveness and programmatic surfaces. Exercise exports only for
+  TASK-1548 formats that have deployed evidence; all others remain `policy-blocked`.
 
 ### Slice 4 — Staged rollout and docs
 
@@ -204,7 +207,7 @@ in the runtime handoff and never promotes a surface solely because its contract 
 ### Slice ordering hard rule
 
 Access/policy → signals/recovery → parity canaries → staged rollout. No client grant before revoke, privacy,
-retention and cross-workspace negatives pass.
+retention and cross-workspace negatives pass. TASK-1548 is not on this critical path.
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 | --- | --- | --- | --- | --- |
@@ -244,7 +247,8 @@ GCP/IAM, Privacy/Legal/IP, Finance, Creative owner and commercial go/no-go owner
 - [ ] Revoked/expired/cross-workspace client and mention tests fail closed without existence leakage.
 - [ ] Manual authoring remains credit-free; inference and Producer spend use existing governed policy.
 - [ ] Full API Parity and recovery are certified across exact deployed surfaces.
-- [ ] Internal, scoped client, agent, Producer, Video Effectiveness and export canaries pass.
+- [ ] Internal, scoped client, agent, Producer and Video Effectiveness canaries pass; each export surface either
+  has TASK-1548 evidence or remains explicitly `policy-blocked`.
 - [ ] Functional docs, manual, runbook and runtime handoff describe exact availability and limitations.
 
 ## Verification

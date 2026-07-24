@@ -34,8 +34,9 @@
   poseen derivados+Range y GC. No fabricar/heredar evidencia.
 - **Globe — dominios creativos diseñados, no implementados.** Video Effectiveness (`ADR-011`/`SPEC-011`,
   `TASK-1536…1541`) y Storyboard Studio/Narrative Preproduction (`ADR-012`/`SPEC-012`, contrato `TASK-1542`
-  cerrado, implementación/rollout `TASK-1543…1549`) son surfaces propias con Full API Parity y handoffs
-  gobernados. Ningún agente aprueba, gasta o muta revisiones; no se habilitaron runtime ni clientes.
+  cerrado, ejecución `TASK-1543…1549`) son surfaces propias. Storyboard usa grafo parallel-first: primer fold con
+  fixtures y gates de integración/export por slice. Ningún agente aprueba, gasta o muta revisiones; no hay runtime
+  ni clientes habilitados.
 
 ## Pendientes inmediatos
 

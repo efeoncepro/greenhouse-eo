@@ -20,7 +20,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `creative-studio`
-- Blocked by: `TASK-1543`, `TASK-1544`, `TASK-1545`, `TASK-1539`
+- Blocked by: `TASK-1543`
 - Branch: `task/TASK-1546-globe-storyboard-mixed-origin-handoffs`
 - Legacy ID: `none`
 
@@ -68,7 +68,10 @@ Reglas obligatorias:
 
 ### Depends on
 
-- TASK-1543–1545, Producer SPEC-004/005/006, asset governance and TASK-1539 Video Effectiveness integration.
+- Hard foundation: TASK-1543 plus Producer SPEC-004/005/006 and canonical asset governance.
+- Slice gate: TASK-1544 is required only for masked-edit payload enrichment.
+- Slice gate: TASK-1539 is required only for the Video Effectiveness adapter and round-trip proof.
+- TASK-1545 is an optional proposal consumer, not a prerequisite for human-authored handoffs.
 
 ### Blocks / Impacts
 
@@ -181,11 +184,12 @@ Reglas obligatorias:
 
 ### Slice 3 — Producer adapter
 
-- Exact draft/estimate/candidate return; masked edit intent remains input, not execution.
+- Exact draft/estimate/candidate return. Base handoff work can advance after TASK-1543; masked edit enrichment
+  enables only after TASK-1544.
 
 ### Slice 4 — Video Effectiveness adapter and proof
 
-- Animatic/video context out; exact shot/time findings/proposals back.
+- After TASK-1539, send animatic/video context out and receive exact shot/time findings/proposals back.
 
 ## Out of Scope
 
@@ -200,7 +204,9 @@ store only opaque downstream identities/status/lineage; no cross-domain table ac
 
 ### Slice ordering hard rule
 
-Plan vocabulary → durable handoff → Producer read-only/draft → human execute round trip → Video Effectiveness.
+Plan vocabulary → durable handoff → Producer read-only/draft → human execute round trip. Slice 4 joins only after
+TASK-1539. TASK-1544 gates masked-edit enrichment, not the base handoff. TASK-1545 may consume the resulting
+handoff command later and never blocks human use.
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 | --- | --- | --- | --- | --- |

@@ -20,7 +20,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `creative-studio`
-- Blocked by: `TASK-1543`, `TASK-1544`, `TASK-1545`, `TASK-1546`
+- Blocked by: `none`
 - Branch: `task/TASK-1547-globe-storyboard-studio-sequence-canvas`
 - Legacy ID: `none`
 
@@ -70,7 +70,11 @@ Reglas obligatorias:
 
 ### Depends on
 
-- TASK-1543–1546 and existing Globe shell/viewer/review patterns.
+- Design start: accepted ADR-012/SPEC-012, the declared UI contracts and existing Globe shell/viewer/review
+  patterns are sufficient for Slice 1 with plausible fixtures.
+- Integration gate: TASK-1543 for authoritative authoring/revision readers and commands.
+- Integration gate: TASK-1544 for persisted comments, mentions, annotations and masks.
+- Integration gate: TASK-1545 for live agent proposals and TASK-1546 for live cross-domain handoffs.
 
 ### Blocks / Impacts
 
@@ -108,7 +112,7 @@ Reglas obligatorias:
 
 ### Experience brief
 
-- UI rigor: `ui-platform`
+- UI rigor: `ui-standard`
 - Usuario / rol: `creative author, internal reviewer, scoped client reviewer`
 - Momento del flujo: `brief-to-review narrative preproduction`
 - Resultado perceptible esperado: `exact revision, sequence, selected shot and next decision are obvious`
@@ -200,16 +204,19 @@ Reglas obligatorias:
 
 ### Slice 1 — First-fold checkpoint
 
-- Implement plausible fixture with shell, sequence, selected shot and inspector; capture desktop/mobile.
+- Start immediately from accepted contracts. Implement a plausible fixture with shell, sequence, selected shot
+  and inspector; capture desktop/mobile without waiting for backend completion.
 - Stop for human `ACCEPT FIRST FOLD` before exhaustive states.
 
 ### Slice 2 — Authoring and revision perspectives
 
-- Implement Brief/Outline/Guion/Storyboard, explicit Script link/reconciliation and sequence editing.
+- After TASK-1543 contracts are available, wire Brief/Outline/Guion/Storyboard, explicit Script
+  link/reconciliation and sequence editing.
 
 ### Slice 3 — Review, proposals and handoffs
 
-- Add comments/mentions/markup/mask, agent diff, Producer/Video Effectiveness state and client review.
+- Integrate comments/mentions/markup/mask after TASK-1544, agent diff after TASK-1545 and live
+  Producer/Video Effectiveness state after TASK-1546. Until then, retain explicit fixture/policy-blocked states.
 
 ### Slice 4 — Responsive, accessibility and premium evidence
 
@@ -229,8 +236,9 @@ structured sequence, revision visibility, human gates or mobile recomposition wi
 
 ### Slice ordering hard rule
 
-First fold acceptance → authoring/revisions → review/handoffs → complete responsive/accessibility/GVC. No commercial
-surface exposure before TASK-1549.
+Slice 1 first-fold acceptance may run in parallel with TASK-1543…1546. Authoritative authoring wiring waits for
+TASK-1543; collaboration, proposal and handoff integrations wait only for their named tasks. Complete responsive/
+accessibility/GVC after the wired states exist. No commercial surface exposure before TASK-1549.
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 | --- | --- | --- | --- | --- |

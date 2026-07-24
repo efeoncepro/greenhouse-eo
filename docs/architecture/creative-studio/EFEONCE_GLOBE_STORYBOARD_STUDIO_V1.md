@@ -243,7 +243,10 @@ collaboration and integrates with post-production tools rather than replacing th
 8. TASK-1549 internal-to-client rollout and parity certification.
 
 Tasks may progress in parallel only after their named contracts exist. External client access remains subordinate
-to TASK-1480 and the commercial runtime gates.
+to TASK-1480 and the commercial runtime gates. TASK-1547 Slice 1 may prove the first fold with fixtures directly
+from the accepted UI contracts while TASK-1543…1546 progress; live integrations wait for their owner tasks.
+TASK-1548 core PDF/CSV waits only for TASK-1543, and TASK-1549 may pilot with unavailable export formats declared
+`policy-blocked`.
 
 ## 17. Open decisions
 
@@ -251,4 +254,3 @@ to TASK-1480 and the commercial runtime gates.
 - `[verificar]` whether Narrative Canon is owned here or referenced from Reference Intelligence/Style DNA.
 - `[verificar]` exact module filenames and next Globe migration number at implementation time.
 - First committed external interchange after PDF/CSV.
-

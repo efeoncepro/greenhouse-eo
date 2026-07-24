@@ -8,7 +8,7 @@
 - Direction: `docs/ui/visual-directions/TASK-1547-globe-storyboard-studio-direction.md`
 - Flow: `docs/ui/flows/TASK-1547-globe-storyboard-studio-flow.md`
 - Motion: `docs/ui/motion/TASK-1547-globe-storyboard-studio-motion.md`
-- Rigor: `ui-platform`
+- Rigor: `ui-standard`
 
 ## Experience brief
 

@@ -3,7 +3,7 @@
 ## Source and rigor
 
 - Direction mode: `repo-native-benchmark`
-- Rigor: `ui-platform`
+- Rigor: `ui-standard`
 - Product thesis: **Editorial Sequence Desk**
 - Runtime: Globe-owned UI; Greenhouse design code is not imported.
 - Architecture: ADR-012 / SPEC-012.
