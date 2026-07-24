@@ -230,6 +230,17 @@ Keep nominal backlog, weighted backlog and actual won value as separate series. 
 - fidelity target (metric, value, cadence and population) or approval to limit `budget vs real` to Growth;
 - ratification or replacement of synthetic Service pilot facts.
 
+## Client closeout communication
+
+The consolidated response to the two client email threads was prepared in
+`docs/documentation/hubspot-as-a-service/anam-seguimiento-2026-07-24.md`. It includes the live Customer Agent
+changes, all dashboard and Goal links, the `Paso siguiente` operating explanation, confirmed training/payment
+facts and the remaining ANAM inputs.
+
+Outlook allowed authenticated search and full-message readback but denied both new-draft and reply-all-draft
+writes with `ErrorAccessDenied` (`403`). No email was sent and no mailbox draft exists. The versioned plain-text
+body is the recovery artifact until mailbox write permission is restored or the operator copies it manually.
+
 ## Rollback
 
 For the unpublished agent changes, rollback is to discard the current drafts. After publication, rollback is to

@@ -46,3 +46,14 @@ Batch independently reversible writes. Separate schema creation, backfill, autom
 - Separate `PASS`, `PASS WITH LIMITATION`, `FAIL`, and `NOT TESTED`.
 - Include exact residual platform constraints and operational dependencies.
 - Do not expose credentials, private URLs, internal emails or unrelated personal data.
+
+## Client closeout message
+
+1. Read the latest source threads and distinguish client confirmations, requests, pending inputs and superseded
+   statements before drafting.
+2. Consolidate multiple threads into one new draft when no single thread owns the full closeout. Use reply-all
+   only when one thread already contains the complete audience and context.
+3. Link only client-appropriate live surfaces; describe pilot, partial and blocked assets explicitly.
+4. Default to a draft. Never report that a draft exists until the mailbox write returns success.
+5. If the email connector returns an access denial, preserve the ready-to-send plain-text body in the governed
+   client follow-up document, report the permission blocker and do not retry as a send.

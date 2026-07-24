@@ -71,3 +71,24 @@ Page-level comments were added to all three source tasks:
 - revenue: exact live configuration and HubSpot evidence URL;
 - activities: created Goals plus the native-template limitations;
 - fidelity: the missing target contract and required inputs.
+
+## Reusable execution lessons
+
+- Verify the Goal template definition before relying on its label. `Llamadas hechas` aggregates Call record IDs
+  and therefore counts every call; it does not implement ANAM's five-type subset.
+- `Crear desde cero` is subscription-dependent. A locked custom-Goal surface is a real capability boundary, not
+  permission to reinterpret the metric through `Negocios creados`, revenue or another nearby template.
+- Reconcile at three levels before saving: one period for one user, annual total for that user and aggregate total
+  for all assignees. This caught the expected 2,050 UF/month, 24,600 UF/year, 18,200 emails/year and 1,820
+  meetings/year totals.
+- HubSpot can retain an inherited Goal-name filter after creation. Clear overview filters before concluding that
+  previously created Goals disappeared.
+- Goal reports require a separate save path from Goals. Choose the source Goal, assignee grain and visual, rename
+  the generated report, explicitly select the existing dashboard and reopen the dashboard to confirm the title.
+- Aggregate Goal reports and time-series reports can hydrate at different moments. One newly created aggregate
+  preview initially showed zero while Goal overview and the monthly series showed progress. Treat the first render
+  as provisional until the surfaces reconcile.
+- The three useful visual contracts are distinct rather than decorative duplicates: aggregate attainment answers
+  current position, the line compares actual versus target over time, and bars expose assignee variance.
+- Hidden portal checkboxes were less reliable than their visible option rows during authenticated automation.
+  Verify the final checked state and saved artifact instead of assuming a click changed the intended control.

@@ -252,6 +252,8 @@
 > cliente están enumerados en
 > `docs/architecture/kortex/hubspot-as-a-service/anam-follow-up-change-set-2026-07-24.md`; QA:
 > `docs/audits/ANAM_HUBSPOT_GOALS_EXECUTION_QA_2026-07-24.md`.
+> Los espejos Codex/Claude de `hubspot-as-a-service` ya incorporan el playbook de Goals/metainformes y el fallback
+> de closeout cuando Outlook permite lectura pero deniega borradores (`403`).
 
 ## Sesión 2026-07-20 — TASK-1490 cerrada: edit/refine cross-model en Globe (verificado en vivo)
 

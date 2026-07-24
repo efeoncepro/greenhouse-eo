@@ -8,7 +8,8 @@ ANAM is an Efeonce client, not a Greenhouse product initiative, internal dashboa
 
 - HubSpot portal: `19893546`
 - Customer Agent: `Agente de clientes de ANAM`
-- Human handoff owner: Maria Paz Haeger
+- Internal human handoff owner: Maria Paz Haeger; customer-facing copy must remain role-neutral because the
+  assignee can change.
 - Public chat landing: `https://anam-2.hubspotpagebuilder.com/agente-anam`
 - CMS project: `kortex-cms-react`, project `103589049`
 - CLI account/profile: `anam-19893546` / `anam`; never replace the Kortex/Efeonce default.
@@ -39,6 +40,9 @@ ANAM is an Efeonce client, not a Greenhouse product initiative, internal dashboa
 - `docs/architecture/kortex/hubspot-as-a-service/anam-phase-3-panel-first-service-readiness-2026-07-16.md`
 - `docs/architecture/kortex/hubspot-as-a-service/anam-phase-3-forward-service-capture-contract-2026-07-16.md`
 - `docs/audits/ANAM_CUSTOMER_AGENT_QA_REPORT_2026-07-16.md`
+- `docs/architecture/kortex/hubspot-as-a-service/anam-follow-up-change-set-2026-07-24.md`
+- `docs/audits/ANAM_COMMERCIAL_BACKLOG_DASHBOARD_QA_2026-07-24.md`
+- `docs/audits/ANAM_HUBSPOT_GOALS_EXECUTION_QA_2026-07-24.md`
 
 ## RevOps object model
 
@@ -89,6 +93,17 @@ When resuming ANAM from a handoff or deciding whether to advance a phase, first 
   Workflows `1805870398` and `1805693705` remain disabled because assigning `Venta nueva` from pipeline membership
   would corrupt income classification. Canon and QA: `anam-commercial-pipeline-governance-change-set-2026-07-17.md`
   and `docs/audits/ANAM_COMMERCIAL_PIPELINE_GOVERNANCE_QA_2026-07-17.md`.
+- Commercial backlog dashboard `21329151` is live as `(PILOTO)`: 575 open Deals, 205,005.55 UF nominal and
+  77,134.72 UF weighted at the verified 2026-07-24 cutoff. It combines open Growth and Renewal stages, excludes
+  `Radar 0%` and every closed stage, and keeps nominal, weighted and actual won values separate.
+- Three native 2026 Goals are live for seven assignees: Growth revenue at 2,050 UF/month and 24,600 UF/year,
+  50 emails/person/week and 5 meetings/person/week. Dashboard `21329151` contains aggregate, time-series and
+  per-assignee reports for each Goal, nine reports total. Revenue is Growth-only; do not compare it to the full
+  Growth-plus-Renewal backlog until ANAM supplies a fidelity target or approves a Growth-only comparison.
+- Do not create ANAM Goal proxies for typed calls, qualified opportunities/quotes or win rate. The available
+  calls template counts all Call records, no equivalent native templates exist for the other two contracts and
+  custom Goal creation is locked in the current subscription. Fidelity remains blocked by missing metric, value,
+  cadence and population.
 
 ## Landing and agent seam
 
@@ -96,11 +111,19 @@ Landing intents are `cotizar`, `seguimiento_servicio` and `requerimiento_calidad
 
 `Deployment > Workflows and bots` is the governed seam for routing only selected ANAM conversations to the Customer Agent. A candidate design is a short rule-based pre-flow that identifies one of the three landing intents, captures the minimum identifying/service context and then sends documented, repeatable needs to the agent while preserving explicit-person requests, commercial commitments, investigations, complaints/appeals and sensitive actions for human handling. This is a design pattern, not evidence of a live deployment: inventory the authenticated portal before proposing it, publish only with separate approval and verify positive, excluded, human-fallback and unavailable paths after activation.
 
-Do not confuse this feature with workflow `1852406585`: that workflow is the controlled Service activation-review queue and does not route conversations or deploy the Customer Agent. Do not infer that the existing 24/7/100% chatflow configuration proves a `Workflows and bots` assignment or effective handling while the Customer Agent remains paused by the documented billing blocker.
+Do not confuse this feature with workflow `1852406585`: that workflow is the controlled Service
+activation-review queue and does not route conversations or deploy the Customer Agent. Channel configuration
+alone never proves handling; use the 2026-07-24 operational readback and real-conversation evidence.
 
 ## Customer Agent capability backlog
 
-The live 2026-07-17 baseline is knowledge-and-handoff heavy: 23 active sources, one live-chat channel configured all hours/100%, direct Help Desk handoff to Maria Paz Haeger, zero published actions and two unnamed action drafts. There is no documented runtime proof yet for CRM permissions, reply recommendations, contact/segment-aware testing, analytics/coaching, lead qualification or additional channels. Absence from the local pack is a discovery gap, not proof that the portal is ineligible.
+The 2026-07-24 readback shows the Customer Agent operational with 23 active sources, live chat configured all
+hours/100%, published Follow-up and Quality instructions and role-neutral customer-facing handoff copy. Internal
+Help Desk routing still targets Maria Paz Haeger until ANAM supplies the owner/fallback matrix. The
+post-publication live simulator accepted a prompt but did not answer within 45 seconds, so real-conversation
+regression and credit-behavior monitoring remain pending. There is still no documented runtime proof for CRM
+permissions, reply recommendations, contact/segment-aware testing, analytics/coaching, lead qualification or
+additional channels.
 
 Use this sequence after a read-only portal inventory:
 
@@ -109,11 +132,13 @@ Use this sequence after a read-only portal inventory:
 3. Inspect historical reports, knowledge gaps, coaching opportunities and source usage. Establish resolution, necessary/premature handoff, unresolved, feedback and source-quality baselines; never equate deflection with resolution.
 4. Propose a small, separately approved Contact-property allowlist. Default to view-only; HubSpot's documented native permission does not expose Company, Deal, Ticket, Service or billing ledgers.
 5. Design the first external action as a read-only `GET` status lookup through a portal-bound Kortex endpoint with verified email, response allowlist, audit and human fallback. Do not publish either existing `Nueva acción` draft until its purpose, endpoint and security contract are known.
-6. After ANAM resolves billing and activation is read back, use a reversible coverage cohort or bounded hours before returning to 100%; verify real conversations and credit behavior.
+6. Verify real conversations and credit behavior on the active channel before expanding coverage or channels.
 7. Evaluate email/form deployment, then WhatsApp. Treat calling and custom channels as eligibility-dependent betas and prove whether they satisfy the separate 600-number requirement.
 8. Keep lead qualification beta last. The current operating model assigns qualification, commitments and exceptions to people; changing lifecycle or routing from the agent requires explicit ANAM ratification and CRM-write QA.
 
-No item in this backlog authorizes a CRM permission, action publication, beta opt-in, new channel, handoff rewrite or deployment change. The current billing blocker still prevents claiming autonomous runtime even if configuration remains visible.
+No item in this backlog authorizes a CRM permission, action publication, beta opt-in, new channel, handoff rewrite
+or deployment change. Operational status does not remove the remaining real-conversation and credit-monitoring
+gate.
 
 ## Operational lessons
 
@@ -123,7 +148,10 @@ No item in this backlog authorizes a CRM permission, action publication, beta op
 - Billing/administrative information should be answered when documented. Escalate only the action requiring a person.
 - Technical quotation needs service-specific intake and can require more than two questions.
 - Native transfer can pre-empt short answers. Transfer copy is part of the experience.
-- Customer Agent and 30,000 additional credits were confirmed purchased on 2026-07-16. Live readback on 2026-07-17 showed 33,000 monthly credits, but the account is overdue on invoice `#760627868` (due 2026-06-07) and the operator has restricted billing access. Two approved activation attempts failed server-side and credit usage remained off. Treat this as an ANAM billing-administration blocker: do not pay or change subscriptions; after ANAM regularizes the invoice, retry activation, require `ACTIVADA`, resume the agent and verify new-conversation handling. Configuration, 23 sources and the chatflow remain present; load the independent source pack before any knowledge change.
+- Customer Agent and 30,000 additional credits were confirmed purchased on 2026-07-16. The overdue-invoice
+  activation failures observed on 2026-07-17 are historical, not the current state: authenticated readback on
+  2026-07-24 showed the agent operational and 33,000 credits per cycle. Do not pay or change subscriptions;
+  continue real-conversation and credit-use monitoring.
 - Classify client attachments before modeling: migration source records, configuration inputs, reference-only evidence and exclusions are different contracts. For ANAM, only the billing ledger and customer-segmentation workbook are migration candidates. Billing remains no-go; segmentation has one approved exact/unique slice live, while held, unmatched and ambiguous rows remain no-go until separate identity, mapping, dry-run and approval gates close.
 - Do not upload vendor subscription PDFs, presentation slides, email signatures, voicemail artifacts or superseded process documents into CRM records or Customer Agent knowledge merely because they were attached to a client email.
 - For client-facing custom properties, use a natural visible label and a stable snake_case internal name. ANAM's governed example is label `Segmento de mercado` with internal name `segmento_de_mercado_anam`; do not expose implementation qualifiers in the label unless users need them.

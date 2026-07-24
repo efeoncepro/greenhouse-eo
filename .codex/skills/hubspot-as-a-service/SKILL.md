@@ -15,7 +15,7 @@ Operate HubSpot as an accountable managed service, not as a collection of portal
    - Customer Agent: [customer-agent.md](references/customer-agent.md)
    - RevOps/schema: [revops-schema.md](references/revops-schema.md)
    - Property types, calculations, sync, rollups, scores or smart properties: [property-types.md](references/property-types.md)
-   - Reports and dashboards: [report-design.md](references/report-design.md)
+   - Reports, dashboards, native Goals and Goal reports: [report-design.md](references/report-design.md)
    - Marketing/sales email or sequence automation by API: [email-api-routing.md](references/email-api-routing.md)
    - ANAM: [anam-case.md](references/anam-case.md)
 4. When the work derives from a sold implementation, read `../hubspot-solutions-partner/modules/12_IMPLEMENTACION.md`; for agents, also read `../hubspot-solutions-partner/modules/13_AGENTES.md`. Product claims and prices remain owned by that skill's `SOURCES.md`.

@@ -30,6 +30,30 @@
 
 Builder availability is a runtime fact. Standard report editors commonly expose horizontal/vertical bar, line, area, donut/pie, summary, gauge and table. The custom report builder may add KPI comparison, combination, pivot and scatter depending on subscription and data sources.
 
+## Native Goals and Goal reports
+
+Use native Goals only when an available template represents the approved business contract without changing its
+population or measure.
+
+1. Inspect the template definition, object, property, aggregation and unit before creating the Goal.
+2. Confirm assignees, pipeline, cadence, fiscal-year alignment and every period target. Reconcile the per-period,
+   per-user and annual aggregates before saving.
+3. Read back the Goal from the overview after creation; clear inherited name/template filters before concluding
+   that another Goal is absent.
+4. Build three complementary Goal reports when they add real decisions: aggregate indicator, time series against
+   target and per-assignee bars.
+5. Rename every report explicitly, select the existing destination dashboard during save and reopen the dashboard
+   to verify all titles.
+
+Do not substitute a nearby template for an unsupported metric. A calls template that aggregates record IDs counts
+all calls unless its definition exposes the required type filter. Deal creation is not qualified-opportunity
+volume, and revenue is not win rate. When `Create from scratch` is entitlement-locked, document the limitation or
+use a governed report with an explicit denominator instead of creating a misleading Goal.
+
+Goal overview and Goal-report builders can hydrate at different times. If an aggregate report initially shows
+zero while overview or the time series contains progress, treat it as propagation/readback drift: wait, reopen and
+reconcile before publishing the number as authoritative.
+
 ## Dashboard composition
 
 Use three reading layers:
@@ -87,3 +111,7 @@ Verify:
 - For a cross-object chart, reconcile both the eligible base population and the joined known-dimension cohort. The chart total answers only for covered records; keep the missing-association/unknown-dimension queue visible in Data Quality.
 - Do not aggregate monetary value by a multi-select execution geography: one Deal can contribute to several regions and inflate the total. Use a mutually exclusive Company headquarters dimension for additive comparison, or present execution geography as non-additive counts with the overlap disclosed.
 - Before summing money, verify whether the selected property is normalized to one portal/company currency or preserves record currency. Never let a display format imply exchange conversion.
+- Goal-report controls can be visually selectable while the hidden checkbox remains awkward to automate. Click
+  the visible option, verify the checked state, and never infer the chosen visual from the create button alone.
+- The Goal-report creator can normalize the source Goal label. Set an explicit client-safe report title during
+  save instead of accepting the generated lowercased or de-accented name.

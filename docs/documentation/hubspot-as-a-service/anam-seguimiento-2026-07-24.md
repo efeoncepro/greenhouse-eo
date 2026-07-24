@@ -129,3 +129,11 @@ Para cerrar los siguientes bloques necesitamos que ANAM confirme:
 Saludos,
 
 Julio
+
+## Estado de preparación y envío
+
+El texto se consolidó después de leer los dos hilos fuente del 22 de julio: la respuesta a la minuta de KPI y el
+hilo de ajustes del Customer Agent. Outlook permitió leer ambos mensajes, pero devolvió `ErrorAccessDenied`
+(`403`) al intentar crear un correo nuevo y también un borrador de respuesta a todos. No existe un borrador
+guardado en el buzón y no se envió el mensaje. Este documento conserva el cuerpo listo para copiar o para reintentar
+como borrador cuando se restablezca el permiso de escritura.

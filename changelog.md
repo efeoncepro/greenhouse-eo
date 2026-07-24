@@ -18,6 +18,9 @@
 - Llamadas tipificadas, oportunidades/ofertas, tasa de cierre y Fidelización permanecen sin meta nativa cuando la
   plantilla o el contrato de datos no permiten una representación fiel. Notion y la documentación ANAM registran
   el motivo y el siguiente gate.
+- Los espejos Codex/Claude de `hubspot-as-a-service` incorporan el playbook reusable de Goals/metainformes,
+  reconciliación de propagación, límites de templates y fallback de comunicación cuando Outlook permite lectura
+  pero deniega la creación de borradores.
 
 ## 2026-07-24 — Globe: derivados de media versionados + entrega por Range (TASK-1528)
 
