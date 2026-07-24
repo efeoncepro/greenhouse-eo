@@ -26,7 +26,8 @@ States used here:
 |---:|---|---|---|---|
 | P0 | Pipeline automations | Ready for controlled slice | Efeonce proposes exact task contracts; ANAM ratifies operational parameters | Eight workflows tested on future stage entry, with no historical task wave |
 | P0 | Controlled pipeline QA | Ready after automation draft | Efeonce runs positive/negative test Deals in each pipeline | Required fields block and allow exactly as designed; test records quarantined/cleaned |
-| P0 | Customer Agent availability | Blocked by ANAM billing administration | ANAM regularizes overdue billing; Efeonce retries activation | Credit usage active, agent resumed and a real new conversation verified |
+| P0 | Customer Agent availability | Operational on 2026-07-24 | Efeonce monitors channel, credits and conversation QA | Channel remains active, new conversations respond and credit behavior is observable |
+| P0 | Customer Agent follow-up/Quality refinement | Draft QA passed; publication pending | Approve and publish the neutral handoff and intent-specific guidelines | Live regression passes without naming an assignee |
 | P1 | DQ adoption and baseline refresh | Operational program | Deal owners correct omissions; Efeonce reads back coverage and queues | Stable cadence, named owners and trustworthy denominator by cohort |
 | P1 | Service fact ratification | Approval pending ANAM | Maria Paz/ANAM ratifies or replaces the five synthetic pilot inputs | Pilot facts become reviewed facts or remain explicitly excluded |
 | P1 | Deal/line item → Service materializer | Blocked by ratified mapping/operating contract | Efeonce builds idempotent per-line-item proposal/execution path | Retry-safe creation, exact lineage, positive/negative tests and rollback |
@@ -157,19 +158,19 @@ NPS or deterministic health score.
 
 ## 6. Customer Agent availability
 
-The configuration, landing, chatflow and 23 knowledge sources remain present. Runtime service is blocked by the
-documented overdue ANAM account/invoice state; two approved activation attempts failed and credit usage remained
-off. Efeonce must not pay or change ANAM's subscription.
+The configuration, landing, chatflow and 23 knowledge sources remain present. On 2026-07-24 the agent was
+operational again, with active live chat, all-hours coverage and draft-preview responses. The billing blocker
+recorded on 2026-07-17 is historical evidence and no longer the current operating state.
 
-Exit sequence:
+The remaining controlled slice is behavioral:
 
-1. ANAM billing administrator regularizes the account.
-2. Efeonce retries `Uso de créditos` and requires live readback `ACTIVADA`.
-3. Resume the agent and verify the channel accepts a new conversation.
-4. Run a real bounded QA covering natural language, multi-turn memory, technical accuracy, handoff and failure.
-5. Confirm credit behavior and record the availability window.
+1. publish the drafted Follow-up scope: results/reports, scheduling and billing, without redirecting to residues;
+2. publish the Quality intake requirement: name, company, email and specific detail;
+3. keep customer-facing handoff generic (`una persona del equipo`) and the assignee internal;
+4. rerun live Follow-up, Quality and unavailable-agent regressions;
+5. record credits, timestamp, published version and rollback.
 
-Configuration presence alone does not prove the Customer Agent is serving new conversations.
+Configuration presence alone still does not prove availability; validate a new conversation and response.
 
 ## 7. Billing integration
 

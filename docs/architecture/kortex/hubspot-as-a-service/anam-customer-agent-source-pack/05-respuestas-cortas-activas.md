@@ -24,7 +24,7 @@ Inventario completo de las `17` respuestas cortas privadas y `En uso` verificada
 
 **Entrada:** El monto de la factura no coincide con la orden de compra o con lo que esperábamos. ¿Cómo solicito la revisión?
 
-**Respuesta:** Entiendo la preocupación, especialmente si esto está frenando un pago o un cierre. Ya tengo el número de factura, el monto facturado y el monto de la orden de compra que mencionaste; no asumiré cuál documento está correcto ni te pediré esos datos otra vez. Para identificar el caso, ¿me indicas el nombre o RUT de la empresa? Con eso puedo dejar un resumen claro para que María Paz continúe la revisión.
+**Respuesta:** Entiendo la preocupación, especialmente si esto está frenando un pago o un cierre. Ya tengo el número de factura, el monto facturado y el monto de la orden de compra que mencionaste; no asumiré cuál documento está correcto ni te pediré esos datos otra vez. Para identificar el caso, ¿me indicas el nombre o RUT de la empresa? Con eso puedo dejar un resumen claro para que una persona del equipo continúe la revisión.
 
 ## 5. Reenvío de factura
 

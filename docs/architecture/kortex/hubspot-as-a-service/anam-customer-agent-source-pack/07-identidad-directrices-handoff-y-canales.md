@@ -1,6 +1,6 @@
 # ANAM — Identidad, directrices, transferencia y canales
 
-Configuración live verificada en el portal `19893546` el `2026-07-17`. Este archivo documenta el contrato que gobierna cómo se usa el conocimiento; no es una fuente técnica adicional.
+Configuración live verificada en el portal `19893546` el `2026-07-24`. Este archivo documenta el contrato que gobierna cómo se usa el conocimiento; no es una fuente técnica adicional.
 
 ## Identidad
 
@@ -75,16 +75,17 @@ Transferir sólo cuando:
 
 No transferir al primer uso de palabras como factura, pago, OC, seguimiento, reclamo, urgente, revisar o cotización. Responder orientación documentada y pedir sólo contexto mínimo. No transferir información técnica, servicios, normas, metodologías, parámetros, plazos estándar, orientación general de muestras, administración general o felicitaciones.
 
-Antes de transferir: resumir en una frase y avisar que María Paz continuará con el contexto.
+Antes de transferir: resumir en una frase y avisar que una persona del equipo continuará con el contexto. El
+copy nunca debe nombrar al assignee porque el responsable puede cambiar.
 
-### Proceso live
+### Proceso actual y borrador
 
 - Transferencia directa; crea ticket en help desk.
 - Bandeja: `Asistencia al cliente`.
-- Asignada a: `Maria Paz Haeger`.
-- Mensaje disponible: “Entiendo. Gracias por compartir el contexto; no tendrás que repetirlo. Te paso con María Paz para que continúe la revisión.”
+- Asignación interna actual: `Maria Paz Haeger`; no se expone al visitante y se reemplazará cuando ANAM confirme la matriz de responsables.
+- Mensaje disponible, guardado como borrador: “Entiendo. Gracias por compartir el contexto; no tendrás que repetirlo. Te paso con una persona del equipo para que continúe la revisión.”
 - Si no está disponible: ticket sin asignar, chat abierto.
-- Mensaje no disponible: “Entiendo. Gracias por compartir los antecedentes; no tendrás que repetirlos. Dejé tu solicitud encaminada y María Paz podrá continuar la revisión cuando esté disponible. El chat quedará abierto.”
+- Mensaje no disponible, guardado como borrador: “Entiendo. Gracias por compartir los antecedentes; no tendrás que repetirlos. Dejé tu solicitud encaminada y una persona del equipo podrá continuar la revisión cuando esté disponible. El chat quedará abierto.”
 
 ## Canales y acciones
 
@@ -100,6 +101,9 @@ Inactividad de chat: personalizada a `1 día`. En la inspección DOM ninguna de 
 
 Acciones: no hay una acción publicada en `Mis acciones`. Existen dos elementos `Nueva acción` en estado `Borrador`, creados el 22 y 24 de junio de 2026. No tratarlos como capacidad activa ni activarlos sin diseño, QA y aprobación.
 
-## Drift runtime
+## Estado runtime
 
-El agente figura pausado por término de acceso gratuito y `Reanudar` está deshabilitado. La cuenta conserva `33.000` créditos mensuales, pero está vencida por la factura `#760627868` con vencimiento `2026-06-07`; dos intentos de activar el uso fueron rechazados por HubSpot y el toggle siguió `DESACTIVADA`. El chatflow y la transferencia siguen configurados, pero el agente no recibe conversaciones nuevas mientras un administrador de facturación ANAM no regularice la cuenta y se complete el readback de activación.
+El agente está operativo nuevamente. El canal live chat permanece activo, con horario de todas las horas y 100%
+de cobertura. La cuenta muestra 33.000 créditos por ciclo y consumo visible. El bloqueo administrativo observado
+el 2026-07-17 queda cerrado como estado vigente, aunque se conserva en la evidencia histórica. Los ajustes de
+Seguimiento, Calidad y copy neutral permanecen como cambios no publicados hasta completar su gate.

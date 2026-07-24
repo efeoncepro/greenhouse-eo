@@ -1,8 +1,8 @@
 # ANAM HubSpot Managed Service end-to-end
 
 > **Tipo:** Documentación funcional
-> **Versión:** 1.3
-> **Actualizado:** 2026-07-17
+> **Versión:** 1.4
+> **Actualizado:** 2026-07-24
 > **Cliente/portal:** ANAM / `19893546`
 > **Canon técnico:** [`../../architecture/kortex/hubspot-as-a-service/README.md`](../../architecture/kortex/hubspot-as-a-service/README.md)
 > **Manual:** [`../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md`](../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md)
@@ -29,21 +29,21 @@ un ítem fuente de facturación. No se deben aplanar estos hechos en Company o D
 ## Customer Agent y landing
 
 La landing live abre el chat oficial con tres intenciones: cotizar, seguimiento del servicio y requerimientos de
-calidad. Customer Agent responde conocimiento documentado, reúne contexto y deriva a Maria Paz Haeger cuando
-hace falta una acción humana. El source pack independiente y reconciliado versiona las 23 fuentes en uso, las
+calidad. Customer Agent responde conocimiento documentado, reúne contexto y deriva a una persona del equipo cuando
+hace falta una acción humana. El nombre del assignee se mantiene como routing interno y no forma parte del copy
+visible. El source pack independiente y reconciliado versiona las 23 fuentes en uso, las
 17 respuestas cortas, el catálogo de 356 registros y el contrato de identidad/directrices/handoff/canales.
 
-Aunque la compra de Customer Agent y 30.000 créditos adicionales fue confirmada el 16 de julio, el readback live
-del 17 de julio mostró 33.000 créditos mensuales, `El acceso gratuito terminó`, agente pausado y conversaciones
-nuevas en pausa. La cuenta está vencida por la factura `#760627868` (venció el 7 de junio de 2026) y HubSpot
-rechazó dos intentos confirmados de activar el uso de créditos. Es un bloqueo administrativo de facturación, no
-una eliminación de la configuración ni falta nominal de créditos. No hubo mutación efectiva durante los intentos.
+El readback del 24 de julio confirmó que Customer Agent volvió a operar, con live chat activo, cobertura de todas
+las horas y pruebas de respuesta disponibles. El bloqueo administrativo observado el 17 de julio queda como
+antecedente histórico, no como estado vigente. Los ajustes posteriores de Seguimiento, Calidad y copy neutral
+están en borrador y requieren publicación controlada.
 
 ## Estado por fase
 
 | Fase | Estado | Resultado vigente |
 |---|---|---|
-| Customer Agent y landing | Configuración cerrada; runtime bloqueado | Landing, tres intents, 23 fuentes, handoff y QA; agente pausado por acceso al 2026-07-17. |
+| Customer Agent y landing | Operativo; mejora en borrador | Landing, tres intents, 23 fuentes y canal activo. Ajustes de Seguimiento, Calidad y handoff neutral con QA favorable, pendientes de publicación. |
 | Growth y calidad | Cerrada | Data Quality `21144697`, Growth `19708354`, siete assets y outcome exacto. |
 | Catálogo | Suficiente | 505/506 líneas tienen Product; 220/220 líneas ganadas resuelven a Product. |
 | Service y contrato | Piloto live | Grupo, diez propiedades, asociaciones, cinco Services y workflow `1852406585`. |

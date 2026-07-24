@@ -39,18 +39,20 @@ Confirmado live:
 - catálogo de parámetros, métodos, límites y días estándar;
 - 17 respuestas cortas de casos críticos;
 - directrices publicadas el 16 de julio;
-- handoff a María Paz / Asistencia al cliente;
+- handoff a `Asistencia al cliente`; el assignee actual es interno y el mensaje visible no depende de su nombre;
 - chatflow 24/7 con 100% de cobertura configurada;
 - cero acciones publicadas y dos borradores.
 
-Drift detectado:
+Drift histórico detectado el 2026-07-17:
 
 - La documentación del 16 de julio decía que no existía bloqueo actual de continuidad después de confirmar compra y 30.000 créditos.
 - El runtime del 17 de julio muestra término de acceso gratuito, agente pausado y `Reanudar` deshabilitado.
 - Cuenta y facturación muestra `33.000` créditos mensuales, pero la cuenta está vencida y existe una factura atrasada: `#760627868`, emitida el `2026-05-08`, vencimiento `2026-06-07`.
 - El usuario operador tiene acceso restringido a facturación. Dos confirmaciones explícitas de `Activar` fueron rechazadas con `No se pudo reanudar el uso de Agente de clientes`; el toggle permaneció `DESACTIVADA`.
 
-Acción requerida: un administrador de facturación de ANAM debe regularizar la factura vencida. Después, reintentar `Cuenta y facturación -> Créditos de HubSpot -> Agente de clientes -> Uso de créditos`, comprobar `ACTIVADA`, reanudar el agente y verificar que acepte conversaciones nuevas. No se cambió facturación ni se logró una mutación efectiva de HubSpot durante esta captura.
+Estado actualizado el 2026-07-24: el Customer Agent está operativo y el canal acepta pruebas en previsualización.
+El bloqueo anterior ya no gobierna la operación actual. Los cambios de Seguimiento, Calidad y handoff neutral
+están guardados como borrador, con QA favorable, pero siguen pendientes de publicación.
 
 ## Checks antes de republicar knowledge
 

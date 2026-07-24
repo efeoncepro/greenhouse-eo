@@ -111,6 +111,10 @@ Requests from client emails or Notion tasks are intake, not executable schema. B
 - Governed Deal execution-country property, Kortex release evidence and non-additive reporting contract: [`anam-deal-execution-countries-change-set-2026-07-17.md`](anam-deal-execution-countries-change-set-2026-07-17.md)
 - Executed Deal pipeline governance, renewal-stage redesign and prospective automation boundary: [`anam-commercial-pipeline-governance-change-set-2026-07-17.md`](anam-commercial-pipeline-governance-change-set-2026-07-17.md)
 - Canonical open-work backlog, dependencies, approvals and exit gates: [`anam-open-work-and-exit-gates-2026-07-17.md`](anam-open-work-and-exit-gates-2026-07-17.md)
+- July follow-up change set for Customer Agent, licenses, SLA and backlog: [`anam-follow-up-change-set-2026-07-24.md`](anam-follow-up-change-set-2026-07-24.md)
+- Client follow-up summary and draft email: [`../../../documentation/hubspot-as-a-service/anam-seguimiento-2026-07-24.md`](../../../documentation/hubspot-as-a-service/anam-seguimiento-2026-07-24.md)
+- Operator guide for `Paso siguiente`, seats and Outlook web: [`../../../manual-de-uso/hubspot-as-a-service/anam-paso-siguiente-licencias-y-outlook.md`](../../../manual-de-uso/hubspot-as-a-service/anam-paso-siguiente-licencias-y-outlook.md)
+- Follow-up Customer Agent QA: [`../../../audits/ANAM_CUSTOMER_AGENT_FOLLOWUP_QA_2026-07-24.md`](../../../audits/ANAM_CUSTOMER_AGENT_FOLLOWUP_QA_2026-07-24.md)
 - Deal-to-Company association remediation dry run, owner queues and approval boundary: [`anam-deal-company-association-remediation-dry-run-2026-07-16.md`](anam-deal-company-association-remediation-dry-run-2026-07-16.md)
 - Final scoped QA verdict: [`../../../audits/ANAM_REVOPS_CHANGE_SET_QA_2026-07-16.md`](../../../audits/ANAM_REVOPS_CHANGE_SET_QA_2026-07-16.md)
 
@@ -118,4 +122,9 @@ The native Service schema, five-record controlled pilot, activation-review queue
 
 ## Operational dependency
 
-ANAM confirmed on 2026-07-16 that Customer Agent and 30,000 additional credits were purchased. Authenticated runtime readback on 2026-07-17 shows 33,000 monthly credits, but also an overdue account and invoice `#760627868` due since 2026-06-07. Two approved activation attempts reached HubSpot confirmation and failed server-side; credit usage remained off, the agent paused and new conversations paused. This is an administrative billing blocker, not missing knowledge or nominal credit capacity. An ANAM billing administrator must regularize the overdue invoice before Efeonce retries activation and verifies the channel. The 23 sources and channel configuration remain present; do not infer that the agent is serving new conversations merely because configuration exists.
+ANAM confirmed on 2026-07-16 that Customer Agent and 30,000 additional credits were purchased. The
+administrative billing blocker observed on 2026-07-17 is no longer the current state: authenticated inspection on
+2026-07-24 showed the agent operational, its live-chat channel active and tests responding. The account exposes
+33,000 credits per cycle. Continue to verify a real new conversation, response and credit behavior; configuration
+presence alone does not prove availability. The Follow-up, Quality and neutral handoff improvements are saved as
+unpublished drafts and remain rollout-pending.
