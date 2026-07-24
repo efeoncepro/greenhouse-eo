@@ -8,6 +8,19 @@
 
 # Handoff
 
+## Active state — 2026-07-24 (TASK-1554 — fleet availability reader code-complete)
+
+- **Reader nuevo `globe.producer.fleet.list`** (`efeonce-globe` `c3b6bf4`, pushed a `main`): proyecta cada ruta del
+  catálogo con `availability` (`available|gated|blocked`) derivada de readiness `promoted` × binding `enabled` por
+  ruta×workspace + `recommendedDefaults`. Foundation Full API Parity del selector del Producer (TASK-1555 = UI consumer,
+  Nexa/MCP). `pnpm check` + `pnpm build` verdes, 12 tests de dominio.
+- **Decisión de diseño:** el ceiling ADR-010 por `kind` se HEREDA de la promoción (un binding sólo queda `enabled` tras
+  pasar el ceiling), así el reader no re-deriva `kind` (evita el muro `resolveKind=undefined` de la proyección de
+  tenancy 0013) y no puede marcar `available` nada no promovido+enabled. Sin slug en la proyección (view pública).
+- **Rollout-pending:** deploy del reader (api/worker) + readback runtime contra una ruta promovida real (Nano Banana
+  Pro tras ADR-009). El "cada modelo funcionando en el Producer + prueba UI" es el gate del programa: TASK-1554 (backend)
+  → TASK-1555 (selector UI) → promociones ADR-009 → verificación GVC/Playwright.
+
 ## Active state — 2026-07-24 (TASK-1553 latest; canary green, promotion pending)
 
 - Governed Vertex-image driver + global endpoint allowlist are deployed at Globe `main` SHA `9b62b193016ffe13c42c679be50fb28d19fc0f24`; API run `30125681964`, worker build `30125679964`, and worker deploy `30125918755` succeeded.

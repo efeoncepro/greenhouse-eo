@@ -100,7 +100,7 @@ Para llevar una ruta del Lab al Producer hacen falta 4 cosas (las 2 primeras son
 | **Gemini Omni** | **construir driver gobernado** (Interactions API) → allowlist → promoción | código (Globe) + Codex |
 | GPT Image 2/1.5 | **verifier de producción OpenAI** (código) → promoción | código (Globe) + Codex |
 | Nano Banana 2 | **allowlist de Google** (externo) → luego ruta + driver + promoción | Google + luego equipo |
-| **Exponer la flota data-driven** | **`TASK-1554`** — reader gobernado availability-aware (foundation; un primitive, muchos consumers) | backend-data |
+| **Exponer la flota data-driven** | **`TASK-1554` — CODE-COMPLETE** (`efeonce-globe` `c3b6bf4`): reader gobernado `globe.producer.fleet.list` (availability `available\|gated\|blocked` por ruta×workspace + `recommendedDefaults`); `pnpm check`+`build` verdes, 12 tests. Falta: deploy + readback runtime | backend-data |
 | **Selector visible (todos)** | **`TASK-1555`** — UI del Producer, consumer de TASK-1554 (bloqueada por ella) · `TASK-1552` recompone la jerarquía del composer, distinto | UI (ui-ux) |
 
 **Secuencia recomendada:** (a) promover las rutas que ya tienen driver (Fal + Veo + Nano Banana Pro) — es el

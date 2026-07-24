@@ -277,15 +277,15 @@ N/A — repo-only + reader read-only en el runtime de Globe; no toca cloud, bill
 
 ## Acceptance Criteria
 
-- [ ] Source of truth nombrado: proyección = catálogo × readiness/binding × `recommendedDefault`; la task es reader, no SoT.
-- [ ] Contract surface nombrado: reader gobernado de flota (`fleet.list` nuevo o `catalog.list` extendido aditivo) con `availability` + `gateReason` + `recommendedDefault`; backward-compatible.
-- [ ] `availability` (`available|gated|blocked`) se deriva de readiness `promoted` + binding `enabled` por ruta × workspace; ningún valor hardcodeado (test lo prueba).
-- [ ] Workspace boundary explícito: ruta promovida en A no es `available` en B; ceiling por `kind` respetado (internal-eval nunca `available` en workspace `client`).
-- [ ] No-slug-leak sobre todo campo visible de la proyección (test verde); `model` público expuesto, slug/costo/margen no.
-- [ ] `recommendedDefault` por capacidad expuesto; si la recomendada no está `available`, el contrato lo marca honesto.
-- [ ] Full API Parity: el mismo reader es consumible por UI (TASK-1555), Nexa y MCP; ningún consumer reconstruye disponibilidad.
-- [ ] Evidencia runtime: readback contra una ruta promovida real (`available`) + una no promovida (`gated`) + una con gate externo (`blocked`).
-- [ ] Migration/rollback posture explícito: read-only, sin migración, rollback = revert PR.
+- [x] Source of truth nombrado: proyección = catálogo × readiness/binding × `recommendedDefault`; la task es reader, no SoT. **DONE.**
+- [x] Contract surface nombrado: **reader NUEVO `globe.producer.fleet.list`** (decisión extend-vs-new: NEW, mantiene `catalog.list` puro) con `availability` + `gateReason` + `recommendedDefaults`; backward-compatible. `contracts/src/producer-fleet.ts` + `GLOBE_PRODUCER_READERS.fleet`.
+- [x] `availability` (`available|gated|blocked`) se deriva de readiness `promoted` + binding `enabled` por ruta × workspace; ningún valor hardcodeado. **Test lo prueba** (`producer-fleet.test.ts`: promoted+enabled→available, promoted-not-enabled→excluido).
+- [x] Workspace boundary explícito: ruta promovida en A no es `available` en B (test workspace-scope). **Ceiling por `kind` HEREDADO de la promoción** (un binding `enabled` ya pasó el ceiling; el reader no re-deriva `kind`, evita el muro `resolveKind=undefined`) — internal-eval nunca fue habilitado en workspace client, por construcción.
+- [x] No-slug-leak: proyección extiende la view pública (`projectProducerRouteView`); test verifica que `gemini-3-pro-image`/`bytedance` NO aparecen en el payload; `model.name` público sí.
+- [x] `recommendedDefaults` por capacidad expuesto (surface del gap de TASK-1553); el consumer ve el `availability` de la recomendada.
+- [x] Full API Parity: un reader (`fleet.list`, capability `globe.producer.catalog.read`) consumible por UI (TASK-1555)/Nexa/MCP; ningún consumer reconstruye disponibilidad.
+- [~] Evidencia runtime: readback contra ruta promovida/no-promovida/blocked. **PENDIENTE DE ROLLOUT** — probado con stub stores (12 tests verdes); el readback live necesita deploy del reader + una ruta promovida real (Nano Banana Pro tras ADR-009).
+- [x] Migration/rollback posture: read-only, sin migración, rollback = revert PR. **DONE.**
 
 ## Verification
 
