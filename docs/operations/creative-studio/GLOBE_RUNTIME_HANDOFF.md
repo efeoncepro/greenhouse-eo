@@ -57,25 +57,29 @@ projection NO persiste `kind` todavía → el resolver da undefined → el lane 
 **Secrets provisionados (Terraform + seeded, targeted-apply, live):** `globe-openai-api-key` (Globe-owned, valor del de
 Greenhouse) + `globe-model-rights-attestation-secret` (HMAC random). Ambos con accessor a `api_runtime`.
 
-**Estado: TODO EL CÓDIGO de ADR-010 está completo, verificado y pusheado (ambos repos). NADA comercial está promovido/vivo.**
-El lane es correcto y está gateado; para que promueva de verdad falta el rollout operativo + el paso humano. Runbook exacto
-del rollout restante (deliberado, no rusheado):
+**Estado: TODO EL CÓDIGO de ADR-010 completo + DESPLEGADO + VERIFICADO LIVE (2026-07-24). La autoridad de atestación está VIVA.**
 
-1. **Tenancy `kind` migration** (follow-up): persistir `kind` en `tenancy_workspaces.projection` (hoy vive sólo en el
-   `BrokerWorkspaceBinding` de sesión). Sin esto el lane siempre deniega. Es la única pieza de código que falta para que el
-   lane funcione.
-2. **cloud_run_services.tf**: agregar `GLOBE_MODEL_RIGHTS_ATTESTATION_SECRET` (+ `GLOBE_OPENAI_API_KEY` cuando exista el
-   adapter) al env map de secrets del api; agregar `GLOBE_CONTROL_PLANE_BREAK_GLASS="false"` al env plano del api para
-   **reconciliar el drift gcloud pre-existente** (hoy `tofu plan` quiere removerlo — no-op de comportamiento). `tofu plan` →
-   leer → `tofu apply`.
-3. **Deploy** (`gh workflow run deploy-internal.yml` / workflow_dispatch): sube el nuevo image + **corre la migración `0030`**
-   (verificar el mecanismo de migración: startup vs step). Ship gateado/inerte sin grants.
-4. **Grants**: `GLOBE_PROMOTION_AUTO_LANE_CALLER_SERVICE_ACCOUNTS` = SA del auto-lane; broker grant `globe.model-rights.attest`
-   al reviewer humano (entitlement Greenhouse). Pre-bindear (disabled) la ruta objetivo en el workspace destino.
-5. **HUMANO irreducible**: **el CEO firma la attestation por proveedor** (Vertex/OpenAI/Fal comercial) con la evidencia ya
-   ensamblada — `requireHuman` rechaza un service principal por diseño; es el control que se vende, no lo puedo firmar yo.
-6. **Canary facturable** por clase de ruta a través del lane; verificar postura aplicada = atestiguada + negativo
-   internal-eval→client.
+**DESPLEGADO + VERIFICADO (hecho):**
+1. ✅ Resolución de workspace kind: NO se cambió el snapshot firmado del broker (no lo lleva). Resolver config-governed
+   `ConfigWorkspaceKindResolver` (env `GLOBE_WORKSPACE_KIND_CLASSIFICATIONS`, fail-closed on miss). Cada client workspace = entry
+   explícito. Reemplazó al durable-projection resolver (que queda como future broker-kind path).
+2. ✅ Migración `0030` aplicada a `globe-pg` vía `pnpm --filter @efeonce-globe/database migrate` (GLOBE_MIGRATOR_USER=julio.reyes,
+   miembro de globe_owner). Tabla `model_commercial_rights_attestations` viva (1 applied, 29 already).
+3. ✅ `cloud_run_services.tf`: `GLOBE_MODEL_RIGHTS_ATTESTATION_SECRET` + `GLOBE_WORKSPACE_KIND_CLASSIFICATIONS={greenhouse-org:efeonce:internal}`
+   + `GLOBE_CONTROL_PLANE_BREAK_GLASS="false"` (drift reconciliado). `tofu apply`: 0 add / 1 change / 0 destroy.
+4. ✅ Deploy `globe-api-internal` @ `02f1edc` (rev `00074-fwv`, run success) — el mecanismo de migración es MANUAL (no en startup ni deploy).
+5. ✅ **Smoke live verificado**: `globe.model-rights.list` como `greenhouse-globe-caller` → **HTTP 200, items:[]**. Autoridad viva.
+   (Gotcha: el ID token impersonado necesita `--include-email` o el app da 401 authentication_required.) tokenCreator temporal
+   revocado + corte verificado.
+
+**REMANENTE (last-mile — no es código de motor, es habilitación + el paso humano):**
+- **Broker grant `globe.model-rights.attest` al reviewer humano** (entitlement Greenhouse) — para que un humano PUEDA atestiguar.
+- **Afordancia de atestación para el humano**: no hay UI de attest todavía (coverage `ui:available` declarada pero sin pantalla).
+  El CEO firma por sesión SSO humana + la capability; falta la superficie (UI o dispatch de sesión humana). Follow-up UI.
+- **Auto-lane**: crear SA dedicado + `GLOBE_PROMOTION_AUTO_LANE_CALLER_SERVICE_ACCOUNTS` + pre-bindear (disabled) la ruta objetivo.
+- **HUMANO irreducible**: el CEO firma la attestation por proveedor (evidencia ensamblada en `scripts/evidence/*-commercial-terms.json`).
+- **Canary facturable** por clase de ruta + negativo internal-eval→client.
+- **OpenAI adapter** (consume `globe-openai-api-key`) + golden briefs de rutas pendientes/nuevos modelos.
 
 
 
