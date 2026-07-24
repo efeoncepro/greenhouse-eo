@@ -108,6 +108,26 @@
   ejercita con la primera ruta real de las 7 pendientes.
 - tokenCreator temporales del rehearsal: otorgados → usados → **revocados con corte verificado**.
 
+### Media Derivatives + Range Gateway (TASK-1528, live 2026-07-24)
+
+- **Flags ON** (`GLOBE_MEDIA_DERIVATIVES_ENABLED=true`, `GLOBE_MEDIA_RANGE_GATEWAY_ENABLED=true`, Terraform
+  `media_derivatives.tf`). Job `globe-media-derivatives` (imagen `sha256:920bfc2f…`, ffmpeg pinneado
+  `7:7.1.5-0+deb13u1`) + Scheduler `*/2` habilitados; migración `0029` aplicada (`pending=[]`); grants DB
+  del worker `ready:true`. Bucket separado `efeonce-globe-media-derivatives`; api rev sirve el gateway.
+- **6 perfiles v1 producidos y verificados** para image/video/audio: card-thumb 512×288, viewer-preview
+  1600×900, video.poster 1280×720, video.preview-transcode 1280×720/4033ms (MP4 H.264/AAC), audio.preview-stream
+  6269ms (AAC), audio.waveform-peaks (JSON). Identidad exacta por
+  `(sourceSha256, objectGeneration, profileId, profileVersion, transformerVersion, outputMime)`; record terminal
+  único por identidad (6 intents/6 records/6 attempts, re-run `claimed=0`).
+- **Range gateway** `GET /v1/media/:sha256`: full 200, partial/suffix 206 con `Content-Range` exacto,
+  unsatisfiable 416, multipart 400; passthrough real a GCS sin buffer. Media ticket HMAC principal-bound
+  (`globe-media-ticket-secret`, TTL 120s); negativos: representación/experiment manipulado + ticket forjado → 403,
+  representación no-lista → 503 `dependency_unavailable`. api_runtime tiene read-only sobre el bucket de derivados.
+- Observabilidad: `globe_media_derivative_failures` (ERROR), `globe_media_derivative_queue_oldest_age_seconds`
+  (WARNING >900s). Rollback: flags a false + apply; el original nunca se toca.
+- **NO** habilita comercial (gate `TASK-1480`). El orphan GC de derivados/originales es `TASK-1529`
+  (estaba bloqueada por 1528, ahora desbloqueada).
+
 ### Asset Governance y alertas
 
 - `645c143` clasifica MP4/MP3 válidos sin Content Credentials como

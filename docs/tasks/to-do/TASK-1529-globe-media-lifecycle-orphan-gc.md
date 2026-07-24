@@ -1,5 +1,14 @@
 # TASK-1529 — Globe Media Lifecycle and Orphan Garbage Collection
 
+## Delta 2026-07-24
+
+- Desbloqueada: `TASK-1528` (Media Derivatives + Range Delivery) quedó **complete internal-only**. Ya existen
+  derivados persistidos (`media_derivative_records`), su bucket separado `efeonce-globe-media-derivatives` y el
+  contrato de identidad exacta que el reconciler de GC necesita para clasificar drift record↔objeto en ambas
+  direcciones. El worker de derivados tiene storage get/create **sin delete** a propósito: el delete guarded con
+  generation-precondition es de esta task.
+
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

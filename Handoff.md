@@ -54,6 +54,10 @@
   sin superficie operable (follow-up). tokenCreator temporales revocados con corte verificado.
   Plan: `docs/tasks/plans/TASK-1527-plan.md`. `TASK-1528`/`TASK-1529` siguen to-do.
 
+- **`TASK-1528` COMPLETE internal-only (P0, 2026-07-24).** ADR-008 media derivatives + Range gateway (206/416)
+  live; canary 3 modalidades verde, flags ON, `tofu plan` No changes. Detalle: `GLOBE_RUNTIME_HANDOFF.md`
+  §Media Derivatives. Desbloquea `TASK-1529`; no habilita comercial (`TASK-1480`).
+
 - **`TASK-1503` COMPLETE y ACTIVA internal-only.** Retrieval, favorite y copy-as-reference funcionan en API y UI
   por grants/BFF; el bucket continúa privado y tenant-blind. Estado mutable y evidencia:
   `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`; operación:
