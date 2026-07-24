@@ -126,6 +126,44 @@ Exponer el **2.º modelo selectable por proveedor NO es data — es un slice de 
 - **Pricing:** los créditos del adapter OpenAI están `PROVISIONAL` (calibrados a gpt-image-1) — reverificar
   contra el pricing real de gpt-image-2 (más caro) en el canary.
 
+### Canary path — mapeo completo del runtime (2026-07-24, verificado contra el deployment vivo)
+
+Ejecutar el canary facturable frontier requiere entender el runtime real (esto evita re-descubrirlo):
+
+- **Runtime del Lab HOY (api rev `00075-8cx`, Job `globe-producer-worker`):** `GLOBE_LAB_ENABLED=true`,
+  `GLOBE_LAB_PROVIDER=composite`, `GLOBE_LAB_DAILY_CAP_CREDITS=200`, `GLOBE_GOVERNED_OPENAI_ENABLED=false`. El
+  worker que ejecuta el proveedor es **`globe-producer-worker`** (NO "creative-runner"). Secret
+  `globe-openai-api-key` **existe**.
+- **`composite` rutea image-generate/image-edit → Fal Seedream, NUNCA Vertex** (`apps/creative-runner/src/composite-adapter.ts:106-107,122-123`).
+  Vertex solo se usa para `video-generate` en `ref/motion/reference-v1` (vertex-omni). **Consecuencia dura:** bajo
+  `composite`, `gemini-3-pro-image` (Nano Banana) **nunca se llama** para imagen — mi cambio del default de
+  `vertex-adapter.ts` no tiene efecto mientras el provider sea `composite`.
+- **El canary tooling existente (`scripts/producer-ui-canary.mjs` + `-lib.mjs`) NO apunta a los modelos frontier.**
+  Su matriz fija bindea imagen a `fal/seedream-5-pro` y `fal/seedream-5-pro-edit`; Vertex solo aparece como
+  `vertex-omni`/`veo` (video). No hay entrada para gpt-image-2 ni gemini-3-pro-image.
+- **Para canariar `gemini-3-pro-image`:** flip `GLOBE_LAB_PROVIDER=vertex` (single-provider) en el worker + api →
+  image-generate va a Vertex → gemini-3-pro-image. Destapa el **preview/allowlist** (si `model_unavailable`, gap de
+  Google). **Para `gpt-image-2`:** `composite` NO incluye OpenAI; hace falta `GLOBE_LAB_PROVIDER=openai` (single) +
+  el worker con el adapter OpenAI desplegado. Ambos flips afectan TODOS los lab runs mientras estén ON → flip,
+  canary, revert a `composite`.
+- **Auth para disparar un lab run real:** el api es IAM-private; el caller allowlist
+  (`GLOBE_API_CALLER_SERVICE_ACCOUNTS`) = `greenhouse-globe-caller`, `globe-tenancy-operator`,
+  `globe-promotion-{routing,promoter,checker,auto-lane}`. La capability `globe.lab.experiment.run` la lleva el
+  **internal-caller principal** (`apps/studio-web/src/app.ts:3235`). Un token de usuario (mi ADC) **NO pasa** el
+  in-app SA-allowlist → hace falta **break-glass** impersonando una SA allowlisted con la lab capability, con
+  `--include-email` (gotcha del lane canary). Driver base reutilizable: `producer-ui-canary.mjs` (usa ADC id token
+  vía `createGoogleAdcIdTokenAuth`), pero su matriz apunta a Fal — para frontier hay que extender la matriz o hacer
+  un dispatch crudo `estimate→prepare→execute→get` de `globe.lab.experiment.*`.
+- **Worker deploy:** `deploy-producer-worker.yml` es 2 pasos (`mode=build` → `mode=deploy`, ambos con
+  `target_sha` de `main`). Redeployar el worker en `main` (`a6dd117`) trae los adapters frontier al worker (necesario
+  para cualquier flip a vertex/openai). Env del Job es Terraform-managed (un deploy no borra las vars).
+- **gcloud auth expira a mitad de sesión** (token no-refresh en no-interactive) → `gcloud auth login` +
+  `gcloud auth application-default login` interactivos antes de operar Cloud Run/ADC.
+
+**Conclusión honesta:** el canary facturable frontier **no es "correr el script"** — es un slice bespoke (flip de
+provider en 2 runtimes + break-glass SA con lab-cap + extender la matriz del canary o dispatch crudo + revert), con
+el gate no-verificable-desde-repo del **preview/allowlist de Vertex**. Se ejecuta como paso enfocado, no al vuelo.
+
 ### Regla dura grabada
 
 Cambiar scopes del broker OAuth Greenhouse↔Globe es rollout de **3 pasos** (broker permite → cliente pide →
