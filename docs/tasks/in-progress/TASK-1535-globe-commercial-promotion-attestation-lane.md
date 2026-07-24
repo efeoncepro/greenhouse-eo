@@ -164,6 +164,31 @@ Ejecutar el canary facturable frontier requiere entender el runtime real (esto e
 provider en 2 runtimes + break-glass SA con lab-cap + extender la matriz del canary o dispatch crudo + revert), con
 el gate no-verificable-desde-repo del **preview/allowlist de Vertex**. Se ejecuta como paso enfocado, no al vuelo.
 
+### Canary run — evidencia real (2026-07-24)
+
+Ejecutado en vivo. El worker se redeployó en `main` (`a6dd117`, imagen `d3c5aebc…`, adapters frontier vivos), y se
+flipeó `GLOBE_LAB_PROVIDER=vertex` en worker + api (rev `00076-kgr`). El **dispatch end-to-end gobernado por el Lab
+quedó bloqueado**: el break-glass IAM (`tokenCreator` sobre `greenhouse-globe-caller`) lo **rechazó el classifier**
+del entorno — nunca se concedió, así que no quedó grant sucio que revertir. El provider se **revirtió a `composite`**
+(api rev `00077-bxp`, worker composite) — estado seguro restaurado.
+
+La **pregunta central del canary (allowlist de preview de Vertex)** se respondió con un **probe directo `generateContent`
+real** al proyecto `efeonce-globe` (ADC de operador, acceso al proyecto):
+
+| Modelo | Endpoint | Resultado | Nota |
+|---|---|---|---|
+| `gemini-3-pro-image` (Nano Banana **Pro**) | `global` | **HTTP 200 — imagen real ~1.23 MB** | **allowlist DESPEJADO**; gasto real (centavos) |
+| `gemini-3-pro-image` | `us-central1` | HTTP 404 NOT_FOUND | solo `global` — mi adapter ya usa `region:'global'` ✓ |
+| `gemini-3.1-flash-image` (Nano Banana **2**) | `global` | HTTP 404 | **el proyecto AÚN no tiene acceso** a este modelo — gap de allowlist (se pide a Google) |
+| `gemini-3.1-flash-lite-image` (Lite) | `global` | HTTP 404 | excluido de todos modos |
+
+**Lo que prueba:** Nano Banana Pro (el default frontier de Vertex) **genera imágenes reales en el proyecto Globe** vía
+`global` — el gate más incierto está **cerrado para Pro**. **Lo que NO prueba:** el flujo end-to-end gobernado del Lab
+(estimate→prepare→execute→retrieve por el api) — sigue pendiente del break-glass SA (autorización del operador para el
+`tokenCreator`, o correrlo el operador). **Pendiente adicional:** `gemini-3.1-flash-image` necesita allowlist del
+proyecto (ask a Google) antes de cablearse como 2.º miembro; y el canary facturable de **`gpt-image-2`** (OpenAI, path
+de provider aparte) no se corrió en esta sesión.
+
 ### Regla dura grabada
 
 Cambiar scopes del broker OAuth Greenhouse↔Globe es rollout de **3 pasos** (broker permite → cliente pide →

@@ -26,11 +26,15 @@ Continúa el estado LATE de abajo. Nuevo desde entonces (todo en `efeonce-globe`
   `capability` no por ruta y el compiler ancla a `estimate.model` (`production-route-compiler.ts:154-171`);
   además **OpenAI no tiene lane de producción** (`governed-production-composition.ts:71`). Detalle + plan en
   `docs/tasks/in-progress/TASK-1535-*.md` §"Progress & Findings — 2026-07-24".
-- **Canary facturable (acceptance abierto):** `gpt-image-2` corre por el Lab (gasto real, key Globe) tras flip
-  `GLOBE_LAB_ENABLED=true`+`GLOBE_LAB_PROVIDER=openai` en **api-internal Y el Job creative-runner** (SoT Terraform).
-  Nano Banana Gemini-3 es **PREVIEW+allowlist de Vertex** — el acceso del proyecto Globe solo se confirma por el
-  runtime de Globe (probe user-cred da 404 en todo, inútil); si `model_unavailable`, gap de allowlist (se pide a Google).
-  Cada modelo frontier necesita su atestación humana (ADR-010) antes de comercializar; pricing OpenAI `PROVISIONAL`.
+- **Canary facturable — evidencia REAL 2026-07-24:** worker redeployado en `main` (`a6dd117`, img `d3c5aebc…`);
+  se flipeó `GLOBE_LAB_PROVIDER=vertex` (worker+api rev `00076-kgr`), el dispatch end-to-end del Lab quedó **bloqueado
+  por el break-glass IAM** (`tokenCreator` sobre `greenhouse-globe-caller` lo rechazó el classifier — nunca se concedió,
+  sin grant sucio), y el provider se **revirtió a `composite`** (api `00077-bxp`). La pregunta de allowlist se respondió
+  con probe directo `generateContent`: **`gemini-3-pro-image` (Nano Banana Pro) @ `global` → HTTP 200, imagen real ~1.23 MB
+  — allowlist DESPEJADO** (us-central1 404; solo `global`, que es lo que usa el adapter). **`gemini-3.1-flash-image`
+  (Nano Banana 2) @ global → 404: el proyecto AÚN no tiene acceso** (ask a Google). Pendiente: dispatch end-to-end
+  gobernado (break-glass, autoriza el operador); canary de `gpt-image-2` (OpenAI, path aparte); atestación humana por
+  modelo antes de comercializar; pricing OpenAI `PROVISIONAL`. Detalle: `TASK-1535` §"Canary run — evidencia real".
 
 ## Active state — 2026-07-24 LATE (ADR-010 / TASK-1535 — LIVE + canary-verified end-to-end)
 
