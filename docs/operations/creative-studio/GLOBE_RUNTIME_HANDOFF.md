@@ -8,18 +8,18 @@
 
 # Handoff
 
-## Active state — 2026-07-24 (TASK-1553 rollout attempt; safe rollback, governed Vertex-image worker blocker)
+## Active state — 2026-07-24 (TASK-1553 latest; canary green, promotion pending)
 
-- Worker deploy `deploy-producer-worker.yml` run `30121176824` succeeded for Globe `main` SHA `5482a60a6c79b740a698a2cce9eb357b9c2f6080`; the immutable worker image was deployed and verified.
+- Governed Vertex-image driver + global endpoint allowlist are deployed at Globe `main` SHA `9b62b193016ffe13c42c679be50fb28d19fc0f24`; API run `30125681964`, worker build `30125679964`, and worker deploy `30125918755` succeeded.
 - The API had not yet consumed the catalog code, so `deploy-internal.yml` run `30121490254` deployed `globe-api-internal` at the same SHA. Live catalog readback is `1.3.0` and includes `ref/still/nanobanana-pro-v1`.
-- Terraform temporarily applied `GLOBE_LAB_PROVIDER=vertex` to both API and worker, with `GLOBE_LAB_ENABLED=true`; after the canary attempt it was reverted via Terraform to `composite` in both runtimes. Both applies were 2 in-place changes, 0 add, 0 destroy. Current safe default is restored.
+- `GLOBE_LAB_PROVIDER=vertex` was applied live to API + worker for the canary and restored to `composite`; Terraform declarations are also restored to `composite`. `GLOBE_LAB_ENABLED=true` remains enabled.
 - Break-glass `roles/iam.serviceAccountTokenCreator` was granted only on `greenhouse-globe-caller` to the operator, the ID token was minted with `--include-email`, and the grant was revoked. IAM readback verified the operator subject is absent; the pre-existing Greenhouse portal grant remains unchanged.
 - Migration `0031_add_nanobanana_pro_credit_rates.sql` was applied through the canonical database migrator (`1 applied`, `30 already applied`), adding standard/HD rates for the supported Nano Banana Pro image shapes. The live estimate then resolved the route at 10 credits.
-- The budget blocker was resolved through governed administration: policy superseded from 100 to 110 credits and a bounded 10-credit grant was posted (`grantId=5dcb54b2-35a7-4d43-a5d3-b0607953ad4d`, source `task-1553-nanobanana-pro-canary-2026-07-24`).
-- Exact estimate→prepare→execute reached worker experiment `bd16ec93-8099-4d99-a6fb-cd07a41eca07`, but ended `failed` with `failureReason=runner_error`, `provider=vertex`, `model=gemini-3-pro-image`, `region=global`, and `spentCredits=0`. No MIME/hash evidence is asserted; ADR-009 promotion was not attempted.
-- Root cause: governed production composition registers Fal/Veo drivers only and its routing compiler allows `us-central1` only. The standalone Vertex adapter is live-verified at `global`, but the governed worker lacks the Vertex-image submit/completion/result path and endpoint allowlist.
-- All temporary IAM grants were revoked and read back absent; `GLOBE_LAB_PROVIDER` is restored to `composite` in API and worker. Current status: **code complete, rollout parcial/bloqueado**, not complete.
-- Next step: implement/deploy the governed Vertex-image driver and `global` endpoint allowlist, then repeat estimate→prepare→execute→output retrieval, capture MIME/hash, and promote only after exact identity readback (`binding.modelId == estimate.model == readiness.route.modelId`).
+- The requested 5000-credit grant returned canonical `409 conflict`; no direct ledger mutation or bypass was used. The existing governed 10-credit grant funded the canary.
+- Lab canary `a258dda8-ea6e-4a34-94f0-4cd9ca301d17` completed `candidate_ready`: 10 credits, `gemini-3-pro-image`, route `ref/still/nanobanana-pro-v1`, `global`, `image/png`, 1,111,472 bytes, SHA-256 `sha256:9e9edaf59cb927610d043e3af3cac9b90c321ed48e55eb34ec0300c72dc429cf`; retrieval HTTP 200 independently matched the hash.
+- The governed scheduler attempt correctly stopped before provider execution because ADR-009 binding/readiness is not promoted. No ADR-009 promotion was attempted without the required readiness/review evidence.
+- All temporary IAM grants were revoked and read back absent; API is restored to governed + composite defaults and worker to composite. Current status: **code complete, canary green, rollout parcial/bloqueado**, not complete.
+- Next step: execute ADR-009 review→propose→promote→activate with the required readiness evidence, then verify `binding.modelId == estimate.model == readiness.route.modelId` and only then enable the route.
 
 ## Active state — 2026-07-24 LATEST (TASK-1535 — golden briefs + frontier fleet defaults; canary facturable abierto)
 

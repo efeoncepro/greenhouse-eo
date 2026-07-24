@@ -312,24 +312,25 @@ resolución (ya es por-ruta).
 
 ## Acceptance Criteria
 
-### Rollout evidence — 2026-07-24
+### Rollout evidence — 2026-07-24 (latest)
 
 - Worker deploy `deploy-producer-worker.yml` run `30121176824` completed `success` for `5482a60a6c79b740a698a2cce9eb357b9c2f6080`.
+- Governed Vertex-image driver + `global` endpoint allowlist landed in Globe `main` at `9b62b193016ffe13c42c679be50fb28d19fc0f24`; API deploy run `30125681964` and worker build run `30125679964` completed `success`, followed by worker deploy run `30125918755`.
 - The API runtime also required the same SHA because its live catalog was still `1.2.0`; `deploy-internal.yml` run `30121490254` completed `success`. The live API then exposed catalog `1.3.0` and `ref/still/nanobanana-pro-v1`.
-- Temporary Terraform flip to `GLOBE_LAB_PROVIDER=vertex` was applied to both `globe-api-internal` and `globe-producer-worker` (plan: 2 in-place changes, 0 add, 0 destroy), then reverted to `composite` and applied (2 in-place changes, 0 add, 0 destroy). `GLOBE_LAB_ENABLED=true` remained enabled.
+- `GLOBE_LAB_PROVIDER=vertex` was applied live to API + worker for the canary and then restored to `composite`; the Terraform SoT was restored to `composite` in the same change. `GLOBE_LAB_ENABLED=true` remained enabled.
 - Break-glass impersonation of `greenhouse-globe-caller` was granted at SA scope to the operator, used with `--include-email`, and revoked; the final IAM readback confirms the operator grant is absent.
 - Migration `0031_add_nanobanana_pro_credit_rates.sql` was applied through the canonical database migrator (`1 applied`, `30 already applied`), adding the governed standard/HD rates for the supported Nano Banana Pro shapes. The live estimate then resolved the route at 10 credits.
-- The budget blocker was resolved through governed credit administration: the monthly policy was superseded from 100 to 110 credits and a bounded 10-credit grant was posted from the existing pool (`grantId=5dcb54b2-35a7-4d43-a5d3-b0607953ad4d`; source `task-1553-nanobanana-pro-canary-2026-07-24`). No budget bypass was used.
-- The exact governed estimate/prepare/execute path then reached the worker, but the experiment `bd16ec93-8099-4d99-a6fb-cd07a41eca07` failed with `state=failed`, `failureReason=runner_error`, `provider=vertex`, `model=gemini-3-pro-image`, `region=global`, and `spentCredits=0`. No MIME/hash evidence is claimed and no promotion was performed.
-- Root cause: the governed worker composition has Fal/Veo production drivers only; it does not register a governed Vertex image submit/completion/result driver, and its production routing compiler still allows only `us-central1`. The standalone Vertex adapter/probe is green, but that is not equivalent to the governed Lab canary.
-- Current state: **code complete, rollout parcial/bloqueado**. Both runtimes are restored to `GLOBE_LAB_PROVIDER=composite`; Nano Banana Pro remains inert until the governed Vertex-image worker path is implemented, deployed, and canaried.
+- A requested additional 5000-credit grant was attempted through the canonical maker/checker command with unique idempotency/source IDs and valid break-glass identity, but live API returned `409 conflict`; no unverified ledger mutation was made. The existing governed 10-credit grant was used instead.
+- The governed path reached the compiler but correctly failed before provider execution because ADR-009 route binding/readiness is not yet promoted. A separate Lab canary with production scheduler temporarily disabled exercised Vertex directly: experiment `a258dda8-ea6e-4a34-94f0-4cd9ca301d17`, `candidate_ready`, `spentCredits=10`, `provider=vertex`, `model=gemini-3-pro-image`, route `ref/still/nanobanana-pro-v1`, region `global`.
+- Runtime evidence: output `image/png`, `1,111,472` bytes, SHA-256 `sha256:9e9edaf59cb927610d043e3af3cac9b90c321ed48e55eb34ec0300c72dc429cf`; retrieval returned HTTP 200 and independently verified the same hash. API revision was restored to governed/composite defaults and worker env to composite after the canary.
+- Current state: **code complete, canary verde, rollout parcial/bloqueado**. Nano Banana Pro is not promoted: ADR-009 binding/readiness saga and exact identity readback remain outstanding.
 
 - [x] Source of truth nombrado: catálogo público (rutas) + binding runtime (providerModelId) + resolución por-ruta en adapters. **DONE (ADR-013 + código Slice 2-3).**
 - [x] Dos modelos del mismo proveedor coexisten y se seleccionan por ruta (GPT Image 1.5 + 2 y/o Nano Banana Pro + 2) sin `route_binding_missing`. **DONE a nivel resolución/Lab** (test del segundo consumidor: `openai-v2`→`gpt-image-2`, `openai-v1-5`→`gpt-image-1.5`, dos modelos mismo proveedor). La ausencia de `route_binding_missing` en **producción** se valida al promover (rollout-pending).
 - [x] Seedream + Nano Banana Pro + GPT Image 2 + GPT Image 1.5 elegibles simultáneamente como imagen; Seedream sin regresión. **DONE** (catálogo v1.3.0 + composite por-ruta; 236/236 tests creative-runner verdes; Seedream sigue default vivo).
 - [x] Semántica update (bump de versión en la ruta) vs add (ruta nueva) explícita y documentada; el catálogo público sin slugs (drift guard verde). **DONE** (ADR-013 + doc funcional/manual; `assertNoSlugLeak` verde con las rutas nuevas).
 - [~] Invariante de consistencia `binding.modelId == estimate.model == readiness.route.modelId` se mantiene con resolución por-ruta. **Diseño garantizado por construcción (ADR-013); no ejercitado en runtime** (sin promoción) — rollout-pending.
-- [ ] Evidencia runtime por modelo (canary por el Lab) listada; región `global` para Vertex image. **ROLLOUT-PENDING**: budget capacity was approved and the governed path reached the worker, but it failed before provider execution because the governed Vertex-image driver/allowlist is missing; spend remains `0` and no output MIME/hash is claimed.
+- [x] Evidencia runtime por modelo (canary por el Lab) listada; región `global` para Vertex image. **DONE for canary**: experiment `a258dda8-ea6e-4a34-94f0-4cd9ca301d17`, 10 credits, `image/png`, 1,111,472 bytes, SHA-256 `9e9edaf59cb927610d043e3af3cac9b90c321ed48e55eb34ec0300c72dc429cf`; promotion remains pending.
 - [x] ADR de resolución por-ruta indexado en `DECISIONS_INDEX`. **DONE (Slice 1, 2026-07-24):** ADR-013 = `docs/architecture/creative-studio/EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md`, indexado en `DECISIONS_INDEX.md` + `creative-studio/README.md`.
 
 ## Verification
