@@ -61,12 +61,23 @@ judgment is **real**, removing it from the place where it was pure toil.
    and it is batchable. **This human signature is not removed; it is relocated to the one fact that genuinely needs
    a human: what the license grants.**
 
-2. **Automated route-promotion lane** — a service principal (distinct from the attestor and from the existing
-   promoter/checker classes) that, **given** a valid Tier-1 attestation for the model **and** a passing objective
-   eval for the route, proposes the route, **derives the rights policy from the attestation** (the posture is always
-   exactly what the attested license grants — commercial → the license's commercial terms; internal-eval → internal
-   restrictions), and drives the ADR-009 saga (promote → activate → canary). **No human keystroke per route ×
-   workspace.**
+2. **Automated route-promotion lane** — a **distinct decision authority** (service principal, distinct from the
+   attestor and from the existing promoter/checker classes) that, **given** a valid Tier-1 attestation for the model
+   **and** a passing objective eval for the route **and** the target workspace ceiling, computes governed
+   **eligibility** and **derives the rights policy from the attestation** (the posture is always exactly what the
+   attested license grants — commercial → the license's commercial terms; internal-eval → internal restrictions).
+   **No human keystroke per route × workspace.**
+
+   > **Implementation discovery (2026-07-24), load-bearing correction.** The ADR-009 saga's `promoteProductionPromotion`
+   > phase is **hardwired to a signed HUMAN model-readiness review** (`resolveReview` + `validateReview` enforcing
+   > maker≠reviewer≠promoter over a human review). That human review **is** the vendible separation-of-duties control
+   > for the human-craft regime. Therefore the automated commercial regime **must NOT route through the ADR-009 saga
+   > and must NOT relax it** — doing either would weaken exactly the control being sold. The lane is a **separate
+   > mechanism**: its eligibility engine (verified attestation + objective eval + workspace ceiling → derived rights
+   > posture) is the piece that legitimately replaces per-route human signing, and the route-binding application uses
+   > the governed routing/rights authorities directly under a dedicated, narrowly-scoped lane principal — never the
+   > human saga, never the break-glass generic caller. The saga is preserved unchanged **precisely by not touching
+   > it.**
 
 3. **Per-workspace promotion policy** — a net-new, append-only policy carried in `tenancy_workspaces.projection`,
    declaring each workspace's promotion regime and, load-bearing, its **maximum rights posture**. The automated lane
@@ -91,7 +102,10 @@ guarantees:
   (license grant, not craft), not a relaxation of the existing review. The two coexist.
 - Rights policies still mirror the provider's real license. No restriction is dropped that the license imposes.
 - The ADR-009 saga, its 13 states, its durable persistence, its recovery-is-service-only rule, and the disjoint
-  promoter/checker workload classes are reused unchanged. This ADR adds authorities; it does not rewrite the saga.
+  promoter/checker workload classes are left **completely untouched**. The lane does NOT route through the saga's
+  human-review-gated promote (see the Implementation discovery above); it is a distinct mechanism, so the saga's
+  separation-of-duties control is preserved precisely by not modifying it. This ADR adds authorities; it does not
+  rewrite or reuse the saga.
 - `GLOBE_CONTROL_PLANE_BREAK_GLASS` semantics are unchanged. Direct `asset-rights-policy.manage` remains break-glass
   once the saga is enabled; the lane publishes rights through the governed derivation, not the break-glass grant.
 

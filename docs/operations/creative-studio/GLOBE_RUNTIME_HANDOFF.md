@@ -25,10 +25,29 @@ durable idempotente en dos ejes. Capabilities nuevas: `globe.model-rights.attest
 reservada para Slice 4). `.read` granteada al internal caller; **attest es broker-side human-only** (grant al reviewer =
 paso de rollout Greenhouse, aún no hecho).
 
-**Rollout pendiente (NO está vivo):** (1) migración `0030` aplicar en `globe-pg`; (2) secret `GLOBE_MODEL_RIGHTS_ATTESTATION_SECRET`;
-(3) grant broker-side `globe.model-rights.attest` al reviewer humano; (4) Slices 2-4 (derivación→publish, techo por
-workspace, lane automatizado); (5) Slice 5 = evidencia real de términos + golden briefs + **el CEO firma las ~O(proveedores)
-attestations** (Vertex/OpenAI/Fal comerciales) — único paso humano irreducible. Ninguna ruta comercial nueva está promovida.
+**Slices 3-4 (decision core) mergeado en `main` (build + 7 tests verdes):** `commercial-promotion-lane.ts` —
+`resolveWorkspaceRightsCeiling` (fail-closed por `kind`: `client` exige client-delivery; unknown rompe el build) +
+`evaluateAutomatedPromotionEligibility` (attestation verificada + eval objetivo + techo → postura derivada; sólo aprieta).
+Una ruta internal-eval-only NUNCA es elegible para un workspace `client`; la misma ruta SÍ internamente.
+
+**Descubrimiento de implementación (corrige ADR-010):** el `promoteProductionPromotion` de la saga ADR-009 está
+**hardwired a un review humano firmado** (el control SoD vendible). Por eso el lane comercial es un **mecanismo distinto**,
+NO enruta por la saga ni la relaja; la saga queda **intacta**. La aplicación del route-binding usa las autoridades
+routing/rights gobernadas bajo un principal de lane dedicado (nunca el break-glass), pendiente de construir (Slice 4 apply).
+
+**Evidencia de términos (Slice 5, source-cited, `reviewerMustVerify`):** `scripts/evidence/vertex-generative-commercial-terms.json`
++ `openai-gpt-image-commercial-terms.json` (Fal seedance/seedream ya existían). Documentan la licencia; NO son attestation.
+
+**Key sourcing (corrección de boundary, directiva 2026-07-24):** OpenAI → **NO** reusar `greenhouse-openai-api-key` cross-boundary;
+crear secret **Globe-owned `globe-openai-api-key`** (contenedor+accessor en Terraform `secrets.tf`, VALOR out-of-band copiado del
+valor de Greenhouse). Vertex → **keyless** (ADC/WIF, runtime SA `aiplatform.user`); **NO** crear API key (rompe el invariante).
+El único key Vertex-adjacent es `globe-gemini-api-key` (edit stateful), ya existente.
+
+**Rollout pendiente (NO está vivo):** (1) migración `0030` en `globe-pg`; (2) secret `GLOBE_MODEL_RIGHTS_ATTESTATION_SECRET`;
+(3) grant broker-side `globe.model-rights.attest` al reviewer; (4) **Slice 4 apply** (lane principal + route-binding vía
+routing/rights authorities); (5) OpenAI adapter + `globe-openai-api-key`; (6) golden briefs de rutas pendientes + nuevos modelos;
+(7) deploy (workflow_dispatch) + **el CEO firma las ~O(proveedores) attestations** (Vertex/OpenAI/Fal) — único paso humano
+irreducible; (8) canary facturable por clase de ruta. Ninguna ruta comercial nueva está promovida.
 
 
 
