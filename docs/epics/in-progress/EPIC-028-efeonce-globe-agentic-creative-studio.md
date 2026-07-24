@@ -67,6 +67,14 @@ evidencia, no una garantía de marketing.
 - La primera plantilla curada de media funciona con provider routing basado en contrato de fidelidad y gates creativos/económicos verificables.
 - Greenhouse/Verk/Think consumen sólo proyecciones, eventos o deep links versionados cuando corresponde; no bases de datos, secrets ni lógica compartida.
 - La plataforma queda preparada para habilitar clientes y créditos comerciales sin rediseñar identidad, autorización o modelo de costos.
+- Una surface propia de Video Effectiveness y sus entry points en Producer, Professional Workbench, Model Lab y
+  cualquier dominio autorizado consumen un solo agente: analiza videos generados o ingresados por el uploader
+  canónico de Globe contra objetivo, craft y channel fit con evidencia temporal exacta, propone direcciones
+  alternativas y sólo habilita forecasts numéricos cuando datos first-party comparables superan una política de
+  calibración versionada. Producer lo invoca directamente con asset/contexto precargado, muestra status/resumen,
+  abre el mismo reporte completo y convierte recomendaciones aceptadas en drafts de refine sin ejecución ni gasto
+  automático. En la dirección inversa, el agente puede llamar los contratos canónicos de Producer para crear una
+  propuesta y obtener su estimate; conserva actor, authority y lineage, y nunca aprueba ni ejecuta por sí mismo.
 - Equipos de otras agencias sólo pueden explorarse como hipótesis B2B2B dentro de modos/modelos existentes y
   después de cerrar tenancy agencia→cliente final, confidencialidad, rights, brand authority y economics.
 
@@ -81,6 +89,9 @@ evidencia, no una garantía de marketing.
 - [Studio Credit Model V1](../../business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md)
 - [Globe Design System Governance Decision V1](../../architecture/EFEONCE_GLOBE_DESIGN_SYSTEM_GOVERNANCE_DECISION_V1.md)
 - [Globe Producer — Human Execution + Approved Product Target Decision V1](../../architecture/creative-studio/EFEONCE_GLOBE_PRODUCER_HUMAN_EXECUTION_DECISION_V1.md)
+- [ADR-011 — Globe Video Effectiveness Agent Decision V1](../../architecture/creative-studio/EFEONCE_GLOBE_VIDEO_EFFECTIVENESS_AGENT_DECISION_V1.md)
+- [SPEC-011 — Globe Video Effectiveness Agent Architecture V1](../../architecture/creative-studio/EFEONCE_GLOBE_VIDEO_EFFECTIVENESS_AGENT_V1.md)
+- [UI Flow — Globe Video Effectiveness standalone + Producer bidireccional](../../ui/flows/TASK-1540-globe-video-effectiveness-surface-flow.md)
 
 ## Child Tasks
 
@@ -134,6 +145,14 @@ evidencia, no una garantía de marketing.
 - `TASK-1524` — **Commercial Login Cinematic Threshold.** Evoluciona la puerta anónima internal-only a una
   apertura comercial poster-first `One Idea, Many Forms`, con master desktop/mobile, pausa, reduced motion,
   progressive enhancement y OAuth/session existentes intactos; promoción sigue gateada por `TASK-1521/1480`.
+- **Video Effectiveness Agent (ADR-011/SPEC-011) — seis tasks compactas, registradas con Full API Parity.**
+  `TASK-1536` posee dominio, lifecycle y primitive durable; `TASK-1537`, evidencia temporal, Gemini/Vertex,
+  challengers y eval experta; `TASK-1538`, channel intelligence y calibración; `TASK-1539`, `assetRef` gobernado,
+  uploader canónico y orquestación standalone/Producer/Workbench/otros dominios/Harness, incluido
+  Producer→análisis y agente→Producer draft/estimate con recursion guard; `TASK-1540`, la surface propia,
+  entry points contextuales, status/resumen in-place en Producer, timeline y review; `TASK-1541`, rollout,
+  grants, credits, canarios, recovery y certificación cross-surface. No crea uploader, asset store ni lógica
+  de negocio por surface: reutiliza TASK-1467/ADR-007 y todas las interfaces consumen el primitive de TASK-1536.
 - `TASK-1521` — **Globe Commercial Runtime Environment Enablement.** Posee el bloqueo actual que impide bootear
   fuera de `internal_smoke`: environment contract, isolation/config, secrets, migrations, rollback y evidencia.
 - `TASK-1506` — **frontend hosting and front door decision (RESUELTA — ADR-004).** Gate P0 cerrado: la ADR
