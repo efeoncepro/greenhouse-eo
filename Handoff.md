@@ -32,11 +32,10 @@
 - **Globe Producer:** `TASK-1525` complete; `TASK-1526` complete (feed/viewer keyed con continuidad estable tras refresh, filtros, búsqueda y orden, con reproducción por modalidad validada).
 - **Globe — promoción/media:** auditoría live `0/7` ready. `TASK-1527` está en checkpoint humano; `TASK-1528…1529`
   poseen derivados+Range y GC. No fabricar/heredar evidencia.
-- **Globe — Video Effectiveness Agent (diseño aceptado, sin implementación).** `ADR-011` + `SPEC-011` incorporan
-  una surface propia compartida por todo Globe. Videos generados o externos convergen en el `assetRef` de
-  TASK-1467/ADR-007. Producer→análisis y agente→Producer draft/estimate comparten authority, lineage, idempotencia
-  y recursion guard; ningún agente aprueba ni gasta. `TASK-1536…1541` registran seis slices compactas y nacen
-  con Full API Parity: surface propia, Producer y demás dominios consumen el mismo primitive.
+- **Globe — dominios creativos diseñados, no implementados.** Video Effectiveness (`ADR-011`/`SPEC-011`,
+  `TASK-1536…1541`) y Storyboard Studio/Narrative Preproduction (`ADR-012`/`SPEC-012`, contrato `TASK-1542`
+  cerrado, implementación/rollout `TASK-1543…1549`) son surfaces propias con Full API Parity y handoffs
+  gobernados. Ningún agente aprueba, gasta o muta revisiones; no se habilitaron runtime ni clientes.
 
 ## Pendientes inmediatos
 

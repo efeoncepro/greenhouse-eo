@@ -7,6 +7,20 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-24 — Globe formaliza Storyboard Studio y Narrative Preproduction
+
+- ADR-012/SPEC-012 establecen Storyboard Studio como surface propia, no como capability aislada de Producer o
+  Video Effectiveness. Narrative Preproduction posee Brief/Script/Storyboard/revisiones/review/handoffs; media
+  generation, análisis, asset governance, scheduling y delivery conservan sus dueños.
+- La experiencia seleccionada es Editorial Sequence Desk: Brief, Outline, Guion, Storyboard y Review sobre un
+  Structured Sequence Canvas responsive. Comentarios y markup vectorial se anclan a revisiones exactas; un mask
+  crea una intención de edición que Producer estima/ejecuta, sin mutar assets desde Storyboard.
+- Los shots pueden combinar contribuciones capturadas, grabadas, generativas, licenciadas, de archivo y
+  determinísticas como `mixed-origin realization`; no se reutiliza el término comercial `Hybrid`. La IA propone
+  diffs y humanos aplican, aprueban, ejecutan e incorporan.
+- `TASK-1542` cerró el contrato documental y `TASK-1543…1549` registran dominio durable, colaboración, propuestas,
+  handoffs, canvas, exports y rollout cliente. No hubo cambios de runtime ni habilitación externa.
+
 ## 2026-07-24 — ANAM publica ajustes del agente, backlog comercial y metas nativas
 
 - Las directrices de Seguimiento y Calidad y el handoff neutral del Customer Agent fueron publicadas; la landing
@@ -832,8 +846,3 @@
   Indexing API y el canary obligatorio antes de asumir paridad API para Platform Properties.
 - El runbook y las skills espejo del sitio público separan el gate de publicación (URL rastreable + sitemap con
   `lastmod` honesto) del seguimiento asíncrono de indexación. `TASK-1426` conserva la implementación pendiente.
-
-## 2026-07-18 — Pillar privada de web agéntica preparada para revisión
-
-- El post WordPress `249387`, `El fin de la web “solo para humanos”`, quedó actualizado como pillar de 4.448 palabras para soportar la landing de desarrollo web: definición citable, cuatro tipos de sitio, arquitectura compartida, matriz WebMCP/MCP/API, estado real de Chrome/WebMCP y del mercado, evals por capas, cadena de autoridad, doce pruebas de readiness, reconstrucción y FAQ.
-- Content Factory pasa con 99 bloques semánticos, TOC de 20 destinos, featured/OG separados y siete diagramas de cuerpo. WAG-V04 agrega identidad, representación, alcance, confirmación y evidencia a WAG-V02/V03; el gate automático de geometría y la QA SVG light/dark desktop/mobile pasan sin texto fuera de superficie, imágenes rotas ni overflow. El artículo sigue en `draft`; publicación, enlace recíproco, purge y QA live requieren autorización humana separada.

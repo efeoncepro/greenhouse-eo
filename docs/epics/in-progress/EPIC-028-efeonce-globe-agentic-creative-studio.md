@@ -92,6 +92,9 @@ evidencia, no una garantía de marketing.
 - [ADR-011 — Globe Video Effectiveness Agent Decision V1](../../architecture/creative-studio/EFEONCE_GLOBE_VIDEO_EFFECTIVENESS_AGENT_DECISION_V1.md)
 - [SPEC-011 — Globe Video Effectiveness Agent Architecture V1](../../architecture/creative-studio/EFEONCE_GLOBE_VIDEO_EFFECTIVENESS_AGENT_V1.md)
 - [UI Flow — Globe Video Effectiveness standalone + Producer bidireccional](../../ui/flows/TASK-1540-globe-video-effectiveness-surface-flow.md)
+- [ADR-012 — Globe Storyboard Studio Decision V1](../../architecture/creative-studio/EFEONCE_GLOBE_STORYBOARD_STUDIO_DECISION_V1.md)
+- [SPEC-012 — Globe Storyboard Studio Architecture V1](../../architecture/creative-studio/EFEONCE_GLOBE_STORYBOARD_STUDIO_V1.md)
+- [UI Flow — Storyboard Studio Structured Sequence Canvas](../../ui/flows/TASK-1547-globe-storyboard-studio-flow.md)
 
 ## Child Tasks
 
@@ -153,6 +156,15 @@ evidencia, no una garantía de marketing.
   entry points contextuales, status/resumen in-place en Producer, timeline y review; `TASK-1541`, rollout,
   grants, credits, canarios, recovery y certificación cross-surface. No crea uploader, asset store ni lógica
   de negocio por surface: reutiliza TASK-1467/ADR-007 y todas las interfaces consumen el primitive de TASK-1536.
+- **Storyboard Studio (ADR-012/SPEC-012) — contrato aceptado y siete slices de implementación/rollout.**
+  `TASK-1542` cerró el bounded context Narrative Preproduction y la dirección Editorial Sequence Desk;
+  `TASK-1543` posee Narrative Project, Script/Storyboard y revisiones durables; `TASK-1544` extiende TASK-1522 con
+  mentions, colaboración cliente, anotación vectorial y masks; `TASK-1545` reutiliza TASK-1530 para propuestas
+  estructuradas con human apply; `TASK-1546` posee mixed-origin realization y handoffs bidireccionales a Producer/
+  Video Effectiveness; `TASK-1547` implementa Brief/Outline/Guion/Storyboard/Review sobre Structured Sequence
+  Canvas; `TASK-1548` entrega exports determinísticos; `TASK-1549` gobierna flags, grants/invites, privacidad,
+  recovery, canarios y rollout. Storyboard no ejecuta modelos ni post-producción: Producer y Video Effectiveness
+  conservan autoridad y consumen una revisión narrativa exacta.
 - `TASK-1521` — **Globe Commercial Runtime Environment Enablement.** Posee el bloqueo actual que impide bootear
   fuera de `internal_smoke`: environment contract, isolation/config, secrets, migrations, rollback y evidencia.
 - `TASK-1506` — **frontend hosting and front door decision (RESUELTA — ADR-004).** Gate P0 cerrado: la ADR
