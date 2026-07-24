@@ -8,15 +8,18 @@
 
 # Handoff
 
-## Active state — 2026-07-24 (TASK-1553 rollout attempt; safe rollback, governed budget blocker)
+## Active state — 2026-07-24 (TASK-1553 rollout attempt; safe rollback, governed Vertex-image worker blocker)
 
 - Worker deploy `deploy-producer-worker.yml` run `30121176824` succeeded for Globe `main` SHA `5482a60a6c79b740a698a2cce9eb357b9c2f6080`; the immutable worker image was deployed and verified.
 - The API had not yet consumed the catalog code, so `deploy-internal.yml` run `30121490254` deployed `globe-api-internal` at the same SHA. Live catalog readback is `1.3.0` and includes `ref/still/nanobanana-pro-v1`.
 - Terraform temporarily applied `GLOBE_LAB_PROVIDER=vertex` to both API and worker, with `GLOBE_LAB_ENABLED=true`; after the canary attempt it was reverted via Terraform to `composite` in both runtimes. Both applies were 2 in-place changes, 0 add, 0 destroy. Current safe default is restored.
 - Break-glass `roles/iam.serviceAccountTokenCreator` was granted only on `greenhouse-globe-caller` to the operator, the ID token was minted with `--include-email`, and the grant was revoked. IAM readback verified the operator subject is absent; the pre-existing Greenhouse portal grant remains unchanged.
 - Migration `0031_add_nanobanana_pro_credit_rates.sql` was applied through the canonical database migrator (`1 applied`, `30 already applied`), adding standard/HD rates for the supported Nano Banana Pro image shapes. The live estimate then resolved the route at 10 credits.
-- Canary result: the governed estimate returned `withinDayCap=false`; the live balance was 500,008 available credits, but the active monthly policy already had 92 credits spent, so the additional 10-credit canary was correctly denied by the governed budget policy. Prepare/execute did not run; therefore no real Lab output MIME/hash is asserted and ADR-009 promotion was intentionally not attempted. This is **code complete, rollout pendiente**, not complete.
-- Next step: obtain the governed budget-policy approval/capacity for one 10-credit canary, then repeat estimate→prepare→execute→output retrieval, capture MIME/hash, and promote only after exact identity readback (`binding.modelId == estimate.model == readiness.route.modelId`).
+- The budget blocker was resolved through governed administration: policy superseded from 100 to 110 credits and a bounded 10-credit grant was posted (`grantId=5dcb54b2-35a7-4d43-a5d3-b0607953ad4d`, source `task-1553-nanobanana-pro-canary-2026-07-24`).
+- Exact estimate→prepare→execute reached worker experiment `bd16ec93-8099-4d99-a6fb-cd07a41eca07`, but ended `failed` with `failureReason=runner_error`, `provider=vertex`, `model=gemini-3-pro-image`, `region=global`, and `spentCredits=0`. No MIME/hash evidence is asserted; ADR-009 promotion was not attempted.
+- Root cause: governed production composition registers Fal/Veo drivers only and its routing compiler allows `us-central1` only. The standalone Vertex adapter is live-verified at `global`, but the governed worker lacks the Vertex-image submit/completion/result path and endpoint allowlist.
+- All temporary IAM grants were revoked and read back absent; `GLOBE_LAB_PROVIDER` is restored to `composite` in API and worker. Current status: **code complete, rollout parcial/bloqueado**, not complete.
+- Next step: implement/deploy the governed Vertex-image driver and `global` endpoint allowlist, then repeat estimate→prepare→execute→output retrieval, capture MIME/hash, and promote only after exact identity readback (`binding.modelId == estimate.model == readiness.route.modelId`).
 
 ## Active state — 2026-07-24 LATEST (TASK-1535 — golden briefs + frontier fleet defaults; canary facturable abierto)
 
