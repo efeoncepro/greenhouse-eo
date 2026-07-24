@@ -3,7 +3,8 @@
 > **Contrato de diseño** del selector de modelo del Producer. Robusto y aterrizado, NO stub. El implementador
 > construye la superficie DESDE acá sin re-decidir arquitectura.
 >
-> **Dirección aprobada (base visual):** [`docs/ui/visual-directions/TASK-1505-globe-creative-producer-approved-direction.md`](../visual-directions/TASK-1505-globe-creative-producer-approved-direction.md)
+> **Dirección visual ELEGIDA (design-studio Step 1-2):** [`docs/ui/visual-directions/TASK-1555-globe-producer-model-selector-direction.md`](../visual-directions/TASK-1555-globe-producer-model-selector-direction.md) — Dirección A "Galería de láminas" (poster-first).
+> **Base aprobada del Producer:** [`docs/ui/visual-directions/TASK-1505-globe-creative-producer-approved-direction.md`](../visual-directions/TASK-1505-globe-creative-producer-approved-direction.md)
 > **Superficie hermana (jerarquía del composer):** [`docs/ui/wireframes/TASK-1552-globe-producer-composer-focused-creation.md`](TASK-1552-globe-producer-composer-focused-creation.md)
 > **Dato (SoT):** reader `globe.producer.fleet.list` (TASK-1554) — rutas con `availability` + `recommendedDefaults`.
 > **Copy (SoT):** `efeonce-globe/apps/studio-web/src/producer-copy.ts` (`composer.route`, `routePending`, `routeDisclosure`).

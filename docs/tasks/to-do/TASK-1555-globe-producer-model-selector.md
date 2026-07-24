@@ -58,8 +58,10 @@ visible para el usuario.
 
 Revisar y respetar:
 
-- `docs/ui/visual-directions/TASK-1505-globe-creative-producer-approved-direction.md` (dirección aprobada del Producer)
+- `docs/ui/visual-directions/TASK-1555-globe-producer-model-selector-direction.md` (**dirección visual ELEGIDA**, design-studio Step 1-2: Dirección A "Galería de láminas")
+- `docs/ui/visual-directions/TASK-1505-globe-creative-producer-approved-direction.md` (dirección aprobada base del Producer)
 - `docs/ui/wireframes/TASK-1555-globe-producer-model-selector.md` (contrato de diseño de esta task)
+- `docs/ui/motion/TASK-1555-globe-producer-model-selector-motion.md` (contrato de motion)
 - `docs/architecture/creative-studio/EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md` (catálogo, audiencia, slug guard)
 - `docs/architecture/creative-studio/EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md` (ADR-013)
 - `docs/operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md` (ledger de flota)
