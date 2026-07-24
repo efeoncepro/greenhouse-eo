@@ -244,6 +244,15 @@
 - Snapshot íntegro pre-migración: [`docs/operations/agent-context-history/2026-07-19/Handoff.legacy.md`](docs/operations/agent-context-history/2026-07-19/Handoff.legacy.md).
 - Modelo operativo: [`docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md`](docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md).
 
+## Sesión 2026-07-24 — ANAM: agente, backlog y metas operativas
+
+> Customer Agent publicado con Seguimiento/Calidad y handoff neutral; regresión live complementaria pendiente.
+> Backlog comercial piloto `21329151` reconciliado en 575 Deals / 205.005,55 UF nominales / 77.134,72 UF
+> ponderadas. Tres Goals y nueve gráficos live. Los proxies no fieles permanecen bloqueados y los insumos del
+> cliente están enumerados en
+> `docs/architecture/kortex/hubspot-as-a-service/anam-follow-up-change-set-2026-07-24.md`; QA:
+> `docs/audits/ANAM_HUBSPOT_GOALS_EXECUTION_QA_2026-07-24.md`.
+
 ## Sesión 2026-07-20 — TASK-1490 cerrada: edit/refine cross-model en Globe (verificado en vivo)
 
 - Refinar un candidato pasó a ser **una sola semántica** para todo modelo editable en `efeonce-globe`:
@@ -502,19 +511,3 @@
 > label, sin redeploy — gotcha #4). **TASK-1428 y TASK-1429 → complete/** (README/registry/ledger/
 > timing ledger sincronizados). Queda: ventana monitor 7d `growth.cta.*` (comparte 2026-07-25 con
 > TASK-1427) y la primera campaña `slide_in` real (decisión de negocio: surface/copy/trigger).
-
-## Sesión 2026-07-18 (cont. 2) — TASK-1429 Slices 1-3: slide_in interruptivo + Experience System (code complete, GVC mirado)
-
-> `/implement-task 1429` (+orden: luego enforcement + producción). **Code-complete en develop
-> local**: `SlideInController` no modal (trigger gobernado dwell 8s/scroll 35%, apertura pasiva,
-> Escape+focus return, dismiss persistido pre-salida con `@starting-style`+`allow-discrete`),
-> density `full|condensed|peek` por container query keyed por placement attr (paridad
-> overlay↔preview), identidad pseudónima consent-aware enviada por headers (cierra el loop con el
-> visitor state de TASK-1428) + guard local de sesión, `viewed` visibility-gated (IO ≥50% +
-> dwell; corte en TRACKING-PLAN) + Tier B, tokens 2026 (`light-dark()`/`color-mix(in oklch)`/
-> `linear()` con `@supports`; `--gh-cta-*` intactos), morph card→form con View Transition,
-> preview con matriz de density + demo vivo. **GVC 1440+390 mirado** (frames en
-> `.captures/2026-07-18T14-57-05_task-1429-*`); el loop cazó 2 bugs pre-merge (destroy
-> cross-instance StrictMode; density anclada a la clase del overlay). 90 tests verdes; bundle
-> `1.1.0-preview.1` (33.7KB). Ningún CTA slide_in publicado aún (decisión de campaña del
-> operador). Siguiente en esta misma sesión: push → staging → enforcement ON → producción.

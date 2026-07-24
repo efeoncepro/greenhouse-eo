@@ -1,7 +1,7 @@
 # ANAM — Paso siguiente, licencias y HubSpot Sales en Outlook web
 
 > **Tipo:** Manual de uso
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Actualizado:** 2026-07-24
 > **Portal:** ANAM `19893546`
 > **Funcional:** [`../../documentation/hubspot-as-a-service/anam-seguimiento-2026-07-24.md`](../../documentation/hubspot-as-a-service/anam-seguimiento-2026-07-24.md)
@@ -12,7 +12,12 @@
 ### Para qué sirve
 
 Permite que cualquier persona entienda qué acción mueve el Negocio, quién la hará y cuándo. No es una etapa ni
-un comentario general.
+un comentario general. También alimenta la columna operativa del backlog comercial: un Negocio abierto sin una
+acción concreta no permite anticipar qué ocurrirá ni cuándo.
+
+En Growth es obligatorio desde `Calificado 30%` y continúa siendo requerido en `Interesado 50%` y `Hot 85%`.
+En Renovación es obligatorio en las cuatro etapas abiertas: `Por revisar`, `Elegibilidad confirmada`,
+`Contacto iniciado` y `Propuesta en negociación`.
 
 ### Paso a paso
 
@@ -20,7 +25,8 @@ un comentario general.
 2. Busca la propiedad `Paso siguiente`.
 3. Escribe `acción + resultado esperado + responsable + fecha`.
 4. Guarda.
-5. Cuando la acción termine o cambie, reemplaza el valor por la nueva acción.
+5. Ejecuta la acción y registra la actividad correspondiente.
+6. Cuando la acción termine o cambie, reemplaza el valor por la nueva acción.
 
 Ejemplos correctos:
 
@@ -36,6 +42,21 @@ Evita:
 - `Esperar respuesta`.
 
 Esos textos no indican resultado, responsable ni fecha.
+
+### Cómo se interpreta
+
+- **Acción:** qué debe hacerse ahora, expresado con un verbo.
+- **Resultado esperado:** qué hito permitirá avanzar o decidir.
+- **Responsable:** quién mueve la acción; puede ser ANAM, el cliente o ambas partes.
+- **Fecha:** compromiso o fecha de revisión, no una estimación indefinida.
+
+`Paso siguiente` no reemplaza las notas, tareas, correos o llamadas. Las actividades conservan el historial; esta
+propiedad muestra únicamente la próxima acción vigente. Por eso debe sustituirse después de cada avance y no
+acumular una cronología dentro del mismo campo.
+
+El seguimiento puede revisarse en
+[`ANAM — Backlog comercial (PILOTO)`](https://app.hubspot.com/reports-dashboard/19893546/view/21329151), donde
+cada fila muestra Negocio, etapa, owner, fecha de cierre y `Paso siguiente`.
 
 ## 2. Entender las licencias
 

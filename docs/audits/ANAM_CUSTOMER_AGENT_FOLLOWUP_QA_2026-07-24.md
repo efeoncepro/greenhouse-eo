@@ -2,8 +2,8 @@
 
 > **Fecha:** 2026-07-24
 > **Portal:** ANAM `19893546`
-> **Plano:** configuración en borrador y previsualización de HubSpot
-> **Estado:** `CONDITIONAL PASS` — QA aprobada; publicación pendiente
+> **Plano:** configuración publicada y previsualización de HubSpot
+> **Estado:** `PASS WITH LIVE-PREVIEW LIMITATION` — publicación confirmada; simulador live sin respuesta en la prueba posterior
 
 ## Alcance
 
@@ -33,15 +33,17 @@ debe cambiar sólo cuando ANAM confirme propietarios y fallback.
 
 - HubSpot puede activar su transferencia nativa antes de completar preguntas en determinadas formulaciones.
 - La prueba se hizo en previsualización, no con una identidad real de cliente.
-- Los cambios siguen en borrador. No representan el comportamiento live hasta `Publicar instrucciones`.
-- Excepción: la respuesta corta corregida de factura/OC ya está sincronizada y activa.
+- Las cinco categorías de directrices y las pautas de transferencia pasaron la comprobación previa sin problemas
+  y fueron publicadas el 2026-07-24.
+- En la regresión posterior, el simulador `En directo` recibió el prompt de Seguimiento, pero no produjo respuesta
+  dentro de 45 segundos. Esto deja esa prueba inconclusa y no revierte la publicación confirmada.
+- La respuesta corta corregida de factura/OC está sincronizada y activa.
 
 ## Gate de publicación
 
-1. aprobación del texto exacto;
-2. confirmación de que el assignee interno actual sigue siendo válido;
-3. publicación única;
-4. regresión live de los tres escenarios;
-5. registro de timestamp, versión y rollback.
+1. Texto exacto, assignee interno y copy neutral: confirmados.
+2. Publicación de directrices y handoff: completada.
+3. Readback sin `Cambios no publicados`: completado.
+4. Regresión live: pendiente de repetir en una conversación real o cuando el simulador vuelva a responder.
 
-Hasta completar ese gate, el estado correcto es `configuración preparada, rollout pendiente`.
+Estado correcto: `publicado; verificación live complementaria pendiente`.

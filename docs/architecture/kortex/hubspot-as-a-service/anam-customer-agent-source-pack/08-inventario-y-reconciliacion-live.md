@@ -50,9 +50,10 @@ Drift histórico detectado el 2026-07-17:
 - Cuenta y facturación muestra `33.000` créditos mensuales, pero la cuenta está vencida y existe una factura atrasada: `#760627868`, emitida el `2026-05-08`, vencimiento `2026-06-07`.
 - El usuario operador tiene acceso restringido a facturación. Dos confirmaciones explícitas de `Activar` fueron rechazadas con `No se pudo reanudar el uso de Agente de clientes`; el toggle permaneció `DESACTIVADA`.
 
-Estado actualizado el 2026-07-24: el Customer Agent está operativo y el canal acepta pruebas en previsualización.
-El bloqueo anterior ya no gobierna la operación actual. Los cambios de Seguimiento, Calidad y handoff neutral
-están guardados como borrador, con QA favorable, pero siguen pendientes de publicación.
+Estado actualizado el 2026-07-24: el Customer Agent está operativo. Los cambios de Seguimiento, Calidad y handoff
+neutral fueron publicados después de pasar la comprobación previa de HubSpot sin problemas. El readback confirmó
+que no quedaron cambios sin publicar. La regresión posterior del simulador `En directo` recibió el prompt, pero
+no respondió dentro de 45 segundos; debe repetirse en conversación real o cuando el simulador se recupere.
 
 ## Checks antes de republicar knowledge
 

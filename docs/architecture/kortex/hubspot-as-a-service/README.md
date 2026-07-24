@@ -115,6 +115,8 @@ Requests from client emails or Notion tasks are intake, not executable schema. B
 - Client follow-up summary and draft email: [`../../../documentation/hubspot-as-a-service/anam-seguimiento-2026-07-24.md`](../../../documentation/hubspot-as-a-service/anam-seguimiento-2026-07-24.md)
 - Operator guide for `Paso siguiente`, seats and Outlook web: [`../../../manual-de-uso/hubspot-as-a-service/anam-paso-siguiente-licencias-y-outlook.md`](../../../manual-de-uso/hubspot-as-a-service/anam-paso-siguiente-licencias-y-outlook.md)
 - Follow-up Customer Agent QA: [`../../../audits/ANAM_CUSTOMER_AGENT_FOLLOWUP_QA_2026-07-24.md`](../../../audits/ANAM_CUSTOMER_AGENT_FOLLOWUP_QA_2026-07-24.md)
+- Commercial backlog dashboard runtime QA: [`../../../audits/ANAM_COMMERCIAL_BACKLOG_DASHBOARD_QA_2026-07-24.md`](../../../audits/ANAM_COMMERCIAL_BACKLOG_DASHBOARD_QA_2026-07-24.md)
+- HubSpot Goals execution and dashboard-panel QA: [`../../../audits/ANAM_HUBSPOT_GOALS_EXECUTION_QA_2026-07-24.md`](../../../audits/ANAM_HUBSPOT_GOALS_EXECUTION_QA_2026-07-24.md)
 - Deal-to-Company association remediation dry run, owner queues and approval boundary: [`anam-deal-company-association-remediation-dry-run-2026-07-16.md`](anam-deal-company-association-remediation-dry-run-2026-07-16.md)
 - Final scoped QA verdict: [`../../../audits/ANAM_REVOPS_CHANGE_SET_QA_2026-07-16.md`](../../../audits/ANAM_REVOPS_CHANGE_SET_QA_2026-07-16.md)
 
@@ -126,5 +128,6 @@ ANAM confirmed on 2026-07-16 that Customer Agent and 30,000 additional credits w
 administrative billing blocker observed on 2026-07-17 is no longer the current state: authenticated inspection on
 2026-07-24 showed the agent operational, its live-chat channel active and tests responding. The account exposes
 33,000 credits per cycle. Continue to verify a real new conversation, response and credit behavior; configuration
-presence alone does not prove availability. The Follow-up, Quality and neutral handoff improvements are saved as
-unpublished drafts and remain rollout-pending.
+presence alone does not prove availability. The Follow-up, Quality and neutral handoff improvements were
+published on 2026-07-24 after HubSpot's preflight reported no issues. The post-publication live simulator received
+the test prompt but did not answer within 45 seconds, so that complementary regression remains pending.

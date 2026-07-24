@@ -7,6 +7,18 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-24 — ANAM publica ajustes del agente, backlog comercial y metas nativas
+
+- Las directrices de Seguimiento y Calidad y el handoff neutral del Customer Agent fueron publicadas; la landing
+  continúa operativa y el routing interno no se expone al visitante.
+- Se publicó `ANAM — Backlog comercial (PILOTO)` con 575 Negocios abiertos, 205.005,55 UF nominales y 77.134,72
+  UF ponderadas, conservando separados Growth, Renovación, montos nominales y ponderados.
+- HubSpot Goals ahora contiene adjudicación Growth (24.600 UF/año), correos semanales y reuniones semanales para
+  siete responsables. El panel comercial recibió nueve gráficos: agregado, evolución y responsable por cada meta.
+- Llamadas tipificadas, oportunidades/ofertas, tasa de cierre y Fidelización permanecen sin meta nativa cuando la
+  plantilla o el contrato de datos no permiten una representación fiel. Notion y la documentación ANAM registran
+  el motivo y el siguiente gate.
+
 ## 2026-07-24 — Globe: derivados de media versionados + entrega por Range (TASK-1528)
 
 - ADR-008 build units 1-3 desplegados y verificados internal-only (SPEC-010): 6 perfiles gobernados de media
@@ -822,21 +834,3 @@
 
 - El post WordPress `249387`, `El fin de la web “solo para humanos”`, quedó actualizado como pillar de 4.448 palabras para soportar la landing de desarrollo web: definición citable, cuatro tipos de sitio, arquitectura compartida, matriz WebMCP/MCP/API, estado real de Chrome/WebMCP y del mercado, evals por capas, cadena de autoridad, doce pruebas de readiness, reconstrucción y FAQ.
 - Content Factory pasa con 99 bloques semánticos, TOC de 20 destinos, featured/OG separados y siete diagramas de cuerpo. WAG-V04 agrega identidad, representación, alcance, confirmación y evidencia a WAG-V02/V03; el gate automático de geometría y la QA SVG light/dark desktop/mobile pasan sin texto fuera de superficie, imágenes rotas ni overflow. El artículo sigue en `draft`; publicación, enlace recíproco, purge y QA live requieren autorización humana separada.
-
-## 2026-07-17 — TASK-1339: Growth CTA & Popup Engine — foundation `growth.cta` (code complete, shadow)
-
-- Fundación server-side de la primera rebanada vertical de EPIC-023: schema `greenhouse_growth.cta_*`
-  (definition/version con state machine + published inmutable por trigger; surface bindings con embed key;
-  conversion ledger Tier A append-only con `trust_level`/`consent_source` + rechazos sin PII), primitive
-  canónico `src/lib/growth/ctas/` (contracts `greenhouse-growth-cta-popup.v1`, arbiter server-side 0–1
-  interruptivo, render-contract compiler browser-safe, action router SOLO `open_growth_form` vía el reader
-  de Growth Forms sin duplicar schema/validación/consent, ingest forjable-hardened con cross-check
-  `cta_version↔surface` + rate-limit + idempotencia), API pública render/events (CORS data-driven) y
-  admin list/author/lifecycle/surfaces (capability fina por acción).
-- Capabilities `growth.cta.{read,author,publish,pause}` (catalog + registry + grants espejo growth.forms +
-  coverage verde; `pause` separada = freno de emergencia sin autoridad de publish). 4 reliability signals
-  `growth.cta.*` cableadas al overview. Outbox `growth.cta.version_lifecycle_changed` + `surface_registered`
-  v1 in-tx (EVENT_CATALOG delta). Primer CTA real `ai-visibility-report-followup` publicado con bindings
-  `wordpress` + `think`; smoke e2e verde contra PG dev (render sin leak de policy, ingest idempotente,
-  forja rechazada y persistida). Flag `GROWTH_CTA_ENGINE_ENABLED` default OFF (ledger); flip coordinado
-  con TASK-1340 (renderer), que queda desbloqueada por el contrato publicado.

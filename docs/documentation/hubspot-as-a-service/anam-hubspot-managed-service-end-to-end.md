@@ -34,16 +34,16 @@ hace falta una acción humana. El nombre del assignee se mantiene como routing i
 visible. El source pack independiente y reconciliado versiona las 23 fuentes en uso, las
 17 respuestas cortas, el catálogo de 356 registros y el contrato de identidad/directrices/handoff/canales.
 
-El readback del 24 de julio confirmó que Customer Agent volvió a operar, con live chat activo, cobertura de todas
-las horas y pruebas de respuesta disponibles. El bloqueo administrativo observado el 17 de julio queda como
-antecedente histórico, no como estado vigente. Los ajustes posteriores de Seguimiento, Calidad y copy neutral
-están en borrador y requieren publicación controlada.
+El readback del 24 de julio confirmó que Customer Agent volvió a operar, con live chat activo y cobertura de todas
+las horas. El bloqueo administrativo observado el 17 de julio queda como antecedente histórico, no como estado
+vigente. Los ajustes posteriores de Seguimiento, Calidad y copy neutral fueron publicados tras una comprobación
+previa sin problemas. El simulador live no respondió en la regresión posterior y esa prueba debe repetirse.
 
 ## Estado por fase
 
 | Fase | Estado | Resultado vigente |
 |---|---|---|
-| Customer Agent y landing | Operativo; mejora en borrador | Landing, tres intents, 23 fuentes y canal activo. Ajustes de Seguimiento, Calidad y handoff neutral con QA favorable, pendientes de publicación. |
+| Customer Agent y landing | Operativo; mejora publicada | Landing, tres intents, 23 fuentes y canal activo. Ajustes de Seguimiento, Calidad y handoff neutral publicados; regresión live complementaria pendiente. |
 | Growth y calidad | Cerrada | Data Quality `21144697`, Growth `19708354`, siete assets y outcome exacto. |
 | Catálogo | Suficiente | 505/506 líneas tienen Product; 220/220 líneas ganadas resuelven a Product. |
 | Service y contrato | Piloto live | Grupo, diez propiedades, asociaciones, cinco Services y workflow `1852406585`. |
@@ -86,6 +86,30 @@ Renovación conserva los stage IDs y ahora expresa el proceso real desde `Por re
 renovado` o `No aplica / Desestimado`. La creación ordinaria parte en `Por revisar`; las cuatro etapas abiertas
 exigen `Paso siguiente`. Las automatizaciones de tareas por entrada futura a etapa quedaron diseñadas, no
 publicadas: requieren un slice con owner, vencimiento, notificación y prueba sin enrolamiento histórico.
+
+## Metas y visualización comercial
+
+El 24 de julio quedaron operativas tres familias de metas nativas en HubSpot para siete responsables:
+
+- adjudicación en `Crecimiento - Nuevos Negocios`: cuatro ingenieros de venta con 400 UF/mes cada uno y tres
+  asistentes comerciales con 150 UF/mes cada uno; total 2.050 UF/mes y 24.600 UF/año;
+- 50 correos enviados por persona por semana;
+- 5 reuniones programadas por persona por semana.
+
+El panel [`ANAM — Backlog comercial (PILOTO)`](https://app.hubspot.com/reports-dashboard/19893546/view/21329151)
+conserva los informes nativos preexistentes y agrega la cola comercial abierta, más nueve visualizaciones de
+metas: indicador agregado, evolución temporal y desglose por responsable para adjudicación, correos y reuniones.
+Las metas también se pueden revisar en
+[`HubSpot Goals`](https://app.hubspot.com/goals/19893546/overview).
+
+No se fabricaron equivalencias para metas que la suscripción no representa fielmente. `Llamadas hechas` cuenta
+todas las llamadas y no permite limitarse a los cinco tipos acordados; no existen plantillas nativas equivalentes
+para volumen de ofertas/oportunidades calificadas ni tasa de cierre superior a 30%; y Fidelización todavía no
+tiene métrica, valor, cadencia ni población aprobadas.
+
+La meta de adjudicación es sólo Growth. El backlog comercial combina Growth y Renovación, por lo que el panel
+mantiene `(PILOTO)` hasta que ANAM entregue una meta de Fidelización o apruebe una comparación estratégica
+limitada a Growth.
 
 ## Calidad de datos y disciplina comercial
 

@@ -3,23 +3,23 @@
 > **Portal:** HubSpot ANAM `19893546`
 > **Scope:** follow-up requests received by email on 2026-07-22 and Teams on 2026-07-23
 > **Evidence:** authenticated portal readback on 2026-07-24, canonical ANAM docs, email and Teams review
-> **Runtime rule:** configuration drafts are not live until explicitly published
+> **Runtime state:** directrices y handoff publicados el 2026-07-24
 
 ## Executive state
 
 | Workstream | State on 2026-07-24 | Evidence / next gate |
 |---|---|---|
 | Customer Agent availability | Operational | Active live-chat channel, all-hours coverage and successful draft-preview responses |
-| Follow-up intent | Drafted and QA passed | Focuses results/reports, scheduling and billing; does not redirect to residues |
-| Quality intake | Drafted and QA passed | Requests name, company, email and the specific result/detail before handoff |
-| Handoff copy | Drafted, neutral | Says `una persona del equipo`; no customer-facing executive name |
+| Follow-up intent | Published; draft QA passed | Focuses results/reports, scheduling and billing; does not redirect to residues |
+| Quality intake | Published; draft QA passed | Requests name, company, email and the specific result/detail before handoff |
+| Handoff copy | Published, neutral | Says `una persona del equipo`; no customer-facing executive name |
 | Short response: invoice/PO review | Updated and synchronized | Active source now says `una persona del equipo` |
 | Handoff assignment | Existing internal routing retained | Currently points to Maria Paz Haeger; change only after ANAM supplies the owner/fallback matrix |
 | Pipeline `Paso siguiente` | Live required property | Operator guidance exists; task automation remains unpublished |
 | Licenses | Current inventory read back | See seat and product inventory below |
 | Outlook web tutorial | Documented | Ready to deliver; a screen recording remains a separate production step |
 | SLA KPI | Definition pending | ANAM must select the SLA grain and provide source dates/owners |
-| Backlog reporting | Three grains defined | Commercial can proceed after live cohort readback; delivery and billing remain source-gated |
+| Backlog reporting | Commercial dashboard published as pilot | 575 open Deals / 205,005.55 UF nominal / 77,134.72 UF weighted; the 24,600 UF/year Growth Goal and nine Goal panels are live, but the Renewal target is still missing |
 
 ## Architecture and ADR assessment
 
@@ -80,17 +80,15 @@ not require changing the visitor experience.
 The active short response `El monto de la factura no coincide...` was updated and reached `Sincronizadas` at
 2026-07-24 04:07 GMT-4. Its answer now also uses `una persona del equipo`.
 
-### Publication boundary
+### Publication result
 
-The guidelines and two transfer messages are saved as unpublished HubSpot changes. The neutral short response is
-already synchronized because it was a direct correction to an active customer-facing source. Publication remains
-approval-gated because it changes live agent behavior. Before publishing:
+The guidelines and handoff instructions were published on 2026-07-24 after HubSpot's preflight reported no
+problems for the five guideline categories or for handoff. Readback confirmed that neither surface retained
+`Cambios no publicados`. The neutral short response remains synchronized as an active customer-facing source.
 
-1. review the exact draft in `Todos los borradores`;
-2. confirm the internal assignee/fallback remains acceptable;
-3. publish the instruction set once;
-4. rerun follow-up, Quality and unavailable-agent scenarios on the live version;
-5. record the published timestamp and rollback text.
+The post-publication `En directo` simulator accepted the Follow-up prompt but did not answer within 45 seconds.
+Repeat Follow-up, Quality and unavailable-agent regression in a real conversation or when the simulator responds;
+do not interpret this simulator timeout as a failed publication.
 
 ## Current subscription and seat inventory
 
@@ -168,6 +166,60 @@ not mix Deals, Services and Tickets in one percentage.
 No consolidated backlog amount may add CLP, UF and USD. No item should appear in more than one row at the same
 grain, and cross-backlog totals must not be presented as additive.
 
+### Commercial backlog runtime execution
+
+The commercial slice was created and read back in the ANAM portal on 2026-07-24:
+
+- dashboard: `ANAM — Backlog comercial (PILOTO)`;
+- dashboard ID: `21329151`;
+- report: `ANAM — Backlog abierto por etapa (UF)`;
+- report ID: `342125020`;
+- dashboard URL: `https://app.hubspot.com/reports-dashboard/19893546/view/21329151`;
+- source pipelines: `Crecimiento - Nuevos Negocios` and `Fidelización - Renovaciones`;
+- included stages:
+  - `Potencial 10%`, `Calificado 30%`, `Interesado 50%`, `Hot 85%`;
+  - `Por revisar`, `Elegibilidad confirmada`, `Contacto iniciado`, `Propuesta en negociación`;
+- excluded from the operational backlog: `Radar 0%` and every closed stage;
+- time scope: current open inventory, without a Deal creation-date restriction;
+- currency: company currency `CLF`, used by this portal for UF;
+- report columns: commercial value, stage, Deal name, owner, close date and `Paso siguiente`.
+
+Live readback produced the following baseline:
+
+| Measure | Value |
+|---|---:|
+| Open commercial Deals | 575 |
+| Nominal open amount | 205,005.55 UF |
+| Weighted open amount | 77,134.72 UF |
+| Growth open amount | 90,398.45 UF |
+| Renewal open amount | 114,607.10 UF |
+
+The count was reconciled from 23 report pages at 25 rows each with the final page full. The nominal and weighted
+amounts were reconciled by summing the eight included stage values in HubSpot's native `Negocios por etapa`
+report. The dashboard retains all eight native `Analíticas de negocio` reports and adds the filtered operational
+table plus an interpretation note.
+
+The approved Growth targets are now represented by the native Goal
+`ANAM — Meta mensual de adjudicación (UF)`: four sales engineers at 400 UF/month and three commercial assistants
+at 150 UF/month, totaling 2,050 UF/month and 24,600 UF/year. The Goal is restricted to
+`Crecimiento - Nuevos Negocios`.
+
+The pilot dashboard contains aggregate, time-series and per-user reports for the revenue Goal and the two
+faithful activity Goals (weekly emails and weekly meetings), nine Goal reports in total.
+
+The strategic `budget vs real` view is still not comparable to the full backlog cohort because that cohort also
+includes `Fidelización - Renovaciones` and the fidelity task contains no approved target. Do not create zero,
+inferred or placeholder quotas. Once ANAM supplies that target or approves a Growth-only comparison, calculate:
+
+```text
+actual = won Deal amount by close date in the period
+gap = budget - actual
+coverage = (actual + weighted open backlog expected in the period) / budget
+```
+
+Keep nominal backlog, weighted backlog and actual won value as separate series. The dashboard must retain
+`(PILOTO)` until the budget scope matches the dashboard cohort and the first monthly reconciliation is approved.
+
 ## Inputs still owned by ANAM
 
 - attendee list for the 2026-08-12 training, 09:00–13:00;
@@ -175,6 +227,7 @@ grain, and cross-backlog totals must not be presented as additive.
 - owner and delivery date for the monthly billing file;
 - people who need dashboard access;
 - selected SLA family, targets, business calendar and exclusions;
+- fidelity target (metric, value, cadence and population) or approval to limit `budget vs real` to Growth;
 - ratification or replacement of synthetic Service pilot facts.
 
 ## Rollback

@@ -78,14 +78,14 @@ No transferir al primer uso de palabras como factura, pago, OC, seguimiento, rec
 Antes de transferir: resumir en una frase y avisar que una persona del equipo continuará con el contexto. El
 copy nunca debe nombrar al assignee porque el responsable puede cambiar.
 
-### Proceso actual y borrador
+### Proceso actual publicado
 
 - Transferencia directa; crea ticket en help desk.
 - Bandeja: `Asistencia al cliente`.
 - Asignación interna actual: `Maria Paz Haeger`; no se expone al visitante y se reemplazará cuando ANAM confirme la matriz de responsables.
-- Mensaje disponible, guardado como borrador: “Entiendo. Gracias por compartir el contexto; no tendrás que repetirlo. Te paso con una persona del equipo para que continúe la revisión.”
+- Mensaje disponible, publicado: “Entiendo. Gracias por compartir el contexto; no tendrás que repetirlo. Te paso con una persona del equipo para que continúe la revisión.”
 - Si no está disponible: ticket sin asignar, chat abierto.
-- Mensaje no disponible, guardado como borrador: “Entiendo. Gracias por compartir los antecedentes; no tendrás que repetirlos. Dejé tu solicitud encaminada y una persona del equipo podrá continuar la revisión cuando esté disponible. El chat quedará abierto.”
+- Mensaje no disponible, publicado: “Entiendo. Gracias por compartir los antecedentes; no tendrás que repetirlos. Dejé tu solicitud encaminada y una persona del equipo podrá continuar la revisión cuando esté disponible. El chat quedará abierto.”
 
 ## Canales y acciones
 
@@ -106,4 +106,6 @@ Acciones: no hay una acción publicada en `Mis acciones`. Existen dos elementos 
 El agente está operativo nuevamente. El canal live chat permanece activo, con horario de todas las horas y 100%
 de cobertura. La cuenta muestra 33.000 créditos por ciclo y consumo visible. El bloqueo administrativo observado
 el 2026-07-17 queda cerrado como estado vigente, aunque se conserva en la evidencia histórica. Los ajustes de
-Seguimiento, Calidad y copy neutral permanecen como cambios no publicados hasta completar su gate.
+Seguimiento, Calidad y copy neutral fueron publicados el 2026-07-24. El readback posterior confirmó que no
+quedaron cambios sin publicar; la regresión del simulador live debe repetirse porque no respondió dentro de 45
+segundos.
