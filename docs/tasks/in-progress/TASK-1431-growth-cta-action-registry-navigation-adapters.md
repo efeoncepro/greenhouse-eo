@@ -451,6 +451,7 @@ Mantener compatibilidad de `greenhouse-growth-cta-popup.v1` si las ramas son adi
 
 ## Follow-ups
 
+- La recomendación para authoring nuevo, el inventario/migración versionada desde `book_meeting` y la graduación CTA -> scheduler nativo pertenecen a TASK-1510; esta task conserva `book_meeting` como navegación legacy compatible.
 - `download_asset` when a governed asset-delivery consumer exists.
 - `embed_growth_form` when a placement requires embedded/modal form UX.
 - `hubspot_handoff` when a bounded CRM write has explicit consent, audit and retry contract.
