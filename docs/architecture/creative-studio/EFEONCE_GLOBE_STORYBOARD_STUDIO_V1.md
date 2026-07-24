@@ -167,6 +167,22 @@ authorization and conformance; `missing` is never representable.
 Timeouts reconcile through handoff/Producer status before retry. `originatingHandoffId` and bounded depth prevent
 automatic loops.
 
+### Realization orchestration boundary (TASK-1550)
+
+An approved Storyboard revision may be compiled by a separate Realization Orchestrator into a durable, versioned
+`ProductionPlan`. The plan owns the multi-shot dependency graph, parallelizable realization units, human-production
+tasks, blockers, receipts, partial completion and recovery state; it binds every unit to the exact Storyboard and
+`ShotRealizationPlan` digests used for compilation. This is a production-plan boundary, not a second Storyboard
+source of truth.
+
+The orchestrator may prepare Producer drafts/estimates and, after a distinct human production approval, coordinate
+Producer commands for eligible units. Producer remains authoritative for provider routing, credit reserve, execution,
+candidate outputs and asset lifecycle. Captured, recorded, licensed, archival and deterministic work are represented
+as explicit units with owners/evidence; they are never claimed complete by an AI call. A timeout reconciles through
+the downstream reader before retry, and a candidate or partial result never mutates or auto-incorporates into an
+approved Storyboard revision. Video Effectiveness is an optional observer after a candidate/animatic and cannot block
+or approve the core plan.
+
 ### Video Effectiveness loop
 
 1. Storyboard exports an animatic or selects a governed video and supplies shot/time mapping.
@@ -238,9 +254,10 @@ collaboration and integrates with post-production tools rather than replacing th
 3. TASK-1544 collaboration/mentions/annotations.
 4. TASK-1545 narrative proposals.
 5. TASK-1546 mixed-origin realization and cross-domain handoffs.
-6. TASK-1547 Structured Sequence Canvas.
-7. TASK-1548 deterministic exports/interoperability.
-8. TASK-1549 internal-to-client rollout and parity certification.
+6. TASK-1550 multi-shot realization orchestration and Producer plan execution boundary.
+7. TASK-1547 Structured Sequence Canvas.
+8. TASK-1548 deterministic exports/interoperability.
+9. TASK-1549 internal-to-client rollout and parity certification.
 
 Tasks may progress in parallel only after their named contracts exist. External client access remains subordinate
 to TASK-1480 and the commercial runtime gates. TASK-1547 Slice 1 may prove the first fold with fixtures directly

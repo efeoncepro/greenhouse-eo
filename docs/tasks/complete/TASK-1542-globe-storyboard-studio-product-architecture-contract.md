@@ -77,7 +77,7 @@ Reglas obligatorias:
 
 ### Blocks / Impacts
 
-- TASK-1543 through TASK-1549.
+- TASK-1543 through TASK-1550.
 
 ### Files owned
 
@@ -115,7 +115,7 @@ Reglas obligatorias:
 
 ## Scope
 
-- Accept ADR-012/SPEC-012, register the UI contracts and decompose implementation into TASK-1543…1549.
+- Accept ADR-012/SPEC-012, register the UI contracts and decompose implementation into TASK-1543…1550.
 
 ## Out of Scope
 
@@ -156,4 +156,4 @@ N/A — policy task. ADR-012 and SPEC-012 are the canonical detailed specificati
 
 ## Follow-ups
 
-- TASK-1543 through TASK-1549.
+- TASK-1543 through TASK-1550.

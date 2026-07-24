@@ -33,10 +33,9 @@
 - **Globe — promoción/media:** auditoría live `0/7` ready. `TASK-1527` está en checkpoint humano; `TASK-1528…1529`
   poseen derivados+Range y GC. No fabricar/heredar evidencia.
 - **Globe — dominios creativos diseñados, no implementados.** Video Effectiveness (`ADR-011`/`SPEC-011`,
-  `TASK-1536…1541`) y Storyboard Studio/Narrative Preproduction (`ADR-012`/`SPEC-012`, contrato `TASK-1542`
-  cerrado, ejecución `TASK-1543…1549`) son surfaces propias. Storyboard usa grafo parallel-first: primer fold con
-  fixtures y gates de integración/export por slice. Ningún agente aprueba, gasta o muta revisiones; no hay runtime
-  ni clientes habilitados.
+  `TASK-1536…1541`) y Storyboard Studio/Narrative Preproduction (`ADR-012`/`SPEC-012`, `TASK-1542…1550`) son
+  surfaces propias. El grafo es parallel-first; `TASK-1550` añadirá planes de realización vía Producer sin mutar
+  revisiones. Ningún agente aprueba, gasta o muta revisiones; no hay runtime ni clientes habilitados.
 
 ## Pendientes inmediatos
 

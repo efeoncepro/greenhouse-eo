@@ -18,10 +18,11 @@
 - Los shots pueden combinar contribuciones capturadas, grabadas, generativas, licenciadas, de archivo y
   determinísticas como `mixed-origin realization`; no se reutiliza el término comercial `Hybrid`. La IA propone
   diffs y humanos aplican, aprueban, ejecutan e incorporan.
-- `TASK-1542` cerró el contrato documental y `TASK-1543…1549` registran dominio durable, colaboración, propuestas,
-  handoffs, canvas, exports y rollout cliente. El grafo quedó parallel-first: el primer fold avanza con fixtures,
-  Video Effectiveness y paquetes de export se habilitan por slice, y exports `policy-blocked` no frenan el primer
-  piloto. No hubo cambios de runtime ni habilitación externa.
+- `TASK-1542` cerró el contrato documental y `TASK-1543…1550` registran dominio durable, colaboración, propuestas,
+  handoffs, canvas, exports, rollout cliente y el Realization Orchestrator que coordinará ProductionPlans con
+  Producer sin mutar Storyboard. El grafo quedó parallel-first: el primer fold avanza con fixtures, Video
+  Effectiveness y paquetes de export se habilitan por slice, y exports `policy-blocked` no frenan el primer piloto.
+  No hubo cambios de runtime ni habilitación externa.
 
 ## 2026-07-24 — ANAM publica ajustes del agente, backlog comercial y metas nativas
 

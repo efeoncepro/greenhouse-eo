@@ -1622,7 +1622,8 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-1547` | `to-do` | **Globe Storyboard Studio Structured Sequence Canvas.** EPIC-028; ui-ux/flow; ui-standard; P1/Muy alto/Alto. Editorial Sequence Desk, Script/Board, visual review, masks/proposals/handoffs and premium GVC. | `docs/tasks/to-do/TASK-1547-globe-storyboard-studio-sequence-canvas.md` |
 | `TASK-1548` | `to-do` | **Globe Storyboard Deterministic Exports and Interoperability.** EPIC-028; backend-data/integration; backend-standard; P2/Alto/Medio. Revision-bound PDF/CSV/review/handoff packages and future adapter seam. | `docs/tasks/to-do/TASK-1548-globe-storyboard-exports-interoperability.md` |
 | `TASK-1549` | `to-do` | **Globe Storyboard Studio Client Rollout and API Parity Certification.** EPIC-028; backend-data/integration; backend-critical; P1/Muy alto/Alto. Flags, grants/invites, privacy/retention, canaries, recovery and staged rollout. | `docs/tasks/to-do/TASK-1549-globe-storyboard-client-rollout-api-parity.md` |
+| `TASK-1550` | `to-do` | **Globe Storyboard Realization Orchestrator and Multi-Shot Production Plan.** EPIC-028; backend-data/integration; backend-critical; P1/Muy alto/Alto. Compila revisiones aprobadas en ProductionPlans durables, DAG multi-shot, unidades humanas, recovery y coordinación gobernada con Producer. | `docs/tasks/to-do/TASK-1550-globe-storyboard-realization-orchestrator.md` |
 
 ## Siguiente ID disponible
 
-`TASK-1550`
+`TASK-1551`

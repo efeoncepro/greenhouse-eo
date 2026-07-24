@@ -104,8 +104,8 @@ Primer bloque operativo asignado:
 - `TASK-1414` ✅ complete — **Láminas reutilizables de operación para propuestas** (standard/none). `ToolStackFull`, `DailyOpsHubFull` y `ContentHubAnatomyFull` quedaron slot-driven, canonizados e integrados en SKY (26 páginas); el deck se adjuntó como v5 draft en Proposal Studio sin reemplazar v1-v4. Composer 213/213 y visual gate 57 frames a 0 píxeles. Domain commercial|content|platform. Spec: `complete/TASK-1414-proposal-reusable-operations-slides.md`.
 - **Reserva vigente: siguiente ID libre `TASK-1532`.** `TASK-1530…1531` corresponden a Creative Prompt Engineer Foundation + Creative Prompt Studio Experience de Globe (`EPIC-028`; creadas 2026-07-23). Esta línea supersede la reserva histórica inmediatamente inferior.
 - **Reserva vigente actualizada: siguiente ID libre `TASK-1533`.** `TASK-1532` corresponde a One-Click Generate con estimate automático de Globe (`EPIC-028`; creada 2026-07-23). Esta línea supersede las reservas históricas inferiores.
-- **Reserva vigente actualizada: siguiente ID libre `TASK-1550`.** `TASK-1536…1541` corresponden a Video
-  Effectiveness y `TASK-1542…1549` a Storyboard Studio/Narrative Preproduction dentro de `EPIC-028`. Esta línea
+- **Reserva vigente actualizada: siguiente ID libre `TASK-1551`.** `TASK-1536…1541` corresponden a Video
+  Effectiveness y `TASK-1542…1550` a Storyboard Studio/Narrative Preproduction dentro de `EPIC-028`. Esta línea
   supersede las reservas históricas inferiores.
 - **Reserva vigente actualizada: siguiente ID libre `TASK-1536`.** `TASK-1535` corresponde a Globe commercial promotion via rights attestation + automated lane (ADR-010; `EPIC-028`; creada 2026-07-24). Esta línea supersede las reservas históricas inferiores.
 - **Reserva histórica: siguiente ID libre `TASK-1535`.** `TASK-1533…1534` corresponden a Voice Ideation Intake Foundation + Voice-to-Creative-Prompt Experience de Globe (`EPIC-028`; creadas 2026-07-23).
@@ -1993,3 +1993,4 @@ Finance Dashboard Calculation Correction ←── Invoice Payment Ledger (cash 
 | TBD | `TASK-1547` | [TASK-1547-globe-storyboard-studio-sequence-canvas.md](to-do/TASK-1547-globe-storyboard-studio-sequence-canvas.md) | P1 | Muy alto | Alto | Diseño · ui-standard · UI ready yes · Slice 1 paralela | Editorial Sequence Desk, Guion/Board/Review y GVC premium |
 | TBD | `TASK-1548` | [TASK-1548-globe-storyboard-exports-interoperability.md](to-do/TASK-1548-globe-storyboard-exports-interoperability.md) | P2 | Alto | Medio | Diseño gobernado · blocked 1543; gates por slice 1544/1546 | PDF/CSV/review/handoff exports determinísticos |
 | TBD | `TASK-1549` | [TASK-1549-globe-storyboard-client-rollout-api-parity.md](to-do/TASK-1549-globe-storyboard-client-rollout-api-parity.md) | P1 | Muy alto | Alto | Diseño gobernado · export opcional/policy-blocked | Rollout cliente y certificación API parity |
+| TBD | `TASK-1550` | [TASK-1550-globe-storyboard-realization-orchestrator.md](to-do/TASK-1550-globe-storyboard-realization-orchestrator.md) | P1 | Muy alto | Alto | Diseño gobernado · blocked 1543/1546 | ProductionPlan multi-shot, DAG, unidades humanas y coordinación con Producer |
