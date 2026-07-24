@@ -15,6 +15,7 @@ const {
   GLOBE_OAUTH_CODE_TTL_SECONDS,
   GLOBE_OAUTH_REVALIDATE_AFTER_SECONDS,
   GLOBE_PRODUCER_CAPABILITY_SCOPES,
+  GLOBE_PRODUCER_TRANSITIONAL_ALLOWED_SCOPES,
   buildGlobeOAuthGrantContract,
   updateGlobeOAuthGrantContract,
   updateGlobeOAuthSessionContract
@@ -130,6 +131,15 @@ describe('Globe OAuth grant contract', () => {
       'globe.mcp.access'
     ]) {
       expect(PRODUCER_CONTRACT.allowedScopes).not.toContain(forbidden)
+    }
+
+    // ADR-010 rollout step 1: the attest scopes are ALLOWED (so the Globe client may start requesting
+    // them) but NOT required or granted yet — moving them to capability+required is step 3, after the
+    // client is deployed requesting them. Requiring them before that denied every login (ADR-010 delta).
+    for (const transitional of GLOBE_PRODUCER_TRANSITIONAL_ALLOWED_SCOPES) {
+      expect(PRODUCER_CONTRACT.allowedScopes).toContain(transitional)
+      expect(PRODUCER_CONTRACT.policy.requiredScopes).not.toContain(transitional)
+      expect(PRODUCER_CONTRACT.policy.capabilityScopes).not.toContain(transitional)
     }
   })
 

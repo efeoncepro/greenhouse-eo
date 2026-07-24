@@ -43,13 +43,31 @@ export const GLOBE_PRODUCER_CAPABILITY_SCOPES = [
   'globe.model-readiness.propose'
 ] as const
 
+/**
+ * ADR-010 (TASK-1535) — TRANSITIONAL allowed-only scopes. Step 1 of the zero-downtime rollout that
+ * adds `globe.model-rights.attest`/`.read` to the human Producer grant. These are added to
+ * `allowedScopes` ONLY (never `capabilityScopes`/`requiredScopes` yet), so:
+ *   - the broker does NOT require them → a client that doesn't request them still logs in;
+ *   - the broker DOES allow them → the Globe client can start requesting them (step 2) without a
+ *     `disallowed_scope` rejection, before they are moved into capability+required (step 3).
+ * The broker enforces `capabilityScopes ⊆ requiredScopes`, so a scope cannot be granted-but-optional;
+ * this buffer is how attest is introduced across the two repos (which hardcode scopes) without an outage.
+ * Once step 3 moves them into `GLOBE_PRODUCER_CAPABILITY_SCOPES`, this list goes back to empty.
+ */
+export const GLOBE_PRODUCER_TRANSITIONAL_ALLOWED_SCOPES = [
+  'globe.model-rights.attest',
+  'globe.model-rights.read'
+] as const
+
 export type GlobeOAuthGrantMode = 'shell-only' | 'producer'
 
 export const buildGlobeOAuthGrantContract = (mode: GlobeOAuthGrantMode) => {
   const capabilityScopes =
     mode === 'producer' ? [...GLOBE_PRODUCER_CAPABILITY_SCOPES] : [...GLOBE_SHELL_CAPABILITY_SCOPES]
 
-  const allowedScopes = [...GLOBE_OIDC_SCOPES, ...capabilityScopes]
+  // Producer mode also ALLOWS (but does not require/grant) the transitional scopes.
+  const transitionalAllowed = mode === 'producer' ? [...GLOBE_PRODUCER_TRANSITIONAL_ALLOWED_SCOPES] : []
+  const allowedScopes = [...GLOBE_OIDC_SCOPES, ...capabilityScopes, ...transitionalAllowed]
 
   const policy: SisterPlatformOAuthPolicyV1 = {
     schemaVersion: '1',
