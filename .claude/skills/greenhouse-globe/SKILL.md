@@ -206,11 +206,11 @@ Si el Model Lab muestra "capability con estado + provider", el **Evaluation Harn
 
 Los dos ejemplos anteriores corren sobre `FakeReferenceAdapter` (hermético, gasto cero). TASK-1486/1487/1488 enchufan **motores reales** sobre el mismo `CreativeProviderAdapter`, **sin tocar el dominio ni el command** — exactamente lo que promete el provider seam. Son el patrón a copiar cuando agregues un provider nuevo. Todos viven en `apps/creative-runner/src/*`.
 
-**`VertexCreativeAdapter` (TASK-1486) — Google-native, keyless.** En `vertex-adapter.ts`. Implementa el contrato completo (`providerId` / `supports` / `estimate` / `submit` / `poll`) y hace el **routing capability→modelo Vertex DENTRO del adapter**: `image-generate → gemini-2.5-flash-image`; `video-generate → gemini-omni-flash-preview` en la región **`global`** (us-east4 y us-central1 devuelven `NOT_FOUND` para estos modelos — usa `global`). Es **keyless**: autentica por **ADC/WIF** con un `getAccessToken` inyectado (la runtime SA tiene `aiplatform.user`), **cero API key**. Reparto de los métodos: `estimate` **no toca red**; `submit` es la **única llamada facturable**; `poll` devuelve **hashes** de output, **nunca una URL pública**. Verificado en vivo.
+**`VertexCreativeAdapter` (TASK-1486) — Google-native, keyless.** En `vertex-adapter.ts`. Implementa el contrato completo (`providerId` / `supports` / `estimate` / `submit` / `poll`) y hace el **routing capability→modelo Vertex DENTRO del adapter** (por-capacidad, un modelo fijo hoy — ver "Flota de modelos" para el seam route→model de TASK-1553): `image-generate → gemini-3-pro-image` (Nano Banana Pro, **actualizado** desde `gemini-2.5-flash-image` el 2026-07-24); `video-generate → gemini-omni-flash-preview` en la región **`global`** (us-east4 y us-central1 devuelven `NOT_FOUND` para estos modelos — usa `global`). Es **keyless**: autentica por **ADC/WIF** con un `getAccessToken` inyectado (la runtime SA tiene `aiplatform.user`), **cero API key**. Reparto de los métodos: `estimate` **no toca red**; `submit` es la **única llamada facturable**; `poll` devuelve **hashes** de output, **nunca una URL pública**. Verificado en vivo.
 
 **`FalCreativeAdapter` (TASK-1487) — motores no-Google, key propia de Globe.** En `fal-adapter.ts`. Habla con la **queue API** de Fal (`submit` / `status` / `result` / `download`). **Gotcha crítico:** usa el `status_url` / `response_url` que Fal devuelve en la respuesta del `submit`; **nunca reconstruyas esas URLs desde el slug** (la ruta de queue no es derivable del slug). La key es **propia de Globe** — `GLOBE_FAL_API_KEY`, inyectada — **nunca** `greenhouse-fal-api-key` (el secreto de Greenhouse no cruza el boundary; es la regla de no compartir secretos de provider entre plataformas).
 
-**`CompositeProviderAdapter` (TASK-1487) — combina Vertex + Fal por política.** En `composite-adapter.ts`. Compone los dos adapters: las capabilities **Fal-only** se resuelven por `supports()`; el **overlap** image/video (que ambos pueden servir) se resuelve por **política explícita**, con **default Vertex**. El `poll` **vuelve al hijo que emitió el run** — no re-rutea; respeta qué adapter hizo el `submit`. Este es el patrón para "un adapter que agrega varios providers": routing por `supports()` + política declarada para el overlap + poll fiel al emisor.
+**`CompositeProviderAdapter` (TASK-1487) — combina Vertex + Fal por política.** En `composite-adapter.ts`. Compone los dos adapters (y registra también `openai`, `vertex-video`, `vertex-omni`): las capabilities **Fal-only** se resuelven por `supports()`; el **overlap** image/video se resuelve por **política explícita** (`DEFAULT_COMPOSITE_POLICY`) — hoy **image-generate/image-edit → Fal Seedream** y `video-generate` de la ruta reference → `vertex-omni` (el comentario histórico "default Vertex" quedó desactualizado; verificar el código). El `poll` **vuelve al hijo que emitió el run** — no re-rutea; respeta qué adapter hizo el `submit`. Este es el patrón para "un adapter que agrega varios providers": routing por `supports()` + política declarada para el overlap + poll fiel al emisor.
 
 **Las 10 capabilities (TASK-1488) y la regla dura del slug ByteDance.** TASK-1488 lleva `CREATIVE_CAPABILITIES` a 10 (suma `image-upscale`, `video-upscale`, `model-3d-generate`). **REGLA DURA verificada en vivo:** los modelos **ByteDance en Fal usan el slug SIN el prefijo `fal-ai/`** (p.ej. `bytedance/seedream/v5/pro/text-to-image`); el resto — Recraft, Topaz, ElevenLabs, Hyper3D, y `fal-ai/seed-audio` — **sí** lleva `fal-ai/`. Para **verificar si un slug existe** antes de cablearlo: `POST {}` (body vacío) a `https://fal.run/<slug>` → **404 = inexistente**, **422 = existe** (falló la validación del payload, no el ruteo). El provider activo del Lab se elige con **`GLOBE_LAB_PROVIDER`** = `fake | vertex | fal | composite` (default **`fake`**): el default sigue siendo hermético / gasto cero, y prender un motor real es una decisión explícita de env.
 
@@ -519,11 +519,55 @@ Canary honesto cero-spend-nuevo: reusar un eval existente (`foley-v1` / `fal`/`s
 `objective_pass` en `greenhouse-org:efeonce`). El auto-lane SA (impersonado con tokenCreator temporal + `--include-email`
 en el ID token, break-glass revocado con corte verificado) creó el binding disabled (rev1) y el `auto-lane.promote` lo
 habilitó (rev2) + publicó `appliedRestrictions` = la postura derivada de la attestation — **postura aplicada =
-atestada**. Fleet: el **OpenAI adapter** (`apps/creative-runner/src/openai-adapter.ts`, gpt-image-1, key Globe-owned
-`globe-openai-api-key` NUNCA la de Greenhouse, `image-generate` only fail-closed) enchufa en el mismo seam. Evidencia
-de términos en `scripts/evidence/*-commercial-terms.json` (Vertex, OpenAI, Fal Seed Audio) — **as-of, `reviewerMustVerify`,
-la stale se supersede con nuevo digest**. Estado vivo (attestations, rutas promovidas, flags, canarios): SIEMPRE
-`GLOBE_RUNTIME_HANDOFF.md`, nunca esta skill.
+atestada**. Fleet: el **OpenAI adapter** (`apps/creative-runner/src/openai-adapter.ts`, `gpt-image-2` snapshot
+`2026-04-21`, key Globe-owned `globe-openai-api-key` NUNCA la de Greenhouse, `image-generate` only fail-closed) enchufa
+en el mismo seam. Evidencia de términos en `scripts/evidence/*-commercial-terms.json` (Vertex, OpenAI, Fal Seed Audio) —
+**as-of, `reviewerMustVerify`, la stale se supersede con nuevo digest**. Estado vivo (attestations, rutas promovidas,
+flags, canarios): SIEMPRE `GLOBE_RUNTIME_HANDOFF.md`, nunca esta skill.
+
+### Flota de modelos — catálogo multi-modelo extensible (update-vs-add) + el seam route→model (2026-07-24)
+
+**Principio de producto (EPIC-028 Delta 2026-07-24):** Globe corre los **mejores modelos del mercado, coexistiendo y
+creciendo — sin que uno sustituya a otro.** Dos operaciones distintas: **update** = bump de versión dentro del mismo
+lineaje/ruta (**reemplaza**: Gemini 2.5→3, gpt-image-1→2); **add** = modelo/tier distinto = **ruta nueva que coexiste**
+(Seedream ≠ Nano Banana; GPT Image 1.5 **y** 2; Nano Banana Pro **y** 2). Compatible con el non-goal "no mejor global":
+el catálogo **ofrece**; la selección es **explícita** (selector UI, TASK-1552) o por **contrato de fidelidad**
+(recommendation matrix), nunca un "mejor global".
+
+**Roster frontier vigente (imagen)** — IDs reales SÓLO en adapter/binding, NUNCA en el catálogo público (`assertNoSlugLeak`):
+
+| Modelo | Proveedor | providerModelId | Estado (2026-07-24) |
+|---|---|---|---|
+| Seedream 5 Pro | fal | `bytedance/seedream/v5/pro/...` | vivo (default de imagen del composite) |
+| Nano Banana Pro | vertex | `gemini-3-pro-image` | **allowlist despejado, genera imágenes reales** vía `global` |
+| GPT Image 2 | openai | `gpt-image-2` (`2026-04-21`) | adapter default OpenAI; canary facturable pendiente |
+| GPT Image 1.5 | openai | `gpt-image-1.5` | 2.º tier a sumar (route-based) |
+| Nano Banana 2 | vertex | `gemini-3.1-flash-image` | **404 — proyecto sin allowlist** (ask a Google) |
+
+Excluidos a propósito: `gpt-image-1`, `gemini-2.5-flash-image`, `gemini-3.1-flash-lite-image` (NB2 **Lite**).
+
+**El seam route→model (hallazgo load-bearing).** Exponer **dos modelos del mismo proveedor** (2 OpenAI / 2 Vertex) NO
+es data — es CÓDIGO. Hoy los adapters resuelven el modelo **por capacidad** (`OPENAI_ROUTING[capability]`,
+`VERTEX_ROUTING[capability]`); el composite rutea imagen a **un** proveedor por capacidad
+(`DEFAULT_COMPOSITE_POLICY['image-generate']='fal'` → Seedream; Vertex sólo para video reference). El compiler ancla a
+`estimate.model` (`production-route-compiler.ts:154-171`): un binding a un 2.º modelo del mismo proveedor da
+`route_binding_missing`/`route_identity_mismatch` → **denegado**. Se necesita **resolución de modelo por-ruta** en los
+adapters. Vehículo: **`TASK-1553`** (backend-data foundation); selector UI = **`TASK-1552`**. OpenAI además no tiene lane
+de producción (`governed-production-composition.ts:71` lanza `globe_governed_openai_official_verifier_missing`; sólo Lab).
+
+**Gotchas de runtime del canary facturable (verificados en vivo, TASK-1535 §"Canary path"):**
+- **Región Vertex image = `global`** (us-central1 da 404). El adapter usa `region:'global'`. ✓
+- **`composite` incluye openai** en el Lab (`app.ts:3488`) pero rutea imagen→Fal por política; para correr un modelo
+  Vertex/OpenAI de imagen hay que **flipear `GLOBE_LAB_PROVIDER`** (worker **`globe-producer-worker`** + api, SoT
+  Terraform) → afecta TODOS los lab runs → flip, canary, **revert a `composite`**.
+- **Auth para disparar un lab run real:** el api es IAM-private; un token de usuario NO pasa el SA-allowlist
+  (`GLOBE_API_CALLER_SERVICE_ACCOUNTS`). Hace falta **break-glass** impersonando una SA con `globe.lab.experiment.run`
+  (`greenhouse-globe-caller`) + `tokenCreator` temporal + `--include-email`.
+- **Para probar SÓLO el allowlist de un modelo Vertex** (sin el flujo gobernado): probe directo `generateContent` al
+  proyecto con ADC de operador — así se verificó Nano Banana Pro (200, imagen real) vs Nano Banana 2 (404).
+- **`gcloud` auth expira a mitad de sesión** → `gcloud auth login` + `application-default login` (interactivos).
+- **El classifier del entorno bloquea** IAM policy-bindings y a veces ediciones de código impactantes en Globe →
+  necesita permiso/aprobación del operador.
 
 ## Provider boundary
 

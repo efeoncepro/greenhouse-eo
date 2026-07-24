@@ -26,6 +26,12 @@
   cliente real; requiere autorización explícita, no autónomo. Task `in-progress` por ese gate. Detalle en
   changelog 2026-07-24 + [ADR-010](docs/architecture/creative-studio/EFEONCE_GLOBE_COMMERCIAL_PROMOTION_ATTESTATION_DECISION_V1.md).
   Regla dura: scopes del broker OAuth = rollout de 3 pasos (permite → pide → exige) o se cae el login.
+- **Globe flota multi-modelo (dirección CEO 2026-07-24) — `TASK-1553` (to-do) + EPIC-028 corregido.** Mejores modelos
+  coexistiendo, sin sustituir: **update** (bump de versión) ≠ **add** (modelo/tier nuevo, coexiste). Canary real: Nano
+  Banana Pro (`gemini-3-pro-image`) **genera imágenes reales** vía `global`; NB2 (`gemini-3.1-flash-image`) 404 (falta
+  allowlist, ask a Google). Gap: 2 modelos del mismo proveedor = **resolución por-ruta** en adapters → `TASK-1553`
+  (selector UI = `TASK-1552`). **Bloqueado:** el classifier bloquea ediciones de código en Globe → el operador las
+  habilita. Detalle: skill `greenhouse-globe` §"Flota de modelos" + `TASK-1553` + `TASK-1535` §"Canary path".
 
 ## Riesgos abiertos
 

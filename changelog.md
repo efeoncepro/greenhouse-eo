@@ -7,6 +7,23 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-24 — Globe flota multi-modelo: principio en EPIC-028 + TASK-1553 + canary real Nano Banana Pro
+
+- **EPIC-028 corregido:** se plantó el principio (faltaba) del **catálogo multi-modelo extensible** — Globe corre los
+  mejores modelos coexistiendo y creciendo, sin sustituir; **update** (bump de versión, reemplaza) ≠ **add** (modelo/tier
+  nuevo, coexiste); compatible con el non-goal "no mejor global" (el catálogo ofrece, la selección es explícita o por
+  contrato de fidelidad). Delta + Outcome nuevos.
+- **`TASK-1553` (to-do, backend-data):** vehículo del principio — **resolución de modelo por-ruta** en los adapters (hoy
+  resuelven por-capacidad → dos modelos del mismo proveedor no coexisten). Selector UI = consumer `TASK-1552`.
+- **Defaults frontier actualizados** (updates legítimos, sin borrar Seedream): OpenAI `gpt-image-1→gpt-image-2`
+  (`acb0776`), Vertex Nano Banana `gemini-2.5-flash-image→gemini-3-pro-image` (`46ab5ab`).
+- **Canary real (TASK-1535):** Nano Banana Pro (`gemini-3-pro-image`) genera **imágenes reales** en el proyecto Globe
+  vía endpoint `global`; Nano Banana 2 (`gemini-3.1-flash-image`) 404 (falta allowlist del proyecto, ask a Google).
+  Provider flip revertido a `composite`; sin IAM break-glass sucio.
+- **Skill `greenhouse-globe` actualizada** (.claude + .codex): sección "Flota de modelos" (roster, seam route→model,
+  gotchas del canary) + 2 fixes de drift (composite rutea imagen→Fal, no "default Vertex"; Vertex image default es
+  `gemini-3-pro-image`). Bloqueo para implementar: el classifier del entorno bloquea ediciones de código en Globe.
+
 ## 2026-07-24 — Globe: promoción comercial por atestación (ADR-010) — golden briefs + docs (TASK-1535)
 
 - **Slice 5 (fleet enablement) — golden briefs para las 6 rutas reference-conditioned pendientes:**
@@ -830,23 +847,3 @@
 - La portada inicial fue reemplazada por la pieza aprobada `HI-YAAH!`: lluvia binaria, figura marcial y golpe de
   energía en formato `1200×630`. WordPress media `251552` quedó sincronizado como featured, Open Graph, Twitter
   y `primaryImage` del schema; caché purgada y readback público verificado.
-
-## 2026-07-18 — Sistema editorial de infografías Efeonce y entrega SVG directa
-
-- `content-marketing-studio` incorpora un canon Efeonce basado en siete precedentes SVG propios y benchmark
-  Semrush: shell de marca estable, arquetipo variable por relación, paleta auditada, shareability y sello
-  `efeoncepro.com` consumido desde Artifact Composer. La regla está espejada en Codex/Claude y enlazada desde
-  `design-studio` y el carril Gutenberg/WordPress.
-- El pillar privado `El fin de la web “solo para humanos”` aplica el sistema en siete infografías y 28 variantes
-  SVG: la firma completa —fuente/fecha, wordmark oficial y URL— vive en el footer, nunca en el header. El draft
-  `249387` quedó integrado con art direction light/dark y desktop/mobile, sin cambiar su estado a publicado.
-- El pipeline deja de imponer PNG/WebP: separa source SVG de delivery SVG saneado y rasteriza solo por contenido,
-  destino, seguridad o comparación de peso. Se agregaron contrato reusable, preset JSON y auditor CLI. En la
-  muestra histórica, el SVG comprimido resultó ~2.1×–5.6× más liviano que WebP 1200 comparable. Comando canónico:
-  `pnpm content:editorial-svg:audit -- <delivery.svg...>`.
-- Se promovió el aprendizaje a un operating model reusable, documentación funcional y manual; las skills
-  Content Marketing, Design Studio, SEO/AEO y Public Site WordPress ahora comparten footer-only, source/delivery,
-  SEO de SVG, alternativas largas, legibilidad CSS, CLS, shareability por canal y raster social-safe.
-- Una auditoría posterior corrigió el estado v7: el PASS existente cubre archivo/seguridad, pero no demuestra
-  todavía legibilidad al ancho CSS, geometría del delivery trazado ni CLS/currentSrc. El draft sigue privado y
-  queda `contextual_v7_qa_pending`; no se declara listo para publicación.

@@ -277,3 +277,25 @@ contratados, no en la amplitud del catálogo.
   incorporación y deben superar fixtures antes de un SLA.
 - Pricing, launch stage, licencias y endpoint schemas son volátiles; el registry exige reverificación mensual y
   antes de cada alta/promoción.
+
+## Delta 2026-07-24 — regla operativa update-vs-add + estado frontier vivo
+
+La dirección hizo explícito el principio que este portafolio ya anticipaba (multi-carril, no sustitución): **Globe corre
+los mejores modelos coexistiendo y creciendo.** Se formaliza la **semántica que un agente no puede confundir** (complementa
+"Dos ejes…"):
+
+- **Update** = bump de versión dentro del **mismo lineaje/ruta** → **reemplaza** (ej. Gemini 2.5→3, gpt-image-1→2). No se
+  cargan versiones viejas de un mismo modelo.
+- **Add** = modelo/tier **distinto** → **ruta nueva que coexiste** (Seedream ≠ Nano Banana; GPT Image 1.5 **y** 2; Nano
+  Banana Pro **y** 2). Nunca sustituye a otro modelo distinto.
+
+**Estado frontier vivo (2026-07-24, canary TASK-1535):** Nano Banana **Pro** (`gemini-3-pro-image`) **genera imágenes
+reales** en el proyecto Globe vía endpoint `global` (allowlist despejado; us-central1 da 404). Nano Banana **2**
+(`gemini-3.1-flash-image`) da 404 — proyecto sin allowlist (ask a Google). GPT Image 2 (`gpt-image-2`) es el default del
+adapter OpenAI; GPT Image 1.5 (`gpt-image-1.5`) es el 2.º tier a sumar. Los `providerModelId` reales viven en
+adapter/binding, NUNCA en el catálogo público de rutas.
+
+**Gap de implementación → `TASK-1553`:** hoy los adapters resuelven el modelo **por capacidad**, así que dos modelos del
+mismo proveedor no coexisten (el compiler ancla a `estimate.model`); se requiere **resolución de modelo por-ruta**. El
+selector de UI es su consumer `TASK-1552`. El principio quedó plantado en **EPIC-028** (Delta 2026-07-24); el detalle
+operativo/runtime vive en la skill `greenhouse-globe` §"Flota de modelos" + `GLOBE_RUNTIME_HANDOFF.md`.
