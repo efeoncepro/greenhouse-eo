@@ -1,9 +1,9 @@
 # Operar el share board de Globe
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-07-25 por Claude (TASK-1558)
-> **Ultima actualizacion:** 2026-07-25 por Claude — v1.1 corrige un error de la v1.0: decía que el cutover era sólo un `tofu apply`, y el flag no está cableado al runtime
+> **Ultima actualizacion:** 2026-07-25 por Claude — v1.1 corrigió un error de la v1.0 (decía que el cutover era sólo un `tofu apply`, y el flag no estaba cableado); v1.2 registra el paso 1 escrito y planeado
 > **Documentacion funcional:** [Share board — la pieza que ve el cliente](../../documentation/creative-studio/efeonce-globe-share-board-cliente.md)
 
 ## Para qué sirve
