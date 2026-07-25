@@ -25,14 +25,20 @@
   `GLOBE_RUNTIME_HANDOFF.md`. Regla dura viva: scopes del broker OAuth = rollout de 3 pasos (permite → pide → exige)
   o se cae el login.
 - **Globe flota multi-modelo en el Producer (programa).** SoT: `GLOBE_MODEL_FLEET_STATUS.md`.
-  **`TASK-1553`** shipped (catálogo v1.3.0 + resolución por-ruta; canary NB Pro VERDE). **`TASK-1554`** shipped +
-  **desplegado** (reader `globe.producer.fleet.list` live). **`TASK-1555`** (selector UI, in-progress): dirección "Galería
-  de láminas" + wireframe/motion + **Slice 1a data layer done** (local `efeonce-globe` `d07a1cd`, sin push);
-  falta render galería + GVC + scorecard. **Blocker duro:** la **promoción ADR-009** espera **identidades de readiness
-  firmadas** (humano) → hasta eso todo `gated`, ningún modelo `available`. `ISSUE-124` = 409 del grant.
-
-## Riesgos abiertos
-
+  **`TASK-1553`** shipped (catálogo + resolución por-ruta; canary NB Pro VERDE). **`TASK-1554`** shipped +
+  **desplegado** (reader `globe.producer.fleet.list` live). **`TASK-1555`** (selector UI, in-progress):
+  **code complete y pusheado** a `efeonce-globe` `main` (`d07a1cd`→`1c7d03b`), **sin desplegar** (el deploy de
+  Globe es `workflow_dispatch` manual). GVC premium VERDE desktop+mobile; `ui:quality` **PASS** (4.54, piso 4.2).
+  Catálogo **v1.4.0**: entraron Nano Banana 2, Recraft y Topaz — antes estaban integrados en el Lab pero
+  **sin ruta pública**, o sea invisibles. Cubre 12/14 capacidades; faltan `model-3d-generate` (3D no existe como
+  modalidad en el contrato → task propia) y `video-extend`.
+  **La dirección visual se revirtió por decisión del operador:** la galería de láminas se implementó y se
+  rechazó al verla; vigente = **desplegable compacto con isotipo real** (doc de dirección actualizado, no el
+  código contradiciendo el contrato).
+  **Blocker duro que NO es mío:** la **promoción ADR-009** espera **identidades de readiness firmadas** (humano)
+  → hasta eso ninguna ruta de imagen queda `available`, y el Producer **no ofrece modelo de imagen elegible**.
+  Es el comportamiento correcto por gobernanza (el selector hace visible el blocker), pero si se necesita el
+  Producer operable antes de la promoción, es **decisión de rollout del operador**. `ISSUE-124` = 409 del grant.
 - Trabajo local concurrente: coordinar ownership antes de tocar archivos ya modificados.
 - **Globe Producer internal-only:** el camino humano ya generó y recuperó Image/Video/Audio reales en tres rutas
   promovidas; feed/viewer y Asset Governance funcionan. El catálogo tiene 10 rutas: las otras 7 requieren
