@@ -861,3 +861,11 @@ Las dos compuertas de la ADR cerraron verdes, así que el fallback a `vite@7.3.x
 
 El share board, la única superficie que ve un cliente, se separó a `TASK-1558`: necesita dirección visual
 aprobada y no existe.
+
+## 2026-07-25 — Globe: `/assets/*` sale por CDN (TASK-1557)
+
+Carril CDN acotado a `/assets/*` sobre el ALB existente, aplicado y verificado en vivo con hits del
+edge. El backend del shell SSO conserva `enable_cdn = false` y el path matcher es un allowlist cuyo
+default apunta al backend sin caché: si una regla no matchea, el request cae hacia el lado seguro.
+La política de caché la sigue declarando el origen (`USE_ORIGIN_HEADERS`), para no crear una segunda
+fuente de verdad. Nada autenticado se cachea, verificado path por path.

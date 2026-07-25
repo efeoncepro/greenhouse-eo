@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Bajo`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Code complete; rollout pendiente (tofu plan + apply exigen credenciales del operador)`
+- Status real: `Complete — aplicado y verificado en vivo; CDN sirviendo /assets/* con hits del edge`
 - Rank: `TBD`
 - Domain: `ops`
 - Blocked by: `none` (TASK-1556 cerrada 2026-07-25: el bundle content-addressed ya existe)
@@ -250,14 +250,38 @@ como prerrequisito y llegó antes. No se re-implementa.
   `?v=…` identifica el mismo archivo. Incluirlo dejaría fragmentar —y llenar— el caché con variantes
   ilimitadas de un objeto, y hundiría el hit rate de justo lo que este carril existe para servir.
 
-### Rollout pendiente (paso del operador)
+### Rollout COMPLETO — aplicado y verificado en vivo (2026-07-25)
 
-`tofu plan` y `apply` exigen credenciales GCP, y `gcloud auth application-default login` es
-interactivo. La secuencia está en §Production verification sequence; lo crítico: **leer el plan y
-confirmar cero `destroy`/`replace`** sobre ALB, certificado, IP global o NEG, y que el backend del
-shell **no aparezca modificado**.
+`plan` con el flag apagado: **`No changes`** — el cambio era inerte. Con el flag prendido:
+**`1 to add, 1 to change, 0 to destroy`**, el backend del shell **ausente del diff** y su
+`enableCDN` real en `False`. Aplicado; `plan` posterior en `No changes`.
 
-Con el flag en `false` el plan debería dar **`No changes`**: el cambio es inerte hasta prenderlo.
+**Estado real post-apply:** `globe-studio-front-door-assets` con `ENABLE_CDN=True`;
+`globe-studio-front-door-backend` (shell) en `False`; el `defaultService` del url map **y** el del
+path matcher apuntan al backend **sin caché**; la única `pathRule` cacheada es `/assets/*`.
+
+**Verificación en vivo sobre `globe.efeoncepro.com`:**
+
+| Path | Resultado |
+|---|---|
+| `/assets/brand/isotipo-globe-negativo.svg` | 200 · `public, max-age=3600, immutable` · **hits del edge: `age: 4`, `12`, `16`** |
+| `/` (shell) | 200 · `no-store` · sin `age` |
+| `/v1/shares/resolve` · `/v1/media/*` · `/shares/*` · `/studio` | `no-store` · sin `age` — ninguno viene del edge |
+
+### El invariante dejó de vivir en un comentario
+
+`apps/studio-web/src/front-door-contract.test.ts` fija por test los tres invariantes: el backend del
+shell nunca con CDN, el carril cacheado siempre por allowlist con su default en el backend sin caché,
+y la política de caché en manos del origen. Es el riesgo de severidad máxima de la matriz —una
+respuesta autenticada servida desde el edge— y un `tofu plan` que voltea `enable_cdn` de `false` a
+`true` se ve como cualquier otro diff. **Un comentario no rompe un build.**
+
+### Lección de método
+
+La primera verificación en vivo dio **404 en todo** y pareció una rotura de producción. Era `curl -I`,
+que manda **HEAD**, y las rutas del app matchean `GET`. Lo delató un **405** en `/shares/*`: si el app
+contesta `method_not_allowed`, el ruteo funciona. Con `GET`: 200. **El instrumento estaba mal, no la
+infraestructura** — y confundirlos habría llevado a revertir un apply sano.
 
 ### Deuda ajena que hubo que tocar
 

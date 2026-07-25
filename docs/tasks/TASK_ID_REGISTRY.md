@@ -104,7 +104,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-081` | `complete` | Organization Legal Entity Canonicalization | `docs/tasks/complete/TASK-081-organization-legal-entity-canonicalization.md` |
 
 
-| `TASK-1558` | `to-do` | **Globe Share Board sobre el payload cliente.** EPIC-028; ui-ux/primitive; ui-standard; P1/Muy alto/Medio. Reconstruye `GET /shares/:shareId` —la única superficie que un cliente externo ve de Globe— sobre el payload que dejó TASK-1556. Separada de esa task porque tiene un gate distinto: necesita **dirección visual aprobada**, que no existe. Es el Slice 1 de ADR-014; acá nacen las primitives base. | `docs/tasks/to-do/TASK-1558-globe-share-board.md` |
+| `TASK-1558` | `in-progress` | **Globe Share Board sobre el payload cliente.** EPIC-028; ui-ux/primitive; ui-standard; P1/Muy alto/Medio. Reconstruye `GET /shares/:shareId` —la única superficie que un cliente externo ve de Globe— sobre el payload que dejó TASK-1556. Separada de esa task porque tiene un gate distinto: necesita **dirección visual aprobada**, que no existe. Es el Slice 1 de ADR-014; acá nacen las primitives base. | `docs/tasks/in-progress/TASK-1558-globe-share-board.md` |
 
 ## Siguiente ID disponible
 
@@ -1635,7 +1635,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-1555` | `in-progress` | **Globe Producer Model Selector.** EPIC-028; ui-ux/interaction; ui-standard; P1/Alto/Medio. Reemplaza el placeholder estático de "Ruta y modelo" del composer por una galería data-driven availability-aware (available/gated/blocked) que consume `globe.producer.fleet.list` (TASK-1554) + preselección del recommendedDefault; escala a la flota. Blocked by TASK-1554; distinta de TASK-1552 (jerarquía). | `docs/tasks/in-progress/TASK-1555-globe-producer-model-selector.md` |
 
 | `TASK-1556` | `complete` | **Globe Client Application Foundation.** EPIC-028; standard; P1/Muy alto/Medio. Implementa el Slice 0 de ADR-014: payload de browser tipado y componetizado (Vite+React) servido por el mismo `studio-web`; SSOT de tokens, capa de copy y gates de UI que Globe no tiene; el seam se valida reconstruyendo el share board (única superficie client-facing). Flag `GLOBE_CLIENT_APP_ENABLED` default OFF. | `docs/tasks/complete/TASK-1556-globe-client-app-foundation.md` |
-| `TASK-1557` | `in-progress` | **Globe Static Asset CDN (path-scoped).** EPIC-028; backend-data/integration; backend-standard; P1/Alto/Bajo. Cloud CDN sobre el ALB existente **sólo** para `/assets/*` vía backend service dedicado + path matcher; el backend del shell SSO conserva `enable_cdn = false` (cachear una superficie por sesión es bug de correctitud). Blocked by TASK-1556. | `docs/tasks/in-progress/TASK-1557-globe-static-asset-cdn.md` |
+| `TASK-1557` | `complete` | **Globe Static Asset CDN (path-scoped).** EPIC-028; backend-data/integration; backend-standard; P1/Alto/Bajo. Cloud CDN sobre el ALB existente **sólo** para `/assets/*` vía backend service dedicado + path matcher; el backend del shell SSO conserva `enable_cdn = false` (cachear una superficie por sesión es bug de correctitud). Blocked by TASK-1556. | `docs/tasks/complete/TASK-1557-globe-static-asset-cdn.md` |
 
 ## Siguiente ID disponible
 

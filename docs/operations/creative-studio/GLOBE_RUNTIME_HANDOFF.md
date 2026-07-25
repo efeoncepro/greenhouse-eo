@@ -8,6 +8,22 @@
 
 # Handoff
 
+## Active state — 2026-07-25 (TASK-1557: CDN de assets VIVO en globe.efeoncepro.com)
+
+- **`assets_cdn_enabled` PRENDIDO y aplicado.** `/assets/*` se sirve por un backend con Cloud CDN;
+  verificado en vivo con hits del edge (`age: 4/12/16`). El backend del shell sigue en
+  `ENABLE_CDN=False` y el `defaultService` del url map **y** del path matcher apuntan a él: si una
+  regla no matchea, el request cae al carril **sin** caché. `plan` posterior en `No changes`.
+- **Nada autenticado se cachea**, verificado: `/`, `/studio`, `/v1/shares/resolve`, `/v1/media/*` y
+  `/shares/*` responden `no-store` y **sin `age`**.
+- **El invariante dejó de vivir en un comentario:** `apps/studio-web/src/front-door-contract.test.ts`
+  falla el build si alguien prende CDN en el shell, invierte el path matcher a catch-all o mete TTLs
+  al edge. Un `tofu plan` que voltea `enable_cdn` se ve como cualquier otro diff.
+- ⚠️ **Trampa de verificación registrada:** `curl -I` manda **HEAD** y las rutas del app matchean
+  `GET`, así que devuelve 404 en todo y parece rotura de producción. Lo delata un **405** en
+  `/shares/*`. Verificar el front door **siempre con GET**.
+
+
 ## Active state — 2026-07-25 (TASK-1556 Slices 1-3: el payload cliente existe y las dos compuertas cerraron)
 
 - **ADR-014: entregado su Slice 0 (= Slices 1-3 de `TASK-1556`: seam · tokens+copy · gates).** Ninguna superficie portada todavía. `apps/studio-client` (Vite 8.1.5 + React 19.2.8 +
