@@ -22,10 +22,23 @@ Consecuencias operativas, no retóricas:
 - **NUNCA** dimensiones infraestructura, UX, seguridad ni calidad "porque es interno". Se dimensiona para el producto comercial que es; si hay brecha, se declara como **deuda con dueño** (`TASK-1521` runtime comercial, `TASK-1480` readiness comercial), no como diseño correcto.
 - El modelo de negocio es real y está escrito: `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md` (cinco líneas de ingreso, tres modalidades de delivery, tres modos operativos) + `..._CREDIT_MODEL_V1.md`.
 
-Baseline verificado contra código y runtime real hasta 2026-07-23. El estado mutable —revisiones, digests,
+Baseline verificado contra código y runtime real hasta 2026-07-25. El estado mutable —revisiones, digests,
 flags, rutas promovidas, canarios y bloqueos— vive en
 `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`; nunca se infiere desde un número histórico de esta
 skill.
+
+> **LEER PRIMERO antes de asumir que un modelo/proveedor "no está" o "hay que integrarlo":**
+> `docs/operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md` — el **ledger canónico de la flota de modelos**
+> (qué modelo/proveedor está integrado, en qué **carril** — Model Lab vs producción gobernada —, validado cuándo y
+> con qué evidencia, y qué falta para llevarlo al Producer). Los proveedores del Lab (Vertex imagen/Veo/Omni, Fal
+> Seedream/Seedance, ElevenLabs, etc.) están integrados y validados en vivo desde 2026-07-19/20 — **no re-integrar**;
+> lo que suele faltar es el **driver gobernado + promoción ADR-009** por ruta. Actualizá ese ledger al integrar,
+> validar o promover cualquier modelo.
+>
+> **Desde `TASK-1554` (COMPLETE) el ledger ya no es la única autoridad:** el **SoT LIVE** de disponibilidad de
+> modelos es el reader **`globe.producer.fleet.list`** (contrato `packages/contracts/src/producer-fleet.ts`,
+> proyección `packages/domain/src/producer-fleet.ts`); el ledger es el **SoT humano**. **Si divergen, manda el
+> reader** — y la divergencia es señal de que el ledger quedó desactualizado, no al revés.
 
 ## Producer UI + media gobernada — contrato operativo
 
@@ -99,7 +112,7 @@ Estructura real:
 - `packages/provider-contract` — interfaz `CreativeProviderAdapter` y `CreativeCapability` semánticas.
 - `packages/database`, `packages/media-qc` — persistencia y QC de media.
 - `apps/studio-web` — shell + BFF/API HTTP + transport MCP (el único servidor HTTP; SDK/MCP/CLI son clientes de él).
-- `apps/studio-client` — **el payload de browser** (ADR-014 / `TASK-1556`): Vite + React + React Router, SSR apagado, compilado a assets estáticos que sirve `studio-web`. Acá viven el **SSOT de tokens**, la **capa de copy** y los **gates de UI**. Toda superficie humana nueva nace acá.
+- `apps/studio-client` — **el payload de browser** (ADR-014 / `TASK-1556`): Vite 8.1.5 + React 19.2.8 + React Router 8.3.0, SSR apagado, compilado a assets estáticos que sirve `studio-web`. Acá viven el **SSOT de tokens** (`src/tokens/tokens.ts`), la **capa de copy** (`src/copy/`), las **primitives** (`src/primitives/index.tsx`), las **superficies** (`src/surfaces/**`) y los **gates de UI** (`src/gates/`). Toda superficie humana nueva nace acá. **Estado del programa: ver §ADR-014 más abajo — el payload existe pero todavía NO sirve ninguna superficie en el runtime vivo.**
 - `apps/asset-governance`, `apps/media-derivatives` — Cloud Run Jobs de governance y de derivados de media.
 - `apps/creative-runner` — Cloud Run Job que ejecuta el trabajo de media (llama providers).
 
@@ -684,6 +697,57 @@ Sus propiedades importan y son deliberadas: aditiva/sustractiva, **una sola tran
 
 **La precondición es lo que hay que interiorizar:** revertir sólo `GLOBE_PUBLIC_BASE_URL` con el ingress todavía endurecido **NO es un rollback**. El `run.app` sigue devolviendo **404** (sólo entra tráfico por el ALB) y el dominio pasa a anunciar un callback inalcanzable — eso es un **segundo incidente** encima del primero, no una mitigación.
 
+## ADR-014 — el payload de browser React+Vite: estado del programa (verificado 2026-07-25)
+
+ADR-014 migra el payload humano de Globe de **templates de string** a un cliente **React + Vite tipado**. Esto es el
+estado real, contra código y runtime; lo mutable vive en `GLOBE_RUNTIME_HANDOFF.md`.
+
+- **`TASK-1556` (foundation) — COMPLETE.** Existe `apps/studio-client` (Vite 8.1.5 + React 19.2.8 + React Router
+  8.3.0, SSR apagado), servido por **el mismo** `apps/studio-web`. Trajo el **SSOT de tokens**
+  (`src/tokens/tokens.ts`, con `LEGACY_TOKEN_DRIFT` registrando las divergencias que NO se unifican por decreto),
+  la **capa de copy** (`src/copy/`) y un **shell por request** con slot `criticalContent`.
+- **`TASK-1557` (Cloud CDN path-scoped sobre `/assets/*`) — COMPLETE y verificado en vivo.**
+- **`TASK-1558` (share board) — Slices 1-2 en `main` (`a336ff5`).** Acá **nacieron las primitives**:
+  `apps/studio-client/src/primitives/index.tsx` exporta `Chip`, `Eyebrow`, `FactList`, `CommentList`, `StateBlock`
+  y `MediaStage`; la superficie es `src/surfaces/share/ShareBoardSurface.tsx`. **Su promoción a primitives de
+  plataforma es PROPUESTA, no asumida:** una primitive con un solo consumer es una **hipótesis**; se promueve
+  cuando una **segunda** superficie la consume **sin modificarla**. Si el segundo consumer necesita una prop nueva,
+  eso **no es promoción** — es evidencia de que la abstracción no estaba lista. Una primitive `Surface`
+  **deliberadamente no se construyó**: shippear una primitive sin superficie que la sirva invita a envolver todo
+  en ella.
+- **`TASK-1554` (reader de flota de modelos) — COMPLETE.** `globe.producer.fleet.list` es el **SoT LIVE** de
+  disponibilidad; el ledger `GLOBE_MODEL_FLEET_STATUS.md` es el **SoT humano**. **Si divergen, manda el reader.**
+- **`TASK-1561` (gate de diseño) — COMPLETE.** `apps/studio-client/src/gates/design-contract.test.ts` pasó de 3 a
+  **5 tests**: literales de color, literales de motion, literales de tipografía
+  (`font-family`/`font-size`/`font-weight`/`line-height`/`letter-spacing`), **pesos sin `@font-face`** — el browser
+  los **sintetiza**, deformando las letras, sin fallar nada — y copy literal en JSX. El escaneo camina
+  `.ts`/`.tsx`/`.css`. **Su frontera está declarada dentro del archivo:** escanea **SOLO** `apps/studio-client`.
+  `apps/studio-web` — donde viven los **184 hex crudos** y las **4 familias tipográficas literales** — **NO está
+  vigilado**. `TASK-1560` Slice 2 amplía la frontera **inmediatamente ANTES** de borrar el legacy, nunca después:
+  un gate rojo al llegar se saltea, y un gate salteado se lee como cobertura.
+- **`TASK-1555` (selector de modelo del Producer) — in-progress.** La **galería de láminas** se implementó y **el
+  operador la rechazó al verla**; se reemplazó por un **desplegable compacto con isotipo real** de cada modelo
+  (`a45954f`), que lista **toda la flota de la modalidad activa** (`0258534`). **No la llames "galería": está
+  muerta.** Ojo con dónde vive: el selector está todavía en el **payload legacy**
+  (`apps/studio-web/src/producer-ui.ts` + `producer-controller.ts`), así que porta bajo `TASK-1560`.
+
+### 🔴 El flag `client_app_enabled` NO está cableado — ninguna superficie sirve sobre el payload nuevo
+
+Esta es la parte que hay que interiorizar antes de prometer un cutover. Verificado el 2026-07-25 contra `main`
+(`6e8ef5a`):
+
+- `grep -rn client_app_enabled infra/terraform/` devuelve **UNA sola línea**: su propia declaración en
+  `variables.tf:188`. `GLOBE_CLIENT_APP_ENABLED` **no aparece en ningún `.tf`**, ni en el spec del Cloud Run service.
+- La **imagen desplegada** de `globe-studio-internal` es `45235ccb62ca`, **anterior** al commit de `TASK-1556`
+  (`4bf631e`): `git merge-base --is-ancestor 4bf631e 45235cc` → **falso**.
+- **Consecuencia: cambiar el default a `true` y correr `tofu apply` da un PLAN VACÍO.** El contenedor vivo no tiene
+  bundle, no tiene `renderShell` y no lee esa variable. **Ninguna superficie sirve sobre el payload nuevo todavía:**
+  el cliente ve `public-share-ui.ts`, el template viejo.
+
+**La cadena real del cutover, en este orden:** (1) **cablear** la variable en el `.tf` del servicio → (2)
+`TASK-1562` → (3) desplegar `origin/main` vía `deploy-internal.yml` → (4) flip + `tofu apply` → (5) verificar con
+**grant real** → (6) retirar el legacy (`TASK-1560`).
+
 ## Errores canónicos y correlación
 
 - El enum `GlobeApiErrorCode` distingue causas: **`policy_blocked` es distinto de `access_denied` y de `not_found`.** El mapeo lo hace `dispatchErrorToApiCode`: `surface_policy_blocked → policy_blocked`; `capability_denied → access_denied`; `capability_not_found` / `surface_not_applicable → not_found`. Un `TrustedContextError` (workspace no bindeado) siempre es `access_denied`, nunca una pista de qué workspaces existen.
@@ -712,6 +776,13 @@ Sus propiedades importan y son deliberadas: aditiva/sustractiva, **una sola tran
 - **NUNCA** devuelvas un `string` desnudo desde un renderer de documento: es `HtmlDocument {nonce, html}` (`apps/studio-web/src/html-document.ts`). El helper de respuesta ya no recupera el nonce con un regex sobre el body — hacerlo emitía `script-src 'nonce-'` y bloqueaba el propio payload sin fallar en build ni en tests. Un nonce que no sea CSP `base64-value` se **rechaza** en la frontera.
 - **NUNCA** corras el dev server de Vite con `--host` / `server.host`: 13 de los 19 advisories históricos de Vite son bypasses de `server.fs.deny` o lectura arbitraria del dev server, y **todos** exigen que sea alcanzable por red.
 - Globe **tiene ESLint desde `TASK-1556`**, acotado a `apps/studio-client` (jsx-a11y + rules-of-hooks en `error`). Eso NO contradice la regla de `node --test`: el runner de tests sigue siendo Node; ESLint es sólo el linter, y no se apunta al legacy de templates de string porque produciría ruido sobre el que nadie puede actuar.
+- 🔴 **NUNCA** declares un flag como "prendido" ni un cutover como "un `tofu apply`" sin verificar **las dos** cosas: **(a) que el flag esté CABLEADO** — si `grep -rn <flag> infra/terraform/` devuelve **UNA sola línea**, esa línea es su **declaración** y no está conectado a nada; un flag cableado aparece **≥2 veces** (declaración en `variables.tf` **+** consumo en el spec del servicio) — y **(b) que la IMAGEN DESPLEGADA contenga el código que lo lee**: `git merge-base --is-ancestor <sha-del-código> <sha-de-la-imagen>`. **Un `tofu apply` verde con plan vacío no es evidencia de nada**: es exactamente cómo el ledger termina diciendo ON con la realidad en OFF. Caso fuente vivo: `client_app_enabled` / `GLOBE_CLIENT_APP_ENABLED` (2026-07-25) — declarado desde `TASK-1556`, conectado a nada, con la revisión viva anterior al commit que trajo el payload.
+- **NUNCA** importes primitives de Greenhouse, `CompositionShell`, MUI ni AXIS dentro de `apps/studio-client` (ADR-014 punto 8 / `TASK-1540`): Globe **materializa sus propios** tokens y componentes. Las primitives de Globe viven en `apps/studio-client/src/primitives/index.tsx` (`Chip`, `Eyebrow`, `FactList`, `CommentList`, `StateBlock`, `MediaStage`).
+- **NUNCA** promuevas una primitive de Globe a "primitive de plataforma" con **un solo consumer**: es una **hipótesis**, no una abstracción. Se promueve cuando una **segunda** superficie la consume **SIN modificarla**; si el segundo consumer necesita una prop nueva, eso **no es promoción** — es evidencia de que no estaba lista. Y **NUNCA** construyas una primitive sin superficie que la sirva (por eso `Surface` deliberadamente **no existe**).
+- **NUNCA** leas el gate `apps/studio-client/src/gates/design-contract.test.ts` como cobertura del repo: su frontera está **declarada en el propio archivo** y escanea **SOLO** `apps/studio-client/src`. `apps/studio-web` — donde viven los **184 hex crudos** y las **4 familias tipográficas literales** — **no está vigilado**. La frontera se amplía en **`TASK-1560` Slice 2, INMEDIATAMENTE ANTES** de borrar el legacy y **nunca después**: un gate rojo al llegar se saltea, y un gate salteado se lee como cobertura. Descripción honesta de hoy: **el payload nuevo no puede driftear; el legacy no está mirado.**
+- **NUNCA** uses un peso tipográfico que no tenga su `@font-face`: el browser lo **sintetiza**, deformando las letras, **sin fallar nada** — por eso es uno de los 5 tests del gate y no una convención. El gate cubre además `font-family`/`font-size`/`font-weight`/`line-height`/`letter-spacing` y camina `.ts`/`.tsx`/`.css`.
+- **NUNCA** decidas la disponibilidad de un modelo desde el ledger `GLOBE_MODEL_FLEET_STATUS.md`: el **SoT LIVE** es el reader **`globe.producer.fleet.list`** (`TASK-1554`); el ledger es el SoT **humano**. Si divergen, **manda el reader**.
+- **NUNCA** te refieras al selector de modelo del Producer (`TASK-1555`) como **"galería"**: esa dirección se implementó, **el operador la rechazó al verla** y hoy es un **desplegable compacto con isotipo real** que lista toda la flota de la modalidad activa. Vive todavía en el payload legacy (`apps/studio-web/src/producer-ui.ts` + `producer-controller.ts`) y **porta con el composer (`TASK-1552`, Slice 3 de ADR-014)** — la región `producer-route` es composición, no feed. `TASK-1560` sólo **borra** el legacy después, no lo porta.
 - **NUNCA** introduzcas Vitest/Jest (Globe usa `node --test`), ni rompas la convención de extensiones (`.js` source↔source de packages; `.ts` en studio-web y en todos los tests).
 - **NUNCA** invoques un provider fuera del runner que corre detrás del command (el Model Lab lo hace por el `LabRunner` en `apps/creative-runner`); un SDK de provider directo desde handler/UI/MCP/CLI/scripts/tests está prohibido.
 - **NUNCA** reconstruyas las URLs de la queue de Fal desde el slug (usa el `status_url`/`response_url` que devuelve el `submit`); **NUNCA** pongas el prefijo `fal-ai/` en un slug ByteDance (van sin prefijo; verifica un slug con `POST {}` a `https://fal.run/<slug>`: 404=inexistente / 422=existe); **NUNCA** uses la key de Greenhouse (`greenhouse-fal-api-key`) para Fal desde Globe (es `GLOBE_FAL_API_KEY`, propia de Globe); **NUNCA** llames Vertex con API key (es keyless: ADC/WIF, runtime SA con `aiplatform.user`); **NUNCA** reportes el slug del modelo como `actualRoute` (el `actualRoute` es el route del contrato de fidelidad — `== proposedRoute` sin fallback; el slug va en `model`).
