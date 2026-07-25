@@ -1,0 +1,4 @@
+interface:
+  display_name: "Efeonce Business Model Operator"
+  short_description: "Design and validate Efeonce business models and unit economics."
+  default_prompt: "Use $efeonce-business-model-operator to map value, delivery, monetization, economics, validation, scale, risk and capital readiness for an Efeonce offer or portfolio."

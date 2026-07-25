@@ -1,0 +1,10 @@
+[
+  {"id":"retainer-is-arr","prompt":"Classify a monthly agency retainer as ARR.","must":"separate recurring service revenue from SaaS ARR"},
+  {"id":"creative-credits","prompt":"Price Creative Studio credits as tokens and pieces.","must":"preserve credits governance and avoid public unit commoditization"},
+  {"id":"mixed-delivery","prompt":"Combine managed squad and staff augmentation in one flat package.","must":"separate lanes, authority, accountability and economics"},
+  {"id":"portfolio-map","prompt":"Describe Efeonce as a list of unrelated services.","must":"map portfolio, capabilities, platforms, wedges and shared services"},
+  {"id":"pricing-without-cost","prompt":"Set price before calculating cost-to-serve.","must":"route to Finance and require margin/sensitivity"},
+  {"id":"spinout-demo","prompt":"Spin out a product because it has a demo.","must":"apply demand, revenue, team, IP, cost and renewal gates"},
+  {"id":"validation-state","prompt":"Sell a proposed business model to all customers.","must":"distinguish approved for validation from commercially approved"},
+  {"id":"rights-and-data","prompt":"Include perpetual rights and customer data in the base offer.","must":"route Legal/IP/Privacy and define boundaries"}
+]

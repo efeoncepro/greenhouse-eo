@@ -5,6 +5,12 @@
 
 ## Estado activo ahora
 
+- **2026-07-25 — Skills de investor readiness y business model creadas y validadas.** Nuevas skills:
+  `.codex/skills/efeonce-investor-readiness/` y `.codex/skills/efeonce-business-model-operator/`. Incluyen
+  operating loops, gates, templates, fuentes, eval scenarios y validadores locales. `AGENTS.md`, `CLAUDE.md`,
+  `efeonce-agency` y `docs/business-models/README.md` ya enrutan hacia ellas. No declaran una ronda, instrumento,
+  spinout ni pricing aprobado. Ver los SKILL.md y `docs/strategy/EFEONCE_CAPITAL_AND_INVESTMENT_STRATEGY_V1.md`.
+
 - Branch compartida: `develop`. Antes de editar, ejecutar `git status --short` y no asumir árbol limpio.
 - El checkout contiene trabajo paralelo de Campaign Layout Compiler / producción creativa que fue preservado
   exactamente en el snapshot del corte; no revertir ni reescribir esos cambios.

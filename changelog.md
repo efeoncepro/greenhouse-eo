@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-25 — Skills de investor readiness y business model
+
+- Se crearon `.codex/skills/efeonce-investor-readiness/` y `.codex/skills/efeonce-business-model-operator/`
+  con operating loops, gates, templates, fuentes verificadas, escenarios de evaluación y validadores locales.
+- Se actualizó el routing de `AGENTS.md`, `CLAUDE.md`, `efeonce-agency`, `project_context.md` y
+  `docs/business-models/README.md`. El cambio no autoriza instrumentos financieros, emisiones, spinouts,
+  pricing, ventas ni transferencia de IP.
+
 ## 2026-07-25 — Cutover del share board de Globe: LIVE, y las dos precondiciones que faltaban (TASK-1558 Slice 3 + TASK-1562)
 
 - **El share board nuevo esta sirviendo.** `client_app_enabled` en `true`, revision

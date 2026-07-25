@@ -6,12 +6,15 @@
 
 ## Propósito
 
-`docs/business-models/` contiene la lógica económica durable de una oferta, producto o plataforma Efeonce:
+`docs/business-models/` contiene la lógica económica durable de una oferta, producto, plataforma o portfolio Efeonce:
 quién compra, qué valor recibe, cómo se entrega, qué unidades se cobran, qué costos y riesgos se absorben, cómo
 se protege el margen y qué evidencia habilita escalar.
 
 Un business model no es un tarifario. Es un sistema de decisiones comprobables que conecta propuesta de valor,
 operación, monetización, unit economics, riesgo y validación.
+
+El método y los invariantes operativos viven en la skill `efeonce-business-model-operator`. Este directorio
+mantiene los modelos concretos y sus versiones; no duplica la skill ni convierte una hipótesis en contrato.
 
 ## Fronteras con las demás categorías
 
@@ -31,6 +34,9 @@ operación, monetización, unit economics, riesgo y validación.
 docs/business-models/
   README.md
   BUSINESS_MODEL_TEMPLATE.md
+  PORTFOLIO_BUSINESS_MODEL_TEMPLATE.md
+  efeonce-group/
+    EFEONCE_GROUP_BUSINESS_MODEL_V1.md
   <oferta-o-producto>/
     <NOMBRE>_BUSINESS_MODEL_V<n>.md
     <NOMBRE>_<SUBMODELO>_V<n>.md       # sólo si merece contrato propio
@@ -48,6 +54,8 @@ Reglas:
 - toda cifra externa lleva fuente y fecha; toda cifra interna identifica su fuente de costo y nivel de confianza;
 - una versión aprobada no se reescribe para ocultar una decisión material: se crea V2 o una decisión que la
   superseda.
+- un modelo de portfolio no reemplaza los modelos de las ofertas; declara boundaries, shared services,
+  cross-sell, asignación de costos y reglas de capital.
 
 ## Estados
 
@@ -90,6 +98,9 @@ Todo business model debe separar al menos estas dimensiones:
 | Lanzamiento comercial | Leadership + owners anteriores | todos los gates y rollback/stop conditions |
 
 ## Modelos disponibles
+
+- [Portfolio Business Model Template](PORTFOLIO_BUSINESS_MODEL_TEMPLATE.md) — contrato para el modelo de
+  Efeonce Group y sus capabilities; no autoriza por sí solo pricing, venta, inversión ni spinout.
 
 - [Efeonce Creative Studio V1.1](creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md) —
   `Approved for validation`; incorpora la doctrina de autoría humana y mantiene B2B2B como hipótesis gateada.

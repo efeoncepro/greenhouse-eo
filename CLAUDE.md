@@ -20,7 +20,8 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 | Payroll receipts + Legal docs/Finiquito | `greenhouse-payroll-auditor` | `architecture/agent-invariants/PAYROLL_LEGAL_DOCS_AGENT_INVARIANTS.md` |
 | Notion sync / integrations | `notion-platform` | `architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` |
 | HubSpot bridge / services intake | `hubspot-greenhouse-bridge` | `architecture/GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md` |
-| Capital, inversión y fundraising | `efeonce-agency` + Finance/Legal aplicables | `strategy/EFEONCE_CAPITAL_AND_INVESTMENT_STRATEGY_V1.md` + `strategy/ASAAS_MANIFESTO_V1.md`; no emitir, endeudar, transferir IP ni crear spinout sin aprobación proporcional |
+| Business model, packaging, pricing, unit economics | `efeonce-business-model-operator` + práctica dueña | `business-models/README.md` + modelo vigente + Finance/Legal/Product según corresponda; `creative-practice` conserva Creative Studio |
+| Capital, inversión y fundraising | `efeonce-investor-readiness` + `efeonce-agency` + Finance/Legal | `strategy/EFEONCE_CAPITAL_AND_INVESTMENT_STRATEGY_V1.md` + `strategy/ASAAS_MANIFESTO_V1.md`; no emitir, endeudar, transferir IP ni crear spinout sin aprobación proporcional |
 | Integraciones/infra (signature/observability/postgres-pooling) | — | `architecture/agent-invariants/INTEGRATIONS_INFRA_AGENT_INVARIANTS.md` |
 | Identity/Workforce (legal profile/role-title/SCIM/session-access/bridge-cutover) | — | `architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` |
 | Org workspace + Client portal | — | `architecture/agent-invariants/ORG_CLIENT_AGENT_INVARIANTS.md` |
