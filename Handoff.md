@@ -25,20 +25,20 @@
   `GLOBE_RUNTIME_HANDOFF.md`. Regla dura viva: scopes del broker OAuth = rollout de 3 pasos (permite → pide → exige)
   o se cae el login.
 - **Globe flota multi-modelo en el Producer (programa).** SoT: `GLOBE_MODEL_FLEET_STATUS.md`.
-  **`TASK-1553`** shipped (catálogo + resolución por-ruta; canary NB Pro VERDE). **`TASK-1554`** shipped +
-  **desplegado** (reader `globe.producer.fleet.list` live). **`TASK-1555`** (selector UI, in-progress):
-  **code complete y pusheado** a `efeonce-globe` `main` (`d07a1cd`→`1c7d03b`), **sin desplegar** (el deploy de
-  Globe es `workflow_dispatch` manual). GVC premium VERDE desktop+mobile; `ui:quality` **PASS** (4.54, piso 4.2).
-  Catálogo **v1.4.0**: entraron Nano Banana 2, Recraft y Topaz — antes estaban integrados en el Lab pero
-  **sin ruta pública**, o sea invisibles. Cubre 12/14 capacidades; faltan `model-3d-generate` (3D no existe como
-  modalidad en el contrato → task propia) y `video-extend`.
-  **La dirección visual se revirtió por decisión del operador:** la galería de láminas se implementó y se
-  rechazó al verla; vigente = **desplegable compacto con isotipo real** (doc de dirección actualizado, no el
-  código contradiciendo el contrato).
-  **Blocker duro que NO es mío:** la **promoción ADR-009** espera **identidades de readiness firmadas** (humano)
-  → hasta eso ninguna ruta de imagen queda `available`, y el Producer **no ofrece modelo de imagen elegible**.
-  Es el comportamiento correcto por gobernanza (el selector hace visible el blocker), pero si se necesita el
-  Producer operable antes de la promoción, es **decisión de rollout del operador**. `ISSUE-124` = 409 del grant.
+  `TASK-1553` + `TASK-1554` shipped. **`TASK-1555`** (selector, in-progress): **DESPLEGADO en internal**
+  2026-07-25 (`globe-api-internal-00091-wnq` + `globe-studio-internal-00068-gx6`, `:45235ccb62ca`, API primero);
+  GVC premium verde, `ui:quality` PASS 4.54. Catálogo **v1.4.0** (entran Nano Banana 2, Recraft y Topaz: estaban
+  en el Lab **sin ruta pública**, o sea invisibles); 12/14 capacidades. Dirección **revertida por el operador**
+  a desplegable compacto con isotipo real.
+  **Blocker que NO es técnico:** sin la **firma humana de identidades de readiness** (ADR-009) ninguna ruta
+  de imagen queda `available`, así que el Producer no ofrece modelo de imagen elegible — correcto por
+  gobernanza; operarlo antes es decisión de rollout. `ISSUE-124` = 409 del grant.
+- **⚠️ `TASK-1555` ↔ `TASK-1556` (ADR-014): colisión real en curso.** `TASK-1556` declara owned
+  `shell.ts`/`assets.ts`/`public-share-ui.ts`/`app.ts`, pero **ya está editando `producer-ui.ts`** (firma de
+  `renderProducerPage` → `HtmlDocument`, nuevo `html-document.ts`), que `TASK-1555` declara suyo y acaba de
+  desplegar. Qué debe preservar el port y por qué hay que portar desde `45235cc`: `TASK-1555` § "Contrato de
+  port al payload cliente". **`TASK-1557` toca `public/models/**`**, creado por `TASK-1555` con su README de
+  licencias.
 - Trabajo local concurrente: coordinar ownership antes de tocar archivos ya modificados.
 - **Globe Producer internal-only:** el camino humano ya generó y recuperó Image/Video/Audio reales en tres rutas
   promovidas; feed/viewer y Asset Governance funcionan. El catálogo tiene 10 rutas: las otras 7 requieren
@@ -270,20 +270,13 @@
 
 ## Sesión 2026-07-20 — TASK-1490 cerrada: edit/refine cross-model en Globe (verificado en vivo)
 
-- Refinar un candidato pasó a ser **una sola semántica** para todo modelo editable en `efeonce-globe`:
-  `editFrom = { experimentId }`; el paradigma (stateful vs reference-based) lo resuelve el seam según qué
-  proveedor va a ejecutar. Spec: `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md`.
-- **Hallazgo que cambió el alcance:** la task daba por hecho que track B ya permitía re-inyectar un output
-  previo. Era falso — los adapters hasheaban los bytes de salida y los **descartaban**, así que el paradigma
-  reference-based fallaba en runtime, no en compilación. Se sumó Slice 0 (retención de outputs) como
-  prerrequisito duro y se recalibró la spec antes de implementar.
-- Verificado en vivo por el seam: reference-based, **cross-model** (Seedream→Nano Banana), stateful (Omni) y
-  cross-modal (imagen+vídeo). Dos defectos aparecieron sólo gastando plata real, con la suite unitaria verde.
-- **Rollout pendiente (no cerrado):** el servicio `globe-studio-internal` sigue en `GLOBE_LAB_PROVIDER=fake`
-  y **sin `GLOBE_LAB_INPUT_BUCKET`** — sin ese flag no hay retención de outputs y todo edit por referencia se
-  rechaza en `prepare`. El flip debe incluirlo en la MISMA operación, y la runtime SA necesita
-  `storage.objectCreator` sobre `efeonce-globe-lab-evidence` (el canary corrió con ADC humana).
-- Sin push: los 5 commits quedan locales en `efeonce-globe` (`596b818`…`1e9dc32`).
+- `TASK-1490` cerró la semántica única `editFrom = { experimentId }`, retención de outputs y ejecución
+  stateful/reference-based. La evidencia viva y el contrato están en
+  `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md` y la task completa.
+- El seam verificó edición cross-model, stateful y cross-modal.
+- **Rollout pendiente:** `globe-studio-internal` sigue con provider fake y sin `GLOBE_LAB_INPUT_BUCKET`.
+  Ambos deben cambiar juntos; la runtime SA requiere `storage.objectCreator` sobre el bucket de evidencia.
+- Cinco commits siguen locales en `efeonce-globe`.
 
 ## Sesión 2026-07-19 — Surface Recipes hardening y CTA como benchmark de no regresión
 

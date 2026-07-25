@@ -595,6 +595,43 @@ Sin flag nueva — cambio aditivo de UI internal-only sobre una superficie exist
 - [ ] Chequeo de impacto cruzado con TASK-1554 (reader), TASK-1552 (composer) y TASK-1505/1531/1532.
 - [ ] Dossier visual + scorecard premium archivados.
 
+## Contrato de port al payload cliente (ADR-014 / TASK-1556)
+
+> **Para la sesión que ejecuta `TASK-1556`.** No es una objeción a ADR-014 — el diagnóstico es
+> correcto y esta task es parte de su evidencia. Es lo que el port del Producer tiene que preservar
+> para no perder trabajo verificado en silencio. `TASK-1556` **no toca** estos archivos en su Slice 0
+> (su superficie es el share board); esto aplica al slice de port del Producer, cuando llegue.
+
+### 1. Portar desde `efeonce-globe` `45235cc`, no desde una lectura anterior
+
+Lo **desplegado en internal** (revisiones `globe-api-internal-00091-wnq` y
+`globe-studio-internal-00068-gx6`, imagen `:45235ccb62ca`, 2026-07-25) incluye cambios que no existían
+horas antes: isotipos reales de modelo, flota completa por modalidad, contrato de modos de imagen,
+seed honesto, filtros de biblioteca y el prompt re-estilizado. Un port hecho contra un snapshot previo
+los pierde **sin que ningún test lo note**, porque son cambios de superficie.
+
+### 2. Contratos que deben sobrevivir (son contratos, no estilo)
+
+| Qué | Por qué no se re-inventa |
+|---|---|
+| `producer-copy.ts` como SoT de copy visible | La capa de copy nueva debería **absorberlo**. Duplicarlo reabre el drift que ya produjo "Retrato editorial" bajo *Genera audio* |
+| `MODEL_ISOTYPES` + `apps/studio-web/public/models/` + su `README.md` | Es **dato con implicancia legal**: fuentes y licencias declaradas (simple-icons CC0; OpenAI desde el set `logos` de Iconify). El README prohíbe explícitamente re-transcribir un logo a mano. **`TASK-1557` toca estos mismos archivos** |
+| Markers `data-capture`: `producer-model-picker`, `producer-model-trigger`, `producer-model-option`, `producer-model-recommended`, `producer-route` | El escenario GVC `task-1555-model-selector` y el scorecard cuelgan de ellos. Renombrarlos los mata **sin fallar** |
+| Invariantes de dominio: availability server-authoritative · `aria-disabled` + razón para lo no ejecutable · cero slug/costo/margen · el `<select>` oculto como autoridad del loop de gasto | Están asertados en `producer-controller.test.ts`; si el port los deja atrás, los tests se van con ellos |
+
+### 3. Dato honesto para re-medir antes de citar números
+
+Esta task **agregó peso al payload legacy** mientras corregía defectos de producto: **+614 líneas** en
+`producer-controller.ts`, **+144** en `producer-ui.ts` y **68 colores crudos nuevos** en
+`producer-ui.ts` (`d07a1cd..45235cc`). Los conteos de ADR-014 (4.999 líneas, 184 hex / 63 colores)
+son **anteriores** a esta sesión: conviene re-medir antes de volver a citarlos.
+
+### 4. Señal que esta task levantó y no resolvió
+
+Cinco zonas revisadas por el operador, cinco con el mismo tipo de defecto: **apariencia que no sigue
+al comportamiento real**, o capas contradiciéndose sin dueño. Es coherente con la tesis de ADR-014 y
+refuerza que el problema es del sustrato, no de cada pantalla.
+
 ## Follow-ups
 
 - Consumo de la flota por Nexa ("qué modelos hay / cuáles disponibles") reusando el mismo reader.
