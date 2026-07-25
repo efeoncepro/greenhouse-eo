@@ -363,9 +363,9 @@ En `greenhouse-eo`: `pnpm task:lint --task TASK-1558` · `pnpm ui:wireframe-chec
 - [ ] `Handoff.md` y `GLOBE_RUNTIME_HANDOFF.md` actualizados
 - [ ] `changelog.md` actualizado
 - [ ] chequeo de impacto cruzado
-- [ ] **Doc funcional obligatoria acá**: es la primera superficie client-facing reconstruida
+- [x] **Doc funcional** (`documentation/creative-studio/efeonce-globe-share-board-cliente.md`) + **manual con el runbook del cutover** (`manual-de-uso/creative-studio/operar-share-board-globe.md`), ambos indexados. Es la primera superficie client-facing reconstruida
       (`docs/documentation/creative-studio/`)
-- [ ] Las primitives que nacieron quedan documentadas y su promoción propuesta
+- [x] Las seis primitives documentadas en ADR-014 §`Las primitives nacidas`, con su promoción **propuesta y no asumida** (una primitive con un consumer es una hipótesis; se promueve cuando una segunda superficie la consume **sin modificarla** — si necesita una prop nueva, eso no es promoción, es la evidencia de que la abstracción no estaba lista). Incluye por qué `Surface` NO se construyó.
 
 ## Follow-ups
 

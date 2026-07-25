@@ -221,6 +221,40 @@ No es escalabilidad de tráfico (eso lo gobiernan `maxScale` y los stores durabl
 - **Slice 5 — library, colecciones, batch; y retiro.** Se eliminan `producer-controller.ts`, `producer-client.ts` y los cuatro `:root`; `studio-web` queda como BFF puro + serving. El flag se retira con el código.
 - **Fuera del strangler:** Storyboard (`TASK-1547`), Video Effectiveness (`TASK-1540`) y delivery (`TASK-1472`) **no se portan** — nacen en el payload nuevo.
 
+## Las primitives nacidas — inventario y **propuesta** de promoción (TASK-1558, 2026-07-25)
+
+`TASK-1556` declaró estas primitives y **deliberadamente no las construyó**: diseñar una librería de
+componentes sin una superficie a la que sirva es cómo se llega a doce props que nadie usa. Nacieron
+sirviendo al share board.
+
+**Su promoción a primitives de plataforma se PROPONE, no se asume.** Una primitive con un solo
+consumer es una **hipótesis** de reutilización, no un hecho — y lo único que la convierte en hecho es
+el segundo consumer. Hasta entonces, "primitive" es una aspiración sobre un componente local.
+
+| Primitive | Qué es | Estado |
+|---|---|---|
+| `Chip` | Marcador de estado no interactivo | Propuesta |
+| `Eyebrow` | Rótulo pequeño sobre un bloque | Propuesta |
+| `FactList` | Pares dato/valor | Propuesta |
+| `CommentList` | Hilo de comentarios con marca temporal | Propuesta |
+| `StateBlock` | Bloque de estado con acción opcional | **La más probable** de promover: los estados aparecen en toda superficie |
+| `MediaStage` | Presentación de la pieza (imagen/video/audio) | Propuesta |
+
+**Lo que NO se construyó, y por qué importa más que lo que sí:** el scope listaba una primitive
+`Surface`. La dirección aprobada no la necesita — el riel de lectura se separa con **una línea** y no
+tiene fondo propio, precisamente para que la página nunca apile una tarjeta sobre otra. Entregar un
+`Surface` sin uso habría invitado a la siguiente superficie a envolver todo en él, que es exactamente
+la composición que la dirección rechaza. Llega cuando una superficie realmente lo necesite.
+
+**Frontera dura, sin excepciones:** acá **no** se importan primitives de Greenhouse, `CompositionShell`,
+MUI ni AXIS, y nunca se van a importar. Globe materializa sus propios tokens y componentes (punto 8 de
+esta ADR y `TASK-1540`). Compartir la librería de UI entre los dos productos ataría el ritmo de
+evolución de uno al del otro.
+
+**Cómo se promueve una:** cuando una segunda superficie la consuma **sin modificarla**. Si el segundo
+consumer necesita una prop nueva, eso no es promoción — es la señal de que la abstracción todavía no
+estaba lista, y la prop nueva es la evidencia.
+
 ## Reglas duras
 
 - **NUNCA** reintroducir `Function.prototype.toString()` para serializar código de browser, ni tunelear copy/tokens como parámetros JSON por falta de imports.
