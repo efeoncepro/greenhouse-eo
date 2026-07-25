@@ -144,22 +144,31 @@ Sus dos hallazgos:
 - **`producer-model-picker` y `producer-model-trigger` sólo se asignan en runtime**, nunca en el
   markup. Un port que use el markup como referencia no los ve, y el escenario de `TASK-1555` falla en
   **readiness** —que se lee como "la página no cargó"— en vez de en una assertion.
-- 🔴 **`data-producer-candidate-kind` y `data-producer-feed-status` NO EXISTEN en Globe**, y el
-  escenario `globe-creative-producer` los declara en su `readiness.selectors` contra la ruta real.
-  **El contrato cross-repo ya estaba roto antes del port**: si alguien corre ese escenario después de
-  portar y falla, la conclusión "lo rompió el port" sería falsa.
+- 🔴 **`data-producer-candidate-kind` y `data-producer-feed-status` NO EXISTEN en Globe** — ni en un
+  solo commit de toda su historia — y el escenario `globe-creative-producer` los declara en su
+  `readiness.selectors` contra la ruta real. Causa raíz investigada en
+  [`ISSUE-125`](../../issues/open/ISSUE-125-gvc-evidence-against-uncommitted-globe-dom.md): la captura
+  corrió con **`env: local`** y el árbol local emitía esos atributos con **código que nunca se
+  commiteó**. El gate no está roto (se verificó). **El contrato nunca se implementó**, y quien corra
+  ese escenario tras portar verá fallar la readiness y concluirá falsamente que lo rompió el port.
 
-Falta de este slice la parte que depende de los ports: la evidencia por superficie de que su reemplazo
-está sirviendo.
+#### Resto del Slice 1 — evidencia por superficie
 
-#### Resto del Slice 1
+Ruta, quién la sirve hoy, cuál es su reemplazo, y **evidencia** de que el reemplazo está sirviendo en
+producción. **Una superficie sin evidencia detiene la task** — no se borra su archivo.
 
-Inventario superficie por superficie: ruta, quién la sirve hoy, cuál es su reemplazo, y **evidencia** de
-que el reemplazo está sirviendo en producción con el flag en `true`. Una superficie sin evidencia
-**detiene la task** — no se borra su archivo.
+| Superficie | Archivo legacy | Reemplazo | Evidencia de que sirve |
+|---|---|---|---|
+| `share` | `public-share-ui.ts` | `ShareBoardSurface` (`TASK-1558`) | ✅ **2026-07-25**, rev. `00071-6vp`: `/shares/*` sirve el bundle cliente, React monta bajo CSP real con 0 errores de consola (desktop + 390px), 0 fugas en 7 sondas, asset por CDN. ⏳ Falta la verificación con **grant real** (6 puntos del runbook) — no automatizable: el token se guarda hasheado |
+| `launch` · `studio` · `error` | `ui.ts` | `TASK-1524` (Slice 2) | ❌ sin portar |
+| `producer` | `producer-ui.ts` + `producer-controller.ts` | `TASK-1552` (composer) + `TASK-1559` (feed/viewer) | ❌ sin portar |
 
-Incluye el inventario de `data-capture`: enumerarlos en el legacy y confirmar que cada uno tiene par en
-el payload cliente. Los que el controlador asigna en runtime son los que se pierden en silencio.
+**Regla del cierre:** `public-share-ui.ts` es el único que ya tiene su reemplazo sirviendo, pero **no se
+borra hasta que la verificación con grant real esté hecha**. Bundle servido ≠ camino con datos probado:
+lo verificado hoy corrió contra un share **inexistente**.
+
+Falta además confirmar que cada marker del inventario tenga **par en el payload cliente**. Sólo se puede
+hacer superficie por superficie, a medida que portan.
 
 ### Slice 2 — Ampliar el gate a `studio-web`
 
