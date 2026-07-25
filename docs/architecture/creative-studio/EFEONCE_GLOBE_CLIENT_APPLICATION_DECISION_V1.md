@@ -343,3 +343,175 @@ estaba lista, y la prop nueva es la evidencia.
 - **Si el Slice 4 no logra reproducir los invariantes de concurrencia** (watermark, epoch, single-flight) con cobertura equivalente: detener el strangler, dejar feed/viewer en el payload viejo y reabrir esta ADR con la evidencia.
 - **Si `TASK-1480` da go antes de que los slices client-facing (1 y 2) estén cerrados:** el share board se expone comercialmente en su estado actual — reabrir prioridades, no continuar por inercia.
 - **Si aparece la necesidad de SSR/edge o de light mode en una superficie humana:** supersede con ADR nueva; nunca reescribir el historial.
+
+## Delta 2026-07-25 — El Producer se reconstruye source-led, y el retiro se mide por capacidad ejecutable
+
+> **Qué cambia:** el Slice 3 (composer) y el Slice 4 (feed + viewer) de esta ADR dejan de describirse como
+> *ports* del payload vanilla y pasan a ser trabajo **`source-led`** contra `approved-prototype.dc.html`.
+> El criterio de retiro del payload viejo pasa de "cuando el feed porte" a **paridad de capacidad
+> verificada por un test ejecutable**. Lo que NO cambia: el orden client-facing-primero, el flag, el
+> trust boundary, ni ninguna de las reglas duras de arriba.
+
+### La evidencia que fuerza el cambio
+
+Medido el 2026-07-25 contra el repo, no contra la doc:
+
+| Hecho | Medición |
+|---|---|
+| Contratos `producer`/`lab` que existen server-side | **74** |
+| Contratos que el payload vanilla efectivamente llama | **12** |
+| Contratos que la UI aprobada promete y que **ya tienen contrato sin consumidor** | ~60 |
+
+Los 12 que el vanilla llama, verbatim: `lab.experiment.{cancel,estimate,execute,get,prepare,status}` ·
+`producer.asset.{copyAsReference,favorite,list}` · `producer.{catalog.list,fleet.list,output.get}`.
+
+Y lo que la UI aprobada muestra como acción con contrato ya construido y **cero** consumidores:
+`lab.experiment.relaunch` (Recrear) · `lab.experiment.children`/`.tree` (Serie) ·
+`producer.review.share.create` (Compartir board) · `lab.experiment.variate` ·
+`producer.style.*` (5, estilos/presets) · `producer.library.*` (14, biblioteca/colecciones/bulk/export) ·
+`lab.prompt.enhance`/`.history` · `feed.live.list`/`.changes` (el feed vivo).
+Sin contrato todavía: sólo el retoque regional (`TASK-1497`, `in-progress`).
+
+**La lectura correcta no es "el diseño está adelantado al backend". Es la inversa: el backend corrió
+adelante y el payload vanilla es el cuello de botella.** Esa inversión es la que invalida el encuadre de
+port: portar el vanilla congela una fracción del target aprobado y deja ~60 contratos gobernados sin
+consumidor, que es precisamente el modo de falla que ADR-004 describía —*"freezes an accidental pilot
+into architecture"*— aplicado a la capa de UI.
+
+### Decisión
+
+1. **El feed, el viewer y el composer se construyen `source-led` contra `approved-prototype.dc.html`**
+   (`docs/ui/visual-sources/TASK-1505/`, SHA-256 `7d0d689b…10e93f`, verificado). Su README ya declara la
+   autoridad: *"the complete approved target… not permission to reduce scope"*. El payload vanilla deja de
+   ser la referencia visual y queda reducido a **una sola función**: la lista de 12 contratos que el
+   reemplazo tiene que seguir llamando.
+2. **Los invariantes temporales se portan del vanilla, no del prototipo.** El prototipo es un HTML con
+   fixtures: no tiene watermark, ni epoch, ni refresh single-flight. Esos tres viven en
+   `producer-client.ts` y son lo único genuinamente irreemplazable de ese archivo. Ya están portados con
+   18 tests (`TASK-1559` Slice 1, `85c0d1f`).
+3. **La convivencia se resuelve por RUTA, no por flag.** `client_app_enabled` ya está en `true` desde el
+   cutover del share board, así que un flag global ya no puede separar las dos generaciones del Producer.
+   El vanilla conserva `/producer`; el payload nuevo crece en rutas propias hasta alcanzar paridad.
+4. **El retiro del payload viejo (`TASK-1560`) se gatea por PARIDAD DE CAPACIDAD EJECUTABLE.**
+
+### El criterio de retiro, y por qué no es un grep
+
+La primera versión de este criterio era "cuando un `grep` encuentre las 12 capabilities en el payload
+nuevo". **Está mal, y vale registrar por qué:** un `grep` prueba que el string aparece en el archivo, no
+que exista una llamada, que sea alcanzable, ni que esté autorizada. Pasaría con el id escrito en un
+comentario. Es el anti-patrón de *"el gate es el test de regresión del primer consumidor"*: un gate que se
+satisface editando texto no mide capacidad.
+
+El criterio canónico:
+
+- **`LEGACY_PRODUCER_CAPABILITY_PARITY`** — un array declarado en `apps/studio-client/src/data/`, con los
+  12 ids **y la razón de cada uno**, que es el inventario contra el que se mide.
+- **El test recorre ese array y ejercita el dispatch del payload nuevo**, afirmando que cada id sale
+  efectivamente a la red con su forma correcta (reader vs command, idempotency donde aplique). Un id sin
+  camino de llamada **falla el test**, no pasa por estar escrito.
+- **Un drift guard** afirma que el inventario declarado coincide con lo que el vanilla llama de verdad, así
+  que agregar una capability al vanilla sin agregarla al inventario rompe el build en vez de erosionar el
+  criterio en silencio.
+- El retiro **no** exige paridad con las 74. Exige paridad con las **12** más los tres invariantes
+  temporales cubiertos. Todo lo demás que la UI aprobada promete es trabajo nuevo, no deuda de port, y no
+  puede bloquear el retiro de un archivo que tampoco lo hacía.
+
+### Alternativas rechazadas
+
+| Alternativa | Decisión |
+|---|---|
+| **Portar el feed vanilla tal cual y llamarlo paridad** | **Rechazada — se intentó y falló el 2026-07-25.** El resultado tenía 4 de ~15 elementos de la card y 0 de sus 8 acciones. Y el fallo de método fue peor que el resultado: se construyó desde un fragmento de CSS en vez de desde la superficie renderizada, y se declaró "geometría preservada" sin haber capturado nunca la línea base. Registrado en `85c0d1f`. |
+| **Rehacer todo desde el prototipo, ignorando el vanilla** | **Rechazada.** Perdería los tres invariantes temporales, que el prototipo no tiene porque usa fixtures. Son el activo real de ese archivo y su regresión es silenciosa. |
+| **Retirar el vanilla cuando el nuevo "esté completo"** | **Rechazada por infalsable.** "Completo" contra 74 contratos no llega nunca, y el vanilla nunca los cumplió. El criterio tiene que ser lo que el vanilla efectivamente hace. |
+| **Separar por flag en vez de por ruta** | **Rechazada por el hecho.** El flag global ya está en `true`; separar dos generaciones del Producer con él exigiría un segundo flag, que es una palanca por superficie disfrazada de palanca de payload. |
+| **Retirar `/producer` y redirigir al nuevo antes de la paridad** | **Rechazada.** Es el big bang que la regla dura de esta ADR prohíbe: no se retira una superficie vieja antes de que el reemplazo tenga cobertura equivalente. |
+
+### 4-Pillar Score
+
+#### Safety
+
+- **Qué puede salir mal:** el payload nuevo consume un contrato que el vanilla no consumía y expone una
+  capacidad que nadie autorizó como visible, o renderiza un identificador de wire al lado equivocado de la
+  frontera de audiencia.
+- **Gates:** cada capability sigue gateada server-side por su propia autorización — la UI nueva no puede
+  ampliar nada. **Frontera de audiencia nueva y verificada:** `ProducerLiveFeedRouteLabelV1` es
+  `{ routeId, model? }`, o sea que el item del feed **transporta el slug de wire**; se renderiza
+  `model.name`/`version` y nunca `routeId`. Es el mismo hallazgo que `TASK-1562` hizo en la proyección del
+  share, un nivel más arriba.
+- **Blast radius si sale mal:** una superficie interna del Producer, tenant Efeonce. No cruza a cliente:
+  el share board es la única superficie client-facing y es otra ruta con otro payload.
+- **Verificado por:** assertion de no-fuga en el canary sobre el DOM servido (mismo patrón que
+  `globe-share-board-canary.mjs`) + el test de paridad, que afirma qué se llama y por lo tanto también
+  qué NO.
+- **Riesgo residual:** el prototipo aprobado promete acciones cuya autorización fina todavía no está
+  mapeada a capability visible (Serie, Compartir board). Se construyen **gated**, y una acción sin
+  capability resuelta se renderiza como no disponible con su razón — nunca como ejecutable.
+
+#### Robustness
+
+- **Idempotencia:** obligatoria por construcción en el transporte nuevo — un `command` sin
+  `idempotencyKey` falla en la llamada y no sale a la red. `execute` gasta; que sea imposible de escribir
+  vale más que detectarlo en el ledger.
+- **Atomicidad:** sin cambio. Las transacciones viven server-side; el browser no compone escrituras.
+- **Protección de carrera:** epoch por operación (una respuesta superada se descarta) + refresh
+  single-flight keyed por epoch con ≤1 reintento + reconciliación por `stableKey` donde gana la `revision`
+  más alta, así que la entrega fuera de orden no revierte la pantalla.
+- **Cobertura de invariantes:** 18 tests en `producer-feed-reconciler.test.ts` y
+  `governed-transport.test.ts`, incluida la concurrencia (N llamadas con sesión rotada → un refresh, un
+  reintento cada una, body/correlation/idempotency preservados).
+- **Verificado por:** esos tests + el drift guard del inventario de paridad.
+
+#### Resilience
+
+- **Política de reintento:** acotada y explícita — un reintento después de un refresh exitoso, y ninguno
+  más. Ante timeout de un command que gasta: **leer estado primero**, nunca reintentar a ciegas.
+- **Dead letter:** no aplica en el cliente; el trabajo durable vive en `governed-run-lifecycle`.
+- **Señal de fiabilidad:** el ciclo del feed se reprograma **siempre**, incluso tras un fallo — un feed que
+  deja de reanudar tras el primer 503 se congela sin decirlo, que es peor que un reintento de más. El
+  fallo de lectura del hilo se loggea en vez de callarse.
+- **Trail de auditoría:** sin cambio — el audit vive server-side por command.
+- **Recuperación:** una marca que el backend ya no reconoce **invalida el watermark** y fuerza `list`
+  completo; perder el delta explícitamente es correcto, aplicar uno inválido saltearía en silencio.
+- **Degradación honesta:** cuatro estados distinguibles (`loading`/`empty`/`degraded`/`denied`), con
+  Reintentar **sólo** donde reintentar puede funcionar.
+
+#### Scalability
+
+- **Big-O del camino caliente:** el feed pasa de `O(n)` por ciclo —`asset.list` completo cada vez, que es
+  lo que hace hoy— a `O(delta)` con `feed.live.changes`. Es la mejora principal y es la razón por la que
+  el reader existía.
+- **Cobertura de índice:** sin cambio; los readers son server-side y ya paginados por cursor.
+- **Caminos async:** sin cambio.
+- **Costo a 10x:** sub-lineal respecto de hoy, porque el volumen por ciclo deja de depender del tamaño del
+  feed y pasa a depender de la tasa de cambio.
+- **Paginación:** por cursor (`nextCursor`), no `OFFSET`. El tope de la reconciliación
+  (`MAX_SHARE_COMMENTS` es del share; el feed usa `nextCursor` + su propio límite) acota la respuesta.
+
+### Reglas duras que agrega este Delta
+
+- **NUNCA** describir trabajo del Producer como "port" desde el payload vanilla: el vanilla es una
+  fracción del target aprobado (12 de 74 contratos) y tratarlo como referencia congela esa fracción.
+- **NUNCA** construir una superficie del Producer sin haber capturado antes su línea base **renderizada**.
+  Un fragmento de CSS no es la superficie, y declarar "geometría preservada" sin before/after es una
+  afirmación no falsable.
+- **NUNCA** gatear el retiro del payload viejo con un criterio satisfacible editando texto (un `grep`, un
+  comentario, una constante). El criterio es un test que ejercita el dispatch.
+- **NUNCA** renderizar `routeId` en una superficie del Producer: el ancla pública es `route.model`, y el
+  `routeId` es el identificador de wire que ADR-003 mantiene afuera.
+- **NUNCA** encodear `producer` en el contrato de una primitive nacida en este trabajo: Storyboard
+  (`TASK-1547`) y Video Effectiveness (`TASK-1540`) son consumidores futuros, y mientras haya un solo
+  consumidor la reutilización es hipótesis, no hecho.
+- **SIEMPRE** portar los invariantes temporales **desde el vanilla** y la forma visual **desde el
+  prototipo**. Son dos fuentes distintas para dos preguntas distintas, y confundirlas es lo que produjo el
+  intento fallido del 2026-07-25.
+
+### Lo que este Delta deliberadamente NO decide
+
+- **El alcance del composer.** Es el otro consumidor grande del prototipo aprobado y de los ~60 contratos
+  sin consumidor (`prompt.enhance`, `prompt.history`, `style.*`, `recipe.*`, `reference.analyze`,
+  `experiment.variate`). Necesita su propia evaluación de alcance: `TASK-1552` y `TASK-1555` ya aterrizaron
+  ahí sobre el payload viejo, así que hay trabajo desplegado que este Delta no puede reencuadrar sin leerlo.
+- **Si el retoque regional entra en la primera generación del feed nuevo.** Depende de `TASK-1497`, que no
+  tiene capability todavía.
+- **Si la biblioteca (`producer.library.*`, 14 contratos) es parte del feed o una superficie hermana.** El
+  prototipo las muestra juntas; el contrato las separa.
