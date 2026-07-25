@@ -19,12 +19,41 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Slices 1-2 completos — transporte + reconciliador + feed reconstruido source-led; Slices 3-4 pendientes`
+- Status real: `code complete, rollout pendiente — los 4 slices cerrados y verificados en browser; falta push a main + deploy de globe-studio-internal`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none` (TASK-1558 LIVE 2026-07-25; las primitives existen)
 - Branch: `task/TASK-1559-globe-feed-viewer-client-port`
 - GitHub Issue: `TBD`
+
+## Estado 2026-07-25 — code complete, rollout pendiente
+
+Los cuatro slices están cerrados y verificados en un browser real. **No está en el runtime**: el deploy
+exige que el SHA esté en `refs/heads/main` de `efeonce-globe`, y ese push no se hizo. Por la regla de
+Runtime Rollout Completion Gate el estado correcto es `code complete, rollout pendiente`, no `complete`.
+
+| Slice | Estado | Evidencia |
+|---|---|---|
+| 1 — transporte + reconciliador | ✅ | 18 tests; `85c0d1f` |
+| 2 — feed | ✅ source-led | 6 defectos corregidos mirando el frame; `15eb6dd` + `c9ceabc` |
+| 3 — viewer | ✅ | `governed-media.ts` + 11 tests; 4 códigos distinguidos en browser; `1e605d5` |
+| 4 — cutover + canary | ✅ | ruta `/producer/feed` + 6 tests; 3 invariantes en browser real; `d198b89` |
+
+**Para prenderlo** (necesita autorización del operador porque es push a un repo de producto):
+
+```bash
+git -C ~/Documents/efeonce-globe push origin main
+gh workflow run deploy-internal.yml -R efeoncepro/efeonce-globe \
+  -f service=globe-studio-internal -f target_sha=<SHA de main>
+```
+
+Verificación post-deploy: `GET /producer/feed` con sesión interna devuelve el shell del payload cliente
+(no el rótulo `<small>Producer</small>`), `GET /producer` sigue devolviendo el vanilla, y el feed pinta
+thumbnails reales de las piezas retenidas.
+
+**Rollback:** el flag `client_app_enabled` NO sirve acá (está en `true` desde el share board y apagarlo
+también apagaría el share board). El rollback es revertir el commit de la ruta y redeployar — la ruta es
+aditiva, así que revertirla no toca `/producer` ni ninguna superficie existente.
 
 ## Delta 2026-07-25 — el feed se reconstruyó source-led, no se portó
 

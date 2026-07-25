@@ -45,7 +45,35 @@ node scripts/frontend/globe-client-seam-gate.mjs             # en greenhouse-eo
 pnpm --filter @efeonce-globe/studio-client build             # en efeonce-globe
 node apps/studio-client/scripts/share-board-canary.mjs       # en efeonce-globe
 node scripts/frontend/globe-share-board-canary.mjs           # en greenhouse-eo
+
+# Canary del FEED del Producer (una terminal) — TASK-1559
+pnpm --filter @efeonce-globe/studio-client build              # en efeonce-globe
+node apps/studio-client/scripts/producer-feed-canary.mjs      # sirve :4323/producer/feed
+#   escenarios via header `x-canary-scenario`:
+#   default · empty · degraded · denied · loading
+#   viewer-ready · viewer-denied · viewer-notfound · viewer-unavailable · viewer-slow
+
+# Canary de CONCURRENCIA (una terminal) — TASK-1559 Slice 4
+node apps/studio-client/scripts/producer-concurrency-canary.mjs   # sirve :4324
+#   escenarios: watermark · single-flight · epoch-cancel
+#   endpoints de control: GET /__log · GET /__reset · GET /__release
 ```
+
+### Los dos canaries del Producer no miden lo mismo
+
+| Canary | Qué afirma | Por qué no lo cubre el otro |
+|---|---|---|
+| `producer-feed-canary` | **píxeles y estados**: la card, el hero, la toolbar, los 4 códigos del viewer, el skeleton, el thumbnail real | sirve respuestas fijas por escenario; no puede observar una secuencia |
+| `producer-concurrency-canary` | **secuencias**: `list → changes` con la marca avanzando, un refresh por ciclo y no uno por llamada, una respuesta que llega a un contexto ya cerrado | no dibuja nada que valga mirar; su artefacto es `/__log` |
+
+El de concurrencia **retiene respuestas a mano** (`/__release`). Es la única forma de reproducir "la
+respuesta llegó a un contexto que ya no existe" sin depender de un `setTimeout` frágil: el harness abre el
+viewer, lo cierra con Escape, y **después** libera los bytes.
+
+**Trampa del harness, ya pisada:** indexar los assets del bundle por `asset.path` da `undefined` — el campo
+es **`publicPath`**. Con la clave mal, el bundle responde 404, el browser nunca ejecuta JS, y el canary da
+por buenos los invariantes sin haber corrido ninguno. Si `/__log` sólo tiene las llamadas que hiciste con
+`curl`, el browser no está ejecutando: revisá los 404 antes de creerle al resultado.
 
 El canary del share board escribe capturas y `canary-report.json` en `.captures/globe-share-board/`
 (gitignored). Dos detalles de método que no son opcionales:

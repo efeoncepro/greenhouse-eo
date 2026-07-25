@@ -515,3 +515,23 @@ El criterio canónico:
   tiene capability todavía.
 - **Si la biblioteca (`producer.library.*`, 14 contratos) es parte del feed o una superficie hermana.** El
   prototipo las muestra juntas; el contrato las separa.
+
+### Estado de los slices — 2026-07-25
+
+| Slice de esta ADR | Superficie | Estado |
+|---|---|---|
+| 1 | Share board (client-facing) | **LIVE** — revisión `globe-studio-internal-00071-6vp`, imagen `85dac33b03b1` |
+| 2 | Hidratación de la proyección del share | **LIVE** (`TASK-1562`) |
+| 3 | Composer | **no empezado** — es el próximo, y es donde se cobran los ~60 contratos sin consumidor |
+| 4 | Feed + viewer | **code complete, rollout pendiente** (`TASK-1559`): 4 slices cerrados y verificados en browser; falta push a `main` + deploy |
+
+**El Slice 4 no reemplaza `/producer`.** Vive en `/producer/feed` y `/producer` sigue sirviendo el vanilla,
+por una razón que vale escribir acá y no sólo en la task: **el payload nuevo todavía no tiene composer**.
+Servirlo en `/producer` dejaría a un operador interno sin la superficie que gasta creditos — una regresión de
+capacidad disfrazada de migración. El reemplazo de `/producer` es un evento único, después del Slice 3, y se
+gatea por el criterio ejecutable de `legacy-parity.ts`.
+
+**Consecuencia para el rollback del Slice 4:** `client_app_enabled` ya no sirve como interruptor — está en
+`true` desde el Slice 1, así que apagarlo apagaría el share board del cliente. El rollback de una ruta
+aditiva es revertir su commit y redeployar, y eso es aceptable *porque* es aditiva: no toca ninguna
+superficie existente. Un slice que sí modificara `/producer` necesitaría otro interruptor antes de shippear.
