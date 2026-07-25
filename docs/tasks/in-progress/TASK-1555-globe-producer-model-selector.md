@@ -394,6 +394,52 @@ El patrón común de los cuatro es el mismo de toda la task: **una constante har
 la realidad** — el copy que no sigue la modalidad, el peso que no sigue el estado, el hueco que no
 sigue al contenido.
 
+### 8. Pasada de calidad sobre el composer y la biblioteca (`76bfada`, `802ba3f`, `45235cc`)
+
+El operador marcó cuatro zonas más. Ninguna era cuestión de gusto: en las cuatro **la apariencia no
+seguía al comportamiento real**, y en dos la causa raíz eran capas de CSS contradiciéndose sin dueño.
+
+**El prompt leía como agujero, no como lienzo** (`76bfada`). Cinco defectos medidos, tres de ellos
+violaciones de token: `padding: 0` (texto contra el borde), `background: rgba(0,0,0,.16)` — un lavado
+**negro**, no un color, que sobre el azul lee como hueco —, placeholder en `rgb(117,117,117)` (**gris
+neutro fuera de la paleta**; `--faint` es `#7f8cb5`), el agarre nativo de `resize` como chrome sin
+gobernar, y el campo hero a 13.92px con 104px de vacío fijo. Ahora: respiro interno, superficie navy
+levemente elevada, placeholder tokenizado, `.95rem` con interlineado de lectura y **alto que sigue al
+contenido** (98 → 145 → 98px). Se removió además un residuo de mi propio fix anterior
+(`padding-right:0`), que existía sólo para anular el hueco del overlay y le comía el padding derecho
+al lienzo nuevo.
+
+**El seed mostraba un número que el run ignora** (`802ba3f`). El payload es
+`...(state.seedLocked ? { recipe: { seed: state.seed } } : {})`: con el candado abierto —el estado por
+defecto— el número **no se usa** y el reroll no tiene efecto observable. La UI exhibía un valor preciso
+que no participa: no parece un error, parece un dato. Y la jerarquía estaba invertida — el número que
+no aplica a **16px**, el modelo que sí decide a 13.12px, y el botón "Fijar seed" también a 16px cuando
+sus chips hermanos están a ~11px. Ahora el control **dice la verdad de su estado**: en aleatorio, una
+línea ("Distinto en cada generación") sin número ni reroll; al fijarlo aparecen número (tabular, tamaño
+de dato), reroll y ayuda. **150px → 63px** en el estado por defecto.
+
+**Los filtros de biblioteca eran una cápsula rota** (`45235cc`). `.filter-row` había acumulado **12
+declaraciones en 8 bloques y 4 breakpoints**. En mobile ganaban dos que se contradicen: una la volvía
+grid de 3 columnas (5 filtros → 2 filas) y otra la envolvía en una cápsula `border-radius:999px`
+diseñada para **una sola fila** → blob de 94px con dos huérfanos abajo; y un tercer override escondía
+las etiquetas dejando filtros solo-icono. En vez del override nº 13, el control recibió **una
+definición coherente**: si no cabe en una fila deja de ser cápsula y pasa a ser lo que sus vecinos ya
+son (chips que envuelven, con etiqueta). 94px → 81px; desktop sin cambios.
+
+**Trampa que costó un ciclo y vale registrar:** el primer intento dejó cada chip a ancho completo (5
+filas, 210px, peor que el original) porque sobrevivía un `.filter-button{width:100%}` de la época de la
+grilla de 2 columnas. Mi regla tenía más especificidad pero **no declaraba `width`**, así que el legacy
+ganaba por omisión. Una definición nueva sobre capas viejas tiene que **neutralizar lo que contradice**,
+no sólo declarar lo que quiere — es exactamente la dinámica que produjo las 12 declaraciones.
+
+**Evidencia:** GVC premium re-capturado verde tras cada cambio; scorecard apunta a
+`.captures/2026-07-25T07-34-15_task-1555-model-selector/`, `pnpm ui:quality` **PASS** (4.54 / piso 4.2).
+
+**Señal para el operador (no resuelta acá):** cinco zonas revisadas, cinco con el mismo tipo de
+defecto. Hay indicio de que es **sistémico en el composer y la biblioteca**, no una serie de
+casualidades. Ir zona por zona funciona pero es reactivo; conviene una pasada completa bajo esa lente
+como task propia.
+
 ## Progress — Implementación (2026-07-24, `efeonce-globe` `78a1863`, pusheado a `main`)
 
 ### Corrección al mapa de Discovery (hallazgo load-bearing)

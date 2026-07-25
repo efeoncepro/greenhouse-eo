@@ -4,9 +4,9 @@
   "reviewedAt": "2026-07-25",
   "reviewer": "Claude + GVC premium evidence (fixture local de Globe, 1440x1000 + 390x844)",
   "evidence": {
-    "desktop": ".captures/2026-07-25T07-08-54_task-1555-model-selector/01-desktop/frames/04-model-list-states-list-settled.png",
-    "mobile": ".captures/2026-07-25T07-08-54_task-1555-model-selector/02-mobile/frames/04-model-list-states-list-settled.png",
-    "dossier": ".captures/2026-07-25T07-08-54_task-1555-model-selector/review-dossier.md"
+    "desktop": ".captures/2026-07-25T07-34-15_task-1555-model-selector/01-desktop/frames/04-model-list-states-list-settled.png",
+    "mobile": ".captures/2026-07-25T07-34-15_task-1555-model-selector/02-mobile/frames/04-model-list-states-list-settled.png",
+    "dossier": ".captures/2026-07-25T07-34-15_task-1555-model-selector/review-dossier.md"
   },
   "dimensions": {
     "hierarchy": {
