@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -253,6 +253,79 @@ Mapa de implementación verificado (arquitectura Globe = HTML-template + control
 - **`producer-gvc-fixture.mjs`** — agregar la capability `globe.producer.fleet.list` (coverage ui available) + data fake de flota (available/gated/blocked) para el escenario `task-1555-model-selector`.
 
 Slices de implementación (design-studio Steps 6-9): (1) data layer client + fixture; (2) render de la galería + CSS (first-fold checkpoint desktop+mobile); (3) estados+selección+a11y; (4) GVC premium + scorecard 14 dims. **Nota de dependencia:** el estado `available` real (modelo funcionando) necesita la **promoción ADR-009** (hoy bloqueada por identidades de readiness firmadas — paso humano); `gated`/`blocked` sí se pueden GVC-ear ya.
+
+## Progress — Implementación (2026-07-24, `efeonce-globe` `78a1863`, pusheado a `main`)
+
+### Corrección al mapa de Discovery (hallazgo load-bearing)
+
+El "placeholder estático" `data-producer-static-route` (`producer-ui.ts`) es **sólo el shell
+PRE-hidratación**. La UI que el usuario ve la renderiza `renderRouteSelector()` en
+`producer-controller.ts`, que reemplazaba esa región por un `<select>` oculto + un
+`details.route-picker` con `role="listbox"` — es decir, **la Dirección C (dropdown técnico) que la
+dirección visual rechaza explícitamente**. El trabajo real fue reescribir ESE render, no el
+placeholder. El placeholder pasó a ser el skeleton de la galería.
+
+### Decisiones de implementación (no re-decidir)
+
+- **El `<select id="producer-route-select">` oculto sigue siendo la autoridad.** `estimate`,
+  `renderShapePane`, `renderReferences`, `projectComposerMode` e `invalidateEstimate` cuelgan de su
+  evento `change`. La lámina escribe **a través de él** (`select.value` + `dispatchEvent('change')`),
+  igual que hacían los botones del `route-picker`. Bifurcar la selección habría roto el loop de gasto
+  y los tests que assertean `producer-route-select` / `producer-runtime-route`.
+- **El copy vive en `producer-copy.ts` (SoT) y viaja serializado.** `browserController` se serializa
+  con `.toString()`, así que no puede importar el módulo de copy; se usó el mismo puente que
+  `viewerCopy` (parámetro serializado, `ProducerFleetCopy`).
+- **`route-card` cede su chrome** (`padding/border/background` a cero) para que la lámina sea la
+  única superficie. Sin eso la galería quedaba *card-on-card*, el anti-patrón que la dirección marca
+  como `BLOCK`.
+- **Hue del campo de textura derivado de la identidad pública del modelo** (`name · version`), no del
+  proveedor: dos tiers del mismo modelo (Seedream 5 Pro vs 5 Pro Edit) deben leerse como láminas
+  distintas. El proveedor **no** es derivable del hue.
+- **Señal de "no pude verificar" ≠ presencia del gate.** El client registra un gate para toda
+  capability que sondea, así que la presencia de la clave no significa nada: sólo un gate cuyo
+  `state !== 'available'` marca `fleetStatus='unverified'`. (Primera implementación tenía este bug;
+  corregido y verificado en runtime.)
+
+### Delta de dirección visual — mobile 390px (decisión registrada)
+
+La dirección fija "columna única de láminas en 390px". **Se implementó 2 columnas en ≤430px** con
+targets y tipografía más grandes. Razón: la columna del composer en desktop ya mide ~27,5rem (≈440px),
+prácticamente el ancho del viewport mobile — una columna única produciría láminas de ~350px de alto y
+~1.400px de scroll para 4 modelos, degradando la descubribilidad, que es exactamente el motivo por el
+que la dirección **rechazó** la Dirección B. 2 columnas es una **transformación** (no una compresión):
+menos densidad, targets mayores, nombres legibles. Pendiente de confirmar contra GVC 390px.
+
+### Consecuencia de producto que requiere decisión del operador (⚠️ no silenciada)
+
+Con la galería, **sólo una ruta `available` es ejecutable**. Hoy ninguna ruta de imagen está promovida
+(ADR-009 bloqueada por identidades de readiness firmadas), así que en el runtime real **el Producer
+queda sin modelo de imagen elegible** hasta la promoción. Es el comportamiento que la task, el
+wireframe y los Acceptance Criteria especifican, y es el correcto desde gobernanza (ejecutar por el
+Lab una ruta no promovida desde una superficie client-facing es justo lo que ADR-009/010 previene) —
+pero hace visible el blocker en vez de esconderlo. `ref/audio/foley-v1` sí está promovida (canary
+ADR-010), así que audio no queda a oscuras. **Si se necesita el Producer operable antes de la
+promoción, es una decisión de rollout, no un bug.**
+
+### Estado por slice
+
+- [x] Slice 1a — data layer en `ProducerClient` (`d07a1cd`).
+- [x] Slice 1b — copy + flota en el estado del controller.
+- [x] Slice 2 — galería de láminas (HTML + CSS inline) + first-fold revisado en fixture local.
+- [x] Slice 3 — estados honestos (`available`/`gated`/`blocked`/`unverified`/loading/empty),
+      selección única, preselect del recomendado sólo si `available`, radiogroup + roving tabindex.
+- [x] Fixture GVC con capability `globe.producer.fleet.list` + los tres estados.
+- [ ] **Pendiente:** escenario GVC `task-1555-model-selector`, capturas premium 1440×1000 + 390×844,
+      dossier, scorecard 14 dimensiones, `pnpm ui:quality`, enterprise review.
+- [ ] **Pendiente:** limpieza del CSS muerto de `.route-picker`/`.route-menu`/`.route-identity`
+      (quedó huérfano al remover el dropdown; vive dentro de una línea CSS minificada compartida).
+- [ ] **Pendiente (out-of-band):** promoción ADR-009 para probar `available` real end-to-end.
+
+### Verificación ejecutada
+
+- `pnpm check` (typecheck + 235 tests) y `pnpm build` verdes en `efeonce-globe`.
+- Runtime real contra el fixture (`http://127.0.0.1:4178/producer`): galería `ready`, orden
+  recomendado → available → gated → blocked, `aria-checked`/`aria-disabled` correctos,
+  `scrollWidth === clientWidth` (1429/1429), hues distintos por lámina, cero slug en el DOM.
 
 ## Detailed Spec
 

@@ -71,6 +71,17 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 - API + worker restaurados a `GLOBE_LAB_PROVIDER=composite`; break-glass IAM revocado (readback limpio).
 - Driver gobernado desplegado en `9b62b19`. **Falta:** ADR-009 (promover binding/readiness + readback de identidad `binding.modelId == estimate.model == readiness.route.modelId`) para que sea entregable a cliente.
 
+## Consumers vivos de la flota
+
+- **Producer Model Selector (TASK-1555, `efeonce-globe` `78a1863`)** — la región "Ruta y modelo" del
+  composer renderiza la **galería de láminas** desde `globe.producer.fleet.list`: cada ruta de la
+  modalidad activa aparece con su `availability` real (`available` elegible · `gated` "Próximamente"
+  · `blocked` con la razón del gate externo), ordenada recomendado → available → gated → blocked.
+  **Promover una ruta la vuelve elegible en el Producer sin tocar la UI.** Consecuencia directa: como
+  hoy ninguna ruta de imagen está promovida, el Producer **no ofrece modelo de imagen elegible** hasta
+  que ADR-009 avance — el blocker dejó de ser invisible. `ref/audio/foley-v1` (promovida en el canary
+  ADR-010) sí queda elegible. Cero slug/costo/margen en el DOM.
+
 ## Delta / pendientes conocidos
 
 - **Gemini Omni en producción gobernada:** hoy Omni está **solo en el Lab**; el path gobernado tiene Fal + Veo + (ahora) Vertex-imagen, **no Omni**. Si `ref/motion/reference-v1` se quiere entregar a cliente, falta su driver gobernado (Interactions API) — análogo a lo que se hizo para Vertex-imagen.
