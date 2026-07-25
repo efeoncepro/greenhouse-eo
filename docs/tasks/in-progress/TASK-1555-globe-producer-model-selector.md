@@ -69,7 +69,7 @@ Revisar y respetar:
 
 Reglas obligatorias:
 
-- Extender el patrón existente de Globe Producer (región `producer-route` + tarjetas); **NO** crear design system nuevo ni primitive Greenhouse (Globe tiene su propio registry/CSS).
+- Extender el patrón existente de Globe Producer (región `producer-route` + tarjetas); **NUNCA** importar primitives, `CompositionShell`, MUI ni AXIS de `greenhouse-eo`. **ADR-014: el CSS/tokens de Globe dejan de vivir dispersos por archivo — el SSOT de tokens lo crea `TASK-1556` Slice 2 y el hex crudo pasa a ser error de lint (Slice 3). Todo token que esta task tocó migra a ese SSOT; no se re-declara.**
 - El navegador **no** calcula disponibilidad, promoción, ceiling ni provider metadata: sólo renderiza el `availability` que da el reader.
 - **NUNCA** exponer slug de proveedor, costo vendor ni margen (el reader ya no los expone; la UI tampoco los infiere).
 - Copy visible via `producer-copy.ts` (extender, no hardcodear en JSX).
@@ -244,7 +244,7 @@ Ver wireframe §4 (contrato completo). Estados: default/loading (skeleton, nunca
 
 ## Progress — Discovery (2026-07-24, contra código real de `efeonce-globe`)
 
-Mapa de implementación verificado (arquitectura Globe = HTML-template + controller vanilla-JS + CSS **inline** en `producer-ui.ts`; NO React/JSX). Reader `globe.producer.fleet.list` **desplegado + live-verificado** (Codex `c3b6bf4`).
+Mapa de implementación verificado **al 2026-07-24, sobre el payload de browser vigente entonces** (HTML-template + controller vanilla-JS + CSS **inline** en `producer-ui.ts`). **ADR-014 (2026-07-25) superseded eso: ya no es la arquitectura de Globe sino el payload legacy.** El payload canónico es una aplicación cliente tipada y componetizada (Vite + React + React Router, SSR apagado), gobernada por `TASK-1556`. El Producer sigue en el payload legacy hasta su propio slice de port, así que este mapa describe correctamente lo ya ejecutado — **no autoriza superficie nueva sobre el patrón viejo**. Reader `globe.producer.fleet.list` **desplegado + live-verificado** (Codex `c3b6bf4`).
 
 - **`producer-client.ts`** — patrón de fetch idéntico al catálogo (`:610-614`: en boot, si `gateFor('globe.producer.catalog.list').state==='available'`, `reader(ids.catalog,{}).then(d => state.catalog = d.routes)`). Plan: agregar `fleet: 'globe.producer.fleet.list'` a `ids` (`:131`), `state.fleet` a `RuntimeState`, el fetch paralelo en boot, y exponerlo al controller (mismo mecanismo que `catalog`). `reader(id, query)` genérico (`:490`) ya arma el envelope (`workspaceSelection`, correlationId).
 - **`producer-ui.ts`** — reemplazar `data-producer-static-route` (`:142`, el placeholder deshabilitado dentro de `route-card`/`route-output-grid`) por el contenedor de la galería + **CSS inline** de las láminas (Dirección A) en el `<style>` del page. Copy desde `producer-copy.ts`.
@@ -451,7 +451,7 @@ PRE-hidratación**. La UI que el usuario ve la renderiza `renderRouteSelector()`
 dirección visual rechaza explícitamente**. El trabajo real fue reescribir ESE render, no el
 placeholder. El placeholder pasó a ser el skeleton de la galería.
 
-### Decisiones de implementación (no re-decidir)
+### Decisiones de implementación (no re-decidir **dentro del payload legacy**)
 
 - **El `<select id="producer-route-select">` oculto sigue siendo la autoridad.** `estimate`,
   `renderShapePane`, `renderReferences`, `projectComposerMode` e `invalidateEstimate` cuelgan de su
@@ -557,7 +557,7 @@ Sin flag nueva — cambio aditivo de UI internal-only sobre una superficie exist
 ### Out-of-band coordination required
 
 - Depende de que existan rutas promovidas (ADR-009, Codex/operador) para probar el estado `available` real.
-- Coordinar ownership de `producer-ui.ts` con TASK-1552.
+- Coordinar ownership de `producer-ui.ts` con TASK-1552 **y con `TASK-1556` (ADR-014): esta task no bloquea el Slice 0, pero su superficie es candidata a port en el slice del composer. Declarar antes de empezar ese slice si lo construido acá se porta a componentes o se reimplementa.**
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING

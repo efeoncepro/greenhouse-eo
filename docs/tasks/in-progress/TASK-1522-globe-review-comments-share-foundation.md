@@ -188,7 +188,7 @@ comentarios auditables y grants share read-only revocables/expirables, sin habil
 ## Out of Scope
 
 - Artifact manifests, packaging, release, delivery/download grants and purge (`TASK-1472`).
-- UI changes (`TASK-1505`) and commercial/public environment activation (`TASK-1521`).
+- UI changes (`TASK-1505` for review/comment surfaces; **`TASK-1556` for the read-only share board, rebuilt on the new typed client payload per ADR-014**) and commercial/public environment activation (`TASK-1521`).
 - Anonymous commands, workspace enumeration, provider calls or direct bucket URLs.
 
 ## Acceptance Criteria

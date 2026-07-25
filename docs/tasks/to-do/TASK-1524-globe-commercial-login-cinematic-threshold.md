@@ -66,7 +66,7 @@ Reglas obligatorias:
 - Globe es un producto comercial y una plataforma hermana; su UI/brand runtime no hereda AXIS, Vuexy,
   CompositionShell ni primitives visuales Greenhouse.
 - OAuth, PKCE, cookie, revalidación, access grants y redirect ownership no cambian en esta task.
-- El CTA y copy funcional están disponibles sin esperar video, JS, audio ni una conexión rápida.
+- El CTA y copy funcional están disponibles sin esperar video, audio ni una conexión rápida. **Con SSR apagado (ADR-014), esto NO se sostiene solo: el shell HTML que emite `studio-web` DEBE incluir logo, headline, CTA y poster como contenido estático del documento, antes de que hidrate el bundle. El bundle nunca puede ser requisito para leer la propuesta ni para llegar a `/auth/start`.**
 - El video es una mejora progresiva, no el LCP ni la única portadora de significado.
 - El logo final usa el asset real; ningún modelo generativo dibuja wordmark o isotipo.
 - Media, música, SFX, fuentes y outputs tienen provenance, derechos comerciales y aprobación humana.
@@ -170,7 +170,7 @@ Reglas obligatorias:
 
 ### State inventory
 
-- Default/poster: copy, CTA y poster aparecen en el primer HTML.
+- Default/poster: copy, CTA y poster aparecen en el shell HTML inicial servido por el BFF, sin depender del bundle cliente; la app hidrata encima sin reflow del first fold.
 - Cinematic playing: master muted/playsinline se carga después del contenido crítico y reproduce una vez.
 - Cinematic settled: frame final estable, sin loop.
 - Paused: control mantiene estado y etiqueta accesible.
@@ -210,7 +210,7 @@ Reglas obligatorias:
 
 - Route/surface: `GET /`, `/auth/start`, callback/error existentes y redirect autenticado a `/producer`.
 - Primitive/variant/kind: Globe `Cinematic Threshold` candidate, native video/picture, media control y CTA.
-- Component candidates: render helpers actuales en `ui.ts`; separar copy/media manifest si evita drift.
+- Component candidates: componentes tipados del payload ADR-014 para la superficie launch (Slice 2), con copy y media manifest en módulos propios; `ui.ts` sólo como referencia hasta su retiro. **El first fold crítico vive en el shell del servidor, no en el bundle.**
 - Copy source: namespace `globe.login.*`.
 - Data reader/command: sesión y OAuth existentes; ningún reader/command nuevo.
 - API parity: sin cambios; HTML no reemplaza `/v1/session`.

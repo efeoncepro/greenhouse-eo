@@ -141,7 +141,7 @@ Reglas obligatorias:
 
 - `readStudioRuntimeConfig` hard-blockea todo ambiente no `internal_smoke`.
 - No hay matriz comercial aceptada de config/isolation/secrets/IAM/migrations/providers/ledger ni promotion evidence.
-- El host/framework/front door comercial sigue siendo decisión diferida.
+- El host y el front door comerciales siguen siendo decisión diferida (ADR-004). **El framework ya NO: ADR-014 (Accepted 2026-07-25) ejerció el gatillo de framework — Vite + React + React Router con SSR apagado, servido por el mismo `studio-web`. Host, BFF, sesión SSO, CSP por nonce, ALB y API privada no cambian. Esta task consume esa decisión, no la re-abre.**
 - No hay thumbnails/posters/transcodes/waveforms gobernados, Range extremo-a-extremo, orphan GC ni política
   implementada de visibilidad pending/eligible.
 - Quedan siete rutas sin promotion/canary exacto, cinco reconcile stale, recuperación explícita de sesión expirada

@@ -70,7 +70,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- Design start: accepted ADR-012/SPEC-012, the declared UI contracts and existing Globe shell/viewer/review
+- Design start: accepted ADR-012/SPEC-012 and the declared UI contracts are sufficient for Slice 1 with plausible fixtures. **Per ADR-014 this surface is BORN in the new typed client payload (Vite + React + React Router, SSR off); legacy string-template surfaces are a visual reference only and are never ported. Hard gate: `TASK-1556` Slice 0 (build seam, token SSOT, style/a11y lint) must land before Slice 1 code.** Superseded line kept for history: existing Globe shell/viewer/review
   patterns are sufficient for Slice 1 with plausible fixtures.
 - Integration gate: TASK-1543 for authoritative authoring/revision readers and commands.
 - Integration gate: TASK-1544 for persisted comments, mentions, annotations and masks.
@@ -123,7 +123,7 @@ Reglas obligatorias:
 
 - Surface: `Globe Storyboard Studio [route verificar]`
 - Composition Shell: `aplica` — extend existing Globe product shell.
-- Primitive decision: `extend` — shell/stage/inspector/review plus new `StoryboardSequenceCanvas` composition.
+- Primitive decision: `new` — `StoryboardSequenceCanvas` is authored as typed React components in the ADR-014 client payload, reusing the *visual* language of shell/stage/inspector/review, never the legacy string-template render helpers.
 - Adaptive density / The Seam: `aplica` — sequence/inspector transform into stage/filmstrip/sheets.
 - Floating/Sidecar/Dialog decision: `context dock desktop; full-height sheets compact; focus-managed proposal/handoff`.
 - Copy source: `Globe canonical copy/nomenclature source [verificar in runtime]`
@@ -165,7 +165,7 @@ Reglas obligatorias:
 ### Implementation mapping
 
 - Route / surface: `/storyboards/:id [verificar]`
-- Primitive / variant / kind: `StoryboardSequenceCanvas new composition over existing Globe patterns`
+- Primitive / variant / kind: `StoryboardSequenceCanvas as a new typed React composition in the ADR-014 client payload, consuming the Globe token SSOT`
 - Component candidates: `shell, stage/viewer, inspector, tabs, sheets/dialog, review/comments, status`
 - Copy source: `Globe canonical copy module [verificar]`
 - Data reader / command: `TASK-1543–1546 governed capabilities`
@@ -175,7 +175,7 @@ Reglas obligatorias:
 
 ### GVC scenario plan
 
-- Scenario file: `../efeonce-globe/apps/studio-web/src/gvc/storyboard-studio.scenario.ts [verificar]`
+- Scenario file: `scripts/frontend/scenarios/globe-storyboard-studio.scenario.ts` (Greenhouse GVC harness pointed at the Globe route — `fe:capture` only resolves scenarios under `scripts/frontend/scenarios/`, same pattern as `globe-creative-producer.scenario.ts`), **plus** the Globe-owned visual canary required by ADR-014 point 4, under `../efeonce-globe/apps/studio-web/scripts/`.
 - Route: `/storyboards/:id [verificar]`
 - Viewports: `1440×1000 and 390×844`
 - Quality profile: `premium`
@@ -193,7 +193,7 @@ Reglas obligatorias:
 - Decision: `Editorial Sequence Desk with finite structured sequence`.
 - Alternatives considered: `infinite whiteboard, screenplay-only and dashboard/card grid`.
 - Why this pattern: `preserves narrative order, review evidence, export, accessibility and mobile transformation`.
-- Reuse / extend / new primitive: `reuse shell/stage/inspector/review; extend; new composition only`.
+- Reuse / extend / new primitive: `reuse the approved visual language; author new typed components in the ADR-014 payload; no reuse of legacy render helpers`.
 - Open risks: `runtime token/primitive names, route and measured virtualization envelope [verificar]`.
 
 <!-- ZONE 2 — PLAN MODE (completed by the executing agent) -->

@@ -170,10 +170,10 @@ Reglas obligatorias:
 
 - Route / surface: `standalone /video-effectiveness candidate plus existing /producer`
 - Primitive / variant / kind: `extend Globe shell, candidate viewer, review/dialog; EvidenceRibbon candidate`
-- Component candidates: `producer-ui.ts, producer-controller.ts, producer-copy.ts plus new bounded surface modules`
+- Component candidates: `new typed React modules in the ADR-014 client payload (shell, EvidenceStage, EvidenceRibbon, Inspector, ReportSheet) + the Globe copy layer; legacy producer-ui.ts / producer-controller.ts are read as reference only and never extended`
 - Copy source: `Globe video-effectiveness namespace`
 - Data reader / command: `TASK-1536/1538/1539 contracts only`
-- API parity: `UI is one consumer; no business logic in renderer/controller`
+- API parity: `UI is one consumer; no business logic in components, hooks or client state`
 - Access / capability: `analysis run/read, human-review and Producer proposal remain distinct`
 - States to implement: `all states in wireframe/flow`
 
@@ -237,7 +237,7 @@ Reglas obligatorias:
 ## Out of Scope
 
 - Backend/data/contracts/providers/migrations/forecast logic.
-- New Globe design system or Greenhouse UI runtime imports.
+- Creating the Globe token SSOT or design-system governance (owned by `TASK-1556` Slice 0 — this task consumes them), and any Greenhouse UI runtime import.
 - Commercial rollout/grants/flags/canaries (TASK-1541).
 
 ## Rollout Plan & Risk Matrix

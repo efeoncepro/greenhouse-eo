@@ -53,7 +53,7 @@ Revisar y respetar:
 
 Reglas obligatorias:
 
-- Reusar y extender los patrones existentes de Globe Producer; no crear un sistema UI paralelo.
+- Reusar el lenguaje visual y el loop aprobado de Globe Producer, materializado en **componentes tipados del payload ADR-014** (esta task es el Slice 3 del strangler); no crear un sistema UI paralelo ni un cuarto bloque `:root` de tokens.
 - El navegador no calcula costos, balance, policy, provenance ni provider metadata.
 - El catálogo, estimate, prepare/generate, provenance y capabilities siguen siendo server-authoritative.
 - El costo continúa visible en el CTA según `TASK-1532`; se elimina sólo la ceremonia de cálculo manual.
@@ -178,7 +178,7 @@ Reglas obligatorias:
 
 - Route / surface: `/producer` en `../efeonce-globe/apps/studio-web`.
 - Primitive / variant / kind: existing Producer Console/composer; variant `focusedCreation` sólo si el registry Globe ya usa variants equivalentes.
-- Component candidates: `producer-ui.ts`, `producer-controller.ts`, `producer-copy.ts`, `producer-client.ts` y estilos existentes.
+- Component candidates: componentes tipados del composer en el payload ADR-014 (PromptField, DirectionPicker, OutputShape, AdvancedDisclosure, GenerateCta), módulo de copy y tokens del SSOT. `producer-client.ts` se conserva como transporte (ADR-014: el transporte se porta antes que el render).
 - Copy source: `producer-copy.ts`.
 - Data reader / command: existing catalog, estimate, provenance, prepare/generate and prompt proposal contracts.
 - API parity: no browser-side business logic; no endpoint/reader/command nuevo.
@@ -249,7 +249,7 @@ Reglas obligatorias:
 - Hiding credits or exposing vendor cost/margin.
 - New API, reader, command, schema, migration, provider integration or capability.
 - Full feed, viewer, collections, batch, review or share redesign.
-- New Globe design system or Greenhouse primitive.
+- Crear el token SSOT / design system de Globe (lo entrega `TASK-1556` Slice 0; esta task lo consume) o cualquier primitive Greenhouse.
 - Replacing the approved `TASK-1505` baseline; this task refines its composition.
 
 ## Detailed Spec

@@ -337,7 +337,7 @@ Los contracts, migrations, workers, ledgers, asset commands y access bridge pert
 
 ### Slice 5 — Review, sharing and accelerators
 
-- Implement approval/request changes/comments and read-only share board.
+- Implement approval/request changes/comments. **The read-only share board is no longer built here: ADR-014 moves it to `TASK-1556` Slice 4, rebuilt on the new typed client payload as the first client-facing surface. This task keeps the review/comment surfaces on the existing Producer payload and stops at the entry point to the share board.**
 - Implement command palette, onboarding, shortcuts and safe tenant/project switch.
 
 ### Slice 6 — Accessibility, source fidelity and premium closure
