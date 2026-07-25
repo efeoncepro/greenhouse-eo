@@ -8,6 +8,36 @@
 
 # Handoff
 
+## Active state — 2026-07-25 (TASK-1556 Slices 1-3: el payload cliente existe y las dos compuertas cerraron)
+
+- **ADR-014 implementada hasta el Slice 3.** `apps/studio-client` (Vite 8.1.5 + React 19.2.8 +
+  React Router 8.3.0, SSR apagado) compila a assets estáticos que sirve el **mismo** `studio-web`.
+  Host, BFF, sesión SSO, CSP por nonce, ALB y API privada **sin tocar**. Commits: `bf1df21` `0e7b22f`
+  `c8ca9a9` `ea10578` `4bf631e`. **Sin push.**
+- **Las dos compuertas de ADR-014 cerraron VERDES.** (a) React Router 8.3.0 sobre Vite 8.1.5 — era el
+  unknown declarado. (b) El bundle real en Chromium real bajo la CSP estricta real: hidrata, el router
+  resuelve, cero errores. **El fallback a `vite@7.3.x` queda retirado.** Arnés reproducible:
+  `pnpm --filter @efeonce-globe/studio-client seam:smoke` + `node scripts/frontend/globe-client-seam-gate.mjs`
+  (el driver vive en Greenhouse porque Playwright vive acá).
+- **`client_app_enabled` default `false`.** Con el flag apagado el bundle no se registra, el shell no se
+  sirve y cada superficie responde exactamente como antes. **Rollout pendiente**: prenderlo requiere el
+  canary del Slice 4, que está bloqueado.
+- **Un cambio de `html()` que toca las 5 superficies HTML:** el nonce CSP ya no se recupera con un regex
+  sobre el body; viaja con el documento (`HtmlDocument`). Cualquier superficie nueva que devuelva un
+  string desnudo no compila.
+- **Globe estrena ESLint** (acotado a `studio-client`: jsx-a11y + rules-of-hooks) y 3 gates de diseño como
+  tests. **React Compiler activado** — su precondición de ADR-014 (rules-of-hooks limpio) quedó cumplida.
+- 🔴 **Drift de tokens registrado, no resuelto:** el **anillo de foco es de distinto color según la
+  superficie** (ámbar en launch/studio/error, azul en producer). Está en `LEGACY_TOKEN_DRIFT` con su
+  canónico; adoptarlo es cambio visible y pertenece al slice de port de cada superficie.
+- **Bloqueado y correcto que lo esté:** el Slice 4 (share board) necesita dirección visual aprobada y no
+  existe. Producirla es trabajo de product-design con decisión del operador, no algo que un implementador
+  improvise sobre la única superficie que ve un cliente.
+- **Pendiente ajeno:** `scripts/frontend/scenarios/task-1555-model-selector.scenario.ts` sigue **sin
+  trackear** en Greenhouse. Es la evidencia GVC de TASK-1555 y el guard del acoplamiento cross-repo que
+  documenta TASK-1556 §Contratos.
+
+
 ## Active state — 2026-07-24 (TASK-1555 selector in-progress; TASK-1554 desplegado; promoción bloqueada)
 
 - **TASK-1554 DESPLEGADO + live-verificado** (Codex): api/worker en `c3b6bf4`, reader `globe.producer.fleet.list` vivo.

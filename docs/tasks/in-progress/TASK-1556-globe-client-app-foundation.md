@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Discovery`
+- Status real: `Slices 1-3 code complete; Slice 4 bloqueado por direccion visual`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`
@@ -301,6 +301,60 @@ que hoy no existe.
 - Flip del flag a `true` tras canary verde.
 - Se retira `public-share-ui.ts` y su rama de render.
 - El flag se retira con el código.
+
+## Progress — 2026-07-25
+
+**Slices 1-3 code complete. Slice 4 bloqueado.** Commits en `efeonce-globe`: `bf1df21` · `0e7b22f` ·
+`c8ca9a9` · `ea10578` · `4bf631e`.
+
+### Las dos compuertas de ADR-014 — ambas VERDES
+
+- **(a)** `react-router@8.3.0` compila limpio sobre `vite@8.1.5` (73 módulos, 90 kB gzip, 65 ms). Era el
+  unknown que la ADR marcaba sin confirmar.
+- **(b)** El bundle real corre en Chromium real bajo la CSP estricta real: hidrata, el router resuelve, el
+  estado actualiza, **cero console errors / page errors / requests fallidos**. La semántica CJS estricta de
+  Rolldown no mordió. Re-verificada tras activar el React Compiler.
+
+**Consecuencia: el fallback a `vite@7.3.x` queda retirado.** Y el **router quedó decidido** (React Router)
+con su rationale en ADR-014, no por inercia.
+
+### Entregado
+
+| Slice | Qué quedó |
+|---|---|
+| 1a | `HtmlDocument`: el nonce CSP viaja con el documento; `htmlDocument()` rechaza nonces no-`base64-value` |
+| 1b | `apps/studio-client` — Vite + React + React Router, con módulo Node que declara qué assets publica |
+| 1c | `shell.ts` con slot de first fold crítico; assets manifest-driven con política de caché por asset |
+| 1d | Dockerfile: los tres bloques enumerados a mano |
+| 1e | `client_app_enabled` en `variables.tf`, default `false` |
+| 2 | SSOT de tokens + `LEGACY_TOKEN_DRIFT` + capa de copy locale-keyed |
+| 3 | ESLint acotado (jsx-a11y + rules-of-hooks) + 3 gates de diseño como tests |
+| — | React Compiler activado (precondición de ADR-014 cumplida) |
+
+### Defectos encontrados que no estaban en el plan
+
+1. **`html()` recuperaba el nonce con un regex sobre el body.** Un shell sin `<style nonce>` habría emitido
+   `script-src 'nonce-'` y bloqueado su propio payload, sin fallar en build ni en tests.
+2. **El nonce se escapaba al markup**, así que uno con `<` quedaba incrustado distinto del que declaraba el
+   header. Se resolvió rechazando en la frontera, no escapando en más lugares.
+3. **La config del React Compiler anidaba las opciones bajo `babelConfig`**, que `PluginOptions` no tiene:
+   typechequeaba como excess property, buildeaba bien y **no corría**. Se detectó comparando bundles (con
+   preset = 3 `useMemoCache`, sin = 2), no confiando en el marcador.
+4. Le quité `immutable` a los assets estáticos por parecerme incoherente. **No lo era**, y tenía un test
+   detrás. Restaurado: cambiar comportamiento ajeno al pasar es tan parche como no arreglar el propio.
+
+### Verificación
+
+`pnpm check` + `pnpm build` verdes en `efeonce-globe`. **Los 6 gates se verificaron mordiendo**: se
+introdujo una violación de cada clase (hex crudo, motion literal, copy literal, `aria-label` literal,
+`onClick` sin teclado, hook condicional) y las 6 fallaron; restauradas, verde.
+
+### Slice 4 — bloqueado, y es correcto que lo esté
+
+El share board necesita **dirección visual aprobada y no existe**. Es el gate `UI ready: no` que esta task
+declara desde su creación. Producirla es trabajo de product-design con decisión del operador
+(`design-studio` / `product-design-loop`), no algo que un implementador improvise sobre la única superficie
+que ve un cliente.
 
 ## Contratos que deben sobrevivir al port (verificados 2026-07-25)
 
