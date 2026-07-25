@@ -1466,6 +1466,118 @@ const cases = [
     }
   },
   {
+    name: 'accepts wireframe prose that begins with the Spanish words "Todo" or "Verificar"',
+    run: () => {
+      const root = createRepo()
+      const id = 'TASK-1453'
+
+      write(
+        join(root, 'docs', 'tasks', 'TASK_ID_REGISTRY.md'),
+        [
+          '# Registry',
+          '',
+          '| Task ID | Lifecycle | Brief | File |',
+          '| --- | --- | --- | --- |',
+          '| `TASK-1453` | `to-do` | Fixture. | `docs/tasks/to-do/TASK-1453-fixture.md` |'
+        ].join('\n')
+      )
+      write(join(root, 'docs', 'tasks', 'README.md'), '# Task Index\n\n- siguiente ID disponible: `TASK-1454`\n')
+
+      /*
+       * Regresion de TASK-1558. `hasSubstantiveMarkdown` marcaba como placeholder cualquier seccion que
+       * empezara con `todo`/`verificar` en cualquier caso, y esas son dos maneras completamente normales
+       * de arrancar un parrafo en espanol: "Todo el copy visible sale de..." y "Verificar el contraste...".
+       * Un Copy Ledger de 1.500 caracteres, completo y real, fallaba el gate por su primera palabra.
+       */
+      const spanishProse = premiumWireframe
+        .replace(
+          '## Action Hierarchy\n',
+          '## Action Hierarchy\n\nTodo el copy visible sale de la capa canonica y ninguna cadena vive en el JSX de la superficie.\n'
+        )
+        .replace(
+          '## Visual Fidelity Mapping\n',
+          '## Visual Fidelity Mapping\n\nVerificar que cada senal visual mapea a un token semantico y que ningun valor literal sobrevive.\n'
+        )
+
+      write(join(root, 'docs', 'ui', 'wireframes', 'TASK-1453-fixture.md'), spanishProse)
+      write(join(root, 'docs', 'ui', 'visual-directions', 'TASK-1453-fixture-direction.md'), premiumDirection)
+      write(
+        join(root, 'docs', 'tasks', 'to-do', 'TASK-1453-fixture.md'),
+        withModularPlacementContract(
+          taskFixture({
+            id,
+            domain: 'ui|platform',
+            executionProfile: 'ui-ux',
+            uiImpact: 'layout',
+            uiReady: 'yes',
+            wireframe: 'docs/ui/wireframes/TASK-1453-fixture.md',
+            uiUxContract: premiumUiContract
+          })
+        )
+      )
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: id } })
+
+      assert.equal(
+        result.errors.some(item => item.rule === 'ui-premium-readiness'),
+        false,
+        'Spanish prose starting with "Todo"/"Verificar" is not a placeholder'
+      )
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'still blocks an uppercase TODO stub in a required wireframe section',
+    run: () => {
+      const root = createRepo()
+      const id = 'TASK-1453'
+
+      write(
+        join(root, 'docs', 'tasks', 'TASK_ID_REGISTRY.md'),
+        [
+          '# Registry',
+          '',
+          '| Task ID | Lifecycle | Brief | File |',
+          '| --- | --- | --- | --- |',
+          '| `TASK-1453` | `to-do` | Fixture. | `docs/tasks/to-do/TASK-1453-fixture.md` |'
+        ].join('\n')
+      )
+      write(join(root, 'docs', 'tasks', 'README.md'), '# Task Index\n\n- siguiente ID disponible: `TASK-1454`\n')
+
+      // El arreglo del falso positivo no puede aflojar la cobertura: un stub sigue siendo un stub.
+      const stubbed = premiumWireframe.replace(
+        'One contained primary action owns the decision context; secondary and destructive actions remain distinct.',
+        'TODO: definir la jerarquia cuando exista la direccion visual aprobada de la superficie.'
+      )
+
+      write(join(root, 'docs', 'ui', 'wireframes', 'TASK-1453-fixture.md'), stubbed)
+      write(join(root, 'docs', 'ui', 'visual-directions', 'TASK-1453-fixture-direction.md'), premiumDirection)
+      write(
+        join(root, 'docs', 'tasks', 'to-do', 'TASK-1453-fixture.md'),
+        withModularPlacementContract(
+          taskFixture({
+            id,
+            domain: 'ui|platform',
+            executionProfile: 'ui-ux',
+            uiImpact: 'layout',
+            uiReady: 'yes',
+            wireframe: 'docs/ui/wireframes/TASK-1453-fixture.md',
+            uiUxContract: premiumUiContract
+          })
+        )
+      )
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: id } })
+
+      assert.equal(
+        result.errors.some(item => item.rule === 'ui-premium-readiness' && item.message.includes('Action Hierarchy')),
+        true,
+        'an uppercase TODO prefix must still fail the readiness gate'
+      )
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
     name: 'blocks premium readiness when a required state contract is missing',
     run: () => {
       const root = createRepo()

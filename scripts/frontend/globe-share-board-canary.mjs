@@ -26,6 +26,7 @@
  */
 import { mkdir, writeFile } from 'node:fs/promises';
 
+import { AxeBuilder } from '@axe-core/playwright';
 import { chromium } from '@playwright/test';
 
 const ORIGIN = process.env.CANARY_ORIGIN ?? 'http://127.0.0.1:4320';
@@ -68,6 +69,8 @@ const FORBIDDEN = [
 ];
 
 const problems = [];
+/** Lo que un gate NO pudo comprobar. No sube el exit code, pero nunca queda invisible. */
+const unverified = [];
 const record = (scenario, viewport, message) => problems.push(`[${scenario}/${viewport}] ${message}`);
 
 await mkdir(OUT, { recursive: true });
@@ -202,11 +205,59 @@ for (const scenario of SCENARIOS) {
       record(scenario.name, viewport.name, `${observed.focusableCount} elementos focusables: el contenido se lee, no se opera`);
     }
 
+    /*
+     * axe, sobre la superficie renderizada.
+     *
+     * Cierra la única dimensión del scorecard que quedó en 4 por falta de evidencia mecánica: el
+     * contraste estaba verificado por token y a ojo, no medido contra el fondo real — y el fondo real
+     * acá son tres gradientes superpuestos, o sea justo donde un cálculo por token miente.
+     *
+     * Sólo `serious` y `critical`: `moderate` arrastra reglas de best-practice que no son WCAG AA, y un
+     * gate que mezcla las dos cosas enseña a ignorar su propia salida. Corre en los viewports que se
+     * capturan; a 320 sólo se mide overflow, que es lo que ese ancho vino a probar.
+     */
     if (viewport.measureOnly !== true) {
+      const audit = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze();
+      const blocking = audit.violations.filter(violation => violation.impact === 'serious' || violation.impact === 'critical');
+
+      for (const violation of blocking) {
+        const where = violation.nodes
+          .map(node => node.target.join(' '))
+          .slice(0, 3)
+          .join(' | ');
+
+        record(scenario.name, viewport.name, `axe ${violation.impact} — ${violation.id}: ${violation.help} [${where}]`);
+      }
+
+      /*
+       * `incomplete` NO es "pasó". Se reporta explícitamente porque acá miente por omisión.
+       *
+       * Verificado el 2026-07-25: con `--muted` movido a `#1b2a52` —contraste muy por debajo de 4.5:1 y
+       * el token efectivamente presente en el HTML servido— axe devolvió **0 violations** y
+       * `color-contrast` en `incomplete` sobre 22 nodos. El fondo de esta superficie son tres gradientes
+       * apilados, y axe no puede resolver un color de fondo que no es un color: en vez de fallar, punta a
+       * `incomplete`.
+       *
+       * O sea que "axe verde" en esta página **no** significa contraste verificado, y dejarlo pasar en
+       * silencio sería peor que no correr axe: convertiría una laguna conocida en una casilla marcada.
+       * Se imprime como advertencia y no sube el exit code, porque en esta superficie `color-contrast`
+       * va a estar SIEMPRE incompleto — un gate permanentemente rojo se apaga y deja de existir. La
+       * medición real (muestrear el píxel renderizado detrás del texto) es follow-up de TASK-1558.
+       */
+      for (const item of audit.incomplete) {
+        unverified.push(`[${scenario.name}/${viewport.name}] axe no pudo verificar "${item.id}" en ${item.nodes.length} nodos`);
+      }
+
       const file = new URL(`${scenario.name}-${viewport.name}.png`, OUT);
 
       await page.screenshot({ path: file.pathname, fullPage: false });
-      summary.push({ scenario: scenario.name, viewport: viewport.name, file: file.pathname, markers: observed.captureMarkers });
+      summary.push({
+        scenario: scenario.name,
+        viewport: viewport.name,
+        file: file.pathname,
+        markers: observed.captureMarkers,
+        axe: { total: audit.violations.length, blocking: blocking.length, incomplete: audit.incomplete.length },
+      });
     }
 
     await context.close();
@@ -217,12 +268,27 @@ await browser.close();
 
 await writeFile(
   new URL('canary-report.json', OUT),
-  `${JSON.stringify({ origin: ORIGIN, captures: summary, problems }, null, 2)}\n`,
+  `${JSON.stringify({ origin: ORIGIN, captures: summary, problems, unverified }, null, 2)}\n`,
   'utf8',
 );
 
 console.log('\ncapturas:', OUT.pathname);
 for (const entry of summary) console.log(`  ${entry.scenario}/${entry.viewport} → ${entry.file}`);
+
+if (unverified.length > 0) {
+  // Se imprime SIEMPRE y antes del veredicto, para que nadie lea "verde" como "todo comprobado".
+  const contrast = unverified.filter(entry => entry.includes('color-contrast')).length;
+
+  console.log(`\n⚠️  NO VERIFICADO MECÁNICAMENTE (${unverified.length})`);
+
+  if (contrast > 0) {
+    console.log('  - contraste: axe no puede resolver el fondo de esta superficie (tres gradientes apilados),');
+    console.log('    así que reporta `incomplete` en vez de fallar. Comprobado el 2026-07-25 rompiendo --muted');
+    console.log('    a propósito: 0 violations. "axe verde" acá NO significa contraste verificado.');
+  }
+
+  console.log(`  detalle completo en ${new URL('canary-report.json', OUT).pathname}`);
+}
 
 if (problems.length > 0) {
   console.log('\n❌ CANARY DEL SHARE BOARD EN ROJO');
@@ -230,4 +296,4 @@ if (problems.length > 0) {
   process.exit(1);
 }
 
-console.log('\n✅ CANARY DEL SHARE BOARD VERDE — 6 estados × 3 anchos, sin fugas ni overflow');
+console.log('\n✅ CANARY DEL SHARE BOARD VERDE — 6 estados × 3 anchos, sin fugas, sin overflow, axe sin violations');

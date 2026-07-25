@@ -179,9 +179,27 @@ const hasSubstantiveMarkdown = body => {
     .replace(/\s+/g, ' ')
     .trim()
 
-  const placeholderOnly = /^(?:tbd|todo|placeholder|verificar|n\/a)(?:\W|$)/i.test(meaningful)
+  /*
+   * Detecta contenido que es sólo un placeholder — SIN confundirse con prosa en español.
+   *
+   * La versión anterior era `/^(?:tbd|todo|placeholder|verificar|n\/a)(?:\W|$)/i`, y el `i` la volvía
+   * un falso positivo garantizado: "Todo el copy visible sale de…" y "Verificar el contraste…" son
+   * arranques naturales de un párrafo en español, y una sección de 1.500 caracteres perfectamente
+   * substantiva se reportaba como shell vacío. Detectado en TASK-1558, donde el Copy Ledger completo
+   * fallaba el gate por empezar con la palabra "Todo".
+   *
+   * Dos reglas en vez de una, para no perder cobertura:
+   *
+   * 1. Prefijo en MAYÚSCULAS (`TODO:`, `TBD`, `FIXME`) — así se escribe un stub por convención, y
+   *    ninguna palabra española normal aparece así. Sigue atrapando "TODO: definir cuando exista la
+   *    dirección visual", que es exactamente lo que la regla vino a frenar.
+   * 2. Cualquier caso, pero SÓLO si el placeholder es todo el contenido (`n/a`, `Placeholder.`).
+   *    Un párrafo que empieza con una de esas palabras y sigue con algo real no es un placeholder.
+   */
+  const placeholderPrefix = /^(?:TODO|TBD|FIXME|PLACEHOLDER)\b/.test(meaningful)
+  const placeholderWhole = /^(?:tbd|todo|placeholder|verificar|n\/a)\W*$/i.test(meaningful)
 
-  return meaningful.length >= 36 && !placeholderOnly
+  return meaningful.length >= 36 && !placeholderPrefix && !placeholderWhole
 }
 
 const readRepoFile = (context, relativePath) => {

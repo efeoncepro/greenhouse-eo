@@ -16,11 +16,23 @@
   },
   "evidence": {
     "captures": ".captures/globe-share-board/",
-    "viewports": ["1440x1000", "390x844", "320x844 (medido, no capturado)"],
-    "states": ["ready", "empty", "partial", "error", "denied", "incomplete"],
+    "viewports": [
+      "1440x1000",
+      "390x844",
+      "320x844 (medido, no capturado)"
+    ],
+    "states": [
+      "ready",
+      "empty",
+      "partial",
+      "error",
+      "denied",
+      "incomplete"
+    ],
     "reducedMotion": "Ejercitado en la pasada mobile (reducedMotion: 'reduce'), no sólo declarado.",
     "before": "Línea base del share board actual capturada antes de tocar nada (default desktop + 390, y estado no disponible). No existía.",
-    "canary": "node scripts/frontend/globe-share-board-canary.mjs — VERDE (6 estados x 3 anchos)"
+    "canary": "node scripts/frontend/globe-share-board-canary.mjs — VERDE (6 estados x 3 anchos)",
+    "axe": "@axe-core/playwright con tags wcag2a/wcag2aa/wcag21a/wcag21aa/wcag22aa — 0 violations en los 12 pares. color-contrast queda `incomplete` porque el fondo es gradiente; reportado explícitamente, no asumido verde."
   },
   "thresholds": {
     "average": 4.5,
@@ -77,7 +89,7 @@
     {
       "name": "colorContrast",
       "score": 4,
-      "rationale": "Ramp de texto en tres niveles, ningún estado comunicado sólo por color (el punto de revisión siempre acompaña al label). No sube a 5 porque el contraste se verificó contra el fondo renderizado a ojo y por token, sin una pasada axe automatizada sobre la superficie: eso queda como follow-up del canary."
+      "rationale": "Ramp de texto en tres niveles y ningún estado comunicado sólo por color (el punto de revisión siempre acompaña al label). Se agregó pasada axe (WCAG 2.0/2.1/2.2 A+AA) al canary: 0 violations en los 12 pares escenario/viewport. Queda en 4 y NO sube a 5 por un hallazgo verificado: axe no puede resolver el fondo de esta superficie —tres gradientes apilados— así que reporta color-contrast como `incomplete` (22 nodos) en vez de fallar. Comprobado el 2026-07-25 moviendo --muted a #1b2a52, muy bajo 4.5:1, con el token presente en el HTML servido: axe siguió dando 0 violations. El canary ahora imprime ese `incomplete` como \"no verificado mecánicamente\" para que nadie lea verde como comprobado. La medición real (muestrear el píxel renderizado detrás del texto) es follow-up."
     },
     {
       "name": "iconography",
@@ -115,7 +127,8 @@
     "Captions de video/audio: WCAG 1.2.2 pide una pista y CreativeShareBoardV1 no transporta ninguna. Declarado en el código con eslint-disable justificado, no silenciado. Cerrarlo es cambio de contrato, fuera del alcance de esta task.",
     "El h1 usa el fallback 'Resultado creativo' para toda pieza: la proyección no tiene campo de título.",
     "Los comentarios se muestran sin autor porque el contrato no lo transporta.",
-    "Contraste sin pasada axe automatizada sobre la superficie renderizada.",
+    "Contraste NO verificado mecánicamente: axe corre limpio pero no puede calcular contraste contra el fondo de gradientes (reporta `incomplete`). Verificado rompiendo el token a propósito: axe no lo detecta. Falta muestreo del píxel renderizado.",
+    "Los comentarios, el label del modelo y el estado de revisión NUNCA llegan en producción: `resolveForShare` (app.ts:2525) devuelve sólo { target, mediaType }. El panel está estructuralmente vacío hasta TASK-1562.",
     "Rollout: el flag client_app_enabled sigue en false. El scorecard puntúa la superficie construida y verificada por canary, NO una superficie en producción."
   ]
 }

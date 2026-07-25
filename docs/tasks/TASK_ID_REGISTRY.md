@@ -1640,6 +1640,9 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-1556` | `complete` | **Globe Client Application Foundation.** EPIC-028; standard; P1/Muy alto/Medio. Implementa el Slice 0 de ADR-014: payload de browser tipado y componetizado (Vite+React) servido por el mismo `studio-web`; SSOT de tokens, capa de copy y gates de UI que Globe no tiene; el seam se valida reconstruyendo el share board (única superficie client-facing). Flag `GLOBE_CLIENT_APP_ENABLED` default OFF. | `docs/tasks/complete/TASK-1556-globe-client-app-foundation.md` |
 | `TASK-1557` | `complete` | **Globe Static Asset CDN (path-scoped).** EPIC-028; backend-data/integration; backend-standard; P1/Alto/Bajo. Cloud CDN sobre el ALB existente **sólo** para `/assets/*` vía backend service dedicado + path matcher; el backend del shell SSO conserva `enable_cdn = false` (cachear una superficie por sesión es bug de correctitud). Blocked by TASK-1556. | `docs/tasks/complete/TASK-1557-globe-static-asset-cdn.md` |
 
+| `TASK-1562` | `to-do` | **Hidratación de la proyección del share board de Globe.** EPIC-028; backend-data/api; backend-standard; P1/Alto/Bajo. `resolveForShare` devuelve sólo `{ target, mediaType }`, así que `modelLabel`, `reviewStatus` y `comments` se descartan en silencio en TODOS los shares: el grant los pide, el dominio los proyecta y el operador puede crearlos, pero la autoridad nunca los entrega. El panel del share board está estructuralmente vacío en producción. | `docs/tasks/to-do/TASK-1562-globe-share-projection-hydration.md` |
+| `TASK-1563` | `to-do` | **Menciones en comentarios de revisión de Globe.** EPIC-028; backend-data/command; backend-standard; P2/Alto/Medio. Mención como dato estructurado validado contra el roster real, no como parseo de `@` sobre el body. El trabajo real son las dos primitives que faltan: un directorio mencionable con nombre (Globe conoce `identitySubject`, no nombres) y un canal de notificación (no existe ninguno general). Mencionar NUNCA concede acceso. Blocked by TASK-1562. | `docs/tasks/to-do/TASK-1563-globe-review-comment-mentions.md` |
+
 ## Siguiente ID disponible
 
-`TASK-1562`
+`TASK-1564`
