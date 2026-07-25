@@ -46,11 +46,17 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 | `ref/voice/tts-v1` | ElevenLabs · Multilingual v2 | ElevenLabs | speech-synthesize | ✅ 07-19 | ✅ driver Fal | — |
 | `ref/voice/change-v1` | ElevenLabs · Voice Changer | ElevenLabs | audio-change-voice | ✅ 07-20 | ✅ | — |
 | `ref/voice/translate-v1` | ElevenLabs · Dubbing | ElevenLabs | audio-translate | ✅ 07-20 | ✅ | — |
-| _(declarada, sin ruta)_ | Nano Banana 2 | Vertex (`gemini-3.1-flash-image`) | image-generate | 🔒 404 | 🔒 | **allowlist de Google pendiente** (probe 07-24 → 404) |
+| `ref/still/nanobanana-2-v1` | Nano Banana · 2 | Vertex (`gemini-3.1-flash-image`) | image-generate | 🔒 404 | 🔒 | **allowlist de Google pendiente**; ruta creada 07-25 (TASK-1555) para que la flota sea visible |
+| `ref/still/vector-v1` | Recraft · v4.1 | Fal (`fal-ai/recraft/v4.1/text-to-vector`) | image-vectorize | ✅ 07-19 | ⏳ sin lane | ruta creada 07-25; vectoriza desde TEXTO (`requiresInput: false`) |
+| `ref/still/upscale-v1` | Topaz · Upscale | Fal (`fal-ai/topaz/upscale/image`) | image-upscale | ✅ 07-19 | ⏳ sin lane | ruta creada 07-25; exige 1 imagen de origen |
+| `ref/video/upscale-v1` | Topaz · Upscale | Fal (`fal-ai/topaz/upscale/video`) | video-upscale | ✅ 07-19 | ⏳ sin lane | ruta creada 07-25; exige 1 video de origen |
 
-> Otros proveedores verificados en vivo el 2026-07-19 dentro de las "10 capacidades" del Lab (Recraft,
-> Topaz, Hyper3D para vectorize/upscale/3d) no tienen ruta pública en el catálogo aún; se agregan como
-> dato cuando se expongan. Fuente: `docs/documentation/creative-studio/efeonce-globe-model-lab-providers.md`.
+> **Delta 2026-07-25 (TASK-1555):** Recraft y Topaz **ya tienen ruta pública** (arriba) — antes estaban
+> integrados y verificados en vivo pero eran **invisibles en el Producer**, porque sin ruta ninguna
+> superficie puede nombrarlos. Queda **Hyper3D Rodin** (`model-3d-generate`) sin ruta: `ProducerRouteModality`
+> es `image | video | audio`, así que **3D no existe como modalidad** — exponerlo pide cambio de contrato,
+> una cuarta pestaña y visor GLB, y es task propia. `video-extend` también sigue sin ruta.
+> Fuente: `docs/documentation/creative-studio/efeonce-globe-model-lab-providers.md`.
 
 ## Línea de tiempo de integración (para no re-descubrir)
 
@@ -79,6 +85,8 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
   real (`available` elegible · `gated` "Próximamente" · `blocked` con la razón del gate externo) y,
   para los modelos que necesitan otro modo del composer (Veo → cuadros, Gemini Omni → referencias),
   lo declara y **cambia el modo al elegirlos** en vez de esconderlos detrás de un chip.
+  Con el catálogo en **v1.4.0** cubre **12 de 14 capacidades**; faltan `model-3d-generate` y
+  `video-extend`, ambas sin ruta.
   **Promover una ruta la vuelve elegible en el Producer sin tocar la UI.** Consecuencia directa: como
   hoy ninguna ruta de imagen está promovida, el Producer **no ofrece modelo de imagen elegible** hasta
   que ADR-009 avance — el blocker dejó de ser invisible. `ref/audio/foley-v1` (promovida en el canary

@@ -317,6 +317,47 @@ imagen no tiene (se entra a editar desde una pieza de la biblioteca), así que a
 reventaría en `assertInputModeSatisfied` **después** de reservar crédito — el fail-open que la
 arquitectura advierte. Se muestran con lo que necesitan, nunca como ejecutables donde no lo son.
 
+### 6. "Te faltan modelos, revisa el ledger" — el catálogo crece (`9e57422`)
+
+El operador tenía razón otra vez, y el gap era upstream de la UI: **5 de las 14 capacidades no tenían
+NINGUNA ruta en `PRODUCER_ROUTE_CATALOG`**. Modelos integrados y verificados en vivo en el Lab desde
+el 2026-07-19 que ninguna superficie podía nombrar, porque el reader proyecta el catálogo.
+
+Catálogo **v1.3.0 → v1.4.0**, cuatro rutas nuevas declaradas contra **lo que el adapter realmente
+transporta**, no contra lo que uno supone:
+
+| Ruta | Modelo | Verdad del adapter |
+|---|---|---|
+| `ref/still/nanobanana-2-v1` | Nano Banana · 2 | 404 allowlist de Google → visible, no ejecutable |
+| `ref/still/vector-v1` | Recraft · v4.1 | `text-to-vector`, `requiresInput: false` → **desde texto, sin imagen de origen** |
+| `ref/still/upscale-v1` | Topaz · Upscale | `image_url`, `maxReferences: 1` |
+| `ref/video/upscale-v1` | Topaz · Upscale | `video_url`, `maxReferences: 1` |
+
+Declarar una referencia en Recraft habría sido anunciar un input que el adapter no adjunta — el
+fail-open que sólo aparece gastando.
+
+**La modalidad imagen gana su contrato de modos** (Crear · Editar · Vectorizar · Escalar) y video suma
+Escalar. Sin un modo, una capacidad no tiene forma de existir en la superficie — es la misma causa
+raíz de Seed Audio y de los modelos de Google en video.
+
+**Mejora general que salió de acá:** el shape pane ya **no renderiza una perilla cuando la dimensión
+admite un solo valor**. Un upscale hereda la proporción del origen: ofrecer un selector que el
+proveedor ignora es mentir en la UI. Una constante es un hecho de la ruta, no una elección.
+
+**Dos bugs de raíz destapados y corregidos:**
+- `routeEligibility` respondía una pregunta de **imagen** con el copy de **video**.
+- El mapa de modos sólo cubría los modos "otros", así que un modelo de la modalidad activa fuera del
+  modo activo caía al gate equivocado. Ahora es total y las claves de copy van **calificadas por
+  modalidad**, para que el cruce no pueda repetirse.
+
+**Sin isotipo disponible:** Recraft y Topaz no están en simple-icons ni en Tabler → monograma,
+documentado. **NUNCA** dibujar una aproximación para completar el set.
+
+**Lo que queda fuera, con razón declarada:** `Hyper3D Rodin` (`model-3d-generate`) —
+`ProducerRouteModality` es `image | video | audio`, así que **3D no existe como modalidad**: pide
+cambio de contrato, cuarta pestaña y visor GLB, y es task propia. `video-extend` tampoco tiene ruta.
+El catálogo cubre hoy **12 de 14 capacidades**.
+
 ## Progress — Implementación (2026-07-24, `efeonce-globe` `78a1863`, pusheado a `main`)
 
 ### Corrección al mapa de Discovery (hallazgo load-bearing)
