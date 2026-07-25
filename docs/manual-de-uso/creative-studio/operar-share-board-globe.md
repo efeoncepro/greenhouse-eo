@@ -74,17 +74,30 @@ tofu plan         → Plan: 0 to add, 1 to change, 0 to destroy
 Cumple las dos condiciones que este runbook exige: **cero destroy, cero replace**, y ningún otro
 recurso en el diff — o sea que tampoco hay drift pendiente de otra sesión.
 
-**Qué falta y por qué:** el `apply` y el commit del `.tf` quedaron **pendientes de autorización
-humana**; el guard de permisos los bloqueó, que es exactamente su trabajo con una mutación de infra.
-El cambio está en el working tree de `efeonce-globe`, sin commitear.
+✅ **Aplicado y commiteado** (`efeonce-globe` `2074a76`). El apply escribió
+`GLOBE_CLIENT_APP_ENABLED=false` — hizo que la palanca exista, sin prenderla — en la revisión `00069`,
+con la misma imagen.
 
-```bash
-cd ../efeonce-globe/infra/terraform && tofu plan -out=tfplan && tofu apply tfplan
-```
+## ✅ CUTOVER COMPLETADO — 2026-07-25
 
-Ojo con el valor: este apply escribe `GLOBE_CLIENT_APP_ENABLED=false`. **Hace que la palanca exista,
-no la prende.** Crea una revisión nueva de Cloud Run con la **misma imagen** y un env var más, así que
-el comportamiento no cambia — el arranque ya está probado por la revisión que corre hoy.
+La cadena se ejecutó completa y **en este orden**, que es el que importa:
+
+| # | Qué | Evidencia |
+|---|---|---|
+| 1 | Cablear el flag | `efeonce-globe` `2074a76` · plan `0 add, 1 change, 0 destroy` · revisión `00069` con el flag en `false` |
+| 2 | `TASK-1562` — hidratar la proyección | `efeonce-globe` `85dac33` · studio-web 264/264 · monorepo verde |
+| 3 | Desplegar | `deploy-internal.yml` run `30156720661` · imagen `85dac33b03b1` · revisión `00070` · **share board todavía legacy con el flag OFF**, o sea el strangler verificado en vivo |
+| 4 | Flip a `true` | plan `0 add, 1 change, 0 destroy`, sin replace · revisión `00071` |
+| 5 | Verificar en vivo | 3 anchos, axe 0 violations, cero fuga, `scrollWidth <= clientWidth` incluso a 320 |
+| 6 | Retirar `public-share-ui.ts` | ⏳ **bloqueado a propósito** — ver abajo |
+
+**El único punto del runbook que quedó sin verificar es el estado `ready` con un grant real.** Crear uno
+exige sesión interna en el Producer sobre un output existente, y no es alcanzable headless. Por eso el
+paso 6 sigue bloqueado: ADR-014 exige cobertura equivalente en runtime antes de retirar lo viejo, y esa
+cobertura es exactamente el estado que falta.
+
+**Rollback**, si algo aparece: `default = false` en `variables.tf` + `tofu apply`. <10 min, y vuelve
+`public-share-ui.ts` intacto porque no se retiró.
 
 ### Por qué `TASK-1562` va ANTES del cutover
 

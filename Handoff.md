@@ -24,14 +24,23 @@
   [ADR-010](docs/architecture/creative-studio/EFEONCE_GLOBE_COMMERCIAL_PROMOTION_ATTESTATION_DECISION_V1.md) +
   `GLOBE_RUNTIME_HANDOFF.md`. Regla dura viva: scopes del broker OAuth = rollout de 3 pasos (permite → pide → exige)
   o se cae el login.
-- 🔴 **Globe — payload cliente (ADR-014): NINGUNA superficie sirve todavía sobre el payload nuevo.** El cliente
-  externo sigue viendo `public-share-ui.ts`, el template viejo. Todo lo construido en `TASK-1556`/`TASK-1558`
-  es potencial hasta que la cadena de cutover se ejecute; no describirlo como entregado.
-- 🔴 **El cutover del share board NO es "un `tofu apply`"** (se creía que sí; corregido 2026-07-25). La imagen
-  desplegada del shell (`45235ccb62ca`, `globe-studio-internal-00068-gx6`) queda **9 commits atrás de `main`**
-  y es anterior a `TASK-1556`: no contiene el bundle ni lee la variable. Cambiar el default a `true` y aplicar
-  daría **plan vacío** y producción idéntica — el modo de falla de `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED`
-  (el registro dice ON, la realidad está OFF).
+- ✅ **Globe — payload cliente (ADR-014): el share board SIRVE sobre el payload nuevo desde 2026-07-25.**
+  `client_app_enabled=true`, revisión `globe-studio-internal-00071-6vp`, imagen `85dac33b03b1`. La página
+  pasó de 6.095 bytes de HTML concatenado a 2.446 de shell y el rótulo interno `Producer` desapareció del
+  DOM servido. Las otras cuatro superficies (`launch`, `error`, `studio`, `producer`) siguen en el payload
+  viejo — convivencia esperada y gobernada por el flag.
+- ✅ **El cutover del share board NO era "un `tofu apply`" — y se ejecutó completo 2026-07-25.** Dos
+  precondiciones que nadie había visto: (1) el flag estaba declarado en `variables.tf` y **conectado a
+  nada** (`grep` devolvía una sola línea), así que el flip habría dado **plan vacío**; (2) la imagen
+  desplegada (`45235ccb62ca`) era anterior incluso a `TASK-1556`, o sea sin bundle. Cadena ejecutada en
+  orden: cable (`2074a76`, revisión `00069` con el flag en `false`) → `TASK-1562` (`85dac33`) → deploy
+  (run `30156720661`, revisión `00070`, **share board todavía legacy con el flag OFF**: el strangler
+  verificado en vivo) → flip (revisión `00071`). **Heurística reutilizable:** si el `grep` de un flag
+  devuelve una sola línea, esa línea es su declaración y no está cableado.
+- ⏳ **Lo único que falta del share board: el estado `ready` con un grant REAL.** Exige sesión interna en
+  el Producer sobre un output existente y no es alcanzable headless. Es la razón por la que `TASK-1560`
+  (retiro de `public-share-ui.ts`) sigue bloqueada — ADR-014 exige cobertura equivalente en runtime.
+  Rollback vigente: `default = false` + apply, <10 min.
 - **Cadena real del cutover, en este orden** (runbook con los pasos y la verificación:
   [`operar-share-board-globe.md`](docs/manual-de-uso/creative-studio/operar-share-board-globe.md) **v1.1** —
   la v1.0 estaba mal):
@@ -50,7 +59,7 @@
   sobre `/assets/*`; **lo único que cambió en runtime ese día**, aplicado y verificado en vivo), `TASK-1554`
   (reader de flota de modelos + doc funcional y manual), `TASK-1561` (gate de diseño: tipografía + frontera
   declarada).
-- **En vuelo:** `TASK-1558` (share board; Slices 1-2 en `main` de Globe, `a336ff5`; cutover NO ejecutado),
+- **En vuelo:** `TASK-1558` (share board: **LIVE**, sólo falta el estado `ready` con grant real),
   `TASK-1555` (selector de modelo del Producer: vivo como desplegable compacto con isotipo real — la galería
   se implementó, el operador la rechazó al verla y ya no existe; pendiente escenario GVC + promoción ADR-009
   out-of-band), `TASK-1562`.

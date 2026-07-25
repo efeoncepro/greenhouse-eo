@@ -7,6 +7,49 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-25 — Cutover del share board de Globe: LIVE, y las dos precondiciones que faltaban (TASK-1558 Slice 3 + TASK-1562)
+
+- **El share board nuevo esta sirviendo.** `client_app_enabled` en `true`, revision
+  `globe-studio-internal-00071-6vp`, imagen `85dac33b03b1`. La pagina paso de 6.095 bytes de HTML
+  concatenado a 2.446 de shell, el rotulo interno `Producer` desaparecio del DOM servido, y el footer
+  existe por primera vez.
+- **Precondicion 1: el flag estaba declarado y conectado a NADA.** `grep -rn client_app_enabled
+  infra/terraform/*.tf` devolvia **una sola linea**, su propia declaracion. Cambiar su default a `true`
+  habria producido un **plan vacio**: el env var nunca llegaba al contenedor, y el cutover habria quedado
+  como un commit que dice "prendido" con produccion sirviendo lo viejo — el modo de falla de
+  `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED`, donde el ledger decia ON y la realidad era OFF.
+  **Heuristica reutilizable:** si el grep de un flag devuelve una sola linea, esa linea es su declaracion
+  y no esta cableado; un flag conectado aparece al menos dos veces.
+- **Precondicion 2: la imagen desplegada era anterior incluso a TASK-1556**, o sea sin bundle y sin leer
+  esa variable. Otra sesion habia reportado que "lo unico que quedaba era el flip"; verificado contra el
+  runtime, faltaban tres cosas.
+- **La cadena se ejecuto en el orden que importa:** cablear (revision `00069`, flag en `false`) → hidratar
+  la proyeccion → desplegar (revision `00070`, **share board todavia legacy con el flag OFF**, o sea el
+  strangler verificado en vivo y no afirmado) → flip (revision `00071`). Los dos planes: `0 to add,
+  1 to change, 0 to destroy`, sin replace de Cloud Run.
+- **TASK-1562 — la proyeccion del share dejaba el panel vacio en produccion.** `resolveForShare` devolvia
+  `{ target, mediaType }`, y `project()` solo emite un field si el grant lo autoriza **y** la fuente lo
+  trae: `modelLabel`, `reviewStatus` y `comments` se descartaban en **todos** los shares, aunque el
+  Producer pide los cuatro fields y el operador puede crear los comentarios. Nada fallaba y nada loggeaba.
+- **El nombre del modelo sale del catalogo, no del intento.** `attempt.model` es el modelId —el valor que
+  `model-readiness` compara contra `route.modelId`— y es un identificador de wire; `RouteModelIdentityV1`
+  del catalogo es el ancla publica con drift guards que rechazan cualquier cosa con forma de slug. Leerlo
+  del intento habria shippeado el slug a una superficie cliente, que es lo que ADR-003 prohibe.
+- **Reglas de audiencia client:** los comentarios borrados se descartan (`getThread` sirve el hilo interno,
+  donde un borrado es historial; para un cliente es algo que alguien retiro); orden ascendente por
+  `createdAt` y tope de 20 conservando el **comienzo**, porque los ultimos veinte de un hilo largo son
+  decisiones sin premisa; y el hilo degrada solo — store caido cuesta el panel, nunca la pieza.
+- **Verificacion en vivo contra el front door real**, 3 anchos (1440, 390 y **320**, el piso de WCAG
+  1.4.10): estado terminal correcto, un solo `role="alert"`, Reintentar ausente donde no aplica, fuentes de
+  Globe cargadas, `scrollWidth <= clientWidth`, cero fuga en el DOM servido, axe **0 violations**, y la CSP
+  de produccion sin rechazar nada.
+- **Lo que NO se verifico, y por que importa:** el estado `ready` con un **grant real**. Crear uno exige
+  sesion interna en el Producer sobre un output existente y no es alcanzable headless. Es el unico punto
+  pendiente del runbook, y es exactamente la razon por la que `TASK-1560` (retiro de `public-share-ui.ts`)
+  sigue bloqueada: ADR-014 exige cobertura equivalente en runtime antes de retirar lo viejo.
+- Rollback vigente: `default = false` + `tofu apply`, <10 min, y vuelve `public-share-ui.ts` intacto
+  porque no se retiro.
+
 ## 2026-07-25 — Globe: el CDN de assets es lo único que cambió en runtime; el payload cliente NO está servido
 
 - **Cambio real en runtime — `TASK-1557` (cerrada):** Cloud CDN path-scoped sobre `/assets/*` en

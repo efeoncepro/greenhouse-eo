@@ -20,7 +20,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Slices 1-2 code complete y canary verde; Slice 3 (flip del flag + retiro) pendiente de rollout`
+- Status real: `LIVE 2026-07-25 — flag prendido y verificado en vivo; falta verificar el estado ready con un grant real`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`
@@ -258,11 +258,15 @@ base que hoy no existe.
   enum crudo), overflow medido **por panel**, y Reintentar/`role=alert` verificados por estado.
   Encontró dos bugs reales antes del commit: el chip decidía el ancho de la página a 320px y el bloque
   de estado de `partial` quedaba pegado arriba en vez de centrado.
-- ⏳ Flip de `client_app_enabled`: **no ejecutado**. Es un `terraform apply` y una decisión de rollout,
-  no más código.
-- ⏳ Retiro de `public-share-ui.ts` y su rama de render: **después** del flip verificado con un grant
-  real, por la regla dura de ADR-014 (no se retira una superficie vieja antes de que su reemplazo tenga
-  cobertura equivalente en runtime).
+- ✅ **Flip ejecutado 2026-07-25.** Precondición que faltaba y nadie había visto: el flag estaba declarado
+  en `variables.tf` y **conectado a nada** (`grep` lo devolvía una sola vez), así que el flip habría dado un
+  plan vacío. Se cableó al `dynamic "env"` de `studio_web` (`efeonce-globe` `2074a76`), se aplicó en `false`
+  (revisión `00069`), se desplegó el SHA `85dac33b03b1` (revisión `00070`, share board todavía legacy con el
+  flag OFF — el strangler verificado en vivo), y recién entonces el flip a `true` (revisión `00071`).
+  Los dos planes: `0 to add, 1 to change, 0 to destroy`, sin replace de Cloud Run.
+- ⏳ Retiro de `public-share-ui.ts`: sigue pendiente y **es correcto que lo esté**. La regla dura de ADR-014
+  exige cobertura equivalente en runtime, y falta exactamente eso: el estado `ready` con un grant real. Es
+  `TASK-1560`.
 
 ## Out of Scope
 
@@ -349,6 +353,28 @@ Slice 1 (dirección visual) → Slice 2 (primitives + superficie) → Slice 3 (c
 - [x] Con el flag en `false` la superficie responde idéntica a hoy — **con test**, no como afirmación (`creative-review-runtime.test.ts` → `TASK-1558 share board strangler`), incluido el caso flag-on-sin-bundle.
 - [x] El transporte del grant no cambió: fragment → header `Globe-Share` → `credentials:'omit'`, con test de contrato que además verifica que el token nunca aparece en la URL.
 - [x] Scorecard: promedio **4,71**, piso **4**, jerarquía/economía/impacto/fidelidad/anti-template en **5**. `docs/ui/reviews/TASK-1558-globe-share-board.scorecard.json`.
+
+## Verificación en vivo — 2026-07-25 (post-flip)
+
+Contra el front door real (`https://globe.efeoncepro.com/shares/demo`), en Chromium, a `1440×1000`,
+`390×844` y `320×844`:
+
+| Comprobado | Resultado |
+|---|---|
+| HTTP + React monta + estado terminal alcanzado | ✅ los tres anchos |
+| Estado `incomplete` (sin token en el fragment) | ✅ "El enlace está incompleto" + "Pídele un enlace nuevo…" |
+| `role="alert"` exactamente uno | ✅ |
+| **Reintentar ausente** en estado no retryable | ✅ los tres anchos |
+| Footer: atribución + alcance + privacidad absoluta externa | ✅ `https://efeonce.com/privacidad` |
+| Fuentes de Globe cargadas (Poppins/Geist) | ✅ |
+| `scrollWidth <= clientWidth` | ✅ 1440, 390 **y 320** |
+| Sin fuga: `Producer`, enum crudo, ISO 8601, `house`, slug, código del transporte | ✅ ninguno en el DOM servido |
+| axe WCAG 2.0/2.1/2.2 A+AA | ✅ 0 violations (1 `incomplete`: contraste sobre gradiente, ver scorecard) |
+| Sin `pageerror`, sin `console.error` inesperado, sin `requestfailed` | ✅ — la CSP de producción no rechazó nada |
+
+**Lo que NO se pudo verificar en vivo:** el estado `ready` con un **grant real**. Crear uno exige sesión
+interna en el Producer sobre un output existente, y eso no es alcanzable headless. Es el único punto
+pendiente del runbook y la razón por la que `TASK-1560` (retiro del payload viejo) sigue bloqueada.
 
 ## Verification
 

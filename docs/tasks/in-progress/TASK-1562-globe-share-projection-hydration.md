@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Bajo`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-028`
-- Status real: `Sin empezar`
+- Status real: `Slices 1-2 implementados y desplegados (85dac33b03b1); Slice 3 decidido a la baja; falta resolve con grant real`
 - Rank: `TBD`
 - Domain: `creative-studio`
 - Blocked by: `none`
