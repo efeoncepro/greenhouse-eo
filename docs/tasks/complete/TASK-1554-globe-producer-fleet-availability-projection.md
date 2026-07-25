@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-028`
-- Status real: `Diseño`
+- Status real: `Complete`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -295,11 +295,11 @@ N/A — repo-only + reader read-only en el runtime de Globe; no toca cloud, bill
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado con el estado real y archivo en la carpeta correcta.
-- [ ] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados.
-- [ ] `Handoff.md`/`GLOBE_RUNTIME_HANDOFF.md` actualizados; delta en `GLOBE_MODEL_FLEET_STATUS.md` (reader = SoT live de disponibilidad).
-- [ ] Chequeo de impacto cruzado con TASK-1555 (consumer UI) y TASK-1552 (composer hierarchy).
-- [ ] Doc funcional + manual del contrato de flota creados/actualizados.
+- [x] `Lifecycle` sincronizado con el estado real y archivo en la carpeta correcta.
+- [x] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados.
+- [x] Delta en `GLOBE_MODEL_FLEET_STATUS.md` — §`El reader es el SoT live de disponibilidad`: el ledger es el SoT **humano**, el reader el SoT **live**, y **si divergen manda el reader** (deriva al preguntar; el doc describe el día que se escribió).
+- [x] Impacto cruzado: `TASK-1555` es consumer vivo (selector compacto, ya registrado en el ledger); `TASK-1552` heredará el mismo reader al portar el composer — no reconstruye disponibilidad.
+- [x] Doc funcional (`documentation/creative-studio/efeonce-globe-producer-flota-modelos.md`) + manual (`manual-de-uso/creative-studio/operar-flota-modelos-producer-globe.md`), ambos indexados.
 
 ## Follow-ups
 

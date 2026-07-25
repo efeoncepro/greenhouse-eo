@@ -77,6 +77,31 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 - API + worker restaurados a `GLOBE_LAB_PROVIDER=composite`; break-glass IAM revocado (readback limpio).
 - Driver gobernado desplegado en `9b62b19`. **Falta:** ADR-009 (promover binding/readiness + readback de identidad `binding.modelId == estimate.model == readiness.route.modelId`) para que sea entregable a cliente.
 
+## El reader es el SoT *live* de disponibilidad (TASK-1554, cerrada 2026-07-25)
+
+**Este documento es el SoT humano; `globe.producer.fleet.list` es el SoT *live*.** La distinción
+importa cuando divergen: si el ledger dice una cosa y el reader otra, **manda el reader** — él deriva
+de readiness × binding en el momento de preguntar, y este archivo describe el día en que se escribió.
+
+El reader devuelve, por capacidad y **por workspace**: la ruta, el `model` público (nombre + versión),
+su `availability` (`available` · `gated` · `blocked`), el `gateReason` cuando está bloqueada, y el
+`recommendedDefault` — que se expone con su disponibilidad real en vez de preseleccionarse cuando no
+se puede ejecutar.
+
+Tres propiedades que sostienen todo lo demás, y cada una tiene test:
+
+- **Nada hardcodeado.** `availability` se deriva de readiness `promoted` × binding `enabled`. Promover
+  una ruta la vuelve elegible en todos los consumers **sin tocar código de consumo**.
+- **Alcance por workspace.** Promovida en A no es `available` en B. El ceiling por `kind` se hereda de
+  la promoción; el reader no lo re-deriva.
+- **Sin fuga de slug.** La proyección extiende la view pública; el identificador de proveedor nunca
+  entra al payload (ADR-003). El nombre público del modelo sí.
+
+Contrato en `packages/contracts/src/producer-fleet.ts`; proyección y tests en
+`packages/domain/src/producer-fleet.{ts,test.ts}`.
+Funcional: [flota de modelos](../../documentation/creative-studio/efeonce-globe-producer-flota-modelos.md) ·
+Manual: [operar la flota](../../manual-de-uso/creative-studio/operar-flota-modelos-producer-globe.md).
+
 ## Consumers vivos de la flota
 
 - **Producer Model Selector (TASK-1555, `efeonce-globe` `0258534`)** — la región **"Modelo"** del
