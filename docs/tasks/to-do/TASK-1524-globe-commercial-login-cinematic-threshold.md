@@ -282,6 +282,22 @@ Reglas obligatorias:
 - Validar auth invariants, tests, GVC/micro frames, performance y scorecard.
 - Dejar promoción comercial explícitamente gateada por `TASK-1521` + `TASK-1480`.
 
+### Slice 5 — Dejar `ui.ts` sin consumidor (ADR-014 Slice 2)
+
+**Esta task es la dueña del port de `ui.ts`, no sólo su consumidora.** `ui.ts` sirve TRES superficies:
+`launch`, `studio` y `error`. Un cierre que porte `launch` y deje las otras dos en el módulo legacy no
+retira nada: `TASK-1560` no puede borrar un archivo que todavía tiene dos consumidores.
+
+- Portar las tres superficies al payload cliente, no sólo la de login.
+- **Adoptar los valores canónicos** de `LEGACY_TOKEN_DRIFT` para `focus`, `surface`, `line`, `canvas`,
+  `action` y `warm` — con alguien mirando el resultado, porque **son cambios visibles**. El más
+  cargado es `focus`: `ui.ts` pinta el anillo ámbar (`#ffb067`) y el canónico es azul (`#4db8ff`); hoy
+  el anillo de foco cambia de identidad cuando el usuario cruza de una superficie a otra.
+- Borrar del ledger las entradas resueltas. Las que sobrevivan pertenecen a superficies que no son de
+  esta task.
+- Confirmar y dejar escrito que `ui.ts` quedó sin ningún import — la evidencia que `TASK-1560`
+  necesita para borrarlo.
+
 ## Out of Scope
 
 - Cambiar OAuth, PKCE, cookies, grants, tenancy, callback authority o `/v1/session`.
@@ -368,6 +384,10 @@ drift; owner de `TASK-1521`/`TASK-1480` autoriza promoción. La adquisición sec
 - [ ] `scrollWidth <= clientWidth` en 1440 y 390 para documento, stage y footer.
 - [ ] GVC premium captura poster/playing/settled/pause/reduced/error desktop/mobile y scorecard supera threshold.
 - [ ] Ningún rollout comercial ocurre sin `TASK-1521` + `TASK-1480` y sign-offs correspondientes.
+- [ ] Las **tres** superficies de `ui.ts` (`launch`, `studio`, `error`) corren sobre el payload cliente.
+- [ ] El anillo de foco es el canónico azul en las tres; verificado con teclado, no sólo por lectura del token.
+- [ ] `ui.ts` no tiene ningún import restante, y esa evidencia queda escrita para `TASK-1560`.
+- [ ] Las entradas de `LEGACY_TOKEN_DRIFT` que corresponden a `ui.ts` están borradas del ledger.
 
 ## Verification
 

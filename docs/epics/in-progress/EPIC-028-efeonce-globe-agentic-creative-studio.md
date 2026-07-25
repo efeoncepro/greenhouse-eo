@@ -658,4 +658,37 @@ principio sobre cómo se construyen**. ADR-014 lo hace explícito y su foundatio
   `vite@7.3.x` se retira.
 - **Cluster ADR-013/ADR-014 en el programa:** `TASK-1553` (resolución de modelo por-ruta) · `TASK-1554`
   (reader de availability, desplegado) · `TASK-1555` (selector del Producer, in-progress) · `TASK-1556`
-  (esta foundation) · `TASK-1557` (CDN de assets, desbloqueada por el bundle content-addressed).
+  (esta foundation, **complete**) · `TASK-1557` (CDN de assets, **complete y verificado en vivo**).
+
+### El programa de ADR-014, completo (creado 2026-07-25)
+
+Los cinco slices de la ADR tienen dueño. Antes de esto sólo existían los dos primeros, y **una
+migración sin task para su último paso no es una migración: es una convivencia permanente.**
+
+| Slice ADR-014 | Task | Estado | Qué la destraba |
+|---|---|---|---|
+| 0 — Foundation | `TASK-1556` | ✅ complete | — |
+| — CDN de assets | `TASK-1557` | ✅ complete, verificado en vivo | — |
+| 1 — Share board | `TASK-1558` | 🚧 in-progress | Dirección visual aprobada |
+| 2 — `ui.ts` (launch/studio/error) | `TASK-1524` | 📋 to-do | Dirección cinematográfica |
+| 3 — Composer | `TASK-1552` | 📋 to-do | — |
+| 4 — Feed + viewer | `TASK-1559` | 📋 to-do | `TASK-1558` (primitives) |
+| 5 — Retiro del legacy | `TASK-1560` | 📋 to-do | Las cuatro superficies portadas |
+| — Hardening del gate | `TASK-1561` | 📋 to-do | **Nada — implementable ya** |
+
+Tres decisiones que quedaron fijadas al crear estas tasks:
+
+- **`TASK-1524` es dueña del port de `ui.ts`, no sólo su consumidora.** `ui.ts` sirve TRES superficies
+  (`launch`, `studio`, `error`); portar sólo la de login no retira el archivo, y `TASK-1560` no puede
+  borrar algo con dos consumidores vivos. Su Slice 5 nuevo lo hace explícito, incluido adoptar el
+  anillo de foco canónico — hoy es **ámbar** ahí y **azul** en el Producer, así que un usuario de
+  teclado ve cambiar la identidad del foco al cruzar de pantalla.
+- **`TASK-1559` es el slice de concurrencia, no una superficie más.** Watermark, epoch por operación y
+  refresh single-flight hoy sólo están verificados por haber funcionado en vivo. Se portan **con sus
+  tests, antes de tocar render** — un port que renderiza bien y reconcilia mal produce una UI que se ve
+  correcta y muestra el candidato equivocado.
+- **`TASK-1561` nace de que el gate de color expuso su propio agujero.** La sesión de `TASK-1558`
+  encontró `font-family` literal en cuatro lugares de `producer-ui.ts`, sin que nada lo detuviera —
+  *"the same shape of failure that produced 63 unrepeatable colours, one step behind"*. Y la tipografía
+  es peor que el color: un peso sin archivo cargado **lo sintetiza el browser** deformando las letras,
+  sin fallar ningún gate.

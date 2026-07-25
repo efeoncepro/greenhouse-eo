@@ -105,6 +105,9 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 
 
 | `TASK-1558` | `in-progress` | **Globe Share Board sobre el payload cliente.** EPIC-028; ui-ux/primitive; ui-standard; P1/Muy alto/Medio. Reconstruye `GET /shares/:shareId` —la única superficie que un cliente externo ve de Globe— sobre el payload que dejó TASK-1556. Separada de esa task porque tiene un gate distinto: necesita **dirección visual aprobada**, que no existe. Es el Slice 1 de ADR-014; acá nacen las primitives base. | `docs/tasks/in-progress/TASK-1558-globe-share-board.md` |
+| `TASK-1559` | `to-do` | **Globe Producer Feed + Viewer sobre el payload cliente.** EPIC-028; ui-ux/interaction; ui-standard; P1/Alto/Alto. Slice 4 de ADR-014 y el slice de **concurrencia**: watermark, epoch por operación y refresh single-flight se portan CON sus tests, porque hoy sólo están verificados por haber funcionado en vivo. Port, no rediseño. Blocked by TASK-1558. | `docs/tasks/to-do/TASK-1559-globe-feed-viewer-client-port.md` |
+| `TASK-1560` | `to-do` | **Retiro del payload legacy de Globe.** EPIC-028; standard; P1/Alto/Medio. Slice 5 de ADR-014: borra `producer-ui.ts`/`ui.ts`/`public-share-ui.ts`/`producer-controller.ts`, retira `client_app_enabled` y vacía `LEGACY_TOKEN_DRIFT`. Mientras esos archivos existan siguen siendo **la plantilla que el próximo agente copia**. Blocked by TASK-1524/1552/1558/1559. | `docs/tasks/to-do/TASK-1560-globe-legacy-payload-retirement.md` |
+| `TASK-1561` | `to-do` | **Gate de diseño de Globe: tipografía + cobertura de frontera.** EPIC-028; standard; P2/Medio/Bajo. El gate de color expuso su propio agujero: `font-family` literal pasa limpio, y un peso sin archivo lo **sintetiza el browser** sin fallar nada. Agrega las reglas de tipografía y **muerde cada clase** del gate. Sin bloqueos — implementable ya. | `docs/tasks/to-do/TASK-1561-globe-design-gate-typography-hardening.md` |
 
 ## Siguiente ID disponible
 
@@ -1639,4 +1642,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 ## Siguiente ID disponible
 
-`TASK-1559`
+`TASK-1562`
