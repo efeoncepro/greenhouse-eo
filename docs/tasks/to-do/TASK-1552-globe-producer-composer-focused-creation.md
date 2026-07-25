@@ -8,11 +8,11 @@
 - Effort: `Medio`
 - Type: `implementation`
 - Execution profile: `ui-ux`
-- UI impact: `layout`
+- UI impact: `flow`
 - UI ready: `no`
 - Wireframe: `docs/ui/wireframes/TASK-1552-globe-producer-composer-focused-creation.md`
-- Flow: `none`
-- Motion: `none`
+- Flow: `docs/ui/flows/TASK-1552-globe-producer-composer-focused-creation-flow.md`
+- Motion: `docs/ui/motion/TASK-1552-globe-producer-composer-focused-creation-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
 - Status real: `Dirección definida; pendiente de implementación y evidencia visual`
@@ -356,6 +356,35 @@ N/A — repo-only task/documentation plus UI changes in the Globe runtime owned 
 - [ ] GVC premium captura 1440×1000 y 390×844, con first fold, estados clave y evidencia revisada en dossier.
 - [ ] `scrollWidth === clientWidth` en desktop y mobile, incluyendo disclosures abiertos.
 - [ ] La evidencia visual alcanza el scorecard definido: promedio ≥4.5, ninguna dimensión <4, jerarquía/economía/impacto/resistencia a template ≥4.5.
+
+### Criterios del GASTO — migrados de TASK-1564 (retirada), no negociables
+
+Estos son los que hacen que el composer no gaste crédito sobre información falsa. El flow contract los desarrolla
+con sus cuatro compuertas (`docs/ui/flows/TASK-1552-...-flow.md`).
+
+- [ ] **G1 — estimado vigente.** `execute` **no está disponible** sin estimado que corresponda a la recipe en
+      pantalla. No es una advertencia: es el botón deshabilitado. Sin esto, un operador ve "12 cr", cambia la
+      cantidad a 4 y ejecuta creyendo que gasta 12.
+- [ ] **G2 — grant.** Sin `lab.experiment.execute` el botón está deshabilitado **con su razón**, y el resto del
+      composer **sigue usable** (se puede escribir y estimar). Ni bloquear toda la superficie ni dejar apretar
+      para fallar después de escribir todo.
+- [ ] **G3 — clave compartida.** La clave de idempotencia **nace en `prepare` y se reusa en `execute`**. Una
+      clave nueva por intento convierte un reintento en gasto nuevo.
+- [ ] **G4 — no re-apretable.** Mientras `prepare`/`execute` están en vuelo el botón está en pendiente.
+      Verificado contando llamadas: **doble click produce UNA** llamada a `execute`.
+- [ ] La vigencia se evalúa por los **dos ejes observables** (forma vía `recipeKey`, tiempo vía
+      `estimateExpiresAt`); el tercero —cambio de tarifa— lo cubre el servidor invalidando el `approvalToken`.
+      **Ya implementado** en `apps/studio-client/src/data/composer-recipe.ts` (17 tests, commit `feffd47`) — ver
+      el Delta de `TASK-1532`, que es su dueña.
+- [ ] El costo va **en el botón** además del riel (patrón medido de Higgsfield): son dos preguntas distintas.
+- [ ] Un estimado stale **se conserva atenuado**, nunca en blanco — un riel vacío se lee como "no cuesta nada".
+- [ ] `routeId` **no aparece en el DOM servido** en ninguno de los tres anchos, con el selector abierto.
+- [ ] Un modelo no listo se muestra **deshabilitado con su motivo**, nunca oculto.
+- [ ] Las cuatro razones de negación se distinguen, y "Reintentar" aparece **sólo donde puede funcionar**.
+- [ ] Las afordancias sin contrato (inpaint, batch) van **deshabilitadas con su razón visible**.
+- [ ] El prompt escrito **no se pierde ante ningún error**, incluida sesión expirada.
+- [ ] Canary a 1440/390/**320**, sin overflow de página ni de panel, más pasada con `prefers-reduced-motion`.
+- [ ] Scorecard visual: promedio ≥ 4.5, piso ≥ 4, fidelidad y resistencia a template ≥ 4.5.
 
 ## Verification
 

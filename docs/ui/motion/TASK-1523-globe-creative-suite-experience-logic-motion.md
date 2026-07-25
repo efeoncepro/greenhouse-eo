@@ -1,5 +1,19 @@
 # TASK-1523 — Globe Creative Loop Motion Contract
 
+> ## 🔴 SSOT del motion del payload cliente — leer ANTES de este documento
+>
+> **`docs/architecture/creative-studio/GLOBE_CLIENT_MOTION_CONTRACT_V1.md`** es el contrato canónico del motion de
+> `apps/studio-client` (feed · viewer · composer), con los valores **medidos** del prototipo aprobado: 11
+> `@keyframes`, 12 animaciones, 9 transiciones. Existe como SSOT compartido y no per-superficie porque el isotipo
+> de Globe generando vive en el feed **y** en el composer — dos definiciones del mismo momento de marca divergen.
+>
+> Su decisión de fondo: el motion tiene **tres capas que se gobiernan distinto** — **identidad** (bajo `reduce` se
+> apaga la animación, **no** el elemento) · **estructura** (pasa a `--duration-none`) · **ambiente** (se apaga).
+>
+> El **plan de implementación** y su estado están en
+> `docs/ui/motion/TASK-1523-globe-client-motion-implementation-plan.md` (migrado de `TASK-1565`, retirada).
+> Implementado y verificado en browser: commit `1c0684e` en `efeonce-globe`.
+
 ## Meta
 
 - Status: `draft`

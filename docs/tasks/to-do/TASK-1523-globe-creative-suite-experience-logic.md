@@ -373,6 +373,29 @@ Product/Creative valida dirección; owners de `TASK-1505`, `1474` y `1485` acept
 - [ ] Deltas de consumers y EPIC-028 quedan sincronizados.
 - [ ] Evidencia distingue Producer runtime de Workbench futuro.
 
+### Criterios del MOTION del payload cliente — migrados de TASK-1565 (retirada)
+
+Los primeros ocho **ya están verificados en browser** (canary `producer-motion-canary.mjs`, 13 asserts, commit
+`1c0684e`); quedan como criterios para que una superficie nueva no los pierda.
+
+- [x] Existen las 11 animaciones del diseño aprobado, o las ausentes están declaradas con su razón (`coachPulse`
+      no se implementa: no existe superficie de onboarding).
+- [x] `gBreathe` y `gHalo` usan el **mismo token** de duración — el token compartido **es** el mecanismo que
+      garantiza la fase. Verificado en browser: `animationDuration` idéntico.
+- [x] Con `reduce`: el isotipo sigue **en el DOM** con `animation-name: none` — se apaga el movimiento, **no** el
+      elemento, porque el elemento es la señal de que algo corre.
+- [x] Con `reduce`: chispas y llama se **ocultan** (congeladas a mitad de vuelo son ruido), pero el isotipo no.
+- [x] Con `reduce`: el **progreso textual está presente** — la prueba de que el motion nunca fue el único
+      portador del estado.
+- [x] `candIn` corre **una vez por `stableKey`** y **no** re-anima en una reanudación: 7/7 en el primer paint,
+      0 tras dos ciclos. Sin esto el feed late completo cada 4 segundos.
+- [x] Existe el **gate de reduced-motion** (`src/gates/reduced-motion.test.ts`, 7 tests), que **muerde** sobre CSS
+      sintético y **no** produce falsos positivos sobre las animaciones existentes.
+- [x] Ninguna duración ni curva literal: el gate de motion literal sigue verde (obligó a tokenizar las 4
+      duraciones de chispas y las 3 de aurora — se le agregaron **tokens al SSOT, no una excepción al gate**).
+- [ ] El motion del **composer** (estimado atenuado, barra de progreso, `overlayIn`) llega con `TASK-1552`.
+- [ ] `coachPulse` cuando exista la superficie de onboarding.
+
 ## Verification
 
 - `pnpm task:lint --task TASK-1523`

@@ -1,10 +1,13 @@
-# TASK-1565 — Motion del payload cliente de Globe · Motion Contract (implementación)
+# TASK-1523 — Plan de implementación del motion del payload cliente
+
+> **Migrado 2026-07-25** desde `TASK-1565`, retirada por duplicación: `TASK-1523` es la dueña de los contratos
+> visual/flow/motion de la suite. Título original: Motion del payload cliente de Globe · Motion Contract (implementación)
 
 ## Meta
 
 - Status: `ready-for-implementation`
-- Owner task: `TASK-1565 — Motion del payload cliente de Globe (feed + composer)`
-- Related wireframe: `docs/ui/wireframes/TASK-1565-globe-client-motion-implementation.md`
+- Owner task: `TASK-1523 — Globe Creative Suite Experience Logic and Information Architecture`
+- Related wireframe: `docs/ui/motion/TASK-1523-globe-creative-suite-experience-logic-motion.md`
 - Related flow: `none`
 - Motion type: `primitive-default` + `transition-system`
 - Primary primitive / library: **CSS** — sin librería de animación

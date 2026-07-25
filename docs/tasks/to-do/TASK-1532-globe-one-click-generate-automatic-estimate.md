@@ -11,10 +11,10 @@
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `interaction`
-- UI ready: `yes`
+- UI ready: `no`
 - Wireframe: `docs/ui/wireframes/TASK-1532-globe-one-click-generate.md`
-- Flow: `none`
-- Motion: `none`
+- Flow: `docs/ui/flows/TASK-1552-globe-producer-composer-focused-creation-flow.md`
+- Motion: `docs/ui/motion/TASK-1552-globe-producer-composer-focused-creation-motion.md`
 - Backend impact: `command`
 - Epic: `EPIC-028`
 - Status real: `Diseño listo; runtime exige dos acciones manuales para una sola intención`
@@ -24,6 +24,10 @@
 - Branch: `task/TASK-1532-globe-one-click-generate-automatic-estimate`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+> **Flow y Motion son COMPARTIDOS con `TASK-1552`, a propósito.** El flujo del gasto es UNO
+> (`prompt → estimado → prepare → execute`) y el estimado atenuado vive dentro del composer; dos contratos del
+> mismo flujo se separarían, y el que derive sería el que cotiza distinto de como corre.
 
 ## Delta 2026-07-25 — el modelo de vigencia del estimado YA ESTÁ CONSTRUIDO (venía de TASK-1564, retirada)
 
@@ -382,6 +386,18 @@ parpadeante, requests inútiles y una carrera entre el texto original y la propu
 - [ ] Wireframe/readiness/task/ops lint pasan sin findings.
 - [ ] GVC premium y canario real prueban un solo CTA y spend único.
 - [ ] Globe `pnpm check && pnpm build` pasan con tests registrados.
+
+### Criterios migrados de TASK-1564 (retirada)
+
+- [ ] **`UI ready` bajó de `yes` a `no` a propósito.** Un CTA que **gasta plata** no puede declararse listo con
+      `Motion: none` y `Flow: none`: el estado atenuado del estimado es información sobre gasto, no decoración, y
+      el flujo `prepare → execute` tiene cuatro compuertas. Sube a `yes` cuando los dos contratos estén completos.
+- [ ] La atenuación del estimado **NO se apaga** bajo `prefers-reduced-motion`: la transición se acorta, el estado
+      atenuado se conserva. El portador redundante es el texto (`estimateStale`), y **los dos** se mantienen.
+- [ ] El contraste del estimado atenuado se mide con **muestreo de píxeles**, no con axe: el fondo es un
+      gradiente y axe reporta `incomplete`, no `pass`. Se registra el valor medido.
+- [ ] La invalidación es **sincrónica** con el cambio de campo, **antes** del debounce.
+- [ ] `withinHardCap: false` se preserva tal cual — es información (supera el tope), y un truthy-check la perdería.
 
 ## Verification
 

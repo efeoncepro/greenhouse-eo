@@ -1,11 +1,14 @@
-# TASK-1564 — Composer del Producer de Globe · Motion Contract
+# TASK-1552 — Composer del Producer de Globe · Motion Contract
+
+> **Migrado 2026-07-25** desde `TASK-1564`, retirada por duplicación. El dueño del composer es `TASK-1552`.
+
 
 ## Meta
 
 - Status: `ready-for-implementation`
-- Owner task: `TASK-1564 — Globe Composer sobre el payload cliente`
-- Related wireframe: `docs/ui/wireframes/TASK-1564-globe-composer-client-port.md`
-- Related flow: `docs/ui/flows/TASK-1564-globe-composer-client-port-flow.md`
+- Owner task: `TASK-1552 — Globe Producer Composer Focused Creation`
+- Related wireframe: `docs/ui/wireframes/TASK-1552-globe-producer-composer-focused-creation.md`
+- Related flow: `docs/ui/flows/TASK-1552-globe-producer-composer-focused-creation-flow.md`
 - Motion type: `microinteraction` + `transition-system`
 - Primary primitive / library: **CSS**
 - Copy source: `apps/studio-client/src/copy/index.ts` → `producerComposer`

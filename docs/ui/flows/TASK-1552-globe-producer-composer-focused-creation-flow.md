@@ -1,10 +1,13 @@
-# TASK-1564 — Composer del Producer de Globe · Flow Contract
+# TASK-1552 — Composer del Producer de Globe · Flow Contract
+
+> **Migrado 2026-07-25** desde `TASK-1564`, retirada por duplicación. El dueño del composer es `TASK-1552`.
+
 
 ## Meta
 
-- Owner task: `TASK-1564 — Globe Composer sobre el payload cliente`
-- Related wireframe: `docs/ui/wireframes/TASK-1564-globe-composer-client-port.md`
-- Related motion: `docs/ui/motion/TASK-1564-globe-composer-client-port-motion.md`
+- Owner task: `TASK-1552 — Globe Producer Composer Focused Creation`
+- Related wireframe: `docs/ui/wireframes/TASK-1552-globe-producer-composer-focused-creation.md`
+- Related motion: `docs/ui/motion/TASK-1552-globe-producer-composer-focused-creation-motion.md`
 - Surfaces coordinadas: composer (`/producer/compose`) · feed (`/producer/feed`) · viewer (diálogo)
 - Flow type: `spend-gated sequence` — el flujo cruza una frontera de **gasto real**
 
