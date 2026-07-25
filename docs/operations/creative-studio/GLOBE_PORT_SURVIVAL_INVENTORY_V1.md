@@ -1,6 +1,6 @@
 # Inventario de supervivencia del port — contratos cross-repo del Producer
 
-> **Tipo:** inventario operativo · **Version:** 1.1 · **Creado:** 2026-07-25 por Claude
+> **Tipo:** inventario operativo · **Version:** 1.2 · **Creado:** 2026-07-25 por Claude
 > **Task:** `TASK-1560` Slice 1 (ADR-014) · **Consumidores:** `TASK-1552`, `TASK-1559`, `TASK-1524`
 > **Verificado contra:** `efeonce-globe` `6e8ef5a` (`main`) y `greenhouse-eo` `develop`
 
@@ -118,6 +118,34 @@ queda un dossier que describe algo que nadie puede reproducir.
 | `data-producer-fleet-state` | 1 | 0 | |
 | **`data-producer-candidate-kind`** | **0** | **0** | 🔴 no existe |
 | **`data-producer-feed-status`** | **0** | **0** | 🔴 no existe |
+
+## Estado de la migración de markers (actualizado 2026-07-25, tras `TASK-1559`)
+
+El port del feed + viewer aterrizó el mismo día que este inventario, y **confirma la predicción**: los
+markers no sobrevivieron con su nombre.
+
+| Legacy (lo que Greenhouse consume) | Payload cliente (lo que emite hoy) |
+|---|---|
+| `producer-feed` | `producer-runtime-feed` · `producer-feed-empty` · `producer-feed-state` · `producer-feed-toolbar` · `producer-feed-hero` |
+| `producer-candidate-viewer` | `producer-viewer-state`, y el estado pasa a `data-viewer-state` (no `data-producer-*`) |
+
+**No es un descuido: es una taxonomía mejor.** Un marker por región y estado es más útil que uno por
+pantalla. Pero **el consumidor no se enteró**, y ahí está el punto de este inventario.
+
+**Hoy no rompe nada, y por una decisión deliberada de `TASK-1559`:** el feed portado vive en
+**`/producer/feed`, una ruta propia al lado de `/producer`**, no reemplazándola. `/producer` sigue
+sirviendo el vanilla hasta que el composer alcance paridad, así que el escenario de Greenhouse —que
+apunta a `/producer`— sigue viendo el markup viejo.
+
+🔴 **El riesgo está diferido, no resuelto.** Cuando `TASK-1564` porte el composer y `/producer` se
+cambie de una sola vez, el escenario `globe-creative-producer` pierde `producer-feed` y
+`producer-candidate-viewer` **el mismo día**. Ese es el momento a preparar, y hay dos salidas:
+
+- **Actualizar el escenario** a la taxonomía nueva — correcto si la nueva es mejor, que parece serlo.
+- **Reemitir los nombres viejos** como alias — barato, pero conserva un vocabulario que ya se decidió
+  reemplazar.
+
+**Lo que NO vale es descubrirlo el día del flip.** Sea cual sea la salida, se decide antes.
 
 ## Cómo usar esto al portar
 

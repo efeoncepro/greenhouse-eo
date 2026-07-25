@@ -235,7 +235,7 @@ del grant (fragmento → header → resolve), que el token desaparezca de la bar
 requiere sesión de Globe por OAuth. **Los 6 puntos de verificación del runbook necesitan una persona —
 es una propiedad permanente del diseño, no una limitación temporal.**
 - **Slice 2 — launch + error.** Superficies públicas, chicas, sobre los mismos tokens. Un 404 en un browser deja de ser JSON.
-- **Slice 3 — composer.** La superficie interna más caliente (`TASK-1552`/`TASK-1555` aterrizan ahí).
+- **Slice 3 — composer. Dueño: `TASK-1564`** (creada 2026-07-25). La superficie interna más caliente. **No confundir con `TASK-1552`**, que es un **rediseño** de la jerarquía del composer (progressive disclosure, una intención dominante en el first fold), no un port — son trabajos distintos sobre la misma región, y `TASK-1564` no declara hoy su relación con él ni con `TASK-1555` (el selector compacto vive en `producer-route`, o sea **dentro** del composer, y tiene que sobrevivir al port).
 - **Slice 4 — feed + viewer.** El slice de concurrencia: watermark, epoch, refresh de sesión. Los contratos del Delta de ADR-005 entran como asserts, no como comentarios.
 - **Slice 5 — library, colecciones, batch; y retiro.** Se eliminan `producer-controller.ts`, `producer-client.ts` y los cuatro `:root`; `studio-web` queda como BFF puro + serving. El flag se retira con el código.
 - **Fuera del strangler:** Storyboard (`TASK-1547`), Video Effectiveness (`TASK-1540`) y delivery (`TASK-1472`) **no se portan** — nacen en el payload nuevo.
