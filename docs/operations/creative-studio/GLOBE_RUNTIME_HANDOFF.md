@@ -30,8 +30,9 @@
 - 🔴 **Drift de tokens registrado, no resuelto:** el **anillo de foco es de distinto color según la
   superficie** (ámbar en launch/studio/error, azul en producer). Está en `LEGACY_TOKEN_DRIFT` con su
   canónico; adoptarlo es cambio visible y pertenece al slice de port de cada superficie.
-- **Bloqueado y correcto que lo esté:** el Slice 4 (share board) necesita dirección visual aprobada y no
-  existe. Producirla es trabajo de product-design con decisión del operador, no algo que un implementador
+- **`TASK-1556` CERRADA** (foundation). El share board se separó a **`TASK-1558`**: necesita dirección visual
+  aprobada y no existe, y mantenerlos juntos habría dejado la fundación bloqueada detrás de una decisión de
+  diseño que no le correspondía. Producirla es trabajo de product-design con decisión del operador, no algo que un implementador
   improvise sobre la única superficie que ve un cliente.
 - **Pendiente ajeno:** `scripts/frontend/scenarios/task-1555-model-selector.scenario.ts` sigue **sin
   trackear** en Greenhouse. Es la evidencia GVC de TASK-1555 y el guard del acoplamiento cross-repo que

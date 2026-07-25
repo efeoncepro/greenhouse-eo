@@ -1,4 +1,4 @@
-# TASK-1556 — Globe Client Application Foundation + Share Board
+# TASK-1556 — Globe Client Application Foundation
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -6,22 +6,22 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
-- Effort: `Alto`
+- Effort: `Medio`
 - Type: `implementation`
-- Execution profile: `ui-ux`
-- UI impact: `primitive`
-- UI ready: `no`
-- Wireframe: `docs/ui/wireframes/TASK-1556-globe-client-app-foundation.md`
+- Execution profile: `standard`
+- UI impact: `none`
+- UI ready: `n/a`
+- Wireframe: `none`
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Slices 1-3 code complete; Slice 4 bloqueado por direccion visual`
+- Status real: `Complete — foundation entregada y verificada; ninguna superficie portada (flag OFF)`
 - Rank: `TBD`
-- Domain: `ui`
+- Domain: `platform`
 - Blocked by: `none`
 - Branch: `task/TASK-1556-globe-client-app-foundation`
 - GitHub Issue: `TBD`
@@ -30,9 +30,12 @@
 
 Implementa el **Slice 0 de ADR-014** en `efeonce-globe`: el payload de browser deja de ser HTML concatenado en
 strings + código serializado con `Function.prototype.toString()` y pasa a ser una aplicación cliente tipada y
-componetizada (Vite + React), servida como assets estáticos por el **mismo** `studio-web`. El seam se valida
-construyendo el **share board** — la única superficie que un cliente externo ve hoy. Nacen el SSOT de tokens, la
-capa de copy y los gates de calidad de UI, que Globe hoy no tiene. Todo detrás de un flag default-OFF.
+componetizada (Vite + React), servida como assets estáticos por el **mismo** `studio-web`. Nacen el SSOT de
+tokens, la capa de copy y los gates de calidad de UI, que Globe no tenía. Todo detrás de un flag default-OFF.
+
+**Es fundación, no superficie: no ship ningún cambio visible.** El share board —la primera superficie real—
+se separó a **`TASK-1558`** porque necesita dirección visual aprobada y esta task no. Por eso el perfil es
+`standard` con `UI impact: none`: lo único que se renderiza es una ruta de diagnóstico detrás del flag.
 
 ## Why This Task Exists
 
@@ -65,8 +68,6 @@ porque es barato ahora**, con cero superficie de cliente ya construida sobre el 
 
 - El browser recibe un bundle tipado y cacheable en vez de HTML concatenado; `studio-web` conserva intacto su rol
   de BFF, la sesión SSO, la CSP por nonce y el trust boundary.
-- El **share board** —la cara del cliente— queda reconstruido con componentes, estados honestos y su primer canary
-  visual, sin rótulos internos ni links muertos.
 - Nace el **SSOT de tokens** de Globe: los cuatro `:root` paralelos colapsan en uno, y un hex crudo **falla el build**.
 - Nace la **capa de copy** lista para locale, sin literales en JSX.
 - Globe estrena los gates de calidad de UI que hoy no existen.
@@ -181,80 +182,16 @@ En `greenhouse-eo`:
   el resto de los packages no la hereda.
 - Extraction blocker: `none` — el bundle es un artefacto estático servido por un allowlist que ya existe.
 
-## UI/UX Contract
+## Sobre la clasificación (por qué esta task NO lleva `## UI/UX Contract`)
 
-### Experience brief
+Al separarse el share board a `TASK-1558`, esta task dejó de shippear cualquier superficie visible: con el
+flag en `false` nada cambia, y lo único que se renderiza es una ruta de diagnóstico. El contrato UI/UX y su
+wireframe **pertenecen a la superficie**, así que viajaron con ella — el wireframe es hoy
+`docs/ui/wireframes/TASK-1558-globe-share-board.md`.
 
-- UI rigor: `ui-standard`
-- Usuario / rol: **cliente externo de Efeonce** (equipo de marketing/creatividad), sin sesión en Globe, entrando por
-  un enlace de revisión con token.
-- Momento del flujo: revisión de una pieza creativa producida por Efeonce, compartida read-only.
-- Resultado perceptible esperado: ve la pieza y su contexto con acabado de producto comercial, sin nomenclatura
-  interna ni errores técnicos.
-- Friccion que debe reducir: hoy la superficie luce desalineada con la marca (tokens drifteados), se llama
-  `Producer` y puede escupir JSON crudo.
-- No-goals UX: no se agregan acciones de escritura, comentarios del cliente ni descargas. El grant es read-only.
-
-### Surface & system decision
-
-- Surface: `GET /shares/:shareId` de Globe (sin sesión).
-- Composition Shell: `no aplica` — es de Greenhouse; Globe tiene su propio sistema (`TASK-1540`).
-- Primitive decision: `new` — nacen las primeras primitives de Globe (`Surface`, `Chip`, `FactList`, `CommentItem`,
-  `MediaStage`, `StateBlock`) sobre el SSOT de tokens. Es el entregable de plataforma de la task.
-- Adaptive density / The Seam: `no aplica` en esta superficie; el SSOT nace preparado para la densidad por modo
-  comercial que consumirán las superficies siguientes.
-- Floating/Sidecar/Dialog decision: ninguno.
-- Copy source: `apps/studio-client/src/copy/` 🆕 (equivalente en Globe de `src/lib/copy/*`).
-- Access impact: `none` — la autorización es server-side por bearer `Globe-Share`, sin cambios.
-
-### State inventory
-
-Los diez estados están especificados con su copy y su ARIA en el wireframe (§Estados). Resumen:
-Default · Loading (skeleton dimensionado, `aria-busy`) · Empty de comentarios · `authentication_required`
-(`role="alert"`, enlace vencido) · `not_found` · `access_denied` · `dependency_unavailable` (**único con
-Reintentar**) · Long content · Mobile 390px · Keyboard/focus · Reduced motion.
-
-### Interaction contract
-
-- Primary interaction: ver la pieza; reproducir si es video/audio.
-- Hover / focus / active: `:focus-visible` ≥3:1 en el reintento y en elementos enfocables.
-- Pending / disabled: el stage muestra skeleton, nunca un placeholder roto.
-- Escape / click-away: no aplica (sin overlays).
-- Focus restore: tras un reintento, el foco vuelve al botón.
-- Latency feedback: skeleton dimensionado al activo; nunca spinner de página.
-- Toast / alert behavior: `role="alert"` sólo para el enlace vencido; el resto es `role="status"`.
-
-### Motion & microinteractions
-
-- Motion primitive: `CSS`
-- Enter / exit: fade corto del stage al resolver el activo. Sin motion decorativo.
-- Layout morph / Stagger: ninguno.
-- Timing / easing token: del SSOT (`--duration-short`, `--ease-enter`).
-- Reduced-motion fallback: sin fade; el skeleton no titila.
-- Non-goal motion: nada de parallax, autoplay decorativo ni loops.
-
-### Implementation mapping
-
-Ver el wireframe §Implementation Mapping (paths, primitives, readers, estados). Resumen del seam:
-`shell.ts` 🆕 emite el documento mínimo con nonce → `assets.ts` sirve el bundle → `studio-client` monta React →
-los datos salen de `GET /v1/shares/resolve` y los bytes de `GET /v1/shares/:id/media` como Blob URL. Ningún
-contrato de API cambia.
-
-### GVC scenario plan
-
-Ver el wireframe §GVC Scenario Plan. Nota de repo: **Globe no corre el GVC de Greenhouse**; el equivalente es su
-fixture/canary propio, que esta task extiende a la primera superficie client-facing —
-`apps/studio-client/scenarios/share-board.fixture.mjs` 🆕, viewports `1440×1000` + `390×844`, `qualityProfile:
-premium`, baseline nuevo `globe.share-board`.
-
-### Design decision log
-
-Ver el wireframe §Design Decision Log (decisión, cuatro alternativas rechazadas con razón, riesgos abiertos).
-
-### Visual verification
-
-Ver el wireframe §Visual verification. Incluye **captura del estado actual antes de tocar nada** — la línea base
-que hoy no existe.
+Lo que esta task entregó (SSOT de tokens, capa de copy, gates de a11y y de diseño) **es** trabajo de UI
+platform, pero es sustrato: se verifica con lint y tests, no con evidencia visual. Declararla `ui-ux` con un
+wireframe prestado habría sido exactamente el "doc escrito para pasar el gate" que el propio contrato prohíbe.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE (no llenar al crear la task)
@@ -290,17 +227,11 @@ que hoy no existe.
 - Registro de los tests nuevos en el script `test` de su package (los scripts **enumeran archivos a mano**: un
   `*.test.ts` no registrado **nunca corre** y la suite queda verde por no haberlo mirado).
 
-### Slice 4 — Share board reconstruido
+### ~~Slice 4 — Share board~~ · ~~Slice 5 — Cutover~~ → **movidos a `TASK-1558`**
 
-- La superficie completa con sus diez estados, sobre las primitives del Slice 2.
-- Se retira el rótulo `Producer` y se resuelve el link a `/legal/terms` (implementarlo o retirarlo).
-- Fixture/canary visual `share-board` + scorecard.
-
-### Slice 5 — Cutover y retiro
-
-- Flip del flag a `true` tras canary verde.
-- Se retira `public-share-ui.ts` y su rama de render.
-- El flag se retira con el código.
+Se separaron porque tienen un gate distinto: la fundación no necesitaba dirección visual (los tokens se
+adoptaron de `producer-ui.ts`, que ya existía), y el share board **sí**. Mantenerlos juntos habría dejado la
+fundación bloqueada detrás de una decisión de diseño que no le correspondía.
 
 ## Progress — 2026-07-25
 
@@ -490,22 +421,13 @@ El detalle vive en dos documentos que **no se duplican aquí**:
 - [ ] Existe **un solo** módulo de tokens; `grep` de `:root` en `apps/studio-client` devuelve exactamente uno.
 - [ ] Un hex crudo introducido a propósito **falla el build** (probado, no asumido).
 - [ ] Cero literales de copy visible en JSX; todo sale de la capa de copy.
-- [ ] El DOM servido al cliente **no contiene** el slug del proveedor, la taxonomía `house`, el costo vendor ni el
-      margen — verificado por assertion del canary.
-- [ ] La página no se auto-rotula `Producer` y no queda ningún link que devuelva JSON a un browser.
-- [ ] Los diez estados del wireframe están implementados; `authentication_required`, `not_found`, `access_denied`
-      y `dependency_unavailable` son **distinguibles** y sólo el último ofrece Reintentar.
-- [ ] Canary `share-board` verde en `1440×1000` y `390×844`, con `scrollWidth <= clientWidth` en ambos.
-- [ ] Existe evidencia **before/after** del share board.
+- [ ] Con el flag en `false`, **ninguna superficie cambia**: cada ruta responde exactamente como antes.
+- [ ] Los 6 gates se verificaron **mordiendo** (una violación de cada clase falla; restauradas, verde).
 - [ ] `GLOBE_CLIENT_APP_ENABLED` está declarado en `variables.tf` con default `false`; con el flag apagado la
       superficie responde idéntica a hoy.
 - [ ] La CSP no cambió: sigue siendo `script-src 'nonce-<n>'; style-src 'nonce-<n>'`, sin `unsafe-inline` ni
       `strict-dynamic`.
 - [ ] `pnpm check` y `pnpm build` verdes en `efeonce-globe`, y cada test nuevo **aparece en la salida del run**.
-- [ ] Se declaró `Execution profile: ui-ux` y `UI impact: primitive`; `UI ready` pasó a `yes` sólo tras completar
-      implementation mapping, GVC scenario plan y design decision log, con `pnpm task:lint --task TASK-1556` limpio.
-- [ ] El wireframe declarado existe y es sustantivo (no un stub para pasar el gate).
-- [ ] Scorecard: promedio ≥4,5, piso 4, fidelidad y resistencia a template ≥4,5.
 
 ## Verification
 

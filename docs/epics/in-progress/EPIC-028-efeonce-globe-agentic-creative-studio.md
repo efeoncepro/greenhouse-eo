@@ -593,7 +593,11 @@ de operador de readiness en el broker de Greenhouse es el siguiente paso ejecuta
 
 **Producto comercial (no piloto):** el runtime sigue clavado en `internal_smoke` por `readStudioRuntimeConfig`;
 habilitar cobro/clientes externos es **TASK-1521** (runtime comercial) + **TASK-1480** (readiness comercial,
-bloqueada por 1477/1478/1479/1482) — ninguna empezada. Esa es la distancia real a comercial, no la UI.
+bloqueada por 1477/1478/1479/1482). Esa es la distancia real a comercial, no la UI.
+**Estado verificado 2026-07-25 (no inferir de esta prosa — chequear el lifecycle real):** `TASK-1521` está
+**`in-progress`** con trabajo cerrado (Producer interno multimodal con sesión/viewer, outbox/queue age y
+severidades); `TASK-1480` sigue en `to-do`. La versión anterior de esta línea decía *"ninguna empezada"* y
+quedó stale — un agente la citó como hecho vigente sin verificar la carpeta de la task.
 
 ## Delta 2026-07-24 — principio faltante: catálogo multi-modelo extensible y elegible (best-in-class, coexistente)
 

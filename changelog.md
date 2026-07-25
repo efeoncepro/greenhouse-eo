@@ -847,3 +847,17 @@
 - La portada inicial fue reemplazada por la pieza aprobada `HI-YAAH!`: lluvia binaria, figura marcial y golpe de
   energía en formato `1200×630`. WordPress media `251552` quedó sincronizado como featured, Open Graph, Twitter
   y `primaryImage` del schema; caché purgada y readback público verificado.
+
+## 2026-07-25 — Globe: el payload de browser deja de ser un string (ADR-014, foundation)
+
+`TASK-1556` cerrada. Nació `apps/studio-client` en `efeonce-globe` (Vite + React + React Router, SSR
+apagado) compilando a assets estáticos que sirve el **mismo** `studio-web`; host, BFF, sesión SSO, CSP por
+nonce, ALB y API privada sin tocar. Con el flag `client_app_enabled` en `false` **ningún comportamiento
+cambia**: es fundación, no superficie.
+
+Globe estrena SSOT de tokens con drift ledger, capa de copy locale-keyed, ESLint acotado (jsx-a11y +
+rules-of-hooks) y 3 gates de diseño como tests — los 6 verificados **mordiendo**. React Compiler activado.
+Las dos compuertas de la ADR cerraron verdes, así que el fallback a `vite@7.3.x` se retira.
+
+El share board, la única superficie que ve un cliente, se separó a `TASK-1558`: necesita dirección visual
+aprobada y no existe.

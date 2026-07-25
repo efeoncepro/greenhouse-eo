@@ -1,8 +1,9 @@
-# Wireframe — TASK-1556 · Globe Client Application Foundation (share board)
+# Wireframe — TASK-1558 · Globe Share Board (la cara del cliente)
 
 > **Superficie:** `GET /shares/:shareId` de Efeonce Globe — **la única cara de Globe que ve un cliente externo hoy**.
 > **Repo de implementación:** `efeonce-globe` (`apps/studio-client`, nuevo). Doc gobernante: Greenhouse.
-> **ADR:** [`EFEONCE_GLOBE_CLIENT_APPLICATION_DECISION_V1.md`](../../architecture/creative-studio/EFEONCE_GLOBE_CLIENT_APPLICATION_DECISION_V1.md) (ADR-014).
+> **ADR:** [`EFEONCE_GLOBE_CLIENT_APPLICATION_DECISION_V1.md`](../../architecture/creative-studio/EFEONCE_GLOBE_CLIENT_APPLICATION_DECISION_V1.md) (ADR-014) — **Slice 1 de la ADR**.
+> **Foundation:** `TASK-1556` (Slices 1-3 de esa task), ya cerrada: el payload cliente, el SSOT de tokens, la capa de copy y los gates existen y se consumen.
 
 ## Por qué esta superficie primero
 
@@ -114,16 +115,16 @@ Copy que **desaparece**: el rótulo `Producer` de esta página (es una superfici
 
 ## Implementation Mapping
 
-- **Route / surface:** `GET /shares/:shareId` (sin sesión) → shell HTML mínimo + bundle montado en `#root`.
+- **Route / surface:** `GET /shares/:shareId` (sin sesión) → `renderShell()` de `apps/studio-web/src/shell.ts` + la superficie montada en `#globe-root`.
 - **Repo / paths:**
-  - `apps/studio-web/src/shell.ts` 🆕 — documento HTML mínimo con `nonce`, reemplaza `renderPublicSharePage`.
+  - `apps/studio-web/src/shell.ts` — **ya existe** (`TASK-1556`); esta task lo consume y retira `renderPublicSharePage`.
   - `apps/studio-web/src/assets.ts` — +entradas del bundle (allowlist explícito ya existente).
   - `apps/studio-client/src/routes/share/` 🆕 — la superficie.
-  - `apps/studio-client/src/tokens/` 🆕 — **SSOT** que colapsa los 4 bloques `:root` (dos en `producer-ui.ts`, uno en `ui.ts`, uno en `public-share-ui.ts`).
-  - `apps/studio-client/src/copy/` 🆕 — capa de copy.
-  - `apps/studio-client/src/data/` 🆕 — cliente tipado; importa de `packages/contracts`.
+  - `apps/studio-client/src/tokens/tokens.ts` — **SSOT ya existente**; se consume, no se re-crea. Ojo con `LEGACY_TOKEN_DRIFT`: los valores del share board divergen y adoptarlos es cambio visible deliberado (dos en `producer-ui.ts`, uno en `ui.ts`, uno en `public-share-ui.ts`).
+  - `apps/studio-client/src/copy/index.ts` — capa de copy **ya existente**: se agrega la clave `share` al diccionario `es-CL`, no se crea una capa nueva.
+  - `apps/studio-client/src/data/` 🆕 — cliente tipado del transporte del share; importa de `packages/contracts`.
 - **Primitive / variant / kind:** nacen aquí las primeras primitives de Globe — `Surface`, `Chip`, `FactList`,
-  `CommentItem`, `MediaStage`, `StateBlock`. **Globe NO importa primitives, CompositionShell, MUI ni AXIS de
+  `CommentItem`, `MediaStage`, `StateBlock` — declaradas en el scope de `TASK-1556` pero **NO entregadas** a propósito: diseñarlas sin una superficie a la que sirvan era especulativo. **Globe NO importa primitives, CompositionShell, MUI ni AXIS de
   Greenhouse** (`TASK-1540`): los tokens se materializan en Globe.
 - **Data reader / command:** `GET /v1/shares/resolve` + `GET /v1/shares/:id/media` (existentes, sin cambio).
 - **API parity:** ninguna capability nueva. La UI es cliente de contratos que ya existen.
@@ -147,7 +148,7 @@ Copy que **desaparece**: el rótulo `Producer` de esta página (es una superfici
   ni `house`, ni costo/margen · el rótulo `Producer` **no aparece** · ningún link devuelve JSON.
 - **Scroll-width checks:** sí, ambos viewports.
 - **Reduced-motion / focus evidence:** captura con `prefers-reduced-motion: reduce` + recorrido de foco por teclado.
-- **Review dossier:** `docs/ui/reviews/TASK-1556-globe-client-app-foundation/`.
+- **Review dossier:** `docs/ui/reviews/TASK-1558-globe-share-board/`.
 - **Baseline decision / surface ID:** `globe.share-board` — **baseline nuevo** (hoy no existe ninguno).
 
 ## Design Decision Log
@@ -180,5 +181,5 @@ Copy que **desaparece**: el rótulo `Producer` de esta página (es una superfici
 - **Before/after evidence:** captura del share board actual **antes** de tocar nada — es la línea base que hoy no existe.
 - **Known visual debt:** el resto de las superficies (`launch`, `error`, Producer) sigue en el payload viejo hasta
   sus slices; convivencia esperada y gobernada por el flag.
-- **Visual scorecard:** `docs/ui/reviews/TASK-1556-globe-client-app-foundation.scorecard.json`
+- **Visual scorecard:** `docs/ui/reviews/TASK-1558-globe-share-board.scorecard.json`
 - **Quality threshold:** `average >= 4.5; floor >= 4; fidelity/template resistance >= 4.5` (estándar premium de Globe).
