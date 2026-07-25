@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Bajo`
@@ -19,10 +19,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Diseno`
+- Status real: `Code complete; rollout pendiente (tofu plan + apply exigen credenciales del operador)`
 - Rank: `TBD`
 - Domain: `ops`
-- Blocked by: `TASK-1556`
+- Blocked by: `none` (TASK-1556 cerrada 2026-07-25: el bundle content-addressed ya existe)
 - Branch: `task/TASK-1557-globe-static-asset-cdn`
 - GitHub Issue: `TBD`
 
@@ -204,12 +204,20 @@ así que no hay contrato que exponer a Nexa/MCP/CLI.
 
 ## Scope
 
-### Slice 1 — Headers de caché en el origen
+### ~~Slice 1 — Headers de caché en el origen~~ → **YA ENTREGADO por `TASK-1556`**
+
+`assets.ts` declara política **por asset** desde `TASK-1556`: `public, max-age=31536000, immutable` para
+los content-addressed y `public, max-age=3600, immutable` para los de nombre estable. La spec lo pedía
+como prerrequisito y llegó antes. No se re-implementa.
+
+<details><summary>Scope original (histórico)</summary>
 
 - `assets.ts` emite `Cache-Control: public, max-age=31536000, immutable` **sólo** para artefactos con hash en el
   nombre (el bundle de `TASK-1556`).
 - Los assets sin hash (isotipos, wordmark, fuentes Tabler) reciben una política más corta y explícita.
 - El shell y cualquier ruta autenticada conservan `Cache-Control: private, no-store`.
+
+</details>
 
 ### Slice 2 — Carril cacheado en Terraform
 
@@ -222,6 +230,40 @@ así que no hay contrato que exponer a Nexa/MCP/CLI.
 
 - `tofu plan` → leer el plan → confirmar **cero** `destroy`/`replace` → `apply`.
 - Verificación de hit del CDN, de que el shell no se cachea, y de que ningún path autenticado cayó en el carril.
+
+## Progress — 2026-07-25
+
+**Code complete; rollout pendiente.** Commit en `efeonce-globe`: `225f483`.
+
+- Slice 1 ya venía entregado por `TASK-1556` (política de caché por asset en `assets.ts`).
+- Slices 2-3 implementados: backend service con `enable_cdn` sobre el **mismo** NEG + path matcher
+  allowlist de `/assets/*`, todo detrás de `assets_cdn_enabled` (default `false`).
+- **Gate de CI verde**, el mismo que corre `terraform-check.yml`: `fmt -check -recursive` +
+  `init -backend=false` + `validate`.
+
+### Dos decisiones que `validate` obligó a tomar explícitas
+
+- **`cache_mode = USE_ORIGIN_HEADERS`** en vez de declarar TTLs en Terraform: el origen ya declara
+  política exacta por asset, y repetirla acá crearía una segunda fuente de verdad que driftea en
+  silencio — el edge sirviendo bajo una política que el origen ya no declara.
+- **`cache_key_policy.include_query_string = false`**: los objetos son content-addressed, así que un
+  `?v=…` identifica el mismo archivo. Incluirlo dejaría fragmentar —y llenar— el caché con variantes
+  ilimitadas de un objeto, y hundiría el hit rate de justo lo que este carril existe para servir.
+
+### Rollout pendiente (paso del operador)
+
+`tofu plan` y `apply` exigen credenciales GCP, y `gcloud auth application-default login` es
+interactivo. La secuencia está en §Production verification sequence; lo crítico: **leer el plan y
+confirmar cero `destroy`/`replace`** sobre ALB, certificado, IP global o NEG, y que el backend del
+shell **no aparezca modificado**.
+
+Con el flag en `false` el plan debería dar **`No changes`**: el cambio es inerte hasta prenderlo.
+
+### Deuda ajena que hubo que tocar
+
+`cloud_run_services.tf` y `locals.tf` fallaban `fmt -check` desde antes. No se ignoró: este cambio toca
+`infra/terraform/` y dispara el mismo gate de CI. Se corrió `tofu fmt` y se verificó por diff que el
+cambio es whitespace puro.
 
 ## Out of Scope
 
