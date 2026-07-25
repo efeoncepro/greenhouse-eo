@@ -4,7 +4,7 @@
 > **Creado:** 2026-05-07 por Claude (Opus 4.7) bajo dirección Julio Reyes
 > **Audiencia:** equipo Efeonce Group (comercial, delivery, finance, leadership), agentes AI que operen el portal Greenhouse, partners y stakeholders externos que necesiten entender el modelo
 > **Tipo:** documento canónico de doctrina comercial
-> **Related:** `spec/Arquitectura_BowTie_Efeonce_v1_1.md`, `docs/architecture/GREENHOUSE_BOWTIE_OPERATIONAL_BRIDGE_V1.md`, `docs/architecture/GREENHOUSE_CLIENT_LIFECYCLE_V1.md`, `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+> **Related:** [`EFEONCE_CAPITAL_AND_INVESTMENT_STRATEGY_V1.md`](EFEONCE_CAPITAL_AND_INVESTMENT_STRATEGY_V1.md), `spec/Arquitectura_BowTie_Efeonce_v1_1.md`, `docs/architecture/GREENHOUSE_BOWTIE_OPERATIONAL_BRIDGE_V1.md`, `docs/architecture/GREENHOUSE_CLIENT_LIFECYCLE_V1.md`, `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 
 ---
 
@@ -17,6 +17,22 @@ Cuando Efeonce dice **ASaaS** (Agency-as-a-Service) suelen pasar 3 cosas malas:
 3. Las decisiones operativas (pricing tiers, comp plans, ICP, dashboards Bow-tie) se toman sin un norte canónico — cada quien lo interpreta y diverge.
 
 Este documento fija qué es ASaaS para Efeonce, qué no es, en qué se basa, cómo se opera, y qué consecuencias arquitectónicas + comerciales tiene. Cualquier otro documento del ecosistema Efeonce que mencione ASaaS debe poder referenciarse contra este.
+
+### La jerarquía correcta de lenguaje
+
+ASaaS no reemplaza la categoría de mercado ni la visión de compañía. Para evitar que el término se convierta en
+una etiqueta difícil de ubicar, Efeonce usa esta jerarquía:
+
+| Capa | Lenguaje | Función |
+|---|---|---|
+| Categoría de mercado | **AI-enabled marketing and growth services platform** | Casillero entendible para compañía, mercado e inversores |
+| Lenguaje comercial | **Integrated Growth Partner** | Cómo se explica la relación al decisor |
+| Modelo | **ASaaS** | Cómo se entrega y monetiza el servicio productizado |
+| Visión | **Growth Operating System** | Hacia dónde evoluciona el sistema integrado |
+
+"Agencia de marketing digital" se usa sólo para captura de demanda y SEO cuando corresponda; no define la tesis
+estratégica. La amplitud de servicios de Efeonce —AEO, Search Visibility 360, creatividad, contenido, medios,
+CRM, web, data y otros— son capacidades y puntos de entrada del mismo sistema.
 
 ---
 

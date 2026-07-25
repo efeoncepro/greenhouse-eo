@@ -56,7 +56,7 @@ Todo lo que mostramos debe poder conectarse —directa o indirectamente— con i
 
 > **Detrás de estos tres ejes hay un Why de marca:** *no te entregamos crecimiento, lo construimos contigo —y te dejamos más capaz de sostenerlo* (co-creación · educación · integralidad). Los tres ejes son el How/What de ese Why en producto: el switching cost se gana haciendo al cliente más capaz (no dependiente), la transparencia hace real la co-creación, y Revenue Enabled prueba que el crecimiento es integral. SSOT del Why: `09_marca-agencia.md` → §El Golden Circle de Efeonce.
 
-**Ambición de mercado:** Efeonce es **LATAM-first, no LATAM-limited**. La dirección es construir una agencia grande y reconocida en toda Latinoamérica desde el inicio, preparada para servir EEUU hispano, mercados en inglés y otros mercados internacionales. La categoría defendible no es "agencia integral" ni "AI agency": es **Growth Operating System / ASaaS**, con co-creación convertida en software, método, datos y memoria acumulada. Decisión pública: `docs/public-site/decisions/PDR-012-growth-operating-system-global-positioning.md`.
+**Ambición de mercado:** Efeonce es **LATAM-first, no LATAM-limited**. La dirección es construir una plataforma de servicios de marketing y crecimiento habilitada por IA, preparada para servir EEUU hispano, mercados en inglés y otros mercados internacionales. En lenguaje comercial: **Integrated Growth Partner**. El modelo es **ASaaS** y la visión de largo plazo es **Growth Operating System**: co-creación convertida en software, método, datos y memoria acumulada. Decisión pública: `docs/public-site/decisions/PDR-012-growth-operating-system-global-positioning.md`.
 
 **Cultura operativa:** el Why se impregna en el equipo mediante el **Efeonce Operating Code**: `docs/operations/EFEONCE_OPERATING_CODE_V1.md`. Regla cultural: *en Efeonce se valora a quien deja al cliente más capaz, deja el sistema con más memoria y conecta su trabajo con crecimiento real.*
 
@@ -112,7 +112,7 @@ El roadmap ASaaS ya nombra dónde duele. Si buscas dónde aportar, empieza aquí
 |---|---|
 | `00_INDEX.md` | Este. Cómo usar la carpeta + North Star de producto. |
 | `01_quienes-somos.md` | Efeonce Group, 4 unidades, Loop Marketing, ICO, experiencia LATAM. |
-| `02_gtm.md` | Posicionamiento, categoría ASaaS, líneas de negocio, segmentación, modelo comercial, canales, proceso de venta, métricas GTM, partnership. |
+| `02_gtm.md` | Posicionamiento, categoría de mercado, ASaaS, líneas de negocio, segmentación, modelo comercial, canales, proceso de venta, métricas GTM, partnership. |
 | `03_ecosistema-producto.md` | Greenhouse + Kortex + Verk. Integración, convergencia, ASaaS redefinido, jerarquía de IP. |
 | `04_greenhouse-producto.md` | Greenhouse hoy: módulos, stack, integraciones, ICO Engine, gaps, roadmap, principios de diseño. |
 | `05_voz-tono-estilo.md` | Creencias contrarias, personalidad, voz, tono, do/don't — aplicado a UX copy del portal. |

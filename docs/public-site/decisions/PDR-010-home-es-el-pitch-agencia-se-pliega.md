@@ -39,7 +39,7 @@ Conclusión operativa: **el Home no requiere un retoque de copy; requiere rework
 
 3. **Toda la doctrina de PDR-008 sigue vigente — solo cambia el contenedor.** El reencuadre *no-es-X-es-Y*, las dos capas (posicionamiento vs descubrimiento), el anti-ICP (sin señales de precio SMB), los casos citables (Sky/Bresler/Berel), las reglas de voz es-LATAM, el JSON-LD (`Organization`+`Service`), la doctrina CRO y el grader como nodo compartido — **se aplican a la Home**.
 
-4. **La Home vende el sistema, no el catálogo interno.** Tras PDR-012, el encuadre público de la Home es **Growth Operating System / ASaaS**: estrategia, creatividad, medios, datos y software propio como una sola operación. Eso NO significa convertir la Home en una página de producto ni listar Greenhouse/Kortex/Verk como inventario. La Home debe vender el mecanismo y la prueba; el detalle de identidad (4 unidades, ICO, Loop Marketing, ecosistema de producto nombrado) va al About Us.
+4. **La Home vende el sistema, no el catálogo interno.** Tras PDR-012, el encuadre público de la Home es **Integrated Growth Partner**, respaldado por una plataforma de servicios de marketing y crecimiento habilitada por IA, con modelo **ASaaS** y visión **Growth Operating System**. Eso NO significa convertir la Home en una página de producto ni listar Greenhouse/Kortex/Verk como inventario. La Home debe vender el mecanismo y la prueba; el detalle de identidad (4 unidades, ICO, Loop Marketing, ecosistema de producto nombrado) va al About Us.
 
 5. **About Us es el gap real.** `/about-us-efeonce/` (249770) existe pero hace de nodo de confianza básico; el trabajo pendiente es **rehacerlo como página de identidad / E-E-A-T** (historia, las 4 unidades, método, equipo, creencias). Se bajará a su propio PDR + task.
 
@@ -66,14 +66,14 @@ La Home no es un tercer género de página: es la fachada = el pitch.
 - La Home concentra la autoridad del dominio para el head term de categoría (mejor que un pillar secundario).
 - El gap se traslada a un lugar donde sí es real y distinto: el **About Us**.
 - `/servicios` sigue siendo el hub navegacional SEO-neutro (PDR-002, sin cambios). La Home reparte a las spokes igual que iba a hacerlo `/agencia`.
-- Coherente con PDR-012: la Home vende **Growth Operating System / ASaaS** como categoría pública, pero sin convertirse en inventario de plataformas ni duplicar el About Us.
+- Coherente con PDR-012: la Home vende **Integrated Growth Partner** como lenguaje público, con plataforma/ASaaS/Growth OS como explicación y prueba, sin convertirse en inventario de plataformas ni duplicar el About Us.
 - El rework debe partir de una auditoría de contenido live: eliminar blocks de template, links de demo, testimonios no-Efeonce, categorías dummy y copy genérico antes de optimizar CRO o motion.
 
 ## Reglas duras
 
 - **NUNCA** construir `/agencia` como página separada near-duplicada de la Home (canibalización). Su contenido es el de la Home.
 - **SIEMPRE** cargar el head term "agencia de marketing digital" en `<title>`/H1 de la Home **con** el reencuadre *no-es-X-es-Y* de PDR-008 §1 en la misma sección.
-- **SIEMPRE** abrir desde el sistema: Efeonce como Growth Operating System / ASaaS, no como lista de servicios ni como agencia creativa/digital competente.
+- **SIEMPRE** abrir desde la categoría entendible: Efeonce como Integrated Growth Partner respaldado por un sistema, no como lista de servicios ni como agencia creativa/digital competente.
 - **NUNCA** meter el material de identidad profunda (4 unidades, ICO, Loop, Greenhouse/Kortex/Verk nombrados como catálogo) en la Home — va al About Us. La Home conserva el mecanismo: operación visible, software propio, datos, aprendizaje y memoria.
 - **NUNCA** dejar residuos de template o demo (`Quality fonts`, `WooCommerce`, `WPBakery`, ThemeForest reviews, links a demos/theme docs, categorías dummy) en contenido visible/indexable.
 - **SIEMPRE** preservar la doctrina de PDR-008 (dos capas, anti-ICP, casos citables, voz es-LATAM, JSON-LD, CRO, grader compartido) aplicada a la Home.

@@ -6,7 +6,7 @@
 
 **Agency Service as a Software** invierte la lógica del SaaS. Un SaaS empaqueta software como servicio; el ASaaS empaqueta **el servicio de agencia como si fuera un producto de software**. El cliente no contrata horas ni entregables: **accede a un sistema** —login, dashboards, datos en tiempo real, aprendizaje, red, valor acumulativo— donde el servicio humano opera por debajo como motor, no como interfaz. La premisa: la agencia del futuro compite más contra herramientas de software que contra otras agencias.
 
-Como posicionamiento de escala, ASaaS convierte a Efeonce en un **Growth Operating System**: estrategia, creatividad, medios, datos y software propio trabajando como una sola operación. Esto es **global-ready** por diseño: el sistema puede localizar idioma, mercado, regulación y canales sin cambiar la tesis central. LATAM es el primer campo de prueba, no el límite del modelo.
+Como modelo de negocio, ASaaS convierte a Efeonce en una **plataforma de servicios de marketing y crecimiento habilitada por IA**: estrategia, creatividad, medios, datos y software propio trabajando como una sola operación. La visión de escala es un **Growth Operating System**. Esto es **global-ready** por diseño: el sistema puede localizar idioma, mercado, regulación y canales sin cambiar la tesis central. LATAM es el primer campo de prueba, no el límite del modelo.
 
 ### Las 6 características del modelo (cada una es una directriz de producto)
 

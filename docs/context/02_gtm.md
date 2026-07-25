@@ -4,7 +4,7 @@
 
 ## Posicionamiento
 
-**Categoría:** *Growth Operating System / ASaaS con ecosistema de producto propio.* **No** "agencia de marketing digital", "agencia integral", "AI agency" ni proveedor de servicios sueltos. La categoría se construye sobre tres conceptos propietarios:
+**Categoría de mercado:** *AI-enabled marketing and growth services platform.* En lenguaje comercial: **Integrated Growth Partner**. **ASaaS** describe el modelo de delivery y monetización; **Growth Operating System** describe la visión de largo plazo. No somos una "AI agency" ni un proveedor de servicios sueltos. "Agencia de marketing digital" se conserva como término de captura de demanda, no como categoría estratégica. La propuesta se construye sobre tres conceptos propietarios:
 
 - **Loop Marketing + IA** — el crecimiento es compuesto, no lineal. Cada ciclo construye sobre el anterior.
 - **ASaaS (Agency Service as a Software)** — el servicio de agencia empaquetado como producto de software. Tres plataformas, no informes.

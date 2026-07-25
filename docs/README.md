@@ -23,6 +23,13 @@ Indice maestro de la documentacion no operativa del repo.
 - Esta categoría define propuesta de valor, taxonomía comercial, arquitectura de ingresos, unidad económica,
   riesgos y validación. No reemplaza servicios, CPQ/Finance, propuestas ni contratos.
 
+### Strategy
+
+- [ASaaS Manifesto V1](strategy/ASAAS_MANIFESTO_V1.md)
+- [Efeonce Capital & Investment Strategy V1](strategy/EFEONCE_CAPITAL_AND_INVESTMENT_STRATEGY_V1.md)
+- La estrategia define la tesis de compañía, categoría, modelo ASaaS, portafolio, vehículos de capital y gates
+  de fundraising; no autoriza por sí sola emisiones, deuda, spinouts, transferencias de IP ni compromisos legales.
+
 ### Services
 
 - [Catálogo de servicios Efeonce](services/README.md)

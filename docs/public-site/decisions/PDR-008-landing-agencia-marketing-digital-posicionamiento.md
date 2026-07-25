@@ -11,8 +11,8 @@ Al escribir el copy quedó claro que el pitch de `/agencia` y el de la Home son 
 
 La revisión del Home público live contra el Why y PDR-012 confirma que el contenido histórico de este PDR no debe ejecutarse como página nueva ni como simple "copy paste" a la Home. Debe aplicarse como **rework integral del pitch**:
 
-- El Home actual ya contiene señales correctas (`ecosistema`, IA, creatividad, tecnología, resultados), pero todavía vende más una agencia creativa/digital competente que un **Growth Operating System / ASaaS**.
-- El primer viewport debe liderar con el reencuadre de categoría: no otra agencia de marketing digital; un sistema operativo de crecimiento con operación visible, software, datos y memoria.
+- El Home actual ya contiene señales correctas (`ecosistema`, IA, creatividad, tecnología, resultados), pero todavía vende más una agencia creativa/digital competente que un **Integrated Growth Partner** respaldado por plataforma y ASaaS.
+- El primer viewport debe liderar con el reencuadre de categoría: no otra agencia de marketing digital; un **Integrated Growth Partner** con operación visible, software, datos y memoria, que construye hacia un Growth Operating System.
 - El residuo de template/demo/theme en el Home live es blocker de confianza y debe eliminarse antes de declarar alineación con este PDR.
 - PDR-010 y PDR-012 mandan sobre cualquier texto de este documento que suene a landing separada `/agencia`.
 
@@ -48,10 +48,10 @@ Crear `/agencia` como **pillar comercial de categoría**: **posiciona** como *gr
 
 ### 1. Dos capas, una página (posicionamiento vs descubrimiento)
 
-- **Capa de posicionamiento** (hero, promesa, lo que Efeonce reclama ser): **growth partner con software propio y visibilidad total**. Claim canónico de apertura: *"El crecimiento real no se compra por partes. Se orquesta."* (`09`). Enemigo declarado: **la fragmentación** — una agencia hace la marca, otra los ads, otra el sitio, otra el CRM, y nadie conecta nada.
+- **Capa de posicionamiento** (hero, promesa, lo que Efeonce reclama ser): **Integrated Growth Partner con software propio y visibilidad total**. Claim canónico de apertura: *"El crecimiento real no se compra por partes. Se orquesta."* (`09`). Enemigo declarado: **la fragmentación** — una agencia hace la marca, otra los ads, otra el sitio, otra el CRM, y nadie conecta nada.
 - **Capa de descubrimiento** (slug `/agencia`, `<title>`, H1, meta, JSON-LD): target al cluster **"agencia de marketing digital" / "agencia de marketing"** (los ~2.400/mes reales), reencuadrado en la misma línea con la estructura *no-es-X-es-Y* (Do canónico de voz, `05:73`).
 - **Titular puente** (candidato, ya vivo como eyebrow del about-us): **"Agencia de crecimiento integrada"** — usa *agencia* (categoría familiar y buscable) + *de crecimiento* (growth partner) + *integrada* (anti-fragmentación). Es el reencuadre exacto: findable **y** desmarcado del commodity.
-- **Regla dura de copy:** el H1 puede contener "agencia de marketing digital" por SEO, pero el **remate de la misma sección** debe reencuadrar (*"No somos una agencia de marketing digital más. Somos tu partner de crecimiento — con software propio y visibilidad total."*). NUNCA dejar "somos una agencia digital" como promesa sin reencuadre.
+- **Regla dura de copy:** el H1 puede contener "agencia de marketing digital" por SEO, pero el **remate de la misma sección** debe reencuadrar (*"No somos una agencia de marketing digital más. Somos tu Integrated Growth Partner — con software propio y visibilidad total."*). NUNCA dejar "somos una agencia digital" como promesa sin reencuadre.
 
 ### 2. Full-service como sistema integrado (no lista de servicios sueltos)
 

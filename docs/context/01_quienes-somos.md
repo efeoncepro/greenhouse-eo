@@ -2,7 +2,7 @@
 
 ## Qué es Efeonce Group
 
-**Efeonce Group es un Growth Operating System**: un ecosistema integrado de cuatro unidades especialistas que opera bajo un mismo estándar de gobernanza, metodología y medición, respaldado por tres plataformas de software propietario. Cubre el journey completo —de estrategia a ejecución y escala— como arquitectura modular: cada unidad tiene expertise profundo y todas comparten datos, talento y lógica operativa común.
+**Efeonce Group es una plataforma de servicios de marketing y crecimiento habilitada por IA**, operada como un ecosistema integrado de cuatro unidades especialistas bajo un mismo estándar de gobernanza, metodología y medición, respaldado por plataformas de software propietario. Cubre el journey completo —de estrategia a ejecución y escala— como arquitectura modular: cada unidad tiene expertise profundo y todas comparten datos, talento y lógica operativa común. Su visión es convertirse en un **Growth Operating System**.
 
 La razón de existir: una marca no debería coordinar 3–5 proveedores inconexos para estrategia, creatividad, medios, tecnología y medición. Efeonce elimina esa fragmentación. **Un solo interlocutor (Director de Cuenta), cuatro capacidades, sin pérdida de contexto entre equipos.**
 
@@ -10,7 +10,7 @@ Operación legal: Efeonce Group SpA. Presencia: **Chile, Colombia, México, Per�
 
 > Para un agente de Greenhouse: "quiénes somos" se traduce en producto como **multi-tenant + multi-unidad + multi-país + multi-moneda**. El portal modela una agencia que corre como sistema, no como silos.
 
-Ambición de escala: **LATAM-first, no LATAM-limited**. La presencia regional prueba ejecución multi-país, cercanía cultural y capacidad operativa; no define el techo. Efeonce debe poder atender diversos mercados y crecer hacia el mundo desde la misma tesis: **Growth Operating System / ASaaS**.
+Ambición de escala: **LATAM-first, no LATAM-limited**. La presencia regional prueba ejecución multi-país, cercanía cultural y capacidad operativa; no define el techo. Efeonce debe poder atender diversos mercados y crecer hacia el mundo desde la misma tesis: plataforma habilitada por tecnología e IA, modelo **ASaaS** y visión **Growth Operating System**.
 
 ---
 

@@ -78,11 +78,11 @@ El diferenciador defendible no es decir "co-creamos", "somos partner" ni "somos 
 - **Memoria:** cada ciclo deja historial, aprendizaje y contexto reutilizable.
 - **Capacidad:** el cliente entiende más, decide mejor y entrega mejores briefs.
 
-La categoría aspiracional se expresa como **Growth Operating System** y **ASaaS (Agency Service as a Software)**. La frase interna de posicionamiento:
+La categoría de mercado se expresa como **AI-enabled marketing and growth services platform**. En conversación comercial: **Integrated Growth Partner**. **ASaaS (Agency Service as a Software)** es el modelo de delivery y monetización; **Growth Operating System** es la visión aspiracional. La frase interna de posicionamiento:
 
-> **Efeonce no es una agencia que ejecuta piezas. Es un sistema operativo de crecimiento: estrategia, creatividad, medios, datos y software propio trabajando como una sola operación.**
+> **Efeonce es una plataforma de servicios de marketing y crecimiento habilitada por IA: estrategia, creatividad, medios, datos y software propio trabajando como una sola operación. Estamos construyendo un Growth Operating System.**
 
-En inglés, usar transcreación, no traducción literal: **Efeonce is a Growth Operating System for ambitious brands: strategy, creative, media, data and proprietary software working as one system.**
+En inglés, usar transcreación, no traducción literal: **Efeonce is an AI-enabled marketing and growth services platform for ambitious brands — an integrated growth partner building toward a Growth Operating System.**
 
 Regla para posicionamiento global: vender el **sistema** antes que el origen regional. "LATAM" puede aparecer como prueba de ejecución multi-mercado, cercanía cultural, velocidad y eficiencia, pero nunca como límite de ambición ni como sustituto del mecanismo.
 
@@ -148,7 +148,7 @@ Las 4 capas verbales (en secuencia natural de conversación):
 
 ## Posicionamiento
 
-- **Categoría:** Growth partner con sistema operativo propio y ecosistema de producto. **No** "agencia de marketing digital" (commodity).
+- **Categoría comercial:** Integrated Growth Partner con plataforma y ecosistema de producto propio. **No** "agencia de marketing digital" como identidad estratégica (aunque puede ser keyword de captura).
 - **Promesa central:** crecimiento orquestado — creatividad, medios y tecnología como un solo sistema con visibilidad total.
 - **Enemigo:** la fragmentación. Una agencia hace la marca, otra los ads, otra el sitio, otra el CRM, y nadie conecta nada.
 - **Proof points:** metodología propietaria (sistema estratégico + operativo) · 120+ empresas en 4 países · 80% de renovación · HubSpot Solutions Partner · visibilidad en tiempo real (dashboards vivos, no informes) · **tres plataformas de software propietario (Greenhouse, Kortex, Verk) — modelo ASaaS único en LATAM.**

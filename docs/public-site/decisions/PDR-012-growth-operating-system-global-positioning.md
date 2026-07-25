@@ -1,4 +1,4 @@
-# PDR-012 — Growth Operating System como posicionamiento global
+# PDR-012 — Jerarquía de posicionamiento global: plataforma, partner, ASaaS y Growth OS
 
 Estado: **Accepted**  
 Fecha: 2026-07-09  
@@ -15,15 +15,15 @@ El mercado tambien se mueve hacia este problema: agencias presionadas por IA/pla
 
 ## Decision
 
-Efeonce se posiciona como **Growth Operating System** y modelo **ASaaS (Agency Service as a Software)**, no como agencia integral, agencia digital, AI agency ni proveedor de servicios sueltos.
+Efeonce se posiciona en cuatro capas: **AI-enabled marketing and growth services platform** como categoría de compañía; **Integrated Growth Partner** como lenguaje comercial; **ASaaS (Agency Service as a Software)** como modelo de delivery y monetización; y **Growth Operating System** como visión de largo plazo. No somos una AI agency ni un proveedor de servicios sueltos. "Agencia de marketing digital" puede usarse como término de captura SEO, no como categoría estratégica.
 
 La formulacion base:
 
-> **Efeonce es un sistema operativo de crecimiento: estrategia, creatividad, medios, datos y software propio trabajando como una sola operacion.**
+> **Efeonce es una plataforma de servicios de marketing y crecimiento habilitada por IA: estrategia, creatividad, medios, datos y software propio trabajando como una sola operación.**
 
 Transcreacion inglesa para superficies globales:
 
-> **Efeonce is a Growth Operating System for ambitious brands: strategy, creative, media, data and proprietary software working as one system.**
+> **Efeonce is an AI-enabled marketing and growth services platform for ambitious brands — an integrated growth partner building toward a Growth Operating System.**
 
 La tesis de diferenciacion:
 
@@ -35,17 +35,17 @@ LATAM es punto de partida y prueba de ejecucion multi-pais, no techo de la marca
 
 La Home es la superficie donde este posicionamiento se prueba primero. Debe responder en el primer recorrido:
 
-1. **Que es Efeonce:** un Growth Operating System / modelo ASaaS, no una agencia que vende piezas por separado.
+1. **Qué es Efeonce:** una plataforma de servicios de marketing y crecimiento habilitada por IA, expresada comercialmente como un Integrated Growth Partner; opera bajo ASaaS y construye hacia un Growth Operating System.
 2. **Que problema resuelve:** la fragmentacion entre estrategia, creatividad, medios, datos, CRM/web y aprendizaje.
 3. **Como lo hace real:** operacion integrada + software propio + datos + metodo + memoria acumulada.
 4. **Por que creer:** casos citables, resultados verificables, `120+` empresas, `80%` renovacion, presencia multi-pais, HubSpot/Kortex/Greenhouse/Verk solo cuando el contexto lo justifique como prueba.
 5. **Que hago despues:** agenda una reunion, toma un diagnostico/Grader o entra a una spoke de servicio.
 
-La Home no debe sonar a manifiesto abstracto ni a catalogo de servicios. El arco correcto es:
+La Home no debe sonar a manifiesto abstracto ni a catálogo de servicios. El arco correcto es:
 
 ```text
 No somos otra agencia de marketing digital.
-Somos el sistema donde estrategia, creatividad, medios, datos y software trabajan como una sola operacion.
+Somos el partner integrado donde estrategia, creatividad, medios, datos y software trabajan como una sola operación.
 Por eso el crecimiento se construye contigo, se ve en vivo y se acumula ciclo a ciclo.
 ```
 
@@ -65,14 +65,14 @@ El Why puede aparecer como tension o remate, pero no debe quedar solo. Siempre d
 
 - **Agencia integral / 360:** demasiado commodity; contradice la disciplina anti-humo del Why.
 - **AI agency:** captura moda pero reduce el sistema a una herramienta.
-- **Growth partner:** util como lenguaje comercial, insuficiente como categoria defendible.
+- **Growth partner:** útil como lenguaje comercial; ahora se precisa como **Integrated Growth Partner**, insuficiente por sí solo como categoría de compañía.
 - **LATAM agency:** aprovecha origen, pero limita la ambicion global.
 
 ## Consecuencias
 
 - `docs/context/09_marca-agencia.md` sigue siendo el SSOT del Why; este PDR fija como se baja al sitio publico y a la ambicion global.
 - La Home y futuras superficies de categoria deben abrir desde el sistema, no desde un catalogo de servicios.
-- La auditoria del Home live 2026-07-09 queda como señal de ejecucion: hoy hay alineacion parcial, pero el sitio todavia comunica "agencia creativa/digital competente" mas que "Growth Operating System". El rework debe corregir eso antes de optimizaciones visuales.
+- La auditoria del Home live 2026-07-09 queda como señal de ejecucion: hoy hay alineacion parcial, pero el sitio todavia comunica "agencia creativa/digital competente" más que "Integrated Growth Partner" respaldado por plataforma. El rework debe corregir eso antes de optimizaciones visuales.
 - Las landings de servicio deben probar una parte del sistema, no presentarse como unidades aisladas.
 - El roadmap publico debe preparar arquitectura `hreflang` y transcreacion para expansion pan-hispana, US Hispanic, en-US y otros mercados.
 

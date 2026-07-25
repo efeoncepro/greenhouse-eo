@@ -89,7 +89,7 @@ Senales de drift:
 
 ### 5. Operamos como un sistema, no como silos
 
-Efeonce compite como Growth Operating System. Estrategia, creatividad, medios, datos y software deben trabajar como una sola operacion.
+Efeonce compite como una plataforma de servicios de marketing y crecimiento habilitada por tecnología e IA, con visión de Growth Operating System. Estrategia, creatividad, medios, datos y software deben trabajar como una sola operación.
 
 Comportamientos esperados:
 
@@ -154,7 +154,7 @@ Senales de alerta:
 Toda persona nueva debe entender que Efeonce no es una fabrica de entregables. El onboarding debe cubrir:
 
 1. Why + Operating Code.
-2. Growth Operating System / ASaaS.
+2. Plataforma de servicios de marketing y crecimiento habilitada por IA; ASaaS como modelo y Growth Operating System como visión.
 3. Greenhouse, Kortex y Verk como prueba del sistema.
 4. Loop Marketing + ICO como metodo.
 5. Revenue Enabled como criterio de impacto.
