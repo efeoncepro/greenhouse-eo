@@ -303,6 +303,36 @@ Lifecycle/retention de storage y capacidad/identidad del worker de export.
 - [ ] Export es recuperable e íntegro; trash/restore/purge respetan authorization y retention.
 - [ ] `TASK-1498` proyecta el estado sin duplicar writes; no se duplicó serving, tenancy ni ledger.
 
+### Criterios de la unión con el FEED — migrados del discovery 2026-07-25
+
+La sinergia con el feed ya está en el Summary de esta task ("proyectables en el feed canónico"); estos criterios
+la vuelven verificable en vez de aspiracional.
+
+- [ ] **El agrupamiento por serie en el feed lee `output.containerIds` del propio item**, no un reader aparte. Es
+      el join y ya viaja en el contrato: un segundo camino para saber a qué serie pertenece una pieza es un
+      segundo camino que puede discrepar.
+- [ ] `container.list` acepta `kind` y el feed pide **`series`** para agrupar y **`collection`** para mover. Un
+      solo listado sin `kind` mezcla dos vocabularios que el contrato separó.
+- [ ] El control **"Serie" del feed deja de estar deshabilitado** cuando esta task entrega `container.list`. Hoy
+      muestra `pendingSeries` — *"la serie ya existe como dato en cada pieza"* — y esa razón tiene que dejar de
+      ser verdad, no cambiarse de texto.
+- [ ] **Mover una pieza a una colección se hace desde el feed**, no sólo desde una vista de biblioteca: es donde
+      el operador está mirando la pieza. La acción vive en la card.
+- [ ] La idempotencia de una anotación va **en SQL** (`ON CONFLICT DO NOTHING` + re-lectura), nunca read-then-write:
+      con `maxScale=3` un chequear-y-después-insertar es una carrera cuyo síntoma visible es un `referenceId`
+      duplicado o una estrella re-fechada.
+- [ ] Un `favorite` toma el **estado deseado explícito**, nunca un toggle ciego: sobre una vista stale, un toggle
+      invierte justo lo que el usuario quiso.
+- [ ] Las **6 capabilities de `surface: 'library'`** del inventario de paridad
+      (`apps/studio-client/src/data/legacy-parity.ts`) se despachan de verdad — el test de paridad pasa con ellas.
+      `TASK-1560` (retiro del legacy) **las necesita cubiertas**.
+- [ ] ⚠️ `library.bulk.prepare`, `library.bulk.execute` y `library.export.request` se construyen como **trabajo
+      nuevo**, no como port: en el legacy están **gateadas y nunca despachadas** (el botón existe, se ilumina con
+      grant, y no llama a nada). Están declaradas con su motivo en `LEGACY_PARITY_EXCLUSIONS`. El contrato
+      (`PrepareLibraryBulkPayloadV1`) **sí** existe.
+- [ ] Cross-workspace y contenedor desconocido son el **MISMO `not_found`**: cualquier respuesta más fina es un
+      oráculo para sondear los contenedores de otro tenant.
+
 ## Verification
 
 - `pnpm task:lint --task TASK-1520`

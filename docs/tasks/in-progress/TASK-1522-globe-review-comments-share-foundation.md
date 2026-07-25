@@ -224,6 +224,32 @@ comentarios auditables y grants share read-only revocables/expirables, sin habil
 - [x] Commands/readers are transport-neutral, audited and covered by the canonical surface matrix.
 - [x] `pnpm check` and `pnpm build` pass in Globe; rollout state remains honest.
 
+### Criterios de las MENCIONES — migrados de TASK-1563 (retirada)
+
+- [ ] Una mención es **dato estructurado validado contra el roster real** del workspace, **nunca** parseo de `@`
+      sobre el body: un parseo acepta cualquier string y convierte un typo en una mención a nadie.
+- [ ] 🔴 **Mencionar NUNCA concede acceso.** Es la regla load-bearing: si mencionar diera visibilidad, el hilo de
+      comentarios sería un canal para filtrar piezas a cualquiera cuyo nombre alguien pueda escribir.
+- [ ] Existe un **directorio mencionable con nombre**. Globe conoce `identitySubject`, **no** nombres — la
+      primitive falta y es la mitad del trabajo real.
+- [ ] Existe un **canal de notificación**. Hoy no existe ninguno general en Globe; mencionar sin notificar es una
+      anotación, no una mención.
+- [ ] ⚠️ El directorio mencionable es **UNA** primitive compartida con `TASK-1544` (menciones de Storyboard), no
+      dos. Dos directorios del mismo roster divergen, y el que derive es el que menciona a alguien que ya no está.
+- [ ] Un `identitySubject` desconocido o cross-workspace es el **MISMO `not_found`** que uno inexistente: si no,
+      el resolver de menciones es un oráculo para enumerar el roster de otro tenant id por id.
+
+### Criterios del SHARE ya LIVE — migrados de TASK-1562
+
+- [x] `resolveForShare` entrega `modelLabel`, `reviewStatus` y `comments` — antes devolvía sólo
+      `{ target, mediaType }` y los descartaba **en silencio en todos los shares**: el grant los pedía, el dominio
+      los proyectaba, el operador podía crearlos, y la autoridad nunca los entregaba.
+- [x] El **nombre público** del modelo se resuelve desde el catálogo, y el `routeId`/slug **nunca** viaja al share.
+- [x] Los comentarios visibles pasan por el filtro del dominio (`shareVisibleComments`), con su tope.
+- [ ] `globe.producer.review.share.create` **existe** y está en el inventario de paridad: el control "Compartir
+      board" del feed deja de estar deshabilitado cuando esta task entregue la superficie que lo consume. Hoy
+      muestra `pendingShare`, y esa razón tiene que dejar de ser verdad, no cambiarse de texto.
+
 ## Verification
 
 - `pnpm task:lint --task TASK-1522`
