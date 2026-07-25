@@ -17,11 +17,15 @@ así que **ningún cliente puede obtener sesión**. La **única** superficie cli
 | `public-share-ui.ts` son **15 líneas**, con 3.071 caracteres de CSS en **una sola línea** | Ilegible, no editable, no linteable |
 | Sus tokens de marca están **re-tipeados a mano y ya driftearon** (`--surface` `.62` vs `.5`; `--line` `.18` vs `.12`) | La cara del cliente no coincide con la marca del producto |
 | Se auto-rotula **`Producer`** | El cliente ve el nombre de una superficie interna |
-| El footer apunta a `/legal/terms`, ruta inexistente → devuelve **JSON crudo** al browser | Fuga de error técnico a un externo |
+| **No tiene footer**: cero atribución, cero link legal, cero referencia de soporte (verificado: 0 `<footer>`, 0 `<a>`) | La cara comercial termina en el aire. El `/legal/terms` roto está en `producer-ui.ts:82`, no acá |
+| Renderiza **valores crudos**: `changes_requested` y `2026-08-01T18:00:00.000Z` van directo a `dd.textContent` | El cliente lee identificadores internos y un ISO 8601 |
+| Si los bytes fallan, el `.catch(fail)` **tira también los hechos y comentarios** | Es el "preview roto genérico" que ADR-005 prohíbe |
 | **Cero** canary visual | Cualquier regresión pasa sin ser vista |
 
 ## Visual Direction Contract
 
+- Visual direction mode: repo-native-benchmark
+- Product Design asset: docs/ui/visual-directions/TASK-1558-globe-share-board-direction.md
 - **Source duradero:** ✅ [`../visual-directions/TASK-1558-globe-share-board-direction.md`](../visual-directions/TASK-1558-globe-share-board-direction.md)
   (2026-07-25). Tres direcciones renderizadas con los valores reales del SSOT y las fuentes reales de Globe,
   mirada cada una a `1440×1000` y `390×844`; elegida **B "Lámina montada"** (passepartout + riel de líneas).
@@ -32,7 +36,7 @@ así que **ningún cliente puede obtener sesión**. La **única** superficie cli
 - **Targets:** desktop `1440×1000` · mobile `390×844`.
 - **Action hierarchy:** el activo es el héroe; la identidad de Efeonce/Globe es marco, no protagonista;
   los comentarios son lectura secundaria; **no hay acciones de escritura** (el grant es read-only). La
-  única acción de toda la superficie es **Reintentar**, y sólo existe en `dependency_unavailable`.
+  única acción de toda la superficie es **Reintentar**, y sólo existe en `partial` y `error`.
 - **Decisión dominante:** el **margen** alrededor de la pieza (`contain`, nunca `cover`; sin viñeta ni
   tinte). Una superficie de revisión no puede recortar ni alterar el color del artefacto que se revisa.
 
@@ -169,6 +173,151 @@ de contenido legal con su propio dueño, y un enlace de revisión read-only no e
 aceptación de términos. Se retira además la línea de `producer-ui.ts` (una línea, cero riesgo) porque es
 una fuga viva de JSON a un browser y ADR-014 lo prohíbe explícitamente.
 
+## Desktop Target
+
+`1440×1000`. Grid de dos columnas: `minmax(0,1fr)` (stage) + `minmax(20rem,24rem)` (riel).
+
+| Región | Alto/ancho | Composición |
+|---|---|---|
+| Topbar (sticky) | `~3.6rem` × full | isotipo Globe 26px + wordmark Poppins `1rem` + eyebrow "Revisión compartida"; a la derecha el chip "Sólo lectura" con punto `--action` |
+| Stage | `1fr` × `1fr` | `place-items:center`, padding `clamp(1.25rem,2.6vw,2.5rem)`, halo radial `--action` 9%. La pieza: `max-height: calc(100svh - 8.5rem)`, **`object-fit: contain`**, `--radius-sm`, sombra + hairline |
+| Riel | `1fr` × `20-24rem` | `border-left: 1px --line`, **sin fondo propio**. Eyebrow → h1 Poppins `1.55rem/1.2` → lede `.85rem/1.6` `max-width:34ch` → hechos separados por líneas → comentarios con barra `--line-strong` 2px |
+| Footer | `~3.4rem` × full | `border-top`, atribución Efeonce + alcance del enlace + link de privacidad |
+
+**Una sola sombra en toda la página** (la de la lámina) y **una sola superficie `contained`**. El riel se
+separa con una línea, no con una card: ése es el presupuesto de chrome del fold.
+
+## Mobile Target
+
+`390×844`. Transformación real vía `@media (max-width: 60rem)`, no compresión.
+
+| Región | Transformación |
+|---|---|
+| Topbar | igual, padding lateral reducido |
+| Stage | **primero**, a sangre: `width:100%`, `border-radius:0`, **`max-height: 62svh`**, `contain` |
+| Riel | debajo, `border-top` en vez de `border-left`, padding `1.5rem clamp(1.1rem,4vw,1.5rem) 1.75rem`; h1 baja a `1.4rem` |
+| Footer | apilado, wrap permitido |
+
+El **techo de `62svh`** es la decisión que hace la transformación honesta: sin él la pieza ocupa el
+viewport entero y el riel queda detrás de un scroll que el cliente no sabe que existe. Con él, el título y
+el primer hecho entran en el fold. `scrollWidth <= clientWidth` verificado a `390` **y a `320`**.
+
+## Action Hierarchy
+
+La superficie es **read-only**: el grant no concede escritura, descarga ni acceso al espacio.
+
+| Nivel | Elemento | Presencia |
+|---|---|---|
+| Primaria | **Reintentar** | **Sólo** en `partial` y `error`. Es la única acción de toda la superficie |
+| Secundaria | link de privacidad (externo) | Footer, siempre |
+| Cero | comentarios, hechos, la pieza | **Contenido, no controles.** No son focusables ni clickeables |
+
+**Anti-patrón bloqueante:** Reintentar visible en un estado no retryable. `denied` no ofrece reintentar
+porque reintentar no arregla un enlace vencido — ofrece pedir uno nuevo, que es texto, no botón.
+
+## Visual Fidelity Mapping
+
+La dirección es intención; acá se convierte en token. Detalle completo en
+[`../visual-directions/TASK-1558-globe-share-board-direction.md`](../visual-directions/TASK-1558-globe-share-board-direction.md) §Token mapping.
+
+| Cue de la dirección | Token del SSOT | Nota |
+|---|---|---|
+| Fondo de página | `--canvas` + los dos radiales de `producer-ui.ts` | continuidad con el producto |
+| Separadores (riel, filas de hechos, bordes de chrome) | `--line` | **adopta el canónico `.12`; hoy esta superficie tiene `.18`** |
+| Barra de comentario, borde del chip | `--line-strong` | |
+| Texto primario/secundario/terciario | `--text` / `--muted` / `--faint` | ramp, nunca opacidad arbitraria |
+| Acento (foco, punto del chip) | `--action` | **hoy esta superficie lo llama `--blue`** |
+| Punto de estado de revisión | `--warning` / `--success` | **siempre con label**; color nunca solo |
+| Anillo de foco | `--focus` | ya canónico acá |
+| Radios | `--radius-sm`, `999px` para el chip | |
+| Sombra de la lámina | `--shadow` reforzada | única de la página |
+| Fade del stage | `--duration-short` + `--ease-enter` | |
+| Display / body | **`--font-display` / `--font-body` 🆕** | **no existen en el SSOT**; nacen acá |
+
+**Cero HEX, cero duración literal, cero `fontFamily` literal en la superficie.** El SSOT es el único lugar
+con valores. La superficie del riel **no usa `--surface`**: en esta dirección el riel no tiene fondo.
+
+## Copy Ledger
+
+Cada string visible sale de `copyFor().share` en `apps/studio-client/src/copy/index.ts`. **Cero literales
+en JSX ni en `aria-label`/`title`/`alt`.** Registro impersonal; `puedes` si el trato es inevitable (nunca `podés`).
+
+| Clave | Texto es-CL | Dónde |
+|---|---|---|
+| `documentTitle` | Globe · Revisión compartida | `<title>` |
+| `brandTagline` | Revisión compartida | eyebrow del topbar |
+| `readOnlyBadge` | Sólo lectura | chip del topbar |
+| `readOnlyBadgeHint` | Este enlace no permite editar, descargar ni entrar al espacio de trabajo. | `title` del chip |
+| `eyebrow` | Pieza compartida | eyebrow del riel |
+| `headingFallback` | Resultado creativo | h1 cuando la pieza no trae título |
+| `lede` | El equipo de Efeonce compartió esta pieza para que la revises. No permite editarla ni descargarla. | lede del riel |
+| `factModel` | Modelo | `<dt>` |
+| `factRevision` | Revisión | `<dt>` |
+| `factExpires` | Vence | `<dt>` |
+| `revisionApproved` | Aprobado | valor de `reviewStatus` |
+| `revisionChangesRequested` | Con cambios pedidos | valor de `reviewStatus` |
+| `revisionPending` | Sin revisión todavía | `reviewStatus` ausente |
+| `factUnavailable` | Sin dato | hecho que el grant no proyecta — **nunca `—` a secas ni `0`** |
+| `commentsHeading` | Comentarios del equipo | encabezado |
+| `commentsEmpty` | Todavía no hay comentarios en esta revisión. | empty state, **sin CTA** |
+| `mediaAlt` | Pieza creativa compartida para revisión | `alt` de la imagen |
+| `stageLoading` | Cargando la pieza… | `aria-label` del skeleton |
+| `retry` | Reintentar | único botón |
+| `footerScope` | Este enlace es de sólo lectura y vence el {fecha}. | footer |
+| `footerPrivacy` | Privacidad | link externo |
+| `footerBrandAlt` | Efeonce | `alt` del wordmark |
+
+Estados en §State Copy. **`Producer` no aparece en ninguna clave.**
+
+## State Copy
+
+Dos slots de datos, cada uno con su estado — es composición de degradación honesta, no un enum plano:
+`board` (desde `/v1/shares/resolve`) y `media` (bytes desde `/v1/shares/:id/media`).
+
+| Estado | Disparador real | Copy visible | Recuperación | ARIA |
+|---|---|---|---|---|
+| `loading` | primer fetch | "Cargando la pieza…" + skeleton dimensionado al stage y placeholders del riel | ninguna; **nunca spinner de página** | `aria-busy="true"` + `role="status"` en el stage |
+| `ready` | `board` 200 + `media` 200 | pieza + título + hechos + comentarios | — | — |
+| `empty` | `board` 200, `comments.length === 0` | "Todavía no hay comentarios en esta revisión." | **sin CTA** — no puede escribir, y prometer una acción inexistente sería peor que el vacío | — |
+| `partial` | **`board` 200 pero `media` falla** | riel completo y legible + en el stage: "No pudimos cargar la pieza" + **Reintentar** | Reintentar **sólo los bytes**; los hechos y comentarios ya leídos **no se pierden** | `role="status"` en el bloque del stage; el riel queda intacto |
+| `error` | `board` **503** `dependency_unavailable` | "No pudimos cargar esta revisión. Vuelve a intentar en unos minutos." + **Reintentar** | Reintentar; el foco vuelve al botón | `role="status"` |
+| `denied` | `board` **404** (colapsado) **o** sin token en el fragment | 404: "Este enlace ya no está disponible." + "Pídele un enlace nuevo a la persona que te lo compartió." · sin token: "El enlace está incompleto." + la misma indicación | **ninguna** — no hay Reintentar: reintentar no revive un enlace vencido | `role="alert"` |
+
+**`partial` es el estado que hoy no existe y es el que ADR-005 pide de verdad.** Hoy, si los bytes fallan,
+el `.catch(fail)` tira **todo** —hechos y comentarios incluidos— y pinta el mensaje genérico: eso *es* el
+"preview roto genérico" que la regla prohíbe. Con `partial`, lo que se pudo leer se muestra, y lo que falló
+se declara en su propio slot con su propia recuperación.
+
+**`denied` no enumera.** Vencido, revocado, firmado mal, de otro target y no-encontrado comparten copy a
+propósito: el 404 del BFF es no enumerable y la UI no lo desarma.
+
+## Accessibility Contract
+
+Target: **WCAG 2.2 AA**. Superficie sin sesión, un solo control, contenido de lectura.
+
+| Contrato | Decisión |
+|---|---|
+| Landmarks | `<header>` · `<main>` · `<aside>` (riel) · `<footer>`. `<h1>` único: el título de la pieza |
+| Orden de foco | topbar → (Reintentar si existe) → link de privacidad. **3 tab-stops como máximo** |
+| **Los comentarios NO son focusables** | Son contenido: se leen, no se operan. Un `tabindex="0"` sobre contenido convierte 3 stops en 10 y no agrega función |
+| Anillo de foco | `outline: .16rem solid var(--focus)`, `outline-offset: .16rem`. **`outline`, no `box-shadow`** (sobrevive `forced-colors`). ≥3:1 contra el canvas **y** contra el fondo del control. **Nunca `outline: transparent`** como reserva de espacio |
+| Nombre accesible | el botón dice "Reintentar" (visible, no `aria-label`). La imagen lleva `alt` desde `mediaAlt`. El isotipo es decorativo: `alt=""` |
+| `aria-busy` | `true` en el stage mientras carga; se **retira** al resolver |
+| `role="alert"` | los dos casos de `denied`: el cliente tiene que reaccionar (pedir otro enlace) |
+| `role="status"` | `loading`, `partial`, `error`: informativo, y la acción ya está en pantalla |
+| Foco tras reintento | vuelve al botón Reintentar. Si el reintento tiene éxito el botón desaparece → el foco se mueve **antes** al `<h1>` del riel (`tabindex="-1"`), nunca al `<body>` |
+| Contraste | texto ≥4,5:1 sobre el fondo **renderizado** (incluye los radiales); `--faint` sólo en eyebrows ≥600 de peso, verificado, nunca en texto corrido |
+| Estado por color | el punto de revisión **siempre** acompañado del label. Ningún estado se comunica sólo con color |
+| Reduced motion | sin fade del stage; el skeleton no pulsa. El significado final es idéntico |
+| Target size | el botón ≥44×44; el link del footer ≥24×24 con padding |
+| Reflow | usable a **320px** con zoom 200% y los overrides de 1.4.12 (line-height 1.5, letter .12em, word .16em) |
+| `forced-colors` | el anillo sobrevive; la pieza no depende de background-image para su affordance |
+| Idioma | `<html lang="es">` |
+
+**Verificación:** `axe-core` limpio + recorrido de teclado real + captura con
+`prefers-reduced-motion: reduce` + medición de `scrollWidth` **en los paneles, no sólo en el documento**
+(un contenedor con `overflow-y:auto` fuerza `overflow-x:auto` y el desborde scrollea adentro).
+
 ## Implementation Mapping
 
 - **Route / surface:** `GET /shares/:shareId` (sin sesión) → `renderShell()` de `apps/studio-web/src/shell.ts` + la superficie montada en `#globe-root`.
@@ -204,7 +353,7 @@ una fuga viva de JSON a un browser y ADR-014 lo prohíbe explícitamente.
 - **Scenario file:** `apps/studio-client/scenarios/share-board.fixture.mjs` 🆕 (espeja `scripts/producer-gvc-fixture.mjs`).
 - **Route:** `/shares/:shareId` con un share grant de prueba emitido por el flujo real.
 - **Viewports:** `1440×1000` y `390×844`.
-- **Quality profile:** `premium` (rigor `ui-standard`).
+- Quality profile: premium (rigor `ui-standard`).
 - **Required steps:** token válido · **sin token en el fragment** (`link_incomplete`) · 404 (`unavailable`) ·
   503 inyectado (`degraded`) · sin comentarios.
 - **Required captures:** first fold desktop · first fold mobile · `link_incomplete` · `unavailable` ·
@@ -237,9 +386,14 @@ una fuga viva de JSON a un browser y ADR-014 lo prohíbe explícitamente.
   del seam, mínimo blast radius, y arregla una fuga real de calidad hacia el cliente.
 - **Reuse / extend / new primitive:** `new` — nacen las primeras primitives de Globe. Es deliberado y es el
   entregable de plataforma de esta task.
-- **Open risks:** (1) la dirección visual del share board no existe → Discovery la produce, `UI ready: no` hasta
-  entonces; (2) compatibilidad `react-router@8.3.0` sobre Vite 8 sin confirmar → compuerta del seam;
-  (3) semántica CJS estricta de Rolldown → el smoke de producción es obligatorio, CI no la atrapa.
+- **Open risks:** (1) ~~dirección visual inexistente~~ **resuelta** 2026-07-25 (dirección B, doc durable);
+  (2) ~~compat `react-router@8.3.0` sobre Vite 8~~ **resuelta** — compuerta (a) verde en `TASK-1556`;
+  (3) semántica CJS estricta de Rolldown → el smoke de producción es obligatorio, CI no la atrapa;
+  (4) el gate de diseño no cubre tipografía ni `.css` → los estilos nacen en TS y los tokens de fuente
+  suben al SSOT en el mismo slice.
+- **Delta de estados 2026-07-25:** los cuatro códigos de error NO son distinguibles desde el cliente porque
+  el BFF los colapsa a un 404 no enumerable a propósito. La unión discriminada real tiene 5 miembros; ver
+  §Estados. La regla de ADR-005 que pedía lo contrario gobierna el feed del Producer, no el share público.
 
 ## Visual verification
 

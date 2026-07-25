@@ -39,7 +39,16 @@
   desplegar. Qué debe preservar el port y por qué hay que portar desde `45235cc`: `TASK-1555` § "Contrato de
   port al payload cliente". **`TASK-1557` toca `public/models/**`**, creado por `TASK-1555` con su README de
   licencias.
+- **`TASK-1558` (ADR-014 Slice 1) — share board reconstruido: code complete, rollout pendiente.**
+  `efeonce-globe` `a336ff5`. Falta el flip de `client_app_enabled` (`terraform apply` + grant real) y el retiro
+  de `public-share-ui.ts`: rollout, no código. **Dos recalibraciones antes de citar la spec vieja:** los 4
+  códigos de error **no** son distinguibles (404 no enumerable, `app.ts:4143`; la unión real tiene 5 miembros y
+  el que importa es `partial`), y el `/legal/terms` roto estaba en `producer-ui.ts:82`. Canary:
+  `scripts/frontend/globe-share-board-canary.mjs`. Detalle: changelog 2026-07-25 + la task.
 - Trabajo local concurrente: coordinar ownership antes de tocar archivos ya modificados.
+  **`TASK-1558` ↔ `TASK-1561`:** las reglas de tipografía del gate nacieron en `TASK-1558` y `TASK-1561`
+  documentó su mordida en el runbook; el runbook lo editaron las dos sesiones. No duplicar la tabla de
+  mordidas.
 - **Globe Producer internal-only:** el camino humano ya generó y recuperó Image/Video/Audio reales en tres rutas
   promovidas; feed/viewer y Asset Governance funcionan. El catálogo tiene 10 rutas: las otras 7 requieren
   promoción exacta. Reauth/viewer están desplegados; `TASK-1551` posee el avatar canónico Greenhouse→Globe por

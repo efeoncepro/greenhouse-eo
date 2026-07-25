@@ -25,3 +25,4 @@ does not satisfy this contract.
 
 - [Greenhouse Secondary — Tidal Teal](./GREENHOUSE-secondary-tidal-teal-direction.md) — rol secondary de marca, mapping light/dark, límites semánticos y firma de aceptación.
 - [TASK-1453 — Premium UI Platform](./TASK-1453-premium-ui-platform-direction.md) — dirección transversal para surfaces premium y recipes.
+- [TASK-1558 — Globe Share Board](./TASK-1558-globe-share-board-direction.md) — la única superficie client-facing de Globe: lámina montada (passepartout) + riel de líneas, sobre el SSOT de tokens de Globe (NO AXIS/MUI de Greenhouse).

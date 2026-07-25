@@ -7,16 +7,24 @@
 > **No aplica** al payload legacy (`producer-ui.ts`, `public-share-ui.ts`, `ui.ts`): son templates de
 > string y por eso mismo no se pueden lintear — es la razón por la que ADR-014 existe.
 
-## Los seis gates y qué atrapa cada uno
+## Los ocho gates y qué atrapa cada uno
 
 | Gate | Atrapa | Dónde vive |
 |---|---|---|
 | Color literal | `#hex`, `rgb()`, `hsl()`, `oklch()` fuera del SSOT | `src/gates/design-contract.test.ts` |
 | Motion literal | duraciones y `cubic-bezier()` fuera del SSOT | idem |
 | Copy literal | texto en JSX y en `aria-label`/`title`/`placeholder`/`alt` | idem |
+| Tipografía literal | `font-family`/`font-size`/`font-weight`/`line-height`/`letter-spacing` y el shorthand `font:` con valor que no sea `var(--token)` | idem (`TASK-1558`/`TASK-1561`) |
+| Peso sin cut cargado | un token `--weight-*` sin `@font-face` — o sea **faux bold**, que renderiza, shippea y pasa todos los demás gates | idem (`TASK-1558`) |
 | a11y | ARIA inválido, controles sin etiqueta, `onClick` sin teclado | `eslint.config.js` (`jsx-a11y`) |
 | Rules of React | hooks condicionales, dependencias faltantes | `eslint.config.js` (`react-hooks`) |
 | Smoke de browser | el bundle carga bajo la CSP estricta, hidrata y no tira | `scripts/seam-smoke-server.mjs` + driver en Greenhouse |
+| Canary del share board | 6 estados × 3 anchos, fuga al DOM, overflow por panel, Reintentar fuera de estado, `role=alert` faltante | `scripts/share-board-canary.mjs` + `scripts/frontend/globe-share-board-canary.mjs` (`TASK-1558`) |
+
+**Los tres gates de escaneo caminan `.ts`, `.tsx` y `.css`.** El `.css` entró en `TASK-1558` y no era
+teórico: la primera superficie real necesita hojas de estilo, y hasta ese momento el escaneo sólo miraba
+TS — o sea que un `.css` era el único lugar donde un hex, una duración o una fuente podían seguir
+tipeándose a mano. Un gate que deja de aplicar en cuanto el payload gana su primer `.css` no es un gate.
 
 **Por qué existen los tres primeros:** `producer-ui.ts` acumuló **184 hex crudos con 63 colores únicos**
 evadiendo ~30 tokens semánticos. Nadie lo decidió; se acumuló porque nada podía impedirlo.
@@ -32,7 +40,22 @@ pnpm check                                          # incluye lo anterior vía p
 # Smoke de browser (dos terminales, cross-repo)
 pnpm --filter @efeonce-globe/studio-client seam:smoke        # en efeonce-globe
 node scripts/frontend/globe-client-seam-gate.mjs             # en greenhouse-eo
+
+# Canary del share board (dos terminales, cross-repo) — TASK-1558
+pnpm --filter @efeonce-globe/studio-client build             # en efeonce-globe
+node apps/studio-client/scripts/share-board-canary.mjs       # en efeonce-globe
+node scripts/frontend/globe-share-board-canary.mjs           # en greenhouse-eo
 ```
+
+El canary del share board escribe capturas y `canary-report.json` en `.captures/globe-share-board/`
+(gitignored). Dos detalles de método que no son opcionales:
+
+- mide el `scrollWidth` **de los paneles**, no sólo del documento. Un contenedor con
+  `overflow-y: auto` recibe `overflow-x: auto` gratis, así que el desborde scrollea adentro y el
+  documento nunca se ensancha — que es cómo este producto shippeó overflow horizontal dos veces con el
+  assert en verde;
+- mide a **320px**, el piso de WCAG 1.4.10. La pasada a 390 no vio nada y la de 320 encontró que el chip
+  "Sólo lectura" decidía el ancho de la página.
 
 ## Verificar que un gate MUERDE
 

@@ -1,0 +1,121 @@
+{
+  "task": "TASK-1558",
+  "surface": "globe.share-board",
+  "surfaceLabel": "Efeonce Globe — Share board (GET /shares/:shareId)",
+  "repo": "efeonce-globe",
+  "reviewedAt": "2026-07-25",
+  "qualityProfile": "premium",
+  "uiRigor": "ui-standard",
+  "directionMode": "repo-native-benchmark",
+  "direction": "docs/ui/visual-directions/TASK-1558-globe-share-board-direction.md",
+  "wireframe": "docs/ui/wireframes/TASK-1558-globe-share-board.md",
+  "baseline": {
+    "surfaceId": "globe.share-board",
+    "decision": "new",
+    "note": "Primer baseline de esta superficie. No existía ninguno: la única cara client-facing de Globe estuvo meses sin red de regresión visual."
+  },
+  "evidence": {
+    "captures": ".captures/globe-share-board/",
+    "viewports": ["1440x1000", "390x844", "320x844 (medido, no capturado)"],
+    "states": ["ready", "empty", "partial", "error", "denied", "incomplete"],
+    "reducedMotion": "Ejercitado en la pasada mobile (reducedMotion: 'reduce'), no sólo declarado.",
+    "before": "Línea base del share board actual capturada antes de tocar nada (default desktop + 390, y estado no disponible). No existía.",
+    "canary": "node scripts/frontend/globe-share-board-canary.mjs — VERDE (6 estados x 3 anchos)"
+  },
+  "thresholds": {
+    "average": 4.5,
+    "floor": 4,
+    "gated": {
+      "hierarchy": 4.5,
+      "surfaceEconomy": 4.5,
+      "visualImpact": 4.5,
+      "sourceFidelity": 4.5,
+      "genericTemplateResistance": 4.5
+    }
+  },
+  "dimensions": [
+    {
+      "name": "hierarchy",
+      "score": 5,
+      "rationale": "La pieza es el héroe sin ambigüedad y no compite con nada: una sola acción en toda la superficie (Reintentar), presente sólo en los dos estados donde reintentar puede funcionar. El orden de lectura es pieza → título → hechos → comentarios, verificado en el frame."
+    },
+    {
+      "name": "proportionsComposition",
+      "score": 5,
+      "rationale": "Stage 1fr + riel 22-27rem. El riel se dimensionó desde la medida (52ch a 16px necesita ~27rem), no al ojo: el primer borrador con 24rem daba ~40 caracteres por línea, bajo el piso de 45."
+    },
+    {
+      "name": "spacingRhythm",
+      "score": 5,
+      "rationale": "Corregido mirando el frame, no leyendo el CSS: el primer render tenía el lede pegado a los hechos y el encabezado de comentarios pegado a la última fila. Se separó a 1.35rem y 1.6rem."
+    },
+    {
+      "name": "informationDensity",
+      "score": 5,
+      "rationale": "Media-baja y deliberada. Tres hechos, no ocho; el riel scrollea con muchos comentarios y el stage queda fijo en desktop."
+    },
+    {
+      "name": "depthSurfaceModel",
+      "score": 5,
+      "rationale": "Una sola sombra en toda la página (la de la lámina) y una sola superficie contenida. El riel se separa con una línea de 1px y no tiene fondo propio."
+    },
+    {
+      "name": "surfaceEconomy",
+      "score": 5,
+      "rationale": "Cero card-on-card, que es exactamente el defecto que reemplaza: hoy los tres hechos son cajas con borde dentro del panel dentro de la card del main. Acá son pares clave/valor separados por líneas."
+    },
+    {
+      "name": "visualImpact",
+      "score": 5,
+      "rationale": "El passepartout es el momento dominante: el margen alrededor de la pieza es lo que la hace leer como obra presentada y no como archivo adjunto. El único color saturado de la página lo aporta la pieza."
+    },
+    {
+      "name": "typography",
+      "score": 5,
+      "rationale": "Escala de cuatro pasos en el SSOT, sin pasos huérfanos. Base 16px y no los ~13.6px del producer: la superficie que un cliente lee una vez, en un dispositivo desconocido, no puede estar bajo el piso de 14px supplementary. Poppins sólo para el h1 y los títulos de estado; Geist para todo lo que se lee. Caps sólo en eyebrows y con tracking."
+    },
+    {
+      "name": "colorContrast",
+      "score": 4,
+      "rationale": "Ramp de texto en tres niveles, ningún estado comunicado sólo por color (el punto de revisión siempre acompaña al label). No sube a 5 porque el contraste se verificó contra el fondo renderizado a ojo y por token, sin una pasada axe automatizada sobre la superficie: eso queda como follow-up del canary."
+    },
+    {
+      "name": "iconography",
+      "score": 4,
+      "rationale": "Deliberadamente mínima: el isotipo de Globe, el wordmark de Efeonce y dos puntos de estado de 4px. No hay set de iconos porque la superficie no tiene acciones que etiquetar. Correcto para el alcance, pero no es una dimensión donde haya craft que demostrar."
+    },
+    {
+      "name": "responsiveTransformation",
+      "score": 5,
+      "rationale": "Transformación real, no compresión: una columna con la pieza a sangre arriba y techo de 62svh para que el riel quede alcanzable. El primer borrador NO tenía el media query y el mobile mostraba metadata sin la pieza — se detectó mirando la captura."
+    },
+    {
+      "name": "motionMicrointeractions",
+      "score": 4,
+      "rationale": "Un solo fade corto del stage al resolver, con tokens, y skeleton sin titileo. Equivalencia reduced-motion ejercitada por el canary. Es lo correcto para esta superficie —motion decorativo acá sería ruido— pero por eso mismo no hay mucho que puntuar alto."
+    },
+    {
+      "name": "sourceFidelity",
+      "score": 5,
+      "rationale": "Implementa la dirección B aprobada: passepartout, riel de líneas, chrome mínimo. Las dos divergencias respecto de los renders de comparación se corrigieron a la baja y quedaron declaradas: el título de pieza y el autor de comentario NO existen en CreativeShareBoardV1, así que no se inventaron."
+    },
+    {
+      "name": "genericTemplateResistance",
+      "score": 5,
+      "rationale": "El riel de líneas sin cajas es lo contrario del dashboard de cards por defecto, y las dos direcciones genéricas se rechazaron con motivo: la de chips de metadata (C) porque promete filtros en una superficie read-only, y la de overlay sobre la obra (A) porque recorta y tinta el artefacto bajo revisión."
+    }
+  ],
+  "computed": {
+    "average": 4.71,
+    "minimum": 4,
+    "gatedPass": true
+  },
+  "verdict": "PASS",
+  "openRisks": [
+    "Captions de video/audio: WCAG 1.2.2 pide una pista y CreativeShareBoardV1 no transporta ninguna. Declarado en el código con eslint-disable justificado, no silenciado. Cerrarlo es cambio de contrato, fuera del alcance de esta task.",
+    "El h1 usa el fallback 'Resultado creativo' para toda pieza: la proyección no tiene campo de título.",
+    "Los comentarios se muestran sin autor porque el contrato no lo transporta.",
+    "Contraste sin pasada axe automatizada sobre la superficie renderizada.",
+    "Rollout: el flag client_app_enabled sigue en false. El scorecard puntúa la superficie construida y verificada por canary, NO una superficie en producción."
+  ]
+}

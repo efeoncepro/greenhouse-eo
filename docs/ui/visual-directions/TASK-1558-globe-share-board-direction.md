@@ -93,6 +93,23 @@ defectos concretos y verificados en la línea base**, no la idea:
 **Rechazadas:** A — corrompe el artefacto bajo revisión (recorte + viñeta); C — degrada la pieza a
 ilustración de documento y su fila de chips promete interacción inexistente.
 
+## ⚠️ Corrección de fidelidad (2026-07-25, al implementar)
+
+Los tres renders de comparación mostraban **datos que el contrato no transporta**, y conviene decirlo
+en vez de dejar que la dirección prometa algo que la implementación no puede cumplir:
+
+| Lo que mostraba el render | Lo que existe de verdad |
+|---|---|
+| Título de pieza: "Campaña primavera · toma 03" | `CreativeShareBoardV1` **no tiene campo de título**. La superficie usa el fallback "Resultado creativo" |
+| Autor por comentario: "Camila Ortiz", "Rodrigo Peña" | `comments` es `{ body, createdAt }`. **No hay autor.** Se renderiza fecha + texto |
+
+Ninguno de los dos se implementó inventándolo: poner un nombre que el contrato nunca envió, en la
+superficie donde un cliente juzga trabajo, sería fabricar evidencia. Ambos quedan como follow-up
+(requieren campo nuevo en la proyección, o sea cambio de contrato, fuera del alcance de esta task).
+
+La decisión de composición **no cambia** por esto: el título sigue siendo el ancla tipográfica del riel
+y los comentarios siguen siendo notas con barra lateral. Sólo cambia de qué se llenan.
+
 ## Visual thesis
 
 - **First-fold reading order:** pieza montada → título de la pieza → hechos → comentarios.

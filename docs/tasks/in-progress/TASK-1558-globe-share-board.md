@@ -13,13 +13,14 @@
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `primitive`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1558-globe-share-board.md`
+- Visual direction: `docs/ui/visual-directions/TASK-1558-globe-share-board-direction.md`
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Bloqueada por direccion visual aprobada inexistente`
+- Status real: `Slices 1-2 code complete y canary verde; Slice 3 (flip del flag + retiro) pendiente de rollout`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`
@@ -43,14 +44,15 @@ dirección visual**: los tokens se adoptaron de `producer-ui.ts`, que ya existí
 necesita**, porque reconstruye una superficie que un cliente mira, y **no existe**: el
 `approved-prototype.dc.html` de `TASK-1505` es el target del **Producer**, no de esta pantalla.
 
-Ése es el gate `UI ready: no`, y no es burocracia: improvisar la única cara comercial de Globe es
-exactamente lo que ADR-014 existe para impedir.
+Ése era el gate `UI ready: no`, y no era burocracia: improvisar la única cara comercial de Globe es
+exactamente lo que ADR-014 existe para impedir. **Cerrado el 2026-07-25**: tres direcciones renderizadas
+con los tokens y fuentes reales, miradas en los dos targets, elegida la B ("Lámina montada").
 
 ## Goal
 
 - El share board queda reconstruido con componentes tipados sobre el SSOT de tokens y la capa de copy.
-- Sus **diez estados** quedan implementados y distinguibles; sólo `dependency_unavailable` ofrece reintentar.
-- Deja de auto-rotularse `Producer` y no queda ningún link que devuelva JSON a un browser.
+- Sus **cinco estados reales** quedan implementados y distinguibles (`loading` · `ready` · `link_incomplete` · `unavailable` · `degraded`); sólo `degraded` ofrece reintentar. Ver §Delta de estados.
+- Deja de auto-rotularse `Producer`, deja de filtrar enums e ISO 8601 crudos, y estrena footer con atribución + privacidad.
 - Estrena su primer canary visual: hoy la única superficie client-facing **no tiene ninguno**.
 - El flag `client_app_enabled` se puede prender con evidencia.
 
@@ -62,8 +64,10 @@ exactamente lo que ADR-014 existe para impedir.
 
 - `docs/architecture/creative-studio/EFEONCE_GLOBE_CLIENT_APPLICATION_DECISION_V1.md` — **ADR-014**, cuyo
   **Slice 1** implementa esta task. Su Slice 0 ya lo entregó `TASK-1556`.
-- `docs/architecture/creative-studio/EFEONCE_GLOBE_PRODUCER_HUMAN_EXECUTION_DECISION_V1.md` — ADR-005 §3/§4 y
-  su Delta: los cuatro códigos de error **nunca** colapsan en un preview roto genérico.
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_PRODUCER_HUMAN_EXECUTION_DECISION_V1.md` — ADR-005 §3/§4:
+  trust boundary intacto. Su **Delta** (los cuatro códigos no colapsan) gobierna el **feed del Producer**,
+  autenticado, no el share público: acá el BFF los colapsa a un 404 **no enumerable a propósito**
+  (`app.ts:4143`). Lo que sí aplica es que ningún fallo se muestre como preview roto genérico.
 - `docs/architecture/creative-studio/EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md` — ADR-003: el
   **nombre** del modelo es público; el slug, el costo vendor y el margen **nunca** salen.
 
@@ -79,8 +83,10 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/ui/wireframes/TASK-1558-globe-share-board.md` — regiones, contrato de audiencia, los diez estados
+- `docs/ui/wireframes/TASK-1558-globe-share-board.md` — regiones, contrato de audiencia, los cinco estados
   con su ARIA, implementation mapping, plan de canary y decision log.
+- `docs/ui/visual-directions/TASK-1558-globe-share-board-direction.md` — la dirección aprobada: tesis,
+  alternativas rechazadas con motivo, targets, mapeo a tokens, firma y anti-patrones.
 - `docs/operations/creative-studio/GLOBE_CLIENT_UI_GATES_RUNBOOK_V1.md` — cómo correr y verificar los gates.
 - `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md` §209-215 — qué **nunca**
   se muestra.
@@ -91,7 +97,7 @@ Reglas obligatorias:
 
 - **`TASK-1556`** (complete): `apps/studio-client`, `apps/studio-web/src/shell.ts`, el SSOT de tokens, la
   capa de copy, los gates y el flag ya existen. Esta task los **consume**.
-- ⚠️ **Dirección visual aprobada** del share board — **no existe**. Es el bloqueo real.
+- ✅ **Dirección visual aprobada** — `docs/ui/visual-directions/TASK-1558-globe-share-board-direction.md` (2026-07-25, dirección **B "Lámina montada"**). El bloqueo se levantó.
 
 ### Blocks / Impacts
 
@@ -113,7 +119,7 @@ En `efeonce-globe`:
 En `greenhouse-eo`:
 
 - `docs/ui/wireframes/TASK-1558-globe-share-board.md`
-- `docs/ui/visual-directions/TASK-1558-*` 🆕 (la dirección aprobada, cuando exista)
+- `docs/ui/visual-directions/TASK-1558-globe-share-board-direction.md` ✅ (dirección aprobada)
 - `docs/ui/reviews/TASK-1558-globe-share-board.scorecard.json` 🆕
 
 ## Current Repo State
@@ -128,7 +134,13 @@ En `greenhouse-eo`:
 
 ### Gap
 
-- **No hay dirección visual aprobada** para esta superficie.
+- ~~No hay dirección visual aprobada~~ → **resuelta** 2026-07-25 (dirección B).
+- El SSOT de tokens **no tiene tokens de tipografía** (Poppins/Geist están literales en `producer-ui.ts`), y
+  el gate de diseño no cubre tipografía ni `.css`. Ambos se cierran acá.
+- La superficie de hoy **filtra valores crudos** al cliente: `changes_requested` y `2026-08-01T18:00:00.000Z`
+  se renderizan verbatim (verificado en la línea base). No estaba declarado.
+- La superficie de hoy **no tiene footer** (0 ocurrencias, 0 links). El `/legal/terms` roto está en
+  `producer-ui.ts:82`, no acá.
 - **Las primitives base no existen** (`Surface`, `Chip`, `FactList`, `CommentItem`, `MediaStage`,
   `StateBlock`): `TASK-1556` las declaró y deliberadamente no las entregó, porque diseñarlas sin una
   superficie a la que sirvan era especulativo. **Nacen acá.**
@@ -166,10 +178,17 @@ En `greenhouse-eo`:
 
 ### State inventory
 
-Los diez están en el wireframe §Estados con su copy y ARIA: Default · Loading (skeleton dimensionado,
-`aria-busy`) · Empty de comentarios · `authentication_required` (`role="alert"`) · `not_found` ·
-`access_denied` · `dependency_unavailable` (**único con Reintentar**) · Long content · Mobile 390px ·
-Keyboard/focus · Reduced motion.
+**Cinco estados de datos** (unión discriminada) + cinco variantes de presentación, en el wireframe §Estados
+con su copy y ARIA: `loading` (skeleton dimensionado, `aria-busy`) · `ready` · `link_incomplete`
+(`role="alert"`, sin token en el fragment) · `unavailable` (`role="alert"`, 404 colapsado) · `degraded`
+(`role="status"`, **único con Reintentar**). Variantes: comentarios vacíos · long content · mobile 390px ·
+keyboard/focus · reduced motion.
+
+> **Delta 2026-07-25.** La versión original pedía `authentication_required`/`not_found`/`access_denied` como
+> tres estados visibles. El BFF los colapsa a un 404 **no enumerable a propósito** (`app.ts:4143`) y esta
+> task tiene prohibido tocar el BFF; enumerarlos sería un oráculo de grants. `authentication_required` se
+> conserva como `link_incomplete`, que **sí** es distinguible client-side (el cliente sabe si el fragment
+> traía token).
 
 ### Interaction contract
 
@@ -188,8 +207,13 @@ Ver wireframe §Implementation Mapping.
 
 ### GVC scenario plan
 
-Ver wireframe §GVC Scenario Plan. Globe no corre el GVC de Greenhouse: el equivalente es un canary propio
-siguiendo el patrón `seam-smoke-server.mjs` + driver Playwright en `scripts/frontend/`.
+- Quality profile: `premium` (rigor `ui-standard`).
+- Viewports: desktop `1440×1000` + mobile `390×844`; `scroll-width` medido en ambos y también a `320`.
+- Review dossier: `docs/ui/reviews/TASK-1558-globe-share-board/`.
+- Baseline: `globe.share-board` — **baseline nuevo**, hoy no existe ninguno.
+
+Detalle en wireframe §GVC Scenario Plan. Globe no corre el GVC de Greenhouse: el equivalente es un canary
+propio siguiendo el patrón `seam-smoke-server.mjs` + driver Playwright en `scripts/frontend/`.
 
 ### Design decision log
 
@@ -210,24 +234,35 @@ base que hoy no existe.
 
 ## Scope
 
-### Slice 1 — Dirección visual (desbloquea todo lo demás)
+### Slice 1 — Dirección visual ✅ (2026-07-25)
 
-- 2-3 direcciones comparadas con `design-studio` / `product-design-loop`, una elegida por el operador.
-- Asset durable persistido en `docs/ui/visual-directions/TASK-1558-*`.
-- `UI ready` pasa a `yes` sólo cuando el wireframe tenga su Visual Direction Contract completo.
+- Tres direcciones **renderizadas** con los valores del SSOT y las fuentes reales de Globe, miradas a
+  `1440×1000` y `390×844`: A "Cine", B "Lámina montada", C "Ficha de revisión".
+- **Elegida B.** A rechazada por descalificante (`cover` recorta la pieza y la viñeta le altera el color:
+  corrompe el artefacto bajo revisión); C rechazada porque degrada la pieza a ilustración de documento.
+- Asset durable: `docs/ui/visual-directions/TASK-1558-globe-share-board-direction.md`.
+- Línea base "antes" capturada (default desktop+mobile y `unavailable`) — no existía.
 
 ### Slice 2 — Primitives base + superficie
 
-- `Surface`, `Chip`, `FactList`, `CommentItem`, `MediaStage`, `StateBlock` sobre el SSOT de tokens.
-- El share board con sus diez estados, copy desde `copyFor().share`.
-- Se retira el rótulo `Producer` y se resuelve `/legal/terms` (implementar o retirar el link).
+- Primitives sobre el SSOT de tokens, nacidas sirviendo a esta superficie.
+- Tokens de tipografía (`--font-display`/`--font-body` + `@font-face`) suben al SSOT.
+- El share board con sus cinco estados, copy desde `copyFor().share`; footer nuevo.
+- Se retira el rótulo `Producer`. **`/legal/terms`: se retira el link** (está en `producer-ui.ts:82`, no en
+  esta superficie; el footer nuevo usa `https://efeonce.com/privacidad`, que sí resuelve).
 
-### Slice 3 — Canary y cutover
+### Slice 3 — Canary y cutover (canary ✅ / cutover pendiente)
 
-- Canary visual del share board: desktop `1440×1000` + mobile `390×844`, estados vencido y degradado,
-  assertion de no-fuga (sin slug, `house`, costo ni margen en el DOM).
-- Flip de `client_app_enabled` tras canary verde.
-- Se retira `public-share-ui.ts` y su rama de render.
+- ✅ Canary visual del share board: **6 estados × 3 anchos** (`1440×1000`, `390×844`, `320×844`),
+  assertion de no-fuga sobre el HTML servido (sin slug, `house`, costo, margen, `Producer`, ISO 8601 ni
+  enum crudo), overflow medido **por panel**, y Reintentar/`role=alert` verificados por estado.
+  Encontró dos bugs reales antes del commit: el chip decidía el ancho de la página a 320px y el bloque
+  de estado de `partial` quedaba pegado arriba en vez de centrado.
+- ⏳ Flip de `client_app_enabled`: **no ejecutado**. Es un `terraform apply` y una decisión de rollout,
+  no más código.
+- ⏳ Retiro de `public-share-ui.ts` y su rama de render: **después** del flip verificado con un grant
+  real, por la regla dura de ADR-014 (no se retira una superficie vieja antes de que su reemplazo tenga
+  cobertura equivalente en runtime).
 
 ## Out of Scope
 
@@ -299,17 +334,21 @@ Slice 1 (dirección visual) → Slice 2 (primitives + superficie) → Slice 3 (c
 
 ## Acceptance Criteria
 
-- [ ] Existe dirección visual aprobada y persistida; `UI ready: yes` con `pnpm task:lint --task TASK-1558` limpio.
-- [ ] Los diez estados están implementados; los cuatro códigos de error son **distinguibles** y sólo
-      `dependency_unavailable` ofrece Reintentar.
-- [ ] El DOM servido **no contiene** slug del proveedor, `house`, costo vendor ni margen — verificado por assertion.
-- [ ] La página no se auto-rotula `Producer` y ningún link devuelve JSON a un browser.
-- [ ] Canary verde en `1440×1000` y `390×844`, con `scrollWidth <= clientWidth` en ambos.
-- [ ] Existe evidencia **before/after**.
-- [ ] Los 6 gates de UI pasan con la superficie mergeada.
-- [ ] Con el flag en `false` la superficie responde idéntica a hoy.
-- [ ] El transporte del grant no cambió: fragment → header `Globe-Share` → `credentials:'omit'`.
-- [ ] Scorecard: promedio ≥4,5, piso 4, fidelidad y resistencia a template ≥4,5.
+- [x] Existe dirección visual aprobada y persistida; `UI ready: yes` con `pnpm task:lint --task TASK-1558` limpio.
+- [x] Los **cinco estados** están implementados y distinguibles, y sólo `degraded` ofrece Reintentar.
+      Los tres fallos no-`ready` tienen copy propio: ninguno se muestra como preview roto genérico.
+      **NO** se exige distinguir `not_found` de `access_denied`: el BFF los colapsa a un 404 no enumerable
+      a propósito y esta task no toca el BFF (ver §State inventory Delta).
+- [x] El DOM servido **no contiene** slug del proveedor, `house`, costo vendor ni margen — verificado por assertion del canary sobre el HTML servido (no sólo el texto visible).
+- [x] La página no se auto-rotula `Producer`, no filtra enums ni ISO 8601 crudos, y ningún link devuelve
+      JSON a un browser (incluye retirar `/legal/terms` de `producer-ui.ts:82`).
+- [x] Canary verde en `1440×1000`, `390×844` **y `320×844`** (piso WCAG 1.4.10), con `scrollWidth <= clientWidth` en los tres y medido **también en los paneles**.
+- [x] Existe evidencia **before/after** (la línea base "antes" se capturó antes de tocar nada).
+- [x] Los tokens de tipografía viven en el SSOT (familias, escala de 4 pasos, leading, pesos, tracking, measure) y el gate nuevo lo hace mecánico.
+- [x] Los gates de UI pasan con la superficie mergeada — ahora **ocho**: se agregaron tipografía literal y peso-sin-`@font-face`, y el escaneo camina `.css`. Las cuatro reglas nuevas verificadas rompiéndolas.
+- [x] Con el flag en `false` la superficie responde idéntica a hoy — **con test**, no como afirmación (`creative-review-runtime.test.ts` → `TASK-1558 share board strangler`), incluido el caso flag-on-sin-bundle.
+- [x] El transporte del grant no cambió: fragment → header `Globe-Share` → `credentials:'omit'`, con test de contrato que además verifica que el token nunca aparece en la URL.
+- [x] Scorecard: promedio **4,71**, piso **4**, jerarquía/economía/impacto/fidelidad/anti-template en **5**. `docs/ui/reviews/TASK-1558-globe-share-board.scorecard.json`.
 
 ## Verification
 
@@ -332,8 +371,32 @@ En `greenhouse-eo`: `pnpm task:lint --task TASK-1558` · `pnpm ui:wireframe-chec
 
 - Slices siguientes de ADR-014: launch + error → composer → feed/viewer → library + retiro del payload viejo.
 - Resolver las entradas de `LEGACY_TOKEN_DRIFT` de esta superficie al adoptarlas.
+- **Slice 3 pendiente (flip + retiro).** El flip de `client_app_enabled` es un `terraform apply` y el
+  retiro de `public-share-ui.ts` va después del flip verificado con un grant real. Ninguno se ejecutó:
+  requieren decisión de rollout, no más código.
+- **Captions de video/audio (WCAG 1.2.2).** `CreativeShareBoardV1` no transporta pista de subtítulos, así
+  que no hay `<track>` que emitir. Declarado en el código con `eslint-disable` justificado en vez de
+  silenciado. Cerrarlo es cambio de contrato (campo en la proyección + forma de adjuntar el asset).
+- **La proyección no tiene título de pieza ni autor de comentario.** El `h1` usa el fallback "Resultado
+  creativo" para toda pieza y los comentarios se muestran sin autor. No se inventaron: poner un nombre
+  que el contrato nunca envió, en la superficie donde un cliente juzga trabajo, sería fabricar evidencia.
+- **Pasada `axe` automatizada** sobre la superficie renderizada: el canary verifica overflow, fuga, roles
+  y foco, pero el contraste se verificó por token y a ojo. Es la única dimensión del scorecard en 4 por
+  falta de evidencia mecánica.
+- **Falso positivo del readiness gate de Greenhouse.** `hasSubstantiveMarkdown` (`scripts/ci/task-lint/rules.mjs`)
+  trata cualquier sección que empiece con la palabra **"Todo"** como placeholder `TODO`, así que un párrafo
+  en español que arranca con "Todo el copy…" hace fallar el gate. Se esquivó reformulando; la regla
+  debería anclar el patrón a `TODO` en mayúsculas o exigir que sea la línea entera.
 
 ## Open Questions
 
-- **Dirección visual**: no existe. Es el Slice 1.
-- **`/legal/terms`**: ¿se implementa la página o se retira el link? Decisión de producto/legal.
+- ~~**Dirección visual**~~ → **resuelta** 2026-07-25: dirección B "Lámina montada", documento durable
+  persistido, alternativas rechazadas con motivo.
+- ~~**`/legal/terms`**~~ → **resuelta**: se **retira el link**, no se implementa la página. El link no está
+  en esta superficie (vive en el footer del Producer, `producer-ui.ts:82`); el footer nuevo del share board
+  usa `https://efeonce.com/privacidad`, que ya existe y resuelve. Una página de términos es un entregable de
+  contenido legal con su propio dueño, y un enlace de revisión read-only no es una superficie de aceptación
+  de términos. Si producto/legal decide después publicar términos, se agrega al footer sin rediseño.
+- **Abierta y nueva:** el gate de diseño de Globe no cubre **tipografía** ni archivos `.css`. Esta task
+  mitiga poniendo los estilos en TS y los tokens de fuente en el SSOT, pero el gate mecánico equivalente al
+  de color/motion queda pendiente (candidato a follow-up).
