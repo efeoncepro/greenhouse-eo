@@ -371,7 +371,48 @@ la distinción **vigente / no vigente**, con tests. Sin render.
 Lectores de `catalog.list`, `fleet.list`, `style.list`, `style.materialize`, `voice.preset.list`. Readiness de
 la flota visible. Assert de que el `routeId` no se renderiza.
 
-### Slice 3 — Superficie del composer
+### Slice 3 — Superficie del composer, con el selector PORTADO (no rediseñado)
+
+Panel con la geometría del prototipo, los campos por capability, prompt + Mejorar + historial. Los 11 estados.
+
+#### 🔴 El selector de modelo se PORTA con su forma aprobada — spec exacta
+
+`TASK-1555` ya resolvió esta pieza y **el operador rechazó la primera versión al verla**. La forma vigente,
+medida de `producer-controller.ts:2217-2242` y `:378-387`, es la que se porta **sin re-decidir**:
+
+**Desplegable compacto** (no galería) que lista **toda la flota de la modalidad activa**, cada opción con la
+marca del modelo resuelta en **tres niveles de fallback**:
+
+| Nivel | Qué se muestra | Cuándo |
+|---|---|---|
+| 1 | **asset del isotipo** real, 16×16, `loading=lazy` | el nombre del modelo matchea `MODEL_ISOTYPES` |
+| 2 | glyph | la entrada declara `glyph` en vez de `asset` |
+| 3 | **monograma** — las iniciales de las 2 primeras palabras, o `AI` | ningún match |
+
+⚠️ **El fallback a monograma es deliberado y el comentario del código lo dice: "rather than an invented logo".**
+Un modelo sin isotipo bundleado **no recibe un logo inventado** — recibe sus iniciales. Nunca dibujar de memoria
+el logo de un proveedor.
+
+**El mapa es DATO, no código** (`MODEL_ISOTYPES`; el comentario dice *"a new model is a new entry"*), matcheando
+por **prefijo en minúsculas** del nombre público del modelo:
+
+```
+'gpt image' → openai.svg      'nano banana' → gemini.svg     'gemini' → gemini.svg
+'veo' → gemini.svg            'seedream' → bytedance.svg     'seedance' → bytedance.svg
+'seed audio' → bytedance.svg  'elevenlabs' → elevenlabs.svg
+```
+
+Los assets viven en `/assets/models/*.svg` y se sirven desde el mismo origen, así que la CSP `img-src 'self'`
+ya los cubre — mismo razonamiento que el isotipo de Globe en `GlobeGeneratingMark`.
+
+**Lo que el selector muestra y lo que NO:** el nombre público (`model.name` + `version`) es **client-facing por
+decisión de producto** (ADR: mostrar el modelo real es ancla de posicionamiento). El `routeId`, el slug de wire,
+el costo del proveedor y el margen **NUNCA** salen. La taxonomía `house` es operator-only detrás de
+`globe.producer.route.reveal_house`.
+
+**La disponibilidad la dicta `fleet.list`, no el ledger.** El selector **sólo renderiza la `availability` que el
+reader declara** — nunca deriva promoción, techo ni elegibilidad. Y por el bloqueo de `TASK-1553` (ver Discovery
+§2), un 2.º modelo del mismo proveedor se muestra **deshabilitado con su razón**, no ejecutable.
 
 Panel con la geometría del prototipo, los campos por capability, prompt + Mejorar + historial. Los 11 estados.
 
