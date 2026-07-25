@@ -242,6 +242,18 @@ Ver wireframe §4 (contrato completo). Estados: default/loading (skeleton, nunca
 - Nuevo API/reader/command/schema/migración/provider/capability, ni design system nuevo.
 - Exponer créditos como vendor cost o slug/margen.
 
+## Progress — Discovery (2026-07-24, contra código real de `efeonce-globe`)
+
+Mapa de implementación verificado (arquitectura Globe = HTML-template + controller vanilla-JS + CSS **inline** en `producer-ui.ts`; NO React/JSX). Reader `globe.producer.fleet.list` **desplegado + live-verificado** (Codex `c3b6bf4`).
+
+- **`producer-client.ts`** — patrón de fetch idéntico al catálogo (`:610-614`: en boot, si `gateFor('globe.producer.catalog.list').state==='available'`, `reader(ids.catalog,{}).then(d => state.catalog = d.routes)`). Plan: agregar `fleet: 'globe.producer.fleet.list'` a `ids` (`:131`), `state.fleet` a `RuntimeState`, el fetch paralelo en boot, y exponerlo al controller (mismo mecanismo que `catalog`). `reader(id, query)` genérico (`:490`) ya arma el envelope (`workspaceSelection`, correlationId).
+- **`producer-ui.ts`** — reemplazar `data-producer-static-route` (`:142`, el placeholder deshabilitado dentro de `route-card`/`route-output-grid`) por el contenedor de la galería + **CSS inline** de las láminas (Dirección A) en el `<style>` del page. Copy desde `producer-copy.ts`.
+- **`producer-controller.ts`** — hidratar la galería desde `state.fleet` filtrando por `state.modality`; render de láminas (nombre público + `availability`); selección única `available` → `referenceRoute`; preselect del `recommendedDefault` si `available`; teclado/aria (radiogroup).
+- **`producer-copy.ts`** — ids nuevos (wireframe §5): `modelAvailable`, `modelRecommended`, `modelGated`, `modelBlockedProviderVerifier`, `modelSelectAria`.
+- **`producer-gvc-fixture.mjs`** — agregar la capability `globe.producer.fleet.list` (coverage ui available) + data fake de flota (available/gated/blocked) para el escenario `task-1555-model-selector`.
+
+Slices de implementación (design-studio Steps 6-9): (1) data layer client + fixture; (2) render de la galería + CSS (first-fold checkpoint desktop+mobile); (3) estados+selección+a11y; (4) GVC premium + scorecard 14 dims. **Nota de dependencia:** el estado `available` real (modelo funcionando) necesita la **promoción ADR-009** (hoy bloqueada por identidades de readiness firmadas — paso humano); `gated`/`blocked` sí se pueden GVC-ear ya.
+
 ## Detailed Spec
 
 El contrato de layout, anatomía de tarjeta, estados, copy, data mapping, primitive, a11y y GVC está en el wireframe
