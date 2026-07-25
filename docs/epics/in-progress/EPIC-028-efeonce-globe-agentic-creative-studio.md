@@ -652,13 +652,19 @@ principio sobre cómo se construyen**. ADR-014 lo hace explícito y su foundatio
   `FactList`, `CommentList`, `StateBlock`, `MediaStage`) sirviendo a una superficie real, los tokens de
   tipografía entraron al SSOT, el gate de diseño creció a tipografía y pesos sin `@font-face`, y hay
   canary visual de seis estados × tres anchos con assertion de no-fuga sobre el HTML servido.
-  **Pero `client_app_enabled` sigue en `false` y ninguna superficie está sirviendo sobre el payload
-  nuevo:** todo lo construido es **potencial** hasta que se ejecute la cadena de cutover (abajo).
+  **Cutover ejecutado 2026-07-25: el share board YA SIRVE** (revisión `00071-6vp`, imagen `85dac33b03b1`,
+  `GLOBE_CLIENT_APP_ENABLED = "true"`). Es la primera superficie de ADR-014 en producción; `launch`,
+  `studio`, `error` y `producer` siguen en el legacy. Verificado automáticamente en vivo: React monta
+  bajo la CSP estricta real **sin un solo error de consola** en desktop y 390px, sin overflow, con Geist
+  cargando del SSOT, cero fugas en 7 sondas del HTML servido, y el asset por CDN con hit de edge —
+  `TASK-1557` y `TASK-1558` se validan mutuamente en vivo por primera vez. **Lo que falta necesita una
+  persona y no puede automatizarse:** el token del grant se guarda hasheado, así que ningún share
+  existente tiene token recuperable y crear uno pide sesión OAuth de Globe.
 - **El único unknown técnico de la ADR quedó cerrado:** React Router 8.3.0 compila sobre Vite 8.1.5, y el
   bundle real corre en Chromium real bajo la CSP estricta real sin un solo error. El fallback a
   `vite@7.3.x` se retira.
 - **Cluster ADR-013/ADR-014 en el programa:** `TASK-1553` (resolución de modelo por-ruta) · `TASK-1554`
-  (reader de availability, desplegado) · `TASK-1555` (selector del Producer, in-progress) · `TASK-1556`
+  (reader de availability, desplegado) · `TASK-1555` (selector compacto del Producer, in-progress — la galería se rechazó) · `TASK-1556`
   (esta foundation, **complete**) · `TASK-1557` (CDN de assets, **complete y verificado en vivo**).
 
 ### El programa de ADR-014, completo (creado 2026-07-25)
@@ -674,8 +680,8 @@ migración sin task para su último paso no es una migración: es una convivenci
 | — CDN de assets | `TASK-1557` | ✅ complete, verificado en vivo | — |
 | — Reader de flota | `TASK-1554` | ✅ complete | — |
 | — Hardening del gate | `TASK-1561` | ✅ complete | — |
-| 1 — Share board | `TASK-1558` | 🚧 Slices 1-2 aterrizados (`a336ff5`); **cutover NO ejecutado** | La cadena de cutover (abajo) |
-| — Hidratación de la proyección del share | `TASK-1562` | 📋 to-do | **Nada — implementable ya**; precede al cutover |
+| 1 — Share board | `TASK-1558` | ✅ **SIRVIENDO** (cutover 2026-07-25, rev. `00071-6vp`) | — |
+| — Hidratación de la proyección del share | `TASK-1562` | ✅ entregada (`85dac33`), precedió al cutover | — |
 | 2 — `ui.ts` (launch/studio/error) | `TASK-1524` | 📋 to-do | Dirección cinematográfica |
 | 3 — Composer | `TASK-1552` | 📋 to-do | **Nada — desbloqueado**: las primitives ya existen |
 | 4 — Feed + viewer | `TASK-1559` | 📋 to-do | **Nada — desbloqueado**: las primitives ya existen |

@@ -1,7 +1,7 @@
 # Efeonce Globe — Client Application Decision V1
 
 - **Decision:** ADR-014
-- **Status:** Accepted — Slices 0 y 1 entregados (`TASK-1556`, `TASK-1558`) pero **ninguna superficie servida**: `client_app_enabled` sigue en `false` y el cutover no se ejecutó (ver "La cadena real del cutover"); el host comercial sigue diferido por ADR-004
+- **Status:** Accepted — Slices 0 y 1 **entregados y SIRVIENDO** (`TASK-1556`, `TASK-1558`, cutover 2026-07-25, revisión `00071-6vp`); las otras cuatro superficies siguen en el payload legacy; el host comercial sigue diferido por ADR-004
 - **Date:** 2026-07-25
 - **Owner:** Efeonce Creative Technology / Globe (código) + Greenhouse control plane (gobierno documental)
 - **Scope:** **TODO el payload de browser de Efeonce Globe** — las cinco superficies HTML que existen hoy (`launch`, `studio`, `error`, `producer`, `share`) y toda superficie humana futura, con énfasis en las **client-facing**: share boards read-only, Storyboard Sequence Canvas con `client_review`, Video Effectiveness `client-operated`/`co-operated` y delivery packages. **NO** cubre el host, el BFF, la sesión, el trust boundary, la API privada ni la infraestructura.
@@ -209,25 +209,42 @@ No es escalabilidad de tráfico (eso lo gobiernan `maxScale` y los stores durabl
 > "Slice N de ADR-014", nunca "Slice N" a secas — decir "implementado hasta el Slice 3" significa
 > cosas opuestas en cada esquema.
 >
-> **Estado 2026-07-25:** el **Slice 0** está entregado (`bf1df21`…`4bf631e` en `main` de
-> `efeonce-globe`) y el **Slice 1** también (`a336ff5`, Slices 1-2 de `TASK-1558`). Pero
-> **ninguna superficie está sirviendo sobre el payload nuevo**: `client_app_enabled` sigue en
-> `false` y **el cutover no se ejecutó**. Todo lo construido —payload, tokens, copy, gates, CDN y
-> el share board completo— es **potencial** hasta que se ejecute la cadena de cutover que está
-> más abajo. Leer esa cadena antes de suponer que falta "un `apply`".
+> **Estado 2026-07-25:** el **Slice 0** está entregado (`bf1df21`…`4bf631e`) y el **Slice 1**
+> está **SIRVIENDO** — el cutover se ejecutó y quedó verificado. Las otras cuatro superficies
+> (`launch`, `studio`, `error`, `producer`) siguen en el payload legacy.
+>
+> La cadena de cutover que está más abajo **se conserva como registro**: documenta que encender una
+> superficie de este programa **no es "un `apply`"**, y el próximo slice la va a necesitar entera.
 
 - **Slice 0 — el seam + los gates + la validación de Vite 8.** Build Vite → assets servidos por `assets.ts` con nonce; módulo SSOT de tokens; lint de estilos (hex crudo = error) y de a11y. **Las dos compuertas de la Decisión punto 1 se resuelven acá y son criterio de salida**: (a) `react-router@8.3.0` funciona sobre Vite 8 (piso declarado `Vite 7+`, compat con 8 sin confirmar); (b) un **smoke de producción real** que ejercite las dependencias en el browser, no sólo CI. Cualquiera de las dos en rojo ⇒ **fallback a `vite@7.3.x` el mismo día**, registrado como Delta en esta ADR. Resto del criterio de salida: CSP, SSO, `pnpm check`, `pnpm build` y el canary verdes, y el flag apaga el payload nuevo sin dejar rastro.
-- **Slice 1 — share board. ENTREGADO, NO SERVIDO (`TASK-1558`, `a336ff5`).** La cara del cliente, primero. Sale del CSS de una línea, adopta el SSOT de tokens, deja de auto-rotularse "Producer", estrena su primer canary visual. Se arregla `/legal/terms` (o se saca el link). Lo que existe hoy: las seis primitives base (inventario abajo), los tokens de tipografía en el SSOT (`--font-display`/`--font-body`, escala de cuatro pasos, pesos derivados de `GLOBE_FONT_FACES`), el gate de diseño extendido a tipografía y a pesos sin `@font-face` —y caminando `.css` además de `.ts`/`.tsx`— y un canary visual de **seis estados × tres anchos** (1440×1000, 390×844, 320×844) con assertion de no-fuga sobre el **HTML servido** (sin slug, `house`, costo, margen, "Producer", ISO 8601 ni enum crudo), que encontró dos bugs reales antes del commit. Scorecard 4,71 promedio, piso 4, cinco dimensiones en 5. **Nada de esto le llega todavía a un cliente:** el flag sigue en `false` y falta la cadena de cutover.
+- **Slice 1 — share board. ✅ SIRVIENDO (`TASK-1558`, cutover 2026-07-25).** La cara del cliente, primero. Sale del CSS de una línea, adopta el SSOT de tokens, deja de auto-rotularse "Producer", estrena su primer canary visual. Se arregla `/legal/terms` (o se saca el link). Lo que existe hoy: las seis primitives base (inventario abajo), los tokens de tipografía en el SSOT (`--font-display`/`--font-body`, escala de cuatro pasos, pesos derivados de `GLOBE_FONT_FACES`), el gate de diseño extendido a tipografía y a pesos sin `@font-face` —y caminando `.css` además de `.ts`/`.tsx`— y un canary visual de **seis estados × tres anchos** (1440×1000, 390×844, 320×844) con assertion de no-fuga sobre el **HTML servido** (sin slug, `house`, costo, margen, "Producer", ISO 8601 ni enum crudo), que encontró dos bugs reales antes del commit. Scorecard 4,71 promedio, piso 4, cinco dimensiones en 5. **LIVE y verificado 2026-07-25** (revisión `00071-6vp`, imagen `85dac33b03b1`): el flag quedó cableado
+(`cloud_run_services.tf` + `variables.tf`), la imagen contiene `TASK-1556`+`1558`+`1562`, y
+`GLOBE_CLIENT_APP_ENABLED = "true"` está en el spec de la revisión viva. `/shares/*` sirve
+`/assets/app/index-*.js` —el bundle cliente, no `public-share-ui.ts`— y el asset llega por CDN con hit
+de edge, así que `TASK-1557` y `TASK-1558` se validan mutuamente en vivo por primera vez.
+
+**React monta bajo la CSP estricta real con CERO errores de consola**, desktop 1440 y mobile 390, sin
+scroll horizontal en ninguno, con Geist cargando desde el `@font-face` del SSOT. Cero fugas en 7 sondas
+sobre el HTML servido. Y "Reintentar" está **correctamente ausente** en un estado no reintentable: la
+regla de estados operando en producción, no en un test.
+
+🔴 **Lo que NO está verificado, y no puede automatizarse:** que una pieza real renderice, el transporte
+del grant (fragmento → header → resolve), que el token desaparezca de la barra, que **la hidratación de
+`TASK-1562` efectivamente llegue**, y los estados vencido/revocado. El token del grant se guarda como
+`hashSecret(token)`, así que **ningún share existente tiene token recuperable** desde la DB, y crear uno
+requiere sesión de Globe por OAuth. **Los 6 puntos de verificación del runbook necesitan una persona —
+es una propiedad permanente del diseño, no una limitación temporal.**
 - **Slice 2 — launch + error.** Superficies públicas, chicas, sobre los mismos tokens. Un 404 en un browser deja de ser JSON.
 - **Slice 3 — composer.** La superficie interna más caliente (`TASK-1552`/`TASK-1555` aterrizan ahí).
 - **Slice 4 — feed + viewer.** El slice de concurrencia: watermark, epoch, refresh de sesión. Los contratos del Delta de ADR-005 entran como asserts, no como comentarios.
 - **Slice 5 — library, colecciones, batch; y retiro.** Se eliminan `producer-controller.ts`, `producer-client.ts` y los cuatro `:root`; `studio-web` queda como BFF puro + serving. El flag se retira con el código.
 - **Fuera del strangler:** Storyboard (`TASK-1547`), Video Effectiveness (`TASK-1540`) y delivery (`TASK-1472`) **no se portan** — nacen en el payload nuevo.
 
-### La cadena real del cutover (verificada 2026-07-25 contra el código, no contra la doc)
+### La cadena real del cutover — EJECUTADA 2026-07-25 (se conserva como registro)
 
-**Encender el share board NO es un `tofu apply`.** Se creía que sí —lo decía la propia `TASK-1558`— y
-es falso. Lo verificado hoy sobre `main` de `efeonce-globe`:
+**Encender el share board NO era un `tofu apply`.** Se creía que sí —lo decía la propia `TASK-1558`— y
+era falso. Los seis pasos se ejecutaron completos; esto queda escrito porque **el próximo slice los va
+a necesitar enteros**, y porque el modo de falla que evitó vale más que el resultado. Lo verificado hoy sobre `main` de `efeonce-globe`:
 
 - `client_app_enabled` aparece **una sola vez** en todo `infra/terraform/`: su propia declaración en
   `variables.tf:188`. **No está cableado a ningún recurso.**

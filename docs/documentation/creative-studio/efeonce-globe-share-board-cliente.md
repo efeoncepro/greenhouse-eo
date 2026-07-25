@@ -1,7 +1,7 @@
 # Share board — la pieza que ve el cliente
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-07-25 por Claude (TASK-1558)
 > **Ultima actualizacion:** 2026-07-25 por Claude
 > **Documentacion tecnica:** [ADR-014 — Client Application](../../architecture/creative-studio/EFEONCE_GLOBE_CLIENT_APPLICATION_DECISION_V1.md) · [Wireframe](../../ui/wireframes/TASK-1558-globe-share-board.md)
@@ -75,16 +75,23 @@ pantalla de entrada— la heredan.
 
 ## Estado actual
 
-**Construida y verificada, todavía no sirviendo.** El canary pasó en seis estados y tres anchos, con
-puntaje 4,71 sobre 5.
+**En vivo desde el 2026-07-25.** Es la primera pantalla de Globe reconstruida que un cliente ve de
+verdad.
 
-Lo que falta **no es sólo encender un interruptor**, como se creyó al principio: el interruptor todavía
-no está conectado al servidor, y el contenedor que corre en producción es anterior a esta versión. La
-cadena real —cablear el interruptor, completar los datos que hoy se descartan, desplegar, encender y
-verificar con un link real— está en el
+Se comprobó automáticamente contra el sitio real: la página arma y funciona sin un solo error, en
+computadora y en teléfono, sin desbordes; la tipografía carga; los archivos llegan por la red de
+distribución; y no se filtra nada de lo que la pantalla no debe mostrar. También quedó comprobado un
+detalle de criterio: cuando el enlace está incompleto, **no** ofrece "Reintentar" —porque reintentar no
+lo arregla— y en su lugar dice qué hacer: pedir un enlace nuevo.
+
+**Lo que todavía necesita una revisión humana:** abrir un enlace **real** y confirmar que la pieza se
+ve, que los datos y comentarios aparecen, y que el permiso desaparece de la barra de direcciones. Eso no
+se puede automatizar, y por una buena razón: el permiso se guarda cifrado, así que ni el propio sistema
+puede reconstruir un enlace existente. Los pasos están en el
 [manual del share board](../../manual-de-uso/creative-studio/operar-share-board-globe.md).
 
-Hasta que eso pase, el cliente sigue viendo la pantalla vieja, que funciona.
+Si algo saliera mal, volver a la pantalla anterior toma menos de diez minutos: la vieja sigue
+disponible.
 
 > **Detalle técnico:** superficie en
 > `efeonce-globe/apps/studio-client/src/surfaces/share/ShareBoardSurface.tsx`; primitives en

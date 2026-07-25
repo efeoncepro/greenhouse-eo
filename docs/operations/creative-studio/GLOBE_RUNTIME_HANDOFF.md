@@ -8,6 +8,50 @@
 
 # Handoff
 
+## LATEST — cutover del share board EJECUTADO y verificado (2026-07-25)
+
+**Revisión viva `globe-studio-internal-00071-6vp`, imagen `85dac33b03b1`.**
+
+`GLOBE_CLIENT_APP_ENABLED = "true"` en el spec de esa revisión. El share board (`/shares/:shareId`) es
+la **primera superficie de ADR-014 sirviendo en producción**; `launch`, `studio`, `error` y `producer`
+siguen en el payload legacy.
+
+**El cutover no era "un `tofu apply`"**, y ese es el registro que importa: el flag estaba declarado en
+`variables.tf` y **conectado a nada** (`grep` devolvía una sola línea), así que el flip solo habría dado
+un **plan vacío** con un commit diciendo "prendido" — el modo de falla de
+`GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED`. Hubo que: cablear el flag al servicio (`cloud_run_services.tf`),
+hidratar la proyección (`TASK-1562`, sin la cual el panel mostraba tres filas "Sin dato" en todo share
+real), desplegar una imagen que contuviera el payload, y **después** flipear.
+
+### Verificado automáticamente contra el deployment vivo
+
+- Flag cableado: aparece en **dos** archivos, no en uno.
+- Imagen: contiene `4bf631e` (1556), `a336ff5` (1558) y `85dac33` (1562).
+- `/shares/*` sirve `/assets/app/index-*.js`, no `public-share-ui.ts`.
+- Asset por CDN con `age` > 0 → **`TASK-1557` y `TASK-1558` se validan mutuamente en vivo**.
+- **React monta bajo la CSP estricta real con CERO errores de consola**, desktop 1440 y mobile 390.
+- Sin scroll horizontal en ninguno de los dos anchos. Geist carga desde el `@font-face` del SSOT.
+- **0 fugas en 7 sondas** sobre el HTML servido (slug, `house`, margen, costo, "Producer"…).
+- "Reintentar" **ausente** en un estado no reintentable, ofreciendo la acción real en su lugar.
+
+### 🔴 Lo que NO está verificado — y no puede automatizarse
+
+Que una pieza real renderice, el transporte del grant (fragmento → header → resolve), que el token
+desaparezca de la barra de direcciones, que **la hidratación de `TASK-1562` efectivamente llegue**, y
+los estados vencido/revocado.
+
+**Por qué necesita una persona:** el token del grant se guarda como `hashSecret(token)`, así que
+**ningún share existente tiene token recuperable** desde la DB, y crear uno requiere sesión de Globe por
+OAuth. Los 6 puntos del runbook
+([`operar-share-board-globe.md`](../../manual-de-uso/creative-studio/operar-share-board-globe.md)) son
+**verificación humana por diseño**, no por falta de herramientas.
+
+### Rollback
+
+`client_app_enabled = false` + `tofu apply`. Menos de 10 minutos, y vuelve `public-share-ui.ts` intacto
+— sigue vivo hasta que `TASK-1560` lo retire.
+
+
 ## 🔴 Active state — 2026-07-25 LATEST (payload cliente: construido, NO servido — el cutover no es un `apply`)
 
 **Estado neto: ninguna superficie de Globe sirve todavía sobre el payload cliente nuevo.** El cliente externo
