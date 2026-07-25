@@ -502,7 +502,10 @@ promoción, es una decisión de rollout, no un bug.**
 - [x] Fixture GVC con capability `globe.producer.fleet.list` + los tres estados.
 - [ ] **Pendiente:** escenario GVC `task-1555-model-selector`, capturas premium 1440×1000 + 390×844,
       dossier, scorecard 14 dimensiones, `pnpm ui:quality`, enterprise review.
-- [ ] **Pendiente:** limpieza del CSS muerto de `.route-picker`/`.route-menu`/`.route-identity`
+- [x] Selector **compacto** con isotipo real + label (`a45954f`), flota completa de la modalidad
+  visible (`0258534`) y catálogo v1.4.0 (`9e57422`) — **la dirección revisada está implementada y viva**.
+  La galería rechazada no sobrevive en ninguna parte.
+- [x] Limpieza del CSS muerto de `.route-picker`/`.route-menu`/`.route-identity`
       (quedó huérfano al remover el dropdown; vive dentro de una línea CSS minificada compartida).
 - [ ] **Pendiente (out-of-band):** promoción ADR-009 para probar `available` real end-to-end.
 
