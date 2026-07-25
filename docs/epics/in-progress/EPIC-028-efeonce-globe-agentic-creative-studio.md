@@ -725,3 +725,86 @@ Tres decisiones que quedaron fijadas al crear estas tasks:
   *"the same shape of failure that produced 63 unrepeatable colours, one step behind"*. Y la tipografía
   es peor que el color: un peso sin archivo cargado **lo sintetiza el browser** deformando las letras,
   sin fallar ningún gate.
+
+## Delta 2026-07-25 — ADR-014 avanza cuatro superficies, y un fallo de gobernanza que vale más que el código
+
+Este delta registra dos cosas de peso muy distinto: **lo que shippeó** del payload cliente, y **un fallo de
+gobernanza propio** que produjo cinco tasks duplicadas antes de detectarse. El segundo es el aprendizaje.
+
+### Lo que shippeó
+
+| Pieza | Estado | Evidencia |
+|---|---|---|
+| **Share board** sobre el payload cliente (`TASK-1558`) | **LIVE en producción** | revisión `globe-studio-internal-00071-6vp`, imagen `85dac33b03b1`; verificado en browser a 1440/390/320 con axe limpio y sin fugas |
+| **Hidratación de la proyección del share** (`TASK-1562`) | **LIVE** | `resolveForShare` devolvía sólo `{ target, mediaType }`: `modelLabel`, `reviewStatus` y `comments` se descartaban **en silencio en TODOS los shares** — el grant los pedía, el dominio los proyectaba, el operador podía crearlos, y la autoridad nunca los entregaba |
+| **Feed + viewer** sobre el payload cliente | code complete, sin desplegar | commits `85c0d1f` → `c9ceabc`; 4 slices; transporte gobernado, resolver de bytes, reconciliación por marca |
+| **Motion del payload cliente** | 6/7 slices, verificado en browser | commit `1c0684e`; 13 asserts del canary en los dos modos de `prefers-reduced-motion` |
+| **Recipe + vigencia del estimado** | Slice 1 | commit `feffd47`, 17 tests |
+
+**Nada de esto está desplegado salvo el share board.** El push a `main` de `efeonce-globe` espera señal del
+operador; el estado correcto del resto es `code complete, rollout pendiente`.
+
+### Las cuatro correcciones técnicas que vale conservar
+
+1. **El criterio de retiro del payload legacy medía 12 de 38 capabilities.** `producer-client.ts` es el
+   **transporte** y expone un `reader(id)`/`command(id)` **genérico**; `producer-controller.ts` —la UI— despacha
+   **29 capabilities más** por ese camino, y ninguna aparece como literal en el transporte. El drift guard leía
+   sólo el transporte, así que **pasaba en verde midiendo el archivo que su autor eligió, no la realidad** — el
+   anti-patrón *"el gate es el test de regresión del primer consumidor"* aplicado al propio gate. Sin corregirlo,
+   `TASK-1560` habría podido borrar el legacy cubriendo un tercio de su capacidad. El inventario ahora declara las
+   38 con su **`surface`**, y ese campo lo convierte en un plan: **composer 14 · viewer 6 · library 6 · credits 4 ·
+   feed 4 · review 4**. El composer es el cuello de botella del retiro, y ahora es un dato.
+2. **`Serie` y `Compartir` SÍ tienen contrato.** Se deshabilitaron en el feed con el mensaje *"no tiene contrato
+   gobernado"* y era falso: `LibraryContainerKindV1` incluye `'series'` y el item del feed ya trae
+   `output.containerIds`; `globe.producer.review.share.create` existe. Lo que falta es la **superficie**. La
+   diferencia no es de copy: *"no hay contrato"* manda al próximo agente a construir uno que ya está.
+3. **El motion del feed shippeó con 4 de 11 animaciones** porque `TASK-1559` se autorizó con **`Motion: none`**
+   para una superficie cuyo diseño aprobado tiene 11 `@keyframes`. El gate de task-lint sólo verifica que el campo
+   exista; **quien ejecuta tiene que cuestionar el contrato**, no ejecutar contra él.
+4. **La vigencia del estimado la da el contrato, no el cliente.** `LabEstimatePreviewV1` trae `approvalToken` —
+   *"binding the previewed commercial quote"*— y `execute` lo consume: **el token ES la cotización**, así que el
+   cliente no puede ejecutar un precio que no mostró. Reemplaza cualquier bookkeeping de "¿cambió algún campo?".
+
+### 🔴 El fallo de gobernanza: cinco tasks duplicadas
+
+Se crearon `TASK-1559`, `1562`, `1563`, `1564` y `1565` sin barrer el registry, y **cada una pisaba territorio de
+una task que ya existía**:
+
+| Creada | Dueña que ya existía |
+|---|---|
+| `TASK-1559` feed + viewer | **`TASK-1526`** Producer Resilient Feed and Viewer |
+| `TASK-1562` proyección del share | **`TASK-1522`** Review, Comments and Read-only Share Foundation |
+| `TASK-1563` menciones | **`TASK-1522`** |
+| `TASK-1564` composer | **`TASK-1552`** Composer Focused Creation + **`TASK-1532`** One-Click Generate + **`TASK-1555`** Model Selector + **`TASK-1530/1531`** Prompt |
+| `TASK-1565` motion | **`TASK-1523`** Creative Suite Experience Logic (dueña de los contratos visual/flow/motion) |
+
+Y se estuvo por crear una sexta, de biblioteca, cuando **`TASK-1520`** ya existe — su propio Summary dice
+*"proyectables en el feed canónico"*, o sea la sinergia con el feed ya estaba en su scope.
+
+**La causa raíz: se barrió por NOMBRE, no por DOMINIO.** *"Feed + viewer sobre el payload cliente"* y *"Resilient
+Feed and Viewer"* son la misma superficie con dos nombres, y ningún barrido por nombre las cruza.
+
+**Lo hecho:** `1563/1564/1565` **retiradas** (movidas a `complete/` con cabecera que dice dónde fue cada pieza).
+Se retiran en vez de completarse porque dos specs de la misma superficie se separan y después nadie sabe cuál
+manda — que es el mismo mecanismo que produjo la medición de 12 vs 38. `1559/1562` **no** se retiran: su código ya
+shippeó y hay commits que las nombran; llevan puntero a su dueña.
+
+**El contenido volvió a las ocho dueñas, y no sólo el razonamiento — también los criterios exigibles**, porque
+prosa no es criterio: 14 checkboxes en `1552` (encabezados por las cuatro compuertas del gasto), 10 en `1523` (8
+ya verificados en browser), 9 en `1520`, 10 en `1522` y 5 en `1532`. Los docs de UI se **migraron con `git mv`** a
+la nomenclatura de su dueña, para que no queden dos versiones. `TASK-1532` bajó de `UI ready: yes` a `no`: un CTA
+que **gasta plata** no puede declararse listo con `Motion: none` y `Flow: none`.
+
+### El patrón que une los cuatro errores de esta sesión
+
+Medir el archivo elegido en vez de la realidad · afirmar que algo no tiene contrato sin buscarlo · declarar
+`Motion: none` sin mirar el diseño · decir "el contenido está en las tasks dueñas" sin abrir sus campos.
+
+**Los cuatro son conclusión antes de barrido.** Y los cuatro tenían el mismo remedio, que cuesta segundos: el
+comando que lo prueba. `grep` del despacho real, `grep` del contrato, contar los `@keyframes` del prototipo,
+`grep -E "^- (Motion|Flow|UI ready):"`.
+
+**Regla operativa que queda para EPIC-028:** antes de crear una task de este epic, barrer el registry **por
+dominio y por superficie**, no por el título que se le quiere dar al trabajo. El epic tiene ~50 tasks hijas y
+varias describen la misma superficie desde ángulos distintos (foundation · resiliencia · port · rediseño): la
+pregunta correcta no es *"¿existe una task con este nombre?"* sino *"¿quién es dueño de esta superficie?"*.

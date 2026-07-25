@@ -43,6 +43,29 @@ Read the user's input. It can be a loose line, a paragraph with context, or a pr
 
 Before writing the task:
 
+0. 🔴 **Barrer el registry por DOMINIO y por SUPERFICIE — antes de reservar un ID.** No por el título que se le
+   quiere dar al trabajo: dos tasks de la misma superficie con nombres distintos no se cruzan en un barrido por
+   nombre. La pregunta correcta es **"¿quién es dueño de esta superficie?"**, no *"¿existe una task con este
+   nombre?"*.
+
+   Caso fuente (2026-07-25, `EPIC-028`): se crearon **cinco tasks duplicadas** en una sesión —
+   *"Feed + viewer sobre el payload cliente"* vs **`TASK-1526`** *"Producer Resilient Feed and Viewer"*;
+   *"Composer sobre el payload cliente"* vs **`TASK-1552`** *"Composer Focused Creation"* + **`TASK-1532`**
+   *"One-Click Generate"*; *"Motion del payload cliente"* vs **`TASK-1523`**, dueña de los contratos
+   visual/flow/motion — y se estuvo por crear una sexta de biblioteca cuando **`TASK-1520`** ya existía. Tres
+   hubo que retirarlas y devolver su contenido a mano.
+
+   Cómo barrer, concretamente: `grep -oE "^\| \\`TASK-1[0-9]{3}\\` \| \\`[a-z-]+\\` \| \*\*[^*]{1,80}"
+   docs/tasks/TASK_ID_REGISTRY.md` para ver **títulos** de un rango, y después leer el `## Summary` de las
+   candidatas — el registry trunca, y el solapamiento vive en el Summary. En un epic grande (>20 hijas), varias
+   tasks describen la misma superficie desde ángulos distintos: **foundation · resiliencia · port · rediseño**.
+   Eso es legítimo; crear una sexta no lo es.
+
+   **Si ya existe dueña: NO crear una task nueva.** Agregar un `## Delta` con el aporte, y —esto es lo que se
+   olvida— **también los criterios exigibles como checkboxes en su `## Acceptance Criteria`**. Prosa no es
+   criterio. Si el aporte trae wireframe/flow/motion, migrarlos con `git mv` a la nomenclatura de la dueña y
+   actualizar sus campos `Wireframe`/`Flow`/`Motion` en `## Status`, o quedan huérfanos por nombre.
+
 1. Read `docs/tasks/TASK_ID_REGISTRY.md` to get the next available ID
 2. Explore source code and architecture docs relevant to the domain
 3. Identify what files already exist (for `Current Repo State > Already exists`)

@@ -727,6 +727,27 @@ estado real, contra código y runtime; lo mutable vive en `GLOBE_RUNTIME_HANDOFF
   `apps/studio-web` — donde viven los **184 hex crudos** y las **4 familias tipográficas literales** — **NO está
   vigilado**. `TASK-1560` Slice 2 amplía la frontera **inmediatamente ANTES** de borrar el legacy, nunca después:
   un gate rojo al llegar se saltea, y un gate salteado se lee como cobertura.
+### El criterio de retiro del legacy mide 38 capabilities, no 12 — y lee DOS archivos
+
+`apps/studio-client/src/data/legacy-parity.ts` es el inventario ejecutable que gatea `TASK-1560`. Su primera
+versión declaraba **12** y leía sólo `producer-client.ts`: ese archivo es el **TRANSPORTE** y expone un
+`reader(id)` / `command(id)` **genérico**, así que `producer-controller.ts` —la UI— despacha **29 capabilities
+más** pasando el id como argumento, y ninguna aparece como literal en el transporte.
+
+**El guard pasaba en verde midiendo el archivo que su autor eligió, no la realidad** — el anti-patrón *"el gate es
+el test de regresión del primer consumidor"* aplicado al propio gate. Sin corregirlo, `TASK-1560` habría podido
+borrar el legacy con el reemplazo cubriendo **12 de 38**.
+
+Hoy el guard lee **los dos archivos**, clasifica por camino de despacho (genérico vs tipado) y tiene un piso
+numérico. El inventario declara la **`surface`** de cada capability, y eso lo vuelve un plan:
+**composer 14 · viewer 6 · library 6 · credits 4 · feed 4 · review 4** — el composer es el cuello de botella.
+
+⚠️ Y **12 capabilities están GATEADAS Y NUNCA DESPACHADAS** en el legacy (`library.bulk.*`,
+`experiment.evidence/list/tree`, `recipe.get`, `prompt.enhancement.accept/reject`, …): el botón existe, se ilumina
+con grant, y no llama a nada. **No son riqueza: son promesas muertas**, declaradas con su motivo en
+`LEGACY_PARITY_EXCLUSIONS`. Cuando alguien diga *"el legacy tiene X y el nuevo no"*, la pregunta es **si X
+DESPACHA**.
+
 - **`TASK-1555` (selector de modelo del Producer) — in-progress.** La **galería de láminas** se implementó y **el
   operador la rechazó al verla**; se reemplazó por un **desplegable compacto con isotipo real** de cada modelo
   (`a45954f`), que lista **toda la flota de la modalidad activa** (`0258534`). **No la llames "galería": está
@@ -749,6 +770,48 @@ Esta es la parte que hay que interiorizar antes de prometer un cutover. Verifica
 **La cadena real del cutover, en este orden:** (1) **cablear** la variable en el `.tf` del servicio → (2)
 `TASK-1562` → (3) desplegar `origin/main` vía `deploy-internal.yml` → (4) flip + `tofu apply` → (5) verificar con
 **grant real** → (6) retirar el legacy (`TASK-1560`).
+
+## 🔴 Antes de crear una TASK de este epic: barrer por DOMINIO, no por nombre (2026-07-25)
+
+EPIC-028 tiene **~50 tasks hijas**, y varias describen **la misma superficie desde ángulos distintos**:
+foundation · resiliencia · port al payload nuevo · rediseño de jerarquía. Eso hace que un barrido por **título**
+no cruce duplicados, y en una sola sesión se crearon **cinco tasks duplicadas** antes de detectarse:
+
+| Creada | Dueña que ya existía |
+|---|---|
+| feed + viewer sobre el payload cliente | **`TASK-1526`** Producer Resilient Feed and Viewer |
+| proyección del share · menciones | **`TASK-1522`** Review, Comments and Read-only Share Foundation |
+| composer sobre el payload cliente | **`TASK-1552`** Composer Focused Creation + **`TASK-1532`** One-Click Generate + **`TASK-1555`** Model Selector |
+| motion del payload cliente | **`TASK-1523`** Creative Suite Experience Logic (dueña de los contratos visual/flow/motion) |
+| (biblioteca, evitada a tiempo) | **`TASK-1520`** Asset Library, Collections and Bulk Operations |
+
+*"Feed + viewer sobre el payload cliente"* y *"Resilient Feed and Viewer"* **son la misma superficie con dos
+nombres.** La pregunta correcta no es *"¿existe una task con este nombre?"* sino **"¿quién es dueño de esta
+superficie?"**.
+
+**Mapa de dueños por superficie del Producer** (verificado 2026-07-25) — usalo antes de crear cualquier task:
+
+| Superficie | Dueña |
+|---|---|
+| Composer (IA, first fold, progressive disclosure) | `TASK-1552` |
+| Estimado automático + CTA de gasto | `TASK-1532` |
+| Selector de modelo | `TASK-1555` (+ `TASK-1553` para resolución por-ruta) |
+| Prompt engineer / prompt studio | `TASK-1530` / `TASK-1531` |
+| Feed + viewer (resiliencia, concurrencia) | `TASK-1526` |
+| Biblioteca, colecciones, bulk | `TASK-1520` |
+| Review, comentarios, share, menciones | `TASK-1522` |
+| **Contratos visual / flow / motion de la suite** | `TASK-1523` |
+| Retiro del payload legacy | `TASK-1560` |
+
+⚠️ **`TASK-1523` es la dueña del contrato de motion de TODO el payload cliente.** El SSOT es
+`docs/architecture/creative-studio/GLOBE_CLIENT_MOTION_CONTRACT_V1.md` — compartido y no per-superficie porque el
+isotipo de Globe generando vive en el feed **y** en el composer, y dos definiciones del mismo momento de marca
+divergen. Sus tres capas se gobiernan distinto: **identidad** (bajo `reduce` se apaga la animación, **no** el
+elemento) · **estructura** (`--duration-none`) · **ambiente** (se apaga).
+
+**Y `Motion: none` en una task de superficie es una alarma, no un default.** `TASK-1559` se autorizó así y el feed
+shippeó con **4 de 11** animaciones del diseño aprobado. El task-lint sólo verifica que el campo exista; contar los
+`@keyframes` del prototipo antes de aceptarlo cuesta un `grep`.
 
 ## Errores canónicos y correlación
 
