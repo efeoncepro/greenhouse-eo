@@ -1,6 +1,6 @@
 # Inventario de supervivencia del port — contratos cross-repo del Producer
 
-> **Tipo:** inventario operativo · **Version:** 1.0 · **Creado:** 2026-07-25 por Claude
+> **Tipo:** inventario operativo · **Version:** 1.1 · **Creado:** 2026-07-25 por Claude
 > **Task:** `TASK-1560` Slice 1 (ADR-014) · **Consumidores:** `TASK-1552`, `TASK-1559`, `TASK-1524`
 > **Verificado contra:** `efeonce-globe` `6e8ef5a` (`main`) y `greenhouse-eo` `develop`
 
@@ -76,17 +76,33 @@ real, no un fixture— y declara en su `readiness.selectors`:
 `data-producer-candidate-kind` además se usa en dos assertions más, una de ellas como base de un
 click: `[data-producer-candidate-kind="hero"] button[aria-label="Ver candidato"]`.
 
-**Consecuencia:** el readiness de ese escenario **no se puede satisfacer contra el Producer real**. No
-es que falle a veces — es que el elemento que espera no lo emite nadie.
+**Causa raíz, ya investigada → [`ISSUE-125`](../../issues/open/ISSUE-125-gvc-evidence-against-uncommitted-globe-dom.md):**
 
-**Lo que esto significa para el port:** el contrato cross-repo ya estaba roto **antes** de que
-empezáramos a portar. Si alguien corre ese escenario después del port y falla, la conclusión natural
-—"lo rompió el port"— sería **falsa**, y se perdería tiempo buscando una regresión que no existe.
+La captura que produjo la evidencia registra **`env: local`** y sus assertions en **`passed`**, incluida
+la del atributo inexistente. El gate **no** está roto —se verificó: `runReadiness` sí incluye el array
+`selectors`, `visible` falla cuando no está visible, y `isVisible` devuelve `false` ante un timeout— así
+que la única explicación consistente es que **el árbol local de Globe emitía esos atributos el
+2026-07-22 y ese código nunca se commiteó**.
 
-**Acción:** verificar el estado de ese escenario **antes** de tocar el Producer, para tener una línea
-base honesta. O el escenario está desactualizado y hay que corregirlo, o describe un estado que Globe
-debía emitir y nunca emitió — y entonces el bug es de Globe. Las dos posibilidades importan; asumir
-cualquiera sin comprobar es lo único que no vale.
+La evidencia es real; **el DOM que la produjo no está en ninguna parte.** Es la clase de bug que este
+repo ya documentó al revés (`TASK-943`: código commiteado que depende de un archivo sin commitear) —
+acá lo que depende de trabajo huérfano es la **evidencia**.
+
+**Lo que esto significa para el port:** el contrato cross-repo **nunca se implementó**. Si alguien corre
+ese escenario después del port y falla, la conclusión natural —"lo rompió el port"— sería **falsa**, y
+se perdería tiempo buscando una regresión que no existe. La baseline de
+`globe.creative-producer-surface` tampoco sirve como referencia de before/after: documenta un estado
+irreproducible, no un estado bueno anterior.
+
+**Acción:** resolver `ISSUE-125` antes de portar el composer o el feed. Hay dos posibilidades opuestas
+—el escenario se adelantó al código, o Globe debía emitirlos y el trabajo quedó huérfano— y **no se
+puede elegir sin revisar el diseño del Producer**. Si `candidate-kind` es una distinción real del modelo
+(una pieza "hero" vs. otras), falta código en Globe. Si era vocabulario de wireframe, hay que corregir
+el escenario. Asumir cualquiera de las dos sin comprobar es lo único que no vale.
+
+**Regla que se sigue:** **NUNCA** producir evidencia GVC canónica de una superficie de otro repo contra
+`env: local`. El árbol local puede tener trabajo sin commitear, y **la evidencia sobrevive al trabajo**:
+queda un dossier que describe algo que nadie puede reproducir.
 
 ## Los 10 atributos de estado que Greenhouse asserta
 

@@ -64,7 +64,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-125`
+`ISSUE-126`
 
 ## Open
 
@@ -73,6 +73,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 | `ISSUE-122` | [Visual gate del composer: nondeterminismo de fotos + sin protocolo de concurrencia + docs dispersas](open/ISSUE-122-composer-visual-gate-photo-nondeterminism-concurrency-docs.md) | local (composer visual gate) | 2026-07-15 | open (runbook cerrado; fix determinismo + regla concurrencia coordinados con la sesión del composer) |
 | `ISSUE-123` | [Alias env-staging de Vercel fijado a un deployment viejo por `vercel alias set` manual](open/ISSUE-123-vercel-env-staging-alias-pinned-manual-alias-set.md) | Vercel staging (agent tooling) | 2026-07-18 | open (tooling resiliente shipped + des-pin ejecutado + **re-atado automático verificado ciclo 1** — cierra con 1 deploy más moviéndose solo) |
 | `ISSUE-124` | [Globe: grant adicional de créditos devuelve 409 sin causa de fase](open/ISSUE-124-globe-credit-grant-canonical-409-root-cause-hidden.md) | production (Globe API internal) | 2026-07-24 | open |
+| `ISSUE-125` | [La evidencia GVC del Producer se produjo contra un DOM de Globe que nunca se commiteó](open/ISSUE-125-gvc-evidence-against-uncommitted-globe-dom.md) | local (evidencia GVC de una superficie de otro repo) | 2026-07-25 | open |
 | `ISSUE-118` | [Los readers del watchdog usan un resolver PAT-only e ignoran el GitHub App ya provisionado](open/ISSUE-118-watchdog-readers-sync-resolver-ignore-github-app.md) | local + Vercel (no afecta GH Actions) | 2026-07-10 | open |
 | `ISSUE-117` | [Offboarding ejecutado nunca desactiva `greenhouse_core.members` (active/status) → desvinculados filtran a rosters/nómina/360](open/ISSUE-117-offboarding-executed-never-deactivates-member-canonical.md) | production + staging (identity canónico) | 2026-07-06 | open |
 | `ISSUE-114` | [Preflight batch-policy: falso positivo `requires_break_glass` por divergencia de squash-merge](open/ISSUE-114-release-batch-policy-classifier-squash-divergence-false-positive.md) | CI/local (release preflight) | 2026-07-03 | open (mitigado con bypass + sync merge-base; fix de raíz pendiente) |
