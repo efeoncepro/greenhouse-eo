@@ -49,12 +49,42 @@ al menos dos veces: donde se declara y donde se consume.
 
 | # | Paso | Naturaleza |
 |---|---|---|
-| 1 | **Cablear la variable**: bloque `env` en el `.tf` de `globe-studio-internal` que pase `GLOBE_CLIENT_APP_ENABLED = tostring(var.client_app_enabled)` | Código de infra. Nunca se hizo |
+| 1 | **Cablear la variable**: bloque `env` en `cloud_run_services.tf` (recurso `studio_web`) que pase `GLOBE_CLIENT_APP_ENABLED = var.client_app_enabled ? "true" : "false"` | ✅ **escrito y planeado** 2026-07-25 · ⏳ `apply` pendiente — ver abajo |
 | 2 | **[`TASK-1562`](../../tasks/to-do/TASK-1562-globe-share-projection-hydration.md)** — hidratar `modelLabel`, `reviewStatus` y `comments`, que hoy `resolveForShare` descarta en silencio | Producto. Ver abajo |
 | 3 | **Desplegar** `origin/main` vía `deploy-internal.yml` (`workflow_dispatch`, servicio `globe-studio-internal`, SHA exacto) | Acción de runtime — **requiere autorización explícita** |
 | 4 | **Flip + `tofu apply`** con el plan leído | Ahí sí con efecto |
 | 5 | **Verificar con grant real** (los 6 puntos de abajo) | |
 | 6 | Retirar `public-share-ui.ts` ([`TASK-1560`](../../tasks/to-do/TASK-1560-globe-legacy-payload-retirement.md)) | Después de verificar |
+
+### Estado del paso 1 (2026-07-25)
+
+El cable **está escrito** en `infra/terraform/cloud_run_services.tf`, dentro del `dynamic "env"` del
+recurso `studio_web` — sólo ahí: es la capa de render, y la API privada no emite HTML.
+
+Verificado antes de proponer el apply:
+
+```
+tofu fmt -check   → limpio
+tofu validate     → Success! The configuration is valid.
+tofu plan         → Plan: 0 to add, 1 to change, 0 to destroy
+                    google_cloud_run_v2_service.studio_web will be updated in-place
+                    + env { name = "GLOBE_CLIENT_APP_ENABLED", value = "false" }
+```
+
+Cumple las dos condiciones que este runbook exige: **cero destroy, cero replace**, y ningún otro
+recurso en el diff — o sea que tampoco hay drift pendiente de otra sesión.
+
+**Qué falta y por qué:** el `apply` y el commit del `.tf` quedaron **pendientes de autorización
+humana**; el guard de permisos los bloqueó, que es exactamente su trabajo con una mutación de infra.
+El cambio está en el working tree de `efeonce-globe`, sin commitear.
+
+```bash
+cd ../efeonce-globe/infra/terraform && tofu plan -out=tfplan && tofu apply tfplan
+```
+
+Ojo con el valor: este apply escribe `GLOBE_CLIENT_APP_ENABLED=false`. **Hace que la palanca exista,
+no la prende.** Crea una revisión nueva de Cloud Run con la **misma imagen** y un env var más, así que
+el comportamiento no cambia — el arranque ya está probado por la revisión que corre hoy.
 
 ### Por qué `TASK-1562` va ANTES del cutover
 
