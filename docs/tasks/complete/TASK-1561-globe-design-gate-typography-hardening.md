@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `En curso`
+- Status real: `Complete`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `ninguna`
@@ -149,8 +149,14 @@ y testearlo. Una regla que enrojece código compliant se apaga sola.
 habría dejado el build en rojo a la otra sesión sin aviso—, cada una enrojeciendo **exactamente una**
 regla con **cero colaterales**, y restaurar devolviendo las cinco a verde.
 
-**Pendiente: Slice 3.** Requiere editar `design-contract.test.ts`, que la sesión de `TASK-1558` tiene
-abierto. Se hace cuando su trabajo aterrice.
+**Slice 3 hecho** (`efeonce-globe` `6e8ef5a`), una vez que el trabajo de `TASK-1558` aterrizó y el
+árbol quedó limpio. La frontera queda escrita en el propio gate, con su razón: escanea
+`apps/studio-client` y nada más, que es la frontera de un **paquete** mientras la responsabilidad que
+cuida es más ancha —`studio-web` sigue teniendo los tres módulos legacy, donde viven los 184 hex y las
+cuatro familias literales—. No se extiende ahí ahora por una razón mecánica, no de gusto: **con el
+legacy presente, un escaneo de `studio-web` falla por construcción, y un gate rojo al llegar se
+saltea**. Un gate salteado es peor que uno ausente, porque se lee como cobertura. `TASK-1560` Slice 2
+lo amplía **inmediatamente antes** del borrado.
 
 ## Scope
 
@@ -173,7 +179,7 @@ Para **cada** clase del gate (las tres vigentes + las nuevas): introducir una vi
 correr el gate, confirmar rojo con el mensaje esperado, restaurar. Dejar el resultado escrito en el
 runbook — es la única evidencia de que el gate corre y no sólo compila.
 
-### Slice 3 — Declarar la frontera ⏳ (bloqueado por el WIP de `TASK-1558`)
+### Slice 3 — Declarar la frontera ✅
 
 Documentar en el propio gate **qué escanea y por qué**, y dejar anotado que `TASK-1560` la extiende a
 `studio-web` una vez retirado el legacy (hoy saldría rojo por los archivos que están por borrarse).
@@ -241,7 +247,7 @@ Coordinar con la sesión de `TASK-1558` antes de endurecer (ver Detailed Spec).
 - [x] La lista de pesos permitidos se **deriva** de `GLOBE_FONT_FACES`, no está escrita a mano.
 - [x] Cada clase del gate fue mordida: violación → rojo → restaurar, con el resultado escrito **y con cero colaterales** — la columna que descarta el gate sobre-amplio, no sólo el inerte.
 - [x] Los mensajes de error nombran el token correcto.
-- [ ] La frontera del gate está declarada en el archivo, con su razón.
+- [x] La frontera del gate está declarada en el archivo, con su razón, y con la descripción honesta de la cobertura: **el payload nuevo no puede driftear; el legacy no está vigilado.**
 - [x] El WIP de `TASK-1558` pasa las cinco reglas (verificado sin tocarlo).
 - [x] Runbook de gates actualizado con la evidencia de la mordida.
 
@@ -251,12 +257,11 @@ Coordinar con la sesión de `TASK-1558` antes de endurecer (ver Detailed Spec).
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado y archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] Runbook de gates actualizado
-- [ ] `Handoff.md`
-- [ ] `TASK-1560` notificada: hereda estas reglas al extender a `studio-web`
-- [ ] chequeo de impacto cruzado
+- [x] `Lifecycle` sincronizado y archivo en la carpeta correcta
+- [x] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
+- [x] Runbook de gates actualizado con la evidencia de la mordida
+- [x] `TASK-1560` notificada: su Slice 2 hereda estas reglas y amplía la frontera **antes** del borrado
+- [x] chequeo de impacto cruzado — `TASK-1558` entregó las reglas; `TASK-1560` las hereda
 
 ## Follow-ups
 
