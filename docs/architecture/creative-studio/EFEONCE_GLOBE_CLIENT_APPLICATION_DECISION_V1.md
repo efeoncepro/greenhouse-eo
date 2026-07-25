@@ -82,7 +82,23 @@ ADR-004 dejó constancia de que *"the target Next.js architecture never material
      **Aun así se entra por 8, y la razón es que Globe es greenfield en esta dependencia.** Entrar por 7 no evita Rolldown: lo **agenda para el peor momento**. Vite 7 no tiene LTS y baja de tier cuando salga Vite 9 (cadencia ~9-12 meses), así que la migración es inevitable — la única variable es si se paga con 3 archivos o con 200. Y los tres riesgos se atenúan fuerte en greenfield: la rotura CJS muerde sobre **dependencias heredadas**, y una app nueva (React + router + capa de canvas) tiene superficie CJS casi nula; la memoria es dev-only y local; el no determinismo importa si el tamaño de bundle es contractual, y acá no lo es. **El precedente de Angular (`vite@7.3.6` pineado) NO aplica**: Angular arrastra una base instalada enorme y usa Vite sólo para su dev server.
 
      **Dos compuertas obligatorias en el Slice 0**, ambas resolubles en horas: (1) **compatibilidad `react-router@8.3.0` ↔ Vite 8** — RR8 declara `Vite 7+` como piso y la compatibilidad con 8 **no está confirmada**; (2) **smoke de producción real que ejercite las dependencias**, no sólo CI — es lo único que atrapa el `e is not a function`. **Si cualquiera falla, se cae a `7.3.x` el mismo día** (recibe *"important fixes + security patches"* por política oficial) y se reagenda la subida a Vite 8 para cuando `rolldown#9330` cierre. Que el costo de equivocarse sea de horas y no de meses es precisamente lo que justifica entrar por 8.
-   - `react@19.2.8` · `react-router@8.3.0` en **framework mode con SSR apagado** (v8.0 del 2026-06-17; el equipo declaró ciclo mayor anual y releases *"regulares, predecibles y sobre todo aburridas"*, y su doc dice que el modo no obliga a SSR).
+   - `react@19.2.8` · **`react-router@8.3.0`** en framework mode con **SSR apagado** (v8.0 del 2026-06-17; ciclo mayor anual declarado, releases *"regulares, predecibles y sobre todo aburridas"*, y el modo no obliga a SSR).
+
+     **Router — decidido, no diferido (`TASK-1556` Slice 1, 2026-07-25).** Gana **React Router**, y el rationale
+     honesto importa más que el veredicto: el argumento a favor de `@tanstack/react-router` es su type-safety de
+     **search params como estado tipado y validado**, y esa ventaja **no se puede evaluar en el Slice 1** — el seam
+     tiene una ruta trivial sin estado en la URL. La superficie que discriminaría entre ambos es el **composer**
+     (selección de modelo, filtros, comparación de candidatos), que llega varios slices después. Se decide igual
+     ahora, con la evidencia que sí existe —madurez, ciclo predecible y **compuerta (a) verde**— porque dejar la
+     decisión abierta durante meses es cómo se termina decidiendo por inercia, que es justo lo que esta ADR existe
+     para evitar. El costo de cambiar sigue siendo bajo mientras el codebase sea chico; si el composer produce
+     evidencia material a favor de TanStack Router, se supersede con esa evidencia sobre la mesa, no antes.
+
+     ✅ **Compuerta (a) RESUELTA (2026-07-25):** `react-router@8.3.0` compila limpio sobre `vite@8.1.5` — 73
+     módulos, 284 kB crudo / 90 kB gzip, 65 ms. Era el unknown que esta ADR marcaba explícitamente sin confirmar
+     (RR8 declara `Vite 7+` como piso y nadie había verificado el 8). **El fallback a `7.3.x` ya no es necesario
+     por este motivo**; sigue vigente sólo si la compuerta (b) —el smoke de producción que ejercita las
+     dependencias en el browser— encontrara la semántica CJS estricta de Rolldown.
    - `babel-plugin-react-compiler@1.0.0` **pineado exacto**, habilitado **después** de que `eslint-plugin-react-hooks` pase limpio sobre el módulo de canvas — el compilador asume las Rules of React y un editor vectorial es justo donde más se rompen.
    - `@tanstack/react-router` es sustituto aceptable de React Router si Discovery prefiere su type-safety; **`@tanstack/react-start` NO** (ver alternativas).
 

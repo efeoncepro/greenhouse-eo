@@ -494,6 +494,8 @@ En `greenhouse-eo`:
 - **Dirección visual del share board**: no existe. Discovery debe producirla con `design-studio` /
   `product-design-loop` antes de escribir JSX. Bloquea `UI ready: yes`, no bloquea los Slices 1-3.
 - **`/legal/terms`**: ¿se implementa la página o se retira el link? Es decisión de producto/legal, no técnica.
-- **Router**: `react-router@8.3.0` es la elección declarada; `@tanstack/react-router` queda como sustituto
-  aceptable si Discovery encuentra ventaja material en su type-safety. Decidir en Plan Mode, no durante la
-  implementación.
+- ~~**Router**~~ — **RESUELTA (2026-07-25, Slice 1).** Gana `react-router@8.3.0`. El argumento de
+  `@tanstack/react-router` (search params como estado tipado y validado) **no es evaluable en el Slice 1**: el
+  seam tiene una ruta trivial sin estado en la URL, y la superficie que discriminaría es el composer. Se decide
+  igual con la evidencia disponible —madurez, ciclo mayor anual predecible y compuerta (a) verde— porque dejar
+  la decisión flotando es cómo termina decidiéndose por inercia. Rationale completo en ADR-014 §Decisión punto 1.
