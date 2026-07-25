@@ -134,7 +134,25 @@ un archivo se borra cuando su última superficie portó, no cuando "ya casi".
 
 ## Scope
 
-### Slice 1 — Verificación de cobertura (antes de borrar nada)
+### Slice 1 — Verificación de cobertura (antes de borrar nada) — **inventario de markers ✅ hecho 2026-07-25**
+
+El inventario de contratos cross-repo está en
+**`docs/operations/creative-studio/GLOBE_PORT_SURVIVAL_INVENTORY_V1.md`**, adelantado porque
+`TASK-1552`, `TASK-1559` y `TASK-1524` lo necesitan **antes** de portar, no cuando se borre el legacy.
+Sus dos hallazgos:
+
+- **`producer-model-picker` y `producer-model-trigger` sólo se asignan en runtime**, nunca en el
+  markup. Un port que use el markup como referencia no los ve, y el escenario de `TASK-1555` falla en
+  **readiness** —que se lee como "la página no cargó"— en vez de en una assertion.
+- 🔴 **`data-producer-candidate-kind` y `data-producer-feed-status` NO EXISTEN en Globe**, y el
+  escenario `globe-creative-producer` los declara en su `readiness.selectors` contra la ruta real.
+  **El contrato cross-repo ya estaba roto antes del port**: si alguien corre ese escenario después de
+  portar y falla, la conclusión "lo rompió el port" sería falsa.
+
+Falta de este slice la parte que depende de los ports: la evidencia por superficie de que su reemplazo
+está sirviendo.
+
+#### Resto del Slice 1
 
 Inventario superficie por superficie: ruta, quién la sirve hoy, cuál es su reemplazo, y **evidencia** de
 que el reemplazo está sirviendo en producción con el flag en `true`. Una superficie sin evidencia
@@ -218,7 +236,8 @@ Esta task **retira** el flag. No introduce ninguno.
 
 ## Acceptance Criteria
 
-- [ ] Inventario del Slice 1 escrito, con evidencia por superficie y por `data-capture`.
+- [x] Inventario de `data-capture` y atributos de estado escrito (`GLOBE_PORT_SURVIVAL_INVENTORY_V1.md`), con los dos hallazgos.
+- [ ] Evidencia **por superficie** de que su reemplazo está sirviendo (depende de los ports).
 - [ ] El gate de literales escanea `apps/studio-web/src/**` y está verde.
 - [ ] `producer-ui.ts`, `ui.ts`, `public-share-ui.ts` y `producer-controller.ts` no existen.
 - [ ] `client_app_enabled` no aparece en Terraform ni en el código.
