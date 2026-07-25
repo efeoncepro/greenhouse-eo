@@ -358,6 +358,42 @@ documentado. **NUNCA** dibujar una aproximación para completar el set.
 cambio de contrato, cuarta pestaña y visor GLB, y es task propia. `video-extend` tampoco tiene ruta.
 El catálogo cubre hoy **12 de 14 capacidades**.
 
+### 7. Gate visual premium + el brief del composer (`246329a`, `1c7d03b`)
+
+**GVC premium VERDE** en desktop 1440×1000 y mobile 390×844, escenario `task-1555-model-selector`
+contra el fixture local de Globe. 24 frames, 7/7 aserciones, 0 errores de consola, 0 fallos HTTP.
+Dossier: `.captures/2026-07-25T07-08-54_task-1555-model-selector/`.
+
+Tres cosas que la captura obligó a resolver bien, y valen como método:
+
+- **La rúbrica enterprise apuntaba al composer**, pero `data-surface-recipe` vive en la consola. Era
+  configuración mía del escenario, no un defecto del producto.
+- **La inercia de lo no ejecutable no se captura clickeando:** Playwright se niega a accionar un
+  `aria-disabled` — que ES la prueba de que no es un control, pero un paso fallido no es evidencia.
+  El invariante de comportamiento se movió a `producer-controller.test.ts`, y la captura declara el
+  estado legible.
+- **Una acción que elimina su propio disparador no puede ser `interaction`:** el harness la re-ejecuta
+  para las variantes, y tras elegir Veo el modo ya es Cuadros. Pasó a paso simple + mark del estado.
+
+**Scorecard:** `docs/ui/reviews/TASK-1555-globe-producer-model-selector.scorecard.json` —
+`pnpm ui:quality --task TASK-1555` **PASS**, promedio **4.54**, piso **4.2** (iconografía).
+Pisos exigidos cumplidos: jerarquía 4.7 · economía de superficies 4.6 · impacto visual 4.5 ·
+fidelidad 4.7 · resistencia a template 4.5. Las tres dimensiones bajo 4.5 (iconografía 4.2, motion
+4.3, ritmo 4.4) llevan `nextAction` declarada; **no se inflaron para pasar el gate**.
+
+**Revisión del operador sobre el brief del composer** (cuatro defectos, uno era bug):
+
+| Defecto | Corrección |
+|---|---|
+| Sugerencias hardcodeadas en el markup e **idénticas en las 3 modalidades** ("Retrato editorial" bajo *Genera audio*) | Por modalidad, desde el copy SoT, proyectadas por el `data-approved-mode` que ya existía |
+| **223px** de alto para inspiración opcional, con peso constante | Etiqueta corta + prompt completo al insertar (el handler ya leía `data-prompt-suggestion`); se repliega al escribir: **223 → 121 → 0px** |
+| "Excluir del resultado" se leía como una **quinta sugerencia** | Entra al bloque del prompt, tras las referencias y detrás de un separador: el brief cierra con su restricción |
+| Las acciones del prompt **flotaban sobre el textarea**: hueco reservado con `padding-right` fijo de 118px, más angosto que los botones (145px) → el placeholder corría bajo el historial | En flujo debajo del texto. Cederles una columna de grid tampoco servía: en 390px dejaba el input primario en 166px de 318px |
+
+El patrón común de los cuatro es el mismo de toda la task: **una constante hardcodeada que no sigue a
+la realidad** — el copy que no sigue la modalidad, el peso que no sigue el estado, el hueco que no
+sigue al contenido.
+
 ## Progress — Implementación (2026-07-24, `efeonce-globe` `78a1863`, pusheado a `main`)
 
 ### Corrección al mapa de Discovery (hallazgo load-bearing)

@@ -72,11 +72,14 @@ export const scenario: CaptureScenario = {
     },
     performance: { enabled: true, severity: 'error', maxDomNodes: 4200, maxRequests: 120, maxTransferBytes: 35_000_000, maxFcpMs: 9000 },
     enterpriseRubric: {
+      // La rúbrica evalúa la superficie que declara su gramática de composición
+      // (`data-surface-recipe` vive en la consola, no en el composer), igual que el escenario
+      // hermano de la superficie aprobada.
       enabled: true,
-      includeSelector: '[data-capture="producer-composer"]',
+      includeSelector: '[data-capture="producer-console"]',
       failOnViolations: true,
       placeholderTerms: ['lorem', 'fake', 'todo'],
-      expectedDataCaptureRegions: ['producer-composer', 'producer-route', 'producer-model-picker', 'producer-model-trigger'],
+      expectedDataCaptureRegions: ['producer-console', 'producer-composer', 'producer-route', 'producer-model-picker', 'producer-model-trigger'],
       maxUniformCards: 8,
       maxNestedSurfaceDepth: 2,
       maxContainedSurfacesInViewport: 5,
@@ -101,8 +104,8 @@ export const scenario: CaptureScenario = {
         action: { kind: 'click', selector: '[data-capture="producer-model-trigger"]' },
         intent: 'La lista abre con la flota completa de la modalidad y declara el estado real de cada modelo.',
         frames: [
-          { label: 'list-feedback', atMs: 0, clipSelector: '[data-capture="producer-route"]' },
-          { label: 'list-settled', atMs: 260, clipSelector: '[data-capture="producer-route"]' },
+          { label: 'list-feedback', atMs: 0, clipSelector: '[data-capture="producer-composer"]' },
+          { label: 'list-settled', atMs: 260, clipSelector: '[data-capture="producer-composer"]' },
         ],
         keyboardEquivalent: {
           action: { kind: 'press', selector: '[data-capture="producer-model-trigger"]', key: 'Enter' },
@@ -120,14 +123,14 @@ export const scenario: CaptureScenario = {
       assertion: { kind: 'visible', selector: '[data-producer-model-state="blocked"]', reason: 'El gate externo del proveedor debe declararse, no esconderse.' },
     },
     {
-      kind: 'interaction',
-      interaction: {
-        name: 'unavailable-model-is-inert',
-        action: { kind: 'click', selector: '[data-producer-model-state="gated"]' },
-        intent: 'Un modelo no promovido es legible y anunciable, pero NO ejecutable: el click no cambia la elección.',
-        frames: [{ label: 'gated-inert', atMs: 220, clipSelector: '[data-capture="producer-route"]' }],
-        reducedMotion: 'capture',
-      },
+      // La inercia de lo no ejecutable NO se captura clickeando: Playwright se niega a accionar un
+      // `aria-disabled`, que es justamente la prueba de que no es un control. El invariante de
+      // comportamiento vive en `producer-controller.test.ts`; acá se captura que el estado se
+      // DECLARA y es legible, que es lo que un humano tiene que poder revisar en la evidencia.
+      kind: 'mark',
+      label: 'unavailable-models-declared',
+      clipSelector: '[data-capture="producer-composer"]',
+      note: 'Próximamente (ADR-009) y gate externo del proveedor: legibles, atenuados y aria-disabled.',
     },
     { kind: 'click', selector: '[role="tab"][data-modality="video"]' },
     { kind: 'wait', selector: '[data-capture="producer-model-picker"]', timeout: 12000 },
@@ -137,25 +140,26 @@ export const scenario: CaptureScenario = {
     {
       kind: 'mark',
       label: 'fleet-video-complete',
-      clipSelector: '[data-capture="producer-route"]',
+      clipSelector: '[data-capture="producer-composer"]',
       note: 'Video muestra los cuatro modelos: Seedance disponible, Veo con lo que necesita, Gemini Omni y motion con su gate.',
     },
+    // Elegir un modelo que necesita otro modo CAMBIA el modo. No va como `interaction` porque el
+    // harness re-ejecuta la acción para las variantes, y esta acción elimina su propio disparador:
+    // una vez en modo Cuadros, Veo ya no "necesita cuadros". La evidencia es el estado resultante.
+    { kind: 'click', selector: '[data-producer-model-needs-mode="frames"]' },
+    { kind: 'sleep', ms: 320 },
     {
-      kind: 'interaction',
-      interaction: {
-        name: 'cross-mode-selection',
-        action: { kind: 'click', selector: '[data-producer-model-needs-mode="frames"]' },
-        intent: 'Elegir un modelo que necesita otro modo cambia el modo del composer y lo deja seleccionado, en vez de ser inerte.',
-        frames: [{ label: 'mode-switched', atMs: 300, clipSelector: '[data-capture="producer-composer"]' }],
-        reducedMotion: 'capture',
-      },
+      kind: 'mark',
+      label: 'cross-mode-switched',
+      clipSelector: '[data-capture="producer-composer"]',
+      note: 'Elegir Veo llevó el composer al modo Cuadros y lo dejó como modelo elegido, en vez de ser un control inerte.',
     },
     { kind: 'click', selector: '[role="tab"][data-modality="audio"]' },
     { kind: 'wait', selector: '[data-capture="producer-model-picker"]', timeout: 12000 },
     { kind: 'scroll', selector: '[data-capture="producer-route"]', scrollBlock: 'center' },
     { kind: 'click', selector: '[data-capture="producer-model-trigger"]' },
     { kind: 'sleep', ms: 240 },
-    { kind: 'mark', label: 'fleet-audio-complete', clipSelector: '[data-capture="producer-route"]', note: 'Audio ofrece Seed Audio y ElevenLabs; ninguno queda inalcanzable.' },
+    { kind: 'mark', label: 'fleet-audio-complete', clipSelector: '[data-capture="producer-composer"]', note: 'Audio ofrece Seed Audio y ElevenLabs; ninguno queda inalcanzable.' },
     { kind: 'click', selector: '[role="tab"][data-modality="image"]' },
     { kind: 'wait', selector: '[data-capture="producer-model-picker"]', timeout: 12000 },
     { kind: 'scroll', selector: '#producer-title', scrollBlock: 'start' },
