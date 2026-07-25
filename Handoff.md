@@ -11,6 +11,12 @@
   `efeonce-agency` y `docs/business-models/README.md` ya enrutan hacia ellas. No declaran una ronda, instrumento,
   spinout ni pricing aprobado. Ver los SKILL.md y `docs/strategy/EFEONCE_CAPITAL_AND_INVESTMENT_STRATEGY_V1.md`.
 
+- **2026-07-25 — Hardening de skills completado.** Investor Readiness ahora incluye templates de deck,
+  financial review, use of funds, data room, pipeline, diligence, applications, videos, demo y post-close;
+  source catalog; validadores de evidence ledger/data room; y protocolo/evidencia de evals. Business Model
+  incluye eval protocol, source catalog, portfolio model contract y drafts explícitos para Efeonce Group,
+  Growth Platform, AEO y Search Visibility 360. Todos siguen `Draft` donde faltan datos reales.
+
 - Branch compartida: `develop`. Antes de editar, ejecutar `git status --short` y no asumir árbol limpio.
 - El checkout contiene trabajo paralelo de Campaign Layout Compiler / producción creativa que fue preservado
   exactamente en el snapshot del corte; no revertir ni reescribir esos cambios.

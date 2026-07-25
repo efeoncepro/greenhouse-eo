@@ -101,6 +101,13 @@ Todo business model debe separar al menos estas dimensiones:
 
 - [Portfolio Business Model Template](PORTFOLIO_BUSINESS_MODEL_TEMPLATE.md) — contrato para el modelo de
   Efeonce Group y sus capabilities; no autoriza por sí solo pricing, venta, inversión ni spinout.
+- [Efeonce Group Business Model V1](efeonce-group/EFEONCE_GROUP_BUSINESS_MODEL_V1.md) — draft portfolio-level,
+  todavía requiere reconciliación de Finance, Commercial, Product y Legal/IP.
+- [Efeonce Growth Platform Business Model V1](growth-platform/EFEONCE_GROWTH_PLATFORM_BUSINESS_MODEL_V1.md) —
+  draft de la hipótesis de plataforma; no afirma SaaS, ARR ni PMF.
+- [Efeonce AEO Business Model V1](aeo/EFEONCE_AEO_BUSINESS_MODEL_V1.md) — draft de wedge/capability.
+- [Search Visibility 360 Business Model V1](search-visibility-360/SEARCH_VISIBILITY_360_BUSINESS_MODEL_V1.md) —
+  draft de capability en construcción.
 
 - [Efeonce Creative Studio V1.1](creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md) —
   `Approved for validation`; incorpora la doctrina de autoría humana y mantiene B2B2B como hipótesis gateada.

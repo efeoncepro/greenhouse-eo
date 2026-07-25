@@ -14,6 +14,9 @@
 - Se actualizó el routing de `AGENTS.md`, `CLAUDE.md`, `efeonce-agency`, `project_context.md` y
   `docs/business-models/README.md`. El cambio no autoriza instrumentos financieros, emisiones, spinouts,
   pricing, ventas ni transferencia de IP.
+- Se endurecieron los artefactos: templates del pack de inversión, source catalogs, validadores de ledger y
+  data room, acceptance criteria/protocol de evals, y drafts `Draft` de Efeonce Group, Growth Platform, AEO
+  y Search Visibility 360 sin inventar datos financieros o de tracción.
 
 ## 2026-07-25 — Cutover del share board de Globe: LIVE, y las dos precondiciones que faltaban (TASK-1558 Slice 3 + TASK-1562)
 

@@ -4,7 +4,11 @@ from pathlib import Path
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-required = ["SKILL.md", "references/sources.md", "templates/business-model-integrity-pack.md", "templates/validation-plan.md", "checklists/business-model-review.md", "agents/openai.yaml"]
+required = [
+    "SKILL.md", "references/sources.md", "references/source-catalog.json", "templates/business-model-integrity-pack.md",
+    "templates/validation-plan.md", "checklists/business-model-review.md", "agents/openai.yaml",
+    "evals/acceptance-criteria.md", "evals/protocol.md"
+]
 missing = [p for p in required if not (ROOT / p).exists()]
 if missing:
     print("missing:", ", ".join(missing))

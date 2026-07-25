@@ -6,6 +6,8 @@ description: Investor readiness, fundraising, accelerator applications, evidence
 # Claude routing companion
 
 The canonical operating skill is `.codex/skills/efeonce-investor-readiness/SKILL.md`.
+Its hardening set includes acceptance criteria, blind-eval protocol, evidence/data-room validators and the
+full investor material templates.
 Load that skill and the routed Efeonce/Finance/Legal documents before acting. This companion exists so
 Claude and Codex share the same trigger and do not create divergent fundraising doctrine.
 

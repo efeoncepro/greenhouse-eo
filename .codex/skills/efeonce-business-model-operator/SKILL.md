@@ -311,4 +311,5 @@ No decir “listo para escalar” si faltan economics, capacidad, rights, soport
 - La fuente de verdad del modelo concreto vive en `docs/business-models/`.
 - Revisar cada cambio material de precio, delivery, provider, derechos, revenue, margen o estado runtime.
 - Crear V2 o una decisión que superseda; no reescribir historia para ocultar un cambio.
-- Ejecutar `checklists/business-model-review.md` y `quick_validate.py` antes de cierre.
+- Ejecutar `checklists/business-model-review.md`, `quick_validate.py` y el protocolo ciego de `evals/protocol.md`
+  para cambios sustantivos antes de cierre.

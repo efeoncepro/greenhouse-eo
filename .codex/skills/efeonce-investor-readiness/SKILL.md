@@ -316,7 +316,10 @@ correcto enumera artefactos, owners, fuentes, riesgos abiertos, próxima decisi�
 - Revisar al menos trimestralmente y antes de cada ronda.
 - Revalidar requisitos de YC, Start-Up Chile, CORFO, instrumentos, SAFE y securities law antes de una aplicación.
 - Registrar URLs, fecha de consulta y jurisdicción en `references/sources.md`.
-- Ejecutar `quick_validate.py` y el checklist de `checklists/readiness.md` antes de cerrar una versión.
+- Ejecutar `quick_validate.py`, `scripts/validate_evidence_ledger.py`, `scripts/validate_data_room.py` cuando
+  existan sus archivos de entrada, y el checklist de `checklists/readiness.md` antes de cerrar una versión.
+- Ejecutar el protocolo ciego de `evals/protocol.md` para cambios sustantivos; el mínimo de release es 100%
+  de hard-fails protegidos y 90% de comportamientos requeridos.
 
 ## Composición de skills
 
@@ -326,5 +329,5 @@ correcto enumera artefactos, owners, fuentes, riesgos abiertos, próxima decisi�
 - deck: `deck-studio`;
 - web: `efeonce-public-site-wordpress`, `seo-aeo`;
 - IP/legal: `legal-privacy-ip-operator`;
-- business model: `efeonce-business-models`;
+- business model: `efeonce-business-model-operator`;
 - cierre documental: `greenhouse-documentation-governor`.

@@ -4,7 +4,15 @@ from pathlib import Path
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-required = ["SKILL.md", "references/sources.md", "templates/claim-record.md", "templates/metric-contract.md", "checklists/readiness.md", "agents/openai.yaml"]
+required = [
+    "SKILL.md", "references/sources.md", "references/source-catalog.json", "templates/claim-record.md", "templates/metric-contract.md",
+    "templates/investor-deck-outline.md", "templates/financial-readiness-review.md",
+    "templates/use-of-funds-model.md", "templates/data-room-index.md", "templates/investor-pipeline.md",
+    "templates/diligence-risk-register.md", "templates/fundraising-decision-record.md",
+    "templates/application-variants.md", "templates/founder-video-brief.md", "templates/product-demo-brief.md",
+    "templates/post-close-reporting.md", "checklists/readiness.md", "agents/openai.yaml",
+    "evals/acceptance-criteria.md", "evals/protocol.md"
+]
 missing = [p for p in required if not (ROOT / p).exists()]
 if missing:
     print("missing:", ", ".join(missing))
