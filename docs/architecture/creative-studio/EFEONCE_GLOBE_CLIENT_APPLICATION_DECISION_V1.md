@@ -1,7 +1,7 @@
 # Efeonce Globe — Client Application Decision V1
 
 - **Decision:** ADR-014
-- **Status:** Accepted — implementación gated por `TASK-1556`; el host comercial sigue diferido por ADR-004
+- **Status:** Accepted — Slices 0 y 1 entregados (`TASK-1556`, `TASK-1558`) pero **ninguna superficie servida**: `client_app_enabled` sigue en `false` y el cutover no se ejecutó (ver "La cadena real del cutover"); el host comercial sigue diferido por ADR-004
 - **Date:** 2026-07-25
 - **Owner:** Efeonce Creative Technology / Globe (código) + Greenhouse control plane (gobierno documental)
 - **Scope:** **TODO el payload de browser de Efeonce Globe** — las cinco superficies HTML que existen hoy (`launch`, `studio`, `error`, `producer`, `share`) y toda superficie humana futura, con énfasis en las **client-facing**: share boards read-only, Storyboard Sequence Canvas con `client_review`, Video Effectiveness `client-operated`/`co-operated` y delivery packages. **NO** cubre el host, el BFF, la sesión, el trust boundary, la API privada ni la infraestructura.
@@ -209,17 +209,52 @@ No es escalabilidad de tráfico (eso lo gobiernan `maxScale` y los stores durabl
 > "Slice N de ADR-014", nunca "Slice N" a secas — decir "implementado hasta el Slice 3" significa
 > cosas opuestas en cada esquema.
 >
-> **Estado 2026-07-25:** el Slice 0 de esta ADR está **entregado** (`bf1df21`…`4bf631e` en `main` de
-> `efeonce-globe`), con `client_app_enabled` en `false` y **ninguna superficie portada**. El share
-> board está bloqueado por dirección visual aprobada inexistente.
+> **Estado 2026-07-25:** el **Slice 0** está entregado (`bf1df21`…`4bf631e` en `main` de
+> `efeonce-globe`) y el **Slice 1** también (`a336ff5`, Slices 1-2 de `TASK-1558`). Pero
+> **ninguna superficie está sirviendo sobre el payload nuevo**: `client_app_enabled` sigue en
+> `false` y **el cutover no se ejecutó**. Todo lo construido —payload, tokens, copy, gates, CDN y
+> el share board completo— es **potencial** hasta que se ejecute la cadena de cutover que está
+> más abajo. Leer esa cadena antes de suponer que falta "un `apply`".
 
 - **Slice 0 — el seam + los gates + la validación de Vite 8.** Build Vite → assets servidos por `assets.ts` con nonce; módulo SSOT de tokens; lint de estilos (hex crudo = error) y de a11y. **Las dos compuertas de la Decisión punto 1 se resuelven acá y son criterio de salida**: (a) `react-router@8.3.0` funciona sobre Vite 8 (piso declarado `Vite 7+`, compat con 8 sin confirmar); (b) un **smoke de producción real** que ejercite las dependencias en el browser, no sólo CI. Cualquiera de las dos en rojo ⇒ **fallback a `vite@7.3.x` el mismo día**, registrado como Delta en esta ADR. Resto del criterio de salida: CSP, SSO, `pnpm check`, `pnpm build` y el canary verdes, y el flag apaga el payload nuevo sin dejar rastro.
-- **Slice 1 — share board.** La cara del cliente, primero. Sale del CSS de una línea, adopta el SSOT de tokens, deja de auto-rotularse "Producer", estrena su primer canary visual. Se arregla `/legal/terms` (o se saca el link).
+- **Slice 1 — share board. ENTREGADO, NO SERVIDO (`TASK-1558`, `a336ff5`).** La cara del cliente, primero. Sale del CSS de una línea, adopta el SSOT de tokens, deja de auto-rotularse "Producer", estrena su primer canary visual. Se arregla `/legal/terms` (o se saca el link). Lo que existe hoy: las seis primitives base (inventario abajo), los tokens de tipografía en el SSOT (`--font-display`/`--font-body`, escala de cuatro pasos, pesos derivados de `GLOBE_FONT_FACES`), el gate de diseño extendido a tipografía y a pesos sin `@font-face` —y caminando `.css` además de `.ts`/`.tsx`— y un canary visual de **seis estados × tres anchos** (1440×1000, 390×844, 320×844) con assertion de no-fuga sobre el **HTML servido** (sin slug, `house`, costo, margen, "Producer", ISO 8601 ni enum crudo), que encontró dos bugs reales antes del commit. Scorecard 4,71 promedio, piso 4, cinco dimensiones en 5. **Nada de esto le llega todavía a un cliente:** el flag sigue en `false` y falta la cadena de cutover.
 - **Slice 2 — launch + error.** Superficies públicas, chicas, sobre los mismos tokens. Un 404 en un browser deja de ser JSON.
 - **Slice 3 — composer.** La superficie interna más caliente (`TASK-1552`/`TASK-1555` aterrizan ahí).
 - **Slice 4 — feed + viewer.** El slice de concurrencia: watermark, epoch, refresh de sesión. Los contratos del Delta de ADR-005 entran como asserts, no como comentarios.
 - **Slice 5 — library, colecciones, batch; y retiro.** Se eliminan `producer-controller.ts`, `producer-client.ts` y los cuatro `:root`; `studio-web` queda como BFF puro + serving. El flag se retira con el código.
 - **Fuera del strangler:** Storyboard (`TASK-1547`), Video Effectiveness (`TASK-1540`) y delivery (`TASK-1472`) **no se portan** — nacen en el payload nuevo.
+
+### La cadena real del cutover (verificada 2026-07-25 contra el código, no contra la doc)
+
+**Encender el share board NO es un `tofu apply`.** Se creía que sí —lo decía la propia `TASK-1558`— y
+es falso. Lo verificado hoy sobre `main` de `efeonce-globe`:
+
+- `client_app_enabled` aparece **una sola vez** en todo `infra/terraform/`: su propia declaración en
+  `variables.tf:188`. **No está cableado a ningún recurso.**
+- `GLOBE_CLIENT_APP_ENABLED` no aparece en ningún `.tf` ni en el spec del Cloud Run
+  `globe-studio-internal`.
+- La imagen desplegada (`45235ccb62ca`) es **anterior** al commit de `TASK-1556`: no tiene el bundle,
+  no tiene `renderShell` y no lee esa variable.
+- Por lo tanto, cambiar el default a `true` y correr `tofu apply` daría **plan vacío** y producción
+  idéntica. Es exactamente el modo de falla de `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED` en Greenhouse:
+  el registro dice ON y la realidad es OFF, en silencio.
+
+**La cadena, en este orden:**
+
+1. Cablear `GLOBE_CLIENT_APP_ENABLED = tostring(var.client_app_enabled)` en el `.tf` del servicio.
+2. `TASK-1562` — hidratación de la proyección del share.
+3. Desplegar `origin/main` vía `deploy-internal.yml` (**requiere autorización humana**).
+4. Flip del default a `true` + `tofu apply`.
+5. Verificar con un grant real, contra el servicio vivo.
+6. Retirar el legacy (`TASK-1560`).
+
+**Por qué `TASK-1562` va antes del flip, y por qué no es cosmética.** Hidrata `modelLabel`,
+`reviewStatus` y `comments`: **el grant los pide, el dominio los proyecta y el operador puede
+crearlos**, pero `resolveForShare` devuelve sólo `{ target, mediaType }` y los descarta en silencio en
+**todos** los shares de producción. El board viejo tapaba el agujero con un `if (!value) continue` que
+nunca ve un valor; el board nuevo, al declarar "Sin dato", **destapó un bug que llevaba tiempo ahí — no
+lo introdujo**. Sin `1562`, el cutover cambiaría "sin panel" por "panel con tres huecos declarados" en
+la **única** superficie que ve un cliente externo.
 
 ## Las primitives nacidas — inventario y **propuesta** de promoción (TASK-1558, 2026-07-25)
 
@@ -271,6 +306,7 @@ estaba lista, y la prop nueva es la evidencia.
 - **NUNCA** importar primitives, `CompositionShell`, MUI o AXIS de `greenhouse-eo` dentro de Globe (`TASK-1540`): los tokens se materializan en Globe.
 - **NUNCA** retirar una superficie vieja antes de que su reemplazo tenga cobertura equivalente (test + canary + fixture): la migración no puede reducir la red de regresión.
 - **NUNCA** dejar el estado real del flag en `terraform.tfvars` (gitignoreado): se declara en `variables.tf` con default `false`.
+- **NUNCA** tratar el flip de `client_app_enabled` como "un `apply`". Antes del flip hay que verificar que la variable esté **cableada a un recurso** (`grep` en `infra/terraform/` debe devolver más que su propia declaración) y que la **imagen desplegada** contenga el payload. Un flag declarado y no cableado produce plan vacío: el registro queda diciendo ON con producción sirviendo lo viejo.
 - **SIEMPRE** importar los tipos del cliente desde `packages/contracts`; jamás redeclarar shapes en el payload.
 - **SIEMPRE** portar por slice: transporte primero, render después, retiro al final. Y client-facing antes que interno.
 

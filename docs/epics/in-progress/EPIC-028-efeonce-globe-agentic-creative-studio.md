@@ -647,12 +647,13 @@ principio sobre cómo se construyen**. ADR-014 lo hace explícito y su foundatio
 - **Globe estrena maquinaria de gates, no sólo framework.** SSOT de tokens con `LEGACY_TOKEN_DRIFT`, capa
   de copy locale-keyed, ESLint (jsx-a11y + rules-of-hooks) y 3 gates de diseño como tests. Los 6 gates se
   verificaron **mordiendo**: se introdujo una violación de cada clase y las 6 fallaron.
-- **Estado real:** foundation code-complete (Slices 1-3 de `TASK-1556`), `client_app_enabled` default
-  `false`, **ninguna superficie portada** y **ningún cambio observable**. Las primitives base declaradas
-  en el Slice 2 **no** se entregaron: diseñarlas sin una superficie a la que sirvan sería especulativo, y
-  nacen con el share board. El Slice 4 (share board, la única superficie client-facing de Globe) está
-  bloqueado por dirección visual aprobada inexistente — decisión de product-design del operador, no algo
-  que un implementador improvise.
+- **Estado real:** la foundation está completa (`TASK-1556`) y el **share board también** (`TASK-1558`
+  Slices 1-2, `a336ff5` en `main` de Globe): nacieron las seis primitives base (`Chip`, `Eyebrow`,
+  `FactList`, `CommentList`, `StateBlock`, `MediaStage`) sirviendo a una superficie real, los tokens de
+  tipografía entraron al SSOT, el gate de diseño creció a tipografía y pesos sin `@font-face`, y hay
+  canary visual de seis estados × tres anchos con assertion de no-fuga sobre el HTML servido.
+  **Pero `client_app_enabled` sigue en `false` y ninguna superficie está sirviendo sobre el payload
+  nuevo:** todo lo construido es **potencial** hasta que se ejecute la cadena de cutover (abajo).
 - **El único unknown técnico de la ADR quedó cerrado:** React Router 8.3.0 compila sobre Vite 8.1.5, y el
   bundle real corre en Chromium real bajo la CSP estricta real sin un solo error. El fallback a
   `vite@7.3.x` se retira.
@@ -665,16 +666,42 @@ principio sobre cómo se construyen**. ADR-014 lo hace explícito y su foundatio
 Los cinco slices de la ADR tienen dueño. Antes de esto sólo existían los dos primeros, y **una
 migración sin task para su último paso no es una migración: es una convivencia permanente.**
 
+**Estado 2026-07-25** (verificado contra lifecycle real y contra `main` de Globe, no inferido de esta prosa):
+
 | Slice ADR-014 | Task | Estado | Qué la destraba |
 |---|---|---|---|
 | 0 — Foundation | `TASK-1556` | ✅ complete | — |
 | — CDN de assets | `TASK-1557` | ✅ complete, verificado en vivo | — |
-| 1 — Share board | `TASK-1558` | 🚧 in-progress | Dirección visual aprobada |
+| — Reader de flota | `TASK-1554` | ✅ complete | — |
+| — Hardening del gate | `TASK-1561` | ✅ complete | — |
+| 1 — Share board | `TASK-1558` | 🚧 Slices 1-2 aterrizados (`a336ff5`); **cutover NO ejecutado** | La cadena de cutover (abajo) |
+| — Hidratación de la proyección del share | `TASK-1562` | 📋 to-do | **Nada — implementable ya**; precede al cutover |
 | 2 — `ui.ts` (launch/studio/error) | `TASK-1524` | 📋 to-do | Dirección cinematográfica |
-| 3 — Composer | `TASK-1552` | 📋 to-do | — |
-| 4 — Feed + viewer | `TASK-1559` | 📋 to-do | `TASK-1558` (primitives) |
-| 5 — Retiro del legacy | `TASK-1560` | 📋 to-do | Las cuatro superficies portadas |
-| — Hardening del gate | `TASK-1561` | 📋 to-do | **Nada — implementable ya** |
+| 3 — Composer | `TASK-1552` | 📋 to-do | **Nada — desbloqueado**: las primitives ya existen |
+| 4 — Feed + viewer | `TASK-1559` | 📋 to-do | **Nada — desbloqueado**: las primitives ya existen |
+| 5 — Retiro del legacy | `TASK-1560` | 📋 to-do | Los ports de `1524` / `1552` / `1559` |
+
+**El hecho que gobierna el próximo paso: el cutover no es un `tofu apply`.** Se creía que sí —lo decía
+la propia `TASK-1558`— y hoy quedó verificado que es falso. En `main` de Globe, `client_app_enabled`
+aparece **una sola vez** en todo `infra/terraform/`: su propia declaración en `variables.tf:188`, **sin
+cablear a ningún recurso**. `GLOBE_CLIENT_APP_ENABLED` no aparece en ningún `.tf` ni en el spec del
+Cloud Run `globe-studio-internal`, y la imagen desplegada (`45235ccb62ca`) es **anterior** al commit de
+`TASK-1556`: no tiene bundle, no tiene `renderShell` y no lee esa variable. Cambiar el default a `true`
+y correr `tofu apply` daría **plan vacío** y producción idéntica — el mismo modo de falla de
+`GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED`: el registro dice ON y la realidad es OFF.
+
+**La cadena real, en orden:** (1) cablear `GLOBE_CLIENT_APP_ENABLED = tostring(var.client_app_enabled)`
+en el `.tf` del servicio → (2) `TASK-1562` → (3) desplegar `origin/main` vía `deploy-internal.yml`
+(**requiere autorización humana**) → (4) flip del default + `tofu apply` → (5) verificar con un grant
+real → (6) retirar el legacy (`TASK-1560`).
+
+**`TASK-1562` va antes del cutover y no es cosmética.** Hidrata `modelLabel`, `reviewStatus` y
+`comments`: el grant los pide, el dominio los proyecta y el operador puede crearlos, pero
+`resolveForShare` devuelve sólo `{ target, mediaType }` y los descarta en silencio en **todos** los
+shares de producción. El board viejo tapaba el agujero con un `if (!value) continue` que nunca ve un
+valor; el board nuevo, al mostrar "Sin dato", **destapó un bug que llevaba tiempo ahí — no lo
+introdujo**. Sin `1562`, el cutover cambiaría "sin panel" por "panel con tres huecos declarados" en la
+única superficie que ve un cliente externo.
 
 Tres decisiones que quedaron fijadas al crear estas tasks:
 
