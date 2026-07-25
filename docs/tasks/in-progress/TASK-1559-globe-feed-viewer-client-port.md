@@ -12,19 +12,46 @@
 - Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `ui-ux`
-- UI impact: `interaction`
+- UI impact: `motion`
 - UI ready: `no`
 - Wireframe: `docs/ui/wireframes/TASK-1559-globe-feed-viewer-client-port.md`
 - Flow: `none`
-- Motion: `none`
+- Motion: `docs/ui/motion/TASK-1559-globe-feed-viewer-client-port-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `code complete, rollout pendiente — los 4 slices cerrados y verificados en browser; falta push a main + deploy de globe-studio-internal`
+- Status real: `code complete PARCIAL — estructura/estados/concurrencia cerrados y verificados; MOTION no implementado (4 de 11 animaciones) y declarado en TASK-1565; falta push a main + deploy`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none` (TASK-1558 LIVE 2026-07-25; las primitives existen)
 - Branch: `task/TASK-1559-globe-feed-viewer-client-port`
 - GitHub Issue: `TBD`
+
+## Corrección de contrato 2026-07-25 — `Motion: none` era falso
+
+**El header de esta task decía `Motion: none` y `UI impact: interaction`. Las dos cosas estaban mal**, y el
+costo fue medible: el motion nunca entró al scope de ningún slice, así que el feed shippeó con **4 de 11**
+animaciones del diseño aprobado, y las 7 ausentes son las que dan personalidad — entre ellas el isotipo de
+Globe respirando mientras genera, que es el momento de marca de la superficie.
+
+Medido contra `Globe Creative Producer.dc.html` el 2026-07-25:
+
+| | Prototipo aprobado | Implementado |
+|---|---|---|
+| `@keyframes` | 11 | 4 |
+| animaciones en uso | 12 | 4 |
+| `transition` declaradas | 9 | 6 |
+
+**Lo que se corrigió:** `UI impact: motion`, `Motion:` apunta al contrato real, y el contrato de motion
+**compartido** vive en `docs/architecture/creative-studio/GLOBE_CLIENT_MOTION_CONTRACT_V1.md` — compartido y
+no per-task porque el isotipo generando se usa en el feed **y** en el composer, y dos definiciones del mismo
+momento de marca divergen.
+
+**Lo que NO se corrigió acá:** la implementación. Va en `TASK-1565`, que cubre feed + composer juntos para no
+definir el isotipo dos veces.
+
+**La lección de proceso:** una task cuyo diseño aprobado tiene 11 keyframes no puede declarar `Motion: none`,
+y el agente que la ejecuta debió cuestionar el contrato en vez de ejecutar contra él. El gate de task-lint
+sólo verifica que el campo exista y apunte a un archivo — no puede saber si el diseño tiene motion.
 
 ## Estado 2026-07-25 — code complete, rollout pendiente
 
@@ -63,15 +90,26 @@ desde un fragmento de CSS de `producer-ui.ts` en vez de desde la superficie rend
 detectó de inmediato. La segunda vuelta se hizo **source-led contra el prototipo aprobado medido**
 (`~/Documents/Globe/Producer/`), y quedó registrada como decisión en el Delta de ADR-014.
 
-**Por qué source-led es lo correcto y no una preferencia.** El payload vanilla llama **12 de los ~74**
-contratos `producer`/`lab` del repo. El backend corrió adelante; el vanilla es el cuello de botella, no
-el tesoro. Reconstruir desde la fuente aprobada no arriesga perder cableado.
+**Por qué source-led es lo correcto y no una preferencia.** El prototipo aprobado es la autoridad de forma, y
+el vanilla nunca implementó el target completo.
+
+⚠️ **Corregido 2026-07-25:** este párrafo decía "el vanilla llama 12 de los ~74 contratos, así que es el cuello
+de botella y no el tesoro". **El número era falso: son 38.** Medí `producer-client.ts` (el transporte) sin ver
+que `producer-controller.ts` despacha 29 más por el camino genérico `client.reader('id')`. El argumento "es un
+subconjunto chico, rebuildearlo arriesga poco" era más fuerte de lo que la evidencia sostiene. La decisión
+source-led se mantiene, pero el riesgo de perder capacidad es mayor, y por eso `TASK-1564` lleva una regla de
+reconciliación explícita de cinco clases. Detalle en `legacy-parity.ts` y en el Delta de ADR-014.
 
 **Criterio de retiro del legacy (habilita TASK-1560).** `apps/studio-client/src/data/legacy-parity.ts`
 + su test. **No es un `grep`** — un `grep` pasa con el id escrito en un comentario. El test *despacha*
 cada capability por el transporte nuevo, y un guard bidireccional compara el inventario contra lo que el
 vanilla llama de verdad en las dos direcciones (omitir infla el criterio en un sentido; declarar de más
 lo vuelve inalcanzable en el otro).
+
+⚠️ **La primera versión de ese guard leía sólo el transporte y por eso declaraba 12 de 38.** Ahora lee los dos
+archivos, clasifica por camino de despacho, y tiene un piso numérico que atrapa la re-subestimación. El
+inventario también declara la **superficie** de cada capability, así que el reparto (composer 14 · viewer 6 ·
+library 6 · credits 4 · feed 4 · review 4) muestra que el composer es el cuello de botella del retiro.
 
 **Invariante recalibrado.** `globe.producer.feed.live.changes` **no tenía consumidor**: aparecía en una
 sola línea del repo (su declaración en contracts). Lo que el Producer llama "feed" hoy es

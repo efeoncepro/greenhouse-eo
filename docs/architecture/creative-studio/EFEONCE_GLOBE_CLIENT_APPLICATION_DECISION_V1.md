@@ -358,12 +358,38 @@ Medido el 2026-07-25 contra el repo, no contra la doc:
 
 | Hecho | Medición |
 |---|---|
-| Contratos `producer`/`lab` que existen server-side | **74** |
-| Contratos que el payload vanilla efectivamente llama | **12** |
-| Contratos que la UI aprobada promete y que **ya tienen contrato sin consumidor** | ~60 |
+| Contratos `producer`/`lab`/`credits`/`run` que existen server-side | **74** |
+| Contratos que el payload vanilla efectivamente **despacha** | **38** |
+| Contratos que el vanilla **gatea y NUNCA despacha** (promesas muertas) | **12** |
+| Contratos con contrato server-side y cero consumidores | ~24 |
 
-Los 12 que el vanilla llama, verbatim: `lab.experiment.{cancel,estimate,execute,get,prepare,status}` ·
-`producer.asset.{copyAsReference,favorite,list}` · `producer.{catalog.list,fleet.list,output.get}`.
+> #### 🔴 Corrección del mismo día — decía 12 y son 38
+>
+> La primera versión de este Delta afirmaba **12**, y estaba mal. El error tiene interés porque el modo de
+> fallar es sutil: `producer-client.ts` es el **transporte** y expone métodos tipados para un puñado de
+> capabilities más un `reader(id, query)` / `command(id, payload)` **genérico**. La UI
+> (`producer-controller.ts`) usa ese camino genérico para **29 capabilities más**, pasando el id como
+> argumento — ninguna aparece como literal en el transporte.
+>
+> Medí el transporte, vi 15 strings, y declaré 12 tras excluir 3. El inventario de paridad y su drift guard
+> heredaron el error: **el guard pasaba en verde porque medía el archivo que yo elegí, no la realidad.** Es el
+> anti-patrón de *"el gate es el test de regresión del primer consumidor"* aplicado a mi propio gate.
+>
+> **Consecuencia si no se corregía:** `TASK-1560` habría podido borrar el payload viejo con el reemplazo
+> cubriendo 12 de 38 — retirando una superficie cuya capacidad el sucesor no tiene. Ahora el guard lee los dos
+> archivos y clasifica por camino de despacho, con un piso numérico que atrapa la re-subestimación.
+>
+> **Y el argumento estratégico se debilita, así que se corrige también:** decir "el vanilla es un subconjunto
+> chico, rebuildearlo arriesga poco" era más fuerte de lo que la evidencia sostiene. 38 de 74 es la mitad del
+> target, no una fracción menor. La decisión `source-led` **se mantiene** —el prototipo sigue siendo la
+> autoridad de forma, y el vanilla nunca implementó las 74— pero el riesgo de perder capacidad al reconstruir
+> es mayor de lo que declaré, y por eso `TASK-1564` lleva una regla de reconciliación explícita de cinco
+> clases en vez de un juicio caso por caso.
+
+Las 38 viven enumeradas, con su razón y la **superficie** que las tiene que cubrir, en
+`apps/studio-client/src/data/legacy-parity.ts`. El reparto: composer 14 · viewer 6 · library 6 · credits 4 ·
+feed 4 · review 4. O sea **el composer es el cuello de botella del retiro**, y eso es un dato, no una
+intuición.
 
 Y lo que la UI aprobada muestra como acción con contrato ya construido y **cero** consumidores:
 `lab.experiment.relaunch` (Recrear) · `lab.experiment.children`/`.tree` (Serie) ·
@@ -490,7 +516,8 @@ El criterio canónico:
 ### Reglas duras que agrega este Delta
 
 - **NUNCA** describir trabajo del Producer como "port" desde el payload vanilla: el vanilla es una
-  fracción del target aprobado (12 de 74 contratos) y tratarlo como referencia congela esa fracción.
+  fracción del target aprobado (38 de 74 contratos, corregido de un 12 mal medido) y tratarlo como referencia
+  congela esa fracción.
 - **NUNCA** construir una superficie del Producer sin haber capturado antes su línea base **renderizada**.
   Un fragmento de CSS no es la superficie, y declarar "geometría preservada" sin before/after es una
   afirmación no falsable.
