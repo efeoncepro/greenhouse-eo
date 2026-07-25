@@ -562,3 +562,62 @@ gatea por el criterio ejecutable de `legacy-parity.ts`.
 `true` desde el Slice 1, así que apagarlo apagaría el share board del cliente. El rollback de una ruta
 aditiva es revertir su commit y redeployar, y eso es aceptable *porque* es aditiva: no toca ninguna
 superficie existente. Un slice que sí modificara `/producer` necesitaría otro interruptor antes de shippear.
+
+## Delta 2026-07-25 (2) — `/producer` se CONVIERTE reutilizando su hoja, y la identidad de display pasa a ser contrato
+
+Tres decisiones de esta sesión, en orden de importancia.
+
+### 1. El interruptor que el delta anterior pedía ya existe
+
+El párrafo de cierre del delta anterior decía que *"un slice que sí modificara `/producer` necesitaría otro
+interruptor antes de shippear"*. Ese interruptor es **`GLOBE_CLIENT_PRODUCER_ENABLED`**
+(`client_producer_enabled`, default `false`), **separado de `client_app_enabled`** exactamente por la razón que
+el delta anterior identificó: `client_app_enabled` está en `true` desde el Slice 1, así que apagarlo apagaría
+el share board del cliente. Verificado **cableado**, no sólo declarado: `variables.tf` + consumo en
+`cloud_run_services.tf` + lectura en `app.ts`, con el legacy como fallback mientras el gate de paridad no esté
+verde.
+
+### 2. La conversión reutiliza `producerStyles` VERBATIM — no se reescribe el estilo
+
+`renderShell` acepta `extraStyles` (CSS inline nonced, emitido después de los tokens y antes de la hoja del
+bundle) y `extraStylesheets` (hrefs ya publicados en el registro de assets). La rama React de `/producer` pasa
+`producerStyles` —ahora exportado desde `producer-ui.ts`— y `/assets/icons/tabler-icons.min.css`.
+
+**Por qué es una decisión y no un atajo.** El markup se traduce **1:1 a JSX conservando los nombres de clase**,
+así que el estilo sigue siendo *exactamente el mismo archivo* y la deriva visual es estructuralmente imposible.
+Reescribir esas reglas en la capa nueva es precisamente lo que produjo la regresión del feed que esta misma
+sesión tuvo que corregir. El markup legacy además dibuja sus iconos por clase (`<i class="ti ti-photo">`): sin
+su hoja, el header convertido queda sin un solo icono.
+
+Es **transitorio y con condición de retiro declarada**: los literales de esa hoja (184 HEX + 4 familias
+tipográficas) se tokenizan antes de retirar el legacy, en el mismo slice que amplía la frontera del gate de
+diseño sobre `studio-web` (`TASK-1560` Slice 2). Mientras dure la convivencia, esa hoja ya se sirve para
+`/producer`, así que reutilizarla no agrega superficie de drift.
+
+### 3. `/v1/session` publica `identity`, hermana del `principal`
+
+La página legacy interpola nombre y correo **server-side** en su HTML, así que el avatar, el panel de perfil y
+el saludo **no tenían contrato por donde cruzar** al payload cliente. El dato ya existía en la sesión
+almacenada; sólo no se publicaba.
+
+`resolveHumanPrincipal` devuelve `displayIdentity { name, email }` y `/v1/session` lo expone como `identity`,
+**hermano del `principal` y nunca dentro**: el `principal` es la superficie de autoridad (capabilities,
+bindings) y su `principalId` es opaco a propósito. Metido dentro, cualquier consumer podría derivar permisos de
+un campo de presentación. No concede nada nuevo — es el mismo dato que el legacy ya renderiza, ahora disponible
+para todos los consumers en vez de para una plantilla, que es el requisito de Full API Parity.
+
+### Lo que la conversión ya descubrió y hay que honrar al portar
+
+- **El legacy gatea el reader de créditos ANTES de despachar** (`gateFor('globe.credits.balance.get')`): si no
+  está disponible, deshabilita el control en vez de gastar un round-trip y mostrar un error. Es una de las tres
+  cosas del legacy que el delta anterior declaró sin portar.
+- **`CreditBalanceV1` trae `available / reserved / spent / allocated`** — es exactamente lo que muestra la
+  píldora `N disp. · N reservados`. No hay que inventar campos.
+- **Las tabs Imagen/Video/Audio no son decorativas:** cambian la modalidad de composición y con ella el
+  encabezado, el placeholder del prompt y las rutas disponibles. Se portan funcionales; tres enlaces al mismo
+  ancla son una promesa muerta.
+- **`--text-lg` no existe en el SSOT** (la escala es `2xs·xs·sm·base·xl·2xl`). Un `font-size: var(--text-lg)`
+  es una declaración inválida cuyo tamaño se hereda **en silencio**, y el gate de diseño **no puede verlo**:
+  verifica que el valor USE un token, no que el token exista.
+- **El gate de tipografía exige el valor exactamente `var(--token)`**, así que `var(--x) !important` lo rompe.
+  Cuando haga falta ganar especificidad, se califica el selector — nunca `!important`.

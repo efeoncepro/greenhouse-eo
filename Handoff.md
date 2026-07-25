@@ -3,6 +3,75 @@
 > Cabina de mando para continuidad inmediata. No es changelog, arquitectura ni memoria completa.
 > Ventana máxima: 20 sesiones. Historia íntegra e índice: [Handoff.archive.md](Handoff.archive.md).
 
+## 2026-07-25 (2) — Globe: regresión del feed cerrada y desplegada; `/producer` empieza a convertirse a React
+
+**Runtime:** revisión viva `globe-studio-internal-00078-5gs`, imagen `03a4beb`. `pnpm check` + `pnpm build`
+verdes. Dueña de la superficie: **`TASK-1505`** (ahí está el checkpoint completo). Decisión: **ADR-014
+§ Delta 2026-07-25 (2)**.
+
+**Desplegado y verificado en producción.** La regresión visual de `/producer/feed` está cerrada: rejilla con
+filas parejas, reposo de card (borde/radio/**sombra que era `none`**), guard de `<img>` sin `src` (el `alt` se
+pintaba sobre la forma de onda de las cards de audio), toggle de selección de vuelta a la derecha con glifo de
+círculo, título con clamp de 2 líneas, fecha en el pie y washes de vuelta a la familia azul (`mediaWashFor`
+recorría la rueda de tonos completa). **Dos bugs vivos que sólo se ven con la obra cargada:** `.pf__badge` sin
+`z-index` mientras `.pf__thumb` declara `1` — el thumbnail tapaba "Destacada" y en el frame desplegado no
+aparecía nunca —, y su relleno dependía de un media oscuro para ser legible.
+
+**Causa raíz de esa regresión, y la regla que deja:** el feed se **reconstruyó contra el prototipo** en vez de
+portarse del legacy. Es la misma clase de error que el transporte en la sesión anterior. Para lo ya probado en
+producción, **la autoridad es el legacy**.
+
+⚠️ **`/producer` en React NO es todavía una conversión.** El flag `GLOBE_CLIENT_PRODUCER_ENABLED` está
+**apagado** y ausente del entorno de la revisión viva, así que `/producer` sirve el legacy completo (verificado
+con sesión real: marca, créditos, avatar, perfil, switcher, ⌘K, Guía, 12 chips). Lo que existe en React es un
+**placeholder** heredado de otra sesión: 4 `<select>` nativos, 4 botones todos deshabilitados, 0 chips, 5 de 14
+capabilities del composer. **No presentarlo como la conversión** — hacerlo costó una sesión de confusión.
+
+**Lo montado para poder convertir SIN recrear:** flag propio cableado (`variables.tf` + `cloud_run_services.tf`
++ `app.ts`); `renderShell` acepta `extraStyles`/`extraStylesheets` y la rama React de `/producer` sirve
+**`producerStyles` verbatim** + iconos Tabler, así el markup se traduce 1:1 conservando clases y la deriva visual
+es imposible; `/v1/session` publica `identity {name,email}` **hermana del `principal`** (sin esto el avatar y el
+perfil no tenían contrato por donde cruzar).
+
+**Siguiente:** header 1:1 (créditos **gateados antes de despachar**, como el legacy) → composer 1:1 con sus
+chips → comportamiento desde `producer-controller.ts` (5.172 líneas) → tokenizar la hoja legacy y ampliar el
+gate de diseño (`TASK-1560` Slice 2) antes de retirar.
+
+⚠️ **Coordinación:** otra sesión estaba escribiendo estas mismas superficies en el mismo árbol. Se tomó la
+conversión en una sola cabeza por decisión del operador; verificar que esa sesión esté detenida antes de seguir.
+
+## 2026-07-25 — payload cliente de Globe (ADR-014): 4 superficies avanzadas, 5 tasks duplicadas retiradas
+
+**Handoff completo:** `docs/operations/creative-studio/GLOBE_CLIENT_PAYLOAD_SESSION_HANDOFF_2026-07-25.md`
+— leerlo antes de retomar; este bloque es sólo el índice.
+
+**Runtime:** revisión `globe-studio-internal-00076-z2x` (`c453d7de`). ⚠️ **1 commit sin desplegar**: `0fd28ab`
+(fill-mode + lift de hover). `pnpm check` verde, 98/98, build verde, ambos repos limpios.
+
+**Vivo y verificado con sesión real:** `/producer/feed` sirve el payload cliente con **datos de producción** (15
+piezas, thumbnails por `blob:`, isotipo respirando, aurora); **`/producer` intacto con su composer**; el payload
+nuevo **no filtra `routeId`** (el legacy sí, 45 veces).
+
+**Lo que hay que saber antes de tocar código:**
+
+1. **El transporte se REESCRIBIÓ cuando debía PORTARSE.** `producer-client.ts` ya tenía las 4 respuestas (rutas
+   separadas, `apiVersion`, desenvolver `.data`, retrieval en 2 pasos con grant). Costó 5 deploys. Es clase 2 de
+   la regla de reconciliación: **invariantes de runtime = autoridad del legacy**.
+2. **98 tests verdes no atraparon nada** porque los dobles devolvían `{ ok: true }` desnudo y el canary servía
+   la ruta inventada: **el harness probaba suposiciones, no el contrato.** Ya corregido con guards.
+3. **`TASK-1526` (dueña del feed, `complete`) ya tenía contrato de motion** y no se leyó: prohibía
+   `fill-mode: both` (lo usaba) y ya especificaba la entrada una-vez-por-key. Además faltaba el lift de hover
+   del prototipo.
+4. **5 tasks duplicadas** por barrer el registry por nombre en vez de por dominio; `1563/1564/1565` retiradas
+   con su contenido **y criterios** devueltos a las 8 dueñas. Regla escrita en `TASK_PROCESS.md` + 4 skills.
+
+**Motion tiene TRES dueñas, no una:** `TASK-1523` (suite: isotipo, aurora, skeleton, tokens, gate) ·
+`TASK-1526` (feed/viewer: entrada, lift, reveal) · `TASK-1552` (composer: estimado atenuado, progreso).
+
+**Siguiente:** desplegar `0fd28ab` → 2 defectos chicos del frame (el `<img>` se renderiza en cards de audio; 3
+de 15 thumbnails en 6s por resolución secuencial) → las 3 cosas del legacy sin portar (`gateFor`,
+reautenticación, cobertura de epoch) → composer.
+
 ## Estado activo ahora
 
 - **2026-07-25 — Skills de investor readiness y business model creadas y validadas.** Nuevas skills:

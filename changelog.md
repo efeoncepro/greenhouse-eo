@@ -7,6 +7,21 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-25 — Globe: regresión del feed cerrada y mecanismo de conversión de `/producer` a React
+
+- Se cerró la regresión visual de `/producer/feed` portándola del legacy (autoridad de lo ya probado en
+  producción, no del prototipo): grid con filas parejas, reposo de card con su sombra, guard de `<img>` sin
+  `src`, toggle de selección, clamp del título, fecha en el pie y washes de vuelta a la familia azul.
+  Desplegado y verificado: revisión `globe-studio-internal-00078-5gs`.
+- Dos bugs que sólo se ven con la obra cargada: `.pf__badge` sin `z-index` (el thumbnail tapaba "Destacada")
+  y su relleno dependiente de un media oscuro para ser legible.
+- Se montó el mecanismo para convertir `/producer` **sin recrear**: `renderShell` acepta
+  `extraStyles`/`extraStylesheets` y la rama React sirve `producerStyles` del legacy **verbatim** + iconos
+  Tabler, con flag propio `GLOBE_CLIENT_PRODUCER_ENABLED` (default off, cableado).
+- `/v1/session` publica `identity {name,email}` hermana del `principal` (presentación, no autoridad).
+- `/producer` sigue sirviendo el legacy: la conversión de la superficie está pendiente. Decisión en ADR-014
+  § Delta 2026-07-25 (2); checkpoint en `TASK-1505`.
+
 ## 2026-07-25 — Skills de investor readiness y business model
 
 - Se crearon `.codex/skills/efeonce-investor-readiness/` y `.codex/skills/efeonce-business-model-operator/`

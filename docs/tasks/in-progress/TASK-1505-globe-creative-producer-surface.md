@@ -511,3 +511,63 @@ dependencies, not duplicated here.
 This Delta corrects the record: nine acceptance criteria were flipped to `[x]` in an uncommitted change
 that also carried the `BLOCK` verdict (scorecard fidelity 3.8, avg 4.39). The surface is not closed;
 its honest state is the list above.
+
+## Checkpoint 2026-07-25 — la superficie empieza a CONVERTIRSE a React, y el feed cierra su regresión
+
+Registrado acá y no en una task nueva porque **esta task es la dueña de la superficie Producer**. El barrido por
+dominio (no por nombre) confirmó que la conversión de `/producer` al payload cliente es un slice de esta
+superficie: `TASK-1526` es dueña del feed/viewer, `TASK-1552`/`1532`/`1555` del composer y su selector,
+`TASK-1560` del retiro. Crear un ID nuevo habría sido la sexta duplicada de la sesión.
+
+### Regresión visual del feed, cerrada y desplegada (revisión `00078-5gs`)
+
+El feed de `/producer/feed` se había reconstruido contra el prototipo aprobado en vez de portarse del legacy, y
+contra `/producer` eso era una regresión medible. Corregido portando del legacy, que es la autoridad de lo ya
+probado en producción:
+
+- rejilla **grid con filas parejas** en vez de `columns: 3`; la media deja de declarar `aspect-ratio` (su alto
+  lo pone la fila). Medido antes: en una misma fila convivían media 176/cuerpo 117 y media 195/cuerpo 98, así
+  que el costurón entre arte y texto quedaba 19 px desfasado entre cards vecinas;
+- reposo de card y hero: borde `--line-strong` (era `--line`, la mitad del alpha del legacy), radio
+  `--radius-lg`, sombra `--shadow` (era **`none`**) y fondo con gradiente;
+- **guard de `<img>` sin `src`** portado del legacy: sin él el texto `alt` se pintaba sobre la forma de onda de
+  las cards de audio, visible en producción;
+- toggle de selección de vuelta arriba a la derecha con glifo de círculo (un `+` promete dar de alta algo nuevo);
+- título con clamp de 2 líneas y alto reservado, y la **fecha** de vuelta al pie;
+- washes de vuelta a la familia azul de la marca: `mediaWashFor` recorría la rueda de tonos completa
+  (`hash % 360` al 78-88% de saturación) y devolvía piezas lima, durazno y magenta dentro de una interfaz navy.
+
+**Dos bugs vivos en producción que sólo se ven con la obra cargada:** `.pf__badge` estaba en `z-index: auto`
+mientras `.pf__thumb` declara `1`, así que el thumbnail tapaba "Destacada" en cuanto resolvía — en el frame
+desplegado no aparecía nunca; y su relleno dependía de un media oscuro para ser legible.
+
+### Decisión: el `R·1` del legacy NO se porta
+
+No es una revisión: es `compactRouteName(routeId)` — primera letra del `routeId` más el número de versión de su
+último segmento (`ref/motion/loop-v1` → `R·1`). Es el identificador de **wire** compactado, y el payload nuevo
+dejó de filtrarlo a propósito (el legacy lo expone 45 veces en el DOM; ADR-003 lo mantiene fuera de una
+superficie con audiencia cliente). El `item.revision` del contrato tampoco lo sustituye: es un contador grande.
+Se implementó, se vio en el frame y se revirtió.
+
+### Conversión de `/producer`: mecanismo montado, superficie pendiente
+
+Ver **ADR-014 § Delta 2026-07-25 (2)** para la decisión completa. Resumen: flag propio
+`GLOBE_CLIENT_PRODUCER_ENABLED` (default off, cableado y verificado), el shell React de `/producer` reutiliza
+**`producerStyles` verbatim** + iconos Tabler, y `/v1/session` publica `identity {name,email}` hermana del
+`principal`.
+
+**Estado honesto: `code complete, rollout pendiente`.** El flag está **apagado** y ausente del entorno de la
+revisión viva, así que `/producer` sigue sirviendo el legacy completo (verificado con sesión real: marca,
+créditos, avatar, perfil, switcher, ⌘K, Guía y 12 chips de sugerencia). Lo que existe en React es el shell con
+un composer **placeholder** heredado de otra sesión — 4 `<select>` nativos, 3 inputs, 4 botones todos
+deshabilitados, 0 chips, 5 de 14 capabilities — que **no es** la conversión y no debe presentarse como tal.
+
+### Pendiente, en orden
+
+1. Header 1:1: marca, tabs de modalidad funcionales, píldora de créditos con su panel (gateada antes de
+   despachar), ⌘K, Guía, avatar con perfil y switcher.
+2. Composer 1:1: prompt con acciones dentro del campo, Sugerencias, Referencias con contador y tile,
+   Excluir del resultado, Estilo·preset con Style DNA, Seed con Recipe efectiva, Modo.
+3. Comportamiento portado desde `producer-controller.ts` (5.172 líneas) función por función contra el
+   transporte ya portado.
+4. Tokenizar la hoja legacy y ampliar la frontera del gate de diseño (`TASK-1560` Slice 2) **antes** de retirar.
