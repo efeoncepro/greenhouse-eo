@@ -24,41 +24,50 @@
   [ADR-010](docs/architecture/creative-studio/EFEONCE_GLOBE_COMMERCIAL_PROMOTION_ATTESTATION_DECISION_V1.md) +
   `GLOBE_RUNTIME_HANDOFF.md`. Regla dura viva: scopes del broker OAuth = rollout de 3 pasos (permite → pide → exige)
   o se cae el login.
-- **Globe flota multi-modelo en el Producer (programa).** SoT: `GLOBE_MODEL_FLEET_STATUS.md`.
-  `TASK-1553` + `TASK-1554` shipped. **`TASK-1555`** (selector, in-progress): **DESPLEGADO en internal**
-  2026-07-25 (`globe-api-internal-00091-wnq` + `globe-studio-internal-00068-gx6`, `:45235ccb62ca`, API primero);
-  GVC premium verde, `ui:quality` PASS 4.54. Catálogo **v1.4.0** (entran Nano Banana 2, Recraft y Topaz: estaban
-  en el Lab **sin ruta pública**, o sea invisibles); 12/14 capacidades. Dirección **revertida por el operador**
-  a desplegable compacto con isotipo real.
-  **Blocker que NO es técnico:** sin la **firma humana de identidades de readiness** (ADR-009) ninguna ruta
-  de imagen queda `available`, así que el Producer no ofrece modelo de imagen elegible — correcto por
-  gobernanza; operarlo antes es decisión de rollout. `ISSUE-124` = 409 del grant.
-- **⚠️ `TASK-1555` ↔ `TASK-1556` (ADR-014): colisión real en curso.** `TASK-1556` declara owned
-  `shell.ts`/`assets.ts`/`public-share-ui.ts`/`app.ts`, pero **ya está editando `producer-ui.ts`** (firma de
-  `renderProducerPage` → `HtmlDocument`, nuevo `html-document.ts`), que `TASK-1555` declara suyo y acaba de
-  desplegar. Qué debe preservar el port y por qué hay que portar desde `45235cc`: `TASK-1555` § "Contrato de
-  port al payload cliente". **`TASK-1557` toca `public/models/**`**, creado por `TASK-1555` con su README de
-  licencias.
-- **`TASK-1558` (ADR-014 Slice 1) — share board reconstruido: code complete, rollout pendiente.**
-  `efeonce-globe` `a336ff5`. Falta el flip de `client_app_enabled` (`terraform apply` + grant real) y el retiro
-  de `public-share-ui.ts`: rollout, no código. **Dos recalibraciones antes de citar la spec vieja:** los 4
-  códigos de error **no** son distinguibles (404 no enumerable, `app.ts:4143`; la unión real tiene 5 miembros y
-  el que importa es `partial`), y el `/legal/terms` roto estaba en `producer-ui.ts:82`. Canary:
-  `scripts/frontend/globe-share-board-canary.mjs`. Detalle: changelog 2026-07-25 + la task.
-- Trabajo local concurrente: coordinar ownership antes de tocar archivos ya modificados.
-  **`TASK-1558` ↔ `TASK-1561`:** las reglas de tipografía del gate nacieron en `TASK-1558` y `TASK-1561`
-  documentó su mordida en el runbook; el runbook lo editaron las dos sesiones. No duplicar la tabla de
-  mordidas.
+- 🔴 **Globe — payload cliente (ADR-014): NINGUNA superficie sirve todavía sobre el payload nuevo.** El cliente
+  externo sigue viendo `public-share-ui.ts`, el template viejo. Todo lo construido en `TASK-1556`/`TASK-1558`
+  es potencial hasta que la cadena de cutover se ejecute; no describirlo como entregado.
+- 🔴 **El cutover del share board NO es "un `tofu apply`"** (se creía que sí; corregido 2026-07-25). La imagen
+  desplegada del shell (`45235ccb62ca`, `globe-studio-internal-00068-gx6`) queda **9 commits atrás de `main`**
+  y es anterior a `TASK-1556`: no contiene el bundle ni lee la variable. Cambiar el default a `true` y aplicar
+  daría **plan vacío** y producción idéntica — el modo de falla de `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED`
+  (el registro dice ON, la realidad está OFF).
+- **Cadena real del cutover, en este orden** (runbook con los pasos y la verificación:
+  [`operar-share-board-globe.md`](docs/manual-de-uso/creative-studio/operar-share-board-globe.md) **v1.1** —
+  la v1.0 estaba mal):
+  1. cablear `GLOBE_CLIENT_APP_ENABLED` al `.tf` del servicio — hay una edición **sin commitear** en el árbol
+     de `efeonce-globe` que lo agrega; no está commiteada ni aplicada;
+  2. `TASK-1562` (hidratación de la proyección del share);
+  3. desplegar `origin/main` vía `deploy-internal.yml` — **requiere autorización humana explícita**;
+  4. flip del default + `tofu apply`;
+  5. verificar con un grant real (6 puntos, en el manual);
+  6. retirar el legacy (`TASK-1560`).
+- **`TASK-1562` no es cosmética.** El grant pide `modelLabel`/`reviewStatus`/`comments`, el dominio los proyecta
+  y el operador puede crearlos, pero `resolveForShare` los descarta en silencio en **todos** los shares de
+  producción: los datos existen y el board viejo los esconde. Es un bug con impacto de cliente, no una
+  condición estética del cutover.
+- **Cerradas 2026-07-25:** `TASK-1556` (foundation del payload cliente), `TASK-1557` (Cloud CDN path-scoped
+  sobre `/assets/*`; **lo único que cambió en runtime ese día**, aplicado y verificado en vivo), `TASK-1554`
+  (reader de flota de modelos + doc funcional y manual), `TASK-1561` (gate de diseño: tipografía + frontera
+  declarada).
+- **En vuelo:** `TASK-1558` (share board; Slices 1-2 en `main` de Globe, `a336ff5`; cutover NO ejecutado),
+  `TASK-1555` (selector de modelo del Producer: vivo como desplegable compacto con isotipo real — la galería
+  se implementó, el operador la rechazó al verla y ya no existe; pendiente escenario GVC + promoción ADR-009
+  out-of-band), `TASK-1562`.
+- **Creadas 2026-07-25:** `TASK-1559` (feed+viewer), `TASK-1560` (retiro del legacy), `TASK-1561`.
+  **`TASK-1524` pasó a ser dueña del port de `ui.ts`**, no sólo consumidora: `ui.ts` sirve TRES superficies
+  —launch, studio y error—, así que portar sólo la de login no retira el archivo.
+- **Bloqueo de gobernanza vigente en la flota (no es técnico):** sin la **firma humana de identidades de
+  readiness** (ADR-009) ninguna ruta de imagen queda `available`, así que el Producer no ofrece modelo de
+  imagen elegible. `ISSUE-124` = 409 del grant. SoT de la flota: `GLOBE_MODEL_FLEET_STATUS.md`.
+- Detalle de runtime de Globe (revisiones, imágenes, flags, verificación en vivo):
+  [`GLOBE_RUNTIME_HANDOFF.md`](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md).
 - **Globe Producer internal-only:** el camino humano ya generó y recuperó Image/Video/Audio reales en tres rutas
   promovidas; feed/viewer y Asset Governance funcionan. El catálogo tiene 10 rutas: las otras 7 requieren
   promoción exacta. Reauth/viewer están desplegados; `TASK-1551` posee el avatar canónico Greenhouse→Globe por
   broker/BFF con iniciales fallback, aún sin implementación; ya no bloquea `TASK-1505`.
 - **Globe — spend fence cross-réplica pendiente (`TASK-1512`).** Hubo dry-run y gasto gobernado; falta prueba de
   contención cross-réplica.
-- **Globe — runtime fix desplegado:** Studio `f9839ee` y Worker `8d7ecb1` cerraron reauth/viewer,
-  supersedieron 6 reconciles, estabilizaron queue age en `0` y aplicaron severidades. Evidencia:
-  `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
-- **Globe Producer:** `TASK-1525` complete; `TASK-1526` complete (feed/viewer keyed con continuidad estable tras refresh, filtros, búsqueda y orden, con reproducción por modalidad validada).
 - **Globe — promoción/media:** auditoría live `0/7` ready. `TASK-1527` está en checkpoint humano; `TASK-1528…1529`
   poseen derivados+Range y GC. No fabricar/heredar evidencia.
 - **Globe — dominios creativos diseñados, no implementados.** Video Effectiveness (`ADR-011`/`SPEC-011`,
@@ -71,12 +80,6 @@
 - **`TASK-1521` IN-PROGRESS.** Producer interno produjo las 3 modalidades y governance promovió un asset; no
   habilita runtime comercial. Pendiente: sesión expirada, outbox stale/alertas, siete promociones (derivados/
   streaming ya los cerró `TASK-1528`). Clientes externos gateados por `TASK-1480`. Plan: `docs/tasks/plans/TASK-1521-plan.md`.
-
-- **`TASK-1525` COMPLETE.** Reader live `ed5e993`; base backend/feed cerrada.
-
-- **`TASK-1526` COMPLETE.** Reconciliación keyed + continuidad del feed/viewer (foco/media estables en refresh/
-  filtros/búsqueda/orden, títulos client-safe); Studio desplegado en `7ac0ded`, API `eac1730`. Detalle en su
-  task file.
 
 - **`TASK-1527` IN-PROGRESS (P0, rollout live avanzado 2026-07-23/24).** Aggregate + flag ON + recovery worker
   + señales + identities disjuntas + canary authority desplegados internal-only (`ffe4102…ff24093`, migración

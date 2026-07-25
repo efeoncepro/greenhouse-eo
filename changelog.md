@@ -7,6 +7,32 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-25 — Globe: el CDN de assets es lo único que cambió en runtime; el payload cliente NO está servido
+
+- **Cambio real en runtime — `TASK-1557` (cerrada):** Cloud CDN path-scoped sobre `/assets/*` en
+  `globe.efeoncepro.com`, **aplicado y verificado en vivo** (hits del edge). Nada autenticado se cachea, y el
+  invariante quedó como test (`front-door-contract.test.ts`) en vez de comentario. Detalle:
+  [`GLOBE_RUNTIME_HANDOFF.md`](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md).
+- 🔴 **El share board y el payload cliente NO cambiaron nada para ningún usuario.** `TASK-1556` (foundation) y
+  `TASK-1558` Slices 1-2 están en `main` de `efeonce-globe`, pero **ninguna superficie sirve sobre el payload
+  nuevo**: el cliente externo sigue viendo `public-share-ui.ts`, el template viejo. Es construcción, no entrega.
+- **Se corrigió una creencia equivocada: el cutover no es "un `tofu apply`".** `client_app_enabled` no estaba
+  cableado a ningún recurso (aparecía sólo en su propia declaración) y la imagen desplegada del shell
+  (`45235ccb62ca`) es anterior a `TASK-1556`, así que no lee la variable. El flip solo habría dado plan vacío y
+  producción idéntica — el modo de falla de `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED`. La cadena real (cablear →
+  `TASK-1562` → deploy con **autorización humana** → flip + apply → verificar con grant real → retirar legacy)
+  vive en [`operar-share-board-globe.md`](docs/manual-de-uso/creative-studio/operar-share-board-globe.md) **v1.1**;
+  la v1.0 afirmaba lo contrario.
+- **`TASK-1562` reclasificada:** `resolveForShare` descarta en silencio `modelLabel`/`reviewStatus`/`comments`
+  en todos los shares de producción, aunque el grant los pide y el dominio los proyecta. Es un bug con impacto
+  de cliente, no una condición estética del cutover.
+- **Cierres documentales:** `TASK-1554` (reader de flota de modelos) cerró con doc funcional
+  [`efeonce-globe-producer-flota-modelos.md`](docs/documentation/creative-studio/efeonce-globe-producer-flota-modelos.md)
+  y manual [`operar-flota-modelos-producer-globe.md`](docs/manual-de-uso/creative-studio/operar-flota-modelos-producer-globe.md).
+  `TASK-1561` cerró el gate de diseño (tipografía + frontera declarada). El selector de modelo del Producer
+  (`TASK-1555`) quedó como desplegable compacto con isotipo real: la galería se implementó y el operador la
+  rechazó al verla. Nuevas: `TASK-1559`, `TASK-1560`, `TASK-1562`.
+
 ## 2026-07-25 — TASK-1558: el share board de Globe, la cara del cliente, reconstruida (ADR-014 Slice 1)
 
 - **La única superficie que un cliente externo ve de Globe deja de ser 15 líneas con 3.071 caracteres de CSS

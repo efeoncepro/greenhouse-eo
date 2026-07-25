@@ -8,6 +8,62 @@
 
 # Handoff
 
+## 🔴 Active state — 2026-07-25 LATEST (payload cliente: construido, NO servido — el cutover no es un `apply`)
+
+**Estado neto: ninguna superficie de Globe sirve todavía sobre el payload cliente nuevo.** El cliente externo
+sigue recibiendo `public-share-ui.ts`, el template viejo. `TASK-1556` (foundation) y `TASK-1558` Slices 1-2
+están en `main` de `efeonce-globe`, pero nada de eso llegó a un usuario. No leer los bloques de abajo como
+"entregado".
+
+**Runtime vivo hoy (lo que verifica el estado anterior):**
+
+- Shell interno `globe-studio-internal`, revisión **`00068-gx6`**, imagen **`:45235ccb62ca`** — el commit
+  `45235cc` es de `TASK-1555` y queda **9 commits atrás de `main`**: es **anterior** a todos los commits de
+  `TASK-1556` (`bf1df21` `0e7b22f` `c8ca9a9` `ea10578` `4bf631e`), de `TASK-1557` (`225f483` `fbfc84f`), de
+  `TASK-1558` (`a336ff5`) y de `TASK-1561` (`6e8ef5a`). La imagen desplegada **no contiene el bundle cliente**
+  y **no lee** `GLOBE_CLIENT_APP_ENABLED`.
+- API interna `globe-api-internal` revisión `00091-wnq` (misma imagen `45235ccb62ca`).
+
+**El flag no estaba cableado — verificado 2026-07-25:**
+
+- `client_app_enabled` aparecía **una sola vez** en todo `infra/terraform/`: su propia declaración en
+  `variables.tf`. **No estaba conectado a ningún recurso.**
+- `GLOBE_CLIENT_APP_ENABLED` no aparecía en ningún `.tf` ni en el spec del Cloud Run `globe-studio-internal`.
+- Consecuencia: cambiar el default a `true` + `tofu apply` habría dado **plan vacío** y producción idéntica,
+  con `variables.tf` diciendo "prendido". Es el mismo modo de falla que
+  `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED` en Greenhouse: el registro decía ON, la realidad estaba OFF.
+- **Delta:** existe una edición **sin commitear** en el árbol de `efeonce-globe`
+  (`infra/terraform/cloud_run_services.tf`) que agrega el cable al servicio `studio_web`. No está commiteada,
+  no está aplicada y no cambia nada en el runtime todavía.
+
+**Cadena real del cutover — 6 pasos, en orden:**
+
+1. **Cablear** `GLOBE_CLIENT_APP_ENABLED` al `.tf` del servicio (commit + revisión del diff).
+2. **`TASK-1562`** — hidratación de la proyección del share. Va **antes**, no después.
+3. **Desplegar `origin/main`** vía `deploy-internal.yml` — ⚠️ **requiere autorización humana explícita**.
+4. **Flip** del default de `client_app_enabled` a `true` + `tofu apply` (leer el plan; ya no debe ser vacío).
+5. **Verificar con un grant REAL** — los 6 puntos del manual.
+6. **Retirar el legacy** (`TASK-1560`), recién después del flip verificado.
+
+**`TASK-1562` no es una condición estética.** El grant pide `modelLabel`, `reviewStatus` y `comments`; el
+dominio los proyecta y el operador puede crearlos — pero `resolveForShare` **los descarta en silencio en todos
+los shares de producción**. Los datos existen y el board viejo los esconde: es un bug con impacto de cliente.
+
+**Runbook canónico del cutover y del diagnóstico:**
+[`operar-share-board-globe.md`](../../manual-de-uso/creative-studio/operar-share-board-globe.md) **v1.1** —
+la v1.0 afirmaba que el cutover era sólo un `tofu apply` y estaba **mal**. Funcional:
+[`efeonce-globe-share-board-cliente.md`](../../documentation/creative-studio/efeonce-globe-share-board-cliente.md).
+
+**Lo único que sí cambió en runtime el 2026-07-25:** el CDN de assets (`TASK-1557`), aplicado y verificado en
+vivo — bloque inmediatamente abajo.
+
+**Flota de modelos:** `TASK-1554` cerrada — reader, doc funcional
+[`efeonce-globe-producer-flota-modelos.md`](../../documentation/creative-studio/efeonce-globe-producer-flota-modelos.md)
+y manual [`operar-flota-modelos-producer-globe.md`](../../manual-de-uso/creative-studio/operar-flota-modelos-producer-globe.md).
+`TASK-1555` sigue in-progress: el selector vive como **desplegable compacto con isotipo real** (la galería de
+láminas se implementó y el operador la rechazó al verla; ya no existe). Pendiente: escenario GVC y la promoción
+ADR-009, que es out-of-band. SoT de la flota: [`GLOBE_MODEL_FLEET_STATUS.md`](GLOBE_MODEL_FLEET_STATUS.md).
+
 ## Active state — 2026-07-25 (TASK-1557: CDN de assets VIVO en globe.efeoncepro.com)
 
 - **`assets_cdn_enabled` PRENDIDO y aplicado.** `/assets/*` se sirve por un backend con Cloud CDN;
