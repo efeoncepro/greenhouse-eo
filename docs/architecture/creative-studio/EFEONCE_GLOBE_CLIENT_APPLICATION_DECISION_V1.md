@@ -94,6 +94,15 @@ ADR-004 dejó constancia de que *"the target Next.js architecture never material
      para evitar. El costo de cambiar sigue siendo bajo mientras el codebase sea chico; si el composer produce
      evidencia material a favor de TanStack Router, se supersede con esa evidencia sobre la mesa, no antes.
 
+     ✅ **Compuerta (b) RESUELTA (2026-07-25):** el bundle real, servido por el renderer de shell real
+     bajo la CSP estricta real, corre en Chromium: HTTP 200, React hidrata, el router resuelve, el
+     estado actualiza, **cero console errors, cero page errors, cero requests fallidos**. La semántica
+     CJS estricta de Rolldown **no mordió**. Arnés reproducible:
+     `efeonce-globe` `pnpm --filter @efeonce-globe/studio-client seam:smoke` +
+     `greenhouse-eo` `node scripts/frontend/globe-client-seam-gate.mjs`.
+
+     **Con las dos compuertas verdes, el fallback a `vite@7.3.x` queda retirado: se sigue con Vite 8.1.5.**
+
      ✅ **Compuerta (a) RESUELTA (2026-07-25):** `react-router@8.3.0` compila limpio sobre `vite@8.1.5` — 73
      módulos, 284 kB crudo / 90 kB gzip, 65 ms. Era el unknown que esta ADR marcaba explícitamente sin confirmar
      (RR8 declara `Vite 7+` como piso y nadie había verificado el 8). **El fallback a `7.3.x` ya no es necesario
