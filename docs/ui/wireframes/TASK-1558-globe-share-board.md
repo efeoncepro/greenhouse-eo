@@ -22,16 +22,19 @@ así que **ningún cliente puede obtener sesión**. La **única** superficie cli
 
 ## Visual Direction Contract
 
-- **Source duradero:** ⚠️ **NO existe todavía** una dirección visual aprobada para el share board.
-  El `approved-prototype.dc.html` de `TASK-1505` es el target del **Producer**, no de esta superficie.
-- **Modo:** `repo-native-benchmark` — la dirección se deriva del sistema visual de Globe (isotipo, wordmark,
-  paleta dark, Tabler icons) ya presente en `producer-ui.ts`, elevada al SSOT de tokens que esta task crea.
-- **Gate:** por eso `UI ready` queda en **`no`**. La dirección visual se produce en Discovery con
-  `design-studio` + `product-design-loop` (2-3 direcciones comparadas, una elegida, asset durable persistido)
-  **antes** de escribir JSX. **No se inventa aquí.**
+- **Source duradero:** ✅ [`../visual-directions/TASK-1558-globe-share-board-direction.md`](../visual-directions/TASK-1558-globe-share-board-direction.md)
+  (2026-07-25). Tres direcciones renderizadas con los valores reales del SSOT y las fuentes reales de Globe,
+  mirada cada una a `1440×1000` y `390×844`; elegida **B "Lámina montada"** (passepartout + riel de líneas).
+  El `approved-prototype.dc.html` de `TASK-1505` **no** es fuente acá: es el target del **Producer**.
+- **Modo:** `repo-native-benchmark` — la dirección se deriva del sistema visual de Globe ya presente en
+  `producer-ui.ts`, elevado al SSOT de tokens de `TASK-1556`.
+- **Gate:** satisfecho. `UI ready` pasa a **`yes`**.
 - **Targets:** desktop `1440×1000` · mobile `390×844`.
 - **Action hierarchy:** el activo es el héroe; la identidad de Efeonce/Globe es marco, no protagonista;
-  los comentarios son lectura secundaria; **no hay acciones de escritura** (el grant es read-only).
+  los comentarios son lectura secundaria; **no hay acciones de escritura** (el grant es read-only). La
+  única acción de toda la superficie es **Reintentar**, y sólo existe en `dependency_unavailable`.
+- **Decisión dominante:** el **margen** alrededor de la pieza (`contain`, nunca `cover`; sin viñeta ni
+  tinte). Una superficie de revisión no puede recortar ni alterar el color del artefacto que se revisa.
 
 ## Layout — regiones
 
@@ -57,11 +60,15 @@ así que **ningún cliente puede obtener sesión**. La **única** superficie cli
 │                                │   · autor · fecha · texto    │
 │                                │   · …                        │
 ├───────────────────────────────┴──────────────────────────────┤
-│ FOOTER   Efeonce · sin links muertos                          │
+│ FOOTER   [Efeonce]  alcance del enlace        Privacidad ↗    │
 └──────────────────────────────────────────────────────────────┘
 
-mobile 390px → STAGE arriba (full-bleed), PANEL debajo, scroll vertical único
+mobile 390px → STAGE arriba (full-bleed, techo 62svh), PANEL debajo, scroll vertical único
 ```
+
+**El footer hoy NO EXISTE** (verificado: `grep footer public-share-ui.ts` = 0, y la superficie no tiene un
+solo `<a>`). Nace acá con tres cosas y ninguna más: atribución Efeonce, el alcance del enlace en una línea,
+y el link de privacidad **que sí existe y resuelve** (`https://efeonce.com/privacidad`).
 
 ## Contrato de datos y confidencialidad
 
@@ -86,22 +93,59 @@ y filtrar un campo prohibido es error de compilación.
 
 ## Estados
 
-| Estado | Qué ve el cliente |
-|---|---|
-| **Default** | Activo + hechos + comentarios |
-| **Loading** | Skeleton dimensionado al activo (no spinner de página); `aria-busy` en el stage |
-| **Empty (sin comentarios)** | "Todavía no hay comentarios en esta revisión" — sin CTA (no puede escribir) |
-| **`authentication_required`** | El enlace **venció o fue revocado**: mensaje claro + a quién pedirle uno nuevo. `role="alert"` |
-| **`not_found`** | "Este enlace ya no existe" — sin revelar si existió (el rechazo de propiedad colapsa a `not_found` por diseño) |
-| **`access_denied`** | Fallo de prueba del grant (firmado mal/editado) — distinto de `not_found`, y así debe leerse |
-| **`dependency_unavailable`** | "No pudimos cargar la pieza. Reintentá en unos minutos." **+ botón Reintentar** (es el único estado retryable) |
-| **Long content** | Muchos comentarios → el panel scrollea, el stage queda fijo en desktop |
-| **Mobile / compact** | Una columna, stage full-bleed |
-| **Keyboard / focus** | Foco visible en el reintento y en cada comentario enfocable; `:focus-visible`, ≥3:1 |
-| **Reduced motion** | Sin fade del stage; el skeleton no titila |
+### ⚠️ Recalibración 2026-07-25 — el runtime sólo distingue dos fallos, y es a propósito
 
-**Regla dura (Delta ADR-005):** los cuatro códigos **nunca** colapsan en un preview roto genérico.
-`authentication_required` es UX de re-solicitud de enlace, **jamás** "falta el medio".
+La versión anterior de esta tabla pedía `authentication_required`, `not_found` y `access_denied` como
+**tres estados visibles distintos**. **Eso no se puede construir sin cambiar el BFF, y cambiarlo sería una
+regresión de seguridad.** Verificado en `apps/studio-web/src/app.ts:4143`:
+
+```ts
+// Collapse invalid, expired, revoked, wrong-target and denied grants into one non-enumerable
+// response. Only infrastructure outages remain distinguishable so the client can retry.
+```
+
+Un grant inválido, vencido, revocado, de otro target o denegado devuelven **el mismo 404**. Sólo
+`dependency_unavailable` sobrevive como 503. Eso es **no-enumerabilidad**: decirle a un desconocido sin
+sesión *por qué* falló su grant es exactamente el oráculo que un atacante necesita.
+
+Y la regla de ADR-005 que se citaba está **fuera de alcance para esta superficie**: su texto
+(`EFEONCE_GLOBE_PRODUCER_HUMAN_EXECUTION_DECISION_V1.md`, §Delta) gobierna el **feed reader del Producer**
+—autenticado, con `TASK-1526` como consumer— no el share público. Lo que la regla exige de verdad es que
+**ningún fallo colapse en "preview roto genérico"** y que `authentication_required` sea UX de
+re-solicitud y no "falta el medio". Eso sí se cumple, y con los estados de abajo.
+
+`Out of Scope` de la task ya prohibía tocar el BFF; la recalibración lo respeta en vez de contradecirlo.
+
+### La unión discriminada real (5 estados)
+
+`authentication_required` **sí es distinguible** — pero **client-side, no por respuesta del servidor**: el
+cliente sabe si el fragment traía token. Un enlace pegado sin su `#token` (lo strippeó un cliente de
+correo, o se copió de la barra después del `replaceState`) es una situación genuinamente distinta de un
+grant rechazado, y merece su propio copy.
+
+| Estado | Disparador | Qué ve el cliente | ARIA | Retryable |
+|---|---|---|---|---|
+| **`loading`** | inicial | Skeleton dimensionado al stage + placeholders del riel. **Nunca** spinner de página | `aria-busy="true"` en el stage; `role="status"` | — |
+| **`ready`** | resolve 200 + media 200 | Pieza montada + hechos + comentarios | — | — |
+| **`link_incomplete`** | **sin token en el fragment** | "El enlace está incompleto o venció" + pedir uno nuevo a quien lo compartió | `role="alert"` | **no** |
+| **`unavailable`** | **404** (colapsado) | "Este enlace ya no está disponible" — sin revelar cuál de las cinco causas | `role="alert"` | **no** |
+| **`degraded`** | **503** `dependency_unavailable` | "No pudimos cargar la pieza" + **Reintentar** | `role="status"` | **sí — el único** |
+
+`role="alert"` en los dos estados terminales porque el cliente **tiene que reaccionar** (pedir otro
+enlace); `role="status"` en el degradado porque es informativo y la acción ya está en pantalla.
+
+### Variantes de presentación (no son estados de datos)
+
+| Variante | Comportamiento |
+|---|---|
+| **Comentarios vacíos** | "Todavía no hay comentarios en esta revisión." **Sin CTA** — no puede escribir. Es el único empty state legítimo sin acción, y la razón se documenta |
+| **Long content** | El riel scrollea; en desktop la lámina queda fija |
+| **Mobile / compact** | Una columna: pieza a sangre con techo `62svh`, riel debajo |
+| **Keyboard / focus** | `:focus-visible` ≥3:1 en Reintentar y en el link de privacidad. Tras un reintento el foco vuelve al botón. **Los comentarios NO son focusables**: son contenido, se leen, no se operan |
+| **Reduced motion** | Sin fade del stage; el skeleton no pulsa |
+
+**Regla dura que sí aplica:** ningún fallo se muestra como "preview roto". Los tres estados no-`ready`
+tienen copy propio, y `link_incomplete` habla de re-solicitar el enlace, nunca de un medio faltante.
 
 ## Copy
 
@@ -110,8 +154,20 @@ validado con `greenhouse-ux-writing`. **Cero literales en JSX.** Motivo no cosm�
 producto y de la moneda todavía no están decididos** (`Globe Credits` está bloqueado), y el ICP es multi-mercado
 — la capa nace lista para locale aunque hoy sirva un solo idioma.
 
-Copy que **desaparece**: el rótulo `Producer` de esta página (es una superficie interna) y el link a `/legal/terms`
-(o se implementa la ruta, o se retira el link — no puede quedar devolviendo JSON).
+**Registro:** impersonal/neutro por defecto ("Este enlace es de sólo lectura", "No permite editar ni
+descargar"). Donde el trato sea inevitable, **tuteo neutro** (`puedes`, nunca `podés`). El cliente es
+externo y comercial: el impersonal evita el falso tú-a-tú sin caer en el usted de un contrato.
+
+Copy que **desaparece**: el rótulo `Producer` de esta página (es una superficie interna).
+
+**`/legal/terms` — resuelto: se retira el link, no se implementa la página.** Dos motivos.
+(1) **El link no está en esta superficie**: verificado, `public-share-ui.ts` no tiene footer ni un solo
+`<a>`; el `/legal/terms` roto vive en `producer-ui.ts:82`, el footer del **Producer** (interno). O sea el
+share board nunca lo tuvo. (2) El footer nuevo necesita un link legal, y ya existe uno que resuelve:
+`https://efeonce.com/privacidad`, absoluto y externo. Implementar una página de términos es un entregable
+de contenido legal con su propio dueño, y un enlace de revisión read-only no es una superficie de
+aceptación de términos. Se retira además la línea de `producer-ui.ts` (una línea, cero riesgo) porque es
+una fuga viva de JSON a un browser y ADR-014 lo prohíbe explícitamente.
 
 ## Implementation Mapping
 
@@ -119,8 +175,16 @@ Copy que **desaparece**: el rótulo `Producer` de esta página (es una superfici
 - **Repo / paths:**
   - `apps/studio-web/src/shell.ts` — **ya existe** (`TASK-1556`); esta task lo consume y retira `renderPublicSharePage`.
   - `apps/studio-web/src/assets.ts` — +entradas del bundle (allowlist explícito ya existente).
-  - `apps/studio-client/src/routes/share/` 🆕 — la superficie.
+  - `apps/studio-client/src/surfaces/share/` 🆕 — la superficie. **`surfaces/`, no `routes/`**: es la
+    convención que el payload ya tiene (`src/surfaces/seam-probe.tsx`).
   - `apps/studio-client/src/tokens/tokens.ts` — **SSOT ya existente**; se consume, no se re-crea. Ojo con `LEGACY_TOKEN_DRIFT`: los valores del share board divergen y adoptarlos es cambio visible deliberado (dos en `producer-ui.ts`, uno en `ui.ts`, uno en `public-share-ui.ts`).
+    **Delta:** el SSOT **no tiene tokens de tipografía** y Poppins/Geist están literales en `producer-ui.ts`.
+    Esta task agrega `--font-display` / `--font-body` + los `@font-face` al SSOT — el gate de color y el de
+    motion no cubren tipografía, así que hoy nada impide que una fuente se re-tipee a mano igual que pasó
+    con los colores.
+  - **Hueco de gate a cerrar en el mismo slice:** `src/gates/design-contract.test.ts` sólo camina
+    `.ts|.tsx`. Si esta superficie introduce un `.css`, un `#hex` ahí pasaría limpio. La superficie declara
+    sus estilos **desde TS** (o el gate se extiende a `.css` en el mismo commit).
   - `apps/studio-client/src/copy/index.ts` — capa de copy **ya existente**: se agrega la clave `share` al diccionario `es-CL`, no se crea una capa nueva.
   - `apps/studio-client/src/data/` 🆕 — cliente tipado del transporte del share; importa de `packages/contracts`.
 - **Primitive / variant / kind:** nacen aquí las primeras primitives de Globe — `Surface`, `Chip`, `FactList`,
@@ -141,11 +205,17 @@ Copy que **desaparece**: el rótulo `Producer` de esta página (es una superfici
 - **Route:** `/shares/:shareId` con un share grant de prueba emitido por el flujo real.
 - **Viewports:** `1440×1000` y `390×844`.
 - **Quality profile:** `premium` (rigor `ui-standard`).
-- **Required steps:** cargar con token válido · token vencido · `dependency_unavailable` inyectado · sin comentarios.
-- **Required captures:** first fold desktop · first fold mobile · estado vencido · estado degradado · empty de comentarios.
-- **Required `data-capture` markers:** `share-header`, `share-stage`, `share-panel`, `share-comments`, `share-state`.
-- **Assertions:** `scrollWidth <= clientWidth` en ambos viewports · el DOM **no contiene** el slug del proveedor,
-  ni `house`, ni costo/margen · el rótulo `Producer` **no aparece** · ningún link devuelve JSON.
+- **Required steps:** token válido · **sin token en el fragment** (`link_incomplete`) · 404 (`unavailable`) ·
+  503 inyectado (`degraded`) · sin comentarios.
+- **Required captures:** first fold desktop · first fold mobile · `link_incomplete` · `unavailable` ·
+  `degraded` · empty de comentarios · reduced-motion.
+- **Required `data-capture` markers:** `share-header`, `share-stage`, `share-panel`, `share-comments`,
+  `share-state`, `share-footer`.
+- **Assertions:** `scrollWidth <= clientWidth` en ambos viewports · el DOM **no contiene** el slug del
+  proveedor, ni `house`, ni costo/margen · el rótulo `Producer` **no aparece** · **ni un ISO 8601 crudo ni
+  un enum crudo** (`changes_requested`, `approved`) — es lo que la superficie de hoy sí filtra · el botón
+  Reintentar existe **sólo** en `degraded` · `role="alert"` presente en los dos estados terminales ·
+  `aria-busy` presente durante la carga · todo `<a>` resuelve a `text/html` o es externo absoluto.
 - **Scroll-width checks:** sí, ambos viewports.
 - **Reduced-motion / focus evidence:** captura con `prefers-reduced-motion: reduce` + recorrido de foco por teclado.
 - **Review dossier:** `docs/ui/reviews/TASK-1558-globe-share-board/`.

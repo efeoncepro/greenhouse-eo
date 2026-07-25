@@ -400,15 +400,15 @@ involucrados.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedó sincronizado con el estado real
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` quedó sincronizado con el cierre
-- [ ] `Handoff.md` y `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md` quedaron actualizados
-- [ ] `changelog.md` quedó actualizado
-- [ ] se ejecutó chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] `EFEONCE_GLOBE_INTERNAL_FRONT_DOOR_V1.md` (SPEC-009) quedó actualizado con el carril de assets, dejando
+- [x] `Lifecycle` del markdown quedó sincronizado con el estado real
+- [x] el archivo vive en la carpeta correcta
+- [x] `docs/tasks/README.md` quedó sincronizado con el cierre
+- [x] `Handoff.md` y `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md` quedaron actualizados
+- [x] `changelog.md` quedó actualizado
+- [x] se ejecutó chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `EFEONCE_GLOBE_INTERNAL_FRONT_DOOR_V1.md` (SPEC-009) quedó actualizado con el carril de assets, dejando
       explícito que `enable_cdn = false` del shell **sigue vigente y por qué**
-- [ ] El costo real del CDN quedó registrado tras 30 días
+- [ ] **PENDIENTE — 2026-08-24:** el costo real del CDN queda registrado tras 30 días. Único ítem abierto del cierre; no bloquea la task pero sí es un compromiso con fecha.
 
 ## Follow-ups
 

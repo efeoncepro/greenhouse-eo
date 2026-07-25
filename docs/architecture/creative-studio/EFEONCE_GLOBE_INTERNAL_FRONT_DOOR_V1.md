@@ -33,7 +33,8 @@ flowchart TB
   subgraph GFE[Google Front End — global · PREMIUM · EXTERNAL_MANAGED]
     FR80[":80 · globe-studio-front-door-http"] --> HP[target http proxy] --> UMR[url map redirect<br/>301 MOVED_PERMANENTLY_DEFAULT<br/>strip_query = false]
     FR443[":443 · globe-studio-front-door-https"] --> SP[target https proxy<br/>managed cert] --> UM[url map globe-studio-front-door]
-    UM --> BS[backend service<br/>enable_cdn = false]
+    UM -->|"default + todo lo no-/assets"| BS[backend service shell<br/>enable_cdn = FALSE]
+    UM -->|"path_rule /assets/*"| BSA[backend service assets<br/>enable_cdn = true<br/>USE_ORIGIN_HEADERS]
     BS --> NEG[serverless NEG<br/>southamerica-west1]
   end
   B -->|http| FR80
@@ -74,8 +75,9 @@ resources in the diff (verified over the plan JSON).
 | --- | --- | --- |
 | `google_compute_global_address.front_door` | `globe-studio-front-door-ip` | `EXTERNAL`, `IPV4`. Assigned `8.233.189.79`. |
 | `google_compute_region_network_endpoint_group.studio_web` | `globe-studio-internal-neg` | `SERVERLESS`, `southamerica-west1`. `cloud_run.service` is the **string literal** `"globe-studio-internal"` — referencing the service as a resource would pull it into this file's graph. The services are governed by their own Terraform resources since TASK-1508; the literal is kept on purpose so a front-door plan never touches them. |
-| `google_compute_backend_service.studio_web` | `globe-studio-front-door-backend` | `EXTERNAL_MANAGED`, `enable_cdn = false`. |
-| `google_compute_url_map.front_door` | `globe-studio-front-door` | One host, one backend, no path rules. |
+| `google_compute_backend_service.studio_web` | `globe-studio-front-door-backend` | `EXTERNAL_MANAGED`, **`enable_cdn = false` — sigue vigente y es invariante**, no un default pendiente de revisar. Sirve respuestas SSO por sesión: cachearlas en el edge puede entregarle a un visitante la página de otro. Si aparece una necesidad de caché, va en un backend aparte tras un allowlist de paths, como el carril de assets — **nunca** volteando este flag. |
+| `google_compute_url_map.front_door` | `globe-studio-front-door` | Un host. `default_service` = backend del **shell** (sin caché). Con `assets_cdn_enabled` (TASK-1557, **aplicado 2026-07-25**) suma un `path_matcher` cuyo `default_service` **también** es el shell y cuya única `path_rule` manda `/assets/*` al backend cacheado. Es un **allowlist**, nunca un catch-all con excepciones: si una regla no matchea, el request cae al carril **sin** caché. La dirección inversa fallaría hacia servir una respuesta autenticada desde el edge. |
+| `google_compute_backend_service.studio_assets` | `globe-studio-front-door-assets` | **TASK-1557**, condicionado a `assets_cdn_enabled`. `enable_cdn = true` sobre el **mismo** serverless NEG: no duplica cómputo, sólo cambia la política de caché por path. `cache_mode = USE_ORIGIN_HEADERS` porque `assets.ts` ya declara un `cache-control` exacto por asset y repetir TTLs acá crearía una segunda fuente de verdad que driftea en silencio. La cache key excluye el query string (los objetos son content-addressed: un `?v=…` nombra el mismo archivo, e incluirlo dejaría fragmentar y llenar el caché con variantes ilimitadas). `negative_caching = false`: un 404 cacheado sobreviviría al deploy que lo arregla. Guardado por test en `apps/studio-web/src/front-door-contract.test.ts`. |
 | `google_compute_managed_ssl_certificate.front_door` | `globe-studio-front-door-cert` | `lifecycle { create_before_destroy = true }` — a managed certificate is not editable in place; changing its domain list forces replacement. |
 | `google_compute_target_https_proxy.front_door` | `globe-studio-front-door-https-proxy` | TLS termination. |
 | `google_compute_global_forwarding_rule.front_door_https` | `globe-studio-front-door-https` | `:443`, `PREMIUM`, `EXTERNAL_MANAGED`. |
