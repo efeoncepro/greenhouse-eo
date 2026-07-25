@@ -18,7 +18,10 @@ provider canary), `TASK-1458` (fixtures/evals), `TASK-1464` (IaC/keyless), el st
 (`TASK-1486/1487/1488`), los model labs still/motion/audio (`TASK-1459/1460/1461`) y el edit cross-model
 (`TASK-1490`). Lo abierto es `TASK-1467` (provenance/rights/private ingest) y el carril de plataforma
 gobernada. Confirma el estado vigente en el `Handoff.md` de cada repo antes de elegir goal.
-Globe permanece internal-only, no productivo y sin clientes externos.
+Efeonce Globe es un PRODUCTO COMERCIAL de Efeonce (ADR-010), no un lab interno ni un piloto. Su
+estadio de rollout vigente es internal-only, runtime en `internal_smoke`, sin clientes externos
+(gate `TASK-1480`). NO confundas el estadio de rollout con la naturaleza del producto: el estadio
+dice hasta dónde llegó el despliegue, no qué es el producto ni cuál es su techo.
 
 Antes de ejecutar una task:
 1. Lee `/Users/jreye/Documents/greenhouse-eo/AGENTS.md`, `project_context.md` y `Handoff.md`.
@@ -35,7 +38,8 @@ Antes de ejecutar una task:
 
 Estado que no debes rehacer:
 - `TASK-1454` y `TASK-1455` están completas: identity/SDK bridge keyless y brand/session shell internal-only
-  están live en Cloud Run no productivo.
+  están live en Cloud Run, entorno internal-only (no es un despliegue desechable: hay Cloud SQL con
+  PITR y deletion protection, front door propio con dominio y gasto real gobernado).
 - Existe un único proyecto GCP `efeonce-globe`, repo privado y monorepo Node 24.
 - Las specs `TASK-1456…1481` se gobiernan en Greenhouse; ver arriba las que ya cerraron.
 - El seam creativo es real y verificado en vivo: `VertexCreativeAdapter`, `FalCreativeAdapter`,
@@ -47,7 +51,9 @@ Estado que no debes rehacer:
 - Los outputs de un run **se retienen** content-addressed bajo el mismo `sha256` del manifest
   (`outputsRetained`), que es lo que hace posible el edit por referencia. No asumas que un adapter sólo
   devuelve hashes. Detalle: `docs/architecture/EFEONCE_GLOBE_MODEL_LAB_V1.md` → §"Edit / refine cross-model".
-- No existen Cloud SQL creativo, asset bucket definitivo, providers creativos promovidos, Production ni clientes.
+- Ya existen y NO se re-aprovisionan: Cloud SQL `globe-pg` (SPEC-007/`TASK-1465`), buckets GCS gobernados de
+  originales y derivados (SPEC-010/`TASK-1528`) y rutas de proveedor promovidas por la lane de atestación
+  (ADR-010/`TASK-1535`). Lo que NO existe todavía: proyecto Production separado y clientes externos (`TASK-1480`).
 
 Contrato parallel-first:
 - Model Lab/craft, plataforma gobernada y validación comercial avanzan en paralelo.

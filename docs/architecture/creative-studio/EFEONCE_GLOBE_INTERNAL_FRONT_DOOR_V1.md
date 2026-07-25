@@ -57,7 +57,7 @@ which ADR-004 recorded and this implementation confirmed:
 2. **It buys the perimeter, not just the name.** Terminating on the ALB is what makes
    `--ingress internal-and-cloud-load-balancing` possible: with a domain mapping the service must stay reachable
    directly. The load balancer is therefore the enabling condition for closing the `ingress=all` soft spot ADR-004
-   flagged, not an incidental cost. This is why the fixed monthly cost is worth paying for an internal pilot.
+   flagged, not an incidental cost. This is why the fixed monthly cost is worth paying for the internal-only release of a commercial product.
 
 The trade-off accepted is a fixed forwarding-rule charge (see [Cost model](#cost-model)) and one more layer to reason
 about during incidents. It is bounded: the load balancer holds no state and no policy beyond host→backend routing.

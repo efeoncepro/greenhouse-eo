@@ -5,7 +5,7 @@
 - Product: Efeonce Globe
 - Functional descriptor: Creative Studio
 - Canonical epic owner: Greenhouse `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
-- Business state: Approved for validation; not commercially approved
+- Business state: **producto comercial** (ADR-010, 2026-07-24). El pricing/packaging está aprobado sólo para validación; el acceso de clientes externos y Production siguen gated por `TASK-1480`
 
 ## Governance boundary
 

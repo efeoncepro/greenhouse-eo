@@ -25,7 +25,7 @@ There is no ADR that decides where `globe.efeoncepro.com` terminates or which st
 
 1. **Internal-only release (now): keep Cloud Run as the web/BFF; do NOT migrate to Vercel.** The web/BFF/SSO shell stays on `globe-studio-internal` (Cloud Run, GCP), inside one trust boundary with the private API, WIF/ADC identity, provider secrets and the Model Lab. Migrating the internal Node shell to Vercel now is rejected: it is a high-blast-radius, one-way-ish runtime/auth/WIF migration that **does not buy robustness or HA** (the real ceiling is the in-memory/`maxScale=1` state, gated by durable persistence, independent of the hosting cloud) and violates the standing rule "saving the cost of a front door never justifies silently migrating auth/BFF across clouds."
 
-2. **Adopt the native Node http server for this release; the Next.js target is `superseded` for the internal shell.** A lean Node BFF + API spine + SSO shell is the right shape for the internal surface; rewriting it to Next.js buys nothing for an internal pilot.
+2. **Adopt the native Node http server for this release; the Next.js target is `superseded` for the internal shell.** A lean Node BFF + API spine + SSO shell is the right shape for the internal surface; rewriting it to Next.js buys nothing for the internal-only release.
 
 3. **The commercial client-facing frontend (`TASK-1505` Producer surface and beyond) is a SEPARATE surface with a DEFERRED host + framework decision.** It does not exist yet. Because the commercial product serves international enterprise marketing teams, a client-facing **Next.js frontend on a global edge/CDN host (Vercel is a live, best-in-class candidate; Greenhouse already runs there)**, talking to the private GCP API, is an explicitly open option — to be decided **when `TASK-1505`'s client UI is built and its framework chosen, and before `TASK-1480` Production**, not by migrating the internal shell today. Choosing Cloud Run now for the internal shell does **not** foreclose this: the commercial frontend is built once, on the host chosen then, and the private API stays in GCP either way.
 
@@ -49,7 +49,7 @@ There is no ADR that decides where `globe.efeoncepro.com` terminates or which st
 | Direct Cloud Run custom domain mapping for `globe.efeoncepro.com` | Rejected as the productive path: Cloud Run domain mappings are Preview/region-limited; the Global External ALB + serverless NEG is the GA path. |
 | Ship the custom domain now, before `TASK-1505` exists | Rejected: adds fixed ALB cost before any human surface needs it; the `run.app` URL suffices for the internal shell until 1505's rollout. |
 | Give `globe-api-internal` a custom domain / browser exposure | Rejected: the API stays IAM-private, service-to-service, with a `run.app` audience never derived from the browser domain. |
-| Lock the commercial frontend host to Cloud Run now | Rejected: over-fits an internal pilot to a commercial-product host choice; kept as a deferred two-way-door decision with a revisit trigger. |
+| Lock the commercial frontend host to Cloud Run now | Rejected: over-fits today's internal-only release to a permanent commercial host choice; kept as a deferred two-way-door decision with a revisit trigger. |
 | Keep the accidental pilot without an ADR | Rejected: freezes hosting/domain ownership with no reversion criteria (the reason this task exists). |
 
 ## Consequences
