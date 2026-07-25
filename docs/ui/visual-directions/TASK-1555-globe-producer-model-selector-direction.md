@@ -50,7 +50,43 @@ escalable a muchos modelos.
 - Contras: **se siente técnica** (lista = dropdown expandido), contradice "decisión creativa dominante"; menor impacto visual.
 - Riesgo template: **alto** (lista es el patrón más genérico).
 
-## Decisión
+## Decisión revisada (2026-07-25) — el operador revierte a un desplegable compacto
+
+> **Esta sección manda sobre la decisión original de abajo.** La Dirección A se implementó
+> (`efeonce-globe` `78a1863`) y el operador la rechazó al verla: *"¿para qué cards gigantes y poner
+> 'Ruta y modelo' si con isotipo REAL del modelo y el label está ok en un desplegable?"*.
+
+**Dirección vigente: desplegable compacto con isotipo real del modelo** (`a45954f`, `0258534`).
+Materialmente cerca de la Dirección C, pero con dos correcciones que la rescatan de "genérica":
+
+- **Isotipo real del proveedor del modelo**, no un monograma ni un glyph decorativo. Es lo que
+  convierte una lista en un roster reconocible de inteligencias. Fuentes y licencias en
+  `efeonce-globe/apps/studio-web/public/models/README.md` (Iconify `logos` para OpenAI —
+  el mismo asset que ya usa Greenhouse—, simple-icons CC0 para Gemini/ByteDance/ElevenLabs).
+- **Estados honestos en la fila**: `Disponible` · `Próximamente` · `Requiere habilitación del
+  proveedor` · `Necesita cuadros`/`Necesita referencias`.
+
+**Por qué la Dirección A estaba mal, en retrospectiva:** elegir el modelo es **una** decisión dentro
+del composer, no su momento dominante. La galería ocupaba 515px y empujaba el prompt y el CTA de
+generar fuera del fold; el desplegable ocupa 121px. La tesis "la flota es una decisión creativa
+dominante" sobrevalora la frecuencia de esa decisión: se elige el modelo una vez y se itera el prompt
+muchas veces. El momento dominante del composer es el **prompt**, no el selector.
+
+**Lo que sí sobrevive de la tesis original:** que la flota completa sea **visible**. El desplegable
+lista todos los modelos de la modalidad activa —incluidos los que necesitan otro modo del composer—
+en vez de esconderlos detrás de un chip que hay que adivinar. Esa era la parte correcta del brief.
+
+**Anti-patrones que siguen vigentes:** card-on-card, exponer slug/costo/margen, `gated`/`blocked` con
+apariencia ejecutable, mobile como desktop comprimido.
+
+**Anti-patrón retirado:** "logos de terceros". El nombre del modelo ya es público por ADR-003
+(*"GPT Image 2"* ya identifica a OpenAI), así que el isotipo no agrega exposición; lo prohibido sigue
+siendo el **slug de wire, el costo vendor y el margen**. Regla operativa: **NUNCA** transcribir a mano
+ni inventar un logo — se usa un set curado y licenciado, o se cae a monograma.
+
+---
+
+## Decisión original (2026-07-24) — superada por la de arriba
 
 **Se elige la Dirección A ("Galería de láminas").** Es la única que cumple la tesis del brief (flota = momento
 creativo dominante, no dropdown técnico), hereda la dirección premium aprobada de TASK-1505, y da el mayor

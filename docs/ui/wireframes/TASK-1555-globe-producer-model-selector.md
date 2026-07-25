@@ -9,6 +9,32 @@
 > **Dato (SoT):** reader `globe.producer.fleet.list` (TASK-1554) — rutas con `availability` + `recommendedDefaults`.
 > **Copy (SoT):** `efeonce-globe/apps/studio-web/src/producer-copy.ts` (`composer.route`, `routePending`, `routeDisclosure`).
 
+## 0. Delta 2026-07-25 — el control es un desplegable, no una galería
+
+> **Esta sección manda sobre el layout descrito abajo.** El resto del contrato (estados, data
+> mapping, a11y, no-slug) sigue vigente sin cambios.
+
+- **Control:** desplegable compacto (`details`/`summary` + `role="listbox"`), no una grilla de
+  láminas. Razón y evidencia en la [dirección visual §Decisión revisada](../visual-directions/TASK-1555-globe-producer-model-selector-direction.md).
+- **Fila de modelo:** `[isotipo real] Nombre · versión — estado` (+ `✦ Recomendado`, `✓` si elegido).
+  El isotipo viene de un set curado y licenciado; **NUNCA** transcrito a mano.
+- **Título de la región:** `Modelo`. "Ruta" es vocabulario de ruteo del backend y no aparece en la
+  cara del producto (también salieron "Ruta seleccionada" de la barra de ejecución y "Curada ·
+  modelo real").
+- **Alcance de la lista:** toda la flota de la **modalidad activa**, no sólo lo que el modo activo
+  puede correr. Un modelo que necesita otro modo se muestra con lo que necesita
+  ("Necesita cuadros" / "Necesita referencias") y, si ese modo tiene chip, **elegirlo cambia el
+  modo**. Esconderlo detrás de un chip que hay que adivinar hace que el operador nunca sepa que
+  existe — que es justo lo que la task venía a resolver.
+- **Nunca un affordance falso:** un modelo con `minReferences ≥ 1` (Gemini Omni) o que exige
+  keyframes (Veo) **no** se ofrece como ejecutable en un modo sólo-prompt; reventaría en
+  `assertInputModeSatisfied` después de reservar crédito.
+- **Barra de ejecución:** `data-compact-route` refleja el modelo elegido (antes era un placeholder
+  estático que prometía una selección que nunca mostraba).
+- **Markers `data-capture` vigentes:** `producer-model-picker`, `producer-model-trigger`,
+  `producer-model-list`, `producer-model-option`, `producer-model-recommended`
+  (reemplazan `producer-model-grid` / `producer-model-card`).
+
 ## 1. Qué reemplaza
 
 Hoy la región "Ruta, modelo y formato" del composer es un **placeholder estático**

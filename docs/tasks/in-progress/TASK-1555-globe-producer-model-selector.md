@@ -254,6 +254,69 @@ Mapa de implementación verificado (arquitectura Globe = HTML-template + control
 
 Slices de implementación (design-studio Steps 6-9): (1) data layer client + fixture; (2) render de la galería + CSS (first-fold checkpoint desktop+mobile); (3) estados+selección+a11y; (4) GVC premium + scorecard 14 dims. **Nota de dependencia:** el estado `available` real (modelo funcionando) necesita la **promoción ADR-009** (hoy bloqueada por identidades de readiness firmadas — paso humano); `gated`/`blocked` sí se pueden GVC-ear ya.
 
+## Progress — Revisión del operador (2026-07-25, `efeonce-globe` `a45954f` + `0258534`)
+
+La galería de láminas se implementó y **el operador la rechazó al verla**. La dirección visual quedó
+revisada (ver `visual-directions/…-direction.md` §Decisión revisada) y el wireframe tiene su §0 delta.
+Lo que cambió y por qué:
+
+### 1. El control: desplegable compacto, no galería
+
+*"¿Para qué cards gigantes … si con isotipo REAL del modelo y el label está ok en un desplegable?"*
+Tiene razón: elegir el modelo es **una** decisión del composer, no su momento dominante — se elige
+una vez y se itera el prompt muchas veces. La región pasó de **515px a 121px** y el prompt recuperó
+el fold. Sobrevive la parte correcta del brief: que la flota completa sea **visible**.
+
+### 2. Isotipos reales del modelo
+
+- **OpenAI** desde el set `logos` de Iconify **que ya vive en Greenhouse**
+  (`src/assets/iconify-icons/generated-icons.css`, `.logos-openai-icon`) — lo señaló el operador;
+  simple-icons no distribuye OpenAI. Se decodificó su data-URI al SVG original, path intacto.
+- **Gemini / ByteDance / ElevenLabs** desde simple-icons v16.27.0 (CC0-1.0), copiados sin modificar.
+- Fuente, licencia y mapeo en `efeonce-globe/apps/studio-web/public/models/README.md`.
+- **NUNCA** transcribir a mano ni inventar un logo: un logo aproximado es peor que un monograma.
+- El anti-patrón "logos de terceros" del doc de dirección **se retiró** con decisión del operador: el
+  nombre del modelo ya es público por ADR-003 ("GPT Image 2" ya identifica a OpenAI). Lo prohibido
+  sigue siendo slug de wire, costo vendor y margen.
+
+### 3. Jerga de ruteo fuera de la cara del producto
+
+"Ruta y modelo" → **"Modelo"**. También salieron "Ruta seleccionada" de la barra de ejecución,
+"Curada · modelo real" y el ícono `ti-route` (el test de contrato de íconos pasó a `sparkles`).
+
+### 4. Tres defectos de contenido que el operador destapó
+
+- **Bajo "Genera una imagen" se ofrecía `Seedream 5 Pro Edit`**, un modelo de EDICIÓN.
+  `routeSupportsCurrentMode` filtraba sólo por modalidad; ahora decide la **capacidad**
+  (`image-generate` vs `image-edit` según `editFrom`).
+- **Bajo "Genera audio" sólo se ofrecía el modelo de voz**: `Seed Audio` (`audio-generate`) era
+  inalcanzable desde toda la superficie — integrado y promovido, pero jamás seleccionable.
+- **`data-compact-route` nunca se actualizaba**: la barra decía "elige un modelo" con un modelo ya
+  elegido. Ahora refleja el modelo elegido y sigue la modalidad.
+
+### 5. "¿Por qué en Video no están los modelos de Google?" — la flota completa es visible
+
+Verificado contra el ledger y el catálogo: **sí eran alcanzables**, pero sólo adivinando un chip de
+sub-modo — en "Crear" sólo aparecía Seedance. Corrijo mi primera lectura: no estaban "inalcanzables",
+estaban **invisibles**, que para el objetivo de la task es igual de malo.
+
+El selector ahora lista **toda la flota de la modalidad activa**, no sólo lo que el modo activo corre:
+
+| Modalidad | Modelos visibles |
+|---|---|
+| Video | Seedance 2.0 (Disponible) · **Veo 2.0** ("Necesita cuadros") · **Gemini Omni Flash** (Próximamente) · Seedance motion (Próximamente) |
+| Audio | Seed Audio · ElevenLabs Multilingual v2 / Voice Changer / Dubbing |
+| Imagen | Seedream 5 Pro (✦) · Seedream 5 Pro Edit ("Necesita una imagen para editar") · Nano Banana Pro · GPT Image 2 / 1.5 |
+
+**Elegir un modelo que necesita otro modo cambia el modo por ti** y lo deja seleccionado (verificado:
+click en Veo → modo Cuadros + barra "Veo · 2.0"). `SWITCHABLE_MODES` declara qué modos tienen chip;
+imagen no tiene (se entra a editar desde una pieza de la biblioteca), así que ahí es informativo.
+
+**Por qué no basta con meterlos en "Crear":** `ref/motion/reference-v1` (Gemini Omni) declara
+`minReferences: 1` y `ref/video/frames-v1` (Veo) exige keyframes. Ofrecerlos en un modo sólo-prompt
+reventaría en `assertInputModeSatisfied` **después** de reservar crédito — el fail-open que la
+arquitectura advierte. Se muestran con lo que necesitan, nunca como ejecutables donde no lo son.
+
 ## Progress — Implementación (2026-07-24, `efeonce-globe` `78a1863`, pusheado a `main`)
 
 ### Corrección al mapa de Discovery (hallazgo load-bearing)

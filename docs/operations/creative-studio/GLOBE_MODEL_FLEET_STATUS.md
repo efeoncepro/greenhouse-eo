@@ -73,10 +73,12 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 
 ## Consumers vivos de la flota
 
-- **Producer Model Selector (TASK-1555, `efeonce-globe` `78a1863`)** — la región "Ruta y modelo" del
-  composer renderiza la **galería de láminas** desde `globe.producer.fleet.list`: cada ruta de la
-  modalidad activa aparece con su `availability` real (`available` elegible · `gated` "Próximamente"
-  · `blocked` con la razón del gate externo), ordenada recomendado → available → gated → blocked.
+- **Producer Model Selector (TASK-1555, `efeonce-globe` `0258534`)** — la región **"Modelo"** del
+  composer renderiza un **desplegable con el isotipo real de cada modelo** desde
+  `globe.producer.fleet.list`. Lista **toda la flota de la modalidad activa** con su `availability`
+  real (`available` elegible · `gated` "Próximamente" · `blocked` con la razón del gate externo) y,
+  para los modelos que necesitan otro modo del composer (Veo → cuadros, Gemini Omni → referencias),
+  lo declara y **cambia el modo al elegirlos** en vez de esconderlos detrás de un chip.
   **Promover una ruta la vuelve elegible en el Producer sin tocar la UI.** Consecuencia directa: como
   hoy ninguna ruta de imagen está promovida, el Producer **no ofrece modelo de imagen elegible** hasta
   que ADR-009 avance — el blocker dejó de ser invisible. `ref/audio/foley-v1` (promovida en el canary
