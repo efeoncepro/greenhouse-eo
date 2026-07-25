@@ -16,6 +16,10 @@
   source catalog; validadores de evidence ledger/data room; y protocolo/evidencia de evals. Business Model
   incluye eval protocol, source catalog, portfolio model contract y drafts explícitos para Efeonce Group,
   Growth Platform, AEO y Search Visibility 360. Todos siguen `Draft` donde faltan datos reales.
+- **2026-07-25 — Arquitectura de modelos de negocio redactada.** El canon ahora explica la jerarquía
+  `Efeonce Group → Growth Platform/ASaaS → capability/oferta → packaging → submodelo`, el criterio para
+  decidir cuándo una oferta necesita modelo propio y cómo se consolida para clientes, operación e inversión:
+  [`EFEONCE_BUSINESS_MODEL_ARCHITECTURE_V1.md`](docs/business-models/EFEONCE_BUSINESS_MODEL_ARCHITECTURE_V1.md).
 
 - Branch compartida: `develop`. Antes de editar, ejecutar `git status --short` y no asumir árbol limpio.
 - El checkout contiene trabajo paralelo de Campaign Layout Compiler / producción creativa que fue preservado

@@ -16,6 +16,9 @@ operación, monetización, unit economics, riesgo y validación.
 El método y los invariantes operativos viven en la skill `efeonce-business-model-operator`. Este directorio
 mantiene los modelos concretos y sus versiones; no duplica la skill ni convierte una hipótesis en contrato.
 
+La arquitectura que explica cómo se relacionan el modelo corporativo, la plataforma, las capabilities, el
+packaging y los submodelos vive en [`EFEONCE_BUSINESS_MODEL_ARCHITECTURE_V1.md`](EFEONCE_BUSINESS_MODEL_ARCHITECTURE_V1.md).
+
 ## Fronteras con las demás categorías
 
 | Categoría | Pregunta que responde | No debe contener como canon |

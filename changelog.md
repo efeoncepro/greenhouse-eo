@@ -17,6 +17,8 @@
 - Se endurecieron los artefactos: templates del pack de inversión, source catalogs, validadores de ledger y
   data room, acceptance criteria/protocol de evals, y drafts `Draft` de Efeonce Group, Growth Platform, AEO
   y Search Visibility 360 sin inventar datos financieros o de tracción.
+- Se redactó la arquitectura canónica de modelos de negocio: corporativo, plataforma, capability/oferta,
+  packaging y submodelos, con ownership, gates y reglas de consolidación.
 
 ## 2026-07-25 — Cutover del share board de Globe: LIVE, y las dos precondiciones que faltaban (TASK-1558 Slice 3 + TASK-1562)
 
