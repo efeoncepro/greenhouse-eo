@@ -76,7 +76,8 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 - **Gemini Omni en producción gobernada:** hoy Omni está **solo en el Lab**; el path gobernado tiene Fal + Veo + (ahora) Vertex-imagen, **no Omni**. Si `ref/motion/reference-v1` se quiere entregar a cliente, falta su driver gobernado (Interactions API) — análogo a lo que se hizo para Vertex-imagen.
 - **OpenAI (GPT Image 2/1.5):** canarean en el Lab; **sin lane de producción** hasta implementar el verifier oficial.
 - **Nano Banana 2:** espera **allowlist de Google**.
-- **Grant de créditos 409:** el comando canónico de administración de créditos devolvió `409 conflict` al intentar un grant adicional de 5000 pese a pool activo + identidad válida + idempotencia nueva (TASK-1553, 2026-07-24). No bloquea lo hecho (el canary corrió con el budget subido 100→110 + grant de 10). Investigar como incidente (posible guard de "un solo activo" o bug de conflicto). No se hizo bypass ni mutación directa.
+- **Grant de créditos 409 → `ISSUE-124`:** el comando canónico de administración de créditos devuelve `409 conflict` en un grant adicional pese a pool activo + identidad válida + idempotencia nueva. No bloquea lo hecho (el canary corrió con el budget subido 100→110 + grant de 10). Documentado en `docs/issues/open/ISSUE-124-globe-credit-grant-canonical-409-root-cause-hidden.md` (Codex, 2026-07-24). No se hizo bypass ni mutación directa.
+- **Promoción ADR-009 bloqueada:** la saga de promoción de Nano Banana Pro espera **identidades de readiness firmadas** (paso humano/gobernado). Codex intentó y NO forzó (correcto). Hasta esa firma, todas las rutas siguen `gated/not_promoted` — ningún modelo queda `available` en el reader/selector.
 
 ## Roadmap → "todos los modelos probados en el Producer"
 
@@ -100,8 +101,8 @@ Para llevar una ruta del Lab al Producer hacen falta 4 cosas (las 2 primeras son
 | **Gemini Omni** | **construir driver gobernado** (Interactions API) → allowlist → promoción | código (Globe) + Codex |
 | GPT Image 2/1.5 | **verifier de producción OpenAI** (código) → promoción | código (Globe) + Codex |
 | Nano Banana 2 | **allowlist de Google** (externo) → luego ruta + driver + promoción | Google + luego equipo |
-| **Exponer la flota data-driven** | **`TASK-1554` — CODE-COMPLETE** (`efeonce-globe` `c3b6bf4`): reader gobernado `globe.producer.fleet.list` (availability `available\|gated\|blocked` por ruta×workspace + `recommendedDefaults`); `pnpm check`+`build` verdes, 12 tests. Falta: deploy + readback runtime | backend-data |
-| **Selector visible (todos)** | **`TASK-1555`** — UI del Producer, consumer de TASK-1554 (bloqueada por ella) · `TASK-1552` recompone la jerarquía del composer, distinto | UI (ui-ux) |
+| **Exponer la flota data-driven** | **`TASK-1554` — DESPLEGADO + live-verificado** (`c3b6bf4`, Codex): reader `globe.producer.fleet.list` vivo (availability `available\|gated\|blocked` + `recommendedDefaults`). ✅ dependencia de datos lista | backend-data |
+| **Selector visible (todos)** | **`TASK-1555` — in-progress:** dirección visual ELEGIDA ("Galería de láminas") + wireframe + motion robustos; **Slice 1a (data layer del client) done + typecheck verde** (local `d07a1cd`). Falta: render galería (HTML/CSS/controller) + GVC premium + scorecard 14 dims. `TASK-1552` = jerarquía del composer (distinto) | UI (ui-ux) |
 
 **Secuencia recomendada:** (a) promover las rutas que ya tienen driver (Fal + Veo + Nano Banana Pro) — es el
 camino más corto a "modelos reales elegibles"; (b) construir el driver gobernado de Omni; (c) `TASK-1552`

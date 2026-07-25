@@ -8,6 +8,21 @@
 
 # Handoff
 
+## Active state — 2026-07-24 (TASK-1555 selector in-progress; TASK-1554 desplegado; promoción bloqueada)
+
+- **TASK-1554 DESPLEGADO + live-verificado** (Codex): api/worker en `c3b6bf4`, reader `globe.producer.fleet.list` vivo.
+- **TASK-1555 (selector UI del Producer) in-progress:** dirección visual ELEGIDA ("Galería de láminas", poster-first)
+  + wireframe + motion robustos (`docs/ui/{visual-directions,wireframes,motion}/TASK-1555-*`). **Slice 1a done + typecheck
+  verde:** el `ProducerClient` fetchea la flota en boot (`state.fleet` + `state.recommendedDefaults`), commit **local**
+  `efeonce-globe` `d07a1cd` (SIN push — WIP de UI). Falta: render de la galería en `producer-ui.ts` (HTML+CSS inline) +
+  hidratación/selección en `producer-controller.ts` + copy en `producer-copy.ts` + fixture GVC + GVC premium + scorecard
+  14 dims. Mapa de implementación exacto en la task (`## Progress — Discovery`).
+- **Promoción ADR-009 BLOQUEADA:** Nano Banana Pro espera **identidades de readiness FIRMADAS** (paso humano/gobernado);
+  Codex no forzó. Hasta la firma, todas las rutas siguen `gated/not_promoted` — ningún modelo `available` en reader/selector.
+  El estado `available` real (modelo funcionando) del selector depende de esto.
+- **`ISSUE-124`** (open): el comando de administración de créditos devuelve `409 conflict` en un grant adicional pese a
+  pool activo + identidad válida + idempotencia nueva. No bloquea lo hecho.
+
 ## Active state — 2026-07-24 (TASK-1554 — fleet availability reader code-complete)
 
 - **Reader nuevo `globe.producer.fleet.list`** (`efeonce-globe` `c3b6bf4`, pushed a `main`): proyecta cada ruta del

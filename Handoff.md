@@ -24,12 +24,12 @@
   [ADR-010](docs/architecture/creative-studio/EFEONCE_GLOBE_COMMERCIAL_PROMOTION_ATTESTATION_DECISION_V1.md) +
   `GLOBE_RUNTIME_HANDOFF.md`. Regla dura viva: scopes del broker OAuth = rollout de 3 pasos (permite → pide → exige)
   o se cae el login.
-- **Globe flota multi-modelo — `TASK-1553` (in-progress).** ADR-013 + resolución por-ruta + catálogo v1.3.0 (NB Pro,
-  GPT Image 2/1.5) + composite por-ruta. **Desplegado + live-verificado** (Codex 2026-07-24): catálogo live `1.3.0`
-  incluye `ref/still/nanobanana-pro-v1`, env en `composite` (0 regresión), ruta price-eada (migr. `0031`), atestación
-  CEO NB Pro ✅. **Único blocker del canary: cap de presupuesto gobernado del Lab** (`withinDayCap=false`) → sin
-  promoción. Falta: aprobar budget → canary 10cr → promover. NB2 espera Google, GPT Image el verifier OpenAI. Detalle:
-  `GLOBE_RUNTIME_HANDOFF.md`.
+- **Globe flota multi-modelo en el Producer (programa).** SoT: `GLOBE_MODEL_FLEET_STATUS.md`.
+  **`TASK-1553`** shipped (catálogo v1.3.0 + resolución por-ruta; canary NB Pro VERDE). **`TASK-1554`** shipped +
+  **desplegado** (reader `globe.producer.fleet.list` live). **`TASK-1555`** (selector UI, in-progress): dirección "Galería
+  de láminas" + wireframe/motion + **Slice 1a data layer done** (local `efeonce-globe` `d07a1cd`, sin push);
+  falta render galería + GVC + scorecard. **Blocker duro:** la **promoción ADR-009** espera **identidades de readiness
+  firmadas** (humano) → hasta eso todo `gated`, ningún modelo `available`. `ISSUE-124` = 409 del grant.
 
 ## Riesgos abiertos
 
