@@ -122,6 +122,12 @@ Primer bloque operativo asignado:
 - **Reserva vigente actualizada: siguiente ID libre `TASK-1551`.** `TASK-1536…1541` corresponden a Video
   Effectiveness y `TASK-1542…1550` a Storyboard Studio/Narrative Preproduction dentro de `EPIC-028`. Esta línea
   supersede las reservas históricas inferiores.
+- ⛔ **Retiradas 2026-07-25 por duplicación** (`EPIC-028`): `TASK-1563` → dueño `TASK-1522`; `TASK-1564` → dueños
+  `TASK-1552`/`TASK-1532`/`TASK-1555`; `TASK-1565` → dueño `TASK-1523`. Se crearon sin barrer el registry por
+  **dominio**, y cuatro tasks ya cubrían su territorio. El trabajo construido está registrado en cada task dueña.
+  `TASK-1559` y `TASK-1562` **no** se retiran porque su código ya shippeó, pero llevan puntero a sus dueños
+  (`TASK-1526` y `TASK-1522`). **Lección: barrer por dominio, no por el nombre que se le quiere dar al trabajo** —
+  "Feed + viewer sobre el payload cliente" y "Resilient Feed and Viewer" son la misma superficie con dos nombres.
 - **Reserva vigente actualizada: siguiente ID libre `TASK-1566`.** `TASK-1564` (composer de Globe sobre el payload cliente, con la regla de reconciliacion prototipo-vs-vanilla de cinco clases) y `TASK-1565` (motion del payload cliente: las 7 animaciones ausentes + el gate de reduced-motion) son de `EPIC-028`, creadas 2026-07-25. `TASK-1562` (hidratación de la proyección del share: `modelLabel`/`reviewStatus`/`comments` que `resolveForShare` descarta hoy en silencio) y `TASK-1563` (menciones en comentarios de revisión) son de `EPIC-028`, creadas 2026-07-25. `TASK-1556`…`TASK-1561` completan el programa de ADR-014 (client application de Globe): Slice 0 foundation, CDN path-scoped, share board, feed+viewer, retiro del legacy y hardening del gate de diseño (`EPIC-028`; creadas 2026-07-25). `TASK-1553` corresponde a Globe Extensible Multi-Model Provider Catalog + Route-Based Model Resolution (`EPIC-028`; creada 2026-07-24; foundation del selector UI TASK-1552). Esta línea supersede las reservas históricas inferiores.
 - **Reserva vigente actualizada: siguiente ID libre `TASK-1536`.** `TASK-1535` corresponde a Globe commercial promotion via rights attestation + automated lane (ADR-010; `EPIC-028`; creada 2026-07-24). Esta línea supersede las reservas históricas inferiores.
 - **Reserva histórica: siguiente ID libre `TASK-1535`.** `TASK-1533…1534` corresponden a Voice Ideation Intake Foundation + Voice-to-Creative-Prompt Experience de Globe (`EPIC-028`; creadas 2026-07-23).

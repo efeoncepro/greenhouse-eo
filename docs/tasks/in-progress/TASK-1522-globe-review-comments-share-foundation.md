@@ -23,6 +23,30 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-07-25 — lo que shippeó del share board, y las menciones vuelven acá
+
+Se crearon `TASK-1562` (hidratación de la proyección del share) y `TASK-1563` (menciones) sin ver que esta task es
+la dueña de review/comments/share. Registro acá lo que pasó, para que esta task no quede ciega:
+
+**Ya LIVE en producción** (revisión `globe-studio-internal-00071-6vp`): el **share board sobre el payload cliente**
+(`TASK-1558`) y la **hidratación de su proyección** (`TASK-1562`) — `resolveForShare` devolvía sólo
+`{ target, mediaType }`, así que `modelLabel`, `reviewStatus` y `comments` se descartaban en silencio en **todos**
+los shares: el grant los pedía, el dominio los proyectaba, el operador podía crearlos, y la autoridad nunca los
+entregaba. El panel del share board estaba estructuralmente vacío en producción. Ambas tasks quedan como el
+registro de lo que shippeó; **el dominio sigue siendo de esta task**.
+
+**Las menciones (`TASK-1563`) pertenecen acá y no a una task propia.** Su contenido: mención como **dato
+estructurado validado contra el roster real**, nunca parseo de `@` sobre el body. El trabajo real son **dos
+primitives que faltan** — un directorio mencionable con nombre (Globe conoce `identitySubject`, no nombres) y un
+canal de notificación (no existe ninguno general). **Mencionar NUNCA concede acceso.** Ojo con `TASK-1544`
+(menciones de Storyboard): son dos dominios distintos y el directorio mencionable debería ser **una** primitive
+compartida, no dos.
+
+**Y el hallazgo que corrige una afirmación falsa del feed:** deshabilité "Compartir board" en el feed diciendo *"no
+tiene contrato gobernado"*. **Falso** — `globe.producer.review.share.create` existe y está declarado en
+`creative-review.ts`. Lo que falta es la superficie que lo consume, y esa razón apunta al trabajo real; "no hay
+contrato" manda al próximo agente a construir uno que ya está.
+
 ## Summary
 
 Separar de `TASK-1472` el kernel durable e independiente de layout/release para review humano, comentarios y

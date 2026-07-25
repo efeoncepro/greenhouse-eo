@@ -1,3 +1,13 @@
+> # ⚠️ TASK-1562 — DUEÑO REAL: TASK-1522 (Globe Review, Comments and Read-only Share Foundation)
+>
+> Esta task se creó sin ver que ese dominio ya tenía dueña. **No se retira porque su código YA SHIPPEÓ** y varios
+> commits la referencian: retirarla dejaría esas referencias huérfanas. Queda como **registro de lo que se
+> entregó**; la spec del dominio es de la task dueña, y ahí está el puntero a lo que aquí se construyó.
+>
+> Regla que sale de esto: antes de crear una task, barrer el registry por el DOMINIO, no por el nombre que se le
+> quiere dar al trabajo. "Feed + viewer sobre el payload cliente" y "Resilient Feed and Viewer" son la misma
+> superficie con dos nombres.
+
 # TASK-1562 — Hidratación de la proyección del share board de Globe
 
 <!-- ═══════════════════════════════════════════════════════════

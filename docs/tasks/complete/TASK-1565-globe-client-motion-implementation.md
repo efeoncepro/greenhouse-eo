@@ -1,3 +1,13 @@
+> # ⛔ TASK-1565 RETIRADA 2026-07-25 — duplicaba una task existente
+>
+> **Dueño real:** TASK-1523 (Creative Suite Experience Logic — dueña de los contratos visual/flow/motion)
+>
+> Se creó sin ver que `TASK-1523` ya es la dueña de los contratos de motion de la suite. Los 6 slices construidos y verificados en browser (commit `1c0684e`: gate de reduced-motion, `GlobeGeneratingMark`, `AuroraLayer`, `candIn`, shimmer) quedaron registrados allá, junto con el SSOT `GLOBE_CLIENT_MOTION_CONTRACT_V1.md`.
+>
+> **Se retira en vez de completarse** porque una segunda task describiendo la misma superficie es exactamente la
+> clase de drift que produce mediciones divergentes: dos specs de lo mismo se separan, y después nadie sabe cuál
+> manda. Este archivo queda como registro del trabajo hecho y de dónde fue a parar; **no lo tomes como spec**.
+
 # TASK-1565 — Motion del payload cliente de Globe (feed + composer)
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -6,7 +16,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -19,7 +29,7 @@
 - Motion: `docs/ui/motion/TASK-1565-globe-client-motion-implementation-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `in-progress — Slice 1 (gate) COMPLETO con 7 tests; Slice 2 retirado (el defecto no existia); siguen tokens + isotipo`
+- Status real: `RETIRADA por duplicación — su contenido vive en TASK-1523 (Creative Suite Experience Logic — dueña de los contratos visual/flow/motion)`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `TASK-1564` (parcialmente — el isotipo se puede construir antes, pero el motion del composer necesita el composer)

@@ -25,6 +25,40 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-07-25 — el modelo de vigencia del estimado YA ESTÁ CONSTRUIDO (venía de TASK-1564, retirada)
+
+Se creó `TASK-1564` sin ver que esta task ya era la dueña de "el sistema precalcula estimates y al pulsar el CTA
+revalida estimate, policy y saldo". **`TASK-1564` queda retirada** y su Slice 1 pertenece acá:
+
+**Entregado** (`efeonce-globe`, commit `feffd47`): `apps/studio-client/src/data/composer-recipe.ts` + **17 tests**.
+
+**La compuerta la da el CONTRATO, no contabilidad del cliente.** `LabEstimatePreviewV1` trae **`approvalToken`**
+—el contrato lo describe como *"Opaque, short-lived server approval binding the previewed commercial quote"*— y
+`ExecuteExperimentPayloadV1` lo consume. **El token ES la cotización:** el cliente no puede ejecutar un precio que
+no mostró, porque lo único que puede mandar es el token que recibió con ese precio. Esto reemplaza cualquier
+bookkeeping de "¿cambió algún campo?".
+
+**Dos ejes de vigencia observables por el cliente, no tres:**
+
+| Eje | Quién lo detecta | Cómo |
+|---|---|---|
+| la forma cambió | cliente | `recipeKey` del estimado ≠ el de la recipe en pantalla |
+| pasó el tiempo | cliente | `estimateExpiresAt` |
+| cambió la tarifa | **servidor** | el `approvalToken` deja de valer; `rateCatalogVersion` vive en `CreditEstimateV1`, que es interno, y la proyección client-safe **no** lo expone |
+
+**Decisiones que los tests fijan:** el **prompt no entra** en `recipeKey` (si entrara, el estimado se invalidaría
+con cada tecla y el botón quedaría deshabilitado mientras alguien escribe; y cambiar las palabras no cambia el
+costo) pero **sí** se exige para ejecutar; la clave se arma con orden explícito de campos, no `JSON.stringify`
+(que depende del orden de inserción); un vencimiento **ilegible se trata como vencido** —ante la duda sobre plata
+no se gasta—; un estimado stale **se conserva** para mostrarlo atenuado, porque un riel en blanco se lee como "no
+cuesta nada".
+
+**Investigación de producto para el riel** (Higgsfield · Freepik/Magnific · Adobe/Photoroom/PixAI): el costo va
+**en el botón** (patrón Higgsfield) además del riel, porque son dos preguntas — *"¿cuánto me queda?"* vs *"¿cuánto
+cuesta esto?"*. Y la queja #1 de la industria no es el precio: es que **se cobra al apretar y la devolución no es
+instantánea**. Globe **retiene** (`held → settled | released`), así que el `Disp./Reserv./Gastado` del prototipo
+**es el mecanismo anti-sorpresa** y colapsarlo en un número tiraría la ventaja.
+
 ## Summary
 
 Eliminar el botón manual `Calcular costo` del Producer y convertir `Generar` en una intención única. El sistema

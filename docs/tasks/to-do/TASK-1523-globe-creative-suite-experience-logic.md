@@ -25,6 +25,50 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-07-25 — el contrato de motion del payload cliente YA EXISTE y está implementado (venía de TASK-1565, retirada)
+
+Se creó `TASK-1565` ("Motion del payload cliente") sin ver que esta task ya es la dueña de los **contratos
+visual/flow/motion** de la suite. **`TASK-1565` queda retirada** y su contenido pertenece acá.
+
+**El contrato escrito:** `docs/architecture/creative-studio/GLOBE_CLIENT_MOTION_CONTRACT_V1.md` — SSOT del motion
+del payload cliente, con los valores **medidos** del prototipo aprobado (11 `@keyframes`, 12 animaciones, 9
+transiciones). Su decisión de fondo: el motion tiene **tres capas que se gobiernan distinto** —
+**identidad** (el isotipo generando: bajo `reduce` se apaga la animación, **no** el elemento) · **estructura**
+(entradas y overlays: pasan a `--duration-none`) · **ambiente** (aurora: se apaga por completo).
+
+**Ya implementado y verificado en browser** (`efeonce-globe`, commit `1c0684e`):
+
+| Pieza | Qué es |
+|---|---|
+| `GlobeGeneratingMark` | primitive con las 4 animaciones del isotipo. `gBreathe` y `gHalo` **comparten el token de duración** — el token compartido ES el mecanismo que garantiza la fase, verificado en browser. El isotipo va como **asset** desde `/assets/brand/`, no inline: `'self'` ya satisface la CSP y un asset de marca no se forkea a código |
+| `AuroraLayer` | 3 capas con duraciones distintas, montada **una vez por documento** (feed y composer comparten pantalla; por superficie habría dos auroras superpuestas) |
+| `candIn` · `skel` | entrada por **primera aparición** de `stableKey` (no por render) y shimmer del skeleton |
+| **gate de reduced-motion** | `src/gates/reduced-motion.test.ts`, 7 tests |
+
+**El gate, y la corrección que él mismo forzó.** Se escribió afirmando que evitaba animaciones sin manejo de
+`prefers-reduced-motion`; **leyendo `base.css` resultó falso** — hay un blanket global que neutraliza todo con
+`!important`. Su valor real es enforcar la **dirección del opt-in** (declarar dentro de `no-preference`, que falla
+segura) y forzar la decisión de **qué queda visible**, porque "detenerse" no siempre es el estado final correcto:
+una chispa congelada a mitad de vuelo es ruido, el isotipo congelado es correcto. Y en su primera corrida marcó
+**dos animaciones correctas** como infracciones (ya envueltas en `no-preference`, la práctica mejor) — obligó a
+calibrar, que es el modo de fallar garantizado de todo gate nuevo.
+
+**Tres defectos que sólo aparecieron mirando el browser:** `candIn` **no corría nunca** (mutaba el registro durante
+el render y StrictMode invoca el render dos veces); el hero no animaba su entrada; y las duraciones de chispas y
+aurora quedaban como literales — el gate de motion me corrigió y les agregué **tokens al SSOT, no una excepción al
+gate**.
+
+**Corrección de una afirmación falsa:** `TASK-1565` declaraba un "defecto de accesibilidad vigente" (que las
+acciones de card desaparecían bajo `reduce`). **No existe** — se revelan con `:hover` **y** `:focus-within`, y
+`@media (hover: none)` las deja siempre visibles en touch. Lo afirmé leyendo el bloque del prototipo sin abrir mi
+archivo.
+
+**Canary:** `apps/studio-client/scripts/producer-motion-canary.mjs`, 13 asserts en los dos modos.
+**Docs de UI reusables:** `docs/ui/motion/TASK-1565-globe-client-motion-implementation-motion.md` (plan de
+implementación) y `docs/ui/wireframes/TASK-1565-globe-client-motion-implementation.md` (mapa de los 8 anclajes).
+
+**Falta:** el motion del composer (estimado atenuado, barra de progreso, `overlayIn`), que llega con `TASK-1552`.
+
 ## Summary
 
 Definir la lógica de experiencia, arquitectura de información y gramática de interacción común de Efeonce

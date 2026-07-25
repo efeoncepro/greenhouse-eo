@@ -44,6 +44,34 @@
 - `GLOBE_LIBRARY_EXPORT_ENABLED=false` permanece cerrado porque no existe un asset real elegible para probar
   queue, bytes e integridad de export. `GLOBE_LIBRARY_PURGE_ENABLED=false` permanece cerrado por policy/Legal.
 
+## Delta 2026-07-25 — la unión con el feed YA está en el contrato, y no hace falta una task nueva
+
+Estuve a punto de crear una task de biblioteca sin ver que **esta ya existe y ya la cubre** (su propio Summary dice
+"proyectables en el feed canónico"). No se creó. Lo que el discovery aporta:
+
+**🔴 La unión profunda feed↔biblioteca ya está en el contrato y no hay que inventarla.** El item del feed trae
+**`output.containerIds`**, y `LibraryContainerKindV1` es **`'collection' | 'series'`**. O sea:
+
+- **"Serie" es un `LibraryContainer` de kind `series`**, listable con `container.list?kind=series`;
+- el agrupamiento por serie en el feed es **derivable de datos que el feed YA recibe** — `containerIds` es el join;
+- la biblioteca no es un silo aparte: es la que **da sentido a "Serie" dentro del feed**, y el feed es donde una
+  pieza entra a una colección.
+
+**Corrección de una afirmación falsa que shippeé en el feed:** deshabilité el control "Serie" con el mensaje *"no
+tiene contrato gobernado"*. **Falso en los dos casos** (Serie y Compartir): los contratos existen; lo que falta es
+la superficie que los consume. Ya corregido en el copy del feed (`efeonce-globe`, commit `d939e95`), porque "no hay
+contrato" manda al próximo agente a negociar un cambio de API que no hace falta.
+
+**Lo que el feed necesita de esta task, concretamente:** `container.list` (kind `series` y `collection`),
+`container.create/update`, y el agrupamiento visual en el feed leyendo `containerIds`. Las **6 capabilities de
+`surface: 'library'`** del inventario de paridad (`apps/studio-client/src/data/legacy-parity.ts`) son las de esta
+task, y el retiro del payload legacy (`TASK-1560`) **las necesita cubiertas**.
+
+⚠️ **Ojo con las promesas muertas:** `library.bulk.prepare`, `library.bulk.execute` y `library.export.request`
+están **gateadas y nunca despachadas** en el payload legacy — el botón existe, se ilumina si hay grant, y no llama
+a nada. Están declaradas con su motivo en `LEGACY_PARITY_EXCLUSIONS`. Construirlas acá es **trabajo nuevo**, no un
+port, y el contrato (`PrepareLibraryBulkPayloadV1` con `LibraryBulkActionV1`) **sí existe**.
+
 ## Summary
 
 Crear la librería durable del Producer: collections/series, membership, búsqueda/filtros/orden, move y bulk

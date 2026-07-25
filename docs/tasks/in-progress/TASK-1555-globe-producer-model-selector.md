@@ -26,6 +26,36 @@
 - Branch: `task/TASK-1555-globe-producer-model-selector`
 - Legacy ID: `none`
 
+## Delta 2026-07-25 — el Summary de esta task está STALE, y el port pertenece acá
+
+**Dos correcciones.**
+
+**1. El Summary dice "una galería" y eso ya no es la forma vigente.** La galería se implementó y **el operador la
+rechazó al verla**; se reemplazó por un **desplegable compacto con isotipo real** (`a45954f`) que lista toda la
+flota de la modalidad activa (`0258534`). El texto de arriba quedó viejo — **no llamarla "galería"**.
+
+**2. El port al payload cliente pertenece acá** (se había puesto en `TASK-1564`, retirada). Spec exacta medida de
+`producer-controller.ts:2217-2242` y `:378-387`:
+
+La marca del modelo resuelve en **tres niveles**: **asset del isotipo** real 16×16 → **glyph** → **monograma**
+(iniciales de las 2 primeras palabras, o `AI`).
+
+⚠️ **El fallback a monograma es deliberado y el comentario del código dice por qué: *"rather than an invented
+logo"*.** Un modelo sin isotipo bundleado recibe **sus iniciales**, nunca un logo dibujado de memoria.
+
+El mapa es **DATO** (*"a new model is a new entry"*), por prefijo en minúsculas del nombre público:
+`gpt image`→openai · `nano banana`/`gemini`/`veo`→gemini · `seedream`/`seedance`/`seed audio`→bytedance ·
+`elevenlabs`→elevenlabs. Los assets están en `/assets/models/*.svg` (4 verificados en disco), servidos desde el
+mismo origen ⇒ la CSP `img-src 'self'` ya los cubre.
+
+**3. Bloqueo que esta task no declaraba:** listar la flota completa no alcanza para **ejecutar** cualquier modelo.
+Los adapters resuelven el modelo **por capability**, y el compiler ancla a `estimate.model`: un binding a un 2.º
+modelo del mismo proveedor da `route_binding_missing`. Eso es **`TASK-1553`**. Hasta entonces esas opciones se
+muestran **deshabilitadas con su razón**, no ejecutables.
+
+**4. La disponibilidad la dicta `fleet.list`, no el ledger** (`TASK-1554`): el selector sólo renderiza la
+`availability` que el reader declara, nunca deriva promoción ni techo.
+
 ## Summary
 
 Reemplaza el **placeholder estático** de "Ruta y modelo" del composer del Producer por un **selector de modelo

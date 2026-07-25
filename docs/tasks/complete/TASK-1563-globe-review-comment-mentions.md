@@ -1,3 +1,13 @@
+> # ⛔ TASK-1563 RETIRADA 2026-07-25 — duplicaba una task existente
+>
+> **Dueño real:** TASK-1522 (Review, Comments and Read-only Share Foundation)
+>
+> Se creó sin ver que `TASK-1522` ya es la dueña de review/comments/share. No se construyó nada, así que el contenido se movió íntegro. Ojo con `TASK-1544` (menciones de Storyboard): el directorio mencionable debería ser UNA primitive compartida, no dos.
+>
+> **Se retira en vez de completarse** porque una segunda task describiendo la misma superficie es exactamente la
+> clase de drift que produce mediciones divergentes: dos specs de lo mismo se separan, y después nadie sabe cuál
+> manda. Este archivo queda como registro del trabajo hecho y de dónde fue a parar; **no lo tomes como spec**.
+
 # TASK-1563 — Menciones en comentarios de revisión de Globe
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -6,7 +16,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -19,7 +29,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-028`
-- Status real: `Sin empezar`
+- Status real: `RETIRADA por duplicación — su contenido vive en TASK-1522 (Review, Comments and Read-only Share Foundation)`
 - Rank: `TBD`
 - Domain: `creative-studio`
 - Blocked by: `TASK-1562`

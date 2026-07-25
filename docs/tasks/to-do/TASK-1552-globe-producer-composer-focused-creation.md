@@ -23,6 +23,46 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-07-25 — absorbe TASK-1564 (retirada) y la regla de reconciliación
+
+Se creó `TASK-1564` ("Composer sobre el payload cliente") sin ver que esta task ya era la dueña del composer.
+**`TASK-1564` queda retirada**; lo que aporta y pertenece acá:
+
+**1. El composer se construye sobre el payload cliente** (`apps/studio-client`), no sobre el legacy — ADR-014
+Slice 3. Hereda ya construido: transporte gobernado con epoch + idempotencia + refresh single-flight, resolver de
+bytes con ciclo de vida de object URLs, SSOT de tokens y las primitives. Ruta propia (`/producer/compose`), con
+`/producer` sirviendo el vanilla hasta que haya paridad — servir el payload nuevo ahí dejaría al operador sin la
+superficie que gasta.
+
+**2. 🔴 La regla de reconciliación prototipo-vs-legacy — cinco clases, no una unión.** El prototipo aprobado tiene
+riquezas que el legacy no tiene y viceversa; unir las dos listas es la respuesta equivocada porque **la autoridad
+cambia según la clase**. Medido el 2026-07-25:
+
+| Clase | Autoridad | Regla |
+|---|---|---|
+| forma, composición, motion, copy | **PROTOTIPO** | 11 `@keyframes` vs 0 en el legacy |
+| invariantes de runtime (idempotencia, epoch, single-flight) | **LEGACY** | 7/19/9 menciones vs **0**: un HTML de fixtures no puede tenerlos |
+| **plomería de accesibilidad** | **LEGACY** | contraintuitivo y medido: **9 `aria-live` vs 1**, 10 restauraciones de foco vs 0 |
+| lo que el prototipo promete sin contrato | ninguna | deshabilitado **con su razón visible** |
+| lo que el legacy muestra y **nunca despacha** | — | **no es riqueza: son promesas muertas** |
+
+La última clase son **12 capabilities concretas** que el legacy gatea y jamás llama (`library.bulk.*`,
+`experiment.evidence/list/tree`, `recipe.get`, `prompt.enhancement.accept/reject`, …), declaradas con su motivo en
+`LEGACY_PARITY_EXCLUSIONS`. **Conclusión operativa: cuando alguien diga "el legacy tiene X y el nuevo no",
+preguntar si X DESPACHA.**
+
+**3. Retoque regional (inpaint) cae en la clase 4.** El prototipo lo desarrolla mucho (117 menciones), el legacy
+tiene el diálogo pero el enmascarado es placeholder. Sin contrato de máscara → deshabilitado con su razón.
+
+**4. Las 18 capabilities del composer YA están en `PRODUCER_HUMAN_CAPABILITY_SCOPES`** (verificado línea por
+línea). Importa porque agregar un scope es un rollout de 3 pasos cero-downtime **across dos repos**, y hacerlo de
+un movimiento **tiró abajo todo el login de Globe** una vez.
+
+**Docs de UI reusables** (autorados para TASK-1564, siguen válidos): wireframe
+`docs/ui/wireframes/TASK-1564-globe-composer-client-port.md`, flow del gasto con sus 4 compuertas
+`docs/ui/flows/TASK-1564-globe-composer-client-port-flow.md`, motion
+`docs/ui/motion/TASK-1564-globe-composer-client-port-motion.md`.
+
 ## Summary
 
 Recomponer el composer de Globe Producer para que una sola intención creativa domine el first fold: `prompt → dirección → output shape → generar`. Las capacidades avanzadas permanecen disponibles mediante progressive disclosure, sin duplicar el costo ni contradecir `TASK-1532`.

@@ -1,3 +1,13 @@
+> # ⛔ TASK-1564 RETIRADA 2026-07-25 — duplicaba una task existente
+>
+> **Dueño real:** TASK-1552 (composer) · TASK-1532 (estimado automático) · TASK-1555 (selector) · TASK-1530/1531 (prompt)
+>
+> Se creó sin ver que **cuatro tasks ya cubrían su territorio**. El Slice 1 que sí se construyó (`composer-recipe.ts` + 17 tests, commit `feffd47`) quedó registrado en `TASK-1532`, que es su dueña. La regla de reconciliación de cinco clases, la investigación del riel de créditos y el discovery de las 18 capabilities están en `TASK-1552`. La spec del selector portado está en `TASK-1555`.
+>
+> **Se retira en vez de completarse** porque una segunda task describiendo la misma superficie es exactamente la
+> clase de drift que produce mediciones divergentes: dos specs de lo mismo se separan, y después nadie sabe cuál
+> manda. Este archivo queda como registro del trabajo hecho y de dónde fue a parar; **no lo tomes como spec**.
+
 # TASK-1564 — Globe Composer sobre el payload cliente
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -6,7 +16,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -19,7 +29,7 @@
 - Motion: `docs/ui/motion/TASK-1564-globe-composer-client-port-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `in-progress — Slice 1 (recipe + vigencia del estimado) COMPLETO con 17 tests; discovery formal hecho 2026-07-25`
+- Status real: `RETIRADA por duplicación — su contenido vive en TASK-1552 (composer) · TASK-1532 (estimado automático) · TASK-1555 (selector) · TASK-1530/1531 (prompt)`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `TASK-1553` PARCIALMENTE — el selector puede listar la flota, pero elegir un 2.º modelo del mismo proveedor no ejecuta hasta que exista resolución de modelo por-ruta en los adapters (ver Discovery §2). El resto de la task no está bloqueado.
