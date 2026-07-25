@@ -1,9 +1,9 @@
 # Operar el share board de Globe
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-25 por Claude (TASK-1558)
-> **Ultima actualizacion:** 2026-07-25 por Claude
+> **Ultima actualizacion:** 2026-07-25 por Claude — v1.1 corrige un error de la v1.0: decía que el cutover era sólo un `tofu apply`, y el flag no está cableado al runtime
 > **Documentacion funcional:** [Share board — la pieza que ve el cliente](../../documentation/creative-studio/efeonce-globe-share-board-cliente.md)
 
 ## Para qué sirve
@@ -13,15 +13,65 @@ Para dos cosas: **encender** la versión nueva del share board (el paso que falt
 
 ## Antes de empezar
 
-- El share board nuevo está **construido y verificado, pero apagado**: `client_app_enabled` está en
-  `false`, así que el cliente sigue viendo `public-share-ui.ts`, la versión anterior, que funciona.
-- Encenderlo es **un `tofu apply`**, no código.
-- Necesitás acceso a `infra/terraform` del repo `efeonce-globe` y un **grant de share real** para
-  verificar. Sin el grant no hay verificación posible — y sin verificación no se retira lo viejo.
+- El share board nuevo está **construido y verificado, pero apagado**: el cliente sigue viendo
+  `public-share-ui.ts`, la versión anterior, que funciona.
+- 🔴 **Encenderlo NO es sólo un `tofu apply`.** La v1.0 de este manual decía que sí, y era **falso**
+  — ver §`Por qué el flip solo no hace nada` antes de tocar el flag.
+- Necesitás acceso a `infra/terraform` del repo `efeonce-globe`, permiso para disparar
+  `deploy-internal.yml`, y un **grant de share real** para verificar. Sin el grant no hay verificación
+  posible — y sin verificación no se retira lo viejo.
+
+---
+
+## 🔴 Por qué el flip solo no hace nada (verificado 2026-07-25)
+
+Antes de seguir, tres hechos que hacen que cambiar el flag **no tenga efecto alguno**:
+
+| Hecho | Cómo comprobarlo |
+|---|---|
+| `client_app_enabled` **no está conectado a ningún recurso** | `grep -rn client_app_enabled infra/terraform/` devuelve **una línea**: su propia declaración |
+| El env var **no llega al runtime** | `grep -rn GLOBE_CLIENT_APP_ENABLED infra/` no devuelve nada; el spec del servicio tampoco lo declara |
+| **El contenedor vivo es anterior a TASK-1556** | `gcloud run services describe` da la imagen `45235ccb62ca`; `git merge-base --is-ancestor 4bf631e 45235cc` → **falso** |
+
+Consecuencia: cambiar el default a `true` y correr `tofu apply` produce un **plan vacío**. Y aun
+aplicándolo, el contenedor que corre no tiene el bundle, no tiene `renderShell` y no lee esa variable.
+
+**El resultado sería `variables.tf` diciendo `default = true`, un commit que dice "prendido", y
+producción sirviendo lo de siempre.** Es el modo de falla de `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED`: el
+registro dice ON, la realidad es OFF. Un flag que se declara prendido sin estarlo es peor que uno
+apagado, porque nadie vuelve a mirarlo.
+
+**Cómo se detecta esta clase de error en cualquier flag:** si `grep` del nombre de la variable devuelve
+**una sola línea**, esa línea es su declaración y no está cableada a nada. Un flag conectado aparece
+al menos dos veces: donde se declara y donde se consume.
+
+## La cadena real, en orden
+
+| # | Paso | Naturaleza |
+|---|---|---|
+| 1 | **Cablear la variable**: bloque `env` en el `.tf` de `globe-studio-internal` que pase `GLOBE_CLIENT_APP_ENABLED = tostring(var.client_app_enabled)` | Código de infra. Nunca se hizo |
+| 2 | **[`TASK-1562`](../../tasks/to-do/TASK-1562-globe-share-projection-hydration.md)** — hidratar `modelLabel`, `reviewStatus` y `comments`, que hoy `resolveForShare` descarta en silencio | Producto. Ver abajo |
+| 3 | **Desplegar** `origin/main` vía `deploy-internal.yml` (`workflow_dispatch`, servicio `globe-studio-internal`, SHA exacto) | Acción de runtime — **requiere autorización explícita** |
+| 4 | **Flip + `tofu apply`** con el plan leído | Ahí sí con efecto |
+| 5 | **Verificar con grant real** (los 6 puntos de abajo) | |
+| 6 | Retirar `public-share-ui.ts` ([`TASK-1560`](../../tasks/to-do/TASK-1560-globe-legacy-payload-retirement.md)) | Después de verificar |
+
+### Por qué `TASK-1562` va ANTES del cutover
+
+Sin ella, el board nuevo muestra tres filas **"Sin dato"** y **"Todavía no hay comentarios"** en todo
+share real, porque el proyector descarta esos tres hechos. El board viejo simplemente **omite** esas
+filas cuando no hay valor.
+
+O sea que el cutover, tal como está hoy, le cambiaría al cliente *"sin panel"* por *"panel con tres
+huecos declarados"*. **Es más honesto y se ve peor** — y ésta es la única superficie que ve alguien de
+afuera de Efeonce. `TASK-1562` es esfuerzo bajo y convierte el cutover en una mejora en vez de un
+cambio de estética.
 
 ---
 
 ## Encender la versión nueva (el cutover)
+
+> Ejecutá esto **sólo después** de los pasos 1-3 de la cadena de arriba. Antes de eso no tiene efecto.
 
 ### 1. Cambiar el default en `variables.tf`
 
@@ -129,6 +179,8 @@ está en el diseño, así que si aparece es un bug y hay que reportarlo con el l
 - **NUNCA** mostrar en esta superficie el proveedor, el costo o el margen. Es la única pantalla que
   ve alguien de afuera de Efeonce.
 - **NUNCA** ofrecer Reintentar en un estado donde reintentar no cambia nada.
+- **NUNCA** declarar un flag "prendido" sin confirmar que llega al runtime **y** que la imagen
+  desplegada contiene el código que lo lee. `tofu apply` verde con plan vacío no es evidencia de nada.
 
 ## Referencias técnicas
 

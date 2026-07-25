@@ -1,7 +1,7 @@
 # Share board — la pieza que ve el cliente
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-25 por Claude (TASK-1558)
 > **Ultima actualizacion:** 2026-07-25 por Claude
 > **Documentacion tecnica:** [ADR-014 — Client Application](../../architecture/creative-studio/EFEONCE_GLOBE_CLIENT_APPLICATION_DECISION_V1.md) · [Wireframe](../../ui/wireframes/TASK-1558-globe-share-board.md)
@@ -76,8 +76,13 @@ pantalla de entrada— la heredan.
 ## Estado actual
 
 **Construida y verificada, todavía no sirviendo.** El canary pasó en seis estados y tres anchos, con
-puntaje 4,71 sobre 5. Falta un paso de despliegue —encender el interruptor— para que el cliente
-empiece a ver esta versión en vez de la anterior.
+puntaje 4,71 sobre 5.
+
+Lo que falta **no es sólo encender un interruptor**, como se creyó al principio: el interruptor todavía
+no está conectado al servidor, y el contenedor que corre en producción es anterior a esta versión. La
+cadena real —cablear el interruptor, completar los datos que hoy se descartan, desplegar, encender y
+verificar con un link real— está en el
+[manual del share board](../../manual-de-uso/creative-studio/operar-share-board-globe.md).
 
 Hasta que eso pase, el cliente sigue viendo la pantalla vieja, que funciona.
 
