@@ -46,8 +46,41 @@ Un gate que pasa no prueba nada. Antes de confiar en uno, rompelo a propósito y
 | `aria-label="Registrar"` literal | copy literal |
 | `<div onClick={…}>` sin handler de teclado | `jsx-a11y` |
 | `useState()` dentro de un `if` | `react-hooks` |
+| `font-family:Poppins,sans-serif` en un template de estilo | tipografía |
+| `font-size:0.9rem` (rem pelado, fuera de la escala) | tipografía |
+| Agregar `'--weight-medium': '500'` al SSOT | peso sin `@font-face` |
 
-Restaurá y confirmá verde. Las seis se verificaron así al crearlas (`TASK-1556` Slice 3).
+Restaurá y confirmá verde. Las seis primeras se verificaron así al crearlas (`TASK-1556` Slice 3).
+
+### Evidencia de la mordida — 2026-07-25 (`TASK-1561`)
+
+Las tres reglas de tipografía nacieron en el trabajo de `TASK-1558` y se ejercitaron el 2026-07-25
+sobre una **copia aislada** del árbol (la sesión dueña tenía el paquete abierto; morder el árbol vivo
+le habría dejado el build en rojo a otra persona sin aviso).
+
+Seis mordidas, y en cada una **exactamente una regla en rojo y las otras cuatro en verde**:
+
+| Mordida | Regla que enrojeció | Colaterales |
+|---|---|---|
+| `color: '#ff0000'` | color literal | ninguna |
+| `transition: 'opacity 250ms linear'` | motion literal | ninguna |
+| `font-family:Poppins,sans-serif` | tipografía | ninguna |
+| `font-size:0.9rem` | tipografía | ninguna |
+| `<button aria-label="Cerrar">Guardar cambios</button>` | copy literal | ninguna |
+| `'--weight-medium': '500'` en el SSOT | peso sin `@font-face` | ninguna |
+
+Restaurar devolvió las cinco a verde.
+
+**Por qué importa la columna "colaterales":** un gate falla de dos maneras, no de una. Puede ser
+**inerte** —no atrapa lo que promete— o **sobre-amplio**, y ésa es la peor: enrojece código correcto,
+alguien lo comenta para avanzar, y el gate deja de existir sin que nadie lo apague. Cero colaterales
+en las seis descarta las dos a la vez. Un "pasa/no pasa" sin esa columna sólo descarta la primera.
+
+**Y es la forma exacta en que este mismo programa se equivocó antes**, dos veces: el plugin de React
+Compiler typechequeaba, buildeaba y **no corría** (lo delató comparar dos bundles, no leer el
+marcador); y la primera versión de la regla de tipografía usaba un lookahead negativo `:\s*(?!var\()`
+cuyo `\s*` retrocedía a ancho cero, así que inspeccionaba `" var("` en vez de `"var("` y reportaba
+**toda línea correctamente tokenizada**. Una regla que enrojece código compliant se apaga sola.
 
 ## `LEGACY_TOKEN_DRIFT` — registrado, NO resuelto
 
