@@ -621,3 +621,67 @@ para todos los consumers en vez de para una plantilla, que es el requisito de Fu
   verifica que el valor USE un token, no que el token exista.
 - **El gate de tipografía exige el valor exactamente `var(--token)`**, así que `var(--x) !important` lo rompe.
   Cuando haga falta ganar especificidad, se califica el selector — nunca `!important`.
+
+## Delta 2026-07-25 (3) — el header y el composer CONVERTIDOS, y el bug que dejaba todo command inoperante
+
+### El envelope de command omitía `idempotencyKey` — NINGÚN command del payload cliente funcionaba
+
+`CommandRequestEnvelopeV1` declara **`idempotencyKey` requerido en el CUERPO**, y `parseCommandEnvelope`
+(`apps/studio-web/src/dispatch.ts`) devuelve `undefined` si falta. El transporte portado lo mandaba **sólo**
+como cabecera `x-globe-idempotency-key`, así que el servidor rechazaba el **envelope entero** con
+`invalid_request` antes de mirar el payload: ni `Generar`, ni favorito, ni usar-como-referencia funcionaban
+desde React. No se había notado porque hasta esta sesión **nadie había ejercitado un command** desde ese
+payload — el share board y el feed viven de readers.
+
+**Cómo se distingue "el envelope no parseó" de "el handler rechazó", que es lo reusable:** por el
+`correlationId` **de la respuesta**. Sin el campo el servidor devuelve **uno propio** (nunca llegó a leer el
+del caller); con él, **devuelve el que se mandó**. Los dos casos son un `400 invalid_request` idéntico y sólo
+ese detalle los separa.
+
+**Guard:** el test del transporte afirmaba el **ruteo** del command y **nunca el cuerpo** del envelope — por
+ahí se escapó. Ahora se afirma que viajan los seis campos requeridos y que la clave del caller va en el cuerpo.
+
+### Atribución del error: una salida mala del proveedor culpaba al caller
+
+`enhancePrompt` validaba la salida del **enhancer** con las mismas funciones que el payload del caller
+(`normalizePromptInput`, `validateEnhancementEvidence`), así que un rechazo salía como `invalid_request` — el
+caller recibía la culpa por una salida ajena, y marcada como **no reintentable** cuando la única acción útil
+era reintentar. Ahora pasan por `attributeToEnhancer` → `PromptEnhancementUnavailableError` →
+`dependency_unavailable`. Mismo principio que el retrieval de outputs: **el código de error acusa al componente
+que realmente falló.**
+
+### 🔴 Abierto: `globe.lab.prompt.enhance` responde `invalid_request` en el runtime
+
+**No es una regresión de la conversión.** Un `fetch` crudo construido exactamente según el contrato, sin pasar
+por el cliente React, falla igual — así que el servidor lo rechaza para **cualquier** cliente, incluido el
+legacy.
+
+Eliminado con evidencia, para que la próxima pasada no repita el camino:
+
+- **No es el envelope** — el servidor eco'a el `correlationId` del caller, prueba de que parseó.
+- **No es el kill switch** (`assertEnabled` → `surface_policy_blocked` → `policy_blocked`).
+- **No es el spend fence** (`PromptEnhancementUnavailableError` → `dependency_unavailable`).
+- **No es la validación de la salida del enhancer** — se corrigió y desplegó, y el código no cambió.
+- **No es la forma del payload** — el cuerpo real se capturó del request y coincide con el contrato; la suite
+  del dominio despacha ese mismo command en verde con un enhancer falso (351/351).
+- **No es la capability ni el coverage** (darían `access_denied` / `policy_blocked`), y el reader hermano
+  `globe.lab.prompt.history` del **mismo módulo y las mismas deps** funciona contra el runtime real.
+
+**Gap de observabilidad que lo hizo caro:** las entradas de Cloud Logging del servicio llegan con
+`jsonPayload` vacío, así que el audit de dispatch (que sí registra `code` y `capability`) no es consultable.
+Sin eso, la única vía fue bisección desde el cliente.
+
+### Cuarta aparición del patrón: el legacy estiliza por ATRIBUTO, no sólo por clase
+
+Al convertir 1:1 hay que cargar los atributos del legacy, no sólo sus nombres de clase:
+
+- `[data-producer-asset]` da `grid-column: span 4` / `:first-child → span 8` sobre una rejilla de 12 columnas.
+  Medido en el feed: **ocho pistas implícitas** y cards de 158 y 779 px alternadas.
+- `capability-button` + `<i class="capability-dot">` es la forma de un control gateado.
+- `data-producer-intent` **no es sólo un hook de JS**: `.advanced-controls [data-producer-intent=styles] {
+  justify-self: start }` es lo que hace **compacto** a Style DNA; sin el atributo salía como una barra de 402 px
+  **sin que ninguna regla propia estuviera mal**.
+
+Y el layout lo manda la hoja legacy: `producer-main` / `composer` / `library` ya traen el grid de dos columnas
+y su paso a una en `max-width: 980px`. Declarar breakpoints propios les peleaba. La banda de modalidad debajo
+del header a anchos medianos **no es un defecto**: es lo que el legacy hace a `≤980px`.
