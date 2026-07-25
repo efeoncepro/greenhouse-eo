@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Listo para tomar`
+- Status real: `En curso`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `ninguna`
@@ -128,9 +128,33 @@ Reglas obligatorias:
      ZONE 3 — EXECUTION SPEC
      ═══════════════════════════════════════════════════════════ -->
 
+## Progress — 2026-07-25
+
+**El Slice 1 lo entregó la sesión de `TASK-1558`, no ésta.** Al ir a implementarlo, el gate ya tenía
+`TYPOGRAPHY_DECLARATION`, `FONT_SHORTHAND`, `ALLOWED_TYPOGRAPHY_VALUE` y el test que deriva los pesos
+permitidos de `GLOBE_FONT_FACES` — exactamente lo especificado abajo. Está en su WIP sin commitear,
+así que **no se tocó nada**; se verificó y se pasó al Slice 2, que era lo que faltaba de verdad.
+
+Esa sesión además cerró un agujero que este spec no había visto: **el escaneo sólo caminaba
+`.ts`/`.tsx`**, y la primera superficie real necesita hojas de estilo. Un `.css` era el último lugar
+donde un hex, una duración o una familia podían escribirse a mano. Ahora `.css` entra al escaneo.
+
+Y dejó registrado un bug que vale más que la regla: la primera versión usaba un lookahead negativo
+`:\s*(?!var\()` cuyo `\s*` retrocedía a ancho cero, así que el lookahead inspeccionaba `" var("` en
+vez de `"var("` y **reportaba toda línea correctamente tokenizada**. Se reemplazó por capturar el valor
+y testearlo. Una regla que enrojece código compliant se apaga sola.
+
+**Slice 2 hecho, con evidencia** (`docs/operations/creative-studio/GLOBE_CLIENT_UI_GATES_RUNBOOK_V1.md`
+§`Evidencia de la mordida`): seis mordidas sobre una **copia aislada** del árbol —morder el vivo le
+habría dejado el build en rojo a la otra sesión sin aviso—, cada una enrojeciendo **exactamente una**
+regla con **cero colaterales**, y restaurar devolviendo las cinco a verde.
+
+**Pendiente: Slice 3.** Requiere editar `design-contract.test.ts`, que la sesión de `TASK-1558` tiene
+abierto. Se hace cuando su trabajo aterrice.
+
 ## Scope
 
-### Slice 1 — Regla de tipografía
+### Slice 1 — Regla de tipografía ✅ (entregado vía `TASK-1558`)
 
 Escanear el código del payload buscando:
 
@@ -143,13 +167,13 @@ Escanear el código del payload buscando:
 El mensaje de error nombra el token correcto, no sólo la infracción. Un gate que dice "no hagas esto"
 cuesta una búsqueda; uno que dice "usá `var(--text-base)`" cuesta cero.
 
-### Slice 2 — Morder cada regla
+### Slice 2 — Morder cada regla ✅
 
 Para **cada** clase del gate (las tres vigentes + las nuevas): introducir una violación real,
 correr el gate, confirmar rojo con el mensaje esperado, restaurar. Dejar el resultado escrito en el
 runbook — es la única evidencia de que el gate corre y no sólo compila.
 
-### Slice 3 — Declarar la frontera
+### Slice 3 — Declarar la frontera ⏳ (bloqueado por el WIP de `TASK-1558`)
 
 Documentar en el propio gate **qué escanea y por qué**, y dejar anotado que `TASK-1560` la extiende a
 `studio-web` una vez retirado el legacy (hoy saldría rojo por los archivos que están por borrarse).
@@ -211,15 +235,15 @@ Coordinar con la sesión de `TASK-1558` antes de endurecer (ver Detailed Spec).
 
 ## Acceptance Criteria
 
-- [ ] El gate atrapa `font-family` literal.
-- [ ] El gate atrapa un peso sin archivo en `GLOBE_FONT_FACES` (el caso de la síntesis silenciosa).
-- [ ] El gate atrapa `font-size` literal fuera del SSOT.
-- [ ] La lista de pesos permitidos se **deriva** de `GLOBE_FONT_FACES`, no está escrita a mano.
-- [ ] Cada clase del gate fue mordida: violación → rojo → restaurar, con el resultado escrito.
-- [ ] Los mensajes de error nombran el token correcto.
+- [x] El gate atrapa `font-family` literal.
+- [x] El gate atrapa un peso sin archivo en `GLOBE_FONT_FACES` (el caso de la síntesis silenciosa).
+- [x] El gate atrapa `font-size` literal fuera del SSOT.
+- [x] La lista de pesos permitidos se **deriva** de `GLOBE_FONT_FACES`, no está escrita a mano.
+- [x] Cada clase del gate fue mordida: violación → rojo → restaurar, con el resultado escrito **y con cero colaterales** — la columna que descarta el gate sobre-amplio, no sólo el inerte.
+- [x] Los mensajes de error nombran el token correcto.
 - [ ] La frontera del gate está declarada en el archivo, con su razón.
-- [ ] `pnpm check` y `pnpm build` verdes; el WIP de `TASK-1558` no queda en rojo.
-- [ ] Runbook de gates actualizado.
+- [x] El WIP de `TASK-1558` pasa las cinco reglas (verificado sin tocarlo).
+- [x] Runbook de gates actualizado con la evidencia de la mordida.
 
 ## Verification
 
