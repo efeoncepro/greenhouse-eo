@@ -103,6 +103,9 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-080` | `complete` | ICO Person Intelligence Frontend + Event Wiring | `docs/tasks/complete/TASK-080-ico-person-intelligence-frontend.md` |
 | `TASK-081` | `complete` | Organization Legal Entity Canonicalization | `docs/tasks/complete/TASK-081-organization-legal-entity-canonicalization.md` |
 
+| `TASK-1556` | `to-do` | **Globe Client Application Foundation + Share Board.** EPIC-028; ui-ux/primitive; ui-standard; P1/Muy alto/Alto. Implementa el Slice 0 de ADR-014: payload de browser tipado y componetizado (Vite+React) servido por el mismo `studio-web`; SSOT de tokens, capa de copy y gates de UI que Globe no tiene; el seam se valida reconstruyendo el share board (única superficie client-facing). Flag `GLOBE_CLIENT_APP_ENABLED` default OFF. | `docs/tasks/to-do/TASK-1556-globe-client-app-foundation.md` |
+| `TASK-1557` | `to-do` | **Globe Static Asset CDN (path-scoped).** EPIC-028; backend-data/integration; backend-standard; P1/Alto/Bajo. Cloud CDN sobre el ALB existente **sólo** para `/assets/*` vía backend service dedicado + path matcher; el backend del shell SSO conserva `enable_cdn = false` (cachear una superficie por sesión es bug de correctitud). Blocked by TASK-1556. | `docs/tasks/to-do/TASK-1557-globe-static-asset-cdn.md` |
+
 ## Siguiente ID disponible
 
 | `TASK-082` | `in-progress` | Compensation Drawer Chile UX Simplification | `docs/tasks/in-progress/TASK-082-compensation-drawer-chile-ux-simplification.md` |
@@ -157,6 +160,9 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 3. reflejarlo en la task markdown
 4. usarlo en el issue `[TASK-###] ..`
 5. usarlo en el GitHub Project como `Task ID`
+
+| `TASK-1556` | `to-do` | **Globe Client Application Foundation + Share Board.** EPIC-028; ui-ux/primitive; ui-standard; P1/Muy alto/Alto. Implementa el Slice 0 de ADR-014: payload de browser tipado y componetizado (Vite+React) servido por el mismo `studio-web`; SSOT de tokens, capa de copy y gates de UI que Globe no tiene; el seam se valida reconstruyendo el share board (única superficie client-facing). Flag `GLOBE_CLIENT_APP_ENABLED` default OFF. | `docs/tasks/to-do/TASK-1556-globe-client-app-foundation.md` |
+| `TASK-1557` | `to-do` | **Globe Static Asset CDN (path-scoped).** EPIC-028; backend-data/integration; backend-standard; P1/Alto/Bajo. Cloud CDN sobre el ALB existente **sólo** para `/assets/*` vía backend service dedicado + path matcher; el backend del shell SSO conserva `enable_cdn = false` (cachear una superficie por sesión es bug de correctitud). Blocked by TASK-1556. | `docs/tasks/to-do/TASK-1557-globe-static-asset-cdn.md` |
 
 ## Siguiente ID disponible
 
@@ -1630,6 +1636,9 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 | `TASK-1555` | `in-progress` | **Globe Producer Model Selector.** EPIC-028; ui-ux/interaction; ui-standard; P1/Alto/Medio. Reemplaza el placeholder estático de "Ruta y modelo" del composer por una galería data-driven availability-aware (available/gated/blocked) que consume `globe.producer.fleet.list` (TASK-1554) + preselección del recommendedDefault; escala a la flota. Blocked by TASK-1554; distinta de TASK-1552 (jerarquía). | `docs/tasks/in-progress/TASK-1555-globe-producer-model-selector.md` |
 
+| `TASK-1556` | `to-do` | **Globe Client Application Foundation + Share Board.** EPIC-028; ui-ux/primitive; ui-standard; P1/Muy alto/Alto. Implementa el Slice 0 de ADR-014: payload de browser tipado y componetizado (Vite+React) servido por el mismo `studio-web`; SSOT de tokens, capa de copy y gates de UI que Globe no tiene; el seam se valida reconstruyendo el share board (única superficie client-facing). Flag `GLOBE_CLIENT_APP_ENABLED` default OFF. | `docs/tasks/to-do/TASK-1556-globe-client-app-foundation.md` |
+| `TASK-1557` | `to-do` | **Globe Static Asset CDN (path-scoped).** EPIC-028; backend-data/integration; backend-standard; P1/Alto/Bajo. Cloud CDN sobre el ALB existente **sólo** para `/assets/*` vía backend service dedicado + path matcher; el backend del shell SSO conserva `enable_cdn = false` (cachear una superficie por sesión es bug de correctitud). Blocked by TASK-1556. | `docs/tasks/to-do/TASK-1557-globe-static-asset-cdn.md` |
+
 ## Siguiente ID disponible
 
-`TASK-1556`
+`TASK-1558`
