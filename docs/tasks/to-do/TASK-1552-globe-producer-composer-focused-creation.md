@@ -138,7 +138,7 @@ Reglas obligatorias:
 - Primitive decision: `extend` — Producer Console/composer y CTA existentes; no crear primitive paralela.
 - Adaptive density / The Seam: `aplica` — el composer debe recomponerse a 390 px sin compresión ni overflow.
 - Floating/Sidecar/Dialog decision: conservar el lane existente; advanced settings pueden usar el patrón Globe vigente sólo si superan el fold.
-- Copy source: `../efeonce-globe/apps/studio-web/src/producer-copy.ts`.
+- Copy source: `../efeonce-globe/apps/studio-client/src/copy/index.ts` — este slice **absorbe** `producer-copy.ts` **moviéndolo** (studio-web depende de studio-client: el copy viaja en esa dirección y nunca de vuelta). Duplicarlo abre dos fuentes de verdad cuyo drift es invisible hasta que una etiqueta queda vieja.
 - Access impact: `entitlements` existentes; sin cambio de autorización.
 
 ### State inventory
@@ -249,7 +249,7 @@ Reglas obligatorias:
 - Hiding credits or exposing vendor cost/margin.
 - New API, reader, command, schema, migration, provider integration or capability.
 - Full feed, viewer, collections, batch, review or share redesign.
-- Crear el token SSOT / design system de Globe (lo entrega `TASK-1556` Slice 0; esta task lo consume) o cualquier primitive Greenhouse.
+- Crear el token SSOT / design system de Globe — entregado por `TASK-1556` Slices 2-3 (`apps/studio-client/src/{tokens/tokens.ts,copy/index.ts,gates/design-contract.test.ts}`, `eslint.config.js`); esta task lo consume. Tampoco crea primitives Greenhouse.
 - Replacing the approved `TASK-1505` baseline; this task refines its composition.
 
 ## Detailed Spec

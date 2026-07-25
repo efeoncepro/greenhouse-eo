@@ -70,7 +70,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- Design start: accepted ADR-012/SPEC-012 and the declared UI contracts are sufficient for Slice 1 with plausible fixtures. **Per ADR-014 this surface is BORN in the new typed client payload (Vite + React + React Router, SSR off); legacy string-template surfaces are a visual reference only and are never ported. Hard gate: `TASK-1556` Slice 0 (build seam, token SSOT, style/a11y lint) must land before Slice 1 code.** Superseded line kept for history: existing Globe shell/viewer/review
+- Design start: accepted ADR-012/SPEC-012 and the declared UI contracts are sufficient for Slice 1 with plausible fixtures. **Per ADR-014 this surface is BORN in the new typed client payload (Vite + React + React Router, SSR off); legacy string-template surfaces are a visual reference only and are never ported. Hard gate: `TASK-1556` Slices 1-3 (build seam `apps/studio-client` + `shell.ts`; token SSOT `src/tokens/tokens.ts` + copy layer `src/copy/index.ts`; ESLint + 3 design gates) — **landed 2026-07-25** (`bf1df21`…`4bf631e`). There is no "Slice 0" in the task; ADR-014 numbers by surface and the task by foundation step. Slice 1 code parts from the current `efeonce-globe` HEAD, not from an earlier read. The base primitives were declared in Slice 2 scope but **NOT delivered** — author what this surface needs and propose promotion; do not assume an import exists.** Superseded line kept for history: existing Globe shell/viewer/review
   patterns are sufficient for Slice 1 with plausible fixtures.
 - Integration gate: TASK-1543 for authoritative authoring/revision readers and commands.
 - Integration gate: TASK-1544 for persisted comments, mentions, annotations and masks.

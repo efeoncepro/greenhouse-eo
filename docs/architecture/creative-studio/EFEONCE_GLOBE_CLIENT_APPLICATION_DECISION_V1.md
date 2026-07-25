@@ -202,6 +202,17 @@ No es escalabilidad de tráfico (eso lo gobiernan `maxScale` y los stores durabl
 
 ## Roadmap por slices (strangler)
 
+> **Mapeo de numeración — leer antes de citar un número de slice.** Este roadmap numera por
+> **superficie**; `TASK-1556` numera por **paso de fundación**. No son off-by-one: el **Slice 0 de esta
+> ADR** lo entregan los **Slices 1-3 de `TASK-1556`** (seam · tokens+copy · gates), y el **Slice 1 de
+> esta ADR** (share board) es el **Slice 4 de la task**. Citá siempre "Slice N de `TASK-1556`" o
+> "Slice N de ADR-014", nunca "Slice N" a secas — decir "implementado hasta el Slice 3" significa
+> cosas opuestas en cada esquema.
+>
+> **Estado 2026-07-25:** el Slice 0 de esta ADR está **entregado** (`bf1df21`…`4bf631e` en `main` de
+> `efeonce-globe`), con `client_app_enabled` en `false` y **ninguna superficie portada**. El share
+> board está bloqueado por dirección visual aprobada inexistente.
+
 - **Slice 0 — el seam + los gates + la validación de Vite 8.** Build Vite → assets servidos por `assets.ts` con nonce; módulo SSOT de tokens; lint de estilos (hex crudo = error) y de a11y. **Las dos compuertas de la Decisión punto 1 se resuelven acá y son criterio de salida**: (a) `react-router@8.3.0` funciona sobre Vite 8 (piso declarado `Vite 7+`, compat con 8 sin confirmar); (b) un **smoke de producción real** que ejercite las dependencias en el browser, no sólo CI. Cualquiera de las dos en rojo ⇒ **fallback a `vite@7.3.x` el mismo día**, registrado como Delta en esta ADR. Resto del criterio de salida: CSP, SSO, `pnpm check`, `pnpm build` y el canary verdes, y el flag apaga el payload nuevo sin dejar rastro.
 - **Slice 1 — share board.** La cara del cliente, primero. Sale del CSS de una línea, adopta el SSOT de tokens, deja de auto-rotularse "Producer", estrena su primer canary visual. Se arregla `/legal/terms` (o se saca el link).
 - **Slice 2 — launch + error.** Superficies públicas, chicas, sobre los mismos tokens. Un 404 en un browser deja de ser JSON.

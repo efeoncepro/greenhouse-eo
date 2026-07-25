@@ -237,7 +237,7 @@ Reglas obligatorias:
 ## Out of Scope
 
 - Backend/data/contracts/providers/migrations/forecast logic.
-- Creating the Globe token SSOT or design-system governance (owned by `TASK-1556` Slice 0 — this task consumes them), and any Greenhouse UI runtime import.
+- Creating the Globe token SSOT or design-system governance — delivered by `TASK-1556` Slices 2-3 and living in `apps/studio-client/src/{tokens/tokens.ts,copy/index.ts,gates/design-contract.test.ts}` + `eslint.config.js`; this task CONSUMES them. Also out of scope: any Greenhouse UI runtime import.
 - Commercial rollout/grants/flags/canaries (TASK-1541).
 
 ## Rollout Plan & Risk Matrix

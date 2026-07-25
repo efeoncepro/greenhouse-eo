@@ -599,7 +599,7 @@ Sin flag nueva — cambio aditivo de UI internal-only sobre una superficie exist
 
 > **Para la sesión que ejecuta `TASK-1556`.** No es una objeción a ADR-014 — el diagnóstico es
 > correcto y esta task es parte de su evidencia. Es lo que el port del Producer tiene que preservar
-> para no perder trabajo verificado en silencio. `TASK-1556` **no toca** estos archivos en su Slice 0
+> para no perder trabajo verificado en silencio. `TASK-1556` **no tocó** estos archivos en sus Slices 1-3 (seam · tokens+copy · gates)
 > (su superficie es el share board); esto aplica al slice de port del Producer, cuando llegue.
 
 ### 1. Portar desde `efeonce-globe` `45235cc`, no desde una lectura anterior

@@ -327,7 +327,7 @@ con su rationale en ADR-014, no por inercia.
 | 1c | `shell.ts` con slot de first fold crítico; assets manifest-driven con política de caché por asset |
 | 1d | Dockerfile: los tres bloques enumerados a mano |
 | 1e | `client_app_enabled` en `variables.tf`, default `false` |
-| 2 | SSOT de tokens + `LEGACY_TOKEN_DRIFT` + capa de copy locale-keyed |
+| 2 | SSOT de tokens + `LEGACY_TOKEN_DRIFT` + capa de copy locale-keyed. ⚠️ **Las primitives base (`Surface`, `Chip`, `FactList`, `CommentItem`, `MediaStage`, `StateBlock`) NO se entregaron**: diseñarlas sin una superficie real a la que sirvan sería especulativo. Nacen con el share board (Slice 4). Ninguna task debe asumirlas importables. |
 | 3 | ESLint acotado (jsx-a11y + rules-of-hooks) + 3 gates de diseño como tests |
 | — | React Compiler activado (precondición de ADR-014 cumplida) |
 

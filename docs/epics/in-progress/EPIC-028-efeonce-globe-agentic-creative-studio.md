@@ -628,3 +628,30 @@ proyecto Globe vía endpoint `global`; Nano Banana 2 (`gemini-3.1-flash-image`) 
 - Globe opera un **catálogo multi-modelo extensible de best-in-class** (imagen/video/audio) donde los modelos
   coexisten como rutas elegibles; **agregar** un modelo es un paso gobernado y **actualizar** (versión) es distinto de
   **sumar** (modelo nuevo); la selección es explícita o por contrato de fidelidad, nunca "mejor global".
+
+## Delta 2026-07-25 — el payload de browser de Globe deja de ser un string (ADR-014, foundation viva)
+
+El epic tenía superficies humanas (`TASK-1505`, `TASK-1524`, `TASK-1540`, `TASK-1547`) pero **ningún
+principio sobre cómo se construyen**. ADR-014 lo hace explícito y su foundation ya está en `main` de Globe.
+
+- **Ninguna superficie humana nueva de Globe nace como template de string.** El payload es una app tipada
+  y componetizada (`apps/studio-client`: Vite 8.1.5 + React 19.2.8 + React Router 8.3.0, SSR apagado)
+  servida como assets estáticos por el **mismo** `studio-web`. Host, BFF, sesión SSO, CSP por nonce, ALB y
+  API privada **sin tocar** — la ADR cambia qué se le manda al browser, no quién tiene autoridad.
+- **Consecuencia directa para tres child tasks:** `TASK-1547` (Storyboard), `TASK-1540` (Video
+  Effectiveness) y `TASK-1472` (delivery) **nacen** en el payload nuevo; no se portan.
+- **Globe estrena maquinaria de gates, no sólo framework.** SSOT de tokens con `LEGACY_TOKEN_DRIFT`, capa
+  de copy locale-keyed, ESLint (jsx-a11y + rules-of-hooks) y 3 gates de diseño como tests. Los 6 gates se
+  verificaron **mordiendo**: se introdujo una violación de cada clase y las 6 fallaron.
+- **Estado real:** foundation code-complete (Slices 1-3 de `TASK-1556`), `client_app_enabled` default
+  `false`, **ninguna superficie portada** y **ningún cambio observable**. Las primitives base declaradas
+  en el Slice 2 **no** se entregaron: diseñarlas sin una superficie a la que sirvan sería especulativo, y
+  nacen con el share board. El Slice 4 (share board, la única superficie client-facing de Globe) está
+  bloqueado por dirección visual aprobada inexistente — decisión de product-design del operador, no algo
+  que un implementador improvise.
+- **El único unknown técnico de la ADR quedó cerrado:** React Router 8.3.0 compila sobre Vite 8.1.5, y el
+  bundle real corre en Chromium real bajo la CSP estricta real sin un solo error. El fallback a
+  `vite@7.3.x` se retira.
+- **Cluster ADR-013/ADR-014 en el programa:** `TASK-1553` (resolución de modelo por-ruta) · `TASK-1554`
+  (reader de availability, desplegado) · `TASK-1555` (selector del Producer, in-progress) · `TASK-1556`
+  (esta foundation) · `TASK-1557` (CDN de assets, desbloqueada por el bundle content-addressed).

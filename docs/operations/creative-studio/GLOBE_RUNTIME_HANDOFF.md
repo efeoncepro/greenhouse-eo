@@ -10,7 +10,7 @@
 
 ## Active state — 2026-07-25 (TASK-1556 Slices 1-3: el payload cliente existe y las dos compuertas cerraron)
 
-- **ADR-014 implementada hasta el Slice 3.** `apps/studio-client` (Vite 8.1.5 + React 19.2.8 +
+- **ADR-014: entregado su Slice 0 (= Slices 1-3 de `TASK-1556`: seam · tokens+copy · gates).** Ninguna superficie portada todavía. `apps/studio-client` (Vite 8.1.5 + React 19.2.8 +
   React Router 8.3.0, SSR apagado) compila a assets estáticos que sirve el **mismo** `studio-web`.
   Host, BFF, sesión SSO, CSP por nonce, ALB y API privada **sin tocar**. Commits: `bf1df21` `0e7b22f`
   `c8ca9a9` `ea10578` `4bf631e`. **Sin push.**
