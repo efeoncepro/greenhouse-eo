@@ -52,7 +52,37 @@ OAuth. Los 6 puntos del runbook
 — sigue vivo hasta que `TASK-1560` lo retire.
 
 
-## 🔴 Active state — 2026-07-25 LATEST (payload cliente: construido, NO servido — el cutover no es un `apply`)
+## 🔴 Active state — 2026-07-26 LATEST (cuatro frentes del Producer React en `main` y SIN desplegar)
+
+**Lo que cambió (todo en `main` de `efeonce-globe`):** `90e14ce` (campo de excluir + botón de historial),
+`13797af` (paleta `⌘K`, atajos, recorrido guiado), `237930e` (fix del CI), `f2b5729` (panel de créditos),
+`f5f9aea` (mención de referencias). Detalle y razones: ADR-014 § Delta 2026-07-25 (5).
+
+**🔴 NINGUNO de los tres últimos está desplegado.** Los dos `Deploy Internal (keyless)` de la sesión corrieron
+**00:45:59** y **00:46:12** UTC; `13797af`, `f2b5729` y `f5f9aea` se empujaron **después** (desde 01:26 UTC). El
+shell interno sirve una imagen anterior a la paleta, al panel de créditos y a la mención. El deploy de esta pasada
+**no se pudo disparar** (`gh workflow run` bloqueado por el clasificador de permisos) — lo tiene que correr el
+operador o autorizarlo explícitamente.
+
+**El CI pasó a verde por primera vez.** Venía **rojo en los últimos 12 commits**, o sea desde que nació
+`apps/studio-client`: su `typecheck` era el único que no construía sus dependencias de workspace, así que en un
+runner limpio no existía `packages/contracts/dist` y fallaba con `TS2307`. Local pasaba por tener los `dist/` de
+antes — un falso verde que sólo miente en la máquina de quien lo escribió. Corregido en `237930e` y verificado
+causal (`rm -rf packages/contracts/dist`).
+
+**Estado de capabilities verificado contra los descriptores publicados (no supuesto):**
+`globe.credits.usage.get` `available` (el panel muestra `102 / 500110` real) · `globe.credits.forecast.get`
+**`policy-blocked`** (el panel dice "no publicada", que es el estado real) ·
+`globe.producer.asset.copyAsReference` `available` · **ninguna ruta promovida admite referencias** (`0 / 0` en
+imagen, video y audio), así que el camino elegir → certificar → estimar de la mención no es ejercitable todavía:
+espera una ruta promovida, no un arreglo.
+
+**No verificado en esta pasada:** revisión e imagen vivas de `globe-studio-internal` / `globe-api-internal`
+(`gcloud` sin autenticar en la sesión). Los números del bloque de abajo son de la pasada anterior.
+
+---
+
+## Active state — 2026-07-25 (payload cliente: construido, NO servido — el cutover no es un `apply`)
 
 **Estado neto: ninguna superficie de Globe sirve todavía sobre el payload cliente nuevo.** El cliente externo
 sigue recibiendo `public-share-ui.ts`, el template viejo. `TASK-1556` (foundation) y `TASK-1558` Slices 1-2

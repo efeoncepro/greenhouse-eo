@@ -760,3 +760,88 @@ gcloud run services describe globe-api-internal --region southamerica-west1 --pr
 que un rechazo del proveedor salía como `invalid_request` **no reintentable**. Ahora pasa por
 `attributeToEnhancer` → `dependency_unavailable`. Mismo principio que el retrieval de outputs: **el código de
 error acusa al componente que realmente falló.**
+
+## Delta 2026-07-25 (5) — la conducta del legacy vivía en un `<script>` inline, y el CI del payload estaba rojo desde su primer commit
+
+Cierre de cuatro frentes de la conversión (`⌘K` + Guía, panel de créditos, mención de referencias) más un
+hallazgo de proceso que vale más que los tres.
+
+### El CI del payload nunca fue verde
+
+`gh run list --workflow CI` mostraba **fallo en los últimos 12 commits**, o sea desde que existe
+`apps/studio-client`. Todo el programa de conversión avanzó con el CI rojo.
+
+Causa: `studio-client` era el **único** package cuyo script `typecheck` no construye sus dependencias de
+workspace antes de correr `tsc`. Sus ocho hermanos sí lo hacen. En un runner limpio no existe
+`packages/contracts/dist`, así que sus imports de `@efeonce-globe/contracts` no resolvían (`TS2307`) y en cascada
+aparecía una veintena de `TS7006 implicitly any` que eran **síntoma** del import sin tipos, no errores propios.
+
+Localmente pasaba por un **falso verde**: el worktree ya tenía los `dist/` de builds anteriores. Es la clase de
+verde que sólo miente en la máquina de quien lo escribió. Se adopta la convención del hermano más cercano
+(`pnpm --filter "<pkg>^..." build`), que construye las dependencias **transitivas** para que agregar una
+dependencia nueva no vuelva a romperlo en silencio. Probado causal, no por inferencia: con
+`rm -rf packages/contracts/dist`, el script nuevo termina en 0 y el `tsc` crudo reproduce los mismos `TS2307`.
+
+**Regla para el próximo agente:** un package nuevo del monorepo declara sus dependencias en su `typecheck`, y el
+primer commit se verifica **contra el CI**, no contra el worktree.
+
+### La conducta de los diálogos no estaba donde se la busca
+
+`⌘K` y `Guía` existían como botones sin conducta. Buscar sus consumidores por `grep` daba **vacío**
+(`[data-open-dialog]`, `data-command-list`, `data-coach-copy`), y estuve a punto de declararlos "promesa muerta".
+No lo son: su conducta vive en un **`<script>` inline dentro de `producer-ui.ts`**, un string literal en el mismo
+archivo que mis greps excluían por ser el que emite el markup. Verificar antes de escribir evitó documentar una
+mentira y reconstruir desde cero algo que ya estaba resuelto.
+
+Portado con las clases del legacy (forma servida por `producerStyles`, cero CSS propio): paleta con búsqueda que
+**pliega diacríticos** ("locucion" encuentra "Locución"), estado vacío y recuento por `aria-live`; atajos `⌘K`,
+`?`, `G`, `1/2/3`, `Escape`; recorrido guiado con spotlight sobre el objetivo real.
+
+Dos diferencias deliberadas con el legacy:
+
+1. **Los comandos los publica su dueño, no los resuelve la paleta por DOM.** El legacy hace
+   `querySelector('[data-producer-intent="mode-frames"]').click()`; acá el composer publica sus comandos (Modo,
+   Ruta, Mejorar) con su elegibilidad real y el workspace los de superficie. Un selector es un contrato implícito:
+   cambiar un atributo del chip apagaría el comando **en silencio**.
+2. **`Escape` se cierra en el handler de documento.** Con el foco en el buscador —`<input type="search">`— Chrome
+   usa `Escape` para limpiar el campo y el diálogo se queda abierto, desmintiendo el `ESC` que la propia paleta
+   muestra en su `<kbd>`.
+
+### Tres defectos del legacy que no se portaron
+
+Verificados en vivo a 1512×950, no razonados:
+
+| Defecto | Qué pasaba | Cómo queda |
+|---|---|---|
+| Tarjeta del coach fuera del viewport | El paso 2 apunta bajo el fold (`top: 969px` en un viewport de 950): el botón "Siguiente" quedaba **inalcanzable** y el recorrido no se podía terminar | `scrollIntoView` antes de medir + acotar por el alto **real** de la tarjeta |
+| Pasos emparejados al revés | "Confirma el costo" señalaba el feed y "Sigue el run" los créditos | costo → riel del estimado, run → feed |
+| Objetivo ausente dejaba el anillo anterior | El feed React se marca `producer-runtime-feed`, no `producer-feed`: el paso 3 iluminaba la ruta mientras hablaba del feed | se apaga el anillo — sin foco el paso sigue siendo correcto, con foco equivocado no |
+
+Un recorrido guiado que señala el lugar equivocado enseña mal, y señalar es su único trabajo.
+
+### Panel de créditos y mención
+
+**Créditos** (dato real de staging): `500008 de 500110 disponibles`, distribución, y `Uso del mes 102 / 500110`.
+El total es `asignado + ajustado` acotado a 0 (un ajuste negativo del ledger pintaría la dona al revés); si el
+total declarado es 0 se usa la suma **observada**, o un espacio sin asignación explícita mostraría la dona vacía
+teniendo saldo. La dona es `conic-gradient` con **tokens**, no los HEX del legacy. Uso y proyección van cada uno
+detrás de su gate y en su propio efecto: el legacy los encadena, así que un fallo del uso se lleva la proyección
+y las reservas con él. `globe.credits.forecast.get` está `policy-blocked` en este runtime, así que el panel dice
+"no publicada" — estado real, no fallo.
+
+**Mención**: el botón decía "llega con private-ingest" y era **falso** — private-ingest es lo que falta para
+*subir* un archivo; mencionar una pieza propia necesita `globe.producer.asset.copyAsReference`, que este runtime
+publica. `authorizedInputs` y `referenceHashes` estaban **hardcodeados vacíos**; ahora viajan, y agregar o quitar
+una referencia invalida el estimado (sin eso se gastaría con el precio de una receta que ya no es la vigente).
+
+**Límite de verificación declarado:** el camino elegir → certificar → estimar **no es ejercitable en este
+runtime**. Ninguna ruta promovida admite referencias (`0 / 0` en las tres modalidades: Seedream es
+`['prompt']`, Seedance `['prompt','edit-target']`). Lo verificado en vivo es el estado correcto con su razón
+visible; lo verificado por test es la precedencia del tope. El resto espera una ruta promovida, no un arreglo.
+
+`referenceCapOf` vive en `data/` y no en el componente por método: los tests corren con `node --test`, que carga
+`.ts` pero **no** `.tsx`. Una regla enterrada en un componente es una regla que ningún test puede ejercitar —
+comprobado intentándolo (`ERR_UNKNOWN_FILE_EXTENSION`).
+
+Commits: `90e14ce`, `13797af`, `237930e` (CI), `f2b5729`, `f5f9aea`. Gate: 110/110 + typecheck + build, CI **verde
+por primera vez**.
