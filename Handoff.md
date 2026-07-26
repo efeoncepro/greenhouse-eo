@@ -3,6 +3,35 @@
 > Cabina de mando para continuidad inmediata. No es changelog, arquitectura ni memoria completa.
 > Ventana máxima: 20 sesiones. Historia íntegra e índice: [Handoff.archive.md](Handoff.archive.md).
 
+## 2026-07-26 — Experience LaunchOps: governance y compliance como capacidad de producto
+
+Se documentó `Experience LaunchOps` como product service independiente de Wave, en `EPIC-036`, separado de
+`EPIC-019` (que sigue siendo el control plane interno del sitio propio de Greenhouse). Se agregó modelo de negocio,
+customer model, ADR de plataforma agéntica y roadmap.
+
+La nueva preocupación enterprise quedó formalizada en
+`docs/architecture/EFEONCE_EXPERIENCE_LAUNCHOPS_GOVERNANCE_COMPLIANCE_OPERATING_MODEL_V1.md`: Launch Policy Pack,
+clasificación de riesgo L0-L3, segregation of duties, control library, findings/exceptions con expiry, evidence
+pack, límites de agents y autoridad del cliente. Governance/compliance/assurance son capacidades explícitas y
+drivers de qualification, staffing, lead time, delivery model y pricing; no son un checklist final ni un claim de
+certificación. El estado es `Proposed`; requiere piloto real y validación legal/compliance por jurisdicción.
+
+## 2026-07-26 — Experience LaunchOps: enterprise readiness companions
+
+Se agregaron companions de stack/reference architecture, security/threat model, cloud/deployment, operations/SRE
+support, legal/contract/data processing, agent assurance/evaluation y enterprise readiness/procurement. El ADR y
+`EPIC-036` los enlazan; el roadmap incluye `Assure` antes de package/specify/build. Todos están en estado `Proposed`
+y no representan certificación, cumplimiento legal, runtime productivo ni selección definitiva de vendors.
+
+## 2026-07-26 — Experience LaunchOps: augmentation-first product thesis
+
+Se formalizó el Launch Operator como héroe del producto y se creó
+`docs/architecture/EFEONCE_EXPERIENCE_LAUNCHOPS_HUMAN_AUGMENTATION_PRODUCT_OPERATING_MODEL_V1.md`. La tesis es que
+LaunchOps entrega una “armadura” de contexto, dependencias, patrones, preflight, diffs, evidencia, simulación y
+recuperación: no reemplaza UI/UX designers, UX Content, developers ni especialistas, sino que reduce coordinación
+repetitiva y preserva autoría, criterio y calidad. El piloto deberá medir operator leverage, craft quality, human
+value y trust, no sólo velocidad o headcount.
+
 ## 2026-07-26 — Customer Model Operator transversal
 
 Se creó `.codex/skills/efeonce-customer-model-operator/` y su companion `.claude/skills/efeonce-customer-model-operator/`.
