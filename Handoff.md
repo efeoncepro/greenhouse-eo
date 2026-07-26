@@ -1,5 +1,15 @@
 # Handoff activo
 
+## 2026-07-26 — EPIC-028 master flow y creative workspace backlog
+
+Se documentó el benchmark de Magnific, Higgsfield, Krea, Runway, Leonardo, Recraft y Firefly dentro de EPIC-028. La dirección vigente del Producer es `intención → Project → Collection → Session → Asset Workspace → lineage → review → Element/reuse`; no se crea un segundo feed, viewer, library ni motion engine.
+
+Se agregaron los contratos maestros [`EPIC-028-globe-creative-studio-master-flow.md`](docs/ui/flows/EPIC-028-globe-creative-studio-master-flow.md) y [`EPIC-028-globe-creative-studio-master-motion.md`](docs/ui/motion/EPIC-028-globe-creative-studio-master-motion.md). `TASK-1523` conserva la autoridad transversal.
+
+Se crearon `TASK-1580` (Project/Session/Element contract), `TASK-1581` (Creative Entry Hub + Session Feed), `TASK-1582` (Asset Workspace + contextual reuse) y `TASK-1583` (Review-to-Element + governed reuse), con wireframes y dependencias ancladas en EPIC-028. `TASK-1520` y `TASK-1523` recibieron deltas de integración.
+
+Verificación: `ops:lint --changed`, task lint de 1580–1583, wireframe checks y `docs:closure-check` pasan; queda pendiente la implementación y GVC real de los consumers.
+
 > Cabina de mando para continuidad inmediata. No es changelog, arquitectura ni memoria completa.
 > Ventana máxima: 20 sesiones. Historia íntegra e índice: [Handoff.archive.md](Handoff.archive.md).
 

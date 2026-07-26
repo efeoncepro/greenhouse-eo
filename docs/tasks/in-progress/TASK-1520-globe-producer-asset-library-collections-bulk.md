@@ -352,3 +352,15 @@ la vuelven verificable en vez de aspiracional.
 ## Open Questions
 
 - Discovery debe fijar límites de batch/export y política exacta de purge con Legal/Storage, sin inventarlos aquí.
+
+## Delta 2026-07-26 — biblioteca dentro del master creative workspace
+
+El benchmark de suites maduras confirma que Library/Collections no deben presentarse como un administrador de archivos aislado. `TASK-1520` conserva la autoridad durable de collections/series/membership/bulk; el master flow de EPIC-028 la proyecta junto a Project, Session, Asset Workspace y Review.
+
+Consumers nuevos:
+
+- `TASK-1581` usa collections para el contexto previo y el feed session-aware.
+- `TASK-1582` muestra membership y acciones de organización desde el Asset Workspace.
+- `TASK-1583` conecta aprobación y reuse sin mover el source asset ni crear Elements client-side.
+
+Esto no crea un cuarto modelo de folders. `containerIds`, `container.list`, commands de membership y los límites tenant-safe de esta task siguen siendo la única autoridad de organización.

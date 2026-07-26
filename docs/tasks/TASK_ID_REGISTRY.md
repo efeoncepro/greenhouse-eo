@@ -109,6 +109,11 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-1560` | `to-do` | **Retiro del payload legacy de Globe.** EPIC-028; standard; P1/Alto/Medio. Slice 5 de ADR-014: borra `producer-ui.ts`/`ui.ts`/`public-share-ui.ts`/`producer-controller.ts`, retira `client_app_enabled` y vacía `LEGACY_TOKEN_DRIFT`. Mientras esos archivos existan siguen siendo **la plantilla que el próximo agente copia**. Blocked by TASK-1524/1552/1558/1559. | `docs/tasks/to-do/TASK-1560-globe-legacy-payload-retirement.md` |
 | `TASK-1561` | `complete` | **Gate de diseño de Globe: tipografía + cobertura de frontera.** EPIC-028; standard; P2/Medio/Bajo. El gate de color expuso su propio agujero: `font-family` literal pasa limpio, y un peso sin archivo lo **sintetiza el browser** sin fallar nada. Slice 1 vía TASK-1558; Slice 2 = seis mordidas con **cero colaterales** (descarta el gate sobre-amplio, no sólo el inerte); Slice 3 = frontera declarada (`6e8ef5a`). Cerrada 2026-07-25. | `docs/tasks/complete/TASK-1561-globe-design-gate-typography-hardening.md` |
 
+| `TASK-1580` | `to-do` | **Globe Creative Project, Session and Reusable Element Contract.** EPIC-028; backend-data/migration; backend-critical; P1/Muy alto/Alto. Define Project, Session y Element sin duplicar experiment, library, lineage, rights ni ledger; foundation para contexto y reuse del Producer. | `docs/tasks/to-do/TASK-1580-globe-creative-project-session-element-contract.md` |
+| `TASK-1581` | `to-do` | **Globe Producer Creative Entry Hub and Session Feed.** EPIC-028; ui-ux/flow; ui-standard; P1/Muy alto/Alto. Entrada por intención, contexto Project/Collection/Session y feed agrupado por sesión sin crear otro feed. | `docs/tasks/to-do/TASK-1581-globe-producer-creative-entry-hub-session-feed.md` |
+| `TASK-1582` | `to-do` | **Globe Producer Asset Workspace and Contextual Reuse.** EPIC-028; ui-ux/flow; ui-standard; P1/Muy alto/Alto. Extiende viewer a workspace con media, inspector, lineage y acciones contextuales; consume los canvases de modalidad. | `docs/tasks/to-do/TASK-1582-globe-producer-asset-workspace-contextual-reuse.md` |
+| `TASK-1583` | `to-do` | **Globe Producer Review-to-Element and Governed Reuse Experience.** EPIC-028; ui-ux/flow; ui-standard; P1/Alto/Medio. Conecta review, child sessions, aprobación y creación/reuso explícito de Elements sin gasto implícito. | `docs/tasks/to-do/TASK-1583-globe-producer-review-to-element-governed-reuse.md` |
+
 ## Siguiente ID disponible
 
 | `TASK-082` | `in-progress` | Compensation Drawer Chile UX Simplification | `docs/tasks/in-progress/TASK-082-compensation-drawer-chile-ux-simplification.md` |
@@ -1662,4 +1667,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 ## Siguiente ID disponible
 
-`TASK-1580`
+`TASK-1584`

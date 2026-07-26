@@ -416,3 +416,14 @@ Los primeros ocho **ya están verificados en browser** (canary `producer-motion-
 
 - Implementación: `TASK-1505`, `TASK-1474` y tasks backend dueñas.
 - Login se diseña por separado; no forma parte del Creative Loop autenticado.
+
+## Delta 2026-07-26 — master flow y motion de EPIC-028
+
+El benchmark de Magnific, Higgsfield, Krea y Runway confirmó que la IA del Creative Loop necesita una jerarquía visible `Project → Collection → Session → Candidate/Asset → Lineage → Review → Element`. `TASK-1523` conserva la autoridad transversal de esa gramática; no se crea un segundo feed, viewer, library ni motion engine.
+
+Los contratos maestros del programa son:
+
+- `docs/ui/flows/EPIC-028-globe-creative-studio-master-flow.md`
+- `docs/ui/motion/EPIC-028-globe-creative-studio-master-motion.md`
+
+El delivery se deriva a `TASK-1580` (Project/Session/Element contract), `TASK-1581` (Entry Hub + Session Feed), `TASK-1582` (Asset Workspace) y `TASK-1583` (Review-to-Element). Los consumers deben declarar esos contratos y no redefinir estados, focus, reduced motion o ownership de media.

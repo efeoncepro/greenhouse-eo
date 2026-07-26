@@ -110,6 +110,8 @@ evidencia, no una garantía de marketing.
 - [ADR-012 — Globe Storyboard Studio Decision V1](../../architecture/creative-studio/EFEONCE_GLOBE_STORYBOARD_STUDIO_DECISION_V1.md)
 - [SPEC-012 — Globe Storyboard Studio Architecture V1](../../architecture/creative-studio/EFEONCE_GLOBE_STORYBOARD_STUDIO_V1.md)
 - [UI Flow — Storyboard Studio Structured Sequence Canvas](../../ui/flows/TASK-1547-globe-storyboard-studio-flow.md)
+- [Master UI Flow — Globe Creative Studio](../../ui/flows/EPIC-028-globe-creative-studio-master-flow.md)
+- [Master UI Motion — Globe Creative Studio](../../ui/motion/EPIC-028-globe-creative-studio-master-motion.md)
 
 ## Child Tasks
 
@@ -177,6 +179,26 @@ evidencia, no una garantía de marketing.
   challengers vía Fal para SFX, música, audio-to-audio, restore y stems sólo después de eval, licencia, canary y
   promotion. `TASK-1577` consume ambos contratos dentro de `TASK-1568` con selección waveform/transcript, layer
   rail, compare A/B y recovery; no crea selector de provider, segundo player ni DAW paralelo.
+
+ - `TASK-1580` — **Globe Creative Project, Session and Reusable Element Contract.** Foundation backend/data para Project, Session y Element sin duplicar experiment, library, lineage, rights ni ledger.
+ - `TASK-1581` — **Globe Producer Creative Entry Hub and Session Feed.** Consumer UI que cambia el ingreso por modalidad a ingreso por intención, muestra contexto reciente y agrupa actividad por sesión sin crear otro feed.
+ - `TASK-1582` — **Globe Producer Asset Workspace and Contextual Reuse.** Consumer UI que conecta el viewer/media canvases con proyecto, colección, sesión, lineage y acciones de continuidad.
+ - `TASK-1583` — **Globe Producer Review-to-Element and Governed Reuse Experience.** Consumer UI que conecta review/changes-requested/approval con child sessions, creación explícita de Elements y reutilización gobernada.
+
+### Creative production workspace experience — 2026-07-26
+
+El benchmark de Magnific, Higgsfield, Krea, Runway, Leonardo, Recraft y Firefly confirma que el patrón premium no es una galería más rica: es una cadena de continuidad `intención → proyecto → sesión → asset → lineage → review → reuse`. Magnific demuestra que el destino debe poder elegirse antes de generar y que edición, historial y organización deben conservarse juntas; Higgsfield aporta Projects, Elements, Canvas y workflows guiados; Krea aporta un entry point simple con herramientas multimodales y asset manager; Runway separa Project, Session y Asset.
+
+Globe adopta esos patrones sin copiar sus límites:
+
+- Project aporta contexto de producción; Collection aporta agrupación editorial; Session conserva exploración; Candidate conserva investigación; Approved asset conserva decisión; Element conserva reutilización.
+- El feed queda orientado a sesiones y deltas, no a una pared de outputs.
+- El Asset Workspace es la superficie de continuidad entre media, metadata, lineage, review y acciones.
+- Creative Recipes presentan intención y resultado esperado antes de exponer ruta/modelo.
+- Auto-routing, derechos, credits, provenance y approval siguen siendo gobernados por Globe; ningún benchmark autoriza una simulación cliente o una segunda fuente de verdad.
+- Boards y community discovery quedan después de la continuidad Project/Session/Asset/Review, fuera del primer corte del Producer.
+
+El mapa de implementación, estados, rutas, focus, mobile, failure paths y ownership vive en el [Master UI Flow del epic](../../ui/flows/EPIC-028-globe-creative-studio-master-flow.md). La gramática cross-surface de causalidad, llegada de sesiones, branch/lineage, workspace, review y reduced motion vive en el [Master UI Motion del epic](../../ui/motion/EPIC-028-globe-creative-studio-master-motion.md). `TASK-1523` conserva la autoridad transversal; las tasks 1580–1583 materializan las piezas nuevas sin apropiarse de feed/viewer/library/media owners existentes.
 
 ### Library discovery and adoption policy — 2026-07-26
 
