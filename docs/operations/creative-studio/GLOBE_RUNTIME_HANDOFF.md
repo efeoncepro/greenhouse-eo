@@ -23,11 +23,21 @@
   proposal `4ddedb4a-efdc-4477-a354-ada58033fd0b` con plan legible real (`monthlyCapBefore=400`,
   `spentInPeriod=166`, `policyAvailableBefore=344`, `policyAvailableAfter=234` — el tope sigue siendo
   el que restringe; un fondeo útil debe subir `monthlyCap`). La propuesta vence por TTL (15 min).
-- 🔴 **`confirm` queda DESBLOQUEADO pero es del operador** (sesión humana real, runbook en TASK-1566
-  § Delta (4)). Tras el PRIMER `confirm`, volver a verificar `pg_locks` en cero — ésa es la prueba
-  de que el deadlock murió en runtime, no sólo en tests.
-- Higiene (TASK-1469): propuestas en PG — **3 `confirmed`** colgadas (una más que las 2 documentadas),
-  1 `confirm_failed`, 4 `proposed` (vencen solas). Las `confirmed` no se terminalizan solas.
+- ✅ **Fondeo real ejecutado punta a punta el mismo día** (TASK-1566 § Delta (6)): `propose` →
+  `confirm` con la sesión REAL del operador (agente ejecutó la mecánica con autorización explícita;
+  atribución `user-efeonce-admin-julio-reyes` en las dos fases). `confirm` en **905 ms** (antes se
+  colgaba). Resultado vivo: **política cap-800 activa** (`0f1afea8`, la cap-400 quedó `superseded`),
+  grant `44a3e601` `posted` (+100), asiento `63256cf0`, propuesta `28be76fc` `completed`.
+  **`pg_locks` 0/0/0 DESPUÉS del confirm** — el deadlock murió en runtime. Disponible por política:
+  344 → **444**.
+- Runbook corregido (medido): el `confirm` necesita `x-idempotency-key` **propia** (el broker 409ea
+  el reuso de la del propose), y el anti-replay del broker es **por propuesta** — ningún confirm
+  repetido pasa, con cualquier clave; `count(grants)=1` verificado tras dos replays.
+- Higiene (TASK-1469): propuestas en PG — **3 `confirmed`** colgadas (pre-fix, una más que las 2
+  documentadas), 1 `confirm_failed`, `proposed` restantes vencen solas por TTL. Las `confirmed` no se
+  terminalizan solas.
+- Siguiente pasada (desbloqueada por el caso real verde): **retiro de la autoridad de crédito del
+  caller genérico** + señal anti-regreso, y retiro de `raise-credit-monthly-cap.mjs`.
 - `globe-studio-internal` y `globe-producer-worker` **no** se redesplegaron: el dispatch del carril
   vive en la API; el worker usa los stores sin tx (comportamiento idéntico). Sus imágenes quedan
   anteriores a `4eab6d3` — normal, pero recordarlo antes de diagnosticar por logs (lección: qué

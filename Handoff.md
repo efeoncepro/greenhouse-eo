@@ -133,10 +133,18 @@ el store viejo (2/2); `pnpm check` + `pnpm build` verdes.
 `4eab6d3` (target_sha verificado, run 30223326513), flag del carril `true` en la revision nueva,
 `pg_locks` post-deploy **0/0/0**, y smoke `propose` → **200** por el puente staging→WIF→Globe contra
 la revision nueva (plan legible real). Detalle vivo en `GLOBE_RUNTIME_HANDOFF.md` § Active state.
-🔴 **`confirm` queda desbloqueado pero es DEL OPERADOR** (sesion humana; runbook en TASK-1566 Delta 4).
-Tras el primer confirm, re-verificar `pg_locks` en cero.
-Higiene pendiente: **3** propuestas en `confirmed` (medido contra PG, una mas que las 2 documentadas)
-+ 1 `confirm_failed`; el TTL solo vence las `proposed`, no se terminalizan solas (TASK-1469).
+✅ **CRITERIO DE SALIDA CUMPLIDO el mismo dia (TASK-1566 § Delta (6)):** fondeo real `propose` →
+`confirm` punta a punta SIN break-glass, con la sesion REAL del operador en Chrome (autorizacion
+explicita "hazlo end to end"; el agente ejecuto la mecanica, la atribucion es humana de verdad).
+`confirm` en **905 ms** — el paso que antes se colgaba. Grant 100 `posted` + cap 400→**800** + asiento
+de ledger en una transaccion; intents `proposed`+`confirmed` con `user-efeonce-admin-julio-reyes`;
+`pg_locks` **0/0/0 despues** del confirm. Dos correcciones de runbook: el confirm necesita clave de
+idempotencia PROPIA (el broker 409ea el reuso), y el anti-replay del broker es POR PROPUESTA (ningun
+segundo grant, verificado con dos replays → `count=1`).
+**Queda en scope de la task (ahora desbloqueado):** retiro de la autoridad de credito del caller
+generico + senal anti-regreso, y retiro de `raise-credit-monthly-cap.mjs` (pasada propia).
+Higiene pendiente: **3** propuestas en `confirmed` colgadas (pre-fix) + 1 `confirm_failed`; el TTL
+solo vence las `proposed`, no se terminalizan solas (TASK-1469).
 
 **Leccion que explica las siete:** *"funciona hasta el borde con Globe"* se habia medido en LOCAL,
 donde el puente no se ejercita. Declararlo como estado es lo que hizo que se pagaran todas juntas.

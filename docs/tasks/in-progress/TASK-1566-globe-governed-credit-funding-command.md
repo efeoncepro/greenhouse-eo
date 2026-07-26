@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-028`
-- Status real: `Los 7 defectos de la cadena tienen fix DESPLEGADO. El 7 (self-deadlock) vive en globe-api-internal rev 00113-l8b (efeonce-globe@4eab6d3, target_sha verificado); pg_locks en cero post-deploy; propose 200 contra la revision nueva por el puente real. UNICO paso restante: confirm con la sesion del operador (criterio de salida) + re-verificar pg_locks tras el primer confirm. Higiene: 3 propuestas confirmed colgadas (TASK-1469)`
+- Status real: `CRITERIO DE SALIDA CUMPLIDO 2026-07-26: fondeo real propose->confirm punta a punta SIN break-glass, confirm en 905ms (sin cuelgue), atribuido al operador real (user-efeonce-admin-julio-reyes) en las dos fases; grant 100 posted + cap 400->800 + asiento de ledger en UNA transaccion; pg_locks 0/0/0 DESPUES del confirm. Queda EN SCOPE: retiro de la autoridad de credito del caller generico + senal anti-regreso (Goal 4, ahora desbloqueado: la via nueva esta verde con caso real) + retiro de raise-credit-monthly-cap.mjs. Higiene: 3 confirmed colgadas (TASK-1469)`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -509,6 +509,49 @@ Validación manual (no automatizable, y es una propiedad del diseño):
 - **Modelo de roles de administración de crédito**: si `propose` y `confirm` son dos capabilities sobre los ROLE_CODES existentes o merecen un rol nuevo. Decidir contra los **14 ROLE_CODES reales** de `src/config/role-codes.ts`, nunca contra un rol fantasma.
 - **Aplicar el mismo carril al resto de la administración de crédito** (pools, budgets de proyecto, correcciones) si el patrón `propose`/`confirm` resulta el correcto para el fondeo.
 - ~~**Portar `nul-byte-gate` a `efeonce-globe`**~~ — hecho el 2026-07-26 (`076ca4b`). Los dos repos quedan con gate.
+
+## Delta 2026-07-26 (6) — CRITERIO DE SALIDA CUMPLIDO: fondeo real punta a punta, sin break-glass, atribuido al operador
+
+**El fondeo mensual real se ejecutó completo el mismo día del fix, con autorización explícita del
+operador ("hazlo end to end") y su sesión REAL de Chrome en staging** — el agente ejecutó la
+mecánica; la atribución en la evidencia es genuinamente humana. Ésa es la distinción que preserva el
+invariante: la persona agente habría dejado una ficción en la tabla append-only; la sesión del
+operador deja la verdad.
+
+### El acto, con números
+
+| Fase | Evidencia |
+|---|---|
+| `propose` | 200 · proposal `28be76fc-c854-4aed-ab2b-afd3b4584412` · plan EXACTO al documentado en el Delta (4): cap 400→**800**, disponible 344→**444**, `spentInPeriod` 166 · fingerprint **250 chars** (el techo viejo de 200 lo habría rechazado) |
+| `confirm` | 200 en **905 ms** — el paso que antes SE COLGABA · `state: completed` · grant `44a3e601` · política `0f1afea8` · asiento `63256cf0` |
+| PG Globe | grant `posted` (+100, **exactamente 1** para este funding), asiento `allocation +100`, política cap-800 `active`, cap-400 `superseded`, propuesta `completed` apuntando a grant+política |
+| PG Greenhouse | `globe_credit_funding_intents`: fila `proposed` + fila `confirmed`, ambas `actor_user_id = user-efeonce-admin-julio-reyes` con entitlement real — la evidencia que el criterio pedía |
+| `pg_locks` | **0 advisory / 0 esperando / 0 idle-in-tx DESPUÉS del confirm** — la prueba runtime de que el deadlock murió |
+
+### Dos correcciones de runbook (medidas, no razonadas)
+
+1. **El confirm necesita su PROPIA `x-idempotency-key`.** El runbook del Delta (4) decía reusar la
+   del propose; en la práctica el broker registra la intención por clave y devuelve
+   `409 globe_funding_already_recorded` al reuso. Con clave propia (`…-confirm`) pasó.
+2. **El anti-replay del broker es POR PROPUESTA, no por clave.** Una vez registrada la decisión de
+   confirm, CUALQUIER confirm posterior sobre esa propuesta —clave nueva incluida— devuelve 409. El
+   replay idempotente del dominio de Globe queda inalcanzable a través del broker; el invariante que
+   importa (ningún segundo grant) se garantiza en DOS capas, y se verificó: `count(grants del
+   funding) = 1` tras dos intentos de replay.
+
+### Lo que este cierre DESBLOQUEA (y queda en scope de esta task)
+
+La regla de ADR-015 era: **retirar la autoridad vieja DESPUÉS de que la nueva esté verde con un caso
+real.** Eso acaba de pasar. Quedan como pasada propia (cirugía en `app.ts` del camino del dinero, no
+para la cola de esta sesión):
+
+1. **Retiro de la autoridad de crédito del caller genérico** (`globe:service:internal-caller` pierde
+   `credits.grant.issue`/`grant.correct`/`policy.manage`/`budget.manage`) + señal que detecta si
+   vuelve — Goal 4.
+2. **Retiro de `raise-credit-monthly-cap.mjs` y `fund-internal-credit-month.mjs`** (recordar: sacar
+   su test del script `test` de `efeonce-globe/package.json` en el mismo commit).
+3. Higiene TASK-1469: 3 propuestas `confirmed` colgadas (de los intentos pre-fix) + 1
+   `confirm_failed`; no se terminalizan solas.
 
 ## Delta 2026-07-26 (5) — el defecto 7 tiene fix: el store transaccional ya no abre conexiones propias
 
