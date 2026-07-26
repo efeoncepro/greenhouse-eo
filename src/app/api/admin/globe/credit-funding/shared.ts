@@ -16,7 +16,8 @@ const BROKER_ERROR_CODES = {
   proposal_not_found: 'globe_funding_proposal_not_found',
   confirmer_is_proposer: 'globe_funding_confirmer_is_proposer',
   already_recorded: 'globe_funding_already_recorded',
-  globe_unavailable: 'globe_unavailable'
+  globe_unavailable: 'globe_unavailable',
+  rejected_by_globe: 'globe_funding_rejected'
 } as const satisfies Record<GlobeCreditFundingBrokerError['code'], string>
 
 export const brokerErrorResponse = (error: GlobeCreditFundingBrokerError) =>

@@ -81,6 +81,7 @@ export type CanonicalErrorCode =
   | 'globe_funding_already_recorded'
   | 'globe_unavailable'
   | 'globe_not_configured'
+  | 'globe_funding_rejected'
   // Roadmap cockpit — work item Markdown lookup (TASK-1153 follow-up).
   | 'roadmap_work_item_not_found'
   | 'roadmap_disabled'
@@ -342,6 +343,14 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   // `actionable: true` —que es lo que hacía— manda a insistir contra una pared y esconde que el
   // arreglo es de rollout, no de código. Mismo criterio que `/api/internal/globe/health`, que ya
   // devolvía `globe_not_configured` con `retryable: false`.
+  // Globe respondió 4xx: NEGÓ la operación. Se separa de `globe_unavailable` porque son opuestos en
+  // lo único que le importa a quien lo recibe — Globe SÍ respondió, y reintentar no cambia nada. El
+  // qué exactamente rechazó vive en el log del servidor, nunca acá: puede traer saldo o política.
+  globe_funding_rejected: {
+    status: 422,
+    message: 'Globe rechazó este fondeo. Revisa el plan con plataforma antes de reintentar.',
+    actionable: false
+  },
   globe_not_configured: {
     status: 503,
     message:

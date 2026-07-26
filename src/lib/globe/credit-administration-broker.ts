@@ -28,6 +28,21 @@ import { createGreenhouseGlobeClient, type GreenhouseGlobeClientDependencies } f
 const PROPOSE_COMMAND = 'globe.credits.month.fund.propose'
 const CONFIRM_COMMAND = 'globe.credits.month.fund.confirm'
 
+/**
+ * Razón del asiento, del vocabulario de Globe. Coincide con la que su `confirm` estampa en el grant
+ * (`reasonCode: 'month_funding'`): dos vocabularios para el mismo hecho harían que el ledger se lea
+ * distinto según por dónde entró.
+ */
+const FUNDING_REASON_CODE = 'month_funding'
+
+/**
+ * `sourceId` deriva de la clave de idempotencia, y eso NO es cosmético: el `fingerprint` de la
+ * propuesta se calcula sobre el payload completo salvo `proposedBy`, así que un `sourceId` con
+ * `Date.now()` o un UUID daría un fingerprint distinto en cada intento y el replay idempotente
+ * dejaría de serlo justo en el camino del dinero.
+ */
+const fundingSourceId = (idempotencyKey: string) => `greenhouse:${idempotencyKey}`
+
 export type GlobeCreditFundingActor = Readonly<{
   /** Identidad de Greenhouse, resuelta de la sesión server-side. NUNCA viene del cliente. */
   userId: string
@@ -62,6 +77,8 @@ export class GlobeCreditFundingBrokerError extends Error {
     | 'confirmer_is_proposer'
     | 'already_recorded'
     | 'globe_unavailable'
+    /** Globe respondió 4xx: negó la operación. Estructural — reintentar no la resuelve. */
+    | 'rejected_by_globe'
 
   constructor(code: GlobeCreditFundingBrokerError['code']) {
     super(code)
@@ -93,7 +110,18 @@ export async function proposeGlobeCreditFunding(
           ...(input.monthlyCap === undefined ? {} : { monthlyCap: input.monthlyCap }),
           periodStart: input.periodStart,
           periodEnd: input.periodEnd,
-          proposedBy: { principalId: input.actor.userId, entitlement: input.actor.entitlement }
+          // `sourceId` y `reasonCode` son OBLIGATORIOS en `parsePropose` de Globe. Omitirlos hacía
+          // que cada `propose` muriera en un `400 invalid_request` — medido en staging el
+          // 2026-07-26, la primera vez que el puente Vercel→Globe estuvo vivo para acusarlo.
+          sourceId: fundingSourceId(input.idempotencyKey),
+          reasonCode: FUNDING_REASON_CODE,
+          // `at` también es obligatorio: `attribution()` lo exige como ISO. La evidencia dice
+          // CUÁNDO se propuso, no sólo quién.
+          proposedBy: {
+            principalId: input.actor.userId,
+            entitlement: input.actor.entitlement,
+            at: new Date().toISOString()
+          }
         },
         {
           workspaceId: input.globeWorkspaceId,
@@ -165,7 +193,15 @@ export async function confirmGlobeCreditFunding(
         {
           proposalId: input.proposalId,
           fingerprint: input.fingerprint,
-          confirmedBy: { principalId: input.actor.userId, entitlement: input.actor.entitlement }
+          // Mismo contrato que `proposedBy`: `attribution()` exige `at`. Sin él, el `confirm` moría
+          // en `400 invalid_request` — y como el broker colapsaba todo a `globe_unavailable`, se
+          // leía como "Globe no respondió" cuando Globe respondía perfectamente que el payload
+          // estaba incompleto.
+          confirmedBy: {
+            principalId: input.actor.userId,
+            entitlement: input.actor.entitlement,
+            at: new Date().toISOString()
+          }
         },
         {
           workspaceId: input.globeWorkspaceId,
@@ -192,13 +228,31 @@ async function dispatch<T>(operation: () => Promise<T>, phase: 'propose' | 'conf
      * Se emite el NOMBRE del error y la fase, JAMÁS su `message`, su `stack` ni el body del upstream:
      * un fallo de credenciales trae el correo de la identidad, y un fallo de Globe puede traer saldo.
      */
+    /*
+     * El `status` y el `code` del SDK sí cruzan al log: son un enum cerrado del transporte, no
+     * prosa del upstream. Son justamente lo que faltaba para distinguir "Globe no respondió" de
+     * "Globe respondió que el payload está incompleto" — dos condiciones que la primera versión
+     * colapsaba en la misma, y que el 2026-07-26 costó tres vueltas de diagnóstico.
+     */
+    const sdk = asGlobeSdkError(error)
+
     console.error(
       JSON.stringify({
         event: 'greenhouse.globe_credit_funding.dispatch_failed',
         phase,
-        errorName: error instanceof Error ? error.name : typeof error
+        errorName: error instanceof Error ? error.name : typeof error,
+        ...(sdk === undefined ? {} : { status: sdk.status, sdkCode: sdk.code })
       })
     )
+
+    /*
+     * Un 4xx de Globe es una NEGACIÓN, no una indisponibilidad: reintentar no la resuelve, y
+     * decirle al operador "inténtalo de nuevo en unos segundos" lo manda a insistir contra una
+     * pared. Es el mismo defecto de actionability que `globe_not_configured` cerró en las rutas.
+     */
+    if (sdk !== undefined && sdk.status !== undefined && sdk.status >= 400 && sdk.status < 500) {
+      throw new GlobeCreditFundingBrokerError('rejected_by_globe')
+    }
 
     throw new GlobeCreditFundingBrokerError('globe_unavailable')
   }
@@ -268,4 +322,17 @@ async function recordIntent(
 
     throw error
   }
+}
+
+/** Estrecha el error del SDK sin importar su clase: el paquete es del repo hermano. */
+function asGlobeSdkError(
+  error: unknown
+): Readonly<{ status: number | undefined; code: string }> | undefined {
+  if (!(error instanceof Error) || error.name !== 'GlobeSdkError') return undefined
+
+  const candidate = error as Error & { status?: unknown; code?: unknown }
+  const status = typeof candidate.status === 'number' ? candidate.status : undefined
+  const code = typeof candidate.code === 'string' ? candidate.code : 'unknown'
+
+  return { status, code }
 }
