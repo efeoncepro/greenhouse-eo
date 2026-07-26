@@ -1,5 +1,37 @@
 # TASK-1469 — Globe Governed Run Lifecycle, Submission Fence and Provider Completion
 
+## Delta 2026-07-26 — el mecanismo ESTÁ vivo; lo que queda es la terminalización del reconcile
+
+**Medido contra el runtime, no leído.** Cuatro runs pagados desde la UI (principal `human` por el BFF, no el
+carril workload): imagen `spent=10` + `spent=10`, video `spent=16` ×2, y un video `provider_failed` con
+`spent=0`. Artefactos reales retenidos (PNG 7,42 MB `active`; MP4 1,57 MB). El feed se actualizó **solo** en las
+cuatro corridas — o sea la captura del aviso de completion funciona end-to-end.
+
+🔴 **El bloque `### Already exists` de esta task quedó STALE y engaña.** Dice cosas que hoy son falsas, y un
+agente que lo lea va a creer que tiene que construir lo que ya corre:
+
+| Dice | Realidad verificada 2026-07-26 |
+|---|---|
+| *"`app.ts` no expone hoy un webhook Fal"* | **Existe**: `apps/studio-web/src/app.ts:1702`, `/v1/provider-webhooks/(fal\|openai)/{id}`, con `GLOBE_PROVIDER_WEBHOOK_PROXY_ENABLED=true` en el servicio vivo |
+| *"crea `InMemoryExperimentStore`"* | Stores **durables** desde TASK-1465 (complete) |
+| *"scheduler `PAUSED`"* | `globe-producer-worker` **ENABLED**, cron `* * * * *` |
+| *"no se ejecutó el worker sobre trabajos pagados"* | 4 runs pagados hoy, con settlement en el ledger |
+
+**Alcance restante, que es MUCHO más chico que el título:**
+
+1. La deuda que la propia task declara (Checkpoint 2026-07-23): eventos outbox `reconcile` en `pending` con runs
+   ya terminales, inflando `queueOldestAgeSeconds`. Cierre correcto ya escrito ahí: terminalizar/superseder al
+   completar + medir edad sólo sobre trabajo reclamable. **NUNCA** limpiar por SQL ni subir el threshold.
+2. OpenAI sigue sin lane productivo (`globe_governed_openai_official_verifier_missing`); el selector del Producer
+   lo muestra como *"No disponible por una dependencia externa"*, que es honesto.
+
+**Lo que NO es de esta task, y hay que no confundirlo:** la superficie de fallo en el feed (tarjeta de una corrida
+fallida ofreciendo acciones muertas) es de **`TASK-1526`**. Ver el delta que se le agregó allí.
+
+> **Recomendación: reescribir el `Summary` y el `Already exists` antes de que alguien la tome.** Una task cuyo
+> encabezado pide "implementar el lifecycle" cuando lo que falta es "terminalizar el reconcile" hace que el próximo
+> ejecutor dimensione mal el trabajo — y este delta existe porque casi me pasa a mí.
+
 ## Delta 2026-07-21 — TASK-1507 complete: la base URL estable es el dominio, no el `run.app`
 
 `TASK-1507` está complete: la base URL estable es `https://globe.efeoncepro.com`; el `*.run.app` ya no es alcanzable

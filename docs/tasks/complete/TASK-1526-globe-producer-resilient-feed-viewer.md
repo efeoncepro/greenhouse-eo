@@ -1,5 +1,37 @@
 # TASK-1526 — Globe Producer Resilient Feed and Viewer
 
+## Delta 2026-07-26 — una corrida FALLIDA ofrece acciones muertas (encontrado en producción)
+
+Encontrado ejerciendo la UI con gasto real, no leyendo código. Un run de video terminó `provider_failed`
+(`spent=0`, fence liberado) y su tarjeta en el feed quedó así:
+
+```
+Video · 0 cr · Seedance 2.0 · "Plano cinematográfico…" · Falló · Se puede reintentar · 26 jul
+acciones: [Seleccionar] [Ver candidato] [Descargar] [Añadir a favoritos] [Usar como referencia] [Recrear]
+```
+
+**Lo que SÍ está bien, y hay que registrarlo para no "arreglarlo" de más:** la tarjeta en grilla **declara el
+estado** (`Falló · Se puede reintentar`) y muestra `0 cr`. Eso es honesto y es justo lo que esta task construyó.
+
+🔴 **El hueco son las ACCIONES.** Sobre una corrida sin output se ofrecen **`Ver candidato`**, **`Descargar`** y
+**`Usar como referencia`** — las tres apuntan a un artefacto que no existe (verificado: la tarjeta no tiene `<video>`
+ni `src`). Un cliente que pague por esto va a apretar Descargar y no va a pasar nada, que es peor que un botón
+ausente: promete algo y calla. Lo que sí corresponde en ese estado es `Recrear`.
+
+⚠️ **Observación con menos evidencia, declarada como tal:** cuando esa misma pieza ocupaba el slot **`Destacada`**,
+su texto **no** traía la línea de estado (leído del DOM: `"DestacadaVideo0 cr…Recrear"`, sin `Falló`). No puedo
+distinguir desde afuera si el hero omite el estado o si todavía no había propagado —fue ~1 min después del fallo— y
+no se reprodujo. **Verificar antes de actuar**; si el hero efectivamente lo omite, es peor que en grilla, porque
+destaca una corrida fallida como si fuera la mejor pieza del espacio.
+
+**Por qué importa más de lo que parece:** el fallo resultó ser **transitorio** del proveedor — el mismo prompt con
+la misma configuración (`with-audio`) pasó en el reintento (`spent=16`, `governed_operation_completed`). O sea esto
+no es un caso de borde raro: si el proveedor falla 1 de cada 3 veces, el usuario ve tarjetas con acciones muertas
+con regularidad.
+
+Dueño natural: esta task (feed + viewer resiliente). No es de `TASK-1469`, cuyo mecanismo de completion quedó
+verificado funcionando el mismo día.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
