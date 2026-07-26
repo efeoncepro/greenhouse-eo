@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-028`
-- Status real: `Los 7 defectos de la cadena tienen fix. El 7 (self-deadlock del store transaccional) esta code-complete en efeonce-globe@4eab6d3 con gates verdes, PENDIENTE DE DEPLOY de globe-api-internal. Regla dura vigente: NO ejercer confirm hasta desplegar y verificar pg_locks en cero. Despues: ejercer propose->confirm con la sesion del operador (criterio de salida)`
+- Status real: `Los 7 defectos de la cadena tienen fix DESPLEGADO. El 7 (self-deadlock) vive en globe-api-internal rev 00113-l8b (efeonce-globe@4eab6d3, target_sha verificado); pg_locks en cero post-deploy; propose 200 contra la revision nueva por el puente real. UNICO paso restante: confirm con la sesion del operador (criterio de salida) + re-verificar pg_locks tras el primer confirm. Higiene: 3 propuestas confirmed colgadas (TASK-1469)`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -570,11 +570,17 @@ nuevo sin registrar.
 
 ### Lo que falta (en orden)
 
-1. **Push + deploy de `globe-api-internal`** (`deploy-internal.yml`, manual) con `4eab6d3`.
-2. Ejercer `confirm` con la sesión del operador (runbook del Delta 4) y verificar `pg_locks` en cero
-   después.
-3. Higiene: las 2 propuestas en `confirmed` sin completar siguen sin terminalizarse solas
-   (TTL sólo vence `proposed`; se conecta con `TASK-1469`).
+1. ~~Push + deploy de `globe-api-internal`~~ **HECHO** (mismo día): rev **`00113-l8b`** desde
+   `4eab6d3` (target_sha verificado en el run 30223326513), flag del carril `true` en la revisión
+   nueva, `pg_locks` post-deploy en **0/0/0** (advisory/esperando/idle-in-tx), y smoke del carril:
+   `propose` por el puente staging→WIF→Globe → **200** con plan legible real (cap 400, gastado 166,
+   disponible 344→234 — el tope sigue restringiendo; el fondeo útil sube `monthlyCap`).
+2. **Ejercer `confirm` con la sesión del operador** (runbook del Delta 4) — el único paso restante.
+   Tras el PRIMER confirm, re-verificar `pg_locks` en cero: ésa es la prueba runtime de que el
+   deadlock murió.
+3. Higiene: **3** propuestas en `confirmed` sin completar (una más que las 2 documentadas — medido
+   contra PG post-deploy), más 1 `confirm_failed`. No se terminalizan solas (TTL sólo vence
+   `proposed`; se conecta con `TASK-1469`).
 
 ## Delta 2026-07-26 (4) — la precondición del cierre queda verificada; el bug class del NUL se cierra con gate
 

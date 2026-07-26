@@ -129,10 +129,14 @@ main, sin push): todo metodo de `DurableCreditAdministrationStore` (run + 11 rea
 del ledger honran la `tx` inyectada; `CreditFundingMutationPorts` gana `policyReader` y el `readState`
 de mitad de mutacion corre por los ports del seam. Regresiones conductuales verificadas en rojo contra
 el store viejo (2/2); `pnpm check` + `pnpm build` verdes.
-🔴 **La regla dura SIGUE vigente: NO ejercer `confirm` hasta desplegar `globe-api-internal` con
-`4eab6d3` (deploy-internal.yml, manual, requiere push) y verificar `pg_locks` en cero despues.**
-Higiene pendiente: 2 propuestas quedaron en `confirmed` y el TTL solo vence las `proposed`, asi que no
-se terminalizan solas (se conecta con TASK-1469).
+**Desplegado el mismo dia ("avanza con todo"):** `globe-api-internal` rev **`00113-l8b`** desde
+`4eab6d3` (target_sha verificado, run 30223326513), flag del carril `true` en la revision nueva,
+`pg_locks` post-deploy **0/0/0**, y smoke `propose` → **200** por el puente staging→WIF→Globe contra
+la revision nueva (plan legible real). Detalle vivo en `GLOBE_RUNTIME_HANDOFF.md` § Active state.
+🔴 **`confirm` queda desbloqueado pero es DEL OPERADOR** (sesion humana; runbook en TASK-1566 Delta 4).
+Tras el primer confirm, re-verificar `pg_locks` en cero.
+Higiene pendiente: **3** propuestas en `confirmed` (medido contra PG, una mas que las 2 documentadas)
++ 1 `confirm_failed`; el TTL solo vence las `proposed`, no se terminalizan solas (TASK-1469).
 
 **Leccion que explica las siete:** *"funciona hasta el borde con Globe"* se habia medido en LOCAL,
 donde el puente no se ejercita. Declararlo como estado es lo que hizo que se pagaran todas juntas.

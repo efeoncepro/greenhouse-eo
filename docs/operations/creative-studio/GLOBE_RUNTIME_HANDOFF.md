@@ -8,7 +8,32 @@
 
 # Handoff
 
-## Active state — 2026-07-26 (canary real bloqueado en runner; break-glass específico revocado)
+## Active state — 2026-07-26 (defecto 7 de TASK-1566 desplegado; confirm desbloqueado para el operador)
+
+- `globe-api-internal` → revisión **`00113-l8b`** (Ready), imagen construida de
+  `efeonce-globe@4eab6d3` (target_sha verificado en el run
+  [30223326513](https://github.com/efeoncepro/efeonce-globe/actions/runs/30223326513)). Contiene el
+  fix del self-deadlock del store transaccional de crédito: `markGrantPosted` y todos los readers
+  honran la `tx` inyectada; el `policyReader` de mitad de mutación viaja por los ports del seam.
+- `GLOBE_CREDIT_ADMIN_LANE_ENABLED=true` verificado en la revisión nueva (deploy image-only; env de
+  Terraform preservada).
+- **PG verificado post-deploy** (IAM `julio.reyes@efeonce.org` vía connector): advisory locks **0**,
+  esperando **0**, `idle in transaction` **0**.
+- **Smoke del carril contra la revisión nueva:** `propose` por el puente staging→WIF→Globe → **200**,
+  proposal `4ddedb4a-efdc-4477-a354-ada58033fd0b` con plan legible real (`monthlyCapBefore=400`,
+  `spentInPeriod=166`, `policyAvailableBefore=344`, `policyAvailableAfter=234` — el tope sigue siendo
+  el que restringe; un fondeo útil debe subir `monthlyCap`). La propuesta vence por TTL (15 min).
+- 🔴 **`confirm` queda DESBLOQUEADO pero es del operador** (sesión humana real, runbook en TASK-1566
+  § Delta (4)). Tras el PRIMER `confirm`, volver a verificar `pg_locks` en cero — ésa es la prueba
+  de que el deadlock murió en runtime, no sólo en tests.
+- Higiene (TASK-1469): propuestas en PG — **3 `confirmed`** colgadas (una más que las 2 documentadas),
+  1 `confirm_failed`, 4 `proposed` (vencen solas). Las `confirmed` no se terminalizan solas.
+- `globe-studio-internal` y `globe-producer-worker` **no** se redesplegaron: el dispatch del carril
+  vive en la API; el worker usa los stores sin tx (comportamiento idéntico). Sus imágenes quedan
+  anteriores a `4eab6d3` — normal, pero recordarlo antes de diagnosticar por logs (lección: qué
+  imagen corre CADA servicio).
+
+## Estado previo — 2026-07-26 (canary real bloqueado en runner; break-glass específico revocado)
 
 - Dry-run con token del caller: `ready=true`; `globe.tenancy.workspace.get` observó
   `brokerExpiresAt=2026-07-26T11:42:00.878Z`, `version=4`, `brokerState=active`; estimados `image=10` y
