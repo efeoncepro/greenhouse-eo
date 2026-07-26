@@ -7,6 +7,11 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-26 — Registro de postulaciones a partners de IA generativa
+
+- Se creó [`docs/audits/commercial/AI_PARTNER_PROGRAM_APPLICATIONS_2026-07-26.md`](docs/audits/commercial/AI_PARTNER_PROGRAM_APPLICATIONS_2026-07-26.md) con el mapa, evidencia, estados y próximos pasos de Anthropic/Claude, Lovable, OpenAI, Google Cloud, AWS, Salesforce, Runway, FLUX, BytePlus/ByteDance, ElevenLabs y HeyGen.
+- Se confirmaron envíos a FLUX, Runway Enterprise y ElevenLabs; BytePlus quedó bloqueado únicamente por reCAPTCHA.
+
 ## 2026-07-26 — ADR-015: Greenhouse administra Globe (créditos y capabilities de usuarios)
 
 - Se creó `docs/architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md` (**ADR-015**,

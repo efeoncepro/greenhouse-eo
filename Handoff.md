@@ -3,6 +3,13 @@
 > Cabina de mando para continuidad inmediata. No es changelog, arquitectura ni memoria completa.
 > Ventana máxima: 20 sesiones. Historia íntegra e índice: [Handoff.archive.md](Handoff.archive.md).
 
+## 2026-07-26 — Postulaciones de partners de IA generativa
+
+Se consolidó el registro auditable en [`docs/audits/commercial/AI_PARTNER_PROGRAM_APPLICATIONS_2026-07-26.md`](docs/audits/commercial/AI_PARTNER_PROGRAM_APPLICATIONS_2026-07-26.md).
+Quedaron confirmadas las postulaciones a **FLUX Creator Program**, **Runway Enterprise** y **ElevenLabs Commercial Partner**. **BytePlus Partner Network** está rellenado hasta reCAPTCHA; **AWS** requiere documento/selfie; **Salesforce** requiere crear/verificar el usuario; **Google Cloud** ya tiene una cuenta partner existente asociada a `efeonce.org` y requiere recuperar el perfil, no duplicarlo. Runway Creative Partners devolvió 504, por lo que se usó la vía enterprise.
+
+**Siguiente acción humana:** completar los captchas/verificaciones y los pasos de identidad/acceso descritos en el audit antes de declarar cualquier programa como aprobado.
+
 ## 2026-07-26 — ESTADO VIGENTE de Globe (consolida el hilo del día; las entradas de abajo son narrativa superada)
 
 > **Leer sólo esta para saber dónde está Globe.** Abajo hay 6 entradas del mismo hilo de hoy, escritas por dos
