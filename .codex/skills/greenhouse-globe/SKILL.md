@@ -1074,5 +1074,14 @@ grant OAuth. Y sería **inerte**: `tenancy_mode` default es `"shadow"` (`variabl
 `capabilityScopes ⊆ requiredScopes` y agregarlo lo vuelve requerido para todos (la lección que tumbó el login en
 ADR-010). El grant OAuth es el **techo**; la proyección es el **piso**.
 
+**Método — `curl` con Bearer contra una API de Google es indistinguible de exfiltración (2026-07-26).** Usar
+`gcloud` (o su `--format=json`), **NUNCA** `curl -H "Authorization: Bearer $(gcloud auth print-access-token)"` contra
+`secretmanager.googleapis.com` / `iam.googleapis.com`. Medido: los dos `curl` con bearer de esa sesión fueron
+bloqueados por el classifier del entorno, mientras **todos** los `gcloud` equivalentes de lectura pasaron
+(`projects get-iam-policy`, `secrets get-iam-policy`, `run/scheduler/logging describe|read`) — y `Bash(gcloud
+secrets:*)` **ya estaba permitido** en `.claude/settings.json`, así que el bloqueo lo causó la FORMA del comando, no
+la falta de permiso. Agregar reglas no arregla esto; usar `gcloud` sí. Y para distinguir éxito de error sin imprimir
+un secreto, el primitive es el **exit code**, nunca una máscara sobre la salida.
+
 **Método:** `gcloud` CLI y ADC son credenciales **distintas** — el token del CLI puede estar vencido y ADC seguir
 viva (o al revés). No des por bloqueado un diagnóstico de infra sin probar las dos.
