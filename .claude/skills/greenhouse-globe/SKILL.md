@@ -1019,10 +1019,13 @@ Ocho reglas medidas contra el runtime, no razonadas. Las tres primeras cuestan u
    `approval_stale` → que llega como `conflict`. Y el token que viaja en `execute` es el del estimado **vigente**:
    "el token ES la cotización".
 
-5. **Firmar aprobaciones desde un cliente es BREAK-GLASS, no operación.** El secreto de aprobación es
-   `only api_runtime can read them` (`infra/terraform/secrets.tf`). El procedimiento documentado
-   (`GLOBE_RUNTIME_HANDOFF.md:220`) otorga `serviceAccountTokenCreator` **temporalmente al operador humano**, ejecuta
-   y revoca con readback. **NUNCA** lo conviertas en el camino normal, **NUNCA** le des
+5. **Firmar aprobaciones desde un cliente es BREAK-GLASS, no operación — y para FONDEAR ya ni eso: el
+   camino normal es el carril gobernado** (`propose` → `confirm`, VIVO y ejercido end-to-end el
+   2026-07-26; runbook `docs/manual-de-uso/creative-studio/fondear-creditos-globe.md`). El secreto de
+   aprobación es `only api_runtime can read them` (`infra/terraform/secrets.tf`). El break-glass
+   documentado (`GLOBE_RUNTIME_HANDOFF.md:220`) otorga `serviceAccountTokenCreator` **temporalmente al
+   operador humano**, ejecuta y revoca con readback; su contador debe tender a CERO ahora que el carril
+   funciona. **NUNCA** lo conviertas en el camino normal, **NUNCA** le des
    `secretmanager.versions.access` a `greenhouse-portal@` (es la identidad de reconciliación de tenancy de
    **Greenhouse**: usarla para administrar crédito de **Globe** es admin implícito cross-plataforma), y **NUNCA**
    dejes que un **agente o proceso** proponga y confirme: la confirmación es de un humano autenticado, siempre.
@@ -1222,9 +1225,22 @@ discriminar por `source`** (`human_session` vs `settled_payment`), no relajarlo.
 Reglas no negociables: monto **del PSP nunca del cliente**, idempotencia por **id de pago** (los PSP
 reintentan webhooks), y un chargeback se corrige con **`grant.correct`**, jamás borrando el grant.
 
-**Lo único que falta para el criterio de salida:** ejercer `propose` → `confirm` con Greenhouse
-**desplegado**. Desde una laptop no se puede: el ADC humano **no puede impersonar** al workload caller
-(`PERMISSION_DENIED`, por diseño — ese `tokenCreator` es de `greenhouse-portal@`, `iam.tf:16-20`).
+✅ **CRITERIO DE SALIDA CUMPLIDO (2026-07-26, misma jornada):** el fondeo real corrió `propose` →
+`confirm` punta a punta SIN break-glass — `confirm` en **905 ms** (el paso que se colgaba), grant
++100 `posted`, tope 400→**800**, asiento de ledger, todo en UNA transacción, atribuido al operador
+real (`user-efeonce-admin-julio-reyes`) vía su sesión de Chrome en staging con autorización
+explícita. `pg_locks` 0/0/0 después. **Runbook canónico:**
+`docs/manual-de-uso/creative-studio/fondear-creditos-globe.md`. Tres reglas medidas que un agente
+futuro debe saber:
+
+- **El confirm exige `x-idempotency-key` PROPIA** — reusar la del propose da
+  `409 globe_funding_already_recorded` (el broker registra la intención por clave).
+- **El anti-replay del broker es POR PROPUESTA**, no por clave: registrada la decisión, ningún
+  confirm repetido pasa. El replay idempotente del dominio queda inalcanzable a través del broker;
+  el invariante (ningún segundo grant) vive en dos capas.
+- **La atribución es lo que era "del operador", no la mecánica**: un agente puede ejecutar los curls
+  con autorización explícita SI la sesión es la del humano real; confirmar con la persona agente
+  (`user-agent-e2e-001`) fabrica evidencia en una tabla append-only y sigue prohibido.
 
 ### Ocho lecciones de método, que valen más que los fixes
 

@@ -1,7 +1,7 @@
 # Efeonce Globe — Administración desde Greenhouse (créditos y capabilities) Decision V1
 
 - **Decision:** ADR-015
-- **Status:** **Partially implemented** — dirección aceptada por el operador (2026-07-26). **Slice A entregado y verde** (fase de negación: cierra la mitad de diagnóstico de `ISSUE-124`; `pnpm check` + `pnpm build` en 0). **Roadmap re-secuenciado el mismo día**: el comando gobernado (Slice B) pasa **antes** de KMS y de la topología de identidades, que son hardening y no prerrequisitos — el error de orden original costó un break-glass evitable. Implementación de B en curso; C-H pendientes.
+- **Status:** **Partially implemented — carril de fondeo VIVO y ejercido end-to-end** (2026-07-26). **Slice A entregado** (fase de negación; cierra la mitad de diagnóstico de `ISSUE-124`). **Slice B entregado y VERIFICADO CON UN CASO REAL**: fondeo mensual `propose` → `confirm` punta a punta SIN break-glass, confirmado por el operador con su sesión real (grant +100 `posted`, tope 400→800, asiento de ledger, en UNA transacción; `confirm` en 905 ms tras cerrar el defecto 7 de TASK-1566 — el self-deadlock del store transaccional). Eso **desbloquea el retiro de la autoridad de crédito del caller genérico** (regla de rollout §10: carril verde con caso real → retiro). C (retiro de scripts de firma cliente) y el retiro de las 4 capabilities (parte de E) en curso; D (KMS), E completo (identidades disjuntas), F-H pendientes. Ver Delta 2026-07-26 (3).
 - **Date:** 2026-07-26
 - **Owner:** Greenhouse control plane (superficie, identidad, desired access, entitlements) + Efeonce Globe (autoridad, firma, ejecución, evidencia)
 - **Scope:** La **administración de Globe desde Greenhouse** en sus dos mitades: **(a) créditos** — fondear el mes, emitir grants, publicar/superseder política de presupuesto, presupuestos de proyecto; y **(b) capabilities por usuario** — qué puede hacer cada persona dentro de cada workspace de Globe. Cubre la topología de identidades de las dos plataformas, el carril de transporte, el modelo de aprobación y firma, la atomicidad de la mutación, la observabilidad de la negación y la superficie de administración en el portal. **NO** cubre el ledger comercial en sí (TASK-1468), el spend fence de seguridad del Lab, la promoción de rutas (ADR-009/ADR-010), el payload de browser (ADR-014) ni el rollout comercial externo (TASK-1480).
@@ -449,3 +449,26 @@ Esto **cierra la mitad de diagnóstico de `ISSUE-124`** y evita que el carril nu
 - **Slice H — break-glass gobernado y retiro del HMAC.** TTL, motivo, autorización atribuida, revocación
   automática, readback del corte y su contador. El HMAC se retira cuando la señal del legacy esté en cero por la
   ventana declarada, con `api_runtime` perdiendo el acceso al secreto.
+
+> **Delta 2026-07-26 (3) — el Slice B quedó VERIFICADO CON UN CASO REAL, y eso activa la regla de retiro del §10.**
+> El primer fondeo mensual real corrió punta a punta por el carril: `propose` (plan legible: tope 400→800,
+> disponible 344→444, gastado 166) → `confirm` **en 905 ms**, confirmado por el operador con su **sesión real**
+> (atribución `user-efeonce-admin-julio-reyes` en las dos filas de `globe_credit_funding_intents`), grant `posted`
+> +100 + política cap-800 + asiento de ledger en **una** transacción, `pg_locks` 0/0/0 después. Sin break-glass.
+> Antes hubo que cerrar el **defecto 7 de TASK-1566**: los stores transaccionales abrían conexiones propias dentro
+> de la transacción del confirm (`markGrantPosted` re-pedía el advisory lock desde otra conexión → cuelgue con el
+> crédito del workspace bloqueado). Regla que quedó escrita: dentro de la transacción, NINGÚN port abre conexión
+> propia.
+>
+> Dos hechos medidos que ajustan el §5 (idempotencia): el broker de Greenhouse exige **clave de idempotencia
+> propia** para el confirm (reusar la del propose → `409 already_recorded`), y su anti-replay es **por propuesta**
+> — registrada la decisión, ningún confirm posterior pasa, con cualquier clave. El replay idempotente del dominio
+> de Globe queda inalcanzable a través del broker; el invariante (ningún segundo grant) se garantiza en dos capas
+> y se verificó (`count(grants)=1` tras dos replays).
+>
+> Consecuencia de rollout: la condición del §10 («carril nuevo verde con un caso real») está cumplida → procede el
+> **retiro de las 4 capabilities de crédito del caller genérico** (`grant.issue`/`grant.correct`/`policy.manage`/
+> `budget.manage`) con su señal de drift, y el **retiro de los scripts de firma cliente** (Slice C). El resto del
+> Slice E (identidades disjuntas por unidad de ejecución) y el Slice D (KMS) siguen pendientes como hardening.
+> Runbook operativo: `docs/manual-de-uso/creative-studio/fondear-creditos-globe.md`; explicación funcional:
+> `docs/documentation/creative-studio/fondeo-gobernado-creditos-globe.md`.
