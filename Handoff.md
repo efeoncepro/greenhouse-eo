@@ -3,6 +3,13 @@
 > Cabina de mando para continuidad inmediata. No es changelog, arquitectura ni memoria completa.
 > Ventana máxima: 20 sesiones. Historia íntegra e índice: [Handoff.archive.md](Handoff.archive.md).
 
+## 2026-07-26 — Pricing Integrity Pack aplicado a Wave
+
+Se probó `efeonce-pricing-operator` sobre las cinco familias de Wave y sus delivery models. El resultado vive en
+`docs/business-models/wave/WAVE_PRICING_INTEGRITY_PACK_V1.md`: la separación de capas es coherente, pero el verdict
+permanece `hypothesis_only` hasta completar métricas de valor, cost-to-serve, margen, capacidad, rights/providers,
+evidencia de repetibilidad y aprobaciones. No se aprobaron tarifas, claims ni venta general.
+
 ## 2026-07-25 (4) — Wave portfolio y boundaries documentados
 
 Se formalizó Wave como marca de producto de Efeonce con cinco familias: Search Visibility 360, Web Experience

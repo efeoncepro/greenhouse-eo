@@ -28,6 +28,13 @@
 - Business model, GTM, commercial, Finance, Creative Practice y SEO/AEO Practice quedaron enrutados al companion;
   sus reglas específicas siguen siendo dueñas de sus respectivas líneas.
 
+## 2026-07-26 — Primera aplicación de pricing a Wave
+
+- Se probó `efeonce-pricing-operator` sobre las cinco familias de Wave y sus seis delivery models.
+- Se creó `docs/business-models/wave/WAVE_PRICING_INTEGRITY_PACK_V1.md` con métricas candidatas, revenue
+  architecture, economics, experimentos y gates de aprobación.
+- El resultado es `hypothesis_only`: no se aprobaron tarifas, claims, márgenes ni venta general.
+
 ## 2026-07-25 — Globe: el payload de browser deja de ser un string (ADR-014, foundation)
 
 `TASK-1556` cerrada. Nació `apps/studio-client` en `efeonce-globe` (Vite + React + React Router, SSR

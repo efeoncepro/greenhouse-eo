@@ -3,6 +3,7 @@
 > **Estado:** `Draft` — estructura y boundaries definidos; pricing, costos, evidencia y aprobación comercial pendientes.
 > **Owner:** Strategy + Wave + Product/Architecture + Finance + Legal/IP
 > **ADR:** [`EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md`](../../architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md)
+> **Pricing Integrity Pack:** [`WAVE_PRICING_INTEGRITY_PACK_V1.md`](WAVE_PRICING_INTEGRITY_PACK_V1.md)
 
 ## Tesis
 
@@ -61,6 +62,9 @@ exclusiones, dependencias, evidencia, soporte y cambio de scope.
 La value metric puede ser implementación, sprint, lane, capacidad gobernada, retainer recurrente o resultado
 verificable según familia. No se publican precios desde este draft. Antes de `Commercially approved` deben existir
 baseline/after evidence, cost-to-serve, margen, capacidad, derechos/IP, límites de claims y señales de renovación.
+
+La primera aplicación del método transversal de pricing está documentada en el
+[`Wave Pricing Integrity Pack`](WAVE_PRICING_INTEGRITY_PACK_V1.md). Su verdict actual es `hypothesis_only`.
 
 ## No confundir
 
