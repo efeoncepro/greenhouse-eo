@@ -1129,3 +1129,43 @@ ledger. Es deliberado (no filtrar saldos por el transporte compartido), pero dej
 `approval_stale` de `pool_exhausted` de `month_cap_exceeded`. Hoy sólo se pudo separar sondeando el reader
 `budget.evaluate`, que **no** está disponible en la superficie `ui`. La observabilidad del conflicto es
 prerrequisito del diseño objetivo, no un extra.
+
+### Alcance real del ADR pendiente: Greenhouse ADMINISTRA Globe (créditos y capabilities) — 2026-07-26
+
+Dirección del operador, y cambia el encuadre de lo anterior: **Greenhouse debe poder administrar los créditos y las
+capabilities de los usuarios de Globe.** Eventualmente esa administración vive en Greenhouse, no en un CLI.
+
+**Esto NO contradice la frontera; la usa.** El reparto declarado ya dice que Greenhouse es el *único control plane
+operativo* —identidad, desired access state, bindings de workspace/cliente, governance cross-plataforma— y Globe es
+*runtime, ejecución y evidencia*. Que la administración de crédito y de capabilities viva en Greenhouse es
+exactamente ese reparto, no una excepción a él.
+
+Lo que objeté antes sigue en pie, pero es otra cosa: **no es que Greenhouse no deba administrar; es que no debe
+hacerlo por impersonación implícita**. Que `greenhouse-portal@` —la identidad de reconciliación de tenancy— pida
+prestado el caller de Globe y necesite el secreto de firma es admin implícito: sin contrato, sin superficie
+declarada y con el poder de forjar cualquier aprobación. La frontera prohíbe *eso*, no la administración.
+
+#### La forma que se sigue de las dos cosas
+
+- **Greenhouse es la SUPERFICIE de administración; Globe es la AUTORIDAD.** El operador administra donde ya vive
+  —con sus entitlements, su audit y su sesión humana—; la decisión la ejecuta y la firma el runtime de Globe.
+- **Lane `sister-platform`, no impersonación.** Las 8 superficies canónicas ya incluyen `sister-platform`: los
+  comandos de crédito y de capability grant se publican ahí con su coverage, y Greenhouse los consume como
+  cualquier otro consumer del spine. Sin credenciales prestadas.
+- **Identidad broker DEDICADA para administración**, distinta del reconciliador de tenancy. Una identidad por
+  propósito: la que reconcilia tenancy no es la que mueve plata.
+- **La evidencia de aprobación NUNCA sale del runtime de Globe.** Greenhouse manda una intención autorizada y
+  atribuida (quién, con qué entitlement, sobre qué workspace); Globe verifica, arma la aprobación internamente
+  (KMS) y ejecuta. Greenhouse nunca tiene la llave.
+- **El maker-checker se vuelve natural**, y esto es lo mejor del encuadre: el humano aprueba en Greenhouse —donde
+  hay identidad real, roles y auditoría— y el ejecutor es la identidad de Globe. Dos actores independientes por
+  construcción, sin break-glass y sin que nadie tenga las dos mitades.
+- **Capabilities por usuario:** es el mismo mecanismo que ya existe. Greenhouse es dueño del *desired access state*
+  y Globe recibe los grants por el broker (`parseGlobeCapabilities` **descarta** lo que no reconoce — un broker no
+  puede inventar capabilities). Administrar capabilities desde Greenhouse es poblar ese estado deseado, no abrir
+  una puerta nueva.
+
+Consecuencia de alcance: el ADR pendiente **no** es "identidades de credit-admin de Globe". Es **la administración
+de Globe desde Greenhouse** — créditos y capabilities — con su topología de identidades, su lane, su modelo de
+aprobación y su superficie en el portal. Y por Full API Parity, esa capability nace con contrato gobernado, así que
+la UI de Greenhouse, Nexa y MCP la operan por construcción.
