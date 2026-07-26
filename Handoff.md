@@ -102,14 +102,30 @@ ese `tokenCreator` es de `greenhouse-portal@` (`iam.tf:16-20`). Hasta entonces N
    anteriores: un `catch` que sanitizaba sin dejar rastro del servidor. La contramedida no es
    disciplina sino procedimiento — el `catch` y su linea de log, en el mismo commit.
 
-**Sesion 2026-07-26 (cierre parcial) — detalle en TASK-1566 § Delta 2026-07-26 (4).** Greenhouse
-DESPLEGADO en staging (`9bf955331`): las dos rutas de fondeo responden `401 unauthorized` canonico y
-una ruta de control devuelve 404 real, asi que el codigo esta vivo. Precondiciones medidas contra
-runtime y PG real (rev `00106-b6w` con el flag ON, migraciones aplicadas, ledger en 0 filas, politica
-interna explicita en OFF, ambas capabilities vivas). 🔴 **Falta solo ejercer `propose`->`confirm` con la
-cookie de sesion del OPERADOR** — runbook con los `curl` exactos en el Delta (4); `staging:request` no
-sirve (resuelve persona agente y no manda `x-idempotency-key`). No se ejercio con la persona agente a
-proposito: pasa el trigger pero escribiria una atribucion humana ficticia en una tabla append-only.
+**Sesion 2026-07-26 (cierre parcial) — detalle completo en TASK-1566 § Delta 2026-07-26 (4).**
+El carril se ejercio DESPLEGADO por primera vez y aparecieron **SIETE defectos en cadena**, cada uno
+tapando al siguiente: (1) cero `GLOBE_*` en Vercel, (2) audiencia OIDC que Vercel nunca emite —la
+federacion Vercel→Globe **nunca funciono**—, (3) payload del broker sin `sourceId`/`reasonCode`/`at`,
+(4) fingerprint de 248 chars validado con un `id()` de 200, (5) parametro SQL ambiguo (`42P08`),
+(6) firma sobre el payload sin su propia `approval`, (7) `readState` usando el pool DENTRO de la
+transaccion atomica → **cuelgue**.
+
+**Seis corregidos y desplegados** (Greenhouse `d2e45dd33`; Globe `004b849`, `659c58d`, `5cb0720`,
+`f268612`, `da8e4bc`). `propose` verde punta a punta con plan legible real; **`confirm` sigue sin
+completar** por el (7).
+
+🔴 **Incidente causado y remediado en la sesion:** el cuelgue dejo el lock advisory
+`credit:workspace:greenhouse-org:efeonce` retenido, lo que bloquea **toda** reserva de credito del
+workspace —generacion incluida—. Se reciclaron las instancias de `globe-api-internal`; verificado
+despues: cero locks, cero sesiones activas. **Si el (7) se vuelve a ejercer, el bloqueo se reproduce.**
+
+🔴 **El (7) NO se intento**: exige enhebrar `GlobeQueryable` por ~20 metodos del archivo mas denso del
+repo, en el camino del dinero. La propia task ya lo habia dictaminado como pasada propia.
+Higiene pendiente: 2 propuestas quedaron en `confirmed` y el TTL solo vence las `proposed`, asi que no
+se terminalizan solas (se conecta con TASK-1469).
+
+**Leccion que explica las siete:** *"funciona hasta el borde con Globe"* se habia medido en LOCAL,
+donde el puente no se ejercita. Declararlo como estado es lo que hizo que se pagaran todas juntas.
 
 **Bug class del NUL cerrado con gate en LOS DOS repos** (`pnpm nul-byte-gate`; en Greenhouse dentro de
 `local:check`/pre-push, en Globe dentro de `check` — commit `076ca4b`). El barrido encontro 3 archivos
