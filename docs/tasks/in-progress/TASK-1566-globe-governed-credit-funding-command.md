@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-028`
-- Status real: `CRITERIO DE SALIDA CUMPLIDO 2026-07-26: fondeo real propose->confirm punta a punta SIN break-glass, confirm en 905ms (sin cuelgue), atribuido al operador real (user-efeonce-admin-julio-reyes) en las dos fases; grant 100 posted + cap 400->800 + asiento de ledger en UNA transaccion; pg_locks 0/0/0 DESPUES del confirm. Queda EN SCOPE: retiro de la autoridad de credito del caller generico + senal anti-regreso (Goal 4, ahora desbloqueado: la via nueva esta verde con caso real) + retiro de raise-credit-monthly-cap.mjs. Higiene: 3 confirmed colgadas (TASK-1469)`
+- Status real: `CRITERIO DE SALIDA CUMPLIDO + RETIRO EJECUTADO (2026-07-26). Fondeo real propose->confirm punta a punta sin break-glass (confirm 905ms, atribuido al operador real); Goal 4 CERRADO: el caller generico perdio las 4 capabilities de credit-admin (rev 00114-k4t, señal drift en dos capas, steady 0 verificado en logs) y los scripts de firma cliente estan retirados (Slice C). Los 5 Goals de la task estan entregados; lo restante (KMS, identidades disjuntas por unidad, superficie UI, break-glass gobernado) es hardening del roadmap de ADR-015 (Slices D-H) — decidir si esta task cierra y eso nace como tasks nuevas. Higiene: 3 confirmed colgadas (TASK-1469)`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -509,6 +509,56 @@ Validación manual (no automatizable, y es una propiedad del diseño):
 - **Modelo de roles de administración de crédito**: si `propose` y `confirm` son dos capabilities sobre los ROLE_CODES existentes o merecen un rol nuevo. Decidir contra los **14 ROLE_CODES reales** de `src/config/role-codes.ts`, nunca contra un rol fantasma.
 - **Aplicar el mismo carril al resto de la administración de crédito** (pools, budgets de proyecto, correcciones) si el patrón `propose`/`confirm` resulta el correcto para el fondeo.
 - ~~**Portar `nul-byte-gate` a `efeonce-globe`**~~ — hecho el 2026-07-26 (`076ca4b`). Los dos repos quedan con gate.
+
+## Delta 2026-07-26 (7) — retiro ejecutado: el caller genérico perdió la autoridad de credit-admin; scripts de firma cliente retirados
+
+**La regla del §10 de ADR-015 se ejecutó el mismo día que se cumplió su condición.** Desplegado en
+`globe-api-internal` rev **`00114-k4t`** (`efeonce-globe@5d64c5d`). Triple documentación previa al
+cambio: manual (`manual-de-uso/creative-studio/fondear-creditos-globe.md`), funcional
+(`documentation/creative-studio/fondeo-gobernado-creditos-globe.md`), ADR-015 Delta (3) + skill.
+
+### Qué se retiró
+
+1. **Las 4 capabilities de credit-admin del caller genérico** (`grant.issue`, `grant.correct`,
+   `policy.manage`, `budget.manage`) — y por construcción también del **broker de tenancy**, que cae
+   en esa clase. Se conservan: lecturas, `pool.manage` (maker cuyo checker es el tenancy-operator) y
+   las dos del carril de fondeo (`funding.propose`/`confirm`), que son el camino normal.
+2. **Los scripts de firma cliente** (Slice C): `raise-credit-monthly-cap{,-lib,.test}.mjs`
+   eliminados y su test des-registrado del script raíz en el mismo commit (la trampa de la suite
+   enumerada). La cita a la lib en el comentario de `signFor` se reapuntó al test del contrato
+   (`credit-admin-approval.test.ts`).
+
+### La señal anti-regreso, en dos capas
+
+- **Runtime**: `creditAdminAuthorityDrift(principal)` + evento
+  `globe.credit_admin.caller_authority_drift` (steady = 0, dedupe por principal) — sólo puede
+  dispararse si alguien re-agrega una de las cuatro. Verificado en logs post-deploy: **cero**.
+- **CI**: test en `tenancy-runtime.test.ts` que exige intersección vacía en las TRES clases de
+  workload y que el carril de fondeo **sobreviva** al retiro (sin eso, el retiro cortaría el único
+  camino operable). El assert viejo que exigía la PRESENCIA de esas caps en el broker se invirtió.
+
+### Verificación post-deploy
+
+- `pnpm check` (11 packages en `fail 0`) + `pnpm build` verdes ANTES del deploy.
+- Smoke por el puente real contra la rev nueva: `propose` → **200**, y de paso confirma que el
+  fondeo de hoy sigue vivo (`monthlyCapBefore: 800`, `policyAvailableBefore: 444`).
+- Señal de drift: cero entradas en Cloud Logging.
+
+### Estado de los Goals de la task
+
+| Goal | Estado |
+|---|---|
+| 1. Fondeo real con UNA confirmación humana, sin break-glass | ✅ Delta (6) |
+| 2. Evidencia nunca sale del runtime; ningún actor aprueba y ejecuta a la vez | ✅ humano aprueba / servicio ejecuta; la disyunción approver/executor **por unidad de ejecución** es hardening (Slice D/E) |
+| 3. Mutación en una transacción, idempotente por proposalId | ✅ Deltas (4)-(5) |
+| 4. El caller genérico pierde la autoridad de crédito, con señal | ✅ este delta |
+| 5. `conflict` declara la fase | ✅ Slice 1 |
+
+**Lo que queda es hardening del roadmap de ADR-015** (D: KMS + verificador dual; E completo:
+identidades disjuntas por unidad; F: desambiguador en `ui`; G: capabilities per-member tras
+`tenancy_mode=enforced`; H: break-glass gobernado + retiro del HMAC) — no bloquea la operación del
+carril. Recomendación: cerrar esta task y crear las de hardening como hijas nuevas de EPIC-028
+(barrido por dominio antes de reservar IDs).
 
 ## Delta 2026-07-26 (6) — CRITERIO DE SALIDA CUMPLIDO: fondeo real punta a punta, sin break-glass, atribuido al operador
 

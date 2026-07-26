@@ -36,8 +36,15 @@
 - Higiene (TASK-1469): propuestas en PG — **3 `confirmed`** colgadas (pre-fix, una más que las 2
   documentadas), 1 `confirm_failed`, `proposed` restantes vencen solas por TTL. Las `confirmed` no se
   terminalizan solas.
-- Siguiente pasada (desbloqueada por el caso real verde): **retiro de la autoridad de crédito del
-  caller genérico** + señal anti-regreso, y retiro de `raise-credit-monthly-cap.mjs`.
+- ✅ **Retiro EJECUTADO el mismo día** (ADR-015 §10; TASK-1566 Delta (7)): `globe-api-internal` →
+  rev **`00114-k4t`** (`efeonce-globe@5d64c5d`). El caller genérico (y el broker de tenancy, misma
+  clase) perdió `grant.issue`/`grant.correct`/`policy.manage`/`budget.manage`; conserva lecturas,
+  `pool.manage` y `funding.propose/confirm`. Señal `globe.credit_admin.caller_authority_drift`
+  (steady = 0, verificada en cero en logs) + test de disyunción en CI. Scripts de firma cliente
+  (`raise-credit-monthly-cap*`) **eliminados** del repo. Smoke post-retiro: `propose` → 200 con
+  cap 800 / disponible 444 (el fondeo sigue vivo). **El break-glass de crédito ya no tiene poder de
+  admin por el caller genérico** — fondear es SIEMPRE por el carril
+  (`manual-de-uso/creative-studio/fondear-creditos-globe.md`).
 - `globe-studio-internal` y `globe-producer-worker` **no** se redesplegaron: el dispatch del carril
   vive en la API; el worker usa los stores sin tx (comportamiento idéntico). Sus imágenes quedan
   anteriores a `4eab6d3` — normal, pero recordarlo antes de diagnosticar por logs (lección: qué

@@ -147,8 +147,16 @@ de ledger en una transaccion; intents `proposed`+`confirmed` con `user-efeonce-a
 `pg_locks` **0/0/0 despues** del confirm. Dos correcciones de runbook: el confirm necesita clave de
 idempotencia PROPIA (el broker 409ea el reuso), y el anti-replay del broker es POR PROPUESTA (ningun
 segundo grant, verificado con dos replays → `count=1`).
-**Queda en scope de la task (ahora desbloqueado):** retiro de la autoridad de credito del caller
-generico + senal anti-regreso, y retiro de `raise-credit-monthly-cap.mjs` (pasada propia).
+✅ **Retiro EJECUTADO en la misma jornada (TASK-1566 Delta (7); rev `00114-k4t`,
+`efeonce-globe@5d64c5d`):** el caller generico (y el broker de tenancy, misma clase) perdio las 4
+capabilities de credit-admin; señal anti-regreso en dos capas (evento
+`globe.credit_admin.caller_authority_drift` steady=0 verificado + test de disyuncion); scripts de
+firma cliente `raise-credit-monthly-cap*` eliminados (Slice C). Smoke post-retiro: `propose` 200 con
+cap 800/disponible 444. **Triple documentacion creada ANTES del retiro:** manual
+`manual-de-uso/creative-studio/fondear-creditos-globe.md` + funcional
+`documentation/creative-studio/fondeo-gobernado-creditos-globe.md` + ADR-015 Delta (3) + skill.
+**Los 5 Goals de TASK-1566 entregados**; lo restante (KMS, identidades por unidad, UI, break-glass
+gobernado) es hardening ADR-015 Slices D-H — candidato a cerrar la task y abrir hijas nuevas.
 Higiene pendiente: **3** propuestas en `confirmed` colgadas (pre-fix) + 1 `confirm_failed`; el TTL
 solo vence las `proposed`, no se terminalizan solas (TASK-1469).
 

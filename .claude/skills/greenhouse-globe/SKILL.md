@@ -1038,12 +1038,15 @@ Ocho reglas medidas contra el runtime, no razonadas. Las tres primeras cuestan u
    que cuesta cero: el agente nunca confirma, y aprobador ≠ ejecutor entre service accounts.
 
 6. 🔴 **La autoridad de crédito YA está concedida a la identidad que Greenhouse puede impersonar — el problema no es
-   que falte, es que SOBRA.** Cadena verificada 2026-07-26: `greenhouse-portal@` tiene `tokenCreator` sobre
-   `greenhouse-globe-caller` (`infra/terraform/iam.tf:16-20`) → ese SA resuelve al principal genérico
-   `globe:service:internal-caller` (`app.ts:3457`) → ese principal carga `globe.credits.grant.issue`,
-   `grant.correct`, `policy.manage` y `budget.manage` (`app.ts:3545-3563`) **más `globe.lab.experiment.run`**
-   (`app.ts:3515`). O sea **una sola identidad tiene fondeo y gasto**, y el único freno es un secreto que no puede
-   leer. **NUNCA** describas el bloqueo como "falta una identidad de credit-admin": es al revés.
+   que falte, es que SOBRABA — y el 2026-07-26 SE RETIRÓ (ADR-015 §10, rev `00114-k4t`).** La cadena era:
+   `greenhouse-portal@` con `tokenCreator` sobre `greenhouse-globe-caller` (`iam.tf:16-20`) → principal genérico
+   `globe:service:internal-caller` → que cargaba `grant.issue`/`grant.correct`/`policy.manage`/`budget.manage`
+   **más `globe.lab.experiment.run`** — fondeo y gasto en una identidad. **Hoy el caller genérico (y el broker de
+   tenancy, misma clase) ya NO carga las cuatro**: conserva lecturas, `pool.manage` y `funding.propose/confirm`
+   (el carril gobernado, que ES el camino de fondeo). Señal anti-regreso en dos capas:
+   `creditAdminAuthorityDrift` + evento `globe.credit_admin.caller_authority_drift` (steady = 0) y el test de
+   disyunción en `tenancy-runtime.test.ts`. **NUNCA re-agregues una de las cuatro sin reabrir ADR-015** — el test
+   te va a parar, y saltártelo reintroduce fondeo+gasto en la identidad que Greenhouse puede asumir.
 
 7. 🔴 **El maker-checker de crédito es VACUO para cualquier caller de workload.** `approval()`
    (`packages/domain/src/credit-administration.ts`) compara `approval.proposedBy` contra
@@ -1058,8 +1061,9 @@ Ocho reglas medidas contra el runtime, no razonadas. Las tres primeras cuestan u
    existe ninguna superficie que firme**: `.sign(` no aparece en `app.ts` — el verificador está cableado, el firmador
    no. **NUNCA** propongas "ampliar el radio del secreto" como salida: es la misma propiedad con otro dueño.
 
-**Dirección decidida — ADR-015** (`EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md`, Proposed 2026-07-26;
-implementación = `TASK-1566`): la administración de créditos y capabilities de Globe **vive en Greenhouse** —
+**Dirección decidida — ADR-015** (`EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md`, Partially
+implemented: carril de fondeo VIVO y ejercido + retiro de las 4 caps ejecutado el 2026-07-26; KMS e
+identidades disjuntas por unidad quedan como hardening; implementación = `TASK-1566`): la administración de créditos y capabilities de Globe **vive en Greenhouse** —
 superficie en Greenhouse, autoridad en Globe, lane `sister-platform` (hoy `available` sólo en tenancy), **cuatro
 identidades disjuntas** (broker de administración **distinto** del reconciliador de tenancy; aprobador que firma y no
 muta; ejecutor que muta y **no puede firmar**, separados como **unidad de ejecución propia** porque dentro de un
