@@ -2,82 +2,68 @@
 
 > **Estado:** `hypothesis_only`
 > **Fecha:** 2026-07-26
-> **Owner:** Strategy + Wave + Commercial + Finance + Legal/IP + Operations
-> **Modelo relacionado:** [`WAVE_BUSINESS_MODEL_V1.md`](WAVE_BUSINESS_MODEL_V1.md)
-> **Método:** `efeonce-pricing-operator` + `efeonce-business-model-operator`
+> **Owner:** Strategy + Wave + Commercial + Finance
+> **Modelo de referencia:** [`WAVE_BUSINESS_MODEL_V1.md`](WAVE_BUSINESS_MODEL_V1.md)
+> **Método:** `efeonce-pricing-operator`
 
-Este documento prueba la arquitectura transversal de pricing sobre Wave. No aprueba precios, márgenes, claims,
-checkout ni venta general. Los importes, monedas, pisos, impuestos y reconocimiento deben vivir en Finance,
-catálogo, cotización y contrato aprobado.
+Este documento es exclusivamente la aplicación de pricing a las ofertas de Wave. No redefine sus familias,
+boundaries, ownership ni delivery models; esas decisiones viven en el modelo de Wave y su ADR. Tampoco aprueba
+precios, márgenes, claims, checkout ni venta general.
 
-## 1. Resultado de la prueba
+## 1. Alcance de pricing
 
-La arquitectura de Wave pasa el test de separación de capas:
+El pricing debe decidir, por oferta concreta:
 
-| Capa | Decisión Wave | Estado |
-|---|---|---|
-| Masterbrand / relación | Efeonce lidera la relación y el contrato | decidido |
-| Product service | cinco familias de Wave | decidido |
-| Delivery model | Productized Service, Managed Squad, Staff Augmentation, Implementation, Advisory, Platform-enabled Service | decidido como taxonomía |
-| Engagement | On-Going, On-Demand, Sample Sprint | decidido como taxonomía |
-| Operating mode | `efeonce-managed`, `co-operated`, `client-operated` cuando aplique | decidido como taxonomía |
-| Ecosystem composition | Wave sola o con Efeonce Digital/Kortex, Globe, Reach y Greenhouse | decidido por SOW/RACI |
-| Precio | métrica y arquitectura por oferta | hipótesis |
-| Cost-to-serve y margen | por familia × delivery × provider × cuenta | pendiente Finance |
-| Precio publicado / venta general | ninguno aprobado por este pack | bloqueado hasta gates |
+1. métrica de valor;
+2. unidad de cobro;
+3. packaging e inclusiones;
+4. revenue streams;
+5. cost drivers y margen;
+6. mínimos, overage y descuentos;
+7. versionado y approval gates;
+8. experimento de willingness-to-pay.
 
-## 2. Arquitectura de oferta por familia
+Los delivery models de Wave sólo se consideran como variables de costo, capacidad y riesgo comercial. No se vuelven a
+definir aquí.
 
-| Familia | Qué compra el cliente | Métrica de valor candidata | Unidad de cobro candidata | Revenue architecture inicial |
-|---|---|---|---|---|
-| Search Visibility 360 | visibilidad orgánica y operación SEO+AEO | scope/lane gobernado, mercado, property o resultado verificable | activation/diagnostic + fee recurrente por lane/capacity + add-ons gobernados | discovery → foundation/implementation → operating retainer → expansion |
-| Web Experience 360 | experiencia web para humanos, buscadores y agentes | scope/milestone, property, capability lane o operación continua | discovery + fixed implementation/milestone + operations retainer | assessment → build/rebuild → performance/accessibility operations → change orders |
-| Measurement & Analytics | instrumentación, calidad y lectura confiable de datos | property, data surface, event system, governance lane o capacidad | audit/implementation fee + governance/operations retainer + integrations/change orders | audit → implementation → measurement operations → expansion |
-| Agent Systems & Platforms | agente o sistema de agentes diseñado, integrado y operado | capability, governed deployment, workspace/use envelope o SLA | strategy/architecture + implementation + governance/base recurring + usage/pass-through controlado | discovery → build/deploy → managed operations + provider/usage guardrail |
-| Digital Automation & Integrations | workflows, APIs, pipelines e integraciones operables | workflow/integration lane, system boundary o transaction envelope | sprint/milestone + managed integration retainer + usage cuando sea medible | assessment → build → operations/support → change/expansion |
+## 2. Matriz de pricing por familia
 
-La métrica final debe demostrar valor y ser medible. Horas, prompts, tokens, piezas o artículos pueden existir como
-inputs internos de capacidad/costo, pero no son automáticamente la unidad pública de valor.
+| Familia | Métrica de valor candidata | Unidad de cobro candidata | Arquitectura de revenue a validar |
+|---|---|---|---|
+| **Search Visibility 360** | property/mercado, lane de operación, baseline de visibilidad o resultado verificable | diagnostic/activation + fee recurrente por lane/capacity + add-ons | discovery → foundation → operating retainer → expansión |
+| **Web Experience 360** | property, scope aceptable, milestone o lane de operación | discovery + implementation/milestone + operations retainer + change order | assessment → build/rebuild → operations → expansión |
+| **Measurement & Analytics** | property, data surface, event system o governance lane | audit/implementation fee + governance retainer + integrations/change orders | audit → implementation → measurement operations → expansión |
+| **Agent Systems & Platforms** | capability desplegada, governed deployment, workspace/use envelope o SLA | strategy/architecture + implementation + governance base + usage/pass-through controlado | discovery → build/deploy → managed operations → provider/usage guardrail |
+| **Digital Automation & Integrations** | workflow, integration lane, system boundary o transaction envelope | sprint/milestone + operations retainer + usage cuando sea medible | assessment → build → operations/support → change/expansión |
 
-## 3. Packaging recomendado para validar
+Estas son hipótesis de pricing, no decisiones aprobadas. La métrica final debe ser explicable, medible y crecer con el
+valor del cliente. Horas, piezas, artículos, prompts y tokens pueden ser inputs internos de costing, pero no deben ser
+la unidad pública principal si commoditizan el resultado.
 
-La arquitectura común propuesta es:
+## 3. Packaging a validar
+
+La hipótesis común de packaging es:
 
 ```text
-wedge de diagnóstico o assessment pagado
-→ core de implementación o productized service
-→ operación recurrente por lane/capacity/governance
-→ expansión por capability, property, mercado, workflow, provider o SLA
+wedge de diagnóstico pagado
+→ core de implementación o servicio productizado
+→ operación recurrente
+→ expansión por alcance, capacidad, mercado, workflow, provider o SLA
 ```
 
-| Paquete | Propósito | Forma de validación | No promete |
-|---|---|---|---|
-| **Wedge / Diagnostic** | reducir incertidumbre y producir baseline/decision brief | fixed fee o sprint acotado con aceptación | resultado de negocio fuera del control de Wave |
-| **Core / Foundation** | instalar la capability repetible | package fijo, milestone o implementation | alcance ilimitado o excepciones no cotizadas |
-| **Operating / Managed** | mantener operación, governance, telemetría y mejora | fee recurrente por servicio/lane/capacity | output ilimitado por fee fijo |
-| **Expansion / Add-on** | aumentar alcance, capacidad, mercados, integrations o SLA | add-on, change order, usage o tier | que una integración del ecosistema cambie ownership |
+| Paquete | Qué debe cobrar | Límite comercial |
+|---|---|---|
+| **Wedge / Diagnostic** | reducción de incertidumbre, baseline y decisión | no promete resultados fuera del control de Wave |
+| **Core / Foundation** | capability instalada con scope y aceptación | no incluye excepciones ni alcance ilimitado |
+| **Operating / Managed** | operación, governance, telemetría, soporte o capacidad reservada | no equivale a output ilimitado |
+| **Expansion / Add-on** | nueva capability, property, mercado, workflow, integración o SLA | debe conservar boundaries y change control |
 
-Los tiers sólo deben aparecer cuando exista evidencia de segmentos o willingness-to-pay distintos. Las fences válidas
+Los tiers sólo se crean cuando exista evidencia de segmentos o willingness-to-pay distintos. Las fences permitidas
 son valor, capacidad, riesgo, SLA, governance, rights o compromiso; no features artificiales.
 
-## 4. Delivery model × pricing mechanism
+## 4. Revenue architecture
 
-| Delivery | Mecanismo inicial | Compromiso que debe quedar explícito | Principal riesgo |
-|---|---|---|---|
-| Productized Service | fixed package / tier / add-on | scope, acceptance, exclusions, inputs y change rule | excepciones destruyen repetibilidad |
-| Managed Squad | monthly capacity fee + minimum term | roles, seniority, capacity, cadence, intake, RACI y rollover | cliente espera output ilimitado |
-| Staff Augmentation | rate/seat/capacity + term | calificación, disponibilidad, dirección del cliente y replacement | commoditización y accountability ambiguo |
-| Implementation | fixed fee / milestone + change order | scope, dependencies, acceptance y handoff | under-scoping y scope creep |
-| Advisory | fixed phase, day rate o retainer de acceso | decisiones, entregables, cadencia y límites | vender outputs como outcomes |
-| Platform-enabled Service | base recurring + service + usage/credits/pass-through | qué aporta la plataforma, quién opera, límites y provider fallback | margen opaco y dependencia de proveedor |
-
-Un mismo product service puede usar más de un delivery model, pero debe tener una cotización y SOW que conserven la
-separación. El delivery compuesto con Globe, Reach, Efeonce Digital/Kortex o Greenhouse no crea automáticamente una
-nueva línea de Wave.
-
-## 5. Revenue architecture mínima
-
-Para cada oferta y cotización se deben separar:
+Para cada oferta y cotización, separar:
 
 ```text
 discovery / activation
@@ -90,35 +76,33 @@ discovery / activation
 + optional performance component
 ```
 
-El pass-through debe declarar costo, markup, FX, impuestos, mínimos y cambios de provider. En Agent Systems & Platforms
-el cost-to-serve debe incluir observabilidad, evaluation, revisión humana, seguridad, incident support, compliance,
-retries, fallback y rebenchmark; no sólo tokens o consumo del modelo.
+Cada stream debe registrar `value_trigger`, `billing_unit`, `frequency`, `minimum_commitment`, `included`, `excluded`,
+`cost_driver`, `renewal_trigger`, `expansion_trigger`, `recognition_boundary` y `evidence`.
 
-## 6. Economics que Finance debe completar
+El pass-through debe declarar costo, markup, FX, impuestos, mínimos y cambios de provider. Para Agent Systems &
+Platforms, el costo debe incluir observabilidad, evaluación, revisión humana, seguridad, soporte de incidentes,
+compliance, retries, fallback y rebenchmark; no sólo tokens o consumo de modelo.
 
-El modelo debe calcularse por `family × offer × account × delivery_model × operating_mode × provider × cohort`:
+## 5. Economics y guardrails
 
-- fully loaded labor y capacidad reservada;
-- cost-to-serve, gross margin y contribution margin;
+Finance debe modelar cada oferta por `family × offer × account × delivery_model × provider × cohort`:
+
+- fully loaded cost y cost-to-serve;
+- gross margin y contribution margin;
 - utilization, realization, bench y delivery variance;
 - software, providers, compute, storage, support, QA, retries y reserve;
 - subcontractors, FX, DSO, working capital, refunds y bad debt;
 - sensibilidad base/downside/upside y piso de margen;
 - CAC/payback, GRR/NRR y expansión cuando exista muestra.
 
-No hay pricing defendible hasta que Finance reconcilie la aritmética y confirme el tratamiento de proyecto,
-recurrente, usage, pass-through, IP y créditos.
+No hay pricing defendible hasta que Finance reconcilie la aritmética y el tratamiento de proyecto, recurrente, usage,
+pass-through, IP y créditos.
 
-## 7. Governance de pricing
-
-Cada oferta debe versionar:
+Toda oferta debe versionar:
 
 ```yaml
 offer_id: TBD
 family: TBD
-delivery_model: TBD
-engagement: TBD
-operating_mode: TBD
 value_metric: TBD
 billing_unit: TBD
 minimum_commitment: TBD
@@ -133,38 +117,32 @@ quote_snapshot: required
 status: hypothesis_only
 ```
 
-Toda excepción necesita motivo, owner, impacto en margen, aprobación, compensación y expiración. Una actualización de
-catálogo no reescribe cotizaciones históricas. La propuesta al cliente debe mostrar precio total, mínimos, overage,
-dependencias, impuestos, renovación, cancelación y reembolso cuando corresponda.
+Toda excepción necesita motivo, owner, impacto en margen, aprobación, compensación y expiración. El catálogo no
+reescribe cotizaciones históricas. La propuesta debe mostrar precio total, mínimos, overage, dependencias, impuestos,
+renovación, cancelación y reembolso cuando corresponda.
 
-## 8. Experimentos de validación
+## 6. Validación de pricing
 
-| Hipótesis | Experimento | Métrica primaria | Threshold / stop condition | Owner |
-|---|---|---|---|---|
-| El wedge reduce fricción comercial | 3–5 discovery pagados por familia prioritaria | conversión discovery → core | stop si el discovery no produce decisión/next step repetible | Commercial + práctica |
-| La métrica propuesta refleja valor | entrevistas + cotizaciones comparables | comprensión y willingness-to-pay | revisar si el comprador sólo compara horas/piezas | Strategy + Commercial |
-| El core es repetible | 3 entregas con scope y aceptación equivalentes | variance de esfuerzo, tiempo y margen | no productizar si la excepción domina el delivery | Operations + Finance |
-| El recurring tiene obligación real | piloto con cadence, SLA y QBR | renewal/expansion signal y realization | no llamar recurring si compra sólo disponibilidad informal | Practice + Commercial |
-| El delivery model protege margen | comparar productized, squad y augmentation | contribution margin y delivery variance | bloquear si el modelo requiere bench no financiado | Finance + Operations |
-| Agent usage es controlable | sandbox con meter, cap, alert y fallback | costo por caso y bill shock | no vender usage sin stop-loss y dispute path | Wave + Finance + Architecture |
+| Hipótesis | Experimento | Métrica primaria | Stop condition |
+|---|---|---|---|
+| El wedge reduce fricción | 3–5 discovery pagados por familia prioritaria | conversión discovery → core | no hay decisión/next step repetible |
+| La métrica refleja valor | entrevistas + cotizaciones comparables | comprensión y willingness-to-pay | el comprador sólo compara horas/piezas |
+| El core es repetible | 3 entregas con scope equivalente | variance de esfuerzo, tiempo y margen | las excepciones dominan el delivery |
+| El recurring tiene obligación real | piloto con cadence, SLA y QBR | renewal/expansion signal y realization | sólo se compra disponibilidad informal |
+| La arquitectura protege margen | escenarios por oferta y delivery | contribution margin y delivery variance | bench o provider cost no financiado |
+| Usage de agentes es controlable | sandbox con meter, cap, alert y fallback | costo por caso y bill shock | no existe stop-loss o dispute path |
 
-Mientras no existan muestras y gates cerrados, el estado correcto de las ofertas es `approved_for_validation` como
-máximo; el modelo portfolio completo permanece `hypothesis_only`.
+## 7. Gates de aprobación
 
-## 9. Gates pendientes para `Commercially approved`
-
-- [ ] ICP, buyer, trigger, alternativa desplazada y claim controlable por familia.
-- [ ] Una métrica de valor y unidad de cobro elegida por oferta.
-- [ ] Packaging wedge/core/operating/expansion con inclusiones y exclusiones.
-- [ ] Cost-to-serve y margen por delivery model, provider y operating mode.
-- [ ] Mínimos, capacidad, overage, rollover, pause, refund y stop-loss.
-- [ ] Rate card, discount band, effective date, FX y quote snapshot.
-- [ ] RACI y SOW para cualquier composición con otras capabilities de Efeonce.
-- [ ] IP, rights, privacy, provider terms, liability y fallback.
-- [ ] Evidencia de repetibilidad, delivery variance y renovación.
-- [ ] Aprobación Strategy/Commercial/Finance/Legal/Operations según el riesgo.
+- [ ] Métrica de valor y unidad de cobro elegida por oferta.
+- [ ] Packaging con inclusiones, exclusiones, mínimo, overage, pause, refund y change rule.
+- [ ] Cost-to-serve, margen y sensibilidad cerrados por oferta y delivery model.
+- [ ] Rate card, discount band, effective date, FX y quote snapshot definidos.
+- [ ] Provider pass-through, credits, usage y stop-loss gobernados cuando apliquen.
+- [ ] Evidencia de repetibilidad, willingness-to-pay y renovación.
+- [ ] Aprobación Strategy/Commercial/Finance/Legal/Operations según riesgo.
 
 ## Verdict
 
-`hypothesis_only` — Wave tiene una arquitectura de pricing coherente y testeable, pero todavía no tiene evidencia,
-economics ni aprobaciones suficientes para publicar tarifas o afirmar que una familia está comercialmente aprobada.
+`hypothesis_only` — la arquitectura de pricing está definida para validación, pero todavía no habilita tarifas
+publicadas, claims comerciales ni venta general.
