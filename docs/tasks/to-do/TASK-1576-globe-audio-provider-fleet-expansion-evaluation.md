@@ -172,6 +172,13 @@ Reglas obligatorias:
 - [ ] La UI nunca decide provider por nombre hardcodeado ni llama Fal directamente.
 - [ ] Las rutas no certificadas permanecen Lab/eval-only o policy-blocked.
 
+## Library Discovery — 2026-07-26
+
+- **Adopt:** Fal’s official server-side TypeScript client only inside `creative-runner`/provider adapters; no provider SDK in React ([Fal client setup](https://fal.ai/docs/documentation/model-apis/inference/client-setup)).
+- **Evaluate:** WaveSurfer, Remotion and Mediabunny are consumer/preview tools, not provider capabilities; provider evaluation must remain route/eval/rights based.
+- **Do not adopt:** a marketplace/editor SDK that hides model identity, cost, terms or raw upload behavior behind a UI component.
+- **Decision gate:** new audio routes require contract/schema, eval evidence, terms digest, promotion and rollback before availability.
+
 ## Scope
 
 ### Slice 1 — Fleet audit and route matrix

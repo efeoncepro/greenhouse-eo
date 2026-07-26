@@ -185,6 +185,13 @@ Reglas obligatorias:
 - [ ] Provider-specific fields permanecen dentro del adapter.
 - [ ] Credits, rights, consent, idempotency, reconciliation y audit evidence están gobernados server-side.
 
+## Library Discovery — 2026-07-26
+
+- **Adopt:** no browser media engine in the contract layer; reuse the existing FFmpeg media-derivatives/QC workers and governed playback projections.
+- **Provider seam:** use the server-side Fal client/adapter; Fal explicitly requires a server proxy for browser callers ([client setup](https://fal.ai/docs/documentation/model-apis/inference/client-setup)).
+- **UI consumer:** WaveSurfer belongs to `TASK-1577`, never to the command or provider contract.
+- **Do not adopt:** Temporal/Trigger/Inngest or another orchestration control plane; Globe already owns commands, jobs, idempotency, spend and reconciliation.
+
 ## Scope
 
 ### Slice 1 — Audio edit brief and capability

@@ -152,6 +152,13 @@ Reglas obligatorias:
 - [ ] No se cambia el formato de `audio.waveform-peaks` sin ADR.
 - [ ] Existe evidencia runtime con audio real y derivative ausente.
 
+## Library Discovery — 2026-07-26
+
+- **Adopt:** `wavesurfer.js` + `@wavesurfer/react` for rendering governed pre-decoded peaks, regions, timeline and hover.
+- **Boundary:** WaveSurfer is a projection/interaction layer; the derivative reader, playback state, asset authority and Blob URL lifecycle remain Globe-owned.
+- **Do not adopt:** browser-side FFmpeg or full audio decoding as the default path; use `audio.waveform-peaks` and the existing media-derivatives worker.
+- **Sources:** [WaveSurfer docs](https://wavesurfer.xyz/docs/), [pre-decoded peaks](https://wavesurfer.xyz/docs/), [timeline plugin](https://wavesurfer.xyz/docs/plugins/timeline/).
+
 ## Scope
 
 ### Slice 1 — Contract and reader

@@ -177,6 +177,31 @@ evidencia, no una garantía de marketing.
   challengers vía Fal para SFX, música, audio-to-audio, restore y stems sólo después de eval, licencia, canary y
   promotion. `TASK-1577` consume ambos contratos dentro de `TASK-1568` con selección waveform/transcript, layer
   rail, compare A/B y recovery; no crea selector de provider, segundo player ni DAW paralelo.
+
+### Library discovery and adoption policy — 2026-07-26
+
+La revisión de librerías del mercado deja una estrategia de primitives, no un editor monolítico:
+
+| Superficie | Adopción | Uso gobernado |
+|---|---|---|
+| Imagen | `react-konva` + `perfect-freehand` | Focus/compare, zoom/pan y máscara; geometry normalizada hacia `image-edit` |
+| Audio | `wavesurfer.js` + `@wavesurfer/react` | Peaks predecodificados, regions, timeline, hover y transcript selection; playback sigue en Globe |
+| Video player | Native `<video>` V1; Vidstack sólo spike React 19 | Playback, focus, captions y controls sin segundo source of truth |
+| Video composition | Remotion sólo futuro | Multi-shot, captions, overlays y rendering; no semantic edit V1 |
+| Media metadata | Mediabunny opcional | Inspección/preview browser; nunca autoridad ni output canónico |
+| Processing | FFmpeg server-side existente | Derivatives, mix, QC y composición determinista |
+| Intake | Uppy/Tus sólo cuando exista uploader gobernado | Upload resumable detrás de BFF/GCS/asset governance |
+| Providers | Fal client server-side | `creative-runner`/adapters; nunca SDK, key o raw provider URL en React |
+
+Fuentes primarias: [Konva React](https://konvajs.org/docs/react/index.html), [perfect-freehand](https://www.npmjs.com/package/perfect-freehand), [Fabric.js](https://fabricjs.com/docs/core-concepts/), [WaveSurfer](https://wavesurfer.xyz/docs/), [Vidstack](https://vidstack.io/docs/player/), [Remotion Editor Starter](https://www.remotion.dev/docs/buy-a-video-editor), [Mediabunny](https://mediabunny.dev/guide/introduction), [Uppy React](https://uppy.io/docs/react/) y [Fal client](https://fal.ai/docs/documentation/model-apis/inference/client-setup).
+
+Reglas de adopción:
+
+- Una librería sólo resuelve interacción, representación, preview o upload; nunca se convierte en source of truth de Globe.
+- No se combinan dos canvas engines ni dos timelines para la misma superficie.
+- Todo spike debe validar React 19, keyboard, focus restoration, reduced motion, `390px`, Blob URL cleanup, bundle/performance y license posture.
+- Los providers se agregan por route contract, eval, rights attestation, promotion y rollback; no por una UI o marketplace SDK.
+- FFmpeg, governance, lineage, credits, rights, commands/readers y reconciliation permanecen server-side.
 - `TASK-1524` — **Commercial Login Cinematic Threshold.** Evoluciona la puerta anónima internal-only a una
   apertura comercial poster-first `One Idea, Many Forms`, con master desktop/mobile, pausa, reduced motion,
   progressive enhancement y OAuth/session existentes intactos; promoción sigue gateada por `TASK-1521/1480`.

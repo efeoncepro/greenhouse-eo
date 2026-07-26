@@ -204,6 +204,13 @@ Reglas obligatorias:
 <!-- ZONE 2 — PLAN MODE (se completa al tomar la task) -->
 <!-- ZONE 3 — EXECUTION SPEC -->
 
+## Library Discovery — 2026-07-26
+
+- **Adopt:** no editor library in the backend; semantic temporal scope, chainability and route contracts remain Globe domain primitives.
+- **Evaluate:** Remotion only for a future composition/rendering lane, not for provider editing or stateful Omni continuation ([Player](https://www.remotion.dev/docs/player/integration)).
+- **Evaluate:** Mediabunny for non-authoritative browser metadata/preview only; FFmpeg remains server-side for deterministic derivatives.
+- **Do not adopt:** a generic React editor whose timeline or autosave becomes a second source of truth.
+
 ## Scope
 
 ### Slice 1 — Capability and edit brief

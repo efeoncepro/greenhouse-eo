@@ -222,6 +222,12 @@ Reglas obligatorias:
 <!-- ZONE 2 — PLAN MODE (se completa al tomar la task) -->
 <!-- ZONE 3 — EXECUTION SPEC -->
 
+## Library Discovery — 2026-07-26
+
+- **Adopt:** existing Cinematic Canvas/player/timeline primitives; use native video first and evaluate Vidstack only through a React 19 compatibility spike.
+- **Evaluate later:** Remotion Timeline/Editor Starter if the product expands from semantic shot edits to multi-track composition, captions and rendering ([Editor Starter](https://www.remotion.dev/docs/buy-a-video-editor)).
+- **Do not adopt:** a full NLE shell, independent autosave or client-side FFmpeg; the UI submits neutral `VideoEditBrief` data only.
+
 ## Scope
 
 ### Slice 1 — Cinematic Canvas handoff

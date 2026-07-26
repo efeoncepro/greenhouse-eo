@@ -207,6 +207,13 @@ con el Audio Edit Studio. Esta task conserva exclusivamente playback, waveform, 
 - Visual scorecard: `docs/ui/reviews/TASK-1568-globe-sonic-canvas-audio-experience.scorecard.json`
 - Quality threshold: `average >= 4.2; floor >= 3; fidelity/template resistance >= 4`; el estándar premium vigente eleva el gate final a average 4.5 y floor 4.
 
+## Library Discovery — 2026-07-26
+
+- **Adopt:** `wavesurfer.js` for waveform/seek/regions, wired to the single `AudioPlaybackProvider` and `AudioDock`.
+- **Evaluate:** Vidstack in an isolated spike for accessible audio/video controls; current Globe React 19 requires compatibility verification before adoption ([docs](https://vidstack.io/docs/player/), [React 19 issue](https://github.com/vidstack/player/issues/1608)).
+- **Do not adopt:** a second player, playlist engine or editor shell; WaveSurfer must not own global playback.
+- **Sources:** [WaveSurfer plugins](https://wavesurfer.xyz/docs/), [Vidstack Player](https://vidstack.io/docs/player/).
+
 ## Scope
 
 ### Slice 1 — Playback foundation

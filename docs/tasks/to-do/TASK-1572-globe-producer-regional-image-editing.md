@@ -221,6 +221,13 @@ Reglas obligatorias:
 - Risk controls: blocked by `TASK-1497`, capability-gated, estimate/approval vigente, no bytes en browser y rollback
   ocultando la acción sin alterar datos.
 
+## Library Discovery — 2026-07-26
+
+- **Adopt:** `react-konva` + `perfect-freehand` for the image mask interaction, with normalized coordinates, device-pixel-ratio handling and undo/redo owned by the Globe surface.
+- **Alternative:** Fabric.js only if later requirements include object layers, clipping stacks or serialized composition; do not add both canvas engines.
+- **Boundary:** the client produces a mask reference/geometry and edit intent; server-side governance, rights, provider routing and output lineage remain authoritative.
+- **Sources:** [Konva React](https://konvajs.org/docs/react/index.html), [Konva Transformer](https://konvajs.org/docs/react/Transformer.html), [Fabric](https://fabricjs.com/docs/core-concepts/).
+
 ## Scope
 
 ### Slice 1 — Focus Canvas handoff y modos de edición

@@ -192,6 +192,13 @@ Reglas obligatorias:
 - Scorecard: `docs/ui/reviews/TASK-1577-globe-producer-audio-edit-studio.scorecard.json`.
 - Threshold: `average >= 4.2; floor >= 3; fidelity/template resistance >= 4`.
 
+## Library Discovery — 2026-07-26
+
+- **Adopt:** `wavesurfer.js` + `@wavesurfer/react` for waveform, regions, timeline, hover and transcript-aligned selection ([docs](https://wavesurfer.xyz/docs/), [React wrapper](https://github.com/katspaugh/wavesurfer.js/discussions/3452)).
+- **Player:** keep the single `AudioPlaybackProvider`; evaluate Vidstack only in a compatibility spike and never let the waveform create competing playback.
+- **Optional later:** Mediabunny for local metadata/preview; not for canonical output or governance.
+- **Do not adopt:** a full DAW/editor SDK, browser FFmpeg or provider-specific UI controls.
+
 ## Scope
 
 ### Slice 1 — Sonic Canvas handoff

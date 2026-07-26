@@ -155,6 +155,13 @@ Reglas obligatorias:
 - [ ] Existe evidencia runtime con video real y derivative ausente/pending.
 - [ ] No se introduce filmstrip/scene derivative sin contrato y ADR aplicables.
 
+## Library Discovery — 2026-07-26
+
+- **Adopt:** existing server-side FFmpeg/media-derivatives pipeline as the canonical source for poster, preview, metadata and transcode.
+- **Evaluate:** Mediabunny only for lightweight browser metadata/codec inspection when it does not bypass governed retrieval ([docs](https://mediabunny.dev/guide/introduction)).
+- **Evaluate:** Vidstack only after a React 19, Blob URL, focus and reduced-motion spike; no provider/player dependency is accepted by documentation alone.
+- **Do not adopt:** `ffmpeg.wasm` as the canonical transformer; browser outputs cannot become Globe assets without governance.
+
 ## Scope
 
 ### Slice 1 — Video projection contract

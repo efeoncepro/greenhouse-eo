@@ -208,6 +208,12 @@ Reglas obligatorias:
 - Visual scorecard: `docs/ui/reviews/TASK-1570-globe-cinematic-canvas-video-experience.scorecard.json`.
 - Quality threshold: `average >= 4.5; floor >= 4; hierarchy/surface economy/visual impact/fidelity/template resistance >= 4.5`.
 
+## Library Discovery — 2026-07-26
+
+- **Adopt:** native governed `<video>` plus Globe playback context for V1; optionally evaluate Vidstack behind a compatibility spike.
+- **Evaluate later:** Remotion Player/Timeline only if Globe expands into multi-shot composition, captions, overlays or deterministic rendering; it is not required for semantic video edit ([Remotion](https://www.remotion.dev/), [Editor Starter](https://www.remotion.dev/docs/buy-a-video-editor)).
+- **Do not adopt:** a monolithic React video editor or independent timeline source of truth.
+
 ## Scope
 
 ### Slice 1 — Shared playback context

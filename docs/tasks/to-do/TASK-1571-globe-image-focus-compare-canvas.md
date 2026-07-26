@@ -145,6 +145,12 @@ Ready, loading, preview pending, no preview, retrieval error, permission denied,
 - Edit handoff: la acción `Editar imagen`/`Editar zona` puede vivir en el inspector, pero el Edit Rail, máscara,
   estimate y ejecución pertenecen a `TASK-1572`; no duplicar el viewer ni abrir un modal dentro del dialog.
 
+## Library Discovery — 2026-07-26
+
+- **Adopt:** `react-konva` for zoom/pan/selection/compare layers and `perfect-freehand` for a smooth mask brush ([React Konva](https://konvajs.org/docs/react/index.html), [perfect-freehand](https://www.npmjs.com/package/perfect-freehand)).
+- **Alternative:** Fabric.js is viable if the surface becomes a general object/composition editor, but it must not be combined with Konva ([Fabric core concepts](https://fabricjs.com/docs/core-concepts/)).
+- **Boundary:** canvas state exports normalized mask geometry/reference metadata to the governed command; it never uploads directly to a provider.
+
 ## Scope
 
 ### Slice 1 — Feed-to-focus handoff
