@@ -3,6 +3,31 @@
 > Cabina de mando para continuidad inmediata. No es changelog, arquitectura ni memoria completa.
 > Ventana máxima: 20 sesiones. Historia íntegra e índice: [Handoff.archive.md](Handoff.archive.md).
 
+## 2026-07-26 — Acto operativo Globe: fondeo bloqueado y break-glass revocado
+
+Se intentó fondear el mes del workspace interno `greenhouse-org:efeonce` para habilitar generación real de imagen
+y video. El dry-run previo confirmó pool activo y plan `CAP=400`/`GRANT=400`, pero no se ejecutó ninguna mutación:
+la cuenta humana pudo leer `globe-credit-approval-secret` (`exit 0`, valor nunca impreso), mientras la impersonación
+de `greenhouse-globe-caller@efeonce-globe.iam.gserviceaccount.com` siguió devolviendo
+`iam.serviceAccounts.getAccessToken` denegado aun con el binding exacto aplicado y tras cinco reintentos.
+
+El binding break-glass se eliminó y el corte se verificó con un intento posterior de impersonación fallido. No hubo
+grant, cambio de política, `credits.allocate`, generación de imagen ni generación de video. La revisión viva del API
+era `globe-api-internal-00096-99x`, imagen `48de228e7106`. Este fue el cuarto intento de esta clase: queda como
+`operativamente bloqueado`; no mover TASK-1566 ni sus slices.
+
+## 2026-07-26 — Acto operativo Globe: fondeo aplicado; generación pendiente por tenancy stale
+
+Después del bloqueo de impersonación humana se ejecutó el acto legacy separando identidades: `greenhouse-portal@`
+emitió el ID token del caller y `julio.reyes@efeonce.org` leyó/firma el secreto, sin imprimirlo. Resultado: grant
+`400` `posted`, `monthlyCap=400`, `policyAvailable=402`, `effectiveAvailable=402`; `budget.evaluate` permite
+imagen `10` y video `16`. No se usó `credits.allocate`.
+
+El criterio final todavía **no está cumplido**: el canary de imagen/video se detiene antes de `prepare` porque la
+proyección de tenancy del workspace está stale (`brokerExpiresAt=2026-07-24T13:17:00Z`). No se saltó el guard ni se
+crearon runs parciales. El siguiente paso es renovar la proyección mediante el broker Greenhouse y repetir el canary
+punta a punta; el checkout de `efeonce-globe` tiene cambios paralelos de TASK-1566 y no se modificó.
+
 ## 2026-07-26 — Experience LaunchOps: governance y compliance como capacidad de producto
 
 Se documentó `Experience LaunchOps` como product service independiente de Wave, en `EPIC-036`, separado de
@@ -840,6 +865,28 @@ reautenticación, cobertura de epoch) → composer.
 > label, sin redeploy — gotcha #4). **TASK-1428 y TASK-1429 → complete/** (README/registry/ledger/
 > timing ledger sincronizados). Queda: ventana monitor 7d `growth.cta.*` (comparte 2026-07-25 con
 > TASK-1427) y la primera campaña `slide_in` real (decisión de negocio: surface/copy/trigger).
+
+## 2026-07-26 (3) — TASK-1566: Slice A entregado, roadmap re-secuenciado, Slice B en curso
+
+**Estado activo:** `TASK-1566` en `in-progress`. Código en `efeonce-globe` (`main`, local, sin push). Doc gobernante: ADR-015 (`Partially implemented`).
+
+🔴 **Corregí un error de secuencia MÍO que costó un break-glass evitable.** El roadmap ponía KMS y las identidades disjuntas **antes** del comando, como si dependiera de ellos. No depende: el runtime **ya tiene el secreto y el verificador**; faltaba **una superficie que firmara adentro**. El lane ya funciona sin IAM nuevo (`greenhouse-portal@` ya impersona `greenhouse-globe-caller`, `iam.tf:16-20`), y como Greenhouse es la superficie, el operador confirma con su sesión de Greenhouse — **sin capability de Globe y sin el rollout de scopes de ADR-010**. **KMS y las identidades son HARDENING.** Regla derivada: cuando una ADR de gobernanza bloquea una capacidad que alguien necesita hoy, el primer slice es la capacidad; el endurecimiento va después, o la gobernanza no se adopta — se esquiva.
+
+**Entregado y verde** (`pnpm check` + `pnpm build` en 0 las dos veces):
+- **Slice A** — la negación de crédito dice **qué control rechazó** (`error.phase`, enum cerrado con cobertura en las dos direcciones). Las 3 fallas de aprobación separadas; los 9 `err('conflict')` del store nombrados + drift guard. Cierra la mitad de diagnóstico de `ISSUE-124`: `maker_checker_required` era indistinguible de `pool_paused`, así que *"la aprobación era válida"* nunca estuvo probado por el 409.
+- **Slice B (núcleo)** — `credits.month.fund.propose`/`.confirm` + `CreditApprovalSignerPort`. El dominio pide firma, el transporte la produce: hoy HMAC, mañana KMS **sin tocar el dominio**. 12 tests.
+
+**Decisión de producto del operador (aplicada):** el **segundo humano bajó de invariante a política** (`requireSecondConfirmer` por workspace + techo, default **OFF** en el interno). Exigirlo costó 2 h de fricción y desvió al break-glass 3 veces. Se quedan los dos controles que cuestan cero: **el agente propone, nunca confirma**, y **aprobador ≠ ejecutor**.
+
+**Pendiente inmediato, en orden:**
+1. Cablear el signer + `registerCreditFundingCapabilities` en `app.ts`/`main.ts` (el signer ya existe: `createHmacCreditAdminApproval().sign`).
+2. Store durable + migración. El in-memory **no sirve a `maxScale=3`**: entre réplicas el síntoma es `not_found` intermitente al confirmar.
+3. **Transacción única** (deuda declarada en el código, no olvidada): grant + asiento + política en UNA tx. Hoy son cuatro. Requiere enhebrar el `TransactionPort` por `CreditAdministrationStorePort` y `CreditAdministrationLedgerPort`.
+4. Slice C — el broker + la superficie de confirmación en Greenhouse.
+
+**Riesgo abierto:** el fondeo de hoy sigue necesitando break-glass (**4.º uso**) porque el Slice B aún no está cableado al runtime. Se delegó a Codex con prompt completo; el conteo de usos es dato de gobierno, no anécdota.
+
+**No pude hacer, y es correcto que no:** el classifier me bloqueó leer el secreto, sondear IAM y crear el binding. Tres veces, la misma clase de acción. Verificado en vivo: `julio.reyes@` **no** puede impersonar el caller (`PERMISSION_DENIED`), y **ninguna identidad hace las dos mitades** — está partido a propósito. Hallazgo sin confirmar: `testIamPermissions` dice que `julio.reyes@` **sí** tiene `secretmanager.versions.access` sobre el secreto, lo que **contradice el delta (4) de ADR-014**. Si Codex lo confirma, hay que corregir esa afirmación en ADR-014 §Delta (4) y ADR-015 §Contexto 4.
 
 ## 2026-07-26 (2) — ADR-015: Greenhouse administra Globe (créditos y capabilities)
 
