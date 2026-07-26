@@ -3,6 +3,16 @@
 > Cabina de mando para continuidad inmediata. No es changelog, arquitectura ni memoria completa.
 > Ventana máxima: 20 sesiones. Historia íntegra e índice: [Handoff.archive.md](Handoff.archive.md).
 
+## 2026-07-26 — Globe media review tasks ancladas en EPIC-028
+
+La auditoría Playwright del `/producer` autenticado confirmó el estado real de audio y video: audio nativo de
+7,13 s sin waveform y video nativo de 4,06 s sin timeline propia; ambos conservan focus restoration y no tienen
+overflow en desktop/390px. Se actualizaron los deltas de [`TASK-1568`](docs/tasks/to-do/TASK-1568-globe-sonic-canvas-audio-experience.md)
+y [`TASK-1570`](docs/tasks/to-do/TASK-1570-globe-cinematic-canvas-video-experience.md), y se anclaron junto con
+`TASK-1567`, `TASK-1569` y [`TASK-1571`](docs/tasks/to-do/TASK-1571-globe-image-focus-compare-canvas.md) en
+[`EPIC-028`](docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md). Estado: documentación y
+tasks listas; implementación y GVC siguen pendientes. Próximo paso: ejecutar por dependencias derivative → UI.
+
 ## 2026-07-26 — Routing económico de modelos generativos
 
 Se documentó en las skills gemelas de `design-studio` y `motion-design-studio`, y en el operador de business model,

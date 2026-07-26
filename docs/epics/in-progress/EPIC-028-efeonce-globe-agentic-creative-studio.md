@@ -160,6 +160,17 @@ evidencia, no una garantía de marketing.
 - `TASK-1523` — **Creative Suite Experience Logic and Information Architecture.** Policy ui-platform que
   contractualiza el Creative Loop común, la relación Producer prompt-first ↔ Workbench brief-first, el rol
   agentic `propose→approve→execute→judge` y los gates humanos, sin crear backend ni runtime paralelo.
+- **Media review specialization — auditada en el Producer React real con Playwright (2026-07-26).**
+  [`TASK-1567`](../../tasks/to-do/TASK-1567-globe-audio-waveform-derivative-playback-projection.md) posee la proyección gobernada de waveform/duración/preview de audio y estados degradados;
+  [`TASK-1568`](../../tasks/to-do/TASK-1568-globe-sonic-canvas-audio-experience.md) extiende el audio nativo a
+  Sonic Canvas con playback único, AudioDock contextual, keyboard y reduced motion. [`TASK-1569`](../../tasks/to-do/TASK-1569-globe-video-derivative-playback-projection.md) posee la
+  proyección de poster/preview transcode/duración/aspect ratio/audio presence de video;
+  [`TASK-1570`](../../tasks/to-do/TASK-1570-globe-cinematic-canvas-video-experience.md) extiende el video nativo
+  a Cinematic Canvas con timeline real, estados de buffering y MediaDock. Finalmente,
+  [`TASK-1571`](../../tasks/to-do/TASK-1571-globe-image-focus-compare-canvas.md) extiende el viewer de imagen a
+  Focus Canvas y compare condicionado por lineage. Las cinco tasks conservan el shell/feed/composer actual,
+  consumen contratos gobernados y no crean una galería paralela; `TASK-1568` depende de `TASK-1567`,
+  `TASK-1570` de `TASK-1569` y `TASK-1571` del ownership vigente de feed/viewer de `TASK-1559`.
 - `TASK-1524` — **Commercial Login Cinematic Threshold.** Evoluciona la puerta anónima internal-only a una
   apertura comercial poster-first `One Idea, Many Forms`, con master desktop/mobile, pausa, reduced motion,
   progressive enhancement y OAuth/session existentes intactos; promoción sigue gateada por `TASK-1521/1480`.
