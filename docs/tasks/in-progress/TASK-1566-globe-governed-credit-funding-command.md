@@ -702,9 +702,17 @@ ajenos). **Verificado después: cero locks advisory, cero sesiones activas.**
 (`credit-administration-store.ts:42-43`). O sea: la transacción externa tiene el lock advisory y desde
 otra conexión se pide trabajo sobre el mismo agregado.
 
-**Sólo se ejerce cuando el plan trae `monthlyCapAfter`** — que es justamente lo único que hace útil al
-fondeo, como demostró el plan legible. Por eso ninguno de los seis defectos anteriores lo destapó: los
-intentos morían antes.
+⚠️ **HIPÓTESIS REFUTADA — leer antes de escribir el fix.** Se supuso que `readState` era el único
+culpable, porque ese camino sólo corre cuando el plan trae `monthlyCapAfter`. **Falso:** un `confirm`
+**sin** `monthlyCap` (grant puro, 50 créditos, propuesta `4f9f82af`) se colgó **igual**, y volvió a
+dejar el lock retenido — reproducido y medido. O sea hay **al menos un segundo acceso al pool** dentro
+de la transacción, en el camino del grant, y `readState` no es condición necesaria.
+
+**Localizar ese segundo acceso ANTES de escribir el fix.** Arreglar sólo `readState` va a parecer que
+funciona hasta que alguien confirme sin subir el tope — que es exactamente el modo de falla que
+produjo esta cadena entera. Pista medida: el backend que retiene toma **tres** claves advisory
+distintas en la misma transacción (`88728424` = crédito del workspace, más otras dos), así que el
+inventario de quién bloquea qué es el punto de partida.
 
 **Cerrarlo de verdad** es lo que la propia task ya dictaminó: *"merece una pasada propia, no la cola de
 otra sesión"* — enhebrar `GlobeQueryable` por ~20 métodos del archivo más denso del repo, con locks

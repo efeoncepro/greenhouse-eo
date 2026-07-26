@@ -121,6 +121,9 @@ despues: cero locks, cero sesiones activas. **Si el (7) se vuelve a ejercer, el 
 
 🔴 **El (7) NO se intento**: exige enhebrar `GlobeQueryable` por ~20 metodos del archivo mas denso del
 repo, en el camino del dinero. La propia task ya lo habia dictaminado como pasada propia.
+⚠️ **Y una hipotesis quedo REFUTADA:** no basta con `readState`. Un `confirm` SIN `monthlyCap` —el
+camino que no lo llama— se colgo igual. Hay al menos un segundo acceso al pool dentro de la
+transaccion; localizarlo es el punto de partida, no arreglar `readState` y darlo por cerrado.
 Higiene pendiente: 2 propuestas quedaron en `confirmed` y el TTL solo vence las `proposed`, asi que no
 se terminalizan solas (se conecta con TASK-1469).
 
