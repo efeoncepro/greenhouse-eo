@@ -3,7 +3,66 @@
 > Cabina de mando para continuidad inmediata. No es changelog, arquitectura ni memoria completa.
 > Ventana máxima: 20 sesiones. Historia íntegra e índice: [Handoff.archive.md](Handoff.archive.md).
 
-## 2026-07-26 — Canary real Globe: bloqueado en runner y corte IAM incompleto
+## 2026-07-26 — ESTADO VIGENTE de Globe (consolida el hilo del día; las entradas de abajo son narrativa superada)
+
+> **Leer sólo esta para saber dónde está Globe.** Abajo hay 6 entradas del mismo hilo de hoy, escritas por dos
+> agentes con convenciones de inserción distintas (una prepende, la otra ancló al vecino temático), y **se
+> contradicen leídas de arriba hacia abajo**: una dice "fondeo bloqueado, no hubo grant" y otra "fondeo aplicado,
+> grant 400 posted". Las dos fueron ciertas en su momento. **Esta entrada gana.**
+
+**Resuelto y verificado hoy:**
+
+- **Fondeo del mes: LISTO.** Grant `400` `posted`, `monthlyCap=400`, `policyAvailable=402`; `budget.evaluate`
+  permite imagen `10` y video `16`. Sin `credits.allocate` (que no fondea) y sin SQL.
+- **`ISSUE-126` — sangrado cerrado y verificado en runtime.** La reconciliación de tenancy llevaba 2 días fallando
+  cada 5 min con su scheduler en `ENABLED` (`globe_tenancy_capability_invalid`: tarball `file:` vendorizado con 51
+  capabilities vs 65 vivas, drift disparado por el rollout de scopes de ADR-010). Re-vendorizado + guard probado en
+  rojo + `ops-worker` desplegado ⇒ dos reconciles consecutivos `done` (3776 ms y 1351 ms) contra fallos de 10-62 ms.
+  **La proyección quedó verificada DIRECTAMENTE** (`brokerState=active`, `brokerExpiresAt=2026-07-26T11:42:00Z`,
+  versión 4) — eso cierra lo que estaba declarado como inferido.
+- **`globe-api-internal` en revisión `00097-s58`** (imagen `10fd5f14`, ancestría verificada, perímetro anónimo → 403):
+  trae la **fase de negación de crédito** (TASK-1566 Slice A) y el **comando gobernado + signer port** (Slice B).
+
+**Bloqueo vigente — el canary, y ya no es por créditos ni por tenancy:** el `execute` de imagen terminó
+`state=failed`, `failureReason=runner_error`, `spentCredits=0`, reserva de 10 liberada, cero output (experimento
+`64a32bfd-d46f-4724-b8a0-8e6db5d0db78`). Video no se ejecutó, correctamente, para no gastar a ciegas.
+**Y la ventana de logs del API estaba VACÍA.** Arreglado en `efeonce-globe` (`adebdb0`, local sin desplegar): el
+fallo no-clasificable ahora se reporta al servidor por un port inyectado, con `reasonShape` distinguiendo "el
+adapter no puso `reason`" de "puso uno malformado" — sin filtrar `message`, `stack` ni body. **El próximo canary sí
+va a dejar rastro; hace falta desplegar el API para que aplique.**
+
+🔴 **Corrección de seguridad a lo que dice la entrada de abajo:** el corte del break-glass **NO** falla porque
+`roles/owner` confiera impersonación. `julio.reyes@efeonce.org` tiene `roles/owner` en `efeonce-globe` **y aun así
+`iam.serviceAccounts.getAccessToken` fue DENEGADO** — verificado dos veces hoy. Owner no confiere ese permiso; lo
+que confiere es `setIamPolicy`, o sea la capacidad de **auto-otorgarse** el binding. La diferencia cambia la
+conclusión: **el corte SÍ sirve** — retira el permiso permanente, y cualquier re-otorgamiento es un cambio de IAM
+nuevo, logueado y atribuible. El control es **detección y atribución**, no prevención. Es el mismo patrón que el
+maker-checker de ADR-015: cuando el aprobador es el dueño, la prevención se cambia por detección.
+**Anomalía sin resolver:** el binding se aplicó, Owner existe, y `getAccessToken` igual falló tras 5 reintentos.
+Si hay una deny policy o restricción de organización activa, **es buena noticia** — es la aplicación real del "la
+llave nunca sale del runtime". Verificarlo antes de asumir propagación.
+
+**Pendiente inmediato, en orden:**
+1. **Desplegar `globe-api-internal`** con `adebdb0` (observabilidad del runner) y repetir el canary. Sin eso el
+   próximo `runner_error` vuelve a ser mudo.
+2. **TASK-1566 Slice B**, lo que falta: cablear `registerCreditFundingCapabilities` + el signer en `app.ts`/`main.ts`
+   (hoy los comandos existen en el dominio pero **no están registrados**: despacharlos da `capability_not_found`),
+   store durable + migración (el in-memory **no sirve a `maxScale=3`**), y la **transacción única** (hoy son cuatro).
+3. **`ISSUE-126`, los tres puntos abiertos**: señal de frescura de la proyección, degradación por-capability, y bump
+   de versión del tarball + ensanche del peer exacto del SDK.
+4. **Slice C** — broker + superficie de confirmación en Greenhouse. ⚠️ Re-vendorizar el vocabulario **ANTES** de
+   mover los scopes de funding al broker, o se reproduce `ISSUE-126`.
+
+**Riesgo abierto:** `tenancy_mode = enforced` **sigue bloqueado** hasta que exista la señal de frescura. Ese flip es
+prerrequisito de las capabilities por usuario (ADR-015 Slice G), y hacerlo con la reconciliación frágil es un outage
+de todo el acceso humano a Globe.
+
+**Patrón que se confirmó tres veces hoy y vale más que cualquiera de los tres fixes:** el bloqueo real fue siempre
+*una causa accionable escondida detrás de un código genérico* — `409 conflict` (arreglado), `authentication_required`
+(clase de credencial vs `--include-email` vs audiencia) y `runner_error` (arreglado). Es el mismo defecto de
+observabilidad en tres dominios distintos.
+
+## 2026-07-26 — Canary real Globe: bloqueado en runner y corte IAM incompleto  ⟨superada por la entrada de arriba⟩
 
 El dry-run autenticado con el caller quedó `ready=true`: `globe.tenancy.workspace.get` mostró proyección fresca
 (`brokerExpiresAt=2026-07-26T11:42:00.878Z`, versión 4), y los estimados fueron imagen `10` y video `16`, ambos
@@ -26,7 +85,7 @@ configuración nombrada `globe` para la misma cuenta / `efeonce-globe`. Preferir
 la postura runtime. Si se activa `globe` interactivamente, restaurar `default` al cerrar el acto.
 La fuente operativa es [`GLOBE_RUNTIME_HANDOFF.md`](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md#cli-local-multi-proyecto).
 
-## 2026-07-26 — Acto operativo Globe: fondeo bloqueado y break-glass revocado
+## 2026-07-26 — Acto operativo Globe: fondeo bloqueado y break-glass revocado  ⟨superada por «ESTADO VIGENTE de Globe»⟩
 
 Se intentó fondear el mes del workspace interno `greenhouse-org:efeonce` para habilitar generación real de imagen
 y video. El dry-run previo confirmó pool activo y plan `CAP=400`/`GRANT=400`, pero no se ejecutó ninguna mutación:
@@ -39,7 +98,7 @@ grant, cambio de política, `credits.allocate`, generación de imagen ni generac
 era `globe-api-internal-00096-99x`, imagen `48de228e7106`. Este fue el cuarto intento de esta clase: queda como
 `operativamente bloqueado`; no mover TASK-1566 ni sus slices.
 
-## 2026-07-26 — Acto operativo Globe: fondeo aplicado; generación pendiente por tenancy stale
+## 2026-07-26 — Acto operativo Globe: fondeo aplicado; generación pendiente por tenancy stale  ⟨superada por «ESTADO VIGENTE de Globe»⟩
 
 Después del bloqueo de impersonación humana se ejecutó el acto legacy separando identidades: `greenhouse-portal@`
 emitió el ID token del caller y `julio.reyes@efeonce.org` leyó/firma el secreto, sin imprimirlo. Resultado: grant
@@ -898,7 +957,7 @@ reautenticación, cobertura de epoch) → composer.
 > timing ledger sincronizados). Queda: ventana monitor 7d `growth.cta.*` (comparte 2026-07-25 con
 > TASK-1427) y la primera campaña `slide_in` real (decisión de negocio: surface/copy/trigger).
 
-## 2026-07-26 (4) — ISSUE-126 cerrado en runtime + Slices A/B de TASK-1566 desplegados
+## 2026-07-26 (4) — ISSUE-126 cerrado en runtime + Slices A/B de TASK-1566 desplegados  ⟨superada por «ESTADO VIGENTE de Globe»⟩
 
 **Dos deploys gobernados, los dos verificados más allá del `success`.**
 
@@ -916,7 +975,7 @@ reautenticación, cobertura de epoch) → composer.
 
 **Riesgo abierto:** `tenancy_mode = enforced` **sigue bloqueado** por ISSUE-126 hasta que exista la señal de frescura. Ese flip es prerrequisito de las capabilities por usuario (Slice G), y hacerlo con la reconciliación frágil es un outage de todo el acceso humano a Globe.
 
-## 2026-07-26 (3) — TASK-1566: Slice A entregado, roadmap re-secuenciado, Slice B en curso
+## 2026-07-26 (3) — TASK-1566: Slice A entregado, roadmap re-secuenciado, Slice B en curso  ⟨superada por «ESTADO VIGENTE de Globe»⟩
 
 **Estado activo:** `TASK-1566` en `in-progress`. Código en `efeonce-globe` (`main`, local, sin push). Doc gobernante: ADR-015 (`Partially implemented`).
 

@@ -112,7 +112,9 @@ Deploy del `ops-worker` disparado por el push a `develop` (`f7a38718d`, workflow
 
 **El dato que prueba la recuperación no es "dejó de fallar", es la DURACIÓN.** Los fallos tomaban 10-62 ms porque lanzaban **antes de tocar nada**; 3776 ms significa que atravesó la reconciliación completa. Un "no falla" de 10 ms habría sido indistinguible de un no-op.
 
-**Lo que quedó inferido y no observado, y hay que decirlo:** que `brokerExpiresAt` se refrescó se deriva del camino de escritura — un reconcile exitoso hace `ON CONFLICT DO UPDATE SET ... broker_expires_at=EXCLUDED.broker_expires_at` (`tenancy-store.ts:84`) — **no de una lectura directa de la proyección de Globe**, que exige el caller impersonado. La verificación directa (`getEffectiveAccess` dejando de responder `projection-stale`) queda para el canary.
+✅ **Verificación DIRECTA de la proyección — 2026-07-26, cierra lo que estaba inferido.** El dry-run autenticado con el caller leyó `globe.tenancy.workspace.get` y devolvió `brokerState=active`, **`brokerExpiresAt=2026-07-26T11:42:00.878Z`, versión 4**. O sea la proyección está fresca y refrescándose: ya no es una deducción del camino de escritura, es una lectura. Nota vigente: los logs muestran `globe_tenancy_shadow_drift` alrededor de las 11:33 — esperable como **consecuencia** de dos días de proyección congelada (grants vencidos mientras estaba stale) y debería converger conforme los reconciles reemitan; **verificar que converge, no asumirlo.**
+
+**Lo que quedó inferido y no observado en la primera pasada, y hay que decirlo:** que `brokerExpiresAt` se refrescó se deriva del camino de escritura — un reconcile exitoso hace `ON CONFLICT DO UPDATE SET ... broker_expires_at=EXCLUDED.broker_expires_at` (`tenancy-store.ts:84`) — **no de una lectura directa de la proyección de Globe**, que exige el caller impersonado. La verificación directa (`getEffectiveAccess` dejando de responder `projection-stale`) queda para el canary.
 
 ### Verificación directa adicional — 2026-07-26
 
