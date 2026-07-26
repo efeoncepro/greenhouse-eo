@@ -36,12 +36,12 @@ Hay un caso que confunde y conviene entenderlo: **Veo aparece como "Necesita cua
 bloqueado. El modelo está disponible; lo que pasa es que necesita imágenes de referencia para
 trabajar, y todavía no se las diste.
 
-La diferencia importa. "Bloqueado" es *no podés*; "necesita cuadros" es *podés, pero falta un
-insumo*. Elegirlo cambia el modo por vos y te deja donde se lo puede dar.
+La diferencia importa. "Bloqueado" es *no puedes*; "necesita cuadros" es *puedes, pero falta un
+insumo*. Elegirlo cambia el modo por ti y te deja donde se lo puede dar.
 
 Si en cambio se ofreciera como ejecutable en un modo que sólo acepta prompt, la ejecución
 **reservaría crédito y recién después fallaría**. Por eso se muestra con lo que necesita, nunca
-como algo que podés lanzar donde no corresponde.
+como algo que puedes lanzar donde no corresponde.
 
 ## Por qué agregar un modelo ya no toca la pantalla
 
@@ -62,7 +62,7 @@ promete algo que ya no existe.
 ## El "recomendado"
 
 Por cada tipo de tarea hay un modelo recomendado, marcado con **✦**. Es una sugerencia, no una
-restricción: siempre podés elegir otro.
+restricción: siempre puedes elegir otro.
 
 Y es **honesto**: si el recomendado no está disponible para tu workspace, se muestra su estado real
 en vez de preseleccionarlo. Preseleccionar algo que no se puede ejecutar convierte la recomendación
@@ -86,7 +86,7 @@ no la identidad del modelo.
 El Producer, Nexa y las integraciones externas leen **exactamente el mismo dato**. No hay una lista
 para la pantalla y otra para el asistente.
 
-La consecuencia práctica: si le preguntás a Nexa qué modelos tenés disponibles, la respuesta coincide
+La consecuencia práctica: si le preguntas a Nexa qué modelos tienes disponibles, la respuesta coincide
 con lo que muestra el Producer, siempre. No pueden divergir, porque no son dos listas.
 
 > **Detalle técnico:** contrato en `efeonce-globe/packages/contracts/src/producer-fleet.ts`;

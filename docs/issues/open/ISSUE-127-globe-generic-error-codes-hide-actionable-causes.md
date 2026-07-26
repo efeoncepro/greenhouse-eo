@@ -72,7 +72,7 @@ Tres cerradas, una abierta:
 
 > **Un bucket por defecto que abarca 17 sitios no es una razón nombrada — es una razón inventada.** Una heurística sirve para acotar 28 causas a un puñado, pero si el bucket tapa familias distintas hay que abrirlo **antes** de shippearlo. Un label equivocado dirige mal, y eso es peor que no tener label.
 
-> **Y la lección de método que el operador impuso y funcionó:** perseguir un error por deploy encuentra síntomas en serie; **leer el camino completo encuentra el que los explica.** Las capas 1-4 costaron un deploy cada una; la 5 se vio en treinta líneas de lectura. Cuando el n-ésimo fix destapa una capa n+1, **dejá de desplegar y leé.**
+> **Y la lección de método que el operador impuso y funcionó:** perseguir un error por deploy encuentra síntomas en serie; **leer el camino completo encuentra el que los explica.** Las capas 1-4 costaron un deploy cada una; la 5 se vio en treinta líneas de lectura. Cuando el n-ésimo fix destapa una capa n+1, **deja de desplegar y lee.**
 
 ### Bloqueo vigente, ahora acotado con precisión
 

@@ -32,7 +32,7 @@ Secuencia técnica:
 4. Next detecta el uso de API dinámica durante prerender → lanza `Dynamic server usage` con `error.digest === 'DYNAMIC_SERVER_USAGE'`.
 5. El `try/catch` en el layout intercepta ese error y lo loggea como `console.error('[DashboardLayout] getServerAuthSession failed:', error)`.
 
-El `DYNAMIC_SERVER_USAGE` **NO es error de auth** — es la señal del framework "esta ruta debe ser dynamic, no la prerendericés". El layout debía re-lanzarlo para que Next lo maneje (marcar ruta como dynamic), no tratarlo como error de auth.
+El `DYNAMIC_SERVER_USAGE` **NO es error de auth** — es la señal del framework "esta ruta debe ser dynamic, no la prerenderices". El layout debía re-lanzarlo para que Next lo maneje (marcar ruta como dynamic), no tratarlo como error de auth.
 
 Antipatrón presente en 4 server components: `(dashboard)/layout.tsx`, `app/page.tsx`, `auth/landing/page.tsx`, `(blank-layout-pages)/login/page.tsx`. Cada uno con su propia variante de `try/catch + console.error + redirect('/login')`.
 

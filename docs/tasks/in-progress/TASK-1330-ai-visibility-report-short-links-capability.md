@@ -125,7 +125,7 @@ que no le toca; two-way-door, se difiere).
 6. **Product design — superficies de error humanas en Think.** Unknown(404)/expired·revoked(410) aterrizan a
    una **persona**. Per `greenhouse-product-ui-architect` (las superficies de error son superficies de producto:
    voz de marca + recovery), `/s/[code]` debe renderizar un estado con copy es-CL ("este enlace expiró / no
-   existe") + CTA de recuperación ("Generá tu propio informe" → landing del grader), NO un 404 crudo. Contrato
+   existe") + CTA de recuperación ("Genera tu propio informe" → landing del grader), NO un 404 crudo. Contrato
    HTTP (404/410) se mantiene para consumers máquina.
 7. **Generación en el publish command (determinista), no lazy.** Llamar `ensureAiVisibilityReportShortLink(reportId)`
    (idempotente) dentro de `publishGraderReportSnapshot` ([snapshot.ts](../../../src/lib/growth/ai-visibility/report/snapshot.ts))

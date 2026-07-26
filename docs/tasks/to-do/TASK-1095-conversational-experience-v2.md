@@ -50,7 +50,7 @@ Intencion del operador: **Greenhouse debe ser una plataforma agentica para colab
 
 ## Delta 2026-06-13 — corrección + decisión del operador: el surfaceContext YA existe y es el canónico
 
-Revisión de necesidad pedida por el operador ("¿1095/1096 quedaron absorbidas? el surfaceContext ya se creó, revisá bien"). **Corrección a una imprecisión previa de este delta:**
+Revisión de necesidad pedida por el operador ("¿1095/1096 quedaron absorbidas? el surfaceContext ya se creó, revisa bien"). **Corrección a una imprecisión previa de este delta:**
 
 - **El surfaceContext SÍ existe:** es **`NexaAnswersSurfaceContext`** (`src/components/greenhouse/primitives/nexa-answers-canvas/nexa-answers-canvas-types.ts`) — `surfaceId/domain/placement/dataReality/sensitivity/allowedRenderers/allowedActions`. Es el contrato que el `NexaAnswersCanvas` consume y que la sesión 2026-06-13 extendió (citas/toolbar/stop/portabilidad). Lo que **nunca se construyó** fue un módulo *separado* `NexaSurfaceContext` en `src/lib/nexa/` que el Arch Gate A1 imaginaba como distinto.
 - **El answer-trace de TASK-1089/1090 NO modela surfaceContext** (`NexaKnowledgeAnswerSurface` solo tiene variants `conversationTrace`/`overviewPanel`/`toolResult` + kinds). ⇒ `NexaAnswersSurfaceContext` es objetivamente el contrato más completo.

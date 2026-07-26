@@ -70,9 +70,9 @@ Cada capa mapea a uno o más **dominios de código** en [`manifest.json`](manife
 2. **`--audit`**: chequeo estructural — cada doc de capa existe, cada code path Nexa pertenece a
    un dominio (no hay código Nexa huérfano sin capa), el manifest y el índice están en sync.
 
-Regla dura: **al tocar cualquier dominio Nexa, actualizá su(s) doc(s) de capa en el mismo cambio.**
-Si agregás un dominio Nexa nuevo (un módulo, un provider, una surface), agregalo al `manifest.json`
-+ creá/asigná su capa. El gate convierte "toqué Nexa pero no documenté" en un fallo mecánico.
+Regla dura: **al tocar cualquier dominio Nexa, actualiza su(s) doc(s) de capa en el mismo cambio.**
+Si agregas un dominio Nexa nuevo (un módulo, un provider, una surface), agrégalo al `manifest.json`
++ crea/asigna su capa. El gate convierte "toqué Nexa pero no documenté" en un fallo mecánico.
 
 ## Procedencia
 

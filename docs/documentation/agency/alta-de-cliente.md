@@ -213,7 +213,7 @@ En la ficha del cliente, el panel del checklist tiene un boton **"Verificar evid
 - **Sin detectar** (gris) — la fuente respondio y todavia no esta hecho.
 - **No verificable** (ambar) — no pudimos verificar (la fuente esta caida). Nunca se muestra un falso "pendiente".
 
-La evidencia solo aparece en los pasos **aun no resueltos** (donde aporta decision: "ya esta listo, marcalo" o "todavia no"); en un paso ya cerrado seria ruido. Los casos de **drift** ("ya esta listo pero nadie lo marco") destacan: ves "Detectado" junto a un estado que sigue pendiente.
+La evidencia solo aparece en los pasos **aun no resueltos** (donde aporta decision: "ya esta listo, márcalo" o "todavia no"); en un paso ya cerrado seria ruido. Los casos de **drift** ("ya esta listo pero nadie lo marco") destacan: ves "Detectado" junto a un estado que sigue pendiente.
 
 Los pasos **declarativos** (contrato firmado, tipo de servicio, terminos comerciales, fases) **no** tienen fuente automatica: siguen siendo manuales, sin evidencia inventada.
 

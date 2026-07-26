@@ -205,7 +205,7 @@ No es escalabilidad de tráfico (eso lo gobiernan `maxScale` y los stores durabl
 > **Mapeo de numeración — leer antes de citar un número de slice.** Este roadmap numera por
 > **superficie**; `TASK-1556` numera por **paso de fundación**. No son off-by-one: el **Slice 0 de esta
 > ADR** lo entregan los **Slices 1-3 de `TASK-1556`** (seam · tokens+copy · gates), y el **Slice 1 de
-> esta ADR** (share board) es el **Slice 4 de la task**. Citá siempre "Slice N de `TASK-1556`" o
+> esta ADR** (share board) es el **Slice 4 de la task**. Cita siempre "Slice N de `TASK-1556`" o
 > "Slice N de ADR-014", nunca "Slice N" a secas — decir "implementado hasta el Slice 3" significa
 > cosas opuestas en cada esquema.
 >
@@ -726,7 +726,7 @@ despliega `globe-api-internal`. La API estuvo corriendo `45235cc` mientras el we
 adelante — y **el dispatch de commands ocurre en la API**, no en el web. Toda instrumentación agregada al web
 era invisible para el fallo.
 
-**SIEMPRE** confirmá qué imagen corre **cada** servicio antes de concluir que una instrumentación no funciona:
+**SIEMPRE** confirma qué imagen corre **cada** servicio antes de concluir que una instrumentación no funciona:
 
 ```bash
 gcloud run services describe globe-api-internal --region southamerica-west1 --project efeonce-globe \

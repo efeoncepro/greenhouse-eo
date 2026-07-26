@@ -31,7 +31,7 @@
 | 2 | **Async stepper** | `queued → running → report ready` (labels público-safe; `review_required` = "revisión" neutral) | progress rail/stepper | run/[handle] (status) |
 | 3 | **Public report** | headline KPI (cuenta) + 3–5 hallazgos + plan priorizado + tendencia + dimensiones (ECharts radar/bar) + **table-fallback** + disclaimer | report-artifact `web` `publicWeb` | report/[token] (1239) |
 | 4 | **"Qué recibes"** (below-fold) | output del reporte + entrega por email/link tokenizado + adjunto PDF público-safe (consumer de 1250) — sin que esta UI despache el email | proof block | copy |
-| 5 | Post-report CTA | "hablá con Efeonce" | CTA | copy |
+| 5 | Post-report CTA | "habla con Efeonce" | CTA | copy |
 
 ## Copy Ledger
 
@@ -54,11 +54,11 @@
 | queued/running | (stepper) | progreso por fase | — | poll honesto, sin provider internals |
 | review_required | En revisión | "tu revisión se está validando" | — | gate interno (1247), razón NUNCA expuesta |
 | partial | — | reporte parcial + "algunos motores no respondieron" | — | disclosure honesto |
-| completed | — | report `publicWeb` | hablá con Efeonce | |
-| invalid (400) | Revisá los datos | campo con error inline | corregir | aria-live |
-| captcha_failed (403) | Verificación fallida | reintentá | reintentar | Turnstile |
-| rate_limited (429) | Demasiados intentos | volvé más tarde | — | abuse-guard per-email/IP |
-| cost_blocked (503) | No disponible ahora | volvé más tarde | — | budget diario global |
+| completed | — | report `publicWeb` | habla con Efeonce | |
+| invalid (400) | Revisa los datos | campo con error inline | corregir | aria-live |
+| captcha_failed (403) | Verificación fallida | reintenta | reintentar | Turnstile |
+| rate_limited (429) | Demasiados intentos | vuelve más tarde | — | abuse-guard per-email/IP |
+| cost_blocked (503) | No disponible ahora | vuelve más tarde | — | budget diario global |
 | disabled (404) | — | feature off | — | flag |
 
 ## Accessibility Contract (WCAG 2.2 AA)

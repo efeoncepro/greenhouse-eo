@@ -135,9 +135,9 @@ La matriz QA operativa vive en `pnpm qa:nexa-knowledge -- --env=staging`. Produc
 
 Antes, cuando alguien agregaba o editaba un artículo en Notion, el conocimiento de Nexa **no se enteraba** hasta que alguien re-corría un comando a mano. Con el auto-ingest, **se mantiene solo**:
 
-- **Agregás un artículo** en una Wiki conectada → Nexa lo ve automáticamente (segundos).
-- **Editás un artículo** → se actualiza solo.
-- **Borrás un artículo** → desaparece de Nexa solo (deja de citarse).
+- **Agregas un artículo** en una Wiki conectada → Nexa lo ve automáticamente (segundos).
+- **Editas un artículo** → se actualiza solo.
+- **Borras un artículo** → desaparece de Nexa solo (deja de citarse).
 
 Cómo funciona en simple: Notion **avisa** (webhook) cuando algo cambia; Greenhouse escucha ese aviso, va a buscar esa página y la actualiza en la base de conocimiento. Nexa no entra a Notion en vivo — consulta la copia ya indexada.
 

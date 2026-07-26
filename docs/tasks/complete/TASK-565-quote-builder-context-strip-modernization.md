@@ -265,9 +265,9 @@ interface FieldsProgressChipProps {
 | Key | Actual | Propuesto |
 |---|---|---|
 | `deal.empty` | "Sin deal vinculado" | "Vincular deal" |
-| `deal.emptyHelper` (nuevo) | — | "Seleccioná un deal de HubSpot o creá uno nuevo" |
+| `deal.emptyHelper` (nuevo) | — | "Selecciona un deal de HubSpot o crea uno nuevo" |
 | `contact.empty` | "Sin contacto asignado" | "Agregar contacto" |
-| `organization.emptyRequired` (nuevo) | — | "Elegí el cliente antes de cotizar" |
+| `organization.emptyRequired` (nuevo) | — | "Elige el cliente antes de cotizar" |
 | `progress.label` (nuevo) | — | "{filled} de {total} campos" |
 
 ### Accesibilidad floor (13-row checklist del skill `modern-ui`)

@@ -1507,7 +1507,7 @@ const subject = t.emails.subjects.payrollExport('Marzo 2026', 4)
 
 ¿Es microcopy funcional reusada en >3 surfaces (CTAs, estados, loading, empty, aria)?
   → src/lib/copy/dictionaries/es-CL/<namespace>.ts
-  → Si namespace no existe, agregalo a types.ts + dictionaries/es-CL/index.ts
+  → Si namespace no existe, agrégalo a types.ts + dictionaries/es-CL/index.ts
 
 ¿Es copy de dominio específico (e.g., un empty state propio de payroll)?
   → Cerca del dominio (helper o componente) pero PASA por skill greenhouse-ux-writing para validar tono.

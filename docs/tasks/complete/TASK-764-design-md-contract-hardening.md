@@ -120,7 +120,7 @@ Reglas obligatorias:
 - **CI gate debe ser fail-soft al inicio**: errors block, warnings report. Subir a "warnings
   block" solo cuando los 16 warnings actuales se hayan resuelto.
 - **No tocar `DESIGN.md` en este orden roto**: nunca limpiar warnings (punto 3) antes de
-  sync con spec V1 (punto 2), porque podés borrar tokens canónicos de la arquitectura.
+  sync con spec V1 (punto 2), porque puedes borrar tokens canónicos de la arquitectura.
 
 ## Normative Docs
 

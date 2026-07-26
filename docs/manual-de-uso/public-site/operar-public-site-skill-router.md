@@ -21,7 +21,7 @@ Esto evita lecturas truncadas, reduce tokens y hace que futuras landings no infl
 
 ## Cuando Usarla
 
-Usala para trabajo sobre:
+Úsala para trabajo sobre:
 
 - `efeoncepro.com`;
 - WordPress/Kinsta;

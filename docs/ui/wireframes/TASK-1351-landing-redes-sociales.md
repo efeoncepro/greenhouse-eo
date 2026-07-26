@@ -52,7 +52,7 @@
 | `public-site.redes-sociales.incluye.listening.title` | 4 | "Social listening y social search" | — | Estás donde tu cliente descubre |
 | `public-site.redes-sociales.muro.title` | 5 | "Así se ve cuando lo hacemos nosotros." | — | Sección firma; el medio es el mensaje |
 | `public-site.redes-sociales.medimos.title` | 7 | "Lo que no se mide, no se mejora. Y te lo mostramos." | — | Transparencia anti-commodity |
-| `public-site.redes-sociales.cta_final.title` | 10 | "Escalá tu presencia social sin sumar headcount." | — | Cierre outcome |
+| `public-site.redes-sociales.cta_final.title` | 10 | "Escala tu presencia social sin sumar headcount." | — | Cierre outcome |
 | `public-site.redes-sociales.auditoria.cta` | 10 | "Solicitar auditoría de redes" | — | Submit del `<greenhouse-form>` |
 
 ## State Copy

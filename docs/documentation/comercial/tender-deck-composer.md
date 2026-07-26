@@ -44,7 +44,7 @@ qué contenido acepta. Uno escribe el **contenido**, y el composer elige la plan
 llena y produce el PDF.
 
 Nadie inventa una lámina nueva a mano. Si el contenido no calza en ninguna plantilla, eso **no**
-significa "improvisá un layout": significa que **falta una plantilla en el catálogo**.
+significa "improvisa un layout": significa que **falta una plantilla en el catálogo**.
 
 Para presentar la operación existen dos moldes complementarios. `tool-stack` muestra las herramientas
 como un sistema por etapas, con una capa transversal de colaboración, licencias y fuentes aprobadas.

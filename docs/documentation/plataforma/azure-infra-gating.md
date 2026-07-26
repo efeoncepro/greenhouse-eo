@@ -21,7 +21,7 @@ El **health check Azure** (verificar que la federación WIF + providers + Resour
 
 Bicep apply puede ser destructivo:
 
-- `delete-on-deletion` semantics — si quitás un recurso del template, Azure lo borra del RG.
+- `delete-on-deletion` semantics — si quitas un recurso del template, Azure lo borra del RG.
 - Federated credential rotation — si cambias el subject WIF, los workflows quedan sin acceso temporalmente.
 - App Service config reset — webhooks externos pueden quedar rotos.
 

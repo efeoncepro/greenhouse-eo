@@ -157,9 +157,9 @@ créditos** (ver Delta) conviene resolverlo antes de la tanda de promociones/can
 
 ## Cómo mantener este ledger (obligatorio)
 
-- **Al integrar un modelo/proveedor nuevo** (Lab o gobernado): agregá su fila acá en el mismo PR, con
+- **Al integrar un modelo/proveedor nuevo** (Lab o gobernado): agrega su fila acá en el mismo PR, con
   carril, fecha, evidencia y ruta. Un modelo integrado sin fila acá = deuda de conocimiento.
-- **Al promover una ruta** (ADR-009): actualizá su celda "Prod. gobernada" a ✅ con la evidencia.
-- **Al validar en vivo:** anotá fecha + evidencia (sha/bytes/experiment id), no "probado" a secas.
+- **Al promover una ruta** (ADR-009): actualiza su celda "Prod. gobernada" a ✅ con la evidencia.
+- **Al validar en vivo:** anota fecha + evidencia (sha/bytes/experiment id), no "probado" a secas.
 - La verdad de promoción live sigue siendo `globe.production-routing`/`globe.model-readiness`; este doc es
   el mapa humano, se reconcilia contra runtime, no lo reemplaza.

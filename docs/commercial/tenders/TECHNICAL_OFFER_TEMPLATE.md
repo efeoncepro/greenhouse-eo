@@ -1,13 +1,13 @@
 <!--
 ════════════════════════════════════════════════════════════════════════════════
   PLANTILLA CANÓNICA — OFERTA TÉCNICA (licitación pública/privada · RFP)
-  Copiá este archivo a docs/commercial/tenders/<caso>/oferta-tecnica.md y llenalo.
+  Copia este archivo a docs/commercial/tenders/<caso>/oferta-tecnica.md y llenalo.
   Destilada del caso SKY (Wherex 2026), que es el ejemplo bueno ya validado.
 
   REGLA RAÍZ — híbrido guía + contrato:
-    • Las SECCIONES son GUÍA. Cada RFP es distinto; usá las que apliquen, en el
+    • Las SECCIONES son GUÍA. Cada RFP es distinto; usa las que apliquen, en el
       orden que puntúe mejor contra los criterios de ESA licitación. No todas las
-      15 aplican siempre. Borrá las que no; agregá las que el pliego exija.
+      15 aplican siempre. Borra las que no; agrega las que el pliego exija.
     • La EVIDENCIA es CONTRATO. Toda cifra/afirmación verificable vive primero en
       el «Ledger de evidencia» (Zona 0) con su fuente googleable + as-of. La
       narrativa NUNCA introduce una cifra que no esté en el ledger. Esto mapea 1:1
@@ -59,7 +59,7 @@
 ## Zona 1 — Narrativa (GUÍA — cada sección apunta a un criterio que puntúa)
 
 <!--
-  Marcadores por sección (borralos al entregar; son para vos):
+  Marcadores por sección (bórralos al entregar; son para ti):
     [admisibilidad: sí|no]  → ¿es requisito excluyente del pliego? si sí, NO la borres.
     [criterio: <nombre> <peso%>]  → contra qué ítem ponderado juega (ver chile-publico-operativo.md).
     [deck → <contentType>]  → qué lámina del deck proyecta esta sección (ver Zona 2).
@@ -75,7 +75,7 @@ convencido del *qué* y del *quién responde*.
 ### 2. Comprensión del requerimiento
 `[admisibilidad: revisar]` `[criterio: comprensión]` `[deck → statement, bullet-list]`
 Demostrar que entendiste el problema real del comprador — **no** que copiaste las
-Bases. Reformulá el requerimiento en tus palabras + el subtexto que las Bases no
+Bases. Reformula el requerimiento en tus palabras + el subtexto que las Bases no
 dicen pero el comité sí siente.
 
 ### 3. Diagnóstico de partida
@@ -112,7 +112,7 @@ trabajo. Muestra sistema, no improvisación.
 ### 9. Diferencial técnico del rubro
 `[criterio: valor diferencial <peso%>]` `[deck → artifact-showcase, one-metric]`
 El piso que exige el pliego, garantizado en cada pieza, **+** el diferencial sobre
-ese piso — con instrumentos propios. Si tenés una muestra viva (Radiografía AEO,
+ese piso — con instrumentos propios. Si tienes una muestra viva (Radiografía AEO,
 informe del Grader), va **por enlace**, no descrita: se muestra, no se cuenta.
 
 ### 10. Recursos y presencia
@@ -122,7 +122,7 @@ Capacidades de apoyo (visual, multicanal, herramientas). Solo lo que suma al cri
 ### 11. Reportería y métricas
 `[criterio: control/SLA]` `[deck → several-kpis]`
 Qué se mide, cada cuánto, con qué instrumento. Por encima del mínimo del pliego si
-tenés con qué. Distingue el informe formal del acceso continuo si lo ofrecés.
+tienes con qué. Distingue el informe formal del acceso continuo si lo ofreces.
 
 ### 12. Equipo asignado y gobernanza
 `[admisibilidad: revisar — el evaluador cruza CV con requisito]` `[criterio: equipo <peso%>]` `[deck → team-gallery]`
@@ -179,7 +179,7 @@ deck-plan.json  (slots, SSOT del deck)
 PDF de N páginas  (Artifact Composer; catálogo cerrado de plantillas)
 ```
 
-**Content-types del catálogo `deck-axis` disponibles** (elegí por intención, no por
+**Content-types del catálogo `deck-axis` disponibles** (elige por intención, no por
 estética): `cover` · `agenda` · `statement` · `highlight` · `one-metric` ·
 `several-kpis` · `bullet-list` · `dual-list` · `dual-text` · `four-pillars` ·
 `capabilities-grid` · `process-sequential` · `timeline` · `maturity-ladder` ·
@@ -204,7 +204,7 @@ del catálogo.)
 - **NUNCA** fabricar la geometría del deck a mano: el número o la barra salen del
   ledger, o no salen.
 - **SIEMPRE** ordenar las secciones hacia los criterios ponderados de ESA licitación
-  (leé la tabla de ponderaciones antes de escribir).
+  (lee la tabla de ponderaciones antes de escribir).
 - **SIEMPRE** llenar el anexo de matriz de cumplimiento item por item — es lo que
   evita el descarte por forma.
 - **SIEMPRE** el `.md` es la fuente; el deck-plan y el PDF se re-emiten desde acá.

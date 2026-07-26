@@ -280,7 +280,7 @@ En `greenhouse-eo`:
 
 - Las cuatro identidades y sus bindings en Terraform: `greenhouse-globe-admin@efeonce-group`, `globe-admin-broker`, `globe-credit-approver`, `globe-credit-executor`. Protocolo de import: `plan` con **cero** `destroy`/`replace` de identidad viva.
 - Las dos clases de workload nuevas en `internalServicePrincipal` con su set fijo y mínimo; el guard de disyunción de callers extendido (mismo espíritu que `app.ts:1222`).
-- `apps/credit-approver` — unidad Cloud Run IAM-private con **una** superficie estrecha: *"dada esta propuesta verificada, firmá su aprobación"*. Lee la propuesta, verifica que exista una confirmación humana atribuida (y el segundo confirmador si la política del workspace lo exige), firma. **Cero DML sobre agregados de crédito.**
+- `apps/credit-approver` — unidad Cloud Run IAM-private con **una** superficie estrecha: *"dada esta propuesta verificada, firma su aprobación"*. Lee la propuesta, verifica que exista una confirmación humana atribuida (y el segundo confirmador si la política del workspace lo exige), firma. **Cero DML sobre agregados de crédito.**
 - Coverage `sister-platform: 'available'` en las capabilities de crédito que el carril necesita.
 - Señal `globe.credit_admin.caller_authority_drift`.
 

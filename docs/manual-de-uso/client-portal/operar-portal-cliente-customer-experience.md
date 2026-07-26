@@ -65,7 +65,7 @@ Ten a mano:
 
 ### El cliente ve not assigned pero deberia ver el modulo
 
-Revisa `module_assignments`. Si el modulo no esta asignado, activalo por la UI admin. No edites la DB manualmente.
+Revisa `module_assignments`. Si el modulo no esta asignado, actívalo por la UI admin. No edites la DB manualmente.
 
 ### El cliente ve zero-state y cree que es error
 

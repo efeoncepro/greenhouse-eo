@@ -10,7 +10,7 @@
 
 Antes de TASK-813 había confusión persistente sobre qué es un "servicio" en Greenhouse: ¿es lo que vendemos? ¿lo que tenemos contratado? ¿lo que está en HubSpot? ¿lo que entregamos? La confusión venía de mezclar 4 capas distintas en una sola tabla, y de tener 30 filas seedeadas en marzo 2026 que no representaban nada real. Este documento explica el modelo canónico actualizado, cómo HubSpot y Greenhouse se sincronizan, y qué señales monitoreamos para detectar drift.
 
-Si ya entendés el modelo y solo querés operar el sync (registrar un servicio, archivar uno viejo, diagnosticar un huérfano), saltá directo al manual de uso: `docs/manual-de-uso/comercial/sincronizacion-hubspot-servicios.md`.
+Si ya entiendes el modelo y solo quieres operar el sync (registrar un servicio, archivar uno viejo, diagnosticar un huérfano), salta directo al manual de uso: `docs/manual-de-uso/comercial/sincronizacion-hubspot-servicios.md`.
 
 ---
 

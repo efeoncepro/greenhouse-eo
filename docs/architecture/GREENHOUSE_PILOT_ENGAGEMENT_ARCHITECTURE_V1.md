@@ -224,7 +224,7 @@ Las 4 categorías comparten estructura (acotadas en tiempo, deliverable explíci
 | `outcome` | ¿Cuál fue la decisión final? | `converted`, `adjusted`, `dropped` | Tabla `service_outcomes` |
 | `lineage` | ¿De qué nació, en qué se transformó? | graph relations | Tabla `service_lineage` |
 
-**Regla dura:** las 5 dimensiones son ortogonales. NUNCA mezclarlas en un solo enum. Mañana aparece un piloto pagado parcialmente con success fee y SLA — la matriz combinatoria explota si las mezclás.
+**Regla dura:** las 5 dimensiones son ortogonales. NUNCA mezclarlas en un solo enum. Mañana aparece un piloto pagado parcialmente con success fee y SLA — la matriz combinatoria explota si las mezclas.
 
 ### 3.2 Schema (propuesto, no implementado)
 

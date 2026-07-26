@@ -25,7 +25,7 @@ Parent: `TASK-642` (Motion Polish Program 2026).
 
 ## Why This Task Exists
 
-Audit 2026-04-26: Greenhouse usa solo defaults de MUI para hover/focus/press. Cada componente decide su propio timing inline (cuando lo decide). Resultado: hovers a 100ms en algunas cards, 250ms en otras; focus rings invisibles en algunos botones; press feedback inexistente. Las apps modernas (Linear, Vercel, Stripe) tienen un sistema de motion canónico que se siente coherente — vos hacés hover en cualquier cosa y la respuesta es la misma curva.
+Audit 2026-04-26: Greenhouse usa solo defaults de MUI para hover/focus/press. Cada componente decide su propio timing inline (cuando lo decide). Resultado: hovers a 100ms en algunas cards, 250ms en otras; focus rings invisibles en algunos botones; press feedback inexistente. Las apps modernas (Linear, Vercel, Stripe) tienen un sistema de motion canónico que se siente coherente — tú haces hover en cualquier cosa y la respuesta es la misma curva.
 
 ## Goal
 

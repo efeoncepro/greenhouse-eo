@@ -118,8 +118,8 @@ El reporte muestra por documento: `PUBLISHED` (n chunks · v#), `SKIPPED_UNCHANG
 ### Qué significan / qué cuidar
 
 - **Idempotente:** re-correr `--apply` no duplica. Solo publica una versión nueva si el checksum del contenido cambió.
-- **Embeddings reactivos:** desde TASK-1155, cada versión publicada dispara el embedding de sus chunks después del commit. El comando de ingesta no debería dejar chunks nuevos pendientes; validalo con `scripts/knowledge/embed-corpus.ts` en dry-run.
-- **Cuarentena:** un documento flagged NO se chunkea ni se vuelve recuperable; queda `quarantined` con la razón en el run. Remediá la fuente (sacá el secreto) y re-ingerí.
+- **Embeddings reactivos:** desde TASK-1155, cada versión publicada dispara el embedding de sus chunks después del commit. El comando de ingesta no debería dejar chunks nuevos pendientes; valídalo con `scripts/knowledge/embed-corpus.ts` en dry-run.
+- **Cuarentena:** un documento flagged NO se chunkea ni se vuelve recuperable; queda `quarantined` con la razón en el run. Remedia la fuente (saca el secreto) y re-ingerí.
 - **Solo el source piloto:** `knowledge_sources.sync_enabled` está en `FALSE` por default; producción se mantiene deshabilitada hasta aprobación humana.
 - **No** ingerir contenido con secretos/tokens reales — el sanitizer los pone en cuarentena, pero el principio es no meterlos.
 
@@ -127,7 +127,7 @@ El reporte muestra por documento: `PUBLISHED` (n chunks · v#), `SKIPPED_UNCHANG
 
 ## Validar embeddings después de una ingesta (TASK-1155)
 
-Después de correr `scripts/knowledge/ingest.ts --apply`, revisá que el backfill global no tenga trabajo pendiente:
+Después de correr `scripts/knowledge/ingest.ts --apply`, revisa que el backfill global no tenga trabajo pendiente:
 
 ```bash
 set -a && source .env.local && set +a
@@ -142,7 +142,7 @@ Estado sano:
 
 Evidencia TASK-1155: repo docs y Notion quedaron en ese estado sano. El smoke Notion real usado fue `scripts/knowledge/ingest.ts --source=notion --only=guia-automatizaciones --apply`, que publicó `guia-automatizaciones v1` con 14 chunks y `14/14` embeddings. Para afirmar webhook live end-to-end, además debe estar redeployado el `ops-worker` que procesa la projection de Notion y debe observarse un cambio real desde una wiki autorizada.
 
-Si aparecen chunks pendientes, corré el backfill idempotente:
+Si aparecen chunks pendientes, corre el backfill idempotente:
 
 ```bash
 npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/knowledge/embed-corpus.ts --apply
@@ -154,7 +154,7 @@ Rollback temporal del hook reactivo:
 KNOWLEDGE_REACTIVE_EMBEDDING_ENABLED=false
 ```
 
-Usalo solo si Vertex/quotas degradan la ingesta; el fallback esperado es que el retrieval híbrido pierda recall vectorial nuevo pero siga respondiendo con FTS.
+Úsalo solo si Vertex/quotas degradan la ingesta; el fallback esperado es que el retrieval híbrido pierda recall vectorial nuevo pero siga respondiendo con FTS.
 
 ## Referencias técnicas
 

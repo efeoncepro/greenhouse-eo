@@ -74,7 +74,7 @@ Vercel/`ops-worker`/Cloud Run directo).
 ### Operator Communication Style
 
 - Hablarle al operador en español neutro latinoamericano, natural para una persona venezolana viviendo en Chile.
-- Evitar modismos argentinos y voseo rioplatense (`che`, `boludo`, `vos`, `tenés`, `querés`, `laburo`, etc.).
+- Evitar modismos argentinos y voseo rioplatense (`vos`, `tenés`, `querés`), sobre todo en **imperativos**: `agregá`/`corré` → **agrega/corre**.
 - Mantener un tono claro, cercano y profesional; se permite chilenismo operativo solo cuando sea contexto del producto/país, no como muletilla.
 
 ### Data Architecture
@@ -259,7 +259,7 @@ Cuando una instrucción menciona "repos hermanos" o pide aplicar un cambio a mú
 
 1. **Relevancia operacional**: ¿el repo target consume o referencia el cambio? `GREENHOUSE_REPO_ECOSYSTEM_V1.md` lista repos hermanos pero algunos son **productos separados** (e.g. `efeoncepro/kortex` es plataforma CRM/HubSpot, NO Greenhouse ecosystem operacional). Aplicar la instrucción literal a TODOS los repos del doc sin filtrar = over-application.
 
-2. **CI/CD del target repo**: ¿el repo tiene auto-deploy en push a `main` (Vercel/GitHub Actions/etc.)? Si SÍ, un commit benigno (incluso solo al README) **dispara el pipeline completo** — puede revelar bugs pre-existing dormant y generar email burst al owner. Antes de commit directo, verificar el último deploy status. Si está en Error, NO commitear (re-disparás el fail).
+2. **CI/CD del target repo**: ¿el repo tiene auto-deploy en push a `main` (Vercel/GitHub Actions/etc.)? Si SÍ, un commit benigno (incluso solo al README) **dispara el pipeline completo** — puede revelar bugs pre-existing dormant y generar email burst al owner. Antes de commit directo, verificar el último deploy status. Si está en Error, NO commitear (re-disparas el fail).
 
 **⚠️ Reglas duras**:
 
@@ -330,7 +330,7 @@ Antes de cerrar, verificar y documentar segun aplique:
 
 Si falta algo, reportar el estado como `code complete, rollout pendiente` o `operativamente bloqueado`; no mover lifecycle a complete ni decir "listo" como si el usuario ya pudiera usarlo.
 
-**Feature Flag State Ledger (anti deuda cognitiva):** los env-var flags (`*_ENABLED`) que quedan code-complete pero pendientes de prender, y el estado por environment de los ~60 flags activos, se registran en **`docs/operations/FEATURE_FLAG_STATE_LEDGER.md`** (SSOT humano del estado; la verdad live es `vercel env ls`). **SIEMPRE** que declares un flag nuevo, agregá su fila al inventario; si lo dejás code-complete sin prender, agregá una fila a "§ Pendientes de acción"; al prenderlo/apagarlo, actualizá el snapshot. Es distinto de los flags PG declarativos (`home_rollout_flags`, `GREENHOUSE_FEATURE_FLAGS_ROLLOUT_PLATFORM_V1.md`). **Gate mecánico de cierre:** `pnpm docs:closure-check` corre `feature-flags-audit --strict` y **falla (exit 1) si hay un `*_ENABLED` en código sin fila en el ledger** — ningún cierre pasa con un flag sin registrar. Pasada manual: `pnpm flags:audit` (advisory) / `pnpm flags:audit --strict --no-vercel`.
+**Feature Flag State Ledger (anti deuda cognitiva):** los env-var flags (`*_ENABLED`) que quedan code-complete pero pendientes de prender, y el estado por environment de los ~60 flags activos, se registran en **`docs/operations/FEATURE_FLAG_STATE_LEDGER.md`** (SSOT humano del estado; la verdad live es `vercel env ls`). **SIEMPRE** que declares un flag nuevo, agrega su fila al inventario; si lo dejas code-complete sin prender, agrega una fila a "§ Pendientes de acción"; al prenderlo/apagarlo, actualiza el snapshot. Es distinto de los flags PG declarativos (`home_rollout_flags`, `GREENHOUSE_FEATURE_FLAGS_ROLLOUT_PLATFORM_V1.md`). **Gate mecánico de cierre:** `pnpm docs:closure-check` corre `feature-flags-audit --strict` y **falla (exit 1) si hay un `*_ENABLED` en código sin fila en el ledger** — ningún cierre pasa con un flag sin registrar. Pasada manual: `pnpm flags:audit` (advisory) / `pnpm flags:audit --strict --no-vercel`.
 
 **⚠️ Prender un flag es MULTI-RUNTIME, no "prenderlo en Vercel".** Hay **5 runtimes con env vars independientes** (Vercel + 4 Cloud Run). **NUNCA** prendas/apagues un flag sin mapear antes dónde se LEE (`grep -rn "<FLAG>" src/ services/`) y aplicarlo en **todos**; lo **async** (email, projection reactiva, consumer del outbox, cron) vive en el **`ops-worker`, NO en Vercel**. **En Cloud Run el SoT es `services/<worker>/deploy.sh`**: declarar el flag ahí (los `deploy.sh` usan `--set-env-vars` **destructivo**, que borra toda var agregada out-of-band) **y además** aplicarlo en vivo con `gcloud run services update … --update-env-vars` para efecto inmediato. Hacer sólo lo segundo = el flag desaparece en el próximo deploy, **en silencio**. **SIEMPRE** verificar en la **revisión activa** + ejercitar el flujo real, y declarar el runtime en la fila del ledger. Runbook: `FEATURE_FLAG_STATE_LEDGER.md`.
 
@@ -1004,7 +1004,7 @@ AGENT_AUTH_SECRET=<secret> node scripts/playwright-auth-setup.mjs
 pnpm playwright test tests/e2e/smoke/finance-cash-out.spec.ts --project=chromium
 ```
 
-**⚠️ Regla**: cuando cierres una task que toque write paths finance, agregá `[downstream-verified: <flow>]` al último commit y describí qué verificaste. Patrón:
+**⚠️ Regla**: cuando cierres una task que toque write paths finance, agrega `[downstream-verified: <flow>]` al último commit y describe qué verificaste. Patrón:
 
 ```text
 feat(finance): TASK-XXX Slice 5 — registro pago atómico
@@ -1105,7 +1105,7 @@ Los invariantes operativos de Finance ledger/bank — internal account number al
 - **Vistas nuevas con dashboards de alto impacto** (MRR/ARR, Finance, ICO, Pulse, Portfolio, Quality Signals, executive views): usar **Apache ECharts** vía `echarts-for-react`. Animaciones cinemáticas, tooltips multi-series ricos, gradientes premium, geo/sankey/sunburst/heatmap si se necesitan en el futuro. Lazy-load por ruta para mitigar bundle (~250-400 KB).
 - **Vistas existentes con ApexCharts** (32 archivos al 2026-04-26): siguen activas sin deadline. ApexCharts se mantiene como segundo tier oficial — no es deuda técnica, es un stack válido vigente. Migración Apex → ECharts es oportunista, solo si la vista se toca y se busca subir el tier visual.
 - **NO usar Recharts** como default para vistas nuevas. Recharts gana en bundle/ecosystem pero pierde en wow factor sin una capa custom de polish (que no existe). Reservar Recharts solo para sparklines compactos en KPI cards o cuando explícitamente no se necesita impacto visual.
-- **Excepción única**: si necesitas un tipo de chart que ECharts no cubre o querés control absoluto Stripe-level, usar Visx (requiere construcción custom).
+- **Excepción única**: si necesitas un tipo de chart que ECharts no cubre o quieres control absoluto Stripe-level, usar Visx (requiere construcción custom).
 - **Por qué este orden** (ECharts > Apex > Recharts):
   - ECharts gana en visual atractivo (10/10), enganche (10/10), cobertura de tipos (heatmap, sankey, geo, calendar).
   - Apex ya cubre el portal con visual decente (8/10) y no urge migrar.

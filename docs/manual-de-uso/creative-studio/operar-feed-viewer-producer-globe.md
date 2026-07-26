@@ -55,7 +55,7 @@ gh workflow run deploy-internal.yml -R efeoncepro/efeonce-globe -f service=globe
    verificación que protege al operador.
 4. `GET /producer/feed` **sin** cookie de sesión → 401, nunca 200.
 5. En el feed, las piezas guardadas muestran su imagen real (no un degradado de color). Un degradado
-   significa que los bytes no llegaron: mirá el punto siguiente.
+   significa que los bytes no llegaron: mira el punto siguiente.
 
 ## Diagnóstico
 
@@ -70,7 +70,7 @@ El degradado es el **placeholder honesto**, no un error. Aparece en tres casos l
 | El retrieval de esa pieza **falló** | Una pieza que falla no degrada el feed: se queda con su degradado y la card sigue usable |
 
 Si **ninguna** pieza guardada muestra imagen, el problema es el retrieval gobernado
-(`globe.producer.output.get`), no el feed. Abrí una pieza en el viewer: te va a decir cuál de los cuatro
+(`globe.producer.output.get`), no el feed. Abre una pieza en el viewer: te va a decir cuál de los cuatro
 casos es.
 
 ### El viewer dice algo distinto según el caso, y eso es a propósito
@@ -91,7 +91,7 @@ es que apretarlo no cambiaría nada.
 
 El feed reanuda cada 4 segundos. Si dejó de traer novedades:
 
-1. abrí las herramientas de red del browser y mirá las llamadas a `/v1/ui/dispatch`;
+1. abre las herramientas de red del browser y mira las llamadas a `/v1/ui/dispatch`;
 2. la **primera** debe ser `globe.producer.feed.live.list` sin cursor, y las **siguientes**
    `globe.producer.feed.live.changes` **con** cursor;
 3. si ves `list` repetido, la marca no se está reanudando y el feed está pidiendo todo cada vez;
@@ -121,7 +121,7 @@ node apps/studio-client/scripts/producer-concurrency-canary.mjs
 |---|---|---|
 | `/producer/feed` da 404 con sesión válida | el bundle cliente no está en la imagen desplegada | redeployar; la ruta da 404 en vez de caer al vanilla a propósito |
 | La pestaña se pone lenta después de abrir muchas piezas | un object URL sin revocar | es un bug: `governed-media.ts` debe revocar; sus tests miden `liveCount()` |
-| El canary de concurrencia dice que todo pasa pero `/__log` está vacío | el browser no está ejecutando JS (bundle 404) | revisá los 404 antes de creerle |
+| El canary de concurrencia dice que todo pasa pero `/__log` está vacío | el browser no está ejecutando JS (bundle 404) | revisa los 404 antes de creerle |
 
 ## Referencias técnicas
 

@@ -37,7 +37,7 @@ el espacio de trabajo de quien pregunta realmente produjo**.
 ## Cómo se comporta
 
 - **Solo ves lo tuyo.** Una pieza de otro espacio de trabajo responde "no encontrada". No dice "existe pero no
-  podés"; dice exactamente lo mismo que si nunca hubiera existido — porque decir algo distinto ya sería una
+  puedes"; dice exactamente lo mismo que si nunca hubiera existido — porque decir algo distinto ya sería una
   pista.
 - **Una referencia de entrada nunca se descarga.** Aunque sus bytes estén en el mismo depósito, solo se sirven
   **piezas producidas y retenidas**. Un material de referencia entra por huella y no sale nunca por esta vía.
@@ -48,7 +48,7 @@ el espacio de trabajo de quien pregunta realmente produjo**.
   de trabajo y una modalidad de entrega. Aun teniéndolo hay que estar autenticado y seguir siendo dueño de la
   pieza; si dejó de serlo, el pase no sirve.
 - **Si el depósito falla, lo dice.** Nunca entrega un archivo vacío ni bytes equivocados: verifica que lo que
-  bajó coincide con la huella declarada y, si algo no calza, responde "dependencia no disponible, reintentá".
+  bajó coincide con la huella declarada y, si algo no calza, responde "dependencia no disponible, reintenta".
 - **Marcar favorito no es un interruptor a ciegas.** Se envía el estado deseado ("marcada" / "no marcada"), así
   que repetir la acción por un reintento no la desmarca sin querer.
 - **Reusar como referencia no gasta.** No corre ningún modelo: certifica la pieza como referencia reutilizable

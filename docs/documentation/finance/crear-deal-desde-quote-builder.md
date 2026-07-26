@@ -30,7 +30,7 @@ Ahora puedes crear el deal **desde el mismo cotizador**, en un drawer gobernado,
 ### El flujo desde el punto de vista del operador
 
 1. Estas cotizando una oportunidad y el selector de deal aparece vacio (no hay deals asociados a la organization).
-2. En el footer del popover del chip Deal aparece "¿No encontrás el deal que buscás?" con el CTA "Crear deal nuevo".
+2. En el footer del popover del chip Deal aparece "¿No encuentras el deal que buscas?" con el CTA "Crear deal nuevo".
 3. Click → se abre un drawer a la derecha con los campos operativos reales del nacimiento del deal: **nombre del deal**, **pipeline**, **etapa inicial**, **tipo de negocio**, **prioridad**, **monto estimado** y **moneda**. También muestra qué contacto se asociará y cómo se resolverá el owner.
 4. El drawer lee `GET /api/commercial/organizations/:id/deal-creation-context` para precargar pipeline + etapa + `dealType` + `priority` con los defaults gobernados. Si falta `hubspot_company_id` o la governance está incompleta, el drawer bloquea el create antes del submit y explica el motivo.
 5. Completas los campos y presionas "Crear deal y asociar".

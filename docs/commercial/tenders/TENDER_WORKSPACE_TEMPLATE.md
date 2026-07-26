@@ -89,8 +89,8 @@ pnpm economica:build docs/commercial/tenders/<slug>/economica.json
 El builder (`scripts/commercial/lib/economic-offer-xlsx.mjs`, domain-free y reusable) aplica el oficio de
 marca: banda navy con el wordmark Efeonce, paleta AXIS, tabla con zebra, **bloque de total Neto/IVA/Total**,
 formato CLP y print setup A4. **Techo de Excel:** las fuentes no se embeben en `.xlsx` (degradan a la del
-lector); si querés brand pixel-perfect, ese lugar es un PDF del composer, con el Excel como la planilla
-editable. **Antes de brandear libre, confirmá si las bases exigen SU planilla** (formato equivocado =
+lector); si quieres brand pixel-perfect, ese lugar es un PDF del composer, con el Excel como la planilla
+editable. **Antes de brandear libre, confirma si las bases exigen SU planilla** (formato equivocado =
 inadmisible). 🔴 **NUNCA** un precio unitario por artículo (el schema no tiene ese campo).
 
 ## Reglas duras

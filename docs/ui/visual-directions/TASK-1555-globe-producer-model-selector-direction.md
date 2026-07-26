@@ -130,6 +130,6 @@ altura al prompt (TASK-1552); C se rechaza por técnica/genérica.
 8-9. GVC premium + scorecard 14 dimensiones (≥4.5 promedio, pisos ≥4.5 en jerarquía/economía/impacto/fidelidad/anti-template).
 10. Enterprise review; `BLOCK` frena el cierre.
 
-> Nota: si querés **ver** las direcciones como imágenes (no solo el benchmark repo-native), se puede generar un set
+> Nota: si quieres **ver** las direcciones como imágenes (no solo el benchmark repo-native), se puede generar un set
 > de conceptos con la lane `ai-ui-generation-director` sobre esta dirección A — es opcional; el contrato acepta este
 > documento como fuente de dirección válida.

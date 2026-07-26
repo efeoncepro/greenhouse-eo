@@ -223,7 +223,7 @@ Que el payload cliente de Globe tenga el motion del diseño aprobado, con el con
 - Alternatives considered: (a) motion dentro de TASK-1564 — rechazado, definiría el isotipo para una superficie
   y la otra lo copiaría; (b) sólo el motion del feed ahora — rechazado por lo mismo; (c) una librería de
   animación — rechazado, todo el motion es declarativo y cíclico, y una librería agrega peso al payload
-- Why this pattern: el gate es lo que convierte «acordate de la contraparte de reduced-motion» en algo que
+- Why this pattern: el gate es lo que convierte «acuérdate de la contraparte de reduced-motion» en algo que
   rompe el build
 - Reuse / extend / new primitive: `new` con dos consumidores desde el día uno
 - Open risks: 7 elementos animados por corrida activa; hay que medir con varias en vuelo

@@ -35,7 +35,7 @@ Setear el ref (Vercel staging+prod + ops-worker):
 ```bash
 printf %s "greenhouse-notion-knowledge-webhook-signing-secret" | vercel env add NOTION_KNOWLEDGE_WEBHOOK_SIGNING_SECRET_REF production --force --scope efeonce-7670142f
 ```
-(idem el target del entorno donde apuntás el webhook; + setear en el ops-worker `deploy.sh`).
+(idem el target del entorno donde apuntas el webhook; + setear en el ops-worker `deploy.sh`).
 
 > El signing secret (verification_token de Notion) es **distinto** del token de la integración (`notion-integration-token-greenhouse-knowledge`). No reusar.
 
@@ -59,7 +59,7 @@ Redeploy Vercel + ops-worker para tomar el env var.
 
 ## Operación diaria
 
-**Nada manual.** Escribís en Notion como siempre; el corpus se mantiene solo. Solo se incluyen las Wikis/páginas declaradas en `src/lib/knowledge/notion/notion-corpus.ts` (lo demás se ignora).
+**Nada manual.** Escribes en Notion como siempre; el corpus se mantiene solo. Solo se incluyen las Wikis/páginas declaradas en `src/lib/knowledge/notion/notion-corpus.ts` (lo demás se ignora).
 
 ### Agregar una Wiki/página nueva al corpus
 

@@ -107,7 +107,7 @@ Reglas obligatorias:
 2. **Mascota viva (ojos siguen, parpadeo, saludo, reacciones) → Rive.** Primitiva correcta: state machine + input look-at, runtime ~90KB, `.riv` editable por diseñador. En superficie dedicada, no en el hero.
 3. **AI image tools (OpenAI GPT Image / Gemini Nano Banana) → generan la hoja de expresiones/turnaround de referencia que alimenta el rig de Rive** + assets estáticos de marca. NO son el runtime de animación.
 
-**Why Rive y no sprite-set IA:** robustez (determinístico vs flicker por drift), escala/peso (1 `.riv` ~90KB vs ~12 PNG 1.5–2.5MB y steppy), mantenibilidad (editás un rig vs regenerar+curar N frames), regla "primitiva correcta vs exótica".
+**Why Rive y no sprite-set IA:** robustez (determinístico vs flicker por drift), escala/peso (1 `.riv` ~90KB vs ~12 PNG 1.5–2.5MB y steppy), mantenibilidad (editas un rig vs regenerar+curar N frames), regla "primitiva correcta vs exótica".
 
 ## Rollout Plan & Risk Matrix
 

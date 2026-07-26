@@ -93,7 +93,7 @@ El operador aprobó la propuesta **Restraint v1** completa (charts vibrantes + d
 2. **Emails** (paleta propia aislada del SoT, `src/emails/constants.ts`) → task separada.
 3. **Promover `greenhouse/no-hardcoded-hex-color` a `error` baseline 0** → con la task del verde finanzas.
 
-Si vas a decir "esto no se hace en TASK-1053", verificá que sea exactamente uno de esos 3. Cualquier otra cosa de Restraint v1 **se hace**.
+Si vas a decir "esto no se hace en TASK-1053", verifica que sea exactamente uno de esos 3. Cualquier otra cosa de Restraint v1 **se hace**.
 
 ## Delta de ejecución 2026-06-08 (A1a + A1b shipped en `develop` local)
 
@@ -340,7 +340,7 @@ Auditoría con `design-system-governance` + `a11y-architect` + `modern-ui`. Veri
 
 **Recomendación canónica: por fases — Paso 0 (foundation) → Fase A (re-value) → Fase B (patrones). NO todo junto.** Razones (robusto + escalable, Solution Quality Contract):
 
-- **Cada paso se verifica y revierte solo.** Si aparece una regresión visual, sabés si fue el cambio de valores (A) o el de comportamiento de componentes (B). Un PR gigante A+B mezcla las dos cosas → diagnóstico imposible.
+- **Cada paso se verifica y revierte solo.** Si aparece una regresión visual, sabes si fue el cambio de valores (A) o el de comportamiento de componentes (B). Un PR gigante A+B mezcla las dos cosas → diagnóstico imposible.
 - **A es mecánico** (propaga por tokens a todos los consumidores) → bajo riesgo, rápido, blast radius gobernado en un solo lugar (el SoT + primaryColorConfig + axisOpacity).
 - **B es escalable por diseño:** el tonal-by-default se hace en UN lugar (el override de `<Chip>`/`<Alert>` del theme) y vuelve tonales TODOS los chips de la app de una — no se toca chip por chip.
 - **El estado intermedio (post-A, pre-B) NO está roto:** es coherente y usable (colores nuevos + chips sólidos con color nuevo). Solo no es el tratamiento tonal final. Ningún usuario queda con UI rota.

@@ -206,5 +206,5 @@ Cada sub-task tiene su Detailed Spec propia. El umbrella solo coordina:
 
 ## Open Questions
 
-- Orden de ejecución: ¿pivote a TASK-526 primero (más rápida, feedback inmediato) y TASK-643 segundo (foundational pero más lenta)? Recomendación actual es TASK-643 primero para tener tokens canónicos antes de animar; pero si querés ver progreso visible en 2-3h, podés invertir el orden.
+- Orden de ejecución: ¿pivote a TASK-526 primero (más rápida, feedback inmediato) y TASK-643 segundo (foundational pero más lenta)? Recomendación actual es TASK-643 primero para tener tokens canónicos antes de animar; pero si quieres ver progreso visible en 2-3h, puedes invertir el orden.
 - ¿Validación con un cliente Globe real (showcase 1:1 con stakeholder) al cerrar el programa para confirmar la percepción "moderna"?

@@ -405,6 +405,6 @@ En `greenhouse-eo`: `node scripts/frontend/globe-share-board-canary.mjs` verde �
   está abierto. Decisión de producto + arquitectura.
 - **¿Qué ve el cliente?** Depende de la Open Question de autoría de `TASK-1562`. Las opciones se mueven
   juntas: si el autor no se muestra, el mencionado tampoco debería.
-- **¿La mención puede apuntar a alguien sin acceso al output?** Sería útil ("mirá esto") y a la vez raro
+- **¿La mención puede apuntar a alguien sin acceso al output?** Sería útil ("mira esto") y a la vez raro
   (recibe un aviso sobre algo que no puede abrir). Decide el Slice 1: o se rechaza, o se notifica con un
   mensaje que no revele contenido.

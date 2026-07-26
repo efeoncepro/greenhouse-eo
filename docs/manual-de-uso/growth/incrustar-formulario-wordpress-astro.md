@@ -114,7 +114,7 @@ define( 'GREENHOUSE_GROWTH_CATALOG_EMBED_KEY', '<secreto>' );                  /
 ```
 
 - La **embed key** se genera en Greenhouse con `pnpm growth:forms:embed-key --surface-id <id>`
-  (el secreto se muestra una sola vez; guardalo aqui, nunca en git ni en el navegador).
+  (el secreto se muestra una sola vez; guárdalo aqui, nunca en git ni en el navegador).
 - Si las constantes no estan o el catalogo no responde, el panel lo dice y caes al
   **slug manual** (los embeds existentes siguen funcionando, sin romperse).
 - El catalogo requiere que `GROWTH_FORMS_CATALOG_API_ENABLED` este ON en el entorno
@@ -177,21 +177,21 @@ estilos de los campos. Esto significa dos cosas:
 `--ghf-radius`, `--ghf-gap`, `--ghf-focus`. El widget Elementor ya expone acento + ancho
 máximo en la pestaña **Estilo**; el resto se ajusta con CSS scoped al contenedor.
 
-> **Propagación de tokens (TASK-1298 — leer si overrideás tokens vía CSS scoped).** El
+> **Propagación de tokens (TASK-1298 — leer si overrideas tokens vía CSS scoped).** El
 > renderer monta el contenido en un `<div class="ghf-root">`. Desde el fix `hosted` del
 > renderer, ese wrapper **NO** re-declara los tokens cuando está dentro de un host
 > `<greenhouse-form>`, así que un override en `greenhouse-form { --ghf-* }` **propaga**
 > a todo el contenido (es el patrón canónico). En la versión previa del renderer (servida
 > hasta que el fix llegue a prod) el wrapper interno llevaba `.ghf-scope` y re-declaraba los
 > tokens, sombreando el override; el workaround forward-compatible es targetear también el
-> scope: `greenhouse-form, greenhouse-form .ghf-scope { --ghf-* }`. Si overrideás tokens y
-> no ves el cambio en el contenido (solo en el borde del host), es esto: agregá el selector
+> scope: `greenhouse-form, greenhouse-form .ghf-scope { --ghf-* }`. Si overrideas tokens y
+> no ves el cambio en el contenido (solo en el borde del host), es esto: agrega el selector
 > `.ghf-scope`. Mismo motivo aplica a `appearance="bare"`: cubre el host; el workaround lo
 > extiende al scope interno.
 
 **Modo claro/oscuro — gotcha importante:** por defecto el renderer sigue el modo del SO
 del visitante (`prefers-color-scheme`). Si tu sección es una **banda clara**, un visitante
-con el SO en oscuro vería el formulario oscuro y descuadrado. Forzá claro en el embed:
+con el SO en oscuro vería el formulario oscuro y descuadrado. Fuerza claro en el embed:
 
 ```html
 <greenhouse-form form-key="…" surface="…" locale="es-CL" color-scheme="light"> … </greenhouse-form>
@@ -202,7 +202,7 @@ con el SO en oscuro vería el formulario oscuro y descuadrado. Forzá claro en e
 **Atributo de conveniencia `appearance` (TASK-1297, disponible):** `appearance="surface"`
 (por defecto, comportamiento actual) o `appearance="bare"` (chromeless: el renderer queda
 con fondo transparente, sin escribir `--ghf-bg: transparent` a mano). Para integrar el
-renderer dentro de una card del host sin card-on-card, preferí `appearance="bare"` sobre el
+renderer dentro de una card del host sin card-on-card, prefiere `appearance="bare"` sobre el
 token CSS.
 
 ```html

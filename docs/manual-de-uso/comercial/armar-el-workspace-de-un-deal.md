@@ -14,8 +14,8 @@ cliente. Es el punto de partida de cualquier deal: primero la carpeta, después 
 
 ## Antes de empezar
 
-- Trabajás desde el repo `greenhouse-eo` (las fuentes son archivos git).
-- Necesitás el **slug** del deal en kebab-case: `<cliente>-<servicio>-<año>` (ej. `sky-blog-2027`).
+- Trabajas desde el repo `greenhouse-eo` (las fuentes son archivos git).
+- Necesitas el **slug** del deal en kebab-case: `<cliente>-<servicio>-<año>` (ej. `sky-blog-2027`).
 
 ## Paso a paso
 
@@ -30,12 +30,12 @@ checklist. No sobrescribe si ya existe.
 
 ### 2. Cargar las bases
 
-Poné el RFP y las bases (administrativas, técnicas, económicas) en **`bases/`**. Es la fuente normativa:
+Pon el RFP y las bases (administrativas, técnicas, económicas) en **`bases/`**. Es la fuente normativa:
 manda sobre todo lo demás. Si hay aclaraciones del foro, van también acá.
 
 ### 3. Admisibilidad + bid/no-bid
 
-Antes de escribir la oferta: corré el checklist de admisibilidad y la decisión bid/no-bid (pedíselo a un
+Antes de escribir la oferta: corre el checklist de admisibilidad y la decisión bid/no-bid (pedíselo a un
 agente con la skill `greenhouse-public-private-tenders`). **Nunca un GO sin margen sobre loaded cost.**
 
 ### 4. Investigación
@@ -50,19 +50,19 @@ El archivo **`oferta-tecnica.md`** ya viene copiado del template. Se llena en do
 
 - **Zona 0 — Ledger de evidencia (primero):** cada cifra/dato con su fuente googleable + fecha. Sin
   fuente, no entra. El evaluador va a buscar la fuente — si no la encuentra, se cae todo lo demás.
-- **Zona 1 — Narrativa:** las secciones (resumen, diagnóstico, enfoque, equipo, SLA…). Usá las que
-  puntúen en ESA licitación; borrá las que no apliquen. Ninguna cifra que no esté en el ledger.
+- **Zona 1 — Narrativa:** las secciones (resumen, diagnóstico, enfoque, equipo, SLA…). Usa las que
+  puntúen en ESA licitación; borra las que no apliquen. Ninguna cifra que no esté en el ledger.
 
 ### 6. Registrar los artefactos vivos
 
-En **`artifact-manifest.json`** anotá las piezas que **no son archivos**: la Radiografía AEO, el informe
+En **`artifact-manifest.json`** anota las piezas que **no son archivos**: la Radiografía AEO, el informe
 del Brand Visibility Grader, un dashboard o demo. Se guardan **por enlace, nunca por captura**
-(`render: "by_link"`). Cada uno anota qué evidencia respalda y dónde se usa. Borrá el ejemplo que trae.
+(`render: "by_link"`). Cada uno anota qué evidencia respalda y dónde se usa. Borra el ejemplo que trae.
 
 ### 7. Armar el deck
 
 El **`deck-plan.json`** es la fuente del deck. Se autora **desde** la oferta técnica (no se auto-genera):
-elegís qué secciones se vuelven lámina. Después:
+eliges qué secciones se vuelven lámina. Después:
 
 ```bash
 pnpm deck:compose docs/commercial/tenders/<slug>/deck-plan.json
@@ -70,7 +70,7 @@ pnpm deck:compose docs/commercial/tenders/<slug>/deck-plan.json
 
 ### 8. Registrar el deal como Proposal
 
-Cuando la oferta esté lista, registrá el deal en el Proposal Studio y adjuntá las salidas (el PDF del
+Cuando la oferta esté lista, registra el deal en el Proposal Studio y adjunta las salidas (el PDF del
 deck, las ofertas). Ahí quedan versionadas y descargables desde el portal `/admin/commercial/proposals`.
 
 ## Qué significan las carpetas
@@ -97,10 +97,10 @@ deck, las ofertas). Ahí quedan versionadas y descargables desde el portal `/adm
 
 ## Problemas comunes
 
-- **`pnpm tender:new` dice "ya existe"** → la carpeta ya está; elegí otro slug o trabajá sobre la existente.
+- **`pnpm tender:new` dice "ya existe"** → la carpeta ya está; elige otro slug o trabaja sobre la existente.
 - **El slug es rechazado** → tiene que ser kebab-case (minúsculas, números, guiones): `sky-blog-2027`.
 - **El deck sale con una cifra "rara" o truncada** → el composer falla cerrado ante cifra sin fuente o
-  texto que no cabe; revisá el ledger y el `deck-plan.json`.
+  texto que no cabe; revisa el ledger y el `deck-plan.json`.
 
 ## Referencias
 

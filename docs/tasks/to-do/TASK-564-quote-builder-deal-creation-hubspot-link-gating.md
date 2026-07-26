@@ -147,14 +147,14 @@ Reglas obligatorias:
 ### Slice 3 — Drawer inline "Vincular Company HubSpot"
 
 - Componente `LinkHubSpotCompanyDrawer` reutilizando el buscador de `/api/commercial/parties/search` con filtro `kind=hubspot_candidate`.
-- Fallback: si el search no devuelve matches, mensaje "No encontramos la Company en HubSpot. Creala allá y volvé" + link externo al portal HubSpot (doc técnico de setup referenciable).
+- Fallback: si el search no devuelve matches, mensaje "No encontramos la Company en HubSpot. Créala allá y vuelve" + link externo al portal HubSpot (doc técnico de setup referenciable).
 - Botón "Vincular Company HubSpot" en `QuoteBuilderShell` junto al CTA gated (o inline dentro del tooltip del botón disabled).
 - Hook `useLinkHubSpotCompany` que invalida el fetch de org detail → `hubspotCompanyId` se actualiza y el CTA se desbloquea sin refresh.
 - Telemetría (logs estructurados, no métricas formales): `link_attempted`, `link_succeeded`, `link_no_candidate` para medir si se necesita Slice 4 (crear Company inline).
 
 ## Out of Scope
 
-- **Crear Company nueva en HubSpot desde Greenhouse.** Si la Company no existe en HubSpot, esta task no la crea — muestra fallback "creala en HubSpot y volvé". Crear Company vía Cloud Run `POST /companies` es task hermana — abrir como TASK-565 (o equivalente) si la telemetría del Slice 3 muestra >20% de casos sin candidate.
+- **Crear Company nueva en HubSpot desde Greenhouse.** Si la Company no existe en HubSpot, esta task no la crea — muestra fallback "créala en HubSpot y vuelve". Crear Company vía Cloud Run `POST /companies` es task hermana — abrir como TASK-565 (o equivalente) si la telemetría del Slice 3 muestra >20% de casos sin candidate.
 - **Bulk link para orgs legacy.** Esta task resuelve el flujo por-operador en Quote Builder. El bulk va en follow-up del programa `TASK-534` (Admin Center tool, nueva task).
 - **Cambios al flujo `party_selector` de TASK-538.** El selector sigue siendo el path preferido para orgs nuevas; este task cubre el subconjunto ya-local-sin-hubspot.
 - **Cambios a `createDealFromQuoteContext`.** El comando sigue siendo consumidor de `hubspot_company_id`, no lo escribe. El guard del línea 369 se mantiene como defensa en profundidad.
@@ -176,7 +176,7 @@ Reglas obligatorias:
   <Stack direction='row' spacing={1}>
     <Tooltip title={
       !hubspotCompanyId
-        ? 'Vinculá esta organización a una Company de HubSpot antes de crear deals.'
+        ? 'Vincula esta organización a una Company de HubSpot antes de crear deals.'
         : ''
     }>
       <span>

@@ -235,7 +235,7 @@ La resolución es por **container** (no viewport) donde sea posible (container q
 - **NUNCA** acoplar el card al shell — el card se adapta a su ancho (container query), no al shell.
 - **NUNCA** declarar la primitive completa sin: un consumer existente re-expresado que **se simplifique** (gate) + GVC desktop+mobile + tests del controller + reducer.
 - **SIEMPRE** flag default OFF hasta GVC verde + sign-off; rollout staged (piloto → ampliar).
-- **NUNCA** hand-wirear el namespace reservado `gh-region-*` de view-transition-name en una view (lint `greenhouse/no-ad-hoc-layout-morph`, TASK-1119). El substrato es el único dueño. Para continuidad de objeto (card→detalle) usá TU namespace con `startViewTransition` (TASK-525), no `gh-region-*`.
+- **NUNCA** hand-wirear el namespace reservado `gh-region-*` de view-transition-name en una view (lint `greenhouse/no-ad-hoc-layout-morph`, TASK-1119). El substrato es el único dueño. Para continuidad de objeto (card→detalle) usa TU namespace con `startViewTransition` (TASK-525), no `gh-region-*`.
 - **NUNCA** animar la misma propiedad sobre el mismo nodo con VT y framer-motion a la vez (TASK-1117). VT = morph estructural; framer-motion `layout` = interrumpible; stagger = entrada. Frontera dura.
 
 ## 14. Open questions (a resolver en Slice 2)

@@ -1027,7 +1027,7 @@ El detalle, límites beta de Adobe y contrato de edición viven en el ADR
 
 | Módulo (`src/lib/commercial/tenders/`) | Qué hace |
 |---|---|
-| `deck/selector.ts` | lookup determinista content-type → plantilla + audit de cierre referencial del registry. Un content-type desconocido **revienta** (significa "falta una plantilla", no "improvisá") |
+| `deck/selector.ts` | lookup determinista content-type → plantilla + audit de cierre referencial del registry. Un content-type desconocido **revienta** (significa "falta una plantilla", no "improvisa") |
 | `deck/validate.ts` | `overflow: reject` — **nunca trunca**; y una cifra sin `evidenceRef` **no se compone** (anti-fabricación) |
 | `deck/resolvers.ts` | **15 resolvers**: traducen valor semántico → presentación. El autor dice QUÉ es; el deck decide CÓMO se ve (ver tabla abajo) |
 | `deck/render.ts` | llena el **DOM real de Chromium** (el browser que resuelve el contrato es el mismo que pinta), **verifica geometría** y captura PNG/PDF |

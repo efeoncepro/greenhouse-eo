@@ -36,7 +36,7 @@ Una entrada por ruta bajo `(dashboard)`. El build seguía siendo `Compiled succe
 4. Next detecta el uso de API dinámica durante prerender → lanza `Dynamic server usage` con `error.digest === 'DYNAMIC_SERVER_USAGE'`.
 5. El `try/catch` en el layout intercepta ese error y lo loggea como `console.error`. Eso es lo que ensucia los logs.
 
-El error **NO es un error real** — es la señal del framework "esta ruta debe ser dynamic, no la prerendericés". Pero el `try/catch` ad hoc lo trataba como falla de auth.
+El error **NO es un error real** — es la señal del framework "esta ruta debe ser dynamic, no la prerenderices". Pero el `try/catch` ad hoc lo trataba como falla de auth.
 
 ### 2.3 Impacto del antipatrón
 
@@ -135,7 +135,7 @@ export const dynamic = 'force-dynamic'
 
 const LoginPage = async () => {
   const session = await getOptionalServerSession()
-  if (session) redirect('/auth/landing')  // ya logueado, mandalo al portal
+  if (session) redirect('/auth/landing')  // ya logueado, mándalo al portal
   return <LoginForm />
 }
 ```

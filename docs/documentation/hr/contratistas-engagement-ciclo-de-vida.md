@@ -17,7 +17,7 @@ Hasta antes de esto, el workbench HR solo mostraba la cola de revisión + el edi
 El workbench `/hr/contractors` tiene **dos pestañas**, porque son dos tareas distintas:
 
 - **Cola de revisión** — *triage*. Lista solo los engagements con algo pendiente: envíos de trabajo por aprobar, disputas, payables bloqueados o tarifa sin fijar. Es lo que HR atiende día a día.
-- **Directorio** — *browse*. Lista **todos** los engagements vigentes (activo, en pausa, borrador, terminando), buscables por nombre, ID o estado. Es donde encontrás a un contractor **sano** (activo, tarifa fijada, sin pendientes) que no aparece en la cola porque no tiene nada que atender.
+- **Directorio** — *browse*. Lista **todos** los engagements vigentes (activo, en pausa, borrador, terminando), buscables por nombre, ID o estado. Es donde encuentras a un contractor **sano** (activo, tarifa fijada, sin pendientes) que no aparece en la cola porque no tiene nada que atender.
 
 Ambas pestañas abren **el mismo inspector** al seleccionar: mismo detalle, mismos controles de ciclo de vida, misma revisión de clasificación, mismo cierre. El Directorio no agrega gestión nueva — solo hace **alcanzable** a cualquier engagement, no solo a los de la cola.
 
@@ -25,7 +25,7 @@ Ambas pestañas abren **el mismo inspector** al seleccionar: mismo detalle, mism
 
 ## Cómo se usa (desde el inspector)
 
-1. Seleccionás un engagement en la **cola de revisión** (pendientes) o en el **Directorio** (todos).
+1. Seleccionas un engagement en la **cola de revisión** (pendientes) o en el **Directorio** (todos).
 2. El **inspector** (columna derecha) muestra el resumen + los **controles de ciclo de vida** (solo las transiciones válidas desde el estado actual) + dos accesos: **Ver detalle completo** y **Revisar clasificación**.
 
 ## Detalle del engagement
@@ -39,7 +39,7 @@ Ambas pestañas abren **el mismo inspector** al seleccionar: mismo detalle, mism
 - **Máquina de estados**: el estado actual + las transiciones disponibles.
 - **Clasificación**: los factores de riesgo (presentes/ausentes) + el estado de riesgo.
 
-Desde el header del detalle podés **Editar términos**.
+Desde el header del detalle puedes **Editar términos**.
 
 ## Ciclo de vida (estados)
 

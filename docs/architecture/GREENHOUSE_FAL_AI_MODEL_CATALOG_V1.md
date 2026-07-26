@@ -27,7 +27,7 @@ Catálogo de **capacidades y modelos** disponibles en Greenhouse a través de **
 
 ### Cómo llamar cualquier modelo (patrón único)
 
-Todo modelo se invoca igual — pasás su **slug** + su **input** al cliente canónico:
+Todo modelo se invoca igual — pasas su **slug** + su **input** al cliente canónico:
 
 ```ts
 import { runFalModel } from '@/lib/ai/fal'
@@ -45,7 +45,7 @@ const res = await runFalModel<{ images?: Array<{ url: string }> }>({
   productivo futuro pertenece al repositorio separado de Creative Studio.
 - **Gotcha queue URLs:** para slugs con sub-path (`fal-ai/flux/schnell`), Fal.ai devuelve `status_url`/`response_url` en el **app padre** (`fal-ai/flux/requests/...`). `runFalModel` ya usa esas URLs; nunca reconstruirlas a mano (da HTTP 405).
 - **⚠️ Gotcha prefijo ByteDance (verificado en vivo 2026-07-19):** los modelos **ByteDance** de imagen y video (Seedream, Seedance) usan slug **SIN** el prefijo `fal-ai/` — `bytedance/seedream/v5/pro/text-to-image`, `bytedance/seedance-2.0/text-to-video`. Con el prefijo `fal-ai/bytedance/...` el submit se acepta (200) pero el **result da 404** (`Path /seedream/... not found`) y `inference_time` ≈ 0.02s (no generó nada). El resto de los proveedores (FLUX, Recraft, ElevenLabs, Topaz, Trellis, Hyper3D…) **sí** llevan `fal-ai/`. **Excepción Seed Audio:** pese a ser ByteDance, **Seed Audio NO sigue esta regla** — vive en `fal-ai/seed-audio` (CON prefijo; `bytedance/seed-audio` da 404) y usa el campo `prompt` (ver §9). Fuente de verdad de slugs: las **skills** (tested), no este catálogo si difieren.
-- **🔬 Método barato para verificar un slug (verificado en vivo 2026-07-19, sin generar ni gastar):** `POST {}` (body vacío) a `https://fal.run/<slug>` → **404** = la app no existe · **422** = la app existe (falló la validación de input por falta de campos). Confirmá cualquier slug así antes de incorporarlo, sin correr una generación real.
+- **🔬 Método barato para verificar un slug (verificado en vivo 2026-07-19, sin generar ni gastar):** `POST {}` (body vacío) a `https://fal.run/<slug>` → **404** = la app no existe · **422** = la app existe (falló la validación de input por falta de campos). Confirma cualquier slug así antes de incorporarlo, sin correr una generación real.
 - **Dirección de arte:** video → skill `motion-design-studio`; audio → `audio-studio`; elección de modelo/estética → `design-studio`; still images de UI/marca → `greenhouse-ai-image-generator`.
 
 ### Modelo de pricing (resumen)

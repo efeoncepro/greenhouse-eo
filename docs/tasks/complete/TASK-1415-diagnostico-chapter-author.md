@@ -382,7 +382,7 @@ El eval mide dos cosas distintas: **hechos** (exactos, string/número-equality c
 
 ## Open Questions
 
-- 🟢 **Primer author de prueba (decisión del operador):** diagnóstico (SEO/AEO) se eligió por tener el contrato más limpio para probar el motor — **NO** porque AEO sea el foco. ¿Confirmás diagnóstico como primera implementación completa, o preferís que la primera sea un author **servicio-transversal** (equipo/squad o económica, que aplica a TODAS las líneas)? El deliverable —el motor agnóstico— es el mismo en cualquier caso; sólo cambia cuál `deriveFacts` se construye primero.
+- 🟢 **Primer author de prueba (decisión del operador):** diagnóstico (SEO/AEO) se eligió por tener el contrato más limpio para probar el motor — **NO** porque AEO sea el foco. ¿Confirmas diagnóstico como primera implementación completa, o prefieres que la primera sea un author **servicio-transversal** (equipo/squad o económica, que aplica a TODAS las líneas)? El deliverable —el motor agnóstico— es el mismo en cualquier caso; sólo cambia cuál `deriveFacts` se construye primero.
 - **El segundo author de prueba (Slice 3):** ¿de qué otro servicio? (equipo/credenciales es el más barato de stubear y el más transversal — no lee el Grader, prueba el agnosticismo limpio.)
 - **Capability:** ¿reusar `commercial.proposal.manage` o crear `commercial.proposal.author`? (Si se crea, grant + coverage test mismo PR.) — resolver en Discovery.
 - **Mapeo dim/readiness → 5 peldaños Be-X:** `[verificar]` la correspondencia exacta con el equipo del Grader (el golden a mano podría tener el mapeo implícito y no documentado).

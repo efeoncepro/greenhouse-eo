@@ -52,7 +52,7 @@ Una carpeta nueva en `.captures/` con:
 - **Un manifest JSON** con metadata (qué ruta, qué env, cuándo, cuánto duró)
 - **Un reporte HTML** (`index.html`) con readiness, assertions, findings automáticos, microinteractions y frames
 
-Todo eso queda fuera del repo (gitignored). Si querés compartirlo, lo adjuntás manualmente.
+Todo eso queda fuera del repo (gitignored). Si quieres compartirlo, lo adjuntas manualmente.
 
 ## Por qué existe
 
@@ -69,15 +69,15 @@ La herramienta consolida ese patrón en una sola CLI canónica que:
 
 3 piezas:
 
-1. **CLI (`pnpm fe:capture`)** — el comando que invocás.
-2. **Scenarios declarativos** (archivos `.scenario.ts`) — describís los pasos (hover, click, mark) en TypeScript tipado.
+1. **CLI (`pnpm fe:capture`)** — el comando que invocas.
+2. **Scenarios declarativos** (archivos `.scenario.ts`) — describes los pasos (hover, click, mark) en TypeScript tipado.
 3. **Output estructurado** (`.captures/<timestamp>_<scenario>/`) — siempre la misma forma para que un visor / agente sepa qué buscar.
 
 ## Niveles de uso
 
 ### Nivel 1 — Captura simple (sin código)
 
-Si solo necesitás un screenshot + un breve video de una ruta:
+Si solo necesitas un screenshot + un breve video de una ruta:
 
 ```bash
 pnpm fe:capture --route=/hr/offboarding --env=staging --hold=3000
@@ -87,7 +87,7 @@ pnpm fe:capture --route=/hr/offboarding --env=staging --hold=3000
 
 ### Nivel 2 — Scenario con interacciones o scroll estable
 
-Si necesitás validar microinteractions, pantallas largas o secciones específicas, escribís un scenario:
+Si necesitas validar microinteractions, pantallas largas o secciones específicas, escribes un scenario:
 
 ```ts
 import type { CaptureScenario } from '../lib/scenario'
@@ -107,7 +107,7 @@ export const scenario: CaptureScenario = {
 }
 ```
 
-Y lo corrés: `pnpm fe:capture mi-feature --env=staging`.
+Y lo corres: `pnpm fe:capture mi-feature --env=staging`.
 
 ### Nivel 2.5 — Evidencia endurecida
 
@@ -138,7 +138,7 @@ Convención: si una sección se va a capturar más de una vez, agregar `data-cap
 
 ### Nivel 3 — Captura con mutaciones (escritura)
 
-Por default un scenario es read-only. Si necesitás llenar un formulario y submitir (lo cual crea una entidad real en staging), tenés que declararlo explícitamente:
+Por default un scenario es read-only. Si necesitas llenar un formulario y submitir (lo cual crea una entidad real en staging), tienes que declararlo explícitamente:
 
 ```ts
 mutating: true,

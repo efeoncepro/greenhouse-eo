@@ -203,7 +203,7 @@ PR separado en `cesargrowth11/notion-hubspot-sync`:
 ## Out of Scope
 
 - Archivar el repo GitHub del sibling. Sigue vivo pero con stub README — decisión del owner GitHub si lo archive formalmente más adelante.
-- Decommissionar la HubSpot Developer Platform app del sibling (`hsproject.json` 2025.2). Esa app todavía la usa el BQ ingestion del sibling — cubierto por TASK-575 si querés upgradearla.
+- Decommissionar la HubSpot Developer Platform app del sibling (`hsproject.json` 2025.2). Esa app todavía la usa el BQ ingestion del sibling — cubierto por TASK-575 si quieres upgradearla.
 - Borrar los BigQuery datasets del sibling inmediatamente. 30 días de safety window post-cutover antes del borrado definitivo.
 
 ## Detailed Spec

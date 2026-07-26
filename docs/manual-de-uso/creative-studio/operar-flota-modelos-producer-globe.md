@@ -18,15 +18,15 @@ Para responder, con evidencia y no de memoria, tres preguntas que aparecen segui
 
 - El reader es **read-only**. Nada de lo que hagas acá cambia disponibilidad: la disponibilidad la
   produce la **promoción** (ADR-009), que es otro proceso.
-- Necesitás la capability `globe.producer.catalog.read`.
+- Necesitas la capability `globe.producer.catalog.read`.
 - El estado por modelo se lleva en
   [`GLOBE_MODEL_FLEET_STATUS.md`](../../operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md).
-  **Leelo primero**: es la causa más común de concluir mal, porque un modelo puede estar integrado y
+  **Léelo primero**: es la causa más común de concluir mal, porque un modelo puede estar integrado y
   verificado en el Model Lab y aun así no estar promovido a producción.
 
 ## Diagnóstico: "este modelo no aparece como disponible"
 
-Recorré en este orden. Cada paso descarta una causa distinta, y saltearse el primero es de dónde
+Recorre en este orden. Cada paso descarta una causa distinta, y saltearse el primero es de dónde
 salen la mayoría de los diagnósticos equivocados.
 
 **1. ¿Existe la ruta en el catálogo?**
@@ -47,10 +47,10 @@ investigar: suele nombrar exactamente qué falta.
 
 ## Diagnóstico: "aparece pero no lo puedo ejecutar"
 
-Distinguí dos situaciones que se parecen y no son lo mismo:
+Distingue dos situaciones que se parecen y no son lo mismo:
 
 - **"Necesita cuadros" / "Necesita una imagen para editar"** → el modelo **está disponible**; le falta
-  un insumo. Elegirlo te lleva al modo donde se lo podés dar.
+  un insumo. Elegirlo te lleva al modo donde se lo puedes dar.
 - **"Próximamente" / "Bloqueado"** → no es ejecutable, y no hay nada que puedas hacer desde la
   pantalla.
 
@@ -101,7 +101,7 @@ por workspace, recomendado honesto, y que **el identificador del proveedor nunca
 |---|---|---|
 | El modelo no aparece en ninguna modalidad | No tiene ruta en el catálogo | Declarar la ruta (paso 1 de "Agregar") |
 | Aparece en un workspace y no en otro | Comportamiento correcto: promoción por workspace | Promover donde haga falta |
-| Dice "Próximamente" y sabés que funciona | Verificado en el Model Lab, **no promovido** a producción | Revisar el ledger; promover si corresponde |
+| Dice "Próximamente" y sabes que funciona | Verificado en el Model Lab, **no promovido** a producción | Revisar el ledger; promover si corresponde |
 | Nexa y la pantalla muestran distinto | **Un consumer se armó su propia lista** | Bug: buscar el cálculo paralelo y borrarlo |
 | Falla después de reservar crédito | Se ofreció ejecutable donde no puede correr | Bug: reportar con la ruta y el modo |
 

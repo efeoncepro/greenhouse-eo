@@ -131,6 +131,32 @@ Las rutas de la tabla son relativas a `docs/architecture/` cuando comienzan por 
 - **Runtime completeness:** código no equivale a operativo. Flags, env, deploy, migrations, backfills, crons,
   webhooks, workers, secrets, data recovery y verificación live forman parte del cierre.
 
+### Registro del español (voseo → tuteo neutro)
+
+El operador **no es argentino** y el voseo rioplatense le molesta explícitamente. La regla vive en
+`CLAUDE.md` → §`Operator Communication Style`; acá va el detalle operativo, porque **el tic no está en
+los modismos obvios (`che`, `boludo`) sino en los IMPERATIVOS**, que son el modo por defecto al escribir
+docs, runbooks, specs y mensajes al operador. Aplica **igual a los docs del repo que a la conversación**:
+un agente que lee un runbook en voseo copia ese registro al responder (causa verificada del sweep
+2026-07-26: ~560 formas corregidas en 147 archivos vigentes).
+
+- **Imperativos** — escribir `agrega`, `actualiza`, `verifica`, `corre`, `revisa`, `usa`, `lee`, `escribe`,
+  `mira`, `deja`, `prende`, `elige`, `abre`, `activa`, `recuerda`, `genera`, `ejecuta`, `cierra`, `busca`;
+  NUNCA `agregá`, `actualizá`, `verificá`, `corré`, `revisá`, `usá`, `leé`, `escribí`, `mirá`, `dejá`,
+  `prendé`, `elegí`, `abrí`, `activá`, `recordá`, `generá`, `ejecutá`, `cerrá`, `buscá`.
+- **Irregulares y con diptongo** — `mantén` (no `mantené`), `propón` (no `proponé`), `pon` (no `poné`),
+  `vuelve` (no `volvé`), `extiende` (no `extendé`), `remueve` (no `remové`), `prueba` (no `probá`),
+  `empieza` (no `empezá`), `refuerza` (no `reforzá`), `sigue` (no `seguí`), `corrige` (no `corregí`).
+- **Indicativo** — `puedes`, `quieres`, `tienes`, `necesitas`, `haces`, `sabes`, `eres`; NUNCA `podés`,
+  `querés`, `tenés`, `necesitás`, `hacés`, `sabés`, `sos`.
+- **Enclíticos** — `dime`, `fíjate`, `acuérdate`, `quédate`; NUNCA `decime`, `fijate`, `acordate`, `quedate`.
+- **Pronombre** — `tú` (o `ti` tras preposición: "para ti"); NUNCA `vos`.
+- **NO confundir con el pretérito de 1ª persona, que es correcto y no se toca:** "yo **elegí** el slug",
+  "**escribí** el adapter", "**medí** el transporte", "**descubrí** que Cloud Run no soporta TCP". La
+  diferencia es semántica, no ortográfica: imperativo (instrucción al lector) vs. narración de trabajo ya
+  hecho. Un sweep automático que no distinga esto corrompe los registros históricos.
+- Se permite chilenismo operativo solo en contexto de producto/país, nunca como muletilla.
+
 ## Contrato UI resumido
 
 Cualquier UI invoca primero `greenhouse-ai-design-studio`. Antes de JSX: dirección visual, comparación de

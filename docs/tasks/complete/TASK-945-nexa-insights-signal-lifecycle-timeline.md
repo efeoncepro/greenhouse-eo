@@ -168,7 +168,7 @@ Render del Block según `dataStatus` (composable con TASK-946):
 | Estado | Render |
 |---|---|
 | `loading` | Skeleton sized 4 cards + header (Vuexy Skeleton); `aria-busy=true` |
-| `empty-pending` (cron no corrió) | `EmptyState` icon `tabler-clock` + microcopy "Aún sin observaciones para este período. Volvé en unas horas." |
+| `empty-pending` (cron no corrió) | `EmptyState` icon `tabler-clock` + microcopy "Aún sin observaciones para este período. Vuelve en unas horas." |
 | `empty-positive` (cron OK, sin anomalías) | `EmptyState` icon `tabler-circle-check` color success + microcopy "Sin anomalías detectadas — salud operativa OK." |
 | `ready-single-point` (1 observation per signal) | Block normal SIN sparkline (datapoint único no es trayectoria); chip severity. |
 | `ready-evolving` (multiple observations) | Block normal CON sparkline + lifecycle expandido disponible. |
@@ -188,7 +188,7 @@ GH_NEXA = {
   lifecycle_resolved: 'Resuelta',
   lifecycle_resolved_relative: (when) => `Resuelta hace ${when}`,
   state_empty_pending: 'Aún sin observaciones para este período',
-  state_empty_pending_help: 'El cron diario corre en la madrugada Santiago. Volvé en unas horas.',
+  state_empty_pending_help: 'El cron diario corre en la madrugada Santiago. Vuelve en unas horas.',
   state_empty_positive: 'Sin anomalías detectadas',
   state_empty_positive_help: 'Salud operativa OK para el período actual.',
   state_stale_degraded: 'Análisis del pipeline pausado',

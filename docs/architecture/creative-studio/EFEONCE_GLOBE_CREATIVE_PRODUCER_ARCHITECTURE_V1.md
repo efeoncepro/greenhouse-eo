@@ -300,7 +300,7 @@ dejó `TASK-1490` (write half) y agrega su **espejo servible** gobernado.
   "volátil" sino **no determinista** (una estrella escrita en una réplica es invisible en otra). Se implementó
   `AssetAnnotationStorePort` con doble in-memory + `DurableProducerAssetStore` (`packages/database`) sobre la
   migración `0003_producer_asset_annotations.sql`; la idempotencia vive en SQL (`ON CONFLICT … DO NOTHING` +
-  re-lectura), porque entre réplicas un "chequeá y después insertá" es una carrera cuyo síntoma visible es un
+  re-lectura), porque entre réplicas un "chequea y después inserta" es una carrera cuyo síntoma visible es un
   `referenceId` duplicado o una estrella re-fechada. `rights = 'derived-internal'` es un `CHECK`, no una
   convención.
 - **Coverage `PRODUCER_ASSETS_COVERAGE`:** `ui`/`mcp` `policy-blocked` (gate de `TASK-1505`, que además hace

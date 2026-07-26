@@ -272,18 +272,18 @@ src/
 
 ## 10. Cómo extender el sistema (guía para devs y agentes)
 
-### 10.1 ¿Necesitás animar algo?
+### 10.1 ¿Necesitas animar algo?
 
-1. **Buscá si ya hay un wrapper canónico** (sección 5). Si lo hay, usalo.
-2. **Si tu caso encaja en una dimensión existente** pero ningún wrapper la cubre exactamente, considerá si vale la pena extender el wrapper existente o crear uno nuevo en `src/components/greenhouse/motion/`.
-3. **Si tu caso es nuevo** (dimensión no cubierta), escribí RFC en `docs/rfcs/` o abrí TASK con propuesta. NO inventes timing inline.
+1. **Busca si ya hay un wrapper canónico** (sección 5). Si lo hay, úsalo.
+2. **Si tu caso encaja en una dimensión existente** pero ningún wrapper la cubre exactamente, considera si vale la pena extender el wrapper existente o crear uno nuevo en `src/components/greenhouse/motion/`.
+3. **Si tu caso es nuevo** (dimensión no cubierta), escribe RFC en `docs/rfcs/` o abre TASK con propuesta. NO inventes timing inline.
 
-### 10.2 ¿Necesitás un timing distinto al token?
+### 10.2 ¿Necesitas un timing distinto al token?
 
-- Validá si tu caso justifica un nuevo token. Si sí, agregá el token a `tokens.ts` y documentá en sección 4.
-- Si es one-off legítimo, documentá inline el porqué con comentario `// motion: <razón>`.
+- Valida si tu caso justifica un nuevo token. Si sí, agrega el token a `tokens.ts` y documenta en sección 4.
+- Si es one-off legítimo, documenta inline el porqué con comentario `// motion: <razón>`.
 
-### 10.3 ¿Necesitás una lib nueva?
+### 10.3 ¿Necesitas una lib nueva?
 
 Triggers válidos para usar GSAP o introducir una lib nueva de motion:
 

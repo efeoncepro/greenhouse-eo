@@ -16,13 +16,13 @@ cómo operarlas sin romper nada y cómo dejar la documentación en regla (hay un
 
 ## Cambiar el system prompt (paso a paso)
 
-1. Editá los módulos en `nexa-system-prompt.ts` (V2).
-2. Elegí la **clase de cambio**: `editorial` (redacción) · `voice` (tono/emoji) · `policy`
+1. Edita los módulos en `nexa-system-prompt.ts` (V2).
+2. Elige la **clase de cambio**: `editorial` (redacción) · `voice` (tono/emoji) · `policy`
    (knowledge/citas/sensibles) · `structural` (secciones/orden).
-3. Bumpeá la versión y agregá la entrada al `changelog` de `NEXA_PROMPT_GOVERNANCE` (en el mismo archivo).
-4. Corré los tests del prompt: `pnpm vitest run src/lib/nexa/nexa-system-prompt.test.ts`.
-5. Si fue `voice`/`policy`: corré la QA matrix (abajo).
-6. Actualizá el doc de capa correspondiente (el gate lo exige).
+3. Bumpea la versión y agrega la entrada al `changelog` de `NEXA_PROMPT_GOVERNANCE` (en el mismo archivo).
+4. Corre los tests del prompt: `pnpm vitest run src/lib/nexa/nexa-system-prompt.test.ts`.
+5. Si fue `voice`/`policy`: corre la QA matrix (abajo).
+6. Actualiza el doc de capa correspondiente (el gate lo exige).
 
 ## Verificar la calidad de respuesta (QA matrix)
 
@@ -47,19 +47,19 @@ pnpm nexa:doc-gate --changed  # ¿toqué Nexa y actualicé sus docs? (lo que cor
 ```
 
 Si falla en `--changed`: tocaste un dominio Nexa (p.ej. el prompt) pero no actualizaste su doc de
-capa. Actualizá el doc que indica el mensaje. Si agregaste un **archivo Nexa nuevo**, registralo en
+capa. Actualiza el doc que indica el mensaje. Si agregaste un **archivo Nexa nuevo**, regístralo en
 `manifest.json` (en `domains` con su doc, o en `codeAllowlist` si es plumbing sin capa).
 
 ## Si Nexa responde algo incorrecto pero CITADO
 
 Casi siempre la **fuente del corpus** tiene el error (no es alucinación). Fix de raíz:
 
-1. Corregí el documento fuente (los del corpus piloto están en `docs/...`, listados en
+1. Corrige el documento fuente (los del corpus piloto están en `docs/...`, listados en
    `src/lib/knowledge/ingestion/pilot-corpus.ts`).
 2. Dry-run de la ingesta (NO escribe): `npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/knowledge/ingest.ts --source=repo_docs`
-3. Revisá el dry-run (qué docs se re-publicarían, 0 quarantined/failed).
-4. Aplicá: agregá `--apply`. El corpus local queda corregido.
-5. Verificá preguntándole a Nexa de nuevo.
+3. Revisa el dry-run (qué docs se re-publicarían, 0 quarantined/failed).
+4. Aplica: agrega `--apply`. El corpus local queda corregido.
+5. Verifica preguntándole a Nexa de nuevo.
 
 > **Staging/Producción:** tienen su propia copia del corpus (`sync_enabled=FALSE`). El fix llega ahí
 > sólo con su **propia re-ingesta** (dry-run revisado → apply), como paso de operador.
@@ -68,7 +68,7 @@ Casi siempre la **fuente del corpus** tiene el error (no es alucinación). Fix d
 
 - NO editar el prompt inline en `nexa-service.ts` (vive en `nexa-system-prompt.ts`).
 - NO cambiar V1 del prompt (es el botón de rollback).
-- NO parchear el prompt para tapar un dato incorrecto que viene de una fuente: arreglá la fuente.
+- NO parchear el prompt para tapar un dato incorrecto que viene de una fuente: arregla la fuente.
 - NO mergear tocando Nexa sin actualizar su doc de capa (el gate lo bloquea).
 - NO habilitar `--apply` de la ingesta sin revisar el dry-run.
 
@@ -76,10 +76,10 @@ Casi siempre la **fuente del corpus** tiene el error (no es alucinación). Fix d
 
 | Síntoma | Causa probable | Qué hacer |
 |---|---|---|
-| Sale `##` o `**` en el panel de Fuentes | preview del excerpt sin limpiar | ya está corregido (`toPlainExcerpt`); si reaparece, revisá los constructores de excerpt |
-| Respuesta sin `[n]` aunque hay fuentes | prompt V1 activo (flag OFF) o modelo no citó | confirmá `NEXA_SYSTEM_PROMPT_V2_ENABLED=true` + reiniciá el dev server |
-| Dato incorrecto pero citado | la fuente del corpus tiene el error | corregí el doc + re-ingestá |
-| El gate de docs falla | tocaste Nexa sin actualizar su capa | actualizá el doc que indica el mensaje |
+| Sale `##` o `**` en el panel de Fuentes | preview del excerpt sin limpiar | ya está corregido (`toPlainExcerpt`); si reaparece, revisa los constructores de excerpt |
+| Respuesta sin `[n]` aunque hay fuentes | prompt V1 activo (flag OFF) o modelo no citó | confirma `NEXA_SYSTEM_PROMPT_V2_ENABLED=true` + reinicia el dev server |
+| Dato incorrecto pero citado | la fuente del corpus tiene el error | corrige el doc + re-ingesta |
+| El gate de docs falla | tocaste Nexa sin actualizar su capa | actualiza el doc que indica el mensaje |
 
 ## Referencias técnicas
 

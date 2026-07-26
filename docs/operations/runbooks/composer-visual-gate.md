@@ -33,13 +33,13 @@ sus cambios se mezclan en el render y cualquier `--freeze` co-mingla el trabajo 
 ## 3. El flujo canónico — cambié un deck o una plantilla, ¿ahora qué?
 
 ```
-1. Editás el deck-plan / la plantilla / el catálogo.
-2. Recomponés y MIRÁS el frame:   pnpm deck:compose <plan>   → Read del PNG (nunca "listo" sin mirar)
-3. Corrés la suite:               pnpm vitest run src/lib/artifact-composer   (boundary/composability/…)
-4. Corrés el gate:                pnpm composer:visual-gate    → va a fallar en las láminas que cambiaste
+1. Editas el deck-plan / la plantilla / el catálogo.
+2. Recompones y MIRÁS el frame:   pnpm deck:compose <plan>   → Read del PNG (nunca "listo" sin mirar)
+3. Corres la suite:               pnpm vitest run src/lib/artifact-composer   (boundary/composability/…)
+4. Corres el gate:                pnpm composer:visual-gate    → va a fallar en las láminas que cambiaste
 5. ¿El cambio es INTENCIONAL?
-     → SÍ:  declarás lámina por lámina en BASELINE_DELTAS.md (§5) + pnpm composer:visual-gate --freeze
-     → NO:  acabás de atrapar una regresión. Arreglá el código, no el baseline.
+     → SÍ:  declaras lámina por lámina en BASELINE_DELTAS.md (§5) + pnpm composer:visual-gate --freeze
+     → NO:  acabas de atrapar una regresión. Arregla el código, no el baseline.
 6. git add <tu deck-plan> <las plantillas> scripts/frontend/baselines/artifact-composer + COMMIT (atómico).
 ```
 
@@ -50,11 +50,11 @@ corridas/entornos** aunque nadie cambie la foto — Chromium re-samplea/rasteriz
 (color profile, resample, `border-radius`). Consecuencias que te van a confundir:
 
 - El `--selftest` (2 corridas **juntas**, mismo proceso) da **cero px** → parece determinista. Pero el
-  frame que **vos** congelaste puede **no coincidir** con el render de **otro agente/sesión/CI**.
+  frame que **tú** congelaste puede **no coincidir** con el render de **otro agente/sesión/CI**.
 - El gate puede reportar `TeamGalleryFull.png` o `18-equipo.png` con **miles de píxeles** distintos **sin
   que hayas tocado esa lámina**. Eso **NO es tu regresión** — es el nondeterminismo de fotos.
 
-**Qué hacer cuando el gate flagea SOLO una lámina con fotos y vos no la tocaste:**
+**Qué hacer cuando el gate flagea SOLO una lámina con fotos y tú no la tocaste:**
 
 - **NO** la aceptes repitiendo `--freeze` (rebaselina un estado que va a driftear otra vez → el gate se
   vuelve inútil ahí). Es el "rebaseline silencioso" que el gate existe para impedir.
@@ -72,7 +72,7 @@ corridas/entornos** aunque nadie cambie la foto — Chromium re-samplea/rasteriz
 
 ## 6. Qué NO hacer NUNCA
 
-- ❌ `--freeze` con el composer sucio por **otro agente** (co-mingla su WIP). Coordiná primero.
+- ❌ `--freeze` con el composer sucio por **otro agente** (co-mingla su WIP). Coordina primero.
 - ❌ Dejar un `--freeze` **sin commitear** (estado ambiguo para el próximo).
 - ❌ Rebaselinear una lámina con fotos que driftea sin cambio real (ISSUE-122) — eso oculta el bug.
 - ❌ Editar un PNG del baseline, `baseline-manifest.json` o el digest **a mano**.
@@ -83,10 +83,10 @@ corridas/entornos** aunque nadie cambie la foto — Chromium re-samplea/rasteriz
 
 | Síntoma | Causa probable | Acción |
 |---|---|---|
-| Gate falla en la lámina que **sí** cambiaste | Cambio intencional no declarado | Declará en `BASELINE_DELTAS.md` + `--freeze` + commit |
-| Gate falla en `TeamGalleryFull`/`18-equipo` que **NO** tocaste, solo en el área de foto | Nondeterminismo de fotos (ISSUE-122) | NO congeles esa lámina; reportá a ISSUE-122 |
-| `item_too_long` al recomponer | Copy > límite de chars del filler (`overflow: reject`) | Acortá el copy (el gate fail-closa, no trunca) |
-| `git status` muestra `M` en `resolvers.ts`/`registry.json`/baseline y no fuiste vos | Otro agente tiene el composer sucio | NO congeles; coordiná (regla single-owner) |
+| Gate falla en la lámina que **sí** cambiaste | Cambio intencional no declarado | Declara en `BASELINE_DELTAS.md` + `--freeze` + commit |
+| Gate falla en `TeamGalleryFull`/`18-equipo` que **NO** tocaste, solo en el área de foto | Nondeterminismo de fotos (ISSUE-122) | NO congeles esa lámina; reporta a ISSUE-122 |
+| `item_too_long` al recomponer | Copy > límite de chars del filler (`overflow: reject`) | Acorta el copy (el gate fail-closa, no trunca) |
+| `git status` muestra `M` en `resolvers.ts`/`registry.json`/baseline y no fuiste tú | Otro agente tiene el composer sucio | NO congeles; coordina (regla single-owner) |
 | `--selftest` da cero pero el gate global no | Drift entre tu render y el frame congelado por otro | Probablemente ISSUE-122 (fotos) o un freeze ajeno stale |
 
 ## Referencias

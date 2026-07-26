@@ -134,7 +134,7 @@ Reglas obligatorias:
 - Escape / click-away: cierra el dialog sin activar.
 - Focus restore: al cerrar el dialog, foco vuelve al botón origen.
 - Latency feedback: spinner en el botón + toast al completar.
-- Toast / alert behavior: éxito → toast; error → banner con el mensaje canónico (`ico_sync_source_not_connected` → "conectá Notion primero", no botón reintentar).
+- Toast / alert behavior: éxito → toast; error → banner con el mensaje canónico (`ico_sync_source_not_connected` → "conecta Notion primero", no botón reintentar).
 
 ### Motion & microinteractions
 

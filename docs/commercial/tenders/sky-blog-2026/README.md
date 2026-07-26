@@ -32,7 +32,7 @@
 
 ---
 
-## 🚀 ¿Sesión nueva? Empezá acá
+## 🚀 ¿Sesión nueva? Empieza acá
 
 **`SESSION-BRIEF.md`** — el brief de arranque. Está escrito para que una sesión nueva **NO empiece a
 hacer**: primero explora, mapea las piezas contra las láminas, presenta el diagnóstico y **espera**.

@@ -174,7 +174,7 @@ popoverNotice={
         message:
           dealOptions.length === 0
             ? GH_PRICING.contextChips.deal.emptyHelper
-            : '¿No encontrás el deal que buscás?',
+            : '¿No encuentras el deal que buscas?',
         actionLabel: GH_PRICING.contextChips.deal.createNewLabel,
         onAction: onCreateDeal
       }
@@ -245,5 +245,5 @@ Agregar (al pasar props a `<QuoteContextStrip>`):
 
 ## Open Questions
 
-- ¿El tone `info` para caso con opciones disponibles es correcto o preferís `default`? **Default assumed**: `info` para hacer visible la invitación sin generar tensión (warning). Ajustable en visual review.
-- ¿Message para caso con opciones: "¿No encontrás el deal que buscás?" o otra microcopy? Coordinar con `greenhouse-ux-writing` si se quiere refinar. **Default assumed**: la propuesta arriba.
+- ¿El tone `info` para caso con opciones disponibles es correcto o prefieres `default`? **Default assumed**: `info` para hacer visible la invitación sin generar tensión (warning). Ajustable en visual review.
+- ¿Message para caso con opciones: "¿No encuentras el deal que buscas?" o otra microcopy? Coordinar con `greenhouse-ux-writing` si se quiere refinar. **Default assumed**: la propuesta arriba.

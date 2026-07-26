@@ -36,7 +36,7 @@ ISSUE-082 reveló que durante semanas, el `NexaInsightsBlock` mostró "Sin insig
 5 estados que la UI debe distinguir:
 
 1. **Loading inicial** — el endpoint aún no respondió (skeleton).
-2. **Empty-pending** — período actual, el cron del día aún no corrió (legítimo, "esperá unas horas").
+2. **Empty-pending** — período actual, el cron del día aún no corrió (legítimo, "espera unas horas").
 3. **Empty-positive** — el cron corrió, no se detectaron anomalías (señal de salud positiva, no error).
 4. **Ready** — hay insights frescos (estado actual del Block).
 5. **Stale-degraded** — el signal `no_new_signals_in_24h` está activo: el pipeline puede estar roto (banner honesto, no esconder).
@@ -96,7 +96,7 @@ Resolución sugerida pre-execution: **dataStatus derivado server-side** — el e
 ### Gap
 
 - Todos los empty states colapsan a un mismo "EmptyState".
-- No hay distinción visual ni semántica entre "esperá unas horas" vs "sistema OK" vs "sistema roto".
+- No hay distinción visual ni semántica entre "espera unas horas" vs "sistema OK" vs "sistema roto".
 - Frontend desconoce el status del pipeline (no consume reliability signals).
 
 ## Scope
@@ -110,7 +110,7 @@ Resolución sugerida pre-execution: **dataStatus derivado server-side** — el e
 
 - 5 ramas de render según `dataStatus`.
 - `loading`: skeleton (Vuexy `Skeleton`).
-- `empty-pending`: `EmptyState` icon clock + microcopy "Aún sin observaciones para este período. Volvé en unas horas".
+- `empty-pending`: `EmptyState` icon clock + microcopy "Aún sin observaciones para este período. Vuelve en unas horas".
 - `empty-positive`: `EmptyState` icon check + microcopy positivo "Sin anomalías detectadas — salud operativa OK".
 - `stale-degraded`: MUI `Alert severity='warning'` + microcopy honesto referenciando ISSUE-082 lesson.
 - `ready`: estado actual.
@@ -191,7 +191,7 @@ Período + insightsCount
 - **Slice 6** (5 surfaces propagate al block): `IcoAdvisoryBlock` (Agency), `HomeView`, `PersonActivityTab`, `OverviewTab Space360`, `FinanceDashboardView` (con narrowing al enum cerrado canonical `allowedStatuses.includes()` para defensive degradation desde endpoint). Cross-domain coherence completa.
 - **Slice 7** (tests anti-regresión): **21 tests verde** — `nexa-data-status.test.ts` ICO (8) + Finance (7) cubren los 6 paths canonical + honest degradation + BQ deserialization shapes. `NexaInsightsBlock.test.tsx` (6) cubre los 4 estados + ready + loading + backward-compat. Updates a `llm-enrichment-reader.test.ts` con stub canonical del helper (probado independiente). Update a `src/test/render.tsx`: extiende `palette.customColors` mirror de V1 light (reusable cross-tests, NO solo TASK-946).
 
-**Cierre del último gap UX ISSUE-082**: la UI antes colapsaba TODOS los empty states a un mismo "Sin datos" ambiguo (parte raíz del falso-sano percibido durante 2 días en mayo 2026). Ahora distingue honestamente entre "esperá unas horas" (empty-pending), "sistema OK sin anomalías" (empty-positive, señal de salud positiva), "el pipeline puede estar caído" (stale-degraded, alerta honesta con `role='alert'`), y "ready" (datos frescos).
+**Cierre del último gap UX ISSUE-082**: la UI antes colapsaba TODOS los empty states a un mismo "Sin datos" ambiguo (parte raíz del falso-sano percibido durante 2 días en mayo 2026). Ahora distingue honestamente entre "espera unas horas" (empty-pending), "sistema OK sin anomalías" (empty-positive, señal de salud positiva), "el pipeline puede estar caído" (stale-degraded, alerta honesta con `role='alert'`), y "ready" (datos frescos).
 
 **Quality gate canonical (pre-cierre)**:
 - `pnpm exec tsc --noEmit` ✓ verde.

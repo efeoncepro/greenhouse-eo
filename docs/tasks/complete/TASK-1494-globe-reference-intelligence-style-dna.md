@@ -43,8 +43,8 @@ private-ingest content-addressed que dejó TASK-1490.
 
 ## Why This Task Exists
 
-El workbench de TASK-1474 está diseñado como una agencia creativa: parte del flujo es "traé una
-referencia y decime cómo la usás" (igualá su paleta, imitá su composición, aplicá su estilo con tal
+El workbench de TASK-1474 está diseñado como una agencia creativa: parte del flujo es "trae una
+referencia y dime cómo la usas" (iguala su paleta, imita su composición, aplica su estilo con tal
 intensidad). El backend hoy no puede dar vida a nada de eso. La referencia entra al contrato **solo
 como identidad content-addressed**: `LabAuthorizedInputV1 = { inputId, sha256, mediaType, rights }`
 (`packages/contracts/src/index.ts`), y el runner la resuelve a bytes por el `InputResolverPort` solo

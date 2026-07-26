@@ -349,7 +349,7 @@ Reglas obligatorias:
 
   Errores bloquean commit; warnings se discuten.
 
-  ### Enforcement gradient (qué valida el linter, qué requiere vos)
+  ### Enforcement gradient (qué valida el linter, qué requiere criterio tuyo)
 
   | Regla declarada en VOICE.md | Validada por linter alpha.3 | Responsabilidad humana |
   |---|---|---|
@@ -838,7 +838,7 @@ Bloque de voz va **antes** del prompt operativo de Nexa (precedencia más alta).
 - **CODEOWNERS**: definir usuario humano canonical para VOICE.md guard.
 - **Comunicación equipo Nexa**: anunciar endpoint + auth + ejemplo payload. Coordinar window smoke Slice 7.
 - **BigQuery quotas**: verificar headroom (esperado ~20 rows/día).
-- **Comunicación a agentes humanos (vos + equipo)**: post-merge Slice 2, anunciar que workflow 3-layer está activo. Sin esa comunicación, agentes nuevos pueden ignorar la regla.
+- **Comunicación a agentes humanos (tú + equipo)**: post-merge Slice 2, anunciar que workflow 3-layer está activo. Sin esa comunicación, agentes nuevos pueden ignorar la regla.
 
 ### 4-Pillar Score (post-alpha.3 update, validated by arch-architect overlay Greenhouse)
 

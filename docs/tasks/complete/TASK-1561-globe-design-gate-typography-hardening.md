@@ -171,7 +171,7 @@ Escanear el código del payload buscando:
 - `font-size` en `px`/`rem` literal fuera del SSOT.
 
 El mensaje de error nombra el token correcto, no sólo la infracción. Un gate que dice "no hagas esto"
-cuesta una búsqueda; uno que dice "usá `var(--text-base)`" cuesta cero.
+cuesta una búsqueda; uno que dice "usa `var(--text-base)`" cuesta cero.
 
 ### Slice 2 — Morder cada regla ✅
 

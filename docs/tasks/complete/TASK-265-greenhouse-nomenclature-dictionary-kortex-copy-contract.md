@@ -302,7 +302,7 @@ Backstop si la rule (5a) tiene false negatives o si el agente bypassea.
 
 #### 5d. Hook PostToolUse opcional (defense-in-depth)
 
-`.claude/settings.json` hook que detecta edits en archivos `src/views/**`, `src/components/**` y emite recordatorio: "Recordá que strings de UI deben venir de `greenhouse-nomenclature.ts` o de la capa dictionary-ready, no hardcoded. La skill `greenhouse-ux-writing` valida el tono."
+`.claude/settings.json` hook que detecta edits en archivos `src/views/**`, `src/components/**` y emite recordatorio: "Recuerda que strings de UI deben venir de `greenhouse-nomenclature.ts` o de la capa dictionary-ready, no hardcoded. La skill `greenhouse-ux-writing` valida el tono."
 
 Es defensa secundaria — la rule (5a) hace el trabajo principal.
 

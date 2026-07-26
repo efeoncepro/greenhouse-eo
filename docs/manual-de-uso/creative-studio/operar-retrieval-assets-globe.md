@@ -57,7 +57,7 @@ referencias son durables).
      gcloud secrets versions add globe-producer-grant-secret --data-file=- --project efeonce-globe
    ```
 
-   Verificá la forma sin revelar el valor: `… versions access latest | wc -c` (64) y que no tenga
+   Verifica la forma sin revelar el valor: `… versions access latest | wc -c` (64) y que no tenga
    saltos de línea.
 
 3. **Aplicar la migración** (corre como `globe_owner`; el migrator es un usuario IAM de Cloud SQL):
@@ -71,7 +71,7 @@ referencias son durables).
    este paso el flag apunta a un binario que no conoce la capacidad. Es image-only: **ningún** otro
    flag de configuración (ver `deploy-internal.yml`).
 
-5. **Declarar los env en Terraform con el flag en `false`** y aplicar. Verificá el contrato *antes*
+5. **Declarar los env en Terraform con el flag en `false`** y aplicar. Verifica el contrato *antes*
    de prender: `/v1/capabilities` debe listar las 4 entradas con `ui`/`mcp` en `policy-blocked`, y
    todo path debe responder `policy_blocked`.
 
@@ -81,7 +81,7 @@ referencias son durables).
    sin `terraform.tfvars`: debe dar `No changes`.
 
 7. **Canario** (abajo). Requiere impersonar la caller SA; si es un grant temporal, revocalo al
-   terminar y verificá el corte.
+   terminar y verifica el corte.
 
 ## Verificación (canary)
 

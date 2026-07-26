@@ -161,6 +161,6 @@ cambie de una sola vez, el escenario `globe-creative-producer` pierde `producer-
 
 ## Regla que se sigue de todo esto
 
-**NUNCA** asumir que los gates del repo que cambiás cubren a sus consumidores. Cuando un contrato cruza
+**NUNCA** asumir que los gates del repo que cambias cubren a sus consumidores. Cuando un contrato cruza
 repos, el gate del productor es ciego por construcción, y la única cobertura real es correr el gate del
 consumidor.

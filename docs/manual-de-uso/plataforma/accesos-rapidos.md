@@ -17,7 +17,7 @@ Llegar en un click a las pantallas que mas usas, sin pasar por el menu lateral. 
 
 - Tu cuenta tiene que estar autenticada.
 - Los atajos que ves son los que tu cuenta puede abrir. Si te falta uno, es porque tu rol o tus permisos no lo incluyen — habla con un admin.
-- Lo que pineas se guarda solo para vos, no afecta a nadie mas del equipo.
+- Lo que pineas se guarda solo para ti, no afecta a nadie mas del equipo.
 
 ---
 

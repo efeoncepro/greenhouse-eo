@@ -10,7 +10,7 @@
 
 ## Para que sirve
 
-Cuando abrís el detalle de una cuenta en `/finance/bank` (click en cualquier cuenta de la tabla), el drawer muestra varias cosas al mismo tiempo: KPIs (saldo, deuda, cupo), un chart de últimos 12 meses, y una lista de "Movimientos de la tarjeta". Este documento explica qué ventana temporal usa cada surface y cómo cambiarla.
+Cuando abres el detalle de una cuenta en `/finance/bank` (click en cualquier cuenta de la tabla), el drawer muestra varias cosas al mismo tiempo: KPIs (saldo, deuda, cupo), un chart de últimos 12 meses, y una lista de "Movimientos de la tarjeta". Este documento explica qué ventana temporal usa cada surface y cómo cambiarla.
 
 ## El problema que resolvía
 
@@ -38,7 +38,7 @@ El **chip header** te dice exactamente qué ventana estás mirando:
 
 ### Default por categoría de cuenta
 
-Cada tipo de cuenta abre con un default semánticamente correcto (no necesitás clickear nada en la mayoría de casos):
+Cada tipo de cuenta abre con un default semánticamente correcto (no necesitas clickear nada en la mayoría de casos):
 
 | Categoría | Default | Por qué |
 |---|---|---|
@@ -50,9 +50,9 @@ Cada tipo de cuenta abre con un default semánticamente correcto (no necesitás 
 
 ### Cuándo cambiar de modo
 
-- Estás revisando la TC un lunes a la mañana → quedate en **Reciente** (default).
-- Estás cerrando el período Mayo 2026 con tu contador → cambiá a **Período** (hereda el mes del dashboard padre).
-- El accionista pide ver todos los aportes desde que abriste la cuenta → cambiá a **Histórico**.
+- Estás revisando la TC un lunes a la mañana → quédate en **Reciente** (default).
+- Estás cerrando el período Mayo 2026 con tu contador → cambia a **Período** (hereda el mes del dashboard padre).
+- El accionista pide ver todos los aportes desde que abriste la cuenta → cambia a **Histórico**.
 
 ## Que NO hacer
 
@@ -72,9 +72,9 @@ No requiere capability granular adicional.
 
 ## Problemas comunes
 
-- **"Cambié de modo y no se actualiza"** → debería refetch automático. Si no lo hace, refresh del browser. Reportá si persiste (puede ser bug del cache).
-- **"En modo Reciente no veo movimientos pero sé que hay"** → puede ser que sean > 30 días atrás. Cambiá a **Histórico** o **Período** apuntando al mes correcto.
-- **"En modo Histórico veo movimientos antiguos pero no los nuevos"** → revisá el rango de fechas (banner). Si el ancla del OTB está mal declarado, hablá con finance.
+- **"Cambié de modo y no se actualiza"** → debería refetch automático. Si no lo hace, refresh del browser. Reporta si persiste (puede ser bug del cache).
+- **"En modo Reciente no veo movimientos pero sé que hay"** → puede ser que sean > 30 días atrás. Cambia a **Histórico** o **Período** apuntando al mes correcto.
+- **"En modo Histórico veo movimientos antiguos pero no los nuevos"** → revisa el rango de fechas (banner). Si el ancla del OTB está mal declarado, habla con finance.
 - **"El selector no aparece"** → estás en una cuenta de tipo `payroll_processor` que tiene su propia vista (digest de procesador, no lista cronológica de movimientos).
 
 ## Referencias tecnicas

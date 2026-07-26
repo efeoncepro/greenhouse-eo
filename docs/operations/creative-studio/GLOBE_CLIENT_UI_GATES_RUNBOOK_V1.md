@@ -73,7 +73,7 @@ viewer, lo cierra con Escape, y **después** libera los bytes.
 **Trampa del harness, ya pisada:** indexar los assets del bundle por `asset.path` da `undefined` — el campo
 es **`publicPath`**. Con la clave mal, el bundle responde 404, el browser nunca ejecuta JS, y el canary da
 por buenos los invariantes sin haber corrido ninguno. Si `/__log` sólo tiene las llamadas que hiciste con
-`curl`, el browser no está ejecutando: revisá los 404 antes de creerle al resultado.
+`curl`, el browser no está ejecutando: revisa los 404 antes de creerle al resultado.
 
 El canary del share board escribe capturas y `canary-report.json` en `.captures/globe-share-board/`
 (gitignored). Dos detalles de método que no son opcionales:
@@ -87,7 +87,7 @@ El canary del share board escribe capturas y `canary-report.json` en `.captures/
 
 ## Verificar que un gate MUERDE
 
-Un gate que pasa no prueba nada. Antes de confiar en uno, rompelo a propósito y confirmá el rojo:
+Un gate que pasa no prueba nada. Antes de confiar en uno, rompelo a propósito y confirma el rojo:
 
 | Violación a introducir | Gate que debe fallar |
 |---|---|
@@ -101,7 +101,7 @@ Un gate que pasa no prueba nada. Antes de confiar en uno, rompelo a propósito y
 | `font-size:0.9rem` (rem pelado, fuera de la escala) | tipografía |
 | Agregar `'--weight-medium': '500'` al SSOT | peso sin `@font-face` |
 
-Restaurá y confirmá verde. Las seis primeras se verificaron así al crearlas (`TASK-1556` Slice 3).
+Restaura y confirma verde. Las seis primeras se verificaron así al crearlas (`TASK-1556` Slice 3).
 
 ### Evidencia de la mordida — 2026-07-25 (`TASK-1561`)
 
@@ -155,4 +155,4 @@ porta; cuando el ledger queda vacío, la migración terminó.
   **enumeran los archivos a mano**, así que uno no registrado nunca corre y la suite queda verde por no
   haberlo mirado.
 - El typecheck de `studio-client` corre **dos** tsconfig (browser y Node). `tsc -p tsconfig.json` solo no
-  ve los tests: usá `pnpm --filter @efeonce-globe/studio-client typecheck`.
+  ve los tests: usa `pnpm --filter @efeonce-globe/studio-client typecheck`.

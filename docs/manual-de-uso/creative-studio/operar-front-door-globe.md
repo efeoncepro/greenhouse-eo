@@ -251,7 +251,7 @@ la variable. Los dos commits siguen siendo la unidad de contenido a revertir —
 huérfano el fix de `cf5e4d1`, y sólo `cf5e4d1` reabre la carrera con `compute.googleapis.com`—, pero se aplica
 como edición reconciliada, no como revert automático.
 
-**Si los pasos 1-2 se hicieron con `gcloud`, releé el plan antes de aplicar.** Aplicar sin reconciliar, con el
+**Si los pasos 1-2 se hicieron con `gcloud`, relee el plan antes de aplicar.** Aplicar sin reconciliar, con el
 ALB ya destruido, es outage total. Y el paso 4 se ejecuta **por Terraform**, nunca destruyendo recursos a mano desde la consola o con `gcloud`: un destroy manual driftea el state y deja el siguiente `plan` mintiendo. Carril IaC completo (plan/apply/state): [`EFEONCE_GLOBE_IAC_RUNBOOK_V1.md` § Rollback por slice](../../operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md#rollback-por-slice).
 
 Por eso el callback `run.app` se conserva deliberadamente en el allowlist: es el camino de rollback documentado y evita tener que escribir en la base bajo presión. Con el ingress endurecido ese origen no es alcanzable por browser, así que un código enviado ahí no llega a ninguna parte.

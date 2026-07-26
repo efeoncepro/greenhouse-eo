@@ -26,8 +26,8 @@
 | 1 | Tier banner | estado del tier (contratado / trial: "Te quedan N de 3 este mes" / agotado) | card/alert | `resolveAeoEntitlement` (TASK-1277) |
 | 2 | Run CTA | botón self-serve "Generar revisión" (trial/contratado con cupo) | `GreenhouseButton` | chokepoint (TASK-1277) |
 | 3 | Workbench | reporte AEO (master-detail) cuando hay run | TASK-1248 view | report model |
-| 4 | Upsell | card "Activá AEO recurrente / Hablá con tu equipo" (trial agotado o sin acceso) | upsell card + Nexa CTA | copy |
-| 5 | Locked/teaser | clientes sin entitlement: teaser "Descubrí cómo te ve la IA" + CTA (GRATIS, no corre motor) | locked card | copy |
+| 4 | Upsell | card "Activa AEO recurrente / Habla con tu equipo" (trial agotado o sin acceso) | upsell card + Nexa CTA | copy |
+| 5 | Locked/teaser | clientes sin entitlement: teaser "Descubre cómo te ve la IA" + CTA (GRATIS, no corre motor) | locked card | copy |
 
 ## Copy Ledger
 
@@ -37,18 +37,18 @@
 | `growth.aeo.tier.trial.resets` | 1 | Se renuevan el {date} | date | honesto |
 | `growth.aeo.run.cta` | 2 | Generar revisión | — | self-serve |
 | `growth.aeo.trial.exhausted.title` | 4 | Usaste tus revisiones de este mes | — | no error, es estado |
-| `growth.aeo.upsell.cta` | 4 | Activá AEO recurrente | — | CTA a comercial (Nexa/equipo) |
-| `growth.aeo.locked.title` | 5 | Descubrí cómo te ve la IA | — | teaser gratis |
-| `growth.aeo.locked.cta` | 5 | Hablá con tu equipo | — | sin self-checkout |
+| `growth.aeo.upsell.cta` | 4 | Activa AEO recurrente | — | CTA a comercial (Nexa/equipo) |
+| `growth.aeo.locked.title` | 5 | Descubre cómo te ve la IA | — | teaser gratis |
+| `growth.aeo.locked.cta` | 5 | Habla con tu equipo | — | sin self-checkout |
 
 ## State Copy
 
 | State | Title | Body | CTA / recovery | Notes |
 |---|---|---|---|---|
 | ready (contratado) | — | workbench completo | — | tier active |
-| trial-available | Te quedan N de 3 | corré tu revisión del mes | Generar revisión | consume allowance |
-| trial-exhausted | Usaste tus revisiones de este mes | se renuevan el {date} | Activá AEO recurrente | upsell, no error |
-| locked (sin acceso) | Descubrí cómo te ve la IA | teaser de valor | Hablá con tu equipo | gratis, no corre motor |
+| trial-available | Te quedan N de 3 | corre tu revisión del mes | Generar revisión | consume allowance |
+| trial-exhausted | Usaste tus revisiones de este mes | se renuevan el {date} | Activa AEO recurrente | upsell, no error |
+| locked (sin acceso) | Descubre cómo te ve la IA | teaser de valor | Habla con tu equipo | gratis, no corre motor |
 | preparing | Tu revisión se está preparando | — | — | reusa TASK-1248 |
 | empty | Aún no generaste una revisión | — | Generar revisión | |
 | error | No pudimos generar la revisión | — | Reintentar (si actionable) | canonical error |

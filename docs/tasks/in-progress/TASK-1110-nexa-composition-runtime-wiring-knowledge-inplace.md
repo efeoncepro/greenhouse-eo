@@ -166,7 +166,7 @@ Fuentes: `GREENHOUSE_NEXA_MOMENT_FABRIC_ARCHITECTURE_V1.md` + `GREENHOUSE_CONVER
 2. **Sin next-step gobernado.** Lo omití. Es **pieza central** del Moment (la "intención + next-step") y está en el mockup.
 3. **Respuesta más densa.** Usé el `renderPlan` del retrieval crudo en vez del layout **enriquecido** del mockup (titular + puntos numerados + pills de cita).
 4. **No verifiqué paridad mockup↔runtime** (`fe:capture:diff`) — me comparé contra mis propias expectativas. Por eso declaré "listo" algo que no lo estaba.
-5. **(proceso)** Cuando el **texto literal de la spec** ("usá el workbench real como host") **se contradijo con el artefacto visual aprobado** (grid limpio + next-step), seguí las palabras en vez de frenar a señalar la contradicción. Manda la imagen aprobada.
+5. **(proceso)** Cuando el **texto literal de la spec** ("usa el workbench real como host") **se contradijo con el artefacto visual aprobado** (grid limpio + next-step), seguí las palabras en vez de frenar a señalar la contradicción. Manda la imagen aprobada.
 
 ### Qué quedó BIEN (no rehacer)
 
@@ -252,7 +252,7 @@ El escenario in-place (UI existente → pregunta → transforma in-place, host v
 - **Kind** = el contexto del consumer (la card de la respuesta de un Nexa moment) → resuelve a la variant `assemble`. La respuesta NO usa una card distinta: usa **la misma** `MetricSummaryCard`/`MetricTrendCard` con `entrance='assemble'`.
 - **Horneado:** SSR-safe (la entrada corre post-mount, client-only; el primer paint es el estado final — sin hydration mismatch, patrón `CompositionShell`/`hasMounted`); reduced-motion (valor final visible, chart estático, never-hidden); compositor-only.
 
-**El seam (cómo compone sin acoplarse):** el Momento (la región de la respuesta) **da la señal "ahora entrás"** a su contenido; las cards arman su entrada al recibirla. La card **NO hereda del shell** ni importa de `NexaMomentComposition` — expone su trigger de entrada y el Momento lo cuela. Espeja "La Costura" (el shell mueve el contenedor, la card adapta el contenido) pero para la ENTRADA. El **stagger del grupo** de cards de la respuesta lo orquesta el **Motion Primitive canónico** (`<Motion variant='stagger'>` / `useGreenhouseGSAP`, TASK-1045) — NO un stagger bespoke inline (reuse > create; una sola fuente de "hacer cosas en ola").
+**El seam (cómo compone sin acoplarse):** el Momento (la región de la respuesta) **da la señal "ahora entras"** a su contenido; las cards arman su entrada al recibirla. La card **NO hereda del shell** ni importa de `NexaMomentComposition` — expone su trigger de entrada y el Momento lo cuela. Espeja "La Costura" (el shell mueve el contenedor, la card adapta el contenido) pero para la ENTRADA. El **stagger del grupo** de cards de la respuesta lo orquesta el **Motion Primitive canónico** (`<Motion variant='stagger'>` / `useGreenhouseGSAP`, TASK-1045) — NO un stagger bespoke inline (reuse > create; una sola fuente de "hacer cosas en ola").
 
 ### Invariantes de boundary (arch — no regresión)
 

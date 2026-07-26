@@ -14,7 +14,7 @@ El ambiente de **Staging** de Greenhouse tiene una proteccion de seguridad de Ve
 
 Para que agentes y scripts puedan trabajar con Staging, se necesitan dos cosas:
 
-1. Un **secreto de bypass** que le dice a Vercel "este request esta autorizado, dejalo pasar"
+1. Un **secreto de bypass** que le dice a Vercel "este request esta autorizado, déjalo pasar"
 2. Una **sesion de usuario** valida dentro de la aplicacion Greenhouse
 
 ## Como funciona

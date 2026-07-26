@@ -17,7 +17,7 @@ Para dos cosas: **encender** la versión nueva del share board (el paso que falt
   `public-share-ui.ts`, la versión anterior, que funciona.
 - 🔴 **Encenderlo NO es sólo un `tofu apply`.** La v1.0 de este manual decía que sí, y era **falso**
   — ver §`Por qué el flip solo no hace nada` antes de tocar el flag.
-- Necesitás acceso a `infra/terraform` del repo `efeonce-globe`, permiso para disparar
+- Necesitas acceso a `infra/terraform` del repo `efeonce-globe`, permiso para disparar
   `deploy-internal.yml`, y un **grant de share real** para verificar. Sin el grant no hay verificación
   posible — y sin verificación no se retira lo viejo.
 
@@ -114,7 +114,7 @@ cambio de estética.
 
 ## Encender la versión nueva (el cutover)
 
-> Ejecutá esto **sólo después** de los pasos 1-3 de la cadena de arriba. Antes de eso no tiene efecto.
+> Ejecuta esto **sólo después** de los pasos 1-3 de la cadena de arriba. Antes de eso no tiene efecto.
 
 ### 1. Cambiar el default en `variables.tf`
 
@@ -129,7 +129,7 @@ variable "client_app_enabled" {
 }
 ```
 
-Dejá el comentario con la fecha y el resumen del plan, igual que hizo `assets_cdn_enabled`. Es lo que
+Deja el comentario con la fecha y el resumen del plan, igual que hizo `assets_cdn_enabled`. Es lo que
 permite reconstruir por qué está prendido sin ir al historial.
 
 ### 2. Planear y **leer** el plan
@@ -140,7 +140,7 @@ tofu init
 tofu plan -out tfplan
 ```
 
-**Leelo antes de aplicar.** Lo que tiene que dar:
+**Léelo antes de aplicar.** Lo que tiene que dar:
 
 - **Cero `destroy`, cero `replace`.** Si aparece alguno, **parar** — este flag no destruye nada.
 - **Cero Cloud Run en el diff.** La identidad de los servicios no se toca; un replace ahí rompe todo
@@ -157,7 +157,7 @@ tofu apply tfplan
 Esto no es opcional ni se puede sustituir con el canary. El canary corre contra un servidor de prueba;
 lo que estás verificando acá es el camino completo con un permiso de verdad.
 
-Abrí un link de share vigente y confirmá, **en este orden**:
+Abre un link de share vigente y confirma, **en este orden**:
 
 | # | Qué verificar | Por qué |
 |---|---|---|
@@ -197,7 +197,7 @@ cutover es de bajo riesgo: **el camino viejo sigue vivo hasta que se retire expl
 
 ## Diagnóstico: "el cliente dice que su link no anda"
 
-Preguntá **qué ve exactamente**. Cada mensaje apunta a una causa distinta, y ésa es la razón de que
+Pregunta **qué ve exactamente**. Cada mensaje apunta a una causa distinta, y ésa es la razón de que
 sean mensajes distintos y no un error genérico:
 
 | Lo que ve el cliente | Qué pasó | Qué hacer |

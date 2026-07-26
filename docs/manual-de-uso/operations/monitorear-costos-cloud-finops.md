@@ -11,7 +11,7 @@
 
 Este manual explica como usar Greenhouse para revisar costos de Google Cloud, detectar que se disparo y decidir donde atacar primero.
 
-Usalo cuando:
+Úsalo cuando:
 
 - la factura subio inesperadamente
 - GCP proyecta un pago mayor al esperado
@@ -44,7 +44,7 @@ Tambien debes tener presente:
 7. Revisa **Alertas tempranas**.
 8. Baja a **Top servicios** para ver que servicio concentra gasto.
 9. Revisa **Recursos que explican el gasto** para identificar instancia, recurso o SKU.
-10. Si existe bloque **Copiloto FinOps AI**, leelo como interpretacion, no como fuente de verdad.
+10. Si existe bloque **Copiloto FinOps AI**, léelo como interpretacion, no como fuente de verdad.
 
 ## Como leer el forecast
 
@@ -160,7 +160,7 @@ Un dry-run:
 - no persiste fingerprint
 - devuelve counts y `skippedReason`
 
-Usalo para validar que el sistema detecta riesgos antes de activar despachos reales.
+Úsalo para validar que el sistema detecta riesgos antes de activar despachos reales.
 
 ## Activar o desactivar el Copiloto AI
 

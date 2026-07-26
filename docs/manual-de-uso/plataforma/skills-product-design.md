@@ -68,7 +68,7 @@ Decile al agente que vas a construir algo. El agente debe invocar la combinacion
 
 ### Caso 2 — Auditar algo que ya existe
 
-Pedile al agente que audite. Las skills tienen un **lane de audit** con checklists.
+Pídele al agente que audite. Las skills tienen un **lane de audit** con checklists.
 
 | Auditoria | Skill |
 |---|---|
@@ -122,7 +122,7 @@ No tenes que orquestarlo a mano. Cada skill declara su grafo de relaciones al in
 
 | Problema | Solucion |
 |---|---|
-| El agente no invoca la skill que esperaba | Mencioná la palabra trigger explicita. Ej: "audita accesibilidad" en vez de "revisa esto" |
+| El agente no invoca la skill que esperaba | Menciona la palabra trigger explicita. Ej: "audita accesibilidad" en vez de "revisa esto" |
 | La skill global y la Greenhouse dicen cosas distintas | El overlay Greenhouse gana. Si la divergencia parece bug, mover la decision al overlay y dejar el global mas neutral |
 | Quiero agregar otra skill | Crear `~/.claude/skills/<nombre>/SKILL.md` (global) o `.claude/skills/<nombre>/SKILL.md` (Greenhouse override). Estructura canonica: frontmatter (name + description + user-invocable + argument-hint) + cuerpo con triggers, compose, reglas duras, output format |
 | Una skill tiene info desactualizada | Editar el archivo directo. Cuando el delta es repo-especifico va al overlay; cuando es transversal va al global |

@@ -31,12 +31,12 @@ Implementado y verificado e2e. `fe:capture:explore` + `fe:capture:promote` cierr
 
 Cerrar el loop **observe → author → determinismo** que `microsoft/webwright` modela, sobre GVC, sin romper su determinismo gobernado. TASK-1097 (Capa 1) ya le dio **ojos** a la captura (`aria_snapshot` por mark). Esta task agrega las dos capas restantes:
 
-- **Capa 2 — `fe:capture --explore --route=X`**: un REPL de autoría contra la página viva. El agente navega, corre snippets de locators (`getByRole`/`getByText`), recibe de vuelta count matcheado + texto + bounding box + screenshot + el `aria_snapshot`, e itera — **sin commitear scenario**. Es el `spawn → inspect → discard` de Webwright aplicado a la **autoría**: descubrís selectores/readiness/scroll contra la página real y *después* escribís el scenario sabiendo que están bien. Reusa `lib/auth.ts` + `lib/browser.ts` (auth + lifecycle + gotchas ya resueltos).
+- **Capa 2 — `fe:capture --explore --route=X`**: un REPL de autoría contra la página viva. El agente navega, corre snippets de locators (`getByRole`/`getByText`), recibe de vuelta count matcheado + texto + bounding box + screenshot + el `aria_snapshot`, e itera — **sin commitear scenario**. Es el `spawn → inspect → discard` de Webwright aplicado a la **autoría**: descubres selectores/readiness/scroll contra la página real y *después* escribes el scenario sabiendo que están bien. Reusa `lib/auth.ts` + `lib/browser.ts` (auth + lifecycle + gotchas ya resueltos).
 - **Capa 3 — `fe:capture:promote`**: toma una sesión de exploración exitosa y **emite el `.scenario.ts` determinístico** (cristaliza improvisación → DSL gobernado).
 
 ## Why This Task Exists
 
-La fricción de autoría que Claude/Codex tienen con Playwright es **autorar a ciegas**: escribir selectores adivinados sin ver la página. Capa 1 la mitigó (leés el `.aria.txt` post-captura). Capa 2/3 la elimina: un modo interactivo donde observás la página viva **antes** de comprometer un scenario, y luego promovés lo explorado al DSL. Es el patrón completo de Webwright, acotado a **ayuda de autoría** (no runtime de producto).
+La fricción de autoría que Claude/Codex tienen con Playwright es **autorar a ciegas**: escribir selectores adivinados sin ver la página. Capa 1 la mitigó (lees el `.aria.txt` post-captura). Capa 2/3 la elimina: un modo interactivo donde observas la página viva **antes** de comprometer un scenario, y luego promueves lo explorado al DSL. Es el patrón completo de Webwright, acotado a **ayuda de autoría** (no runtime de producto).
 
 ## Architecture Alignment
 

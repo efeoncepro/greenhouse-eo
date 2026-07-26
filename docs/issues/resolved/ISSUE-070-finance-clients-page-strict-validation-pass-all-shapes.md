@@ -29,13 +29,13 @@ const finance = await resolveFinanceClientContext({
 })
 ```
 
-`resolveFinanceClientContext` valida estrictamente cada shape pasado: si pasás `hubspotCompanyId="hubspot-company-27776076692"`, el resolver verifica que ese valor exista en la columna `hubspot_company_id` de DB. Pero la columna real tiene `"27776076692"` (sin prefix). La validación falla → `FinanceValidationError` → catch → `return null` → page cae a legacy.
+`resolveFinanceClientContext` valida estrictamente cada shape pasado: si pasas `hubspotCompanyId="hubspot-company-27776076692"`, el resolver verifica que ese valor exista en la columna `hubspot_company_id` de DB. Pero la columna real tiene `"27776076692"` (sin prefix). La validación falla → `FinanceValidationError` → catch → `return null` → page cae a legacy.
 
 Mismo problema con `organizationId`: el ID URL `"hubspot-company-27776076692"` no matchea ninguna `organization_id` real (que tienen formato `"org-f6aa4e20-..."`).
 
 **Por qué pasó desapercibido**: el catch silencioso a legacy fallback es zero-risk para el rollout V1 (default OFF), pero en V1.1 cuando se activó el flag para Julio, el comportamiento esperado era ver el shell V2. El catch ocultó el error de validación del operador y de los reliability signals (eran throws de validación, no de connection/data).
 
-**Por qué el resolver es estricto**: `resolveFinanceClientContext` se diseñó para WRITE paths (registrar income/expense) donde pasás los shapes que ya conocés y el resolver verifica consistencia. Si pasás `hubspotCompanyId` que no existe en DB, eso es un bug del caller — el throw es correcto en write context.
+**Por qué el resolver es estricto**: `resolveFinanceClientContext` se diseñó para WRITE paths (registrar income/expense) donde pasas los shapes que ya conoces y el resolver verifica consistencia. Si pasas `hubspotCompanyId` que no existe en DB, eso es un bug del caller — el throw es correcto en write context.
 
 ## Impacto
 

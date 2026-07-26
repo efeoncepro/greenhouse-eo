@@ -25,7 +25,7 @@
 
 ## Summary
 
-Cleanup de baja prioridad: tras TASK-725 (re-scope del IVA a entidad legal), `space_id`/`client_id` en `vat_ledger_entries` / `vat_monthly_positions` quedaron como etiqueta analítica de contraparte (nullable), ya no como clave fiscal. Esta task deprecá esas columnas como dimensión cuando se confirme que ningún reader legacy las usa como scope — primero marcándolas deprecated, luego (en una task/fase posterior) eventualmente removiéndolas si no aportan valor analítico. NO es urgente: las columnas nullable no molestan y `space_id` aún sirve como tag de contraparte por asiento.
+Cleanup de baja prioridad: tras TASK-725 (re-scope del IVA a entidad legal), `space_id`/`client_id` en `vat_ledger_entries` / `vat_monthly_positions` quedaron como etiqueta analítica de contraparte (nullable), ya no como clave fiscal. Esta task depreca esas columnas como dimensión cuando se confirme que ningún reader legacy las usa como scope — primero marcándolas deprecated, luego (en una task/fase posterior) eventualmente removiéndolas si no aportan valor analítico. NO es urgente: las columnas nullable no molestan y `space_id` aún sirve como tag de contraparte por asiento.
 
 ## Why This Task Exists
 
@@ -51,7 +51,7 @@ Revisar y respetar:
 
 Reglas obligatorias:
 
-- **NUNCA** re-introducir `space_id` como clave fiscal (TASK-725). Esta task solo lo deprecá/retira como dimensión, no lo revive.
+- **NUNCA** re-introducir `space_id` como clave fiscal (TASK-725). Esta task solo lo depreca/retira como dimensión, no lo revive.
 - **NUNCA** dropear columnas sin confirmar 0 readers que dependan de ellas (audit primero).
 - Migración con markers correctos + DO block anti pre-up-marker; remoción de columna solo si se decide, en migración reversible documentada.
 

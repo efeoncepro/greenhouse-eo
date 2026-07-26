@@ -172,8 +172,8 @@ El mockup pinta solo el estado **Default**. Cada superficie runtime debe shippea
 |---|---|---|
 | Loading | **skeleton** de filas (no spinner; preserva layout, evita CLS) — `role=status aria-busy="true"` | "Cargando documentos…" |
 | Empty (zero) | EmptyState 5-elementos: icon + título + descripción + CTA | "Aún no hay documentos publicados. Cuando se publique uno, aparece aquí." |
-| Empty (filtered) | reconocimiento + recuperación | "No hay resultados para `<query>`. Revisá la ortografía o limpiá los filtros." + "Limpiar filtros" |
-| Error (retriable) | qué pasó + reintentar | "No pudimos cargar los documentos. Probá de nuevo." + Reintentar |
+| Empty (filtered) | reconocimiento + recuperación | "No hay resultados para `<query>`. Revisa la ortografía o limpia los filtros." + "Limpiar filtros" |
+| Error (retriable) | qué pasó + reintentar | "No pudimos cargar los documentos. Prueba de nuevo." + Reintentar |
 | Degraded (search caído, browse OK) | per-slot honesto: la caja de búsqueda muestra "Búsqueda no disponible" pero la lista funciona | banner sin romper la página |
 
 ### Read-detail / Manual reader (1084) — el de mayor riesgo

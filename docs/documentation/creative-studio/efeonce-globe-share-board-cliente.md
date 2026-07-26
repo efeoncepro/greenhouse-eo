@@ -54,7 +54,7 @@ viejo, tres semanas después. La pantalla está diseñada para eso.
 | Algo se cayó | Que se cayó, con Reintentar |
 
 El tercer caso es el que separa una pantalla bien hecha de una que no: **si el archivo no carga pero
-los datos sí, mostrás los datos.** Tirar toda la página porque falló una parte le hace creer al cliente
+los datos sí, muestras los datos.** Tirar toda la página porque falló una parte le hace creer al cliente
 que no hay nada, cuando sí hay.
 
 Y "Reintentar" aparece **sólo cuando reintentar sirve**. Si el link venció, reintentar no lo revive —
