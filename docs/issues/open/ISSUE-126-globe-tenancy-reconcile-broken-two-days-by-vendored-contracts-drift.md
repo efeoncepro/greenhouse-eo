@@ -62,6 +62,32 @@ Es **la misma clase de bug que ADR-010 documentó, en el eje opuesto**. ADR-010 
 3. **Cerrar el acoplamiento de raíz.** El fail-loud se conserva, pero una capability desconocida no puede tumbar la reconciliación **completa del workspace**: o se degrada por-capability con evidencia observable, o el reconciliador valida el policy **antes** de empezar y reporta el drift como señal en vez de como excepción. Decidir con `arch-architect`.
 4. **Regla de ordenamiento** para cualquier ampliación futura de `capabilityScopes`: **bumpear el vocabulario vendorizado en Greenhouse ANTES** de mover el scope en el broker. ADR-010 ya definió el rollout de 3 pasos para el eje cliente-de-Globe; este issue agrega el paso que falta para el eje reconciliador.
 
+## Delta 2026-07-26 — aplicado, más el hallazgo que hace al drift invisible
+
+**Aplicado** (commit `f7a38718d`, empujado a `develop`, deploy del `ops-worker` disparado por el push porque el workflow observa `vendor/**` y `pnpm-lock.yaml`):
+
+1. **Re-vendorizado** el tarball desde el source vigente de Globe: 51 → **65** capabilities, con `globe.model-rights.attest` y `.read` presentes. `pnpm worker:build-contract-gate` verde (2 deps `file:` coincidiendo con el lockfile). `local:check` exit 0.
+2. **Guard nuevo** — `src/lib/sister-platforms/globe-capability-vocabulary.test.ts`: afirma que **cada capability que el grant OAuth declara existe en el vocabulario vendorizado**, que es el par exacto que se desincronizó. Corre **sin el repo hermano** (compara la política de Greenhouse contra lo que Greenhouse realmente tiene instalado) y falla en `pnpm test`, en el commit que introduce el problema, en vez de romper un cron async dos días después.
+   **Probado en ROJO, no sólo en verde:** simulando el vocabulario pre-fix reporta las dos capabilities faltantes — habría atrapado el rollout de ADR-010 en su propio commit. Un guard que nunca se vio fallar no está probado.
+
+### 🔴 El hallazgo que explica por qué el drift fue INVISIBLE, y que hay que conocer al arreglar el próximo
+
+**pnpm resuelve un `file:` por NOMBRE DE ARCHIVO.** Con el tarball nuevo ya copiado en su lugar, `pnpm install` **seguía sirviendo 51**; recién tras `rm -rf node_modules/@efeonce-globe/contracts` pasó a 65. Verificado en vivo, no razonado.
+
+Consecuencias, y la segunda es la peligrosa:
+
+- Un re-vendorizado **correcto** puede ser **silenciosamente inefectivo**: quien lo hace verifica en local, ve el comportamiento viejo y concluye que su fix no sirvió.
+- En **CI no hay cache**, así que se extrae el tarball actual ⇒ **local y CI divergen**. Es la forma más difícil de diagnosticar de este bug: cada lado tiene razón sobre lo que ve.
+
+Por eso la versión del tarball **no** es cosmética: es load-bearing para la resolución de pnpm. **Bumpear la versión sería el fix correcto**, pero hoy está bloqueado porque `@efeonce-globe/sdk` declara `peerDependencies: { "@efeonce-globe/contracts": "0.0.1" }` **exacto** — subir contracts arrastra al SDK. Queda como follow-up con su costo declarado: bumpear ambos y ensanchar ese rango exacto, que es brittle por sí mismo.
+
+### Lo que sigue abierto (por eso el issue NO se cierra)
+
+- **Señal de reliability de frescura de la proyección** (steady = 0 workspaces con `brokerExpiresAt` vencido). Es la ausencia que permitió los dos días. Debe verificarse **disparando** con un drift inyectado.
+- **Degradación por-capability**: una capability desconocida no puede tumbar la reconciliación **completa del workspace**. El fail-loud se conserva; lo que cambia es el radio. Decidir con `arch-architect`.
+- **Bump de versión del tarball** + ensanche del peer del SDK (arriba).
+- **Verificación runtime post-deploy** (abajo).
+
 ## Verificación
 
 - `pnpm worker:build-contract-gate` verde y el tarball coincidiendo con el source de Globe.
