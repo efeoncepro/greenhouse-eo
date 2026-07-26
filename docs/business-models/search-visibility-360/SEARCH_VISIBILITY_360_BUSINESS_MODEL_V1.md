@@ -4,6 +4,7 @@
 > sin runtime y evidencia aprobada.
 > **Owner:** Wave + Strategy + SEO/AEO + Product + Finance
 > **Pricing Integrity Pack:** [`SEARCH_VISIBILITY_360_PRICING_INTEGRITY_PACK_V1.md`](SEARCH_VISIBILITY_360_PRICING_INTEGRITY_PACK_V1.md)
+> **Business Model Integrity Pack:** [`SEARCH_VISIBILITY_360_BUSINESS_MODEL_INTEGRITY_PACK_V1.md`](SEARCH_VISIBILITY_360_BUSINESS_MODEL_INTEGRITY_PACK_V1.md)
 
 ## Scope hypothesis
 
@@ -16,18 +17,18 @@ ownership de Wave sobre la oferta de visibilidad.
 
 | Question | Required answer |
 |---|---|
-| Customer/ICP | |
-| Entry trigger | |
-| Core job | |
-| Output/outcome boundary | |
-| Delivery model | |
-| Billing/value metric | |
-| Recurring trigger | |
-| Data/IP ownership | |
-| Human/tooling split | |
-| Cost-to-serve | |
-| Expansion path | |
-| Product/runtime state | |
+| Customer/ICP | See Integrity Pack §3; ICP still hypothesis |
+| Entry trigger | See Integrity Pack §3; trigger still hypothesis |
+| Core job | See Integrity Pack §3; proposed job, pending evidence |
+| Output/outcome boundary | See Integrity Pack §3; boundaries proposed, claims pending |
+| Delivery model | See Integrity Pack §5; fit by stage pending validation |
+| Billing/value metric | See Pricing Pack §2; candidates pending Finance/commercial validation |
+| Recurring trigger | See Integrity Pack §6; contract trigger pending |
+| Data/IP ownership | See Integrity Pack §8; Legal/Product decisions pending |
+| Human/tooling split | See Integrity Pack §§7–8; cost/runtime mapping pending |
+| Cost-to-serve | See Integrity Pack §7; Finance model pending |
+| Expansion path | See Integrity Pack §§4 and 6; hypothesis pending evidence |
+| Product/runtime state | See Integrity Pack §§8–10; runtime/productization gate pending |
 
 ## Validation gates
 

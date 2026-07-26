@@ -7,18 +7,6 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-## 2026-07-25 — Wave portfolio y boundaries documentados
-
-- Se formalizó Wave como marca de producto de Efeonce para cinco familias: Search Visibility 360, Web Experience 360,
-  Measurement & Analytics, Agent Systems & Platforms y Digital Automation & Integrations.
-- Se fijó que CRM/RevOps pertenece a Efeonce Digital/Kortex; Wave sólo entrega capas técnicas conectadas.
-- Se documentó la frontera con Globe (contenido/producción) y Reach (medios/distribución), manteniendo Efeonce como
-  masterbrand externa.
-- Canon: `docs/architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md` y
-  `docs/business-models/wave/WAVE_BUSINESS_MODEL_V1.md`.
-- Se separaron product service, delivery model, engagement, operating mode y composición del ecosistema; Wave puede
-  operar Managed Squad, Staff Augmentation y otros modelos sin cambiar el ownership de la oferta.
-
 ## 2026-07-26 — Pricing transversal para Codex y Claude
 
 - Se creó la skill agnóstica `efeonce-pricing-operator` en `.codex/skills/` y `.claude/skills/`.
@@ -42,6 +30,24 @@
 - El pack separa diagnóstico, foundation, operación, transparencia/plataforma, capacidad de contenido y expansión;
   evita usar artículos como unidad pública y trata SEO+AEO como producto integrado.
 - Verdict: `hypothesis_only`, pendiente de Finance, evidencia de willingness-to-pay, capacidad y aprobación comercial.
+
+## 2026-07-26 — Business Model Integrity Pack para Search Visibility 360
+
+- Se creó `SEARCH_VISIBILITY_360_BUSINESS_MODEL_INTEGRITY_PACK_V1.md` para completar customer/value, oferta, delivery,
+  revenue, economics, data/IP, evidence, scale y capital sin convertir hipótesis en decisiones.
+- El modelo canónico ahora enlaza su Integrity Pack y mantiene `Draft`; el verdict actual es `model_incomplete`.
+
+## 2026-07-25 — Wave portfolio y boundaries documentados
+
+- Se formalizó Wave como marca de producto de Efeonce para cinco familias: Search Visibility 360, Web Experience 360,
+  Measurement & Analytics, Agent Systems & Platforms y Digital Automation & Integrations.
+- Se fijó que CRM/RevOps pertenece a Efeonce Digital/Kortex; Wave sólo entrega capas técnicas conectadas.
+- Se documentó la frontera con Globe (contenido/producción) y Reach (medios/distribución), manteniendo Efeonce como
+  masterbrand externa.
+- Canon: `docs/architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md` y
+  `docs/business-models/wave/WAVE_BUSINESS_MODEL_V1.md`.
+- Se separaron product service, delivery model, engagement, operating mode y composición del ecosistema; Wave puede
+  operar Managed Squad, Staff Augmentation y otros modelos sin cambiar el ownership de la oferta.
 
 ## 2026-07-25 — Globe: el payload de browser deja de ser un string (ADR-014, foundation)
 
@@ -905,175 +911,3 @@ fuente de verdad. Nada autenticado se cachea, verificado path por path.
   TASK-893). GETs admin + POST author des-gateados de `GROWTH_CTA_ENGINE_ENABLED` (el flag gobierna
   exposición pública). GVC desktop+mobile mirados. Arch §28 + skill actualizada (ambos espejos).
   Rollout pendiente: push + smoke staging.
-
-## 2026-07-18 — ISSUE-123: staging access resuelve el deployment vigente (alias env-staging des-pinneado)
-
-- Causa raíz identificada del bug class recurrente (3 veces en 2 días): un `vercel alias set` manual
-  FIJA el alias `greenhouse-eo-env-staging-….vercel.app` y cada deploy posterior lo deja rezagado —
-  los agentes validaban staging contra código viejo en silencio. El "fix" manual era la causa.
-- Tooling resiliente: `resolveStagingAccess()` ahora resuelve el **último deployment staging READY
-  vía Vercel API** (alias solo como fallback con warning); nuevo `pnpm staging:url` para componer
-  (`STAGING_URL=$(pnpm --silent staging:url) pnpm fe:capture … --env=staging`); GVC con
-  `STAGING_URL` + storageState por host (cookies no cruzan subdominios). Picker unit-testeado con
-  el shape real de la API v6 (`customEnvironment.slug === 'staging'`, `target: null`).
-- Alias des-pinneado (`vercel alias rm`, autorizado por el operador). Regla anti-recurrencia en la
-  spec: NUNCA re-apuntar con `alias set`. ISSUE-123 queda open hasta verificar el re-atado
-  automático en 2 deploys. Specs: `GREENHOUSE_STAGING_ACCESS_V1.md` §10 + ISSUE-123.
-
-## 2026-07-18 — EPIC-032: Notion Work Management Control Plane planificado
-
-- Se registraron `EPIC-032` y cuatro tasks compactas (`TASK-1449…1452`) para convertir la delegación y consulta
-  de trabajo Notion en una capability multi-space por commands/readers y CLI: registry+Enhanced Markdown,
-  jerarquía recursiva, estado/resultados/historia observada y rollout de agentes.
-- El plan exige reconciliar `TASK-880` y `TASK-577` antes de implementar para conservar un solo cliente seam y
-  un solo write bridge. Cambio sólo documental: no habilita runtime, flags, migrations ni writes Notion.
-
-## 2026-07-18 — TASK-1431: Growth CTA Action Registry + navegación gobernada (code complete, rollout pendiente)
-
-- El action router monomórfico del motor de CTAs se reemplazó por un **Action Registry tipado**
-  (`src/lib/growth/ctas/action-registry.ts`, server-only): un entry por kind con policy schema,
-  resolver y proyección browser-safe; `resolveCtaAction` queda como fachada estable y publish/render
-  fallan closed ante kinds sin entry. Metadata read-only browser-safe por kind
-  (`CTA_ACTION_KIND_METADATA`) para cockpit (TASK-1430)/preview/tests sin server-only. Taxonomía
-  canónica de fallo `action_policy_invalid|action_kind_unsupported|action_destination_invalid|action_destination_unavailable`.
-- Nuevas acciones de **navegación gobernada**: `link_url` (root-relative o https; anti open-redirect,
-  sin credenciales ni protocol-relative), `open_think_tool` (path sobre hub Think gobernado + campaign
-  context UTM-allowlisted strict) y `book_meeting` (hosts `meetings*.hubspot.com` + env
-  `GROWTH_CTA_BOOKING_URL_HOSTS`; navegación-only, cero write CRM). `open_growth_form` sin cambios.
-- Renderer `1.2.0`: executor por familia `growth_form|navigate` — navigate renderiza **`<a href>` real**
-  (middle-click/historial/copy-link/a11y de link; `rel='noopener noreferrer'` externo, `target=_blank`
-  opt-in + affordance sr-only), telemetría `clicked` ANTES de navegar (ingest keepalive), pending
-  single-dispatch accesible con recovery 4s, fail-closed ante kind desconocido. Sin migración; SoT de
-  telemetría intacta (`action_kind` porta 4 valores). Evidencia: 9728 tests verdes + build prod +
-  GVC `task-1431-growth-cta-actions` 1440/390 mirado. Docs: arch §27, funcional 1.6, manual 1.3,
-  TRACKING-PLAN §CTAs, skill `greenhouse-growth-ctas` (2 espejos). **Rollout pendiente**: push/release +
-  bundle 1.2.0 en hosts antes de publicar cualquier CTA con action nueva + smoke staging.
-
-## 2026-07-18 — notion-platform V1.1: delegación y seguimiento gobernados
-
-- Se versionó la skill `notion-platform` para Codex y Claude con gramática canónica de Notion Enhanced Markdown, renderer/linter determinista y templates de proyecto, tarea, subtarea recursiva, cierre y snapshot de estado.
-- Se añadió el contrato multi-space `alias → space_id → data sources/token ref/property IDs/schema fingerprint`; los proyectos permanecen planos y las subtareas son una relación autorreferencial sin límite de profundidad de dominio, con ciclos y límites operativos controlados.
-- Se canonizaron consultas live de vencimiento/progreso/resultado, ledger observado para historial y cierre incompleto cuando falta resultado o evidencia. También se retiró la inferencia insegura por prefijo de ID y se actualizó el inventario MCP/async.
-
-## 2026-07-18 — RELEASE: TASK-1428 + TASK-1429 en producción + enforcement ON (d5db8b568)
-
-- Release develop→main (PR #159 + fix CI #160; orquestador `29651461496`, manifest `released`):
-  suppression/Tier B/kill switches (TASK-1428) y slide_in/Experience System (TASK-1429) LIVE en
-  producción. `GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` ON en staging y Production —
-  verificado E2E post-release con visitante sintético (dismiss → exclusión; fresco → ve).
-- Incidente cazado y cerrado de raíz durante el release: los timeouts del CI (Test 8 min /
-  Coverage 10 min) mataban runs SANOS exactamente en el techo — la suite creció a ~9.8k tests.
-  Subidos a 14/17 (job deep 25) y validados en el mismo release. Dos releases previos ya habían
-  rozado el mismo patrón.
-- Ambas tasks movidas a `complete/`. Ventana de monitoreo 7d de `growth.cta.*` hasta 2026-07-25.
-  La primera campaña interruptiva real (superficie/mensaje/momento) queda como decisión de negocio.
-
-## 2026-07-18 — EPIC-030: Greenhouse Link Hub Control Plane
-
-- Se aceptó la dirección arquitectónica para una capacidad link-in-bio multi-marca controlada íntegramente desde Greenhouse: aggregate/versiones/dominios/audit como SSOT y renderer público limitado a una proyección allowlisted.
-- El MVP parte con `links.efeoncepro.com/efeonce` para Instagram y TikTok; luego extiende `links.efeoncepro.com/<slug>` y custom domains opcionales de clientes sobre el mismo `link_page_id`. Comprar un dominio corto no es precondición.
-- Se crearon `EPIC-030` y las tasks `TASK-1433…1439` para foundation/API, renderer, cockpit, dominios, medición, piloto Efeonce y productización cliente. Cambio sólo documental: no modifica runtime, DNS, Vercel ni perfiles sociales.
-
-## 2026-07-18 — TASK-1429: slide_in interruptivo + CTA Experience System del renderer (code complete)
-
-- Primer placement interruptivo oficial del motor CTA: `slide_in` no modal (`role=complementary`,
-  sin focus trap), trigger gobernado del bundle (8s en página o 35% de scroll), apertura pasiva sin
-  robar foco, Escape + focus return, dismiss persistido antes de la salida visual (mecánica
-  `@starting-style` + `allow-discrete`, cero dependencia de animationend). Density
-  `full|condensed|peek` derivada del contenedor propio; appearances `default|spotlight|minimal`
-  tokenizadas con fallback seguro.
-- El renderer ahora envía la identidad pseudónima del visitante (session siempre; visitor durable
-  solo con `consent-state="granted"`) — activa el loop real de suppression de TASK-1428 — y
-  `greenhouse_cta_viewed` pasa a visibility-gated (corte de semántica registrado en TRACKING-PLAN).
-- Tokens del bundle al piso 2026 (`light-dark()`, `color-mix(in oklch)`, `linear()`) con fallbacks
-  `@supports` y nombres `--gh-cta-*` intactos. Preview `/growth/ctas` con matriz de density + demo
-  vivo del overlay. GVC desktop+mobile mirado; 90 tests verdes. Sin campaña interruptiva publicada
-  aún (decisión del operador).
-
-## 2026-07-18 — TASK-1428: suppression + Tier B + kill switches del motor CTA (code complete, shadow)
-
-- Migración aditiva `greenhouse_growth`: `cta_visitor_state` (estado pseudónimo por sujeto visitor/session,
-  hash-only, consent-aware), `cta_exposure_rollup` (Tier B agregado por hora — la exposición jamás entra al
-  ledger OLTP de conversión) y `cta_kill_switch_event` (append-only). Aplicada a la instancia; tablas dormidas
-  hasta el deploy del código.
-- Suppression/frequency capping server-side con taxonomía estable de razones y policy por versión
-  (`suppression_policy_json`, defaults conservadores, fail-closed): dismiss cooldown, conversión verificada
-  contra Growth Forms, caps per-CTA y global interruptivo con claim atómico multi-tab. Integrado al arbiter en
-  **shadow** (`GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED` default OFF; registrado en el ledger de flags).
-- Kill switches global/per-surface operables **sin redeploy** (estado en DB, capability `growth.cta.pause`,
-  API `GET/POST /api/admin/growth/ctas/kill-switch`, outbox `growth.cta.kill_switch_changed`, respuesta pública
-  `engineState ok|killed`). Signals nuevos: `growth.cta.kill_switch_active`, `growth.cta.priority_collision`,
-  `growth.cta.event_ingest_backpressure`.
-- Evidencia: full suite 9684 tests verdes + build prod + SQL vivo contra PG real. Rollout pendiente
-  (push → shadow-compare staging → enforcement → prod gradual); la task sigue `in-progress` por diseño.
-
-## 2026-07-18 — EPIC-023: CTA Experience System incorporado al plan V1
-
-- El renderer portable se gobierna como una sola primitive con ejes ortogonales: placement, experience kind,
-  appearance (`style_variant`), density `full|condensed|peek` derivada por container query y `variant_id`
-  reservado para experimentación futura. Se canonizaron anatomía contextual, evidencia visual real, estados,
-  motion, reduced motion, asset failure, long content, overflow/CLS y paridad preview↔Think↔WordPress.
-- `TASK-1429` ahora entrega el sistema de presentación y un único interruptivo `slide_in`; `TASK-1431` define el
-  contrato perceptible por action kind sin action-driven skins; `TASK-1430` incorpora authoring secuencial y
-  preview con el renderer real, sin WYSIWYG/page builder; `TASK-1428` explicita dismiss/re-entry/caps/kill
-  semantics y `TASK-1427` conserva el baseline productivo.
-- El ADR aclara que `slide_in` es no modal: no usa `aria-modal` ni focus trap; sí exige Escape, dismiss accesible,
-  focus return tras interacción, suppression y safe-area. No hubo cambio de código, runtime, flags ni lifecycle.
-
-## 2026-07-18 — Pillar Web agéntica publicado y enlazado bidireccionalmente
-
-- Publicado el post WordPress `249387`, cuyo título final es `El fin de la web “solo para humanos”: cómo preparar tu sitio para los agentes de IA`, en
-  `https://efeoncepro.com/aeo/web-agentica-agentes-ia/`: 99 bloques gobernados, 14 H2 + 6 H3,
-  TOC de 20 destinos y siete infografías SVG art-directed light/dark y desktop/mobile.
-- La portada `WAG-V01-C15` quedó integrada como featured `251553` y OG/Twitter `251554`; schema, canonical,
-  robots, sitemap, archive card, media y caché fueron verificados en vivo.
-- La relación pillar–servicio quedó bidireccional: tres enlaces del artículo a `/desarrollo-sitios-web/` y un
-  enlace contextual de la landing hacia el artículo. QA Playwright en 1440 y 390 px confirma visibilidad,
-  recuentos exactos y ausencia de overflow. No se inventó tracking `gh_cta_clicked`; su gobernanza sigue pendiente.
-- Riesgo residual ajeno: Related Posts aún solicita una variante inexistente de la portada de Surround Discovery.
-  El body y la portada de este artículo no tienen recursos rotos. Cierre durable:
-  `docs/audits/public-site/2026-07-18-web-agentica-pillar-publication.md`.
-- El H1 se amplió post-publicación para conservar la tesis original y sumar una promesa práctica explícita. El
-  slug `web-agentica-agentes-ia` y el SEO title específico de Yoast permanecen estables; `og:title` y schema
-  heredan el nuevo título editorial. Yoast 28 no imprime `twitter:title`, por lo que X/Twitter usa el OG fallback
-  correcto y no se dejó metadata inerte. Snapshot: `/tmp/gh-post-249387-before-title-v2-20260718.json`.
-- AEO (`156`) fue promovida de hija de Loop Marketing a categoría raíz por `wp_update_term()`. Yoast SEO Premium
-  gestiona cuatro 301 explícitos —tres posts y el archive—; canonical, breadcrumbs, cards y sitemaps ya usan
-  `/aeo/`. El enlace recíproco de la landing fue actualizado al canonical mediante `Elementor\Document::save()`.
-- El cierre de canonización distribuyó y consolidó los aprendizajes en las skills espejo de WordPress, Content,
-  Design e Image Generator, el runbook agentic, los operating models visuales y `PDR-015`. El manifest general
-  ahora deriva WAG-V01 del submanifest C15 y no puede reintroducir la portada anterior; el template reusable
-  incorpora los arquetipos v7 y separa `indexed_observed` del estado de entrega. Los dos enlaces internos del
-  post que todavía dependían de 301 fueron reconciliados a sus canonicals, con snapshot, purge y nueva inspección
-  final `post-deep-inspection-249387-2026-07-18T11-37-13+00-00.json`.
-
-## 2026-07-18 — Método de portadas editoriales Efeonce y piloto Web Agéntica
-
-- La portada del pillar privado `El fin de la web “solo para humanos”` llegó a su candidato seleccionado
-  `WAG-V01-C15`: composición humano–interfaz–agente producida con `gpt-image-2`, calidad `high`, master
-  `2048×1152` y un degradado continuo blanco cálido → azul luminoso → azul nave que reemplaza los planos
-  triangulares. La topología de la mano robótica fue validada con referencia anatómica explícita para asegurar
-  que el gesto corresponde al índice y no al dedo medio o meñique.
-- Se generaron derivados featured `1600×900`, Open Graph `1440×756` y card cuadrada `1152×1152`, con score
-  editorial `49/50`, hashes y provenance reproducible. Posteriormente se integraron y verificaron en vivo como
-  media `251553` y `251554` del post WordPress `249387`.
-- El aprendizaje quedó canonizado en `EDITORIAL_COVER_KEY_VISUAL_OPERATING_MODEL_V1.md` y enlazado desde las
-  skills espejo de Content Marketing, Design Studio y AI Image Generator: metáfora editorial, roles de
-  referencia, modelo exacto, iteración de una variable, gradientes narrativos, anatomía/cultura, scorecard,
-  derivados, metadata y frontera de publicación. La metodología es estable; el lenguaje visual de la serie
-  seguirá provisional hasta validarlo en dos portadas adicionales.
-
-## 2026-07-18 — Artículo Agent Skills publicado
-
-- Publicado `«I Know Kung Fu»: el momento Matrix de los Agent Skills` en el sitio público, preservando la voz de
-  Julio Reyes y la tesis sobre convertir criterio organizacional en capacidades reutilizables.
-- La pieza incluye tres infografías editoriales (dos con variantes desktop/mobile), featured/OG `1200×630`,
-  metadescripción Yoast, focus keyphrase, metadata Open Graph/Twitter, canonical propio, robots indexables y
-  disclosure editorial. El cierre live confirmó `200`, schema Article/Person, sitemap, archivos multimedia,
-  fuentes y ausencia de duplicado WordPress/Think.
-- Compatibilidad móvil: la variante KFU-V02 usa un fallback PNG `1000×1500` bajo `600px` después de detectar que
-  un navegador móvil/in-app no interpretaba el SVG trazado. El SVG editable y la variante desktop permanecen;
-  el render live quedó verificado por `currentSrc`, dimensiones naturales, captura y ausencia de overflow.
-- La portada inicial fue reemplazada por la pieza aprobada `HI-YAAH!`: lluvia binaria, figura marcial y golpe de
-  energía en formato `1200×630`. WordPress media `251552` quedó sincronizado como featured, Open Graph, Twitter
-  y `primaryImage` del schema; caché purgada y readback público verificado.

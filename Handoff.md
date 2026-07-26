@@ -17,6 +17,13 @@ Es un artefacto exclusivamente de pricing: métrica property/market/surface/lane
 transparency/platform, content capacity, expansion, FX, margen y validación. SEO y AEO siguen integrados en Search
 Visibility 360; el pack no redefine Wave ni el oficio SEO/AEO. Verdict: `hypothesis_only`.
 
+## 2026-07-26 — Business Model Integrity Pack para Search Visibility 360
+
+Se creó `docs/business-models/search-visibility-360/SEARCH_VISIBILITY_360_BUSINESS_MODEL_INTEGRITY_PACK_V1.md`.
+El documento completa el mapa de customer/value, ICP, oferta, delivery, revenue, economics, data/IP, evidencia,
+escala y capital. El estado sigue siendo `model_incomplete`: hay tesis y boundaries, pero faltan cohortes, economics
+reconciliados, contrato de datos/IP, repeatability y señales de renovación.
+
 ## 2026-07-25 (4) — Wave portfolio y boundaries documentados
 
 Se formalizó Wave como marca de producto de Efeonce con cinco familias: Search Visibility 360, Web Experience
