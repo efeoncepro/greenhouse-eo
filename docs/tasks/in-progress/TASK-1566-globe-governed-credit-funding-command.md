@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-028`
-- Status real: `Slices 1/4/5 entregados. Globe: rev 00104-gkc, flag OFF. Greenhouse: tabla append-only + CHECK confirmante!=proponente + 2 capabilities + broker + rutas + senal, verificados contra PG real. Falta prender el flag y ejercer un fondeo real con dos personas`
+- Status real: `Carril VIVO en produccion (rev 00106-b6w, flag ON, 176 capabilities). Slices 1/4/5 entregados y verificados contra PG real. Falta UNICO paso: ejercer propose->confirm con Greenhouse DESPLEGADO (el ADC local no puede impersonar el workload caller, por diseno)`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -587,6 +587,37 @@ El amarre real es el **Slice 5** (broker de Greenhouse con sesión, entitlement 
 `CHECK` confirmante ≠ proponente). **Prender antes de eso publica un gate humano que nadie puede hacer
 cumplir**, y por eso el criterio de salida del Slice 4 —*"un fondeo real punta a punta con UNA
 confirmación humana"*— todavía no se cumple: falta la superficie desde donde ese humano confirma.
+
+### Flip del flag 2026-07-26 (`b4c56a1`) — el carril está VIVO, y lo que falta es un deploy de Greenhouse
+
+`GLOBE_CREDIT_ADMIN_LANE_ENABLED='true'` aplicado y desplegado: revisión **`00106-b6w`**, imagen
+`b4c56a12ce65`, **176 capabilities** (173 → 176, las tres de fondeo publicadas). Plan del apply:
+`0 to add, 1 to change, 0 to destroy`.
+
+**La ruta gobernada se ejercitó y funciona hasta el borde con Globe**: auth ✓, capability ✓,
+validación de cuerpo ✓, idempotencia ✓, y el error honesto (`503 globe_unavailable`, `actionable:
+true`). Estado tras el intento: **0 intenciones registradas**, `policyAvailable: 344` intacto — nada
+quedó a medias.
+
+🔴 **Lo único que falta para el criterio de salida** (*"un fondeo real punta a punta"*): ejercer
+`propose` → `confirm` con **Greenhouse desplegado**. Desde una laptop **no se puede, y es por diseño**:
+el ADC local es una cuenta humana y **no puede impersonar** al workload caller (`PERMISSION_DENIED`,
+verificado) — ese `tokenCreator` es de `greenhouse-portal@` (`iam.tf:16-20`), que es la identidad que
+Greenhouse asume en Vercel vía WIF.
+
+**Próximo paso concreto:** desplegar Greenhouse (staging), hacer `POST /api/admin/globe/credit-funding/propose`
+y `…/confirm` con sesión real, y verificar el grant en el ledger de Globe. Recién ahí se retira
+`raise-credit-monthly-cap.mjs` y la task puede cerrar.
+
+### 🔴 Novena aparición de ISSUE-127, en el broker de esta misma task (`8c8d12fde`)
+
+El `catch` de `dispatch` sanitizaba al caller y **no dejaba rastro del servidor**. Medido en vivo:
+apareció un `503` propio y **no se pudo diagnosticar desde el servidor**. Corregido — emite
+`{event, phase, errorName}`, nunca `message`/`stack`/body del upstream.
+
+Vale registrarlo porque el defecto se cometió **el mismo día y en la misma sesión** en que se cerraban
+las ocho capas previas del issue. La contramedida que funciona no es disciplina sino **procedimiento**:
+al escribir un `catch` que sanitiza, escribir su línea de servidor **en el mismo commit**.
 
 ### 🔴 Corrección 2026-07-26 — el segundo confirmador es POLÍTICA, y yo lo había hecho invariante
 

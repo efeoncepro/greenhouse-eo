@@ -1120,6 +1120,126 @@ sospechosos heredados asumían que `buildBody` armaba referencias con `placehold
 vertex en el **constructor**, que valida las 12 entries, no 3) murió con un `gcloud run services describe`:
 `GLOBE_LAB_VERTEX_PROJECT` está sin setear y cae al default. Ninguna de las dos costó un deploy.
 
+## Sesión 2026-07-26 — generación real, carril de fondeo y ocho lecciones de método
+
+**El día en una línea:** el canary de generación GENERÓ por primera vez, el Producer React salió a la
+luz, la UI produce las tres modalidades, y el carril gobernado de fondeo quedó vivo end-to-end salvo
+el último salto de credenciales. Lo que sigue son las reglas que sobreviven a la sesión.
+
+### Generación — el estado real (verificado en runtime, no leído)
+
+Las **tres modalidades generan desde la UI** con principal `human` por el BFF: imagen (Seedream 5 Pro,
+10 cr, PNG 7,4 MB), video (Seedance 2.0, 16 cr, MP4 1,5 MB) y audio (ElevenLabs Multilingual v2, 6 cr,
+MP3 114 KB). El fence libera correctamente: un `provider_failed` dejó `spentCredits=0`.
+
+🔴 **`"Key visual"` NO es una credencial (ISSUE-127 capa 8).** El sanitizador del body snapshot marcaba
+como credencial cualquier string que empezara con `Key `/`Bearer ` (regla `^(?:Bearer|Key)\s+`,
+prefijo y nada más). El prompt del canary de imagen empieza con *"Key visual editorial para Efeonce
+Globe…"* — el término de dirección de arte del equipo. **Ese falso positivo bloqueó el `execute`
+durante una sesión entera**, y llegaba etiquetado `endpoint_url_not_permitted`, mandando a revisar una
+config de endpoint intachable.
+
+**Un control legítimo que rechaza un caso legítimo se arregla en el CONTROL, no en el caso.** Cambiar
+el prompt habría desbloqueado la sesión **escondiendo** el bug para el próximo usuario real. La regla
+correcta distingue el dato del formato: una credencial serializada es **un token opaco, no una frase**
+— se exige token único, sin espacios, ASCII de credencial y **anclado al final** (`$`).
+
+🔴 **Un fallo de proveedor puede ser TRANSITORIO, y una hipótesis con un solo dato no está confirmada.**
+Un video falló con `provider_failed`; la hipótesis "es el audio" pareció confirmarse porque `silent`
+pasó. **La corrida de confirmación la refutó: `with-audio` también pasó.** Marcador real: 2 de 3.
+Antes de shippear un fix sobre una correlación, **corré el caso que la refutaría**.
+
+### Producer React — el flag que lo tenía invisible
+
+`GLOBE_CLIENT_PRODUCER_ENABLED` estaba en `false`, y `app.ts:2061` caía al **fallback legacy**. El
+código React estaba **desplegado desde antes** (la imagen ya contenía `ProducerComposer.tsx`): no
+faltaba deploy, faltaba el flag. El gate que la propia variable citaba (`legacy-parity.test.ts`) estaba
+**verde 7/7**, así que la condición para prenderlo estaba cumplida y sin medir.
+
+⚠️ **Notas de esta skill que resultaron STALE y ya no aplican:** `client_app_enabled` "no está
+cableado" (sí lo está, y en `true` desde 2026-07-25) y "ninguna superficie sirve sobre el payload
+nuevo" (el Producer sirve React desde 2026-07-26, rev `00092-9pr`). **Verificá contra el runtime antes
+de citar una nota de estado de este archivo.**
+
+🔴 **`MediaStage` es primitive COMPARTIDA (share board + viewer): su `padding` y su
+`max-height: calc(100svh - 8.5rem)` son correctos en el share board y ROMPEN el viewer**, donde la
+celda ya tiene altura propia. Medido: celda 830×830, pieza 757×757, 37 px de aire por lado. El override
+va **acotado al viewer** (`producer-viewer.css`), nunca en la primitive. Sigue en `contain`, jamás
+`cover`: llenar no puede significar recortar.
+
+🔴 **Una corrida FALLIDA no puede ofrecer acciones muertas.** `Descargar` y `Usar como referencia` ya
+estaban gateadas por `retained`; **`Ver candidato` no**, y era la única realmente muerta — corregido.
+Y el slot **`Destacada` no renderizaba `statusLine`** (se consumía sólo en la rejilla), así que una
+corrida fallida se presentaba como la mejor pieza del espacio, muda. Ambas cerradas.
+
+⚠️ **`GLOBE_PRODUCER_LIVE_FEED_ENABLED=true` invalida los `ref_N` del árbol de accesibilidad** entre el
+`read_page` y el click: el feed se re-renderiza solo. Cualquier QA automatizado sobre esta UI es flaky
+por diseño hasta que feed y tabs tengan `data-testid` estables (el composer ya los tiene).
+
+### Fondeo gobernado (TASK-1566) — lo que quedó y lo que falta
+
+**Vivo en producción:** `GLOBE_CREDIT_ADMIN_LANE_ENABLED='true'`, rev `00106-b6w`, **176 capabilities**
+(las tres de fondeo publicadas), migración Globe `0032` + Greenhouse `…164420386`/`…171851162`
+aplicadas.
+
+🔴 **Componer transacciones sobre los stores de crédito DEADLOCKEA si cada uno abre la suya.**
+`DurableCreditAdministrationStore` abría `pool.transaction` **por método** (11 call-sites) y cada una
+tomaba `pg_advisory_xact_lock(credit:workspace:X)`. Una transacción externa hace que la interna pida
+ese lock **desde otra conexión**: la externa no commitea porque espera a la interna, y la interna no
+obtiene el lock porque lo tiene la externa. **No es "queda no atómico" — se cuelga, en el camino del
+dinero.** El fix es un **ejecutor inyectable** por store (dentro de una misma transacción el lock es
+reentrante) + el seam `atomically` en el dominio. Backward compatible.
+
+🔴 **El segundo confirmador humano es POLÍTICA, NO invariante** (ADR-015 Delta 2026-07-26 (2)).
+`requires_second_confirmer` es por workspace, **default FALSE en el interno**, más techo por operación
+(`second_confirmer_above_credits`). **NUNCA** lo pongas como `CHECK` incondicional: el operador es CEO
+y dueño del presupuesto, no hay segundo actor, y **un control que nadie puede satisfacer no protege —
+desvía al break-glass, que otorga MÁS autoridad que el camino que reemplaza**. Se cometió ese error en
+esta sesión y bloqueó al operador hasta el forward-fix.
+
+**Lo que sí es invariante y no se toca:** el agente **nunca** confirma (trigger `actor_must_be_human`
+rechaza principals de servicio), toda confirmación registra contra quién confirma, y la evidencia es
+**append-only** (triggers anti-UPDATE/DELETE).
+
+🔴 **`assertHumanAttribution` de Globe es SHAPE-ONLY** — rechaza `globe:service:` y exige entitlement
+no vacío, pero **no puede** verificar que la atribución venga de una sesión autenticada, porque Globe
+no tiene las sesiones. Ese amarre vive en Greenhouse (`globe_credit_funding_intents` + trigger). **No
+publiques el carril sin esa contraparte.**
+
+🔴 **El top-up de CLIENTE es otro acto económico, y el trigger actual lo bloquea.** El grant interno
+gasta presupuesto **de Efeonce** (por eso lo aprueba una persona de Efeonce); un top-up gasta plata
+**del cliente** y lo autoriza **el pago liquidado**. El trigger exige actor humano ⇒ **hay que
+discriminar por `source`** (`human_session` vs `settled_payment`), no relajarlo. Dueño: `TASK-1484`.
+Reglas no negociables: monto **del PSP nunca del cliente**, idempotencia por **id de pago** (los PSP
+reintentan webhooks), y un chargeback se corrige con **`grant.correct`**, jamás borrando el grant.
+
+**Lo único que falta para el criterio de salida:** ejercer `propose` → `confirm` con Greenhouse
+**desplegado**. Desde una laptop no se puede: el ADC humano **no puede impersonar** al workload caller
+(`PERMISSION_DENIED`, por diseño — ese `tokenCreator` es de `greenhouse-portal@`, `iam.tf:16-20`).
+
+### Ocho lecciones de método, que valen más que los fixes
+
+1. **Una hipótesis se mata leyendo, no desplegando.** Dos hipótesis murieron con una lectura y un
+   `describe`; las capas 1-4 costaron un deploy cada una y la 5 se vio en treinta líneas.
+2. **Un bucket por defecto que abarca 17 sitios no es una razón nombrada: es una razón inventada.** Un
+   label equivocado dirige mal, y eso es peor que no tener label.
+3. **Una sanitización sin contraparte de observabilidad no protege información: la DESTRUYE.** Ocurrió
+   **ocho veces** en el mismo día, la última en código escrito mientras se arreglaban las siete
+   anteriores. **Conocer la regla no la aplica sola.**
+4. **Que exista una clave de idempotencia no prueba que el handler la honre.** Verificá el efecto, no
+   la presencia del argumento.
+5. **Un timeout del CLIENTE no es un fallo del servidor.** Leé el estado con el reader antes de
+   reintentar, o gastás de nuevo.
+6. **Código presente no es capacidad disponible.** `registerCreditFundingCapabilities` existía con 12
+   tests verdes y **no lo llamaba nadie**. Los tests de dominio no pueden ver un hueco de cableado:
+   la aserción tiene que ir contra `/v1/capabilities`, que es lo que un caller ve.
+7. **Endurecer más de lo que la decisión pide no es conservador: es cambiar la decisión sin
+   discutirla.**
+8. 🔴 **Un `.ts` con bytes NUL crudos se detecta como BINARIO y todo `grep` lo salta en silencio.**
+   `credit-funding.ts` los usaba como separador de clave; hizo concluir dos veces que un símbolo no
+   existía, y **ningún gate lo atrapa** (compila perfecto). Si un símbolo "no aparece" pero deberías
+   estar viéndolo: `file <path>` — si dice `data`, ahí está. Usar ` `, nunca el byte literal.
+
 🔴 **ANTES de escribir una secuencia de canary a mano: YA EXISTE COMO SCRIPT (2026-07-26).**
 `pnpm producer:canary` (`scripts/producer-ui-canary.mjs` + `-lib.mjs`) hace el recorrido **completo** de gasto real
 —`producer.catalog.list` → `lab.experiment.estimate` → `prepare` → `execute` → `experiment.get` →

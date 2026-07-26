@@ -80,6 +80,30 @@ El `execute` de imagen (ruta `ref/still/rrss-v1` → `fal.seedream.text-to-image
 
 **El próximo paso NO es otro deploy.** Es leer `buildBody` de `fal.seedream.text-to-image` (`governed-production-composition.ts:205`) contra los doce chequeos de `safeSnapshotBody` (`production-route-composition.ts:133-167`) y encontrar cuál viola. Es el mismo método que resolvió la capa 5.
 
+## Delta 2026-07-26 (c) — NOVENA aparición, en código escrito mientras se arreglaban las ocho anteriores
+
+**El dato que vale más que todo el issue:** el mismo defecto reapareció en
+`src/lib/globe/credit-administration-broker.ts`, escrito **el mismo día**, por el mismo agente, en la
+misma sesión en que se cerraban las ocho capas previas.
+
+Su `catch` de `dispatch` sanitizaba hacia el caller —correcto— y **no dejaba ningún rastro del lado
+del servidor** —incorrecto—. Medido en vivo: ejercitando la ruta gobernada apareció un `503`
+`globe_unavailable` propio y **fue imposible diagnosticarlo desde el servidor**. La causa real era que
+el ADC humano no puede impersonar al workload caller, pero eso hubo que descubrirlo por fuera.
+
+Corregido: emite `{event, phase, errorName}` — nunca `message`, `stack` ni body del upstream (un fallo
+de credenciales trae el correo de la identidad; uno de Globe puede traer saldo). La **fase** importa
+porque `propose` y `confirm` fallan por razones distintas y exigen acciones distintas.
+
+> **La conclusión operativa del issue completo, y la razón de que siga abierto como referencia:**
+> conocer la regla no la aplica sola. Nueve apariciones, la última cometida por quien acababa de
+> documentar las ocho. Lo que sí funciona es **mecánico**: al escribir un `catch` que sanitiza,
+> escribir en el mismo commit su línea de servidor. No es disciplina, es un paso del procedimiento.
+
+**Estado de las cuatro filas de la tabla original:** tres cerradas; `authentication_required` en API
+mode **sigue abierta** — sus tres causas (clase de credencial equivocada, `--include-email` ausente,
+audiencia incorrecta) siguen colapsadas en el mismo 401/403. Es el único trabajo pendiente del issue.
+
 ## Delta 2026-07-26 (b) — capa 8: el control que rechazaba, encontrado leyendo (commit `4eee1cc`)
 
 Se hizo esa lectura y **apareció la causa, sin desplegar nada**. El método funcionó por segunda vez.

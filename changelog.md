@@ -7,6 +7,27 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-26 — Globe genera de verdad: Producer React vivo y carril de fondeo gobernado
+
+- **Generación desbloqueada.** Las tres modalidades producen desde la UI con principal humano por el BFF:
+  imagen (Seedream 5 Pro), video (Seedance 2.0) y audio (ElevenLabs Multilingual v2). Lo que lo bloqueaba
+  era un falso positivo del sanitizador, que leía `"Key visual…"` —término de dirección de arte— como una
+  credencial (`ISSUE-127` capa 8). Se corrigió el **control**, no el prompt: una credencial serializada es
+  un token opaco, no una frase.
+- **Producer React en runtime** (`globe-studio-internal` rev `00094-pr8`). El código ya estaba desplegado;
+  lo tapaba `GLOBE_CLIENT_PRODUCER_ENABLED=false`, con su gate de paridad ya verde. Se corrigieron además
+  el viewer (la pieza no llenaba su celda por una herencia del share board), las acciones muertas en una
+  corrida fallida y los enums crudos (`with-audio`/`silent`) que salían como copy visible.
+- **Carril gobernado de fondeo de crédito vivo** (`globe-api-internal` rev `00106-b6w`, 176 capabilities).
+  La atribución humana pasó de convención de payload a control exigible: tabla append-only en Greenhouse
+  con trigger en la base que rechaza que un principal de servicio figure como el humano que aprueba. La
+  mutación (grant + asiento + política) corre en **una** transacción.
+- **El segundo confirmador humano quedó como política por workspace** (default OFF en el interno) más
+  techo por operación, no como invariante — coherente con ADR-015. Un control que su único usuario no
+  puede satisfacer no protege: desvía al break-glass.
+- Pendiente para cerrar `TASK-1566`: ejercer `propose`→`confirm` con Greenhouse desplegado. El ADC local
+  no puede impersonar al workload caller, por diseño.
+
 ## 2026-07-26 — Routing económico y creativo de modelos generativos
 
 - Las skills de diseño/motion y Business Model Operator documentan la selección por caso de uso entre Seedance 2.0,

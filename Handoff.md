@@ -53,6 +53,51 @@ Quedaron confirmadas las postulaciones a **FLUX Creator Program**, **Runway Ente
 Las skills `efeonce-business-model-operator` y `efeonce-customer-model-operator` (Codex y companions de Claude) ya
 incorporan la clasificación y los gates para evaluar partners/providers; el estado concreto sigue viviendo en el audit.
 
+## 2026-07-26 — ESTADO VIGENTE de generacion y fondeo de Globe (supersede TODO lo de abajo sobre estos dos temas)
+
+> **Para generacion y fondeo de Globe, esta entrada gana.** Las de abajo son narrativa del mismo hilo y
+> varias se contradicen entre si leidas de arriba hacia abajo — fueron ciertas en su momento. Las
+> entradas de Codex que estan **arriba** cubren otros temas (identidad visual, routing economico,
+> partners) y no compiten con esta.
+
+**Runtime vigente (verificado, no inferido):**
+
+| Servicio | Revision | Estado |
+|---|---|---|
+| `globe-api-internal` | **`00106-b6w`** (`b4c56a12ce65`) | `GLOBE_CREDIT_ADMIN_LANE_ENABLED='true'`, **176 capabilities** |
+| `globe-studio-internal` | **`00094-pr8`** (`7cd0df363839`) | Producer **React** sirviendo, `GLOBE_CLIENT_PRODUCER_ENABLED='true'` |
+
+**Generacion: RESUELTA.** Las tres modalidades generan desde la UI con principal `human` por el BFF —
+imagen (Seedream 5 Pro, 10 cr, PNG 7,4 MB), video (Seedance 2.0, 16 cr, MP4 1,5 MB) y audio
+(ElevenLabs Multilingual v2, 6 cr, MP3 114 KB). Lo que la bloqueaba era un falso positivo: el
+sanitizador leia `"Key visual…"` como credencial (ISSUE-127 capa 8). Se arreglo el CONTROL, no el
+prompt. Un video fallo por `provider_failed` **transitorio** (2 de 3), con `spentCredits=0`.
+
+**Fondeo gobernado (TASK-1566): carril VIVO, falta el ultimo salto.** Slices 1/4/5 entregados. La
+atribucion humana es exigible (tabla append-only + trigger en la BASE), el segundo confirmador es
+POLITICA con default OFF en el interno, y la mutacion corre en UNA transaccion.
+🔴 **Falta un unico paso: ejercer `propose`->`confirm` con Greenhouse DESPLEGADO.** Desde una laptop no
+se puede y es por diseno — el ADC humano no puede impersonar al workload caller (`PERMISSION_DENIED`);
+ese `tokenCreator` es de `greenhouse-portal@` (`iam.tf:16-20`). Hasta entonces NO se retira
+`raise-credit-monthly-cap.mjs`: sacarlo dejaria cero caminos para subir el tope.
+
+**Migraciones aplicadas hoy:** Globe `0032_credit_funding_proposals`; Greenhouse
+`…164420386_task-1566-globe-credit-funding-intents` y `…171851162_task-1566-second-confirmer-is-policy-not-invariant`.
+
+**Dos errores propios que conviene no repetir:**
+1. Puse un `CHECK` duro exigiendo dos humanos donde ADR-015 ya habia decidido POLITICA con default OFF
+   — y bloquee al operador, que es el unico con esa autoridad. Endurecer mas de lo que la decision pide
+   no es conservador: es cambiar la decision sin discutirla.
+2. **Novena aparicion de ISSUE-127**, en el broker escrito el mismo dia en que se cerraban las ocho
+   anteriores: un `catch` que sanitizaba sin dejar rastro del servidor. La contramedida no es
+   disciplina sino procedimiento — el `catch` y su linea de log, en el mismo commit.
+
+**Pendientes vivos:** `authentication_required` (4.a fila de ISSUE-127, unica abierta) · los dos huecos
+del canary (`RUN_LABEL` exigido solo en `--execute`; el dry-run no reporta `withinDayCap`) · reconcile
+terminalization (TASK-1469) · `data-testid` estables en feed/tabs (el live feed invalida los refs de
+a11y y vuelve flaky cualquier QA automatizado) · top-up de cliente (TASK-1484: el trigger exige actor
+humano y hay que discriminar por `source`, no relajarlo).
+
 ## 2026-07-26 — TASK-1566 Slice 5: la atribucion humana se vuelve EXIGIBLE
 
 **Entregado en Greenhouse** (`b6f2ff4` + `d2916371e`, local en `develop`, sin push). Es lo que faltaba
