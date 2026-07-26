@@ -10,6 +10,9 @@ Quedaron confirmadas las postulaciones a **FLUX Creator Program**, **Runway Ente
 
 **Siguiente acción humana:** completar los captchas/verificaciones y los pasos de identidad/acceso descritos en el audit antes de declarar cualquier programa como aprobado.
 
+Las skills `efeonce-business-model-operator` y `efeonce-customer-model-operator` (Codex y companions de Claude) ya
+incorporan la clasificación y los gates para evaluar partners/providers; el estado concreto sigue viviendo en el audit.
+
 ## 2026-07-26 — ESTADO VIGENTE de Globe (consolida el hilo del día; las entradas de abajo son narrativa superada)
 
 > **Leer sólo esta para saber dónde está Globe.** Abajo hay 6 entradas del mismo hilo de hoy, escritas por dos

@@ -151,6 +151,28 @@ Usar `references/customer-model-integrity-pack-template.md`. El pack debe inclui
 ledger, gaps, next experiment, owners, review date y handoffs a business model, GTM, commercial, pricing, finance,
 legal y operations.
 
+## Calificación de partners y providers en la oferta
+
+Cuando una oferta depende de un tercero, evaluar al partner como parte del modelo de cliente y no sólo como una
+integración técnica. Separar tres preguntas:
+
+1. **¿El cliente lo compra?** Confirmar el JTBD y el criterio de compra que el partner habilita: resultado,
+   seguridad, procurement, capacidad, velocidad, calidad o distribución.
+2. **¿Efeonce puede entregarlo?** Confirmar owner, RACI, soporte, acceso, onboarding, human-in-the-loop, fallback,
+   portabilidad y responsabilidad frente al cliente.
+3. **¿Efeonce puede sostenerlo?** Confirmar economics, términos de datos/IP, subprocesadores, continuidad, cambios de
+   precio, SLA, renovación y sustitución del provider.
+
+Un programa de partner en estado `applied`, `accepted` o `enabled` no demuestra problem-solution fit, buying intent,
+renovación ni canal productivo. El partner sólo puede declararse parte de una oferta `commercially_qualified` cuando
+   existe evidencia bilateral de cliente, criterios de procurement/seguridad, owner interno, próximo paso verificable
+   y economics por fase. En caso contrario, mantenerlo como `hypothesis_only` o `approved_for_validation`.
+
+Para el portafolio AI de Efeonce, priorizar primero las relaciones que soportan delivery enterprise (Claude, OpenAI,
+Google Cloud/Vertex AI), después las que agregan una capability vendible y diferenciada (ElevenLabs, BytePlus,
+Runway, FLUX), y dejar habilitadores o experimentos (AWS, Salesforce, Lovable, HeyGen) condicionados a una cuenta,
+JTBD y oportunidad concreta. Mantener el mapa de estados y su fecha en el audit comercial, no en esta skill.
+
 ## Verdicts
 
 - `customer_model_incomplete`: faltan decisiones load-bearing o evidencia mínima.

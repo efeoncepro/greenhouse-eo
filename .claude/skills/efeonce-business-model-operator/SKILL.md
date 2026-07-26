@@ -18,3 +18,7 @@ engagements lives in `docs/business-models/EFEONCE_PRODUCT_SERVICE_OPERATING_MOD
 The corporate 2028 direction requires every client-facing service to become productized and AI-native; use
 `docs/strategy/EFEONCE_2028_PRODUCTIZED_AI_NATIVE_SERVICES_STRATEGIC_DIRECTION_V1.md` for maturity gates and
 exceptions.
+
+For partner/provider portfolio decisions, load the canonical skill's `Portfolio de partners y providers` section:
+classify relationships as strategic core, creative capability, execution enabler or experiment, and require offer,
+owner, economics, contract, rights, support, fallback and demand evidence before increasing priority.

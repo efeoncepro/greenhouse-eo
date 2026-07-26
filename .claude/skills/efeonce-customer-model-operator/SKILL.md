@@ -37,3 +37,8 @@ research, pricing, finance, legal y operations.
 - Legal/Operations decide procurement, datos, IP, riesgo, contrato y delivery.
 
 La especialización de línea de negocio siempre conserva sus invariantes; esta skill aporta el modelo transversal.
+
+Cuando una oferta depende de un partner/provider, cargar también la sección canónica `Calificación de partners y
+providers en la oferta`. El estado del programa del tercero no prueba demanda del cliente, readiness de delivery ni
+calificación comercial: exigir evidencia de JTBD, procurement/seguridad, ownership, economics, continuidad y
+sustitución.

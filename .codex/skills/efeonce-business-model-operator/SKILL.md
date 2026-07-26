@@ -266,6 +266,32 @@ Un modelo es financiable sólo si puede explicar:
 
 El output pasa a `efeonce-investor-readiness` con revenue, costos, evidencia y estados honestos.
 
+## Portfolio de partners y providers
+
+Un programa de partners no es automáticamente un canal comercial ni un activo estratégico. Clasificar cada relación
+en una de estas funciones: **núcleo estratégico** (intelligence/cloud rail y enterprise delivery), **capability
+creativa** (imagen, video, voz o producción), **habilitador de ejecución** (cloud/CRM/multi-cloud) o **experimento**
+(prototipado, acceso temprano o creator-led).
+
+Para cada provider o partner registrar, como mínimo:
+
+- casos de uso vendibles y Product Service al que habilita;
+- owner interno, delivery model, operating mode y RACI;
+- revenue/canal real: co-selling, reseller, referral, pass-through, enablement o sólo acceso técnico;
+- cost-to-serve, margen, mínimos, consumo, soporte y sensibilidad a cambios de precio;
+- términos de datos, IP, entrenamiento, sublicencia, portfolio rights, jurisdicción y subprocesadores;
+- SLA/support, continuidad, portabilidad, fallback y provider substitution;
+- evidencia de demanda, referencias, certificaciones o acceso comercial conseguido.
+
+Para Efeonce, la regla de composición es **provider-neutral, provider-transparent**: Claude, OpenAI y Google
+Cloud/Vertex AI forman el núcleo enterprise; ElevenLabs y BytePlus son apuestas de capability/canal con potencial
+comercial; Runway y FLUX son una segunda capa creativa; AWS, Salesforce, Lovable y HeyGen se activan por oportunidad
+concreta. Esta clasificación es una hipótesis de portafolio, no evidencia de partnership aprobado. La evidencia
+fechada de postulaciones vive en `docs/audits/commercial/AI_PARTNER_PROGRAM_APPLICATIONS_2026-07-26.md`.
+
+No ampliar el portafolio por acumulación de logos. Un partner sube de prioridad sólo cuando existe una oferta,
+owner, economics, ruta contractual y evidencia de demanda; si no, permanece como experimento o capability opcional.
+
 ## Invariantes obligatorios
 
 1. Un business model no es un tarifario.

@@ -11,6 +11,7 @@
 
 - Se creó [`docs/audits/commercial/AI_PARTNER_PROGRAM_APPLICATIONS_2026-07-26.md`](docs/audits/commercial/AI_PARTNER_PROGRAM_APPLICATIONS_2026-07-26.md) con el mapa, evidencia, estados y próximos pasos de Anthropic/Claude, Lovable, OpenAI, Google Cloud, AWS, Salesforce, Runway, FLUX, BytePlus/ByteDance, ElevenLabs y HeyGen.
 - Se confirmaron envíos a FLUX, Runway Enterprise y ElevenLabs; BytePlus quedó bloqueado únicamente por reCAPTCHA.
+- Se incorporó a las skills de business model y customer model la clasificación de partners por función y los gates de oferta, ownership, economics, derechos, procurement, continuidad, fallback y evidencia de demanda; los companions de Claude quedaron sincronizados.
 
 ## 2026-07-26 — ADR-015: Greenhouse administra Globe (créditos y capabilities de usuarios)
 
