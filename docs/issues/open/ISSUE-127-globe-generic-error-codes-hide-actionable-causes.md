@@ -98,7 +98,26 @@ Encaja exacto con la capa 7: el rechazo llegaba etiquetado `endpoint_url_not_per
 
 **Capa 8b — el patrón otra vez, adentro del propio fix.** El evento `globe.production_route.compilation_failed` nombraba la **clase** (`ProductionRouteDependencyError`) y **tiraba la razón**, que es el dato por el que existen las 28. Medido en vivo: el evento del último canary (`12:37:39Z`, `experimentId=115b549b…`) no permitía saber cuál control rechazó; la razón sólo viajaba al caller. Ya emite `reason` — enum cerrado propio, sin `message`, `stack` ni nada derivado del payload.
 
-**Estado del bloqueo: causa cerrada en código, pendiente de deploy + canary.** `4eee1cc` no está desplegado.
+### Verificado en vivo — EL CANARY GENERÓ (2026-07-26, revisión `00101-gfn`)
+
+`4eee1cc` desplegado (imagen `4eee1cc51dad`, ancestría verificada). **El bloqueo se rompió: hubo generación real por primera vez.**
+
+| Evidencia | Valor |
+|---|---|
+| Settlement | `13:36:15.451Z` · `governed_operation_completed` · **`spentDelta: 10`** |
+| Attempt | `attempt 1` → **`outcome: succeeded`** · ruta `ref/still/rrss-v1` · `seedream-5-pro` `v5-pro` |
+| Actor | `globe:service:internal-caller` vía `greenhouse-globe-caller@` · `correlationId: canary-a8013c68…` |
+| Artefacto | **PNG real de 7.454.584 bytes**, `sha256:c8e365f1…`, `sourceKind: generated`, `13:36:15.402Z` |
+| `compilation_failed` en la ventana | **CERO** (con `40ed85a` aparecía en cada intento) ⇒ **capa 8 cerrada** |
+
+El asset quedó `lifecycle: quarantined` con `governance.state: c2pa_verify` (`terminal: false`) — pipeline normal de governance, no un fallo.
+
+**El canary NO completó de punta a punta**, por dos cosas que hay que registrar como propias:
+
+1. **Timeout del CLIENTE a los 10 min** mató la corrida mientras esperaba governance (el canary tolera 20). Es la trampa ya documentada, otra vez — esta vez sin costo, porque no reintenté a ciegas.
+2. 🔴 **Mi técnica de "replay con la misma etiqueta" fue correcta en el gasto y FALSA en la premisa.** Verifiqué que `prepare`/`execute` llevan claves derivadas del `runLabel` y concluí que devolvería *el mismo* experimento. **No lo hizo: creó uno nuevo** (`d756055f`, `createdAt 13:44:02.287`, distinto del original). El gasto sí fue cero — el ledger lo prueba (`reservation 10` → `release 10`, `spent 0`) —, así que fue inocuo, pero la premisa era incorrecta. **Que una clave de idempotencia exista no prueba que el handler la honre**; hay que verificar el efecto, no la presencia del argumento.
+
+**Capa 9, abierta y NO diagnosticada.** El experimento nuevo falló en **177 ms** con `attempts: []` (o sea antes de cualquier llamada al proveedor), `failureReason: runner_error`, y su evento de servidor dice `errorName: "Error"`, `reasonShape: "absent"` — un `Error` pelado sin razón de nuestro vocabulario. El release fue `governed_schedule_failed`. **Hipótesis sin verificar:** colisión de `submissionKey` por reusar el `runLabel` de una corrida que ya había ejecutado — o sea, posiblemente un artefacto de mi propia técnica y no un defecto del camino de producto. Se marca como hipótesis a propósito: no leí ese camino.
 
 ### Tres huecos del canary, encontrados USÁNDOLO
 

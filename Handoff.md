@@ -56,8 +56,20 @@ eyJ…` y `Key <id>:<secret>` siguen atrapados; la prosa no). Cambiar el prompt 
 **escondiendo** el bug para el próximo usuario real que escriba el término estándar del oficio.
 **Capa 8b — el patrón otra vez adentro del propio fix:** `globe.production_route.compilation_failed` nombraba la clase
 y **tiraba la razón**; ya emite `reason` (enum cerrado, sin `message`/`stack`).
-🔴 **Pendiente: desplegar `324be6b` + `4eee1cc` y correr el canary con gasto real.** Gates verdes (`pnpm check` +
-`pnpm build` exit=0). Revisión viva sigue siendo **`00100-drb`**.
+✅ **DESPLEGADO Y VERIFICADO — EL CANARY GENERÓ.** Revisión **`00101-gfn`** (imagen `4eee1cc51dad`, ancestría
+verificada). Evidencia: settlement `13:36:15.451Z` `governed_operation_completed` **`spentDelta: 10`**, `attempt 1
+→ succeeded` en `ref/still/rrss-v1`/`seedream-5-pro`, `correlationId: canary-a8013c68…`, y un **PNG real de
+7.454.584 bytes** (`sha256:c8e365f1…`, `sourceKind: generated`). **CERO `compilation_failed`** en la ventana ⇒
+capa 8 cerrada. El asset quedó `quarantined` en `c2pa_verify` (governance normal, no fallo).
+🔴 **El canary NO completó de punta a punta, y las dos causas son mías:** (1) timeout del **cliente** a los 10 min
+mató la corrida esperando governance (el canary tolera 20) — la trampa ya documentada, esta vez sin costo porque no
+reintenté a ciegas; (2) mi "replay con la misma etiqueta" fue **correcto en el gasto y falso en la premisa**:
+`prepare` **creó un experimento nuevo** en vez de devolver el existente (gasto cero igual — `reservation 10` →
+`release 10`). **Que una clave de idempotencia exista no prueba que el handler la honre.**
+🔴 **Capa 9 abierta, NO diagnosticada:** ese experimento nuevo murió en **177 ms** con `attempts: []`,
+`runner_error`, `errorName: "Error"`, `reasonShape: "absent"`, release `governed_schedule_failed`. Hipótesis sin
+verificar: colisión de `submissionKey` por reusar el `runLabel` — o sea posiblemente artefacto de mi técnica, no del
+producto. **Video y audio nunca se intentaron.** Completar el canary con etiqueta fresca cuesta **32 créditos**.
 
 **Delta final del canary — SIETE capas, y la séptima corrige a la sexta (`ISSUE-127`).** Corrido **4 veces con gasto real, CERO créditos perdidos** (el fence liberó cada reserva). **No generó.** Bloqueo vigente **acotado con precisión**: el `execute` de imagen (`ref/still/rrss-v1` → `fal.seedream.text-to-image`) lo rechaza el **sanitizador del body snapshot**, NO la config del endpoint — las tres entries del allowlist pasan sus aserciones, verificado leyéndolas. Sospechosos por cómo `buildBody` arma referencias con `placeholder(input)`: `snapshot_body_inline_data_uri`, `snapshot_body_too_large` (>256 KB), `snapshot_body_binary_key`, `snapshot_body_credential_like`.
 🔴 **El próximo paso NO es otro deploy.** Es leer `buildBody` de `fal.seedream.text-to-image` (`governed-production-composition.ts:205`) contra los 12 chequeos de `safeSnapshotBody` (`production-route-composition.ts:133-167`). Revisión viva: **`00100-drb`**; el fix de etiquetado (`324be6b`) está **commiteado y SIN desplegar** — desplegarlo sólo mejora el label del próximo intento, no desbloquea.
