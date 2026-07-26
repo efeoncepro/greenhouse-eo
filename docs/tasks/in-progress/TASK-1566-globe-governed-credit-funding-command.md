@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-028`
-- Status real: `Carril VIVO en produccion (rev 00106-b6w, flag ON, 176 capabilities). Slices 1/4/5 entregados y verificados contra PG real. Falta UNICO paso: ejercer propose->confirm con Greenhouse DESPLEGADO (el ADC local no puede impersonar el workload caller, por diseno)`
+- Status real: `Los 7 defectos de la cadena tienen fix. El 7 (self-deadlock del store transaccional) esta code-complete en efeonce-globe@4eab6d3 con gates verdes, PENDIENTE DE DEPLOY de globe-api-internal. Regla dura vigente: NO ejercer confirm hasta desplegar y verificar pg_locks en cero. Despues: ejercer propose->confirm con la sesion del operador (criterio de salida)`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -509,6 +509,72 @@ Validación manual (no automatizable, y es una propiedad del diseño):
 - **Modelo de roles de administración de crédito**: si `propose` y `confirm` son dos capabilities sobre los ROLE_CODES existentes o merecen un rol nuevo. Decidir contra los **14 ROLE_CODES reales** de `src/config/role-codes.ts`, nunca contra un rol fantasma.
 - **Aplicar el mismo carril al resto de la administración de crédito** (pools, budgets de proyecto, correcciones) si el patrón `propose`/`confirm` resulta el correcto para el fondeo.
 - ~~**Portar `nul-byte-gate` a `efeonce-globe`**~~ — hecho el 2026-07-26 (`076ca4b`). Los dos repos quedan con gate.
+
+## Delta 2026-07-26 (5) — el defecto 7 tiene fix: el store transaccional ya no abre conexiones propias
+
+**La pasada dedicada que el Delta (4) dejó dictaminada, ejecutada.** Fix en `efeonce-globe@4eab6d3`
+(local, `main`, **sin push**), gates `pnpm check` + `pnpm build` verdes. **NO desplegado**: la regla
+dura sigue vigente — NO ejercer `confirm` hasta redesplegar `globe-api-internal` con esta imagen y
+verificar `pg_locks` en cero después del primer ejercicio.
+
+### El segundo acceso al pool, localizado — y por qué la primera hipótesis estaba refutada
+
+El Delta (4) exigía localizar el segundo acceso antes de escribir el fix. Está en
+`markGrantPosted` (`credit-administration-store.ts:27` pre-fix): usaba `this.pool.transaction`
+**incondicionalmente** — ignoraba la `tx` inyectada del Slice 4c — y toma
+`pg_advisory_xact_lock(credit:workspace:X)` como primera instrucción. El camino sin `monthlyCap` es
+exactamente: `confirm` → `issueCreditGrant` → `store.issueGrant` (tx ✓) → `ledger.allocate` (tx ✓) →
+`store.markGrantPosted` (**pool → conexión nueva → lock → cuelgue**). Por eso el cuelgue se
+reproducía sin `monthlyCap`: el primer sospechoso (`getPolicySnapshot`/`getAvailability` vía
+`readState`) es la **misma clase** (leer por otra conexión dentro de la transacción) pero **nunca se
+alcanzaba** — el confirm se colgaba antes, en el grant. Los reads además no toman el advisory lock,
+así que su síntoma no es cuelgue sino no ver los writes propios.
+
+### El fix — enhebrado completo, como la task dictaminó
+
+En `efeonce-globe` (7 archivos, +145/−54):
+
+1. **`DurableCreditAdministrationStore`**: `markGrantPosted` pasa por `run()` (tx inyectada si hay;
+   propia si no), y los **11 readers** (`getPool`, `listPools`, `getGrant`, `listGrants`,
+   `getEffectivePolicy`, `listBudgets`, `getPolicySnapshot` ×2, `getAvailability`, `getForecast`,
+   `listAlerts`) leen por el accessor `db` (`tx ?? pool`). Todo método del store honra la
+   transacción inyectada: misma conexión, lock reentrante, read-your-own-writes.
+2. **`DurableCreditLedgerStore`**: misma clase en sus 6 readers (`getRateCatalog`, `getBalance`,
+   `getEstimate`, `getReservation`, `listEntries`, `getUsage`) — accessor `#db`.
+3. **Dominio `credit-funding.ts`**: `CreditFundingMutationPorts` gana `policyReader`, y el
+   `readState` de mitad de mutación (camino `monthlyCapAfter`) corre por `ports.policyReader` —
+   los ports ENLAZADOS — nunca por `deps.policyReader` (el externo). Cierra la hipótesis refutada
+   por diseño, no por coincidencia.
+4. **Transporte `app.ts`**: `mutationPorts(store, …)` construye el `policyReader` del MISMO store
+   que la mutación (un solo armado); el literal duplicado a nivel registro se eliminó. Dentro de
+   `atomically` el reader corre sobre el store enlazado a la transacción.
+5. El docstring de `confirmCreditMonthFunding` que declaraba la atomicidad como deuda ("los stores
+   hoy no lo aceptan") quedó actualizado: ya la aceptan, y la regla escrita es que dentro de la
+   transacción NINGÚN port abre conexión propia.
+
+### La evidencia — regresiones que fallan contra el store viejo
+
+El deadlock real no se reproduce con dobles; lo que SÍ se verifica es su **condición necesaria**:
+con `tx` inyectada, el pool no se toca.
+
+- `credit-administration-store.test.ts`: dos tests nuevos (markGrantPosted y `getAvailability` con
+  `tx` inyectada → `pool.calls.length === 0`). **Verificado que fallan 2/2 contra el store sin fix**
+  (git stash del store, suite 6 pass / 2 fail, restaurado).
+- `credit-ledger-store.test.ts`: misma aserción para los readers del ledger.
+- `credit-funding.test.ts`: `confirm` con `monthlyCapAfter` lee política **sólo** por los ports del
+  seam (scoped=1, outer=0 después del propose); los dos tests existentes del seam ganaron el
+  `policyReader` en sus ports (exigido por el tipo).
+
+Los tests viven en archivos **ya registrados** en los scripts `test` de sus packages — no hay test
+nuevo sin registrar.
+
+### Lo que falta (en orden)
+
+1. **Push + deploy de `globe-api-internal`** (`deploy-internal.yml`, manual) con `4eab6d3`.
+2. Ejercer `confirm` con la sesión del operador (runbook del Delta 4) y verificar `pg_locks` en cero
+   después.
+3. Higiene: las 2 propuestas en `confirmed` sin completar siguen sin terminalizarse solas
+   (TTL sólo vence `proposed`; se conecta con `TASK-1469`).
 
 ## Delta 2026-07-26 (4) — la precondición del cierre queda verificada; el bug class del NUL se cierra con gate
 

@@ -1189,6 +1189,15 @@ ese lock **desde otra conexión**: la externa no commitea porque espera a la int
 obtiene el lock porque lo tiene la externa. **No es "queda no atómico" — se cuelga, en el camino del
 dinero.** El fix es un **ejecutor inyectable** por store (dentro de una misma transacción el lock es
 reentrante) + el seam `atomically` en el dominio. Backward compatible.
+🔴 **Y el ejecutor tiene que cubrir TODOS los métodos, lecturas incluidas — uno solo que quede en
+`this.pool` reintroduce el cuelgue** (defecto 7 de TASK-1566, medido dos veces en `pg_locks` en
+vivo). `markGrantPosted` quedó fuera del enhebrado del Slice 4c y colgó todo `confirm` desplegado,
+reteniendo el lock del workspace y bloqueando la generación entera; los readers en `this.pool` son la
+misma clase con otro síntoma (no ven los writes de su propia transacción). Cerrado en
+`efeonce-globe@4eab6d3`: accessor `db = tx ?? pool` en TODO método de los stores de administración y
+ledger, `policyReader` viaja por los `CreditFundingMutationPorts` del seam (nunca el reader externo
+dentro de `mutate`), y la regresión conductual es «con `tx` inyectada, `pool.calls === 0`». Al
+agregar un método a un store transaccional de crédito: **NUNCA** `this.pool` directo — `run()`/`db`.
 
 🔴 **El segundo confirmador humano es POLÍTICA, NO invariante** (ADR-015 Delta 2026-07-26 (2)).
 `requires_second_confirmer` es por workspace, **default FALSE en el interno**, más techo por operación

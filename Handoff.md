@@ -119,11 +119,18 @@ completar** por el (7).
 workspace —generacion incluida—. Se reciclaron las instancias de `globe-api-internal`; verificado
 despues: cero locks, cero sesiones activas. **Si el (7) se vuelve a ejercer, el bloqueo se reproduce.**
 
-🔴 **El (7) NO se intento**: exige enhebrar `GlobeQueryable` por ~20 metodos del archivo mas denso del
-repo, en el camino del dinero. La propia task ya lo habia dictaminado como pasada propia.
-⚠️ **Y una hipotesis quedo REFUTADA:** no basta con `readState`. Un `confirm` SIN `monthlyCap` —el
-camino que no lo llama— se colgo igual. Hay al menos un segundo acceso al pool dentro de la
-transaccion; localizarlo es el punto de partida, no arreglar `readState` y darlo por cerrado.
+**Sesion 2026-07-26 (pasada dedicada al 7) — code-complete, SIN desplegar. Detalle en TASK-1566
+§ Delta 2026-07-26 (5).** El segundo acceso al pool que la hipotesis refutada exigia localizar era
+`markGrantPosted`: usaba `this.pool.transaction` incondicional —ignoraba la `tx` inyectada del Slice
+4c— y toma el advisory lock del workspace desde una conexion nueva; es exactamente el camino sin
+`monthlyCap` (`confirm` → `issueCreditGrant` → grant tx ✓ → allocate tx ✓ → `markGrantPosted` pool →
+cuelgue). `readState` era la MISMA clase pero nunca se alcanzaba. Fix `efeonce-globe@4eab6d3` (local,
+main, sin push): todo metodo de `DurableCreditAdministrationStore` (run + 11 readers) y los 6 readers
+del ledger honran la `tx` inyectada; `CreditFundingMutationPorts` gana `policyReader` y el `readState`
+de mitad de mutacion corre por los ports del seam. Regresiones conductuales verificadas en rojo contra
+el store viejo (2/2); `pnpm check` + `pnpm build` verdes.
+🔴 **La regla dura SIGUE vigente: NO ejercer `confirm` hasta desplegar `globe-api-internal` con
+`4eab6d3` (deploy-internal.yml, manual, requiere push) y verificar `pg_locks` en cero despues.**
 Higiene pendiente: 2 propuestas quedaron en `confirmed` y el TTL solo vence las `proposed`, asi que no
 se terminalizan solas (se conecta con TASK-1469).
 
