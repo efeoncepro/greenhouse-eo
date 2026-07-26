@@ -80,6 +80,26 @@ El `execute` de imagen (ruta `ref/still/rrss-v1` → `fal.seedream.text-to-image
 
 **El próximo paso NO es otro deploy.** Es leer `buildBody` de `fal.seedream.text-to-image` (`governed-production-composition.ts:205`) contra los doce chequeos de `safeSnapshotBody` (`production-route-composition.ts:133-167`) y encontrar cuál viola. Es el mismo método que resolvió la capa 5.
 
+## Delta 2026-07-26 (b) — capa 8: el control que rechazaba, encontrado leyendo (commit `4eee1cc`)
+
+Se hizo esa lectura y **apareció la causa, sin desplegar nada**. El método funcionó por segunda vez.
+
+**`Key visual` no es una credencial.** El prompt del canary de imagen (`scripts/producer-ui-canary-lib.mjs:10`) empieza con `'Key visual editorial para Efeonce Globe: ...'`. El sanitizador marcaba como credencial **cualquier** string que empezara con `Key `/`Bearer ` —la regla era `^(?:Bearer|Key)\s+`, prefijo y nada más—, así que el término de dirección de arte del equipo se leía como material secreto. **Ese falso positivo es todo el bloqueo del `execute`.**
+
+Encaja exacto con la capa 7: el rechazo llegaba etiquetado `endpoint_url_not_permitted`, que mandaba a revisar la config del endpoint — y estaba bien, porque **el endpoint nunca estuvo involucrado**.
+
+**Dos hipótesis previas murieron leyendo, no desplegando** (que es el punto):
+- Los cuatro sospechosos de la capa 7 asumían que `buildBody` arma referencias con `placeholder(input)`. El de `text-to-image` **no llama `placeholder` en absoluto**: el body son cuatro escalares (`prompt`, `output_format`, `num_images`, `image_size`). `credential_like` estaba en la lista, pero por la razón equivocada.
+- `vertexProject` vacío habría roto el regex de la URL de vertex en el **constructor** (que valida las 12 entries, no 3) y habría bloqueado toda ruta, incluida fal. `GLOBE_LAB_VERTEX_PROJECT` está **sin setear** → cae al default `'efeonce-globe'`. Descartada contra el runtime.
+
+**El fix es al control, no al prompt.** Una credencial serializada es **un token opaco, no una frase**: ahora se exige que el resto sea un token único, sin espacios, ASCII de credencial y anclado al final. `Bearer eyJhbGci...` y `Key <id>:<secret>` (el formato real de fal) se siguen atrapando; la prosa no. Sube la precisión sin bajar el alcance contra credenciales reales — ningún token real lleva espacios ni acentos.
+
+> **No se tocó el prompt del canary, a propósito.** Cambiarlo habría desbloqueado el canary **escondiendo** el bug, y el próximo que escriba "Key visual" —un usuario real, con el término estándar del oficio— comería el mismo rechazo mudo. Cuando un control legítimo rechaza un caso legítimo, el defecto está en el control.
+
+**Capa 8b — el patrón otra vez, adentro del propio fix.** El evento `globe.production_route.compilation_failed` nombraba la **clase** (`ProductionRouteDependencyError`) y **tiraba la razón**, que es el dato por el que existen las 28. Medido en vivo: el evento del último canary (`12:37:39Z`, `experimentId=115b549b…`) no permitía saber cuál control rechazó; la razón sólo viajaba al caller. Ya emite `reason` — enum cerrado propio, sin `message`, `stack` ni nada derivado del payload.
+
+**Estado del bloqueo: causa cerrada en código, pendiente de deploy + canary.** `4eee1cc` no está desplegado.
+
 ### Tres huecos del canary, encontrados USÁNDOLO
 
 1. ✅ Descartaba el `failureReason` que el reader acababa de entregar — el script sabía por qué falló y obligaba a ir a los logs.
@@ -88,7 +108,7 @@ El `execute` de imagen (ruta `ref/still/rrss-v1` → `fal.seedream.text-to-image
 
 ## Estado
 
-open — cuatro de los códigos cerrados (`409` de crédito, `runner_error`, `ProductionRouteDependencyError` con 24 razones, el catch que las destruía); `authentication_required` pendiente; y el bloqueo del canary acotado al sanitizador del body. Antes decía: tres de los cuatro códigos cerrados; `authentication_required` pendiente. La verificación runtime del tercero necesita el deploy de `17329f6`.
+open — cuatro de los códigos cerrados (`409` de crédito, `runner_error`, `ProductionRouteDependencyError` con 24 razones, el catch que las destruía); `authentication_required` pendiente; y **la causa del bloqueo del canary encontrada y cerrada en código** (capa 8: el falso positivo de `credential_like` sobre `"Key visual"`, `4eee1cc`), pendiente de deploy + canary con gasto real. Antes decía: bloqueo acotado al sanitizador del body, sin causa identificada. La verificación runtime necesita desplegar `324be6b` + `4eee1cc`.
 
 ## Relacionado
 

@@ -1100,6 +1100,26 @@ derivado del payload: la prohibición de filtrar detalle interno aplica a los **
 tests que lo verifican. Y si el dominio es transport-neutral —lo es, cero `console` en el paquete— la razón se
 observa por un **port inyectado**, no por un `console.error` metido ahí.
 
+🔴 **Un control legítimo que rechaza un caso legítimo se arregla en el CONTROL, no en el caso (ISSUE-127 capa 8, 2026-07-26).**
+El sanitizador del body snapshot trataba como credencial **cualquier** string que empezara con `Key `/`Bearer `
+(regla `^(?:Bearer|Key)\s+`, prefijo y nada más). El prompt del canary de imagen empieza con **`"Key visual editorial
+para Efeonce Globe: ..."`** — `Key visual` es el término de dirección de arte del equipo, no un secreto. Ese falso
+positivo bloqueó el `execute` durante toda una sesión, y **llegaba etiquetado `endpoint_url_not_permitted`**, que
+mandaba a leer una config de endpoint que estaba perfecta.
+
+**NUNCA** desbloquees esto cambiando el input (el prompt del canary): desbloquea la sesión **escondiendo** el bug, y
+el próximo que escriba el término estándar del oficio —un usuario real— come el mismo rechazo mudo. **La heurística
+tiene que distinguir el dato del formato:** una credencial serializada es **un token opaco, no una frase**, así que
+se exige token único, sin espacios, ASCII de credencial y **anclado al final** (`$`). Con eso `Bearer eyJhbGci…` y
+`Key <id>:<secret>` (el formato real de fal) se siguen atrapando y la prosa no: sube la precisión sin bajar el
+alcance contra credenciales reales — ningún token real lleva espacios ni acentos.
+
+Corolario de método, medido dos veces el mismo día: **una hipótesis se mata leyendo, no desplegando.** Los cuatro
+sospechosos heredados asumían que `buildBody` armaba referencias con `placeholder(input)` — el de `text-to-image`
+**no lo llama**, su body son cuatro escalares; y la hipótesis de `vertexProject` vacío (que habría roto el regex de
+vertex en el **constructor**, que valida las 12 entries, no 3) murió con un `gcloud run services describe`:
+`GLOBE_LAB_VERTEX_PROJECT` está sin setear y cae al default. Ninguna de las dos costó un deploy.
+
 🔴 **ANTES de escribir una secuencia de canary a mano: YA EXISTE COMO SCRIPT (2026-07-26).**
 `pnpm producer:canary` (`scripts/producer-ui-canary.mjs` + `-lib.mjs`) hace el recorrido **completo** de gasto real
 —`producer.catalog.list` → `lab.experiment.estimate` → `prepare` → `execute` → `experiment.get` →

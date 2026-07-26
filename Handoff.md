@@ -33,6 +33,24 @@ incorporan la clasificación y los gates para evaluar partners/providers; el est
 - **`globe-api-internal` en revisión `00097-s58`** (imagen `10fd5f14`, ancestría verificada, perímetro anónimo → 403):
   trae la **fase de negación de crédito** (TASK-1566 Slice A) y el **comando gobernado + signer port** (Slice B).
 
+**Delta 2026-07-26 (b) — CAPA 8: la causa del bloqueo, encontrada LEYENDO (commit `4eee1cc`, sin desplegar).**
+Se hizo la lectura que pedía la capa 7 y apareció la causa sin gastar un deploy. **`Key visual` no es una credencial:**
+el prompt del canary de imagen (`producer-ui-canary-lib.mjs:10`) empieza con `'Key visual editorial para Efeonce
+Globe: ...'`, y el sanitizador marcaba como credencial **cualquier** string que empezara con `Key `/`Bearer ` (la regla
+era `^(?:Bearer|Key)\s+`, prefijo y nada más). **Ese falso positivo era todo el bloqueo del `execute`**, y explica la
+capa 7: llegaba etiquetado `endpoint_url_not_permitted`, que mandaba a revisar un endpoint que nunca estuvo involucrado.
+**Dos hipótesis murieron leyendo, no desplegando:** (a) los cuatro sospechosos de la capa 7 asumían `placeholder(input)`,
+y el `buildBody` de `text-to-image` **no lo llama** — su body son cuatro escalares; (b) un `vertexProject` vacío habría
+roto el regex de vertex en el **constructor** (valida las 12 entries, no 3) y bloqueado toda ruta, pero
+`GLOBE_LAB_VERTEX_PROJECT` está sin setear → default `'efeonce-globe'`. **El fix es al control, NO al prompt**: una
+credencial es un token opaco, no una frase, así que ahora se exige token único sin espacios anclado al final (`Bearer
+eyJ…` y `Key <id>:<secret>` siguen atrapados; la prosa no). Cambiar el prompt habría desbloqueado el canary
+**escondiendo** el bug para el próximo usuario real que escriba el término estándar del oficio.
+**Capa 8b — el patrón otra vez adentro del propio fix:** `globe.production_route.compilation_failed` nombraba la clase
+y **tiraba la razón**; ya emite `reason` (enum cerrado, sin `message`/`stack`).
+🔴 **Pendiente: desplegar `324be6b` + `4eee1cc` y correr el canary con gasto real.** Gates verdes (`pnpm check` +
+`pnpm build` exit=0). Revisión viva sigue siendo **`00100-drb`**.
+
 **Delta final del canary — SIETE capas, y la séptima corrige a la sexta (`ISSUE-127`).** Corrido **4 veces con gasto real, CERO créditos perdidos** (el fence liberó cada reserva). **No generó.** Bloqueo vigente **acotado con precisión**: el `execute` de imagen (`ref/still/rrss-v1` → `fal.seedream.text-to-image`) lo rechaza el **sanitizador del body snapshot**, NO la config del endpoint — las tres entries del allowlist pasan sus aserciones, verificado leyéndolas. Sospechosos por cómo `buildBody` arma referencias con `placeholder(input)`: `snapshot_body_inline_data_uri`, `snapshot_body_too_large` (>256 KB), `snapshot_body_binary_key`, `snapshot_body_credential_like`.
 🔴 **El próximo paso NO es otro deploy.** Es leer `buildBody` de `fal.seedream.text-to-image` (`governed-production-composition.ts:205`) contra los 12 chequeos de `safeSnapshotBody` (`production-route-composition.ts:133-167`). Revisión viva: **`00100-drb`**; el fix de etiquetado (`324be6b`) está **commiteado y SIN desplegar** — desplegarlo sólo mejora el label del próximo intento, no desbloquea.
 🔴 **Error propio a registrar (capa 7):** etiqueté las 28 razones con heurística y usé `endpoint_url_not_permitted` como bucket por defecto; 12 de esos sitios son del **body snapshot**, no de URL, así que **el label me mandó a mí mismo a leer la config equivocada**. Corregido a `snapshot_body_*`. **Un bucket por defecto que abarca 17 sitios no es una razón nombrada: es una razón inventada.**
