@@ -1493,6 +1493,24 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['read'] as const,
     defaultScope: 'all'
   },
+  // TASK-1566 (ADR-015 Slice 5) — carril gobernado de fondeo de credito de Globe.
+  // DOS capabilities, no una: proponer es read-only sobre Globe (devuelve el plan para revisar) y
+  // confirmar es el UNICO punto que dispara la mutacion. Colapsarlas daria a quien solo necesita ver
+  // el plan la autoridad de mover dinero.
+  // El agente puede proponer; confirmar es de una persona, y la disyuncion confirmante != proponente
+  // la impone un CHECK en `globe_credit_funding_intents` — no una convencion de payload.
+  {
+    key: 'platform.globe_credit_funding.propose',
+    module: 'platform',
+    actions: ['execute'] as const,
+    defaultScope: 'all'
+  },
+  {
+    key: 'platform.globe_credit_funding.confirm',
+    module: 'platform',
+    actions: ['execute'] as const,
+    defaultScope: 'all'
+  },
   // TASK-850 — Production Preflight CLI: 3 sub-capabilities granulares.
   // Mismo patron least-privilege que TASK-848 — NO reusar `platform.release.execute`
   // (preflight es validation read-mostly; execute es write-mostly de release).

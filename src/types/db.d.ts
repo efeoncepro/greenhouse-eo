@@ -2628,6 +2628,21 @@ export interface GreenhouseCoreFirstPartyAppSessions {
   user_id: string;
 }
 
+export interface GreenhouseCoreGlobeCreditFundingIntents {
+  actor_entitlement: string;
+  actor_user_id: string;
+  correlation_id: string;
+  created_at: Generated<Timestamp>;
+  globe_workspace_id: string;
+  idempotency_key: string;
+  intent_id: Generated<string>;
+  phase: string;
+  plan: Json;
+  plan_fingerprint: string;
+  proposal_id: string;
+  proposed_by_user_id: string | null;
+}
+
 export interface GreenhouseCoreIdentityProfiles {
   active: Generated<boolean>;
   canonical_email: string | null;
@@ -11702,6 +11717,7 @@ export interface DB {
   "greenhouse_core.entitlement_governance_audit_log": GreenhouseCoreEntitlementGovernanceAuditLog;
   "greenhouse_core.entity_source_links": GreenhouseCoreEntitySourceLinks;
   "greenhouse_core.first_party_app_sessions": GreenhouseCoreFirstPartyAppSessions;
+  "greenhouse_core.globe_credit_funding_intents": GreenhouseCoreGlobeCreditFundingIntents;
   "greenhouse_core.identity_profile_source_links": GreenhouseCoreIdentityProfileSourceLinks;
   "greenhouse_core.identity_profiles": GreenhouseCoreIdentityProfiles;
   "greenhouse_core.launch_notifications": GreenhouseCoreLaunchNotifications;

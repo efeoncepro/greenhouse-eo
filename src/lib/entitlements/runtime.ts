@@ -1582,6 +1582,28 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source: 'role'
     })
 
+    // TASK-1566 (ADR-015 Slice 5) — carril gobernado de fondeo de crédito de Globe.
+    // Sólo EFEONCE_ADMIN: mover el presupuesto de Globe es autoridad de tesorería, no de
+    // operación. Se grantean las DOS en el mismo rol a propósito — la protección real no es
+    // repartirlas entre roles distintos (hoy no hay un segundo actor con esta autoridad, y un
+    // control que nadie puede satisfacer desvía al break-glass, ADR-015 Delta 2026-07-26) sino
+    // que confirmante ≠ proponente lo imponga un CHECK en la tabla de intenciones.
+    addEntitlement(entries, {
+      module: 'platform',
+      capability: 'platform.globe_credit_funding.propose',
+      action: 'execute',
+      scope: 'all',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'platform',
+      capability: 'platform.globe_credit_funding.confirm',
+      action: 'execute',
+      scope: 'all',
+      source: 'role'
+    })
+
     // TASK-935 — platform + client_portal admin endpoints (latent 403). Roles
     // documentados inexistentes (DEVOPS_OPERATOR, commercial_admin) colapsan a
     // EFEONCE_ADMIN, el único que pasa requireAdminTenantContext en estos paths.
