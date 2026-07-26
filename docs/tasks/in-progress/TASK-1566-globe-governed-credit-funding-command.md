@@ -653,13 +653,81 @@ mergear. Hecho, y reprodujo limpio (`efeonce-globe@f268612`):
 
 Un parámetro por contexto (`$7`/`$8` repiten el valor) es la forma que no puede volver a ser ambigua.
 
-### La cadena completa: cinco defectos, cada uno tapando al siguiente
+### 🔴 El sexto: la firma del fondeo NUNCA podía verificar
+
+Sin el `500`, el `confirm` pasó a `409 conflict` — y la propuesta quedó en `confirm_failed` con **cero
+grants nuevos**: la transacción aguantó, nada a medias. La fase real era `approval_invalid`.
+
+El verificador reconstruye el digest sobre `withoutApprovalDigest(payloadParseado)`, que **incluye
+`approval` sin su digest**. `signFor` firmaba el payload **pelado**. Dos objetos distintos, dos
+digests distintos, verificación fallida **siempre**.
+
+**Y la trampa ya estaba documentada.** `scripts/raise-credit-monthly-cap-lib.mjs` la explica en su
+cabecera y dice que su autor la cometió en el primer intento — por eso su `buildSignInput` inyecta la
+aprobación. El test de `credit-admin-approval` también usaba la forma correcta. Pero la usaba como
+**forma, no como contrato**: nada fallaba si un caller nuevo la ignoraba, y el carril de fondeo,
+escrito después, la ignoró. Ahora hay un test que exige que firmar sin la approval **falle**
+(`efeonce-globe@da8e4bc`).
+
+**Por qué ningún test del dominio lo veía:** usan un verificador falso que devuelve `true`. Por eso el
+test nuevo vive donde viven de verdad el firmante y el verificador.
+
+### 🔴 El séptimo: `confirm` no falla — SE CUELGA, y bloquea el crédito del workspace entero
+
+Con la firma arreglada, el `confirm` dejó de dar 409 y pasó a **timeout del cliente** (`503`). El
+síntoma decisivo no fue el código HTTP sino el **estado persistido**: las propuestas quedaron en
+**`confirmed`** — ni `completed` ni `confirm_failed`. La transición ocurrió, `mutate` nunca terminó, y
+**ni siquiera corrió el `catch`** que marca `confirm_failed`. Eso no es un error: es un cuelgue.
+
+Confirmado contra PostgreSQL en vivo:
+
+```
+pid=550473  ExclusiveLock granted=TRUE   objid=88728424   ← lo tiene, idle in transaction
+pid=550525  ExclusiveLock granted=false  objid=88728424   ← bloqueado
+pid=550614  ExclusiveLock granted=false  objid=88728424   ← bloqueado
+```
+
+Y ese lock **es** el del crédito del workspace: `hashtextextended('credit:workspace:greenhouse-org:efeonce', 0)`
+= `6419349315730924392` = `classid 1494621233` + `objid 88728424`, idéntico al bloqueado.
+
+🔴 **Impacto operativo real, causado por ejercer el confirm:** mientras ese lock estuvo tomado,
+**toda** reserva de crédito del workspace quedaba bloqueada — **la generación incluida**. Remediado
+reciclando las instancias de `globe-api-internal` (el usuario IAM de base no puede terminar backends
+ajenos). **Verificado después: cero locks advisory, cero sesiones activas.**
+
+**Causa raíz:** es el deadlock que el "Nota de secuencia" de esta misma task documenta y que el Delta
+(3) da por resuelto con ejecutor inyectable. **No lo está del todo.** Dentro de la transacción atómica,
+`policyReader.readState` llama a `getPolicySnapshot` / `getAvailability`, y esos métodos de
+`DurableCreditAdministrationStore` usan **`this.pool` siempre**, aunque el store sea el transaccional
+(`credit-administration-store.ts:42-43`). O sea: la transacción externa tiene el lock advisory y desde
+otra conexión se pide trabajo sobre el mismo agregado.
+
+**Sólo se ejerce cuando el plan trae `monthlyCapAfter`** — que es justamente lo único que hace útil al
+fondeo, como demostró el plan legible. Por eso ninguno de los seis defectos anteriores lo destapó: los
+intentos morían antes.
+
+**Cerrarlo de verdad** es lo que la propia task ya dictaminó: *"merece una pasada propia, no la cola de
+otra sesión"* — enhebrar `GlobeQueryable` por ~20 métodos del archivo más denso del repo, con locks
+advisory y recibos de idempotencia de por medio. **No se intentó en esta sesión**: es cirugía en el
+camino del dinero, y hacerla al final de una jornada con siete defectos encontrados es cómo se produce
+el octavo.
+
+**Higiene pendiente:** dos propuestas quedaron en `confirmed` sin completar. El TTL sólo vence
+propuestas en `proposed`, así que estas **no se terminalizan solas** — se conectan con la
+terminalización del reconcile (`TASK-1469`).
+
+### La cadena completa: siete defectos, cada uno tapando al siguiente
 
 1. **Cero `GLOBE_*` en Vercel** → Greenhouse desplegado nunca habló con Globe.
 2. **Audiencia OIDC que no cruzaba** → la federación WIF nunca completó un intercambio.
 3. **Payload del broker incompleto** (`sourceId`, `reasonCode`, `at`) → `400`.
 4. **Fingerprint de 248 chars validado con `id()` de 200** → `400`.
 5. **Parámetro SQL ambiguo (`42P08`)** → `500`.
+6. **Firma sobre el payload sin su `approval`** → `409 approval_invalid`.
+7. **`readState` usa el pool dentro de la transacción atómica** → **cuelgue** + lock del workspace retenido.
+
+**Seis de siete están corregidos y desplegados.** El séptimo tiene causa raíz identificada con
+evidencia en vivo y está acotado; queda para la pasada dedicada que la propia task ya había previsto.
 
 Ninguno era visible hasta resolver el anterior, y **ninguno se habría visto sin ejercer el carril
 desplegado**. Tres de los cinco son la misma familia: una condición perfectamente diagnosticable
