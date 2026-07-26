@@ -845,3 +845,80 @@ comprobado intentándolo (`ERR_UNKNOWN_FILE_EXTENSION`).
 
 Commits: `90e14ce`, `13797af`, `237930e` (CI), `f2b5729`, `f5f9aea`. Gate: 110/110 + typecheck + build, CI **verde
 por primera vez**.
+
+## Delta 2026-07-26 — probar generación de verdad: la señal de presupuesto que nadie miraba, y por qué `execute` daba `409` siempre
+
+Se intentó generar imagen, video y audio con gasto real. **No se generó nada**, y el intento encontró tres
+defectos del payload React más un bloqueo de runtime que sigue abierto. Los tres defectos son de contrato o de
+invariante, no de presentación, y ninguno se arregló en el componente.
+
+### 1. La señal de presupuesto se ignoraba — causa del `409 conflict`
+
+`globe.lab.experiment.estimate` devuelve **`withinDayCap: false`** en este espacio. Ese campo es
+`commercial.withinBudget` (`model-lab.ts:855`), o sea `evaluateReservation` **negando la reserva**. El composer no
+lo miraba: habilitaba el CTA, `prepare` respondía 200 y `execute` moría con `conflict`, porque el ledger niega con
+`budget_denied` y **la taxonomía del transporte colapsa TODAS las negaciones de crédito en `conflict`**
+(`dispatch.ts`: cualquier `CommercialCreditLifecycleError` que no sea `shape_required` → `conflict`). El operador
+no tenía forma de saber que el problema era presupuesto, y cada intento dejaba un experimento preparado.
+
+El cliente legacy chequea exactamente esta señal antes de preparar (`producer_budget_policy_blocked`). Ahora es la
+**cuarta razón** de estimado no vigente en `composer-recipe.ts` (+3 tests). Sólo un `false` **explícito** bloquea:
+`undefined` significa "el fence no la publica" y tratarlo como negación dejaría el composer inservible en cualquier
+despliegue que no la pueble.
+
+### 2. Las cuatro razones decían lo mismo
+
+El riel mostraba "Cambiaste la configuración" para forma, vencimiento, token ausente **y** presupuesto. Para un
+bloqueo de presupuesto eso es falso: manda al operador a toquetear la forma cuando lo que tiene que hacer es pedir
+presupuesto. La copy de las cuatro **ya existía sin usarse**. Ahora es un `Record<StaleReason, string>` —agregar
+una razón sin su texto no compila— y la etiqueta distingue "Recalculando" (se resuelve solo) de "Bloqueado" (no).
+
+### 3. La banda de modalidad era decorativa
+
+Cambiar a Video o Audio **no reelegía ruta**: el desplegable seguía diciendo "Seedream", el estimado cotizaba
+10 cr (precio de imagen) y `prepare` se despachaba con `image-generate`. Se podía **gastar en la capability
+equivocada creyendo pedir otra cosa**. Ahora la modalidad reelige la recomendada de su capability, recalcula la
+forma, resetea el chip de Modo y poda las referencias que la ruta nueva no admite. Verificado: Video pasa a
+Seedance 2.0 y cotiza 16 cr.
+
+### Sobre el contrato del gasto (leído de la doc, no inferido)
+
+- **Un techo declarado, constante, en el estimado Y en `prepare`.** `hardCapCredits` es parte del quote que el
+  `approvalToken` firma (`fingerprint(quote, route, rate)`) y `execute` reconstruye ese quote desde lo guardado
+  (`quoteInputFromStored`): cotizar con un techo y preparar con otro deja el token firmado sobre un quote que no
+  existe (`approval_stale`). Antes se cotizaba con 100 y se preparaba con los créditos cotizados.
+- **`execute` manda el token del estimado VIGENTE**, el mismo cuyo precio se mostró — *"el token ES la
+  cotización"* (`TASK-1532`). Probé una variante en dos fases (cotizar → recotizar con el cap = precio, como hace
+  el cliente legacy) y **se retiró**: el 409 no venía de ahí, y el modelo del contrato no la necesita.
+- **Una clave de idempotencia por paso**, derivada de una operación (`-prepare` / `-execute`), igual que el
+  `${operationId}-prepare` del cliente legacy. `TASK-1552` G3 dice "nace en `prepare` y se reusa en `execute`": se
+  lee como una identidad de operación por par, que es lo que hacen los dos clientes.
+
+### El bloqueo que sigue abierto
+
+**El runtime niega la reserva y por eso no hay generación.** Descartado con dato: no es saldo (500.008
+disponibles, **0 reservado**, 102 gastados en el mes) ni el tope mensual por defecto (15.500, que además **no está
+declarado en Terraform**, así que corre con el default del código). Queda `month_cap_exceeded` con una política
+durable de tope chico, o `policy_unavailable` — la política fallando **cerrada**.
+
+Distinguirlos necesita el log del API o el reader `globe.credits.policy.effective.get`, que está `policy-blocked`
+para UI. Mi token de `gcloud` expiró y reautenticar exige browser, así que **esto lo tiene que resolver el
+operador**:
+
+```bash
+gcloud auth login
+gcloud logging read 'resource.labels.service_name="globe-api-internal" AND severity>=WARNING' --project efeonce-group --limit 20 --freshness=2h
+```
+
+**Bisect que aisló el rechazo** (contra el runtime, no razonado): `execute` **sin** `approvalToken` → `400
+invalid_request` (o sea el crédito comercial está cableado y el token es obligatorio); **con** token → `409` con
+las dos políticas de techo (cap = precio y cap = 100). Eso descarta el `hardCapCredits` y deja el rechazo del lado
+de la aprobación/ledger.
+
+**El flag `client_producer_enabled` sigue en `false`** y no se movió: su propia descripción dice *"Keep off until
+the 38-capability parity gate is green"*. La ruta viva `/producer` sirve el legacy — verificado por la ausencia de
+bundle (`script[src*="/assets/app/"]`), no por el atributo `data-producer-controller-bound`, que **ambos** emiten
+(mi primer detector daba "react" para el legacy).
+
+Commits: `48de228` (+ `f5f9aea`, `f2b5729`, `237930e`, `13797af`, `90e14ce`). Deploys: `30184976224` /
+`30184980583`. 113/113 + typecheck + build.
