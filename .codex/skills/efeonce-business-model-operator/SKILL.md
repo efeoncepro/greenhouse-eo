@@ -21,6 +21,10 @@ un canvas decorativo ni una hoja contable aislada. Es el puente entre:
 estrategia → cliente → oferta → delivery → monetización → economía → validación → escala → capital
 ```
 
+Para diseñar o auditar la arquitectura concreta de precios, cargar también `efeonce-pricing-operator`: esta skill
+decide el modelo de negocio; el companion gobierna métrica de valor, packaging, unidades de cobro, descuentos,
+versionado, guardrails y Pricing Integrity Pack.
+
 La skill es transversal; los documentos de `docs/business-models/` son la fuente canónica de cada oferta.
 
 ## Autoridad y composición

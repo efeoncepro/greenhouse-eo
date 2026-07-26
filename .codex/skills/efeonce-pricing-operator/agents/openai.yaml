@@ -1,0 +1,4 @@
+interface:
+  display_name: "Efeonce Pricing Operator"
+  short_description: "Packaging, pricing y economics de Efeonce"
+  default_prompt: "Usa $efeonce-pricing-operator para diseñar el packaging y pricing gobernado de una oferta Efeonce."

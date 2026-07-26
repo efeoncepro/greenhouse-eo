@@ -10,3 +10,5 @@ Its hardening set includes portfolio/capability model contracts, source catalog,
 blind-eval protocol.
 Load that skill and the current model under `docs/business-models/`. Finance owns accounting, cost, cash and
 margin controls; Legal owns contracts, IP and privacy; Commercial owns execution of offers and sales.
+For the price architecture itself, also load `efeonce-pricing-operator`; it owns value metrics, packaging, billing
+units, discounts, versioning, economics guardrails and the Pricing Integrity Pack.

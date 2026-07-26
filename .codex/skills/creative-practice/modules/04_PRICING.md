@@ -399,3 +399,8 @@ para cerrar **nunca vuelve a subirlo, y además enseñó que su primer precio er
 
 **→ Siguiente:** el precio protege el margen del lado de la entrada; **el alcance lo protege del lado de la
 salida.** Y ahí es donde el creativo realmente sangra → **`modules/05_SCOPE_SOW.md`**.
+# Pricing architecture companion
+
+Load `efeonce-pricing-operator` first for cross-line pricing architecture, value metrics, delivery models,
+cost-to-serve, credits, discounts, versioning and governance. This module owns only Creative Studio-specific
+packaging, rights, rounds, pools and creative-capacity economics.

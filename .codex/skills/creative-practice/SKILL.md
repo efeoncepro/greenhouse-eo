@@ -16,6 +16,10 @@ description: >-
 
 # Creative Practice — el negocio, no el oficio
 
+Para la arquitectura general de pricing y economics cargar `efeonce-pricing-operator`. Esta skill sigue siendo dueña
+de las decisiones específicas de Creative Studio: créditos creativos, derechos, rounds, buyouts, pools, scope y
+capacidad creativa.
+
 Esta skill opera **el negocio de vender servicios creativos**. No enseña a hacer el trabajo.
 
 - ¿*"Cómo dirijo este key visual / qué encuadre uso / cómo escribo este copy"*? → **los studios** (`design-studio`, `motion-design-studio`, `audio-studio`, `social-media-studio`, `copywriting`).

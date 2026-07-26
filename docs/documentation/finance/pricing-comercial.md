@@ -1,5 +1,10 @@
 # Pricing Comercial — Catálogo, Motor y Builder de Cotizaciones
 
+> **Capa estratégica:** la metodología transversal de pricing y packaging vive en
+> [`.codex/skills/efeonce-pricing-operator/SKILL.md`](../../../.codex/skills/efeonce-pricing-operator/SKILL.md) y su
+> referencia general. Este documento sigue siendo el owner operativo del catálogo Greenhouse, pricing engine,
+> quote builder, approvals y persistencia; no es la doctrina de pricing de todas las líneas Efeonce.
+
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-04-18 por Claude (TASK-469)
@@ -154,3 +159,9 @@ Tres primitives presentacionales standalone ya están implementados en `src/comp
 - **`PricingCatalogNavCard`** — card de navegación a secciones del admin catalog (roles, tools, overhead, etc.) con icon + count + link.
 
 El resto (CostStackPanel, SellableItemPickerDrawer, ServiceCompositionEditor, QuickEntityFormDrawer, PriceChangeAuditTimeline, SellableItemRow) requiere el engine v2 y catálogos de Ola 2, por lo que llegan con TASK-464e/465/467.
+# Pricing strategy companion
+
+The cross-line pricing strategy and packaging method lives in `.codex/skills/efeonce-pricing-operator/SKILL.md` and
+its general patterns reference. This document remains the runtime owner for Greenhouse catalog, pricing engine,
+quote builder, approval and operational persistence; it is not the source for pricing doctrine across all Efeonce
+lines.

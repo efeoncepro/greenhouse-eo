@@ -9,6 +9,10 @@ Use this skill when the task touches finance, accounting treatment, payment flow
 
 This skill is for **investigation, architecture, diagnosis, and remediation design**. It is not legal or tax advice. When current tax rates, legal thresholds, or official filing rules matter, verify against official sources before concluding.
 
+When the question starts with offer design, value metric, packaging, billing unit, discounts or pricing governance,
+load `efeonce-pricing-operator` as the commercial companion; this skill remains the owner of cost, margin, cash,
+accounting and reconciliation.
+
 ## External Benchmarks
 
 This skill must not rely only on Greenhouse repo conventions. It should also reason from widely used accounting, reporting, treasury, and control frameworks:

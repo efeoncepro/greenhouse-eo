@@ -14,6 +14,9 @@ argument-hint: "[decisión o pieza de GTM concreta]"
 
 > **Doble audiencia:** GTM **para el propio crecimiento de Efeonce** (producto, ecosistema, mercados) **Y como servicio billable para clientes** (auditoría/estrategia/launch de GTM). Cuando es para un cliente, carga `09_GTM_AS_A_SERVICE`.
 
+Para la arquitectura transversal de pricing y packaging, cargar `efeonce-pricing-operator`; este skill conserva la
+decisión GTM de segmento, posicionamiento, oferta y motion.
+
 ## Doctrina 2026 (lo que hay que creer este año)
 
 Verificado vía web, **as-of 2026-07** (reverificar — ver Paso 2):

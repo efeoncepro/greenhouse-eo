@@ -16,6 +16,14 @@ La cartera de Wave separa ahora product service de delivery model: una misma ofe
 Service, Managed Squad, Staff Augmentation, Implementation, Advisory o Platform-enabled Service, y componerse con
 otras capabilities del ecosistema bajo RACI/SOW explícitos.
 
+## 2026-07-26 — Pricing transversal para Codex y Claude
+
+Se creó `efeonce-pricing-operator` como companion agnóstico a la línea de negocio. Gobierna value metric,
+packaging, delivery/pricing mechanism, híbridos, capacity, usage/credits, cost-to-serve, margin waterfall,
+descuentos, versionado, validación y approval gates. Se sincronizó en `.codex/skills/` y `.claude/skills/` y se
+conectó con business model, agency, GTM, commercial, Finance, Creative Practice y SEO/AEO Practice. La skill no
+fija tarifas: los precios vigentes siguen siendo responsabilidad de Finance, catálogo y contrato aprobado.
+
 ## 2026-07-25 (3) — Globe: /producer convertido a React, y la razon por la que NINGUN command funcionaba
 
 **Runtime:** `globe-studio-internal` y `globe-api-internal` desplegados al mismo SHA. Dueña de la superficie:

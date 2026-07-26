@@ -19,6 +19,15 @@
 - Se separaron product service, delivery model, engagement, operating mode y composición del ecosistema; Wave puede
   operar Managed Squad, Staff Augmentation y otros modelos sin cambiar el ownership de la oferta.
 
+## 2026-07-26 — Pricing transversal para Codex y Claude
+
+- Se creó la skill agnóstica `efeonce-pricing-operator` en `.codex/skills/` y `.claude/skills/`.
+- Se consolidaron patrones investigados de value-based/cost-floor pricing, productized services, capacity,
+  managed delivery, T&M/fixed/milestone/usage/outcome/hybrid, credits, AI cost controls, margin waterfall,
+  discount governance, versionado y validación.
+- Business model, GTM, commercial, Finance, Creative Practice y SEO/AEO Practice quedaron enrutados al companion;
+  sus reglas específicas siguen siendo dueñas de sus respectivas líneas.
+
 ## 2026-07-25 — Globe: el payload de browser deja de ser un string (ADR-014, foundation)
 
 `TASK-1556` cerrada. Nació `apps/studio-client` en `efeonce-globe` (Vite + React + React Router, SSR

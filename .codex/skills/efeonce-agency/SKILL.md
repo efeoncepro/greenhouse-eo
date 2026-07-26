@@ -19,7 +19,7 @@ Esta skill es el **router + doctrina destilada** del context pack de negocio de 
 
 **NO invocar para:** plumbing puramente técnico sin razonamiento de negocio (qué endpoint usa una vista → `greenhouse-backend`; ajustar un chart Apex → `greenhouse-ux`; cálculo de nómina → `greenhouse-payroll-auditor`). Si la tarea mezcla negocio + técnico, invocar esta **y** la técnica.
 
-**Sinergia:** para venta/pricing/pipeline profundo → `commercial-expert` (esta da el frame; esa da el playbook). Para copy es-CL → `greenhouse-ux-writing`. Para HubSpot bridge → `hubspot-greenhouse-bridge`. Para bonos/ICO runtime → `greenhouse-ico` / `greenhouse-payroll-auditor`.
+**Sinergia:** para arquitectura de packaging/pricing → `efeonce-pricing-operator`; para venta/pipeline profundo → `commercial-expert` (esta da el frame; esa da el playbook). Para copy es-CL → `greenhouse-ux-writing`. Para HubSpot bridge → `hubspot-greenhouse-bridge`. Para bonos/ICO runtime → `greenhouse-ico` / `greenhouse-payroll-auditor`.
 
 ---
 

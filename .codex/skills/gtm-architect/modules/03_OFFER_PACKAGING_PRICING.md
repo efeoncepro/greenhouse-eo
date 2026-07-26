@@ -1,5 +1,9 @@
 # 03 · Offer, Packaging & Pricing (strategy)
 
+**Companion transversal:** carga `efeonce-pricing-operator` para la arquitectura general de métrica de valor,
+delivery, billing, economics, descuentos, créditos y governance. Este módulo conserva la estrategia GTM de oferta,
+segmentación, tiers, bundling y motion; no duplica el motor de pricing.
+
 Cómo empaquetas y cobras es una **decisión de GTM**, no solo de finanzas: define el motion (`04`), el segmento que atraes y la economía (`07`). Este módulo decide la **estrategia** de oferta/packaging/pricing; las **tácticas de pricing y el modelado financiero** → `commercial-expert` + `greenhouse-finance-accounting-operator`. La doctrina ASaaS de packaging/pricing es **vinculante** (`efeonce-agency`/`commercial-expert`).
 
 ## Del servicio al producto (productización)

@@ -9,8 +9,7 @@ description: >-
   AI Visibility Grader como motor de venta, descalificación honesta,
   displacement (freelancer / in-house / la herramienta / no hacer nada),
   canales y prospección, outbound/inbound, la conversación de venta, el retainer
-  que sobrevive, y el estado real de la práctica (Berel, SKY, cero casos
-  citables). Triggers: "vender SEO", "vender AEO", "precio de SEO", "cuánto
+  que sobrevive, y el estado real de la práctica (Berel, SKY). Triggers: "vender SEO", "vender AEO", "precio de SEO", "cuánto
   cobramos", "retainer", "margen", "piso", "cotizar SEO", "propuesta de SEO",
   "descuento", "prospección SEO", "outbound de SEO", "canales para vender SEO",
   "objeción SEO", "el cliente dice que es caro", "competimos con un freelancer",
@@ -18,6 +17,10 @@ description: >-
 ---
 
 # SEO/AEO Practice — el negocio, no el oficio
+
+Para decisiones transversales de packaging, pricing, billing, margen, descuentos y créditos cargar también
+`efeonce-pricing-operator`. Esta skill conserva las reglas específicas de Search Visibility 360 y sus hipótesis de
+mercado, oferta, venta y retención.
 
 > **Portfolio owner:** Search Visibility 360 es una familia de servicios productizados de Wave dentro de Efeonce.
 > Esta skill gobierna el negocio de SEO/AEO; sus boundaries con web, measurement, Globe, Reach y CRM están en
