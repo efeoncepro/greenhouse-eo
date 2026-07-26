@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-028`
-- Status real: `Slice 4 COMPLETO (4a/4b/4c) y desplegado en rev 00104-gkc con flag OFF verificado; el criterio de salida "fondeo real punta a punta" espera al Slice 5, que es donde la atribucion humana se hace exigible`
+- Status real: `Slices 1/4/5 entregados. Globe: rev 00104-gkc, flag OFF. Greenhouse: tabla append-only + CHECK confirmante!=proponente + 2 capabilities + broker + rutas + senal, verificados contra PG real. Falta prender el flag y ejercer un fondeo real con dos personas`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -587,6 +587,47 @@ El amarre real es el **Slice 5** (broker de Greenhouse con sesión, entitlement 
 `CHECK` confirmante ≠ proponente). **Prender antes de eso publica un gate humano que nadie puede hacer
 cumplir**, y por eso el criterio de salida del Slice 4 —*"un fondeo real punta a punta con UNA
 confirmación humana"*— todavía no se cumple: falta la superficie desde donde ese humano confirma.
+
+### Slice 5 (`b6f2ff4`, `d2916371e`) — ENTREGADO: la atribución humana se vuelve EXIGIBLE
+
+Es lo que faltaba para que el flag del Slice 4 pueda significar algo. Globe no puede verificar la
+atribución humana porque **no tiene las sesiones**; acá se ancla donde sí las hay.
+
+- **Tabla append-only `globe_credit_funding_intents`** con triggers anti-UPDATE/anti-DELETE, y el
+  **`CHECK` de confirmante ≠ proponente en la BASE**, no en TypeScript — porque el TS no corre en la
+  base, y ese es exactamente el control que en Globe resultaba vacuo por comparar contra una
+  **constante** de clase de servicio.
+- **Dos capabilities**, no una: `platform.globe_credit_funding.propose` (read-only sobre Globe) y
+  `.confirm` (único punto de mutación). Colapsarlas daría a quien sólo necesita ver el plan la
+  autoridad de mover dinero. Seed + catálogo + grant a `EFEONCE_ADMIN` en el mismo commit.
+- **Broker** `src/lib/globe/credit-administration-broker.ts` reusando `createGreenhouseGlobeClient`
+  — nunca un cliente paralelo — por la surface `sister-platform`.
+- **Rutas** `POST /api/admin/globe/credit-funding/{propose,confirm}` con capability propia,
+  idempotencia obligatoria y **5 códigos canónicos nuevos**. La atribución sale de la **sesión**,
+  nunca del cuerpo: si el caller pudiera declararla, el carril valdría lo mismo que el que reemplaza.
+- **Señal** `platform.globe_credit_funding.stale_proposal`, steady=0, que escala por **antigüedad**
+  y no por cantidad: cinco propuestas de hoy son un día ocupado; una de hace una semana es una
+  decisión abandonada.
+
+**Verificado contra PostgreSQL real** (gate TASK-893, no mocks): `propose` OK · confirmante ==
+proponente **RECHAZADO por el CHECK** · confirmante ≠ proponente ACEPTADO · `UPDATE` **RECHAZADO** por
+append-only. La señal ejecuta y arranca en `severity=ok, count=0`. Filas de prueba limpiadas.
+
+**Orden que NO es intercambiable:** en `confirm` la intención se registra **antes** de despachar. Al
+revés, un fallo entre la mutación y el registro dejaría dinero movido **sin evidencia de quién lo
+aprobó** — que es lo que este carril existe para producir.
+
+**Prerequisito verificado, no asumido:** el vocabulario de capabilities vendorizado está en **65 = 65**
+contra el Globe vivo, con las dos de funding presentes. No hacía falta re-vendorizar; confirmarlo es
+lo que evita reproducir `ISSUE-126`.
+
+🔴 **NO se retiró `raise-credit-monthly-cap.mjs`.** El reemplazo tiene el flag en OFF, así que sacarlo
+dejaría **cero** caminos para subir el tope. Es la misma disciplina que la task aplica al Slice 6: el
+retiro va después del reemplazo verde, nunca antes.
+
+**Lo que falta para el criterio de salida del Slice 4** (*"un fondeo real punta a punta"*): prender
+`GLOBE_CREDIT_ADMIN_LANE_ENABLED`, desplegar, y ejercer el fondeo desde estas rutas con dos personas
+distintas. Recién ahí se retira el script.
 
 ### Nota de secuencia (corrige el orden declarado arriba)
 

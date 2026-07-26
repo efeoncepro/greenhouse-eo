@@ -3,6 +3,23 @@
 > Cabina de mando para continuidad inmediata. No es changelog, arquitectura ni memoria completa.
 > Ventana máxima: 20 sesiones. Historia íntegra e índice: [Handoff.archive.md](Handoff.archive.md).
 
+## 2026-07-26 — Iteración de identidad visual para Globe Capacity
+
+La suite de Studio Credits se documentó como **Globe Capacity**: `Capacity` / `Capacidad` es la navegación,
+`Studio Capacity` / `Capacidad del estudio` el título de suite y `credits` / `créditos` la unidad operativa.
+`TASK-1485` gobierna la semántica multi-locale y el patrón `Capacity Observatory`; `TASK-1483` conserva el
+Runway Control Plane como composición full-workbench. Producer y Creative Loop consumen variantes compactas
+(`Credit Pulse`, `Runway Plane`, `Risk Rail`, `Evidence Ledger`, `Governed Command Dock`). La identidad Horizon +
+Orbit separa capacidad de wallet, token, dinero y checkout; `TASK-1484` mantiene la frontera comercial. Cambios
+documentales aplicados en EPIC-028, TASK-1483, TASK-1484, TASK-1485 y TASK-1523. Producer queda como consumidor
+futuro, sin convertir TASK-1505 en dueño de esta identidad. Implementación y GVC
+siguen pendientes.
+
+Se creó [`TASK-1578`](docs/tasks/to-do/TASK-1578-globe-model-onboarding-credit-rate-promotion.md) para cerrar el
+onboarding transversal de modelos: route → credit rate → binding → estimate/actual → canary → promotion, con
+receipt auditable y coverage API/SDK/MCP/UI. `TASK-1468` conserva el rate catalog y ledger; `TASK-1553` conserva
+catálogo/bindings/resolución; `TASK-1578` une y certifica el flujo.
+
 ## 2026-07-26 — Globe media review tasks ancladas en EPIC-028
 
 La auditoría Playwright del `/producer` autenticado confirmó el estado real de audio y video: audio nativo de
@@ -30,6 +47,34 @@ Quedaron confirmadas las postulaciones a **FLUX Creator Program**, **Runway Ente
 
 Las skills `efeonce-business-model-operator` y `efeonce-customer-model-operator` (Codex y companions de Claude) ya
 incorporan la clasificación y los gates para evaluar partners/providers; el estado concreto sigue viviendo en el audit.
+
+## 2026-07-26 — TASK-1566 Slice 5: la atribucion humana se vuelve EXIGIBLE
+
+**Entregado en Greenhouse** (`b6f2ff4` + `d2916371e`, local en `develop`, sin push). Es lo que faltaba
+para que el flag del Slice 4 pueda significar algo: Globe **no tiene las sesiones**, asi que su
+`assertHumanAttribution` nunca podia pasar de shape-only. Aca se ancla donde si hay identidades.
+
+- Tabla **append-only** `globe_credit_funding_intents` + triggers anti-UPDATE/DELETE, y el **CHECK de
+  confirmante != proponente EN LA BASE** — el control que en Globe era vacuo por comparar contra una
+  **constante** de clase de servicio.
+- **Dos capabilities** (proponer read-only / confirmar unico punto de mutacion) con seed + catalogo +
+  grant a `EFEONCE_ADMIN` en el mismo commit.
+- Broker reusando `createGreenhouseGlobeClient`, rutas `POST /api/admin/globe/credit-funding/{propose,confirm}`
+  con idempotencia obligatoria y 5 codigos canonicos, y la senal
+  `platform.globe_credit_funding.stale_proposal` (steady=0, escala por **antiguedad** no por cantidad).
+
+**Verificado contra PostgreSQL REAL** (no mocks): confirmante == proponente **RECHAZADO**, != ACEPTADO,
+`UPDATE` **RECHAZADO**. Senal ejecuta en `ok/0`. Gates: `local:check` 0, **9916 tests verdes**, `build` 0.
+
+**Prerequisito verificado y no asumido:** vocabulario vendorizado **65 = 65** vs Globe vivo. No hacia
+falta re-vendorizar; medirlo es lo que evita reproducir `ISSUE-126`.
+
+🔴 **NO se retiro `raise-credit-monthly-cap.mjs`**: con el flag en OFF, sacarlo dejaria CERO caminos
+para subir el tope. El retiro va despues del reemplazo verde.
+
+**Proximo paso (unico que falta para el criterio de salida del Slice 4):** prender
+`GLOBE_CREDIT_ADMIN_LANE_ENABLED`, desplegar, y ejercer un fondeo real desde estas rutas **con dos
+personas distintas** — el CHECK lo exige. Recien ahi se retira el script.
 
 ## 2026-07-26 — TASK-1566: el carril de fondeo, cableado y durable; 4c bloqueado por un deadlock real
 
