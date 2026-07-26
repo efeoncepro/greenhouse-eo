@@ -508,7 +508,7 @@ Validación manual (no automatizable, y es una propiedad del diseño):
 - **El guard de "un solo grant activo"** de `ISSUE-124`: decidir si es política deseada o si el 409 venía de otra fase (que el Slice 1 vuelve observable).
 - **Modelo de roles de administración de crédito**: si `propose` y `confirm` son dos capabilities sobre los ROLE_CODES existentes o merecen un rol nuevo. Decidir contra los **14 ROLE_CODES reales** de `src/config/role-codes.ts`, nunca contra un rol fantasma.
 - **Aplicar el mismo carril al resto de la administración de crédito** (pools, budgets de proyecto, correcciones) si el patrón `propose`/`confirm` resulta el correcto para el fondeo.
-- **Portar `nul-byte-gate` a `efeonce-globe`** (Delta 2026-07-26 (4)). Es donde nació el bug class y hoy es el único de los dos repos sin gate. Requiere decisión del operador porque cruza a un repo hermano cuyo `main` despliega, y su test hay que registrarlo a mano en el script `test` del `package.json`.
+- ~~**Portar `nul-byte-gate` a `efeonce-globe`**~~ — hecho el 2026-07-26 (`076ca4b`). Los dos repos quedan con gate.
 
 ## Delta 2026-07-26 (4) — la precondición del cierre queda verificada; el bug class del NUL se cierra con gate
 
@@ -554,9 +554,11 @@ disciplina.
 limpio: el caso `credit-funding.ts` reproducido, conteo múltiple, número de línea, y la aserción de que
 la escape es runtime-idéntica al byte.
 
-🔴 **Globe queda sin gate equivalente** — que es donde nació el defecto. Copiar el script cruza a un
-repo hermano cuyo `main` despliega; queda como follow-up con decisión del operador, no aplicado de
-oficio.
+**Portado a `efeonce-globe` con autorización del operador** (`076ca4b`), que es donde nació el defecto:
+cableado en `pnpm check` antes del typecheck y su test registrado a mano en el script `test`, como pide
+la convención de ese repo. Verificado que el push a `main` de Globe dispara **CI, no deploy** — el
+`Deploy Internal (keyless)` es `workflow_dispatch` manual, así que un commit de tooling no ejercita el
+pipeline de despliegue.
 
 ### Lo que NO se hizo, y por qué
 

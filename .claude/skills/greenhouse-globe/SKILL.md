@@ -1239,11 +1239,12 @@ reintentan webhooks), y un chargeback se corrige con **`grant.correct`**, jamás
    `credit-funding.ts` los usaba como separador de clave; hizo concluir dos veces que un símbolo no
    existía. Si un símbolo "no aparece" pero deberías estar viéndolo: `file <path>` — si dice `data`,
    ahí está. Usar `\0`, nunca el byte literal (es runtime-idéntico: no cambia hashes ni ids).
-   **Gate desde 2026-07-26:** `pnpm nul-byte-gate`, dentro de `pnpm local:check` — o sea del pre-push.
-   El barrido encontró 3 archivos más (`media-derivatives.ts`, esta skill y la propia TASK-1566, las
-   dos últimas con el byte escrito **dentro de la línea que enseña a no escribirlo**), y el byte se
-   coló también en el gate mientras se escribía: por eso la contramedida no podía ser disciplina.
-   🔴 **`efeonce-globe` sigue SIN gate equivalente** — que es donde nació el defecto.
+   **Gate desde 2026-07-26, en LOS DOS repos:** `pnpm nul-byte-gate` — en Greenhouse dentro de
+   `pnpm local:check` (o sea del pre-push), en `efeonce-globe` dentro de `pnpm check`, con su test
+   registrado a mano en el script `test` como pide ese repo. El barrido encontró 3 archivos más
+   (`media-derivatives.ts`, esta skill y la propia TASK-1566, las dos últimas con el byte escrito
+   **dentro de la línea que enseña a no escribirlo**), y el byte se coló también en el gate mientras
+   se escribía: por eso la contramedida no podía ser disciplina.
 
 🔴 **ANTES de escribir una secuencia de canary a mano: YA EXISTE COMO SCRIPT (2026-07-26).**
 `pnpm producer:canary` (`scripts/producer-ui-canary.mjs` + `-lib.mjs`) hace el recorrido **completo** de gasto real

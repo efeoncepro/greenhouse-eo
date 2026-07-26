@@ -109,10 +109,11 @@ separador de `mediaDerivativeId`; corregido y **verificado runtime-identico**, n
 skill `greenhouse-globe` + la propia TASK-1566, ambas con el byte **dentro de la linea que ensena a no
 escribirlo**. El archivo de la task era `data` para `file`, y por eso `grep` no devolvia ni sus
 encabezados. Nuevo `pnpm nul-byte-gate` cableado dentro de `pnpm local:check` (o sea del pre-push), con
-7 tests que ejercitan la **deteccion**, no solo el camino limpio. Dos correcciones documentales: la
-secuencia de verificacion todavia exigia "un segundo humano distinto", que es exactamente la
-contradiccion que ya habia bloqueado al operador. 🔴 `efeonce-globe` queda **sin gate equivalente** —
-copiarlo cruza a un repo hermano cuyo `main` despliega, asi que es decision del operador.
+7 tests que ejercitan la **deteccion**, no solo el camino limpio. **Portado tambien a `efeonce-globe`**
+(`076ca4b`), donde nacio el defecto: dentro de `pnpm check` y con su test registrado a mano en el
+script `test`. Verificado que el push a `main` de Globe dispara **CI, no deploy** (`Deploy Internal` es
+`workflow_dispatch` manual). Dos correcciones documentales: la secuencia de verificacion todavia exigia
+"un segundo humano distinto", que es exactamente la contradiccion que ya habia bloqueado al operador.
 
 **Pendientes vivos:** `authentication_required` (4.a fila de ISSUE-127, unica abierta) · los dos huecos
 del canary (`RUN_LABEL` exigido solo en `--execute`; el dry-run no reporta `withinDayCap`) · reconcile
