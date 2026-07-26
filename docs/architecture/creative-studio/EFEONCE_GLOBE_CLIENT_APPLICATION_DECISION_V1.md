@@ -1080,3 +1080,52 @@ confirma sobre un estado que ya cambió.
 **Estado del bloqueo:** imagen y video siguen sin generarse (audio sí, verificado punta a punta). Y no hay atajo
 operativo: nadie —ni humano ni agente— puede fondear el mes hasta que exista ese comando, o hasta que el mes
 reinicie.
+
+### Corrección del Delta (4) y diseño objetivo — 2026-07-26
+
+**Lo que el Delta (4) afirma y es FALSO:** *"firmar una aprobación desde un cliente nunca fue un camino
+soportado"*. Sí lo es, como **break-glass**: `GLOBE_RUNTIME_HANDOFF.md:220` documenta el procedimiento —
+`serviceAccountTokenCreator` otorgado **sólo** sobre `greenhouse-globe-caller` y **sólo** al operador, ID token con
+`--include-email`, ejecución, revocación y readback de IAM. Está ejercido al menos tres veces (líneas 220, 541,
+781).
+
+Eso no debilita la conclusión: la invierte de signo. **Break-glass ejercido tres veces para la misma clase de acto
+ya no es excepción, es la operación normal por la puerta de emergencia** — y cada uso está a una revocación
+olvidada de volverse permanente.
+
+#### Los dos huecos que los scripts de esta sesión tienen y no se pueden tapar scripteando
+
+1. **Maker-checker colapsado.** Un mismo proceso lee el secreto, firma como aprobador y ejecuta como caller.
+   Declara dos nombres, pero no hay dos actores. Es exactamente el control que debía impedir que alguien se
+   autofinancie.
+2. **Grant y política no son atómicos.** El script emite el grant y después mueve el tope: si el primero pasa y el
+   segundo falla, queda un estado parcial. La idempotencia permite recuperar, pero recuperar no estaba diseñado.
+
+Y uno de topología que es **frontera de plataforma**, no sólo IAM: `greenhouse-portal@` es la identidad de runtime
+del control plane de **Greenhouse**. Usarla para administrar el crédito de **Globe** acopla dos plataformas que
+esta misma ADR manda mantener separadas —"nunca un rol admin implícito entre Globe y Greenhouse"—. Que además no
+pueda leer el secreto no es el problema: es el síntoma de que esa identidad no tiene por qué poder hacerlo. **La
+salida NO es darle `secretmanager.versions.access`.**
+
+#### Diseño objetivo (requiere ADR de IAM + administración financiera antes de ser operación estable)
+
+- Identidad dedicada **`globe-credit-approver`** (propone y aprueba) e identidad dedicada
+  **`globe-credit-executor`** (ejecuta). Ninguna persona ni proceso obtiene las dos.
+- La clave de aprobación accesible **sólo por el aprobador**, idealmente **KMS asimétrico** en vez de un HMAC
+  compartido: hoy quien lee el secreto puede forjar cualquier aprobación de cualquier payload.
+- Grant y cambio de política como comandos **independientes**, con readback y reconciliación explícita del estado
+  parcial.
+- Break-glass con **expiración, motivo, aprobación y revocación automática** — no un `add-iam-policy-binding` que
+  alguien tiene que acordarse de deshacer.
+- Encima de eso, el comando gobernado `propose → confirm` que el Delta (4) describe, para que la intención del
+  operador sea UNA y la ejecute el runtime.
+
+#### Y una pieza de `ISSUE-124` que esta sesión resuelve
+
+`ISSUE-124` está abierta como *"grant adicional devuelve 409 sin causa de fase"*. La causa de la ambigüedad quedó
+identificada acá: **`dispatch.ts` colapsa TODA negación de crédito en `conflict`** — cualquier
+`CommercialCreditLifecycleError` que no sea `shape_required`, más `insufficient_balance` y `budget_denied` del
+ledger. Es deliberado (no filtrar saldos por el transporte compartido), pero deja al operador sin poder distinguir
+`approval_stale` de `pool_exhausted` de `month_cap_exceeded`. Hoy sólo se pudo separar sondeando el reader
+`budget.evaluate`, que **no** está disponible en la superficie `ui`. La observabilidad del conflicto es
+prerrequisito del diseño objetivo, no un extra.
