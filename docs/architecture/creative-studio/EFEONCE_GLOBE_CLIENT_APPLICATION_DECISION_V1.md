@@ -1169,3 +1169,32 @@ Consecuencia de alcance: el ADR pendiente **no** es "identidades de credit-admin
 de Globe desde Greenhouse** — créditos y capabilities — con su topología de identidades, su lane, su modelo de
 aprobación y su superficie en el portal. Y por Full API Parity, esa capability nace con contrato gobernado, así que
 la UI de Greenhouse, Nexa y MCP la operan por construcción.
+
+#### ✅ Ese ADR ya existe: **ADR-015** (2026-07-26) — y corrige dos cosas de estos deltas
+
+Escrito en
+[`EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md`](EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md),
+status **Proposed**, con `TASK-1566` como su implementación. Dos correcciones a lo que estos deltas afirmaron, las
+dos verificadas con `file:line`:
+
+1. 🔴 **La autoridad de crédito YA está concedida a la identidad que Greenhouse puede impersonar.** El Delta (3)
+   dijo que habilitar el carril *"pide dos identidades propias de credit-admin"* y miró las SAs del saga de
+   promoción de modelos. La cadena real es otra: `greenhouse-portal@` tiene `tokenCreator` sobre
+   `greenhouse-globe-caller` (`iam.tf:16-20`), ese SA resuelve al principal genérico `globe:service:internal-caller`
+   (`app.ts:3457`), y ese principal carga `grant.issue`, `grant.correct`, `policy.manage` y `budget.manage`
+   (`app.ts:3545-3563`) **más** `globe.lab.experiment.run` (`app.ts:3515`). **No falta una capability: sobra** — una
+   sola identidad tiene fondeo y gasto, y su único freno es un secreto que no puede leer. Eso no debilita la
+   conclusión de estos deltas: la agrava.
+2. 🔴 **El maker-checker de crédito es VACUO para cualquier caller de workload, y eso explica el mecanismo del
+   "declara dos nombres pero no hay dos actores".** `approval()` compara `proposedBy` contra
+   `context.actor.principalId`, que para un workload es la **constante** `'globe:service:internal-caller'`
+   (`app.ts:3503`): cualquier `proposedBy` distinto pasa ese término trivialmente. **Corolario que ordena ADR-015:**
+   la disyunción de actores no puede vivir del lado de Globe (sus principals son constantes por clase) — vive donde
+   hay identidades humanas reales, y por eso el encuadre del operador es el técnicamente correcto, no sólo el
+   conveniente.
+
+Y una corrección al **diseño objetivo** de arriba: pedía *"grant y cambio de política como comandos independientes,
+con readback y reconciliación explícita del estado parcial"*, razonable si los agregados vivieran en stores
+distintos. **Viven los tres en el mismo Postgres de Globe**, así que ADR-015 los pone en **UNA transacción** — una
+saga aceptaría un estado parcial que no hace falta aceptar. Los comandos independientes se conservan para las
+intenciones simples.

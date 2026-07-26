@@ -737,6 +737,27 @@ reautenticación, cobertura de epoch) → composer.
 > timing ledger sincronizados). Queda: ventana monitor 7d `growth.cta.*` (comparte 2026-07-25 con
 > TASK-1427) y la primera campaña `slide_in` real (decisión de negocio: surface/copy/trigger).
 
+## 2026-07-26 (2) — ADR-015: Greenhouse administra Globe (créditos y capabilities)
+
+**Doc gobernante creada:** `docs/architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md` — **ADR-015, Proposed**. Registrada en `creative-studio/DECISIONS_INDEX.md` + `README.md`. Implementación: **`TASK-1566`** (`to-do`, backend-data/command, backend-critical, P1/Alto/Alto; `task:lint` en `template=1 errors=0 warnings=0`).
+
+**Dos correcciones a los deltas del 2026-07-26, verificadas con `file:line` contra los dos repos:**
+
+1. 🔴 **La autoridad de crédito YA está concedida a la identidad que Greenhouse puede impersonar.** `greenhouse-portal@` tiene `tokenCreator` sobre `greenhouse-globe-caller` (`iam.tf:16-20`) → resuelve al principal genérico `globe:service:internal-caller` (`app.ts:3457`) → que carga `grant.issue`/`grant.correct`/`policy.manage`/`budget.manage` (`app.ts:3545-3563`) **más `globe.lab.experiment.run`** (`app.ts:3515`). **Una sola identidad tiene fondeo y gasto, y su único freno es un secreto que no puede leer. No falta una capability: sobra.** El Delta (3) miró las SAs del saga de promoción de modelos, que era el lugar equivocado.
+2. 🔴 **El maker-checker de crédito es VACUO para todo caller de workload.** `approval()` compara `proposedBy` contra `context.actor.principalId`, que para un workload es la **constante** `'globe:service:internal-caller'` (`app.ts:3503`). Cualquier `proposedBy` distinto pasa trivialmente; la única atadura es el HMAC. **Corolario que ordena la ADR: la disyunción de actores no puede vivir en Globe** (sus principals son constantes por clase) — vive donde hay identidades humanas. El encuadre del operador era el técnicamente correcto, no sólo el conveniente.
+
+**Y una corrección al diseño objetivo:** pedía saga para grant + política. Los tres agregados (grant, asiento de ledger, política) **viven en el mismo Postgres de Globe**, así que va **UNA transacción** — una saga aceptaría un estado parcial que no hace falta aceptar.
+
+**Lo que decide la ADR:** lane `sister-platform` (hoy `available` sólo en tenancy) **+ retiro de la autoridad de crédito del caller genérico**; **cuatro identidades disjuntas** (broker de administración **distinto** del reconciliador de tenancy; aprobador que firma y no muta; ejecutor que muta y no puede firmar) realizadas como **unidad de ejecución separada**, porque dentro de un proceso la disyunción es cosmética; **KMS asimétrico** en vez del HMAC (con HMAC, quien verifica puede forjar), con verificador dual, fecha de retiro y señal que la mide; `credits.month.fund.propose`/`.confirm` con **dos humanos autenticados distintos**; break-glass con TTL/motivo/aprobación/revocación automática/readback **y su propio contador**.
+
+🔴 **Hallazgo que bloquea la mitad de capabilities:** administrar capabilities **por usuario** no es afinar algo que existe — **la dimensión per-member no existe**: `tenancy-reconciler.ts:216` asigna `desiredCapabilities: policy.capabilities`, el mismo set a todo miembro de todo workspace. Y sería **inerte**: `tenancy_mode` default es `"shadow"` (`variables.tf:130`) y la proyección observa sin negar. **Una superficie que prometiera ese control hoy mentiría.** Prerrequisito: `tenancy_mode = enforced` (`TASK-1511`), no follow-up.
+
+**`ISSUE-124` actualizada con la evidencia.** El 409 ambiguo tiene dos mitades deliberadas: `dispatch.ts` colapsa **TRES** clases de error en `conflict` — y la tercera (`CreditAdministrationError`) incluye **`maker_checker_required`**, así que una aprobación vencida o con digest que no calza es **indistinguible de `pool_paused`**; y el desambiguador `budget.evaluate` está `policy-blocked` en `ui`. O sea: "la aprobación era válida" **no está probada** por el 409. Lo cierra el **Slice 1 de `TASK-1566`**, que va primero por eso mismo.
+
+**También actualizado:** la skill `greenhouse-globe` (ambos namespaces) — la sección `Gasto y crédito` pasa de 5 a 8 reglas; nueva `.claude/rules/globe-administration.md` (auto-load por `src/lib/globe/**` + `src/lib/sister-platforms/**`, no cuenta al budget). **El pointer NO se agregó a `CLAUDE.md`**: el router estaba a 27 tokens del techo y agregarlo lo pasaba — el routing ya existe vía la skill y el índice de `creative-studio`.
+
+**Pendiente sin bloqueo (medido, no revisado en esta sesión):** la paridad para retirar el legacy sigue en **14/38** y el cuello es **library 0/6 y viewer 1/6, no el composer** (7/14).
+
 ## 2026-07-26 — Globe Producer React: conversión, generación real y el bloqueo de fondeo
 
 **Repo del código:** `efeonce-globe` (`main`, desplegado). **Doc gobernante:** `docs/architecture/creative-studio/EFEONCE_GLOBE_CLIENT_APPLICATION_DECISION_V1.md`, deltas 2026-07-25 (5) y 2026-07-26 (1)…(4) + alcance del ADR.

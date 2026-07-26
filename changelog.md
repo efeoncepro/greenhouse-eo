@@ -7,6 +7,29 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-26 — ADR-015: Greenhouse administra Globe (créditos y capabilities de usuarios)
+
+- Se creó `docs/architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md` (**ADR-015**,
+  Proposed) y se registró en `creative-studio/DECISIONS_INDEX.md` + `README.md`. Greenhouse es la **superficie** de
+  administración; Globe la **autoridad**: la llave de aprobación nunca sale de su runtime y ningún actor obtiene
+  aprobación y ejecución a la vez.
+- Se creó **`TASK-1566`** (backend-data/command, backend-critical) como su implementación, con el registry y el
+  índice de tasks sincronizados. Siguiente ID libre: `TASK-1567`.
+- Se corrigieron dos afirmaciones de los deltas del 2026-07-26 de ADR-014, con evidencia de código: la autoridad de
+  crédito **ya está** concedida al principal genérico `globe:service:internal-caller` junto con el gasto (no falta
+  una capability, **sobra**), y el maker-checker de crédito es **vacuo** para cualquier caller de workload porque
+  compara contra un `principalId` que es constante por clase. De ahí que la disyunción de actores viva en Greenhouse
+  y no en Globe.
+- Se corrigió el diseño objetivo del Delta (4): grant + asiento de ledger + política van en **una** transacción
+  Postgres, no en una saga — los tres agregados viven en la misma base.
+- Se actualizó `ISSUE-124` con la causa localizada: `dispatch.ts` colapsa **tres** clases de error de crédito en
+  `conflict` (incluido `maker_checker_required`, indistinguible de `pool_paused`) y el desambiguador
+  `budget.evaluate` está `policy-blocked` en `ui`. Solución = Slice 1 de `TASK-1566`.
+- **Cambio de contrato para agentes:** la skill `greenhouse-globe` (`.claude/` y `.codex/`) pasa de 5 a 8 reglas en
+  `Gasto y crédito en Globe`, y nace `.claude/rules/globe-administration.md` (auto-load por `src/lib/globe/**` +
+  `src/lib/sister-platforms/**`). El pointer **no** se agregó a `CLAUDE.md`: el router estaba a 27 tokens del techo
+  y el routing ya existe vía la skill y el índice de `creative-studio`.
+
 ## 2026-07-26 — Customer Model Operator para Codex y Claude
 
 - Se creó la skill transversal `efeonce-customer-model-operator` en `.codex/skills/` y `.claude/skills/`.

@@ -960,18 +960,23 @@ shippeó con **4 de 11** animaciones del diseño aprobado. El task-lint sólo ve
 
 ## Gasto y crédito en Globe — lo que hay que saber ANTES de tocar generación (2026-07-26)
 
-Cinco reglas medidas contra el runtime, no razonadas. Las tres primeras cuestan una sesión entera si se ignoran.
+Ocho reglas medidas contra el runtime, no razonadas. Las tres primeras cuestan una sesión entera si se ignoran; las 6-8 son las que impiden diagnosticar mal la topología de autoridad.
 
 1. **`credits.allocate` NO habilita gasto.** Llena el **ledger**; la política (`AdminCreditBudgetPolicy`) sólo mira
    **grants de pools activos**. Por eso se puede ver `ledgerAvailable: 500002` y que toda generación se niegue con
    `pool_exhausted`. Son dos capas: ledger ≠ fondeo. "Cargar créditos" no es fondear.
 
-2. **Un `409 conflict` en `execute` casi nunca es idempotencia.** `dispatch.ts` colapsa **toda** negación de crédito
-   en `conflict` —`approval_stale`, `approval_invalid`, `hard_cap_exceeded`, `insufficient_balance`,
-   `budget_denied`— para no filtrar saldos. Para desambiguar hay que preguntarle a
+2. **Un `409 conflict` en `execute` casi nunca es idempotencia.** `dispatch.ts` § `handlerErrorToApiCode` (~304-320)
+   colapsa **TRES** clases de error en `conflict`, a propósito, para no filtrar saldos: `CreditLedgerError`
+   (`insufficient_balance`, `budget_denied`), `CommercialCreditLifecycleError` (todo salvo `shape_required`:
+   `approval_stale`, `approval_invalid`, `hard_cap_exceeded`) y `CreditAdministrationError` (todo salvo
+   invalid/not_found/dependency — **incluyendo `maker_checker_required`**). 🔴 **Consecuencia que cuesta una sesión:
+   una aprobación vencida o con digest que no calza devuelve el MISMO 409 que un `pool_paused`**, así que "la
+   aprobación era válida" no está probada por el 409. Para desambiguar hay que preguntarle a
    **`globe.credits.budget.evaluate`** (devuelve `reason`) y a `budget.availability.get`
    (`policyAvailable` vs `ledgerAvailable`). **Ninguno de los dos está en la superficie `ui`**: se consultan por el
-   lane privado.
+   lane privado. Es la causa de `ISSUE-124`, y la arregla el Slice 1 de `TASK-1566` (fase de negación como enum
+   cerrado + los dos readers a `ui: available`).
 
 3. **El cliente DEBE honrar `withinDayCap`.** El estimado lo trae (`= commercial.withinBudget`, o sea la política
    negando). Ignorarlo deja el CTA habilitado, `prepare` en 200 y `execute` en 409 opaco, con un experimento
@@ -990,10 +995,45 @@ Cinco reglas medidas contra el runtime, no razonadas. Las tres primeras cuestan 
    **Greenhouse**: usarla para administrar crédito de **Globe** es admin implícito cross-plataforma), y **NUNCA**
    dejes que un solo proceso proponga y confirme — eso colapsa el maker-checker que impide autofinanciarse.
 
-**Dirección aprobada (ADR pendiente, alcance en `EFEONCE_GLOBE_CLIENT_APPLICATION_DECISION_V1.md` §2026-07-26):**
-la administración de créditos y capabilities de Globe **vive en Greenhouse** — superficie en Greenhouse, autoridad
-en Globe, lane `sister-platform`, identidad broker dedicada, la llave nunca sale del runtime de Globe, y el humano
-aprueba en Greenhouse mientras Globe ejecuta (dos actores por construcción, sin break-glass).
+6. 🔴 **La autoridad de crédito YA está concedida a la identidad que Greenhouse puede impersonar — el problema no es
+   que falte, es que SOBRA.** Cadena verificada 2026-07-26: `greenhouse-portal@` tiene `tokenCreator` sobre
+   `greenhouse-globe-caller` (`infra/terraform/iam.tf:16-20`) → ese SA resuelve al principal genérico
+   `globe:service:internal-caller` (`app.ts:3457`) → ese principal carga `globe.credits.grant.issue`,
+   `grant.correct`, `policy.manage` y `budget.manage` (`app.ts:3545-3563`) **más `globe.lab.experiment.run`**
+   (`app.ts:3515`). O sea **una sola identidad tiene fondeo y gasto**, y el único freno es un secreto que no puede
+   leer. **NUNCA** describas el bloqueo como "falta una identidad de credit-admin": es al revés.
+
+7. 🔴 **El maker-checker de crédito es VACUO para cualquier caller de workload.** `approval()`
+   (`packages/domain/src/credit-administration.ts`) compara `approval.proposedBy` contra
+   `context.actor.principalId`, que para un workload es la **constante** `'globe:service:internal-caller'`
+   (`app.ts:3503`): cualquier `proposedBy` distinto de esa constante pasa el chequeo **trivialmente**, y la única
+   atadura real es el HMAC. **NUNCA** apoyes una disyunción de actores en ese chequeo, y **NUNCA** cites "el
+   maker-checker lo impide" como control para un caller de workload. Corolario: la disyunción tiene que vivir donde
+   hay identidades humanas reales — **Greenhouse**, no Globe.
+
+8. **Un HMAC compartido significa que quien verifica puede FORJAR** (es la misma llave y la misma operación). Por eso
+   `createHmacCreditAdminApproval` no admite un firmador de cliente sin repartir poder de forja, y por eso **no
+   existe ninguna superficie que firme**: `.sign(` no aparece en `app.ts` — el verificador está cableado, el firmador
+   no. **NUNCA** propongas "ampliar el radio del secreto" como salida: es la misma propiedad con otro dueño.
+
+**Dirección decidida — ADR-015** (`EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md`, Proposed 2026-07-26;
+implementación = `TASK-1566`): la administración de créditos y capabilities de Globe **vive en Greenhouse** —
+superficie en Greenhouse, autoridad en Globe, lane `sister-platform` (hoy `available` sólo en tenancy), **cuatro
+identidades disjuntas** (broker de administración **distinto** del reconciliador de tenancy; aprobador que firma y no
+muta; ejecutor que muta y **no puede firmar**, separados como **unidad de ejecución propia** porque dentro de un
+proceso la disyunción es cosmética), **KMS asimétrico** en vez del HMAC, comando gobernado
+`credits.month.fund.propose` / `.confirm` con **dos humanos autenticados distintos** y la mutación (grant + asiento
+de ledger + política) en **UNA transacción Postgres**, y el **retiro de la autoridad de crédito del caller
+genérico** al final. Break-glass con TTL/motivo/aprobación/revocación automática/readback **y su propio contador**.
+**Cargá ADR-015 antes de tocar administración de crédito o capabilities de usuarios de Globe.**
+
+**Capabilities por usuario: hoy NO EXISTE la dimensión.** `src/lib/globe/tenancy-reconciler.ts:216` asigna
+`desiredCapabilities: policy.capabilities` — **el mismo set a todo miembro de todo workspace bindeado**, tomado del
+grant OAuth. Y sería **inerte**: `tenancy_mode` default es `"shadow"` (`variables.tf:130`) y la proyección
+**observa y nunca niega**. **NUNCA** prometas control de capabilities por usuario sin `tenancy_mode = enforced`
+(`TASK-1511`), y **NUNCA** intentes diferenciar por usuario en el **token**: el broker acopla
+`capabilityScopes ⊆ requiredScopes` y agregarlo lo vuelve requerido para todos (la lección que tumbó el login en
+ADR-010). El grant OAuth es el **techo**; la proyección es el **piso**.
 
 **Método:** `gcloud` CLI y ADC son credenciales **distintas** — el token del CLI puede estar vencido y ADC seguir
 viva (o al revés). No des por bloqueado un diagnóstico de infra sin probar las dos.
