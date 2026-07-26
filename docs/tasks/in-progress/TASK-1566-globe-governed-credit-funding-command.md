@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-028`
-- Status real: `Slices 1/4a/4b entregados y desplegados (rev 00102-nxk, migracion 0032, flag OFF verificado); 4c bloqueado por deadlock de lock advisory`
+- Status real: `Slice 4 COMPLETO (4a/4b/4c) y desplegado en rev 00104-gkc con flag OFF verificado; el criterio de salida "fondeo real punta a punta" espera al Slice 5, que es donde la atribucion humana se hace exigible`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -546,7 +546,49 @@ sino **no determinista**: el síntoma sería un `not_found` **intermitente** al 
 carreras se resuelven **en SQL**: `create` idempotente por unique **parcial** `(workspace_id,
 fingerprint) WHERE state='proposed'`, y `transition` como `UPDATE … WHERE state = <esperado>`.
 
-### 🔴 Slice 4c — la transacción única NO es un slice pequeño, y la vía obvia DEADLOCKEA
+### Slice 4c (`bc9dc1e`, `e237db1`) — ENTREGADO: la transacción única, y el deadlock que la bloqueaba
+
+El bloqueo no era "falta escribirla": **componerla se colgaba**. Cada store durable abría su propia
+`pool.transaction` y tomaba `pg_advisory_xact_lock(credit:workspace:X)`; una transacción externa hacía
+que la interna pidiera ese lock **desde otra conexión**, y ninguna de las dos podía avanzar.
+
+**El fix es un ejecutor inyectable por store, no un rediseño.** Los tres stores —administración,
+ledger y propuestas— aceptan una transacción externa opcional. Dentro de una misma transacción el lock
+advisory es **reentrante**, así que componen. Backward compatible: sin inyección, cada uno abre la suya
+como antes.
+
+El seam del dominio es **`atomically`**: `confirm` arma su mutación como función de los ports y pide
+"corré esto atómicamente". Opcional a propósito — sin él degrada a secuencial resumible, y los tests
+con dobles no simulan transacciones.
+
+**Separación que hubo que rehacer a mitad de camino:** la primera versión duplicaba el adapter de
+política entre `main.ts` y `app.ts` — que es exactamente cómo el camino atómico y el secuencial
+derivan sin que nada falle. Ahora `main.ts` aporta sólo pool + impls durables y `app.ts` arma los
+ports **una vez**, parametrizados por sus stores.
+
+**Tests probados en rojo** contra la versión secuencial (revirtiendo el seam fallan los dos; con él
+14/14): la mutación pasa por el seam exactamente una vez y el grant se emite con los ports
+**enlazados**, nunca por fuera; y un fallo de política propaga fuera del seam para que la transacción
+revierta.
+
+### 🔴 El flag queda en FALSE, y NO por prudencia genérica
+
+Declarado **y cableado** (2 referencias, plan `0 to add, 1 to change, 0 to destroy`, aplicado).
+Desplegado: revisión **`00104-gkc`**, imagen `e237db1ac160`, `GLOBE_CREDIT_ADMIN_LANE_ENABLED='false'`
+verificado en el runtime y las capabilities de fondeo **no publicadas** (173, ninguna de fondeo).
+
+**Por qué no se prende aunque 4c esté listo:** `assertHumanAttribution` es **shape-only** — rechaza
+`globe:service:` y exige un entitlement no vacío, pero **no verifica que la atribución humana
+corresponda a una sesión autenticada**. Con el carril publicado, el caller genérico —que Greenhouse
+puede asumir— podría confirmar con una **atribución humana fabricada**: el mismo maker-checker vacuo
+que esta task documenta, movido un nivel.
+
+El amarre real es el **Slice 5** (broker de Greenhouse con sesión, entitlement y tabla append-only con
+`CHECK` confirmante ≠ proponente). **Prender antes de eso publica un gate humano que nadie puede hacer
+cumplir**, y por eso el criterio de salida del Slice 4 —*"un fondeo real punta a punta con UNA
+confirmación humana"*— todavía no se cumple: falta la superficie desde donde ese humano confirma.
+
+### Nota de secuencia (corrige el orden declarado arriba)
 
 `DurableCreditAdministrationStore` abre **`pool.transaction` por método** (11 call-sites de `mutate`)
 y cada una toma `pg_advisory_xact_lock(credit:workspace:X)`. Envolver `confirm` en una transacción

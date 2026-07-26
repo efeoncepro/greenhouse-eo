@@ -45,13 +45,24 @@ test nuevo assertea contra `/v1/capabilities` y **se probó en rojo** antes. De 
 atrapó que `creditAdminApproval` estaba tipado como **verificador** y se usaba como **firmador** — el
 defecto exacto que ADR-015 cierra; ahora son dos dependencias.
 
-🔴 **4c NO es un slice pequeño, y la vía obvia DEADLOCKEA.** `DurableCreditAdministrationStore` abre
-`pool.transaction` **por método** (11 call-sites) y cada una toma `pg_advisory_xact_lock` del mismo
-workspace. Envolver `confirm` en una transacción externa hace que la interna pida ese lock **desde
-otra conexión**: la externa no commitea porque espera a la interna, la interna no obtiene el lock
-porque lo tiene la externa. **Se cuelga, en el camino del dinero.** Cerrarlo exige la variante
-transaction-scoped del port (~20 métodos, archivo denso, locks + recibos de idempotencia): **pasada
-propia, no cola de sesión**. Flag OFF hasta entonces; el carril viejo opera sin cambio.
+✅ **4c ENTREGADO** (`bc9dc1e` + `e237db1`). El bloqueo no era escribir la transacción: **componerla se
+colgaba**. Cada store durable abría su propia `pool.transaction` con `pg_advisory_xact_lock` del mismo
+workspace, y una transacción externa hacía que la interna pidiera ese lock **desde otra conexión** —
+deadlock, no error. El fix es un **ejecutor inyectable por store** (dentro de una misma transacción ese
+lock es reentrante), más el seam `atomically` en el dominio. Backward compatible. Tests **probados en
+rojo** contra la versión secuencial: 14/14 con el seam, 2 fallan sin él.
+
+🔴 **El flag queda en FALSE, y NO por prudencia genérica.** `assertHumanAttribution` es **shape-only**:
+rechaza `globe:service:` y exige un entitlement no vacío, pero **no verifica que la atribución humana
+venga de una sesión autenticada**. Con el carril publicado, el caller genérico —que Greenhouse puede
+asumir— confirmaría con una **atribución humana fabricada**: el mismo maker-checker vacuo de la task,
+un nivel más arriba. El amarre vive en el **Slice 5** (broker de Greenhouse con sesión + entitlement +
+tabla append-only con `CHECK` confirmante ≠ proponente). **Ese es el próximo paso**, y hasta entonces el
+criterio de salida del Slice 4 (*"fondeo real punta a punta"*) no se puede cumplir: falta la superficie
+desde donde el humano confirma.
+
+Desplegado y verificado: rev **`00104-gkc`**, imagen `e237db1ac160`, flag `'false'` en el runtime, 173
+capabilities y **ninguna** de fondeo publicada.
 
 🔴 **Hallazgo transversal:** `credit-funding.ts` tenía **3 bytes NUL crudos** como separador de clave.
 UTF-8 válido, compila, **ningún gate lo atrapa** — pero `file` lo reporta como `data` y **todo grep lo
