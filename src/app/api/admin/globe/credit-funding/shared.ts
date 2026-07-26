@@ -1,4 +1,5 @@
 import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
+import type { GreenhouseGlobeConfigurationError } from '@/lib/globe/client'
 import type { GlobeCreditFundingBrokerError } from '@/lib/globe/credit-administration-broker'
 
 /**
@@ -20,6 +21,34 @@ const BROKER_ERROR_CODES = {
 
 export const brokerErrorResponse = (error: GlobeCreditFundingBrokerError) =>
   canonicalErrorResponse(BROKER_ERROR_CODES[error.code])
+
+/**
+ * El enlace con Globe no está configurado en este runtime (falta `GLOBE_API_BASE_URL` o el par WIF).
+ *
+ * Va aparte del broker a propósito: es un fallo **estructural de rollout**, y hasta acá caía en el
+ * `catch` genérico como `internal_error` con `actionable: true` — o sea, "reintenta en unos minutos"
+ * para algo que ningún reintento resuelve. Medido en staging el 2026-07-26: las rutas devolvían 500
+ * opaco mientras `/api/internal/globe/health` ya decía `globe_not_configured` con `retryable: false`.
+ * Dos lecturas distintas de la MISMA condición es justamente lo que este carril existe para eliminar.
+ *
+ * La línea de servidor va acá y no queda a criterio del caller (ISSUE-127): sin ella, el operador ve
+ * un código honesto pero nadie puede decir QUÉ variable falta.
+ */
+export const globeConfigurationErrorResponse = (
+  error: GreenhouseGlobeConfigurationError,
+  operation: string
+) => {
+  // `error.code` es un enum cerrado de configuración: no lleva secreto, host ni payload.
+  console.error(
+    JSON.stringify({
+      event: 'greenhouse.globe_credit_funding.not_configured',
+      operation,
+      configurationCode: error.code
+    })
+  )
+
+  return canonicalErrorResponse('globe_not_configured')
+}
 
 /** La idempotencia es obligatoria: un command que mueve dinero no puede depender de que el caller
  *  se acuerde de mandarla. */

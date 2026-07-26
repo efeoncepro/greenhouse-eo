@@ -80,6 +80,7 @@ export type CanonicalErrorCode =
   | 'globe_funding_confirmer_is_proposer'
   | 'globe_funding_already_recorded'
   | 'globe_unavailable'
+  | 'globe_not_configured'
   // Roadmap cockpit — work item Markdown lookup (TASK-1153 follow-up).
   | 'roadmap_work_item_not_found'
   | 'roadmap_disabled'
@@ -334,6 +335,18 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     status: 503,
     message: 'Globe no respondió en este momento. Inténtalo de nuevo en unos segundos.',
     actionable: true
+  },
+  // ESTRUCTURAL, no transitorio: este runtime no tiene configurado el enlace con Globe (falta
+  // `GLOBE_API_BASE_URL` o el par WIF). Distinto de `globe_unavailable` en lo único que le importa a
+  // quien lo recibe: reintentar NUNCA lo resuelve. Servirlo como `internal_error` con
+  // `actionable: true` —que es lo que hacía— manda a insistir contra una pared y esconde que el
+  // arreglo es de rollout, no de código. Mismo criterio que `/api/internal/globe/health`, que ya
+  // devolvía `globe_not_configured` con `retryable: false`.
+  globe_not_configured: {
+    status: 503,
+    message:
+      'El enlace con Globe no está configurado en este entorno. Avísale a plataforma: reintentar no lo resuelve.',
+    actionable: false
   },
   // TASK-1153 — el work item solicitado no existe (o no es legible) en el índice del backlog.
   roadmap_work_item_not_found: {

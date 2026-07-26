@@ -9,7 +9,14 @@ import {
 import { captureWithDomain } from '@/lib/observability/capture'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 
-import { brokerErrorResponse, parseConfirmBody, requireIdempotencyKey } from '../shared'
+import { GreenhouseGlobeConfigurationError } from '@/lib/globe/client'
+
+import {
+  brokerErrorResponse,
+  globeConfigurationErrorResponse,
+  parseConfirmBody,
+  requireIdempotencyKey
+} from '../shared'
 
 /**
  * TASK-1566 Slice 5 — `POST /api/admin/globe/credit-funding/confirm`.
@@ -60,6 +67,10 @@ export const POST = async (request: Request) => {
     return Response.json({ outcome }, { status: 200 })
   } catch (error) {
     if (error instanceof GlobeCreditFundingBrokerError) return brokerErrorResponse(error)
+
+    if (error instanceof GreenhouseGlobeConfigurationError) {
+      return globeConfigurationErrorResponse(error, 'confirm')
+    }
 
     captureWithDomain(error, 'platform', { extra: { operation: 'globe_credit_funding.confirm' } })
 
