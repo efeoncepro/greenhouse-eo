@@ -588,6 +588,46 @@ El amarre real es el **Slice 5** (broker de Greenhouse con sesión, entitlement 
 cumplir**, y por eso el criterio de salida del Slice 4 —*"un fondeo real punta a punta con UNA
 confirmación humana"*— todavía no se cumple: falta la superficie desde donde ese humano confirma.
 
+### 🔴 Corrección 2026-07-26 — el segundo confirmador es POLÍTICA, y yo lo había hecho invariante
+
+**Error propio, y de la clase que más daño hace: contradecir una decisión ya tomada.** La primera
+migración puso un `CHECK` **duro e incondicional** exigiendo confirmante ≠ proponente siempre. El
+Delta 2026-07-26 (2) de esta misma task —y ADR-015— ya habían bajado eso a **política por workspace +
+techo por operación, default OFF en el interno**.
+
+Lo peor no es haberlo puesto: **leí ese Delta en el discovery y cité su razonamiento** en el
+comentario del grant en `runtime.ts` (*"un control que nadie puede satisfacer desvía al break-glass"*)
+mientras construía en la base exactamente ese control. Endurecí de más porque dos humanos *suena* más
+seguro, y el efecto neto habría sido **menos** seguridad: el operador es CEO y dueño del presupuesto,
+no hay segundo actor, y el desvío ya está medido — tres break-glass, cada uno otorgando **más**
+autoridad que el camino que reemplaza.
+
+**Forward-fix** (`20260726171851162`, sin editar la migración aplicada): el `CHECK` incondicional se
+retira; la regla depende de una política por workspace y un `CHECK` no puede consultar otra tabla, así
+que vive en un **trigger**. Nueva tabla `globe_credit_funding_policies` con
+`requires_second_confirmer` (default **FALSE**) y `second_confirmer_above_credits` (**techo por
+operación**, `NULL` = sin techo) — *umbral de aprobación*, como cualquier tesorería real, en vez de
+dual control universal. La fila del workspace interno es **explícita**: que el default sea OFF debe
+leerse en la tabla, no deducirse de una ausencia.
+
+**Lo que NO se relajó, porque cuesta cero:** el agente nunca confirma (un principal de servicio no
+puede figurar como el humano que aprueba), toda confirmación registra contra quién confirma (`CHECK`
+de fila), y append-only.
+
+**Verificado contra PostgreSQL real:** auto-confirmación del operador **ACEPTADA** (el caso que estaba
+bloqueado) · servicio confirmando **RECHAZADO** (`actor_must_be_human`) · con la política en ON,
+auto-confirmar **RECHAZADO** (`second_confirmer_required`). Política restaurada a OFF, filas de prueba
+limpiadas.
+
+> **La regla que se deriva:** endurecer más de lo que la decisión pide no es conservador — es cambiar
+> la decisión sin discutirla. Y un control que su único usuario no puede satisfacer no protege: desvía.
+
+### Nota para `TASK-1484` (top-up de cliente) — el trigger de autoridad va a chocar
+
+El trigger exige actor **humano**. Un top-up de cliente **no tiene** actor humano de Efeonce: lo
+autoriza el **pago liquidado**. La corrección no es relajarlo sino **discriminar por `source`**
+(`human_session` vs `settled_payment`), cada uno con su prueba. Delta completo en `TASK-1484`.
+
 ### Slice 5 (`b6f2ff4`, `d2916371e`) — ENTREGADO: la atribución humana se vuelve EXIGIBLE
 
 Es lo que faltaba para que el flag del Slice 4 pueda significar algo. Globe no puede verificar la
