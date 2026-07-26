@@ -76,6 +76,8 @@ Reglas obligatorias:
 
 - Bloquea TASK-1540 y TASK-1541.
 - Impacts Producer TASK-1505, Workbench TASK-1474 and IA TASK-1523 without taking their layouts.
+- `TASK-1573` y `TASK-1574` consumen este `assetRef` para edición de videos externos y referencias con roles; esta
+  task mantiene ownership exclusivo del ingest/gobernanza y no crea un uploader específico de video-edit.
 
 ### Files owned
 
@@ -255,3 +257,4 @@ Capability grants and rollout owner coordination in TASK-1541.
 ## Follow-ups
 
 - TASK-1540 and TASK-1541.
+- `TASK-1573` — video-edit capability consume el `assetRef`; `TASK-1574` — Producer consume el command y la proyección.

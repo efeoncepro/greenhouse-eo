@@ -70,6 +70,8 @@ Reglas obligatorias:
 
 - Impacta `/producer`, feed, viewer, `MediaStage` y el nuevo MediaDock.
 - No absorbe composer, asset library, video generation ni model fleet.
+- No absorbe edición semántica, referencias con roles, lineage de edición ni máscaras temporales; esos contratos viven
+  en `TASK-1573`/`TASK-1574`.
 
 ### Files owned
 
@@ -90,6 +92,8 @@ Reglas obligatorias:
 
 - No existe Cinematic Stage, timeline custom, MediaDock contextual ni playback context compartido entre video/audio.
 - Poster, preview pending, buffering, audio presence, reduced motion y estados de revisión no tienen una experiencia unificada.
+- `TASK-1574` consumirá esta superficie para editar una toma; el stage debe conservar un punto de entrada estable,
+  keyframe actual y rango temporal sin crear un segundo reproductor.
 
 ## Modular Placement Contract
 
@@ -111,6 +115,8 @@ Reglas obligatorias:
 - Resultado perceptible esperado: el usuario entiende la pieza antes de reproducirla y puede revisarla con precisión sin perder contexto.
 - Fricción que debe reducir: cards genéricas, viewer nativo, controles dispersos y estados ambiguos.
 - No-goals UX: no crear un editor, timeline de montaje, capítulos sociales ni reproducción automática masiva.
+- Handoff: expone el Video Focus/Cinematic Stage y timeline real para `TASK-1574`; no absorbe el Edit Rail ni la
+  ejecución de `video-edit`.
 
 ### Surface & system decision
 

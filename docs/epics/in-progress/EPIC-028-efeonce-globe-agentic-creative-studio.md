@@ -171,6 +171,12 @@ evidencia, no una garantía de marketing.
   Focus Canvas y compare condicionado por lineage. Las cinco tasks conservan el shell/feed/composer actual,
   consumen contratos gobernados y no crean una galería paralela; `TASK-1568` depende de `TASK-1567`,
   `TASK-1570` de `TASK-1569` y `TASK-1571` del ownership vigente de feed/viewer de `TASK-1559`.
+- **Audio editing specialization — multi-provider y layer-aware.** `TASK-1575` posee el contrato neutral
+  `audio-edit`, el brief temporal/capa, preservation, lineage, mix manifest, QC, credits y rights; mantiene
+  separadas las capabilities existentes de voz y doblaje. `TASK-1576` audita Seed Audio/ElevenLabs y suma
+  challengers vía Fal para SFX, música, audio-to-audio, restore y stems sólo después de eval, licencia, canary y
+  promotion. `TASK-1577` consume ambos contratos dentro de `TASK-1568` con selección waveform/transcript, layer
+  rail, compare A/B y recovery; no crea selector de provider, segundo player ni DAW paralelo.
 - `TASK-1524` — **Commercial Login Cinematic Threshold.** Evoluciona la puerta anónima internal-only a una
   apertura comercial poster-first `One Idea, Many Forms`, con master desktop/mobile, pausa, reduced motion,
   progressive enhancement y OAuth/session existentes intactos; promoción sigue gateada por `TASK-1521/1480`.

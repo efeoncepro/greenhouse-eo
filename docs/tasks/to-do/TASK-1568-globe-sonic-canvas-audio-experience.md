@@ -111,6 +111,12 @@ Reglas obligatorias:
 - Fricción que debe reducir: controles dispersos, ausencia de feedback y reproducción competidora.
 - No-goals UX: no crear un DAW, edición de audio, playlist social ni analítica de escucha.
 
+### Follow-up boundary
+
+La edición generativa de audio no pertenece a esta task. `TASK-1575` posee el contrato y la orquestación
+multi-provider; `TASK-1576` posee la evaluación y promoción de rutas vía Fal; `TASK-1577` extiende este Sonic Canvas
+con el Audio Edit Studio. Esta task conserva exclusivamente playback, waveform, stage y AudioDock.
+
 ### Surface & system decision
 
 - Surface: feed + viewer `/producer`.

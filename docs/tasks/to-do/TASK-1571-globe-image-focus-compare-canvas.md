@@ -102,6 +102,8 @@ Reglas obligatorias:
 - Momento: revisar, seleccionar y comparar outputs de imagen.
 - Resultado: entiende la imagen, la inspecciona con precisión y decide una acción sin perder el feed.
 - No-goals: editor de imagen, crop, retoque, nueva galería, comparación arbitraria.
+- Handoff: expone un punto de entrada estable para `TASK-1572` sin convertir el Focus Canvas en dueño del flujo de
+  edición regional.
 
 ### Surface & system decision
 
@@ -140,6 +142,8 @@ Ready, loading, preview pending, no preview, retrieval error, permission denied,
 - Retrieval: `apps/studio-client/src/data/governed-media.ts`.
 - Data reader: existing governed derivative projection and TASK-1498 relation reader; no new UI endpoint.
 - Candidate pattern: `ImageFocusCanvas` only if extending `MediaStage` cannot express the contract.
+- Edit handoff: la acción `Editar imagen`/`Editar zona` puede vivir en el inspector, pero el Edit Rail, máscara,
+  estimate y ejecución pertenecen a `TASK-1572`; no duplicar el viewer ni abrir un modal dentro del dialog.
 
 ## Scope
 

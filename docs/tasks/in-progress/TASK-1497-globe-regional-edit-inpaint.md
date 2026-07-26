@@ -490,7 +490,7 @@ adicionales", no adivinar por índice. La regla cross-surface del stateful sigue
 
 ## Follow-ups
 
-- UI "Retocar zona / inpaint" (task `ui-ux` consumer, dentro de TASK-1474).
+- UI "Editar zona / retoque regional": `TASK-1572` (consumer React del Producer; no agrega lógica de provider).
 - Autoría de máscara / segmentación automática (prompt-to-mask) como capacidad separada.
 - Edición regional de video (masked video) si algún modelo lo soporta.
 - Provenance/rights del derivado enmascarado + de la máscara (TASK-1467).
@@ -504,3 +504,34 @@ adicionales", no adivinar por índice. La regla cross-surface del stateful sigue
   dominio) o delegar al vendor si su API acepta bbox nativo. `[verificar]` por proveedor.
 - **¿Omni (stateful) soporta edición enmascarada?** Si no, el edit regional sólo corre por el carril reference-based;
   el fail-closed de afford. lo cubre. `[verificar]`.
+
+## Delta 2026-07-26 — preservación, routing regional y canary de proveedor
+
+La investigación de producto y proveedores agregó requisitos load-bearing para que la capacidad no sea sólo un
+transporte de máscara:
+
+- La ruta genérica `ref/still/reference-v1` no puede aceptar silenciosamente `editFrom.region`; la edición regional
+  requiere un binding de ruta explícito y una affordance real del adapter. Si no existe, debe fallar closed antes de
+  reservar gasto.
+- El contrato canónico conserva la máscara completa y deriva server-side `bbox`, dilatación y feather. El navegador
+  no decide coordenadas de proveedor ni envía bytes de máscara.
+- El runtime debe distinguir `userMask`, `generationMask` y `compositeMask`: el modelo necesita contexto alrededor
+  del borde, pero el modo de preservación estricta debe restaurar la imagen original fuera de la zona autorizada.
+- El manifest debe registrar la política de preservación (`strict|natural`) y cualquier recomposición aplicada, sin
+  convertir esos detalles en vocabulario público de proveedor.
+- El canary no se considera verde sólo porque el proveedor devuelva una imagen: debe demostrar cambio dentro de la
+  máscara, preservación fuera de ella, lineage, `editScope=regional`, gasto único e inexistencia de bytes de máscara
+  en el request público o logs.
+
+### Acceptance criteria additions
+
+- [ ] Existe una ruta regional promovible y distinta de la ruta genérica de referencia, con capability matrix por
+  intención (`replace|remove|add`) y fail-closed si falta binding.
+- [ ] El adapter deriva y valida la máscara de generación sin mutar la máscara autorada por el usuario; registra
+  dimensiones, bbox, dilatación/feather y hash de la máscara original como evidencia server-side.
+- [ ] El modo `strict` conserva fuera de la máscara la imagen padre mediante recomposición verificable; el modo
+  `natural` queda explícitamente identificado en el manifest y nunca se presenta como preservación exacta.
+- [ ] El canary vivo verifica métricas de cambio dentro/fuera de la máscara y rechaza resultados fuera de tolerancia
+  antes de promocionar la ruta.
+- [ ] `TASK-1572` puede consumir el command existente usando sólo referencias gobernadas (`maskId`/asset ref), sin
+  endpoint ni payload paralelo de UI.
