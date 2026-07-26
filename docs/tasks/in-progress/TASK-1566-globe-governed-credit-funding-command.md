@@ -527,9 +527,27 @@ alguien se acuerde.
 | Política del workspace interno | `SELECT * FROM globe_credit_funding_policies` | fila **explícita**: `requires_second_confirmer=false`, sin techo |
 | Capabilities | `capabilities_registry` | `propose` y `confirm`, ninguna `deprecated_at` |
 
-La base que usa staging **ya tiene todo**. La única pieza ausente es el **código de Greenhouse
-desplegado**: `develop` está **12 commits adelante de `origin/develop`**, así que staging no tiene las
-rutas. Eso convierte el paso que falta en un **push autorizado**, no en trabajo de ingeniería.
+La base que usa staging **ya tenía todo**. La única pieza ausente era el **código de Greenhouse
+desplegado**: `develop` estaba **12 commits adelante de `origin/develop`**, así que staging no tenía las
+rutas. Eso convertía el paso faltante en un **push autorizado**, no en trabajo de ingeniería.
+
+### Deploy hecho y verificado (`9bf955331`)
+
+Empujado con autorización del operador; Vercel construyó staging en 4 min. **Las dos rutas están vivas**,
+comprobado contra el deployment real con bypass y sin sesión:
+
+| Ruta | Respuesta |
+|---|---|
+| `POST …/credit-funding/propose` | `401` · `{"code":"unauthorized","actionable":true}`, prose es-CL |
+| `POST …/credit-funding/confirm` | `401` · idéntico |
+| `POST …/credit-funding/no-existe` (control) | `404` HTML de Next |
+
+El control importa: sin él, un `401` podría ser un guard global y no la ruta. Con un 404 real al lado,
+el `401` es **el handler**, o sea el código desplegado.
+
+🔴 **Queda un único acto, y necesita a un humano por diseño:** `propose` → `confirm` con la **cookie de
+sesión del operador**, según el runbook de abajo. La atribución sale de la sesión — no hay forma de
+automatizarlo sin falsificar justamente lo que el carril produce.
 
 ### El NUL crudo: cuarta aparición, y ahora sí hay gate
 

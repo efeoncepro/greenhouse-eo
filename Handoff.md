@@ -92,28 +92,18 @@ ese `tokenCreator` es de `greenhouse-portal@` (`iam.tf:16-20`). Hasta entonces N
    anteriores: un `catch` que sanitizaba sin dejar rastro del servidor. La contramedida no es
    disciplina sino procedimiento — el `catch` y su linea de log, en el mismo commit.
 
-**Sesion 2026-07-26 (cierre parcial).** La precondicion del cierre dejo de ser afirmacion y paso a
-medicion, verificada contra el runtime y contra PG real: `globe-api-internal-00106-b6w` con
-`GLOBE_CREDIT_ADMIN_LANE_ENABLED=true` · las dos migraciones aplicadas · `globe_credit_funding_intents`
-en **0 filas** · la fila de politica del workspace interno **explicita** en `requires_second_confirmer=FALSE`
-sin techo · ambas capabilities vivas y sin deprecar. **La base que usa staging ya tiene todo.**
+**Sesion 2026-07-26 (cierre parcial) — detalle en TASK-1566 § Delta 2026-07-26 (4).** Greenhouse
+DESPLEGADO en staging (`9bf955331`): las dos rutas de fondeo responden `401 unauthorized` canonico y
+una ruta de control devuelve 404 real, asi que el codigo esta vivo. Precondiciones medidas contra
+runtime y PG real (rev `00106-b6w` con el flag ON, migraciones aplicadas, ledger en 0 filas, politica
+interna explicita en OFF, ambas capabilities vivas). 🔴 **Falta solo ejercer `propose`->`confirm` con la
+cookie de sesion del OPERADOR** — runbook con los `curl` exactos en el Delta (4); `staging:request` no
+sirve (resuelve persona agente y no manda `x-idempotency-key`). No se ejercio con la persona agente a
+proposito: pasa el trigger pero escribiria una atribucion humana ficticia en una tabla append-only.
 
-🔴 **Lo unico ausente es el codigo de Greenhouse desplegado: `develop` esta 12 commits adelante de
-`origin/develop`.** El paso que falta es por lo tanto un **push autorizado**, no trabajo de ingenieria.
-No se ejercio con la persona agente a proposito: `user-agent-e2e-001` pasa el trigger, pero dejaria en
-una tabla append-only una atribucion humana ficticia y otorgaria creditos reales.
-
-**El bug class del NUL se cierra con gate.** El barrido encontro 3 archivos mas contaminados ademas del
-`credit-funding.ts` original — `efeonce-globe/packages/domain/src/media-derivatives.ts` (NUL real en el
-separador de `mediaDerivativeId`; corregido y **verificado runtime-identico**, ningun id cambia), y la
-skill `greenhouse-globe` + la propia TASK-1566, ambas con el byte **dentro de la linea que ensena a no
-escribirlo**. El archivo de la task era `data` para `file`, y por eso `grep` no devolvia ni sus
-encabezados. Nuevo `pnpm nul-byte-gate` cableado dentro de `pnpm local:check` (o sea del pre-push), con
-7 tests que ejercitan la **deteccion**, no solo el camino limpio. **Portado tambien a `efeonce-globe`**
-(`076ca4b`), donde nacio el defecto: dentro de `pnpm check` y con su test registrado a mano en el
-script `test`. Verificado que el push a `main` de Globe dispara **CI, no deploy** (`Deploy Internal` es
-`workflow_dispatch` manual). Dos correcciones documentales: la secuencia de verificacion todavia exigia
-"un segundo humano distinto", que es exactamente la contradiccion que ya habia bloqueado al operador.
+**Bug class del NUL cerrado con gate en LOS DOS repos** (`pnpm nul-byte-gate`; en Greenhouse dentro de
+`local:check`/pre-push, en Globe dentro de `check` — commit `076ca4b`). El barrido encontro 3 archivos
+mas ademas del `credit-funding.ts` original. Detalle en el Delta (4) y en la skill `greenhouse-globe`.
 
 **Pendientes vivos:** `authentication_required` (4.a fila de ISSUE-127, unica abierta) · los dos huecos
 del canary (`RUN_LABEL` exigido solo en `--execute`; el dry-run no reporta `withinDayCap`) · reconcile
