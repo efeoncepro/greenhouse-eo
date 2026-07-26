@@ -343,6 +343,23 @@ Esta sección es **load-bearing**: la task toca autoridad financiera, IAM cross-
 
 ### Slice ordering hard rule
 
+> 🔴 **Re-secuenciado 2026-07-26 (2). El orden original era incorrecto y costó un break-glass evitable.**
+> Ponía KMS (Slice 2) y la topología de identidades (Slice 3) **antes** del comando (Slice 4), como si el comando
+> dependiera de ellos. **No depende:** el runtime ya tiene el secreto en su env y ya tiene el verificador cableado
+> — falta **una superficie que firme adentro**; el lane ya funciona sin IAM nuevo (`greenhouse-portal@` ya
+> impersona `greenhouse-globe-caller`, `iam.tf:16-20`); y como **Greenhouse es la superficie**, el operador
+> confirma con su sesión de Greenhouse, **sin capability de Globe y sin el rollout de scopes de ADR-010**.
+>
+> **Orden vigente:** Slice 1 (fase, ✅ entregado) → **Slice 4 renombrado a "el comando sobre el HMAC existente",
+> que pasa a ser el SIGUIENTE** → Slice 5 (superficie en Greenhouse) → Slices 2 y 3 (KMS + identidades, ahora
+> **hardening**) → Slice 6 (retiro de autoridad vieja) → Slices 7-8.
+>
+> **La regla que se deriva, y vale más que este grafo:** cuando una task de gobernanza bloquea una capacidad que
+> alguien necesita **hoy**, el primer slice es **la capacidad gobernada** y el endurecimiento va después. Al
+> revés, la gobernanza no se adopta: se esquiva — y el esquive (break-glass) otorga **más** autoridad que el
+> camino que reemplaza.
+
+
 - **Slice 1** (fase de negación) es independiente y va **primero**: es el más barato, cierra la mitad de `ISSUE-124` y **sin él todo el diagnóstico de los slices siguientes es ciego**. Un 409 opaco durante el Slice 4 costaría la misma sesión que ya costó una vez.
 - **Slice 2** (KMS + verificador dual) → **Slice 3** (identidades + lane) → **Slice 4** (propose/confirm + transacción). Este es el camino crítico y no admite reordenamiento: no se pueden publicar los comandos sin las identidades, ni las identidades sin la clave que justifica la disyunción.
 - **Slice 5** (broker de Greenhouse) puede correr en paralelo con el Slice 4 una vez que el Slice 3 cerró, **pero su smoke end-to-end depende del Slice 4**.

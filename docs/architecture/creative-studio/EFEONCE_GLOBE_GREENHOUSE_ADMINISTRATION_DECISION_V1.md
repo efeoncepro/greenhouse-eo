@@ -1,7 +1,7 @@
 # Efeonce Globe — Administración desde Greenhouse (créditos y capabilities) Decision V1
 
 - **Decision:** ADR-015
-- **Status:** Proposed — diseño aceptado en dirección por el operador (2026-07-26); implementación y rollout pendientes. **Nada de esto está construido.**
+- **Status:** **Partially implemented** — dirección aceptada por el operador (2026-07-26). **Slice A entregado y verde** (fase de negación: cierra la mitad de diagnóstico de `ISSUE-124`; `pnpm check` + `pnpm build` en 0). **Roadmap re-secuenciado el mismo día**: el comando gobernado (Slice B) pasa **antes** de KMS y de la topología de identidades, que son hardening y no prerrequisitos — el error de orden original costó un break-glass evitable. Implementación de B en curso; C-H pendientes.
 - **Date:** 2026-07-26
 - **Owner:** Greenhouse control plane (superficie, identidad, desired access, entitlements) + Efeonce Globe (autoridad, firma, ejecución, evidencia)
 - **Scope:** La **administración de Globe desde Greenhouse** en sus dos mitades: **(a) créditos** — fondear el mes, emitir grants, publicar/superseder política de presupuesto, presupuestos de proyecto; y **(b) capabilities por usuario** — qué puede hacer cada persona dentro de cada workspace de Globe. Cubre la topología de identidades de las dos plataformas, el carril de transporte, el modelo de aprobación y firma, la atomicidad de la mutación, la observabilidad de la negación y la superficie de administración en el portal. **NO** cubre el ledger comercial en sí (TASK-1468), el spend fence de seguridad del Lab, la promoción de rutas (ADR-009/ADR-010), el payload de browser (ADR-014) ni el rollout comercial externo (TASK-1480).
@@ -142,7 +142,14 @@ Cuatro identidades nuevas. La regla que las ordena: **la que reconcilia tenancy 
 
 Precedente que se reusa, no se inventa: `apps/asset-governance` y `apps/media-derivatives` ya son unidades Cloud Run keyless separadas (ADR-007/ADR-008), y ADR-009/ADR-010 ya tienen **cuatro** SAs disjuntas para el saga de promoción. Costo honesto: **un deployable más en Globe**. Es del lado de Globe y no toca la frontera de deployables de `EPIC-027`, que gobierna `greenhouse-eo`.
 
-### 4. La llave de aprobación pasa a KMS asimétrico: leer deja de implicar forjar
+### 4. La llave de aprobación pasa a KMS asimétrico: leer deja de implicar forjar — **pero es HARDENING, no prerrequisito**
+
+> **Delta 2026-07-26 (2).** Este punto se secuenció mal en la primera versión: iba **antes** del comando, como si
+> el comando dependiera de él. **No depende.** El invariante *"la llave nunca sale del runtime de Globe"* **ya es
+> cierto hoy** — el secreto está en el env del api y sólo `api_runtime` lo lee. Lo que falta no es una llave mejor:
+> es **una superficie que firme adentro**. KMS mejora la postura de un carril que ya funciona (con HMAC, quien
+> verifica puede forjar), y por eso va **después** del Slice B. Ponerlo antes fue lo que dejó al operador pagando
+> break-glass para llegar al mismo lugar.
 
 Se reemplaza el HMAC compartido por una clave **asimétrica de KMS** (`EC_SIGN_P256_SHA256`, Cloud KMS, región del proyecto de Globe), con `asymmetricSign` concedido **exclusivamente** a `globe-credit-approver`.
 
@@ -374,11 +381,55 @@ Esto **cierra la mitad de diagnóstico de `ISSUE-124`** y evita que el carril nu
 
 ## Roadmap por slices
 
-- **Slice 0 — observabilidad del conflicto y el desambiguador.** La razón de fase estable y sanitizada en los comandos de administración de crédito; `budget.evaluate` y `budget.availability.get` a `ui: available` para principals de administración. **Cierra la mitad de diagnóstico de `ISSUE-124` y es prerrequisito de todo lo demás** — sin esto el carril nuevo hereda la misma ceguera. Sin identidades nuevas, sin KMS, sin flags: es el slice más barato y el que más rápido paga.
-- **Slice 1 — KMS asimétrico y verificador dual.** Habilitar `cloudkms.googleapis.com`, la clave de firma, el aprobador como unidad separada con `signerVerifier`, el verificador que acepta ambos formatos, y la señal que mide el uso del legacy. **El carril viejo sigue operando sin cambios.**
-- **Slice 2 — la topología de identidades y el lane.** Las cuatro identidades, sus bindings en Terraform (protocolo de import: `plan` con **cero** `destroy`/`replace` de identidad viva), las dos clases de workload en `internalServicePrincipal`, el coverage `sister-platform` de los comandos nuevos, y el guard de disyunción de callers extendido.
-- **Slice 3 — `propose` / `confirm` y la transacción única.** Los dos comandos, la propuesta durable con su máquina de estados, los ports transaction-scoped, la idempotencia en SQL, el readback y los tests de concurrencia. **Criterio de salida: un fondeo real, punta a punta, con UNA confirmación humana y cero break-glass.** El del mes que se agotó es el caso de prueba natural.
-- **Slice 4 — la superficie en Greenhouse.** La capability, el desired state de propuestas, el enforcement de proponente ≠ confirmante en Postgres, la superficie del portal con su Discovery de UI, y el retiro de los dos scripts. Verificación GVC del estándar premium.
-- **Slice 5 — retiro de la autoridad vieja.** El caller genérico pierde las cuatro capabilities de crédito; la señal de drift queda vigilando. **Sólo después del Slice 3 verde.**
-- **Slice 6 — capabilities por usuario.** Bloqueado por `tenancy_mode = enforced`. Desired state per-member en Greenhouse, validación write-time contra el techo OAuth, reconciliador leyendo per-member, señal de divergencia, y la superficie de administración por persona.
-- **Slice 7 — break-glass gobernado y retiro del HMAC.** El procedimiento con TTL/motivo/aprobación/revocación automática/readback y su contador; el retiro del HMAC cuando la señal del legacy esté en cero por la ventana declarada, con `api_runtime` perdiendo el acceso al secreto.
+> 🔴 **Re-secuenciado 2026-07-26 (2) — la primera versión de este roadmap tenía un error de orden que costó un
+> break-glass evitable.** Ponía **KMS y la topología de identidades ANTES del comando**, como si el comando
+> dependiera de ellos. **No depende.** El runtime de Globe **ya tiene el secreto en su env** y **ya tiene el
+> verificador cableado**: lo único que falta es **una superficie que firme adentro**. Y el lane hacia Globe **ya
+> funciona hoy sin IAM nuevo** — `greenhouse-portal@` ya puede impersonar `greenhouse-globe-caller`
+> (`iam.tf:16-20`, verificado). Y como **Greenhouse es la superficie**, el operador confirma con su sesión de
+> Greenhouse: **no necesita ninguna capability de Globe**, así que tampoco necesita el rollout de 3 pasos de
+> scopes OAuth que yo había puesto como techo.
+>
+> **Consecuencia:** el comando gobernado es **construible ahora**, contra el HMAC existente — que ya nunca sale
+> del runtime, porque eso ya es cierto hoy. **KMS asimétrico, aprobador ≠ ejecutor y el broker dedicado son
+> HARDENING: mejoran la postura, no habilitan la capacidad.** Secuenciarlos primero es lo que dejó al operador
+> pagando el break-glass por cuarta vez para llegar al mismo lugar.
+>
+> **Regla que se deriva y que vale más que este roadmap:** cuando una ADR de gobernanza bloquea una capacidad que
+> la gente necesita **hoy**, el primer slice es **la capacidad gobernada**, y el endurecimiento de su postura va
+> después. Al revés, la gobernanza no se adopta: se esquiva.
+
+- **Slice A — la fase de negación (✅ ENTREGADO 2026-07-26).** Razón de fase cerrada y sanitizada acompañando al
+  `conflict` en las tres clases de error de crédito; `approval()` separa sus tres fallas; los nueve
+  `err('conflict')` del store nombran su fase, con drift guard. **Cierra la mitad de diagnóstico de `ISSUE-124`.**
+  Cero identidades, cero KMS, cero flags. El flip de `ui: available` **salió** de este slice: no arreglaba nada
+  (`#authorize` evalúa coverage antes que capability, así que habría cambiado `policy_blocked` por
+  `access_denied`) y se reasignó al Slice F.
+- **Slice B — `credits.month.fund.propose` / `.confirm` sobre el HMAC existente. ESTE ES EL QUE DESBLOQUEA.**
+  Los dos comandos, la propuesta durable con su máquina de estados, la firma **dentro del runtime** (el api ya
+  tiene el secreto), grant + asiento de ledger + política publish/supersede en **UNA transacción Postgres**, los
+  ports transaction-scoped, idempotencia en SQL por `proposalId`, readback y tests de concurrencia. Coverage
+  `sister-platform: available`. **Criterio de salida: el fondeo del mes ejecutado con UNA confirmación humana y
+  CERO break-glass.**
+- **Slice C — la superficie de confirmación en Greenhouse.** El broker (`src/lib/globe/**`, reusando
+  `createGreenhouseGlobeClient` sobre el lane que ya funciona), la capability de Greenhouse + su grant en el mismo
+  PR, la tabla append-only de intenciones, y el punto donde el operador confirma. **Sin scope OAuth nuevo en
+  Globe: el humano confirma con su identidad de Greenhouse, no con una capability de Globe.** Retiro de los dos
+  scripts de firma cliente.
+- **Slice D — endurecimiento de la firma: KMS asimétrico y verificador dual.** Habilitar `cloudkms`, la clave, el
+  aprobador como unidad separada con `signerVerifier`, el verificador que acepta ambos formatos con **fecha de
+  retiro declarada** y la señal que mide el uso del legacy. **Mejora la postura de un carril que ya funciona** —
+  con HMAC, quien verifica puede forjar; con firma asimétrica, verificar y forjar se separan.
+- **Slice E — endurecimiento de la topología: las cuatro identidades disjuntas y el retiro de la autoridad
+  vieja.** Broker de administración distinto del reconciliador de tenancy, aprobador y ejecutor disjuntos por
+  unidad de ejecución, guard de disyunción de callers extendido, y el caller genérico **pierde** las cuatro
+  capabilities de crédito con su señal de drift vigilando. **Sólo con el Slice B verde.**
+- **Slice F — el desambiguador al alcance del operador.** `budget.evaluate` y `budget.availability.get` en `ui`
+  **con** su capability en el grant humano (rollout de 3 pasos de ADR-010), o por la vía que no requiera ampliarlo
+  (la razón viajando en el estimado, que el humano ya consume). Decidir la vía con evidencia.
+- **Slice G — capabilities por usuario.** Bloqueado por `tenancy_mode = enforced` (`TASK-1511`). Desired state
+  per-member en Greenhouse anclado al `Persona` canónico, validación write-time contra el techo OAuth,
+  reconciliador leyendo per-member, señal de divergencia y la superficie por persona.
+- **Slice H — break-glass gobernado y retiro del HMAC.** TTL, motivo, autorización atribuida, revocación
+  automática, readback del corte y su contador. El HMAC se retira cuando la señal del legacy esté en cero por la
+  ventana declarada, con `api_runtime` perdiendo el acceso al secreto.
