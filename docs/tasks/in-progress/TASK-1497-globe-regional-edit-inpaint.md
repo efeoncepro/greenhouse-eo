@@ -38,7 +38,9 @@ al vocabulario de edit (transport-neutral: una máscara declarada por hash + rig
 y un **canal de máscara server-internal** que viaja por el **mismo track de private-ingest (track B)** que ya
 resuelve `parentOutput` y `resolvedInputs` a bytes — la máscara nunca cruza el wire. El **mecanismo de inpaint
 (mask param) vive DENTRO de cada adapter** (Fal `mask_url`, Vertex/Nano-Banana inpaint), nunca en policy de
-dominio, exactamente como el paradigma stateful/reference de TASK-1490.
+dominio, exactamente como el paradigma stateful/reference de TASK-1490. TASK-1495 puede reutilizar este seam
+para `adapt-existing` cuando un cambio de formato requiere outpaint/reframe generativo; 1497 sigue siendo dueña
+del mecanismo regional, no del catálogo de formatos ni del Format Set.
 
 ## Why This Task Exists
 
@@ -165,6 +167,8 @@ Reglas obligatorias (boundary DURO — repetir del brief de la categoría ②):
 - El dominio no sabe si el modelo ejecutor **soporta inpaint** — no puede fallar closed pre-spend sobre un modelo
   que sólo edita full-asset.
 - El manifest no distingue **edición full vs regional** (`editScope`), así que un cambio de alcance sería silencioso.
+- El seam aún no declara de forma interoperable qué estrategias de preservación puede usar una adaptación de
+  formato (`strict`/`natural`) ni qué evidencia debe devolver para que TASK-1495 y el ledger liquiden el resultado.
 
 ## Modular Placement Contract
 
@@ -466,6 +470,9 @@ adicionales", no adivinar por índice. La regla cross-surface del stateful sigue
   reservar gasto (verificado por test).
 - [ ] El manifest del edit registra `editScope: 'regional'` + lineage al padre; el spend fence lo cobra como
   experimento nuevo.
+- [ ] Cuando el edit regional se invoca como parte de `adapt-existing`, el manifest conserva también el formato
+      origen, ratio destino, estrategia de adaptación y política de preservación; no se registra como una simple
+      generación con otro `aspectRatio`.
 - [ ] La máscara/candidato de otro workspace se rechaza (tenant boundary verificado).
 - [ ] Evidencia en vivo: un chain generate → regional edit por el seam sobre un modelo con inpaint real, con la zona
   enmascarada alterada y el resto del asset preservado, y manifest con `editScope=regional`.

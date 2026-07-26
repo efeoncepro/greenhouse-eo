@@ -341,6 +341,8 @@ Cambio **aditivo** en el runtime de `efeonce-globe`: reader nuevo + tipo + seam 
       cuando aplique; audio no recibe controles de cámara.
 - [ ] La respuesta distingue lo explícito, inferido y sugerido, y puede recomendar locks de cámara,
       sujeto, luz o estilo sin mutar el brief ni aplicar cambios automáticamente.
+- [ ] La interpretación declara limitaciones de formato/capability cuando la combinación solicitada no está
+      confirmada; no inventa soporte ni convierte silenciosamente una adaptación en generación nativa.
 - [ ] La interpretación se invoca **solo** por `BriefInterpreterPort`; no hay import de SDK de provider en `packages/domain`.
 - [ ] El reader **no muta** el experimento ni el brief (test verde: `state` y `request` idénticos antes/después).
 - [ ] Un experimento de otro workspace no es legible (test de denegación cross-workspace verde).

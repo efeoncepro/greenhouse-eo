@@ -326,6 +326,8 @@ y rollback probado. Un modelo fuerte generalista sin profiles/evals no constituy
 - [ ] Evals rechazan propuestas que mejoran sintaxis/target fit pero degradan intención, creative latitude o
   atribución de autoría.
 - [ ] Profiles cubren Image/Video/Audio y operaciones promovidas con compatibilidad de catálogo.
+- [ ] Cada propuesta declara el target profile, modalidad, operación, formato, restricciones y capabilities
+      realmente disponibles; nunca presenta una combinación provider/ratio/operación no verificada como lista.
 - [ ] Pipeline y validators preservan literals/constraints y bloquean injection/policy leakage.
 - [ ] Al menos dos candidatos comparables pasan la misma suite antes de decidir default, o se documenta por qué
   sólo uno es operativo y el estado permanece no promovido.

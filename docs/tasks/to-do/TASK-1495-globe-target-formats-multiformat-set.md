@@ -83,6 +83,8 @@ fila "Formatos objetivo … Set de key visuales").
 - El formato objetivo es un campo transport-neutral del contrato del run, validado y almacenado
   server-side; esta task no redefine `OutputShapeV1`, sino que completa el catálogo y el comportamiento
   real de sus valores.
+- La capacidad de formato se prueba como una matriz `capability × route × operation × ratio`; una entrada
+  sólo puede declararse disponible cuando existe evidencia del request aceptado y del output final.
 - El mapeo formato → vocabulario del provider vive DENTRO de cada `CreativeProviderAdapter` (Veo,
   Omni, imagen); un formato que una capability no puede producir se rechaza ANTES del gasto
   (readiness), nunca se coerciona en silencio.
@@ -92,6 +94,9 @@ fila "Formatos objetivo … Set de key visuales").
 - Una adaptación de formato es distinta de una generación nativa: recibe un asset origen y una estrategia
   explícita (`preserve-source`, `reframe`, `expand-background`, `generative-outpaint` o equivalente
   validado), declara qué elementos debe preservar y devuelve evidencia por output.
+- La adaptación reutiliza el mecanismo de edición regional de TASK-1497 cuando necesita máscara/outpaint;
+  TASK-1495 conserva la autoridad sobre el formato destino, la estrategia, el agregado y el costo, sin
+  duplicar el provider seam.
 - La capacidad nace con Full API Parity (command + reader transport-neutral + coverage), con `ui`
   naciendo `policy-blocked` hasta promocion de ruta.
 
@@ -153,7 +158,8 @@ Reglas obligatorias (boundary DURO — repetir de TASK-1481/1490):
 - `TASK-1474` — Globe Professional Studio Workbench (consume "Formatos objetivo" y "Set de formatos").
 - Complementa sin solapar: `TASK-1496` (seed/variar/relanzar — variacion es N variantes de un mismo
   formato; el Set es un mismo brief en N formatos distintos), `TASK-1493` (brief estructurado),
-  `TASK-1494` (Style DNA), `TASK-1497` (mecanismo de edición/inpaint para adaptación generativa).
+  `TASK-1494` (Style DNA), `TASK-1497` (mecanismo de edición/inpaint para adaptación generativa),
+  `TASK-1579` (política de rating/settlement/fallback) y `TASK-1468` (ledger y reservations).
 
 ### Files owned
 
@@ -416,6 +422,12 @@ Reglas obligatorias (boundary DURO — repetir de TASK-1481/1490):
 - **Set parcial honesto.** Si un miembro falla (provider o formato no soportado detectado tarde), el
   Set no miente: reporta el estado por miembro (algunos `candidate_ready`, otros `failed`), nunca
   colapsa a un unico "ok/no ok" ni fabrica un output faltante.
+- **Matriz de evidencia.** Cada capability/route/operación publica sólo formatos confirmados y conserva
+  evidencia de request, output dimensions, provider mapping, versión de catálogo y fecha de verificación.
+  Un ratio listado pero no verificado queda `gated` o `unknown`, nunca `available`.
+- **Adaptación y gasto.** `adapt-existing` recibe un asset padre, ratio destino, estrategia y preservaciones;
+  su estimate incluye el trabajo de adaptación. Cambiar el ratio de una generación nueva no se cobra ni se
+  presenta como una adaptación de un asset existente.
 - Confirmar contra el codigo real de `efeonce-globe` los nombres exactos de campos/capabilities y la
   forma del store antes de implementar; marcar `[verificar]` cualquier supuesto que no se confirme en
   Discovery.
@@ -514,6 +526,12 @@ OFF.
       texto/logo, producto y composición; una limitación del provider aparece como estado honesto.
 - [ ] Las capabilities de formato/Set estan en el coverage manifest (`ui`/`mcp` `policy-blocked`; resto
       `available`) y el coverage/conformance test pasa.
+- [ ] Existe una matriz verificable `capability × route × operation × ratio` con estados `available`,
+      `gated`, `unsupported` o `unknown`; ningún ratio no probado se presenta como disponible.
+- [ ] La operación `adapt-existing` conserva parent lineage, strategy, target ratio, preservation policy y
+      resultado de preservación; una adaptación no se confunde con cambiar el `aspectRatio` de una generación.
+- [ ] El estimate/reservation/settlement de una adaptación, Set o fallback consume la policy versionada de
+      TASK-1579 y el ledger de TASK-1468; la UI no calcula ni suma créditos localmente.
 - [ ] `cd ../efeonce-globe && pnpm check && pnpm build` verdes en el ultimo commit.
 
 ## Verification

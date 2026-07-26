@@ -121,7 +121,7 @@ control, duración, output contract, quality tier o la política aprobada.
 Cada rate version declara:
 
 - capability class (`image_generate`, `video_generate`, `audio_generate`, `voice_generate`, `specialist_inference`,
-  etc.);
+  `prompt_direction`, `format_adaptation`, `regional_edit`, `format_set`, etc.);
 - quality tier y shape constraints;
 - unidad de cantidad/duración y reglas de redondeo;
 - modifiers permitidos y su justificación;
@@ -132,6 +132,17 @@ Cada rate version declara:
 - approval authority y change reason.
 
 Los tokens, dólares, costo contractual del provider y margen Efeonce no son unidades públicas de credits.
+
+### Creative operation semantics
+
+- `prompt_direction` y `specialist_inference` deben declarar si son gratuitos, incluidos en una generación o
+  consumen una banda propia; nunca pueden activar gasto oculto al escribir en el composer.
+- `format_adaptation` y `regional_edit` son operaciones creativas nuevas sobre un asset existente: deben
+  conservar parent lineage, estrategia, preservaciones y ratio destino en la identidad de estimate/reservation.
+- `format_set` agrega miembros con un tope común; cada miembro puede tener rate propio, pero el agregado no
+  puede superar el envelope autorizado ni crear reservations huérfanas.
+- Cambiar prompt, receta, cámara, ratio, estrategia, preservación o route invalida el fingerprint vigente y
+  exige un nuevo estimate cuando modifica la operación económica.
 
 ### Estimate, reservation, actual and settlement
 
@@ -284,6 +295,12 @@ settlement delay, partial output, route availability drift, credits per successf
 ## Acceptance Criteria
 
 - [ ] Existe una fórmula única y versionada que resuelve capability, tier, shape, quantity/duration y modifiers.
+- [ ] La policy define el tratamiento económico de `prompt_direction`, `format_adaptation`, `regional_edit` y
+      `format_set`, incluyendo si consumen credits, si están incluidos o si requieren rate propia.
+- [ ] Cambiar ratio, estrategia de adaptación, preservación, cámara, receta o parent asset cambia la identidad
+      económica cuando corresponde e invalida el estimate anterior; no existe cobro oculto.
+- [ ] Un Format Set respeta un envelope agregado y una adaptación conserva lineage, ratio origen/destino,
+      estrategia y preservación en estimate, reservation y settlement.
 - [ ] `estimate`, `reservation`, `actual`, `settlement`, `release` y `adjustment` tienen semántica y balance effect explícitos.
 - [ ] Estimate/actual drift, caps y reauthorization están definidos; no existe cobro silencioso por encima del envelope.
 - [ ] Fallback, retry, timeout, partial output, batch y cambio creativo tienen outcomes deterministas y auditables.

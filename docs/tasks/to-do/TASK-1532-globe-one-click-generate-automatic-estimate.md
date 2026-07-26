@@ -85,6 +85,8 @@ TASK-1505 está sobrecargada e in-progress; este slice tiene ownership, verifica
 - Confirmación adicional sólo ante policy/costo material, no para cada run.
 - Latencia, insuficiencia, stale state y unknown outcome tienen recovery honesto.
 - Una propuesta aceptada por TASK-1531 invalida el estimate anterior y dispara uno nuevo sin acción manual.
+- Cambiar formato, estrategia de adaptación, preservación, cámara, receta o asset padre invalida el estimate
+  cuando cambia la operación económica; una adaptación no se trata como una generación nativa.
 - El sistema absorbe la ceremonia técnica de calcular; el operador conserva costo visible y la decisión de gastar.
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
@@ -377,6 +379,8 @@ parpadeante, requests inútiles y una carrera entre el texto original y la propu
   para el structured brief aceptado.
 - [ ] El fingerprint cubre brief/proposal revision, route/catalog, modalidad/operación, output, referencias,
   estilo, seed y negative constraint.
+- [ ] Native generation, preserve-source, adapt-existing, regional-edit y Format Set producen fingerprints y
+      estimates distinguibles; la UI no suma créditos localmente ni reutiliza un estimate de otra operación.
 - [ ] Un click resuelve estimate→validate→prepare sin segunda acción normal.
 - [ ] Costo vigente es visible y diferencia material detiene antes del spend.
 - [ ] Doble click/timeout/retry no duplican reserva ni run.
