@@ -96,9 +96,27 @@ Por eso la versión del tarball **no** es cosmética: es load-bearing para la re
 - `getEffectiveAccess` dejando de responder `projection-stale`.
 - La señal nueva en steady 0, y **verificada disparando** con un drift inyectado a propósito — una señal que nunca se vio en rojo no está probada.
 
+### Verificación runtime — ejecutada 2026-07-26
+
+Deploy del `ops-worker` disparado por el push a `develop` (`f7a38718d`, workflow keyless `ops-worker-deploy.yml`, observa `vendor/**` + `pnpm-lock.yaml`), concluido `success`. Y la recuperación quedó visible en los logs, con **dos corridas consecutivas en verde**:
+
+| Hora (UTC) | Resultado | Duración |
+|---|---|---|
+| 10:55:00 | `failed — globe_tenancy_capability_invalid` | 46 ms |
+| 10:55:16 | `failed — globe_tenancy_capability_invalid` | 10 ms |
+| 11:00:00 | `failed — globe_tenancy_capability_invalid` | 62 ms |
+| **11:00:21** | **`done`** | **3776 ms** |
+| **11:05:10** | **`done`** | **1351 ms** |
+
+`status.code` del Cloud Scheduler pasó de **`13` (INTERNAL) a ausente**.
+
+**El dato que prueba la recuperación no es "dejó de fallar", es la DURACIÓN.** Los fallos tomaban 10-62 ms porque lanzaban **antes de tocar nada**; 3776 ms significa que atravesó la reconciliación completa. Un "no falla" de 10 ms habría sido indistinguible de un no-op.
+
+**Lo que quedó inferido y no observado, y hay que decirlo:** que `brokerExpiresAt` se refrescó se deriva del camino de escritura — un reconcile exitoso hace `ON CONFLICT DO UPDATE SET ... broker_expires_at=EXCLUDED.broker_expires_at` (`tenancy-store.ts:84`) — **no de una lectura directa de la proyección de Globe**, que exige el caller impersonado. La verificación directa (`getEffectiveAccess` dejando de responder `projection-stale`) queda para el canary.
+
 ## Estado
 
-open
+open — **el sangrado está cerrado y verificado en runtime** (re-vendorizado + guard probado en rojo + `ops-worker` desplegado + dos reconciles consecutivos). Siguen abiertos los tres puntos que evitan el próximo: **la señal de frescura de la proyección** (su ausencia es lo que permitió los dos días), **la degradación por-capability** en vez de tumbar el workspace completo, y el **bump de versión del tarball** con el ensanche del peer exacto del SDK.
 
 ## Relacionado
 
