@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-028`
-- Status real: `Diseno`
+- Status real: `Slices 1/4a/4b entregados y desplegados (rev 00102-nxk, migracion 0032, flag OFF verificado); 4c bloqueado por deadlock de lock advisory`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -508,6 +508,60 @@ Validación manual (no automatizable, y es una propiedad del diseño):
 - **El guard de "un solo grant activo"** de `ISSUE-124`: decidir si es política deseada o si el 409 venía de otra fase (que el Slice 1 vuelve observable).
 - **Modelo de roles de administración de crédito**: si `propose` y `confirm` son dos capabilities sobre los ROLE_CODES existentes o merecen un rol nuevo. Decidir contra los **14 ROLE_CODES reales** de `src/config/role-codes.ts`, nunca contra un rol fantasma.
 - **Aplicar el mismo carril al resto de la administración de crédito** (pools, budgets de proyecto, correcciones) si el patrón `propose`/`confirm` resulta el correcto para el fondeo.
+
+## Delta 2026-07-26 (3) — Slices 4a y 4b entregados; 4c tiene un bloqueo de diseño CONCRETO
+
+**Estado real: `Diseño` era falso.** Slice 1 entregado (`369dc99`), el dominio de `propose`/`confirm`
+entregado (`493318f`), y ahora el carril **cableado y durable**. Desplegado en `globe-api-internal`
+revisión **`00102-nxk`** (imagen `add15d888696`), migración `0032` aplicada, **flag OFF verificado
+contra el runtime**: las tres capabilities NO aparecen en `/v1/capabilities` (173 publicadas, ninguna
+de fondeo). Cero exposición.
+
+### Slice 4a (`ffcb470`) — estaba escrito y desconectado
+
+`registerCreditFundingCapabilities` vivía en el dominio con sus 12 tests en verde y **no lo llamaba
+nadie**: despachar `globe.credits.month.fund.propose` devolvía `capability_not_found`. Los tests del
+dominio no podían verlo porque ejercitan el handler directo — el hueco estaba en el cableado. El test
+nuevo assertea contra `/v1/capabilities`, que es lo que un caller ve, y **se probó en rojo** antes.
+
+Tres cosas que el compilador y los tests obligaron a corregir:
+
+1. **`creditAdminApproval` estaba tipado como verificador y se usaba como firmador.** El compilador lo
+   rechazó, y tenía razón: es el defecto que ADR-015 cierra ("quien verifica puede forjar"). Se
+   inyectan como **dos dependencias distintas**, hoy satisfechas por el mismo objeto HMAC.
+2. Los adapters de política **reusan** `getPolicySnapshot` + `getAvailability`; derivar la
+   disponibilidad aparte es la vía directa a un plan que promete lo que el `execute` después niega.
+3. `mut` → `creditAdminMutationContext`, **exportado** en vez de duplicado: dos derivaciones del
+   `fingerprint` pueden divergir y romper la idempotencia en silencio.
+
+**Hallazgo fuera de la spec:** `credit-funding.ts` tenía **3 bytes NUL crudos** como separador de
+clave. UTF-8 válido, compila, ningún gate lo atrapa — pero `file` lo reporta como `data` y **todo
+grep lo salta como binario**, lo que hizo concluir dos veces que un símbolo no existía. Corregido a
+` `.
+
+### Slice 4b (`add15d8`) — la propuesta se vuelve durable
+
+Migración `0032` + `DurableCreditFundingProposalStore`. El in-memory a `maxScale=3` no es "volátil"
+sino **no determinista**: el síntoma sería un `not_found` **intermitente** al confirmar. Las dos
+carreras se resuelven **en SQL**: `create` idempotente por unique **parcial** `(workspace_id,
+fingerprint) WHERE state='proposed'`, y `transition` como `UPDATE … WHERE state = <esperado>`.
+
+### 🔴 Slice 4c — la transacción única NO es un slice pequeño, y la vía obvia DEADLOCKEA
+
+`DurableCreditAdministrationStore` abre **`pool.transaction` por método** (11 call-sites de `mutate`)
+y cada una toma `pg_advisory_xact_lock(credit:workspace:X)`. Envolver `confirm` en una transacción
+externa hace que la interna pida **el mismo lock advisory desde otra conexión**: la externa no puede
+commitear porque espera a la interna, y la interna no obtiene el lock porque lo tiene la externa.
+**No es "queda no atómico": se cuelga, en el camino del dinero.**
+
+Cerrarlo de verdad exige lo que la propia spec pide —variante transaction-scoped del
+`CreditAdministrationStorePort` enhebrando `GlobeQueryable`— y eso toca ~20 métodos del archivo más
+denso del repo, con locks advisory y recibos de idempotencia. **Merece una pasada propia, no la cola
+de otra sesión.** Hasta entonces el flag queda OFF y el carril viejo opera sin cambio.
+
+Mientras tanto el estado parcial es **detectable y resumible** por `proposalId` (`confirm_failed` +
+claves de idempotencia derivadas), que es estrictamente mejor que hoy — pero **no** es la atomicidad
+que la ADR pide, y el código lo declara.
 
 ## Delta 2026-07-26 (2) — el segundo humano baja de invariante a política
 

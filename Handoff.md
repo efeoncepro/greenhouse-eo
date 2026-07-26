@@ -31,6 +31,32 @@ Quedaron confirmadas las postulaciones a **FLUX Creator Program**, **Runway Ente
 Las skills `efeonce-business-model-operator` y `efeonce-customer-model-operator` (Codex y companions de Claude) ya
 incorporan la clasificación y los gates para evaluar partners/providers; el estado concreto sigue viviendo en el audit.
 
+## 2026-07-26 — TASK-1566: el carril de fondeo, cableado y durable; 4c bloqueado por un deadlock real
+
+**Slices 4a (`ffcb470`) y 4b (`add15d8`) entregados, pusheados y desplegados** — `globe-api-internal`
+revisión **`00102-nxk`** (imagen `add15d888696`), migración **`0032` aplicada** (plan leído antes:
+`pending: [0032]`, cero `unexpected`, cero `checksumMismatches`). **Flag OFF verificado contra el
+runtime**: `/v1/capabilities` devuelve 173 y **ninguna** de fondeo. Cero exposición.
+
+**4a — estaba escrito y desconectado.** `registerCreditFundingCapabilities` vivía en el dominio con
+12 tests verdes y **no lo llamaba nadie**: despachar `…fund.propose` daba `capability_not_found`. Los
+tests del dominio no podían verlo (ejercitan el handler directo; el hueco estaba en el cableado). El
+test nuevo assertea contra `/v1/capabilities` y **se probó en rojo** antes. De paso el compilador
+atrapó que `creditAdminApproval` estaba tipado como **verificador** y se usaba como **firmador** — el
+defecto exacto que ADR-015 cierra; ahora son dos dependencias.
+
+🔴 **4c NO es un slice pequeño, y la vía obvia DEADLOCKEA.** `DurableCreditAdministrationStore` abre
+`pool.transaction` **por método** (11 call-sites) y cada una toma `pg_advisory_xact_lock` del mismo
+workspace. Envolver `confirm` en una transacción externa hace que la interna pida ese lock **desde
+otra conexión**: la externa no commitea porque espera a la interna, la interna no obtiene el lock
+porque lo tiene la externa. **Se cuelga, en el camino del dinero.** Cerrarlo exige la variante
+transaction-scoped del port (~20 métodos, archivo denso, locks + recibos de idempotencia): **pasada
+propia, no cola de sesión**. Flag OFF hasta entonces; el carril viejo opera sin cambio.
+
+🔴 **Hallazgo transversal:** `credit-funding.ts` tenía **3 bytes NUL crudos** como separador de clave.
+UTF-8 válido, compila, **ningún gate lo atrapa** — pero `file` lo reporta como `data` y **todo grep lo
+salta como binario**, lo que me hizo concluir dos veces que un símbolo no existía. Corregido.
+
 ## 2026-07-26 — ESTADO VIGENTE de Globe (consolida el hilo del día; las entradas de abajo son narrativa superada)
 
 > **Leer sólo esta para saber dónde está Globe.** Abajo hay 6 entradas del mismo hilo de hoy, escritas por dos
