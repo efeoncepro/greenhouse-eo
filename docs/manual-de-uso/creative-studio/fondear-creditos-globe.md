@@ -4,7 +4,7 @@
 > **Version:** 1.0
 > **Creado:** 2026-07-26 por Claude (TASK-1566)
 > **Ultima actualizacion:** 2026-07-26 por Claude
-> **Documentacion tecnica:** [ADR-015](../../architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md) · [TASK-1566](../../tasks/in-progress/TASK-1566-globe-governed-credit-funding-command.md)
+> **Documentacion tecnica:** [ADR-015](../../architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md) · [TASK-1566](../../tasks/complete/TASK-1566-globe-governed-credit-funding-command.md)
 
 ## Para qué sirve
 
@@ -125,7 +125,7 @@ tope) y `allocationEntryId`. Todo ocurre en **una** transacción: grant + asient
 ## Referencias técnicas
 
 - Decisión: [ADR-015 — Greenhouse administra Globe](../../architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md)
-- Implementación + evidencia del primer fondeo real: [TASK-1566](../../tasks/in-progress/TASK-1566-globe-governed-credit-funding-command.md) (Deltas 4–6)
+- Implementación + evidencia del primer fondeo real: [TASK-1566](../../tasks/complete/TASK-1566-globe-governed-credit-funding-command.md) (Deltas 4–6)
 - Estado vivo (revisiones, pool, flags): [`GLOBE_RUNTIME_HANDOFF.md`](../../operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md)
 - Explicación en simple: [documentación funcional](../../documentation/creative-studio/fondeo-gobernado-creditos-globe.md)
 - Reglas de gasto/crédito para agentes: skill `greenhouse-globe` § «Gasto y crédito en Globe»

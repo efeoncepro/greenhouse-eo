@@ -1,5 +1,14 @@
 # TASK-1469 — Globe Governed Run Lifecycle, Submission Fence and Provider Completion
 
+## Delta 2026-07-26
+
+- **Caso nuevo para la terminalización del reconcile:** el carril de fondeo (TASK-1566, cerrada)
+  dejó **3 propuestas de `credit_funding_proposals` colgadas en `confirmed`** (cuelgues pre-fix del
+  defecto 7) + 1 `confirm_failed`. El TTL sólo vence `proposed`, así que NO se terminalizan solas, y
+  re-confirmarlas da `conflict` (expectativa de estado). La reconciliación/terminalización que esta
+  task diseñe debe cubrir ese estado — nunca SQL manual (evidencia inmutable del incidente).
+
+
 ## Delta 2026-07-26 — el mecanismo ESTÁ vivo; lo que queda es la terminalización del reconcile
 
 **Medido contra el runtime, no leído.** Cuatro runs pagados desde la UI (principal `human` por el BFF, no el

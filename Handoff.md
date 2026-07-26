@@ -1,5 +1,18 @@
 # Handoff activo
 
+## 2026-07-26 — Catálogo inicial de Creative Services
+
+Se creó [`docs/services/creative-services/README.md`](docs/services/creative-services/README.md) y se enlazó
+desde [`docs/services/README.md`](docs/services/README.md). El catálogo separa la línea de negocio Creative
+Services de la product brand Globe / Creative Studio, y define como primera cartera: Creative Capacity / Managed
+Creative Squad, Brand & Identity Systems, Campaign & Key Visual Systems, Content & Social Operations, Audiovisual /
+Motion & Audio Production y Creative Studio Access. Creative Diagnostic queda como cuña de entrada; Editorial
+Content & SEO se mantiene como composición con Wave/Search Visibility hasta resolver boundary y pricing.
+
+Estado: `Approved for validation`; no habilita precios públicos ni venta self-serve. Próximo paso: crear las fichas
+completas por oferta, el Pricing Integrity Pack de Creative Services y los gates de Finance/Legal/evidencia antes de
+declarar cualquier servicio `Commercially approved`.
+
 ## 2026-07-26 — Taxonomía de portfolio Efeonce corregida
 
 Se estableció el contrato [`EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md`](docs/architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md): **Efeonce es la marca paraguas y relación comercial; Creative Services, Digital Services & Engineering, RevOps & CRM, Media & Distribution y Growth Strategy & Measurement son líneas de negocio/prácticas; Globe, Wave, Reach, Kortex y Verk son product brands o platform brands; Greenhouse es el control plane; las ofertas y delivery models viven debajo de esas capas**. Se sincronizaron context pack, business models, catálogo de servicios y skills Codex/Claude. Los labels históricos de runtime pueden permanecer donde sean identificadores técnicos; no deben usarse como taxonomía comercial nueva.
@@ -155,8 +168,13 @@ firma cliente `raise-credit-monthly-cap*` eliminados (Slice C). Smoke post-retir
 cap 800/disponible 444. **Triple documentacion creada ANTES del retiro:** manual
 `manual-de-uso/creative-studio/fondear-creditos-globe.md` + funcional
 `documentation/creative-studio/fondeo-gobernado-creditos-globe.md` + ADR-015 Delta (3) + skill.
-**Los 5 Goals de TASK-1566 entregados**; lo restante (KMS, identidades por unidad, UI, break-glass
-gobernado) es hardening ADR-015 Slices D-H — candidato a cerrar la task y abrir hijas nuevas.
+✅ **TASK-1566 CERRADA (2026-07-26)** con gates completos (`pnpm test` full + `pnpm build` prod
+verdes; task:lint limpio) y el hardening restante creado como hijas nuevas de EPIC-028:
+**TASK-1584** (ADR-015 D+E: KMS asimétrico + identidades disjuntas por unidad), **TASK-1585**
+(Slice H: break-glass gobernado + retiro del HMAC; bloqueada por 1584) y **TASK-1586** (Slice F:
+desambiguador de negación al operador vía broker lane — cierra ISSUE-124). La superficie ui-ux de
+administración NO se creó como task a propósito: exige wireframe real (nada de stubs); nace vía
+product-design-loop cuando se priorice, consumiendo los contratos de 1586.
 Higiene pendiente: **3** propuestas en `confirmed` colgadas (pre-fix) + 1 `confirm_failed`; el TTL
 solo vence las `proposed`, no se terminalizan solas (TASK-1469).
 

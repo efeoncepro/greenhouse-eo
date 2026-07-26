@@ -69,3 +69,16 @@ open — **causa de la ambigüedad identificada y con dueño (2026-07-26)**. La 
 ## Relacionado
 
 TASK-1553; **TASK-1566** (dueño de la solución de diagnóstico, Slice 1); **ADR-015** (`docs/architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md`, § `Y una pieza de ISSUE-124 que esta sesión resuelve` + Decisión punto 9); ADR-014 § Delta 2026-07-26 (4); ADR-009; `apps/studio-web/src/dispatch.ts` § `handlerErrorToApiCode`; `packages/domain/src/credit-administration.ts` (`approval()` + `COVERAGE`); `packages/database/src/stores/credit-administration-store.ts`; migration `0023_credit_receipt_command_grain.sql`.
+
+
+### Delta 2026-07-26 (2) — la mitad de diagnóstico quedó CERRADA (TASK-1566, cerrada); la mitad operativa tiene dueña: TASK-1586
+
+La fase de negación server-side existe y está desplegada (`CreditDenialPhaseV1` como enum cerrado:
+`pool_not_active`, `policy_already_active`, `replay_fingerprint_mismatch`, `approval_expired`,
+`approval_invalid`, `approval_self_confirmed`, `grant_state_conflict`, `version_conflict`, etc.) —
+ningún `conflict` del store sale sin fase declarada, y el carril de fondeo gobernado
+(`propose`/`confirm`) corrió end-to-end el 2026-07-26.
+
+**Lo que mantiene este issue abierto** es la mitad operativa: que el OPERADOR, con su sesión, pueda
+leer la razón vigente sin impersonar el workload caller. Eso es `TASK-1586` (ADR-015 Slice F: rutas
+broker para `budget.evaluate` + `budget.availability.get`). Este issue se cierra con esa task.

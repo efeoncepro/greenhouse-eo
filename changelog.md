@@ -7,6 +7,26 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-26 — TASK-1566 COMPLETE: fondeo gobernado de créditos de Globe vivo, ejercido y con la autoridad vieja retirada
+
+- **Primer fondeo real de Globe punta a punta sin break-glass**: `propose` (plan legible con el delta
+  completo) → `confirm` en 905 ms con atribución humana real; grant +100 `posted`, tope 400→800 y
+  asiento de ledger en **una** transacción; `pg_locks` 0/0/0 después. En el camino se cerraron los
+  7 defectos en cadena de la sesión (incluida la federación WIF Vercel→Globe que **nunca** había
+  funcionado y el self-deadlock del store transaccional — regla nueva: dentro de la transacción,
+  ningún port abre conexión propia).
+- **Retiro ejecutado (ADR-015 §10)**: el caller genérico (y el broker de tenancy) perdió las 4
+  capabilities de credit-admin; señal anti-regreso en dos capas (evento
+  `globe.credit_admin.caller_authority_drift` + test de disyunción); scripts de firma cliente
+  eliminados.
+- **Triple documentación**: manual `docs/manual-de-uso/creative-studio/fondear-creditos-globe.md`
+  (con las dos correcciones de runbook medidas: clave de idempotencia propia para el confirm;
+  anti-replay del broker por propuesta), funcional
+  `docs/documentation/creative-studio/fondeo-gobernado-creditos-globe.md`, ADR-015 delta + skill.
+- **Hardening restante como tasks nuevas**: `TASK-1584` (KMS + identidades disjuntas),
+  `TASK-1585` (break-glass gobernado + retiro del HMAC), `TASK-1586` (desambiguador de negación al
+  operador — cierra ISSUE-124).
+
 ## 2026-07-26 — Portfolio Efeonce: marca paraguas, líneas y product brands
 
 - Se canonizó la separación entre **Efeonce** como marca paraguas/relación comercial, líneas de negocio/prácticas,
