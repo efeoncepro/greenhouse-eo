@@ -44,7 +44,7 @@ agentes**. Su cartera canónica tiene cinco familias:
 | Web, performance y arquitectura digital | Wave | Owner de diseño técnico, delivery y operación |
 | Measurement & Analytics | Wave | Implementa y opera instrumentación bajo el contrato de medición |
 | Sistemas de agentes | Wave | Owner de ingeniería y operación técnica; Efeonce Digital define el outcome de negocio cuando aplica |
-| Contenido y producción creativa | Globe | Proveedor/partner de Wave cuando el plan necesita assets o contenido |
+| Contenido y producción creativa | Globe | Capability de Efeonce con plataforma, especialistas, Managed Squad y Staff Augmentation; partner de Wave cuando el plan necesita assets o producción |
 | Medios, PR y amplificación | Reach | Partner de distribución cuando el plan lo necesita |
 
 **CRM enablement no es una familia de Wave.** Puede existir una integración CRM dentro de una entrega Wave, pero la
@@ -67,7 +67,8 @@ no como marcas de portfolio.
 - Wave deja de ser una etiqueta genérica de infraestructura y adquiere una cartera de productized services clara y
   nombrable como marca de producto.
 - Search Visibility 360 es la propuesta 360 de SEO+AEO, no una capability separada de dos productos rivales.
-- Globe conserva contenido/producción; Wave conserva estrategia de visibilidad, ingeniería y medición.
+- Globe conserva contenido/producción, personas y operación creativa; Wave conserva estrategia de visibilidad,
+  ingeniería y medición.
 - Efeonce Digital conserva CRM, RevOps y la decisión de negocio; Wave puede ejecutar la capa técnica conectada.
 - Hacia el cliente Efeonce lidera la relación y Wave puede nombrar el producto/capability; Wave, Globe, Reach y
   Efeonce Digital no se presentan como agencias/proveedores contractuales separados.

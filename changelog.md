@@ -30,6 +30,25 @@
   `src/lib/sister-platforms/**`). El pointer **no** se agregó a `CLAUDE.md`: el router estaba a 27 tokens del techo
   y el routing ya existe vía la skill y el índice de `creative-studio`.
 
+## 2026-07-26 — Experience LaunchOps + Globe: producción creativa para experiencias launch-ready
+
+- Se creó `docs/architecture/EFEONCE_EXPERIENCE_LAUNCHOPS_GLOBE_CREATIVE_PRODUCTION_INTEGRATION_V1.md`.
+- La frontera queda explícita: Globe produce `CreativeAssetPack`, `AssetManifest` y `AssemblyManifest`; Wave conserva
+  `LaunchContract`, ensamblaje, Search/AEO, Measurement, governance, release y evidencia.
+- Se distinguen `asset-ready`, `experience-ready` y `launch-ready`, y se agregan los modos client-assets,
+  Globe-assisted, Globe-managed y full Efeonce.
+- Las skills gemelas `.codex/skills/greenhouse-globe/SKILL.md` y `.claude/skills/greenhouse-globe/SKILL.md` incorporan
+  el `Creative Production Contract`, la composición con Wave y la regla de no pasar secretos ni integrar ad hoc.
+
+## 2026-07-26 — Efeonce Product Service Operating Model transversal
+
+- Se creó `docs/business-models/EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md` para definir `Product Service` y
+  separar oferta, productización, delivery model, operating mode y engagement.
+- El contrato cubre scope, outputs, roles, plataformas, Workers, quality gates, pricing architecture, economics,
+  legal/IP, evidence, expansion y stop conditions.
+- Business Model y Pricing Operators de Codex/Claude ahora deben cargar este modelo antes de diseñar packaging o
+  pricing; Wave, Globe y Experience LaunchOps quedan referenciados a él.
+
 ## 2026-07-26 — Customer Model Operator para Codex y Claude
 
 - Se creó la skill transversal `efeonce-customer-model-operator` en `.codex/skills/` y `.claude/skills/`.

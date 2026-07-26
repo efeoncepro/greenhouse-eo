@@ -8,7 +8,7 @@
 ## 1. Identidad
 
 - Compañía: Efeonce Group SpA.
-- Categoría: AI-enabled marketing and growth services platform.
+- Categoría: AI-enabled marketing and growth systems company.
 - Lenguaje comercial: Integrated Growth Partner.
 - Modelo: ASaaS.
 - Visión: Growth Operating System.
@@ -19,9 +19,9 @@
 | Elemento | Tipo provisional | Entrada/valor | Estado del modelo |
 |---|---|---|---|
 | Efeonce Digital | Capability | estrategia, growth, RevOps, CRM/Kortex y orquestación | hypothesis / map |
-| Globe / Creative Studio | Capability + posible product line | creatividad, contenido y operaciones creativas | see current model |
+| Globe / Creative Studio | Capability + posible product line | plataforma, especialistas, creatividad, contenido y operaciones creativas | see current model |
 | Reach | Capability | medios, PR y distribución | hypothesis / map |
-| Wave | Productora/capability | Search Visibility 360, web para humanos/buscadores/agentes, measurement, sistemas de agentes y automatización/integraciones | draft; ver modelo propio |
+| Wave | Productora/capability | Search Visibility 360, web para humanos/buscadores/agentes, measurement, sistemas de agentes y automatización/integraciones; delivery con plataforma, squads o especialistas | draft; ver modelo propio |
 | Greenhouse | Platform/control plane | operación, cliente, métricas y memoria | runtime-dependent |
 | Kortex | Product/platform capability | CRM e inteligencia comercial | runtime-dependent |
 | Verk | Product/platform capability | contenido, distribución y data/AI tooling | runtime-dependent |

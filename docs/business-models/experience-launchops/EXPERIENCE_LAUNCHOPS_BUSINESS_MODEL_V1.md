@@ -73,10 +73,11 @@ debe basar su caso de valor en headcount reduction.
 | Delivery model | Productized Service, Platform-enabled Service, Managed Squad, Staff Augmentation, Implementation, Advisory |
 | Engagement | Diagnostic, Sprint, On-Going, On-Demand, Pilot |
 | Operating mode | `efeonce-managed`, `co-operated`, `client-operated` |
-| Ecosystem composition | Wave sola; Wave + Globe; Wave + Search Visibility 360; Wave + Measurement; Wave + Agent Systems; Wave + Efeonce Digital/Kortex cuando hay CRM/RevOps |
+| Ecosystem composition | Wave sola; Wave + Globe Creative Production; Wave + Search Visibility 360; Wave + Measurement; Wave + Agent Systems; Wave + Efeonce Digital/Kortex cuando hay CRM/RevOps |
 
 Un Managed Squad o Staff Augmentation no es un producto distinto: es la forma de aportar capacidad y
-accountability. Globe conserva contenido/producción creativa; Efeonce Digital/Kortex conserva CRM/RevOps.
+accountability. Globe conserva contenido/producción creativa y puede aportar plataforma, especialistas, Managed
+Squad o Staff Augmentation; Efeonce Digital/Kortex conserva CRM/RevOps.
 
 ## 5. Packaging inicial — hipótesis
 
@@ -88,6 +89,9 @@ accountability. Globe conserva contenido/producción creativa; Efeonce Digital/K
    verificación y reporting.
 4. **Launch Platform Enablement:** diseño del operating model, adapters, governance y capacitación para que el
    cliente opere parte de la capacidad.
+5. **Experience Production Pack by Globe:** producción creativa gobernada con `CreativeAssetPack`, variantes,
+   rights/provenance, `AssetManifest` y `AssemblyManifest`, como addon opcional del Experience LaunchOps; puede
+   entregarse con Studio Access, producción gestionada, Managed Squad o Staff Augmentation.
 
 El packaging no autoriza aún precios, SLA ni claims comerciales; deben pasar por el Pricing Integrity Pack y
 validación de delivery.
@@ -108,6 +112,10 @@ La unidad económica debe separar trabajo humano, consumo de providers, operaci�
 retrabajo y propiedad intelectual. El precio debe basarse en valor/capacidad y complejidad gobernada, no en el
 número bruto de páginas.
 
+Custom Workers son extensiones de valor: pueden cobrarse como setup, implementation, maintenance, managed operation
+o capacidad, con tratamiento explícito de IP, datos, adapters, evaluación y offboarding. No deben convertirse en
+trabajo bespoke invisible dentro del retainer.
+
 ## 7. Governance, compliance y assurance
 
 Governance y compliance son parte explícita del valor y del scope, no una revisión final invisible. El servicio
@@ -124,6 +132,9 @@ Efeonce es la cara y contraparte. Wave opera el product service. El SOW debe dec
 - quién es Launch Owner y quién aprueba;
 - qué CMS, sitios, mercados y componentes están dentro;
 - qué produce Globe y qué produce el cliente;
+- si el alcance es asset-ready, experience-ready o launch-ready;
+- si Globe participa como client asset replacement, Globe-assisted, Globe-managed o full Efeonce;
+- si la capacidad humana de Globe es Managed Squad, Staff Augmentation o soporte de plataforma;
 - quién mantiene CRM, analytics, consentimiento y taxonomía de datos;
 - límites de agentes, revisión humana, seguridad, compliance, rollback y soporte;
 - definición de “publicado”, “medido”, “indexable” y “listo para agentes”.

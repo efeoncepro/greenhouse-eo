@@ -59,13 +59,27 @@ The socio-technical operating model is defined in [`Human Augmentation Product O
 The Launch Operator is the primary product user and hero; specialist disciplines remain domain authorities and are
 augmented rather than abstracted away.
 
+The agent runtime, provider gateway and Worker extension model are defined in [`Agent Fabric & Worker Extension Architecture`](EFEONCE_EXPERIENCE_LAUNCHOPS_AGENT_FABRIC_ARCHITECTURE_V1.md).
+
+Brand, UI/UX, content and release quality are governed by [`Brand, UI/UX Consistency & Quality Model`](EFEONCE_EXPERIENCE_LAUNCHOPS_BRAND_UI_UX_CONSISTENCY_QUALITY_MODEL_V1.md).
+
+Cloud placement, dedicated tenancy and multi-cloud execution are governed by [`Cloud Placement Decision`](EFEONCE_EXPERIENCE_LAUNCHOPS_CLOUD_PLACEMENT_DECISION_V1.md).
+
+Federated authentication, SCIM provisioning and LaunchOps authorization are governed by [`Identity & Access Architecture`](EFEONCE_EXPERIENCE_LAUNCHOPS_IDENTITY_ACCESS_ARCHITECTURE_V1.md).
+
+The measurable product promise, Launch Contract, acceleration mechanism and Search/Agent-native readiness gates are
+defined by [`Product Promise & Search-Native Architecture`](EFEONCE_EXPERIENCE_LAUNCHOPS_PRODUCT_PROMISE_AND_SEARCH_NATIVE_ARCHITECTURE_V1.md).
+
+La integración opcional de producción creativa, `CreativeAssetPack`, `AssetManifest` y `AssemblyManifest` está
+definida por [`Wave + Globe Creative Production Integration`](EFEONCE_EXPERIENCE_LAUNCHOPS_GLOBE_CREATIVE_PRODUCTION_INTEGRATION_V1.md).
+
 ## Product boundary
 
 | Concern | Experience LaunchOps | Adjacent owner |
 | --- | --- | --- |
 | Launch orchestration and evidence | Wave | — |
-| Web experience design/build | Wave / Web Experience 360 | Globe may provide creative production |
-| SEO/AEO contract and preflight | Wave / Search Visibility 360 | Globe may provide source content |
+| Web experience design/build | Wave / Web Experience 360 | Globe may provide governed creative production |
+| SEO/AEO contract and preflight | Wave / Search Visibility 360 | Globe may provide creative assets and source content |
 | Tagging, analytics and measurement | Wave / Measurement & Analytics | — |
 | Agents and MCP/tool integrations | Wave / Agent Systems & Platforms | Provider adapters are implementation detail |
 | CRM, lifecycle and RevOps | Efeonce Digital/Kortex | Not a Wave line |

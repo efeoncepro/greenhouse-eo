@@ -75,8 +75,40 @@ Esta es la regla que gobierna todo lo demás. Interiorízala antes de tocar cód
 
 - **Globe es una plataforma hermana gobernada por Greenhouse, no un módulo de Greenhouse.** No corre dentro de `greenhouse-eo`, no comparte su runtime ni su build.
 - **Reparto de responsabilidad:**
-  - **Greenhouse = único control plane operativo.** Registra EPICs, `TASK-###`, dependencias, lifecycle, hooks, lint, QA, cierre documental y handoff — incluso cuando la implementación vive en `efeonce-globe`.
+- **Greenhouse = único control plane operativo.** Registra EPICs, `TASK-###`, dependencias, lifecycle, hooks, lint, QA, cierre documental y handoff — incluso cuando la implementación vive en `efeonce-globe`.
   - **Globe = código, runtime, infraestructura, datos, ejecución creativa y evidencia técnica.** Posee creative assets, rights/provenance, compositions, runs, provider adapters, quality evidence, approvals y creative credits.
+
+## Composición con Wave Experience LaunchOps
+
+Globe es un product service de Efeonce que combina plataforma, especialistas creativos y capacidad de delivery.
+Puede participar como capability composable dentro de `Experience LaunchOps`, el product service de Wave. La
+arquitectura canónica está en
+`docs/architecture/EFEONCE_EXPERIENCE_LAUNCHOPS_GLOBE_CREATIVE_PRODUCTION_INTEGRATION_V1.md`.
+
+La frontera es estricta:
+
+- Wave posee `LaunchContract`, `ExperienceSpec`, Brand/Search/Measurement Contracts, ensamblaje en CMS/DXP,
+  governance, release, rollback y evidencia de lanzamiento.
+- Globe posee dirección y producción creativa, variantes, composiciones, rights/provenance y evidencia de calidad.
+- Globe entrega `CreativeAssetPack`, `AssetManifest` y `AssemblyManifest`; un archivo sin destino, metadata,
+  derechos y evidencia no es un output productivo completo.
+- Wave puede consumir assets del cliente u otros proveedores; Globe no es dependencia obligatoria de Wave.
+- Los niveles deben distinguirse: `asset-ready` (Globe), `experience-ready` (Globe + mapping) y `launch-ready`
+  (Wave + integración, gates y release).
+- Globe puede entregarse como `Studio Access`/platform-enabled, Creative Production, `Managed Squad` o `Staff
+  Augmentation`. Managed Squad implica dirección y accountability de Efeonce/Globe; Staff Augmentation implica
+  dirección cotidiana del cliente y no hereda automáticamente el SLA de Managed Squad.
+
+### Creative Production Contract
+
+Cuando Globe participe en un lanzamiento, Wave deriva un `CreativeProductionContract` con objetivo, audiencia,
+mercado, canal, Brand Contract, slots/componentes, requisitos Search/Measurement, formatos, restricciones legales,
+ventana y criterios de aceptación. Globe responde con outputs versionados, manifests, variantes, rights status,
+provenance, quality evidence, excepciones y dependencias.
+
+Workers creativos pueden proponer y producir; especialistas humanos conservan dirección, craft y decisión sobre
+claims sensibles, derechos, compliance, marca y publicación. No conviertas esta composición en una integración ad
+hoc desde la UI ni pases URLs públicas, credenciales o secretos entre plataformas.
 - **Greenhouse es dueño de:** identidad de ecosistema, desired access state, workspace/client bindings y governance cross-plataforma. Globe recibe esa identidad como *broker*, no la reemplaza.
 - **NUNCA** compartas base de datos, sesión/cookie, bucket, secreto de provider, service-account key ni rol admin implícito entre Globe y Greenhouse.
 - **El registry de tasks es SOLO de Greenhouse.** Globe **no** crea un segundo namespace, registry, lifecycle ni harness de trabajo. Su execution plan referencia las `TASK-###` de Greenhouse; no las duplica.

@@ -16,6 +16,7 @@ dependency of the product service.
 ## 2. Pack contents
 
 - one-page product/service description and boundaries;
+- identity/access architecture with OIDC/SAML/SCIM, tenant roles and deprovisioning behavior;
 - reference architecture and data-flow diagram;
 - governance/compliance operating model;
 - security questionnaire response library;

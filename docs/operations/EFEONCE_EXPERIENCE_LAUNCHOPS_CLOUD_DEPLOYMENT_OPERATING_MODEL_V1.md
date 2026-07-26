@@ -4,10 +4,16 @@
 > **Date:** 2026-07-26
 > **Owner:** Architecture + Cloud/Platform + Wave Operations
 
+> **Placement decision:** [`EFEONCE_EXPERIENCE_LAUNCHOPS_CLOUD_PLACEMENT_DECISION_V1.md`](../architecture/EFEONCE_EXPERIENCE_LAUNCHOPS_CLOUD_PLACEMENT_DECISION_V1.md)
+
 ## 1. Principle
 
 Cloud is an implementation rail, not the product promise. The deployment model must support client isolation,
 approved data locations, controlled promotion, recovery and transparent cost attribution.
+
+The default Efeonce/Wave placement is a dedicated GCP project. Azure and AWS are supported through the portable
+Execution Runner and future client-controlled/private deployment modes; shared Greenhouse infrastructure is not the
+commercial product baseline.
 
 ## 2. Environment model
 

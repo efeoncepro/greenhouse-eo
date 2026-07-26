@@ -32,6 +32,81 @@ recuperación: no reemplaza UI/UX designers, UX Content, developers ni especiali
 repetitiva y preserva autoría, criterio y calidad. El piloto deberá medir operator leverage, craft quality, human
 value y trust, no sólo velocidad o headcount.
 
+## 2026-07-26 — Experience LaunchOps: Agent Fabric y Worker architecture
+
+Se creó `docs/architecture/EFEONCE_EXPERIENCE_LAUNCHOPS_AGENT_FABRIC_ARCHITECTURE_V1.md`. La capa agentic queda
+separada en Control Plane, Agent Fabric, Tool/MCP Gateway y Client Execution Plane. Los agents se operacionalizan
+como Workers gobernados: roles de razonamiento, workers acotados, skills/recipes y adapters tienen fronteras
+distintas. Se define catálogo de Core Workers, Client/Partner/Provider Workers, composición de Custom Workers sin
+fork del core, Worker Manifest, lifecycle, Provider Gateway, memoria y deployment modes. La recomendación inicial es
+un provider principal + fallback validado; Vertex/Foundry quedan como enterprise rails según el cliente. Estado:
+`Proposed`, sujeto a piloto y evaluación real.
+
+## 2026-07-26 — Experience LaunchOps: multi-transport integration strategy
+
+La arquitectura de Agent Fabric documenta que LaunchOps no será MCP-first: API es la columna vertebral
+determinística; MCP es interfaz agentic/discovery; CLI/Job Runner es brazo operacional sandboxed; webhooks/events
+sincronizan estados; browser automation queda como fallback legacy. Workers solicitan capabilities de negocio y el
+Capability Registry/Transport Resolver selecciona el adapter/transport según policy, ambiente, riesgo y evidencia.
+
+## 2026-07-26 — Experience LaunchOps: cloud placement decision
+
+Se creó `docs/architecture/EFEONCE_EXPERIENCE_LAUNCHOPS_CLOUD_PLACEMENT_DECISION_V1.md`. La decisión propuesta es
+GCP dedicado para el Control Plane/Agent Fabric de Wave, separado de Greenhouse, con Cloud Run/Jobs, Cloud SQL
+dedicado, storage privado, Secret Manager, WIF y observabilidad. Azure y AWS quedan como execution/deployment rails
+para clientes Microsoft/AWS-first mediante Client Execution Runner y futuros modos client-controlled/private. No se
+propone active-active multi-cloud en V1; la portabilidad vive en contratos, containers y adapters.
+
+## 2026-07-26 — Experience LaunchOps: federated identity and access
+
+Se creó `docs/architecture/EFEONCE_EXPERIENCE_LAUNCHOPS_IDENTITY_ACCESS_ARCHITECTURE_V1.md`. La decisión es una capa
+federada basada en OIDC/SAML, SCIM 2.0, JIT opcional y mapping gobernado de grupos/claims a roles/entitlements.
+Entra y Google tienen paths preconfigurados; Okta/Auth0/Ping/OneLogin/Keycloak entran por adapters estándar. El IdP
+es source of truth de identidad/lifecycle; LaunchOps es source of truth de membership, autorización, approvals y
+policies. La identidad estable es `(issuer, subject)`, no email. Se separan views de entitlements y se revocan
+sesiones/acciones privilegiadas ante deprovisioning.
+
+## 2026-07-26 — Experience LaunchOps: product promise and search-native readiness
+
+Se creó `docs/architecture/EFEONCE_EXPERIENCE_LAUNCHOPS_PRODUCT_PROMISE_AND_SEARCH_NATIVE_ARCHITECTURE_V1.md`.
+La promesa queda operacionalizada como reducción de lead time mediante Launch Contracts, trabajo paralelo,
+reutilización gobernada, preflight determinístico, aprobaciones explícitas, release controlado y evidencia
+post-launch. Cada experiencia debe incluir Experience, Brand, Search, Measurement, Delivery y Governance Contracts.
+Search/AEO y agent readability son requisitos desde el diseño, no una revisión posterior; el producto promete
+readiness y evidencia, nunca rankings, indexación, tráfico o citaciones garantizadas por terceros.
+
+## 2026-07-26 — Experience LaunchOps + Globe: creative production integration
+
+Se creó `docs/architecture/EFEONCE_EXPERIENCE_LAUNCHOPS_GLOBE_CREATIVE_PRODUCTION_INTEGRATION_V1.md`. Globe queda
+formalizado como capability composable, no como dependencia obligatoria: puede entregar `CreativeAssetPack`,
+`AssetManifest` y `AssemblyManifest` para llevar una experiencia de asset-ready a experience-ready. Wave conserva
+la responsabilidad de launch-ready: ensamblaje, CMS/DXP, Search/AEO, Measurement, governance, release y evidencia.
+El modelo comercial queda expresado como `Experience Production Pack by Globe` dentro de Experience LaunchOps,
+con modos client-assets, Globe-assisted, Globe-managed y full Efeonce.
+
+La aclaración posterior queda incorporada: Globe no es sólo plataforma/producción de assets. Es un product service
+que combina plataforma, especialistas y capacidad de delivery. Puede entregarse como Studio Access, Creative
+Production, Managed Squad o Staff Augmentation. Managed Squad conserva dirección y accountability de Efeonce/Globe;
+Staff Augmentation queda bajo dirección cotidiana del cliente y no hereda automáticamente el SLA del squad.
+
+## 2026-07-26 — Efeonce Product Service Operating Model
+
+Se creó `docs/business-models/EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md` como contrato transversal para toda
+oferta Efeonce. Define `Product Service` como una oferta orientada a resultado que combina método, personas,
+plataformas y ejecución gobernada. Obliga a separar product service, nivel de productización, delivery model,
+operating mode y engagement, y a declarar scope, roles, quality gates, pricing architecture, economics, evidencia,
+IP, expansión y stop conditions. Wave y Globe quedan conectados al modelo, y las skills de business model/pricing
+de Codex y Claude ahora lo referencian antes de diseñar packaging o pricing.
+
+## 2026-07-26 — Experience LaunchOps: brand/UI/UX consistency quality model
+
+Se creó `docs/architecture/EFEONCE_EXPERIENCE_LAUNCHOPS_BRAND_UI_UX_CONSISTENCY_QUALITY_MODEL_V1.md`. La consistencia
+de marca queda modelada como artifact chain versionado —Brand DNA, Experience System, UI/UX System, Content System,
+recipes/templates, golden set, Experience Artifact y Quality Evidence Pack— con Gates 0–8: intake, brief, system
+readiness, content/claims, visual/interaction, technical/search/measurement, human release, post-launch/drift. Los
+agents detectan y proponen; checks determinísticos validan; UI/UX, UX Content/Brand, Technical, Measurement y
+Compliance conservan la autoridad humana.
+
 ## 2026-07-26 — Customer Model Operator transversal
 
 Se creó `.codex/skills/efeonce-customer-model-operator/` y su companion `.claude/skills/efeonce-customer-model-operator/`.

@@ -13,3 +13,5 @@ margin controls; Legal owns contracts, IP and privacy; Commercial owns execution
 For the customer model (ICP, JTBD, buying group, decision, procurement, validation, adoption and expansion), also load
 `efeonce-customer-model-operator`. For the price architecture itself, also load `efeonce-pricing-operator`; it owns value metrics, packaging, billing
 units, discounts, versioning, economics guardrails and the Pricing Integrity Pack.
+The transversal definition of Product Service, productization levels, delivery models, operating modes and
+engagements lives in `docs/business-models/EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md`.

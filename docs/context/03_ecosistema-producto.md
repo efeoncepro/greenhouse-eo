@@ -1,6 +1,6 @@
 # 03 · Ecosistema de Producto
 
-> Regla maestra: **cada plataforma puede venderse y operar de forma independiente. Cuando el cliente está en el ecosistema completo, Greenhouse es el hub donde todo converge.** Las plataformas verticales (Kortex, Verk y Efeonce Globe / Creative Studio) alimentan el hub sin depender de él para operar.
+> Regla maestra: **cada plataforma o capability puede venderse y operar de forma independiente. Cuando el cliente está en el ecosistema completo, Greenhouse es el hub donde todo converge.** Las plataformas verticales (Kortex, Verk y Efeonce Globe / Creative Studio) alimentan el hub sin depender de él para operar. Globe combina plataforma, especialistas y capacidad de delivery; no es sólo software.
 
 Efeonce tiene cuatro plataformas de software propietario, en distinta madurez:
 

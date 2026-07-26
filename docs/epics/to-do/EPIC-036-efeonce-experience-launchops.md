@@ -26,6 +26,9 @@ El producto debe ser augmentation-first: el Launch Operator es el héroe y los e
 armadura de contexto, herramientas, preflight, trazabilidad y recuperación. No se valida el producto sólo por
 velocidad ni por reducción de headcount.
 
+La plataforma promete readiness y evidencia para Search/AEO, medición, governance y sistemas agentic; no promete
+rankings, indexación, tráfico ni citaciones de terceros.
+
 ## Why This Epic Exists
 
 El problema cruza negocio, marketing, contenido, diseño, desarrollo, CMS, analytics, search, compliance y release.
@@ -52,6 +55,12 @@ la repetibilidad comercial.
 - `docs/architecture/EFEONCE_EXPERIENCE_LAUNCHOPS_STACK_REFERENCE_ARCHITECTURE_V1.md`
 - `docs/architecture/EFEONCE_EXPERIENCE_LAUNCHOPS_SECURITY_THREAT_MODEL_V1.md`
 - `docs/architecture/EFEONCE_EXPERIENCE_LAUNCHOPS_AGENT_ASSURANCE_EVALUATION_MODEL_V1.md`
+- `docs/architecture/EFEONCE_EXPERIENCE_LAUNCHOPS_AGENT_FABRIC_ARCHITECTURE_V1.md`
+- `docs/architecture/EFEONCE_EXPERIENCE_LAUNCHOPS_BRAND_UI_UX_CONSISTENCY_QUALITY_MODEL_V1.md`
+- `docs/architecture/EFEONCE_EXPERIENCE_LAUNCHOPS_CLOUD_PLACEMENT_DECISION_V1.md`
+- `docs/architecture/EFEONCE_EXPERIENCE_LAUNCHOPS_IDENTITY_ACCESS_ARCHITECTURE_V1.md`
+- `docs/architecture/EFEONCE_EXPERIENCE_LAUNCHOPS_PRODUCT_PROMISE_AND_SEARCH_NATIVE_ARCHITECTURE_V1.md`
+- `docs/architecture/EFEONCE_EXPERIENCE_LAUNCHOPS_GLOBE_CREATIVE_PRODUCTION_INTEGRATION_V1.md`
 - `docs/operations/EFEONCE_EXPERIENCE_LAUNCHOPS_CLOUD_DEPLOYMENT_OPERATING_MODEL_V1.md`
 - `docs/operations/EFEONCE_EXPERIENCE_LAUNCHOPS_OPERATIONS_SRE_SUPPORT_MODEL_V1.md`
 - `docs/business-models/experience-launchops/EXPERIENCE_LAUNCHOPS_LEGAL_CONTRACT_DATA_PROCESSING_PACK_V1.md`
@@ -87,6 +96,20 @@ tasks técnicas aisladas que confundan discovery con product-market fit.
 - [ ] Stack, seguridad, cloud, ops, legal/data, agent assurance y enterprise readiness revisados por sus owners.
 - [ ] Cada integración declara system of record, modo observe/connect/assist/governed-write, permisos, rollback y salida.
 - [ ] El piloto demuestra valor para Launch Operator, UI/UX, UX Content, developers y especialistas sin pérdida de autoría ni calidad.
+- [ ] Existe Worker Catalogue inicial, Worker Manifest y un custom worker probado sin fork del core.
+- [ ] Un adapter demuestra API/MCP/CLI/event transport según capability, con resolver, manifest, audit y fallback.
+- [ ] Una experiencia pasa el artifact chain y Gates 0–8 de brand/UI/UX/content/technical quality.
+- [ ] Dedicated GCP placement y Client Execution Runner multi-cloud pasan sus acceptance gates.
+- [ ] Entra/Google federation, generic OIDC/SAML, SCIM/JIT y role/entitlement mapping pasan sus access gates.
+- [ ] Un Launch Contract versionado expresa intent, experience, brand, search, measurement, delivery y governance
+      antes de solicitar aprobación.
+- [ ] La integración opcional con Globe entrega `CreativeAssetPack`, `AssetManifest` y `AssemblyManifest` sin
+      acoplar Wave a un único proveedor creativo.
+- [ ] El flujo distingue asset-ready, experience-ready y launch-ready, con gates y evidencia por nivel.
+- [ ] El piloto demuestra reducción de lead time explicada por menor espera, handoffs y retrabajo, sin degradar
+      calidad, compliance, accesibilidad, medición o autoría humana.
+- [ ] Cada experiencia pasa Search/Agent preflight y queda lista para ser descubierta, interpretada, medida y
+      potencialmente citada, sin prometer resultados de terceros.
 - [ ] Una experiencia publicada con aprobación humana, Search Contract, Measurement Contract y evidencia post-launch.
 - [ ] Cost-to-serve y margen p50/p95 estimados.
 - [ ] Decisión documentada: scale, iterate, pivot o stop.

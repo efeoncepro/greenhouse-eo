@@ -24,6 +24,10 @@ los modelos concretos sólo fijan las decisiones propias de cada línea.
 La arquitectura que explica cómo se relacionan el modelo corporativo, la plataforma, las capabilities, el
 packaging y los submodelos vive en [`EFEONCE_BUSINESS_MODEL_ARCHITECTURE_V1.md`](EFEONCE_BUSINESS_MODEL_ARCHITECTURE_V1.md).
 
+La definición transversal de oferta, productización, delivery model, operating mode y engagement vive en
+[`Efeonce Product Service Operating Model V1`](EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md). Los modelos de cada
+línea deben referenciarlo y declarar sus diferencias; no deben redefinir `Product Service` localmente.
+
 ## Fronteras con las demás categorías
 
 | Categoría | Pregunta que responde | No debe contener como canon |
@@ -106,6 +110,9 @@ Todo business model debe separar al menos estas dimensiones:
 | Lanzamiento comercial | Leadership + owners anteriores | todos los gates y rollback/stop conditions |
 
 ## Modelos disponibles
+
+- [Efeonce Product Service Operating Model V1](EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md) — contrato transversal
+  para nombrar, empaquetar, entregar, medir y gobernar Product Services; no autoriza pricing o venta por sí solo.
 
 - [Portfolio Business Model Template](PORTFOLIO_BUSINESS_MODEL_TEMPLATE.md) — contrato para el modelo de
   Efeonce Group y sus capabilities; no autoriza por sí solo pricing, venta, inversión ni spinout.

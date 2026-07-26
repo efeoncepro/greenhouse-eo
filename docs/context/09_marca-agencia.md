@@ -78,11 +78,11 @@ El diferenciador defendible no es decir "co-creamos", "somos partner" ni "somos 
 - **Memoria:** cada ciclo deja historial, aprendizaje y contexto reutilizable.
 - **Capacidad:** el cliente entiende más, decide mejor y entrega mejores briefs.
 
-La categoría de mercado se expresa como **AI-enabled marketing and growth services platform**. En conversación comercial: **Integrated Growth Partner**. **ASaaS (Agency Service as a Software)** es el modelo de delivery y monetización; **Growth Operating System** es la visión aspiracional. La frase interna de posicionamiento:
+La categoría de mercado se expresa como **AI-enabled marketing and growth systems company**. En conversación comercial: **Integrated Growth Partner**. **ASaaS (Agency Service as a Software)** es el modelo de delivery y monetización; **Growth Operating System** es la visión aspiracional. Efeonce combina estrategia, personas, product services, plataformas y agentes. La frase interna de posicionamiento:
 
-> **Efeonce es una plataforma de servicios de marketing y crecimiento habilitada por IA: estrategia, creatividad, medios, datos y software propio trabajando como una sola operación. Estamos construyendo un Growth Operating System.**
+> **Efeonce es una empresa de sistemas de crecimiento digital habilitados por IA: estrategia, personas, creatividad, medios, datos, product services y software propio trabajando como una sola operación. Estamos construyendo un Growth Operating System.**
 
-En inglés, usar transcreación, no traducción literal: **Efeonce is an AI-enabled marketing and growth services platform for ambitious brands — an integrated growth partner building toward a Growth Operating System.**
+En inglés, usar transcreación, no traducción literal: **Efeonce is an AI-enabled growth systems company for ambitious organizations — an integrated growth partner combining people, products, platforms and agents on the way to a Growth Operating System.**
 
 Regla para posicionamiento global: vender el **sistema** antes que el origen regional. "LATAM" puede aparecer como prueba de ejecución multi-mercado, cercanía cultural, velocidad y eficiencia, pero nunca como límite de ambición ni como sustituto del mecanismo.
 

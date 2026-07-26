@@ -24,6 +24,11 @@ stream, economics y contract. Ejemplos de delivery: Productized Service, Managed
 Studio Access, Implementation, Advisory y Platform-enabled Service. Ejemplos de engagement: On-Going, On-Demand
 y Sample Sprint.
 
+Antes de fijar packaging o pricing, usar `docs/business-models/EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md` para
+separar Product Service, nivel de productización, delivery model, operating mode y engagement. Pricing no debe
+convertir un delivery model —por ejemplo Managed Squad o Staff Augmentation— en una oferta distinta sin decisión
+de negocio explícita.
+
 ## Workflow
 
 1. Enmarcar oferta, ICP, buyer, JTBD, trigger, resultado controlable, exclusiones, owner, geografía, moneda,

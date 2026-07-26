@@ -36,13 +36,28 @@
 
 ## Summary
 
-Construir **Efeonce Globe**, la capability creativa propia de Efeonce, como una plataforma **agentic por nacimiento** para imagen, video, audio y extensiones futuras. Creative Studio es su descriptor funcional. El producto se opera por UI, MCP y agentes sobre el mismo contrato, pero la experiencia humana empieza en briefs, referencias, tratamientos, candidatos y review; el workflow técnico se compila por debajo. Templates/rúbricas de Efeonce, assets trazables, gasto controlado y revisión humana viven en una plataforma hermana: Greenhouse la integra como consumidor, no la hospeda.
+Construir **Efeonce Globe**, la capability creativa propia de Efeonce, como un product service que combina una
+plataforma **agentic por nacimiento**, especialistas creativos y capacidad de delivery para imagen, video, audio y
+extensiones futuras. Creative Studio es su descriptor funcional. El producto se opera por UI, MCP y agentes sobre
+el mismo contrato, pero la experiencia humana empieza en briefs, referencias, tratamientos, candidatos y review;
+el workflow técnico se compila por debajo. Globe puede entregarse como Studio Access, Creative Production,
+Managed Squad o Staff Augmentation, con fronteras explícitas de dirección y accountability. Templates/rúbricas de
+Efeonce, assets trazables, gasto controlado y revisión humana viven en una plataforma hermana: Greenhouse la integra
+como consumidor, no la hospeda.
 
 ## Why This Epic Exists
 
 Los pilotos de RRSS y Glitch demostraron que generar media es sólo una fracción del trabajo. El valor operacional está en elegir el motor según fidelidad requerida, preservar el set/derechos, controlar créditos, revisar acción/anatomía/sonido y conservar la decisión para repetirla. Si se construye UI-first, MCP/agentes y clientes llegarían tarde y con lógica duplicada. Si se construye dentro de Greenhouse, se agrava su runtime y se desdibuja la propiedad del dominio creativo.
 
 Este programa convierte esos aprendizajes en una capability de agencia acumulable y, después, vendible: **capacidad creativa + dirección + memoria**, no reventa de tokens de un proveedor.
+
+## Cross-product composition with Experience LaunchOps
+
+Globe puede operar como capability composable dentro del product service Experience LaunchOps de Wave. La frontera
+canónica vive en [`Wave + Globe Creative Production Integration`](../../architecture/EFEONCE_EXPERIENCE_LAUNCHOPS_GLOBE_CREATIVE_PRODUCTION_INTEGRATION_V1.md):
+Globe produce `CreativeAssetPack`, `AssetManifest` y `AssemblyManifest`; Wave conserva el Launch Contract,
+ensamblaje, Search/AEO, Measurement, governance, release y evidencia de lanzamiento. Globe no es dependencia
+obligatoria de Wave y Wave puede consumir assets del cliente u otros proveedores.
 
 El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prueba craft en operación managed, convierte patrones validados en templates, habilita autonomía cliente en trabajo repetible y conserva el contexto para que Efeonce absorba excepciones, picos y producción de alta incertidumbre sin reiniciar el proyecto.
 

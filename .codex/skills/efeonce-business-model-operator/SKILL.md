@@ -27,6 +27,8 @@ decide el modelo de negocio; el companion gobierna métrica de valor, packaging,
 versionado, guardrails y Pricing Integrity Pack.
 
 La skill es transversal; los documentos de `docs/business-models/` son la fuente canónica de cada oferta.
+La definición transversal de qué es un Product Service, sus niveles de productización y la separación entre
+delivery model, operating mode y engagement vive en `docs/business-models/EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md`.
 
 ## Autoridad y composición
 

@@ -64,9 +64,9 @@ Responde:
 
 La formulación vigente es:
 
-> **Efeonce es una plataforma de servicios de marketing y crecimiento habilitada por IA, expresada
-> comercialmente como Integrated Growth Partner, operada bajo ASaaS y orientada hacia la visión de Growth
-> Operating System.**
+> **Efeonce es una empresa de sistemas de crecimiento digital habilitados por IA que combina estrategia,
+> personas, product services, plataformas y agentes; se presenta comercialmente como Integrated Growth Partner,
+> opera bajo ASaaS y se orienta hacia la visión de Growth Operating System.**
 
 Este modelo describe la compañía completa: servicios, capabilities, plataformas, datos, método, memoria,
 operación recurrente y expansión de cuentas. No debe reducirse a AEO, creatividad, software ni a una lista de

@@ -13,6 +13,11 @@ Es agnóstica a la línea de negocio: sirve para Efeonce Digital, Wave, Globe, R
 Creative Studio y futuras capabilities. No reemplaza Strategy/Commercial, Finance, Legal/IP, Operations, Product
 ni Architecture; coordina sus decisiones y deja explícito qué está aprobado, qué es hipótesis y qué requiere gate.
 
+Antes de fijar packaging o pricing, usar `docs/business-models/EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md` para
+separar Product Service, nivel de productización, delivery model, operating mode y engagement. Pricing no debe
+convertir un delivery model —por ejemplo Managed Squad o Staff Augmentation— en una oferta distinta sin decisión
+de negocio explícita.
+
 ## Fuentes y ownership
 
 Leer primero el modelo concreto en `docs/business-models/`, después:
