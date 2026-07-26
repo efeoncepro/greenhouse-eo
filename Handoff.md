@@ -10,6 +10,13 @@ Se probó `efeonce-pricing-operator` sobre las cinco familias de Wave y sus deli
 permanece `hypothesis_only` hasta completar métricas de valor, cost-to-serve, margen, capacidad, rights/providers,
 evidencia de repetibilidad y aprobaciones. No se aprobaron tarifas, claims ni venta general.
 
+## 2026-07-26 — Pricing Integrity Pack aplicado a Search Visibility 360
+
+Se creó `docs/business-models/search-visibility-360/SEARCH_VISIBILITY_360_PRICING_INTEGRITY_PACK_V1.md`.
+Es un artefacto exclusivamente de pricing: métrica property/market/surface/lane, foundation, recurring operations,
+transparency/platform, content capacity, expansion, FX, margen y validación. SEO y AEO siguen integrados en Search
+Visibility 360; el pack no redefine Wave ni el oficio SEO/AEO. Verdict: `hypothesis_only`.
+
 ## 2026-07-25 (4) — Wave portfolio y boundaries documentados
 
 Se formalizó Wave como marca de producto de Efeonce con cinco familias: Search Visibility 360, Web Experience

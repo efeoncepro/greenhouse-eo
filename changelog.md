@@ -35,6 +35,14 @@
   architecture, economics, experimentos y gates de aprobación.
 - El resultado es `hypothesis_only`: no se aprobaron tarifas, claims, márgenes ni venta general.
 
+## 2026-07-26 — Pricing específico para Search Visibility 360
+
+- Se creó `SEARCH_VISIBILITY_360_PRICING_INTEGRITY_PACK_V1.md` como aplicación específica de la skill general de
+  pricing a Search Visibility 360.
+- El pack separa diagnóstico, foundation, operación, transparencia/plataforma, capacidad de contenido y expansión;
+  evita usar artículos como unidad pública y trata SEO+AEO como producto integrado.
+- Verdict: `hypothesis_only`, pendiente de Finance, evidencia de willingness-to-pay, capacidad y aprobación comercial.
+
 ## 2026-07-25 — Globe: el payload de browser deja de ser un string (ADR-014, foundation)
 
 `TASK-1556` cerrada. Nació `apps/studio-client` en `efeonce-globe` (Vite + React + React Router, SSR

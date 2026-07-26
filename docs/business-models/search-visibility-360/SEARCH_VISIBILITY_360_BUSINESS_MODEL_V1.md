@@ -3,6 +3,7 @@
 > **Estado:** `Draft` — capability en construcción; no declarar producto, ARR, adopción o margen separado
 > sin runtime y evidencia aprobada.
 > **Owner:** Wave + Strategy + SEO/AEO + Product + Finance
+> **Pricing Integrity Pack:** [`SEARCH_VISIBILITY_360_PRICING_INTEGRITY_PACK_V1.md`](SEARCH_VISIBILITY_360_PRICING_INTEGRITY_PACK_V1.md)
 
 ## Scope hypothesis
 
