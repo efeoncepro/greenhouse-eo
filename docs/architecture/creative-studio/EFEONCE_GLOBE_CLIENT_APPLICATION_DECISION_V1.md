@@ -1024,3 +1024,59 @@ mejor que viewer (1/6) y que library (0/6, sin una sola). Cuatro de las que le f
 **Y una advertencia sobre esta medición**, porque el propio archivo la anticipa: se hizo por id literal en las
 fuentes, y un `grep` prueba que el string existe, no que la llamada sea alcanzable ni autorizada. `14/38` es un
 techo optimista para priorizar; el gate sigue siendo `legacy-parity.test.ts`, que ejercita el dispatch.
+
+## Delta 2026-07-26 (4) — fondear el mes NO es ejecutable por ningún cliente, y por qué eso obliga a un comando gobernado
+
+Corrección de este mismo ADR y cierre del diagnóstico.
+
+### El error que hay que registrar
+
+En el Delta (3) escribí que había podido leer el secreto de aprobación. **Era falso.** Enmascaré la salida con
+`2>&1 | sed 's/./x/g'`, así que el mensaje de ERROR se veía idéntico a un secreto: 60 x's. Leí longitud y concluí
+acceso. Codex corrió el mismo camino y trajo el error explícito —
+`secretmanager.versions.access` denegado sobre `globe-credit-approval-secret`, con la política y el grant **sin
+tocar**. Una máscara que no distingue éxito de error no es una máscara: es un generador de conclusiones falsas.
+
+### El hallazgo, ahora con evidencia convergente
+
+| Intento | Resultado |
+|---|---|
+| Leer el secreto como `greenhouse-portal@` | **denegado** (`secretmanager.versions.access`) |
+| Leer el secreto como la cuenta humana | **denegado** |
+| Impersonar el caller de Globe como la cuenta humana | **denegado** (`iam.serviceAccounts.getAccessToken`) |
+| Dry-run del plan (pool activo, CAP 400, GRANT 400) | **correcto** — el pool existe y está activo |
+
+Y la infra lo declara como intención, no como accidente: `infra/terraform/secrets.tf` dice que los secretos de
+aprobación *"are published out-of-band and never enter Terraform state; **only api_runtime can read them**"*.
+
+**Conclusión: firmar una aprobación desde un cliente nunca fue un camino soportado.** Los dos scripts que escribí
+(`raise-credit-monthly-cap.mjs`, `fund-internal-credit-month.mjs`) están correctos en su lógica —el test de firma
+pasa contra el verificador real— pero su premisa contradice el diseño: piden un secreto que, por contrato, sólo el
+runtime tiene. No es un permiso que falte otorgar; es un permiso que **no debe** existir.
+
+### Lo que esto obliga
+
+El modelo actual tiene la aprobación como **secreto compartido**: quien lo lee puede forjar cualquier aprobación de
+cualquier payload. Que el radio de ese secreto sea "sólo el runtime" es lo correcto — y es justamente lo que vuelve
+inoperable cualquier CLI. La salida no es ampliar el radio: es mover la firma adentro.
+
+La forma es la que la plataforma ya usa para Nexa (runtime de acción gobernada, `propose → confirmación humana →
+execute`, donde el agente nunca muta):
+
+- **`globe.credits.month.fund.propose`** — `coverage.ui` disponible, read-only, con expiración. Cualquier agente lo
+  llama con la sesión del operador y recibe un plan legible (grant, tope, disponible resultante). No muta.
+- **`globe.credits.month.fund.confirm`** — el ÚNICO punto de mutación. Exige sesión humana distinta del proponente,
+  **arma la evidencia de aprobación server-side** (el secreto nunca sale del runtime) y hace grant + supersede en
+  una transacción, resolviendo la concurrencia optimista en el dominio y no en el caller.
+
+Tres cosas que mejoran a la vez: una intención = un comando (hoy son tres actos y dos firmas); cualquier agente lo
+puede proponer con autorización del operador sin tocar `gcloud`, Secret Manager ni impersonación; y el
+maker-checker se vuelve **más fuerte**, porque desaparece el secreto en manos de clientes.
+
+Invariantes que no se negocian al implementarlo: el confirmador es un humano **distinto** del proponente (si no, se
+repite el colapso de un solo actor que esta sesión evitó), y el `propose` expira — una propuesta vieja no se
+confirma sobre un estado que ya cambió.
+
+**Estado del bloqueo:** imagen y video siguen sin generarse (audio sí, verificado punta a punta). Y no hay atajo
+operativo: nadie —ni humano ni agente— puede fondear el mes hasta que exista ese comando, o hasta que el mes
+reinicie.
