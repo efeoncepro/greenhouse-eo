@@ -922,3 +922,59 @@ bundle (`script[src*="/assets/app/"]`), no por el atributo `data-producer-contro
 
 Commits: `48de228` (+ `f5f9aea`, `f2b5729`, `237930e`, `13797af`, `90e14ce`). Deploys: `30184976224` /
 `30184980583`. 113/113 + typecheck + build.
+
+## Delta 2026-07-26 (2) — el payload React GENERA: audio real punta a punta, y el tope de crédito medido
+
+Cierre del delta anterior con **generación real verificada** y el bloqueo de imagen/video cuantificado.
+
+### Audio: generado, retenido y servido
+
+- `prepare` **200** → `execute` **200** — la primera vez que un command de gasto se completa desde el payload React.
+- Pieza en el feed: `state=retained`, `coarseProgress=terminal`, **6 créditos**, `sha256:cf481327dc6…`, título = el
+  prompt enviado.
+- Bytes por el carril gobernado (descriptor + `x-globe-retrieval-grant`): HTTP **200**, `audio/mpeg`,
+  **114.983 bytes**.
+- Observación sin defecto: el descriptor anuncia `mimeType: audio/wav` y los bytes salen `audio/mpeg`. El contrato
+  dice que el tipo autoritativo se resuelve del objeto **al servir**, y el player usa el de la respuesta
+  (`response.blob()`), no el del descriptor — la reproducción es correcta.
+
+Lo que lo desbloqueó fue un defecto propio: la forma por defecto ponía `mode: { kind: 'foley' }` para **toda** ruta
+de audio, y la ruta de locución (`speech-synthesize`) no lo admite → el estimado devolvía `invalid_request` y el
+riel se quedaba en "Se calcula antes de gastar" **para siempre, sin decir por qué**. El modo ahora se deriva de la
+capability (`speech-synthesize` → `voiceover`, `audio-change-voice` → `change-voice`, resto → `foley`).
+
+### Imagen y video: el tope mensual, medido
+
+La política de presupuesto en producción es **`AdminCreditBudgetPolicy`** (durable, leída de la base) — **no** la
+`FixedCreditBudgetPolicy` que sugiere el default de `app.ts`. Exige política publicada **y** fondeo por
+pool/grant, y su denegación llega al cliente como `withinDayCap: false`.
+
+Sondeo de `withinDayCap` por ruta con el gasto del mes en 102 créditos:
+
+| Ruta | Créditos | Permitido |
+|---|---|---|
+| `ref/voice/tts-v1` (audio) | 6 | **sí** |
+| `ref/still/rrss-v1` (imagen) | 10 | no |
+| `ref/motion/loop-v1` (video) | 16 | no |
+
+El margen del mes era de **6 a 10 créditos** ⇒ el tope publicado está entre **108 y 112**, y tras esta corrida
+quedan ~2. Descartado con dato: no es saldo (500.008 disponibles, **0 reservado**) ni el default de código
+(15.500), y `GLOBE_CREDIT_MONTHLY_CAP_CREDITS` **no está declarada** en la revisión desplegada
+(`globe-api-internal-00096-99x`, imagen `48de228e7106`, leída por la API REST de Cloud Run con ADC).
+
+**Subirlo es administración gobernada con maker-checker**: `globe.credits.policy.publish` exige dos principales
+distintos y un digest firmado, y el API allowlistea `globe-promotion-promoter@` y `globe-promotion-checker@`
+justamente para eso. No lo puede hacer un agente solo, y está bien que sea así: quien gasta no se autofondea.
+
+### Método que vale para la próxima
+
+- **La suite no encuentra esto.** Los tres defectos de esta sesión (modalidad decorativa, señal de presupuesto
+  ignorada, modo de audio inválido) pasaban lint, typecheck, 113 tests y build. Aparecieron al intentar gastar.
+- **`gcloud` CLI y ADC son credenciales distintas.** El token del CLI expiró (reauth necesita browser) pero **ADC
+  seguía viva**, y con ella se leen Cloud Run y cualquier API REST de Google por `curl`. No dar por bloqueado el
+  diagnóstico de infra sin probar ADC.
+- **Bisect por API antes que log.** Sin logs se aisló el rechazo variando una cosa por vez: `execute` sin token →
+  `400`; con token → `409` con dos políticas de techo distintas; y el sondeo por precio localizó el tope. El log
+  habría sido más rápido, no más concluyente.
+
+Commits: `cb4a6cb`, `48de228`. Deploy: `30185494229`.
