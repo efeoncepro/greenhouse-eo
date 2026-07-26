@@ -883,6 +883,24 @@ reautenticación, cobertura de epoch) → composer.
 > timing ledger sincronizados). Queda: ventana monitor 7d `growth.cta.*` (comparte 2026-07-25 con
 > TASK-1427) y la primera campaña `slide_in` real (decisión de negocio: surface/copy/trigger).
 
+## 2026-07-26 (4) — ISSUE-126 cerrado en runtime + Slices A/B de TASK-1566 desplegados
+
+**Dos deploys gobernados, los dos verificados más allá del `success`.**
+
+**`ops-worker`** (Greenhouse, `develop` → `f7a38718d`, workflow keyless disparado por el push porque observa `vendor/**`): **ISSUE-126 cerrado en runtime**. `status.code` del scheduler pasó de `13` a ausente, con **dos reconciles consecutivos `done`** (3776 ms y 1351 ms) contra fallos de 10-62 ms. **La evidencia es la duración, no el status**: los fallos lanzaban antes de tocar nada, así que un "no falla" de 10 ms habría sido indistinguible de un no-op.
+
+**`globe-api-internal`** (Globe, `main` → `10fd5f14`, revisión **`00097-s58`** Ready): trae **Slice A** (la negación de crédito dice qué control rechazó) y **Slice B** (el comando gobernado + el signer port). Verificado con el contrato de la skill, no por confianza: `git merge-base --is-ancestor` confirma que `369dc99` y `493318f` **están en la imagen desplegada**, y el perímetro sigue intacto (anónimo → **403**).
+
+**Lo inferido vs. lo observado, declarado:** que `brokerExpiresAt` se refrescó se deriva del camino de escritura (`ON CONFLICT DO UPDATE`, `tenancy-store.ts:84`), **no de leer la proyección** — eso exige el caller impersonado. Y **la fase en un 409 real tampoco está observada**: el código está desplegado, pero provocar una negación de crédito necesita el mismo caller. Las dos verificaciones directas quedan para el canary.
+
+**Pendiente inmediato, en orden:**
+1. **Canary real de imagen y video** (Codex, con prompt entregado). Es lo único que falta del objetivo original. ⚠️ La advertencia de ese prompt sobre *"el 409 va a venir sin `error.phase`"* **quedó obsoleta con este deploy**: la fase ya está en la imagen viva.
+2. **TASK-1566 Slice B**, lo que falta: cablear `registerCreditFundingCapabilities` + el signer en `app.ts`/`main.ts`, store durable + migración (el in-memory **no sirve a `maxScale=3`**: síntoma `not_found` intermitente al confirmar), y la **transacción única** (hoy son cuatro — deuda declarada en el código).
+3. **Slice C** — el broker + la superficie de confirmación en Greenhouse. ⚠️ Regla de ordenamiento de ISSUE-126: **re-vendorizar el vocabulario ANTES** de mover los scopes de funding al broker, o se reproduce el mismo incidente.
+4. **ISSUE-126, los tres puntos abiertos**: señal de frescura de la proyección, degradación por-capability, y bump de versión del tarball + ensanche del peer exacto del SDK.
+
+**Riesgo abierto:** `tenancy_mode = enforced` **sigue bloqueado** por ISSUE-126 hasta que exista la señal de frescura. Ese flip es prerrequisito de las capabilities por usuario (Slice G), y hacerlo con la reconciliación frágil es un outage de todo el acceso humano a Globe.
+
 ## 2026-07-26 (3) — TASK-1566: Slice A entregado, roadmap re-secuenciado, Slice B en curso
 
 **Estado activo:** `TASK-1566` en `in-progress`. Código en `efeonce-globe` (`main`, local, sin push). Doc gobernante: ADR-015 (`Partially implemented`).
