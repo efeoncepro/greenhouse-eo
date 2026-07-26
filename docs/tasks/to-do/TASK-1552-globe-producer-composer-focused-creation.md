@@ -111,6 +111,8 @@ El composer actual intenta ser prompt editor, selector de modelos, panel de pres
 - Hacer del prompt la entrada dominante del Producer.
 - Integrar Creative Prompt, Brief Direction y Creative Recipe en una única secuencia visible: intención →
   interpretación → receta/cámara → output shape → estimate → Generate.
+- Presentar el output shape como intención de formato y no como una lista técnica: uso, ratio real, preview
+  del lienzo y estrategia de generación nativa, conservación del origen o adaptación cuando corresponda.
 - Reducir la competencia visual entre sugerencias, presets, referencias, seed, modelo y governance.
 - Mantener Imagen, Video y Audio como modos de un solo producto con controles específicos por modalidad.
 - Integrar el CTA y los estados de `TASK-1532` sin añadir una línea de costo duplicada ni ocultar créditos.
@@ -508,6 +510,10 @@ N/A — repo-only task/documentation plus UI changes in the Globe runtime owned 
       paralela de chips hardcoded.
 - [ ] Imagen y video pueden revisar controles de cámara semánticos compatibles con su modalidad; audio no
       muestra controles de cámara.
+- [ ] El selector de formato distingue generación nativa, conservar origen y adaptar; no ofrece ratios que la
+      route no soporte ni promete que cambiar el ratio preserve automáticamente el encuadre.
+- [ ] El formato muestra una preview proporcional y, cuando corresponde, safe zones o limitaciones de
+      composición antes del estimate.
 - [ ] Una receta modificada se identifica como personalizada y permite restaurar la receta base; los locks
       de cámara/look/sujeto se muestran con estado honesto y no se simulan si el contrato no está disponible.
 - [ ] Imagen, Video y Audio muestran sólo los controles relevantes para su modalidad y no presentan capacidades gated como activas.

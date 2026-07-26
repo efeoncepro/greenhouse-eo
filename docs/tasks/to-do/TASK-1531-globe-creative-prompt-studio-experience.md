@@ -39,6 +39,10 @@ en un brief estructurado de TASK-1493, Dirección de TASK-1499 explica qué fue 
 puede revisar cámara, look y restricciones antes de aceptar. No se deben presentar prompt, presets y cámara como
 superficies independientes.
 
+El formato debe seguir la misma cadena: el usuario elige una intención de uso, Globe revela el ratio real y
+declara si está generando nativamente, conservando el origen o adaptando un asset. La propuesta no debe prometer
+que cambiar el ratio preservará automáticamente la composición.
+
 ## Why This Task Exists
 
 En producción se observó una espera aproximada de 36 segundos sin feedback; el control parece roto. La propuesta
@@ -347,6 +351,8 @@ la maquinaria.
 - [ ] Creative read, target, proposal, provenance, preservation y warnings son legibles.
 - [ ] La propuesta muestra cómo se conectan prompt, receta, cámara y Dirección; cámara, look y restricciones
       pueden revisarse como decisiones estructuradas sin reconstruirlas desde el texto compilado.
+- [ ] La propuesta muestra formato de uso, ratio real, safe zones y estrategia (`nativa`, `conservar origen`
+      o `adaptar`) cuando el contexto lo requiera; un cambio de ratio no se presenta como reencuadre garantizado.
 - [ ] Aceptar una propuesta conserva la referencia a la receta/version efectiva y no crea una segunda fuente
       local de presets o cámara.
 - [ ] La jerarquía mantiene al original/decisión humana como foco y no convierte provider/model en protagonista.

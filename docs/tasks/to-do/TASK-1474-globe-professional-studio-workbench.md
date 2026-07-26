@@ -65,6 +65,8 @@ EPIC-028 exige que integración de modelos, plataforma gobernada y validación c
 ## Goal
 
 Dar a operadores una experiencia creative-native de agencia, no un formulario de prompts ni un DAG técnico.
+El workbench debe tratar el formato como una decisión creativa y operativa: la UI muestra intención de uso,
+ratio real, safe zones y estrategia de generación/adaptación sin confundir un cambio de lienzo con un reencuadre.
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
 

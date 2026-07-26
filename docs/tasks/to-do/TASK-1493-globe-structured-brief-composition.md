@@ -43,6 +43,10 @@ La receta no se limita a un preset visual ni a un string de estilo: es la repres
 intención creativa que Creative Prompt, Dirección y Producer comparten. Debe poder expresar una dirección
 de cámara semántica y versionada sin exponer parámetros propietarios de un proveedor.
 
+La receta también puede declarar la intención de formato —uso, ratio, safe zones y relación con el origen—
+pero no debe duplicar la autoridad técnica de `OutputShapeV1` ni inventar capacidades que el catálogo de
+la route no confirma.
+
 ## Why This Task Exists
 
 El diseño del Globe Studio Workbench modela el paso 1 (Brief) como una agencia creativa: un compositor

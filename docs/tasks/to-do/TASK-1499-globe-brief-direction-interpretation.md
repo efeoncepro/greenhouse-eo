@@ -34,7 +34,7 @@
 Introducir el paso "Dirección" del Globe Studio Workbench: un reader gobernado que **interpreta y parafrasea el brief antes de estimar** ("así entendimos tu brief") y declara las **decisiones de dirección** que tomaría (sujeto, estilo, luz, encuadre, cámara, mood, paleta, formato), separando lo que el operador dijo explícito de lo que la plataforma infirió, con supuestos, preguntas abiertas y confianza. Es **read-only**: nunca muta el brief ni el experimento. La interpretación pasa por un **seam gobernado de texto** (LLM detrás de un port/adapter, nunca un SDK de provider directo), y la capacidad nace con Full API Parity (reader transport-neutral, `ui`/`mcp` `policy-blocked` hasta promoción).
 
 Dirección es el puente entre Creative Prompt y la ejecución: valida que la propuesta del agente se entienda
-antes de reservar créditos y convierte las inferencias de cámara en decisiones observables, editables o
+antes de reservar créditos y convierte las inferencias de cámara y formato en decisiones observables, editables o
 marcadas como preguntas abiertas. No genera un prompt alternativo opaco ni captura chain-of-thought.
 
 ## Why This Task Exists
@@ -48,6 +48,8 @@ Además, `efeonce-globe` **no tiene todavía un cliente de texto/LLM canónico**
 - Un reader gobernado y transport-neutral `globe.lab.experiment.direction` `[verificar nombre wire]` que devuelva una **interpretación del brief** (`BriefDirectionV1`) para un experimento del workspace del caller, sin mutar estado.
 - Un **seam de interpretación de texto** (port + adapter) que sea el ÚNICO lugar donde se invoca un LLM para interpretar, detrás del kill switch, con impl fake determinista para tests y adapter real por el cliente de texto gobernado de Globe (nunca un SDK de provider directo).
 - La interpretación declara **decisiones de dirección** (dimensión + valor + `source: explicit|inferred|suggested`), supuestos, preguntas abiertas y confianza, de modo que el operador vea qué es del brief y qué infirió la plataforma antes de estimar.
+- Cuando el formato cambia la dirección, la lectura puede declarar el uso (`feed`, `story`, `hero`, `banner`),
+  safe zones, relación con el origen y si la operación es generación nativa, conservación o adaptación.
 - Capacidad con **Full API Parity**: reader canónico en el registry del spine, `ui`/`mcp` `policy-blocked` hasta promoción; http/sdk/cli/worker/e2e disponibles. Nexa y los demás consumers la operan por construcción una vez promovida — cero integración específica.
 
 <!-- ═══════════════════════════════════════════════════════════
