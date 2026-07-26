@@ -714,3 +714,19 @@ reautenticación, cobertura de epoch) → composer.
 > label, sin redeploy — gotcha #4). **TASK-1428 y TASK-1429 → complete/** (README/registry/ledger/
 > timing ledger sincronizados). Queda: ventana monitor 7d `growth.cta.*` (comparte 2026-07-25 con
 > TASK-1427) y la primera campaña `slide_in` real (decisión de negocio: surface/copy/trigger).
+
+## 2026-07-26 — Globe Producer React: conversión, generación real y el bloqueo de fondeo
+
+**Repo del código:** `efeonce-globe` (`main`, desplegado). **Doc gobernante:** `docs/architecture/creative-studio/EFEONCE_GLOBE_CLIENT_APPLICATION_DECISION_V1.md`, deltas 2026-07-25 (5) y 2026-07-26 (1)…(4) + alcance del ADR.
+
+**Entregado y verificado:** paleta ⌘K + atajos + recorrido guiado; panel de créditos con saldo real (`500008 de 500110`, uso del mes); mención de referencias cableada (`authorizedInputs`/`referenceHashes` viajan); glifo por modo; **CI en verde por primera vez** (llevaba 12 commits rojo: `studio-client` era el único package cuyo `typecheck` no construía sus dependencias).
+
+**Generación real:** **audio punta a punta** — `prepare` 200, `execute` 200, pieza `retained`/`terminal`, 6 créditos, bytes servidos por el carril gobernado (HTTP 200, `audio/mpeg`, 114.983 bytes). **Imagen y video NO**: el fondeo del mes está agotado.
+
+**Bloqueo abierto (necesita decisión, no código):** `monthlyCap 110 · spentInPeriod 108 · policyAvailable 2 · reason pool_exhausted`. `credits.allocate` llena el ledger pero **no fondea** (la política sólo mira grants de pools activos). Fondearlo hoy exige break-glass —`serviceAccountTokenCreator` temporal al operador, ejecutar, revocar, readback (`GLOBE_RUNTIME_HANDOFF.md:220`)—, que ya se usó tres veces para la misma clase de acto. Alternativa sin acción: el mes reinicia y libera el tope.
+
+**Siguiente paso decidido:** ADR de **administración de Globe desde Greenhouse** (créditos + capabilities): superficie en Greenhouse, autoridad en Globe, lane `sister-platform`, identidad broker dedicada, llave siempre dentro del runtime de Globe, humano aprueba en Greenhouse y Globe ejecuta. Eso elimina el break-glass como operación normal. Después: la task del comando `propose → confirm`, y `ISSUE-124` con la evidencia de hoy (el 409 es la taxonomía de crédito colapsada en `conflict`).
+
+**Paridad para retirar el legacy: 14/38.** Cuello real: `library` 0/6 y `viewer` 1/6 — **ya no el composer** (7/14), que es lo que decía el delta del 2026-07-25. Medido por id literal: es techo optimista, el gate sigue siendo `legacy-parity.test.ts`.
+
+**Pendiente sin bloqueo:** capa de teclado del feed + favoritos; reservas activas y presupuesto de proyecto en el panel de créditos; retirar `scripts/raise-credit-monthly-cap.mjs` cuando exista el comando gobernado (su premisa —firmar desde el cliente— contradice el diseño).

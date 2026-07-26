@@ -957,3 +957,43 @@ shippeó con **4 de 11** animaciones del diseño aprobado. El task-lint sólo ve
 - **`greenhouse-task-planner`**: para autorar/actualizar la `TASK-###` que gobierna el trabajo (recordá: el registry es de Greenhouse).
 - **`greenhouse-documentation-governor`**: para el cierre documental proporcional (arquitectura de Globe + handoff + lifecycle de la task en Greenhouse).
 - Globe está gobernado por **EPIC-028** (parallel-first: Model Lab, plataforma gobernada y validación comercial avanzan en carriles con gates distintos). Ejecutar un experimento de modelo y promover una ruta a UI/MCP son **gates separados**: parity contractual nace temprano; habilitar una surface es aparte.
+
+## Gasto y crédito en Globe — lo que hay que saber ANTES de tocar generación (2026-07-26)
+
+Cinco reglas medidas contra el runtime, no razonadas. Las tres primeras cuestan una sesión entera si se ignoran.
+
+1. **`credits.allocate` NO habilita gasto.** Llena el **ledger**; la política (`AdminCreditBudgetPolicy`) sólo mira
+   **grants de pools activos**. Por eso se puede ver `ledgerAvailable: 500002` y que toda generación se niegue con
+   `pool_exhausted`. Son dos capas: ledger ≠ fondeo. "Cargar créditos" no es fondear.
+
+2. **Un `409 conflict` en `execute` casi nunca es idempotencia.** `dispatch.ts` colapsa **toda** negación de crédito
+   en `conflict` —`approval_stale`, `approval_invalid`, `hard_cap_exceeded`, `insufficient_balance`,
+   `budget_denied`— para no filtrar saldos. Para desambiguar hay que preguntarle a
+   **`globe.credits.budget.evaluate`** (devuelve `reason`) y a `budget.availability.get`
+   (`policyAvailable` vs `ledgerAvailable`). **Ninguno de los dos está en la superficie `ui`**: se consultan por el
+   lane privado.
+
+3. **El cliente DEBE honrar `withinDayCap`.** El estimado lo trae (`= commercial.withinBudget`, o sea la política
+   negando). Ignorarlo deja el CTA habilitado, `prepare` en 200 y `execute` en 409 opaco, con un experimento
+   preparado por intento. El legacy lo chequea antes de preparar (`producer_budget_policy_blocked`).
+
+4. **`hardCapCredits` es parte del quote que firma el `approvalToken`.** El estimado y `prepare` tienen que declarar
+   **el mismo** techo: `execute` reconstruye el quote desde lo guardado y, si no coincide, rechaza como
+   `approval_stale` → que llega como `conflict`. Y el token que viaja en `execute` es el del estimado **vigente**:
+   "el token ES la cotización".
+
+5. **Firmar aprobaciones desde un cliente es BREAK-GLASS, no operación.** El secreto de aprobación es
+   `only api_runtime can read them` (`infra/terraform/secrets.tf`). El procedimiento documentado
+   (`GLOBE_RUNTIME_HANDOFF.md:220`) otorga `serviceAccountTokenCreator` **temporalmente al operador humano**, ejecuta
+   y revoca con readback. **NUNCA** lo conviertas en el camino normal, **NUNCA** le des
+   `secretmanager.versions.access` a `greenhouse-portal@` (es la identidad de reconciliación de tenancy de
+   **Greenhouse**: usarla para administrar crédito de **Globe** es admin implícito cross-plataforma), y **NUNCA**
+   dejes que un solo proceso proponga y confirme — eso colapsa el maker-checker que impide autofinanciarse.
+
+**Dirección aprobada (ADR pendiente, alcance en `EFEONCE_GLOBE_CLIENT_APPLICATION_DECISION_V1.md` §2026-07-26):**
+la administración de créditos y capabilities de Globe **vive en Greenhouse** — superficie en Greenhouse, autoridad
+en Globe, lane `sister-platform`, identidad broker dedicada, la llave nunca sale del runtime de Globe, y el humano
+aprueba en Greenhouse mientras Globe ejecuta (dos actores por construcción, sin break-glass).
+
+**Método:** `gcloud` CLI y ADC son credenciales **distintas** — el token del CLI puede estar vencido y ADC seguir
+viva (o al revés). No des por bloqueado un diagnóstico de infra sin probar las dos.
