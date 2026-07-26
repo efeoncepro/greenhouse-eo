@@ -44,15 +44,17 @@ El modelo sigue en `Draft` hasta cerrar evidencia de cliente, delivery, economic
 
 ### ICP inicial a seleccionar
 
-No hay todavía un ICP primario aprobado. Las cohortes candidatas son:
+El universo operativo de Efeonce para esta oferta es **mid-market y enterprise**. No hay todavía un ICP primario
+aprobado dentro de esas dos bandas. Las cohortes candidatas son:
 
 1. organizaciones multi-mercado o multi-marca con alta dependencia de búsqueda;
 2. equipos de marketing/growth que necesitan unir SEO, AEO y evidencia ejecutiva;
 3. empresas en migración, replatforming o expansión internacional;
 4. organizaciones con baja transparencia sobre qué acciones mueven su visibilidad.
 
-La primera cohorte debe elegir una sola combinación de industria, tamaño, geografía, complejidad y trigger. No se debe
-validar “cualquier empresa que necesite SEO”.
+La primera cohorte debe elegir una sola combinación de banda —mid-market o enterprise—, industria, geografía,
+complejidad y trigger. No se debe validar “cualquier empresa que necesite SEO” ni extender el alcance a SMB por
+conveniencia de adquisición.
 
 ### Buying committee candidato
 

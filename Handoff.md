@@ -14,6 +14,10 @@ Commercial, Research, Pricing, Finance, Legal u Operations: define sus handoffs 
 El modelo queda agnóstico a Wave, Globe, Search Visibility 360 o cualquier otra línea. Las ofertas concretas deben
 aplicarlo con evidencia real; la skill no convierte hipótesis en ICP aprobado, venta, renovación ni escala.
 
+Aplicación inicial: `docs/business-models/search-visibility-360/SEARCH_VISIBILITY_360_CUSTOMER_MODEL_INTEGRITY_PACK_V1.md`.
+Search Visibility 360 queda explícitamente acotado a clientes mid-market y enterprise; el pack mantiene `model_incomplete`
+porque todavía faltan beachhead, cuentas reales, buying groups, WTP, economics y señales de adopción/retención.
+
 ## 2026-07-26 — Pricing Integrity Pack aplicado a Wave
 
 Se probó `efeonce-pricing-operator` sobre las cinco familias de Wave y sus delivery models. El resultado vive en

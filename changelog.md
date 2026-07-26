@@ -16,6 +16,15 @@
 - Business model, GTM, commercial, research, pricing y agency quedaron conectados a la nueva capa; las ofertas concretas
   siguen siendo responsables de aportar evidencia y mantener sus boundaries.
 
+## 2026-07-26 — Customer Model Integrity Pack para Search Visibility 360
+
+- Se creó `SEARCH_VISIBILITY_360_CUSTOMER_MODEL_INTEGRITY_PACK_V1.md` aplicado a la oferta SEO+AEO integrada de Wave.
+- El alcance comercial queda explícitamente en mid-market y enterprise; SMB queda fuera salvo decisión posterior.
+- El pack separa ICP estratégico/oportunidad/delivery y califica de forma independiente diagnostic, implementation,
+  managed operation, ecosystem/providers y renewal.
+- Se documentan jobs secuenciales, buying group por fase, decision/paper process, provider governance, transition gates,
+  evidence ledger y experimentos. Verdict: `model_incomplete` / `hypothesis_only`.
+
 ## 2026-07-26 — Pricing transversal para Codex y Claude
 
 - Se creó la skill agnóstica `efeonce-pricing-operator` en `.codex/skills/` y `.claude/skills/`.

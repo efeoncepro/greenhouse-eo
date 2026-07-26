@@ -5,6 +5,7 @@
 > **Owner:** Wave + Strategy + SEO/AEO + Product + Finance
 > **Pricing Integrity Pack:** [`SEARCH_VISIBILITY_360_PRICING_INTEGRITY_PACK_V1.md`](SEARCH_VISIBILITY_360_PRICING_INTEGRITY_PACK_V1.md)
 > **Business Model Integrity Pack:** [`SEARCH_VISIBILITY_360_BUSINESS_MODEL_INTEGRITY_PACK_V1.md`](SEARCH_VISIBILITY_360_BUSINESS_MODEL_INTEGRITY_PACK_V1.md)
+> **Customer Model Integrity Pack:** [`SEARCH_VISIBILITY_360_CUSTOMER_MODEL_INTEGRITY_PACK_V1.md`](SEARCH_VISIBILITY_360_CUSTOMER_MODEL_INTEGRITY_PACK_V1.md)
 
 ## Scope hypothesis
 
@@ -17,7 +18,7 @@ ownership de Wave sobre la oferta de visibilidad.
 
 | Question | Required answer |
 |---|---|
-| Customer/ICP | See Integrity Pack §3; ICP still hypothesis |
+| Customer/ICP | Mid-market y enterprise; see Customer Model Integrity Pack §§2–3; beachhead and ICP still hypothesis |
 | Entry trigger | See Integrity Pack §3; trigger still hypothesis |
 | Core job | See Integrity Pack §3; proposed job, pending evidence |
 | Output/outcome boundary | See Integrity Pack §3; boundaries proposed, claims pending |
