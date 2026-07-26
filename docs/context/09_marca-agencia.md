@@ -84,6 +84,9 @@ La categoría de mercado se expresa como **AI-enabled marketing and growth syste
 
 En inglés, usar transcreación, no traducción literal: **Efeonce is an AI-enabled growth systems company for ambitious organizations — an integrated growth partner combining people, products, platforms and agents on the way to a Growth Operating System.**
 
+La promesa operativa detrás de ese posicionamiento es la dirección 2028: cada servicio client-facing debe ser un
+Product Service productizado y AI-native, sin confundir AI-native con autónomo, self-service o reducción de personas.
+
 Regla para posicionamiento global: vender el **sistema** antes que el origen regional. "LATAM" puede aparecer como prueba de ejecución multi-mercado, cercanía cultural, velocidad y eficiencia, pero nunca como límite de ambición ni como sustituto del mecanismo.
 
 ### Operating Code interno

@@ -28,6 +28,9 @@ Antes de fijar packaging o pricing, usar `docs/business-models/EFEONCE_PRODUCT_S
 separar Product Service, nivel de productización, delivery model, operating mode y engagement. Pricing no debe
 convertir un delivery model —por ejemplo Managed Squad o Staff Augmentation— en una oferta distinta sin decisión
 de negocio explícita.
+El pricing de servicios 2028 debe poder operar sobre Product Services AI-native: separar people capacity, platform,
+agent/provider usage, governance, implementation, risk, rights y recurring economics; no asumir que AI-native implica
+self-service o eliminar personas.
 
 ## Workflow
 

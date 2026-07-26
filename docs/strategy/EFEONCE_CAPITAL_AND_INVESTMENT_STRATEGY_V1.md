@@ -20,6 +20,10 @@ delivery.
 una entidad legal ni una ronda. El capital se levanta en la compañía o vehículo que ejecuta la tesis de
 crecimiento; ASaaS explica cómo se captura valor.
 
+La dirección estratégica 2028 exige que todos los servicios client-facing evolucionen a Product Services
+productizados y AI-native. La evidencia de esa transición debe distinguirse de software revenue, ARR o PMF y no
+autoriza claims financieros por sí sola.
+
 La dirección vigente es:
 
 1. evaluar primero una ronda a nivel de **Efeonce Group** cuando el capital financie el sistema completo;

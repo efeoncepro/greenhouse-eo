@@ -122,6 +122,15 @@ que combina plataforma, especialistas y capacidad de delivery. Puede entregarse 
 Production, Managed Squad o Staff Augmentation. Managed Squad conserva dirección y accountability de Efeonce/Globe;
 Staff Augmentation queda bajo dirección cotidiana del cliente y no hereda automáticamente el SLA del squad.
 
+## 2026-07-26 — Efeonce 2028: todos los servicios Productized y AI-native
+
+Se creó `docs/strategy/EFEONCE_2028_PRODUCTIZED_AI_NATIVE_SERVICES_STRATEGIC_DIRECTION_V1.md` como directriz
+corporativa propuesta. Para 2028, todo servicio client-facing debe pasar los gates de Product Service y AI-native:
+oferta y scope definidos, workflow repetible, IA estructural, autoridad humana, plataforma/memoria, quality gates,
+economics, governance y evidencia. No implica SaaS puro, self-service, autonomía total ni reducción de personas.
+Se actualizaron ASaaS, Product Service Operating Model, business models, context y skills de agencia, negocio,
+pricing y customer model.
+
 ## 2026-07-26 — Efeonce Product Service Operating Model
 
 Se creó `docs/business-models/EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md` como contrato transversal para toda

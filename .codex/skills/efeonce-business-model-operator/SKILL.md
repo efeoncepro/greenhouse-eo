@@ -29,6 +29,9 @@ versionado, guardrails y Pricing Integrity Pack.
 La skill es transversal; los documentos de `docs/business-models/` son la fuente canónica de cada oferta.
 La definición transversal de qué es un Product Service, sus niveles de productización y la separación entre
 delivery model, operating mode y engagement vive en `docs/business-models/EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md`.
+La dirección corporativa vigente exige que todo servicio client-facing llegue a 2028 como Product Service
+productizado y AI-native; usar `docs/strategy/EFEONCE_2028_PRODUCTIZED_AI_NATIVE_SERVICES_STRATEGIC_DIRECTION_V1.md`
+para sus gates, madurez y excepciones.
 
 ## Autoridad y composición
 

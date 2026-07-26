@@ -36,6 +36,15 @@ CRM, web, data y otros— son capacidades y puntos de entrada del mismo sistema.
 
 ---
 
+### Dirección 2028
+
+La ambición operativa es que **todos los servicios client-facing de Efeonce sean productizados y AI-native para
+2028**. ASaaS no significa que todos sean SaaS puro, self-service o autónomos: significa que cada servicio tiene
+Product Service Contract, método repetible, plataforma/memoria, IA estructural, autoridad humana, quality gates,
+economics y evidencia. La definición detallada y sus gates viven en [`Efeonce 2028 — Productized AI-Native Services`](EFEONCE_2028_PRODUCTIZED_AI_NATIVE_SERVICES_STRATEGIC_DIRECTION_V1.md).
+
+---
+
 ## 1. Definición canónica
 
 > **ASaaS (Agency-as-a-Service) es la operación de una agencia digital cuyas capacidades de servicio están productizadas, instrumentadas con software propio, y entregadas con la confiabilidad operativa, transparencia de datos, y economía unitaria de un negocio SaaS — sin renunciar a la sofisticación humana del trabajo creativo y estratégico que define la disciplina de agencia.**

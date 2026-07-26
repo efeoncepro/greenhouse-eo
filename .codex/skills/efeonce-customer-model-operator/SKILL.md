@@ -12,6 +12,10 @@ servicios, Productized Services, Managed Squads, Staff Augmentation, plataformas
 licencias y ofertas híbridas. En ofertas compuestas, calificar por separado diagnóstico, implementación, operación
 recurrente y ecosistema de proveedores.
 
+Para cualquier oferta con horizonte 2028, el modelo de cliente debe validar también si el buyer compra una capacidad
+Product Service AI-native, qué nivel de human-in-the-loop espera, qué operación desea (managed, co-operated o
+client-operated) y qué evidencia justificaría adopción, renovación y expansión.
+
 No es una buyer-persona decorativa, un lead score ni un método de ventas único. `MEDDPICC`, `Challenger`, `JTBD`,
 `BANT` u otros métodos son lentes que se seleccionan por complejidad; ninguno sustituye el modelo de cliente.
 

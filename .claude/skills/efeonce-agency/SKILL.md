@@ -90,6 +90,10 @@ Antes de construir, poder responder **sí a ≥1 verde** y **no a todas las roja
  - Regla: cada plataforma opera sola; **cuando el cliente está en el ecosistema completo, Greenhouse es donde todo converge.** No acoplar Greenhouse al runtime de Kortex/Verk/Creative Studio; consumir sólo contratos/proyecciones autorizadas.
 - **ASaaS (Agency Service as a Software)**: el servicio de agencia empaquetado como producto de software. 6 directrices: acceso permanente · datos en vivo · experiencia estandarizada · **valor acumulativo (el historial es feature)** · **switching cost creciente (North Star)** · monetización recurrente (tier pricing Basic/Pro/Enterprise = capability flags por tenant).
 
+**Dirección corporativa 2028:** todos los servicios client-facing deben ser Product Services productizados y
+AI-native. Cargar `docs/strategy/EFEONCE_2028_PRODUCTIZED_AI_NATIVE_SERVICES_STRATEGIC_DIRECTION_V1.md` y
+`docs/business-models/EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md` antes de validar una nueva oferta o feature.
+
 > Detalle: `01_quienes-somos` · `03_ecosistema-producto` · `04_greenhouse-producto` · `07_ico` · `14_modelo-negocio-asaas`.
 
 ---

@@ -18,6 +18,8 @@ compuestas, calificar por separado diagnóstico, implementación, operación rec
 `ICP de oportunidad` e `ICP de delivery` no son equivalentes.
 Modelar tanto el decision process como el paper/procurement process. Seleccionar MEDDPICC, Challenger, JTBD u otro
 lente por complejidad; ninguno sustituye el modelo de cliente.
+Para ofertas con horizonte 2028, validar también el nivel de human-in-the-loop, el operating mode esperado y la
+evidencia de que el comprador adopta una capability Product Service AI-native, no sólo una entrega puntual.
 
 ## Resultado obligatorio
 

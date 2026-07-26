@@ -15,3 +15,6 @@ For the customer model (ICP, JTBD, buying group, decision, procurement, validati
 units, discounts, versioning, economics guardrails and the Pricing Integrity Pack.
 The transversal definition of Product Service, productization levels, delivery models, operating modes and
 engagements lives in `docs/business-models/EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md`.
+The corporate 2028 direction requires every client-facing service to become productized and AI-native; use
+`docs/strategy/EFEONCE_2028_PRODUCTIZED_AI_NATIVE_SERVICES_STRATEGIC_DIRECTION_V1.md` for maturity gates and
+exceptions.

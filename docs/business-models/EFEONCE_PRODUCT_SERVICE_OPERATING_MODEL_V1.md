@@ -8,6 +8,9 @@
 - Applies to: Efeonce Group, Wave, Globe, Search Visibility 360, Measurement, Agent Systems y futuras capabilities
 - Does not authorize pricing, sale self-serve, claims públicos ni contratos por sí solo
 
+La dirección corporativa para este modelo está en [`Efeonce 2028 — Productized AI-Native Services`](../strategy/EFEONCE_2028_PRODUCTIZED_AI_NATIVE_SERVICES_STRATEGIC_DIRECTION_V1.md): para 2028 todo servicio
+client-facing debe pasar los gates de Product Service y AI-native.
+
 ## Purpose
 
 Este documento define qué significa `Product Service` dentro de Efeonce y evita que cada línea use el concepto
@@ -27,6 +30,13 @@ Legal, Operations, Product y las skills de los agentes.
 Un Product Service no es simplemente una lista de servicios, una skill interna, un retainer abierto, una plataforma
 tecnológica, un equipo de personas ni un tarifario. Puede combinar todos esos elementos, pero debe declarar cómo
 se relacionan y qué outcome controlable compra el cliente.
+
+## 2028 portfolio requirement
+
+Para 2028, ningún servicio client-facing de Efeonce debe permanecer como trabajo bespoke no sistematizado. Todo
+servicio deberá alcanzar, como mínimo, nivel `AI-native` en la escalera corporativa: Product Service Contract,
+workflow repetible, plataforma o sistema de memoria, IA estructural, autoridad humana, quality gates, economics y
+evidencia. Esto no exige SaaS puro, self-service ni autonomía total.
 
 ## Market terminology
 

@@ -58,6 +58,9 @@ Todo lo que mostramos debe poder conectarse —directa o indirectamente— con i
 
 **Ambición de mercado:** Efeonce es **LATAM-first, no LATAM-limited**. La dirección es construir una empresa de sistemas de crecimiento digital habilitados por IA, preparada para servir EEUU hispano, mercados en inglés y otros mercados internacionales mediante estrategia, personas, product services, plataformas y agentes. En lenguaje comercial: **Integrated Growth Partner**. El modelo es **ASaaS** y la visión de largo plazo es **Growth Operating System**: co-creación convertida en software, método, datos y memoria acumulada. Decisión pública: `docs/public-site/decisions/PDR-012-growth-operating-system-global-positioning.md`.
 
+Directriz corporativa: para 2028 todos los servicios client-facing deben ser Product Services productizados y
+AI-native. El contrato y los gates viven en [`Efeonce 2028 — Productized AI-Native Services`](../strategy/EFEONCE_2028_PRODUCTIZED_AI_NATIVE_SERVICES_STRATEGIC_DIRECTION_V1.md).
+
 **Cultura operativa:** el Why se impregna en el equipo mediante el **Efeonce Operating Code**: `docs/operations/EFEONCE_OPERATING_CODE_V1.md`. Regla cultural: *en Efeonce se valora a quien deja al cliente más capaz, deja el sistema con más memoria y conecta su trabajo con crecimiento real.*
 
 ---

@@ -10,6 +10,9 @@
 - **ASaaS (Agency Service as a Software)** — el servicio de agencia empaquetado como producto de software. Tres plataformas, no informes.
 - **Surround Discovery™** — visibilidad en las 5 superficies donde la audiencia descubre, incluyendo motores de IA.
 
+Directriz de portfolio: para 2028 todo servicio client-facing debe llegar como Product Service productizado y
+AI-native. El GTM debe vender outcomes y sistemas de delivery, no horas, herramientas de IA ni automatización aislada.
+
 **Contra quién competimos** (no de frente con agencias creativas ni con SaaS puros):
 
 | Dimensión | Agencia tradicional | SaaS puro | **Efeonce ASaaS** |

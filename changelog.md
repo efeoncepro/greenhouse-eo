@@ -49,6 +49,14 @@
 - Business Model y Pricing Operators de Codex/Claude ahora deben cargar este modelo antes de diseñar packaging o
   pricing; Wave, Globe y Experience LaunchOps quedan referenciados a él.
 
+## 2026-07-26 — Directriz corporativa 2028: todos los servicios Productized y AI-native
+
+- Se creó `docs/strategy/EFEONCE_2028_PRODUCTIZED_AI_NATIVE_SERVICES_STRATEGIC_DIRECTION_V1.md`.
+- La directriz aplica a todo servicio client-facing y exige Product Service Contract, workflow repetible, IA
+  estructural, autoridad humana, plataforma/memoria, gates, economics, governance y evidencia.
+- ASaaS Manifesto, modelo ASaaS, contexto corporativo y skills de agencia, business model, pricing y customer model
+  quedaron alineados. AI-native no se interpreta como SaaS puro, self-service, autonomía total ni reducción de personas.
+
 ## 2026-07-26 — Customer Model Operator para Codex y Claude
 
 - Se creó la skill transversal `efeonce-customer-model-operator` en `.codex/skills/` y `.claude/skills/`.
