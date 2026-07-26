@@ -978,3 +978,49 @@ justamente para eso. No lo puede hacer un agente solo, y está bien que sea así
   habría sido más rápido, no más concluyente.
 
 Commits: `cb4a6cb`, `48de228`. Deploy: `30185494229`.
+
+## Delta 2026-07-26 (3) — el carril gobernado de crédito no tiene identidades asumibles, y la paridad real es 14/38
+
+Dos mediciones que cierran la sesión.
+
+### Subir el tope de crédito no lo puede hacer NADIE hoy
+
+`scripts/raise-credit-monthly-cap.mjs` quedó completo y probado (6 tests contra el verificador real del servidor,
+registrados en el `test` de la raíz). No se puede correr, y no por permisos de una persona:
+
+- Las dos SAs que el API allowlistea con forma de maker-checker —`globe-promotion-promoter@` y
+  `globe-promotion-checker@`— pertenecen al **saga de promoción de MODELOS** (ADR-009 / `TASK-1527`,
+  `infra/terraform/locals.tf`). No son de administración de crédito, y reusarlas sería tomar prestada una
+  separación de deberes ajena para autorizar gasto.
+- Nadie puede asumirlas: `generateIdToken` sobre el checker devuelve **403** para la identidad del operador. No hay
+  binding de `serviceAccountTokenCreator` para ningún humano ni para Actions.
+
+O sea: los comandos existen, el verificador existe, el script existe — y el carril **nunca fue ejercitado**.
+Habilitarlo pide dos identidades propias de credit-admin, disjuntas, con su binding en Terraform: gobernanza con
+revisión, no un `add-iam-policy-binding` al paso. Mientras no existan, el tope se mueve solo al reiniciar el mes,
+y por eso imagen y video siguen sin poder generarse (audio sí: verificado punta a punta más arriba).
+
+**Corrección a lo que este ADR insinuaba:** la conversión no estaba bloqueada por "presupuesto agotado" sino por un
+**carril de administración sin identidad**. El agotamiento del tope es el síntoma; la ausencia del binding es la
+causa de que no se pueda resolver.
+
+### La paridad real es 14/38, y el cuello NO es el composer
+
+Medido contra `apps/studio-client/src/data/legacy-parity.ts`, por superficie:
+
+| Superficie | Cobertura | Falta |
+|---|---|---|
+| credits | 3/4 | `credits.budget.list` |
+| feed | 2/4 | `asset.favorite`, `run.list` |
+| composer | 7/14 | `catalog.list`, `style.list`, `style.materialize`, `voice.preset.list`, `run.retry.estimate`, `experiment.relaunch`, `experiment.variate` |
+| review | 1/4 | `review.thread.get`, `review.comment.create`, `review.decide` |
+| viewer | 1/6 | `experiment.get`, `experiment.status`, `run.get`, `provenance.get`, `provenance.list` |
+| library | **0/6** | las seis de biblioteca/colecciones/export |
+
+El Delta del 2026-07-25 declaró el composer como "el cuello de botella del retiro". **Ya no lo es**: con 7/14 va
+mejor que viewer (1/6) y que library (0/6, sin una sola). Cuatro de las que le faltan tienen la UI puesta y muerta
+(Style DNA, voces, Recrear, Variar), así que su hueco es sólo el despacho — la deuda más barata del inventario.
+
+**Y una advertencia sobre esta medición**, porque el propio archivo la anticipa: se hizo por id literal en las
+fuentes, y un `grep` prueba que el string existe, no que la llamada sea alcanzable ni autorizada. `14/38` es un
+techo optimista para priorizar; el gate sigue siendo `legacy-parity.test.ts`, que ejercita el dispatch.
