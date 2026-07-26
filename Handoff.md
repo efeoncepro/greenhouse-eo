@@ -18,6 +18,13 @@ Aplicación inicial: `docs/business-models/search-visibility-360/SEARCH_VISIBILI
 Search Visibility 360 queda explícitamente acotado a clientes mid-market y enterprise; el pack mantiene `model_incomplete`
 porque todavía faltan beachhead, cuentas reales, buying groups, WTP, economics y señales de adopción/retención.
 
+## 2026-07-26 — EPIC-022 actualizado con product/service readiness
+
+EPIC-022 ahora distingue madurez AEO, arquitectura SEO y runtime SEO, e incorpora los gaps de producto-servicio:
+action loop, integración de contenido/Globe, medición de negocio, customer success, enterprise operations y provider
+governance. También fija mid-market + enterprise como alcance, gates de diagnostic/commercial qualification/
+implementation/managed operation/renewal/enterprise y la secuencia de olas recomendada. El epic permanece en diseño.
+
 ## 2026-07-26 — Pricing Integrity Pack aplicado a Wave
 
 Se probó `efeonce-pricing-operator` sobre las cinco familias de Wave y sus delivery models. El resultado vive en

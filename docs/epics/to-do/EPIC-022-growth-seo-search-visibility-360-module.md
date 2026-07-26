@@ -100,3 +100,79 @@ El topic cluster gana estructura **pillar + supporting**: la pillar page es el h
 ## Delta 2026-07-02 (cont. 2) — E-E-A-T como capa de entidad/calidad conectiva
 
 E-E-A-T (Experience · Expertise · Authoritativeness · Trustworthiness) es el "por qué" debajo de rankear (SEO) Y de ser citado (AEO), y el multiplicador del topical authority. Hallazgo al aterrizar el diseño: **~70% de la materia prima ya existe en el probe layer del grader** (eje `entity` KG/Wikidata/Reddit-UGC de TASK-1267 + `json-ld` structural + `brand-intelligence` LLM del contenido del sitio). Gap = capa de autor + rúbrica/rater 4 pilares (YMYL-aware) + señales de trust explícitas. **Vive cerca del grader** (extiende su eje entity), el módulo SEO la **consume** (un primitive, dos consumers). Regla dura: E-E-A-T es un **assessment**, no un dial — medido (●) vs evaluado (◑), calibración anti falso-0 (lección EPIC-021), reusa evals/accuracy. 3 tasks: `TASK-1315/1316/1317`. Detalle: `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §16.
+
+## Delta 2026-07-26 — Madurez de producto-servicio y readiness comercial
+
+Este epic no debe cerrarse sólo porque existan schema, readers, crons y pantallas. Search Visibility 360 es una
+capability productizada de Wave operada por Efeonce; debe cerrar el ciclo **diagnóstico → acción → implementación →
+verificación → renovación** y servir al alcance comercial mid-market y enterprise.
+
+### Madurez actual
+
+| Capa | Estado | Qué significa |
+|---|---|---|
+| AEO engine | `diagnostic_ready` | El motor brand-aware, reportes, probes y evidencia permiten diagnosticar visibilidad IA. |
+| AEO comercial | `commercially_partial` | Grader/Radiografía existen; cockpit operador, entrada pública y loop completo siguen pendientes. |
+| SEO architecture | `design_complete` | El bounded context, datos, providers, boundaries y secuencia están definidos. |
+| SEO runtime | `not_started_as_epic` | EPIC-022 sigue en diseño; TASK-1299 es el bloqueador fundacional. |
+| Search Visibility 360 | `validation_only` | La narrativa SEO+AEO está definida, pero no hay aún evidencia suficiente de repetibilidad, WTP, margen o renovación. |
+
+### Gaps de producto-servicio que el programa debe cerrar
+
+1. **Action loop:** cada finding debe poder convertirse en prioridad, responsable, tarea, aprobación, implementación y
+   verificación; el módulo no puede ser sólo un dashboard.
+2. **Content/delivery loop:** `gap → brief → producción Globe cuando corresponda → aprobación → publicación →
+   indexación → medición`, manteniendo Wave como owner de Search Visibility 360.
+3. **Business measurement:** conectar GSC/GA4/HubSpot y la evidencia del cliente con leads, conversiones, pipeline y
+   revenue influence; rankings, clicks, SoV y citaciones no son automáticamente outcomes.
+4. **Customer success:** instrumentar baseline/after, cadence, sponsor, health, renewal trigger, expansion trigger y
+   límites de atribución.
+5. **Enterprise operations:** multi-site, multi-brand, multi-market, permisos, seguridad, DPA, procurement, SLA,
+   exportación, retención y continuidad de proveedores.
+6. **Provider/ecosystem governance:** definir RACI, pass-through, subcontratistas, liability, incident response,
+   sustitución y exit assistance para Globe, Reach, plataformas y terceros.
+
+### Alcance de cliente
+
+Efeonce atiende **mid-market y enterprise**. SMB queda fuera del ICP de este epic salvo una decisión explícita
+posterior. El diseño debe separar:
+
+| Segmento | Requisitos mínimos adicionales |
+|---|---|
+| Mid-market | onboarding simple, diagnostic de bajo esfuerzo, reporting ejecutivo, configuración acotada y cadence clara |
+| Enterprise | jerarquía multi-site/marca/mercado, stakeholders y procurement complejos, seguridad/DPA, roles, SLA, auditoría y exportación |
+
+El ICP estratégico, el ICP de oportunidad y el ICP de delivery son objetos distintos. Una cuenta puede tener fit
+comercial y ser inoperable por falta de datos, approvals, governance, proveedores o margen.
+
+### Readiness gates del epic
+
+Además de los exit criteria técnicos, el epic requiere estos gates antes de elevar el estado del modelo:
+
+| Gate | Verdict requerido | Evidencia mínima |
+|---|---|---|
+| Diagnostic | `diagnostic_ready` | trigger, buyer/problem owner, baseline, decision question y siguiente compromiso |
+| Commercial qualification | `commercially_qualified` | buying group, economic buyer, criteria/process, paper process, champion y next step bilateral |
+| Implementation | `implementation_ready` | scope, acceptance, RACI, dependencia del cliente y capacidad/margen por fase |
+| Managed operation | `managed_operation_ready` | counterpart, backlog, cadence, health, first value y economics recurrentes |
+| Renewal/expansion | `renewal_ready` / `expansion_ready` | evidencia aceptada por cliente, sponsor, trigger, capacidad y nuevo scope |
+| Enterprise | `enterprise_ready` | procurement, seguridad, datos, IP, SLA, continuidad y multi-entity governance cerrados |
+
+Los verdicts por fase son independientes: calificar un diagnostic no califica automáticamente implementation, Managed
+Operation, ecosystem providers ni renewal.
+
+### No autoriza todavía
+
+Este delta no autoriza vender Search Visibility 360 como producto autónomo, afirmar PMF/ARR/NRR, prometer rankings o
+revenue, ni publicar pricing. Mantiene las reglas del modelo canónico y del [Customer Model Integrity Pack](../../business-models/search-visibility-360/SEARCH_VISIBILITY_360_CUSTOMER_MODEL_INTEGRITY_PACK_V1.md).
+
+### Secuencia de entrega recomendada
+
+- **Ola A — AEO wedge:** cerrar cockpit operador, entrada pública, binding cliente, regrade, fix-it y SoV por motor.
+- **Ola B — SEO mínimo valuable:** `TASK-1299 → TASK-1300 → TASK-1301 → TASK-1302 → TASK-1306 → TASK-1307`, empezando por GSC para minimizar costo DataForSEO.
+- **Ola C — 360 operativo:** `TASK-1303 → TASK-1304 → TASK-1305 → TASK-1311 → TASK-1313`.
+- **Ola D — authority/enterprise:** `TASK-1312 → TASK-1314 → TASK-1315 → TASK-1316 → TASK-1317 → TASK-1426`, más los contratos de delivery, contenido, revenue y procurement correspondientes.
+
+La definición de cierre del epic debe incluir evidencia técnica **y** evidencia de cliente, delivery, economics,
+adopción y renovación. La fuente transversal para esa evaluación es `efeonce-customer-model-operator`; GTM,
+Commercial, Pricing, Finance, Legal y Operations conservan sus decisiones propias.

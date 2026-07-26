@@ -25,6 +25,14 @@
 - Se documentan jobs secuenciales, buying group por fase, decision/paper process, provider governance, transition gates,
   evidence ledger y experimentos. Verdict: `model_incomplete` / `hypothesis_only`.
 
+## 2026-07-26 — EPIC-022 incorpora readiness de producto-servicio
+
+- Se añadió al epic la madurez actual de AEO, la diferencia entre arquitectura SEO y runtime SEO, y los gaps para cerrar
+  el loop diagnóstico → acción → implementación → verificación → renovación.
+- Se fijó mid-market y enterprise como alcance; SMB queda fuera salvo decisión explícita.
+- Se agregaron gates independientes para diagnostic, commercial qualification, implementation, managed operation,
+  renewal/expansion y enterprise readiness, además de la secuencia por olas AEO → SEO mínimo → 360 → authority/enterprise.
+
 ## 2026-07-26 — Pricing transversal para Codex y Claude
 
 - Se creó la skill agnóstica `efeonce-pricing-operator` en `.codex/skills/` y `.claude/skills/`.
