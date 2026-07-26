@@ -1074,6 +1074,32 @@ grant OAuth. Y sería **inerte**: `tenancy_mode` default es `"shadow"` (`variabl
 `capabilityScopes ⊆ requiredScopes` y agregarlo lo vuelve requerido para todos (la lección que tumbó el login en
 ADR-010). El grant OAuth es el **techo**; la proyección es el **piso**.
 
+🔴 **Una sanitización SIN contraparte de observabilidad no protege información: la DESTRUYE (ISSUE-127, 2026-07-26).**
+Cuatro códigos canónicos de Globe colapsaban causas que exigen acciones **opuestas**, y tres de ellos bloquearon el
+canary de generación en cadena: **`409 conflict`** de crédito (aprobación vencida vs. inválida vs. pool pausado vs.
+replay), **`runner_error`** (todo fallo del runner sin `reason` de nuestro vocabulario), y
+**`ProductionRouteDependencyError`** (**28 sitios de throw sin argumento**: allowlist, endpoint, provider, URL,
+región, persistencia de la decisión, forma del request, placeholder de input). El cuarto —
+**`authentication_required`** en api mode (clase de credencial vs. `--include-email` ausente vs. audiencia
+incorrecta) — **sigue abierto**.
+
+El colapso es **correcto** de cara al caller: no filtrar saldos, política, prosa de proveedor ni detalle de
+credencial por una taxonomía compartida. El defecto es hacerlo **sin dejar rastro del lado del servidor**. El
+precedente correcto ya existía y no se había replicado: `globe.dispatch.invalid_request`.
+
+**La evidencia de que es un patrón y no bugs sueltos:** arreglar `runner_error` hizo aparecer
+`ProductionRouteDependencyError` **en el primer canary posterior** — el evento nuevo reportó
+`errorName=ProductionRouteDependencyError, reasonShape=absent`, o sea nombró la clase y probó que la clase no
+llevaba causa. Sin ese arreglo la tercera seguiría invisible.
+
+**REGLA:** todo código canónico que colapse **más de una causa accionable** nace con su razón del lado del
+servidor. El payload lleva el **nombre del control** y, si aplica, la **FORMA** del dato faltante (`reasonShape`:
+`absent` / `not-a-string` / `malformed` — separa "el adapter no puso `reason`" de "puso uno malformado", dos bugs
+distintos y el segundo invisible sin esto). **JAMÁS** el `message`, el `stack`, el body del upstream ni nada
+derivado del payload: la prohibición de filtrar detalle interno aplica a los **logs** igual que al cliente, y hay
+tests que lo verifican. Y si el dominio es transport-neutral —lo es, cero `console` en el paquete— la razón se
+observa por un **port inyectado**, no por un `console.error` metido ahí.
+
 🔴 **ANTES de escribir una secuencia de canary a mano: YA EXISTE COMO SCRIPT (2026-07-26).**
 `pnpm producer:canary` (`scripts/producer-ui-canary.mjs` + `-lib.mjs`) hace el recorrido **completo** de gasto real
 —`producer.catalog.list` → `lab.experiment.estimate` → `prepare` → `execute` → `experiment.get` →
