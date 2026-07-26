@@ -993,7 +993,14 @@ Ocho reglas medidas contra el runtime, no razonadas. Las tres primeras cuestan u
    y revoca con readback. **NUNCA** lo conviertas en el camino normal, **NUNCA** le des
    `secretmanager.versions.access` a `greenhouse-portal@` (es la identidad de reconciliación de tenancy de
    **Greenhouse**: usarla para administrar crédito de **Globe** es admin implícito cross-plataforma), y **NUNCA**
-   dejes que un solo proceso proponga y confirme — eso colapsa el maker-checker que impide autofinanciarse.
+   dejes que un **agente o proceso** proponga y confirme: la confirmación es de un humano autenticado, siempre.
+
+   🔴 **Y NUNCA exijas DOS humanos por defecto.** La primera versión de ADR-015 lo hacía y costó **dos horas de
+   fricción para sumar créditos**: el operador es CEO y product owner del presupuesto, así que no hay segundo actor
+   que buscar. **Un control que nadie puede satisfacer no protege, desvía** — al break-glass, que otorga MÁS
+   autoridad que el camino que reemplaza. El segundo confirmador es **política** (`requireSecondConfirmer` por
+   workspace + techo por operación), **default OFF** en el workspace interno. Lo que se queda como invariante es lo
+   que cuesta cero: el agente nunca confirma, y aprobador ≠ ejecutor entre service accounts.
 
 6. 🔴 **La autoridad de crédito YA está concedida a la identidad que Greenhouse puede impersonar — el problema no es
    que falte, es que SOBRA.** Cadena verificada 2026-07-26: `greenhouse-portal@` tiene `tokenCreator` sobre
@@ -1022,7 +1029,7 @@ superficie en Greenhouse, autoridad en Globe, lane `sister-platform` (hoy `avail
 identidades disjuntas** (broker de administración **distinto** del reconciliador de tenancy; aprobador que firma y no
 muta; ejecutor que muta y **no puede firmar**, separados como **unidad de ejecución propia** porque dentro de un
 proceso la disyunción es cosmética), **KMS asimétrico** en vez del HMAC, comando gobernado
-`credits.month.fund.propose` / `.confirm` con **dos humanos autenticados distintos** y la mutación (grant + asiento
+`credits.month.fund.propose` / `.confirm` con **UNA confirmación humana** (el agente propone, nunca confirma; el segundo confirmador es política por workspace + techo, default OFF en el interno) y la mutación (grant + asiento
 de ledger + política) en **UNA transacción Postgres**, y el **retiro de la autoridad de crédito del caller
 genérico** al final. Break-glass con TTL/motivo/aprobación/revocación automática/readback **y su propio contador**.
 **Cargá ADR-015 antes de tocar administración de crédito o capabilities de usuarios de Globe.**

@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -45,7 +45,7 @@ Consecuencia operativa medida: con el tope mensual publicado en ~110 créditos y
 
 ## Goal
 
-- Un fondeo mensual real, ejecutado punta a punta por **dos humanos distintos** de Greenhouse, **sin break-glass**.
+- Un fondeo mensual real, ejecutado punta a punta con **UNA confirmación humana** de Greenhouse, **sin break-glass**. El agente puede proponer; **nunca** confirmar.
 - La evidencia de aprobación **nunca sale del runtime de Globe**, y **ningún actor obtiene aprobación y ejecución a la vez**.
 - La mutación (grant + asiento de ledger + política) ocurre en **una sola transacción Postgres**, idempotente por `proposalId`.
 - El caller genérico **pierde** la autoridad de crédito, con señal que detecta si vuelve.
@@ -96,7 +96,7 @@ Reglas obligatorias (extracto de ADR-015 § Reglas duras — la lista completa m
 
 - **Nada bloqueante.** El ledger comercial durable (`TASK-1468`) ya existe y es el que la política consulta. El carril `sister-platform` ya existe y está `available` en tenancy (`packages/domain/src/tenancy.ts:23`).
 - **Habilitación nueva de infra:** Cloud KMS **no está habilitado** en el proyecto de Globe (`grep -rn kms infra/terraform/` = 0 resultados). Hay que sumar `cloudkms.googleapis.com` a `local.enabled_services` en `infra/terraform/locals.tf`, y si el recurso nuevo no tiene arista implícita hacia la API, darle `depends_on` explícito — **arreglar la carrera en el HCL, no reintentar a ciegas** (lección de `TASK-1507`).
-- **Coordinación humana**, no código: el fondeo real del criterio de salida del Slice 4 necesita **dos personas** de Greenhouse.
+- **Coordinación humana**, no código: el fondeo real del criterio de salida del Slice 4 necesita **una** confirmación humana del operador. El segundo confirmador es política (`requireSecondConfirmer`), **default OFF** en el workspace interno owner-operated.
 
 ### Blocks / Impacts
 
@@ -207,7 +207,7 @@ En `greenhouse-eo`:
 - Default state: `flag OFF`. `GLOBE_CREDIT_ADMIN_LANE_ENABLED` declarado en `infra/terraform/variables.tf` con default `false` — **nunca sólo en `terraform.tfvars`**, que está gitignoreado — y **cableado al recurso**: si `grep -rn GLOBE_CREDIT_ADMIN_LANE_ENABLED infra/terraform/` devuelve **una** línea, esa línea es su declaración y no está conectado a nada. Con el flag OFF los comandos nuevos devuelven `policy_blocked` (fail-closed) y el carril viejo sigue operando sin cambio.
 - Backfill plan: `N/A — sin backfill.` Las aprobaciones HMAC históricas no se migran: el verificador dual las sigue aceptando hasta la fecha de retiro declarada (ver Follow-ups para la decisión de retención).
 - Rollback path: flag OFF + redeploy para los Slices 2-5. El Slice 6 (retiro de autoridad del caller genérico) revierte con una edición de HCL/código + deploy — **no** es un flag, y por eso va último y sólo con el carril nuevo verde. El Slice 7 (retiro del HMAC) revierte restaurando el accessor del secreto.
-- External coordination: **sí, y es load-bearing.** Habilitar `cloudkms.googleapis.com` en el proyecto `efeonce-globe`; crear el keyring/clave por Terraform; bindings de IAM cross-proyecto (`greenhouse-globe-admin@efeonce-group` → `tokenCreator` sobre `globe-admin-broker@efeonce-globe`), que el classifier del entorno suele bloquear y **necesita aprobación del operador**; env vars nuevas en `globe-api-internal`, en el `producer-worker` y en Vercel (staging + production); y **dos personas** de Greenhouse para el fondeo real del criterio de salida.
+- External coordination: **sí, y es load-bearing.** Habilitar `cloudkms.googleapis.com` en el proyecto `efeonce-globe`; crear el keyring/clave por Terraform; bindings de IAM cross-proyecto (`greenhouse-globe-admin@efeonce-group` → `tokenCreator` sobre `globe-admin-broker@efeonce-globe`), que el classifier del entorno suele bloquear y **necesita aprobación del operador**; env vars nuevas en `globe-api-internal`, en el `producer-worker` y en Vercel (staging + production); y **una** confirmación humana del operador para el fondeo real del criterio de salida (el segundo confirmador es política, default OFF acá).
 
 ### Security and access
 
@@ -220,7 +220,7 @@ En `greenhouse-eo`:
 
 - Local checks: `pnpm check && pnpm build` en `efeonce-globe` (typecheck NodeNext strict + `node --test`); `pnpm local:check` + `pnpm test` en `greenhouse-eo`. Tests nuevos: verificación de firma KMS (con doble inyectado), verificador dual HMAC+KMS, disyunción de callers, rechazo de propuesta vencida y de fingerprint alterado, y **test de concurrencia con dos `confirm` simultáneos** sobre la misma propuesta. **Registrar cada test nuevo en el script `test` de su package en Globe.**
 - DB/runtime checks: verificar el DDL aplicado contra `information_schema` después de `migrate:up` en los dos repos; probar la transacción parcial (fallo del publish de política deja **cero** grant); leer la propuesta y el grant resultante contra Postgres real.
-- Integration checks: `tofu plan` con **cero** `destroy`/`replace` de identidad viva antes de cualquier apply; verificar que la clave de KMS existe y que **sólo** el aprobador tiene `asymmetricSign` (readback de IAM, no asumido); smoke del lane con el broker nuevo desde staging de Greenhouse; y el **fondeo real punta a punta con dos humanos distintos**.
+- Integration checks: `tofu plan` con **cero** `destroy`/`replace` de identidad viva antes de cualquier apply; verificar que la clave de KMS existe y que **sólo** el aprobador tiene `asymmetricSign` (readback de IAM, no asumido); smoke del lane con el broker nuevo desde staging de Greenhouse; y el **fondeo real punta a punta con una confirmación humana y cero break-glass**.
 - Reliability signals/logs: `globe.credit_admin.break_glass_active` (steady 0), `globe.credit_admin.caller_authority_drift` (steady 0), `globe.credit_admin.partial_funding_state` (steady 0), `globe.credit_admin.legacy_hmac_approval_used` (mide el retiro del HMAC y es lo que le da fecha real), y del lado de Greenhouse la señal de propuestas vencidas sin confirmar. Logs: en Cloud Logging, `textPayload:"…"` **no** matchea logs JSON — usar texto libre o `jsonPayload.event="…"`.
 - Production verification sequence: ver `## Rollout Plan & Risk Matrix § Production verification sequence`.
 
@@ -241,11 +241,33 @@ En `greenhouse-eo`:
 
 ### Slice 1 — La fase de negación se hace legible (cierra la mitad de `ISSUE-124`)
 
-- `CreditAdminDenialPhaseV1` como **enum cerrado** en `packages/contracts`: `approval_stale | approval_invalid | maker_checker_required | pool_paused | pool_exhausted | month_cap_exceeded | project_cap_exceeded | policy_unavailable | replay_fingerprint_mismatch`.
-- `CreditAdministrationError` transporta la fase; `handlerErrorToApiCode` la propaga junto al `conflict` sin cambiar el status HTTP.
-- `globe.credits.budget.evaluate` y `globe.credits.budget.availability.get` pasan a `ui: available` para principals de administración.
-- Tests de que cada fase emerge donde corresponde, y de que **ninguna** expone saldo, política cruda, SQL ni payload.
+> **Delta 2026-07-26 — el flip de coverage SALIÓ de este slice.** Ver `## Delta 2026-07-26` al final: pasar los
+> readers a `ui: available` **no arregla el diagnóstico, lo renombra** (`policy_blocked` → `access_denied`), porque
+> al principal humano le falta la capability y ampliar el grant OAuth es el rollout de 3 pasos que esta misma task
+> declara Out of Scope. Se reasigna al Slice 8.
+
+- `CreditDenialPhaseV1` como **enum cerrado** en `packages/contracts`, cubriendo las tres clases que colapsan:
+  evidencia de aprobación (`approval_expired | approval_invalid | approval_self_confirmed`), estado del agregado
+  (`pool_not_active | pool_transition_illegal | grant_state_conflict | budget_state_conflict |
+  policy_already_active | version_conflict`), guard de replay (`replay_fingerprint_mismatch`) y las negaciones que
+  el ledger y el ciclo comercial **ya exponen** como `code` (`insufficient_balance | budget_denied |
+  hard_cap_exceeded | approval_stale`).
+- `CreditAdministrationError` transporta `phase?`; `approval()` **separa las tres fallas** que hoy fusiona en un
+  solo throw (proponente igual al actor / vencida / digest inválido) — son tres acciones distintas del operador.
+- Los **nueve** `err('conflict')` del store nombran su fase.
+- `handlerErrorToApiCode` propaga la fase junto al `conflict` **sin cambiar el status HTTP**; `errorJson` la emite
+  como `error.phase`. El BFF reenvía el body verbatim, así que llega al browser sin cambios en el BFF.
+- Tests: las tres fallas de aprobación son distinguibles · las nueve fases del store emergen donde corresponde ·
+  **ninguna fase contiene monto, id de política, saldo ni fragmento de SQL** (el test que protege la razón del
+  colapso).
 - Delta en `ISSUE-124` con la evidencia y el estado.
+
+### Slice 8 — El desambiguador al alcance del operador (reasignado desde el Slice 1)
+
+- `budget.evaluate` y `budget.availability.get` a `ui: available` **con** su capability en el grant humano, o por
+  un camino que no requiera ampliarlo (p. ej. la razón viajando en el estimado, que el humano ya consume).
+- **Bloqueado por** el rollout de 3 pasos zero-downtime de ADR-010 si se elige la vía del scope. Decidir la vía
+  con evidencia, no por inercia.
 
 ### Slice 2 — KMS asimétrico y verificador dual
 
@@ -258,7 +280,7 @@ En `greenhouse-eo`:
 
 - Las cuatro identidades y sus bindings en Terraform: `greenhouse-globe-admin@efeonce-group`, `globe-admin-broker`, `globe-credit-approver`, `globe-credit-executor`. Protocolo de import: `plan` con **cero** `destroy`/`replace` de identidad viva.
 - Las dos clases de workload nuevas en `internalServicePrincipal` con su set fijo y mínimo; el guard de disyunción de callers extendido (mismo espíritu que `app.ts:1222`).
-- `apps/credit-approver` — unidad Cloud Run IAM-private con **una** superficie estrecha: *"dada esta propuesta verificada, firmá su aprobación"*. Lee la propuesta, verifica el invariante de dos humanos, firma. **Cero DML sobre agregados de crédito.**
+- `apps/credit-approver` — unidad Cloud Run IAM-private con **una** superficie estrecha: *"dada esta propuesta verificada, firmá su aprobación"*. Lee la propuesta, verifica que exista una confirmación humana atribuida (y el segundo confirmador si la política del workspace lo exige), firma. **Cero DML sobre agregados de crédito.**
 - Coverage `sister-platform: 'available'` en las capabilities de crédito que el carril necesita.
 - Señal `globe.credit_admin.caller_authority_drift`.
 
@@ -270,7 +292,7 @@ En `greenhouse-eo`:
 - Variante transaction-scoped de `CreditAdministrationStorePort` + `CreditAdministrationLedgerPort` enhebrando el `TransactionPort` de `packages/database`.
 - Señal `globe.credit_admin.partial_funding_state`.
 - Tests: concurrencia (dos `confirm` simultáneos, uno gana limpio), propuesta vencida, fingerprint alterado, transacción parcial (fallo de política deja cero grant), idempotencia del replay.
-- **Criterio de salida: un fondeo real, punta a punta, con dos humanos distintos y cero break-glass.**
+- **Criterio de salida: un fondeo real, punta a punta, con UNA confirmación humana y cero break-glass.**
 
 ### Slice 5 — El broker y la intención del lado de Greenhouse
 
@@ -368,7 +390,7 @@ Esta sección es **load-bearing**: la task toca autoridad financiera, IAM cross-
 2. **Slice 2**: `tofu plan` leído → apply → **readback de IAM**: sólo el aprobador tiene `asymmetricSign` sobre la clave. Verificar que el verificador sigue aceptando una aprobación HMAC existente (**no** romper el carril viejo).
 3. **Slice 3**: `tofu plan` con **cero** `destroy`/`replace` → apply → readback de los bindings → verificar que el broker alcanza el API y que el `admin-broker` **no** puede confirmar ni mutar (negativo explícito, no inferido).
 4. **Slice 4** en staging: `migrate:up` → verificar el DDL contra `information_schema` → flag ON → `propose` con la sesión de un humano → revisar el plan → `confirm` con **un segundo humano distinto** → verificar el grant, el asiento y la política resultantes en Postgres → verificar que un `confirm` repetido es idempotente → verificar que una propuesta vencida se rechaza con la fase correcta.
-5. **Slice 4 en producción**, con cooldown de 24 h respecto de staging: el **fondeo real del mes**, dos humanos, cero break-glass. Verificar que imagen y video **generan** después (es la prueba de que el fondeo tuvo efecto, no sólo de que el comando respondió 200).
+5. **Slice 4 en producción**, con cooldown de 24 h respecto de staging: el **fondeo real del mes**, una confirmación humana, cero break-glass. Verificar que imagen y video **generan** después (es la prueba de que el fondeo tuvo efecto, no sólo de que el comando respondió 200).
 6. **Slice 5**: smoke del broker desde staging de Greenhouse → verificar audit en los dos lados y la cadena de correlación completa → repetir en producción.
 7. **Slice 6**: inventario de consumidores del carril viejo → retiro → verificar que el fondeo por el carril nuevo **sigue** funcionando y que el viejo devuelve `access_denied`.
 8. **Slice 7**: `break_glass_active` en 0 → `legacy_hmac_approval_used` en 0 por la ventana declarada → retiro del HMAC → verificar que una aprobación KMS sigue verificando.
@@ -404,7 +426,8 @@ Stop & escalate si cualquier verify falla. En particular: si el paso 5 responde 
 - [ ] `globe.credits.month.fund.confirm` rechaza: propuesta inexistente, vencida, con fingerprint alterado, con proponente igual al confirmante, y con firma inválida — cada una con su fase correcta.
 - [ ] Grant + asiento de ledger + política ocurren en **una** transacción: un test verifica que un fallo del publish de política deja **cero** grant.
 - [ ] Un `confirm` repetido con la misma propuesta es idempotente y **no** produce un segundo grant; un test de concurrencia con dos `confirm` simultáneos deja uno ganando limpio.
-- [ ] **Un fondeo mensual real se ejecutó punta a punta con dos humanos distintos de Greenhouse y cero break-glass**, y después de él **imagen y video generan**.
+- [ ] **Un fondeo mensual real se ejecutó punta a punta con UNA confirmación humana de Greenhouse y cero break-glass**, y después de él **imagen y video generan**.
+- [ ] `requireSecondConfirmer` existe como **política por workspace + techo por operación**, con default **OFF** en el workspace interno, y un test verifica que con OFF basta una confirmación **humana** (nunca un agente) y con ON se exige un confirmador distinto.
 - [ ] El broker de Greenhouse es `server-only`, reusa `createGreenhouseGlobeClient` y no instancia un cliente paralelo.
 - [ ] La tabla de intenciones de Greenhouse es append-only (triggers anti-UPDATE/anti-DELETE) con `CHECK` de confirmante ≠ proponente, y ambos se re-verifican en Globe.
 - [ ] Las capabilities de Greenhouse están en `capabilities_registry` (seed) + `entitlements-catalog` + **grant a ≥1 rol real, en el mismo PR** (el guard de coverage pasa).
@@ -439,7 +462,7 @@ En `greenhouse-eo`:
 
 Validación manual (no automatizable, y es una propiedad del diseño):
 
-- El fondeo real del mes con **dos personas distintas**.
+- El fondeo real del mes con **una confirmación humana** del operador.
 - Readback de IAM después de cada binding.
 - Verificar el flag en la **revisión activa** de cada runtime, no en el HCL.
 
@@ -468,6 +491,57 @@ Validación manual (no automatizable, y es una propiedad del diseño):
 - **El guard de "un solo grant activo"** de `ISSUE-124`: decidir si es política deseada o si el 409 venía de otra fase (que el Slice 1 vuelve observable).
 - **Modelo de roles de administración de crédito**: si `propose` y `confirm` son dos capabilities sobre los ROLE_CODES existentes o merecen un rol nuevo. Decidir contra los **14 ROLE_CODES reales** de `src/config/role-codes.ts`, nunca contra un rol fantasma.
 - **Aplicar el mismo carril al resto de la administración de crédito** (pools, budgets de proyecto, correcciones) si el patrón `propose`/`confirm` resulta el correcto para el fondeo.
+
+## Delta 2026-07-26 (2) — el segundo humano baja de invariante a política
+
+**Dirección del operador.** Exigir dos humanos distintos costó **dos horas de fricción para sumar créditos y
+terminar un trabajo**, y el operador es hoy CEO y product owner del presupuesto de Globe: no hay segundo actor que
+buscar. Un control que nadie puede satisfacer **no protege, desvía** — y el desvío medible fue el break-glass, tres
+veces para el mismo acto, otorgando MÁS autoridad que el camino que reemplazaba.
+
+**Lo que cambia:** `requireSecondConfirmer` pasa a ser **política por workspace + techo por operación**, default
+**OFF** en el workspace interno owner-operated. Se prende donde un segundo actor existe y significa algo:
+workspaces de cliente, o por encima de un techo declarado.
+
+**Lo que NO cambia, y es lo que de verdad impedía autofinanciarse:** el **agente nunca confirma** (propone; la
+mutación exige confirmación humana atribuida) y **aprobador ≠ ejecutor** entre service accounts, en unidades
+separadas. Las dos cuestan **cero** al operador.
+
+**Lo que reemplaza la prevención retirada:** detección — audit append-only atribuido en los dos lados, la señal de
+reliability, y el techo por operación que sí escala a un segundo actor cuando el monto lo amerita. Es cómo funciona
+cualquier tesorería real: **umbral de aprobación, no dual control universal**.
+
+Detalle completo en ADR-015 § Decisión punto 5 y § Safety vs Resilience.
+
+## Delta 2026-07-26
+
+**Q4 resuelta: la fase viaja en el BODY**, como `error.phase` aditivo y opcional. Verificado, no supuesto: el BFF
+reenvía `upstream.body` **verbatim** (`app.ts:3256`), así que el campo llega al browser con cero cambios en el BFF;
+y el SDK lee `payload?.error.code ?? fallbackCode` (`sdk/src/index.ts:894`), así que un campo nuevo no lo rompe. Un
+header se pierde en proxies y obliga a leer dos canales para un solo hecho.
+
+**Q1 / Q2 / Q3 siguen abiertas y no bloquean el Slice 1** (tocan los Slices 3-5). Resolverlas antes del Discovery
+de sus slices sería adivinar.
+
+🔴 **El flip de coverage salió del Slice 1 — no arreglaba, renombraba.** `#authorize` evalúa **coverage antes que
+capability** (`packages/domain/src/index.ts:307-315`): con `ui: available`, los readers dejan de devolver
+`policy_blocked` y devuelven **`access_denied`**, porque el principal humano **no carga
+`globe.credits.budget.read`** — verificado en `PRODUCER_HUMAN_CAPABILITY_SCOPES` (`app.ts:241-265`, 19 scopes, no
+está) y en `GLOBE_PRODUCER_CAPABILITY_SCOPES` del broker de Greenhouse. Y ampliar el grant es el rollout de 3 pasos
+de ADR-010, que esta task declara **Out of Scope**. O sea: el bullet, tal como estaba escrito, movía la mentira de
+lugar — exactamente lo que la ADR critica. Se reasigna al **Slice 8**, que tiene que pagarlo entero o elegir la vía
+del estimado.
+
+**Y una corrección estructural que el Discovery obligó:** `COVERAGE` es **un solo const** compartido por los 14
+commands y los 10 readers de administración de crédito. Flipear `ui` ahí habría puesto `grant.issue` y
+`policy.publish` en la superficie del browser. Cualquier cambio de coverage en este dominio necesita un const
+separado y acotado a readers read-only, nunca una edición del compartido.
+
+**Vocabulario de fase refinado contra el store, no contra la ADR.** La ADR listaba nueve fases derivadas del
+razonamiento; el store tiene **nueve sitios `err('conflict')` reales** con significados propios
+(`credit-administration-store.ts:10,11,12,15,17,18,20,22,31`) y `approval()` fusiona **tres** fallas accionables
+distintas en un throw (`credit-administration.ts:104`). El enum del Slice 1 sale de ahí. Las cuatro negaciones del
+ledger/ciclo comercial se **reusan** de los `code` que esas clases ya exponen, en vez de duplicarse.
 
 ## Open Questions
 
