@@ -620,8 +620,55 @@ sin subir el tope era plata que no se puede gastar. Con `monthlyCap: 800` el pla
 **Ése es el punto entero del carril:** el confirmador ve el delta ANTES de aprobar. Por el carril viejo
 —que sólo sube el tope, sin grant— ese trade-off no era visible en ninguna parte.
 
+### 🔴 El quinto: un parámetro SQL ambiguo mataba TODO `confirm` en el punto de mutación
+
+Con el fingerprint arreglado, el `confirm` pasó de `400` a **`500`** — y Globe no dejaba **ninguna
+línea**: `dispatch.ts` hacía `if (code === undefined) throw error`, así que todo error no mapeado salía
+mudo. Es la misma clase de defecto que ISSUE-127, del lado de Globe, en el archivo que ya lo corregía
+unas líneas más abajo para `invalid_request`. Cerrado (`efeonce-globe@5cb0720`): emite `errorName` y,
+cuando existe, el `code` corto — que para Postgres es el **SQLSTATE**, o sea justo lo que localiza la
+causa. Nunca `message` ni `stack`.
+
+Con esa línea, la causa apareció en el primer intento:
+
+```json
+{"event":"globe.dispatch.unmapped_error","capability":"globe.credits.month.fund.confirm",
+ "kind":"command","errorName":"error","errorCode":"42P08"}
+```
+
+**`42P08 ambiguous_parameter`.** El `UPDATE` de `transition` reusaba el **mismo parámetro en dos
+contextos con tipos distintos**: `updated_at = $5` (timestamptz) y `jsonb_build_object('updatedAt',
+$5::text)` (text). PostgreSQL no puede deducir un único tipo y aborta. **Compila en TS, pasa el
+typecheck y revienta sólo al ejecutarse** — por eso llegó a producción sin que nada lo detuviera, y
+mataba TODO `confirm` justo en el punto de mutación.
+
+Es exactamente el bug class de **`ISSUE-071`** y del gate de SQL/date-math: SQL embebido cuyos tipos
+sólo se resuelven contra PG real, y cuya regla dice ejercitarlo contra PostgreSQL de verdad antes de
+mergear. Hecho, y reprodujo limpio (`efeonce-globe@f268612`):
+
+| | Resultado contra `globe-pg` real |
+|---|---|
+| Antes | `ERROR 42P08 — inconsistent types deduced for parameter $5` |
+| Después | `OK (0 filas)` |
+
+Un parámetro por contexto (`$7`/`$8` repiten el valor) es la forma que no puede volver a ser ambigua.
+
+### La cadena completa: cinco defectos, cada uno tapando al siguiente
+
+1. **Cero `GLOBE_*` en Vercel** → Greenhouse desplegado nunca habló con Globe.
+2. **Audiencia OIDC que no cruzaba** → la federación WIF nunca completó un intercambio.
+3. **Payload del broker incompleto** (`sourceId`, `reasonCode`, `at`) → `400`.
+4. **Fingerprint de 248 chars validado con `id()` de 200** → `400`.
+5. **Parámetro SQL ambiguo (`42P08`)** → `500`.
+
+Ninguno era visible hasta resolver el anterior, y **ninguno se habría visto sin ejercer el carril
+desplegado**. Tres de los cinco son la misma familia: una condición perfectamente diagnosticable
+servida como opaca. La lección operativa no es sobre estos cinco bugs — es que *"funciona hasta el
+borde"* medido en local no predice nada sobre el runtime desplegado, y declararlo como estado fue lo
+que hizo que se pagaran todos juntos.
+
 **Estado:** `propose` verde punta a punta con datos reales; `confirm` a la espera del deploy de la API
-de Globe con el fix del fingerprint. Pool `10b0c57a-231d-4244-88d3-49ee7ecab17f` **activo**, período
+de Globe con el fix del `42P08`. Pool `10b0c57a-231d-4244-88d3-49ee7ecab17f` **activo**, período
 julio, 3 grants posteados (100 + 400 + 10 = **510** créditos) y 2 propuestas registradas en la tabla
 append-only, ambas atribuidas a `user-agent-e2e-001`.
 
