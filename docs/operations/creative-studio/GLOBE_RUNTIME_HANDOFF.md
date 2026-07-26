@@ -8,6 +8,25 @@
 
 # Handoff
 
+## CLI local multi-proyecto
+
+La postura de recursos de Globe sigue siendo de un solo proyecto (`efeonce-globe`); lo multi-proyecto
+es únicamente el contexto local de `gcloud`. Verificado el 2026-07-26:
+
+- `default` → `julio.reyes@efeonce.org` / `efeonce-group` y queda activo al terminar.
+- `globe` → `julio.reyes@efeonce.org` / `efeonce-globe`.
+
+Para evitar mutar el contexto activo compartido, preferir:
+
+```bash
+gcloud --configuration=globe <comando> --project=efeonce-globe
+```
+
+Si una herramienta exige activar la configuración, ejecutar `gcloud config configurations activate globe`
+solo durante el acto y restaurar `gcloud config configurations activate default` al finalizar. Estos perfiles
+no conceden IAM, no sustituyen ADC y no autorizan operar otros proyectos. No cambiar el proyecto de `default`
+para una operación puntual ni el quota project de ADC como parte de esta configuración.
+
 ## LATEST — cutover del share board EJECUTADO y verificado (2026-07-25)
 
 **Revisión viva `globe-studio-internal-00071-6vp`, imagen `85dac33b03b1`.**
@@ -1049,3 +1068,26 @@ raíz en vez de sólo detectarlo.
 Fresh-session handoff prompt: [`EPIC_028_FRESH_SESSION_PROMPT.md`](docs/operations/EPIC_028_FRESH_SESSION_PROMPT.md).
 
 Do not add a service-account key, enable Production or widen the OAuth audience. `globe-studio-internal` is network-reachable because the organization policy blocks `allUsers` IAM binding; application authorization remains internal-only and the service is configured with Cloud Run's no-invoker-IAM-check setting. The API service remains IAM-private.
+## Active state — 2026-07-26 (acto operativo de fondeo: bloqueado, break-glass revocado)
+
+- Se aplicó temporalmente `roles/iam.serviceAccountTokenCreator` sólo para `user:julio.reyes@efeonce.org` sobre
+  `greenhouse-globe-caller@efeonce-globe.iam.gserviceaccount.com`; no fue project-scope.
+- La lectura de `globe-credit-approval-secret` como cuenta humana dio `exit 0` y el valor nunca se imprimió. Esto
+  corrige la evidencia stale que decía acceso denegado; el acceso proviene de IAM a nivel de proyecto y debe
+  corregirse en ADR-015, no trasladarse a `greenhouse-portal@`.
+- La impersonación del caller falló con `iam.serviceAccounts.getAccessToken` pese al binding leído correctamente y
+  cinco reintentos. Se revocó el binding y el corte se verificó con un intento posterior fallido.
+- No hubo grant, supersede de política, mutación de ledger ni generación. Revisión viva observada:
+  `globe-api-internal-00096-99x`, imagen `48de228e7106`. Cuarto intento de esta clase; estado `operativamente
+  bloqueado`. No tocar TASK-1566.
+
+## Active state — 2026-07-26 (fondeo aplicado; canary bloqueado por tenancy projection stale)
+
+- Se ejecutó el fondeo legacy separando identidades: `greenhouse-portal@` ejecutó el caller y
+  `julio.reyes@efeonce.org` leyó/firma el secreto sin imprimirlo. Grant `400` quedó `posted`; política en `400`;
+  disponibilidad efectiva `402`; `budget.evaluate` permite `10` y `16` créditos.
+- El criterio de éxito sigue abierto: el canary de imagen/video encontró `tenancy_projection_stale` antes de
+  `prepare`. La proyección live tiene `brokerExpiresAt=2026-07-24T13:17:00.625Z`; no se ejecutó ningún run ni se
+  creó gasto adicional.
+- Próximo paso operativo: renovar la proyección de tenancy desde el broker Greenhouse y repetir el canary real.
+  No saltar el guard, no tocar env vars y no tocar TASK-1566.

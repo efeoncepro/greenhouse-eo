@@ -1118,6 +1118,7 @@ Estos CLIs están autenticados localmente. Cuando una task toca su dominio, **ú
 
 - **Azure CLI (`az`)**: autenticado contra el tenant Microsoft de Efeonce `a80bf6c1-7c45-4d70-b043-51389622a0e4`. Se usa para gestionar Azure AD App Registrations (redirect URIs, client secrets, tenant config), Bot Service, Logic Apps, Resource Groups, etc. Comandos canónicos: `az ad app show --id <client-id>`, `az ad app update`, `az ad app credential reset`, `az ad sp show`. Subscription ID: `e1cfff3e-8c21-4170-8b28-ad083b741266`.
 - **Google Cloud CLI (`gcloud`)**: autenticado como `julio.reyes@efeonce.org` con ADC. Usar para Secret Manager, Cloud Run, Cloud SQL, Cloud Scheduler, BigQuery, Cloud Build, Workload Identity Federation. Project canónico: `efeonce-group`.
+  - **GCP multi-proyecto:** `globe` para Globe; restaurar `default`.
   - **Regla operativa obligatoria**: cuando un agente necesite acceso interactivo local a GCP, debe lanzar **siempre ambos** flujos y no asumir que uno reemplaza al otro:
     - `gcloud auth login`
     - `gcloud auth application-default login`

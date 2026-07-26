@@ -146,6 +146,11 @@ y [`GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md`](docs/ui/GREENHOUSE_PREMIUM_U
 - CLIs autenticados: `az`, `gcloud`, `gh`, `vercel`, `psql` vía `pnpm pg:connect`.
 - GCP interactivo local requiere ambos flujos: `gcloud auth login` y
   `gcloud auth application-default login`.
+- **GCP multi-proyecto local:** `default` conserva `julio.reyes@efeonce.org` / `efeonce-group` y
+  `globe` apunta a la misma cuenta / `efeonce-globe`. Son perfiles locales, no permisos ni runtime.
+  Para Globe preferir `gcloud --configuration=globe ... --project=efeonce-globe`; si se activa el
+  perfil interactivamente, restaurar `default` al terminar. No cambiar el proyecto de `default` para
+  un acto puntual.
 - macOS usa `gtimeout`, no asumir `timeout` GNU.
 - GVC: `pnpm fe:capture <scenario> --env=staging`; review/diff/health según necesidad.
 - Antes de una acción sensible, consultar Platform Health/safe modes cuando el dominio lo exponga.

@@ -3,6 +3,14 @@
 > Cabina de mando para continuidad inmediata. No es changelog, arquitectura ni memoria completa.
 > Ventana máxima: 20 sesiones. Historia íntegra e índice: [Handoff.archive.md](Handoff.archive.md).
 
+## 2026-07-26 — CLI local multi-proyecto para Globe
+
+`gcloud` conserva `default` activo con `julio.reyes@efeonce.org` / `efeonce-group` y tiene la
+configuración nombrada `globe` para la misma cuenta / `efeonce-globe`. Preferir
+`gcloud --configuration=globe ... --project=efeonce-globe`; activar perfiles no concede IAM ni cambia
+la postura runtime. Si se activa `globe` interactivamente, restaurar `default` al cerrar el acto.
+La fuente operativa es [`GLOBE_RUNTIME_HANDOFF.md`](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md#cli-local-multi-proyecto).
+
 ## 2026-07-26 — Acto operativo Globe: fondeo bloqueado y break-glass revocado
 
 Se intentó fondear el mes del workspace interno `greenhouse-org:efeonce` para habilitar generación real de imagen

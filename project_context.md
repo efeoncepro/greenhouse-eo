@@ -82,6 +82,10 @@ Todo trabajo formal sigue:
 
 ## Entry points ejecutables
 
+- **GCP local multi-proyecto:** mantener `default` en `efeonce-group` y usar la configuración nombrada
+  `globe` para `efeonce-globe`; preferir `gcloud --configuration=globe ... --project=efeonce-globe`
+  para no mutar el contexto compartido. La configuración no sustituye IAM ni cambia la postura runtime.
+  Detalle operativo: [`GLOBE_RUNTIME_HANDOFF.md`](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md#cli-local-multi-proyecto).
 - Cambio en task/epic/mini-task: `pnpm ops:lint --changed`.
 - Ejecución Codex de `TASK-###`: goal preflight y luego `pnpm codex:task-hook TASK-###`; aliases aceptados:
   `/implement-task TASK-###`, `/implement-task ###`, `/task TASK-###` y `/task ###`.
