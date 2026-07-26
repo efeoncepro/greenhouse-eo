@@ -819,7 +819,7 @@ packages:
     resolution: {integrity: sha512-id+7YRUgoUX6CgV0DtuhirQWodeeA7Lf4i2x71JS/vtA5pRb/hIGWlw+G6MeXvsM+MXrz0VAydTGElX1rAfgPg==}
 
   '@efeonce-globe/contracts@file:vendor/efeonce-globe/efeonce-globe-contracts-0.0.1.tgz':
-    resolution: {integrity: sha512-S1ubXTA3Ps+nQ+8crBRMqU70eJWqiSpqwq/Cc7RhWHU8YflT258ZqQRxlomoorkGnfTNCwiP9A2A4OAT2XKLZA==, tarball: file:vendor/efeonce-globe/efeonce-globe-contracts-0.0.1.tgz}
+    resolution: {integrity: sha512-NO8eNv7kV9f6QvpRnVFqcOeVGp0DUnoOpjVOJlU8wTY/yECp0aVTInjm5ufba1jmcfTcYocp93Bh04Wk4cVXrQ==, tarball: file:vendor/efeonce-globe/efeonce-globe-contracts-0.0.1.tgz}
     version: 0.0.1
 
   '@efeonce-globe/sdk@file:vendor/efeonce-globe/efeonce-globe-sdk-0.1.1.tgz':
