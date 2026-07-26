@@ -1074,6 +1074,29 @@ grant OAuth. Y sería **inerte**: `tenancy_mode` default es `"shadow"` (`variabl
 `capabilityScopes ⊆ requiredScopes` y agregarlo lo vuelve requerido para todos (la lección que tumbó el login en
 ADR-010). El grant OAuth es el **techo**; la proyección es el **piso**.
 
+🔴 **ANTES de escribir una secuencia de canary a mano: YA EXISTE COMO SCRIPT (2026-07-26).**
+`pnpm producer:canary` (`scripts/producer-ui-canary.mjs` + `-lib.mjs`) hace el recorrido **completo** de gasto real
+—`producer.catalog.list` → `lab.experiment.estimate` → `prepare` → `execute` → `experiment.get` →
+`producer.output.get`— y **valida `retained === true`** sobre el output de la modalidad pedida. Su test
+(`producer-ui-canary.test.mjs`) está registrado en el `test` de la raíz. Necesita **una sola** variable:
+`GLOBE_CANARY_ID_TOKEN`.
+
+Los otros dos smokes canónicos, para no confundirlos: **`smoke-private-api.mjs`** cubre el carril **workload**
+(SA + ID token) y **`smoke-human-federation.mjs`** el carril **humano** (las tres piernas del login SSO).
+
+Invocación (el token se sustituye en el shell: **nunca** se imprime ni queda en un literal, sólo vive en el env del
+proceso; y el script lo mintea internamente con `execFileSync`, que es mejor manejo que cualquier `curl`):
+
+```bash
+GLOBE_CANARY_ID_TOKEN="$(gcloud auth print-identity-token   --impersonate-service-account=greenhouse-globe-caller@efeonce-globe.iam.gserviceaccount.com   --audiences=https://globe-api-internal-a6odmgzpvq-tl.a.run.app --include-email)" pnpm producer:canary
+```
+
+**Caso fuente, y es una lección de método, no una nota:** el 2026-07-26 dos agentes distintos estuvieron a punto de
+re-derivar esa secuencia a mano —uno escribió dos prompts manuales completos— antes de descubrir que el script
+existía, estaba commiteado y estaba testeado. **Buscá el script antes de escribir la secuencia.** Un canary
+artesanal no sólo cuesta tiempo: se comporta distinto para cada agente y para CI, y esa divergencia es
+indiagnosticable después.
+
 **Método — `curl` con Bearer contra una API de Google es indistinguible de exfiltración (2026-07-26).** Usar
 `gcloud` (o su `--format=json`), **NUNCA** `curl -H "Authorization: Bearer $(gcloud auth print-access-token)"` contra
 `secretmanager.googleapis.com` / `iam.googleapis.com`. Medido: los dos `curl` con bearer de esa sesión fueron
