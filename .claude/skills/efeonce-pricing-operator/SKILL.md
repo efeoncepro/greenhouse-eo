@@ -28,6 +28,7 @@ y Sample Sprint.
 
 1. Enmarcar oferta, ICP, buyer, JTBD, trigger, resultado controlable, exclusiones, owner, geografía, moneda,
    capacidad y estado.
+   Si ICP, JTBD, buying group o decision process no están modelados, cargar `efeonce-customer-model-operator`.
 2. Elegir la métrica de valor: capacidad/lane, implementation, retainer, usage, workspace/tenant, outcome,
    licencia/IP, mínimo comprometido o híbrido.
 3. Diseñar `wedge → core → expansion`; usar hasta tres tiers sólo con evidencia y fences por valor/capacidad/

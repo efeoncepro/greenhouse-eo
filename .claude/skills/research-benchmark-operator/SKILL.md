@@ -12,6 +12,8 @@ argument-hint: "[pregunta de research o benchmark concreto]"
 
 > **DOBLE audiencia.** Esta skill sirve para research/benchmark **de Efeonce** (interno: pitch, GTM, inteligencia competitiva, decisiones) **Y como servicio entregable para clientes** (Efeonce es agencia: el research/benchmark es un deliverable billable, con confidencialidad, metodología transparente y presentación de nivel). Cuando el trabajo es para un cliente, carga `11_RESEARCH_AS_A_SERVICE`. La **inteligencia competitiva** tiene su módulo profundo dedicado (`10`).
 
+> **Customer model:** cuando el research alimenta ICP, JTBD, buying group, triggers, WTP o retention, entregar el evidence ledger y confidence requeridos por `efeonce-customer-model-operator`; esta skill conserva el método de investigación.
+
 > **Skill de MÉTODO + orquestación, no de ejecución cruda ni de dominio.** La **ejecución** (fan-out de búsquedas, verificación, síntesis con citas) se delega a la harness **`deep-research`**. El **research de dominio** se delega a su skill dueña (búsqueda/keywords/visibilidad IA → `seo-aeo`; competitivo comercial/win-loss/ICP → `commercial-expert`). Esta skill aporta la **capa de rigor** + el **diseño** + la **orquestación**.
 
 ## Regla #0 — evidencia con fecha, nunca memoria

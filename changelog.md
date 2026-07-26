@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-26 — Customer Model Operator para Codex y Claude
+
+- Se creó la skill transversal `efeonce-customer-model-operator` en `.codex/skills/` y `.claude/skills/`.
+- Se cubrieron ICP, segmentación, beachhead, JTBD, triggers, WTP, buyer personas, buying group, stakeholder map,
+  decision/paper process, procurement readiness, qualification, evidence, adopción, retención, expansión y gates.
+- Se añadió el `Customer Model Integrity Pack` reusable, con evidence ledger, confidence, owners, falsadores y handoffs.
+- Business model, GTM, commercial, research, pricing y agency quedaron conectados a la nueva capa; las ofertas concretas
+  siguen siendo responsables de aportar evidencia y mantener sus boundaries.
+
 ## 2026-07-26 — Pricing transversal para Codex y Claude
 
 - Se creó la skill agnóstica `efeonce-pricing-operator` en `.codex/skills/` y `.claude/skills/`.

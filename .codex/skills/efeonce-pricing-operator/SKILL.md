@@ -58,8 +58,8 @@ delivery no crea automáticamente un producto nuevo.
 ### 1. Enmarcar
 
 Registrar oferta, ICP, buyer, JTBD, trigger, resultado controlable, alternativa desplazada, owner, geografía,
-moneda, capacidad, estado y decisión que el pricing debe habilitar. Separar hechos, decisiones, hipótesis y
-unknowns.
+moneda, capacidad, estado y decisión que el pricing debe habilitar. Si ICP, JTBD, buying group o decision process
+no están modelados, cargar `efeonce-customer-model-operator`. Separar hechos, decisiones, hipótesis y unknowns.
 
 ### 2. Elegir la métrica de valor
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Efeonce Customer Model Operator"
+  short_description: "ICP, JTBD, buying groups y validación de clientes"
+  default_prompt: "Usa $efeonce-customer-model-operator para construir o auditar el modelo de cliente, JTBD, buying group y evidencia de una oferta Efeonce."

@@ -16,8 +16,10 @@ operación, monetización, unit economics, riesgo y validación.
 El método y los invariantes operativos viven en la skill `efeonce-business-model-operator`. Este directorio
 mantiene los modelos concretos y sus versiones; no duplica la skill ni convierte una hipótesis en contrato.
 
-La arquitectura transversal de packaging, pricing, billing, descuentos, economics y validación vive en la skill
-`efeonce-pricing-operator`; los modelos concretos sólo fijan las decisiones propias de cada línea.
+El modelo transversal de cliente —ICP, segmentación, beachhead, JTBD, buying group, decision/procurement process,
+evidence, adopción, retención y expansión— vive en `efeonce-customer-model-operator`. La arquitectura transversal de
+packaging, pricing, billing, descuentos, economics y validación de monetización vive en `efeonce-pricing-operator`;
+los modelos concretos sólo fijan las decisiones propias de cada línea.
 
 La arquitectura que explica cómo se relacionan el modelo corporativo, la plataforma, las capabilities, el
 packaging y los submodelos vive en [`EFEONCE_BUSINESS_MODEL_ARCHITECTURE_V1.md`](EFEONCE_BUSINESS_MODEL_ARCHITECTURE_V1.md).

@@ -6,7 +6,8 @@ user-invocable: true
 argument-hint: "[area or specific question]"
 ---
 
-Para arquitectura transversal de packaging, pricing, billing, descuentos, credits y guardrails cargar
+Para el modelo transversal de cliente —ICP, JTBD, buying group, stakeholder map, decision/paper process y evidence— cargar
+`efeonce-customer-model-operator`. Para arquitectura transversal de packaging, pricing, billing, descuentos, credits y guardrails cargar
 `efeonce-pricing-operator`. Esta skill conserva la ejecución comercial: discovery, negociación, pipeline, proposal,
 win/loss y deal tactics.
 

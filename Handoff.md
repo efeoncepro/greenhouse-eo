@@ -3,6 +3,17 @@
 > Cabina de mando para continuidad inmediata. No es changelog, arquitectura ni memoria completa.
 > Ventana máxima: 20 sesiones. Historia íntegra e índice: [Handoff.archive.md](Handoff.archive.md).
 
+## 2026-07-26 — Customer Model Operator transversal
+
+Se creó `.codex/skills/efeonce-customer-model-operator/` y su companion `.claude/skills/efeonce-customer-model-operator/`.
+La skill cubre ICP, segmentación, beachhead, JTBD, teoría de valor, triggers, buyer personas, buying group, stakeholder
+map, decision process, paper/procurement process, qualification, evidencia, validación/WTP, adopción, retención y
+expansión. Incluye método detallado y `Customer Model Integrity Pack` reusable. No reemplaza las skills de GTM,
+Commercial, Research, Pricing, Finance, Legal u Operations: define sus handoffs y ownership.
+
+El modelo queda agnóstico a Wave, Globe, Search Visibility 360 o cualquier otra línea. Las ofertas concretas deben
+aplicarlo con evidencia real; la skill no convierte hipótesis en ICP aprobado, venta, renovación ni escala.
+
 ## 2026-07-26 — Pricing Integrity Pack aplicado a Wave
 
 Se probó `efeonce-pricing-operator` sobre las cinco familias de Wave y sus delivery models. El resultado vive en
