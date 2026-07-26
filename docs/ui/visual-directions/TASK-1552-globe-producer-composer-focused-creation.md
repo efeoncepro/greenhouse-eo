@@ -2,7 +2,13 @@
 
 ## Direction mode
 
-`repo-native-benchmark`
+`approved-prototype` — actualizado 2026-07-25.
+
+La fuente visual es el prototipo aprobado
+`~/Documents/Globe/Producer/Suite de IA Generativa Creativa/Globe Creative Producer.dc.html`; su **geometría
+medida** (panel `minmax(24rem, 27.5rem)`, `max-height: calc(100svh - 6.4rem)`, riel de estimado fijo al pie con
+`border-top`) es el registro durable y vive en el anexo del wireframe. Este documento conserva la tesis de
+producto y las alternativas rechazadas, que siguen vigentes.
 
 ## Product thesis
 
@@ -57,8 +63,10 @@ El feed sigue siendo el workspace principal y el composer funciona como un lane 
 - Brand blue: primary action and active modality only.
 - Green: valid/ready states only.
 - Amber: policy or material cost-change warning only.
-- Globe tokens and existing Producer patterns; no new provider colors, raw hex or parallel design system.
-- Surface: existing Globe Producer Console/composer in `../efeonce-globe/apps/studio-web`.
+- Tokens del SSOT del payload cliente (`apps/studio-client/src/tokens/tokens.ts`); **cero HEX, cero px de fuente
+  y cero ms literales** — el gate `src/gates/design-contract.test.ts` los rechaza como error, no como aviso.
+- Surface: `/producer` → `ProducerWorkspace` → `composer/ProducerComposer.tsx` en
+  `../efeonce-globe/apps/studio-client` (payload cliente ADR-014), **no** el Producer Console de `studio-web`.
 
 ## GVC intent
 

@@ -8,7 +8,9 @@
 - Owner task: `TASK-1552 — Globe Producer Composer Focused Creation`
 - Related wireframe: `docs/ui/wireframes/TASK-1552-globe-producer-composer-focused-creation.md`
 - Related motion: `docs/ui/motion/TASK-1552-globe-producer-composer-focused-creation-motion.md`
-- Surfaces coordinadas: composer (`/producer/compose`) · feed (`/producer/feed`) · viewer (diálogo)
+- Surfaces coordinadas: composer y feed **conviven en `/producer`** dentro de `ProducerWorkspace`, como
+  hermanos; el viewer es un diálogo. `/producer/feed` sobrevive como ruta focalizada del strangler.
+  ⚠️ Corregido 2026-07-25: `/producer/compose` nunca se creó y no se va a crear.
 - Flow type: `spend-gated sequence` — el flujo cruza una frontera de **gasto real**
 
 ## Por qué este flujo necesita contrato

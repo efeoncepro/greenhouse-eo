@@ -71,8 +71,11 @@ y los dos se conservan.
 
 ## Primitive & Token Mapping
 
-- **Primitive:** `GlobeGeneratingMark` — **nace en TASK-1565** y acá se consume. Si esta task se ejecuta antes,
-  se renderiza el isotipo **estático** y se declara la deuda; nunca se implementa una segunda versión.
+- **Primitive:** `GlobeGeneratingMark` — **ya existe y ya se consume** (verificado 2026-07-25:
+  `apps/studio-client/src/primitives/GlobeGeneratingMark.tsx` + `globe-generating-mark.css` con sus 4
+  `@keyframes`, importada por `ProducerComposer.tsx` y por `ProducerFeed.tsx`). No hay deuda de isotipo estático
+  y **nunca se implementa una segunda versión**. Su contrato es de `TASK-1523` (dueña del SSOT de motion);
+  `TASK-1565`, que este documento citaba como su origen, quedó **retirada** el 2026-07-25.
 - **Imports allowed:** CSS del módulo, `tokens.ts`, primitives del payload cliente.
 - **Imports forbidden:** cualquier cosa de Greenhouse (`@core`, MUI, AXIS), librerías de animación.
 - **Timing tokens:** `--duration-none|short|overlay|breathe|flame|progress`.
@@ -121,9 +124,11 @@ y los dos se conservan.
 
 ## GVC / Micro Evidence
 
-- **Scenario:** `producer-composer-canary.mjs` — frames en `estimado-vigente`, `estimado-no-vigente`,
-  `ejecutando`, más la pasada con `prefers-reduced-motion` emulado.
-- **Route:** `http://127.0.0.1:4326/producer/compose`
+- **Scenario:** `apps/studio-client/scripts/producer-composer-canary.mjs` — frames en `estimado-vigente`,
+  `estimado-no-vigente`, `ejecutando`, más la pasada con `prefers-reduced-motion` emulado. Sigue el patrón de
+  `producer-feed-canary.mjs` / `producer-motion-canary.mjs`, con `CANARY_URL` override.
+- **Route:** `http://127.0.0.1:4326/producer` (el composer **no tiene ruta propia**: vive dentro de
+  `ProducerWorkspace` — corregido 2026-07-25 contra `main.tsx`).
 - **Asserts obligatorios:**
   1. al cambiar un campo, el estimado queda atenuado **antes** de que llegue el nuevo valor;
   2. con `reduce` activo, el estimado atenuado **sigue atenuado** y `estimateStale` está presente;

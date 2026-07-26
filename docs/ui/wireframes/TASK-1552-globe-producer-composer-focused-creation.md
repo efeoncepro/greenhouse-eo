@@ -1,14 +1,24 @@
 # TASK-1552 — Globe Producer Composer Focused Creation
 
+> **Reconciliado 2026-07-25.** Este documento tenía dos cabeceras que se contradecían: la original (ruta
+> `/producer`, copy en `producer-copy.ts`, componentes del payload legacy) y la del anexo migrado de
+> `TASK-1564` (prototipo medido, payload cliente). **Manda el anexo**, corregido contra el runtime: el composer
+> vive en `apps/studio-client/src/surfaces/producer/composer/`, montado en `/producer` dentro de
+> `ProducerWorkspace` — **no** en `/producer/compose`, que nunca se creó.
+
 ## Meta
 
 - Status: `ready-for-implementation`
 - Owner task: `TASK-1552`
-- Product Design asset: `docs/ui/visual-directions/TASK-1552-globe-producer-composer-focused-creation.md`
-- Visual direction mode: `repo-native-benchmark`
+- Product Design asset: **prototipo aprobado**
+  `~/Documents/Globe/Producer/Suite de IA Generativa Creativa/Globe Creative Producer.dc.html` (fuera del repo;
+  su geometría medida es el registro durable y vive en el anexo de abajo) + la tesis y las alternativas
+  rechazadas en `docs/ui/visual-directions/TASK-1552-globe-producer-composer-focused-creation.md`
+- Visual direction mode: `approved-prototype`
 - Intended consumers: Globe Producer operators on desktop and mobile
-- Copy source: `../efeonce-globe/apps/studio-web/src/producer-copy.ts`
-- Primitive decision: `extend` — existing Producer Console/composer patterns
+- Copy source: `../efeonce-globe/apps/studio-client/src/copy/index.ts` → namespace `producerComposer`
+- Primitive decision: `extend` — primitives del payload cliente (`apps/studio-client/src/primitives/index.tsx`).
+  **Prohibido** importar `CompositionShell`, primitives de Greenhouse, MUI o AXIS (ADR-014 §8 / `TASK-1540`).
 - UI ready target: `no`
 
 ## Brief
@@ -60,20 +70,30 @@ Reducir la carga visual del composer sin eliminar capacidades existentes. La exp
 
 ## Implementation Mapping
 
-- Route/surface: `/producer` en `../efeonce-globe/apps/studio-web`.
-- Pattern: existing Producer Console/composer; no new Greenhouse primitive.
-- Components: `producer-ui.ts`, `producer-controller.ts`, `producer-copy.ts`, `producer-client.ts` y estilos existentes del Producer.
-- Readers/commands: contratos actuales de catálogo, estimate, prepare/generate y provenance; no endpoint nuevo.
+- Route/surface: `/producer` → `ProducerWorkspace` → `composer/ProducerComposer.tsx`, en
+  `../efeonce-globe/apps/studio-client`. **El composer no tiene ruta propia.** Servido por `studio-web` detrás
+  de `GLOBE_CLIENT_APP_ENABLED` + `GLOBE_CLIENT_PRODUCER_ENABLED`.
+- Pattern: composer + feed como hermanos dentro del workspace; primitives del payload cliente.
+- Components: `ProducerComposer.tsx` + `producer-composer.css` (ya portados), `GlobeGeneratingMark` (ya existe,
+  se consume), transporte gobernado (`governed-transport.ts`) y `composer-recipe.ts` (vigencia del estimado,
+  dueña `TASK-1532`).
+- Readers/commands: contratos actuales de catálogo, flota, estilos, voces, estimate, prepare/execute/cancel y
+  provenance; **no endpoint nuevo, ni scope OAuth nuevo**.
 - API parity: browser sólo presenta DTOs y consume comandos/readers gobernados.
 - Access: capabilities y grants actuales; no cambio de autorización.
-- Copy: `producer-copy.ts`; no copy reusable nueva en el componente.
-- Data-capture: `producer-composer`, `producer-prompt`, `producer-direction`, `producer-output-shape`, `producer-advanced-settings`, `producer-generate-primary`.
+- Copy: namespace `producerComposer`; ningún literal en JSX ni en `aria-label`/`title`/`placeholder`/`alt`.
+- Data-capture (medidos contra el runtime): existentes `producer-prompt-bar`, `producer-reference-tray`,
+  `producer-seed`, `producer-route`, `producer-output-shape`, `producer-estimate`; de `TASK-1555` y no se
+  renombran acá: `producer-model-{picker,trigger,list,option,recommended}`; **a agregar**:
+  `producer-composer`, `producer-advanced-settings`, `producer-generate-primary`.
 
 ## GVC Scenario Plan
 
-- Scenario file: `../efeonce-globe/apps/studio-web/scripts/producer-gvc-fixture.mjs` y scenario Producer existente.
-- Route: `/producer?gvc=task-1552-focused-composer`.
-- Viewports: `1440×1000`, `390×844`.
+- Scenario file: `../efeonce-globe/apps/studio-client/scripts/producer-composer-canary.mjs` (**a crear**, junto
+  a `producer-feed-canary.mjs` / `producer-motion-canary.mjs`). El fixture legacy
+  `apps/studio-web/scripts/producer-gvc-fixture.mjs` sirve de referencia de estados, no como el canary.
+- Route: `http://127.0.0.1:<puerto>/producer`.
+- Viewports: `1440×1000`, `390×844` y **`320`**.
 - Quality profile: `premium`.
 - Required steps: initial Image, Video and Audio modality; prompt entered; direction selection; advanced disclosure; route without references; stale estimate; one-click generate; keyboard; reduced motion.
 - Required captures: first fold, advanced collapsed/open, each modality, invalid/gated, ready/stale CTA and mobile recomposition.
@@ -85,7 +105,9 @@ Reducir la carga visual del composer sin eliminar capacidades existentes. La exp
 
 ## Design Decision Log
 
-- Decision: Focus + Context sidecar with progressive disclosure.
+- Decision: Focus + Context con progressive disclosure — **el composer es un lane fijo (24–27.5rem) hermano del
+  feed**, no un sidecar. ⚠️ No confundir con el `AdaptiveSidecarLayout` de Greenhouse: esa primitive no puede
+  importarse acá (ADR-014 §8).
 - Alternatives: technical compact composer; centered modal composer.
 - Why this pattern: preserves the approved prompt-first Producer loop while reducing visual competition and retaining advanced capability access.
 - Reuse/extend/new primitive: extend existing Globe Producer patterns; no parallel design system or Greenhouse primitive.
@@ -117,9 +139,10 @@ Reducir la carga visual del composer sin eliminar capacidades existentes. La exp
   - `~/Documents/Globe/Producer/Suite de IA Generativa Creativa/Globe Creative Producer.dc.html` (fuente aprobada)
   - geometría medida: panel `minmax(24rem, 27.5rem)`, `max-height: calc(100svh - 6.4rem)`, riel de estimado
     fijo al pie con `border-top`
-- Route: `/producer/compose` (payload cliente); `/producer` sigue siendo el vanilla
-- Related flow: `docs/ui/flows/TASK-1564-globe-composer-client-port-flow.md`
-- Related motion: `docs/ui/motion/TASK-1564-globe-composer-client-port-motion.md`
+- Route: ~~`/producer/compose`~~ → **`/producer`**, con el composer dentro de `ProducerWorkspace` (corregido
+  2026-07-25 contra `main.tsx`). `/producer/feed` sobrevive como ruta focalizada del strangler.
+- Related flow: `docs/ui/flows/TASK-1552-globe-producer-composer-focused-creation-flow.md`
+- Related motion: `docs/ui/motion/TASK-1552-globe-producer-composer-focused-creation-motion.md`
 - Contrato de motion SSOT: `docs/architecture/creative-studio/GLOBE_CLIENT_MOTION_CONTRACT_V1.md`
 
 ## Desktop target (1440)
