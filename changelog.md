@@ -879,35 +879,3 @@ fuente de verdad. Nada autenticado se cachea, verificado path por path.
   integridad; el prompt operativo de Codex y `implement-task` de Claude declaran explícitamente la ventana,
   archivo, rotación y gate del changelog, y CI verifica esos pointers. `docs/changelog/CLIENT_CHANGELOG.md`,
   `CLAUDE.md` y su CI permanecen fuera de este cambio.
-
-## 2026-07-19 — Creative Studio: portfolio enterprise y routing agentic gobernado
-
-- Una flota auditó documentación oficial de Google Cloud, Fal y la arquitectura de control para definir un
-  portafolio profesional de imagen, video, audio, localización, post, capas y 3D. Google nativo queda directo
-  por GCP; Fal sólo cubre rutas no-Google exactas; OpenAI se mantiene directo.
-- Se añadieron el portfolio enterprise y un registry JSON de research para agentes. Separan capability estable,
-  route candidate, tier, lifecycle y readiness; ninguna ruta ejecuta hasta `production_approved`.
-- La skill `design-studio` en Codex/Claude incorpora routing enterprise, tres carriles Gemini Image, endpoints
-  Seedream/FLUX/Ideogram/Kling/PixVerse/ElevenLabs/Bria exactos, Seedance 2.5 bloqueado y workbenches externos
-  en `watch`.
-- Se endurecieron los contratos de costo, privacidad, derechos, aprobación single-use, no-double-spend,
-  observabilidad, DR y agent permissions. No se creó runtime, adapter, credencial ni gasto; EPIC-028 sigue siendo
-  la frontera de implementación.
-
-## 2026-07-19 — Efeonce Globe inicia construcción como Creative Studio hermano
-
-- Se fijó **Efeonce Globe** como nombre canónico interno del Creative Studio y EPIC-028 pasó a `in-progress`.
-- Se creó el repositorio privado `efeoncepro/efeonce-globe` y el único proyecto GCP inicial `efeonce-globe`,
-  aislado de Greenhouse, con billing y APIs base pero sin workloads, datos, buckets, secretos ni gasto de providers.
-- El monorepo foundation en Node 24 incorpora contratos UI/MCP, dominio de runs, provider boundary, media QC,
-  runner async, CI y gobernanza. CI remota verde; IAM/WIF, budgets, IaC y primer vertical slice siguen pendientes.
-
-## 2026-07-19 — Globe queda alcanzable desde Greenhouse como piloto interno
-
-- TASK-1454 generalizó el broker OAuth de sister platforms mediante policy validada por client, preservó Kortex y
-  registró Globe con audiencia `efeonce_internal`, capability namespaced y claims mínimos sin roles Greenhouse.
-- Se aplicó la migración aditiva aprobada, se desplegaron callback web y API privada en Cloud Run y se verificaron
-  PKCE/replay, acceso humano interno, denegación de tenant cliente, revocación convergente, correlación y audience
-  exacto/incorrecto. El bridge Vercel OIDC → WIF → Google ID token opera sin service-account keys.
-- Globe permanece activo sólo como piloto interno no productivo. No se habilitaron clientes externos, Production,
-  providers creativos, DB ni buckets. La UI/branding con logo canónico continúa en una task `ui-ux` separada.
