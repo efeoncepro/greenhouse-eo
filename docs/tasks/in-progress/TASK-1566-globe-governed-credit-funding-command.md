@@ -406,7 +406,7 @@ Esta sección es **load-bearing**: la task toca autoridad financiera, IAM cross-
 1. **Slice 1** en staging: provocar cada fase de negación y verificar que el `conflict` la declara y que **ninguna** filtra saldo, política cruda, SQL ni payload. Repetir en producción.
 2. **Slice 2**: `tofu plan` leído → apply → **readback de IAM**: sólo el aprobador tiene `asymmetricSign` sobre la clave. Verificar que el verificador sigue aceptando una aprobación HMAC existente (**no** romper el carril viejo).
 3. **Slice 3**: `tofu plan` con **cero** `destroy`/`replace` → apply → readback de los bindings → verificar que el broker alcanza el API y que el `admin-broker` **no** puede confirmar ni mutar (negativo explícito, no inferido).
-4. **Slice 4** en staging: `migrate:up` → verificar el DDL contra `information_schema` → flag ON → `propose` con la sesión de un humano → revisar el plan → `confirm` con **un segundo humano distinto** → verificar el grant, el asiento y la política resultantes en Postgres → verificar que un `confirm` repetido es idempotente → verificar que una propuesta vencida se rechaza con la fase correcta.
+4. **Slice 4** en staging: `migrate:up` → verificar el DDL contra `information_schema` → flag ON → `propose` con la sesión de un humano → revisar el plan → `confirm` **según la política del workspace** (en el interno `requires_second_confirmer=FALSE` y sin techo, así que el mismo humano confirma; ver Delta 2026-07-26 (2)) → verificar el grant, el asiento y la política resultantes en Postgres → verificar que un `confirm` repetido es idempotente → verificar que una propuesta vencida se rechaza con la fase correcta.
 5. **Slice 4 en producción**, con cooldown de 24 h respecto de staging: el **fondeo real del mes**, una confirmación humana, cero break-glass. Verificar que imagen y video **generan** después (es la prueba de que el fondeo tuvo efecto, no sólo de que el comando respondió 200).
 6. **Slice 5**: smoke del broker desde staging de Greenhouse → verificar audit en los dos lados y la cadena de correlación completa → repetir en producción.
 7. **Slice 6**: inventario de consumidores del carril viejo → retiro → verificar que el fondeo por el carril nuevo **sigue** funcionando y que el viejo devuelve `access_denied`.
@@ -420,7 +420,7 @@ Stop & escalate si cualquier verify falla. En particular: si el paso 5 responde 
 - **Habilitar `cloudkms.googleapis.com`** en el proyecto `efeonce-globe`.
 - **IAM cross-proyecto**: crear `greenhouse-globe-admin@efeonce-group` y su `tokenCreator` sobre `globe-admin-broker@efeonce-globe`. El classifier del entorno bloquea policy-bindings de IAM en Globe: **pedir aprobación del operador antes de empezar el Slice 3**, no en el medio.
 - **Env vars nuevas** en `globe-api-internal`, en el `producer-worker` si lee el flag, y en Vercel (staging + production; **las env vars no se calientan solas — hay redeploy**).
-- **Dos personas de Greenhouse** para el `propose` y el `confirm` del fondeo real (pasos 4 y 5). **No es automatizable — es una propiedad del diseño, no una limitación temporal.**
+- **Una sesión humana real** para el `propose` y el `confirm` del fondeo (pasos 4 y 5): la atribución sale de la sesión, nunca del cuerpo, y por eso **no es automatizable** — es propiedad del diseño, no limitación temporal. Que sean **dos** personas distintas es **política por workspace** (`requires_second_confirmer` + techo por operación), y en el interno está en **OFF explícito**: exigir un segundo actor que no existe desvía al break-glass, que otorga más autoridad que el camino que reemplaza. Ver Delta 2026-07-26 (2).
 - **`gcloud auth login` + `gcloud auth application-default login`**: son credenciales **distintas** y pueden estar desalineadas; una puede estar vencida y la otra viva.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -508,6 +508,107 @@ Validación manual (no automatizable, y es una propiedad del diseño):
 - **El guard de "un solo grant activo"** de `ISSUE-124`: decidir si es política deseada o si el 409 venía de otra fase (que el Slice 1 vuelve observable).
 - **Modelo de roles de administración de crédito**: si `propose` y `confirm` son dos capabilities sobre los ROLE_CODES existentes o merecen un rol nuevo. Decidir contra los **14 ROLE_CODES reales** de `src/config/role-codes.ts`, nunca contra un rol fantasma.
 - **Aplicar el mismo carril al resto de la administración de crédito** (pools, budgets de proyecto, correcciones) si el patrón `propose`/`confirm` resulta el correcto para el fondeo.
+- **Portar `nul-byte-gate` a `efeonce-globe`** (Delta 2026-07-26 (4)). Es donde nació el bug class y hoy es el único de los dos repos sin gate. Requiere decisión del operador porque cruza a un repo hermano cuyo `main` despliega, y su test hay que registrarlo a mano en el script `test` del `package.json`.
+
+## Delta 2026-07-26 (4) — la precondición del cierre queda verificada; el bug class del NUL se cierra con gate
+
+**Nada del carril cambió. Lo que cambió es que su precondición dejó de ser una afirmación y pasó a ser
+una medición**, y que el defecto que ya había costado dos diagnósticos falsos dejó de depender de que
+alguien se acuerde.
+
+### Precondición del cierre, verificada contra el runtime (no contra estos docs)
+
+| Qué | Cómo se verificó | Resultado |
+|---|---|---|
+| Globe API vivo | `gcloud run services list --project=efeonce-globe` | `globe-api-internal-00106-b6w`, `southamerica-west1` |
+| Flag del carril | `run revisions describe … --format=json` | `GLOBE_CREDIT_ADMIN_LANE_ENABLED = true` |
+| Migraciones de Greenhouse | `SELECT … FROM pgmigrations` contra PG real | las dos aplicadas (`…164420386`, `…171851162`) |
+| Estado del ledger | `SELECT count(*)` | `globe_credit_funding_intents` = **0 filas** |
+| Política del workspace interno | `SELECT * FROM globe_credit_funding_policies` | fila **explícita**: `requires_second_confirmer=false`, sin techo |
+| Capabilities | `capabilities_registry` | `propose` y `confirm`, ninguna `deprecated_at` |
+
+La base que usa staging **ya tiene todo**. La única pieza ausente es el **código de Greenhouse
+desplegado**: `develop` está **12 commits adelante de `origin/develop`**, así que staging no tiene las
+rutas. Eso convierte el paso que falta en un **push autorizado**, no en trabajo de ingeniería.
+
+### El NUL crudo: cuarta aparición, y ahora sí hay gate
+
+El barrido sobre los dos repos encontró **tres archivos más** contaminados, además del
+`credit-funding.ts` original:
+
+- `efeonce-globe/packages/domain/src/media-derivatives.ts` — NUL real como separador de
+  `mediaDerivativeId`. Corregido a la secuencia de escape; **verificado runtime-idéntico**
+  (`'\0' === String.fromCharCode(0)`), así que **ningún id derivado cambia de valor**.
+- Esta misma task y `.claude/skills/greenhouse-globe/SKILL.md` — el byte literal escrito **dentro de la
+  línea que enseña a no escribirlo**. El archivo de la task era `data` para `file`, y por eso `grep`
+  no devolvía ninguno de sus encabezados.
+
+Y una quinta, útil como evidencia: al escribir el gate, **el byte se coló en el propio gate**. Se
+reproduce con sólo teclear el carácter en vez de la escape. Por eso la contramedida no podía ser
+disciplina.
+
+**Gate `pnpm nul-byte-gate`** (`scripts/ci/nul-byte-source-gate.mjs`), cableado dentro de
+`pnpm local:check` — es decir, dentro del **pre-push hook**, que es donde tiene que morir. Corre en
+~1,3 s sobre los archivos de texto trackeados. Test propio (7 casos,
+`scripts/ci/__tests__/nul-byte-source-gate.test.mjs`) que **ejercita la detección**, no sólo el camino
+limpio: el caso `credit-funding.ts` reproducido, conteo múltiple, número de línea, y la aserción de que
+la escape es runtime-idéntica al byte.
+
+🔴 **Globe queda sin gate equivalente** — que es donde nació el defecto. Copiar el script cruza a un
+repo hermano cuyo `main` despliega; queda como follow-up con decisión del operador, no aplicado de
+oficio.
+
+### Lo que NO se hizo, y por qué
+
+**No se ejerció `propose` → `confirm`.** Requiere el deploy, y el deploy requiere `git push`. Tampoco se
+ejerció con la persona agente: `user-agent-e2e-001` **pasa** el trigger (no matchea `service:%`), pero
+dejaría en una tabla **append-only e inmutable** una atribución humana que es ficción, y otorgaría
+créditos reales. La evidencia que el criterio de salida pide es la sesión del operador; fabricarla con
+una persona de prueba sería exactamente el vicio que este carril existe para eliminar.
+
+**No se retiró `raise-credit-monthly-cap.mjs`**, por lo mismo de siempre: el retiro va después del
+reemplazo verde. Nota para cuando toque: su test está registrado a mano en el script `test` de
+`efeonce-globe/package.json` y hay que sacarlo en el mismo commit. Vale registrar que el reemplazo es
+**superset**: el script viejo sólo supersede la política (`monthlyCap`); el carril nuevo exige
+`grantCredits` y acepta `monthlyCap` opcional en el mismo plan.
+
+### Runbook del ejercicio (para cuando Greenhouse esté desplegado)
+
+`pnpm staging:request` **no sirve acá** por dos razones: resuelve su cookie contra
+`/api/auth/agent-session` (persona agente, no el operador) y no manda headers custom, y
+`x-idempotency-key` es **obligatorio** (mínimo 8 caracteres). Y todavía no hay UI: la superficie de
+administración de crédito es el Slice 4 de ADR-015, follow-up bloqueado por esta task. Así que el
+ejercicio es por `curl`, con la cookie de sesión del operador tomada del portal de staging:
+
+```bash
+BASE=https://greenhouse-eo-env-staging-efeonce-7670142f.vercel.app
+COOKIE='next-auth.session-token=<cookie del operador, desde el portal de staging>'
+KEY="funding-$(date +%Y%m)-01"   # estable: repetirla es lo que prueba la idempotencia
+
+curl -sS -X POST "$BASE/api/admin/globe/credit-funding/propose" \
+  -H "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" \
+  -H "x-idempotency-key: $KEY" -H 'Content-Type: application/json' -H "Cookie: $COOKIE" \
+  -d '{"globeWorkspaceId":"greenhouse-org:efeonce","poolId":"<pool vigente>","grantCredits":<n>,"periodStart":"2026-08-01T00:00:00Z","periodEnd":"2026-09-01T00:00:00Z"}'
+```
+
+La respuesta trae `{ proposal: { proposalId, fingerprint, plan } }`. **Revisar el `plan` antes de
+confirmar** — ése es el punto entero del carril. Después:
+
+```bash
+curl -sS -X POST "$BASE/api/admin/globe/credit-funding/confirm" \
+  -H "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" \
+  -H "x-idempotency-key: $KEY" -H 'Content-Type: application/json' -H "Cookie: $COOKIE" \
+  -d '{"globeWorkspaceId":"greenhouse-org:efeonce","proposalId":"<…>","fingerprint":"<…>"}'
+```
+
+Verificaciones que hacen que esto cuente como evidencia, no como un 200:
+
+1. `SELECT phase, actor_user_id, proposed_by_user_id FROM greenhouse_core.globe_credit_funding_intents`
+   → dos filas (`proposed`, `confirmed`) con el **user id real** del operador.
+2. El grant y el asiento en el ledger de Globe.
+3. `confirm` repetido con la misma `x-idempotency-key` → idempotente, **sin** segundo grant.
+4. 🔴 **Imagen y video generan después.** Es la única prueba de que el fondeo tuvo efecto; un 200 sin
+   generación significa que no lo tuvo, y ahí se para (paso 5 de la secuencia de verificación).
 
 ## Delta 2026-07-26 (3) — Slices 4a y 4b entregados; 4c tiene un bloqueo de diseño CONCRETO
 
@@ -537,7 +638,7 @@ Tres cosas que el compilador y los tests obligaron a corregir:
 **Hallazgo fuera de la spec:** `credit-funding.ts` tenía **3 bytes NUL crudos** como separador de
 clave. UTF-8 válido, compila, ningún gate lo atrapa — pero `file` lo reporta como `data` y **todo
 grep lo salta como binario**, lo que hizo concluir dos veces que un símbolo no existía. Corregido a
-` `.
+`\0`.
 
 ### Slice 4b (`add15d8`) — la propuesta se vuelve durable
 

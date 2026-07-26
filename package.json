@@ -14,7 +14,7 @@
     ]
   },
   "scripts": {
-    "local:check": "pnpm lint && NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit",
+    "local:check": "pnpm nul-byte-gate && pnpm lint && NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit",
     "typecheck": "NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit",
     "local:check:full": "pnpm local:check && pnpm test && pnpm build",
     "local:check:ui": "pnpm local:check && pnpm design:lint && pnpm design-contract:lint && pnpm ui:code-lint --changed && pnpm build",
@@ -107,6 +107,8 @@
     "vercel-cron-gate": "node scripts/ci/vercel-cron-async-critical-gate.mjs",
     "route-reachability-gate": "node scripts/ci/route-reachability-gate.mjs",
     "nexa:doc-gate": "node scripts/ci/nexa-intelligence-doc-gate.mjs",
+    "nul-byte-gate": "node scripts/ci/nul-byte-source-gate.mjs",
+    "nul-byte-gate:test": "node --test scripts/ci/__tests__/nul-byte-source-gate.test.mjs",
     "migration-marker-gate": "node scripts/ci/migration-marker-gate.mjs",
     "migration-marker-gate:test": "node scripts/ci/__tests__/migration-marker-gate.test.mjs",
     "worker:runtime-deps-gate": "node scripts/ci/worker-runtime-deps-gate.mjs",

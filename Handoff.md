@@ -92,6 +92,28 @@ ese `tokenCreator` es de `greenhouse-portal@` (`iam.tf:16-20`). Hasta entonces N
    anteriores: un `catch` que sanitizaba sin dejar rastro del servidor. La contramedida no es
    disciplina sino procedimiento — el `catch` y su linea de log, en el mismo commit.
 
+**Sesion 2026-07-26 (cierre parcial).** La precondicion del cierre dejo de ser afirmacion y paso a
+medicion, verificada contra el runtime y contra PG real: `globe-api-internal-00106-b6w` con
+`GLOBE_CREDIT_ADMIN_LANE_ENABLED=true` · las dos migraciones aplicadas · `globe_credit_funding_intents`
+en **0 filas** · la fila de politica del workspace interno **explicita** en `requires_second_confirmer=FALSE`
+sin techo · ambas capabilities vivas y sin deprecar. **La base que usa staging ya tiene todo.**
+
+🔴 **Lo unico ausente es el codigo de Greenhouse desplegado: `develop` esta 12 commits adelante de
+`origin/develop`.** El paso que falta es por lo tanto un **push autorizado**, no trabajo de ingenieria.
+No se ejercio con la persona agente a proposito: `user-agent-e2e-001` pasa el trigger, pero dejaria en
+una tabla append-only una atribucion humana ficticia y otorgaria creditos reales.
+
+**El bug class del NUL se cierra con gate.** El barrido encontro 3 archivos mas contaminados ademas del
+`credit-funding.ts` original — `efeonce-globe/packages/domain/src/media-derivatives.ts` (NUL real en el
+separador de `mediaDerivativeId`; corregido y **verificado runtime-identico**, ningun id cambia), y la
+skill `greenhouse-globe` + la propia TASK-1566, ambas con el byte **dentro de la linea que ensena a no
+escribirlo**. El archivo de la task era `data` para `file`, y por eso `grep` no devolvia ni sus
+encabezados. Nuevo `pnpm nul-byte-gate` cableado dentro de `pnpm local:check` (o sea del pre-push), con
+7 tests que ejercitan la **deteccion**, no solo el camino limpio. Dos correcciones documentales: la
+secuencia de verificacion todavia exigia "un segundo humano distinto", que es exactamente la
+contradiccion que ya habia bloqueado al operador. 🔴 `efeonce-globe` queda **sin gate equivalente** —
+copiarlo cruza a un repo hermano cuyo `main` despliega, asi que es decision del operador.
+
 **Pendientes vivos:** `authentication_required` (4.a fila de ISSUE-127, unica abierta) · los dos huecos
 del canary (`RUN_LABEL` exigido solo en `--execute`; el dry-run no reporta `withinDayCap`) · reconcile
 terminalization (TASK-1469) · `data-testid` estables en feed/tabs (el live feed invalida los refs de
