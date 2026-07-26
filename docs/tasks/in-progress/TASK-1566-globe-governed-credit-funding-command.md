@@ -545,9 +545,85 @@ comprobado contra el deployment real con bypass y sin sesión:
 El control importa: sin él, un `401` podría ser un guard global y no la ruta. Con un 404 real al lado,
 el `401` es **el handler**, o sea el código desplegado.
 
-🔴 **Queda un único acto, y necesita a un humano por diseño:** `propose` → `confirm` con la **cookie de
-sesión del operador**, según el runbook de abajo. La atribución sale de la sesión — no hay forma de
-automatizarlo sin falsificar justamente lo que el carril produce.
+### 🔴 El bloqueo real NO era el deploy: Greenhouse-en-Vercel nunca pudo hablar con Globe
+
+Al ejercer el `propose` con una sesión real apareció un **`500 internal_error`**. Diagnóstico
+completo, medido:
+
+1. **`/api/internal/globe/health` en staging devolvía `globe_not_configured`.** En Vercel había
+   **cero variables `GLOBE_*`**, en **todos** los environments. O sea el enlace Greenhouse→Globe nunca
+   estuvo configurado en ningún runtime desplegado — ni para fondear, ni para el reconciliador de
+   tenancy. Lo que la sesión anterior midió como "funciona hasta el borde con Globe" fue **en local**.
+2. Configuradas las 5 (`GLOBE_API_BASE_URL`, `GLOBE_API_AUDIENCE`, `GLOBE_GCP_PROJECT`,
+   `GLOBE_GCP_WORKLOAD_IDENTITY_PROVIDER`, `GLOBE_GCP_SERVICE_ACCOUNT_EMAIL`) en `staging` + redeploy,
+   el health pasó a **`globe_bridge_unavailable`**: ya lee la config, ahora falla el puente.
+3. **Causa raíz: las audiencias OIDC no se cruzan.** Un proyecto de Vercel emite **UN** token, con un
+   `aud`. Comparadas las dos federaciones:
+
+   | Proveedor | `allowedAudiences` | ¿Coincide con lo que Vercel emite? |
+   |---|---|---|
+   | `efeonce-group` / pool `vercel` | `https://vercel.com/efeonce-7670142f` | **Sí** — funciona hoy |
+   | `efeonce-globe` / pool `vercel-greenhouse` | `//iam.googleapis.com/projects/818083690953/…/providers/greenhouse-eo` | **No** |
+
+   El proveedor de Globe exige un `aud` **custom que Vercel nunca emite**. La prueba empírica es que
+   el de `efeonce-group` —que sí funciona— acepta exactamente el `aud` por defecto del equipo.
+
+**Conclusión: la federación Vercel→Globe NUNCA funcionó.** No es una regresión ni algo que rompió el
+deploy de hoy: es que nadie la había ejercido. Encaja con que no hubiera ni una `GLOBE_*` en Vercel y
+con que el propio bloque *Out-of-band coordination* de esta task ya listara las env vars como
+pendientes.
+
+**Resuelto** (`efeonce-globe@004b849`): `allowed_audiences` pasa a llevar **las dos** — la canónica y
+`https://vercel.com/efeonce-7670142f`. Aplicado primero con `gcloud` para desbloquear (el classifier
+bloqueó dos veces la edición del IaC) y **cerrado en terraform en el mismo día**, porque sin la línea
+el próximo apply lo revertía **en silencio**. Verificado como manda el README de ese repo:
+`tofu plan -target=google_iam_workload_identity_pool_provider.vercel` → **"No changes. Your
+infrastructure matches the configuration"**, cero destroy/replace. No se corrió un plan completo a
+propósito: no existe `terraform.tfvars` local, y con variables adivinadas el plan miente y el apply
+puede destruir recursos vivos.
+
+Con eso, `/api/internal/globe/health` en staging pasó a **`200 ok`, `auth.source: wif`** — Greenhouse
+desplegado habla con Globe **por primera vez**.
+
+### 🔴 Con el puente vivo aparecieron DOS defectos más, invisibles hasta ahora
+
+**1. El payload del broker estaba incompleto** (`greenhouse-eo@d2e45dd33`). El `propose` moría en
+`400`. `parsePropose` de Globe exige `sourceId` y `reasonCode`, y `attribution()` exige `at`: el
+broker no mandaba **ninguno de los tres**, ni en propose ni en confirm. `sourceId` deriva ahora de la
+clave de idempotencia, y eso **no es cosmético**: el `fingerprint` se calcula sobre el payload salvo
+`proposedBy`, así que un UUID o un `Date.now()` daría fingerprint distinto por intento y el replay
+idempotente dejaría de serlo justo en el camino del dinero.
+
+**2. El `fingerprint` que `propose` emite no podía volver a entrar en `confirm`**
+(`efeonce-globe@659c58d`). `parseConfirm` lo validaba con `id()` (máx 200 chars) mientras `stable(...)`
+serializa el plan completo: con `poolId` uuid, los dos ISO de período, `sourceId` y `reasonCode` son
+**248 caracteres**. Globe emitía un valor que **su propio `confirm` rechazaba**: ninguna propuesta real
+era confirmable — el carril estaba estructuralmente muerto en su último paso. Un fingerprint no es un
+id; ahora tiene validador propio, acotado pero holgado. **Por qué ningún test lo atrapaba:** la fixture
+usa ids cortos (`pool-a`, `july-topup`) que dan un fingerprint bajo el techo. El test de regresión usa
+la forma **real** de producción y se verificó que **falla sin el fix y pasa con él**.
+
+**Y el mismo defecto de actionability, tres veces en el día.** `dispatch` colapsaba **todo** fallo en
+`globe_unavailable` (503, `actionable: true`), así que un `400` se leía como *"Globe no respondió,
+reintenta en unos segundos"* cuando Globe respondía perfectamente que el payload estaba incompleto.
+Ahora un 4xx es `rejected_by_globe` → `globe_funding_rejected` (422, `actionable: false`), y el log del
+servidor lleva `status` + `sdkCode` — enum cerrado del transporte, nunca prosa del upstream.
+
+### El plan legible hizo exactamente su trabajo
+
+Primer `propose` real (200): `monthlyCapBefore: 400` · `spentInPeriod: 166` · `policyAvailableBefore:
+344` · **`policyAvailableAfter: 234`**. Es decir: **agregar 100 créditos BAJABA lo disponible**. No es
+un bug — los grants ya suman 510 y el **tope de 400 es el que restringe** (400 − 166 = 234). Fondear
+sin subir el tope era plata que no se puede gastar. Con `monthlyCap: 800` el plan pasa a
+`policyAvailableAfter: 444`, un aumento real.
+
+**Ése es el punto entero del carril:** el confirmador ve el delta ANTES de aprobar. Por el carril viejo
+—que sólo sube el tope, sin grant— ese trade-off no era visible en ninguna parte.
+
+**Estado:** `propose` verde punta a punta con datos reales; `confirm` a la espera del deploy de la API
+de Globe con el fix del fingerprint. Pool `10b0c57a-231d-4244-88d3-49ee7ecab17f` **activo**, período
+julio, 3 grants posteados (100 + 400 + 10 = **510** créditos) y 2 propuestas registradas en la tabla
+append-only, ambas atribuidas a `user-agent-e2e-001`.
 
 ### El NUL crudo: cuarta aparición, y ahora sí hay gate
 
