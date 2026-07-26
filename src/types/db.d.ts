@@ -2643,6 +2643,13 @@ export interface GreenhouseCoreGlobeCreditFundingIntents {
   proposed_by_user_id: string | null;
 }
 
+export interface GreenhouseCoreGlobeCreditFundingPolicies {
+  globe_workspace_id: string;
+  requires_second_confirmer: Generated<boolean>;
+  second_confirmer_above_credits: number | null;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCoreIdentityProfiles {
   active: Generated<boolean>;
   canonical_email: string | null;
@@ -11718,6 +11725,7 @@ export interface DB {
   "greenhouse_core.entity_source_links": GreenhouseCoreEntitySourceLinks;
   "greenhouse_core.first_party_app_sessions": GreenhouseCoreFirstPartyAppSessions;
   "greenhouse_core.globe_credit_funding_intents": GreenhouseCoreGlobeCreditFundingIntents;
+  "greenhouse_core.globe_credit_funding_policies": GreenhouseCoreGlobeCreditFundingPolicies;
   "greenhouse_core.identity_profile_source_links": GreenhouseCoreIdentityProfileSourceLinks;
   "greenhouse_core.identity_profiles": GreenhouseCoreIdentityProfiles;
   "greenhouse_core.launch_notifications": GreenhouseCoreLaunchNotifications;
