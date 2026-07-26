@@ -166,18 +166,18 @@ de valor, límites de scope, economía defendible y capacidad de ser operado por
 ```text
 Efeonce
 └── Product Service portfolio
-    ├── Wave
+    ├── Digital Services & Engineering (Wave product brand cuando aplica)
     │   ├── Search Visibility 360
     │   ├── Web Experience 360
     │   ├── Measurement & Analytics
     │   ├── Agent Systems & Platforms
     │   └── Digital Automation & Integrations
-    ├── Globe / Creative Studio
+    ├── Creative Services (Globe / Creative Studio product brand cuando aplica)
     │   ├── Studio Access / platform-enabled
     │   ├── Creative Production
     │   ├── Managed Squad
     │   └── Staff Augmentation
-    ├── Efeonce Digital / Kortex
+    ├── RevOps & CRM (Kortex product brand cuando aplica)
     │   └── CRM, RevOps y lifecycle
     └── Greenhouse
         └── internal operating/control plane, no default client-facing product

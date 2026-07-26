@@ -114,7 +114,8 @@ El roadmap ASaaS ya nombra dónde duele. Si buscas dónde aportar, empieza aquí
 | Archivo | Dominio |
 |---|---|
 | `00_INDEX.md` | Este. Cómo usar la carpeta + North Star de producto. |
-| `01_quienes-somos.md` | Efeonce Group, 4 unidades, Loop Marketing, ICO, experiencia LATAM. |
+| `01_quienes-somos.md` | Efeonce Group, líneas de negocio, product brands, Loop Marketing, ICO, experiencia LATAM. |
+| `../architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md` | Contrato de capas: Efeonce, líneas de negocio/prácticas, product brands, ofertas y delivery. |
 | `02_gtm.md` | Posicionamiento, categoría de mercado, ASaaS, líneas de negocio, segmentación, modelo comercial, canales, proceso de venta, métricas GTM, partnership. |
 | `03_ecosistema-producto.md` | Greenhouse + Kortex + Verk. Integración, convergencia, ASaaS redefinido, jerarquía de IP. |
 | `04_greenhouse-producto.md` | Greenhouse hoy: módulos, stack, integraciones, ICO Engine, gaps, roadmap, principios de diseño. |

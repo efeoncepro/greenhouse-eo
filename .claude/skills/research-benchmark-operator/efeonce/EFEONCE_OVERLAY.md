@@ -31,7 +31,9 @@ Efeonce ya tiene un **benchmark productizado**: el **AI Visibility Grader** (sco
 ## Casos y contexto (delegado)
 
 - **ICP/segmentos, casos citables (Sky/Bresler/Berel), naming de métricas** → `efeonce-agency` + `docs/context/` (`06_glosario-metricas`, `13_icp-buyer-personas-jtbd`). (nunca usarlo como prueba).
-- **Business lines (Globe/Reach/Wave/Digital)** para segmentar research por unidad → `efeonce-agency`.
+- **Business lines** (Creative Services, Digital Services & Engineering, RevOps & CRM, Media & Distribution,
+  Growth Strategy & Measurement) y sus product brands (Globe, Wave, Kortex, Reach, Verk) para segmentar research
+  por ownership → `efeonce-agency`.
 
 ## Research/benchmark como diferenciador comercial
 

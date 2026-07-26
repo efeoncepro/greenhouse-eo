@@ -1,10 +1,10 @@
 # 03 · Ecosistema de Producto
 
-> Regla maestra: **cada plataforma o capability puede venderse y operar de forma independiente. Cuando el cliente está en el ecosistema completo, Greenhouse es el hub donde todo converge.** Las plataformas verticales (Kortex, Verk y Efeonce Globe / Creative Studio) alimentan el hub sin depender de él para operar. Globe combina plataforma, especialistas y capacidad de delivery; no es sólo software.
+> Regla maestra: **cada product brand o capability puede venderse y operar de forma independiente. Cuando el cliente está en el ecosistema completo, Greenhouse es el hub donde todo converge.** Las plataformas verticales (Kortex, Verk y Efeonce Globe / Creative Studio) alimentan el hub sin depender de él para operar. Globe es una product brand de producción creativa; no representa por sí sola toda la línea Creative Services ni toda la relación de agencia.
 
 Efeonce tiene cuatro plataformas de software propietario, en distinta madurez:
 
-> **Nota de portfolio:** Wave es una marca de producto/capability de servicios digitales, no una quinta plataforma de software dentro de esta tabla. Puede nombrarse como producto frente al cliente, siempre bajo la relación Efeonce. Su modelo y boundaries viven en [`Wave Business Model V1`](../business-models/wave/WAVE_BUSINESS_MODEL_V1.md).
+> **Nota de portfolio:** Wave es una product brand/capability de servicios digitales, no una línea comercial separada de Efeonce ni una quinta plataforma de software dentro de esta tabla. Puede nombrarse como producto frente al cliente, siempre bajo la relación Efeonce. Su modelo y boundaries viven en [`Wave Business Model V1`](../business-models/wave/WAVE_BUSINESS_MODEL_V1.md).
 
 | Plataforma | Territorio | ICP | GTM | Estado |
 |---|---|---|---|---|

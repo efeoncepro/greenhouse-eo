@@ -64,12 +64,13 @@ que diseña, construye y opera la capa digital inteligente. El catálogo económ
 | **Agent Systems & Platforms** | Agent Strategy & Architecture · Custom Agent System · Managed Agent Deployment · Agent Integrations · Agent Evaluation & Operations |
 | **Digital Automation & Integrations** | API/Workflow Sprint · Data Pipeline · Automation Build · Integration Operations |
 
-La composición de un proyecto puede incorporar capacidades de Efeonce Digital/Kortex, Globe o Reach según el
-resultado contratado y el RACI definido. Wave conserva el ownership de sus familias de servicio.
+La composición de un proyecto puede incorporar capacidades de RevOps & CRM/Kortex, Creative Services/Globe o
+Media & Distribution/Reach según el resultado contratado y el RACI definido. Wave conserva el ownership de sus
+familias de servicio.
 
 ### Delivery models de Wave
 
 Las familias anteriores son product services; el modelo de delivery se cotiza y gobierna por separado. Wave puede
 entregar mediante Productized Service, Managed Squad, Staff Augmentation, Implementation, Advisory o
 Platform-enabled Service, con engagements On-Going, On-Demand o Sample Sprint. Un proyecto puede combinar Wave con
-Efeonce Digital/Kortex, Globe, Reach o Greenhouse sin mezclar ownership.
+RevOps & CRM/Kortex, Creative Services/Globe, Media & Distribution/Reach o Greenhouse sin mezclar ownership.

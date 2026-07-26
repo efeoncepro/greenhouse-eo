@@ -1,5 +1,11 @@
 # Handoff activo
 
+## 2026-07-26 — Taxonomía de portfolio Efeonce corregida
+
+Se estableció el contrato [`EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md`](docs/architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md): **Efeonce es la marca paraguas y relación comercial; Creative Services, Digital Services & Engineering, RevOps & CRM, Media & Distribution y Growth Strategy & Measurement son líneas de negocio/prácticas; Globe, Wave, Reach, Kortex y Verk son product brands o platform brands; Greenhouse es el control plane; las ofertas y delivery models viven debajo de esas capas**. Se sincronizaron context pack, business models, catálogo de servicios y skills Codex/Claude. Los labels históricos de runtime pueden permanecer donde sean identificadores técnicos; no deben usarse como taxonomía comercial nueva.
+
+Estado: docs/skills actualizados localmente; no hay cambio de runtime ni rollout. Próximo paso si se implementa CRM: mapear `business_line`, `product_brand`, `offer`, `delivery_model` y `engagement` en el catálogo/HubSpot sin reutilizar `unit` como sustituto.
+
 ## 2026-07-26 — EPIC-028 master flow y creative workspace backlog
 
 Se documentó el benchmark de Magnific, Higgsfield, Krea, Runway, Leonardo, Recraft y Firefly dentro de EPIC-028. La dirección vigente del Producer es `intención → Project → Collection → Session → Asset Workspace → lineage → review → Element/reuse`; no se crea un segundo feed, viewer, library ni motion engine.

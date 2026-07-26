@@ -185,7 +185,7 @@ Esta skill es **dominio**, no método. No duplica; compone.
 
 ## 6. Las 4 capas del negocio (y dónde está el margen)
 
-Fuente canónica: `docs/context/02_gtm.md:45-54`. CRM Solutions es la **5.ª línea, transversal**.
+Fuente canónica: `docs/context/02_gtm.md:45-54`. RevOps & CRM es una **línea de negocio de Efeonce**; HubSpot es la plataforma externa y Kortex es la product brand/capability de inteligencia y delivery programático.
 
 | Capa | Qué es | Revenue | Puntos de tier |
 |---|---|---|---|

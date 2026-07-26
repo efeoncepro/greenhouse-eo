@@ -18,10 +18,11 @@
 
 | Elemento | Tipo provisional | Entrada/valor | Estado del modelo |
 |---|---|---|---|
-| Efeonce Digital | Capability | estrategia, growth, RevOps, CRM/Kortex y orquestación | hypothesis / map |
-| Globe / Creative Studio | Capability + posible product line | plataforma, especialistas, creatividad, contenido y operaciones creativas | see current model |
-| Reach | Capability | medios, PR y distribución | hypothesis / map |
-| Wave | Productora/capability | Search Visibility 360, web para humanos/buscadores/agentes, measurement, sistemas de agentes y automatización/integraciones; delivery con plataforma, squads o especialistas | draft; ver modelo propio |
+| Growth Strategy & Measurement | Business line / practice | estrategia, growth, revenue enablement y orquestación | hypothesis / map |
+| Creative Services | Business line / practice | branding, creatividad, contenido y operaciones creativas; Globe / Creative Studio como product brand cuando aplica | see current model |
+| Media & Distribution | Business line / practice | medios, PR, distribución y amplificación; Reach como product brand cuando aplica | hypothesis / map |
+| Digital Services & Engineering | Business line / practice | Search Visibility 360, web para humanos/buscadores/agentes, measurement, sistemas de agentes y automatización; Wave como product brand | draft; ver modelo propio |
+| RevOps & CRM | Business line / practice | CRM, HubSpot, implementación, managed ops e inteligencia; Kortex como product brand | hypothesis / map |
 | Greenhouse | Platform/control plane | operación, cliente, métricas y memoria | runtime-dependent |
 | Kortex | Product/platform capability | CRM e inteligencia comercial | runtime-dependent |
 | Verk | Product/platform capability | contenido, distribución y data/AI tooling | runtime-dependent |

@@ -10,7 +10,7 @@ La **Creative Supply Chain (CSC)** es el modelo operativo de referencia de la in
 
 > *Si la CSC es el motor, ICO es el sistema nervioso.*
 
-**Alcance — nota de versión:** el ICO master v1.0 enmarca a ICO "dentro de Globe" (la unidad creativa). La visión vigente (Addendum v1.1+ y decisión de marca) lo define como **capa transversal a las 4 unidades**, no solo Globe. Usa "ICO es transversal"; el origen Globe es histórico.
+**Alcance — nota de versión:** el ICO master v1.0 enmarca a ICO "dentro de Globe" (la product brand creativa de ese período). La visión vigente (Addendum v1.1+ y decisión de portfolio) lo define como **capa operativa transversal a las líneas donde aplica**, no como propiedad de Globe. Usa "ICO es transversal"; el origen Globe es histórico.
 
 ICO no es un producto que se compra ni una herramienta: **es la forma en que Efeonce opera.** No se vende por separado.
 

@@ -22,15 +22,24 @@ La arquitectura correcta es jerárquica:
 Efeonce Group
 └── Modelo corporativo
     └── Growth Platform / ASaaS
-        ├── Capabilities y líneas de negocio
-        │   ├── Efeonce Digital
-        │   │   ├── AEO
-        │   │   ├── Search Visibility 360
-        │   │   ├── SEO/contenido
-        │   │   └── CRM/GTM
-        │   │   ├── Globe / Creative Studio
-        │   │   ├── Reach
-        │   │   └── Wave
+        ├── Líneas de negocio y prácticas
+        │   ├── Creative Services
+        │   │   └── branding, campañas, contenido, producción y Creative Studio
+        │   ├── Digital Services & Engineering
+        │   │   └── Search Visibility 360, web, measurement, agentes e integraciones
+        │   ├── RevOps & CRM
+        │   │   └── HubSpot, CRM Intelligence, implementación y Managed Ops
+        │   ├── Media & Distribution
+        │   │   └── medios, PR, influencers y amplificación
+        │   └── Growth Strategy & Measurement
+        │       └── estrategia, Revenue Enabled, analytics y orquestación
+        ├── Product brands y platform brands
+        │   ├── Globe / Creative Studio
+        │   ├── Wave
+        │   ├── Reach
+        │   ├── Kortex
+        │   ├── Verk
+        │   └── Greenhouse
         │   └── Otras capabilities aprobadas
         ├── Plataformas y activos habilitantes
         │   ├── Greenhouse

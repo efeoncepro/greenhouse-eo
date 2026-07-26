@@ -54,7 +54,7 @@ Start from the **canonical Greenhouse agency roles** (colored in runtime: Accoun
 | **Medios** | Media Planner/Buyer, Paid (Reach) — si el engagement lo pide | Senior/Mid |
 | **Infra** | Tracking/Martech (Wave) — si el engagement lo pide | Senior/Mid |
 
-> Lead with **"Efeonce"** to the client and describe lanes by capability ("nuestro equipo de contenido y SEO"); the Globe/Reach/Wave unit labels are internal (`efeonce-agency` brand rule). The client contracts Efeonce, not four sub-brands.
+> Lead with **"Efeonce"** to the client and describe lanes by business line/capability ("nuestro equipo de Creative Services" o "Digital Services & Engineering"). Globe/Reach/Wave/Kortex are product brands that may name the enabling system; the client contracts Efeonce, not a peer set of product brands.
 
 ## Seniority ladder (what each level owns)
 

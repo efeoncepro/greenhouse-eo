@@ -107,19 +107,21 @@ Regla de marca: Nexa nunca debe presentarse como "asistente virtual" genérico n
 
 ## Arquitectura de marca: masterbrand con capabilities
 
-Una sola marca lidera toda la comunicación externa. Las antiguas sub-marcas se reposicionan como **capabilities** (áreas de expertise internas), no marcas independientes.
+Una sola marca lidera toda la relación externa: **Efeonce es la marca paraguas**. El portfolio distingue líneas de negocio/prácticas y product brands; estas últimas pueden ser visibles cuando ayudan a explicar una solución, pero no se presentan como agencias contractuales separadas.
 
 > *El cliente contrata a Efeonce. Wave puede nombrar el producto/capability que se entrega, pero el cliente no contrata a Globe + Reach + Wave como proveedores separados. Una marca relacional, productos reconocibles, un sistema.*
 
 | Nivel | Elemento | Rol |
 |---|---|---|
 | **Masterbrand** | **Efeonce** | La única marca que se construye activamente. Todo el brand building va aquí. |
-| Capability 1 | Creatividad y Contenido (Globe) | Motor creativo: identidad, contenido, campañas, audiovisual. |
-| Capability 2 | Amplificación y Medios (Reach) | Media buying, distribución, PR. |
-| Producto/capability 3 | Wave — Ingeniería Digital, Visibilidad y Sistemas de Agentes | Search Visibility 360, web para humanos/buscadores/agentes, measurement, agentes, integraciones y automatización. CRM permanece en Efeonce Digital/Kortex. |
-| Sub-marca endorsed | **Globe Studio \| Efeonce** | Única excepción con identidad propia. Punto de entrada al sistema. |
+| Línea de negocio / práctica | Product brand relacionada | Rol |
+| **Creative Services** | **Globe / Creative Studio** | Branding, contenido, campañas, audiovisual y producción creativa productizada. |
+| **Media & Distribution** | **Reach** | Media buying, distribución y PR. |
+| **Digital Services & Engineering** | **Wave** | Search Visibility 360, web, measurement, agentes, integraciones y automatización. |
+| **RevOps & CRM** | **Kortex** + HubSpot | CRM, implementación, automatización e inteligencia comercial. |
+| **Control plane / experiencia** | **Greenhouse** | Operación, cliente, memoria, medición y convergencia del ecosistema. |
 
-> Implicación de producto: la **vista interna (Agency) de Greenhouse** sí organiza por unidades (Globe, Reach, Wave) porque refleja la operación; la **experiencia de cara al cliente** debe liderar con "Efeonce" como marca única. No expongas la estructura de capabilities como si fueran proveedores separados al cliente.
+> Implicación de producto: Greenhouse puede organizar internamente por líneas de negocio, product brands, ownership y delivery. La experiencia de cara al cliente debe liderar con "Efeonce" como marca paraguas y mostrar la product brand solo cuando aporte claridad. No expongas líneas o marcas como proveedores contractuales separados.
 
 ---
 
@@ -195,9 +197,9 @@ Las 4 capas verbales (en secuencia natural de conversación):
 
 ## Reglas de comunicación (aplican a todo touchpoint externo, incluido el portal)
 
-1. Toda comunicación externa lidera con **"Efeonce"**. Nunca Globe/Reach/Wave solos.
-2. En propuestas, las capabilities se nombran descriptivamente ("nuestro equipo de creatividad y contenido"); Globe/Reach/Wave entre paréntesis.
-3. **Globe Studio** es la única excepción que comunica con nombre propio, siempre con "| Efeonce".
+1. Toda comunicación externa lidera con **"Efeonce"**.
+2. En propuestas, nombra primero la línea y la oferta ("Servicios Creativos — Managed Creative Operations"); agrega la product brand cuando aporte diferenciación ("potenciado por Globe").
+3. Globe, Wave, Reach y Kortex no se presentan solos como agencias o proveedores contractuales separados.
 4. Las metodologías propietarias (Loop Marketing, Nested Loops, ICO) **no** se mencionan en primer contacto.
 5. "Empower your ___" se activa según contexto; "Growth" es default.
 6. Tono **"tú"** siempre. "Usted" solo en contratos, legales y procurement.

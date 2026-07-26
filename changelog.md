@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-26 — Portfolio Efeonce: marca paraguas, líneas y product brands
+
+- Se canonizó la separación entre **Efeonce** como marca paraguas/relación comercial, líneas de negocio/prácticas,
+  product brands/platform brands, ofertas, delivery models y engagements en
+  [`EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md`](docs/architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md).
+- Se corrigió el lenguaje de contextos, business models, catálogo de servicios y skills: Creative Services no se
+  reduce a Globe; Digital Services & Engineering no se reduce a Wave; RevOps & CRM no es una quinta unidad; Reach,
+  Wave, Globe, Kortex y Verk nombran productos/sistemas cuando corresponde; Greenhouse es el control plane.
+- No hubo cambios de runtime, schema, catálogo productivo ni configuración externa.
+
 ## 2026-07-26 — Globe genera de verdad: Producer React vivo y carril de fondeo gobernado
 
 - **Generación desbloqueada.** Las tres modalidades producen desde la UI con principal humano por el BFF:

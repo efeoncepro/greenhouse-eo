@@ -217,7 +217,7 @@ La visibilidad se escala por tier (alineado con el modelo ASaaS). **Directamente
 | **Surround Discovery™** | Visibilidad en 5 superficies. Motor **S⁴: SENSE → SHAPE → SURFACE → SOLVE**. | SOLVE es la 4ª fase, no un framework suelto. |
 | **Surround Strategy™** | Marco de Reach: superficies Owned, Amplified, Earned, Dark. | Lleva ™. |
 | **CSC** | Creative Supply Chain: 7 fases de producción. ICO opera sobre la CSC. | — |
-| **ICO** | Intelligent Creative Operations: capa de inteligencia operativa transversal. | Transversal a las 4 unidades, no solo Globe. |
+| **ICO** | Intelligent Creative Operations: capa de inteligencia operativa transversal. | Transversal a las líneas donde aplica, no solo Globe. |
 | **Design System** (capa ICO) | Infraestructura visual de componentes/tokens que sube FTR, baja RpA/CT. | Capacidad embebida, no producto standalone. |
 | **Brand Voice para AI** (capa ICO) | Framework que codifica voz para que la IA generativa produzca on-brand. | Capacidad embebida, no producto standalone. |
 | **ASaaS** | Agency Service as a Software. | — |
@@ -231,7 +231,7 @@ La visibilidad se escala por tier (alineado con el modelo ASaaS). **Directamente
 
 ## J. Nombres de producto, casos y constantes
 
-**Producto/marca:** `Greenhouse` (nunca "Greenhouse EO") · `Kortex` · `Verk` · `Nexa` (capa AI de Greenhouse: Nexa Insights + Nexa Chat; **nunca "Nexus"**, sub-marca deprecada) · Globe · Globe Studio · Efeonce Digital · Reach · Wave.
+**Producto/marca:** `Greenhouse` (nunca "Greenhouse EO") · `Kortex` · `Verk` · `Nexa` (capa AI de Greenhouse: Nexa Insights + Nexa Chat; **nunca "Nexus"**, sub-marca deprecada) · Globe · Globe Studio · Reach · Wave. `Efeonce` es la marca paraguas; las líneas de negocio/prácticas no son product brands por defecto.
 
 **Casos citables (reales):** Sky Airlines · Bresler · Pinturas Berel.
 

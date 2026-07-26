@@ -17,7 +17,7 @@ AI-native. El GTM debe vender outcomes y sistemas de delivery, no horas, herrami
 
 | Dimensión | Agencia tradicional | SaaS puro | **Efeonce ASaaS** |
 |---|---|---|---|
-| Productos propios | Cero. Solo servicio. | Un producto. Sin servicio. | **Tres plataformas + servicio de 4 unidades.** |
+| Productos propios | Cero. Solo servicio. | Un producto. Sin servicio. | **Product brands + líneas de servicio coordinadas bajo Efeonce.** |
 | Switching cost | Bajo (relacional) | Medio (datos) | **Alto (datos + proceso + IA + historial en 3 plataformas)** |
 | Inteligencia | Criterio individual variable | Algoritmos genéricos | **Agentes IA entrenados en marca, CRM y distribución** |
 | Medición | Vanity metrics | Métricas de producto | **Revenue Enabled: atribución conectada a pipeline** |
@@ -29,17 +29,17 @@ AI-native. El GTM debe vender outcomes y sistemas de delivery, no horas, herrami
 
 ---
 
-## Líneas de negocio
+## Líneas de negocio y product brands
 
-Cinco líneas. Cuatro son las unidades; la quinta (CRM Solutions) es transversal. Todas comparten un estándar no negociable: **se miden contra Revenue Enabled, no contra métricas de canal.**
+Efeonce organiza el portfolio en líneas de negocio/prácticas. Las product brands nombran sistemas o soluciones que habilitan una línea; no reemplazan a Efeonce ni equivalen automáticamente a toda la práctica. Todas comparten un estándar no negociable: **se miden contra Revenue Enabled, no contra métricas de canal.**
 
-| Línea | Unidad | Fase Loop | Plataforma |
+| Línea de negocio / práctica | Product brand(s) | Fase Loop | Ejemplos de alcance |
 |---|---|---|---|
-| **Growth & Strategy** | Efeonce Digital | Tailor + Evolve | Greenhouse + Verk |
-| **Creative & Content** | Globe | Express | Verk |
-| **Media & Distribution** | Reach | Amplify | Verk |
-| **Digital Engineering & Visibility** | Wave | Transversal | Greenhouse / Search Visibility 360 |
-| **CRM Solutions** | Efeonce Digital (líder) | Tailor + Evolve | **Kortex** |
+| **Growth Strategy & Measurement** | Greenhouse, Verk, Wave, Kortex | Tailor + Evolve | estrategia, revenue enablement, analytics y orquestación |
+| **Creative Services** | Globe / Creative Studio, Greenhouse, ICO | Express | branding, campañas, contenido y producción |
+| **Media & Distribution** | Reach, Verk, Greenhouse | Amplify | medios, PR, influencers y distribución |
+| **Digital Services & Engineering** | Wave, Greenhouse | Transversal | visibilidad, web, measurement, agentes e integraciones |
+| **RevOps & CRM** | Kortex, HubSpot, Greenhouse | Tailor + Evolve | licencias, implementación, managed ops e inteligencia CRM |
 
 **Taxonomía comercial:** la relación separa **modelo de delivery** (Managed Squad, Staff Augmentation, Studio
 Access o híbrido por lanes), **forma de engagement** (On-Going, On-Demand o Sample Sprint) y, cuando aplica
@@ -64,7 +64,7 @@ Flywheel: licencia → implementación (Kortex) → managed ops (Greenhouse) →
 
 ## Segmentación
 
-12 ICPs documentados en 4 unidades, consolidados en 8 Buyer Personas → 4 decisores primarios para GTM:
+12 ICPs documentados a través de las líneas de negocio y prácticas, consolidados en 8 Buyer Personas → 4 decisores primarios para GTM:
 
 | Buyer Persona | Dolor | Demo primario |
 |---|---|---|

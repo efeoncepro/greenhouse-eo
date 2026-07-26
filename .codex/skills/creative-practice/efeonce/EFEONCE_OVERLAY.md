@@ -12,11 +12,12 @@
 
 **Masterbrand único: Efeonce.**
 
-**Globe, Reach y Wave son capabilities INTERNAS. NO son sub-marcas. NO se le presentan al cliente como
-proveedores separados.** Única excepción autorizada: **`Globe Studio | Efeonce`**.
+**Creative Services es la línea de negocio de Efeonce. Globe / Creative Studio es una product brand que puede
+potenciar o empaquetar esa línea; Reach y Wave son product brands de otras líneas.** Ninguna product brand se
+presenta al cliente como proveedor contractual separado. La relación y el contrato son de Efeonce.
 
-🔴 **Un vendedor que dice *"eso lo hace nuestra unidad Globe"* está fragmentando la marca en la cabeza del
-cliente** — y la fragmentación es, literalmente, **el enemigo que declaramos combatir**
+🔴 **Un vendedor que dice *"eso lo hace nuestra unidad Globe"* está confundiendo línea de negocio con product brand**.
+Debe decir: *"Efeonce Creative Services, potenciado por Globe cuando aplica"*.
 *(`docs/context/09_marca-agencia.md`)*.
 
 **La categoría:** *growth partner con sistema operativo propio.* **NO "agencia de marketing digital"** — eso es

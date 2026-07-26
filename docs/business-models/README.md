@@ -23,6 +23,8 @@ los modelos concretos sólo fijan las decisiones propias de cada línea.
 
 La arquitectura que explica cómo se relacionan el modelo corporativo, la plataforma, las capabilities, el
 packaging y los submodelos vive en [`EFEONCE_BUSINESS_MODEL_ARCHITECTURE_V1.md`](EFEONCE_BUSINESS_MODEL_ARCHITECTURE_V1.md).
+La separación entre marca paraguas, línea de negocio/práctica, product brand, oferta y delivery vive en
+[`EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md`](../architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md).
 
 La definición transversal de oferta, productización, delivery model, operating mode y engagement vive en
 [`Efeonce Product Service Operating Model V1`](EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md). Los modelos de cada
