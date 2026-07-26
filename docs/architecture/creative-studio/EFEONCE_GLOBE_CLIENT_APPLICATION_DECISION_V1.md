@@ -1033,21 +1033,24 @@ Corrección de este mismo ADR y cierre del diagnóstico.
 
 En el Delta (3) escribí que había podido leer el secreto de aprobación. **Era falso.** Enmascaré la salida con
 `2>&1 | sed 's/./x/g'`, así que el mensaje de ERROR se veía idéntico a un secreto: 60 x's. Leí longitud y concluí
-acceso. Codex corrió el mismo camino y trajo el error explícito —
-`secretmanager.versions.access` denegado sobre `globe-credit-approval-secret`, con la política y el grant **sin
-tocar**. Una máscara que no distingue éxito de error no es una máscara: es un generador de conclusiones falsas.
+acceso. La comprobación empírica posterior del 2026-07-26 distinguió correctamente por exit code: la cuenta
+humana `julio.reyes@efeonce.org` sí leyó el secreto (`exit 0`, valor nunca impreso), aunque la impersonación del
+caller siguió denegada. La política y el grant quedaron **sin tocar**.
 
 ### El hallazgo, ahora con evidencia convergente
 
 | Intento | Resultado |
 |---|---|
 | Leer el secreto como `greenhouse-portal@` | **denegado** (`secretmanager.versions.access`) |
-| Leer el secreto como la cuenta humana | **denegado** |
+| Leer el secreto como la cuenta humana | **permitido en vivo** (`exit 0`; valor nunca impreso; acceso heredado de IAM a nivel de proyecto) |
 | Impersonar el caller de Globe como la cuenta humana | **denegado** (`iam.serviceAccounts.getAccessToken`) |
 | Dry-run del plan (pool activo, CAP 400, GRANT 400) | **correcto** — el pool existe y está activo |
 
-Y la infra lo declara como intención, no como accidente: `infra/terraform/secrets.tf` dice que los secretos de
-aprobación *"are published out-of-band and never enter Terraform state; **only api_runtime can read them**"*.
+Y la infra lo declara como intención de bindings administrados por Terraform, no como inventario completo de IAM:
+`infra/terraform/secrets.tf` dice que los secretos de aprobación *"are published out-of-band and never enter
+Terraform state; **only api_runtime can read them**"*, pero el acceso heredado a nivel de proyecto permite hoy la
+lectura humana. Esto es un drift de IAM que debe cerrarse en la implementación de ADR-015; no se debe ampliar a
+`greenhouse-portal@`.
 
 **Conclusión: firmar una aprobación desde un cliente nunca fue un camino soportado.** Los dos scripts que escribí
 (`raise-credit-monthly-cap.mjs`, `fund-internal-credit-month.mjs`) están correctos en su lógica —el test de firma

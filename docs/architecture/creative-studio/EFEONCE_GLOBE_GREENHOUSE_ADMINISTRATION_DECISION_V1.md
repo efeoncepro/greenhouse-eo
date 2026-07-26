@@ -411,7 +411,14 @@ Esto **cierra la mitad de diagnóstico de `ISSUE-124`** y evita que el carril nu
   ports transaction-scoped, idempotencia en SQL por `proposalId`, readback y tests de concurrencia. Coverage
   `sister-platform: available`. **Criterio de salida: el fondeo del mes ejecutado con UNA confirmación humana y
   CERO break-glass.**
-- **Slice C — la superficie de confirmación en Greenhouse.** El broker (`src/lib/globe/**`, reusando
+- **Slice C — la superficie de confirmación en Greenhouse.** ⚠️ **Regla de ordenamiento que `ISSUE-126` hizo
+  explícita, y que este slice DEBE respetar:** las capabilities nuevas (`globe.credits.funding.propose`/`.confirm`)
+  viven en el vocabulario de Globe, y Greenhouse lo consume como **tarball `file:` vendorizado**. Agregarlas al
+  `capabilityScopes` del broker **antes** de re-vendorizar el tarball reproduce `ISSUE-126` exactamente: el
+  reconciliador de tenancy tumba la reconciliación completa del workspace con `globe_tenancy_capability_invalid`.
+  **Primero se re-vendoriza el vocabulario en Greenhouse (`pnpm worker:build-contract-gate` verde), después se
+  mueve el scope.** Y ojo: el tarball está pinneado en `0.0.1` y **cambia de contenido sin cambiar de versión**, así
+  que el lockfile no delata el drift. El broker (`src/lib/globe/**`, reusando
   `createGreenhouseGlobeClient` sobre el lane que ya funciona), la capability de Greenhouse + su grant en el mismo
   PR, la tabla append-only de intenciones, y el punto donde el operador confirma. **Sin scope OAuth nuevo en
   Globe: el humano confirma con su identidad de Greenhouse, no con una capability de Globe.** Retiro de los dos
@@ -427,7 +434,16 @@ Esto **cierra la mitad de diagnóstico de `ISSUE-124`** y evita que el carril nu
 - **Slice F — el desambiguador al alcance del operador.** `budget.evaluate` y `budget.availability.get` en `ui`
   **con** su capability en el grant humano (rollout de 3 pasos de ADR-010), o por la vía que no requiera ampliarlo
   (la razón viajando en el estimado, que el humano ya consume). Decidir la vía con evidencia.
-- **Slice G — capabilities por usuario.** Bloqueado por `tenancy_mode = enforced` (`TASK-1511`). Desired state
+- **Slice G — capabilities por usuario.** Bloqueado por `tenancy_mode = enforced` (`TASK-1511`) **y por `ISSUE-126`,
+  que es el gate más duro de los dos.** 🔴 Descubierto el 2026-07-26: la reconciliación Greenhouse→Globe **lleva
+  dos días fallando cada 5 minutos con su Cloud Scheduler en `ENABLED`** (`globe_tenancy_capability_invalid`,
+  causado por drift de contenido del tarball `file:` de `@efeonce-globe/contracts` — 51 capabilities instaladas vs
+  65 vivas — disparado por el rollout de scopes de ADR-010 el 2026-07-24). Con `shadow` la proyección observa y no
+  niega, así que nada se cayó; **en `enforced` una proyección stale DENIEGA TODO.** Flipear `enforced` hoy sería un
+  outage de todo el acceso humano a Globe. **Cerrar `ISSUE-126` + su señal de frescura es prerrequisito del flip**,
+  no un follow-up.
+  Desired state per-member en Greenhouse anclado al `Persona` canónico, validación write-time contra el techo OAuth,
+  reconciliador leyendo per-member, señal de divergencia y la superficie por persona. Desired state
   per-member en Greenhouse anclado al `Persona` canónico, validación write-time contra el techo OAuth,
   reconciliador leyendo per-member, señal de divergencia y la superficie por persona.
 - **Slice H — break-glass gobernado y retiro del HMAC.** TTL, motivo, autorización atribuida, revocación
