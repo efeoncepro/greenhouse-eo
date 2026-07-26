@@ -292,6 +292,17 @@ fechada de postulaciones vive en `docs/audits/commercial/AI_PARTNER_PROGRAM_APPL
 No ampliar el portafolio por acumulación de logos. Un partner sube de prioridad sólo cuando existe una oferta,
 owner, economics, ruta contractual y evidencia de demanda; si no, permanece como experimento o capability opcional.
 
+### Regla de economics para providers de IA
+
+Para cada capability separar `prototype`, `production-scale` y `fallback`. Fal puede funcionar como gateway de
+prototipo y multi-provider, pero no se asume que sea la ruta más barata. Para volumen, comparar precio efectivo,
+cuotas, SLA, soporte, derechos, residencia de datos, observabilidad y portabilidad del endpoint directo frente a Fal.
+En la evaluación vigente: Google nativo va directo por AI Studio/Vertex; OpenAI va directo; BytePlus directo es la
+ruta de referencia para volumen Seedance/Seedream; BFL/Fal y Recraft/Fal se comparan por paridad pública y control
+operativo. FLUX 3 permanece en early access, sin API pública general ni precio público al 2026-07-26, por lo que no
+entra en compromisos de producción ni en unit economics aprobados. Toda cifra debe conservar fuente, fecha, modelo,
+resolución/duración, reintentos y costo efectivo por output.
+
 ## Invariantes obligatorios
 
 1. Un business model no es un tarifario.

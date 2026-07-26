@@ -3,6 +3,14 @@
 > Cabina de mando para continuidad inmediata. No es changelog, arquitectura ni memoria completa.
 > Ventana máxima: 20 sesiones. Historia íntegra e índice: [Handoff.archive.md](Handoff.archive.md).
 
+## 2026-07-26 — Routing económico de modelos generativos
+
+Se documentó en las skills gemelas de `design-studio` y `motion-design-studio`, y en el operador de business model,
+la comparación directo vs. Fal, el routing de Seedance 2.0 / Gemini Omni / FLUX 3 y sus casos de uso. FLUX 3 queda
+como early access sin API pública general ni precio público al corte; no es dependencia de producción. La matriz
+canónica y sus fuentes fechadas están en `.codex/skills/*/SOURCES.md`; las copias Claude de diseño y motion están
+sincronizadas. No hubo cambios de runtime ni consumo de APIs.
+
 ## 2026-07-26 — Postulaciones de partners de IA generativa
 
 Se consolidó el registro auditable en [`docs/audits/commercial/AI_PARTNER_PROGRAM_APPLICATIONS_2026-07-26.md`](docs/audits/commercial/AI_PARTNER_PROGRAM_APPLICATIONS_2026-07-26.md).

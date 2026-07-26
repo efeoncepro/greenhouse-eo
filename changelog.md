@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-26 — Routing económico y creativo de modelos generativos
+
+- Las skills de diseño/motion y Business Model Operator documentan la selección por caso de uso entre Seedance 2.0,
+  Gemini Omni y FLUX 3, además de la comparación de consumo directo vs. Fal.
+- FLUX 3 queda explícitamente como early access sin API pública general ni precio público al corte; no entra en
+  compromisos de producción ni en unit economics aprobados.
+- Se sincronizaron las fuentes `.codex`/`.claude` correspondientes; no hubo cambios de runtime.
+
 ## 2026-07-26 — Registro de postulaciones a partners de IA generativa
 
 - Se creó [`docs/audits/commercial/AI_PARTNER_PROGRAM_APPLICATIONS_2026-07-26.md`](docs/audits/commercial/AI_PARTNER_PROGRAM_APPLICATIONS_2026-07-26.md) con el mapa, evidencia, estados y próximos pasos de Anthropic/Claude, Lovable, OpenAI, Google Cloud, AWS, Salesforce, Runway, FLUX, BytePlus/ByteDance, ElevenLabs y HeyGen.

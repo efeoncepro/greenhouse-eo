@@ -39,6 +39,12 @@ nativo:** Seedance 2.0 genera audio nativo que a veces cae en la policy del prov
 para chequear un slug sin gastar:** `POST {}` (body vacío) a `https://fal.run/<slug>` → **404** = la app no
 existe · **422** = la app existe (falló la validación de input por falta de campos).
 
+**Economía de provider (as-of 2026-07-26):** BytePlus/ModelArk directo es la ruta de volumen para Seedance 2.0;
+Fal sirve como gateway de prototipo/fallback, pero puede agregar markup. Para FLUX.2 y Recraft hay paridad pública
+en los endpoints comparados; decidir por SLA, auth, observabilidad y derechos. FLUX 3 fue anunciado por BFL el
+2026-07-23, pero sigue en early access sin API pública general ni precio público: no usarlo como dependencia de
+producción ni asumir que está disponible en Fal.
+
 ## Fuentes base (as-of 2026-07)
 
 **Tendencias motion / animación 2026**
@@ -48,6 +54,11 @@ existe · **422** = la app existe (falló la validación de input por falta de c
 - Renderforest — Logo Animation Trends 2026 — https://www.renderforest.com/blog/logo-animation-trends
 
 **Modelos de video IA + workflow cinematográfico**
+- Black Forest Labs — FLUX 3 announcement — https://bfl.ai/blog/flux-3
+- Google AI — Gemini video generation / Omni — https://ai.google.dev/gemini-api/docs/video
+- Google DeepMind — Gemini Omni — https://deepmind.google/models/gemini-omni/
+- BytePlus — Seedance 2.0 API — https://docs.byteplus.com/en/docs/ModelArk/2300461
+- fal.ai — Seedance 2.0 — https://fal.ai/seedance-2.0
 - Higgsfield — 5 Best AI Video Models 2026 — https://higgsfield.ai/blog/5-Best-AI-Video-Models-2026-Tested-Compared
 - FrankX — Ultimate Higgsfield Workflow 2026 (Soul ID + Cinema Studio + Claude MCP) — https://www.frankx.ai/blog/ultimate-higgsfield-workflow-2026
 - Higgsfield — LipSync Studio — https://higgsfield.ai/lipsync-studio
@@ -84,10 +95,11 @@ existe · **422** = la app existe (falló la validación de input por falta de c
 |---|---|---|---|
 | **Higgsfield** (agregador, MCP) | 30+ modelos bajo 1 sub + **Cinema Studio** (presets de cámara: dolly/crash-zoom/orbit/crane/pan/tilt/tracking + focal length + física óptica) + **Soul ID** (consistencia de personaje: 3-5 fotos, entrena 5-10min) + **LipSync** (+voz ElevenLabs) + upscaling; **MCP genera video desde Claude** + CLI | dependes de su plataforma/créditos | **default de producción cinematográfica IA** con control de cámara y personaje consistente; es la mano conectada |
 | **Runway Gen-4.5** | cine dirigido, tomas controladas, entiende **beats + coreografía de cámara** (pan/truck/handheld) | atado a su plataforma | tomas cinematográficas dirigidas con control fino |
-| **Seedance 2.0 / 2.5** (ByteDance) | briefs detallados, camera moves, **hasta 12–50 refs + audio ref** (fija personaje/producto), 30s/4K (2.5), barato (~$0.06/s) | vivid/alto contraste (menos editorial), físico complejo, texto fino, manos | control por referencias, social punchy, presupuesto ajustado |
+| **Seedance 2.0** (ByteDance) | briefs detallados, camera moves, hasta **9 imágenes + 3 videos + 3 audios**, native audio, multi-shot, 4–15 s | QA físico/anatomía/continuidad; audio nativo sujeto a policy | anuncios, social punchy y tomas dirigidas por referencias; directo BytePlus para volumen, Fal para gateway |
 | **Kling 3.0** | **storyboarding multi-shot + Voice Binding** (voz consistente 6 cortes/5 idiomas), económico | control fino | narrativas multi-corte con voz consistente; económico |
 | **Veo 3.1 / 3.0 Fast** (`veo-3.0-fast-generate-001`, Google) | broadcast-ready, frame rate de cine, **sync audio-visual integrado**, hasta 4K; render **one-shot** vía `predictLongRunning` (async) | **one-shot: sin edición conversacional** (regeneras); precio (~$0.10/s 720p) | entregable broadcast/cine, resolución alta o clip largo. Es el contraste de Omni: Omni edita hablándole (stateful), Veo no. Live-verificado para Globe |
 | **Gemini Omni** (`gemini-omni-flash-preview`, Google) | multimodal any-to-any; **edición conversacional stateful** (`previous_interaction_id`) = su superpoder vs. one-shot; audio nativo contextual; **live-verificado 2026-07-20** (t2v keyless Vertex + edit stateful Gemini-key, ambos `200 completed`) | **solo 720p · 3–10s**, no MCP (REST), **deforma texto/logos/UI**, personas RAI-gated, editar uploaded video bloqueado EEA/CH/UK | **Interactions API (NO `generateContent`, que da `400`)**, **dos superficies**: (1) **Vertex KEYLESS** (ADC, sin key) = solo generación; (2) **Gemini-key** (`generativelanguage`) = Interactions completa + edit stateful. text/i2v + **reference-chaining**; UI/logo NO con IA. **Refinar no es exclusivo de Omni (2026-07-20):** el stateful es **uno de dos paradigmas** — el **reference-based** re-inyecta el output del padre y permite **cross-model** (refinar un candidato de Omni con otro motor y viceversa); `reference_to_video` acepta sets **combinados imagen+vídeo** (verificado en ambas superficies) pero **exige ≥1 imagen o audio**. Contrato: `efeonce/GEMINI_OMNI_VERTEX.md §0/§4.6/§4.7` · capacidades: `GEMINI_OMNI_CAPABILITIES.md` |
+| **FLUX 3** (Black Forest Labs) | modelo unificado de imagen, video y audio; hasta 20 s según anuncio | early access; sin API pública/precio general al corte | laboratorio estratégico, no producción ni fallback |
 | ~~**Sora 2** (OpenAI)~~ | líder en consistencia temporal/física | **API deprecada 2026-03-24, shutdown 2026-09-24** | **NO** basar nada nuevo; sigue accesible vía agregadores (Higgsfield) pero con fecha de muerte |
 
 ### Upscale / enhance / finish
