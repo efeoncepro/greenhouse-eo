@@ -3,6 +3,53 @@
 > Cabina de mando para continuidad inmediata. No es changelog, arquitectura ni memoria completa.
 > Ventana máxima: 20 sesiones. Historia íntegra e índice: [Handoff.archive.md](Handoff.archive.md).
 
+## 2026-07-25 (3) — Globe: /producer convertido a React, y la razon por la que NINGUN command funcionaba
+
+**Runtime:** `globe-studio-internal` y `globe-api-internal` desplegados al mismo SHA. Dueña de la superficie:
+**`TASK-1505`**. Decisiones: **ADR-014 § Delta 2026-07-25 (2)/(3)/(4)**.
+
+⚠️ **`/producer` sigue sirviendo el legacy**: `GLOBE_CLIENT_PRODUCER_ENABLED` está en `false` (ahora explícito
+en el spec). Lo convertido se ve en local con el harness, no en el portal.
+
+### Lo convertido (1:1, reutilizando `producerStyles` verbatim)
+
+Header completo (marca, banda de modalidad funcional, créditos reales `500008 disp.`, ⌘K, Guía, avatar con
+perfil y switcher) y composer completo (prompt con acciones dentro, Sugerencias por modalidad, Referencias con
+contador y tile, Excluir del resultado, Estilo·preset con Style DNA, Seed, Modo, selector de flota con
+**isotipo real y filtrado por modalidad**, y formato de salida con **chips + stepper**). El feed ya portado se
+reutiliza tal cual.
+
+### 🔴 La causa raíz de que ningún command funcionara
+
+El transporte inventaba la cabecera **`x-globe-idempotency-key`**; la plataforma entera usa
+**`x-idempotency-key`**. El BFF la EXIGE igual al `idempotencyKey` del envelope y rechaza con
+`return denied('invalid_request', 400)` — **sin lanzar**, así que sin `catch`, sin audit de handler y sin
+rastro en logs. Ni `Generar` ni `Mejorar` podían funcionar. Verificado tras el arreglo: `Mejorar` devuelve
+propuesta real.
+
+**Cuatro tests afirmaban la cabecera inventada.** Tercera vez que este transporte falla así — el harness
+validando la suposición de quien lo escribió.
+
+### 🔴 La API estaba DESFASADA del web
+
+`deploy-internal.yml` toma el servicio como input: desplegar el web **no** despliega la API. La API corría
+`45235cc` mientras el web iba adelante, y **el dispatch de commands ocurre en la API** — toda instrumentación
+que agregué al web era invisible para el fallo. Ambos servicios quedan al día; verificar la imagen de CADA
+servicio antes de diagnosticar.
+
+### Observabilidad, cerrada
+
+Faltaba `roles/logging.logWriter` en las runtime SAs (aplicado por IaC: un servicio sin ese rol corre **mudo**
+y no lo dice) y la app no tenía **línea de arranque**, así que el silencio era indistinguible de un canal
+roto. Ahora emite `globe.studio_web.listening`. Trampa de consulta registrada: **`textPayload:` no matchea
+logs JSON**.
+
+Localización de rechazos instrumentada en los **dos** caminos (handler y envelope), con el nombre del campo
+—nunca su valor— al log del servidor.
+
+**Siguiente:** aplicar preset y cambiar de Modo en el composer, que además arregla **"Excluir del resultado"**,
+hoy entrada muerta que no viaja a ningún lado. Después panel de créditos completo y ⌘K + Guía.
+
 ## 2026-07-25 (2) — Globe: regresión del feed cerrada y desplegada; `/producer` empieza a convertirse a React
 
 **Runtime:** revisión viva `globe-studio-internal-00078-5gs`, imagen `03a4beb`. `pnpm check` + `pnpm build`

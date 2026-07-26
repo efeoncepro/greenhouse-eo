@@ -848,6 +848,40 @@ shippeó con **4 de 11** animaciones del diseño aprobado. El task-lint sólo ve
 - **NUNCA** uses un peso tipográfico que no tenga su `@font-face`: el browser lo **sintetiza**, deformando las letras, **sin fallar nada** — por eso es uno de los 5 tests del gate y no una convención. El gate cubre además `font-family`/`font-size`/`font-weight`/`line-height`/`letter-spacing` y camina `.ts`/`.tsx`/`.css`.
 - **NUNCA** decidas la disponibilidad de un modelo desde el ledger `GLOBE_MODEL_FLEET_STATUS.md`: el **SoT LIVE** es el reader **`globe.producer.fleet.list`** (`TASK-1554`); el ledger es el SoT **humano**. Si divergen, **manda el reader**.
 - **NUNCA** te refieras al selector de modelo del Producer (`TASK-1555`) como **"galería"**: esa dirección se implementó, **el operador la rechazó al verla** y hoy es un **desplegable compacto con isotipo real** que lista toda la flota de la modalidad activa. **Ya está portado** al payload cliente: vive dentro de `apps/studio-client/src/surfaces/producer/composer/ProducerComposer.tsx` (marcadores `producer-model-*`), en `/producer`. **Corregido 2026-07-25:** `TASK-1564` quedó **retirada** y el dueño del composer —port y rediseño de jerarquía— es **`TASK-1552`**; las dos tasks editan el MISMO archivo, así que hay que coordinar orden. La región `producer-route` es composición, no feed. `TASK-1560` sólo **borra** el legacy después, no lo porta.
+- 🔴 **NUNCA inventes un nombre de cabecera al portar.** El transporte del payload cliente enviaba
+  `x-globe-idempotency-key` y **ese nombre no lo lee NADIE**: toda la plataforma usa **`x-idempotency-key`**
+  (`producer-client.ts` lo manda, `app.ts:2982` lo lee, `app.ts:3164` lo **EXIGE** igual a
+  `envelope.idempotencyKey` o devuelve `invalid_request` 400, `app.ts:3215` lo reenvía a la API privada).
+  Consecuencia real: **NINGÚN command del payload React funcionaba** — ni `Generar`, ni `Mejorar`, ni
+  favorito — y el fallo era invisible porque el BFF rechaza con `return denied(...)`, **sin lanzar**, así que
+  no pasa por ningún `catch` ni deja rastro en logs. La cabecera es contrato tanto como el cuerpo.
+- 🔴 **`idempotencyKey` va en el CUERPO del envelope, no sólo en la cabecera.**
+  `CommandRequestEnvelopeV1` lo declara requerido y `parseCommandEnvelope` devuelve `undefined` sin él.
+  Truco de diagnóstico: para distinguir *"el envelope no parseó"* de *"el handler rechazó"* NO sirve el
+  `correlationId` de la respuesta — viene de la cabecera `x-globe-correlation-id`, no del cuerpo parseado.
+- 🔴 **`deploy-internal.yml` toma el servicio como INPUT: desplegar `globe-studio-internal` NO despliega
+  `globe-api-internal`.** La API estuvo corriendo una imagen varios commits vieja mientras el web iba
+  adelante, y **el dispatch de commands ocurre en la API**: toda instrumentación agregada al web era
+  invisible para el fallo. **SIEMPRE** confirmá qué imagen corre CADA servicio antes de concluir que una
+  instrumentación no funciona.
+- 🔴 **`textPayload:"…"` NO matchea logs JSON en Cloud Logging.** Una línea JSON se parsea a `jsonPayload`,
+  así que ese filtro devuelve cero aunque los logs existan. Usar búsqueda de texto libre (`'"mi.evento"'`) o
+  `jsonPayload.event="…"`.
+- 🔴 **Un servicio sin `roles/logging.logWriter` corre MUDO y no lo dice.** Cloud Run sigue emitiendo sus
+  *request logs* — así que en la consola parece que hay logs — pero cada línea del contenedor se descarta en
+  silencio. Y sin una **línea de arranque** que siempre aparezca, ese silencio es indistinguible de una app
+  que no loggea. Globe emite `globe.studio_web.listening`; si no está, sospechá del rol antes que del código.
+- 🔴 **La hoja legacy estiliza por ATRIBUTO, no sólo por clase.** Al convertir 1:1 hay que cargar los
+  atributos o el control se ve distinto **sin que ninguna regla propia esté mal**: `[data-producer-asset]`
+  (span 4 / `:first-child` span 8 sobre 12 columnas), `capability-button` + `<i class="capability-dot">`,
+  `data-producer-intent` (`.advanced-controls [data-producer-intent=styles] { justify-self: start }` es lo
+  que hace compacto a Style DNA), y `.producer-console[data-producer-controller-bound=true]
+  [data-producer-runtime-shape]` — sin ESOS DOS, los controles de formato de salida quedan como selects
+  nativos grises.
+- 🔴 **Los controles de salida del legacy NO son `<select>`:** una enumeración se elige con **chips**
+  (`shape-chip`, y el glifo de proporción **ES** la proporción vía `aspect-ratio` del valor), un número con
+  **stepper** (`shape-stepper`), y **una dimensión con un solo valor admisible es un HECHO de la ruta**
+  (`shape-fixed`), no un selector — ofrecerlo promete una decisión que el proveedor ignora.
 - **NUNCA** introduzcas Vitest/Jest (Globe usa `node --test`), ni rompas la convención de extensiones (`.js` source↔source de packages; `.ts` en studio-web y en todos los tests).
 - **NUNCA** invoques un provider fuera del runner que corre detrás del command (el Model Lab lo hace por el `LabRunner` en `apps/creative-runner`); un SDK de provider directo desde handler/UI/MCP/CLI/scripts/tests está prohibido.
 - **NUNCA** reconstruyas las URLs de la queue de Fal desde el slug (usa el `status_url`/`response_url` que devuelve el `submit`); **NUNCA** pongas el prefijo `fal-ai/` en un slug ByteDance (van sin prefijo; verifica un slug con `POST {}` a `https://fal.run/<slug>`: 404=inexistente / 422=existe); **NUNCA** uses la key de Greenhouse (`greenhouse-fal-api-key`) para Fal desde Globe (es `GLOBE_FAL_API_KEY`, propia de Globe); **NUNCA** llames Vertex con API key (es keyless: ADC/WIF, runtime SA con `aiplatform.user`); **NUNCA** reportes el slug del modelo como `actualRoute` (el `actualRoute` es el route del contrato de fidelidad — `== proposedRoute` sin fallback; el slug va en `model`).

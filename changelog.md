@@ -7,6 +7,23 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-25 — Globe: /producer convertido a React y el bug que dejaba todo command inoperante
+
+- Header y composer de `/producer` convertidos 1:1 reutilizando `producerStyles` verbatim: selector de flota
+  con isotipo real y filtrado por modalidad, formato de salida con chips y stepper, Sugerencias, presets,
+  Seed y Modo. `/producer` sigue en legacy (flag en `false`).
+- Causa raíz: el transporte inventaba la cabecera `x-globe-idempotency-key`; la plataforma usa
+  `x-idempotency-key`. El BFF rechazaba todos los commands sin lanzar, así que el fallo no dejaba rastro.
+  Ni `Generar` ni `Mejorar` funcionaban. Corregido y verificado en vivo.
+- La API (`globe-api-internal`) estaba desfasada del web varios commits, y el dispatch de commands ocurre
+  ahí. Ambos servicios al día.
+- Observabilidad: se otorgó `roles/logging.logWriter` a las runtime SAs (sin él el servicio corre mudo) y se
+  agregó la señal de arranque. Localización de rechazos en handler y envelope, con el nombre del campo.
+- Un rechazo de la salida del enhancer ya no se reporta como `invalid_request` del caller.
+- La skill `greenhouse-globe` (Claude y Codex) suma siete reglas duras nuevas: cabeceras al portar,
+  `idempotencyKey` en el cuerpo, el deploy por servicio, `textPayload` vs logs JSON, `logging.logWriter`,
+  el estilado por atributo de la hoja legacy y los controles de salida sin `<select>`.
+
 ## 2026-07-25 — Globe: regresión del feed cerrada y mecanismo de conversión de `/producer` a React
 
 - Se cerró la regresión visual de `/producer/feed` portándola del legacy (autoridad de lo ya probado en

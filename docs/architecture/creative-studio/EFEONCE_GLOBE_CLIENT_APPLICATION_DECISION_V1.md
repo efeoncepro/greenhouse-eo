@@ -685,3 +685,78 @@ Al convertir 1:1 hay que cargar los atributos del legacy, no sólo sus nombres d
 Y el layout lo manda la hoja legacy: `producer-main` / `composer` / `library` ya traen el grid de dos columnas
 y su paso a una en `max-width: 980px`. Declarar breakpoints propios les peleaba. La banda de modalidad debajo
 del header a anchos medianos **no es un defecto**: es lo que el legacy hace a `≤980px`.
+
+## Delta 2026-07-25 (4) — por qué NINGÚN command del payload cliente funcionaba, y las tres señales que lo escondieron
+
+### 🔴 La cabecera de idempotencia se llamaba mal — regla dura
+
+El transporte portado enviaba **`x-globe-idempotency-key`**. **Ese nombre no lo lee nadie.** Toda la
+plataforma usa **`x-idempotency-key`**:
+
+| dónde | qué hace |
+|---|---|
+| `producer-client.ts:533` | lo **manda** — el legacy siempre lo hizo bien |
+| `app.ts:2982` | lo **lee** en el carril directo |
+| `app.ts:3164` | lo **EXIGE** igual a `envelope.idempotencyKey`, o `invalid_request` 400 |
+| `app.ts:3215` | lo **reenvía** a la API privada |
+
+**Por qué fue tan difícil de ver:** el BFF rechaza en un camino que **retorna sin lanzar**
+(`return denied('invalid_request', 400)`), así que no pasa por ningún `catch`, no emite audit de handler y no
+deja rastro. El 400 es **indistinguible** de un payload malo. Consecuencia: ni `Generar` ni `Mejorar` ni
+favorito ni usar-como-referencia podían funcionar desde React, y nadie lo había notado porque el feed y el
+share board viven de readers.
+
+**NUNCA** inventes un nombre de cabecera al portar. La cabecera es parte del contrato tanto como el cuerpo, y
+un nombre que nadie lee falla en silencio.
+
+Corregido y verificado en vivo: `Mejorar` devuelve propuesta real. Guard en el suite: la cabecera es
+`x-idempotency-key` **y** `x-globe-idempotency-key` no viaja.
+
+### 🔴 Cuatro tests afirmaban la cabecera inventada
+
+Al corregirla se pusieron rojos cuatro tests — incluidos *"el reintento preserva idempotency"* y el de
+paridad con el legacy. Afirmaban **el nombre del autor**, no el que la plataforma lee. Es la **tercera** vez
+que este mismo transporte falla así: el harness validando la suposición de quien lo escribió. Antes fue la
+ruta única `/v1/ui/dispatch` y el sobre sin desenvolver.
+
+### 🔴 La API puede quedar DESFASADA del web — verificarlo antes de diagnosticar
+
+`deploy-internal.yml` toma el servicio como **input**, así que desplegar `globe-studio-internal` **no**
+despliega `globe-api-internal`. La API estuvo corriendo `45235cc` mientras el web iba varios commits
+adelante — y **el dispatch de commands ocurre en la API**, no en el web. Toda instrumentación agregada al web
+era invisible para el fallo.
+
+**SIEMPRE** confirmá qué imagen corre **cada** servicio antes de concluir que una instrumentación no funciona:
+
+```bash
+gcloud run services describe globe-api-internal --region southamerica-west1 --project efeonce-globe \
+  --format='value(status.latestReadyRevisionName,spec.template.spec.containers[0].image)'
+```
+
+### Observabilidad: dos causas distintas, las dos reales
+
+1. **Faltaba `roles/logging.logWriter`** en las runtime SAs. Sin él Cloud Run sigue emitiendo sus *request
+   logs* — así que en la consola **parece** que hay logs — pero cada línea del contenedor se descarta **en
+   silencio**. Corregido en IaC (`iam.tf`) y aplicado.
+2. **La app no tenía línea de arranque.** Con siete `console.*` en todo `studio-web` y ninguno al bootear, el
+   silencio era indistinguible de un canal roto. Ahora emite `globe.studio_web.listening` con environment,
+   modo, stores durables, estado de los dos flags y revisión.
+
+**Y una trampa de consulta:** `textPayload:"…"` **NO matchea logs JSON**. Una línea JSON se parsea a
+`jsonPayload`, así que el filtro correcto es una búsqueda de texto libre (`'"mi.evento"'`) o
+`jsonPayload.event="…"`. Con `textPayload:` los logs existen y la consulta devuelve cero.
+
+### Localización de rechazos, ahora instrumentada en los DOS caminos
+
+- **Handler**: `InvalidStructuredBriefRequestError` lleva el campo que falló (había **26** llamadas a un
+  `invalid()` opaco) y el dispatch lo emite. Sólo el nombre del campo, nunca su valor: el payload puede traer
+  el prompt de una persona.
+- **Envelope**: `commandEnvelopeRejection` nombra el primer campo que rechaza. Era el **único** camino de la
+  superficie sin localización, y el más fácil de romper porque lo produce un cliente.
+
+### Atribución del error: el proveedor no puede culpar al caller
+
+`enhancePrompt` validaba la salida del **enhancer** con las mismas funciones que el payload del caller, así
+que un rechazo del proveedor salía como `invalid_request` **no reintentable**. Ahora pasa por
+`attributeToEnhancer` → `dependency_unavailable`. Mismo principio que el retrieval de outputs: **el código de
+error acusa al componente que realmente falló.**
