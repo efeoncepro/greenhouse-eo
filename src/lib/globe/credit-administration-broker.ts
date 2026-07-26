@@ -100,7 +100,8 @@ export async function proposeGlobeCreditFunding(
           idempotencyKey: input.idempotencyKey,
           correlationId
         }
-      )
+      ),
+    'propose'
   )
 
   // El SDK devuelve un SOBRE (`{schemaVersion, command, status, …, outcome}`); la propuesta vive en
@@ -157,29 +158,48 @@ export async function confirmGlobeCreditFunding(
 
   const { client } = createGreenhouseGlobeClient(process.env, dependencies)
 
-  return dispatch(() =>
-    client.dispatchCommand(
-      CONFIRM_COMMAND,
-      {
-        proposalId: input.proposalId,
-        fingerprint: input.fingerprint,
-        confirmedBy: { principalId: input.actor.userId, entitlement: input.actor.entitlement }
-      },
-      {
-        workspaceId: input.globeWorkspaceId,
-        idempotencyKey: input.idempotencyKey,
-        correlationId
-      }
-    )
+  return dispatch(
+    () =>
+      client.dispatchCommand(
+        CONFIRM_COMMAND,
+        {
+          proposalId: input.proposalId,
+          fingerprint: input.fingerprint,
+          confirmedBy: { principalId: input.actor.userId, entitlement: input.actor.entitlement }
+        },
+        {
+          workspaceId: input.globeWorkspaceId,
+          idempotencyKey: input.idempotencyKey,
+          correlationId
+        }
+      ),
+    'confirm'
   )
 }
 
-async function dispatch<T>(operation: () => Promise<T>): Promise<T> {
+async function dispatch<T>(operation: () => Promise<T>, phase: 'propose' | 'confirm'): Promise<T> {
   try {
     return await operation()
-  } catch {
-    // El detalle del upstream NUNCA cruza: puede traer saldos, política o prosa del proveedor. El
-    // código dice que Globe no respondió; el diagnóstico vive en sus logs, del lado del servidor.
+  } catch (error) {
+    /*
+     * El detalle del upstream NUNCA cruza al caller: puede traer saldos, política o prosa del
+     * proveedor. Pero el SERVIDOR sí necesita saber qué falló — y esta es la octava aparición del
+     * mismo defecto que ISSUE-127 documenta, cometida acá mismo: la primera versión de este `catch`
+     * no dejaba rastro alguno, y medido en vivo el 2026-07-26 fue imposible diagnosticar un `503`
+     * propio desde el servidor. Una sanitización sin contraparte de observabilidad no protege
+     * información: la destruye.
+     *
+     * Se emite el NOMBRE del error y la fase, JAMÁS su `message`, su `stack` ni el body del upstream:
+     * un fallo de credenciales trae el correo de la identidad, y un fallo de Globe puede traer saldo.
+     */
+    console.error(
+      JSON.stringify({
+        event: 'greenhouse.globe_credit_funding.dispatch_failed',
+        phase,
+        errorName: error instanceof Error ? error.name : typeof error
+      })
+    )
+
     throw new GlobeCreditFundingBrokerError('globe_unavailable')
   }
 }
