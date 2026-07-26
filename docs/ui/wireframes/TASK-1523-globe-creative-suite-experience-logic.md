@@ -21,7 +21,8 @@
 
 ## Desktop Target — 1440×1000
 
-1. Contexto compacto: workspace/proyecto, responsabilidad y credits/readiness resumidos.
+1. Contexto compacto: workspace/proyecto, responsabilidad y Capacity/readiness resumidos; credits se muestra como
+   la unidad operativa dentro de ese contexto.
 2. Intención + Dirección: prompt/brief y “Así entendimos tu intención”.
 3. Stage dominante: referencia, run o candidato con estado real.
 4. Estimate + acción primaria juntos, con razón visible si están gated.
@@ -72,6 +73,26 @@ semántico con foco y retorno. Filmstrip es scroll-container interno, nunca scro
 | `globe.suite.generate.cta` | Action | `Generar candidatos · ✨{credits}` | credits | current only |
 | `globe.suite.candidates.title` | Candidates | `Candidatos` | count | not “results” |
 | `globe.suite.gate.title` | Gate | `Esta capacidad aún no está disponible` | capability | explain why |
+
+### Capacity and credit consumption contract
+
+La suite consume el contrato de credits de `TASK-1485`; no crea una semántica local. `Capacity` / `Capacidad` es la
+identidad de navegación y `credits` / `créditos` la unidad. Cada aparición combina cantidad, unidad y fase; cuando
+la acción lo exige, añade proyecto, pool, grant, run o evidencia.
+
+Producer y Creative Loop consumen las variantes ambientales y de decisión de `Capacity Observatory`:
+
+- `Credit Pulse` en contexto compacto;
+- `Credit Unit + Credit Phase` en estimate, CTA e inspector;
+- `Capacity Context` en budget/readiness y gates;
+- enlace a `Evidence Ledger` cuando el usuario necesita explicar un cambio.
+
+La suite no muestra `wallet`, `token`, `saldo` o `money` como semántica operativa. El visual `Horizon + Orbit` debe
+mantenerse aunque el idioma cambie: English usa `Capacity`, `credits`, `Estimated`, `Reserved`, `Settled` y
+`Projected usage`; Español usa `Capacidad`, `créditos`, `Estimado`, `Reservado`, `Liquidado` y `Consumo proyectado`.
+
+Estimate, reservation, settled y projection nunca se mezclan en una única cifra. `null`, `partial`, `stale`, `denied`
+y `unknown` conservan su estado explícito y nunca se muestran como cero.
 
 ## State Copy
 

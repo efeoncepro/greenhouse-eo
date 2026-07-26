@@ -104,6 +104,9 @@ Reglas obligatorias:
   task es su foundation backend.
 - Comercialización por modelo (TASK-1535 / ADR-010): cada modelo/tier nuevo necesita su atestación humana antes de
   entrega a cliente.
+- `TASK-1578` posee el onboarding transversal de route + credit rate + binding + canary + promotion. Esta task
+  produce los artefactos de catálogo, resolución y binding que ese flujo consume; no publica una ruta como
+  `available` por el solo hecho de registrarla.
 
 ### Files owned (repo `efeonce-globe`)
 
@@ -238,11 +241,16 @@ catálogo público).
 
 - Binding (`globe.production-routing.route.append`) por (workspace, ruta, modelo). Entradas de endpoint allowlist por
   modelo en `governed-production-composition.ts` (región `global` para Vertex image). Promoción por ruta (ADR-009/010).
+- La promoción exige el resultado de `TASK-1578`: rate version vigente de `TASK-1468`, estimate/actual
+  reconciliados, evidencia de canary y coverage declarada por cada surface. Binding `enabled` sin ese recibo es
+  inválido y debe fallar cerrado.
 
 ### Slice 5 — Evidencia + canary por modelo + docs
 
 - Canary por el Lab de cada ruta nueva; evidencia `scripts/evidence/*`; doc funcional + manual del catálogo
   multi-modelo y de la receta "agregar un modelo".
+- El manual enlaza la receta completa de `TASK-1578`; no mantiene un segundo procedimiento de rates ni de
+  settlement dentro del catálogo.
 
 ## Out of Scope
 
@@ -335,6 +343,7 @@ resolución (ya es por-ruta).
 - [x] Evidencia runtime por modelo (canary por el Lab) listada; región `global` para Vertex image. **DONE for canary**: experiment `a258dda8-ea6e-4a34-94f0-4cd9ca301d17`, 10 credits, `image/png`, 1,111,472 bytes, SHA-256 `9e9edaf59cb927610d043e3af3cac9b90c321ed48e55eb34ec0300c72dc429cf`; promotion remains pending.
 - [~] Promoción ADR-009 + reader `globe.producer.fleet.list`: API/worker deployados y reader verificado live, pero Nano Banana Pro sigue `gated/not_promoted`; no se declara promoción ni disponibilidad.
 - [x] ADR de resolución por-ruta indexado en `DECISIONS_INDEX`. **DONE (Slice 1, 2026-07-24):** ADR-013 = `docs/architecture/creative-studio/EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md`, indexado en `DECISIONS_INDEX.md` + `creative-studio/README.md`.
+- [ ] Cada ruta promovible referencia un rate version vigente de `TASK-1468` y un receipt de onboarding de `TASK-1578`.
 
 ## Verification
 

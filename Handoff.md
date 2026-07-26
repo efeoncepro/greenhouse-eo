@@ -20,6 +20,11 @@ onboarding transversal de modelos: route → credit rate → binding → estimat
 receipt auditable y coverage API/SDK/MCP/UI. `TASK-1468` conserva el rate catalog y ledger; `TASK-1553` conserva
 catálogo/bindings/resolución; `TASK-1578` une y certifica el flujo.
 
+Se creó [`TASK-1579`](docs/tasks/to-do/TASK-1579-globe-credit-rate-settlement-fallback-policy.md) como contrato
+normativo previo: define la fórmula única de credits, estimate/actual/settlement, fallback, retries, batches,
+equivalencia entre providers, lifecycle de rates, calibración y observabilidad. `TASK-1468` y `TASK-1578` quedan
+dependientes de esta policy; implementación y rollout siguen pendientes.
+
 ## 2026-07-26 — Globe media review tasks ancladas en EPIC-028
 
 La auditoría Playwright del `/producer` autenticado confirmó el estado real de audio y video: audio nativo de

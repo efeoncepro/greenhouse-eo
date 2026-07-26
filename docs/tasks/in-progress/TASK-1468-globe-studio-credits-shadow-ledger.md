@@ -102,6 +102,10 @@ SDK, MCP, CLI, workers y harnesses sin que ningún consumer calcule o mute saldo
 - `TASK-1474` sólo presenta balance, estimate e historial mediante readers/commands canónicos.
 - La administración de pools/grants/budgets y su cockpit pertenecen a `TASK-1482`/`TASK-1483`; esta task
   soporta la allocation shadow mínima y el seam transaccional que esos consumers necesitan.
+- El onboarding de un modelo y su promoción operativa pertenecen a `TASK-1578`; esta task conserva la autoridad
+  del rate catalog, rate pinning y lifecycle de credits, pero no convierte el ledger en un catálogo de providers.
+- La fórmula normativa de rating, settlement, fallback y recalibración pertenece a `TASK-1579`; esta task implementa
+  el kernel durable una vez resuelta esa policy y no mantiene una fórmula paralela.
 
 ## Current Repo State
 
@@ -220,6 +224,11 @@ SDK, MCP, CLI, workers y harnesses sin que ningún consumer calcule o mute saldo
   `getCreditBalance` como primitives + private API/SDK.
 - Mantener `allocateCredits` como primitive kernel/internal: grants llaman este seam con source ref idempotente
   y no exponen un bypass genérico a UI/MCP.
+- Consumir la fórmula y las reglas de settlement/fallback de `TASK-1579`; no aceptar rate, actual usage o envelope
+  calculados por el provider o por el browser como autoridad.
+- Exponer el rate catalog como input gobernado del onboarding: una ruta debe declarar `capability_class`,
+  `quality_tier`, output-shape, rate version, rationale y effective date; el modelo/provider no se vuelve una
+  unidad pública por defecto.
 
 ### Slice 2 — Transactional ledger lifecycle
 
@@ -294,6 +303,10 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
       commands/readers canónicos y no como writes directos de fixtures, workers o UI.
 - [ ] Balance disponible/reservado/consumido/ajustado se reconstruye exactamente desde el ledger append-only.
 - [ ] Estimate conserva rate version y ruta propuesta; settlement conserva ruta real y fallbacks por attempt.
+- [ ] Una ruta nueva no puede promoverse si no tiene rate version vigente, pinneable y reconciliada con el estimate
+      del Model Lab; `TASK-1578` consume este contrato sin crear un segundo cálculo.
+- [ ] La policy de `TASK-1579` es la única fuente de fórmula, tolerancia estimate/actual, fallback y settlement;
+      adapters, Model Lab, UI, SDK, MCP, CLI y workers no mantienen cálculos alternativos.
 - [ ] Retry, replay, fallback y concurrencia no duplican allocation, reserva, settlement, release ni adjustment.
 - [ ] Source refs de grant/pool son únicos y el funding breakdown queda pinneado; concurrencia/replay no crea
       dos allocations para un mismo grant.

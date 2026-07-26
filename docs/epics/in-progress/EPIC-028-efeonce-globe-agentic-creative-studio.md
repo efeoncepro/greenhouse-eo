@@ -371,6 +371,12 @@ gobierna decisiones, registry, lifecycle, QA, evidencia y promoción; Globe pose
 patterns, components, motion y runtime. Compartir deliberadamente un color no implica heredar el sistema UI
 de Greenhouse.
 
+La incorporación de modelos y su efecto en credits se cierra mediante `TASK-1579` y `TASK-1578`: `TASK-1579`
+define la fórmula, settlement, fallback y lifecycle de rates; `TASK-1468` implementa el ledger; `TASK-1553` posee
+catálogo, bindings y resolución por ruta; `TASK-1578` certifica route → rate → binding → estimate/actual → canary
+→ promotion y declara coverage API/SDK/MCP/UI. Ningún modelo nuevo se considera disponible sólo por existir en el
+catálogo.
+
 ## Delta 2026-07-19 — TASK-1458 complete (Golden Briefs & Evaluation Harness)
 
 `TASK-1458` quedó **complete** (fake canary), sumándose a `TASK-1481` (spine), `TASK-1457` (Model Lab) y
