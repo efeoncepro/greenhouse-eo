@@ -23,6 +23,11 @@
 - **`globe-api-internal` en revisión `00097-s58`** (imagen `10fd5f14`, ancestría verificada, perímetro anónimo → 403):
   trae la **fase de negación de crédito** (TASK-1566 Slice A) y el **comando gobernado + signer port** (Slice B).
 
+**Delta del canary — 6 fixes de observabilidad, y el sexto explica los cinco anteriores (`ISSUE-127`).** Corrido 4 veces con gasto real, **cero créditos perdidos** (el fence liberó cada reserva, `spentCredits=0`). Cadena: `runner_error` mudo → instrumentado (`00098-45x`) → destapó `ProductionRouteDependencyError` con `reasonShape=absent` → 28 sitios de throw pasan a **12 razones nombradas** (`00099-t89`) → el canary reportó **`route_compilation_failed`**, el catch-all, **con las razones ya desplegadas**.
+🔴 **Y ahí está la causa raíz, encontrada LEYENDO el compile en vez de persiguiéndolo con otro deploy** (decisión del operador, y fue la correcta): `deny()` lanza `ProductionRouteDeniedError`, que el catch **sí** re-lanza — pero `#requests.compile` y `assertCompiledProviderRequest` lanzan **`ProductionRouteDependencyError`**, que el catch **no** contemplaba, así que caía en el catch-all y **le reemplazaba la razón**. Las 12 razones existían y **ese catch las destruía** justo en los dos caminos que más importan. Cerrado con un `instanceof` re-throw (`40ed85a`, desplegando).
+**Lección de método, y vale más que los seis fixes:** perseguir un error por deploy encuentra síntomas en serie; leer el camino completo encuentra el que los explica. Cinco capas se arreglaron a un deploy por capa; la sexta se vio en treinta líneas.
+**Tres huecos del canary, encontrados usándolo** (no leyéndolo): descartaba el `failureReason` que el reader acababa de entregar (**arreglado**); `GLOBE_CANARY_RUN_LABEL` se exige en la rama `--execute` y no arriba del archivo, así que el dry-run pasa y el execute muere (**abierto**); y el dry-run reporta `withinHardCap` pero **no `withinDayCap`**, que es la señal que de verdad decide (**abierto**).
+
 **Bloqueo vigente — el canary, y ya no es por créditos ni por tenancy:** el `execute` de imagen terminó
 `state=failed`, `failureReason=runner_error`, `spentCredits=0`, reserva de 10 liberada, cero output (experimento
 `64a32bfd-d46f-4724-b8a0-8e6db5d0db78`). Video no se ejecutó, correctamente, para no gastar a ciegas.
