@@ -8,6 +8,26 @@
 
 # Handoff
 
+## Active state — 2026-07-26 (canary real bloqueado en runner; break-glass específico revocado)
+
+- Dry-run con token del caller: `ready=true`; `globe.tenancy.workspace.get` observó
+  `brokerExpiresAt=2026-07-26T11:42:00.878Z`, `version=4`, `brokerState=active`; estimados `image=10` y
+  `video=16`, ambos `withinHardCap=true`. La lectura `globe.tenancy.access.effective` no fue autorizada para el
+  principal de service account (403), por lo que la confirmación fresca es la lectura de workspace, no una lectura
+  humana de effective access.
+- Imagen: `estimate → prepare → execute` aceptados; experimento
+  `64a32bfd-d46f-4724-b8a0-8e6db5d0db78` terminó `state=failed`, `failureReason=runner_error`, `spentCredits=0`.
+  La reserva de 10 terminó en `release`; no hubo bytes ni output retenido. Video no se ejecutó para no reintentar a
+  ciegas. Logs de `11:32:51Z` muestran `globe_tenancy_shadow_drift`; el job `globe-producer-worker` reportó
+  `claimed=0`.
+- El binding temporal `user:julio.reyes@efeonce.org` → `greenhouse-globe-caller` fue revocado; el readback de la
+  policy del service account confirma que sólo queda `greenhouse-portal@`. El corte global **no** quedó verificado:
+  la cuenta humana conserva `roles/owner` a nivel de `efeonce-globe`, que permite impersonación heredada. No retirar
+  ese acceso permanente sin autorización separada.
+
+**Criterio de éxito:** no cumplido. Falta resolver `runner_error`, repetir imagen y video, verificar cada descriptor
+con `x-globe-retrieval-grant` → HTTP 200/MIME/tamaño, y cerrar el corte de autoridad permanente.
+
 ## CLI local multi-proyecto
 
 La postura de recursos de Globe sigue siendo de un solo proyecto (`efeonce-globe`); lo multi-proyecto

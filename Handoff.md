@@ -3,6 +3,21 @@
 > Cabina de mando para continuidad inmediata. No es changelog, arquitectura ni memoria completa.
 > Ventana máxima: 20 sesiones. Historia íntegra e índice: [Handoff.archive.md](Handoff.archive.md).
 
+## 2026-07-26 — Canary real Globe: bloqueado en runner y corte IAM incompleto
+
+El dry-run autenticado con el caller quedó `ready=true`: `globe.tenancy.workspace.get` mostró proyección fresca
+(`brokerExpiresAt=2026-07-26T11:42:00.878Z`, versión 4), y los estimados fueron imagen `10` y video `16`, ambos
+`withinHardCap=true`. El canary de imagen sí ejecutó `prepare`/`execute`, pero el run
+`64a32bfd-d46f-4724-b8a0-8e6db5d0db78` terminó `state=failed`, `failureReason=runner_error`, `spentCredits=0`;
+la reserva de 10 fue liberada y no se produjo output. Video no se ejecutó para evitar gasto a ciegas.
+
+La evidencia de logs alrededor de `11:32:51Z` muestra `globe_tenancy_shadow_drift` y el worker
+`globe-producer-worker` terminó con `claimed=0`; queda bloqueado el diagnóstico del runner antes de reintentar.
+El binding break-glass específico fue revocado y la policy del service account ya no contiene al usuario. La prueba
+de corte global no pasó porque `julio.reyes@efeonce.org` conserva `roles/owner` a nivel de proyecto `efeonce-globe`,
+que sigue permitiendo impersonación; no se retiró ese acceso permanente sin autorización separada. Estado:
+`operativamente bloqueado`; no mover TASK-1566.
+
 ## 2026-07-26 — CLI local multi-proyecto para Globe
 
 `gcloud` conserva `default` activo con `julio.reyes@efeonce.org` / `efeonce-group` y tiene la
