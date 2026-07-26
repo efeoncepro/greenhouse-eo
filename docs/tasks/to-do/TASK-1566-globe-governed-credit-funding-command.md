@@ -88,7 +88,7 @@ Reglas obligatorias (extracto de ADR-015 § Reglas duras — la lista completa m
 - `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md` — estado vivo de revisiones/flags/bloqueos, y el procedimiento de break-glass en la línea 220 que esta task existe para dejar de necesitar. **Es el SoT del estado mutable; no inferir revisiones desde esta task.**
 - `docs/issues/open/ISSUE-124-globe-credit-grant-canonical-409-root-cause-hidden.md` — la mitad de diagnóstico que cierra el Slice 1.
 - `.claude/skills/greenhouse-globe/SKILL.md` § `Gasto y crédito en Globe` — las cinco reglas medidas contra el runtime.
-- `docs/architecture/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md` [verificar path exacto: el runbook vive en `docs/operations/creative-studio/`] — protocolo de import de Terraform: `plan` con cero `destroy`/`replace` de identidad viva.
+- `docs/operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md` — protocolo de import de Terraform: `plan` con cero `destroy`/`replace` de identidad viva.
 
 ## Dependencies & Impact
 
