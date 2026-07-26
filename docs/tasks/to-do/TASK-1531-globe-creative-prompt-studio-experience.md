@@ -34,6 +34,11 @@ qué decisiones sugirió y qué requiere revisión, manteniendo el original inta
 La experiencia trata al operador como autor y punto de vista, no como supervisor de una caja negra: Globe guía,
 explica y reduce carga técnica; el workspace conserva memoria, autoridad y decisión.
 
+Creative Prompt Studio debe ser el punto de entrada de una misma cadena de dirección: la propuesta se convierte
+en un brief estructurado de TASK-1493, Dirección de TASK-1499 explica qué fue explícito o inferido y el usuario
+puede revisar cámara, look y restricciones antes de aceptar. No se deben presentar prompt, presets y cámara como
+superficies independientes.
+
 ## Why This Task Exists
 
 En producción se observó una espera aproximada de 36 segundos sin feedback; el control parece roto. La propuesta
@@ -77,6 +82,8 @@ y valiosa sin convertir el composer en chat ni card wall.
 ### Depends on
 
 - `TASK-1530` — Creative Prompt Engineer contract/outcome/fixtures.
+- `TASK-1493` — structured brief y recipe registry; autoridad de la receta efectiva y la dirección de cámara.
+- `TASK-1499` — Brief Direction; interpretación explícito/inferido antes del estimate.
 - `TASK-1505` — Producer visual baseline.
 - `TASK-1519` — human BFF execution bridge.
 
@@ -310,7 +317,8 @@ y valiosa sin convertir el composer en chat ni card wall.
 ## Detailed Spec
 
 El workbench presenta sólo evidencia observable: intent summary, target público, propuesta, preserved constraints,
-creative decisions, assumptions y warnings. Provenance usa `aportado|derivado|sugerido`; nunca “razonamiento”.
+creative decisions, camera/look summary, assumptions y warnings. Provenance usa `aportado|derivado|sugerido`;
+nunca “razonamiento”.
 El browser mantiene una signature de source+target+composer context. Si cambia, la respuesta anterior puede
 reconciliarse pero no sustituye el estado actual.
 
@@ -337,6 +345,10 @@ la maquinaria.
 
 - [ ] First fold desktop/mobile es aceptado antes del wiring completo.
 - [ ] Creative read, target, proposal, provenance, preservation y warnings son legibles.
+- [ ] La propuesta muestra cómo se conectan prompt, receta, cámara y Dirección; cámara, look y restricciones
+      pueden revisarse como decisiones estructuradas sin reconstruirlas desde el texto compilado.
+- [ ] Aceptar una propuesta conserva la referencia a la receta/version efectiva y no crea una segunda fuente
+      local de presets o cámara.
 - [ ] La jerarquía mantiene al original/decisión humana como foco y no convierte provider/model en protagonista.
 - [ ] Original cambia sólo tras accept; edit/reject/error lo preservan.
 - [ ] Pending aparece <100 ms perceptibles y un fingerprint produce un request activo.

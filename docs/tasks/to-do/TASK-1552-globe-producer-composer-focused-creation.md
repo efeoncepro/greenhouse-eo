@@ -109,6 +109,8 @@ El composer actual intenta ser prompt editor, selector de modelos, panel de pres
 ## Goal
 
 - Hacer del prompt la entrada dominante del Producer.
+- Integrar Creative Prompt, Brief Direction y Creative Recipe en una única secuencia visible: intención →
+  interpretación → receta/cámara → output shape → estimate → Generate.
 - Reducir la competencia visual entre sugerencias, presets, referencias, seed, modelo y governance.
 - Mantener Imagen, Video y Audio como modos de un solo producto con controles específicos por modalidad.
 - Integrar el CTA y los estados de `TASK-1532` sin añadir una línea de costo duplicada ni ocultar créditos.
@@ -125,6 +127,8 @@ Revisar y respetar:
 - `docs/tasks/in-progress/TASK-1505-globe-creative-producer-surface.md`
 - `docs/tasks/to-do/TASK-1531-globe-creative-prompt-studio-experience.md`
 - `docs/tasks/to-do/TASK-1532-globe-one-click-generate-automatic-estimate.md`
+- `docs/tasks/to-do/TASK-1493-globe-structured-brief-composition.md`
+- `docs/tasks/to-do/TASK-1499-globe-brief-direction-interpretation.md`
 - `.codex/skills/greenhouse-ai-design-studio/SKILL.md`
 - `.codex/skills/greenhouse-product-ui-architect/SKILL.md`
 
@@ -500,6 +504,12 @@ N/A — repo-only task/documentation plus UI changes in the Globe runtime owned 
 - [ ] El composer tiene una sola jerarquía primaria: prompt → dirección/output shape → CTA Generate.
 - [ ] No existe selector/título de modalidad duplicado dentro del composer.
 - [ ] Modelo, seed, Style DNA, referencias y controles avanzados permanecen accesibles mediante progressive disclosure o estado contextual honesto.
+- [ ] Los presets se presentan como recetas visuales o puntos de partida; la UI no mantiene una taxonomía
+      paralela de chips hardcoded.
+- [ ] Imagen y video pueden revisar controles de cámara semánticos compatibles con su modalidad; audio no
+      muestra controles de cámara.
+- [ ] Una receta modificada se identifica como personalizada y permite restaurar la receta base; los locks
+      de cámara/look/sujeto se muestran con estado honesto y no se simulan si el contrato no está disponible.
 - [ ] Imagen, Video y Audio muestran sólo los controles relevantes para su modalidad y no presentan capacidades gated como activas.
 - [ ] El CTA reutiliza `TASK-1532`: no hay botón manual `Calcular costo`, no se duplica la línea de costo y el estimate vigente aparece dentro del CTA.
 - [ ] El prompt, disclosures, CTA y estados son operables por teclado, tienen focus visible, targets táctiles de 44 px y equivalencia reduced-motion.
@@ -533,6 +543,8 @@ con sus cuatro compuertas (`docs/ui/flows/TASK-1552-...-flow.md`).
 - [ ] Las cuatro razones de negación se distinguen, y "Reintentar" aparece **sólo donde puede funcionar**.
 - [ ] Las afordancias sin contrato (inpaint, batch) van **deshabilitadas con su razón visible**.
 - [ ] El prompt escrito **no se pierde ante ningún error**, incluida sesión expirada.
+- [ ] Cambiar prompt, receta, cámara, referencia u output shape invalida el estimate vigente mediante la
+      misma `recipeKey`/fingerprint canónica; la UI no calcula créditos ni recompone el costo localmente.
 - [ ] Canary a 1440/390/**320**, sin overflow de página ni de panel, más pasada con `prefers-reduced-motion`.
 - [ ] Scorecard visual: promedio ≥ 4.5, piso ≥ 4, fidelidad y resistencia a template ≥ 4.5.
 

@@ -31,7 +31,11 @@
 
 ## Summary
 
-Introducir el paso "Dirección" del Globe Studio Workbench: un reader gobernado que **interpreta y parafrasea el brief antes de estimar** ("así entendimos tu brief") y declara las **decisiones de dirección** que tomaría (sujeto, estilo, luz, encuadre, mood, paleta, formato), separando lo que el operador dijo explícito de lo que la plataforma infirió, con supuestos, preguntas abiertas y confianza. Es **read-only**: nunca muta el brief ni el experimento. La interpretación pasa por un **seam gobernado de texto** (LLM detrás de un port/adapter, nunca un SDK de provider directo), y la capacidad nace con Full API Parity (reader transport-neutral, `ui`/`mcp` `policy-blocked` hasta promoción).
+Introducir el paso "Dirección" del Globe Studio Workbench: un reader gobernado que **interpreta y parafrasea el brief antes de estimar** ("así entendimos tu brief") y declara las **decisiones de dirección** que tomaría (sujeto, estilo, luz, encuadre, cámara, mood, paleta, formato), separando lo que el operador dijo explícito de lo que la plataforma infirió, con supuestos, preguntas abiertas y confianza. Es **read-only**: nunca muta el brief ni el experimento. La interpretación pasa por un **seam gobernado de texto** (LLM detrás de un port/adapter, nunca un SDK de provider directo), y la capacidad nace con Full API Parity (reader transport-neutral, `ui`/`mcp` `policy-blocked` hasta promoción).
+
+Dirección es el puente entre Creative Prompt y la ejecución: valida que la propuesta del agente se entienda
+antes de reservar créditos y convierte las inferencias de cámara en decisiones observables, editables o
+marcadas como preguntas abiertas. No genera un prompt alternativo opaco ni captura chain-of-thought.
 
 ## Why This Task Exists
 
@@ -43,7 +47,7 @@ Además, `efeonce-globe` **no tiene todavía un cliente de texto/LLM canónico**
 
 - Un reader gobernado y transport-neutral `globe.lab.experiment.direction` `[verificar nombre wire]` que devuelva una **interpretación del brief** (`BriefDirectionV1`) para un experimento del workspace del caller, sin mutar estado.
 - Un **seam de interpretación de texto** (port + adapter) que sea el ÚNICO lugar donde se invoca un LLM para interpretar, detrás del kill switch, con impl fake determinista para tests y adapter real por el cliente de texto gobernado de Globe (nunca un SDK de provider directo).
-- La interpretación declara **decisiones de dirección** (dimensión + valor + `source: explicit|inferred`), supuestos, preguntas abiertas y confianza, de modo que el operador vea qué es del brief y qué infirió la plataforma antes de estimar.
+- La interpretación declara **decisiones de dirección** (dimensión + valor + `source: explicit|inferred|suggested`), supuestos, preguntas abiertas y confianza, de modo que el operador vea qué es del brief y qué infirió la plataforma antes de estimar.
 - Capacidad con **Full API Parity**: reader canónico en el registry del spine, `ui`/`mcp` `policy-blocked` hasta promoción; http/sdk/cli/worker/e2e disponibles. Nexa y los demás consumers la operan por construcción una vez promovida — cero integración específica.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -232,7 +236,8 @@ Reglas obligatorias:
 
 ## Out of Scope
 
-- **Composición estructurada del brief / Prompt Studio / recetas** — TASK-1493. Aquí se interpreta el brief tal como exista (plano hoy, estructurado si 1493 aterriza), no se rediseña su forma.
+- **Composición estructurada del brief / Prompt Studio / recetas** — TASK-1493. Aquí se interpreta el brief
+  tal como exista, incluyendo la cámara materializada por 1493; esta task no rediseña ni persiste la receta.
 - **Análisis de referencias / Style DNA** (extraer paleta/estilo de una imagen) — TASK-1494. La Dirección interpreta el brief textual, no inspecciona bytes de referencia.
 - **Estimate previewable + gate de aprobación humana + lifecycle de run** — TASK-1469. La Dirección precede al estimate; no lo calcula ni aprueba.
 - **El panel/UI "Dirección"** del workbench — TASK-1474 (consumer). Aquí solo el backend.
@@ -246,12 +251,13 @@ Reglas obligatorias:
 
 ```ts
 export type BriefDirectionDimension =
-  | 'subject' | 'style' | 'light' | 'framing' | 'mood' | 'palette' | 'format';
+  | 'subject' | 'style' | 'light' | 'framing' | 'camera' | 'mood' | 'palette' | 'format';
 
 export type BriefDirectionDecisionV1 = Readonly<{
   dimension: BriefDirectionDimension;
   value: string;
-  source: 'explicit' | 'inferred'; // separa lo que dijo el operador de lo que infirió la plataforma
+  source: 'explicit' | 'inferred' | 'suggested'; // separa aporte, inferencia y sugerencia
+  lockRecommended?: boolean;
 }>;
 
 export type BriefDirectionV1 = Readonly<{
@@ -327,7 +333,12 @@ Cambio **aditivo** en el runtime de `efeonce-globe`: reader nuevo + tipo + seam 
 ## Acceptance Criteria
 
 - [ ] Existe el reader `globe.lab.experiment.direction` `[verificar nombre]` registrado en el registry del spine con `LAB_COVERAGE` (`ui`/`mcp` `policy-blocked`, http/sdk/cli/worker/e2e `available`).
-- [ ] El reader devuelve `BriefDirectionV1` con paráfrasis (`interpretationSummary`), decisiones con `source: explicit|inferred`, supuestos, preguntas abiertas, confianza y provenance (`briefHash`, `model`, `modelVersion`).
+- [ ] El reader devuelve `BriefDirectionV1` con paráfrasis (`interpretationSummary`), decisiones con `source: explicit|inferred|suggested`, supuestos, preguntas abiertas, confianza y provenance (`briefHash`, `model`, `modelVersion`).
+- [ ] Cuando la modalidad es imagen o video, `BriefDirectionV1` puede devolver decisiones de cámara
+      semánticas y diferenciadas de estilo: shot, ángulo, lente, profundidad, composición y movimiento
+      cuando aplique; audio no recibe controles de cámara.
+- [ ] La respuesta distingue lo explícito, inferido y sugerido, y puede recomendar locks de cámara,
+      sujeto, luz o estilo sin mutar el brief ni aplicar cambios automáticamente.
 - [ ] La interpretación se invoca **solo** por `BriefInterpreterPort`; no hay import de SDK de provider en `packages/domain`.
 - [ ] El reader **no muta** el experimento ni el brief (test verde: `state` y `request` idénticos antes/después).
 - [ ] Un experimento de otro workspace no es legible (test de denegación cross-workspace verde).

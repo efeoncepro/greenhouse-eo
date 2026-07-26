@@ -31,7 +31,9 @@ Convertir el enhancer existente de Globe en un **Creative Prompt Engineer** gobe
 capaz de comprender intención creativa, preservar restricciones, razonar sobre medio y operación, y compilar una
 propuesta específica para la ruta/modelo generativo elegido. El LLM es un motor sustituible; la competencia vive
 en contratos, perfiles versionados, herramientas, validadores, evals y políticas de promoción. El agente absorbe
-la ingeniería del prompt sin reclamar la autoría de la idea.
+la ingeniería del prompt sin reclamar la autoría de la idea. Su outcome debe poder expresar una receta creativa
+estructurada —incluida cámara y composición cuando corresponda— para que Creative Prompt no sea una reescritura
+opaca de texto.
 
 ## Why This Task Exists
 
@@ -55,6 +57,8 @@ reduce opciones creativas no es una mejora.
 - Separar análisis de intención, estrategia creativa y compilación técnica por target.
 - Seleccionar el LLM default mediante evals comparables, no mediante preferencia de proveedor.
 - Entregar una propuesta estructurada que TASK-1531 pueda presentar sin reinterpretar lógica en UI.
+- Entregar decisiones observables separando intención aportada, decisiones derivadas y sugerencias, incluyendo
+  cámara, composición, look, luz y restricciones cuando la modalidad lo permita.
 - Mantener propose→accept/reject, spend fence, trusted context, aislamiento tenant y Full API Parity.
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
@@ -129,9 +133,13 @@ Reglas:
 
 - No existe contrato explícito de `CreativePromptEngineer`.
 - No existe pipeline separado `understand → strategize → compile → validate`.
+- No existe una salida común que conecte `understand → strategize` con la receta/cámara durable de TASK-1493
+  y la lectura explícito/inferido de TASK-1499.
 - No hay profiles por target/operación ni policy de campos que se pueden inferir.
 - No hay candidate router/fallback ni eval gate para escoger GPT, Claude, Gemini u otro.
 - El outcome no distingue intención, restricciones preservadas, decisiones creativas, propuesta y advertencias.
+- El outcome no tiene todavía un shape explícito para decisiones de cámara ni para indicar qué dimensiones
+  deberían preservarse durante una edición o variación.
 - Faltan golden sets multimodales, ataques de prompt injection y señales de calidad/costo/latencia.
 
 ## Modular Placement Contract
@@ -170,6 +178,10 @@ Reglas:
   - Toda propuesta conserva restricciones explícitas o declara exactamente cuáles no pudo preservar.
   - El target se deriva de `referenceRoute + catalogVersion`, nunca de provider slug no confiable.
   - Campos inferidos se distinguen de campos aportados; facts, texto literal, identidad, rights y claims no se inventan.
+  - Cámara, composición, look y restricciones se entregan como decisiones estructuradas compatibles con la
+    receta de TASK-1493; la UI nunca debe reconstruirlas desde el texto compilado.
+  - En edición o variación, una dimensión marcada como preservada/locked no puede desaparecer silenciosamente
+    de la propuesta; si el target no la soporta, el outcome declara la limitación.
   - La salida no expone system prompt, chain-of-thought, secretos, provider wire names ni operator-only evidence.
   - Un outcome es reproducible por policy/profile/catalog/model version, no necesariamente bit-identical.
 - Tenant/space boundary: actor/workspace se derivan exclusivamente de trusted context.
@@ -306,6 +318,11 @@ y rollback probado. Un modelo fuerte generalista sin profiles/evals no constituy
 
 - [ ] Existe contrato explícito `CreativePromptEngineer` vendor-neutral y versionado.
 - [ ] El outcome V2 separa intención, propuesta, decisiones, provenance, preservación y advertencias.
+- [ ] El outcome V2 expresa decisiones estructuradas de cámara/composición, look, luz y restricciones cuando
+      la modalidad lo permite, distinguiendo `aportado|derivado|sugerido` y sin obligar a la UI a parsear el
+      texto compilado.
+- [ ] Las fixtures de Image/Video cubren cámara preservada, cámara sugerida y limitación de target; Audio no
+      recibe dimensiones de cámara.
 - [ ] Evals rechazan propuestas que mejoran sintaxis/target fit pero degradan intención, creative latitude o
   atribución de autoría.
 - [ ] Profiles cubren Image/Video/Audio y operaciones promovidas con compatibilidad de catálogo.
