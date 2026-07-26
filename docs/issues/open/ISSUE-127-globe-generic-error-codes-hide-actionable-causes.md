@@ -52,9 +52,43 @@ Tres cerradas, una abierta:
 - El del runner verifica que el evento serializado **no** contenga `<html>`, `500 Internal` ni `stack`, y tiene el negativo: cuando el `reason` **sí** es clasificable, el canal no se usa.
 - Pendiente: re-correr `pnpm producer:canary` con `17329f6` desplegado y confirmar que reporta **cuál** de las 12 razones falla, en vez de `runner_error`.
 
+## Delta 2026-07-26 — siete capas, y la séptima corrige a la sexta
+
+**El canary corrió cuatro veces con gasto real. Cero créditos perdidos** (el fence liberó cada reserva, `spentCredits=0`). No generó. Pero la cadena de diagnóstico quedó construida, y su forma es el hallazgo:
+
+| # | Capa | Cómo se descubrió |
+|---|---|---|
+| 1 | `409 conflict` de crédito | leyendo `dispatch.ts` |
+| 2 | `runner_error` mudo, **con la ventana de logs vacía** | corriendo el canary |
+| 3 | `ProductionRouteDependencyError` sin `reason` (28 sitios) | **el fix de la capa 2 lo destapó** (`reasonShape=absent`) |
+| 4 | `route_compilation_failed`: el catch-all | el canary, con las 12 razones ya desplegadas |
+| 5 | 🔴 **el catch DESTRUÍA las razones nombradas** | **leyendo el compile, no desplegando** |
+| 6 | `endpoint_url_not_permitted` | el canary, con el re-throw ya desplegado |
+| 7 | 🔴 **ese label era MÍO y estaba MAL** | leyendo la config de endpoints y viendo que **las tres entries pasan** |
+
+**Capa 5 — el bug que explicaba las cuatro anteriores.** `deny()` lanza `ProductionRouteDeniedError`, que el catch **sí** re-lanza; pero `#requests.compile` y `assertCompiledProviderRequest` lanzan **`ProductionRouteDependencyError`**, que el catch **no** contemplaba, así que caía en el catch-all y **le reemplazaba la razón**. Las 12 razones existían y ese catch las destruía justo en los dos caminos que más importan. Cerrado con un `instanceof` re-throw.
+
+**Capa 7 — error propio, de la clase que más daño hace.** Al nombrar las 28 razones usé una heurística con `endpoint_url_not_permitted` como **bucket por defecto**. Sólo las líneas 110-128 son aserciones de URL; **las 133-167 son el sanitizador del body snapshot** (profundidad, binarios, claves secretas, prefijos `Bearer`/`Key`, `data:` URIs, tamaño). Doce chequeos quedaron etiquetados como config de endpoint, y **el label me mandó a mí mismo a leer la config equivocada**. Corregido: las doce tienen su propio nombre `snapshot_body_*`.
+
+> **Un bucket por defecto que abarca 17 sitios no es una razón nombrada — es una razón inventada.** Una heurística sirve para acotar 28 causas a un puñado, pero si el bucket tapa familias distintas hay que abrirlo **antes** de shippearlo. Un label equivocado dirige mal, y eso es peor que no tener label.
+
+> **Y la lección de método que el operador impuso y funcionó:** perseguir un error por deploy encuentra síntomas en serie; **leer el camino completo encuentra el que los explica.** Las capas 1-4 costaron un deploy cada una; la 5 se vio en treinta líneas de lectura. Cuando el n-ésimo fix destapa una capa n+1, **dejá de desplegar y leé.**
+
+### Bloqueo vigente, ahora acotado con precisión
+
+El `execute` de imagen (ruta `ref/still/rrss-v1` → `fal.seedream.text-to-image`) es rechazado por el **sanitizador del body snapshot**, no por la config del endpoint. Sospechosos, por cómo `buildBody` arma las referencias con `placeholder(input)`: `snapshot_body_inline_data_uri` (un `data:` URI), `snapshot_body_too_large` (>256 KB por string o el tope del snapshot completo), `snapshot_body_binary_key` o `snapshot_body_credential_like`.
+
+**El próximo paso NO es otro deploy.** Es leer `buildBody` de `fal.seedream.text-to-image` (`governed-production-composition.ts:205`) contra los doce chequeos de `safeSnapshotBody` (`production-route-composition.ts:133-167`) y encontrar cuál viola. Es el mismo método que resolvió la capa 5.
+
+### Tres huecos del canary, encontrados USÁNDOLO
+
+1. ✅ Descartaba el `failureReason` que el reader acababa de entregar — el script sabía por qué falló y obligaba a ir a los logs.
+2. 🔴 `GLOBE_CANARY_RUN_LABEL` se exige en la rama `--execute` y no arriba del archivo: **el dry-run pasa y el execute muere.**
+3. 🔴 El dry-run reporta `withinHardCap` pero **no `withinDayCap`** — la señal que de verdad decide si el mes deja gastar.
+
 ## Estado
 
-open — tres de los cuatro códigos cerrados; `authentication_required` pendiente. La verificación runtime del tercero necesita el deploy de `17329f6`.
+open — cuatro de los códigos cerrados (`409` de crédito, `runner_error`, `ProductionRouteDependencyError` con 24 razones, el catch que las destruía); `authentication_required` pendiente; y el bloqueo del canary acotado al sanitizador del body. Antes decía: tres de los cuatro códigos cerrados; `authentication_required` pendiente. La verificación runtime del tercero necesita el deploy de `17329f6`.
 
 ## Relacionado
 
