@@ -111,6 +111,9 @@ Todo business model debe separar al menos estas dimensiones:
 - [Efeonce AEO Business Model V1](aeo/EFEONCE_AEO_BUSINESS_MODEL_V1.md) — draft de wedge/capability.
 - [Search Visibility 360 Business Model V1](search-visibility-360/SEARCH_VISIBILITY_360_BUSINESS_MODEL_V1.md) —
   draft de capability en construcción.
+- [Wave Business Model V1](wave/WAVE_BUSINESS_MODEL_V1.md) — draft de productora/capability con cinco familias:
+  Search Visibility 360, Web Experience 360, Measurement & Analytics, Agent Systems & Platforms y Digital
+  Automation & Integrations.
 
 - [Efeonce Creative Studio V1.1](creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md) —
   `Approved for validation`; incorpora la doctrina de autoría humana y mantiene B2B2B como hipótesis gateada.

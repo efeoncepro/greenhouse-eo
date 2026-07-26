@@ -48,3 +48,28 @@ Cada servicio debe declarar como mínimo:
 ## Familias disponibles
 
 - [HubSpot as a Service](hubspot-as-a-service/README.md)
+
+## Wave — cartera de servicios productizados
+
+Wave es una marca de producto de Efeonce. El cliente contrata y se relaciona con Efeonce; Wave nombra la solución
+que diseña, construye y opera la capa digital inteligente. El catálogo económico canónico está en
+[`Wave Business Model V1`](../business-models/wave/WAVE_BUSINESS_MODEL_V1.md) y el boundary de ownership en
+[`ADR Wave Portfolio Boundaries`](../architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md).
+
+| Familia | Servicios productizados |
+|---|---|
+| **Search Visibility 360** | Search Visibility Diagnostic · AEO Readiness Sprint · SEO Foundation Sprint · Search Architecture & Entity Authority · Search Visibility Operating System · Search Recovery & Migration |
+| **Web Experience 360** | Web Foundation Sprint · Conversion Website · Agent-Ready Website · Website Rebuild & Migration · Web Performance Operations |
+| **Measurement & Analytics** | Measurement Audit · Tagging/Data Layer · GTM/GA4 Implementation · Dashboard & Attribution · Analytics Operations |
+| **Agent Systems & Platforms** | Agent Strategy & Architecture · Custom Agent System · Managed Agent Deployment · Agent Integrations · Agent Evaluation & Operations |
+| **Digital Automation & Integrations** | API/Workflow Sprint · Data Pipeline · Automation Build · Integration Operations |
+
+La composición de un proyecto puede incorporar capacidades de Efeonce Digital/Kortex, Globe o Reach según el
+resultado contratado y el RACI definido. Wave conserva el ownership de sus familias de servicio.
+
+### Delivery models de Wave
+
+Las familias anteriores son product services; el modelo de delivery se cotiza y gobierna por separado. Wave puede
+entregar mediante Productized Service, Managed Squad, Staff Augmentation, Implementation, Advisory o
+Platform-enabled Service, con engagements On-Going, On-Demand o Sample Sprint. Un proyecto puede combinar Wave con
+Efeonce Digital/Kortex, Globe, Reach o Greenhouse sin mezclar ownership.

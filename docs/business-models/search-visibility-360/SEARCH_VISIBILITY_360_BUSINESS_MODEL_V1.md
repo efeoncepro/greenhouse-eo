@@ -2,12 +2,14 @@
 
 > **Estado:** `Draft` — capability en construcción; no declarar producto, ARR, adopción o margen separado
 > sin runtime y evidencia aprobada.
-> **Owner:** Strategy + SEO/AEO + Product + Finance
+> **Owner:** Wave + Strategy + SEO/AEO + Product + Finance
 
 ## Scope hypothesis
 
-Un sistema que conecta búsqueda clásica, visibilidad generativa, contenido, technical foundations,
-distribución y medición para entender dónde una marca es descubierta y qué acciones mejoran esa presencia.
+Un producto-servicio de Wave que conecta búsqueda clásica, visibilidad generativa, technical foundations,
+arquitectura de entidades, medición e inteligencia para entender dónde una marca es descubierta y qué acciones
+mejoran esa presencia. Globe puede producir contenido y Reach puede aportar distribución, pero no cambian el
+ownership de Wave sobre la oferta de visibilidad.
 
 ## Model questions
 

@@ -110,7 +110,7 @@ Formato del doc: Situación/Trigger → Job Statement → Resultado Esperado. Aq
 | **Tier 2 · Con educación previa** | Digital ICP1 (B2B Revenue), Globe ICP2 (Rebranding), Globe ICP1 (Escalar) | Ticket alto, ciclo largo, trigger fuerte. |
 | **Tier 3 · Venta cruzada** | Digital ICP2 (Retail), Globe ICP3 (Ejecución a escala/Sky), Reach ICP1 (Distribución) | Se activan **desde dentro**, cuando se diagnostica el gap. |
 
-Ejemplo de cadena de expansión: AEO → SEO/contenido → CRM → GTM integral → (si falta infra) Wave → (si falta contenido) Globe.
+Ejemplo de cadena de expansión: AEO → Search Visibility 360 → web/medición/agentes → CRM/GTM integral → (si falta contenido) Globe → (si falta distribución) Reach. Wave opera visibilidad, web, measurement y agentes; Efeonce Digital/Kortex opera CRM/GTM.
 
 ---
 

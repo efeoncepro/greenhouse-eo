@@ -112,7 +112,11 @@ Clasificar cada elemento como:
 - futura vertical.
 
 Para Efeonce, mapear Efeonce Group, Efeonce Digital, Globe, Reach, Wave, Greenhouse, Kortex, Verk,
-AEO, Search Visibility 360 y Creative Studio sin presentarlos como una lista desconectada.
+AEO, Search Visibility 360 y Creative Studio sin presentarlos como una lista desconectada. Para cualquier
+decisión sobre Wave, cargar [`Wave Business Model V1`](../../docs/business-models/wave/WAVE_BUSINESS_MODEL_V1.md)
+y el ADR de boundaries (`../../docs/architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md`). Wave tiene
+cinco familias: Search Visibility 360, Web Experience 360, Measurement & Analytics, Agent Systems & Platforms y
+Digital Automation & Integrations. CRM/RevOps permanece en Efeonce Digital/Kortex.
 
 ### 3. Definir customer/value
 

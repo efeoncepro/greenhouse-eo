@@ -73,9 +73,9 @@ El diferenciador real no es ningún servicio individual — es escalar dentro de
 | Entry point | Cross-sell | Trigger de ecosistema |
 |---|---|---|
 | CRM (Efeonce) | Contenido (Globe) | Greenhouse: Account 360 detecta pipeline sin assets. Verk: Surround Map con gaps. |
-| Branding (Globe) | SEO/AEO (Efeonce) | Greenhouse: métricas ICO altas sin tracking orgánico. Verk: "Búsqueda clásica" inactiva. |
+| Branding (Globe) | Search Visibility 360 (Wave) | Greenhouse: métricas ICO altas sin tracking orgánico. Verk: "Búsqueda clásica" inactiva. |
 | Producción (Globe) | Medios (Reach) | Greenhouse: alta cadencia + bajo engagement. Verk: capas Amplified/Earned sin cobertura. |
-| Analytics (Efeonce) | Web performance (Wave) | Greenhouse: inversión alta con conversion bajo. Verk: tráfico sin conversión web. |
+| Analytics (Efeonce Digital + Wave) | Web performance / Measurement (Wave) | Greenhouse: inversión alta con conversión baja. Verk: tráfico sin conversión web. Wave instrumenta y opera; Efeonce Digital gobierna la decisión de growth. |
 | CRM implementado (Kortex) | Contenido AEO (Verk) | Kortex: CRM desplegado sin contenido que alimente pipeline. Verk: Surround Map vacío. |
 
 > Construir o mejorar el **Pulse Dashboard y sus triggers** es construir directamente el motor de expansión (Motor 1). Es de las features de mayor leverage comercial en Greenhouse.

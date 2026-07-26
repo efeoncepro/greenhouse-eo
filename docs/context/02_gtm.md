@@ -35,8 +35,8 @@ Cinco líneas. Cuatro son las unidades; la quinta (CRM Solutions) es transversal
 | **Growth & Strategy** | Efeonce Digital | Tailor + Evolve | Greenhouse + Verk |
 | **Creative & Content** | Globe | Express | Verk |
 | **Media & Distribution** | Reach | Amplify | Verk |
-| **Digital Infrastructure** | Wave | Transversal | Greenhouse |
-| **CRM Solutions** | Efeonce Digital (líder) + Wave | Tailor + Evolve | **Kortex** |
+| **Digital Engineering & Visibility** | Wave | Transversal | Greenhouse / Search Visibility 360 |
+| **CRM Solutions** | Efeonce Digital (líder) | Tailor + Evolve | **Kortex** |
 
 **Taxonomía comercial:** la relación separa **modelo de delivery** (Managed Squad, Staff Augmentation, Studio
 Access o híbrido por lanes), **forma de engagement** (On-Going, On-Demand o Sample Sprint) y, cuando aplica
@@ -70,7 +70,7 @@ Flywheel: licencia → implementación (Kortex) → managed ops (Greenhouse) →
 | **BP3 CEO / Gerente General** | Necesita justificar ante comité; busca evidencia y bajo riesgo. | **Greenhouse (sistema completo)** |
 | **BP8 Dir. Comercial** | Pipeline débil; marketing no alimenta ventas. | Kortex (CRM intelligence) |
 
-**ICP puerta de entrada estrella:** AEO / Visibilidad en IA (ciclo 2–4 sem, ticket bajo, trigger urgente, "caballo de Troya"). Ruta de expansión: AEO → SEO/contenido → CRM → GTM integral.
+**ICP puerta de entrada estrella:** AEO / Visibilidad en IA (ciclo 2–4 sem, ticket bajo, trigger urgente, "caballo de Troya"). Ruta de expansión: AEO → Search Visibility 360 → web/medición → CRM/GTM integral. Wave opera la visibilidad, web y measurement; Efeonce Digital/Kortex gobierna CRM.
 
 > Implicación de producto: el **CEO (BP3) elige por Greenhouse como sistema completo**. La demo de Greenhouse tiene que verse como un sistema serio y vivo, no como un MVP. Esto sube la vara de pulido y consistencia del portal.
 

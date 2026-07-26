@@ -1,12 +1,13 @@
 # Efeonce AEO Business Model V1
 
 > **Estado:** `Draft` — AEO es una wedge/capability, no la tesis completa de Efeonce.
-> **Owner:** Efeonce Digital + SEO/AEO + Strategy + Finance
+> **Owner:** Wave + SEO/AEO + Strategy + Finance
 
 ## Offer hypothesis
 
 Ayudar a una marca a mejorar su presencia, citabilidad y comprensión en respuestas generativas, conectado
-con search visibility, contenido, datos y medición. El alcance exacto, metodología, evidencia y límites deben
+con Search Visibility 360, contenido, datos y medición. Wave posee la oferta; Globe puede producir contenido,
+Reach puede aportar distribución y Efeonce Digital gobierna el contexto de growth/CRM cuando corresponda. El alcance exacto, metodología, evidencia y límites deben
 ser definidos antes de vender como modelo aprobado.
 
 ## Required model decisions

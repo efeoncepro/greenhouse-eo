@@ -18,14 +18,14 @@
 
 | Elemento | Tipo provisional | Entrada/valor | Estado del modelo |
 |---|---|---|---|
-| Efeonce Digital | Capability | estrategia, SEO/AEO, CRM, growth y medición | hypothesis / map |
+| Efeonce Digital | Capability | estrategia, growth, RevOps, CRM/Kortex y orquestación | hypothesis / map |
 | Globe / Creative Studio | Capability + posible product line | creatividad, contenido y operaciones creativas | see current model |
 | Reach | Capability | medios, PR y distribución | hypothesis / map |
-| Wave | Capability | web, infraestructura, tracking y automatización | hypothesis / map |
+| Wave | Productora/capability | Search Visibility 360, web para humanos/buscadores/agentes, measurement, sistemas de agentes y automatización/integraciones | draft; ver modelo propio |
 | Greenhouse | Platform/control plane | operación, cliente, métricas y memoria | runtime-dependent |
 | Kortex | Product/platform capability | CRM e inteligencia comercial | runtime-dependent |
 | Verk | Product/platform capability | contenido, distribución y data/AI tooling | runtime-dependent |
-| AEO / Search Visibility 360 | Wedge/capability | visibilidad en búsqueda clásica y generativa | separate model needed |
+| AEO / Search Visibility 360 | Wedge/capability | visibilidad en búsqueda clásica y generativa | Search Visibility 360 es el producto SEO+AEO 360 dentro de Wave; ver modelos propios |
 
 ## 3. Revenue architecture pendiente
 

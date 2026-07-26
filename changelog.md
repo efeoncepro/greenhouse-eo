@@ -7,6 +7,40 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-25 — Wave portfolio y boundaries documentados
+
+- Se formalizó Wave como marca de producto de Efeonce para cinco familias: Search Visibility 360, Web Experience 360,
+  Measurement & Analytics, Agent Systems & Platforms y Digital Automation & Integrations.
+- Se fijó que CRM/RevOps pertenece a Efeonce Digital/Kortex; Wave sólo entrega capas técnicas conectadas.
+- Se documentó la frontera con Globe (contenido/producción) y Reach (medios/distribución), manteniendo Efeonce como
+  masterbrand externa.
+- Canon: `docs/architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md` y
+  `docs/business-models/wave/WAVE_BUSINESS_MODEL_V1.md`.
+- Se separaron product service, delivery model, engagement, operating mode y composición del ecosistema; Wave puede
+  operar Managed Squad, Staff Augmentation y otros modelos sin cambiar el ownership de la oferta.
+
+## 2026-07-25 — Globe: el payload de browser deja de ser un string (ADR-014, foundation)
+
+`TASK-1556` cerrada. Nació `apps/studio-client` en `efeonce-globe` (Vite + React + React Router, SSR
+apagado) compilando a assets estáticos que sirve el **mismo** `studio-web`; host, BFF, sesión SSO, CSP por
+nonce, ALB y API privada sin tocar. Con el flag `client_app_enabled` en `false` **ningún comportamiento
+cambia**: es fundación, no superficie.
+
+Globe estrena SSOT de tokens con drift ledger, capa de copy locale-keyed, ESLint acotado (jsx-a11y +
+rules-of-hooks) y 3 gates de diseño como tests — los 6 verificados **mordiendo**. React Compiler activado.
+Las dos compuertas de la ADR cerraron verdes, así que el fallback a `vite@7.3.x` se retira.
+
+El share board, la única superficie que ve un cliente, se separó a `TASK-1558`: necesita dirección visual
+aprobada y no existe.
+
+## 2026-07-25 — Globe: `/assets/*` sale por CDN (TASK-1557)
+
+Carril CDN acotado a `/assets/*` sobre el ALB existente, aplicado y verificado en vivo con hits del
+edge. El backend del shell SSO conserva `enable_cdn = false` y el path matcher es un allowlist cuyo
+default apunta al backend sin caché: si una regla no matchea, el request cae hacia el lado seguro.
+La política de caché la sigue declarando el origen (`USE_ORIGIN_HEADERS`), para no crear una segunda
+fuente de verdad. Nada autenticado se cachea, verificado path por path.
+
 ## 2026-07-25 — Globe: /producer convertido a React y el bug que dejaba todo command inoperante
 
 - Header y composer de `/producer` convertidos 1:1 reutilizando `producerStyles` verbatim: selector de flota
@@ -1019,25 +1053,3 @@
 - La portada inicial fue reemplazada por la pieza aprobada `HI-YAAH!`: lluvia binaria, figura marcial y golpe de
   energía en formato `1200×630`. WordPress media `251552` quedó sincronizado como featured, Open Graph, Twitter
   y `primaryImage` del schema; caché purgada y readback público verificado.
-
-## 2026-07-25 — Globe: el payload de browser deja de ser un string (ADR-014, foundation)
-
-`TASK-1556` cerrada. Nació `apps/studio-client` en `efeonce-globe` (Vite + React + React Router, SSR
-apagado) compilando a assets estáticos que sirve el **mismo** `studio-web`; host, BFF, sesión SSO, CSP por
-nonce, ALB y API privada sin tocar. Con el flag `client_app_enabled` en `false` **ningún comportamiento
-cambia**: es fundación, no superficie.
-
-Globe estrena SSOT de tokens con drift ledger, capa de copy locale-keyed, ESLint acotado (jsx-a11y +
-rules-of-hooks) y 3 gates de diseño como tests — los 6 verificados **mordiendo**. React Compiler activado.
-Las dos compuertas de la ADR cerraron verdes, así que el fallback a `vite@7.3.x` se retira.
-
-El share board, la única superficie que ve un cliente, se separó a `TASK-1558`: necesita dirección visual
-aprobada y no existe.
-
-## 2026-07-25 — Globe: `/assets/*` sale por CDN (TASK-1557)
-
-Carril CDN acotado a `/assets/*` sobre el ALB existente, aplicado y verificado en vivo con hits del
-edge. El backend del shell SSO conserva `enable_cdn = false` y el path matcher es un allowlist cuyo
-default apunta al backend sin caché: si una regla no matchea, el request cae hacia el lado seguro.
-La política de caché la sigue declarando el origen (`USE_ORIGIN_HEADERS`), para no crear una segunda
-fuente de verdad. Nada autenticado se cachea, verificado path por path.

@@ -4,6 +4,8 @@
 
 Efeonce tiene cuatro plataformas de software propietario, en distinta madurez:
 
+> **Nota de portfolio:** Wave es una marca de producto/capability de servicios digitales, no una quinta plataforma de software dentro de esta tabla. Puede nombrarse como producto frente al cliente, siempre bajo la relación Efeonce. Su modelo y boundaries viven en [`Wave Business Model V1`](../business-models/wave/WAVE_BUSINESS_MODEL_V1.md).
+
 | Plataforma | Territorio | ICP | GTM | Estado |
 |---|---|---|---|---|
 | **Greenhouse** | Experiencia de cliente + operaciones internas | Clientes activos de servicio Efeonce | B2B directo (parte del servicio) | Operativo (~77% madurez ASaaS) |
@@ -28,6 +30,8 @@ Por qué importa: Greenhouse es el que **genera switching cost sistémico** y el
 
 CRM Intelligence Platform: captura estrategia en lenguaje natural → normaliza → compila manifests YAML → despliega en HubSpot vía API con trazabilidad. Capas: Schema Deployer, Workflow Deployer, UI Extensions (cards en HubSpot), Intelligence Layer (agente Claude), Portal Audit, Adopción por Hub.
 
+**Boundary con Wave:** Efeonce Digital/Kortex posee CRM y RevOps. Wave puede construir la web, instrumentación, integraciones o agentes conectados al CRM, pero no es owner de CRM enablement.
+
 **Lo que el agente de Greenhouse necesita saber:**
 - **Kortex → Greenhouse:** el progreso de implementación CRM y los KPIs de adopción por hub aparecen en la vista **Account 360** del cliente (vía API REST / BigQuery).
 - Tenant de Kortex = `portal_id` (HubSpot). Se vincula a Greenhouse con un mapping `portal_id → space_id`.
@@ -37,7 +41,7 @@ CRM Intelligence Platform: captura estrategia en lenguaje natural → normaliza 
 
 ## Verk — contexto (no es tu producto, pero conversa contigo)
 
-Content + Distribution Operating System. Donde la estrategia de distribución se convierte en contenido producido, aprobado, publicado y medido en ciclo continuo. Módulos: Surround Map™ (5 superficies × 4 capas), Brand Profiles, Content Calendar, Review + Approval, Tracking + Analytics, Diagnostics, SEO/AEO (AI citation tracking + entity authority), Verk Agent.
+Content + Distribution Operating System. Donde la estrategia de distribución se convierte en contenido producido, aprobado, publicado y medido en ciclo continuo. Módulos: Surround Map™ (5 superficies × 4 capas), Brand Profiles, Content Calendar, Review + Approval, Tracking + Analytics, Diagnostics y Verk Agent. Verk puede aportar superficies/datos de contenido y distribución a Search Visibility 360, cuyo servicio y ownership de SEO/AEO pertenecen a Wave.
 
 **Lo que el agente de Greenhouse necesita saber:**
 - **Verk → Greenhouse:** el **Surround Map** y el resumen del content calendar se exponen como **embed card** en el dashboard del cliente (vía API REST).
@@ -50,6 +54,8 @@ Content + Distribution Operating System. Donde la estrategia de distribución se
 ## Efeonce Globe — Creative Studio de producción agentic (plataforma hermana)
 
 Capability para dirigir y operar generación de imagen, video, audio y extensiones futuras mediante templates, referencias, assets, review y crédito gobernado. Nace con una superficie UI y una superficie MCP/agente sobre el mismo contrato; no es una galería de prompts ni un módulo de Greenhouse.
+
+**Boundary con Wave:** Globe posee la producción de contenido y assets creativos. Wave puede consumir esos outputs para Search Visibility 360, web o sistemas de agentes; no absorbe la identidad ni el ownership de Globe.
 
 La interfaz primaria habla el lenguaje de una persona creativa: brief, referencias, tratamiento, candidatos, variantes, feedback y aprobación. El sistema compila esas decisiones en un workflow ejecutable; no exige diseñar nodos ni conocer providers. Un canvas técnico queda como authoring avanzado cuando la evidencia lo justifique.
 

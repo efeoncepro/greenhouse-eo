@@ -19,6 +19,10 @@ description: >-
 
 # SEO/AEO Practice — el negocio, no el oficio
 
+> **Portfolio owner:** Search Visibility 360 es una familia de servicios productizados de Wave dentro de Efeonce.
+> Esta skill gobierna el negocio de SEO/AEO; sus boundaries con web, measurement, Globe, Reach y CRM están en
+> [`EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md`](../../docs/architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md).
+
 Esta skill opera **el negocio de vender SEO/AEO**. No enseña a hacer SEO.
 
 - ¿*"Cómo hago citable esta página / qué schema uso / cómo audito el sitio"*? → **`seo-aeo`** (el oficio).

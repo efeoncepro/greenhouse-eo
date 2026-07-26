@@ -106,14 +106,14 @@ Regla de marca: Nexa nunca debe presentarse como "asistente virtual" genérico n
 
 Una sola marca lidera toda la comunicación externa. Las antiguas sub-marcas se reposicionan como **capabilities** (áreas de expertise internas), no marcas independientes.
 
-> *El cliente contrata a Efeonce. No contrata a Globe + Reach + Wave por separado. Una marca, un sistema, múltiples capacidades.*
+> *El cliente contrata a Efeonce. Wave puede nombrar el producto/capability que se entrega, pero el cliente no contrata a Globe + Reach + Wave como proveedores separados. Una marca relacional, productos reconocibles, un sistema.*
 
 | Nivel | Elemento | Rol |
 |---|---|---|
 | **Masterbrand** | **Efeonce** | La única marca que se construye activamente. Todo el brand building va aquí. |
 | Capability 1 | Creatividad y Contenido (Globe) | Motor creativo: identidad, contenido, campañas, audiovisual. |
 | Capability 2 | Amplificación y Medios (Reach) | Media buying, distribución, PR. |
-| Capability 3 | Infraestructura Digital (Wave) | Web, CRM, automatización, tracking, data. |
+| Producto/capability 3 | Wave — Ingeniería Digital, Visibilidad y Sistemas de Agentes | Search Visibility 360, web para humanos/buscadores/agentes, measurement, agentes, integraciones y automatización. CRM permanece en Efeonce Digital/Kortex. |
 | Sub-marca endorsed | **Globe Studio \| Efeonce** | Única excepción con identidad propia. Punto de entrada al sistema. |
 
 > Implicación de producto: la **vista interna (Agency) de Greenhouse** sí organiza por unidades (Globe, Reach, Wave) porque refleja la operación; la **experiencia de cara al cliente** debe liderar con "Efeonce" como marca única. No expongas la estructura de capabilities como si fueran proveedores separados al cliente.
@@ -129,7 +129,7 @@ Tagline master: **Empower your Growth**. La palabra final rota según la capabil
 | **Empower your Growth** | Efeonce como ecosistema completo (default). Web, LinkedIn corporativo, propuestas integrales, firma de email. |
 | **Empower your Brand** | Lidera creatividad/contenido. |
 | **Empower your Voice** | Lidera medios/amplificación. |
-| **Empower your Engine** | Lidera web/CRM/infraestructura (= contexto típico de Greenhouse/Wave). |
+| **Empower your Engine** | Lidera web, visibilidad, measurement, agentes e infraestructura digital (= contexto típico de Wave). CRM se lidera desde Efeonce Digital/Kortex. |
 
 **Línea de compromiso para la capability creativa:** *“Automatizamos lo repetible para potenciar lo irrepetible.”* Funciona como principio/manifesto de Creative Studio, no reemplaza el tagline master **Empower your Growth** ni debe prometer automatización total. Siempre debe aterrizarse en su mecanismo: fricción y repetición al sistema; exploración, criterio y aprobación a las personas.
 

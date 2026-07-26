@@ -3,6 +3,19 @@
 > Cabina de mando para continuidad inmediata. No es changelog, arquitectura ni memoria completa.
 > Ventana máxima: 20 sesiones. Historia íntegra e índice: [Handoff.archive.md](Handoff.archive.md).
 
+## 2026-07-25 (4) — Wave portfolio y boundaries documentados
+
+Se formalizó Wave como marca de producto de Efeonce con cinco familias: Search Visibility 360, Web Experience
+360, Measurement & Analytics, Agent Systems & Platforms y Digital Automation & Integrations. CRM/RevOps queda en
+Efeonce Digital/Kortex; Globe conserva contenido/producción; Reach conserva medios/distribución. Canon:
+`docs/architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md` y
+`docs/business-models/wave/WAVE_BUSINESS_MODEL_V1.md`. Pricing, claims, costos y aprobación comercial siguen
+pendientes; no hay rollout runtime.
+
+La cartera de Wave separa ahora product service de delivery model: una misma oferta puede operar como Productized
+Service, Managed Squad, Staff Augmentation, Implementation, Advisory o Platform-enabled Service, y componerse con
+otras capabilities del ecosistema bajo RACI/SOW explícitos.
+
 ## 2026-07-25 (3) — Globe: /producer convertido a React, y la razon por la que NINGUN command funcionaba
 
 **Runtime:** `globe-studio-internal` y `globe-api-internal` desplegados al mismo SHA. Dueña de la superficie:

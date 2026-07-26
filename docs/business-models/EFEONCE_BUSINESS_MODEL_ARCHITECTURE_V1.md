@@ -116,7 +116,8 @@ Ejemplos actuales:
 | Modelo | Naturaleza | Por qué merece análisis propio |
 |---|---|---|
 | AEO | Wedge/capability | buyer, metodología, métricas y ruta de expansión propias |
-| Search Visibility 360 | Capability/product line en construcción | combina search clásica, visibilidad generativa, data, contenido y tooling |
+| Search Visibility 360 | Capability/product line en construcción dentro de Wave | combina SEO, AEO, arquitectura de entidades, intelligence, medición y operación; Globe aporta contenido cuando corresponde |
+| Wave | Productora/capability en construcción | web para humanos/buscadores/agentes, Search Visibility 360, measurement, Agent Systems & Platforms y automatización/integraciones |
 | Creative Studio | Capability/product line | squads, créditos, derechos, providers, autoría y modos operativos propios |
 | CRM/Kortex | Capability/producto | implementación, licencias, managed ops e inteligencia tienen economics distintos |
 | Greenhouse | Plataforma/control plane | habilita operación, memoria, visibilidad y switching cost; no se declara SaaS por existir |
@@ -346,6 +347,7 @@ La arquitectura está definida, pero no todos los modelos están aprobados:
 - Growth Platform: `Draft`.
 - AEO: `Draft`.
 - Search Visibility 360: `Draft`.
+- Wave: `Draft`; boundaries aceptados en [ADR Wave Portfolio Boundaries](../architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md).
 - Creative Studio: `Approved for validation` según su modelo vigente.
 - Studio Credits: política económica propia, sin precio público self-serve aprobado.
 

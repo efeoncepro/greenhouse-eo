@@ -35,10 +35,10 @@ Loop Marketing es el framework estratégico (impulsado por HubSpot como sucesor 
 | Fase | Pregunta | Unidad | Qué hace |
 |---|---|---|---|
 | **EXPRESS** | ¿Quiénes somos y para quién? | Globe | Identidad, voz, concepto creativo, KVs, campañas, contenido full-funnel. |
-| **TAILOR** | ¿Cómo personalizamos? | Efeonce Digital | CRM, comportamiento, intención, SEO/AEO, AI agents, landing pages dinámicas. |
+| **TAILOR** | ¿Cómo personalizamos? | Efeonce Digital | CRM, comportamiento, intención, growth y soluciones comerciales; Wave implementa las capas web, de medición o agentes cuando el scope lo requiere. |
 | **AMPLIFY** | ¿Dónde nos encuentran? | Reach | Medios ATL, pauta digital, PR, influencers, AEO (LLMs), dark channels. |
-| **EVOLVE** | ¿Cómo mejoramos cada ciclo? | Efeonce Digital | A/B, analytics, AI citations tracking. Los insights alimentan el siguiente Express. |
-| **TRANSVERSAL** | ¿Qué lo hace posible? | Wave | Web performance, tracking, DSP/DMP/CDP, schema, automatización, web agéntica. |
+| **EVOLVE** | ¿Cómo mejoramos cada ciclo? | Efeonce Digital + Wave | Efeonce Digital gobierna la decisión de negocio; Wave instrumenta analytics, search intelligence y sistemas de medición. |
+| **TRANSVERSAL** | ¿Qué lo hace posible? | Wave | Search Visibility 360, web para humanos/buscadores/agentes, tagging, analytics, schema, Agent Systems & Platforms y automatización. |
 
 - **Nested Loops™** — metodología propietaria para *operar* Loop Marketing.
 - **Surround Discovery™** incluye el motor **S⁴: SENSE → SHAPE → SURFACE → SOLVE**. **SOLVE es una etapa de Surround Discovery™, no una metodología independiente.**
@@ -49,12 +49,12 @@ Loop Marketing es el framework estratégico (impulsado por HubSpot como sucesor 
 
 | Unidad | Claim | Fase Loop | Especialidad |
 |---|---|---|---|
-| **Efeonce Digital** | *Empower your Growth* | Tailor + Evolve | Núcleo estratégico y digital. GTM, RevOps, CRM, SEO/AEO, redes, pauta, analytics, Martech, AI agents. **Orquesta las demás unidades.** |
+| **Efeonce Digital** | *Empower your Growth* | Tailor + Evolve | Núcleo estratégico y digital. GTM, RevOps, CRM, Kortex, estrategia comercial y orquestación de las demás capabilities. |
 | **Globe** | *Empower your Brand* | Express | Branding, creatividad, contenido full-funnel, producción audiovisual (Globe Studio), campañas ATL/BTL, copywriting. Opera bajo Creative Supply Chain + ICO. |
 | **Reach** | *Empower your Voice* | Amplify | Planificación/compra de medios ATL y digital, PR, influencers. Opera bajo Surround Strategy™. |
-| **Wave** | *Empower your Engine* | Transversal | Infraestructura digital, web performance, tracking, DSP/DMP/CDP, integraciones, automatización. Metodología: **IDD (Intelligence-Driven Development)**. Prepara la web agéntica. |
+| **Wave** | *Empower your Engine* | Transversal | Productora de Search Visibility 360, web para humanos/buscadores/agentes, measurement, Agent Systems & Platforms, integraciones y automatización. Metodología: **IDD (Intelligence-Driven Development)**. |
 
-**La línea para distinguir IA por unidad:** si la IA decide *qué hacer para el negocio* → Efeonce Digital. Si optimiza *cómo funciona el motor técnico* → Wave. Si gobierna y acelera *la producción creativa* → ICO dentro de Globe.
+**La línea para distinguir IA por unidad:** si la IA decide *qué hacer para el negocio* → Efeonce Digital. Si Wave diseña/construye/opera *el sistema técnico o agente* → Wave. Si gobierna y acelera *la producción creativa* → Globe/ICO. CRM/RevOps permanece en Efeonce Digital/Kortex.
 
 ---
 
