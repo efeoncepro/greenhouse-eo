@@ -340,6 +340,58 @@ resultante por combinación `quality × aspectRatio`, como ya hace video. Sin es
 decidir si una pieza sirve para el entregable. Dueño natural: **`TASK-1553`** (catálogo multi-modelo extensible)
 o el dueño del contrato de catálogo. Mientras no exista, la UI lo declara como faltante en vez de rellenarlo.
 
+## Delta 2026-07-27 (5) — ritmo vertical medido + las 4 regresiones que YA se cometieron
+
+Prototipado en browser real. Se registran los valores y los modos de falla **para que no se repitan**: cada uno
+costó una iteración y todos son reproducibles.
+
+### Contrato de ritmo vertical (medido, no estimado)
+
+| Relación | Valor | Nota |
+|---|---:|---|
+| Entre bloques del composer (`gap` del scroll) | **30 px** | a 17 px el operador lo reportó como *«todo muy apretado»* — **17 px es el piso que NO se debe usar** |
+| Título de bloque → su contenido | **13,6 px** | a 8,8 px el título se lee pegado |
+| Riel → último bloque | `padding-top` propio | sin él, el CTA se lee como parte del formulario |
+| Chip de formato | `min-height: 54px` | a 46 px con dos líneas de copy el texto se ahoga |
+| Control (`.opt`) | `min-height: 40px` | 34 px queda por debajo del target táctil |
+
+⚠️ **Regla de método que originó esto:** se comprimió seis veces seguidas persiguiendo que todo entrara sin
+scroll. **Era la prioridad equivocada** — el panel tiene scroll propio por diseño y el riel está anclado, así que
+lo único que debe estar siempre visible es el gasto. **NUNCA sacrificar el ritmo vertical para evitar scroll
+interno.**
+
+### 🔴 Las 4 regresiones cometidas en el prototipo
+
+1. **`max-height` en un chip con dos líneas → el contenido se sale.** Un glifo de proporción quedó 4 px por
+   encima de su chip. **Nunca acotar la altura de un control cuyo contenido es variable**; usar `min-height`.
+2. **`.estimate-rail > div` tiene CUATRO reglas en la hoja legacy, dos con `!important` forzando `display:grid`.**
+   Cualquier `div` nuevo dentro del riel hereda la grilla y se desarma. Solución aplicada: **cambiar de elemento**
+   (dejó de ser `div`), no pelear especificidad — una guerra de `!important` es deuda garantizada.
+3. **Meter "Cuántas" dentro del riel lo hizo crecer a 3 filas y tapó el bloque de formato.** El riel es **sólo
+   dinero**: saldo + CTA. Toda decisión de forma vive arriba, aunque multiplique el costo.
+4. **Hardcodear `1 · 2 · 4` en cantidad.** El máximo lo declara la ruta (`count.min/max`) y varía: 7 rutas
+   permiten 4, **4 rutas permiten sólo 1**. Regla derivada, implementada y verificada:
+   - `max === 1` → **la fila no se renderiza** (la ruta no ofrece la decisión)
+   - `max <= 4` → un chip por valor
+   - `max > 4` → chips de atajo (`1 · 2 · 4 · max`) **+ campo para el valor exacto**, visualmente distinto del chip
+
+   Es el tercer caso del mismo error (medida en píxeles · nombres de calidad · cantidad): **hardcodear en la UI
+   lo que el catálogo declara.** El composer legacy ya lo hacía bien (`route.constraints.count` en su input); lo
+   pobre era la presentación, no la fuente.
+
+### 🔴 Bug de datos del catálogo (no es de UI)
+
+Existe una ruta con **`count: { min: 4, max: 1 }`** — mínimo mayor que máximo. Ningún rango válido es posible y
+rompe cualquier consumidor que confíe en él. Reportar al dueño del catálogo (**`TASK-1553`**); la UI debe
+degradar a "sin opción" en vez de renderizar un control imposible.
+
+### Lección de verificación
+
+Se midió altura, `scrollWidth` y visibilidad del CTA — **y todo daba verde mientras el layout estaba roto**. La
+métrica que faltaba es la de **contención**: para cada descendiente, comprobar que su rect esté dentro del rect
+de su contenedor (arriba, abajo y a los lados). Sin eso, un `overflow: visible` deja hijos fuera sin que ninguna
+métrica de página lo note. **Agregar esa aserción al canary de la superficie.**
+
 ## Summary
 
 Recomponer el composer de Globe Producer para que una sola intención creativa domine el first fold: `prompt → dirección → output shape → generar`. Las capacidades avanzadas permanecen disponibles mediante progressive disclosure, sin duplicar el costo ni contradecir `TASK-1532`.
