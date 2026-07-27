@@ -1,0 +1,4 @@
+interface:
+  display_name: "Efeonce Brand Studio"
+  short_description: "Estrategia y gobierno de marca"
+  default_prompt: "Usa $efeonce-brand-studio para diagnosticar, posicionar y gobernar una marca con métricas y evidencia."
