@@ -385,6 +385,21 @@ Existe una ruta con **`count: { min: 4, max: 1 }`** — mínimo mayor que máxim
 rompe cualquier consumidor que confíe en él. Reportar al dueño del catálogo (**`TASK-1553`**); la UI debe
 degradar a "sin opción" en vez de renderizar un control imposible.
 
+### 🔴 Regresión 5 — renombrar clases también CORTA lo que sí se quería heredar
+
+Se renombraron las clases nuevas con prefijo `pc-*` para escapar de las colisiones… y con eso el prompt
+**perdió su glow**: `.prompt-field` del legacy trae `:hover` y `:focus-within` con borde encendido,
+`box-shadow: 0 0 0 1.5px rgba(77,184,255,.55)` + halo proyectado, y `transition` de **220 ms** sobre
+`border-color`, `box-shadow` y `background-color`. El operador lo detectó de inmediato.
+
+**Las cuatro colisiones anteriores eran el legacy pisando lo nuevo. Ésta es la inversa:** renombrar te salva de
+lo que estorba y te desconecta de lo que sirve. **Consecuencia dura para el Slice 0: es un movimiento consciente
+regla por regla, NUNCA un renombrado masivo.** El inventario de las 84 clases debe marcar, para cada una, si se
+hereda, se reescribe o se retira — y el glow es el ejemplo de que "se hereda" no es el caso raro.
+
+⚠️ Al internalizar, **conservar el efecto y agregarle su corte de `prefers-reduced-motion`**, que el original no
+declara.
+
 ### Lección de verificación
 
 Se midió altura, `scrollWidth` y visibilidad del CTA — **y todo daba verde mientras el layout estaba roto**. La
