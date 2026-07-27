@@ -506,6 +506,9 @@ Reglas obligatorias:
 - `docs/tasks/TASK_UI_UX_ADDENDUM.md`
 - `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`
 - `docs/ui/GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md`
+- **`docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md`** — ⭐ **referencia consolidada de estilo**: cada
+  región con su geometría, valores exactos, estados y comportamiento. Escrita para **traducir, no interpretar**;
+  independiente del motor de estilos (sirve igual en CSS o Tailwind). **Empezar por acá al implementar.**
 - `docs/ui/visual-directions/TASK-1552-globe-producer-composer-focused-creation.md`
 - `docs/ui/wireframes/TASK-1552-globe-producer-composer-focused-creation.md`
 

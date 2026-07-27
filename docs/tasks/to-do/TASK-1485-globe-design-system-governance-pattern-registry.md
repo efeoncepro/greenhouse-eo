@@ -49,6 +49,10 @@ de CSS global sin scope con dos hojas conviviendo.
 - Migrar superficie por superficie, con **diff visual contra el render anterior** en cada una. Nunca big-bang.
 - Orden propuesto: composer (el que duele) → feed → viewer → share.
 
+**Referencia para la migración:** [`GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md`](../../ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md)
+consolida geometría, valores exactos, estados, motion, iconografía y asertos del composer. Está escrita para que
+la reescritura sea **traducción mecánica**, no reinterpretación — y es independiente del motor de estilos.
+
 **Lo que destraba:** el Slice 0 de `TASK-1552` se retira —mover 272 reglas que se van a reescribir es trabajo
 desechable— y `TASK-1560` se destraba por el mismo camino.
 
