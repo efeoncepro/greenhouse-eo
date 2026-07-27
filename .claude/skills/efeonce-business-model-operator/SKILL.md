@@ -28,3 +28,5 @@ exceptions.
 For partner/provider portfolio decisions, load the canonical skill's `Portfolio de partners y providers` section:
 classify relationships as strategic core, creative capability, execution enabler or experiment, and require offer,
 owner, economics, contract, rights, support, fallback and demand evidence before increasing priority.
+The transversal commercial contract is `docs/business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md`;
+it also separates license/access, advisory, implementation, managed operations, Product Services and Efeonce IP.

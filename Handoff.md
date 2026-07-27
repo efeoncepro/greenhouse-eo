@@ -1,5 +1,16 @@
 # Handoff activo
 
+## 2026-07-26 — Partner & Provider Layer transversal
+
+Se formalizó [`EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md`](docs/business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md):
+partnerships y providers son una capa habilitante transversal, no una línea de negocio ni una colección de logos. El
+modelo separa licencia/acceso, advisory, implementación, managed operations, Product Services e IP propia, y exige
+provider-neutral/provider-transparent, estado contractual, economics, derechos, soporte, fallback y evidencia de demanda.
+
+Se sincronizaron arquitectura de portfolio, business models, GTM, context pack y skills de Efeonce/HubSpot. El registro
+de postulaciones continúa en `docs/audits/commercial/AI_PARTNER_PROGRAM_APPLICATIONS_2026-07-26.md`; una postulación enviada
+no se presenta como partnership aprobado. Estado: `Approved for validation`; no cambia runtime ni habilita pricing público.
+
 ## 2026-07-26 — Brochures HubSpot absorbidos como input de RevOps & CRM
 
 Se revisó el brochure principal de Efeonce x HubSpot de octubre de 2025 y las versiones históricas de 2024/2025.

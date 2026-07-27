@@ -303,6 +303,19 @@ fechada de postulaciones vive en `docs/audits/commercial/AI_PARTNER_PROGRAM_APPL
 No ampliar el portafolio por acumulación de logos. Un partner sube de prioridad sólo cuando existe una oferta,
 owner, economics, ruta contractual y evidencia de demanda; si no, permanece como experimento o capability opcional.
 
+### Cómo se vende una relación de partner/provider
+
+La capa de partnerships es transversal a las líneas de Efeonce. No la presentes como otra business line ni como una
+colección de logos. Efeonce puede capturar valor mediante licencia/acceso cuando los términos lo permiten, advisory,
+implementación, integración, managed operations, Product Services e IP propia. La regla comercial es
+**provider-neutral, provider-transparent**: el cliente compra el sistema, método y operación de Efeonce; el provider
+se declara con sus datos, costos, límites, derechos y fallback.
+
+El contrato canónico y el mapa de composición viven en
+`docs/business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md`; el estado de postulaciones y programas
+vive en `docs/audits/commercial/AI_PARTNER_PROGRAM_APPLICATIONS_2026-07-26.md`. Una postulación enviada, una cuenta
+creada o una capability disponible no equivale a partnership aprobado, reseller rights o co-selling habilitado.
+
 ### Regla de economics para providers de IA
 
 Para cada capability separar `prototype`, `production-scale` y `fallback`. Fal puede funcionar como gateway de

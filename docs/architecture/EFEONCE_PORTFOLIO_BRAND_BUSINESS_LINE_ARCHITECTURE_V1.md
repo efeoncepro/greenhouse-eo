@@ -21,6 +21,10 @@ Efeonce (umbrella/masterbrand)
 The customer may recognize a product brand, but the commercial relationship, contract and accountability remain
 with Efeonce unless an approved contract explicitly states otherwise.
 
+Partnerships and providers are a transversal enablement layer, not a peer business line or a collection of logos. They
+may enable licensing, advisory, implementation, managed operations or product services; the provider does not replace
+Efeonce's relationship, method or accountability. Canon: [`Efeonce Partner & Provider Layer Operating Model V1`](../business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md).
+
 ## 2. Vocabulary
 
 | Layer | Meaning | Example |
@@ -32,6 +36,7 @@ with Efeonce unless an approved contract explicitly states otherwise.
 | **Product service / offer** | Specific thing the customer buys, with scope, outcome, evidence and boundaries | RevOps Managed; Brand System; Search Visibility 360; Managed Media |
 | **Delivery model** | How the offer is delivered and who owns the outcome | Productized Service; Managed Squad; Staff Augmentation; Implementation; Advisory |
 | **Engagement** | Duration and commercial cadence | On-Going; On-Demand; Sample Sprint |
+| **Partner / provider layer** | External relationship that enables an offer through technology, access, distribution, co-selling, certification or capability | HubSpot; OpenAI; Claude; Microsoft; AWS; Adobe; Salesforce |
 
 “Agencia creativa”, “agencia digital” and “agencia de medios” remain useful market language, but the canonical
 portfolio taxonomy uses **Creative Services**, **Digital Services & Engineering**, and **Media & Distribution**
@@ -49,6 +54,10 @@ as business lines. They are not separate masterbrands or contractual agencies.
 
 This map is a portfolio routing contract, not a claim that every listed brand is a separate legal entity, vendor or
 provider. Product ownership, delivery ownership and contractual ownership must remain explicit per offer.
+
+Providers and partnerships must be classified separately from Efeonce brands. A provider can enable multiple lines;
+an approved commercial partnership can add referral, reseller, co-selling or marketplace economics, but neither status
+automatically creates a product brand or a business line.
 
 ## 4. Brand and contract rules
 

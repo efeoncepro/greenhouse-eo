@@ -121,6 +121,22 @@ Validado por datos del CRM: win rate ~50% en cuentas existentes vs. 2–3% en ne
 - **Kortex** es la pieza que convierte el partnership en ventaja técnica: deployment programático sobre HubSpot, rumbo al HubSpot Marketplace (B2B2B hacia agencias).
 - Portal HubSpot de Efeonce: **48713323**. Owner IDs: Julio `75788512`, Luis (BDR) `86856220`. Greenhouse sincroniza companies/contacts con este portal vía Account 360.
 
+## Partner & Provider Layer
+
+Los partnerships y providers habilitan todas las líneas de Efeonce, pero no son líneas de negocio ni una colección de
+logos. Efeonce vende licencias o acceso cuando los términos lo permiten; también vende advisory, implementación,
+integración, managed operations, Product Services e IP propia. La relación debe clasificarse como partnership comercial,
+provider tecnológico, capability partner, enterprise rail o experimento.
+
+La regla es **provider-neutral, provider-transparent**: el cliente compra el sistema, el método y la operación de
+Efeonce; se declara qué plataforma participa, qué dependencia introduce y cuál es el fallback. El modelo canónico,
+economics y gates están en [`EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md`](../business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md).
+
+El mapa vigente prioriza HubSpot para licencias/RevOps; OpenAI, Claude y Google Cloud/Vertex AI como núcleo de
+inteligencia y delivery enterprise; Microsoft AI Cloud y AWS como rails según el cliente; Adobe y Salesforce como
+plataformas enterprise complementarias; Lovable como acelerador de prototipado; y Runway, FLUX, ElevenLabs y BytePlus
+como capabilities creativas. El estado de una postulación o programa no equivale a aprobación comercial.
+
 ---
 
 ## Proceso de venta (es una demostración del loop, no un pitch)

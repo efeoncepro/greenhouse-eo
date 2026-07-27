@@ -30,6 +30,9 @@ La definición transversal de oferta, productización, delivery model, operating
 [`Efeonce Product Service Operating Model V1`](EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md). Los modelos de cada
 línea deben referenciarlo y declarar sus diferencias; no deben redefinir `Product Service` localmente.
 
+La capa transversal que gobierna partners, providers, licencias, pass-through, co-selling, capability enablement y
+captura de valor vive en [`Efeonce Partner & Provider Layer Operating Model V1`](EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md).
+
 ## Fronteras con las demás categorías
 
 | Categoría | Pregunta que responde | No debe contener como canon |
@@ -136,5 +139,6 @@ Todo business model debe separar al menos estas dimensiones:
   `Approved for validation`; incorpora la doctrina de autoría humana y mantiene B2B2B como hipótesis gateada.
 - [Studio Credits](creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md) — política económica V1,
   todavía sin precio público ni venta self-serve.
+- [Efeonce Partner & Provider Layer V1](EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md) — `Approved for validation`; modelo transversal para relaciones comerciales y tecnológicas, sin declarar por sí solo partnerships aprobados ni pricing.
 - [Creative Studio Skill Adoption Matrix](creative-studio/EFEONCE_CREATIVE_STUDIO_SKILL_ADOPTION_V1.md) —
   cobertura de skills, fronteras de ownership, validación y dominios auditados sin cambio.

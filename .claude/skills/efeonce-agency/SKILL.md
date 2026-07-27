@@ -9,6 +9,11 @@ description: Contexto de negocio, marca, GTM y modelo ASaaS de Efeonce Group (la
 
 Esta skill es el **router + doctrina destilada** del context pack de negocio de Efeonce Group. Su trabajo: que cualquier agente (Claude o Codex) entienda *para qué existe Greenhouse en el negocio* antes de tocar producto, copy, métricas o estrategia, y sepa **qué archivo canónico leer** según la tarea.
 
+La capa de partnerships y providers es transversal al portfolio: Efeonce puede vender licencias cuando los términos lo
+permiten, pero también advisory, implementación, operación, Product Services e IP propia. Para clasificar un partner o
+provider carga [`EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md`](../../docs/business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md);
+no confundas provider, partnership aprobado, product brand ni línea de negocio.
+
 **Fuente de verdad = `docs/context/` (archivos `00`–`14`).** Esta skill NO los reemplaza: los resume y enruta. Ante cualquier conflicto, mandan los docs `docs/context/*` y, sobre arquitectura/runtime/contratos, manda el contrato técnico verificado (regla del `CLAUDE.md`). Empezar siempre por `docs/context/00_INDEX.md`.
 
 ---

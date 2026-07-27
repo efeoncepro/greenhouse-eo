@@ -22,6 +22,10 @@ Esta skill opera **el negocio HubSpot de Efeonce**, no el CRM interno de Efeonce
 Si la pregunta es "cómo configuro una property en nuestro portal" → `hubspot-ops`.
 Si la pregunta es "cómo vendemos, implementamos, retenemos o expandimos HubSpot en un cliente" → acá.
 
+HubSpot es el caso de referencia de una relación donde pueden coexistir licencia/referral, implementación, Managed CRM
+Ops, CRM Intelligence y expansión. El contrato transversal para separar licencia, pass-through, margen, delivery e IP
+propia vive en `docs/business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md`.
+
 ## Taxonomía comercial vigente
 
 La práctica se presenta como **Efeonce → RevOps & CRM → Kortex (cuando aplica) → HubSpot (plataforma/provider)**.
