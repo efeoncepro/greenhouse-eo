@@ -6,23 +6,23 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `interaction`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1555-globe-producer-model-selector.md`
 - Flow: `none`
 - Motion: `docs/ui/motion/TASK-1555-globe-producer-model-selector-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Diseño`
+- Status real: `IMPLEMENTADO Y VERIFICADO EN RUNTIME (2026-07-27). El selector vive en apps/studio-client/src/surfaces/producer/composer/ProducerComposer.tsx:1128-1194 como desplegable compacto (details + listbox) con isotipo real y fallback a monograma — NO la galeria, que fue rechazada por el operador. Los 5 markers producer-model-* estan vivos. Canary con flota de 4 modelos ejercitando available/gated/blocked/monograma, verde a 1440/390/320 y bajo reduced-motion. Los criterios de abajo se reescribieron porque describian la galeria rechazada`
 - Rank: `TBD`
 - Domain: `creative|ui|product`
-- Blocked by: `TASK-1554`
+- Blocked by: `none`
 - Branch: `task/TASK-1555-globe-producer-model-selector`
 - Legacy ID: `none`
 
@@ -213,14 +213,38 @@ Ver wireframe §4 (contrato completo). Estados: default/loading (skeleton, nunca
 
 ### GVC scenario plan
 
-- Scenario file: `../efeonce-globe/apps/studio-web/scripts/producer-gvc-fixture.mjs` (nuevo escenario `task-1555-model-selector`).
-- Route: `/producer?gvc=task-1555-model-selector`.
-- Viewports: `1440×1000`, `390×844`. Quality profile: `premium`.
-- Required captures: galería con available+gated+blocked, recomendado ✦, selección, modalidades Image/Video/Audio, empty, mobile.
-- `data-capture` markers: `producer-route`, `producer-model-grid`, `producer-model-card`, `producer-model-recommended`.
-- Assertions: cero slug/costo/margen en el DOM; una sola selección; `gated`/`blocked` no ejecutables; `scrollWidth === clientWidth` desktop y 390px.
-- Review dossier: `.captures/<run>/review/`.
-- Baseline decision / surface ID: `globe.creative-producer-surface` tras aceptación de first fold.
+> ⚠️ **Reescrito 2026-07-27 contra el runtime.** La versión anterior apuntaba al fixture del **payload legacy**
+> (`apps/studio-web/scripts/producer-gvc-fixture.mjs`) y declaraba markers de la **galería rechazada**
+> (`producer-model-grid`, `producer-model-card`) que **no existen**. La superficie vive en `studio-client` y
+> Globe corre sus propios canaries con Playwright.
+
+- Scenario file: `../efeonce-globe/apps/studio-client/scripts/producer-composer-canary.mjs` (servidor con
+  fixture) + `producer-composer-browser-canary.mjs` (asertos), registrados en el script `test` del paquete.
+- Route: `http://127.0.0.1:4324/producer`, bundle real + shell real + CSP real + `producerStyles` como
+  producción.
+- Viewports: `1440×1000`, `390×844` **y `320×844`**, más una pasada con `prefers-reduced-motion: reduce`.
+  Quality profile: `premium`.
+- **Desktop evidence:** `.captures/task-1552-composer/model-selector-1440.png` (+ `first-fold-1440.png`).
+- **390px mobile evidence:** `.captures/task-1552-composer/model-selector-390.png` (+
+  `model-selector-390-reduce.png` y `first-fold-390.png`).
+- Evidencia adicional a 320 px: `model-selector-320.png` — a 320 el menú es donde primero desborda.
+- **`data-capture` markers medidos contra el runtime** (no inventados): `producer-model-picker`,
+  `producer-model-trigger`, `producer-model-list`, `producer-model-option`, `producer-model-recommended`.
+- Fixture: flota de imagen de **4 rutas**, cada una para ejercitar un estado — `available` + recomendado
+  (isotipo ByteDance), `available` de otra casa (isotipo Gemini), `gated` («Próximamente», isotipo OpenAI) y
+  `blocked` **sin isotipo** para el fallback a monograma. Con una sola ruta no había estado que probar.
+- Assertions: apertura **por teclado** (Enter sobre el trigger); `Tab` entra a la lista y la opción enfocada
+  tiene anillo visible; 4 opciones con `gated`=1 y `blocked`=1 visibles; lo no ejecutable con `aria-disabled`
+  y **cero** `disabled`; razón **en texto** en toda opción no disponible; recomendado marcado una sola vez;
+  target táctil ≥44 px en toda opción; sin modelos de otra modalidad; cero `routeId` en texto visible.
+- **Scroll-width evidence:** `document.documentElement.scrollWidth === clientWidth` **con el menú abierto** a
+  1440 / 390 / 320, más contención del rect de la lista dentro del viewport.
+- **Review dossier:** `docs/ui/reviews/TASK-1555-globe-producer-model-selector.scorecard.json` — `PASS`,
+  `average=4.54`, `floor=4.2` (`pnpm ui:quality --task TASK-1555`). Puntuado contra el **desplegable**, no la
+  galería: su propio texto mide *«la región pasó de 515px (galería) a 121px»*.
+- **Baseline decision / surface ID:** `globe.creative-producer-surface`. El baseline vigente son las capturas
+  de arriba, tomadas **con la hoja del legacy inyectada**. ⚠️ Las anteriores al 2026-07-27 16:30 no son
+  baseline de nada: el canary servía la superficie **sin estilos** y sus asertos daban verde igual.
 
 ### Design decision log
 
@@ -600,25 +624,64 @@ Sin flag nueva — cambio aditivo de UI internal-only sobre una superficie exist
 
 - [ ] `Execution profile: ui-ux`, `UI impact: interaction`, `UI ready: no` hasta completar mapping/GVC/decision log; al pasar a `yes`, `pnpm task:lint --task TASK-1555` sin findings.
 - [ ] Existe `docs/ui/wireframes/TASK-1555-globe-producer-model-selector.md` y pasa `pnpm ui:wireframe-check --task TASK-1555`.
-- [ ] La región `producer-route` renderiza una galería data-driven desde `globe.producer.fleet.list` (no placeholder estático).
-- [ ] Cada tarjeta muestra `model` público (nombre+versión) y su `availability`; **cero slug/costo/margen** en el DOM.
-- [ ] `available` es elegible (selección única → `referenceRoute`); `gated` ("Próximamente") y `blocked` (razón) son legibles pero **no ejecutables**.
-- [ ] El `recommendedDefault` se preselecciona sólo si está `available`; si no, no se preselecciona una ruta ejecutable.
-- [ ] Se muestran sólo los modelos de la capacidad de la modalidad activa (Image/Video/Audio).
-- [ ] Teclado/foco: radiogroup semántico, `aria-checked`/`aria-disabled`, foco visible, targets 44px, reduced-motion equivalente.
-- [ ] GVC premium 1440×1000 + 390×844 con galería (available/gated/blocked), recomendado, selección, empty y mobile; dossier revisado.
-- [ ] `scrollWidth === clientWidth` desktop y mobile, incluyendo la galería.
-- [ ] Scorecard: promedio ≥4.5, piso ≥4, jerarquía/economía/impacto/resistencia a template ≥4.5.
+> ⚠️ **Reescritos 2026-07-27 contra el runtime.** Los anteriores exigían *«una galería data-driven»*, *«cada
+> tarjeta»* y *«radiogroup semántico»* — **la forma que el operador rechazó al verla** (Delta 2026-07-25). La
+> implementación vigente es un **desplegable compacto** (`details` + `role='listbox'`), y unos criterios que
+> piden lo rechazado obligarían a deshacer una decisión ya tomada para poder marcarlos. Se conserva íntegro
+> todo lo que era invariante de contenido y de acceso; sólo cambia la forma que describen.
+
+- [x] La región `producer-route` renderiza la flota **data-driven** desde `globe.producer.fleet.list` (no
+      placeholder estático). ✅ verificado: 4 opciones desde el reader.
+- [x] Cada opción muestra el `model` público (nombre + versión) y su `availability`; **cero slug de proveedor,
+      costo o margen** en el DOM. ✅ aserto `routeId no se expone en texto visible`.
+- [x] `available` es elegible (selección única → `changeRoute`); `gated` («Próximamente») y `blocked` (su
+      razón) son **legibles pero no ejecutables**. ✅ verificado con `gated`=1 y `blocked`=1 en el canary.
+- [x] **Lo no ejecutable usa `aria-disabled`, NUNCA `disabled`.** Deshabilitar esconde justamente lo único que
+      explica por qué la opción está ahí. ✅ aserto explícito: 2 con `aria-disabled`, 0 con `disabled`.
+- [x] Todo modelo no disponible **declara su razón en texto**, no sólo en un atributo — con motion apagado el
+      texto es el único canal que queda. ✅ aserto `0 sin razón`.
+- [x] La marca resuelve en tres niveles: **isotipo real → glyph → monograma**. Un modelo sin isotipo
+      bundleado recibe **sus iniciales**, *«rather than an invented logo»*. ✅ verificado
+      `isotype/isotype/isotype/monogram`.
+- [x] El `recommendedDefault` se marca **una sola vez** y sólo si está `available`. ✅ aserto `recomendados=1`.
+- [x] Se muestran **sólo** los modelos de la capacidad de la modalidad activa. ✅ aserto: bajo Imagen no
+      aparecen `Seedance` ni `ElevenLabs`.
+- [x] `scrollWidth === clientWidth` a 1440 / 390 / **320**, **con el menú abierto** — que es cuando desborda.
+      ✅ verificado en los tres anchos.
+- [x] Evidencia capturada en los tres anchos y bajo `prefers-reduced-motion`:
+      `.captures/task-1552-composer/model-selector-*.png`.
+- [x] Teclado/foco: el selector **abre por Enter** sobre el trigger, `Tab` entra a la lista, la opción
+      enfocada tiene **anillo visible** y toda opción alcanza **44 px**. ✅ verificado con Playwright en los
+      tres anchos y bajo `prefers-reduced-motion`.
+
+      > ⚠️ **Casi se reporta un defecto que no existía.** La primera medición dijo «no abre con Enter ni con
+      > Space» — y era el harness, no el código: el panel de browser entrega texto pero no la acción nativa
+      > de un `<summary>`. **Un negativo de accesibilidad se confirma con el harness real antes de escribirlo
+      > en ninguna parte.**
+
+- [ ] Scorecard visual: promedio ≥4.5, piso ≥4, jerarquía/economía/impacto/resistencia a template ≥4.5.
+      ⚠️ **Lo único pendiente**, y es juicio humano sobre la evidencia ya capturada
+      (`.captures/task-1552-composer/model-selector-*.png`), no trabajo de código.
 
 ## Verification
 
+> ⚠️ **Corregido 2026-07-27.** La versión anterior apuntaba a `pnpm fe:capture`, que es de **Greenhouse**, y a
+> checks de **`apps/studio-web`**, donde el selector **no vive**. Globe corre sus propios canaries con
+> Playwright en `apps/studio-client/scripts/`. Además, `task:lint`, `ui:wireframe-check` y
+> `ui:readiness-check` son **el mismo binario** (`scripts/ci/task-lint.mjs`): listarlos como tres daba
+> sensación de cobertura triple sobre **una** pasada.
+
+**En `greenhouse-eo`** (control plane documental):
+
 - `pnpm task:lint --task TASK-1555`
-- `pnpm ui:wireframe-check --task TASK-1555`
-- `pnpm ui:readiness-check --task TASK-1555`
-- Checks/test/build focales de `../efeonce-globe/apps/studio-web`
-- `pnpm fe:capture task-1555-model-selector --env=staging` cuando el scenario esté disponible
-- `pnpm fe:capture:review <capture-dir>` + `pnpm ui:quality --task TASK-1555`
-- Revisión manual desktop/mobile, teclado, reduced motion, no overflow.
+- `pnpm ui:quality --task TASK-1555` (único gate distinto)
+
+**En `../efeonce-globe`** (runtime — toolchain independiente):
+
+- `pnpm check` en la raíz (nul-byte gate + typecheck + suites de los dos paquetes + canaries de browser)
+- `node scripts/producer-composer-canary.test.mjs` desde `apps/studio-client` — levanta el fixture con la
+  flota de 4 modelos y ejerce el selector a 1440 / 390 / 320 y bajo `prefers-reduced-motion`
+- Revisión manual desktop/mobile, **teclado**, reduced motion y no overflow con el menú abierto.
 
 ## Closing Protocol
 

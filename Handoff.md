@@ -1,5 +1,43 @@
 # Handoff activo
 
+## 2026-07-27 — `TASK-1555` cerrada: **el Slice 1 de `TASK-1552` queda desbloqueado**
+
+Era el último bloqueo. Al ir a cerrarla se encontró que **su ficha mentía en tres campos** —y los tres se
+detectaron midiendo el runtime, no leyendo el documento:
+
+| Campo | Decía | Runtime |
+|---|---|---|
+| `Status real` | `Diseño` | el código existe desde hace días, en la forma **aceptada** |
+| `Blocked by` | `TASK-1554` | esa task está `complete` |
+| Criterios de aceptación | *«galería data-driven»*, *«cada tarjeta»*, *«radiogroup semántico»* | es un `listbox` compacto — **describían la forma que el operador rechazó** |
+| Verificación | `pnpm fe:capture`, checks de `studio-web` | `fe:capture` es de Greenhouse; el código vive en `studio-client` |
+
+Unos criterios que piden lo rechazado obligarían a **deshacer una decisión ya tomada** para poder marcarlos.
+Se reescribieron contra el runtime, junto con el wireframe (que todavía dibujaba la grilla y decía que el
+momento visual dominante era *«la galería de modelos, no un dropdown técnico»* — exactamente lo rechazado).
+
+### El hueco de evidencia: el canary tenía UNA ruta
+
+Sin lista que abrir, sin `gated`, sin `blocked` con razón y sin un modelo sin isotipo, el selector **no podía
+probar ningún estado** — verde vacuo, el mismo argumento que `TASK-1552` hace sobre su propio gate de tokens.
+
+Flota de 4 rutas, una por estado, y **11 asertos nuevos** verdes a 1440/390/320 y bajo reduced-motion:
+apertura **por teclado**, `Tab` entra a la lista, anillo de foco, `aria-disabled` **nunca** `disabled`, razón
+**en texto**, recomendado una sola vez, 44 px, sin fuga de modalidad ajena, menú abierto sin overflow.
+
+### ⚠️ Casi se reporta un defecto de accesibilidad que no existía
+
+La activación por teclado se midió primero con el panel de browser y dio «no abre con Enter ni con Space».
+Ese panel entrega texto (verificado: 17 caracteres a un textarea) pero **no la acción nativa de un
+`<summary>`**. Playwright confirma que Enter abre y Space alterna. **Un negativo de accesibilidad se confirma
+con el harness real antes de escribirlo en ninguna parte.**
+
+Cerrada con `pnpm task:lint` en cero y scorecard `PASS` (4.54) — verificado que está puntuado contra el
+desplegable y no contra la galería: su propio texto mide *«la región pasó de 515px (galería) a 121px»*.
+
+**Siguiente:** Slice 1 de `TASK-1552` — recomposición del composer en Tailwind. La región `producer-model-*`
+es **baseline congelado**: se decide dónde vive, nunca su forma interna.
+
 ## 2026-07-27 — ADR-016 implementado: el motor está en Tailwind; **ninguna superficie migrada**
 
 Ejecutados los **pasos 1-4** del orden de ADR-016 en `efeonce-globe` (`804b7d7`, `91432ed`). El paso 5 —migrar

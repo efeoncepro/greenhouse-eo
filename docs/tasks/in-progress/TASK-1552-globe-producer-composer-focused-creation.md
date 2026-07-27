@@ -6,7 +6,7 @@
 >
 > 1. **[`docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md`](../../ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md)** — todos los valores, medidos. Escrito para **traducir, no interpretar**. Empieza acá.
 > 2. **[ADR-016](../../architecture/creative-studio/EFEONCE_GLOBE_CLIENT_STYLING_ENGINE_DECISION_V1.md)** — el payload cliente usa **Tailwind v4**. El **Slice 0 de esta task está RETIRADO**.
-> 3. **Bloqueada por UNA cosa:** cerrar `TASK-1555` (misma región, mismo archivo). ✅ **El slice de Tailwind de `TASK-1485` YA ESTÁ** (2026-07-27, commits `804b7d7` + `91432ed`): motor instalado, theme generado desde el SSOT y los gates reescritos y verificados. Ver el Delta al pie.
+> 3. ✅ **DESBLOQUEADA (2026-07-27). Slice 1 se puede tomar.** `TASK-1555` cerró (su región `producer-model-*` queda como baseline congelado: se decide dónde vive, no cómo se ve) y **el slice de Tailwind de `TASK-1485` YA ESTÁ** (2026-07-27, commits `804b7d7` + `91432ed`): motor instalado, theme generado desde el SSOT y los gates reescritos y verificados. Ver el Delta al pie.
 > 4. En `efeonce-globe`, la rama `task/TASK-1552-slice0-internalizar-css` commit **`5edd2a3`** es **WIP congelado**: su mensaje dice qué conservar y qué revertir. **No lo tomes como entrega.** Ya fue limpiado en `804b7d7`; el commit se conserva sólo como referencia histórica de la copia de 151 KB.
 >
 > ⚠️ **No confíes en un `Status real` sin verificar el runtime.** Hoy pasó: `TASK-1555` declaraba `Diseño` con el código ya escrito, y eso desvió una sesión entera.
@@ -590,9 +590,10 @@ Reglas obligatorias:
   cliente. **Es de lo que esta superficie está hecha**; sin ella no hay dónde componer.
 - `TASK-1505` — Producer surface y patrones existentes (dirección aprobada).
 - `TASK-1532` — CTA único y estimate automático. **Flow y motion contract compartidos** con esta task.
-- `TASK-1555` 🚧 in-progress — selector de modelo: dueño de la región `producer-model-*` **dentro del mismo
-  archivo** (verificado: líneas 1127-1181). **Orden fijado, no "coordinar": `TASK-1555` cierra ANTES de que
-  Slice 1 toque la jerarquía.** El operador ya rechazó una versión galería del selector; recomponer el fold
+- `TASK-1555` ✅ **complete 2026-07-27 — SLICE 1 DESBLOQUEADO.** Selector de modelo: dueño de la región
+  `producer-model-*` **dentro del mismo archivo** (verificado: líneas 1128-1194). Cerrada con 11 asertos de
+  browser sobre una flota de 4 modelos. **Su forma interna es baseline congelado**: Slice 1 decide **dónde
+  vive** el bloque, nunca cómo se ve por dentro. El operador ya rechazó una versión galería del selector; recomponer el fold
   sobre una región en vuelo re-abre una decisión ya tomada. Al empezar Slice 1, el estado de los 5 markers
   `producer-model-*` es baseline congelado: se decide **dónde vive** el bloque, nunca su forma interna.
 - `TASK-1523` — dueña del SSOT de motion del payload cliente (`GLOBE_CLIENT_MOTION_CONTRACT_V1.md`) y de
