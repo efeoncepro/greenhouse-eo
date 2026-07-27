@@ -7,6 +7,13 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-27 — Reconciliación de costo del AI Visibility Grader
+
+- Se documentó que `grader_runs.estimated_cost_usd` es un guard parcial, no costo all-in ni base suficiente para pricing.
+- La auditoría de un run público real recalculó ~US$0,3067 en providers principales antes de extracción LLM; el valor persistido US$0,2767 omitía request fees de Perplexity.
+- Se documentaron los 18 intentos de extracción LLM sin tokens/costo persistidos y la imposibilidad de asignar directamente el costo del `ops-worker` compartido.
+- Se sincronizaron la documentación funcional, el runbook de smoke y las skills Codex/Claude; la instrumentación completa queda pendiente.
+
 ## 2026-07-27 — Ecosystem Work Registry y Federated Execution Harness
 
 - Se formalizó el ADR propuesto que extiende el harness Greenhouse-local hacia una arquitectura de ecosistema: Greenhouse conserva registro, visibilidad y coordinación global; cada repo conserva ejecución y evidencia primaria.

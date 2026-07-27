@@ -159,6 +159,9 @@ provider **no es verdad de negocio**: se normaliza y puntúa después.
 - **Full API parity:** la UI pública, admin, Nexa/MCP y scripts consumen los
   mismos readers/commands server-side. Acciones de Nexa = `propose → confirm →
   execute`, nunca write directo.
+- **Costo:** `grader_runs.estimated_cost_usd` es un guard aproximado de observaciones principales, no costo all-in.
+  Nunca presentes US$0,50 como costo real garantizado: la reconciliación 2026-07-27 observó ~US$0,3067 en providers
+  principales antes de extracción LLM, y el costo de `ops-worker` compartido requiere ledger de atribución.
 - **PII:** no enviar email/teléfono a providers; data pública = al menos
   `confidential`; postura Ley 21.719/GDPR-compatible (clientes LATAM).
 

@@ -1,9 +1,23 @@
 # Manual — Correr el AI Visibility Grader (smoke + endpoint)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.13 · **Ultima actualizacion:** 2026-07-05 por Codex (TASK-1327 production handoff + TASK-1341 DataForSEO guard)
+> **Version:** 1.14 · **Ultima actualizacion:** 2026-07-27 por Codex (reconciliacion de costo por run)
 >
 > **Para que sirve:** ejecutar una corrida acotada (low-volume) del AI Visibility Grader contra los answer engines, para validar el motor end-to-end. Por defecto usa un proveedor simulado (no gasta dinero); con flags + secrets corre proveedores reales. Dos caminos: el **CLI** (`pnpm growth:ai-visibility:smoke`, local/dev) y el **endpoint interno** (`/api/admin/growth/ai-visibility/runs`, mismo primitive, apto staging).
+
+## Regla de costo
+
+El costo persistido en `grader_runs.estimated_cost_usd` es un estimador parcial, no una factura por corrida.
+La auditoría del 2026-07-27 encontró un run público real con US$0,2767 registrados y aproximadamente US$0,3067
+recalculados para providers principales, antes de extracción LLM. No uses “US$0,50 por run” como costo garantizado.
+
+Antes de una corrida real:
+
+1. empieza con fake provider o un solo provider real;
+2. registra runId, providers, modelo, usage y costo observado;
+3. confirma si la extracción LLM está activada, porque puede añadir llamadas por finding;
+4. no cargues el costo total de `ops-worker` a un run: es un worker compartido;
+5. documenta la evidencia en [`AI_VISIBILITY_GRADER_COST_RECONCILIATION_2026-07-27.md`](../../audits/cloud-cost/AI_VISIBILITY_GRADER_COST_RECONCILIATION_2026-07-27.md).
 
 ## Estado actual del rollout (2026-06-29)
 

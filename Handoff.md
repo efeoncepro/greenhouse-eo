@@ -1,5 +1,16 @@
 # Handoff activo
 
+## 2026-07-27 — Costo real del AI Visibility Grader
+
+La reautenticación de `gcloud` y ADC mediante Playwright quedó verificada para `julio.reyes@efeonce.org`; Cloud SQL
+conectó como `greenhouse_ops` y el export de billing estuvo disponible. La reconciliación documentada en
+[`AI_VISIBILITY_GRADER_COST_RECONCILIATION_2026-07-27.md`](docs/audits/cloud-cost/AI_VISIBILITY_GRADER_COST_RECONCILIATION_2026-07-27.md)
+confirma que el costo registrado del grader es parcial: un run público real recalculó ~US$0,3067 antes de extracción
+LLM, frente a US$0,2767 persistidos. No ejecutar pricing ni paid con US$0,50 como costo garantizado.
+
+Pendiente: ledger de costo por run para request/search/grounding, extracción LLM, DataForSEO e infraestructura Cloud Run;
+canaries reales N≥3 reconciliados con invoices/provider dashboards; owner sugerido: Growth + Finance + Platform.
+
 ## 2026-07-27 — Ecosystem Work Registry y Federated Execution Harness
 
 Se documentó [`GREENHOUSE_ECOSYSTEM_WORK_REGISTRY_FEDERATED_EXECUTION_DECISION_V1.md`](docs/architecture/GREENHOUSE_ECOSYSTEM_WORK_REGISTRY_FEDERATED_EXECUTION_DECISION_V1.md)

@@ -166,17 +166,21 @@ personalizado.** **Casi ninguna agencia lo tiene. Nosotros sí — y no lo estam
 
 ### 🔴 El guardrail que nadie va a mirar: **el Grader cuesta plata**
 
-**Cada run consume 5 motores + DataForSEO + los probes.**
+La cifra no se puede inventar ni tomar de `estimated_cost_usd` como si fuera factura. La reconciliación del
+2026-07-27 encontró un run público real con **US$0,3067 de providers principales antes de extracción LLM**;
+el valor persistido era US$0,2767 porque omitía request fees de Perplexity. El histórico de 13 runs públicos tiene
+un estimador promedio de US$0,2627, pero todavía faltan extracción LLM y Cloud Run asignado.
 
-| Si un run cuesta… | 1.000 runs/mes son… |
+| Estado | Qué significa |
 |---|---|
-| USD 2 | **USD 2.000/mes de API** |
-| USD 5 | **USD 5.000/mes** |
-| USD 10 | 🔴 **USD 10.000/mes** |
+| **US$0,50** | Techo aproximado del componente principal `light`, no costo all-in |
+| **US$0,3067** | Subtotal observado/recalculado de un run público real, antes de extracción |
+| **Costo total** | Providers + request/search/grounding + extracción + DataForSEO + infraestructura atribuida |
 
-🔴 **Antes de escalar paid: modelar el costo marginal del Grader y ponerle un techo.**
-🎯 **Es el mismo error que denunciamos en HubSpot con los créditos — no lo cometamos nosotros.**
-*(Rate-limit y captcha ya existen en `public-intake`. **El techo de presupuesto, no.**)*
+🔴 **Antes de escalar paid: usa costo observado y no supuestos de CAC.** El Grader es un lead magnet, pero cada
+run consume presupuesto real y el worker Cloud Run es compartido.
+🎯 **No uses “US$0,50 por run” como claim contable ni comercial** hasta que exista ledger de costo total y canaries
+reconciliados con invoices.
 
 ### 🔴 El protocolo: se testea antes de escalar
 
@@ -186,6 +190,8 @@ personalizado.** **Casi ninguna agencia lo tiene. Nosotros sí — y no lo estam
    🔴 (Hoy NO tenemos ninguno de los tres números)
 3. Recién con eso, calcular el CAC REAL y escalar — o cortar
 ```
+
+Fuente operativa: [`AI_VISIBILITY_GRADER_COST_RECONCILIATION_2026-07-27.md`](../../../../docs/audits/cloud-cost/AI_VISIBILITY_GRADER_COST_RECONCILIATION_2026-07-27.md).
 
 🔴 **Nunca escales paid con las hipótesis de esta tabla. Escálalo con TUS números.**
 *(Es exactamente lo que le exigimos a un cliente. **Aplicárnoslo a nosotros no es opcional.**)*
