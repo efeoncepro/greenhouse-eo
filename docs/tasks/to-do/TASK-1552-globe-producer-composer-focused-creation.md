@@ -310,6 +310,36 @@ existe).
 La CSP estricta de Globe **necesita `script-src 'nonce-…'` explícito**: sin él cae a `default-src 'self'`, que
 bloquea el inline **aunque lleve nonce**. Costó una iteración en el harness; el runtime real ya lo declara.
 
+## Delta 2026-07-27 (4) — 🔴 el contrato de imagen no declara resolución, y el diseñador la necesita
+
+Detectado por el operador al revisar la caja de Salida: *«esto lo opera un diseñador, ¿Estándar no sería 2K y
+Alta 4K?»*. Verificado contra el contrato — el instinto señala un gap real, pero la respuesta no es renombrar.
+
+**Lo medido:**
+
+- Los valores reales de `quality` en el catálogo son **`standard` | `hd`**; algunas rutas traen `quality: []`
+  (sin opción). **No existe 2K/4K en ninguna parte.**
+- **`ImageRouteConstraintsV1` NO tiene campo de resolución** (`producer-catalog.ts:69-74`: sólo `quality`,
+  `aspectRatio`, `count`). `VideoRouteConstraintsV1` **sí** declara `resolution` — la asimetría es real.
+
+**Error propio corregido en la maqueta:** el preview del lienzo mostraba `1080 × 1350 px`, **un número
+fabricado**: no venía del contrato. Para un director de arte eso es peor que no mostrar nada — decide encuadre,
+tipografía y entrega contra una medida que la plataforma nunca prometió. Viola la regla que esta misma task
+declara (*el navegador no calcula; catálogo/estimate son server-authoritative*). Retirado.
+
+**Reglas que quedan para esta superficie:**
+
+- **NUNCA** mostrar una medida en píxeles que el contrato no declare. Si la ruta no la da, se dice que no la da.
+- La fila de acabado usa los valores **reales** del catálogo (`Estándar` / `HD`), y **se oculta** cuando la ruta
+  trae `quality: []` — no se renderiza vacía ni con un default inventado.
+- **Cuántas piezas** se refleja en el CTA y en el saldo al instante: es la variable que más multiplica el gasto y
+  un multiplicador invisible es cómo se gasta de más.
+
+**Gap escalado a su dueño (no es de esta task):** `ImageRouteConstraintsV1` debería declarar la resolución
+resultante por combinación `quality × aspectRatio`, como ya hace video. Sin eso, un operador profesional no puede
+decidir si una pieza sirve para el entregable. Dueño natural: **`TASK-1553`** (catálogo multi-modelo extensible)
+o el dueño del contrato de catálogo. Mientras no exista, la UI lo declara como faltante en vez de rellenarlo.
+
 ## Summary
 
 Recomponer el composer de Globe Producer para que una sola intención creativa domine el first fold: `prompt → dirección → output shape → generar`. Las capacidades avanzadas permanecen disponibles mediante progressive disclosure, sin duplicar el costo ni contradecir `TASK-1532`.
