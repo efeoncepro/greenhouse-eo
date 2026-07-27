@@ -42,7 +42,7 @@ Efeonce Group
 └── AI-enabled marketing and growth services platform
     ├── Efeonce Digital: estrategia, SEO/AEO, Search Visibility 360, contenido, CRM y medición
     ├── Globe / Creative Studio: producción creativa y nuevos modelos de operación
-    ├── Reach: medios, PR y distribución
+    ├── Media & Distribution: medios, PR y distribución (Reach como product brand habilitadora)
     ├── Wave: web, infraestructura y experiencia digital
     ├── Greenhouse: control plane operativo, cliente, métricas y memoria
     ├── Kortex: CRM e inteligencia comercial

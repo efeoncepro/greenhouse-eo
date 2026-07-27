@@ -128,6 +128,9 @@ Todo business model debe separar al menos estas dimensiones:
 - [Wave Business Model V1](wave/WAVE_BUSINESS_MODEL_V1.md) — draft de productora/capability con cinco familias:
   Search Visibility 360, Web Experience 360, Measurement & Analytics, Agent Systems & Platforms y Digital
   Automation & Integrations.
+- [Media & Distribution Business Model V1](media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md) —
+  `Approved for validation`; tres soluciones comerciales, siete capacidades de delivery y Reach como product brand
+  habilitadora. No autoriza pricing público ni venta general.
 
 - [Efeonce Creative Studio V1.1](creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md) —
   `Approved for validation`; incorpora la doctrina de autoría humana y mantiene B2B2B como hipótesis gateada.

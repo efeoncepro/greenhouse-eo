@@ -116,7 +116,7 @@ Una sola marca lidera toda la relación externa: **Efeonce es la marca paraguas*
 | **Masterbrand** | **Efeonce** | La única marca que se construye activamente. Todo el brand building va aquí. |
 | Línea de negocio / práctica | Product brand relacionada | Rol |
 | **Creative Services** | **Globe / Creative Studio** | Branding, contenido, campañas, audiovisual y producción creativa productizada. |
-| **Media & Distribution** | **Reach** | Media buying, distribución y PR. |
+| **Media & Distribution** | **Reach, Verk, Greenhouse** | Tres soluciones comerciales de distribución; Reach es product brand habilitadora. |
 | **Digital Services & Engineering** | **Wave** | Search Visibility 360, web, measurement, agentes, integraciones y automatización. |
 | **RevOps & CRM** | **Kortex** + HubSpot | CRM, implementación, automatización e inteligencia comercial. |
 | **Control plane / experiencia** | **Greenhouse** | Operación, cliente, memoria, medición y convergencia del ecosistema. |

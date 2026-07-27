@@ -37,7 +37,7 @@ Efeonce organiza el portfolio en líneas de negocio/prácticas. Las product bran
 |---|---|---|---|
 | **Growth Strategy & Measurement** | Greenhouse, Verk, Wave, Kortex | Tailor + Evolve | estrategia, revenue enablement, analytics y orquestación |
 | **Creative Services** | Globe / Creative Studio, Greenhouse, ICO | Express | branding, campañas, contenido y producción |
-| **Media & Distribution** | Reach, Verk, Greenhouse | Amplify | medios, PR, influencers y distribución |
+| **Media & Distribution** | Reach, Verk, Greenhouse | Amplify | estrategia de distribución; performance y commerce; influence, earned y partnerships |
 | **Digital Services & Engineering** | Wave, Greenhouse | Transversal | visibilidad, web, measurement, agentes e integraciones |
 | **RevOps & CRM** | Kortex, HubSpot, Greenhouse | Tailor + Evolve | licencias, implementación, managed ops e inteligencia CRM |
 

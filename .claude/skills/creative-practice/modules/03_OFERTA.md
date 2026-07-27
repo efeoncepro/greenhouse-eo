@@ -278,7 +278,7 @@ Lo que está roto es cómo lo cobramos.**
 | **AI Creative Operations / Studio Access** | On-Going · Studio Access · Pilot | **Workspace, memoria, provenance, providers, créditos, governance y límites; Globe potencia, no reemplaza la línea** | `greenhouse-globe` · studios especializados |
 | **Creative Diagnostic** | 🎯 Entrada / Diagnostic | **Baseline de marca, contenido, capacidad u operación; propone la siguiente fase, no la sustituye** | `modules/06_CUNA.md` |
 
-`Performance Creative Lab` es una composición con Media & Distribution/Reach y Measurement; prueba variantes,
+`Performance Creative Lab` es una composición con Media & Distribution (Reach puede habilitarla) y Measurement; prueba variantes,
 hipótesis y aprendizaje creativo conectado con medios. `Experience/Product/CX` compone con Wave cuando requiere
 producto, web o tecnología. `Editorial Content & SEO` compone con Search Visibility hasta resolver ownership y
 pricing. Ninguna de estas composiciones crea una nueva línea de Creative Services por sí sola.

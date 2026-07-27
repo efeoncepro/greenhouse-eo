@@ -110,7 +110,7 @@ Formato del doc: Situación/Trigger → Job Statement → Resultado Esperado. Aq
 | **Tier 2 · Con educación previa** | Growth Strategy & Measurement ICP1 (B2B Revenue), Creative Services ICP2 (Rebranding), Creative Services ICP1 (Escalar) | Ticket alto, ciclo largo, trigger fuerte. |
 | **Tier 3 · Venta cruzada** | Growth Strategy & Measurement ICP2 (Retail), Creative Services ICP3 (Ejecución a escala/Sky), Media & Distribution ICP1 (Distribución) | Se activan **desde dentro**, cuando se diagnostica el gap. |
 
-Ejemplo de cadena de expansión: AEO → Search Visibility 360 → web/medición/agentes → CRM/GTM integral → (si falta contenido) Creative Services potenciado por Globe → (si falta distribución) Media & Distribution potenciado por Reach. Digital Services & Engineering opera visibilidad, web, measurement y agentes; RevOps & CRM/Kortex opera CRM/GTM.
+Ejemplo de cadena de expansión: AEO → Search Visibility 360 → web/medición/agentes → CRM/GTM integral → (si falta contenido) Creative Services potenciado por Globe → (si falta distribución) Media & Distribution potenciado por Reach. En Media & Distribution la entrada recomendada es Distribution Strategy & Media Architecture y la expansión puede ir a Performance & Commerce Distribution o Influence, Earned & Partnership Distribution. Digital Services & Engineering opera visibilidad, web, measurement y agentes; RevOps & CRM/Kortex opera CRM/GTM.
 
 ---
 

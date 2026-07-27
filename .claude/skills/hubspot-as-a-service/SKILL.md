@@ -7,6 +7,15 @@ description: "Deliver and operate HubSpot as a managed client service: portal di
 
 Operate HubSpot as an accountable managed service, not as a collection of portal clicks.
 
+## Commercial context
+
+The canonical commercial structure is **Efeonce → RevOps & CRM → Kortex (when applicable) → HubSpot as
+platform/provider**. Use the service catalog in `docs/services/hubspot-as-a-service/README.md` to compose Diagnostic,
+Architecture, Implementation, Data/Automation/Lifecycle, Managed CRM Operations and Customer Agent / AI Operations.
+Treat brochures as historical commercial input only; the review and quarantine rules live in
+`docs/audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md`. Do not import brochure claims, pricing, bundles or
+feature availability without current primary-source verification and an `as-of` date.
+
 ## Load first
 
 1. Read `project_context.md`, `Handoff.md`, `docs/context/00_INDEX.md`, and client-specific context.

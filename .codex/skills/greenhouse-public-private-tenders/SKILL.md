@@ -93,7 +93,7 @@ Esta skill **decide y estructura**; delega el craft especializado. Declara siemp
 | Necesitas… | Delega en | Frontera |
 |---|---|---|
 | Estrategia de deal, pricing/packaging, ASaaS doctrine, ICP Globe | `commercial-expert` (+ overlay Efeonce) | Esta skill trae la oportunidad; commercial-expert decide el motion comercial |
-| Qué servicios puede ofertar Efeonce, matching de rubro/BU | `efeonce-agency` | El catálogo de servicios y las BU (Globe/Wave/Reach…) son de agency; acá se usan para el fit |
+| Qué servicios puede ofertar Efeonce, matching de rubro/línea | `efeonce-agency` | El catálogo de servicios y las líneas de negocio (incluida Media & Distribution; Reach es product brand) son de agency; acá se usan para el fit |
 | Redacción persuasiva de la propuesta | `copywriting` | Esta skill define QUÉ va y la estructura; copywriting el CÓMO se escribe |
 | Garantías, costeo, cashflow, factoring, indexación UF/UTM, margen | `greenhouse-finance-accounting-operator` | Loaded cost y tesorería son de finance; acá se consumen para el precio/garantía |
 | Creative Studio, Studio Credits y estimaciones por pieza | `efeonce-agency` + `creative-practice` + `greenhouse-finance-accounting-operator` | El bid traduce el alcance; el modelo canónico define créditos y Finance aprueba equivalencias/margen |

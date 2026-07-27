@@ -52,7 +52,7 @@ Loop Marketing es el framework estratégico (impulsado por HubSpot como sucesor 
 | **Creative Services** | Globe / Creative Studio; Greenhouse; ICO | Express | Branding, creatividad, contenido full-funnel, producción audiovisual, campañas ATL/BTL y copywriting. |
 | **Growth Strategy & Measurement** | Greenhouse; Verk; Wave; Kortex | Tailor + Evolve | Estrategia, GTM, Revenue Enabled, analytics, medición y orquestación de líneas. |
 | **RevOps & CRM** | Kortex; HubSpot; Greenhouse | Tailor + Evolve | CRM, implementación, automatización, inteligencia comercial y operación gestionada. |
-| **Media & Distribution** | Reach; Verk; Greenhouse | Amplify | Planificación/compra de medios ATL y digital, PR, influencers y distribución. |
+| **Media & Distribution** | Reach; Verk; Greenhouse | Amplify | Distribution Strategy & Media Architecture; Performance & Commerce Distribution; Influence, Earned & Partnership Distribution. |
 | **Digital Services & Engineering** | Wave; Greenhouse | Transversal | Search Visibility 360, web, measurement, Agent Systems & Platforms, integraciones y automatización. |
 
 **Regla de ownership:** una línea de negocio posee la relación de problema, oferta, delivery y economics; una product brand puede habilitar o empaquetar esa oferta. Globe no equivale a todos los Creative Services; Wave no equivale a todos los Digital Services; Reach no equivale a toda Media & Distribution. La relación comercial sigue siendo Efeonce.

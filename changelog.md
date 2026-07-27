@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-26 — HubSpot: brochure histórico convertido en input gobernado
+
+- Se revisaron los brochures Efeonce x HubSpot de 2024/2025 y se documentó qué capacidades se absorben en RevOps & CRM.
+- El catálogo adopta el recorrido diagnóstico → arquitectura → implementación modular → enablement → operación,
+  con ofertas diferenciadas y HubSpot explícitamente como plataforma/provider.
+- Se sincronizaron `hubspot-as-a-service` y `hubspot-solutions-partner` en `.codex` y `.claude`; claims, precios,
+  bundles y disponibilidad del brochure quedan fuera del canon hasta verificación primaria fechada.
+- Auditoría: [`HUBSPOT_BROCHURE_REVIEW_2026-07-26.md`](docs/audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md).
+
 ## 2026-07-26 — TASK-1566 COMPLETE: fondeo gobernado de créditos de Globe vivo, ejercido y con la autoridad vieja retirada
 
 - **Primer fondeo real de Globe punta a punta sin break-glass**: `propose` (plan legible con el delta
@@ -26,6 +35,21 @@
 - **Hardening restante como tasks nuevas**: `TASK-1584` (KMS + identidades disjuntas),
   `TASK-1585` (break-glass gobernado + retiro del HMAC), `TASK-1586` (desambiguador de negación al
   operador — cierra ISSUE-124).
+
+## 2026-07-26 — Media & Distribution: catálogo y reubicación de servicios Reach
+
+- Se revisó el brochure 2026 de Reach y se formalizó `Media & Distribution` como línea de negocio de Efeonce.
+- Se documentaron las siete familias de servicio, la separación entre Influencer Marketing y UGC, la capa operativa
+  IMO, las modalidades On-Going/On-Demand/Staff Augmentation y los boundaries con Creative Services, Wave, Kortex y
+  Growth Strategy & Measurement.
+- Reach queda como product brand habilitadora; no se presenta como agencia, unidad comercial principal ni equivalente
+  a toda la línea. El catálogo queda en `docs/services/media-distribution/README.md` con estado `Approved for validation`.
+- Se profundizó el packaging: tres soluciones comerciales —Distribution Strategy & Media Architecture; Performance
+  & Commerce Distribution; e Influence, Earned & Partnership Distribution— y Managed Media Operations como capa de
+  delivery. Se agregó beachhead, JTBD, buying group, criterios de calificación, métricas y guardrails de revenue.
+- Se creó el business model canónico `docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md`
+  y se sincronizaron context pack, estrategia de capital, Creative Practice, public/private tenders y squad design.
+- Se agregó el benchmark [`PERFORMANCE_COMMERCE_DISTRIBUTION_MARKET_RESEARCH_2026-07-26.md`](docs/audits/commercial/PERFORMANCE_COMMERCE_DISTRIBUTION_MARKET_RESEARCH_2026-07-26.md) y se robusteció Performance & Commerce alrededor de señales first-party, medición, commerce, creative performance y governance algorítmico. MMM e incrementality quedan como escalera avanzada y no como promesa general.
 
 ## 2026-07-26 — Creative Services: catálogo y skills sincronizados
 

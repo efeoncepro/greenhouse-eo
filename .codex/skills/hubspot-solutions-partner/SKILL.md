@@ -19,6 +19,15 @@ Esta skill opera **el negocio HubSpot de Efeonce**, no el CRM interno de Efeonce
 Si la pregunta es "cómo configuro una property en nuestro portal" → `hubspot-ops`.
 Si la pregunta es "cómo vendemos, implementamos, retenemos o expandimos HubSpot en un cliente" → acá.
 
+## Taxonomía comercial vigente
+
+La práctica se presenta como **Efeonce → RevOps & CRM → Kortex (cuando aplica) → HubSpot (plataforma/provider)**.
+La venta debe poder recorrer diagnóstico, arquitectura, implementación, data/automation/lifecycle, managed operations
+y Customer Agent / AI Operations sin convertir cada etapa en un bundle obligatorio. El brochure es input histórico,
+no canon: usa [`docs/services/hubspot-as-a-service/README.md`](../../../docs/services/hubspot-as-a-service/README.md) y
+la auditoría [`HUBSPOT_BROCHURE_REVIEW_2026-07-26.md`](../../../docs/audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md)
+para separar capacidades reutilizables de claims, precios y disponibilidad que necesitan verificación vigente.
+
 ---
 
 ## 0. La tesis — dónde se pelea y dónde no

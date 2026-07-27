@@ -31,7 +31,7 @@ negocio ni representa por sí solo toda la agencia creativa.
 `Creative Diagnostic` es la cuña de entrada y mecanismo de discovery. No es una sexta línea de producción ni debe
 confundirse con una solución completa: diagnostica el problema, establece baseline y propone la siguiente fase.
 
-`Performance Creative Lab` es una composición con Media & Distribution/Reach y Measurement; experimenta variantes,
+`Performance Creative Lab` es una composición con Media & Distribution (Reach puede habilitarla) y Measurement; experimenta variantes,
 hipótesis y aprendizaje creativo conectado con medios. No asume el ownership de media buying ni de atribución por sí
 solo.
 
@@ -100,11 +100,11 @@ Antes de convertir un servicio en `Commercially approved`, su ficha debe declara
 - **Globe / Creative Studio:** plataforma/product brand que habilita producción, memoria, créditos y governance.
 - **Run-and-Gun Studio:** capability de producción audiovisual de Creative Services; no es Globe ni una product
   brand por defecto.
-- **Media & Distribution / Reach:** performance creative, distribución y medios. El laboratorio creativo puede
+- **Media & Distribution:** performance creative, distribución y medios. Reach puede habilitar la capacidad; el laboratorio creativo puede
   componer esta línea, pero no sustituye su ownership.
 - **Wave:** ownership de Search Visibility 360, Web Experience 360, Measurement & Analytics, Agent Systems &
   Platforms y Digital Automation & Integrations. Creative Services puede aportar assets, pero no asume esas familias.
-- **Reach / Media & Distribution:** distribución, pauta y medios. Una campaña creativa no incluye media buying por
+- **Media & Distribution:** distribución, pauta y medios. Reach puede habilitarla. Una campaña creativa no incluye media buying por
   defecto.
 - **RevOps & CRM / Kortex:** CRM, lifecycle y RevOps. El trabajo creativo puede producir contenido para esas
   iniciativas sin asumir su arquitectura u operación.

@@ -1,5 +1,39 @@
 # Handoff activo
 
+## 2026-07-26 — Brochures HubSpot absorbidos como input de RevOps & CRM
+
+Se revisó el brochure principal de Efeonce x HubSpot de octubre de 2025 y las versiones históricas de 2024/2025.
+Se adoptó su secuencia útil —diagnóstico, arquitectura, implementación modular, enablement y operación/optimización—
+en el catálogo de [`HubSpot as a Service`](docs/services/hubspot-as-a-service/README.md). La práctica queda presentada
+como Efeonce → RevOps & CRM → Kortex cuando aplica → HubSpot como plataforma/provider, con ofertas de Diagnostic,
+Architecture, Implementation, Data/Automation/Lifecycle, Managed CRM Operations y Customer Agent/AI Operations.
+
+La auditoría [`HUBSPOT_BROCHURE_REVIEW_2026-07-26.md`](docs/audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md)
+deja fuera del canon cifras, precios, bundles, nombres de producto y disponibilidad no verificados. Estado: docs y
+skills actualizados localmente; no hay cambio de runtime, pricing público ni rollout. Próximo paso: validar packaging,
+economics, buyer journeys y claims con fuentes primarias antes de convertir ofertas en propuestas comerciales.
+
+## 2026-07-26 — Media & Distribution y brochure histórico de Reach
+
+Se revisó el brochure 2026 de Reach ubicado en `Alineación/4. Comercial/Brochures/2026/EO_Brochure_Reach-2026.pdf`.
+El material confirma siete familias: Paid Media Digital; Retail Media & Commerce; ATL, OOH & DOOH; Influencers,
+Creators & UGC; PR & Communications; Sponsorships & Strategic Partnerships; y Dark Channels & Organic Amplification.
+Se documentaron en [`docs/services/media-distribution/README.md`](docs/services/media-distribution/README.md) como la
+línea de negocio de Efeonce **Media & Distribution**. Reach queda explícitamente como product brand habilitadora,
+no como agencia o unidad comercial principal. IMO queda como capa operativa, no como octava familia.
+
+Estado: `Approved for validation`; no habilita pricing público ni venta self-serve. El siguiente paso es validar
+demanda, economics, derechos de creadores/medios, RACI, proveedores y pricing por familia.
+
+Se profundizó la arquitectura comercial: las siete familias se conservan como capacidades de delivery, pero la venta
+se concentra en Distribution Strategy & Media Architecture; Performance & Commerce Distribution; e Influence, Earned
+& Partnership Distribution. Managed Media Operations es una capa operativa recurrente, no una cuarta solución.
+El beachhead queda como hipótesis: empresas B2C/B2B2C mid-market y enterprise en LATAM con inversión multicanal,
+varios proveedores y presión por demostrar eficiencia, cobertura o contribución a demanda.
+La lógica económica y de validación quedó en [`MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md`](docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md).
+
+Se incorporó la investigación de mercado [`PERFORMANCE_COMMERCE_DISTRIBUTION_MARKET_RESEARCH_2026-07-26.md`](docs/audits/commercial/PERFORMANCE_COMMERCE_DISTRIBUTION_MARKET_RESEARCH_2026-07-26.md). Performance & Commerce queda robustecido alrededor de Measurement & Signal Foundation, Performance Media Operations, Commerce Media Operations, Creative Performance System y Algorithmic Media Governance. Incrementality/MMM queda como capability avanzada condicionada por escala, datos y experimentación; no se promete como estándar.
+
 ## 2026-07-26 — Catálogo inicial de Creative Services
 
 Se creó [`docs/services/creative-services/README.md`](docs/services/creative-services/README.md) y se enlazó

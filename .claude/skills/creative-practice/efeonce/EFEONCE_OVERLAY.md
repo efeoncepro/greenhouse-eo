@@ -40,7 +40,8 @@ un commodity con 10.000 competidores y un ranking de recall en el que no salimos
 | **AI Creative Operations / Studio Access** | Workflow, memoria, provenance y governance creativo | Globe / Creative Studio + studios |
 | **Creative Diagnostic** | Baseline y roadmap para elegir la siguiente fase | `modules/06_CUNA.md` |
 
-`Performance Creative Lab`, Experience/Product/CX y Editorial Content & SEO son composiciones con Reach/Media,
+`Performance Creative Lab`, Experience/Product/CX y Editorial Content & SEO son composiciones con Media & Distribution
+(Reach puede habilitarla),
 Wave/Search Visibility u otras líneas; no son nuevas líneas de Creative Services por defecto.
 
 **La taxonomía comercial** *(`docs/context/14` + Business Model V1)* tiene tres ejes, no una lista de

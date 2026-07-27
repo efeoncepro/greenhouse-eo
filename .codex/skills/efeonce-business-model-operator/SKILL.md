@@ -128,6 +128,17 @@ y el ADR de boundaries (`../../docs/architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARI
 cinco familias: Search Visibility 360, Web Experience 360, Measurement & Analytics, Agent Systems & Platforms y
 Digital Automation & Integrations. CRM/RevOps permanece en Efeonce Digital/Kortex.
 
+Media & Distribution es una línea de negocio de Efeonce. Su catálogo vigente está en
+[`Media & Distribution — catálogo de servicios`](../../docs/services/media-distribution/README.md). Comercialmente se
+presenta mediante tres soluciones: Distribution Strategy & Media Architecture; Performance & Commerce Distribution;
+e Influence, Earned & Partnership Distribution. Paid media, retail media, ATL/OOH, influencers/creators/UGC, PR,
+sponsorships/partnerships y dark channels son capacidades de delivery que se activan dentro de esas soluciones.
+Reach es una product brand habilitadora, no una agencia ni un business unit contractual. Influencer/creator marketing
+compra acceso y distribución ante una audiencia; UGC compra principalmente un activo y sus derechos, por lo que
+deben modelarse como ofertas y economics distintos. Performance & Commerce debe modelarse como signal/data infrastructure,
+media/commerce operations, creative performance y governance, no como simple configuración de plataformas. IMO y Managed Media Operations son capas operativas, no servicios
+adicionales.
+
 ### 3. Definir customer/value
 
 Registrar:

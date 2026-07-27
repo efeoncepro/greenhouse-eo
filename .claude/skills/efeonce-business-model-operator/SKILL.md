@@ -8,8 +8,14 @@ description: Business model design and audit for Efeonce offers, portfolio, deli
 The canonical operating skill is `.codex/skills/efeonce-business-model-operator/SKILL.md`.
 Its hardening set includes portfolio/capability model contracts, source catalog, acceptance criteria and
 blind-eval protocol.
+For Media & Distribution, use the canonical service catalog at `docs/services/media-distribution/README.md` and
+preserve the distinction between Efeonce as the contracting masterbrand, the business line and Reach as enabling
+product brand.
 Load that skill and the current model under `docs/business-models/`. Finance owns accounting, cost, cash and
 margin controls; Legal owns contracts, IP and privacy; Commercial owns execution of offers and sales.
+For Media & Distribution, the current model is `docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md`.
+Its current Performance & Commerce research benchmark is `docs/audits/commercial/PERFORMANCE_COMMERCE_DISTRIBUTION_MARKET_RESEARCH_2026-07-26.md`.
+For Media & Distribution, the current model is `docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md`.
 For the customer model (ICP, JTBD, buying group, decision, procurement, validation, adoption and expansion), also load
 `efeonce-customer-model-operator`. For the price architecture itself, also load `efeonce-pricing-operator`; it owns value metrics, packaging, billing
 units, discounts, versioning, economics guardrails and the Pricing Integrity Pack.

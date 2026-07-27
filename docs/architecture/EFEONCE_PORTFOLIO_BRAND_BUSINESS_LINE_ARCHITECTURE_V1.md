@@ -44,7 +44,7 @@ as business lines. They are not separate masterbrands or contractual agencies.
 | **Creative Services** | Globe / Creative Studio; Greenhouse; ICO | brand systems, campaigns, content, copy, social, motion, audiovisual production, creative operations |
 | **Digital Services & Engineering** | Wave; Greenhouse | Search Visibility 360, web experience, measurement, agent systems, automation and integrations |
 | **RevOps & CRM** | Kortex; HubSpot; Greenhouse | CRM diagnostic, HubSpot implementation, RevOps Managed, Customer Agent, CRM Intelligence |
-| **Media & Distribution** | Reach; Verk; Greenhouse | paid media, PR, influencers, distribution and amplification |
+| **Media & Distribution** | Reach; Verk; Greenhouse | Distribution Strategy & Media Architecture; Performance & Commerce Distribution; Influence, Earned & Partnership Distribution |
 | **Growth Strategy & Measurement** | Greenhouse; Verk; Wave; Kortex | growth strategy, revenue enablement, analytics, attribution and cross-line orchestration |
 
 This map is a portfolio routing contract, not a claim that every listed brand is a separate legal entity, vendor or

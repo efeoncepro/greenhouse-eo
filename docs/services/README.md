@@ -49,6 +49,17 @@ Cada servicio debe declarar como mínimo:
 
 - [HubSpot as a Service](hubspot-as-a-service/README.md)
 - [Creative Services](creative-services/README.md)
+- [Media & Distribution](media-distribution/README.md)
+
+HubSpot as a Service pertenece a la línea de negocio **RevOps & CRM**. Su arquitectura comercial y la revisión de los
+brochures históricos están documentadas en su ficha y en [`docs/audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md`](../audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md).
+
+Media & Distribution se vende mediante tres soluciones principales y una capa operativa: Distribution Strategy &
+Media Architecture; Performance & Commerce Distribution; Influence, Earned & Partnership Distribution; y Managed
+Media Operations como modalidad de operación, no como cuarta solución.
+Performance & Commerce se estructura alrededor de Measurement & Signal Foundation, Performance Media Operations,
+Commerce Media Operations, Creative Performance System y Algorithmic Media Governance; Incrementality & Marketing
+Effectiveness queda como capability avanzada condicionada por madurez.
 
 ## Wave — cartera de servicios productizados
 
@@ -66,7 +77,7 @@ que diseña, construye y opera la capa digital inteligente. El catálogo económ
 | **Digital Automation & Integrations** | API/Workflow Sprint · Data Pipeline · Automation Build · Integration Operations |
 
 La composición de un proyecto puede incorporar capacidades de RevOps & CRM/Kortex, Creative Services/Globe o
-Media & Distribution/Reach según el resultado contratado y el RACI definido. Wave conserva el ownership de sus
+Media & Distribution (con Reach cuando aplique) según el resultado contratado y el RACI definido. Wave conserva el ownership de sus
 familias de servicio.
 
 ### Delivery models de Wave
@@ -74,4 +85,4 @@ familias de servicio.
 Las familias anteriores son product services; el modelo de delivery se cotiza y gobierna por separado. Wave puede
 entregar mediante Productized Service, Managed Squad, Staff Augmentation, Implementation, Advisory o
 Platform-enabled Service, con engagements On-Going, On-Demand o Sample Sprint. Un proyecto puede combinar Wave con
-RevOps & CRM/Kortex, Creative Services/Globe, Media & Distribution/Reach o Greenhouse sin mezclar ownership.
+RevOps & CRM/Kortex, Creative Services/Globe, Media & Distribution (con Reach cuando aplique) o Greenhouse sin mezclar ownership.
