@@ -1,0 +1,4 @@
+interface:
+  display_name: "Efeonce Customer Experience"
+  short_description: "Diseño y gobierno de experiencia cliente"
+  default_prompt: "Usa $efeonce-customer-experience para diagnosticar y mejorar un journey de cliente con evidencia, métricas y owners."
