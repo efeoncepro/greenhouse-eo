@@ -103,6 +103,8 @@ evidencia, no una garantía de marketing.
 - [Creative Studio Business Model V1](../../business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md)
 - [Studio Credit Model V1](../../business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md)
 - [Globe Design System Governance Decision V1](../../architecture/EFEONCE_GLOBE_DESIGN_SYSTEM_GOVERNANCE_DECISION_V1.md)
+- [ADR-016 — Motor de estilos del payload cliente: Tailwind v4 sobre el SSOT](../../architecture/creative-studio/EFEONCE_GLOBE_CLIENT_STYLING_ENGINE_DECISION_V1.md) · `Accepted` 2026-07-27
+- [Composer — Referencia de estilo e implementación V1](../../ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md)
 - [Globe Producer — Human Execution + Approved Product Target Decision V1](../../architecture/creative-studio/EFEONCE_GLOBE_PRODUCER_HUMAN_EXECUTION_DECISION_V1.md)
 - [ADR-011 — Globe Video Effectiveness Agent Decision V1](../../architecture/creative-studio/EFEONCE_GLOBE_VIDEO_EFFECTIVENESS_AGENT_DECISION_V1.md)
 - [SPEC-011 — Globe Video Effectiveness Agent Architecture V1](../../architecture/creative-studio/EFEONCE_GLOBE_VIDEO_EFFECTIVENESS_AGENT_V1.md)
@@ -112,6 +114,23 @@ evidencia, no una garantía de marketing.
 - [UI Flow — Storyboard Studio Structured Sequence Canvas](../../ui/flows/TASK-1547-globe-storyboard-studio-flow.md)
 - [Master UI Flow — Globe Creative Studio](../../ui/flows/EPIC-028-globe-creative-studio-master-flow.md)
 - [Master UI Motion — Globe Creative Studio](../../ui/motion/EPIC-028-globe-creative-studio-master-motion.md)
+
+### Delta 2026-07-27 — ADR-016: el payload cliente adopta Tailwind v4
+
+Seis colisiones de CSS global medidas en una sola sesión (cuatro donde la hoja legacy pisó markup nuevo, una
+donde renombrar clases desconectó el glow del prompt, y el hallazgo de que **66 de 84 clases del composer vivían
+en la hoja del legacy**) motivaron [**ADR-016**](../../architecture/creative-studio/EFEONCE_GLOBE_CLIENT_STYLING_ENGINE_DECISION_V1.md),
+**aceptado el 2026-07-27**: el payload cliente adopta **Tailwind v4 con el SSOT de tokens como theme**.
+
+Supersede a ADR-014 **sólo** en el motor de estilos; Vite, React 19, shell propio, CSP por nonce y CDN siguen
+vigentes. Dueño de implementación: **`TASK-1485`** (barrido por dominio, no task nueva).
+
+**Consecuencias en el backlog:** el Slice 0 de `TASK-1552` **se retira** —una superficie reescrita en Tailwind
+no depende de la hoja legacy, así que mover 272 reglas era trabajo desechable— y `TASK-1560` se destraba por el
+mismo camino. Reescribir los tres gates de diseño es **precondición**, no follow-up.
+
+La referencia de valores para migrar sin reinterpretar vive en
+[`GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md`](../../ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md).
 
 ## Child Tasks
 

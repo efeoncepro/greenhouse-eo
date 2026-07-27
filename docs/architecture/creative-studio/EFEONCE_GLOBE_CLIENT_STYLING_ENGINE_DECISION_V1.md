@@ -1,7 +1,7 @@
 # ADR-016 — Motor de estilos del payload cliente de Globe: Tailwind v4 sobre el SSOT de tokens
 
 > **Tipo:** Architecture Decision Record
-> **Estado:** `Proposed` — requiere aceptación del operador antes de ejecutar
+> **Estado:** `Accepted` — aceptado por el operador el 2026-07-27
 > **Creado:** 2026-07-27
 > **Dueño de implementación:** `TASK-1485` (Globe Design System Governance and Pattern Registry)
 > **Supersede parcialmente:** [ADR-014](./EFEONCE_GLOBE_CLIENT_APPLICATION_DECISION_V1.md) — sólo en la
@@ -100,6 +100,18 @@ el SSOT en vez de competir.
 
 ## Estado y siguiente paso
 
-`Proposed`. No se ejecuta hasta aceptación explícita del operador. Al aceptarse, la implementación es un slice
-de **`TASK-1485`** — no una task nueva: el barrido por dominio confirma que esa task ya es dueña de tokens,
-patterns, components, motion y runtime del Design System de Globe.
+**`Accepted` (2026-07-27).** La implementación es un slice de **`TASK-1485`** — no una task nueva: el barrido
+por dominio confirma que esa task ya es dueña de tokens, patterns, components, motion y runtime del Design
+System de Globe.
+
+**Orden de ejecución acordado:**
+
+1. Limpiar la rama `task/TASK-1552-slice0-internalizar-css`: revertir el CSS copiado, `app.ts` y las exclusiones
+   de los gates (van juntos por acoplamiento); conservar `data-capture`, el estimado `stale` y los canaries.
+2. Preservar la copia verbatim de 151 KB como **baseline de diff**, fuera del código.
+3. Instalar Tailwind v4 en `apps/studio-client` con `tokens.ts` como theme.
+4. **Reescribir los tres gates** — precondición, no follow-up.
+5. Migrar por superficie con diff visual: composer → feed → viewer → share.
+
+La referencia de valores para la migración es
+[`GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md`](../../ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md).

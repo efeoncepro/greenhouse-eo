@@ -1,5 +1,66 @@
 # Handoff activo
 
+## 2026-07-27 — ADR-016 aceptado: el payload cliente de Globe adopta Tailwind v4
+
+**Decisión de arquitectura, sin runtime tocado todavía.** Seis colisiones de CSS global medidas en una sesión
+—cuatro donde la hoja legacy pisó markup nuevo (incluida `.estimate-rail>div` con cuatro reglas y dos
+`!important` forzando grid), una donde renombrar clases desconectó el glow del prompt, y el hallazgo de que
+**66 de 84 clases del composer vivían en `producerStyles`**— motivaron
+[ADR-016](docs/architecture/creative-studio/EFEONCE_GLOBE_CLIENT_STYLING_ENGINE_DECISION_V1.md), **aceptado**.
+
+Dueño de implementación: **`TASK-1485`**. El **Slice 0 de `TASK-1552` se retira** (mover 272 reglas que se van a
+reescribir es trabajo desechable) y `TASK-1560` se destraba por el mismo camino.
+
+**Referencia para migrar sin reinterpretar:**
+[`GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md`](docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md) —
+geometría, valores exactos (glow, ritmo vertical, alturas), estados, motion, los 23 iconos de piso y los asertos
+de verificación, incluido el de **contención** que faltaba (altura y `scrollWidth` daban verde con el layout
+roto).
+
+🔴 **Pendiente de limpieza antes de arrancar:** la rama `task/TASK-1552-slice0-internalizar-css` de
+`efeonce-globe` tiene **10 archivos sin commitear y 0 commits**. Hay que revertir **juntos** el CSS copiado
+(151 KB), `app.ts` y las exclusiones de los dos gates —van acoplados: revertir uno sin el otro deja el composer
+sin estilos— y conservar `data-capture`, el estimado `stale` (verificado: `canExecute` sigue bloqueando) y los
+tres canaries. La copia de 151 KB se preserva **fuera del código** como baseline de diff.
+
+⚠️ `TASK-1555` declara `Status real: Diseño` pero su código ya existe, y sus criterios describen una galería que
+fue rechazada. Alinear antes de tomarla.
+
+## 2026-07-27 — TASK-1552 Globe Composer: Slice 0 y canary local
+
+Se retomó TASK-1552 sobre el trabajo funcional existente de Claude, sin cambiar la rama `main` de
+`efeonce-globe` ni ampliar el alcance a TASK-1555. Slice 0 quedó aplicado: la hoja legacy completa se copia
+verbatim a `apps/studio-client/src/surfaces/producer/composer/producer-composer.css`, la rama React de
+`studio-web` dejó de inyectar `extraStyles: producerStyles`, y se conservaron los markers del composer más la
+señal visual de `estimate stale`. Se agregó `apps/studio-client/scripts/producer-composer-canary.mjs`, que
+sirve bundle, shell, assets y lectores fixtureados en `127.0.0.1:4324/producer`.
+
+Se corrigió un defecto descubierto por el canary: la primera copia había internalizado sólo reglas del panel y
+dejaba header/layout sin estilos al retirar `extraStyles`. Ahora la hoja React contiene los 147.479 B completos
+de `producerStyles`; además, un guard scoped limita el composer al viewport, deja el riel y CTA visibles y hace
+que sólo el cuerpo de la receta tenga scroll. En 1440×1000, 390×844 y 320×844: header 66 px, CTA visible,
+`advanced-controls` cerrado y `scrollWidth === clientWidth`. El estimate anterior se conserva y se pinta como
+`stale` atenuado durante el debounce. Esto estabiliza el primer fold, pero no cierra todavía el dock ni la
+recomposición completa. TASK-1555 sigue siendo la dependencia para tocar `producer-model-*`.
+
+La revisión de teclado confirmó que el disclosure permanece alcanzable y Enter lo abre sin robar el foco;
+el selector de ruta no expone `routeId` en texto visible y el composer mantiene 26 iconos Tabler en el canary.
+
+Se agregó el primer dock de herramientas en React: `producer-tool-dock[role=toolbar]` con disclosures separados
+para negativo, estilo/presets y seed, cada uno con icono y target de 45 px. Los paneles pasan 390/320 px sin
+overflow. El selector `producer-model-*` sigue intacto; la derivación completa desde capabilities publicadas y
+la variante de panel lateral siguen pendientes antes del cierre final.
+
+El canary browser quedó registrado en `apps/studio-client/package.json` y pasó build, 113 tests del client y la
+matriz 1440/390/320/reduced-motion. La extracción/tokenización de `producer-composer.css` no se marcó como
+resuelta: el artefacto de 34 KB referido por Claude no está en este worktree, así que la hoja compat completa y
+sus excepciones de gates permanecen visibles como deuda temporal de TASK-1560.
+El item Style del dock ya consulta `globe.producer.style.list` antes de mostrar disponibilidad; el canary publica
+esa capability y volvió a pasar en las cuatro variantes.
+
+Validado en Globe: client tests (113), client build, studio-web typecheck/tests (279), task lint, ops lint y
+`git diff --check`. No hay commit ni push.
+
 ## 2026-07-27 — Reconciliación de Brand Visibility Grader en Think
 
 Se verificó que `https://think.efeoncepro.com/brand-visibility` está live (`HTTP 200`) y contiene el
