@@ -170,6 +170,34 @@ Cada efecto externo debe tener checkpoint, idempotency key, timeout, política d
 La identidad del operador, la identidad del agente, el grant delegado y la identidad del runtime se mantienen
 separadas. Ningún agente puede ampliar tenant, scope, presupuesto o capability por inferencia.
 
+### 6. Codex y Claude deben consumir el mismo contrato de ejecución
+
+El harness del ecosistema no será Codex-only. Greenhouse tiene dos entrypoints operativos que deben permanecer
+alineados:
+
+| Entrypoint | Estado actual | Evolución objetivo |
+|---|---|---|
+| Codex `pnpm codex:task-hook` | Resuelve la task y genera el prompt canónico Greenhouse-local | Resuelve work item/target y entrega el contrato de ejecución y verification profile correspondiente |
+| Claude `/implement-task` | Ejecuta el proceso local-first y contiene gates específicos de Greenhouse | Consume el mismo work contract; selecciona gates del repo destino y conserva sus guardrails propios |
+
+Ambos entrypoints deben compartir:
+
+- identidad del work item y target repository;
+- source of truth, owner, dependencias y lifecycle;
+- Repo Capability Manifest y verification profile;
+- reglas de autorización, branch/worktree, subagentes y efectos externos;
+- formato de estado, evidencia, freshness y handoff;
+- clasificación de cierre (`complete`, `code complete, rollout pendiente` o `operativamente bloqueado`).
+
+Pueden diferir en instrucciones específicas del modelo, formato de prompt y tooling de delegación, pero no pueden
+divergir en el contrato de autoridad, gates requeridos, evidencia o semántica de cierre. Los gates actualmente
+embebidos en `.claude/commands/implement-task.md` —como `pnpm`, ESLint, typecheck, GVC, workers o `pg:doctor`— deben
+convertirse en gates del perfil `greenhouse-standard`, no en requisitos universales para Wave, Globe, Think o el sitio
+público.
+
+La paridad debe tener drift guards para ambos entrypoints. Un cambio en el work contract, verification profile,
+capability o estado de cierre debe actualizar el contrato común y validar Codex y Claude antes de promoverlo.
+
 ## Boundary model
 
 | Concern | Greenhouse / Work Registry | Repo o runtime destino |
@@ -182,6 +210,7 @@ separadas. Ningún agente puede ampliar tenant, scope, presupuesto o capability 
 | Tests/build/deploy/rollback | Orquesta policy y evidencia | Ejecuta y verifica |
 | Definition of verification gates | Consume perfiles y aplica policy de cierre | Declara comandos, dependencias, versiones y evidencia |
 | Gate result | Proyección agregada por target | Resultado primario firmado o verificable |
+| Agent entrypoint | Consume el contrato y reporta ejecución | Codex/Claude ejecutan sin divergir en autoridad, gates ni cierre |
 | Identidad y entitlements ecosistema | Administra contexto y bindings | Enforces localmente |
 | Secretos, DB, service accounts | Aislados por plataforma | Owner local |
 | Auditoría cross-platform | Registro de coordinación y grants | Auditoría del efecto local |
@@ -256,6 +285,7 @@ gradualmente con capacidades y contratos explícitos.
 - No autoriza a Greenhouse a ejecutar directamente código, SQL, secretos o deploys de otra plataforma.
 - No reemplaza los comandos, readers, APIs, MCP o workflows locales de cada producto.
 - No impone los gates, package manager, linter, framework, proveedor cloud o estrategia de build de Greenhouse a otros repos.
+- No mantiene un contrato cross-repo separado para Codex y Claude.
 - No define todavía transporte específico, proveedor de colas, schema final de tablas ni UI final.
 - No convierte todos los scripts históricos en capacidades federadas automáticamente.
 
@@ -269,13 +299,15 @@ gradualmente con capacidades y contratos explícitos.
    freshness y reconciliation.
 4. **Verification profiles:** registrar por repo los comandos reales de lint, typecheck, tests, build, deploy, smoke y
    rollback; clasificar cada gate como required, advisory, conditional o human approval y definir su schema de evidencia.
-5. **First adapters:** implementar un adapter read-only de referencia para un repo hermano y uno para una superficie
+5. **Entrypoint parity:** extraer el contrato común consumido por `pnpm codex:task-hook` y `/implement-task`, mapear los
+   gates Greenhouse actuales al perfil `greenhouse-standard` y crear drift guards para ambos caminos.
+6. **First adapters:** implementar un adapter read-only de referencia para un repo hermano y uno para una superficie
    externa como Think o sitio público. Validar discovery, estado y evidencia antes de permitir mutaciones.
-6. **Execution federation:** añadir planificación y ejecución delegada con capabilities, grants, checkpoints,
+7. **Execution federation:** añadir planificación y ejecución delegada con capabilities, grants, checkpoints,
    idempotencia, cancelación y approval gates.
-7. **Conformance:** agregar contract tests, drift/freshness checks, failure/replay tests y dashboard de cobertura del
+8. **Conformance:** agregar contract tests, drift/freshness checks, failure/replay tests y dashboard de cobertura del
    ecosistema.
-8. **Promotion:** habilitar mutaciones o deploys sólo por repo, capability y nivel de autonomía, con rollback y kill
+9. **Promotion:** habilitar mutaciones o deploys sólo por repo, capability y nivel de autonomía, con rollback y kill
    switch probados.
 
 ## Open decisions before implementation
@@ -287,6 +319,7 @@ gradualmente con capacidades y contratos explícitos.
 - ¿Cuál es el contrato mínimo de verification profiles y cómo se versionan los gates sin imponer una toolchain común?
 - ¿Qué operaciones serán read-only en V1 y cuáles podrán mutar o desplegar?
 - ¿Qué repo o producto será el primer adapter de referencia?
+- ¿Cuál será la fuente canónica compartida que consuman Codex y Claude, y qué drift guards tendrán ambos entrypoints?
 - ¿Dónde se almacenará la evidencia pesada: en el repo/runtime destino, en un artifact store o mediante referencias?
 - ¿Qué SLO de frescura y disponibilidad necesita la vista central para trabajo interno y trabajo cliente-facing?
 

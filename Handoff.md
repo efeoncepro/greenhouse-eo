@@ -9,8 +9,11 @@ conserva ejecución, evidencia primaria, runtime y ownership local mediante mani
 `Proposed — architecture direction accepted, implementation gated`; no se definieron aún transporte, schema, primer
 adapter, mutaciones ni deploys cross-repo. Se agregó explícitamente que los gates de ESLint, `pnpm`, typecheck, tests,
 build, deploy y smoke son propiedad de cada repo: Greenhouse agrega resultados y aplica policy, pero no impone una
-toolchain común. Próximo paso: aceptar el ADR y abrir el epic transversal de foundation del registry, comenzando por
-baseline de repos/owners/contracts/gates y un adapter read-only.
+toolchain común. El alcance incluye tanto `pnpm codex:task-hook` como `/implement-task` de Claude: ambos deben consumir
+el mismo work contract, verification profile, autoridad, evidencia y semántica de cierre; los gates Greenhouse-specific
+de `.claude/commands/implement-task.md` no son universales. Próximo paso: aceptar el ADR y abrir el epic transversal
+de foundation del registry, comenzando por baseline de repos/owners/contracts/gates y paridad de entrypoints antes de
+un adapter read-only.
 
 ## 2026-07-27 — Wave Product House, Greenhouse Admin y Agent Native
 

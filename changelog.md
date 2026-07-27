@@ -12,6 +12,7 @@
 - Se formalizó el ADR propuesto que extiende el harness Greenhouse-local hacia una arquitectura de ecosistema: Greenhouse conserva registro, visibilidad y coordinación global; cada repo conserva ejecución y evidencia primaria.
 - Se definieron work contracts, Repo Capability Manifests, adapters federados, estados de freshness y una transición read-only antes de habilitar mutaciones cross-repo.
 - Se fijó que ESLint, `pnpm`, typecheck, tests, build, deploy y smoke se declaran por repo mediante verification profiles; Greenhouse agrega sus resultados y aplica policy sin imponer una toolchain común.
+- Se aclaró que el contrato debe gobernar tanto `pnpm codex:task-hook` como `/implement-task` de Claude; los gates actuales del command de Claude pasan a ser un perfil Greenhouse-specific, no requisitos universales del ecosistema.
 - No se autorizó todavía schema, transporte, adapter concreto, ejecución remota, deploy ni segundo task registry.
 
 ## 2026-07-27 — Wave Product House, Greenhouse Admin y Agent Native
