@@ -144,6 +144,35 @@ literales** y **3 ms literales**. El gate **documenta su propia frontera** (lín
 `TASK-1560` Slice 2 — eso es buena gobernanza, no un agujero oculto. Pero mientras el estilo venga de ahí,
 **esta task no puede reclamar cumplimiento del contrato de tokens: su verde es vacuo por construcción.**
 
+### 3-bis. Evidencia visual: antes real vs. recomposición, misma hoja
+
+Se montó el composer real (bundle + shell + `producerStyles`, igual que producción) y se prototipó la
+recomposición **sobre la misma hoja**, para que la única variable fuera la composición.
+
+| Medición | Antes (runtime real) | Recomposición |
+|---|---:|---:|
+| CTA `Generar` @1440×1000 | `y=1389` — **fuera del fold** | `y=921` — visible |
+| Riel de estimado | `y=1332`, `position: relative` | `position: sticky` al pie |
+| Alto del panel @1440 | 1249 px | 1000 px, sin scroll de página |
+| Alto del documento @390 | **2.391 px** (2,8 pantallas) | 1.004 px |
+| CTA @390 | `y=1460` — invisible | `y=806` — visible |
+| `advanced-controls` | `open` | cerrado |
+| Overflow horizontal | no | no |
+
+**El riel NO está fijo hoy**, contra lo que el wireframe exige explícitamente (*«en angosto es lo único que no
+puede quedar fuera de vista»*). Es un hallazgo nuevo: el gap lo describía como jerarquía, y además es geometría.
+
+🔴 **Dos acoplamientos de la hoja legacy que muerden al recomponer** (encontrados al construirlo, no teóricos):
+
+1. `.prompt-actions` está **posicionado en absoluto** dentro de `.prompt-field`. Al sacar el bloque de esa
+   estructura, los botones flotan sobre el feed.
+2. `.icon-pill` es **circular de tamaño fijo**: usado con label, recorta el texto.
+
+Ambos son la misma clase de problema — **la hoja legacy tiene reglas acopladas a la estructura del legacy**, así
+que mover markup sin mover CSS produce glitches que no son de diseño sino de herencia. Es evidencia adicional de
+que **Slice 0 va antes que Slice 1**, y de que el diff visual a cero del Slice 0 tiene que medirse con el markup
+actual, ANTES de recomponer.
+
 ### 4. Correcciones menores medidas
 
 - `ProducerComposer.tsx` es de **69.378 B**, no 45 KB (+54 %; último commit `7cd0df3`, 2026-07-26). Re-medir
