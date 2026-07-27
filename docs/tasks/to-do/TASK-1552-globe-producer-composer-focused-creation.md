@@ -252,6 +252,64 @@ Al recomponer, `.control-title`, `.number-shape-field`, `.helper` y `.availabili
 las reglas nuevas (títulos desalineados, input deformado). **Las clases nuevas necesitan namespace propio**
 (`pc-*`) o el Slice 0 debe migrarlas de verdad. Tercer ejemplo del mismo acoplamiento — refuerza Slice 0 → Slice 1.
 
+## Delta 2026-07-27 (3) — benchmark de mercado: el panel se reinterpreta, y las entidades salen al texto
+
+Investigación con subagentes sobre 13 composers (jul 2026). Fuente primaria sólida en **Recraft, Krea, Adobe
+Firefly e Ideogram**; Midjourney y Runway bloquean fetch directo (evidencia por snippets de sus propias docs);
+Kling/Pika/Luma/Leonardo/Magnific sin doc pública de UI (evidencia secundaria, marcada).
+
+### Los tres patrones que gobiernan
+
+1. **El panel se reinterpreta, no crece** (Recraft): el modo se deriva de **qué hay seleccionado** — nada →
+   generar, una imagen → editar, varias → esas pasan a ser referencias. Cero tabs, cero acordeones.
+2. **Colapsar hacia el punto de acción** (Firefly, abril 2026): modelo, saldo de créditos y referencias
+   **dentro de la barra del prompt**, explícitamente para retirar paneles satélite.
+3. **Las entidades salen del panel al texto** (`@refs` — Runway Gen-4, Higgsfield Elements): nombres
+   reutilizables invocados con `@` dentro del prompt. **Es la única estrategia que escala sin techo**: sumar 40
+   personajes no agranda el panel ni un píxel.
+
+> ⚠️ **Consecuencia para el `tool dock` del Delta (2):** el dock **contiene** bien, pero es un contenedor — con
+> 20 herramientas hay 20 iconos. Los patrones 1 y 3 no contienen: **redistribuyen**. El dock se conserva para lo
+> que es genuinamente una herramienta puntual; no es la respuesta completa al crecimiento.
+
+### 🔴 `@menciones` — la pieza existe y el puente no tiene dueño
+
+- `'mention'` **ya existe** como `RouteInputMode` en `packages/contracts/src/producer-catalog.ts:61`.
+- `TASK-1580` va a crear los **Element** reutilizables… y **no menciona invocación por `@` en ninguna parte**.
+- Ninguna task de UI la reclama.
+
+Mismo patrón de hueco que el CSS del Slice 0: **dos tasks que asumen que la otra lo hace.** Necesita dueño
+explícito — recomendación: slice de `TASK-1580` + su consumer de UI, no una task suelta.
+
+### Implementado en esta pasada (verificado en browser)
+
+| Mejora | Patrón fuente | Estado |
+|---|---|---|
+| **Metadata del modelo**: costo · velocidad · fortaleza (`10 cr · ~8 s · fotorrealismo`) | Krea — el benchmark de "transparent model selection" | ✅ |
+| **Pin/lock de referencia** — distingue `Fijada` de `Solo esta vez` | Midjourney; casi nadie resuelve efímera vs sostenida | ✅ |
+| **Elasticidad con FLIP** — el panel de herramienta abre inline y los hermanos se desplazan animando **`transform`**, nunca `height` | — | ✅ verificado: `getAnimations()` reporta `transform`; foco al panel; `Escape` cierra; `prefers-reduced-motion` salta la animación |
+
+**La elasticidad NO viola la regla dura del contrato de motion.** Se mide la posición antes y después, y se anima
+la diferencia con `transform` (FLIP). Visualmente se estira; el compositor no recalcula layout. Stack verificado:
+React 19.2 + Vite 8, **cero librerías de animación** — se hace con `element.animate()` o `View Transitions`, sin
+sumar dependencia.
+
+⚠️ **Elástico donde hay continuidad** (abrir herramienta, sumar referencia: *lo mismo creció*). **Cross-fade donde
+cambia el contenido** (Imagen→Video→Audio: los campos son **otros**, y estirar finge una continuidad que no
+existe).
+
+### Propuestas con impacto, sin dueño todavía
+
+- **Modo borrador barato** (Luma Draft Mode): previsualizar en baja resolución y comprometer créditos completos
+  sólo al render final. Para un producto cuyo centro es el gasto, es el patrón de mayor impacto del benchmark.
+  Toca el contrato de estimate/créditos → `TASK-1532` + ledger.
+- **Modo derivado del contexto** (Recraft) como evolución del progressive disclosure.
+
+### Nota de implementación
+
+La CSP estricta de Globe **necesita `script-src 'nonce-…'` explícito**: sin él cae a `default-src 'self'`, que
+bloquea el inline **aunque lleve nonce**. Costó una iteración en el harness; el runtime real ya lo declara.
+
 ## Summary
 
 Recomponer el composer de Globe Producer para que una sola intención creativa domine el first fold: `prompt → dirección → output shape → generar`. Las capacidades avanzadas permanecen disponibles mediante progressive disclosure, sin duplicar el costo ni contradecir `TASK-1532`.
