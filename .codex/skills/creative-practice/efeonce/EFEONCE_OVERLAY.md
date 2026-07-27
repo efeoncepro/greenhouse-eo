@@ -29,14 +29,19 @@ un commodity con 10.000 competidores y un ranking de recall en el que no salimos
 
 *(De `docs/context/15`, la lane creativa del full-service.)*
 
-| Servicio | Studio que lo ejecuta |
-|---|---|
-| **Identidad / marca / sistema visual** | `design-studio` |
-| **Key Visual / campaña** | `design-studio` + `copywriting` |
-| **Audiovisual** *(spots, piezas, motion)* | `motion-design-studio` |
-| **Contenido creativo** | `content-marketing-studio` + `copywriting` |
-| **Social** *(adaptación y ejecución)* | `social-media-studio` |
-| **Audio / sonic branding** | `audio-studio` |
+| Servicio comercial | Qué compra el cliente | Studio/capability que lo ejecuta |
+|---|---|---|
+| **Creative Strategy & Brand Systems** | Diagnóstico, posicionamiento, identidad y governance | `design-studio` · `copywriting` |
+| **Campaign & Creative Platform Systems** | Idea, campaña, KV, mensajes y toolkit multicanal | `design-studio` · `copywriting` |
+| **Content & Social Operations** | Capacidad recurrente de contenido, social, QA y aprendizaje | `content-marketing-studio` · `social-media-studio` · `copywriting` |
+| **Audiovisual, Motion & Audio Production** | Producción, edición, motion, audio y finishing | `motion-design-studio` · `audio-studio` |
+| **Run-and-Gun Production** | Captura profesional ágil con crew, setup y post definidos | Run-and-Gun Studio · `motion-design-studio` · `audio-studio` |
+| **Managed Creative Capacity** | Squad recurrente con prioridades, RACI y accountability | `greenhouse-talent-people-operator` + studios |
+| **AI Creative Operations / Studio Access** | Workflow, memoria, provenance y governance creativo | Globe / Creative Studio + studios |
+| **Creative Diagnostic** | Baseline y roadmap para elegir la siguiente fase | `modules/06_CUNA.md` |
+
+`Performance Creative Lab`, Experience/Product/CX y Editorial Content & SEO son composiciones con Reach/Media,
+Wave/Search Visibility u otras líneas; no son nuevas líneas de Creative Services por defecto.
 
 **La taxonomía comercial** *(`docs/context/14` + Business Model V1)* tiene tres ejes, no una lista de
 modalidades:

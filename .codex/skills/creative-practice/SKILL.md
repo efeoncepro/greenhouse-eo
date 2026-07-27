@@ -3,7 +3,7 @@ name: creative-practice
 description: >-
   Operador comercial de la práctica creativa de Efeonce: oferta, pricing, scope,
   SOW, descalificación, pitch, retención y expansión para marca, campaña,
-  audiovisual, social y contenido creativo. Usar al vender o cotizar Managed
+  audiovisual, Run-and-Gun, social y contenido creativo. Usar al vender o cotizar Managed
   Squad, Staff Augmentation, Studio Access, On-Going, On-Demand, Sample Sprint o
   Creative Studio; al definir Studio/Globe Credits, pools, consumo por pieza,
   refunds o top-ups; y ante preguntas de rate card, retainer, derechos, buyout,

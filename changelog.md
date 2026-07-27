@@ -27,6 +27,17 @@
   `TASK-1585` (break-glass gobernado + retiro del HMAC), `TASK-1586` (desambiguador de negación al
   operador — cierra ISSUE-124).
 
+## 2026-07-26 — Creative Services: catálogo y skills sincronizados
+
+- Se formalizó el catálogo de Creative Services como línea de negocio de Efeonce: Creative Strategy & Brand
+  Systems, Campaign & Creative Platform Systems, Content & Social Operations, Audiovisual/Motion/Audio Production,
+  Run-and-Gun Production, Managed Creative Capacity y AI Creative Operations/Studio Access.
+- Se sincronizaron las skills gemelas de `creative-practice`, incluyendo el hand-off a studios, la frontera
+  Run-and-Gun Studio/capability versus Run-and-Gun Production/servicio y las composiciones con Wave, Reach y
+  Search Visibility.
+- Globe conserva el rol de product brand habilitante; no se convierte en la línea creativa completa. No hubo cambios
+  de runtime ni de pricing aprobado.
+
 ## 2026-07-26 — Portfolio Efeonce: marca paraguas, líneas y product brands
 
 - Se canonizó la separación entre **Efeonce** como marca paraguas/relación comercial, líneas de negocio/prácticas,

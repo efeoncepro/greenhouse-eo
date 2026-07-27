@@ -269,12 +269,28 @@ Lo que está roto es cómo lo cobramos.**
 
 | Servicio | Modalidad natural | 🔴 El borde de alcance que hay que fijar | Hand-off al oficio |
 |---|---|---|---|
-| **Identidad / sistema de marca** | **On-Demand** *(proyecto con fin)* | ✅ **2-3 rondas de concepto + 1-2 de refinamiento** *(estándar verificado)*. **Y los derechos: la identidad es el caso donde el buyout perpetuo se justifica — y se cobra** | `design-studio` · `typography-design` |
-| **Key Visual / campaña** | On-Demand, o dentro del On-Going | **Cantidad de conceptos · adaptaciones incluidas · canales · territorio · plazo de uso** | `design-studio` · `greenhouse-ai-image-generator` |
-| **Audiovisual** | On-Demand *(o lane del squad)* | 🔴 **Rondas sobre el corte, no sobre el guion aprobado. Y el uso en pauta pagada se cotiza: +50-100%** ✅ | `motion-design-studio` · `audio-studio` |
-| **Social / contenido creativo** | 🎯 **On-Going** *(es capacidad pura)* | **Capacidad de hasta N piezas/mes.** 🔴 **Nunca precio por post** | `social-media-studio` · `copywriting` |
-| **Contenido editorial / blog** | **On-Going** | **Capacidad + grilla.** 🔴 **Si el deal incluye SEO/contenido, el pricing de esa lane es de `seo-aeo-practice` — NO dupliques su rate card** | `content-marketing-studio` · `seo-aeo-practice` |
-| **Diagnóstico** | 🎯 **Gratis — es la cuña** | **Se regala el diagnóstico. NUNCA la solución** | → `modules/06_CUNA.md` |
+| **Creative Strategy & Brand Systems** | Diagnostic · On-Demand · Managed Squad | **Diagnóstico, posicionamiento, identidad, sistema, governance, templates y enablement** | `design-studio` · `copywriting` |
+| **Campaign & Creative Platform Systems** | On-Demand · Managed Squad | **Concepto, plataforma, KV, mensajes, toolkit, canales, adaptaciones, territorio y uso** | `design-studio` · `copywriting` |
+| **Content & Social Operations** | 🎯 **On-Going** *(capacidad recurrente)* | **Grilla, cadencia, formatos, aprobador, QA y capacidad; nunca precio por post** | `social-media-studio` · `copywriting` · `content-marketing-studio` |
+| **Audiovisual, Motion & Audio Production** | On-Demand · Managed Squad | **Rondas sobre el corte, derechos, formatos, finishing, audio, uso en pauta y pass-through** | `motion-design-studio` · `audio-studio` |
+| **Run-and-Gun Production** | On-Demand · Managed Squad | **Setup, crew, jornada, locación, talentos, permisos, captura, backup, post, derechos y contingencia** | `motion-design-studio` · `audio-studio` |
+| **Managed Creative Capacity** | 🎯 **On-Going** *(Managed Squad)* | **Capacity envelope, lanes, prioridades, RACI, SLA/expectations y telemetría** | `greenhouse-talent-people-operator` + studios especializados |
+| **AI Creative Operations / Studio Access** | On-Going · Studio Access · Pilot | **Workspace, memoria, provenance, providers, créditos, governance y límites; Globe potencia, no reemplaza la línea** | `greenhouse-globe` · studios especializados |
+| **Creative Diagnostic** | 🎯 Entrada / Diagnostic | **Baseline de marca, contenido, capacidad u operación; propone la siguiente fase, no la sustituye** | `modules/06_CUNA.md` |
+
+`Performance Creative Lab` es una composición con Media & Distribution/Reach y Measurement; prueba variantes,
+hipótesis y aprendizaje creativo conectado con medios. `Experience/Product/CX` compone con Wave cuando requiere
+producto, web o tecnología. `Editorial Content & SEO` compone con Search Visibility hasta resolver ownership y
+pricing. Ninguna de estas composiciones crea una nueva línea de Creative Services por sí sola.
+
+### Run-and-Gun: capability versus servicio
+
+**Run-and-Gun Production** es el servicio que compra el cliente. **Run-and-Gun Studio** es la capability de
+infraestructura, equipo y crew que permite entregarlo. No es Globe ni una product brand por defecto.
+
+Candidatos de packaging para validación: `Content Capture Day`, `Interview / Podcast Capture`, `Social-First
+Production Sprint` y `Brand Story / Campaign Capture`. Antes de venderlos se deben fijar inventario, movilidad,
+perfiles, postproducción, tiempos, seguros, derechos de imagen/voz, música, IA y contingencia.
 
 🔴 **Regla de frontera:** si la pregunta es *cómo se hace la pieza* → **es del studio.**
 Si es *cuánto vale, qué incluye y hasta dónde llega* → **es de acá.**

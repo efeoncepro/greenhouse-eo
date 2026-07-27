@@ -13,6 +13,33 @@ Estado: `Approved for validation`; no habilita precios públicos ni venta self-s
 completas por oferta, el Pricing Integrity Pack de Creative Services y los gates de Finance/Legal/evidencia antes de
 declarar cualquier servicio `Commercially approved`.
 
+## 2026-07-26 — Benchmark de Creative Services LatAm y global
+
+Se completó el benchmark [`CREATIVE_SERVICES_MARKET_BENCHMARK_2026-07-26.md`](docs/audits/commercial/CREATIVE_SERVICES_MARKET_BENCHMARK_2026-07-26.md)
+con referentes globales, latinoamericanos y modelos productizados. La recomendación ajusta el catálogo hacia
+Creative Strategy & Brand Systems, Campaign & Creative Platform Systems, Content & Social Operations, Audiovisual /
+Motion & Audio Production, Managed Creative Capacity y AI Creative Operations / Studio Access. Performance Creative
+Lab, Wave, Reach, Kortex e Impact Narrative quedan como composiciones o hipótesis hasta cerrar ownership, ICP,
+pricing y evidencia.
+
+Conclusión: el posicionamiento defendible es capacidad creativa gobernada, sistemas reutilizables y aprendizaje
+medible; no piezas ilimitadas, horas ni IA creativa aislada. El benchmark no autoriza pricing ni aprobación comercial.
+
+## 2026-07-26 — Run-and-Gun Studio dentro de Creative Services
+
+Se ubicó el estudio Run-and-Gun como capability de producción y se agregó `Run-and-Gun Production` como oferta
+especializada bajo `Audiovisual, Motion & Audio Production` en el catálogo de Creative Services. La separación
+vigente es: el cliente compra producción dirigida por Efeonce; el estudio/equipamiento es la capacidad habilitante.
+Un futuro alquiler o acceso autónomo sería otra modalidad `Studio Access`, con RACI, liability, seguros y condiciones
+de uso propios.
+
+Los paquetes `Content Capture Day`, `Interview / Podcast Capture`, `Social-First Production Sprint` y `Brand Story /
+Campaign Capture` quedan como candidatos de validación. Falta inventariar equipo, crew, movilidad, post, derechos,
+seguros, tiempos y economics antes de aprobación comercial.
+
+La taxonomía fue sincronizada en las skills gemelas de `creative-practice`: catálogo comercial, hand-off a studios,
+frontera Run-and-Gun Studio versus Run-and-Gun Production y composiciones con Wave/Reach.
+
 ## 2026-07-26 — Taxonomía de portfolio Efeonce corregida
 
 Se estableció el contrato [`EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md`](docs/architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md): **Efeonce es la marca paraguas y relación comercial; Creative Services, Digital Services & Engineering, RevOps & CRM, Media & Distribution y Growth Strategy & Measurement son líneas de negocio/prácticas; Globe, Wave, Reach, Kortex y Verk son product brands o platform brands; Greenhouse es el control plane; las ofertas y delivery models viven debajo de esas capas**. Se sincronizaron context pack, business models, catálogo de servicios y skills Codex/Claude. Los labels históricos de runtime pueden permanecer donde sean identificadores técnicos; no deben usarse como taxonomía comercial nueva.
