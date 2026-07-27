@@ -6,8 +6,8 @@
 
 - Lifecycle: `to-do`
 - Priority: `P1`
-- Impact: `Alto`
-- Effort: `Medio`
+- Impact: `Muy alto`
+- Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
@@ -17,10 +17,10 @@
 - Motion: `docs/ui/motion/TASK-1552-globe-producer-composer-focused-creation-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Port 1:1 del composer ENTREGADO en el payload cliente (ProducerComposer.tsx, 45KB); pendiente la recomposición de jerarquía, el contrato de motion y la evidencia visual`
+- Status real: `Port del MARKUP entregado (ProducerComposer.tsx, 69KB) pero SIN estilos propios: 66 de 84 clases viven en producerStyles del legacy, que es lo que bloquea TASK-1560. Pendientes: Slice 0 (internalizar CSS), recomposición de jerarquía, atenuación del estimado y evidencia visual`
 - Rank: `TBD`
 - Domain: `creative|ui|product`
-- Blocked by: `none`
+- Blocked by: `TASK-1555`
 - Branch: `task/TASK-1552-globe-producer-composer-focused-creation`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -98,6 +98,65 @@ task es exactamente su alcance original: la **recomposición de jerarquía**, el
 día que se escribió; el runtime describe hoy** — antes de tomar esta task, `ls` sobre
 `apps/studio-client/src/surfaces/producer/` y `grep` de la ruta en `main.tsx`, no memoria de este archivo.
 
+## Delta 2026-07-27 — 🔴 el port no incluyó los estilos, y dos premisas estaban medidas sobre el archivo equivocado
+
+Auditoría de diseño con `greenhouse-ai-design-studio`, medida contra `efeonce-globe@main`. **La regla del Delta
+anterior se aplicó a este archivo y encontró tres cosas que lo invalidan parcialmente.**
+
+### 1. 🔴 El composer React no tiene CSS propio: hereda la hoja del legacy VERBATIM
+
+| Medición | Valor |
+|---|---:|
+| Clases distintas en `ProducerComposer.tsx` | **84** |
+| Definidas en CSS de `studio-client` | **0** |
+| Definidas **sólo** en `studio-web` (`producerStyles`) | **66** |
+| Iconfont Tabler (asset servido aparte) | 18 |
+| `producer-composer.css` | 2.202 B · **2 selectores** |
+| `producerStyles` en `producer-ui.ts` | **147.543 B** |
+
+No es descuido: `apps/studio-web/src/app.ts:2237-2256` lo hace a propósito y lo documenta — *«reutiliza la hoja
+del legacy VERBATIM… Reescribir estas reglas en la capa nueva es lo que produjo la regresión del feed»*. La
+decisión es defendible; **lo que falta es su dueño.**
+
+**Consecuencia dura: la razón por la que esta task bloquea `TASK-1560` estaba mal enunciada.** Decía que el
+legacy «sigue siendo la plantilla que el próximo agente copia» — razón cultural. La razón real es de runtime:
+`producer-ui.ts` exporta la **única** hoja de estilos del composer nuevo. Borrarlo deja la superficie sin CSS.
+Y como esta task declaraba ese archivo `NO owned` y `TASK-1560` es *retiro*, **nadie era dueño de migrar los
+147 KB**. Lo cierra el **Slice 0** nuevo.
+
+### 2. La premisa de motion de Slice 3 medía el stub de 2 KB
+
+Este archivo afirmaba dos veces «**0 `@keyframes`** → el contrato de motion está sin implementar». La hoja que
+la superficie **realmente aplica** tiene **16 `@keyframes`**, 20 `transition` y 2 `prefers-reduced-motion`,
+incluido `budget-popover-in` — el popover que se creía faltante.
+
+**La conclusión sobrevive, por otra razón:** `stale` aparece **0 veces** en la hoja real. La atenuación del
+estimado —que el contrato de motion llama *«el motion más importante de la superficie»*— no existe. El TSX sí
+ramifica `status.kind === 'stale'` (líneas 1222 y 1240): **el estado se decide y no se pinta.**
+
+Es el anti-patrón que `EPIC-028` denuncia (*«el gate es el test de regresión del primer consumidor»*, el drift
+guard que medía 12 de 38), reaparecido dentro de la task que lo documenta.
+
+### 3. El gate de diseño no cubre la hoja que la superficie aplica
+
+`design-contract.test.ts` camina `apps/studio-client/**`; la hoja real vive en `studio-web` y tiene **178 HEX
+literales** y **3 ms literales**. El gate **documenta su propia frontera** (líneas 31-39) y asigna el ensanche a
+`TASK-1560` Slice 2 — eso es buena gobernanza, no un agujero oculto. Pero mientras el estilo venga de ahí,
+**esta task no puede reclamar cumplimiento del contrato de tokens: su verde es vacuo por construcción.**
+
+### 4. Correcciones menores medidas
+
+- `ProducerComposer.tsx` es de **69.378 B**, no 45 KB (+54 %; último commit `7cd0df3`, 2026-07-26). Re-medir
+  antes de planificar.
+- Los 9 tokens de motion que el contrato exige **existen los 9** en `tokens.ts`. Slice 3 no está bloqueado por
+  `TASK-1523` en ese eje.
+- Lo que este archivo declaraba con exactitud 1:1 contra el runtime y **se confirma**: los 11 `data-capture`,
+  los 3 faltantes, `advanced-controls` `open` (línea 1010), `GlobeGeneratingMark` consumido, 3 `aria-live`.
+- ⚠️ `pnpm task:lint`, `ui:wireframe-check` y `ui:readiness-check` son **el mismo binario**
+  (`scripts/ci/task-lint.mjs`). Tres verdes son **una** pasada, no tres. Sólo `ui:quality` es distinto.
+- ⚠️ La fuente visual (`~/Documents/Globe/…dc.html`) vive **fuera del repo**. El orquestador exige versionarla
+  dentro. Mitigado por la geometría medida en el anexo del wireframe, no resuelto.
+
 ## Summary
 
 Recomponer el composer de Globe Producer para que una sola intención creativa domine el first fold: `prompt → dirección → output shape → generar`. Las capacidades avanzadas permanecen disponibles mediante progressive disclosure, sin duplicar el costo ni contradecir `TASK-1532`.
@@ -160,7 +219,10 @@ Reglas obligatorias:
 - `TASK-1505` — Producer surface y patrones existentes (dirección aprobada).
 - `TASK-1532` — CTA único y estimate automático. **Flow y motion contract compartidos** con esta task.
 - `TASK-1555` 🚧 in-progress — selector de modelo: dueño de la región `producer-model-*` **dentro del mismo
-  archivo**. Coordinar orden.
+  archivo** (verificado: líneas 1127-1181). **Orden fijado, no "coordinar": `TASK-1555` cierra ANTES de que
+  Slice 1 toque la jerarquía.** El operador ya rechazó una versión galería del selector; recomponer el fold
+  sobre una región en vuelo re-abre una decisión ya tomada. Al empezar Slice 1, el estado de los 5 markers
+  `producer-model-*` es baseline congelado: se decide **dónde vive** el bloque, nunca su forma interna.
 - `TASK-1523` — dueña del SSOT de motion del payload cliente (`GLOBE_CLIENT_MOTION_CONTRACT_V1.md`) y de
   `GlobeGeneratingMark`, que esta superficie **consume**.
 - `TASK-1531` — Creative Prompt Studio, si su propuesta se integra en el composer.
@@ -170,8 +232,11 @@ Reglas obligatorias:
 
 ### Blocks / Impacts
 
-- **Bloquea `TASK-1560`** (retiro del payload legacy): mientras `producer-ui.ts` / `producer-controller.ts`
-  existan siguen siendo la plantilla que el próximo agente copia.
+- 🔴 **Bloquea `TASK-1560`** (retiro del payload legacy) **por acoplamiento de runtime, no por higiene**:
+  `producer-ui.ts` exporta `producerStyles`, la **única** hoja de estilos que aplica el composer React (66 de
+  sus 84 clases se definen sólo ahí; su CSS propio tiene 2 selectores). **Borrar ese archivo deja la superficie
+  sin CSS.** El Slice 0 de esta task es la precondición material del retiro. La razón secundaria —que el legacy
+  sigue siendo la plantilla que el próximo agente copia— es real pero no es la que bloquea.
 - Mejora el first fold y la exposición de capacidades del Producer sin modificar contratos backend.
 - Debe coordinar ownership de archivos con `TASK-1555` (misma superficie, mismo archivo), `TASK-1532` (CTA) y
   `TASK-1531` antes de implementación.
@@ -182,6 +247,9 @@ Reglas obligatorias:
 - `../efeonce-globe/apps/studio-client/src/surfaces/producer/composer/ProducerComposer.tsx`
 - `../efeonce-globe/apps/studio-client/src/surfaces/producer/composer/producer-composer.css`
 - `../efeonce-globe/apps/studio-client/src/copy/index.ts` → namespace `producerComposer` (**sólo ese namespace**)
+- `../efeonce-globe/apps/studio-web/src/app.ts` → **sólo** la rama del client app en `/producer`
+  (líneas ~2237-2256): retirar `extraStyles: producerStyles` al cerrar Slice 0, conservando
+  `extraStylesheets` de iconos. Ninguna otra línea de ese archivo
 - `../efeonce-globe/apps/studio-client/scripts/producer-composer-canary.mjs` (**a crear**, junto a
   `producer-feed-canary.mjs` / `producer-motion-canary.mjs`)
 - `docs/ui/visual-directions/TASK-1552-globe-producer-composer-focused-creation.md`
@@ -224,8 +292,14 @@ Reglas obligatorias:
 - Sugerencias y presets forman una pared de chips sin jerarquía.
 - Seed, modelo y governance compiten con la intención creativa.
 - Referencias no disponibles pueden ocupar espacio dominante.
-- **Cero `@keyframes` en el CSS del composer**: la atenuación del estimado y las transiciones de popover que el
-  contrato de motion declara obligatorias **no están implementadas**.
+- 🔴 **El composer no tiene CSS propio**: 66 de sus 84 clases se definen sólo en `producerStyles`
+  (`studio-web`, 147 KB), inyectada a propósito por `app.ts:2252`. Su archivo propio tiene **2 selectores**.
+  Esto —no la higiene— es lo que bloquea `TASK-1560`. Lo cierra el Slice 0.
+- **La atenuación del estimado no existe**: `stale` = 0 menciones en la hoja real, aunque el TSX ya decide ese
+  estado. ⚠️ Corregido 2026-07-27: la afirmación anterior («cero `@keyframes` en el CSS del composer») medía el
+  stub de 2 KB — la hoja real tiene **16**, incluida la del popover que se creía faltante.
+- El gate `design-contract.test.ts` **no alcanza** la hoja real (178 HEX + 3 ms literales viven en
+  `studio-web`): el verde de tokens de esta superficie es vacuo hasta el Slice 0.
 - Faltan 3 de los marcadores `data-capture` que la evidencia necesita, y no existe canary de esta superficie.
 - `producer-copy.ts` legacy sigue vivo en paralelo al namespace nuevo: dos fuentes de verdad.
 
@@ -389,9 +463,35 @@ Reglas obligatorias:
 
 ## Scope
 
-> **Punto de partida medido:** los tres slices operan sobre `ProducerComposer.tsx` **ya portado**, no sobre una
+> **Punto de partida medido:** los slices operan sobre `ProducerComposer.tsx` **ya portado**, no sobre una
 > superficie por construir. Ninguno reescribe el transporte, el modelo de vigencia del estimado ni el selector
-> de modelo.
+> de modelo. ⚠️ **El port trajo el markup y la lógica, NO los estilos** (Delta 2026-07-27): por eso existe el
+> Slice 0, y por eso ningún slice posterior puede declararse cerrado contra el gate de diseño sin él.
+
+### Slice 0 — Internalizar la hoja de estilos (precondición de `TASK-1560`)
+
+**Decisión de método: mover verbatim ahora, tokenizar después.** Se evaluaron tres caminos y se descartan dos:
+
+| Opción | Por qué no |
+|---|---|
+| Tokenizar los 178 HEX en el mismo movimiento | Apuesta la regresión visual que el comentario de `app.ts:2238-2244` dice que ya se pagó una vez en el feed. Mezcla un movimiento de archivos con un cambio de valores: si algo se ve distinto, no se sabe cuál de los dos fue |
+| Dejarlo y ensanchar el gate en `TASK-1560` | Deja el bloqueo del retiro sin dueño, que es exactamente el hueco que este slice cierra |
+
+- Mover a `apps/studio-client/src/surfaces/producer/composer/producer-composer.css` **las reglas que la
+  superficie usa**, sin reescribirlas: mismos selectores, mismos valores, mismo orden. El criterio de corte son
+  las 84 clases del TSX, no el juicio sobre qué "parece" del composer.
+- Las reglas compartidas con feed/viewer que no son de esta superficie **no se mueven acá**: se declaran en el
+  handoff como pendientes de sus dueñas (`TASK-1559`, viewer), para que `TASK-1560` sepa qué le queda.
+- Resolver las 18 clases sin definición propia: las `ti-*` vienen de `/assets/icons/tabler-icons.min.css`
+  (servida por `renderShell`) — declarar esa dependencia explícita. `sr-only` **sí se internaliza**: hoy sólo
+  existe en el legacy y sin ella el texto para lectores de pantalla se vuelve visible.
+- Al cierre del slice, `studio-web` deja de pasar `extraStyles: producerStyles` en la rama del client app
+  (`app.ts:2252`); la hoja de iconos se conserva. **`producer-ui.ts` no se borra acá** — eso sigue siendo
+  `TASK-1560`.
+- Evidencia obligatoria: captura antes/después a 1440/390/320 con **diff visual a cero**. Un movimiento verbatim
+  que cambia un píxel no fue verbatim.
+- ⚠️ **La tokenización de los 178 HEX y los 3 ms NO es de este slice.** Nace como follow-up con dueño una vez
+  que el gate de diseño alcance el archivo — recién ahí es medible.
 
 ### Slice 1 — First-fold composer hierarchy
 
@@ -417,8 +517,19 @@ Reglas obligatorias:
 ### Slice 3 — Execution states, motion and visual verification
 
 - Integrate the `TASK-1532` CTA states without a second estimate button or duplicated cost line.
-- Implementar el contrato de motion: atenuación sincrónica del estimado, transición del popover, isotipo
-  consumido, y el fallback de `prefers-reduced-motion` que **conserva** el estado atenuado.
+- **Motion — alcance corregido (Delta 2026-07-27).** No es «implementar el contrato desde cero»: la hoja real ya
+  trae 16 `@keyframes` (incluido `budget-popover-in`) y 2 `prefers-reduced-motion`. Lo que falta de verdad:
+  1. 🔴 **La atenuación del estimado.** `stale` = **0** menciones en la hoja; el TSX ya decide el estado
+     (`status.kind === 'stale'`, líneas 1222/1240) y **no lo pinta**. Es el motion que el contrato llama el más
+     importante de la superficie y es el único que no existe. Sincrónico con el cambio de campo, antes del
+     debounce.
+  2. El fallback de `prefers-reduced-motion` que **conserva** el estado atenuado (acorta la transición, no la
+     apaga: es información sobre plata, no decoración).
+  3. Decidir explícitamente, para las 16 heredadas, **internalizar vs. heredar** — el Slice 0 ya movió las de
+     esta superficie; las que queden heredadas se declaran con su dueña.
+  - Los 9 tokens exigidos (`--duration-none|short|overlay|breathe|flame|progress`, `--ease-enter|linear|pulse`)
+    **existen los 9** en `tokens.ts`: no hay dependencia abierta con `TASK-1523` en este eje.
+  - `GlobeGeneratingMark` se **consume**; nunca se reimplementa.
 - Agregar los 3 marcadores faltantes (`producer-composer`, `producer-advanced-settings`,
   `producer-generate-primary`) sin renombrar los de `TASK-1555`.
 - Crear `producer-composer-canary.mjs` y registrar sus tests en el script `test` del package.
@@ -437,7 +548,11 @@ Reglas obligatorias:
 - **Autorar el contrato de motion del payload cliente** ni crear/modificar `GlobeGeneratingMark`: SSOT y
   primitive son de `TASK-1523`. Acá se aplican.
 - **Borrar el payload legacy** (`producer-ui.ts` / `producer-controller.ts` / `producer-copy.ts`) ni ampliar la
-  frontera del gate de diseño a `apps/studio-web`: es `TASK-1560` Slices 2 y 5.
+  frontera del gate de diseño a `apps/studio-web`: es `TASK-1560` Slices 2 y 5. ⚠️ **Matiz del Slice 0:** esta
+  task **sí** mueve a `studio-client` las reglas CSS que el composer usa y deja de consumir `producerStyles` en
+  la rama del client app — pero **no borra el archivo**, que sigue sirviendo al payload legacy hasta el retiro.
+- **Tokenizar** los 178 HEX / 3 ms literales de la hoja heredada: follow-up con dueño propio, medible recién
+  cuando el gate de diseño alcance el archivo.
 - **Crear la ruta `/producer/compose`** ni cualquier URL paralela del composer.
 - **Prender los flags** `GLOBE_CLIENT_APP_ENABLED` / `GLOBE_CLIENT_PRODUCER_ENABLED` en un entorno vivo: el
   cutover es decisión de rollout con su propia verificación, no un efecto colateral de esta task.
@@ -458,6 +573,10 @@ The visible cost contract is owned by `TASK-1532`: the CTA shows `Generar · {cr
 
 ### Slice ordering hard rule
 
+- **Slice 0 MUST cerrar antes que Slice 1**, con diff visual a cero. Recomponer jerarquía sobre una hoja que
+  vive en otro repo-path convierte cualquier regresión en indistinguible entre "el movimiento" y "el rediseño".
+- **`TASK-1555` MUST estar cerrada antes de Slice 1** (misma superficie, mismo archivo, región ya aceptada por
+  el operador).
 - Slice 1 MUST establish the first-fold hierarchy before Slice 2 exposes advanced disclosures.
 - Slice 2 MUST preserve modality/capability truth before Slice 3 captures evidence.
 - Slice 3 MUST pass desktop/mobile visual review before the task is considered code complete.
@@ -481,6 +600,7 @@ y muere en el próximo `tofu apply`, en silencio). No muta datos ni contratos.
 
 | Slice | Rollback | Tiempo | Reversible? |
 |---|---|---:|---|
+| 0 | Revert del movimiento de CSS + restaurar `extraStyles: producerStyles` en `app.ts`; el legacy sigue intacto porque este slice no lo borra | <20 min | sí |
 | 1 | Revert de render/CSS/copy del composer y restauración del bloque anterior | <30 min | sí |
 | 2 | Desactivar disclosures mediante revert, manteniendo contratos y estados existentes | <30 min | sí |
 | 3 | Revert markers/fixture/captures; no afecta runtime de generación | <15 min | sí |
@@ -503,6 +623,12 @@ N/A — repo-only task/documentation plus UI changes in the Globe runtime owned 
 
 - [ ] Se mantiene `Execution profile: ui-ux`, `UI impact: flow`, `UI ready: no` hasta completar mapping, GVC plan y decision log; al pasar a `yes`, `pnpm task:lint --task TASK-1552` queda en cero findings.
 - [ ] Existe `docs/ui/wireframes/TASK-1552-globe-producer-composer-focused-creation.md` y pasa `pnpm ui:wireframe-check --task TASK-1552`.
+- [ ] **Slice 0 — CSS internalizado.** Ninguna clase del composer se resuelve sólo en `apps/studio-web`;
+      `sr-only` está definida en `studio-client`; la rama del client app en `app.ts` ya no pasa
+      `extraStyles: producerStyles`; y `producer-ui.ts` **sigue existiendo** para el payload legacy.
+- [ ] **Slice 0 — diff visual a cero.** Antes/después a 1440/390/320 sin diferencia de píxeles. Un movimiento
+      verbatim que cambia un píxel no fue verbatim y se revierte, no se justifica.
+- [ ] `TASK-1555` está cerrada y sus 5 markers `producer-model-*` intactos antes del primer commit de Slice 1.
 - [ ] El composer tiene una sola jerarquía primaria: prompt → dirección/output shape → CTA Generate.
 - [ ] No existe selector/título de modalidad duplicado dentro del composer.
 - [ ] Modelo, seed, Style DNA, referencias y controles avanzados permanecen accesibles mediante progressive disclosure o estado contextual honesto.
@@ -559,9 +685,13 @@ con sus cuatro compuertas (`docs/ui/flows/TASK-1552-...-flow.md`).
 **En `greenhouse-eo`** (control plane documental):
 
 - `pnpm task:lint --task TASK-1552`
-- `pnpm ui:wireframe-check --task TASK-1552`
-- `pnpm ui:readiness-check --task TASK-1552`
 - `pnpm ui:quality --task TASK-1552`
+
+> ⚠️ **Corregido 2026-07-27:** `task:lint`, `ui:wireframe-check` y `ui:readiness-check` son **el mismo binario**
+> (`scripts/ci/task-lint.mjs`, ver `package.json`). Listarlos como tres verificaciones daba una sensación de
+> cobertura triple sobre **una** pasada. Sólo `ui:quality` corre un gate distinto
+> (`scripts/ci/ui-quality-gate.mjs`). La cobertura visual real de esta superficie **no está en Greenhouse**:
+> está en el canary de `studio-client`, abajo.
 
 **En `../efeonce-globe`** (runtime — toolchain independiente; **NO** correr acá los comandos de Greenhouse):
 
