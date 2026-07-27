@@ -25,6 +25,33 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-07-27 — ADR-016: el motor de estilos del payload cliente entra a esta task
+
+El barrido por dominio (regla de `EPIC-028`) confirma que **esta task es la dueña** del motor de estilos: su
+Summary ya declara que *«Globe posee e implementa tokens seleccionados, patterns, components, motion y
+runtime»*. No se crea task nueva.
+
+[**ADR-016**](../../architecture/creative-studio/EFEONCE_GLOBE_CLIENT_STYLING_ENGINE_DECISION_V1.md) propone
+adoptar **Tailwind v4** con el SSOT de tokens como theme. Estado `Proposed`: no se ejecuta sin aceptación.
+
+**Qué lo motivó (medido, no opinión):** seis colisiones de CSS global en una sola sesión — cuatro donde la hoja
+legacy pisó markup nuevo, una donde renombrar clases desconectó el glow del prompt, y el descubrimiento de que
+66 de 84 clases del composer vivían en la hoja del legacy. Ninguna es error de criterio: todas son consecuencia
+de CSS global sin scope con dos hojas conviviendo.
+
+**Slice que entra a esta task (bloqueado por aceptación del ADR):**
+
+- Instalar Tailwind v4 en `apps/studio-client` y exponer `src/tokens/tokens.ts` como su theme — **un token se
+  declara una vez, ahí**.
+- **Reescribir los tres gates** (`design-contract.test.ts` ×3 + `reduced-motion.test.ts`) para que muerdan la
+  sintaxis de utilidades: `text-[#hex]`, `p-[13px]`, duraciones literales. **Es precondición, no follow-up** —
+  un gate que deja de morder al cambiar de motor no era un gate.
+- Migrar superficie por superficie, con **diff visual contra el render anterior** en cada una. Nunca big-bang.
+- Orden propuesto: composer (el que duele) → feed → viewer → share.
+
+**Lo que destraba:** el Slice 0 de `TASK-1552` se retira —mover 272 reglas que se van a reescribir es trabajo
+desechable— y `TASK-1560` se destraba por el mismo camino.
+
 ## Summary
 
 Crear el Design System propio de Globe como sistema incremental: Greenhouse gobierna decisiones, registry,
