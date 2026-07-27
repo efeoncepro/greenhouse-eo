@@ -186,6 +186,63 @@ actual, ANTES de recomponer.
 - ⚠️ La fuente visual (`~/Documents/Globe/…dc.html`) vive **fuera del repo**. El orquestador exige versionarla
   dentro. Mitigado por la geometría medida en el anexo del wireframe, no resuelto.
 
+## Delta 2026-07-27 (2) — la estructura: núcleo por pregunta creativa + dock de herramientas
+
+Feedback del operador sobre el primer prototipo, con tres correcciones que **cambian el diseño de la task**:
+
+### 1. 🔴 «Ajustes avanzados» era un cajón de sastre — se retira como patrón
+
+Colapsar todo bajo un `<details>` no resuelve el crecimiento: lo **aplaza**. Con `TASK-1530/1531` (prompt),
+`TASK-1533/1534` (voz), `TASK-1572` (inpaint), `TASK-1536…1541` (efectividad) y `TASK-1494` (Style DNA)
+apuntando a esta superficie, el acordeón se vuelve el próximo monstruo. Y peor: **«básico vs avanzado» es una
+taxonomía del sistema, no del usuario** — un creativo no piensa «esto es avanzado».
+
+**Estructura canónica: cinco bloques por pregunta creativa, y el núcleo NO crece.**
+
+| # | Pregunta | Contiene |
+|---|---|---|
+| 1 | ¿Qué quiero? | prompt + `Mejorar con IA` + `Recientes` |
+| 2 | **¿De qué parto?** | **referencias — visible, con slots** |
+| 3 | ¿Cómo se ve? | dirección (muestras) + modelo |
+| 4 | ¿En qué sale? | formato por uso + preview del lienzo |
+| 5 | ¿Cuánto? | saldo + CTA |
+
+**Lo que crece va a un `tool dock`**: una fila de iconos bajo el prompt; cada herramienta abre en **su propio
+espacio**, no apilada en la columna. Sumar la herramienta #12 cuesta **un icono**, no 80 px de alto.
+
+- **Regla de apertura:** popover anclado para lo chico (seed, negativo, cámara); panel lateral para lo que
+  necesita ver la imagen (Style DNA, retoque, efectividad). *Si necesita lienzo, va al panel.*
+- **El dock se deriva del catálogo/capabilities**, nunca de una lista hardcodeada — es el mismo invariante que
+  el Scope ya exige para los campos por modalidad. Una capability nueva server-side aparece como herramienta
+  sin tocar layout.
+- Una herramienta sin contrato aparece **deshabilitada con su razón en `title`**, nunca oculta.
+
+### 2. 🔴 Referencias NO es un ajuste: es una entrada
+
+Estaba metida en el acordeón. Medido: **78 menciones de `reference`** en `ProducerComposer.tsx` — es de las
+regiones más desarrolladas de la superficie. Para quien trabaja con imagen, **partir de una referencia es tan
+primario como escribir el prompt**. Sube al bloque 2, con affordance explícita de subir imagen o video.
+
+### 3. 🔴 La iconografía es funcional, no decorativa — su ausencia es REGRESIÓN
+
+El composer real usa **23 iconos Tabler**: `ti-wand` ×3 (justo en «Mejorar»), `ti-sparkles`, `ti-photo-plus`,
+`ti-photo-up`, `ti-dna-2`, `ti-history`, `ti-circle-minus`, `ti-lock-open`, `ti-bulb`, `ti-selector`, `ti-check`…
+El primer prototipo los perdió al recomponer.
+
+**El operador de esta superficie es creativo y lee visualmente**: el icono es velocidad de reconocimiento, no
+adorno — la varita se reconoce antes de leer «Mejorar con IA». Y el dock **no funciona sin iconos**: son su
+unidad. La fuente ya se sirve (`/assets/icons/tabler-icons.min.css` vía `assets.ts`), así que conservarlos no
+agrega dependencia: **quitarlos sí resta**.
+
+⚠️ **Criterio de aceptación nuevo:** ninguna acción, herramienta o encabezado de bloque queda sin su icono, y el
+recuento de iconos de la superficie **no baja** respecto del baseline medido (23).
+
+### 4. Hallazgo de implementación: las clases del legacy ganan por especificidad
+
+Al recomponer, `.control-title`, `.number-shape-field`, `.helper` y `.availability` de `producerStyles` pisaron
+las reglas nuevas (títulos desalineados, input deformado). **Las clases nuevas necesitan namespace propio**
+(`pc-*`) o el Slice 0 debe migrarlas de verdad. Tercer ejemplo del mismo acoplamiento — refuerza Slice 0 → Slice 1.
+
 ## Summary
 
 Recomponer el composer de Globe Producer para que una sola intención creativa domine el first fold: `prompt → dirección → output shape → generar`. Las capacidades avanzadas permanecen disponibles mediante progressive disclosure, sin duplicar el costo ni contradecir `TASK-1532`.
@@ -531,10 +588,17 @@ Reglas obligatorias:
 - Conservar el **riel de estimado fijo al pie**: es la información que decide el gasto y no puede perderse al
   scrollear.
 
-### Slice 2 — Progressive disclosure and modality recomposition
+### Slice 2 — Dock de herramientas y recomposición por modalidad
 
-- Cerrar `advanced-controls` por defecto (hoy es `open`) y agrupar bajo él model, seed, Style DNA, referencias y
-  controles de governance.
+> ⚠️ **Reescrito 2026-07-27 (2).** La versión anterior decía «cerrar `advanced-controls` y agrupar bajo él model,
+> seed, Style DNA, referencias y governance». Eso es el cajón de sastre que el Delta (2) retira: aplaza el
+> crecimiento en vez de resolverlo, y mete **referencias** —una entrada— entre los ajustes.
+
+- **Retirar `advanced-controls` como patrón.** El núcleo queda en los cinco bloques por pregunta creativa; lo que
+  crece va al `tool dock`.
+- Implementar el dock: fila de iconos, `role='toolbar'`, cada item ≥44 px, **derivado del catálogo/capabilities**
+  y no de una lista hardcodeada. Apertura: popover para lo chico, panel lateral para lo que necesita lienzo.
+- **Referencias sube al bloque 2** con affordance explícita de subir imagen o video y sus slots visibles.
 - Render only modality-relevant controls for Image, Video and Audio. ⚠️ **El set de campos se deriva del
   catálogo, nunca de un `switch` sobre `capability` en el render**: una capability nueva server-side produciría
   un composer sin campos, en silencio.
@@ -660,7 +724,14 @@ N/A — repo-only task/documentation plus UI changes in the Globe runtime owned 
 - [ ] `TASK-1555` está cerrada y sus 5 markers `producer-model-*` intactos antes del primer commit de Slice 1.
 - [ ] El composer tiene una sola jerarquía primaria: prompt → dirección/output shape → CTA Generate.
 - [ ] No existe selector/título de modalidad duplicado dentro del composer.
-- [ ] Modelo, seed, Style DNA, referencias y controles avanzados permanecen accesibles mediante progressive disclosure o estado contextual honesto.
+- [ ] **No existe un contenedor `advanced-controls` ni equivalente cajón-de-sastre**; seed, Style DNA, negativo y
+      retoque viven en el `tool dock` y abren en su propio espacio.
+- [ ] **Referencias es visible en el núcleo** (bloque 2), con affordance de subir imagen o video, nunca dentro de
+      un colapsable.
+- [ ] **El dock se deriva del catálogo/capabilities**; una capability nueva server-side aparece como herramienta
+      sin editar el layout. Una sin contrato aparece deshabilitada con su razón en `title`.
+- [ ] **Iconografía preservada:** ninguna acción, herramienta o encabezado de bloque sin icono, y el recuento de
+      iconos de la superficie no baja del baseline medido (**23**).
 - [ ] Los presets se presentan como recetas visuales o puntos de partida; la UI no mantiene una taxonomía
       paralela de chips hardcoded.
 - [ ] Imagen y video pueden revisar controles de cámara semánticos compatibles con su modalidad; audio no
