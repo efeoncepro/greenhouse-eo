@@ -237,6 +237,15 @@ agrega dependencia: **quitarlos sí resta**.
 ⚠️ **Criterio de aceptación nuevo:** ninguna acción, herramienta o encabezado de bloque queda sin su icono, y el
 recuento de iconos de la superficie **no baja** respecto del baseline medido (23).
 
+**Isotipo de casa en el selector de modelo.** Cada modelo se identifica por el isotipo real de su proveedor —
+`bytedance.svg` (Seedream · Seedance · Seed Audio), `gemini.svg` (Nano Banana · Gemini · Veo), `openai.svg`
+(GPT Image), `elevenlabs.svg` — servidos desde `apps/studio-web/public/models/` con el tratamiento vigente
+(`<span class='model-mark'><img width=16 height=16>` + `filter: brightness(0) invert(1)`), y monograma como
+fallback cuando no hay isotipo. Fuente: **simple-icons v16.27.0, CC0-1.0, copiados sin modificar**
+(`public/models/README.md`). **NUNCA** transcribir a mano un logo de tercero ni inventar una variante. El
+isotipo identifica la **casa**; el nombre público sigue siendo el modelo (`Seedream 5 Pro`), y el slug del
+proveedor no aparece en el DOM.
+
 ### 4. Hallazgo de implementación: las clases del legacy ganan por especificidad
 
 Al recomponer, `.control-title`, `.number-shape-field`, `.helper` y `.availability` de `producerStyles` pisaron
