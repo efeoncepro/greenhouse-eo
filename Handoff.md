@@ -1,5 +1,32 @@
 # Handoff activo
 
+## 2026-07-27 — TASK-1552 Slices 1a y 1c: **el CTA volvió al fold**
+
+`efeonce-globe` `4cd4aee` + `cf5555e`. **El Slice 1b —la recomposición en cinco bloques— NO está hecho.**
+
+🔴 **El problema no era jerarquía.** La hoja del legacy declara el anclaje del panel
+(`max-height:calc(100svh - 6.4rem)`) y **lo apaga más abajo sin media query**, en una pasada cosmética. Con
+eso el panel no se acota en ningún ancho y el riel se va al fondo del documento. El diseño ya tenía la
+solución; una línea la desactivaba. Restaurado desde la superficie con utilidades (las utilidades ganan por
+capa) y con `--composer-max-block` en el SSOT.
+
+| Medido | Antes | Después |
+|---|---:|---:|
+| Panel @1440×1000 | 1376 px | 898 px, con scroll interno |
+| CTA @1440 / @390 / @320 | `y=1389` / `y=1460` / fuera | **`y=910` / `y=762` / `y=762` — los tres dentro** |
+
+**Slice 1a — `@layer legacy`.** Precondición: la hoja se inyecta sin capa y le ganaba a toda utilidad
+tipográfica (`text-sm font-semibold` sobre un `<button>` rendía 16px/400). ⚠️ **Ponerla como capa más baja
+fue un error medido**: el reset de `base.css` pasó a ganarle a las reglas de clase del legacy y el panel
+creció 98 px **con el canary verde**. Orden correcto: `theme, base, legacy, components, utilities`.
+Verificado con A/B en la misma página: diferencias, ninguna.
+
+**Decisión del operador:** ritmo vertical **opción A** — ajustar a la escala de Tailwind (`gap-8`/`mb-3.5`),
+no tokenizar los 30/13,6 px medidos.
+
+**Siguiente:** Slice 1b (los cinco bloques; ~550 líneas de JSX y 84 clases heredadas) y 1d (retirar
+`advanced-controls`, que hoy es markup decorativo sin control para cerrarse).
+
 ## 2026-07-27 — `TASK-1555` cerrada: **el Slice 1 de `TASK-1552` queda desbloqueado**
 
 Era el último bloqueo. Al ir a cerrarla se encontró que **su ficha mentía en tres campos** —y los tres se

@@ -467,6 +467,66 @@ métrica que faltaba es la de **contención**: para cada descendiente, comprobar
 de su contenedor (arriba, abajo y a los lados). Sin eso, un `overflow: visible` deja hijos fuera sin que ninguna
 métrica de página lo note. **Agregar esa aserción al canary de la superficie.**
 
+## Delta 2026-07-27 (7) — Slices 1a y 1c: **el CTA volvió al fold**, y el problema no era jerarquía
+
+Ejecutados en `efeonce-globe`: `4cd4aee` (1a) y `cf5555e` (1c). **Slice 1b —la recomposición en cinco
+bloques— NO está hecho.** Lo que sigue abajo es lo que cambió y lo que falta.
+
+### 🔴 El hallazgo que corrige a esta task sobre sí misma
+
+Esta task describe el gap como jerarquía: *«el CTA queda fuera del fold»*, *«el riel NO está fijo hoy»*.
+Medido contra el runtime, **el origen es una línea, no una composición**.
+
+La hoja del legacy **declara** el anclaje —`.composer{max-height:calc(100svh - 6.4rem);overflow:hidden}`— y
+más abajo **lo apaga** con `.composer{max-height:none;overflow:visible}` **sin media query**, dentro de una
+pasada cosmética posterior que le da al panel su borde y su sombra. Con eso el panel no se acota en ningún
+ancho, `composer-scroll` nunca scrollea y el riel se va al fondo del documento.
+
+**El diseño ya tenía la solución; una línea la desactivaba.** El Delta (3-bis) atribuía el `y=1389` a la
+composición y por eso el prototipo de recomposición «lo arreglaba»: movía markup, sí, pero lo que en realidad
+cambiaba era que su contenido cabía. La recomposición sigue valiendo por sí misma —el prompt tiene que
+dominar— pero **ya no es lo que trae el CTA de vuelta**.
+
+| Medido | Antes | Después |
+|---|---:|---:|
+| Panel @1440×1000 | 1376 px | **898 px** (acotado, scroll interno) |
+| CTA @1440 | `y=1389` — fuera | **`y=910` — dentro** |
+| CTA @390 | `y=1460` — fuera | **`y=762` — dentro** |
+| CTA @320 | fuera | **`y=762` — dentro** |
+
+Se restaura **desde la superficie con utilidades**, no editando la hoja: esa hoja es del payload legacy
+(`TASK-1560`) y todavía viste al fallback. Las utilidades ganan por capa — lo que habilitó el Slice 1a.
+
+### Slice 1a — la hoja legacy pasa a `@layer legacy`
+
+Precondición dura: el shell la inyecta **sin capa**, y el CSS sin capa le gana siempre al CSS en capa. Con
+`button,input,textarea,summary{font:inherit}` en la hoja, `text-sm font-semibold` sobre un `<button>` rendía
+**16px/400**. Toda superficie migrada habría quedado con la tipografía derrotada, en silencio.
+
+⚠️ **La POSICIÓN de la capa importa y ponerla primera fue un error medido.** Con `legacy` como capa más baja,
+el reset de `base.css` pasó a ganarle a las reglas de clase del legacy: `.capability-button` cayó de
+11,52px/600 a 16px/400 y el panel creció 98 px — **con el canary verde**, porque mide contención y overflow,
+no tipografía. Orden correcto: `theme, base, legacy, components, utilities`; la hoja es estilado de
+componentes, así que va encima del reset y debajo de las utilidades. Verificado con un A/B en la misma página
+alternando el envoltorio en vivo: **diferencias, ninguna**.
+
+Guard permanente: una sonda `<button>` con utilidades bajo la cascada real, y el canary sirve ahora también
+`/_client-seam` con la misma hoja — el motor se estaba midiendo en laboratorio, sin la hoja que rompe.
+
+### Nuevos tokens y decisiones
+
+- `--composer-max-block: calc(100svh - 6.4rem)` en el SSOT. El gate rechaza `max-h-[calc(...)]` con razón.
+- **Ritmo vertical: opción A**, decidida por el operador — se ajusta a la escala de Tailwind (`gap-8` = 32 px,
+  `mb-3.5` = 14 px) en vez de tokenizar los 30/13,6 px medidos. Diferencia real: +2 px y +0,4 px.
+
+### Lo que falta de Slice 1
+
+- **1b — los cinco bloques por pregunta creativa.** Es el grueso: reescribir el render (~550 líneas de JSX,
+  84 clases heredadas) a Tailwind con la estructura del `STYLE_REFERENCE` §1. No empezado.
+- **1d — retirar `advanced-controls`.** Recordar que hoy **es markup decorativo**: su `summary` tiene
+  `display:none`, así que no se puede cerrar ni con teclado. Reemplazarlo no arriesga regresión de
+  comportamiento porque no hay comportamiento.
+
 ## Delta 2026-07-27 (6) — el motor de ADR-016 está listo; la superficie NO está migrada
 
 Ejecutados los pasos 1-4 del orden de ADR-016 en `efeonce-globe` (`804b7d7`, `91432ed`). **El paso 5 —migrar
