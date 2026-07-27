@@ -7,6 +7,13 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-27 — Ecosystem Work Registry y Federated Execution Harness
+
+- Se formalizó el ADR propuesto que extiende el harness Greenhouse-local hacia una arquitectura de ecosistema: Greenhouse conserva registro, visibilidad y coordinación global; cada repo conserva ejecución y evidencia primaria.
+- Se definieron work contracts, Repo Capability Manifests, adapters federados, estados de freshness y una transición read-only antes de habilitar mutaciones cross-repo.
+- Se fijó que ESLint, `pnpm`, typecheck, tests, build, deploy y smoke se declaran por repo mediante verification profiles; Greenhouse agrega sus resultados y aplica policy sin imponer una toolchain común.
+- No se autorizó todavía schema, transporte, adapter concreto, ejecución remota, deploy ni segundo task registry.
+
 ## 2026-07-27 — Wave Product House, Greenhouse Admin y Agent Native
 
 - Se formalizó `EPIC-037` y el ADR propuesto para que Wave sea la casa de producto de sus Product Services, con Greenhouse como admin/control plane transversal de todas las plataformas Efeonce.

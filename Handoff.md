@@ -1,5 +1,17 @@
 # Handoff activo
 
+## 2026-07-27 — Ecosystem Work Registry y Federated Execution Harness
+
+Se documentó [`GREENHOUSE_ECOSYSTEM_WORK_REGISTRY_FEDERATED_EXECUTION_DECISION_V1.md`](docs/architecture/GREENHOUSE_ECOSYSTEM_WORK_REGISTRY_FEDERATED_EXECUTION_DECISION_V1.md)
+y se agregó al índice de decisiones. La decisión conserva Greenhouse como registro, visibilidad y coordinación global
+del trabajo del ecosistema, mientras cada repo —Wave, Globe, Think, sitio público, Kortex y servicios auxiliares—
+conserva ejecución, evidencia primaria, runtime y ownership local mediante manifests/adapters federados. Estado:
+`Proposed — architecture direction accepted, implementation gated`; no se definieron aún transporte, schema, primer
+adapter, mutaciones ni deploys cross-repo. Se agregó explícitamente que los gates de ESLint, `pnpm`, typecheck, tests,
+build, deploy y smoke son propiedad de cada repo: Greenhouse agrega resultados y aplica policy, pero no impone una
+toolchain común. Próximo paso: aceptar el ADR y abrir el epic transversal de foundation del registry, comenzando por
+baseline de repos/owners/contracts/gates y un adapter read-only.
+
 ## 2026-07-27 — Wave Product House, Greenhouse Admin y Agent Native
 
 Se creó [`EPIC-037`](docs/epics/to-do/EPIC-037-wave-agentic-readiness-product-platform.md), el ADR propuesto
