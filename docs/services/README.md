@@ -21,6 +21,8 @@ Esta categoría complementa las tres capas documentales obligatorias:
 | `docs/documentation/` | ¿Cómo funciona la capacidad desde producto y operación? |
 | `docs/manual-de-uso/` | ¿Cómo se ejecuta, verifica, diagnostica y escala? |
 
+El foco comercial transversal —beachheads, ofertas de entrada, expansión y proof— vive en [`EFEONCE_COMMERCIAL_FOCUS_AND_BEACHHEADS_V1.md`](../strategy/EFEONCE_COMMERCIAL_FOCUS_AND_BEACHHEADS_V1.md). Las fichas de servicio mantienen el alcance y la accountability; no deben convertirse en un catálogo de adquisición sin buyer, trigger y motion.
+
 ## Fronteras
 
 - No es un tarifario. Precios, descuentos y condiciones comerciales pertenecen a propuestas y contratos.

@@ -15,6 +15,11 @@ Para el modelo auditable de cliente (ICP, beachhead, JTBD, buying group y decisi
 `efeonce-customer-model-operator`; GTM conserva segmentación, positioning y motion. Para la arquitectura transversal de pricing y packaging, cargar `efeonce-pricing-operator`; este skill conserva la
 decisión GTM de segmento, posicionamiento, oferta y motion.
 
+Para Efeonce, el foco vigente de adquisición y expansión está en
+`docs/strategy/EFEONCE_COMMERCIAL_FOCUS_AND_BEACHHEADS_V1.md`: cuatro beachheads, ofertas de entrada, rutas de
+expansión, proof system y cross-sell. No presentar todo el portfolio en la primera conversación; usar el documento como
+contrato de secuenciación y dejar las fichas de servicio como fuente de alcance y delivery.
+
 ## Doctrina 2026 (lo que hay que creer este año)
 
 Verificado vía web, **as-of 2026-07** (reverificar — ver Paso 2):

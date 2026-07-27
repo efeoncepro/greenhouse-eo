@@ -1,5 +1,17 @@
 # Handoff activo
 
+## 2026-07-26 — Foco comercial y beachheads V1
+
+Se convirtió la evaluación del portafolio en [`EFEONCE_COMMERCIAL_FOCUS_AND_BEACHHEADS_V1.md`](docs/strategy/EFEONCE_COMMERCIAL_FOCUS_AND_BEACHHEADS_V1.md).
+La amplitud se conserva para expansión, pero la adquisición se concentra en cuatro puertas: AI Visibility & Search;
+Revenue Operations & HubSpot; Performance & Commerce; y Creative Velocity & Production. Vocería/PR y Web Velocity
+permanecen como wedges secundarios condicionados por trigger.
+
+El plan define oferta de entrada, core, expansión, motion, proof system, campos comerciales propuestos para cross-sell
+y validación de 90 días. Estado: `Approved for validation`; no cambia pricing, CRM runtime ni autorización de venta
+general. Próximo paso: crear los cuatro Offer Briefs y Pricing Integrity Packs, comenzando por RevOps/HubSpot y
+Performance & Commerce.
+
 ## 2026-07-26 — Partner & Provider Layer transversal
 
 Se formalizó [`EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md`](docs/business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md):
