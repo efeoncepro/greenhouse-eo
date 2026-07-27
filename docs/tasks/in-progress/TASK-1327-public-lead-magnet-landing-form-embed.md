@@ -1,5 +1,18 @@
 # TASK-1327 — Public lead-magnet landing + embed del form gobernado (think.efeoncepro.com/brand-visibility)
 
+## Delta 2026-07-27 — superficie y loop base confirmados en producción
+
+La landing ya no está en estado “code complete local” ni “rollout pendiente”.
+`https://think.efeoncepro.com/brand-visibility` está publicada y responde `HTTP 200`; el HTML productivo contiene
+el `<greenhouse-form>` real del grader con `formKey=69cd5269-5f97-4d32-99c4-0b23f41aa2f5` y
+`surface=fhsf-ai-visibility-grader`. Think implementa el handoff `gh_form_submission_accepted` → `status_url`
+→ polling de estado → `/brand-visibility/r/<reportToken>`.
+
+La evidencia productiva documentada en `docs/think/brand-visibility-landing.md` indica que el submit real genera
+el run y abre el informe. Queda una única acción de cierre de esta task: actualizar la evidencia E2E fechada y
+reconciliar el lifecycle de TASK-1335/TASK-1336 si sus smoke productivos también están confirmados. No queda
+pendiente construir la landing ni embebir el form.
+
 ## Delta 2026-07-04 — handoff contract listo (desbloqueo parcial por TASK-1336)
 
 El contrato del handoff submit→reporte quedó code-complete (TASK-1336). Think NO inventa polling ni cierra con email: consume el contrato gobernado de Greenhouse (SSOT del submit/status/token). Cómo:
@@ -9,7 +22,9 @@ El contrato del handoff submit→reporte quedó code-complete (TASK-1336). Think
 3. Con `status_url`, hacer poll (respetando `retryAfterSeconds` de la respuesta): `GET` devuelve `{ status, reportToken, message, retryAfterSeconds }` con `status ∈ queued|processing|ready|in_review|unavailable|not_found`. Mostrar loader honesto (sin inventar %), estados finales para `in_review`/`unavailable`.
 4. Cuando `status="ready"`, `reportToken` aparece → navegar a `think.efeoncepro.com/brand-visibility/r/<reportToken>` (el hub ya conoce su path; short link `/s/<code>` cuando el flag esté ON, fallback al largo).
 
-La implementación local de Think ya puede avanzar contra el contrato code-complete de **TASK-1335** + **TASK-1336**. Lo que sigue pendiente es rollout/smoke browser real desde el origin de Think: activar el handoff en el form del grader (`pnpm growth:forms:activate-grader-tokenized-report --apply`, dry-run + guard de runtime), servir el renderer bundle en prod y desplegar/aplicar CORS de TASK-1335 en staging/prod. El contrato transversal vive en `docs/architecture/growth-public-forms-runtime-contract.md` → §Tokenized Report Handoff.
+El rollout del handoff y la superficie de Think ya están reflejados en producción. El contrato transversal vive en
+`docs/architecture/growth-public-forms-runtime-contract.md` → §Tokenized Report Handoff. La evidencia que aún debe
+consolidarse es el smoke E2E productivo fechado, no la implementación del flujo.
 
 ## Delta 2026-07-04 — implementación local Think code-complete, visual aprobada aplicada
 
@@ -29,7 +44,7 @@ Evidencia local en Think:
 - `pnpm verify:landing -- http://127.0.0.1:4322/brand-visibility task1327-brand-visibility-approved-static-v4` OK en 1440/1280/390, `scrollWidth == clientWidth`;
 - capturas finales: `/Users/jreye/Documents/efeonce-think/.captures/task1327-brand-visibility-approved-static-v4-desktop-1440.png`, `...-laptop-1280.png`, `...-mobile-390.png`.
 
-Estado de cierre correcto: **code complete local, rollout pendiente**. No se hizo push, deploy ni activación del form v4. El smoke end-to-end real sigue pendiente de: publicar/activar `tokenized_report` en el form del grader, confirmar CORS/runtime productivo de TASK-1335 y probar submit real desde `https://think.efeoncepro.com/brand-visibility` hasta `/brand-visibility/r/<reportToken>`.
+Estado de cierre actualizado: **live en producción; cierre formal pendiente por reconciliación de evidencia/lifecycle**.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -50,7 +65,7 @@ Estado de cierre correcto: **code complete local, rollout pendiente**. No se hiz
 - Motion: `docs/ui/motion/TASK-1327-public-lead-magnet-landing-form-embed-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-020`
-- Status real: `Code complete local — Think implementation; rollout/smoke pendiente`
+- Status real: `Live en producción — landing y loop base operativos; cierre formal de evidencia pendiente`
 - Rank: `TBD`
 - Domain: `growth|public-site|forms`
 - Blocked by: `none`
@@ -81,7 +96,11 @@ Construir la **Superficie B** del hub: la **landing pública principal `think.ef
 
 ## Why This Task Exists
 
-Hoy **no existe ninguna superficie pública donde llenar el grader self-serve** (verificado TASK-1246): el form del grader es un form gobernado del motor Growth Forms, pero no está embebido en ningún lado (no confundir con `/aeo-2/`, que es el form comercial `fdef-efeonce-aeo-diagnostic`, otro flujo). El ADR [`GREENHOUSE_PUBLIC_REPORT_HEADLESS_RENDER_DECISION_V1.md`](../../docs/architecture/GREENHOUSE_PUBLIC_REPORT_HEADLESS_RENDER_DECISION_V1.md) (Delta 2026-07-03) resolvió que la landing vive en el hub `efeonce-think` y **embebe el form gobernado** (no reconstruye) — el mismo web component `<greenhouse-form>` que `/aeo-2/` usa live en WordPress (TASK-1298). Sin esta landing, el lead magnet no tiene puerta de entrada self-serve.
+La superficie pública self-serve ya existe en Think: el form del grader se embebe como contrato gobernado en
+`/brand-visibility` (no confundir con `/aeo-2/`, que sigue siendo el form comercial `fdef-efeonce-aeo-diagnostic`).
+El ADR [`GREENHOUSE_PUBLIC_REPORT_HEADLESS_RENDER_DECISION_V1.md`](../../docs/architecture/GREENHOUSE_PUBLIC_REPORT_HEADLESS_RENDER_DECISION_V1.md)
+resolvió que la landing vive en el hub `efeonce-think` y embebe el form gobernado. El pendiente actual es de
+reconciliación y evidencia, no de puerta de entrada self-serve.
 
 ## Goal
 

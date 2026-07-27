@@ -1,5 +1,13 @@
 # Greenhouse — Feature Flag State Ledger (env-var flags)
 
+## Reconciliación 2026-07-27 — Think ya está publicado
+
+Las notas históricas de esta ledger que indicaban “0 tráfico self-serve” o “el grader no está embebido en ninguna
+superficie pública” corresponden a la auditoría del 2026-07-01 y quedan superseded. La superficie canónica actual es
+`https://think.efeoncepro.com/brand-visibility`, con el form gobernado `fdef-ai-visibility-grader` y el flujo de
+reporte tokenizado de Think. El riesgo/costo real debe medirse desde tráfico productivo y el ledger all-in pendiente;
+no reutilizar esas notas históricas como estado actual.
+
 > **Tipo de documento:** Ledger operativo vivo (SSOT del ESTADO de los env-var flags)
 > **Creado:** 2026-06-18 por Claude (TASK-1079 follow-up)
 > **Última actualización:** 2026-07-22 (alcance explícito: este ledger gobierna los flags de **este repo**; los `GLOBE_*_ENABLED` de `efeonce-globe` quedan fuera — ver §`Alcance`. La regla dura #1 se acotó a "de este repo"; ningún estado de flag Greenhouse cambió.)

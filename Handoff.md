@@ -1,5 +1,15 @@
 # Handoff activo
 
+## 2026-07-27 — Reconciliación de Brand Visibility Grader en Think
+
+Se verificó que `https://think.efeoncepro.com/brand-visibility` está live (`HTTP 200`) y contiene el
+`<greenhouse-form>` gobernado `fdef-ai-visibility-grader`. Think consume el handoff `gh_form_submission_accepted`
+→ `status_url` → reporte tokenizado `/brand-visibility/r/<token>`. Se actualizaron TASK-1246, TASK-1327, el índice
+de tasks, la documentación funcional de Think y el feature-flag ledger: ya no debe describirse la superficie como
+inexistente o pendiente de construcción. Pendiente: consolidar smoke E2E productivo fechado y sincronizar el
+lifecycle formal de TASK-1335/TASK-1336; luego separar las brechas de producto (AIO, Fix-It, Lighthouse, SoV por
+motor, re-grade y cost ledger).
+
 ## 2026-07-27 — Costo real del AI Visibility Grader
 
 La reautenticación de `gcloud` y ADC mediante Playwright quedó verificada para `julio.reyes@efeonce.org`; Cloud SQL

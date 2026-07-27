@@ -1,5 +1,16 @@
 # Brand Visibility Landing
 
+## Estado verificado 2026-07-27
+
+La landing está publicada en producción en `https://think.efeoncepro.com/brand-visibility` y respondió `HTTP 200`.
+El HTML productivo contiene el renderer Growth Forms y el form gobernado del grader:
+`formKey=69cd5269-5f97-4d32-99c4-0b23f41aa2f5`, `surface=fhsf-ai-visibility-grader`.
+
+El loop documentado es operativo: submit del form → `gh_form_submission_accepted` → `status_url` → polling del run
+→ `/brand-visibility/r/<reportToken>`. La evidencia de submit real y navegación al reporte queda registrada como
+evidencia funcional del flujo; el cierre administrativo de las tasks 1327/1335/1336 requiere únicamente consolidar
+un smoke E2E productivo fechado y sincronizar sus estados.
+
 Tipo: documentacion funcional de producto.
 
 URL publica: `https://think.efeoncepro.com/brand-visibility`.
