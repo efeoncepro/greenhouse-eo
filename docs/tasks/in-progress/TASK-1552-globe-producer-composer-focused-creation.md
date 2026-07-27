@@ -1,5 +1,16 @@
 # TASK-1552 — Globe Producer Composer Focused Creation
 
+> ## 🛑 LEE ESTO ANTES DE TOCAR NADA
+>
+> **El plan cambió el 2026-07-27.** Si vas a implementar, en este orden:
+>
+> 1. **[`docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md`](../../ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md)** — todos los valores, medidos. Escrito para **traducir, no interpretar**. Empieza acá.
+> 2. **[ADR-016](../../architecture/creative-studio/EFEONCE_GLOBE_CLIENT_STYLING_ENGINE_DECISION_V1.md)** — el payload cliente usa **Tailwind v4**. El **Slice 0 de esta task está RETIRADO**.
+> 3. **Bloqueada por dos cosas:** el slice de Tailwind en `TASK-1485`, y cerrar `TASK-1555` (misma región, mismo archivo).
+> 4. En `efeonce-globe`, la rama `task/TASK-1552-slice0-internalizar-css` commit **`5edd2a3`** es **WIP congelado**: su mensaje dice qué conservar y qué revertir. **No lo tomes como entrega.**
+>
+> ⚠️ **No confíes en un `Status real` sin verificar el runtime.** Hoy pasó: `TASK-1555` declaraba `Diseño` con el código ya escrito, y eso desvió una sesión entera.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
@@ -17,7 +28,7 @@
 - Motion: `docs/ui/motion/TASK-1552-globe-producer-composer-focused-creation-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Slice 0, first-fold containment, stale estimate y primer tool dock implementados; canary browser registrado y ejecutable desde el test del client. La recomposición que reubica la región producer-model-* queda condicionada a TASK-1555. Pendientes: derivación completa del dock desde capabilities, apertura lateral cuando requiera lienzo, extracción/tokenización verificable de la hoja compat y revisión visual final.`
+- Status real: `ADR-016 CAMBIO EL PLAN (2026-07-27): Slice 0 RETIRADO — el payload cliente migra a Tailwind v4 y una superficie reescrita no depende de la hoja legacy. BLOQUEADA por el slice de Tailwind en TASK-1485 y por cerrar TASK-1555. Diseno COMPLETO y documentado en docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md (leer PRIMERO). Rama efeonce-globe task/TASK-1552-slice0-internalizar-css commit 5edd2a3 = WIP congelado con partes a revertir, ver su mensaje`
 - Rank: `TBD`
 - Domain: `creative|ui|product`
 - Blocked by: `none`
