@@ -28,7 +28,7 @@
 - Motion: `docs/ui/motion/TASK-1552-globe-producer-composer-focused-creation-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `TAILWIND LISTO, SUPERFICIE NO MIGRADA (2026-07-27): el motor de ADR-016 quedo instalado, gateado y verificado en efeonce-globe (804b7d7 + 91432ed) — theme generado desde el SSOT, 4 gates que muerden en className, canary de motor sobre valores computados. NINGUNA superficie migrada: el composer sigue con producerStyles y cero utilidades Tailwind. Unico bloqueo restante: cerrar TASK-1555. Baseline de diff capturado a 1440/390/320 CON la hoja del legacy. Historico: ADR-016 CAMBIO EL PLAN (2026-07-27): Slice 0 RETIRADO — el payload cliente migra a Tailwind v4 y una superficie reescrita no depende de la hoja legacy. BLOQUEADA por el slice de Tailwind en TASK-1485 y por cerrar TASK-1555. Diseno COMPLETO y documentado en docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md (leer PRIMERO). Rama efeonce-globe task/TASK-1552-slice0-internalizar-css commit 5edd2a3 = WIP congelado con partes a revertir, ver su mensaje`
+- Status real: `SLICE 1 EN CURSO — LOS CINCO BLOQUES EXISTEN, LA CONVERSION A TAILWIND VA POR TRES REGIONES (2026-07-27, commits 5b7cb3f + 512dcbc + a37d105). Cada bloque declara su pregunta creativa con su icono; Modo subio al bloque 1; el cajon de sastre no existe y el canary ahora afirma su ausencia en vez de un KNOWN sobre un elemento borrado. Convertidas a Tailwind: cabecera, modality-pill y fila de Modo, verificadas por VALOR COMPUTADO en browser. El SSOT gano 5 tokens (--text-micro, --text-meta, --text-lg, --accent-ink-bright, --field/--white) por decision del operador de tokenizar en vez de normalizar. HALLAZGO: el peso 700 no tenia utilidad alcanzable (font-display lo tomaba la familia) con el build en verde — corregido en el generador + guardrail que lanza. PENDIENTE: convertir prompt-field, riel, selector, referencias, seed y shape; capability-button necesita extraerse como primitive, no repetirse inline. Historico: TAILWIND LISTO, SUPERFICIE NO MIGRADA (2026-07-27): el motor de ADR-016 quedo instalado, gateado y verificado en efeonce-globe (804b7d7 + 91432ed) — theme generado desde el SSOT, 4 gates que muerden en className, canary de motor sobre valores computados. NINGUNA superficie migrada: el composer sigue con producerStyles y cero utilidades Tailwind. Unico bloqueo restante: cerrar TASK-1555. Baseline de diff capturado a 1440/390/320 CON la hoja del legacy. Historico: ADR-016 CAMBIO EL PLAN (2026-07-27): Slice 0 RETIRADO — el payload cliente migra a Tailwind v4 y una superficie reescrita no depende de la hoja legacy. BLOQUEADA por el slice de Tailwind en TASK-1485 y por cerrar TASK-1555. Diseno COMPLETO y documentado en docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md (leer PRIMERO). Rama efeonce-globe task/TASK-1552-slice0-internalizar-css commit 5edd2a3 = WIP congelado con partes a revertir, ver su mensaje`
 - Rank: `TBD`
 - Domain: `creative|ui|product`
 - Blocked by: `none`
@@ -466,6 +466,108 @@ Se midió altura, `scrollWidth` y visibilidad del CTA — **y todo daba verde mi
 métrica que faltaba es la de **contención**: para cada descendiente, comprobar que su rect esté dentro del rect
 de su contenedor (arriba, abajo y a los lados). Sin eso, un `overflow: visible` deja hijos fuera sin que ninguna
 métrica de página lo note. **Agregar esa aserción al canary de la superficie.**
+
+## Delta 2026-07-27 (8) — los cinco bloques existen, y convertir a Tailwind resultó ser TOKENIZAR
+
+Ejecutados en `efeonce-globe`: `5b7cb3f` (1e), `512dcbc` (1f), `a37d105` (1g). **Slice 1 sigue abierto:
+falta convertir el markup interno de la mayoría de las regiones.**
+
+### Slice 1e — la estructura deja de ser implícita
+
+El contenido de los cinco bloques ya estaba; lo que faltaba era **nombrarlos**. Cada bloque declara
+ahora su pregunta creativa con su icono (`ComposerBlock`, escrito en Tailwind sobre el theme generado).
+
+Tres consecuencias de adoptar la estructura, no adornos:
+
+- **Modo subió al bloque 1.** Cambia *qué capability se despacha* (`Crear` es `*-generate`), o sea qué
+  operación se pide. Enterrado entre Seed y Modelo se leía como un ajuste; dejarlo en el bloque 3
+  habría hecho que «¿Cómo se ve?» contuviera una decisión que no es de apariencia.
+- Los `control-title` de Referencias y de Salida **se retiran**: el encabezado del bloque los absorbe y
+  su dato (`0 / 4`, `Se adapta a la ruta`) sube como meta.
+- Los `h2` de Estilo, Seed y Modelo **bajan a `h3`**; `route-output-grid` se disuelve.
+
+**El canary afirmaba algo falso sobre el runtime.** `producer-advanced-settings` nombraba el `<details>`
+de ajustes; el Slice 1d retiró el patrón y el marcador sobrevivió sobre un `div` de agrupación, así que
+el canary imprimía en cada corrida un `KNOWN` sobre un disclosure ausente. Se invirtió: ahora mide que
+**no exista** cajón de sastre, que los cuatro bloques tengan encabezado, que ninguno quede sin icono y
+que la jerarquía de encabezados no salte niveles. ⚠️ **El marcador `producer-advanced-settings` ya no
+existe** — la lista de §8 del `STYLE_REFERENCE` quedó desactualizada en ese punto.
+
+### 🔴 La medición que cambió el método, y su corrección
+
+Primer cuadro medido sobre las **299 reglas** del legacy que visten la superficie: 36 tamaños de fuente
+(2 en la escala del SSOT), 83 valores de espaciado (63 fuera de la escala de 4 px), 78 colores
+literales. Conclusión de entonces: *convertir no es traducir, es normalizar, y el «diff visual a cero»
+de ADR-016 no es alcanzable.*
+
+**Esa conclusión estaba parcialmente equivocada y se corrige acá.** Al ir a aplicarla se re-midió el
+espaciado contra la escala **real** de Tailwind —que acepta medios pasos, o sea 2 px, no 4:
+
+| | contra 4 px | contra la escala real (2 px) |
+|---|---:|---:|
+| valores de espaciado fuera de escala | 63 de 83 | **0 de 82** (error medio 0,40 px, máximo 1 px) |
+
+Y los 78 colores literales son sólo **29 colores base**: el 76% son alfas del mismo azul, que el
+modificador de opacidad expresa sin token nuevo (`bg-action/13`). **Espaciado y casi todo el color se
+traducen sin tokenizar nada, y el diff a cero sí es alcanzable.** Lo que de verdad faltaba era
+tipografía.
+
+### Decisión del operador: tokenizar, no normalizar
+
+Se le presentó el cuadro y eligió **tokenizar lo que falte en el SSOT**, incluido el tamaño del `h1`.
+Se ejecuta con la disciplina que el propio SSOT exige: **un token por decisión, no por valor** — los 34
+tamaños colapsan a seis escalones funcionales, y el rango .55–.76rem son 25 valores que nadie decidió
+como 25.
+
+Cinco tokens nuevos en `tokens.ts`: `--text-micro` (9 px, metadata mínima adosada a un control),
+`--text-meta` (11 px, el escalón entre `2xs` y `xs`, el más poblado de la superficie), `--text-lg`
+(18,8 px, el `h1` de un **panel**, distinto del de una página), `--accent-ink-bright` (#cfe8ff — la
+hoja tenía **tres** valores indistinguibles para ese rol) y `--field` / `--white` como bases para
+consumirse con modificador de opacidad en vez de un token por alfa.
+
+### 🔴 El peso 700 no tenía utilidad alcanzable, con el build en verde
+
+El SSOT declara `--font-display` (Poppins) y `--weight-display` (700), y en Tailwind los dos aspiran a
+`font-display`. **La familia gana** —medido en el CSS compilado: `.font-display{font-family:…}`, sin
+`font-weight`— así que el peso quedaba inalcanzable y el texto se renderizaba en 400 sin que ninguna
+regla estuviera mal escrita. Misma clase de falla que la referencia circular del `@theme inline`.
+
+El generador lo publica ahora como `--font-weight-bold` y **`assertNoUtilityCollisions` lanza** si
+aparece otra colisión familia/peso. Escalado a `TASK-1485` como dueña del SSOT.
+
+### 🔴 Cuarta regla que colgaba del ancestro: las mayúsculas del pill
+
+`.modality-pill` **no declara `text-transform`** en ninguna de sus tres reglas. Las mayúsculas y el
+tracking venían de `.section-heading>span{…text-transform:uppercase}`, o sea de ser un `<span>` hijo
+directo del contenedor. Al convertir la cabecera, el pill pasó de «IMAGEN» a «Imagen» sin que ninguna
+regla propia cambiara, **y el canary daba verde**. Se vio mirando el render.
+
+Cuarta aparición del mismo patrón en esta task (glow del prompt · Style DNA · punto del chip de Modo ·
+esto). **Regla operativa: al convertir una región, listar qué reglas del legacy le llegaban POR
+ANCESTRO antes de tocarla** — las que declara su propia clase son las fáciles.
+
+### Dos sondas que dejaron de ser ciertas al cambiar el SSOT
+
+- El canary del motor afirmaba que `text-lg` «no tiene efecto» como ejemplo de escala ajena de fábrica.
+  Al entrar `--text-lg` al SSOT el aserto empezó a fallar afirmando algo que había dejado de ser
+  cierto. Apunta ahora a `text-4xl`. **Una sonda de «esto no existe» tiene que nombrar algo que el SSOT
+  no vaya a querer nunca.**
+- Breakpoint: el legacy corta en 560 px y se adopta `max-sm` (640). Globe no declara `--breakpoint-*` y
+  tokenizar 560 sería abrir un breakpoint propio para una sola regla de alineación.
+
+### Lo que falta de Slice 1
+
+Convertir el markup interno de las regiones restantes. Convertidas: cabecera, pill y fila de Modo.
+Pendientes por peso de reglas: `prompt-field` (25) · `estimate-rail` (21) · `model-option` (19) ·
+`capability-button` (15) · `seed-actions` (15) · `suggestion-row` (12) · referencias (~40 entre sus 14
+clases) · `shape-*`.
+
+⚠️ **`capability-button` no es un conjunto de utilidades: es una primitive** con estados, tooltip por
+`data-gate-reason`, animación de disponibilidad y un piso responsive de 45 px. Repetir sus 15 reglas
+inline en cada callsite sería peor que la hoja. Necesita extraerse como componente — y esta task
+declara `Primitive decision: extend` con la regla de que una primitive con un solo consumer es una
+hipótesis. Acá tiene muchos consumers dentro de la propia superficie, así que la excepción está
+justificada, pero **es una decisión a tomar explícitamente antes de convertir esa región**.
 
 ## Delta 2026-07-27 (7) — Slices 1a y 1c: **el CTA volvió al fold**, y el problema no era jerarquía
 

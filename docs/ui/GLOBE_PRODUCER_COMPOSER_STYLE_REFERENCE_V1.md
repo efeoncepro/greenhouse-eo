@@ -251,10 +251,17 @@ Fuente: `@tabler/icons-webfont`, servida por `studio-web` vía `extraStylesheets
 
 ## 8 · Marcadores de captura
 
-**Ya existen:** `producer-prompt-bar` · `producer-reference-tray` · `producer-seed` · `producer-route` ·
-`producer-output-shape` · `producer-estimate`
+**Ya existen:** `producer-composer` · `producer-prompt-bar` · `producer-reference-tray` ·
+`producer-seed` · `producer-route` · `producer-output-shape` · `producer-estimate` ·
+`producer-generate-primary`
 **De `TASK-1555`, no renombrar:** `producer-model-{picker,trigger,list,option,recommended}`
-**A agregar:** `producer-composer` · `producer-advanced-settings` · `producer-generate-primary`
+**Estructura de bloques:** `data-pc-block` en cada uno de los cuatro `ComposerBlock`
+
+⛔ **`producer-advanced-settings` ya NO existe** (retirado 2026-07-27). Nombraba el `<details>` de
+ajustes avanzados; al retirarse el patrón (§3) el marcador sobrevivió un rato sobre un `div` de
+agrupación, y el canary siguió imprimiendo un hallazgo sobre un disclosure ausente. **Un marcador que
+sobrevive a su referente miente en la evidencia.** Lo reemplaza el aserto inverso —que no exista cajón
+de sastre— más `data-pc-block`, que nombra lo que sí hay.
 
 ---
 
@@ -323,7 +330,34 @@ valor computado en browser, no por inspección del CSS.
 El theme vacía los namespaces de Tailwind, así que su paleta y su escala tipográfica de fábrica no generan
 nada. Si escribís una y no pasa nada visualmente, no es un bug: es el contrato.
 
-### 3. 🔴 El ritmo vertical de §2 NO cae en la escala de 4 px — hay que decidirlo
+### 0. ✅ Decidido 2026-07-27 — cuando un valor no cae en la escala, **se tokeniza**
+
+El criterio que gobierna toda la conversión, elegido por el operador después de medir las 299 reglas
+del legacy que visten esta superficie. **Se tokeniza el escalón funcional, nunca el valor suelto**: los
+34 tamaños de fuente de la hoja son seis decisiones, y el rango .55–.76 rem son 25 valores que nadie
+decidió como 25.
+
+⚠️ **Lo que la medición corrigió sobre sí misma, y hay que saber antes de repetirla:** el primer cuadro
+decía «63 de 83 espaciados fuera de escala» midiendo contra 4 px. **La escala real de Tailwind acepta
+medios pasos (2 px)**, y contra ella caen **0 de 82**, con error medio de 0,40 px. Los 78 colores
+literales son sólo **29 bases** — el 76% son alfas del mismo azul, que `bg-action/13` expresa sin token.
+**Espaciado y color se traducen sin tokenizar nada; lo único que faltaba era tipografía.**
+
+Tokens que nacieron de esto (`apps/studio-client/src/tokens/tokens.ts`):
+
+| Token | Valor | Para qué |
+|---|---:|---|
+| `--text-micro` | 9 px | metadata mínima adosada a un control (flag de recomendado, estado de referencia) |
+| `--text-meta` | 11 px | el escalón entre `2xs` y `xs`: helper, availability, sugerencias, seed |
+| `--text-lg` | 18,8 px | el `h1` de un **panel** — distinto del de una página (`xl`) |
+| `--accent-ink-bright` | `#cfe8ff` | tinta de un control seleccionado; absorbe los tres valores que la hoja tenía |
+| `--field` · `--white` | `#060f2d` · `#ffffff` | bases para consumir con modificador de opacidad, no un token por alfa |
+
+🔴 **El peso 700 no tenía utilidad alcanzable.** `--font-display` (familia) y `--weight-display` (peso)
+aspiran ambos a `font-display`, **y la familia gana** — el texto salía en 400 con el build en verde. Se
+escribe **`font-bold`**; el generador lo publica así y lanza si aparece otra colisión familia/peso.
+
+### 3. ~~🔴 El ritmo vertical de §2 NO cae en la escala de 4 px — hay que decidirlo~~ · ✅ decidido
 
 30 px entre bloques y 13,6 px título→contenido **no son múltiplos de 4**, y el gate **rechaza**
 `gap-[1.875rem]`. Dos salidas legítimas, y hay que elegir una explícitamente:

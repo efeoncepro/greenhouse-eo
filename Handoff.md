@@ -1,5 +1,60 @@
 # Handoff activo
 
+## 2026-07-27 — TASK-1552: los cinco bloques existen, y convertir a Tailwind resultó ser **tokenizar**
+
+`efeonce-globe` `5b7cb3f` (1e) + `512dcbc` (1f) + `a37d105` (1g). **Slice 1 sigue abierto**: van tres
+regiones convertidas de las ~doce.
+
+**Los cinco bloques por pregunta creativa.** El contenido ya estaba; faltaba nombrarlo. Cada bloque
+declara su pregunta con su icono. **Modo subió al bloque 1** —cambia qué capability se despacha, o sea
+qué operación se pide— y con eso «¿Cómo se ve?» deja de contener una decisión que no es de apariencia.
+
+**El canary afirmaba algo falso.** `producer-advanced-settings` nombraba el `<details>` que el Slice 1d
+retiró, y el marcador sobrevivió sobre un `div`: el canary imprimía cada corrida un `KNOWN` sobre un
+disclosure ausente. Se invirtió — ahora mide que **no exista** cajón de sastre, que los cuatro bloques
+tengan encabezado con icono y que la jerarquía de encabezados no salte niveles.
+
+### 🔴 La medición que cambió el método — y su corrección
+
+Primer cuadro sobre las **299 reglas** del legacy que visten la superficie: 36 tamaños de fuente,
+83 espaciados, 78 colores; conclusión, *el diff visual a cero de ADR-016 no es alcanzable*.
+
+**Parcialmente equivocado.** Al aplicarlo se re-midió contra la escala **real** de Tailwind —medios
+pasos, 2 px, no 4:
+
+| | contra 4 px | real |
+|---|---:|---:|
+| espaciado fuera de escala | 63 de 83 | **0 de 82** (error medio 0,40 px) |
+
+Y los 78 colores son **29 bases**: el 76% son alfas del mismo azul, que `bg-action/13` expresa sin
+token. **Espaciado y color se traducen sin tokenizar.** Lo que faltaba era tipografía.
+
+**Decisión del operador: tokenizar, no normalizar.** Ejecutado con un token por decisión y no por
+valor —los 34 tamaños son seis escalones funcionales—: `--text-micro` (9 px), `--text-meta` (11 px, el
+escalón entre `2xs` y `xs`, el más poblado), `--text-lg` (18,8 px, el `h1` de un **panel**),
+`--accent-ink-bright` (la hoja tenía tres valores indistinguibles para ese rol) y `--field`/`--white`
+como bases para modificador de opacidad.
+
+### 🔴 El peso 700 no tenía utilidad, con el build en verde
+
+`--font-display` (Poppins) y `--weight-display` (700) aspiran ambos a `font-display`. **La familia
+gana** —medido en el CSS compilado— así que el peso era inalcanzable y el texto salía en 400 sin que
+ninguna regla estuviera mal. Ahora se publica como `--font-weight-bold` y un guardrail **lanza** ante
+otra colisión familia/peso. Escalado a `TASK-1485`.
+
+### 🔴 Cuarta regla que colgaba del ancestro
+
+`.modality-pill` no declara `text-transform`: las mayúsculas venían de `.section-heading>span`. Al
+convertir la cabecera el pill pasó de «IMAGEN» a «Imagen», **con el canary verde**. Se vio mirando.
+Cuarta vez en esta task. **Regla: al convertir una región, listar primero qué le llegaba POR ANCESTRO.**
+
+También dos sondas dejaron de ser ciertas al crecer el SSOT: el canary del motor usaba `text-lg` como
+ejemplo de «escala ajena que no existe», y `text-lg` pasó a existir. Apunta ahora a `text-4xl`.
+
+**Siguiente:** convertir `prompt-field` (25 reglas, y el glow vive ahí), riel, selector, referencias,
+seed y shape. ⚠️ **`capability-button` es una primitive**, no un puñado de utilidades: 15 reglas con
+estados, tooltip y piso responsive de 45 px. Repetirla inline sería peor que la hoja.
+
 ## 2026-07-27 — TASK-1552 Slices 1a y 1c: **el CTA volvió al fold**
 
 `efeonce-globe` `4cd4aee` + `cf5555e`. **El Slice 1b —la recomposición en cinco bloques— NO está hecho.**
