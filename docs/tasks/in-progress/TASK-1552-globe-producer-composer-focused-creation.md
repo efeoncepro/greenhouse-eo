@@ -6,8 +6,8 @@
 >
 > 1. **[`docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md`](../../ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md)** — todos los valores, medidos. Escrito para **traducir, no interpretar**. Empieza acá.
 > 2. **[ADR-016](../../architecture/creative-studio/EFEONCE_GLOBE_CLIENT_STYLING_ENGINE_DECISION_V1.md)** — el payload cliente usa **Tailwind v4**. El **Slice 0 de esta task está RETIRADO**.
-> 3. **Bloqueada por dos cosas:** el slice de Tailwind en `TASK-1485`, y cerrar `TASK-1555` (misma región, mismo archivo).
-> 4. En `efeonce-globe`, la rama `task/TASK-1552-slice0-internalizar-css` commit **`5edd2a3`** es **WIP congelado**: su mensaje dice qué conservar y qué revertir. **No lo tomes como entrega.**
+> 3. **Bloqueada por UNA cosa:** cerrar `TASK-1555` (misma región, mismo archivo). ✅ **El slice de Tailwind de `TASK-1485` YA ESTÁ** (2026-07-27, commits `804b7d7` + `91432ed`): motor instalado, theme generado desde el SSOT y los gates reescritos y verificados. Ver el Delta al pie.
+> 4. En `efeonce-globe`, la rama `task/TASK-1552-slice0-internalizar-css` commit **`5edd2a3`** es **WIP congelado**: su mensaje dice qué conservar y qué revertir. **No lo tomes como entrega.** Ya fue limpiado en `804b7d7`; el commit se conserva sólo como referencia histórica de la copia de 151 KB.
 >
 > ⚠️ **No confíes en un `Status real` sin verificar el runtime.** Hoy pasó: `TASK-1555` declaraba `Diseño` con el código ya escrito, y eso desvió una sesión entera.
 
@@ -28,7 +28,7 @@
 - Motion: `docs/ui/motion/TASK-1552-globe-producer-composer-focused-creation-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `ADR-016 CAMBIO EL PLAN (2026-07-27): Slice 0 RETIRADO — el payload cliente migra a Tailwind v4 y una superficie reescrita no depende de la hoja legacy. BLOQUEADA por el slice de Tailwind en TASK-1485 y por cerrar TASK-1555. Diseno COMPLETO y documentado en docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md (leer PRIMERO). Rama efeonce-globe task/TASK-1552-slice0-internalizar-css commit 5edd2a3 = WIP congelado con partes a revertir, ver su mensaje`
+- Status real: `TAILWIND LISTO, SUPERFICIE NO MIGRADA (2026-07-27): el motor de ADR-016 quedo instalado, gateado y verificado en efeonce-globe (804b7d7 + 91432ed) — theme generado desde el SSOT, 4 gates que muerden en className, canary de motor sobre valores computados. NINGUNA superficie migrada: el composer sigue con producerStyles y cero utilidades Tailwind. Unico bloqueo restante: cerrar TASK-1555. Baseline de diff capturado a 1440/390/320 CON la hoja del legacy. Historico: ADR-016 CAMBIO EL PLAN (2026-07-27): Slice 0 RETIRADO — el payload cliente migra a Tailwind v4 y una superficie reescrita no depende de la hoja legacy. BLOQUEADA por el slice de Tailwind en TASK-1485 y por cerrar TASK-1555. Diseno COMPLETO y documentado en docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md (leer PRIMERO). Rama efeonce-globe task/TASK-1552-slice0-internalizar-css commit 5edd2a3 = WIP congelado con partes a revertir, ver su mensaje`
 - Rank: `TBD`
 - Domain: `creative|ui|product`
 - Blocked by: `none`
@@ -467,6 +467,62 @@ métrica que faltaba es la de **contención**: para cada descendiente, comprobar
 de su contenedor (arriba, abajo y a los lados). Sin eso, un `overflow: visible` deja hijos fuera sin que ninguna
 métrica de página lo note. **Agregar esa aserción al canary de la superficie.**
 
+## Delta 2026-07-27 (6) — el motor de ADR-016 está listo; la superficie NO está migrada
+
+Ejecutados los pasos 1-4 del orden de ADR-016 en `efeonce-globe` (`804b7d7`, `91432ed`). **El paso 5 —migrar
+por superficie— no empezó y sigue bloqueado por `TASK-1555`.**
+
+### Lo que cambió para esta task
+
+| Antes | Ahora |
+|---|---|
+| Bloqueada por `TASK-1485` **y** `TASK-1555` | Bloqueada **sólo** por `TASK-1555` |
+| Slice 1 se escribiría en CSS | Slice 1 se escribe en **Tailwind**, con 4 gates que muerden en `className` |
+| Sin baseline de diff verificable | Capturas a 1440/390/320 **con la hoja del legacy**, desde el canary |
+
+### Estado medido de la rama, para que nadie lo asuma
+
+- `producer-composer.css` volvió a **2.202 B**; `app.ts:2252` vuelve a pasar `extraStyles: producerStyles`.
+- Se conservan los tres `data-capture` (`producer-composer`, `producer-advanced-settings`,
+  `producer-generate-primary`), `data-estimate-state` y el estimado `stale`.
+- **El tool dock se revirtió**: era Slice 2 adelantado al orden y su CSS vivía dentro de la copia. Se
+  reescribe en Tailwind cuando toque.
+- **Cero utilidades de Tailwind en `ProducerComposer.tsx`.** Las únicas seis en el CSS compilado son la sonda
+  del seam que verifica el motor.
+
+### 🔴 Dos hallazgos de runtime que cambian lo que esta task dice de sí misma
+
+**1. El canary servía la superficie SIN estilos y daba TODO verde.** Contención, `scrollWidth`, recuento de
+iconos y visibilidad del CTA dan lo mismo con o sin CSS. El canary se había escrito cuando la hoja vivía en el
+bundle; al revertir, quedó midiendo una superficie desnuda. Corregido — ahora inyecta `producerStyles` como
+producción.
+
+> Es la MISMA lección que el Delta (5) ya registra («se midió altura, `scrollWidth` y visibilidad del CTA y
+> todo daba verde mientras el layout estaba roto»), reaparecida un nivel más arriba: ahora el que estaba roto
+> era el harness. **Se detectó mirando el render, no leyendo la salida.**
+
+**2. `advanced-controls` no es «un disclosure abierto por defecto»: no es un disclosure.** La hoja del legacy
+termina con `.advanced-controls > summary { display: none }` — medido en runtime: `display:none`, altura 0. El
+`<details open>` **no tiene control para cerrarse**, ni con puntero ni con teclado.
+
+El `## Gap` de esta task dice «`advanced-controls` está `open` por defecto — la progressive disclosure no
+existe todavía». La medición dice algo más fuerte y más simple: **el markup es decorativo**. Refuerza la
+decisión del Delta (2) de retirar el patrón, y agrega un argumento que no estaba: además de ser un cajón de
+sastre, **hoy es inoperable por teclado**. El canary lo reporta como `KNOWN` en cada corrida.
+
+### Lo que la implementación corrigió del propio ADR
+
+El idiom de alias de la documentación de Tailwind (`@theme inline` con `var(--token)`) produce una
+**referencia circular** cuando el nombre coincide a ambos lados — y en Globe casi todos coinciden, porque el
+SSOT ya estaba escrito con los namespaces de Tailwind. Medido en browser: `text-xs` a 16px, `rounded-sm` a
+0px, `font-display` en Times, **con el build verde**. El theme pasa a **generarse** desde el SSOT con valores.
+Detalle completo en el Delta de [ADR-016](../../architecture/creative-studio/EFEONCE_GLOBE_CLIENT_STYLING_ENGINE_DECISION_V1.md).
+
+⚠️ **Consecuencia para quien tome Slice 1:** el ritmo vertical medido (30 px entre bloques, 13,6 px
+título→contenido) **no cae en la escala de 4 px de Tailwind**, y el gate rechaza `gap-[1.875rem]`. Hay que
+decidir explícitamente: ajustar a `gap-8` (32 px) o subir el ritmo al SSOT como token. **No se puede postergar
+en silencio** — que es exactamente para lo que se agregó ese cuarto gate.
+
 ## Summary
 
 Recomponer el composer de Globe Producer para que una sola intención creativa domine el first fold: `prompt → dirección → output shape → generar`. Las capacidades avanzadas permanecen disponibles mediante progressive disclosure, sin duplicar el costo ni contradecir `TASK-1532`.
@@ -527,8 +583,9 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-1485` 🚧 **bloqueante nuevo (ADR-016)** — motor de estilos del payload cliente. La recomposición se
-  escribe en Tailwind, así que su adopción va antes que Slice 1.
+- `TASK-1485` ✅ **desbloqueado 2026-07-27** — motor de estilos del payload cliente (ADR-016). Tailwind v4
+  instalado, theme generado desde el SSOT, 4 gates que muerden en `className` y canary de motor sobre valores
+  computados (`efeonce-globe` `804b7d7` + `91432ed`). La recomposición se escribe en Tailwind.
 - `TASK-1556` ✅ complete — foundation ADR-014: SSOT de tokens, capa de copy, primitives y shell del payload
   cliente. **Es de lo que esta superficie está hecha**; sin ella no hay dónde componer.
 - `TASK-1505` — Producer surface y patrones existentes (dirección aprobada).

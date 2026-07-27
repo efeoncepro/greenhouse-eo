@@ -291,6 +291,53 @@ Todas ocurrieron en una sola sesión sobre CSS global sin scope. Motivan [ADR-01
 
 ## Referencia visual
 
-La copia verbatim de `producerStyles` (151 KB) que quedó en la rama
-`task/TASK-1552-slice0-internalizar-css` de `efeonce-globe` es el **render exacto de la superficie al
-2026-07-27**. Se conserva como baseline de diff para verificar que la reescritura no pierde nada.
+El baseline de diff son las **capturas del canary del composer** a 1440 / 390 / 320
+(`apps/studio-client/.captures/task-1552-composer/`), tomadas **con `producerStyles` inyectada**, que es
+exactamente lo que sirve producción. Se regeneran con `pnpm test` en `apps/studio-client`.
+
+⚠️ **Las capturas anteriores al 2026-07-27 16:30 no son baseline de nada:** el canary servía la superficie
+**sin** la hoja del legacy y sus asertos daban todo verde igual —contención, `scrollWidth`, recuento de iconos
+y visibilidad del CTA dan lo mismo con o sin CSS—. Se detectó mirando el render.
+
+La copia verbatim de `producerStyles` (151 KB) queda en el commit `5edd2a3` de la rama
+`task/TASK-1552-slice0-internalizar-css` como referencia textual. El texto de origen sigue vivo de todas
+formas en `apps/studio-web/src/producer-ui.ts` hasta que `TASK-1560` retire el legacy.
+
+---
+
+## Delta 2026-07-27 — el motor ya es Tailwind: lo que cambia al traducir esta referencia
+
+Los valores de este documento **no cambian**: sigue siendo independiente del motor. Cambian tres cosas de
+**cómo** se escriben.
+
+### 1. Los valores salen del theme generado, con sus nombres canónicos
+
+`bg-canvas`, `text-xs`, `rounded-sm`, `font-display`, `font-semibold`, `ease-enter`. Todos verificados por
+valor computado en browser, no por inspección del CSS.
+
+**Duraciones y compuestos no tienen namespace de theme en v4** — se referencian:
+`duration-(--duration-short)`, `bg-(image:--page-backdrop)`.
+
+### 2. `text-red-500` y `text-lg` NO EXISTEN
+
+El theme vacía los namespaces de Tailwind, así que su paleta y su escala tipográfica de fábrica no generan
+nada. Si escribís una y no pasa nada visualmente, no es un bug: es el contrato.
+
+### 3. 🔴 El ritmo vertical de §2 NO cae en la escala de 4 px — hay que decidirlo
+
+30 px entre bloques y 13,6 px título→contenido **no son múltiplos de 4**, y el gate **rechaza**
+`gap-[1.875rem]`. Dos salidas legítimas, y hay que elegir una explícitamente:
+
+- **Ajustar a la escala:** `gap-8` (32 px) y `mb-3.5` (14 px). El operador reportó 17 px como «todo muy
+  apretado»; 32 y 14 están del lado correcto de ese piso.
+- **Subir el ritmo al SSOT** como token y exponerlo al theme.
+
+⛔ **Lo que NO es una salida:** escribir el valor arbitrario. El gate existe justamente para que esta decisión
+no se postergue en silencio.
+
+### 4. `advanced-controls` hoy es inoperable, no sólo «abierto»
+
+Medido en runtime: `.advanced-controls > summary` tiene `display:none`, altura 0. El `<details open>` **no
+tiene control para cerrarse** ni con puntero ni con teclado. El §3 ya retira el patrón; esto agrega que
+además **hoy está roto**, así que reemplazarlo no arriesga una regresión de comportamiento — no hay
+comportamiento que perder.

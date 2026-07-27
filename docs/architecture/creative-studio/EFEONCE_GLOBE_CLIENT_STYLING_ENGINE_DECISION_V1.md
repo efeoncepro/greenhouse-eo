@@ -106,12 +106,110 @@ System de Globe.
 
 **Orden de ejecución acordado:**
 
-1. Limpiar la rama `task/TASK-1552-slice0-internalizar-css`: revertir el CSS copiado, `app.ts` y las exclusiones
-   de los gates (van juntos por acoplamiento); conservar `data-capture`, el estimado `stale` y los canaries.
-2. Preservar la copia verbatim de 151 KB como **baseline de diff**, fuera del código.
-3. Instalar Tailwind v4 en `apps/studio-client` con `tokens.ts` como theme.
-4. **Reescribir los tres gates** — precondición, no follow-up.
-5. Migrar por superficie con diff visual: composer → feed → viewer → share.
+| # | Paso | Estado |
+|---|---|---|
+| 1 | Limpiar la rama `task/TASK-1552-slice0-internalizar-css`: revertir el CSS copiado, `app.ts` y las exclusiones de los gates (van juntos por acoplamiento); conservar `data-capture`, el estimado `stale` y los canaries | ✅ `804b7d7` |
+| 2 | Preservar la copia verbatim de 151 KB como **baseline de diff**, fuera del código | ✅ commit `5edd2a3` + capturas |
+| 3 | Instalar Tailwind v4 en `apps/studio-client` con `tokens.ts` como theme | ✅ `804b7d7` |
+| 4 | **Reescribir los tres gates** — precondición, no follow-up | ✅ `804b7d7` + `91432ed` |
+| 5 | Migrar por superficie con diff visual: composer → feed → viewer → share | ⛔ **no empezado** — el composer sigue bloqueado por `TASK-1555` |
 
 La referencia de valores para la migración es
 [`GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md`](../../ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md).
+
+---
+
+## Delta 2026-07-27 — implementación de los pasos 1-4, y lo que la implementación corrigió del ADR
+
+> ⚠️ **Estado honesto: el MOTOR está listo; ninguna SUPERFICIE está migrada.** El composer sigue
+> renderizando con `producerStyles` inyectada por `app.ts:2252`, exactamente como antes. Cero utilidades de
+> Tailwind en `ProducerComposer.tsx`. Las únicas seis que existen en el CSS compilado son la sonda del seam.
+
+### 🔴 El idiom de alias de la documentación NO funciona acá — medido, no supuesto
+
+El ADR dice que el theming CSS-first de v4 «puede consumir un SSOT existente». Es cierto, **pero no por el
+camino que la documentación de Tailwind muestra.** El idiom canónico es `@theme inline` con alias:
+
+```css
+@theme inline { --color-background: var(--background); }
+```
+
+Funciona cuando los nombres **difieren**. En Globe casi todos **coinciden**, porque el SSOT ya estaba escrito
+con los namespaces de Tailwind (`--text-xs`, `--radius-sm`, `--ease-enter`, `--font-display`). Un alias con el
+mismo nombre a ambos lados es una **referencia circular**: Tailwind emite `:root{--text-xs:var(--text-xs)}` en
+la hoja del bundle, que llega **después** del `:root` del shell y lo pisa, dejando la propiedad en el valor
+inválido garantizado.
+
+Medido en browser con `getComputedStyle`:
+
+| Utilidad | Computado | Debía ser |
+|---|---|---|
+| `text-xs` | **16px** | 12px |
+| `rounded-sm` | **0px** | `.58rem` |
+| `font-display` | **Times** | Poppins |
+| `bg-canvas` | ✅ correcto | — (porque `--color-canvas` ≠ `--canvas`) |
+
+**El build estaba verde y las utilidades presentes en el CSS compilado.** Es la clase de falla que se ve
+«instalada y funcionando», y ningún escaneo estático puede verla: el CSS emitido es sintácticamente impecable.
+
+**Corrección adoptada:** el `@theme` se **genera** desde el SSOT con **valores**
+(`src/styles/theme-from-tokens.ts` → `globe-theme.generated.css`, vía `pnpm theme:generate`). La clasificación
+es por **regla, no por lista**, para que un token nuevo aparezca como utilidad sin editar el generador.
+
+**La consecuencia que se acepta y hay que saber:** los valores quedan en dos lugares del CSS servido (el
+`:root` del shell y el `@theme` del bundle). No pueden derivar —los genera la misma fuente y un gate lo
+afirma carácter por carácter— pero **este payload no soporta re-tematizado en runtime**. Globe tiene un solo
+tema y ninguna superficie lo cambia, así que el costo hoy es cero. Si algún día se quiere, la salida **no** es
+volver a `var()`: es que el shell deje de emitir su `:root` y Tailwind sea el único que lo emita.
+
+### Dos decisiones de integración que el ADR no anticipaba
+
+1. **Preflight queda FUERA.** El reset de Tailwind es global, y el payload ya tiene el suyo documentado.
+   Adoptarlo cambiaría de golpe feed, viewer y share —que conviven en CSS propio hasta su turno— y eso es el
+   big-bang que el punto 3 del ADR prohíbe. Se adopta cuando migre la última superficie, con dueño y diff.
+2. **`base.css` pasa a `@layer base`.** El CSS **sin capa le gana siempre** al CSS en capa: con el reset fuera
+   de capa, `button { font: inherit }` derrotaría a cualquier utilidad de Tailwind sobre ese botón, sin
+   ninguna regla equivocada a la vista. El bloque de `prefers-reduced-motion` queda **fuera** de capa a
+   propósito: las `!important` invierten el orden de capas, y ése es el piso que debe ser inderrotable.
+
+### Los gates: cómo quedaron, y por qué son cuatro
+
+La condición 2 del ADR se cumple con una regla común a los tres: **el único valor arbitrario permitido es una
+REFERENCIA a token.** `duration-(--duration-short)` referencia; `duration-[220ms]` declara.
+
+Se agrega un **cuarto** que el ADR no listaba: **espaciado y medidas** (`p-[13px]`, `gap-[1.875rem]`). Tailwind
+lo hace fácil y el CSS plano no lo tenía a mano. Importa acá y ahora: el ritmo medido del composer es 30 px y
+13,6 px, y **ninguno cae en la escala de 4 px**. Sin este gate la migración escribe `gap-[1.875rem]` y sigue;
+con él, la decisión —ajustar a la escala o subir el ritmo al SSOT— se toma en voz alta.
+
+**La otra mitad de la defensa no es un escaneo:** el theme generado **vacía los namespaces**
+(`--color-*: initial`), así que `text-red-500` y `text-lg` **no existen**. Un escaneo atrapa el literal
+explícito; vaciar el namespace cierra la escala ajena, que es la que nadie habría mirado — `text-red-500` no
+parece un literal.
+
+Verificado que los cuatro **muerden** con violaciones deliberadas, y que la línea correcta no genera hallazgos.
+
+**`tailwind-engine-canary.mjs`** lee valores computados sobre el seam smoke: prueba que el motor está cableado
+y que la escala ajena no tiene efecto. Corre **antes** de que migre la primera superficie — descubrirlo durante
+una migración habría hecho indistinguible «el motor está mal» de «la migración está mal».
+
+### 🔴 El gate de literales los estaba EMITIENDO
+
+Tailwind lee los `.ts` como texto plano y **no ignora comentarios**, así que los ejemplos con los que
+`design-contract.test.ts` documenta lo que prohíbe se compilaban como clases reales y viajaban en la hoja
+servida. Inofensivo en peso, grave en señal. Cerrado con `@source not` sobre los tests (`91432ed`).
+
+**Regla que se desprende:** en Tailwind, **documentar un anti-patrón dentro del árbol escaneado lo materializa**.
+
+### Dos hallazgos de runtime del composer (no del motor)
+
+Aparecieron al mirar el render, no al leer la salida de los tests:
+
+1. **El canary del composer servía la superficie SIN la hoja del legacy** y daba **todo verde**: contención,
+   `scrollWidth` y recuento de iconos dan igual con o sin CSS. Corregido — ahora inyecta `producerStyles`
+   igual que `app.ts:2252`. Las capturas anteriores no eran baseline de nada.
+2. **`.advanced-controls > summary` tiene `display:none`** en la hoja del legacy. El `<details open>` **no
+   tiene control para cerrarse**, ni con puntero ni con teclado. La task lo describía como «abierto por
+   defecto»; la medición dice algo más fuerte: **la progressive disclosure no existe, el markup es
+   decorativo.** Refuerza el retiro del patrón en Slice 2. El canary lo reporta como `KNOWN` en cada corrida,
+   nunca como skip silencioso.

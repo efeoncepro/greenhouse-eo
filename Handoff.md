@@ -1,5 +1,62 @@
 # Handoff activo
 
+## 2026-07-27 — ADR-016 implementado: el motor está en Tailwind; **ninguna superficie migrada**
+
+Ejecutados los **pasos 1-4** del orden de ADR-016 en `efeonce-globe` (`804b7d7`, `91432ed`). El paso 5 —migrar
+por superficie— **no empezó**: el composer sigue bloqueado por `TASK-1555`.
+
+**Estado honesto:** el composer renderiza exactamente igual que antes, con `producerStyles` inyectada por
+`app.ts:2252`. **Cero utilidades de Tailwind en `ProducerComposer.tsx`.** Las únicas seis en el CSS compilado
+son la sonda del seam que verifica el motor.
+
+**Rama limpiada** como pedía el mensaje del WIP: `producer-composer.css` volvió a 2.202 B, `app.ts` recuperó
+`extraStyles`, las exclusiones de los dos gates se retiraron. Se conservaron los tres `data-capture`,
+`data-estimate-state`, el estimado `stale` y los canaries. **El tool dock se revirtió** (era Slice 2 adelantado
+y su CSS vivía en la copia).
+
+### 🔴 Lo que la implementación corrigió del propio ADR
+
+El idiom de alias de la documentación de Tailwind —`@theme inline { --text-xs: var(--text-xs) }`— es una
+**referencia circular** cuando el nombre coincide a ambos lados, y en Globe casi todos coinciden porque el SSOT
+ya estaba escrito con los namespaces de Tailwind. Medido en browser: **`text-xs` a 16px, `rounded-sm` a 0px,
+`font-display` en Times — con el build verde y las utilidades presentes en el CSS.** Ningún escaneo estático
+puede verlo.
+
+El theme pasa a **generarse** desde el SSOT con valores (`pnpm theme:generate`), y un gate afirma que el
+archivo es exactamente lo que produce el generador.
+
+### Los gates: cuatro, y verificados mordiendo
+
+Regla común: **el único valor arbitrario permitido es una REFERENCIA a token.** Se agregó un cuarto para
+espaciado y medidas. La otra mitad no es un escaneo: el theme **vacía los namespaces**, así que `text-red-500`
+y `text-lg` no existen. `tailwind-engine-canary.mjs` lo prueba por **valor computado** en browser.
+
+⚠️ **Para quien tome Slice 1:** el ritmo medido (30 px / 13,6 px) **no cae en la escala de 4 px** y el gate
+rechaza `gap-[1.875rem]`. Hay que decidir: ajustar a `gap-8` o subir el ritmo al SSOT. Esa es la función del
+gate — que la decisión no se postergue en silencio.
+
+### Tres hallazgos que sólo aparecen mirando, no leyendo la salida
+
+1. **El canary del composer servía la superficie SIN la hoja del legacy y daba todo verde.** Contención,
+   `scrollWidth`, iconos y visibilidad del CTA dan igual con o sin CSS. Corregido. Las capturas previas no eran
+   baseline de nada.
+2. **`advanced-controls` no es un disclosure abierto: es inoperable.** `.advanced-controls > summary` tiene
+   `display:none` (medido: altura 0). El `<details open>` no tiene control para cerrarse ni con teclado. El
+   markup es decorativo — refuerza su retiro y quita el riesgo de regresión al reemplazarlo.
+3. **El gate de literales los estaba emitiendo al CSS servido.** Tailwind lee los `.ts` como texto plano y no
+   ignora comentarios: los ejemplos con los que el gate documenta lo que prohíbe se compilaban como clases
+   reales. Cerrado con `@source not`. Regla: **documentar un anti-patrón dentro del árbol escaneado lo
+   materializa.**
+
+**Verificación:** `pnpm check` en la raíz de `efeonce-globe`, exit 0 — nul-byte gate, typecheck, 279 tests de
+`studio-web`, suite de `studio-client` y los dos canaries de browser.
+
+**Baseline de diff:** `apps/studio-client/.captures/task-1552-composer/` a 1440/390/320, **con la hoja
+puesta**. Se regeneran con `pnpm test`.
+
+⚠️ `TASK-1555` sigue siendo el único bloqueo de Slice 1, y sigue declarando `Status real: Diseño` con el código
+ya escrito. Alinear antes de tomarla.
+
 ## 2026-07-27 — ADR-016 aceptado: el payload cliente de Globe adopta Tailwind v4
 
 **Decisión de arquitectura, sin runtime tocado todavía.** Seis colisiones de CSS global medidas en una sesión
