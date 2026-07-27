@@ -113,6 +113,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-1581` | `to-do` | **Globe Producer Creative Entry Hub and Session Feed.** EPIC-028; ui-ux/flow; ui-standard; P1/Muy alto/Alto. Entrada por intención, contexto Project/Collection/Session y feed agrupado por sesión sin crear otro feed. | `docs/tasks/to-do/TASK-1581-globe-producer-creative-entry-hub-session-feed.md` |
 | `TASK-1582` | `to-do` | **Globe Producer Asset Workspace and Contextual Reuse.** EPIC-028; ui-ux/flow; ui-standard; P1/Muy alto/Alto. Extiende viewer a workspace con media, inspector, lineage y acciones contextuales; consume los canvases de modalidad. | `docs/tasks/to-do/TASK-1582-globe-producer-asset-workspace-contextual-reuse.md` |
 | `TASK-1583` | `to-do` | **Globe Producer Review-to-Element and Governed Reuse Experience.** EPIC-028; ui-ux/flow; ui-standard; P1/Alto/Medio. Conecta review, child sessions, aprobación y creación/reuso explícito de Elements sin gasto implícito. | `docs/tasks/to-do/TASK-1583-globe-producer-review-to-element-governed-reuse.md` |
+| `TASK-1587` | `to-do` | **Globe Governed Skill System and Orchestration Contract.** EPIC-028; policy/standard; P1/Alto/Medio. Define Skill, Skill Plan, Planner, Execution Coordinator, evidence, evals, promoción, rollback y límites de autoridad; no implementa runtime. | `docs/tasks/to-do/TASK-1587-globe-governed-skill-system-and-orchestration.md` |
 
 ## Siguiente ID disponible
 

@@ -185,6 +185,27 @@ evidencia, no una garantía de marketing.
  - `TASK-1582` — **Globe Producer Asset Workspace and Contextual Reuse.** Consumer UI que conecta el viewer/media canvases con proyecto, colección, sesión, lineage y acciones de continuidad.
  - `TASK-1583` — **Globe Producer Review-to-Element and Governed Reuse Experience.** Consumer UI que conecta review/changes-requested/approval con child sessions, creación explícita de Elements y reutilización gobernada.
 
+### Governed Skill System and orchestration — 2026-07-26
+
+Globe incorpora como línea de arquitectura el diseño de un sistema de Skills ejecutables y evolucionables.
+La Skill aporta método y criterio especializado; el agente define el perfil; el Capability Registry define
+qué operaciones existen; Policy define qué está permitido; la memoria conserva contexto de workspace; y la
+Evidence Store conserva lo que ocurrió. El **Skill Plan** es el objeto que conecta intención, composición,
+estimación, aprobación, ejecución, evaluación y feedback.
+
+La orquestación se separa en dos responsabilidades: un **Skill Planner** propone y valida un plan de Skills,
+y un **Skill Execution Coordinator** ejecuta únicamente el plan aprobado mediante commands/readers/workers
+canónicos. Ninguno puede otorgarse capabilities, ampliar presupuesto, saltar rights/approvals, llamar providers
+directamente o modificar una Skill productiva en silencio.
+
+La evolución queda gobernada por evidencia: `draft → shadow → governed → commercial → deprecated/retired`,
+con evals objetivas y review creativa humana separadas, rollback, version pin y aislamiento entre memoria de
+workspace y doctrina global. Esto no crea un segundo task registry, provider router, credit ledger ni runtime
+en Greenhouse.
+
+`TASK-1587` posee el ADR/spec y el backlog downstream. La implementación runtime en `efeonce-globe` queda
+bloqueada hasta aceptar ese contrato.
+
 ### Creative production workspace experience — 2026-07-26
 
 El benchmark de Magnific, Higgsfield, Krea, Runway, Leonardo, Recraft y Firefly confirma que el patrón premium no es una galería más rica: es una cadena de continuidad `intención → proyecto → sesión → asset → lineage → review → reuse`. Magnific demuestra que el destino debe poder elegirse antes de generar y que edición, historial y organización deben conservarse juntas; Higgsfield aporta Projects, Elements, Canvas y workflows guiados; Krea aporta un entry point simple con herramientas multimodales y asset manager; Runway separa Project, Session y Asset.

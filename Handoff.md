@@ -1,5 +1,12 @@
 # Handoff activo
 
+## 2026-07-26 — Globe Governed Skill System
+
+Se creó [`TASK-1587`](docs/tasks/to-do/TASK-1587-globe-governed-skill-system-and-orchestration.md) y se enlazó
+con EPIC-028 para definir el contrato del Skill System de Globe: Skill Plan, Planner, Execution Coordinator,
+evidence, evals, promoción, rollback y límites de autoridad. Es una task `policy` sin cambio de runtime; el
+siguiente paso es producir el ADR/spec canónico antes de derivar implementación en `efeonce-globe`.
+
 ## 2026-07-26 — Foco comercial y beachheads V1
 
 Se convirtió la evaluación del portafolio en [`EFEONCE_COMMERCIAL_FOCUS_AND_BEACHHEADS_V1.md`](docs/strategy/EFEONCE_COMMERCIAL_FOCUS_AND_BEACHHEADS_V1.md).
