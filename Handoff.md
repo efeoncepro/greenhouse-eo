@@ -1,5 +1,17 @@
 # Handoff activo
 
+## 2026-07-27 — Wave Product House, Greenhouse Admin y Agent Native
+
+Se creó [`EPIC-037`](docs/epics/to-do/EPIC-037-wave-agentic-readiness-product-platform.md), el ADR propuesto
+[`EFEONCE_WAVE_PRODUCT_PLATFORM_GREENHOUSE_ADMINISTRATION_DECISION_V1.md`](docs/architecture/EFEONCE_WAVE_PRODUCT_PLATFORM_GREENHOUSE_ADMINISTRATION_DECISION_V1.md)
+y la documentación funcional inicial de Agentic Readiness. La dirección queda: Wave posee la capa de producto y su
+runtime; Greenhouse administra transversalmente todas las plataformas Efeonce y consume proyecciones gobernadas. Los
+productos nuevos nacen Agent Native y con Full API Parity. La experiencia objetivo es una sola identidad/SSO de
+Greenhouse, con enforcement local en cada plataforma. Experience LaunchOps queda documentado como Product Service
+compuesto de Wave, no como sexta familia. El ADR sigue `Proposed`; no hay implementación, migración
+del Brand Visibility Grader ni rollout autorizados. Próximo paso: iterar y aceptar el ADR, definir el primer product
+slice y luego derivar tasks para el repositorio Wave.
+
 ## 2026-07-26 — Globe Governed Skill System
 
 Se creó [`TASK-1587`](docs/tasks/to-do/TASK-1587-globe-governed-skill-system-and-orchestration.md) y se enlazó

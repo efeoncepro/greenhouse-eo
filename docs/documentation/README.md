@@ -45,6 +45,8 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### Plataforma interna y calidad
 
+- [Agentic Readiness — Producto Wave](wave/agentic-readiness-product.md) — diseño funcional inicial del producto de Wave: Snapshot público, Audit/Grader, workbench interno, superficie cliente, monitoreo y frontera administrativa con Greenhouse.
+
 - [Public Site WordPress — Layout Ohio + Elementor](public-site/wordpress-ohio-elementor-layout.md) — contrato funcional del sitio publico Efeonce en WordPress/Kinsta cuando Ohio + Elementor producen desfases de contenedor, con causa raiz del incidente `/blog` 2026-06-14 y guardrails para no romper el sidebar fijo ni el hero.
 - [Public Site y Content Factory end-to-end](public-site/public-site-content-factory-end-to-end.md) — como opera el sitio publico WordPress/Kinsta desde Greenhouse: inspeccion, authoring Gutenberg, drafts privados y publicacion agentic separada con autorizacion, snapshot, rollback y QA live.
 - [Runbook agentic de blogposts end to end](../operations/public-site-content-factory/AGENTIC_BLOGPOST_END_TO_END_RUNBOOK_V1.md) — contrato operativo reusable desde research y voz hasta WordPress, SEO/E-E-A-T, media, publicación fail-closed y cierre documental.

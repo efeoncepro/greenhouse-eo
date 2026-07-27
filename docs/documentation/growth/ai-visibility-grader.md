@@ -23,6 +23,12 @@ El Grader y la Radiografía cumplen trabajos distintos dentro del motion SEO/AEO
 
 La cadena comercial correcta es **diagnóstico → demostración → propuesta → operación**. Un informe del Grader puede abrir la conversación; la Radiografía la vuelve tangible cuando el comprador necesita ver el método y no solo un score.
 
+### Rol dentro de Wave
+
+El Brand Visibility Grader es la primera puerta de Wave para el beachhead **AI Visibility & Search**. Su ruta primaria
+es **Search Visibility 360**; Web Experience, Measurement y Content/Creative son expansiones según los gaps observados.
+No es el diagnóstico universal de Wave ni debe absorber Agentic Readiness o Experience LaunchOps.
+
 Referencia comercial: [Usar la Radiografía AEO en venta y educación](../../manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md).
 
 ## Conceptos

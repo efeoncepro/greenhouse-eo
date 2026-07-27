@@ -356,7 +356,7 @@ La arquitectura está definida, pero no todos los modelos están aprobados:
 - Growth Platform: `Draft`.
 - AEO: `Draft`.
 - Search Visibility 360: `Draft`.
-- Wave: `Draft`; boundaries aceptados en [ADR Wave Portfolio Boundaries](../architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md).
+- Wave: `Proposed`; boundaries aceptados en [ADR Wave Portfolio Boundaries](../architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md); validación comercial pendiente.
 - Creative Studio: `Approved for validation` según su modelo vigente.
 - Studio Credits: política económica propia, sin precio público self-serve aprobado.
 

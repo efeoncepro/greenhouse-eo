@@ -7,6 +7,13 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-27 — Wave Product House, Greenhouse Admin y Agent Native
+
+- Se formalizó `EPIC-037` y el ADR propuesto para que Wave sea la casa de producto de sus Product Services, con Greenhouse como admin/control plane transversal de todas las plataformas Efeonce.
+- Se documentaron Agentic Readiness y Experience LaunchOps como Product Services compuestos de Wave sobre las cinco familias base; Agentic Readiness incluye Snapshot público, Audit/Grader, workbench interno, superficie cliente y monitoreo.
+- Se explicitó el contrato de identidad: una sesión/SSO de Greenhouse para entrar a las plataformas habilitadas, con subject, tenant, capabilities y entitlements verificados localmente en cada runtime.
+- Se estableció Agent Native + Full API Parity como requisito de nacimiento para los nuevos productos; no se autorizó runtime, migración del Brand Visibility Grader actual, pricing ni rollout.
+
 ## 2026-07-26 — Foco comercial: beachheads, entrada y expansión
 
 - Se creó `EFEONCE_COMMERCIAL_FOCUS_AND_BEACHHEADS_V1.md` para convertir el portfolio amplio en una máquina comercial secuenciada.
