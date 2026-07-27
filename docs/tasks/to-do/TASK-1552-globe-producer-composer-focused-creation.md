@@ -681,6 +681,13 @@ Reglas obligatorias:
   - **a agregar por esta task**: `producer-composer` (raíz), `producer-advanced-settings` (el `<details>`),
     `producer-generate-primary` (el CTA).
 - Assertions: exactly one primary CTA; no manual estimate button; no duplicated cost line; no dominant empty references panel; no provider slug/vendor cost/margin; no horizontal overflow.
+- **Aserto de contención (nuevo, obligatorio):** para cada descendiente del panel con `width > 0`, su
+  `getBoundingClientRect()` debe estar contenido en el del panel. Es la métrica que faltaba: altura, `scrollWidth`
+  y visibilidad del CTA dieron verde **mientras el layout estaba roto**.
+- **Aserto de ritmo:** `gap` efectivo entre bloques ≥ 28 px y `margin-bottom` de `.pc-title` ≥ 12 px.
+- **Aserto de glow:** el `box-shadow` del campo de prompt **cambia** entre reposo y `:focus-within`.
+- **Aserto de cantidad:** con `count.max === 1` la fila no existe en el DOM; con `max > 4` existe el campo exacto
+  y su atributo `max` coincide con el de la ruta.
 - Scroll-width checks: `document.documentElement.scrollWidth === document.documentElement.clientWidth` desktop and 390 px.
 - Reduced-motion / focus evidence: disclosure, CTA state changes and keyboard navigation.
 - Review dossier: `.captures/<run>/review/`.
@@ -886,6 +893,16 @@ N/A — repo-only task/documentation plus UI changes in the Globe runtime owned 
 - [ ] **Slice 0 — diff visual a cero.** Antes/después a 1440/390/320 sin diferencia de píxeles. Un movimiento
       verbatim que cambia un píxel no fue verbatim y se revierte, no se justifica.
 - [ ] `TASK-1555` está cerrada y sus 5 markers `producer-model-*` intactos antes del primer commit de Slice 1.
+- [ ] **Ritmo vertical:** separación entre bloques **≥ 28 px** y título→contenido **≥ 12 px**, medidos en browser.
+      17 px / 8,8 px son los valores que el operador reportó como «todo muy apretado» y quedan como piso prohibido.
+- [ ] **El glow del prompt se conserva**: `:hover` y `:focus-within` encienden borde + halo
+      `rgba(77,184,255,.55)` con transición de 220 ms sobre `border-color`, `box-shadow` y `background-color`,
+      **más** el corte de `prefers-reduced-motion` que el original no declara.
+- [ ] **Contención:** ningún descendiente del panel excede el rect de su contenedor (arriba, abajo, izquierda y
+      derecha). Altura y `scrollWidth` en verde NO bastan — con ambos verdes hubo layouts rotos.
+- [ ] **Cantidad derivada de la ruta**: `max === 1` no renderiza la fila; `max <= 4` un chip por valor;
+      `max > 4` chips de atajo + campo exacto visualmente distinto. Ningún valor hardcodeado.
+- [ ] **El riel es sólo dinero** (saldo + CTA). Ninguna decisión de forma vive ahí, aunque multiplique el costo.
 - [ ] El composer tiene una sola jerarquía primaria: prompt → dirección/output shape → CTA Generate.
 - [ ] No existe selector/título de modalidad duplicado dentro del composer.
 - [ ] **No existe un contenedor `advanced-controls` ni equivalente cajón-de-sastre**; seed, Style DNA, negativo y
