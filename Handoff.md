@@ -118,7 +118,29 @@ Una decisión que conviene no re-litigar: el punto de color de un preset reusa `
 **cuadrado** (`--radius-xs`, nacido acá) mientras el de capability es un círculo. **Un círculo de color
 ya significa «disponibilidad» en esta superficie, y dos cosas distintas no pueden compartir forma.**
 
-**Siguiente:** referencias (~40 reglas), selector de modelo, `shape-*` y riel de estimado.
+### Slice 1m — referencias, y tres defectos que se escondían entre sí (`3ab6015`)
+
+**El fixture no podía producir una ficha**, así que esa región —78 menciones de `reference` en el TSX—
+**nunca se había renderizado en el canary**: verde sobre una superficie inexistente. Al poblarlo
+aparecieron tres defectos:
+
+1. **«Mencionar del feed» estaba bloqueado por omisión**, no por el gate: el mapa de gates consulta
+   tres capabilities y `copyAsReference` no era una. Le decía al operador que **la plataforma** no lo
+   soporta cuando la pantalla nunca preguntó. **Una negación falsa manda a pedir algo que ya existe.**
+2. El botón de quitar y la etiqueta de derechos son `absolute` **sin ancestro posicionado**: se
+   anclaban al composer, así que el botón de cada ficha aterrizaba en la esquina del panel.
+3. El port usó `.reference-source` (badge para un glifo) donde el diseño tenía `.reference-detail p`
+   (prosa truncada).
+
+**Los defectos 2 y 3 se cancelaban.** El badge sin ancestro flotaba lejos en vez de verse mal en su
+sitio; al arreglar el 2, el texto aterrizó sobre la miniatura y la tapó entera. **Arreglar uno hizo
+visible el otro** — es lo que la conversión encuentra y ninguna lectura del CSS encuentra.
+
+⚠️ El mapa de gates es una lista explícita: **toda capability que la superficie despache hay que
+agregarla ahí**, y el síntoma de olvidarla es un control bloqueado con una razón que suena plausible.
+
+**Siguiente:** selector de modelo (baseline congelado de `TASK-1555`: se convierte de motor sin tocar
+su forma), `shape-*` y riel de estimado.
 
 ## 2026-07-27 — TASK-1552 Slices 1a y 1c: **el CTA volvió al fold**
 

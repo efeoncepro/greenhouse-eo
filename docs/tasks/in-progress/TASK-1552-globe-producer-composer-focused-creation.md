@@ -28,7 +28,7 @@
 - Motion: `docs/ui/motion/TASK-1552-globe-producer-composer-focused-creation-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `SLICE 1 EN CURSO — LOS CINCO BLOQUES EXISTEN, LA CONVERSION A TAILWIND VA POR TRES REGIONES (2026-07-27, commits 5b7cb3f + 512dcbc + a37d105). Cada bloque declara su pregunta creativa con su icono; Modo subio al bloque 1; el cajon de sastre no existe y el canary ahora afirma su ausencia en vez de un KNOWN sobre un elemento borrado. Convertidas a Tailwind: cabecera, modality-pill y fila de Modo, verificadas por VALOR COMPUTADO en browser. El SSOT gano 5 tokens (--text-micro, --text-meta, --text-lg, --accent-ink-bright, --field/--white) por decision del operador de tokenizar en vez de normalizar. HALLAZGO: el peso 700 no tenia utilidad alcanzable (font-display lo tomaba la familia) con el build en verde — corregido en el generador + guardrail que lanza. Slice 1h: los 8 `capability-button` pasan a un COMPONENTE local (CapabilityButton.tsx) con API de tipo discriminado — `blocked` siempre trae razon. HALLAZGO: el orden dentro del className NO decide nada; con `rounded-sm` en base y `rounded-full` en la variante, el boton circular rindio 9,28px con build y typecheck verdes. Regla: una propiedad se declara en UNA sola capa. Slices 1i/1j: el BLOQUE 1 queda entero en Tailwind (campo de prompt con su glow tokenizado, acciones, sugerencias, negativo) y el canary gana el aserto del glow que el STYLE_REFERENCE §9 pedia y no existia. Slices 1k/1l: overlays, direccion y seed convertidos. HALLAZGO MAYOR: el gate de reduced-motion leia solo CSS, asi que una animacion escrita en Tailwind era INVISIBLE para el — mismo agujero que ADR-016 condicion 2 describe para los otros tres gates, que si se reescribieron. Cerrado antes de crear la animacion. PENDIENTE: referencias, selector de modelo, shape y riel. Historico: TAILWIND LISTO, SUPERFICIE NO MIGRADA (2026-07-27): el motor de ADR-016 quedo instalado, gateado y verificado en efeonce-globe (804b7d7 + 91432ed) — theme generado desde el SSOT, 4 gates que muerden en className, canary de motor sobre valores computados. NINGUNA superficie migrada: el composer sigue con producerStyles y cero utilidades Tailwind. Unico bloqueo restante: cerrar TASK-1555. Baseline de diff capturado a 1440/390/320 CON la hoja del legacy. Historico: ADR-016 CAMBIO EL PLAN (2026-07-27): Slice 0 RETIRADO — el payload cliente migra a Tailwind v4 y una superficie reescrita no depende de la hoja legacy. BLOQUEADA por el slice de Tailwind en TASK-1485 y por cerrar TASK-1555. Diseno COMPLETO y documentado en docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md (leer PRIMERO). Rama efeonce-globe task/TASK-1552-slice0-internalizar-css commit 5edd2a3 = WIP congelado con partes a revertir, ver su mensaje`
+- Status real: `SLICE 1 EN CURSO — LOS CINCO BLOQUES EXISTEN, LA CONVERSION A TAILWIND VA POR TRES REGIONES (2026-07-27, commits 5b7cb3f + 512dcbc + a37d105). Cada bloque declara su pregunta creativa con su icono; Modo subio al bloque 1; el cajon de sastre no existe y el canary ahora afirma su ausencia en vez de un KNOWN sobre un elemento borrado. Convertidas a Tailwind: cabecera, modality-pill y fila de Modo, verificadas por VALOR COMPUTADO en browser. El SSOT gano 5 tokens (--text-micro, --text-meta, --text-lg, --accent-ink-bright, --field/--white) por decision del operador de tokenizar en vez de normalizar. HALLAZGO: el peso 700 no tenia utilidad alcanzable (font-display lo tomaba la familia) con el build en verde — corregido en el generador + guardrail que lanza. Slice 1h: los 8 `capability-button` pasan a un COMPONENTE local (CapabilityButton.tsx) con API de tipo discriminado — `blocked` siempre trae razon. HALLAZGO: el orden dentro del className NO decide nada; con `rounded-sm` en base y `rounded-full` en la variante, el boton circular rindio 9,28px con build y typecheck verdes. Regla: una propiedad se declara en UNA sola capa. Slices 1i/1j: el BLOQUE 1 queda entero en Tailwind (campo de prompt con su glow tokenizado, acciones, sugerencias, negativo) y el canary gana el aserto del glow que el STYLE_REFERENCE §9 pedia y no existia. Slices 1k/1l: overlays, direccion y seed convertidos. HALLAZGO MAYOR: el gate de reduced-motion leia solo CSS, asi que una animacion escrita en Tailwind era INVISIBLE para el — mismo agujero que ADR-016 condicion 2 describe para los otros tres gates, que si se reescribieron. Cerrado antes de crear la animacion. Slice 1m: referencias convertidas. HALLAZGO: el fixture no podia producir una ficha, asi que esa region nunca se habia renderizado en el canary — al poblarlo aparecieron TRES defectos, dos de ellos cancelandose mutuamente. Y «Mencionar del feed» estaba bloqueado POR OMISION (falta en el mapa de gates), no por el gate. PENDIENTE: selector de modelo, shape y riel. Historico: TAILWIND LISTO, SUPERFICIE NO MIGRADA (2026-07-27): el motor de ADR-016 quedo instalado, gateado y verificado en efeonce-globe (804b7d7 + 91432ed) — theme generado desde el SSOT, 4 gates que muerden en className, canary de motor sobre valores computados. NINGUNA superficie migrada: el composer sigue con producerStyles y cero utilidades Tailwind. Unico bloqueo restante: cerrar TASK-1555. Baseline de diff capturado a 1440/390/320 CON la hoja del legacy. Historico: ADR-016 CAMBIO EL PLAN (2026-07-27): Slice 0 RETIRADO — el payload cliente migra a Tailwind v4 y una superficie reescrita no depende de la hoja legacy. BLOQUEADA por el slice de Tailwind en TASK-1485 y por cerrar TASK-1555. Diseno COMPLETO y documentado en docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md (leer PRIMERO). Rama efeonce-globe task/TASK-1552-slice0-internalizar-css commit 5edd2a3 = WIP congelado con partes a revertir, ver su mensaje`
 - Rank: `TBD`
 - Domain: `creative|ui|product`
 - Blocked by: `none`
@@ -466,6 +466,47 @@ Se midió altura, `scrollWidth` y visibilidad del CTA — **y todo daba verde mi
 métrica que faltaba es la de **contención**: para cada descendiente, comprobar que su rect esté dentro del rect
 de su contenedor (arriba, abajo y a los lados). Sin eso, un `overflow: visible` deja hijos fuera sin que ninguna
 métrica de página lo note. **Agregar esa aserción al canary de la superficie.**
+
+## Delta 2026-07-27 (12) — Slice 1m: referencias, y tres defectos que se escondían entre sí
+
+Ejecutado en `efeonce-globe` `3ab6015`. La región más grande que quedaba: 14 clases, ~40 reglas.
+
+### 🔴 El fixture no podía producir una ficha, así que nadie la había mirado
+
+El feed del canary devolvía `{items:[]}`, y mencionar del feed es lo **único** que crea una ficha de
+referencia. La región más desarrollada del bloque 2 —78 menciones de `reference` en el TSX— **no se
+renderizaba nunca**: los asertos daban verde sobre una superficie que no existía. Mismo hueco que
+`TASK-1555` cerró en el selector, en otra región.
+
+Poblado el fixture, aparecieron **tres** defectos:
+
+1. **«Mencionar del feed» estaba bloqueado por omisión, no por el gate.** El mapa de gates de la
+   superficie consulta **tres** capabilities y `copyAsReference` no era una. `gateOf` devuelve
+   `undefined` para lo que no está en el mapa, y eso se traduce a *«todavía no tiene contrato
+   gobernado»* — o sea el botón le decía al operador que **la plataforma** no lo soporta cuando lo
+   único que pasaba es que esta pantalla nunca preguntó. **Una negación falsa es peor que una
+   negación: manda a pedir una capability que ya existe.**
+2. **`.reference-remove` y `.reference-source` son `absolute` sin ancestro posicionado.** Se anclaban
+   al composer entero: el botón de quitar de **cada** ficha aterrizaba en la esquina del panel, todos
+   sobre el mismo punto. Roto desde antes de esta task; sólo se nota con más de una ficha.
+3. **El port usó la clase equivocada para los derechos.** `.reference-source` es el badge sobre la
+   miniatura (absolute, para un glifo de dos caracteres); la línea de derechos es prosa. La clase que
+   el diseño tenía es `.reference-detail p`, truncada con ellipsis bajo el nombre.
+
+**Los defectos 2 y 3 se cancelaban mutuamente.** Como el badge era `absolute` sin ancestro, el texto
+flotaba en una esquina del composer en vez de verse mal en su sitio. **Recién al arreglar el 2, el
+texto aterrizó sobre la miniatura y ocupó los 56 px en tres líneas** — arreglar uno hizo visible el
+otro. Es la razón por la que la conversión encuentra cosas que ninguna lectura del CSS encuentra.
+
+⚠️ **Regla que se desprende para el mapa de gates:** es una lista explícita (una lectura, N gates), así
+que **toda capability nueva que la superficie despache hay que agregarla ahí**. El síntoma de olvidarla
+es un control permanentemente bloqueado con una razón que suena plausible.
+
+### El gate volvió a empujar al idiom correcto
+
+Cuatro violaciones, cuatro reemplazos que no son workarounds: `grid-cols-[3.5rem_minmax(0,1fr)]` →
+`flex` con miniatura `size-14 flex-none` y detalle `flex-1 min-w-0`; `z-[2]`/`z-[3]` → `z-2`/`z-3` (el
+namespace de z-index **no** se vacía en el theme); `top-[calc(100%+0.4rem)]` → `top-full mt-1.5`.
 
 ## Delta 2026-07-27 (11) — Slices 1k/1l: 🔴 el gate de motion no miraba el `className`
 
