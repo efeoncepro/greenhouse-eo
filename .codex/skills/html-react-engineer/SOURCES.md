@@ -2,7 +2,7 @@
 
 > **Regla:** el HTML semántico y los principios de composición de React **no se reverifican**: son
 > estables. Lo que rota es (a) el catálogo de elementos/atributos de plataforma nuevos y (b) la
-> superficie de React. Si la fila tiene más de ~3 meses y la afirmación es load-bearing, reverificá.
+> superficie de React. Si la fila tiene más de ~3 meses y la afirmación es load-bearing, reverifica.
 >
 > **Última revisión completa: 2026-07-27.**
 
@@ -16,7 +16,7 @@
 | Invoker commands, customizable select, `popover=hint` | **trimestral** | **todo** — son de 2025 | idem |
 | React 19.x API | **trimestral** | qué es estable vs experimental; el minor vigente | `references/react19-components.md` |
 | React Compiler | **trimestral** | comportamiento y qué inhibe la optimización | idem |
-| Adopción real en los repos | **por task** | **siempre** — grepeá, no cites esta tabla | ↓ |
+| Adopción real en los repos | **por task** | **siempre** — grepea, no cites esta tabla | ↓ |
 
 ## Fuentes
 
@@ -28,16 +28,16 @@
 | [modern-css.com — What's New](https://modern-css.com/whats-new/) | customizable select (`appearance: base-select`, Chrome 134); `popover=hint` (Chrome 135); `field-sizing`; `::details-content` | 2026-07-27 |
 | [MDN — `::picker`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Selectors/::picker) | pseudo-elemento del select personalizable | 2026-07-27 |
 | [React 19.2 — guías secundarias](https://blog.logrocket.com/react-19-2-is-here/) | confirmación de que **React Compiler llegó a 1.0**; el patch vigente de la 19.2 es 19.2.7 (2026-06-01) | 2026-07-27 |
-| Prácticas 2026 (varias) | "Server Components por defecto, cliente solo cuando hace falta"; "usá el compiler antes que memo manual"; `use()` sobre `useEffect` para datos; Server Actions sobre API routes para formularios | 2026-07-27 |
+| Prácticas 2026 (varias) | "Server Components por defecto, cliente solo cuando hace falta"; "usa el compiler antes que memo manual"; `use()` sobre `useEffect` para datos; Server Actions sobre API routes para formularios | 2026-07-27 |
 
 ⚠️ **Sesgo a corregir:** los artículos de "React best practices 2026" recomiendan Server Actions y la
 forms API como default. **En este ecosistema no son el idiom** (ver abajo), y el repo tiene un contrato
-propio — Full API Parity — que un Server Action ingenuo puede violar. Tomá la técnica, no la
+propio — Full API Parity — que un Server Action ingenuo puede violar. Toma la técnica, no la
 prescripción arquitectónica.
 
 ## Adopción real en los repos (runtime > doc)
 
-Verificado por grep 2026-07-27. **Grepeá antes de citar esto**: es lo que más rápido queda viejo.
+Verificado por grep 2026-07-27. **Grepea antes de citar esto**: es lo que más rápido queda viejo.
 
 | | greenhouse-eo | globe/studio-client | efeonce-think |
 |---|---|---|---|

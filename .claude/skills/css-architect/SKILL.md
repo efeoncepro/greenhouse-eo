@@ -59,15 +59,15 @@ Cuatro fuentes de estilo conviven, y el orden importa:
 Consecuencias prácticas:
 
 - **Si una utilidad pisa un estado de MUI que querías** (hover, disabled, selected), no es un bug de
-  MUI: es el `important` de los imports. Sacá la utilidad, no pelees con especificidad.
-- **Antes de tocar `globals.css`**, verificá si el problema es de una superficie. Un cambio ahí afecta
+  MUI: es el `important` de los imports. Saca la utilidad, no pelees con especificidad.
+- **Antes de tocar `globals.css`**, verifica si el problema es de una superficie. Un cambio ahí afecta
   a todo el portal y no lo atrapa ningún lint.
-- **CSS modules de Vuexy**: son del starter-kit. Modificarlos es fork; preferí envolver.
+- **CSS modules de Vuexy**: son del starter-kit. Modificarlos es fork; prefiere envolver.
 
 ## Features de plataforma: criterio local
 
 El portal es interno y con SSO, pero **no** hay un target de navegador declarado. Antes de usar algo
-del Nivel 2/3 de `platform-2026.md`, verificá y dejá la decisión escrita. Ya en uso en el repo:
+del Nivel 2/3 de `platform-2026.md`, verifica y deja la decisión escrita. Ya en uso en el repo:
 keyframes de view transition en `globals.css` y `@media (prefers-reduced-motion)`.
 
 ⚠️ **Cualquier uso de `reading-flow`, o cualquier cambio de orden de foco, pasa por

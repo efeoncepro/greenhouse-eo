@@ -44,7 +44,7 @@ Reglas que se rompen seguido:
 - **`<nav>` múltiples necesitan `aria-label`** distinto cada uno ("Principal", "Migas", "Pie"). Sin
   eso, el usuario oye "navegación" tres veces y no sabe cuál es cuál.
 - **`<section>` sin nombre accesible no es un landmark.** Necesita `aria-labelledby` o `aria-label`;
-  si no, usá un `<div>` — un `<section>` anónimo es ruido.
+  si no, usa un `<div>` — un `<section>` anónimo es ruido.
 - **`<article>`** = unidad autocontenida y redistribuible (post, card de producto, comentario).
   **`<section>`** = parte temática de algo mayor.
 - **`<header>`/`<footer>` dentro de `<article>` o `<section>`** son encabezado/pie **de ese elemento**,
@@ -69,7 +69,7 @@ Reglas que se rompen seguido:
   usuario de lector navega saltando entre headings, y una región sin heading es invisible para esa
   navegación.
 
-Prueba de 10 segundos: extraé solo los headings de la página. Si eso no se lee como una tabla de
+Prueba de 10 segundos: extrae solo los headings de la página. Si eso no se lee como una tabla de
 contenidos coherente, la estructura está mal.
 
 ---
@@ -129,7 +129,7 @@ clave-valor (fichas de datos, metadatos, glosarios): es la etiqueta correcta y c
 es un `<span>` con estilo de link, y es peor que un `<div>` porque parece correcto.
 
 **`<button>` sin `type` dentro de un `<form>` es `type="submit"`.** Causa clásica de "el formulario se
-envía solo al hacer click en cualquier botón". Poné `type="button"` siempre que no sea el submit.
+envía solo al hacer click en cualquier botón". Pon `type="button"` siempre que no sea el submit.
 
 ---
 
@@ -169,7 +169,7 @@ Lo que sí necesita ARIA, porque no hay nativo: `aria-live` para regiones que ca
 - **`autocomplete` correcto** en identidad, dirección, teléfono y pago. Es accesibilidad (WCAG 1.3.5)
   **y** conversión.
 - **`type` correcto** cambia el teclado móvil: `email`, `tel`, `url`, `number` (ojo: `number` no sirve
-  para códigos ni RUT — usá `text` + `inputmode`).
+  para códigos ni RUT — usa `text` + `inputmode`).
 - **`name` en cada control** o no viaja en el envío.
 - **`<fieldset>` + `<legend>`** para radios/checkboxes: sin eso, el grupo no tiene pregunta.
 - **`:user-invalid`** en vez de `:invalid` para no marcar en rojo antes de que el usuario escriba.
@@ -185,8 +185,8 @@ Lo que sí necesita ARIA, porque no hay nativo: `aria-live` para regiones que ca
 `Shadow DOM` no aparecía ni una vez en el inventario de skills, y en este ecosistema no se usa. Está
 bien: **no lo introduzcas para una feature**.
 
-Tiene sentido cuando: necesitás encapsulación real de estilos para un widget embebible en un host que
-no controlás, o un componente que debe funcionar en varios frameworks. En una app React homogénea, el
+Tiene sentido cuando: necesitas encapsulación real de estilos para un widget embebible en un host que
+no controlas, o un componente que debe funcionar en varios frameworks. En una app React homogénea, el
 costo (formularios, SSR, eventos que no cruzan el shadow boundary, estilos que no entran) supera al
 beneficio.
 

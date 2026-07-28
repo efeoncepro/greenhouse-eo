@@ -7,7 +7,7 @@ Los fundamentos de esta página son **estables**: no se reverifican. Lo único c
 
 ## Triage — por qué gana esa regla
 
-Corré esto **en orden**. Saltar al paso 4 y subir especificidad es cómo se degrada un sistema de CSS.
+Corre esto **en orden**. Saltar al paso 4 y subir especificidad es cómo se degrada un sistema de CSS.
 
 ### 1. ¿La regla existe y matchea?
 
@@ -69,7 +69,7 @@ de izquierda a derecha; **no hay acarreo**: 11 clases (0,11,0) nunca superan un 
 ```
 
 ⚠️ **Con nesting nativo, `&` propaga especificidad.** Anidar tres niveles produce selectores que no
-escribirías a mano. Si el CSS anidado "gana demasiado", desanidalo o envolvé con `:where()`.
+escribirías a mano. Si el CSS anidado "gana demasiado", desanídalo o envuelve con `:where()`.
 
 ### 5. Herencia y contextos
 
@@ -117,12 +117,12 @@ un estilo que se pisa (eso es el paso 2 del triage).
 
 **Síntoma:** el archivo tiene 40 `!important` y cada cambio nuevo necesita uno más.
 **Causa:** alguien ganó una pelea con fuerza bruta y el siguiente tuvo que hacer lo mismo.
-**Fix:** capas. Movés lo que debe perder a una capa temprana y lo que debe ganar a una tardía, y
-borrás los `!important` de a tandas verificando visualmente.
+**Fix:** capas. Mueves lo que debe perder a una capa temprana y lo que debe ganar a una tardía, y
+borras los `!important` de a tandas verificando visualmente.
 
 **Los dos `!important` legítimos:** utilidades que por contrato deben ganar (es exactamente lo que
 hace `greenhouse-eo` con el modificador `important` en sus dos `@import`), y pisar estilos inline de
-terceros que no controlás.
+terceros que no controlas.
 
 ### `z-index: 9999` que no funciona
 
@@ -133,7 +133,7 @@ Crean contexto de apilamiento: `position` + `z-index` distinto de `auto`, `opaci
 `filter`, `backdrop-filter`, `will-change`, `isolation: isolate`, `contain: paint|layout|strict`,
 `mix-blend-mode`, y estar en el **top layer**.
 
-**Diagnóstico:** subí por los ancestros buscando el primero que cree contexto. Ese es el que hay que
+**Diagnóstico:** sube por los ancestros buscando el primero que cree contexto. Ese es el que hay que
 ajustar. **Fix preventivo:** `isolation: isolate` en el componente, para que su apilamiento interno no
 dependa del resto de la página.
 
@@ -143,7 +143,7 @@ cascada de apilamiento por completo. Ver `html-react-engineer`.
 
 ### El estilo se ve distinto en dos lugares
 
-Descartá en este orden: (1) el componente hereda algo distinto en cada lugar (font, color, `direction`);
+Descarta en este orden: (1) el componente hereda algo distinto en cada lugar (font, color, `direction`);
 (2) hay una container query o un breakpoint distinto; (3) un ancestro crea un formatting context
 distinto (flex vs grid vs block cambia márgenes y tamaños); (4) hay dos motores de estilo y en un
 lugar gana uno y en el otro el otro.

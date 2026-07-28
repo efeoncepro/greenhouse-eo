@@ -68,7 +68,7 @@ peligrosas: pasan el build y rompen la consistencia.
 
 **Nota v4.2+:** el core ya trae lógicas nativas (`mbs-*`, `mbe-*`, `pbs-*`, `pbe-*`, `block-*`,
 `inline-*`, `inset-s/e/bs/be-*`). El repo está en `4.1.17`, así que hoy vienen del plugin. Si el repo
-sube a ≥4.2, revisá si el plugin sigue haciendo falta antes de asumirlo.
+sube a ≥4.2, revisa si el plugin sigue haciendo falta antes de asumirlo.
 
 ## El modificador de importancia ya está puesto — no lo repitas
 
@@ -83,11 +83,11 @@ sube a ≥4.2, revisá si el plugin sigue haciendo falta antes de asumirlo.
 El `important` de esos dos imports hace que **toda utilidad Tailwind gane sobre Emotion/MUI** por
 diseño (es el patrón del starter-kit Vuexy). Consecuencias:
 
-- **NUNCA agregues `!` a una clase individual** para "ganarle a MUI". Ya ganás. Si no estás ganando,
-  el problema es otro — corré el triage de `../references/debugging.md`.
+- **NUNCA agregues `!` a una clase individual** para "ganarle a MUI". Ya ganas. Si no estás ganando,
+  el problema es otro — corre el triage de `../references/debugging.md`.
 - **Cuidado con el efecto inverso**: una utilidad puesta al pasar puede pisar un estado de MUI
   (hover, disabled, selected) que sí querías. Si un componente MUI deja de reaccionar a un estado,
-  sospechá de una utilidad tuya antes que del componente.
+  sospecha de una utilidad tuya antes que del componente.
 - **Preflight NO está importado.** El reset de MUI (`CssBaseline`) es el que manda. No asumas los
   defaults de Tailwind sobre `h1`, `ul`, `button`, etc.
 
@@ -104,7 +104,7 @@ del mismo grupo esperando override.
 ## Anti-patrones específicos de este repo
 
 1. **Pintar color con Tailwind saltándose el theme.** El color sale de `theme.palette.*` /
-   `theme.axis.*` (regla dura del repo, ver `CLAUDE.md` §AXIS). Si necesitás el color en una clase,
+   `theme.axis.*` (regla dura del repo, ver `CLAUDE.md` §AXIS). Si necesitas el color en una clase,
    tiene que existir como token del `@theme` puente, y ese token viene del SSOT.
 2. **Ejemplos de clases en archivos del repo.** No hay `@source` acotando: la detección escanea el
    árbol respetando `.gitignore`, y `docs/**` + `.claude/skills/**` están trackeados. Medido en
@@ -114,7 +114,7 @@ del mismo grupo esperando override.
    **Follow-up abierto:** el portal hoy emite utilidades que solo existen en documentación. Acotarlo
    con `@source not "docs/**"` + `@source not ".claude/**"` en `globals.css` es barato y no tiene
    contraindicación conocida — requiere verificar que ninguna clase productiva viva solo en un `.md`.
-3. **Reemplazar un componente MUI por un div con utilidades.** Perdés accesibilidad, estados, RTL y el
+3. **Reemplazar un componente MUI por un div con utilidades.** Pierdes accesibilidad, estados, RTL y el
    theme. La primitive existente gana; ver `greenhouse-product-ui-architect`.
 4. **`@apply` para "limpiar" JSX.** Ver §4 del SKILL. Acá además compite con `sx`, que es el idiom
    nativo para eso.

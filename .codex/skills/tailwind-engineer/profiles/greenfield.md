@@ -1,7 +1,7 @@
 # Perfil: greenfield — montar Tailwind v4 bien desde cero
 
 Usar solo cuando el repo **no** es greenhouse-eo, efeonce-globe ni un Astro del ecosistema. Si es uno
-de esos tres, cargá su perfil: acá vas a tomar decisiones que ahí ya están tomadas.
+de esos tres, carga su perfil: acá vas a tomar decisiones que ahí ya están tomadas.
 
 ## Decisiones de arranque, en orden
 
@@ -29,19 +29,19 @@ Esta es **la** decisión del repo, y define su dialecto para siempre.
 
 | Patrón | Cuándo | Ejemplo del ecosistema |
 |---|---|---|
-| **SSOT en TS → generador → `@theme` generado + gate** | hay un design system propio y querés una sola fuente auditable | `efeonce-globe` |
+| **SSOT en TS → generador → `@theme` generado + gate** | hay un design system propio y quieres una sola fuente auditable | `efeonce-globe` |
 | **`@theme` puente que consume vars de otro sistema** | ya existe un theme dueño (MUI, Chakra, un DS heredado) | `greenhouse-eo` |
 | **`@theme` escrito a mano** | proyecto chico, sin DS, sin dark mode complejo | — |
 | **Sin theme** | nunca a propósito | `efeonce-think` (es deuda, no diseño) |
 
-Si elegís el primero, **el gate no es opcional**: sin un test que compare lo generado contra el
+Si eliges el primero, **el gate no es opcional**: sin un test que compare lo generado contra el
 generador, alguien va a editar el archivo generado a mano y nadie se va a enterar.
 
-### 4. ¿Vaciás los namespaces?
+### 4. ¿Vacías los namespaces?
 
 `--color-*: initial` (o `--*: initial`) borra la escala de fábrica.
 
-- **Vaciá** si el producto tiene identidad propia y no querés que nadie use un color de la paleta
+- **Vacía** si el producto tiene identidad propia y no quieres que nadie use un color de la paleta
   default por accidente. Es lo que hace Globe. Costo: todo tiene que existir en tu SSOT antes de
   poder usarse, y una utilidad ausente **falla en silencio**.
 - **No vacíes** si el equipo se beneficia de la escala de fábrica para prototipar. Costo: entra
@@ -62,7 +62,7 @@ Si hay CSS heredado conviviendo, dale su propia capa y ponela **después de `bas
 `components`**. Ponerla primera hace que las utilidades le ganen a estilos de componente que sí
 querías conservar (medido en Globe: `.capability-button` cayó de 11,52px/600 a 16px/400).
 
-### 6. Acotá la detección de contenido desde el día 1
+### 6. Acota la detección de contenido desde el día 1
 
 ```css
 @source not "**/*.test.ts";
@@ -92,7 +92,7 @@ el CSS compilado. Excluir esto después es una arqueología desagradable.
 
 ## Lo que NO vas a necesitar
 
-- `clsx` / `cva` / `tailwind-merge` — el idiom shadcn/ui no se usa en este ecosistema. Si creés que
+- `clsx` / `cva` / `tailwind-merge` — el idiom shadcn/ui no se usa en este ecosistema. Si crees que
   hace falta, es una decisión de plataforma (`arch-architect`), no de feature.
 - `@apply` como estilo de la casa — ver §4 del SKILL.
 - Configurar `content` o purge — no existe en v4.

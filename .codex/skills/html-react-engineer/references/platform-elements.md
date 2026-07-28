@@ -1,7 +1,7 @@
 # Referencia — elementos y comportamientos de plataforma
 
 Estado verificado 2026-07-27. Ver `../SOURCES.md`. **Esta página es la que más rápido cambia**: si vas a
-comprometerte con algo en producción, reverificá el soporte contra los targets del repo.
+comprometerte con algo en producción, reverifica el soporte contra los targets del repo.
 
 ---
 
@@ -28,7 +28,7 @@ comprometerte con algo en producción, reverificá el soporte contra los targets
 
 Diferencias que importan:
 
-- `show()` → **no** modal, **no** atrapa foco, **no** hace inerte. Casi nunca es lo que querés.
+- `show()` → **no** modal, **no** atrapa foco, **no** hace inerte. Casi nunca es lo que quieres.
 - `<form method="dialog">` cierra el diálogo y expone `dialog.returnValue` con el `value` del botón.
 - **`closedby="any"`** (nuevo) permite cerrar con click afuera de forma declarativa, sin listener.
 - `request-close` (vía invoker command) dispara el evento `cancel`, respetando la lógica de
@@ -138,7 +138,7 @@ Chrome 134 a 2026-07. **Es la solución correcta a "necesito un select estilizad
 permite: cualquier combobox reconstruido con `div`s carga con teclado, anuncio, búsqueda por tipeo y
 móvil, y casi siempre queda peor.
 
-Si necesitás multi-select con búsqueda y tags, eso ya no es un `<select>`: es el patrón combobox de
+Si necesitas multi-select con búsqueda y tags, eso ya no es un `<select>`: es el patrón combobox de
 APG, y pasa por `a11y-architect`.
 
 ---
@@ -162,7 +162,7 @@ APG, y pasa por `a11y-architect`.
 
 ## Tabla de decisión
 
-| Quiero… | Usá | No uses |
+| Quiero… | Usa | No uses |
 |---|---|---|
 | modal bloqueante | `<dialog>` + `showModal()` | div + overlay + trap manual |
 | menú/dropdown/tooltip | `popover` (+ anchor positioning) | portal + z-index + click-outside |
@@ -182,7 +182,7 @@ APG, y pasa por `a11y-architect`.
 2. **¿Degrada con gracia?** `popover` sin soporte muestra el contenido siempre visible — feo pero
    funcional. `field-sizing` sin soporte deja un textarea de tamaño fijo — aceptable. Una feature que
    degrada a "no funciona" necesita fallback sí o sí.
-3. **¿El fallback cuesta más que la librería?** Si sí, usá la librería **hoy** y dejá anotado el
+3. **¿El fallback cuesta más que la librería?** Si sí, usa la librería **hoy** y deja anotado el
    reemplazo. Media implementación nativa con media librería es lo peor de los dos.
-4. **Escribí la decisión.** "No usamos `<dialog>` porque X" es información; descubrirlo por
+4. **Escribe la decisión.** "No usamos `<dialog>` porque X" es información; descubrirlo por
    arqueología dos años después, no.

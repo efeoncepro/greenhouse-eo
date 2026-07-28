@@ -68,10 +68,10 @@ Tres decisiones deliberadas, cada una con su razón medida:
 ```
 
 **Consecuencia dura:** la escala de fábrica **no existe acá**. `text-red-500`, `text-lg`,
-`rounded-md`, `shadow-sm`, `ease-out` — ninguna se genera. Si escribís una, **no aparece nada** y el
+`rounded-md`, `shadow-sm`, `ease-out` — ninguna se genera. Si escribes una, **no aparece nada** y el
 build queda verde. Es la patología P4 de `../references/debugging.md`.
 
-Antes de usar cualquier utilidad tematizada, mirá qué tokens existen:
+Antes de usar cualquier utilidad tematizada, mira qué tokens existen:
 
 ```bash
 grep -o "^\s*'--[a-z0-9-]*'" apps/studio-client/src/tokens/tokens.ts | sort
@@ -112,7 +112,7 @@ inyectadas por `app.ts:2267` dentro de `@layer legacy{…}`. Esa es la superfici
 
 ⚠️ **El ADR va un paso atrás del código.** Declara "motor listo, ninguna superficie migrada", pero los
 commits de TASK-1552 (`852b9b1`, `5b7cb3f`, `512dcbc`) indican que la región piloto ya empezó.
-**Verificá el estado real antes de afirmarlo** — `git log --oneline -15` y mirá qué superficies
+**Verifica el estado real antes de afirmarlo** — `git log --oneline -15` y mira qué superficies
 importan de `tailwind.css`.
 
 Referencia obligatoria al migrar el composer:

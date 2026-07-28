@@ -40,7 +40,7 @@ Lo **volátil**: los elementos de plataforma nuevos (invoker commands, select pe
 
 ## 0. La regla que ahorra más trabajo que ninguna otra
 
-**Antes de construir un comportamiento, preguntá si la plataforma ya lo trae.** En 2025-2026 el
+**Antes de construir un comportamiento, pregunta si la plataforma ya lo trae.** En 2025-2026 el
 inventario cambió lo suficiente como para que el instinto esté desactualizado:
 
 | Vas a construir… | Ya existe |
@@ -54,8 +54,8 @@ inventario cambió lo suficiente como para que el instinto esté desactualizado:
 | validación básica de formulario | atributos nativos + `:user-invalid` |
 | tabla ordenable | `<table>` real + `aria-sort` |
 
-Cada fila que aceptás borra JavaScript, borra bugs de accesibilidad **y borra una dependencia**. Cada
-fila que rechazás tiene que tener una razón escrita. Detalle en `references/platform-elements.md`.
+Cada fila que aceptas borra JavaScript, borra bugs de accesibilidad **y borra una dependencia**. Cada
+fila que rechazas tiene que tener una razón escrita. Detalle en `references/platform-elements.md`.
 
 **El corolario incómodo:** un `<div>` con `onClick` y `role="button"` es *siempre* peor que un
 `<button>`. No es purismo — es que el `<div>` no tiene foco, no responde a Enter/Espacio, no aparece
@@ -69,7 +69,7 @@ Cada una de esas hay que reimplementarla y ninguna sale gratis.
 > **Dónde están estos archivos.** Paths **relativos al directorio de esta skill**, que vive en dos
 > lugares equivalentes: `~/.claude/skills/html-react-engineer/` (núcleo user-scope, no versionado) y
 > `/Users/jreye/Documents/greenhouse-eo/.codex/skills/html-react-engineer/` (espejo versionado).
-> Dentro de greenhouse-eo usá el espejo: `.codex/skills/html-react-engineer/references/<archivo>.md`.
+> Dentro de greenhouse-eo usa el espejo: `.codex/skills/html-react-engineer/references/<archivo>.md`.
 > El `.claude/skills/html-react-engineer/SKILL.md` del repo es **solo un overlay de un archivo**.
 
 ```
@@ -115,7 +115,7 @@ Detalle y casos de borde en `references/semantic-html.md`.
 ```
 
 **El bug de estado más común es duplicarlo.** Un `useState` que se sincroniza con una prop vía
-`useEffect` es casi siempre estado derivado mal modelado. Si lo podés calcular durante el render,
+`useEffect` es casi siempre estado derivado mal modelado. Si lo puedes calcular durante el render,
 calculalo.
 
 ### 3.2 Con React Compiler, no memoices a mano
@@ -130,10 +130,10 @@ cuando algo depende de ella (una dependencia de efecto, una key de cache).
 
 ### 3.3 Efectos — la mayoría no deberían existir
 
-No necesitás un efecto para: transformar datos para el render, responder a un evento del usuario,
-resetear estado cuando cambia una prop (usá `key`), ni calcular algo derivado.
+No necesitas un efecto para: transformar datos para el render, responder a un evento del usuario,
+resetear estado cuando cambia una prop (usa `key`), ni calcular algo derivado.
 
-Sí lo necesitás para **sincronizar con algo externo**: suscripciones, `IntersectionObserver`, timers,
+Sí lo necesitas para **sincronizar con algo externo**: suscripciones, `IntersectionObserver`, timers,
 APIs no-React.
 
 **`useEffectEvent` (19.2)** resuelve el problema estructural de las dependencias: separa la lógica de
@@ -173,7 +173,7 @@ la cantidad: es que está tratando de ser N componentes. Las salidas, en orden d
 **children / slots** → **compound components** → **una prop `variant` con valores cerrados**. Última
 opción: más booleanas.
 
-En Greenhouse hay una regla previa: **buscá la primitive existente antes de construir**
+En Greenhouse hay una regla previa: **busca la primitive existente antes de construir**
 (Greenhouse primitive → wrapper Vuexy `Custom*` → MUI base). Nacer una primitive nueva tiene su propio
 protocolo — ver `greenhouse-product-ui-architect`.
 
@@ -188,14 +188,14 @@ protocolo — ver `greenhouse-product-ui-architect`.
   ARIA mal puesto es **peor** que sin ARIA porque miente.
 - **NUNCA elijas un nivel de encabezado por su tamaño visual.**
 - **NUNCA uses el índice del array como `key`** en una lista que se reordena, filtra o inserta.
-- **NUNCA sincronices una prop a estado con `useEffect`.** Derivá, o remontá con `key`.
+- **NUNCA sincronices una prop a estado con `useEffect`.** Deriva, o remonta con `key`.
 - **NUNCA memoices a mano por performance donde corre React Compiler.**
 - **NUNCA metas lógica de negocio en el componente** si puede afectar datos, permisos o estado
   persistente: va a un command/reader canónico en `src/lib/**` (Full API Parity).
 - **SIEMPRE** `<label for>` asociado; placeholder **no** es label.
 - **SIEMPRE** `autocomplete` correcto en campos de identidad, dirección y pago.
 - **SIEMPRE** un `<main>`, un `<h1>`, y jerarquía de headings sin saltos.
-- **SIEMPRE** que uses un elemento de plataforma nuevo, verificá soporte y dejá el fallback escrito
+- **SIEMPRE** que uses un elemento de plataforma nuevo, verifica soporte y deja el fallback escrito
   (o la decisión de no tenerlo).
 - **SIEMPRE** que el componente cambie orden de foco, agregue un modal, o introduzca ARIA no trivial:
   pasa por `a11y-architect`.

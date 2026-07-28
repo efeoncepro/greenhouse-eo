@@ -2,7 +2,7 @@
 
 ⚠️ **Ésta es la página más volátil de la skill.** Varias features son Chrome-only o "expected", y los
 artículos de "lo nuevo de CSS" **sobre-reportan Chrome**. La columna de estado tiene fecha de
-verificación (2026-07-27); si vas a comprometerte con una en producción, **reverificá los tres motores
+verificación (2026-07-27); si vas a comprometerte con una en producción, **reverifica los tres motores
 y los targets reales del repo**. Ver `../SOURCES.md`.
 
 Ordenadas por qué tan seguro es usarlas hoy.
@@ -58,11 +58,11 @@ textarea { field-sizing: content; max-block-size: 12rem; }
 ```
 
 Autosize nativo de `textarea` e inputs. Borra una librería o un `useEffect` que medía `scrollHeight`.
-**Poné siempre un `max-*`**, o crece sin límite.
+**Pon siempre un `max-*`**, o crece sin límite.
 
 ---
 
-## Nivel 2 — interop reciente, verificá targets
+## Nivel 2 — interop reciente, verifica targets
 
 ### Container queries solo por nombre
 
@@ -124,8 +124,8 @@ Corrige el orden de tabulación y de lector de pantalla en flex/grid cuando el o
 orden del DOM. Chrome 137.
 
 ☠️ **Esto cambia el orden de foco.** No es una decisión de layout: es una decisión de accesibilidad.
-**Cualquier uso pasa por `a11y-architect`.** Y ojo con el orden de causalidad: si necesitás
-`reading-flow`, primero preguntate si el DOM debería estar en otro orden.
+**Cualquier uso pasa por `a11y-architect`.** Y ojo con el orden de causalidad: si necesitas
+`reading-flow`, primero pregúntate si el DOM debería estar en otro orden.
 
 ---
 
@@ -143,10 +143,10 @@ orden del DOM. Chrome 137.
 
 **Cómo tratarlas:** son excelentes para prototipos, demos internas y superficies con un solo target de
 navegador. En producción multi-navegador, o hay fallback o no van. Y si alguien te dice "esto ya es
-estándar" citando un artículo, mirá la fecha y los tres motores.
+estándar" citando un artículo, mira la fecha y los tres motores.
 
 `@function` y `@mixin` en particular tientan a reconstruir Sass en CSS nativo. Antes de eso,
-preguntate si el problema no lo resuelve mejor una custom property o una capa.
+pregúntate si el problema no lo resuelve mejor una custom property o una capa.
 
 ---
 
@@ -168,4 +168,4 @@ Inventario de dependencias que dejan de ser necesarias. Útil al auditar un repo
 | `z-index` en escalada para modales | top layer (`<dialog>` / `popover`) |
 
 Cada fila es una dependencia menos, un bug menos y menos JS en el bundle. **Pero** cada una tiene una
-fila de soporte en la tabla de arriba: verificá antes de prometer el borrado.
+fila de soporte en la tabla de arriba: verifica antes de prometer el borrado.

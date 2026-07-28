@@ -36,7 +36,7 @@ description: >-
 contexto de apilamiento, formatting contexts) son **estables desde siempre** y no se reverifican.
 Lo **volátil** es el soporte de features nuevas: 2025–2026 movió mucho (anchor positioning, `@scope`,
 `if()`, `@function`, `shape()`, `corner-shape`, container queries sin condición de tamaño). **Antes de
-afirmar que algo se puede o no se puede usar, reverificá** — ver `SOURCES.md`.
+afirmar que algo se puede o no se puede usar, reverifica** — ver `SOURCES.md`.
 
 ---
 
@@ -64,7 +64,7 @@ deja el sistema peor: la próxima regla tendrá que subir más. Ver `references/
 > **Dónde están estos archivos.** Paths **relativos al directorio de esta skill**, que vive en dos
 > lugares equivalentes: `~/.claude/skills/css-architect/` (núcleo user-scope, no versionado) y
 > `/Users/jreye/Documents/greenhouse-eo/.codex/skills/css-architect/` (espejo versionado).
-> Dentro de greenhouse-eo usá el espejo: `.codex/skills/css-architect/references/<archivo>.md`.
+> Dentro de greenhouse-eo usa el espejo: `.codex/skills/css-architect/references/<archivo>.md`.
 > El `.claude/skills/css-architect/SKILL.md` del repo es **solo un overlay de un archivo**.
 
 ```
@@ -93,7 +93,7 @@ gana" en una decisión de diseño explícita en vez de una carrera de selectores
 ```
 
 **El corolario que casi nadie aplica:** CSS **fuera** de toda capa gana a **todo** lo que está en
-capas. Un `.css` de terceros importado suelto pisa tu sistema entero sin que se vea por qué. Meté
+capas. Un `.css` de terceros importado suelto pisa tu sistema entero sin que se vea por qué. Mete
 todo en capas, incluido lo ajeno:
 
 ```css
@@ -105,13 +105,13 @@ todo en capas, incluido lo ajeno:
 `:where()` tiene especificidad **cero**. `:is()` toma la del argumento más específico.
 
 ```css
-/* especificidad 0,1,0 — fácil de pisar, que es lo que querés en una base */
+/* especificidad 0,1,0 — fácil de pisar, que es lo que quieres en una base */
 :where(.card) .title { font-weight: 600; }
 ```
 
-Usalo para estilos base que deben ser sobrescribibles sin pelea. `!important` es la respuesta correcta
+Úsalo para estilos base que deben ser sobrescribibles sin pelea. `!important` es la respuesta correcta
 en exactamente dos casos: utilidades que por contrato deben ganar (es lo que hace el import de
-`greenhouse-eo`) y sobreescribir estilos inline de terceros que no controlás.
+`greenhouse-eo`) y sobreescribir estilos inline de terceros que no controlas.
 
 ### 2.3 El componente se defiende con `@scope` o con capas, no con nombres largos
 
@@ -158,7 +158,7 @@ y ya no:
 | centrado óptico a ojo con márgenes negativos | **`text-box: trim-both cap alphabetic`** |
 | polyfill de transición entre páginas | **view transitions (mismo doc y cross-document)** |
 
-Cada una borra una dependencia y un bug. **Pero verificá el soporte** antes de comprometerte: varias
+Cada una borra una dependencia y un bug. **Pero verifica el soporte** antes de comprometerte: varias
 son recientes y el ecosistema tiene tres repos con targets distintos.
 
 ---
@@ -175,15 +175,15 @@ son recientes y el ecosistema tiene tres repos con targets distintos.
 - **NUNCA declares un valor de diseño (color, tamaño, duración) directamente en una regla** si el
   repo tiene design system. El valor sale del token. Ver `design-system-governance`.
 - **NUNCA dejes dos motores de estilo activos en la misma superficie** (CSS propio + utilidades +
-  CSS-in-JS peleando). Elegí uno por superficie.
+  CSS-in-JS peleando). Elige uno por superficie.
 - **NUNCA uses `z-index` sin saber en qué contexto de apilamiento estás.** `z-index: 9999` que no
   funciona es siempre un contexto padre, nunca un número insuficiente.
-- **SIEMPRE** declará el orden de capas **una vez, arriba de todo**, antes del primer `@import`.
-- **SIEMPRE** que una animación dependa de `display` o de entrada desde `display:none`, usá
+- **SIEMPRE** declara el orden de capas **una vez, arriba de todo**, antes del primer `@import`.
+- **SIEMPRE** que una animación dependa de `display` o de entrada desde `display:none`, usa
   `@starting-style` + `transition-behavior: allow-discrete` en vez de timers.
-- **SIEMPRE** que uses una feature de plataforma reciente, verificá el soporte contra los targets
-  reales del repo y dejá el fallback escrito (o la decisión de no tenerlo).
-- **SIEMPRE** respetá `prefers-reduced-motion` cuando el CSS anime algo — el contrato lo define
+- **SIEMPRE** que uses una feature de plataforma reciente, verifica el soporte contra los targets
+  reales del repo y deja el fallback escrito (o la decisión de no tenerlo).
+- **SIEMPRE** respeta `prefers-reduced-motion` cuando el CSS anime algo — el contrato lo define
   `motion-design`, ésta lo implementa.
 
 ---

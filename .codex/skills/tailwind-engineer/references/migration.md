@@ -14,17 +14,17 @@ peor que una sin migrar: cada cambio futuro tiene que razonar sobre dos sistemas
 
 ## Secuencia
 
-### 1. Capturá el antes
+### 1. Captura el antes
 
 En Greenhouse: scenario GVC (`pnpm fe:capture`) + `pnpm fe:capture:diff` al final. En Globe/Astro:
 screenshot determinista de la superficie en desktop y 390px, guardado fuera del repo.
 
-Si la superficie tiene estados (hover, loading, vacío, error), capturá **cada estado**. Es donde se
+Si la superficie tiene estados (hover, loading, vacío, error), captura **cada estado**. Es donde se
 esconden las regresiones.
 
-### 2. Inventariá los valores, no las reglas
+### 2. Inventaria los valores, no las reglas
 
-No traduzcas selector por selector. Extraé la **lista de valores distintos** que la superficie usa:
+No traduzcas selector por selector. Extrae la **lista de valores distintos** que la superficie usa:
 colores, tamaños, pesos, radios, sombras, duraciones, espaciados.
 
 ```bash
@@ -39,21 +39,21 @@ Cada valor cae en una de tres categorías:
 | **debería existir** (es del sistema, faltaba) | agregarlo al SSOT → regenerar → usar |
 | **es un accidente** (un `13px` que nadie decidió) | **decidirlo**: redondear al token más cercano y anotarlo |
 
-La tercera categoría es el valor real de migrar. Si traducís los accidentes tal cual a valores
+La tercera categoría es el valor real de migrar. Si traduces los accidentes tal cual a valores
 arbitrarios, moviste el problema de lugar y perdiste la oportunidad.
 
 En Globe hay ayuda: `LEGACY_TOKEN_DRIFT` en `tokens.ts` registra qué declara cada superficie legacy,
 justo para que el port lo reemplace **deliberadamente** y no por copia.
 
-### 3. Migrá una región, no un archivo
+### 3. Migra una región, no un archivo
 
-Elegí la unidad más chica que se pueda ver entera en una captura (una card, un header, una fila). El
+Elige la unidad más chica que se pueda ver entera en una captura (una card, un header, una fila). El
 archivo completo es demasiado: si el diff sale distinto, no vas a saber cuál de los 40 cambios fue.
 
-### 4. Sacá el CSS viejo en el mismo commit
+### 4. Saca el CSS viejo en el mismo commit
 
-Si el CSS legacy de esa región sigue vivo, tenés dos motores. Borralo. Si no podés borrarlo porque
-otra superficie lo comparte, **no era la región correcta para empezar** — subí un nivel o extraé
+Si el CSS legacy de esa región sigue vivo, tienes dos motores. Bórralo. Si no puedes borrarlo porque
+otra superficie lo comparte, **no era la región correcta para empezar** — sube un nivel o extrae
 primero lo compartido.
 
 ### 5. Diff visual + gates
@@ -68,7 +68,7 @@ pnpm fe:capture:diff <antes> <después>
 ```
 
 Un diff distinto es un **hallazgo**, no un fracaso: casi siempre es un accidente que estaba en el CSS
-viejo y que ahora tenés que decidir. Anotá la decisión.
+viejo y que ahora tienes que decidir. Anota la decisión.
 
 ## Qué NO migrar
 
@@ -88,5 +88,5 @@ Al terminar, la superficie debería tener **menos decisiones**, no las mismas es
 - [ ] Los accidentes de la categoría 3 quedaron resueltos y anotados.
 - [ ] El CSS legacy de la región **ya no existe**.
 - [ ] El diff visual es cero, o cada píxel de diferencia está explicado.
-- [ ] Los gates pasan sin rebaseline. Si necesitás rebaseline, va **declarado** (en Greenhouse, en
+- [ ] Los gates pasan sin rebaseline. Si necesitas rebaseline, va **declarado** (en Greenhouse, en
       `BASELINE_DELTAS.md`).

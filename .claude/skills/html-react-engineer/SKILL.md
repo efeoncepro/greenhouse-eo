@@ -33,7 +33,7 @@ description: >-
 4. `frontend-architect` — topología de render (RSC, boundaries, streaming).
 5. Esta skill — markup y composición del componente.
 
-## Antes de escribir markup: buscá la primitive
+## Antes de escribir markup: busca la primitive
 
 Orden obligatorio, **siempre**:
 
@@ -83,7 +83,7 @@ React 19 son greenfield: adoptarlas es una decisión de arquitectura con su prop
 introduce de pasada en una feature.
 
 Nota: no hay React Compiler en este repo (sí en Globe). Acá `useMemo`/`useCallback` siguen teniendo
-efecto real — pero seguí necesitando una razón para ponerlos.
+efecto real — pero sigue necesitando una razón para ponerlos.
 
 ## Cierre
 

@@ -1,8 +1,8 @@
 # SOURCES — tailwind-engineer
 
 > **Regla:** nunca afirmes de memoria qué versión, utilidad o feature existe. Si el `Verified` de la
-> fila tiene más de ~3 meses y la afirmación es load-bearing, reverificá con `WebFetch` a la fuente
-> oficial y actualizá el `as-of` inline en la skill.
+> fila tiene más de ~3 meses y la afirmación es load-bearing, reverifica con `WebFetch` a la fuente
+> oficial y actualiza el `as-of` inline en la skill.
 >
 > **Última revisión completa: 2026-07-27.**
 
@@ -12,8 +12,8 @@
 |---|---|---|---|
 | Mecánica CSS-first (`@theme`, namespaces, capas, `@utility`) | **estable** | — (no cambió desde v4.0) | `references/v4-directives.md` |
 | Catálogo de utilidades disponibles | **volátil (por minor)** | "esa utilidad no existe" / "hay que hacerla a mano" | `SOURCES` ↓ |
-| Versión instalada por repo | **volátil** | cualquier cosa versión-dependiente → leé el `package.json`, no esta tabla | `profiles/*.md` |
-| Dialecto/SSOT de cada repo | **semestral** | el SSOT o el gate de un repo → verificá contra el runtime | `profiles/*.md` |
+| Versión instalada por repo | **volátil** | cualquier cosa versión-dependiente → lee el `package.json`, no esta tabla | `profiles/*.md` |
+| Dialecto/SSOT de cada repo | **semestral** | el SSOT o el gate de un repo → verifica contra el runtime | `profiles/*.md` |
 | ADR-016 (ley del dialecto Globe) | **por task** | estado de migración de superficies → el ADR va un paso atrás del código | ver §ADR-016 |
 | Patologías de debugging | **estable** | — (son propiedades del motor, medidas) | `references/debugging.md` |
 
@@ -52,7 +52,7 @@ Notas load-bearing:
 
 `docs/architecture/creative-studio/EFEONCE_GLOBE_CLIENT_STYLING_ENGINE_DECISION_V1.md` —
 `Accepted` 2026-07-27, dueño `TASK-1485`, supersede parcialmente ADR-014 (solo el motor de estilos).
-Es la fuente normativa del perfil `efeonce-globe`. **Reverificá el estado de migración antes de
+Es la fuente normativa del perfil `efeonce-globe`. **Reverifica el estado de migración antes de
 afirmarlo**: el ADR declara "motor listo, ninguna superficie migrada", pero los commits de TASK-1552
 indican que la región piloto ya empezó — el documento va un paso atrás del código.
 
@@ -60,7 +60,7 @@ indican que la región piloto ya empezó — el documento va un paso atrás del 
 
 - **"Tailwind hincha el HTML / no escala."** El argumento es de la era de purge por regex; en v4 la
   detección es del motor y el CSS emitido es proporcional a lo usado. Si vas a objetar Tailwind,
-  objetá algo medible en el repo, no esto.
+  objeta algo medible en el repo, no esto.
 - **"`@apply` es la forma de hacer componentes."** Fue un patrón de v1-v3 que la propia doc desalienta;
   entra a la capa equivocada y pierde variantes. Ver §4 del SKILL.
 - **"Hay que declarar `content` / configurar purge."** No en v4.

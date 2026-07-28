@@ -128,13 +128,13 @@ boundaries de Suspense — decisión de `frontend-architect`.
 
 ---
 
-## React Compiler 1.0 — qué cambia en cómo escribís
+## React Compiler 1.0 — qué cambia en cómo escribes
 
 Activo en `efeonce-globe` (`babel-plugin-react-compiler@1.0.0`, pin exacto).
 
 - **No agregues `useMemo`/`useCallback`/`React.memo` por performance.** El compiler memoiza mejor y
   con más contexto. La memoización manual puede **impedirle** optimizar.
-- **Escribí componentes puros.** El compiler se abstiene cuando detecta efectos secundarios escondidos:
+- **Escribe componentes puros.** El compiler se abstiene cuando detecta efectos secundarios escondidos:
   mutar props, mutar un objeto del render, leer/escribir globals. Un componente "sucio" simplemente no
   se optimiza — en silencio.
 - **`eslint-plugin-react-hooks` limpio es la precondición** (v7 en Globe; v6+ usa flat config por
@@ -153,7 +153,7 @@ Activo en `efeonce-globe` (`babel-plugin-react-compiler@1.0.0`, pin exacto).
 const [items, setItems] = useState(props.items)
 useEffect(() => setItems(props.items), [props.items])
 
-// ✓ derivá durante el render
+// ✓ deriva durante el render
 const visibles = items.filter(i => i.active)
 ```
 
@@ -163,7 +163,7 @@ const visibles = items.filter(i => i.active)
 // ✗ efecto que limpia
 useEffect(() => { setDraft('') }, [userId])
 
-// ✓ remontá con key — React descarta todo el estado del subárbol
+// ✓ remonta con key — React descarta todo el estado del subárbol
 <Profile key={userId} userId={userId} />
 ```
 
@@ -177,7 +177,7 @@ muestran el valor de otra fila, checkboxes que saltan.
 
 ### Efectos que no deberían existir
 
-No necesitás efecto para: transformar datos para el render · responder a un evento del usuario ·
+No necesitas efecto para: transformar datos para el render · responder a un evento del usuario ·
 resetear por cambio de prop (`key`) · calcular derivados.
 Sí para: suscripciones, observers, timers, APIs no-React, sincronizar con `localStorage`.
 
@@ -204,7 +204,7 @@ explotar el API.
 
 **4. booleanas** — última opción, y solo si son verdaderamente independientes.
 
-> En Greenhouse hay un paso previo: **buscá la primitive existente antes de construir**
+> En Greenhouse hay un paso previo: **busca la primitive existente antes de construir**
 > (Greenhouse primitive → wrapper Vuexy `Custom*` → MUI base). Nacer una primitive tiene protocolo
 > propio → `greenhouse-product-ui-architect`.
 

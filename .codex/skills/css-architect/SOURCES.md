@@ -3,7 +3,7 @@
 > **Regla:** los **fundamentos** de CSS (cascada, especificidad, herencia, contextos) no se
 > reverifican: son estables desde hace décadas. Lo que **sí** rota es el **soporte de features
 > nuevas**. Si vas a afirmar "esto ya se puede usar" o "esto todavía no", y la fila tiene más de ~3
-> meses, reverificá y actualizá el `as-of`.
+> meses, reverifica y actualiza el `as-of`.
 >
 > **Última revisión completa: 2026-07-27.**
 
@@ -34,7 +34,7 @@
 
 ⚠️ **Sesgo a corregir en las fuentes secundarias:** los artículos de "lo nuevo de CSS" **sobre-reportan
 Chrome**. Varias filas de arriba son Chrome-only o "expected". Antes de usar una feature en producción,
-verificá **los tres motores** y los targets reales del repo. `if()`, `@function`, `@mixin`,
+verifica **los tres motores** y los targets reales del repo. `if()`, `@function`, `@mixin`,
 `corner-shape` y gap decorations están en esa categoría a 2026-07.
 
 ## Política del ecosistema (runtime > doc)
@@ -42,7 +42,7 @@ verificá **los tres motores** y los targets reales del repo. `if()`, `@function
 El overlay de `modern-ui` en `greenhouse-eo` **desactiva explícitamente** recomendaciones globales:
 OKLCH, `color-mix()` y P3 no aplican dentro del portal, porque el color sale del theme MUI/AXIS. Eso
 **no invalida** esta skill: aplica a Globe, a los sitios Astro y a cualquier superficie fuera del
-portal. **Antes de recomendar color moderno, mirá en qué repo estás.**
+portal. **Antes de recomendar color moderno, mira en qué repo estás.**
 
 ## Mitos que NO se citan
 
@@ -52,8 +52,8 @@ portal. **Antes de recomendar color moderno, mirá en qué repo estás.**
 - **"Los IDs no se usan nunca."** El problema del ID no es el ID: es su especificidad (1,0,0). Como
   hook de JS o ancla de `commandfor` es correcto; como selector de estilo casi nunca.
 - **"CSS-in-JS es más lento por definición."** Depende de si extrae en build o inyecta en runtime. Si
-  vas a argumentar performance, medí en el repo.
+  vas a argumentar performance, mide en el repo.
 - **"`:has()` es caro."** Fue cierto en las primeras implementaciones. Hoy está optimizado; si
-  sospechás, medí antes de evitarlo por reputación.
+  sospechas, mide antes de evitarlo por reputación.
 - **"Hay que usar `will-change` para que sea fluido."** `will-change` permanente crea capas de
   composición que consumen memoria. Es una herramienta puntual, no un adorno.

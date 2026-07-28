@@ -13,7 +13,7 @@ description: >-
 
 > ⚠️ **Este archivo es SOLO el overlay.** No contiene los perfiles ni las referencias: pinea el
 > dialecto local y nada más. **El cuerpo de la skill vive en el espejo versionado del repo**, y los
-> paths de abajo son los reales — copiá y leé.
+> paths de abajo son los reales — copia y lee.
 
 ## Router (rutas reales en este repo)
 
@@ -29,8 +29,19 @@ description: >-
 | Frescura de las afirmaciones + versiones por repo | `.codex/skills/tailwind-engineer/SOURCES.md` |
 | Router y hard rules cross-dialecto | `.codex/skills/tailwind-engineer/SKILL.md` |
 
+## Estado vigente de Efeonce Globe
+
+En `../efeonce-globe`, el payload React activo usa Tailwind v4 como pipeline único: composer, shell, diálogos,
+feed, viewer, share board, primitives y capas base/motion están centralizados en el payload Tailwind, sin hojas
+CSS de superficie importadas. El theme se genera desde `tokens.ts`; no agregues literales de diseño a
+`className`.
+
+`producerStyles` en `apps/studio-web/src/producer-ui.ts` permanece sólo para el renderer vanilla de fallback
+cuando la ruta React no está habilitada. No lo retires como parte de una migración de superficie: `TASK-1560`
+gobierna ese cutover y sus gates de paridad.
+
 (El mismo contenido existe en `~/.claude/skills/tailwind-engineer/`, núcleo user-scope no versionado.
-Dentro del repo preferí el espejo: es el que está bajo control de versiones.)
+Dentro del repo prefiere el espejo: es el que está bajo control de versiones.)
 
 ## Precedencia dentro de este repo
 

@@ -14,7 +14,7 @@ la Radiografía AEO como muestra de trabajo.
 Composición real: **28 `.astro`, 0 `.tsx`, 0 `.jsx`, 7 `.ts`**. `@astrojs/react` está registrado en
 `astro.config.mjs` pero no hay una sola isla (`client:load|visible|idle` = 0 hits). Es **HTML + CSS
 puro con Astro**; la integración React es peso muerto. No agregues una isla React "porque está
-disponible" — si hace falta interactividad, evaluá primero HTML de plataforma
+disponible" — si hace falta interactividad, evalúa primero HTML de plataforma
 (`html-react-engineer` → `references/platform-elements.md`).
 
 ## Cableado
@@ -55,7 +55,7 @@ Es el repo con **menor disciplina de tokens de los tres**.
 
 - **Es un hub público de marca, no el portal.** La vara visual la fija `frontend-design` /
   `efeonce-brand-studio`, no los tokens AXIS del producto. No importes el theme del portal.
-- **Regla de no-regresión:** si tocás una superficie, **no agregues más valores literales**. Lo mínimo
+- **Regla de no-regresión:** si tocas una superficie, **no agregues más valores literales**. Lo mínimo
   viable es declarar el valor una vez en `@theme` y consumirlo. Un `@theme` chico y honesto es mejor
   que 1.307 líneas creciendo.
 - **El camino correcto es el follow-up ya identificado**: paquete de tokens compartido. Si vas a

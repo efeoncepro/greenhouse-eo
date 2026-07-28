@@ -10,7 +10,7 @@ cuesta una tarde. Las tres primeras están **medidas en producción** en este ec
 
 ```
 1. ¿La utilidad EXISTE en el CSS compilado?
-   grep -c "\.mi-clase" <output.css>       (o buscá en DevTools → Sources)
+   grep -c "\.mi-clase" <output.css>       (o busca en DevTools → Sources)
       NO  → P4 (no se generó) o P5 (no se escaneó)
       SÍ  → sigue
 
@@ -64,7 +64,7 @@ mismo.
 grep -nE '^\s*--([a-z0-9-]+):\s*var\(--\1\)' src/**/*.css
 ```
 
-**Prohibido por ADR-016 §3.** Si trabajás en Globe, el theme se **genera** — no hay `@theme inline` a
+**Prohibido por ADR-016 §3.** Si trabajas en Globe, el theme se **genera** — no hay `@theme inline` a
 mano que valga.
 
 ---
@@ -105,7 +105,7 @@ estado (hover/disabled/selected).
 
 - **Emotion/MUI vs utilidades.** En `greenhouse-eo` los imports llevan el modificador de importancia
   justamente para que Tailwind gane. **Efecto inverso**: una utilidad puesta al pasar pisa un estado
-  de MUI que sí querías. Si un componente MUI deja de reaccionar a un estado, sospechá de tu clase
+  de MUI que sí querías. Si un componente MUI deja de reaccionar a un estado, sospecha de tu clase
   antes que del componente.
 - **Preflight ausente/presente.** `greenhouse-eo` y `efeonce-globe` **no** importan preflight;
   `efeonce-think` **sí**. Asumir los defaults de Tailwind sobre `h1`/`ul`/`button` es correcto en uno
@@ -130,7 +130,7 @@ estado (hover/disabled/selected).
 ```
 
 La escala de fábrica **no existe**. `text-lg`, `bg-red-500`, `rounded-md`, `ease-out` no se generan.
-Comprobá qué existe realmente:
+Comprueba qué existe realmente:
 
 ```bash
 grep -o "^\s*'--[a-z0-9-]*'" apps/studio-client/src/tokens/tokens.ts | sort
@@ -164,7 +164,7 @@ const cls = size === 'lg' ? 'text-lg' : 'text-sm'
 ```
 
 Salida de emergencia si no hay forma: `@source inline("bg-red-500 bg-green-500")`. Antes de usarla,
-preguntate si la construcción dinámica es necesaria.
+pregúntate si la construcción dinámica es necesaria.
 
 **Causa B — se escaneó de más.** Tailwind lee el árbol como texto plano, **sin ignorar comentarios**,
 y eso incluye docs, tests y fixtures. Un ejemplo escrito en un archivo del árbol puede materializarse
@@ -197,7 +197,7 @@ simples. Consecuencias prácticas:
 - Las **clases simples de ejemplo en docs sí engordan el CSS**. En `greenhouse-eo` no hay `@source`
   acotando y `docs/**` + `.claude/skills/**` están trackeados: hoy el portal materializa utilidades
   que solo existen en documentación.
-- Es una observación empírica de una versión, no un contrato. Si el repo sube de minor, revalidá antes
+- Es una observación empírica de una versión, no un contrato. Si el repo sube de minor, revalida antes
   de apoyarte en ella.
 
 ---
@@ -227,4 +227,4 @@ head -5 src/app/globals.css
 
 **Nunca cierres un bug de Tailwind con `!`, con especificidad extra o duplicando la regla.** Las cinco
 patologías tienen fix estructural y ninguna se arregla con fuerza bruta. Si llegaste a `!important`,
-volvé al paso 1 del triage: estás mirando el síntoma equivocado.
+vuelve al paso 1 del triage: estás mirando el síntoma equivocado.

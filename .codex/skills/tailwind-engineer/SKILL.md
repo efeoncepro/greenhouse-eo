@@ -36,7 +36,7 @@ reverifica** — ver `SOURCES.md`.
 
 ---
 
-## 0. Regla cero — identificá el dialecto ANTES de escribir una clase
+## 0. Regla cero — identifica el dialecto ANTES de escribir una clase
 
 No hay "Tailwind del ecosistema". Hay **tres dialectos**, y una clase legal en uno es ilegal o
 inexistente en otro. Antes de tocar nada:
@@ -55,14 +55,14 @@ grep -rn "@import 'tailwindcss\|@import \"tailwindcss\|@theme\|@source\|@plugin"
 | `astro` + `@tailwindcss/vite` + `@import 'tailwindcss'` pelado | **astro (think / web)** | `profiles/astro-think.md` |
 | ninguna de las anteriores | repo nuevo | `profiles/greenfield.md` |
 
-**Cargá el perfil y leelo entero.** Contiene el SSOT, qué está prohibido, qué gates corren y cuál es
+**Carga el perfil y leelo entero.** Contiene el SSOT, qué está prohibido, qué gates corren y cuál es
 el idiom local. Sin eso vas a escribir código que compila y está mal.
 
 > **Dónde están esos archivos.** Los paths de este documento son **relativos al directorio de esta
 > skill**, y la skill vive en dos lugares equivalentes:
 > `~/.claude/skills/tailwind-engineer/` (núcleo user-scope, no versionado) y
 > `/Users/jreye/Documents/greenhouse-eo/.codex/skills/tailwind-engineer/` (espejo versionado).
-> **Si trabajás dentro de greenhouse-eo, usá el espejo** — es el que está en el repo:
+> **Si trabajas dentro de greenhouse-eo, usa el espejo** — es el que está en el repo:
 > `.codex/skills/tailwind-engineer/profiles/<dialecto>.md`.
 > El `.claude/skills/tailwind-engineer/SKILL.md` del repo es **solo un overlay de un archivo**; no
 > contiene los perfiles ni las referencias.
@@ -87,7 +87,7 @@ Las tres diferencias que más queman:
 ├─ Vas a tocar el theme, agregar un token,
 │  crear una utilidad o una variante ............. references/v4-directives.md
 ├─ Algo no aplica, no se genera, o se ve mal
-│  con el build verde ............................ references/debugging.md   ← empezá por el §Triage
+│  con el build verde ............................ references/debugging.md   ← empieza por el §Triage
 ├─ Vas a migrar una superficie de CSS→Tailwind ... references/migration.md
 └─ ¿Sigue vigente lo que voy a afirmar? ......... SOURCES.md
 ```
@@ -139,29 +139,29 @@ Estas valen en los tres repos. Las específicas están en cada perfil.
   **no nulo** — ver `references/debugging.md` §P5 para qué se materializa y qué no (medido en
   `4.1.17`). Ante la duda: `@source not`, o el ejemplo va fuera del árbol.
 - **SIEMPRE** token nuevo → SSOT primero, nunca al revés.
-- **SIEMPRE** que una utilidad "no funcione", corré el triage de `references/debugging.md` antes de
+- **SIEMPRE** que una utilidad "no funcione", corre el triage de `references/debugging.md` antes de
   agregar `!important`, subir especificidad o duplicar la regla. Las cinco patologías conocidas se
   ven iguales desde afuera y tienen causas distintas.
-- **SIEMPRE** que agregues una familia de utilidades propia, preferí `@utility` funcional con
+- **SIEMPRE** que agregues una familia de utilidades propia, prefiere `@utility` funcional con
   `--value()` sobre N utilidades sueltas: una definición cubre theme + bare + arbitrario.
 
 ---
 
 ## 4. Decisiones frecuentes, resueltas
 
-| Necesito… | Hacé | No hagas |
+| Necesito… | Haz | No hagas |
 |---|---|---|
-| un color/tamaño/radio nuevo | agregalo al SSOT del repo y regenerá/consumilo desde `@theme` | declararlo en la clase |
+| un color/tamaño/radio nuevo | agregalo al SSOT del repo y regenera/consumilo desde `@theme` | declararlo en la clase |
 | un valor que varía en runtime (JS, estado, dato) | variable CSS en el elemento + utilidad que la referencia | recomputar clases string |
-| un patrón repetido de 6 clases | evaluá primero si es un **componente**; si es puramente presentacional y transversal, `@utility` | `@apply` para "limpiar" el JSX |
+| un patrón repetido de 6 clases | evalúa primero si es un **componente**; si es puramente presentacional y transversal, `@utility` | `@apply` para "limpiar" el JSX |
 | estilos en un `<style>` de framework o CSS module | `@reference` a la hoja principal, luego `@apply` | reimportar `tailwindcss` (duplica todo el CSS) |
 | una variante propia (tema, data-attr, estado) | `@custom-variant` | selectores ad-hoc en CSS global |
 | condicionar por tamaño del contenedor | container queries (`@container` + variantes `@sm:`) | breakpoints de viewport para un componente |
-| que una utilidad gane sobre CSS-in-JS | mirá el perfil: en greenhouse-eo el import ya viene con el modificador de importancia | agregar `!` a mano en cada clase |
+| que una utilidad gane sobre CSS-in-JS | mira el perfil: en greenhouse-eo el import ya viene con el modificador de importancia | agregar `!` a mano en cada clase |
 
 **Sobre `@apply`:** es la salida de emergencia, no el estilo de la casa. Legítimo en: hojas de terceros
-que no podés tocar, CSS modules de un starter-kit heredado, y `@reference` en bloques `<style>`.
-Ilegítimo como forma de "ordenar" JSX — ahí perdés el sistema de variantes y creás una capa de
+que no puedes tocar, CSS modules de un starter-kit heredado, y `@reference` en bloques `<style>`.
+Ilegítimo como forma de "ordenar" JSX — ahí pierdes el sistema de variantes y creas una capa de
 indirección que ningún grep encuentra.
 
 ---

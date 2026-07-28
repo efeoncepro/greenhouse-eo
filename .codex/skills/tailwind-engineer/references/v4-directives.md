@@ -54,7 +54,7 @@ utilidad de tamaño de fuente cuyo valor es un color. Falla en silencio.
 define**, no donde se usa:
 
 ```html
-<!-- SIN inline — no funciona como esperás -->
+<!-- SIN inline — no funciona como esperas -->
 <div style="--font-sans: var(--font-inter, sans-serif);">
   <div style="--font-inter: Inter; font-family: var(--font-sans);">
     <!-- usa sans-serif: --font-sans se resolvió arriba, donde --font-inter no existía -->
@@ -99,7 +99,7 @@ existir** y usarlas no produce error, produce nada.
 v4 no tiene `content:`. Escanea el árbol respetando `.gitignore`, **como texto plano, sin ignorar
 comentarios**. Por eso un ejemplo de clase en un `.md` o en un comentario `.ts` se materializa.
 `@source inline(...)` es la salida cuando las clases se construyen dinámicamente y el scanner no
-puede verlas — pero antes de usarlo, preguntate si la construcción dinámica es necesaria.
+puede verlas — pero antes de usarlo, pregúntate si la construcción dinámica es necesaria.
 
 ---
 
@@ -244,7 +244,7 @@ Con subpath imports de `package.json`:
 
 En valores arbitrarios: `py-[calc(--spacing(4)-1px)]`.
 
-`theme('spacing.12')` está **deprecada** — usá la variable CSS.
+`theme('spacing.12')` está **deprecada** — usa la variable CSS.
 
 ---
 
@@ -288,5 +288,5 @@ PostCSS) · lógicas extendidas en el core (`mbs-*`, `mbe-*`, `pbs-*`, `pbe-*`, 
 · `font-features-*` (OpenType sin CSS custom).
 
 ⚠️ Las lógicas del core **se solapan con el plugin `tailwindcss-logical`** que usa `greenhouse-eo`.
-Si ese repo sube a ≥4.2, verificá si el plugin sigue haciendo falta antes de asumirlo — y ojo con la
+Si ese repo sube a ≥4.2, verifica si el plugin sigue haciendo falta antes de asumirlo — y ojo con la
 diferencia de nombres (`is-full` del plugin vs `inline-full` del core).

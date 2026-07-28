@@ -1,6 +1,6 @@
 # Referencia — color, custom properties y theming
 
-⚠️ **Antes de recomendar color moderno, mirá en qué repo estás.** El overlay de `modern-ui` en
+⚠️ **Antes de recomendar color moderno, mira en qué repo estás.** El overlay de `modern-ui` en
 `greenhouse-eo` **desactiva OKLCH, `color-mix()` y P3 dentro del portal**: ahí el color sale del theme
 MUI/AXIS y punto. Esta página aplica a Globe, a los sitios Astro y a superficies fuera del portal.
 La dueña del **valor** del token siempre es `design-system-governance`.
@@ -68,7 +68,7 @@ background: color-mix(in oklab, var(--brand) 20%, transparent);
 border-color: color-mix(in oklab, var(--brand), black 15%);
 ```
 
-Un color base + mezclas > doce tokens de opacidad hechos a mano. Ojo: **mezclá en `oklab`/`oklch`**,
+Un color base + mezclas > doce tokens de opacidad hechos a mano. Ojo: **mezcla en `oklab`/`oklch`**,
 no en `srgb`, o vas a ver los grises sucios del mix lineal.
 
 ### Relative color syntax
@@ -92,8 +92,8 @@ de paletas.
 Un tema, sin duplicar el bloque de reglas. **Requiere `color-scheme`** declarado, y por eso mismo los
 controles nativos (scrollbars, inputs, `<select>`) se adaptan solos.
 
-Limitación real: solo cubre dos modos. Para multi-brand o más de dos temas, seguís necesitando
-variables por tema — pero podés combinar: variables por marca + `light-dark()` por modo.
+Limitación real: solo cubre dos modos. Para multi-brand o más de dos temas, sigues necesitando
+variables por tema — pero puedes combinar: variables por marca + `light-dark()` por modo.
 
 ### `contrast-color()`
 
@@ -103,7 +103,7 @@ variables por tema — pero podés combinar: variables por marca + `light-dark()
 
 El navegador elige el texto legible según la luminancia del fondo. Mata el patrón de "función JS que
 decide si el texto va negro o blanco". Es de las más nuevas (Firefox 146, Safari 26 — verificado
-2026-07): **verificá antes de usarla sin fallback**.
+2026-07): **verifica antes de usarla sin fallback**.
 
 ⚠️ **`contrast-color()` no reemplaza una auditoría de contraste.** Garantiza legibilidad, no un ratio
 WCAG concreto ni la coherencia de marca. El ratio lo audita `a11y-architect`.
@@ -136,7 +136,7 @@ Tres capas, y confundirlas es el origen de la mayoría de los sistemas de color 
   marca hay que tocar cada componente.
 - **El dark mode se resuelve en la capa semántica.** Si aparece un `.dark .button` estás resolviendo
   el tema en el componente y vas a duplicarlo N veces.
-- **Nombrá por intención, no por apariencia.** `--color-danger`, no `--color-red`. El día que el rojo
+- **Nombra por intención, no por apariencia.** `--color-danger`, no `--color-red`. El día que el rojo
   de peligro pasa a naranja, el nombre sigue siendo verdad.
 
 En un repo con Tailwind, el punto donde el token semántico se vuelve utilidad es `@theme` →
@@ -166,7 +166,7 @@ de color, un gráfico). La auditoría es de `a11y-architect`.
 | Error | Por qué duele |
 |---|---|
 | escala de grises en HSL | los pasos no se ven parejos; en OKLCH sí |
-| opacidad para "aclarar" un color | `opacity` afecta al elemento entero, hijos incluidos. Para aclarar el color usá `color-mix()` |
+| opacidad para "aclarar" un color | `opacity` afecta al elemento entero, hijos incluidos. Para aclarar el color usa `color-mix()` |
 | tokens de color con nombre de apariencia | `--color-red` que ahora es naranja |
 | dark mode con clases duplicadas | dos sistemas de color que se desincronizan solos |
 | `color-mix` en `srgb` | grises sucios en el medio de la mezcla |

@@ -35,7 +35,7 @@ contenido en ese eje. Es la causa #1 de "puse container-type y se rompió el lay
 ```
 
 Interop confirmado: Chrome 149, Safari 26.4, Firefox 148. Útil para "estoy dentro de X" sin importar
-el tamaño. **Verificá contra los targets del repo antes de usarlo sin fallback.**
+el tamaño. **Verifica contra los targets del repo antes de usarlo sin fallback.**
 
 ### Style queries
 
@@ -168,10 +168,10 @@ equivocado casi siempre es esto — típicamente un `transform` de animación en
 altura 0.
 
 `contain: layout | paint | size | style | strict | content` — cada valor promete algo distinto. `size`
-es el más peligroso: promete que el tamaño no depende del contenido, y si mentís, el elemento colapsa.
+es el más peligroso: promete que el tamaño no depende del contenido, y si mientes, el elemento colapsa.
 
 `will-change` es una herramienta **puntual**: puesto de forma permanente crea capas de composición que
-consumen memoria. Ponelo justo antes de animar y sacalo después, o no lo pongas.
+consumen memoria. Ponlo justo antes de animar y sácalo después, o no lo pongas.
 
 > Medir es de `web-perf-design`. Acá está el mecanismo; el presupuesto es de ella.
 
