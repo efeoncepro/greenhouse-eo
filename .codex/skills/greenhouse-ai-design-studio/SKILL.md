@@ -48,6 +48,20 @@ Use the minimum lanes that apply:
 - `greenhouse-mockup-builder`: mockup-only route when a runtime surface should
   not be touched before direction approval.
 
+Materialization lanes (how the approved direction becomes code). They own craft,
+never the loop: they do not re-declare the score gate, the Figma Implementation
+Contract or GVC — this orchestrator owns those.
+
+- `tailwind-engineer`: theme, custom utilities, variants, layers, content
+  detection, SSOT → `@theme` → class. Routes by repo dialect; in greenhouse-eo
+  the MUI/AXIS theme is the SSOT and logical properties are mandatory.
+- `css-architect`: cascade, `@layer`, specificity, `@scope`, container queries,
+  anchor positioning, containment, and the diagnosis of style that does not
+  apply or gets overridden.
+- `html-react-engineer`: correct HTML element, platform behaviour (`<dialog>`,
+  `popover`, invoker commands, customizable select) and React 19 component
+  composition. Render topology stays with `frontend-architect`.
+
 Never cite unavailable skills as required dependencies. If a desired specialty
 is unavailable, the orchestrator owns the decision using the canonical docs and
 records the fallback.

@@ -14,6 +14,16 @@ lanes to the locally available Claude skills, but do not change the order,
 artifacts, readiness fields, GVC premium requirements, score dimensions or
 thresholds.
 
+Materialization lanes (Claude namespace) — how the approved direction becomes
+code. They own craft only; they never re-declare the score gate, the Figma
+Implementation Contract or GVC:
+
+- `tailwind-engineer` — theme, utilities, variants, layers, SSOT → class.
+- `css-architect` — cascade, layers, specificity, layout, platform CSS.
+- `html-react-engineer` — HTML element, platform behaviour, React 19 composition.
+
+Render topology (RSC, boundaries, streaming) stays with `frontend-architect`.
+
 Hard requirements:
 
 1. Persist external source or a repo-native direction.

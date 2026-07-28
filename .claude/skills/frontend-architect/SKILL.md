@@ -170,6 +170,15 @@ Greenhouse INP is monitored. Hot spots fixed via:
 - `info-architecture-greenhouse-overlay` — IA dictates topology.
 - `a11y-architect-greenhouse-overlay` — interactivity needs client.
 
+## Compose with — materialization lanes (2026-07-27)
+
+- `html-react-engineer` — **frontera explícita**: esta skill decide *dónde corre* el código (RSC,
+  boundaries `use client`, hydration, streaming, Server Actions como arquitectura de datos); aquélla,
+  *cómo se estructura el componente* (elemento HTML, composición, hooks, forms API). Ante una duda de
+  topología, gana ésta.
+- `css-architect` / `tailwind-engineer` — CSS crítico, orden de hojas y code splitting los decide esta
+  skill; el contenido del CSS, aquéllas.
+
 ## Version
 
 - **v1.0** — 2026-05-11 — Initial overlay.
