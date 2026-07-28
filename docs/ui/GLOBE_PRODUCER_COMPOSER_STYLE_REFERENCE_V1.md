@@ -94,13 +94,15 @@ Se hereda de la hoja legacy. **Valores literales, no aproximaciones:**
 
 ```
 reposo    borde: var(--line-strong) · fondo: rgba(6,15,45,.55)
-          box-shadow: inset 0 1px rgba(255,255,255,.025)
+          box-shadow: inset 0 1px rgba(255,255,255,.025),
+                      0 .625rem 1.75rem -1.1rem rgba(77,184,255,.22)
 
-hover     borde: rgba(77,184,255,.42) · fondo: rgba(7,18,54,.68)
+hover     borde: rgba(77,184,255,.42) · fondo: rgba(6,15,45,.42)
           box-shadow: 0 0 0 1px rgba(77,184,255,.18),
+                      inset 0 1px rgba(255,255,255,.025),
                       0 .75rem 2rem -.9rem rgba(77,184,255,.32)
 
-focus     borde: rgba(77,184,255,.55) · fondo: rgba(7,18,54,.76)
+focus     borde: rgba(77,184,255,.55) · fondo: rgba(6,15,45,.30)
 (within)  box-shadow: 0 0 0 1.5px rgba(77,184,255,.55),
                       inset 0 1px 0 rgba(255,255,255,.06),
                       0 14px 38px -12px rgba(77,184,255,.45)
@@ -108,8 +110,58 @@ focus     borde: rgba(77,184,255,.55) · fondo: rgba(7,18,54,.76)
 transición  220 ms sobre border-color, box-shadow y background-color
 ```
 
-⚠️ **Perder este efecto es regresión detectable a simple vista** — ya pasó una vez al renombrar clases. Y al
-reimplementarlo hay que **agregarle el corte de `prefers-reduced-motion`**, que el original no declara.
+⚠️ **Perder este efecto es regresión detectable a simple vista** — ya pasó una vez al renombrar clases. El
+corte de `prefers-reduced-motion`, que el original legacy no declaraba, **ya está implementado**
+(`motion-reduce:transition-none` en el contenedor del campo): se apaga la interpolación, no el estado
+encendido, que es información de foco y no decoración.
+
+**Delta 2026-07-28 — el reposo lleva halo propio.** El valor heredado del legacy era sólo el filo interno de
+`rgba(255,255,255,.025)` — 2,4 % de alfa medido en runtime, invisible sobre el navy. Eso dejaba toda la
+identidad del campo en `hover` y `focus`, dos estados que la primera impresión nunca ve: el operador llega al
+composer **en reposo**, y el lienzo principal del producto le aparecía plano. Se conserva el filo verbatim y se
+suma **una** capa: un halo proyectado, más corto y más tenue que el de hover.
+
+El anillo (`0 0 0 Npx`) **no entra en reposo a propósito**: el anillo es la afordancia de foco. La escalera
+queda semántica —atmósfera → aparece el anillo → el anillo se intensifica— en vez de ser el mismo efecto tres
+veces con más alfa. Y el filo interno se repite en los **tres** estados: `box-shadow` reemplaza entero, así
+que un hover sin `inset` apagaba la línea de luz superior justo al interactuar.
+
+**Delta 2026-07-28 — la rampa del fondo va HACIA ABAJO en alfa** (`.55` reposo → `.42` hover → `.30` foco).
+Corrige un bug reportado por el operador: *«se apaga cuando pongo el mouse encima, y se prende medio un poco
+cuando quito el mouse»*. `--field` (`#060f2d`) es **más oscuro que el panel** que tiene detrás
+(`rgba(11,26,78,.5)`), así que la rampa ascendente heredada del legacy (`.55→.68→.76`) oscurecía la superficie
+más grande del bloque justo al interactuar — y el fill gana perceptualmente contra un borde de 1 px y un halo
+tenue. El efecto se invirtió cuando el campo se mudó del fondo del legacy a este panel, y pasó inadvertido
+porque los valores eran «los medidos, verbatim». Bajar el alfa deja pasar más panel: la superficie **se
+aclara**, que es lo que significa elevarse en una UI oscura y lo que el aserto del canary
+(`la superficie del prompt se eleva al enfocar`) siempre dijo que hacía. El aserto sólo exige que el fondo
+**cambie**, así que la dirección era libre y estaba mal elegida.
+
+**Delta 2026-07-28 — ritmo INTERNO del pozo, y la inserción se mide contra el campo.** El operador reportó
+«muy apretado» y «Mejorar y Recientes están como montados». Ambos eran medibles:
+
+| Síntoma | Medición | Corrección |
+|---|---|---|
+| Botones «montados» sobre el lienzo | el grupo salía **4 px por arriba y 4 px por la derecha** del textarea | `top-6`/`right-6`: quedan **10 px dentro** del campo |
+| Bloque apretado | hueco campo → Sugerencias = **0 px** | `mt-4` (16 px) |
+| Bloque apretado | hueco Sugerencias → dock = 10 px | `mt-4` (16 px), en el dock para que sirva también cuando las sugerencias desaparecen |
+| Etiqueta pegada a la caja | hueco pozo → `Modo` = **0 px** | `mt-5` (20 px) |
+
+Causa del desborde: los botones son `absolute` contra el **padding-box** de la barra (10 px), mientras el
+textarea entra por el **padding** de la barra (14 px). Esos 4 px de diferencia eran el «montado». La regla
+que queda: **la inserción de los flotantes se mide contra el CAMPO, no contra la caja del bloque.**
+
+Escalera vertical resultante: **16 px dentro del pozo · 20 px entre el pozo y `Modo` · 32 px entre bloques**
+(`gap-8`, ya verificado consistente en los cuatro bloques). El bloque de intención pasa de 239 a 263 px.
+
+**Delta 2026-07-28 — un solo pozo: el `<textarea>` no se enmarca aparte.** El operador reportó «card dentro
+de card dentro de card». La causa no era de diseño: el theme vacía los namespaces de Tailwind y no hay
+preflight de controles de formulario, así que el `<textarea>` conservaba el **borde de fábrica del navegador**
+—`1px solid rgb(133,133,133)`, un gris neutro que no existe en la paleta—. Eran tres marcos concéntricos
+(panel `r18` → bloque `r14` → textarea `r9,28`) y el del medio era el único no diseñado. Se resuelve con
+`border-0` en el textarea: **el pozo de escritura es el contenedor del bloque**, y el textarea vive dentro de
+él conservando su superficie propia (velo + filo interno), que distingue el área de escritura sin dibujar una
+caja. Barrido de la superficie: era el único control con borde UA.
 
 ### 4.2 · Referencias — es entrada, no ajuste
 
@@ -128,6 +180,17 @@ Miniaturas cuadradas, no chips de texto. La opción activa lleva borde `#5b8cff`
 
 ⚠️ **Dependencia externa:** requiere una imagen representativa por estilo. **Si el equipo creativo no las tiene,
 este bloque se ve peor que los chips de texto que reemplaza.** Confirmar antes de comprometerlo.
+
+**Estado 2026-07-28 — el bloque está implementado con arte provisional, y el riesgo de arriba se materializó.**
+Los ocho `apps/studio-web/public/styles/direction-*.svg` son SVG procedurales de 277–449 bytes: pictogramas de
+dos o tres formas sobre un degradado. `direction-photographic.svg` es un rostro esquemático (círculo + pelo +
+hombros); `direction-cinematic.svg` es un atardecer con montañas. **Ninguno enseña el estilo que nombra** — en
+render no se distingue «Fotográfico» de «Editorial» sin leer la etiqueta, que es justo lo que la miniatura
+venía a evitar.
+
+Cierre pendiente: ocho stills representativos reales, **generados con el Still Model Lab de Globe**
+(`TASK-1459`) con seed fijo y receta versionada, y aterrizados como asset gobernado con derechos limpios. No
+sirve arte out-of-band: estas imágenes viajan dentro del bundle del producto.
 
 ### 4.4 · Modelo — isotipo de la casa
 
