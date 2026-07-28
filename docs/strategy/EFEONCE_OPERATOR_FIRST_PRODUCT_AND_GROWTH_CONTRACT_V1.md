@@ -225,6 +225,39 @@ El contrato no aplica automáticamente cuando:
 Operator-first no reemplaza buyer modeling. Exige mapear user, problem owner, champion, sponsor, economic buyer
 y governance owner por oferta y por fase.
 
+## 10A. Los dolores de agencia siguen vigentes
+
+Identificar al operador no elimina los dolores que originan la relación con una agencia. Los convierte en una
+agenda de capacidades que Efeonce debe resolver y demostrar:
+
+| Dolor vigente | Conversión operator-first |
+|---|---|
+| La agencia no entiende el negocio | El operador no debe reconstruir contexto en cada brief; el sistema debe conservar memoria y racionales. |
+| Entregas inconsistentes | El operador necesita criterios, revisión, ownership y trazabilidad para reducir retrabajo. |
+| Reportes que no sirven para decidir | La operación debe producir evidencia que el champion pueda defender ante dirección. |
+| Feedback y aprobaciones lentas | La capacidad debe reducir persecución, rondas, espera y coordinación invisible. |
+| Múltiples agencias desconectadas | Greenhouse y las Product Services deben hacer visible ownership, dependencias y handoffs. |
+| Pérdida de consistencia de marca | La memoria, governance y provenance deben proteger criterio y reputación. |
+| Dificultad para demostrar valor | El operador necesita conectar uso, capacidad desbloqueada, resultado y próximo paso. |
+| Dependencia de personas clave | El producto debe transferir memoria y capacidad al equipo, no capturarlas en una sola persona. |
+| Riesgo de IA, derechos y trazabilidad | El flujo debe mantener límites humanos, evidencia de origen y control de governance. |
+
+El operator-champion no es una solución al dolor; es el mecanismo de adopción que vuelve observable si la solución
+realmente reduce ese dolor. Si una capacidad no disminuye carga, mejora autonomía o aumenta influencia interna, el
+operador no tendrá una razón sostenible para defenderla.
+
+También deben validarse dolores nuevos: el operador puede adoptar sin controlar presupuesto, defender una solución
+sin tener autoridad formal, generar valor sin poder demostrarlo a dirección o quedar personalmente expuesto cuando
+la solución falla. Por eso el contrato completo es:
+
+```text
+capacidad del operador
+  → evidencia de uso y resultado
+  → champion interno
+  → validación del sponsor
+  → compra, renovación y expansión
+```
+
 ## 11. Verificación del contrato
 
 La validación debe observar comportamiento longitudinal, no solo opiniones.

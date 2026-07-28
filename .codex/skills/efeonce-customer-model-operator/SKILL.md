@@ -28,6 +28,11 @@ economic buyer, governance owner, procurement, blockers, decision process, paper
 triggers de expansión. “Comité de compra” es una posible forma organizacional; `buying group` es el contrato
 analítico obligatorio.
 
+El customer model debe conservar el mapa de dolores aunque cambie la arquitectura de roles. Identificar al operador
+no resuelve por sí mismo contexto perdido, retrabajo, aprobaciones, reporting débil, ownership difuso, governance,
+dependencia de personas o coordinación multi-provider. Registrar cómo cada dolor afecta al operador, qué capacidad
+lo reduce, qué evidencia llega al sponsor y qué riesgo aparece si el operador puede adoptar pero no comprar.
+
 No es una buyer-persona decorativa, un lead score ni un método de ventas único. `MEDDPICC`, `Challenger`, `JTBD`,
 `BANT` u otros métodos son lentes que se seleccionan por complejidad; ninguno sustituye el modelo de cliente.
 

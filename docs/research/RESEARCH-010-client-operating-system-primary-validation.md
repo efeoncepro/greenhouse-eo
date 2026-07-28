@@ -13,6 +13,8 @@ Este research implementa el contrato transversal de Efeonce para construir produ
 
 Este brief **no autoriza** una plataforma, una API, una nueva oferta comercial ni tareas de implementación. Su resultado debe ser una decisión de priorización y un conjunto de hipótesis suficientemente evidenciadas para diseñar un piloto controlado.
 
+El artefacto CX que estructura la investigación es [`Efeonce Operator Pain & Journey Failure Map V1`](../strategy/EFEONCE_OPERATOR_PAIN_AND_JOURNEY_FAILURE_MAP_V1.md). Cada entrevista debe alimentar, cuando exista evidencia, la fase del lifecycle, el moment of truth, la causa backstage, el recovery owner y la métrica asociada.
+
 ## Decisión que habilita
 
 ¿Qué primera capacidad interna debe priorizar Efeonce para aumentar la capacidad del operador-champion, reducir coordinación y retrabajo, aumentar continuidad y fortalecer su influencia interna?
@@ -60,6 +62,17 @@ El contrato no asume que todo operador sea champion. La investigación debe dist
 - **director/sponsor:** valida relevancia y prioridad;
 - **economic buyer:** aprueba presupuesto;
 - **governance owner:** define límites de marca, legal, seguridad o riesgo.
+
+### Dolor vigente, no problema resuelto
+
+El contrato operator-first no reemplaza el mapa de dolores de agencia ni supone que identificar al champion los
+elimina. Cada entrevista debe comprobar si siguen presentes problemas de contexto perdido, entregas inconsistentes,
+aprobaciones lentas, reporting poco accionable, ownership difuso, inconsistencia de marca, dependencia de personas,
+riesgo de IA/provenance y carga invisible de coordinación. La pregunta de research es cómo convertirlos en capacidad
+observable para el operador y evidencia defendible para el sponsor.
+
+También se deben buscar fallas propias del modelo: adopción sin autoridad presupuestaria, champion sin influencia,
+valor operativo sin evidencia ejecutiva y exposición personal del operador cuando el servicio falla.
 
 ## Evidencia secundaria que origina el contrato
 

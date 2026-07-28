@@ -30,6 +30,11 @@ workflow/JTBD, first value, path to operator-champion, sponsor, economic buyer, 
 blockers, decision process, paper process, adoption evidence and expansion triggers. `Buying group` is the required
 analytical contract even when the customer has no formal committee.
 
+The customer model must preserve the agency-pain map even when the role architecture changes. Identifying the
+operator does not itself resolve lost context, rework, approvals, weak reporting, diffuse ownership, governance,
+key-person dependency or multi-provider coordination. Record how each pain affects the operator, which capability
+reduces it, what evidence reaches the sponsor and what risk appears when the operator can adopt but cannot buy.
+
 ## Resultado obligatorio
 
 Entregar un Customer Model Integrity Pack con: decisión y alcance, segmentos/beachhead, ICP/anti-ICP, JTBD y teoría

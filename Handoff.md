@@ -31,6 +31,16 @@ Se sincronizaron context pack, `project_context.md` y skills Codex/Claude de age
 y research. Los cambios no alteran runtime, schema, API, entitlements ni rollout. Siguiente paso: reclutar los
 primeros candidatos y registrar episodios de dolor, influencia y evidencia de champion.
 
+Se añadió al contrato y a las skills la regla de que los dolores de agencia siguen vigentes: identificar al operador
+no los resuelve, sino que convierte cada dolor en una capacidad que debe reducir fricción y producir evidencia para
+el sponsor. También se registraron los nuevos riesgos de adopción sin presupuesto, champion sin influencia y valor
+operativo sin evidencia ejecutiva.
+
+Con la skill `efeonce-customer-experience` se creó [`Efeonce Operator Pain & Journey Failure Map V1`](docs/strategy/EFEONCE_OPERATOR_PAIN_AND_JOURNEY_FAILURE_MAP_V1.md). El artefacto cubre lifecycle, failure moments, causas backstage,
+service blueprint mínimo, recovery, métricas y señales para Greenhouse. La evidencia externa reciente de ANA/4As,
+WFA, Gartner e IAB refuerza confianza, transparencia, procurement/coordinación y governance de IA como dolores
+estructurales; RESEARCH-010 debe validar frecuencia y severidad en Chile/LatAm.
+
 ## 2026-07-27 — TASK-1552: los cinco bloques existen, y convertir a Tailwind resultó ser **tokenizar**
 
 `efeonce-globe` `5b7cb3f` (1e) + `512dcbc` (1f) + `a37d105` (1g). **Slice 1 sigue abierto**: van tres

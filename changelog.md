@@ -16,6 +16,17 @@
 - Se creó `RESEARCH-010` con evidencia secundaria, hipótesis falsables, guion de entrevistas, scorecard y gates
   para validar la adopción primaria. No autoriza implementación ni venta general.
 - Se sincronizaron `docs/context/*`, `project_context.md` y skills Codex/Claude relevantes.
+- Se documentó que el mapa de dolores de agencia sigue vigente y debe traducirse, por oferta, en capacidades de
+  memoria, consistencia, aprobaciones, evidencia, coordinación, governance y transferencia de capacidad; el
+  operator-champion es señal de adopción, no sustituto de la solución.
+
+## 2026-07-28 — Mapa de dolores y fallas del journey
+
+- Se aplicó `efeonce-customer-experience` para convertir el mapa de dolores en un artefacto operativo de CX.
+- Se creó `EFEONCE_OPERATOR_PAIN_AND_JOURNEY_FAILURE_MAP_V1.md` con lifecycle, moments of truth, causas backstage,
+  service blueprint mínimo, recovery, métricas y señales de Greenhouse.
+- La investigación externa reciente refuerza confianza/transparencia, procurement/coordinación y governance de IA;
+  la validación primaria en Chile/LatAm permanece pendiente.
 
 ## 2026-07-27 — Globe: motor de estilos en Tailwind v4 y cierre de `TASK-1555`
 

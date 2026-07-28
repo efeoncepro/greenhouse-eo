@@ -35,6 +35,11 @@ operator name, workflow/JTBD, first value, champion path, buying group, separate
 unlocked-capacity metric, adoption evidence and renewal/expansion triggers. Do not assume the buyer is the user or
 that the operator controls budget.
 
+Agency pains remain valid after identifying the operator. Each offer must translate them into a verifiable
+capability: context and memory, consistency and ownership, approvals, actionable evidence, multi-provider
+coordination, governance/provenance and transfer of capability to the team. Do not treat the operator-champion as
+the solution to the pain; it is evidence that the capability reduced friction and can mobilize adoption.
+
 For partner/provider portfolio decisions, load the canonical skill's `Portfolio de partners y providers` section:
 classify relationships as strategic core, creative capability, execution enabler or experiment, and require offer,
 owner, economics, contract, rights, support, fallback and demand evidence before increasing priority.

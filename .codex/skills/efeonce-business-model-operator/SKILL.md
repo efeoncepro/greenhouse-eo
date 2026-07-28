@@ -44,6 +44,11 @@ con operador nombrado por función, workflow/JTBD, primer valor, champion path, 
 paper/procurement process, métrica de capacidad desbloqueada, evidencia de adopción y triggers de renovación o
 expansión. No asumir que el buyer es el usuario ni que el operador tiene presupuesto.
 
+Los dolores de agencia siguen vigentes después de identificar al operador. Cada oferta debe traducirlos en una
+capacidad verificable: contexto y memoria, consistencia y ownership, aprobaciones, evidencia accionable,
+coordinación multi-provider, governance/provenance y transferencia de capacidad al equipo. No tratar al
+operator-champion como solución del dolor; es la señal de que la capacidad redujo fricción y puede movilizar adopción.
+
 ## Autoridad y composición
 
 1. Leer `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `Handoff.md`, `docs/business-models/README.md` y

@@ -16,6 +16,11 @@ description: Diseña research y benchmarks rigurosos con evidencia fechada, tria
 > `operator-champion`, quién patrocina y quién aprueba presupuesto. La adopción se valida por comportamiento,
 > movilización interna, renovación y expansión; no por entusiasmo verbal. Canon: `docs/strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md`.
 
+El mapa de dolores de agencia sigue siendo una entrada activa del research. No asumir que el operator-champion los
+elimina: validar si persisten contexto perdido, retrabajo, aprobaciones, reporting poco accionable, ownership difuso,
+coordinación, governance/provenance y carga política del operador. Buscar también adopción sin presupuesto, champion
+sin influencia y valor operativo sin evidencia ejecutiva.
+
 > **Skill de MÉTODO + orquestación, no de ejecución cruda ni de dominio.** La **ejecución** (fan-out de búsquedas, verificación, síntesis con citas) se delega a la harness **`deep-research`**. El **research de dominio** se delega a su skill dueña (búsqueda/keywords/visibilidad IA → `seo-aeo`; competitivo comercial/win-loss/ICP → `commercial-expert`). Esta skill aporta la **capa de rigor** + el **diseño** + la **orquestación**.
 
 ## Regla #0 — evidencia con fecha, nunca memoria

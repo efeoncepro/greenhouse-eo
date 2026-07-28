@@ -7,6 +7,9 @@
 > sponsorship, renovación y expansión. El contrato completo vive en [`Efeonce Operator-First Product & Growth
 > Contract V1`](../strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md).
 
+El mapa operativo de dolores y fallas del journey vive en [`Efeonce Operator Pain & Journey Failure Map V1`](../strategy/EFEONCE_OPERATOR_PAIN_AND_JOURNEY_FAILURE_MAP_V1.md). Ese artefacto conecta cada dolor del operador con fase,
+failure moment, causa backstage, capacidad, recovery, owner, métrica y evidencia ejecutiva.
+
 ## Experiencia Efeonce: la promesa completa
 
 Un cliente no solo "entra a una agencia". Al contratar Efeonce, compra su entrada a un **ecosistema de crecimiento**: operación, software, metodología, contenido, aprendizaje, red y acceso a inteligencia acumulada.

@@ -126,6 +126,7 @@ El roadmap ASaaS ya nombra dónde duele. Si buscas dónde aportar, empieza aquí
 | `08_estrategia-comercial.md` | Dos motores, cuentas ancla y playbooks, cross-sell por Pulse, demo por buyer persona, KPIs, dependencias de producto. |
 | `09_marca-agencia.md` | Arquitectura de marca (masterbrand + capabilities), sistema verbal, posicionamiento, elevator pitch, messaging por audiencia, reglas de comunicación. |
 | `10_experiencia-cliente.md` | Experiencia Efeonce como entrada al ecosistema de crecimiento: operación, software, aprendizaje, red y memoria. Greenhouse como command center; journey de 8 fases + 2 transversales, artefactos de marca y métricas de adopción. |
+| [`../strategy/EFEONCE_OPERATOR_PAIN_AND_JOURNEY_FAILURE_MAP_V1.md`](../strategy/EFEONCE_OPERATOR_PAIN_AND_JOURNEY_FAILURE_MAP_V1.md) | Mapa operativo de dolores del operador, fallas del journey, momentos de verdad, causas backstage, recovery, métricas y señales para Greenhouse. |
 | `11_hubspot-bowtie.md` | Arquitectura HubSpot: 3 pipelines de deals, properties custom, y Bow-tie (lifecycle dual 7/12 stages + motion booleans) con los **internal names exactos** para el sync de Account 360. |
 | `13_icp-buyer-personas-jtbd.md` | ICPs, buyer personas y Jobs-to-be-Done. Traduce dolores comerciales en prioridades de producto por usuario y tier de entrada. |
 | `14_modelo-negocio-asaas.md` | Modelo ASaaS recalibrado: switching cost, self-service, tiers, monetizacion recurrente y roadmap de exposicion/adopcion. |

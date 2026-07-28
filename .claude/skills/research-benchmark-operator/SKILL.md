@@ -19,6 +19,11 @@ quién puede ser `operator-champion`, quién patrocina y quién aprueba presupue
 movilización interna, renovación y expansión, no por entusiasmo verbal. Canon:
 `docs/strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md`.
 
+The agency-pain map remains an active research input. Do not assume the operator-champion eliminates it: validate
+whether lost context, rework, approvals, weakly actionable reporting, diffuse ownership, coordination,
+governance/provenance and the operator's political load persist. Also look for adoption without budget authority,
+champions without influence and operational value without executive evidence.
+
 > **Skill de MÉTODO + orquestación, no de ejecución cruda ni de dominio.** La **ejecución** (fan-out de búsquedas, verificación, síntesis con citas) se delega a la harness **`deep-research`**. El **research de dominio** se delega a su skill dueña (búsqueda/keywords/visibilidad IA → `seo-aeo`; competitivo comercial/win-loss/ICP → `commercial-expert`). Esta skill aporta la **capa de rigor** + el **diseño** + la **orquestación**.
 
 ## Regla #0 — evidencia con fecha, nunca memoria
