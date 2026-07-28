@@ -139,8 +139,36 @@ visible el otro** — es lo que la conversión encuentra y ninguna lectura del C
 ⚠️ El mapa de gates es una lista explícita: **toda capability que la superficie despache hay que
 agregarla ahí**, y el síntoma de olvidarla es un control bloqueado con una razón que suena plausible.
 
-**Siguiente:** selector de modelo (baseline congelado de `TASK-1555`: se convierte de motor sin tocar
-su forma), `shape-*` y riel de estimado.
+### Slices 1n/1o — **SLICE 1 CERRADO** (`e2af8a3`, `96548b3`)
+
+**Cero clases de la hoja legacy en el composer**: se cumple la regla dura de ADR-016 (una superficie
+está en un motor, no a medias). El shell sigue inyectando `producerStyles` porque viste **otras**
+superficies del payload — se retira con `TASK-1560`.
+
+**🔴 Una utilidad de Tailwind puede colisionar POR NOMBRE con una clase del legacy, y las capas no lo
+resuelven.** `text-action` es utilidad válida (color) **y** clase del legacy
+(`min-height:2.75rem;padding;border;cursor`). Las utilidades ganan el color; **las propiedades que la
+utilidad no declara pasan intactas**. Medido: el marco del icono de un encabezado rindió **30,8 × 44 px**
+en vez de 28 × 28 — y **estuvo así en varias capturas que revisé sin notarlo**. Cerrado con un guardrail
+que cruza las clases usadas contra los selectores de la capa `legacy`, leyendo `document.styleSheets`.
+
+⚠️ **El guardrail tenía dos bugs, los dos visibles sólo al probar que mordiera**: (1) `CSSStyleRule`
+moderna **puede** tener `cssRules` —anidamiento nativo de v4— así que `if (rule.cssRules) { …; continue }`
+se saltaba todos los selectores y devolvía cero siempre; (2) la segunda versión leía todas las hojas y
+reportaba la superficie como colisión consigo misma. **Un guardrail que nunca falla se ve idéntico a uno
+que pasa.**
+
+**La atenuación del estimado ya existe** — el motion que el contrato llama el más importante y que nunca
+se había pintado (el TSX decidía `stale` y `stale` aparecía cero veces en la hoja). No se apaga bajo
+reduced-motion: se apaga la interpolación, no el estado.
+
+**Tercer aserto que apuntaba a una clase** (`.estimate-summary`, tras `.model-disclosure`). Regla ya
+escrita en el canary: **los asertos apuntan a `data-*`, nunca a clases.**
+
+El selector se convirtió con su forma **congelada** y sus 11 asertos lo prueban. `--model-menu-fill`
+**no** se consolida con `--overlay-fill`: unificarlos le corresponde a la dueña de esa región.
+
+**Siguiente:** Slice 2 (tool dock) y lo que reste de Slice 3 (estados de ejecución y evidencia premium).
 
 ## 2026-07-27 — TASK-1552 Slices 1a y 1c: **el CTA volvió al fold**
 
