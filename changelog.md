@@ -15,6 +15,10 @@
 - Se creó `efeoncepro/axis-design-system`, se desplegó `axis-design-system-lab.vercel.app` y se publicaron
   `@efeoncepro/axis-tokens`, `@efeoncepro/axis-ui-contracts` y `@efeoncepro/axis-ui-registry` en GitHub Packages como `0.1.2`.
 - Greenhouse/Globe todavía no importan los packages en runtime; la adopción queda en `TASK-1591`.
+- Se completaron las precondiciones de distribución privada: permisos GitHub Packages para Greenhouse/Globe,
+  `NPM_RC` del Lab en Vercel y secreto/IAM de lectura para Cloud Build en `efeonce-globe`. El runbook operativo
+  queda en `docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`; el PAT operator-owned debe rotarse
+  antes de cualquier rollout externo.
 
 ## 2026-07-28 — Globe: payload React migrado al pipeline Tailwind v4
 

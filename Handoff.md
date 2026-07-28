@@ -17,6 +17,14 @@ Lab navegable con búsqueda, preview, contract metadata y evidence checklist. To
 runtime conectado; estado honesto: foundation y distribución completas, integración de Greenhouse/Globe
 pendiente por `TASK-1591` y configuración segura de auth del registry en cada runtime.
 
+La distribución privada ya tiene sus precondiciones operativas verificadas: Greenhouse y Globe tienen acceso
+`Read` a los tres packages en GitHub Packages; el Lab tiene `NPM_RC` en Vercel Production y Preview; y Globe
+tiene el secreto `axis-packages-read-token` en Secret Manager con `roles/secretmanager.secretAccessor` para el
+service account de Cloud Build. El procedimiento y la evidencia no sensible viven en
+[`AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
+Estado honesto: **foundation/distribution completas; consumer runtime pendiente**. El PAT actual es operator-owned
+y vence el 2026-08-27; antes del rollout externo se debe reemplazar por una identidad de máquina dedicada.
+
 ## 2026-07-28 — Globe: payload React en pipeline Tailwind v4
 
 En `../efeonce-globe` se completó la migración del payload React de Producer: composer, shell, diálogos, feed,
