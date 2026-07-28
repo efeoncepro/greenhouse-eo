@@ -1,5 +1,34 @@
 # Handoff activo
 
+## 2026-07-28 — TASK-1588: plataforma UI compartida iniciada
+
+Se formalizó `EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1`: Greenhouse conserva gobierno,
+registry, lifecycle, QA y evidencia; `../axis-design-system` es el nuevo home local de la
+foundation portable y el Lab independiente; Greenhouse y Globe quedan como consumers con adapters
+MUI/Tailwind, sin herencia automática de Vuexy/MUI.
+
+Se crearon `TASK-1588` y child tasks `TASK-1589…1592`. El repositorio privado
+`efeoncepro/axis-design-system` ya existe, el Lab está desplegado en
+`https://axis-design-system-lab.vercel.app` y los packages privados
+`@efeoncepro/axis-tokens`, `@efeoncepro/axis-ui-contracts` y `@efeoncepro/axis-ui-registry` están
+publicados en GitHub Packages como `0.1.2`. La foundation compila y pasa build/test:
+tokens semanticamente nombrados, contracts con lifecycle/evidence, registry inicial `efeonce.status` y
+Lab navegable con búsqueda, preview, contract metadata y evidence checklist. Todavía no hay consumer
+runtime conectado; estado honesto: foundation y distribución completas, integración de Greenhouse/Globe
+pendiente por `TASK-1591` y configuración segura de auth del registry en cada runtime.
+
+## 2026-07-28 — Globe: payload React en pipeline Tailwind v4
+
+En `../efeonce-globe` se completó la migración del payload React de Producer: composer, shell, diálogos, feed,
+viewer, share board, primitives y capas base/motion ya no importan hojas CSS de superficie. Los estilos de
+componentes viven en `studio-client/src/styles/tailwind.css` y el theme sigue generado desde `tokens.ts`.
+Build, lint, tests del cliente (118/118), gates de diseño, reduced-motion y Tailwind engine canary están verdes.
+
+La frontera vanilla permanece deliberadamente en `producer-ui.ts`/`producerStyles` para el fallback cuando la
+ruta React no está habilitada; su retiro pertenece a `TASK-1560` y no debe declararse como parte de esta
+migración. La evidencia browser de share requiere repetir el harness específico: la verificación manual del
+DOM pasó, pero el driver automatizado expiró esperando el selector.
+
 ## 2026-07-28 — TASK-1552: flujo integrado verificado en `efeonce-globe`
 
 La continuación se ejecutó en el repo hermano correcto, `/Users/jreye/Documents/efeonce-globe`; Greenhouse
