@@ -78,6 +78,28 @@ If rollback, watchdog, Azure, Vercel, or HubSpot is involved, also read:
 - **Never assume "hotfix small, no orchestrator needed"** — the rule has zero exceptions outside break-glass. Even a typo fix to `main` requires orchestrator dispatch to keep manifest aligned. If the fix is too trivial for a release manifest, it's too trivial to push to `main` — merge to develop and wait for the next regular release.
 - **SIEMPRE revisar `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` (§ Pendientes de acción) al planear Y al cerrar un paso a producción.** Una feature `code-complete` mergeada a `main` queda **invisible** en prod si su flag `*_ENABLED` (default OFF) no se prende explícitamente — a veces además requiere su migración aplicada a prod (vía este release) y/o redeploy del ops-worker. El deploy del código NO prende flags. Qué flags prender con este release se lee del ledger, no de la memoria; tras prenderlos, actualizar el snapshot del ledger. **NUNCA** declarar un release `released` dejando un flag que debía prenderse en este release sin prender (queda como `degraded` o pendiente documentado).
 
+### AXIS private package release boundary
+
+AXIS package authentication is a **build-time** concern. `NPM_RC`, GitHub Packages
+read access, and the scoped Secret Manager reference allow a consumer build to
+install private `@efeoncepro/axis-*` packages; they do not prove that Greenhouse
+or Globe imports, renders, or operates an AXIS consumer at runtime. The Vercel
+Lab's `NPM_RC` is Lab readiness evidence only, not consumer-runtime evidence.
+
+Treat the AXIS consumer rollout as gated by `TASK-1591`. Before promotion, the
+release evidence must include the exact consumer build, package versions, target
+commit, image/deployment digest where applicable, runtime smoke evidence, and a
+rollback target. For Globe/Cloud Build, keep the package credential scoped to
+Secret Manager and the build identity; never bake the token into an image,
+artifact, deployment variable, or log. A rollback must identify both the
+consumer deployment/image digest and the package/auth configuration that was
+used to build it; restoring traffic alone is insufficient if the build cannot
+be reproduced.
+
+Canonical pointers: [AXIS shared UI platform ADR](../../docs/architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md),
+[AXIS private package consumption runbook](../../docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md),
+and `TASK-1591`.
+
 ## Canonical Release Path
 
 The normal release path is:
