@@ -168,7 +168,29 @@ escrita en el canary: **los asertos apuntan a `data-*`, nunca a clases.**
 El selector se convirtió con su forma **congelada** y sus 11 asertos lo prueban. `--model-menu-fill`
 **no** se consolida con `--overlay-fill`: unificarlos le corresponde a la dueña de esa región.
 
-**Siguiente:** Slice 2 (tool dock) y lo que reste de Slice 3 (estados de ejecución y evidencia premium).
+### Slice 2 — el tool dock, con su frontera declarada en vez de simulada (`a631f7c`)
+
+El negativo y el seed **vivían en el flujo** y cada uno costaba una fila de la columna. Ahora cuestan un
+icono, que es la única propiedad que justifica el dock.
+
+**🔴 El criterio «derivado del catálogo, nunca de una lista» NO es alcanzable hoy, y el límite es del
+contrato.** `/v1/capabilities` publica `{capability, coverage}`: dice qué está **disponible** y **nada**
+sobre cómo se presenta — sin icono, sin etiqueta, sin afordancia. Lo que sí se cumple es la mitad que
+importa: **el servidor decide la disponibilidad y la UI no la adivina nunca**; una capability que el
+servidor empieza a publicar se habilita sin tocar layout. **Gap escalado al API Contract Spine
+(`TASK-1481`)**, y la frontera queda escrita en el componente en vez de simulada con una lista que finge
+derivarse.
+
+**El retoque regional no existía ni como ausencia** — ni habilitado ni bloqueado, o sea la capacidad se
+leía como *inexistente* en vez de *pendiente*. Su copy ya estaba en la capa sin usarse: tercera de esta
+task.
+
+⚠️ **Al mover una región, su `data-capture` se mueve con ella.** `producer-seed` desapareció del DOM con
+su sección: es la deriva de `producer-advanced-settings` en su forma inversa — allá el marcador
+sobrevivió a su referente, acá el referente casi sobrevive sin su marcador.
+
+**Siguiente:** lo que reste de Slice 3 (estados de ejecución y evidencia premium). La atenuación del
+estimado, los 3 marcadores y el canary ya están.
 
 ## 2026-07-27 — TASK-1552 Slices 1a y 1c: **el CTA volvió al fold**
 
