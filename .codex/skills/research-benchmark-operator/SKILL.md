@@ -11,6 +11,11 @@ description: Diseña research y benchmarks rigurosos con evidencia fechada, tria
 
 > **Customer model:** cuando el research alimenta ICP, JTBD, buying group, triggers, WTP o retention, entregar el evidence ledger y confidence requeridos por `efeonce-customer-model-operator`; esta skill conserva el método de investigación.
 
+> **Operator-first research:** cuando el research estudia una oferta o Product Service Efeonce, no reclutar solo
+> por cargo. Separar quién opera el workflow, quién sufre el problema, quién puede convertirse en
+> `operator-champion`, quién patrocina y quién aprueba presupuesto. La adopción se valida por comportamiento,
+> movilización interna, renovación y expansión; no por entusiasmo verbal. Canon: `docs/strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md`.
+
 > **Skill de MÉTODO + orquestación, no de ejecución cruda ni de dominio.** La **ejecución** (fan-out de búsquedas, verificación, síntesis con citas) se delega a la harness **`deep-research`**. El **research de dominio** se delega a su skill dueña (búsqueda/keywords/visibilidad IA → `seo-aeo`; competitivo comercial/win-loss/ICP → `commercial-expert`). Esta skill aporta la **capa de rigor** + el **diseño** + la **orquestación**.
 
 ## Regla #0 — evidencia con fecha, nunca memoria

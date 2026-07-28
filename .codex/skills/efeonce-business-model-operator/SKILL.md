@@ -33,6 +33,17 @@ La dirección corporativa vigente exige que todo servicio client-facing llegue a
 productizado y AI-native; usar `docs/strategy/EFEONCE_2028_PRODUCTIZED_AI_NATIVE_SERVICES_STRATEGIC_DIRECTION_V1.md`
 para sus gates, madurez y excepciones.
 
+Para el modelo transversal de adopción, separar la superficie operatoria del assurance ejecutivo: el operador es
+el usuario cotidiano y posible `operator-champion`; el director/sponsor y el economic buyer validan prioridad,
+governance y presupuesto; Greenhouse soporta memoria, evidencia, assurance y expansión cuando aplica. Cargar
+[`Efeonce Operator-First Product & Growth Contract V1`](../../docs/strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md)
+antes de diseñar una Product Service cuyo primer valor ocurra en un workflow operatorio.
+
+**Obligación por oferta:** todo Business Model y Product Service debe incluir un `Operator & Buying Group Contract`
+con operador nombrado por función, workflow/JTBD, primer valor, champion path, buying group, decision process,
+paper/procurement process, métrica de capacidad desbloqueada, evidencia de adopción y triggers de renovación o
+expansión. No asumir que el buyer es el usuario ni que el operador tiene presupuesto.
+
 ## Autoridad y composición
 
 1. Leer `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `Handoff.md`, `docs/business-models/README.md` y

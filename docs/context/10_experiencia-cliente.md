@@ -2,6 +2,11 @@
 
 > La **Experiencia Efeonce** es la vivencia completa de entrar al ecosistema de crecimiento de Efeonce. Greenhouse no es solo un portal de métricas: es el **sistema operativo/command center** que vuelve esa experiencia visible, medible y repetible. Este archivo define qué debe *vivir* el cliente en cada fase y qué módulo, ritual o superficie lo soporta. Es la guía para que las features sirvan a la experiencia, no solo a la función.
 
+> La experiencia sigue un **Operator-Led Adoption and Expansion Loop**: el operador descubre valor en la superficie
+> operatoria, puede convertirse en operator-champion y Greenhouse traduce esa adopción en memoria, assurance,
+> sponsorship, renovación y expansión. El contrato completo vive en [`Efeonce Operator-First Product & Growth
+> Contract V1`](../strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md).
+
 ## Experiencia Efeonce: la promesa completa
 
 Un cliente no solo "entra a una agencia". Al contratar Efeonce, compra su entrada a un **ecosistema de crecimiento**: operación, software, metodología, contenido, aprendizaje, red y acceso a inteligencia acumulada.

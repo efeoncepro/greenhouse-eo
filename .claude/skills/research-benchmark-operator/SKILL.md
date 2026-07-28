@@ -14,6 +14,11 @@ argument-hint: "[pregunta de research o benchmark concreto]"
 
 > **Customer model:** cuando el research alimenta ICP, JTBD, buying group, triggers, WTP o retention, entregar el evidence ledger y confidence requeridos por `efeonce-customer-model-operator`; esta skill conserva el método de investigación.
 
+Cuando el research estudie una Product Service Efeonce, separar quién opera el workflow, quién sufre el problema,
+quién puede ser `operator-champion`, quién patrocina y quién aprueba presupuesto. Validar adopción por comportamiento,
+movilización interna, renovación y expansión, no por entusiasmo verbal. Canon:
+`docs/strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md`.
+
 > **Skill de MÉTODO + orquestación, no de ejecución cruda ni de dominio.** La **ejecución** (fan-out de búsquedas, verificación, síntesis con citas) se delega a la harness **`deep-research`**. El **research de dominio** se delega a su skill dueña (búsqueda/keywords/visibilidad IA → `seo-aeo`; competitivo comercial/win-loss/ICP → `commercial-expert`). Esta skill aporta la **capa de rigor** + el **diseño** + la **orquestación**.
 
 ## Regla #0 — evidencia con fecha, nunca memoria

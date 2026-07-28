@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-28 — Contrato operator-first y research primario
+
+- Se canonizó `EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md`: las Product Services construyen la
+  superficie operatoria; Greenhouse soporta assurance ejecutivo, memoria, coordinación y expansión.
+- Se formalizó el ciclo `operador → operator-champion → sponsor/director → compra recurrente → evangelista` y se
+  separaron los roles de usuario, problem owner, champion, sponsor, economic buyer y governance owner.
+- Se creó `RESEARCH-010` con evidencia secundaria, hipótesis falsables, guion de entrevistas, scorecard y gates
+  para validar la adopción primaria. No autoriza implementación ni venta general.
+- Se sincronizaron `docs/context/*`, `project_context.md` y skills Codex/Claude relevantes.
+
 ## 2026-07-27 — Globe: motor de estilos en Tailwind v4 y cierre de `TASK-1555`
 
 - **ADR-016 implementado (pasos 1-4).** `apps/studio-client` adopta Tailwind v4 con el SSOT de tokens como

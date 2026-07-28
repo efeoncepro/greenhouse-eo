@@ -21,6 +21,15 @@ lente por complejidad; ninguno sustituye el modelo de cliente.
 Para ofertas con horizonte 2028, validar también el nivel de human-in-the-loop, el operating mode esperado y la
 evidencia de que el comprador adopta una capability Product Service AI-native, no sólo una entrega puntual.
 
+Separar siempre `operator`, `operator-champion`, `problem owner`, `sponsor/director`, `economic buyer` y
+`governance owner`; no tratarlos como cargos fijos. El primer valor debe sentirse en el workflow operatorio y la
+adopción debe producir evidencia para assurance y expansión. Canon: `docs/strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md`.
+
+Every Customer Model Integrity Pack must instantiate the `Operator & Buying Group Contract`: function-based operator,
+workflow/JTBD, first value, path to operator-champion, sponsor, economic buyer, governance owner, procurement,
+blockers, decision process, paper process, adoption evidence and expansion triggers. `Buying group` is the required
+analytical contract even when the customer has no formal committee.
+
 ## Resultado obligatorio
 
 Entregar un Customer Model Integrity Pack con: decisión y alcance, segmentos/beachhead, ICP/anti-ICP, JTBD y teoría

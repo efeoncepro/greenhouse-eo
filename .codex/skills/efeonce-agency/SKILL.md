@@ -7,6 +7,8 @@ description: Contexto de negocio, marca, GTM y modelo ASaaS de Efeonce Group (la
 
 > **Ecosistema digital Efeonce — layering canónico** (SSOT: `docs/architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md` + `docs/public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md`). Efeonce es la marca paraguas; las líneas de negocio/prácticas poseen ofertas; Globe, Wave, Reach, Kortex y Verk son product brands o platform brands; Greenhouse es el control plane. Las superficies front-of-house consumen plataformas/backbones, pero ninguna product brand reemplaza la relación Efeonce ni equivale automáticamente a toda una línea de negocio. Cargar el contrato de portfolio al razonar sobre marca, capas, hosts, ownership o dónde nace una capacidad del ecosistema.
 
+> **Contrato operator-first:** la superficie operatoria vive en el Product Service o product brand; Greenhouse soporta la superficie ejecutiva, memoria, assurance y coordinación. La adopción esperada es `operador → operator-champion → sponsor/director → compra recurrente → evangelista`. Canon: [`Efeonce Operator-First Product & Growth Contract V1`](../../docs/strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md).
+
 Esta skill es el **router + doctrina destilada** del context pack de negocio de Efeonce Group. Su trabajo: que cualquier agente (Claude o Codex) entienda *para qué existe Greenhouse en el negocio* antes de tocar producto, copy, métricas o estrategia, y sepa **qué archivo canónico leer** según la tarea.
 
 La capa de partnerships y providers es transversal al portfolio: Efeonce puede vender licencias cuando los términos lo

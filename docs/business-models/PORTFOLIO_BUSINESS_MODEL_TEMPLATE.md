@@ -41,6 +41,17 @@
 entry capability → first value → renewal trigger → cross-sell → retained memory → account expansion
 ```
 
+### Operator and buying-group system
+
+El portfolio debe mostrar cómo cada capability instancia el contrato operator-first:
+
+| Capability | Operator | Operator-champion path | Sponsor/director | Economic buyer | Greenhouse evidence |
+|---|---|---|---|---|---|
+| | | | | | |
+
+No asumir que el buyer del portfolio es el usuario de la capability. Enlazar cada fila con el Business Model o
+Customer Model Integrity Pack concreto.
+
 ## 5. Capital translation
 
 | Capability | Cash-generative today | Investment required | Proof needed | Spinout gate |

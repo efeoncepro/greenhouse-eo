@@ -2,6 +2,10 @@
 
 > Por qué un agente de Greenhouse necesita esto: el GTM define **qué demos vende el negocio, contra quién compite y cómo gana plata**. Greenhouse aparece en casi todos los pitches como el diferenciador tangible. Lo que construyes alimenta —o debilita— ese argumento.
 
+> **Motion transversal:** Efeonce entra por el job del operador, convierte a los usuarios de mayor valor en
+> `operator-champions` y usa Greenhouse para traducir adopción operativa en assurance ejecutivo, renovación y
+> expansión. Ver [`Efeonce Operator-First Product & Growth Contract V1`](../strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md).
+
 ## Posicionamiento
 
 **Categoría de mercado:** *AI-enabled marketing and growth systems company.* En lenguaje comercial: **Integrated Growth Partner**. **ASaaS** describe el modelo de delivery y monetización; **Growth Operating System** describe la visión de largo plazo. No somos una "AI agency" ni un proveedor de servicios sueltos. Combinamos personas, product services, plataformas y agentes. "Agencia de marketing digital" se conserva como término de captura de demanda, no como categoría estratégica. La propuesta se construye sobre tres conceptos propietarios:

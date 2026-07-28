@@ -134,7 +134,7 @@ Cada Product Service debe declarar:
 
 1. nombre, owner y estado de madurez;
 2. problema, trigger, JTBD y outcome controlable;
-3. ICP, buyer, buying group y usuarios operativos;
+3. ICP, **operator nombrado por función**, buyer, buying group y usuarios operativos;
 4. alternativa desplazada y costo de no actuar;
 5. nivel de productización;
 6. scope, inputs, outputs y exclusiones;
@@ -148,7 +148,7 @@ Cada Product Service debe declarar:
 14. costos, capacidad, margen y sensibilidad;
 15. derechos, datos, privacidad, IP y offboarding;
 16. métricas de valor, delivery y salud económica;
-17. paths de expansión, cross-sell y renovación;
+17. recorrido del operador (`problema → wedge → uso → operator-champion → sponsor → compra recurrente → evangelización`), paths de expansión, cross-sell y renovación;
 18. stop conditions y criterios para pasar a la siguiente madurez.
 
 ## Product Service lifecycle

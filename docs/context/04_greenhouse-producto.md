@@ -6,6 +6,11 @@
 
 Greenhouse es la **plataforma operativa de Efeonce Group**: reúne en un solo portal web finanzas, RRHH, nómina, delivery de proyectos, gestión de cuentas e IA, que antes vivían dispersos en hojas de cálculo y sistemas externos.
 
+En el portfolio operator-first, Greenhouse soporta la **superficie ejecutiva**: convierte el trabajo de Wave, Reach,
+Globe y otras Product Services en memoria, evidencia, assurance, coordinación y señales de expansión. No reemplaza
+las superficies operatorias verticales ni es condición para que una plataforma hermana opere. Ver [`Efeonce
+Operator-First Product & Growth Contract V1`](../strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md).
+
 Es **multi-tenant**: cada organización cliente tiene su workspace aislado (métricas, proyectos, equipo); el equipo interno de Efeonce tiene una vista consolidada (**Agency**) que cruza todas las cuentas.
 
 **Dos audiencias en una app:** el cliente (transparencia de su operación) y Efeonce (operación interna + gestión de cuentas). Toda feature debe ser clara sobre a cuál de las dos sirve y respetar el aislamiento entre tenants.

@@ -21,6 +21,11 @@ evidence, adopción, retención y expansión— vive en `efeonce-customer-model-
 packaging, pricing, billing, descuentos, economics y validación de monetización vive en `efeonce-pricing-operator`;
 los modelos concretos sólo fijan las decisiones propias de cada línea.
 
+Todo Business Model y Product Service debe instanciar el [`Efeonce Operator-First Product & Growth Contract V1`](../strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md)
+con una sección `Operator & Buying Group Contract`: operador nombrado por función, JTBD, primer valor, recorrido
+de champion, buying group, decision/paper process, evidencia de adopción y triggers de renovación/expansión.
+El estado de cobertura se mantiene en [`Operator & Buying Group Registry V1`](OPERATOR_BUYING_GROUP_REGISTRY_V1.md).
+
 La arquitectura que explica cómo se relacionan el modelo corporativo, la plataforma, las capabilities, el
 packaging y los submodelos vive en [`EFEONCE_BUSINESS_MODEL_ARCHITECTURE_V1.md`](EFEONCE_BUSINESS_MODEL_ARCHITECTURE_V1.md).
 La separación entre marca paraguas, línea de negocio/práctica, product brand, oferta y delivery vive en

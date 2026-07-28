@@ -2,6 +2,11 @@
 
 > **Para qué sirve este archivo.** Define **para quién** se construye Greenhouse y **qué "job"** intenta resolver cada usuario. Un agente de producto traduce JTBD en features: saber qué intenta lograr un CMO o un Head de CRM cuando entra al portal es lo que separa una feature que importa de una cosmética. Fuente: doc de Segmentación Comercial (mar-2026), que tiene los 12 ICPs con 11 dimensiones c/u y los JTBD completos — aquí está lo que mueve decisiones de producto.
 
+> **Actualización transversal:** el customer model debe separar al usuario/operator del operator-champion, problem
+> owner, sponsor, economic buyer y governance owner. Los productos verticales se diseñan primero para el workflow
+> del operador; Greenhouse soporta la evidencia y la superficie ejecutiva. Ver [`Efeonce Operator-First Product &
+> Growth Contract V1`](../strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md).
+
 ## Principio rector
 
 **No todos los clientes entran igual.** Algunos ICPs son **puertas de entrada** (ciclo corto, ticket bajo, trigger urgente); otros se activan por **venta cruzada** una vez dentro. Esto importa para producto porque **el portal es el activo que convierte una puerta de entrada de ticket bajo en una relación expandible**: el onboarding al portal y la transparencia temprana son lo que dispara el cross-sell (ver Bow-tie en `11` y modelo ASaaS en `14`).

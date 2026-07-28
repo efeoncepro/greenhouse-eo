@@ -103,6 +103,22 @@
 **Sponsor/mobilizer test:** autoridad de continuidad, recursos, escalamiento y defensa de la siguiente fase.  
 **Consenso requerido:** problema, resultado, criterios, riesgo, responsabilidades y proceso; no necesariamente unanimidad.
 
+### 5A. Operator & Buying Group Contract
+
+- Nombre funcional del operador: [ ]
+- Workflow y JTBD del operador: [ ]
+- Primer valor observable: [ ]
+- Recorrido: `problema → wedge → uso → operator-champion → sponsor → compra recurrente → evangelización`
+- Capacidad desbloqueada / métrica primaria: [ ]
+- Qué puede recomendar, defender o expandir el operator-champion: [ ]
+- Sponsor/director: [ ]
+- Economic buyer: [ ]
+- Governance owner: [ ]
+- Procurement/ratifier y blockers: [ ]
+- Evidencia por etapa de adopción: [E#]
+- Trigger de renovación/expansión: [ ]
+- Unknown, next experiment y condición de falsación: [ ]
+
 ## 6. Decision process y paper process
 
 | Fase | Pregunta / gate | Owner cliente | Fecha | Evidencia | Riesgo / bloqueo | Próximo compromiso bilateral |

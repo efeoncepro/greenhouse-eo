@@ -1,5 +1,36 @@
 # Handoff activo
 
+## 2026-07-28 — TASK-1552: flujo integrado verificado en `efeonce-globe`
+
+La continuación se ejecutó en el repo hermano correcto, `/Users/jreye/Documents/efeonce-globe`; Greenhouse
+queda como control plane documental. El composer ya verifica en browser el camino prompt → estimate vigente →
+stale inmediato → cambio de modalidad → `prepare/execute`, con doble activación sin duplicación y la misma clave
+de idempotencia para ambos commands.
+
+Cambios runtime relevantes: proporción visible en Video, dock bloqueado alcanzable por teclado con razón
+audible (`aria-disabled`/`aria-describedby`) y `data-opening` explícito para el contrato popover/panel; el canary
+de fixture registra commands reales para comprobar estas garantías.
+
+Evidencia: `pnpm --filter @efeonce-globe/studio-client test` verde (118 tests), build/lint/gates verdes y
+composer browser canary verde a 1440/390/320 px, incluida pasada `prefers-reduced-motion`. Estado no cerrado:
+faltan estados browser de error/cancelación, revisión premium humana y verificación operativa live/internal-only.
+No promover ni marcar `TASK-1552` como completa todavía.
+
+## 2026-07-28 — Contrato transversal operator-first y RESEARCH-010
+
+Se documentó [`Efeonce Operator-First Product & Growth Contract V1`](docs/strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md).
+El contrato fija que Wave, Reach, Globe y futuras Product Services son las superficies operatorias; Greenhouse
+soporta la superficie ejecutiva, memoria, assurance y coordinación. El motion esperado es
+`operador → operator-champion → sponsor/director → compra recurrente → evangelista`.
+
+Se creó [`RESEARCH-010`](docs/research/RESEARCH-010-client-operating-system-primary-validation.md) para validar
+el contrato con operadores-champions reales. Estado: brief listo; faltan 5 entrevistas piloto y luego una muestra
+de 12–15 participantes. No abrir tareas de producto hasta obtener evidencia primaria.
+
+Se sincronizaron context pack, `project_context.md` y skills Codex/Claude de agency, business model, customer model
+y research. Los cambios no alteran runtime, schema, API, entitlements ni rollout. Siguiente paso: reclutar los
+primeros candidatos y registrar episodios de dolor, influencia y evidencia de champion.
+
 ## 2026-07-27 — TASK-1552: los cinco bloques existen, y convertir a Tailwind resultó ser **tokenizar**
 
 `efeonce-globe` `5b7cb3f` (1e) + `512dcbc` (1f) + `a37d105` (1g). **Slice 1 sigue abierto**: van tres

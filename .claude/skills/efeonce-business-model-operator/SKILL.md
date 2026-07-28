@@ -25,6 +25,16 @@ The corporate 2028 direction requires every client-facing service to become prod
 `docs/strategy/EFEONCE_2028_PRODUCTIZED_AI_NATIVE_SERVICES_STRATEGIC_DIRECTION_V1.md` for maturity gates and
 exceptions.
 
+For the transversal adoption model, distinguish the operator-facing Product Service surface from executive
+assurance: the operator may become the `operator-champion`, while the sponsor/director and economic buyer validate
+priority, governance and budget. Greenhouse supports memory, evidence and expansion where applicable. Canon:
+`docs/strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md`.
+
+Every Business Model and Product Service must include an `Operator & Buying Group Contract`: function-based
+operator name, workflow/JTBD, first value, champion path, buying group, separated decision/paper processes,
+unlocked-capacity metric, adoption evidence and renewal/expansion triggers. Do not assume the buyer is the user or
+that the operator controls budget.
+
 For partner/provider portfolio decisions, load the canonical skill's `Portfolio de partners y providers` section:
 classify relationships as strategic core, creative capability, execution enabler or experiment, and require offer,
 owner, economics, contract, rights, support, fallback and demand evidence before increasing priority.

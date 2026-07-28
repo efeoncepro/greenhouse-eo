@@ -118,6 +118,7 @@ El roadmap ASaaS ya nombra dónde duele. Si buscas dónde aportar, empieza aquí
 | `../architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md` | Contrato de capas: Efeonce, líneas de negocio/prácticas, product brands, ofertas y delivery. |
 | `02_gtm.md` | Posicionamiento, categoría de mercado, ASaaS, líneas de negocio, segmentación, modelo comercial, canales, proceso de venta, métricas GTM, partnership. |
 | `03_ecosistema-producto.md` | Greenhouse + Kortex + Verk. Integración, convergencia, ASaaS redefinido, jerarquía de IP. |
+| [`../strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md`](../strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md) | Contrato transversal: productos operator-first, operator-champion, ciclo de adopción/expansión y Greenhouse como superficie ejecutiva. |
 | `04_greenhouse-producto.md` | Greenhouse hoy: módulos, stack, integraciones, ICO Engine, gaps, roadmap, principios de diseño. |
 | `05_voz-tono-estilo.md` | Creencias contrarias, personalidad, voz, tono, do/don't — aplicado a UX copy del portal. |
 | `06_glosario-metricas.md` | Glosario canónico de métricas, siglas y naming. Fuente de verdad para nombres en código. |

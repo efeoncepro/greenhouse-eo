@@ -12,10 +12,12 @@
 
 En una página: qué vendemos, a quién, por qué gana, cómo cobramos, qué riesgo asumimos y qué no está aprobado.
 
-## 2. Problema, ICP, buyer y JTBD
+## 2. Problema, operador, ICP, buyer y JTBD
 
 - ICP y exclusions.
-- Economic buyer, champion, user y procurement/legal.
+- **Operator & Buying Group Contract:** nombre funcional del operador, workflow, JTBD, primer valor, champion path,
+  operator-champion, problem owner, sponsor/director, economic buyer, governance owner, procurement/ratifier y blockers.
+- Decision process y paper/procurement process separados.
 - Job funcional, emocional y de riesgo.
 - Alternativas actuales y costo de no actuar.
 
@@ -64,6 +66,8 @@ subprocesadores, retención y borrado.
 ## 9. Journey y expansión
 
 Adquisición, onboarding, time-to-value, adopción, renovación, expansión, downgrade, offboarding y portabilidad.
+Nombrar el recorrido del operador: `problema → wedge → uso → operator-champion → sponsor → compra recurrente → evangelización`.
+Definir evidencia por etapa y triggers de expansión.
 
 ## 10. Métricas
 

@@ -16,6 +16,18 @@ Para cualquier oferta con horizonte 2028, el modelo de cliente debe validar tamb
 Product Service AI-native, qué nivel de human-in-the-loop espera, qué operación desea (managed, co-operated o
 client-operated) y qué evidencia justificaría adopción, renovación y expansión.
 
+El customer model debe distinguir la persona que opera el workflow de la persona que compra o gobierna. Usar
+`operator`, `operator-champion`, `problem owner`, `sponsor/director`, `economic buyer` y `governance owner` como
+roles, no como cargos fijos. El primer valor debe sentirse en la superficie operatoria y la evidencia de adopción
+debe llegar a Greenhouse para soportar assurance y expansión. Canon: [`Efeonce Operator-First Product & Growth
+Contract V1`](../../docs/strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md).
+
+En cada Customer Model Integrity Pack, la sección de buying group debe incluir también el `Operator & Buying Group
+Contract`: nombre funcional del operador, workflow/JTBD, primer valor, recorrido hacia operator-champion, sponsor,
+economic buyer, governance owner, procurement, blockers, decision process, paper process, evidencia de adopción y
+triggers de expansión. “Comité de compra” es una posible forma organizacional; `buying group` es el contrato
+analítico obligatorio.
+
 No es una buyer-persona decorativa, un lead score ni un método de ventas único. `MEDDPICC`, `Challenger`, `JTBD`,
 `BANT` u otros métodos son lentes que se seleccionan por complejidad; ninguno sustituye el modelo de cliente.
 
