@@ -63,3 +63,12 @@ simple y una compleja en Greenhouse/MUI y Globe/Tailwind, con adopción opt-in y
 
 - Feature opt-in en consumers piloto.
 - Rollback a implementation local sin modificar el contrato de runtime.
+
+## Execution note — 2026-07-28
+
+La foundation AXIS y el Lab ya están publicados y verificados. La ejecución del piloto
+queda bloqueada únicamente en el acceso de consumidores a GitHub Packages: hay que
+conceder read access a `efeoncepro/greenhouse-eo` y `efeoncepro/efeonce-globe` desde la
+configuración de cada paquete y provisionar una credencial técnica `read:packages` para
+Vercel/Cloud Build. El runbook operativo está en
+`docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`.
