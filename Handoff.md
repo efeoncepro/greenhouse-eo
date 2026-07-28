@@ -51,9 +51,30 @@ Cuarta vez en esta task. **Regla: al convertir una región, listar primero qué 
 También dos sondas dejaron de ser ciertas al crecer el SSOT: el canary del motor usaba `text-lg` como
 ejemplo de «escala ajena que no existe», y `text-lg` pasó a existir. Apunta ahora a `text-4xl`.
 
+### Slice 1h — `capability-button` pasa a componente (`9118117`)
+
+Los ocho callsites a `composer/CapabilityButton.tsx`. **Componente y no `@utility`** porque lo que se
+repetía no era un aspecto sino un **contrato**: una utilidad reproduce padding y `:disabled`, pero no
+puede garantizar que el punto de estado exista ni que la razón viaje en el `title` — las dos son
+criterios de aceptación. Y `@utility` habría reintroducido el acoplamiento estructural que ADR-016 vino
+a matar (*«un botón que tiene un dot adentro»*).
+
+`state` es un tipo discriminado —`ready` o `blocked` **con su razón**— así que «deshabilitado y sin
+explicar por qué» es irrepresentable. `stateFromGate` concentra además el colapso de los cuatro estados
+del gate a dos, que antes ocurría en ocho lugares sin que nadie lo decidiera.
+
+**🔴 El orden dentro del `className` no decide nada.** Con `rounded-sm` en la base y `rounded-full` en
+la variante, el botón circular rindió **9,28 px** — con build y typecheck verdes. Gana la utilidad que
+la hoja emite después, que es un orden del framework. **Regla: una propiedad se declara en UNA sola
+capa**; si una variante necesita otro valor, la propiedad entera baja a la variante.
+
+Tres correcciones gratis al unificar: «Usar propuesta» gana su icono (era la única acción sin glifo),
+mención y sus candidatos ganan punto de estado, y `aria-disabled` acompaña a `disabled` en los ocho.
+No se portan el tooltip por `data-gate-reason` ni la animación por `data-capability-state`: **ningún
+callsite emite esos atributos** (medido 0 y 0) — promesas muertas.
+
 **Siguiente:** convertir `prompt-field` (25 reglas, y el glow vive ahí), riel, selector, referencias,
-seed y shape. ⚠️ **`capability-button` es una primitive**, no un puñado de utilidades: 15 reglas con
-estados, tooltip y piso responsive de 45 px. Repetirla inline sería peor que la hoja.
+seed y shape.
 
 ## 2026-07-27 — TASK-1552 Slices 1a y 1c: **el CTA volvió al fold**
 

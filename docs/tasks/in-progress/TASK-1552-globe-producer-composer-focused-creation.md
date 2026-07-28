@@ -28,7 +28,7 @@
 - Motion: `docs/ui/motion/TASK-1552-globe-producer-composer-focused-creation-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `SLICE 1 EN CURSO — LOS CINCO BLOQUES EXISTEN, LA CONVERSION A TAILWIND VA POR TRES REGIONES (2026-07-27, commits 5b7cb3f + 512dcbc + a37d105). Cada bloque declara su pregunta creativa con su icono; Modo subio al bloque 1; el cajon de sastre no existe y el canary ahora afirma su ausencia en vez de un KNOWN sobre un elemento borrado. Convertidas a Tailwind: cabecera, modality-pill y fila de Modo, verificadas por VALOR COMPUTADO en browser. El SSOT gano 5 tokens (--text-micro, --text-meta, --text-lg, --accent-ink-bright, --field/--white) por decision del operador de tokenizar en vez de normalizar. HALLAZGO: el peso 700 no tenia utilidad alcanzable (font-display lo tomaba la familia) con el build en verde — corregido en el generador + guardrail que lanza. PENDIENTE: convertir prompt-field, riel, selector, referencias, seed y shape; capability-button necesita extraerse como primitive, no repetirse inline. Historico: TAILWIND LISTO, SUPERFICIE NO MIGRADA (2026-07-27): el motor de ADR-016 quedo instalado, gateado y verificado en efeonce-globe (804b7d7 + 91432ed) — theme generado desde el SSOT, 4 gates que muerden en className, canary de motor sobre valores computados. NINGUNA superficie migrada: el composer sigue con producerStyles y cero utilidades Tailwind. Unico bloqueo restante: cerrar TASK-1555. Baseline de diff capturado a 1440/390/320 CON la hoja del legacy. Historico: ADR-016 CAMBIO EL PLAN (2026-07-27): Slice 0 RETIRADO — el payload cliente migra a Tailwind v4 y una superficie reescrita no depende de la hoja legacy. BLOQUEADA por el slice de Tailwind en TASK-1485 y por cerrar TASK-1555. Diseno COMPLETO y documentado en docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md (leer PRIMERO). Rama efeonce-globe task/TASK-1552-slice0-internalizar-css commit 5edd2a3 = WIP congelado con partes a revertir, ver su mensaje`
+- Status real: `SLICE 1 EN CURSO — LOS CINCO BLOQUES EXISTEN, LA CONVERSION A TAILWIND VA POR TRES REGIONES (2026-07-27, commits 5b7cb3f + 512dcbc + a37d105). Cada bloque declara su pregunta creativa con su icono; Modo subio al bloque 1; el cajon de sastre no existe y el canary ahora afirma su ausencia en vez de un KNOWN sobre un elemento borrado. Convertidas a Tailwind: cabecera, modality-pill y fila de Modo, verificadas por VALOR COMPUTADO en browser. El SSOT gano 5 tokens (--text-micro, --text-meta, --text-lg, --accent-ink-bright, --field/--white) por decision del operador de tokenizar en vez de normalizar. HALLAZGO: el peso 700 no tenia utilidad alcanzable (font-display lo tomaba la familia) con el build en verde — corregido en el generador + guardrail que lanza. Slice 1h: los 8 `capability-button` pasan a un COMPONENTE local (CapabilityButton.tsx) con API de tipo discriminado — `blocked` siempre trae razon. HALLAZGO: el orden dentro del className NO decide nada; con `rounded-sm` en base y `rounded-full` en la variante, el boton circular rindio 9,28px con build y typecheck verdes. Regla: una propiedad se declara en UNA sola capa. PENDIENTE: convertir prompt-field, riel, selector, referencias, seed y shape. Historico: TAILWIND LISTO, SUPERFICIE NO MIGRADA (2026-07-27): el motor de ADR-016 quedo instalado, gateado y verificado en efeonce-globe (804b7d7 + 91432ed) — theme generado desde el SSOT, 4 gates que muerden en className, canary de motor sobre valores computados. NINGUNA superficie migrada: el composer sigue con producerStyles y cero utilidades Tailwind. Unico bloqueo restante: cerrar TASK-1555. Baseline de diff capturado a 1440/390/320 CON la hoja del legacy. Historico: ADR-016 CAMBIO EL PLAN (2026-07-27): Slice 0 RETIRADO — el payload cliente migra a Tailwind v4 y una superficie reescrita no depende de la hoja legacy. BLOQUEADA por el slice de Tailwind en TASK-1485 y por cerrar TASK-1555. Diseno COMPLETO y documentado en docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md (leer PRIMERO). Rama efeonce-globe task/TASK-1552-slice0-internalizar-css commit 5edd2a3 = WIP congelado con partes a revertir, ver su mensaje`
 - Rank: `TBD`
 - Domain: `creative|ui|product`
 - Blocked by: `none`
@@ -466,6 +466,66 @@ Se midió altura, `scrollWidth` y visibilidad del CTA — **y todo daba verde mi
 métrica que faltaba es la de **contención**: para cada descendiente, comprobar que su rect esté dentro del rect
 de su contenedor (arriba, abajo y a los lados). Sin eso, un `overflow: visible` deja hijos fuera sin que ninguna
 métrica de página lo note. **Agregar esa aserción al canary de la superficie.**
+
+## Delta 2026-07-27 (9) — Slice 1h: el control gateado es un componente, y el orden del `className` no decide nada
+
+Ejecutado en `efeonce-globe` `9118117`. Los ocho `capability-button` de la superficie pasan a
+`composer/CapabilityButton.tsx`.
+
+### Por qué componente y no `@utility` — la decisión, para no re-litigarla
+
+Lo que se repetía ocho veces **no era un aspecto: era un contrato**. Una utilidad reproduce padding,
+borde y `:disabled`; no puede garantizar que el punto de estado exista, que la razón viaje en el
+`title`, ni que un control no ejecutable siga siendo legible. Las tres son criterios de aceptación de
+esta task.
+
+Y `@utility capability-button` habría reintroducido el acoplamiento estructural que ADR-016 vino a
+matar: la regla volvería a describir *«un botón que tiene un dot adentro»*, que es la forma exacta de
+las seis colisiones del ADR.
+
+**Vive local a la superficie, no en `src/primitives/`.** La regla de esta task (una primitive con un
+solo consumer es una hipótesis) se respeta: se promueve cuando una segunda superficie lo consuma sin
+modificarlo. `ProducerHeader` ya maneja tres `CapabilityGate`, así que ese momento probablemente llegue.
+
+### La API hace irrepresentable el estado que la task persigue en cuatro criterios
+
+`state` es un tipo discriminado: o `ready`, o `blocked` **con su razón**. No hay forma de escribir
+«deshabilitado y sin explicar por qué».
+
+`stateFromGate` concentra además el colapso de los **cuatro** estados del gate a dos. Antes ocurría en
+cada callsite con `gate?.state === 'available'`, así que la distinción que `capability-gate.ts` declara
+—y cuyo comentario advierte que colapsarlos *«borra la única información que le sirve a quien tiene que
+resolverlo»*— se perdía ocho veces sin que nadie lo decidiera. **Sigue perdiéndose, pero ahora hay un
+único sitio donde recuperarla** el día que la UI quiera distinguir «no existe» de «está apagada».
+
+Señal de que la conversión fue completa: `enabled()` y `reasonOf()` quedaron sin consumers y el linter
+los reportó.
+
+### 🔴 El orden dentro del `className` NO decide nada — medido
+
+Primer intento con `rounded-sm` en la base y `rounded-full` en el `kind`: el botón de historial rindió
+**9,28 px** — un squircle donde el legacy tenía un círculo, **con build y typecheck verdes**. Dos
+utilidades de la misma propiedad tienen la misma especificidad y gana la que la hoja generada emite
+después, que es un orden canónico del framework y no el que escribió el autor.
+
+**Regla para toda la migración: una propiedad se declara en UNA sola capa.** Si una variante necesita
+otro valor, la propiedad entera baja a la variante; no se «pisa» desde arriba. Las variantes de media
+query sí pueden vivir en la base — se emiten después de las utilidades planas.
+
+### Dos reglas del legacy que NO se portan
+
+El tooltip por `data-gate-reason` y la animación por `data-capability-state`: **ningún callsite del
+composer emite esos atributos** (medido: 0 y 0). Nunca corrieron acá. Son de la clase que `EPIC-028`
+llama *promesas muertas* — portarlas era copiar CSS que ninguna condición activa.
+
+### Tres correcciones que salieron gratis al unificar
+
+- «Usar propuesta» gana icono (`ti-check`): era la única acción de la superficie sin glifo.
+- Mención y sus candidatos ganan punto de estado: estaban gateados igual y su estado no se veía.
+- `aria-disabled` acompaña a `disabled` en los ocho, no sólo en los que lo recordaban.
+
+Token nuevo `--dot-glow` (`0 0 .45rem currentColor`); `currentColor` a propósito, para que el halo siga
+al punto en vez de necesitar dos tokens para una sola decisión.
 
 ## Delta 2026-07-27 (8) — los cinco bloques existen, y convertir a Tailwind resultó ser TOKENIZAR
 
