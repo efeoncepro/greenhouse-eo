@@ -58,6 +58,15 @@ grep -rn "@import 'tailwindcss\|@import \"tailwindcss\|@theme\|@source\|@plugin"
 **Cargá el perfil y leelo entero.** Contiene el SSOT, qué está prohibido, qué gates corren y cuál es
 el idiom local. Sin eso vas a escribir código que compila y está mal.
 
+> **Dónde están esos archivos.** Los paths de este documento son **relativos al directorio de esta
+> skill**, y la skill vive en dos lugares equivalentes:
+> `~/.claude/skills/tailwind-engineer/` (núcleo user-scope, no versionado) y
+> `/Users/jreye/Documents/greenhouse-eo/.codex/skills/tailwind-engineer/` (espejo versionado).
+> **Si trabajás dentro de greenhouse-eo, usá el espejo** — es el que está en el repo:
+> `.codex/skills/tailwind-engineer/profiles/<dialecto>.md`.
+> El `.claude/skills/tailwind-engineer/SKILL.md` del repo es **solo un overlay de un archivo**; no
+> contiene los perfiles ni las referencias.
+
 Las tres diferencias que más queman:
 
 1. **La dirección del SSOT se invierte.** En Globe: `tokens.ts` → `@theme` generado → utilidad. En

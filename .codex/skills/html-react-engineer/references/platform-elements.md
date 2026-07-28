@@ -1,6 +1,6 @@
 # Referencia — elementos y comportamientos de plataforma
 
-Estado verificado 2026-07-27. Ver `SOURCES.md`. **Esta página es la que más rápido cambia**: si vas a
+Estado verificado 2026-07-27. Ver `../SOURCES.md`. **Esta página es la que más rápido cambia**: si vas a
 comprometerte con algo en producción, reverificá el soporte contra los targets del repo.
 
 ---
@@ -34,8 +34,7 @@ Diferencias que importan:
 - `request-close` (vía invoker command) dispara el evento `cancel`, respetando la lógica de
   confirmación; `close` cierra directo.
 
-**Animarlo:** `@starting-style` + `transition-behavior: allow-discrete` (ver `css-architect` →
-`references/platform-2026.md`). Sin eso, la entrada desde `display:none` no transiciona.
+**Animarlo:** `@starting-style` + `transition-behavior: allow-discrete` (ver `css-architect` → `references/platform-2026.md`). Sin eso, la entrada desde `display:none` no transiciona.
 
 ---
 

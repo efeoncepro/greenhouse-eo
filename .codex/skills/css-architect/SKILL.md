@@ -61,6 +61,12 @@ deja el sistema peor: la próxima regla tendrá que subir más. Ver `references/
 
 ## 1. Router — qué cargar
 
+> **Dónde están estos archivos.** Paths **relativos al directorio de esta skill**, que vive en dos
+> lugares equivalentes: `~/.claude/skills/css-architect/` (núcleo user-scope, no versionado) y
+> `/Users/jreye/Documents/greenhouse-eo/.codex/skills/css-architect/` (espejo versionado).
+> Dentro de greenhouse-eo usá el espejo: `.codex/skills/css-architect/references/<archivo>.md`.
+> El `.claude/skills/css-architect/SKILL.md` del repo es **solo un overlay de un archivo**.
+
 ```
 ├─ Algo no aplica / se pisa / gana la regla equivocada .. references/cascade-scope-layers.md
 ├─ Layout: grid, subgrid, container queries, anchor,

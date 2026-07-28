@@ -1,7 +1,7 @@
 # Referencia — layout, contención y contextos
 
 Fundamentos estables. El soporte de container queries avanzadas y anchor positioning tiene fecha: ver
-`SOURCES.md`.
+`../SOURCES.md`.
 
 ---
 

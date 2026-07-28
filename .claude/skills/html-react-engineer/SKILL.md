@@ -11,8 +11,19 @@ description: >-
 
 # html-react-engineer — overlay Greenhouse EO
 
-**Cuerpo completo:** `.codex/skills/html-react-engineer/` (espejo en repo) o
-`~/.claude/skills/html-react-engineer/` (núcleo user-scope).
+> ⚠️ **Este archivo es SOLO el overlay.** No contiene las referencias: pinea lo local y nada más.
+
+## Router (rutas reales en este repo)
+
+| Necesito | Archivo |
+|---|---|
+| Qué elemento uso: landmarks, headings, listas, tablas, ARIA-vs-nativo, forms | `.codex/skills/html-react-engineer/references/semantic-html.md` |
+| `<dialog>`, `popover`, invoker commands, `<details>`, select personalizable | `.codex/skills/html-react-engineer/references/platform-elements.md` |
+| Hooks, forms API, estado, keys, refs, React Compiler | `.codex/skills/html-react-engineer/references/react19-components.md` |
+| Frescura + adopción real de React 19 por repo | `.codex/skills/html-react-engineer/SOURCES.md` |
+| Regla cero, hard rules y fronteras | `.codex/skills/html-react-engineer/SKILL.md` |
+
+(Mismo contenido en `~/.claude/skills/html-react-engineer/`, núcleo no versionado.)
 
 ## Precedencia
 

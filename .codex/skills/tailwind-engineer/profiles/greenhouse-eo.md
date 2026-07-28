@@ -84,7 +84,7 @@ El `important` de esos dos imports hace que **toda utilidad Tailwind gane sobre 
 diseño (es el patrón del starter-kit Vuexy). Consecuencias:
 
 - **NUNCA agregues `!` a una clase individual** para "ganarle a MUI". Ya ganás. Si no estás ganando,
-  el problema es otro — corré el triage de `references/debugging.md`.
+  el problema es otro — corré el triage de `../references/debugging.md`.
 - **Cuidado con el efecto inverso**: una utilidad puesta al pasar puede pisar un estado de MUI
   (hover, disabled, selected) que sí querías. Si un componente MUI deja de reaccionar a un estado,
   sospechá de una utilidad tuya antes que del componente.
@@ -110,7 +110,7 @@ del mismo grupo esperando override.
    árbol respetando `.gitignore`, y `docs/**` + `.claude/skills/**` están trackeados. Medido en
    `4.1.17`: las **clases simples** de un `.md` **sí** se materializan (incluso dentro de un bloque de
    código); los **valores arbitrarios con corchetes**, no. En `.ts`/`.tsx` se materializa todo. Ver
-   `references/debugging.md` §P5.
+   `../references/debugging.md` §P5.
    **Follow-up abierto:** el portal hoy emite utilidades que solo existen en documentación. Acotarlo
    con `@source not "docs/**"` + `@source not ".claude/**"` en `globals.css` es barato y no tiene
    contraindicación conocida — requiere verificar que ninguna clase productiva viva solo en un `.md`.

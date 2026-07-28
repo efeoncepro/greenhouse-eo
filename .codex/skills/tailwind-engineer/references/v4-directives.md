@@ -1,7 +1,7 @@
 # Referencia — directivas y funciones de Tailwind v4
 
 Verificado 2026-07-27 contra la doc oficial (`tailwindcss.com/docs/functions-and-directives`,
-`/docs/theme`, `/docs/adding-custom-styles`). Ver `SOURCES.md`.
+`/docs/theme`, `/docs/adding-custom-styles`). Ver `../SOURCES.md`.
 
 ---
 

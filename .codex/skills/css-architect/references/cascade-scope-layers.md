@@ -1,7 +1,7 @@
 # Referencia — cascada, capas, scope, especificidad
 
 Los fundamentos de esta página son **estables**: no se reverifican. Lo único con fecha es el soporte de
-`@scope` (ver `SOURCES.md`).
+`@scope` (ver `../SOURCES.md`).
 
 ---
 

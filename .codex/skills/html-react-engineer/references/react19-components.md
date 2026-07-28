@@ -4,7 +4,7 @@ Verificado contra React 19.2 (react.dev, 2025-10-01). Patch vigente a 2026-07: 1
 **Frontera:** acá está *cómo se estructura el componente*. *Dónde corre* (RSC, hydration, streaming,
 boundaries) es de **`frontend-architect`**.
 
-⚠️ **Estas APIs son greenfield en los tres repos** (ver `SOURCES.md`). No son el idiom local.
+⚠️ **Estas APIs son greenfield en los tres repos** (ver `../SOURCES.md`). No son el idiom local.
 Introducirlas es una decisión de arquitectura, no de componente.
 
 ---

@@ -3,7 +3,7 @@
 ⚠️ **Ésta es la página más volátil de la skill.** Varias features son Chrome-only o "expected", y los
 artículos de "lo nuevo de CSS" **sobre-reportan Chrome**. La columna de estado tiene fecha de
 verificación (2026-07-27); si vas a comprometerte con una en producción, **reverificá los tres motores
-y los targets reales del repo**. Ver `SOURCES.md`.
+y los targets reales del repo**. Ver `../SOURCES.md`.
 
 Ordenadas por qué tan seguro es usarlas hoy.
 

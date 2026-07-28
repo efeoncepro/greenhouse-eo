@@ -66,6 +66,12 @@ Cada una de esas hay que reimplementarla y ninguna sale gratis.
 
 ## 1. Router — qué cargar
 
+> **Dónde están estos archivos.** Paths **relativos al directorio de esta skill**, que vive en dos
+> lugares equivalentes: `~/.claude/skills/html-react-engineer/` (núcleo user-scope, no versionado) y
+> `/Users/jreye/Documents/greenhouse-eo/.codex/skills/html-react-engineer/` (espejo versionado).
+> Dentro de greenhouse-eo usá el espejo: `.codex/skills/html-react-engineer/references/<archivo>.md`.
+> El `.claude/skills/html-react-engineer/SKILL.md` del repo es **solo un overlay de un archivo**.
+
 ```
 ├─ ¿Qué elemento uso? landmarks, headings, listas,
 │  tablas, ARIA-vs-nativo ........................ references/semantic-html.md

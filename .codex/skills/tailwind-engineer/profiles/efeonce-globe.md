@@ -69,7 +69,7 @@ Tres decisiones deliberadas, cada una con su razón medida:
 
 **Consecuencia dura:** la escala de fábrica **no existe acá**. `text-red-500`, `text-lg`,
 `rounded-md`, `shadow-sm`, `ease-out` — ninguna se genera. Si escribís una, **no aparece nada** y el
-build queda verde. Es la patología P4 de `references/debugging.md`.
+build queda verde. Es la patología P4 de `../references/debugging.md`.
 
 Antes de usar cualquier utilidad tematizada, mirá qué tokens existen:
 

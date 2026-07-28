@@ -11,9 +11,26 @@ description: >-
 
 # tailwind-engineer — overlay Greenhouse EO
 
-**Cuerpo completo de la skill:** `.codex/skills/tailwind-engineer/` (espejo en repo) o
-`~/.claude/skills/tailwind-engineer/` (núcleo user-scope). Este overlay **no lo reemplaza**: pinea el
-dialecto local. Cargá `profiles/greenhouse-eo.md` antes de escribir una clase.
+> ⚠️ **Este archivo es SOLO el overlay.** No contiene los perfiles ni las referencias: pinea el
+> dialecto local y nada más. **El cuerpo de la skill vive en el espejo versionado del repo**, y los
+> paths de abajo son los reales — copiá y leé.
+
+## Router (rutas reales en este repo)
+
+| Necesito | Archivo |
+|---|---|
+| **Escribir clases acá** (leer SIEMPRE primero) | `.codex/skills/tailwind-engineer/profiles/greenhouse-eo.md` |
+| Trabajar en efeonce-globe (ADR-016, tokens.ts, 4 gates) | `.codex/skills/tailwind-engineer/profiles/efeonce-globe.md` |
+| Trabajar en efeonce-think / efeonce-web (Astro) | `.codex/skills/tailwind-engineer/profiles/astro-think.md` |
+| Montar Tailwind en un repo nuevo | `.codex/skills/tailwind-engineer/profiles/greenfield.md` |
+| `@theme`, `@utility`, `@variant`, `@source`, funciones | `.codex/skills/tailwind-engineer/references/v4-directives.md` |
+| **Algo no aplica / no se genera / se ve mal con build verde** | `.codex/skills/tailwind-engineer/references/debugging.md` |
+| Migrar una superficie de CSS a Tailwind | `.codex/skills/tailwind-engineer/references/migration.md` |
+| Frescura de las afirmaciones + versiones por repo | `.codex/skills/tailwind-engineer/SOURCES.md` |
+| Router y hard rules cross-dialecto | `.codex/skills/tailwind-engineer/SKILL.md` |
+
+(El mismo contenido existe en `~/.claude/skills/tailwind-engineer/`, núcleo user-scope no versionado.
+Dentro del repo preferí el espejo: es el que está bajo control de versiones.)
 
 ## Precedencia dentro de este repo
 

@@ -11,8 +11,20 @@ description: >-
 
 # css-architect — overlay Greenhouse EO
 
-**Cuerpo completo:** `.codex/skills/css-architect/` (espejo en repo) o
-`~/.claude/skills/css-architect/` (núcleo user-scope).
+> ⚠️ **Este archivo es SOLO el overlay.** No contiene las referencias: pinea lo local y nada más.
+
+## Router (rutas reales en este repo)
+
+| Necesito | Archivo |
+|---|---|
+| **Algo no aplica / se pisa / gana la regla equivocada** | `.codex/skills/css-architect/references/cascade-scope-layers.md` |
+| Grid, subgrid, container queries, anchor, sticky, overflow, stacking, contención | `.codex/skills/css-architect/references/layout-and-containment.md` |
+| Color, dark mode, theming, custom properties, `@property` | `.codex/skills/css-architect/references/color-and-theming.md` |
+| Features 2025-2026 con estado por navegador | `.codex/skills/css-architect/references/platform-2026.md` |
+| Frescura de las afirmaciones | `.codex/skills/css-architect/SOURCES.md` |
+| Principios, triage de 5 pasos y hard rules | `.codex/skills/css-architect/SKILL.md` |
+
+(Mismo contenido en `~/.claude/skills/css-architect/`, núcleo no versionado.)
 
 ## Precedencia
 
