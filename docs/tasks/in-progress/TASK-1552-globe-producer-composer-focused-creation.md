@@ -28,7 +28,7 @@
 - Motion: `docs/ui/motion/TASK-1552-globe-producer-composer-focused-creation-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `SLICE 1 EN CURSO — LOS CINCO BLOQUES EXISTEN, LA CONVERSION A TAILWIND VA POR TRES REGIONES (2026-07-27, commits 5b7cb3f + 512dcbc + a37d105). Cada bloque declara su pregunta creativa con su icono; Modo subio al bloque 1; el cajon de sastre no existe y el canary ahora afirma su ausencia en vez de un KNOWN sobre un elemento borrado. Convertidas a Tailwind: cabecera, modality-pill y fila de Modo, verificadas por VALOR COMPUTADO en browser. El SSOT gano 5 tokens (--text-micro, --text-meta, --text-lg, --accent-ink-bright, --field/--white) por decision del operador de tokenizar en vez de normalizar. HALLAZGO: el peso 700 no tenia utilidad alcanzable (font-display lo tomaba la familia) con el build en verde — corregido en el generador + guardrail que lanza. Slice 1h: los 8 `capability-button` pasan a un COMPONENTE local (CapabilityButton.tsx) con API de tipo discriminado — `blocked` siempre trae razon. HALLAZGO: el orden dentro del className NO decide nada; con `rounded-sm` en base y `rounded-full` en la variante, el boton circular rindio 9,28px con build y typecheck verdes. Regla: una propiedad se declara en UNA sola capa. Slices 1i/1j: el BLOQUE 1 queda entero en Tailwind (campo de prompt con su glow tokenizado, acciones, sugerencias, negativo) y el canary gana el aserto del glow que el STYLE_REFERENCE §9 pedia y no existia. PENDIENTE: los dos overlays (van juntos), referencias, preset, seed, selector, shape y riel. Historico: TAILWIND LISTO, SUPERFICIE NO MIGRADA (2026-07-27): el motor de ADR-016 quedo instalado, gateado y verificado en efeonce-globe (804b7d7 + 91432ed) — theme generado desde el SSOT, 4 gates que muerden en className, canary de motor sobre valores computados. NINGUNA superficie migrada: el composer sigue con producerStyles y cero utilidades Tailwind. Unico bloqueo restante: cerrar TASK-1555. Baseline de diff capturado a 1440/390/320 CON la hoja del legacy. Historico: ADR-016 CAMBIO EL PLAN (2026-07-27): Slice 0 RETIRADO — el payload cliente migra a Tailwind v4 y una superficie reescrita no depende de la hoja legacy. BLOQUEADA por el slice de Tailwind en TASK-1485 y por cerrar TASK-1555. Diseno COMPLETO y documentado en docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md (leer PRIMERO). Rama efeonce-globe task/TASK-1552-slice0-internalizar-css commit 5edd2a3 = WIP congelado con partes a revertir, ver su mensaje`
+- Status real: `SLICE 1 EN CURSO — LOS CINCO BLOQUES EXISTEN, LA CONVERSION A TAILWIND VA POR TRES REGIONES (2026-07-27, commits 5b7cb3f + 512dcbc + a37d105). Cada bloque declara su pregunta creativa con su icono; Modo subio al bloque 1; el cajon de sastre no existe y el canary ahora afirma su ausencia en vez de un KNOWN sobre un elemento borrado. Convertidas a Tailwind: cabecera, modality-pill y fila de Modo, verificadas por VALOR COMPUTADO en browser. El SSOT gano 5 tokens (--text-micro, --text-meta, --text-lg, --accent-ink-bright, --field/--white) por decision del operador de tokenizar en vez de normalizar. HALLAZGO: el peso 700 no tenia utilidad alcanzable (font-display lo tomaba la familia) con el build en verde — corregido en el generador + guardrail que lanza. Slice 1h: los 8 `capability-button` pasan a un COMPONENTE local (CapabilityButton.tsx) con API de tipo discriminado — `blocked` siempre trae razon. HALLAZGO: el orden dentro del className NO decide nada; con `rounded-sm` en base y `rounded-full` en la variante, el boton circular rindio 9,28px con build y typecheck verdes. Regla: una propiedad se declara en UNA sola capa. Slices 1i/1j: el BLOQUE 1 queda entero en Tailwind (campo de prompt con su glow tokenizado, acciones, sugerencias, negativo) y el canary gana el aserto del glow que el STYLE_REFERENCE §9 pedia y no existia. Slices 1k/1l: overlays, direccion y seed convertidos. HALLAZGO MAYOR: el gate de reduced-motion leia solo CSS, asi que una animacion escrita en Tailwind era INVISIBLE para el — mismo agujero que ADR-016 condicion 2 describe para los otros tres gates, que si se reescribieron. Cerrado antes de crear la animacion. PENDIENTE: referencias, selector de modelo, shape y riel. Historico: TAILWIND LISTO, SUPERFICIE NO MIGRADA (2026-07-27): el motor de ADR-016 quedo instalado, gateado y verificado en efeonce-globe (804b7d7 + 91432ed) — theme generado desde el SSOT, 4 gates que muerden en className, canary de motor sobre valores computados. NINGUNA superficie migrada: el composer sigue con producerStyles y cero utilidades Tailwind. Unico bloqueo restante: cerrar TASK-1555. Baseline de diff capturado a 1440/390/320 CON la hoja del legacy. Historico: ADR-016 CAMBIO EL PLAN (2026-07-27): Slice 0 RETIRADO — el payload cliente migra a Tailwind v4 y una superficie reescrita no depende de la hoja legacy. BLOQUEADA por el slice de Tailwind en TASK-1485 y por cerrar TASK-1555. Diseno COMPLETO y documentado en docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md (leer PRIMERO). Rama efeonce-globe task/TASK-1552-slice0-internalizar-css commit 5edd2a3 = WIP congelado con partes a revertir, ver su mensaje`
 - Rank: `TBD`
 - Domain: `creative|ui|product`
 - Blocked by: `none`
@@ -466,6 +466,66 @@ Se midió altura, `scrollWidth` y visibilidad del CTA — **y todo daba verde mi
 métrica que faltaba es la de **contención**: para cada descendiente, comprobar que su rect esté dentro del rect
 de su contenedor (arriba, abajo y a los lados). Sin eso, un `overflow: visible` deja hijos fuera sin que ninguna
 métrica de página lo note. **Agregar esa aserción al canary de la superficie.**
+
+## Delta 2026-07-27 (11) — Slices 1k/1l: 🔴 el gate de motion no miraba el `className`
+
+Ejecutados en `efeonce-globe` `6ec39c9` (overlays) y `ad0e4e8` (dirección + seed).
+
+### 🔴 El agujero que apareció al ir a convertir la primera animación
+
+El gate de reduced-motion lee archivos `.css`. Con Tailwind una animación ya no se declara ahí: se
+escribe `animate-overlay-rise` en un `className`, y **el gate no la veía en absoluto** — ni siquiera la
+reportaba como infracción, simplemente no existía para él.
+
+Es exactamente el agujero que **ADR-016 condición 2** describe para los otros tres gates: *«un gate que
+deja de morder al cambiar de motor no era un gate, era un accidente de ubicación»*. Aquéllos se
+reescribieron al instalar el motor; **éste quedó fuera de esa pasada**, y el hueco se descubrió al
+convertir la primera superficie con animación.
+
+Se cierra **antes** de crear la animación: el gate exige ahora que toda `animate-*` de un `className`
+lleve `motion-safe:` — la misma doctrina de opt-in seguro, en la sintaxis del motor nuevo. Verificado
+que muerde con una violación deliberada y que no da falsos positivos al restaurar.
+
+### El generador resuelve referencias entre tokens
+
+`--overlay-rise` se escribe naturalmente como `overlay-rise var(--duration-overlay) var(--ease-enter)
+both`, que es lo que lo mantiene sincronizado con la escala de motion. Pero **el `@theme` no puede
+contener referencias** — es la regla que el gate del theme enforca, y viene de la referencia circular
+que dejó `text-xs` en 16 px con el build verde. **El gate mordió.**
+
+Se concilia resolviendo en el generador: el SSOT conserva la referencia y lo que se emite son valores.
+Lanza ante un token inexistente o una cadena circular, en vez de emitir el `var()` intacto.
+
+### Los dos overlays, y una duplicación que importaba
+
+`--overlay-fill` estaba declarado **dos veces** en la hoja (155deg `.98/.99` y 165deg `.97/.98`) sobre
+el mismo conjunto de elementos, en pasadas distintas. Gana la segunda y es la que se tokeniza. La
+diferencia entre ambas es invisible; la duplicación no lo era — tocar una y no la otra dejaba dos
+overlays hermanos con fondos distintos.
+
+La propuesta de Mejorar es `relative` y no flota, y eso es deliberado en el original: **una propuesta de
+IA que tapara el prompt escondería justo el texto que propone reemplazar.**
+
+### Una forma que no se puede compartir
+
+El punto de color de un preset **reusa `--dot-glow`** —el mismo halo del punto de estado— porque es el
+mismo concepto y `currentColor` hace que siga al preset. Lo que los distingue no es el halo sino la
+**forma**: el preset es cuadrado con esquina apenas marcada, el de capability es un círculo. **Un
+círculo de color en esta superficie ya significa «disponibilidad», y dos cosas distintas no pueden
+compartir forma.** Para eso nace `--radius-xs` (2,6 px): con `--radius-sm` un cuadrado de 8 px queda
+redondo y las dos señales se vuelven la misma.
+
+### El seed reservaba espacio para lo que no se puede usar
+
+`.seed-actions` tenía una grilla de tres columnas para un control que hoy tiene **dos** hijos. Las
+otras dos —campo del número y botón de re-tirar— pertenecen al seed **fijo**, que no tiene contrato y
+por eso el botón está bloqueado. Reservar su espacio dejaba un hueco permanente para algo inusable.
+
+### Tercer control sin ninguna regla
+
+«Descartar» se renderizaba con el estilo del navegador —gris de sistema, 16 px— dentro de un panel de
+la paleta. Es el tercero en esa situación, después del input del negativo y del propio composer. **La
+conversión los encuentra porque obliga a mirar cada elemento; la hoja los escondía por omisión.**
 
 ## Delta 2026-07-27 (10) — Slices 1i/1j: el campo de prompt con su glow, y el guardrail que faltaba
 

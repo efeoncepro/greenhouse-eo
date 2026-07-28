@@ -94,9 +94,31 @@ su variante bajo reduced-motion (transición `0s`, estado conservado).
 El gate empujó al idiom correcto dos veces: `grid-cols-[minmax(0,1fr)]` → **`grid-cols-1`, que en
 Tailwind ES exactamente eso**, y `transition-[…]` → `transition-all`.
 
-**Siguiente:** `prompt-overlay` + `enhancement-proposal` **juntos** (comparten gradiente, sombra y la
-animación `overlay-rise`, que necesita su token y su corte de reduced-motion), luego referencias,
-preset, seed, selector de modelo, shape y riel.
+### Slices 1k/1l — 🔴 el gate de motion no miraba el `className` (`6ec39c9`, `ad0e4e8`)
+
+**El hallazgo mayor de la sesión.** El gate de reduced-motion lee `.css`. Con Tailwind una animación se
+escribe `animate-*` en un `className`, y **el gate no la veía en absoluto** — ni siquiera la reportaba,
+no existía para él. Es el agujero que **ADR-016 condición 2** describe para los otros tres gates
+(*«dejar de morder al cambiar de motor»*); aquéllos se reescribieron al instalar el motor y **éste quedó
+fuera de esa pasada**. Se descubrió al convertir la primera superficie con animación, y se cerró
+**antes** de crearla: toda `animate-*` exige `motion-safe:`. Verificado mordiendo.
+
+**El generador ahora resuelve referencias entre tokens.** `--overlay-rise` se escribe con
+`var(--duration-overlay)` para seguir a la escala de motion, pero el `@theme` **no puede contener
+referencias** —es la regla que viene de la circular que dejó `text-xs` en 16 px— y el gate mordió. El
+SSOT conserva la referencia; lo emitido son valores.
+
+Otros hallazgos: `--overlay-fill` estaba declarado **dos veces** con dos ángulos sobre los mismos
+elementos (tocar una y no la otra dejaba overlays hermanos distintos); el seed reservaba **tres
+columnas** de grilla para un control con dos hijos, siendo las otras dos del seed fijo que no tiene
+contrato; y «Descartar» es el **tercer** control de la superficie sin ninguna regla, renderizándose con
+el gris del sistema dentro de un panel de la paleta.
+
+Una decisión que conviene no re-litigar: el punto de color de un preset reusa `--dot-glow`, pero es
+**cuadrado** (`--radius-xs`, nacido acá) mientras el de capability es un círculo. **Un círculo de color
+ya significa «disponibilidad» en esta superficie, y dos cosas distintas no pueden compartir forma.**
+
+**Siguiente:** referencias (~40 reglas), selector de modelo, `shape-*` y riel de estimado.
 
 ## 2026-07-27 — TASK-1552 Slices 1a y 1c: **el CTA volvió al fold**
 
