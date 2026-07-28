@@ -124,6 +124,26 @@ Greenhouse `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_{DECISION
 + `docs/epics/in-progress/EPIC-028-*.md`. (Codex mirrors this: `software-architect-2026`
 ↔ `greenhouse-globe` under `.codex/skills/`.)
 
+## Compose with AXIS (shared product UI platform)
+
+When an architectural decision touches reusable UI across Greenhouse, Globe or future products, load
+`docs/architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md` and
+`docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`. AXIS is the portable foundation and Lab;
+Greenhouse owns governance, registry, lifecycle, QA and evidence; each consumer owns its native adapter. Do not
+turn AXIS into a shared runtime, import MUI/Vuexy into the portable layer, or make Globe a Greenhouse module.
+
+The current verified state is **foundation/distribution ready, consumer rollout gated**: packages
+`@efeoncepro/axis-tokens`, `@efeoncepro/axis-ui-contracts` and `@efeoncepro/axis-ui-registry` are published at
+`0.1.2`; Greenhouse and Globe have GitHub Packages `Read` access; the Lab has sensitive `NPM_RC` in Vercel
+Production/Preview; and Globe has `axis-packages-read-token` in Secret Manager with Cloud Build IAM. These facts
+do not mean Greenhouse or Globe consume AXIS at runtime. `TASK-1591` owns the adapters pilot.
+
+Architecture decisions must preserve semantic tokens and fixed package versions, keep package credentials out of
+source/artifacts/images, and document the native adapter boundary (MUI for Greenhouse, Tailwind v4 for Globe).
+Any change to package ownership, registry/auth flow, cross-runtime boundary or rollout status requires the AXIS
+architecture decision, the task lifecycle and the private-package runbook to remain aligned. The operator-owned
+PAT expires 2026-08-27 and is a temporary risk, not a durable machine identity.
+
 ## Pinned decisions (OVERRIDES global arch-architect)
 
 ### 1. Canonical 360 extension is mandatory
