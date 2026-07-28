@@ -97,6 +97,11 @@ el SSOT en vez de competir.
 - **NUNCA** migrar una superficie sin su referencia de diff visual previa.
 - **NUNCA** dejar dos motores activos en la misma superficie: una superficie está en CSS o está en Tailwind.
 - **SIEMPRE** que se agregue un token, se agrega en `tokens.ts` y se expone al theme — nunca al revés.
+- **NUNCA** escribir una utilidad de un namespace que el theme vació y el SSOT no repobló. El theme vacía
+  trece namespaces para que la escala ajena no exista; si uno queda en cero, la utilidad **compila, el CSS
+  la contiene, el build y los gates quedan verdes, y la propiedad computa en su valor inicial**. Es el modo
+  de falla más caro del motor porque no deja rastro. Gate: `tailwind-theme.test.ts` → *«ninguna utilidad
+  consume un namespace que el theme vació y no repobló»*.
 
 ## Estado y siguiente paso
 
@@ -238,3 +243,44 @@ Aparecieron al mirar el render, no al leer la salida de los tests:
    defecto»; la medición dice algo más fuerte: **la progressive disclosure no existe, el markup es
    decorativo.** Refuerza el retiro del patrón en Slice 2. El canary lo reporta como `KNOWN` en cada corrida,
    nunca como skip silencioso.
+
+## Delta 2026-07-28 — 🔴 namespace vaciado y no repoblado: el tercer modo de falla silenciosa
+
+El mismo día produjo **dos** hallazgos de esta clase, y ninguno era visible: build verde, cuatro gates
+verdes, CSS conteniendo la clase, y la propiedad computando en su valor inicial.
+
+El theme vacía **trece** namespaces (`--color-*`, `--font-*`, `--text-*`, `--font-weight-*`, `--leading-*`,
+`--tracking-*`, `--radius-*`, `--shadow-*`, `--inset-shadow-*`, `--drop-shadow-*`, `--ease-*`, `--animate-*`,
+`--blur-*`) y los repuebla **sólo** con lo que declara el SSOT. Un namespace que el código escribe y el
+theme no expone no falla: no hace nada.
+
+**Caso medido — `--blur-*`.** `--blur-` no estaba en `PASSTHROUGH_NAMESPACES` y el SSOT no declaraba ningún
+token de desenfoque. Los **seis** `backdrop-blur-*` de la superficie computaban `backdrop-filter: none`. Se
+veía sólo en el header, la única superficie que de verdad dependía de ello: `bg-rail` al 58 % de opacidad
+**sin** desenfoque no es translúcido, es un agujero — el contenido pasaba nítido por detrás al scrollear.
+Corregido con `--blur-sm` / `--blur-md` en el SSOT más `--blur-` en los passthrough.
+
+**Contra-caso, igual de importante — `--aspect-*` NO está vaciado.** Se creyó que sí y se evitó
+`aspect-video` por esa razón; era falso. Sólo se vacían los trece de arriba, así que **para cualquier
+namespace fuera de esa lista la escala por defecto de Tailwind sigue viva y sus utilidades resuelven**. La
+lista de vaciados es la autoridad; suponerla es cómo se toman decisiones de implementación peores por un
+motivo inventado.
+
+### El gate que lo cierra
+
+`apps/studio-client/src/gates/tailwind-theme.test.ts` gana un tercer aserto, **inverso** al que ya existía:
+el viejo comprueba que un token del SSOT llegue al theme; el nuevo comprueba que el código no consuma un
+namespace que el theme dejó sin poblar.
+
+Alcance deliberado y escrito en el propio gate: sólo los namespaces cuyo prefijo de utilidad es
+**inequívoco** (`--blur-`, `--radius-`, `--ease-`, `--animate-`, `--leading-`, `--tracking-`,
+`--inset-shadow-`, `--drop-shadow-`). Quedan fuera `--color-`, `--text-`, `--font-`, `--font-weight-` y
+`--shadow-` porque sus prefijos se solapan —`text-` es tamaño y color, `font-` es familia y peso, `shadow-`
+es sombra y color— y un barrido por prefijo daría falsos positivos; además son los que el SSOT puebla
+masivamente, así que el modo de falla no se da ahí en la práctica.
+
+Verificado como debe verificarse un gate: pasa en estado sano (`exit 0`), **falla** al comentar los dos
+tokens de blur (`exit 1`, señalando los seis usos), y vuelve a pasar al restaurarlos. Durante su
+construcción el propio gate dio un falso positivo de dieciocho usos legítimos de `animate-*` —un
+`--[a-z-]+-` glotón lee `--animate-overlay-rise` como namespace `--animate-overlay-`—; se corrigió
+comprobando **por** namespace conocido en vez de derivarlo del texto.

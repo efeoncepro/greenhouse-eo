@@ -63,6 +63,17 @@ el ritmo vertical para evitar scroll interno** — ese error costó seis iteraci
 
 ---
 
+**Delta 2026-07-28 — el `sticky` del riel estaba muerto por debajo de `lg`.** La regla de arriba se cumplía
+sólo en escritorio. Un elemento `sticky` se ancla a su ancestro con scroll; el panel del composer tiene
+`overflow-hidden`, así que **él** se volvía ese ancestro — y como bajo `lg` no está acotado (`max-h` lleva
+prefijo `lg:`), tampoco scrollea. El riel no tenía contra qué pegarse y quedaba estático al final de una
+columna de 1717 px. Medido a 840×987: el CTA fuera de pantalla, el mismo síntoma que el Slice 1c ya había
+corregido para escritorio.
+
+`max-lg:overflow-visible` devuelve el ancestro de scroll al documento y el riel se pega al fondo del viewport.
+**No se acota el panel en angosto a propósito**: crearía un scroll anidado y el feed, que va debajo, quedaría
+atrapado detrás del scroll interno del composer.
+
 ## 3 · El dock de herramientas
 
 Fila de iconos bajo el prompt. **Sumar una herramienta cuesta un icono, no 80 px de columna.**
@@ -163,6 +174,32 @@ preflight de controles de formulario, así que el `<textarea>` conservaba el **b
 él conservando su superficie propia (velo + filo interno), que distingue el área de escritura sin dibujar una
 caja. Barrido de la superficie: era el único control con borde UA.
 
+**Delta 2026-07-28 — el bloque deja de prometer lo que no hace.** Tiene DOS caminos en estados opuestos y la
+UI estaba ordenada al revés del que funciona:
+
+- **Mencionar del feed opera hoy**: `globe.producer.asset.copyAsReference`, cableado contra readers y commands
+  reales (`TASK-1490` escritura + `TASK-1503` lectura, ambas `complete`), y el `parentRights` de cada ficha lo
+  **certifica el servidor**.
+- **Subir archivo nuevo está gated OFF punta a punta**: `private-ingest`, `GLOBE_ASSET_PROVENANCE_ENABLED=false`
+  en ambos servicios, dueña `TASK-1467` (`in-progress`). Le faltan además autoridad de evidencia de derechos,
+  IAM/retención del bucket y un canario live.
+
+Y sin embargo el disparador se llamaba «Subir imagen o video» —el camino bloqueado— dejando el que sí opera
+escondido como ítem secundario dentro de su propio menú. Correcciones:
+
+- Disparador neutral («Agregar referencia») y **el menú ordena por disponibilidad**: mencionar primero, subir
+  después con su razón visible.
+- El vacío dice lo que **sí** se puede hacer. Decía «Sin referencias…», que informa una ausencia y deja creyendo
+  que no hay nada por hacer.
+- **El vacío pierde el borde punteado.** El punteado es el significante universal de «suelta acá», y en toda la
+  superficie del Producer no existe `onDrop`, `onDragOver`, `dataTransfer` ni `input[type=file]`: prometía un
+  gesto inexistente, y convivía con el punteado del picker, así que había **dos** zonas aparentemente soltables
+  y ninguna lo era. El picker conserva el suyo, donde significa otra cosa (hueco donde va una pieza, frente a
+  la ficha sólida de una referencia real). Cuando `private-ingest` aterrice y haya drop real, el punteado se
+  gana su lugar en el vacío.
+- La promesa de derechos aparece **sólo cuando hay algo que validar**. En vacío prometía validar la nada. NO se
+  muda al riel: el riel es sólo dinero (`TASK-1532`).
+
 ### 4.2 · Referencias — es entrada, no ajuste
 
 - Va en el **bloque 2**, visible, nunca dentro de un colapsable
@@ -181,16 +218,31 @@ Miniaturas cuadradas, no chips de texto. La opción activa lleva borde `#5b8cff`
 ⚠️ **Dependencia externa:** requiere una imagen representativa por estilo. **Si el equipo creativo no las tiene,
 este bloque se ve peor que los chips de texto que reemplaza.** Confirmar antes de comprometerlo.
 
-**Estado 2026-07-28 — el bloque está implementado con arte provisional, y el riesgo de arriba se materializó.**
-Los ocho `apps/studio-web/public/styles/direction-*.svg` son SVG procedurales de 277–449 bytes: pictogramas de
-dos o tres formas sobre un degradado. `direction-photographic.svg` es un rostro esquemático (círculo + pelo +
-hombros); `direction-cinematic.svg` es un atardecer con montañas. **Ninguno enseña el estilo que nombra** — en
-render no se distingue «Fotográfico» de «Editorial» sin leer la etiqueta, que es justo lo que la miniatura
-venía a evitar.
+**Delta 2026-07-28 — el arte procedural se reemplaza por stills reales, y el aspecto del slot cambia.**
 
-Cierre pendiente: ocho stills representativos reales, **generados con el Still Model Lab de Globe**
-(`TASK-1459`) con seed fijo y receta versionada, y aterrizados como asset gobernado con derechos limpios. No
-sirve arte out-of-band: estas imágenes viajan dentro del bundle del producto.
+El riesgo que anticipaba el párrafo anterior se materializó: los ocho `direction-*.svg` eran pictogramas
+procedurales de 277–449 bytes, y en render no se distinguía «Fotográfico» de «Editorial» sin leer la etiqueta
+—justo lo que la miniatura venía a evitar—. Se reemplazan por ocho `.webp` (384×216, 60 KB el set completo).
+
+Dos reglas que quedan, y valen más que los archivos:
+
+1. **Mismo sujeto, ocho tratamientos.** Si cambia el estilo *y* cambia el motivo, el ojo no puede atribuir la
+   diferencia al estilo. El sujeto es un **globo aerostático** —el motivo de la casa, lo que convierte el
+   selector en un momento de marca— y lo único que varía es luz, paleta, textura y calidad de borde, que es
+   lo único legible a este tamaño. Una primera pasada con una forma ovoide abstracta falló exactamente acá:
+   Fotográfico, 3D render e Ilustración salieron mutuamente indistinguibles porque se separan por *técnica de
+   render*, y sobre una forma mate neutra la técnica no se ve.
+2. **El slot es 16:9, con `aspect-video`, y el recorte es explícito.** Los SVG se autoraron **cuadrados** y el
+   CSS les recortaba la banda central con `object-fit: cover` — por eso «Fotográfico» se veía como un borrón
+   naranja: era el centro de una cara sin cabeza ni hombros. Autorar en un aspecto y delegar el encuadre al
+   CSS es el defecto, no la solución. **`aspect-video` y no un alto fijo**: `h-24` hace que la proporción
+   derive con el ancho de columna — medido a 1280 px de viewport la columna del preset mide 82 px, y con alto
+   fijo la miniatura habría salido **retrato** (82×96).
+
+Pendiente declarado: esta es la pasada de **dirección**, generada con `pnpm ai:image` (gpt-image-2), el
+generador canónico del repo. El set que se embarque debería regenerarse por el **Still Model Lab de Globe**
+(`TASK-1459`) con seed fijo y receta versionada, para que la procedencia la cargue el propio producto. No
+sirve arte out-of-band: estas imágenes viajan dentro del bundle.
 
 ### 4.4 · Modelo — isotipo de la casa
 
@@ -438,3 +490,32 @@ Medido en runtime: `.advanced-controls > summary` tiene `display:none`, altura 0
 tiene control para cerrarse** ni con puntero ni con teclado. El §3 ya retira el patrón; esto agrega que
 además **hoy está roto**, así que reemplazarlo no arriesga una regresión de comportamiento — no hay
 comportamiento que perder.
+
+---
+
+## Delta 2026-07-28 — regresiones del port: lo que el legacy tenía y React dejó caer
+
+Adyacente al composer y no cubierto por este documento —el header es `ProducerHeader.tsx`—, pero la **clase de
+bug** sí pertenece acá porque la produjo la misma migración.
+
+El legacy tenía **`.credit-orbit`**: un `conic-gradient` alrededor del glifo de créditos que mostraba la
+proporción disponible/reservado. Al portar la superficie a React el anillo quedó **sólo dentro del popover**, y
+el trigger heredó un círculo relleno que no informa nada.
+
+La consecuencia no era estética. Sin anillo, «reservados» únicamente podía decirse con texto, y ese texto vivía
+en **tres líneas apiladas** —«240» / «disp.» / «18 reservados»— que estiraban la pastilla a 143×58 px y
+desequilibraban toda la fila. El operador lo diagnosticó exacto: *«perdió el anillo y se ve más alargado, por
+eso daña todo»*. **El anillo no era decoración: era lo que le permitía al texto ser corto.**
+
+Corregido reusando la **misma** expresión de dona que el popover —una sola y no dos, que es lo que evita que se
+separen el día que alguien ajuste una— y bajando el texto a una línea. El número exacto queda en el popover y en
+un `sr-only`: el anillo transmite proporción, no cifra, y esa información no puede quedar sólo en color.
+Medido a 840 px: pastilla 143×58 → 133×46, header 133 → 121 px.
+
+**La regla que queda:** al portar una superficie del legacy, un elemento que *informa* no se reemplaza por uno
+que sólo *decora* aunque ocupe el mismo lugar. Y cuando algo «se ve más largo de lo que debería», sospechar
+primero de un afordance que desapareció y cuyo trabajo ahora hace el texto.
+
+> Cierre honesto: no se auditó el resto de la superficie buscando otras regresiones de este tipo. `.credit-orbit`
+> se encontró porque el operador lo señaló, no porque un barrido lo detectara. Queda como trabajo pendiente
+> comparar el inventario de afordancias del legacy contra el port.
