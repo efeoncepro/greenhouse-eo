@@ -179,8 +179,8 @@ Invoke the `greenhouse-ui-review` skill. It runs the formal gate checklist.
 > this repo's productive stack — measured, **685 of 1.491 `.tsx` use `className`**, led by `flex` (493),
 > `items-center` (149), `gap-4` (71). The real split is: **Tailwind for layout/spacing, MUI+Emotion for
 > components and theming, MUI/AXIS theme as the SSOT for color, typography, radii and shadows**. Do not
-> cite the old line as a reason to avoid Tailwind. Canonical detail: `tailwind-engineer` overlay +
-> `profiles/greenhouse-eo.md`.
+> cite the old line as a reason to avoid Tailwind. Canonical detail:
+> `.codex/skills/tailwind-engineer/profiles/greenhouse-eo.md`.
 
 ## How to detect canonical drift (anti-regression for this skill)
 

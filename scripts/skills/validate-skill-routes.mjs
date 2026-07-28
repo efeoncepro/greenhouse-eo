@@ -48,6 +48,30 @@ return all ? existsSync(join(p, 'SKILL.md')) : DEFAULT_SKILLS.includes(d)
       })
     : []
 
+// Índice nombre-de-skill → directorios donde existe (para resolver referencias cross-skill
+// escritas como `otra-skill/references/x.md`, `skills/otra-skill/...` o `../otra-skill/...`).
+const skillIndex = new Map()
+
+for (const root of ROOTS) {
+  if (!existsSync(root)) continue
+
+  for (const d of readdirSync(root)) {
+    const p = join(root, d)
+
+    if (statSync(p).isDirectory()) {
+      if (!skillIndex.has(d)) skillIndex.set(d, [])
+      skillIndex.get(d).push(p)
+    }
+  }
+}
+
+const crossSkillCandidates = ref => {
+  const parts = ref.replace(/^(\.\.\/)+/, '').replace(/^skills\//, '').split('/')
+  const roots = skillIndex.get(parts[0])
+
+  return roots ? roots.map(r => join(r, ...parts.slice(1))) : []
+}
+
 let checked = 0
 const broken = []
 
@@ -63,6 +87,19 @@ for (const root of ROOTS) {
 
         // placeholders de documentación (`<dialecto>.md`, `profiles/*.md`) no son rutas
         if (/[<>*?]/.test(ref)) continue
+
+        // etiqueta de un link markdown: [`x.md`](destino). El backtick es texto, no una ruta:
+        // lo que hay que verificar es el DESTINO. Si es una URL externa, no hay nada que
+        // validar. Caso fuente: firebase-basics lista los archivos del repo upstream con
+        // enlaces a github.com (59 falsos positivos).
+        const after = text.slice(m.index + m[0].length, m.index + m[0].length + 200)
+        const link = text[m.index - 1] === '[' && /^\]\(([^)]+)\)/.exec(after)
+
+        if (link) {
+          if (/^(https?:|\/\/|#)/.test(link[1])) continue
+          if (existsSync(resolve(dirname(file), link[1]))) continue
+        }
+
         // solo nos interesan rutas internas de skill
         if (!/(^|\/)(profiles|references)\//.test(ref) && !/(^|\/)SOURCES\.md$/.test(ref) && !/(^|\/)SKILL\.md$/.test(ref)) continue
         // cross-skill: precedida por `<otra-skill>` →
@@ -72,10 +109,14 @@ for (const root of ROOTS) {
         if (cross && cross[1] !== skill) continue
         checked++
 
+        const expanded = ref.startsWith('~/') ? join(homedir(), ref.slice(2)) : ref
+
         const candidates = [
-          resolve(dirname(file), ref), // relativa al archivo
-          resolve(skillRoot, ref), // relativa a la raíz de la skill
-          resolve(REPO, ref) // anclada al repo
+          resolve(dirname(file), expanded), // relativa al archivo
+          resolve(skillRoot, expanded), // relativa a la raíz de la skill
+          resolve(REPO, expanded), // anclada al repo
+          expanded, // absoluta (o `~/…` ya expandida)
+          ...crossSkillCandidates(ref) // `otra-skill/references/x.md`
         ]
 
         if (!candidates.some(existsSync)) {

@@ -19,7 +19,7 @@
   `ideate` (LLM autónomo) → `revise` (co-creación) → `author` → `validate` →
   `run --send` (write gobernado `private`, autoría del operador). CLIs
   `pnpm public-website:content-factory:{ideate,author,run}`. Detalle en la skill
-  owner `efeonce-public-site-wordpress` (`references/content-factory-gutenberg.md`) +
+  owner `efeonce-public-site-wordpress` (`efeonce-public-site-wordpress` → `references/content-factory-gutenberg.md`) +
   `docs/documentation/public-site/content-factory-ideation-and-cocreation.md`.
 - **Comparison table widget:** `docs/documentation/public-site/comparison-table-widget.md`
   — pieza de conversión (comparativa) para páginas de servicio.
