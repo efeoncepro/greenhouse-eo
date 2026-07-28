@@ -16,6 +16,14 @@ source control.
 - Lab: `https://axis-design-system-lab.vercel.app`.
 - Greenhouse and Globe are not runtime consumers yet.
 - The consumer rollout remains gated by `TASK-1591`.
+- GitHub Actions read access is configured for `efeoncepro/greenhouse-eo` and
+  `efeoncepro/efeonce-globe` on all three packages.
+- Vercel `NPM_RC` is configured on `axis-design-system-lab` for Production and Preview.
+- GCP Secret Manager secret `axis-packages-read-token` exists in `efeonce-globe`; the
+  Compute Engine service account used by Cloud Build has secret-level
+  `roles/secretmanager.secretAccessor`.
+- The current PAT is operator-owned and expires on 2026-08-27. Replace it with a
+  dedicated machine identity before the first external/customer rollout.
 
 ## Required GitHub package access
 
@@ -62,6 +70,18 @@ project. Grant the build service account access to that one secret only. The bui
 step writes the `.npmrc` file to the ephemeral workspace, runs `pnpm install --frozen-lockfile`,
 and removes the file before producing the artifact. The token must not be passed as a
 Docker build argument or copied into the image.
+
+Current secret reference:
+
+```text
+projects/efeonce-globe/secrets/axis-packages-read-token
+```
+
+Current build identity:
+
+```text
+818083690953-compute@developer.gserviceaccount.com
+```
 
 The deployment workflow must prove:
 
