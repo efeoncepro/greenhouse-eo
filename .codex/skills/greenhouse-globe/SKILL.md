@@ -150,6 +150,15 @@ Estructura real:
 - `apps/asset-governance`, `apps/media-derivatives` — Cloud Run Jobs de governance y de derivados de media.
 - `apps/creative-runner` — Cloud Run Job que ejecuta el trabajo de media (llama providers).
 
+### AXIS: foundation compartida y consumo del payload
+
+AXIS es la foundation portable gobernada desde Greenhouse, no un runtime compartido ni un motivo para importar MUI/Vuexy en Globe. El paquete privado y el Lab viven en `../axis-design-system`; Globe consume contratos/tokens mediante un adapter local Tailwind. No cruces implementaciones entre repositorios ni conviertas el adapter en un segundo design system.
+
+- El SSOT local de diseño del payload sigue siendo `apps/studio-client/src/tokens/tokens.ts`. Los valores de UI deben resolverse como tokens semánticos del theme Tailwind v4; no uses valores literales de diseño en `className` (`text-[#hex]`, `p-[13px]` o equivalentes).
+- Para paquetes privados usa versiones fijadas y el registry scoped `@efeoncepro:registry=https://npm.pkg.github.com`. Nunca hagas públicos los paquetes ni guardes tokens en código, lockfiles generados, artefactos o logs.
+- El acceso de Cloud Build usa el secreto `projects/efeonce-globe/secrets/axis-packages-read-token` y el service account de build autorizado a ese secreto. Materializa `.npmrc` solo durante la instalación en el workspace efímero; nunca pases el token como Docker build argument ni lo copies a la imagen.
+- `TASK-1591` permanece en estado de adapters piloto pendientes: la foundation, el Lab y la distribución están disponibles, pero Globe todavía no es consumer runtime. Antes de declarar integración, prueba una primitive simple y una compleja, evidencia desktop/390 px/teclado/reduced-motion/accesibilidad/diff y rollback por versión.
+
 **Toolchain (verificado en `tsconfig.base.json`):** `module`/`moduleResolution` NodeNext, `strict`, más `verbatimModuleSyntax`, `exactOptionalPropertyTypes`, `noUncheckedIndexedAccess`, `noImplicitOverride`, `useUnknownInCatchVariables`. Escribe código que satisfaga estos flags (p.ej. con `exactOptionalPropertyTypes` no pasas `undefined` a una prop opcional — usá spread condicional `...(x !== undefined ? { x } : {})`, patrón usado en todo el spine).
 
 **Tests: `node --test`, NO Vitest.** Los tests son `*.test.ts` ejecutados directo por Node (p.ej. `node --test src/index.test.ts`). No introduzcas Vitest, Jest ni otro runner. **Trampa de la suite (lección de método, cuesta un verde falso):** los scripts `test` de cada package **ENUMERAN los archivos a mano** — no hay glob ni descubrimiento. Un `*.test.ts` nuevo que no se agrega a ese script **NUNCA corre**, y la suite queda **verde por no haberlo mirado**, que es el peor de los verdes. Al agregar un test, agrégalo también al script `test` del package y confirma que aparece en la salida del run.

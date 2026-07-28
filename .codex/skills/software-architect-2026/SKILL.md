@@ -157,6 +157,14 @@ Compose with specialized skills after deciding the architectural shape. In parti
 - hand Efeonce Globe implementation to `greenhouse-globe` while preserving the sister-platform boundary;
 - hand UI, finance, payroll, legal, identity, cloud, data, growth, or release details to the routed specialist.
 
+### AXIS shared UI platform
+
+When a decision involves AXIS, treat it as a cross-runtime package boundary: `../axis-design-system` owns the portable foundation and Lab; Greenhouse owns governance and the consumers keep their native adapters. Do not make Greenhouse and Globe share a runtime, import one another's implementations, or place MUI/Vuexy dependencies in the portable layer.
+
+The portable contract uses semantic tokens and fixed private package versions. In Globe, `apps/studio-client/src/tokens/tokens.ts` remains the local token SSOT and Tailwind v4 is the styling adapter; literal design values in `className` are not an acceptable substitute for theme tokens. Package installation is an infrastructure concern: use the scoped GitHub Packages registry, inject read-only credentials at build time, and keep the credential out of source, artifacts, Docker arguments and images.
+
+The current AXIS rollout is not runtime-complete: `TASK-1591` still tracks the Greenhouse/MUI and Globe/Tailwind adapter pilot. Record the distinction between foundation/distribution readiness and consumer integration readiness, and require package-install, visual/accessibility evidence, rollback and fresh-install evidence before claiming completion. If the boundary, package source of truth, credential flow or rollout state changes, route the change through the applicable ADR and task rather than silently updating only a consumer.
+
 If a specialist uncovers a new one-way decision, return to this workflow.
 
 ## Maintain and validate the skill

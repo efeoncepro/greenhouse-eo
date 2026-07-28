@@ -57,6 +57,26 @@ desplegará como proyecto Vercel independiente, inicialmente en modo internal-on
 crea un runtime Cloud Run para el Lab mientras no exista una necesidad de backend,
 persistencia o jobs.
 
+## Estado verificable de distribución y autenticación — 2026-07-28
+
+- Los paquetes privados publicados en GitHub Packages son `@efeoncepro/axis-tokens`,
+  `@efeoncepro/axis-ui-contracts` y `@efeoncepro/axis-ui-registry`, versión `0.1.2`.
+- Los repositorios `efeoncepro/greenhouse-eo` y `efeoncepro/efeonce-globe` tienen acceso
+  `Read` configurado en GitHub Actions para los tres paquetes.
+- El proyecto Vercel independiente `axis-design-system-lab` tiene `NPM_RC` configurado
+  como variable sensible para `Production` y `Preview`, con el registry de GitHub Packages
+  para el scope `@efeoncepro`. Esto habilita la instalación del Lab; no demuestra todavía
+  consumo runtime en Greenhouse ni Globe.
+- En GCP, proyecto `efeonce-globe`, existe el secreto de Secret Manager
+  `axis-packages-read-token`. El service account de Cloud Build
+  `818083690953-compute@developer.gserviceaccount.com` tiene
+  `roles/secretmanager.secretAccessor` sobre ese secreto.
+- La distribución y los permisos de lectura están preparados; los consumers runtime aún no
+  importan AXIS ni tienen adapters conectados. Esa integración sigue pendiente en `TASK-1591`.
+- El token de GitHub usado para esta preparación es operator-owned y tiene expiración
+  `2026-08-27`. Antes de rollout externo o para una operación durable debe reemplazarse por
+  una identidad de máquina dedicada; el valor del token no forma parte de esta documentación.
+
 ## Rules
 
 1. Un token compartido se declara una sola vez y conserva provenance, rol semántico y

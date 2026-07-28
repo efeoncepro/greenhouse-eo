@@ -71,6 +71,14 @@ printf %s "$VALOR" | gcloud secrets versions add <secret-id> --data-file=-
   - PostgreSQL passwords require `pnpm pg:doctor` or a real connection test
 - If a secret publication error caused runtime degradation, document it as `ISSUE-###` even if the fix also includes defensive code.
 
+### AXIS private package credential
+
+Treat the AXIS package read credential as a provider/build secret, not as application configuration. The current reference is `projects/efeonce-globe/secrets/axis-packages-read-token`; access is granted only to the Cloud Build service account that installs the private packages. Never print, paste, commit, or place the token in a Docker build argument, image, lockfile, deployment artifact, or log.
+
+For Cloud Build, materialize the scoped `.npmrc` only in the ephemeral build workspace, run the frozen install, and remove or discard it before producing the artifact. Verify the package install, absence of `.npmrc` and the token from the resulting image, and the build/deployed digest relationship without revealing the secret. Use the repository's configured `gcloud` profile and Secret Manager IAM for inspection; do not substitute a bearer `curl` probe against Google APIs.
+
+The current operator-owned PAT is a temporary distribution credential with an expiration of 2026-08-27. Before external/customer rollout, replace it with a dedicated Efeonce machine identity limited to `read:packages`, with an explicit rotation owner. This is a residual risk, not evidence that `TASK-1591` consumer integration is complete.
+
 ## Workflow
 
 1. Identify the secret lane
