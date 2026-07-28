@@ -147,6 +147,14 @@ After confirmation:
 
 ## Quality Rules
 
+### AXIS Shared UI Platform
+
+When a task consumes or extends AXIS, point to `TASK-1591`, the shared UI platform ADR, and
+`docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md` instead of copying architecture. Include package
+auth, required env/secrets, runtime completeness, adapter evidence, visual/accessibility evidence, and rollback
+evidence in binary acceptance criteria. Package publication alone is not completion evidence; keep the task open or
+use `code complete, rollout pendiente` until consumers are verified in their runtime.
+
 - All paths must be real. If you cannot confirm them, use `[verificar]`.
 - Do not invent schema names, routes, tables, or helpers.
 - Use canonical project terminology such as `space_id`, `ICO Engine`, `greenhouse_serving`, and route groups already used in the repo.

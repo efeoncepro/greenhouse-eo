@@ -174,6 +174,14 @@ When authoring a task in greenhouse-eo, read `docs/operations/MODULAR_MIGRATION_
 
 ## Quality Rules
 
+### AXIS Shared UI Platform
+
+When a task consumes or extends AXIS, point to `TASK-1591`, the shared UI platform ADR, and
+`docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md` instead of copying architecture. Include package
+auth, required env/secrets, runtime completeness, adapter evidence, visual/accessibility evidence, and rollback
+evidence in binary acceptance criteria. Package publication alone is not completion evidence; keep the task open or
+use `code complete, rollout pendiente` until consumers are verified in their runtime.
+
 - **All paths must be real.** Do not invent file paths. If you cannot confirm a file exists, mark it with `[verificar]` for the agent taking the task to confirm during Discovery.
 - **Slices must be executable.** Each slice produces a committable deliverable. No slices like "investigate" or "think" — those are Discovery steps, not Scope slices.
 - **Acceptance Criteria must be verifiable.** Each criterion must be answerable with yes/no without interpretation. "The UI looks good" is not verifiable. "The component renders the amount in the space's currency" is.

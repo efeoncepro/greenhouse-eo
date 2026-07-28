@@ -82,6 +82,14 @@ or operational doc for that domain.
    - Say which docs were intentionally not updated and why.
    - Say what was not validated.
 
+## AXIS Shared UI Platform Gate
+
+For AXIS work, use `TASK-1591`, the accepted shared UI platform ADR, and
+`docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md` as canonical pointers. Record package auth,
+environment variables, and secrets without copying secret values. Closure requires runtime completeness plus
+evidence for consumer adapters, visual/accessibility behavior, and rollback. Publishing AXIS packages is
+foundation/distribution evidence only; it does not justify moving `TASK-1591` to `complete`.
+
 ## Documentation Decision Matrix
 
 Use this matrix to choose the smallest complete update set.
