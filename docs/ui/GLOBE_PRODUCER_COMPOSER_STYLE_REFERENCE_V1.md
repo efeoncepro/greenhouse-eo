@@ -519,3 +519,33 @@ primero de un afordance que desapareció y cuyo trabajo ahora hace el texto.
 > Cierre honesto: no se auditó el resto de la superficie buscando otras regresiones de este tipo. `.credit-orbit`
 > se encontró porque el operador lo señaló, no porque un barrido lo detectara. Queda como trabajo pendiente
 > comparar el inventario de afordancias del legacy contra el port.
+
+### Auditoría de regresiones del port — resultado
+
+El pendiente que dejaba el delta anterior se ejecutó. La hipótesis inicial —«lo que vivía sólo en la hoja
+CSS es lo que se pierde, porque quien porta lee el markup»— resultó **parcialmente cierta**: explicó
+`.credit-orbit` y el foco ambiental, pero los hallazgos de más peso fueron **funcionales**, no de pintura.
+
+| Regresión | Veredicto |
+|---|---|
+| **Miniatura real de la referencia** | **Corregida.** El port mostraba el mismo glifo `at` para todas: con cuatro adjuntas eran cuatro fichas idénticas. No hizo falta contrato nuevo — el handle ya trae `sourceExperimentId` + `sha256`, el descriptor que `GovernedMediaResolver.resolve` espera. |
+| **Foco ambiental del composer** | **Corregido**, con las dos guardas del legacy intactas (`prefers-reduced-motion` y puntero táctil). No se porta la intensificación de borde/sombra al escribir: ese trabajo lo carga ahora la escalera del propio campo de prompt. |
+| **Origen del popover de créditos** | **Corregido a medias, a propósito.** `origin-top-right` ancla la escala al trigger. La dirección (sube en vez de bajar) pide una variante de descenso en el SSOT de motion, que es de `TASK-1523`. |
+| **Anclaje de referencias** | **Deshabilitado con razón.** Era cosmético: `Set` local sin exclusión mutua que no llegaba al payload, mientras el legacy sí anclaba de forma excluyente y eso viajaba al brief. |
+| **Influencia por referencia** | **No se reconstruye, y no es una regresión.** El contrato lo excluye a propósito: *«it cannot send a compiled prompt, profile, strength or provider conditioning payload as part of a run»*. El slider del legacy mandaba algo que la gobernanza hoy rechaza por diseño. Lo único real era el copy prometiéndolo. |
+| **Seed lock** | **Bloqueado por contrato**, ya declarado honestamente. No es trabajo de diseño. |
+
+**Dos correcciones de método que valen más que la lista:**
+
+1. **El canary no podía probar la miniatura.** No servía `/v1/outputs/` ni el reader
+   `globe.producer.output.get`, así que la ficha se quedaba con el glifo pasara lo que pasara — no
+   distinguía «funciona» de «no existe», que es exactamente el hueco por el que el port la perdió. Se le
+   agregaron el reader, la ruta y un PNG 1×1. **Un harness que no puede ejercer la funcionalidad tampoco
+   puede protegerla.**
+2. **Un hallazgo de la auditoría era falso.** Se afirmó que los `capability-dot` fallaban WCAG 1.4.1 por
+   ser color-only con `aria-hidden`. Eso se midió sobre el **fixture legacy**, no sobre el port: en React
+   el punto ámbar sólo existe en la rama `!usable && !active`, que ya trae `opacity-75`, `disabled`,
+   `aria-disabled` y `title`. El color nunca es el único canal. **No había nada que arreglar.**
+
+> Cierre honesto: la auditoría cubrió composer, header y tool dock — las superficies ya portadas. Feed,
+> viewer y share siguen su propio port (`TASK-1558`/`1559`) y **no se auditaron**.
