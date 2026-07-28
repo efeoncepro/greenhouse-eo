@@ -112,7 +112,7 @@ System de Globe.
 | 2 | Preservar la copia verbatim de 151 KB como **baseline de diff**, fuera del código | ✅ commit `5edd2a3` + capturas |
 | 3 | Instalar Tailwind v4 en `apps/studio-client` con `tokens.ts` como theme | ✅ `804b7d7` |
 | 4 | **Reescribir los tres gates** — precondición, no follow-up | ✅ `804b7d7` + `91432ed` |
-| 5 | Migrar por superficie con diff visual: composer → feed → viewer → share | ⛔ **no empezado** — el composer sigue bloqueado por `TASK-1555` |
+| 5 | Migrar por superficie con diff visual: composer → feed → viewer → share | ✅ payload React migrado; las hojas de superficie e infraestructura quedaron retiradas o vacías |
 
 La referencia de valores para la migración es
 [`GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md`](../../ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md).
@@ -121,9 +121,34 @@ La referencia de valores para la migración es
 
 ## Delta 2026-07-27 — implementación de los pasos 1-4, y lo que la implementación corrigió del ADR
 
-> ⚠️ **Estado honesto: el MOTOR está listo; ninguna SUPERFICIE está migrada.** El composer sigue
-> renderizando con `producerStyles` inyectada por `app.ts:2252`, exactamente como antes. Cero utilidades de
-> Tailwind en `ProducerComposer.tsx`. Las únicas seis que existen en el CSS compilado son la sonda del seam.
+> **Estado honesto actualizado:** el payload React está migrado al pipeline Tailwind. Las superficies
+> composer, shell Producer, diálogos, feed, viewer y share board no importan hojas CSS propias; la base,
+> motion y primitives quedaron absorbidas por `tailwind.css`/`@utility`. `producerStyles` sólo permanece en
+> el renderer vanilla de fallback, cuya retirada sigue siendo el gate separado de `TASK-1560`.
+
+### Estado verificable de la frontera legacy
+
+La ruta React se selecciona sólo cuando `GLOBE_CLIENT_APP_ENABLED=true`,
+`GLOBE_CLIENT_PRODUCER_ENABLED=true` y existe el bundle cliente. Esa rama sirve el bundle y los iconos
+Tabler, pero no la hoja monolítica de `producer-ui.ts`. Si alguno de esos requisitos no se cumple, `/producer`
+responde con el renderer vanilla y su `producerStyles` inline; ese fallback sigue siendo deliberado hasta
+que `TASK-1560` y las superficies pendientes alcancen paridad y sus gates de retiro.
+
+La frontera no es una convivencia dentro de la misma superficie: React Producer no depende de la hoja legacy.
+La convivencia actual es entre superficies distintas del payload y entre el payload React y su fallback de
+seguridad.
+
+### Evidencia de la migración en curso
+
+- Gates Tailwind: color, motion, tipografía, espaciado/medidas y theme generado desde `tokens.ts`.
+- Browser canary de Producer: 1440, 390 y 320 px, incluyendo `prefers-reduced-motion`, sin overflow y con
+  la cascada legacy ejercitada en el seam.
+- Capturas: `efeonce-globe/.captures/producer-final-qa-2026-07-22/`,
+  `efeonce-globe/.captures/task-1552-composer-final-visual/` y
+  `efeonce-globe/.captures/producer-illumination-browser-2026-07-22/`.
+
+La migración del payload React queda integrada. El retiro global del renderer vanilla sigue bloqueado hasta
+que `TASK-1560` retire `producerStyles` con paridad, captura visual equivalente y gates verdes para cada corte.
 
 ### 🔴 El idiom de alias de la documentación NO funciona acá — medido, no supuesto
 

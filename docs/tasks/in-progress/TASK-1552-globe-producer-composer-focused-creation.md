@@ -6,7 +6,7 @@
 >
 > 1. **[`docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md`](../../ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md)** — todos los valores, medidos. Escrito para **traducir, no interpretar**. Empieza acá.
 > 2. **[ADR-016](../../architecture/creative-studio/EFEONCE_GLOBE_CLIENT_STYLING_ENGINE_DECISION_V1.md)** — el payload cliente usa **Tailwind v4**. El **Slice 0 de esta task está RETIRADO**.
-> 3. ✅ **DESBLOQUEADA (2026-07-27). Slice 1 se puede tomar.** `TASK-1555` cerró (su región `producer-model-*` queda como baseline congelado: se decide dónde vive, no cómo se ve) y **el slice de Tailwind de `TASK-1485` YA ESTÁ** (2026-07-27, commits `804b7d7` + `91432ed`): motor instalado, theme generado desde el SSOT y los gates reescritos y verificados. Ver el Delta al pie.
+> 3. ✅ **Desbloqueada. Slice 1 y Slice 2 están implementados; Slice 3 sigue abierto.** `TASK-1555` cerró (su región `producer-model-*` queda como baseline congelado: se decide dónde vive, no cómo se ve) y **el slice de Tailwind de `TASK-1485` YA ESTÁ** (2026-07-27, commits `804b7d7` + `91432ed`): motor instalado, theme generado desde el SSOT y los gates reescritos y verificados. El payload React completo quedó integrado en Tailwind el 2026-07-28; ver el estado vigente más abajo y el Delta al pie.
 > 4. En `efeonce-globe`, la rama `task/TASK-1552-slice0-internalizar-css` commit **`5edd2a3`** es **WIP congelado**: su mensaje dice qué conservar y qué revertir. **No lo tomes como entrega.** Ya fue limpiado en `804b7d7`; el commit se conserva sólo como referencia histórica de la copia de 151 KB.
 >
 > ⚠️ **No confíes en un `Status real` sin verificar el runtime.** Hoy pasó: `TASK-1555` declaraba `Diseño` con el código ya escrito, y eso desvió una sesión entera.
@@ -35,6 +35,41 @@
 - Branch: `task/TASK-1552-globe-producer-composer-focused-creation`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+> **Nota de lectura del status:** el campo `Status real` extenso conserva el registro histórico de los slices.
+> El estado vigente a 2026-07-28 es el de la sección siguiente: el payload React completo está en el
+> pipeline Tailwind; el fallback vanilla sigue delimitado por `producerStyles` y `TASK-1560`.
+
+## Estado documental actualizado 2026-07-28 — frontera Tailwind y fallback vanilla
+
+El payload React completo —composer, shell Producer, diálogos, feed, viewer, share board, primitives e
+infraestructura— está migrado al pipeline Tailwind. No quedan imports de hojas CSS de superficie; `base.css`
+y `motion.css` son bridges sin reglas propias y los estilos de componentes viven en `tailwind.css`.
+
+El fallback vanilla sigue siendo válido y explícito: `/producer` usa `producer-ui.ts` y `producerStyles` cuando
+la aplicación cliente o el bundle no están habilitados. La retirada de esa frontera pertenece a `TASK-1560` y
+requiere paridad, diff visual y gates verdes por superficie. Evidencia actual: canary browser a 1440/390/320,
+reduced motion y capturas bajo `.captures/task-1552-composer-final-visual/` y
+`.captures/producer-illumination-browser-2026-07-22/` en `efeonce-globe`.
+
+## Delta 2026-07-28 — cierre técnico del flujo integrado en el runtime hermano
+
+La implementación se ejecutó únicamente en `../efeonce-globe`, no en `greenhouse-eo`. El runtime queda
+con la superficie del composer en Tailwind v4 y el siguiente alcance verificado:
+
+- `ProducerComposer` conserva una sola clave de idempotencia para toda la secuencia `prepare → execute`.
+- Video expone proporción además de resolución y duración; audio no expone controles visuales de cámara.
+- El canary browser ahora cubre prompt → estimate vigente → stale inmediato → cambio de modalidad →
+  `prepare/execute`, doble evento sin duplicación y clave compartida.
+- El dock mantiene herramientas bloqueadas alcanzables por teclado con `aria-disabled`, razón audible y
+  `data-opening` explícito para distinguir `popover` y `panel`.
+- Evidencia local: `pnpm --filter @efeonce-globe/studio-client test` verde (118 tests), build/lint verdes,
+  Tailwind engine canary verde y composer browser canary verde en 1440×1000, 390×844 y 320×844, incluido
+  `prefers-reduced-motion: reduce`.
+
+Estado honesto: **Slice 3 sigue abierto**. El flujo de gasto y sus gates principales están cubiertos en el
+fixture; todavía falta cerrar estados de error/cancelación con evidencia browser, revisión humana premium y
+la integración operativa live/internal-only. No mover la task a `complete` ni declarar rollout cerrado.
 
 ## Delta 2026-07-27 — ejecución Codex sobre el trabajo existente
 
@@ -1022,6 +1057,64 @@ Detalle completo en el Delta de [ADR-016](../../architecture/creative-studio/EFE
 título→contenido) **no cae en la escala de 4 px de Tailwind**, y el gate rechaza `gap-[1.875rem]`. Hay que
 decidir explícitamente: ajustar a `gap-8` (32 px) o subir el ritmo al SSOT como token. **No se puede postergar
 en silencio** — que es exactamente para lo que se agregó ese cuarto gate.
+
+## Delta 2026-07-28 (2) — revisión visual: 4 defectos reales, 4 falsos negativos, y un gate que contaba mal
+
+Revisión del composer implementado contra `GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1`, medida en browser.
+Commits en `efeonce-globe`: `e3a3ca1` + `8ed37b7`.
+
+### 🔴 El gate contaba encabezados PRESENTES, no VISIBLES
+
+```js
+blockHeadings: document.querySelectorAll('[data-pc-block] > header').length
+```
+
+Con `hideTitle` el `<header>` existe igual — sólo lleva `sr-only`. **El gate contaba 4 y la pantalla mostraba
+0.** Es el mismo patrón del drift guard que medía 12 de 38 capabilities: *el gate mide lo que su autor eligió
+medir, no la realidad.* Corregido con `offsetParent` + altura, más un aserto que exige los **cuatro nombres
+literales** del contrato. **Verificado que muerde:** reintroducido el defecto → `faltan: ¿En qué formato sale?`,
+exit 1.
+
+### Los 4 defectos reales
+
+1. **`hideTitle` en tres bloques** mandaba sus encabezados a `sr-only`; el icono tenía `sr-only` fijo. Los
+   cuatro títulos existían en el copy y ninguno se veía.
+2. **El bloque de salida apuntaba a `copy.output`** (`Formato de salida`) mientras `copy.blockOutput`
+   (`¿En qué formato sale?`) existía sin usarse.
+3. **`blockSource` decía `Referencias`** en vez de `¿De qué partes?`.
+4. **El dock eran iconos mudos** — el nombre sólo en `aria-label`/`title`, que en touch no existe.
+
+### El h1 estaba mal desde antes, y el flag lo tapaba
+
+Al hacer visible el bloque 1 apareció `¿Qué quieres crear?` **dos veces**: el `<h1>` usaba `copy.blockIntent`.
+El `hideTitle` no era la causa — era el parche que escondía el síntoma. El h1 pasa a nombrar la **superficie**
+(`headingImage/Video/Audio`) y el bloque conserva su pregunta. Retirado también el chip de modalidad del
+composer: anti-patrón explícito del contrato (*doble selector de modalidad*).
+
+### Formato por intención — decisión previa conservada, no revertida
+
+El chip mostraba el valor crudo por decisión deliberada, argumentando que *«16:9 se lee directo»*. El argumento
+es válido y **se conserva**: ahora muestra **uso arriba y medida abajo**, no uno en lugar del otro. Un ratio sin
+uso conocido cae al valor crudo — el catálogo manda.
+
+### ⚠️ 4 falsos negativos de la auditoría — la lección vale más que las correcciones
+
+| Reporté como faltante | Realidad |
+|---|---|
+| Cantidad | **existía**, derivada de `count.min/max` — busqué «Cuántas» y el copy dice «Cantidad» |
+| Metadata del modelo | **existía** (`modelGuidance`: cost · speed · bestFor) — **el fixture del canary no trae el dato** |
+| Pin de referencias | **existía** — lo busqué por clase y está por `aria-label` |
+| Ritmo irregular (12 px) | **estaba bien: 32 px** — medí entre `<section>` internos, no entre bloques |
+
+**«No se ve» no es «no está».** Un fixture incompleto hace que una superficie correcta parezca a medias, y un
+selector mal apuntado inventa defectos. Ambos producen auditorías que suenan seguras y son falsas.
+
+### Asertos agregados al canary (163 OK, 0 FAIL)
+
+- encabezados de bloque **visibles**, no sólo presentes
+- los **cuatro nombres literales** del contrato
+- el título de la superficie **no repite** el de ningún bloque
+- la modalidad **no se repite** dentro del composer
 
 ## Summary
 
