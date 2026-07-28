@@ -73,8 +73,30 @@ mención y sus candidatos ganan punto de estado, y `aria-disabled` acompaña a `
 No se portan el tooltip por `data-gate-reason` ni la animación por `data-capability-state`: **ningún
 callsite emite esos atributos** (medido 0 y 0) — promesas muertas.
 
-**Siguiente:** convertir `prompt-field` (25 reglas, y el glow vive ahí), riel, selector, referencias,
-seed y shape.
+### Slices 1i/1j — el bloque 1 queda entero en Tailwind (`7ebcdda`, `5310d23`)
+
+Campo de prompt con su glow, acciones, sugerencias y prompt negativo. Los tres compuestos del glow se
+tokenizaron **enteros** (`--glow-rest|hover|focus`): el efecto es el anillo más el halo juntos, y
+separarlos permitiría combinar el anillo de foco con el halo de hover, que no es un estado que exista.
+`--duration-field` (220 ms) es token nuevo. `motion-reduce:transition-none` es **nuevo**: el original no
+declaraba el corte, y el estado encendido **se conserva** — es información de foco.
+
+**🔴 Dos trampas de medición, las dos hacían parecer roto código que estaba bien.** Quedan escritas
+dentro del canary: (1) **no truncar el `boxShadow`** — Tailwind lo compone en cinco capas y las cuatro
+primeras están vacías e idénticas en todo estado, así que comparar los primeros N caracteres da «no
+cambia» siempre; (2) **no medir en `t=0`** — la transición dura 220 ms y `getComputedStyle` justo
+después de `focus()` devuelve el valor de partida. **Tercera vez en esta task que la medición estaba
+rota y el runtime no.**
+
+El canary gana por fin el **aserto del glow** que el `STYLE_REFERENCE` §9 pedía desde el principio, con
+su variante bajo reduced-motion (transición `0s`, estado conservado).
+
+El gate empujó al idiom correcto dos veces: `grid-cols-[minmax(0,1fr)]` → **`grid-cols-1`, que en
+Tailwind ES exactamente eso**, y `transition-[…]` → `transition-all`.
+
+**Siguiente:** `prompt-overlay` + `enhancement-proposal` **juntos** (comparten gradiente, sombra y la
+animación `overlay-rise`, que necesita su token y su corte de reduced-motion), luego referencias,
+preset, seed, selector de modelo, shape y riel.
 
 ## 2026-07-27 — TASK-1552 Slices 1a y 1c: **el CTA volvió al fold**
 

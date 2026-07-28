@@ -28,7 +28,7 @@
 - Motion: `docs/ui/motion/TASK-1552-globe-producer-composer-focused-creation-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `SLICE 1 EN CURSO — LOS CINCO BLOQUES EXISTEN, LA CONVERSION A TAILWIND VA POR TRES REGIONES (2026-07-27, commits 5b7cb3f + 512dcbc + a37d105). Cada bloque declara su pregunta creativa con su icono; Modo subio al bloque 1; el cajon de sastre no existe y el canary ahora afirma su ausencia en vez de un KNOWN sobre un elemento borrado. Convertidas a Tailwind: cabecera, modality-pill y fila de Modo, verificadas por VALOR COMPUTADO en browser. El SSOT gano 5 tokens (--text-micro, --text-meta, --text-lg, --accent-ink-bright, --field/--white) por decision del operador de tokenizar en vez de normalizar. HALLAZGO: el peso 700 no tenia utilidad alcanzable (font-display lo tomaba la familia) con el build en verde — corregido en el generador + guardrail que lanza. Slice 1h: los 8 `capability-button` pasan a un COMPONENTE local (CapabilityButton.tsx) con API de tipo discriminado — `blocked` siempre trae razon. HALLAZGO: el orden dentro del className NO decide nada; con `rounded-sm` en base y `rounded-full` en la variante, el boton circular rindio 9,28px con build y typecheck verdes. Regla: una propiedad se declara en UNA sola capa. PENDIENTE: convertir prompt-field, riel, selector, referencias, seed y shape. Historico: TAILWIND LISTO, SUPERFICIE NO MIGRADA (2026-07-27): el motor de ADR-016 quedo instalado, gateado y verificado en efeonce-globe (804b7d7 + 91432ed) — theme generado desde el SSOT, 4 gates que muerden en className, canary de motor sobre valores computados. NINGUNA superficie migrada: el composer sigue con producerStyles y cero utilidades Tailwind. Unico bloqueo restante: cerrar TASK-1555. Baseline de diff capturado a 1440/390/320 CON la hoja del legacy. Historico: ADR-016 CAMBIO EL PLAN (2026-07-27): Slice 0 RETIRADO — el payload cliente migra a Tailwind v4 y una superficie reescrita no depende de la hoja legacy. BLOQUEADA por el slice de Tailwind en TASK-1485 y por cerrar TASK-1555. Diseno COMPLETO y documentado en docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md (leer PRIMERO). Rama efeonce-globe task/TASK-1552-slice0-internalizar-css commit 5edd2a3 = WIP congelado con partes a revertir, ver su mensaje`
+- Status real: `SLICE 1 EN CURSO — LOS CINCO BLOQUES EXISTEN, LA CONVERSION A TAILWIND VA POR TRES REGIONES (2026-07-27, commits 5b7cb3f + 512dcbc + a37d105). Cada bloque declara su pregunta creativa con su icono; Modo subio al bloque 1; el cajon de sastre no existe y el canary ahora afirma su ausencia en vez de un KNOWN sobre un elemento borrado. Convertidas a Tailwind: cabecera, modality-pill y fila de Modo, verificadas por VALOR COMPUTADO en browser. El SSOT gano 5 tokens (--text-micro, --text-meta, --text-lg, --accent-ink-bright, --field/--white) por decision del operador de tokenizar en vez de normalizar. HALLAZGO: el peso 700 no tenia utilidad alcanzable (font-display lo tomaba la familia) con el build en verde — corregido en el generador + guardrail que lanza. Slice 1h: los 8 `capability-button` pasan a un COMPONENTE local (CapabilityButton.tsx) con API de tipo discriminado — `blocked` siempre trae razon. HALLAZGO: el orden dentro del className NO decide nada; con `rounded-sm` en base y `rounded-full` en la variante, el boton circular rindio 9,28px con build y typecheck verdes. Regla: una propiedad se declara en UNA sola capa. Slices 1i/1j: el BLOQUE 1 queda entero en Tailwind (campo de prompt con su glow tokenizado, acciones, sugerencias, negativo) y el canary gana el aserto del glow que el STYLE_REFERENCE §9 pedia y no existia. PENDIENTE: los dos overlays (van juntos), referencias, preset, seed, selector, shape y riel. Historico: TAILWIND LISTO, SUPERFICIE NO MIGRADA (2026-07-27): el motor de ADR-016 quedo instalado, gateado y verificado en efeonce-globe (804b7d7 + 91432ed) — theme generado desde el SSOT, 4 gates que muerden en className, canary de motor sobre valores computados. NINGUNA superficie migrada: el composer sigue con producerStyles y cero utilidades Tailwind. Unico bloqueo restante: cerrar TASK-1555. Baseline de diff capturado a 1440/390/320 CON la hoja del legacy. Historico: ADR-016 CAMBIO EL PLAN (2026-07-27): Slice 0 RETIRADO — el payload cliente migra a Tailwind v4 y una superficie reescrita no depende de la hoja legacy. BLOQUEADA por el slice de Tailwind en TASK-1485 y por cerrar TASK-1555. Diseno COMPLETO y documentado en docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md (leer PRIMERO). Rama efeonce-globe task/TASK-1552-slice0-internalizar-css commit 5edd2a3 = WIP congelado con partes a revertir, ver su mensaje`
 - Rank: `TBD`
 - Domain: `creative|ui|product`
 - Blocked by: `none`
@@ -466,6 +466,66 @@ Se midió altura, `scrollWidth` y visibilidad del CTA — **y todo daba verde mi
 métrica que faltaba es la de **contención**: para cada descendiente, comprobar que su rect esté dentro del rect
 de su contenedor (arriba, abajo y a los lados). Sin eso, un `overflow: visible` deja hijos fuera sin que ninguna
 métrica de página lo note. **Agregar esa aserción al canary de la superficie.**
+
+## Delta 2026-07-27 (10) — Slices 1i/1j: el campo de prompt con su glow, y el guardrail que faltaba
+
+Ejecutados en `efeonce-globe` `7ebcdda` (1i) y `5310d23` (1j). **El bloque 1 queda entero en Tailwind.**
+
+### El glow, verificado por valor computado
+
+Es la región cuya regresión **ya ocurrió**: al renombrar clases a `pc-*` el prompt perdió su glow y lo
+detectó el operador. Los tres compuestos se tokenizaron **enteros** (`--glow-rest|hover|focus`), no capa
+por capa — el efecto es el anillo más el halo juntos, y separarlos permitiría combinar el anillo de foco
+con el halo de hover, que no es un estado que exista.
+
+`--duration-field` (220 ms) es token nuevo: no estaba en la escala, y a 160 ms lee como parpadeo.
+⚠️ `motion-reduce:transition-none` es **nuevo** — el original no declaraba el corte. El estado encendido
+**se conserva**; sólo se apaga la interpolación.
+
+### 🔴 Dos trampas de medición — las dos hacían parecer roto código que estaba bien
+
+Quedan documentadas dentro del canary porque son reproducibles y caras:
+
+1. **No truncar el `boxShadow`.** Tailwind lo compone en cinco capas y las cuatro primeras
+   (`inset-shadow`, `inset-ring`, `ring-offset`, `ring`) están vacías e **idénticas en todo estado**.
+   Comparar los primeros N caracteres da «no cambia» siempre. Concluí que el glow no encendía; encendía.
+2. **No medir en `t=0`.** La transición dura 220 ms y `getComputedStyle` justo después de `focus()`
+   devuelve el valor de **partida**. Concluí que `focus-within:bg-*` no aplicaba; a los 400 ms el valor
+   era el correcto.
+
+Es la tercera vez en esta task que **la medición estaba rota y el runtime no** (antes: el canary sin la
+hoja legacy, y el panel de browser sin la acción nativa del `<summary>`).
+
+### El aserto del glow ahora existe
+
+El `STYLE_REFERENCE` §9 lo pedía desde el principio y no estaba. El canary mide en los tres anchos que
+box-shadow, borde y superficie cambian al enfocar, y que bajo reduced-motion la transición es `0s` con
+el estado conservado.
+
+### El gate empujó al idiom correcto, dos veces
+
+`grid-cols-[minmax(0,1fr)]` —copiado literal de la hoja— fue rechazado como arbitrario. El reemplazo no
+es un workaround: **`grid-cols-1` en Tailwind ES `repeat(1,minmax(0,1fr))`**. Lo mismo con
+`transition-[border-color,box-shadow,background-color]` → `transition-all`.
+
+### Tres correcciones que no son pérdidas
+
+- El `<small>` del negativo pasa de peso 500 a 400: el SSOT sólo carga 400/600/700 y **advierte que
+  pedir un peso ausente hace que el navegador lo sintetice y emborrone las letras** — y eso pasaba
+  todos los gates.
+- El input del negativo toma la superficie del textarea. En la hoja no recibía **ninguna** regla:
+  `.control-group input` no alcanza ahí porque el negativo no vive en un `control-group`, así que
+  quedaba con el estilo del navegador dentro del lienzo.
+- Las sugerencias envuelven en vez de scrollear: la hoja tenía las dos reglas y gana la última, que
+  además es la correcta — un carrusel esconde opciones sin decir que existen, y son cuatro.
+
+### Estado de la conversión
+
+**Convertido:** cabecera · pill de modalidad · Modo · campo de prompt · acciones del prompt ·
+sugerencias · prompt negativo · los ocho controles gateados.
+**Pendiente:** `prompt-overlay` + `enhancement-proposal` (**van juntos**: comparten gradiente, sombra y
+la animación `overlay-rise`, que necesita su token y su corte de reduced-motion) · referencias ·
+`preset-chip-rail` · seed · selector de modelo · `shape-*` · riel de estimado.
 
 ## Delta 2026-07-27 (9) — Slice 1h: el control gateado es un componente, y el orden del `className` no decide nada
 
