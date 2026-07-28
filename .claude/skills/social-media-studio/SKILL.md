@@ -128,6 +128,15 @@ herramientas conectadas (detalle en `efeonce/STUDIO_TOOLING.md`):
     para un cliente Globe** (as-a-service). **NUNCA** hardcodees un HEX de marca en una plantilla.
   - Frontera con **Media Foundry**: Foundry **genera** el pixel (IA); el Composer **compone** el frame. Un
     carrusel puede usar los dos. **NO** se fusionan.
+
+### Reportes y evidencia de producto
+
+Para posts visuales de reportes, dashboards o Brand Visibility, cargar el contrato canónico
+[`GREENHOUSE_SOCIAL_VISUAL_REPORT_PRODUCTION_V1.md`](../../../docs/operations/GREENHOUSE_SOCIAL_VISUAL_REPORT_PRODUCTION_V1.md).
+El patrón por defecto es **proof-first**: un score/hallazgo domina, el reporte se recorta como material editorial
+y no vive dentro de una tarjeta o marco azul. El formato 1080 × 1350 se recompone de forma nativa; no se reduce un
+slide horizontal completo. Verificar thumbnail, logo único, ausencia de clipping y legibilidad antes de proponer
+publicación.
 - **Programar y medir**: **Metricool** MCP (`getBestTimeToPostByNetwork`,
   `createScheduledPost`, `getAnalyticsDataByMetrics`, `getBrandSettings`).
 - **Publicar y HubSpot**: atribución/lead capture social → `growth-marketing-cro` +

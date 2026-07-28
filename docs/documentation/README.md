@@ -14,6 +14,11 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ## Indice por dominio
 
+### Social y Creative Studio
+
+- [Producción visual social para reportes](social/visual-report-social-production.md) — contrato funcional para
+  convertir reportes reales en posts de Instagram legibles, trazables y reutilizables.
+
 ### Identidad y acceso
 
 - [Identity, Access y Admin Center end-to-end](identity/identity-access-admin-center-end-to-end.md) — como Greenhouse resuelve identidad, sesion, roles, vistas, entitlements, permission sets, SCIM y troubleshooting de acceso sin convertir Admin Center en un bypass manual.

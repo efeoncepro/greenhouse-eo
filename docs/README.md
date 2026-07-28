@@ -98,6 +98,7 @@ Indice maestro de la documentacion no operativa del repo.
 - [Greenhouse Visual Capture](documentation/plataforma/captura-visual.md)
 - [Sistema de Observabilidad de Tests](documentation/plataforma/sistema-observabilidad-de-tests.md)
 - [Sister Platform Bindings](documentation/plataforma/sister-platform-bindings.md)
+- [Producción visual social para reportes](documentation/social/visual-report-social-production.md)
 
 ### Manual de uso
 
@@ -105,6 +106,7 @@ Indice maestro de la documentacion no operativa del repo.
 - [Greenhouse Visual Capture](manual-de-uso/plataforma/captura-visual-playwright.md)
 - [Sugerencias asistidas de conciliacion](manual-de-uso/finance/sugerencias-asistidas-conciliacion.md)
 - [Finance Movement Feed](documentation/finance/finance-movement-feed.md)
+- [Manual: producir un post visual de reporte](manual-de-uso/social/visual-report-social-production.md)
 
 ### API
 

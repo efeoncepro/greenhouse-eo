@@ -10,6 +10,11 @@ La diferencia con otras capas de documentacion:
 
 ## Indice por categoria
 
+### Social y Creative Studio
+
+- [Manual: producir un post visual de reporte](social/visual-report-social-production.md) — brief, dirección,
+  crop, logo, QA y gates contra capturas ilegibles o composiciones genéricas.
+
 ### Comercial
 
 - [Catálogo HubSpot as a Service](../services/hubspot-as-a-service/README.md) — alcance y frontera de los dos servicios operables que este manual soporta.
