@@ -35,6 +35,13 @@
 - Se fijó la regla transversal: el valor debe ganarse por `capacidad + memoria`, nunca por dependencia u opacidad.
 - Se conectó cada dolor del operador con la promesa de dejar al cliente más capaz y mejorar cada ciclo.
 
+## 2026-07-28 — Content-to-Capability Loop y learn moments
+
+- Se creó `EFEONCE_CONTENT_TO_CAPABILITY_LOOP_V1.md` para conectar Glitch, blog, YouTube, microcapacitaciones,
+  Product Services y Greenhouse como un sistema de aprendizaje y autoridad.
+- Se definió el `Learn Moment Contract` para convertir contenido en aprendizaje contextual, acción, evidencia y
+  memoria dentro de los productos.
+
 ## 2026-07-27 — Globe: motor de estilos en Tailwind v4 y cierre de `TASK-1555`
 
 - **ADR-016 implementado (pasos 1-4).** `apps/studio-client` adopta Tailwind v4 con el SSOT de tokens como

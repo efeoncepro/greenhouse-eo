@@ -8,6 +8,10 @@ Esta arquitectura es también el mecanismo de marca: las superficies verticales 
 Greenhouse conserva memoria y evidencia para que el cliente entienda, decida y mejore cada ciclo. La integración no
 debe producir dependencia opaca; debe producir capacidad acumulada.
 
+El aprendizaje público y privado forma parte del mismo ecosistema: Glitch opera el discovery editorial, el blog y
+YouTube explican y demuestran, y los Product Services convierten el criterio en learn moments dentro del workflow.
+Ver [`Efeonce Content-to-Capability Loop V1`](../strategy/EFEONCE_CONTENT_TO_CAPABILITY_LOOP_V1.md).
+
 Efeonce tiene cinco plataformas/product houses de software propietario, en distinta madurez:
 
 > **Nota de portfolio:** Wave es la product house de la capa de producto de sus Product Services digitales. Sus cinco familias base pueden componerse en Product Services como **Experience LaunchOps** y **Agentic Readiness**. Puede nombrarse como producto frente al cliente, siempre bajo la relación Efeonce. Su modelo, boundaries y separación administrativa con Greenhouse viven en [`Wave Business Model V1`](../business-models/wave/WAVE_BUSINESS_MODEL_V1.md) y el [ADR de Wave Product Platform](../architecture/EFEONCE_WAVE_PRODUCT_PLATFORM_GREENHOUSE_ADMINISTRATION_DECISION_V1.md).

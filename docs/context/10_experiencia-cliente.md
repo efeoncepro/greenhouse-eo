@@ -82,6 +82,8 @@ Cuatro momentos del journey **son features de Greenhouse**, no actividades offli
 4. **Protocolo de transparencia con datos** — en momentos de tensión, el portal muestra Stuck Assets / Cycle Time / OTD% caído. La feature convierte una conversación incómoda en una basada en hechos.
 5. **Ecosystem Learning Layer** — la experiencia educativa del cliente no vive solo en llamadas. Blog, Think tools, YouTube, sociales, ebooks, webinars y futuro podcast deben poder alimentar onboarding, expansión y madurez del cliente. El producto no reemplaza esos canales; los conecta con el Account 360 cuando exista señal útil.
 
+El contrato de esa conexión vive en [`Efeonce Content-to-Capability Loop V1`](../strategy/EFEONCE_CONTENT_TO_CAPABILITY_LOOP_V1.md): el aprendizaje público se convierte en microcapacitación, learn moment, workflow guiado y memoria privada, según el contexto y los permisos del cliente.
+
 ### Primer wrapper vivo: SKY primer año
 
 El primer precedente real de esta categoría es el **Efeonce Wrapper SKY primer año** (`https://experiencia.efeoncepro.com`, repo satélite `efeoncepro/sky-efeonce`, documentado en `sky-efeonce/docs/experiencia/`). Fue creado manualmente para SKY en 2026-07-13 como una experiencia anual cliente-facing: video, momentos, dossier y narrativa de recorrido.

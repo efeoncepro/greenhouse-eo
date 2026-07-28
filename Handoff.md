@@ -45,6 +45,10 @@ Se propagó la conexión con el Why de Efeonce: el contrato operator-first y el 
 las capacidades deben dejar al cliente más capaz, preservar memoria y mejorar cada ciclo. Se añadió la regla de
 evaluación `capacidad + memoria, no dependencia + opacidad` en marca, experiencia, negocio, customer model y skills.
 
+Se creó [`Efeonce Content-to-Capability Loop V1`](docs/strategy/EFEONCE_CONTENT_TO_CAPABILITY_LOOP_V1.md) para
+conectar Glitch, blog, YouTube, microcapacitaciones, Product Services y Greenhouse. Incluye el `Learn Moment
+Contract`: trigger, JTBD, pain, intervención, acción, límite humano, evidencia, memoria y siguiente paso.
+
 ## 2026-07-27 — TASK-1552: los cinco bloques existen, y convertir a Tailwind resultó ser **tokenizar**
 
 `efeonce-globe` `5b7cb3f` (1e) + `512dcbc` (1f) + `a37d105` (1g). **Slice 1 sigue abierto**: van tres

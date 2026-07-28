@@ -6,6 +6,10 @@
 > `operator-champions` y usa Greenhouse para traducir adopción operativa en assurance ejecutivo, renovación y
 > expansión. Ver [`Efeonce Operator-First Product & Growth Contract V1`](../strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md).
 
+El contenido participa en ese motion como `Content-to-Capability Loop`: Glitch detecta señales, blog construye
+autoridad canónica, YouTube demuestra el mecanismo, los servicios transfieren criterio y los productos convierten
+ese aprendizaje en capacidad. Canon: [`Efeonce Content-to-Capability Loop V1`](../strategy/EFEONCE_CONTENT_TO_CAPABILITY_LOOP_V1.md).
+
 ## Posicionamiento
 
 **Categoría de mercado:** *AI-enabled marketing and growth systems company.* En lenguaje comercial: **Integrated Growth Partner**. **ASaaS** describe el modelo de delivery y monetización; **Growth Operating System** describe la visión de largo plazo. No somos una "AI agency" ni un proveedor de servicios sueltos. Combinamos personas, product services, plataformas y agentes. "Agencia de marketing digital" se conserva como término de captura de demanda, no como categoría estratégica. La propuesta se construye sobre tres conceptos propietarios:

@@ -19,6 +19,10 @@ La voz de Efeonce no nace de adjetivos genéricos ("profesional y cercano") sino
 7. **La transparencia operativa no es un diferenciador, es un mínimo.** ← _Esta es la que Greenhouse encarna directamente._
 8. **El cliente no contrata entregables; entra a un ecosistema que lo vuelve más capaz.** La relación no termina en la pieza ni en el reporte: incluye operación, software, aprendizaje, contenido/tools, networking y memoria acumulada.
 
+La estrategia de contenido debe probar esa creencia: enseñar el mecanismo públicamente y transferirlo dentro del
+producto mediante learn moments contextuales. No crear contenido o microcopy educativo como decoración; cada pieza
+debe ayudar a entender, decidir, ejecutar o mejorar. Ver [`Efeonce Content-to-Capability Loop V1`](../strategy/EFEONCE_CONTENT_TO_CAPABILITY_LOOP_V1.md).
+
 ## Personalidad (constante, no cambia entre canales)
 
 1. **Arquitecto con las manos sucias** — piensa en sistemas, ejecuta en trinchera.

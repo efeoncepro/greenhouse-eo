@@ -13,6 +13,8 @@ argument-hint: "[etapa del content engine o pregunta concreta]"
 
 ## Cuándo invocar (y cuándo no)
 
+Para Efeonce, el contenido puede convertirse en capacidad de producto. Cargar `docs/strategy/EFEONCE_CONTENT_TO_CAPABILITY_LOOP_V1.md` cuando una pieza, workshop o learn moment deba pasar de autoridad editorial a aplicación contextual, evidencia y memoria.
+
 **Invocar** para: operacionalizar una estrategia editorial (pillars→clusters→calendario), diseñar/operar el pipeline de producción, atomizar una pieza pilar en N átomos, decidir formato y su anatomía, planificar distribución de una pieza, montar la medición contenido→pipeline, o gobernar un content engine (roles, cadencia, brand safety, IA sin slop).
 
 **No invocar** (delega): el *rol del contenido en el canal-mix / campaña integrada* → `digital-marketing`; *si convierte / loops / experimentos* → `growth-marketing-cro`; *el craft de las palabras* → `copywriting`; *táctica SEO/AEO técnica* → `seo-aeo`; *ejecución social por red* → `social-media-studio`; *publicar el contenido* → runtime (WordPress/Astro/email/forms).
