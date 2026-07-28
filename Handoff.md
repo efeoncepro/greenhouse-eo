@@ -41,6 +41,10 @@ service blueprint mínimo, recovery, métricas y señales para Greenhouse. La ev
 WFA, Gartner e IAB refuerza confianza, transparencia, procurement/coordinación y governance de IA como dolores
 estructurales; RESEARCH-010 debe validar frecuencia y severidad en Chile/LatAm.
 
+Se propagó la conexión con el Why de Efeonce: el contrato operator-first y el mapa de dolores ahora explicitan que
+las capacidades deben dejar al cliente más capaz, preservar memoria y mejorar cada ciclo. Se añadió la regla de
+evaluación `capacidad + memoria, no dependencia + opacidad` en marca, experiencia, negocio, customer model y skills.
+
 ## 2026-07-27 — TASK-1552: los cinco bloques existen, y convertir a Tailwind resultó ser **tokenizar**
 
 `efeonce-globe` `5b7cb3f` (1e) + `512dcbc` (1f) + `a37d105` (1g). **Slice 1 sigue abierto**: van tres

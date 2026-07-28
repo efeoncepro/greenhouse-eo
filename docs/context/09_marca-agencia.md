@@ -18,6 +18,11 @@ Los CMOs recuerdan espontáneamente 6–7 agencias por mercado (SCOPEN). Si no e
 
 El crecimiento no se entrega: se **co-construye**. No nace de los números ni del paquete de entregables —nace de *cómo trabajamos juntos*: con transparencia total, educándote en el proceso, y sumando cada ciclo sobre el anterior. Un cliente que crece con nosotros sale **más capaz, no más dependiente**.
 
+El contrato operator-first es la forma de hacer esta creencia observable en el trabajo cotidiano: los dolores del
+operador revelan dónde la agencia tradicional reduce capacidad; las Product Services deben devolver autonomía,
+criterio, memoria e influencia; Greenhouse debe conservar la evidencia de que cada ciclo dejó al cliente más capaz.
+El desarrollo detallado vive en [`Operator-First Product & Growth Contract`](../strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md) y el mapa de fallas en [`Operator Pain & Journey Failure Map`](../strategy/EFEONCE_OPERATOR_PAIN_AND_JOURNEY_FAILURE_MAP_V1.md).
+
 Es una creencia sobre la **naturaleza del crecimiento y de la sociedad con un cliente**, no una feature. Tres pilares, una sola creencia:
 
 1. **Co-creación, no entrega.** El cliente no "recibe entregables": **opera con nosotros, en vivo**. La experiencia de construir juntos es parte del producto, no un extra. → *Prueba (no promesa):* el login a su operación en tiempo real (`03`/`04`, transparencia de Greenhouse).

@@ -40,6 +40,10 @@ capability: context and memory, consistency and ownership, approvals, actionable
 coordination, governance/provenance and transfer of capability to the team. Do not treat the operator-champion as
 the solution to the pain; it is evidence that the capability reduced friction and can mobilize adoption.
 
+The business model must demonstrate the connection to the Why: the offer leaves the client more capable and preserves
+useful memory for the next cycle. Penalize models that capture value through opaque dependency, output without
+learning or metrics without decisions.
+
 For partner/provider portfolio decisions, load the canonical skill's `Portfolio de partners y providers` section:
 classify relationships as strategic core, creative capability, execution enabler or experiment, and require offer,
 owner, economics, contract, rights, support, fallback and demand evidence before increasing priority.

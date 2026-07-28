@@ -28,6 +28,13 @@
 - La investigación externa reciente refuerza confianza/transparencia, procurement/coordinación y governance de IA;
   la validación primaria en Chile/LatAm permanece pendiente.
 
+## 2026-07-28 — Operator-first como mecanismo del Why
+
+- Se documentó la relación entre el Why de Efeonce y el contrato operator-first en estrategia, marca, experiencia,
+  ecosistema, Greenhouse y skills.
+- Se fijó la regla transversal: el valor debe ganarse por `capacidad + memoria`, nunca por dependencia u opacidad.
+- Se conectó cada dolor del operador con la promesa de dejar al cliente más capaz y mejorar cada ciclo.
+
 ## 2026-07-27 — Globe: motor de estilos en Tailwind v4 y cierre de `TASK-1555`
 
 - **ADR-016 implementado (pasos 1-4).** `apps/studio-client` adopta Tailwind v4 con el SSOT de tokens como

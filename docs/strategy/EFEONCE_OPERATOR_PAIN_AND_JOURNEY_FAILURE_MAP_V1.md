@@ -30,6 +30,24 @@ dolor del operador
 El operator-champion no es la solución del dolor. Es una señal de que la capacidad redujo fricción, aumentó
 autonomía o fortaleció la influencia interna lo suficiente como para movilizar adopción.
 
+## 2A. El mapa como expresión del Why
+
+El Why de Efeonce es **no entregar crecimiento, sino construirlo con el cliente y dejarlo más capaz de sostenerlo**.
+Por eso este mapa no busca únicamente eliminar molestias: identifica dónde la relación agencia-cliente reduce la
+capacidad del operador y qué debe hacer Efeonce para devolverle autonomía, criterio, memoria e influencia.
+
+```text
+dolor de agencia
+  → el cliente pierde capacidad
+  → Efeonce elimina fricción y comparte criterio
+  → el operador gana autonomía e influencia
+  → Greenhouse conserva memoria y evidencia
+  → cada ciclo empieza más adelante
+```
+
+Una solución falla el Why si crea dependencia opaca, produce output sin aprendizaje, agrega reporting sin decisión
+o deja al operador más expuesto. La permanencia debe ganarse por capacidad y memoria acumulada.
+
 ## 3. Mapa por fase del lifecycle
 
 | Fase | Dolor principal | Failure moment visible | Causa backstage probable | Capacidad Efeonce a validar | Evidencia / métrica | Owner inicial |

@@ -35,6 +35,9 @@ operator does not itself resolve lost context, rework, approvals, weak reporting
 key-person dependency or multi-provider coordination. Record how each pain affects the operator, which capability
 reduces it, what evidence reaches the sponsor and what risk appears when the operator can adopt but cannot buy.
 
+The model must also test the Why: the offer increases client capability and leaves useful memory for the next cycle.
+Do not call opaque dependency that the client cannot explain, transfer or port “retention.”
+
 ## Resultado obligatorio
 
 Entregar un Customer Model Integrity Pack con: decisión y alcance, segmentos/beachhead, ICP/anti-ICP, JTBD y teoría

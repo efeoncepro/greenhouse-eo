@@ -47,6 +47,10 @@ Un *greenhouse* es un espacio de condiciones controladas para que algo crezca. A
 
 > **Esta experiencia ES el Why de Efeonce hecho vivencia.** "Ver todo, entender todo, mejorar cada ciclo" es exactamente la creencia central (*no te entregamos crecimiento, lo construimos contigo*): el crecimiento se **co-construye** (operas con nosotros en vivo, no recibes un reporte), se **educa** (entiendes, no solo recibes) y es **integral** (cada ciclo compone sobre el anterior). Cada mejora de experiencia en Greenhouse es una prueba del Why, no un adorno. SSOT del Why: `09_marca-agencia.md` → §El Golden Circle de Efeonce.
 
+El journey debe demostrar la promesa en la experiencia del operador: menos reconstrucción de contexto, menos
+persecución, mejores decisiones, más memoria y mayor capacidad de defender el trabajo. La satisfacción no basta si
+el cliente termina más dependiente o el operador queda más expuesto.
+
 ---
 
 ## El journey: 8 fases + 2 transversales, mapeadas a módulos

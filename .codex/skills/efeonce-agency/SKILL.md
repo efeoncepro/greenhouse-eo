@@ -9,6 +9,10 @@ description: Contexto de negocio, marca, GTM y modelo ASaaS de Efeonce Group (la
 
 > **Contrato operator-first:** la superficie operatoria vive en el Product Service o product brand; Greenhouse soporta la superficie ejecutiva, memoria, assurance y coordinación. La adopción esperada es `operador → operator-champion → sponsor/director → compra recurrente → evangelista`. Canon: [`Efeonce Operator-First Product & Growth Contract V1`](../../docs/strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md).
 
+El contrato operator-first es el mecanismo del Why en producto: convertir dolores de agencia en capacidad,
+autonomía, influencia y memoria acumulada. Evaluar cada solución contra la regla **capacidad + memoria, no
+dependencia + opacidad**.
+
 Esta skill es el **router + doctrina destilada** del context pack de negocio de Efeonce Group. Su trabajo: que cualquier agente (Claude o Codex) entienda *para qué existe Greenhouse en el negocio* antes de tocar producto, copy, métricas o estrategia, y sepa **qué archivo canónico leer** según la tarea.
 
 La capa de partnerships y providers es transversal al portfolio: Efeonce puede vender licencias cuando los términos lo

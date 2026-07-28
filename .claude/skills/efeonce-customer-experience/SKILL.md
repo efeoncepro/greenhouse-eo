@@ -38,6 +38,11 @@ operación + software + aprendizaje + red + memoria
 
 Greenhouse no reemplaza todas las superficies de la Experiencia Efeonce: las conecta, las hace visibles, medibles y acumulativas. La experiencia debe hacer al cliente más capaz y conservar memoria útil, no generar dependencia opaca.
 
+Esta doctrina es la expresión del Why en el journey: cada fase debe reducir un dolor de agencia y aumentar la
+capacidad del operador para entender, decidir, ejecutar o defender el trabajo. Una experiencia que solo mejora la
+satisfacción, agrega reporting o crea dependencia sin memoria contradice el Why. Usar `docs/strategy/EFEONCE_OPERATOR_PAIN_AND_JOURNEY_FAILURE_MAP_V1.md`
+para conectar dolor, failure moment, recovery, métrica y evidencia.
+
 El canon actual contiene ocho fases:
 
 ```text

@@ -33,6 +33,9 @@ no resuelve por sí mismo contexto perdido, retrabajo, aprobaciones, reporting d
 dependencia de personas o coordinación multi-provider. Registrar cómo cada dolor afecta al operador, qué capacidad
 lo reduce, qué evidencia llega al sponsor y qué riesgo aparece si el operador puede adoptar pero no comprar.
 
+El modelo también debe probar el Why: la oferta aumenta la capacidad del cliente y deja memoria útil para el siguiente
+ciclo. No llamar “retención” a una dependencia que el cliente no puede explicar, transferir o portar.
+
 No es una buyer-persona decorativa, un lead score ni un método de ventas único. `MEDDPICC`, `Challenger`, `JTBD`,
 `BANT` u otros métodos son lentes que se seleccionan por complejidad; ninguno sustituye el modelo de cliente.
 

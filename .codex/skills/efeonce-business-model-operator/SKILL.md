@@ -49,6 +49,10 @@ capacidad verificable: contexto y memoria, consistencia y ownership, aprobacione
 coordinación multi-provider, governance/provenance y transferencia de capacidad al equipo. No tratar al
 operator-champion como solución del dolor; es la señal de que la capacidad redujo fricción y puede movilizar adopción.
 
+El modelo de negocio debe demostrar la conexión con el Why: la oferta deja al cliente más capaz y conserva memoria
+útil para el siguiente ciclo. Penalizar modelos que capturan valor mediante dependencia opaca, entregables sin
+aprendizaje o métricas sin decisión.
+
 ## Autoridad y composición
 
 1. Leer `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `Handoff.md`, `docs/business-models/README.md` y

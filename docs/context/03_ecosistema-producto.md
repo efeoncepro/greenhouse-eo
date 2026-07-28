@@ -4,6 +4,10 @@
 
 > **Contrato operator-first:** la superficie operatoria vive en la product brand o Product Service (Wave, Reach, Globe y futuras capabilities); Greenhouse soporta la superficie ejecutiva, la memoria, el assurance y la coordinación. La adopción se espera primero en el operador-champion y se traduce después en sponsorship, compra recurrente y expansión. Canon: [`Efeonce Operator-First Product & Growth Contract V1`](../strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md).
 
+Esta arquitectura es también el mecanismo de marca: las superficies verticales aumentan capacidad en el workflow y
+Greenhouse conserva memoria y evidencia para que el cliente entienda, decida y mejore cada ciclo. La integración no
+debe producir dependencia opaca; debe producir capacidad acumulada.
+
 Efeonce tiene cinco plataformas/product houses de software propietario, en distinta madurez:
 
 > **Nota de portfolio:** Wave es la product house de la capa de producto de sus Product Services digitales. Sus cinco familias base pueden componerse en Product Services como **Experience LaunchOps** y **Agentic Readiness**. Puede nombrarse como producto frente al cliente, siempre bajo la relación Efeonce. Su modelo, boundaries y separación administrativa con Greenhouse viven en [`Wave Business Model V1`](../business-models/wave/WAVE_BUSINESS_MODEL_V1.md) y el [ADR de Wave Product Platform](../architecture/EFEONCE_WAVE_PRODUCT_PLATFORM_GREENHOUSE_ADMINISTRATION_DECISION_V1.md).

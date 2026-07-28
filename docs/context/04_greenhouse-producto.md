@@ -11,6 +11,10 @@ Globe y otras Product Services en memoria, evidencia, assurance, coordinación y
 las superficies operatorias verticales ni es condición para que una plataforma hermana opere. Ver [`Efeonce
 Operator-First Product & Growth Contract V1`](../strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md).
 
+Su relación con el Why es concreta: Greenhouse debe hacer visible que el cliente quedó más capaz, no solo que
+recibió más entregables. La memoria y la evidencia acumuladas son el mecanismo de “mejorar cada ciclo”; la plataforma
+no debe convertir el switching cost en dependencia opaca.
+
 Es **multi-tenant**: cada organización cliente tiene su workspace aislado (métricas, proyectos, equipo); el equipo interno de Efeonce tiene una vista consolidada (**Agency**) que cruza todas las cuentas.
 
 **Dos audiencias en una app:** el cliente (transparencia de su operación) y Efeonce (operación interna + gestión de cuentas). Toda feature debe ser clara sobre a cuál de las dos sirve y respetar el aislamiento entre tenants.

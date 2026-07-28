@@ -16,6 +16,20 @@ El contrato orienta producto, delivery, customer model y GTM. No declara product
 Customer Model Integrity Pack por oferta y no autoriza por sí sola schema, API, runtime, pricing, contratación,
 checkout ni expansión comercial.
 
+## 1A. Relación con el Why
+
+El contrato es la traducción operativa del Why de Efeonce: **no te entregamos crecimiento; lo construimos contigo
+y te dejamos más capaz de sostenerlo**. Los dolores de agencia describen dónde el cliente pierde capacidad: repite
+contexto, persigue aprobaciones, absorbe handoffs, recibe actividad sin decisión o queda expuesto sin evidencia.
+
+Operator-first convierte esos dolores en capacidades acumulativas para que el cliente pueda entender, decidir,
+ejecutar y mejorar mejor cada ciclo. El operador es el punto donde el Why se vuelve experiencia; Greenhouse conserva
+la memoria y evidencia que hacen visible esa mejora para la dirección.
+
+Regla de diseño: una solución contradice el Why si reduce trabajo a costa de dependencia opaca, entrega output sin
+memoria, muestra métricas sin ayudar a decidir o aumenta la exposición política del operador. El switching cost
+válido nace de **capacidad + memoria**, no de opacidad.
+
 ## 2. Contrato
 
 > **Efeonce construye productos y servicios operator-first: capacidades que aumentan la capacidad,
