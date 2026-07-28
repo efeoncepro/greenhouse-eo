@@ -8,6 +8,14 @@ type: gate
 
 This is a product-quality gate, not a token-only lint.
 
+## AXIS review pointer
+
+AXIS is Efeonce's portable foundation and Lab. Review the native adapter in the
+consumer—MUI for Greenhouse, Tailwind v4 for Globe—and require semantic tokens
+and `tokens.ts` instead of literal design values. Consult the shared UI ADR and
+`docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`. Keep runtime
+readiness pending while `TASK-1591` remains pending.
+
 Use after implementation and screenshots, before commit or approval.
 
 ## Gate Rubric

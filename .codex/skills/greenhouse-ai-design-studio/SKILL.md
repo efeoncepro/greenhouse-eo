@@ -14,6 +14,16 @@ Do not replace this orchestrator with a loose list of skills. It owns the order,
 artifacts, checkpoints and acceptance gate. Specialist skills are lanes inside
 this loop.
 
+## AXIS foundation pointer
+
+AXIS is Efeonce's portable product-UI foundation and Lab, not a second
+Greenhouse runtime. Use native adapters: MUI in Greenhouse and Tailwind v4 in
+Globe. Resolve visual values through semantic tokens and `tokens.ts`; never add
+literal design values. Consult
+`docs/architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md` and
+`docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`. Do not claim
+consumer runtime readiness while `TASK-1591` remains pending.
+
 ## Canonical sources
 
 Read before decisions:

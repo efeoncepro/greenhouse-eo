@@ -14,6 +14,14 @@ lanes to the locally available Claude skills, but do not change the order,
 artifacts, readiness fields, GVC premium requirements, score dimensions or
 thresholds.
 
+## AXIS foundation pointer
+
+AXIS is Efeonce's portable foundation and Lab. Keep adapters native to each
+consumer: MUI for Greenhouse and Tailwind v4 for Globe. Use semantic tokens and
+`tokens.ts`; never add literal design values. Consult the shared UI ADR and
+`docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`, and do not
+claim consumer runtime readiness while `TASK-1591` is pending.
+
 Materialization lanes (Claude namespace) — how the approved direction becomes
 code. They own craft only; they never re-declare the score gate, the Figma
 Implementation Contract or GVC:

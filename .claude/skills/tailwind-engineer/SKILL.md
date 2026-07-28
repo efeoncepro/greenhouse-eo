@@ -43,6 +43,14 @@ gobierna ese cutover y sus gates de paridad.
 (El mismo contenido existe en `~/.claude/skills/tailwind-engineer/`, núcleo user-scope no versionado.
 Dentro del repo prefiere el espejo: es el que está bajo control de versiones.)
 
+## AXIS foundation pointer
+
+AXIS is Efeonce's portable foundation and Lab. Globe's native adapter is
+Tailwind v4, with semantic tokens flowing through `tokens.ts`; do not add
+literal design values to `className`. Consult the shared UI ADR and
+`docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`, and do not
+claim consumer runtime readiness while `TASK-1591` is pending.
+
 ## Precedencia dentro de este repo
 
 1. `CLAUDE.md` (AXIS, tokens, Full API Parity, closure gates) — **siempre gana**.
