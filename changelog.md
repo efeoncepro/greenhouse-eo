@@ -21,7 +21,13 @@
 - `artifact-worker`, cuarto build unit que instala el `package.json` raíz, adoptó el mismo montaje BuildKit; el gate
   ahora exige AXIS auth en todas las etapas `pnpm install` de los cuatro workers.
 - Se concedió acceso Secret Manager sólo al service account de Cloud Build de Greenhouse. Validaciones locales de
-  contratos de workers y tests focales pasaron; rollout queda pendiente de PR y nuevo orchestrator.
+  contratos de workers, tests focales y los cuatro builds reales pasaron.
+- PR #166 promovió todo `develop` a `main` en `0b4bdd6acb401ef0b108e27f1a8f1d80c469a0ed`. El orquestador oficial
+  `30473069894` terminó verde sin bypass, dejó el manifest
+  `0b4bdd6acb40-2608542b-b1e5-4b3b-b24e-5036501dfef1` en `released`, verificó Vercel Production, Cloud Run y
+  `/api/auth/health`. Azure aplicó sus skips canónicos `no_infra_diff`.
+- El watchdog conserva un falso positivo conocido para `ops-worker`: su diff de rutas runtime desde el SHA
+  desplegado al target es vacío y el orquestador aplicó el change-gate, por lo que no corresponde redeploy label-only.
 
 ## 2026-07-29 — Globe: contrato tipográfico del payload cliente + jerarquía del Producer (TASK-1599)
 
