@@ -18,6 +18,8 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 - [Producción visual social para reportes](social/visual-report-social-production.md) — contrato funcional para
   convertir reportes reales en posts de Instagram legibles, trazables y reutilizables.
+- [Creator Influence & Content](media-distribution/creator-influence-content.md) — reglas funcionales para separar
+  influencer marketing, UGC, partnerships, whitelisting, derechos, aprobaciones y medición.
 
 ### Identidad y acceso
 

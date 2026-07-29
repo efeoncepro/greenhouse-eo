@@ -7,14 +7,39 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-## 2026-07-28 — Plataforma UI compartida Efeonce: foundation local
+## 2026-07-29 — TASK-1591: adapters AXIS opt-in verificados
+
+- AXIS publicó `0.1.4` con los contratos `efeonce.status` y `efeonce.progress` gobernados para Greenhouse y Globe.
+- Greenhouse fija los tres paquetes privados y expone adapters MUI/Vuexy; Globe fija los mismos paquetes y expone adapters Tailwind/token classes.
+- Se añadieron fixtures opt-in en `/design-system/axis-adapters` y `/_axis-pilot`, con evidencia desktop/mobile, teclado, reduced motion y sin overflow.
+- El rollout productivo permanece separado; el PAT operator-owned vence el 2026-08-27 y debe rotarse antes de uso externo durable.
+
+## 2026-07-29 — Creator Influence & Content: modelo operativo documentado
+
+- Se documentó el submodelo de Influencers, Creators & UGC dentro de Media & Distribution, con cinco ofertas:
+  Creator Intelligence, Influencer Activation, Creator Content & UGC, Creator Partnership Program y Amplification & Whitelisting.
+- Se añadieron ficha de servicio, arquitectura operativa no-runtime, documentación funcional y manual de operación,
+  separando audiencia, assets, derechos, pass-through, paid usage, RACI, gates y medición.
+- La skill social de Creator/UGC quedó enlazada al modelo canónico; el estado permanece `Approved for validation` y
+  no habilita pricing público ni venta general.
+
+## 2026-07-28 — Contrato de producción visual social para reportes
+
+- Se documentó el contrato técnico, funcional y operativo para producir posts de Instagram con reportes reales,
+  incluyendo el patrón proof-first/score dominante, crop nativo 4:5, logo único, composición determinística y gates
+  contra tarjetas azules, dashboards ilegibles, clipping y decoración genérica.
+- Se sincronizaron las skills Codex/Claude de `design-studio`, `social-media-studio` y
+  `greenhouse-ai-image-generator`.
+
+## 2026-07-28 — HISTÓRICO SUPERSEDIDO — Plataforma UI compartida Efeonce: foundation local
 
 - Se creó `EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1` para superseder parcialmente el modelo Globe-local y separar gobierno Greenhouse, packages portables, adapters por runtime y Lab independiente.
 - Se registraron `TASK-1588` y `TASK-1589…1592`.
 - Se inició `../axis-design-system` con tokens, contracts, registry y un Lab Vite navegable; build y tests pasan.
 - Se creó `efeoncepro/axis-design-system`, se desplegó `axis-design-system-lab.vercel.app` y se publicaron
   `@efeoncepro/axis-tokens`, `@efeoncepro/axis-ui-contracts` y `@efeoncepro/axis-ui-registry` en GitHub Packages como `0.1.2`.
-- Greenhouse/Globe todavía no importan los packages en runtime; la adopción queda en `TASK-1591`.
+- En ese corte Greenhouse/Globe todavía no importaban los packages en runtime; la adopción quedó
+  verificada como canary opt-in en `TASK-1591` el 2026-07-29.
 - Se completaron las precondiciones de distribución privada: permisos GitHub Packages para Greenhouse/Globe,
   `NPM_RC` del Lab en Vercel y secreto/IAM de lectura para Cloud Build en `efeonce-globe`. El runbook operativo
   queda en `docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`; el PAT operator-owned debe rotarse

@@ -11,6 +11,36 @@ Cárgalo cuando trabajes UGC, sourcing/selección de creadores, whitelisting, co
 derechos de uso o compensación por performance. Complementa 08 (social commerce, donde el
 creador convierte) y delega el asset visual concreto a los generadores.
 
+Para trabajo comercial de Efeonce, carga también el contrato canónico de [Creator Influence & Content](../../../../docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md), su [ficha de servicio](../../../../docs/services/media-distribution/CREATOR_INFLUENCE_CONTENT_SERVICE_V1.md) y el [manual de operación](../../../../docs/manual-de-uso/media-distribution/operar-creator-influence-content.md). Esa documentación gobierna packaging, buyer, RACI, economics, derechos y gates; este módulo gobierna el craft social y las reglas específicas de creator/UGC.
+
+## 0. Modelo operativo de Efeonce
+
+La capability se divide en cinco ofertas, que no deben mezclarse en una sola tarifa:
+
+1. **Creator Intelligence:** scouting, vetting, shortlist, benchmark y recomendación.
+2. **Influencer Activation:** acceso a audiencia, negociación, brief, publicación y medición.
+3. **Creator Content & UGC:** producción de assets y derechos; la audiencia del creador es opcional.
+4. **Creator Partnership Program:** roster y relación recurrente de 6/12 meses.
+5. **Amplification & Whitelisting:** uso paid desde el handle del creador y testing de distribución.
+
+Flujo estándar: `brief → diagnóstico → scouting → vetting → shortlist → disponibilidad/negociación → contrato/derechos → brief → producción/aprobación → publicación/entrega → amplificación → medición → aprendizaje`.
+
+### Scorecard mínimo de vetting
+
+Registrar fit de audiencia, país/mercado, engagement real, calidad de comentarios, calidad/natividad del contenido,
+consistencia, colaboraciones visibles, saturación publicitaria, brand safety, contactabilidad, disponibilidad, fee
+estimado, derechos ofrecidos, fuente, fecha y owner. Follower count es contexto, no criterio de selección.
+
+### Boundary comercial
+
+- Influencer marketing compra acceso y distribución ante una audiencia.
+- UGC compra principalmente un asset y derechos de uso.
+- Partnership compra continuidad y aprendizaje.
+- Whitelisting compra permiso paid y acceso al handle.
+
+Fee de Efeonce, fee del creador, producción, derechos, exclusividad, whitelisting, viajes y media deben aparecer por
+separado. No se cierra una colaboración sin derechos de uso, disclosure, aprobaciones y condiciones de pago claras.
+
 ---
 
 ## 1. Definiciones (no confundir)

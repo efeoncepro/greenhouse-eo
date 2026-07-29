@@ -14,6 +14,8 @@ La diferencia con otras capas de documentacion:
 
 - [Manual: producir un post visual de reporte](social/visual-report-social-production.md) — brief, dirección,
   crop, logo, QA y gates contra capturas ilegibles o composiciones genéricas.
+- [Manual: operar Creator Influence & Content](media-distribution/operar-creator-influence-content.md) — intake,
+  scouting, vetting, contacto, negociación, derechos, producción, publicación y cierre de ciclo.
 
 ### Comercial
 

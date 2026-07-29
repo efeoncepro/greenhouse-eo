@@ -161,6 +161,8 @@ se compra acceso a la audiencia del creador, la oportunidad pertenece a esta sol
 
 ### Influencers, Creators & UGC: distinción comercial
 
+La capability se documenta en el [modelo de negocio específico](../../business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md), la [ficha de servicio](CREATOR_INFLUENCE_CONTENT_SERVICE_V1.md), la [arquitectura operativa](../../architecture/media-distribution/CREATOR_INFLUENCE_CONTENT_OPERATING_ARCHITECTURE_V1.md), la [documentación funcional](../../documentation/media-distribution/creator-influence-content.md) y el [manual de operación](../../manual-de-uso/media-distribution/operar-creator-influence-content.md). Estos documentos mantienen la separación entre audience access, content assets, rights, partnerships y paid amplification.
+
 Esta familia pertenece a Media & Distribution cuando el objetivo principal es acceder a la audiencia de terceros,
 activar influencia y distribuir el mensaje. Creative Services puede producir la idea, el sistema visual, el guion,
 el asset o la edición; Media & Distribution gobierna la selección, negociación, activación, amplificación y

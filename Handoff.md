@@ -1,6 +1,39 @@
 # Handoff activo
 
-## 2026-07-28 — TASK-1588: plataforma UI compartida iniciada
+## 2026-07-29 — Creator Influence & Content: documentación canónica
+
+Se documentó el modelo agnóstico a marca de Influencers, Creators & UGC dentro de Media & Distribution. Nuevos
+artefactos: business model específico, ficha de servicio, arquitectura operativa no-runtime, documentación funcional
+y manual de operación. La skill `social-media-studio` incorpora la taxonomía de cinco ofertas, el flujo y el scorecard
+de vetting. Estado honesto: `Approved for validation`; quedan pendientes validación de cost-to-serve, pricing,
+capacity, derechos y evidencia de cohortes antes de venta general.
+
+Validación ejecutada pendiente de cierre documental: `pnpm docs:closure-check`, `pnpm docs:context-check:strict` y
+revisión de enlaces/rutas.
+
+## 2026-07-29 — TASK-1591: AXIS adapters pilot
+
+El piloto de adapters AXIS quedó implementado y verificado como canary opt-in en Greenhouse y Globe.
+AXIS `v0.1.4` está publicado; ambos consumers fijan `axis-tokens`, `axis-ui-contracts` y
+`axis-ui-registry` en esa versión. Greenhouse expone `AxisStatus` y `AxisProgress` con MUI/Vuexy;
+Globe expone equivalentes nativos con Tailwind/token classes. Fixtures: `/design-system/axis-adapters`
+y `/_axis-pilot`.
+
+Evidencia: build Vite de Globe, typecheck/ESLint de los archivos Greenhouse, design-contract gate
+6/6, Playwright a 1440/390 px sin overflow, foco por Tab, 3 pasos ordenados y reduced motion `0s`.
+La promoción a superficies productivas sigue pendiente; rollback documentado en `TASK-1591` y el
+runbook de consumo privado. El PAT operator-owned expira el 2026-08-27.
+
+## 2026-07-28 — Contrato para producción visual social de reportes
+
+Se documentó el aprendizaje de la exploración del post de Brand Visibility/SKY en
+[`GREENHOUSE_SOCIAL_VISUAL_REPORT_PRODUCTION_V1.md`](docs/operations/GREENHOUSE_SOCIAL_VISUAL_REPORT_PRODUCTION_V1.md),
+con capas técnica, funcional y manual. Las skills Codex/Claude de diseño, social media y generación de imágenes
+ahora exigen evidencia editorial proof-first, crop vertical nativo, logo único y composición determinística.
+La pieza visual continúa pendiente: las iteraciones exploratorias no aprobaron el gate de calidad y no deben
+considerarse entregables finales.
+
+## 2026-07-28 — HISTÓRICO SUPERSEDIDO — TASK-1588: plataforma UI compartida iniciada
 
 Se formalizó `EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1`: Greenhouse conserva gobierno,
 registry, lifecycle, QA y evidencia; `../axis-design-system` es el nuevo home local de la
