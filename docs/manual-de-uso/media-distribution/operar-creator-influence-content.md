@@ -64,3 +64,4 @@ recomendación de siguiente ciclo. En caso de conflicto, prevalecen el contrato 
 - [Documentación funcional](../../documentation/media-distribution/creator-influence-content.md)
 - [Ficha de servicio](../../services/media-distribution/CREATOR_INFLUENCE_CONTENT_SERVICE_V1.md)
 - [Arquitectura operativa](../../architecture/media-distribution/CREATOR_INFLUENCE_CONTENT_OPERATING_ARCHITECTURE_V1.md)
+- [Simulación end-to-end: perfume masculino con deportistas chilenos](../../audits/commercial/CREATOR_INFLUENCE_PERFUME_ATHLETES_CHILE_SIMULATION_2026-07-29.md)

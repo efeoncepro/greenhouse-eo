@@ -31,6 +31,11 @@ recomendaciones según el SOW.
 Quedan fuera por defecto media spend, fees de creadores, managers, producción extraordinaria, viajes, props, música,
 derechos adicionales, exclusividad, whitelisting y usos fuera del territorio/plazo contratado.
 
+El fee Efeonce se cotiza separado de terceros. La modalidad preferida es fee fijo más pass-through; si Efeonce
+administra contratación y pagos de terceros, puede aplicar una comisión explícita de coordinación aprobada en el SOW.
+La comisión de performance no reemplaza el fee base y sólo se habilita con tracking y reglas de atribución aceptadas.
+Las bandas de validación están en el [Pricing Integrity Pack](../../business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md).
+
 ## Ciclo de servicio
 
 `intake → inventory → design → propose → approve → execute → verify → document → measure`
@@ -64,6 +69,8 @@ evidencia del ciclo anterior y economics aceptables; no se renueva sólo por vol
 ## Documentación relacionada
 
 - [Business Model V1](../../business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md)
+- [Pricing Integrity Pack](../../business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md)
+- [Market Research 2026-07-29](../../audits/commercial/CREATOR_INFLUENCE_CONTENT_MARKET_RESEARCH_2026-07-29.md)
 - [Arquitectura operativa](../../architecture/media-distribution/CREATOR_INFLUENCE_CONTENT_OPERATING_ARCHITECTURE_V1.md)
 - [Documentación funcional](../../documentation/media-distribution/creator-influence-content.md)
 - [Manual](../../manual-de-uso/media-distribution/operar-creator-influence-content.md)

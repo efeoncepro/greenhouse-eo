@@ -13,6 +13,8 @@ creador convierte) y delega el asset visual concreto a los generadores.
 
 Para trabajo comercial de Efeonce, carga también el contrato canónico de [Creator Influence & Content](../../../../docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md), su [ficha de servicio](../../../../docs/services/media-distribution/CREATOR_INFLUENCE_CONTENT_SERVICE_V1.md) y el [manual de operación](../../../../docs/manual-de-uso/media-distribution/operar-creator-influence-content.md). Esa documentación gobierna packaging, buyer, RACI, economics, derechos y gates; este módulo gobierna el craft social y las reglas específicas de creator/UGC.
 
+Para practicar el flujo completo, usa la [simulación de perfume masculino con deportistas chilenos](../../../../docs/audits/commercial/CREATOR_INFLUENCE_PERFUME_ATHLETES_CHILE_SIMULATION_2026-07-29.md). Es un caso sintético: los nombres, roles creativos y rangos de planificación no equivalen a disponibilidad, fee cotizado ni endorsement aprobado.
+
 ## 0. Modelo operativo de Efeonce
 
 La capability se divide en cinco ofertas, que no deben mezclarse en una sola tarifa:
@@ -40,6 +42,33 @@ estimado, derechos ofrecidos, fuente, fecha y owner. Follower count es contexto,
 
 Fee de Efeonce, fee del creador, producción, derechos, exclusividad, whitelisting, viajes y media deben aparecer por
 separado. No se cierra una colaboración sin derechos de uso, disclosure, aprobaciones y condiciones de pago claras.
+
+## 0.1 Pricing y delivery comercial de Efeonce
+
+Estas bandas son hipótesis internas; carga el [Pricing Integrity Pack](../../../../docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md)
+antes de cotizar y no las presentes como tarifas públicas.
+
+| Lane | Fee Efeonce de referencia | Regla de terceros |
+|---|---:|---|
+| Creator Fit Brief | USD 500–1.000 | sin creator fees |
+| Intelligence Sprint | USD 1.500–4.000 | sin creator fees |
+| Activation pequeña | USD 3.000–6.000 | pass-through |
+| Activation media | USD 6.000–12.000 o 15% creator/production spend | elegir una estructura, no duplicar |
+| Content Engine | USD 4.000–8.000/mes | creator, production y rights separados |
+| Partnership | setup USD 5.000–12.000 + USD 6.000–15.000/mes | mínimo 6 meses |
+| Whitelisting | setup USD 1.500–4.000 + USD 2.000–6.000/mes | rights y media separados |
+
+### Porcentajes permitidos
+
+- **10–15%:** coordinación de pass-through sólo si Efeonce administra contratos, pagos, reconciliación y riesgo; no se suma automáticamente al 15% de management.
+- **15%:** alternativa de management para activaciones medias con mínimo USD 6.000.
+- **5–15%:** comisión del creator en programas affiliate, pagada al creator sobre revenue neto atribuido.
+- **2–5%:** success fee de Efeonce sobre revenue neto cobrado atribuible, sólo con fee base y tracking aceptado.
+- **15–35%:** hipótesis de premium por paid usage por cada 30 días sobre el creator base fee; whitelisting se negocia aparte.
+- **15–30%:** hipótesis de premium por exclusividad, sujeto a categoría, territorio y duración.
+
+Nunca cotices por follower, por publicación o sólo como porcentaje de media spend. Nunca escondas creator fees,
+rights, production, media o impuestos dentro del fee de Efeonce.
 
 ---
 

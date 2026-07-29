@@ -7,6 +7,8 @@
 > **Versión:** V1 · 2026-07-29
 > **Revisión:** después de cada piloto pagado y, como mínimo, trimestral
 
+La arquitectura concreta de fees, pass-through, comisiones y condiciones de pago vive en el [Pricing Integrity Pack](CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md). Sus bandas son hipótesis de validación y no pricing público.
+
 ## 1. Decisión ejecutiva
 
 Efeonce operará Influencers, Creators & UGC como una capability de distribución, contenido y aprendizaje. No se
@@ -116,6 +118,10 @@ intake → diagnóstico → scouting → vetting → shortlist → disponibilida
 La unidad pública no debe ser follower, publicación, hora ni porcentaje de inversión. Piezas, horas y plataformas son
 inputs internos de capacidad y costeo.
 
+El modelo preferido es fee fijo de estrategia/operación más pass-through transparente. Una comisión de coordinación de
+terceros sólo aplica si Efeonce administra contratación, pagos, reconciliación y riesgo; una comisión de performance
+queda condicionada a tracking, baseline y resultado controlable. Ver el [Pricing Integrity Pack](CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md).
+
 ## 7. Costos, margen y guardrails
 
 Costear por oferta × cuenta × mercado × plataforma × provider × delivery model:
@@ -180,6 +186,7 @@ gates de Finance, Legal, Commercial y Operations.
 
 - [Media & Distribution — catálogo](../../services/media-distribution/README.md)
 - [Creator Influence & Content — ficha de servicio](../../services/media-distribution/CREATOR_INFLUENCE_CONTENT_SERVICE_V1.md)
+- [Pricing Integrity Pack](CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md)
 - [Arquitectura operativa](../../architecture/media-distribution/CREATOR_INFLUENCE_CONTENT_OPERATING_ARCHITECTURE_V1.md)
 - [Documentación funcional](../../documentation/media-distribution/creator-influence-content.md)
 - [Manual de operación](../../manual-de-uso/media-distribution/operar-creator-influence-content.md)
