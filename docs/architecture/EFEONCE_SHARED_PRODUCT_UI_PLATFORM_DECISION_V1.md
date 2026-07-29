@@ -106,7 +106,16 @@ persistencia o jobs.
 Tres preguntas quedaron abiertas cuando se publicó la foundation. Se deciden acá porque las tres son
 la misma pregunta: **quién es dueño del valor, y qué lo detecta cuando alguien lo contradice.**
 
-### (a) Dirección del SSOT de tokens — decidida
+### (a) Dirección del SSOT de tokens — decidida, y **cuestionada el mismo día**
+
+> ⚠️ **Esta sub-decisión quedó parcialmente invertida por
+> [`EFEONCE_AXIS_DESIGN_SYSTEM_OWNERSHIP_DECISION_V1.md`](EFEONCE_AXIS_DESIGN_SYSTEM_OWNERSHIP_DECISION_V1.md)
+> (`Proposed`, 2026-07-29).** Lo de abajo describe el estado implementado y sigue siendo correcto como
+> descripción del runtime de hoy; lo que cambia es el destino. El razonamiento aquí —*"AXIS no puede
+> importar de Greenhouse → entonces Greenhouse es el dueño"*— tiene premisa correcta y **conclusión no
+> derivada**: la tercera opción (mover el dato a AXIS y que Greenhouse lo consuma) no se evaluó, y los
+> tokens resultaron ser datos puros sin ninguna dependencia de MUI, o sea portables tal cual.
+> Todo lo demás de este Delta —gobierno, distribución, versionado, gates— se mantiene íntegro.
 
 `@efeoncepro/axis-tokens` y `src/@core/theme/axis-tokens.ts` cargaban los mismos valores de marca bajo
 el mismo nombre, **sin relación declarada**. Coincidían porque alguien los tecleó dos veces.
