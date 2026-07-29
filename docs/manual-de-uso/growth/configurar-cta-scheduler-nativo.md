@@ -19,11 +19,15 @@
 9. Completa una reserva controlada y revisa la confirmación: debe reemplazar todo el calendario, mostrar fecha,
    rango horario, zona y Teams, y no volver a ofrecer selección ni otra acción de booking.
 10. Comprueba que el foco llegue al título confirmado y que el email o receipt interno no aparezcan en DOM/dataLayer.
+11. En un host ancho, revisa que “Conversemos” no corte letras, que el carril no muestre aros recortados y que la marca monocroma de Teams aparezca sin fondo morado. Repite a 820 px y 390 px verificando `scrollWidth === clientWidth`.
 
 ## Degradación y rollback
 
 - Si no carga la agenda nativa, usa **Reintentar** y revisa bundle/CSP/origin binding si el problema persiste.
-- Para rollback, publica o reasigna la versión anterior `book_meeting`; no cambies la semántica de ese kind.
+- Para rollback, desactiva el binding/flag de la surface, purga la caché del host o restaura la versión/backup anterior.
+  Esto retira el launcher nativo de esa surface; no lo transforma en `book_meeting` ni abre una UI alternativa.
+- `book_meeting` permanece navigation-only para superficies legacy. No lo reasignes como reemplazo automático de
+  `open_meeting_scheduler` y no cambies la semántica de ninguno de los dos kinds durante un rollback.
 - No agregues enlaces directos a HubSpot dentro del scheduler o su superficie de recuperación.
 
 Contrato funcional: [Scheduler de reuniones nativo](../../documentation/growth/scheduler-reuniones-nativo.md). Arquitectura: [Growth Meetings Scheduler](../../architecture/GREENHOUSE_GROWTH_MEETINGS_SCHEDULER_ARCHITECTURE_V1.md).

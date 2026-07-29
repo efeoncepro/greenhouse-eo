@@ -6,6 +6,67 @@
 
 # Changelog
 
+## 2026-07-21 — TASK-1508: Cloud Run bajo IaC + ownership por campo
+
+- **Los dos servicios Cloud Run entraron a Terraform por import brownfield:** `2 imported / 2 changed / 0 destroyed`.
+  El invoker binding de la api (`greenhouse-globe-caller` → `roles/run.invoker`) también quedó declarado en IaC, así que
+  el perímetro de `globe-api-internal` deja de vivir out-of-band.
+- **Bump de provider `hashicorp/google` `~> 6.0` → `~> 7.0`:** el ceiling a nivel servicio
+  (`scaling.max_instance_count`) no existe en 6.x, así que sin el bump el campo no era declarable. Verificado que
+  **76 de 78 recursos quedan no-op** bajo la major nueva.
+- **`deploy-internal.yml` quedó image-only.** Ya no pasa `--service-account`, `--no-allow-unauthenticated`,
+  `--min-instances` ni `--max-instances`: **pasa sólo `--image`**. El workflow deja de ser un segundo escritor sobre
+  campos que gobierna Terraform.
+- **`ignore_changes` acotado a tres entradas:** la imagen, `client` y `client_version` (estos dos son metadata de la
+  herramienta que escribió último, no configuración). Todo lo demás lo gobierna el HCL.
+- **El bug de los dos ceilings, corregido.** Un servicio Cloud Run lleva ceiling **a nivel servicio** y **a nivel
+  revisión**, y **Cloud Run aplica el menor**: ambos servicios estaban en servicio=1 / revisión=3, así que el techo
+  **efectivo era 1**. La causa es que `--max-instances` escribe un campo distinto según el subcomando (`gcloud run
+  deploy` → servicio; `gcloud run services update` → revisión), por lo que el workaround de "restaurar el techo tras un
+  deploy" que la doc prescribía era **inefectivo**. Corregido a **3/3** y ambos campos bajo Terraform.
+- **Anti-drift probado en dos ciclos**, uno por servicio (runs `29872768853` web / `29875135147` api): ambos dejaron
+  `tofu plan` en **No changes**.
+- **Consecuencia registrada:** como nunca hubo más de una réplica, el **spend fence cross-réplica de `TASK-1465` jamás
+  se ejercitó**. Ejercitarlo es **`TASK-1512`**, con gasto real de proveedor y su propia autorización.
+- **Sigue internal-only.** Nada de esto habilita Production, HA gobernada como tal ni clientes externos (`TASK-1480`).
+
+## 2026-07-21 — TASK-1507: front door internal-only (Globe estrena dominio propio) — aplicado + verificado en vivo
+
+- **`globe.efeoncepro.com` es la URL estable del shell interno.** Global External ALB + serverless NEG
+  (`southamerica-west1`) → `globe-studio-internal`, IP global `8.233.189.79`, certificado administrado por Google
+  `ACTIVE` (issuer GTS `WR3`, vence `Oct 19 20:35:36 2026 GMT`) y 301 HTTP→HTTPS. `GLOBE_PUBLIC_BASE_URL` cortado al
+  dominio en la revisión `globe-studio-internal-00018-zkx` (100% del tráfico); ese valor es load-bearing porque
+  `apps/studio-web/src/app.ts` construye el callback como `new URL('/auth/callback', config.publicBaseUrl)`.
+- **El `*.run.app` dejó de ser alcanzable por browser.** Ingress del web en `internal-and-cloud-load-balancing`
+  (aplicado con `gcloud run services update --ingress`, no por Terraform: los servicios Cloud Run siguen fuera de
+  IaC y adoptarlos es `TASK-1508`, así que el valor queda **sin gobierno IaC** hasta entonces). Acceso directo por
+  `run.app` → 404; dominio por el ALB → 200 con el shell real y su propio `x-correlation-id`.
+- **Terraform aditivo puro** (`infra/terraform/front_door.tf`, nuevo): IP global, serverless NEG, backend service
+  (`EXTERNAL_MANAGED`, `enable_cdn = false` deliberado — es un shell SSO por sesión, cachearlo sería un bug de
+  correctitud), URL map, managed cert (`create_before_destroy`), target proxies y forwarding rules `:443`/`:80`.
+  Plan `11 to add, 0 to change, 0 to destroy`, cero recursos Cloud Run en el diff; `maxScale=3` no se tocó. El
+  carril HTTP-redirect falló el primer apply con `SERVICE_DISABLED` porque era la única raíz sin arista implícita a
+  `compute.googleapis.com`: se arregló la carrera en el HCL con un `depends_on` explícito, no reintentando a ciegas.
+- **Allowlist OAuth aditivo, no reemplazo.** Greenhouse ganó `updateSisterPlatformOAuthRedirectUris`
+  (`src/lib/sister-platforms/oauth-broker.ts`) + el CLI `pnpm sister-platform:redirect`: una transacción con
+  `SELECT ... FOR UPDATE` que toca sólo `redirect_uris`, reusa `normalizeRedirectUris`, es idempotente al agregar y
+  falla fuerte al remover un URI ausente. El seed vigente no servía (reemplazaba el array y rotaba el client
+  secret). El redirect `run.app` **se conserva** como camino de rollback.
+- **Orden de cutover invertido a propósito:** allowlist primero, `GLOBE_PUBLIC_BASE_URL` después. Un redirect URI es
+  inerte hasta que algo lo use; la env var al revés abre una ventana en la que `/auth/start` anuncia un callback
+  todavía no permitido. Smoke SSO de tres piernas (`scripts/smoke-human-federation.mjs`, calibrado contra el
+  `run.app` **antes** del cutover) verde antes y después del hardening de ingress.
+- **Costo:** ~US$18,25/mes fijo (forwarding rules globales) + ~US$0,024 por GiB servido (in+out), precios de la
+  Cloud Billing Catalog API al 2026-07-21; el certificado no tiene cargo. Al destruir el ALB, destruir también la IP
+  global (reservada y sin adjuntar factura como IP ociosa).
+- **Sigue internal-only.** No habilita Production, clientes externos ni marketing (`TASK-1480`).
+  `globe-api-internal` no recibe custom domain, sigue IAM-private (403 anónimo) y su audience se deriva de
+  `run.app`. **Continuó en:** `TASK-1508` (adopción brownfield de los servicios + single-writer deploy ownership;
+  completa el mismo día — ver la entrada de arriba).
+- **Docs:** spec `docs/tasks/complete/TASK-1507-globe-internal-front-door-alb-terraform.md`; decisión ADR-004
+  `docs/architecture/creative-studio/EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md`; continuidad
+  `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
+
 ## 2026-07-21 — TASK-1465: persistencia durable (Globe deja de vivir en memoria) — desplegada + verificada en vivo
 
 - **Primera base de datos durable de Globe.** Cloud SQL **`globe-pg`** (Postgres 16, `southamerica-west1`, tier
@@ -25,9 +86,11 @@
 - **Fix de build:** el Dockerfile ahora compila `packages/database`. Un servicio corre durable sólo si declara
   `GLOBE_POSTGRES_INSTANCE_CONNECTION_NAME` / `GLOBE_POSTGRES_DATABASE` / `GLOBE_POSTGRES_USER`; si falta alguna,
   arranca en memoria (sólo permitido en el environment `internal_smoke`).
-- **⚠️ Drift-trap → `TASK-1508`:** `deploy-internal.yml` hoy fija `--max-instances=1` por hardcode, así que un
-  redespliegue por ese workflow baja el `maxScale` a 1 hasta que Terraform gobierne el valor. **Diferido:** un
-  modelo rico de workspace / members / grants.
+- **⚠️ Drift-trap → `TASK-1508` (cerrado ese mismo día):** `deploy-internal.yml` hardcodeaba `--max-instances=1`.
+  `TASK-1508` descubrió además que el `maxScale=3` reportado acá era el ceiling **de revisión**: el de **servicio**
+  seguía en 1 y Cloud Run aplica el menor, así que el techo efectivo **era 1**. Corregido a **3/3**, ambos campos bajo
+  Terraform y workflow image-only. Consecuencia: el spend fence cross-réplica nunca se ejercitó → `TASK-1512`.
+  **Diferido:** un modelo rico de workspace / members / grants.
 - **Docs:** funcional `docs/documentation/creative-studio/persistencia-durable-globe.md`; manual
   `docs/manual-de-uso/creative-studio/operar-persistencia-globe.md`; spec
   `docs/architecture/creative-studio/EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md`.

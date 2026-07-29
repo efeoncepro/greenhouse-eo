@@ -22,6 +22,19 @@ Esta skill opera **el negocio HubSpot de Efeonce**, no el CRM interno de Efeonce
 Si la pregunta es "cómo configuro una property en nuestro portal" → `hubspot-ops`.
 Si la pregunta es "cómo vendemos, implementamos, retenemos o expandimos HubSpot en un cliente" → acá.
 
+HubSpot es el caso de referencia de una relación donde pueden coexistir licencia/referral, implementación, Managed CRM
+Ops, CRM Intelligence y expansión. El contrato transversal para separar licencia, pass-through, margen, delivery e IP
+propia vive en `docs/business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md`.
+
+## Taxonomía comercial vigente
+
+La práctica se presenta como **Efeonce → RevOps & CRM → Kortex (cuando aplica) → HubSpot (plataforma/provider)**.
+La venta debe poder recorrer diagnóstico, arquitectura, implementación, data/automation/lifecycle, managed operations
+y Customer Agent / AI Operations sin convertir cada etapa en un bundle obligatorio. El brochure es input histórico,
+no canon: usa [`docs/services/hubspot-as-a-service/README.md`](../../../docs/services/hubspot-as-a-service/README.md) y
+la auditoría [`HUBSPOT_BROCHURE_REVIEW_2026-07-26.md`](../../../docs/audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md)
+para separar capacidades reutilizables de claims, precios y disponibilidad que necesitan verificación vigente.
+
 ---
 
 ## 0. La tesis — dónde se pelea y dónde no
@@ -188,7 +201,7 @@ Esta skill es **dominio**, no método. No duplica; compone.
 
 ## 6. Las 4 capas del negocio (y dónde está el margen)
 
-Fuente canónica: `docs/context/02_gtm.md:45-54`. CRM Solutions es la **5.ª línea, transversal**.
+Fuente canónica: `docs/context/02_gtm.md:45-54`. RevOps & CRM es una **línea de negocio de Efeonce**; HubSpot es la plataforma externa y Kortex es la product brand/capability de inteligencia y delivery programático.
 
 | Capa | Qué es | Revenue | Puntos de tier |
 |---|---|---|---|

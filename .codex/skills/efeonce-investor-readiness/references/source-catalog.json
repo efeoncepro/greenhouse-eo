@@ -1,0 +1,11 @@
+{
+  "as_of": "2026-07-25",
+  "sources": [
+    {"id":"yc-application","url":"https://www.ycombinator.com/howtoapply.html","authority":"primary","use":"application narrative, founder proof and demo"},
+    {"id":"yc-video","url":"https://www.ycombinator.com/video/","authority":"primary","use":"founder video requirements"},
+    {"id":"yc-safe","url":"https://www.ycombinator.com/documents","authority":"primary","use":"SAFE reference; local counsel required"},
+    {"id":"startup-chile-ignite","url":"https://startupchile.org/postula/ignite/","authority":"primary","use":"program fit and current application framing"},
+    {"id":"sec-early-stage","url":"https://www.sec.gov/resources-small-businesses/capital-raising-building-blocks/early-stage-investors","authority":"primary","use":"investor type and offering context"},
+    {"id":"sec-solicitation","url":"https://www.sec.gov/resources-small-businesses/capital-raising-building-blocks/general-solicitation","authority":"primary","use":"public solicitation risk routing"}
+  ]
+}

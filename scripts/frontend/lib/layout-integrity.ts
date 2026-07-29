@@ -55,9 +55,20 @@ export const analyzeLayoutIntegrity = async (
         // que NO existe en el contexto del browser de page.evaluate.
         function isIgnored(el: Element): boolean {
           if (el.closest('[aria-hidden="true"]')) return true
+          if (isVisuallyHidden(el)) return true
           for (const ig of ignore) if (ig === el || ig.contains(el)) return true
 
           return false
+        }
+
+        function isVisuallyHidden(el: Element): boolean {
+          if (el.matches('.sr-only, .visually-hidden, .ghc-sr-only, .ghf-sr-only, [data-visually-hidden]')) return true
+
+          const style = getComputedStyle(el)
+          const r = el.getBoundingClientRect()
+          const clipped = style.clip === 'rect(0px, 0px, 0px, 0px)' || style.clipPath === 'inset(50%)'
+
+          return (style.position === 'absolute' || style.position === 'fixed') && r.width <= 2 && r.height <= 2 && clipped
         }
 
         function describe(el: Element): string {

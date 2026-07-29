@@ -36,7 +36,7 @@ Este es el camino recomendado para operacion formal.
 
 Algunos drawers de Finance permiten crear una cuenta simple para no bloquear Banco o Conciliacion. Este camino crea datos basicos como nombre, banco, moneda, tipo y saldo inicial.
 
-Usalo solo cuando el flujo operativo lo requiera y luego completa governance en `/admin/payment-instruments` si el instrumento queda vivo.
+Úsalo solo cuando el flujo operativo lo requiera y luego completa governance en `/admin/payment-instruments` si el instrumento queda vivo.
 
 ## Categorias de instrumento
 

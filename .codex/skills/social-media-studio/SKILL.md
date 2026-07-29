@@ -98,6 +98,30 @@ herramientas conectadas (detalle en `efeonce/STUDIO_TOOLING.md`):
     para un cliente Globe** (as-a-service). **NUNCA** hardcodees un HEX de marca en una plantilla.
   - Frontera con **Media Foundry**: Foundry **genera** el pixel (IA); el Composer **compone** el frame. Un
     carrusel puede usar los dos. **NO** se fusionan.
+
+### Reportes y evidencia de producto
+
+Para posts visuales de reportes, dashboards o Brand Visibility, cargar el contrato canónico
+[`GREENHOUSE_SOCIAL_VISUAL_REPORT_PRODUCTION_V1.md`](../../../docs/operations/GREENHOUSE_SOCIAL_VISUAL_REPORT_PRODUCTION_V1.md).
+El patrón por defecto es **proof-first**: un score/hallazgo domina, el reporte se recorta como material editorial
+y no vive dentro de una tarjeta o marco azul. El formato 1080 × 1350 se recompone de forma nativa; no se reduce un
+slide horizontal completo. El archivo no es universal: separar derivados para Instagram, LinkedIn y YouTube, y
+validar feed, vista individual, perfil, preview de enlace, Home, Subscriptions, Watch y Community según aplique.
+Usar la zona central protegida como regla prudencial, no como contrato pixelado de plataforma. Verificar thumbnail,
+logo único, ausencia de clipping, overlays y legibilidad antes de proponer publicación. La matriz canónica está en
+[`docs/audits/social/2026-07-28-social-platform-surface-audit.md`](../../../docs/audits/social/2026-07-28-social-platform-surface-audit.md).
+
+### Carruseles narrativos
+
+Un carrusel es una secuencia de atención, no una colección de láminas: construirlo como
+`hook → problema → reencuadre → mecanismo → evidencia → lectura → acción → cierre`. En la portada, ubicar el logo
+Efeonce pequeño y centrado en la parte inferior; no usar esquina superior. Instagram se entrega como secuencia
+nativa de imágenes; LinkedIn como documento PDF con páginas uniformes, título y descripción. No poner botones o
+flechas que impliquen que la imagen es clickeable; dejar la acción para el caption, la descripción del documento o la
+conversación. Definir una sola conversión antes del guion: guardar/compartir/comentar/conversación/lead. Para
+Instagram, optimizar tensión → descubrimiento → utilidad → conversación; para LinkedIn, patrón → implicación de
+negocio → mecanismo → prueba → aplicación → debate. Ver la investigación en
+[`docs/audits/social/2026-07-28-carousel-storytelling-platform-research.md`](../../../docs/audits/social/2026-07-28-carousel-storytelling-platform-research.md).
 - **Programar y medir**: **Metricool** MCP (`getBestTimeToPostByNetwork`,
   `createScheduledPost`, `getAnalyticsDataByMetrics`, `getBrandSettings`).
 - **Publicar y HubSpot**: atribución/lead capture social → `growth-marketing-cro` +

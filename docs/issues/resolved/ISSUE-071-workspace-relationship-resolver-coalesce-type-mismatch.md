@@ -12,7 +12,7 @@ staging + production (post TASK-611 deploy, latente desde 2026-05-08 madrugada)
 
 `/finance/clients/<id>` con flag user-scope `enabled=true` y page reaching `<FinanceClientsOrganizationWorkspaceClient>` correctly post ISSUE-070 fix, pero la projection devolvía `degradedMode=true` con motivo `relationship_lookup_failed`. Banner visible al usuario:
 
-> Workspace en modo degradado — No pudimos resolver tu relación con esta organización. Volvé a intentar en unos segundos.
+> Workspace en modo degradado — No pudimos resolver tu relación con esta organización. Vuelve a intentar en unos segundos.
 
 ## Causa raíz
 

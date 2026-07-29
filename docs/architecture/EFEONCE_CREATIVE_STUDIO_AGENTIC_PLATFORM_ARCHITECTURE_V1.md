@@ -476,10 +476,13 @@ evidencia técnica; su plan operativo referencia las tasks canónicas y no crea 
 > connector, provisto en Terraform). El §5 de esta arquitectura —*Durable operational store: Dedicated Cloud SQL for
 > PostgreSQL*— deja de ser sólo objetivo: seis tablas tenant-scoped + un `audit_log` append-only respaldan, detrás de
 > sus ports ya existentes, los cinco stores antes **in-memory / per-proceso** (sesiones, transacciones OAuth,
-> experimentos, reportes de evaluación y el spend fence de seguridad). Ambos servicios Cloud Run corren durable en
-> `maxScale=3`: esto **levanta el techo de HA** (`maxScale=1`) que ADR-004 hard-gateaba en esta task. **Queda
-> diferido:** el modelo rico de workspace/members/grants y el mecanismo exacto de tenancy PostgreSQL/RLS (§13);
-> persistir `maxScale` por IaC es `TASK-1508`. Spec canónica:
+> experimentos, reportes de evaluación y el spend fence de seguridad). Ambos servicios Cloud Run corren durable: esto
+> **levanta el techo de HA** que ADR-004 hard-gateaba en esta task. **Corrección de historia (`TASK-1508`, complete
+> 2026-07-21):** el `maxScale=3` que 1465 reportó era el ceiling **de revisión**; el ceiling **de servicio** seguía en
+> 1 y Cloud Run aplica el menor, así que el techo efectivo **era 1** y ningún servicio corrió nunca más de una réplica.
+> `TASK-1508` lo corrigió a **3/3** y puso ambos campos bajo Terraform. Consecuencia: el spend fence cross-réplica
+> **nunca se ejercitó** — ejercitarlo es `TASK-1512`. **Queda diferido:** el modelo rico de workspace/members/grants
+> y el mecanismo exacto de tenancy PostgreSQL/RLS (§13). Spec canónica:
 > `docs/architecture/creative-studio/EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md`.
 
 | Phase | Outcome | Explicitly excluded |

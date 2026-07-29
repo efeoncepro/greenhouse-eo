@@ -3,7 +3,7 @@
 > **Audience:** EFEONCE_ADMIN + DEVOPS_OPERATOR
 > **Spec canónico:** [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md) §2.9
 > **Source task:** TASK-849
-> **Last updated:** 2026-07-09
+> **Last updated:** 2026-07-21
 
 Este runbook opera el watchdog que detecta y alerta temprano sobre approvals obsoletos de Production, runs productivos sin jobs y drift de deploy de workers.
 
@@ -36,7 +36,7 @@ Sin blockers detectados. Los 3 signals están en steady state. Operador no neces
 ### `warning`
 - **stale_approval**: aprobación pendiente entre 2h y 24h. Visible pero no bloqueante. Operador debe revisar el run en el próximo ciclo de trabajo.
 - **pending_without_jobs**: deploy entre 5min y 30min sin jobs. Probablemente concurrency normal; verificar que no escale.
-- **worker_revision_drift**: data missing en >=1 worker (gcloud absent o GIT_SHA no inyectado aún). NO es drift falso — el reader lo distingue. Re-deploy el worker para activar GIT_SHA.
+- **worker_revision_drift / `data_missing`**: falta evidencia en >=1 worker. Una sesión `gcloud` ausente/expirada o una consulta Cloud Run fallida produce `warning` con `drift_count=0`; eso **no prueba drift** y no autoriza un redeploy. Restaurar autenticación o usar logs/evidencia autenticada. Un `GIT_SHA` realmente ausente se evalúa solo después de confirmar que la lectura autenticada fue válida.
 
 ### `error`
 - **stale_approval >24h**: aprobación lleva un día completo sin acción. Operador debe revisar y decidir cancel/approve.
@@ -104,6 +104,11 @@ Cuando recibes alerta `[ERROR] Deploy pending sin jobs (concurrency deadlock)`:
 
 Cuando recibes alerta `[ERROR] Worker revision drift — <workflow>`:
 
+0. **Clasificar evidencia antes de actuar.** Inspeccionar el JSON completo del watchdog:
+   - `drift_count > 0` y dos SHA comparables distintos = drift confirmado.
+   - `data_missing_count > 0` con `drift_count=0` = evidencia insuficiente, no drift.
+   - Si `gcloud auth list` no muestra una cuenta activa, la sesión expiró o la consulta falló, restaurar la autenticación o usar los logs del job del orquestador/otra lectura autenticada. No redeployar para corregir observabilidad local.
+
 1. **Verificar SHAs**:
    ```bash
    # GH last successful workflow run SHA
@@ -144,7 +149,7 @@ Cuando recibes alerta `[ERROR] Worker revision drift — <workflow>`:
 
    Leccion TASK-1328 (2026-07-03): `ico-batch-worker` no estaba skippeado; habia deploy job + health + `Ready=True`. El drift real fue `ops-worker` porque Cloud Run seguia exponiendo el SHA anterior. La conclusion operacional sale del watchdog y del `GIT_SHA` de Cloud Run, no de la intuicion sobre qué jobs "deberian" haber corrido.
 
-3. **Si Cloud Run muestra `unknown`**: worker fue deployado antes de TASK-849 Slice 1 (GIT_SHA injection). Re-deploy el worker via workflow normal — el GIT_SHA se poblará en la nueva revision.
+3. **Si Cloud Run muestra `unknown`**: primero distinguir error de lectura de estado runtime. Confirmar `gcloud` autenticado, servicio/región/proyecto correctos y una consulta Cloud Run exitosa. Solo si una lectura autenticada válida confirma que la revisión `Ready=True` no expone `GIT_SHA`, evaluar un deploy gobernado vía workflow normal para poblarlo. `unknown` por sí solo nunca autoriza un redeploy.
 
 ## 7. Dedup state operations
 
@@ -200,6 +205,13 @@ pnpm release:watchdog --json
 ```
 
 Verificado 2026-07-10: con esto los 3 signals dejan de ser `unknown`.
+
+La lectura de Cloud Run también requiere una sesión `gcloud` activa. Antes de
+interpretar `data_missing`, comprobar `gcloud auth list` sin imprimir tokens.
+Si la sesión está ausente o expirada, reautenticar mediante el flujo aprobado o
+usar la evidencia del orquestador. El contrato del reader es conservador:
+`data_missing_count > 0` mantiene severidad `warning`, pero
+`drift_count = 0`; no convertir esa ausencia de evidencia en drift.
 
 #### Setup GitHub App AUTOMATIZADO (recomendado, ~5 min)
 

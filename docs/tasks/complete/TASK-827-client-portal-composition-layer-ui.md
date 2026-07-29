@@ -248,7 +248,7 @@ export const GH_CLIENT_PORTAL_COMPOSITION = {
     retryCta: 'Volver a intentar'
   },
   error: {
-    toast: 'No pudimos cargar tu portal. Volvé a intentar en unos segundos.',
+    toast: 'No pudimos cargar tu portal. Vuelve a intentar en unos segundos.',
     fallbackTitle: 'No pudimos cargar todo',
     fallbackBody: 'Llevanos al inicio mientras lo resolvemos.',
     fallbackCta: 'Ir al inicio'

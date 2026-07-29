@@ -2,13 +2,21 @@
 
 ## Meta
 
-- Status: `draft`
+- Status: `draft — conversion contract amended 2026-07-21`
 - Owner task: `TASK-1350 — Landing pública "Agencia Creativa" (Efeonce · Design Engineer)`
 - Related wireframe: [docs/ui/wireframes/TASK-1350-landing-agencia-creativa.md](../wireframes/TASK-1350-landing-agencia-creativa.md)
 - Intended route / surface: página pública `efeoncepro.com/<slug>` (WordPress code-custom) `[slug pendiente]`
-- Flow type: `multi-surface` (landing pública → HubSpot Meetings → confirmación; + ancla interna al bloque diferenciador)
-- Primary primitives: bloques de theme custom + embed HubSpot Meetings (no primitives del portal)
+- Flow type: `multi-surface` (landing pública → scheduler native-only → confirmación; + ancla interna)
+- Primary primitives: bloques de theme custom + Growth CTA `open_meeting_scheduler`
 - Copy source: contenido WP es-CL (validado `greenhouse-ux-writing`)
+
+> **Amendment vigente 2026-07-21 — prevalece sobre el baseline histórico inferior.** El mecanismo objetivo ya no
+> es iframe/link HubSpot: es `open_meeting_scheduler` con dialog desktop, full-screen móvil y recovery nativo por
+> grilla mensual/navegación/**Reintentar**. Sólo un receipt server-confirmed habilita confirmación/conversión; un
+> outcome ambiguo bloquea retry. Agencia Creativa aún no está promovida: requiere su propio surface/binding,
+> booking/replay, `/g/collect` y aprobación de rollout. `/contacto/`, WhatsApp y mail pueden existir como canales
+> editoriales independientes, nunca como fallback interno del scheduler. Las secciones siguientes documentan el
+> flow del candidato legacy de 2026-07-07 y no deben implementarse como arquitectura futura.
 
 > **Programa (EPIC-019):** esta landing es un **nodo** del programa de landings públicas. El patrón de conversión (CTA → UTM → destino de contacto/booking) es el mismo continuo de demand-capture que estableció TASK-1345 (`/contacto/` + UTM → Growth Form/HubSpot/Meetings/WhatsApp). Este flow adopta ese contrato con **HubSpot Meetings como destino primario** y `/contacto/`+WhatsApp/mailto como fallback. Si emerge un master UI flow del EPIC-019, referenciarlo aquí y declarar este nodo.
 

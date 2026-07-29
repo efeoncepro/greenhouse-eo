@@ -68,3 +68,27 @@ describe('ops-worker deploy finance DTE emission retry contract', () => {
     expect(script).toContain('queued DTE emission retry, TASK-1194')
   })
 })
+
+describe('ops-worker deploy Globe tenancy reconciliation contract', () => {
+  it('persists all non-secret Globe identity configuration across destructive deploys', () => {
+    const script = deployScript()
+
+    expect(script).toContain('GLOBE_API_BASE_URL=')
+    expect(script).toContain('GLOBE_API_AUDIENCE=')
+    expect(script).toContain('GLOBE_GCP_PROJECT=')
+    expect(script).toContain('GLOBE_GCP_SERVICE_ACCOUNT_EMAIL=')
+    expect(script).toContain('ENV_VARS="${ENV_VARS},GLOBE_API_BASE_URL=${GLOBE_API_BASE_URL}"')
+    expect(script).toContain(
+      'ENV_VARS="${ENV_VARS},GLOBE_GCP_SERVICE_ACCOUNT_EMAIL=${GLOBE_GCP_SERVICE_ACCOUNT_EMAIL}"'
+    )
+  })
+
+  it('renews the full-workspace projection every five minutes', () => {
+    const script = deployScript()
+    const jobIndex = script.indexOf('"ops-globe-tenancy-reconcile"')
+
+    expect(jobIndex).toBeGreaterThan(0)
+    expect(script.slice(jobIndex, jobIndex + 220)).toContain('"*/5 * * * *"')
+    expect(script.slice(jobIndex, jobIndex + 220)).toContain('"/globe/tenancy/reconcile"')
+  })
+})

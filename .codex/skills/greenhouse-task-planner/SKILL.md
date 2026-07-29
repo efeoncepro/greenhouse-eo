@@ -48,6 +48,23 @@ If a value is inferable with confidence, infer it and declare the inference in t
 
 Before writing:
 
+0. 🔴 **Barrer el registry por DOMINIO y por SUPERFICIE, antes de reservar un ID.** No por el título que se le
+   quiere dar al trabajo: dos tasks de la misma superficie con nombres distintos no se cruzan en un barrido por
+   nombre. La pregunta correcta es **"¿quién es dueño de esta superficie?"**.
+
+   Caso fuente (2026-07-25, `EPIC-028`): cinco tasks duplicadas en una sesión — *"Feed + viewer sobre el payload
+   cliente"* vs `TASK-1526` *"Producer Resilient Feed and Viewer"*; *"Composer sobre el payload cliente"* vs
+   `TASK-1552` + `TASK-1532`; *"Motion del payload cliente"* vs `TASK-1523`, dueña de los contratos
+   visual/flow/motion. Tres hubo que retirarlas y devolver su contenido a mano.
+
+   En un epic con más de 20 hijas, varias tasks describen la misma superficie desde ángulos distintos
+   (**foundation · resiliencia · port · rediseño**). Eso es legítimo; crear una sexta no lo es. El registry trunca
+   los títulos, así que hay que leer el `## Summary` de las candidatas — el solapamiento vive ahí.
+
+   **Si ya existe dueña: NO crear task nueva.** Agregar un `## Delta` con el aporte **y los criterios exigibles
+   como checkboxes en su `## Acceptance Criteria`** — prosa no es criterio. Wireframe/flow/motion se migran con
+   `git mv` a la nomenclatura de la dueña y se actualizan sus campos en `## Status`, o quedan huérfanos por nombre.
+
 1. Reserve the next available ID from `docs/tasks/TASK_ID_REGISTRY.md`.
 2. Read the architecture and operational docs that govern the domain.
 3. Confirm real files, modules, tables, routes, schemas, or helper layers that already exist.
@@ -129,6 +146,14 @@ After confirmation:
 4. leave the repo documentation consistent with the new task
 
 ## Quality Rules
+
+### AXIS Shared UI Platform
+
+When a task consumes or extends AXIS, point to `TASK-1591`, the shared UI platform ADR, and
+`docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md` instead of copying architecture. Include package
+auth, required env/secrets, runtime completeness, adapter evidence, visual/accessibility evidence, and rollback
+evidence in binary acceptance criteria. Package publication alone is not completion evidence; keep the task open or
+use `code complete, rollout pendiente` until consumers are verified in their runtime.
 
 - All paths must be real. If you cannot confirm them, use `[verificar]`.
 - Do not invent schema names, routes, tables, or helpers.

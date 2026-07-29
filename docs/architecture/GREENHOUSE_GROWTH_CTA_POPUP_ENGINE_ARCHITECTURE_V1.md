@@ -436,6 +436,7 @@ Supported action kinds:
 | `embed_growth_form` | Growth Forms | CTA displays a form in-place/modal; form owns submit. |
 | `open_think_tool` | Think + CTA engine | Routes to tools with campaign context. |
 | `book_meeting` | HubSpot Meetings | Link destination; no CRM mutation by click alone. |
+| `open_meeting_scheduler` | Growth Meetings Scheduler | Opens the native scheduler through a governed surface/key binding; booking and conversion remain owned by TASK-1509. |
 | `hubspot_handoff` | HubSpot adapter | Server-side, audited, bounded. |
 | `dismiss` | CTA engine | Records suppression. |
 
@@ -446,7 +447,18 @@ Rules:
 - Think routes receive campaign context, not raw PII.
 - HubSpot handoff is explicit and bounded; no silent deal creation.
 
-**V1 action-registry boundary (amendment 2026-07-18).** V1 must ship the extensibility seam, not every speculative integration: one typed registry owns policy schema, server resolver, browser-safe projection, execution family and failure taxonomy. V1 proves `open_growth_form` plus governed navigation for `link_url`, `open_think_tool` and `book_meeting`; `dismiss` remains a renderer/suppression control. `download_asset`, `embed_growth_form` and `hubspot_handoff` remain supported architecture kinds but graduate as demand-driven adapters only when a real consumer supplies their asset/form/CRM, consent, retry and runtime-evidence contracts. Unknown or unregistered actions fail closed at publish/render.
+**V1 action-registry boundary (amendment 2026-07-18).** V1 must ship the extensibility seam, not every speculative integration: one typed registry owns policy schema, server resolver, browser-safe projection, execution family and failure taxonomy. V1 proves `open_growth_form` plus governed navigation for `link_url`, `open_think_tool` and `book_meeting`; `dismiss` remains a renderer/suppression control. `download_asset`, `embed_growth_form` and `hubspot_handoff` remain supported architecture kinds but graduate as demand-driven adapters only when a real consumer supplies their asset/form/CRM, consent, retry and runtime-evidence contracts. Unknown or unregistered actions fail closed at publish/render. This original V1 set remains historical and is extended by the native scheduler amendment below.
+
+**Native scheduler adapter (amendment 2026-07-21).** `open_meeting_scheduler` is the first demand-backed
+non-navigation extension of the registry. Its policy contains only `meetingSurfaceId` and `schedulerKey`; the server
+requires an active `meeting_surface_binding` and projects no provider URL, provider ID, origin, secret or PII. The
+renderer uses execution family `meeting_scheduler`, lazy-loads the scheduler bundle after activation or strong intent,
+and opens a bounded dialog on desktop or full-screen surface on mobile while preserving one connected scheduler across
+close/reopen. `book_meeting` remains navigation-only for legacy CTAs and is not silently reinterpreted. A load failure,
+`fallback_only` config or empty month stays inside the native experience through `Reintentar` or month navigation; no
+nested/direct HubSpot anchor is rendered. `fallbackHref` may remain in the V1 transport projection only for cached-client
+compatibility and must not be consumed by current renderers. The scheduler, not the CTA opener, owns its funnel and the
+receipt-gated conversion.
 
 ## 13. Telemetry contract
 
@@ -916,6 +928,12 @@ local — rollout pendiente** (push/release + bundle en hosts; ninguna CTA con a
   `action_unsupported` en telemetría).
 - `dismiss` sigue como control/suppression del renderer; `download_asset`/`embed_growth_form`/
   `hubspot_handoff` permanecen demand-driven (§12).
+
+**Extensión liberada 2026-07-21 (TASK-1509/TASK-1510).** La unión anterior describe el baseline de TASK-1431.
+`open_meeting_scheduler` ya está registrado de forma aditiva con familia `meeting_scheduler`, policy
+`meetingSurfaceId + schedulerKey`, proyección browser-safe y executor lazy dialog/full-screen. La recuperación es
+native-only y `book_meeting` conserva su contrato navigation-only. El bundle fue liberado en `fbe8a9c76a74` mediante
+el run `29854833210`; el piloto `/agenda/` sigue aislado y no autoriza promoción automática a otras superficies.
 
 ## 28. Delta 2026-07-18 — TASK-1430: cockpit operator de autoría/reporting (code complete)
 

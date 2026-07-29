@@ -123,7 +123,7 @@ Knowledge es el **primer consumer**, no el dueño. La transversalidad NO es una 
 3. **Feature primitives neutrales.** `NexaProvenanceTrace` / `NexaResponseToolbar` / `NexaStreamingText` tienen nombres + props **neutrales** (no "knowledge*"). Cero acoplamiento al dominio.
 4. **Guard mecánico = specimens de portabilidad.** El scenario `nexa-answers-surface` incluye **specimens Finanzas + Insight** (`nexa-answers-portability-finance` / `…-insight`) que prueban que el MISMO canvas renderiza otro dominio. Más los **tests de contrato** del controller (`nexa-answers-canvas-controller.test.ts`: los 5 dominios resuelven a variants neutrales) y de cada feature-primitive.
 
-**Si agregás chrome especial "solo para X dominio" en el shell o en un feature-primitive, rompés la capa 3 y el guard de la capa 4 debe atraparlo.**
+**Si agregas chrome especial "solo para X dominio" en el shell o en un feature-primitive, rompes la capa 3 y el guard de la capa 4 debe atraparlo.**
 
 ---
 
@@ -132,7 +132,7 @@ Knowledge es el **primer consumer**, no el dueño. La transversalidad NO es una 
 No se crea un componente nuevo. Se compone el canvas con el contrato del dominio.
 
 1. **Declarar el `surfaceContext`** con `domain: '<nuevo>'`, `placement`, `dataReality`, `sensitivity`, `allowedRenderers` (whitelist de renderers que esa surface permite) y `allowedActions`. Import del SSOT.
-2. **Elegir kind→variant.** Si hay un kind de dominio (`<x>InsightEmbedded`), agregalo a `NEXA_ANSWERS_CANVAS_KIND_CONFIG` resolviendo a un **variant existente** (`embedded`/`sidecar`/`inline`) — NUNCA un variant nuevo por dominio. Si no, usar `custom`.
+2. **Elegir kind→variant.** Si hay un kind de dominio (`<x>InsightEmbedded`), agrégalo a `NEXA_ANSWERS_CANVAS_KIND_CONFIG` resolviendo a un **variant existente** (`embedded`/`sidecar`/`inline`) — NUNCA un variant nuevo por dominio. Si no, usar `custom`.
 3. **Producir el render plan** (`nexa-answer-render-plan.v1`): blocks con `answerBubble` (variant por intent) + `proof` (con `ConversationalEvidencePacket` si hay evidencia). El packet de evidencia se mapea desde el packet de dominio (p.ej. `knowledge-search.v1` → `nexa-evidence.v1`).
 4. **Conducir la coreografía** desde el host (los 11 estados) — degradación honesta en `degraded`/`error`.
 5. **Agregar un specimen de portabilidad** al scenario GVC (mismo canvas, dominio nuevo) → el guard de transversalidad lo cubre.

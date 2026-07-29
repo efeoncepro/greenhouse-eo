@@ -206,6 +206,11 @@ Do not publish `1 credit = money`, vendor→credit conversion, per-piece tables 
 ## Workflow
 
 1. Normalize the asset brief: target surface, audience, final size, format, alpha needs, style, constraints, and whether it is exploratory or repo-bound.
+
+For social posts that contain real reports, dashboards or exact product UI, also load
+`docs/operations/GREENHOUSE_SOCIAL_VISUAL_REPORT_PRODUCTION_V1.md`. The generator may produce a clean plate or
+supporting texture, but must not regenerate the final report, score, UI, copy or logo. Those layers remain
+deterministic and are composed after any generative finish.
 2. Build a short art-direction hypothesis: viewer takeaway, silhouette, visual hierarchy, finish, material, lighting, palette, and quality risks.
 3. If a visual reference is a webpage, inspect its original SVG/Lottie/CSS/raster source before choosing the
    engine; load `../design-studio/modules/11_PRODUCT_STORY_SCENES.md` for product/editorial scenes.

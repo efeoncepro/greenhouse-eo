@@ -187,6 +187,14 @@ La tipografía tiene su propio SoT en código (espejo del patrón AXIS de color)
 - `figma-create-design-system-rules` — sync rules with Figma side.
 - `figma-generate-library` — when building Figma library that mirrors code tokens.
 
+## Compose with — materialization lanes (2026-07-27)
+
+- `tailwind-engineer` — esta skill gobierna **qué token existe** y su ciclo de vida; aquélla, **cómo
+  ese token se vuelve utilidad** (`@theme`, namespaces, `@utility`). Un token nuevo entra siempre por
+  acá, nunca agregándolo directo al `@theme`.
+- `css-architect` — capa `tokens` en la arquitectura de capas, `@property` para tipar y poder animar
+  custom properties, y la separación primitivo → semántico → componente.
+
 ## Version
 
 - **v1.0** — 2026-05-11 — Initial skill. Pins the 3-layer governance model.

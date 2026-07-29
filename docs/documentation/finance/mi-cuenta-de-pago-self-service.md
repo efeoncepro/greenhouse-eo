@@ -54,7 +54,7 @@ El nombre del titular y el documento legal se pre-rellenan desde tus Datos legal
 | --- | --- |
 | **Cuenta activa** | Esta es la cuenta donde recibes pagos hoy. Aprobada por finance. |
 | **En revision** | Tu solicitud (alta o cambio) esta esperando aprobacion de finance. |
-| **Cancelada** | La solicitud fue cancelada (por vos o por finance). |
+| **Cancelada** | La solicitud fue cancelada (por ti o por finance). |
 | **Reemplazada** | Esta cuenta fue reemplazada por una nueva mas reciente (historial). |
 
 Solo veras "Activa" + opcionalmente "En revision". Las canceladas/reemplazadas son historico interno que no aparece en tu vista.

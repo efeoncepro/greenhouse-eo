@@ -50,6 +50,9 @@ Use this reference for any Efeonce public landing page on WordPress/Ohio/Element
 
 7. **Purge and verify**
    - Purge Kinsta cache after live mutations.
+   - Hard-reload or freshly navigate the real URL before the smoke. An already open tab can retain
+     the previous custom-element JavaScript bundle even after the server and Kinsta cache changed;
+     verify the current bundle/version before attributing behavior to the new runtime.
    - Verify desktop and mobile 390px.
    - Check `scrollWidth == clientWidth` or report exact overflow.
    - For UI/copy changes, inspect computed typography, spacing, overlaps, hover/focus/reduced-motion where relevant.

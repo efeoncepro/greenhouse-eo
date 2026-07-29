@@ -37,13 +37,13 @@ El **puente de dominio**. Traduce el packet real del dominio al render plan **ne
 - **Reusa** el evidence converter para el `proof`.
 - **Honestidad (state-design):** sin datos (`confidence='none'` / 0 resultados) → **gap honesto** en el render plan (título "No encontré…", sin puntos, sin evidence, con `unavailableReason`). NUNCA una respuesta inventada.
 - **Trust cue** derivado de la confianza/frescura del dominio (success/info/warning honestos).
-- Emite **solo los renderers que tu `allowedRenderers` declara** (Knowledge: solo `answerBubble`). Validá con `assertNexaAnswersRenderPlanAllowed`.
+- Emite **solo los renderers que tu `allowedRenderers` declara** (Knowledge: solo `answerBubble`). Valida con `assertNexaAnswersRenderPlanAllowed`.
 
 Ref: `buildKnowledgeAnswerRenderPlan` (`src/lib/knowledge/nexa/knowledge-answer-render-plan.ts`) + sus 7 tests.
 
 ### 2 — `surfaceContext` (declarativo)
 
-Declará el contrato de surface: `domain` + `placement` + `density` + `dataReality` + `sensitivity` + `allowedRenderers` (whitelist de seguridad) + `allowedActions`. Es lo único "de dominio" que ve el canvas — y es **datos**, no chrome.
+Declara el contrato de surface: `domain` + `placement` + `density` + `dataReality` + `sensitivity` + `allowedRenderers` (whitelist de seguridad) + `allowedActions`. Es lo único "de dominio" que ve el canvas — y es **datos**, no chrome.
 
 ```ts
 const SURFACE_CONTEXT: NexaAnswersSurfaceContext = {
@@ -53,7 +53,7 @@ const SURFACE_CONTEXT: NexaAnswersSurfaceContext = {
 }
 ```
 
-Si tu dominio tiene un `kind` semántico, agregalo al resolver `kind→variant` del canvas resolviendo a un **variant existente** (`embedded`/`sidecar`/`inline`) — NUNCA un variant nuevo por dominio.
+Si tu dominio tiene un `kind` semántico, agrégalo al resolver `kind→variant` del canvas resolviendo a un **variant existente** (`embedded`/`sidecar`/`inline`) — NUNCA un variant nuevo por dominio.
 
 ### 3 — Lens host: máquina de estados + fetch + handlers (self-contained)
 
@@ -80,7 +80,7 @@ NO conflar con el flag de retrieval (`NEXA_KNOWLEDGE_RETRIEVAL_ENABLED`): uno ha
 
 ### 5 — Verificación GVC (loop) + rollout gradual
 
-- Scenario GVC que ejercita la interacción (click lente → escribir → submit → frames thinking/reasoning/answered). Corré con el dev server + el flag ON: `NEXA_ANSWERS_CANVAS_LENS_ENABLED=true pnpm dev` + `pnpm fe:capture <scenario> --env=local`. **Mirá los frames.**
+- Scenario GVC que ejercita la interacción (click lente → escribir → submit → frames thinking/reasoning/answered). Corre con el dev server + el flag ON: `NEXA_ANSWERS_CANVAS_LENS_ENABLED=true pnpm dev` + `pnpm fe:capture <scenario> --env=local`. **Mira los frames.**
 - **El corpus/datos reales del dominio suelen vivir en staging, no en local** (lección ISSUE-094: la verificación del grounded-rico es mejor en staging — pool estable + datos). Local prueba wiring + estados + **degradación honesta** (gap sin datos).
 - Rollout: flag ON staging → QA → sign-off → prod gradual. Rollback = flag OFF (la surface legacy queda intacta de fallback).
 
@@ -89,12 +89,12 @@ Ref: `scripts/frontend/scenarios/knowledge-nexa-canvas-lens.scenario.ts`. GVC TA
 ## Hard rules (anti-regresión)
 
 - **NUNCA** metas lógica/copy/tipos del dominio dentro de `NexaAnswersCanvas` ni de los feature-primitives. El adapter + el host viven en el consumer.
-- **NUNCA** forkees el citation mapper ni el evidence converter — reusá los canónicos de `src/lib/nexa/`.
+- **NUNCA** forkees el citation mapper ni el evidence converter — reusa los canónicos de `src/lib/nexa/`.
 - **NUNCA** inventes una respuesta sin datos: gap honesto (`confidence='none'` → título "no encontré…", sin evidence).
 - **NUNCA** un flag de presentación conflado con el de retrieval; default OFF; la page (server) lo resuelve.
 - **NUNCA** declares la UI "lista" sin una captura GVC mirada (corpus real → staging).
-- **NUNCA** emitas un renderer fuera de tu `allowedRenderers` (validá con `assertNexaAnswersRenderPlanAllowed`).
-- **SIEMPRE** que un dominio nuevo emerja, escribí SU adapter + host + flag; el canvas no cambia. Si necesitás un renderer/feature nuevo, es trabajo de **primitive** (P+V+K completo), no del consumer.
+- **NUNCA** emitas un renderer fuera de tu `allowedRenderers` (valida con `assertNexaAnswersRenderPlanAllowed`).
+- **SIEMPRE** que un dominio nuevo emerja, escribe SU adapter + host + flag; el canvas no cambia. Si necesitas un renderer/feature nuevo, es trabajo de **primitive** (P+V+K completo), no del consumer.
 
 ## Procedencia
 

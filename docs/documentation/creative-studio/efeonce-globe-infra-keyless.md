@@ -1,9 +1,9 @@
 # Efeonce Globe — Infraestructura como código, despliegue sin llaves (viva)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-19 por Claude (TASK-1464)
-> **Ultima actualizacion:** 2026-07-19 por Claude
+> **Ultima actualizacion:** 2026-07-21 por Claude (TASK-1507)
 > **Documentacion tecnica:** [`docs/operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`](../../operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md) (repo hermano)
 
 ## De qué se trata este documento
@@ -35,6 +35,10 @@ Entre lo que quedó **vivo y nuevo**:
 - **Bucket privado de evidencia del Lab.** El almacenamiento privado donde el Model Lab guardará su evidencia — privado por diseño, sin acceso público.
 - **Estado remoto.** El "estado" de Terraform (el registro de qué existe) vive en un bucket remoto versionado, no en la máquina de una persona.
 - **Alerta anti-llaves.** Una señal de observabilidad que **avisa si alguien crea una clave de service account** — porque el modelo es *keyless* (sin llaves), y crear una llave violaría ese invariante.
+
+## Delta 2026-07-21 — el front door internal-only (`TASK-1507`)
+
+Un segundo apply supervisado sobre esta misma IaC agregó la **puerta de entrada interna** de Globe: hoy se entra por **`https://globe.efeoncepro.com`** y la URL `run.app` anterior **ya no responde** desde un navegador (se cerró a propósito, dejando una sola puerta). Costo fijo: **~US$18,25 al mes** más ~US$0,024 por GiB servido. Sigue siendo **internal-only**: no es producción ni acceso de clientes. Detalle funcional en [`dominio-interno-globe.md`](dominio-interno-globe.md).
 
 ## Cómo lo gobierna Greenhouse
 

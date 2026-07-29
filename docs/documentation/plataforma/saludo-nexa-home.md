@@ -19,8 +19,8 @@ No es decorativa: es la **puerta de entrada a la operación** — desde ahí se 
 | **Avatar de Nexa** + chip "¡Hola, soy Nexa!" | La identidad de la asistente. Debajo, un aviso chico de que Nexa usa IA generativa. |
 | **Saludo** | Un saludo personalizado y **distinto cada vez** (ver abajo). |
 | **Rol · empresa** | Ej. "Colaborador · Efeonce Group". |
-| **Campo de pregunta** | Donde le escribís a Nexa. El texto de ejemplo va **rotando** para mostrarte qué le podés preguntar. |
-| **Botón enviar** | Aparece "apagado" cuando el campo está vacío y se **enciende** (relleno) cuando escribís; muestra un *spinner* al enviar. |
+| **Campo de pregunta** | Donde le escribes a Nexa. El texto de ejemplo va **rotando** para mostrarte qué le puedes preguntar. |
+| **Botón enviar** | Aparece "apagado" cuando el campo está vacío y se **enciende** (relleno) cuando escribes; muestra un *spinner* al enviar. |
 | **Accesos rápidos** | Chips con ícono (ej. *Mis tareas*, *Mis horas*, *Mi nómina*) que dependen de tu rol. |
 
 ## El saludo siempre cambia (y "sabe" el momento)

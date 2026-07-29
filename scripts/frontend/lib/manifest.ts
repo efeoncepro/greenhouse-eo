@@ -67,6 +67,7 @@ export type FindingCategory =
   | 'accessibility'
   | 'layout'
   | 'runtime'
+  | 'asset_integrity'
   | 'keyboard'
   | 'performance'
   | 'enterprise'

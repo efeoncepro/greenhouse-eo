@@ -18,6 +18,11 @@ Los CMOs recuerdan espontáneamente 6–7 agencias por mercado (SCOPEN). Si no e
 
 El crecimiento no se entrega: se **co-construye**. No nace de los números ni del paquete de entregables —nace de *cómo trabajamos juntos*: con transparencia total, educándote en el proceso, y sumando cada ciclo sobre el anterior. Un cliente que crece con nosotros sale **más capaz, no más dependiente**.
 
+El contrato operator-first es la forma de hacer esta creencia observable en el trabajo cotidiano: los dolores del
+operador revelan dónde la agencia tradicional reduce capacidad; las Product Services deben devolver autonomía,
+criterio, memoria e influencia; Greenhouse debe conservar la evidencia de que cada ciclo dejó al cliente más capaz.
+El desarrollo detallado vive en [`Operator-First Product & Growth Contract`](../strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md) y el mapa de fallas en [`Operator Pain & Journey Failure Map`](../strategy/EFEONCE_OPERATOR_PAIN_AND_JOURNEY_FAILURE_MAP_V1.md).
+
 Es una creencia sobre la **naturaleza del crecimiento y de la sociedad con un cliente**, no una feature. Tres pilares, una sola creencia:
 
 1. **Co-creación, no entrega.** El cliente no "recibe entregables": **opera con nosotros, en vivo**. La experiencia de construir juntos es parte del producto, no un extra. → *Prueba (no promesa):* el login a su operación en tiempo real (`03`/`04`, transparencia de Greenhouse).
@@ -51,6 +56,21 @@ El **switching cost NO nace de dejar al cliente dependiente y a oscuras** (el ju
 
 > **Este bloque es el SSOT del Why/Golden Circle de Efeonce.** El resto de los docs (`01`, `05`, `10`, `14`) y la skill `efeonce-agency` lo **citan**, no lo recopian. Si difieren, manda este bloque.
 
+### Doctrina narrativa de Creative Studio
+
+En la historia de Globe, el héroe no es la IA ni Efeonce. **El equipo creativo es protagonista** y el operador
+activo es el punto de vista desde el que se vive la experiencia. El Head of Creative/Brand conserva autoridad;
+el CMO patrocina el outcome; Globe funciona como guía y sistema; los modelos son maquinaria intercambiable.
+
+El enemigo es la fragmentación aplicada a crear: trabajo repetitivo, traducción entre herramientas, parámetros,
+retries, costos opacos, pérdida de contexto y campañas que dependen de actos heroicos. La promesa no es fabricar
+más piezas con menos personas. Es que el equipo invierta más atención en intención, exploración, dirección y
+decisión, mientras el sistema resuelve la complejidad técnica con evidencia.
+
+Regla de lenguaje: “clase mundial” describe un estándar interno de craft y verificación, no un claim externo
+autosuficiente. Hacia el mercado se demuestra con mecanismos —original preservado, decisiones trazables,
+provenance, rutas visibles, revisión humana, memoria y resultados aprobados— en vez de superlativos.
+
 ### Ambición de escala y diferenciador defendible
 
 La ambición de Efeonce es **LATAM-first, no LATAM-limited**: construir una agencia grande y reconocida en toda Latinoamérica desde el inicio, preparada para servir después a EEUU hispano, mercados en inglés y otros mercados internacionales. La presencia LATAM es una ventaja operativa/cultural y una prueba de ejecución multi-país; **no es el techo de la categoría**.
@@ -63,11 +83,14 @@ El diferenciador defendible no es decir "co-creamos", "somos partner" ni "somos 
 - **Memoria:** cada ciclo deja historial, aprendizaje y contexto reutilizable.
 - **Capacidad:** el cliente entiende más, decide mejor y entrega mejores briefs.
 
-La categoría aspiracional se expresa como **Growth Operating System** y **ASaaS (Agency Service as a Software)**. La frase interna de posicionamiento:
+La categoría de mercado se expresa como **AI-enabled marketing and growth systems company**. En conversación comercial: **Integrated Growth Partner**. **ASaaS (Agency Service as a Software)** es el modelo de delivery y monetización; **Growth Operating System** es la visión aspiracional. Efeonce combina estrategia, personas, product services, plataformas y agentes. La frase interna de posicionamiento:
 
-> **Efeonce no es una agencia que ejecuta piezas. Es un sistema operativo de crecimiento: estrategia, creatividad, medios, datos y software propio trabajando como una sola operación.**
+> **Efeonce es una empresa de sistemas de crecimiento digital habilitados por IA: estrategia, personas, creatividad, medios, datos, product services y software propio trabajando como una sola operación. Estamos construyendo un Growth Operating System.**
 
-En inglés, usar transcreación, no traducción literal: **Efeonce is a Growth Operating System for ambitious brands: strategy, creative, media, data and proprietary software working as one system.**
+En inglés, usar transcreación, no traducción literal: **Efeonce is an AI-enabled growth systems company for ambitious organizations — an integrated growth partner combining people, products, platforms and agents on the way to a Growth Operating System.**
+
+La promesa operativa detrás de ese posicionamiento es la dirección 2028: cada servicio client-facing debe ser un
+Product Service productizado y AI-native, sin confundir AI-native con autónomo, self-service o reducción de personas.
 
 Regla para posicionamiento global: vender el **sistema** antes que el origen regional. "LATAM" puede aparecer como prueba de ejecución multi-mercado, cercanía cultural, velocidad y eficiencia, pero nunca como límite de ambición ni como sustituto del mecanismo.
 
@@ -89,19 +112,21 @@ Regla de marca: Nexa nunca debe presentarse como "asistente virtual" genérico n
 
 ## Arquitectura de marca: masterbrand con capabilities
 
-Una sola marca lidera toda la comunicación externa. Las antiguas sub-marcas se reposicionan como **capabilities** (áreas de expertise internas), no marcas independientes.
+Una sola marca lidera toda la relación externa: **Efeonce es la marca paraguas**. El portfolio distingue líneas de negocio/prácticas y product brands; estas últimas pueden ser visibles cuando ayudan a explicar una solución, pero no se presentan como agencias contractuales separadas.
 
-> *El cliente contrata a Efeonce. No contrata a Globe + Reach + Wave por separado. Una marca, un sistema, múltiples capacidades.*
+> *El cliente contrata a Efeonce. Wave puede nombrar el producto/capability que se entrega, pero el cliente no contrata a Globe + Reach + Wave como proveedores separados. Una marca relacional, productos reconocibles, un sistema.*
 
 | Nivel | Elemento | Rol |
 |---|---|---|
 | **Masterbrand** | **Efeonce** | La única marca que se construye activamente. Todo el brand building va aquí. |
-| Capability 1 | Creatividad y Contenido (Globe) | Motor creativo: identidad, contenido, campañas, audiovisual. |
-| Capability 2 | Amplificación y Medios (Reach) | Media buying, distribución, PR. |
-| Capability 3 | Infraestructura Digital (Wave) | Web, CRM, automatización, tracking, data. |
-| Sub-marca endorsed | **Globe Studio \| Efeonce** | Única excepción con identidad propia. Punto de entrada al sistema. |
+| Línea de negocio / práctica | Product brand relacionada | Rol |
+| **Creative Services** | **Globe / Creative Studio** | Branding, contenido, campañas, audiovisual y producción creativa productizada. |
+| **Media & Distribution** | **Reach, Verk, Greenhouse** | Tres soluciones comerciales de distribución; Reach es product brand habilitadora. |
+| **Digital Services & Engineering** | **Wave** | Search Visibility 360, web, measurement, agentes, integraciones y automatización. |
+| **RevOps & CRM** | **Kortex** + HubSpot | CRM, implementación, automatización e inteligencia comercial. |
+| **Control plane / experiencia** | **Greenhouse** | Operación, cliente, memoria, medición y convergencia del ecosistema. |
 
-> Implicación de producto: la **vista interna (Agency) de Greenhouse** sí organiza por unidades (Globe, Reach, Wave) porque refleja la operación; la **experiencia de cara al cliente** debe liderar con "Efeonce" como marca única. No expongas la estructura de capabilities como si fueran proveedores separados al cliente.
+> Implicación de producto: Greenhouse puede organizar internamente por líneas de negocio, product brands, ownership y delivery. La experiencia de cara al cliente debe liderar con "Efeonce" como marca paraguas y mostrar la product brand solo cuando aporte claridad. No expongas líneas o marcas como proveedores contractuales separados.
 
 ---
 
@@ -114,7 +139,7 @@ Tagline master: **Empower your Growth**. La palabra final rota según la capabil
 | **Empower your Growth** | Efeonce como ecosistema completo (default). Web, LinkedIn corporativo, propuestas integrales, firma de email. |
 | **Empower your Brand** | Lidera creatividad/contenido. |
 | **Empower your Voice** | Lidera medios/amplificación. |
-| **Empower your Engine** | Lidera web/CRM/infraestructura (= contexto típico de Greenhouse/Wave). |
+| **Empower your Engine** | Lidera web, visibilidad, measurement, agentes e infraestructura digital (= contexto típico de Wave). CRM se lidera desde Efeonce Digital/Kortex. |
 
 **Línea de compromiso para la capability creativa:** *“Automatizamos lo repetible para potenciar lo irrepetible.”* Funciona como principio/manifesto de Creative Studio, no reemplaza el tagline master **Empower your Growth** ni debe prometer automatización total. Siempre debe aterrizarse en su mecanismo: fricción y repetición al sistema; exploración, criterio y aprobación a las personas.
 
@@ -133,7 +158,7 @@ Las 4 capas verbales (en secuencia natural de conversación):
 
 ## Posicionamiento
 
-- **Categoría:** Growth partner con sistema operativo propio y ecosistema de producto. **No** "agencia de marketing digital" (commodity).
+- **Categoría comercial:** Integrated Growth Partner con plataforma y ecosistema de producto propio. **No** "agencia de marketing digital" como identidad estratégica (aunque puede ser keyword de captura).
 - **Promesa central:** crecimiento orquestado — creatividad, medios y tecnología como un solo sistema con visibilidad total.
 - **Enemigo:** la fragmentación. Una agencia hace la marca, otra los ads, otra el sitio, otra el CRM, y nadie conecta nada.
 - **Proof points:** metodología propietaria (sistema estratégico + operativo) · 120+ empresas en 4 países · 80% de renovación · HubSpot Solutions Partner · visibilidad en tiempo real (dashboards vivos, no informes) · **tres plataformas de software propietario (Greenhouse, Kortex, Verk) — modelo ASaaS único en LATAM.**
@@ -177,9 +202,9 @@ Las 4 capas verbales (en secuencia natural de conversación):
 
 ## Reglas de comunicación (aplican a todo touchpoint externo, incluido el portal)
 
-1. Toda comunicación externa lidera con **"Efeonce"**. Nunca Globe/Reach/Wave solos.
-2. En propuestas, las capabilities se nombran descriptivamente ("nuestro equipo de creatividad y contenido"); Globe/Reach/Wave entre paréntesis.
-3. **Globe Studio** es la única excepción que comunica con nombre propio, siempre con "| Efeonce".
+1. Toda comunicación externa lidera con **"Efeonce"**.
+2. En propuestas, nombra primero la línea y la oferta ("Servicios Creativos — Managed Creative Operations"); agrega la product brand cuando aporte diferenciación ("potenciado por Globe").
+3. Globe, Wave, Reach y Kortex no se presentan solos como agencias o proveedores contractuales separados.
 4. Las metodologías propietarias (Loop Marketing, Nested Loops, ICO) **no** se mencionan en primer contacto.
 5. "Empower your ___" se activa según contexto; "Growth" es default.
 6. Tono **"tú"** siempre. "Usted" solo en contratos, legales y procurement.
@@ -207,4 +232,5 @@ ICO y el ecosistema de producto no son solo operaciones — son **experiencia de
 
 *Fuente: Arquitectura de Marca & Messaging Framework v1.0 + Marca Agencia Estrategia Completa v1.2. Los Thought Territories T1–T5 (contenido/LinkedIn) viven en el doc de marca; T6 = ASaaS / futuro de la agencia.*
 
-*Última verificación de drift contra runtime: 2026-06-09 (TASK-1064) — sin claims de runtime hardcodeados; targets/fechas comerciales son intencionales.*
+*Última verificación de drift contra runtime: 2026-07-23 — doctrina de autoría Creative Studio reconciliada con
+el business model V1.1; sin claims de runtime hardcodeados.*

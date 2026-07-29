@@ -12,7 +12,7 @@
 
 Este manual explica como **activar el motor de metricas ICO** (OTD, RpA, tareas, etc.) para un cliente y como **verificar en que etapa real** esta el cliente. Desde TASK-1171 esto es data-driven: cualquier cliente entra solo, sin tocar codigo.
 
-Usalo cuando:
+Úsalo cuando:
 
 - entra un cliente nuevo y hay que hacerlo aparecer en su dashboard y en el reporte de agencia
 - un cliente ya conectado a Notion no muestra metricas

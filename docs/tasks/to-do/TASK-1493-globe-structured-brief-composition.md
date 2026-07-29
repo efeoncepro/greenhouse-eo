@@ -24,7 +24,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `creative|ai|platform`
-- Blocked by: `TASK-1481`
+- Blocked by: `none`
 - Branch: `task/TASK-1493-globe-structured-brief-composition`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -38,6 +38,14 @@ estructura. Esta task convierte el brief en una **estructura tipada de ingredien
 provider por el seam, y agrega un **registry de recetas/plantillas reusables por workspace** (hoy
 `GoldenBriefFixtureV1` es fixture de test, no autorable). Habilita el Prompt Studio, las Recetas y la
 plantilla curada del Globe Studio Workbench (`TASK-1474`), sin tocar el provider seam ni la UI.
+
+La receta no se limita a un preset visual ni a un string de estilo: es la representación durable de la
+intención creativa que Creative Prompt, Dirección y Producer comparten. Debe poder expresar una dirección
+de cámara semántica y versionada sin exponer parámetros propietarios de un proveedor.
+
+La receta también puede declarar la intención de formato —uso, ratio, safe zones y relación con el origen—
+pero no debe duplicar la autoridad técnica de `OutputShapeV1` ni inventar capacidades que el catálogo de
+la route no confirma.
 
 ## Why This Task Exists
 
@@ -67,6 +75,9 @@ recurso durable por workspace: hoy `GoldenBriefFixtureV1` es una constante de te
 - Un registry de recetas/plantillas reusables por workspace: command para autorar/versionar una receta
   y reader para listarla/materializarla en un brief, con gobernanza tenant-safe (el fixture de test deja
   de ser el único camino).
+- Una dimensión de cámara neutral y versionada, reutilizable por imagen y video, con shot, ángulo,
+  sensación de lente, profundidad, composición y movimiento cuando aplique; el mapeo a parámetros o
+  prompt de proveedor queda fuera del contrato público y vive en la compilación/adaptación server-side.
 - Full API Parity: brief-compose + recipe-registry como command/reader del spine con coverage
   (`ui`/`mcp` pueden nacer `policy-blocked` como el resto del Lab), no como campo de UI ad hoc.
 
@@ -297,11 +308,40 @@ Reglas obligatorias:
 
 ## Scope
 
+### Approved Producer target addendum — recipes, prompt history and enhance
+
+The Producer consumes this task as the authority for reusable recipes and prompt evolution. Add a durable,
+workspace-scoped prompt history reader and an `enhance prompt` command that returns a proposal; enhancement never
+silently rewrites the submitted prompt or starts a run.
+
+- Prompt history is bounded, paginated and scoped by trusted actor/workspace context. It records the accepted
+  prompt/structured brief, recipe/version references and correlation evidence without leaking provider prompts or
+  secrets.
+- Enhance returns proposed text/structured deltas plus method/model/policy version evidence. The human must accept
+  the proposal explicitly before it becomes run input; rejection leaves the original unchanged.
+- Enhancement routes through the governed provider/policy seam, with rate/spend controls and deterministic
+  fallback to an honest unavailable state. No UI-only prompt mutation or direct vendor SDK is allowed.
+- Recipe create/version/list/materialize remains canonical here and is reusable by Producer, Workbench and API
+  consumers through the same commands/readers.
+- Creative Prompt no compila ni persiste una segunda receta: una propuesta aceptada debe referenciar o
+  materializar la receta efectiva de TASK-1493. La cámara, el look y las restricciones quedan visibles como
+  cambios estructurados, no sólo como texto reescrito.
+
+Additional acceptance evidence:
+
+- [ ] History pagination and access tests prove actor/workspace isolation and bounded retention.
+- [ ] Enhance is idempotent for the same request key, produces a reviewable proposal and never dispatches a run.
+- [ ] Accepting a proposal captures its source/version in the effective recipe and audit trail.
+
 ### Slice 1 — Tipos de brief estructurado (contrato transport-neutral)
 
 - `BriefIngredientKind` (enum: `subject`|`style`|`light`|`framing`|`mood`|`palette`) y
   `BriefIngredientV1` (`kind`, `value`, `weight` normalizado) en `packages/contracts`.
 - `StructuredBriefV1` (`schemaVersion`, lista de ingredientes, `notes?`) versionado.
+- Extender el modelo de receta/brief con `CreativeCameraDirectionV1` `[verificar versión exacta]` como
+  objeto semántico opcional y retrocompatible. Debe cubrir `shot`, `angle`, `lensFeel`, `depthOfField`,
+  `composition`, `focalPlacement` y `movement?`; no debe aceptar slugs de proveedor ni parámetros de
+  transporte como autoridad del caller.
 - `structuredBrief?: StructuredBriefV1` aditivo en `PrepareExperimentPayloadV1`, documentado como
   mutuamente excluyente con `prompt`.
 
@@ -416,6 +456,11 @@ declararlo y coordinarlo antes de shippear `[verificar durante Plan Mode]`.
       (sin precedencia silenciosa), con test que lo prueba.
 - [ ] Recipe registry: command para autorar/versionar receta por workspace + reader para listar/
       materializar, tenant-safe (`workspaceId` del contexto), idempotente por versión.
+- [ ] Una receta puede persistir y materializar una dirección de cámara semántica sin provider slugs,
+      preservando compatibilidad con recetas antiguas que sólo contienen ingredientes existentes.
+- [ ] El compilador conserva la separación entre intención, cámara, look y restricciones; una propuesta
+      de Creative Prompt aceptada no reemplaza silenciosamente el brief original ni pierde la referencia
+      a la receta/version que la originó.
 - [ ] Nuevos command/reader registrados en `GLOBE_LAB_COMMANDS`/`GLOBE_LAB_READERS` + coverage
       (`ui`/`mcp` = `policy-blocked`, carriles internos `available`).
 - [ ] `cd ../efeonce-globe && pnpm check && pnpm build` verdes.
@@ -450,6 +495,8 @@ sigue abierta.]
 - `TASK-1494` (Style DNA), `TASK-1495` (formatos), `TASK-1496` (receta reproducible seed/sampler),
   `TASK-1499` (Dirección) reusan el `StructuredBriefV1` como insumo. Confirmar que el compilador es
   reproducible antes de que TASK-1496 dependa de él.
+- `TASK-1530` (Creative Prompt Engineer) produce propuestas estructuradas que deben consumir este registry;
+  `TASK-1531` y `TASK-1552` son consumidores de presentación, no dueños del modelo de receta/cámara.
 - Evaluar sembrar las `GoldenBriefFixtureV1` como recetas de referencia read-only (paridad entre el
   brief-como-fixture de test y las recetas autorables por workspace).
 

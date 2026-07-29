@@ -43,9 +43,9 @@ Revisada con `arch-architect` (lente dominante — es capa reactiva/outbox/CQRS)
 ## Delta 2026-07-07
 
 - **Desbloqueada (foundation):** `TASK-353` completa. Ya existe:
-  - **Snapshot de handoff embebido** en `hiring_application`: `decision`, `decision_at`, `decision_by`, `selected_destination`, `tentative_start_date`, `expected_legal_entity`, `expected_context`, `prerequisites_snapshot_json` (verificado en migración `20260707235655376`:167-178). Leé esos para crear `HiringHandoff` — la Person es `identity_profile_id` (no dupliques identidad).
-  - **Outbox events v1 ya emitidos** por el store (`talent_demand.*`, `hiring.opening.*` incl. published/unpublished, `hiring.candidate_facet.*`, `hiring.application.created|stage_changed`, `hiring.assessment.*`) vía `publishOutboxEvent()` — **sin consumer reactivo todavía**. Vos construís el consumer reactivo + `hiring.handoff.*` + `hiring.signal.*` (nuevos) + el `HiringHandoff` como aggregate propio. Aggregate/event types en `src/lib/sync/event-catalog.ts` (comentario en :1085 reserva estos eventos para esta task).
-  - **Boundary duro (respetá):** Hiring NO crea `member`/`assignment`/`placement`/payroll. El `internal_hire` → colaborador activo lo cierra `TASK-770` bajo HRIS/People, no acá.
+  - **Snapshot de handoff embebido** en `hiring_application`: `decision`, `decision_at`, `decision_by`, `selected_destination`, `tentative_start_date`, `expected_legal_entity`, `expected_context`, `prerequisites_snapshot_json` (verificado en migración `20260707235655376`:167-178). Lee esos para crear `HiringHandoff` — la Person es `identity_profile_id` (no dupliques identidad).
+  - **Outbox events v1 ya emitidos** por el store (`talent_demand.*`, `hiring.opening.*` incl. published/unpublished, `hiring.candidate_facet.*`, `hiring.application.created|stage_changed`, `hiring.assessment.*`) vía `publishOutboxEvent()` — **sin consumer reactivo todavía**. Vos construyes el consumer reactivo + `hiring.handoff.*` + `hiring.signal.*` (nuevos) + el `HiringHandoff` como aggregate propio. Aggregate/event types en `src/lib/sync/event-catalog.ts` (comentario en :1085 reserva estos eventos para esta task).
+  - **Boundary duro (respeta):** Hiring NO crea `member`/`assignment`/`placement`/payroll. El `internal_hire` → colaborador activo lo cierra `TASK-770` bajo HRIS/People, no acá.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE

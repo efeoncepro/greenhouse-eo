@@ -11,8 +11,8 @@ Al escribir el copy quedó claro que el pitch de `/agencia` y el de la Home son 
 
 La revisión del Home público live contra el Why y PDR-012 confirma que el contenido histórico de este PDR no debe ejecutarse como página nueva ni como simple "copy paste" a la Home. Debe aplicarse como **rework integral del pitch**:
 
-- El Home actual ya contiene señales correctas (`ecosistema`, IA, creatividad, tecnología, resultados), pero todavía vende más una agencia creativa/digital competente que un **Growth Operating System / ASaaS**.
-- El primer viewport debe liderar con el reencuadre de categoría: no otra agencia de marketing digital; un sistema operativo de crecimiento con operación visible, software, datos y memoria.
+- El Home actual ya contiene señales correctas (`ecosistema`, IA, creatividad, tecnología, resultados), pero todavía vende más una agencia creativa/digital competente que un **Integrated Growth Partner** respaldado por plataforma y ASaaS.
+- El primer viewport debe liderar con el reencuadre de categoría: no otra agencia de marketing digital; un **Integrated Growth Partner** con operación visible, software, datos y memoria, que construye hacia un Growth Operating System.
 - El residuo de template/demo/theme en el Home live es blocker de confianza y debe eliminarse antes de declarar alineación con este PDR.
 - PDR-010 y PDR-012 mandan sobre cualquier texto de este documento que suene a landing separada `/agencia`.
 
@@ -48,10 +48,10 @@ Crear `/agencia` como **pillar comercial de categoría**: **posiciona** como *gr
 
 ### 1. Dos capas, una página (posicionamiento vs descubrimiento)
 
-- **Capa de posicionamiento** (hero, promesa, lo que Efeonce reclama ser): **growth partner con software propio y visibilidad total**. Claim canónico de apertura: *"El crecimiento real no se compra por partes. Se orquesta."* (`09`). Enemigo declarado: **la fragmentación** — una agencia hace la marca, otra los ads, otra el sitio, otra el CRM, y nadie conecta nada.
+- **Capa de posicionamiento** (hero, promesa, lo que Efeonce reclama ser): **Integrated Growth Partner con software propio y visibilidad total**. Claim canónico de apertura: *"El crecimiento real no se compra por partes. Se orquesta."* (`09`). Enemigo declarado: **la fragmentación** — una agencia hace la marca, otra los ads, otra el sitio, otra el CRM, y nadie conecta nada.
 - **Capa de descubrimiento** (slug `/agencia`, `<title>`, H1, meta, JSON-LD): target al cluster **"agencia de marketing digital" / "agencia de marketing"** (los ~2.400/mes reales), reencuadrado en la misma línea con la estructura *no-es-X-es-Y* (Do canónico de voz, `05:73`).
 - **Titular puente** (candidato, ya vivo como eyebrow del about-us): **"Agencia de crecimiento integrada"** — usa *agencia* (categoría familiar y buscable) + *de crecimiento* (growth partner) + *integrada* (anti-fragmentación). Es el reencuadre exacto: findable **y** desmarcado del commodity.
-- **Regla dura de copy:** el H1 puede contener "agencia de marketing digital" por SEO, pero el **remate de la misma sección** debe reencuadrar (*"No somos una agencia de marketing digital más. Somos tu partner de crecimiento — con software propio y visibilidad total."*). NUNCA dejar "somos una agencia digital" como promesa sin reencuadre.
+- **Regla dura de copy:** el H1 puede contener "agencia de marketing digital" por SEO, pero el **remate de la misma sección** debe reencuadrar (*"No somos una agencia de marketing digital más. Somos tu Integrated Growth Partner — con software propio y visibilidad total."*). NUNCA dejar "somos una agencia digital" como promesa sin reencuadre.
 
 ### 2. Full-service como sistema integrado (no lista de servicios sueltos)
 
@@ -71,7 +71,11 @@ El scope es **full-service** — creatividad y contenido, **performance marketin
 ### 4. Marca, conversión y CRO
 
 - **Lidera la masterbrand Efeonce.** Globe/Reach/Wave nunca solos; capabilities descritas, no siglas en los primeros 30s (`09` regla cardinal: beneficios antes que nombres). Tuteo es-CL neutro.
-- **CTA primario: "Agenda una reunión"** + UTM/atribución preservada; fallback `/contacto/` + WhatsApp/mailto. **Mecanismo a decidir en ejecución** (ninguna landing viva lo tiene aún): HubSpot Meetings embed (net-new, sin precedente gobernado) **vs** `<greenhouse-form>` de solicitud de reunión in-page (patrón gobernado ya vivo en SEO/desarrollo-web, menor riesgo). Preferencia por el path gobernado salvo decisión explícita del operador. **CTA secundario de bajo compromiso** (dos escalones, patrón `PDR-004/005/006`): *"Mira cómo operamos"* (video/tour del ecosistema) o el grader como diagnóstico gratis.
+- **CTA primario: "Agenda una reunión"** + atribución preservada. El mecanismo canónico ya resuelto es
+  `open_meeting_scheduler`; `/agencia` todavía no está promovida y debe obtener surface/binding, booking y medición
+  propios antes de activarlo. El scheduler es native-only, sin embed ni link HubSpot como recuperación. `/contacto/`,
+  WhatsApp o mail pueden ofrecerse como canales editoriales separados. **CTA secundario de bajo compromiso** (dos
+  escalones, patrón `PDR-004/005/006`): *"Mira cómo operamos"* (video/tour del ecosistema) o el grader como diagnóstico gratis.
 - **CRO (doctrina `growth-marketing-cro`):** el 80% del lift es **message-market fit + confianza**, no micro-ajustes. Orden: claridad de propuesta → prueba (casos citables + logos + 4 países + 90+ clientes) → objeciones (miedo a tercerizar = perder control → lo resuelve la visibilidad total) → CTA. **Velocidad/CWV y trust signals son palancas de conversión de primer orden** (cada +100ms ≈ −1% conversión; juicio de confianza en ~50ms). El grader es la **costura** top→bottom (nodo compartido, `PDR-003`), no se reconstruye.
 - **Web agéntica:** la landing nace con datos estructurados / JSON-LD `Organization`+`Service` y citabilidad (skill `seo-aeo`) para ser recuperada por motores de respuesta, no solo por humanos.
 

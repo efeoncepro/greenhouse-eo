@@ -1,0 +1,98 @@
+{
+  "taskId": "TASK-1555",
+  "scenario": "task-1555-model-selector",
+  "reviewedAt": "2026-07-25",
+  "reviewer": "Claude + GVC premium evidence (fixture local de Globe, 1440x1000 + 390x844)",
+  "evidence": {
+    "desktop": ".captures/2026-07-25T07-34-15_task-1555-model-selector/01-desktop/frames/04-model-list-states-list-settled.png",
+    "mobile": ".captures/2026-07-25T07-34-15_task-1555-model-selector/02-mobile/frames/04-model-list-states-list-settled.png",
+    "dossier": ".captures/2026-07-25T07-34-15_task-1555-model-selector/review-dossier.md"
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.7,
+      "rationale": "El prompt domina el composer y el modelo es un control denso, no un competidor: la region paso de 515px (galeria) a 121px. El orden de lectura es brief -> modo -> modelo -> forma -> costo, y el modelo elegido se nombra en la barra fija sin abrir nada.",
+      "evidence": "01-producer-first-fold.png + 02-model-picker-closed.png (desktop y mobile)",
+      "nextAction": ""
+    },
+    "proportions": {
+      "score": 4.5,
+      "rationale": "El bloque de brief (prompt + sugerencias + referencias + restriccion) queda como una sola superficie proporcionada, y el selector ocupa una linea. En 390px la fila de modos envuelve dejando 'Escalar' solo en la segunda linea.",
+      "evidence": "02-mobile/frames/04-model-list-states-list-settled.png",
+      "nextAction": "Evaluar reparto de la fila de modos en 390px si la modalidad suma un quinto modo."
+    },
+    "rhythm": {
+      "score": 4.4,
+      "rationale": "Espaciado consistente por la escala de Globe y un separador fino que cierra el brief antes de la restriccion. El salto entre el heading 'Estilo - preset' y sus chips es mas ajustado que el resto de los grupos.",
+      "evidence": "02-mobile/frames/04-model-list-states-list-settled.png",
+      "nextAction": "Unificar el espacio heading->contenido de los control-group del composer."
+    },
+    "density": {
+      "score": 4.6,
+      "rationale": "Alta pero legible: la lista muestra cinco modelos antes de scroll y cada fila lleva identidad, version y estado sin truncar el dato clave. Las sugerencias bajaron de 223px a 121px y se repliegan a 0 al escribir.",
+      "evidence": "medicion en runtime: rowHeight 223 -> 121 -> 0; frames 03/04",
+      "nextAction": ""
+    },
+    "depth": {
+      "score": 4.6,
+      "rationale": "Roles de elevacion distintos y semanticos: campo de brief hundido, disparador en superficie, menu flotante con sombra propia y barra de ejecucion fija. La region de ruta cedio su chrome para no anidar tarjetas.",
+      "evidence": "01-desktop/frames/04-model-list-states-list-settled.png",
+      "nextAction": ""
+    },
+    "surfaceEconomy": {
+      "score": 4.6,
+      "rationale": "Es la dimension que se corrigio activamente: la route-card entrega padding/borde/fondo para que el control sea la unica superficie (sin card-on-card, anti-patron BLOCK de la direccion), y las sugerencias dejaron de flotar sueltas para vivir dentro del bloque de brief.",
+      "evidence": "01-desktop first-fold + rubrica enterprise sin hallazgos",
+      "nextAction": ""
+    },
+    "visualImpact": {
+      "score": 4.5,
+      "rationale": "Deliberadamente contenido: la direccion revisada declara que elegir modelo NO es el momento dominante. El impacto lo aporta el roster reconocible por isotipo real sobre el lenguaje oscuro cinematografico del Producer, no un despliegue decorativo. Es premium por restriccion, no por espectaculo.",
+      "evidence": "01-desktop/frames/04-model-list-states-list-settled.png",
+      "nextAction": ""
+    },
+    "typography": {
+      "score": 4.6,
+      "rationale": "Poppins display para headings y Geist para cuerpo, con jerarquia clara dentro de cada fila: nombre en 600, version y estado en secundario atenuado. Nada de fontSize suelto.",
+      "evidence": "01-desktop/frames/04-model-list-states-list-settled.png",
+      "nextAction": ""
+    },
+    "color": {
+      "score": 4.7,
+      "rationale": "El color carga significado, no decoracion: acento de accion para elegido/disponible, ambar para 'Proximamente' (gate ADR-009) y atenuado para el gate externo del proveedor. Los isotipos monocromos se recolorean por CSS sin alterar su path.",
+      "evidence": "07-unavailable-models-declared.png",
+      "nextAction": ""
+    },
+    "iconography": {
+      "score": 4.2,
+      "rationale": "Es la dimension mas debil y esta declarada: cuatro familias llevan isotipo oficial real (OpenAI, Gemini, ByteDance, ElevenLabs) pero Recraft y Topaz caen a monograma porque no existen en ningun set curado. El conjunto queda mixto a proposito: un logo inventado seria peor que un monograma.",
+      "evidence": "01-desktop/frames/04-model-list-states-list-settled.png + public/models/README.md",
+      "nextAction": "Sumar Recraft y Topaz cuando un set curado y licenciado los publique."
+    },
+    "responsive": {
+      "score": 4.6,
+      "rationale": "Transformacion real, no compresion: scrollWidth == clientWidth en 1440 y en 390, targets de 48px, el menu limita su alto y scrollea internamente, y la fila de modos envuelve en vez de comprimirse.",
+      "evidence": "02-mobile frames + medicion 390/390",
+      "nextAction": ""
+    },
+    "motion": {
+      "score": 4.3,
+      "rationale": "Minima y honesta, como fija el contrato de motion: transicion de estado en el disparador y en la fila, sin morph espacial ni pulso del recomendado. El bloque global de reduced-motion anula animacion y transicion dentro de la consola, y el significado sobrevive por estado, color y texto.",
+      "evidence": "06-model-list-states-reduced-motion.png",
+      "nextAction": "Dar al despliegue de la lista la transicion de estado existente de Globe: hoy el toggle nativo de <details> abre de golpe. Reusar el token vigente, sin morph espacial y conservando reduced-motion sin movimiento."
+    },
+    "fidelity": {
+      "score": 4.7,
+      "rationale": "Fiel a la direccion REVISADA por el operador: desplegable compacto, isotipo real del modelo, label sin jerga de ruteo y estados honestos. Cada pieza es trazable a una decision declarada, y la reversion de la Direccion A quedo escrita en el doc de direccion en vez de dejar el codigo contradiciendo el contrato.",
+      "evidence": "docs/ui/visual-directions/TASK-1555-globe-producer-model-selector-direction.md (Decision revisada)",
+      "nextAction": ""
+    },
+    "genericTemplateResistance": {
+      "score": 4.5,
+      "rationale": "Un desplegable es el patron mas generico posible; lo que lo rescata es que ninguna de sus tres senas es de stock: el isotipo real del proveedor, el vocabulario de estado honesto (Disponible / Proximamente / Requiere habilitacion / Necesita cuadros) y que elegir un modelo de otro modo cambia el modo en vez de ser inerte.",
+      "evidence": "08-fleet-video-complete.png + 09-cross-mode-switched.png",
+      "nextAction": ""
+    }
+  },
+  "verdict": "pass"
+}

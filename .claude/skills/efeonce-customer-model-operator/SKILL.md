@@ -1,0 +1,61 @@
+---
+name: efeonce-customer-model-operator
+description: Diseña y audita el modelo de cliente de cualquier oferta Efeonce: ICP, segmentación, beachhead, JTBD, buyer personas, buying group, triggers, decisión, procurement, qualification, evidencia, adopción, retención y expansión.
+argument-hint: "[oferta, segmento o decisión comercial]"
+---
+
+# Efeonce Customer Model Operator
+
+Companion transversal para Claude. Su fuente canónica de método es
+`.codex/skills/efeonce-customer-model-operator/`; cargar primero su `SKILL.md` y, cuando corresponda,
+`references/customer-model-method.md` y `references/customer-model-integrity-pack-template.md`.
+
+## Contrato
+
+No producir buyer personas decorativas ni declarar ICP, urgencia, champion, economic buyer, presupuesto o WTP sin
+evidencia. Separar mercado, segmento, ICP, cuenta, oportunidad, stakeholder, job, outcome, impact y claim. En ofertas
+compuestas, calificar por separado diagnóstico, implementación, operación recurrente y proveedores; `ICP estratégico`,
+`ICP de oportunidad` e `ICP de delivery` no son equivalentes.
+Modelar tanto el decision process como el paper/procurement process. Seleccionar MEDDPICC, Challenger, JTBD u otro
+lente por complejidad; ninguno sustituye el modelo de cliente.
+Para ofertas con horizonte 2028, validar también el nivel de human-in-the-loop, el operating mode esperado y la
+evidencia de que el comprador adopta una capability Product Service AI-native, no sólo una entrega puntual.
+
+Separar siempre `operator`, `operator-champion`, `problem owner`, `sponsor/director`, `economic buyer` y
+`governance owner`; no tratarlos como cargos fijos. El primer valor debe sentirse en el workflow operatorio y la
+adopción debe producir evidencia para assurance y expansión. Canon: `docs/strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md`.
+
+Every Customer Model Integrity Pack must instantiate the `Operator & Buying Group Contract`: function-based operator,
+workflow/JTBD, first value, path to operator-champion, sponsor, economic buyer, governance owner, procurement,
+blockers, decision process, paper process, adoption evidence and expansion triggers. `Buying group` is the required
+analytical contract even when the customer has no formal committee.
+
+The customer model must preserve the agency-pain map even when the role architecture changes. Identifying the
+operator does not itself resolve lost context, rework, approvals, weak reporting, diffuse ownership, governance,
+key-person dependency or multi-provider coordination. Record how each pain affects the operator, which capability
+reduces it, what evidence reaches the sponsor and what risk appears when the operator can adopt but cannot buy.
+
+The model must also test the Why: the offer increases client capability and leaves useful memory for the next cycle.
+Do not call opaque dependency that the client cannot explain, transfer or port “retention.”
+
+## Resultado obligatorio
+
+Entregar un Customer Model Integrity Pack con: decisión y alcance, segmentos/beachhead, ICP/anti-ICP, JTBD y teoría
+de valor, buying group y stakeholder map, triggers, decision/paper process, qualification, validación/WTP, adopción,
+retención/expansión, ecosistema y riesgo de proveedores, evidence ledger, gaps, owners, gates, verdict y handoffs a business model, GTM, commercial,
+research, pricing, finance, legal y operations.
+
+## Handoffs
+
+- GTM decide category, positioning, segmentación y motion.
+- Commercial ejecuta discovery, qualification, negociación y next steps.
+- Research diseña evidencia, VoC, entrevistas, triangulación y confidence.
+- Pricing/Finance decide WTP, packaging, margen, capacidad y economics.
+- Legal/Operations decide procurement, datos, IP, riesgo, contrato y delivery.
+
+La especialización de línea de negocio siempre conserva sus invariantes; esta skill aporta el modelo transversal.
+
+Cuando una oferta depende de un partner/provider, cargar también la sección canónica `Calificación de partners y
+providers en la oferta`. El estado del programa del tercero no prueba demanda del cliente, readiness de delivery ni
+calificación comercial: exigir evidencia de JTBD, procurement/seguridad, ownership, economics, continuidad y
+sustitución.

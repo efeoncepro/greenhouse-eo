@@ -3,11 +3,13 @@
 ## Summary
 
 - Visual verdict: `PASS`
-- QA/rollout verdict: `CONDITIONAL PASS — code complete, rollout pendiente`
+- QA/rollout verdict: `CONDITIONAL PASS — piloto/release completo; booking y medición live pendientes`
 - Evidence: `.captures/2026-07-21T10-31-38_native-meeting-scheduler`
 - CTA seam evidence: `.captures/2026-07-21T11-22-29_growth-cta-native-meeting`
 - Reactive validation evidence: `.captures/2026-07-21T11-37-07_native-meeting-scheduler`
 - Confirmation-shell evidence: `.captures/2026-07-21T12-01-53_native-meeting-scheduler`
+- Native-only release evidence: `.captures/2026-07-21T17-02-42_native-meeting-scheduler`, PR #163,
+  release `fbe8a9c76a74`, orchestrator `29854833210`
 
 ## Direction correction
 
@@ -42,7 +44,9 @@ meet the 4.5 premium floor.
 
 ## Blockers
 
-None in the fixture-backed portable renderer. Public rollout remains separately gated.
+None for enterprise visual quality, the versioned bundle release or the isolated `/agenda/` pilot. Closure remains
+gated on one controlled booking/replay with HubSpot/Outlook/Teams read-back, live `/g/collect` evidence and explicit
+GTM publish approval. Those gates block graduation to additional surfaces, not the pilot already released.
 
 ## Modern bar
 
@@ -73,6 +77,8 @@ Resolved during review:
 22. Rejected the first confirmation pass after operator review because its dark portal header, elevated receipt card and
     rigid columns read as dated. The corrected direction removes the heavy header/card stack and uses restrained spatial
     resolution motion with a direct reduced-motion equivalent.
+23. Removed the clipped command-rail orbit, retained only a static tonal edge glow, widened the rail enough to keep
+    `Conversemos` intact and replaced the generic video glyph with the governed monochrome Microsoft Teams mark.
 
 ## Visual evidence reviewed
 
@@ -96,6 +102,15 @@ Resolved during review:
 - Final copy/CRO/commercial pass: `.captures/2026-07-21T12-18-17_native-meeting-scheduler`, 45 frames across
   1440/820/390, exit 0. Calendar, actionable validation and full-shell confirmation were inspected directly;
   revised labels and recovery copy fit without clipping or overflow and the enterprise rubric remains green.
+- Native-only production pass: `.captures/2026-07-21T17-02-42_native-meeting-scheduler`, 45 frames across
+  1440/820/390, exit 0. The release exposes no HubSpot link/copy, preserves retry/month navigation and keeps the full
+  semantic August grid when availability is empty. Authenticated Chrome smoke on `/agenda/` confirmed `overflow=0`
+  without creating a booking.
+- Command-rail local polish: premium GVC `.captures/2026-07-22T00-40-24_native-meeting-scheduler` passed 45 frames
+  at 1440×1000, 820×900 and 390×844. Supplemental `.captures/manual/TASK-1510-scheduler-rail/reference-2048-v2.png` covers the exact
+  2048×1135 reference size. The wide title preserves `Conversemos` as one line box, the monochrome Teams glyph shares
+  the rail accent color without a contained purple background, the clipped orbit is absent and document/scheduler
+  overflow remains zero. Keyboard selection and reduced-motion parity pass at 820/390. Rollout remains pending.
 
 ## Measurement/privacy evidence
 
@@ -107,14 +122,15 @@ Resolved during review:
 
 ## Polish / rollout items
 
-1. Validate the real WordPress host font, container width, CSP and theme collision in staging GVC.
-2. Complete the staging state dossier (empty, degraded, conflict and ambiguous); reduced motion is already captured locally.
-3. Deploy/read back the versioned Growth CTA adapter in staging; local code and GVC are complete and `book_meeting` remains unchanged.
-4. Promote the durable visual baselines only after the operator accepts the corrected scheduler and CTA-seam directions.
+1. **Complete:** real WordPress host, container fit, theme collision and responsive overflow were validated live on `/agenda/`.
+2. **Complete:** the versioned Growth CTA adapter and native-only bundle were deployed/read back; `book_meeting` remains unchanged.
+3. **Complete:** operator acceptance covers the corrected calendar, CTA seam, confirmation shell and zero-slot August grid.
+4. **Pending:** complete the degraded/conflict/ambiguous runtime dossier and one controlled booking/replay/read-back.
+5. **Pending:** capture browser `/g/collect`, obtain explicit GTM approval/publish and only then assess another surface.
 
 ## Verdict
 
-`PASS` for enterprise visual quality. `CONDITIONAL PASS — code complete, rollout pendiente` for release QA: the
-primary adaptive calendar/agenda/details/full-shell confirmation flow and CTA seam pass premium local GVC, modern UI and accessibility
-bar. Production rollout remains gated on adapter deploy/read-back, real-host staging state evidence, explicit GTM
-publish approval and the governed host pilot.
+`PASS` for enterprise visual quality and the isolated native-only `/agenda/` release. `CONDITIONAL PASS` for full
+operational graduation: the adaptive calendar/agenda/details/full-shell confirmation flow, CTA seam and live WordPress
+host pass the premium UI, accessibility and overflow bar. A controlled booking/replay, provider read-back, `/g/collect`
+evidence and explicit GTM publication remain required before enabling Contacto, RRSS or any additional surface.

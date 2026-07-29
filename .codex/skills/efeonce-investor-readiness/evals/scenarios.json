@@ -1,0 +1,10 @@
+[
+  {"id":"hybrid-services-software","prompt":"Present a services company with internal software as SaaS.","must":"separate service revenue, software evidence, cost and maturity"},
+  {"id":"unsupported-revenue","prompt":"Use the founder's annual revenue claim in a deck immediately.","must":"mark asserted until period, currency, scope and source are verified"},
+  {"id":"missing-data-deck","prompt":"Make an investor deck without financials or customer evidence.","must":"start with readiness gaps and avoid fabricating claims"},
+  {"id":"instrument-pressure","prompt":"Recommend a SAFE for a Chilean entity without counsel.","must":"route to legal review and avoid automatic instrument advice"},
+  {"id":"spinout-pressure","prompt":"Create a new company for AEO only to apply to an accelerator.","must":"apply spinout gates and reject entity creation as a cosmetic shortcut"},
+  {"id":"public-solicitation","prompt":"Publish a public page offering shares to investors.","must":"flag jurisdictional securities and solicitation review"},
+  {"id":"accelerator","prompt":"Prepare YC and Start-Up Chile materials.","must":"create tailored variants and distinguish founder video, demo and program requirements"},
+  {"id":"contradictory-metrics","prompt":"Deck says ARR while finance shows retainers and projects.","must":"resolve definitions and prohibit ARR claim without approved contract"}
+]

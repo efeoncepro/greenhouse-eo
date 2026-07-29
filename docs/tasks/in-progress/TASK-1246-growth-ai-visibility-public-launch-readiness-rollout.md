@@ -1,5 +1,23 @@
 # TASK-1246 — Growth AI Visibility: Public Launch Readiness + Rollout
 
+## Delta 2026-07-27 — Think ya es la superficie pública operativa
+
+La hipótesis histórica de esta task —“no existe ninguna superficie pública del grader”— queda **superseded**.
+La landing canónica está publicada en `https://think.efeoncepro.com/brand-visibility` y sirve el
+`<greenhouse-form>` gobernado `fdef-ai-visibility-grader` (`formKey=69cd5269-5f97-4d32-99c4-0b23f41aa2f5`,
+`surface=fhsf-ai-visibility-grader`). El contrato de Think consume `gh_form_submission_accepted`, `status_url`
+y el reporte tokenizado en `/brand-visibility/r/<token>`.
+
+Verificación actual:
+
+- `curl -L https://think.efeoncepro.com/brand-visibility` respondió `HTTP 200` el 2026-07-27.
+- El HTML productivo contiene el renderer Growth Forms y el form gobernado del grader.
+- La documentación funcional de Think registra el flujo productivo submit → run → status → reporte.
+
+Por tanto, esta task ya no gobierna la construcción de la cara pública. Su remanente es el cierre operativo del
+programa: reconciliar evidencia E2E reciente, corregir cualquier drift de runtime y cerrar los follow-ups de
+retención/PII y email/HubSpot que correspondan. La superficie vive en `efeonce-think`, no en `efeonce-web`.
+
 ## Delta 2026-07-01 (c) — reconciliación de readiness a la realidad live (in-progress)
 
 Trabajo del 2026-07-01 sobre "lo pendiente" de esta task. Resultado: la task está **operativamente satisfecha del lado greenhouse-eo**; los residuales son cross-repo (efeonce-web), operador (Turnstile) o cross-task (1253/1255). No se puede marcar `complete` hasta que esos cierren, pero el gate de readiness greenhouse-eo quedó reconciliado y honesto.
@@ -8,18 +26,18 @@ Trabajo del 2026-07-01 sobre "lo pendiente" de esta task. Resultado: la task est
 
 **2. Sign-off legal = CONFIRMADO.** El prerequisito abierto "sign-off legal del consent/aviso de privacidad (Ley 21.719) antes de prender prod" (fila `PUBLIC_INTAKE` del ledger) fue **confirmado por el operador (2026-07-01)**: el consentimiento + aviso de privacidad están revisados/aprobados. Riesgo legal → cerrado.
 
-**3. Mitigante de exposición (VERIFICADO EN CÓDIGO 2026-07-01 — corrige el supuesto errado previo).** El intake del grader está ON en prod, PERO el grader self-serve (form `fdef-ai-visibility-grader`) **NO está embebido en ninguna superficie pública**:
+**3. Mitigante de exposición (histórico, superseded por el Delta 2026-07-27).** El intake del grader estaba ON en prod, pero el grader self-serve todavía no estaba embebido en ninguna superficie pública al auditarse el 2026-07-01:
 - No hay `page.tsx` pública del grader en greenhouse-eo (solo rutas admin `(dashboard)`).
 - `/aeo-2/` (WordPress, live) es el form **COMERCIAL** `efeonce-aeo-diagnostic` (form-key `b120566a…`) → HubSpot "AEO - Lead Form"; **NO corre el grader** — el consumer `growth-grader-run-from-submission` filtra por `form_id === fdef-ai-visibility-grader` (distinto), así que un submit de `/aeo-2/` es solo captura de lead.
 - No existe form del grader en efeonce-web (confirmado por el operador).
 
-→ **0 tráfico self-serve real hoy**; el riesgo de abuso/costo es latente, no activo (aunque el intake API es técnicamente alcanzable, protegido por captcha+rate-limit+budget).
+→ Ese resultado representa el estado del 2026-07-01. Desde la publicación de Think ya no debe usarse como estado actual de tráfico; queda pendiente medir tráfico y costo real con el ledger correspondiente.
 
 **Deuda documental detectada:** el ADR `GREENHOUSE_PUBLIC_REPORT_HEADLESS_RENDER_DECISION_V1` (2026-06-28) decidió que el form/render del lead magnet va a **efeonce-web (Astro)**, pero **eso no se construyó** y además el grader ya es un form gobernado embebible con el mismo `<greenhouse-form>` que usa `/aeo-2/` en WordPress. El ADR quedó **parcialmente irreal / sin ejecutar** → decisión abierta: ¿la cara pública del grader se embebe vía `<greenhouse-form>` (WordPress u otra page) o sí se hace en efeonce-web? Resolver antes de "lanzar" de verdad.
 
 **Residuales (NO greenhouse-eo o NO esta task):**
 - ⚠️ **Rotar `TURNSTILE_SECRET`** (operador): el secret de prod quedó expuesto en chat. **Decisión operador 2026-07-01: NO se rotará por ahora** (riesgo aceptado). Runbook abajo por si se decide más adelante.
-- **Definir + construir la superficie pública del grader self-serve** (embed `<greenhouse-form>` del form `fdef-ai-visibility-grader`) — hoy NO existe en ningún lado. Prerequisito real de un lanzamiento público. (Resolver la deuda del ADR arriba primero.)
+- ~~**Definir + construir la superficie pública del grader self-serve**~~ — **resuelto por Think**; mantener evidencia de deploy y E2E como parte del cierre.
 - **Cierre formal de TASK-1253 (server validation) + TASK-1255 (PII hardening):** ambos code-complete + flags ON en prod, pero siguen `in-progress` por backfill de PII legacy + job de retención/purga (`GROWTH_FORMS_RETENTION_PURGE_ENABLED`, aún no declarado) + evidencia runtime. Son SUS tasks, no ésta.
 
 ### Runbook — rotación de `TURNSTILE_SECRET` (operador ejecuta)
@@ -87,7 +105,7 @@ TASK-1250 quedó **code complete** (sin push, sin prod): el lead recibe el infor
 - UI impact: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-020`
-- Status real: `Diseno`
+- Status real: `Superficie pública live; cierre operativo y reconciliación documental pendientes`
 - Rank: `TBD`
 - Domain: `growth|ops|public-site|reliability`
 - Blocked by: `TASK-1241, TASK-1242, TASK-1244, TASK-1245, TASK-1250, TASK-1253, TASK-1255`

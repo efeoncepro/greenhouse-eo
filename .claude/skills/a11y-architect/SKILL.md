@@ -115,6 +115,16 @@ WCAG 3.3.8 is hard-passed via `next-auth` Microsoft SSO (passkey-equivalent unde
 - `greenhouse-microinteractions-auditor` — enforces focus return + reduced motion at audit time.
 - `greenhouse-ui-review` — runs §11 of the floor (a11y) before commit.
 
+## Compose with — materialization lanes (2026-07-27)
+
+- `html-react-engineer` — **elige el elemento nativo** (`<dialog>`, `popover`, invoker commands,
+  customizable select, `<details>`), que es lo que hace innecesaria la mitad de una auditoría ARIA.
+  Esta skill **audita el resultado**. Todo modal, cambio de orden de foco o ARIA no trivial pasa por acá.
+- `css-architect` — provee `contrast-color()`, `:focus-visible`, `forced-colors`, `reading-flow`.
+  ⚠️ **`reading-flow` cambia el orden de foco: su uso se decide acá, no en layout.**
+- `tailwind-engineer` — un token que no pasa contraste es problema de esta skill; que exista como
+  utilidad, de aquélla.
+
 ## Version
 
 - **v1.0** — 2026-05-11 — Initial overlay. Pins 10 Greenhouse-specific a11y decisions over the global skill.

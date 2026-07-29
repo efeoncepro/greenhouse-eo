@@ -236,12 +236,47 @@ El §1 de la Decisión —*"Creative Studio tendrá … base de datos … propio
 autorizada … ledger append-only"*— dejan de ser sólo objetivo: existe un Cloud SQL `globe-pg` propio (Postgres 16,
 `southamerica-west1`, IAM keyless sobre el connector, en Terraform) que respalda, detrás de sus ports ya existentes,
 los cinco stores antes en memoria (sesiones, transacciones OAuth, experimentos, reportes de evaluación y el spend
-fence de seguridad) más un audit log append-only. Ambos servicios Cloud Run corren durable en `maxScale=3`, lo que
-**levanta el techo de HA** que ADR-004 gateaba en esta task.
+fence de seguridad) más un audit log append-only, lo que **levanta el techo de HA** que ADR-004 gateaba en esta task.
+
+**Corrección posterior (`TASK-1508`, 2026-07-21).** El `maxScale=3` que esta Delta registró era el valor a nivel
+**revisión**; a nivel **servicio** el ceiling estaba en 1, y Cloud Run aplica el **menor** — así que el techo
+efectivo era 1 y ningún servicio corrió nunca más de una réplica. `TASK-1508` lo corrigió a 3/3 y puso ambos campos
+bajo Terraform. Consecuencia registrada: el **spend fence cross-réplica nunca se ejercitó**, y hacerlo es
+`TASK-1512`.
 
 **Sigue diferido (no lo abre esta Delta):** el modelo rico de workspace/members/grants persistido; el mecanismo
-exacto de tenancy PostgreSQL/RLS que la arquitectura dejó abierto; persistir `maxScale` por IaC (`TASK-1508`); y la
+exacto de tenancy PostgreSQL/RLS que la arquitectura dejó abierto (`TASK-1511`); y la
 habilitación de clientes/créditos comerciales, que sigue gateada por sus decisiones de legal/finanzas/derechos.
 **Confidence:** alta — verificado en vivo. **Validated as of:** 2026-07-21. Detalle técnico:
 [`creative-studio/EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md`](creative-studio/EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md)
 (SPEC-007) + `docs/tasks/complete/TASK-1465-globe-workspace-tenancy-persistence-audit.md`.
+
+---
+
+## Delta 2026-07-23 — el agente compila intención; no ocupa la autoría
+
+**Decisión aceptada.** La experiencia agentic de Globe se diseña alrededor de la autoría del equipo creativo.
+El operador es el punto de vista de la interacción y conserva intención, exploración y selección; la autoridad
+creativa y la aprobación permanecen en las personas designadas por el workspace. El agente es guía y
+compilador: entiende intención, propone estrategia, adapta la especificación al target y valida compatibilidad.
+Los modelos/providers son maquinaria sustituible.
+
+### Invariantes que agrega
+
+- Toda transformación creativa distingue `aportado`, `derivado` y `sugerido`; una inferencia nunca se presenta
+  como instrucción humana.
+- El source original permanece inmutable, visible y recuperable hasta una aceptación explícita.
+- Una propuesta puede mejorar target fit sin decidir gusto, rights, presupuesto, delivery o publicación.
+- La UI empieza en intención, brief, referencias y decisiones; provider/modelo se muestra cuando aporta
+  transparencia o cambia materialmente el resultado, no como centro de la tarea.
+- La automatización elimina ceremonia técnica —incluidos prompt engineering, negative constraints compatibles,
+  parámetros, estimate y retries— sin ocultar costo, riesgo, incertidumbre ni fallback.
+- La calidad “de clase mundial” es un gate interno respaldado por evals, revisión humana, evidencia y resultado;
+  no una garantía absoluta ni un claim client-facing sin prueba.
+
+**Runtime Contract:** `TASK-1530…1534` implementan el primer slice explícito de esta doctrina en Creative Prompt
+Engineering, propuesta revisable, estimate automático y captura de ideación por voz. Ninguna de esas capacidades
+autoacepta, autoestima una propuesta no aceptada ni autogenera.
+
+**Revisit when:** investigación con equipos demuestra que preservar original/provenance agrega fricción sin
+control útil; o una operación de bajo riesgo puede automatizarse más sin degradar autoría, derechos ni budget.

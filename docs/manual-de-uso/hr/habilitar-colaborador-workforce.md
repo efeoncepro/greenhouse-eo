@@ -99,7 +99,7 @@ Si una persona tiene foto en Microsoft pero ves iniciales:
 | Una persona pendiente no aparece | Ya esta `completed`, esta inactiva o no tiene member operativo. | Revisa Person 360 y `workforce_intake_status`. |
 | **Completar ficha** esta deshabilitado | Hay blockers criticos. | Usa **Resolver blockers** y revisa el primer blocker del inspector. |
 | Al guardar fecha de ingreso aparece `Team member not found` | Flujo legacy intentando editar un member SCIM/PG-only. | Usa `/hr/workforce/activation?memberId=<id>` y guarda desde **Resolver blockers**. |
-| El perfil de pago existe pero sigue bloqueando | Puede estar en borrador o pendiente de aprobacion. | Activalo o apruebalo desde el bloque **Pago** segun maker-checker. |
+| El perfil de pago existe pero sigue bloqueando | Puede estar en borrador o pendiente de aprobacion. | Actívalo o apruebalo desde el bloque **Pago** segun maker-checker. |
 | No puedes aprobar un perfil de pago | El maker no puede ser checker. | Pide a otro usuario autorizado que apruebe. |
 | Compensacion aparece pero readiness no cambia | Falta version vigente o no coincide moneda/vigencia. | Abre compensacion y confirma que haya version actual aplicable. |
 | Aparece `Falta cargo vigente` pero la persona tiene cargo en Microsoft | SCIM pudo llegar antes que el enriquecimiento Graph o el sync quedo pendiente. | Usa **Resolver blockers** y guarda **Cargo vigente**; el cambio queda auditado. Si el dato ya esta en Entra, el sync canonico tambien lo puede aplicar automaticamente. |

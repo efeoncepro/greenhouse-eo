@@ -1,24 +1,37 @@
 # 03 · Ecosistema de Producto
 
-> Regla maestra: **cada plataforma puede venderse y operar de forma independiente. Cuando el cliente está en el ecosistema completo, Greenhouse es el hub donde todo converge.** Las plataformas verticales (Kortex, Verk y Efeonce Globe / Creative Studio) alimentan el hub sin depender de él para operar.
+> Regla maestra: **cada product brand o capability puede venderse y operar de forma independiente. Cuando el cliente está en el ecosistema completo, Greenhouse es el hub y admin donde todo converge.** Las plataformas verticales (Wave, Kortex, Verk y Efeonce Globe / Creative Studio) alimentan el hub sin depender de él para operar. Los productos nuevos nacen Agent Native y con Full API Parity. Globe es una product brand de producción creativa; no representa por sí sola toda la línea Creative Services ni toda la relación de agencia.
 
-Efeonce tiene cuatro plataformas de software propietario, en distinta madurez:
+> **Contrato operator-first:** la superficie operatoria vive en la product brand o Product Service (Wave, Reach, Globe y futuras capabilities); Greenhouse soporta la superficie ejecutiva, la memoria, el assurance y la coordinación. La adopción se espera primero en el operador-champion y se traduce después en sponsorship, compra recurrente y expansión. Canon: [`Efeonce Operator-First Product & Growth Contract V1`](../strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md).
+
+Esta arquitectura es también el mecanismo de marca: las superficies verticales aumentan capacidad en el workflow y
+Greenhouse conserva memoria y evidencia para que el cliente entienda, decida y mejore cada ciclo. La integración no
+debe producir dependencia opaca; debe producir capacidad acumulada.
+
+El aprendizaje público y privado forma parte del mismo ecosistema: Glitch opera el discovery editorial, el blog y
+YouTube explican y demuestran, y los Product Services convierten el criterio en learn moments dentro del workflow.
+Ver [`Efeonce Content-to-Capability Loop V1`](../strategy/EFEONCE_CONTENT_TO_CAPABILITY_LOOP_V1.md).
+
+Efeonce tiene cinco plataformas/product houses de software propietario, en distinta madurez:
+
+> **Nota de portfolio:** Wave es la product house de la capa de producto de sus Product Services digitales. Sus cinco familias base pueden componerse en Product Services como **Experience LaunchOps** y **Agentic Readiness**. Puede nombrarse como producto frente al cliente, siempre bajo la relación Efeonce. Su modelo, boundaries y separación administrativa con Greenhouse viven en [`Wave Business Model V1`](../business-models/wave/WAVE_BUSINESS_MODEL_V1.md) y el [ADR de Wave Product Platform](../architecture/EFEONCE_WAVE_PRODUCT_PLATFORM_GREENHOUSE_ADMINISTRATION_DECISION_V1.md).
 
 | Plataforma | Territorio | ICP | GTM | Estado |
 |---|---|---|---|---|
 | **Greenhouse** | Experiencia de cliente + operaciones internas | Clientes activos de servicio Efeonce | B2B directo (parte del servicio) | Operativo (~77% madurez ASaaS) |
 | **Kortex** | CRM Intelligence Platform (sobre HubSpot) | Fase 1: clientes Efeonce Digital. Fase 2: agencias HubSpot (B2B2B) | B2B2B → HubSpot Marketplace | Operativo (validado en producción) |
 | **Verk** | Content + Distribution Operating System | Fase 1: interno. Fase 2: empresas con 20+ piezas/mes (B2B standalone) | B2B standalone | P0 en construcción |
-| **Efeonce Globe** *(Creative Studio)* | Producción creativa agentic: imagen, video, audio, assets, review y créditos | Fase 1: equipo Efeonce. Fase 2: equipos creativos/marketing de clientes | Capability Efeonce operada en modo managed, co-operated o client-operated; acceso B2B futuro y gobernado | Foundation en construcción: repo + GCP creados, runtime pendiente (EPIC-028) |
+| **Efeonce Globe** *(Creative Studio)* | Producción creativa agentic: imagen, video, audio, assets, review y créditos | Fase 1: equipo Efeonce. Fase 2: equipos creativos/marketing de clientes | Capability Efeonce operada en modo managed, co-operated o client-operated; acceso B2B futuro y gobernado | Operativo internal-only en tres rutas; acceso comercial/cliente sigue gateado (EPIC-028) |
+| **Wave** | Capa de producto digital para Search Visibility, Web Experience, Measurement, Agent Systems y Automation | Fase 1: productos y servicios Efeonce. Fase 2: clientes con acceso gobernado a Product Services | Product house operada en modo managed, co-operated o client-operated según Product Service; Greenhouse administra el contexto transversal | Dirección propuesta; runtime/product platform propio pendiente de definición y validación (EPIC-037) |
 
-**Por qué cuatro plataformas independientes y no un monolito:** ICP y ritmo de producto distintos; narrativa ASaaS más potente (ecosistema de producto, no "agencia con portal"); independencia técnica (Globe no hereda el runtime pesado de Greenhouse; Verk no hereda su test coverage; Kortex no depende del ciclo de releases de Verk); patrón ya probado (Kortex corre como plataforma independiente con integración bidireccional con Greenhouse).
+**Por qué cinco plataformas/product houses independientes y no un monolito:** ICP y ritmo de producto distintos; narrativa ASaaS más potente (ecosistema de producto, no "agencia con portal"); independencia técnica (Wave y Globe no heredan el runtime pesado de Greenhouse; Verk no hereda su test coverage; Kortex no depende del ciclo de releases de Verk); patrón ya probado (Kortex corre como plataforma independiente con integración bidireccional con Greenhouse).
 
 ---
 
 ## Greenhouse — el hub (lo tuyo)
 
 **Territorio:** experiencia del cliente con Efeonce + operaciones internas (finanzas, RRHH, nómina, delivery, gestión de cuentas).
-**Rol en el ecosistema:** el único login donde el cliente ve la operación completa —ICO, contenido, CRM, finanzas. Detalle de producto en `04`.
+**Rol en el ecosistema:** la identidad y administración transversal desde donde el cliente ve la operación completa —ICO, contenido, CRM, finanzas— y entra por SSO a las plataformas habilitadas. No exige un segundo login para Wave, Globe, Kortex o Verk. Detalle de producto en `04`.
 
 Por qué importa: Greenhouse es el que **genera switching cost sistémico** y el **hub donde convergen** las otras plataformas. En el GTM es el diferenciador tangible que cierra al BP3 (CEO) y sostiene renovaciones.
 
@@ -27,6 +40,8 @@ Por qué importa: Greenhouse es el que **genera switching cost sistémico** y el
 ## Kortex — contexto (no es tu producto, pero conversa contigo)
 
 CRM Intelligence Platform: captura estrategia en lenguaje natural → normaliza → compila manifests YAML → despliega en HubSpot vía API con trazabilidad. Capas: Schema Deployer, Workflow Deployer, UI Extensions (cards en HubSpot), Intelligence Layer (agente Claude), Portal Audit, Adopción por Hub.
+
+**Boundary con Wave:** Efeonce Digital/Kortex posee CRM y RevOps. Wave puede construir la web, instrumentación, integraciones o agentes conectados al CRM, pero no es owner de CRM enablement.
 
 **Lo que el agente de Greenhouse necesita saber:**
 - **Kortex → Greenhouse:** el progreso de implementación CRM y los KPIs de adopción por hub aparecen en la vista **Account 360** del cliente (vía API REST / BigQuery).
@@ -37,7 +52,7 @@ CRM Intelligence Platform: captura estrategia en lenguaje natural → normaliza 
 
 ## Verk — contexto (no es tu producto, pero conversa contigo)
 
-Content + Distribution Operating System. Donde la estrategia de distribución se convierte en contenido producido, aprobado, publicado y medido en ciclo continuo. Módulos: Surround Map™ (5 superficies × 4 capas), Brand Profiles, Content Calendar, Review + Approval, Tracking + Analytics, Diagnostics, SEO/AEO (AI citation tracking + entity authority), Verk Agent.
+Content + Distribution Operating System. Donde la estrategia de distribución se convierte en contenido producido, aprobado, publicado y medido en ciclo continuo. Módulos: Surround Map™ (5 superficies × 4 capas), Brand Profiles, Content Calendar, Review + Approval, Tracking + Analytics, Diagnostics y Verk Agent. Verk puede aportar superficies/datos de contenido y distribución a Search Visibility 360, cuyo servicio y ownership de SEO/AEO pertenecen a Wave.
 
 **Lo que el agente de Greenhouse necesita saber:**
 - **Verk → Greenhouse:** el **Surround Map** y el resumen del content calendar se exponen como **embed card** en el dashboard del cliente (vía API REST).
@@ -51,7 +66,18 @@ Content + Distribution Operating System. Donde la estrategia de distribución se
 
 Capability para dirigir y operar generación de imagen, video, audio y extensiones futuras mediante templates, referencias, assets, review y crédito gobernado. Nace con una superficie UI y una superficie MCP/agente sobre el mismo contrato; no es una galería de prompts ni un módulo de Greenhouse.
 
+**Boundary con Wave:** Globe posee la producción de contenido y assets creativos. Wave puede consumir esos outputs para Search Visibility 360, web o sistemas de agentes; no absorbe la identidad ni el ownership de Globe.
+
 La interfaz primaria habla el lenguaje de una persona creativa: brief, referencias, tratamiento, candidatos, variantes, feedback y aprobación. El sistema compila esas decisiones en un workflow ejecutable; no exige diseñar nodos ni conocer providers. Un canvas técnico queda como authoring avanzado cuando la evidencia lo justifique.
+
+**Propósito de producto:** devolverle al equipo el espacio rico de pensar, explorar, dirigir y decidir, y asumir
+por debajo la ingeniería necesaria para lograr un resultado profesional. El equipo creativo es protagonista; el
+operador activo es el punto de vista; Globe es guía/sistema; los modelos son maquinaria. La UI no debe pedirle a
+la persona que actúe como prompt engineer, router de proveedores, calculadora de créditos ni operadora de retries.
+
+Eso no significa ocultar el sistema. Globe expone costo, ruta/modelo, provenance, restricciones, incertidumbre y
+fallback cuando cambian una decisión material, y conserva el original hasta aceptación. Automatiza fricción y
+repetición; no automatiza silenciosamente gusto, derechos, presupuesto, aprobación o publicación.
 
 ### Modelo operativo
 
@@ -77,11 +103,16 @@ Business Model V1](../business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BU
 
 El flywheel de producto y servicio es deliberado: Efeonce opera y valida craft → el Studio conserva el patrón → el cliente gana autonomía sobre trabajo repetible → el uso produce evidencia → Efeonce absorbe complejidad, excepciones y picos → los templates mejoran. El acceso cliente no canibaliza la agencia: desplaza valor desde repetición manual hacia dirección, sistemas creativos, QA y capacidad elástica.
 
+Los equipos creativos de otras agencias son una hipótesis B2B2B de validación, no un ICP ni un modo adicional.
+Antes de habilitarlos deben resolverse tenancy agencia→cliente final, confidencialidad, rights, brand authority,
+white-label/endorsed, accountability y margen. El canon vive en el
+[Creative Studio Business Model V1.1](../business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md).
+
 ---
 
 ## Arquitectura de integración
 
-Cuatro plataformas independientes que se comunican por **APIs REST/eventos versionados** y comparten sólo la capa analítica autorizada cuando corresponde. El patrón que ya funciona entre Kortex y Greenhouse es el punto de partida para Verk y Globe; no autoriza data stores compartidos.
+Cinco plataformas/product houses independientes que se comunican por **APIs REST/eventos versionados** y comparten sólo la capa analítica autorizada cuando corresponde. El patrón que ya funciona entre Kortex y Greenhouse es el punto de partida para Wave, Verk y Globe; no autoriza data stores compartidos.
 
 ### BigQuery como data lake compartido (proyecto GCP `efeonce-group`)
 
@@ -121,7 +152,7 @@ Cada plataforma productiza un tipo de servicio distinto:
 | Valor acumulativo (= switching cost) | Historial ICO + inteligencia financiera + Person/Account 360 | Schema CRM + workflows + UI Extensions instaladas | Brand profiles + keyword universe + performance histórico | Reference packs + templates + lineage de assets + decisiones/revisión creativa |
 | Intelligence layer | AI Tools + recomendaciones proactivas (roadmap → Nexa) | Agente Claude (manifests YAML) | Verk Agent (roadmap) | Agentes/MCP con `propose→approve→execute` |
 
-> *Efeonce no es una agencia que tiene un portal. Es un ecosistema de producto con cuatro plataformas que además ofrece servicio. El servicio opera las plataformas. Las plataformas generan el switching cost. El switching cost protege el revenue. Ese es el flywheel ASaaS.*
+> *Efeonce no es una agencia que tiene un portal. Es un ecosistema de producto con cinco plataformas/product houses que además ofrece servicio. El servicio opera las plataformas. Las plataformas generan el switching cost. El switching cost protege el revenue. Ese es el flywheel ASaaS.*
 
 ---
 
@@ -141,4 +172,6 @@ Cada plataforma productiza un tipo de servicio distinto:
 
 *Fuente: Efeonce Product Ecosystem v1.0 (documento ancla — prevalece sobre downstream en conflictos de arquitectura de producto).*
 
-*Última verificación de drift contra runtime: 2026-07-19 — Efeonce Globe tiene repositorio y proyecto GCP inicial, pero no workloads, datos, secretos ni acceso cliente; sus tres modos operativos siguen siendo contrato objetivo. Targets/fechas comerciales son intencionales.*
+*Última verificación de drift contra runtime: 2026-07-23 — Efeonce Globe opera internal-only con Producer,
+persistencia y tres rutas promovidas; clientes externos y la hipótesis B2B2B siguen gateados por EPIC-028.
+Targets/fechas comerciales son intencionales.*

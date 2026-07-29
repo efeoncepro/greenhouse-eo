@@ -18,19 +18,19 @@ operativo paso a paso — con snippets reales de código — vive en ese repo. A
   del build de `greenhouse-eo`; tiene su propio toolchain (Node 24 nativo, `pnpm check` / `pnpm build`).
 - **Quién gobierna:** Greenhouse. Toda extensión se hace bajo una `TASK-###` de Greenhouse (control plane),
   gobernada por `EPIC-028`. No se crea un registry de tareas paralelo en Globe.
-- **Skill obligatoria:** invocá **`greenhouse-globe`** antes de tocar el repo de Globe. Encapsula el boundary,
+- **Skill obligatoria:** invoca **`greenhouse-globe`** antes de tocar el repo de Globe. Encapsula el boundary,
   el build system, el flujo de extensión de capabilities y las reglas duras.
 
 ## Paso a paso (resumen — el detalle está en el runbook de Globe)
 
-1. **Tomá la `TASK-###`** de Greenhouse que gobierna el trabajo (por ejemplo `TASK-1457` para el primer provider
-   canary). Ejecutá su hook / Plan Mode.
-2. **Agregá la capability al spine** en `efeonce-globe`: schemas en `packages/contracts` → registrá el
-   command/reader en el `CapabilityRegistry` (`packages/domain`) → volteá su coverage de `policy-blocked` a
-   `available` en las superficies que shippeás → el handler llama al `provider-contract` / `creative-runner`
-   (nunca a un SDK de proveedor directo) → método SDK tipado → granteá la capability al principal.
-3. **Verificá** con `cd ../efeonce-globe && pnpm check && pnpm build` y los tests de conformance.
-4. **Cerrá** en Greenhouse: lifecycle de la task, docs, handoff (el cierre documental es de Greenhouse).
+1. **Toma la `TASK-###`** de Greenhouse que gobierna el trabajo (por ejemplo `TASK-1457` para el primer provider
+   canary). Ejecuta su hook / Plan Mode.
+2. **Agrega la capability al spine** en `efeonce-globe`: schemas en `packages/contracts` → registra el
+   command/reader en el `CapabilityRegistry` (`packages/domain`) → voltea su coverage de `policy-blocked` a
+   `available` en las superficies que shippeas → el handler llama al `provider-contract` / `creative-runner`
+   (nunca a un SDK de proveedor directo) → método SDK tipado → grantea la capability al principal.
+3. **Verifica** con `cd ../efeonce-globe && pnpm check && pnpm build` y los tests de conformance.
+4. **Cierra** en Greenhouse: lifecycle de la task, docs, handoff (el cierre documental es de Greenhouse).
 
 El **runbook operativo completo** (con el envelope JSON real para llamar por HTTP, el snippet del `GlobeClient`,
 la semántica de estados/errores, el troubleshooting y la lista de NUNCA) está en el repo hermano:
@@ -54,11 +54,11 @@ la semántica de estados/errores, el troubleshooting y la lista de NUNCA) está 
 
 ## Problemas comunes
 
-- **"No valida Globe con `pnpm local:check` de Greenhouse":** correcto — son toolchains distintos. Validá Globe
+- **"No valida Globe con `pnpm local:check` de Greenhouse":** correcto — son toolchains distintos. Valida Globe
   con `pnpm check` / `pnpm build` dentro de `efeonce-globe`.
-- **Dependencia de workspace nueva no resuelve:** corré `pnpm install` en `efeonce-globe` para relinkear.
+- **Dependencia de workspace nueva no resuelve:** corre `pnpm install` en `efeonce-globe` para relinkear.
 - **En modo `api` una capability `available` responde 403:** el service principal interno del piloto tiene un
-  grant acotado; extendé el grant o esperá el mapeo por-identidad de `TASK-1457` (ver runbook).
+  grant acotado; extiende el grant o espera el mapeo por-identidad de `TASK-1457` (ver runbook).
 
 ## Referencias técnicas
 

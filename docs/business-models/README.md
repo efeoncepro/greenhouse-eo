@@ -6,12 +6,37 @@
 
 ## Propósito
 
-`docs/business-models/` contiene la lógica económica durable de una oferta, producto o plataforma Efeonce:
+`docs/business-models/` contiene la lógica económica durable de una oferta, producto, plataforma o portfolio Efeonce:
 quién compra, qué valor recibe, cómo se entrega, qué unidades se cobran, qué costos y riesgos se absorben, cómo
 se protege el margen y qué evidencia habilita escalar.
 
 Un business model no es un tarifario. Es un sistema de decisiones comprobables que conecta propuesta de valor,
 operación, monetización, unit economics, riesgo y validación.
+
+El método y los invariantes operativos viven en la skill `efeonce-business-model-operator`. Este directorio
+mantiene los modelos concretos y sus versiones; no duplica la skill ni convierte una hipótesis en contrato.
+
+El modelo transversal de cliente —ICP, segmentación, beachhead, JTBD, buying group, decision/procurement process,
+evidence, adopción, retención y expansión— vive en `efeonce-customer-model-operator`. La arquitectura transversal de
+packaging, pricing, billing, descuentos, economics y validación de monetización vive en `efeonce-pricing-operator`;
+los modelos concretos sólo fijan las decisiones propias de cada línea.
+
+Todo Business Model y Product Service debe instanciar el [`Efeonce Operator-First Product & Growth Contract V1`](../strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md)
+con una sección `Operator & Buying Group Contract`: operador nombrado por función, JTBD, primer valor, recorrido
+de champion, buying group, decision/paper process, evidencia de adopción y triggers de renovación/expansión.
+El estado de cobertura se mantiene en [`Operator & Buying Group Registry V1`](OPERATOR_BUYING_GROUP_REGISTRY_V1.md).
+
+La arquitectura que explica cómo se relacionan el modelo corporativo, la plataforma, las capabilities, el
+packaging y los submodelos vive en [`EFEONCE_BUSINESS_MODEL_ARCHITECTURE_V1.md`](EFEONCE_BUSINESS_MODEL_ARCHITECTURE_V1.md).
+La separación entre marca paraguas, línea de negocio/práctica, product brand, oferta y delivery vive en
+[`EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md`](../architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md).
+
+La definición transversal de oferta, productización, delivery model, operating mode y engagement vive en
+[`Efeonce Product Service Operating Model V1`](EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md). Los modelos de cada
+línea deben referenciarlo y declarar sus diferencias; no deben redefinir `Product Service` localmente.
+
+La capa transversal que gobierna partners, providers, licencias, pass-through, co-selling, capability enablement y
+captura de valor vive en [`Efeonce Partner & Provider Layer Operating Model V1`](EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md).
 
 ## Fronteras con las demás categorías
 
@@ -31,6 +56,9 @@ operación, monetización, unit economics, riesgo y validación.
 docs/business-models/
   README.md
   BUSINESS_MODEL_TEMPLATE.md
+  PORTFOLIO_BUSINESS_MODEL_TEMPLATE.md
+  efeonce-group/
+    EFEONCE_GROUP_BUSINESS_MODEL_V1.md
   <oferta-o-producto>/
     <NOMBRE>_BUSINESS_MODEL_V<n>.md
     <NOMBRE>_<SUBMODELO>_V<n>.md       # sólo si merece contrato propio
@@ -48,6 +76,8 @@ Reglas:
 - toda cifra externa lleva fuente y fecha; toda cifra interna identifica su fuente de costo y nivel de confianza;
 - una versión aprobada no se reescribe para ocultar una decisión material: se crea V2 o una decisión que la
   superseda.
+- un modelo de portfolio no reemplaza los modelos de las ofertas; declara boundaries, shared services,
+  cross-sell, asignación de costos y reglas de capital.
 
 ## Estados
 
@@ -91,8 +121,43 @@ Todo business model debe separar al menos estas dimensiones:
 
 ## Modelos disponibles
 
-- [Efeonce Creative Studio](creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md) — `Approved for validation`.
+- [Efeonce Product Service Operating Model V1](EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md) — contrato transversal
+  para nombrar, empaquetar, entregar, medir y gobernar Product Services; no autoriza pricing o venta por sí solo.
+
+- [Portfolio Business Model Template](PORTFOLIO_BUSINESS_MODEL_TEMPLATE.md) — contrato para el modelo de
+  Efeonce Group y sus capabilities; no autoriza por sí solo pricing, venta, inversión ni spinout.
+- [Efeonce Group Business Model V1](efeonce-group/EFEONCE_GROUP_BUSINESS_MODEL_V1.md) — draft portfolio-level,
+  todavía requiere reconciliación de Finance, Commercial, Product y Legal/IP.
+- [Efeonce Growth Platform Business Model V1](growth-platform/EFEONCE_GROWTH_PLATFORM_BUSINESS_MODEL_V1.md) —
+  draft de la hipótesis de plataforma; no afirma SaaS, ARR ni PMF.
+- [Efeonce AEO Business Model V1](aeo/EFEONCE_AEO_BUSINESS_MODEL_V1.md) — draft de wedge/capability.
+- [Search Visibility 360 Business Model V1](search-visibility-360/SEARCH_VISIBILITY_360_BUSINESS_MODEL_V1.md) + [Business Model Integrity Pack](search-visibility-360/SEARCH_VISIBILITY_360_BUSINESS_MODEL_INTEGRITY_PACK_V1.md) + [Customer Model Integrity Pack](search-visibility-360/SEARCH_VISIBILITY_360_CUSTOMER_MODEL_INTEGRITY_PACK_V1.md) —
+  draft de capability en construcción; alcance comercial mid-market y enterprise.
+- [Wave Business Model V1](wave/WAVE_BUSINESS_MODEL_V1.md) — `Proposed`; productora/capability con cinco familias y
+  Agentic Readiness Audit como wedge prioritario de validación:
+  Search Visibility 360, Web Experience 360, Measurement & Analytics, Agent Systems & Platforms y Digital
+  Automation & Integrations.
+- [Media & Distribution Business Model V1](media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md) —
+  `Approved for validation`; tres soluciones comerciales, siete capacidades de delivery y Reach como product brand
+  habilitadora. No autoriza pricing público ni venta general.
+- [Creator Influence & Content Business Model V1](media-distribution/CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md) —
+  submodelo de Influencers, Creators & UGC; separa intelligence, activation, content, partnerships y whitelisting.
+  `Approved for validation`; no autoriza pricing público ni venta general.
+- [Creator Influence & Content Pricing Integrity Pack V1](media-distribution/CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md) —
+  bandas de validación, fee fijo, pass-through, coordinación de terceros, performance fee, mínimos y condiciones de pago.
+- [Creator Influence & Content Market Research 2026-07-29](../audits/commercial/CREATOR_INFLUENCE_CONTENT_MARKET_RESEARCH_2026-07-29.md) —
+  benchmark de agencias/plataformas, best practices, prácticas descartadas y modelo propio escalable.
+
+- [Efeonce Creative Studio V1.1](creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md) —
+  `Approved for validation`; incorpora la doctrina de autoría humana y mantiene B2B2B como hipótesis gateada.
 - [Studio Credits](creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md) — política económica V1,
   todavía sin precio público ni venta self-serve.
+- [Efeonce Partner & Provider Layer V1](EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md) — `Approved for validation`; modelo transversal para relaciones comerciales y tecnológicas, sin declarar por sí solo partnerships aprobados ni pricing.
 - [Creative Studio Skill Adoption Matrix](creative-studio/EFEONCE_CREATIVE_STUDIO_SKILL_ADOPTION_V1.md) —
   cobertura de skills, fronteras de ownership, validación y dominios auditados sin cambio.
+- [Higgsfield Partnership & Vertical Expansion Research 2026-07-29](../audits/commercial/HIGGSFIELD_PARTNERSHIP_AND_VERTICAL_EXPANSION_RESEARCH_2026-07-29.md) —
+  benchmark de partnerships, advertising beachhead, enablement y expansión vertical; evidencia direccional, no aprobación comercial.
+- [Magnific Go-to-Market & Platform Expansion Research 2026-07-29](../audits/commercial/MAGNIFIC_GO_TO_MARKET_AND_PLATFORM_EXPANSION_RESEARCH_2026-07-29.md) —
+  benchmark de wedge visual, workflow productization, ecosystem distribution, expansión Business/Enterprise y límites de evidencia.
+- [Globe Market, Distribution & Monetization Strategy V1](../strategy/EFEONCE_GLOBE_MARKET_DISTRIBUTION_AND_MONETIZATION_STRATEGY_V1.md) —
+  arquitectura de segmentos, distribución masiva, ventas B2B/enterprise, canales, packaging y validación; `Approved for validation`.

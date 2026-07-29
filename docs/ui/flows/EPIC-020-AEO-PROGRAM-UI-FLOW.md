@@ -102,10 +102,10 @@ Login portal → nav módulo AEO (gateado por module_assignment=active, TASK-127
 
 ```text
 Login portal → entra a /aeo
-  ├─ sin entitlement → S6 teaser/Locked GRATIS ("Descubrí cómo te ve la IA → Hablá con tu equipo")  [no corre motor]
+  ├─ sin entitlement → S6 teaser/Locked GRATIS ("Descubre cómo te ve la IA → Habla con tu equipo")  [no corre motor]
   └─ con trial → S6 banner "Te quedan N de 3 este mes" → CTA "Generar revisión"
         → requestGraderRunForOrganization (chokepoint, consume allowance) → preparing → S5 workbench
-        → al agotar cupo → S6 upsell "Activá AEO recurrente"
+        → al agotar cupo → S6 upsell "Activa AEO recurrente"
 ```
 - **Costo:** el teaser cuesta $0; el run consume cupo (cap mensual + tope global). PLG sin freepass.
 
@@ -173,7 +173,7 @@ Cada acción visible = un command server-side (UI/Nexa/MCP son clientes del mism
 | Enviar + crear Lead (no Deal) | `sendAeoReportAndCreateLead` | 1279 | S11 · Nexa |
 | Aprobar/publicar run | review/approve · report/publish | 1247 | S13 |
 
-→ Consecuencia: **Nexa puede operar todo el programa** ("corré AEO de Sky y mandáselo") por construcción.
+→ Consecuencia: **Nexa puede operar todo el programa** ("corre AEO de Sky y mandáselo") por construcción.
 
 ---
 

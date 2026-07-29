@@ -7,6 +7,15 @@ description: "Deliver and operate HubSpot as a managed client service: portal di
 
 Operate HubSpot as an accountable managed service, not as a collection of portal clicks.
 
+## Commercial context
+
+The canonical commercial structure is **Efeonce → RevOps & CRM → Kortex (when applicable) → HubSpot as
+platform/provider**. Use the service catalog in `docs/services/hubspot-as-a-service/README.md` to compose Diagnostic,
+Architecture, Implementation, Data/Automation/Lifecycle, Managed CRM Operations and Customer Agent / AI Operations.
+Treat brochures as historical commercial input only; the review and quarantine rules live in
+`docs/audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md`. Do not import brochure claims, pricing, bundles or
+feature availability without current primary-source verification and an `as-of` date.
+
 ## Load first
 
 1. Read `project_context.md`, `Handoff.md`, `docs/context/00_INDEX.md`, and client-specific context.
@@ -15,10 +24,10 @@ Operate HubSpot as an accountable managed service, not as a collection of portal
    - Customer Agent: [customer-agent.md](references/customer-agent.md)
    - RevOps/schema: [revops-schema.md](references/revops-schema.md)
    - Property types, calculations, sync, rollups, scores or smart properties: [property-types.md](references/property-types.md)
-   - Reports and dashboards: [report-design.md](references/report-design.md)
+   - Reports, dashboards, native Goals and Goal reports: [report-design.md](references/report-design.md)
    - Marketing/sales email or sequence automation by API: [email-api-routing.md](references/email-api-routing.md)
    - ANAM: [anam-case.md](references/anam-case.md)
-4. When the work derives from a sold implementation, read `../hubspot-solutions-partner/modules/12_IMPLEMENTACION.md`; for agents, also read `../hubspot-solutions-partner/modules/13_AGENTES.md`. Product claims and prices remain owned by that skill's `SOURCES.md`.
+4. When the work derives from a sold implementation, read `../hubspot-solutions-partner/modules/12_IMPLEMENTACION.md`; for agents, also read `../hubspot-solutions-partner/modules/13_AGENTES.md`. Product claims and prices remain owned by that skill's `hubspot-solutions-partner` → `SOURCES.md`.
 
 ## Boundary router
 

@@ -62,7 +62,7 @@ Solo deberias tocar `Version tabla impositiva` en `Editar periodo` si:
 - necesitas apuntar a una version sincronizada distinta de la canonica del mes
 - soporte o el equipo tecnico te lo pidio explicitamente
 
-Si no tienes una instruccion clara, dejalo vacio para que Greenhouse resuelva la version correcta.
+Si no tienes una instruccion clara, déjalo vacio para que Greenhouse resuelva la version correcta.
 
 ## Que significan los estados
 

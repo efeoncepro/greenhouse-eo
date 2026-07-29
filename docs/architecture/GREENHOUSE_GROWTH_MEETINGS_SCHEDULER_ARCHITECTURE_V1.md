@@ -8,7 +8,7 @@
 - Scope: `src/lib/growth/meetings/**`, `/api/public/growth/meetings/**`, `greenhouse_growth.meeting_*`, GTM/GA4 meeting contract
 - Reversibility: two-way
 - Confidence: high para el rail Efeonce de un organizador; medium para configuraciones HubSpot multiusuario no verificadas
-- Validated as of: 2026-07-21, Scheduler API `2026-03` y scheduling page `efeoncepro/agenda-discovery`
+- Validated as of: 2026-07-21, Scheduler API `2026-03`, scheduling page `efeoncepro/agenda-discovery` y piloto native-only liberado en `/agenda/`
 - Implements: TASK-1509; consumed by TASK-1510
 
 ### Context
@@ -104,7 +104,7 @@ El secret HMAC es obligatorio en producción. Los buckets de rate limit se consu
 - `meeting_step`: `viewed|availability_loaded|availability_failed|date_selected|slot_selected|details_started|validation_failed|booking_started|booking_failed`. `fallback_opened` permanece reservado sólo para compatibilidad histórica y el renderer nativo ya no lo emite.
 - Conversión: `gh_meeting_booking_confirmed` existe sólo en `dataLayer`; GTM lo transforma a `generate_lead` con `lead_source=meeting_booking` y no envía además el custom a GA4.
 - `stage` se rechaza porque duplica `meeting_step` y permite pares contradictorios.
-- Parámetros allowlisted: `meeting_step`, `scheduler_key`, `surface_id`, `placement`, `availability_state`, `days_ahead_bucket`, `time_of_day_bucket`, `error_category`; `renderer_version` y `contract_version` se validan en el renderer pero no requieren dimensión.
+- Parámetros allowlisted: `meeting_step`, `scheduler_key`, `surface_id`, `placement`, `availability_state`, `days_ahead_bucket`, `time_of_day_bucket`, `error_category`, `presentation_variant` y `activation_mode`; `renderer_version` y `contract_version` se validan en el renderer pero no requieren dimensión.
 - Nunca se envían PII, slot/timestamp/timezone exactos, receipt, idempotency/correlation/provider IDs, Teams URL, UTMs crudos ni provider errors.
 - El receipt evita éxito optimista en la implementación, pero no vuelve infalsificable el `dataLayer`. Reconciliación diaria compara `generate_lead(lead_source=meeting_booking)` contra `succeeded` server-side.
 - GTM/GA4 sigue workspace → preview → confirmación humana explícita → publish → snapshot/live verification.
@@ -125,7 +125,7 @@ El secret HMAC es obligatorio en producción. Los buckets de rate limit se consu
 - Lock-in acotado: el contrato público es provider-neutral, pero el adapter V1 valida la configuración Efeonce `GROUP_CALENDAR` + Office 365 + Teams.
 - No hay backfill. Rollback es flags OFF o versión anterior; nunca se elimina una reunión como rollback técnico.
 
-### Rollout
+### Rollout plan inicial (histórico)
 
 1. Flags `GROWTH_NATIVE_MEETING_SCHEDULER_READ_ENABLED=false` y `GROWTH_NATIVE_MEETING_SCHEDULER_ENABLED=false` por defecto.
 2. Contratos/provider y suites locales.
@@ -133,6 +133,19 @@ El secret HMAC es obligatorio en producción. Los buckets de rate limit se consu
 4. Booking controlado y replay con read-back HubSpot/Outlook/Teams.
 5. TASK-1510 + GTM Preview, con recuperación nativa por reintento/navegación.
 6. Pilot allowlisted; producción sólo tras evidencia y confirmaciones humanas de flag/GTM.
+
+### Estado vigente del rollout — 2026-07-21
+
+- Los defaults de código permanecen seguros en OFF, pero staging y Production tienen ambos flags en ON y el binding
+  `fhsf-efeonce-lead-gen-web`/`discovery` está activo para el piloto aislado.
+- `/agenda/` sirve el scheduler native-only. El release `fbe8a9c76a74` (orchestrator `29854833210`) eliminó toda salida
+  visible a HubSpot; la recuperación se limita a reintento y navegación mensual dentro del producto.
+- La regresión de mes vacío está corregida: agosto conserva su grilla semántica completa de 31 días aun cuando el
+  provider devuelve cero slots, con copy específico y navegación acotada.
+- El release y el piloto de lectura/UX están completos. Siguen pendientes, como gates separados, un booking controlado
+  con replay/read-back HubSpot/Outlook/Teams, evidencia browser `/g/collect`, aprobación humana y publicación GTM.
+- No se gradúa todavía a Contacto, RRSS ni otras superficies. Cada ampliación requiere evidencia y activación propia;
+  no se interpreta el piloto como reemplazo global de los embeds legacy.
 
 ### Revisit When
 
@@ -185,6 +198,8 @@ Thresholds are initial hypotheses, expressed against the component container rat
 | `split` | 560–959 px | Month and selected-day agenda together; context compresses into an operational header. | Dialog, medium embed, tablet |
 | `command` | 960 px+ with sufficient height | Context rail, month and agenda visible as the current Calendar Command Center. | Full-width section or dedicated page |
 
+The `command` context rail uses a static full-bleed tonal edge glow only: no clipped orbit or decorative motion node. Its title preserves whole-word wrapping, and Microsoft Teams is represented by the governed monochrome `tabler-brand-teams` mark in the rail accent color, without a contained purple background or generic video glyph.
+
 Pure CSS container queries own layout-only changes. A bounded `ResizeObserver` may select a different semantic recipe when the information architecture changes; it calls a pure resolver with hysteresis to avoid oscillation near a threshold. A resize never creates a new booking intent, emits a funnel step, clears form data or remounts provider/Turnstile effects.
 
 ### Growth CTA integration
@@ -196,11 +211,11 @@ Pure CSS container queries own layout-only changes. A bounded `ResizeObserver` m
 - The scheduler bundle and availability request load on activation or strong user intent, not on every collapsed CTA impression. Optional prefetch must respect Save-Data.
 - Once the provider request is dispatched, closing hides rather than destroys the controller. Reopening exposes pending, check-email or terminal state and cannot silently produce a second intent.
 
-#### Native adapter contract (implemented locally 2026-07-21)
+#### Native adapter contract (released to isolated pilot 2026-07-21)
 
 - `open_meeting_scheduler` is the additive CTA action kind for native activation. `book_meeting` remains an anchor-only compatibility path.
 - Its server policy contains only `meetingSurfaceId` and `schedulerKey`. The registry requires an active `meeting_surface_binding`. `fallbackHref` remains temporarily in the V1 transport projection for cached-client compatibility, but current renderers neither render nor consume it; provider IDs, secrets, origins and PII never enter the experience.
-- Its execution family is `meeting_scheduler`. The portable CTA renderer lazy-loads `/growth-meetings/renderer-latest.js` only after activation or strong intent; focus/hover prewarm respects Save-Data and 2G and never fetches configuration or availability.
+- Its execution family is `meeting_scheduler`. The portable CTA renderer lazy-loads `https://efeonce-public-renderers.vercel.app/loader.js` only after activation or strong intent; focus/hover prewarm respects Save-Data and 2G and never fetches configuration or availability. The API `base-url` remains Greenhouse. Artifact delivery, atomic promotion and rollback follow [Public Renderer Artifact Delivery V1](GREENHOUSE_PUBLIC_RENDERER_ARTIFACT_DELIVERY_DECISION_V1.md).
 - One native `<dialog>` owns backdrop, inert/focus containment, Escape, scroll lock and focus return. It is bounded on desktop and becomes `100dvh` full-screen with safe-area padding below 640 px.
 - Closing calls `dialog.close()` and keeps the same `<efeonce-meeting-scheduler>` connected. State, telemetry dedupe, form draft and command/idempotency lifecycle survive reopen; disposal occurs only when the CTA host leaves the document or the contract is replaced.
 - CTA emits `clicked` and `action_started` once for the handoff. The scheduler remains the only funnel and receipt-gated conversion authority, preventing a surface open from becoming a false lead.

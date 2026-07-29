@@ -10,9 +10,9 @@
 
 ## Para qué sirve este documento
 
-Este documento explica **cómo se siente** el portal Greenhouse cuando lo usás: qué animaciones tiene, por qué están ahí, y qué transmite cada una. Está pensado para el equipo de producto, diseño y stakeholders que quieren entender la dimensión visual del portal sin entrar en código.
+Este documento explica **cómo se siente** el portal Greenhouse cuando lo usas: qué animaciones tiene, por qué están ahí, y qué transmite cada una. Está pensado para el equipo de producto, diseño y stakeholders que quieren entender la dimensión visual del portal sin entrar en código.
 
-Si sos dev y querés saber **cómo implementar** una animación, leé el documento técnico.
+Si eres dev y quieres saber **cómo implementar** una animación, lee el documento técnico.
 
 ---
 
@@ -20,8 +20,8 @@ Si sos dev y querés saber **cómo implementar** una animación, leé el documen
 
 El portal Greenhouse no se anima por gusto estético. Cada animación tiene una intención de UX específica:
 
-- **Continuidad** → cuando hacés click en un cliente y vas al detalle, la información viaja en lugar de saltar.
-- **Feedback** → cuando hacés click en un botón, sentís que respondió antes de que cargue la siguiente pantalla.
+- **Continuidad** → cuando haces click en un cliente y vas al detalle, la información viaja en lugar de saltar.
+- **Feedback** → cuando haces click en un botón, sientes que respondió antes de que cargue la siguiente pantalla.
 - **Jerarquía** → los datos importantes (KPIs financieros) llegan con más presencia que los datos secundarios.
 - **Atención** → cuando un chart aparece al hacer scroll, la animación dirige la mirada al dato.
 
@@ -51,7 +51,7 @@ Greenhouse es plataforma operativa enterprise, no portfolio creativo.
 
 ### 2. Microinteractions (hover, focus, press)
 
-**Qué pasa**: cuando pasás el mouse sobre un botón, card o link, hay una respuesta sutil — un leve scale-up (1.02x), un cambio de sombra, un underline animado. Cuando hacés click, el elemento "se hunde" (0.97x). Cuando navegás con teclado, el elemento focalizado se ilumina con un glow.
+**Qué pasa**: cuando pasas el mouse sobre un botón, card o link, hay una respuesta sutil — un leve scale-up (1.02x), un cambio de sombra, un underline animado. Cuando haces click, el elemento "se hunde" (0.97x). Cuando navegas con teclado, el elemento focalizado se ilumina con un glow.
 
 **Por qué importa**: el portal "responde". Sin esto, los elementos clickeables se sienten estáticos y el usuario no sabe si su acción fue registrada.
 
@@ -63,9 +63,9 @@ Greenhouse es plataforma operativa enterprise, no portfolio creativo.
 
 ---
 
-### 3. List mutations (cuando agregás, sacás o reordenás items)
+### 3. List mutations (cuando agregas, sacas o reordenas items)
 
-**Qué pasa**: cuando agregás un line item a una cotización, la nueva fila aparece con fade-in y las demás se acomodan suavemente. Cuando sacás un item, hace fade-out y las siguientes se desplazan. Cuando reordenás (drag), las filas se mueven con física natural.
+**Qué pasa**: cuando agregas un line item a una cotización, la nueva fila aparece con fade-in y las demás se acomodan suavemente. Cuando sacas un item, hace fade-out y las siguientes se desplazan. Cuando reordenas (drag), las filas se mueven con física natural.
 
 **Por qué importa**: hoy las listas "saltan" cuando cambian — la nueva fila aparece de golpe, la removida desaparece. Eso rompe el flow y hace que el usuario tenga que mirar dos veces para confirmar qué cambió.
 
@@ -75,9 +75,9 @@ Greenhouse es plataforma operativa enterprise, no portfolio creativo.
 
 ---
 
-### 4. Page entrance (cuando cargás una vista)
+### 4. Page entrance (cuando cargas una vista)
 
-**Qué pasa**: cuando navegás a `/finance/intelligence` o cualquier vista, en lugar de aparecer instantánea, el contenido entra con un fade-in suave + un sutil slide-up de 8 píxeles, en 300ms.
+**Qué pasa**: cuando navegas a `/finance/intelligence` o cualquier vista, en lugar de aparecer instantánea, el contenido entra con un fade-in suave + un sutil slide-up de 8 píxeles, en 300ms.
 
 **Por qué importa**: convierte cada navegación dentro del portal en una micro-experiencia premium. Hoy la sensación es "cut" — el contenido aparece de golpe. Con esto, el portal "respira".
 
@@ -89,7 +89,7 @@ Greenhouse es plataforma operativa enterprise, no portfolio creativo.
 
 ### 5. Skeleton crossfade (cuando los datos terminan de cargar)
 
-**Qué pasa**: hoy cuando cargás una vista que necesita datos, ves un skeleton (placeholders grises animados) y cuando llegan los datos hay un swap brusco. Con esta dimensión, el skeleton hace fade-out mientras el contenido real hace fade-in superpuestos — cross-fade suave de 200ms.
+**Qué pasa**: hoy cuando cargas una vista que necesita datos, ves un skeleton (placeholders grises animados) y cuando llegan los datos hay un swap brusco. Con esta dimensión, el skeleton hace fade-out mientras el contenido real hace fade-in superpuestos — cross-fade suave de 200ms.
 
 **Por qué importa**: el cambio loading→loaded deja de ser un "flash" y pasa a ser una transición orgánica. La sensación es que los datos "aparecen" en lugar de "reemplazar".
 
@@ -99,7 +99,7 @@ Greenhouse es plataforma operativa enterprise, no portfolio creativo.
 
 ### 6. KPI counter rolling (cuando aparecen las cifras importantes)
 
-**Qué pasa**: cuando entrás a un dashboard (MRR/ARR, Finance Intelligence, ICO, Pulse, Portfolio Health), las cifras grandes (`$45.230.000`, `92%`, `1.245 horas`) no aparecen estáticas. **Ruedan** desde 0 hasta el valor final en 800-1200ms con física de spring.
+**Qué pasa**: cuando entras a un dashboard (MRR/ARR, Finance Intelligence, ICO, Pulse, Portfolio Health), las cifras grandes (`$45.230.000`, `92%`, `1.245 horas`) no aparecen estáticas. **Ruedan** desde 0 hasta el valor final en 800-1200ms con física de spring.
 
 **Por qué importa**: las cifras de KPI son lo primero que mira el usuario. Si aparecen estáticas, se sienten como "printout". Si ruedan, transmiten que el sistema está vivo, calculando, presentando un dato real.
 
@@ -107,13 +107,13 @@ Greenhouse es plataforma operativa enterprise, no portfolio creativo.
 
 **Dónde lo verás**: KPI cards de los 5 dashboards principales del portal. TASK-645.
 
-**Detalle importante**: cuando los datos cambian (por ejemplo, cambiás el filtro de mes), el contador interpola desde el valor visible actual al nuevo, **no resetea a 0**. Eso preserva la continuidad cognitiva del dato.
+**Detalle importante**: cuando los datos cambian (por ejemplo, cambias el filtro de mes), el contador interpola desde el valor visible actual al nuevo, **no resetea a 0**. Eso preserva la continuidad cognitiva del dato.
 
 ---
 
 ### 7. Scroll-triggered chart entrance (cuando los charts aparecen al hacer scroll)
 
-**Qué pasa**: cuando un chart está más abajo del fold y hacés scroll para verlo, en lugar de aparecer ya renderizado, entra con fade + slide-up de 16 píxeles cuando entra al viewport.
+**Qué pasa**: cuando un chart está más abajo del fold y haces scroll para verlo, en lugar de aparecer ya renderizado, entra con fade + slide-up de 16 píxeles cuando entra al viewport.
 
 **Por qué importa**: dirige la atención del usuario al chart en el momento exacto en que se hace visible. Crea sensación de revelación, no de "todo estaba ahí desde el inicio".
 
@@ -125,7 +125,7 @@ Greenhouse es plataforma operativa enterprise, no portfolio creativo.
 
 ### 8. List stagger (cuando una lista larga aparece)
 
-**Qué pasa**: cuando entrás a `/people`, `/finance/clients` o `/finance/quotes` con una lista de 20+ items, las rows no aparecen todas a la vez. Entran una a una con un delay de 30-50ms entre cada una. Total: ~600ms para que toda la lista esté visible.
+**Qué pasa**: cuando entras a `/people`, `/finance/clients` o `/finance/quotes` con una lista de 20+ items, las rows no aparecen todas a la vez. Entran una a una con un delay de 30-50ms entre cada una. Total: ~600ms para que toda la lista esté visible.
 
 **Por qué importa**: una lista grande que aparece de golpe abruma; la misma lista entrando staggered se siente cinematográfica y enterprise. La mirada del usuario sigue naturalmente la cadencia.
 

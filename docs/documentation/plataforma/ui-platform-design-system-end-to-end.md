@@ -13,6 +13,12 @@ UI Platform define como se construyen pantallas Greenhouse: stack Next/MUI/Vuexy
 
 Design System es una superficie interna, no cliente. Sirve para descubrir, probar y validar primitives/patrones vivos.
 
+Para productos fuera de Greenhouse, AXIS es la frontera compartida: Greenhouse conserva gobierno,
+contratos y registry; cada consumer implementa un adapter nativo. El piloto verificable está en
+[TASK-1591](../../tasks/complete/TASK-1591-efeonce-ui-adapters-pilot.md), la decisión en
+[la arquitectura compartida](../../architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md)
+y la instalación/rollback en el [runbook AXIS](../../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
+
 ## Evidencia revisada
 
 Codigo y rutas:

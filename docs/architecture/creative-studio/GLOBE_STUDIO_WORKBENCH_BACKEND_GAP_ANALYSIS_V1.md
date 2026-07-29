@@ -19,7 +19,7 @@ existen están declaradas `ui: policy-blocked` en el coverage manifest
 (`packages/domain/src/model-lab.ts:120-129`) — ninguna es despachable desde una UI todavía.
 
 El workbench está diseñado como una **agencia creativa completa** (brief compuesto → dirección →
-estimate → aprobación → producción → candidatos/exploración → entrega). El backend hoy es un
+estimate → aprobación → producción → candidatos/exploración → entrega). Al 2026-07-20 el backend cubria solo el carril del Model Lab, un
 **sandbox de laboratorio**: generar un candidato y refinarlo. La tesis de TASK-1474 ("thin client
 sobre commands existentes, cero business logic en la UI") **no es alcanzable hoy**.
 

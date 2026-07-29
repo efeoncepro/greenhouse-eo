@@ -42,6 +42,31 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.07-beta.2
+
+**Canal:** Beta
+**Fecha:** 2026-07-21
+**Disponible para:** pilot
+**Módulos:** Sitio público / Growth / Agenda
+
+### Novedades
+
+- El piloto `efeoncepro.com/agenda/` permite elegir fecha y hora en la zona local del visitante dentro de una
+  experiencia Efeonce, sin abrir una agenda externa. HubSpot continúa gestionando disponibilidad, calendario,
+  Microsoft Teams y CRM detrás del servicio.
+
+### Mejoras
+
+- Los meses sin horarios ya no hacen desaparecer el calendario: se conserva la grilla completa y se explica que no
+  hay disponibilidad para ese mes. Agosto de 2026 fue verificado con sus 31 días aunque el provider devolviera cero slots.
+- Los estados de carga o indisponibilidad ofrecen navegación mensual y `Reintentar`, sin enlaces de fallback visibles.
+
+### Notas
+
+- La capacidad está limitada al piloto `/agenda/` (`noindex`). No está promovida a Contacto ni a landings de servicios.
+- La medición de conversión sigue en preview: el booking controlado, la evidencia live y la publicación GTM requieren
+  cierre y confirmación humana separados.
+
 ## 2026.07-beta.1
 
 **Canal:** Beta

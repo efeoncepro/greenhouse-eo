@@ -1,0 +1,55 @@
+/* ===========================================================================
+   AXIS · Spacing, radius, elevation & motion tokens
+   Greenhouse favors predictable spacing and strong rhythm over visual tricks.
+   Spacing step = 4px · N. Radius is moderate and systematic. Depth is restrained
+   and semantic: two soft shadow layers + a 1px hairline, never a heavy drop.
+   =========================================================================== */
+
+:root {
+  /* --- Spacing (theme.spacing(N) = 4N px) ------------------------------ */
+  --space-xs: 4px;
+  --space-sm: 8px;     /* compact inline gap */
+  --space-md: 16px;    /* standard inner spacing step */
+  --space-lg: 24px;    /* default card padding + container rhythm */
+  --space-xl: 32px;
+  --space-xxl: 40px;   /* larger section breathing room */
+
+  /* --- Radius ---------------------------------------------------------- */
+  --radius-none: 0px;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;    /* DEFAULT — cards, fields, chips, common surfaces */
+  --radius-lg: 8px;    /* floating / high-emphasis — docks, dialogs */
+  --radius-xl: 10px;   /* larger panels & previews */
+  --radius-xxl: 12px;  /* large support / editorial surfaces */
+  --radius-display: 16px;
+  --radius-full: 9999px; /* pills / capsules (true circle = 50%) */
+
+  /* --- Elevation · semantic roles (two soft layers + 1px hairline) ------
+     No role exceeds 0 8px 24px rgba(0,0,0,.1). The border carries separation
+     under forced-colors; the shadow is the enhancement. */
+  --elevation-none: none;
+  --elevation-raised:  0 1px 2px rgba(16, 24, 40, 0.04), 0 2px 6px rgba(16, 24, 40, 0.06);
+  --elevation-floating: 0 2px 6px rgba(16, 24, 40, 0.06), 0 6px 16px rgba(16, 24, 40, 0.08);
+  --elevation-overlay:  0 4px 10px rgba(16, 24, 40, 0.07), 0 8px 24px rgba(16, 24, 40, 0.10);
+  --elevation-modal:    0 4px 12px rgba(16, 24, 40, 0.08), 0 8px 24px rgba(16, 24, 40, 0.10);
+
+  /* --- Borders / hairlines (px — must not scale with font) ------------- */
+  --hairline: 1px;
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+
+  /* --- Motion (ms, fixed scale) --------------------------------------- */
+  --motion-instant: 75ms;    /* @kind other */
+  --motion-short: 150ms;     /* @kind other */
+  --motion-standard: 200ms;  /* @kind other */
+  --motion-medium: 300ms;    /* @kind other */
+  --motion-long: 400ms;      /* @kind other */
+  --motion-extended: 600ms;  /* @kind other */
+
+  /* Easing — never ease-in-out as default */
+  --ease-emphasized: cubic-bezier(0.2, 0, 0, 1);      /* @kind other */ /* default */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);      /* @kind other */
+  --ease-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15); /* @kind other */ /* exits */
+  --ease-linear: linear;                              /* @kind other */
+}

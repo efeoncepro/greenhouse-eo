@@ -1076,7 +1076,7 @@ Cierra el gap operativo de TASK-1088: la ingesta era manual (re-correr el CLI). 
 ### Pipeline canónico
 
 ```
-Notion (publicás/editás/borrás en una Wiki de knowledge)
+Notion (publicas/editas/borras en una Wiki de knowledge)
   → webhook "Greenhouse KNOW"  →  /api/webhooks/notion-knowledge   [bus TASK-912]
      ├─ verification handshake (ACK siempre, pre-flag/pre-HMAC)
      ├─ HMAC-SHA256 (secret propio NOTION_KNOWLEDGE_WEBHOOK_SIGNING_SECRET_REF)

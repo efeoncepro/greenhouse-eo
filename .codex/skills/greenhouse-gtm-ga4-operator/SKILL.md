@@ -1,6 +1,6 @@
 ---
 name: greenhouse-gtm-ga4-operator
-description: Operate Google Tag Manager + GA4 for Efeonce — create/edit tags, triggers, variables via the GTM API v2 (governed workspace → preview → confirm → publish), register GA4 custom dimensions & key events, and verify events land. Use when tagging Growth Forms/CTAs/landings, wiring gh_* dataLayer events to GA4, building or auditing GTM container config, confirming a measurement ID/property, or diagnosing "event not showing in GA4". Operates the src/lib/growth/{gtm,ga4} clients and the docs/reference/measurement-gtm-ga4 tracking plan. Delegates naming/strategy to growth-marketing-cro, the event source to greenhouse-growth-forms, snippet install to efeonce-public-site-wordpress, browser verify to greenhouse-gvc-playwright.
+description: Operate Google Tag Manager + GA4 for Efeonce — create/edit tags, triggers and variables via the GTM API v2 (governed workspace → preview → confirm → publish), register GA4 custom dimensions and key events, and verify events land. Use when tagging Growth Forms, Growth CTAs, the native meeting scheduler or landings; wiring governed dataLayer events to GA4; building or auditing GTM container config; confirming a measurement ID/property; or diagnosing "event not showing in GA4". Operates the `src/lib/growth/{gtm,ga4}` clients and the measurement tracking plan; event semantics remain owned by their source domains.
 ---
 
 # Greenhouse GTM + GA4 Operator
@@ -11,8 +11,9 @@ Use this skill to **operate measurement instrumentation** for Efeonce: build and
 
 ## When to invoke
 
-- Tagging a Growth Form / CTA / landing so its submit/click event reaches GA4.
-- Wiring `gh_*` dataLayer events (`gh_form_submission_accepted`, future `gh_cta_clicked`) → GA4 Event tags.
+- Tagging a Growth Form, Growth CTA, native meeting scheduler or landing so its governed event reaches GA4.
+- Wiring form `gh_form_*`, CTA engine `greenhouse_cta_*`, legacy host `gh_cta_clicked` or native
+  meeting `gh_meeting_*` events to GA4 without merging their namespaces.
 - Creating/editing/publishing GTM tags, triggers, variables (by API or reviewing UI changes).
 - Registering GA4 custom dimensions (`form_slug`, `form_kind`, `surface_id`, `cta_location`…) or key events (`generate_lead`, `sign_up`).
 - Confirming which Measurement ID maps to which GA4 property; auditing a container.
@@ -40,7 +41,11 @@ For **event naming / taxonomy / the gh_ house style** → `docs/reference/measur
 Ante una tarea de medición, seguir este árbol; NO improvisar el camino:
 
 1. **¿Qué se quiere medir?** submit de form · click de CTA · vista · conversión.
-2. **¿El evento ya se emite al dataLayer?** Forms SÍ (`gh_form_*`, default true). CTAs → falta la familia `gh_cta_*` (definir primero en la SoT `src/lib/growth/forms/contracts.ts`). Verificar con `curl gtm.js | grep` o el renderer telemetry.
+2. **¿El evento ya se emite al dataLayer?** Resolver su SoT antes de taggear: Forms `gh_form_*`
+   (`src/lib/growth/forms/contracts.ts`); CTA engine `greenhouse_cta_*`
+   (`src/lib/growth/ctas/contracts.ts`); rail CTA legacy `gh_cta_clicked` (no renombrar); meetings
+   `gh_meeting_step_reached|gh_meeting_booking_confirmed` (`src/lib/growth/meetings/contracts.ts`).
+   Verificar el renderer y el dataLayer; GTM no inventa eventos ausentes.
 3. **¿Existe un evento recomendado GA4 que calce?** (lead → `generate_lead`; signup → `sign_up`). Sí → usar ese verbatim (hereda key events/predictivos). No → custom `gh_<object>_<action>`. Regla completa: doc `04`.
 4. **¿Ya hay un tag genérico que lo cubra?** Un solo GA4 Event tag + parámetro de identidad (`form_slug`) cubre N superficies — **reusar antes de crear**. Ver `TRACKING-PLAN.md`.
 5. **Construir** con el Workflow gobernado (abajo) usando los shapes verificados del doc `05`.
@@ -60,6 +65,10 @@ Diagnóstico "no llega a GA4" → el **diagnostic ladder del doc `06 §6`** (dat
 - **Preferir el evento recomendado GA4** cuando existe (submit de lead → `generate_lead`, hereda key events/predictivos); custom `gh_` solo cuando no hay equivalente (regla en `docs/reference/measurement-gtm-ga4/04`).
 - **Un evento genérico + parámetro de identidad** (`form_slug`), NO un tag por form. Un solo GA4 Event tag cubre todos los forms.
 - **NUNCA marcar como key event un click/scroll/view/paso de funnel** (`gh_cta_clicked`, `gh_form_started`, `page_view`…). Key event SOLO para conversiones reales de negocio (`generate_lead`, `sign_up`, `purchase`). Criterio canónico: doc `04 §3b`. (GA4 limita a 30 key events/propiedad — son escasos.)
+- **Meetings:** `gh_meeting_step_reached` es funnel custom y nunca key event.
+  `gh_meeting_booking_confirmed` sólo existe tras un receipt server-confirmed elegible; GTM lo
+  transforma a `generate_lead` con `lead_source=meeting_booking` y NO envía además el custom a GA4.
+  El ledger es verdad de conversión; GA4 es mirror a reconciliar.
 - **SIEMPRE que se sume un host/sitio nuevo del ecosistema** (subdominio, Astro/WP, microsite) → **instalar el tag GA4** desde su nacimiento: snippet `GTM-NGHPGRLZ` + (si no tiene otra fuente de page_view) GA4 Config gateado por hostname, **misma propiedad `486264460`** (NUNCA stream/propiedad aparte por subdominio propio). Registrar en Tracking Engine §19.5 + verificar sin doble conteo. **Un host sin tag GA4 = superficie incompleta** (mandato §19.2). Cross-repo: rama+PR. En Astro, `is:inline` va SOLO en `<script>`, NUNCA en `<noscript>`.
 
 ## Workflow gobernado (crear un tag end-to-end)
@@ -100,6 +109,8 @@ Todo el conocimiento vive en la carpeta canónica `docs/reference/measurement-gt
 
 - **`growth-marketing-cro`** (dueña del reference) → conocimiento de medición, naming, estrategia de conversión. Este operador *ejecuta* lo que esa skill *decide*.
 - **`greenhouse-growth-forms`** → fuente de los eventos `gh_form_*` + el TRACKING-PLAN. Un form nuevo llega acá para taggearse.
+- **`greenhouse-growth-meetings`** → fuente de `gh_meeting_*`, receipt gate y allowlist sin PII.
+  Este operador construye/publica el tagging, pero no decide que una reserva fue confirmada.
 - **`efeonce-public-site-wordpress`** → dónde vive el snippet GTM; instalar/verificar el contenedor en el sitio, resolver container-drift.
 - **`greenhouse-gvc-playwright`** → verificación en browser real (dataLayer, `/collect`, Tag Assistant) desktop+mobile.
 - **`digital-marketing`** → medición de campañas, taxonomía UTM que alimenta los eventos.

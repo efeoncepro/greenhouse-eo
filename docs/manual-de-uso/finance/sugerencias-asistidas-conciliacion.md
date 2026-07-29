@@ -66,7 +66,7 @@ El componente reutilizable que soporta esta vista esta documentado en [Finance M
 |---|---|
 | Alta confianza | Las reglas y/o el modelo encontraron señales fuertes de monto, fecha, referencia o descripcion. Igual requiere revision humana. |
 | Confianza media | Hay señales utiles, pero no suficientes para tratarlo como obvio. Revisar con cuidado. |
-| Baja confianza | La sugerencia es debil o exploratoria. Usala solo como pista. |
+| Baja confianza | La sugerencia es debil o exploratoria. Úsala solo como pista. |
 | Legacy payment-only | El candidato apunta a un payment antiguo sin `settlement_leg` canonica. Revisar con especial cuidado antes de conciliar. |
 | Sin sugerencias pendientes | No hay filas pendientes o Greenhouse no encontro una propuesta util para ese periodo. |
 | Inteligencia apagada | El kill switch esta en `false`; no se generan sugerencias nuevas. |

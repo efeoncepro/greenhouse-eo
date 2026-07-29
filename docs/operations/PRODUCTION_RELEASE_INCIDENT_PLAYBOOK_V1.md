@@ -57,7 +57,7 @@ Cuando `Production Release Orchestrator` falla en `Preflight (TASK-850 CLI)`:
 
 ---
 
-## ⚠️ Regla #3: invocá al `arch-architect` ANTES de tocar cualquier cosa canónica
+## ⚠️ Regla #3: invoca al `arch-architect` ANTES de tocar cualquier cosa canónica
 
 Codex no lo hizo. Sus 4 fix commits introdujeron drift adicional en `sentry-critical-issues.ts` que después tuvo que ser reconciliado. El arch verdict toma 90 segundos y previene esta clase de errores.
 
@@ -126,7 +126,7 @@ for i in json.load(sys.stdin):
 Por cada issue activo en ventana 15min, decidir:
 
 - **Recurrente (lastSeen <5min, count alto)** → bug runtime real. Investigar el code path que lo emite. Fix → deploy → wait → verify.
-- **Residual post-fix (count viejo pero lastSeen reciente)** → el fix ya está deployado pero hay eventos que llegaron tarde o cold-starts antiguos. Esperá hasta que `lastSeen` salga de los 15min naturales.
+- **Residual post-fix (count viejo pero lastSeen reciente)** → el fix ya está deployado pero hay eventos que llegaron tarde o cold-starts antiguos. Espera hasta que `lastSeen` salga de los 15min naturales.
 - **Real pero non-blocker** → mark as `resolved` en Sentry API (`PUT /api/0/issues/<id>/`), no bloquea preflight. Si reaparece, se crea issue nuevo (no recicla el resolved).
 
 ### Paso 4 — Verificar fix LIVE antes de re-trigger
@@ -165,7 +165,7 @@ Ejemplo malo:
 
 **Caso real**: Codex re-trigger 4 veces (`25729006167`, `25730555533`, `25734474468`, `25734817631`) sin esperar que los fixes propagaran a runtime. Cada trigger era ruido.
 
-**Regla**: entre push y trigger del orchestrator, esperá:
+**Regla**: entre push y trigger del orchestrator, espera:
 - ~3 min para Vercel build complete + cold-start cycles
 - ~5-15 min para que Sentry active window se enfríe si el fix lo requería
 
@@ -261,7 +261,7 @@ El preflight detectó el incidente actual correctamente: env var corrupta produc
 - ✅ Cuando un check tiene bug class verificado (false positives sostenidos demostrables)
 - ✅ Cuando emerge un nuevo failure mode que el catálogo de checks no cubre (agregar check nuevo, no quitar)
 - ❌ Cuando "está siendo molesto en un release específico" → eso es la señal correcta
-- ❌ Cuando "queremos cerrar el release rápido" → escalá a humano con autoridad, NO al código
+- ❌ Cuando "queremos cerrar el release rápido" → escala a humano con autoridad, NO al código
 
 ---
 

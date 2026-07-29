@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-023`
-- Status real: `Foundation code-complete, incluido gate canónico de correo corporativo; dev migration + live DB concurrency + provider read verified; controlled booking/rollout pending`
+- Status real: `Adapter y piloto native-only liberados; flags staging/Production y binding /agenda activos. Pendientes: booking controlado/replay, read-back HubSpot/Outlook/Teams, evidencia /g/collect y publish GTM.`
 - Rank: `TBD`
 - Domain: `growth|public-site|crm|data`
 - Blocked by: `none`
@@ -27,7 +27,7 @@
 
 ## Summary
 
-Productiza el `conditional pass` de TASK-1366 como adapter server-side seguro sobre HubSpot Scheduler API. Entrega config/availability y un command de booking gobernado con origen/surface, Turnstile, rate limiting, idempotencia, atribución allowlisted, errores sanitizados, señales y rollout default OFF.
+Productiza el `conditional pass` de TASK-1366 como adapter server-side seguro sobre HubSpot Scheduler API. Entrega config/availability y un command de booking gobernado con origen/surface, Turnstile, rate limiting, idempotencia, atribución allowlisted, errores sanitizados y señales. Los defaults de código permanecen OFF; el piloto aislado `/agenda/` opera con flags de staging/Production ON.
 
 La tarea persigue dos resultados inseparables: habilitar una UI propia de alta calidad y crear un rail de medición GTM/GA4 confiable. HubSpot continúa como fuente de verdad de disponibilidad, calendario, Teams, contacto y reunión; Greenhouse no crea un calendario paralelo.
 
@@ -40,7 +40,7 @@ El spike verificó una reserva real con Office 365, Teams y CRM, pero su harness
 - Exponer configuración y disponibilidad HubSpot como DTOs browser-safe para surfaces autorizadas.
 - Ejecutar booking idempotente y aceptar éxito sólo con reserva online, calendar event y Teams válidos.
 - Emitir un recibo de conversión opaco que permita `gh_meeting_booking_confirmed -> generate_lead` sin PII ni doble conteo.
-- Mantener el iframe/link como fallback durante shadow, pilot y rollback.
+- Mantener HubSpot como provider server-side invisible; resolver recuperación en la UI nativa y ejecutar rollback por flags, binding o versión, nunca mediante un enlace visible.
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
 
@@ -92,7 +92,7 @@ Reglas obligatorias:
 
 - Blocks TASK-1510 native portable renderer.
 - Affects public growth API, HubSpot scheduling traffic, measurement contract, flags and reliability.
-- Future `hubspot_handoff` graduation remains a separate task after TASK-1431 releases ownership.
+- La graduación de `open_meeting_scheduler` más allá del piloto aislado permanece separada y requiere evidencia por surface; `book_meeting` conserva su contrato navigation-only.
 
 ### Files owned
 
@@ -109,15 +109,16 @@ Reglas obligatorias:
 ### Already exists
 
 - `scripts/hubspot/smoke-scheduler-booking.mjs` verifies details, availability and booking with redacted output.
-- PDR-009 records the source-of-truth, fallback and attribution limits.
+- PDR-009 records the source-of-truth, native-only recovery and attribution limits.
 - Growth Forms provides proven public-origin/CORS, Turnstile, PII and error-boundary patterns.
 - The live scheduling page `efeoncepro/agenda-discovery` uses Office 365, Teams, 30 minutes, company required and legal consent.
 
-### Gap
+### Estado vigente 2026-07-21
 
-- No canonical meeting reader/command, browser DTO, public API, idempotency ledger or provider adapter exists.
-- No measurement receipt or event contract can prove a booking conversion without leaking provider/PII data.
-- No flag, reliability signals, rollout sequence or renderer-ready fixtures exist.
+- Reader/command, DTOs browser-safe, public API, ledger de idempotencia, provider adapter y receipt ya existen.
+- Migración dev, race PostgreSQL y lecturas provider están verificadas; los flags staging/Production y el binding piloto están activos.
+- `/agenda/` consume el adapter mediante la experiencia native-only. HubSpot no aparece como UI alternativa.
+- Falta ejercer un booking controlado post-flip con replay/read-back y cerrar la evidencia de medición antes de publicar GTM.
 
 ## Modular Placement Contract
 
@@ -141,7 +142,7 @@ Reglas obligatorias:
 
 ### Contract surface
 
-- `GET /api/public/growth/meetings/config?surfaceId=...&timezone=...`: browser-safe duration, visitor-resolved IANA timezone policy, required fields/legal consent and fallback mode; no organizer/provider IDs. Surface timezone is fallback, not a visitor allowlist.
+- `GET /api/public/growth/meetings/config?surfaceId=...&timezone=...`: browser-safe duration, visitor-resolved IANA timezone policy, required fields/legal consent and availability/recovery mode; no organizer/provider IDs or provider link. Surface timezone is fallback, not a visitor allowlist.
 - `GET /api/public/growth/meetings/availability?surfaceId=...&timezone=...&monthOffset=...`: normalized bounded days/slots with explicit freshness/state.
 - `POST /api/public/growth/meetings/book`: slot/duration/timezone/locale, required contact/form fields, legal consent, surface/captcha, idempotency key and attribution envelope.
 - `POST /api/public/growth/meetings/verify-email`: veredicto browser-safe, rate-limited y autorizado por surface/origin para feedback debounced; la autoridad se reejecuta dentro de `book` antes de CAPTCHA, disponibilidad, claim o write.
@@ -175,8 +176,8 @@ Reglas obligatorias:
 
 - Migration: additive idempotency/audit storage only if Discovery proves no existing command ledger fits; architecture/ADR precedes schema.
 - Backfill: none; do not import historic meetings/contacts.
-- Flag: `GROWTH_NATIVE_MEETING_SCHEDULER_ENABLED=false`, with scoped shadow/read and booking/pilot posture if supported.
-- Rollback: flag OFF; hosts return to embed/link. Preserve receipts for reconciliation; never delete calendar meetings as rollback.
+- Flag contract defaults safe (`false`) in code; staging/Production currently set both read and booking flags to `true` for the allowlisted pilot.
+- Rollback: flag OFF, binding `paused` o versión/backup previo del host. Preserve receipts for reconciliation; never delete calendar meetings as rollback and never expose an automatic provider link.
 
 ### Observability and runtime evidence
 
@@ -188,7 +189,7 @@ Reglas obligatorias:
 ### Measurement
 
 - Tier B funnel: renderer emits canonical `gh_meeting_step_reached` with allowlisted `meeting_step`, `surface_id`, `placement`, `scheduler_key`, `availability_state`, `days_ahead_bucket`, `time_of_day_bucket` and sanitized `error_category`.
-- Allowed `meeting_step`: `viewed|availability_loaded|availability_failed|date_selected|slot_selected|details_started|validation_failed|booking_started|booking_failed|fallback_opened`.
+- Allowed `meeting_step`: `viewed|availability_loaded|availability_failed|date_selected|slot_selected|details_started|validation_failed|booking_started|booking_failed`; `fallback_opened` remains reserved only for historical/cached-client compatibility and is not emitted by the native renderer.
 - Tier A conversion mirror: only the first successful conversion receipt branch allows renderer event `gh_meeting_booking_confirmed`; GTM maps it to recommended GA4 `generate_lead` with `lead_source=meeting_booking`, does not forward the custom confirmation event, and no other scheduler event is a key event.
 - Exact slot, email, name, company, free text, receipt and correlation ID are excluded from `dataLayer`/GA4.
 - Tracking plan must define funnel/custom dimensions, dedupe semantics, measurement ID verification and `/g/collect`/Realtime evidence before publish.
@@ -202,7 +203,7 @@ Reglas obligatorias:
 
 ### Slice 0 — Architecture and measurement decision
 
-- Create `GREENHOUSE_GROWTH_MEETINGS_SCHEDULER_ARCHITECTURE_V1.md` with C4, threat model, idempotency, provider lock-in, conversion receipt and fallback.
+- Create `GREENHOUSE_GROWTH_MEETINGS_SCHEDULER_ARCHITECTURE_V1.md` with C4, threat model, idempotency, provider lock-in, conversion receipt and native recovery.
 - Freeze the GTM event/parameter matrix and decide whether the existing command ledger satisfies durable claims.
 
 ### Slice 1 — Contracts and provider adapter
@@ -223,12 +224,12 @@ Reglas obligatorias:
 
 ### Slice 4 — Controlled runtime proof
 
-- Run approved booking and duplicate replay; read back HubSpot/Outlook/Teams and document fallback.
+- Run approved booking and duplicate replay; read back HubSpot/Outlook/Teams and document native recovery/rollback.
 
 ## Out of Scope
 
 - Renderer/visual system/public host (TASK-1510).
-- Removing iframe/link or modifying TASK-1431 Action Registry.
+- Renderer/host removal of iframe/link and the additive Action Registry adapter belong to TASK-1510; TASK-1509 remains the booking authority.
 - Reschedule/cancel APIs, payments, routing redesign or CRM Meetings API writes.
 - Historic backfill or marketing Forms API submission by default.
 - Publishing GTM workspace without a later explicit human confirmation.
@@ -243,22 +244,23 @@ The canonical capability is a provider-independent meetings contract with one Hu
 
 - Slice 0 -> 1 -> 2 -> 3 -> 4.
 - No write route before anti-abuse, idempotency and fail-closed tests pass.
-- TASK-1510 may use fixtures after Slice 1, but no public pilot before Slice 4.
+- TASK-1510 may use fixtures after Slice 1. The isolated public read/UX pilot may run after provider-read, migration,
+  anti-abuse and native-recovery evidence; graduation or measurement publish remains gated on the controlled booking proof.
 
 ### Risk matrix
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
 | Duplicate calendar booking | HubSpot/Office 365 | medium | durable claim and replay receipt | `growth.meeting.duplicate_prevented` |
-| Offline/no-Teams accepted | HubSpot/Teams | low | strict response gate + fallback | `growth.meeting.offline_booking_detected` |
+| Offline/no-Teams accepted | HubSpot/Teams | low | strict response gate + terminal native recovery | `growth.meeting.offline_booking_detected` |
 | Public abuse | public API | medium | Turnstile, surface/origin, limits | captcha/rate outcomes |
 | PII/provider leak | privacy/measurement | low | closed DTO/event allowlists + negative tests | redaction gate |
 | Funnel double-counts conversion | GTM/GA4 | medium | receipt-gated single event; generate_lead only | reconciliation mismatch |
 
 ### Feature flags / cutover
 
-- Default OFF everywhere. A read flag shadows config/availability; the booking flag enables writes only on allowlisted surfaces.
-- Revert is flag OFF and renderer fallback only before dispatch. `ambiguous`/`provider_created_invalid` never auto-open fallback because it could duplicate a real meeting.
+- Code defaults remain OFF. Staging/Production are currently ON by explicit rollout; the read flag gates config/availability and the booking flag enables writes only on allowlisted surfaces.
+- Revert is flag OFF/binding paused/version rollback. Before dispatch the renderer may offer native retry; `ambiguous`/`provider_created_invalid` never auto-retry or open another booking path because it could duplicate a real meeting.
 
 ### Rollback plan per slice
 
@@ -271,54 +273,55 @@ The canonical capability is a provider-independent meetings contract with one Hu
 ### Production verification sequence
 
 1. Local contract/concurrency/redaction/receipt suites.
-2. Staging availability matches official embed.
-3. Controlled booking + identical replay produces one event.
-4. HubSpot CRM and authenticated Outlook prove the same online Teams meeting.
-5. Keep public host on fallback until TASK-1510/GTM preview gates pass.
+2. Staging availability matches official provider data.
+3. Isolated `/agenda/` pilot proves native UI/recovery without a booking write.
+4. Controlled booking + identical replay produces one event.
+5. HubSpot CRM and authenticated Outlook prove the same online Teams meeting.
+6. Keep the native pilot isolated until `/g/collect` and GTM gates pass; do not promote to Contacto/RRSS.
 
 ### Out-of-band coordination required
 
 - Approved recipient/time for booking smoke and optional inbox inspection.
 - HubSpot page/calendar/scope must remain healthy.
-- GTM publish and production flag flip each require explicit human confirmation.
+- Production flags were explicitly approved and are ON; GTM publish still requires a separate explicit human confirmation.
 
 <!-- ZONE 4 — VERIFICATION & CLOSURE -->
 
 ## Acceptance Criteria
 
-- [x] Architecture names HubSpot as SoT and documents threat model, receipt, provider failure and fallback.
+- [x] Architecture names HubSpot as SoT and documents threat model, receipt, provider failure, native recovery and flag/version rollback.
 - [x] Config/availability return normalized browser-safe DTOs only for authorized surfaces.
 - [x] Booking enforces surface/origin, Turnstile, limits, validation and consent without raw errors/secrets.
 - [x] Concurrent/replayed requests create at most one booking; conflicting key reuse rejects.
 - [x] Success is impossible for offline, missing calendar, mismatched slot or invalid Teams result.
 - [x] Conversion receipt is opaque/replay-safe and carries no PII/provider IDs.
 - [x] Tracking Plan defines the Tier B funnel and receipt-gated `generate_lead` rail with no PII/exact slot.
-- [x] Flag/signals/rollback are registered default OFF.
-- [ ] Controlled runtime proof verifies HubSpot, Office 365, Teams and duplicate replay while embed remains available.
+- [x] Flag/signals/rollback are registered with safe code defaults and current live ON state recorded in the ledger.
+- [ ] Controlled runtime proof verifies HubSpot, Office 365, Teams and duplicate replay without exposing a provider UI path.
 
 ## Verification
 
 - [x] `pnpm codex:task-hook TASK-1509`
 - [x] `pnpm task:lint` (TASK-1509/TASK-1510 changed set: zero errors/warnings)
 - [x] Focused contract/concurrency/security/measurement tests.
-- [ ] `pnpm lint`
+- [x] `pnpm lint`
 - [x] `pnpm tsc --noEmit`
 - [ ] Controlled redacted runtime smoke.
 - [x] `pnpm ops:lint --changed`
 - [ ] `pnpm qa:gates --changed --agent codex`
-- [ ] `pnpm docs:closure-check`
+- [x] `pnpm docs:closure-check` (sin finding bloqueante; warnings de cierre/índices se coordinan en el cierre multiagente)
 
 ## Closing Protocol
 
-- [ ] Keep status honest if flag, inbox QA, GTM publish or public pilot remains pending.
+- [x] Keep lifecycle `in-progress` while controlled booking/replay, optional inbox QA, `/g/collect` and GTM publish remain pending; flags and public pilot are complete.
 - [ ] Synchronize registry/index, architecture/ADR, flag ledger, Tracking Plan, changelog and Handoff.
-- [ ] Record runtime/flag/fallback evidence without secrets or PII.
+- [x] Record runtime/flag/native-recovery evidence without secrets or PII.
 
 ## Definition of Done
 
-- [ ] Adapter, contracts, security/idempotency, receipt, tests, signals and measurement registry are complete.
+- [x] Adapter, contracts, security/idempotency, receipt, tests, signals and measurement registry are complete.
 - [ ] A controlled real booking and replay prove runtime behavior.
-- [ ] Public replacement remains gated on TASK-1510 and GTM preview/publish evidence.
+- [ ] Graduation beyond the isolated `/agenda/` pilot remains gated on TASK-1510 controlled booking, `/g/collect` and GTM publish evidence.
 
 ## Runtime Evidence — 2026-07-21
 
@@ -335,7 +338,12 @@ The canonical capability is a provider-independent meetings contract with one Hu
   proving one booking instant with local representations. No booking write was made.
 - GTM disposable workspace `task-1510-native-meeting-scheduler-1784624040208` (ID `6`) compiles and syncs in
   `quick_preview`: eight allowlisted DLVs, two triggers and two GA4 tags. No version or publication occurred.
+- Flags staging/Production and binding `fhsf-efeonce-lead-gen-web`/`discovery` are active. The native-only bundle
+  was released at `fbe8a9c76a74` (run `29854833210`); `/agenda/` exposes no HubSpot link/copy and retains the
+  complete August grid when HubSpot returns zero slots. No booking was created during release verification.
 
 ## Follow-ups
 
-- After TASK-1431, graduate `hubspot_handoff` to this adapter without changing navigation-only `book_meeting`.
+- Ejecutar un booking controlado y replay con read-back HubSpot/Outlook/Teams; validar el rail browser con `/g/collect`.
+- Publicar GTM sólo después de Preview/Tag Assistant, evidencia live y confirmación humana explícita.
+- Graduar `open_meeting_scheduler` una superficie a la vez, sin cambiar `book_meeting` navigation-only ni reintroducir una salida visible al provider.

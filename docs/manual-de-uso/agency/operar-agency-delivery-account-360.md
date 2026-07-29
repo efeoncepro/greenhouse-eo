@@ -61,4 +61,4 @@ Primero revisa `service_attribution_unresolved`. Si hay unresolved, el margen po
 
 ### Nexa da una recomendacion de delivery
 
-Usala como apoyo operacional. La accion final sigue siendo del operador y debe respetar permisos, capacity y contexto comercial.
+Úsala como apoyo operacional. La accion final sigue siendo del operador y debe respetar permisos, capacity y contexto comercial.

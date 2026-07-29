@@ -49,6 +49,10 @@ export const FINDING_CODES = {
   runtime_page_error: 'runtime_page_error',
   runtime_hydration_warning: 'runtime_hydration_warning',
   runtime_http_error: 'runtime_http_error',
+  // --- Asset integrity: decode + MIME incluso con HTTP 2xx ---
+  asset_mime_mismatch: 'asset_mime_mismatch',
+  asset_image_broken: 'asset_image_broken',
+  asset_image_probe_failed: 'asset_image_probe_failed',
   // --- Slice 5: keyboard / focus / reduced motion ---
   keyboard_focus_mismatch: 'keyboard_focus_mismatch',
   keyboard_focus_ring_missing: 'keyboard_focus_ring_missing',

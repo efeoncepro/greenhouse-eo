@@ -21,7 +21,12 @@ La persistencia durable de Globe (`TASK-1465`) le da a Efeonce Globe su **primer
 
 ### 1. Correr las migraciones
 
-Las migraciones son archivos `*.sql` numerados, **idempotentes**, registradas en la tabla `globe._migrations`, y se aplican como el rol dueño `globe_owner`. Desde `efeonce-globe`, con el connection name de la instancia y un usuario IAM migrador (que sea miembro de `globe_owner`) en el entorno:
+Las migraciones son archivos `*.sql` numerados, **idempotentes**, registradas en `globe._migrations` y se
+aplican como `globe_owner`. Las migraciones nuevas guardan además el SHA-256 del SQL: si un archivo ya aplicado
+cambia, el runner aborta con `globe_migration_checksum_mismatch` en vez de omitirlo por nombre. Las entradas
+históricas `0001…0003`, anteriores a este control, se reportan como `legacy without checksum` y no se presentan
+como verificadas. Desde `efeonce-globe`, con el connection name y un usuario IAM migrador miembro de
+`globe_owner`:
 
 ```bash
 # dentro de ../efeonce-globe
@@ -30,7 +35,8 @@ GLOBE_MIGRATOR_USER=<tu usuario IAM, miembro de globe_owner> \
 node packages/database/scripts/migrate.mjs
 ```
 
-El runner aplica sólo lo pendiente y deja constancia en `globe._migrations`. Correrlo dos veces no rompe ni duplica nada (idempotente).
+El runner aplica sólo lo pendiente y deja constancia en `globe._migrations`. Correrlo dos veces no duplica nada;
+editar una migración ya aplicada está prohibido y exige una migración forward nueva.
 
 ### 2. Bootstrap de roles (una sola vez, aparte)
 
@@ -67,10 +73,10 @@ Si **falta** cualquiera, el servicio **arranca en memoria** (comportamiento prev
 
 ## Problemas comunes
 
-- **El servicio arrancó en memoria (perdí estado tras un reinicio):** le falta alguna de las tres `GLOBE_POSTGRES_*` (`INSTANCE_CONNECTION_NAME`, `DATABASE`, `USER`). Declaralas en el servicio de Cloud Run (con su usuario IAM de runtime) y redesplegá. Recordá: correr en memoria sólo está permitido en `internal_smoke`.
-- **El techo de réplicas volvió a 1 tras un deploy por workflow:** esperado y conocido. `deploy-internal.yml` hoy **fija `--max-instances=1`** por hardcode, así que un redespliegue por ese workflow **baja el `maxScale` a 1** aunque lo hayas subido a 3 a mano. Workaround inmediato: volver a subir el `maxScale` con `gcloud run services update <servicio> --max-instances=3` después del deploy. El saneamiento de raíz —que Terraform gobierne ese valor y el workflow deje de pisarlo— es la **`TASK-1508`** (drift-trap).
-- **La migración no aplica / no ve la instancia:** confirmá `GLOBE_POSTGRES_INSTANCE_CONNECTION_NAME=efeonce-globe:southamerica-west1:globe-pg` y que `GLOBE_MIGRATOR_USER` sea un usuario IAM miembro de `globe_owner`. El runner aplica como `globe_owner`; un usuario sin ese rol no tiene los privilegios de DDL.
-- **No valida Globe con `pnpm local:check` de Greenhouse:** correcto, son toolchains distintos. Validá Globe con `pnpm check` / `pnpm build` dentro de `efeonce-globe`.
+- **El servicio arrancó en memoria (perdí estado tras un reinicio):** le falta alguna de las tres `GLOBE_POSTGRES_*` (`INSTANCE_CONNECTION_NAME`, `DATABASE`, `USER`). Declaralas en el servicio de Cloud Run (con su usuario IAM de runtime) y redespliega. Recuerda: correr en memoria sólo está permitido en `internal_smoke`.
+- **El techo de réplicas ya no baja tras un deploy:** `TASK-1508` cerró ese drift-trap. `deploy-internal.yml` dejó de pasar `--max-instances` y Terraform gobierna los **dos** ceilings (servicio y revisión), hoy en 3/3. Cuidado con el workaround viejo `gcloud run services update <servicio> --max-instances=3`: escribía el ceiling de **revisión**, no el de **servicio**, y Cloud Run aplica el menor — dejaba el techo efectivo en 1 aparentando restaurarlo.
+- **La migración no aplica / no ve la instancia:** confirma `GLOBE_POSTGRES_INSTANCE_CONNECTION_NAME=efeonce-globe:southamerica-west1:globe-pg` y que `GLOBE_MIGRATOR_USER` sea un usuario IAM miembro de `globe_owner`. El runner aplica como `globe_owner`; un usuario sin ese rol no tiene los privilegios de DDL.
+- **No valida Globe con `pnpm local:check` de Greenhouse:** correcto, son toolchains distintos. Valida Globe con `pnpm check` / `pnpm build` dentro de `efeonce-globe`.
 
 ## Referencias técnicas
 

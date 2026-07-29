@@ -47,28 +47,27 @@ Parte del cluster **Creative Producer** de EPIC-028
 
 ## Summary
 
-Convierte el formato objetivo (aspect ratio) en un campo gobernado del contrato del run
-—hoy el aspect ratio esta hardcodeado por ruta y solo para video (`apps/creative-runner/src/vertex-video-adapter.ts:90`),
-y `1:1`/`4:5` no existen— y agrega la generacion de un **Set** coordinado de formatos como
-unidad gobernada (hoy un experimento produce exactamente un output). El contrato transporta la
-intencion de formato; el mecanismo de aspect ratio vive DENTRO de cada adapter, detras del provider
-seam. Desbloquea "Formatos objetivo" y "Set de key visuales / Set de formatos" del Globe Studio
-Workbench (TASK-1474).
+Convierte el formato objetivo en una capacidad operable de extremo a extremo sobre el contrato ya existente
+de `OutputShapeV1`, y agrega la generación de un **Set** coordinado de formatos como unidad gobernada.
+El alcance actual no es volver a crear `aspectRatio`: es hacer confiable su catálogo, su mapeo por adapter,
+su validación antes del gasto y su experiencia de adaptación entre formatos. Debe distinguir generación
+nativa, conservación del formato de origen y adaptación/reencuadre de un asset existente. Desbloquea
+"Formatos objetivo" y "Set de key visuales / Set de formatos" del Globe Studio Workbench (TASK-1474).
 
 ## Why This Task Exists
 
 El workbench esta disenado para que quien dirige elija el formato de salida (`1:1`, `4:5`, `16:9`,
-`9:16`) y para pedir un **set** coordinado de un mismo brief en varios formatos a la vez. El backend
-real no lo permite:
+`9:16`) y para pedir un **set** coordinado de un mismo brief en varios formatos a la vez. El runtime ya
+transporta `aspectRatio` dentro de `ImageOutputShapeV1` y `VideoOutputShapeV1`, pero todavía quedan gaps:
 
-- **Aspect ratio no es contrato.** `PrepareExperimentPayloadV1`
-  (`packages/contracts/src/index.ts`, ~312-337) lleva `capability`, `referenceRoute`,
-  `authorizedInputs`, `hardCapCredits`, `prompt?`, `editFrom?`, `previousInteractionId?` — **ningun
-  campo de formato**. El aspect ratio existe solo dentro de las tablas de ruteo de los adapters de
-  video, hardcodeado: `vertex-video-adapter.ts:90` y `:100` fijan `aspectRatio: '16:9'`;
-  `vertex-omni-adapter.ts:81` lo tipa como `'16:9' | '9:16'` y lo fija en `:96`/`:106`. Los adapters
-  de imagen (`fal-adapter.ts`, `vertex-adapter.ts`) no exponen aspect ratio por el contrato.
-  Consecuencia: `1:1` y `4:5` no existen en ningun lado, y el caller no puede elegir formato.
+- **El contrato existe, pero el catálogo y el mecanismo no son uniformes.** La route declara los ratios
+  posibles y `prepare` los valida, pero cada provider los materializa distinto: Vertex usa
+  `imageConfig.aspectRatio`, Omni/Veo usan `aspect_ratio`/`aspectRatio`, OpenAI usa tamaños discretos y
+  Seedream usa presets `image_size`. No se puede prometer un ratio sin evidencia por capability.
+- **La UI aún piensa en una lista técnica.** Debe ofrecer intenciones de uso (cuadrado, feed vertical,
+  story, horizontal, banner) y revelar el ratio real, incluyendo `4:5` cuando una route lo soporte.
+- **No existe una operación explícita de adaptación.** Cambiar el ratio de una nueva generación funciona;
+  cambiarlo sobre un asset existente no garantiza preservar sujeto, texto, producto, logos o composición.
 - **Un experimento = un output.** `executeExperiment` (`packages/domain/src/model-lab.ts:266-337`)
   corre una sola attempt via `deps.runner.run(...)` y produce un solo manifest. No hay primitiva que
   agrupe varios outputs de un mismo brief como una unidad gobernada (estado agregado, gasto agregado,
@@ -82,14 +81,22 @@ fila "Formatos objetivo … Set de key visuales").
 ## Goal
 
 - El formato objetivo es un campo transport-neutral del contrato del run, validado y almacenado
-  server-side; `1:1`, `4:5`, `16:9` y `9:16` pasan a ser vocabulario del contrato, no literales de una
-  tabla de ruteo.
+  server-side; esta task no redefine `OutputShapeV1`, sino que completa el catálogo y el comportamiento
+  real de sus valores.
+- La capacidad de formato se prueba como una matriz `capability × route × operation × ratio`; una entrada
+  sólo puede declararse disponible cuando existe evidencia del request aceptado y del output final.
 - El mapeo formato → vocabulario del provider vive DENTRO de cada `CreativeProviderAdapter` (Veo,
   Omni, imagen); un formato que una capability no puede producir se rechaza ANTES del gasto
   (readiness), nunca se coerciona en silencio.
 - Un Set de formatos es una unidad gobernada: un command hace fan-out de un mismo brief a N formatos,
   con id propio, estado agregado por miembro, gasto agregado y un tope duro que respeta spend fence +
   kill switch + private-ingest como conjunto; readers gobernados leen el set y sus miembros.
+- Una adaptación de formato es distinta de una generación nativa: recibe un asset origen y una estrategia
+  explícita (`preserve-source`, `reframe`, `expand-background`, `generative-outpaint` o equivalente
+  validado), declara qué elementos debe preservar y devuelve evidencia por output.
+- La adaptación reutiliza el mecanismo de edición regional de TASK-1497 cuando necesita máscara/outpaint;
+  TASK-1495 conserva la autoridad sobre el formato destino, la estrategia, el agregado y el costo, sin
+  duplicar el provider seam.
 - La capacidad nace con Full API Parity (command + reader transport-neutral + coverage), con `ui`
   naciendo `policy-blocked` hasta promocion de ruta.
 
@@ -151,7 +158,8 @@ Reglas obligatorias (boundary DURO — repetir de TASK-1481/1490):
 - `TASK-1474` — Globe Professional Studio Workbench (consume "Formatos objetivo" y "Set de formatos").
 - Complementa sin solapar: `TASK-1496` (seed/variar/relanzar — variacion es N variantes de un mismo
   formato; el Set es un mismo brief en N formatos distintos), `TASK-1493` (brief estructurado),
-  `TASK-1494` (Style DNA).
+  `TASK-1494` (Style DNA), `TASK-1497` (mecanismo de edición/inpaint para adaptación generativa),
+  `TASK-1579` (política de rating/settlement/fallback) y `TASK-1468` (ledger y reservations).
 
 ### Files owned
 
@@ -388,8 +396,9 @@ Reglas obligatorias (boundary DURO — repetir de TASK-1481/1490):
 - **UI del workbench** (TASK-1474): esta task no construye pantalla; `ui` nace `policy-blocked`.
 - **Variacion / seed / relanzar** (TASK-1496): variacion = N variantes de un MISMO formato; el Set =
   un MISMO brief en N formatos DISTINTOS. No mezclar el fan-out de Set con el fan-out de variantes.
-- **Brief estructurado** (TASK-1493), **Style DNA** (TASK-1494), **inpaint** (TASK-1497): el Set opera
-  sobre el brief que reciba, no compone ni analiza referencias.
+- **Brief estructurado** (TASK-1493) y **Style DNA** (TASK-1494): el Set opera sobre el brief que reciba,
+  no compone ni analiza referencias. La estrategia de adaptación puede delegar el mecanismo de edición a
+  TASK-1497, pero esta task conserva la autoridad sobre el formato objetivo y el estado del Set.
 - **Studio Credits comercial** (TASK-1468): el tope del Set usa el spend fence de seguridad, no el
   ledger comercial del workspace.
 - **Aprobacion humana / delivery / master** (TASK-1469 / TASK-1472).
@@ -413,6 +422,12 @@ Reglas obligatorias (boundary DURO — repetir de TASK-1481/1490):
 - **Set parcial honesto.** Si un miembro falla (provider o formato no soportado detectado tarde), el
   Set no miente: reporta el estado por miembro (algunos `candidate_ready`, otros `failed`), nunca
   colapsa a un unico "ok/no ok" ni fabrica un output faltante.
+- **Matriz de evidencia.** Cada capability/route/operación publica sólo formatos confirmados y conserva
+  evidencia de request, output dimensions, provider mapping, versión de catálogo y fecha de verificación.
+  Un ratio listado pero no verificado queda `gated` o `unknown`, nunca `available`.
+- **Adaptación y gasto.** `adapt-existing` recibe un asset padre, ratio destino, estrategia y preservaciones;
+  su estimate incluye el trabajo de adaptación. Cambiar el ratio de una generación nueva no se cobra ni se
+  presenta como una adaptación de un asset existente.
 - Confirmar contra el codigo real de `efeonce-globe` los nombres exactos de campos/capabilities y la
   forma del store antes de implementar; marcar `[verificar]` cualquier supuesto que no se confirme en
   Discovery.
@@ -488,10 +503,16 @@ OFF.
 
 ## Acceptance Criteria
 
-- [ ] `PrepareExperimentPayloadV1` acepta un campo de formato transport-neutral (`1:1`/`4:5`/`16:9`/
-      `9:16`), validado y almacenado server-side; ausente = default del adapter (compatible).
+- [ ] `OutputShapeV1.aspectRatio` sigue siendo la autoridad transport-neutral del formato, validada y
+      almacenada server-side contra la route; esta task no crea un segundo campo de formato.
 - [ ] El aspect ratio hardcodeado de los adapters de video se reemplaza por un mapeo del formato
       solicitado; `1:1` y `4:5` existen al menos en las capabilities de imagen que el provider soporta.
+- [ ] El catálogo distingue, por capability, `native-generation`, `preserve-source` y `adapt-existing`;
+      no ofrece una perilla de ratio cuando el provider hereda la proporción del origen.
+- [ ] La adaptación declara una estrategia y preservaciones explícitas (sujeto, texto, logo, producto,
+      composición) y no se presenta como un simple cambio de `aspectRatio`.
+- [ ] La evidencia de una adaptación confirma el ratio final, la estrategia aplicada y el estado de las
+      preservaciones; si no puede garantizarse una preservación, devuelve una limitación honesta.
 - [ ] Un formato no soportado por una capability se rechaza ANTES del gasto, con error canonico, sin
       llamar al provider.
 - [ ] El mecanismo de aspect ratio vive solo dentro de los adapters; el contrato/dominio no nombra
@@ -501,8 +522,16 @@ OFF.
 - [ ] El gasto agregado del Set nunca excede su tope; cada miembro pasa su fence per-run; kill switch
       activo no dispara ningun miembro.
 - [ ] Un reader gobernado y tenant-safe devuelve el Set + sus miembros + aspect ratio por miembro.
+- [ ] Una operación de adaptación devuelve estrategia, ratio final y estado de preservación de sujeto,
+      texto/logo, producto y composición; una limitación del provider aparece como estado honesto.
 - [ ] Las capabilities de formato/Set estan en el coverage manifest (`ui`/`mcp` `policy-blocked`; resto
       `available`) y el coverage/conformance test pasa.
+- [ ] Existe una matriz verificable `capability × route × operation × ratio` con estados `available`,
+      `gated`, `unsupported` o `unknown`; ningún ratio no probado se presenta como disponible.
+- [ ] La operación `adapt-existing` conserva parent lineage, strategy, target ratio, preservation policy y
+      resultado de preservación; una adaptación no se confunde con cambiar el `aspectRatio` de una generación.
+- [ ] El estimate/reservation/settlement de una adaptación, Set o fallback consume la policy versionada de
+      TASK-1579 y el ledger de TASK-1468; la UI no calcula ni suma créditos localmente.
 - [ ] `cd ../efeonce-globe && pnpm check && pnpm build` verdes en el ultimo commit.
 
 ## Verification

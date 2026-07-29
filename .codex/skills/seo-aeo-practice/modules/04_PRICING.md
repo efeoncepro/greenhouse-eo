@@ -509,3 +509,8 @@ referencia, tu caso y tu moral de equipo.**
 ⚠️ **Los benchmarks de precio son globales/US.** LATAM cobra menos. **Pero la brecha es tan grande que, aun con
 un descuento LATAM del 35%, seguimos abajo** — y **nuestros dos clientes no son PyMEs locales: son un grupo
 industrial mexicano y una aerolínea.**
+# Pricing architecture companion
+
+Load `efeonce-pricing-operator` first for cross-line pricing architecture, value metrics, delivery models,
+cost-to-serve, discounts, versioning and governance. This module owns only Search Visibility 360-specific
+packaging, floors, FX and SEO/AEO offer economics.

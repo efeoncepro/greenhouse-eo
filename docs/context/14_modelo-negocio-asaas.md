@@ -6,7 +6,7 @@
 
 **Agency Service as a Software** invierte la lógica del SaaS. Un SaaS empaqueta software como servicio; el ASaaS empaqueta **el servicio de agencia como si fuera un producto de software**. El cliente no contrata horas ni entregables: **accede a un sistema** —login, dashboards, datos en tiempo real, aprendizaje, red, valor acumulativo— donde el servicio humano opera por debajo como motor, no como interfaz. La premisa: la agencia del futuro compite más contra herramientas de software que contra otras agencias.
 
-Como posicionamiento de escala, ASaaS convierte a Efeonce en un **Growth Operating System**: estrategia, creatividad, medios, datos y software propio trabajando como una sola operación. Esto es **global-ready** por diseño: el sistema puede localizar idioma, mercado, regulación y canales sin cambiar la tesis central. LATAM es el primer campo de prueba, no el límite del modelo.
+Como modelo de negocio, ASaaS convierte a Efeonce en una **empresa de sistemas de crecimiento digital habilitados por IA**: estrategia, creatividad, medios, datos, personas, Product Services y software propio trabajando como una sola operación. La dirección corporativa es que todos los servicios client-facing sean productizados y AI-native para 2028. La visión de escala es un **Growth Operating System**. Esto es **global-ready** por diseño: el sistema puede localizar idioma, mercado, regulación y canales sin cambiar la tesis central. LATAM es el primer campo de prueba, no el límite del modelo.
 
 ### Las 6 características del modelo (cada una es una directriz de producto)
 
@@ -97,6 +97,11 @@ No se abandona el fee de servicio — se **agrega una capa de producto** que jus
 
 Creative Studio no obliga a escoger entre “vender software” y “vender agencia”. Productiza el servicio creativo en un sistema que puede ser operado con distintos grados de autonomía:
 
+Su propósito concilia autoría y escala: el equipo creativo conserva la parte irrepetible —pensar, explorar,
+dirigir y decidir— y Globe absorbe la parte pesada —Creative Prompt Engineering, routing, referencias,
+restricciones, parámetros, estimate, retries, lineage y memoria—. El operador es el punto de vista de la
+experiencia, pero el workspace/equipo es el protagonista económico; la autoridad y la aprobación siguen humanas.
+
 | Modo operativo | Valor que compra el cliente | Frontera económica |
 |---|---|---|
 | **Efeonce-managed** | Capacidad gobernada, dirección, ejecución y accountability de delivery | Fee de servicio/capacidad; Efeonce controla el scope y puede comprometer OTD/FTR |
@@ -115,6 +120,12 @@ lane es inválido. Canon: [Creative Studio Business Model V1](../business-models
 La progresión adecuada es **observar/revisar → correr templates curados → ajustar variables autorizadas → construir/versionar sólo con madurez y permiso**. El sistema debe enrutar alta ambigüedad, riesgo de marca, derechos complejos o gasto elevado hacia co-operación/managed; empujar todo a self-service dañaría craft y trasladaría riesgo al cliente.
 
 El flywheel económico es servicio → template validado → autonomía segura → uso/evidencia → excepciones y picos gestionados por Efeonce → mejor template. Por eso el producto no canibaliza automáticamente el servicio: lo mueve desde la repetición hacia dirección, diseño de workflows, QA y capacidad elástica. La prueba ASaaS no es vender más tokens; es que el cliente quede **más capaz** y el sistema con **más memoria**.
+
+Esta doctrina mejora la captura de valor sin cambiar las cinco líneas de ingreso: hace defendible gobierno/
+plataforma por reducción de complejidad y memoria; eleva capacidad humana hacia dirección/curation; convierte
+templates y Creative Prompt Engineering en IP acumulativa; y mantiene credits como operaciones gobernadas, no
+como venta de prompts. Otras agencias permanecen como hipótesis B2B2B y no alteran tiers, delivery ni acceso
+hasta probar tenancy, rights, marca, accountability y margen.
 
 ---
 
@@ -136,4 +147,4 @@ La recalibración cambia tres cosas, y todas tocan al producto:
 
 ---
 
-*Fuentes: ASaaS Strategy (mar-2026) + Addendum de Recalibración (vigente). El addendum prevalece sobre el roadmap original donde difieren. Nombres/dominios normalizados según `00` (Greenhouse, greenhouse.efeoncepro.com). Última verificación de drift contra runtime: 2026-07-14 — fases sin fecha dura; Creative Studio sigue como arquitectura objetivo/EPIC-028 y su acceso cliente no está habilitado; estado/roadmap vivo en `project_context.md`.*
+*Fuentes: ASaaS Strategy (mar-2026) + Addendum de Recalibración (vigente). El addendum prevalece sobre el roadmap original donde difieren. Nombres/dominios normalizados según `00` (Greenhouse, greenhouse.efeoncepro.com). Última verificación de drift contra runtime: 2026-07-23 — Creative Studio está operativo internal-only; acceso cliente y B2B2B permanecen gateados; estado/roadmap vivo en `project_context.md`.*

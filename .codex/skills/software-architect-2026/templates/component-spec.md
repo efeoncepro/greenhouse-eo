@@ -63,13 +63,9 @@ CREATE TABLE component_things (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
-
--- RLS policy if multi-tenant
-ALTER TABLE component_things ENABLE ROW LEVEL SECURITY;
-CREATE POLICY tenant_isolation ON component_things
-  FOR ALL
-  USING (tenant_id = current_setting('app.current_tenant')::uuid);
 ```
+
+Document the verified tenant/access mechanism separately. If database policies are selected, link the canonical policy/migration and specify trusted context, pooling semantics, fail-closed behavior, bypass roles, and negative tests; do not invent policy SQL in the spec.
 
 ### Tables this component reads (but doesn't own)
 
@@ -186,4 +182,4 @@ What this component instruments:
 3. **Behavior section is the differentiator.** Everything else can be skimmed; the Behavior section is where the implementer learns what's actually special.
 4. **Edge cases are mandatory.** A spec without explicit edge cases will produce buggy implementations. Force the architect to enumerate.
 5. **Cross-link to the architecture spec.** The component is a node in a larger graph; the implementer needs to see the graph.
-6. **For Efeonce**: convert this template to TASK_TEMPLATE_v2 format on handoff. See `efeonce-overlay/handoff-to-task.md`.
+6. **For Efeonce**: hand the architectural contract to `greenhouse-task-planner`; the repository's current task template/process remain canonical. See `efeonce-overlay/task-routing.md`.

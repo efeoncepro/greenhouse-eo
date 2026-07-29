@@ -1,5 +1,15 @@
 # TASK-1474 — Globe Professional Studio Workbench
 
+## Delta 2026-07-22
+
+- `TASK-1503` **complete** — uno de sus `Blocked by` queda cerrado. El Workbench ya tiene primitivos
+  gobernados para el dock de candidatos y la entrega: reader `globe.producer.output.get` (ficha +
+  grant efímero, **sin bytes**), ruta `GET /v1/outputs/:sha256` para preview/descarga, y las asset
+  actions `favorite` / `copyAsReference` / `asset.list`, todas bajo `globe.producer.assets.operate`
+  (gasto cero, **no** es la capability del Lab).
+- Consumirlos tal cual: la autorización tenant-safe vive en `authorizeOwnedOutput` (dominio) y la
+  ruta de serving ya la reusa. **No** reimplementar la política en la superficie del Workbench.
+
 ## Delta 2026-07-20 — estimate previewable disponible (TASK-1502 complete)
 
 El paso de estimate/aprobación del workbench consume el mismo reader `globe.lab.experiment.estimate` (`LabEstimatePreviewV1`, curado) que el Producer — cero lógica de estimate duplicada por superficie.
@@ -55,6 +65,8 @@ EPIC-028 exige que integración de modelos, plataforma gobernada y validación c
 ## Goal
 
 Dar a operadores una experiencia creative-native de agencia, no un formulario de prompts ni un DAG técnico.
+El workbench debe tratar el formato como una decisión creativa y operativa: la UI muestra intención de uso,
+ratio real, safe zones y estrategia de generación/adaptación sin confundir un cambio de lienzo con un reencuadre.
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
 

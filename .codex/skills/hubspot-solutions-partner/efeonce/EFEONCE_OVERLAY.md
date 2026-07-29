@@ -7,8 +7,9 @@
 
 ## 1. Qué es CRM Solutions dentro de Efeonce
 
-✅ **La 5.ª línea de negocio, y es transversal** (`docs/context/02_gtm.md:29-54`).
-No es un producto: es una **práctica** que atraviesa a las otras cuatro unidades.
+✅ **RevOps & CRM es una línea de negocio de Efeonce** (`docs/context/02_gtm.md:29-54`).
+HubSpot es la plataforma externa; Kortex es la product brand/capability de inteligencia y delivery programático.
+No se debe describir RevOps como una quinta unidad ni como una product brand única.
 
 | Capa | Qué es | Revenue | Motor de tier |
 |---|---|---|---|

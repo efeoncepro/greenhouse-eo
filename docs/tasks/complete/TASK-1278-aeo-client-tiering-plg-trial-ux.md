@@ -29,7 +29,7 @@
 
 ## Summary
 
-UX por tier de AEO en el portal cliente, sobre el workbench `/aeo` de TASK-1248: **contratado** ve el reporte completo; **trial PLG** ve "te quedan N de 3 revisiones este mes" + botón self-serve para generar su revisión + upsell al agotarse; **sin acceso** ve un teaser/locked gratis "Descubrí cómo te ve la IA → Hablá con tu equipo". El teaser es gratis (no corre el motor); el run pasa por el chokepoint gobernado de TASK-1277.
+UX por tier de AEO en el portal cliente, sobre el workbench `/aeo` de TASK-1248: **contratado** ve el reporte completo; **trial PLG** ve "te quedan N de 3 revisiones este mes" + botón self-serve para generar su revisión + upsell al agotarse; **sin acceso** ve un teaser/locked gratis "Descubre cómo te ve la IA → Habla con tu equipo". El teaser es gratis (no corre el motor); el run pasa por el chokepoint gobernado de TASK-1277.
 
 ## Why This Task Exists
 

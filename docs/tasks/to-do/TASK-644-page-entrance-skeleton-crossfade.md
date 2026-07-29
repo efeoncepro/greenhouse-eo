@@ -194,7 +194,7 @@ Validar en DevTools (Rendering panel → Emulate CSS media `prefers-reduced-moti
 
 ## Out of Scope
 
-- Page exit animations (cuando salís de una vista) — out of scope, es complejidad extra que no agrega valor proporcional.
+- Page exit animations (cuando sales de una vista) — out of scope, es complejidad extra que no agrega valor proporcional.
 - Transiciones entre tabs dentro de una misma vista — out of scope (queda como follow-up si emerge necesidad).
 
 ## Detailed Spec

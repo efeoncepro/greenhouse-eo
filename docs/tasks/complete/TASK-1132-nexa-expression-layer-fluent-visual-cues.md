@@ -2,7 +2,7 @@
 
 ## Delta 2026-06-15
 
-- Si esta task termina tocando el contrato de voz/emoji en `nexa-system-prompt.ts`, ahora aplica el gate de TASK-1126: regenerá el **golden snapshot** (`pnpm vitest run src/lib/nexa/nexa-system-prompt.test.ts -u`) y el **doc-gate** (`pnpm nexa:doc-gate --changed`) exige bump de `version` + entrada de `changelog` (clase `voice`). Detalle en `nexa-intelligence/system-prompt/versioning.md`. — por trabajo en TASK-1126.
+- Si esta task termina tocando el contrato de voz/emoji en `nexa-system-prompt.ts`, ahora aplica el gate de TASK-1126: regenera el **golden snapshot** (`pnpm vitest run src/lib/nexa/nexa-system-prompt.test.ts -u`) y el **doc-gate** (`pnpm nexa:doc-gate --changed`) exige bump de `version` + entrada de `changelog` (clase `voice`). Detalle en `nexa-intelligence/system-prompt/versioning.md`. — por trabajo en TASK-1126.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE

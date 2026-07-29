@@ -117,6 +117,14 @@ import { getCurrentAuthReadiness } from '@/lib/auth-secrets'
 import { probeNextAuthSecretRoundTrip } from '@/lib/auth/readiness'
 
 import { resolveCleanSeedDate } from '@/lib/finance/account-balances-clean-seed-resolver'
+import { createGreenhouseGlobeTenancyReconcileCommand } from '@/lib/globe/client'
+import {
+  claimCanonicalGlobeWorkspace,
+  completeCanonicalGlobeWorkspace,
+  failCanonicalGlobeWorkspace,
+  loadCanonicalGlobeDesiredWorkspaces,
+  runGlobeTenancyReconciliation
+} from '@/lib/globe/tenancy-reconciler'
 import { drainPendingGraderRuns, recoverStuckRunningRuns } from '@/lib/growth/ai-visibility/run-engine'
 import { isGraderEnabled } from '@/lib/growth/ai-visibility/flags'
 import { handleRecurringRegradeBatch } from '@/lib/growth/ai-visibility/regrade'
@@ -1983,6 +1991,19 @@ const handleOtdWriteback = wrapCronHandler({
   run: async (): Promise<Record<string, unknown>> => ({ ...(await runOtdWritebackBatch()) })
 })
 
+const handleGlobeTenancyReconcile = wrapCronHandler({
+  name: 'globe-tenancy-reconcile',
+  domain: 'sync',
+  run: async () =>
+    runGlobeTenancyReconciliation({
+      loadDesiredWorkspaces: loadCanonicalGlobeDesiredWorkspaces,
+      claimWorkspace: claimCanonicalGlobeWorkspace,
+      completeWorkspace: completeCanonicalGlobeWorkspace,
+      failWorkspace: failCanonicalGlobeWorkspace,
+      reconcile: createGreenhouseGlobeTenancyReconcileCommand()
+    })
+})
+
 const handleNotionConformedSync = async (req: IncomingMessage, res: ServerResponse) => {
   const body = await readBody(req)
   const rawSource = typeof body.executionSource === 'string' ? body.executionSource.trim() : 'scheduled_primary'
@@ -2542,6 +2563,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/otd/writeback') {
       await handleOtdWriteback(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/globe/tenancy/reconcile') {
+      await handleGlobeTenancyReconcile(req, res)
 
       return
     }

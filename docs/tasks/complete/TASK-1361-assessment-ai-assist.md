@@ -249,7 +249,7 @@ Frontera en 3 capas:
 |---|---|---|---|
 | **Infra compartida** | `generateStructured{Anthropic,Gemini}` + patrón "IA propone / contrato gobierna" | `src/lib/ai/*` + patrón AEO grader | NO — reusar tal cual |
 | **Dominio hiring** | rúbricas de competencias, qué es una buena pregunta, ledger `hiring_assessment_ai_proposal` (propose→confirm de *contenido*) | `src/lib/hiring/assessment/ai/**` | SÍ — Nexa no sabe de rúbricas |
-| **Nexa por construcción** | operar la capability desde el chat ("proponé un puntaje para la respuesta X") | Nexa registra el actionKey vía Full API Parity | NO — sale gratis cuando la capability existe |
+| **Nexa por construcción** | operar la capability desde el chat ("propón un puntaje para la respuesta X") | Nexa registra el actionKey vía Full API Parity | NO — sale gratis cuando la capability existe |
 
 **Por qué NO rutear por `NexaService.generateResponse`:** es *wrong shape*. Envolvería una tarea batch (una llamada estructurada, sin retrieval, sin conversación, sin citas) en la maquinaria de un turno de chat — system prompt versionado, `history.slice(-10)`, persistencia a `nexa_messages`, telemetría de turno, coreografía de 11 estados. El consumer primario tampoco es un chat: es el botón "sugerir puntaje" del desk (TASK-1363) llamando a `/api/hiring/assessments/ai/score/propose`. Además `hiring_assessment_ai_proposal` NO duplica el action-registry de Nexa: Nexa propone *qué capability invocar con qué args*; hiring propone *contenido generado* (borrador de pregunta / score) — ejes distintos.
 

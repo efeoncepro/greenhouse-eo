@@ -25,7 +25,7 @@ Anillo 0  src/components/greenhouse/motion/core/   PORTABLE (cero deps Greenhous
           · register.ts      ensureMotionRegistered() idempotente (useGSAP + CustomEase)
           · reduced-motion.ts  contrato prefers-reduced-motion (conditions + helper)
           · use-greenhouse-gsap.ts  hook canónico sobre @gsap/react useGSAP
-          → este anillo se copia a otras apps; le pasás (u override) sus tokens
+          → este anillo se copia a otras apps; le pasas (u override) sus tokens
 Anillo 1  src/components/theme/motion-tokens.ts     binding design-system (re-export)
 Anillo 2  src/components/greenhouse/motion/Motion.tsx  <Motion variant kind> declarativo
 ```
@@ -62,7 +62,7 @@ Valores (ms, escala fija del design system): `instant 75 · short 150 · standar
 - **Safety** — reduced-motion no-bypassable (en el núcleo) + lint boundary + SSR-safe + nunca info esencial solo por motion (WCAG 1.4.13).
 - **Robustness** — `useGSAP` resuelve cleanup + StrictMode; solo props de compositor (`transform`/`opacity`); degradación honesta.
 - **Resilience** — ScrollTrigger se registra lazy solo en `scrollReveal`; un fallo de plugin degrada al estado final.
-- **Scalability** — tokens centralizados (cambiás una vez); variants cubren N surfaces sin GSAP per-surface; núcleo portable a otras apps; `quickTo` disponible para alta frecuencia.
+- **Scalability** — tokens centralizados (cambias una vez); variants cubren N surfaces sin GSAP per-surface; núcleo portable a otras apps; `quickTo` disponible para alta frecuencia.
 
 ## Hard rules (anti-regresión)
 

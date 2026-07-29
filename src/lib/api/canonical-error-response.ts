@@ -74,6 +74,14 @@ export type CanonicalErrorCode =
   | 'nexa_action_not_available'
   | 'nexa_action_conflict'
   | 'nexa_action_failed'
+  // Carril gobernado de fondeo de crédito de Globe (TASK-1566 / ADR-015 Slice 5).
+  | 'globe_funding_invalid_request'
+  | 'globe_funding_proposal_not_found'
+  | 'globe_funding_confirmer_is_proposer'
+  | 'globe_funding_already_recorded'
+  | 'globe_unavailable'
+  | 'globe_not_configured'
+  | 'globe_funding_rejected'
   // Roadmap cockpit — work item Markdown lookup (TASK-1153 follow-up).
   | 'roadmap_work_item_not_found'
   | 'roadmap_disabled'
@@ -296,6 +304,58 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     status: 500,
     message: 'No pude completar la acción en este momento. Inténtalo de nuevo en unos segundos.',
     actionable: true
+  },
+  // TASK-1566 — carril gobernado de fondeo de crédito de Globe.
+  // `actionable: false` en los tres primeros a propósito: reintentar no resuelve ninguno. El de
+  // confirmante repetido es el más importante que se lea claro, porque la acción correcta no es
+  // insistir sino que confirme otra persona.
+  // El cuerpo o la clave de idempotencia no cumplen el contrato. NO dice QUÉ campo falló: eso va al
+  // log del servidor, siguiendo el precedente de `globe.dispatch.invalid_request` (ISSUE-127).
+  globe_funding_invalid_request: {
+    status: 400,
+    message: 'La solicitud de fondeo no tiene el formato esperado. Revisa los datos e inténtalo de nuevo.',
+    actionable: false
+  },
+  globe_funding_proposal_not_found: {
+    status: 404,
+    message: 'Esa propuesta de fondeo no existe o ya no está vigente. Vuelve a proponer el plan.',
+    actionable: false
+  },
+  globe_funding_confirmer_is_proposer: {
+    status: 409,
+    message: 'No puedes confirmar un fondeo que propusiste. Pídele a otra persona con autorización que lo confirme.',
+    actionable: false
+  },
+  globe_funding_already_recorded: {
+    status: 409,
+    message: 'Esta propuesta ya tiene esa decisión registrada. Revisa su estado antes de volver a intentarlo.',
+    actionable: false
+  },
+  // Transitorio: Globe no respondió. El detalle vive en sus logs, nunca en esta respuesta.
+  globe_unavailable: {
+    status: 503,
+    message: 'Globe no respondió en este momento. Inténtalo de nuevo en unos segundos.',
+    actionable: true
+  },
+  // ESTRUCTURAL, no transitorio: este runtime no tiene configurado el enlace con Globe (falta
+  // `GLOBE_API_BASE_URL` o el par WIF). Distinto de `globe_unavailable` en lo único que le importa a
+  // quien lo recibe: reintentar NUNCA lo resuelve. Servirlo como `internal_error` con
+  // `actionable: true` —que es lo que hacía— manda a insistir contra una pared y esconde que el
+  // arreglo es de rollout, no de código. Mismo criterio que `/api/internal/globe/health`, que ya
+  // devolvía `globe_not_configured` con `retryable: false`.
+  // Globe respondió 4xx: NEGÓ la operación. Se separa de `globe_unavailable` porque son opuestos en
+  // lo único que le importa a quien lo recibe — Globe SÍ respondió, y reintentar no cambia nada. El
+  // qué exactamente rechazó vive en el log del servidor, nunca acá: puede traer saldo o política.
+  globe_funding_rejected: {
+    status: 422,
+    message: 'Globe rechazó este fondeo. Revisa el plan con plataforma antes de reintentar.',
+    actionable: false
+  },
+  globe_not_configured: {
+    status: 503,
+    message:
+      'El enlace con Globe no está configurado en este entorno. Avísale a plataforma: reintentar no lo resuelve.',
+    actionable: false
   },
   // TASK-1153 — el work item solicitado no existe (o no es legible) en el índice del backlog.
   roadmap_work_item_not_found: {

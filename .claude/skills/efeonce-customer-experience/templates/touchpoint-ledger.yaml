@@ -1,0 +1,15 @@
+journey_id: ""
+version: ""
+touchpoints:
+  - timestamp: ""
+    phase: ""
+    channel: ""
+    actor: ""
+    intent: ""
+    expected_next_event: ""
+    actual_outcome: ""
+    context_available: true
+    owner: ""
+    evidence_ref: ""
+    sensitivity: low
+    confidence: medium

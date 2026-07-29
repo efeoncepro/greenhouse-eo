@@ -25,6 +25,9 @@ es auditable en el git log del repo hermano):
 - [TASK_1454_INTERNAL_SMOKE_RUNBOOK.md](TASK_1454_INTERNAL_SMOKE_RUNBOOK.md) — smoke internal-only.
 - [EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md](EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md) — plan de ejecución paralela del EPIC-028.
 - [EPIC_028_FRESH_SESSION_PROMPT.md](EPIC_028_FRESH_SESSION_PROMPT.md) — prompt de arranque de sesión para trabajo sobre EPIC-028.
+- [GLOBE_PRODUCER_ROLLOUT_AND_CANARY_V1.md](GLOBE_PRODUCER_ROLLOUT_AND_CANARY_V1.md) — rollout interno serializado, políticas exactas y canarios image/video/audio por los commands/readers de la UI.
+- [GLOBE_PRODUCER_ALERT_TRIAGE_V1.md](GLOBE_PRODUCER_ALERT_TRIAGE_V1.md) — diagnóstico de failures, cola stale, Asset Governance/C2PA y recuperación sin mutación SQL ad hoc.
+- [GLOBE_CLIENT_UI_GATES_RUNBOOK_V1.md](GLOBE_CLIENT_UI_GATES_RUNBOOK_V1.md) — cómo correr y **verificar que muerden** los 6 gates de UI del payload cliente (`apps/studio-client`, ADR-014), el smoke de browser cross-repo (`seam:smoke` en Globe + el driver Playwright en Greenhouse) y el ledger `LEGACY_TOKEN_DRIFT`.
 
 > **Evidencia técnica** de Globe (NO repatriada, queda en `efeonce-globe/docs/operations/`):
 > `BOOTSTRAP_EVIDENCE.md`, `QA_RELEASE_AUDIT_2026-07-19.md`, `TASK_1455_BRAND_SHELL_EVIDENCE.md` —

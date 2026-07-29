@@ -159,6 +159,7 @@ const calendarDates = (date: string): Array<string | null> => {
 
 const emailLooksValid = (value: string): boolean => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
 const normalizedEmail = (value: string): string => value.trim().toLowerCase()
+const LEGACY_ENGLISH_COMMUNICATION_CONSENT = 'I agree to receive other communications from Efeonce Group.'
 let rendererInstanceSequence = 0
 
 type EmailVerificationState = {
@@ -239,6 +240,7 @@ export class MeetingRenderer {
   private abortController: AbortController | null = null
   private generation = 0
   private turnstileHandle: MeetingTurnstileHandle | null = null
+  private submissionPending = false
   private viewedCleanup: (() => void) | null = null
   private resizeObserver: ResizeObserver | null = null
   private previousPhase = this.state.phase
@@ -511,7 +513,6 @@ export class MeetingRenderer {
 
   private renderSignalRail(): HTMLElement {
     const rail = element('header', 'ghm-signal')
-    const atmosphere = element('span', 'ghm-signal-atmosphere')
     const confirmed = this.state.phase === 'confirmed'
     const eyebrow = element('p', 'ghm-eyebrow', confirmed ? copy.confirmedEyebrow : copy.eyebrow)
 
@@ -519,7 +520,6 @@ export class MeetingRenderer {
       ? copy.confirmedRailTitle
       : this.layoutRecipe === 'guided' ? copy.compactTitle : copy.title)
 
-    atmosphere.setAttribute('aria-hidden', 'true')
     title.tabIndex = -1
     title.dataset.ghmFocus = ''
     const liveStatus = element('div', 'ghm-live-status')
@@ -528,7 +528,7 @@ export class MeetingRenderer {
       element('span', 'ghm-live-dot'),
       element('span', undefined, confirmed ? copy.confirmedRailStatus : copy.availabilitySynced),
     )
-    rail.append(atmosphere, liveStatus, eyebrow, title, element('p', 'ghm-intro', confirmed ? copy.confirmedRailBody : copy.intro))
+    rail.append(liveStatus, eyebrow, title, element('p', 'ghm-intro', confirmed ? copy.confirmedRailBody : copy.intro))
 
     if (confirmed) {
       const assurance = element('div', 'ghm-confirmation-assurance')
@@ -543,12 +543,12 @@ export class MeetingRenderer {
 
     for (const [iconName, label] of [
       ['clock', `${this.state.config?.durationsMinutes[0] ?? 30} min`],
-      ['video', copy.meetingPlatform],
+      ['brand-teams', copy.meetingPlatform],
       ['world', formatMeetingTimezoneLabel(this.timezone(), this.options.now?.())],
     ]) {
       const fact = element('span', 'ghm-fact')
 
-      fact.append(uiIcon(iconName, 'ghm-fact-icon'), element('span', undefined, label))
+      fact.append(uiIcon(iconName, iconName === 'brand-teams' ? 'ghm-fact-icon ghm-teams-mark' : 'ghm-fact-icon'), element('span', undefined, label))
       facts.append(fact)
     }
 
@@ -867,12 +867,18 @@ export class MeetingRenderer {
 
           button.setAttribute('aria-label', `${isToday ? `${copy.today}, ` : ''}${formatMeetingDate(date, this.timezone(), 'long')}, ${slotLabel}`)
           const meter = element('span', 'ghm-availability-meter')
+          const availability = element('span', 'ghm-calendar-available')
 
           meter.setAttribute('aria-hidden', 'true')
           meter.append(element('span'), element('span'), element('span'))
+          availability.setAttribute('aria-hidden', 'true')
+          availability.append(
+            element('span', 'ghm-calendar-available-count', String(day.slots.length)),
+            element('span', 'ghm-calendar-available-label', day.slots.length === 1 ? copy.optionSingular : copy.optionPlural),
+          )
           button.append(
             element('span', 'ghm-calendar-number', String(Number(date.slice(-2)))),
-            element('span', 'ghm-calendar-available', `${day.slots.length} ${day.slots.length === 1 ? copy.optionSingular : copy.optionPlural}`),
+            availability,
             meter,
           )
           if (isToday) button.append(element('span', 'ghm-today-label', copy.today))
@@ -1012,13 +1018,16 @@ export class MeetingRenderer {
     form.append(fields)
 
     const processing = this.checkbox('processingAccepted', copy.processingConsent, this.state.form.processingAccepted)
+    const consents = element('fieldset', 'ghm-consents')
+    const consentLegend = element('legend', 'ghm-visually-hidden', copy.consentGroup)
 
-    form.append(processing)
+    consents.append(consentLegend, processing)
 
     for (const consent of this.state.config?.consent.communications ?? []) {
-      form.append(this.communicationCheckbox(consent.consentKey, consent.label))
+      consents.append(this.communicationCheckbox(consent.consentKey, consent.label, consent.required))
     }
 
+    form.append(consents)
     form.append(element('div', 'ghm-turnstile'))
 
     if (this.state.fieldErrors.includes('captchaToken')) {
@@ -1030,13 +1039,13 @@ export class MeetingRenderer {
 
     const actions = element('div', 'ghm-form-actions')
     const back = element('button', 'ghm-secondary', copy.back)
-    const submit = element('button', 'ghm-primary', this.state.phase === 'submitting' ? copy.processing : copy.reserve)
+    const submit = element('button', 'ghm-primary', this.state.phase === 'submitting' || this.submissionPending ? copy.processing : copy.reserve)
 
     back.type = 'button'
     back.disabled = this.state.phase === 'submitting'
     back.addEventListener('click', () => this.transition({ type: 'back' }))
     submit.type = 'submit'
-    submit.disabled = this.state.phase === 'submitting' || this.emailVerification.status === 'verifying' ||
+    submit.disabled = this.state.phase === 'submitting' || this.submissionPending || this.emailVerification.status === 'verifying' ||
       this.emailVerification.status === 'rejected'
     actions.append(back, submit)
     form.append(actions)
@@ -1118,7 +1127,7 @@ export class MeetingRenderer {
       message = error
     } else if (hasInteraction) {
       validation = 'valid'
-      message = key === 'processingAccepted' ? copy.consentAccepted : copy.fieldReady
+      message = key === 'processingAccepted' ? '' : copy.fieldReady
     }
 
     wrap.dataset.validation = validation
@@ -1297,11 +1306,20 @@ export class MeetingRenderer {
     return group
   }
 
-  private communicationCheckbox(consentKey: string, labelText: string): HTMLElement {
+  private communicationCheckbox(consentKey: string, labelText: string, required: boolean): HTMLElement {
     const label = element('label', 'ghm-check')
     const input = element('input')
 
+    const localizedLabel = labelText.trim() === LEGACY_ENGLISH_COMMUNICATION_CONSENT
+      ? copy.communicationConsent
+      : labelText
+
+    const visibleLabel = required ? localizedLabel : `${localizedLabel} ${copy.optional}`
+
     input.type = 'checkbox'
+    input.name = 'communications'
+    input.value = consentKey
+    input.required = required
     input.checked = this.state.form.communicationKeys.includes(consentKey)
     input.addEventListener('change', () => {
       const values = new Set(this.state.form.communicationKeys)
@@ -1313,7 +1331,7 @@ export class MeetingRenderer {
         values: { communicationKeys: [...values] },
       })
     })
-    label.append(input, element('span', undefined, labelText))
+    label.append(input, element('span', undefined, visibleLabel))
 
     return label
   }
@@ -1491,12 +1509,6 @@ export class MeetingRenderer {
       container,
       siteKey: captcha.siteKey,
       action: captcha.action,
-      onToken: token => {
-        this.state = reduceMeetingState(this.state, { type: 'captcha', token })
-      },
-      onExpired: () => {
-        this.state = reduceMeetingState(this.state, { type: 'captcha', token: null })
-      },
     })
   }
 
@@ -1508,13 +1520,12 @@ export class MeetingRenderer {
     if (!emailLooksValid(this.state.form.email.trim())) errors.push('email')
     if (!this.state.form.company.trim()) errors.push('company')
     if (!this.state.form.processingAccepted) errors.push('processingAccepted')
-    if (!this.state.captchaToken) errors.push('captchaToken')
 
     return errors
   }
 
   private async submit(): Promise<void> {
-    if (!this.state.selectedSlot || !this.state.config || !this.state.idempotencyKey) return
+    if (this.submissionPending || !this.state.selectedSlot || !this.state.config || !this.state.idempotencyKey) return
 
     const errors = this.validate()
 
@@ -1547,6 +1558,34 @@ export class MeetingRenderer {
       return
     }
 
+    this.submissionPending = true
+    const submitButton = this.host.querySelector<HTMLButtonElement>('.ghm-form-actions .ghm-primary')
+    const backButton = this.host.querySelector<HTMLButtonElement>('.ghm-form-actions .ghm-secondary')
+
+    if (submitButton) {
+      submitButton.disabled = true
+      submitButton.textContent = copy.processing
+    }
+
+    if (backButton) backButton.disabled = true
+
+    let captchaToken: string
+
+    try {
+      if (!this.turnstileHandle) throw new Error('turnstile_unavailable')
+      captchaToken = await this.turnstileHandle.execute()
+    } catch {
+      this.submissionPending = false
+      this.turnstileHandle?.reset()
+      this.transition(
+        { type: 'validation_failed', fields: ['captchaToken'] },
+        { type: 'step_reached', step: 'validation_failed', context: { error_category: 'validation_failed' } },
+      )
+      queueMicrotask(() => this.host.querySelector<HTMLElement>('.ghm-error-summary')?.focus())
+
+      return
+    }
+
     const selectedContext = this.selectedContext()
 
     this.transition(
@@ -1573,7 +1612,7 @@ export class MeetingRenderer {
         processingAccepted: this.state.form.processingAccepted,
         communicationKeys: this.state.form.communicationKeys,
       },
-      captchaToken: this.state.captchaToken ?? '',
+      captchaToken,
       attribution: {
         placement: this.options.telemetryBase.placement,
         pagePath: typeof location !== 'undefined' ? location.pathname : '/',
@@ -1581,6 +1620,8 @@ export class MeetingRenderer {
     }
 
     const result = await this.options.api.book(payload, this.state.idempotencyKey)
+
+    this.submissionPending = false
 
     if (result.outcome === 'confirmed') {
       this.telemetry({ type: 'booking_confirmed', response: result, context: selectedContext })

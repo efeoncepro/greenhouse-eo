@@ -8,11 +8,29 @@ import {
   SisterPlatformOAuthPolicyError
 } from './oauth-policy'
 
+const globeCapabilities = [
+  'globe.studio.access',
+  'globe.producer.catalog.read',
+  'globe.lab.experiment.run',
+  'globe.producer.assets.operate',
+  'globe.producer.library.read',
+  'globe.producer.library.manage',
+  'globe.producer.library.export',
+  'globe.producer.review.read',
+  'globe.producer.review.decide',
+  'globe.producer.comment.manage',
+  'globe.producer.share.manage',
+  'globe.voice.preset.manage',
+  'globe.lab.recipe.author',
+  'globe.credits.read',
+  'globe.credits.estimate'
+] as const
+
 const globePolicyInput = {
   schemaVersion: '1',
   audience: { tenantTypes: ['efeonce_internal'] },
-  requiredScopes: ['openid', 'globe.studio.access'],
-  capabilityScopes: ['globe.studio.access'],
+  requiredScopes: ['openid', ...globeCapabilities],
+  capabilityScopes: [...globeCapabilities],
   claims: { includeGreenhouseRoles: false },
   revocation: {
     mode: 'userinfo_revalidation',
@@ -30,12 +48,10 @@ describe('sister platform OAuth policy', () => {
         active: true,
         status: 'active',
         tenantType: 'efeonce_internal',
-        requestedScopes: ['openid', 'profile', 'email', 'globe.studio.access']
+        requestedScopes: ['openid', 'profile', 'email', ...globeCapabilities]
       })
     ).toEqual({ allowed: true })
-    expect(resolveSisterPlatformOAuthCapabilities(policy, ['openid', 'globe.studio.access'])).toEqual([
-      'globe.studio.access'
-    ])
+    expect(resolveSisterPlatformOAuthCapabilities(policy, ['openid', ...globeCapabilities])).toEqual(globeCapabilities)
   })
 
   it('denies a client tenant even when the caller requests the Globe scope', () => {
@@ -46,7 +62,7 @@ describe('sister platform OAuth policy', () => {
         active: true,
         status: 'active',
         tenantType: 'client',
-        requestedScopes: ['openid', 'globe.studio.access']
+        requestedScopes: ['openid', ...globeCapabilities]
       })
     ).toEqual({ allowed: false, errorCode: 'audience_not_allowed' })
   })

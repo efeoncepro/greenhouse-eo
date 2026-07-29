@@ -40,7 +40,8 @@ El iframe funciona pero impone estética, pasos y scroll ajenos. Un simple calen
 - Entregar un Web Component host-neutral con calendario mensual, agenda diaria y resumen de reunión accesibles y responsive.
 - Instrumentar el funnel completo en GTM/GA4 con evento genérico + parámetros y cero PII.
 - Confirmar visualmente el booking sólo desde el recibo server-side de TASK-1509.
-- Pilotear un host público controlado con rollback instantáneo al embed/link.
+- Pilotear un host público controlado con rollback operativo por flags, binding, host backup o versión anterior; nunca mediante embed/link visible.
+- Graduar todas las CTA de reuniones de Efeonce hacia `open_meeting_scheduler` mediante versiones inmutables y evidencia real; `book_meeting` queda sólo como compatibilidad técnica temporal, nunca como experiencia pública o fallback.
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
 
@@ -57,7 +58,9 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md`
 - `docs/architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_DECISION_V1.md`
 - `docs/public-site/decisions/PDR-009-hubspot-scheduler-native-booking.md`
-- `docs/tasks/to-do/TASK-1509-growth-meetings-scheduler-server-adapter.md`
+- `docs/tasks/in-progress/TASK-1509-growth-meetings-scheduler-server-adapter.md`
+- `docs/tasks/in-progress/TASK-1431-growth-cta-action-registry-navigation-adapters.md`
+- `docs/tasks/to-do/TASK-1518-growth-cta-embed-runtime-fleet-closure.md`
 
 Reglas obligatorias:
 
@@ -65,7 +68,10 @@ Reglas obligatorias:
 - El renderer sólo consume DTOs browser-safe; no importa provider SDK, secret, store o server-only modules.
 - No hay booking optimista. Success y `generate_lead` requieren el recibo server-confirmed.
 - WordPress/Think sólo configuran atributos allowlisted y placement; no duplican fields, booking, consent o telemetry.
-- Los estados de carga/degradación ofrecen recuperación nativa por reintento o navegación mensual. Después de `provider_dispatched`, un outcome ambiguo o booking provider-created-invalid bloquea otro intento o vía de reserva; esta task no toca `book_meeting`/Action Registry de TASK-1431.
+- Los estados de carga/degradación ofrecen recuperación nativa por reintento o navegación mensual. Después de `provider_dispatched`, un outcome ambiguo o booking provider-created-invalid bloquea otro intento o vía de reserva.
+- `book_meeting` conserva temporalmente el contrato navigation-only de TASK-1431 para no romper clientes históricos, pero no se ofrece para authoring nuevo ni se sirve como experiencia de reunión en superficies públicas de Efeonce.
+- Toda CTA de reunión nueva usa `open_meeting_scheduler`. Los usos existentes de `book_meeting` se migran o retiran mediante una nueva versión de CTA; una superficie incompatible queda sin CTA de reunión hasta soportar el runtime nativo.
+- Las versiones publicadas de CTA son inmutables. No existe migración global automática ni cambio silencioso de action kind.
 
 ## Normative Docs
 
@@ -89,6 +95,7 @@ Reglas obligatorias:
 ### Depends on
 
 - TASK-1509 DTOs/errors/fixtures, receipt and feature-flag contract.
+- TASK-1431 Action Registry, contrato navigation-only de `book_meeting` y action nativo aditivo `open_meeting_scheduler`.
 - Portable custom-element patterns in `src/growth-forms-renderer/**`.
 - Governed WordPress runtime export/diff/release process.
 - GTM container `GTM-NGHPGRLZ` and GA4 property `486264460` after measurement ID read-back.
@@ -97,7 +104,7 @@ Reglas obligatorias:
 
 - Enables gradual native-scheduler rollout across Efeonce public surfaces.
 - Creates a reusable design/measurement system for meeting conversion, not a page-local widget.
-- Future CTA routing remains separate until TASK-1431 ownership is released.
+- TASK-1518 consume el resultado para cerrar migración y paridad del fleet de embeds; no duplica la semántica de actions ni la reserva.
 
 ### Files owned
 
@@ -222,7 +229,7 @@ Reglas obligatorias:
 - Markers: `native-meeting-scheduler`, `meeting-calendar`, `meeting-agenda`, `meeting-details`, `meeting-summary`.
 - Assertions: no console/page errors, no PII in dataLayer, exact expected events once, `/g/collect` payloads, one primary action, focus destinations, 44px targets and `scrollWidth===clientWidth`.
 - Review dossier: `docs/ui/reviews/TASK-1510-native-meeting-scheduler-review.md`.
-- Baseline decision: the official HubSpot embed on the selected pilot surface is the functional/CRO baseline; the accepted monthly-calendar captures become the visual baseline after human approval. Time Horizon remains only as a negative comparison.
+- Baseline decision: the official HubSpot embed was the historical functional/CRO comparison during design; it is not a recovery path or current pilot UI. The accepted monthly-calendar captures are the native visual baseline. Time Horizon remains only as a negative comparison.
 
 ### Design decision log
 
@@ -268,16 +275,28 @@ Reglas obligatorias:
 - Present GTM workspace diff and request explicit human confirmation before create-version/publish; snapshot after approved publish.
 - Pilot one allowlisted surface and monitor before any graduation.
 
+### Slice 5 — Growth CTA native-meeting graduation
+
+- Inventariar CTAs draft/published que usan `book_meeting`, su host, versión, destino y capacidad de cargar el scheduler nativo.
+- Retirar `book_meeting` de las opciones de authoring nuevo y rotularlo como action legacy/deprecado sólo donde sea necesario administrar versiones históricas.
+- Hacer inequívoco en el cockpit que la única experiencia vigente de reunión de Efeonce es `open_meeting_scheduler`; un binding o bundle incompatible bloquea la publicación en vez de ofrecer una agenda externa.
+- Crear una nueva versión CTA con `open_meeting_scheduler`, binding/surface allowlisted y bundle compatible para el primer host aprobado.
+- Probar CTA -> task surface -> reserva real -> recibo -> HubSpot/Outlook/Teams -> dataLayer/`/g/collect`, sin PII ni slot exacto.
+- Graduar una superficie a la vez después de evidencia y aprobación; rollback por versión CTA nativa anterior, binding, flag, bundle anterior o pausa de la CTA, nunca mediante `book_meeting`.
+
 ## Out of Scope
 
 - Backend adapter/idempotency/receipt/PII authority (TASK-1509).
-- Removing all embeds, global CTA cutover or editing TASK-1431.
+- Redefinir, eliminar o convertir silenciosamente `book_meeting` en una reserva nativa.
+- Removing all embeds, global CTA cutover or mass migration of published CTA versions.
 - Reschedule/cancel UI, payments, login or sales-routing redesign.
 - Publishing GTM or flipping production without explicit human confirmation.
 
 ## Detailed Spec
 
 The renderer is a standalone custom element with an explicit state reducer. Rendering, accessibility and telemetry consume the same typed actions so visual state and measurement cannot drift. The month table is a date-selection surface over normalized availability, not an event-management calendar. The selected-meeting summary may enter `confirmed` only from TASK-1509's successful conversion receipt. Hosts provide placement/configuration attributes; they never fork the flow or inject provider links.
+
+Growth CTA conserva dos contratos técnicos distintos durante la migración: `book_meeting` resuelve una navegación gobernada hacia una agenda externa y no reserva; `open_meeting_scheduler` activa la task surface nativa y completa la reserva mediante TASK-1509. Sin embargo, la política de producto de Efeonce admite sólo el segundo en experiencias públicas vigentes. El cockpit no ofrece `book_meeting` para authoring nuevo y bloquea la publicación nativa cuando falta compatibilidad de bundle/binding. La graduación crea una versión CTA nueva y conserva una versión nativa anterior o la pausa como rollback; nunca reinterpreta una versión publicada ni expone HubSpot al usuario.
 
 ## Rollout Plan & Risk Matrix
 
@@ -300,8 +319,9 @@ The renderer is a standalone custom element with an explicit state reducer. Rend
 ### Feature flags / cutover
 
 - Consumes `GROWTH_NATIVE_MEETING_SCHEDULER_ENABLED`.
+- Los defaults de código son OFF. El estado operativo vigente tiene staging/Production ON sólo para el binding allowlisted de `/agenda/`; la graduación a otras superficies sigue pendiente.
 - OFF -> native surface unavailable/version rollback; shadow -> invisible/deterministic validation; pilot -> native on one allowlisted surface; graduation later.
-- Revert: flag OFF + host cache purge; no calendar/CRM data migration.
+- Revert: flag OFF + binding/host cache purge o versión anterior; no calendar/CRM data migration y ninguna derivación visible al provider.
 
 ### Rollback plan per slice
 
@@ -318,15 +338,16 @@ The renderer is a standalone custom element with an explicit state reducer. Rend
 3. Full state/a11y/telemetry suites.
 4. Staging real availability and native recovery.
 5. GTM workspace preview + browser dataLayer/`/g/collect`, no publish.
-6. Approved real booking and HubSpot/Outlook/Teams read-back.
-7. Human confirms GTM publish; create version/publish/snapshot/realtime verify.
-8. Pilot one surface; compare view->slot->details->confirmed/recovery and visual evidence before graduation.
+6. Pilot one isolated surface for read/UX/recovery evidence without creating a booking.
+7. Approved real booking and HubSpot/Outlook/Teams read-back plus live `/g/collect`.
+8. Human confirms GTM publish; create version/publish/snapshot/realtime verify.
+9. Compare view->slot->details->confirmed/recovery before graduating any additional surface.
 
 ### Out-of-band coordination required
 
 - Kinsta/public runtime rollout approval.
 - Approved recipient/time and optional inbox inspection.
-- Human first-fold acceptance, enterprise verdict, GTM publish and production flag flip.
+- Human first-fold acceptance, enterprise verdict and production flag flip are complete; booking evidence and GTM publish remain separate approvals.
 
 <!-- ZONE 4 — VERIFICATION & CLOSURE -->
 
@@ -341,6 +362,10 @@ The renderer is a standalone custom element with an explicit state reducer. Rend
 - [x] GTM generic tags are built/read back/quick-previewed in disposable workspace 6; publish still requires explicit human confirmation and live evidence.
 - [x] Host público gobernado de piloto en `https://efeoncepro.com/agenda/` (WP `251583`, `noindex`) usa exclusivamente la experiencia nativa y conserva rollback operativo por flags/binding o backups Elementor; no sustituye todavía Contacto/RRSS.
 - [x] Growth CTA exposes an additive `open_meeting_scheduler` action; `book_meeting` remains navigation-only. The native adapter lazy-loads, uses dialog/full-screen activation and preserves one connected scheduler across close/reopen.
+- [ ] El cockpit no ofrece `book_meeting` para authoring nuevo; las versiones históricas lo muestran como legacy/deprecado y toda nueva CTA de reunión exige `open_meeting_scheduler` con binding activo.
+- [ ] Existe un inventario verificable de CTAs que usan `book_meeting`, con decisión `migrate | retire` por versión/superficie y sin mutaciones in-place.
+- [ ] Una versión CTA nueva con `open_meeting_scheduler` completa el flujo CTA -> scheduler -> booking controlado -> recibo y mantiene rollback por versión/binding/flag.
+- [ ] Ninguna superficie pública vigente de Efeonce renderiza un link/iframe HubSpot ni usa `book_meeting` como fallback; ante incompatibilidad, la CTA se bloquea, pausa o revierte a una versión nativa.
 - [ ] One controlled native booking verifies renderer -> adapter -> HubSpot/Outlook/Teams and `/g/collect`/GA4 evidence.
 
 ## Verification
@@ -362,6 +387,7 @@ The renderer is a standalone custom element with an explicit state reducer. Rend
   remains visible, targets are >=44 px and reduced-motion reaches the same state.
 - [x] Enterprise UI scorecard: average 4.66/5, no dimension <4 and key premium dimensions >=4.5; visual verdict `PASS`.
 - [x] CTA/scheduler contract suite: 171 tests across 25 files; action-registry/parity, lazy task-surface lifecycle, reopen continuity and responsive activation pass. TypeScript and focal ESLint pass.
+- [ ] Action-registry/cockpit tests prueban que `book_meeting` continúa navigation-only sólo por compatibilidad, no puede seleccionarse para authoring nuevo y `open_meeting_scheduler` exige surface/binding compatible.
 - [x] CTA seam GVC `.captures/2026-07-21T11-22-29_growth-cta-native-meeting`: 10 frames, desktop/mobile, exit 0; launcher compacto, dialog/full-screen, teclado/reduced-motion y selección preservada al reabrir. Sólo `baseline_stale` pendiente de aprobación humana.
 - [x] Reactive validation GVC `.captures/2026-07-21T11-37-07_native-meeting-scheduler`: 39 frames en 1440/820/390, exit 0; neutral→invalid→valid, rechazo corporativo, teclado, reduced-motion, accessibility, layout, runtime y enterprise rubric verdes. Vitest focal 13/13, TypeScript (heap 8 GB), ESLint y bundle portable verdes.
 - [x] `pnpm fe:capture:review .captures/2026-07-21T11-37-07_native-meeting-scheduler` — dossier regenerado desde la captura aprobada.
@@ -381,7 +407,15 @@ The renderer is a standalone custom element with an explicit state reducer. Rend
 - [x] Runtime activation 2026-07-21: `GROWTH_NATIVE_MEETING_SCHEDULER_READ_ENABLED=true` + `GROWTH_NATIVE_MEETING_SCHEDULER_ENABLED=true` in staging/Production, fresh production deployment Ready, and pilot binding `fhsf-efeonce-lead-gen-web`/`discovery` switched to `active`. Public-origin config and availability returned 200 with visitor timezone `America/New_York`; no booking was created for this activation check.
 - [x] WordPress pilot 2026-07-21: `/agenda/` page `251583` published as `noindex` with `<efeonce-meeting-scheduler>`. Live Playwright confirmed renderer/real slots in normal Ohio template, desktop + 390 px `overflow=0`, recipes `split|guided`, no console errors, and one allowlisted `gh_meeting_step_reached` dataLayer event without PII/exact slot; no booking or GTM publish was performed. The native-only amendment removes every visible HubSpot link and retains retry/month navigation as recovery.
 - [x] Empty-month regression 2026-07-21: HubSpot returns zero August slots, but July→August now keeps `Agosto de 2026`, the semantic 31-day grid, month-specific recovery copy and bounded navigation. Vitest verifies focus restoration and return to July; local browser review at 1440/390 reports zero overflow and console errors. PR #162 was released at SHA `ddd3094538e7` (orchestrator `29848667096`, manifest `released`); the operator's authenticated Chrome session confirmed the full August grid and `overflow=0` live on `/agenda/` without creating a booking.
-- [x] Native-only recovery amendment 2026-07-21: WordPress page `251583` was saved through Elementor `Document::save()` after removing its child/page-level HubSpot anchors and fallback CSS; backup `_gh_backup_before_agenda_native_only_20260721T170615Z`, readback `schedulerHosts=1`, `hubspotLinks=0`, protected meta stable. The portable renderer and Growth CTA now expose only native retry/month navigation, covered by 75 focal Vitest tests, TypeScript, ESLint and production build. Premium GVC `.captures/2026-07-21T17-02-42_native-meeting-scheduler` passed 45 frames at 1440/820/390 with zero runtime/layout/a11y errors; bundle rollout remains the final operational step.
+- [x] Native-only recovery amendment 2026-07-21: WordPress page `251583` was saved through Elementor `Document::save()` after removing its child/page-level HubSpot anchors and fallback CSS; backup `_gh_backup_before_agenda_native_only_20260721T170615Z`, readback `schedulerHosts=1`, `hubspotLinks=0`, protected meta stable. The portable renderer and Growth CTA now expose only native retry/month navigation, covered by 75 focal Vitest tests, TypeScript, ESLint and production build. Premium GVC `.captures/2026-07-21T17-02-42_native-meeting-scheduler` passed 45 frames at 1440/820/390 with zero runtime/layout/a11y errors. Bundle rollout completed through PR #163 at `fbe8a9c76a74` (orchestrator `29854833210`, release `fbe8a9c76a74-4aee6089-fec9-45b7-8b70-5ba16a84cfa9`, state `released`); authenticated Chrome smoke confirmed zero visible HubSpot fallback, the August grid and `overflow=0` without creating a booking.
+- [x] Focused WordPress host 2026-07-21: `/agenda/` preserves native header navigation, uses exactly one task-led H1 and removes the inherited Ohio title/breadcrumb/sidebar. The rejected prefooter is absent and the page inherits the complete global Efeonce/Ohio footer without local overrides. Final Playwright evidence `.captures/2026-07-21T23-44-01-104Z_agenda-focused-booking-canvas` passed `1440×1000`, `820×1000` and `390×844`: page/scheduler overflow `0`, recipes `command|split|guided`, menu keyboard open/Escape close, reduced-motion parity, zero visible HubSpot links and zero console/page errors. No booking, GTM publish, release or commit was performed in this host pass.
+- [x] Command-rail polish 2026-07-21 (local, rollout pending): removed the clipped decorative orbit, replaced it with a static full-bleed tonal edge glow, protected whole-word wrapping for `Conversemos` and replaced the generic video glyph with the governed monochrome `tabler-brand-teams` mark in the rail accent color, without a purple contained background. Premium GVC `.captures/2026-07-22T00-40-24_native-meeting-scheduler` passed 45 frames at `1440×1000`, `820×900` and `390×844`; supplemental Playwright evidence `.captures/manual/TASK-1510-scheduler-rail/reference-2048-v2.png` covers the exact `2048×1135` reference size and measures the title word as one line box. Keyboard/reduced-motion and document/scheduler overflow pass. Focal Vitest 41/41, ESLint, TypeScript, preview bundle and `git diff --check` pass. No release or commit was performed.
+- [x] Independent artifact lane 2026-07-22: root cause removed. `/agenda/` now loads `https://efeonce-public-renderers.vercel.app/loader.js`; Greenhouse remains the API origin but its `prebuild`/`renderer-latest.js` can no longer alter the public presentation. Dedicated Vercel project `efeonce-public-renderers` serves content-addressed JS+CSS with matching SHA-256/SRI, immutable cache, revalidated stable pointer, health provenance, staged promotion and alias rollback. Live release `2fbea2b39b555c5762e6` is active; Elementor backup `_gh_backup_before_agenda_public_renderer_20260722T075004Z`. Browser evidence `.captures/2026-07-22-agenda-public-renderer` covers 2048/1440/820/390, matching renderer/icon release markers, zero legacy bundle requests, global footer intact, keyboard calendar movement, fresh reduced-motion overflow 0 and no console errors. No booking was created.
+- [x] Agenda hero copy 2026-07-23: the redundant eyebrow `Efeonce · conversación inicial` was replaced once with
+  `Reunión de 30 minutos` in Elementor widget `ghagendahost` through `Document::save()`. Backup
+  `_gh_backup_before_agenda_kicker_copy_20260723T103650Z`; Kinsta cache purged. Live evidence
+  `.captures/agenda-kicker-copy-2026-07-23/` covers 1440×1000 and 390×844 with the new copy exactly once, old
+  copy absent, overflow `0` and no console/page errors. No scheduler behavior, booking or GTM state changed.
 - [ ] `pnpm measurement:smoke` after approved publish.
 - [x] `pnpm ops:lint --changed`
 - [x] `pnpm qa:gates --changed --agent codex --task TASK-1510 --ui --runtime --integration --docs` — advisory; rollout dependencies remain explicit.
@@ -389,16 +423,19 @@ The renderer is a standalone custom element with an explicit state reducer. Rend
 
 ## Closing Protocol
 
-- [ ] Keep `code complete, rollout pendiente` while GTM publish, public pilot or native-recovery evidence is pending.
+- [x] Keep lifecycle `in-progress` while controlled booking/replay, `/g/collect` evidence and GTM publish remain pending; public pilot and native-recovery evidence are complete.
 - [x] Runtime flag/binding, public pilot host and API evidence recorded in the feature-flag ledger, Handoff and changelog; GTM/booking evidence remains pending.
 - [ ] Never claim global iframe replacement from a single pilot.
 
 ## Definition of Done
 
-- [ ] Portable frontier renderer, complete flow/a11y, GTM funnel and premium evidence are complete.
+- [x] Portable frontier renderer, complete flow/a11y, local GTM funnel contract and premium evidence are complete.
 - [ ] Controlled booking and conversion measurement are runtime-verified with flag/version rollback.
 - [ ] Any wider graduation remains evidence-driven, one surface at a time.
 
 ## Follow-ups
 
-- After TASK-1431, graduate `hubspot_handoff` and additional public surfaces without changing navigation-only `book_meeting`.
+- Ejecutar el booking controlado/replay y read-back HubSpot/Outlook/Teams; capturar `/g/collect` sin PII ni slot exacto.
+- Publicar GTM sólo tras Preview/Tag Assistant, evidencia live y aprobación humana explícita.
+- Completar inventario/matriz `migrate | retire` de CTAs `book_meeting`; crear versiones nuevas, nunca editar versiones publicadas.
+- Graduar `open_meeting_scheduler` una superficie a la vez; mantener `book_meeting` sólo como compatibilidad técnica transitoria y el scheduler native-only sin enlaces de recuperación al provider. TASK-1518 cierra después la migración/paridad del fleet de embeds.

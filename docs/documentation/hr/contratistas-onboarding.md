@@ -24,7 +24,7 @@ Un colaborador que dejó de ser empleado y sigue como contractor. El wizard:
 
 > **Importante (boundary)**: este camino es **read-only/append-only** sobre el finiquito, el offboarding y el member. NO toca el `contract_type` ni el finiquito. La salida laboral queda intacta.
 
-El resultado es honesto e **idempotente** — si lo corrés dos veces, no duplica:
+El resultado es honesto e **idempotente** — si lo corres dos veces, no duplica:
 
 - **Transición completa**: cerró empleado + abrió contractor + creó el engagement.
 - **Engagement sobre relación existente**: la relación contractor ya existía, solo creó el engagement.
@@ -34,22 +34,22 @@ El resultado es honesto e **idempotente** — si lo corrés dos veces, no duplic
 
 Una persona con una **relación de contractor ya activa**. El wizard:
 
-1. Buscás a la persona.
+1. Buscas a la persona.
 2. **Resuelve** su situación y muestra uno de tres estados honestos:
-   - **Tiene relación contractor activa** → continuás y creás el engagement.
+   - **Tiene relación contractor activa** → continúas y creas el engagement.
    - **Viene de una relación laboral** (tiene un offboarding ejecutado) → te manda al **Camino B** (con el caso ya seleccionado).
    - **No tiene relación** → te dice que **primero hay que crear la relación en Person 360** (fuera de alcance de esta pantalla).
-3. Pedís los términos del engagement.
+3. Pides los términos del engagement.
 
 > El wizard **no fabrica** la relación legal — la exige o te deriva. Crear una relación desde cero es gobernanza de Person 360.
 
 ## El resultado
 
-El engagement nace en estado **Borrador** con clasificación **Necesita revisión**. Para activarlo, revisás la clasificación y movés el ciclo de vida desde el workbench (ver [Detalle, Ciclo de Vida y Clasificación](contratistas-engagement-ciclo-de-vida.md)).
+El engagement nace en estado **Borrador** con clasificación **Necesita revisión**. Para activarlo, revisas la clasificación y mueves el ciclo de vida desde el workbench (ver [Detalle, Ciclo de Vida y Clasificación](contratistas-engagement-ciclo-de-vida.md)).
 
 ## Quién puede entrar
 
-Acceso: route_group `hr` o `efeonce_admin` (viewCode `equipo.contratistas`). Camino A requiere `hr.contractor_engagement:create`; Camino B requiere `hr.contractor_engagement:manage`. Si no tenés el permiso, el botón de crear no aparece.
+Acceso: route_group `hr` o `efeonce_admin` (viewCode `equipo.contratistas`). Camino A requiere `hr.contractor_engagement:create`; Camino B requiere `hr.contractor_engagement:manage`. Si no tienes el permiso, el botón de crear no aparece.
 
 ## Qué NO hace
 

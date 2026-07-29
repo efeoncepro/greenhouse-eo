@@ -18,10 +18,17 @@ Indice maestro de la documentacion no operativa del repo.
 
 - [Índice y contrato de Business Models](business-models/README.md)
 - [Template canónico](business-models/BUSINESS_MODEL_TEMPLATE.md)
-- [Creative Studio — Business Model V1](business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md)
+- [Creative Studio — Business Model V1.1](business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md)
 - [Creative Studio — Studio Credit Model V1](business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md)
 - Esta categoría define propuesta de valor, taxonomía comercial, arquitectura de ingresos, unidad económica,
   riesgos y validación. No reemplaza servicios, CPQ/Finance, propuestas ni contratos.
+
+### Strategy
+
+- [ASaaS Manifesto V1](strategy/ASAAS_MANIFESTO_V1.md)
+- [Efeonce Capital & Investment Strategy V1](strategy/EFEONCE_CAPITAL_AND_INVESTMENT_STRATEGY_V1.md)
+- La estrategia define la tesis de compañía, categoría, modelo ASaaS, portafolio, vehículos de capital y gates
+  de fundraising; no autoriza por sí sola emisiones, deuda, spinouts, transferencias de IP ni compromisos legales.
 
 ### Services
 
@@ -33,6 +40,7 @@ Indice maestro de la documentacion no operativa del repo.
 ### Architecture
 
 - [Architecture Decisions Index](architecture/DECISIONS_INDEX.md)
+- [Efeonce Shared Product UI Platform Decision](architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md)
 - [Creative Studio — Business Model Decision V1](architecture/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_DECISION_V1.md)
 - [Efeonce Creative Studio — Agentic Platform](architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md)
 - [Efeonce Creative Studio — Enterprise Model Portfolio](architecture/EFEONCE_CREATIVE_STUDIO_ENTERPRISE_MODEL_PORTFOLIO_V1.md)
@@ -91,6 +99,7 @@ Indice maestro de la documentacion no operativa del repo.
 - [Greenhouse Visual Capture](documentation/plataforma/captura-visual.md)
 - [Sistema de Observabilidad de Tests](documentation/plataforma/sistema-observabilidad-de-tests.md)
 - [Sister Platform Bindings](documentation/plataforma/sister-platform-bindings.md)
+- [Producción visual social para reportes](documentation/social/visual-report-social-production.md)
 
 ### Manual de uso
 
@@ -98,6 +107,7 @@ Indice maestro de la documentacion no operativa del repo.
 - [Greenhouse Visual Capture](manual-de-uso/plataforma/captura-visual-playwright.md)
 - [Sugerencias asistidas de conciliacion](manual-de-uso/finance/sugerencias-asistidas-conciliacion.md)
 - [Finance Movement Feed](documentation/finance/finance-movement-feed.md)
+- [Manual: producir un post visual de reporte](manual-de-uso/social/visual-report-social-production.md)
 
 ### API
 
@@ -159,6 +169,7 @@ Indice maestro de la documentacion no operativa del repo.
 ### Operations
 
 - [Issue Tracker](issues/README.md)
+- [AXIS Private Package Consumption Runbook](operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md)
 - [Agent Context History](operations/agent-context-history/README.md)
 - [Agent Context Router Decision](architecture/GREENHOUSE_AGENT_CONTEXT_ROUTER_DECISION_V1.md)
 - [SOLUTION_QUALITY_OPERATING_MODEL_V1.md](operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md)

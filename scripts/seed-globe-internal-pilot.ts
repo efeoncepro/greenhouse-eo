@@ -112,29 +112,26 @@ async function main() {
 
   const { upsertSisterPlatformOAuthClient } = await import('@/lib/sister-platforms/oauth-broker')
 
+  const {
+    GLOBE_OAUTH_ACCESS_TOKEN_TTL_SECONDS,
+    GLOBE_OAUTH_CODE_TTL_SECONDS,
+    buildGlobeOAuthGrantContract
+  } = await import('@/lib/sister-platforms/globe-oauth-grants')
+
+  const grantContract = buildGlobeOAuthGrantContract('producer')
+
   const oauthClient = await upsertSisterPlatformOAuthClient({
     sisterPlatformConsumerId: consumer.consumer.consumerId,
     clientId: 'globe',
     clientName: 'Efeonce Globe Internal Studio',
     clientStatus,
     redirectUris: [redirectUri],
-    allowedScopes: ['openid', 'profile', 'email', 'globe.studio.access'],
-    codeTtlSeconds: 300,
-    accessTokenTtlSeconds: 300,
+    allowedScopes: grantContract.allowedScopes,
+    codeTtlSeconds: GLOBE_OAUTH_CODE_TTL_SECONDS,
+    accessTokenTtlSeconds: GLOBE_OAUTH_ACCESS_TOKEN_TTL_SECONDS,
     requirePkce: true,
     issueIdentityInline: true,
-    policy: {
-      schemaVersion: '1',
-      audience: { tenantTypes: ['efeonce_internal'] },
-      requiredScopes: ['openid', 'globe.studio.access'],
-      capabilityScopes: ['globe.studio.access'],
-      claims: { includeGreenhouseRoles: false },
-      revocation: {
-        mode: 'userinfo_revalidation',
-        revalidateAfterSeconds: 60,
-        requireOnPrivilegedAction: true
-      }
-    },
+    policy: grantContract.policy,
     metadata: { source: 'scripts/seed-globe-internal-pilot.ts', taskId: 'TASK-1454' },
     actorUserId
   })

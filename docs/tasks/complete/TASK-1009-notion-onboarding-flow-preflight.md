@@ -6,7 +6,7 @@
 
 - Lifecycle: `complete`
 - Priority: `P2`
-- Impact: `Alto` (convierte el debugging arqueológico por cliente en "corré el check, arreglá lo rojo")
+- Impact: `Alto` (convierte el debugging arqueológico por cliente en "corre el check, arregla lo rojo")
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-CLIENT-360`

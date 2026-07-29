@@ -80,7 +80,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- TASK-466 ✅ (cerrada 2026-04-20, merge `3507ef60` en develop) — proveé `QuotationFxSnapshot`, `evaluateQuotationFxReadinessGate`, endpoint `fx-snapshot`, PDF footer, QuoteSendDialog readiness hooks
+- TASK-466 ✅ (cerrada 2026-04-20, merge `3507ef60` en develop) — provee `QuotationFxSnapshot`, `evaluateQuotationFxReadinessGate`, endpoint `fx-snapshot`, PDF footer, QuoteSendDialog readiness hooks
 - `greenhouse_commercial.quotations.currency` CHECK expandido a 6 monedas — migración `20260421011323497` **debe estar aplicada en staging/prod antes de tomar esta task** (`pnpm pg:connect:migrate`). Sin eso, Slice 2 falla al tratar de persistir `payment_currency` en monedas nuevas.
 - `src/lib/finance/quotation-fx-snapshot.ts` — fuente de verdad del shape canónico
 - `src/lib/finance/quotation-fx-readiness-gate.ts` — policy gate

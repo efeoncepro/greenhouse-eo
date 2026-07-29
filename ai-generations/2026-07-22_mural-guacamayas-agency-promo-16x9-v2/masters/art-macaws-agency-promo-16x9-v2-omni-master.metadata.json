@@ -1,0 +1,81 @@
+{
+  "ok": true,
+  "runId": "2026-07-22_mural-guacamayas-agency-promo-16x9-v2",
+  "mode": "execute",
+  "provider": "Vertex AI / Gemini Omni Interactions API",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-flash-preview",
+  "task": "reference_to_video",
+  "aspectRatio": "16:9",
+  "expectedDurationSeconds": 10,
+  "attemptsAuthorized": 1,
+  "references": [
+    {
+      "role": "IMAGE_REF_0",
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-07_mural-guacamayas-hero/keyframe-01-eye.png",
+      "bytes": 3022330,
+      "sha256": "b60a36eb694fde49b8ccd9d2eaf3d87c13b06a6ff243208cf34337542776c806"
+    },
+    {
+      "role": "IMAGE_REF_1",
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-07_mural-guacamayas-hero/keyframe-02-wing-breakout.png",
+      "bytes": 2722749,
+      "sha256": "5810c6e6bb8d76392808a62088bdc5cd929248de1063da2fff6fc3487f160f46"
+    },
+    {
+      "role": "IMAGE_REF_2",
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-07_mural-guacamayas-hero/keyframe-03-flight-trails.png",
+      "bytes": 3105114,
+      "sha256": "7f53ecc7c377fd298102dfc9d4f1764cd66fe862484ec7a2ad10b66dda535093"
+    }
+  ],
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-22_mural-guacamayas-agency-promo-16x9-v2/prompt.md",
+  "outputPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-22_mural-guacamayas-agency-promo-16x9-v2/masters/art-macaws-agency-promo-16x9-v2-omni-master.mp4",
+  "fidelityContract": "same art direction and causal mural-to-living-paint transformation; full generative 16:9 shot",
+  "reviewStatus": "candidate_pending_operator_review",
+  "startedAt": "2026-07-22T21:33:22.185Z",
+  "completedAt": "2026-07-22T21:34:10.498Z",
+  "interaction": {
+    "id": "JDdhaof0POGzobIPkcni-AE",
+    "status": "completed",
+    "model": "gemini-omni-flash-preview",
+    "outputs": [
+      {
+        "type": "video",
+        "mimeType": "video/mp4",
+        "hasData": true,
+        "hasUri": false
+      }
+    ]
+  },
+  "usage": {
+    "total_tokens": 62622,
+    "total_input_tokens": 4087,
+    "input_tokens_by_modality": [
+      {
+        "modality": "text",
+        "tokens": 847
+      },
+      {
+        "modality": "image",
+        "tokens": 3240
+      }
+    ],
+    "total_output_tokens": 57920,
+    "output_tokens_by_modality": [
+      {
+        "modality": "video",
+        "tokens": 57920
+      }
+    ],
+    "total_tool_use_tokens": 0,
+    "total_thought_tokens": 615
+  },
+  "output": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-22_mural-guacamayas-agency-promo-16x9-v2/masters/art-macaws-agency-promo-16x9-v2-omni-master.mp4",
+    "bytes": 2947440,
+    "sha256": "a5465a2fda84b351d3e64408e05ca09330ba449a5e02ce6304b3977dc99a671c",
+    "mimeType": "video/mp4"
+  }
+}

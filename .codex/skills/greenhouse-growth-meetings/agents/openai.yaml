@@ -1,0 +1,4 @@
+interface:
+  display_name: "Greenhouse Growth Meetings"
+  short_description: "Opera el scheduler nativo de reuniones"
+  default_prompt: "Usa $greenhouse-growth-meetings para implementar o auditar el scheduler nativo de reuniones de Efeonce."

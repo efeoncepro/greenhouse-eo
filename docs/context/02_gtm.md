@@ -2,19 +2,30 @@
 
 > Por qué un agente de Greenhouse necesita esto: el GTM define **qué demos vende el negocio, contra quién compite y cómo gana plata**. Greenhouse aparece en casi todos los pitches como el diferenciador tangible. Lo que construyes alimenta —o debilita— ese argumento.
 
+> **Motion transversal:** Efeonce entra por el job del operador, convierte a los usuarios de mayor valor en
+> `operator-champions` y usa Greenhouse para traducir adopción operativa en assurance ejecutivo, renovación y
+> expansión. Ver [`Efeonce Operator-First Product & Growth Contract V1`](../strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md).
+
+El contenido participa en ese motion como `Content-to-Capability Loop`: Glitch detecta señales, blog construye
+autoridad canónica, YouTube demuestra el mecanismo, los servicios transfieren criterio y los productos convierten
+ese aprendizaje en capacidad. Canon: [`Efeonce Content-to-Capability Loop V1`](../strategy/EFEONCE_CONTENT_TO_CAPABILITY_LOOP_V1.md).
+
 ## Posicionamiento
 
-**Categoría:** *Growth Operating System / ASaaS con ecosistema de producto propio.* **No** "agencia de marketing digital", "agencia integral", "AI agency" ni proveedor de servicios sueltos. La categoría se construye sobre tres conceptos propietarios:
+**Categoría de mercado:** *AI-enabled marketing and growth systems company.* En lenguaje comercial: **Integrated Growth Partner**. **ASaaS** describe el modelo de delivery y monetización; **Growth Operating System** describe la visión de largo plazo. No somos una "AI agency" ni un proveedor de servicios sueltos. Combinamos personas, product services, plataformas y agentes. "Agencia de marketing digital" se conserva como término de captura de demanda, no como categoría estratégica. La propuesta se construye sobre tres conceptos propietarios:
 
 - **Loop Marketing + IA** — el crecimiento es compuesto, no lineal. Cada ciclo construye sobre el anterior.
 - **ASaaS (Agency Service as a Software)** — el servicio de agencia empaquetado como producto de software. Tres plataformas, no informes.
 - **Surround Discovery™** — visibilidad en las 5 superficies donde la audiencia descubre, incluyendo motores de IA.
 
+Directriz de portfolio: para 2028 todo servicio client-facing debe llegar como Product Service productizado y
+AI-native. El GTM debe vender outcomes y sistemas de delivery, no horas, herramientas de IA ni automatización aislada.
+
 **Contra quién competimos** (no de frente con agencias creativas ni con SaaS puros):
 
 | Dimensión | Agencia tradicional | SaaS puro | **Efeonce ASaaS** |
 |---|---|---|---|
-| Productos propios | Cero. Solo servicio. | Un producto. Sin servicio. | **Tres plataformas + servicio de 4 unidades.** |
+| Productos propios | Cero. Solo servicio. | Un producto. Sin servicio. | **Product brands + líneas de servicio coordinadas bajo Efeonce.** |
 | Switching cost | Bajo (relacional) | Medio (datos) | **Alto (datos + proceso + IA + historial en 3 plataformas)** |
 | Inteligencia | Criterio individual variable | Algoritmos genéricos | **Agentes IA entrenados en marca, CRM y distribución** |
 | Medición | Vanity metrics | Métricas de producto | **Revenue Enabled: atribución conectada a pipeline** |
@@ -26,17 +37,17 @@
 
 ---
 
-## Líneas de negocio
+## Líneas de negocio y product brands
 
-Cinco líneas. Cuatro son las unidades; la quinta (CRM Solutions) es transversal. Todas comparten un estándar no negociable: **se miden contra Revenue Enabled, no contra métricas de canal.**
+Efeonce organiza el portfolio en líneas de negocio/prácticas. Las product brands nombran sistemas o soluciones que habilitan una línea; no reemplazan a Efeonce ni equivalen automáticamente a toda la práctica. Todas comparten un estándar no negociable: **se miden contra Revenue Enabled, no contra métricas de canal.**
 
-| Línea | Unidad | Fase Loop | Plataforma |
+| Línea de negocio / práctica | Product brand(s) | Fase Loop | Ejemplos de alcance |
 |---|---|---|---|
-| **Growth & Strategy** | Efeonce Digital | Tailor + Evolve | Greenhouse + Verk |
-| **Creative & Content** | Globe | Express | Verk |
-| **Media & Distribution** | Reach | Amplify | Verk |
-| **Digital Infrastructure** | Wave | Transversal | Greenhouse |
-| **CRM Solutions** | Efeonce Digital (líder) + Wave | Tailor + Evolve | **Kortex** |
+| **Growth Strategy & Measurement** | Greenhouse, Verk, Wave, Kortex | Tailor + Evolve | estrategia, revenue enablement, analytics y orquestación |
+| **Creative Services** | Globe / Creative Studio, Greenhouse, ICO | Express | branding, campañas, contenido y producción |
+| **Media & Distribution** | Reach, Verk, Greenhouse | Amplify | estrategia de distribución; performance y commerce; influence, earned y partnerships |
+| **Digital Services & Engineering** | Wave, Greenhouse | Transversal | visibilidad, web, measurement, agentes e integraciones |
+| **RevOps & CRM** | Kortex, HubSpot, Greenhouse | Tailor + Evolve | licencias, implementación, managed ops e inteligencia CRM |
 
 **Taxonomía comercial:** la relación separa **modelo de delivery** (Managed Squad, Staff Augmentation, Studio
 Access o híbrido por lanes), **forma de engagement** (On-Going, On-Demand o Sample Sprint) y, cuando aplica
@@ -61,7 +72,7 @@ Flywheel: licencia → implementación (Kortex) → managed ops (Greenhouse) →
 
 ## Segmentación
 
-12 ICPs documentados en 4 unidades, consolidados en 8 Buyer Personas → 4 decisores primarios para GTM:
+12 ICPs documentados a través de las líneas de negocio y prácticas, consolidados en 8 Buyer Personas → 4 decisores primarios para GTM:
 
 | Buyer Persona | Dolor | Demo primario |
 |---|---|---|
@@ -70,7 +81,7 @@ Flywheel: licencia → implementación (Kortex) → managed ops (Greenhouse) →
 | **BP3 CEO / Gerente General** | Necesita justificar ante comité; busca evidencia y bajo riesgo. | **Greenhouse (sistema completo)** |
 | **BP8 Dir. Comercial** | Pipeline débil; marketing no alimenta ventas. | Kortex (CRM intelligence) |
 
-**ICP puerta de entrada estrella:** AEO / Visibilidad en IA (ciclo 2–4 sem, ticket bajo, trigger urgente, "caballo de Troya"). Ruta de expansión: AEO → SEO/contenido → CRM → GTM integral.
+**ICP puerta de entrada estrella:** AEO / Visibilidad en IA (ciclo 2–4 sem, ticket bajo, trigger urgente, "caballo de Troya"). Ruta de expansión: AEO → Search Visibility 360 → web/medición → CRM/GTM integral. Wave opera la visibilidad, web y measurement; Efeonce Digital/Kortex gobierna CRM.
 
 > Implicación de producto: el **CEO (BP3) elige por Greenhouse como sistema completo**. La demo de Greenhouse tiene que verse como un sistema serio y vivo, no como un MVP. Esto sube la vara de pulido y consistencia del portal.
 
@@ -117,6 +128,22 @@ Validado por datos del CRM: win rate ~50% en cuentas existentes vs. 2–3% en ne
 - **Berel se cerró directo, sin co-selling HubSpot y sin involucrar a Simón.** No mezclar ese caso con el partnership.
 - **Kortex** es la pieza que convierte el partnership en ventaja técnica: deployment programático sobre HubSpot, rumbo al HubSpot Marketplace (B2B2B hacia agencias).
 - Portal HubSpot de Efeonce: **48713323**. Owner IDs: Julio `75788512`, Luis (BDR) `86856220`. Greenhouse sincroniza companies/contacts con este portal vía Account 360.
+
+## Partner & Provider Layer
+
+Los partnerships y providers habilitan todas las líneas de Efeonce, pero no son líneas de negocio ni una colección de
+logos. Efeonce vende licencias o acceso cuando los términos lo permiten; también vende advisory, implementación,
+integración, managed operations, Product Services e IP propia. La relación debe clasificarse como partnership comercial,
+provider tecnológico, capability partner, enterprise rail o experimento.
+
+La regla es **provider-neutral, provider-transparent**: el cliente compra el sistema, el método y la operación de
+Efeonce; se declara qué plataforma participa, qué dependencia introduce y cuál es el fallback. El modelo canónico,
+economics y gates están en [`EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md`](../business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md).
+
+El mapa vigente prioriza HubSpot para licencias/RevOps; OpenAI, Claude y Google Cloud/Vertex AI como núcleo de
+inteligencia y delivery enterprise; Microsoft AI Cloud y AWS como rails según el cliente; Adobe y Salesforce como
+plataformas enterprise complementarias; Lovable como acelerador de prototipado; y Runway, FLUX, ElevenLabs y BytePlus
+como capabilities creativas. El estado de una postulación o programa no equivale a aprobación comercial.
 
 ---
 

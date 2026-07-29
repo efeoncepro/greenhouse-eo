@@ -170,6 +170,7 @@ import { getVatEntryUnresolvedFxSignal } from './queries/vat-entry-unresolved-fx
 import { getVatEligibleWithoutPeriodSignal } from './queries/vat-eligible-without-period'
 import { getHubspotCompaniesIntakeDeadLetterSignal } from './queries/hubspot-companies-intake-dead-letter'
 import { getWorkforceUnlinkedInternalUsersSignal } from './queries/workforce-unlinked-internal-users'
+import { getGlobeCreditFundingStaleProposalsSignal } from './queries/globe-credit-funding-stale-proposals'
 import { getGrowthAiVisibilitySignals } from './queries/growth-ai-visibility-signals'
 import { getGrowthAiVisibilityScoringSignals } from './queries/growth-ai-visibility-scoring-signals'
 import { getGrowthAiVisibilityArchetypeCoverageSignals } from './queries/growth-ai-visibility-archetype-coverage-signals'
@@ -642,6 +643,7 @@ interface ReliabilityOverviewSources {
   providerBqSyncDeadLetter?: ReliabilitySignal[] | null
   hubspotCompaniesIntakeDeadLetter?: ReliabilitySignal | null
   workforceUnlinkedInternalUsers?: ReliabilitySignal | null
+  globeCreditFundingStaleProposals?: ReliabilitySignal | null
   growthAiVisibility?: ReliabilitySignal[] | null
   growthAiVisibilityScoring?: ReliabilitySignal[] | null
   growthAiVisibilityProbe?: ReliabilitySignal[] | null
@@ -1158,6 +1160,7 @@ export const buildReliabilityOverview = (
     ...(sources.hubspotCompaniesIntakeDeadLetter ? [sources.hubspotCompaniesIntakeDeadLetter] : []),
     // TASK-878 follow-up — Identity UX hardening: internal users sin member enlazado.
     ...(sources.workforceUnlinkedInternalUsers ? [sources.workforceUnlinkedInternalUsers] : []),
+    ...(sources.globeCreditFundingStaleProposals ? [sources.globeCreditFundingStaleProposals] : []),
     // TASK-1082 — Knowledge ingestion: quarantine count + failed sync source.
     ...(sources.knowledgeQuarantineCount ? [sources.knowledgeQuarantineCount] : []),
     ...(sources.assetScanOpenQuarantine ? [sources.assetScanOpenQuarantine] : []),
@@ -1734,6 +1737,13 @@ export const getReliabilityOverview = async (
     preloadedSources.workforceUnlinkedInternalUsers !== undefined
       ? preloadedSources.workforceUnlinkedInternalUsers
       : await getWorkforceUnlinkedInternalUsersSignal().catch(() => null)
+
+  // TASK-1566 — propuestas de fondeo de Globe sin confirmar. Steady=0: un valor > 0 es una decision
+  // humana pendiente, no un fallo del sistema, y por eso escala por ANTIGUEDAD y no por cantidad.
+  const globeCreditFundingStaleProposals =
+    preloadedSources.globeCreditFundingStaleProposals !== undefined
+      ? preloadedSources.globeCreditFundingStaleProposals
+      : await getGlobeCreditFundingStaleProposalsSignal().catch(() => null)
 
   // TASK-1082 — Knowledge ingestion signals (moduleKey 'knowledge'). Degradan
   // honestamente (severity='unknown') si su query falla.
@@ -2563,6 +2573,7 @@ export const getReliabilityOverview = async (
     ppmPositionDrift,
     hubspotCompaniesIntakeDeadLetter,
     workforceUnlinkedInternalUsers,
+    globeCreditFundingStaleProposals,
     knowledgeQuarantineCount,
     assetScanOpenQuarantine,
     hiringCandidateRetentionOverdue,

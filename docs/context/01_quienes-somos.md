@@ -2,15 +2,15 @@
 
 ## Qué es Efeonce Group
 
-**Efeonce Group es un Growth Operating System**: un ecosistema integrado de cuatro unidades especialistas que opera bajo un mismo estándar de gobernanza, metodología y medición, respaldado por tres plataformas de software propietario. Cubre el journey completo —de estrategia a ejecución y escala— como arquitectura modular: cada unidad tiene expertise profundo y todas comparten datos, talento y lógica operativa común.
+**Efeonce Group es la marca paraguas y la relación comercial de una plataforma de servicios de marketing y crecimiento habilitada por IA.** Su portfolio se organiza en líneas de negocio/prácticas y product brands, bajo un mismo estándar de gobernanza, metodología y medición, respaldado por plataformas de software propietario. Cubre el journey completo —de estrategia a ejecución y escala— como arquitectura modular: cada línea posee expertise y ofertas propias, mientras las product brands habilitan o empaquetan capacidades. Su visión es convertirse en un **Growth Operating System**.
 
-La razón de existir: una marca no debería coordinar 3–5 proveedores inconexos para estrategia, creatividad, medios, tecnología y medición. Efeonce elimina esa fragmentación. **Un solo interlocutor (Director de Cuenta), cuatro capacidades, sin pérdida de contexto entre equipos.**
+La razón de existir: una marca no debería coordinar 3–5 proveedores inconexos para estrategia, creatividad, medios, tecnología y medición. Efeonce elimina esa fragmentación. **Un solo interlocutor (Director de Cuenta), varias líneas coordinadas y sin pérdida de contexto entre equipos.**
 
 Operación legal: Efeonce Group SpA. Presencia: **Chile, Colombia, México, Perú.** +10 años ejecutando en LATAM.
 
 > Para un agente de Greenhouse: "quiénes somos" se traduce en producto como **multi-tenant + multi-unidad + multi-país + multi-moneda**. El portal modela una agencia que corre como sistema, no como silos.
 
-Ambición de escala: **LATAM-first, no LATAM-limited**. La presencia regional prueba ejecución multi-país, cercanía cultural y capacidad operativa; no define el techo. Efeonce debe poder atender diversos mercados y crecer hacia el mundo desde la misma tesis: **Growth Operating System / ASaaS**.
+Ambición de escala: **LATAM-first, no LATAM-limited**. La presencia regional prueba ejecución multi-país, cercanía cultural y capacidad operativa; no define el techo. Efeonce debe poder atender diversos mercados y crecer hacia el mundo desde la misma tesis: plataforma habilitada por tecnología e IA, modelo **ASaaS** y visión **Growth Operating System**.
 
 ---
 
@@ -34,33 +34,34 @@ Loop Marketing es el framework estratégico (impulsado por HubSpot como sucesor 
 
 | Fase | Pregunta | Unidad | Qué hace |
 |---|---|---|---|
-| **EXPRESS** | ¿Quiénes somos y para quién? | Globe | Identidad, voz, concepto creativo, KVs, campañas, contenido full-funnel. |
-| **TAILOR** | ¿Cómo personalizamos? | Efeonce Digital | CRM, comportamiento, intención, SEO/AEO, AI agents, landing pages dinámicas. |
-| **AMPLIFY** | ¿Dónde nos encuentran? | Reach | Medios ATL, pauta digital, PR, influencers, AEO (LLMs), dark channels. |
-| **EVOLVE** | ¿Cómo mejoramos cada ciclo? | Efeonce Digital | A/B, analytics, AI citations tracking. Los insights alimentan el siguiente Express. |
-| **TRANSVERSAL** | ¿Qué lo hace posible? | Wave | Web performance, tracking, DSP/DMP/CDP, schema, automatización, web agéntica. |
+| **EXPRESS** | ¿Quiénes somos y para quién? | Creative Services, con Globe como product brand cuando aplica | Identidad, voz, concepto creativo, KVs, campañas, contenido full-funnel. |
+| **TAILOR** | ¿Cómo personalizamos? | Growth Strategy y RevOps & CRM, con Kortex/Greenhouse cuando aplica | CRM, comportamiento, intención, growth y soluciones comerciales. |
+| **AMPLIFY** | ¿Dónde nos encuentran? | Media & Distribution, con Reach como product brand cuando aplica | Medios ATL, pauta digital, PR, influencers, AEO (LLMs), dark channels. |
+| **EVOLVE** | ¿Cómo mejoramos cada ciclo? | Growth Strategy & Measurement, Digital Services & Engineering y RevOps & CRM | Efeonce gobierna la decisión de negocio; Wave, Kortex, Verk y Greenhouse aportan sistemas según el scope. |
+| **TRANSVERSAL** | ¿Qué lo hace posible? | Digital Services & Engineering, con Wave como product brand cuando aplica | Search Visibility 360, web, tagging, analytics, schema, Agent Systems & Platforms y automatización. |
 
 - **Nested Loops™** — metodología propietaria para *operar* Loop Marketing.
 - **Surround Discovery™** incluye el motor **S⁴: SENSE → SHAPE → SURFACE → SOLVE**. **SOLVE es una etapa de Surround Discovery™, no una metodología independiente.**
 
 ---
 
-## Las 4 unidades
+## Líneas de negocio y product brands
 
-| Unidad | Claim | Fase Loop | Especialidad |
+| Línea de negocio / práctica | Product brand(s) relacionada(s) | Fase Loop | Especialidad |
 |---|---|---|---|
-| **Efeonce Digital** | *Empower your Growth* | Tailor + Evolve | Núcleo estratégico y digital. GTM, RevOps, CRM, SEO/AEO, redes, pauta, analytics, Martech, AI agents. **Orquesta las demás unidades.** |
-| **Globe** | *Empower your Brand* | Express | Branding, creatividad, contenido full-funnel, producción audiovisual (Globe Studio), campañas ATL/BTL, copywriting. Opera bajo Creative Supply Chain + ICO. |
-| **Reach** | *Empower your Voice* | Amplify | Planificación/compra de medios ATL y digital, PR, influencers. Opera bajo Surround Strategy™. |
-| **Wave** | *Empower your Engine* | Transversal | Infraestructura digital, web performance, tracking, DSP/DMP/CDP, integraciones, automatización. Metodología: **IDD (Intelligence-Driven Development)**. Prepara la web agéntica. |
+| **Creative Services** | Globe / Creative Studio; Greenhouse; ICO | Express | Branding, creatividad, contenido full-funnel, producción audiovisual, campañas ATL/BTL y copywriting. |
+| **Growth Strategy & Measurement** | Greenhouse; Verk; Wave; Kortex | Tailor + Evolve | Estrategia, GTM, Revenue Enabled, analytics, medición y orquestación de líneas. |
+| **RevOps & CRM** | Kortex; HubSpot; Greenhouse | Tailor + Evolve | CRM, implementación, automatización, inteligencia comercial y operación gestionada. |
+| **Media & Distribution** | Reach; Verk; Greenhouse | Amplify | Distribution Strategy & Media Architecture; Performance & Commerce Distribution; Influence, Earned & Partnership Distribution. |
+| **Digital Services & Engineering** | Wave; Greenhouse | Transversal | Search Visibility 360, web, measurement, Agent Systems & Platforms, integraciones y automatización. |
 
-**La línea para distinguir IA por unidad:** si la IA decide *qué hacer para el negocio* → Efeonce Digital. Si optimiza *cómo funciona el motor técnico* → Wave. Si gobierna y acelera *la producción creativa* → ICO dentro de Globe.
+**Regla de ownership:** una línea de negocio posee la relación de problema, oferta, delivery y economics; una product brand puede habilitar o empaquetar esa oferta. Globe no equivale a todos los Creative Services; Wave no equivale a todos los Digital Services; Reach no equivale a toda Media & Distribution. La relación comercial sigue siendo Efeonce.
 
 ---
 
 ## ICO — Intelligent Creative Operations
 
-**ICO es la capa de inteligencia operativa transversal** que corre por debajo de la Creative Supply Chain (CSC). No es solo de Globe: gobierna la operación de las cuatro unidades. Mientras la CSC define *qué* y *cuándo* de la producción, ICO define el *cómo inteligente*: gobernanza automatizada por IA, métricas en tiempo real a nivel de pieza individual, y visibilidad total para el cliente.
+**ICO es la capa de inteligencia operativa transversal** que corre por debajo de la Creative Supply Chain (CSC) y de otras operaciones donde aplique. No es la marca de una unidad ni propiedad exclusiva de Globe: define el *cómo inteligente*: gobernanza automatizada por IA, métricas en tiempo real y visibilidad total para el cliente.
 
 **4 dimensiones de medición:** Production · Concept · Outcome · Anticipation.
 

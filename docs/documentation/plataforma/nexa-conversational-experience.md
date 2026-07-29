@@ -10,21 +10,21 @@
 
 La **experiencia conversacional de Nexa** es la forma en que una persona le pregunta algo a Nexa dentro de Greenhouse y recibe una respuesta clara, confiable y con sus fuentes a la vista — sin tener que abrir otra pantalla ni perder el contexto en el que estaba.
 
-La idea de fondo es la misma que viste en buscadores modernos con IA: **primero la respuesta**, no una lista de links. Nexa responde, te dice **por qué podés confiar** en esa respuesta, te deja **ver la evidencia si querés** y te ofrece **seguir conversando** con preguntas sugeridas.
+La idea de fondo es la misma que viste en buscadores modernos con IA: **primero la respuesta**, no una lista de links. Nexa responde, te dice **por qué puedes confiar** en esa respuesta, te deja **ver la evidencia si quieres** y te ofrece **seguir conversando** con preguntas sugeridas.
 
 Lo importante: es **una sola experiencia, reutilizable en todo el portal**. Hoy vive primero en Knowledge (la base de conocimiento), pero el mismo formato sirve para Finanzas, Agencia, Personas, Comercial o el Home. Knowledge es el **primer lugar donde se usa**, no el único destino.
 
 ## Cómo se ve y cómo fluye (paso a paso)
 
-Cuando preguntás algo, la conversación pasa por una secuencia (una "coreografía") que siempre es la misma, sin importar el área:
+Cuando preguntas algo, la conversación pasa por una secuencia (una "coreografía") que siempre es la misma, sin importar el área:
 
 1. **Reposo (idle).** Ves la cajita de Nexa con su borde luminoso esperando tu pregunta.
-2. **Enviás.** Apenas escribís y mandás, la cajita baja y empieza la secuencia (acá arranca todo).
+2. **Envías.** Apenas escribes y mandas, la cajita baja y empieza la secuencia (acá arranca todo).
 3. **Pensando.** Aparece tu pregunta como burbuja y Nexa muestra que está "pensando".
 4. **Razonando.** Nexa muestra los pasos que va dando (entendiendo la pregunta → leyendo fuentes → redactando), con tics de progreso.
-5. **Escribiendo.** La respuesta va apareciendo de a poco, como si Nexa la estuviera tecleando, con un cursor al final. Podés **detener** si querés.
+5. **Escribiendo.** La respuesta va apareciendo de a poco, como si Nexa la estuviera tecleando, con un cursor al final. Puedes **detener** si quieres.
 6. **Respondido.** Queda la respuesta completa, con su **sello de confianza** (de qué fuentes salió, qué tan actuales son) y una **barra para opinar**: ¿te sirvió? + copiar / compartir / regenerar.
-7. **Evidencia (opcional).** Si querés ver el detalle, abrís el panel de **evidencia**: las fuentes exactas, su frescura y el razonamiento.
+7. **Evidencia (opcional).** Si quieres ver el detalle, abres el panel de **evidencia**: las fuentes exactas, su frescura y el razonamiento.
 8. **Seguir conversando.** Abajo aparecen **preguntas sugeridas** y la cajita para que sigas preguntando.
 
 Si algo sale mal, Nexa es **honesta**: te dice "no pude" o "esto está incompleto" con claridad, en vez de mostrar un cero o un dato falso.
@@ -47,11 +47,11 @@ Cada pieza visible es un componente reutilizable. No hay un "chat de Finanzas" d
 
 Nexa no solo responde: **muestra su trabajo**. Cada respuesta puede traer:
 
-- **Fuentes citadas** dentro del texto (como `[1]`, `[3]`), que podés tocar para ver de dónde salió cada cosa.
+- **Fuentes citadas** dentro del texto (como `[1]`, `[3]`), que puedes tocar para ver de dónde salió cada cosa.
 - **Frescura**: si una fuente está actual, pendiente de revisión o deprecada — y lo dice abierto.
 - **Confianza**: alta / media / baja.
-- **Cuántas fuentes se filtraron** por política (por ejemplo, contenido al que no tenés acceso).
-- **Tu feedback**: cuando votás "¿me sirvió?", eso ayuda a mejorar.
+- **Cuántas fuentes se filtraron** por política (por ejemplo, contenido al que no tienes acceso).
+- **Tu feedback**: cuando votas "¿me sirvió?", eso ayuda a mejorar.
 
 Esto es a propósito: una respuesta sin fuentes o sin frescura no genera la misma confianza, y Nexa está diseñada para no esconder eso.
 

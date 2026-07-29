@@ -48,6 +48,20 @@ If the task is time-sensitive or blocked by auth/protection, verify against offi
   - `GCP_PROJECT`
   - `GOOGLE_APPLICATION_CREDENTIALS_JSON` or `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64`
 - Treat `next-auth NO_SECRET` as an infrastructure/env issue first, not as an application bug.
+- AXIS package authentication is build-time only. A Vercel `NPM_RC` variable proves that the
+  configured project can be prepared to install private `@efeoncepro/axis-*` packages; it does
+  not prove that a Greenhouse or Globe consumer imports, renders, or operates AXIS at runtime.
+  The AXIS Lab's `NPM_RC` is Lab readiness evidence, not consumer-runtime evidence.
+- AXIS consumer deploys remain gated by product-promotion controls; `TASK-1591` is the verified
+  opt-in pilot. Before promotion, record the exact commit,
+  package versions, deployment URL, build/deployment digest where available, runtime smoke evidence,
+  and rollback target. If a rollback is needed, verify the restored deployment and its reproducible
+  package/auth configuration; changing traffic alone is not sufficient evidence.
+- Keep AXIS package credentials scoped to the build system and Secret Manager. Never expose the token
+  through a Vercel runtime variable, image, artifact, deployment log, or client bundle.
+
+Canonical AXIS pointers: [shared UI platform ADR](../../docs/architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md)
+and [private package consumption runbook](../../docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
 - Do not repoint shared aliases like `pre-greenhouse` to a branch preview until that preview has passed a minimal auth smoke:
   - `vercel curl /api/auth/session --deployment <url>`
   - expected without session: `200 {}` or another non-500 response

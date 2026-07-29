@@ -100,6 +100,17 @@ description: Dirige arte y diseño gráfico enterprise con IA y humanos. Use for
 Cierra el loop **idear → dirigir → producir → auditar → iterar** (detalle en
 `efeonce/STUDIO_TOOLING.md`):
 
+### Social report visual contract
+
+Cuando el asset sea un post o carrusel que promociona un reporte, dashboard o evidencia de producto, cargar
+[`docs/operations/GREENHOUSE_SOCIAL_VISUAL_REPORT_PRODUCTION_V1.md`](../../../docs/operations/GREENHOUSE_SOCIAL_VISUAL_REPORT_PRODUCTION_V1.md).
+La dirección por defecto es **proof-first / score dominante**: una evidencia legible, crop nativo por formato y
+ningún frame, tarjeta, sombra pesada o mockup que convierta la captura en un dashboard genérico. El logo debe
+aparecer una sola vez y los datos/UI finales se componen determinísticamente. La dirección debe entregar una
+familia de derivados por superficie —no un archivo universal— y mantener evidencia crítica en la zona central,
+validada contra overlays y recortes reales de cada plataforma. Ver la auditoría
+[`docs/audits/social/2026-07-28-social-platform-surface-audit.md`](../../../docs/audits/social/2026-07-28-social-platform-surface-audit.md).
+
 - **Auditar**: rúbrica de KV (`modules/05` + `templates/key-visual-audit-scorecard.md`).
 - **Dirigir**: brief + mood board + selección de herramienta por tarea (`modules/06`, `08`).
 - **Producir**: la herramienta o secuencia correcta para cada trabajo — **UI de Greenhouse →**

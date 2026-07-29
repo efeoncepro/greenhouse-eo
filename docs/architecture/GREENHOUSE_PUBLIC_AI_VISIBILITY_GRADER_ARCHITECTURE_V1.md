@@ -1573,7 +1573,7 @@ Operador (Growth/AM)      → requestGraderRunAsOperator    → ilimitado, costo
 
 ### Invariantes operativos para agentes (corporate email gate — TASK-1263)
 
-- **NUNCA** asumir que publicar el grader-form con `emailPolicy` gateaa el intake: el grader NO pasa por `submitForm`. El gate corre en las fachadas vía `evaluateFormEmailGate`. Si agregás un tercer path de intake, cableá el helper ahí también.
+- **NUNCA** asumir que publicar el grader-form con `emailPolicy` gateaa el intake: el grader NO pasa por `submitForm`. El gate corre en las fachadas vía `evaluateFormEmailGate`. Si agregas un tercer path de intake, cablea el helper ahí también.
 - **NUNCA** duplicar la lógica del gate (flag + policy + verifyEmail + decisión): usar SIEMPRE `evaluateFormEmailGate` (un primitive, muchos consumers). Es el mismo helper que consume `submitForm`.
 - **NUNCA** correr `activate-grader-email-gate.ts --apply` antes de desplegar el código de las fachadas (ancla a versión deprecada + no gatea). Secuencia: deploy → `--apply` → smoke.
 - **NUNCA** publicar el grader-form por raw-SQL ni editar in-place una versión published (inmutable por trigger): usar el script gobernado (`authorDraftForm`+`publishForm`).
@@ -1603,7 +1603,7 @@ Operador (Growth/AM)      → requestGraderRunAsOperator    → ilimitado, costo
 - **NUNCA** hacer fetch de superficies del sitio analizado fuera de `createProbeFetcher` (SSRF guard + read-only GET + timeout + cortesía); cero auth/mutación/endpoint privado.
 - **NUNCA** ejecutar probes headless (CWV/WebMCP) en Vercel; corren en Cloud Run worker. Sin `HeadlessRenderer` → `skipped/no_headless`. WebMCP es el techo del eje agentic, no el único camino (MCP + structured data + DOM semántico pueden scorear alto).
 - **NUNCA** romper el run de percepción por un fallo de probes: `gatherRunProbes` es best-effort (no lanza). Un sitio caído degrada los probes, no el run.
-- **SIEMPRE** que agregues un probe nuevo: declará su `ProbeKind` + dimensión en `readiness-config.ts` con peso que mantenga la suma del eje en 100, registralo en `structural/index.ts` o `agentic/index.ts`, y mapeá su evidence public-safe (sin PII ni contenido crudo de terceros más allá de conteos/snippets acotados).
+- **SIEMPRE** que agregues un probe nuevo: declara su `ProbeKind` + dimensión en `readiness-config.ts` con peso que mantenga la suma del eje en 100, regístralo en `structural/index.ts` o `agentic/index.ts`, y mapea su evidence public-safe (sin PII ni contenido crudo de terceros más allá de conteos/snippets acotados).
 
 ## Delta 2026-06-28 — TASK-1267 Entity Infrastructure Probes · tercer eje `entity` (staging ON) · EPIC-020
 

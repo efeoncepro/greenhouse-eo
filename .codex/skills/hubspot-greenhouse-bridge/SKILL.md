@@ -15,6 +15,7 @@ Operate the Cloud Run service that bridges HubSpot CRM writes/webhooks ↔ `gree
 | **HubSpot → BigQuery CRM sync** (Cloud Function `hubspot-bq-sync`, `main.py`) | `cesargrowth11/hubspot-bigquery/main.py` + `deploy.sh` (sibling, **NOT moved**) | GCP Cloud Function + BigQuery `hubspot_crm.*` |
 | **HubSpot write bridge + webhooks** (Cloud Run `hubspot-greenhouse-integration`, 23 routes) | `greenhouse-eo/services/hubspot_greenhouse_integration/` | **this skill** owns this system |
 | **Greenhouse runtime** (Next.js on Vercel) | `greenhouse-eo/src/**` | `src/lib/integrations/hubspot-greenhouse-service.ts` is the canonical client |
+| **Native meeting scheduler** (public config/availability/booking) | `greenhouse-eo/src/lib/growth/meetings/**` + `src/growth-meeting-renderer/**` | `greenhouse-growth-meetings`; HubSpot Scheduler is a server-side provider called from the Next.js runtime, **not** a route in this Cloud Run bridge |
 | **Secret Manager** (3 secrets) | GCP project `efeonce-group` | Runtime SA `greenhouse-portal@` reads at boot |
 | **Kortex HubSpot CMS / Content Hub operations** | `greenhouse-eo/docs/architecture/kortex/hubspot-cms/` + Kortex control plane | Kortex OAuth runtime + HubSpot Developer Platform; this skill only cross-links |
 

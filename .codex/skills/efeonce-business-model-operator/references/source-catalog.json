@@ -1,0 +1,9 @@
+{
+  "as_of": "2026-07-25",
+  "sources": [
+    {"id":"ifrs-15","url":"https://www.ifrs.org/issued-standards/list-of-standards/ifrs-15-revenue-from-contracts-with-customers/","authority":"primary","use":"revenue recognition routing"},
+    {"id":"ias-7","url":"https://www.ifrs.org/issued-standards/list-of-standards/ias-7-statement-of-cash-flows/","authority":"primary","use":"operating, investing and financing cash separation"},
+    {"id":"wipo-ip-audit","url":"https://www.wipo.int/en/web/business/ip-audit","authority":"primary","use":"IP ownership and audit routing"},
+    {"id":"yc-safe","url":"https://www.ycombinator.com/documents","authority":"primary","use":"instrument reference; legal review required"}
+  ]
+}

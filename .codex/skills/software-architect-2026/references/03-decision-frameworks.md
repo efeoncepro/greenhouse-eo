@@ -4,6 +4,10 @@ Architecture is the accumulation of decisions. The decisions that matter — the
 
 This file gives you the frameworks to identify which decisions to record, how to write them, how to compare options rigorously, and how to handle the special cases (low-confidence decisions, decisions made under time pressure, decisions that supersede previous ones).
 
+## Contents
+
+ADR qualification; reversibility; ADR anatomy; context; trade-off matrices; confidence; retroactive decisions; evolution discipline; decision techniques; anti-patterns; storage/discoverability.
+
 ## When a decision deserves an ADR
 
 Write an ADR when **at least two** of the following are true:

@@ -19,6 +19,18 @@ description: Orienta, sin sustituir asesoría legal, sobre privacidad, contratos
 
 Efeonce opera en **Chile, Colombia, México, Perú** y está **abriendo Estados Unidos**. Regla: **la jurisdicción importa** — no exportar el derecho de un país a otro; identificar siempre **ley aplicable + foro** antes de opinar. Clientes internacionales (Globe) pueden arrastrar **GDPR** (UE) → ver `04`.
 
+### Creator Influence & Content — overlay regional obligatorio
+
+Cuando el asunto involucre influencers, creators, UGC, talent, paid usage, whitelisting, Partnership Ads,
+exclusividad, imagen, voz, likeness, disclosure o derechos de contenido, carga además el [Rights & Usage Integrity Pack](../../../docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_RIGHTS_AND_USAGE_INTEGRITY_PACK_V1.md)
+y la [investigación regional de derechos](../../../docs/audits/commercial/CREATOR_INFLUENCE_CONTENT_RIGHTS_REGIONAL_RESEARCH_2026-07-29.md).
+
+El pack define el baseline operativo de Efeonce y obliga a seleccionar un overlay para Chile, Colombia, México o Perú,
+además de los overlays de plataforma y categoría. No es contrato legal final ni reemplaza la validación con abogado
+habilitado en la jurisdicción aplicable.
+
+Para el hand-off operativo, usa además el [Operating Control Pack](../../../docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_OPERATING_CONTROL_PACK_V1.md): la fuente propia debe conservar contratos, rights matrix, chain of title, evidencia, expiraciones y takedown.
+
 ## Árbol de decisión — qué módulo cargar
 
 ```
@@ -105,4 +117,6 @@ Cuando el asunto sea Studio Credits, Creative Studio, clonación de voz o produc
 | `modules/09_DIGITAL_COMPLIANCE.md` | Cookies/consentimiento/tracking, privacy/cookie/terms pages, anti-spam email, datos en martech |
 | `ANTIPATTERNS` · `GLOSSARY` · `SOURCES` | Antipatrones, vocabulario, fuentes por jurisdicción con "reverificar" |
 | `efeonce/EFEONCE_OVERLAY.md` | Efeonce Group SpA como entidad, ZapSign, ownership de entregables, privacy policy del sitio, DPA con clientes, boundary payroll |
+| `docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_RIGHTS_AND_USAGE_INTEGRITY_PACK_V1.md` | Baseline regional, rights matrix, country/platform overlays, chain of title, disclosure, expiración y gates para Creator Influence & Content |
+| `docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_OPERATING_CONTROL_PACK_V1.md` | Registros operativos, gates, tooling, measurement, caja, capacidad, crisis y enterprise hand-off |
 | `templates/` | Checklists advisory (NDA, DPA, cesión IP, redline MSA/SOW, privacy policy, release) — **no** documentos legales finales |

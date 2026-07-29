@@ -1,6 +1,6 @@
 # Efeonce Globe — API Contract Spine (TASK-1481) — Runbook V1
 
-- Estado: vigente para el pilot interno no productivo (`internal_smoke`)
+- Estado: vigente para el runtime interno no productivo (`internal_smoke`) — estadio actual del runtime, NO el techo del producto (ADR-010: Globe es producto comercial)
 - Alcance: cómo **extender**, **llamar** y **verificar** la costilla de contrato de API (API Contract Spine)
 - Audiencia: el ingeniero/operador/agente que va a construir sobre la costilla, en particular quien ejecute **TASK-1457** (primer proveedor con paridad de API)
 - No autoriza: Producción, clientes externos, llamadas reales a proveedores creativos, almacenamiento de assets, base de datos ni una superficie pública de marca. Eso llega con sus propias tasks.
@@ -508,9 +508,9 @@ const evidence = await client.getExperimentEvidence(prepared.outcome.experimentI
 (aborta ANTES de gastar); si el workspace superó su cap diario → `day_cap_exceeded`; si el runner falla → se
 libera la reserva y queda `failed`. `candidate_ready` es un candidato técnico, **no** una aprobación.
 
-**Agregar una ruta de proveedor real:** implementá un `CreativeProviderAdapter` real
+**Agregar una ruta de proveedor real:** implementa un `CreativeProviderAdapter` real
 (Vertex/OpenAI/Fal según la política de soberanía), inyectalo en el `LabRunner` en lugar del `FakeReferenceAdapter`,
-y prendé el flag sólo cuando existan credenciales WIF/ADC, bucket privado y budget alerts. El adapter real NUNCA
+y prende el flag sólo cuando existan credenciales WIF/ADC, bucket privado y budget alerts. El adapter real NUNCA
 se llama desde script/CLI/UI/MCP — sólo por el runner detrás del command.
 
 ---

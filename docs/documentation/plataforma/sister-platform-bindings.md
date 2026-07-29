@@ -1,10 +1,10 @@
 # Sister Platform Bindings
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-04-11 por Codex (TASK-375)
-> **Ultima actualizacion:** 2026-05-28 por Codex (TASK-948 Kortex SSO broker)
-> **Documentacion tecnica:** `docs/architecture/GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`
+> **Ultima actualizacion:** 2026-07-21 por Claude (TASK-1507 CLI de redirect allowlist)
+> **Documentacion tecnica:** [GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md](../../architecture/GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md) · [GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md](../../architecture/GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md) (§15.5 para el redirect allowlist)
 
 ---
 
@@ -193,6 +193,86 @@ Flags de rollout:
 - Kortex: `KORTEX_GREENHOUSE_SSO_ENABLED=false` por default.
 
 Rollback operativo: apagar primero `KORTEX_GREENHOUSE_SSO_ENABLED`; si hace falta, apagar tambien `GREENHOUSE_SISTER_PLATFORM_OAUTH_ENABLED`. El bridge de password queda como break-glass hasta cerrar el cutover.
+
+## Cambiar el redirect allowlist de un cliente OAuth
+
+El carril de SSO no acepta comodines: cada plataforma hermana tiene una lista exacta de callbacks permitidos. Si la app hermana cambia de dominio, ese callback nuevo no funciona hasta que alguien lo agrega a la lista.
+
+Para eso existe un comando dedicado:
+
+```bash
+pnpm sister-platform:redirect --client globe --add https://globe.efeoncepro.com/auth/callback
+```
+
+Sin `--apply` el comando es un **dry-run**: no escribe nada y solo imprime la lista actual y como quedaria. Recien cuando agregas `--apply` toca la base de datos:
+
+```bash
+pnpm sister-platform:redirect --client globe --add https://globe.efeoncepro.com/auth/callback --apply
+```
+
+Tambien sirve para retirar un callback que ya no se usa:
+
+```bash
+pnpm sister-platform:redirect --client globe --remove https://<origen-anterior>/auth/callback --apply
+```
+
+El comando es generico: `--client` acepta cualquier cliente OAuth de plataforma hermana registrado, hoy `globe` y `kortex`.
+
+### Que toca y que no toca
+
+Toca una sola cosa: la lista de callbacks permitidos.
+
+No toca:
+
+- el token del consumer ni el client secret vivo
+- los scopes OAuth permitidos
+- la policy del cliente ni sus tiempos de expiracion
+- el estado del cliente (`active`, `suspended`, `deprecated`)
+
+Por eso este es el camino correcto para un cliente que ya esta en uso, y **no** volver a correr el seed de piloto: el seed esta pensado para crear el cliente desde cero y reemplaza la lista completa de callbacks. Ademas, el seed de Globe rota siempre el token del consumer y el de Kortex lo rota si se pide con `KORTEX_ROTATE_CONSUMER_TOKEN=true`; en cualquiera de los dos casos es el camino equivocado sobre un cliente en uso, porque cortaria el login mientras esta ocurriendo el cambio.
+
+### Que pasa si te equivocas
+
+Sin `--apply` el comando solo comprueba que el callback a quitar exista hoy en la lista; las demas validaciones (comodin, HTTPS, lista vacia) corren server-side dentro de la transaccion del `--apply`. Un dry-run verde con un comodin o con la lista proyectada vacia no significa que el cambio sea valido.
+
+Al aplicar, el comando falla en vez de dejar algo raro:
+
+- si intentas quitar un callback que no esta en la lista, falla. Eso quiere decir que estas mirando una lista vieja.
+- si el resultado dejaria la lista vacia, falla.
+- si el callback tiene un comodin (`*`) o no es HTTPS (salvo `localhost`), falla.
+- si el cliente no existe, falla con "no encontrado"; nunca lo crea por accidente.
+
+Agregar dos veces el mismo callback no rompe nada: la segunda vez no cambia nada.
+
+### Como confirmar que quedo bien
+
+La lista real la valida el broker, asi que la forma correcta de confirmar no es mirar la tabla sino preguntarle al broker. El endpoint `/api/auth/sister-platforms/authorize` revisa el callback **antes** de mirar si hay sesion.
+
+Para que la prueba sirva, el request tiene que ir completo (`response_type=code`, `state`, `nonce`, `code_challenge` + `code_challenge_method=S256`) y contra un ambiente con el broker prendido (`GREENHOUSE_SISTER_PLATFORM_OAUTH_ENABLED=true`); lo que discrimina es el codigo de error `invalid_redirect_uri`, no el numero de status:
+
+- callback no permitido: responde `400` con `invalid_redirect_uri`
+- callback permitido y request completa: responde `303` (te manda a login o de vuelta a la app)
+- un callback con comodin: sigue respondiendo `400` con `invalid_redirect_uri` (control: confirma que la lista no se volvio permisiva)
+
+Es decir, se puede verificar sin necesidad de iniciar sesion. Un request incompleto contra un callback que ya esta permitido devuelve `400` con otro codigo (`unsupported_response_type`), y con el broker apagado devuelve `404` con `broker_disabled`: ninguno de los dos dice nada sobre la lista.
+
+### Orden correcto durante un cambio de dominio
+
+1. agregar el callback nuevo (la lista crece, el viejo sigue funcionando)
+2. verificar contra el broker, con el request completo, que el nuevo ya responde `303`
+3. recien ahi cambiar el dominio que la app hermana anuncia
+4. probar el login completo
+5. retirar el callback viejo solo cuando ya no se necesite como camino de vuelta
+
+Hacerlo al reves deja una ventana en la que la app hermana manda a la gente a un callback que todavia no esta permitido, y el login queda roto.
+
+### Quien lo puede operar hoy
+
+Hoy es un comando de operador con acceso a la base de datos: no hay pantalla ni endpoint para esto. La logica no vive en el script sino en la plataforma, justamente para que mas adelante una API, un tool MCP o Nexa puedan hacer el mismo cambio sin reescribir las reglas. Antes de abrirlo por API faltan dos cosas: registrar quien hizo el cambio y definir que permiso lo habilita.
+
+El comando acepta la variable `SISTER_PLATFORM_ACTOR_USER_ID` para nombrar al operador (por defecto `system`), pero hoy ese dato **no queda guardado en ninguna parte**: se pasa y se descarta. O sea, la trazabilidad real del cambio sigue siendo el historial del propio operador, no la plataforma. Cerrar ese hueco, definir el permiso y abrir la operacion por API/MCP es `TASK-1513` (Sister Platform Redirect Allowlist Governance), ya creada y en `to-do`.
+
+> Detalle tecnico: el contrato de la primitive, sus garantias transaccionales y las reglas duras estan en [GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md](../../architecture/GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md) §15.5. Codigo: `src/lib/sister-platforms/oauth-broker.ts` (`updateSisterPlatformOAuthRedirectUris`) y `scripts/sister-platform-oauth-redirect-uris.ts`.
 
 ## Quien deberia tocarlo
 

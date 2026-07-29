@@ -10,15 +10,34 @@
 
 YYYY-MM-DD (the date this status was set)
 
+## Owners and decision authority
+
+- **Decision owner**: [accountable person/team]
+- **Implementation owner**: [person/team, if different]
+- **Operational owner**: [person/team]
+- **Consulted / approving stakeholders**: [roles or STK IDs]
+
+## Decision drivers
+
+> Rank the forces that distinguish the alternatives. Link critical stakeholder concerns and quality scenarios rather than repeating them.
+
+1. [Driver / CON-### / QS-###]
+2. [Driver]
+3. [Driver]
+
 ## Reversibility
 
 `One-way` | `Two-way` | `Two-way but slow`
 
-> **One-way**: undoing this costs more than 1 quarter of effort.
-> **Two-way**: undoing this costs days to weeks.
-> **Two-way but slow**: undoing this is feasible but costs weeks to a couple months.
+> Calibrate reversibility to this organization's time, cost, data, contractual, and migration realities; the labels are not universal duration bands.
 >
-> If one-way, also describe what would force reconsideration: "We would reconsider this if [specific trigger]."
+> **One-way**: reversal would be prohibitive or would lose obligations/data/options.
+>
+> **Two-way**: a tested, bounded reversal path exists.
+>
+> **Two-way but slow**: reversal is feasible but needs a planned migration or coexistence period.
+>
+> Describe the reversal path and evidence, not only the label.
 
 ## Confidence
 
@@ -30,7 +49,7 @@ YYYY-MM-DD (the date this status was set)
 
 ## Validated as of
 
-YYYY-MM-DD — the date when the facts this decision relies on were last verified (vendor pricing, framework version, ecosystem maturity, regulatory text). After 12 months without re-validation, treat the ADR as suspect.
+YYYY-MM-DD — the date when changeable facts this decision relies on were last verified (vendor pricing, framework version, ecosystem maturity, regulatory text). Use risk-based review triggers below; age alone does not invalidate a decision.
 
 ## Context
 
@@ -48,9 +67,16 @@ YYYY-MM-DD — the date when the facts this decision relies on were last verifie
 
 [Replace this with the actual decision]
 
+### Scope and conformance
+
+- **Applies to**: [systems, domains, environments, future work]
+- **Does not apply to**: [explicit exclusions]
+- **How conformance is evaluated**: [test, query, review, fitness-function IDs]
+- **Exception authority**: [who may approve, required evidence, expiry]
+
 ## Alternatives considered
 
-> List each meaningful alternative with one or two sentences on why it was not chosen. If no alternatives were seriously considered, the decision is probably not significant enough for an ADR — or you didn't think hard enough.
+> List each viable alternative and why it was not chosen. Include “do nothing”, delay, or an imposed option when relevant. If the decision is forced by a hard constraint, name that constraint and the evidence instead of inventing alternatives.
 
 ### Alternative 1: [name]
 
@@ -88,13 +114,21 @@ YYYY-MM-DD — the date when the facts this decision relies on were last verifie
 
 > If the decision involves a multi-step rollout or migration, brief notes on how it's being executed. For complex migrations, link to a separate plan document.
 
+## Evaluation and review triggers
+
+- **Evidence that the decision is working**: [signals, scenario thresholds, fitness functions]
+- **Reconsider when**: [assumption invalidated, threshold breached, incident class, regulation/vendor/ownership change]
+- **Review owner**: [person/team]
+- **Next scheduled review (only if useful)**: [date / none]
+- **Change procedure**: [new ADR, amendment policy, migration/rollback authority]
+
 ## Related ADRs (optional)
 
 - Supersedes: ADR-XXXX (if applicable)
-- Superseded by: ADR-XXXX (if applicable; this is the only edit allowed on an Accepted ADR)
+- Superseded by: ADR-XXXX (if applicable)
 - Related: ADR-XXXX, ADR-XXXX (decisions that interact with this one)
 
-## Sources / evidence (optional but recommended)
+## Sources / evidence
 
 > For decisions that depend on current 2026 reality (vendor pricing, framework versions, ecosystem maturity), cite the sources you validated against, with dates.
 
@@ -107,9 +141,10 @@ YYYY-MM-DD — the date when the facts this decision relies on were last verifie
 
 The skill produces ADRs that:
 
-1. **State exactly one decision per ADR.** If you find yourself writing about two decisions, split into two ADRs.
+1. **Keep one coherent decision scope per ADR.** Split independently revisitable choices; keep coupled choices together when separating them would hide the real trade-off.
 2. **Include all required fields** (Status, Date, Reversibility, Confidence, Validated-as-of, Context, Decision, Alternatives, Consequences). Optional fields are included when relevant.
 3. **Have honest Confidence levels.** A `Low` confidence ADR is not a bad ADR — it is honest. The alternative is pretending high confidence and being wrong.
 4. **Cite evidence** for any claim that depends on current vendor / framework / pricing reality. Skip the citation only when the claim is universal architecture knowledge (e.g., "Postgres supports ACID transactions").
-5. **Keep length 1-2 pages.** If the ADR is longer, the decision is probably too coupled or the writer is over-explaining.
-6. **Never edit an Accepted ADR.** If the decision changes, write a new ADR with `Supersedes`. The old ADR's status becomes `Superseded by ADR-NNNN` — that is the only edit allowed.
+5. **Prefer a concise decision record.** Move deep analysis and rollout detail to linked artifacts when that improves comprehension; use the length the decision needs.
+6. **Preserve accepted rationale as history.** Supersede a changed decision with a new ADR. A governed repository may still update factual metadata, status, backlinks, ownership, or discovered consequences without rewriting what was decided; record material amendments visibly.
+7. **Name evaluation and change triggers.** An accepted decision without an owner, evidence path, or reconsideration condition cannot be governed.

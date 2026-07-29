@@ -1,5 +1,26 @@
 # TASK-1455 — Globe Internal Launch and Brand Shell
 
+## Delta 2026-07-25 — el encuadre de "piloto" queda SUPERSEDED
+
+Esta task quedó como el **origen documental** del término `piloto interno` en el copy de Globe. Cuatro de sus
+líneas encuadran el producto como piloto y hoy están **superseded por ADR-010** (*"Efeonce Globe is now a
+**commercial product**, not an internal lab"*) y por `TASK-1524` (que retira ese copy de la superficie visible):
+
+- **:41** *"Mantener explícitos los límites: piloto interno, no Production…"* → lo correcto es **"despliegue
+  internal-only, no Production"**. El límite de rollout es verdadero; llamarlo piloto no.
+- **:57** *"El estado funcional debe ser honesto: 'piloto interno / foundation active'…"* → la intención (no
+  prometer capability inexistente) sigue vigente; el vehículo no. **NUNCA** expresar honestidad de estado como
+  lenguaje de piloto/lab. `TASK-1524` lo revierte explícitamente: *"Copy visible no contiene `piloto`,
+  `internal`, `foundation`"*.
+- **:131** *"nomenclatura canónica 'Efeonce Globe', 'piloto interno', 'Greenhouse'"* → **el peor**: declaraba
+  `piloto interno` como **nomenclatura de producto**, al mismo nivel que la marca. El estado de despliegue
+  **NUNCA** es nomenclatura de producto.
+- **:262** fila de riesgo *"Piloto parece producto completo"* → el riesgo está invertido: hoy el riesgo comercial
+  es que **el producto se perciba como piloto**.
+
+No se reescribe la historia de lo que se implementó: la task se ejecutó correctamente para su momento. Lo que
+queda anulado es su vocabulario de encuadre.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

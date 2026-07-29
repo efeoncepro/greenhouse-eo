@@ -15,5 +15,5 @@ contratos de datos.
 | [`data-contracts.md`](data-contracts.md) | Contratos versionados: `knowledge-search.v1`, `nexa-evidence.v1`, render plan, governance del prompt |
 
 **Mantenimiento:** estos docs están en el [`manifest.json`](../manifest.json) y los cubre el gate
-`pnpm nexa:doc-gate`. Al cambiar modelos, técnica de retrieval o un contrato, actualizá el doc técnico
+`pnpm nexa:doc-gate`. Al cambiar modelos, técnica de retrieval o un contrato, actualiza el doc técnico
 correspondiente en el mismo cambio.

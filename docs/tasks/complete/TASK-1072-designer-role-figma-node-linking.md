@@ -90,7 +90,7 @@ en una tabla SSOT — reemplazando el registro TS hardcodeado por data-driven.
 **Separación de planos (canónica)**:
 - **Ver el Design System** = plano **views** (`plataforma.design_system`, todo interno).
 - **Vincular un nodo** = plano **entitlements** (`design_system.figma_node.link`, solo `designer` + admin).
-- Un colaborador no-diseñador ve el DS + ve el botón disabled, pero **no** ve el affordance de vincular (tooltip honesto "pedile a un diseñador").
+- Un colaborador no-diseñador ve el DS + ve el botón disabled, pero **no** ve el affordance de vincular (tooltip honesto "pídele a un diseñador").
 
 **`capturar el nodo` partido en dos** (no acoplar el write a la API de Figma):
 - **V1 = link-only**: parse + validar AXIS + upsert. El botón se activa. Síncrono.

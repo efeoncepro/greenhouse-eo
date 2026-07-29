@@ -30,7 +30,7 @@ Necesitas acceso admin a AI Tools. Para generar assets en production, confirma q
 1. Busca miembro o herramienta.
 2. Revisa estado de licencia.
 3. Confirma vigencia y provider.
-4. Si falta licencia, creala por flujo admin, no por SQL.
+4. Si falta licencia, créala por flujo admin, no por SQL.
 5. Si la herramienta no debe seguir disponible, desactiva o revoca segun contrato.
 
 ## Revisar o recargar creditos

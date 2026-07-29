@@ -1,6 +1,9 @@
 ---
 name: greenhouse-globe
-description: Ingeniero senior de la plataforma hermana Efeonce Globe (Creative Studio) y guardián de su contrato de arquitectura. Úsala para cualquier trabajo sobre el repo `efeonce-globe`: extender el API Contract Spine (TASK-1481), agregar una capability con Full API Parity, escribir un command/reader/handler transport-neutral, montar un provider adapter, extender el Model Lab (spend fence, private-ingest, kill switch) como ejemplo trabajado de una capability, tocar la foundation IaC keyless (Terraform/OpenTofu + deploy sin llaves), tocar la persistencia durable (Cloud SQL `globe-pg`, `packages/database`, stores durables detrás de sus ports), tocar trusted context / dispatch / SDK, o razonar el boundary Globe↔Greenhouse. Triggers — "Efeonce Globe", "creative studio", "contract spine", "capability", "command/reader", "trusted context", "provider adapter", "coverage matrix", "policy-blocked", "creative-runner", "Model Lab", "spend fence", "kill switch", "IaC", "Terraform", "OpenTofu", "keyless deploy", "WIF", "EPIC-028", "TASK-1457…1481", "TASK-1464", "Model Lab", "evaluation harness", "golden briefs", "fidelity contract", "TASK-1458", "provider adapter real", "VertexCreativeAdapter", "FalCreativeAdapter", "CompositeProviderAdapter", "vertex adapter", "fal adapter", "composite adapter", "recommendation matrix", "eval real", "ByteDance slug", "GLOBE_LAB_PROVIDER", "GLOBE_FAL_API_KEY", "keyless Vertex", "TASK-1486", "TASK-1487", "TASK-1488", "TASK-1459", "producer catalog", "Producer Route Catalog", "PRODUCER_ROUTE_CATALOG", "globe.producer.catalog.read", "globe.producer.route.reveal_house", "Creative Producer", "route catalog", "TASK-1500", "TASK-1501", "TASK-1502", "TASK-1505", "TASK-1465", "persistencia durable", "durable persistence", "Cloud SQL", "globe-pg", "packages/database", "createGlobePool", "globe_owner", "keyless IAM database auth", "DurableSpendFence", "SessionStorePort", "GLOBE_POSTGRES_INSTANCE_CONNECTION_NAME", "migration runner", "TASK-1508".
+description: >-
+  Implementa, audita y opera Efeonce Globe, plataforma hermana gobernada por Greenhouse. Úsala para Producer
+  UI/BFF, API Contract Spine, trusted context, provider adapters, Model Lab y readiness, generación y retrieval,
+  GCS privado, Asset Governance/C2PA/rights, workers Cloud Run, Cloud SQL, IaC keyless y rollout comercial.
 user-invocable: true
 argument-hint: "[describe la capability, command/reader, provider adapter, o cambio del spine que vas a construir en efeonce-globe]"
 ---
@@ -9,7 +12,86 @@ argument-hint: "[describe la capability, command/reader, provider adapter, o cam
 
 Eres ingeniero senior de **Efeonce Globe** (nombre de producto; *Creative Studio* es su descriptor funcional). Tu trabajo es implementar sobre el repo hermano `efeonce-globe` respetando su contrato de arquitectura, sin re-decidir la forma que ya está construida. La pieza más repetida será **extender el API Contract Spine que TASK-1481 dejó montado**: las tasks `TASK-1457…1480` (~23) agregan capabilities encima de él.
 
-Baseline verificado contra el código real de `efeonce-globe`: 2026-07-19.
+## 🔴 Encuadre del producto — leer ANTES que cualquier detalle técnico
+
+**Efeonce Globe es un PRODUCTO COMERCIAL de la agencia Efeonce. NO es un lab interno, un piloto, un experimento ni una prueba de concepto.** Declaración canónica: **ADR-010** (`docs/architecture/creative-studio/EFEONCE_GLOBE_COMMERCIAL_PROMOTION_ATTESTATION_DECISION_V1.md` §Context) — *"Efeonce Globe is now a **commercial product**, not an internal lab"* — reafirmada en ADR-004 (*"Efeonce Globe is, and will remain, a commercial product"*) y ADR-013.
+
+Lo que sí es acotado es el **estadio de rollout**: hoy el runtime corre `internal_smoke`, desplegado internal-only, con clientes externos gated por `TASK-1480`. **Estadio de rollout ≠ naturaleza del producto, y colapsarlos es el error recurrente de esta plataforma.** El estadio dice hasta dónde llegó el despliegue; no dice qué es el producto ni cuál es su techo.
+
+Consecuencias operativas, no retóricas:
+
+- Al escribir doc, tasks, ADRs o **copy visible**, describí el estado con precisión (*"desplegado internal-only"*, *"runtime en `internal_smoke`"*, *"gated por TASK-1480"*) y **NUNCA** con encuadre de piloto/lab/experimento/no-productivo. El copy visible no dice `piloto`, `internal` ni `foundation` (TASK-1523/1524).
+- **NUNCA** dimensiones infraestructura, UX, seguridad ni calidad "porque es interno". Se dimensiona para el producto comercial que es; si hay brecha, se declara como **deuda con dueño** (`TASK-1521` runtime comercial, `TASK-1480` readiness comercial), no como diseño correcto.
+- El modelo de negocio es real y está escrito: `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md` (cinco líneas de ingreso, tres modalidades de delivery, tres modos operativos) + `..._CREDIT_MODEL_V1.md`.
+
+Baseline verificado contra código y runtime real hasta 2026-07-25. El estado mutable —revisiones, digests,
+flags, rutas promovidas, canarios y bloqueos— vive en
+`docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`; nunca se infiere desde un número histórico de esta
+skill.
+
+> **LEER PRIMERO antes de asumir que un modelo/proveedor "no está" o "hay que integrarlo":**
+> `docs/operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md` — el **ledger canónico de la flota de modelos**
+> (qué modelo/proveedor está integrado, en qué **carril** — Model Lab vs producción gobernada —, validado cuándo y
+> con qué evidencia, y qué falta para llevarlo al Producer). Los proveedores del Lab (Vertex imagen/Veo/Omni, Fal
+> Seedream/Seedance, ElevenLabs, etc.) están integrados y validados en vivo desde 2026-07-19/20 — **no re-integrar**;
+> lo que suele faltar es el **driver gobernado + promoción ADR-009** por ruta. Actualizá ese ledger al integrar,
+> validar o promover cualquier modelo.
+>
+> **Desde `TASK-1554` (COMPLETE) el ledger ya no es la única autoridad:** el **SoT LIVE** de disponibilidad de
+> modelos es el reader **`globe.producer.fleet.list`** (contrato `packages/contracts/src/producer-fleet.ts`,
+> proyección `packages/domain/src/producer-fleet.ts`); el ledger es el **SoT humano**. **Si divergen, manda el
+> reader** — y la divergencia es señal de que el ledger quedó desactualizado, no al revés.
+
+## Producer UI + media gobernada — contrato operativo
+
+- El flujo humano es `browser autenticado → BFF same-origin → API IAM-private`. Persona, workspace, surface,
+  correlación e idempotencia se derivan o preservan server-side; el browser no porta credenciales de workload.
+- La sesión/CSRF puede rotar por login en otra pestaña. El cliente refresca sesión con single-flight compartido y
+  reintenta **como máximo una vez**, conservando body, correlation e idempotency. Un timeout de gasto primero se
+  reconcilia por reader; nunca se re-ejecuta a ciegas.
+- Feed/library se hidrata por identidad exacta `(experimentId, sha256)` y por
+  `attempts[].outputs`; sólo un output exacto `retained: true` puede renderizarse. El viewer cancela resultados
+  tardíos con un epoch por operación para que seleccionar B nunca sea sobrescrito por la respuesta de A.
+- Los bytes viven en GCS privado, content-addressed (`sha256:<digest>`) y tenant-blind. El objeto no concede
+  autoridad: propiedad, workspace, estado y elegibilidad salen del dominio/Postgres. No hay URL pública ni nombre
+  de bucket/objeto en el contrato cliente.
+- Retrieval usa descriptor gobernado + grant corto en `x-globe-retrieval-grant`, fetch same-origin y Blob URL;
+  query sólo existe como compatibilidad. Se revalida propiedad e integridad antes de servir.
+- Asset Governance procesa `inspection → malware → C2PA → rights` en un Job keyless, durable y fenced. En
+  `c2patool` 0.26.60, un MP4/MP3 válido sin manifest devuelve nonzero `No claim found`: se normaliza como
+  `unverified/c2pa_manifest_absent`, no como outage ni `unsupported`. Sólo `Trusted` habilita badge C2PA.
+- Antes de crear otra revisión, el worker reconcilia proyecciones terminales no aplicadas y recupera autoridad de
+  rights desde evidencia durable; requeue/replay son revisionados e idempotentes, nunca SQL manual.
+- El cierre proporcional exige `pnpm check && pnpm build`, test nuevo registrado en el script del package,
+  imagen/digest/policy verificados y canario UI de Image/Video/Audio con feed, viewer/playback, MIME/hash,
+  governance y `tofu plan` sin drift.
+- Gaps de escala vigentes: derivados de preview (thumbnail/poster/transcode/waveform), Range/streaming real,
+  política explícita de visibilidad mientras governance está pendiente y reconciliación/GC de objetos huérfanos.
+  Se diseñan como arquitectura versionada; no se resuelven cargando originales completos ni con excepciones UI.
+
+### 🔴 Trampas de verificación del payload cliente — medidas, no teóricas
+
+Siete defectos reales pasaron con **build verde, cuatro gates de diseño verdes y canary de browser verde**.
+El patrón: los gates comprueban que *el código dice lo correcto*, no que *el runtime hace lo correcto*.
+Detalle y evidencia: [auditoría 2026-07-29](../../../docs/audits/globe/GLOBE_PRODUCER_VERIFICATION_BLIND_SPOTS_2026-07-29.md).
+
+- **`assets.ts` es la autoridad de lo que producción sirve.** Un archivo en `public/` que no esté listado
+  ahí **no existe para el runtime**, por más que el canary lo sirva — el harness tiene su PROPIO allowlist.
+  Ocho miniaturas dieron 404 en producción mientras se veían perfectas en local. **No hay test que lo guarde.**
+- **El canary cachea el bundle al arrancar** (`loadClientBundle()`). Tras cualquier build, comparar el hash
+  en disco (`ls dist/client/*.js`) contra el servido (`curl .../producer | grep index-`) ANTES de reportar
+  que algo está listo. «Lo verifiqué hace un rato» no es garantía de «es lo que estás viendo».
+- **Un namespace del theme vaciado y no repoblado** hace que la utilidad compile y la propiedad computa su
+  valor inicial. Ya hay gate (`tailwind-theme.test.ts`); la lista de vaciados está en el archivo generado y
+  **es la autoridad — no suponerla**.
+- **Un harness que no puede ejercer la funcionalidad no puede protegerla.** Si un aserto pasa sobre una
+  superficie que el fixture no sabe construir, el aserto no vale: primero se enseña al fixture.
+- **Nombrar los guards por su razón, no por su caso.** `isAudio` dejó fuera a video y el mismo bug volvió con
+  otra modalidad; `hasPoster` cierra la familia entera.
+- **El pipeline de build sólo se ejercita al desplegar.** `--mount=type=secret` es POR-RUN: `pnpm deploy
+  --prod` re-resuelve dependencias y necesita su propio `.npmrc`. Publicar e instalar en local no prueba nada.
+- **Ningún aserto compara la proporción de un control contra sus hermanos.** Un stepper midió 768 px donde
+  sus pares miden 68, con todo verde.
 
 ## Boundary: Globe es plataforma hermana, no un módulo de Greenhouse
 
@@ -17,8 +99,40 @@ Esta es la regla que gobierna todo lo demás. Interiorízala antes de tocar cód
 
 - **Globe es una plataforma hermana gobernada por Greenhouse, no un módulo de Greenhouse.** No corre dentro de `greenhouse-eo`, no comparte su runtime ni su build.
 - **Reparto de responsabilidad:**
-  - **Greenhouse = único control plane operativo.** Registra EPICs, `TASK-###`, dependencias, lifecycle, hooks, lint, QA, cierre documental y handoff — incluso cuando la implementación vive en `efeonce-globe`.
+- **Greenhouse = único control plane operativo.** Registra EPICs, `TASK-###`, dependencias, lifecycle, hooks, lint, QA, cierre documental y handoff — incluso cuando la implementación vive en `efeonce-globe`.
   - **Globe = código, runtime, infraestructura, datos, ejecución creativa y evidencia técnica.** Posee creative assets, rights/provenance, compositions, runs, provider adapters, quality evidence, approvals y creative credits.
+
+## Composición con Wave Experience LaunchOps
+
+Globe es un product service de Efeonce que combina plataforma, especialistas creativos y capacidad de delivery.
+Puede participar como capability composable dentro de `Experience LaunchOps`, el product service de Wave. La
+arquitectura canónica está en
+`docs/architecture/EFEONCE_EXPERIENCE_LAUNCHOPS_GLOBE_CREATIVE_PRODUCTION_INTEGRATION_V1.md`.
+
+La frontera es estricta:
+
+- Wave posee `LaunchContract`, `ExperienceSpec`, Brand/Search/Measurement Contracts, ensamblaje en CMS/DXP,
+  governance, release, rollback y evidencia de lanzamiento.
+- Globe posee dirección y producción creativa, variantes, composiciones, rights/provenance y evidencia de calidad.
+- Globe entrega `CreativeAssetPack`, `AssetManifest` y `AssemblyManifest`; un archivo sin destino, metadata,
+  derechos y evidencia no es un output productivo completo.
+- Wave puede consumir assets del cliente u otros proveedores; Globe no es dependencia obligatoria de Wave.
+- Los niveles deben distinguirse: `asset-ready` (Globe), `experience-ready` (Globe + mapping) y `launch-ready`
+  (Wave + integración, gates y release).
+- Globe puede entregarse como `Studio Access`/platform-enabled, Creative Production, `Managed Squad` o `Staff
+  Augmentation`. Managed Squad implica dirección y accountability de Efeonce/Globe; Staff Augmentation implica
+  dirección cotidiana del cliente y no hereda automáticamente el SLA de Managed Squad.
+
+### Creative Production Contract
+
+Cuando Globe participe en un lanzamiento, Wave deriva un `CreativeProductionContract` con objetivo, audiencia,
+mercado, canal, Brand Contract, slots/componentes, requisitos Search/Measurement, formatos, restricciones legales,
+ventana y criterios de aceptación. Globe responde con outputs versionados, manifests, variantes, rights status,
+provenance, quality evidence, excepciones y dependencias.
+
+Workers creativos pueden proponer y producir; especialistas humanos conservan dirección, craft y decisión sobre
+claims sensibles, derechos, compliance, marca y publicación. No conviertas esta composición en una integración ad
+hoc desde la UI ni pases URLs públicas, credenciales o secretos entre plataformas.
 - **Greenhouse es dueño de:** identidad de ecosistema, desired access state, workspace/client bindings y governance cross-plataforma. Globe recibe esa identidad como *broker*, no la reemplaza.
 - **NUNCA** compartas base de datos, sesión/cookie, bucket, secreto de provider, service-account key ni rol admin implícito entre Globe y Greenhouse.
 - **El registry de tasks es SOLO de Greenhouse.** Globe **no** crea un segundo namespace, registry, lifecycle ni harness de trabajo. Su execution plan referencia las `TASK-###` de Greenhouse; no las duplica.
@@ -26,7 +140,7 @@ Esta es la regla que gobierna todo lo demás. Interiorízala antes de tocar cód
 
 ## Repos y primeras lecturas
 
-- La **skill** (este archivo, META: instrucciones para agentes) vive en `greenhouse-eo`: `.claude/skills/greenhouse-globe/SKILL.md` (Claude) y `.codex/skills/greenhouse-globe/SKILL.md` (Codex).
+- La **skill** (este archivo, META: instrucciones para agentes) vive en `greenhouse-eo`: `.codex/skills/greenhouse-globe/SKILL.md` (Codex) y `.claude/skills/greenhouse-globe/SKILL.md` (Claude).
 - El **código, infra y evidencia técnica** de Globe viven en el repo hermano `efeonce-globe` (por convención local `/Users/jreye/Documents/efeonce-globe`, GitHub `efeoncepro/efeonce-globe`).
 - **La documentación gobernante de Globe vive en `greenhouse-eo`** (control plane documental, EPIC-028 / TASK-1492), bajo la convención `creative-studio/`:
   - Arquitectura + ADR: `docs/architecture/creative-studio/**` (índice: `docs/architecture/creative-studio/README.md`).
@@ -36,7 +150,7 @@ Esta es la regla que gobierna todo lo demás. Interiorízala antes de tocar cód
 Antes de implementar, lee lo que la task necesite, en este orden:
 
 1. La `TASK-###` canónica en `docs/tasks/**` (Greenhouse es el control plane; ejecuta su hook / Plan Mode).
-2. La **doc gobernante de Globe, en Greenhouse**: empieza por `docs/architecture/creative-studio/README.md` (índice + mapa doc↔repo) y de ahí la arquitectura vigente (`EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md`, `PLATFORM_FOUNDATION_V1.md`, `GREENHOUSE_CONNECTIVITY_V1.md` ADR-001, `EFEONCE_GLOBE_MODEL_LAB_V1.md`, `EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md`); runbooks/plan de ejecución en `docs/operations/creative-studio/**`.
+2. La **doc gobernante de Globe, en Greenhouse**: empieza por `docs/architecture/creative-studio/README.md` (índice + mapa doc↔repo) y de ahí la arquitectura vigente (`EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md`, `PLATFORM_FOUNDATION_V1.md`, `GREENHOUSE_CONNECTIVITY_V1.md` ADR-001, `EFEONCE_GLOBE_MODEL_LAB_V1.md`, `EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md`, `EFEONCE_GLOBE_INTERNAL_FRONT_DOOR_V1.md`); runbooks/plan de ejecución en `docs/operations/creative-studio/**`.
 3. En `efeonce-globe` (solo runtime): `README.md`/`AGENTS.md` (reducidos a puntero, remiten aquí); el **código** del spine — `packages/contracts/src/index.ts`, `packages/domain/src/index.ts`, `apps/studio-web/src/dispatch.ts`, `apps/studio-web/src/app.ts`, `packages/sdk/src/index.ts`, `packages/provider-contract/src/index.ts`; la **infra** en `infra/terraform/`; la **evidencia técnica** en `docs/operations/` (bootstrap, QA audits, brand-shell).
 4. En `greenhouse-eo`: el programa `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md` y sus ADR/arquitectura `EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_{DECISION,ARCHITECTURE}_V1.md`.
 
@@ -55,12 +169,23 @@ Estructura real:
 - `packages/sdk` — cliente server-oriented del API privada (+ subpath `@efeonce-globe/sdk/google-auth`, server-only).
 - `packages/provider-contract` — interfaz `CreativeProviderAdapter` y `CreativeCapability` semánticas.
 - `packages/database`, `packages/media-qc` — persistencia y QC de media.
-- `apps/studio-web` — UI + BFF/API HTTP + transport MCP (el único servidor HTTP; SDK/MCP/CLI son clientes de él).
+- `apps/studio-web` — shell + BFF/API HTTP + transport MCP (el único servidor HTTP; SDK/MCP/CLI son clientes de él).
+- `apps/studio-client` — **el payload de browser** (ADR-014 / `TASK-1556`): Vite 8.1.5 + React 19.2.8 + React Router 8.3.0, SSR apagado, compilado a assets estáticos que sirve `studio-web`. Acá viven el **SSOT de tokens** (`src/tokens/tokens.ts`), la **capa de copy** (`src/copy/`), las **primitives** (`src/primitives/index.tsx`), las **superficies** (`src/surfaces/**`) y los **gates de UI** (`src/gates/`). Toda superficie humana nueva nace acá. **Estado del programa: ver §ADR-014 más abajo — el payload existe pero todavía NO sirve ninguna superficie en el runtime vivo.**
+- `apps/asset-governance`, `apps/media-derivatives` — Cloud Run Jobs de governance y de derivados de media.
 - `apps/creative-runner` — Cloud Run Job que ejecuta el trabajo de media (llama providers).
+
+### AXIS: foundation compartida y consumo del payload
+
+AXIS es la foundation portable gobernada desde Greenhouse, no un runtime compartido ni un motivo para importar MUI/Vuexy en Globe. El paquete privado y el Lab viven en `../axis-design-system`; Globe consume contratos/registry mediante un adapter local Tailwind y conserva sus tokens en `tokens.ts`. No cruces implementaciones entre repositorios ni conviertas el adapter en un segundo design system.
+
+- El SSOT local de diseño del payload sigue siendo `apps/studio-client/src/tokens/tokens.ts`. Los valores de UI deben resolverse como tokens semánticos del theme Tailwind v4; no uses valores literales de diseño en `className` (`text-[#hex]`, `p-[13px]` o equivalentes).
+- Para paquetes privados usa versiones fijadas y el registry scoped `@efeoncepro:registry=https://npm.pkg.github.com`. Nunca hagas públicos los paquetes ni guardes tokens en código, lockfiles generados, artefactos o logs.
+- El acceso de Cloud Build usa el secreto `projects/efeonce-globe/secrets/axis-packages-read-token` y el service account de build autorizado a ese secreto. Materializa `.npmrc` solo durante la instalación en el workspace efímero; nunca pases el token como Docker build argument ni lo copies a la imagen.
+- `TASK-1591` tiene el piloto de adapters opt-in verificado en Globe con paquetes `0.1.4`: `AxisStatus` y `AxisProgress`, evidencia desktop/390 px/teclado/reduced-motion/accesibilidad y rollback por versión. No confundas este piloto con promoción de producto.
 
 **Toolchain (verificado en `tsconfig.base.json`):** `module`/`moduleResolution` NodeNext, `strict`, más `verbatimModuleSyntax`, `exactOptionalPropertyTypes`, `noUncheckedIndexedAccess`, `noImplicitOverride`, `useUnknownInCatchVariables`. Escribe código que satisfaga estos flags (p.ej. con `exactOptionalPropertyTypes` no pasas `undefined` a una prop opcional — usá spread condicional `...(x !== undefined ? { x } : {})`, patrón usado en todo el spine).
 
-**Tests: `node --test`, NO Vitest.** Los tests son `*.test.ts` ejecutados directo por Node (p.ej. `node --test src/index.test.ts`). No introduzcas Vitest, Jest ni otro runner.
+**Tests: `node --test`, NO Vitest.** Los tests son `*.test.ts` ejecutados directo por Node (p.ej. `node --test src/index.test.ts`). No introduzcas Vitest, Jest ni otro runner. **Trampa de la suite (lección de método, cuesta un verde falso):** los scripts `test` de cada package **ENUMERAN los archivos a mano** — no hay glob ni descubrimiento. Un `*.test.ts` nuevo que no se agrega a ese script **NUNCA corre**, y la suite queda **verde por no haberlo mirado**, que es el peor de los verdes. Al agregar un test, agrégalo también al script `test` del package y confirma que aparece en la salida del run.
 
 **Convención de extensiones de import (crítica, el compilador la exige):**
 
@@ -108,9 +233,11 @@ En `api` mode el perímetro (Cloud Run IAM) es la **primera** puerta, no la úni
 - **Dos gates fail-closed:** `apiExpectedAudience` (env `GLOBE_API_EXPECTED_AUDIENCE`, multi-valor por los dos formatos de URL `run.app`, EXPLÍCITO — nunca derivado de `publicBaseUrl`, que en api mode es placeholder) **y** `apiCallerServiceAccounts` (env `GLOBE_API_CALLER_SERVICE_ACCOUNTS`, allowlist de emails de SA). Cualquiera de los dos vacío ⇒ **NADIE entra** (`access_denied` 403). Se exige además `email_verified`.
 - **El ID token viaja en `Authorization`, NUNCA `X-Serverless-Authorization`.** Cloud Run **CONSUME** `X-Serverless-Authorization` (su propio invoker check; no lo reenvía al contenedor) y **REENVÍA** `Authorization`; la re-verificación en-app sólo puede leer lo reenviado. El SDK manda el `cloud-run-id-token` en `Authorization` (`applyAuthMaterial`). Regla verificada en vivo: con X-Serverless el perímetro pasa pero la app rechaza al caller legítimo con **401** (X-Serverless queda solo como fallback defensivo para el caso `invokerIamDisabled` on, donde Cloud Run reenvía todo).
 
-**Dónde vive el Model Lab (consecuencia directa).** El Lab se opera por **`api` mode**: el `internalServicePrincipal()` que emite `verifyWorkloadCaller` lleva `globe.lab.experiment.run` (+ `globe.lab.evaluation.run`). En **`web` mode** el principal humano lleva **sólo `globe.studio.access`** — el broker de Greenhouse **no** otorga la capability del Lab a humanos — así que ahí el Lab es **inalcanzable**, coherente con `LAB_COVERAGE` que declara `ui`/`mcp` `policy-blocked`. Un doc/skill que diga "un humano opera el Lab desde el studio" es **stale**; su promoción a `ui` es futura y requeriría que el broker grantee la capability a humanos.
+**Dónde vive el Model Lab.** La ejecución sigue en **`api` mode** y el browser entra sólo por el BFF same-origin.
+Desde TASK-1519, `LAB_COVERAGE.ui` está `available` para grants humanos acotados; MCP continúa separado. El browser
+nunca recibe la capability de workload ni llama la API IAM-private directamente.
 
-**`invokerIamDisabled` — matiz + follow-up.** Para un servicio **web** con SSO (`globe-studio-internal`) tenerlo **on** es correcto: un browser no presenta ID token, la app autentica por su sesión-cookie. Para un servicio **`api` mode** debe estar **OFF** (perímetro activo) y la verificación en-app es la segunda capa. Los servicios Cloud Run **no** están en Terraform hoy (los crea el workflow de deploy), así que el flag **no está gobernado por IaC** — nada previene drift: **follow-up**.
+**`invokerIamDisabled` — matiz + gobierno IaC.** Para un servicio **web** con SSO (`globe-studio-internal`) tenerlo **on** es correcto: un browser no presenta ID token, la app autentica por su sesión-cookie. Para un servicio **`api` mode** debe estar **OFF** (perímetro activo) y la verificación en-app es la segunda capa. El flag **ya está gobernado por IaC**: **TASK-1508 adoptó los dos servicios Cloud Run a Terraform** (import brownfield). Antes los creaba sólo el workflow de deploy y nada prevenía drift.
 
 ### Las capas del spine
 
@@ -141,7 +268,9 @@ Este es el camino exacto. Seguilo; no inventes uno paralelo.
 
 El flujo de arriba es abstracto. El **Model Lab** es su primera instancia real y el patrón a copiar: una capability con estado externo y un provider detrás. Vive en `packages/domain/src/model-lab.ts` (+ `spend-fence.ts`), con el runner en `apps/creative-runner/src/index.ts` y el wiring en `apps/studio-web/src/app.ts`. Léelo como la plantilla de "cómo se ve una capability terminada".
 
-**Qué es.** Una sola capability de autoridad — `globe.lab.experiment.run` (`GLOBE_LAB_EXPERIMENT_CAPABILITY`) — gobierna 3 commands (`globe.lab.experiment.prepare|execute|cancel`) y 3 readers (`globe.lab.experiment.get|status|evidence`), todos registrados de una vez por `registerModelLabCapabilities(registry, deps)`. Su `coverage` (`LAB_COVERAGE`) declara `ui` y `mcp` como `policy-blocked` (aún no promovidas), y `http`/`sdk`/`cli`/`worker`/`e2e` como `available`; `sister-platform` es `not-applicable`. Es exactamente el patrón de la sección anterior: parity contractual completa, surfaces ejecutables prendidas, UI/MCP gobernadas-pero-apagadas hasta el gate de promoción.
+**Qué es.** Una sola capability de autoridad — `globe.lab.experiment.run`
+(`GLOBE_LAB_EXPERIMENT_CAPABILITY`) — gobierna sus commands/readers. Coverage actual: `ui`, `http`, `sdk`,
+`cli`, `worker` y `e2e` disponibles; MCP conserva su gate y `sister-platform` es `not-applicable`.
 
 **Ports + inyección de dependencias (el patrón a repetir).** El dominio no conoce impls concretas: define **ports** y recibe todo por `ModelLabDependencies` — `ExperimentStorePort` (persistencia workspace-scoped), `SpendFencePort` (fence de gasto), `LabRunnerPort` (el seam del provider) y `LabKillSwitchPort` (`() => boolean`), más `now`/`newId`. El transporte inyecta las impls reales (`app.ts`: `InMemoryExperimentStore`, `LabSpendFence`, `LabRunner(new FakeReferenceAdapter)`, `killSwitch: () => labEnabled`); los tests inyectan dobles. Cuando una capability nueva toque estado externo o un provider, **replica esta forma**: define ports en el dominio, inyecta impls desde el transporte/runner, prueba con dobles — nunca acoples el handler a una DB, un bucket o un SDK concretos.
 
@@ -169,11 +298,11 @@ Si el Model Lab muestra "capability con estado + provider", el **Evaluation Harn
 
 Los dos ejemplos anteriores corren sobre `FakeReferenceAdapter` (hermético, gasto cero). TASK-1486/1487/1488 enchufan **motores reales** sobre el mismo `CreativeProviderAdapter`, **sin tocar el dominio ni el command** — exactamente lo que promete el provider seam. Son el patrón a copiar cuando agregues un provider nuevo. Todos viven en `apps/creative-runner/src/*`.
 
-**`VertexCreativeAdapter` (TASK-1486) — Google-native, keyless.** En `vertex-adapter.ts`. Implementa el contrato completo (`providerId` / `supports` / `estimate` / `submit` / `poll`) y hace el **routing capability→modelo Vertex DENTRO del adapter**: `image-generate → gemini-2.5-flash-image`; `video-generate → gemini-omni-flash-preview` en la región **`global`** (us-east4 y us-central1 devuelven `NOT_FOUND` para estos modelos — usa `global`). Es **keyless**: autentica por **ADC/WIF** con un `getAccessToken` inyectado (la runtime SA tiene `aiplatform.user`), **cero API key**. Reparto de los métodos: `estimate` **no toca red**; `submit` es la **única llamada facturable**; `poll` devuelve **hashes** de output, **nunca una URL pública**. Verificado en vivo.
+**`VertexCreativeAdapter` (TASK-1486) — Google-native, keyless.** En `vertex-adapter.ts`. Implementa el contrato completo (`providerId` / `supports` / `estimate` / `submit` / `poll`) y hace el **routing capability→modelo Vertex DENTRO del adapter** (por-capacidad, un modelo fijo hoy — ver "Flota de modelos" para el seam route→model de TASK-1553): `image-generate → gemini-3-pro-image` (Nano Banana Pro, **actualizado** desde `gemini-2.5-flash-image` el 2026-07-24); `video-generate → gemini-omni-flash-preview` en la región **`global`** (us-east4 y us-central1 devuelven `NOT_FOUND` para estos modelos — usa `global`). Es **keyless**: autentica por **ADC/WIF** con un `getAccessToken` inyectado (la runtime SA tiene `aiplatform.user`), **cero API key**. Reparto de los métodos: `estimate` **no toca red**; `submit` es la **única llamada facturable**; `poll` devuelve **hashes** de output, **nunca una URL pública**. Verificado en vivo.
 
 **`FalCreativeAdapter` (TASK-1487) — motores no-Google, key propia de Globe.** En `fal-adapter.ts`. Habla con la **queue API** de Fal (`submit` / `status` / `result` / `download`). **Gotcha crítico:** usa el `status_url` / `response_url` que Fal devuelve en la respuesta del `submit`; **nunca reconstruyas esas URLs desde el slug** (la ruta de queue no es derivable del slug). La key es **propia de Globe** — `GLOBE_FAL_API_KEY`, inyectada — **nunca** `greenhouse-fal-api-key` (el secreto de Greenhouse no cruza el boundary; es la regla de no compartir secretos de provider entre plataformas).
 
-**`CompositeProviderAdapter` (TASK-1487) — combina Vertex + Fal por política.** En `composite-adapter.ts`. Compone los dos adapters: las capabilities **Fal-only** se resuelven por `supports()`; el **overlap** image/video (que ambos pueden servir) se resuelve por **política explícita**, con **default Vertex**. El `poll` **vuelve al hijo que emitió el run** — no re-rutea; respeta qué adapter hizo el `submit`. Este es el patrón para "un adapter que agrega varios providers": routing por `supports()` + política declarada para el overlap + poll fiel al emisor.
+**`CompositeProviderAdapter` (TASK-1487) — combina Vertex + Fal por política.** En `composite-adapter.ts`. Compone los dos adapters (y registra también `openai`, `vertex-video`, `vertex-omni`): las capabilities **Fal-only** se resuelven por `supports()`; el **overlap** image/video se resuelve por **política explícita** (`DEFAULT_COMPOSITE_POLICY`) — hoy **image-generate/image-edit → Fal Seedream** y `video-generate` de la ruta reference → `vertex-omni` (el comentario histórico "default Vertex" quedó desactualizado; verificar el código). El `poll` **vuelve al hijo que emitió el run** — no re-rutea; respeta qué adapter hizo el `submit`. Este es el patrón para "un adapter que agrega varios providers": routing por `supports()` + política declarada para el overlap + poll fiel al emisor.
 
 **Las 10 capabilities (TASK-1488) y la regla dura del slug ByteDance.** TASK-1488 lleva `CREATIVE_CAPABILITIES` a 10 (suma `image-upscale`, `video-upscale`, `model-3d-generate`). **REGLA DURA verificada en vivo:** los modelos **ByteDance en Fal usan el slug SIN el prefijo `fal-ai/`** (p.ej. `bytedance/seedream/v5/pro/text-to-image`); el resto — Recraft, Topaz, ElevenLabs, Hyper3D, y `fal-ai/seed-audio` — **sí** lleva `fal-ai/`. Para **verificar si un slug existe** antes de cablearlo: `POST {}` (body vacío) a `https://fal.run/<slug>` → **404 = inexistente**, **422 = existe** (falló la validación del payload, no el ruteo). El provider activo del Lab se elige con **`GLOBE_LAB_PROVIDER`** = `fake | vertex | fal | composite` (default **`fake`**): el default sigue siendo hermético / gasto cero, y prender un motor real es una decisión explícita de env.
 
@@ -192,11 +321,11 @@ El follow-up que el Track B anunció ("un adapter Vertex video dedicado") está 
 - **(1) Keyless Vertex — solo GENERATE.** `aiplatform.googleapis.com/v1beta1/projects/{p}/locations/{global|us-central1}/interactions`, **ADC Bearer, cero key**. Sirve `text_to_video` e `image_to_video`. **NO** sirve el edit stateful: `previous_interaction_id` → **400 "do not support"**; `GET /interactions/{id}` → **500**.
 - **(2) Gemini Developer API — full, incl. STATEFUL EDIT.** `generativelanguage.googleapis.com/v1beta/interactions?key=`, con **API key** desde Secret Manager `globe-gemini-api-key` (esta superficie **exige** key: OAuth se rechaza con `ACCESS_TOKEN_SCOPE_INSUFFICIENT`). Es la **única** superficie que hace **edit stateful** (`previous_interaction_id` + `store:true`). Ojo: `generativelanguage` **no es Vertex** — por eso no contradice la regla "Vertex es keyless"; son dos superficies físicas distintas.
 
-Request canónico: `{ model, input, response_format:{ type:video, aspect_ratio }, generation_config:{ video_config:{ task } }, background:false, store, stream:false }`; la respuesta llega en `steps[].model_output.content[].video.{data|uri}`. Es **unary síncrono** (~35-60s), no long-running. Specs del modelo: 3-10s / 720p / 24fps / 16:9|9:16 / con audio / **$0.10 por segundo**. Verificado en vivo: generate keyless por el seam → `objective_pass_pending_human` **40 créditos**; edit stateful (crear store → editar) → **200 completed** con video.
+Request canónico: `{ model, input, response_format:{ type:video, aspect_ratio }, generation_config:{ video_config:{ task } }, background:false, store, stream:false }`; la respuesta llega en `steps[].model_output.content[].video.{data|uri}`. Es **unary síncrono** (~35-60s), no long-running. Specs del modelo: 3-10s / 720p / 24fps / 16:9|9:16 / con audio / **USD 0.10 por segundo**. Verificado en vivo: generate keyless por el seam → `objective_pass_pending_human` **40 créditos**; edit stateful (crear store → editar) → **200 completed** con video.
 
 **Ancla de video del Composite.** `GLOBE_LAB_VIDEO_ANCHOR` = `fal` (default, Seedance) | `vertex-video` (Veo) | `vertex-omni` (Omni). Es **fidelity-aware**: un contrato `preserve-set` va siempre a **Seedance**; `anchor`/`flexible` van al motor ancla elegido. La matriz motion por el seam: **Omni 40cr, Veo 32cr, Seedance 20cr**, los tres `objective_pass_pending_human` (el harness nunca auto-gana un motor).
 
-**Claridad de billing/superficie (regla dura de registrar).** El video de Omni **no tiene tier gratis** ($0.10/s, solo pago). La **Gemini Developer API** (`generativelanguage`) usa **Prepay/Postpay + API key** y es **hoy la única superficie de edit**. **"GEAP"** es solo el rebrand de **Vertex AI** (keyless pay-as-you-go, hoy solo generate). Y **"Gemini Enterprise"** (por-asiento, ~$25/seat) es el **producto sucesor de Agentspace, SIN relación** con la Interactions video API — **NUNCA** comprarlo para esto. Secrets: `globe-gemini-api-key` (edit) + `globe-fal-api-key` (Fal), inyectados por Secret Manager, `secretAccessor` de la runtime SA, trackeados en Terraform.
+**Claridad de billing/superficie (regla dura de registrar).** El video de Omni **no tiene tier gratis** (USD 0.10/s, solo pago). La **Gemini Developer API** (`generativelanguage`) usa **Prepay/Postpay + API key** y es **hoy la única superficie de edit**. **"GEAP"** es solo el rebrand de **Vertex AI** (keyless pay-as-you-go, hoy solo generate). Y **"Gemini Enterprise"** (por-asiento, ~USD 25/seat) es el **producto sucesor de Agentspace, SIN relación** con la Interactions video API — **NUNCA** comprarlo para esto. Secrets: `globe-gemini-api-key` (edit) + `globe-fal-api-key` (Fal), inyectados por Secret Manager, `secretAccessor` de la runtime SA, trackeados en Terraform.
 
 ## Lab edit-command — stateful edit por el seam (verificado en vivo 2026-07-20, commit `a765d55`)
 
@@ -251,6 +380,287 @@ Los tres ejemplos anteriores son capabilities con provider detrás. El **Produce
 
 **La distinción que muerde (colisión de término `model`).** El **nombre** del modelo (`"Seedance"`) es público y **≠** el **slug** de wire (`"bytedance/seedance-2.0/text-to-video"`, prohibido). Ojo: el campo `model` del **manifest de adapter** (provider seam, "el slug va en el campo `model`") carga el **slug**; el campo `route.model` del **catálogo** carga el **nombre público**. Son dos campos `model` en dos capas distintas — no los conflaciones.
 
+## El output side del Creative Producer (TASK-1503) — la capability de gasto CERO cuya autoridad no puede venir del store
+
+Los ejemplos anteriores **producen** piezas. TASK-1503 es el **output side**: hace **usable** una pieza ya generada — recuperarla, listarla, marcarla, reusarla como referencia. Vive en `packages/{contracts,domain}/src/producer-assets.ts`, con el seam de lectura en `apps/creative-runner/src/output-retrieval.ts`, el grant en `apps/studio-web/src/retrieval-grant.ts`, la ruta de serving en `apps/studio-web/src/app.ts` y la persistencia en `packages/database/src/stores/producer-asset-store.ts`. Es el patrón a copiar cuando una capability **no gasta** pero **expone bytes**.
+
+**Capability propia, de gasto CERO — y por qué NO reusa la del Lab.** `globe.producer.assets.operate` gobierna
+retrieval y asset actions en un mapa separado de gasto. `ui` está `available` desde TASK-1519; MCP conserva su
+gate. Descargar lo producido nunca debe implicar autoridad para facturar a un provider.
+
+**La pieza load-bearing — `authorizeOwnedOutput`, y por qué la autoridad NO puede venir del store.** El store de outputs es **content-addressed y TENANT-BLIND**: el nombre del objeto **ES** el hash, un solo bucket para todos los workspaces, y ahí adentro conviven **los outputs Y los bytes de las referencias private-ingest de entrada**. Un bucket así no sabe de quién es nada — preguntarle "¿este workspace puede leer este hash?" no tiene respuesta posible. Por eso la autoridad se resuelve **en el dominio** (`packages/domain/src/producer-assets.ts`): `authorizeOwnedOutput` gatea contra `store.get(workspaceId, experimentId)` — **el MISMO `ExperimentStorePort` del Lab, no un índice paralelo** — y sólo autoriza un `sha256` que aparezca en los `outputHashes` de un attempt con `outcome === 'candidate_ready'` **y** `outputsRetained === true`. **NUNCA** consulta `authorizedInputHashes`: los bytes de una referencia de entrada están en el mismo bucket, y autorizar por presencia convertiría el endpoint de outputs en un lector de los inputs de cualquiera.
+
+**Todo rechazo de PROPIEDAD colapsa a `not_found` — es diseño de seguridad, no laxitud.** Cross-workspace, `experimentId` desconocido, hash que sólo fue **input**, y candidato **no retenido** caen todos en `DispatchError('capability_not_found')` → `not_found`, y son **indistinguibles desde afuera** (distinto del fallo de *prueba* de autorización — grant forjado, editado o expirado — que sí es `access_denied`, porque no dice nada sobre si el activo existe). Cualquier respuesta más fina —un `access_denied` que confirme existencia, un "no retenido" que confirme el hash— es un **oráculo para sondear por content hash un bucket compartido**. Es la misma disciplina que el Lab aplica a un `experimentId` ajeno, llevada al plano de los bytes.
+
+**El grant: opaco, firmado, corto, y NO un bearer autosuficiente.** Va preferentemente en
+`x-globe-retrieval-grant`; query queda como compatibilidad. La UI hace fetch same-origin y crea una Blob URL local.
+La ruta autentica, verifica el grant y re-chequea propiedad; nunca se loggea ni entra a audit.
+
+**La ruta de serving no duplica política.** `GET /v1/outputs/:sha256?experiment=&grant=&disposition=` en `apps/studio-web/src/app.ts`, en este orden: `resolveDispatchPrincipal` (auth, en el router, antes de entrar) → kill switch → verify del grant (HMAC + expiry + claims) → `deriveTrustedContext` con `workspaceSelection = claims.workspaceId` → **`authorizeOwnedOutput` RE-EJECUTADO** → stream. La re-ejecución es defense in depth **con consecuencia real**: un candidato que dejó de ser recuperable deja de ser **servible**, aunque su grant siga vivo. Reusa el **mismo helper del reader** y el **mismo `handlerErrorToApiCode`** — un primitivo, dos transportes, cero política duplicada. El stream sale con `Content-Type` + `Content-Disposition` de filename **neutro** (`globe-<hash12>.<ext>`, **sin vendor**) y `Cache-Control: private, no-store`.
+
+**Degradación: `dependency_unavailable`, jamás 200 vacío y jamás `not_found`.** Cualquier `OutputRetrievalError` (`not_found` / `unreadable` / `integrity_mismatch`) mapea a **`dependency_unavailable`** (retryable). Un **200 con cuerpo vacío** entrega un archivo roto que parece bueno; y **`not_found` sería una mentira**: el dominio **acaba de certificar** que el candidato existe, así que contradecir el descriptor manda a un operador a **cazar un fantasma**. El código de error tiene que acusar al componente que realmente falló.
+
+**El seam de lectura es el TERCER lector del store.** `OutputRetrievalPort` / `GcsOutputRetrieval` en `apps/creative-runner/src/output-retrieval.ts`: mismo bucket, mismo token **keyless** (ADC/WIF) y mismo naming que `GcsOutputIngest`, y **re-verifica `sha256(bytes) === declarado` ANTES de devolver**. Es distinto de `GcsInputResolver`, que alimenta a un provider **dentro de un run pagado, detrás del fence**: mismo bucket, tres lectores, tres fronteras.
+
+**Asset actions: estado deseado explícito y derechos inforjables.** `favorite` toma el **estado deseado explícito** — **nunca un toggle ciego**, que sobre una vista stale invierte justo lo que el usuario quiso — y en un repeat **conserva el timestamp original**. `copyAsReference` certifica un `ProducerReferenceHandleV1` con `rights: 'derived-internal'`, una postura que **un caller no puede declarar**, más el `parentRights` heredado por `inheritedDerivedRights` — **la MISMA función que usa el edit base del Lab**, para que un ancestro `licensed` no deje de restringir en una de las dos derivaciones. Falla **cerrado antes de mintear** si el medio no es referenciable (`model-3d`). Cero bytes por la API, cero crédito.
+
+**Tipos: `ProducerOutputMediaType` NO es `LabInputMediaType`.** El del output side es `image | video | audio | model-3d`; el de inputs del Lab es `image | video | audio | text`. Son vocabularios distintos y no se conflacionan. El `mediaType` se deriva de la **capability semántica** del run, pero el **`Content-Type` servido sale del objeto real** — así un run multi-output no miente en el cable.
+
+**Persistencia: la idempotencia vive en SQL, no en un read-then-write.** `AssetAnnotationStorePort` + `InMemoryAssetAnnotationStore` (dominio) + `DurableProducerAssetStore` (`packages/database/src/stores/producer-asset-store.ts`) + migración `0003_producer_asset_annotations.sql`. La idempotencia es **`ON CONFLICT DO NOTHING` + re-lectura**: entre réplicas, "chequear y después insertar" es una **carrera** cuyo síntoma visible es un `referenceId` duplicado o una estrella re-fechada. `rights = 'derived-internal'` es un **CHECK**, no una convención. **Delta contra el spec, que hay que registrar:** el spec difería esto a TASK-1465 (que ya shipeó sin cubrirlo); con los servicios en **3 réplicas** (TASK-1508) un store in-memory no queda "volátil" sino **NO DETERMINISTA**.
+
+**Flags y secretos.** `GLOBE_PRODUCER_ASSETS_ENABLED` — variable Terraform `producer_assets_enabled`, **default TRUE en git** (`variables.tf`) y **NO** en `terraform.tfvars` (gitignoreado): un flag cuyo estado real vive en un archivo sin trackear es el **mismo problema de estado efímero** que moverlo con `gcloud`, sólo que mejor disfrazado. `GLOBE_PRODUCER_GRANT_SECRET` — Secret Manager `globe-producer-grant-secret`, con **contenedor + accessor en Terraform** (`secrets.tf`) y **VALOR out-of-band**; el accessor es **sólo para `api_runtime`** (`web_runtime` no tiene consumidor hasta el gate de TASK-1505). Sin el secreto, el mint **degrada a `dependency_unavailable`** — fail-closed, nunca un grant sin firma. `GLOBE_PRODUCER_GRANT_TTL_SECONDS` = 300 default, rango 30-900.
+
+**Runtime vivo.** Las revisiones/digests se consultan en `GLOBE_RUNTIME_HANDOFF.md`, nunca en esta skill. La API
+conserva autoridad/serving; el web/BFF consume las capabilities humanas acotadas que entrega el broker.
+
+**Los gates hacia comercial (identificados, no inventados).** Para el **humano interno** en el shell web: **TASK-1505** (broker grant + flip de `ui`/`mcp`). Para el **cliente externo/comercial**: **TASK-1480**, bloqueada por **TASK-1477, TASK-1478, TASK-1479 y TASK-1482** (esta última sobre TASK-1468) — las cinco en `to-do`. Y un gate **sin dueño declarado**: `readStudioRuntimeConfig` **LANZA** `globe_environment_not_internal_smoke` para cualquier valor distinto de `internal_smoke`, así que **hoy no existe forma de bootear un runtime comercial**, y **TASK-1480 no lo menciona**. `internal_smoke` es el **estadio actual del runtime, NO el techo del producto** — no lo describas como limitación permanente. La contabilidad comercial es aparte: el spend fence es de **seguridad**, no ledger (TASK-1468 → TASK-1482).
+
+**Lección de método — un timeout del cliente no es un fallo del servidor.** En este rollout un `execute` síncrono **excedió el timeout de transporte del CLIENTE** y **completó bien en el SERVIDOR**. Leerlo como fallo y reintentar **gasta créditos de nuevo**. Ante un timeout de un command que gasta: **primero leer el estado** (el reader `get`/`status`), después decidir. Aplica a toda capability cara, no sólo a esta.
+
+**Lección de método — un negativo tiene que ser el negativo difícil.** Probar el rechazo de private-ingest con un hash **inexistente** prueba muchísimo menos que hacerlo con un hash que **sí está en el store como input**. La versión válida del control **declara el output retenido de una corrida como input de otra**, y agrega el contra-control de que **el output propio de esa corrida SÍ se sirve**; sin ese par, el test no distingue "rechaza inputs ajenos" de "no encuentra nada". Del mismo rollout sale el patrón de **acceso privilegiado temporal**: grant acotado → verificar → revocar → **verificar el CORTE** (no se asume que la revocación propagó).
+
+## El sexto ejemplo — Sub-familias de video/audio + multi-output + voice presets (TASK-1504): cuando el vocabulario crece, el motor tiene que decir la verdad
+
+Los ejemplos anteriores agregan **capabilities**. TASK-1504 agrega **vocabulario de modalidad**. Está desplegada
+internal-only; el canario de una ruta base no certifica frames/motion/change-voice/translate/multi-output, que
+mantienen promoción y canario propios.
+
+**El vocabulario.** `CREATIVE_CAPABILITIES` pasa de **10 a 14**: `video-frames` (interpolar entre keyframes), `video-motion-control` (transferir movimiento desde un video de referencia), `audio-change-voice` y `audio-translate`. `GLOBE_CAPABILITIES` pasa de **12 a 13** con `globe.voice.preset.manage`.
+
+### Reglas duras de motor — verificadas EN VIVO con probes de gasto cero
+
+Esto es lo más valioso de la task y lo que un agente futuro **no debe volver a derivar de memoria**: cablear "el motor que uno sabe que existe" shippea una ruta que **sólo falla cuando alguien gasta**.
+
+- **`lastFrame` lo soporta ÚNICAMENTE `veo-2.0-generate-001`.** `veo-3.0-fast-generate-001` y `veo-3.0-generate-001` responden `FAILED_PRECONDITION` — *"The request is not supported by this model"* —, y los ids `veo-3.1-*-preview` **no existen** en el proyecto (`NOT_FOUND`). Por eso `video-frames` está **pineado** a Veo 2.0: no es una preferencia de calidad, es el único motor que **acepta y valida** el segundo keyframe.
+- **`fal-ai/elevenlabs/speech-to-speech` NO EXISTE (404).** Es el nombre por el que ese modelo se conoce — y justamente por eso es el que uno cablea de memoria, shippeando una ruta muerta. El app real es **`fal-ai/elevenlabs/voice-changer`** (422), con `audio_url` (obligatorio), `voice` y `output_format`.
+- **`fal-ai/elevenlabs/dubbing`** (422) sirve `audio-translate`; su **único** campo obligatorio es `target_lang`.
+- **`bytedance/seedance-2.0/reference-to-video`** (422) sirve `video-motion-control`, y su forma tiene tres trampas: `video_urls[]` e `image_urls[]` van **SEPARADOS**, `duration` viaja como **STRING**, y lleva `generate_audio`.
+- **`fal-ai/vidu/q1/start-end-to-video` existe (422) pero exige AMBOS keyframes**, así que **no puede servir `hasEndFrame: false`** — un estado que el contrato de run declara. Queda como **ruta futura de alta fidelidad**, no como la elegida: un motor que sólo cubre parte del contrato no es "el motor con una limitación", es una ruta que falla en la mitad de los requests legítimos.
+- **El método de verificación es reusable y cuesta cero.** Fal: `POST {}` (body vacío) a `https://fal.run/<slug>` con la key de Globe → **404 = no existe**, **422 = existe** (falló la validación del payload, no el ruteo). Vertex: un probe que **siempre falla la validación** (bytes base64 inválidos) discrimina *"el modelo no soporta este campo"* de *"el campo se aceptó y el request murió después"* — **sin gastar**.
+
+### Los patrones nuevos (lo que hay que copiar)
+
+- **`FAL_ROUTING` es `Record<CreativeCapability, FalModelRoute | null>`.** El record sigue **EXHAUSTIVO**: una capability nueva **rompe el build** hasta que alguien decida, **en código**, si Fal la sirve. `null` significa **"deliberadamente no servida acá"**, que es información; una clave ausente sería un olvido indistinguible de una decisión. Por eso `supports()` chequea **`!== null`**, nunca la presencia de la clave.
+- **`supportsLastFrame` es DATO de la ruta, no código.** Mover la interpolación a un motor nuevo tiene que ser **cambiar un id en la tabla**, no editar una rama.
+- **`inputUrlKeyByMedia` reparte las referencias POR TIPO DE MEDIO.** Un solo campo compartido metería el video de movimiento en el slot de imágenes: el motor **lo acepta, lo cobra y condiciona sobre lo equivocado** — el peor fallo posible, porque devuelve algo que **se ve bien**. Una referencia cuyo medio la ruta no puede cargar **FALLA CERRADA**: nunca se sube y se omite.
+- **Orden de diagnóstico: "este motor no interpola" va ANTES del tope de referencias.** Al revés, el tope **enmascara la causa** y manda al operador a recortar el request cuando la respuesta real es que esa ruta **no interpola nunca**. Un error tiene que acusar **la causa**, no la consecuencia.
+- **Los campos de forma se hilan al seam por UN helper compartido.** Resolución, duración, `audioMode`, sample rate, formato, `targetLang` y `voicePreset` los mapea **una** función usada por **la ruta de run y la de estimate**. Con dos mapeos, uno **deriva** — y el que deriva es el que **cotiza distinto de como corre**, o sea el estimate deja de ser una promesa sobre el gasto.
+- **El modo de input de video se HILA al seam, no se infiere.** Dos imágenes significan **"inicio y fin"** bajo `frames` con fin, y **"dos referencias"** bajo `elements`. Mismo input, distinto significado: adivinar devuelve un video que **se ve bien y responde otra pregunta**.
+
+### Multi-output: la retención se declara por pieza
+
+`ExperimentAttemptManifestV1.outputs?: LabOutputDescriptorV1[]` (`{ sha256, mediaType, mimeType, retained }`), **aditivo**. La retención pasa a ser **POR OUTPUT**: antes un solo `throw` abandonaba el loop y el manifest **desconocía las piezas que sí se habían guardado**. El flag plano `outputsRetained` queda por compatibilidad y es `true` **sólo si TODAS** se retuvieron.
+
+La consecuencia está en el edit: **`resolveEditSource` elige POR MODALIDAD**, y la modalidad la aporta la **capability HIJA** — sólo el hijo sabe qué medio consume. Antes leía `outputHashes[0]`, así que refinar "el video" de un attempt `{video, audio}` podía entregarle al motor **la pista de audio**.
+
+### El voice preset registry: cuatro identidades, y sólo una viaja
+
+`globe.voice.preset.manage` es capability **PROPIA y de gasto CERO** — registrar una voz no debe implicar autoridad para **facturarle a un proveedor**, exactamente el mismo razonamiento que separó el output side (TASK-1503) de la capability de gasto del Lab. Vive en `packages/domain/src/voice-presets.ts` (+ `packages/contracts/src/voice-presets.ts`), con `VoicePresetStorePort` / `InMemoryVoicePresetStore` y su resolver.
+
+Las **cuatro identidades separadas** son el corazón del diseño:
+
+1. **`presetId`** — workspace-scoped; lo que declara el caller.
+2. **`displayName`** — lo que ve el cliente.
+3. **`catalogVoice`** — la clave curada de Efeonce; **lo ÚNICO que viaja al seam**.
+4. **el vendor voice id** — vive **SÓLO** en el `FAL_VOICE_MAP` del adapter, y de ahí no sale.
+
+Lo que cae de esa separación: cross-workspace y desconocido son el **MISMO `not_found`** (si no, el registry es un **oráculo para sondear otro tenant id por id** — misma disciplina que el retrieval de TASK-1503); un clon **sin `rights` se rechaza**; y un clon **sin voz curada resuelve a nada y el run falla cerrado**, en vez de caer a la voz por defecto — **entregar otra voz es peor que no entregar nada**. La **idempotencia vive EN EL STORE**, nunca en un read-then-write: entre réplicas eso es una carrera cuyo síntoma visible son **dos preset ids para una misma voz**, y un preset id ya usado por corridas pasadas **es parte de su evidencia**.
+
+### El bug fail-open que se cerró, y la validación que faltaba
+
+`ref/motion/loop-v1` declaraba los modos `frames` / `motion-source`, pero su capability resuelve a un motor **text-to-video sin campo de referencia** ⇒ los keyframes se **descartaban EN SILENCIO**, *después* de reservar crédito. La lección general: **una ruta que anuncia un modo que su adapter no adjunta es fail-open**, y sólo se ve **gastando**.
+
+La validación nueva lo cierra: **`assertInputModeSatisfied` cuenta las referencias POR TIPO DE MEDIO antes del fence**. La validación de shape que ya existía sólo probaba que la ruta **DECLARA** el modo; nunca que el caller aportó **lo que ese modo CONSUME**.
+
+### Trampa de método (ya documentada) que igual se repitió
+
+Los scripts `test` de cada package **enumeran los archivos a mano**. `src/voice-presets.test.ts` **tuvo que agregarse** a `packages/domain/package.json` o **nunca habría corrido**, y la suite habría quedado **verde por no haberlo mirado**. Que la trampa reaparezca en una task de cinco slices es la prueba de que hay que chequearla **cada vez**, no "recordarla".
+
+### Estado de rollout
+
+Snapshot histórico del 2026-07-22: kill switch OFF, provider fake y canarios pendientes. El estado actual se
+consulta en Runtime Handoff. Los probes de gasto cero siguen probando sólo forma/existencia, nunca calidad.
+
+## El séptimo ejemplo — Media derivatives + Range gateway (TASK-1528): versiones livianas versionadas + serving por tramos
+
+Los ejemplos anteriores **producen** piezas o exponen sus bytes completos. TASK-1528 implementa los **build units
+1-3 de ADR-008** ([`EFEONCE_GLOBE_MEDIA_DERIVATIVES_V1.md`](../../../docs/architecture/creative-studio/EFEONCE_GLOBE_MEDIA_DERIVATIVES_V1.md),
+SPEC-010): derivados de media versionados producidos por un worker separado + un gateway que sirve **un solo
+Range** re-autorizando cada request. Vive en `packages/{contracts,domain}/src/media-derivatives.ts`,
+`packages/database/src/stores/media-derivative-store.ts` + `migrations/0029_media_derivatives.sql`, el worker
+dedicado `apps/media-derivatives/**` (segundo Cloud Run Job con binario nativo, patrón asset-governance/ADR-007),
+y el gateway `serveMedia` + ruta `/v1/media/` + `apps/studio-web/src/media-ticket.ts`. Desplegado y
+canary-verificado internal-only.
+
+**Identidad exacta e inmutable** (cambiar cualquier componente crea otro record/objeto, nunca overwrite):
+`(workspaceId, sourceSha256, sourceObjectGeneration, profileId, profileVersion, transformerVersion, outputMime)`.
+
+**Perfiles = DATA gobernada** (`GLOBE_MEDIA_DERIVATIVE_PROFILES`), 6 en v1, cada parámetro EXPLÍCITO — nada
+depende de defaults de ffmpeg. Bumpear un valor = nueva `profileVersion` (los viejos → `superseded`); bumpear el
+binario/args de ffmpeg = nueva `MEDIA_TRANSFORMER_VERSION`.
+
+**El worker** (`apps/media-derivatives`, debian + ffmpeg pinneado por versión) claima intents con lease+fencing
+`SKIP LOCKED`, descarga el source **PINNED a la generation de la identidad** (drift = fallo permanente, nunca un
+re-target silencioso), corre planes ffmpeg deterministas por perfil (+ waveform peaks post-procesando el PCM), y
+sube content-addressed al **bucket SEPARADO de derivados** con `ifGenerationMatch=0` + reconciliación de same-key
+`412` por readback (nombre=hash+size igual ⇒ idempotente; mismatch ⇒ integrity conflict). Un record terminal por
+identidad.
+
+**El gateway** `GET /v1/media/:sha256` es un **authority gateway, no un byte buffer**: autentica → verifica el
+**media ticket principal-bound** → re-corre `authorizeOwnedOutput` AHORA → resuelve la representación READY
+(original o `profileId@version`) → passthrough de UN Range a GCS con backpressure (`GcsOutputRetrieval.openByteStream`).
+200/206/416 nativo, sin arrayBuffer/Blob/base64; multipart 400. Errores honestos: storage/no-ready →
+`dependency_unavailable`, nunca `internal_error` ni 200 vacío.
+
+**El media ticket** (`media-ticket.ts`, secreto propio `globe-media-ticket-secret`, TTL 120s) es HMAC firmado,
+atado a `workspace+experiment+sourceSha256+representation+disposition+principalId`, y **NO es bearer
+autosuficiente**: el gateway exige que el principal AUTENTICADO matchee el binding. La `representation` pinea
+original vs derivado exacto (un ticket de poster no trae el original). El mint es un reader gobernado
+(`globe.media.derivative.ticket`); el BFF reenvía `x-globe-media-ticket`.
+
+**Reglas duras de este dominio:**
+- **NUNCA** transformar media en el web/BFF ni en el gateway (ADR-008): la transformación vive SOLO en el Job
+  `apps/media-derivatives`. El gateway sólo autoriza + streamea.
+- **NUNCA** servir bytes bufferizando el objeto completo (`arrayBuffer`/`Blob`/base64): el tamaño del objeto no
+  puede determinar la memoria del request. Se pasa UN Range a GCS y se pipea con backpressure. Multipart → 400.
+- **NUNCA** guardar un derivado junto al original ni con su object key: bucket separado
+  `efeonce-globe-media-derivatives`, content-addressed. El worker tiene storage **get/create SIN delete** (el
+  delete guarded es TASK-1529); el gateway (`api_runtime`) tiene **read-only** sobre ese bucket.
+- **NUNCA** sobrescribir un derivado: same-key `412` se reconcilia por readback (idempotente o integrity
+  conflict). **NUNCA** re-targetear si el source cambió de generation: es fallo permanente.
+- **NUNCA** cambiar un valor de perfil sin bumpear `profileVersion`, ni bumpear el pin de ffmpeg del Dockerfile sin
+  bumpear `MEDIA_TRANSFORMER_VERSION` (los bytes cambiarían bajo una identidad sin cambiar — el build falla loud si
+  el pin no existe en trixie). Verificado en vivo: el pin drifteado lo atrapó el build antes de producir nada.
+- **NUNCA** tratar el media ticket como bearer: el gateway re-autentica, exige match del principal y re-corre
+  ownership por request. El secreto del ticket es propio (no reusar el retrieval grant) y nunca se loggea.
+- **SIEMPRE** resolver la generation del source y el ownership server-side (`authorizeOwnedOutput`, el MISMO
+  primitive de TASK-1503); el request command falla-closed a `policy_blocked` con `GLOBE_MEDIA_DERIVATIVES_ENABLED`
+  OFF y el gateway con `GLOBE_MEDIA_RANGE_GATEWAY_ENABLED` OFF.
+
+**Estado de rollout**: build units 1-3 desplegados internal-only; feed/viewer (TASK-1526) y orphan GC (TASK-1529,
+desbloqueada) son build units separados; comercial gated por TASK-1480. El estado vivo (revisiones/flags) se
+consulta en `GLOBE_RUNTIME_HANDOFF.md` § Media Derivatives, nunca en esta skill.
+
+## El octavo ejemplo — Commercial promotion via rights attestation (ADR-010 / TASK-1535): la firma humana en la unidad correcta
+
+Los ejemplos anteriores generan/promueven piezas. ADR-010 resuelve **cómo comercializar amplitud de modelos de
+frontera sin firmar readiness por ruta × workspace**. La clave no es "internal vs comercial": es que la firma humana
+estaba en la **unidad equivocada** (O(rutas × workspaces)). El fix la reubica a los dos hechos que **de verdad**
+exigen juicio humano — la **licencia por modelo** (O(modelos), en la práctica O(proveedores)) y el **artefacto que
+se entrega al cliente** (candidate→approval, ya existente) — y automatiza lo que era toil. Doc: ADR-010
+`EFEONCE_GLOBE_COMMERCIAL_PROMOTION_ATTESTATION_DECISION_V1.md`. Verificado en vivo end-to-end 2026-07-24 (el CEO
+firmó, el lane promovió `foley-v1`).
+
+**Dos piezas (SSOT + derivación).** (1) **Model Commercial Rights Attestation** — autoridad nueva, `requireHuman`,
+UNA VEZ por modelo, anclada a evidencia durable (`providerTermsRef` + `providerTermsDigest` sha256 + reviewer + el
+grant exacto: `commercialUse`/`clientDelivery`/`sublicensable`). Es un **hecho de control-plane GLOBAL, no dato de
+tenant** — por eso la tabla `model_commercial_rights_attestations` NO es workspace-RLS'd (el lane, corriendo como
+service workspace, debe leer una attestation firmada desde el workspace interno), y por eso es O(modelos). Inmutable
+por `(provider, model, version, termsDigest)`; un cambio de licencia es una attestation NUEVA (nuevo digest), el
+`getLatest` devuelve la más reciente. Vive en `packages/{contracts,domain}/src/model-commercial-rights.ts` + store
+`packages/database/src/stores/model-commercial-rights-store.ts` + migración `0030`. (2) **Automated lane** — command
+`globe.production-promotion.auto-lane.promote` (`packages/domain/src/commercial-promotion-lane.ts`), principal de
+servicio **disjunto** `globe:service:promotion-auto-lane` (workload class con `[auto-lane, model-rights.read,
+asset-rights-policy.manage, production-routing.manage]`, anti-overlap con routing/promoter/checker). Handler
+fail-closed de 7 pasos: parse → resolver workspace **kind** server-side → verificar firma de attestation → re-leer +
+re-chequear el eval report objetivo contra la ruta exacta → techo/elegibilidad → publicar rights derivados + habilitar
+el binding existente → resultado curado (sin slug/costo/margen).
+
+**El lane es un mecanismo DISTINTO, NO la saga ADR-009.** Descubrimiento load-bearing: el `promoteProductionPromotion`
+de la saga está **hardwired a un review humano firmado** (`resolveReview` + `validateReview` maker≠reviewer≠promoter)
+— ese review ES el control SoD vendible del régimen humano-craft. El régimen comercial **NO enruta por la saga y NO la
+relaja**; el lane deriva la elegibilidad (attestation verificada + eval objetivo + techo) — la pieza que legítimamente
+reemplaza la firma por ruta. **Promotion ≠ delivery**: promover hace la ruta *available*; cada artefacto client-bound
+sigue pasando candidate→aprobación humana. **La attestation es SSOT; toda postura de derechos es una DERIVACIÓN**
+(`deriveEffectiveRestrictions`, sólo aprieta). Techo por workspace fail-closed: una ruta internal-eval-only NUNCA se
+promueve a un workspace `client`.
+
+**Workspace kind: config-governed, NO del broker snapshot.** El `BrokerTenancySnapshotV1/V2` firmado **NO lleva
+`kind`** (es member-focused); cambiar ese contrato de federación firmado es out-of-scope. El kind se resuelve
+server-side desde `GLOBE_WORKSPACE_KIND_CLASSIFICATIONS` (env, JSON `workspaceId→kind`, `ConfigWorkspaceKindResolver`
+en `apps/studio-web/src/workspace-kind-resolver.ts`), **fail-closed on miss** (unknown → deny). Cada client workspace
+es un entry EXPLÍCITO — defensa en profundidad, nunca caller-declared. (El `DurableWorkspaceKindResolver` sobre
+`tenancy_workspaces.projection` queda como future path si el broker algún día lleva kind.)
+
+### 🔴 La lección que MÁS importa — el grant SSO acopla dos repos y rompió el login
+
+Habilitar `globe.model-rights.attest` para el humano **causó una caída de TODO el login de Globe**, y la causa raíz es
+una regla del broker que un agente futuro DEBE conocer:
+
+- **El broker impone `capabilityScopes ⊆ requiredScopes`** (`src/lib/sister-platforms/oauth-policy.ts`): un scope no
+  puede ser "otorgable pero opcional" — si lo otorgás, es REQUERIDO. Y **ambos repos hardcodean su lista de scopes**:
+  Greenhouse `GLOBE_PRODUCER_CAPABILITY_SCOPES` (`globe-oauth-grants.ts`) ↔ Globe `PRODUCER_HUMAN_CAPABILITY_SCOPES`
+  (`apps/studio-web/src/app.ts`). Agregar attest SÓLO en el broker lo volvió required; el cliente desplegado no lo
+  pedía → el broker **denegó todo login** ("Acceso no disponible / tu sesión no cumple la política de acceso").
+- El **fix correcto es un rollout de 3 pasos CERO-DOWNTIME**, en orden, verificando login entre cada uno: **(1)
+  Broker: attest a `allowedScopes` SOLAMENTE** (buffer transicional — permitido, aún no required/capability) → login
+  intacto; **(2) Globe client: `PRODUCER_HUMAN_CAPABILITY_SCOPES` pide attest**, deploy → login intacto (permitido,
+  aún no otorgado); **(3) Broker: mover attest a `capabilityScopes`+`requiredScopes`** → login intacto (el cliente ya
+  lo pide) y el token ahora carga la capability. Cada paso mantiene `requiredScopes ⊆ lo-que-pide-el-cliente ⊆
+  allowedScopes` por construcción.
+- **NUNCA** agregues un capability scope al grant del broker de Globe en un solo movimiento. **NUNCA** lo agregues al
+  broker antes de que el cliente Globe desplegado lo pida (ni al cliente antes de que el broker lo permita). Verificá
+  el `/auth/start` real (`curl` el redirect, mirá el `scope=`) antes del paso 3, y el broker `authorize` (303-accept
+  vs 400 invalid_scope). El script del grant es `scripts/update-globe-producer-oauth-grants.ts` (dry-run sin `--apply`;
+  corre contra greenhouse-pg vía **proxy** con `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=` vacío para deshabilitar
+  el connector que cuelga).
+
+### El canary (verificado en vivo) + fleet
+
+Canary honesto cero-spend-nuevo: reusar un eval existente (`foley-v1` / `fal`/`seed-audio`/`v1`, report
+`objective_pass` en `greenhouse-org:efeonce`). El auto-lane SA (impersonado con tokenCreator temporal + `--include-email`
+en el ID token, break-glass revocado con corte verificado) creó el binding disabled (rev1) y el `auto-lane.promote` lo
+habilitó (rev2) + publicó `appliedRestrictions` = la postura derivada de la attestation — **postura aplicada =
+atestada**. Fleet: el **OpenAI adapter** (`apps/creative-runner/src/openai-adapter.ts`, `gpt-image-2` snapshot
+`2026-04-21`, key Globe-owned `globe-openai-api-key` NUNCA la de Greenhouse, `image-generate` only fail-closed) enchufa
+en el mismo seam. Evidencia de términos en `scripts/evidence/*-commercial-terms.json` (Vertex, OpenAI, Fal Seed Audio) —
+**as-of, `reviewerMustVerify`, la stale se supersede con nuevo digest**. Estado vivo (attestations, rutas promovidas,
+flags, canarios): SIEMPRE `GLOBE_RUNTIME_HANDOFF.md`, nunca esta skill.
+
+### Flota de modelos — catálogo multi-modelo extensible (update-vs-add) + el seam route→model (2026-07-24)
+
+**Principio de producto (EPIC-028 Delta 2026-07-24):** Globe corre los **mejores modelos del mercado, coexistiendo y
+creciendo — sin que uno sustituya a otro.** Dos operaciones distintas: **update** = bump de versión dentro del mismo
+lineaje/ruta (**reemplaza**: Gemini 2.5→3, gpt-image-1→2); **add** = modelo/tier distinto = **ruta nueva que coexiste**
+(Seedream ≠ Nano Banana; GPT Image 1.5 **y** 2; Nano Banana Pro **y** 2). Compatible con el non-goal "no mejor global":
+el catálogo **ofrece**; la selección es **explícita** (selector UI, TASK-1552) o por **contrato de fidelidad**
+(recommendation matrix), nunca un "mejor global".
+
+**Roster frontier vigente (imagen)** — IDs reales SÓLO en adapter/binding, NUNCA en el catálogo público (`assertNoSlugLeak`):
+
+| Modelo | Proveedor | providerModelId | Estado (2026-07-24) |
+|---|---|---|---|
+| Seedream 5 Pro | fal | `bytedance/seedream/v5/pro/...` | vivo (default de imagen del composite) |
+| Nano Banana Pro | vertex | `gemini-3-pro-image` | **allowlist despejado, genera imágenes reales** vía `global` |
+| GPT Image 2 | openai | `gpt-image-2` (`2026-04-21`) | adapter default OpenAI; canary facturable pendiente |
+| GPT Image 1.5 | openai | `gpt-image-1.5` | 2.º tier a sumar (route-based) |
+| Nano Banana 2 | vertex | `gemini-3.1-flash-image` | **404 — proyecto sin allowlist** (ask a Google) |
+
+Excluidos a propósito: `gpt-image-1`, `gemini-2.5-flash-image`, `gemini-3.1-flash-lite-image` (NB2 **Lite**).
+
+**El seam route→model (hallazgo load-bearing).** Exponer **dos modelos del mismo proveedor** (2 OpenAI / 2 Vertex) NO
+es data — es CÓDIGO. Hoy los adapters resuelven el modelo **por capacidad** (`OPENAI_ROUTING[capability]`,
+`VERTEX_ROUTING[capability]`); el composite rutea imagen a **un** proveedor por capacidad
+(`DEFAULT_COMPOSITE_POLICY['image-generate']='fal'` → Seedream; Vertex sólo para video reference). El compiler ancla a
+`estimate.model` (`production-route-compiler.ts:154-171`): un binding a un 2.º modelo del mismo proveedor da
+`route_binding_missing`/`route_identity_mismatch` → **denegado**. Se necesita **resolución de modelo por-ruta** en los
+adapters. Vehículo: **`TASK-1553`** (backend-data foundation); selector UI = **`TASK-1552`**. OpenAI además no tiene lane
+de producción (`governed-production-composition.ts:71` lanza `globe_governed_openai_official_verifier_missing`; sólo Lab).
+
+**Gotchas de runtime del canary facturable (verificados en vivo, TASK-1535 §"Canary path"):**
+- **Región Vertex image = `global`** (us-central1 da 404). El adapter usa `region:'global'`. ✓
+- **`composite` incluye openai** en el Lab (`app.ts:3488`) pero rutea imagen→Fal por política; para correr un modelo
+  Vertex/OpenAI de imagen hay que **flipear `GLOBE_LAB_PROVIDER`** (worker **`globe-producer-worker`** + api, SoT
+  Terraform) → afecta TODOS los lab runs → flip, canary, **revert a `composite`**.
+- **Auth para disparar un lab run real:** el api es IAM-private; un token de usuario NO pasa el SA-allowlist
+  (`GLOBE_API_CALLER_SERVICE_ACCOUNTS`). Hace falta **break-glass** impersonando una SA con `globe.lab.experiment.run`
+  (`greenhouse-globe-caller`) + `tokenCreator` temporal + `--include-email`.
+- **Para probar SÓLO el allowlist de un modelo Vertex** (sin el flujo gobernado): probe directo `generateContent` al
+  proyecto con ADC de operador — así se verificó Nano Banana Pro (200, imagen real) vs Nano Banana 2 (404).
+- **`gcloud` auth expira a mitad de sesión** → `gcloud auth login` + `application-default login` (interactivos).
+- **El classifier del entorno bloquea** IAM policy-bindings y a veces ediciones de código impactantes en Globe →
+  necesita permiso/aprobación del operador.
+
 ## Provider boundary
 
 - **El primer provider call *billable* entra por el mismo seam que las surfaces posteriores:** API/SDK o conformance harness → command/reader canónico → provider adapter (`packages/provider-contract`) → runner (`apps/creative-runner`). **NUNCA** un provider SDK directo desde UI/MCP/CLI/scripts/tests.
@@ -273,13 +683,13 @@ La infraestructura de Globe es **reproducible y sin llaves**, y ya está **APLIC
 
 **Git hygiene.** **NUNCA** committees `*.tfstate`, `.terraform/`, `tfplan` ni `terraform.tfvars` real (el `.gitignore` los bloquea); el **`.terraform.lock.hcl` SÍ se committea** (pinea versiones de providers). El state vive solo en `gs://efeonce-globe-tfstate`; en git solo está el HCL.
 
-**Qué codifica ahora también (TASK-1465).** El datastore **Cloud SQL `globe-pg`** SÍ está en Terraform (`cloud_sql.tf`; plan `12 added / 0 destroyed`) — es el primer datastore de Globe; ver *Persistencia durable* abajo. **Qué queda diferido:** el modelo rico de workspace/members/grants persistido (follow-up), y meter las **Cloud Run services de la app a Terraform** — hoy las crea el workflow keyless, y `deploy-internal.yml` aún hardcodea `--max-instances=1` (drift-trap del `maxScale`): gobernar ese valor por IaC es **TASK-1508** (deploy ownership). No aprovisiona secretos de provider (rollout del canary live) ni producción/clientes externos. Runbook: `docs/operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`.
+**Qué codifica ahora también (TASK-1465 + TASK-1508).** El datastore **Cloud SQL `globe-pg`** SÍ está en Terraform (`cloud_sql.tf`; plan `12 added / 0 destroyed`) — es el primer datastore de Globe; ver *Persistencia durable* abajo. Y las **Cloud Run services de la app** también: **TASK-1508** las adoptó por import brownfield (`2 imported / 2 changed / 0 destroyed`), junto con el invoker binding de la api (`greenhouse-globe-caller` → `roles/run.invoker`); el workflow `deploy-internal.yml` quedó **image-only** (ver *front door* abajo). **Qué queda diferido:** el modelo rico de workspace/members/grants persistido (follow-up). No aprovisiona secretos de provider (rollout del canary live) ni producción/clientes externos. Runbook: `docs/operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md`.
 
 ## El quinto ejemplo — Persistencia durable (TASK-1465): de todo-en-memoria a Postgres real, live
 
 Globe nació **sin base de datos**: los 5 stores del spine eran in-memory y se reseteaban al reiniciar. TASK-1465 le dio **persistencia genuinamente durable**, desplegada en los servicios Cloud Run vivos y **verificada en producción-interna (2026-07-21)**. Es la fundación de datos que faltaba y su forma es el patrón a copiar cuando una capability necesite estado que sobreviva un reinicio. Todo vive en `packages/database` (antes un stub de 14 líneas, ahora el cliente real) + `apps/studio-web/src/{app,main}.ts`.
 
-**El datastore — Cloud SQL `globe-pg`.** El **primer** datastore de Globe. Postgres 16, región `southamerica-west1`, tier `db-g1-small`, **ZONAL** (sin réplica HA), **IAM database auth keyless**, **connector-only** (IP pública pero SIN authorized networks — TCP directo rechazado, igual que Greenhouse), PITR + backups, deletion protection. ~US$15–30/mes fijo. Aprovisionado por **Terraform** (`infra/terraform/cloud_sql.tf`; plan `12 added / 0 destroyed`). Es **Globe-owned**, **NUNCA** compartido con Greenhouse (misma regla de no-compartir-DB del boundary).
+**El datastore — Cloud SQL `globe-pg`.** El **primer** datastore de Globe. Postgres 16, región `southamerica-west1`, tier `db-g1-small`, **ZONAL** (sin réplica HA), **IAM database auth keyless**, **connector-only** (IP pública pero SIN authorized networks — TCP directo rechazado, igual que Greenhouse), PITR + backups, deletion protection. ~USD 15–30/mes fijo. Aprovisionado por **Terraform** (`infra/terraform/cloud_sql.tf`; plan `12 added / 0 destroyed`). Es **Globe-owned**, **NUNCA** compartido con Greenhouse (misma regla de no-compartir-DB del boundary).
 
 **El cliente keyless (`packages/database`).** `createGlobePool(config)` = **Cloud SQL connector** (`@google-cloud/cloud-sql-connector`) + pool `pg` + un `transaction()` (BEGIN/COMMIT/ROLLBACK). Más `resolveRuntimePoolConfigFromEnv()` y los tipos `GlobeQueryable` / `GlobePool` / `TransactionPort`. El runtime es **keyless IAM (sin password)**; el modo PASSWORD existe **SOLO** para el bootstrap one-time del superuser. Los imports internos usan la convención `.ts` (el build reescribe a `.js`), como `packages/domain`.
 
@@ -298,7 +708,175 @@ Globe nació **sin base de datos**: los 5 stores del spine eran in-memory y se r
 
 **Deploy + verificación live.** Ambos servicios Cloud Run desplegados durable — `globe-studio-internal` (web, user IAM `globe-web-runtime@efeonce-globe.iam`) y `globe-api-internal` (api, user IAM `globe-api-runtime@efeonce-globe.iam`) — a **`maxScale=3`**. El `apps/studio-web/Dockerfile` se arregló para **COPY + build `@efeonce-globe/database`** (bundlea `pg` + connector vía `pnpm deploy`). **Durabilidad PROBADA live:** un `GET /auth/start` en el web service vivo persistió una fila `oauth_transaction` en Postgres, escrita por el servicio corriendo como `web_runtime`, **keyless vía el connector + IAM**. Env por servicio: `GLOBE_POSTGRES_INSTANCE_CONNECTION_NAME=efeonce-globe:southamerica-west1:globe-pg`, `GLOBE_POSTGRES_DATABASE=globe`, `GLOBE_POSTGRES_USER=<web_runtime|api_runtime IAM user>`.
 
-**Lo diferido + el drift-trap (TASK-1508).** El modelo rico de workspace/members/grants persistido es follow-up. **Drift-trap a gobernar:** `deploy-internal.yml` todavía hardcodea `--max-instances=1`, así que el próximo deploy del workflow **resetearía el `maxScale`**; el valor persistente debe quedar gobernado por Terraform (TASK-1508, deploy ownership — el mismo carril que mete las Cloud Run services a IaC).
+**Lo diferido, y el drift-trap ya CERRADO (TASK-1508).** El modelo rico de workspace/members/grants persistido sigue siendo follow-up. El **drift-trap del `maxScale`** — `deploy-internal.yml` hardcodeaba `--max-instances=1`, así que cada deploy del workflow reseteaba el techo — quedó **cerrado**: TASK-1508 adoptó los dos servicios a Terraform, dejó el ceiling en **3/3** (campo de servicio **y** de revisión) y volvió el workflow **image-only**. Ojo con la consecuencia registrada: mientras el techo efectivo fue **1**, el `DurableSpendFence` cross-réplica **nunca se ejercitó**; ejercitarlo es **TASK-1512**.
+
+## El front door internal-only (TASK-1507) — el dominio sirve el web, y sólo el web
+
+Hasta TASK-1507 Globe se alcanzaba por la URL `run.app` del servicio. TASK-1507 le dio un **front door propio**, `globe.efeoncepro.com`, **internal-only**, implementando ADR-004 (`docs/architecture/creative-studio/EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md`, TASK-1506); **spec vigente:** `docs/architecture/creative-studio/EFEONCE_GLOBE_INTERNAL_FRONT_DOOR_V1.md` (SPEC-009); **runbook:** `docs/operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md` § Front door internal-only (TASK-1507). Verificado en vivo el 2026-07-21. **Un dominio internal-only NO es Production, GA ni acceso de clientes externos:** eso sigue gateado por TASK-1480, y ADR-004 mantiene **diferida** la decisión del frontend cliente comercial (Vercel + Next.js sigue siendo candidato vivo) — "Cloud Run para el shell interno" **no** significa "Cloud Run para el frontend cliente".
+
+**Topología: Global External Application Load Balancer + serverless NEG, no domain mapping.** Los **10** recursos del front door viven en `infra/terraform/front_door.tf` (Globe: código e infra; la doc gobernante, acá); el plan fue `11 to add` porque el 11.º es la habilitación de `compute.googleapis.com` agregada a `local.enabled_services` en `locals.tf`. Carril HTTPS: IP global externa (`globe-studio-front-door-ip`, asignada `8.233.189.79`) → forwarding rule `:443` → target HTTPS proxy → url map → backend service `EXTERNAL_MANAGED` → **serverless NEG regional** (`southamerica-west1`) → Cloud Run `globe-studio-internal`. Carril HTTP: forwarding rule `:80` → target HTTP proxy → url map de redirect (`https_redirect=true`, `MOVED_PERMANENTLY_DEFAULT`, `strip_query=false`). Ambas forwarding rules en `PREMIUM` + `EXTERNAL_MANAGED`. Tres decisiones que hay que respetar al tocarlo:
+
+- **El NEG nombra el servicio por string literal, no por referencia de recurso.** Cuando se construyó, referenciar el `google_cloud_run_v2_service` habría significado **adoptar** el servicio a Terraform, y eso era explícitamente scope de **TASK-1508** — ya ejecutada: hoy los dos servicios **sí** están en Terraform. Convertir ese literal en referencia sigue exigiendo el protocolo de import (`plan` con **cero** `destroy`/`replace`), no un cambio casual de HCL.
+- **`enable_cdn = false`, deliberado.** El backend sirve un shell SSO autenticado por sesión; cachearlo en el edge sería un bug de correctitud, no una optimización.
+- **`create_before_destroy` en el managed cert.** Un certificado administrado por Google **no se edita in place**; cambiar el dominio sin ese lifecycle deja el front door sin cert.
+
+**Por qué un ALB y no un domain mapping de Cloud Run.** El estado final endureció el ingress a **`internal-and-cloud-load-balancing`**: el servicio sólo admite tráfico que llega **por el balanceador**, así que el front door tiene que ser un balanceador — es el único punto de control que puede quedar delante. El ALB además es lo que da el carril de redirect HTTP→HTTPS y el lugar donde vive la política de borde. **Domain mappings en el proyecto: 0**, y así debe quedar.
+
+**El dominio sirve SÓLO el web; la API queda IAM-private.** El NEG apunta **únicamente** a `globe-studio-internal`. `globe-api-internal` **NUNCA** recibe custom domain ni entrada al NEG: sigue IAM-private (anónimo → **403**, antes y después del cutover), su `GLOBE_API_EXPECTED_AUDIENCE` contiene **los dos formatos de URL `run.app`** y **JAMÁS** el dominio browser, y su `GLOBE_PUBLIC_BASE_URL` es el placeholder `https://globe-api-internal.invalid`. La audience de un ID token se deriva de la URL que Cloud Run reconoce; darle dominio browser a la API rompería la verificación en-app de `verifyWorkloadCaller`.
+
+**Y el `ingress` de `globe-api-internal` es `all` — deliberado. NO lo endurezcas por analogía con el web.** Es la asimetría que más invita a un error de simetría: el web quedó en `internal-and-cloud-load-balancing` porque su único camino legítimo es el ALB, pero el caller de la api es **Greenhouse corriendo en Vercel**, que llega **por internet** — no por la VPC ni por un balanceador. Endurecer su ingress **cortaría la federación workload**. Su perímetro no es el ingress sino **IAM** (`invokerIamDisabled` en **false**, invoker binding en Terraform) **+** la verificación en-app del ID token, con audience derivada del `run.app`. Verificado: anónimo → **403**.
+
+**El ceiling de escala tiene DOS campos y Cloud Run aplica el MENOR — la trampa que costó cara.** Un servicio Cloud Run lleva un ceiling **a nivel servicio** (`Service.scaling.maxInstanceCount`) y otro **a nivel revisión** (`template.scaling.maxInstanceCount`), y el efectivo es el menor de los dos. Peor: **`--max-instances` escribe un campo distinto según el subcomando** — `gcloud run deploy` escribe el de servicio, `gcloud run services update` el de revisión. Eso produjo un bug silencioso de meses: ambos servicios de Globe tenían **servicio=1 / revisión=3**, o sea techo efectivo **1**, mientras toda la documentación (incluido el cierre de TASK-1465) declaraba 3 — y por eso el **spend fence cross-réplica que TASK-1465 construyó nunca se ejercitó**. Lo destapó TASK-1508 al adoptar los servicios en Terraform, y quedó **corregido a 3/3 efectivo**, con **los dos campos** gobernados por IaC. Gobernar el campo de servicio exige provider `google` **>= 7.x** (no existe en 6.x): TASK-1508 subió el constraint de `~> 6.0` a **`~> 7.0`**, y bajo la major nueva **76 de 78 recursos quedaron no-op**. El workflow `deploy-internal.yml` pasó a ser **image-only**: ya **no** pasa `--service-account`, `--no-allow-unauthenticated`, `--min-instances` ni `--max-instances` — pasa **sólo `--image`**; la configuración vive en Terraform y el `ignore_changes` cubre exactamente **tres entradas: la imagen, `client` y `client_version`** (estos dos son metadata de qué herramienta escribió último, no configuración). Prueba anti-drift ejecutada en **dos ciclos, uno por servicio**: ambos dejaron `tofu plan` en **No changes**. **El drift-trap está CERRADO.** Consecuencia registrada: como el techo efectivo fue **1**, el spend fence cross-réplica de TASK-1465 **nunca se ejercitó** — ejercitarlo es **TASK-1512**. El **ingress nunca fue drift-trap**: `deploy-internal.yml` no pasa `--ingress`, y `gcloud run deploy` preserva lo que no se le especifica.
+
+**El orden del cutover: allowlist ANTES que env var.** La spec original ordenaba al revés (cambiar `GLOBE_PUBLIC_BASE_URL` y después agregar el redirect). Se invirtió **deliberadamente**, y ese es el orden canónico para cualquier cambio de origen SSO: **agregar un redirect URI al allowlist es inerte hasta que algo lo use**, mientras que flipear `GLOBE_PUBLIC_BASE_URL` primero abre una ventana en la que `/auth/start` anuncia un callback que el broker todavía no permite — SSO roto para todos, con un rollback que necesita una escritura en DB bajo presión. La secuencia ejecutada fue: (1) ampliar el allowlist de forma **aditiva**, sin quitar el `run.app`; (2) verificar contra el broker **antes** de tocar el runtime; (3) cutover de `GLOBE_PUBLIC_BASE_URL` en Cloud Run; (4) smoke SSO end-to-end contra el dominio; (5) endurecer el ingress; (6) re-smoke post-hardening. El valor es load-bearing: `apps/studio-web/src/app.ts` construye el callback como `new URL('/auth/callback', config.publicBaseUrl)` dentro de `/auth/start`.
+
+**El allowlist se mueve con una primitive, NUNCA con el seed.** El allowlist de redirect URIs se administra por script — no existe route admin de OAuth clients (sólo `/api/admin/integrations/sister-platform-bindings`) — pero el seed de piloto **no sirve para un cutover**: `scripts/seed-globe-internal-pilot.ts` pasa `redirectUris: [uri]` (**REEMPLAZA** el array, o sea borra el `run.app`) y `rotateToken: true` (**ROTA** el client secret y rompe el SSO vivo). El camino correcto es la primitive `updateSisterPlatformOAuthRedirectUris` (`src/lib/sister-platforms/oauth-broker.ts`), manejada por `pnpm sister-platform:redirect` (`scripts/sister-platform-oauth-redirect-uris.ts`, genérico: sirve `globe` y `kortex`):
+
+```bash
+# dry-run (no escribe nada, imprime el allowlist resultante)
+pnpm sister-platform:redirect --client globe --add https://globe.efeoncepro.com/auth/callback
+# aplica
+pnpm sister-platform:redirect --client globe --add https://globe.efeoncepro.com/auth/callback --apply
+```
+
+Sus propiedades importan y son deliberadas: aditiva/sustractiva, **una sola transacción** con `SELECT ... FOR UPDATE`, toca **exclusivamente** la columna `redirect_uris` (nunca `policy_json`, `allowed_scopes`, TTLs, `client_status` ni el token del consumer); reusa `normalizeRedirectUris` como única autoridad de validación (rechaza wildcards, exige HTTPS salvo localhost, nunca vacío); re-agregar un URI existente es **no-op idempotente** (`changed=false`); **quitar un URI que no está en el allowlist FALLA fuerte** (`invalid_redirect_uri`) en vez de hacer no-op silencioso — durante un cutover, un no-op silencioso sobre una vista stale es exactamente cómo sobrevive el callback equivocado; cliente desconocido → `404 invalid_client`, **nunca** lo crea. La lógica vive en el broker y no en el script a propósito: una route, MCP o Nexa puede operar el mismo cambio por la misma primitive (Full API Parity). Tests: `src/lib/sister-platforms/oauth-redirect-uris.test.ts` (11 casos).
+
+**Verificación de tres vías contra el broker, antes y después.** El broker valida el `redirect_uri` **antes** de mirar la sesión, así que `GET /api/auth/sister-platforms/authorize` discrimina sin necesitar login: antes del cambio, dominio → `400 invalid_redirect_uri` y `run.app` → `303 /login`; después, dominio → `303`, `run.app` → `303`, y un wildcard (`https://*.efeoncepro.com/auth/callback`) → **sigue** `400 invalid_redirect_uri`. El allowlist quedó en **2 URIs**: el `run.app` se **conserva a propósito** como camino de rollback documentado — con el ingress endurecido ese origen ya no es alcanzable por browser, así que un código enviado ahí no llega a ninguna parte, y quitarlo obligaría a una segunda escritura en DB bajo presión durante un rollback.
+
+**Cutover de runtime y endurecimiento de ingress (gcloud, no Terraform, y por qué).** `GLOBE_PUBLIC_BASE_URL` se movió con `gcloud run services update ... --update-env-vars` — **NUNCA `--set-env-vars`, que es destructivo** sobre un servicio vivo (reemplaza todo el set y borra las variables que no listes). El ingress se cerró con `gcloud run services update globe-studio-internal --region southamerica-west1 --project efeonce-globe --ingress internal-and-cloud-load-balancing`. **Contradicción de la spec que hay que registrar:** la spec decía "vía Terraform", pero **en ese momento** los servicios Cloud Run **no estaban en Terraform** y adoptarlos era explícitamente scope de TASK-1508; `gcloud` era el único camino consistente con el scope de TASK-1507. **TASK-1508 ya los adoptó**, así que la configuración del servicio —ingress incluido— queda hoy gobernada por IaC: el `ignore_changes` sólo cubre la imagen + `client` + `client_version`. Resultado verificado: acceso **directo por `run.app` → 404** (bloqueado, es el estado esperado y no un incidente), dominio por el ALB → **200**. `invokerIamDisabled` sigue **true** en el web, que es lo correcto para un servicio con SSO: un browser no presenta ID token, la app autentica por su cookie de sesión.
+
+**Certificado y DNS: dos trampas de diagnóstico que cuestan horas.** El cert quedó `PROVISIONING` tras el apply (esperado: aún no existía DNS); con el A record ya creado en HostGator pasó a **`FAILED_NOT_VISIBLE`**, y **eso no es un error de configuración**: es el resultado guardado del **primer** intento de validación de Google, ocurrido **antes** de que el registro existiera. Google reintenta solo y el estado llega a `ACTIVE` sin intervención — acá tardó ~28 min desde la creación del DNS (cert servido: `CN=globe.efeoncepro.com`, issuer Google Trust Services `WR3`). Antes de tocar nada, la checklist de descarte que se corrió (toda OK) es la que hay que repetir: NS autoritativos respondiendo, `8.8.8.8` y `1.1.1.1` devolviendo la IP correcta, sin `AAAA`, sin `CNAME`, sin `CAA` en el dominio padre, cert adjunto al target-https-proxy, forwarding rule `:443` sobre la IP correcta, y el ALB ya respondiendo por el dominio real desde internet. La segunda trampa es local: el resolver de la máquina del operador mantuvo **cache negativa** del nombre — el SOA de `efeoncepro.com` tiene `minimum` TTL **86400 (24h)**, así que un `NXDOMAIN` cacheado antes de crear el registro persiste ~24h, y `dscacheutil -flushcache` sin `sudo` no hace nada. Síntoma engañoso: `curl` devuelve **`status=000` sin remote_ip**, como si el dominio no sirviera, cuando en realidad sirve para todo el mundo menos para esa máquina. **Siempre** contrastar con `dig @8.8.8.8` y `curl --resolve` antes de concluir que algo está roto.
+
+**El apply, y la carrera que se arregló en el HCL.** `compute.googleapis.com` **no** estaba habilitada en el proyecto (verificado con `PERMISSION_DENIED` antes del cambio) y se agregó a `local.enabled_services`. El plan inicial fue `11 to add, 0 to change, 0 to destroy`, con 65 recursos no-op, **cero destroy/replace y cero recursos Cloud Run en el diff** — el protocolo de import de la foundation, aplicado. El primer apply creó 8/11 y falló en los 3 del carril HTTP-redirect con `SERVICE_DISABLED`: la API recién habilitada no había propagado, y `google_compute_url_map.front_door_http_redirect` era la **única raíz del grafo sin arista implícita hacia la API** (el carril HTTPS la alcanza transitivamente vía backend service → NEG). **Se arregló la carrera en el HCL** con un `depends_on` explícito hacia `google_project_service.enabled["compute.googleapis.com"]`, **no** se reintentó a ciegas. Segundo apply: 3/3, y el plan posterior quedó en `No changes`. Herramienta: **OpenTofu v1.12.4**, provider `hashicorp/google` 6.50.0 (TASK-1508 subió después el constraint a **`~> 7.0`** para poder gobernar el ceiling a nivel servicio).
+
+**Smoke de federación humana, y la regla de calibrarlo.** `efeonce-globe/scripts/smoke-human-federation.mjs` es el par **humano** de `smoke-private-api.mjs` (que cubre el carril workload con SA + ID token). Recorre las **tres piernas** del login real: `GET {origen}/auth/start` → 303 al authorize de Greenhouse; el authorize con sesión Greenhouse → 303 de vuelta al `redirect_uri` con `code`; el callback con la cookie de transacción de Globe → 303 a `/studio` con cookie de sesión. Asserts: el `redirect_uri` anunciado pertenece al origen bajo prueba, PKCE **S256** con `code_challenge` presente, `state` y `nonce` presentes, `state` ecoado, el authorize no puede redirigir fuera del origen, y el callback debe emitir cookie y aterrizar en `/studio`. Env: `GLOBE_WEB_BASE_URL`, `GREENHOUSE_BASE_URL`, `GREENHOUSE_AGENT_SECRET`, `GREENHOUSE_AGENT_EMAIL`, `GREENHOUSE_VERCEL_BYPASS`, `GLOBE_SMOKE_RESOLVE`. `GLOBE_SMOKE_RESOLVE=host:ip` fija la resolución **sólo para ese proceso** (equivalente a `curl --resolve`) para poder smokear un front door recién publicado desde un resolver con cache negativa, **sin debilitar ninguna aserción**: SNI, CN del certificado, header `Host` y `redirect_uri` siguen viajando con el hostname real; sólo decide a qué dirección disca el socket. Detalle técnico: `dns.setServers` **no sirve** (el `fetch` de Node usa el resolver del SO vía `dns.lookup`); la vía correcta es interponer `dns.lookup` devolviendo array cuando undici pide `all`. **Lección de método, no anécdota:** el smoke se corrió **primero contra el origen `run.app`, antes del cutover**, y pasó — así, si fallaba después, acusaba al cutover y no al instrumento. **Un smoke sin calibrar no es evidencia.** Los secretos se leen del entorno y **nunca** se imprimen; el bypass de Vercel se manda **sólo** al origen de Greenhouse, nunca a Globe ni a terceros.
+
+**Resultado final verificado en vivo.** `http://globe.efeoncepro.com/` → **301** a `https://globe.efeoncepro.com:443/`; `https://globe.efeoncepro.com/` → **200**, TLS válido (`ssl_verify_result=0`), HTTP/2, sirviendo el shell real de Globe (`<title>Efeonce Globe — Internal creative studio</title>`) con su propio `x-correlation-id` — o sea responde la app, no una página del balanceador. Smoke SSO contra el dominio: `human_federation_ok` **antes y después** del hardening.
+
+**Costo fijo (Cloud Billing Catalog API, servicio "Networking" `E505-1604-58F8`, precios efectivos 2026-07-21, USD).** La regla mínima global de forwarding rule es **USD 0.025/hora ≈ USD 18,25/mes** y cubre las 5 primeras reglas globales; este front door usa **2** (`:443` y `:80`), así que sumar reglas dentro de ese margen no agrega costo fijo (la adicional sería USD 0.010/hora). El data processing del ALB en Santiago (`southamerica-west1`) es **USD 0.012/GiB** inbound y **USD 0.012/GiB** outbound. El certificado administrado por Google **no tiene cargo**. **Total: ~USD 18,25/mes + ~USD 0,024 por GiB servido (in+out).** Nota de rollback: destruir el ALB pero dejar la **IP global reservada y sin adjuntar** la empieza a facturar como IP estática ociosa — hay que destruir la dirección junto con el resto.
+
+**Rollback: una SECUENCIA ORDENADA, no un menú de slices (camino verificado, no ejecutado).** Los pasos se ejecutan **en este orden**, y el primero es **precondición** de los siguientes. **Desde TASK-1508 la configuración del servicio vive en Terraform**, así que para los pasos 1 y 2 hay que elegir carril explícitamente — HCL, o `gcloud` con la deuda declarada:
+
+1. **Ingress** (<10 min) — en HCL: `ingress = "INGRESS_TRAFFIC_ALL"` en `cloud_run_services.tf` + apply. Por velocidad se puede mover con `gcloud run services update globe-studio-internal --region southamerica-west1 --project efeonce-globe --ingress all`, **sabiendo que es una mutación out-of-band contra el state** que el apply del paso 4 revierte si no se refleja en HCL. Restaura el acceso directo por `run.app`. **Precondición del paso 2**, no un slice independiente.
+2. **URL/OAuth** (<15 min) — en HCL: poner `GLOBE_PUBLIC_BASE_URL = <run.app>` en `cloud_run_services.tf` (hoy es `"https://${var.front_door_domain}"`) + apply; o `gcloud run services update … --update-env-vars GLOBE_PUBLIC_BASE_URL=<run.app>` con la misma advertencia del paso 1. El `run.app` sigue en el allowlist a propósito, así que este paso **no** necesita escritura en DB.
+3. **DNS** (<60 min por propagación) — quitar el A record en HostGator.
+4. **ALB** — revertir **el HCL del front door**, **no** un `git revert` a ciegas de los dos commits: `16919d9` arrastra `variables.tf`/`locals.tf`/`outputs.tf` además de `front_door.tf`, y borra `variable "front_door_domain"`, que `cloud_run_services.tf` usa desde TASK-1508 (`GLOBE_PUBLIC_BASE_URL = "https://${var.front_door_domain}"`) ⇒ el revert deja la referencia viva sin declaración y `tofu plan` aborta con *"Reference to undeclared input variable"* — no llega ni a producir plan. Lo que se revierte: `front_door.tf` completo (sus 10 recursos), la habilitación de `compute.googleapis.com` en `locals.tf` y los outputs del front door; se **conserva** `variable "front_door_domain"` en `variables.tf` mientras `cloud_run_services.tf` la referencie, o se resuelve esa referencia en el mismo movimiento (es la misma edición del paso 2). Los **DOS** commits (**`16919d9` + `cf5e4d1`**) siguen siendo la unidad de contenido a revertir: revertir uno solo deja huérfano el fix del `depends_on` o reabre la carrera `SERVICE_DISABLED`. Después: `tofu plan` → **leer el plan** → `tofu apply`, e incluir la **destrucción de la IP global** (reservada y sin adjuntar se factura como IP estática ociosa). **NO** es un destroy a mano recurso por recurso. **Y "leer el plan" acá es literal:** si los pasos 1 y 2 se hicieron con `gcloud`, el plan va a mostrar el servicio web **volviendo** a `internal-and-cloud-load-balancing` y a `GLOBE_PUBLIC_BASE_URL` del dominio — esos dos cambios hay que revertirlos **también en HCL ANTES** del apply. Aplicar sin eso deshace los pasos 1 y 2 justo cuando el ALB acaba de ser destruido y el A record ya no existe: un servicio que sólo admite tráfico de un balanceador inexistente, anunciando un callback en un dominio muerto — la versión total-outage del segundo incidente.
+
+**La precondición es lo que hay que interiorizar:** revertir sólo `GLOBE_PUBLIC_BASE_URL` con el ingress todavía endurecido **NO es un rollback**. El `run.app` sigue devolviendo **404** (sólo entra tráfico por el ALB) y el dominio pasa a anunciar un callback inalcanzable — eso es un **segundo incidente** encima del primero, no una mitigación.
+
+## ADR-014 — el payload de browser React+Vite: estado del programa (verificado 2026-07-25)
+
+ADR-014 migra el payload humano de Globe de **templates de string** a un cliente **React + Vite tipado**. Esto es el
+estado real, contra código y runtime; lo mutable vive en `GLOBE_RUNTIME_HANDOFF.md`.
+
+- **`TASK-1556` (foundation) — COMPLETE.** Existe `apps/studio-client` (Vite 8.1.5 + React 19.2.8 + React Router
+  8.3.0, SSR apagado), servido por **el mismo** `apps/studio-web`. Trajo el **SSOT de tokens**
+  (`src/tokens/tokens.ts`, con `LEGACY_TOKEN_DRIFT` registrando las divergencias que NO se unifican por decreto),
+  la **capa de copy** (`src/copy/`) y un **shell por request** con slot `criticalContent`.
+- **`TASK-1557` (Cloud CDN path-scoped sobre `/assets/*`) — COMPLETE y verificado en vivo.**
+- **`TASK-1558` (share board) — Slices 1-2 en `main` (`a336ff5`).** Acá **nacieron las primitives**:
+  `apps/studio-client/src/primitives/index.tsx` exporta `Chip`, `Eyebrow`, `FactList`, `CommentList`, `StateBlock`
+  y `MediaStage`; la superficie es `src/surfaces/share/ShareBoardSurface.tsx`. **Su promoción a primitives de
+  plataforma es PROPUESTA, no asumida:** una primitive con un solo consumer es una **hipótesis**; se promueve
+  cuando una **segunda** superficie la consume **sin modificarla**. Si el segundo consumer necesita una prop nueva,
+  eso **no es promoción** — es evidencia de que la abstracción no estaba lista. Una primitive `Surface`
+  **deliberadamente no se construyó**: shippear una primitive sin superficie que la sirva invita a envolver todo
+  en ella.
+- **`TASK-1554` (reader de flota de modelos) — COMPLETE.** `globe.producer.fleet.list` es el **SoT LIVE** de
+  disponibilidad; el ledger `GLOBE_MODEL_FLEET_STATUS.md` es el **SoT humano**. **Si divergen, manda el reader.**
+- **`TASK-1561` (gate de diseño) — COMPLETE.** `apps/studio-client/src/gates/design-contract.test.ts` pasó de 3 a
+  **5 tests**: literales de color, literales de motion, literales de tipografía
+  (`font-family`/`font-size`/`font-weight`/`line-height`/`letter-spacing`), **pesos sin `@font-face`** — el browser
+  los **sintetiza**, deformando las letras, sin fallar nada — y copy literal en JSX. El escaneo camina
+  `.ts`/`.tsx`/`.css`. **Su frontera está declarada dentro del archivo:** escanea **SOLO** `apps/studio-client`.
+  `apps/studio-web` — donde viven los **184 hex crudos** y las **4 familias tipográficas literales** — **NO está
+  vigilado**. `TASK-1560` Slice 2 amplía la frontera **inmediatamente ANTES** de borrar el legacy, nunca después:
+  un gate rojo al llegar se saltea, y un gate salteado se lee como cobertura.
+### El criterio de retiro del legacy mide 38 capabilities, no 12 — y lee DOS archivos
+
+`apps/studio-client/src/data/legacy-parity.ts` es el inventario ejecutable que gatea `TASK-1560`. Su primera
+versión declaraba **12** y leía sólo `producer-client.ts`: ese archivo es el **TRANSPORTE** y expone un
+`reader(id)` / `command(id)` **genérico**, así que `producer-controller.ts` —la UI— despacha **29 capabilities
+más** pasando el id como argumento, y ninguna aparece como literal en el transporte.
+
+**El guard pasaba en verde midiendo el archivo que su autor eligió, no la realidad** — el anti-patrón *"el gate es
+el test de regresión del primer consumidor"* aplicado al propio gate. Sin corregirlo, `TASK-1560` habría podido
+borrar el legacy con el reemplazo cubriendo **12 de 38**.
+
+Hoy el guard lee **los dos archivos**, clasifica por camino de despacho (genérico vs tipado) y tiene un piso
+numérico. El inventario declara la **`surface`** de cada capability, y eso lo vuelve un plan:
+**composer 14 · viewer 6 · library 6 · credits 4 · feed 4 · review 4** — el composer es el cuello de botella.
+
+⚠️ Y **12 capabilities están GATEADAS Y NUNCA DESPACHADAS** en el legacy (`library.bulk.*`,
+`experiment.evidence/list/tree`, `recipe.get`, `prompt.enhancement.accept/reject`, …): el botón existe, se ilumina
+con grant, y no llama a nada. **No son riqueza: son promesas muertas**, declaradas con su motivo en
+`LEGACY_PARITY_EXCLUSIONS`. Cuando alguien diga *"el legacy tiene X y el nuevo no"*, la pregunta es **si X
+DESPACHA**.
+
+- **`TASK-1555` (selector de modelo del Producer) — in-progress.** La **galería de láminas** se implementó y **el
+  operador la rechazó al verla**; se reemplazó por un **desplegable compacto con isotipo real** de cada modelo
+  (`a45954f`), que lista **toda la flota de la modalidad activa** (`0258534`). **No la llames "galería": está
+  muerta.** Ojo con dónde vive: el selector está todavía en el **payload legacy**
+  (`apps/studio-web/src/producer-ui.ts` + `producer-controller.ts`), así que porta bajo `TASK-1560`.
+
+### 🔴 El flag `client_app_enabled` NO está cableado — ninguna superficie sirve sobre el payload nuevo
+
+Esta es la parte que hay que interiorizar antes de prometer un cutover. Verificado el 2026-07-25 contra `main`
+(`6e8ef5a`):
+
+- `grep -rn client_app_enabled infra/terraform/` devuelve **UNA sola línea**: su propia declaración en
+  `variables.tf:188`. `GLOBE_CLIENT_APP_ENABLED` **no aparece en ningún `.tf`**, ni en el spec del Cloud Run service.
+- La **imagen desplegada** de `globe-studio-internal` es `45235ccb62ca`, **anterior** al commit de `TASK-1556`
+  (`4bf631e`): `git merge-base --is-ancestor 4bf631e 45235cc` → **falso**.
+- **Consecuencia: cambiar el default a `true` y correr `tofu apply` da un PLAN VACÍO.** El contenedor vivo no tiene
+  bundle, no tiene `renderShell` y no lee esa variable. **Ninguna superficie sirve sobre el payload nuevo todavía:**
+  el cliente ve `public-share-ui.ts`, el template viejo.
+
+**La cadena real del cutover, en este orden:** (1) **cablear** la variable en el `.tf` del servicio → (2)
+`TASK-1562` → (3) desplegar `origin/main` vía `deploy-internal.yml` → (4) flip + `tofu apply` → (5) verificar con
+**grant real** → (6) retirar el legacy (`TASK-1560`).
+
+## 🔴 Antes de crear una TASK de este epic: barrer por DOMINIO, no por nombre (2026-07-25)
+
+EPIC-028 tiene **~50 tasks hijas**, y varias describen **la misma superficie desde ángulos distintos**:
+foundation · resiliencia · port al payload nuevo · rediseño de jerarquía. Eso hace que un barrido por **título**
+no cruce duplicados, y en una sola sesión se crearon **cinco tasks duplicadas** antes de detectarse:
+
+| Creada | Dueña que ya existía |
+|---|---|
+| feed + viewer sobre el payload cliente | **`TASK-1526`** Producer Resilient Feed and Viewer |
+| proyección del share · menciones | **`TASK-1522`** Review, Comments and Read-only Share Foundation |
+| composer sobre el payload cliente | **`TASK-1552`** Composer Focused Creation + **`TASK-1532`** One-Click Generate + **`TASK-1555`** Model Selector |
+| motion del payload cliente | **`TASK-1523`** Creative Suite Experience Logic (dueña de los contratos visual/flow/motion) |
+| (biblioteca, evitada a tiempo) | **`TASK-1520`** Asset Library, Collections and Bulk Operations |
+
+*"Feed + viewer sobre el payload cliente"* y *"Resilient Feed and Viewer"* **son la misma superficie con dos
+nombres.** La pregunta correcta no es *"¿existe una task con este nombre?"* sino **"¿quién es dueño de esta
+superficie?"**.
+
+**Mapa de dueños por superficie del Producer** (verificado 2026-07-25) — usalo antes de crear cualquier task:
+
+| Superficie | Dueña |
+|---|---|
+| Composer (IA, first fold, progressive disclosure) | `TASK-1552` |
+| Estimado automático + CTA de gasto | `TASK-1532` |
+| Selector de modelo | `TASK-1555` (+ `TASK-1553` para resolución por-ruta) |
+| Prompt engineer / prompt studio | `TASK-1530` / `TASK-1531` |
+| Feed + viewer (resiliencia, concurrencia) | `TASK-1526` |
+| Biblioteca, colecciones, bulk | `TASK-1520` |
+| Review, comentarios, share, menciones | `TASK-1522` |
+| **Contratos visual / flow / motion de la suite** | `TASK-1523` |
+| Retiro del payload legacy | `TASK-1560` |
+
+⚠️ **`TASK-1523` es la dueña del contrato de motion de TODO el payload cliente.** El SSOT es
+`docs/architecture/creative-studio/GLOBE_CLIENT_MOTION_CONTRACT_V1.md` — compartido y no per-superficie porque el
+isotipo de Globe generando vive en el feed **y** en el composer, y dos definiciones del mismo momento de marca
+divergen. Sus tres capas se gobiernan distinto: **identidad** (bajo `reduce` se apaga la animación, **no** el
+elemento) · **estructura** (`--duration-none`) · **ambiente** (se apaga).
+
+**Y `Motion: none` en una task de superficie es una alarma, no un default.** `TASK-1559` se autorizó así y el feed
+shippeó con **4 de 11** animaciones del diseño aprobado. El task-lint sólo verifica que el campo exista; contar los
+`@keyframes` del prototipo antes de aceptarlo cuesta un `grep`.
 
 ## Errores canónicos y correlación
 
@@ -315,18 +893,67 @@ Globe nació **sin base de datos**: los 5 stores del spine eran in-memory y se r
 - **NUNCA** construyas o mutes un `TrustedCommandContextV1` fuera de `deriveTrustedContext`; es branded y server-only.
 - **NUNCA** confíes en `api` mode sólo en el perímetro (Cloud Run IAM): un servicio puede tener `invokerIamDisabled: True` y saltarse el invoker check. La app verifica el ID token del caller en-app (`verifyWorkloadCaller`) como segunda capa, **LOCAL** (`google-auth-library.verifyIdToken`, claves cacheadas — **NUNCA** `tokeninfo` por request), con `apiExpectedAudience` (`GLOBE_API_EXPECTED_AUDIENCE`) + `apiCallerServiceAccounts` (`GLOBE_API_CALLER_SERVICE_ACCOUNTS`) **ambos fail-closed** (vacío ⇒ nadie, `access_denied` 403). `IdTokenVerifier` es port inyectable.
 - **NUNCA** mandes el ID token en `X-Serverless-Authorization` (Cloud Run lo **consume**, no lo reenvía al contenedor): va en **`Authorization`** (Cloud Run lo reenvía, y es lo único que la re-verificación en-app puede leer). Con X-Serverless el perímetro pasa y la app da **401** al caller legítimo. El SDK usa `Authorization` (`applyAuthMaterial`).
-- **NUNCA** asumas que un humano opera el Model Lab desde el studio: el Lab vive en **`api` mode** (service principal con `globe.lab.experiment.run`); en `web` mode el humano lleva **sólo `globe.studio.access`** (el broker no otorga la capability del Lab a humanos) ⇒ Lab inalcanzable, coherente con `ui: policy-blocked`.
-- **NUNCA** dejes `invokerIamDisabled: True` en un servicio **`api` mode** (perímetro OFF): es correcto sólo para el servicio **web** con SSO (browser sin ID token; auth por sesión). Hoy los servicios Cloud Run no están en Terraform, así que el flag **no está gobernado por IaC** — cuidado con drift (follow-up).
+- **NUNCA** permitas que el browser opere el Lab directamente: TASK-1519 habilita UI sólo por BFF same-origin,
+  grants acotados y trusted surface server-derived; la ejecución/autoridad sigue en API mode.
+- **NUNCA** dejes `invokerIamDisabled: True` en un servicio **`api` mode** (perímetro OFF): es correcto sólo para el servicio **web** con SSO (browser sin ID token; auth por sesión). Desde **TASK-1508** los dos servicios Cloud Run están en Terraform, así que el flag **sí está gobernado por IaC** — **NUNCA** lo muevas con `gcloud` fuera de un incidente documentado: eso reintroduce drift contra el state.
+- **NUNCA** trates una mutación `gcloud` sobre los servicios Cloud Run de Globe como si fuera permanente: desde **TASK-1508** el `ingress`, las env vars, el scaling y la service account viven en `cloud_run_services.tf`, y el `ignore_changes` cubre **sólo** imagen + `client` + `client_version` ⇒ **todo lo demás que muevas con `gcloud` es out-of-band contra el state y muere en el próximo `tofu apply`, en silencio**. Está permitido por velocidad dentro de un incidente documentado, y en ese caso el mismo movimiento tiene que reflejarse en HCL **antes** del siguiente apply.
 - **NUNCA** llames a un SDK de provider directo desde UI/MCP/CLI/scripts/tests; **NUNCA** expongas `endpoint + arbitrary JSON`; **NUNCA** metas model identifiers vendor en policy de dominio.
 - **NUNCA** llames Google-native fuera de Vertex/GCP, ni un modelo Google por Fal; Fal solo non-Google allowlisted; OpenAI directo.
 - **NUNCA** confundas `policy_blocked` con `access_denied` / `not_found`; **NUNCA** filtres secretos/tokens/body upstream a cliente o logs.
+- **NUNCA** escribas una superficie humana nueva de Globe como **template de string**, ni serialices código de browser con `Function.prototype.toString()` (ADR-014). El payload vive en `apps/studio-client` (React + Vite, tipado, `lib.dom` + el `strict` del monorepo). `producer-ui.ts` / `public-share-ui.ts` / `ui.ts` son **payload viejo en retiro**, no plantilla a copiar: un agente que los toma como referencia reintroduce justo lo que la ADR eliminó.
+- **NUNCA** declares un `:root` de tokens fuera del SSOT (`apps/studio-client/src/tokens/tokens.ts`) ni un color, duración o easing literal en una superficie — son **error** de gate, no advertencia. Y **NUNCA** unifiques por decreto un valor que `LEGACY_TOKEN_DRIFT` registra como divergente (p. ej. el anillo de foco, **ámbar** en launch/studio/error y **azul** en producer): adoptarlo es cambio visible y pertenece al slice de port de esa superficie.
+- **NUNCA** pongas un string visible en JSX ni en `aria-label`/`title`/`placeholder`/`alt`: sale de `apps/studio-client/src/copy/index.ts` vía `copyFor()`. El nombre público del producto y de la moneda **no están decididos**, así que esas etiquetas van a cambiar. Y **NUNCA** dupliques `producer-copy.ts` en la capa nueva: se absorbe **moviéndolo** cuando el composer porte (studio-web depende de studio-client, el copy viaja en esa dirección y nunca de vuelta).
+- **NUNCA** devuelvas un `string` desnudo desde un renderer de documento: es `HtmlDocument {nonce, html}` (`apps/studio-web/src/html-document.ts`). El helper de respuesta ya no recupera el nonce con un regex sobre el body — hacerlo emitía `script-src 'nonce-'` y bloqueaba el propio payload sin fallar en build ni en tests. Un nonce que no sea CSP `base64-value` se **rechaza** en la frontera.
+- **NUNCA** corras el dev server de Vite con `--host` / `server.host`: 13 de los 19 advisories históricos de Vite son bypasses de `server.fs.deny` o lectura arbitraria del dev server, y **todos** exigen que sea alcanzable por red.
+- Globe **tiene ESLint desde `TASK-1556`**, acotado a `apps/studio-client` (jsx-a11y + rules-of-hooks en `error`). Eso NO contradice la regla de `node --test`: el runner de tests sigue siendo Node; ESLint es sólo el linter, y no se apunta al legacy de templates de string porque produciría ruido sobre el que nadie puede actuar.
+- 🔴 **NUNCA** declares un flag como "prendido" ni un cutover como "un `tofu apply`" sin verificar **las dos** cosas: **(a) que el flag esté CABLEADO** — si `grep -rn <flag> infra/terraform/` devuelve **UNA sola línea**, esa línea es su **declaración** y no está conectado a nada; un flag cableado aparece **≥2 veces** (declaración en `variables.tf` **+** consumo en el spec del servicio) — y **(b) que la IMAGEN DESPLEGADA contenga el código que lo lee**: `git merge-base --is-ancestor <sha-del-código> <sha-de-la-imagen>`. **Un `tofu apply` verde con plan vacío no es evidencia de nada**: es exactamente cómo el ledger termina diciendo ON con la realidad en OFF. Caso fuente vivo: `client_app_enabled` / `GLOBE_CLIENT_APP_ENABLED` (2026-07-25) — declarado desde `TASK-1556`, conectado a nada, con la revisión viva anterior al commit que trajo el payload.
+- **NUNCA** importes primitives de Greenhouse, `CompositionShell` ni MUI dentro de `apps/studio-client` (ADR-014 punto 8 / `TASK-1540`). AXIS contracts/registry pueden consumirse como gobierno de adapters, pero Globe **materializa sus propios** tokens y componentes. Las primitives de Globe viven en `apps/studio-client/src/primitives/index.tsx` (`Chip`, `Eyebrow`, `FactList`, `CommentList`, `StateBlock`, `MediaStage`, `AxisStatus`, `AxisProgress`).
+- **NUNCA** promuevas una primitive de Globe a "primitive de plataforma" con **un solo consumer**: es una **hipótesis**, no una abstracción. Se promueve cuando una **segunda** superficie la consume **SIN modificarla**; si el segundo consumer necesita una prop nueva, eso **no es promoción** — es evidencia de que no estaba lista. Y **NUNCA** construyas una primitive sin superficie que la sirva (por eso `Surface` deliberadamente **no existe**).
+- **NUNCA** leas el gate `apps/studio-client/src/gates/design-contract.test.ts` como cobertura del repo: su frontera está **declarada en el propio archivo** y escanea **SOLO** `apps/studio-client/src`. `apps/studio-web` — donde viven los **184 hex crudos** y las **4 familias tipográficas literales** — **no está vigilado**. La frontera se amplía en **`TASK-1560` Slice 2, INMEDIATAMENTE ANTES** de borrar el legacy y **nunca después**: un gate rojo al llegar se saltea, y un gate salteado se lee como cobertura. Descripción honesta de hoy: **el payload nuevo no puede driftear; el legacy no está mirado.**
+- **NUNCA** uses un peso tipográfico que no tenga su `@font-face`: el browser lo **sintetiza**, deformando las letras, **sin fallar nada** — por eso es uno de los 5 tests del gate y no una convención. El gate cubre además `font-family`/`font-size`/`font-weight`/`line-height`/`letter-spacing` y camina `.ts`/`.tsx`/`.css`.
+- **NUNCA** decidas la disponibilidad de un modelo desde el ledger `GLOBE_MODEL_FLEET_STATUS.md`: el **SoT LIVE** es el reader **`globe.producer.fleet.list`** (`TASK-1554`); el ledger es el SoT **humano**. Si divergen, **manda el reader**.
+- **NUNCA** te refieras al selector de modelo del Producer (`TASK-1555`) como **"galería"**: esa dirección se implementó, **el operador la rechazó al verla** y hoy es un **desplegable compacto con isotipo real** que lista toda la flota de la modalidad activa. **Ya está portado** al payload cliente: vive dentro de `apps/studio-client/src/surfaces/producer/composer/ProducerComposer.tsx` (marcadores `producer-model-*`), en `/producer`. **Corregido 2026-07-25:** `TASK-1564` quedó **retirada** y el dueño del composer —port y rediseño de jerarquía— es **`TASK-1552`**; las dos tasks editan el MISMO archivo, así que hay que coordinar orden. La región `producer-route` es composición, no feed. `TASK-1560` sólo **borra** el legacy después, no lo porta.
+- 🔴 **NUNCA inventes un nombre de cabecera al portar.** El transporte del payload cliente enviaba
+  `x-globe-idempotency-key` y **ese nombre no lo lee NADIE**: toda la plataforma usa **`x-idempotency-key`**
+  (`producer-client.ts` lo manda, `app.ts:2982` lo lee, `app.ts:3164` lo **EXIGE** igual a
+  `envelope.idempotencyKey` o devuelve `invalid_request` 400, `app.ts:3215` lo reenvía a la API privada).
+  Consecuencia real: **NINGÚN command del payload React funcionaba** — ni `Generar`, ni `Mejorar`, ni
+  favorito — y el fallo era invisible porque el BFF rechaza con `return denied(...)`, **sin lanzar**, así que
+  no pasa por ningún `catch` ni deja rastro en logs. La cabecera es contrato tanto como el cuerpo.
+- 🔴 **`idempotencyKey` va en el CUERPO del envelope, no sólo en la cabecera.**
+  `CommandRequestEnvelopeV1` lo declara requerido y `parseCommandEnvelope` devuelve `undefined` sin él.
+  Truco de diagnóstico: para distinguir *"el envelope no parseó"* de *"el handler rechazó"* NO sirve el
+  `correlationId` de la respuesta — viene de la cabecera `x-globe-correlation-id`, no del cuerpo parseado.
+- 🔴 **`deploy-internal.yml` toma el servicio como INPUT: desplegar `globe-studio-internal` NO despliega
+  `globe-api-internal`.** La API estuvo corriendo una imagen varios commits vieja mientras el web iba
+  adelante, y **el dispatch de commands ocurre en la API**: toda instrumentación agregada al web era
+  invisible para el fallo. **SIEMPRE** confirmá qué imagen corre CADA servicio antes de concluir que una
+  instrumentación no funciona.
+- 🔴 **`textPayload:"…"` NO matchea logs JSON en Cloud Logging.** Una línea JSON se parsea a `jsonPayload`,
+  así que ese filtro devuelve cero aunque los logs existan. Usar búsqueda de texto libre (`'"mi.evento"'`) o
+  `jsonPayload.event="…"`.
+- 🔴 **Un servicio sin `roles/logging.logWriter` corre MUDO y no lo dice.** Cloud Run sigue emitiendo sus
+  *request logs* — así que en la consola parece que hay logs — pero cada línea del contenedor se descarta en
+  silencio. Y sin una **línea de arranque** que siempre aparezca, ese silencio es indistinguible de una app
+  que no loggea. Globe emite `globe.studio_web.listening`; si no está, sospechá del rol antes que del código.
+- 🔴 **La hoja legacy estiliza por ATRIBUTO, no sólo por clase.** Al convertir 1:1 hay que cargar los
+  atributos o el control se ve distinto **sin que ninguna regla propia esté mal**: `[data-producer-asset]`
+  (span 4 / `:first-child` span 8 sobre 12 columnas), `capability-button` + `<i class="capability-dot">`,
+  `data-producer-intent` (`.advanced-controls [data-producer-intent=styles] { justify-self: start }` es lo
+  que hace compacto a Style DNA), y `.producer-console[data-producer-controller-bound=true]
+  [data-producer-runtime-shape]` — sin ESOS DOS, los controles de formato de salida quedan como selects
+  nativos grises.
+- 🔴 **Los controles de salida del legacy NO son `<select>`:** una enumeración se elige con **chips**
+  (`shape-chip`, y el glifo de proporción **ES** la proporción vía `aspect-ratio` del valor), un número con
+  **stepper** (`shape-stepper`), y **una dimensión con un solo valor admisible es un HECHO de la ruta**
+  (`shape-fixed`), no un selector — ofrecerlo promete una decisión que el proveedor ignora.
 - **NUNCA** introduzcas Vitest/Jest (Globe usa `node --test`), ni rompas la convención de extensiones (`.js` source↔source de packages; `.ts` en studio-web y en todos los tests).
 - **NUNCA** invoques un provider fuera del runner que corre detrás del command (el Model Lab lo hace por el `LabRunner` en `apps/creative-runner`); un SDK de provider directo desde handler/UI/MCP/CLI/scripts/tests está prohibido.
 - **NUNCA** reconstruyas las URLs de la queue de Fal desde el slug (usa el `status_url`/`response_url` que devuelve el `submit`); **NUNCA** pongas el prefijo `fal-ai/` en un slug ByteDance (van sin prefijo; verifica un slug con `POST {}` a `https://fal.run/<slug>`: 404=inexistente / 422=existe); **NUNCA** uses la key de Greenhouse (`greenhouse-fal-api-key`) para Fal desde Globe (es `GLOBE_FAL_API_KEY`, propia de Globe); **NUNCA** llames Vertex con API key (es keyless: ADC/WIF, runtime SA con `aiplatform.user`); **NUNCA** reportes el slug del modelo como `actualRoute` (el `actualRoute` es el route del contrato de fidelidad — `== proposedRoute` sin fallback; el slug va en `model`).
 - **NUNCA** invoques Omni (`gemini-omni-flash-preview`) por `generateContent` ni por `predictLongRunning`: es **Interactions API** (unary síncrono ~35-60s). Veo (`veo-3.0-fast-generate-001`) **sí** usa `:predictLongRunning`→`:fetchPredictOperation`; el adapter Vertex `generateContent` es **image-only** (video da 400). No cruces las tres fronteras de invocación.
 - **NUNCA** metas una imagen en un request **text-to-video** de Veo (da **400**): en i2v el primer frame se **siembra** desde la referencia resuelta por Track B; el t2v va **sin imagen**.
 - **NUNCA** intentes **edit stateful** por la superficie **keyless de Vertex** (`aiplatform.googleapis.com/.../interactions`): `previous_interaction_id` → 400 "do not support" y `GET /interactions/{id}` → 500. El edit stateful (`previous_interaction_id` + `store:true`) es **SOLO** por `generativelanguage.googleapis.com/.../interactions?key=` con la API key `globe-gemini-api-key` (ahí OAuth se rechaza con `ACCESS_TOKEN_SCOPE_INSUFFICIENT`). `generativelanguage` **no es Vertex**.
-- **NUNCA** compres **"Gemini Enterprise"** (per-seat ~$25/seat, sucesor de Agentspace) para la Interactions video API — no tienen relación; el video de Omni **no tiene tier gratis** ($0.10/s), y la Gemini Developer API (`generativelanguage`) se paga con **Prepay/Postpay + API key** (`globe-gemini-api-key`, no `greenhouse-*`).
+- **NUNCA** compres **"Gemini Enterprise"** (per-seat ~USD 25/seat, sucesor de Agentspace) para la Interactions video API — no tienen relación; el video de Omni **no tiene tier gratis** (USD 0.10/s), y la Gemini Developer API (`generativelanguage`) se paga con **Prepay/Postpay + API key** (`globe-gemini-api-key`, no `greenhouse-*`).
 - **NUNCA** encadenes un edit sobre un interaction id **cross-surface**: un id emitido por **Vertex keyless** NO es editable en la superficie Gemini (`generativelanguage`) — son namespaces de id distintos. El edit stateful rutea **solo** por `editTransport` (Gemini-key) del `VertexOmniAdapter` dual-transport, y **falla cerrado con `edit_unavailable`** si no hay `editTransport` inyectado (nunca cae al keyless).
 - **SIEMPRE** que un generate deba ser **editable**, córrelo con `store:true` **en la superficie Gemini** (no en Vertex keyless): el adapter resuelve `useEditSurface = (isEdit || store) && editTransport`. Un generate editable en keyless deja un id que ningún edit posterior puede encadenar.
 - **NUNCA** dejes un command de capability cara sin kill switch fail-closed (apagado ⇒ `policy_blocked`), sin hard spend fence que aborte *antes* de gastar (el fence es de seguridad, NO el credit ledger de TASK-1468), ni aceptes inputs como bytes crudos (private-ingest: content hash + rights declarados).
@@ -340,8 +967,45 @@ Globe nació **sin base de datos**: los 5 stores del spine eran in-memory y se r
 - **NUNCA** agregues una dep de package nueva a `studio-web` sin **COPY + build** de ese package (`@efeonce-globe/database` incluido) en el `apps/studio-web/Dockerfile`: el bundle `pnpm deploy` debe traer `pg` + el connector, o el servicio bootea sin cliente de DB (lección viva de TASK-1465).
 - **SIEMPRE** que hagas durable un store, ponelo **detrás del port EXISTENTE** (no reshapees callsites): `DurableExperimentStore`/`DurableEvaluationReportStore`/`DurableSpendFence`/`DurableSessionStore`/`DurableAuditLog` implementan los mismos ports que sus dobles in-memory, inyectados por DI (`StudioAppDependencies`). El `DurableSpendFence` hace reserve/settle/release **atómico bajo row locks** (el cap cross-replica que in-memory no da a `maxScale>1`), y sigue siendo el fence de **seguridad**, **NO** el ledger comercial (TASK-1468).
 - **SIEMPRE** recordá que **`globe_owner` (NOLOGIN) es dueño de TODO objeto** de la app: migrators son members (`SET ROLE globe_owner`), runtime SAs reciben DML por `ALTER DEFAULT PRIVILEGES`. Ojo con el superuser **restringido** de Cloud SQL (PG16): no puede `CREATE SCHEMA AUTHORIZATION` para un rol al que no puede `SET ROLE` ⇒ el bootstrap hace a `postgres` member de `globe_owner` primero.
+- **NUNCA** uses un **seed de piloto** (`seed-globe-internal-pilot.ts`, `seed-kortex-sister-platform-pilot.ts`) para agregar o quitar un redirect URI de un cliente vivo: **REEMPLAZA** el array completo (borra el `run.app`) y **ROTA** el client secret (rompe el SSO en curso). El único camino es la primitive `updateSisterPlatformOAuthRedirectUris` vía `pnpm sister-platform:redirect --client <id> --add|--remove <uri> [--apply]` (aditiva/sustractiva, una transacción con `SELECT ... FOR UPDATE`, toca sólo `redirect_uris`; sin `--apply` es dry-run). Quitar un URI ausente **falla fuerte** a propósito — no lo "arregles" convirtiéndolo en no-op.
+- **NUNCA** flipees `GLOBE_PUBLIC_BASE_URL` (ni ningún origen SSO) **antes** de que su `/auth/callback` esté en el allowlist del broker: agregar el redirect es inerte hasta que algo lo use, pero mover la env var primero deja `/auth/start` anunciando un callback no permitido ⇒ SSO roto. El orden canónico es allowlist aditivo → verificar contra el broker (`GET /api/auth/sister-platforms/authorize`: `400 invalid_redirect_uri` vs `303`) → cutover de env var → smoke → endurecer ingress → re-smoke. **NUNCA** quites el origen anterior del allowlist en el mismo movimiento: es el camino de rollback.
+- **NUNCA** le des custom domain, domain mapping ni entrada al serverless NEG a **`globe-api-internal`**: es IAM-private (anónimo → 403), su `GLOBE_API_EXPECTED_AUDIENCE` lleva **los dos formatos de URL `run.app`** y **JAMÁS** el dominio browser, y su `GLOBE_PUBLIC_BASE_URL` es el placeholder `https://globe-api-internal.invalid`. El dominio `globe.efeoncepro.com` sirve **sólo** `globe-studio-internal` (domain mappings en el proyecto: **0**).
+- **NUNCA** endurezcas el `ingress` de **`globe-api-internal`** por analogía con el web: es **`all` deliberado**, porque su caller es **Greenhouse en Vercel** y llega **por internet**, no por la VPC ni por el balanceador — `internal-and-cloud-load-balancing` le **cortaría la federación workload**. Su perímetro es **IAM** (`invokerIamDisabled` en **false** + invoker binding en Terraform) **más** la verificación en-app del ID token (audience derivada del `run.app`); anónimo → **403**. Que el web esté endurecido **no** es un argumento para endurecer la api: son perímetros distintos por diseño.
+- **NUNCA** uses `gcloud run services update --set-env-vars` sobre un servicio Cloud Run vivo: es **destructivo** (reemplaza el set completo y borra en silencio las variables que no listaste). Para mover una variable es **`--update-env-vars`**.
+- **NUNCA** concluyas que un dominio "no sirve" por un `curl` con **`status=000` sin remote_ip** antes de descartar **cache negativa del resolver local**: un `NXDOMAIN` cacheado antes de crear el registro persiste según el `minimum` del SOA (en `efeoncepro.com`, **86400s = 24h**) y `dscacheutil -flushcache` sin `sudo` no hace nada. Contrasta con `dig @8.8.8.8` y `curl --resolve`; para smokear desde esa máquina, `GLOBE_SMOKE_RESOLVE=host:ip` (fija sólo el socket; SNI, CN, `Host` y `redirect_uri` siguen con el hostname real).
+- **NUNCA** leas `managed.domainStatus = FAILED_NOT_VISIBLE` de un managed cert como error de configuración sin correr la checklist de descarte: suele ser el resultado guardado del **primer** intento de validación, ocurrido antes de que existiera el DNS, y Google reintenta solo hasta `ACTIVE` (acá, ~28 min desde el A record). Checklist: NS autoritativos, `8.8.8.8` + `1.1.1.1` devolviendo la IP, sin `AAAA`, sin `CNAME`, sin `CAA` en el dominio padre, cert adjunto al target-https-proxy, forwarding rule `:443` sobre la IP correcta, y el ALB ya respondiendo por el dominio desde internet.
+- **NUNCA** trates el **404 del `run.app` directo** de `globe-studio-internal` como incidente: es el estado esperado con `--ingress internal-and-cloud-load-balancing` (sólo entra tráfico por el ALB). El acceso legítimo es por `globe.efeoncepro.com`.
+- **NUNCA** ejecutes el rollback del front door como un **menú de slices**: es una **secuencia ordenada** — (1) ingress a `all`, (2) `GLOBE_PUBLIC_BASE_URL` de vuelta al `run.app`, (3) DNS, (4) ALB — y el paso de **ingress es PRECONDICIÓN** del de URL/OAuth. Revertir sólo la env var con el ingress todavía endurecido deja el `run.app` en **404** y el dominio anunciando un callback inalcanzable: **segundo incidente, no rollback**. El paso ALB **NO** es un destroy a mano **ni un `git revert` a ciegas de los dos commits**: se revierte **el HCL del front door** (`front_door.tf` completo + `compute.googleapis.com` de `locals.tf` + los outputs), **conservando** `variable "front_door_domain"` mientras `cloud_run_services.tf` la referencie — `16919d9` arrastra `variables.tf`/`locals.tf`/`outputs.tf`, y borrar esa variable deja viva la referencia de TASK-1508 ⇒ `tofu plan` aborta con *"Reference to undeclared input variable"*. Los **DOS** commits (**`16919d9` + `cf5e4d1`**) siguen siendo la unidad de contenido: revertir uno solo deja huérfano el fix del `depends_on` o reabre la carrera `SERVICE_DISABLED`. Y si los pasos 1-2 se hicieron con `gcloud`, hay que revertirlos **también en HCL ANTES** del apply: el plan mostrará el web volviendo a ingress endurecido + dominio, y aplicarlo con el ALB ya destruido es **outage total**. Después: `tofu plan` → **leer el plan** → `tofu apply`, **incluida la destrucción de la IP global** (reservada y sin adjuntar se factura como IP estática ociosa).
+- **NUNCA** leas un `maxScale` de un solo lugar: hay ceiling **a nivel servicio** y **a nivel revisión**, Cloud Run aplica el **menor**, y `--max-instances` escribe uno u otro según el subcomando (`run deploy` → servicio; `run services update` → revisión). Ambos servicios estuvieron capados a **1 efectivo** mientras los docs decían 3, dejando sin ejercitar el spend fence cross-réplica de TASK-1465 (ejercitarlo es **TASK-1512**); **TASK-1508 lo corrigió a `3/3`** y puso **los dos campos** bajo Terraform, subiendo el constraint del provider `google` de `~> 6.0` a **`~> 7.0`** (el campo de servicio no existe en 6.x). **NUNCA** "restaures" el techo con `gcloud run services update … --max-instances=3`: escribe el campo de revisión y deja el efectivo en 1. El workflow `deploy-internal.yml` es hoy **image-only** (pasa **sólo `--image`**; ya no `--service-account`, `--no-allow-unauthenticated`, `--min-instances` ni `--max-instances`) y el `ignore_changes` cubre exactamente **imagen + `client` + `client_version`**: **NUNCA** le devuelvas flags de configuración al workflow ni amplíes ese `ignore_changes` a configuración real — es reabrir el drift-trap. El **ingress tampoco** fue nunca drift-trap del workflow.
+- **NUNCA** conviertas el string literal del serverless NEG en una referencia al `google_cloud_run_v2_service` sin pasar el protocolo de import (`plan` con cero `destroy`/`replace`): el NEG lo nombra por literal desde TASK-1507, cuando adoptar el servicio todavía era scope de **TASK-1508** (ya ejecutada; los servicios están en Terraform). **NUNCA** prendas `enable_cdn` en el backend del shell SSO (cachear una superficie autenticada por sesión es un bug de correctitud), y **NUNCA** saques `create_before_destroy` del managed cert (no se edita in place). Si un recurso del front door no tiene arista implícita hacia `compute.googleapis.com`, dale `depends_on` explícito — **arregla la carrera en el HCL, no reintentando a ciegas**.
+- **SIEMPRE** calibra un smoke contra el origen **viejo** antes de un cutover: si falla después, tiene que acusar al cutover y no al instrumento. Un smoke sin calibrar no es evidencia.
 - **NUNCA** expongas por ninguna surface el **slug de wire**, el **costo vendor** ni el **margen** de una ruta del Producer Catalog: lo público es `model = { name, version? }` (el nombre real "Seedance · 2.0" es ancla de posicionamiento), y la taxonomía `house` es OPERATOR-ONLY detrás de `globe.producer.route.reveal_house` (default audiencia `client`, que omite `house`). El **nombre** del modelo ≠ el **slug** (el campo `model` del catálogo es el nombre; el campo `model` del manifest de adapter es el slug).
 - **NUNCA** reimplementes la resolución de rutas del Producer Catalog: reusá los helpers in-process SSOT (`resolveRouteConstraints`/`getProducerRoute`/`listProducerRoutes`) sin re-dispatch por el registry desde dentro de un handler (mismo patrón que el Evaluation Harness); ampliar/tunear una ruta es editar el array de dato + `PRODUCER_CATALOG_VERSION`, nunca el motor del reader.
+- **NUNCA** autorices retrieval de un output **contra el store**: el store de Globe es **content-addressed y TENANT-BLIND** (el nombre del objeto ES el hash, un bucket para todos los workspaces) y guarda **los outputs Y los bytes de las referencias private-ingest de entrada** — no sabe de quién es nada. La autoridad la resuelve el **dominio** (`authorizeOwnedOutput`) contra `store.get(workspaceId, experimentId)` — el **MISMO `ExperimentStorePort` del Lab, nunca un índice paralelo** — y sólo sobre `outputHashes` de un attempt `candidate_ready` con `outputsRetained === true`. **NUNCA** consultes `authorizedInputHashes` en un path de retrieval: eso convierte el endpoint de outputs en un lector de los inputs de cualquiera.
+- **NUNCA** devuelvas de un rechazo de **propiedad** en retrieval algo más fino que **`not_found`**: cross-workspace, id desconocido, hash que sólo fue input y candidato no retenido tienen que ser **indistinguibles desde afuera** (un grant forjado/expirado sí es `access_denied`: es fallo de prueba de autorización, no una señal sobre existencia). Un `access_denied` que confirme existencia —o un código que confirme el hash— es un **oráculo para sondear por content hash un bucket compartido**.
+- **NUNCA** dupliques la política de autorización en la ruta de serving: `GET /v1/outputs/:sha256` reusa el **mismo helper del reader** y el **mismo `handlerErrorToApiCode`** (un primitivo, dos transportes) y **RE-EJECUTA** `authorizeOwnedOutput` después de autenticar y de verificar el grant — un candidato que dejó de ser recuperable deja de ser servible aunque el grant siga vivo. El grant (HMAC-SHA256, server-minted, **firmado no cifrado**, bound a `(workspaceId, experimentId, sha256, disposition)`, TTL 300s —rango 30-900—, verify stateless en tiempo constante) **NO es un bearer autosuficiente**; viaja en query porque la UI necesita `src` directo, y **NUNCA** se loggea ni entra a un audit event.
+- **NUNCA** respondas un fallo del store con **200 y cuerpo vacío** ni con **`not_found`**: todo `OutputRetrievalError` (`not_found`/`unreadable`/`integrity_mismatch`) es **`dependency_unavailable`** (retryable). El cuerpo vacío entrega un archivo roto que parece bueno, y `not_found` es mentira — el dominio **acaba de certificar** que el candidato existe, así que contradecir el descriptor manda a un operador a cazar un fantasma. La lectura **re-verifica `sha256(bytes) === declarado` ANTES de devolver** (`GcsOutputRetrieval`, tercer lector del bucket, distinto de `GcsInputResolver`, que corre dentro de un run pagado detrás del fence).
+- **NUNCA** dejes que un caller declare `rights: 'derived-internal'` ni **blanquees** un derivado a `internal-owned`: `copyAsReference` **certifica** esa postura server-side y hereda `parentRights` con `inheritedDerivedRights` — **la misma función que el edit base del Lab** —, para que un ancestro `licensed` siga restringiendo a sus descendientes; falla **cerrado antes de mintear** si el medio no es referenciable (`model-3d`). Y **NUNCA** hagas `favorite` como toggle ciego: toma el **estado deseado explícito** (un toggle sobre una vista stale invierte lo que el usuario quiso) y conserva el timestamp original en un repeat.
+- **NUNCA** reuses la capability de **gasto** del Lab para el output side: es
+  `globe.producer.assets.operate`, de gasto cero. UI puede consumirla por BFF/grant humano; MCP y comercial
+  conservan gates propios.
+- **NUNCA** implementes la idempotencia de una anotación con **read-then-write**: entre réplicas, "chequear y después insertar" es una carrera cuyo síntoma visible es un `referenceId` duplicado o una estrella re-fechada. Va en SQL (`ON CONFLICT DO NOTHING` + re-lectura), y `rights='derived-internal'` es un **CHECK**, no una convención. Con `maxScale=3` un store in-memory no es "volátil": es **NO DETERMINISTA**.
+- **NUNCA** dejes el estado real de un flag de Globe en `terraform.tfvars` (gitignoreado): `GLOBE_PRODUCER_ASSETS_ENABLED` se declara en `variables.tf` (`producer_assets_enabled`, default **TRUE en git**) — un flag cuyo valor real vive en un archivo sin trackear es el mismo problema de estado efímero que moverlo con `gcloud`, mejor disfrazado. El secreto `globe-producer-grant-secret` lleva **contenedor + accessor en Terraform y VALOR out-of-band**, con accessor **sólo para `api_runtime`**; sin él el mint **degrada a `dependency_unavailable`** (fail-closed), nunca a un grant sin firma.
+- **NUNCA** filtres vendor en el filename servido (es neutro: `globe-<hash12>.<ext>`) ni sirvas un output sin `Cache-Control: private, no-store`; y **NUNCA** conflaciones `ProducerOutputMediaType` (`image|video|audio|model-3d`) con `LabInputMediaType` (`image|video|audio|text`): el `mediaType` se deriva de la capability semántica del run, pero el **`Content-Type` servido sale del objeto real**, para que un run multi-output no mienta en el cable.
+- **NUNCA** cablees un slug/modelo "que se sabe que existe" sin probarlo primero con un probe de **gasto cero**: en Fal, `POST {}` a `https://fal.run/<slug>` (**404 = no existe**, **422 = existe**); en Vertex, un probe que **siempre falla la validación** (bytes base64 inválidos) para discriminar *"el modelo no soporta el campo"* de *"el campo se aceptó"*. Verificado en vivo: **`fal-ai/elevenlabs/speech-to-speech` NO EXISTE** (404) — el app real de `audio-change-voice` es **`fal-ai/elevenlabs/voice-changer`** (`audio_url` obligatorio, `voice`, `output_format`); `audio-translate` es `fal-ai/elevenlabs/dubbing` (único obligatorio: `target_lang`); `video-motion-control` es `bytedance/seedance-2.0/reference-to-video`, con **`video_urls[]` e `image_urls[]` SEPARADOS**, `duration` como **STRING** y `generate_audio`. Cablear de memoria shippea una ruta que **sólo falla cuando alguien gasta**.
+- **NUNCA** uses un Veo 3.x para `video-frames`: **sólo `veo-2.0-generate-001` acepta y valida `lastFrame`** (`veo-3.0-fast-generate-001` / `veo-3.0-generate-001` → `FAILED_PRECONDITION` *"The request is not supported by this model"*; los ids `veo-3.1-*-preview` **no existen**, `NOT_FOUND`). Y **NUNCA** elijas `fal-ai/vidu/q1/start-end-to-video` para esa capability: existe (422), pero **exige AMBOS keyframes**, así que no puede servir `hasEndFrame: false` — un estado que el contrato de run declara. Es ruta futura de alta fidelidad, no la elegida.
+- **NUNCA** conviertas `FAL_ROUTING` en un record parcial ni resuelvas `supports()` por presencia de clave: es `Record<CreativeCapability, FalModelRoute | null>` **exhaustivo** (una capability nueva **rompe el build** hasta que alguien decida **en código** si Fal la sirve), `null` significa **"deliberadamente no servida acá"** y `supports()` chequea **`!== null`**. Una clave ausente sería un olvido indistinguible de una decisión. **SIEMPRE** dejá `supportsLastFrame` y equivalentes como **DATO de la ruta**: mover la interpolación a otro motor tiene que ser cambiar un id en la tabla, no editar una rama.
+- **NUNCA** metas referencias de distinto medio en un mismo campo del request del proveedor: se reparten **POR TIPO DE MEDIO** (`inputUrlKeyByMedia`), porque un slot compartido mete el video de movimiento en el slot de imágenes y el motor **lo acepta, lo cobra y condiciona sobre lo equivocado** — devuelve algo que **se ve bien**. Una referencia cuyo medio la ruta no puede cargar **FALLA CERRADA**: nunca se sube y se omite.
+- **NUNCA** chequees el tope de referencias antes que la afordancia: el chequeo *"este motor no interpola"* va **PRIMERO**, o el tope **enmascara la causa** y manda al operador a recortar el request cuando esa ruta **no interpola nunca**. Un error acusa la causa, no la consecuencia.
+- **NUNCA** dupliques el mapeo de los campos de forma (resolución, duración, `audioMode`, sample rate, formato, `targetLang`, `voicePreset`) entre la ruta de **run** y la de **estimate**: van por **UN** helper compartido, o el que deriva **cotiza distinto de como corre** y el estimate deja de ser una promesa sobre el gasto.
+- **NUNCA** infieras el modo de input de video desde la cantidad de referencias: se **HILA** al seam. Dos imágenes son **"inicio y fin"** bajo `frames` con fin y **"dos referencias"** bajo `elements`; adivinar devuelve un video que **se ve bien y responde otra pregunta**.
+- **NUNCA** declares en una ruta un modo de input que su adapter no adjunta: es **fail-open** y sólo se ve **gastando** (`ref/motion/loop-v1` declaraba `frames`/`motion-source` sobre un motor text-to-video sin campo de referencia y **descartaba los keyframes en silencio, después de reservar crédito**). **SIEMPRE** validá con `assertInputModeSatisfied`, que cuenta referencias **por tipo de medio ANTES del fence**: la validación de shape sólo prueba que la ruta **declara** el modo, nunca que el caller aportó **lo que ese modo consume**.
+- **NUNCA** describas la retención de un attempt multi-output con un solo booleano: es **POR OUTPUT** (`ExperimentAttemptManifestV1.outputs?: LabOutputDescriptorV1[]` = `{sha256, mediaType, mimeType, retained}`, aditivo) — antes un solo `throw` abandonaba el loop y el manifest **desconocía las piezas que sí se guardaron**; `outputsRetained` queda por compat y es `true` **sólo si TODAS** se retuvieron. Y **NUNCA** resuelvas la base de un edit con `outputHashes[0]`: `resolveEditSource` elige **POR MODALIDAD**, tomada de la capability **HIJA** (sólo el hijo sabe qué medio consume), o refinar "el video" de un `{video, audio}` entrega **la pista de audio**.
+- **NUNCA** metas el registro de voces bajo la capability de **gasto** ni dejes salir el vendor voice id: `globe.voice.preset.manage` es **propia y de gasto CERO** (registrar una voz no debe implicar autoridad para facturarle a un proveedor — mismo razonamiento que el output side), y hay **cuatro identidades separadas**: `presetId` (workspace-scoped, del caller), `displayName` (cliente), `catalogVoice` (clave curada de Efeonce, **lo ÚNICO que viaja al seam**) y el **vendor voice id, que vive SÓLO en el `FAL_VOICE_MAP` del adapter**. Cross-workspace y desconocido son el **MISMO `not_found`** (si no, el registry es un **oráculo para sondear otro tenant id por id**); un clon **sin `rights`** se rechaza; un clon **sin voz curada** resuelve a nada y el run **falla cerrado** en vez de usar la voz por defecto — entregar otra voz es peor que no entregar nada. La **idempotencia va EN EL STORE**, nunca read-then-write: entre réplicas es una carrera cuyo síntoma son **dos preset ids para una voz**, y un preset id ya usado por corridas pasadas **es parte de su evidencia**.
+- **NUNCA** declares lista una capability de modalidad nueva porque una ruta vecina o los probes pasaron: cada
+  identity exacta necesita evidencia, revisión, promoción, binding, circuito y canario.
+- **NUNCA** agregues un `*.test.ts` en `efeonce-globe` sin registrarlo en el script `test` de su package: los scripts **enumeran los archivos a mano** (no hay glob ni descubrimiento), así que un test no registrado **NUNCA corre** y la suite queda **verde por no haberlo mirado**.
+- **NUNCA** reintentes un command que gasta después de un **timeout del cliente**: un `execute` síncrono puede exceder el timeout de transporte del **CLIENTE** y completar **bien en el SERVIDOR** — reintentar ahí **gasta créditos de nuevo**. Lee el estado (`get`/`status`) **antes** de decidir.
 - **SIEMPRE** una capability nace con schema versionado + command/reader transport-neutral + trusted context + path HTTP/SDK + coverage + conformance (Full API Parity by birth).
 - **SIEMPRE** el primer provider call entra por API/SDK/harness → command → adapter → runner.
 - **SIEMPRE** commands mutantes llevan actor (derivado), workspace, `idempotencyKey`, `correlationId` y audit; todo run caro se estima y aprueba antes de reservar créditos; los outputs son *candidates* hasta review humano.
@@ -350,9 +1014,331 @@ Globe nació **sin base de datos**: los 5 stores del spine eran in-memory y se r
 - **SIEMPRE** que enchufes un motor real, hazlo reemplazando el `CreativeProviderAdapter` detrás del runner — sin tocar el dominio ni el command — siguiendo los adapters reales: Vertex keyless (ADC/WIF), Fal con key propia de Globe (`GLOBE_FAL_API_KEY`, `status_url`/`response_url` de la queue), Composite por `supports()` + política para el overlap; el default de `GLOBE_LAB_PROVIDER` sigue siendo `fake` (hermético) hasta prender un motor por env, y el `actualRoute` reportado es el route del contrato de fidelidad, nunca el slug.
 - **SIEMPRE** usá la superficie **keyless** (ADC/WIF, runtime SA) para **GENERATE** de video — Veo (`:predictLongRunning`) y Omni generate (Interactions keyless en `aiplatform`); reservá la API key `globe-gemini-api-key` **solo** para el **edit stateful** de Omni (`generativelanguage`). El ancla `GLOBE_LAB_VIDEO_ANCHOR` (`fal`|`vertex-video`|`vertex-omni`, default `fal`) es **fidelity-aware**: `preserve-set` → Seedance; `anchor`/`flexible` → el motor ancla elegido; el harness nunca auto-gana un motor (todo verdict `objective_pass_pending_human`).
 
+- **NUNCA** transformes media fuera del Job `apps/media-derivatives` (TASK-1528/ADR-008): el web/BFF y el gateway JAMÁS transforman; **NUNCA** sirvas bytes bufferizando el objeto completo (arrayBuffer/Blob/base64) — el gateway `GET /v1/media/:sha256` pasa UN Range a GCS y pipea con backpressure (200/206/416; multipart 400); **NUNCA** guardes un derivado junto al original (bucket separado content-addressed, worker con get/create SIN delete, gateway read-only); **NUNCA** sobrescribas un derivado (same-key 412 = readback idempotente o integrity conflict) ni cambies un valor de perfil sin bumpear `profileVersion`, ni el pin de ffmpeg del Dockerfile sin bumpear `MEDIA_TRANSFORMER_VERSION`; **NUNCA** trates el media ticket (`globe-media-ticket-secret`, TTL 120s, principal-bound) como bearer — el gateway re-autentica + re-corre `authorizeOwnedOutput` por request. Detalle: `EFEONCE_GLOBE_MEDIA_DERIVATIVES_V1.md` (SPEC-010).
+
 ## Sinergias y gobierno
 
 - **`arch-architect`** (overlay greenhouse-pinned): para forma, decisiones de dominio/schema/frontera y red-team antes de implementar.
 - **`greenhouse-task-planner`**: para autorar/actualizar la `TASK-###` que gobierna el trabajo (recordá: el registry es de Greenhouse).
 - **`greenhouse-documentation-governor`**: para el cierre documental proporcional (arquitectura de Globe + handoff + lifecycle de la task en Greenhouse).
 - Globe está gobernado por **EPIC-028** (parallel-first: Model Lab, plataforma gobernada y validación comercial avanzan en carriles con gates distintos). Ejecutar un experimento de modelo y promover una ruta a UI/MCP son **gates separados**: parity contractual nace temprano; habilitar una surface es aparte.
+
+## Gasto y crédito en Globe — lo que hay que saber ANTES de tocar generación (2026-07-26)
+
+Ocho reglas medidas contra el runtime, no razonadas. Las tres primeras cuestan una sesión entera si se ignoran; las 6-8 son las que impiden diagnosticar mal la topología de autoridad.
+
+1. **`credits.allocate` NO habilita gasto.** Llena el **ledger**; la política (`AdminCreditBudgetPolicy`) sólo mira
+   **grants de pools activos**. Por eso se puede ver `ledgerAvailable: 500002` y que toda generación se niegue con
+   `pool_exhausted`. Son dos capas: ledger ≠ fondeo. "Cargar créditos" no es fondear.
+
+2. **Un `409 conflict` en `execute` casi nunca es idempotencia.** `dispatch.ts` § `handlerErrorToApiCode` (~304-320)
+   colapsa **TRES** clases de error en `conflict`, a propósito, para no filtrar saldos: `CreditLedgerError`
+   (`insufficient_balance`, `budget_denied`), `CommercialCreditLifecycleError` (todo salvo `shape_required`:
+   `approval_stale`, `approval_invalid`, `hard_cap_exceeded`) y `CreditAdministrationError` (todo salvo
+   invalid/not_found/dependency — **incluyendo `maker_checker_required`**). 🔴 **Consecuencia que cuesta una sesión:
+   una aprobación vencida o con digest que no calza devuelve el MISMO 409 que un `pool_paused`**, así que "la
+   aprobación era válida" no está probada por el 409. Para desambiguar hay que preguntarle a
+   **`globe.credits.budget.evaluate`** (devuelve `reason`) y a `budget.availability.get`
+   (`policyAvailable` vs `ledgerAvailable`). **Ninguno de los dos está en la superficie `ui`**: se consultan por el
+   lane privado. Es la causa de `ISSUE-124`, y la arregla el Slice 1 de `TASK-1566` (fase de negación como enum
+   cerrado + los dos readers a `ui: available`).
+
+3. **El cliente DEBE honrar `withinDayCap`.** El estimado lo trae (`= commercial.withinBudget`, o sea la política
+   negando). Ignorarlo deja el CTA habilitado, `prepare` en 200 y `execute` en 409 opaco, con un experimento
+   preparado por intento. El legacy lo chequea antes de preparar (`producer_budget_policy_blocked`).
+
+4. **`hardCapCredits` es parte del quote que firma el `approvalToken`.** El estimado y `prepare` tienen que declarar
+   **el mismo** techo: `execute` reconstruye el quote desde lo guardado y, si no coincide, rechaza como
+   `approval_stale` → que llega como `conflict`. Y el token que viaja en `execute` es el del estimado **vigente**:
+   "el token ES la cotización".
+
+5. **Firmar aprobaciones desde un cliente es BREAK-GLASS, no operación — y para FONDEAR ya ni eso: el
+   camino normal es el carril gobernado** (`propose` → `confirm`, VIVO y ejercido end-to-end el
+   2026-07-26; runbook `docs/manual-de-uso/creative-studio/fondear-creditos-globe.md`). El secreto de
+   aprobación es `only api_runtime can read them` (`infra/terraform/secrets.tf`). El break-glass
+   documentado (`GLOBE_RUNTIME_HANDOFF.md:220`) otorga `serviceAccountTokenCreator` **temporalmente al
+   operador humano**, ejecuta y revoca con readback; su contador debe tender a CERO ahora que el carril
+   funciona. **NUNCA** lo conviertas en el camino normal, **NUNCA** le des
+   `secretmanager.versions.access` a `greenhouse-portal@` (es la identidad de reconciliación de tenancy de
+   **Greenhouse**: usarla para administrar crédito de **Globe** es admin implícito cross-plataforma), y **NUNCA**
+   dejes que un **agente o proceso** proponga y confirme: la confirmación es de un humano autenticado, siempre.
+
+   🔴 **Y NUNCA exijas DOS humanos por defecto.** La primera versión de ADR-015 lo hacía y costó **dos horas de
+   fricción para sumar créditos**: el operador es CEO y product owner del presupuesto, así que no hay segundo actor
+   que buscar. **Un control que nadie puede satisfacer no protege, desvía** — al break-glass, que otorga MÁS
+   autoridad que el camino que reemplaza. El segundo confirmador es **política** (`requireSecondConfirmer` por
+   workspace + techo por operación), **default OFF** en el workspace interno. Lo que se queda como invariante es lo
+   que cuesta cero: el agente nunca confirma, y aprobador ≠ ejecutor entre service accounts.
+
+6. 🔴 **La autoridad de crédito YA está concedida a la identidad que Greenhouse puede impersonar — el problema no es
+   que falte, es que SOBRABA — y el 2026-07-26 SE RETIRÓ (ADR-015 §10, rev `00114-k4t`).** La cadena era:
+   `greenhouse-portal@` con `tokenCreator` sobre `greenhouse-globe-caller` (`iam.tf:16-20`) → principal genérico
+   `globe:service:internal-caller` → que cargaba `grant.issue`/`grant.correct`/`policy.manage`/`budget.manage`
+   **más `globe.lab.experiment.run`** — fondeo y gasto en una identidad. **Hoy el caller genérico (y el broker de
+   tenancy, misma clase) ya NO carga las cuatro**: conserva lecturas, `pool.manage` y `funding.propose/confirm`
+   (el carril gobernado, que ES el camino de fondeo). Señal anti-regreso en dos capas:
+   `creditAdminAuthorityDrift` + evento `globe.credit_admin.caller_authority_drift` (steady = 0) y el test de
+   disyunción en `tenancy-runtime.test.ts`. **NUNCA re-agregues una de las cuatro sin reabrir ADR-015** — el test
+   te va a parar, y saltártelo reintroduce fondeo+gasto en la identidad que Greenhouse puede asumir.
+
+7. 🔴 **El maker-checker de crédito es VACUO para cualquier caller de workload.** `approval()`
+   (`packages/domain/src/credit-administration.ts`) compara `approval.proposedBy` contra
+   `context.actor.principalId`, que para un workload es la **constante** `'globe:service:internal-caller'`
+   (`app.ts:3503`): cualquier `proposedBy` distinto de esa constante pasa el chequeo **trivialmente**, y la única
+   atadura real es el HMAC. **NUNCA** apoyes una disyunción de actores en ese chequeo, y **NUNCA** cites "el
+   maker-checker lo impide" como control para un caller de workload. Corolario: la disyunción tiene que vivir donde
+   hay identidades humanas reales — **Greenhouse**, no Globe.
+
+8. **Un HMAC compartido significa que quien verifica puede FORJAR** (es la misma llave y la misma operación). Por eso
+   `createHmacCreditAdminApproval` no admite un firmador de cliente sin repartir poder de forja, y por eso **no
+   existe ninguna superficie que firme**: `.sign(` no aparece en `app.ts` — el verificador está cableado, el firmador
+   no. **NUNCA** propongas "ampliar el radio del secreto" como salida: es la misma propiedad con otro dueño.
+
+**Dirección decidida — ADR-015** (`EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md`, Partially
+implemented: carril de fondeo VIVO y ejercido + retiro de las 4 caps ejecutado el 2026-07-26; KMS e
+identidades disjuntas por unidad quedan como hardening; implementación = `TASK-1566`): la administración de créditos y capabilities de Globe **vive en Greenhouse** —
+superficie en Greenhouse, autoridad en Globe, lane `sister-platform` (hoy `available` sólo en tenancy), **cuatro
+identidades disjuntas** (broker de administración **distinto** del reconciliador de tenancy; aprobador que firma y no
+muta; ejecutor que muta y **no puede firmar**, separados como **unidad de ejecución propia** porque dentro de un
+proceso la disyunción es cosmética), **KMS asimétrico** en vez del HMAC, comando gobernado
+`credits.month.fund.propose` / `.confirm` con **UNA confirmación humana** (el agente propone, nunca confirma; el segundo confirmador es política por workspace + techo, default OFF en el interno) y la mutación (grant + asiento
+de ledger + política) en **UNA transacción Postgres**, y el **retiro de la autoridad de crédito del caller
+genérico** al final. Break-glass con TTL/motivo/aprobación/revocación automática/readback **y su propio contador**.
+**Cargá ADR-015 antes de tocar administración de crédito o capabilities de usuarios de Globe.**
+
+**Capabilities por usuario: hoy NO EXISTE la dimensión.** `src/lib/globe/tenancy-reconciler.ts:216` asigna
+`desiredCapabilities: policy.capabilities` — **el mismo set a todo miembro de todo workspace bindeado**, tomado del
+grant OAuth. Y sería **inerte**: `tenancy_mode` default es `"shadow"` (`variables.tf:130`) y la proyección
+**observa y nunca niega**. **NUNCA** prometas control de capabilities por usuario sin `tenancy_mode = enforced`
+(`TASK-1511`), y **NUNCA** intentes diferenciar por usuario en el **token**: el broker acopla
+`capabilityScopes ⊆ requiredScopes` y agregarlo lo vuelve requerido para todos (la lección que tumbó el login en
+ADR-010). El grant OAuth es el **techo**; la proyección es el **piso**.
+
+🔴 **Una sanitización SIN contraparte de observabilidad no protege información: la DESTRUYE (ISSUE-127, 2026-07-26).**
+Cuatro códigos canónicos de Globe colapsaban causas que exigen acciones **opuestas**, y tres de ellos bloquearon el
+canary de generación en cadena: **`409 conflict`** de crédito (aprobación vencida vs. inválida vs. pool pausado vs.
+replay), **`runner_error`** (todo fallo del runner sin `reason` de nuestro vocabulario), y
+**`ProductionRouteDependencyError`** (**28 sitios de throw sin argumento**: allowlist, endpoint, provider, URL,
+región, persistencia de la decisión, forma del request, placeholder de input). El cuarto —
+**`authentication_required`** en api mode (clase de credencial vs. `--include-email` ausente vs. audiencia
+incorrecta) — **sigue abierto**.
+
+El colapso es **correcto** de cara al caller: no filtrar saldos, política, prosa de proveedor ni detalle de
+credencial por una taxonomía compartida. El defecto es hacerlo **sin dejar rastro del lado del servidor**. El
+precedente correcto ya existía y no se había replicado: `globe.dispatch.invalid_request`.
+
+**La evidencia de que es un patrón y no bugs sueltos:** arreglar `runner_error` hizo aparecer
+`ProductionRouteDependencyError` **en el primer canary posterior** — el evento nuevo reportó
+`errorName=ProductionRouteDependencyError, reasonShape=absent`, o sea nombró la clase y probó que la clase no
+llevaba causa. Sin ese arreglo la tercera seguiría invisible.
+
+**REGLA:** todo código canónico que colapse **más de una causa accionable** nace con su razón del lado del
+servidor. El payload lleva el **nombre del control** y, si aplica, la **FORMA** del dato faltante (`reasonShape`:
+`absent` / `not-a-string` / `malformed` — separa "el adapter no puso `reason`" de "puso uno malformado", dos bugs
+distintos y el segundo invisible sin esto). **JAMÁS** el `message`, el `stack`, el body del upstream ni nada
+derivado del payload: la prohibición de filtrar detalle interno aplica a los **logs** igual que al cliente, y hay
+tests que lo verifican. Y si el dominio es transport-neutral —lo es, cero `console` en el paquete— la razón se
+observa por un **port inyectado**, no por un `console.error` metido ahí.
+
+🔴 **Un control legítimo que rechaza un caso legítimo se arregla en el CONTROL, no en el caso (ISSUE-127 capa 8, 2026-07-26).**
+El sanitizador del body snapshot trataba como credencial **cualquier** string que empezara con `Key `/`Bearer `
+(regla `^(?:Bearer|Key)\s+`, prefijo y nada más). El prompt del canary de imagen empieza con **`"Key visual editorial
+para Efeonce Globe: ..."`** — `Key visual` es el término de dirección de arte del equipo, no un secreto. Ese falso
+positivo bloqueó el `execute` durante toda una sesión, y **llegaba etiquetado `endpoint_url_not_permitted`**, que
+mandaba a leer una config de endpoint que estaba perfecta.
+
+**NUNCA** desbloquees esto cambiando el input (el prompt del canary): desbloquea la sesión **escondiendo** el bug, y
+el próximo que escriba el término estándar del oficio —un usuario real— come el mismo rechazo mudo. **La heurística
+tiene que distinguir el dato del formato:** una credencial serializada es **un token opaco, no una frase**, así que
+se exige token único, sin espacios, ASCII de credencial y **anclado al final** (`$`). Con eso `Bearer eyJhbGci…` y
+`Key <id>:<secret>` (el formato real de fal) se siguen atrapando y la prosa no: sube la precisión sin bajar el
+alcance contra credenciales reales — ningún token real lleva espacios ni acentos.
+
+Corolario de método, medido dos veces el mismo día: **una hipótesis se mata leyendo, no desplegando.** Los cuatro
+sospechosos heredados asumían que `buildBody` armaba referencias con `placeholder(input)` — el de `text-to-image`
+**no lo llama**, su body son cuatro escalares; y la hipótesis de `vertexProject` vacío (que habría roto el regex de
+vertex en el **constructor**, que valida las 12 entries, no 3) murió con un `gcloud run services describe`:
+`GLOBE_LAB_VERTEX_PROJECT` está sin setear y cae al default. Ninguna de las dos costó un deploy.
+
+## Sesión 2026-07-26 — generación real, carril de fondeo y ocho lecciones de método
+
+**El día en una línea:** el canary de generación GENERÓ por primera vez, el Producer React salió a la
+luz, la UI produce las tres modalidades, y el carril gobernado de fondeo quedó vivo end-to-end salvo
+el último salto de credenciales. Lo que sigue son las reglas que sobreviven a la sesión.
+
+### Generación — el estado real (verificado en runtime, no leído)
+
+Las **tres modalidades generan desde la UI** con principal `human` por el BFF: imagen (Seedream 5 Pro,
+10 cr, PNG 7,4 MB), video (Seedance 2.0, 16 cr, MP4 1,5 MB) y audio (ElevenLabs Multilingual v2, 6 cr,
+MP3 114 KB). El fence libera correctamente: un `provider_failed` dejó `spentCredits=0`.
+
+🔴 **`"Key visual"` NO es una credencial (ISSUE-127 capa 8).** El sanitizador del body snapshot marcaba
+como credencial cualquier string que empezara con `Key `/`Bearer ` (regla `^(?:Bearer|Key)\s+`,
+prefijo y nada más). El prompt del canary de imagen empieza con *"Key visual editorial para Efeonce
+Globe…"* — el término de dirección de arte del equipo. **Ese falso positivo bloqueó el `execute`
+durante una sesión entera**, y llegaba etiquetado `endpoint_url_not_permitted`, mandando a revisar una
+config de endpoint intachable.
+
+**Un control legítimo que rechaza un caso legítimo se arregla en el CONTROL, no en el caso.** Cambiar
+el prompt habría desbloqueado la sesión **escondiendo** el bug para el próximo usuario real. La regla
+correcta distingue el dato del formato: una credencial serializada es **un token opaco, no una frase**
+— se exige token único, sin espacios, ASCII de credencial y **anclado al final** (`$`).
+
+🔴 **Un fallo de proveedor puede ser TRANSITORIO, y una hipótesis con un solo dato no está confirmada.**
+Un video falló con `provider_failed`; la hipótesis "es el audio" pareció confirmarse porque `silent`
+pasó. **La corrida de confirmación la refutó: `with-audio` también pasó.** Marcador real: 2 de 3.
+Antes de shippear un fix sobre una correlación, **corré el caso que la refutaría**.
+
+### Producer React — el flag que lo tenía invisible
+
+`GLOBE_CLIENT_PRODUCER_ENABLED` estaba en `false`, y `app.ts:2061` caía al **fallback legacy**. El
+código React estaba **desplegado desde antes** (la imagen ya contenía `ProducerComposer.tsx`): no
+faltaba deploy, faltaba el flag. El gate que la propia variable citaba (`legacy-parity.test.ts`) estaba
+**verde 7/7**, así que la condición para prenderlo estaba cumplida y sin medir.
+
+⚠️ **Notas de esta skill que resultaron STALE y ya no aplican:** `client_app_enabled` "no está
+cableado" (sí lo está, y en `true` desde 2026-07-25) y "ninguna superficie sirve sobre el payload
+nuevo" (el Producer sirve React desde 2026-07-26, rev `00092-9pr`). **Verificá contra el runtime antes
+de citar una nota de estado de este archivo.**
+
+🔴 **`MediaStage` es primitive COMPARTIDA (share board + viewer): su `padding` y su
+`max-height: calc(100svh - 8.5rem)` son correctos en el share board y ROMPEN el viewer**, donde la
+celda ya tiene altura propia. Medido: celda 830×830, pieza 757×757, 37 px de aire por lado. El override
+va **acotado al viewer** (`producer-viewer.css`), nunca en la primitive. Sigue en `contain`, jamás
+`cover`: llenar no puede significar recortar.
+
+🔴 **Una corrida FALLIDA no puede ofrecer acciones muertas.** `Descargar` y `Usar como referencia` ya
+estaban gateadas por `retained`; **`Ver candidato` no**, y era la única realmente muerta — corregido.
+Y el slot **`Destacada` no renderizaba `statusLine`** (se consumía sólo en la rejilla), así que una
+corrida fallida se presentaba como la mejor pieza del espacio, muda. Ambas cerradas.
+
+⚠️ **`GLOBE_PRODUCER_LIVE_FEED_ENABLED=true` invalida los `ref_N` del árbol de accesibilidad** entre el
+`read_page` y el click: el feed se re-renderiza solo. Cualquier QA automatizado sobre esta UI es flaky
+por diseño hasta que feed y tabs tengan `data-testid` estables (el composer ya los tiene).
+
+### Fondeo gobernado (TASK-1566) — lo que quedó y lo que falta
+
+**Vivo en producción:** `GLOBE_CREDIT_ADMIN_LANE_ENABLED='true'`, rev `00106-b6w`, **176 capabilities**
+(las tres de fondeo publicadas), migración Globe `0032` + Greenhouse `…164420386`/`…171851162`
+aplicadas.
+
+🔴 **Componer transacciones sobre los stores de crédito DEADLOCKEA si cada uno abre la suya.**
+`DurableCreditAdministrationStore` abría `pool.transaction` **por método** (11 call-sites) y cada una
+tomaba `pg_advisory_xact_lock(credit:workspace:X)`. Una transacción externa hace que la interna pida
+ese lock **desde otra conexión**: la externa no commitea porque espera a la interna, y la interna no
+obtiene el lock porque lo tiene la externa. **No es "queda no atómico" — se cuelga, en el camino del
+dinero.** El fix es un **ejecutor inyectable** por store (dentro de una misma transacción el lock es
+reentrante) + el seam `atomically` en el dominio. Backward compatible.
+🔴 **Y el ejecutor tiene que cubrir TODOS los métodos, lecturas incluidas — uno solo que quede en
+`this.pool` reintroduce el cuelgue** (defecto 7 de TASK-1566, medido dos veces en `pg_locks` en
+vivo). `markGrantPosted` quedó fuera del enhebrado del Slice 4c y colgó todo `confirm` desplegado,
+reteniendo el lock del workspace y bloqueando la generación entera; los readers en `this.pool` son la
+misma clase con otro síntoma (no ven los writes de su propia transacción). Cerrado en
+`efeonce-globe@4eab6d3`: accessor `db = tx ?? pool` en TODO método de los stores de administración y
+ledger, `policyReader` viaja por los `CreditFundingMutationPorts` del seam (nunca el reader externo
+dentro de `mutate`), y la regresión conductual es «con `tx` inyectada, `pool.calls === 0`». Al
+agregar un método a un store transaccional de crédito: **NUNCA** `this.pool` directo — `run()`/`db`.
+
+🔴 **El segundo confirmador humano es POLÍTICA, NO invariante** (ADR-015 Delta 2026-07-26 (2)).
+`requires_second_confirmer` es por workspace, **default FALSE en el interno**, más techo por operación
+(`second_confirmer_above_credits`). **NUNCA** lo pongas como `CHECK` incondicional: el operador es CEO
+y dueño del presupuesto, no hay segundo actor, y **un control que nadie puede satisfacer no protege —
+desvía al break-glass, que otorga MÁS autoridad que el camino que reemplaza**. Se cometió ese error en
+esta sesión y bloqueó al operador hasta el forward-fix.
+
+**Lo que sí es invariante y no se toca:** el agente **nunca** confirma (trigger `actor_must_be_human`
+rechaza principals de servicio), toda confirmación registra contra quién confirma, y la evidencia es
+**append-only** (triggers anti-UPDATE/DELETE).
+
+🔴 **`assertHumanAttribution` de Globe es SHAPE-ONLY** — rechaza `globe:service:` y exige entitlement
+no vacío, pero **no puede** verificar que la atribución venga de una sesión autenticada, porque Globe
+no tiene las sesiones. Ese amarre vive en Greenhouse (`globe_credit_funding_intents` + trigger). **No
+publiques el carril sin esa contraparte.**
+
+🔴 **El top-up de CLIENTE es otro acto económico, y el trigger actual lo bloquea.** El grant interno
+gasta presupuesto **de Efeonce** (por eso lo aprueba una persona de Efeonce); un top-up gasta plata
+**del cliente** y lo autoriza **el pago liquidado**. El trigger exige actor humano ⇒ **hay que
+discriminar por `source`** (`human_session` vs `settled_payment`), no relajarlo. Dueño: `TASK-1484`.
+Reglas no negociables: monto **del PSP nunca del cliente**, idempotencia por **id de pago** (los PSP
+reintentan webhooks), y un chargeback se corrige con **`grant.correct`**, jamás borrando el grant.
+
+✅ **CRITERIO DE SALIDA CUMPLIDO (2026-07-26, misma jornada):** el fondeo real corrió `propose` →
+`confirm` punta a punta SIN break-glass — `confirm` en **905 ms** (el paso que se colgaba), grant
++100 `posted`, tope 400→**800**, asiento de ledger, todo en UNA transacción, atribuido al operador
+real (`user-efeonce-admin-julio-reyes`) vía su sesión de Chrome en staging con autorización
+explícita. `pg_locks` 0/0/0 después. **Runbook canónico:**
+`docs/manual-de-uso/creative-studio/fondear-creditos-globe.md`. Tres reglas medidas que un agente
+futuro debe saber:
+
+- **El confirm exige `x-idempotency-key` PROPIA** — reusar la del propose da
+  `409 globe_funding_already_recorded` (el broker registra la intención por clave).
+- **El anti-replay del broker es POR PROPUESTA**, no por clave: registrada la decisión, ningún
+  confirm repetido pasa. El replay idempotente del dominio queda inalcanzable a través del broker;
+  el invariante (ningún segundo grant) vive en dos capas.
+- **La atribución es lo que era "del operador", no la mecánica**: un agente puede ejecutar los curls
+  con autorización explícita SI la sesión es la del humano real; confirmar con la persona agente
+  (`user-agent-e2e-001`) fabrica evidencia en una tabla append-only y sigue prohibido.
+
+### Ocho lecciones de método, que valen más que los fixes
+
+1. **Una hipótesis se mata leyendo, no desplegando.** Dos hipótesis murieron con una lectura y un
+   `describe`; las capas 1-4 costaron un deploy cada una y la 5 se vio en treinta líneas.
+2. **Un bucket por defecto que abarca 17 sitios no es una razón nombrada: es una razón inventada.** Un
+   label equivocado dirige mal, y eso es peor que no tener label.
+3. **Una sanitización sin contraparte de observabilidad no protege información: la DESTRUYE.** Ocurrió
+   **ocho veces** en el mismo día, la última en código escrito mientras se arreglaban las siete
+   anteriores. **Conocer la regla no la aplica sola.**
+4. **Que exista una clave de idempotencia no prueba que el handler la honre.** Verificá el efecto, no
+   la presencia del argumento.
+5. **Un timeout del CLIENTE no es un fallo del servidor.** Leé el estado con el reader antes de
+   reintentar, o gastás de nuevo.
+6. **Código presente no es capacidad disponible.** `registerCreditFundingCapabilities` existía con 12
+   tests verdes y **no lo llamaba nadie**. Los tests de dominio no pueden ver un hueco de cableado:
+   la aserción tiene que ir contra `/v1/capabilities`, que es lo que un caller ve.
+7. **Endurecer más de lo que la decisión pide no es conservador: es cambiar la decisión sin
+   discutirla.**
+8. 🔴 **Un `.ts` con bytes NUL crudos se detecta como BINARIO y todo `grep` lo salta en silencio.**
+   `credit-funding.ts` los usaba como separador de clave; hizo concluir dos veces que un símbolo no
+   existía. Si un símbolo "no aparece" pero deberías estar viéndolo: `file <path>` — si dice `data`,
+   ahí está. Usar `\0`, nunca el byte literal (es runtime-idéntico: no cambia hashes ni ids).
+   **Gate desde 2026-07-26, en LOS DOS repos:** `pnpm nul-byte-gate` — en Greenhouse dentro de
+   `pnpm local:check` (o sea del pre-push), en `efeonce-globe` dentro de `pnpm check`, con su test
+   registrado a mano en el script `test` como pide ese repo. El barrido encontró 3 archivos más
+   (`media-derivatives.ts`, esta skill y la propia TASK-1566, las dos últimas con el byte escrito
+   **dentro de la línea que enseña a no escribirlo**), y el byte se coló también en el gate mientras
+   se escribía: por eso la contramedida no podía ser disciplina.
+
+🔴 **ANTES de escribir una secuencia de canary a mano: YA EXISTE COMO SCRIPT (2026-07-26).**
+`pnpm producer:canary` (`scripts/producer-ui-canary.mjs` + `-lib.mjs`) hace el recorrido **completo** de gasto real
+—`producer.catalog.list` → `lab.experiment.estimate` → `prepare` → `execute` → `experiment.get` →
+`producer.output.get`— y **valida `retained === true`** sobre el output de la modalidad pedida. Su test
+(`producer-ui-canary.test.mjs`) está registrado en el `test` de la raíz. Necesita **una sola** variable:
+`GLOBE_CANARY_ID_TOKEN`.
+
+Los otros dos smokes canónicos, para no confundirlos: **`smoke-private-api.mjs`** cubre el carril **workload**
+(SA + ID token) y **`smoke-human-federation.mjs`** el carril **humano** (las tres piernas del login SSO).
+
+Invocación (el token se sustituye en el shell: **nunca** se imprime ni queda en un literal, sólo vive en el env del
+proceso; y el script lo mintea internamente con `execFileSync`, que es mejor manejo que cualquier `curl`):
+
+```bash
+GLOBE_CANARY_ID_TOKEN="$(gcloud auth print-identity-token   --impersonate-service-account=greenhouse-globe-caller@efeonce-globe.iam.gserviceaccount.com   --audiences=https://globe-api-internal-a6odmgzpvq-tl.a.run.app --include-email)" pnpm producer:canary
+```
+
+**Caso fuente, y es una lección de método, no una nota:** el 2026-07-26 dos agentes distintos estuvieron a punto de
+re-derivar esa secuencia a mano —uno escribió dos prompts manuales completos— antes de descubrir que el script
+existía, estaba commiteado y estaba testeado. **Buscá el script antes de escribir la secuencia.** Un canary
+artesanal no sólo cuesta tiempo: se comporta distinto para cada agente y para CI, y esa divergencia es
+indiagnosticable después.
+
+**Método — `curl` con Bearer contra una API de Google es indistinguible de exfiltración (2026-07-26).** Usar
+`gcloud` (o su `--format=json`), **NUNCA** `curl -H "Authorization: Bearer $(gcloud auth print-access-token)"` contra
+`secretmanager.googleapis.com` / `iam.googleapis.com`. Medido: los dos `curl` con bearer de esa sesión fueron
+bloqueados por el classifier del entorno, mientras **todos** los `gcloud` equivalentes de lectura pasaron
+(`projects get-iam-policy`, `secrets get-iam-policy`, `run/scheduler/logging describe|read`) — y `Bash(gcloud
+secrets:*)` **ya estaba permitido** en `.claude/settings.json`, así que el bloqueo lo causó la FORMA del comando, no
+la falta de permiso. Agregar reglas no arregla esto; usar `gcloud` sí. Y para distinguir éxito de error sin imprimir
+un secreto, el primitive es el **exit code**, nunca una máscara sobre la salida.
+
+**Método:** `gcloud` CLI y ADC son credenciales **distintas** — el token del CLI puede estar vencido y ADC seguir
+viva (o al revés). No des por bloqueado un diagnóstico de infra sin probar las dos.

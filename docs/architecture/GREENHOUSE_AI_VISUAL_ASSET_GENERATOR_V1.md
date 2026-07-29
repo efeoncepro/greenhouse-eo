@@ -277,7 +277,7 @@ consumen directamente por Google Cloud/Vertex, nunca por Fal. Fal ofrece Model S
 una allowlist. Queue: submit → status/result o webhook → cancel/recovery; el adapter Studio productivo es
 separado de este helper Greenhouse.
 
-**Cliente canónico:** `src/lib/ai/fal.ts` (scaffold 2026-07-06, hermano de `openai-image.ts`/`anthropic.ts`/`perplexity.ts`). Expone `isFalConfigured()` y `runFalModel({ model, input, pollTimeoutMs?, pollIntervalMs? })` — **model-agnostic** (pasás el slug fal, ej. `bytedance/seedance-2.0/mini/image-to-video`, + el input de ese modelo), hace **submit+poll a COMPLETED** y **NO lanza en HTTP-not-ok** (devuelve `ok:false` con `errorDetail` saneado, espejo de `runPerplexitySearch`).
+**Cliente canónico:** `src/lib/ai/fal.ts` (scaffold 2026-07-06, hermano de `openai-image.ts`/`anthropic.ts`/`perplexity.ts`). Expone `isFalConfigured()` y `runFalModel({ model, input, pollTimeoutMs?, pollIntervalMs? })` — **model-agnostic** (pasas el slug fal, ej. `bytedance/seedance-2.0/mini/image-to-video`, + el input de ese modelo), hace **submit+poll a COMPLETED** y **NO lanza en HTTP-not-ok** (devuelve `ok:false` con `errorDetail` saneado, espejo de `runPerplexitySearch`).
 
 - **NUNCA** instanciar un fetch/SDK paralelo a fal dentro de un módulo de dominio — extender `runFalModel`. Un consumer nuevo (image-generator provider `fal`, un futuro módulo de video/Media Foundry) compone encima del cliente, no lo duplica.
 - **El secreto se resuelve solo server-side** vía `FAL_API_KEY` (env) o `FAL_API_KEY_SECRET_REF` (GCP Secret Manager). **NUNCA** hardcodear la key (shape `<id>:<secret>`) en repo, Vercel env directo, logs, tests ni docs. Secret canónico: `greenhouse-fal-api-key`.

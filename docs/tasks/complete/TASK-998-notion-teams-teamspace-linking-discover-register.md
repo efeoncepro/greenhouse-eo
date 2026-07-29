@@ -131,7 +131,7 @@ nacimiento ≠ provisioning de tooling).
    DBs ya clasificadas. El operador elige el teamspace del cliente (ej. "Grupo Berel").
 3. Confirma → `/register` con el `spaceId` del cliente + los 3 DB ids clasificados.
 4. Estado honesto: loading / ready / empty (sin teamspaces sin registrar) / degraded
-   (pipeline caído → "registrá manualmente con los ids").
+   (pipeline caído → "registra manualmente con los ids").
 5. "Crear teamspace nuevo": el provisioning crea el teamspace + 3 DBs con el template L1
    (TASK-910) + registra en `space_notion_sources`.
 

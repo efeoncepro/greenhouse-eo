@@ -77,6 +77,9 @@ REACTIVE_BATCH_SIZE="500"
 DEFAULT_EMAIL_FROM="Efeonce Greenhouse <greenhouse@efeoncepro.com>"
 HUBSPOT_SERVICE_NAME="hubspot-greenhouse-integration"
 HUBSPOT_SERVICE_REGION="us-central1"
+DEFAULT_GLOBE_API_BASE_URL="https://globe-api-internal-a6odmgzpvq-tl.a.run.app"
+DEFAULT_GLOBE_GCP_PROJECT="efeonce-globe"
+DEFAULT_GLOBE_GCP_SERVICE_ACCOUNT_EMAIL="greenhouse-globe-caller@efeonce-globe.iam.gserviceaccount.com"
 
 # Cloud Scheduler timezone
 SCHEDULER_TZ="America/Santiago"
@@ -122,6 +125,10 @@ HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL="${HUBSPOT_GREENHOUSE_INTEGRATION_BASE_U
 GREENHOUSE_PORTAL_BASE_URL="${GREENHOUSE_PORTAL_BASE_URL:-${DEFAULT_GREENHOUSE_PORTAL_BASE_URL}}"
 AZURE_AD_CLIENT_ID="${AZURE_AD_CLIENT_ID:-3626642f-0451-4eb2-8c29-d2211ab3176c}"
 AZURE_AD_CLIENT_SECRET_REF="${AZURE_AD_CLIENT_SECRET_REF:-${DEFAULT_AZURE_AD_CLIENT_SECRET_REF}}"
+GLOBE_API_BASE_URL="${GLOBE_API_BASE_URL:-${DEFAULT_GLOBE_API_BASE_URL}}"
+GLOBE_API_AUDIENCE="${GLOBE_API_AUDIENCE:-${GLOBE_API_BASE_URL}}"
+GLOBE_GCP_PROJECT="${GLOBE_GCP_PROJECT:-${DEFAULT_GLOBE_GCP_PROJECT}}"
+GLOBE_GCP_SERVICE_ACCOUNT_EMAIL="${GLOBE_GCP_SERVICE_ACCOUNT_EMAIL:-${DEFAULT_GLOBE_GCP_SERVICE_ACCOUNT_EMAIL}}"
 
 require_non_empty() {
   local name="$1"
@@ -139,6 +146,10 @@ require_non_empty "NUBOX_X_API_KEY_SECRET_REF" "${NUBOX_X_API_KEY_SECRET_REF}"
 require_non_empty "GREENHOUSE_PORTAL_BASE_URL" "${GREENHOUSE_PORTAL_BASE_URL}"
 require_non_empty "AZURE_AD_CLIENT_ID" "${AZURE_AD_CLIENT_ID}"
 require_non_empty "AZURE_AD_CLIENT_SECRET_REF" "${AZURE_AD_CLIENT_SECRET_REF}"
+require_non_empty "GLOBE_API_BASE_URL" "${GLOBE_API_BASE_URL}"
+require_non_empty "GLOBE_API_AUDIENCE" "${GLOBE_API_AUDIENCE}"
+require_non_empty "GLOBE_GCP_PROJECT" "${GLOBE_GCP_PROJECT}"
+require_non_empty "GLOBE_GCP_SERVICE_ACCOUNT_EMAIL" "${GLOBE_GCP_SERVICE_ACCOUNT_EMAIL}"
 
 # ─── Build & Deploy to Cloud Run ─────────────────────────────────────────────
 
@@ -223,6 +234,10 @@ ENV_VARS="${ENV_VARS},NUBOX_BEARER_TOKEN_SECRET_REF=${NUBOX_BEARER_TOKEN_SECRET_
 ENV_VARS="${ENV_VARS},NUBOX_X_API_KEY_SECRET_REF=${NUBOX_X_API_KEY_SECRET_REF}"
 ENV_VARS="${ENV_VARS},GREENHOUSE_PORTAL_BASE_URL=${GREENHOUSE_PORTAL_BASE_URL}"
 ENV_VARS="${ENV_VARS},AZURE_AD_CLIENT_ID=${AZURE_AD_CLIENT_ID}"
+ENV_VARS="${ENV_VARS},GLOBE_API_BASE_URL=${GLOBE_API_BASE_URL}"
+ENV_VARS="${ENV_VARS},GLOBE_API_AUDIENCE=${GLOBE_API_AUDIENCE}"
+ENV_VARS="${ENV_VARS},GLOBE_GCP_PROJECT=${GLOBE_GCP_PROJECT}"
+ENV_VARS="${ENV_VARS},GLOBE_GCP_SERVICE_ACCOUNT_EMAIL=${GLOBE_GCP_SERVICE_ACCOUNT_EMAIL}"
 
 # TASK-742 + TASK-870 — `AZURE_AD_CLIENT_ID` requerido por `/smoke/identity-auth-providers`
 # (probe `azure_authorize_endpoint`) en `server.ts`. Es un public GUID, NO un secreto
@@ -869,6 +884,16 @@ upsert_scheduler_job \
   "/artifact-render/dispatch" \
   '{}'
 echo "  -> ops-artifact-render-dispatch: */2 * * * * (TASK-1391 render queue)"
+
+# TASK-1521 — Freshness is a renewable lease, independent from semantic
+# workspace/member revisions. Five-minute cadence leaves a seven-minute
+# failure budget inside the reconciler's 12-minute fail-closed snapshot TTL.
+upsert_scheduler_job \
+  "ops-globe-tenancy-reconcile" \
+  "*/5 * * * *" \
+  "/globe/tenancy/reconcile" \
+  '{}'
+echo "  -> ops-globe-tenancy-reconcile: */5 * * * * (Greenhouse → Globe full-workspace tenancy V2)"
 
 upsert_scheduler_job \
   "ops-reactive-organization" \

@@ -98,3 +98,30 @@ Esta decisión no crea precios, SKUs, checkout, facturación ni autorización de
 - más de 15% de runs requiere reclasificar manualmente modelo, engagement o modo;
 - Finance/Legal aprueban venta externa, impuestos, expiración, top-ups y reconocimiento de ingresos;
 - evidencia muestra que una taxonomía más simple mantiene igual control y auditabilidad.
+
+---
+
+## Delta 2026-07-23 — autoría humana como mecanismo de valor; agencias como hipótesis, no nuevo modelo
+
+**Clarificación aceptada.** La decisión de vender capacidad creativa gobernada implica una doctrina de autoría:
+el equipo creativo es protagonista, el operador es el punto de vista de la interacción, la autoridad creativa
+permanece humana y Globe actúa como guía/sistema. Globe absorbe routing, perfiles de prompt, parámetros,
+referencias, restricciones, retries, estimate y trazabilidad; no absorbe gusto, derechos, presupuesto,
+aprobación ni publicación.
+
+Esto no cambia la taxonomía de tres ejes ni Studio Credits. La vuelve más defendible: gobierno/plataforma remunera
+la reducción de complejidad y la memoria; capacidad humana se concentra en dirección, curation y excepciones;
+implementación/IP captura templates, recetas y Creative Prompt Engineering validados; credits continúan midiendo
+operaciones generativas gobernadas, no prompts ni horas.
+
+Los equipos creativos de otras agencias quedan registrados como **hipótesis B2B2B**. No se crea un cuarto modelo
+de delivery, package ni entitlement. Cualquier piloto debe usar una combinación existente de `Studio Access`,
+`co-operated` o `client-operated` y cerrar antes tenancy agencia→cliente final, confidencialidad, derechos,
+brand authority, white-label/endorsed, accountability y margen.
+
+**Runtime Contract:** la formulación completa vive en
+[Creative Studio Business Model V1.1](../business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md);
+las experiencias agentic deben preservar original, provenance `aportado|derivado|sugerido` y aceptación humana.
+
+**Revisit when:** evidencia de entrevistas y pilotos B2B2B justifique promover agencias a ICP; o métricas de
+uso muestren que la automatización reduce control/autonomía percibidos en vez de aumentarlos.

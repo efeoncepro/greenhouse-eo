@@ -456,7 +456,7 @@ git rebase --onto origin/develop <other-agent-commit> <your-branch>
 # ejemplo concreto: git rebase --onto origin/develop fe3b274c
 ```
 
-Esto reescribe tu historial para que tus commits queden directamente sobre `origin/develop`, saltándose el del otro agente. Esencial cuando el otro agente hará merge por su propia PR y no querés duplicar su trabajo ni pisarle la atribución.
+Esto reescribe tu historial para que tus commits queden directamente sobre `origin/develop`, saltándose el del otro agente. Esencial cuando el otro agente hará merge por su propia PR y no quieres duplicar su trabajo ni pisarle la atribución.
 
 ### 2. `git push --force-with-lease`
 
@@ -569,7 +569,7 @@ else
 fi
 ```
 
-Correr con `run_in_background: true` para no bloquear el agente. Recibís notificación cuando el merge ocurre.
+Correr con `run_in_background: true` para no bloquear el agente. Recibes notificación cuando el merge ocurre.
 
 ### Squash merge siempre
 

@@ -1,0 +1,14 @@
+context:
+  account: ""
+  segment: ""
+  journey: ""
+  outcome: ""
+evidence:
+  sources: []
+  confidence: medium
+scope:
+  in: []
+  out: []
+decisions:
+  owner: ""
+  next_review: ""

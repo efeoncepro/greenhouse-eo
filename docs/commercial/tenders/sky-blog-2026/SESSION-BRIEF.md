@@ -83,7 +83,7 @@ construir. Antes de eso:
 2. Lee los artefactos de §2 (los que ya existen — no los reinventes).
 3. **Mapea las piezas contra las láminas** y dime **qué está suelto** (§4 es mi hipótesis; verificala,
    no la copies).
-4. Presentá el diagnóstico y **esperá**.
+4. Presenta el diagnóstico y **espera**.
 
 **Skills a cargar antes de opinar:** `greenhouse-public-private-tenders` (dueña de la licitación) ·
 `deck-studio` (el oficio del deck; la de licitaciones es su *consumer*) · `seo-aeo-practice` (cómo se
@@ -158,7 +158,7 @@ desde la escalera? ¿O ambas? Ojo con la regla del oficio: **dos enlaces diluyen
 La Radiografía (lámina 13) y el informe del grader **viven en la web** — ése es su valor: el comité los
 verifica solo. Pero el PDF del deck **hoy no emite anotaciones de link**.
 
-**Verificá primero si el composer ya soporta links** (`src/lib/artifact-composer/` → el emisor de PDF
+**Verifica primero si el composer ya soporta links** (`src/lib/artifact-composer/` → el emisor de PDF
 usa `pdf-lib`; `pdf-lib` **sí** puede crear anotaciones `/Link`). Si no lo soporta, es un **gap del
 motor**, no de una plantilla — y el fix es en el emisor, no en el catálogo.
 
@@ -200,14 +200,14 @@ nombre**. Un evaluador **va a buscar la fuente**. Antes de escribir una cifra: `
 - `pnpm vitest run src/lib/artifact-composer` — el guard sintetiza un payload y **llena las 27**.
 - **`pnpm composer:visual-gate` a CERO píxeles.** Un frame nuevo/cambiado se declara en
   `BASELINE_DELTAS.md` y se re-promueve con `--freeze`.
-- **Si insertás una lámina en el medio, RENUMERA todo lo que va detrás.** Verificá con
+- **Si insertas una lámina en el medio, RENUMERA todo lo que va detrás.** Verifica con
   `shasum -a 256` que los desplazados sean **byte-idénticos** a su baseline previo **antes** de
   promover — si no, el renombre esconde una regresión.
 - **NUNCA declares un deck listo sin MIRAR LOS FRAMES, TODOS.** Los tests verdes no son el gate: las
   dos plantillas nuevas salieron con **una banda muerta** que ningún test vio.
 
 🔴 **El autor nunca elige `template`.** Declara `contentType` + slots; el selector resuelve
-(`TemplateAuthorityError` si no calza). Y **si ningún contentType puede afirmar lo que querés decir,
+(`TemplateAuthorityError` si no calza). Y **si ningún contentType puede afirmar lo que quieres decir,
 eso es un GAP del catálogo** — se abre una plantilla, **no se improvisa** ni se sube un `maxItems` para
 que entre.
 

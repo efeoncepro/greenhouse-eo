@@ -1,0 +1,46 @@
+{
+  "task": "TASK-1552",
+  "surface": "globe.producer-composer",
+  "surfaceLabel": "Efeonce Globe — Producer Composer focused creation",
+  "repo": "efeonce-globe",
+  "reviewedAt": "2026-07-27",
+  "reviewer": "Codex — revisión visual local sobre canary",
+  "qualityProfile": "premium",
+  "uiRigor": "ui-standard",
+  "direction": "docs/ui/visual-directions/TASK-1552-globe-producer-composer-focused-creation.md",
+  "wireframe": "docs/ui/wireframes/TASK-1552-globe-producer-composer-focused-creation.md",
+  "evidence": {
+    "desktop": "docs/ui/reviews/TASK-1552-globe-producer-composer-focused-creation.dossier.md",
+    "mobile": "docs/ui/reviews/TASK-1552-globe-producer-composer-focused-creation.dossier.md",
+    "dossier": "docs/ui/reviews/TASK-1552-globe-producer-composer-focused-creation.dossier.md",
+    "captures": "efeonce-globe/apps/studio-client/.captures/task-1552-composer/",
+    "viewports": ["1440x1000", "390x844", "320x844"],
+    "states": ["empty", "dock-open", "estimate-stale", "reduced-motion"],
+    "canary": "node apps/studio-client/scripts/producer-composer-canary.test.mjs — PASS"
+  },
+  "thresholds": {"average": 4.5, "floor": 4, "gated": {"hierarchy": 4.5, "surfaceEconomy": 4.5, "visualImpact": 4.5, "fidelity": 4.5, "genericTemplateResistance": 4.5}},
+  "dimensions": {
+    "hierarchy": {"score": 4.6, "rationale": "El prompt domina; referencias son una entrada primaria; dock, modelo, forma y gasto quedan en una secuencia legible.", "evidence": "dossier desktop/mobile"},
+    "proportions": {"score": 4.5, "rationale": "El composer conserva una columna contenida y el riel no compite con el cuerpo; mobile transforma a una columna sin overflow.", "evidence": "dossier desktop/mobile"},
+    "rhythm": {"score": 4.4, "rationale": "El ritmo es consistente en las capturas, aunque la densidad del prompt y sus sugerencias sigue siendo el punto más ajustado.", "evidence": "dossier desktop/mobile", "nextAction": "Revisar spacing después de la extracción CSS."},
+    "density": {"score": 4.6, "rationale": "El dock evita convertir herramientas secundarias en una columna interminable y las referencias permanecen visibles.", "evidence": "dossier desktop/mobile"},
+    "depth": {"score": 4.5, "rationale": "El prompt funciona como superficie principal; el dock usa píldoras y el riel se separa como barra de ejecución.", "evidence": "dossier desktop"},
+    "surfaceEconomy": {"score": 4.5, "rationale": "Se retiró el cajón advanced-controls y se distribuyeron sus responsabilidades en disclosures compactos.", "evidence": "dossier desktop/mobile"},
+    "visualImpact": {"score": 4.5, "rationale": "La dirección Globe se conserva: fondo oscuro, acento azul y una acción primaria inequívoca.", "evidence": "dossier desktop"},
+    "typography": {"score": 4.5, "rationale": "La jerarquía de eyebrow, heading, helper y estados del riel es clara en desktop y mobile.", "evidence": "dossier desktop/mobile"},
+    "color": {"score": 4.2, "rationale": "La jerarquía cromática es legible, pero la hoja compat completa aún mantiene literales fuera del gate de tokens.", "evidence": "dossier desktop", "nextAction": "Retirar la compat completa cuando entre la extracción tokenizada verificable."},
+    "iconography": {"score": 4.7, "rationale": "El canary registra 28 iconos Tabler, por encima del baseline de 23, con iconos funcionales en acciones y herramientas.", "evidence": "dossier desktop/mobile"},
+    "responsive": {"score": 4.7, "rationale": "1440, 390 y 320 pasan contención; los tres disclosures abiertos no generan overflow.", "evidence": "dossier desktop/mobile"},
+    "motion": {"score": 4.3, "rationale": "El stale estimate conserva una señal informativa y reduced-motion fue ejercitado; la migración completa de motion CSS sigue pendiente.", "evidence": "dossier reduced-motion", "nextAction": "Migrar motion de la hoja compat al SSOT y conservar la prueba reduced-motion."},
+    "fidelity": {"score": 4.5, "rationale": "La composición se construye sobre las clases y contratos existentes, preservando funcionalidad y markers del selector.", "evidence": "dossier desktop/mobile"},
+    "genericTemplateResistance": {"score": 4.5, "rationale": "La sustitución del acordeón genérico por un dock por intención mejora la resistencia a crecimiento del composer.", "evidence": "dossier desktop/mobile"}
+  },
+  "computed": {"average": 4.5, "minimum": 4.2, "gatedPass": true},
+  "verdict": "VISUAL_PASS_FUNCTIONAL_CLOSURE_PENDING",
+  "openRisks": [
+    "El dock todavía es un primer corte: sólo Style consulta una capability publicada; el inventario completo y las herramientas server-defined requieren contrato de metadata UI.",
+    "Style DNA y las herramientas que requieran lienzo todavía no abren un panel lateral funcional.",
+    "La hoja producer-composer.css sigue siendo compat completa; la extracción/tokenización descrita por Claude no está presente en este worktree.",
+    "La región producer-model-* permanece bajo TASK-1555 y no se rediseñó aquí."
+  ]
+}

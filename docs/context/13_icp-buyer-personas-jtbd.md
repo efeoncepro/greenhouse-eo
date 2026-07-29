@@ -2,6 +2,11 @@
 
 > **Para qué sirve este archivo.** Define **para quién** se construye Greenhouse y **qué "job"** intenta resolver cada usuario. Un agente de producto traduce JTBD en features: saber qué intenta lograr un CMO o un Head de CRM cuando entra al portal es lo que separa una feature que importa de una cosmética. Fuente: doc de Segmentación Comercial (mar-2026), que tiene los 12 ICPs con 11 dimensiones c/u y los JTBD completos — aquí está lo que mueve decisiones de producto.
 
+> **Actualización transversal:** el customer model debe separar al usuario/operator del operator-champion, problem
+> owner, sponsor, economic buyer y governance owner. Los productos verticales se diseñan primero para el workflow
+> del operador; Greenhouse soporta la evidencia y la superficie ejecutiva. Ver [`Efeonce Operator-First Product &
+> Growth Contract V1`](../strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md).
+
 ## Principio rector
 
 **No todos los clientes entran igual.** Algunos ICPs son **puertas de entrada** (ciclo corto, ticket bajo, trigger urgente); otros se activan por **venta cruzada** una vez dentro. Esto importa para producto porque **el portal es el activo que convierte una puerta de entrada de ticket bajo en una relación expandible**: el onboarding al portal y la transparencia temprana son lo que dispara el cross-sell (ver Bow-tie en `11` y modelo ASaaS en `14`).
@@ -10,18 +15,18 @@
 
 ## Los 12 ICPs (resumen)
 
-| Unidad | ICP | Qué es | Ciclo / ticket | Dolor central |
+| Línea de negocio / práctica | ICP | Qué es | Ciclo / ticket | Dolor central |
 |---|---|---|---|---|
-| **Efeonce Digital** | ICP1 B2B revenue | B2B LATAM, ciclo de venta complejo | 6-8 sem / alto | "No puedo decir cuánto vendimos gracias a marketing". CRM muerto. |
+| **Growth Strategy & Measurement** | ICP1 B2B revenue | B2B LATAM, ciclo de venta complejo | 6-8 sem / alto | "No puedo decir cuánto vendimos gracias a marketing". CRM muerto. |
 | | ICP2 Retail/consumo | Consumo/retail en madurez digital | 4-8 sem / medio | Múltiples proveedores, nadie integra. Cada Q empieza de cero. |
 | | **ICP3 AEO** ⭐ | Necesita posicionarse en motores de IA | 2-4 sem / bajo | Cero visibilidad de cómo los LLMs citan su marca. |
-| **Globe** | ICP1 Escalar producción | Volumen alto de contenido | 3-6 sem / medio | Sin sistema escalable. No produce a la velocidad del negocio. |
+| **Creative Services** | ICP1 Escalar producción | Volumen alto de contenido | 3-6 sem / medio | Sin sistema escalable. No produce a la velocidad del negocio. |
 | | ICP2 Rebranding | Construir/reconstruir marca | educación / alto | Identidad que no comunica su evolución. |
 | | ICP3 Ejecución a escala | Modelo Sky Airlines | cross-sell | Tiene concepto, no producción. |
-| **Reach** | ICP1 Distribución | Inversión de medios fragmentada | cross-sell | Sin visión unificada de amplificación. |
+| **Media & Distribution** | ICP1 Distribución | Inversión de medios fragmentada | cross-sell | Sin visión unificada de amplificación. |
 | | ICP2 Retail media | Retail media sin estrategia | 3-5 sem / medio | Retail media desconectado de estrategia. |
 | | **ICP3 Vocería/PR** ⭐ | Visibilidad ejecutiva / PR | 2-4 sem / bajo | Sin programa sostenido de visibilidad. Acceso directo al CEO. |
-| **Wave** | ICP1 Infraestructura | Necesita infra/plataforma web | educación / alto | Deuda técnica, infra es cuello de botella. |
+| **Digital Services & Engineering** | ICP1 Infraestructura | Necesita infra/plataforma web | educación / alto | Deuda técnica, infra es cuello de botella. |
 | | **ICP2 Velocidad Web** ⭐ | Landing/web rápida | 1-3 sem / bajo | Conversiones perdidas por sitio lento. |
 | | ICP3 Datos/Analytics | Medición confiable | cross-sell | Sin medición confiable para decidir. |
 
@@ -44,39 +49,61 @@
 
 > Para producto: **BP1, BP2, BP5 y BP6 son los usuarios primarios del portal.** Son quienes se logean. El dashboard tiene que responder *su* pregunta en los primeros 10 segundos (revenue para BP1, foto unificada para BP2, fuente de verdad para BP5, gobernanza/RpA para BP6).
 
+### Roles de producto en Creative Studio
+
+Creative Studio no reduce el buying committee a una sola “persona usuaria”:
+
+- **Protagonista:** el equipo creativo/marketing que debe producir mejor como sistema.
+- **Punto de vista:** BP6 o el operador activo —designer, producer, marketer o director de arte— que idea,
+  configura, explora y selecciona.
+- **Autoridad creativa:** Head of Creative/Brand o aprobador designado; no se infiere del rol que ejecuta.
+- **Sponsor económico:** BP1/BP2 y Procurement/Finance según el engagement.
+- **Guía:** Globe / Creative Studio, que absorbe ingeniería de producción y conserva memoria sin reclamar autoría.
+
+La experiencia debe hacer al operador más capaz sin depender de sobrecarga individual: el usuario es héroe de la
+interacción, pero el producto elimina la necesidad de actos heroicos para entregar.
+
+### Segmento candidato — equipos de otras agencias
+
+Otras agencias **no se agregan a los 12 ICPs vigentes** todavía. Son una hipótesis B2B2B separada para equipos
+creativos con múltiples cuentas, picos de demanda y presión de consistencia. Antes de promoverla se validan
+tenancy agencia→cliente final, confidencialidad, derechos, aprobación de marca, atribución
+`white-label|endorsed`, accountability y economics. No se crea una modalidad nueva: cualquier piloto usaría
+`Studio Access`, `co-operated` o `client-operated` bajo los gates del business model.
+
 ---
 
 ## Jobs-to-be-Done (los que más informan producto)
 
-Formato del doc: Situación/Trigger → Job Statement → Resultado Esperado. Aquí los de las unidades que Greenhouse opera más directo (Efeonce Digital + Globe).
+Formato del doc: Situación/Trigger → Job Statement → Resultado Esperado. Aquí los de las líneas que Greenhouse opera más directo (Growth Strategy & Measurement + Creative Services).
 
-### Efeonce Digital · ICP1 B2B (buyer: CMO + Dir. Comercial)
+### Growth Strategy & Measurement · ICP1 B2B (buyer: CMO + Dir. Comercial)
 - **Conectar marketing con revenue** → "demostrar al directorio cuánto revenue genera cada peso" → reporte con contribución a pipeline validada por ventas.
 - **Activar el CRM como sistema de inteligencia** → lead scoring con datos de cierre real, workflows que maduran leads, ciclo más corto.
 - **Contenido que genera pipeline** → contenido por etapa de funnel, no solo tráfico.
 - *Emocional:* tener control y hablar con confianza ante el directorio. *Social:* ser visto como quien convirtió marketing en motor de revenue.
 
-### Efeonce Digital · ICP2 Retail (buyer: Dir. Digital / Head Growth + CMO)
+### Growth Strategy & Measurement · ICP2 Retail (buyer: Dir. Digital / Head Growth + CMO)
 - **Integrar el ecosistema de proveedores** → un solo interlocutor, reporting unificado.
 - **Acumular conocimiento entre ciclos** → "cada trimestre mejor, no un reinicio"; cada ciclo hereda insights. ← *Este job es literalmente el valor acumulativo del ASaaS (`14`).*
 - *Emocional:* dejar de "volar a ciegas con millones". *Social:* que vean al equipo digital como motor de crecimiento.
 
-### Efeonce Digital · ICP3 AEO (buyer: CMO / Head of Digital)
+### Growth Strategy & Measurement · ICP3 AEO (buyer: CMO / Head of Digital)
 - **Visibilidad en motores de IA** → diagnóstico de cómo los LLMs citan la marca + monitoreo de citaciones.
 - **Contenido dual Google + IA** → estructura semántica que funciona en Google, ChatGPT, Perplexity y Gemini.
 - *Emocional:* "ser el que vio venir el cambio". *Social:* innovador que entiende hacia dónde va el mercado.
 
-### Globe · ICP1 Escalar producción (buyer: CMO / Brand Manager)
+### Creative Services · ICP1 Escalar producción (buyer: CMO / Brand Manager)
 - **Producir a la velocidad del negocio** → entrega a tiempo, calidad consistente, **máximo 2 rondas**. ← *RpA (`06`) es el KPI de este job.*
 - **Escalar sin fragmentar** → "todas las piezas se sienten como la misma marca"; gobernanza real.
 - **Medir impacto creativo** → **Revenue Enabled**: cuánto revenue se habilitó por velocidad, iteración y volumen.
 - *Emocional:* dejar de sentir que cada campaña es un acto heroico. *Social:* quien profesionalizó la operación creativa.
 
-### Globe · ICP2 Rebranding (buyer: CEO / GM)
+### Creative Services · ICP2 Rebranding (buyer: CEO / GM)
 - **Marca que refleje la empresa actual** + **sistema de marca escalable** (multi-mercado, multi-superficie).
 - *Emocional:* orgullo de la marca. *Social:* que la perciban moderna y con visión.
 
-> Reach y Wave tienen sus propios JTBD en el doc fuente (vocería/PR, distribución integrada, velocidad web, infra, datos). Para producto son secundarios hoy porque Greenhouse modela sobre todo operación creativa (Globe) + métricas/CRM (Digital).
+> Media & Distribution y Digital Services & Engineering tienen sus propios JTBD en el doc fuente (vocería/PR, distribución integrada, velocidad web, infra, datos). Para producto son secundarios hoy porque Greenhouse modela sobre todo operación creativa, métricas y CRM.
 
 ---
 
@@ -84,11 +111,11 @@ Formato del doc: Situación/Trigger → Job Statement → Resultado Esperado. Aq
 
 | Tier | ICPs | Lógica |
 |---|---|---|
-| **Tier 1 · Prospección activa** | Digital ICP3 (AEO), Reach ICP3 (Vocería/PR), Wave ICP2 (Velocidad Web) | Caballo de Troya: entra por dolor concreto y ticket bajo, **se queda por la estrategia integral**. |
-| **Tier 2 · Con educación previa** | Digital ICP1 (B2B Revenue), Globe ICP2 (Rebranding), Globe ICP1 (Escalar) | Ticket alto, ciclo largo, trigger fuerte. |
-| **Tier 3 · Venta cruzada** | Digital ICP2 (Retail), Globe ICP3 (Ejecución a escala/Sky), Reach ICP1 (Distribución) | Se activan **desde dentro**, cuando se diagnostica el gap. |
+| **Tier 1 · Prospección activa** | Growth Strategy & Measurement ICP3 (AEO), Media & Distribution ICP3 (Vocería/PR), Digital Services & Engineering ICP2 (Velocidad Web) | Caballo de Troya: entra por dolor concreto y ticket bajo, **se queda por la estrategia integral**. |
+| **Tier 2 · Con educación previa** | Growth Strategy & Measurement ICP1 (B2B Revenue), Creative Services ICP2 (Rebranding), Creative Services ICP1 (Escalar) | Ticket alto, ciclo largo, trigger fuerte. |
+| **Tier 3 · Venta cruzada** | Growth Strategy & Measurement ICP2 (Retail), Creative Services ICP3 (Ejecución a escala/Sky), Media & Distribution ICP1 (Distribución) | Se activan **desde dentro**, cuando se diagnostica el gap. |
 
-Ejemplo de cadena de expansión: AEO → SEO/contenido → CRM → GTM integral → (si falta infra) Wave → (si falta contenido) Globe.
+Ejemplo de cadena de expansión: AEO → Search Visibility 360 → web/medición/agentes → CRM/GTM integral → (si falta contenido) Creative Services potenciado por Globe → (si falta distribución) Media & Distribution potenciado por Reach. En Media & Distribution la entrada recomendada es Distribution Strategy & Media Architecture y la expansión puede ir a Performance & Commerce Distribution o Influence, Earned & Partnership Distribution. Digital Services & Engineering opera visibilidad, web, measurement y agentes; RevOps & CRM/Kortex opera CRM/GTM.
 
 ---
 
@@ -106,10 +133,11 @@ Cada job mapea a una capacidad del portal. Esto es lo accionable:
 | "Visibilidad en motores de IA" (AEO) | Métricas AEO (Otterly.ai) expuestas como otra capa del dashboard. |
 | "Una sola fuente de verdad" (BP5) | Confiabilidad del dato = por qué el test coverage en finance/identity no es opcional; revisar arquitectura vigente y `04` antes de tocar esos dominios. |
 
-**Regla para el agente:** antes de construir una feature, pregúntate *de qué BP es el job y en qué tier entró*. Una feature que no sirve a un job de BP1/BP2/BP5/BP6 (los que usan el portal) probablemente no es prioridad. Para casos reales por ICP usa solo los confirmados (`01`/`06`): Sky (Globe ICP3), Bresler, Berel (Digital ICP3/AEO+SEO). 
+**Regla para el agente:** antes de construir una feature, identifica la línea de negocio, product brand habilitadora, BP y tier del job. Una feature que no sirve a un job de BP1/BP2/BP5/BP6 (los que usan el portal) probablemente no es prioridad. Para casos reales por ICP usa solo los confirmados (`01`/`06`): Sky (Creative Services), Bresler y Berel (Growth Strategy & Measurement / AEO+SEO).
 
 ---
 
-*Fuente: doc de Segmentación Comercial — ICPs, Buyer Personas & JTBD (mar-2026). El doc fuente tiene las 11 dimensiones de los 12 ICPs y los JTBD de las 4 unidades; aquí se destiló lo que informa producto.*
+*Fuente: doc de Segmentación Comercial — ICPs, Buyer Personas & JTBD (mar-2026). El doc fuente tiene las 11 dimensiones de los 12 ICPs y los JTBD de las líneas de negocio/prácticas; aquí se destiló lo que informa producto.*
 
-*Última verificación de drift contra runtime: 2026-06-09 (TASK-1064) — sin claims de runtime hardcodeados; targets/fechas comerciales son intencionales.*
+*Última verificación de drift contra runtime: 2026-07-23 — roles Creative Studio y la hipótesis B2B2B quedan
+alineados al business model V1.1 sin modificar los 12 ICPs vigentes.*

@@ -20,7 +20,7 @@
 - Status real: `Diseño gobernado; implementación pendiente`
 - Rank: `TBD`
 - Domain: `creative|ops|delivery`
-- Blocked by: `TASK-1469, TASK-1470, TASK-1471`
+- Blocked by: `TASK-1469, TASK-1470, TASK-1471, TASK-1522`
 - Branch: `task/TASK-1472-globe-creative-review-release-delivery`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -59,7 +59,7 @@ Cerrar la brecha entre output del modelo y pieza profesional liberada.
 
 ### Depends on
 
-- `TASK-1469`, `TASK-1470`, `TASK-1471`.
+- `TASK-1469`, `TASK-1470`, `TASK-1471`, `TASK-1522`.
 
 ### Blocks / Impacts
 
@@ -151,6 +151,35 @@ Cerrar la brecha entre output del modelo y pieza profesional liberada.
 <!-- ZONE 3 — EXECUTION SPEC -->
 
 ## Scope
+
+### Approved Producer target addendum — review, share board and delivery
+
+`TASK-1522` owns the independent review/comment/read-only-share foundation. This task consumes that foundation
+and retains artifact manifests, release gates, delivery packages and their rollback/revocation lifecycle.
+
+This task owns the durable human execution state that follows candidate creation: approval, request changes,
+comments, read-only sharing and delivery. Those records are server-authoritative resources, not annotations held
+only in the Producer browser.
+
+- Approval and request-changes are explicit, mutually coherent transitions with actor, workspace, target version,
+  reason, timestamp and idempotency/audit evidence. Approval of one immutable version never silently approves a
+  later derivative.
+- Comments are tenant-scoped, ordered and attributable; edit/delete policy is explicit and preserves the audit
+  trail required by review history.
+- A share board is a revocable, expiring, read-only grant over an allowlisted projection. Its bearer/token material
+  is stored hashed, never logged, and confers no generation, spend, download or workspace-enumeration authority
+  unless separately and explicitly granted.
+- Delivery produces a durable manifest/packaging job over approved versions, with recoverable status, checksums,
+  provenance/rights evidence and revocation/expiry rules. It consumes governed asset serving rather than copying
+  private bucket coordinates into the client.
+- This task does not activate a commercial environment; `TASK-1521` remains the runtime-enablement gate.
+
+Additional acceptance evidence:
+
+- [ ] Concurrent approval/request-changes transitions converge deterministically and are retry-safe.
+- [ ] Comment authorization and cross-workspace negative tests cover create/read/edit/delete behavior.
+- [ ] Revoked/expired share grants fail closed and cannot invoke commands or broaden their allowlisted projection.
+- [ ] Delivery retry returns the same logical package/manifest and verifies integrity before release.
 
 ### Slice 1
 

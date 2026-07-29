@@ -3,7 +3,7 @@ name: creative-practice
 description: >-
   Operador comercial de la práctica creativa de Efeonce: oferta, pricing, scope,
   SOW, descalificación, pitch, retención y expansión para marca, campaña,
-  audiovisual, social y contenido creativo. Usar al vender o cotizar Managed
+  audiovisual, Run-and-Gun, social y contenido creativo. Usar al vender o cotizar Managed
   Squad, Staff Augmentation, Studio Access, On-Going, On-Demand, Sample Sprint o
   Creative Studio; al definir Studio/Globe Credits, pools, consumo por pieza,
   refunds o top-ups; y ante preguntas de rate card, retainer, derechos, buyout,
@@ -15,6 +15,10 @@ description: >-
 ---
 
 # Creative Practice — el negocio, no el oficio
+
+Para la arquitectura general de pricing y economics cargar `efeonce-pricing-operator`. Esta skill sigue siendo dueña
+de las decisiones específicas de Creative Studio: créditos creativos, derechos, rounds, buyouts, pools, scope y
+capacidad creativa.
 
 Esta skill opera **el negocio de vender servicios creativos**. No enseña a hacer el trabajo.
 
@@ -269,7 +273,7 @@ Dos cosas que el SEO no tiene y el creativo sí, y que **ninguna** de nuestras s
 |---|---|---|
 | **`design-studio`** · **`motion-design-studio`** · **`audio-studio`** · **`social-media-studio`** · **`copywriting`** · **`content-marketing-studio`** | **El oficio.** | Hacen el trabajo. Esta skill lo **vende** y lo **scopea**; no lo reimplementa. Su `CLIENT_DELIVERY.md` es cómo se **entrega**; este es cómo se **cobra**. |
 | **`commercial-expert`** | **El método de venta.** | Discovery (MEDDPICC), JOLT, Challenger, negociación, forecast, doctrina ASaaS. Esta skill pone el **dominio creativo** encima. |
-| **`greenhouse-talent-people-operator`** | 🎯 **El squad.** | `references/client-squad-design.md` + `templates/squad-blueprint.md`. **El dimensionamiento del pod y el loaded cost salen de ahí.** Esta skill los **precia**. |
+| **`greenhouse-talent-people-operator`** | 🎯 **El squad.** | `greenhouse-talent-people-operator` → `references/client-squad-design.md` + `templates/squad-blueprint.md`. **El dimensionamiento del pod y el loaded cost salen de ahí.** Esta skill los **precia**. |
 | **`greenhouse-finance-accounting-operator`** | **La economía.** | Loaded cost real, cargas, overhead, el cotizador. 🔴 **El piso sale de acá, no de la intuición.** |
 | **Creative Studio Business/Credit Model** | **El canon económico.** | `docs/business-models/creative-studio/*`. Esta skill lo aplica a discovery/propuesta/SOW; no inventa precio público ni condiciones financieras. |
 | **`gtm-architect`** | **El motion.** | Si la práctica necesita cambiar de motion (ABM, partner-led, PLG). |

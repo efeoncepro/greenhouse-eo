@@ -2628,6 +2628,28 @@ export interface GreenhouseCoreFirstPartyAppSessions {
   user_id: string;
 }
 
+export interface GreenhouseCoreGlobeCreditFundingIntents {
+  actor_entitlement: string;
+  actor_user_id: string;
+  correlation_id: string;
+  created_at: Generated<Timestamp>;
+  globe_workspace_id: string;
+  idempotency_key: string;
+  intent_id: Generated<string>;
+  phase: string;
+  plan: Json;
+  plan_fingerprint: string;
+  proposal_id: string;
+  proposed_by_user_id: string | null;
+}
+
+export interface GreenhouseCoreGlobeCreditFundingPolicies {
+  globe_workspace_id: string;
+  requires_second_confirmer: Generated<boolean>;
+  second_confirmer_above_credits: number | null;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCoreIdentityProfiles {
   active: Generated<boolean>;
   canonical_email: string | null;
@@ -10830,6 +10852,27 @@ export interface GreenhouseSyncGithubReleaseWebhookEvents {
   workflow_run_id: Int8 | null;
 }
 
+export interface GreenhouseSyncGlobeTenancyReconciliationState {
+  broker_binding_id: string;
+  created_at: Generated<Timestamp>;
+  last_error_code: string | null;
+  last_reconciled_at: Timestamp | null;
+  last_reconciliation_id: string | null;
+  lease_expires_at: Timestamp | null;
+  lease_token: string | null;
+  /**
+   * Per identity subject semantic fingerprint/revision map; contains no email, name or token.
+   */
+  member_revisions: Generated<Json>;
+  updated_at: Generated<Timestamp>;
+  workspace_fingerprint: string | null;
+  workspace_id: string;
+  /**
+   * Semantic desired-state revision. Freshness-only lease renewal never increments it.
+   */
+  workspace_revision: Generated<Int8>;
+}
+
 export interface GreenhouseSyncHandlerHealth {
   consecutive_failures: Generated<number>;
   consecutive_successes: Generated<number>;
@@ -11681,6 +11724,8 @@ export interface DB {
   "greenhouse_core.entitlement_governance_audit_log": GreenhouseCoreEntitlementGovernanceAuditLog;
   "greenhouse_core.entity_source_links": GreenhouseCoreEntitySourceLinks;
   "greenhouse_core.first_party_app_sessions": GreenhouseCoreFirstPartyAppSessions;
+  "greenhouse_core.globe_credit_funding_intents": GreenhouseCoreGlobeCreditFundingIntents;
+  "greenhouse_core.globe_credit_funding_policies": GreenhouseCoreGlobeCreditFundingPolicies;
   "greenhouse_core.identity_profile_source_links": GreenhouseCoreIdentityProfileSourceLinks;
   "greenhouse_core.identity_profiles": GreenhouseCoreIdentityProfiles;
   "greenhouse_core.launch_notifications": GreenhouseCoreLaunchNotifications;
@@ -12046,6 +12091,7 @@ export interface DB {
   "greenhouse_serving.user_recent_items": GreenhouseServingUserRecentItems;
   "greenhouse_sync.contractor_payment_runs": GreenhouseSyncContractorPaymentRuns;
   "greenhouse_sync.github_release_webhook_events": GreenhouseSyncGithubReleaseWebhookEvents;
+  "greenhouse_sync.globe_tenancy_reconciliation_state": GreenhouseSyncGlobeTenancyReconciliationState;
   "greenhouse_sync.handler_health": GreenhouseSyncHandlerHealth;
   "greenhouse_sync.handler_health_transitions": GreenhouseSyncHandlerHealthTransitions;
   "greenhouse_sync.ico_materialization_runs": GreenhouseSyncIcoMaterializationRuns;

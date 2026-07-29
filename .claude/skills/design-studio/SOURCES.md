@@ -29,7 +29,26 @@ registry agentic: `docs/architecture/EFEONCE_CREATIVE_STUDIO_ENTERPRISE_MODEL_PO
 `EFEONCE_CREATIVE_STUDIO_CAPABILITY_REGISTRY_V1.json`.
 
 **Provider policy:** cualquier modelo Google nativo se consume directo por Google Cloud/Vertex, nunca por Fal.
-Fal queda para modelos no-Google allowlisted; OpenAI va directo.
+Fal queda para modelos no-Google allowlisted; OpenAI va directo. Para volumen BytePlus (Seedance/Seedream),
+comparar el endpoint directo contra Fal: el directo suele ser más barato y Fal reduce fricción de integración.
+No confundir créditos de partner con precio API ni comprometer tarifas sin revalidación.
+
+## Comparación directo vs. Fal (as-of 2026-07-26)
+
+Guía de arquitectura y compras, no tarifario. Verificar endpoint, región, cuota y calculadora antes de reservar consumo.
+
+| Capability | Ruta preferida | Decisión |
+|---|---|---|
+| Seedance 2.0 / Seedream | BytePlus/ModelArk directo en producción; Fal en prototipo/gateway | Directo suele ser más barato; Fal aporta conveniencia. Validar soporte, derechos y portabilidad. |
+| FLUX.2 | BFL directo o Fal | Paridad pública en los endpoints comparados; decidir por SLA, auth y observabilidad. |
+| Recraft v4 | Recraft directo o Fal | Paridad pública en los endpoints comparados; directo si pesa el control contractual. |
+| GPT Image 2 | OpenAI directo | Ruta canónica; Fal sólo para pruebas o gateway explícitamente justificado. |
+| Nano Banana / Gemini | Google AI Studio o Vertex directo | Google nativo nunca por Fal; separar API, Batch, región y cuotas. |
+| FLUX 3 | Early access autorizado únicamente | Anunciado por BFL el 2026-07-23; al corte no hay API pública general ni precio público de producción. No usar Fal. |
+
+**Regla:** `prototype` → Fal si reduce tiempo; `production-scale` → directo cuando hay ahorro, SLA o control de
+datos; `fallback` → Fal sólo con slug/schema verificados y salida normalizada. Registrar fecha, resolución,
+duración, reintentos y costo efectivo por output.
 
 ## Fuentes base (as-of 2026-07)
 
@@ -57,8 +76,16 @@ Fal queda para modelos no-Google allowlisted; OpenAI va directo.
 
 **Modelos IA de video**
 - Google Cloud — Gemini Omni Flash Preview — https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/omni-flash-preview
+- Google AI — Gemini video generation / Omni — https://ai.google.dev/gemini-api/docs/video
+- Google DeepMind — Gemini Omni — https://deepmind.google/models/gemini-omni/
 - Google Cloud — Veo 3.1 — https://docs.cloud.google.com/vertex-ai/generative-ai/docs/models/veo/3-1-generate
+- Black Forest Labs — FLUX 3 announcement — https://bfl.ai/blog/flux-3
+- Black Forest Labs — FLUX pricing — https://bfl.ai/pricing
+- Recraft — API pricing — https://www.recraft.ai/docs/api-reference/pricing
+- BytePlus — Seedance 2.0 API — https://docs.byteplus.com/en/docs/ModelArk/2300461
 - fal.ai — Seedance 2.0 reference-to-video — https://fal.ai/models/bytedance/seedance-2.0/reference-to-video/api
+- fal.ai — FLUX.2 Pro — https://fal.ai/models/fal-ai/flux-2-pro
+- fal.ai — Recraft v4 — https://fal.ai/models/fal-ai/recraft/v4/text-to-image
 - fal.ai — PixVerse V6 — https://fal.ai/pixverse-v6
 - fal.ai — Kling 3 Pro — https://fal.ai/models/fal-ai/kling-video/v3/pro/image-to-video
 - WaveSpeed — Seedance 2.0 vs Kling 3.0 vs Sora 2 vs Veo 3.1 — https://wavespeed.ai/blog/posts/seedance-2-0-vs-kling-3-0-sora-2-veo-3-1-video-generation-comparison-2026/
@@ -97,6 +124,7 @@ Fal queda para modelos no-Google allowlisted; OpenAI va directo.
 | **Kling 3 Pro/4K** (Fal) | start/end, elements, multi-shot y 4K | límites de audio/idioma y concurrencia | especialista premium/4K |
 | **PixVerse V6** (Fal) | 1080p, audio, cámara y costo de volumen | límites por resolución/duración | scale social/motion |
 | **Gemini Omni Flash** (Google Vertex) | reference/video edit + audio | preview, 720p, máx. 10 s | canary con fallback; nunca Fal |
+| **FLUX 3** (Black Forest Labs) | imagen + video + audio en un modelo multimodal; hasta 20 s según anuncio | early access; sin API pública/precio general al corte | exploración estratégica únicamente |
 | ~~**Sora 2** (OpenAI)~~ | físico/consistencia | **DEPRECADO**: API deprecada 2026-03-24, shutdown 2026-09-24 | **NO** usar para proyectos nuevos |
 
 > **Herramientas conectadas por MCP/skill:** `greenhouse-ai-image-generator` (assets UI Greenhouse, helper canónico), `higgsfield-*` (video/imagen/audio/avatares), Adobe Firefly (MCP Adobe), Magnific (upscale/enhance), Figma (design system/handoff). Detalle en `efeonce/STUDIO_TOOLING.md`.
@@ -109,5 +137,6 @@ Fal queda para modelos no-Google allowlisted; OpenAI va directo.
   → Midjourney**; **vector/logo escalable → Recraft**; **realismo/cámara → FLUX.2**; **realista diario →
   GPT Image 2**; **divergencia de campaña → Seedream 5 Lite**; **material/color/región semántica →
   Seedream 5 Pro**; **secuencia híbrida → módulo 12 + anchor/handoff**; **Photoshop/Firefly → workbench watch tras rights review**; **video con control por referencias → Seedance**;
-  **broadcast/cine → Veo**; **económico simple → Kling**; **edición conversacional → Gemini Omni**.
+  **broadcast/cine → Veo**; **económico simple → Kling**; **edición conversacional → Gemini Omni**;
+  **multimodal experimental imagen+video+audio → FLUX 3 sólo con acceso explícito**.
 - Sora 2 deprecado (shutdown 2026-09-24) — no basar nada nuevo en él.

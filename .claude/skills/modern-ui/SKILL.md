@@ -170,7 +170,17 @@ Invoke the `greenhouse-ui-review` skill. It runs the formal gate checklist.
 - **Designing new surface** → Global modern-ui Lane A + this overlay's pinned decisions
 - **Auditing surface** → `greenhouse-ui-review` (specialized for Greenhouse pattern compliance)
 - **Translating Figma** → `figma-implement-design` + this overlay + tokens doc
-- **Deciding CSS API** → Global modern-ui Lane D + this overlay (MUI first, Tailwind 4 only if not available)
+- **Deciding CSS API** → Global modern-ui Lane D + this overlay + `tailwind-engineer` / `css-architect`
+- **Writing the CSS/classes** → `tailwind-engineer` (theme + utilities) · `css-architect` (cascade, layers, layout)
+- **Writing the markup/component** → `html-react-engineer` (element + composition) · `frontend-architect` (render topology)
+
+> **Drift catch (2026-07-27).** This overlay used to say *"MUI first, Tailwind 4 only if not
+> available"*. That is **stale**: Tailwind 4 (`tailwindcss@4.1.17` + `tailwindcss-logical`) is part of
+> this repo's productive stack — measured, **685 of 1.491 `.tsx` use `className`**, led by `flex` (493),
+> `items-center` (149), `gap-4` (71). The real split is: **Tailwind for layout/spacing, MUI+Emotion for
+> components and theming, MUI/AXIS theme as the SSOT for color, typography, radii and shadows**. Do not
+> cite the old line as a reason to avoid Tailwind. Canonical detail:
+> `.codex/skills/tailwind-engineer/profiles/greenhouse-eo.md`.
 
 ## How to detect canonical drift (anti-regression for this skill)
 

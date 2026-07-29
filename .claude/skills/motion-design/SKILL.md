@@ -184,6 +184,15 @@ Motion is exactly what you must *watch*, not describe. Before declaring any moti
 - `greenhouse-nexa-conversational` — for the conversational-experience motion (§8).
 - `greenhouse-gvc-playwright` — the capture loop (§10).
 
+## Compose with — materialization lanes (2026-07-27)
+
+- `css-architect` — implementa el mecanismo: `@starting-style` + `transition-behavior: allow-discrete`
+  (entrada desde `display:none` sin timers), scroll-driven, view transitions, `sibling-index()` para
+  escalonado. Esta skill decide duración, curva y coreografía; aquélla, cómo se declara.
+- `tailwind-engineer` — expone las curvas y animaciones como namespaces `--ease-*` / `--animate-*`, y
+  prohíbe la duración literal en la clase (el valor sale del token).
+- `html-react-engineer` — `<Activity>`, transiciones de React y `key` como ganchos de montaje.
+
 ## Version
 
 - **v2.0** — 2026-07-05 — **Rebind to the real motion system.** Replaced the aspirational "MUI-first / framer-motion / NEVER GSAP" library section with the actual governed stack (`@/components/greenhouse/motion`: `<Motion>`/`useGreenhouseGSAP` GSAP tier + `ViewTransitionLink`), the token SoT + 3-layer parity + drift-guard, the `no-direct-gsap-in-views` lint gate, pattern primitives (composition-shell / card-density), the `docs/ui/motion` governance contract, the GVC verification loop, and AI/Nexa motion (thinking beat, TASK-1110 in-place transform, streaming reveal).

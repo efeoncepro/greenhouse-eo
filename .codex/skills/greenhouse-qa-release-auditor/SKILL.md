@@ -104,6 +104,13 @@ verdict. Codex and Claude skill names are not assumed to match.
 
 ## Non-Negotiable Blockers
 
+### AXIS Shared UI Platform Gate
+
+For AXIS changes, verify the shared UI platform ADR, `TASK-1591`, and
+`docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`. Require evidence that package auth/env/secrets are
+wired in the consuming runtime, the adapter works, visual and accessibility checks pass, and rollback is defined
+and testable. A successful package publish is not consumer runtime evidence and cannot produce a `complete` verdict.
+
 - No GVC/screenshot evidence for visible UI changes.
 - Runtime-dependent change validated only by unit tests.
 - Flags, env vars, migrations, backfills, secrets, webhooks, worker deploys, or

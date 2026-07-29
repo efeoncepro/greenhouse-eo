@@ -34,7 +34,7 @@ GVC ya es maduro (auth, browser lifecycle, failure-taxonomy, quality gates, ~90 
   - En `onMark`, después del screenshot, captura `ariaSnapshot()` de la región: `clipSelector` → snapshot del nodo; sino → snapshot del `body`. Best-effort + `try/catch` (graceful degrade, patrón Webwright): **nunca rompe el mark**.
   - Escribe `frames/<NN>-<label>.aria.txt` + nuevo campo opcional `FrameRecord.ariaSnapshotPath` en el `manifest.json`.
   - Aditivo: `manifest.schemaVersion` se mantiene en `1`; scenarios existentes no cambian de comportamiento (solo ganan el sibling file).
-- **Skill** `greenhouse-gvc-playwright` ([.claude](../../../.claude/skills/greenhouse-gvc-playwright/SKILL.md) + [.codex](../../../.codex/skills/greenhouse-gvc-playwright/SKILL.md) mirror): Regla #1 (observá antes de autorar), tabla locators user-facing > CSS, readiness anti-networkidle, layered timeouts, graceful degrade, gotchas GVC, cuándo caer a ad-hoc, el límite vs Webwright, comandos canónicos.
+- **Skill** `greenhouse-gvc-playwright` ([.claude](../../../.claude/skills/greenhouse-gvc-playwright/SKILL.md) + [.codex](../../../.codex/skills/greenhouse-gvc-playwright/SKILL.md) mirror): Regla #1 (observa antes de autorar), tabla locators user-facing > CSS, readiness anti-networkidle, layered timeouts, graceful degrade, gotchas GVC, cuándo caer a ad-hoc, el límite vs Webwright, comandos canónicos.
 
 ## Verification
 

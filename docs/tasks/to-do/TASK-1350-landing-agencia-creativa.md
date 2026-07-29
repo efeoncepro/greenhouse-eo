@@ -29,7 +29,7 @@
 
 ## Summary
 
-Landing pública de la capability creativa de Efeonce (`efeoncepro.com`), posicionada como **"la agencia creativa que puedes ver operar en tiempo real"**. **Comprador = los departamentos de marketing y/o equipos creativos in-house de empresas mid-market y enterprise**; Efeonce NO los reemplaza: es **la capacidad de producción creativa que les permite escalar** su output sin sumar headcount y sin perder control ni visibilidad ("tu equipo dirige, nosotros producimos a escala, y lo ves todo"). Concepto de ejecución **Design Engineer** = arte + color + ingeniería: assets art-dirigidos producidos con el stack IA propio (fal.ai / Higgsfield / Magnific / Adobe CC), montados como experiencia performante e interactiva. Lidera la masterbrand **Efeonce**; CTA primario **"Agenda una reunión"** (HubSpot Meetings). El diferenciador es un bloque de **operaciones creativas medibles** (ICO) — el mismo claim de transparencia que Greenhouse entrega.
+Landing pública de la capability creativa de Efeonce (`efeoncepro.com`), posicionada como **"la agencia creativa que puedes ver operar en tiempo real"**. **Comprador = los departamentos de marketing y/o equipos creativos in-house de empresas mid-market y enterprise**; Efeonce NO los reemplaza: es **la capacidad de producción creativa que les permite escalar** su output sin sumar headcount y sin perder control ni visibilidad ("tu equipo dirige, nosotros producimos a escala, y lo ves todo"). Concepto de ejecución **Design Engineer** = arte + color + ingeniería: assets art-dirigidos producidos con el stack IA propio (fal.ai / Higgsfield / Magnific / Adobe CC), montados como experiencia performante e interactiva. Lidera la masterbrand **Efeonce**; el CTA primario **"Agenda una reunión"** adopta `open_meeting_scheduler` sólo después del gate explícito de esta surface. El diferenciador es un bloque de **operaciones creativas medibles** (ICO) — el mismo claim de transparencia que Greenhouse entrega.
 
 ### Runtime delta 2026-07-07 — operador override
 
@@ -41,7 +41,7 @@ El 68% de los compradores B2B dice que todas las agencias suenan igual (`docs/co
 
 ## Goal
 
-- Publicar una landing de agencia creativa en `efeoncepro.com` que lidere con Efeonce, posicione a Efeonce como **la capacidad de producción creativa que escala el output del equipo de marketing in-house** (partner, no reemplazo) "operada como sistema medible con visibilidad total", y convierta a **"Agenda una reunión"** (HubSpot Meetings) con atribución UTM.
+- Publicar una landing de agencia creativa en `efeoncepro.com` que lidere con Efeonce, posicione a Efeonce como **la capacidad de producción creativa que escala el output del equipo de marketing in-house** (partner, no reemplazo) "operada como sistema medible con visibilidad total", y convierta a **"Agenda una reunión"** mediante `open_meeting_scheduler` con medición allowlisted cuando esta surface sea promovida.
 - Que la ejecución **pruebe** el concepto Design Engineer: art direction real, motion con intención, performance y accesibilidad. Para el candidato live 2026-07-07, esto se resuelve con widgets Elementor custom gobernados en `eo-elementor-widgets` por instrucción explícita del operador.
 - Incluir el bloque diferenciador de **operaciones creativas medibles** con el **Time-to-Market como titular** (más piezas bien a la primera + menos rondas → ciclo más corto → llegas antes al mercado → Revenue Enabled) como componente vivo, no imagen estática — la ventaja competitiva es producir más rápido sin perder calidad, **probado con el número**.
 - Dejar la superficie indexable + citable (SEO/AEO: schema, answer capsules) y medible (conversión + GA4/GSC).
@@ -80,7 +80,9 @@ Reglas obligatorias:
 ### Depends on
 
 - **Dirección de arte aprobada (Product Design)** — el hero + KV art-dirigidos NO existen aún; se producen con `design-studio` → `fal.ai`/Higgsfield/Magnific como paso previo. `UI ready` permanece `no` hasta tener esa dirección aprobada + el design decision log completo.
-- Contrato de conversión existente del sitio público: HubSpot Meetings + el patrón UTM→`/contacto/`/Growth Form ya usado por TASK-1345 (reuse, no crear backend nuevo). `[verificar]` el embed/URL de Meetings vigente.
+- Contrato de conversión canónico: Growth CTA `open_meeting_scheduler` + Growth Meetings sobre HubSpot server-side.
+  Agencia Creativa no hereda el binding de `/agenda/` y permanece sin promoción hasta completar booking/replay,
+  `/g/collect` y aprobación de rollout propios.
 
 ### Blocks / Impacts
 
@@ -127,7 +129,8 @@ Reglas obligatorias:
 - Composition Shell: `no aplica` — es sitio público WordPress, no el shell del portal (contratos UI Platform de Greenhouse no aplican; el "sistema" acá es el theme + tokens de marca Efeonce).
 - Primitive decision: `new public-site widget` — widget Elementor `greenhouse_creative_landing_module` en `eo-elementor-widgets`, instanciado una vez por módulo para evitar HTML monolítico. No usa primitives del portal; el bloque de métricas reusa el lenguaje visual del producto como implementación pública independiente.
 - Adaptive density / The Seam: `no aplica`.
-- Floating/Sidecar/Dialog decision: modal/embed de HubSpot Meetings para el booking (o sección dedicada); ver Flow.
+- Floating/Sidecar/Dialog decision: Growth CTA abre la task surface nativa en dialog desktop y full-screen móvil;
+  un host editorial ancho puede usar inline/page sin fork del controller. Ver Flow.
 - Copy source: contenido de página WordPress (es-CL), redactado/validado con `greenhouse-ux-writing` + `docs/context/05_voz-tono-estilo.md` + `09_marca-agencia.md`. No `src/lib/copy/*` (no es portal).
 - Access impact: `none` (público, sin auth/capability).
 
@@ -136,7 +139,8 @@ Reglas obligatorias:
 - Default: landing completa renderizada, hero con media art-dirigido (poster + video lazy).
 - Loading: media del hero con poster/blur-up mientras carga; islands (bloque métricas) con skeleton antes de hidratar.
 - Empty: N/A (contenido estático curado; no hay data vacía) — el bloque de métricas usa cifras curadas/ilustrativas, no live del portal.
-- Error: si el embed de Meetings/form falla, fallback visible a `/contacto/` + WhatsApp/mailto (nunca CTA muerto).
+- Error: el scheduler conserva grilla mensual, navegación y **Reintentar**; nunca muestra iframe/link provider.
+  `/contacto/`, WhatsApp/mailto pueden existir como canales editoriales separados, no como recovery interno.
 - Degraded / partial: si el video de frontera no puede cargar (red/datos/reduced-motion), degradar a still art-dirigido sin romper layout ni contraste.
 - Permission denied: N/A (público).
 - Long content: página larga multi-sección con scroll; sin scroll horizontal en desktop ni 390px.
@@ -146,13 +150,13 @@ Reglas obligatorias:
 
 ### Interaction contract
 
-- Primary interaction: click en "Agenda una reunión" → abre booking (HubSpot Meetings modal/embed o sección) con UTM preservado.
+- Primary interaction: click en "Agenda una reunión" → Growth CTA ejecuta `open_meeting_scheduler` con surface/scheduler key autorizados.
 - Hover / focus / active: estados tactile en CTAs y cards (motion tokenizado); foco visible siempre.
-- Pending / disabled: durante carga del embed de Meetings, estado pending del CTA; nunca doble-submit.
+- Pending / disabled: config/availability/booking muestran estado explícito; el command idempotente nunca permite doble-submit.
 - Escape / click-away: cierra el modal de Meetings y restaura foco al CTA disparador.
 - Focus restore: al cerrar el booking, foco vuelve al CTA origen.
-- Latency feedback: skeleton/poster para media; spinner/estado para el embed.
-- Toast / alert behavior: confirmación de agendamiento la maneja HubSpot Meetings; fallback de error → mensaje es-CL + ruta alterna.
+- Latency feedback: skeleton/poster para media; shell estructural y estado para el scheduler.
+- Toast / alert behavior: el receipt server-confirmed reemplaza todo el shell con confirmación nativa; errores inline recuperables.
 
 ### Motion & microinteractions
 
@@ -168,12 +172,15 @@ Reglas obligatorias:
 
 - Route / surface: candidato live WordPress `https://efeoncepro.com/agencia-creativa-v2/` (`postId=251279`, `noindex` hasta cutover). La página canónica `/agencia-creativa/` (`postId=249582`) no se tocó.
 - Primitive / variant / kind: public-site Elementor widget `greenhouse_creative_landing_module`, módulos `hero`, `trust`, `problem`, `workflow`, `services`, `ai_engine`, `metrics`, `work`, `cases`, `testimonial`, `ecosystem`, `process`, `cta`, `faq`.
-- Component candidates: hero art-dirigido, trust bar, secciones de contenido, **bloque vivo de métricas** (island), grilla de casos, embed de Meetings, FAQ.
+- Component candidates: hero art-dirigido, trust bar, secciones de contenido, **bloque vivo de métricas**,
+  grilla de casos, Growth CTA + `<efeonce-meeting-scheduler>`, FAQ.
 - Copy source: contenido WP es-CL (validado `greenhouse-ux-writing`).
-- Data reader / command: **ninguno de Greenhouse** — conversión vía HubSpot Meetings/Forms existentes (reuse). Métricas del bloque diferenciador = cifras curadas/ilustrativas, no readers live del portal (declararlo honesto en copy).
-- API parity: N/A — no expone acción de negocio de Greenhouse; la única acción (agendar) es HubSpot, gobernada por su propio contrato.
+- Data reader / command: Growth Meetings config/availability + verify-email/booking; WordPress sólo compone el host.
+  Métricas del bloque diferenciador = cifras curadas/ilustrativas, no readers live del portal.
+- API parity: booking usa el command server-side gobernado; HubSpot nunca se llama desde WordPress/browser.
 - Access / capability: none (público).
-- States to implement: default, loading (media/island), error (embed fallback), degraded (video→still), mobile, keyboard/focus, reduced-motion.
+- States to implement: default/loading/empty/error/ambiguous/confirmed del scheduler, degradación editorial video→still,
+  mobile dialog/full-screen, keyboard/focus y reduced-motion.
 
 ### GVC scenario plan
 
@@ -193,7 +200,7 @@ Reglas obligatorias:
 - Decision: landing de posicionamiento de la capability creativa, liderada por Efeonce, con concepto de ejecución Design Engineer (arte+color+ingeniería) y diferenciador de operaciones medibles; build WordPress **code-custom** (no Elementor).
 - Alternatives considered: (a) Astro hand-built en Vercel (máximo craft, pero routing hacia `efeoncepro.com` y sale del dominio canónico WP) — **descartado por decisión del operador a favor de WP-custom**; (b) Elementor drag-drop — **descartado**: contradice el mensaje Design Engineer y topa el techo de craft.
 - Why this pattern: el medio es el mensaje — la landing debe *probar* craft técnico; WP-custom con bundle Vite para islands lo permite dentro del dominio canónico, asumiendo el trade-off de pelear con la plataforma (techo de craft más bajo que Astro, mitigado con enqueue disciplinado + media lazy + Kinsta CDN).
-- Reuse / extend / new primitive: new (one-off público); reusa el contrato de conversión HubSpot Meetings/Forms del sitio.
+- Reuse / extend / new primitive: new para la landing; reusa Growth CTA + Growth Meetings sin fork de booking.
 - Open risks: performance vs riqueza visual (video de frontera pesado); riesgo "AI slop" (mitigar con art direction + color tokenizado); WP como techo de craft; contraste/a11y sobre media rica.
 
 ### Visual verification
@@ -233,19 +240,19 @@ Reglas obligatorias:
 ### Slice 3 — Build WordPress Elementor modular (operator override 2026-07-07)
 
 - Widget propio en `eo-elementor-widgets` + assets CSS/JS versionados por `filemtime()`, con un widget por módulo de la landing.
-- Implementar secciones, estados (loading/error/degraded/mobile/reduced-motion), motion tokenizado, CTA "Agenda una reunión" → HubSpot Meetings con UTM.
+- Implementar secciones, estados editoriales y launcher `open_meeting_scheduler`; mantener la acción desactivada hasta el gate de la surface.
 - SEO/AEO: JSON-LD (`Organization`/`Service`/`FAQPage`/`BreadcrumbList`), Yoast/canonical, answer capsules; performance budget (LCP/INP).
 
 ### Slice 4 — Publicar + verificar + medir
 
 - Publicar la página (page ID), purgar Kinsta, verificación Playwright live (1440/1280/390, overflow, `errors=[]`, contraste, reduced-motion).
-- Instrumentar conversión: UTM + GA4 events (CTA click, booking, "mira cómo medimos") + registrar en HubSpot.
+- Instrumentar CTA + funnel `gh_meeting_*`; conversión sólo desde receipt server-confirmed y sin PII.
 - Registrar en `docs/public-site/` (roadmap) y triple documentación proporcional.
 
 ## Out of Scope
 
 - Portal Greenhouse: no se toca ninguna ruta/primitive/capability del portal.
-- Backend Greenhouse nuevo: la conversión reusa HubSpot Meetings/Forms; no se crea API/DB/command.
+- Backend nuevo: ninguno; reusar el adapter/ledger/command existentes de Growth Meetings.
 - Métricas ICO **live** del portal en la web pública (el bloque usa cifras curadas/ilustrativas; conectar data real sería otra task con su contrato).
 - Migración a Astro / cambio de host (decisión = WP-custom).
 - Landings de servicio puntual (SEO, desarrollo web) — ya cubiertas por otras tasks del EPIC-019.
@@ -264,7 +271,7 @@ Estructura canónica de la página (jerarquía de conversión; detalle de region
 7. Motor de producción IA — Multi-Model AI Studio + "cómo está hecho" (los propios assets como portfolio).
 8. Casos — Sky (+127% tráfico orgánico), Bresler (+180% ventas digitales), Berel (retainer SEO+AEO).
 9. Ecosistema / switching cost — Greenhouse como prueba de la transparencia.
-10. CTA final + booking (HubSpot Meetings).
+10. CTA final + launcher `open_meeting_scheduler` (aún no promovido en esta surface).
 11. FAQ — answer capsules (doble función: objeciones + AEO).
 
 ## Rollout Plan & Risk Matrix
@@ -285,7 +292,7 @@ Cambio **aditivo, público, sin runtime de producto Greenhouse**: publicación d
 | "AI slop" (visual genérico) lee barato, no premium | UI / marca | medium | art direction primero (design-studio), color tokenizado, restraint de motion, revisión humana del KV | rechazo del operador en Slice 1 |
 | Copy filtra siglas/infla cifras/usa un caso no citable | marca | low | reglas duras de `09_marca-agencia`; validación `greenhouse-ux-writing`; solo casos citables | review de copy pre-publicación |
 | Contraste/a11y sobre media rica falla | UI / a11y | medium | contraste AA verificado, reduced-motion, foco visible | Playwright live + audit a11y |
-| CTA muerto si el embed de Meetings falla | conversión | low | fallback a `/contacto/` + WhatsApp/mailto | verificación del booking en live |
+| Surface promovida sin evidencia propia | conversión | medium | binding/flags OFF hasta booking/replay + `/g/collect` aprobados | ledger + host smoke |
 
 ### Feature flags / cutover
 
@@ -305,12 +312,13 @@ Sin flag de producto. Candidato live additive en `/agencia-creativa-v2/` con `no
 1. Slice 1 aprobado (operador elige dirección + assets producidos con el stack propio).
 2. Slice 2: copy validado (`greenhouse-ux-writing`) + contrato de Motion escrito.
 3. Slice 3: build en borrador WP; verificación Playwright en la preview.
-4. Slice 4: publicar → purgar Kinsta → Playwright live 1440/1280/390 (overflow, `errors=[]`, contraste, reduced-motion, CWV) → verificar booking real (Meetings) + UTM + GA4 events.
+4. Slice 4: publicar → purgar Kinsta → Playwright live 1440/1280/390. La promoción del scheduler ocurre después,
+   con binding propio, booking/replay/read-back y `/g/collect`; nunca durante smoke visual.
 5. Monitorear conversión + CWV los primeros días.
 
 ### Out-of-band coordination required
 
-- HubSpot Meetings/Forms: confirmar el link/embed vigente y la propiedad de destino (reuse del contrato existente; sin crear propiedades nuevas salvo que se decida).
+- Growth Meetings: definir `meetingSurfaceId`/binding y aprobar booking/medición antes de promover esta landing.
 - WordPress/Kinsta: acceso de publicación + purga de cache.
 - Decisión del slug/URL + registro SEO (canonical, sitemap).
 
@@ -351,7 +359,7 @@ Sin flag de producto. Candidato live additive en `/agencia-creativa-v2/` con `no
 - [x] Existe `docs/ui/wireframes/TASK-1350-landing-agencia-creativa.md` (declarado en Status).
 - [x] Existe `docs/ui/flows/TASK-1350-landing-agencia-creativa-flow.md` (declarado en Status).
 - [ ] La landing lidera **Efeonce** (no Globe/Reach/Wave sueltos) y el hero no usa siglas.
-- [ ] CTA primario = **"Agenda una reunión"** → HubSpot Meetings con UTM; fallback si el embed falla.
+- [ ] CTA primario = **"Agenda una reunión"** → `open_meeting_scheduler` sólo tras gate propio; recovery native-only.
 - [ ] Bloque diferenciador de operaciones creativas medibles presente (cifras honestas/ilustrativas, no live del portal).
 - [ ] Solo casos citables (Sky/Bresler/Berel); cifras coherentes con el doc de autoridad.
 - [ ] Assets producidos con el stack IA propio (fal.ai/Higgsfield/Magnific/Adobe), art-dirigidos, color tokenizado; sin logos de operating-entity generados por IA.
@@ -366,7 +374,7 @@ Sin flag de producto. Candidato live additive en `/agencia-creativa-v2/` con `no
 - Playwright live sobre la página publicada (1440/1280/390): overflow, `errors=[]`, contraste, reduced-motion, CWV.
 - Validación de copy con `greenhouse-ux-writing` + reglas de marca.
 - Validación de JSON-LD (Rich Results) + canonical/sitemap.
-- Verificación del booking real (HubSpot Meetings) + UTM + GA4 events.
+- Verificación controlada de booking/replay/read-back + `/g/collect`, separada del smoke visual.
 - `pnpm task:lint --task TASK-1350`, `pnpm ui:wireframe-check --task TASK-1350`, `pnpm ui:flow-check --task TASK-1350`.
 
 ## Closing Protocol
@@ -391,4 +399,4 @@ Sin flag de producto. Candidato live additive en `/agencia-creativa-v2/` con `no
 
 - Slug/URL canónico de la página (`/agencia-creativa/` vs bajo `/servicios/`) — pendiente de IA/SEO.
 - ¿El bloque diferenciador queda con cifras ilustrativas curadas (recomendado v1) o se prioriza conectar data real (V2)?
-- Embed vs sección dedicada para HubSpot Meetings `[verificar]` el contrato vigente del sitio.
+- Definir la fecha/owner del rollout de `open_meeting_scheduler` para Agencia Creativa; el mecanismo ya no es una pregunta abierta.

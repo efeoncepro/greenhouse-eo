@@ -1,5 +1,17 @@
 # EPIC-023 — Growth CTA & Popup CRO Engine
 
+## Delta 2026-07-21 — Scheduler nativo como action demand-backed
+
+- `TASK-1509` materializó el adapter server-side provider-neutral sobre HubSpot Scheduler con public DTOs, ledger
+  de idempotencia/estado ambiguo, anti-abuso, receipt de conversión y funnel allowlisted.
+- `TASK-1510` agregó `open_meeting_scheduler` al Action Registry sin alterar `book_meeting`: lazy task surface en
+  diálogo/full-screen, una sola instancia y recetas adaptativas. La recuperación es native-only; HubSpot permanece
+  invisible como provider server-side.
+- Flags staging/Production y binding del piloto `/agenda/` están activos. La UI conserva la grilla completa de agosto
+  aunque HubSpot devuelva cero slots. Release native-only `fbe8a9c76a74`, run `29854833210`.
+- El epic sigue abierto: faltan booking controlado/replay, read-back HubSpot/Outlook/Teams, evidencia `/g/collect`,
+  publicación GTM con confirmación humana y cualquier promoción posterior a Contacto/RRSS.
+
 ## Delta 2026-07-18 (2) — TASK-1428+1429 released
 
 - Release `d5db8b568` (PR #159 + #160, orquestador run `29651461496`, manifest `released` 16:23Z)
@@ -45,7 +57,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Diseño`
+- Status real: `En ejecución: CTA foundation live y piloto de scheduler nativo activo; cierres de medición/booking y graduación de superficies pendientes`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `unassigned`
@@ -69,7 +81,7 @@ Esto no cabe en una sola task porque cruza backend/data, renderer portable, publ
 - `growth.cta` existe como capability Greenhouse con source of truth propio, Full API Parity y boundary claro contra `growth.forms`, `public_site`, `commercial`, HubSpot y GTM.
 - Un renderer portable host-DOM/no-iframe por defecto puede desplegar CTAs/popups en WordPress, Astro/Think y Greenhouse preview sin duplicar lógica por surface.
 - Los eventos `greenhouse_cta_*` son GTM/dataLayer-compatible y además se registran en un ledger server-side sin PII, reconciliable con Growth Forms y futuro Tracking Engine.
-- Un Action Registry gobierna schemas, resolución server-side y proyecciones browser-safe; V1 prueba `open_growth_form`, `link_url`, `open_think_tool` y `book_meeting`, y deja adapters con semántica propia para consumidores reales futuros.
+- Un Action Registry gobierna schemas, resolución server-side y proyecciones browser-safe; V1 prueba `open_growth_form`, `link_url`, `open_think_tool` y `book_meeting`, y el consumidor real de meetings agrega `open_meeting_scheduler` como adapter stateful aditivo con autoridad separada.
 - El cockpit `/growth/ctas` permite autorar/revisar/publicar/pausar/reportar CTAs con Composition Shell, Sidecar, contracts UI y GVC.
 - La capa de experimentación impide declarar winners sin hipótesis, MDE, sample size, guardrails y evidencia suficiente.
 
@@ -97,6 +109,12 @@ Sequencing is **vertical-slice-first**, not horizontal-platform-first (Arch §18
 - `TASK-1429` — [ui-ux/platform] **CTA Experience System + one interruptive placement** (`slide_in`): formaliza placement/kind/appearance/density/variant, anatomía contextual, profundidad tokenizada, estados y motion; consume TASK-1428 y cubre a11y, focus, mobile y ambos hosts.
 - `TASK-1431` — [backend-data/interaction] **Action Registry + governed navigation adapters**: one typed registry and browser-safe executor for `open_growth_form`, `link_url`, `open_think_tool` and navigation-only `book_meeting`, including expectation/state/recovery metadata but no action-driven skins. Blocks action authoring in TASK-1430.
 - `TASK-1430` — [ui-ux] **Governed authoring, canonical preview and reporting cockpit** at `/growth/ctas`, reusing existing readers/commands plus TASK-1428 controls and TASK-1431 registry metadata in one Composition Shell workbench; no freeform page builder or parallel preview renderer.
+- `TASK-1509` — [backend-data/integration] **Growth Meetings Scheduler Server Adapter**: contrato provider-neutral,
+  disponibilidad/booking HubSpot server-side, idempotencia, receipt, anti-abuso, flags y medición. Adapter/piloto
+  liberados; booking controlado/replay y evidencia de medición siguen pendientes.
+- `TASK-1510` — [ui-ux/flow] **Native Meeting Scheduler Portable Experience**: calendario mensual, agenda diaria,
+  formulario/confirmación, recipes adaptativas y action `open_meeting_scheduler`. Piloto `/agenda/` native-only activo;
+  graduación a otras superficies permanece gateada.
 - Deferred demand-driven — `download_asset`, `embed_growth_form` and bounded `hubspot_handoff` only when a real consumer supplies the asset/form/CRM contract and runtime evidence.
 - `TASK-TBD` (deferred, post-V1) — [backend-data] Experimentation layer: stable assignment, mutual exclusion, sample ratio mismatch detection, powered-test metadata and guardrail reporting. **Deferred out of V1** (Arch §18 / ADR §Deferred): built only when public traffic supports a powered test; candidate `growth.experiment` split.
 

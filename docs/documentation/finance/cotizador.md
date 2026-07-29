@@ -29,7 +29,7 @@ El costo y el margen son información sensible (poder de negociación + intelige
 
 **Nuevos consumidores (un motor, muchos canales).** Además de la pantalla del cotizador, la misma capacidad la operan ahora:
 
-- **Nexa** (asistente): tool `quote_price` — preguntás un precio por nombre y responde con el estimado; elicita si es ambiguo; perfil según quién pregunta (el cliente nunca ve margen).
+- **Nexa** (asistente): tool `quote_price` — preguntas un precio por nombre y responde con el estimado; elicita si es ambiguo; perfil según quién pregunta (el cliente nunca ve margen).
 - **MCP / agentes externos** (ej. Claude conectando el MCP): tools `search_services` + `quote_price`, read-only, perfil cliente por defecto. Consultar, no operar.
 - **API Platform**: lane `quotation` (app + ecosystem) para integraciones programáticas.
 

@@ -13,6 +13,7 @@ import {
   SisterPlatformOAuthPolicyError,
   type SisterPlatformOAuthPolicyV1
 } from './oauth-policy'
+import { resolveGlobeOAuthWorkspaceBindings, type GlobeOAuthWorkspaceBindingV1 } from './oauth-workspace-bindings'
 
 type OAuthClientRow = {
   oauth_client_id: string
@@ -108,6 +109,7 @@ export type SisterPlatformOAuthIdentityPayload = {
     clientName: string
     tenantType: 'client' | 'efeonce_internal'
   }
+  workspaceBindings?: readonly GlobeOAuthWorkspaceBindingV1[]
 }
 
 export type OAuthRequestAuditMetadata = {
@@ -159,6 +161,18 @@ export type UpsertSisterPlatformOAuthClientInput = {
   actorUserId?: string | null
 }
 
+export type UpdateSisterPlatformOAuthGrantPolicyInput = {
+  clientId: string
+  allowedScopes: string[]
+  policy: SisterPlatformOAuthPolicyV1
+}
+
+export type UpdateSisterPlatformOAuthTokenTtlsInput = {
+  clientId: string
+  codeTtlSeconds?: number
+  accessTokenTtlSeconds?: number
+}
+
 export class SisterPlatformOAuthError extends Error {
   statusCode: number
   errorCode: string
@@ -173,6 +187,9 @@ export class SisterPlatformOAuthError extends Error {
 
 const CODE_PREFIX_LENGTH = 18
 const TOKEN_PREFIX_LENGTH = 18
+const AUTHORIZATION_CODE_TTL_MAX_SECONDS = 10 * 60
+
+export const OAUTH_ACCESS_TOKEN_TTL_MAX_SECONDS = 8 * 60 * 60
 const DEFAULT_ALLOWED_SCOPES = ['openid', 'profile', 'email']
 const CORRELATION_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/
 
@@ -240,7 +257,9 @@ const normalizeRedirectUris = (value: string[]) => {
 }
 
 const normalizeAllowedScopes = (value: string[] | undefined) => {
-  const scopes = Array.from(new Set((value?.length ? value : DEFAULT_ALLOWED_SCOPES).map(scope => scope.trim()).filter(Boolean)))
+  const scopes = Array.from(
+    new Set((value?.length ? value : DEFAULT_ALLOWED_SCOPES).map(scope => scope.trim()).filter(Boolean))
+  )
 
   if (!scopes.includes('openid')) scopes.unshift('openid')
 
@@ -265,8 +284,7 @@ const generateAuthorizationCode = () => `ghspoac_${randomBytes(32).toString('bas
 
 const generateAccessToken = () => `ghspoat_${randomBytes(48).toString('base64url')}`
 
-const buildPkceChallenge = (codeVerifier: string) =>
-  createHash('sha256').update(codeVerifier).digest('base64url')
+const buildPkceChallenge = (codeVerifier: string) => createHash('sha256').update(codeVerifier).digest('base64url')
 
 const mapOAuthClient = (row: OAuthClientRow): SisterPlatformOAuthClient => {
   const allowedScopes = normalizeStringArray(row.allowed_scopes, DEFAULT_ALLOWED_SCOPES)
@@ -393,8 +411,8 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
   const clientStatus = input.clientStatus ?? 'active'
   const redirectUris = normalizeRedirectUris(input.redirectUris)
   const allowedScopes = normalizeAllowedScopes(input.allowedScopes)
-  const codeTtlSeconds = normalizeTtl(input.codeTtlSeconds, 300, 60, 600)
-  const accessTokenTtlSeconds = normalizeTtl(input.accessTokenTtlSeconds, 300, 60, 900)
+  const codeTtlSeconds = normalizeTtl(input.codeTtlSeconds, 300, 60, AUTHORIZATION_CODE_TTL_MAX_SECONDS)
+  const accessTokenTtlSeconds = normalizeTtl(input.accessTokenTtlSeconds, 300, 60, OAUTH_ACCESS_TOKEN_TTL_MAX_SECONDS)
   const policy = parseSisterPlatformOAuthPolicy(input.policy)
 
   assertSisterPlatformOAuthPolicyScopes(policy, allowedScopes)
@@ -522,6 +540,335 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
   return client
 }
 
+/**
+ * Adjust ONLY the redirect-URI allowlist of an existing OAuth client (TASK-1507).
+ *
+ * A domain cutover has to add the new callback while the old one keeps working, then drop the old
+ * one once the smoke is green. `upsertSisterPlatformOAuthClient` cannot express that: it replaces
+ * the whole row, so the caller has to restate policy, scopes and TTLs, and any value that drifted
+ * since it was last seeded would be silently rewritten. Seed scripts also rotate the consumer
+ * token alongside the client, which would invalidate the live secret mid-cutover.
+ *
+ * So this touches exactly one column, inside one transaction, reusing `normalizeRedirectUris` as
+ * the single validation authority (no wildcards, HTTPS outside localhost, never empty). Adding a
+ * URI that is already allowed is a no-op, which makes re-running it safe.
+ */
+export const updateSisterPlatformOAuthRedirectUris = async (input: {
+  clientId: string
+  add?: string[]
+  remove?: string[]
+  actorUserId?: string | null
+}) => {
+  const clientId = input.clientId.trim().toLowerCase()
+
+  if (!clientId) {
+    throw new SisterPlatformOAuthError('clientId is required.', { errorCode: 'invalid_client' })
+  }
+
+  const add = (input.add ?? []).map(uri => uri.trim()).filter(Boolean)
+  const remove = (input.remove ?? []).map(uri => uri.trim()).filter(Boolean)
+
+  if (add.length === 0 && remove.length === 0) {
+    throw new SisterPlatformOAuthError('At least one redirect URI to add or remove is required.', {
+      errorCode: 'invalid_request'
+    })
+  }
+
+  // Removing a URI that is not currently allowed means the caller is working from a stale picture
+  // of the allowlist — during a cutover that is exactly when a silent no-op is dangerous.
+  const overlap = add.filter(uri => remove.includes(uri))
+
+  if (overlap.length > 0) {
+    throw new SisterPlatformOAuthError('A redirect URI cannot be added and removed in the same call.', {
+      errorCode: 'invalid_redirect_uri'
+    })
+  }
+
+  let previousRedirectUris: string[] = []
+  let nextRedirectUris: string[] = []
+
+  await withTransaction(async pgClient => {
+    const existing = await pgClient.query<{ oauth_client_id: string; redirect_uris: string[] | null }>(
+      `
+        SELECT sister_platform_oauth_client_id AS oauth_client_id, redirect_uris
+        FROM greenhouse_core.sister_platform_oauth_clients
+        WHERE lower(client_id) = lower($1)
+        LIMIT 1
+        FOR UPDATE
+      `,
+      [clientId]
+    )
+
+    const row = existing.rows[0]
+
+    if (!row) {
+      throw new SisterPlatformOAuthError('OAuth client not found.', {
+        statusCode: 404,
+        errorCode: 'invalid_client'
+      })
+    }
+
+    previousRedirectUris = normalizeStringArray(row.redirect_uris, [])
+
+    const missing = remove.filter(uri => !previousRedirectUris.includes(uri))
+
+    if (missing.length > 0) {
+      throw new SisterPlatformOAuthError('Redirect URI to remove is not in the allowlist.', {
+        errorCode: 'invalid_redirect_uri'
+      })
+    }
+
+    const merged = [...previousRedirectUris.filter(uri => !remove.includes(uri)), ...add]
+
+    // Throws when the result would be empty, contains a wildcard, or is not HTTPS outside
+    // localhost — the same authority `upsertSisterPlatformOAuthClient` applies.
+    nextRedirectUris = normalizeRedirectUris(merged)
+
+    await pgClient.query(
+      `
+        UPDATE greenhouse_core.sister_platform_oauth_clients
+        SET redirect_uris = $2::text[], updated_at = CURRENT_TIMESTAMP
+        WHERE sister_platform_oauth_client_id = $1
+      `,
+      [row.oauth_client_id, nextRedirectUris]
+    )
+  })
+
+  const client = await loadSisterPlatformOAuthClient(clientId)
+
+  if (!client) {
+    throw new SisterPlatformOAuthError('Unable to reload OAuth client after redirect URI update.', {
+      statusCode: 500,
+      errorCode: 'client_reload_failed'
+    })
+  }
+
+  return {
+    client,
+    previousRedirectUris,
+    redirectUris: nextRedirectUris,
+    changed:
+      previousRedirectUris.length !== nextRedirectUris.length ||
+      previousRedirectUris.some((uri, index) => uri !== nextRedirectUris[index])
+  }
+}
+
+/**
+ * Replace ONLY the token lifetimes of an existing OAuth client.
+ *
+ * This gives live sister-platform clients a non-destructive way to move from smoke-test TTLs to
+ * working-session TTLs. It deliberately leaves redirect URIs, grant scopes, policy, client status,
+ * metadata and consumer credentials untouched.
+ */
+export const updateSisterPlatformOAuthTokenTtls = async (input: UpdateSisterPlatformOAuthTokenTtlsInput) => {
+  const clientId = input.clientId.trim().toLowerCase()
+
+  if (!clientId) {
+    throw new SisterPlatformOAuthError('clientId is required.', { errorCode: 'invalid_client' })
+  }
+
+  const hasCodeTtl = input.codeTtlSeconds !== undefined && input.codeTtlSeconds !== null
+  const hasAccessTokenTtl = input.accessTokenTtlSeconds !== undefined && input.accessTokenTtlSeconds !== null
+
+  if (!hasCodeTtl && !hasAccessTokenTtl) {
+    throw new SisterPlatformOAuthError('At least one token TTL is required.', {
+      errorCode: 'invalid_ttl'
+    })
+  }
+
+  const requestedCodeTtlSeconds = hasCodeTtl
+    ? normalizeTtl(input.codeTtlSeconds, 300, 60, AUTHORIZATION_CODE_TTL_MAX_SECONDS)
+    : undefined
+
+  const requestedAccessTokenTtlSeconds = hasAccessTokenTtl
+    ? normalizeTtl(input.accessTokenTtlSeconds, 300, 60, OAUTH_ACCESS_TOKEN_TTL_MAX_SECONDS)
+    : undefined
+
+  let previousCodeTtlSeconds = 300
+  let previousAccessTokenTtlSeconds = 300
+  let codeTtlSeconds = 300
+  let accessTokenTtlSeconds = 300
+  let changed = false
+
+  await withTransaction(async pgClient => {
+    const existing = await pgClient.query<{
+      oauth_client_id: string
+      code_ttl_seconds: number
+      access_token_ttl_seconds: number
+    }>(
+      `
+        SELECT
+          sister_platform_oauth_client_id AS oauth_client_id,
+          code_ttl_seconds,
+          access_token_ttl_seconds
+        FROM greenhouse_core.sister_platform_oauth_clients
+        WHERE lower(client_id) = lower($1)
+        LIMIT 1
+        FOR UPDATE
+      `,
+      [clientId]
+    )
+
+    const row = existing.rows[0]
+
+    if (!row) {
+      throw new SisterPlatformOAuthError('OAuth client not found.', {
+        statusCode: 404,
+        errorCode: 'invalid_client'
+      })
+    }
+
+    previousCodeTtlSeconds = Number(row.code_ttl_seconds || 300)
+    previousAccessTokenTtlSeconds = Number(row.access_token_ttl_seconds || 300)
+    codeTtlSeconds = requestedCodeTtlSeconds ?? previousCodeTtlSeconds
+    accessTokenTtlSeconds = requestedAccessTokenTtlSeconds ?? previousAccessTokenTtlSeconds
+    changed =
+      previousCodeTtlSeconds !== codeTtlSeconds ||
+      previousAccessTokenTtlSeconds !== accessTokenTtlSeconds
+
+    if (!changed) return
+
+    await pgClient.query(
+      `
+        UPDATE greenhouse_core.sister_platform_oauth_clients
+        SET
+          code_ttl_seconds = $2,
+          access_token_ttl_seconds = $3,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE sister_platform_oauth_client_id = $1
+      `,
+      [row.oauth_client_id, codeTtlSeconds, accessTokenTtlSeconds]
+    )
+  })
+
+  const client = await loadSisterPlatformOAuthClient(clientId)
+
+  if (!client) {
+    throw new SisterPlatformOAuthError('Unable to reload OAuth client after token TTL update.', {
+      statusCode: 500,
+      errorCode: 'client_reload_failed'
+    })
+  }
+
+  return {
+    client,
+    previousCodeTtlSeconds,
+    previousAccessTokenTtlSeconds,
+    codeTtlSeconds,
+    accessTokenTtlSeconds,
+    changed
+  }
+}
+
+/**
+ * Replace ONLY the scopes + capability policy of an existing OAuth client.
+ *
+ * This is the grant-policy counterpart to `updateSisterPlatformOAuthRedirectUris`: an active
+ * sister-platform client cannot be safely promoted with the full upsert because doing so would
+ * restate and potentially overwrite its redirect allowlist, TTLs, status and metadata. The pilot
+ * seed also rotates the consumer credential, which is explicitly forbidden for a grant rollout.
+ *
+ * Calling this function again with the returned previous values is the rollback. No authorization
+ * code, access token, consumer credential or redirect URI is read or changed here.
+ */
+export const updateSisterPlatformOAuthGrantPolicy = async (input: UpdateSisterPlatformOAuthGrantPolicyInput) => {
+  const clientId = input.clientId.trim().toLowerCase()
+
+  if (!clientId) {
+    throw new SisterPlatformOAuthError('clientId is required.', { errorCode: 'invalid_client' })
+  }
+
+  const allowedScopes = normalizeAllowedScopes(input.allowedScopes)
+  const policy = parseSisterPlatformOAuthPolicy(input.policy)
+
+  assertSisterPlatformOAuthPolicyScopes(policy, allowedScopes)
+
+  let previousAllowedScopes: string[] = []
+  let previousPolicy: SisterPlatformOAuthPolicyV1 | undefined
+  let changed = false
+
+  await withTransaction(async pgClient => {
+    const existing = await pgClient.query<{
+      oauth_client_id: string
+      allowed_scopes: string[] | null
+      policy_json: unknown
+    }>(
+      `
+        SELECT sister_platform_oauth_client_id AS oauth_client_id, allowed_scopes, policy_json
+        FROM greenhouse_core.sister_platform_oauth_clients
+        WHERE lower(client_id) = lower($1)
+        LIMIT 1
+        FOR UPDATE
+      `,
+      [clientId]
+    )
+
+    const row = existing.rows[0]
+
+    if (!row) {
+      throw new SisterPlatformOAuthError('OAuth client not found.', {
+        statusCode: 404,
+        errorCode: 'invalid_client'
+      })
+    }
+
+    previousAllowedScopes = normalizeStringArray(row.allowed_scopes, DEFAULT_ALLOWED_SCOPES)
+
+    try {
+      previousPolicy = parseSisterPlatformOAuthPolicy(row.policy_json)
+      assertSisterPlatformOAuthPolicyScopes(previousPolicy, previousAllowedScopes)
+    } catch (error) {
+      if (error instanceof SisterPlatformOAuthPolicyError) {
+        throw new SisterPlatformOAuthError('OAuth client policy is unavailable.', {
+          statusCode: 503,
+          errorCode: error.errorCode
+        })
+      }
+
+      throw error
+    }
+
+    changed =
+      !sameStringArray(previousAllowedScopes, allowedScopes) ||
+      JSON.stringify(previousPolicy) !== JSON.stringify(policy)
+
+    if (!changed) return
+
+    await pgClient.query(
+      `
+        UPDATE greenhouse_core.sister_platform_oauth_clients
+        SET
+          allowed_scopes = $2::text[],
+          policy_json = $3::jsonb,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE sister_platform_oauth_client_id = $1
+      `,
+      [row.oauth_client_id, allowedScopes, JSON.stringify(policy)]
+    )
+  })
+
+  const client = await loadSisterPlatformOAuthClient(clientId)
+
+  if (!client) {
+    throw new SisterPlatformOAuthError('Unable to reload OAuth client after grant policy update.', {
+      statusCode: 500,
+      errorCode: 'client_reload_failed'
+    })
+  }
+
+  return {
+    client,
+    previousAllowedScopes,
+    previousPolicy: previousPolicy as SisterPlatformOAuthPolicyV1,
+    allowedScopes,
+    policy,
+    changed
+  }
+}
+
+const sameStringArray = (left: readonly string[], right: readonly string[]) =>
+  left.length === right.length && left.every((value, index) => value === right[index])
+
 const assertClientActive = (client: SisterPlatformOAuthClient) => {
   if (client.clientStatus !== 'active') {
     throw new SisterPlatformOAuthError('OAuth client is not active.', {
@@ -648,28 +995,61 @@ export const buildSisterPlatformOAuthIdentityPayload = ({
   tenant,
   client,
   requestedScopes,
+  expiresAt,
+  workspaceBindings
+}: {
+  tenant: TenantAccessRecord
+  client: SisterPlatformOAuthClient
+  requestedScopes: string[]
+  expiresAt: string
+  workspaceBindings?: readonly GlobeOAuthWorkspaceBindingV1[]
+}): SisterPlatformOAuthIdentityPayload => {
+  const identity: SisterPlatformOAuthIdentityPayload = {
+    sub: `greenhouse:user:${tenant.userId}`,
+    email: tenant.email,
+    name: tenant.fullName,
+    tenantId: getOAuthTenantId(tenant),
+    identityProfileId: tenant.identityProfileId,
+    roles: client.policy.claims.includeGreenhouseRoles ? tenant.roleCodes : [],
+    capabilities: resolveSisterPlatformOAuthCapabilities(client.policy, requestedScopes),
+    issuedAt: new Date().toISOString(),
+    expiresAt,
+    organization: {
+      clientId: tenant.clientId,
+      clientName: tenant.clientName,
+      tenantType: tenant.tenantType
+    }
+  }
+
+  if (client.sisterPlatformKey === 'globe' && workspaceBindings) {
+    identity.workspaceBindings = workspaceBindings
+  }
+
+  return identity
+}
+
+export const buildBrokerSisterPlatformOAuthIdentityPayload = async ({
+  tenant,
+  client,
+  requestedScopes,
   expiresAt
 }: {
   tenant: TenantAccessRecord
   client: SisterPlatformOAuthClient
   requestedScopes: string[]
   expiresAt: string
-}): SisterPlatformOAuthIdentityPayload => ({
-  sub: `greenhouse:user:${tenant.userId}`,
-  email: tenant.email,
-  name: tenant.fullName,
-  tenantId: getOAuthTenantId(tenant),
-  identityProfileId: tenant.identityProfileId,
-  roles: client.policy.claims.includeGreenhouseRoles ? tenant.roleCodes : [],
-  capabilities: resolveSisterPlatformOAuthCapabilities(client.policy, requestedScopes),
-  issuedAt: new Date().toISOString(),
-  expiresAt,
-  organization: {
-    clientId: tenant.clientId,
-    clientName: tenant.clientName,
-    tenantType: tenant.tenantType
-  }
-})
+}): Promise<SisterPlatformOAuthIdentityPayload> => {
+  const workspaceBindings =
+    client.sisterPlatformKey === 'globe' ? await resolveGlobeOAuthWorkspaceBindings(tenant) : undefined
+
+  return buildSisterPlatformOAuthIdentityPayload({
+    tenant,
+    client,
+    requestedScopes,
+    expiresAt,
+    workspaceBindings
+  })
+}
 
 export const recordSisterPlatformOAuthAuditEvent = async ({
   client,
@@ -1181,7 +1561,7 @@ export const consumeSisterPlatformAuthorizationCode = async ({
     correlationId: result.correlationId,
     expiresIn: client.accessTokenTtlSeconds,
     scopes: result.requestedScopes,
-    identity: buildSisterPlatformOAuthIdentityPayload({
+    identity: await buildBrokerSisterPlatformOAuthIdentityPayload({
       tenant: result.tenant,
       client,
       requestedScopes: result.requestedScopes,
@@ -1300,7 +1680,7 @@ export const resolveSisterPlatformOAuthUserinfo = async ({
     client,
     accessTokenId: row.access_token_id,
     correlationId: row.correlation_id ?? auditMetadata.correlationId,
-    identity: buildSisterPlatformOAuthIdentityPayload({
+    identity: await buildBrokerSisterPlatformOAuthIdentityPayload({
       tenant,
       client,
       requestedScopes,
@@ -1343,9 +1723,7 @@ const normalizeRevocationReason = (value: string) => {
   return normalized
 }
 
-export const revokeSisterPlatformOAuthAccessTokens = async (
-  input: RevokeSisterPlatformOAuthTokensInput
-) => {
+export const revokeSisterPlatformOAuthAccessTokens = async (input: RevokeSisterPlatformOAuthTokensInput) => {
   const client = await loadSisterPlatformOAuthClient(input.clientId)
 
   if (!client) {
@@ -1413,9 +1791,7 @@ export const revokeSisterPlatformOAuthAccessTokens = async (
   return { clientId: client.clientId, correlationId, revokedCount: revoked.length }
 }
 
-export const setSisterPlatformOAuthClientStatus = async (
-  input: SetSisterPlatformOAuthClientStatusInput
-) => {
+export const setSisterPlatformOAuthClientStatus = async (input: SetSisterPlatformOAuthClientStatusInput) => {
   const current = await loadSisterPlatformOAuthClient(input.clientId)
 
   if (!current) {

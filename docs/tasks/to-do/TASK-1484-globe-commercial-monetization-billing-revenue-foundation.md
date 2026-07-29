@@ -1,5 +1,45 @@
 # TASK-1484 — Globe Commercial Monetization, Billing and Revenue Foundation
 
+## Delta 2026-07-26 — el carril interno de fondeo ya existe, y su trigger BLOQUEA el top-up de cliente
+
+`TASK-1566` entregó el carril gobernado de fondeo **interno** (`kind: 'internal'`). Buena parte es
+reusable acá, pero hay **una colisión concreta** que conviene resolver antes de construir, no después.
+
+**Lo que se reusa entero:** la mutación (grant + asiento de ledger + política **en UNA transacción**
+Postgres, `credit-funding.ts` + el seam `atomically`), la tabla append-only de evidencia
+`greenhouse_core.globe_credit_funding_intents`, y la idempotencia.
+
+🔴 **La colisión:** el trigger `enforce_globe_credit_funding_intent_authority` **exige que
+`actor_user_id` sea humano** y rechaza cualquier principal de servicio
+(`globe_credit_funding_intent_actor_must_be_human`). Un top-up de cliente **no tiene actor humano de
+Efeonce** — lo autoriza el **pago liquidado**. Tal como está hoy, ese trigger **bloquea el carril
+comercial**.
+
+**La corrección NO es relajarlo, es discriminar por `source`** — dos fuentes de autoridad, cada una
+con su prueba:
+
+| `source` | Qué lo autoriza | Qué exige el trigger |
+|---|---|---|
+| `human_session` | una persona de Efeonce confirma | actor humano + política de segundo confirmador |
+| `settled_payment` | el pago liquidado del PSP | id de pago verificado; **sin** actor humano |
+
+**Por qué el gate humano no aplica al cliente:** son dos actos económicos distintos. El grant interno
+gasta presupuesto **de Efeonce**, y por eso una persona de Efeonce lo aprueba. Un top-up gasta plata
+**del cliente** — pedir que un humano de Efeonce lo confirme no protege nada y no escala: sería pedirle
+al cajero que apruebe cada compra con tarjeta.
+
+**Tres reglas que no son negociables cuando se implemente:**
+
+1. **El monto se lee del PSP, nunca del cliente.** Si el importe viaja desde el browser, el carril
+   vale cero.
+2. **Idempotencia por el id del pago**, no por una clave que mande el caller: los PSP reintentan
+   webhooks, y ese reintento no puede emitir un segundo grant.
+3. **Un chargeback NO borra el grant** — se corrige con `grant.correct` (ya existe en
+   `CreditGrantKindV1` / el vocabulario de administración). Borrar evidencia de dinero es exactamente
+   lo que la tabla append-only impide.
+
+**Y el invariante que sobrevive a los dos carriles:** el agente/LLM **nunca** confirma ninguno.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
@@ -181,6 +221,14 @@ preservando las tres dimensiones comerciales y cinco líneas económicas separad
 - UI/checkout público, public pricing page o external-client enablement.
 - Gift cards, crypto, transferencias cross-tenant o créditos negociables.
 - Recalibrar consumo, incluir IP/derechos en credits, construir GL/tax engine o compra autónoma por agentes.
+
+### Visual and semantic boundary with Capacity
+
+La suite operativa usa `Capacity` / `Capacidad` como identidad y `credits` / `créditos` como unidad técnica de
+consumo. Esta task no puede convertir esa superficie en checkout, wallet o balance monetario. `Funding`, price,
+tax, invoice, payment y revenue usan una superficie comercial separada, con semántica, permisos y snapshots propios.
+La presencia futura de un CTA de fondeo no cambia la lectura del runway operativo ni mezcla provider cost/margin con
+la vista de capacidad.
 
 ## Detailed Spec
 

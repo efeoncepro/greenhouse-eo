@@ -194,7 +194,7 @@ Componente real: `src/views/greenhouse/home/components/NexaThread.tsx` (thread a
    **Fix robusto:** sacar el registro del Fallback y montar `<NexaToolRenderer/>` **una sola vez** dentro del thread (siempre montado, registro persistente) + renderers a nivel de módulo (`React.memo`) + Fallback puro `() => null`.
 
 3. **Scroll trabado** — el viewport tenía CSS `scroll-behavior: smooth`; el auto-scroll-to-bottom de assistant-ui (`scrollTo({behavior:'auto'})`) se volvía animación suave que se re-disparaba en cada resize de contenido durante el revelado, peleaba con la rueda y mantenía `scrollingToBottomBehaviorRef` sin liberar (bloqueaba subir).
-   **Fix:** quitar el CSS smooth → sticky-bottom honesto de assistant-ui (se ancla si estás al fondo, **suelta** cuando subís). Reduced-motion satisfecho por construcción.
+   **Fix:** quitar el CSS smooth → sticky-bottom honesto de assistant-ui (se ancla si estás al fondo, **suelta** cuando subes). Reduced-motion satisfecho por construcción.
 
 ### Evidencia objetiva (panel real `/knowledge`, Gemini local, Playwright)
 

@@ -13,7 +13,7 @@
 3. Por eso "no salimos" **no es un problema de propuesta** (Efeonce está fuerte y on-trend) — es un problema de **notoriedad de industria, presencia gremial, prensa y participación en el estudio**.
 4. Efeonce enfrenta **dos frentes competitivos**: agencias **digitales/growth/performance** (su casillero natural) y agencias **creativas/de efectividad** (liga Effie, juego largo).
 5. **Hallazgo central (CI):** los competidores digitales **ganan visibilidad publicando su propio contenido de autoridad** para dominar el buscador (SEO/AEO). **Efeonce vende AEO pero está ausente en su propio SERP de categoría.** Ese es el gap #1 y el más rápido de cerrar con las propias capacidades.
-6. **Efeonce es una agencia full-service de marketing digital y growth** — **Paid Media, CRO, Marketing de Contenidos, SEO/AEO, performance, CRM/automatización, creatividad y data** — operada como **sistema integrado (Growth OS / ASaaS)**. Su diferenciación defendible **no es un servicio suelto**, es la **integración de todo el stack** + **AI Visibility Grader propietario** + **multi-país LATAM** + **casos con resultados duros** (Sky +127%, Bresler +180%, Berel). Eso ataca justo el dolor #1 del mercado: el **82%** de los anunciantes quiere proveedores que **se coordinen** y solo el **32%** siente que tiene su combinación ideal de servicios (fragmentación de proveedores = la oportunidad de Efeonce).
+6. **Efeonce es una plataforma de servicios de marketing y crecimiento habilitada por IA** — **Paid Media, CRO, Marketing de Contenidos, SEO/AEO, performance, CRM/automatización, creatividad y data** — que comercialmente opera como **Integrated Growth Partner**, bajo el modelo **ASaaS** y con visión de **Growth Operating System**. Su diferenciación defendible **no es un servicio suelto**, es la **integración de todo el stack** + **AI Visibility Grader propietario** + **multi-país LATAM** + **casos con resultados duros** (Sky +127%, Bresler +180%, Berel). Eso ataca justo el dolor #1 del mercado: el **82%** de los anunciantes quiere proveedores que **se coordinen** y solo el **32%** siente que tiene su combinación ideal de servicios (fragmentación de proveedores = la oportunidad de Efeonce).
 
 ---
 
@@ -75,7 +75,7 @@ Solo **40%** de los chilenos declara que le gusta ver publicidad; nota promedio 
 **Loup, Bigbuda, Rompecabeza, Cebra, Moov, MEAT Group, Relevant, Nexbu, Wolf BCPP, Muller y Pérez** (performance data-driven), **Milimetrix**.
 - ⚠️ **Milimetrix** se posiciona públicamente en **"SEO, AEO, Paid Media, contenidos… crecimiento real del negocio"** — casi idéntico al ángulo full-stack de Efeonce. **Es el competidor más directo (mismo posicionamiento integrado).**
 - **Muller y Pérez, Bigbuda** compiten fuerte en **Paid Media / performance / CRO** (terreno donde Efeonce también juega) y **dominan el SERP** con rankings auto-publicados donde se ubican #1.
-- **La ventaja de Efeonce no es hacer uno de esos servicios mejor, sino hacerlos como un SISTEMA integrado** (Growth OS) — justo el dolor #1 del mercado (82% quiere proveedores coordinados). La mayoría de los competidores es fuerte en 1–2 servicios, no en el stack integrado + plataforma + LATAM.
+- **La ventaja de Efeonce no es hacer uno de esos servicios mejor, sino hacerlos como un sistema integrado** — categoría de plataforma habilitada por IA, lenguaje comercial de Integrated Growth Partner y visión Growth OS. Eso ataca el dolor #1 del mercado (82% quiere proveedores coordinados). La mayoría de los competidores es fuerte en 1–2 servicios, no en el stack integrado + plataforma + LATAM.
 
 ### 3.2 Frente 2 — Agencias creativas / de efectividad (liga Effie, juego largo)
 - **BBDO Chile** — **Agencia del Año Effie 2025** (Gran Effie con Unilever "Nunca Bajemos los Brazos", junto a Initiative + Grupomass).
@@ -155,5 +155,5 @@ Los competidores digitales **ganan visibilidad publicando su propio contenido de
 - **Método** (cómo se hizo este benchmark/CI y cómo repetirlo/actualizarlo) → skill `research-benchmark-operator` (carriles Benchmark + `10` Competitive Intelligence).
 - **Posicionamiento / casillero / pitch / battlecards** → `commercial-expert` + `09_marca-agencia.md` + `08_estrategia-comercial.md`.
 - **Ganar el SERP de categoría / PR gremial / data study de autoridad** → `content-marketing-studio` + `seo-aeo`.
-- **Doctrina de negocio / ICP / categoría Growth OS** → `efeonce-agency` + `01_quienes-somos.md` + `02_gtm.md` + `13_icp-buyer-personas-jtbd.md` + `14_modelo-negocio-asaas.md`.
+- **Doctrina de negocio / ICP / jerarquía de categoría** → `efeonce-agency` + `01_quienes-somos.md` + `02_gtm.md` + `13_icp-buyer-personas-jtbd.md` + `14_modelo-negocio-asaas.md`.
 - **Fuente cruda** → `~/Downloads/BAROMETRO-DEL-MKTG-2026_EXTRACTO-EJECUTIVO.pdf` (no está en el repo; pedir informe completo a La Vulca).

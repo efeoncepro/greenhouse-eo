@@ -1,0 +1,55 @@
+{
+  "runId": "2026-07-22_mural-guacamayas-agency-promo-16x9-seedance-v1",
+  "provider": "Fal",
+  "model": "bytedance/seedance-2.0/reference-to-video",
+  "operation": "reference-to-video",
+  "attemptsAuthorized": 1,
+  "output": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-22_mural-guacamayas-agency-promo-16x9-seedance-v1/masters/art-macaws-agency-promo-16x9-seedance-v1-master.mp4",
+    "bytes": 13995137,
+    "sha256": "f508c2c56556cea2101ca556f47aca7cde51ca205b2c024e7eec3320c085a5c2",
+    "mimeType": "video/mp4"
+  },
+  "referenceAuthority": {
+    "Video1": "motion, causal transformation, timing, camera and flight choreography",
+    "Image1": "opening/closing eye, identity and impasto",
+    "Image2": "wall-to-wing material breakthrough",
+    "Image3": "flight state, paint ribbons, depth and atmosphere"
+  },
+  "references": [
+    {
+      "role": "Video1",
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-22_mural-guacamayas-agency-promo-16x9-seedance-v1/references/art-macaws-v1-reference-626x1112.mp4",
+      "bytes": 5296605,
+      "sha256": "51bd77c2a0e672659e9997da1391e2950a77989d223e428796d64d94d2e0bddb"
+    },
+    {
+      "role": "Image1",
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-07_mural-guacamayas-hero/keyframe-01-eye.png",
+      "bytes": 3022330,
+      "sha256": "b60a36eb694fde49b8ccd9d2eaf3d87c13b06a6ff243208cf34337542776c806"
+    },
+    {
+      "role": "Image2",
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-07_mural-guacamayas-hero/keyframe-02-wing-breakout.png",
+      "bytes": 2722749,
+      "sha256": "5810c6e6bb8d76392808a62088bdc5cd929248de1063da2fff6fc3487f160f46"
+    },
+    {
+      "role": "Image3",
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-07_mural-guacamayas-hero/keyframe-03-flight-trails.png",
+      "bytes": 3105114,
+      "sha256": "7f53ecc7c377fd298102dfc9d4f1764cd66fe862484ec7a2ad10b66dda535093"
+    }
+  ],
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-22_mural-guacamayas-agency-promo-16x9-seedance-v1/prompt.md",
+  "outputPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-22_mural-guacamayas-agency-promo-16x9-seedance-v1/masters/art-macaws-agency-promo-16x9-seedance-v1-master.mp4",
+  "reviewStatus": "candidate_pending_operator_review",
+  "startedAt": "2026-07-22T21:40:41.133Z",
+  "completedAt": "2026-07-22T21:45:45.876Z",
+  "requestId": "019f8bc6-3d68-7720-8676-9d3cdbe08fac",
+  "httpStatus": 200,
+  "latencyMs": 301498,
+  "secretSource": "secret_manager",
+  "providerSeed": 1391427052
+}

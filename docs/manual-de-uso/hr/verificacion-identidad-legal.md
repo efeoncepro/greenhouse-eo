@@ -25,7 +25,7 @@ Cuando un colaborador completa su RUT, pasaporte o direccion en `/my/profile`, e
 
 ### Ver el valor completo (cuando es necesario)
 
-Esta accion queda registrada en audit log. Solo usala cuando lo necesites para verificacion cruzada (ej. matchear con un certificado fisico, confirmar con un comprobante externo).
+Esta accion queda registrada en audit log. Solo úsala cuando lo necesites para verificacion cruzada (ej. matchear con un certificado fisico, confirmar con un comprobante externo).
 
 1. En la fila del documento o direccion, click en **Ver completo**.
 2. Ingresa un motivo claro (minimo 5 caracteres). Ejemplo: "verificacion contra cedula entregada por colaborador".

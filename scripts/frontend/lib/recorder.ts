@@ -119,7 +119,8 @@ export const runScenario = async ({
       allowErrorBoundary: scenario.quality?.allowErrorBoundary,
       fullPage: options?.fullPage,
       accessibility: scenario.quality?.accessibility,
-      layout: scenario.quality?.layout
+      layout: scenario.quality?.layout,
+      assets: scenario.quality?.assets
     })
 
     qualityFindings.push(...frameQualityFindings)

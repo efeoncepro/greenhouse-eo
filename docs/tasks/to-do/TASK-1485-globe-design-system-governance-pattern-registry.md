@@ -25,6 +25,37 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-07-27 — ADR-016: el motor de estilos del payload cliente entra a esta task
+
+El barrido por dominio (regla de `EPIC-028`) confirma que **esta task es la dueña** del motor de estilos: su
+Summary ya declara que *«Globe posee e implementa tokens seleccionados, patterns, components, motion y
+runtime»*. No se crea task nueva.
+
+[**ADR-016**](../../architecture/creative-studio/EFEONCE_GLOBE_CLIENT_STYLING_ENGINE_DECISION_V1.md) propone
+adoptar **Tailwind v4** con el SSOT de tokens como theme. Estado `Proposed`: no se ejecuta sin aceptación.
+
+**Qué lo motivó (medido, no opinión):** seis colisiones de CSS global en una sola sesión — cuatro donde la hoja
+legacy pisó markup nuevo, una donde renombrar clases desconectó el glow del prompt, y el descubrimiento de que
+66 de 84 clases del composer vivían en la hoja del legacy. Ninguna es error de criterio: todas son consecuencia
+de CSS global sin scope con dos hojas conviviendo.
+
+**Slice que entra a esta task (bloqueado por aceptación del ADR):**
+
+- Instalar Tailwind v4 en `apps/studio-client` y exponer `src/tokens/tokens.ts` como su theme — **un token se
+  declara una vez, ahí**.
+- **Reescribir los tres gates** (`design-contract.test.ts` ×3 + `reduced-motion.test.ts`) para que muerdan la
+  sintaxis de utilidades: `text-[#hex]`, `p-[13px]`, duraciones literales. **Es precondición, no follow-up** —
+  un gate que deja de morder al cambiar de motor no era un gate.
+- Migrar superficie por superficie, con **diff visual contra el render anterior** en cada una. Nunca big-bang.
+- Orden propuesto: composer (el que duele) → feed → viewer → share.
+
+**Referencia para la migración:** [`GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md`](../../ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md)
+consolida geometría, valores exactos, estados, motion, iconografía y asertos del composer. Está escrita para que
+la reescritura sea **traducción mecánica**, no reinterpretación — y es independiente del motor de estilos.
+
+**Lo que destraba:** el Slice 0 de `TASK-1552` se retira —mover 272 reglas que se van a reescribir es trabajo
+desechable— y `TASK-1560` se destraba por el mismo camino.
+
 ## Summary
 
 Crear el Design System propio de Globe como sistema incremental: Greenhouse gobierna decisiones, registry,
@@ -39,7 +70,9 @@ a Vuexy/MUI/CompositionShell ni improvisar patterns aislados por pantalla.
 ## Goal
 
 Entregar un registry versionado y un Pattern Lab Globe donde cada pattern nazca `candidate`, demuestre anatomy,
-states, responsive, a11y, motion y evidence, y sólo entonces se promueva para reuso.
+states, responsive, a11y, motion y evidence, y sólo entonces se promueva para reuso. El registry también fija la
+identidad internacional de la suite **Capacity**: la capacidad es la superficie de producto; `credits` es la
+unidad operativa, no el nombre de una wallet ni una equivalencia monetaria.
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
 
@@ -106,6 +139,122 @@ No posee el Design System de Greenhouse ni autoriza dependencias Vuexy/MUI/React
 - Registry lifecycle: `candidate -> trial -> stable -> deprecated -> retired` con owner/version/evidence.
 - Pattern contract: anatomy, slots, variants, states, density, responsive, content, a11y, motion, do/don't.
 - Visual evidence: Pattern Lab desktop/mobile, keyboard, reduced motion, contrast y regression baselines.
+- Suite identity: `Capacity` / `Capacidad`, `Studio Capacity` / `Capacidad del estudio`, `credits` / `créditos`.
+- Cross-locale semantics: la identidad visual no depende del idioma; copy keys, estados y labels tienen fuente
+  canónica por locale y conservan el mismo significado operativo.
+
+### Credit identity and semantic contract
+
+Los créditos son las unidades atómicas de capacidad creativa gobernada. No son dinero, saldo, wallet, token
+negociable ni una segunda contabilidad. Cada representación visual debe explicar no sólo cuántos créditos existen,
+sino qué capacidad está disponible, comprometida, consumiéndose o confirmada, en qué ámbito y con qué nivel de
+certeza.
+
+La primitive canónica se compone de tres capas:
+
+1. **Credit Unit** — cantidad, unidad, formato, locale y estado de dato.
+2. **Credit Phase** — fase operativa: `estimated`, `reserved`, `consuming`, `settled`, `released`, `blocked`,
+   `partial`, `stale` o `unknown`.
+3. **Capacity Context** — ámbito y causalidad: workspace, proyecto, pool, grant, run o evento de ledger.
+
+La unidad mínima visible siempre contiene `cantidad + unidad + fase`. En superficies operativas añade el ámbito:
+
+```text
+24 credits · Reserved
+24 créditos · Reservado
+```
+
+```text
+24 credits · Reserved · Campaign A · Run 042
+24 créditos · Reservado · Campaña A · Run 042
+```
+
+Un número desnudo (`24`, `184`, `−12`) no es una representación válida de credits.
+
+#### Fases y comportamiento
+
+| Phase | Meaning | Visual behavior |
+|---|---|---|
+| `estimated` | cálculo previo, aún no comprometido | azure tenue, marcado como estimate vigente |
+| `reserved` | capacidad retenida para una acción | amber tonal, segmento anclado al runway |
+| `consuming` | consumo activo del run | pulso azure breve, sin loop permanente |
+| `settled` | consumo confirmado por el ledger | estado estable, rastro confirmado |
+| `released` | reserva devuelta a capacidad disponible | segmento se reintegra sin dramatización |
+| `blocked` | la acción no puede continuar | rojo tonal, causa y recovery visibles |
+| `partial` | respuesta incompleta o cobertura parcial | amber y explicación de cobertura |
+| `stale` | dato fuera de freshness válida | amber, timestamp y acción de refresh |
+| `unknown` | ausencia de dato confiable | `—` y explicación; nunca se presenta como `0` |
+
+#### Visual identity: Horizon + Orbit
+
+La identidad visual de credits es **Horizon + Orbit**. El horizonte representa el límite de capacidad; el orbe
+representa la unidad creativa; la órbita representa reservas y asignaciones; el pulso representa consumo activo; la
+estela representa consumo confirmado; la banda discontinua representa proyección e incertidumbre.
+
+El `Credit Unit` usa un orbital capacity mark, no una moneda. No utiliza signo monetario, tarjeta, relieve de moneda,
+wallet, token crypto ni ticker financiero. La forma puede ser circular por continuidad con Globe, pero nunca debe
+parecer una pieza de dinero.
+
+La paleta expresa fase, no valor monetario: azure para capacidad activa, amber para reserva/proyección/atención,
+verde tonal para operación confirmada, rojo tonal para bloqueo/error y azul grisáceo para estados liberados o
+cerrados. Todo estado combina color con icono, label y texto.
+
+#### Magnitude, phase and authority
+
+Cada componente debe distinguir tres dimensiones:
+
+- **Magnitude:** cuántos créditos.
+- **Phase:** qué ocurrió o qué está ocurriendo con ellos.
+- **Authority:** qué workspace, proyecto, pool, grant, run o evento los explica.
+
+`Available`, `Budget`, `Consumed` y `Projected usage` no son sinónimos ni comparten el mismo tratamiento visual:
+
+| Concept | Meaning | Canonical treatment |
+|---|---|---|
+| `Available` | capacidad actualmente utilizable | horizonte abierto / capacidad activa |
+| `Budget` | límite autorizado | línea o marco de contención |
+| `Consumed` | uso confirmado | segmento o rastro settled |
+| `Projected usage` | posible uso futuro | banda de confianza, nunca certeza falsa |
+
+#### Surface hierarchy
+
+La misma primitive adopta cuatro densidades, sin crear identidades distintas:
+
+- **Ambient:** Producer header, feed y context rail; muestra `Credit Pulse`.
+- **Decision:** estimate, CTA y budget block; muestra consecuencia y vigencia antes de ejecutar.
+- **Operational:** Capacity Workbench, pools y forecast; muestra runway, fases y asignaciones.
+- **Evidence:** ledger, manifest e inspector; muestra evento, impacto, actor, ámbito y enlace causal.
+
+El output creativo sigue siendo el héroe en Producer, Feed y Library. Credits sólo gana protagonismo en Capacity y
+en los puntos donde una decisión de gasto, reserva o bloqueo requiere comprensión.
+
+#### Motion and data honesty
+
+Motion explica causalidad, no valor. `estimated → reserved` ancla un segmento; `reserved → consuming` activa un pulso
+breve; `consuming → settled` deja un rastro estable; `released` devuelve capacidad al horizonte. No hay count-up
+celebratorio, ticker, shake, flicker ni animación que sugiera velocidad o dinero.
+
+`null`, `partial`, `stale`, `denied` y `unknown` nunca se normalizan a cero. Toda proyección distingue actual de
+posible y toda cifra muestra freshness cuando el contrato lo exige.
+
+#### Locale and copy contract
+
+La identidad visual y el modelo de estados son independientes del idioma. Las copy keys permanecen estables y los
+valores se localizan:
+
+| Semantic key | English | Español |
+|---|---|---|
+| `globe.capacity.nav` | `Capacity` | `Capacidad` |
+| `globe.capacity.title` | `Studio Capacity` | `Capacidad del estudio` |
+| `globe.capacity.unit` | `credits` | `créditos` |
+| `globe.capacity.estimated` | `Estimated` | `Estimado` |
+| `globe.capacity.reserved` | `Reserved` | `Reservado` |
+| `globe.capacity.settled` | `Settled` | `Liquidado` |
+| `globe.capacity.projected` | `Projected usage` | `Consumo proyectado` |
+| `globe.capacity.review` | `Review capacity` | `Revisar capacidad` |
+
+La traducción no puede cambiar la jerarquía, la fase, la autoridad ni la diferencia entre estimate, reservation y
+settlement.
 
 <!-- ZONE 2 — PLAN MODE: se completa al tomar la task -->
 <!-- ZONE 3 — EXECUTION SPEC -->
@@ -123,6 +272,8 @@ No posee el Design System de Greenhouse ni autoriza dependencias Vuexy/MUI/React
 - Implementar Pattern Lab Globe y fixtures multi-state/responsive/audience.
 - Registrar la shell vigente y contracts fundacionales, sin crear una biblioteca big-bang.
 - Habilitar propuestas de `Creative Desk` y `Runway Control Plane` como candidates independientes.
+- Registrar `Capacity Observatory` como composición transversal: `Credit Pulse`, `Runway Plane`, `Risk Rail`,
+  `Allocation Navigator`, `Evidence Ledger` y `Governed Command Dock`.
 
 ### Slice 3 — Promotion gates
 
@@ -162,6 +313,11 @@ Greenhouse. Cada nueva surface puede crear candidates en su task, pero promueve 
 - [ ] ADR/decision declara Greenhouse governance, Globe ownership/runtime y no inheritance automática.
 - [ ] Registry machine-readable valida ID/version/lifecycle/owner/consumer/evidence.
 - [ ] Cada pattern documenta anatomy, states, responsive, a11y, motion y content contract.
+- [ ] `Capacity Observatory` queda registrado como composición transversal con variantes compactas y full-workbench.
+- [ ] Credit Unit, Credit Phase y Capacity Context tienen contract, fixtures y variantes por superficie.
+- [ ] Las fases, freshness, partial/unknown y la diferencia available/budget/consumed/projected tienen evidencia.
+- [ ] Horizon + Orbit se documenta y se prueba sin iconografía de wallet, token o dinero.
+- [ ] English y Español conservan las mismas semantic keys, estados, jerarquía y alternativas accesibles.
 - [ ] Pattern Lab muestra fixtures desktop/mobile/keyboard/reduced motion y estados honestos.
 - [ ] No existen imports/dependencies de UI Greenhouse en Globe salvo contrato explícitamente aprobado.
 - [ ] Compartir colores queda token-by-token documentado; no arrastra patterns ni semantics completas.

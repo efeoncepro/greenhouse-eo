@@ -10,23 +10,23 @@
 
 Greenhouse despliega 2 stacks en Azure: **Logic Apps** (Teams notifications, `infra/azure/teams-notifications/`) y **Bot Service** (Greenhouse Teams Bot, `infra/azure/teams-bot/`). Antes de TASK-853, cada release production reaplicaba Bicep aunque no hubiese cambios — riesgo innecesario porque reapply puede ser destructivo (delete-on-deletion semantics, federated credential rotation, App Service config reset).
 
-Con TASK-853, los workflows Azure operan con **gating canónico**: el Bicep apply real solo corre si hay cambios reales en `infra/azure/<sub>/**` o si vos forzás el deploy explícitamente. El **health check** Azure (verificar que WIF + providers + Resource Group siguen vivos) corre **siempre** como preflight.
+Con TASK-853, los workflows Azure operan con **gating canónico**: el Bicep apply real solo corre si hay cambios reales en `infra/azure/<sub>/**` o si tú fuerzas el deploy explícitamente. El **health check** Azure (verificar que WIF + providers + Resource Group siguen vivos) corre **siempre** como preflight.
 
 ## Antes de empezar
 
 - Tener capability `platform.release.execute` (EFEONCE_ADMIN o DEVOPS_OPERATOR) si vas a disparar via orchestrator.
-- Si vas a usar `force_infra_deploy=true`: estar seguro de que el Bicep template está correcto (corré `az deployment group what-if` local primero).
-- Verificar que tenés acceso al tenant Azure `a80bf6c1-7c45-4d70-b043-51389622a0e4` (efeoncepro).
+- Si vas a usar `force_infra_deploy=true`: estar seguro de que el Bicep template está correcto (corre `az deployment group what-if` local primero).
+- Verificar que tienes acceso al tenant Azure `a80bf6c1-7c45-4d70-b043-51389622a0e4` (efeoncepro).
 
 ## Como se dispara
 
 ### Modo automático (push:main con cambios Bicep)
 
-Pusheás un commit a main que toca `infra/azure/teams-notifications/**` o `infra/azure/teams-bot/**` → el path filter del workflow lo gatilla → deploy automático.
+Pusheas un commit a main que toca `infra/azure/teams-notifications/**` o `infra/azure/teams-bot/**` → el path filter del workflow lo gatilla → deploy automático.
 
-### Modo orchestrator (default cuando promovés release con TASK-851)
+### Modo orchestrator (default cuando promueves release con TASK-851)
 
-Cuando disparás `production-release.yml` con un `target_sha`:
+Cuando disparas `production-release.yml` con un `target_sha`:
 
 1. El orchestrator invoca los 2 Azure workflows via `workflow_call` en paralelo con los workers Cloud Run.
 2. Cada Azure workflow corre los 5 jobs canónicos:
@@ -39,7 +39,7 @@ Cuando disparás `production-release.yml` con un `target_sha`:
 
 ### Modo force (operator override)
 
-Cuando el Bicep template necesita reapply incluso sin diff (e.g. parametros cambiaron en el repo de configs externas, o necesitás reaplicar después de manual rollback):
+Cuando el Bicep template necesita reapply incluso sin diff (e.g. parametros cambiaron en el repo de configs externas, o necesitas reaplicar después de manual rollback):
 
 ```bash
 gh workflow run production-release.yml \
@@ -80,7 +80,7 @@ gh workflow run azure-teams-deploy.yml \
 | `health-check` falla con "AADSTS70021: No matching federated identity record found" | Falta el subject WIF para el contexto actual | Agregar federated credential via `az ad app federated-credential create` (ver §6.2 del runbook) |
 | `diff-detection` no detecta cambios obvios | `target_sha` no es descendiente de `origin/main~1` | Verificar git history; si es push:main, el path filter ya filtró |
 | Bicep apply falla con "DeploymentFailed" + ProvisioningState=Failed | Recurso conflictivo, naming colision, quota exceeded | `az deployment group show --resource-group <rg> --name <deploy>` para ver el error específico |
-| `skip-deploy-summary` se ejecutó pero esperabas que aplicara | Forgot to set `force_infra_deploy=true` o no había diff real | Re-run con `--force_infra_deploy=true` si querés forzar |
+| `skip-deploy-summary` se ejecutó pero esperabas que aplicara | Forgot to set `force_infra_deploy=true` o no había diff real | Re-run con `--force_infra_deploy=true` si quieres forzar |
 | 2 jobs Azure quedan `pending` por minutos | `secrets: inherit` no resuelve AZURE_* en el environment correcto | Verificar que el approval-gate del orchestrator ya pasó (mismo environment production) |
 
 ## Referencias técnicas

@@ -56,7 +56,10 @@ Todo lo que mostramos debe poder conectarse —directa o indirectamente— con i
 
 > **Detrás de estos tres ejes hay un Why de marca:** *no te entregamos crecimiento, lo construimos contigo —y te dejamos más capaz de sostenerlo* (co-creación · educación · integralidad). Los tres ejes son el How/What de ese Why en producto: el switching cost se gana haciendo al cliente más capaz (no dependiente), la transparencia hace real la co-creación, y Revenue Enabled prueba que el crecimiento es integral. SSOT del Why: `09_marca-agencia.md` → §El Golden Circle de Efeonce.
 
-**Ambición de mercado:** Efeonce es **LATAM-first, no LATAM-limited**. La dirección es construir una agencia grande y reconocida en toda Latinoamérica desde el inicio, preparada para servir EEUU hispano, mercados en inglés y otros mercados internacionales. La categoría defendible no es "agencia integral" ni "AI agency": es **Growth Operating System / ASaaS**, con co-creación convertida en software, método, datos y memoria acumulada. Decisión pública: `docs/public-site/decisions/PDR-012-growth-operating-system-global-positioning.md`.
+**Ambición de mercado:** Efeonce es **LATAM-first, no LATAM-limited**. La dirección es construir una empresa de sistemas de crecimiento digital habilitados por IA, preparada para servir EEUU hispano, mercados en inglés y otros mercados internacionales mediante estrategia, personas, product services, plataformas y agentes. En lenguaje comercial: **Integrated Growth Partner**. El modelo es **ASaaS** y la visión de largo plazo es **Growth Operating System**: co-creación convertida en software, método, datos y memoria acumulada. Decisión pública: `docs/public-site/decisions/PDR-012-growth-operating-system-global-positioning.md`.
+
+Directriz corporativa: para 2028 todos los servicios client-facing deben ser Product Services productizados y
+AI-native. El contrato y los gates viven en [`Efeonce 2028 — Productized AI-Native Services`](../strategy/EFEONCE_2028_PRODUCTIZED_AI_NATIVE_SERVICES_STRATEGIC_DIRECTION_V1.md).
 
 **Cultura operativa:** el Why se impregna en el equipo mediante el **Efeonce Operating Code**: `docs/operations/EFEONCE_OPERATING_CODE_V1.md`. Regla cultural: *en Efeonce se valora a quien deja al cliente más capaz, deja el sistema con más memoria y conecta su trabajo con crecimiento real.*
 
@@ -111,9 +114,11 @@ El roadmap ASaaS ya nombra dónde duele. Si buscas dónde aportar, empieza aquí
 | Archivo | Dominio |
 |---|---|
 | `00_INDEX.md` | Este. Cómo usar la carpeta + North Star de producto. |
-| `01_quienes-somos.md` | Efeonce Group, 4 unidades, Loop Marketing, ICO, experiencia LATAM. |
-| `02_gtm.md` | Posicionamiento, categoría ASaaS, líneas de negocio, segmentación, modelo comercial, canales, proceso de venta, métricas GTM, partnership. |
+| `01_quienes-somos.md` | Efeonce Group, líneas de negocio, product brands, Loop Marketing, ICO, experiencia LATAM. |
+| `../architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md` | Contrato de capas: Efeonce, líneas de negocio/prácticas, product brands, ofertas y delivery. |
+| `02_gtm.md` | Posicionamiento, categoría de mercado, ASaaS, líneas de negocio, segmentación, modelo comercial, canales, proceso de venta, métricas GTM, partnership. |
 | `03_ecosistema-producto.md` | Greenhouse + Kortex + Verk. Integración, convergencia, ASaaS redefinido, jerarquía de IP. |
+| [`../strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md`](../strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md) | Contrato transversal: productos operator-first, operator-champion, ciclo de adopción/expansión y Greenhouse como superficie ejecutiva. |
 | `04_greenhouse-producto.md` | Greenhouse hoy: módulos, stack, integraciones, ICO Engine, gaps, roadmap, principios de diseño. |
 | `05_voz-tono-estilo.md` | Creencias contrarias, personalidad, voz, tono, do/don't — aplicado a UX copy del portal. |
 | `06_glosario-metricas.md` | Glosario canónico de métricas, siglas y naming. Fuente de verdad para nombres en código. |
@@ -121,6 +126,8 @@ El roadmap ASaaS ya nombra dónde duele. Si buscas dónde aportar, empieza aquí
 | `08_estrategia-comercial.md` | Dos motores, cuentas ancla y playbooks, cross-sell por Pulse, demo por buyer persona, KPIs, dependencias de producto. |
 | `09_marca-agencia.md` | Arquitectura de marca (masterbrand + capabilities), sistema verbal, posicionamiento, elevator pitch, messaging por audiencia, reglas de comunicación. |
 | `10_experiencia-cliente.md` | Experiencia Efeonce como entrada al ecosistema de crecimiento: operación, software, aprendizaje, red y memoria. Greenhouse como command center; journey de 8 fases + 2 transversales, artefactos de marca y métricas de adopción. |
+| [`../strategy/EFEONCE_OPERATOR_PAIN_AND_JOURNEY_FAILURE_MAP_V1.md`](../strategy/EFEONCE_OPERATOR_PAIN_AND_JOURNEY_FAILURE_MAP_V1.md) | Mapa operativo de dolores del operador, fallas del journey, momentos de verdad, causas backstage, recovery, métricas y señales para Greenhouse. |
+| [`../strategy/EFEONCE_CONTENT_TO_CAPABILITY_LOOP_V1.md`](../strategy/EFEONCE_CONTENT_TO_CAPABILITY_LOOP_V1.md) | Arquitectura de contenido: Glitch, blog, YouTube, microcapacitaciones, learn moments, Product Services y Greenhouse. |
 | `11_hubspot-bowtie.md` | Arquitectura HubSpot: 3 pipelines de deals, properties custom, y Bow-tie (lifecycle dual 7/12 stages + motion booleans) con los **internal names exactos** para el sync de Account 360. |
 | `13_icp-buyer-personas-jtbd.md` | ICPs, buyer personas y Jobs-to-be-Done. Traduce dolores comerciales en prioridades de producto por usuario y tier de entrada. |
 | `14_modelo-negocio-asaas.md` | Modelo ASaaS recalibrado: switching cost, self-service, tiers, monetizacion recurrente y roadmap de exposicion/adopcion. |

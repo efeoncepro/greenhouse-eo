@@ -33,7 +33,7 @@
 | 8 | Casos | Sky · Bresler · Berel · SSilva | Prueba con dato real (solo citables) | `.gh-agencia-cases` | casos citables (`13`) |
 | 9 | Ecosistema / foso ASaaS | 3 plataformas → switching cost | Diferenciador estructural (`14`) | `.gh-agencia-ecosystem` (dark) | copy estático |
 | 10 | Para quién | equipos de marketing mid-market/enterprise | Auto-calificación + anti-ICP suave | `.gh-agencia-audience` | copy estático |
-| 11 | CTA / Agenda | conversión: "Agenda una reunión" | Cierre; captura de lead gobernada | `#agenda` — `<greenhouse-form>` **o** HubSpot Meetings (ver Open Q) | Greenhouse Growth Forms |
+| 11 | CTA / Agenda | conversión: "Agenda una reunión" | Cierre; launcher gobernado, aún no promovido | Growth CTA `open_meeting_scheduler` → scheduler native-only | Growth Meetings |
 | 12 | FAQ | objeciones de categoría | Reduce fricción de decisión + FAQPage schema | `<details name="task1358-faq">` nativo | copy + FAQPage JSON-LD |
 | 13 | Footer | Ohio `#colophon` nativo | Cierre + nav global | Ohio nativo | WP theme |
 
@@ -46,7 +46,7 @@
 | `publicsite.agencia.hero.eyebrow` | Hero | "Agencia de crecimiento integrada" | — | Reencuadre puente (findable + desmarcado); espeja eyebrow del about-us |
 | `publicsite.agencia.hero.h1` | Hero | "El crecimiento real no se compra por partes. Se orquesta." | — | Claim canónico `09`; el término de categoría vive en `<title>`/meta, no fuerza el H1 visible |
 | `publicsite.agencia.hero.subhead` | Hero | "Creatividad, performance, medios, CRM y data trabajando como un solo motor —con visibilidad total de qué pasa y qué resultado produce." | — | Enumera capabilities incl. **performance**; promete visibilidad |
-| `publicsite.agencia.hero.cta_primary` | Hero | "Agenda una reunión" | — | → `#agenda` |
+| `publicsite.agencia.hero.cta_primary` | Hero | "Agenda una reunión" | — | → `open_meeting_scheduler` cuando la surface sea promovida |
 | `publicsite.agencia.hero.cta_secondary` | Hero | "Mira cómo operamos" | — | video/tour ecosistema; bajo compromiso |
 | `publicsite.agencia.hero.proof` | Hero | "+90 marcas · Chile · Colombia · México · Perú" | count, países | Cifra citable (`09`) |
 | `publicsite.agencia.reframe.headline` | Reframe | "No somos una agencia de marketing digital más. Somos tu partner de crecimiento —con software propio y visibilidad total." | — | **Regla dura del PDR**: el remate que desmarca del commodity |
@@ -60,15 +60,16 @@
 
 ## State Copy
 
-> Landing pública estática: los "estados" son del bloque de conversión (`<greenhouse-form>`) + degradación de assets. No hay readers del portal.
+> Landing pública estática con task surface de Growth Meetings. Agencia aún no está promovida; estos estados son el
+> contrato objetivo del launcher/scheduler más la degradación editorial de assets.
 
 | State | Title | Body | CTA / recovery | Notes |
 | --- | --- | --- | --- | --- |
-| `ready` | (form visible) | Formulario de reunión renderizado, campos válidos | "Agenda una reunión →" | `data-form-ready="true"` |
-| `loading` | (form montando) | Chrome del bloque visible; skeleton del form | — | WP owns chrome; Greenhouse owns fields |
-| `empty` | — | N/A (sin listas de datos) | — | — |
+| `ready` | Agenda disponible | Calendario, agenda y zona del visitante listos | Elegir fecha/hora | scheduler native-only |
+| `loading` | Cargando disponibilidad | Shell estructural estable | — | sin fechas falsas |
+| `empty` | Sin horarios este mes | Grilla mensual completa con días no disponibles | Mes anterior/siguiente · Reintentar | sin provider link |
 | `partial` | Assets degradados | Si un asset (logo/video) falla, la sección colapsa a texto/fondo sólido | — | Nunca romper layout; sin white-on-white |
-| `error` | "No pudimos enviar tu solicitud" | Mensaje del renderer + fallback | `mailto:hola@efeoncepro.com` / `/contacto/` | CTA nunca muere |
+| `error` | No pudimos actualizar la disponibilidad | Mensaje sanitizado | Reintentar | recuperación nativa |
 | `denied` | — | N/A (público, sin auth) | — | — |
 
 ## Accessibility Contract
@@ -76,18 +77,19 @@
 - Heading order: un solo `<h1>` (hero); secciones en `<h2>`; sub-bloques `<h3>`. Sin saltos de nivel.
 - Chart/table alternatives: el dashboard ilustrativo (region 6) lleva texto equivalente (las cifras se leen en prosa, no solo en el gráfico); tabla comparativa (si se usa) es `<table>` semántica.
 - Aria labels: CTAs con `aria-label` explícito cuando el texto visible no basta; logos con `alt` de marca; video con control accesible.
-- Focus notes: orden de foco = DOM order; CTAs y form con `:focus-visible` (anillo, no solo color); dropdowns del form con `aria-expanded`.
-- Color-independent state labels: estados del form (error/success) con texto + ícono, no solo color; contraste AA en dark sections (texto sobre `clb__dark_section`).
+- Focus notes: launcher con `:focus-visible`; dialog/full-screen contiene foco, calendario usa semántica y cierre restaura al invocador.
+- Color-independent state labels: disponibilidad/error/éxito usan texto + ícono, no sólo color; contraste AA.
 
 ## Implementation Mapping
 
 - Route / surface: `https://efeoncepro.com/agencia/` (WordPress/Kinsta, Ohio/Elementor document; canonical apex).
 - Primitives: patrones marketing `modern-ui` + rail HTML gobernado `.gh-agencia-*` (modelo TASK-1345); **NO** primitives del portal (`src/components/greenhouse/**`).
 - Variants / kinds: N/A (sitio público, no design system del portal).
-- Component candidates: Ohio `ohio_badge`/`ohio_heading`/`ohio_button` (hero) · `<greenhouse-form>` (conversión) · `greenhouse_comparison_table` (widget Elementor, si se usa tabla) · `<details>` nativo (FAQ).
+- Component candidates: Ohio `ohio_badge`/`ohio_heading`/`ohio_button` (hero) · Growth CTA
+  `open_meeting_scheduler` + `<efeonce-meeting-scheduler>` · `greenhouse_comparison_table` · `<details>` nativo.
 - Copy source: WordPress es-LATAM, validado `greenhouse-ux-writing`; NUNCA `src/lib/copy/*`.
-- Data reader / command: **none** (landing estática; conversión vía Greenhouse Growth Forms API pública `POST /api/public/growth/forms/{slug}/submit`).
-- API parity: N/A — no crea capability de portal; el único contrato programático es la Growth Forms public API (ya gobernada). Full API Parity: no aplica (superficie de marketing, no capability operable).
+- Data reader / command: Growth Meetings config/availability + verify-email/booking; WordPress sólo compone el host.
+- API parity: booking permanece en el command server-side gobernado; no hay llamadas HubSpot desde WordPress/browser.
 - Access / capability: público, sin auth, sin entitlements.
 - Runtime consumers: navegador público + motores de respuesta IA (JSON-LD `Organization`+`Service`+`BreadcrumbList`+`FAQPage`).
 - Print/email/PDF considerations: ninguna.
@@ -98,12 +100,13 @@
 - Scenario file: **N/A** — GVC del portal (agent-auth) **no aplica** a WordPress público. Se usa **Playwright live** sobre la preview/página publicada (patrón TASK-1343/1345).
 - Route: `/agencia/` (staging WP o preview antes de indexar).
 - Viewports: `1440`, `1280`, `390`.
-- Required steps: cargar página → scroll por cada `data-capture` → abrir 1 FAQ → montar y validar el `<greenhouse-form>` (sin enviar lead real) → verificar CTAs.
-- Required captures: full-page desktop + mobile 390; hero fold; sección firma (motor + proof-engine); bloque de conversión con form montado.
+- Required steps: cargar → abrir/cerrar/reabrir scheduler sin booking → navegar calendario/mes vacío → abrir FAQ.
+- Required captures: full-page desktop + mobile 390; hero; sección firma; launcher y scheduler dialog/full-screen.
 - Required data-capture markers: los 12 listados arriba.
-- Assertions: un solo `<h1>`; `scrollWidth == clientWidth` (sin overflow horizontal) en desktop y mobile; CTAs con destino válido (nunca muerto); form monta con `data-form-ready="true"`; dark sections con contraste AA.
+- Assertions: un solo `<h1>`; `scrollWidth == clientWidth`; action `open_meeting_scheduler`; cero links HubSpot en
+  el scheduler; foco restaurado; dark sections AA y ningún booking durante smoke visual.
 - Scroll-width checks: `scrollWidth == clientWidth` en 1440/1280/390.
-- Accessibility/focus checks: foco visible en CTAs + campos del form; orden de foco = DOM; FAQ operable por teclado.
+- Accessibility/focus checks: foco visible, trap/restore del scheduler, teclado de calendario y FAQ operable.
 - Reduced-motion evidence: capturar con `prefers-reduced-motion: reduce` — marquee/reveals detenidos, contenido legible y completo.
 
 ## Design Decision Log
@@ -112,17 +115,17 @@
 - Alternatives considered: (a) H1 = "Agencia de Marketing Digital en Chile" literal por SEO → descartado, viola doctrina masterbrand y suena commodity; (b) landing "partner de crecimiento" pura → descartado, keyword sin volumen; (c) que about-us haga el job → descartado, mismatch de intención.
 - Why this pattern: resuelve la tensión posicionamiento vs descubrimiento como PDR-002 (slug/title = keyword; hero = categoría diferenciada); el reframe *no-es-X-es-Y* es Do canónico de voz.
 - Reuse / extend / new primitive: `reuse` — rail HTML gobernado + Ohio nativo (TASK-1345); ninguna primitive nueva.
-- Open risks: atraer comprador SMB equivocado (mitiga anti-ICP + sin precios commodity); mecanismo de CTA "Agenda una reunión" sin precedente gobernado (Open Q).
+- Open risks: atraer comprador SMB equivocado (mitiga anti-ICP + sin precios commodity); activar Agencia antes de completar su binding, booking/replay y medición.
 - Follow-up: contrato de Motion (region 5/6 sección firma) antes de `UI ready: yes`; art direction del hero (Slice 1).
 
 ## Acceptance Checklist
 
 - [ ] Todas las strings visibles están en el Copy Ledger (o marcadas como dirección a validar en Slice 2 con `greenhouse-ux-writing`).
 - [ ] Los valores dinámicos (proof count, países, cifras del proof-engine) están acotados y declarados como **ilustrativos** donde no son live.
-- [ ] Estados `partial`/`error` del bloque de conversión son explícitos y el CTA nunca queda muerto.
+- [ ] Estados empty/error/ambiguous son explícitos y su recovery permanece native-only.
 - [ ] No se promete un dato como live cuando es ilustrativo (regla `09`/`13`).
 - [ ] El dashboard/gráfico ilustrativo tiene alternativa textual.
-- [ ] State + aria copy listos (error/success del form con texto + ícono).
+- [ ] State + aria copy listos (calendario, error y success con texto + ícono).
 - [ ] Implementation Mapping completo (route, primitives, copy source, data reader, access, GVC markers).
 - [ ] GVC Scenario Plan específico (Playwright live, viewports, markers, scroll-width, reduced-motion).
 - [ ] Design Decision Log explica reuse vs extend vs new y las alternativas descartadas.

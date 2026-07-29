@@ -7,6 +7,11 @@ TypeScript. Este archivo contiene solo contratos durables y rutas de descubrimie
 rollout o bloqueo vive en [Handoff.md](Handoff.md); la historia pre-2026-07-19 quedó preservada en
 [`docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`](docs/operations/agent-context-history/2026-07-19/project_context.legacy.md).
 
+El payload React activo de Efeonce Globe (`../efeonce-globe`) usa Tailwind v4 como pipeline único de estilos:
+composer, shell, diálogos, feed, viewer, share board, primitives y capas base/motion están absorbidos por el
+payload Tailwind. El renderer vanilla y `producerStyles` permanecen sólo como fallback de rollout hasta
+`TASK-1560`; no confundir esa frontera con una hoja activa en la ruta React.
+
 ### Lectura mínima obligatoria
 
 1. [AGENTS.md](AGENTS.md): reglas transversales y router de dominios.
@@ -23,6 +28,8 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 - Este repo corresponde al `starter-kit` Greenhouse. `full-version` es referencia visual/funcional, no
   source of truth ni producto activo.
 - Greenhouse es plataforma/subproducto de Efeonce; `EO` es abreviación del repo, no nomenclatura visible.
+- Wave es una product house hermana para la capa de producto de sus Product Services; sus runtimes y plataformas no se crean dentro de Greenhouse. Greenhouse administra transversalmente las plataformas Efeonce mediante contratos de sister platform. Los productos nuevos nacen Agent Native y con Full API Parity. Canon: [`EFEONCE_WAVE_PRODUCT_PLATFORM_GREENHOUSE_ADMINISTRATION_DECISION_V1.md`](docs/architecture/EFEONCE_WAVE_PRODUCT_PLATFORM_GREENHOUSE_ADMINISTRATION_DECISION_V1.md).
+- Greenhouse evolucionará hacia un Ecosystem Work Registry + Federated Execution Harness: mantendrá la visibilidad y coordinación global del trabajo; cada repo conservará ejecución, evidencia primaria, runtime y ownership local mediante contratos, manifests y adapters. Canon: [`GREENHOUSE_ECOSYSTEM_WORK_REGISTRY_FEDERATED_EXECUTION_DECISION_V1.md`](docs/architecture/GREENHOUSE_ECOSYSTEM_WORK_REGISTRY_FEDERATED_EXECUTION_DECISION_V1.md). La implementación está gated; no hay transporte, schema, adapter ni mutación cross-repo autorizados todavía.
 - Arquitectura vigente + código/schema/runtime verificados prevalecen sobre tasks o handoffs stale.
 - El repo puede convivir con satélites. Ver [`docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md`](docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md)
   antes de asumir ownership de otro runtime.
@@ -50,8 +57,35 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 | Cómo se ejecuta una unidad de trabajo      | `docs/tasks/TASK_PROCESS.md` / modelo de issue/epic/mini-task                                      |
 | Qué pasó históricamente                    | task/issue/commit y snapshots bajo `agent-context-history/`                                        |
 | Qué ofrece/opera Efeonce                   | `docs/services/README.md`                                                                          |
+| Cómo se presenta Efeonce para capital, inversión y fundraising | `docs/strategy/EFEONCE_CAPITAL_AND_INVESTMENT_STRATEGY_V1.md` + [`ASAAS_MANIFESTO_V1.md`](strategy/ASAAS_MANIFESTO_V1.md) |
+| Cómo preparar investor readiness y fundraising | `.codex/skills/efeonce-investor-readiness/SKILL.md` + estrategia de capital + Finance/Legal |
+| Cómo diseñar/auditar customer models, business models, pricing y unit economics | `.codex/skills/efeonce-customer-model-operator/SKILL.md` + `.codex/skills/efeonce-business-model-operator/SKILL.md` + `.codex/skills/efeonce-pricing-operator/SKILL.md` + `docs/business-models/README.md` + Finance/Legal |
+| Cómo modelar Wave y sus boundaries con Efeonce Digital, Kortex, Globe y Reach | `docs/architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md` + `docs/business-models/wave/WAVE_BUSINESS_MODEL_V1.md` |
 | Qué tooling/modelos evalúa Efeonce Globe / Creative Studio | `docs/architecture/EFEONCE_CREATIVE_STUDIO_ENTERPRISE_MODEL_PORTFOLIO_V1.md` + capability registry |
 | Cómo crea y captura valor Creative Studio, cómo funcionan sus créditos y qué skills lo adoptan | `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md` + `EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md` + `EFEONCE_CREATIVE_STUDIO_SKILL_ADOPTION_V1.md` |
+| Cómo producir posts sociales visuales con reportes, dashboards o evidencia de producto | `docs/operations/GREENHOUSE_SOCIAL_VISUAL_REPORT_PRODUCTION_V1.md` + capas funcional/manual + skills `design-studio` y `social-media-studio` |
+| Cómo modelar Efeonce Group, Media & Distribution, Growth Platform, AEO y Search Visibility 360 | `docs/business-models/README.md` + `.codex/skills/efeonce-business-model-operator/SKILL.md` + modelos vigentes |
+| Cómo reconciliar el costo del AI Visibility Grader | `docs/audits/cloud-cost/AI_VISIBILITY_GRADER_COST_RECONCILIATION_2026-07-27.md` + documentación funcional/runbook del grader |
+| Cómo evaluar el portafolio de partners/providers de IA | `.codex/skills/efeonce-business-model-operator/SKILL.md` + `.codex/skills/efeonce-customer-model-operator/SKILL.md` + audit comercial fechado; economics y routing directo/Fal en `design-studio` y `motion-design-studio` |
+| Qué es un Product Service y cómo separar oferta, productización, delivery, operación y engagement | `docs/business-models/EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md` |
+| Cómo se relacionan los modelos corporativo, portfolio, capability, packaging y submodelo | `docs/business-models/EFEONCE_BUSINESS_MODEL_ARCHITECTURE_V1.md` |
+| Cómo se estructura y vende Creative Services, incluido Run-and-Gun y sus composiciones | `docs/services/creative-services/README.md` + `.codex/skills/creative-practice/modules/03_OFERTA.md` |
+| Cómo se estructura y vende Media & Distribution, sus tres soluciones, Performance & Commerce, capacidades de delivery, Influencers/UGC y el rol de Reach | `docs/services/media-distribution/README.md` + `docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md` + `docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md` + `docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md` + `docs/audits/commercial/CREATOR_INFLUENCE_CONTENT_MARKET_RESEARCH_2026-07-29.md` + `docs/audits/commercial/CREATOR_INFLUENCE_PERFUME_ATHLETES_CHILE_SIMULATION_2026-07-29.md` |
+| Cómo se estructura y vende RevOps & CRM/HubSpot, y cómo usar los brochures comerciales como insumo sin volverlos canon | `docs/services/hubspot-as-a-service/README.md` + `docs/audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md` + skills `hubspot-as-a-service` y `hubspot-solutions-partner` |
+| Cómo funcionan partnerships/providers, licencias, co-selling, capability enablement y captura de valor en Efeonce | `docs/business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md` + `docs/audits/commercial/AI_PARTNER_PROGRAM_APPLICATIONS_2026-07-26.md` + `efeonce-business-model-operator` |
+| Cómo se priorizan beachheads, ofertas de entrada, rutas de expansión, proof y cross-sell | `docs/strategy/EFEONCE_COMMERCIAL_FOCUS_AND_BEACHHEADS_V1.md` + `docs/context/13_icp-buyer-personas-jtbd.md` + `gtm-architect`/`efeonce-customer-model-operator` |
+| Contrato transversal de producto y crecimiento operator-first | `docs/strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md` + `docs/context/03_ecosistema-producto.md` + `docs/context/10_experiencia-cliente.md` + `efeonce-business-model-operator`/`efeonce-customer-model-operator`/`research-benchmark-operator` |
+| Mapa operativo de dolores y fallas del journey del operador | `docs/strategy/EFEONCE_OPERATOR_PAIN_AND_JOURNEY_FAILURE_MAP_V1.md` + `efeonce-customer-experience` + RESEARCH-010 |
+| Relación Why → operator-first → CX → Greenhouse | `docs/context/09_marca-agencia.md` + `docs/strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md` + `docs/context/10_experiencia-cliente.md` |
+| Arquitectura de contenido y learn moments | `docs/strategy/EFEONCE_CONTENT_TO_CAPABILITY_LOOP_V1.md` + `content-marketing-studio` + `efeonce-customer-experience` |
+| Cómo se separan marca paraguas, líneas de negocio/prácticas, product brands, ofertas y delivery | `docs/architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md` |
+| Cuál es la directriz estratégica 2028 para todos los servicios | `docs/strategy/EFEONCE_2028_PRODUCTIZED_AI_NATIVE_SERVICES_STRATEGIC_DIRECTION_V1.md` |
+| Cómo implementar/operar Globe y dónde leer su estado runtime mutable | `.codex/skills/greenhouse-globe/SKILL.md` + `.claude/skills/greenhouse-globe/SKILL.md` + `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md` |
+| Cómo compartir UI entre Greenhouse, Globe y futuros productos | `docs/architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md` + `TASK-1588` + `TASK-1591` (canary opt-in completo; promoción separada) + `docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md` + `../axis-design-system` (AXIS foundation; packages `@efeoncepro/axis-*` y Lab Vercel) |
+| Cómo componer Globe con Wave para producir experiencias launch-ready | `docs/architecture/EFEONCE_EXPERIENCE_LAUNCHOPS_GLOBE_CREATIVE_PRODUCTION_INTEGRATION_V1.md` + las skills gemelas `greenhouse-globe` |
+| Cómo se administran los créditos y las capabilities de los usuarios de Globe (y por qué la llave de aprobación nunca sale de su runtime) | `docs/architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md` (ADR-015) + `TASK-1566` + `.claude/rules/globe-administration.md` |
+| Cómo debe razonar, documentar y autoevaluarse el arquitecto Codex | skill `software-architect-2026` + `docs/architecture/GREENHOUSE_SOFTWARE_ARCHITECT_SKILL_GOVERNANCE_V1.md` + `evals/software-architect-2026/` |
+| Cómo opera el scheduler nativo, su booking/medición y la plataforma portable de Forms/CTAs/Meetings | `docs/architecture/GREENHOUSE_GROWTH_MEETINGS_SCHEDULER_ARCHITECTURE_V1.md` + `docs/architecture/GREENHOUSE_EFEONCE_EMBED_RUNTIME_DELIVERY_DECISION_V2.md` + `docs/architecture/GREENHOUSE_EFEONCE_EMBED_RUNTIME_ARCHITECTURE_V1.md` + skill `greenhouse-growth-meetings` |
 | Qué significa para producto/negocio        | `docs/context/00_INDEX.md` + docs funcionales                                                      |
 | Cómo lo opera una persona/agente           | `docs/manual-de-uso/**` y runbook aplicable                                                        |
 
@@ -70,6 +104,10 @@ Todo trabajo formal sigue:
 
 ## Entry points ejecutables
 
+- **GCP local multi-proyecto:** mantener `default` en `efeonce-group` y usar la configuración nombrada
+  `globe` para `efeonce-globe`; preferir `gcloud --configuration=globe ... --project=efeonce-globe`
+  para no mutar el contexto compartido. La configuración no sustituye IAM ni cambia la postura runtime.
+  Detalle operativo: [`GLOBE_RUNTIME_HANDOFF.md`](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md#cli-local-multi-proyecto).
 - Cambio en task/epic/mini-task: `pnpm ops:lint --changed`.
 - Ejecución Codex de `TASK-###`: goal preflight y luego `pnpm codex:task-hook TASK-###`; aliases aceptados:
   `/implement-task TASK-###`, `/implement-task ###`, `/task TASK-###` y `/task ###`.

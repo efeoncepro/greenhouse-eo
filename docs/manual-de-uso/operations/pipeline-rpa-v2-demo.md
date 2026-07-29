@@ -11,7 +11,7 @@
 
 Este manual explica como verificar y operar el pipeline que captura cambios de estado de tareas en el teamspace **Demo Greenhouse** de Notion y los convierte en la metrica **RpA** (rondas de correccion), escribiendola de vuelta en Notion.
 
-Usalo cuando:
+Úsalo cuando:
 
 - quieras confirmar que un cambio de estado en una tarea demo se capturo
 - la propiedad `RpA` de una tarea demo no se actualiza

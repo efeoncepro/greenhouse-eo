@@ -51,7 +51,7 @@ general, **estás escribiendo `commercial-expert`. Para.**
 
 | Necesitas… | Skill dueña | Contrato |
 |---|---|---|
-| **Dimensionar el squad** *(roles, seniority, % dedicación, RACI)* | **`greenhouse-talent-people-operator`** | `references/client-squad-design.md` + `templates/squad-blueprint.md`. 🔴 **El blueprint es SUYO. Esta skill lo PRECIA, no lo diseña.** |
+| **Dimensionar el squad** *(roles, seniority, % dedicación, RACI)* | **`greenhouse-talent-people-operator`** | `greenhouse-talent-people-operator` → `references/client-squad-design.md` + `templates/squad-blueprint.md`. 🔴 **El blueprint es SUYO. Esta skill lo PRECIA, no lo diseña.** |
 | **El loaded cost real** *(bruto vs costo empresa, cargas, overhead)* | **`greenhouse-finance-accounting-operator`** | 🩸 **El piso sale de acá, no de la intuición.** *(Y hay un hallazgo abierto: `modules/04_PRICING.md` §3.)* |
 | **Redactar la cláusula de derechos de uso / MSA / SOW** | **`legal-privacy-ip-operator`** | 🎯 **Esta skill decide QUÉ COBRAR por el uso. Esa decide CÓMO SE REDACTA para que sea exigible.** |
 | **Componer el deck** | **`deck-studio`** *(+ Artifact Composer)* | Esta skill es **consumer**. 🔴 **La fuente es el repo, no el PDF.** |

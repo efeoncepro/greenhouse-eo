@@ -11,6 +11,14 @@ This file **overrides** the global `typography-design` skill inside the `greenho
 
 **Load order:** read global `typography-design/SKILL.md` (the craft + references) → then this overlay (the pins) → then apply.
 
+## 🔴 STOP — ¿el trabajo es de Efeonce Globe? Este NO es tu overlay
+
+Si estás tocando el repo hermano `efeonce-globe` (payload `apps/studio-client`), **cierra este archivo y lee [`GLOBE_OVERLAY.md`](GLOBE_OVERLAY.md)**, que anula a éste.
+
+Por ADR-014, Globe **materializa sus propios tokens y componentes** y tiene prohibido importar primitives de Greenhouse o MUI. Nada de lo que este archivo pinea existe allá: ni `typography-tokens.ts`, ni el bridge de variantes MUI, ni `<Typography variant>`, ni `monoId`/`monoAmount`/`kpiValue`. Aplicar estos pins a Globe produce dos errores concretos: pedir el **peso 800** (que en Globe no tiene archivo y el navegador sintetiza) y emitir una **variante MUI** (que allá no compila).
+
+Lo único que ambos comparten, y que no se re-litiga: dos familias, **Poppins display + Geist texto**.
+
 ## Why this overlay exists
 
 Greenhouse is not greenfield. Typography is already a governed 3-surface system with a CI drift-guard. The global skill teaches *the craft* (weights, contrast, measure, OpenType, i18n); this overlay pins *the answers already decided here* so an agent never re-litigates the scale, picks a banned weight, or hardcodes a size. Two families are fixed: **Poppins** (display, h1–h4 + `surfaceHeroTitle` only) + **Geist** (everything else). Numbers use **Geist + `tabular-nums`** — never a monospace family.

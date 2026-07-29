@@ -2,6 +2,14 @@
 
 > La **Experiencia Efeonce** es la vivencia completa de entrar al ecosistema de crecimiento de Efeonce. Greenhouse no es solo un portal de métricas: es el **sistema operativo/command center** que vuelve esa experiencia visible, medible y repetible. Este archivo define qué debe *vivir* el cliente en cada fase y qué módulo, ritual o superficie lo soporta. Es la guía para que las features sirvan a la experiencia, no solo a la función.
 
+> La experiencia sigue un **Operator-Led Adoption and Expansion Loop**: el operador descubre valor en la superficie
+> operatoria, puede convertirse en operator-champion y Greenhouse traduce esa adopción en memoria, assurance,
+> sponsorship, renovación y expansión. El contrato completo vive en [`Efeonce Operator-First Product & Growth
+> Contract V1`](../strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md).
+
+El mapa operativo de dolores y fallas del journey vive en [`Efeonce Operator Pain & Journey Failure Map V1`](../strategy/EFEONCE_OPERATOR_PAIN_AND_JOURNEY_FAILURE_MAP_V1.md). Ese artefacto conecta cada dolor del operador con fase,
+failure moment, causa backstage, capacidad, recovery, owner, métrica y evidencia ejecutiva.
+
 ## Experiencia Efeonce: la promesa completa
 
 Un cliente no solo "entra a una agencia". Al contratar Efeonce, compra su entrada a un **ecosistema de crecimiento**: operación, software, metodología, contenido, aprendizaje, red y acceso a inteligencia acumulada.
@@ -39,6 +47,10 @@ Un *greenhouse* es un espacio de condiciones controladas para que algo crezca. A
 
 > **Esta experiencia ES el Why de Efeonce hecho vivencia.** "Ver todo, entender todo, mejorar cada ciclo" es exactamente la creencia central (*no te entregamos crecimiento, lo construimos contigo*): el crecimiento se **co-construye** (operas con nosotros en vivo, no recibes un reporte), se **educa** (entiendes, no solo recibes) y es **integral** (cada ciclo compone sobre el anterior). Cada mejora de experiencia en Greenhouse es una prueba del Why, no un adorno. SSOT del Why: `09_marca-agencia.md` → §El Golden Circle de Efeonce.
 
+El journey debe demostrar la promesa en la experiencia del operador: menos reconstrucción de contexto, menos
+persecución, mejores decisiones, más memoria y mayor capacidad de defender el trabajo. La satisfacción no basta si
+el cliente termina más dependiente o el operador queda más expuesto.
+
 ---
 
 ## El journey: 8 fases + 2 transversales, mapeadas a módulos
@@ -69,6 +81,8 @@ Cuatro momentos del journey **son features de Greenhouse**, no actividades offli
 3. **"Tu año con Efeonce"** — reporte de renovación autogenerado desde Account 360 + ICO historial + Person 360. Artefacto de máximo switching cost: hace visible el valor acumulado.
 4. **Protocolo de transparencia con datos** — en momentos de tensión, el portal muestra Stuck Assets / Cycle Time / OTD% caído. La feature convierte una conversación incómoda en una basada en hechos.
 5. **Ecosystem Learning Layer** — la experiencia educativa del cliente no vive solo en llamadas. Blog, Think tools, YouTube, sociales, ebooks, webinars y futuro podcast deben poder alimentar onboarding, expansión y madurez del cliente. El producto no reemplaza esos canales; los conecta con el Account 360 cuando exista señal útil.
+
+El contrato de esa conexión vive en [`Efeonce Content-to-Capability Loop V1`](../strategy/EFEONCE_CONTENT_TO_CAPABILITY_LOOP_V1.md): el aprendizaje público se convierte en microcapacitación, learn moment, workflow guiado y memoria privada, según el contexto y los permisos del cliente.
 
 ### Primer wrapper vivo: SKY primer año
 

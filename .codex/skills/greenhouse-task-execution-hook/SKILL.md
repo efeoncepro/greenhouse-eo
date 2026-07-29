@@ -79,6 +79,14 @@ Apply the prompt printed by the command before implementation.
 
 Before planning or code, validate `## Modular Placement Contract` against `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`: current/candidate home, canonical boundary, server/browser split, build inputs and extraction blocker. A candidate home never authorizes opportunistic `apps/*` or `packages/*`.
 
+## AXIS Consumer Execution Gate
+
+For `TASK-1591` or any AXIS consumer task, load the shared UI platform ADR and
+`docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`. Before implementation, account for package
+authentication, env/secrets, and the actual consumer runtime. Plan evidence for the MUI/Tailwind adapter, visual and
+accessibility behavior, and rollback. Package publication alone is not a valid completion signal; missing runtime
+evidence means `code complete, rollout pendiente` or `operativamente bloqueado`.
+
 ## Filesystem / Worktree Rule
 
 Do not create `git worktree` folders or cloned repo folders by default when this

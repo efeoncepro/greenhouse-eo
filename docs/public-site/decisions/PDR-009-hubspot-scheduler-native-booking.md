@@ -1,9 +1,10 @@
 # PDR-009 — Booking nativo con HubSpot Scheduler API
 
 > **Tipo:** Product Decision Record para conversiones del sitio publico.
-> **Estado:** Accepted — scheduler nativo activo; HubSpot queda como proveedor server-side, no como UI alternativa.
+> **Estado:** Accepted — piloto scheduler native-only activo en `/agenda/`; HubSpot queda como proveedor server-side, no como UI alternativa.
 > **Fecha:** 2026-07-08.
-> **Task:** [`TASK-1366`](../../tasks/complete/TASK-1366-hubspot-scheduler-booking-equivalence.md).
+> **Última validación:** 2026-07-21; release `fbe8a9c76a74`, orchestrator `29854833210`.
+> **Tasks:** [`TASK-1366`](../../tasks/complete/TASK-1366-hubspot-scheduler-booking-equivalence.md), [`TASK-1509`](../../tasks/in-progress/TASK-1509-growth-meetings-scheduler-server-adapter.md) y [`TASK-1510`](../../tasks/in-progress/TASK-1510-native-meeting-scheduler-portable-experience.md).
 > **Superficies afectadas:** `efeoncepro.com`, `think.efeoncepro.com`, Growth CTA engine, landings publicas con CTA "Agenda una reunion".
 
 ## Contexto
@@ -29,6 +30,10 @@ La decisión inicial autorizó un spike controlado. La evidencia de TASK-1366 y 
 
 ## Evidencia final TASK-1366 — 2026-07-21
 
+> **Evidencia histórica del spike.** Las referencias de esta sección a “adapter futuro”, ausencia de runtime y
+> prohibición de retirar el iframe describen el gate anterior a TASK-1509/1510. El amendment de productización al
+> final de este PDR registra el estado vigente y prevalece para el piloto `/agenda/`.
+
 - El app `Efeonce Data Platform` fue desplegado/reinstalado con el scope mínimo
   `scheduler.meetings.meeting-link.read`; el token estático gobernado existente adquirió el permiso sin rotación.
 - El slug API canónico es `efeoncepro/agenda-discovery` codificado como un solo segmento de path. El leaf
@@ -50,12 +55,12 @@ La decisión inicial autorizó un spike controlado. La evidencia de TASK-1366 y 
 - Los eventos de CTA/embed existentes siguen siendo mid-funnel. Una reserva solo se considera conversión cuando
   el servidor recibe confirmación exitosa de Scheduler; al productizar, esa evidencia debe mapear a
   `generate_lead` de GA4, no a un evento browser autorreportado ni a una nueva key event paralela.
-- El adapter futuro debe conservar server-side solo campaña allowlisted (`utm_*`, referrer, page, surface y
+- **Requisito heredado por TASK-1509:** el adapter conserva server-side sólo campaña allowlisted (`utm_*`, referrer, page, surface y
   correlation), sin PII en `dataLayer`.
 - Forms API + `context.hutk` queda como mitigación opcional, no default: requiere consentimiento vigente,
   deduplicación y una decisión explícita porque agrega actividad de form además del booking. Los hosts públicos
   hoy no tienen CMP/Consent Mode default, por lo que no puede asumirse ese gate.
-- No se cambia `TRACKING-PLAN.md` todavía: esta task no crea runtime ni evento nuevo. La task de productización
+- **Histórico TASK-1366:** no se cambiaba `TRACKING-PLAN.md` todavía porque el spike no creaba runtime ni evento. La task de productización
   deberá registrar el rail server-confirmed antes de publicar GTM/Measurement Protocol.
 
 ### Veredicto
@@ -94,19 +99,22 @@ Si cualquiera de los puntos core deja de cumplirse, se desactiva o revierte el s
 
 ## Guardrails
 
+Los siguientes guardrails nacieron en el spike. La restricción de no insertar UI nativa quedó satisfecha por
+TASK-1509/1510 y sólo se considera superada para el piloto gobernado; sigue vigente para superficies no graduadas.
+
 - No exponer tokens HubSpot en cliente.
 - No llamar Scheduler API directo desde WordPress/Think.
 - No construir un calendario propio que reserve fuera de HubSpot si el objetivo es mantener Teams/calendario/CRM nativos.
 - No usar CRM Meetings API como sustituto de booking.
 - No crear reuniones reales con leads/clientes durante el spike; usar cuenta de prueba y horario aprobado.
-- No insertar UI nativa en landings hasta tener veredicto y task posterior.
+- **Gate histórico satisfecho para `/agenda/`:** no insertar UI nativa en otras landings hasta tener veredicto y task posterior por superficie.
 - Capturar `hubspotutk`/UTM solo si existe consentimiento y sin enviar PII al browser telemetry.
 
 ## Consecuencias
 
 - `HubSpotMeetingEmbed` deja de ser fallback de la experiencia nativa. Puede persistir únicamente en superficies legacy todavía no migradas.
-- El action router futuro de `growth.cta` puede agregar un adapter nuevo (`native_booking`/`hubspot_handoff`),
-  sin cambiar el `book_meeting` navigation-only existente.
+- El action router de `growth.cta` usa `open_meeting_scheduler` con `meetingSurfaceId` + `schedulerKey`; `book_meeting`
+  conserva su contrato navigation-only.
 - Las landings con open question de mecanismo CTA (`/agencia`, creativa, HubSpot, redes) ganan una decision comun en vez de resolver meeting por pagina.
 - La medicion de booking debe ser Greenhouse-first: `gh_cta_clicked`, eventos de meeting, conversion server-confirmed y reconciliacion con HubSpot/GA4.
 
@@ -117,9 +125,25 @@ Si cualquiera de los puntos core deja de cumplirse, se desactiva o revierte el s
 - **Calendario propio fuera de HubSpot.** Duplicaria la fuente de verdad y perderia el valor principal del Meetings tool.
 - **Reemplazo inmediato del iframe.** Riesgoso sin probar side effects reales del portal Efeonce.
 
+## Amendment de productización — 2026-07-21
+
+- TASK-1509 y TASK-1510 implementaron el adapter server-side, el ledger idempotente, los contratos browser-safe, el
+  renderer portable y la action `open_meeting_scheduler`.
+- El piloto `/agenda/` está liberado con flags staging/Production y binding allowlisted activos. La UI conserva la
+  grilla de agosto de 31 días aun con cero slots y ofrece únicamente reintento/navegación mensual como recuperación.
+- No existe fallback visible a HubSpot en la experiencia nativa. `fallbackHref` permanece sólo en la proyección V1
+  por compatibilidad con clientes cacheados y ningún renderer vigente lo consume.
+- El estado es `piloto de lectura/UX liberado`, no graduación global. Continúan pendientes un booking controlado con
+  replay/read-back, evidencia `/g/collect`, aprobación/publicación GTM y la habilitación individual de nuevas surfaces.
+- Contacto, RRSS y otros hosts legacy no se migran por inferencia desde este PDR; requieren gate, evidencia y rollout
+  explícitos. El rollback es flag/binding/versión y nunca un enlace externo en la UI nativa.
+
 ## Links
 
 - Growth CTA engine: `docs/architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_DECISION_V1.md`
 - Public Site primitives: `docs/architecture/public-site/PRIMITIVES.md`
 - Tracking plan: `docs/reference/measurement-gtm-ga4/TRACKING-PLAN.md`
 - Task de validacion: `docs/tasks/complete/TASK-1366-hubspot-scheduler-booking-equivalence.md`
+- Arquitectura del scheduler: `docs/architecture/GREENHOUSE_GROWTH_MEETINGS_SCHEDULER_ARCHITECTURE_V1.md`
+- Adapter y runtime: `docs/tasks/in-progress/TASK-1509-growth-meetings-scheduler-server-adapter.md`
+- Experiencia portable y piloto: `docs/tasks/in-progress/TASK-1510-native-meeting-scheduler-portable-experience.md`

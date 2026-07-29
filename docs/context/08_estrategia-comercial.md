@@ -8,7 +8,7 @@ De **$6.9M a $15–25M CLP/mes** en revenue recurrente (base actual: retainer Sk
 
 > *Concentrar energía en pocas cuentas de alto valor, profundizar con múltiples servicios, y filtrar agresivamente el new business para que cada propuesta tenga probabilidad real de cierre.*
 
-La ambición de escala es **LATAM-first, global-ready**: ganar reconocimiento regional fuerte primero, pero construir método, producto, idioma y pruebas para atender diversos mercados. El argumento comercial no debe limitarse a "somos una agencia LATAM"; LATAM es prueba de ejecución multi-país. El diferenciador defendible es **Growth Operating System / ASaaS**: co-creación convertida en software, método, datos y memoria acumulada.
+La ambición de escala es **LATAM-first, global-ready**: ganar reconocimiento regional fuerte primero, pero construir método, producto, idioma y pruebas para atender diversos mercados. El argumento comercial no debe limitarse a "somos una agencia LATAM"; LATAM es prueba de ejecución multi-país. La categoría entendible es **AI-enabled marketing and growth systems company**; en venta se expresa como **Integrated Growth Partner**. Efeonce combina personas, product services, plataformas y agentes. **ASaaS** es el modelo y **Growth Operating System** la visión: co-creación convertida en software, método, datos y memoria acumulada.
 
 ---
 
@@ -72,10 +72,10 @@ El diferenciador real no es ningún servicio individual — es escalar dentro de
 
 | Entry point | Cross-sell | Trigger de ecosistema |
 |---|---|---|
-| CRM (Efeonce) | Contenido (Globe) | Greenhouse: Account 360 detecta pipeline sin assets. Verk: Surround Map con gaps. |
-| Branding (Globe) | SEO/AEO (Efeonce) | Greenhouse: métricas ICO altas sin tracking orgánico. Verk: "Búsqueda clásica" inactiva. |
-| Producción (Globe) | Medios (Reach) | Greenhouse: alta cadencia + bajo engagement. Verk: capas Amplified/Earned sin cobertura. |
-| Analytics (Efeonce) | Web performance (Wave) | Greenhouse: inversión alta con conversion bajo. Verk: tráfico sin conversión web. |
+| RevOps & CRM | Creative Services / contenido (Globe cuando aplica) | Greenhouse: Account 360 detecta pipeline sin assets. Verk: Surround Map con gaps. |
+| Creative Services / branding (Globe cuando aplica) | Search Visibility 360 (Wave) | Greenhouse: métricas ICO altas sin tracking orgánico. Verk: "Búsqueda clásica" inactiva. |
+| Creative Services / producción (Globe cuando aplica) | Media & Distribution (Reach cuando aplica) | Greenhouse: alta cadencia + bajo engagement. Verk: capas Amplified/Earned sin cobertura. |
+| Growth Strategy & Measurement + Digital Services & Engineering | Web performance / Measurement (Wave cuando aplica) | Greenhouse: inversión alta con conversión baja. Wave instrumenta y opera; Efeonce gobierna la decisión de growth. |
 | CRM implementado (Kortex) | Contenido AEO (Verk) | Kortex: CRM desplegado sin contenido que alimente pipeline. Verk: Surround Map vacío. |
 
 > Construir o mejorar el **Pulse Dashboard y sus triggers** es construir directamente el motor de expansión (Motor 1). Es de las features de mayor leverage comercial en Greenhouse.

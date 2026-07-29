@@ -120,7 +120,7 @@ Reglas obligatorias (skills `greenhouse-ico` + `arch-architect` + `greenhouse-ux
 
 - Migración: agregar columnas **nullable additivas** a `greenhouse_serving.ico_ai_signal_enrichments`: `explanation_summary_self_view`, `root_cause_narrative_self_view`, `recommended_action_self_view` (TEXT NULL). Marker `-- Up Migration` correcto + DO block de verificación post-DDL.
 - `[verificar]` mirror en el ensure-infrastructure del worker si existe.
-- `llm-types.ts`: extender el structured output schema con los 3 campos self-view + extender las reglas de narrativa del prompt: *"Generá además una versión en segunda persona (tuteo es-CL) dirigida al colaborador como 'tú': no lo nombres, usá 'tus tareas/tu métrica'; mantené las menciones de OTRAS entidades (proyectos, otros miembros). NO traduzcas literal — reescribí la voz."*
+- `llm-types.ts`: extender el structured output schema con los 3 campos self-view + extender las reglas de narrativa del prompt: *"Generá además una versión en segunda persona (tuteo es-CL) dirigida al colaborador como 'tú': no lo nombres, usa 'tus tareas/tu métrica'; mantén las menciones de OTRAS entidades (proyectos, otros miembros). NO traduzcas literal — reescribí la voz."*
 - `llm-enrichment-worker.ts`: persistir las 6 columnas (3 canónicas + 3 self-view) en el mismo INSERT/append. Append-only / forward-only: regenera al próximo run.
 
 ### Slice 2 — Selección por voz en el reader + DTO personal

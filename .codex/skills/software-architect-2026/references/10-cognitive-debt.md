@@ -1,10 +1,14 @@
 # Cognitive Debt
 
-This is loaded **always** at Step 6 (self-critique) and is the most underrated risk of 2026 software architecture.
+Load this during self-critique when ownership, maintainability, generated code, or agent-produced changes are material.
 
-The phenomenon: as AI generates more of the code, humans develop less of the mental model needed to understand, debug, and evolve it. Tech Radar Vol 34 names this as a foundational concern for the industry — not because AI-assisted development is bad, but because *unmanaged* AI-assisted development creates a debt that compounds.
+As AI generates more code, humans can develop less of the mental model needed to understand, debug, and evolve it. The risk comes from unmanaged generation and weak ownership, not from AI assistance itself.
 
 The architect's job is to design systems that humans can still reason about even when most of the code was written by an agent.
+
+## Contents
+
+Definition; AI amplification; architectural countermeasures; self-critique; reduction patterns; review questions; the 18-month test; recovery.
 
 ## What cognitive debt is
 

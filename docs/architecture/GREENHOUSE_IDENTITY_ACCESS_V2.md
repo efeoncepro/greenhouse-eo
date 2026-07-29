@@ -180,7 +180,7 @@ El evento es informativo; no bloquea la escritura. Queda persistido en `greenhou
 2. **Ningún reader externo (BigQuery, HubSpot, Entra, SCIM, Notion) es fuente de verdad para passwords.** No se mirror, no se backfillea, no se reconcilia.
 3. Si tienes un caso de bootstrap legítimo (seed admin en un ambiente nuevo, fixture de test), usa el helper con `source: 'bootstrap_admin'` o `source: 'test_fixture'` — queda trazado en outbox.
 4. **El helper requiere transacción.** No uses `runGreenhousePostgresQuery` pelado para escribir `password_hash`.
-5. Si algo intenta mutar `password_hash` sin autorización y ves el error `password_hash mutation not authorized`, **no desactives el trigger ni seteés el flag sin pensar**. Investiga por qué ese path quiere escribir passwords.
+5. Si algo intenta mutar `password_hash` sin autorización y ves el error `password_hash mutation not authorized`, **no desactives el trigger ni setees el flag sin pensar**. Investiga por qué ese path quiere escribir passwords.
 
 ### Cambios aplicados
 

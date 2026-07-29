@@ -5,6 +5,31 @@
 > **Método:** configuración versionada, evidencia runtime, aprobación humana y operación gestionada
 > **Caso de referencia:** ANAM, portal HubSpot `19893546`
 
+## Arquitectura comercial vigente
+
+La relación comercial se ordena así: **Efeonce** (marca paraguas) → **RevOps & CRM** (línea de negocio) → **Kortex**
+(product brand, cuando aplica) → **HubSpot** (plataforma/provider). Greenhouse puede actuar como control plane de
+observabilidad cuando forma parte del engagement. HubSpot no reemplaza a Efeonce y Kortex no equivale a toda la
+práctica.
+
+El recorrido de oferta es:
+
+1. **RevOps Diagnostic / Discovery & Assessment** — entender outcomes, procesos, stack, datos, riesgos y quick wins.
+2. **CRM & HubSpot Architecture** — diseñar modelo de datos, lifecycle, pipelines, integraciones, gobierno y medición.
+3. **HubSpot Implementation** — implementar por fases y workstreams aprobados, con migración, automatización,
+   integraciones, documentación y enablement.
+4. **Data, Automation & Lifecycle** — mejorar calidad, captura, routing, workflows, scoring, reporting y adopción.
+5. **Managed CRM Operations** — operar, medir, mantener y optimizar el sistema con cadencia y backlog gobernado.
+6. **Customer Agent / AI Operations** — servicio especializado para conocimiento, agentes, handoff, QA y gobierno.
+
+Estas son etapas y composiciones comerciales, no seis promesas obligatorias ni un bundle cerrado. Los dos servicios
+canónicos de abajo son los contratos documentados hoy; los demás funcionan como ofertas, workstreams o escalones de
+entrada dentro de ellos.
+
+La secuencia se adopta del brochure principal revisado, pero el material comercial es sólo insumo histórico. La
+auditoría [`HUBSPOT_BROCHURE_REVIEW_2026-07-26.md`](../../audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md) registra
+qué se absorbió y qué claims, precios, nombres o capacidades no deben reutilizarse sin verificación.
+
 ## Servicios canónicos
 
 | Servicio | Clave estable | Resultado principal | Evidencia ANAM |

@@ -44,15 +44,15 @@ Cuando un agente o persona verifique UI visible de Greenhouse, la evidencia visu
 | Lupa de motion / frames por selector | `pnpm fe:capture:micro --route=/path --selector='[data-capture="x"]'` |
 | Limpieza de artifacts | `pnpm fe:capture:gc [--apply] [--max-gb=N]` |
 
-Playwright ad-hoc solo debe usarse como complemento cuando haga falta inspeccionar consola, network, payloads de API o un gesto que el DSL todavía no soporte. En ese caso, guardá artifacts bajo `.captures/`, explicá por qué no alcanzó el helper canónico y convertí el flujo en scenario si se va a repetir.
+Playwright ad-hoc solo debe usarse como complemento cuando haga falta inspeccionar consola, network, payloads de API o un gesto que el DSL todavía no soporte. En ese caso, guarda artifacts bajo `.captures/`, explica por qué no alcanzó el helper canónico y convertí el flujo en scenario si se va a repetir.
 
-Si la captura staging falla por configuración local, por ejemplo `VERCEL_AUTOMATION_BYPASS_SECRET ausente`, documentá ese bloqueo exacto y probá `--env=local` si la ruta puede validarse contra `pnpm dev`.
+Si la captura staging falla por configuración local, por ejemplo `VERCEL_AUTOMATION_BYPASS_SECRET ausente`, documenta ese bloqueo exacto y prueba `--env=local` si la ruta puede validarse contra `pnpm dev`.
 
 GVC no usa `networkidle` como readiness de navegación. En Next/Turbopack puede haber HMR, chunks o requests persistentes aunque la UI ya esté lista, así que la señal canónica es un selector/guard de pantalla: en scenarios, `readiness`; en capturas inline, `--ready='[data-capture="..."]'`.
 
 ## Antes de empezar
 
-Verificá que están las variables en `.env.local`:
+Verifica que están las variables en `.env.local`:
 
 ```bash
 AGENT_AUTH_SECRET=...
@@ -60,7 +60,7 @@ AGENT_AUTH_EMAIL=agent@greenhouse.efeonce.org
 VERCEL_AUTOMATION_BYPASS_SECRET=...
 ```
 
-Elegí `AGENT_AUTH_EMAIL` según el rol que querés validar:
+Elige `AGENT_AUTH_EMAIL` según el rol que quieres validar:
 
 | Caso | Email recomendado |
 |---|---|
@@ -68,7 +68,7 @@ Elegí `AGENT_AUTH_EMAIL` según el rol que querés validar:
 | Experiencia personal `/my` y collaborator puro | `agent-collaborator@greenhouse.efeonce.org` |
 | Portal cliente general y rutas client-facing | `agent-client@greenhouse.efeonce.org` |
 
-Si vas a generar GIFs, instalá ffmpeg:
+Si vas a generar GIFs, instala ffmpeg:
 
 ```bash
 # macOS
@@ -95,7 +95,7 @@ Resultado: `recording.webm` (~3 segundos) + `frames/01-snapshot.png` (1 still).
 
 ### Caso 2 — Captura con scenario predefinido
 
-Para microinteractions, usá un scenario que actúa la página:
+Para microinteractions, usa un scenario que actúa la página:
 
 ```bash
 set -a; source .env.local; set +a
@@ -130,13 +130,13 @@ Genera `flipbook.gif` (~800px ancho, 12 fps). Adjuntable a PRs / issues GitHub d
 
 ### Caso 4 — Headed (para debug visual local)
 
-Si querés ver el browser mientras se ejecuta:
+Si quieres ver el browser mientras se ejecuta:
 
 ```bash
 pnpm fe:capture offboarding-queue-microinteractions --env=staging --headed
 ```
 
-Útil cuando algo falla y querés ver qué pasa en tiempo real.
+Útil cuando algo falla y quieres ver qué pasa en tiempo real.
 
 ### Caso 5 — Crear un scenario nuevo
 
@@ -171,7 +171,7 @@ Ver el DSL completo en `scripts/frontend/scenarios/_README.md`.
 
 ### Caso 5.1 — Pantallas con scroll y secciones largas
 
-Para pantallas largas, evitá offsets a ojo. El DSL soporta scroll robusto por selector y captura de sección:
+Para pantallas largas, evita offsets a ojo. El DSL soporta scroll robusto por selector y captura de sección:
 
 ```ts
 steps: [
@@ -182,7 +182,7 @@ steps: [
 ]
 ```
 
-Si necesitás auditar toda la pantalla, usá `fullPage`:
+Si necesitas auditar toda la pantalla, usa `fullPage`:
 
 ```ts
 { kind: 'mark', label: 'full-page', fullPage: true }
@@ -199,7 +199,7 @@ Convención recomendada: agregar `data-capture="<nombre-seccion>"` en el wrapper
 
 ### Caso 5.2 — Readiness, assertions y report HTML
 
-Para que una captura no pase verde cuando en realidad grabó login, loading o error boundary, agregá guards ligeros:
+Para que una captura no pase verde cuando en realidad grabó login, loading o error boundary, agrega guards ligeros:
 
 ```ts
 readiness: {
@@ -241,23 +241,23 @@ El video sigue siendo continuo, pero el manifest registra segmentos lógicos por
 
 ### Caso 5.4 — Autorar un scenario observando la página viva (explore → promote)
 
-En vez de escribir selectores **a ciegas** (adivinar `[role="tab"]:nth-child(2)`, correr, mirar el PNG, re-correr), observá la página viva primero y dejá que GVC arme el scenario.
+En vez de escribir selectores **a ciegas** (adivinar `[role="tab"]:nth-child(2)`, correr, mirar el PNG, re-correr), observa la página viva primero y deja que GVC arme el scenario.
 
 ```bash
-# 1. Observá la ruta viva (read-only): candidatos con su getByRole(...) sugerido,
+# 1. Observa la ruta viva (read-only): candidatos con su getByRole(...) sugerido,
 #    uniqueness validada, markers data-capture, + valida locators con --probe
 pnpm fe:capture:explore --route=/finance/cash-out --env=staging --probe='role=button[name="Registrar pago"]'
 
-# 2. Cristalizá la sesión en un .scenario.ts válido (readiness auto + marks)
+# 2. Cristaliza la sesión en un .scenario.ts válido (readiness auto + marks)
 pnpm fe:capture:promote --route=/finance/cash-out --name=cash-out-overview --mark='[data-capture="timeline"]'
 
-# 3. Revisá selectores/readiness/marks del archivo generado y capturá
+# 3. Revisa selectores/readiness/marks del archivo generado y captura
 pnpm fe:capture cash-out-overview --env=staging
 ```
 
-`explore` persiste `.captures/_explore/<slug>/{session.json, aria.txt, snapshot.png}`. Leé `aria.txt` (el árbol de accesibilidad) y escribí `getByRole(...)` contra lo que **existe**, no contra un selector adivinado.
+`explore` persiste `.captures/_explore/<slug>/{session.json, aria.txt, snapshot.png}`. Lee `aria.txt` (el árbol de accesibilidad) y escribe `getByRole(...)` contra lo que **existe**, no contra un selector adivinado.
 
-⚠️ **Revisá la readiness del scenario generado.** Si la ruta no tiene markers `data-gvc-ready`/`data-capture`, `promote` ancla la readiness a un heading único — y si ese heading tiene copy dinámico (rota), la readiness falla al capturar. Preferí un marker estable.
+⚠️ **Revisa la readiness del scenario generado.** Si la ruta no tiene markers `data-gvc-ready`/`data-capture`, `promote` ancla la readiness a un heading único — y si ese heading tiene copy dinámico (rota), la readiness falla al capturar. Prefiere un marker estable.
 
 ### Caso 5.5 — Medir microinteracciones reales (explore --interaction)
 
@@ -267,9 +267,9 @@ pnpm fe:capture cash-out-overview --env=staging
 # Performa la acción (hover|focus|click — read-only) y MIDE feedback/settled por pixel-diff
 pnpm fe:capture:explore --route=/finance/cash-out --env=staging \
   --interaction='hover:[role="tab"]' \
-  --interaction-window=1500   # subí la ventana para animaciones GSAP largas (default 1000ms)
+  --interaction-window=1500   # sube la ventana para animaciones GSAP largas (default 1000ms)
 
-# promote auto-emite el step `interaction` con los timings MEDIDOS; ajustás intent y capturás
+# promote auto-emite el step `interaction` con los timings MEDIDOS; ajustas intent y capturas
 pnpm fe:capture:promote --route=/finance/cash-out --name=cash-out-tabs
 ```
 
@@ -277,7 +277,7 @@ Funciona para cualquier tecnología de motion (CSS, framer-motion, GSAP) porque 
 
 ### Caso 6 — Capturar frames finos de una microinteracción
 
-Cuando necesitás revisar parpadeos, easing, rebotes o una animación pequeña que no alcanza con un `mark`, usá el sampler selector-scoped. Este modo no aplica determinismo de baseline porque su propósito es preservar la motion real.
+Cuando necesitas revisar parpadeos, easing, rebotes o una animación pequeña que no alcanza con un `mark`, usa el sampler selector-scoped. Este modo no aplica determinismo de baseline porque su propósito es preservar la motion real.
 
 ```bash
 pnpm fe:capture:micro \
@@ -373,7 +373,7 @@ pnpm fe:capture:review <scenario> --env=staging
 pnpm fe:capture:review .captures/<existing-run>
 ```
 
-Genera `review-dossier.md` con frames + 13-row checklist + canon Geist+Poppins. Pegás el dossier en una conversación de Claude Code con la skill `greenhouse-ui-review` cargada.
+Genera `review-dossier.md` con frames + 13-row checklist + canon Geist+Poppins. Pegas el dossier en una conversación de Claude Code con la skill `greenhouse-ui-review` cargada.
 
 V1.2: invocación directa Anthropic SDK sin copy-paste.
 
@@ -387,7 +387,7 @@ export GREENHOUSE_CAPTURE_ACTOR_CAPABILITY=platform.frontend.capture_prod
 pnpm fe:capture <scenario> --env=production --prod
 ```
 
-Solo declaralos si **sabés** que poseés la capability vigente. El audit log registra al actor para forensic post-hoc.
+Solo declaralos si **sabes** que posees la capability vigente. El audit log registra al actor para forensic post-hoc.
 
 ## Que significan los estados / señales
 
@@ -402,23 +402,23 @@ Solo declaralos si **sabés** que poseés la capability vigente. El audit log re
 
 ## Que no hacer
 
-- **NUNCA** ejecutar contra production sin Triple Gate: `GREENHOUSE_CAPTURE_ALLOW_PROD=true` env + `--prod` flag + capability (futuro). Para visualizar production usá production directamente con un browser real.
-- **NUNCA** committear `.captures/` — ya está en `.gitignore`. Si necesitás compartir un artifact, pegalo en un Notion/Drive o adjuntalo a un comentario en PR/GitHub directamente.
+- **NUNCA** ejecutar contra production sin Triple Gate: `GREENHOUSE_CAPTURE_ALLOW_PROD=true` env + `--prod` flag + capability (futuro). Para visualizar production usa production directamente con un browser real.
+- **NUNCA** committear `.captures/` — ya está en `.gitignore`. Si necesitas compartir un artifact, pégalo en un Notion/Drive o adjuntalo a un comentario en PR/GitHub directamente.
 - **NUNCA** crear scenarios con `mutating: true` que toquen surfaces irreversibles (Pagos, Finiquitos, Releases) sin coordinar primero. Esos scenarios crean entidades reales en staging.
-- **NUNCA** invocar `tsx scripts/frontend/capture.ts` directo — usá siempre `pnpm fe:capture` para que el script entrypoint del package corra el resolve correcto.
+- **NUNCA** invocar `tsx scripts/frontend/capture.ts` directo — usa siempre `pnpm fe:capture` para que el script entrypoint del package corra el resolve correcto.
 - **NUNCA** reinventar la generación del cookie de agent — el helper delega a `scripts/playwright-auth-setup.mjs` canónico.
 
 ## Problemas comunes
 
 | Problema | Solucion |
 |---|---|
-| `VERCEL_AUTOMATION_BYPASS_SECRET ausente` | Cargá `.env.local` con `set -a; source .env.local; set +a` antes de correr |
-| Captura redirigida a `/login` | El helper detecta y auto-refresca el storage state. Si persiste, corré manual: `AGENT_AUTH_BASE_URL=https://greenhouse-eo-env-staging-efeonce-7670142f.vercel.app AGENT_AUTH_EMAIL=agent@greenhouse.efeonce.org AGENT_AUTH_STORAGE_PATH=.auth/storageState.staging.json node scripts/playwright-auth-setup.mjs` |
-| `ffmpeg not found` con `--gif` | Instalá ffmpeg (`brew install ffmpeg`). El webm + frames quedan intactos sin el GIF. |
-| Step `hover` / `click` falla con timeout | Verificá el selector — usa DevTools del browser (con `--headed`) para inspeccionar y ajustar el selector |
+| `VERCEL_AUTOMATION_BYPASS_SECRET ausente` | Carga `.env.local` con `set -a; source .env.local; set +a` antes de correr |
+| Captura redirigida a `/login` | El helper detecta y auto-refresca el storage state. Si persiste, corre manual: `AGENT_AUTH_BASE_URL=https://greenhouse-eo-env-staging-efeonce-7670142f.vercel.app AGENT_AUTH_EMAIL=agent@greenhouse.efeonce.org AGENT_AUTH_STORAGE_PATH=.auth/storageState.staging.json node scripts/playwright-auth-setup.mjs` |
+| `ffmpeg not found` con `--gif` | Instala ffmpeg (`brew install ffmpeg`). El webm + frames quedan intactos sin el GIF. |
+| Step `hover` / `click` falla con timeout | Verifica el selector — usa DevTools del browser (con `--headed`) para inspeccionar y ajustar el selector |
 | GIF muy grande / muy lento | Reducir el `--gif` workflow — el helper produce 12 fps 800px por default. Para casos pesados, abrir `flipbook.gif` y comprimirlo con `gifsicle` después |
-| Tests vitest fallan luego de agregar steps | Los tests usan `getByText`/`getByRole`; al agregar elementos nuevos podés introducir duplicados. Cambiar a `findByText`/`getAllByText` |
-| `mark fullPage` sale ilegible / con la barra lateral repetida | Artefacto conocido del stitch de `fullPage` cuando hay un sidebar `position: fixed` (la barra se pinta a cada altura de scroll) + el escalado achica el texto. **No uses `fullPage` para leer una sección puntual.** Agregá un `data-capture` a la sección y usá `{ kind: 'scroll', selector: '[data-capture="x"]' }` + `{ kind: 'mark', clipSelector: '[data-capture="x"]' }` → captura crisp a resolución real. `fullPage` queda para "ver el largo total", no para leer detalle. (TASK-1006, 2026-06-04.) |
+| Tests vitest fallan luego de agregar steps | Los tests usan `getByText`/`getByRole`; al agregar elementos nuevos puedes introducir duplicados. Cambiar a `findByText`/`getAllByText` |
+| `mark fullPage` sale ilegible / con la barra lateral repetida | Artefacto conocido del stitch de `fullPage` cuando hay un sidebar `position: fixed` (la barra se pinta a cada altura de scroll) + el escalado achica el texto. **No uses `fullPage` para leer una sección puntual.** Agrega un `data-capture` a la sección y usa `{ kind: 'scroll', selector: '[data-capture="x"]' }` + `{ kind: 'mark', clipSelector: '[data-capture="x"]' }` → captura crisp a resolución real. `fullPage` queda para "ver el largo total", no para leer detalle. (TASK-1006, 2026-06-04.) |
 
 ## Referencias técnicas
 
@@ -431,12 +431,12 @@ Solo declaralos si **sabés** que poseés la capability vigente. El audit log re
 
 ## Contract gates mockup→runtime (V1.5 · TASK-1018)
 
-Cuando implementás un runtime desde un mockup aprobado, GVC puede verificar la paridad y la calidad enterprise con gates **opt-in por scenario** (todos warning por defecto; `error` solo si lo declarás).
+Cuando implementas un runtime desde un mockup aprobado, GVC puede verificar la paridad y la calidad enterprise con gates **opt-in por scenario** (todos warning por defecto; `error` solo si lo declaras).
 
 ### Baseline visual diff
 
-1. Capturá el mockup aprobado: `pnpm fe:capture <scenario> --env=local`.
-2. Promové el baseline durable: `pnpm fe:capture:diff --promote .captures/<run>`. Esto materializa `scripts/frontend/baselines/<surfaceId>/` (committeable, contrato compartido).
+1. Captura el mockup aprobado: `pnpm fe:capture <scenario> --env=local`.
+2. Promueve el baseline durable: `pnpm fe:capture:diff --promote .captures/<run>`. Esto materializa `scripts/frontend/baselines/<surfaceId>/` (committeable, contrato compartido).
 3. El scenario runtime declara el mismo `baseline.surfaceId` + `maxDiffRatio` (y `maskSelectors` para datos dinámicos). `fe:capture` corre el diff solo y reporta `match` / `exceeded` (con PNG diff) / `baseline_stale` si falta el baseline.
 
 ### Gates de calidad (`quality.*`)

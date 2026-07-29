@@ -1,5 +1,15 @@
 # TASK-1336 — Growth Forms Tokenized Report Success Contract
 
+## Delta 2026-07-27 — handoff observado en la superficie live
+
+El contrato `tokenized_report` ya está integrado en Think: la landing productiva escucha
+`gh_form_submission_accepted`, consume `status_url` y resuelve el reporte tokenizado en
+`/brand-visibility/r/<token>`. La documentación que decía “NO aplicado a prod” queda histórica respecto del estado
+actual de la superficie publicada.
+
+La task permanece `in-progress` únicamente hasta consolidar la evidencia E2E productiva fechada y sincronizar el
+lifecycle con TASK-1327.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -19,7 +29,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-020`
-- Status real: `code-complete, rollout pendiente`
+- Status real: `Live en Think; evidencia E2E fechada y cierre formal pendientes`
 - Rank: `TBD`
 - Domain: `growth|public-site|forms|api`
 - Blocked by: `verificar contrato actual tokenized_report + TASK-1335 para smoke browser desde Think`

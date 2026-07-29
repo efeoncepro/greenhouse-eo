@@ -12,7 +12,27 @@ argument-hint: "[pregunta de research o benchmark concreto]"
 
 > **DOBLE audiencia.** Esta skill sirve para research/benchmark **de Efeonce** (interno: pitch, GTM, inteligencia competitiva, decisiones) **Y como servicio entregable para clientes** (Efeonce es agencia: el research/benchmark es un deliverable billable, con confidencialidad, metodología transparente y presentación de nivel). Cuando el trabajo es para un cliente, carga `11_RESEARCH_AS_A_SERVICE`. La **inteligencia competitiva** tiene su módulo profundo dedicado (`10`).
 
+> **Customer model:** cuando el research alimenta ICP, JTBD, buying group, triggers, WTP o retention, entregar el evidence ledger y confidence requeridos por `efeonce-customer-model-operator`; esta skill conserva el método de investigación.
+
+Cuando el research estudie una Product Service Efeonce, separar quién opera el workflow, quién sufre el problema,
+quién puede ser `operator-champion`, quién patrocina y quién aprueba presupuesto. Validar adopción por comportamiento,
+movilización interna, renovación y expansión, no por entusiasmo verbal. Canon:
+`docs/strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md`.
+
+The agency-pain map remains an active research input. Do not assume the operator-champion eliminates it: validate
+whether lost context, rework, approvals, weakly actionable reporting, diffuse ownership, coordination,
+governance/provenance and the operator's political load persist. Also look for adoption without budget authority,
+champions without influence and operational value without executive evidence.
+
 > **Skill de MÉTODO + orquestación, no de ejecución cruda ni de dominio.** La **ejecución** (fan-out de búsquedas, verificación, síntesis con citas) se delega a la harness **`deep-research`**. El **research de dominio** se delega a su skill dueña (búsqueda/keywords/visibilidad IA → `seo-aeo`; competitivo comercial/win-loss/ICP → `commercial-expert`). Esta skill aporta la **capa de rigor** + el **diseño** + la **orquestación**.
+
+## Patrón reutilizable para benchmarks de GTM creativo
+
+Para benchmarks como Higgsfield, separar siempre wedge, activación, workflow, agency-led adoption, enterprise
+expansion, ecosystem distribution y servicios humanos. No convertir logos, casos, creator programs, plugins o
+integraciones en partnerships, PMF o revenue sin evidencia contractual/operativa. El output debe traducir cada patrón
+como `adoptar | adaptar | descartar` para Efeonce y enlazar el audit fechado
+`docs/audits/commercial/HIGGSFIELD_PARTNERSHIP_AND_VERTICAL_EXPANSION_RESEARCH_2026-07-29.md` cuando aplique.
 
 ## Regla #0 — evidencia con fecha, nunca memoria
 

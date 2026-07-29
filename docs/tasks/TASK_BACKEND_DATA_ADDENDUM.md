@@ -78,7 +78,7 @@ No usarlo para docs puros, copy-only UI, cambios visuales sin API/data, refactor
 
 ## Capability Definition of Done — Full API Parity gate
 
-Aplica cuando la task **introduce o modifica una capability** (cualquier acción de negocio que afecte estado, permisos, datos, aprobaciones, exports, recoveries, reportes o configuración). Si la task no toca una capability (refactor local, doc, copy), marcá `N/A — no capability` con razón.
+Aplica cuando la task **introduce o modifica una capability** (cualquier acción de negocio que afecte estado, permisos, datos, aprobaciones, exports, recoveries, reportes o configuración). Si la task no toca una capability (refactor local, doc, copy), marca `N/A — no capability` con razón.
 
 **Base:** Full API Parity (contrato gobernado a nivel capability). **Consecuencia:** Nexa y los 10 consumers la operan por construcción. Fuente: `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` (§North Star + §Canonical consumers), CLAUDE.md §"Full API Parity Principle".
 

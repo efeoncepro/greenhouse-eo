@@ -1,9 +1,9 @@
 # Motor de CTAs y Popups — `growth.cta`
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-07-17 por Claude (TASK-1339)
-> **Ultima actualizacion:** 2026-07-18 por Claude (TASK-1431: Action Registry + navegación gobernada — code complete, rollout pendiente)
+> **Ultima actualizacion:** 2026-07-21 (TASK-1509/1510: adapter `open_meeting_scheduler` native-only liberado)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md)
 > **Skill de dominio:** `greenhouse-growth-ctas` (Claude + Codex; se actualiza con cada cambio del motor)
 
@@ -17,13 +17,16 @@ El motor de CTAs es el sistema que decide **qué invitación a la acción (promp
 - El flag `GROWTH_CTA_ENGINE_ENABLED` está **encendido en staging y producción**.
 - La medición está **completa y verificada de extremo a extremo en ambos hosts** (TASK-1427): eventos en el dataLayer, hits reales llegando a GA4, registro server-side en el ledger y rechazo comprobado de credenciales forjadas.
 - Con el release de hoy (`d5db8b568`) también están **en producción**: el **respeto al visitante (suppression) operando de verdad** — el motor ya no repite un CTA a quien lo descartó, dentro de su ventana —, los **frenos de emergencia** (kill switch global y por superficie, verificados en vivo sin necesidad de deploy) y el formato **slide-in** listo en el motor.
+- El registro incorpora de forma aditiva `open_meeting_scheduler`: abre el scheduler nativo en diálogo desktop o
+  full-screen móvil, conserva la misma instancia al cerrar/reabrir y no expone links de HubSpot. El piloto aislado
+  `/agenda/` está live; Contacto y RRSS no están promovidos. `book_meeting` conserva su semántica histórica de navegación.
 - Falta por decisión del negocio: el **placement amplio en WordPress** (qué páginas, tras validar la prueba), **publicar la primera campaña interruptiva** (el formato slide-in ya está listo; falta elegir superficie, mensaje y momento) y el cockpit de autoría visual (hoy se autora por API/CLI).
 
 ## Cómo funciona (en simple)
 
 1. **Un CTA se define y se versiona.** Cada versión tiene su texto, su ubicación (embebido, banner…), su **variante visual** (`default`, `spotlight` con gradiente de marca, `minimal` editorial — es un dato de la versión, no código), su acción y sus reglas de dónde aparece. Una versión publicada **no se puede editar**: cualquier cambio crea una versión nueva. Así siempre se sabe exactamente qué vio el visitante.
 2. **El servidor decide qué se muestra.** Cuando una página pregunta "¿qué CTA va aquí?", Greenhouse evalúa las reglas y responde con el resultado ya resuelto: **a lo sumo un prompt interruptivo** más los no-interruptivos que apliquen. El navegador nunca ve las reglas ni los candidatos descartados. Si nada aplica (o el motor está apagado), la página no muestra nada — jamás un card roto.
-3. **La acción es un destino gobernado, elegido de un registro cerrado (TASK-1431).** Cada versión declara UNA acción de un registro tipado con 4 opciones: **abrir un Growth Form** (`open_growth_form` — el CTA solo guarda la referencia al form, nunca copia campos/validación/consentimiento; la conversión "de verdad" sigue siendo del formulario), **navegar a un enlace** (`link_url` — solo rutas internas o HTTPS, sin protocolos peligrosos ni credenciales), **abrir una herramienta de Think** (`open_think_tool` — el autor elige el *path* dentro del hub gobernado `think.efeoncepro.com`, jamás un host arbitrario; el contexto de campaña viaja solo por UTM permitidas) o **abrir la agenda** (`book_meeting` — solo hosts de agendamiento gobernados como HubSpot Meetings; es navegación pura: **ningún click crea contactos, negocios ni reuniones en el CRM**). Una acción inválida o de un tipo no registrado **no se puede publicar ni renderizar**. En el navegador, las acciones de navegación son un **enlace real** (funciona abrir en pestaña nueva, copiar el link, el historial y el teclado); los destinos externos llevan protección `noopener` y, si abren pestaña nueva, se le anuncia al lector de pantalla.
+3. **La acción es un destino gobernado, elegido de un registro cerrado.** Cada versión declara UNA acción entre cinco ramas operativas: **abrir un Growth Form** (`open_growth_form` — el CTA referencia el form y nunca copia campos/validación/consentimiento), **navegar a un enlace** (`link_url` — sólo ruta interna o HTTPS segura), **abrir una herramienta de Think** (`open_think_tool` — path dentro del hub gobernado y UTM allowlisted), **navegar a una agenda legacy** (`book_meeting` — enlace real, cero write CRM por click) o **abrir el scheduler nativo** (`open_meeting_scheduler` — sólo `meetingSurfaceId + schedulerKey`, binding server-side y task surface adaptativa). Esta última rama no recibe ni renderiza un destino HubSpot: el provider queda detrás de TASK-1509, la recuperación usa navegación mensual/`Reintentar` y sólo un receipt server-confirmed puede producir conversión. Una acción inválida no se publica ni renderiza.
 4. **La evidencia se guarda con desconfianza sana.** Lo que reporta el navegador queda marcado como `browser_reported` (direccional); solo lo confirmado por el servidor (`server_confirmed`) cuenta como conversión en reportes. Los intentos forjados (superficie o versión falsa, credencial inválida) se **rechazan y quedan registrados** sin datos personales — alimentan la señal de seguridad.
 5. **Todo se mide.** Cada vista/click/cierre/apertura de form emite un evento `greenhouse_cta_*` al dataLayer (con una lista blanca dura de parámetros, sin PII) y además se registra server-side en el ledger. GTM los reenvía a GA4, donde se reportan por `cta_slug`/`cta_location`/`placement`.
 

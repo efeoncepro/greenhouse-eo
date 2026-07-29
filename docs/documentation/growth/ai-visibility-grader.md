@@ -1,5 +1,5 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.22
+> **Version:** 1.23
 > **Creado:** 2026-06-24 por Claude (TASK-1226)
 > **Ultima actualizacion:** 2026-07-17 por Claude (TASK-1276 — vista operador Growth/AEO + facet Account 360)
 > **Documentacion tecnica:** [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
@@ -22,6 +22,12 @@ El Grader y la Radiografía cumplen trabajos distintos dentro del motion SEO/AEO
 | **Radiografía AEO** | "¿Cómo se ve un trabajo que tapa uno de esos huecos?" | Educación, demo en vivo, licitación, propuesta, QBR |
 
 La cadena comercial correcta es **diagnóstico → demostración → propuesta → operación**. Un informe del Grader puede abrir la conversación; la Radiografía la vuelve tangible cuando el comprador necesita ver el método y no solo un score.
+
+### Rol dentro de Wave
+
+El Brand Visibility Grader es la primera puerta de Wave para el beachhead **AI Visibility & Search**. Su ruta primaria
+es **Search Visibility 360**; Web Experience, Measurement y Content/Creative son expansiones según los gaps observados.
+No es el diagnóstico universal de Wave ni debe absorber Agentic Readiness o Experience LaunchOps.
 
 Referencia comercial: [Usar la Radiografía AEO en venta y educación](../../manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md).
 
@@ -54,6 +60,27 @@ Referencia comercial: [Usar la Radiografía AEO en venta y educación](../../man
 ## Por que no consume secretos por defecto
 
 El grader nace **apagado** (flags `GROWTH_AI_VISIBILITY_*_ENABLED` en OFF). Sin encender el flag global + el del proveedor, cada llamada se **salta limpio** (no llama a ningun proveedor, no gasta dinero). Para desarrollo local usa un "fake provider" deterministico que simula respuestas sin red.
+
+## Costo por corrida: lectura correcta
+
+El campo `grader_runs.estimated_cost_usd` es un **guard aproximado del costo de las observaciones principales**.
+No es una contabilidad all-in: hoy no incorpora de forma completa request fees, search/grounding, extracción LLM,
+probes ni la parte atribuible de Cloud Run.
+
+La reconciliación operativa del 2026-07-27 auditó el run público
+`grun-324ed1d5-c67b-4768-9d6d-0272fd9ca67b`: registró US$0,2767, pero el recálculo con usage persistido dio
+aproximadamente **US$0,3067 antes de extracción LLM**. El run tuvo 18 intentos de extracción de prosa con Anthropic;
+el esquema actual conserva el estado, pero todavía no conserva tokens/costo de esas llamadas.
+
+Por lo tanto:
+
+- **US$0,50 no es el costo garantizado de un run público.** Es el techo aproximado del componente principal del modo `light`.
+- Los 13 runs públicos históricos auditados tienen `estimated_cost_usd` promedio de US$0,2627, con rango US$0,1916–US$0,3237; esos números describen el estimador, no el costo contable.
+- No usar estos valores para pricing, CAC o presupuesto de paid hasta cerrar la instrumentación descrita en [`AI_VISIBILITY_GRADER_COST_RECONCILIATION_2026-07-27.md`](../../audits/cloud-cost/AI_VISIBILITY_GRADER_COST_RECONCILIATION_2026-07-27.md).
+- El costo de `ops-worker` no se divide por run sin un ledger de asignación: el worker es compartido por grader, outbox, forms y otros handlers.
+
+La formulación permitida para operación y ventas es: **“el modo `light` tiene un techo aproximado de US$0,50 para
+observaciones principales; el costo total depende de providers, extracción e infraestructura”**.
 
 ## Como se opera hoy
 

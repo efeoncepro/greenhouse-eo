@@ -98,9 +98,11 @@ Manifest machine-readable y gateado: [`docs/operations/agent-context-router.json
 | Identity/roles/session/access                       | skill identity aplicable                                         | `agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` + entitlements/roles architecture                                                                                          |
 | Organization/Client portal/Account 360              | skill producto aplicable                                         | `agent-invariants/ORG_CLIENT_AGENT_INVARIANTS.md`                                                                                                                                    |
 | Knowledge/Nexa                                      | `greenhouse-nexa-conversational`                                 | `agent-invariants/KNOWLEDGE_NEXA_AGENT_INVARIANTS.md`                                                                                                                                |
+| **Efeonce Globe / Creative Studio** (repo hermano `efeonce-globe`) · EPIC-028 | `greenhouse-globe` (+ `arch-architect`) | **Globe es un PRODUCTO COMERCIAL de Efeonce (ADR-010), NUNCA un lab/piloto interno; su estadio de rollout hoy es internal-only + `internal_smoke` + externos gated por TASK-1480 — estadio ≠ naturaleza.** `architecture/creative-studio/README.md` + `DECISIONS_INDEX.md` + `operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md` (estado vivo) + `operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md` + `GLOBE_MODEL_FLEET_STATUS.md`. **ADR-016 (`Accepted` 2026-07-27): el payload cliente usa Tailwind v4 con `tokens.ts` como theme — NUNCA un valor de diseño literal en `className` (`text-[#hex]`, `p-[13px]`); todo sale del theme, que sale del SSOT. Dueño: `TASK-1485`.** Valores exactos del composer: `docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md` |
 | Notion sync/work management                         | `notion-platform`                                                | `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` + Notion architecture/runbook aplicable                                                                                                     |
 | HubSpot/CRM/services intake                         | `hubspot-greenhouse-bridge` o `hubspot-as-a-service`             | `GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md`                                                                                                                                           |
-| Business model/pricing/packaging/credits           | `efeonce-agency`, `creative-practice`, skill de práctica         | `docs/business-models/README.md` + business model canónico + Finance/Legal cuando corresponda                                                                                        |
+| Business model, customer model, packaging, pricing, unit economics | `efeonce-business-model-operator` + `efeonce-customer-model-operator` + `efeonce-pricing-operator` + práctica dueña | `docs/business-models/README.md` + modelo vigente + Finance/Legal/Product según corresponda; customer model gobierna ICP/JTBD/buying group; `creative-practice` conserva la especialización Creative Studio |
+| Capital, inversión y fundraising                   | `efeonce-investor-readiness` + `efeonce-agency` + Finance/Legal | `docs/strategy/EFEONCE_CAPITAL_AND_INVESTMENT_STRATEGY_V1.md` + `docs/strategy/ASAAS_MANIFESTO_V1.md`; no emitir, endeudar, transferir IP ni crear spinout sin aprobación proporcional |
 | Integraciones cross-runtime                         | skill de integración aplicable                                   | `agent-invariants/INTEGRATIONS_INFRA_AGENT_INVARIANTS.md`                                                                                                                            |
 | Growth/SEO/AEO/forms/CTAs/GTM                       | skill growth/SEO/GTM aplicable                                   | arquitectura del subdominio + `docs/context/` + tracking/privacy contracts                                                                                                           |
 | Sitio público WordPress/Kinsta                      | `efeonce-public-site-wordpress`                                  | `docs/public-site/README.md` + Kinsta access invariants                                                                                                                              |
@@ -129,6 +131,32 @@ Las rutas de la tabla son relativas a `docs/architecture/` cuando comienzan por 
 - **Runtime completeness:** código no equivale a operativo. Flags, env, deploy, migrations, backfills, crons,
   webhooks, workers, secrets, data recovery y verificación live forman parte del cierre.
 
+### Registro del español (voseo → tuteo neutro)
+
+El operador **no es argentino** y el voseo rioplatense le molesta explícitamente. La regla vive en
+`CLAUDE.md` → §`Operator Communication Style`; acá va el detalle operativo, porque **el tic no está en
+los modismos obvios (`che`, `boludo`) sino en los IMPERATIVOS**, que son el modo por defecto al escribir
+docs, runbooks, specs y mensajes al operador. Aplica **igual a los docs del repo que a la conversación**:
+un agente que lee un runbook en voseo copia ese registro al responder (causa verificada del sweep
+2026-07-26: ~560 formas corregidas en 147 archivos vigentes).
+
+- **Imperativos** — escribir `agrega`, `actualiza`, `verifica`, `corre`, `revisa`, `usa`, `lee`, `escribe`,
+  `mira`, `deja`, `prende`, `elige`, `abre`, `activa`, `recuerda`, `genera`, `ejecuta`, `cierra`, `busca`;
+  NUNCA `agregá`, `actualizá`, `verificá`, `corré`, `revisá`, `usá`, `leé`, `escribí`, `mirá`, `dejá`,
+  `prendé`, `elegí`, `abrí`, `activá`, `recordá`, `generá`, `ejecutá`, `cerrá`, `buscá`.
+- **Irregulares y con diptongo** — `mantén` (no `mantené`), `propón` (no `proponé`), `pon` (no `poné`),
+  `vuelve` (no `volvé`), `extiende` (no `extendé`), `remueve` (no `remové`), `prueba` (no `probá`),
+  `empieza` (no `empezá`), `refuerza` (no `reforzá`), `sigue` (no `seguí`), `corrige` (no `corregí`).
+- **Indicativo** — `puedes`, `quieres`, `tienes`, `necesitas`, `haces`, `sabes`, `eres`; NUNCA `podés`,
+  `querés`, `tenés`, `necesitás`, `hacés`, `sabés`, `sos`.
+- **Enclíticos** — `dime`, `fíjate`, `acuérdate`, `quédate`; NUNCA `decime`, `fijate`, `acordate`, `quedate`.
+- **Pronombre** — `tú` (o `ti` tras preposición: "para ti"); NUNCA `vos`.
+- **NO confundir con el pretérito de 1ª persona, que es correcto y no se toca:** "yo **elegí** el slug",
+  "**escribí** el adapter", "**medí** el transporte", "**descubrí** que Cloud Run no soporta TCP". La
+  diferencia es semántica, no ortográfica: imperativo (instrucción al lector) vs. narración de trabajo ya
+  hecho. Un sweep automático que no distinga esto corrompe los registros históricos.
+- Se permite chilenismo operativo solo en contexto de producto/país, nunca como muletilla.
+
 ## Contrato UI resumido
 
 Cualquier UI invoca primero `greenhouse-ai-design-studio`. Antes de JSX: dirección visual, comparación de
@@ -144,6 +172,11 @@ y [`GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md`](docs/ui/GREENHOUSE_PREMIUM_U
 - CLIs autenticados: `az`, `gcloud`, `gh`, `vercel`, `psql` vía `pnpm pg:connect`.
 - GCP interactivo local requiere ambos flujos: `gcloud auth login` y
   `gcloud auth application-default login`.
+- **GCP multi-proyecto local:** `default` conserva `julio.reyes@efeonce.org` / `efeonce-group` y
+  `globe` apunta a la misma cuenta / `efeonce-globe`. Son perfiles locales, no permisos ni runtime.
+  Para Globe preferir `gcloud --configuration=globe ... --project=efeonce-globe`; si se activa el
+  perfil interactivamente, restaurar `default` al terminar. No cambiar el proyecto de `default` para
+  un acto puntual.
 - macOS usa `gtimeout`, no asumir `timeout` GNU.
 - GVC: `pnpm fe:capture <scenario> --env=staging`; review/diff/health según necesidad.
 - Antes de una acción sensible, consultar Platform Health/safe modes cuando el dominio lo exponga.

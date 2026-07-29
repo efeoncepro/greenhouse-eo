@@ -136,8 +136,8 @@ En la ficha del cliente, el panel del checklist tiene un boton **"Verificar evid
 
 La evidencia aparece **solo en los pasos que aun no marcaste**. Si ves **"Detectado"** junto a un paso que sigue pendiente, es justo lo que buscas: la pieza ya esta lista, podes marcarla.
 
-- **Auto-completado:** si tu entorno tiene el auto-completado activo, los pasos detectados que no necesitan un documento adjunto se marcan solos. **Nunca** se marca algo sin detectar, **nunca** se pisa lo que ya marcaste a mano, y los pasos que piden un documento (como provisionar Notion) muestran la evidencia pero los completas vos.
-- **Que NO hacer:** suponer que "Sin detectar" es un error. Significa que la pieza todavia no esta — hacela y volve a verificar.
+- **Auto-completado:** si tu entorno tiene el auto-completado activo, los pasos detectados que no necesitan un documento adjunto se marcan solos. **Nunca** se marca algo sin detectar, **nunca** se pisa lo que ya marcaste a mano, y los pasos que piden un documento (como provisionar Notion) muestran la evidencia pero los completas tú.
+- **Que NO hacer:** suponer que "Sin detectar" es un error. Significa que la pieza todavia no esta — hazla y volve a verificar.
 
 ## Referencias tecnicas
 

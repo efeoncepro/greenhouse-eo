@@ -1,0 +1,4 @@
+interface:
+  display_name: "Efeonce Investor Readiness"
+  short_description: "Build evidence-backed fundraising and investor-readiness systems."
+  default_prompt: "Use $efeonce-investor-readiness to audit or build Efeonce's narrative, metrics, financial evidence, materials, data room, investor pipeline, and fundraising gates."

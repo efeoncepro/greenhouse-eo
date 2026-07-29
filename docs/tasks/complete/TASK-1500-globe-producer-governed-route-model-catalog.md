@@ -1,5 +1,25 @@
 # TASK-1500 — Governed Route/Model Catalog
 
+## Delta 2026-07-22
+
+Cerrado por `TASK-1504` (code-complete, código en `efeonce-globe`, sin push):
+
+- **Fail-open del seed corregido.** La entrada `ref/motion/loop-v1` que shipeó esta task declaraba los
+  `inputModes` `frames` y `motion-source` sobre un motor **text-to-video sin campo de referencia**: los
+  keyframes se descartaban en silencio **después** de que el run reservara crédito. Ambos modos se movieron
+  a rutas dedicadas y la validación de forma (`assertInputModeSatisfied`) ahora cuenta las referencias **por
+  tipo de medio** antes del fence. Regla que queda: declarar un `inputMode` en el catálogo es una promesa
+  ejecutable — si el motor de la ruta no puede consumir ese medio, la ruta no lo declara.
+- **Catálogo a `1.1.0`, 8 rutas.** 4 entradas nuevas de dato (`ref/video/frames-v1`, `ref/video/motion-v1`,
+  `ref/voice/change-v1`, `ref/voice/translate-v1`) para las capabilities que `CREATIVE_CAPABILITIES` sumó
+  (10 → 14). Se cierra el follow-up "ampliar el catálogo con las rutas de TASK-1504 cuando aterricen": se
+  agregaron **como dato**, sin tocar el motor del reader.
+- **`GLOBE_CAPABILITIES` 12 → 13** con `globe.voice.preset.manage` (registry de presets de voz; el vendor
+  voice id nunca entra al catálogo ni al dominio — vive sólo en el adapter, igual que el slug).
+- **Sigue abierto:** el follow-up de confirmar `sampleRate`/`format` de audio contra los adapters reales.
+  Los rangos degenerados de `speed`/`volume`/`pitch` se mantienen y siguen siendo declaración honesta de lo
+  que la ruta admite, no un placeholder.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

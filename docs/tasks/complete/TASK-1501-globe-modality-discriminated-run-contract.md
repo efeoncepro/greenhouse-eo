@@ -1,5 +1,30 @@
 # TASK-1501 — Globe Modality-Discriminated Run Contract
 
+## Delta 2026-07-22
+
+Cerrado por `TASK-1504` (code-complete, código en `efeonce-globe`, sin push):
+
+- **El threading de video/audio que esta task dejó anotado como pendiente ya está.** Los selectores que este
+  contrato declaró en Slice 1 —`inputMode { kind: 'frames'; hasEndFrame }`, `{ kind: 'motion' }`,
+  `mode { kind: 'change-voice' }`, `{ kind: 'translate'; targetLang }` y `voicePreset`— tienen ahora motor
+  real detrás y sus adapters leen la forma del request. Cierra el follow-up "TASK-1504 — cablear los adapters
+  de video/audio para leer `inputMode`/`mode` del shape".
+- **Open question de `voicePreset` resuelta:** es un id contra un **registry propio** de Globe
+  (`globe.voice.preset.{register,list,get}`, capability `globe.voice.preset.manage`), no una extensión del
+  treatment registry de `TASK-1493`. El vendor voice id vive sólo en el adapter — el preset id que cruza el
+  contrato nunca es el identificador del proveedor.
+- **El fail-closed pre-spend tenía un agujero de dato, no de código.** La validación de esta task comprueba
+  que `inputMode.kind` esté entre los modos que **declara** la ruta; una ruta del catálogo declaraba
+  `frames`/`motion-source` sobre un motor sin campo de referencia, así que un run pasaba la validación y las
+  referencias se descartaban en silencio **después** de reservar crédito. `TASK-1504` agregó
+  `assertInputModeSatisfied`, que cuenta las referencias **por tipo de medio** antes del fence. Regla que
+  queda: la garantía fail-closed vale lo que valga el dato del catálogo — validar el modo declarado no basta
+  si nadie verifica que el medio requerido llegó.
+- **Multi-output:** un attempt puede retener más de una pieza (`ExperimentAttemptManifestV1.outputs?:
+  LabOutputDescriptorV1[]`, retención por-output). `resolveEditSource` ya no toma `outputHashes[0]`: elige el
+  output **por modalidad** desde la capability hija, así un encadenamiento sobre un run multi-output no
+  agarra la pieza equivocada.
+
 ## Delta 2026-07-20
 
 - El gap "no existe SSOT de constraints contra el cual validar el shape pre-spend" quedó **cerrado por TASK-1500**

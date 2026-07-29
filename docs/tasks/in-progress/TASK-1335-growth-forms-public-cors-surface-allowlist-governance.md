@@ -1,5 +1,14 @@
 # TASK-1335 — Growth Forms Public CORS + Surface Allowlist Governance
 
+## Delta 2026-07-27 — Think consume el form en producción
+
+La surface `fhsf-ai-visibility-grader` ya está siendo consumida por la landing productiva de Think en
+`https://think.efeoncepro.com/brand-visibility`; el HTML live carga el renderer y el form gobernado sin workaround
+local. Por ello, la documentación que describía a Think como “aún sin embeber” queda histórica.
+
+La task permanece `in-progress` únicamente hasta consolidar la matriz formal de `GET`/`OPTIONS`/`POST`/`verify-email`
+con origins permitidos y rechazados en el environment productivo, y registrar esa evidencia para cerrar el lifecycle.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -19,7 +28,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-020`
-- Status real: `Diseno`
+- Status real: `Think live; matriz CORS productiva y cierre formal pendientes`
 - Rank: `TBD`
 - Domain: `growth|public-site|forms|api`
 - Blocked by: `none`

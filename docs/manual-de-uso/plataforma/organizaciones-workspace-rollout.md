@@ -20,9 +20,9 @@ Necesitas:
 
 - Acceso admin a Greenhouse (`efeonce_admin`).
 - Acceso al endpoint canónico de flags: `/api/admin/home/rollout-flags` (TASK-780). Los overrides finos de entitlements ya viven en Admin Center vía `/admin/views` y la ficha de usuario; los rollout flags siguen usando este endpoint hasta que exista formulario dedicado.
-- Identificar al menos 2 usuarios admin (incluido vos) para el dogfood inicial.
+- Identificar al menos 2 usuarios admin (incluido tú) para el dogfood inicial.
 
-## Operación 1 — Activar para vos primero (dogfood)
+## Operación 1 — Activar para ti primero (dogfood)
 
 1. Conseguir tu `userId` desde la session: abre `/admin/users` y buscate; el `userId` aparece en la URL del detalle del usuario.
 2. Hacer un `POST` al endpoint de flags:
@@ -40,8 +40,8 @@ Necesitas:
      }'
    ```
 
-3. Abrí `/agency/organizations/<id-de-cualquier-org>` en una pestaña incógnito (refresh hard) o esperá ~30s para que el cache TTL expire. Vas a ver el header con el shell nuevo + tabs.
-4. Verificá:
+3. Abre `/agency/organizations/<id-de-cualquier-org>` en una pestaña incógnito (refresh hard) o espera ~30s para que el cache TTL expire. Vas a ver el header con el shell nuevo + tabs.
+4. Verifica:
    - Header con nombre de la org + status chip
    - 4 KPI cards (Revenue, Margen bruto, Equipo, Spaces)
    - Las 9 pestañas (algunas con empty state honesto: CRM, Servicios, Staff Aug)
@@ -134,7 +134,7 @@ Si un usuario reporta un issue, revertir es instantáneo:
 
 ## Que NO hacer
 
-- **No edites manualmente la tabla `home_rollout_flags`**. Usá el endpoint canónico — el endpoint hace audit log + invalidación de cache reactiva.
+- **No edites manualmente la tabla `home_rollout_flags`**. Usa el endpoint canónico — el endpoint hace audit log + invalidación de cache reactiva.
 - **No actives el flag en `global` antes de soak ≥7d en cada rol**. El staged rollout existe para detectar issues progresivamente.
 - **No mezcles los flag keys**: `organization_workspace_shell_agency` cubre `/agency/organizations/[id]`. El de Finance (`organization_workspace_shell_finance`) lo activará TASK-613 cuando esa convergencia mergee.
 - **No actives el flag para clientes externos** (scope `tenant` con tenantId de cliente). El shell hoy solo está validado para usuarios internos. La activación para client portal requiere security review específico.
@@ -144,7 +144,7 @@ Si un usuario reporta un issue, revertir es instantáneo:
 
 ### "Activé el flag pero sigo viendo el legacy"
 
-Cache TTL natural de 30s. Esperá. Si pasaron > 1 min, verificá:
+Cache TTL natural de 30s. Espera. Si pasaron > 1 min, verifica:
 
 - ¿El POST devolvió 201? (chequear logs Vercel)
 - `/admin/operations` signal `home.rollout.drift` ¿está en steady? Si > 0, hay drift PG↔env.

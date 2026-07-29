@@ -27,6 +27,15 @@ Esta carpeta describe la **plataforma de ingeniería UI**. El **lenguaje visual 
 
 Regla: cuando un doc temático difiera del runtime, **gana el runtime** y el doc se actualiza.
 
+### AXIS cross-runtime boundary
+
+AXIS gobierna tokens, contratos y registry compartidos; cada producto conserva su adapter y
+runtime nativo. Para consumir AXIS desde Greenhouse, Globe o un producto futuro, usa la decisión
+[EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1](../EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md),
+el [runbook de paquetes privados](../../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md)
+y la evidencia de [TASK-1591](../../tasks/complete/TASK-1591-efeonce-ui-adapters-pilot.md). No copies
+componentes MUI/Vuexy a Globe ni conviertas el Lab en una dependencia de runtime de producto.
+
 ## Mapa "¿dónde vive X?"
 
 | Necesito… | Doc |
@@ -66,6 +75,8 @@ Regla: cuando un doc temático difiera del runtime, **gana el runtime** y el doc
 ## Design System catalog
 
 `/admin/design-system` es el front door canónico para encontrar cualquier parte viva del Design System interno. Cuando nace o cambia una incorporación del Design System:
+
+- **Design System catalog canónico — `/admin/design-system` (INTERNA, los clientes NUNCA la ven)**: esta es la home navegable de AXIS/Design System. **Claude debe agregar aquí toda nueva incorporación del Design System** (token, primitive, patrón, lab o governance) en `DesignSystemCatalogView`, con ruta real, SoT/owner y link funcional; además debe declarar la child route en `route-reachability-manifest.ts`, crear/actualizar scenario GVC cuando la surface sea visual/repetible, y enlazar la documentación correspondiente (`ui-platform/*`, ADR/doc de tokens o `project_context.md` si cambia un contrato). La paleta AXIS vive como child route `/admin/design-system/colors` (TASK-1034): renderiza los ramps AXIS live (100→900 + opacity + neutrales light/dark) desde `theme.axis.*` / `src/@core/theme/axis-tokens.ts` (SoT 1:1 con AXIS Figma, fileKey `yyMksCoijfMaIoYplXKZaR` nodo `11205:5341`). Gateada por viewCode `administracion.design_system` (routeGroup `internal`, sembrado solo a roles internos — **NUNCA `client_*`**) + redirect defensivo si `tenantType==='client'`. `DESIGN.md` sigue siendo el contrato agent-facing; los HEX se resuelven desde `theme.palette.*` / `theme.axis.*`, NUNCA inline. El `AxisWordmark` es **solo del design system** (NUNCA en UI de producto, login, emails, PDFs ni portal cliente). NUNCA agregar un viewCode nuevo a `VIEW_REGISTRY` sin la migración seed acompañante en el mismo PR (gobernanza TASK-827) ni una ruta `(dashboard)` sin hacerla alcanzable por nav (TASK-982).
 
 1. Agregar o actualizar su entrada en `DesignSystemCatalogView` con ruta real, familia, tipo, status, SoT/owner y tags buscables.
 2. Declarar la ruta en `src/lib/navigation/route-reachability-manifest.ts` si es child route bajo `/admin/design-system`.

@@ -54,7 +54,7 @@ proyectos. Estratégico, claro, con prueba."*
 
 ## Cómo verlo / cambiarlo
 
-- El contenido vive en `buildNexaSystemPromptV2`. Para cambiarlo, seguí el checklist de
+- El contenido vive en `buildNexaSystemPromptV2`. Para cambiarlo, sigue el checklist de
   [`01-system-prompt-versioning.md`](versioning.md) (clase de cambio + bump + changelog + tests).
 - Los snapshot tests (`nexa-system-prompt.test.ts`) asertan los anclajes de cada módulo (realidad de
   plataforma, fecha, contrato de voz, política de knowledge, estructura/formato, determinismo con `now`

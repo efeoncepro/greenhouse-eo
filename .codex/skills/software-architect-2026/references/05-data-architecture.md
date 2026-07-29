@@ -2,16 +2,20 @@
 
 This reference is loaded when the system has non-trivial data concerns: OLTP/OLAP separation, ETL/ELT pipelines, vector stores, event streaming, or anywhere the data architecture is a primary design concern (data platforms, multi-tenant SaaS at scale, analytical products).
 
-The 2026 reality: data architectures have largely converged on a few patterns, and the open table format (Apache Iceberg) is becoming the lingua franca to avoid lock-in. AI-driven workloads add vector search and feature stores as new layers.
+Start from authority, access patterns, quality, lifecycle, and operating capacity. Open formats, vector retrieval, streaming, and feature stores are conditional options, not maturity badges.
+
+## Contents
+
+Operational/analytical stores; sync and outbox; lakehouse/open formats; transformation; semantic layer; vector retrieval; caching; schema evolution; tenancy; anti-patterns; architecture output.
 
 ## The two-store pattern (OLTP + OLAP)
 
-Almost every serious system separates:
+Separate these concerns when their workloads, ownership, lifecycle, or scale require it:
 
 - **OLTP** (Online Transactional Processing): the operational database. Optimized for low-latency reads and writes of small amounts of data per query. PostgreSQL, MySQL, SQLite, etc.
 - **OLAP** (Online Analytical Processing): the analytical database. Optimized for scans across large amounts of data for reporting, ML, dashboards. BigQuery, Snowflake, Databricks, ClickHouse.
 
-These have different shapes, different access patterns, different cost models. Trying to do both in one system fails — the workloads conflict.
+These often have different shapes, access patterns, and cost models. A small system or a validated HTAP design may combine them; document the trade-off rather than enforcing separation by slogan.
 
 **The architectural decision**: how does data flow from OLTP to OLAP, and what's the freshness contract?
 
@@ -79,7 +83,7 @@ The 2026 lakehouse pattern: data lives in object storage (S3, GCS) in an **open 
 - Clear separation of storage cost (cheap object storage) from compute cost (pay per query)
 - Time travel, schema evolution, and ACID are built into the format
 
-**Apache Iceberg in 2026**: now supported by all major platforms (BigQuery, Snowflake, Databricks, AWS, Azure). It's the bet against lock-in. Tech Radar Vol 34 places it firmly in Adopt territory.
+Open table formats can reduce coupling when multiple engines must share large analytical datasets. Verify current engine support, catalog/transaction semantics, operational skill, and migration cost before selecting one; an open format does not eliminate surrounding platform lock-in.
 
 **When to use**:
 - Multi-engine access: queries from BigQuery for reporting + Spark for ML + DuckDB for ad-hoc
@@ -93,11 +97,11 @@ The 2026 lakehouse pattern: data lives in object storage (S3, GCS) in an **open 
 
 ## Transformations: dbt and SQLMesh
 
-Both tools turn SQL transformations into versioned, tested, documented code. The default in 2026.
+Transformation frameworks can turn SQL transformations into versioned, tested, documented code. Select one only after validating workflow, ownership, deployment, lineage, and cost against the current project.
 
 | Tool | Best for | Trade-offs |
 |---|---|---|
-| **dbt Core / dbt Cloud** | The default; widest ecosystem | Macro language is Jinja; can get complex; pricing on Cloud is steep |
+| **dbt Core / dbt Cloud** | Broad ecosystem; verify current adapters and workflow fit | Macro complexity and current managed pricing require validation |
 | **SQLMesh** | Same niche, with virtual environments and column-level lineage | Newer, smaller ecosystem; promising features around impact analysis |
 
 Both produce DAGs of models with tests, documentation, and lineage. Both work with warehouses (BigQuery, Snowflake, Databricks, Postgres, DuckDB, Trino).

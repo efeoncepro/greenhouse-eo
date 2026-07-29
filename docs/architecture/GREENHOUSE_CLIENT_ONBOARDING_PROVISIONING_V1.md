@@ -28,7 +28,7 @@ La pregunta operativa: *¿para cada cliente nuevo hay que pedir setup manual de 
 ### Alternativas rechazadas
 
 - *Setup manual per-cliente* — no escala, fuente del drift; es el problema.
-- *Terraform 100% API del teamspace* — Notion **no crea teamspaces por API** (concepto admin/UI; sí crea databases+properties) → terminás híbrido igual. Complejidad extra sin valor en V1.
+- *Terraform 100% API del teamspace* — Notion **no crea teamspaces por API** (concepto admin/UI; sí crea databases+properties) → terminas híbrido igual. Complejidad extra sin valor en V1.
 - *Re-decidir el template* — innecesario: el Golden Template (clone Demo Greenhouse, vocabulary canónico) ya es decisión canónica (TASK-742). Este ADR lo **reusa**, no lo re-define.
 - *Instalar fórmulas de cómputo en el template* — viola el boundary (Notion = OS / Greenhouse = motor); el cómputo vive en Greenhouse.
 

@@ -89,6 +89,18 @@ Corrida acotada (`ONLY_PROMPTS=p01,p03,p04,p11,p12,p16,p14`) con el set: Efeonce
 - Tokens de input por run con web search: OpenAI ~17-35k, Anthropic ~20-35k.
 - **Recomendación preliminar:** `light` mode público debería evitar Anthropic con web_search por costo/latencia, o limitar prompts. Cost ceiling por-run a fijar con la corrida de varianza. (Pendiente: N≥3 + medición de costo agregado.)
 
+## Delta 2026-07-27 — reconciliación de costo real
+
+La primera reconciliación operativa contra `greenhouse_growth` y el export de billing confirmó que el campo
+`estimated_cost_usd` es un **guard de providers principales**, no una contabilidad all-in. El run público
+`grun-324ed1d5-c67b-4768-9d6d-0272fd9ca67b` registró US$0,2767 y recalculó aproximadamente US$0,3067 con usage
+persistido, antes de extracción LLM. La diferencia inmediata proviene principalmente de request fees de Perplexity;
+las extracciones de prosa con Anthropic aún no persisten tokens/costo.
+
+**Decisión operativa:** no declarar US$0,50 como costo real por run. Hasta que exista un ledger de costo total,
+US$0,50 solo describe el techo aproximado del componente principal `light`. La evidencia completa, incluidos los
+CLP de Cloud Run compartido y los gaps de atribución, vive en [`AI_VISIBILITY_GRADER_COST_RECONCILIATION_2026-07-27.md`](../audits/cloud-cost/AI_VISIBILITY_GRADER_COST_RECONCILIATION_2026-07-27.md).
+
 ## 5.bis Varianza run-to-run (N=3, p03 + p14 subject, 12 llamadas, 2026-06-24)
 
 Misma pregunta repetida 3 veces por motor, para definir el modelo de muestreo del score:

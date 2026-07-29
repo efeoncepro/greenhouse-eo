@@ -8,10 +8,12 @@ import type { MeetingApiClient } from '../api-client'
 import type { MeetingTurnstilePort } from '../turnstile'
 
 const turnstile: MeetingTurnstilePort = {
-  mount({ onToken }) {
-    onToken('preview-captcha-token')
-
-    return { destroy() {} }
+  mount() {
+    return {
+      execute: async () => 'preview-captcha-token',
+      reset() {},
+      destroy() {},
+    }
   },
 }
 
@@ -74,6 +76,24 @@ beforeEach(() => {
 })
 
 describe('MeetingRenderer', () => {
+  it('usa el logo monocromo de Teams y no renderiza la órbita decorativa recortada', async () => {
+    const { host, renderer } = await mount()
+
+    Object.defineProperty(host, 'getBoundingClientRect', {
+      configurable: true,
+      value: () => ({ width: 1280, height: 760, top: 0, right: 1280, bottom: 760, left: 0, x: 0, y: 0, toJSON() {} }),
+    })
+    renderer.updatePresentation({ activationMode: 'inline', maxRecipe: 'command' })
+    renderer.updatePresentation({ activationMode: 'inline', maxRecipe: 'command' })
+    const teamsMark = host.querySelector<HTMLElement>('.ghm-teams-mark')
+
+    expect(host.querySelector('.ghm-signal-atmosphere')).toBeNull()
+    expect(teamsMark?.classList.contains('tabler-brand-teams')).toBe(true)
+    expect(teamsMark?.getAttribute('aria-hidden')).toBe('true')
+    expect(host.querySelector('.ghm-fact img')).toBeNull()
+    renderer.destroy()
+  })
+
   it('no atribuye la fecha preseleccionada hasta una acción humana', async () => {
     const { host, renderer } = await mount()
     const dataLayer = (window as unknown as { dataLayer: Array<Record<string, unknown>> }).dataLayer
@@ -203,6 +223,28 @@ describe('MeetingRenderer', () => {
     renderer.destroy()
   })
 
+  it('agrupa consentimientos con semántica compacta y copy localizado', async () => {
+    const { host, renderer } = await mount()
+
+    ;(host.querySelector('.ghm-slot') as HTMLButtonElement).click()
+    ;(host.querySelector('.ghm-agenda-action') as HTMLButtonElement).click()
+    await Promise.resolve()
+
+    const consents = host.querySelector<HTMLFieldSetElement>('.ghm-consents')!
+    const checks = consents.querySelectorAll<HTMLInputElement>("input[type='checkbox']")
+
+    expect(consents.tagName).toBe('FIELDSET')
+    expect(consents.querySelector('legend')?.textContent).toBe('Privacidad y comunicaciones')
+    expect(checks).toHaveLength(2)
+    expect(checks[0]?.name).toBe('processingAccepted')
+    expect(checks[0]?.required).toBe(true)
+    expect(checks[1]?.name).toBe('communications')
+    expect(checks[1]?.required).toBe(false)
+    expect(consents.textContent).toContain('Quiero recibir contenidos y novedades de Efeonce. (opcional)')
+    expect(consents.textContent).not.toContain('I agree to receive')
+    renderer.destroy()
+  })
+
   it('expone navegación roving de calendario con flechas y estados no basados sólo en color', async () => {
     const { host, renderer } = await mount()
     const activeDate = host.querySelector<HTMLButtonElement>('.ghm-calendar-day[tabindex="0"]')!
@@ -210,6 +252,9 @@ describe('MeetingRenderer', () => {
     expect(host.querySelectorAll('.ghm-calendar-day[tabindex="0"]')).toHaveLength(1)
     expect(activeDate.dataset.date).toBe('2026-07-22')
     expect(activeDate.querySelector('.ghm-availability-meter')).not.toBeNull()
+    expect(activeDate.querySelector('.ghm-calendar-available')?.getAttribute('aria-hidden')).toBe('true')
+    expect(activeDate.querySelector('.ghm-calendar-available-count')?.textContent).toBe('3')
+    expect(activeDate.querySelector('.ghm-calendar-available-label')?.textContent).toBe('opciones')
     expect(activeDate.querySelector('.tabler-check')).not.toBeNull()
 
     activeDate.focus()

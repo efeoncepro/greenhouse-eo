@@ -715,3 +715,31 @@ Los `CODEX_TASK_*` existentes siguen vigentes como legacy. Para migrar uno al fo
 7. Mapear `File structure` -> `Files owned`
 8. Agregar `Type` segun naturaleza de la task
 9. Derivar Checkpoint y Mode de Priority x Effort
+
+
+## Barrido por dominio antes de crear una task (2026-07-25)
+
+**Antes de reservar un ID, barrer el registry por DOMINIO y por SUPERFICIE — no por el título que se le quiere dar
+al trabajo.** Dos tasks de la misma superficie con nombres distintos **no se cruzan** en un barrido por nombre.
+
+La pregunta correcta es **"¿quién es dueño de esta superficie?"**, no *"¿existe una task con este nombre?"*.
+
+**Caso fuente:** en una sesión se crearon **cinco tasks duplicadas** en `EPIC-028`. *"Feed + viewer sobre el
+payload cliente"* y *"Producer Resilient Feed and Viewer"* son la misma superficie con dos nombres; *"Motion del
+payload cliente"* pisaba a la task dueña de los contratos visual/flow/motion de la suite. Tres hubo que retirarlas
+y devolver su contenido a mano — deltas **y** criterios exigibles, porque prosa no es criterio.
+
+**Por qué importa más de lo que parece:** dos specs de la misma superficie **se separan con el tiempo**, y después
+nadie sabe cuál manda. En la misma sesión eso ya había producido un criterio de retiro que medía **12 de 38**
+capabilities, porque había dos fuentes y se midió la equivocada.
+
+**Cómo barrer:**
+
+1. títulos de un rango — `grep -oE '^\| `TASK-1[0-9]{3}` \| `[a-z-]+` \| \*\*[^*]{1,80}' docs/tasks/TASK_ID_REGISTRY.md`
+2. leer el `## Summary` de las candidatas: **el registry trunca y el solapamiento vive en el Summary**
+3. en un epic con más de 20 hijas, esperar que varias describan la misma superficie desde ángulos distintos —
+   **foundation · resiliencia · port · rediseño**. Eso es legítimo; una sexta descripción no lo es
+
+**Si ya existe dueña, NO crear task nueva.** Agregar `## Delta` con el aporte **y** los criterios como checkboxes
+en su `## Acceptance Criteria`; migrar wireframe/flow/motion con `git mv` a la nomenclatura de la dueña y
+actualizar sus campos en `## Status`, o quedan huérfanos por nombre.

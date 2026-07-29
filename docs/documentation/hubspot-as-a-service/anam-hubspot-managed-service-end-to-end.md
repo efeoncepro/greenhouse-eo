@@ -1,8 +1,8 @@
 # ANAM HubSpot Managed Service end-to-end
 
 > **Tipo:** Documentación funcional
-> **Versión:** 1.3
-> **Actualizado:** 2026-07-17
+> **Versión:** 1.4
+> **Actualizado:** 2026-07-24
 > **Cliente/portal:** ANAM / `19893546`
 > **Canon técnico:** [`../../architecture/kortex/hubspot-as-a-service/README.md`](../../architecture/kortex/hubspot-as-a-service/README.md)
 > **Manual:** [`../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md`](../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md)
@@ -29,21 +29,21 @@ un ítem fuente de facturación. No se deben aplanar estos hechos en Company o D
 ## Customer Agent y landing
 
 La landing live abre el chat oficial con tres intenciones: cotizar, seguimiento del servicio y requerimientos de
-calidad. Customer Agent responde conocimiento documentado, reúne contexto y deriva a Maria Paz Haeger cuando
-hace falta una acción humana. El source pack independiente y reconciliado versiona las 23 fuentes en uso, las
+calidad. Customer Agent responde conocimiento documentado, reúne contexto y deriva a una persona del equipo cuando
+hace falta una acción humana. El nombre del assignee se mantiene como routing interno y no forma parte del copy
+visible. El source pack independiente y reconciliado versiona las 23 fuentes en uso, las
 17 respuestas cortas, el catálogo de 356 registros y el contrato de identidad/directrices/handoff/canales.
 
-Aunque la compra de Customer Agent y 30.000 créditos adicionales fue confirmada el 16 de julio, el readback live
-del 17 de julio mostró 33.000 créditos mensuales, `El acceso gratuito terminó`, agente pausado y conversaciones
-nuevas en pausa. La cuenta está vencida por la factura `#760627868` (venció el 7 de junio de 2026) y HubSpot
-rechazó dos intentos confirmados de activar el uso de créditos. Es un bloqueo administrativo de facturación, no
-una eliminación de la configuración ni falta nominal de créditos. No hubo mutación efectiva durante los intentos.
+El readback del 24 de julio confirmó que Customer Agent volvió a operar, con live chat activo y cobertura de todas
+las horas. El bloqueo administrativo observado el 17 de julio queda como antecedente histórico, no como estado
+vigente. Los ajustes posteriores de Seguimiento, Calidad y copy neutral fueron publicados tras una comprobación
+previa sin problemas. El simulador live no respondió en la regresión posterior y esa prueba debe repetirse.
 
 ## Estado por fase
 
 | Fase | Estado | Resultado vigente |
 |---|---|---|
-| Customer Agent y landing | Configuración cerrada; runtime bloqueado | Landing, tres intents, 23 fuentes, handoff y QA; agente pausado por acceso al 2026-07-17. |
+| Customer Agent y landing | Operativo; mejora publicada | Landing, tres intents, 23 fuentes y canal activo. Ajustes de Seguimiento, Calidad y handoff neutral publicados; regresión live complementaria pendiente. |
 | Growth y calidad | Cerrada | Data Quality `21144697`, Growth `19708354`, siete assets y outcome exacto. |
 | Catálogo | Suficiente | 505/506 líneas tienen Product; 220/220 líneas ganadas resuelven a Product. |
 | Service y contrato | Piloto live | Grupo, diez propiedades, asociaciones, cinco Services y workflow `1852406585`. |
@@ -86,6 +86,30 @@ Renovación conserva los stage IDs y ahora expresa el proceso real desde `Por re
 renovado` o `No aplica / Desestimado`. La creación ordinaria parte en `Por revisar`; las cuatro etapas abiertas
 exigen `Paso siguiente`. Las automatizaciones de tareas por entrada futura a etapa quedaron diseñadas, no
 publicadas: requieren un slice con owner, vencimiento, notificación y prueba sin enrolamiento histórico.
+
+## Metas y visualización comercial
+
+El 24 de julio quedaron operativas tres familias de metas nativas en HubSpot para siete responsables:
+
+- adjudicación en `Crecimiento - Nuevos Negocios`: cuatro ingenieros de venta con 400 UF/mes cada uno y tres
+  asistentes comerciales con 150 UF/mes cada uno; total 2.050 UF/mes y 24.600 UF/año;
+- 50 correos enviados por persona por semana;
+- 5 reuniones programadas por persona por semana.
+
+El panel [`ANAM — Backlog comercial (PILOTO)`](https://app.hubspot.com/reports-dashboard/19893546/view/21329151)
+conserva los informes nativos preexistentes y agrega la cola comercial abierta, más nueve visualizaciones de
+metas: indicador agregado, evolución temporal y desglose por responsable para adjudicación, correos y reuniones.
+Las metas también se pueden revisar en
+[`HubSpot Goals`](https://app.hubspot.com/goals/19893546/overview).
+
+No se fabricaron equivalencias para metas que la suscripción no representa fielmente. `Llamadas hechas` cuenta
+todas las llamadas y no permite limitarse a los cinco tipos acordados; no existen plantillas nativas equivalentes
+para volumen de ofertas/oportunidades calificadas ni tasa de cierre superior a 30%; y Fidelización todavía no
+tiene métrica, valor, cadencia ni población aprobadas.
+
+La meta de adjudicación es sólo Growth. El backlog comercial combina Growth y Renovación, por lo que el panel
+mantiene `(PILOTO)` hasta que ANAM entregue una meta de Fidelización o apruebe una comparación estratégica
+limitada a Growth.
 
 ## Calidad de datos y disciplina comercial
 

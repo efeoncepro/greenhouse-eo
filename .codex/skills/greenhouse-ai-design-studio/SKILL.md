@@ -14,6 +14,17 @@ Do not replace this orchestrator with a loose list of skills. It owns the order,
 artifacts, checkpoints and acceptance gate. Specialist skills are lanes inside
 this loop.
 
+## AXIS foundation pointer
+
+AXIS is Efeonce's portable product-UI foundation and Lab, not a second
+Greenhouse runtime. Use native adapters: MUI in Greenhouse and Tailwind v4 in
+Globe. Resolve visual values through semantic tokens and `tokens.ts`; never add
+literal design values. Consult
+`docs/architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md` and
+`docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`. `TASK-1591` now
+has an opt-in consumer pilot verified at package `0.1.4`; do not infer product-promotion
+readiness from the pilot alone.
+
 ## Canonical sources
 
 Read before decisions:
@@ -47,6 +58,20 @@ Use the minimum lanes that apply:
 - `greenhouse-browser-diagnostics`: runtime/browser failures and evidence.
 - `greenhouse-mockup-builder`: mockup-only route when a runtime surface should
   not be touched before direction approval.
+
+Materialization lanes (how the approved direction becomes code). They own craft,
+never the loop: they do not re-declare the score gate, the Figma Implementation
+Contract or GVC — this orchestrator owns those.
+
+- `tailwind-engineer`: theme, custom utilities, variants, layers, content
+  detection, SSOT → `@theme` → class. Routes by repo dialect; in greenhouse-eo
+  the MUI/AXIS theme is the SSOT and logical properties are mandatory.
+- `css-architect`: cascade, `@layer`, specificity, `@scope`, container queries,
+  anchor positioning, containment, and the diagnosis of style that does not
+  apply or gets overridden.
+- `html-react-engineer`: correct HTML element, platform behaviour (`<dialog>`,
+  `popover`, invoker commands, customizable select) and React 19 component
+  composition. Render topology stays with `frontend-architect`.
 
 Never cite unavailable skills as required dependencies. If a desired specialty
 is unavailable, the orchestrator owns the decision using the canonical docs and

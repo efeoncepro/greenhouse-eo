@@ -12,7 +12,7 @@ Permite obtener un **estimado de precio** de un servicio del catálogo preguntan
 ## Antes de empezar
 
 - El servicio tiene que existir en el catálogo con su **receta** (roles/horas/tools). Un servicio sin receta no es priceable y no aparece.
-- El precio se calcula sobre el **paquete estándar** del servicio (horas/tier por defecto). Para una cotización ajustada al alcance real, usá el cotizador completo.
+- El precio se calcula sobre el **paquete estándar** del servicio (horas/tier por defecto). Para una cotización ajustada al alcance real, usa el cotizador completo.
 
 ## Cómo se usa
 
@@ -21,7 +21,7 @@ Permite obtener un **estimado de precio** de un servicio del catálogo preguntan
 Preguntale directo: *"¿Cuánto cuesta un servicio de diseño digital?"* (opcionalmente "…en CLP").
 
 - Si hay un solo servicio que coincide → responde el estimado + moneda.
-- Si hay varios → te pregunta a cuál te referís (elegís y repreguntás).
+- Si hay varios → te pregunta a cuál te refieres (eliges y repreguntas).
 - Si no existe → te lo dice; no inventa un precio.
 
 ### Desde un agente externo (MCP)
@@ -50,6 +50,6 @@ La regla la aplica el servidor: un cliente **no puede** pedir el perfil interno.
 
 ## Problemas comunes
 
-- **"No encontré un servicio que coincida"**: el nombre no matchea ningún servicio activo con receta. Probá el nombre exacto o el SKU, o verificá que el servicio tenga receta en el catálogo.
+- **"No encontré un servicio que coincida"**: el nombre no matchea ningún servicio activo con receta. Prueba el nombre exacto o el SKU, o verifica que el servicio tenga receta en el catálogo.
 - **Pide aclaración siempre**: hay varios servicios con nombres parecidos; afina el nombre.
 - **403 / forbidden en la API**: falta la capability `commercial.quote.simulate` para ese rol.

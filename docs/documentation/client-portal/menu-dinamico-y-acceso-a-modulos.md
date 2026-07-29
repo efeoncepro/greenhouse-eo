@@ -162,7 +162,7 @@ Cuando comercial activa un nuevo modulo via Admin Center, el cache se invalida a
 ## Para equipo comercial y account: que cambia para ti
 
 - Tu account ahora puede tener una matriz real de modulos contratados. Ya no es "Globe vs Wave vs CRM Solutions" como dimensiones binarias — cada modulo (incluyendo addons) se activa o desactiva individualmente.
-- Para vender un addon a un cliente Globe existente: activalo desde `/admin/client-portal/organizations/[orgId]/modules` y avisa al cliente que en su proxima sesion lo va a ver.
+- Para vender un addon a un cliente Globe existente: actívalo desde `/admin/client-portal/organizations/[orgId]/modules` y avisa al cliente que en su proxima sesion lo va a ver.
 - Si un cliente reporta que "no veo X cosa" o "me sale un mensaje raro": revisa que modulos tiene activos en su organization. El portal solo le muestra lo que su comercial le encendio.
 
 > Detalle operativo paso a paso: [Manual de uso del portal cliente — menu dinamico y empty states](../../manual-de-uso/client-portal/menu-dinamico-y-empty-states.md)

@@ -42,6 +42,7 @@ Motor **encendido en staging y producción**. Primer CTA (`ai-visibility-report-
    | `link_url` | `{ kind, url, openInNewContext? }` | Solo path interno (`/algo`) o HTTPS; sin `javascript:`/`data:`, sin `//host`, sin credenciales embebidas |
    | `open_think_tool` | `{ kind, toolPath: '/brand-visibility', campaignUtm?: { source/medium/campaign/term/content }, openInNewContext? }` | `toolPath` es un **path del hub Think** (el host lo pone el motor — nunca lo elige el autor); sin `?`/`#` propios; contexto de campaña SOLO por UTM permitidas |
    | `book_meeting` | `{ kind, meetingUrl, openInNewContext? }` | Solo HTTPS en hosts de agenda gobernados (`meetings*.hubspot.com`; extras vía env `GROWTH_CTA_BOOKING_URL_HOSTS`). **Navegación pura: cero write CRM por click** |
+   | `open_meeting_scheduler` | `{ kind, meetingSurfaceId, schedulerKey }` | Requiere un `meeting_surface_binding` activo. Abre la experiencia nativa en diálogo/full-screen, sin URL ni fallback visible de HubSpot; recuperación por navegación mensual/`Reintentar`. |
 
    **Expectation integrity (regla de autoría):** el `ctaLabel`/footnote debe describir la acción real — "Agendar" abre la agenda (no promete reunión creada), "Ver X" navega. Nunca un label de descarga/resultado que el kind no ejecuta. `openInNewContext` default `false` (mismo contexto).
 2. `POST /api/admin/growth/ctas/{ctaId}/lifecycle` con `{ action: 'submit_review', ctaVersionId }` y luego `{ action: 'publish', ctaVersionId }` (o desde la UI).
@@ -137,7 +138,8 @@ El motor decide server-side si un visitante debe volver a ver un CTA y, con `GRO
 1. Entra a `/growth/ctas` (menú Growth → CTAs). A la izquierda está el inventario; a la derecha,
    el detalle del CTA seleccionado. En pantallas angostas el detalle se abre como panel.
 2. **Crear un CTA:** botón «Crear CTA» → recorre los 8 pasos. En «Acción» las opciones y campos
-   vienen del registro canónico (formulario, URL, herramienta Think, agendador). En «Vista
+   vienen del registro canónico (formulario, URL, herramienta Think, agenda legacy o scheduler nativo). Para
+   `open_meeting_scheduler`, usa exclusivamente la surface y scheduler key gobernadas; no pegues una URL HubSpot. En «Vista
    previa» mueve el ancho del contenedor para ver el morph full → condensed → peek y prueba
    esquema claro/oscuro y ambos hosts. «Revisión» lista los bloqueos; el envío queda
    deshabilitado hasta resolverlos. El resultado siempre lo confirma el servidor.
@@ -152,6 +154,9 @@ El motor decide server-side si un visitante debe volver a ver un CTA y, con `GRO
 6. **Resultados:** revisa los 30 días con deltas. Solo `server_confirmed` es conversión real;
    si ves «Sin datos» en CTR/tasa con una nota de cobertura, es honestidad del sistema (las
    impresiones aún no cubren la ventana), no un bug.
+
+Para el procedimiento específico de binding, continuidad al reabrir, booking controlado y rollback, consulta
+[Configurar un Growth CTA con scheduler nativo](configurar-cta-scheduler-nativo.md).
 
 ## Qué no hacer
 

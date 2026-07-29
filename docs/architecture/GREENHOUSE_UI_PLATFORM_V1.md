@@ -3,7 +3,7 @@
 > **Version:** 2.0 · **Updated:** 2026-06-07
 > **⚠️ Este doc se dividió.** El monolito (~3.000 líneas, mayormente changelog `Delta` append-only) se reestructuró en docs temáticos de **estado vigente** + un **HISTORIAL** cronológico, bajo:
 >
-> ### → [`docs/architecture/ui-platform/`](./ui-platform/README.md) ← empezá por el README (índice + mapa "dónde vive X")
+> ### → [`docs/architecture/ui-platform/`](./ui-platform/README.md) ← empieza por el README (índice + mapa "dónde vive X")
 >
 > Este archivo queda como **router** para no romper las referencias existentes. No agregar contenido nuevo acá.
 

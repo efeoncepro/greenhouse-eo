@@ -69,7 +69,7 @@ Si la proyección no puede resolverse (ej. backend caído, permisos no resoluble
 
 - "No pudimos resolver tu relación con esta organización."
 - "No pudimos cargar tus permisos para esta organización."
-- "No tenés acceso a ninguna sección de esta organización. Hablá con un admin."
+- "No tienes acceso a ninguna sección de esta organización. Habla con un admin."
 
 Nunca renderiza una vista en blanco ni crashea. El error queda capturado en Sentry con `domain=identity` para que ops vea la causa raíz.
 

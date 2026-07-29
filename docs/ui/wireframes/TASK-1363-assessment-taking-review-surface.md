@@ -38,7 +38,7 @@
 | `hiring.assessment.taking.header.title` | 0 | `Evaluación para {rol}` | `{rol}` | rol público del opening |
 | `hiring.assessment.taking.timer.label` | 0 | `Tiempo restante` | `{mm:ss}` | anuncio en umbrales, no cada segundo |
 | `hiring.assessment.taking.instructions.title` | 1 | `Antes de empezar` | — | tono calmo, no examen intimidante |
-| `hiring.assessment.taking.instructions.body` | 1 | `Vas a responder {n} secciones. Tenés {min} minutos. Una vez que envíes, no podés volver a editar.` | `{n}`,`{min}` | claridad sobre irreversibilidad |
+| `hiring.assessment.taking.instructions.body` | 1 | `Vas a responder {n} secciones. Tienes {min} minutos. Una vez que envíes, no puedes volver a editar.` | `{n}`,`{min}` | claridad sobre irreversibilidad |
 | `hiring.assessment.taking.consent.checkbox` | 1 | `Autorizo el tratamiento de mis respuestas para este proceso de selección.` | — | consentimiento obligatorio |
 | `hiring.assessment.taking.start.cta` | 1 | `Empezar evaluación` | — | verbo + objeto; arranca el timer |
 | `hiring.assessment.taking.progress.label` | 3 | `Sección {i} de {total}: {competencia}` | `{i}`,`{total}`,`{competencia}` | nombrado por competencia |
@@ -60,7 +60,7 @@
 | `hiring.assessment.review.queue.empty.title` | 6 | `Sin respuestas pendientes` | — | empty state |
 | `hiring.assessment.review.queue.empty.body` | 6 | `Cuando el candidato envíe respuestas abiertas, aparecen acá para que las corrijas.` | — | 5-part empty |
 | `hiring.assessment.review.rate.confirm` | 7 | `Confirmar puntaje` | — | command |
-| `hiring.assessment.review.rate.ai_suggestion` | 7 | `Sugerencia de IA (revisá antes de confirmar)` | — | solo si TASK-1361 activa |
+| `hiring.assessment.review.rate.ai_suggestion` | 7 | `Sugerencia de IA (revisa antes de confirmar)` | — | solo si TASK-1361 activa |
 
 ## State Copy
 
@@ -70,7 +70,7 @@
 | loading | — | — | — | skeleton + `aria-busy` |
 | empty (cola) | `Sin respuestas pendientes` | `…aparecen acá para que las corrijas.` | — | 5-part |
 | partial (scorecard) | competencia sin corregir | muestra `Pendiente`, no `0` | corregir | honest degradation |
-| error | `No pudimos cargar la evaluación` | `Probá de nuevo en unos minutos.` | `Reintentar` | genérico, sin leak |
+| error | `No pudimos cargar la evaluación` | `Prueba de nuevo en unos minutos.` | `Reintentar` | genérico, sin leak |
 | denied (token) | `Este enlace no está disponible` | `Puede haber expirado o ya haberse usado.` | contactar | no revelar detalle |
 | submitted | `¡Listo! Recibimos tu evaluación` | `El equipo va a revisar tus respuestas.` | — | terminal |
 | expired | `Se acabó el tiempo` | `Guardamos lo que alcanzaste a responder.` | — | terminal honesto |

@@ -363,7 +363,7 @@ Body: { kind: 'expense_payments' | 'income_payments', dryRun?: true, ... }
 Capability: finance.payments.repair_clp (FINANCE_ADMIN + EFEONCE_ADMIN)
 ```
 
-El endpoint resuelve rate histórico al `payment_date` desde `greenhouse_finance.exchange_rates` y poblá `amount_clp + exchange_rate_at_payment + requires_fx_repair=FALSE` per-row atomic. Idempotente. Outbox audit `finance.payments.clp_repaired` v1.
+El endpoint resuelve rate histórico al `payment_date` desde `greenhouse_finance.exchange_rates` y pobla `amount_clp + exchange_rate_at_payment + requires_fx_repair=FALSE` per-row atomic. Idempotente. Outbox audit `finance.payments.clp_repaired` v1.
 
 ### Steady state esperado
 

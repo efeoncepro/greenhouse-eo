@@ -7,6 +7,7 @@ Auditorías de costo cloud (GitHub Actions, GCP, Vercel) — reproducibles, basa
 | Audit | Fecha | Alcance |
 |---|---|---|
 | [CLOUD_COST_AUDIT_2026-05-24.md](CLOUD_COST_AUDIT_2026-05-24.md) | 2026-05-24 | GitHub Actions + GCP + Vercel. Total ~$249/mo. Oportunidades: Gemini seat $22, Artifact Registry $9-13 (TASK-932), Secret Manager $8 (tokens Frame.io muertos), Cloud SQL CUD $15. |
+| [AI_VISIBILITY_GRADER_COST_RECONCILIATION_2026-07-27.md](AI_VISIBILITY_GRADER_COST_RECONCILIATION_2026-07-27.md) | 2026-07-27 | Reconciliación de runs reales del grader, providers, extracción LLM y Cloud Run compartido. US$0,3067 observado/recalculado como subtotal de providers; costo all-in pendiente. |
 
 ## Herramientas reproducibles relacionadas
 

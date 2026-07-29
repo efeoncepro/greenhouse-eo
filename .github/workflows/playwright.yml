@@ -32,6 +32,7 @@ on:
 
 permissions:
   contents: read
+  packages: read
   id-token: write # Required for Workload Identity Federation to GCP (Cloud SQL Connector for the smoke-lane publisher)
 
 concurrency:
@@ -76,7 +77,13 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npmrc="$RUNNER_TEMP/greenhouse-npmrc"
+          trap 'rm -f "$npmrc"' EXIT
+          printf '%s\n' '@efeoncepro:registry=https://npm.pkg.github.com' '//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}' > "$npmrc"
+          NPM_CONFIG_USERCONFIG="$npmrc" pnpm install --frozen-lockfile
 
       - name: Verify Chrome browser
         # GitHub's Ubuntu runners include Chrome. CI uses the system channel to
