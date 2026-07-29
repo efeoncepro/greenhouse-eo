@@ -98,10 +98,12 @@ Greenhouse worker build identity:
 ```
 
 This cross-project binding is temporary and intentionally avoids a second copy of the
-PAT. When the dedicated machine identity replaces the operator-owned PAT, create the
-replacement secret under the ecosystem owner, migrate both consumers, revoke the
+PAT. The retirement condition is an ownership decision, not the PAT expiry: when the
+dedicated machine identity is created, its replacement secret must be born in a neutral
+AXIS ecosystem project outside any product project. Migrate both consumers, revoke the
 Greenhouse binding to this legacy secret, and remove the legacy secret only after both
-consumers pass their build and digest gates.
+consumers pass their build and digest gates. Do not recreate the coupling by placing the
+replacement secret in `efeonce-globe` merely because the legacy secret is there today.
 
 The Greenhouse deploy scripts for `ops-worker`, `commercial-cost-worker` and
 `ico-batch-worker` use the same contract. Their Dockerfiles mount the secret in

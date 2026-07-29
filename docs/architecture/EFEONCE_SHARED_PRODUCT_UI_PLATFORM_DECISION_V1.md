@@ -73,8 +73,11 @@ persistencia o jobs.
   Greenhouse `183008134038-compute@developer.gserviceaccount.com` tienen
   `roles/secretmanager.secretAccessor` sobre ese secreto. La ubicación es ownership
   deliberado del ecosistema AXIS, no una credencial exclusiva de Globe; no se duplica
-  el PAT. Este binding cross-project se retira al migrar ambos consumers a una identidad
-  de máquina dedicada y rotar el secreto, con sus gates de build/digest completos.
+  el PAT. La retirada es una decisión de ownership, no un vencimiento: al crear la
+  identidad de máquina, el secreto nuevo debe nacer en un proyecto neutral del
+  ecosistema AXIS, fuera de cualquier producto. Sólo después de migrar ambos consumers
+  y completar sus gates de build/digest se revoca el binding cross-project y se retira
+  el secreto legado; nunca se recrea en `efeonce-globe` por inercia.
 - Greenhouse y Globe consumen `efeonce.status` y `efeonce.progress` en adapters opt-in de
   `TASK-1591`, cada uno con una primitive simple y una compleja nativa a su runtime.
 - El token de GitHub usado para esta preparación es operator-owned y tiene expiración

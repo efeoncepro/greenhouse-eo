@@ -19,6 +19,11 @@ Se concedió `secretAccessor` únicamente a `183008134038-compute@developer.gser
 logs, imagen, artefactos ni runtime. Gates locales `worker-build-contract`, `worker-runtime-deps` y 10 tests focales
 pasaron. Falta push/PR, CI, reintentar el orchestrator y verificar los tres digests/health checks.
 
+La ubicación en `efeonce-globe` es un acoplamiento legado deliberado y temporal, no ownership de Globe. La decisión de
+retiro está atada a ownership: cuando se cree la identidad de máquina, el secreto nuevo debe nacer en un proyecto
+neutral del ecosistema AXIS, fuera de cualquier producto; después se migran ambos consumers, se completan build/digest
+gates y se revoca el binding cross-project. No se debe recrear el secreto nuevo en `efeonce-globe` por inercia.
+
 ## 2026-07-29 — PR #164: main promovido, release bloqueado por latencia Sentry (fix en develop)
 
 `develop` quedó en `2ecef6a5c4c8a79a738536fe04192b7343e358b0` y PR #164 promovió todo el contenido a `main` mediante
