@@ -1,6 +1,6 @@
 # Handoff activo
 
-## 2026-07-29 — Production release: Cloud Build AXIS auth blocker identified and fixed in develop
+## 2026-07-29 — Production release: Cloud Build AXIS auth wiring fixed; credential expired
 
 `main` sigue en `9bb780ba4c41bfdf40903b762194fb6bb8085b59`, con CI, CI Deep, smoke, Vercel Production READY,
 preflight y manifest verdes. El orchestrator `30465872005` llegó al gate Production, fue aprobado por la sesión
@@ -12,12 +12,16 @@ La evidencia de Cloud Build (`322e8c71`, `f7da8e53`, `cd604434`) fue `ERR_PNPM_F
 `@efeoncepro/axis-tokens`: `No authorization header was set`. La causa era que los tres Dockerfiles y sus inline
 Cloud Build configs instalaban paquetes privados sin el secreto AXIS.
 
-Fix code-complete en develop, pendiente de PR/gates y nuevo release: los tres deploy scripts leen
+Fix code-complete en develop, con PR #166 pendiente de gates y nuevo release: los tres deploy scripts leen
 `projects/efeonce-globe/secrets/axis-packages-read-token` con `secretEnv`, materializan `.npmrc` efímero con
 `trap`, ejecutan Docker BuildKit `--secret`, y los tres Dockerfiles montan `axis_npmrc` en builder y runtime.
 Se concedió `secretAccessor` únicamente a `183008134038-compute@developer.gserviceaccount.com`. No se expuso token en
 logs, imagen, artefactos ni runtime. Gates locales `worker-build-contract`, `worker-runtime-deps` y 10 tests focales
-pasaron. Falta push/PR, CI, reintentar el orchestrator y verificar los tres digests/health checks.
+pasaron. El carril real de Cloud Build ya montó el `.npmrc`, pero GitHub Packages respondió `401 Unauthorized` en
+los tres builds nuevos (`d393c460`, `367ee552`, `f356a7bd`); el secreto tiene una única versión creada el
+2026-07-28 y su PAT está vencido o revocado. Por tanto falta renovar el PAT read-only fuera del repositorio,
+crear una nueva versión del secreto y revalidar CI, Vercel y los tres digests/health checks. No se debe subir la
+credencial local del operador ni imprimirla.
 
 La ubicación en `efeonce-globe` es un acoplamiento legado deliberado y temporal, no ownership de Globe. La decisión de
 retiro está atada a ownership: cuando se cree la identidad de máquina, el secreto nuevo debe nacer en un proyecto
