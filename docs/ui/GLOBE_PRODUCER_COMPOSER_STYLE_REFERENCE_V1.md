@@ -1,7 +1,7 @@
 # Globe Producer — Composer · Referencia de estilo e implementación V1
 
 > **Tipo:** Referencia de implementación (valores exactos, no intención)
-> **Versión:** 1.0 · **Creado:** 2026-07-27
+> **Versión:** 1.1 · **Creado:** 2026-07-27 · **Última actualización:** 2026-07-29 (legibilidad y jerarquía)
 > **Para qué sirve:** reescribir el composer **sin volver a decidir nada**. Cada valor de acá fue medido en
 > browser o leído del contrato; ninguno es estimado.
 > **Tasks dueñas:** `TASK-1552` (composición) · `TASK-1485` (motor de estilos, ADR-016) · `TASK-1555` (selector
@@ -76,15 +76,27 @@ atrapado detrás del scroll interno del composer.
 
 ## 3 · El dock de herramientas
 
-Fila de iconos bajo el prompt. **Sumar una herramienta cuesta un icono, no 80 px de columna.**
+**Grilla de tres columnas** bajo el prompt (`grid auto-rows-fr grid-cols-3 gap-1.5`), no `flex-wrap`.
+**Sumar una herramienta cuesta un icono, no 80 px de columna.**
 
-| Herramienta | Icono | Apertura |
-|---|---|---|
-| Prompt negativo | `ti-circle-minus` | popover |
-| Seed | `ti-dice-5` | popover |
-| Style DNA | `ti-dna-2` | panel lateral |
-| Retoque regional | `ti-brush` | panel lateral |
-| Más | `ti-dots` | — |
+| Herramienta | Rótulo visible | Icono | Apertura |
+|---|---|---|---|
+| Prompt negativo | **Excluir** | `ti-circle-minus` | popover |
+| Seed | Seed | `ti-dice-5` | popover |
+| Style DNA | Style DNA | `ti-dna-2` | panel lateral |
+| Retoque regional | **Retoque** | `ti-brush` | panel lateral |
+| Más | Más | `ti-dots` | — |
+
+⚠️ **Los rótulos son de UNA palabra por medición, no por gusto.** «Excluir del resultado» a 12 px pide
+~138 px y la celda más ancha que llega a existir es 124 px (77 px a 320). No cabía en ningún ancho:
+envolvía a dos renglones y estiraba el dock de 94 a 127 px. Ver el delta del 2026-07-29 (segunda tanda).
+
+| Valor del dock | Vigente |
+|---|---|
+| Tamaño del rótulo | `text-xs` (12 px) — **NO** `text-2xs`, prohibido fuera de chips sobre media |
+| Peso del rótulo | regular, heredado (`text-muted`). El dock se subordina por **peso**, no por tamaño |
+| Alto mínimo de la pastilla | `min-h-11` (44 px), en todos los anchos |
+| Filas | `auto-rows-fr` — todas iguales a la más alta |
 
 **Regla de apertura:** popover para lo chico (seed, negativo, cámara); **panel lateral para lo que necesita ver
 la imagen** (Style DNA, retoque, efectividad). *Si necesita lienzo, va al panel.*
@@ -151,16 +163,21 @@ aclara**, que es lo que significa elevarse en una UI oscura y lo que el aserto d
 **Delta 2026-07-28 — ritmo INTERNO del pozo, y la inserción se mide contra el campo.** El operador reportó
 «muy apretado» y «Mejorar y Recientes están como montados». Ambos eran medibles:
 
+⛔ **La primera fila de esta tabla quedó SUPERSEDED el 2026-07-29:** los botones ya no flotan. Ver
+«Delta 2026-07-29 (2) → Los botones del prompt bajan al flujo». Las otras tres filas siguen vigentes.
+
 | Síntoma | Medición | Corrección |
 |---|---|---|
-| Botones «montados» sobre el lienzo | el grupo salía **4 px por arriba y 4 px por la derecha** del textarea | `top-6`/`right-6`: quedan **10 px dentro** del campo |
+| ~~Botones «montados» sobre el lienzo~~ | ~~el grupo salía **4 px por arriba y 4 px por la derecha** del textarea~~ | ~~`top-6`/`right-6`: quedan **10 px dentro** del campo~~ — **retirado: el grupo va en flujo** |
 | Bloque apretado | hueco campo → Sugerencias = **0 px** | `mt-4` (16 px) |
 | Bloque apretado | hueco Sugerencias → dock = 10 px | `mt-4` (16 px), en el dock para que sirva también cuando las sugerencias desaparecen |
 | Etiqueta pegada a la caja | hueco pozo → `Modo` = **0 px** | `mt-5` (20 px) |
 
 Causa del desborde: los botones son `absolute` contra el **padding-box** de la barra (10 px), mientras el
 textarea entra por el **padding** de la barra (14 px). Esos 4 px de diferencia eran el «montado». La regla
-que queda: **la inserción de los flotantes se mide contra el CAMPO, no contra la caja del bloque.**
+que quedaba entonces —*la inserción de los flotantes se mide contra el CAMPO, no contra la caja del
+bloque*— **ya no aplica a estos botones**, porque dejaron de ser flotantes; sigue valiendo para cualquier
+otro elemento que sí lo sea.
 
 Escalera vertical resultante: **16 px dentro del pozo · 20 px entre el pozo y `Modo` · 32 px entre bloques**
 (`gap-8`, ya verificado consistente en los cuatro bloques). El bloque de intención pasa de 239 a 263 px.
@@ -298,13 +315,46 @@ degradar a «sin opción», no renderizar un control imposible. Reportado a `TAS
 
 ### 4.7 · Riel — sólo dinero
 
-Dos preguntas distintas, no el mismo número dos veces:
+Estructura vigente, de arriba abajo (verificada en `ProducerComposer.tsx`):
 
-- **Arriba (¿me alcanza?):** `Tienes 340 créditos · esto reserva 12`
-- **En el botón (¿cuánto cuesta?):** `Generar · 12 créditos` con `ti-sparkles`
+| Slot | Contenido | Clase |
+|---|---|---|
+| Rótulo | `Costo estimado` | `text-meta text-faint` |
+| Estado | `Se calcula antes de gastar` · `Vigente` · `Recalculando` · `Bloqueado` | `text-xs font-semibold`, color por estado (abajo) |
+| Cifra | `ti-sparkles` + `12 cr` | `font-semibold tabular-nums`, color por estado |
+| Instrucción | la única línea accionable del riel | `text-sm leading-normal text-muted` |
+| CTA | `ti-wand` + `Generar` · `12 cr` | `min-h-12`, `data-capture='producer-generate-primary'` |
 
-**La cantidad y la duración se reflejan en ambos al instante.** Un multiplicador invisible es cómo se gasta de
-más.
+🔴 **`Tienes 340 créditos · esto reserva 12` NO existe en el riel.** Era la intención escrita de la V1 y
+nunca se implementó ahí: la pregunta «¿me alcanza?» la responde hoy la **píldora de créditos de la
+cabecera** y su panel, no el composer. Si algún día baja al riel, entra como un slot nuevo — no como
+sustituto de los cinco de arriba.
+
+**El reparto del color, que ES el criterio y no una preferencia:**
+
+| Elemento | Estado | Color |
+|---|---|---|
+| Línea de estado | `stale` (incluye `Bloqueado`) | `text-warm` |
+| Línea de estado | `absent` / `current` | `text-muted` |
+| Cifra | hay cifra | `text-warm` |
+| Cifra | `absent` (es un `—`) | `text-faint` |
+| Instrucción | siempre | `text-muted` |
+
+Orden de lectura resultante: **cuánto cuesta › qué hacer › en qué estado está.** `--warm` es el color de
+máxima atención de la paleta: se reserva para **dinero real** y para **el estado que reclama**.
+
+⚠️ **`font-semibold` es explícito en el `<strong>` y en el `<b>`, y no es redundante.** Esta superficie
+corre **sin preflight**, así que ambos conservan el `font-weight: bolder` del navegador → 700 sobre
+**Geist**, que sólo carga 400 y 600: el browser sintetiza el corte y el trazo sale embarrado. El 700
+legítimo sólo existe acompañado de `font-display` (Poppins sí trae ese archivo).
+
+**Scrim del riel.** El riel es translúcido (`--rail`, `.58` + blur) y el cuerpo del composer scrollea por
+detrás. Un pseudo-elemento `before:` anclado a `bottom-full` (`h-6`, `--rail-scrim`, `pointer-events-none`)
+disuelve el contenido que pasa: sin él el último renglón queda **guillotinado a media letra**, que se lee
+como roto. **NO se opaca el riel** — el problema es el filo, no la transparencia.
+
+**La cantidad y la duración se reflejan al instante en cifra y CTA.** Un multiplicador invisible es cómo se
+gasta de más.
 
 ---
 
@@ -341,8 +391,14 @@ Tokens: `--duration-none|short|overlay|breathe|flame|progress` · `--ease-enter|
 | Abrir herramienta | **FLIP**: medir, abrir, medir, animar la diferencia con `transform` — **nunca `height`** |
 | Layout morph | **ninguno** |
 
-🔴 **Estado actual:** la atenuación del estimado **no existe**. El código decide `status.kind === 'stale'` pero
-no lo pinta. Es el motion que el contrato llama el más importante de la superficie.
+✅ **Estado actual (verificado 2026-07-29):** la atenuación del estimado **ya existe**. Se implementó el
+2026-07-27 y hoy es `transition-opacity duration-(--duration-short) ease-enter motion-reduce:transition-none`
+con `opacity-45` cuando `status.kind === 'stale'` y `opacity-100` en el resto, sobre el contenedor que lleva
+`data-estimate-state`. El estado atenuado **no se apaga** bajo `prefers-reduced-motion`: lo que se apaga es
+la interpolación.
+
+> Este documento decía «no existe» hasta esta revisión. Un pendiente que sobrevive a su arreglo hace que el
+> próximo agente vuelva a implementarlo.
 
 ⚠️ **Dos tokens declarados y sin usar:** `--duration-overlay` y `--duration-progress`.
 
@@ -649,3 +705,124 @@ a dar 404 sin aviso.
 
 > Este y otros seis puntos ciegos de verificación —todos con gates verdes— están registrados en
 > [`GLOBE_PRODUCER_VERIFICATION_BLIND_SPOTS_2026-07-29.md`](../audits/globe/GLOBE_PRODUCER_VERIFICATION_BLIND_SPOTS_2026-07-29.md).
+
+---
+
+## Delta 2026-07-29 (2) — legibilidad: lo que se lee deja de vestirse de rótulo
+
+Segunda tanda del mismo día, sobre la superficie **desplegada** y con sesión real. Todo lo de acá está
+verificado en el código vigente de `apps/studio-client/src/surfaces/producer/**`; los valores reemplazan a
+los que este documento traía.
+
+### Los botones del prompt bajan al FLUJO — y con eso muere el `pr-36`
+
+**La corrección estaba a medio aplicar y el síntoma era el placeholder partido en dos.** El comentario del
+código ya decía «las acciones van en flujo», pero el grupo seguía `absolute top-6 right-6` y el textarea
+seguía con `pr-36` (144 px) / `max-sm:pr-32`. Sólo se había cambiado un número mágico por otro más grande.
+
+Medido: `Describe lo que quieres crear` —30 caracteres, ~170 px a 16 px— entra en los 250-300 px del campo,
+pero con 144 px de gutter reservado le quedaban ~110 px y envolvía.
+
+| Elemento | Valor vigente |
+|---|---|
+| Grupo `Mejorar` + historial | `relative mt-2 flex flex-wrap items-center justify-end gap-1.5` (en flujo, debajo del lienzo) |
+| `<textarea>` | `px-4 py-3.5`, **sin** `pr-*` — no hay hueco que reservar |
+| Overlay de prompts recientes | `absolute top-full right-0 z-30 mt-1.5 w-full max-w-80` — cuelga del **grupo**, no de una posición |
+
+⚠️ **La regla que queda:** un `padding` que reserva sitio para un hermano posicionado **miente** en cuanto
+cambia la etiqueta, el idioma o se suma un botón. Y un overlay se ancla a su **disparador**
+(`top-full right-0`), nunca a las coordenadas donde el disparador estaba (`top-11 right-3`): al mover el
+botón, el panel lo sigue solo. `z-30` iguala los tres flotantes del composer; antes éste era `z-10` y podía
+quedar debajo.
+
+### Los textos que se LEEN salen de `--text-meta`
+
+`--text-meta` (11 px) está documentado para «etiqueta, ayuda y disponibilidad **dentro de un control**».
+Cuatro textos de lectura vivían ahí, y uno en `--text-2xs` (10 px), cuyo docblock prohíbe explícitamente la
+superficie client-facing.
+
+| Texto | Antes | Ahora | Por qué |
+|---|---|---|---|
+| Propuesta de «Mejorar» (párrafo) | `text-meta leading-snug` | `text-sm leading-normal` | es prosa que el operador juzga antes de gastar |
+| Eyebrow de esa propuesta | `text-2xs font-bold` | `text-xs font-semibold` | es el rótulo de un panel, no un chip sobre media |
+| Estado vacío de referencias | `text-meta leading-snug` | `text-sm leading-normal` | dos frases que enseñan un concepto |
+| Instrucción del riel (`#generate-help`) | `text-sm … text-faint` | `text-sm … text-muted` | es la única línea accionable del riel |
+| Rótulo del dock | `text-2xs` (10 px) | `text-xs` (12 px) | nombra una capacidad del producto |
+
+⚠️ **`text-sm` y no `text-base`, y está medido.** El `<p>` de la propuesta mide 306–362 px en escritorio
+(282–330 px en el rango compacto). Con `--measure-body` calibrando 8,31 px por carácter a 16 px, a
+`text-base` daría **37–44 caracteres por línea** —bajo el piso de 45 de la banda cómoda— y a `text-sm`
+(7,27 px/carácter) da **42–50**. Acá el paso más grande **empeora** la lectura.
+
+**La escala vigente**, para no volver a elegir de memoria:
+
+| Token | Valor | Para qué |
+|---|---:|---|
+| `--text-micro` | 9 px | metadata mínima adosada a un control |
+| `--text-2xs` | 10 px | ⛔ chips SOBRE media, y sólo eso |
+| `--text-meta` | 11 px | etiqueta/ayuda **dentro** de un control |
+| `--text-xs` | 12 px | rótulo de control, chip, overline |
+| `--text-sm` | 14 px | **texto de lectura** en esta columna |
+| `--text-base` | 16 px | el campo de prompt |
+
+### Cortes de fuente: `<strong>` y `<b>` no bastan
+
+La superficie corre **sin preflight**, así que `<strong>`, `<b>` y `<output>` conservan el
+`font-weight: bolder` del navegador. Las familias cargadas son **Geist 400 y 600** y **Poppins 700**:
+pedirle 700 a Geist hace que el browser **sintetice** el corte engordando el trazo — renderiza, shippea y
+no falla ningún gate visual.
+
+- **Peso 600 → `font-semibold` EXPLÍCITO** en cualquier `<strong>`/`<b>`/`<output>`.
+- **`font-bold` (700) sólo acompañado de `font-display`.**
+- **Peso 400 explícito se escribe `font-regular`**: el theme vacía `--font-weight-*`, así que
+  `font-normal` y `font-medium` no emiten un solo byte.
+
+### El dock: grilla de tres columnas, y el copy es parte de la geometría
+
+Ver §3 para la tabla vigente. Lo que hay que saber para no deshacerlo:
+
+- Con `flex-wrap` cada pastilla se ajustaba a su etiqueta y la fila salía **dentada** (116 px vs. 56 px sin
+  que la diferencia significara nada); la suma natural de las cinco (~387 px + 24 de gaps = **411 px**)
+  desbordaba cualquier ancho y `Más` caía sola a una segunda fila alineada a la izquierda — se leía como un
+  bug de wrap.
+- Tres columnas es lo máximo que entra manteniendo el piso táctil y el rótulo legible en los ~77 px del peor
+  caso (320 px de viewport). Con cinco herramientas quedan **3 + 2**, y la sexta entra en la celda vacía
+  **sin costo vertical**.
+- `auto-rows-fr` iguala los altos: sin él la fila 1 salía a 60,4 px y la fila 2 a 44,2 px — el mismo defecto
+  girado 90°.
+- **El copy es geometría acá.** Rótulos de una palabra («Excluir», «Retoque») dejan las cinco pastillas en
+  una línea. Quien alargue una etiqueta paga ~14 px de alto en TODA la fila.
+
+### `Modo` es sub-sección, no encabezado de bloque
+
+`Modo` vive dentro del bloque 1, así que su patrón es el de `Dirección` y `Modelo`, no el del bloque que lo
+contiene. Vigente: `<h3 id='mode-title' className='m-0 text-xs font-semibold text-text'>` con la sección
+apuntando por `aria-labelledby` (no `aria-label`, que duplicaba en un atributo el texto ya visible).
+
+⛔ **NO promoverlo a encabezado de bloque:** reabriría los seis encabezados del mismo peso compitiendo, que
+es justo lo que el retiro de «Ajustes avanzados» (§3) cerró.
+
+### Token nuevo
+
+| Token | Valor | Para qué |
+|---|---|---|
+| `--rail-scrim` | `linear-gradient(180deg, transparent, rgba(5,13,40,.72) 55%, rgba(5,13,40,.94))` | degradado que muere justo encima del riel; ver §4.7 |
+
+Espeja `--media-scrim` y **no se consolida** con él: aquél va sobre media de color desconocido y tiene que
+tapar cualquier cosa; éste va sobre la superficie del panel y sólo tiene que fundirse con un fondo conocido.
+
+### Fuera del composer, misma tanda
+
+Registrado acá porque lo produjo la misma sesión, aunque el dueño sea otro archivo:
+
+- **Panel de créditos (`ProducerHeader.tsx`).** Se rompía por `max-w-full`, no por el número: un `absolute`
+  resuelve porcentajes contra su bloque contenedor —el ancho del **disparador**—, así que con `500444 disp.`
+  los 352 px del panel quedaban en ~150 y a cada celda le sobraban ~34 px para un número de ~50. Donut
+  desbordado, encabezado clippeado y celdas superpuestas eran **un** bug, no tres. Cada slot pasa a
+  responder una pregunta distinta —dona = porcentaje (`Math.floor`), encabezado = cifra exacta agrupada,
+  celdas = composición— y las cifras van `tabular-nums`. El formateo vive en `src/format/credits.ts`; el
+  umbral de abreviación (1.000.000) está **medido** contra la celda más angosta.
+- **Feed (`ProducerFeed.tsx`).** Barra agrupada en tres clusters (vista+orden · acciones · buscar+filtros)
+  sin esconder nada; `progressLabel` rinde el eje `coarseProgress`, así que un terminal sin error dice
+  **`Listo`** venga de `retained-asset` o de `terminal-run{completed}`; y `posterFor()` decide por los
+  **bytes** (`mimeType`), no por una lista negra de modalidades.

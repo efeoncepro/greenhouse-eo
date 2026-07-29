@@ -29,6 +29,72 @@
 
 # Handoff
 
+## Active state — 2026-07-29 LATEST (TASK-1599: contrato tipográfico + jerarquía del Producer, desplegado y verificado)
+
+**Revisión viva, verificada — no supuesta:**
+
+```bash
+gcloud run services describe globe-studio-internal \
+  --region southamerica-west1 --project efeonce-globe
+# → globe-studio-internal-00100-9kq · Ready · 100% del tráfico
+#   imagen southamerica-west1-docker.pkg.dev/efeonce-globe/globe-runtime/globe-studio-internal:b9112a80985d
+```
+
+El tag de la imagen (`b9112a80985d`) corresponde al tercero de los tres SHA desplegados hoy. Registro:
+[`TASK-1599`](../../tasks/complete/TASK-1599-globe-client-typographic-contract-producer-hierarchy.md).
+
+### Los tres SHA desplegados a `globe-studio-internal`
+
+| SHA | Qué entrega |
+|---|---|
+| **`68a2cbe`** | **Contrato tipográfico.** 13 sitios pedían Geist@700 con sólo Poppins 700 · Geist 400 · Geist 600 cargados: el navegador lo **sintetiza** —engrosa el trazo por algoritmo— sin fallar ningún gate. Incluye los tres KPI de crédito del encabezado y cinco reglas `.pf__*` de la hoja. **Dos gates nuevos**: `never asks a family for a cut it does not load` (aparea familia×peso **en el sitio de uso**, no en la declaración, que estaba sana) y `never writes a font utility the theme cannot generate` (`font-normal`/`font-medium` no emitían CSS). Más `tabular-nums` en siete números vivos y tokens de rótulo que se usaban como prosa |
+| **`d009871`** | **Jerarquía del Producer**, nueve hallazgos de una revisión visual en vivo. El mayor: el **panel de créditos no se rompía por el número** sino por `max-w-full`, que sobre un elemento `absolute` resuelve contra el bloque contenedor —el `<details>`, o sea el ancho del disparador—; los tres síntomas eran **un** bug. Y `Listo` vs `Completada` no eran dos palabras sino **dos ejes** del contrato (`coarseProgress` vs `state`), así que `stateCompleted` quedó huérfana y se borró |
+| **`b9112a8`** | **Cierre de una regresión propia.** Bajar las acciones del prompt al flujo hizo desbordar el cuerpo y un renglón quedó cortado a media letra contra el riel translúcido. Token nuevo `--rail-scrim` en el SSOT. Más `Math.floor` en el porcentaje del donut: con `round` decía `100 %` junto a `Gastado 166` |
+
+### Qué cambió visiblemente en el Producer
+
+- Los tres KPI de crédito del encabezado dejan de verse con trazo sintetizado y sus cifras dejan de bailar
+  al actualizarse.
+- El panel de créditos deja de recortarse, de tomar anchos absurdos y de quebrar el número.
+- El porcentaje del donut deja de contradecir a la cifra de gasto que tiene al lado.
+- El último renglón del cuerpo del composer deja de quedar cortado contra el riel.
+- Los rótulos del dock vuelven a su escalón tipográfico.
+- El estado de una tarjeta del feed deja de mezclar avance con estado final.
+
+### Verificación
+
+Build 0 · eslint 0 · `node --test` **129/129** · canario de motor **8/8** · canario del composer
+**163/163** · revisión humana en vivo en `https://globe.efeoncepro.com/producer` con sesión real a 1440px,
+contra el deploy real después de cada uno de los tres despliegues. Esa revisión del segundo despliegue fue
+lo que **expuso** la regresión que el tercero cerró.
+
+### 🔴 Puntos abiertos de runtime
+
+1. **El preflight de Tailwind no se emite — SIN DUEÑO.** La regla del navegador
+   `b, strong { font-weight: bolder }` pide el corte fuerte **por herencia, sin que ninguna clase lo diga**.
+   Los gates escanean `className`, no elementos HTML: el caso les es **estructuralmente invisible**.
+   Apareció tres veces en un solo día. Las dos salidas —emitir el preflight (cambia el reset de toda la
+   superficie) o construir una verificación sobre el HTML renderizado (un tipo de gate que hoy no existe)—
+   se identificaron y **ninguna se tomó**: son decisiones del motor de estilos (ADR-016 / `TASK-1485`).
+   **Hoy ninguna task lo reclama.** Si aparece un trazo más pesado de lo pedido sin clase que lo explique,
+   ésta es la causa.
+2. **Frontera de los gates.** Escanean sólo `apps/studio-client/src`. `apps/studio-web` **no está
+   vigilado**: **184 hex crudos** y **4 familias literales** medidos hoy. Dueño: `TASK-1560` Slice 2, que
+   amplía la frontera **antes** del borrado del legacy. Hereda dos clases más de las que su spec calculaba.
+3. **Fuga del `axis-pilot-canary` — SIN DUEÑO.** Mata el envoltorio de `pnpm` y **no** el `vite` nieto, que
+   sobrevive reteniendo los pipes. Consecuencia operativa: **`pnpm test` no termina solo** y deja un
+   huérfano en el **puerto 4326 por corrida**. Se acumularon doce, uno de tres días. Mitigación manual
+   mientras no tenga dueño: revisar y matar los procesos huérfanos del puerto 4326 después de correr la
+   suite. **Ninguna task lo reclama hoy.**
+
+### Rollback
+
+De imagen. Ningún slice muta estado durable: sin migraciones, sin backfills, sin transiciones de máquina de
+estados. Desplegar la revisión anterior de `globe-studio-internal` revierte los tres cambios en ~5 min.
+`b9112a8` y `d009871` **van apareados**: revertir sólo el tercero reabre la regresión del riel que cerró.
+
+---
+
 ## Active state — 2026-07-26 (defecto 7 de TASK-1566 desplegado; confirm desbloqueado para el operador)
 
 - `globe-api-internal` → revisión **`00113-l8b`** (Ready), imagen construida de

@@ -125,6 +125,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-1596` | `to-do` | **Globe Distribution and Activation Layer.** EPIC-028; policy; P1/Alto/Medio. Loops de artifacts, templates, content, creators, referrals, integrations, PQL y second-run activation. | `docs/tasks/to-do/TASK-1596-globe-distribution-activation-layer.md` |
 | `TASK-1597` | `to-do` | **Globe Packaging and Unit Economics Validation.** EPIC-028; policy; P1/Muy alto/Alto. Packaging, revenue lanes, cost-to-serve, rights/pass-through y margin gate ≥45%; pricing bloqueado. | `docs/tasks/to-do/TASK-1597-globe-packaging-unit-economics-validation.md` |
 | `TASK-1598` | `to-do` | **Landing pública Influencer Marketing, Creators & UGC.** EPIC-019; public-site/ui-ux; P1/Alto/Medio. Convierte la capability de creator influence en demanda calificada con CTA dual, brief gobernado, prueba de método, derechos y medición; sin marketplace ni runtime nuevo. | `docs/tasks/to-do/TASK-1598-landing-influencer-marketing-creators-ugc.md` |
+| `TASK-1599` | `complete` | **Contrato tipográfico del payload cliente de Globe + jerarquía del Producer.** EPIC-028; ui-ux/layout; ui-standard; P1/Alto/Medio. Cierra lo que `TASK-1561` dejó nombrado y abierto: un peso sin archivo lo **sintetiza el navegador** sin fallar nada, y 13 sitios pedían Geist@700 (cargados: Poppins 700 · Geist 400 · Geist 600). Dos gates nuevos —aparear familia×peso **en el sitio de uso**, y rechazar la utilidad de fuente que el theme no puede generar—, `tabular-nums` en 7 números vivos, primitive `format/credits.ts`. Jerarquía del Producer: el panel de créditos **no se rompía por el número** sino por `max-w-full` sobre un `absolute` (resuelve contra el `<details>`) — 3 síntomas, 1 bug; y `Listo` vs `Completada` eran **dos ejes** (`coarseProgress` vs `state`), no dos palabras. Cierra su propia regresión con el token `--rail-scrim` + `Math.floor` en el donut. **Desplegada y verificada en vivo** (`globe-studio-internal-00100-9kq`, imagen `b9112a80985d`); 129/129 `node --test`, canarios 8/8 y 163/163. **Cinco puntos abiertos, tres SIN DUEÑO**: preflight no emitido (peso heredado invisible al gate), fuga del `axis-pilot-canary` (puerto 4326), H9 del feed (`DISPLAY_TITLE_MAX_LENGTH = 96` recorta por caracteres, ningún ancho lo arregla). | `docs/tasks/complete/TASK-1599-globe-client-typographic-contract-producer-hierarchy.md` |
 
 ## Siguiente ID disponible
 
@@ -1683,4 +1684,9 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 ## Siguiente ID disponible
 
-`TASK-1587`
+`TASK-1600`
+
+> **Corrección 2026-07-29.** Este pie declaraba `TASK-1587`, pero la tabla de este mismo archivo ya
+> registraba hasta `TASK-1598` y esos archivos existen en disco: el pie estaba obsoleto respecto de su
+> propia tabla. Antes de reservar un ID, **verificar contra el sistema de archivos**
+> (`ls docs/tasks/*/TASK-*.md`), no sólo contra este pie. Reservado `TASK-1599` en esa pasada.

@@ -1,6 +1,6 @@
 ---
 name: typography-design-globe-overlay
-description: Pins tipográficos de Efeonce Globe (repo hermano `efeonce-globe`, payload `apps/studio-client`) que ANULAN tanto los defaults del skill global `typography-design` como el overlay de Greenhouse. Cargar en lugar del overlay de Greenhouse cuando el trabajo toca Globe. Fija las dos familias y los TRES cortes realmente cargados, la escala de nueve pasos con el contrato escrito de cada token, la trampa de faux bold Geist@700, las utilidades de peso muertas, los ratios de contraste medidos, y la frontera real de los gates.
+description: Pins tipográficos de Efeonce Globe (repo hermano `efeonce-globe`, payload `apps/studio-client`) que ANULAN tanto los defaults del skill global `typography-design` como el overlay de Greenhouse. Cargar en lugar del overlay de Greenhouse cuando el trabajo toca Globe. Fija las dos familias y los TRES cortes realmente cargados, la escala de nueve pasos con el contrato escrito de cada token, la trampa de faux bold Geist@700 (incluido el `<strong>` que ningún gate puede ver), las utilidades de peso muertas, los ratios de contraste medidos y sus scrims, el formato de números con presupuesto de caracteres, y la frontera real de los gates.
 type: overlay
 overrides: typography-design, typography-design-greenhouse-overlay
 applies-to: efeonce-globe/apps/studio-client
@@ -29,6 +29,7 @@ Lo que **sí** comparten, y no se re-litiga: dos familias, Poppins display + Gei
 | **Theme Tailwind** | `apps/studio-client/src/styles/globe-theme.generated.css` | **GENERADO** con `pnpm theme:generate`. Nunca se edita a mano. |
 | **Capa base** | `apps/studio-client/src/styles/tailwind.css` | `html` fija familia/leading; las clases de título (`.pf__title`, `.share-rail__title`, `.share-brand__wordmark`) declaran su peso. |
 | **Gates** | `apps/studio-client/src/gates/design-contract.test.ts` | Prohíbe literales de color, motion y tipografía. **Su frontera está declarada dentro del archivo** — ver §Gates. |
+| **Formato de números** | `apps/studio-client/src/format/credits.ts` (+ `date.ts`) | La forma en que un número se convierte en texto. Locale anclado al producto, umbral de abreviación **medido** contra el slot. |
 | **Contrato de motion** | `docs/architecture/creative-studio/GLOBE_CLIENT_MOTION_CONTRACT_V1.md` (en Greenhouse) | Dueña: `TASK-1523`. |
 | **Compat de legacy** | `LEGACY_TOKEN_DRIFT` (en `tokens.ts`) | Divergencias registradas que **NO se unifican por decreto**. |
 
@@ -59,9 +60,9 @@ Tokens de peso: `--weight-regular: 400` · `--weight-semibold: 600` · `--weight
 
 **El caso asimétrico, que hay que entender para no "arreglar" lo que no está roto:** la síntesis de CSS solo va hacia **más pesado**, nunca hacia más liviano. Pedir 400 en una familia que solo trae 700 **no sintetiza**: el algoritmo de font-matching selecciona el 700 existente. Por eso `font-display` sin peso se ve bien hoy. Pero el peso sale del **fallback**, no de una declaración, así que se declara igual — y por eso las tres clases de título en `tailwind.css` sí escriben `font-weight: var(--weight-display)`.
 
-**Caso fuente (2026-07-29):** trece sitios en producción pedían Geist@700, incluidos los **tres KPI de crédito** del header, el rótulo del stepper del composer y cinco reglas `.pf__*` en `tailwind.css`. El gate tenía un test dedicado a pesos sintetizados y **no los vio**, porque colapsaba las tres caras en un `Set` de pesos `{400,600,700}` — era **ciego a la familia**: `--weight-display: 700` pasaba porque *Poppins* lo tiene, y Tailwind lo exponía después como `font-bold` aplicable a cualquier elemento. El defecto vivía en la frontera token↔uso, que es donde ningún gate miraba.
+**Caso fuente (2026-07-29):** trece sitios en producción pedían Geist@700, incluidos los **tres KPI de crédito** del header, el rótulo del stepper del composer y cinco reglas `.pf__*` en `tailwind.css`. **La mayoría estaba en la hoja, no en JSX** — buscar sólo en `.tsx` habría cerrado el caso con la mitad adentro. El gate tenía un test dedicado a pesos sintetizados y **no los vio**, porque colapsaba las tres caras en un `Set` de pesos `{400,600,700}` — era **ciego a la familia**: `--weight-display: 700` pasaba porque *Poppins* lo tiene, y Tailwind lo exponía después como `font-bold` aplicable a cualquier elemento. El defecto vivía en la frontera token↔uso, que es donde ningún gate miraba. Lección que sobrevive al caso: **un test dedicado puede no cubrir lo que su nombre promete** — antes de confiar en un aserto, lee **qué aparea**.
 
-**Ya está cerrado con gate propio:** `never asks a family for a cut it does not load` resuelve la familia en el sitio de uso y la aparea contra `GLOBE_FONT_FACES` agrupado por familia. Si mañana se agrega `geist-bold.ttf` al manifiesto, el aserto deja de quejarse **solo por eso** — el manifiesto es la autoridad, no una lista escrita a mano.
+**Ya está cerrado con gate propio:** `never asks a family for a cut it does not load` resuelve la familia **en el sitio de uso** y la aparea contra `GLOBE_FONT_FACES` agrupado por familia, mapeando cada `--weight-*` con **`themeKeyFor`** — la misma función que genera el theme, y por eso el aserto honra el alias `--weight-display → font-bold` en vez de suponer que el nombre del token es el nombre de la utilidad. Si mañana se agrega `geist-bold.ttf` al manifiesto, el aserto deja de quejarse **solo por eso** — el manifiesto es la autoridad, no una lista escrita a mano.
 
 ### 🔴 Utilidades de peso: solo existen las que el theme puede generar
 
@@ -77,7 +78,7 @@ Cerrado por el aserto `never writes a font utility the theme cannot generate`, q
 
 El proyecto **no emite el preflight de Tailwind**: no hay `font-weight: bolder` neutralizado en ninguna parte, así que la hoja del navegador aplica `b, strong { font-weight: bolder }`. Un `<strong>` dentro de un contenedor a 600 computa **900**; dentro de uno a 400 computa 700. En ambos casos pide un corte de Geist que no existe → **faux bold sin que ninguna clase lo diga**.
 
-El gate escanea `className`, no elementos HTML, así que **le es estructuralmente invisible**. Es la misma falla una capa más abajo. Al usar `<strong>`/`<b>` en Globe, declara el peso explícitamente (`font-semibold`) en vez de confiar en el default del navegador. Detectado 2026-07-29, **sin dueño asignado todavía**.
+El gate escanea `className`, no elementos HTML, así que **le es estructuralmente invisible**. Es la misma falla una capa más abajo, y por eso no basta con "acordarse": apareció **tres veces el mismo día en sitios distintos**, ya conocida. Al usar `<strong>`/`<b>` en Globe, declara el peso explícitamente (`font-semibold`) en vez de confiar en el default del navegador. Detectado 2026-07-29, **sin dueño asignado todavía**.
 
 ## La escala — nueve pasos, y tres tienen prohibiciones escritas
 
@@ -137,6 +138,8 @@ Rampa de texto sobre los tres fondos reales. **Toda la rampa pasa WCAG AA con ma
 
 Consecuencia operativa: **`--faint` es el último escalón legible y no tiene holgura.** Cualquier token de texto nuevo más tenue que `--faint`, o `--faint` sobre un fondo más claro que `--surface-solid`, cae bajo 4,5:1. No inventes un cuarto escalón de gris para "bajar jerarquía" — la jerarquía se baja con **peso y tamaño**, que es gratis, no con contraste, que es el presupuesto de accesibilidad.
 
+**Esa tabla mide texto sobre un fondo CONOCIDO. Sobre uno que no controlas, el contraste lo garantiza un scrim.** Hay dos y **no se consolidan**: `--media-scrim` protege texto sobre una pieza, y `--rail-scrim` —nuevo el 2026-07-29— protege el riel. El riel era translúcido porque «en desktop nada pasa por detrás»; la premisa se rompió y un renglón quedó **cortado a media letra**. Espejan la misma forma a propósito, pero unificarlos ata la legibilidad del riel a la de una pieza, que es otra decisión. **Una premisa de layout que sostiene legibilidad es un supuesto con fecha de vencimiento: cuando cae, el texto no se degrada — desaparece.**
+
 `--warning` y `--danger` son distinguibles sin depender del tono, pero **el color nunca es el único portador**: toda superficie que los use debe además un icono o una etiqueta.
 
 ## Los gates — y su frontera real
@@ -146,6 +149,8 @@ Consecuencia operativa: **`--faint` es el último escalón legible y no tiene ho
 🔴 **Su frontera está declarada dentro del propio archivo y hay que conocerla: escanea SOLO `apps/studio-client/src`.** `apps/studio-web` —donde viven **184 hex crudos** y **4 familias tipográficas literales**— **NO está vigilado**. La descripción honesta del estado es: *el payload nuevo no puede driftear; el legacy no está mirado*. La frontera se amplía en `TASK-1560` Slice 2, **inmediatamente ANTES** de borrar el legacy y nunca después — un gate rojo al llegar se saltea, y un gate salteado se lee como cobertura.
 
 **Trampa del runner, que ya mordió más de una vez:** el runner es **`node --test`, NO Vitest**, y los scripts `test` de cada package **enumeran los archivos a mano** — no hay glob ni descubrimiento. Un `*.test.ts` nuevo que no se agregue al script `test` de su package **NUNCA corre**, y la suite queda **verde por no haberlo mirado**, que es el peor de los verdes. Confirma que tu test aparece en la salida del run.
+
+**Y esa suite no termina sola (2026-07-29, sin dueño).** El último paso del `test` de `studio-client` es `axis-pilot-canary.test.mjs`, que hace `server.kill('SIGTERM')` sobre el wrapper de `pnpm` y **no sobre el `vite` nieto**: el nieto sobrevive reteniendo los pipes, el comando no retorna y cada corrida deja un huérfano en el puerto **4326** (se acumularon doce, uno de tres días). Workaround verificado: correr los canarios por separado y liberar el puerto antes de la corrida siguiente. Cuenta para el paso 11 de la pasada de auditoría — **«se colgó» no es aquí un verde ni un rojo, y confundirlo con lo normal es cómo un cuelgue real pasa desapercibido**.
 
 ## Reglas duras (NUNCA / SIEMPRE)
 
@@ -164,6 +169,8 @@ Consecuencia operativa: **`--faint` es el último escalón legible y no tiene ho
 - **NUNCA** documentes un anti-patrón tipográfico dentro del árbol que Tailwind escanea (`.ts`/`.tsx`): lo lee como texto plano y **materializa el ejemplo como clase real**.
 - **NUNCA** importes primitives de Greenhouse, MUI ni `<Typography variant>` (ADR-014). Las primitives de Globe viven en `apps/studio-client/src/primitives/index.tsx`.
 - **SIEMPRE** `tabular-nums` en cualquier número que **cambie en vivo** (créditos, contadores, estimados, steppers). Sin cifras tabulares los dígitos cambian de ancho y la fila salta en cada actualización. Un número que no cambia —un id, una etiqueta— no lo necesita: no lo pongas por reflejo.
+- **NUNCA** concatenes separadores de miles a mano ni imprimas un entero con `String(n)`: la primitive es `src/format/credits.ts` (`formatCredits` exacta · `creditReadout` para slot angosto), anclada al locale **del producto** (`es-CL`) y no al del navegador — un lector con el navegador en inglés leería `500,444` como cuatro órdenes de magnitud menos. `creditReadout` abrevia **sólo** desde 1.000.000, con el umbral **medido** contra la celda más angosta del panel (~62 px: un dígito tabular de Geist a 14 px avanza ~8,4 px, el punto ~4,9), y conserva el valor exacto en el `title` y en el `sr-only`. Su test afirma un **presupuesto de caracteres** (barre 0→1e12, falla sobre 7), **no un formato**: un test de formato se rompe con cada ajuste cosmético y no protege el slot; el presupuesto sí. Si el panel se ensancha, el umbral se **recalcula con la misma aritmética**, no se estima.
+- **NUNCA** redondees un número que se muestra al lado de sus propios operandos: el porcentaje del donut usaba `Math.round` y decía `100 %` con la celda vecina mostrando `Gastado 166`. Es **`Math.floor`** — un redondeo que contradice el dato que tiene al lado no es un decimal de más, es una cifra falsa.
 - **SIEMPRE** `text-base` (16px) en `<textarea>`/`<input>`: por debajo, iOS Safari hace auto-zoom al enfocar. **NUNCA** lo "arregles" con `user-scalable=no` (rompe WCAG 1.4.4).
 - **SIEMPRE** declara el peso de un título aunque el fallback acierte: la intención se escribe, no se hereda.
 - **SIEMPRE** que agregues un paso a la escala, escríbele su **docblock con la razón medida y su prohibición** si la tiene. En Globe el docblock es el contrato; un token sin razón escrita es el próximo que alguien usa "porque se ve bien".
@@ -178,15 +185,18 @@ Consecuencia operativa: **`--faint` es el último escalón legible y no tiene ho
 
 ## Pasada de auditoría (lente Globe)
 
+**Paso 0, y no es retórico: MIRA el frame renderizado antes de leer código.** El 2026-07-29 la regresión la introdujimos nosotros y sobrevivió a `pnpm build`, ESLint, **129 tests y tres canarios en verde**, con un renglón cortado a media letra en pantalla. Todo lo que sigue audita lo que el código *dice*; nada de eso audita lo que la pantalla *hace*.
+
 1. ¿Cada `font-bold` va acompañado de `font-display`? (si no → **faux bold sobre Geist**)
-2. ¿Aparece `font-normal` o `font-medium`? (→ clases muertas, no declaran nada)
-3. ¿Algún peso pedido fuera de los tres cortes de `GLOBE_FONT_FACES`?
-4. ¿`--text-micro`/`--text-2xs`/`--text-meta` usados como **prosa** o en superficie client-facing? (→ token fuera de su contrato escrito)
-5. ¿Los `<textarea>`/`<input>` en `text-base` (16px)?
-6. ¿Prosa con `leading-normal` (1.5) y rótulos con `snug`, y no al revés?
-7. ¿Los números que cambian en vivo llevan `tabular-nums`?
-8. ¿Medida de lectura entre 45 y 75ch — y el contenedor lo permite de verdad, medido y no supuesto?
-9. ¿Versalitas solo en eyebrow corto, con `tracking-eyebrow`, y ninguna en texto corrido?
-10. ¿Todo texto ≥ 4,5:1 (3:1 en large), sin gris nuevo más tenue que `--faint`?
-11. ¿Cero literales tipográficos; todo desde el SSOT? (`pnpm --filter @efeonce-globe/studio-client test` verde)
-12. Si agregaste un `*.test.ts`, **¿está registrado en el script `test` del package** y aparece en la salida del run?
+2. ¿Hay `<strong>`/`<b>` sin peso declarado? (→ `bolder` del navegador ⇒ faux bold que ningún gate ve)
+3. ¿Aparece `font-normal` o `font-medium`? (→ clases muertas, no declaran nada)
+4. ¿Algún peso pedido fuera de los tres cortes de `GLOBE_FONT_FACES`? (revisa **también `tailwind.css`**: la mayoría del caso fuente vivía en la hoja, no en JSX)
+5. ¿`--text-micro`/`--text-2xs`/`--text-meta` usados como **prosa** o en superficie client-facing? (→ token fuera de su contrato escrito)
+6. ¿Los `<textarea>`/`<input>` en `text-base` (16px)?
+7. ¿Prosa con `leading-normal` (1.5) y rótulos con `snug`, y no al revés?
+8. ¿Los números que cambian en vivo llevan `tabular-nums`, salen de la primitive de formato y usan `floor` cuando conviven con sus operandos?
+9. ¿Medida de lectura entre 45 y 75ch — y el contenedor lo permite de verdad, medido y no supuesto?
+10. ¿Versalitas solo en eyebrow corto, con `tracking-eyebrow`, y ninguna en texto corrido?
+11. ¿Todo texto ≥ 4,5:1 (3:1 en large), sin gris nuevo más tenue que `--faint` — y con scrim donde el fondo no lo controlas?
+12. ¿Cero literales tipográficos; todo desde el SSOT? (`pnpm --filter @efeonce-globe/studio-client test` verde — recuerda que **no retorna solo**: ver §Gates)
+13. Si agregaste un `*.test.ts`, **¿está registrado en el script `test` del package** y aparece en la salida del run?

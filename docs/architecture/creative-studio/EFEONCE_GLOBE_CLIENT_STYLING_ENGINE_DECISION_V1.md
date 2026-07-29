@@ -7,6 +7,9 @@
 > **Supersede parcialmente:** [ADR-014](./EFEONCE_GLOBE_CLIENT_APPLICATION_DECISION_V1.md) — sólo en la
 > elección de motor de estilos; el resto de ADR-014 (Vite + React + shell propio + CSP por nonce) sigue vigente
 > **Relacionados:** `TASK-1552`, `TASK-1556`, `TASK-1560`, `TASK-1561`
+> **Contratos de uso derivados** (encima de este motor, gobernados por este ADR):
+> [Tipografía V1](./EFEONCE_GLOBE_CLIENT_TYPOGRAPHY_CONTRACT_V1.md) ·
+> [Motion V1](./GLOBE_CLIENT_MOTION_CONTRACT_V1.md)
 
 ---
 
@@ -308,3 +311,44 @@ medido a 1280 px de viewport, la columna del preset mide 82 px y la miniatura ha
 **La regla operativa:** la lista de namespaces vaciados es la autoridad, y está en el archivo generado.
 Suponerla lleva a decisiones de implementación peores por un motivo inventado. `aspect-[16/9]` sí sigue
 prohibido —el gate rechaza el valor arbitrario con corchetes— pero ese es otro motivo, y es el correcto.
+
+## Delta 2026-07-29 — la frontera token↔uso: el alcance que este ADR **no** cubre
+
+> **El contrato de uso tipográfico se separa a documento propio:**
+> [`EFEONCE_GLOBE_CLIENT_TYPOGRAPHY_CONTRACT_V1.md`](./EFEONCE_GLOBE_CLIENT_TYPOGRAPHY_CONTRACT_V1.md).
+> Este Delta registra únicamente el hallazgo de **motor**, que es el límite de alcance de este ADR.
+
+Los cuatro gates de este ADR más el del theme validan **cómo se declara** un valor de diseño: literal
+prohibido, namespace vaciado, theme generado carácter por carácter contra el SSOT. Todos miran la
+**declaración**.
+
+La sesión del 2026-07-29 encontró una clase de defecto que vive en la frontera **token↔uso**, donde ninguno
+de los cinco miraba. El caso: **trece sitios pedían Geist@700**. `--weight-display: 700` es una declaración
+**legítima** —Poppins carga 700—, pero Tailwind la expone después como `font-bold`, aplicable a cualquier
+elemento, y se escribió sobre elementos **Geist**, que carga sólo 400 y 600. El navegador **sintetiza** el
+peso cizallando el 600; el trazo queda embarrado a tamaño y **renderiza, shippea y pasa los cinco gates**.
+
+Cinco de los trece sitios estaban en **reglas `.pf__*` de `styles/tailwind.css`**, no en JSX — o sea, la
+mayoría del defecto vivía en el dialecto CSS, no en el bag de clases.
+
+**Lo que esto corrige de la premisa de este ADR:** vaciar un namespace cierra *la escala ajena*, y escanear
+literales cierra *el valor inventado*. Ninguna de las dos cierra **una combinación inválida de dos valores
+ambos legítimos**. Un gate de motor no puede: la familia de un elemento **hereda**, así que sólo se conoce en
+el sitio de uso.
+
+**Dos gates nuevos** cubren el hueco para tipografía (`design-contract.test.ts`, verdes desde `d009871`) —
+`never asks a family for a cut it does not load` y `never writes a font utility the theme cannot generate`—
+y **derivan su autoridad del manifiesto y del theme**, nunca de listas escritas a mano: agregar
+`geist-bold.ttf` a `GLOBE_FONT_FACES` haría que el primero deje de objetar por ese solo acto. Su contrato
+completo, la frontera declarada del escaneo (`apps/studio-client/src` y nada más; `studio-web` **no está
+mirado** hasta `TASK-1560` Slice 2) y el riesgo abierto de `bolder` del UA —invisible para cualquier gate,
+consecuencia directa de la decisión de dejar **preflight fuera**— viven en el contrato de tipografía.
+
+**Corrección al aparato de gates que afectaba a los cinco:** `withoutComments` **borraba** los comentarios en
+vez de blanquearlos, y borrar un bloque borra sus saltos de línea. **Todo `file:line` reportado después de un
+comentario venía corrido.** Ahora se sobrescriben con espacios, preservando offsets exactos.
+
+**La generalización para el próximo gate de este ADR:** un valor de diseño puede ser correcto en su
+declaración y equivocado en su uso. Cuando la corrección depende de un contexto que sólo existe en el sitio
+de uso —familia heredada, audiencia de la superficie, elemento HTML—, el gate tiene que mudarse ahí, y si no
+puede (§ el `bolder` del UA), eso se declara como riesgo abierto en vez de asumirse cubierto.

@@ -340,3 +340,34 @@ Greenhouse. Cada nueva surface puede crear candidates en su task, pero promueve 
 ## Follow-ups
 
 - Cada product task conserva ownership de su composition y propone candidates; esta task gobierna promoción.
+
+---
+
+## Delta 2026-07-29 — el motor que gobiernas ganó dos gates y un token, y mostró un límite
+
+Cerró [`TASK-1599`](../complete/TASK-1599-globe-client-typographic-contract-producer-hierarchy.md) sobre el
+motor de estilos y los gates que esta task declara suyos. **No transfiere propiedad**: se registra acá para
+que el próximo agente no re-decida lo ya decidido.
+
+**Dos gates nuevos** en `apps/studio-client/src/gates/design-contract.test.ts`:
+
+- `never asks a family for a cut it does not load` — aparea familia×peso **en el sitio de uso**. La
+  declaración de `@font-face` estaba sana; el defecto era **quién pedía qué**: 13 sitios pedían Geist@700
+  con sólo Poppins 700 · Geist 400 · Geist 600 cargados, y el navegador lo **sintetizaba** — trazo
+  deformado, build/lint/canario/gate todos verdes.
+- `never writes a font utility the theme cannot generate` — `font-normal` y `font-medium` estaban escritas
+  y **no emitían CSS**, porque el theme generado desde el SSOT no podía producirlas. Se decidió que falle
+  en vez de agregar los escalones: **agregar un escalón al SSOT es decisión de diseño, no arreglo de
+  compilación**.
+
+**Token nuevo en el SSOT:** `--rail-scrim`, el velo del riel del flujo del composer. Nació en
+`tokens/tokens.ts` y no como valor literal, por la regla dura de ADR-016.
+
+**Límite del enfoque, medido hoy y sin dueño.** Los cuatro gates —y estos dos— escanean `className`. El
+**preflight de Tailwind no se emite**, así que la regla del navegador `b, strong { font-weight: bolder }`
+pide el corte fuerte **por herencia, sin que ninguna clase lo diga**: estructuralmente invisible a
+cualquier verificación que lea utilidades. Apareció tres veces en un solo día.
+
+Las dos salidas posibles se identificaron y **ninguna se tomó**, porque ambas son decisiones del motor:
+emitir el preflight (cambia el reset de toda la superficie) o construir una verificación que lea el HTML
+renderizado en vez del `className` (un tipo de gate que hoy no existe). **Hoy ninguna task lo reclama.**

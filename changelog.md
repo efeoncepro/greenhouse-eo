@@ -7,6 +7,33 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-29 — Globe: contrato tipográfico del payload cliente + jerarquía del Producer (TASK-1599)
+
+- Tres commits desplegados y verificados en vivo sobre `globe-studio-internal-00100-9kq` (imagen
+  `b9112a80985d`) en `https://globe.efeoncepro.com/producer`, con sesión real a 1440px.
+- **`68a2cbe`** — 13 sitios del payload pedían Geist@700 con sólo Poppins 700 · Geist 400 · Geist 600
+  cargados: el navegador **sintetiza** el corte faltante, deforma el trazo y no falla ningún gate. Dos
+  gates nuevos cierran la clase: uno aparea familia×peso **en el sitio de uso** (la declaración de
+  `@font-face` estaba sana; el defecto era quién pedía qué) y otro rechaza la utilidad de fuente que el
+  theme no puede generar (`font-normal`/`font-medium` no emitían CSS). Más `tabular-nums` en siete
+  números vivos.
+- **`d009871`** — jerarquía del Producer. El panel de créditos **no se rompía por el número**: llevaba
+  `max-w-full`, y sobre un elemento `absolute` esa medida resuelve contra el bloque contenedor —el
+  `<details>`, o sea el ancho del disparador—; los tres síntomas eran un bug. Y `Listo` vs `Completada`
+  eran **dos ejes** del contrato (`coarseProgress` vs `state`), no dos palabras: `stateCompleted` quedó
+  huérfana y se borró.
+- **`b9112a8`** — cierre de una regresión propia: bajar las acciones del prompt al flujo desbordó el
+  cuerpo y un renglón quedó cortado contra el riel translúcido; se resolvió con el token `--rail-scrim`
+  en el SSOT. Más `Math.floor` en el donut, que con `round` decía `100 %` junto a `Gastado 166`.
+- Verificación: build 0 · eslint 0 · `node --test` 129/129 · canario de motor 8/8 · canario del composer
+  163/163 · revisión humana en vivo tras cada despliegue.
+- **Quedan tres puntos abiertos sin dueño**: el preflight de Tailwind no se emite, así que
+  `b, strong { font-weight: bolder }` pide el corte fuerte por herencia y es invisible a un gate que
+  escanea `className`; la fuga del `axis-pilot-canary` deja `pnpm test` sin terminar y un huérfano en el
+  puerto 4326 por corrida; y el H9 del feed, cuyo `…` no es CSS (`DISPLAY_TITLE_MAX_LENGTH = 96` recorta
+  por conteo de caracteres antes de que exista layout, así que ningún ancho lo arregla).
+- Detalle de runtime: `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
+
 ## 2026-07-29 — Release preflight: corrección de latencia del check Sentry
 
 - La causa del timeout persistente de `sentry_critical_issues` era la consulta de hasta 100 issues, que tardaba
