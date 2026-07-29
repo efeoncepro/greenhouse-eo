@@ -111,15 +111,56 @@ CI real — run [30499520419](https://github.com/efeoncepro/efeonce-globe/action
 Los ~20 s entre el fin de los tests unitarios y el OK del composer canary son el browser real
 levantándose. Duración total del job: 4 m 14 s.
 
+## Follow-ups — cerrados el mismo día
+
+**1. Gate contra la reintroducción** (`efeonce-globe@0963abb`). Nace
+`scripts/absolute-path-source-gate.mjs`, gemelo del gate de NUL: barre el código trackeado
+(`ts/tsx/js/jsx/mjs/cjs`) buscando homes de macOS, Linux y Windows, y reporta `file:line` con contexto.
+Dockerfiles, workflows y `.tf` quedan **fuera a propósito** — ahí las rutas de contenedor y de runner son
+legítimas; el bug class vive en el código que se ejecuta. Cableado a `pnpm check` **antes** del typecheck
+(es el gate más barato) + 8 tests en el lote del root. Verificado en las dos direcciones: con el fallback
+original reintroducido → `BLOCK`, exit 1, señalando `axis-pilot-canary.mjs:11`.
+
+**2. El pin de versión pasa a forma + monotonicidad** (mismo commit). `=== '1.5.0'` se rompía en cada bump
+legítimo, así que entrenaba a actualizar el número sin leerlo — y por eso quedó huérfano. Ahora verifica lo
+que el nombre del `it` promete (*"stays version-bumped"*): semver válido y nunca por debajo de la versión
+donde estas rutas existen. Un bump futuro pasa solo; un downgrade rompe. Verificado bajando el catálogo a
+`1.4.0` → falla; restaurado → 8/8. El comparador cubre 9 casos, incluido `10.0.0 >= 9.9.9`, que un string
+compare resolvería mal.
+
+### El gate se bloqueó a sí mismo, y la lección vale más que el fix
+
+La primera versión (`0963abb`) **rompió el CI**: escribí una ruta de contenedor **literal en un comentario
+de prosa**, en el gate y en su test, mientras el mismo archivo explicaba por qué los patrones se construyen
+por concatenación. Es la forma exacta que el gate de NUL ya documentaba —*"el byte escrito dentro de la
+línea que enseña a no escribirlo"*— citada al escribirlo.
+
+**Por qué pasó en CI y no en local, que es la parte reutilizable:** el gate barre `git ls-files`, así que un
+archivo nuevo **no se ve a sí mismo hasta estar trackeado**. Al correrlo localmente los dos archivos eran
+`??` untracked y quedaron fuera de su propio barrido. Corregido en `957c6c8`, con la regla escrita en la
+nota de implementación: **correr un gate de source DESPUÉS de `git add`, nunca antes.**
+
+Vale como evidencia de que el gate muerde: su primer hallazgo real fui yo.
+
 ## Qué queda abierto
 
-- **Un aserto que pinea una versión y hay que actualizar a mano en cada bump detecta "cambió", no "cambió
-  mal".** Es de bajo valor y volverá a quedar huérfano. Vale reemplazarlo por una verificación de forma
-  (que las rutas declaradas existan) en vez de un número.
-- **Ningún gate impide reintroducir una ruta absoluta.** Un `grep` de `/Users/` o `/home/` en CI lo cerraría
-  de forma barata. No se agregó en esta pasada.
 - La frontera de TASK-1556 ("el driver de Playwright vive en Greenhouse") sigue vigente para el resto de los
   drivers cross-repo; sólo se corrigió el caso de estos cuatro canaries.
+- El gate cubre código. Un Dockerfile o un workflow con una ruta personal sigue pasando — es deliberado
+  (ahí hay rutas legítimas), pero no es gratis: si aparece el caso, hay que decidir la forma del gate para
+  esos archivos en vez de ampliarlo a ciegas.
+
+## Verificación de los follow-ups
+
+Run [30500485154](https://github.com/efeoncepro/efeonce-globe/actions/runs/30500485154) `success`, con los
+dos gates y los canaries en el log del runner:
+
+```
+23:44:49  nul-byte-source-gate: OK
+23:44:50  absolute-path-source-gate: OK
+23:46:49  composer canary OK
+23:46:55  AXIS pilot canary OK
+```
 
 ## Referencias
 
