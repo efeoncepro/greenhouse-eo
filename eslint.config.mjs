@@ -54,6 +54,11 @@ export default [
       // Output gitignorado de GVC (`pnpm fe:capture`) + material de trabajo creativo ad-hoc
       // (scripts WIP de otra sesión acá no deben bloquear el pre-push de todos — 2026-07-19).
       '.captures/**',
+      // Assets generados (PNG/carruseles) + los scripts ad-hoc de dirección de arte que los
+      // producen. Misma clase que `ai-generations/**`: material de trabajo, no código de
+      // producto. Sus `.cjs` usan `require()` a propósito —se corren sueltos con node— y sin
+      // esta entrada 43 errores de un WIP ajeno bloqueaban el pre-push de todos (2026-07-29).
+      'generated/**',
       // Scratch efímero de smokes/diagnósticos (TASK-1454/1455 y similares) — mismo criterio.
       '.tmp/**',
       'full-version/**',
