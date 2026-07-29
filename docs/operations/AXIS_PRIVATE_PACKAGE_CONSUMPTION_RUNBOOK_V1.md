@@ -20,8 +20,8 @@ source control.
   `efeoncepro/efeonce-globe` on all three packages.
 - Vercel `NPM_RC` is configured on `axis-design-system-lab` for Production and Preview.
 - GCP Secret Manager secret `axis-packages-read-token` exists in `efeonce-globe`; the
-  Compute Engine service account used by Cloud Build has secret-level
-  `roles/secretmanager.secretAccessor`.
+  Compute Engine service accounts used by Globe and Greenhouse Cloud Build have
+  secret-level `roles/secretmanager.secretAccessor`.
 - The current PAT is operator-owned and expires on 2026-08-27. Replace it with a
   dedicated machine identity before the first external/customer rollout.
 - Local private-package installation for the TASK-1591 canary was verified with a temporary
@@ -70,7 +70,7 @@ PAT classic with `read:packages` only; do not use a personal deployment token.
 After setting `NPM_RC`, trigger a new deployment. Environment changes do not affect
 previous deployments.
 
-## Cloud Build / Globe
+## Cloud Build / Globe and Greenhouse workers
 
 Store the organization-owned read-only token in Secret Manager in the `efeonce-globe`
 project. Grant the build service account access to that one secret only. The build
@@ -84,11 +84,23 @@ Current secret reference:
 projects/efeonce-globe/secrets/axis-packages-read-token
 ```
 
-Current build identity:
+Current Globe build identity:
 
 ```text
 818083690953-compute@developer.gserviceaccount.com
 ```
+
+Greenhouse worker build identity:
+
+```text
+183008134038-compute@developer.gserviceaccount.com
+```
+
+The Greenhouse deploy scripts for `ops-worker`, `commercial-cost-worker` and
+`ico-batch-worker` use the same contract. Their Dockerfiles mount the secret in
+both the builder and runtime `pnpm install` layers because BuildKit secrets are
+scoped to one `RUN`; the token is never passed as a Docker build argument or
+copied into the image.
 
 The deployment workflow must prove:
 

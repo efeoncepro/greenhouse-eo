@@ -47,6 +47,25 @@ test('validateDockerfile acepta cada etapa determinística', () => {
   assert.deepEqual(findings, [])
 })
 
+test('validateDockerfile acepta pnpm install con secreto BuildKit', () => {
+  const findings = validateDockerfile({
+    source: `# syntax=docker/dockerfile:1.7
+FROM node:22 AS builder
+ARG PNPM_VERSION=10.32.1
+COPY vendor/ ./vendor/
+RUN --mount=type=secret,id=axis_npmrc,target=/root/.npmrc,required=true \\
+  pnpm install --frozen-lockfile
+FROM node:22
+ARG PNPM_VERSION=10.32.1
+COPY vendor/ ./vendor/
+RUN --mount=type=secret,id=axis_npmrc,target=/root/.npmrc,required=true pnpm install --prod`,
+    pnpmVersion: '10.32.1',
+    localDependencies: [{ path: 'vendor/package.tgz' }]
+  })
+
+  assert.deepEqual(findings, [])
+})
+
 test('workflow toolchain hereda packageManager y bloquea versiones duplicadas', () => {
   const valid = { jobs: { test: { steps: [{ uses: 'pnpm/action-setup@v6' }] } } }
   const invalid = { jobs: { test: { steps: [{ uses: 'pnpm/action-setup@v4', with: { version: '10.9.0' } }] } } }

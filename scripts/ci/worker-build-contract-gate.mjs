@@ -66,11 +66,14 @@ export const splitDockerStages = dockerfile =>
 
 export const validateDockerfile = ({ source, pnpmVersion, localDependencies }) => {
   const errors = []
-  const stages = splitDockerStages(source)
+  // Docker BuildKit options may precede the command and line continuations may
+  // split `RUN --mount=... pnpm install` across physical lines.
+  const normalizedSource = source.replace(/\\\s*\n/g, ' ')
+  const stages = splitDockerStages(normalizedSource)
   const localDependencyRoots = [...new Set(localDependencies.map(item => item.path.split('/')[0]).filter(Boolean))]
 
   for (const [index, stage] of stages.entries()) {
-    const installsDependencies = /RUN\s+pnpm\s+install\b/i.test(stage)
+    const installsDependencies = /RUN(?:\s+--[^\n]+)*\s+pnpm\s+install\b/i.test(stage)
 
     if (!installsDependencies) continue
 
@@ -86,7 +89,7 @@ export const validateDockerfile = ({ source, pnpmVersion, localDependencies }) =
         'im'
       )
 
-      const installOffset = stage.search(/RUN\s+pnpm\s+install\b/i)
+      const installOffset = stage.search(/RUN(?:\s+--[^\n]+)*\s+pnpm\s+install\b/i)
       const copyMatch = copyPattern.exec(stage)
 
       if (!copyMatch || copyMatch.index > installOffset) {
@@ -95,7 +98,7 @@ export const validateDockerfile = ({ source, pnpmVersion, localDependencies }) =
     }
   }
 
-  if (!stages.some(stage => /RUN\s+pnpm\s+install\b/i.test(stage))) {
+  if (!stages.some(stage => /RUN(?:\s+--[^\n]+)*\s+pnpm\s+install\b/i.test(stage))) {
     errors.push('no se encontró ninguna etapa con pnpm install')
   }
 
