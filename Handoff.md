@@ -1,43 +1,36 @@
 # Handoff activo
 
-## 2026-07-29 — Production release: Cloud Build AXIS auth root cause isolated
+## 2026-07-29 — Release completo: develop promovido y producción verificada
 
-`main` sigue en `9bb780ba4c41bfdf40903b762194fb6bb8085b59`, con CI, CI Deep, smoke, Vercel Production READY,
-preflight y manifest verdes. El orchestrator `30465872005` llegó al gate Production, fue aprobado por la sesión
-autorizada y desplegó HubSpot correctamente, pero los builds Cloud Run de `ops-worker`, `commercial-cost-worker` e
-`ico-batch-worker` fallaron antes del deploy. Azure quedó en sus lanes normales de `no_infra_diff`/espera y no es la
-causa.
+Estado honesto: **complete**. PR #166 promovió todo `develop` a `main` mediante el merge
+`0b4bdd6acb401ef0b108e27f1a8f1d80c469a0ed`; no hubo cherry-picks ni release parcial de AXIS. CI, CI Deep,
+Playwright smoke, CLAUDE/context governance y Vercel pasaron para ese SHA. El orquestador oficial
+`30473069894`, sin bypass ni break-glass, terminó `success` y dejó el manifest
+`0b4bdd6acb40-2608542b-b1e5-4b3b-b24e-5036501dfef1` en `released`. El intento obsoleto `30465872005` quedó
+cancelado.
 
-La evidencia de Cloud Build (`322e8c71`, `f7da8e53`, `cd604434`) fue `ERR_PNPM_FETCH_401` para
-`@efeoncepro/axis-tokens`: `No authorization header was set`. La causa era que los tres Dockerfiles y sus inline
-Cloud Build configs instalaban paquetes privados sin el secreto AXIS.
+Vercel Production está READY en `dpl_EkXUC1oCddYWvtWxB5sJVY7qXfkd`
+(`greenhouse-7i34pkv5e-efeonce-7670142f.vercel.app`) y `greenhouse.efeoncepro.com/api/auth/health` responde
+`200`. Cloud Run quedó Ready en `commercial-cost-worker-00411-q6j`, `ico-batch-worker-00234-58d` y
+`hubspot-greenhouse-integration-00124-drd`, todos trazados al SHA de main. `ops-worker-00507-b4g` permanece
+Ready en `49ea5741aec1`: el job oficial calculó diff vacío entre ese commit y el target para todas sus rutas runtime,
+por lo que aplicó el change-gate canónico y omitió un redeploy label-only. El watchdog local sigue reportando ese
+caso conocido como `worker_revision_drift`; no existe drift de código desplegable.
 
-Fix code-complete en develop, con PR #166 pendiente de gates y nuevo release: los tres deploy scripts leen
-`projects/efeonce-globe/secrets/axis-packages-read-token` con `secretEnv`, materializan `.npmrc` efímero con
-`trap`, ejecutan Docker BuildKit `--secret`, y los tres Dockerfiles montan `axis_npmrc` en builder y runtime.
-Se concedió `secretAccessor` únicamente a `183008134038-compute@developer.gserviceaccount.com`. No se expuso token en
-logs, imagen, artefactos ni runtime. Gates locales `worker-build-contract`, `worker-runtime-deps` y 10 tests focales
-pasaron. El carril real de Cloud Build montó el `.npmrc`, pero GitHub Packages respondió `401 Unauthorized` en los
-tres builds nuevos (`d393c460`, `367ee552`, `f356a7bd`). La verificación segura posterior demostró que el PAT no
-está vencido: el payload es un PAT clásico limpio, GitHub `/user` responde `200` y el tarball privado exacto responde
-`200`. La causa real era doble expansión de `$$` en el heredoc no quoted: el shell generador lo convertía en su PID
-antes de entregar el config a Cloud Build, lo que explica que cada build reportara un bearer numérico distinto.
-El fix preserva `$$AXIS_PACKAGES_READ_TOKEN` para que Cloud Build inyecte el secreto real. Falta revalidar CI, los
-tres builds/digests y repetir el orchestrator.
+La causa raíz de los `401` no era un PAT vencido. El secreto es un PAT clásico válido: GitHub `/user` y el tarball
+privado exacto respondieron `200`. El heredoc no quoted expandía `$$` al PID del shell antes de entregar el config a
+Cloud Build, produciendo bearer tokens numéricos. Los deploy scripts ahora preservan el doble dólar para que Cloud
+Build inyecte el secreto real. `ops-worker`, `commercial-cost-worker`, `ico-batch-worker` y el job staging-only
+`artifact-worker` usan `secretEnv` → `.npmrc` efímero → BuildKit secret; `.npmrc` está excluido de los contextos y
+los gates cubren los cuatro build units. Builds reales, imágenes sin token/runtime env y revisiones Cloud Run fueron
+verificados.
 
-La revisión de arquitectura añadió `.npmrc` a `.dockerignore` y `.gcloudignore`: aunque los Dockerfiles usan `COPY`
-explícitos y el archivo no entraba a las imágenes, el secreto efímero tampoco debe viajar dentro del contexto enviado
-al daemon de Docker. El worker build-contract gate ahora bloquea ambas omisiones.
-
-El inventario completo de build units detectó un cuarto consumidor: `artifact-worker` instala el mismo `package.json`
-y por tanto también requiere AXIS auth, aunque sea un Cloud Run Job staging-only y no forme parte del orchestrator
-productivo. Su Dockerfile/deploy script ahora usan el mismo contrato `secretEnv` → `.npmrc` efímero → BuildKit secret;
-el gate exige el montaje en los cuatro Dockerfiles.
-
-La ubicación en `efeonce-globe` es un acoplamiento legado deliberado y temporal, no ownership de Globe. La decisión de
-retiro está atada a ownership: cuando se cree la identidad de máquina, el secreto nuevo debe nacer en un proyecto
-neutral del ecosistema AXIS, fuera de cualquier producto; después se migran ambos consumers, se completan build/digest
-gates y se revoca el binding cross-project. No se debe recrear el secreto nuevo en `efeonce-globe` por inercia.
+La ubicación actual en `efeonce-globe` es un acoplamiento legado deliberado y temporal, no ownership de Globe.
+Cuando se cree la identidad de máquina, el secreto nuevo debe nacer en un proyecto neutral del ecosistema AXIS,
+fuera de cualquier producto; luego se migran ambos consumidores, se validan builds/digests y se revoca el binding
+cross-project. No se debe recrear el secreto en Globe por inercia. Además, la CLI local de Vercel imprimió su
+credencial de sesión al construir un comando de paginación; el valor no se copió a archivos ni logs versionados,
+pero esa credencial operator-owned debe revocarse y reautenticarse fuera del release.
 
 ## 2026-07-29 — PR #164: main promovido, release bloqueado por latencia Sentry (fix en develop)
 
