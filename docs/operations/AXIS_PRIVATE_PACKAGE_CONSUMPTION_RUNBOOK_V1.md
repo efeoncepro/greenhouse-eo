@@ -19,6 +19,8 @@ source control.
 - GitHub Actions read access is configured for `efeoncepro/greenhouse-eo` and
   `efeoncepro/efeonce-globe` on all three packages.
 - Vercel `NPM_RC` is configured on `axis-design-system-lab` for Production and Preview.
+  ⚠️ **Verified 2026-07-29: it is not used.** The Lab consumes AXIS through `workspace:*`
+  links, so its build never authenticates against the registry. Retire it — see the Delta below.
 - GCP Secret Manager secret `axis-packages-read-token` exists in `efeonce-globe`; this
   is deliberate ecosystem ownership, not a Globe-only credential. The Compute Engine
   service accounts used by Globe and Greenhouse Cloud Build have secret-level
@@ -32,6 +34,71 @@ source control.
 - The Globe AXIS browser/accessibility/reduced-motion evidence is automated by
   `apps/studio-client/scripts/axis-pilot-canary.test.mjs`; a real CI/Cloud Build execution and
   deployed digest verification remain required before promotion.
+
+## Delta 2026-07-29 — dónde vive el credencial, y dónde NO hace falta (TASK-1589 V1.1)
+
+Decisión arquitectónica completa en
+`docs/architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md` § Delta 2026-07-29. Lo operativo:
+
+**Hay dos planos de ejecución, y solo uno necesita un credencial durable.**
+
+| Plano | Qué usa hoy | ¿Necesita secreto? |
+|---|---|---|
+| GitHub Actions — 11 workflows Greenhouse + `ci.yml` de Globe | `secrets.GITHUB_TOKEN` del runner | **No.** Efímero, por run. Ya es óptimo; no tocar |
+| Cloud Build — 4 workers Greenhouse + Globe | Secret Manager | **Sí.** Único consumidor real del PAT |
+| Vercel `NPM_RC` del Lab | variable de entorno sensible | **No — y hay que retirarla** (ver abajo) |
+
+**Por qué esto importa para el diagnóstico:** el PAT **no está en el camino del PR**. El día que expire,
+todos los PR seguirán verdes y solo fallará un build de worker, posiblemente semanas después y bajo
+deadline. Es una falla silenciosa por construcción, y por eso existe el detector.
+
+**Detector:** `.github/workflows/axis-credential-expiry.yml` (semanal, martes 13:00 UTC) corre
+`scripts/ci/axis-package-credential-expiry-gate.mjs`. Lee la expiración **real que reporta GitHub** en el
+header `github-authentication-token-expiration` — no una fecha escrita en este documento. Umbrales: aviso a
+21 días, falla a 7. Mientras el secreto siga en el proyecto legacy, el workflow se omite solo y no hace
+ruido; empieza a medir en cuanto exista en `efeonce-group`.
+
+### 🔴 Retirar el `NPM_RC` de Vercel — credencial sin consumidor
+
+`apps/lab` consume AXIS por **`workspace:*`** (symlinks a `packages/`), verificado en `pnpm-lock.yaml`
+(`version: link:../../packages/tokens`). El build del Lab **nunca resuelve nada contra
+`npm.pkg.github.com`**, así que el `NPM_RC` configurado en Production y Preview es un credencial de larga
+vida almacenado **sin ningún consumidor**: superficie de exposición sin contrapartida.
+
+Acción: borrar la variable en ambos entornos y redesplegar el Lab para confirmar que sigue construyendo.
+Es reversible en un minuto (volver a crearla) y no afecta a Greenhouse ni a Globe.
+
+### Nuevo hogar del secreto: `efeonce-group`
+
+Decisión del operador (2026-07-29). El secreto deja de vivir en `efeonce-globe` —un proyecto de
+**producto**— y pasa al proyecto del **control plane**, que ya gobierna a Globe. No es simétrico al
+anterior: `efeonce-group` no es un peer de Globe.
+
+Secuencia obligatoria, en este orden:
+
+```bash
+# 1. Crear el contenedor (el VALOR lo publica el operador; nunca por chat, nunca en un log)
+gcloud secrets create axis-packages-read-token --project=efeonce-group
+
+# 2. Publicar el valor como scalar crudo (sin comillas, sin \n — higiene de secretos)
+printf %s "$TOKEN" | gcloud secrets versions add axis-packages-read-token \
+  --project=efeonce-group --data-file=-
+
+# 3. Conceder accessor SOLO sobre este secreto, a las dos identidades de build
+for SA in 183008134038-compute@developer.gserviceaccount.com \
+          818083690953-compute@developer.gserviceaccount.com; do
+  gcloud secrets add-iam-policy-binding axis-packages-read-token \
+    --project=efeonce-group --member="serviceAccount:${SA}" \
+    --role=roles/secretmanager.secretAccessor
+done
+
+# 4. Apuntar los consumidores al nuevo versionName (4 deploy.sh de Greenhouse + Cloud Build de Globe)
+# 5. Build verde en AMBOS productos contra el secreto nuevo
+# 6. RECIÉN ENTONCES revocar el binding legacy en efeonce-globe y borrar el secreto viejo
+```
+
+**NUNCA** revocar el binding legacy antes del paso 5. Revocar primero deja a Greenhouse sin poder
+desplegar sus workers.
 
 ## Required GitHub package access
 
@@ -63,7 +130,12 @@ file. Never add the resolved token to git, a deployment artifact or a log.
 
 ## Vercel
 
-For a Vercel consumer, configure the project environment variable `NPM_RC` with the
+⚠️ **This section does NOT apply to the AXIS Lab.** The Lab is a workspace member and resolves
+AXIS through `workspace:*` links, so it needs no registry credential at all — its `NPM_RC` is
+being retired (see the Delta above). What follows applies only to a Vercel project that consumes
+the **published** packages from outside the AXIS workspace.
+
+For such a Vercel consumer, configure the project environment variable `NPM_RC` with the
 `.npmrc` contents and select only the required environments (`Preview` first, then
 `Production` after a successful canary). Vercel must receive an organization-owned
 PAT classic with `read:packages` only; do not use a personal deployment token.

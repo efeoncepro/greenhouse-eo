@@ -101,6 +101,160 @@ persistencia o jobs.
 8. La convivencia MUI/Tailwind se permite entre adapters o superficies, nunca mezclando
    dos motores dentro de la misma superficie sin una decisión explícita.
 
+## Delta 2026-07-29 — gobierno de distribución, SSOT de tokens y versionado de contratos (TASK-1589 V1.1)
+
+Tres preguntas quedaron abiertas cuando se publicó la foundation. Se deciden acá porque las tres son
+la misma pregunta: **quién es dueño del valor, y qué lo detecta cuando alguien lo contradice.**
+
+### (a) Dirección del SSOT de tokens — decidida
+
+`@efeoncepro/axis-tokens` y `src/@core/theme/axis-tokens.ts` cargaban los mismos valores de marca bajo
+el mismo nombre, **sin relación declarada**. Coincidían porque alguien los tecleó dos veces.
+
+**Decisión:** el **valor** de marca lo posee Greenhouse (`axisRamp` + `axisSemanticHex`). AXIS publica un
+**subconjunto portable** de esos valores bajo nombres de rol estables. **AXIS nombra roles; nunca es autor
+de un valor de marca.**
+
+La derivación **no puede ser mecánica**: el paquete debe permanecer runtime-agnóstico e instalable por
+Globe, que no tiene MUI. Un generador cross-repo acoplaría el build de Greenhouse al de AXIS y volvería a
+AXIS un artefacto de Greenhouse, rompiendo la premisa. Por eso se **guarda**, no se genera —
+`src/@core/theme/axis-package-drift.test.ts`, extendiendo el patrón canónico *SSOT + derivación + señal de
+drift* ya establecido por `axis-semantic-drift.test.ts` (TASK-1034) y por la familia
+TASK-571/699/766/774.
+
+El gate **descubre** los roles publicados en vez de listarlos: un color nuevo en AXIS sin contraparte
+declarada rompe el test. Un gate que hay que acordarse de extender no es un gate.
+
+**Medición al declararlo (2026-07-29):** el drift **ya existía**. `0.1.4` publicaba `warning: #d59800` y
+`danger: #c01d27`, valores anteriores a TASK-1053 (`#ffb703` / `#dc2e39`). Era **inerte** —ningún consumidor
+lee `efeonceTokens.color`; Greenhouse pinta por MUI y Globe por su theme Tailwind— y por eso pasó
+inadvertido. Corregido en AXIS `0.1.5` con blast radius cero, que es exactamente por qué se corrige ahora
+y no cuando el primer consumidor lea los colores.
+
+### (b) Identidad de lectura del registry privado — dos planos, no uno
+
+El sistema tiene **dos planos de ejecución** con propiedades distintas, y tratarlos igual es lo que
+producía la sensación de un único punto de falla:
+
+| Plano | Credencial | Durabilidad | Escala a N consumidores |
+|---|---|---|---|
+| **GitHub Actions** (11 workflows Greenhouse + CI Globe) | `GITHUB_TOKEN` del runner | efímera, por run | sí — vía *Manage Actions access* por repo |
+| **Cloud Build** (4 workers Greenhouse + Globe) | secreto durable en Secret Manager | permanente | sí — un secreto, N lectores por WIF |
+
+El plano de Actions **ya está resuelto de forma óptima** y no se toca: cero credenciales durables.
+Solo Cloud Build necesita un valor persistente.
+
+**Decisión:** identidad de máquina dedicada con `read:packages` únicamente, **un solo secreto**, alojado en
+**`efeonce-group`** (el proyecto del control plane), leído por WIF desde ambos productos. Se descarta una
+GitHub App: sus installation tokens duran una hora y `availableSecrets.secretManager` exige un valor
+estático, así que exigiría un rotador programado — maquinaria nueva y un modo de falla nuevo para resolver
+un problema que un detector resuelve sin infraestructura.
+
+**Retira** el acoplamiento cross-project actual (el secreto vive hoy en `efeonce-globe`, un proyecto de
+producto, y Greenhouse lo lee desde afuera). `efeonce-group` no es simétrico a `efeonce-globe`: es el
+control plane que ya gobierna a Globe, no un peer.
+
+**Hallazgo que dimensiona el riesgo — el acoplamiento de los workers es accidental, no esencial.**
+Ningún archivo de `src/lib/**` ni `services/**` importa AXIS: vive únicamente en
+`src/components/greenhouse/primitives`, que los workers no bundlean (esbuild parte de `server.ts` y nunca
+alcanza `src/components`). Los cuatro workers necesitan el credencial **solo porque `pnpm install`
+resuelve el `package.json` completo del repo**. Consecuencias: (1) el modo de falla al expirar es *"un
+worker no despliega"*, nunca *"un worker deja de funcionar"*; (2) la salida estructural no es rotar mejor,
+es que la UI viva en su propio build unit — pertenece al `Modular Placement Contract` de EPIC-026, no a
+esta task.
+
+**El modo de falla que justifica el detector:** el credencial lo consume un plano que **no está en el
+camino del PR**. Cuando expire, todos los PR siguen verdes y lo único que falla es un build de worker,
+posiblemente semanas después. `scripts/ci/axis-package-credential-expiry-gate.mjs` +
+`.github/workflows/axis-credential-expiry.yml` miden la **expiración real que reporta GitHub**, no una
+fecha escrita en un doc — misma lección que el `FEATURE_FLAG_STATE_LEDGER`: el registro puede mentir, la
+realidad no.
+
+### (c) Versionado y promoción de contratos — dos ejes, nunca uno
+
+Los consumidores fijan versión exacta del paquete. Promover un pattern no puede obligarlos a moverse.
+
+**Decisión — se canoniza lo que hoy ya ocurre por accidente:** `DesignPatternContract.version` y la versión
+del **paquete** son **ejes distintos** y se mueven por razones distintas (hoy `efeonce.status` está en
+`0.1.1` dentro de un paquete `0.1.5`).
+
+- `candidate → trial → stable → deprecated → retired` es **metadato aditivo**: nunca cambia la forma del
+  contrato. Viaja como patch/minor del paquete. Un consumidor que no actualiza no se entera y no se rompe.
+- **Cambiar la forma** de un contrato **no es una promoción**: es un contrato nuevo. `version` mayor dentro
+  del mismo `id` **reemplaza**; un `id` nuevo **coexiste**. Re-apuntar un `id` existente a otra forma es
+  **substitución prohibida**.
+
+Es deliberadamente el mismo patrón que ADR-013 fijó para las rutas de modelo de Globe (`routeId`: update =
+bump en el mismo id, add = id nuevo, re-apuntar = prohibido). El ecosistema ya resolvió este problema una
+vez; no se inventa un segundo vocabulario para el mismo invariante.
+
+**Gate:** `packages/contracts/src/index.test.ts` corre `isPromotable()` sobre **cada contrato exportado**,
+verifica ids únicos, lifecycle dentro de la unión, y —la parte que importa— que el gate sea *load-bearing*
+para cada uno (quitarle la evidencia debe volverlo no-promocionable). Antes existía la función y no la
+corría nadie.
+
+### 4-Pillar Score
+
+**Safety** — *Qué puede salir mal:* el credencial se filtra a una imagen o a un log, o alguien publica un
+paquete roto que entra a producción por instalación. *Gates:* secreto solo en Secret Manager leído por WIF,
+BuildKit acotado a un `RUN`, `.npmrc` borrado por `trap`, `read:packages` como único scope, CI obligatorio
+antes de publicar y coherencia tag↔versión. *Blast radius:* lectura de tres paquetes de UI; no hay datos de
+cliente ni escritura detrás de este credencial. *Verificado por:* `worker-build-contract-gate` exige el
+wiring de auth; los 4 puntos del runbook siguen **pendientes de ejecución real**. *Riesgo residual:* hasta
+que esos 4 puntos corran en pipeline real, la ausencia de `.npmrc` en la imagen está razonada, no
+verificada.
+
+**Robustness** — *Idempotencia:* publicar es idempotente por versión (npm rechaza republicar la misma).
+*Atomicidad:* no aplica; no hay escritura multi-paso ni estado durable. *Protección de carrera:* `concurrency`
+por ref en CI; publish serializado por tag. *Cobertura de invariantes:* forma del contrato (`isPromotable` +
+unicidad de id + lifecycle), coherencia tag↔versión, derivación de tokens, y la excepción de drift que se
+autodestruye. *Verificado por:* cada gate ejercitado en **las dos direcciones** — verde y rojo deliberado.
+
+**Resilience** — *Reintentos:* no aplica a la publicación (acto humano por tag). *Trabajo atascado:* un tag
+que falla no publica nada parcial: los gates corren antes de los tres `publish`. *Señal:* el workflow
+semanal de expiración, con umbrales 21 días (aviso) y 7 (falla). *Rastro:* versiones publicadas son
+inmutables y append-only por naturaleza del registry. *Recuperación:* el consumidor fija versión; volver
+atrás es cambiar una línea del `package.json` — nunca mutar ni borrar un paquete publicado.
+
+**Scalability** — *Camino caliente:* resolución de tres paquetes en `install`, O(1) por build. *Consumidores:*
+el modelo escala por adición — un producto nuevo suma un grant de Actions (cero credenciales) y, si tiene
+Cloud Build, un lector WIF más sobre **el mismo** secreto. *Costo a 10x:* lineal y despreciable. *Punto de
+contención real:* no es el registry sino el **acoplamiento accidental de instalación**, que hace que todo
+build del repo dependa del credencial aunque no use el paquete; se disuelve con la extracción del build
+unit de UI (EPIC-026), no con más plomería acá.
+
+**Tradeoff declarado (Safety ↔ Resilience):** un secreto único compartido por Greenhouse y Globe simplifica
+la rotación y elimina copias divergentes, pero acopla el blast radius de ambos productos. Se acepta
+conscientemente porque el scope es lectura de UI: separarlo en dos credenciales duplicaría la superficie de
+rotación —el modo de falla real observado— a cambio de aislar un riesgo de bajo impacto.
+
+### Hard rules
+
+- **NUNCA** un valor de marca se declara en `@efeoncepro/axis-tokens`. El valor vive en `axisRamp` /
+  `axisSemanticHex`; AXIS publica el rol que lo referencia.
+- **NUNCA** promover `candidate → stable` cambiando la forma del contrato. Promoción es metadato aditivo;
+  cambiar la forma es `version` mayor (reemplaza) o `id` nuevo (coexiste). Re-apuntar un `id` es
+  substitución prohibida.
+- **NUNCA** publicar un tag sin CI verde y sin coherencia tag↔versión de los tres paquetes.
+- **NUNCA** poner el credencial AXIS en un proyecto de producto. Vive en `efeonce-group`, el control plane.
+- **NUNCA** dar al credencial más scope que `read:packages`, ni pasarlo como build-arg de Docker, ni
+  copiarlo a una imagen.
+- **NUNCA** declarar "rollout de producción" de los adapters antes de que los 4 puntos del runbook corran
+  en un pipeline real (install · imagen sin `.npmrc` ni token · digest desplegado == construido · rollback).
+- **SIEMPRE** que se agregue un rol de color a AXIS, declarar de qué valor de Greenhouse deriva, o
+  clasificarlo como neutral portable. El gate de descubrimiento rompe si no.
+
+### Open questions (deliberadamente no decididas)
+
+- **Cuándo publicar `0.1.5`.** El fix está commiteado en el repo AXIS; taguear es un acto de release del
+  operador. Hasta entonces, la excepción autolimpiante del gate sostiene el estado real.
+- **Extracción del build unit de UI** que disuelve el acoplamiento accidental: pertenece a EPIC-026 y
+  necesita su propia task hija.
+- **Team de Vercel del Lab** (`team_gmNiF4YCHmc1wqsHUTCvqjmN`, distinto del canónico de Greenhouse): queda
+  por confirmar si es deliberado.
+- **Promoción de `efeonce.status` / `efeonce.progress` a `stable`**: falta definir el criterio de evidencia
+  y quién firma.
+
 ## Supersession
 
 Esta decisión supersede parcialmente `EFEONCE_GLOBE_DESIGN_SYSTEM_GOVERNANCE_DECISION_V1`:
