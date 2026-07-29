@@ -6,10 +6,10 @@
 
 ---
 
-## AXIS package distribution/auth — estado verificado 2026-07-28
+## AXIS package distribution/auth — estado verificado 2026-07-29
 
 - GitHub Packages publica `@efeoncepro/axis-tokens`, `@efeoncepro/axis-ui-contracts` y
-  `@efeoncepro/axis-ui-registry` en versión `0.1.2`.
+  `@efeoncepro/axis-ui-registry` en versión `0.1.4`.
 - `efeoncepro/greenhouse-eo` y `efeoncepro/efeonce-globe` tienen permiso `Read` en GitHub
   Actions para los tres paquetes.
 - `axis-design-system-lab` tiene `NPM_RC` sensible configurado en Vercel para `Production` y
@@ -18,9 +18,9 @@
   Cloud Build usa el service account
   `818083690953-compute@developer.gserviceaccount.com`, que tiene
   `roles/secretmanager.secretAccessor` sobre el secreto.
-- Esto resuelve la distribución y autenticación de paquetes, no la integración de runtime:
-  Greenhouse y Globe aún no consumen los paquetes ni tienen adapters AXIS conectados. El
-  siguiente gate es `TASK-1591`.
+- Esto resuelve la distribución y autenticación de paquetes. Globe consume los tres paquetes
+  `0.1.4` en `apps/studio-client` y expone los fixtures opt-in `/_axis-pilot`; la evidencia del
+  piloto vive en `TASK-1591`. La promoción a superficies de producto permanece separada.
 - Riesgo vigente: el PAT utilizado es operator-owned y expira `2026-08-27`. Sustituirlo por
   una identidad de máquina dedicada antes de rollout externo o uso durable. El valor secreto
   no se documenta.

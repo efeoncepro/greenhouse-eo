@@ -9,13 +9,13 @@ source control.
 ## Current state — 2026-07-28
 
 - Package repository: `efeoncepro/axis-design-system`.
-- Private packages published at version `0.1.2`:
+- Private packages published at version `0.1.4`:
   - `@efeoncepro/axis-tokens`
   - `@efeoncepro/axis-ui-contracts`
   - `@efeoncepro/axis-ui-registry`
 - Lab: `https://axis-design-system-lab.vercel.app`.
-- Greenhouse and Globe are not runtime consumers yet.
-- The consumer rollout remains gated by `TASK-1591`.
+- Greenhouse and Globe consume the packages in opt-in AXIS adapter fixtures under `TASK-1591`.
+- Product promotion remains gated separately from the pilot.
 - GitHub Actions read access is configured for `efeoncepro/greenhouse-eo` and
   `efeoncepro/efeonce-globe` on all three packages.
 - Vercel `NPM_RC` is configured on `axis-design-system-lab` for Production and Preview.
@@ -101,11 +101,11 @@ short expiration and documented rotation owner. Do not send the token through ch
 1. Grant repository read access to all AXIS packages.
 2. Configure the read-only token in Vercel and/or Secret Manager.
 3. Add the scoped registry configuration without resolving the secret in source.
-4. Add fixed package versions, starting at `0.1.2`.
+4. Add fixed package versions, starting at the verified pilot version `0.1.4`.
 5. Implement one simple and one complex adapter under the consumer's native runtime.
 6. Run desktop, 390 px, keyboard, reduced-motion, accessibility and visual-diff evidence.
 7. Record the consumer and evidence in the AXIS registry.
-8. Promote only after rollback and a fresh install have passed.
+8. Keep the pilot opt-in until rollback and a fresh install have passed.
 
 ## Rollback
 

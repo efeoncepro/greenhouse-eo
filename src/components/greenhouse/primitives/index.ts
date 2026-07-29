@@ -565,6 +565,10 @@ export type {
   GreenhouseStepperProgressStep,
   GreenhouseStepperProgressVariant
 } from './GreenhouseStepperProgressMicro'
+export { default as AxisStatus } from './AxisStatus'
+export type { AxisStatusProps, AxisStatusState } from './AxisStatus'
+export { default as AxisProgress } from './AxisProgress'
+export type { AxisProgressProps } from './AxisProgress'
 export {
   default as GreenhouseRoadmapTimeline,
   normalizeGreenhouseRoadmapTimelineStatus,

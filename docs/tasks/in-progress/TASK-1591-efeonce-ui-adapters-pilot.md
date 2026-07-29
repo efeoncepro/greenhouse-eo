@@ -2,26 +2,28 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `primitive`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1591-efeonce-ui-adapters-pilot.md`
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `optional`
-- Status real: `Diseño gobernado; adapters piloto pendientes`
+- Status real: `Adapters implementados y verificados en fixtures opt-in; promoción productiva sigue pendiente`
 - Rank: `TBD`
 - Domain: `ui-platform|cross-runtime`
-- Blocked by: `TASK-1589`
+- Blocked by: `none`
 - Branch: `task/TASK-1591-efeonce-ui-adapters-pilot`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+`TASK-1589` foundation is complete; distribution and registry authentication prerequisites are verified.
 
 ## Summary
 
@@ -53,11 +55,11 @@ simple y una compleja en Greenhouse/MUI y Globe/Tailwind, con adopción opt-in y
 
 ## Acceptance Criteria
 
-- [ ] Una primitive simple y una compleja comparten contract.
-- [ ] Greenhouse no importa el adapter Globe.
-- [ ] Globe no importa MUI/Vuexy.
-- [ ] Cada consumer puede rollback por versión.
-- [ ] Evidence y ownership quedan en registry.
+- [x] Una primitive simple y una compleja comparten contract (`efeonce.status` y `efeonce.progress`).
+- [x] Greenhouse no importa el adapter Globe.
+- [x] Globe no importa MUI/Vuexy.
+- [x] Cada consumer puede rollback por versión (`0.1.3`/`0.1.4` en lockfile y adapter opt-in).
+- [x] Evidence y ownership quedan en registry (`greenhouse-ui-platform`, fixtures desktop/mobile/keyboard).
 
 > La foundation y la distribución privada son prerrequisitos completados; estos criterios
 > permanecen abiertos hasta implementar y verificar los adapters en ambos consumidores.
@@ -66,6 +68,8 @@ simple y una compleja en Greenhouse/MUI y Globe/Tailwind, con adopción opt-in y
 
 - Feature opt-in en consumers piloto.
 - Rollback a implementation local sin modificar el contrato de runtime.
+- Greenhouse: revertir los tres paquetes a `0.1.3` y retirar la ruta `/design-system/axis-adapters`.
+- Globe: revertir los tres paquetes a `0.1.3` y retirar la ruta `/_axis-pilot`; las superficies existentes no dependen del adapter.
 
 ## Delivery state — 2026-07-28
 
@@ -74,7 +78,7 @@ simple y una compleja en Greenhouse/MUI y Globe/Tailwind, con adopción opt-in y
 - AXIS foundation y Lab publicados y verificados en el repositorio privado
   `efeoncepro/axis-design-system`.
 - Paquetes privados publicados en GitHub Packages: `@efeoncepro/axis-tokens`,
-  `@efeoncepro/axis-ui-contracts` y `@efeoncepro/axis-ui-registry`, versión `0.1.2`.
+  `@efeoncepro/axis-ui-contracts` y `@efeoncepro/axis-ui-registry`, versión `0.1.4`.
 - `efeoncepro/greenhouse-eo` y `efeoncepro/efeonce-globe` tienen acceso `Read` a los tres
   paquetes desde GitHub Actions.
 - El proyecto Vercel `axis-design-system-lab` tiene `NPM_RC` sensible configurado para
@@ -88,18 +92,33 @@ simple y una compleja en Greenhouse/MUI y Globe/Tailwind, con adopción opt-in y
 
 ### Consumer runtime — pendiente
 
-La distribución está habilitada, pero Greenhouse y Globe todavía no consumen los paquetes
-AXIS en su runtime. La task no se puede cerrar como completa hasta ejecutar el siguiente
-slice de implementación:
+La distribución y el slice de consumer están implementados como canary opt-in en ambos
+runtimes. La promoción productiva permanece separada y requiere el gate de release correspondiente:
 
-1. Incorporar las dependencias AXIS y la configuración de registro/token en los pipelines
-   de Greenhouse y Globe, consumiendo el secreto de GCP sin imprimirlo.
-2. Implementar una primitive simple y una compleja por consumer mediante adapters locales:
-   MUI/Vuexy en Greenhouse y Tailwind en Globe, sin imports cruzados.
-3. Registrar contract, versión, ownership, estados y evidencia en el registry.
-4. Verificar desktop/mobile, teclado, reduced motion, estados ready/disabled/loading/error,
-   build de cada consumer y rollback por versión.
-5. Ejecutar canary opt-in y documentar el resultado antes de cualquier promoción.
+1. [x] Incorporar las dependencias AXIS `0.1.4` y autenticar el registry privado durante la instalación.
+2. [x] Implementar una primitive simple y una compleja por consumer mediante adapters locales:
+   MUI/Vuexy en Greenhouse y Tailwind/token classes en Globe, sin imports cruzados.
+3. [x] Registrar contract, versión, ownership, estados y evidencia en el registry.
+4. [x] Verificar desktop/mobile, teclado, reduced motion, estados de estado y build de cada consumer.
+5. [x] Ejecutar canary opt-in en `/design-system/axis-adapters` y `/_axis-pilot`.
+
+## Delivery evidence — 2026-07-29
+
+- AXIS `v0.1.4` publicado por GitHub Actions `30432127754` desde commit `10af569`.
+- Greenhouse fija `@efeoncepro/axis-{tokens,ui-contracts,ui-registry}` en `0.1.4` y expone
+  `AxisStatus` + `AxisProgress` desde `src/components/greenhouse/primitives`.
+- Globe fija los mismos tres paquetes en `apps/studio-client/package.json` y expone
+  `AxisStatus` + `AxisProgress` desde `apps/studio-client/src/primitives`.
+- Fixtures opt-in: Greenhouse `/design-system/axis-adapters`; Globe `/_axis-pilot`.
+- Globe Vite build pasa; design-contract gate pasa 6/6; ESLint de adapters pasa.
+- Playwright local: a 1440 px y 390 px `scrollWidth === clientWidth`; 4 status markers, 2 progress
+  contracts y 3 ordered steps; Tab enfoca el progress contract; reduced motion computa `0s`.
+- Greenhouse TypeScript y ESLint de los archivos modificados pasan. El typecheck global de Globe
+  conserva dos errores preexistentes en `ProducerComposer.tsx:1772,1792` sobre `thumbnail`, fuera
+  del piloto.
+- Autenticación: instalación privada verificada con `gh` token temporal; no se escribió ningún
+  token en el repositorio. La credencial operator-owned de GCP requiere reautenticación y conserva
+  el riesgo documentado de rotación antes de rollout externo.
 
 La credencial usada para habilitar la distribución es operator-owned y expira el
 `2026-08-27`; antes de rollout externo debe reemplazarse por una identidad de máquina

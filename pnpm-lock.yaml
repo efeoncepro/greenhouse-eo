@@ -29,6 +29,15 @@ importers:
       '@efeonce-globe/sdk':
         specifier: file:vendor/efeonce-globe/efeonce-globe-sdk-0.1.1.tgz
         version: file:vendor/efeonce-globe/efeonce-globe-sdk-0.1.1.tgz(@efeonce-globe/contracts@file:vendor/efeonce-globe/efeonce-globe-contracts-0.0.1.tgz)
+      '@efeoncepro/axis-tokens':
+        specifier: 0.1.4
+        version: 0.1.4
+      '@efeoncepro/axis-ui-contracts':
+        specifier: 0.1.4
+        version: 0.1.4
+      '@efeoncepro/axis-ui-registry':
+        specifier: 0.1.4
+        version: 0.1.4
       '@emoji-mart/data':
         specifier: 1.2.1
         version: 1.2.1
@@ -827,6 +836,15 @@ packages:
     version: 0.1.1
     peerDependencies:
       '@efeonce-globe/contracts': 0.0.1
+
+  '@efeoncepro/axis-tokens@0.1.4':
+    resolution: {integrity: sha512-/pr/Il9I7hJi7oLcnE+WHfz1tSOoko1YdZJMQoVIn4Bq+6JtLqN/HaCLxq3eCdnQ3Lz7IbVUkrsGM95lmN9EUA==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-tokens/0.1.4/7579008e6d28b3650b0b130318fd1cce5b64b22e}
+
+  '@efeoncepro/axis-ui-contracts@0.1.4':
+    resolution: {integrity: sha512-CIOYCC4hAV6bnaA9E42/pb4CJAjf70vpe5si0Ms8pbGS9EYu+5BKImKKx0V3zf0zVV2CjQOWZQSEb7Hfv+G1kg==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-ui-contracts/0.1.4/8f54e3c24582ec1b2d4f96bdf5af1b17888ba187}
+
+  '@efeoncepro/axis-ui-registry@0.1.4':
+    resolution: {integrity: sha512-wSdXFa2kz+cBPQUKPZi7mMtbKUVNTyXECK/vaSkyE28qBdc+ILA9xuxdGzimd2c1QzzBTpqAWpiow0ZmC1mX+g==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-ui-registry/0.1.4/f373e884627a919de38c98df0bcbc5345b862d36}
 
   '@emnapi/core@1.9.0':
     resolution: {integrity: sha512-0DQ98G9ZQZOxfUcQn1waV2yS8aWdZ6kJMbYCJB3oUBecjWYO1fqJ+a1DRfPF3O5JEkwqwP1A9QEN/9mYm2Yd0w==}
@@ -10845,6 +10863,14 @@ snapshots:
       google-auth-library: 10.9.0
     transitivePeerDependencies:
       - supports-color
+
+  '@efeoncepro/axis-tokens@0.1.4': {}
+
+  '@efeoncepro/axis-ui-contracts@0.1.4': {}
+
+  '@efeoncepro/axis-ui-registry@0.1.4':
+    dependencies:
+      '@efeoncepro/axis-ui-contracts': 0.1.4
 
   '@emnapi/core@1.9.0':
     dependencies:
