@@ -19,9 +19,10 @@ source control.
 - GitHub Actions read access is configured for `efeoncepro/greenhouse-eo` and
   `efeoncepro/efeonce-globe` on all three packages.
 - Vercel `NPM_RC` is configured on `axis-design-system-lab` for Production and Preview.
-- GCP Secret Manager secret `axis-packages-read-token` exists in `efeonce-globe`; the
-  Compute Engine service accounts used by Globe and Greenhouse Cloud Build have
-  secret-level `roles/secretmanager.secretAccessor`.
+- GCP Secret Manager secret `axis-packages-read-token` exists in `efeonce-globe`; this
+  is deliberate ecosystem ownership, not a Globe-only credential. The Compute Engine
+  service accounts used by Globe and Greenhouse Cloud Build have secret-level
+  `roles/secretmanager.secretAccessor`.
 - The current PAT is operator-owned and expires on 2026-08-27. Replace it with a
   dedicated machine identity before the first external/customer rollout.
 - Local private-package installation for the TASK-1591 canary was verified with a temporary
@@ -95,6 +96,12 @@ Greenhouse worker build identity:
 ```text
 183008134038-compute@developer.gserviceaccount.com
 ```
+
+This cross-project binding is temporary and intentionally avoids a second copy of the
+PAT. When the dedicated machine identity replaces the operator-owned PAT, create the
+replacement secret under the ecosystem owner, migrate both consumers, revoke the
+Greenhouse binding to this legacy secret, and remove the legacy secret only after both
+consumers pass their build and digest gates.
 
 The Greenhouse deploy scripts for `ops-worker`, `commercial-cost-worker` and
 `ico-batch-worker` use the same contract. Their Dockerfiles mount the secret in
