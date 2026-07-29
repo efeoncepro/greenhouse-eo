@@ -15,7 +15,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `optional`
-- Status real: `V1.1 EN CURSO — foundation publicada y operativa; endurecimiento de distribución/gobierno abierto. Hecho y verificado en las dos direcciones (verde + rojo deliberado): CI de PR en el repo AXIS (antes NO existía: un main roto se publicaba), gate de contrato que DESCUBRE los contratos exportados en vez de listarlos, gate de coherencia tag↔versión, y gate de drift de tokens. HALLAZGO 1: el drift de tokens YA HABÍA OCURRIDO — 0.1.4 publica warning #d59800 y danger #c01d27, valores pre-TASK-1053; inerte porque ningún consumidor lee efeonceTokens.color, corregido en 0.1.5 con blast radius cero. HALLAZGO 2: los 11 workflows de Greenhouse y el CI de Globe usan GITHUB_TOKEN, NO el PAT — el PAT lo consume solo Cloud Build, así que al expirar el CI queda VERDE y solo fallan builds de worker: falla silenciosa por construcción. HALLAZGO 3: ningún src/lib/** ni services/** importa AXIS (vive solo en src/components/greenhouse/primitives) — el acoplamiento de los workers es ACCIDENTAL de instalación, no de runtime; la salida estructural es EPIC-026, no más plomería. HALLAZGO 4: el NPM_RC de Vercel del Lab NO SE USA (apps/lab consume por workspace:*) — credencial de larga vida sin consumidor, a retirar. PENDIENTE (requiere al operador): crear la identidad de máquina, publicar el secreto en efeonce-group, migrar los 5 consumidores, publicar 0.1.5 y ejecutar los 4 puntos de verificación del runbook`
+- Status real: `V1.1 EN CURSO — foundation publicada y operativa; endurecimiento de distribución/gobierno abierto. Hecho y verificado en las dos direcciones (verde + rojo deliberado): CI de PR en el repo AXIS (antes NO existía: un main roto se publicaba), gate de contrato que DESCUBRE los contratos exportados en vez de listarlos, gate de coherencia tag↔versión, y gate de drift de tokens. HALLAZGO 1: el drift de tokens YA HABÍA OCURRIDO — 0.1.4 publica warning #d59800 y danger #c01d27, valores pre-TASK-1053; inerte porque ningún consumidor lee efeonceTokens.color, corregido en 0.1.5 con blast radius cero. HALLAZGO 2: los 11 workflows de Greenhouse y el CI de Globe usan GITHUB_TOKEN, NO el PAT — el PAT lo consume solo Cloud Build, así que al expirar el CI queda VERDE y solo fallan builds de worker: falla silenciosa por construcción. HALLAZGO 3: ningún src/lib/** ni services/** importa AXIS (vive solo en src/components/greenhouse/primitives) — el acoplamiento de los workers es ACCIDENTAL de instalación, no de runtime; la salida estructural es EPIC-026, no más plomería. HALLAZGO 4: el NPM_RC de Vercel del Lab NO SE USA (apps/lab consume por workspace:*) — credencial de larga vida sin consumidor, a retirar. EJECUTADO 2026-07-29: CI del repo AXIS vivo y verde (actions alineadas a v5/v6 tras la anotación de Node 20); 0.1.5 PUBLICADA con los gates corriendo antes de los publish; Greenhouse y Globe la consumen con gates verdes; la excepcion autolimpiante se rompio sola al instalar 0.1.5 y fue borrada; NPM_RC del Lab retirado y probado con install+build SIN credencial (247ms); contenedor del secreto creado en efeonce-group con IAM y CERO versiones (inerte, el legacy sigue sirviendo). PENDIENTE (solo el operador, un agente no debe hacerlo): crear la identidad de maquina, publicar el VALOR del token, migrar los 5 consumidores de Cloud Build y ejecutar los 4 puntos de verificacion del runbook`
 - Rank: `TBD`
 - Domain: `ui-platform|cross-runtime`
 - Blocked by: `TASK-1588`
@@ -37,7 +37,7 @@ open questions) en `docs/architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISIO
 § Delta 2026-07-29. Runbook operativo actualizado en
 `docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md` § Delta 2026-07-29.
 
-### Implementado y verificado (local-first, sin push)
+### Implementado y verificado
 
 En `../axis-design-system`:
 
@@ -63,17 +63,34 @@ En Greenhouse:
   **nuevos**. Miden la expiración real que reporta GitHub, no una fecha escrita en un doc. Semanal, aviso
   a 21 días, falla a 7. Se omite solo mientras el secreto siga en el proyecto legacy.
 
-### Pendiente — requiere al operador (no ejecutable por un agente)
+### Ejecutado el 2026-07-29
+
+- **CI del repo AXIS vivo.** Primera corrida verde (`30487680371`); anotó que las actions v4 targetean
+  Node 20 deprecado, así que se alinearon al canon del ecosistema (checkout@v5 · setup-node@v5 ·
+  action-setup@v6) y la segunda corrida quedó limpia.
+- **`0.1.5` publicada** (`30487828729`) con los gates corriendo ANTES de los tres `publish`, incluido el
+  de coherencia tag↔versión estrenado en este release.
+- **Greenhouse y Globe consumen `0.1.5`.** Greenhouse: 49/49 tests de theme, typecheck limpio. Globe:
+  typecheck, build de `studio-client` y los dos canarios (composer + axis-pilot) verdes.
+- **La excepción autolimpiante funcionó como se diseñó:** al instalar `0.1.5` sus dos asserts fallaron
+  —`expected '#ffb703' to be '#d59800'`— forzando su borrado. El workaround no sobrevivió a su causa.
+- **`NPM_RC` del Lab retirado** de Production y Preview; el proyecto quedó sin ninguna variable.
+  Verificado de forma determinista, no por redeploy: con `node_modules` borrado y sin credencial alguna
+  (`NPM_CONFIG_USERCONFIG=/dev/null`), `pnpm install --frozen-lockfile` resolvió en 247 ms y el build
+  emitió `dist/` completo.
+- **Contenedor del secreto creado en `efeonce-group`** con `secretAccessor` para las dos identidades de
+  build y readback verificado. **Cero versiones**: inerte, sin riesgo, y el legacy sigue sirviendo a los
+  builds sin cambio de runtime.
+
+### Pendiente — sólo el operador (un agente no debe ejecutarlo)
 
 1. Crear la identidad de máquina con `read:packages` únicamente y su dueño de rotación.
-2. Publicar el secreto en `efeonce-group` (`printf %s | gcloud secrets versions add`) + accessor a las dos
-   identidades de build. **El valor del credencial nunca pasa por un agente ni por chat.**
-3. Apuntar los 5 consumidores de Cloud Build al nuevo `versionName`; build verde en ambos productos.
-4. Recién entonces: revocar el binding legacy en `efeonce-globe` y borrar el secreto viejo.
-5. Taguear `v0.1.5` para publicar la corrección de tokens; actualizar la versión fijada en Greenhouse y
-   Globe; borrar la excepción autolimpiante del gate de drift.
-6. Retirar el `NPM_RC` de Vercel del Lab (no tiene consumidor) y redesplegar para confirmar.
-7. Ejecutar los 4 puntos de verificación del runbook en pipeline real.
+2. Publicar su token en el secreto de `efeonce-group` (`printf %s | gcloud secrets versions add`).
+   **El valor nunca pasa por un agente, por chat ni por un log.**
+3. Apuntar los 5 consumidores de Cloud Build al nuevo `versionName` — **nunca antes del paso 2**: un
+   `versionName` sin versión rompe todo build.
+4. Build verde en ambos productos; recién entonces revocar el binding legacy y borrar el secreto viejo.
+5. Ejecutar los 4 puntos de verificación del runbook en pipeline real.
 
 ### Acceptance criteria (V1.1)
 
@@ -83,9 +100,11 @@ En Greenhouse:
 - [x] Existe un gate que detecta drift entre los tokens publicados y el SSOT de Greenhouse.
 - [x] Existe un detector de expiración que mide la realidad, no un registro.
 - [x] Cada gate nuevo ejercitado en las dos direcciones (verde y rojo deliberado).
-- [ ] Identidad de máquina creada, con dueño y fecha de rotación documentados.
-- [ ] Secreto en `efeonce-group`; ambos consumidores verdes contra él **antes** de revocar el legacy.
-- [ ] `0.1.5` publicada y consumida; excepción autolimpiante borrada.
+- [x] `0.1.5` publicada y consumida por ambos productos; excepción autolimpiante borrada por su diseño.
+- [x] `NPM_RC` del Lab retirado, probado con install + build sin ninguna credencial.
+- [x] Contenedor del secreto creado en `efeonce-group` con IAM a las dos identidades de build.
+- [ ] Identidad de máquina creada, con dueño y fecha de rotación documentados. **Sólo el operador.**
+- [ ] Valor publicado en `efeonce-group`; los 5 consumidores migrados y verdes **antes** de revocar el legacy.
 - [ ] Los 4 puntos del runbook ejecutados en pipeline real.
 
 ### Rollback

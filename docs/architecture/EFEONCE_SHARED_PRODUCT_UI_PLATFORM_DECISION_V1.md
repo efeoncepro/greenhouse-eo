@@ -246,8 +246,6 @@ rotación —el modo de falla real observado— a cambio de aislar un riesgo de 
 
 ### Open questions (deliberadamente no decididas)
 
-- **Cuándo publicar `0.1.5`.** El fix está commiteado en el repo AXIS; taguear es un acto de release del
-  operador. Hasta entonces, la excepción autolimpiante del gate sostiene el estado real.
 - **Extracción del build unit de UI** que disuelve el acoplamiento accidental: pertenece a EPIC-026 y
   necesita su propia task hija.
 - **Promoción de `efeonce.status` / `efeonce.progress` a `stable`**: falta definir el criterio de evidencia
@@ -257,8 +255,27 @@ rotación —el modo de falla real observado— a cambio de aislar un riesgo de 
   contenido del tarball). Consumir lo publicado lo convertiría en el verificador del artefacto — y sería
   la única razón legítima para que el Lab tenga credencial de registry.
 
-*(Cerrada 2026-07-29: el team de Vercel del Lab **no** es distinto del canónico. `team_gmNiF4YCHmc1wqsHUTCvqjmN`
-es el id cuyo slug es `efeonce-7670142f`; `greenhouse-eo` y `axis-design-system-lab` comparten orgId.)*
+*Cerradas el 2026-07-29:*
+
+- *El team de Vercel del Lab **no** es distinto del canónico. `team_gmNiF4YCHmc1wqsHUTCvqjmN` es el id cuyo
+  slug es `efeonce-7670142f`; `greenhouse-eo` y `axis-design-system-lab` comparten orgId.*
+- *`0.1.5` publicada. El release corrió con CI, gate de contratos y verificación tag↔versión; Greenhouse y
+  Globe la consumen y la excepción autolimpiante del gate de drift ya fue borrada por su propio diseño.*
+
+### Estado de ejecución — 2026-07-29
+
+| Movimiento | Estado |
+|---|---|
+| CI de PR en el repo AXIS | ✅ verde en su primera corrida (`30487680371`) |
+| Actions alineadas al canon v5/v6 | ✅ (la corrida anotó Node 20 deprecado) |
+| `0.1.5` publicada con gates previos | ✅ `30487828729` |
+| Greenhouse y Globe en `0.1.5` | ✅ gates verdes en ambos |
+| Excepción autolimpiante del drift | ✅ se rompió al instalar `0.1.5` y fue borrada |
+| `NPM_RC` del Lab retirado | ✅ probado con install+build sin credencial |
+| Secreto en `efeonce-group` | ⏳ contenedor + IAM creados; **cero versiones** |
+| Identidad de máquina y valor del token | 🔴 sólo el operador |
+| Migración de los 5 consumidores de Cloud Build | 🔴 bloqueada por lo anterior |
+| Los 4 puntos de verificación del runbook | 🔴 pendientes |
 
 ## Supersession
 

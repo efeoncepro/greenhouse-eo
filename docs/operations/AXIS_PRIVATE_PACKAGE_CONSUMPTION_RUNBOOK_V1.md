@@ -9,7 +9,8 @@ source control.
 ## Current state — 2026-07-29
 
 - Package repository: `efeoncepro/axis-design-system`.
-- Private packages published at version `0.1.4`:
+- Private packages published at version `0.1.5` (was `0.1.4` until 2026-07-29; the bump corrected
+  the `warning`/`danger` token drift and was the first release gated by CI):
   - `@efeoncepro/axis-tokens`
   - `@efeoncepro/axis-ui-contracts`
   - `@efeoncepro/axis-ui-registry`
@@ -18,11 +19,12 @@ source control.
 - Product promotion remains gated separately from the pilot.
 - GitHub Actions read access is configured for `efeoncepro/greenhouse-eo` and
   `efeoncepro/efeonce-globe` on all three packages.
-- Vercel `NPM_RC` is configured on `axis-design-system-lab` for Production and Preview.
-  ⚠️ **Verified 2026-07-29: it is not used.** The Lab consumes AXIS through `workspace:*`
-  links, so its build never authenticates against the registry. Retire it — see the Delta below.
-- GCP Secret Manager secret `axis-packages-read-token` exists in `efeonce-globe`; this
-  is deliberate ecosystem ownership, not a Globe-only credential. The Compute Engine
+- Vercel `NPM_RC` on `axis-design-system-lab`: **retired 2026-07-29**. The Lab consumes AXIS through
+  `workspace:*` links, so its build never authenticates against the registry — the variable had no
+  consumer. Proven by installing and building with no credential at all. See the Delta below.
+- GCP Secret Manager secret `axis-packages-read-token` still lives in `efeonce-globe` and is what the
+  builds read today. Its replacement container **already exists in `efeonce-group`** (created
+  2026-07-29, IAM granted, zero versions) and takes over once the machine identity is issued. The Compute Engine
   service accounts used by Globe and Greenhouse Cloud Build have secret-level
   `roles/secretmanager.secretAccessor`.
 - The current PAT is operator-owned and expires on 2026-08-27. Replace it with a
@@ -46,7 +48,7 @@ Decisión arquitectónica completa en
 |---|---|---|
 | GitHub Actions — 11 workflows Greenhouse + `ci.yml` de Globe | `secrets.GITHUB_TOKEN` del runner | **No.** Efímero, por run. Ya es óptimo; no tocar |
 | Cloud Build — 4 workers Greenhouse + Globe | Secret Manager | **Sí.** Único consumidor real del PAT |
-| Vercel `NPM_RC` del Lab | variable de entorno sensible | **No — y hay que retirarla** (ver abajo) |
+| Vercel `NPM_RC` del Lab | *(nada — retirada 2026-07-29)* | **No.** El Lab usa `workspace:*`; la variable no tenía consumidor |
 
 **Por qué esto importa para el diagnóstico:** el PAT **no está en el camino del PR**. El día que expire,
 todos los PR seguirán verdes y solo fallará un build de worker, posiblemente semanas después y bajo
@@ -58,17 +60,30 @@ header `github-authentication-token-expiration` — no una fecha escrita en este
 21 días, falla a 7. Mientras el secreto siga en el proyecto legacy, el workflow se omite solo y no hace
 ruido; empieza a medir en cuanto exista en `efeonce-group`.
 
-### 🔴 Retirar el `NPM_RC` de Vercel — credencial sin consumidor
+### ✅ `NPM_RC` de Vercel retirado — era un credencial sin consumidor (ejecutado 2026-07-29)
 
 `apps/lab` consume AXIS por **`workspace:*`** (symlinks a `packages/`), verificado en `pnpm-lock.yaml`
 (`version: link:../../packages/tokens`). El build del Lab **nunca resuelve nada contra
-`npm.pkg.github.com`**, así que el `NPM_RC` configurado en Production y Preview es un credencial de larga
+`npm.pkg.github.com`**, así que el `NPM_RC` que estaba en Production y Preview era un credencial de larga
 vida almacenado **sin ningún consumidor**: superficie de exposición sin contrapartida.
 
-Acción: borrar la variable en ambos entornos y redesplegar el Lab para confirmar que sigue construyendo.
-Es reversible en un minuto (volver a crearla) y no afecta a Greenhouse ni a Globe.
+**Retirado** de ambos entornos; el proyecto quedó sin ninguna variable de entorno.
 
-### Nuevo hogar del secreto: `efeonce-group`
+**Verificación (determinista, más fuerte que un redeploy):** con `node_modules` borrado y **sin ninguna
+credencial de registry** —`NPM_CONFIG_USERCONFIG=/dev/null`, sin `NPM_TOKEN` ni `NODE_AUTH_TOKEN`—
+`pnpm install --frozen-lockfile` resolvió en 247 ms y `pnpm --filter @efeonce/axis-design-system-lab build`
+emitió `dist/` completo. Si el Lab necesitara el registry, el install habría fallado con 401.
+
+Reversible en un minuto: volver a crear la variable. No afecta a Greenhouse ni a Globe.
+
+### Nuevo hogar del secreto: `efeonce-group` — contenedor creado 2026-07-29
+
+**Estado:** el secreto `axis-packages-read-token` **ya existe** en `efeonce-group` con las dos identidades
+de build como `secretAccessor`, y **cero versiones** — inerte y sin riesgo hasta que se le publique un
+valor. El legacy en `efeonce-globe` sigue siendo el que usan los builds; nada cambió todavía en runtime.
+
+**Lo que falta es exactamente el paso que un agente no debe ejecutar:** crear la identidad de máquina y
+publicar el valor. Los pasos 1 y 3 de abajo ya están hechos; quedan el 2 y del 4 en adelante.
 
 Decisión del operador (2026-07-29). El secreto deja de vivir en `efeonce-globe` —un proyecto de
 **producto**— y pasa al proyecto del **control plane**, que ya gobierna a Globe. No es simétrico al
@@ -77,14 +92,18 @@ anterior: `efeonce-group` no es un peer de Globe.
 Secuencia obligatoria, en este orden:
 
 ```bash
-# 1. Crear el contenedor (el VALOR lo publica el operador; nunca por chat, nunca en un log)
-gcloud secrets create axis-packages-read-token --project=efeonce-group
+# ✅ 1. HECHO 2026-07-29 — contenedor creado (no lleva valor)
+gcloud secrets create axis-packages-read-token --project=efeonce-group \
+  --replication-policy=automatic \
+  --labels=owner=axis-design-system,purpose=private-package-read,task=task-1589
 
-# 2. Publicar el valor como scalar crudo (sin comillas, sin \n — higiene de secretos)
+# 🔴 2. PENDIENTE — sólo el operador. Crear la identidad de máquina (read:packages, nada más)
+#       y publicar su token como scalar crudo: sin comillas, sin \n, sin whitespace.
+#       El valor NUNCA pasa por un agente, por chat ni por un log.
 printf %s "$TOKEN" | gcloud secrets versions add axis-packages-read-token \
   --project=efeonce-group --data-file=-
 
-# 3. Conceder accessor SOLO sobre este secreto, a las dos identidades de build
+# ✅ 3. HECHO 2026-07-29 — accessor SOLO sobre este secreto, readback verificado
 for SA in 183008134038-compute@developer.gserviceaccount.com \
           818083690953-compute@developer.gserviceaccount.com; do
   gcloud secrets add-iam-policy-binding axis-packages-read-token \
@@ -92,9 +111,11 @@ for SA in 183008134038-compute@developer.gserviceaccount.com \
     --role=roles/secretmanager.secretAccessor
 done
 
-# 4. Apuntar los consumidores al nuevo versionName (4 deploy.sh de Greenhouse + Cloud Build de Globe)
-# 5. Build verde en AMBOS productos contra el secreto nuevo
-# 6. RECIÉN ENTONCES revocar el binding legacy en efeonce-globe y borrar el secreto viejo
+# 🔴 4. PENDIENTE — apuntar los consumidores al nuevo versionName
+#       (los 4 services/*/deploy.sh de Greenhouse + el Cloud Build de Globe).
+#       NO hacerlo antes del paso 2: un versionName sin versión rompe todo build.
+# 🔴 5. PENDIENTE — build verde en AMBOS productos contra el secreto nuevo
+# 🔴 6. PENDIENTE — RECIÉN ENTONCES revocar el binding legacy y borrar el secreto viejo
 ```
 
 **NUNCA** revocar el binding legacy antes del paso 5. Revocar primero deja a Greenhouse sin poder

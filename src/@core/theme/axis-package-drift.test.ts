@@ -53,26 +53,6 @@ const DERIVED_ROLES: Record<string, string> = {
  */
 const NEUTRAL_ROLES = ['surface', 'canvas', 'text', 'textMuted', 'border'] as const
 
-/**
- * TEMPORARY, SELF-RETIRING (2026-07-29 · owner TASK-1589 V1.1).
- *
- * Measured drift: the installed package `0.1.4` still carries pre-TASK-1053
- * values for these two roles. It is inert today — no consumer reads
- * `efeonceTokens.color`; Greenhouse paints through MUI and Globe through its own
- * Tailwind theme — which is why it went unnoticed and why correcting it costs
- * nothing right now.
- *
- * The fix is already committed in the AXIS repo and ships as `0.1.5`.
- *
- * Retirement condition: this block asserts the drift STILL EXISTS. The moment
- * `0.1.5` is installed here, these assertions fail and force the exception to be
- * deleted. A workaround that cannot outlive its cause.
- */
-const KNOWN_DRIFT: Record<string, string> = {
-  warning: '#d59800',
-  danger: '#c01d27'
-}
-
 describe('AXIS package tokens derive from the Greenhouse brand SSOT', () => {
   it('covers every colour the package publishes', () => {
     const published = Object.keys(efeonceTokens.color).sort()
@@ -81,18 +61,10 @@ describe('AXIS package tokens derive from the Greenhouse brand SSOT', () => {
     expect(published).toEqual(accounted)
   })
 
-  it.each(Object.entries(DERIVED_ROLES).filter(([role]) => !(role in KNOWN_DRIFT)))(
+  it.each(Object.entries(DERIVED_ROLES))(
     'role "%s" matches the Greenhouse SSOT value',
     (role, expected) => {
       expect(efeonceTokens.color[role as keyof typeof efeonceTokens.color]).toBe(expected)
-    }
-  )
-
-  it.each(Object.entries(KNOWN_DRIFT))(
-    'known drift on "%s" still exists — delete this exception once AXIS 0.1.5 is installed',
-    (role, published) => {
-      expect(efeonceTokens.color[role as keyof typeof efeonceTokens.color]).toBe(published)
-      expect(published).not.toBe(DERIVED_ROLES[role])
     }
   )
 
