@@ -64,15 +64,25 @@ export const collectLocalFileDependencies = pkg => {
 export const splitDockerStages = dockerfile =>
   dockerfile.split(/(?=^FROM\s+)/gim).filter(stage => /^FROM\s+/im.test(stage))
 
-export const validateDockerfile = ({ source, pnpmVersion, localDependencies }) => {
+export const validateDockerfile = ({ source, pnpmVersion, localDependencies, requiresPrivatePackageAuth = false }) => {
   const errors = []
-  const stages = splitDockerStages(source)
+  // Docker BuildKit options may precede the command and line continuations may
+  // split `RUN --mount=... pnpm install` across physical lines.
+  const normalizedSource = source.replace(/\\\s*\n/g, ' ')
+  const stages = splitDockerStages(normalizedSource)
   const localDependencyRoots = [...new Set(localDependencies.map(item => item.path.split('/')[0]).filter(Boolean))]
 
   for (const [index, stage] of stages.entries()) {
-    const installsDependencies = /RUN\s+pnpm\s+install\b/i.test(stage)
+    const installsDependencies = /RUN(?:\s+--[^\n]+)*\s+pnpm\s+install\b/i.test(stage)
 
     if (!installsDependencies) continue
+
+    if (
+      requiresPrivatePackageAuth &&
+      !/RUN\s+--mount=type=secret,id=axis_npmrc,[^\n]*\s+pnpm\s+install\b/i.test(stage)
+    ) {
+      errors.push(`stage ${index + 1}: pnpm install debe montar el secreto BuildKit axis_npmrc`)
+    }
 
     const versionMatches = [...stage.matchAll(/^ARG\s+PNPM_VERSION=([^\s]+)$/gim)].map(match => match[1])
 
@@ -86,7 +96,7 @@ export const validateDockerfile = ({ source, pnpmVersion, localDependencies }) =
         'im'
       )
 
-      const installOffset = stage.search(/RUN\s+pnpm\s+install\b/i)
+      const installOffset = stage.search(/RUN(?:\s+--[^\n]+)*\s+pnpm\s+install\b/i)
       const copyMatch = copyPattern.exec(stage)
 
       if (!copyMatch || copyMatch.index > installOffset) {
@@ -95,7 +105,7 @@ export const validateDockerfile = ({ source, pnpmVersion, localDependencies }) =
     }
   }
 
-  if (!stages.some(stage => /RUN\s+pnpm\s+install\b/i.test(stage))) {
+  if (!stages.some(stage => /RUN(?:\s+--[^\n]+)*\s+pnpm\s+install\b/i.test(stage))) {
     errors.push('no se encontró ninguna etapa con pnpm install')
   }
 
@@ -192,9 +202,24 @@ export const validateWorkerWorkflowPaths = ({ path, workflow }) => {
 const validateIgnoreContract = ({ root, path }) => {
   const source = readText(root, path)
 
-  return source.includes('!vendor/efeonce-globe/**')
-    ? []
-    : [`${path}: debe incluir explícitamente !vendor/efeonce-globe/**`]
+  const rules = new Set(
+    source
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line && !line.startsWith('#'))
+  )
+
+  const errors = []
+
+  if (!rules.has('!vendor/efeonce-globe/**')) {
+    errors.push(`${path}: debe incluir explícitamente !vendor/efeonce-globe/**`)
+  }
+
+  if (!rules.has('.npmrc')) {
+    errors.push(`${path}: debe excluir .npmrc para que credenciales de package install no entren al build context`)
+  }
+
+  return errors
 }
 
 export const runWorkerBuildContractGate = (root = repoRoot) => {
@@ -203,6 +228,10 @@ export const runWorkerBuildContractGate = (root = repoRoot) => {
   const lockfile = YAML.parse(readText(root, 'pnpm-lock.yaml'))
   const pnpmVersion = parsePnpmVersion(pkg.packageManager)
   const localDependencies = collectLocalFileDependencies(pkg)
+
+  const requiresPrivatePackageAuth = Object.keys(pkg.dependencies ?? {}).some(name =>
+    name.startsWith('@efeoncepro/axis-')
+  )
 
   if (localDependencies.length === 0) {
     console.log('• No hay dependencias file: locales; se mantienen los demás contratos de build.')
@@ -217,7 +246,8 @@ export const runWorkerBuildContractGate = (root = repoRoot) => {
       ...validateDockerfile({
         source: readText(root, unit.dockerfile),
         pnpmVersion,
-        localDependencies
+        localDependencies,
+        requiresPrivatePackageAuth
       }).map(error => `${unit.dockerfile}: ${error}`)
     )
 

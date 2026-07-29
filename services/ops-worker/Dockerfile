@@ -9,6 +9,7 @@
 
 # ─── Builder stage: install deps + bundle ────────────────────────────────────
 
+# syntax=docker/dockerfile:1.7
 FROM node:22-slim AS builder
 
 ARG PNPM_VERSION=10.32.1
@@ -19,7 +20,8 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml ./
 COPY vendor/ ./vendor/
-RUN pnpm install --frozen-lockfile --ignore-scripts
+RUN --mount=type=secret,id=axis_npmrc,target=/root/.npmrc,required=true \
+    pnpm install --frozen-lockfile --ignore-scripts
 
 COPY tsconfig.json ./
 COPY src/ ./src/
@@ -79,7 +81,8 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml ./
 COPY vendor/ ./vendor/
-RUN pnpm install --frozen-lockfile --ignore-scripts --prod
+RUN --mount=type=secret,id=axis_npmrc,target=/root/.npmrc,required=true \
+    pnpm install --frozen-lockfile --ignore-scripts --prod
 
 COPY --from=builder /app/dist/server.mjs ./dist/server.mjs
 

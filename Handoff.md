@@ -1,5 +1,44 @@
 # Handoff activo
 
+## 2026-07-29 — Production release: Cloud Build AXIS auth root cause isolated
+
+`main` sigue en `9bb780ba4c41bfdf40903b762194fb6bb8085b59`, con CI, CI Deep, smoke, Vercel Production READY,
+preflight y manifest verdes. El orchestrator `30465872005` llegó al gate Production, fue aprobado por la sesión
+autorizada y desplegó HubSpot correctamente, pero los builds Cloud Run de `ops-worker`, `commercial-cost-worker` e
+`ico-batch-worker` fallaron antes del deploy. Azure quedó en sus lanes normales de `no_infra_diff`/espera y no es la
+causa.
+
+La evidencia de Cloud Build (`322e8c71`, `f7da8e53`, `cd604434`) fue `ERR_PNPM_FETCH_401` para
+`@efeoncepro/axis-tokens`: `No authorization header was set`. La causa era que los tres Dockerfiles y sus inline
+Cloud Build configs instalaban paquetes privados sin el secreto AXIS.
+
+Fix code-complete en develop, con PR #166 pendiente de gates y nuevo release: los tres deploy scripts leen
+`projects/efeonce-globe/secrets/axis-packages-read-token` con `secretEnv`, materializan `.npmrc` efímero con
+`trap`, ejecutan Docker BuildKit `--secret`, y los tres Dockerfiles montan `axis_npmrc` en builder y runtime.
+Se concedió `secretAccessor` únicamente a `183008134038-compute@developer.gserviceaccount.com`. No se expuso token en
+logs, imagen, artefactos ni runtime. Gates locales `worker-build-contract`, `worker-runtime-deps` y 10 tests focales
+pasaron. El carril real de Cloud Build montó el `.npmrc`, pero GitHub Packages respondió `401 Unauthorized` en los
+tres builds nuevos (`d393c460`, `367ee552`, `f356a7bd`). La verificación segura posterior demostró que el PAT no
+está vencido: el payload es un PAT clásico limpio, GitHub `/user` responde `200` y el tarball privado exacto responde
+`200`. La causa real era doble expansión de `$$` en el heredoc no quoted: el shell generador lo convertía en su PID
+antes de entregar el config a Cloud Build, lo que explica que cada build reportara un bearer numérico distinto.
+El fix preserva `$$AXIS_PACKAGES_READ_TOKEN` para que Cloud Build inyecte el secreto real. Falta revalidar CI, los
+tres builds/digests y repetir el orchestrator.
+
+La revisión de arquitectura añadió `.npmrc` a `.dockerignore` y `.gcloudignore`: aunque los Dockerfiles usan `COPY`
+explícitos y el archivo no entraba a las imágenes, el secreto efímero tampoco debe viajar dentro del contexto enviado
+al daemon de Docker. El worker build-contract gate ahora bloquea ambas omisiones.
+
+El inventario completo de build units detectó un cuarto consumidor: `artifact-worker` instala el mismo `package.json`
+y por tanto también requiere AXIS auth, aunque sea un Cloud Run Job staging-only y no forme parte del orchestrator
+productivo. Su Dockerfile/deploy script ahora usan el mismo contrato `secretEnv` → `.npmrc` efímero → BuildKit secret;
+el gate exige el montaje en los cuatro Dockerfiles.
+
+La ubicación en `efeonce-globe` es un acoplamiento legado deliberado y temporal, no ownership de Globe. La decisión de
+retiro está atada a ownership: cuando se cree la identidad de máquina, el secreto nuevo debe nacer en un proyecto
+neutral del ecosistema AXIS, fuera de cualquier producto; después se migran ambos consumers, se completan build/digest
+gates y se revoca el binding cross-project. No se debe recrear el secreto nuevo en `efeonce-globe` por inercia.
+
 ## 2026-07-29 — PR #164: main promovido, release bloqueado por latencia Sentry (fix en develop)
 
 `develop` quedó en `2ecef6a5c4c8a79a738536fe04192b7343e358b0` y PR #164 promovió todo el contenido a `main` mediante

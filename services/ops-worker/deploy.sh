@@ -170,9 +170,28 @@ BUILD_ID=$(gcloud builds submit . \
   --config=/dev/stdin <<CLOUDBUILD_EOF
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', '${IMAGE}', '-f', 'services/ops-worker/Dockerfile', '.']
+    entrypoint: bash
+    secretEnv:
+      - AXIS_PACKAGES_READ_TOKEN
+    args:
+      - -ceu
+      - |
+        trap 'rm -f .npmrc' EXIT
+        umask 077
+        printf '%s\n' \
+          '@efeoncepro:registry=https://npm.pkg.github.com' \
+          "//npm.pkg.github.com/:_authToken=\$\${AXIS_PACKAGES_READ_TOKEN}" > .npmrc
+        DOCKER_BUILDKIT=1 docker build \
+          --secret id=axis_npmrc,src=.npmrc \
+          -t '${IMAGE}' \
+          -f 'services/ops-worker/Dockerfile' \
+          .
 images:
   - '${IMAGE}'
+availableSecrets:
+  secretManager:
+    - versionName: projects/efeonce-globe/secrets/axis-packages-read-token/versions/latest
+      env: AXIS_PACKAGES_READ_TOKEN
 options:
   logging: CLOUD_LOGGING_ONLY
 CLOUDBUILD_EOF

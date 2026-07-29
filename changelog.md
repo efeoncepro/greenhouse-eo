@@ -7,6 +7,22 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-29 — Release Cloud Build: autenticación privada AXIS en workers
+
+- El release orchestrator `30465872005` reveló `ERR_PNPM_FETCH_401` en los builds Cloud Run de `ops-worker`,
+  `commercial-cost-worker` e `ico-batch-worker`: faltaba autorización para `@efeoncepro/axis-tokens`.
+- Los tres deploy scripts ahora usan el secreto read-only existente `axis-packages-read-token` mediante `secretEnv` y
+  `.npmrc` efímero; los Dockerfiles montan BuildKit secret en ambas capas `pnpm install`, sin token en imagen o runtime.
+- La primera corrida autenticada aún respondió `401`: el PAT estaba sano, pero el heredoc no quoted expandía `$$` al
+  PID del shell antes de que Cloud Build pudiera resolver `secretEnv`. Los scripts ahora preservan el doble dólar
+  requerido por Cloud Build y un test de contrato cubre los tres consumidores.
+- `.dockerignore` y `.gcloudignore` excluyen `.npmrc`; el gate de contratos impide que el secreto efímero viaje en el
+  contexto de Docker o en un upload local accidental.
+- `artifact-worker`, cuarto build unit que instala el `package.json` raíz, adoptó el mismo montaje BuildKit; el gate
+  ahora exige AXIS auth en todas las etapas `pnpm install` de los cuatro workers.
+- Se concedió acceso Secret Manager sólo al service account de Cloud Build de Greenhouse. Validaciones locales de
+  contratos de workers y tests focales pasaron; rollout queda pendiente de PR y nuevo orchestrator.
+
 ## 2026-07-29 — Globe: contrato tipográfico del payload cliente + jerarquía del Producer (TASK-1599)
 
 - Tres commits desplegados y verificados en vivo sobre `globe-studio-internal-00100-9kq` (imagen
@@ -683,61 +699,3 @@ fuente de verdad. Nada autenticado se cachea, verificado path por path.
   `TASK-1561` cerró el gate de diseño (tipografía + frontera declarada). El selector de modelo del Producer
   (`TASK-1555`) quedó como desplegable compacto con isotipo real: la galería se implementó y el operador la
   rechazó al verla. Nuevas: `TASK-1559`, `TASK-1560`, `TASK-1562`.
-
-## 2026-07-25 — TASK-1558: el share board de Globe, la cara del cliente, reconstruida (ADR-014 Slice 1)
-
-- **La única superficie que un cliente externo ve de Globe deja de ser 15 líneas con 3.071 caracteres de CSS
-  en una sola línea.** Reconstruida como componentes tipados sobre el SSOT de tokens del payload cliente
-  (`efeonce-globe` `a336ff5`). Nacen las primeras primitives de Globe —`Chip`, `Eyebrow`, `FactList`,
-  `CommentList`, `MediaStage`, `StateBlock`— sirviendo a esta superficie; su promoción a plataforma se
-  **propone**, no se asume. `Surface` NO se entregó: la dirección elegida no la necesita y una primitive con
-  un solo consumer y ningún rol visual es una hipótesis.
-- **Dirección visual aprobada: B "lámina montada"** (passepartout + riel de líneas). Tres direcciones
-  renderizadas con los tokens y las fuentes reales y miradas en los dos targets, no comparadas en prosa.
-  **A se rechazó por descalificante**: `object-fit: cover` recorta la pieza y la viñeta le altera el color, o
-  sea corrompe el artefacto que el cliente vino a juzgar. **C** degradaba la pieza a ilustración de documento
-  y su fila de chips prometía filtros en una superficie read-only.
-- **Cuatro defectos verificados en la línea base, arreglados:** cards anidadas en el panel (card-on-card, que
-  el estándar de entrega trata como fallo de diseño); valores crudos al cliente (`changes_requested` y
-  `2026-08-01T18:00:00.000Z` iban directo a `textContent`); el rótulo interno `Producer`; y la ausencia total
-  de footer. La línea base "antes" se capturó antes de tocar nada — no existía.
-- **El estado que no existía y es el que ADR-005 pide de verdad: `partial`.** Si fallan los bytes, el
-  `.catch(fail)` de hoy tira **también** los hechos y los comentarios ya recibidos y pinta un mensaje
-  genérico — que es exactamente el "preview roto genérico" que la Delta prohíbe. Ahora el riel sobrevive
-  legible y sólo el stage degrada, con un Reintentar acotado a los bytes.
-- **Recalibración de la spec: los cuatro códigos de error NO son distinguibles, y es correcto.**
-  `publicShareError` (`app.ts:4143`) colapsa inválido/vencido/revocado/de-otro-target/denegado en **un 404 no
-  enumerable a propósito**, y sólo deja el 503 aparte para que el cliente pueda reintentar. Enumerarlos en la
-  UI reconstruiría el oráculo de grants que el colapso existe para evitar; además el `Out of Scope` de la
-  task prohíbe tocar el BFF. La regla de ADR-005 que se citaba gobierna el **feed del Producer**
-  (autenticado), no el share público. La unión discriminada real tiene 5 miembros.
-- **Tipografía al SSOT, con escala.** `--font-display`/`--font-body`, cuatro pasos sin huérfanos, leading,
-  pesos limitados a los tres cuts cargados, tracking y measure. La base sube a **16px**: el producer pone el
-  texto de lectura en ~13.6px, bajo el piso de 14px supplementary, y eso es defendible en una consola interna
-  donde el operador vive todo el día — no en la superficie que un cliente lee una vez, en un dispositivo
-  desconocido, para juzgar trabajo creativo. El riel se ensanchó a 22-27rem porque 52ch a 16px lo exige: a
-  24rem daban ~40 caracteres por línea, bajo el piso de 45.
-- **El gate de diseño pasa de 6 a 8 reglas y ahora camina `.css`.** Era el único lugar donde un hex, una
-  duración o una fuente podían seguir tipeándose a mano — un gate que deja de aplicar en cuanto el payload
-  gana su primer `.css` no es un gate. Reglas nuevas: tipografía literal, y **peso sin `@font-face`** (faux
-  bold renderiza, shippea y pasa todos los demás gates). Las cuatro verificadas rompiéndolas a propósito.
-  Y una lección de método: la primera versión de la regla de tipografía usaba un lookahead negativo cuyo
-  `\s*` retrocedía a ancho cero, así que **reportaba toda línea correctamente tokenizada**; una regla que
-  enrojece código compliant se apaga sola.
-- **`/legal/terms` retirado — y no estaba donde la spec decía.** El link roto que devolvía JSON crudo a un
-  browser vivía en el footer del **Producer** (`producer-ui.ts:82`), no en el share board, que no tiene ni
-  footer ni un solo `<a>`. Se retiró (ADR-014 lo prohíbe explícitamente) y el test que **fijaba su presencia**
-  quedó invertido, no borrado: un assert sobre la presencia de algo perpetúa el defecto cuando nadie pregunta
-  si debería estar.
-- **Primer canary visual de la superficie: 6 estados × 3 anchos** (1440, 390 y **320**, el piso de WCAG
-  1.4.10), con assertions de no-fuga sobre el HTML servido, overflow medido **por panel** y no sólo en el
-  documento, y Reintentar/`role=alert` verificados por estado. Encontró dos bugs reales antes del commit: el
-  chip "Sólo lectura" decidía el ancho de la página a 320px, y el bloque de estado de `partial` quedaba pegado
-  arriba en vez de centrado. Scorecard 4,71 promedio, piso 4.
-- **Estado honesto: code complete, rollout pendiente.** `client_app_enabled` sigue en `false` y el payload
-  viejo responde idéntico — **con test**, no como afirmación. Faltan el `terraform apply` del flip y el retiro
-  de `public-share-ui.ts`, que va después del flip verificado con un grant real.
-- **Brechas declaradas, no silenciadas:** no hay captions de video/audio porque `CreativeShareBoardV1` no
-  transporta pista (WCAG 1.2.2; `eslint-disable` justificado, cerrarlo es cambio de contrato); el `h1` usa un
-  fallback para toda pieza y los comentarios van sin autor porque la proyección no tiene esos campos, y
-  inventarlos en la superficie donde un cliente juzga trabajo sería fabricar evidencia.

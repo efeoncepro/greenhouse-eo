@@ -69,8 +69,15 @@ persistencia o jobs.
   lockfile en los consumers.
 - En GCP, proyecto `efeonce-globe`, existe el secreto de Secret Manager
   `axis-packages-read-token`. El service account de Cloud Build
-  `818083690953-compute@developer.gserviceaccount.com` tiene
-  `roles/secretmanager.secretAccessor` sobre ese secreto.
+  `818083690953-compute@developer.gserviceaccount.com` y el de Cloud Build de
+  Greenhouse `183008134038-compute@developer.gserviceaccount.com` tienen
+  `roles/secretmanager.secretAccessor` sobre ese secreto. La ubicación es ownership
+  deliberado del ecosistema AXIS, no una credencial exclusiva de Globe; no se duplica
+  el PAT. La retirada es una decisión de ownership, no un vencimiento: al crear la
+  identidad de máquina, el secreto nuevo debe nacer en un proyecto neutral del
+  ecosistema AXIS, fuera de cualquier producto. Sólo después de migrar ambos consumers
+  y completar sus gates de build/digest se revoca el binding cross-project y se retira
+  el secreto legado; nunca se recrea en `efeonce-globe` por inercia.
 - Greenhouse y Globe consumen `efeonce.status` y `efeonce.progress` en adapters opt-in de
   `TASK-1591`, cada uno con una primitive simple y una compleja nativa a su runtime.
 - El token de GitHub usado para esta preparación es operator-owned y tiene expiración

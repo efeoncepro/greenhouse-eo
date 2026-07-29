@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import test from 'node:test'
 
 import {
@@ -45,6 +47,72 @@ test('validateDockerfile acepta cada etapa determinística', () => {
   })
 
   assert.deepEqual(findings, [])
+})
+
+test('validateDockerfile acepta pnpm install con secreto BuildKit', () => {
+  const findings = validateDockerfile({
+    source: `# syntax=docker/dockerfile:1.7
+FROM node:22 AS builder
+ARG PNPM_VERSION=10.32.1
+COPY vendor/ ./vendor/
+RUN --mount=type=secret,id=axis_npmrc,target=/root/.npmrc,required=true \\
+  pnpm install --frozen-lockfile
+FROM node:22
+ARG PNPM_VERSION=10.32.1
+COPY vendor/ ./vendor/
+RUN --mount=type=secret,id=axis_npmrc,target=/root/.npmrc,required=true pnpm install --prod`,
+    pnpmVersion: '10.32.1',
+    localDependencies: [{ path: 'vendor/package.tgz' }],
+    requiresPrivatePackageAuth: true
+  })
+
+  assert.deepEqual(findings, [])
+})
+
+test('validateDockerfile bloquea private package install sin secreto BuildKit', () => {
+  const findings = validateDockerfile({
+    source: `FROM node:22
+ARG PNPM_VERSION=10.32.1
+COPY vendor/ ./vendor/
+RUN pnpm install --frozen-lockfile`,
+    pnpmVersion: '10.32.1',
+    localDependencies: [{ path: 'vendor/package.tgz' }],
+    requiresPrivatePackageAuth: true
+  })
+
+  assert.match(findings.join('\n'), /debe montar el secreto BuildKit axis_npmrc/)
+})
+
+test('deploy scripts preservan el escape de Cloud Build para el token AXIS', () => {
+  const deployScripts = [
+    'services/ops-worker/deploy.sh',
+    'services/commercial-cost-worker/deploy.sh',
+    'services/ico-batch/deploy.sh',
+    'services/artifact-worker/deploy.sh'
+  ]
+
+  for (const scriptPath of deployScripts) {
+    const source = readFileSync(resolve(process.cwd(), scriptPath), 'utf8')
+
+    assert.ok(
+      source.includes('\\$\\${AXIS_PACKAGES_READ_TOKEN}'),
+      `${scriptPath} debe emitir $${'{'}AXIS_PACKAGES_READ_TOKEN} al config de Cloud Build`
+    )
+    assert.ok(
+      !source.includes('_authToken=$${AXIS_PACKAGES_READ_TOKEN}'),
+      `${scriptPath} no debe expandir $$ como PID del shell que genera el config`
+    )
+  }
+})
+
+test('los contextos de build excluyen el npmrc efímero', () => {
+  for (const ignorePath of ['.dockerignore', '.gcloudignore']) {
+    const rules = readFileSync(resolve(process.cwd(), ignorePath), 'utf8')
+      .split('\n')
+      .map(line => line.trim())
+
+    assert.ok(rules.includes('.npmrc'), `${ignorePath} debe excluir .npmrc`)
+  }
 })
 
 test('workflow toolchain hereda packageManager y bloquea versiones duplicadas', () => {
