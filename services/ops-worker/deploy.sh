@@ -180,7 +180,7 @@ steps:
         umask 077
         printf '%s\n' \
           '@efeoncepro:registry=https://npm.pkg.github.com' \
-          "//npm.pkg.github.com/:_authToken=$${AXIS_PACKAGES_READ_TOKEN}" > .npmrc
+          "//npm.pkg.github.com/:_authToken=\$\${AXIS_PACKAGES_READ_TOKEN}" > .npmrc
         DOCKER_BUILDKIT=1 docker build \
           --secret id=axis_npmrc,src=.npmrc \
           -t '${IMAGE}' \

@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import test from 'node:test'
 
 import {
@@ -64,6 +66,27 @@ RUN --mount=type=secret,id=axis_npmrc,target=/root/.npmrc,required=true pnpm ins
   })
 
   assert.deepEqual(findings, [])
+})
+
+test('deploy scripts preservan el escape de Cloud Build para el token AXIS', () => {
+  const deployScripts = [
+    'services/ops-worker/deploy.sh',
+    'services/commercial-cost-worker/deploy.sh',
+    'services/ico-batch/deploy.sh'
+  ]
+
+  for (const scriptPath of deployScripts) {
+    const source = readFileSync(resolve(process.cwd(), scriptPath), 'utf8')
+
+    assert.ok(
+      source.includes('\\$\\${AXIS_PACKAGES_READ_TOKEN}'),
+      `${scriptPath} debe emitir $${'{'}AXIS_PACKAGES_READ_TOKEN} al config de Cloud Build`
+    )
+    assert.ok(
+      !source.includes('_authToken=$${AXIS_PACKAGES_READ_TOKEN}'),
+      `${scriptPath} no debe expandir $$ como PID del shell que genera el config`
+    )
+  }
 })
 
 test('workflow toolchain hereda packageManager y bloquea versiones duplicadas', () => {

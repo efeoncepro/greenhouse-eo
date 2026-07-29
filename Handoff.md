@@ -1,6 +1,6 @@
 # Handoff activo
 
-## 2026-07-29 — Production release: Cloud Build AXIS auth wiring fixed; credential expired
+## 2026-07-29 — Production release: Cloud Build AXIS auth root cause isolated
 
 `main` sigue en `9bb780ba4c41bfdf40903b762194fb6bb8085b59`, con CI, CI Deep, smoke, Vercel Production READY,
 preflight y manifest verdes. El orchestrator `30465872005` llegó al gate Production, fue aprobado por la sesión
@@ -17,11 +17,13 @@ Fix code-complete en develop, con PR #166 pendiente de gates y nuevo release: lo
 `trap`, ejecutan Docker BuildKit `--secret`, y los tres Dockerfiles montan `axis_npmrc` en builder y runtime.
 Se concedió `secretAccessor` únicamente a `183008134038-compute@developer.gserviceaccount.com`. No se expuso token en
 logs, imagen, artefactos ni runtime. Gates locales `worker-build-contract`, `worker-runtime-deps` y 10 tests focales
-pasaron. El carril real de Cloud Build ya montó el `.npmrc`, pero GitHub Packages respondió `401 Unauthorized` en
-los tres builds nuevos (`d393c460`, `367ee552`, `f356a7bd`); el secreto tiene una única versión creada el
-2026-07-28 y su PAT está vencido o revocado. Por tanto falta renovar el PAT read-only fuera del repositorio,
-crear una nueva versión del secreto y revalidar CI, Vercel y los tres digests/health checks. No se debe subir la
-credencial local del operador ni imprimirla.
+pasaron. El carril real de Cloud Build montó el `.npmrc`, pero GitHub Packages respondió `401 Unauthorized` en los
+tres builds nuevos (`d393c460`, `367ee552`, `f356a7bd`). La verificación segura posterior demostró que el PAT no
+está vencido: el payload es un PAT clásico limpio, GitHub `/user` responde `200` y el tarball privado exacto responde
+`200`. La causa real era doble expansión de `$$` en el heredoc no quoted: el shell generador lo convertía en su PID
+antes de entregar el config a Cloud Build, lo que explica que cada build reportara un bearer numérico distinto.
+El fix preserva `$$AXIS_PACKAGES_READ_TOKEN` para que Cloud Build inyecte el secreto real. Falta revalidar CI, los
+tres builds/digests y repetir el orchestrator.
 
 La ubicación en `efeonce-globe` es un acoplamiento legado deliberado y temporal, no ownership de Globe. La decisión de
 retiro está atada a ownership: cuando se cree la identidad de máquina, el secreto nuevo debe nacer en un proyecto
