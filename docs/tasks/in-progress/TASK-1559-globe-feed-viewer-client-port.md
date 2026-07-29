@@ -416,3 +416,30 @@ invariantes temporales sin red justo mientras se los mueve.
 
 - ¿La librería de estado/data-fetching se decide acá o se hereda de lo que `TASK-1558` haya elegido?
   Resolver leyendo lo que 1558 dejó, no re-decidiendo.
+
+## Delta 2026-07-29 — el `<img>` del feed sólo se monta cuando los bytes pueden ser una imagen
+
+Defecto **visto en producción** por el operador, no por un gate: las cards de video mostraban el prompt
+desparramado sobre el póster con el icono de imagen rota.
+
+**Causa.** El feed resuelve `item.output.sha256` — los BYTES DE LA SALIDA. Para una imagen eso es la
+imagen; para un video es el MP4, y un `<img>` no lo decodifica: el browser pinta su texto `alt` encima.
+
+**⚠️ El mismo defecto ya se había corregido para audio**, y su comentario lo documenta: *«el `<img>` quedaba
+sin bytes que decodificar y el browser pintaba su texto alt sobre la forma de onda. Se veía en producción
+como el título del foley encima de las barras»*. Pero el guard se escribió como `isAudio` —nombrado por el
+caso que lo motivó y no por su razón— así que **video quedó fuera y el bug volvió con otra modalidad**.
+
+**Corrección.** Renombrado a `hasPoster` (`modality !== 'audio' && modality !== 'video'`) y aplicado a las
+**dos** superficies: la card destacada y la card normal. Sólo la normal estaba en el reporte; la destacada
+tenía el mismo hueco. Un guard nombrado por su caso sirve una vez; nombrado por su significado cierra la
+familia entera.
+
+**Degradación mientras tanto.** El póster real de video llega con `TASK-1569` (proyección de derivados,
+`to-do`). Hasta entonces la card cae a su composición de color + botón de play: información honesta en vez
+de un error de decodificación.
+
+**Alcance pendiente.** Este hallazgo salió de mirar producción, **no** de la auditoría de regresiones del
+port —que cubrió composer, header y tool dock—. **Feed, viewer y share siguen sin auditar**, y este defecto
+vino justamente de ahí: si el patrón se repitió en esas superficies, sigue invisible.
+Ver [auditoría 2026-07-29 §5](../../audits/globe/GLOBE_PRODUCER_VERIFICATION_BLIND_SPOTS_2026-07-29.md).

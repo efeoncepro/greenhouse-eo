@@ -284,3 +284,27 @@ tokens de blur (`exit 1`, señalando los seis usos), y vuelve a pasar al restaur
 construcción el propio gate dio un falso positivo de dieciocho usos legítimos de `animate-*` —un
 `--[a-z-]+-` glotón lee `--animate-overlay-rise` como namespace `--animate-overlay-`—; se corrigió
 comprobando **por** namespace conocido en vez de derivarlo del texto.
+
+## Delta 2026-07-29 — utilidad de scroll, y el namespace que NO estaba vaciado
+
+Complementa el delta anterior sobre `--blur-*`.
+
+**`gl-scroll-quiet` — primera `@utility` de scroll de la superficie.** Una región con scroll interno salía
+con la barra **nativa del sistema**. Se adelgaza (`scrollbar-width: thin`) y se tokeniza
+(`scrollbar-color: var(--line-strong) transparent`). Deliberadamente **no** la oculta: `.pf__chips` sí usa
+`scrollbar-width: none` porque es una fila corta donde el desplazamiento se descubre arrastrando, pero un
+panel que esconde varios bloques necesita la señal de que hay más abajo. **La decisión de ocultar o
+adelgazar depende de cuánto contenido queda fuera de vista, no del gusto.**
+
+**⚠️ Corrección: `--aspect-*` NO está vaciado.** Se afirmó que sí —en un comentario de código y en un
+mensaje de commit— y por esa razón se evitó `aspect-video` en favor de un alto fijo. **Era falso.** Sólo se
+vacían los trece namespaces listados arriba; para cualquier otro, la escala por defecto de Tailwind sigue
+viva y sus utilidades resuelven.
+
+No fue un error cosmético: un alto fijo hace que la proporción **derive con el ancho de la columna** —
+medido a 1280 px de viewport, la columna del preset mide 82 px y la miniatura habría salido **retrato**
+(82×96). `aspect-video` la mantiene en 16:9 a cualquier ancho.
+
+**La regla operativa:** la lista de namespaces vaciados es la autoridad, y está en el archivo generado.
+Suponerla lleva a decisiones de implementación peores por un motivo inventado. `aspect-[16/9]` sí sigue
+prohibido —el gate rechaza el valor arbitrario con corchetes— pero ese es otro motivo, y es el correcto.

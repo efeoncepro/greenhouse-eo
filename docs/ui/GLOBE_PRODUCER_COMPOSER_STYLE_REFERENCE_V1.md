@@ -549,3 +549,103 @@ CSS es lo que se pierde, porque quien porta lee el markup»— resultó **parcia
 
 > Cierre honesto: la auditoría cubrió composer, header y tool dock — las superficies ya portadas. Feed,
 > viewer y share siguen su propio port (`TASK-1558`/`1559`) y **no se auditaron**.
+
+---
+
+## Delta 2026-07-29 — densidad, jerarquía y los defectos que sólo aparecieron desplegando
+
+Sesión completa sobre el composer, con la superficie **desplegada a `globe-studio-internal`** (revisiones
+`00095`→`00097`). Lo que sigue es el estado vigente; la cronología y la evidencia de cada arreglo viven en
+los mensajes de commit de `efeonce-globe`.
+
+### Bloque de modelo y formato — densidad medida
+
+El operador lo reportó como *«todo este espacio, tamaño, poca jerarquía, qué sentido tiene»*. Medido: la
+región `Modelo` → riel gastaba **471 px para cuatro decisiones**, tres de ellas de sólo dos opciones —
+mientras la grilla de presets, al lado, da nueve opciones visuales en ~330 px.
+
+Se compararon tres direcciones y se descartaron dos por escrito: la **barra en una sola fila** (con rutas de
+cinco ratios envuelve y se rompe) y la **línea-receta con tokens editables** (máxima densidad, pero
+popover-heavy y mata descubribilidad — y §3 ya retiró «Ajustes avanzados» por esconder cosas).
+
+**Jerarquía por consecuencia**, que ahora es una decisión y no deriva:
+
+- La **proporción** cambia la forma de lo que recibes: conserva glifo, nombre y medida.
+- **Calidad** y **cantidad** son ajustes de GRADO y comparten una fila compacta.
+
+Antes los tres median 32, 64 y 34 px sin razón detrás: proporción era la alta porque le habían puesto glifo
++ nombre + ratio, no porque alguien lo decidiera. **Ahora la diferencia de peso ES el argumento.**
+
+Además: etiquetas **inline** con `min-w-20` (cada ajuste gastaba una estrofa completa), los facts del modelo
+dejan de ser card y pasan a línea inline pegada al selector, y la promesa de divulgación se muda al **pie de
+la lista de modelos** — habla de qué se muestra de un modelo, así que va donde se elige uno.
+
+**Resultado: 471 → 302 px, 36 % menos, sin esconder ninguna decisión.**
+
+### Proporción: taxonomía por forma, no por plataforma
+
+⚠️ **Corrección del operador que invalida el racional anterior de §4.5.** El mapa nombraba los ratios por
+destino social («Post de feed», «Story · Reel», «YouTube · horizontal»). Su premisa escrita —*nadie piensa
+«4:5», piensa «post de feed»*— es cierta para un social media manager y **falsa para el resto: Globe no
+produce sólo para social**. Un ratio llamado «YouTube» le dice al que hace una pieza editorial, un key
+visual o un spot que está en el lugar equivocado.
+
+La forma sí es universal: orientación + carácter, con la medida exacta debajo como apoyo.
+
+| | | | |
+|---|---|---|---|
+| `1:1` Cuadrado | `4:5` Vertical | `3:4` Vertical clásico | `2:3` Vertical foto |
+| `9:16` Vertical alto | `4:3` Horizontal clásico | `3:2` Horizontal foto | `16:9` Horizontal |
+| `21:9` Panorámico | | | |
+
+Se conserva la regla original: un ratio fuera de la lista cae al valor crudo — el catálogo manda, la UI no
+inventa.
+
+**Calidad tenía el mismo problema sin cerrar:** renderizaba `standard` / `high` crudos del contrato. La capa
+de traducción ya existía en `ShapeChoiceField` (`labels`) y no se le pasaba — se construyó para un eje y no
+para el otro. Y «Se adapta a la ruta» pasa a **«Depende del modelo»**: «ruta» es el nombre interno de la
+combinación capability + modelo.
+
+### Slot de preset propio
+
+La grilla dejaba un hueco tras «Analógico», y un espacio vacío no comunica que algo va a ir ahí. El slot lo
+ocupa, con borde punteado —«hueco donde va una pieza», el mismo sentido que conserva el picker de
+referencias— y **deshabilitado con su razón**, como Seed, Style DNA y subir referencia.
+
+⚠️ **NO se ata a `globe.producer.style.create`.** La primera versión lo bindeó ahí suponiendo que un preset
+propio era la capacidad de Style DNA. **No lo es:** Style DNA (`TASK-1494`) deriva un perfil **determinista
+desde bytes reales** —paleta, descriptores, composición— para anclar la identidad de una marca a partir de
+sus assets. Un preset es una preferencia de look que el operador guarda. El binding habría **encendido** el
+slot el día que Style DNA aterrizara, prometiendo una función que no es la que llegó.
+
+### Header a una fila (768–1024)
+
+Entre 640 y 1024 el header se partía en dos filas y gastaba 121 px de alto pegajoso con un hueco de 288 px
+en el medio. Dos causas, ambas necesarias: el cluster derecho medía 420 px (sus dos rótulos más caros
+ocultaban en `max-sm` cuando la banda problemática es 640–1024) y `basis-full` **forzaba** la fila propia
+quepa o no. Corte a `max-md` por aritmética: logo 97 + segmentado 286 + cluster 294 + gaps ≈ 701 px.
+
+**121 → 67 px.** Ningún control se pierde: se verificó que el ⌘K es un botón real («Abrir comandos»), así
+que descartarlo habría quitado una afordancia. Lo que cae son rótulos; el workspace conserva las iniciales
+del avatar.
+
+### Barra de scroll de la región interna
+
+Salía con el estilo **nativo del sistema** —ancha, gris, en macOS con «mostrar siempre» permanente—
+partiendo en dos la frontera entre el composer y el feed. Nueva utilidad `gl-scroll-quiet`: se adelgaza y se
+tokeniza. **No se oculta**, aunque hay precedente (`.pf__chips` usa `scrollbar-width: none`): esa fila es
+corta y el desplazamiento se descubre arrastrando, pero el composer esconde varios bloques y una barra
+invisible deja sin señal de que hay más abajo.
+
+### 🔴 Las miniaturas de §4.3 daban 404 en producción
+
+`apps/studio-web/src/assets.ts` es un allowlist **explícito**: todo asset que el runtime sirve tiene que
+estar listado. Las miniaturas de Dirección **nunca estuvieron ahí** — ni los `.svg` originales. El bloque se
+construyó y se verificó contra el canary del composer, que tiene su **propio** allowlist estático.
+
+**La regla que queda:** un archivo en `public/` que no esté listado en `assets.ts` **no existe para el
+runtime**, por más que el harness lo sirva. No hay test que lo guarde; el próximo asset sin entrada volverá
+a dar 404 sin aviso.
+
+> Este y otros seis puntos ciegos de verificación —todos con gates verdes— están registrados en
+> [`GLOBE_PRODUCER_VERIFICATION_BLIND_SPOTS_2026-07-29.md`](../audits/globe/GLOBE_PRODUCER_VERIFICATION_BLIND_SPOTS_2026-07-29.md).

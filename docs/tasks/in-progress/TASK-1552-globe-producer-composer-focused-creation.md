@@ -1738,3 +1738,44 @@ con sus cuatro compuertas (`docs/ui/flows/TASK-1552-...-flow.md`).
 ## Open Questions
 
 - Confirmar durante Discovery si el disclosure de ajustes avanzados puede permanecer inline en 390 px o debe usar el sheet existente de Globe; no bloquea la dirección, pero sí la implementación final.
+
+## Delta 2026-07-29 — sesión de craft, densidad y despliegue real
+
+Slice 3 sigue **abierta**. Esta sesión avanzó craft y jerarquía, y desplegó la superficie a
+`globe-studio-internal` (revisiones `00095`→`00097`), pero **no cierra la task**.
+
+**Estado vigente y racional completo:** [Style Reference §Delta 2026-07-29](../../ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md).
+**Puntos ciegos de verificación descubiertos:** [auditoría 2026-07-29](../../audits/globe/GLOBE_PRODUCER_VERIFICATION_BLIND_SPOTS_2026-07-29.md).
+
+### Lo que avanzó
+
+| Área | Resultado medido |
+|---|---|
+| Glow del prompt | El reposo lleva halo propio; la rampa de fondo se **invierte** (`.55→.42→.30`) porque `--field` es más oscuro que el panel y la rampa heredada oscurecía al interactuar |
+| Card-on-card | El `<textarea>` conservaba el borde de fábrica del navegador (`rgb(133,133,133)`): tres marcos concéntricos, el del medio no diseñado |
+| Ritmo interno | 16 px dentro del pozo · 20 px al Modo · 32 px entre bloques; los flotantes se insertan contra el **campo**, no contra la caja |
+| Miniaturas de Dirección | Ocho stills con globo, mismo sujeto y ocho tratamientos, `aspect-video` |
+| Bloque de referencias | Menú ordenado por disponibilidad; el copy deja de prometer influencia y anclaje; el anclaje queda deshabilitado con razón |
+| Miniatura real de referencia | Cableada por `GovernedMediaResolver`, sin contrato nuevo |
+| Modelo + formato | **471 → 302 px** (36 % menos) con jerarquía por consecuencia |
+| Header | **121 → 67 px** en la banda 768–1024 |
+| Anillo de créditos | Regresión del port: existía en el legacy y quedó sólo dentro del popover |
+
+### Lo que NO se hizo, y por qué
+
+- **Multiplicador de costo en los chips** de Calidad y Cantidad («Alta ×2»). Es la idea de más valor del
+  lote y **no se ejecutó**: el costo es territorio del riel y de `TASK-1532`.
+- **Dirección de la animación del popover de créditos.** `overlay-rise` sube desde abajo; para un panel
+  anclado al borde superior debería bajar. Pide una variante de descenso en el SSOT de motion, que es de
+  `TASK-1523`. Anotado en el código, no parcheado.
+- **Influencia por referencia.** La auditoría del port la señaló como la pérdida mayor; el contrato la
+  excluye **a propósito**: *«it cannot send a compiled prompt, profile, strength or provider conditioning
+  payload as part of a run»*. No es una regresión a restaurar.
+- **`Durable`** en «Estilo · preset» sigue con la misma jerga de contrato que se limpió en Formato.
+
+### Correcciones a afirmaciones previas de esta task
+
+- Se afirmó que los `capability-dot` fallaban **WCAG 1.4.1** por ser color-only con `aria-hidden`. **Falso**:
+  esa medición fue sobre el fixture legacy. En el port el punto ámbar sólo existe en la rama
+  `!usable && !active`, que ya trae `opacity-75`, `disabled`, `aria-disabled` y `title`.
+- Se afirmó que el namespace `--aspect-*` estaba vaciado. **Falso** — ver el delta de ADR-016.

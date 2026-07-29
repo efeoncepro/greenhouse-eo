@@ -69,6 +69,30 @@ skill.
   política explícita de visibilidad mientras governance está pendiente y reconciliación/GC de objetos huérfanos.
   Se diseñan como arquitectura versionada; no se resuelven cargando originales completos ni con excepciones UI.
 
+### 🔴 Trampas de verificación del payload cliente — medidas, no teóricas
+
+Siete defectos reales pasaron con **build verde, cuatro gates de diseño verdes y canary de browser verde**.
+El patrón: los gates comprueban que *el código dice lo correcto*, no que *el runtime hace lo correcto*.
+Detalle y evidencia: [auditoría 2026-07-29](../../../docs/audits/globe/GLOBE_PRODUCER_VERIFICATION_BLIND_SPOTS_2026-07-29.md).
+
+- **`assets.ts` es la autoridad de lo que producción sirve.** Un archivo en `public/` que no esté listado
+  ahí **no existe para el runtime**, por más que el canary lo sirva — el harness tiene su PROPIO allowlist.
+  Ocho miniaturas dieron 404 en producción mientras se veían perfectas en local. **No hay test que lo guarde.**
+- **El canary cachea el bundle al arrancar** (`loadClientBundle()`). Tras cualquier build, comparar el hash
+  en disco (`ls dist/client/*.js`) contra el servido (`curl .../producer | grep index-`) ANTES de reportar
+  que algo está listo. «Lo verifiqué hace un rato» no es garantía de «es lo que estás viendo».
+- **Un namespace del theme vaciado y no repoblado** hace que la utilidad compile y la propiedad computa su
+  valor inicial. Ya hay gate (`tailwind-theme.test.ts`); la lista de vaciados está en el archivo generado y
+  **es la autoridad — no suponerla**.
+- **Un harness que no puede ejercer la funcionalidad no puede protegerla.** Si un aserto pasa sobre una
+  superficie que el fixture no sabe construir, el aserto no vale: primero se enseña al fixture.
+- **Nombrar los guards por su razón, no por su caso.** `isAudio` dejó fuera a video y el mismo bug volvió con
+  otra modalidad; `hasPoster` cierra la familia entera.
+- **El pipeline de build sólo se ejercita al desplegar.** `--mount=type=secret` es POR-RUN: `pnpm deploy
+  --prod` re-resuelve dependencias y necesita su propio `.npmrc`. Publicar e instalar en local no prueba nada.
+- **Ningún aserto compara la proporción de un control contra sus hermanos.** Un stepper midió 768 px donde
+  sus pares miden 68, con todo verde.
+
 ## Boundary: Globe es plataforma hermana, no un módulo de Greenhouse
 
 Esta es la regla que gobierna todo lo demás. Interiorízala antes de tocar código.

@@ -139,3 +139,35 @@ real del pipeline, digest desplegado y rollback probado.
 La credencial usada para habilitar la distribución es operator-owned y expira el
 `2026-08-27`; antes de rollout externo debe reemplazarse por una identidad de máquina
 dedicada.
+
+## Delta 2026-07-29 — el `pnpm deploy --prod` también necesita el npmrc
+
+Defecto **descubierto al desplegar por primera vez** el cableado de paquetes privados que trajo esta task.
+El primer deploy a `globe-studio-internal` falló en el build de imagen (run 30438182204, Cloud Build
+57584101):
+
+```
+ERR_PNPM_FETCH_404  GET registry.npmjs.org/@efeoncepro%2Faxis-ui-contracts
+No authorization header was set for the request.
+```
+
+**Causa.** `--mount=type=secret` es **por-RUN**. El `.npmrc` montado en el `pnpm install` no sobrevive al
+RUN siguiente, y `pnpm deploy --legacy --prod /release` **no reusa lo instalado**: re-resuelve y descarga
+las dependencias de producción. Sin `.npmrc` cae a `registry.npmjs.org` sin credenciales.
+
+La secuencia lo confirma: el install pasó y `studio-client` compiló en 3,68 s —o sea la primera capa **sí**
+tenía auth— y reventó recién en el prune de producción.
+
+**El mensaje de npm engaña.** Dice *«is not in the npm registry, or you have no permission»*. Lo primero es
+falso y lo segundo tampoco es exacto: el paquete existe y el token sirve. Lo que falta es que **esa capa**
+los pueda ver. Leído de frente manda a revisar permisos del token o a dudar de si el paquete se publicó.
+
+**Corregido** montando el mismo secreto en el segundo RUN de `apps/studio-web/Dockerfile`, con la
+explicación en el propio archivo. Deploy posterior verde y verificado en Cloud Run.
+
+**Nada llegó a producción en el fallo:** los pasos de deploy quedaron en `skipped` y la revisión servida no
+se tocó. El workflow falla cerrado, que es el comportamiento correcto.
+
+> Lección de rollout: la distribución de paquetes privados no queda probada al publicarlos ni al instalarlos
+> en local — se prueba en la **primera imagen de producción que los consume**. Ver
+> [`AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`](../../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).

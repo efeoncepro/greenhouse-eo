@@ -7,6 +7,49 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-29 — Globe Producer: craft, densidad y tres bugs que sólo vio el despliegue
+
+- Composer del Producer desplegado a `globe-studio-internal` (`00095`→`00097`): glow con reposo propio y
+  rampa de fondo **invertida** (`--field` es más oscuro que el panel, así que la rampa heredada oscurecía
+  al interactuar), pozo único sin el borde de fábrica del navegador en el `<textarea>`, ritmo interno
+  16/20/32, y bloque de modelo+formato de **471 a 302 px** con jerarquía por consecuencia.
+- Miniaturas de Dirección: ocho stills con globo generados con `pnpm ai:image`, mismo sujeto y ocho
+  tratamientos, `aspect-video`. Pendiente regenerarlas por el Still Model Lab para procedencia gobernada.
+- Proporción pasa a **taxonomía por forma, no por plataforma** (corrección del operador: Globe no produce
+  sólo para social). Calidad deja de mostrar el enum crudo `standard`/`high`.
+- Header a una fila en la banda 768–1024: **121 → 67 px**. Riel `sticky` funcionando bajo `lg`
+  (`overflow-hidden` lo anulaba). Anillo de créditos devuelto al trigger, que el port había perdido.
+- Bloque de referencias: el menú ordena por disponibilidad, el copy deja de prometer influencia y anclaje
+  —ninguna de las dos existe— y cada ficha muestra su miniatura real.
+- **Gate nuevo**: `tailwind-theme.test.ts` falla si una utilidad consume un namespace que el theme vació y
+  el SSOT no repobló. Verificado en ambos sentidos. Nació de seis `backdrop-blur-*` computando `none`.
+- ⚠️ Tres defectos aparecieron **sólo al desplegar**, con gates verdes: el `.npmrc` que no llegaba al
+  `pnpm deploy --prod`, las miniaturas dando 404 por no estar en `assets.ts`, y el feed montando un MP4 en
+  un `<img>`. Registrados con su patrón en
+  [`GLOBE_PRODUCER_VERIFICATION_BLIND_SPOTS_2026-07-29.md`](docs/audits/globe/GLOBE_PRODUCER_VERIFICATION_BLIND_SPOTS_2026-07-29.md).
+- **TASK-1552 Slice 3 sigue abierta**; nada de esto la cierra.
+
+## 2026-07-29 — Magnific: Go-to-Market, workflows y expansión de plataforma documentados
+
+- Se añadió una auditoría comercial sobre el wedge de upscaling, PLG, content/community, Flows/Agents, plugins, API, MCP,
+  Business, Enterprise, services y value capture.
+- Se clasificaron adquisición, integración, contributors, affiliates, Creative Partners, casos de agencia y enterprise;
+  la evidencia pública no permite llamar partnership formal a la mayoría de esas relaciones ni validar claims de escala.
+- El patrón transferible para Globe queda definido como `builder experto → workflow → runner → pod/workspace`, con
+  derechos, provenance, QA, aprobación, costos y accountability; no se copian créditos, unlimited ni logos.
+
+## 2026-07-29 — Higgsfield: Go-to-Market, partnerships, advertising y expansión vertical documentadas
+
+- Se añadió una auditoría comercial que analiza el GTM completo: PLG/self-serve, content-led education, agency-led
+  adoption, enterprise sales y ecosystem distribution; además separa partnerships formales, proveedores,
+  integraciones, workshops, creator programs y case studies.
+- Se documentó Advertising como beachhead de alta frecuencia: URL-to-Ad, variantes, workflows de campaña y expansión
+  hacia Team/Enterprise, con agencias como multiplicadores y enablement como acelerador de adopción.
+- La implicancia para Globe queda en validación: wedge estrecho, partnership taxonomy explícita, memoria de workflow,
+  derechos/provenance y accountability Efeonce; Higgsfield puede ser capability provider, no dueño del resultado.
+- Las skills de GTM, business model y research incorporan el patrón transferible `cuña → activación → workflow →
+  agencia/pod → enterprise → expansión`, con traducción `adoptar | adaptar | descartar` y anti-copia explícita.
+
 ## 2026-07-29 — TASK-1591: adapters AXIS opt-in verificados
 
 - AXIS publicó `0.1.4` con los contratos `efeonce.status` y `efeonce.progress` gobernados para Greenhouse y Globe.
@@ -22,6 +65,32 @@
   separando audiencia, assets, derechos, pass-through, paid usage, RACI, gates y medición.
 - La skill social de Creator/UGC quedó enlazada al modelo canónico; el estado permanece `Approved for validation` y
   no habilita pricing público ni venta general.
+
+## 2026-07-29 — Creator Influence & Content: arquitectura de fees y comisiones
+
+- Se añadió el `Pricing Integrity Pack V1` con bandas internas de validación, fee fijo, pass-through transparente,
+  coordinación de terceros, performance fee condicionado, mínimos y condiciones de pago.
+- Se fijó como hipótesis el modelo `fee base + pass-through`; las comisiones no pueden ser ocultas ni sustituir el
+  delivery fee. Finance, Legal y Commercial deben validar cost-to-serve, derechos, atribución y willingness-to-pay.
+
+## 2026-07-29 — Creator Influence & Content: benchmark de mercado y modelo escalable
+
+- Se investigaron agencias y plataformas líderes, incluyendo Aspire, NeoReach, Upfluence, CreatorIQ e Influentials,
+  además de referencias públicas de pricing y guidance de disclosure/rights.
+- Se añadió el benchmark comercial con patrones adoptados y descartados: end-to-end modular, rights at signing,
+  paid amplification, affiliate con tracking, transparencia y source of truth portable; fuera quedan per-post,
+  performance-only, comisión oculta y porcentaje de media spend.
+- El modelo propio queda orientado a capacidad gobernada por lane, no a volumen de publicaciones, y permanece en
+  `Approved for validation`.
+
+## 2026-07-29 — Creator Influence & Content: bandas y porcentajes de validación
+
+- El Pricing Integrity Pack pasó a V1.1 con bandas por lane: Creator Fit Brief USD 500–1.000, Intelligence USD
+  1.500–4.000, Activations USD 3.000–12.000, Content Engine USD 4.000–8.000/mes y Partnership USD 6.000–15.000/mes.
+- Se fijaron como hipótesis operativas 10–15% para coordinación de pass-through, 15% para management medio,
+  5–15% para creator affiliate, 2–5% para Efeonce success fee, 15–35% por 30 días de paid usage y 15–30% por exclusividad.
+- Las skills Codex/Claude de Creator/UGC ahora incluyen las bandas, porcentajes, regla de no doble cobro y prohibición
+  de presentar estos números como pricing público.
 
 ## 2026-07-28 — Contrato de producción visual social para reportes
 

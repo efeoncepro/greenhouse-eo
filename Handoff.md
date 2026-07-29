@@ -1,5 +1,65 @@
 # Handoff activo
 
+## 2026-07-29 — Globe Producer: craft, densidad y despliegue a internal (TASK-1552 Slice 3, ABIERTA)
+
+Sesión completa sobre el composer del Producer, **desplegada** a `globe-studio-internal`
+(revisiones `00095`→`00097`, imagen `:494caa0dfe2e`, tráfico 100 %, verificado en Cloud Run).
+23 commits en `efeonce-globe`; `main` avanzó de `5d64c5d` a `494caa0` por push directo —el repo
+está en plan **free**, así que `main` no tiene branch protection y CI corre DESPUÉS del push.
+
+**Estado vigente y racional:** [Style Reference §Delta 2026-07-29](docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md)
+· [ADR-016 §Delta](docs/architecture/creative-studio/EFEONCE_GLOBE_CLIENT_STYLING_ENGINE_DECISION_V1.md)
+· [TASK-1552 §Delta](docs/tasks/in-progress/TASK-1552-globe-producer-composer-focused-creation.md).
+
+**Lo desplegado:** glow con reposo propio y rampa invertida · pozo único sin el borde UA del textarea ·
+ocho miniaturas de globo (`aspect-video`) · anillo de créditos devuelto al header · header 121→67 px ·
+riel `sticky` funcionando bajo `lg` · bloque de referencias sin promesas falsas y con miniatura real ·
+bloque de modelo+formato 471→302 px · slot de preset propio · gate nuevo de namespace vacío del theme.
+
+**⚠️ Tres bugs sólo aparecieron al desplegar**, con todos los gates verdes:
+1. `.npmrc` no llegaba al `pnpm deploy --prod` → primer deploy falló en build (nada llegó a producción).
+2. Las miniaturas daban **404**: `assets.ts` es un allowlist explícito y nunca las tuvo — el canary usa
+   su propio allowlist, así que ahí se veían.
+3. El feed montaba el MP4 en un `<img>` → `alt` desparramado sobre las cards de video.
+
+**Pendiente con dueño:**
+- **TASK-1552 Slice 3 sigue abierta.** Nada de esta sesión la cierra; su doc lo pide explícitamente.
+- **Dos puntos ciegos de verificación sin guardián**: no hay test del registro de `assets.ts`, ni aserto
+  que compare el ancho de un control contra sus hermanos. Siete hallazgos en
+  [la auditoría](docs/audits/globe/GLOBE_PRODUCER_VERIFICATION_BLIND_SPOTS_2026-07-29.md).
+- **Feed, viewer y share nunca se auditaron** por regresiones del port (`TASK-1558`/`TASK-1559`); el bug
+  del `<img>` salió justamente de ahí, por observación directa y no por barrido.
+- Multiplicador de costo en Calidad/Cantidad (`TASK-1532`) · dirección de la animación del popover
+  (`TASK-1523`) · «Durable» en Estilo · preset.
+
+## 2026-07-29 — Magnific: Go-to-Market, workflows y expansión de plataforma
+
+Se añadió [`MAGNIFIC_GO_TO_MARKET_AND_PLATFORM_EXPANSION_RESEARCH_2026-07-29.md`](docs/audits/commercial/MAGNIFIC_GO_TO_MARKET_AND_PLATFORM_EXPANSION_RESEARCH_2026-07-29.md).
+La investigación documenta la secuencia `upscaling wedge → suite multiproveedor → workflow → plugins/API/MCP → Business → Enterprise`,
+separa ecosystem distribution de partnership contractual y registra conflictos/unknowns de pricing, créditos, rights y retención.
+Para Globe, la lección transferible es `builder experto → workflow parametrizado → runner → pod/workspace`, con intención,
+provenance, QA, aprobación y accountability Efeonce. Se descartan créditos, unlimited, logos y claims de escala como unidad de valor.
+
+Estado honesto: `approved_for_validation`; no se autoriza pricing, checkout, reseller rights, co-selling ni rollout externo.
+
+## 2026-07-29 — Higgsfield: Go-to-Market, partnerships y vertical expansion
+
+Se añadió [`HIGGSFIELD_PARTNERSHIP_AND_VERTICAL_EXPANSION_RESEARCH_2026-07-29.md`](docs/audits/commercial/HIGGSFIELD_PARTNERSHIP_AND_VERTICAL_EXPANSION_RESEARCH_2026-07-29.md).
+La investigación concluye que Higgsfield usa Advertising como beachhead de alta frecuencia y feedback rápido, y combina
+PLG/self-serve, content-led education, agency-led adoption, Team/Enterprise y partnerships de distribución/enablement.
+La evidencia no permite
+llamar partner comercial a cada logo ni afirmar reseller, co-selling, affiliate revenue share o campañas producidas por
+Higgsfield. Globe debe conservar dirección, producción, QA, derechos y accountability; el siguiente experimento recomendado
+es un piloto pagado de seis semanas con dos design partners, usando Higgsfield como capability provider-neutral.
+
+El patrón transferible quedó incorporado en las skills espejo de `gtm-architect`, `efeonce-business-model-operator` y
+`research-benchmark-operator`: cuña → activación → workflow → multiplicador de agencia/pod → enterprise → expansión,
+con clasificación estricta de partners, owner, economics, rights y evidencia. No se adoptan créditos públicos,
+“unlimited”, claims de views, verticales amplias ni logos como estrategia.
+
+Estado honesto: `approved_for_validation`; claims de escala, performance, revenue share y conversión enterprise siguen
+sin evidencia independiente.
+
 ## 2026-07-29 — Creator Influence & Content: documentación canónica
 
 Se documentó el modelo agnóstico a marca de Influencers, Creators & UGC dentro de Media & Distribution. Nuevos
@@ -10,6 +70,29 @@ capacity, derechos y evidencia de cohortes antes de venta general.
 
 Validación ejecutada pendiente de cierre documental: `pnpm docs:closure-check`, `pnpm docs:context-check:strict` y
 revisión de enlaces/rutas.
+
+## 2026-07-29 — Creator Influence & Content: pricing en validación
+
+Se añadió [`CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md`](docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md).
+La hipótesis recomendada es fee fijo de estrategia/operación + pass-through transparente; coordinación de terceros sólo
+cuando Efeonce administra pagos/riesgo, y performance fee únicamente con tracking y atribución aceptados. Las bandas
+en USD son internas y no autorizan pricing público. Pendientes: cost-to-serve real, piso de margen, cash exposure,
+derechos y validación comercial.
+
+## 2026-07-29 — Creator Influence & Content: benchmark de mercado
+
+Se añadió [`CREATOR_INFLUENCE_CONTENT_MARKET_RESEARCH_2026-07-29.md`](docs/audits/commercial/CREATOR_INFLUENCE_CONTENT_MARKET_RESEARCH_2026-07-29.md),
+con revisión de Aspire, NeoReach, Upfluence, CreatorIQ, Influentials y referencias públicas de pricing. La decisión
+es adoptar un servicio end-to-end modular con rights at signing, paid amplification, affiliate condicionado,
+transparencia y memoria portable; descartar per-post, performance-only, porcentaje de media spend y comisiones opacas.
+La propuesta queda aún en `Approved for validation`.
+
+## 2026-07-29 — Creator Influence & Content: bandas de pricing sincronizadas
+
+El Pricing Integrity Pack pasó a V1.1 y las skills Codex/Claude quedaron sincronizadas con bandas monetarias y
+porcentajes de validación: 10–15% coordinación de terceros, 15% management medio, 5–15% affiliate del creator,
+2–5% success fee Efeonce, 15–35% paid usage por 30 días y 15–30% exclusividad. Se mantiene la regla de no doble
+cobro y ningún monto está aprobado como tarifario público.
 
 ## 2026-07-29 — TASK-1591: AXIS adapters pilot
 
