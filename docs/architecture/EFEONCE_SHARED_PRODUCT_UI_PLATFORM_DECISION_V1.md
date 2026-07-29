@@ -250,10 +250,15 @@ rotación —el modo de falla real observado— a cambio de aislar un riesgo de 
   operador. Hasta entonces, la excepción autolimpiante del gate sostiene el estado real.
 - **Extracción del build unit de UI** que disuelve el acoplamiento accidental: pertenece a EPIC-026 y
   necesita su propia task hija.
-- **Team de Vercel del Lab** (`team_gmNiF4YCHmc1wqsHUTCvqjmN`, distinto del canónico de Greenhouse): queda
-  por confirmar si es deliberado.
 - **Promoción de `efeonce.status` / `efeonce.progress` a `stable`**: falta definir el criterio de evidencia
   y quién firma.
+- **Si el Lab debería consumir los paquetes PUBLICADOS** en vez de los `workspace:*` links. Hoy usa links,
+  así que valida el código fuente pero **no valida lo que realmente se publica** (`files`, `exports`, el
+  contenido del tarball). Consumir lo publicado lo convertiría en el verificador del artefacto — y sería
+  la única razón legítima para que el Lab tenga credencial de registry.
+
+*(Cerrada 2026-07-29: el team de Vercel del Lab **no** es distinto del canónico. `team_gmNiF4YCHmc1wqsHUTCvqjmN`
+es el id cuyo slug es `efeonce-7670142f`; `greenhouse-eo` y `axis-design-system-lab` comparten orgId.)*
 
 ## Supersession
 
