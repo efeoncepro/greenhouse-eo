@@ -1,5 +1,11 @@
 # Efeonce Globe Creative Producer
 
+> **Tipo de documento:** Documentacion funcional (lenguaje simple)
+> **Version:** 1.1
+> **Creado:** 2026-07-23 por Claude
+> **Ultima actualizacion:** 2026-07-29 por Claude (legibilidad y jerarquia de la consola)
+> **Documentacion tecnica:** [Creative Producer V1](../../architecture/creative-studio/EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md) · [ADR-014 — Client Application](../../architecture/creative-studio/EFEONCE_GLOBE_CLIENT_APPLICATION_DECISION_V1.md)
+
 Creative Producer es la consola prompt-first de Globe para crear y continuar activos de imagen, video y audio.
 El diseño aprobado es el producto completo: composer multimodal, referencias privadas, estimación pre-spend,
 biblioteca editorial, viewer/refinamiento, organización, revisión y sharing. Las capacidades no se eliminan cuando
@@ -30,6 +36,88 @@ derivados heredan restricciones de sus padres.
 
 Los modos que necesitan referencias o provenance no se habilitan por apariencia: el Producer consulta la
 autoridad del workspace y los mantiene cerrados si la capability está apagada, denegada o degradada.
+
+## Cómo se lee la pantalla
+
+La consola tiene tres zonas, y cada una responde una pregunta distinta.
+
+| Zona | Dónde está | Qué responde |
+|---|---|---|
+| Píldora de créditos y su panel | cabecera, arriba a la derecha | ¿cuánto saldo me queda y en qué se está yendo? |
+| Composer | columna izquierda | ¿qué quiero crear, con qué, en qué forma y cuánto cuesta? |
+| Feed | columna derecha | ¿qué se generó, cómo lo encuentro y qué hago con eso? |
+
+### El panel de créditos: tres slots, tres preguntas
+
+El panel se abre haciendo clic en la píldora de la cabecera. Cada slot muestra algo que los otros no
+repiten:
+
+| Slot | Qué muestra | Ejemplo |
+|---|---|---|
+| El anillo | la **proporción** disponible, en porcentaje | `99 %` |
+| El encabezado | la **cifra exacta**, con separadores de miles | `500.444 de 500.610 disponibles` |
+| Las tres celdas | la **composición**: Disponible, Reservado, Gastado | `500.444` · `0` · `166` |
+
+Dos reglas de lectura que conviene conocer:
+
+- **El porcentaje redondea hacia abajo.** Con 166 créditos gastados dice `99 %`, no `100 %`. Sólo dice
+  `100 %` cuando de verdad no se gastó nada.
+- **Los puntos de color de las tres celdas son la leyenda de la barra** que está encima: cada punto
+  corresponde a un segmento.
+
+Si el saldo es muy grande, las celdas lo abrevian (`1,3 M`) para no romper la columna, pero **el valor
+exacto nunca se pierde**: sigue en el encabezado, en el tooltip y en lo que lee un lector de pantalla.
+
+> Detalle técnico: lectores `globe.credits.balance.get` / `.usage.get` / `.forecast.get`, cada uno
+> detrás de su propia capability; formato de cifras en `apps/studio-client/src/format/credits.ts`.
+> Cómo se le agrega presupuesto al mes: [fondeo gobernado de créditos](./fondeo-gobernado-creditos-globe.md).
+
+### El composer: el orden de lectura del costo
+
+El bloque de costo, anclado al pie de la columna, se lee en este orden: **cuánto cuesta › qué hacer ›
+en qué estado está el estimado**. El color naranja queda reservado para lo que pide atención — una
+cifra real de gasto, un estimado que quedó desactualizado o un presupuesto bloqueado. Un estado sano
+(«Vigente») y la frase que tranquiliza («Se calcula antes de gastar») se muestran en gris, porque no
+hay nada que atender.
+
+Cuando el contenido de la columna no cabe, **se desvanece** contra el bloque de costo en lugar de
+cortarse a media letra: ese degradado significa «hay más abajo».
+
+> Detalle técnico: valores exactos de la superficie en
+> [`GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md`](../../ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md).
+
+### El feed: tres grupos, una palabra por estado
+
+La barra de herramientas del feed está agrupada por tarea, no por tipo de control:
+
+| Grupo | Contiene | Para qué |
+|---|---|---|
+| Cómo se ve la lista | vista cómoda/compacta + orden | presentar |
+| Acciones | Serie, Compartir | operar sobre la selección |
+| Encontrar | buscador + filtros | reducir lo que veo |
+
+Una pieza terminada dice **«Listo»** en todas partes — en la card destacada y en la grilla. Antes la
+misma pieza podía decir «Listo» en un lugar y «Completada» en el otro; eran dos formas de nombrar el
+mismo hecho, y leerlas juntas parecía una inconsistencia. La diferencia entre «una corrida que
+terminó» y «una pieza guardada» sigue estando donde importa: sin archivo retenido, las acciones (`Ver`,
+`Descargar`, `Usar como referencia`) salen deshabilitadas con su razón.
+
+> Detalle técnico: la línea de estado renderiza el eje `coarseProgress` del contrato, no el eje
+> `state` de la corrida. Ver
+> [`operar-feed-viewer-producer-globe.md`](../../manual-de-uso/creative-studio/operar-feed-viewer-producer-globe.md).
+
+## Lo que la pantalla todavía no hace
+
+Tres límites visibles, para que no se confundan con fallas:
+
+| Se ve así | Por qué | Dueño |
+|---|---|---|
+| Las miniaturas de **video** son un degradado de color, no un cuadro del video | el feed recibe los bytes de la salida, y un MP4 no se puede mostrar como imagen; el póster derivado todavía no se proyecta | `TASK-1569` |
+| Los **títulos** de las piezas se cortan con «…» aunque sobre ancho | el recorte ocurre en el dato, a 96 caracteres, antes de que exista diseño: ensanchar la tarjeta no lo cambia | paquete de dominio |
+| El **audio** muestra una onda y no una miniatura | no es un reemplazo de póster faltante: así es como se ve una pieza de audio | — |
+
+> Detalle técnico: la decisión de si hay póster se toma por los **bytes** (`mimeType` de la salida) y
+> no por la modalidad de la card, para que una modalidad nueva no vuelva a quedar fuera.
 
 ## Estado vigente
 

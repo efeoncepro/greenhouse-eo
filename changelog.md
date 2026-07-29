@@ -7,6 +7,60 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-29 — Globe: contrato tipográfico del payload cliente + jerarquía del Producer (TASK-1599)
+
+- Tres commits desplegados y verificados en vivo sobre `globe-studio-internal-00100-9kq` (imagen
+  `b9112a80985d`) en `https://globe.efeoncepro.com/producer`, con sesión real a 1440px.
+- **`68a2cbe`** — 13 sitios del payload pedían Geist@700 con sólo Poppins 700 · Geist 400 · Geist 600
+  cargados: el navegador **sintetiza** el corte faltante, deforma el trazo y no falla ningún gate. Dos
+  gates nuevos cierran la clase: uno aparea familia×peso **en el sitio de uso** (la declaración de
+  `@font-face` estaba sana; el defecto era quién pedía qué) y otro rechaza la utilidad de fuente que el
+  theme no puede generar (`font-normal`/`font-medium` no emitían CSS). Más `tabular-nums` en siete
+  números vivos.
+- **`d009871`** — jerarquía del Producer. El panel de créditos **no se rompía por el número**: llevaba
+  `max-w-full`, y sobre un elemento `absolute` esa medida resuelve contra el bloque contenedor —el
+  `<details>`, o sea el ancho del disparador—; los tres síntomas eran un bug. Y `Listo` vs `Completada`
+  eran **dos ejes** del contrato (`coarseProgress` vs `state`), no dos palabras: `stateCompleted` quedó
+  huérfana y se borró.
+- **`b9112a8`** — cierre de una regresión propia: bajar las acciones del prompt al flujo desbordó el
+  cuerpo y un renglón quedó cortado contra el riel translúcido; se resolvió con el token `--rail-scrim`
+  en el SSOT. Más `Math.floor` en el donut, que con `round` decía `100 %` junto a `Gastado 166`.
+- Verificación: build 0 · eslint 0 · `node --test` 129/129 · canario de motor 8/8 · canario del composer
+  163/163 · revisión humana en vivo tras cada despliegue.
+- **Quedan tres puntos abiertos sin dueño**: el preflight de Tailwind no se emite, así que
+  `b, strong { font-weight: bolder }` pide el corte fuerte por herencia y es invisible a un gate que
+  escanea `className`; la fuga del `axis-pilot-canary` deja `pnpm test` sin terminar y un huérfano en el
+  puerto 4326 por corrida; y el H9 del feed, cuyo `…` no es CSS (`DISPLAY_TITLE_MAX_LENGTH = 96` recorta
+  por conteo de caracteres antes de que exista layout, así que ningún ancho lo arregla).
+- Detalle de runtime: `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
+
+## 2026-07-29 — Release preflight: corrección de latencia del check Sentry
+
+- La causa del timeout persistente de `sentry_critical_issues` era la consulta de hasta 100 issues, que tardaba
+  8,5–9,1 s en Sentry aunque no hubiera resultados; el presupuesto externo e interno anterior era de 6 s.
+- El check ahora solicita 10 resultados, suficiente para detectar el umbral bloqueante `>=10`, mantiene la semántica
+  estricta ante errores, usa un deadline API de 15 s y un presupuesto de runner de 20 s. El runner reporta el budget
+  efectivo de cada check.
+- El cambio está en `develop`; todavía no se ha repetido el orchestrator ni se ha desplegado producción.
+
+## 2026-07-29 — PR #164: promoción completa y release detenido por evidencia de smoke
+
+- PR #164 promovió todo `develop` a `main` en `e711fe2560e3a7c2e7e8639e07a8a394e9582cdb`; no hubo cherry-picks ni
+  release aislado de AXIS.
+- CI/CI Deep, Vercel READY y los gates de governance pasaron. El orchestrator `30452322643` detuvo el proceso en
+  preflight por falta de smoke asociado al SHA de `main`; el smoke manual `30452463889` pasó verde posteriormente.
+- Queda pendiente reintentar el orchestrator sin bypass cuando la API de GitHub Actions responda. No hubo manifest,
+  deploy de workers ni promoción parcial.
+
+## 2026-07-29 — PR #164: bloqueo persistente del preflight Sentry
+
+- Smoke manual `30452463889` pasó y staging fue recuperado a `READY` mediante redeploy del deployment existente del
+  proyecto Greenhouse; Production permaneció READY.
+- Los orchestrators `30452924614`, `30453278402` y `30453818726` fallaron antes del manifest por
+  `sentry_critical_issues` timeout de 6 s; el último ya no tuvo bloqueos de smoke ni staging.
+- El rollout queda pendiente. No se activó `bypass_preflight`; requiere `platform.release.bypass_preflight` y razón
+  auditada de al menos 20 caracteres.
+
 ## 2026-07-29 — PR #164: autenticación de paquetes privados y gobierno de release
 
 - Los workflows con instalación de dependencias privadas usan `GITHUB_TOKEN` con `packages: read` y un `.npmrc`
@@ -687,66 +741,3 @@ fuente de verdad. Nada autenticado se cachea, verificado path por path.
   transporta pista (WCAG 1.2.2; `eslint-disable` justificado, cerrarlo es cambio de contrato); el `h1` usa un
   fallback para toda pieza y los comentarios van sin autor porque la proyección no tiene esos campos, y
   inventarlos en la superficie donde un cliente juzga trabajo sería fabricar evidencia.
-
-## 2026-07-24 — Globe flota multi-modelo: principio en EPIC-028 + TASK-1553 + canary real Nano Banana Pro
-
-- **EPIC-028 corregido:** se plantó el principio (faltaba) del **catálogo multi-modelo extensible** — Globe corre los
-  mejores modelos coexistiendo y creciendo, sin sustituir; **update** (bump de versión, reemplaza) ≠ **add** (modelo/tier
-  nuevo, coexiste); compatible con el non-goal "no mejor global" (el catálogo ofrece, la selección es explícita o por
-  contrato de fidelidad). Delta + Outcome nuevos.
-- **`TASK-1553` (to-do, backend-data):** vehículo del principio — **resolución de modelo por-ruta** en los adapters (hoy
-  resuelven por-capacidad → dos modelos del mismo proveedor no coexisten). Selector UI = consumer `TASK-1552`.
-- **Defaults frontier actualizados** (updates legítimos, sin borrar Seedream): OpenAI `gpt-image-1→gpt-image-2`
-  (`acb0776`), Vertex Nano Banana `gemini-2.5-flash-image→gemini-3-pro-image` (`46ab5ab`).
-- **Canary real (TASK-1535):** Nano Banana Pro (`gemini-3-pro-image`) genera **imágenes reales** en el proyecto Globe
-  vía endpoint `global`; Nano Banana 2 (`gemini-3.1-flash-image`) 404 (falta allowlist del proyecto, ask a Google).
-  Provider flip revertido a `composite`; sin IAM break-glass sucio.
-- **Skill `greenhouse-globe` actualizada** (.claude + .codex): sección "Flota de modelos" (roster, seam route→model,
-  gotchas del canary) + 2 fixes de drift (composite rutea imagen→Fal, no "default Vertex"; Vertex image default es
-  `gemini-3-pro-image`). Bloqueo para implementar: el classifier del entorno bloquea ediciones de código en Globe.
-
-## 2026-07-24 — Globe: promoción comercial por atestación (ADR-010) — golden briefs + docs (TASK-1535)
-
-- **Slice 5 (fleet enablement) — golden briefs para las 6 rutas reference-conditioned pendientes:**
-  `ref/still/reference-v1`, `ref/motion/reference-v1`, `ref/video/frames-v1`, `ref/video/motion-v1`,
-  `ref/voice/change-v1`, `ref/voice/translate-v1`. Se agregaron 3 rúbricas (`preserve-set-v1`,
-  `voice-transform-v1`, `voice-translation-v1`) y 2 contratos de fidelidad aditivos (`voice-transform`,
-  `voice-translation`) al enum — todos los consumers validan membresía, ninguno hace switch exhaustivo. Cada
-  fixture lleva una referencia sintética `rights: 'test-fixture'` (aceptada sin puerto de assets, el caso del
-  harness). El test del **segundo consumidor** corre las 6 end-to-end y asserta que la referencia autorizada
-  **sobrevive** al manifiesto puntuado (`input_lineage_intact`). Globe `pnpm check` (domain 337/0) + build verde.
-  Commit Globe `f62c2e4`.
-- **Slice 6 (docs closure):** doc funcional [`efeonce-globe-promocion-comercial-atestacion.md`](docs/documentation/creative-studio/efeonce-globe-promocion-comercial-atestacion.md)
-  + manual [`operar-promocion-comercial-atestacion-globe.md`](docs/manual-de-uso/creative-studio/operar-promocion-comercial-atestacion-globe.md),
-  ambos indexados. Triple documentación completa (ADR-010 técnica + funcional + manual).
-- **Pendiente (único gate abierto de TASK-1535):** el **canary facturable** (acceptance criterion de evidencia
-  runtime) implica **gasto real** de proveedor y/o promoción comercial a un workspace de cliente real — requiere
-  autorización explícita del operador; no se ejecuta de forma autónoma. La lane ya se probó en vivo con proveedor
-  interno (canary de lane + 2 atestaciones comerciales firmadas por el CEO). Task sigue `in-progress` por este gate.
-
-## 2026-07-24 — Globe formaliza Storyboard Studio y Narrative Preproduction
-
-- ADR-012/SPEC-012 establecen Storyboard Studio como surface propia, no como capability aislada de Producer o
-  Video Effectiveness. Narrative Preproduction posee Brief/Script/Storyboard/revisiones/review/handoffs; media
-  generation, análisis, asset governance, scheduling y delivery conservan sus dueños.
-- La experiencia seleccionada es Editorial Sequence Desk: Brief, Outline, Guion, Storyboard y Review sobre un
-  Structured Sequence Canvas responsive. Comentarios y markup vectorial se anclan a revisiones exactas; un mask
-  crea una intención de edición que Producer estima/ejecuta, sin mutar assets desde Storyboard.
-- Los shots pueden combinar contribuciones capturadas, grabadas, generativas, licenciadas, de archivo y
-  determinísticas como `mixed-origin realization`; no se reutiliza el término comercial `Hybrid`. La IA propone
-  diffs y humanos aplican, aprueban, ejecutan e incorporan.
-- `TASK-1542` cerró el contrato documental y `TASK-1543…1550` registran dominio durable, colaboración, propuestas,
-  handoffs, canvas, exports, rollout cliente y el Realization Orchestrator que coordinará ProductionPlans con
-  Producer sin mutar Storyboard. El grafo quedó parallel-first: el primer fold avanza con fixtures, Video
-  Effectiveness y paquetes de export se habilitan por slice, y exports `policy-blocked` no frenan el primer piloto.
-  No hubo cambios de runtime ni habilitación externa.
-
-## 2026-07-24 — Globe separa la paridad de avatar canónico de Producer
-
-- `TASK-1551` extrae el avatar de cuenta de `TASK-1505`: Greenhouse seguirá siendo el único source of truth de la
-  foto sincronizada desde Entra/Graph y Globe la consumirá mediante descriptor OAuth, reader self-only y BFF
-  same-origin.
-- El contrato prohíbe hardcode, copias de la foto, acceso browser-side a Graph/GCS/URLs privadas y lookups por
-  user id arbitrario. Trigger y panel usarán la foto cuando exista e iniciales como fallback.
-- Es planificación/contrato, no implementación ni deploy. `TASK-1505` recupera un cierre propio de Producer; la
-  evidencia de avatar queda aislada en `TASK-1551`.

@@ -276,3 +276,30 @@ Esta task **retira** el flag. No introduce ninguno.
 ## Open Questions
 
 - Ninguna. El criterio de borrado es objetivo (evidencia por superficie) y el orden está fijado.
+
+---
+
+## Delta 2026-07-29 — tu Slice 2 hereda dos clases más de gate, y un límite estructural
+
+Cerró [`TASK-1599`](../complete/TASK-1599-globe-client-typographic-contract-producer-hierarchy.md), que
+agregó **dos gates nuevos** al mismo archivo que tu Slice 2 va a ampliar
+(`apps/studio-client/src/gates/design-contract.test.ts`):
+
+- `never asks a family for a cut it does not load` — aparea familia×peso **en el sitio de uso**, no en la
+  declaración. Cierra la síntesis del navegador que `TASK-1561` dejó nombrada: un peso sin archivo se
+  sintetiza, deforma el trazo y **no falla nada**.
+- `never writes a font utility the theme cannot generate` — una utilidad de fuente que el theme no puede
+  producir no emite CSS y es indistinguible de un olvido.
+
+**Qué cambia para tu Slice 2:** al ampliar la frontera a `apps/studio-web/src/**` ya no son sólo colores,
+motion, copy y `font-family` literal — son **seis clases**. Y el rojo esperado al ampliar será mayor de lo
+que este spec calculaba.
+
+**Medición nueva de `studio-web`, hecha hoy:** **184 hex crudos** y **4 familias literales**. Ése es el
+tamaño real del rojo que tu Slice 2 va a encender antes de que el Slice 3 lo apague.
+
+**Límite estructural que heredas, y que ninguna ampliación de frontera resuelve:** el preflight de Tailwind
+no se emite, así que la regla del navegador `b, strong { font-weight: bolder }` pide el corte fuerte **por
+herencia, sin que ninguna clase lo diga**. El gate escanea `className`, no elementos HTML: el caso le es
+invisible por construcción. Apareció tres veces en un solo día. **No tiene dueño.** Ampliar la frontera a
+`studio-web` no lo cubre — es un eje distinto del mismo contrato.

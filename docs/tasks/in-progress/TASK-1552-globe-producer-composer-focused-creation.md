@@ -1779,3 +1779,50 @@ Slice 3 sigue **abierta**. Esta sesión avanzó craft y jerarquía, y desplegó 
   esa medición fue sobre el fixture legacy. En el port el punto ámbar sólo existe en la rama
   `!usable && !active`, que ya trae `opacity-75`, `disabled`, `aria-disabled` y `title`.
 - Se afirmó que el namespace `--aspect-*` estaba vaciado. **Falso** — ver el delta de ADR-016.
+
+---
+
+## Delta 2026-07-29 (2) — el composer cambió hoy bajo `TASK-1599`; esta task sigue siendo su dueña
+
+Sesión posterior a la de arriba (`00095`→`00097`). Tres commits más, desplegados y verificados en vivo:
+la revisión activa quedó en **`globe-studio-internal-00100-9kq`** (imagen `b9112a80985d`).
+
+El trabajo se registró como [`TASK-1599`](../complete/TASK-1599-globe-client-typographic-contract-producer-hierarchy.md).
+**No transfiere propiedad**: `TASK-1552` sigue siendo la dueña del composer, y Slice 3 sigue **abierta**.
+
+### Qué de tu superficie cambió
+
+| Superficie tuya | Qué cambió | Commit |
+|---|---|---|
+| `composer/ProducerComposer.tsx` | Cierre de una **regresión propia de la sesión anterior**: bajar las acciones del prompt al flujo hizo desbordar el cuerpo y un renglón quedaba cortado a media letra contra el riel translúcido. Se resolvió con el token nuevo `--rail-scrim` en el SSOT, **no** devolviendo las acciones a su lugar | `b9112a8` |
+| `composer/ComposerToolDock.tsx` | Tokens de rótulo que se estaban usando como prosa vuelven a su token | `68a2cbe` |
+| `ProducerHeader.tsx` | Los tres KPI de crédito pedían Geist@700, un corte que no se carga → el navegador lo **sintetizaba**. Pasan al par familia×peso real, ganan `tabular-nums`, y el donut redondea con `Math.floor` (con `round` decía `100 %` junto a `Gastado 166`) | `68a2cbe` + `d009871` |
+| Panel de créditos | **La causa raíz no era el número.** Llevaba `max-w-full`, y sobre un elemento `absolute` esa medida resuelve contra el bloque contenedor —el `<details>`, o sea el ancho del disparador—. Los tres síntomas eran **un** bug | `d009871` |
+| `primitives/index.tsx`, `dialogs/*`, `styles/tailwind.css`, `tokens/tokens.ts`, `copy/index.ts` | Contrato tipográfico (13 sitios), cinco reglas `.pf__*`, token `--rail-scrim`, retiro de `stateCompleted` | los tres |
+
+### Qué supuestos tuyos siguen vigentes
+
+- **La regla de reconciliación de cinco clases**, intacta. En particular la plomería de accesibilidad
+  (9 regiones de anuncio del vanilla) **no se tocó**.
+- **Slice 3 abierta**: estados de ejecución y evidencia premium siguen pendientes. `TASK-1599` no los tocó.
+- **La regla dura de ADR-016** —cero clases de la hoja legacy en la superficie— se conserva: `--rail-scrim`
+  nació en el SSOT precisamente para no escribir un velo literal.
+- **Los tres pendientes que declaraste no ejecutados** siguen no ejecutados: el multiplicador de costo en
+  los chips (es de `TASK-1532`), la dirección del popover de créditos (pide variante de descenso en el SSOT
+  de `TASK-1523`) y `Durable` en «Estilo · preset».
+- **La región `producer-model-*`** de `TASK-1555` sigue congelada como baseline.
+
+### Qué gana tu contrato hacia adelante
+
+Dos gates nuevos en `gates/design-contract.test.ts` que aplican a tu superficie:
+
+- `never asks a family for a cut it does not load` — aparea familia×peso **en el sitio de uso**. Ya no se
+  puede pedir un corte que el navegador tendría que sintetizar.
+- `never writes a font utility the theme cannot generate` — `font-normal` y `font-medium` estaban escritas
+  y **no emitían CSS**. Si hace falta un escalón, se agrega al SSOT como decisión explícita.
+
+**Límite conocido de ambos, y de todos los demás:** escanean `className`. El preflight de Tailwind no se
+emite, así que `b, strong { font-weight: bolder }` del navegador pide el corte fuerte **por herencia, sin
+que ninguna clase lo diga** — estructuralmente invisible al gate. Apareció tres veces el mismo día y **no
+tiene dueño**. Si al cerrar Slice 3 aparece un trazo más pesado de lo pedido sin clase que lo explique,
+ésta es la causa.

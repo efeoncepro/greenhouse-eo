@@ -104,6 +104,11 @@ Identifica:
 
 **No** modifiques el gate. Investiga:
 
+El check conserva severidad estricta. Si el resultado es `timeout` sin evidencia de issues, distingue latencia de la
+consulta de un incidente runtime: el runner dispone de un presupuesto explícito de 20 s y la consulta canónica está
+acotada al umbral de 10 issues. Un timeout con ese presupuesto sigue siendo bloqueo y requiere diagnosticar la API o
+la autenticación; nunca se convierte automáticamente en warning.
+
 ```bash
 TOKEN=$(gcloud secrets versions access latest --secret=greenhouse-sentry-incidents-auth-token --project=efeonce-group)
 

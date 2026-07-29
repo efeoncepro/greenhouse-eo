@@ -65,7 +65,8 @@ const DEFAULT_CHECK_TIMEOUT_MS = 6_000
  */
 const adaptSourceResult = (
   checkId: PreflightCheckId,
-  source: SourceResult<PreflightCheckResult>
+  source: SourceResult<PreflightCheckResult>,
+  timeoutMs: number
 ): PreflightCheckResult => {
   if (source.status === 'ok' && source.value) {
     return source.value
@@ -79,7 +80,7 @@ const adaptSourceResult = (
     durationMs: source.durationMs,
     summary:
       source.status === 'timeout'
-        ? `Check '${checkId}' excedio el budget de ${DEFAULT_CHECK_TIMEOUT_MS}ms.`
+        ? `Check '${checkId}' excedio el budget de ${timeoutMs}ms.`
         : `Check '${checkId}' degradada: ${source.error ?? source.status}.`,
     error: source.error,
     evidence: null,
@@ -111,12 +112,14 @@ export const runPreflight = async (
   try {
     const sourceResults = await Promise.all(
       options.checks.map(async definition => {
+        const timeoutMs = definition.timeoutMs ?? DEFAULT_CHECK_TIMEOUT_MS
+
         const source = await withSourceTimeout(() => definition.run(options.input), {
           source: definition.id,
-          timeoutMs: definition.timeoutMs ?? DEFAULT_CHECK_TIMEOUT_MS
+          timeoutMs
         })
 
-        return adaptSourceResult(definition.id, source)
+        return adaptSourceResult(definition.id, source, timeoutMs)
       })
     )
 

@@ -71,9 +71,14 @@ skill.
 
 ### 🔴 Trampas de verificación del payload cliente — medidas, no teóricas
 
-Siete defectos reales pasaron con **build verde, cuatro gates de diseño verdes y canary de browser verde**.
+Los siete defectos de la auditoría inicial pasaron con **build verde, cuatro gates de diseño verdes y canary de browser verde** (la lista de abajo ya creció con lo medido después, mismo patrón).
 El patrón: los gates comprueban que *el código dice lo correcto*, no que *el runtime hace lo correcto*.
 Detalle y evidencia: [auditoría 2026-07-29](../../../docs/audits/globe/GLOBE_PRODUCER_VERIFICATION_BLIND_SPOTS_2026-07-29.md).
+
+**El caso propio y fechado (2026-07-29):** la regresión la introdujimos nosotros y apareció **MIRANDO, no
+testeando** — `pnpm build`, ESLint, **129 tests** y **tres canarios** en verde, con un renglón cortado a media
+letra en pantalla. Mirar el frame renderizado no es la cortesía del cierre: para esta clase de defecto es el
+único instrumento que existe.
 
 - **`assets.ts` es la autoridad de lo que producción sirve.** Un archivo en `public/` que no esté listado
   ahí **no existe para el runtime**, por más que el canary lo sirva — el harness tiene su PROPIO allowlist.
@@ -86,8 +91,44 @@ Detalle y evidencia: [auditoría 2026-07-29](../../../docs/audits/globe/GLOBE_PR
   **es la autoridad — no suponerla**.
 - **Un harness que no puede ejercer la funcionalidad no puede protegerla.** Si un aserto pasa sobre una
   superficie que el fixture no sabe construir, el aserto no vale: primero se enseña al fixture.
-- **Nombrar los guards por su razón, no por su caso.** `isAudio` dejó fuera a video y el mismo bug volvió con
-  otra modalidad; `hasPoster` cierra la familia entera.
+- **Nombrar los guards por su razón, no por su caso — y la razón es el DATO, no la lista de casos.** `isAudio`
+  dejó fuera a video; `hasPoster` con `!== 'audio'` volvió a fallar con video, y `&& !== 'video'` habría
+  fallado con un GLB. Lo que cierra la familia entera es **`posterFor(item, thumbnails)`**, que decide por los
+  **BYTES** (`output.mimeType`) en vez de por una lista negra de modalidades — forward-compatible con las que
+  traiga `TASK-1569`. **El contraejemplo importa igual:** `isAudio` **sí** se nombra por modalidad en el feed y
+  está bien, porque la onda de audio es **cómo se ve el audio**, no un póster de reemplazo. No lo "generalices".
+- **Un test dedicado puede no cubrir lo que su nombre promete.** El gate tenía un aserto de pesos sintetizados,
+  verde, y trece sitios pedían igual un corte de Geist inexistente: colapsaba las tres caras cargadas en un
+  `Set` de pesos, o sea era **ciego a la familia** (`--weight-display: 700` pasaba porque *Poppins* lo tiene, y
+  Tailwind lo exponía después como `font-bold` aplicable a cualquier elemento). Antes de confiar en un aserto
+  por su nombre, lee **qué aparea**.
+- **Hay defectos que ningún gate PUEDE ver, y a veces el remedio es un reset, no un gate.** El proyecto no
+  emite el preflight de Tailwind, así que la hoja del navegador aplicaba `b, strong { font-weight: bolder }`:
+  un `<strong>` en un contenedor a 600 computaba **900** — faux bold **sin que ninguna clase lo dijera**. El
+  gate escanea `className`, no elementos HTML: le era **estructuralmente invisible**, porque el peso entraba
+  por el **nombre del elemento**. Apareció **tres veces el mismo día** en sitios distintos. **Cerrado el
+  2026-07-29 (`403d346`)** declarando `b, strong { font-weight: var(--weight-semibold) }` en `@layer base`,
+  sin adoptar preflight: cuando el defecto lo inyecta el navegador, una regla de base que lo vuelva imposible
+  hace innecesario el gate. **La categoría sigue viva:** otro elemento HTML con default propio del UA reabre
+  el agujero con los gates verdes.
+- **Varios síntomas juntos dentro de un contenedor acusan al CONTENEDOR, no a los contenidos.** El panel de
+  créditos parecía tres bugs —donut desbordado, encabezado clippeado, celdas superpuestas— y era **uno**:
+  `max-w-full` sobre un `absolute`, que resuelve porcentajes contra su bloque contenedor, y ahí es el
+  `<details>` — o sea **el ancho del disparador**. Con la pastilla en 157 px, los 352 px del panel quedaban en
+  ~150. Arreglarlo destapó un segundo (bajo ~510 px de viewport el panel arrancaba en `x = -120`), y el mismo
+  `max-w-full` roto estaba en el menú de cuenta: **un bug de contenedor rara vez vive en un solo contenedor**.
+- **Dos campos del contrato que coinciden pueden ser dos EJES distintos.** `Listo` y `Completada` no eran dos
+  palabras: el contrato trae `coarseProgress` y `state` por separado y declara `terminal` tanto para
+  `retained-asset` como para `terminal-run{completed}` — coincidían por casualidad. `stateCompleted` era el otro
+  eje filtrándose; quedó huérfana y se borró. Un segundo eje se gana la línea sólo cuando **aporta lo que el
+  primero esconde** (acá: que la corrida **no** entregó).
+- **Un número que se muestra al lado de sus propios operandos no se redondea.** El porcentaje del donut usaba
+  `Math.round` y mostraba `100 %` con la celda vecina diciendo `Gastado 166`: es **`Math.floor`**. Y la cifra
+  sale de una primitive (`src/format/credits.ts`, `creditReadout`): `Intl.NumberFormat('es-CL')` anclado al
+  locale **del producto** —no al del navegador, que leería `500,444` como cuatro órdenes de magnitud menos—,
+  exacta mientras quepa y abreviada desde 1.000.000, con el umbral **medido** contra la celda más angosta. Su
+  test afirma un **presupuesto de caracteres** (barre 0→1e12, falla sobre 7): un test de formato se rompe con
+  cada ajuste cosmético y no protege el slot; el presupuesto sí.
 - **El pipeline de build sólo se ejercita al desplegar.** `--mount=type=secret` es POR-RUN: `pnpm deploy
   --prod` re-resuelve dependencias y necesita su propio `.npmrc`. Publicar e instalar en local no prueba nada.
 - **Ningún aserto compara la proporción de un control contra sus hermanos.** Un stepper midió 768 px donde
@@ -186,6 +227,8 @@ AXIS es la foundation portable gobernada desde Greenhouse, no un runtime compart
 **Toolchain (verificado en `tsconfig.base.json`):** `module`/`moduleResolution` NodeNext, `strict`, más `verbatimModuleSyntax`, `exactOptionalPropertyTypes`, `noUncheckedIndexedAccess`, `noImplicitOverride`, `useUnknownInCatchVariables`. Escribe código que satisfaga estos flags (p.ej. con `exactOptionalPropertyTypes` no pasas `undefined` a una prop opcional — usá spread condicional `...(x !== undefined ? { x } : {})`, patrón usado en todo el spine).
 
 **Tests: `node --test`, NO Vitest.** Los tests son `*.test.ts` ejecutados directo por Node (p.ej. `node --test src/index.test.ts`). No introduzcas Vitest, Jest ni otro runner. **Trampa de la suite (lección de método, cuesta un verde falso):** los scripts `test` de cada package **ENUMERAN los archivos a mano** — no hay glob ni descubrimiento. Un `*.test.ts` nuevo que no se agrega a ese script **NUNCA corre**, y la suite queda **verde por no haberlo mirado**, que es el peor de los verdes. Al agregar un test, agrégalo también al script `test` del package y confirma que aparece en la salida del run.
+
+**La suite termina sola desde el 2026-07-29 (`403d346`) — y el workaround del puerto quedó retirado.** El canary `axis-pilot-canary` hacía `server.kill('SIGTERM')` sobre el wrapper de `pnpm`, pero `pnpm exec vite` **no es un proceso, son tres** (el wrapper, su `node` y el `vite` nieto): el nieto sobrevivía reteniendo los pipes, el event loop de Node **nunca drenaba** y `pnpm test` **no retornaba**, dejando además un huérfano en el puerto **4326** por corrida (llegaron a acumularse doce, uno de tres días). Hoy el canary usa `detached: true` para hacer al hijo líder de su grupo, `process.kill(-pid, …)` para señalar al **grupo entero** y **espera** la muerte con escalón a `SIGKILL` — sin ese `await` el proceso puede terminar antes de que el nieto suelte el puerto, que es el mismo bug con otro disfraz; en Windows se conserva `server.kill()`. Medido: `pnpm --filter @efeonce-globe/studio-client test` → **exit 0 en 29 s**, 129/129, tres canarios verdes, cero huérfanos en el 4326. **No sigas corriendo los canarios por separado ni liberando el puerto a mano:** un workaround vigente para un bug muerto hace pagar el costo dos veces. La lección de método sí queda: un runner que hay que matar a mano entrena a leer «se colgó» como normal — que es exactamente cómo un cuelgue real pasa desapercibido.
 
 **Convención de extensiones de import (crítica, el compilador la exige):**
 
@@ -901,7 +944,7 @@ shippeó con **4 de 11** animaciones del diseño aprobado. El task-lint sólo ve
 - **NUNCA** llames Google-native fuera de Vertex/GCP, ni un modelo Google por Fal; Fal solo non-Google allowlisted; OpenAI directo.
 - **NUNCA** confundas `policy_blocked` con `access_denied` / `not_found`; **NUNCA** filtres secretos/tokens/body upstream a cliente o logs.
 - **NUNCA** escribas una superficie humana nueva de Globe como **template de string**, ni serialices código de browser con `Function.prototype.toString()` (ADR-014). El payload vive en `apps/studio-client` (React + Vite, tipado, `lib.dom` + el `strict` del monorepo). `producer-ui.ts` / `public-share-ui.ts` / `ui.ts` son **payload viejo en retiro**, no plantilla a copiar: un agente que los toma como referencia reintroduce justo lo que la ADR eliminó.
-- **NUNCA** declares un `:root` de tokens fuera del SSOT (`apps/studio-client/src/tokens/tokens.ts`) ni un color, duración o easing literal en una superficie — son **error** de gate, no advertencia. Y **NUNCA** unifiques por decreto un valor que `LEGACY_TOKEN_DRIFT` registra como divergente (p. ej. el anillo de foco, **ámbar** en launch/studio/error y **azul** en producer): adoptarlo es cambio visible y pertenece al slice de port de esa superficie.
+- **NUNCA** declares un `:root` de tokens fuera del SSOT (`apps/studio-client/src/tokens/tokens.ts`) ni un color, duración o easing literal en una superficie — son **error** de gate, no advertencia. Y **NUNCA** unifiques por decreto un valor que `LEGACY_TOKEN_DRIFT` registra como divergente (p. ej. el anillo de foco, **ámbar** en launch/studio/error y **azul** en producer): adoptarlo es cambio visible y pertenece al slice de port de esa superficie. Corolario del mismo día: dos tokens que **resuelven parecido no son el mismo token** — `--rail-scrim` nació porque la premisa del riel translúcido («en desktop nada pasa por detrás») se rompió y dejó un renglón cortado a media letra; **espeja** `--media-scrim` y **no se consolida** con él, porque consolidarlos ata la legibilidad del riel a la de una pieza.
 - **NUNCA** pongas un string visible en JSX ni en `aria-label`/`title`/`placeholder`/`alt`: sale de `apps/studio-client/src/copy/index.ts` vía `copyFor()`. El nombre público del producto y de la moneda **no están decididos**, así que esas etiquetas van a cambiar. Y **NUNCA** dupliques `producer-copy.ts` en la capa nueva: se absorbe **moviéndolo** cuando el composer porte (studio-web depende de studio-client, el copy viaja en esa dirección y nunca de vuelta).
 - **NUNCA** devuelvas un `string` desnudo desde un renderer de documento: es `HtmlDocument {nonce, html}` (`apps/studio-web/src/html-document.ts`). El helper de respuesta ya no recupera el nonce con un regex sobre el body — hacerlo emitía `script-src 'nonce-'` y bloqueaba el propio payload sin fallar en build ni en tests. Un nonce que no sea CSP `base64-value` se **rechaza** en la frontera.
 - **NUNCA** corras el dev server de Vite con `--host` / `server.host`: 13 de los 19 advisories históricos de Vite son bypasses de `server.fs.deny` o lectura arbitraria del dev server, y **todos** exigen que sea alcanzable por red.
@@ -910,7 +953,8 @@ shippeó con **4 de 11** animaciones del diseño aprobado. El task-lint sólo ve
 - **NUNCA** importes primitives de Greenhouse, `CompositionShell` ni MUI dentro de `apps/studio-client` (ADR-014 punto 8 / `TASK-1540`). AXIS contracts/registry pueden consumirse como gobierno de adapters, pero Globe **materializa sus propios** tokens y componentes. Las primitives de Globe viven en `apps/studio-client/src/primitives/index.tsx` (`Chip`, `Eyebrow`, `FactList`, `CommentList`, `StateBlock`, `MediaStage`, `AxisStatus`, `AxisProgress`).
 - **NUNCA** promuevas una primitive de Globe a "primitive de plataforma" con **un solo consumer**: es una **hipótesis**, no una abstracción. Se promueve cuando una **segunda** superficie la consume **SIN modificarla**; si el segundo consumer necesita una prop nueva, eso **no es promoción** — es evidencia de que no estaba lista. Y **NUNCA** construyas una primitive sin superficie que la sirva (por eso `Surface` deliberadamente **no existe**).
 - **NUNCA** leas el gate `apps/studio-client/src/gates/design-contract.test.ts` como cobertura del repo: su frontera está **declarada en el propio archivo** y escanea **SOLO** `apps/studio-client/src`. `apps/studio-web` — donde viven los **184 hex crudos** y las **4 familias tipográficas literales** — **no está vigilado**. La frontera se amplía en **`TASK-1560` Slice 2, INMEDIATAMENTE ANTES** de borrar el legacy y **nunca después**: un gate rojo al llegar se saltea, y un gate salteado se lee como cobertura. Descripción honesta de hoy: **el payload nuevo no puede driftear; el legacy no está mirado.**
-- **NUNCA** uses un peso tipográfico que no tenga su `@font-face`: el browser lo **sintetiza**, deformando las letras, **sin fallar nada** — por eso es uno de los 5 tests del gate y no una convención. El gate cubre además `font-family`/`font-size`/`font-weight`/`line-height`/`letter-spacing` y camina `.ts`/`.tsx`/`.css`.
+- 🔴 **NUNCA** uses un peso tipográfico que no tenga su `@font-face`: el browser lo **sintetiza**, deformando las letras, **sin fallar nada**. En Globe eso es concreto — `GLOBE_FONT_FACES` carga **tres cortes** (Poppins 700, Geist 400, Geist 600), así que **`font-bold` SÓLO acompañado de `font-display`**; el énfasis en Geist es **`font-semibold`**. Y `font-normal`/`font-medium` son **clases MUERTAS**: el theme hace `--font-weight-*: initial` y el build emite exactamente cuatro utilidades (`font-bold`/`font-semibold`/`font-regular`/`font-display`) ⇒ el 400 explícito se escribe **`font-regular`**. La síntesis sólo va hacia **más pesado**, por eso `font-display` sin peso se ve bien **por accidente** — se declara igual, porque la intención se escribe. Caso fuente 2026-07-29: **trece sitios** pedían Geist@700 (los tres KPI de crédito del header y **cinco reglas `.pf__*` en `styles/tailwind.css`** — la mayoría en la hoja, no en JSX) con el aserto de pesos sintetizados **verde**, porque era ciego a la familia. Hoy lo cierran dos gates: **`never asks a family for a cut it does not load`** (aparea familia×peso **en el sitio de uso**, deriva de `GLOBE_FONT_FACES` agrupado por familia y mapea con `themeKeyFor` —la misma función del generador— para honrar el alias `--weight-display → font-bold`) y **`never writes a font utility the theme cannot generate`**. El gate cubre además `font-family`/`font-size`/`font-weight`/`line-height`/`letter-spacing` (+ el shorthand `font:`) y camina `.ts`/`.tsx`/`.css`. Detalle tipográfico completo: overlay `typography-design/GLOBE_OVERLAY.md`.
+- ⚠️ **NUNCA** pidas más de 600 en un `<strong>`/`<b>` sobre Geist, y **NUNCA** introduzcas un elemento HTML nuevo sin verificar qué peso le inyecta el UA. Contexto: el proyecto **no emite el preflight de Tailwind**, así que `b, strong { font-weight: bolder }` computaba **900** dentro de un contenedor a 600 (y 700 dentro de uno a 400) y pedía un corte de Geist que no existe — **faux bold que ninguna clase declaraba**, invisible al gate porque el peso entraba por el **nombre del elemento** y el gate escanea `className`. **Cerrado el 2026-07-29 (`403d346`)**: la base declara `b, strong { font-weight: var(--weight-semibold) }` y ya no hace falta repetir el peso en cada sitio (medido en el runtime vivo: 24 Geist@600, 1 Poppins@700, **cero sintetizados**). Lo que **sí** hay que saber es el techo: el énfasis sobre Geist **topa en 600** — un `<strong>` dentro de un contenedor que ya está en 600 se ve **igual que su padre**, porque no hay archivo. Si de verdad hace falta más peso, el camino es **`font-display` (Poppins 700)**, no pedirle a Geist un corte que no carga. Y la **categoría** sigue abierta: `b`/`strong` están neutralizados, cualquier otro elemento con default del UA vuelve a caer fuera de todo escaneo de clases.
 - **NUNCA** decidas la disponibilidad de un modelo desde el ledger `GLOBE_MODEL_FLEET_STATUS.md`: el **SoT LIVE** es el reader **`globe.producer.fleet.list`** (`TASK-1554`); el ledger es el SoT **humano**. Si divergen, **manda el reader**.
 - **NUNCA** te refieras al selector de modelo del Producer (`TASK-1555`) como **"galería"**: esa dirección se implementó, **el operador la rechazó al verla** y hoy es un **desplegable compacto con isotipo real** que lista toda la flota de la modalidad activa. **Ya está portado** al payload cliente: vive dentro de `apps/studio-client/src/surfaces/producer/composer/ProducerComposer.tsx` (marcadores `producer-model-*`), en `/producer`. **Corregido 2026-07-25:** `TASK-1564` quedó **retirada** y el dueño del composer —port y rediseño de jerarquía— es **`TASK-1552`**; las dos tasks editan el MISMO archivo, así que hay que coordinar orden. La región `producer-route` es composición, no feed. `TASK-1560` sólo **borra** el legacy después, no lo porta.
 - 🔴 **NUNCA inventes un nombre de cabecera al portar.** El transporte del payload cliente enviaba
@@ -929,6 +973,9 @@ shippeó con **4 de 11** animaciones del diseño aprobado. El task-lint sólo ve
   adelante, y **el dispatch de commands ocurre en la API**: toda instrumentación agregada al web era
   invisible para el fallo. **SIEMPRE** confirmá qué imagen corre CADA servicio antes de concluir que una
   instrumentación no funciona.
+- 🔴 **NUNCA completes un SHA de memoria.** Despaché un deploy "rellenando" los 40 caracteres y el workflow lo
+  rechazó en **`Verify exact remote main SHA`** antes de construir nada. El guardrail existe y es la única razón
+  por la que ese error salió barato — no es licencia para adivinar: el SHA sale de **`git rev-parse`**, siempre.
 - 🔴 **`textPayload:"…"` NO matchea logs JSON en Cloud Logging.** Una línea JSON se parsea a `jsonPayload`,
   así que ese filtro devuelve cero aunque los logs existan. Usar búsqueda de texto libre (`'"mi.evento"'`) o
   `jsonPayload.event="…"`.
@@ -1052,10 +1099,13 @@ Ocho reglas medidas contra el runtime, no razonadas. Las tres primeras cuestan u
    `approval_stale` → que llega como `conflict`. Y el token que viaja en `execute` es el del estimado **vigente**:
    "el token ES la cotización".
 
-5. **Firmar aprobaciones desde un cliente es BREAK-GLASS, no operación.** El secreto de aprobación es
-   `only api_runtime can read them` (`infra/terraform/secrets.tf`). El procedimiento documentado
-   (`GLOBE_RUNTIME_HANDOFF.md:220`) otorga `serviceAccountTokenCreator` **temporalmente al operador humano**, ejecuta
-   y revoca con readback. **NUNCA** lo conviertas en el camino normal, **NUNCA** le des
+5. **Firmar aprobaciones desde un cliente es BREAK-GLASS, no operación — y para FONDEAR ya ni eso: el
+   camino normal es el carril gobernado** (`propose` → `confirm`, VIVO y ejercido end-to-end el
+   2026-07-26; runbook `docs/manual-de-uso/creative-studio/fondear-creditos-globe.md`). El secreto de
+   aprobación es `only api_runtime can read them` (`infra/terraform/secrets.tf`). El break-glass
+   documentado (`GLOBE_RUNTIME_HANDOFF.md:220`) otorga `serviceAccountTokenCreator` **temporalmente al
+   operador humano**, ejecuta y revoca con readback; su contador debe tender a CERO ahora que el carril
+   funciona. **NUNCA** lo conviertas en el camino normal, **NUNCA** le des
    `secretmanager.versions.access` a `greenhouse-portal@` (es la identidad de reconciliación de tenancy de
    **Greenhouse**: usarla para administrar crédito de **Globe** es admin implícito cross-plataforma), y **NUNCA**
    dejes que un **agente o proceso** proponga y confirme: la confirmación es de un humano autenticado, siempre.
@@ -1068,12 +1118,15 @@ Ocho reglas medidas contra el runtime, no razonadas. Las tres primeras cuestan u
    que cuesta cero: el agente nunca confirma, y aprobador ≠ ejecutor entre service accounts.
 
 6. 🔴 **La autoridad de crédito YA está concedida a la identidad que Greenhouse puede impersonar — el problema no es
-   que falte, es que SOBRA.** Cadena verificada 2026-07-26: `greenhouse-portal@` tiene `tokenCreator` sobre
-   `greenhouse-globe-caller` (`infra/terraform/iam.tf:16-20`) → ese SA resuelve al principal genérico
-   `globe:service:internal-caller` (`app.ts:3457`) → ese principal carga `globe.credits.grant.issue`,
-   `grant.correct`, `policy.manage` y `budget.manage` (`app.ts:3545-3563`) **más `globe.lab.experiment.run`**
-   (`app.ts:3515`). O sea **una sola identidad tiene fondeo y gasto**, y el único freno es un secreto que no puede
-   leer. **NUNCA** describas el bloqueo como "falta una identidad de credit-admin": es al revés.
+   que falte, es que SOBRABA — y el 2026-07-26 SE RETIRÓ (ADR-015 §10, rev `00114-k4t`).** La cadena era:
+   `greenhouse-portal@` con `tokenCreator` sobre `greenhouse-globe-caller` (`iam.tf:16-20`) → principal genérico
+   `globe:service:internal-caller` → que cargaba `grant.issue`/`grant.correct`/`policy.manage`/`budget.manage`
+   **más `globe.lab.experiment.run`** — fondeo y gasto en una identidad. **Hoy el caller genérico (y el broker de
+   tenancy, misma clase) ya NO carga las cuatro**: conserva lecturas, `pool.manage` y `funding.propose/confirm`
+   (el carril gobernado, que ES el camino de fondeo). Señal anti-regreso en dos capas:
+   `creditAdminAuthorityDrift` + evento `globe.credit_admin.caller_authority_drift` (steady = 0) y el test de
+   disyunción en `tenancy-runtime.test.ts`. **NUNCA re-agregues una de las cuatro sin reabrir ADR-015** — el test
+   te va a parar, y saltártelo reintroduce fondeo+gasto en la identidad que Greenhouse puede asumir.
 
 7. 🔴 **El maker-checker de crédito es VACUO para cualquier caller de workload.** `approval()`
    (`packages/domain/src/credit-administration.ts`) compara `approval.proposedBy` contra
@@ -1088,8 +1141,9 @@ Ocho reglas medidas contra el runtime, no razonadas. Las tres primeras cuestan u
    existe ninguna superficie que firme**: `.sign(` no aparece en `app.ts` — el verificador está cableado, el firmador
    no. **NUNCA** propongas "ampliar el radio del secreto" como salida: es la misma propiedad con otro dueño.
 
-**Dirección decidida — ADR-015** (`EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md`, Proposed 2026-07-26;
-implementación = `TASK-1566`): la administración de créditos y capabilities de Globe **vive en Greenhouse** —
+**Dirección decidida — ADR-015** (`EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md`, Partially
+implemented: carril de fondeo VIVO y ejercido + retiro de las 4 caps ejecutado el 2026-07-26; KMS e
+identidades disjuntas por unidad quedan como hardening; implementación = `TASK-1566`): la administración de créditos y capabilities de Globe **vive en Greenhouse** —
 superficie en Greenhouse, autoridad en Globe, lane `sister-platform` (hoy `available` sólo en tenancy), **cuatro
 identidades disjuntas** (broker de administración **distinto** del reconciliador de tenancy; aprobador que firma y no
 muta; ejecutor que muta y **no puede firmar**, separados como **unidad de ejecución propia** porque dentro de un
@@ -1132,6 +1186,174 @@ distintos y el segundo invisible sin esto). **JAMÁS** el `message`, el `stack`,
 derivado del payload: la prohibición de filtrar detalle interno aplica a los **logs** igual que al cliente, y hay
 tests que lo verifican. Y si el dominio es transport-neutral —lo es, cero `console` en el paquete— la razón se
 observa por un **port inyectado**, no por un `console.error` metido ahí.
+
+🔴 **Un control legítimo que rechaza un caso legítimo se arregla en el CONTROL, no en el caso (ISSUE-127 capa 8, 2026-07-26).**
+El sanitizador del body snapshot trataba como credencial **cualquier** string que empezara con `Key `/`Bearer `
+(regla `^(?:Bearer|Key)\s+`, prefijo y nada más). El prompt del canary de imagen empieza con **`"Key visual editorial
+para Efeonce Globe: ..."`** — `Key visual` es el término de dirección de arte del equipo, no un secreto. Ese falso
+positivo bloqueó el `execute` durante toda una sesión, y **llegaba etiquetado `endpoint_url_not_permitted`**, que
+mandaba a leer una config de endpoint que estaba perfecta.
+
+**NUNCA** desbloquees esto cambiando el input (el prompt del canary): desbloquea la sesión **escondiendo** el bug, y
+el próximo que escriba el término estándar del oficio —un usuario real— come el mismo rechazo mudo. **La heurística
+tiene que distinguir el dato del formato:** una credencial serializada es **un token opaco, no una frase**, así que
+se exige token único, sin espacios, ASCII de credencial y **anclado al final** (`$`). Con eso `Bearer eyJhbGci…` y
+`Key <id>:<secret>` (el formato real de fal) se siguen atrapando y la prosa no: sube la precisión sin bajar el
+alcance contra credenciales reales — ningún token real lleva espacios ni acentos.
+
+Corolario de método, medido dos veces el mismo día: **una hipótesis se mata leyendo, no desplegando.** Los cuatro
+sospechosos heredados asumían que `buildBody` armaba referencias con `placeholder(input)` — el de `text-to-image`
+**no lo llama**, su body son cuatro escalares; y la hipótesis de `vertexProject` vacío (que habría roto el regex de
+vertex en el **constructor**, que valida las 12 entries, no 3) murió con un `gcloud run services describe`:
+`GLOBE_LAB_VERTEX_PROJECT` está sin setear y cae al default. Ninguna de las dos costó un deploy.
+
+## Sesión 2026-07-26 — generación real, carril de fondeo y ocho lecciones de método
+
+**El día en una línea:** el canary de generación GENERÓ por primera vez, el Producer React salió a la
+luz, la UI produce las tres modalidades, y el carril gobernado de fondeo quedó vivo end-to-end salvo
+el último salto de credenciales. Lo que sigue son las reglas que sobreviven a la sesión.
+
+### Generación — el estado real (verificado en runtime, no leído)
+
+Las **tres modalidades generan desde la UI** con principal `human` por el BFF: imagen (Seedream 5 Pro,
+10 cr, PNG 7,4 MB), video (Seedance 2.0, 16 cr, MP4 1,5 MB) y audio (ElevenLabs Multilingual v2, 6 cr,
+MP3 114 KB). El fence libera correctamente: un `provider_failed` dejó `spentCredits=0`.
+
+🔴 **`"Key visual"` NO es una credencial (ISSUE-127 capa 8).** El sanitizador del body snapshot marcaba
+como credencial cualquier string que empezara con `Key `/`Bearer ` (regla `^(?:Bearer|Key)\s+`,
+prefijo y nada más). El prompt del canary de imagen empieza con *"Key visual editorial para Efeonce
+Globe…"* — el término de dirección de arte del equipo. **Ese falso positivo bloqueó el `execute`
+durante una sesión entera**, y llegaba etiquetado `endpoint_url_not_permitted`, mandando a revisar una
+config de endpoint intachable.
+
+**Un control legítimo que rechaza un caso legítimo se arregla en el CONTROL, no en el caso.** Cambiar
+el prompt habría desbloqueado la sesión **escondiendo** el bug para el próximo usuario real. La regla
+correcta distingue el dato del formato: una credencial serializada es **un token opaco, no una frase**
+— se exige token único, sin espacios, ASCII de credencial y **anclado al final** (`$`).
+
+🔴 **Un fallo de proveedor puede ser TRANSITORIO, y una hipótesis con un solo dato no está confirmada.**
+Un video falló con `provider_failed`; la hipótesis "es el audio" pareció confirmarse porque `silent`
+pasó. **La corrida de confirmación la refutó: `with-audio` también pasó.** Marcador real: 2 de 3.
+Antes de shippear un fix sobre una correlación, **corré el caso que la refutaría**.
+
+### Producer React — el flag que lo tenía invisible
+
+`GLOBE_CLIENT_PRODUCER_ENABLED` estaba en `false`, y `app.ts:2061` caía al **fallback legacy**. El
+código React estaba **desplegado desde antes** (la imagen ya contenía `ProducerComposer.tsx`): no
+faltaba deploy, faltaba el flag. El gate que la propia variable citaba (`legacy-parity.test.ts`) estaba
+**verde 7/7**, así que la condición para prenderlo estaba cumplida y sin medir.
+
+⚠️ **Notas de esta skill que resultaron STALE y ya no aplican:** `client_app_enabled` "no está
+cableado" (sí lo está, y en `true` desde 2026-07-25) y "ninguna superficie sirve sobre el payload
+nuevo" (el Producer sirve React desde 2026-07-26, rev `00092-9pr`). **Verificá contra el runtime antes
+de citar una nota de estado de este archivo.**
+
+🔴 **`MediaStage` es primitive COMPARTIDA (share board + viewer): su `padding` y su
+`max-height: calc(100svh - 8.5rem)` son correctos en el share board y ROMPEN el viewer**, donde la
+celda ya tiene altura propia. Medido: celda 830×830, pieza 757×757, 37 px de aire por lado. El override
+va **acotado al viewer** (`producer-viewer.css`), nunca en la primitive. Sigue en `contain`, jamás
+`cover`: llenar no puede significar recortar.
+
+🔴 **Una corrida FALLIDA no puede ofrecer acciones muertas.** `Descargar` y `Usar como referencia` ya
+estaban gateadas por `retained`; **`Ver candidato` no**, y era la única realmente muerta — corregido.
+Y el slot **`Destacada` no renderizaba `statusLine`** (se consumía sólo en la rejilla), así que una
+corrida fallida se presentaba como la mejor pieza del espacio, muda. Ambas cerradas.
+
+⚠️ **`GLOBE_PRODUCER_LIVE_FEED_ENABLED=true` invalida los `ref_N` del árbol de accesibilidad** entre el
+`read_page` y el click: el feed se re-renderiza solo. Cualquier QA automatizado sobre esta UI es flaky
+por diseño hasta que feed y tabs tengan `data-testid` estables (el composer ya los tiene).
+
+### Fondeo gobernado (TASK-1566) — lo que quedó y lo que falta
+
+**Vivo en producción:** `GLOBE_CREDIT_ADMIN_LANE_ENABLED='true'`, rev `00106-b6w`, **176 capabilities**
+(las tres de fondeo publicadas), migración Globe `0032` + Greenhouse `…164420386`/`…171851162`
+aplicadas.
+
+🔴 **Componer transacciones sobre los stores de crédito DEADLOCKEA si cada uno abre la suya.**
+`DurableCreditAdministrationStore` abría `pool.transaction` **por método** (11 call-sites) y cada una
+tomaba `pg_advisory_xact_lock(credit:workspace:X)`. Una transacción externa hace que la interna pida
+ese lock **desde otra conexión**: la externa no commitea porque espera a la interna, y la interna no
+obtiene el lock porque lo tiene la externa. **No es "queda no atómico" — se cuelga, en el camino del
+dinero.** El fix es un **ejecutor inyectable** por store (dentro de una misma transacción el lock es
+reentrante) + el seam `atomically` en el dominio. Backward compatible.
+🔴 **Y el ejecutor tiene que cubrir TODOS los métodos, lecturas incluidas — uno solo que quede en
+`this.pool` reintroduce el cuelgue** (defecto 7 de TASK-1566, medido dos veces en `pg_locks` en
+vivo). `markGrantPosted` quedó fuera del enhebrado del Slice 4c y colgó todo `confirm` desplegado,
+reteniendo el lock del workspace y bloqueando la generación entera; los readers en `this.pool` son la
+misma clase con otro síntoma (no ven los writes de su propia transacción). Cerrado en
+`efeonce-globe@4eab6d3`: accessor `db = tx ?? pool` en TODO método de los stores de administración y
+ledger, `policyReader` viaja por los `CreditFundingMutationPorts` del seam (nunca el reader externo
+dentro de `mutate`), y la regresión conductual es «con `tx` inyectada, `pool.calls === 0`». Al
+agregar un método a un store transaccional de crédito: **NUNCA** `this.pool` directo — `run()`/`db`.
+
+🔴 **El segundo confirmador humano es POLÍTICA, NO invariante** (ADR-015 Delta 2026-07-26 (2)).
+`requires_second_confirmer` es por workspace, **default FALSE en el interno**, más techo por operación
+(`second_confirmer_above_credits`). **NUNCA** lo pongas como `CHECK` incondicional: el operador es CEO
+y dueño del presupuesto, no hay segundo actor, y **un control que nadie puede satisfacer no protege —
+desvía al break-glass, que otorga MÁS autoridad que el camino que reemplaza**. Se cometió ese error en
+esta sesión y bloqueó al operador hasta el forward-fix.
+
+**Lo que sí es invariante y no se toca:** el agente **nunca** confirma (trigger `actor_must_be_human`
+rechaza principals de servicio), toda confirmación registra contra quién confirma, y la evidencia es
+**append-only** (triggers anti-UPDATE/DELETE).
+
+🔴 **`assertHumanAttribution` de Globe es SHAPE-ONLY** — rechaza `globe:service:` y exige entitlement
+no vacío, pero **no puede** verificar que la atribución venga de una sesión autenticada, porque Globe
+no tiene las sesiones. Ese amarre vive en Greenhouse (`globe_credit_funding_intents` + trigger). **No
+publiques el carril sin esa contraparte.**
+
+🔴 **El top-up de CLIENTE es otro acto económico, y el trigger actual lo bloquea.** El grant interno
+gasta presupuesto **de Efeonce** (por eso lo aprueba una persona de Efeonce); un top-up gasta plata
+**del cliente** y lo autoriza **el pago liquidado**. El trigger exige actor humano ⇒ **hay que
+discriminar por `source`** (`human_session` vs `settled_payment`), no relajarlo. Dueño: `TASK-1484`.
+Reglas no negociables: monto **del PSP nunca del cliente**, idempotencia por **id de pago** (los PSP
+reintentan webhooks), y un chargeback se corrige con **`grant.correct`**, jamás borrando el grant.
+
+✅ **CRITERIO DE SALIDA CUMPLIDO (2026-07-26, misma jornada):** el fondeo real corrió `propose` →
+`confirm` punta a punta SIN break-glass — `confirm` en **905 ms** (el paso que se colgaba), grant
++100 `posted`, tope 400→**800**, asiento de ledger, todo en UNA transacción, atribuido al operador
+real (`user-efeonce-admin-julio-reyes`) vía su sesión de Chrome en staging con autorización
+explícita. `pg_locks` 0/0/0 después. **Runbook canónico:**
+`docs/manual-de-uso/creative-studio/fondear-creditos-globe.md`. Tres reglas medidas que un agente
+futuro debe saber:
+
+- **El confirm exige `x-idempotency-key` PROPIA** — reusar la del propose da
+  `409 globe_funding_already_recorded` (el broker registra la intención por clave).
+- **El anti-replay del broker es POR PROPUESTA**, no por clave: registrada la decisión, ningún
+  confirm repetido pasa. El replay idempotente del dominio queda inalcanzable a través del broker;
+  el invariante (ningún segundo grant) vive en dos capas.
+- **La atribución es lo que era "del operador", no la mecánica**: un agente puede ejecutar los curls
+  con autorización explícita SI la sesión es la del humano real; confirmar con la persona agente
+  (`user-agent-e2e-001`) fabrica evidencia en una tabla append-only y sigue prohibido.
+
+### Ocho lecciones de método, que valen más que los fixes
+
+1. **Una hipótesis se mata leyendo, no desplegando.** Dos hipótesis murieron con una lectura y un
+   `describe`; las capas 1-4 costaron un deploy cada una y la 5 se vio en treinta líneas.
+2. **Un bucket por defecto que abarca 17 sitios no es una razón nombrada: es una razón inventada.** Un
+   label equivocado dirige mal, y eso es peor que no tener label.
+3. **Una sanitización sin contraparte de observabilidad no protege información: la DESTRUYE.** Ocurrió
+   **ocho veces** en el mismo día, la última en código escrito mientras se arreglaban las siete
+   anteriores. **Conocer la regla no la aplica sola.**
+4. **Que exista una clave de idempotencia no prueba que el handler la honre.** Verificá el efecto, no
+   la presencia del argumento.
+5. **Un timeout del CLIENTE no es un fallo del servidor.** Leé el estado con el reader antes de
+   reintentar, o gastás de nuevo.
+6. **Código presente no es capacidad disponible.** `registerCreditFundingCapabilities` existía con 12
+   tests verdes y **no lo llamaba nadie**. Los tests de dominio no pueden ver un hueco de cableado:
+   la aserción tiene que ir contra `/v1/capabilities`, que es lo que un caller ve.
+7. **Endurecer más de lo que la decisión pide no es conservador: es cambiar la decisión sin
+   discutirla.**
+8. 🔴 **Un `.ts` con bytes NUL crudos se detecta como BINARIO y todo `grep` lo salta en silencio.**
+   `credit-funding.ts` los usaba como separador de clave; hizo concluir dos veces que un símbolo no
+   existía. Si un símbolo "no aparece" pero deberías estar viéndolo: `file <path>` — si dice `data`,
+   ahí está. Usar `\0`, nunca el byte literal (es runtime-idéntico: no cambia hashes ni ids).
+   **Gate desde 2026-07-26, en LOS DOS repos:** `pnpm nul-byte-gate` — en Greenhouse dentro de
+   `pnpm local:check` (o sea del pre-push), en `efeonce-globe` dentro de `pnpm check`, con su test
+   registrado a mano en el script `test` como pide ese repo. El barrido encontró 3 archivos más
+   (`media-derivatives.ts`, esta skill y la propia TASK-1566, las dos últimas con el byte escrito
+   **dentro de la línea que enseña a no escribirlo**), y el byte se coló también en el gate mientras
+   se escribía: por eso la contramedida no podía ser disciplina.
 
 🔴 **ANTES de escribir una secuencia de canary a mano: YA EXISTE COMO SCRIPT (2026-07-26).**
 `pnpm producer:canary` (`scripts/producer-ui-canary.mjs` + `-lib.mjs`) hace el recorrido **completo** de gasto real

@@ -29,6 +29,101 @@
 
 # Handoff
 
+## Active state — 2026-07-29 LATEST (TASK-1599: contrato tipográfico + jerarquía del Producer, desplegado y verificado)
+
+**Revisión viva, verificada — no supuesta:**
+
+```bash
+gcloud run services describe globe-studio-internal \
+  --region southamerica-west1 --project efeonce-globe
+# → globe-studio-internal-00101-x2d · Ready · 100% del tráfico
+#   imagen southamerica-west1-docker.pkg.dev/efeonce-globe/globe-runtime/globe-studio-internal:403d3464e88e
+```
+
+El tag de la imagen (`403d3464e88e`) corresponde al cuarto y último SHA desplegado hoy — el que cierra los
+puntos 1 y 3 de la sección de runtime más abajo. Registro:
+[`TASK-1599`](../../tasks/complete/TASK-1599-globe-client-typographic-contract-producer-hierarchy.md).
+
+### Los cuatro SHA desplegados a `globe-studio-internal`
+
+| SHA | Qué entrega |
+|---|---|
+| **`68a2cbe`** | **Contrato tipográfico.** 13 sitios pedían Geist@700 con sólo Poppins 700 · Geist 400 · Geist 600 cargados: el navegador lo **sintetiza** —engrosa el trazo por algoritmo— sin fallar ningún gate. Incluye los tres KPI de crédito del encabezado y cinco reglas `.pf__*` de la hoja. **Dos gates nuevos**: `never asks a family for a cut it does not load` (aparea familia×peso **en el sitio de uso**, no en la declaración, que estaba sana) y `never writes a font utility the theme cannot generate` (`font-normal`/`font-medium` no emitían CSS). Más `tabular-nums` en siete números vivos y tokens de rótulo que se usaban como prosa |
+| **`d009871`** | **Jerarquía del Producer**, nueve hallazgos de una revisión visual en vivo. El mayor: el **panel de créditos no se rompía por el número** sino por `max-w-full`, que sobre un elemento `absolute` resuelve contra el bloque contenedor —el `<details>`, o sea el ancho del disparador—; los tres síntomas eran **un** bug. Y `Listo` vs `Completada` no eran dos palabras sino **dos ejes** del contrato (`coarseProgress` vs `state`), así que `stateCompleted` quedó huérfana y se borró |
+| **`b9112a8`** | **Cierre de una regresión propia.** Bajar las acciones del prompt al flujo hizo desbordar el cuerpo y un renglón quedó cortado a media letra contra el riel translúcido. Token nuevo `--rail-scrim` en el SSOT. Más `Math.floor` en el porcentaje del donut: con `round` decía `100 %` junto a `Gastado 166` |
+| **`403d346`** | **Cierre de los dos puntos de runtime que quedaron sin dueño.** (a) `b, strong { font-weight: var(--weight-semibold) }` en `@layer base`: el UA ya no puede pedir por herencia un corte que Geist no carga, y el gate deja de hacer falta para este caso porque el reset cierra la puerta entera. (b) El canary `axis-pilot-canary` pasa a `detached: true` + `process.kill(-pid, …)` sobre el **grupo** de procesos, con espera y escalón a `SIGKILL`: `pnpm test` vuelve a terminar solo, a devolver exit code y a no dejar huérfanos en el 4326. Ambos **medidos**, no supuestos — detalle abajo |
+
+### Qué cambió visiblemente en el Producer
+
+- Los tres KPI de crédito del encabezado dejan de verse con trazo sintetizado y sus cifras dejan de bailar
+  al actualizarse.
+- El panel de créditos deja de recortarse, de tomar anchos absurdos y de quebrar el número.
+- El porcentaje del donut deja de contradecir a la cifra de gasto que tiene al lado.
+- El último renglón del cuerpo del composer deja de quedar cortado contra el riel.
+- Los rótulos del dock vuelven a su escalón tipográfico.
+- El estado de una tarjeta del feed deja de mezclar avance con estado final.
+
+### Verificación
+
+Build 0 · eslint 0 · `node --test` **129/129** · canario de motor **8/8** · canario del composer
+**163/163** · revisión humana en vivo en `https://globe.efeoncepro.com/producer` con sesión real a 1440px,
+contra el deploy real después de cada uno de los tres primeros despliegues. Esa revisión del segundo
+despliegue fue lo que **expuso** la regresión que el tercero cerró.
+
+Con `403d346`, la suite además **termina sola**: `pnpm --filter @efeonce-globe/studio-client test` → **exit 0
+en 29 s** (antes: indefinido), 129/129 y tres canarios verdes, cero huérfanos en el 4326. Y el peso real de
+los `<strong>` se midió en el navegador con `getComputedStyle`, no se dedujo del código: 24 en Geist@600, 1
+en Poppins@700, **cero sintetizados**.
+
+### Puntos de runtime — dos cerrados el mismo día, uno abierto
+
+1. ✅ **El `bolder` del UA — CERRADO en `403d346`, medido contra el runtime vivo.** El diagnóstico se
+   mantiene porque explica la regla: el proyecto no emite el preflight de Tailwind (decisión de ADR-016), así
+   que la hoja del navegador aplicaba `b, strong { font-weight: bolder }` — un peso **relativo** que computa
+   700 sobre un contenedor a 400 y **900** sobre uno a 600, ambos cortes que Geist no carga. Los gates
+   escanean `className`, no elementos HTML: el caso les era **estructuralmente invisible**, porque el peso
+   entraba por el **nombre del elemento**. Apareció tres veces en un solo día.
+   **El cierre:** `b, strong { font-weight: var(--weight-semibold) }` en `@layer base` de
+   `apps/studio-client/src/styles/tailwind.css`. Se eligió 600 y no `inherit` porque `inherit` mata el
+   énfasis y `<strong>` dejaría de significar algo; 600 es un corte que existe y conserva el contraste contra
+   el 400 heredado. **No se adoptó preflight** — esa sigue siendo la decisión pendiente de ADR-016.
+   **Medición** (`getComputedStyle` sobre los 25 `<strong>`/`<b>` del Producer vivo, revisión
+   `globe-studio-internal-00101-x2d`): `Geist@600 × 24`, `Poppins@700 × 1`, **`SINTETIZADOS: []`**.
+   **Consecuencia operativa vigente:** el énfasis sobre Geist **topa en 600**. Un `<strong>` dentro de un
+   contenedor que ya está en 600 se ve igual que su padre — no hay escalón más porque no hay archivo. Más
+   peso es `font-display` (Poppins 700).
+   **Lo que sigue abierto es la categoría, no el caso:** lo que entra por el nombre del elemento es invisible
+   a un gate que lee clases. Otro elemento HTML con default propio del UA reabre el agujero con los gates
+   verdes.
+2. 🔴 **Frontera de los gates — ABIERTO.** Escanean sólo `apps/studio-client/src`. `apps/studio-web` **no
+   está vigilado**: **184 hex crudos** y **4 familias literales** medidos hoy. Dueño: `TASK-1560` Slice 2, que
+   amplía la frontera **antes** del borrado del legacy. Hereda dos clases más de las que su spec calculaba.
+3. ✅ **Fuga del `axis-pilot-canary` — CERRADA en `403d346`, medida.** El diagnóstico, porque explica la
+   forma del arreglo: `pnpm exec vite` **no es un proceso, son tres** —el wrapper de `pnpm`, su `node` y el
+   `vite` nieto— y `server.kill('SIGTERM')` alcanzaba sólo al primero. El nieto sobrevivía reteniendo los
+   pipes, así que el event loop de Node **nunca drenaba**: el runner imprimía su OK y después se colgaba para
+   siempre. Consecuencia medida: **`pnpm test` no terminaba solo** y cada corrida dejaba un `vite` ocupando
+   el **puerto 4326** que hacía fallar a la siguiente. Se acumularon doce, uno de tres días.
+   **El cierre:** `detached: true` hace al hijo líder de su propio grupo de procesos, `process.kill(-pid, …)`
+   señala al **grupo entero** (nieto incluido) y el cierre **espera** a que muera, con escalón a `SIGKILL`.
+   Sin ese `await` el proceso puede terminar antes de que el nieto suelte el puerto — el mismo bug con otro
+   disfraz. En Windows se conserva `server.kill()`, porque `detached` no tiene la misma semántica.
+   **Medición:** `pnpm --filter @efeonce-globe/studio-client test` → **exit 0 en 29 s** (antes: indefinido),
+   **129/129** con los tres canarios verdes y **cero huérfanos** en el 4326 después.
+   ⚠️ **El workaround manual —correr los canarios por separado y liberar el puerto a mano— queda retirado.**
+   Ya no hace falta para cobrar el exit code, y sostenerlo entrena a leer «se colgó» como normal, que es
+   exactamente cómo un cuelgue real pasa desapercibido.
+
+### Rollback
+
+De imagen. Ningún slice muta estado durable: sin migraciones, sin backfills, sin transiciones de máquina de
+estados. Desplegar la revisión anterior de `globe-studio-internal` revierte los cuatro cambios en ~5 min.
+`b9112a8` y `d009871` **van apareados**: revertir sólo el tercero reabre la regresión del riel que cerró.
+Revertir `403d346` reabre las dos causas que cerró — el UA vuelve a inyectar `bolder` y el canary vuelve a
+colgar la suite dejando el 4326 ocupado.
+
+---
+
 ## Active state — 2026-07-26 (defecto 7 de TASK-1566 desplegado; confirm desbloqueado para el operador)
 
 - `globe-api-internal` → revisión **`00113-l8b`** (Ready), imagen construida de

@@ -71,9 +71,14 @@ skill.
 
 ### 🔴 Trampas de verificación del payload cliente — medidas, no teóricas
 
-Siete defectos reales pasaron con **build verde, cuatro gates de diseño verdes y canary de browser verde**.
+Los siete defectos de la auditoría inicial pasaron con **build verde, cuatro gates de diseño verdes y canary de browser verde** (la lista de abajo ya creció con lo medido después, mismo patrón).
 El patrón: los gates comprueban que *el código dice lo correcto*, no que *el runtime hace lo correcto*.
 Detalle y evidencia: [auditoría 2026-07-29](../../../docs/audits/globe/GLOBE_PRODUCER_VERIFICATION_BLIND_SPOTS_2026-07-29.md).
+
+**El caso propio y fechado (2026-07-29):** la regresión la introdujimos nosotros y apareció **MIRANDO, no
+testeando** — `pnpm build`, ESLint, **129 tests** y **tres canarios** en verde, con un renglón cortado a media
+letra en pantalla. Mirar el frame renderizado no es la cortesía del cierre: para esta clase de defecto es el
+único instrumento que existe.
 
 - **`assets.ts` es la autoridad de lo que producción sirve.** Un archivo en `public/` que no esté listado
   ahí **no existe para el runtime**, por más que el canary lo sirva — el harness tiene su PROPIO allowlist.
@@ -86,8 +91,44 @@ Detalle y evidencia: [auditoría 2026-07-29](../../../docs/audits/globe/GLOBE_PR
   **es la autoridad — no suponerla**.
 - **Un harness que no puede ejercer la funcionalidad no puede protegerla.** Si un aserto pasa sobre una
   superficie que el fixture no sabe construir, el aserto no vale: primero se enseña al fixture.
-- **Nombrar los guards por su razón, no por su caso.** `isAudio` dejó fuera a video y el mismo bug volvió con
-  otra modalidad; `hasPoster` cierra la familia entera.
+- **Nombrar los guards por su razón, no por su caso — y la razón es el DATO, no la lista de casos.** `isAudio`
+  dejó fuera a video; `hasPoster` con `!== 'audio'` volvió a fallar con video, y `&& !== 'video'` habría
+  fallado con un GLB. Lo que cierra la familia entera es **`posterFor(item, thumbnails)`**, que decide por los
+  **BYTES** (`output.mimeType`) en vez de por una lista negra de modalidades — forward-compatible con las que
+  traiga `TASK-1569`. **El contraejemplo importa igual:** `isAudio` **sí** se nombra por modalidad en el feed y
+  está bien, porque la onda de audio es **cómo se ve el audio**, no un póster de reemplazo. No lo "generalices".
+- **Un test dedicado puede no cubrir lo que su nombre promete.** El gate tenía un aserto de pesos sintetizados,
+  verde, y trece sitios pedían igual un corte de Geist inexistente: colapsaba las tres caras cargadas en un
+  `Set` de pesos, o sea era **ciego a la familia** (`--weight-display: 700` pasaba porque *Poppins* lo tiene, y
+  Tailwind lo exponía después como `font-bold` aplicable a cualquier elemento). Antes de confiar en un aserto
+  por su nombre, lee **qué aparea**.
+- **Hay defectos que ningún gate PUEDE ver, y a veces el remedio es un reset, no un gate.** El proyecto no
+  emite el preflight de Tailwind, así que la hoja del navegador aplicaba `b, strong { font-weight: bolder }`:
+  un `<strong>` en un contenedor a 600 computaba **900** — faux bold **sin que ninguna clase lo dijera**. El
+  gate escanea `className`, no elementos HTML: le era **estructuralmente invisible**, porque el peso entraba
+  por el **nombre del elemento**. Apareció **tres veces el mismo día** en sitios distintos. **Cerrado el
+  2026-07-29 (`403d346`)** declarando `b, strong { font-weight: var(--weight-semibold) }` en `@layer base`,
+  sin adoptar preflight: cuando el defecto lo inyecta el navegador, una regla de base que lo vuelva imposible
+  hace innecesario el gate. **La categoría sigue viva:** otro elemento HTML con default propio del UA reabre
+  el agujero con los gates verdes.
+- **Varios síntomas juntos dentro de un contenedor acusan al CONTENEDOR, no a los contenidos.** El panel de
+  créditos parecía tres bugs —donut desbordado, encabezado clippeado, celdas superpuestas— y era **uno**:
+  `max-w-full` sobre un `absolute`, que resuelve porcentajes contra su bloque contenedor, y ahí es el
+  `<details>` — o sea **el ancho del disparador**. Con la pastilla en 157 px, los 352 px del panel quedaban en
+  ~150. Arreglarlo destapó un segundo (bajo ~510 px de viewport el panel arrancaba en `x = -120`), y el mismo
+  `max-w-full` roto estaba en el menú de cuenta: **un bug de contenedor rara vez vive en un solo contenedor**.
+- **Dos campos del contrato que coinciden pueden ser dos EJES distintos.** `Listo` y `Completada` no eran dos
+  palabras: el contrato trae `coarseProgress` y `state` por separado y declara `terminal` tanto para
+  `retained-asset` como para `terminal-run{completed}` — coincidían por casualidad. `stateCompleted` era el otro
+  eje filtrándose; quedó huérfana y se borró. Un segundo eje se gana la línea sólo cuando **aporta lo que el
+  primero esconde** (acá: que la corrida **no** entregó).
+- **Un número que se muestra al lado de sus propios operandos no se redondea.** El porcentaje del donut usaba
+  `Math.round` y mostraba `100 %` con la celda vecina diciendo `Gastado 166`: es **`Math.floor`**. Y la cifra
+  sale de una primitive (`src/format/credits.ts`, `creditReadout`): `Intl.NumberFormat('es-CL')` anclado al
+  locale **del producto** —no al del navegador, que leería `500,444` como cuatro órdenes de magnitud menos—,
+  exacta mientras quepa y abreviada desde 1.000.000, con el umbral **medido** contra la celda más angosta. Su
+  test afirma un **presupuesto de caracteres** (barre 0→1e12, falla sobre 7): un test de formato se rompe con
+  cada ajuste cosmético y no protege el slot; el presupuesto sí.
 - **El pipeline de build sólo se ejercita al desplegar.** `--mount=type=secret` es POR-RUN: `pnpm deploy
   --prod` re-resuelve dependencias y necesita su propio `.npmrc`. Publicar e instalar en local no prueba nada.
 - **Ningún aserto compara la proporción de un control contra sus hermanos.** Un stepper midió 768 px donde
@@ -186,6 +227,8 @@ AXIS es la foundation portable gobernada desde Greenhouse, no un runtime compart
 **Toolchain (verificado en `tsconfig.base.json`):** `module`/`moduleResolution` NodeNext, `strict`, más `verbatimModuleSyntax`, `exactOptionalPropertyTypes`, `noUncheckedIndexedAccess`, `noImplicitOverride`, `useUnknownInCatchVariables`. Escribe código que satisfaga estos flags (p.ej. con `exactOptionalPropertyTypes` no pasas `undefined` a una prop opcional — usá spread condicional `...(x !== undefined ? { x } : {})`, patrón usado en todo el spine).
 
 **Tests: `node --test`, NO Vitest.** Los tests son `*.test.ts` ejecutados directo por Node (p.ej. `node --test src/index.test.ts`). No introduzcas Vitest, Jest ni otro runner. **Trampa de la suite (lección de método, cuesta un verde falso):** los scripts `test` de cada package **ENUMERAN los archivos a mano** — no hay glob ni descubrimiento. Un `*.test.ts` nuevo que no se agrega a ese script **NUNCA corre**, y la suite queda **verde por no haberlo mirado**, que es el peor de los verdes. Al agregar un test, agrégalo también al script `test` del package y confirma que aparece en la salida del run.
+
+**La suite termina sola desde el 2026-07-29 (`403d346`) — y el workaround del puerto quedó retirado.** El canary `axis-pilot-canary` hacía `server.kill('SIGTERM')` sobre el wrapper de `pnpm`, pero `pnpm exec vite` **no es un proceso, son tres** (el wrapper, su `node` y el `vite` nieto): el nieto sobrevivía reteniendo los pipes, el event loop de Node **nunca drenaba** y `pnpm test` **no retornaba**, dejando además un huérfano en el puerto **4326** por corrida (llegaron a acumularse doce, uno de tres días). Hoy el canary usa `detached: true` para hacer al hijo líder de su grupo, `process.kill(-pid, …)` para señalar al **grupo entero** y **espera** la muerte con escalón a `SIGKILL` — sin ese `await` el proceso puede terminar antes de que el nieto suelte el puerto, que es el mismo bug con otro disfraz; en Windows se conserva `server.kill()`. Medido: `pnpm --filter @efeonce-globe/studio-client test` → **exit 0 en 29 s**, 129/129, tres canarios verdes, cero huérfanos en el 4326. **No sigas corriendo los canarios por separado ni liberando el puerto a mano:** un workaround vigente para un bug muerto hace pagar el costo dos veces. La lección de método sí queda: un runner que hay que matar a mano entrena a leer «se colgó» como normal — que es exactamente cómo un cuelgue real pasa desapercibido.
 
 **Convención de extensiones de import (crítica, el compilador la exige):**
 
@@ -901,7 +944,7 @@ shippeó con **4 de 11** animaciones del diseño aprobado. El task-lint sólo ve
 - **NUNCA** llames Google-native fuera de Vertex/GCP, ni un modelo Google por Fal; Fal solo non-Google allowlisted; OpenAI directo.
 - **NUNCA** confundas `policy_blocked` con `access_denied` / `not_found`; **NUNCA** filtres secretos/tokens/body upstream a cliente o logs.
 - **NUNCA** escribas una superficie humana nueva de Globe como **template de string**, ni serialices código de browser con `Function.prototype.toString()` (ADR-014). El payload vive en `apps/studio-client` (React + Vite, tipado, `lib.dom` + el `strict` del monorepo). `producer-ui.ts` / `public-share-ui.ts` / `ui.ts` son **payload viejo en retiro**, no plantilla a copiar: un agente que los toma como referencia reintroduce justo lo que la ADR eliminó.
-- **NUNCA** declares un `:root` de tokens fuera del SSOT (`apps/studio-client/src/tokens/tokens.ts`) ni un color, duración o easing literal en una superficie — son **error** de gate, no advertencia. Y **NUNCA** unifiques por decreto un valor que `LEGACY_TOKEN_DRIFT` registra como divergente (p. ej. el anillo de foco, **ámbar** en launch/studio/error y **azul** en producer): adoptarlo es cambio visible y pertenece al slice de port de esa superficie.
+- **NUNCA** declares un `:root` de tokens fuera del SSOT (`apps/studio-client/src/tokens/tokens.ts`) ni un color, duración o easing literal en una superficie — son **error** de gate, no advertencia. Y **NUNCA** unifiques por decreto un valor que `LEGACY_TOKEN_DRIFT` registra como divergente (p. ej. el anillo de foco, **ámbar** en launch/studio/error y **azul** en producer): adoptarlo es cambio visible y pertenece al slice de port de esa superficie. Corolario del mismo día: dos tokens que **resuelven parecido no son el mismo token** — `--rail-scrim` nació porque la premisa del riel translúcido («en desktop nada pasa por detrás») se rompió y dejó un renglón cortado a media letra; **espeja** `--media-scrim` y **no se consolida** con él, porque consolidarlos ata la legibilidad del riel a la de una pieza.
 - **NUNCA** pongas un string visible en JSX ni en `aria-label`/`title`/`placeholder`/`alt`: sale de `apps/studio-client/src/copy/index.ts` vía `copyFor()`. El nombre público del producto y de la moneda **no están decididos**, así que esas etiquetas van a cambiar. Y **NUNCA** dupliques `producer-copy.ts` en la capa nueva: se absorbe **moviéndolo** cuando el composer porte (studio-web depende de studio-client, el copy viaja en esa dirección y nunca de vuelta).
 - **NUNCA** devuelvas un `string` desnudo desde un renderer de documento: es `HtmlDocument {nonce, html}` (`apps/studio-web/src/html-document.ts`). El helper de respuesta ya no recupera el nonce con un regex sobre el body — hacerlo emitía `script-src 'nonce-'` y bloqueaba el propio payload sin fallar en build ni en tests. Un nonce que no sea CSP `base64-value` se **rechaza** en la frontera.
 - **NUNCA** corras el dev server de Vite con `--host` / `server.host`: 13 de los 19 advisories históricos de Vite son bypasses de `server.fs.deny` o lectura arbitraria del dev server, y **todos** exigen que sea alcanzable por red.
@@ -910,7 +953,8 @@ shippeó con **4 de 11** animaciones del diseño aprobado. El task-lint sólo ve
 - **NUNCA** importes primitives de Greenhouse, `CompositionShell` ni MUI dentro de `apps/studio-client` (ADR-014 punto 8 / `TASK-1540`). AXIS contracts/registry pueden consumirse como gobierno de adapters, pero Globe **materializa sus propios** tokens y componentes. Las primitives de Globe viven en `apps/studio-client/src/primitives/index.tsx` (`Chip`, `Eyebrow`, `FactList`, `CommentList`, `StateBlock`, `MediaStage`, `AxisStatus`, `AxisProgress`).
 - **NUNCA** promuevas una primitive de Globe a "primitive de plataforma" con **un solo consumer**: es una **hipótesis**, no una abstracción. Se promueve cuando una **segunda** superficie la consume **SIN modificarla**; si el segundo consumer necesita una prop nueva, eso **no es promoción** — es evidencia de que no estaba lista. Y **NUNCA** construyas una primitive sin superficie que la sirva (por eso `Surface` deliberadamente **no existe**).
 - **NUNCA** leas el gate `apps/studio-client/src/gates/design-contract.test.ts` como cobertura del repo: su frontera está **declarada en el propio archivo** y escanea **SOLO** `apps/studio-client/src`. `apps/studio-web` — donde viven los **184 hex crudos** y las **4 familias tipográficas literales** — **no está vigilado**. La frontera se amplía en **`TASK-1560` Slice 2, INMEDIATAMENTE ANTES** de borrar el legacy y **nunca después**: un gate rojo al llegar se saltea, y un gate salteado se lee como cobertura. Descripción honesta de hoy: **el payload nuevo no puede driftear; el legacy no está mirado.**
-- **NUNCA** uses un peso tipográfico que no tenga su `@font-face`: el browser lo **sintetiza**, deformando las letras, **sin fallar nada** — por eso es uno de los 5 tests del gate y no una convención. El gate cubre además `font-family`/`font-size`/`font-weight`/`line-height`/`letter-spacing` y camina `.ts`/`.tsx`/`.css`.
+- 🔴 **NUNCA** uses un peso tipográfico que no tenga su `@font-face`: el browser lo **sintetiza**, deformando las letras, **sin fallar nada**. En Globe eso es concreto — `GLOBE_FONT_FACES` carga **tres cortes** (Poppins 700, Geist 400, Geist 600), así que **`font-bold` SÓLO acompañado de `font-display`**; el énfasis en Geist es **`font-semibold`**. Y `font-normal`/`font-medium` son **clases MUERTAS**: el theme hace `--font-weight-*: initial` y el build emite exactamente cuatro utilidades (`font-bold`/`font-semibold`/`font-regular`/`font-display`) ⇒ el 400 explícito se escribe **`font-regular`**. La síntesis sólo va hacia **más pesado**, por eso `font-display` sin peso se ve bien **por accidente** — se declara igual, porque la intención se escribe. Caso fuente 2026-07-29: **trece sitios** pedían Geist@700 (los tres KPI de crédito del header y **cinco reglas `.pf__*` en `styles/tailwind.css`** — la mayoría en la hoja, no en JSX) con el aserto de pesos sintetizados **verde**, porque era ciego a la familia. Hoy lo cierran dos gates: **`never asks a family for a cut it does not load`** (aparea familia×peso **en el sitio de uso**, deriva de `GLOBE_FONT_FACES` agrupado por familia y mapea con `themeKeyFor` —la misma función del generador— para honrar el alias `--weight-display → font-bold`) y **`never writes a font utility the theme cannot generate`**. El gate cubre además `font-family`/`font-size`/`font-weight`/`line-height`/`letter-spacing` (+ el shorthand `font:`) y camina `.ts`/`.tsx`/`.css`. Detalle tipográfico completo: overlay `typography-design/GLOBE_OVERLAY.md`.
+- ⚠️ **NUNCA** pidas más de 600 en un `<strong>`/`<b>` sobre Geist, y **NUNCA** introduzcas un elemento HTML nuevo sin verificar qué peso le inyecta el UA. Contexto: el proyecto **no emite el preflight de Tailwind**, así que `b, strong { font-weight: bolder }` computaba **900** dentro de un contenedor a 600 (y 700 dentro de uno a 400) y pedía un corte de Geist que no existe — **faux bold que ninguna clase declaraba**, invisible al gate porque el peso entraba por el **nombre del elemento** y el gate escanea `className`. **Cerrado el 2026-07-29 (`403d346`)**: la base declara `b, strong { font-weight: var(--weight-semibold) }` y ya no hace falta repetir el peso en cada sitio (medido en el runtime vivo: 24 Geist@600, 1 Poppins@700, **cero sintetizados**). Lo que **sí** hay que saber es el techo: el énfasis sobre Geist **topa en 600** — un `<strong>` dentro de un contenedor que ya está en 600 se ve **igual que su padre**, porque no hay archivo. Si de verdad hace falta más peso, el camino es **`font-display` (Poppins 700)**, no pedirle a Geist un corte que no carga. Y la **categoría** sigue abierta: `b`/`strong` están neutralizados, cualquier otro elemento con default del UA vuelve a caer fuera de todo escaneo de clases.
 - **NUNCA** decidas la disponibilidad de un modelo desde el ledger `GLOBE_MODEL_FLEET_STATUS.md`: el **SoT LIVE** es el reader **`globe.producer.fleet.list`** (`TASK-1554`); el ledger es el SoT **humano**. Si divergen, **manda el reader**.
 - **NUNCA** te refieras al selector de modelo del Producer (`TASK-1555`) como **"galería"**: esa dirección se implementó, **el operador la rechazó al verla** y hoy es un **desplegable compacto con isotipo real** que lista toda la flota de la modalidad activa. **Ya está portado** al payload cliente: vive dentro de `apps/studio-client/src/surfaces/producer/composer/ProducerComposer.tsx` (marcadores `producer-model-*`), en `/producer`. **Corregido 2026-07-25:** `TASK-1564` quedó **retirada** y el dueño del composer —port y rediseño de jerarquía— es **`TASK-1552`**; las dos tasks editan el MISMO archivo, así que hay que coordinar orden. La región `producer-route` es composición, no feed. `TASK-1560` sólo **borra** el legacy después, no lo porta.
 - 🔴 **NUNCA inventes un nombre de cabecera al portar.** El transporte del payload cliente enviaba
@@ -929,6 +973,9 @@ shippeó con **4 de 11** animaciones del diseño aprobado. El task-lint sólo ve
   adelante, y **el dispatch de commands ocurre en la API**: toda instrumentación agregada al web era
   invisible para el fallo. **SIEMPRE** confirmá qué imagen corre CADA servicio antes de concluir que una
   instrumentación no funciona.
+- 🔴 **NUNCA completes un SHA de memoria.** Despaché un deploy "rellenando" los 40 caracteres y el workflow lo
+  rechazó en **`Verify exact remote main SHA`** antes de construir nada. El guardrail existe y es la única razón
+  por la que ese error salió barato — no es licencia para adivinar: el SHA sale de **`git rev-parse`**, siempre.
 - 🔴 **`textPayload:"…"` NO matchea logs JSON en Cloud Logging.** Una línea JSON se parsea a `jsonPayload`,
   así que ese filtro devuelve cero aunque los logs existan. Usar búsqueda de texto libre (`'"mi.evento"'`) o
   `jsonPayload.event="…"`.
