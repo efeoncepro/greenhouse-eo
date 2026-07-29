@@ -78,6 +78,38 @@ Verificado vía web, **as-of 2026-07** (reverificar — ver Paso 2):
 8. **es-CL neutro, tuteo.**
 9. **Creative Studio mantiene tres ejes y cinco líneas.** Al definir su GTM no colapses delivery model, engagement form y operating mode; tampoco vendas Studio Credits como piezas, horas, dinero o derechos. El modelo canónico en `docs/business-models/creative-studio/` gobierna la oferta; GTM decide segmento, packaging, motion y rollout dentro de ese contrato.
 
+## Patrón transferible de GTM: creative production con cuña y expansión
+
+El benchmark de Higgsfield (`docs/audits/commercial/HIGGSFIELD_PARTNERSHIP_AND_VERTICAL_EXPANSION_RESEARCH_2026-07-29.md`)
+se usa como evidencia de patrones, no como plantilla de copia. Para Creative Studio y futuras Product Services:
+
+1. **Empieza con una cuña de alta frecuencia y primer valor visible.** Una URL, un brief o un asset existente puede
+   reducir activación; la cuña debe resolver un job concreto y no presentar todo el portfolio.
+2. **Convierte el primer output en workflow recurrente.** Variantes, memoria, templates, feedback y evidencia deben
+   aumentar el valor del siguiente ciclo; medir aprobación y reutilización, no sólo actividad o consumo.
+3. **Trata a agencias, studios y partners como multiplicadores condicionados.** Cada relación se clasifica como
+   provider, integración, distribución, enablement, producción, cliente/case study, creator program o canal. “Partner”
+   requiere términos, owner, economics y responsabilidad explícitos.
+4. **Diseña la expansión por cuenta operativa.** El camino puede ser operador → pod → workspace → enterprise, pero cada
+   salto necesita trigger, buyer group, capacidad, governance, prueba y margen; no se infiere desde número de seats.
+5. **Usa ecosystem-led y content-led como aceleradores, no como sustitutos del positioning.** Workshops, showcases,
+   contests, plugins y co-marketing deben tener hipótesis de adquisición/activación y una métrica de pipeline o revenue.
+6. **Separa software, enablement y servicio gestionado.** Si Efeonce asume dirección, QA, derechos o delivery, se
+   cotiza y gobierna como capacidad/servicio; no se esconde dentro de usage, credits ni una relación de proveedor.
+7. **Valida el paso workflow → recurrente.** Antes de declarar PMF, exige primer valor, repetición pagada, expansión,
+   cost-to-serve, margen, procurement y evidencia de renovación.
+8. **Productiza expertise sin trasladar complejidad al runner.** Un builder puede configurar intención, referencias,
+   reglas y QA; el runner debe ejecutar inputs semánticos. En Efeonce, el workflow también debe conservar derechos,
+   provenance, decisiones, costos y aprobación humana.
+
+### Anti-copia obligatoria
+
+No copiar créditos públicos, “unlimited”, claims de views, verticales amplias, logos, creator payouts o la etiqueta
+“partner” de un competidor. Traducir cada patrón a una hipótesis falsable de Efeonce y a un experimento con owner,
+threshold y stop condition. GTM define el motion; `commercial-expert` vende; `growth-marketing-cro` opera activación;
+`content-marketing-studio` produce educación; `digital-marketing` opera canales; Finance/Legal validan economics y
+rights.
+
 ## Tabla de sinergias — GTM como conductor
 
 | Terreno | Delega/orquesta en | Frontera |

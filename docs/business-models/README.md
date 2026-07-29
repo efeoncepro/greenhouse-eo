@@ -143,6 +143,10 @@ Todo business model debe separar al menos estas dimensiones:
 - [Creator Influence & Content Business Model V1](media-distribution/CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md) —
   submodelo de Influencers, Creators & UGC; separa intelligence, activation, content, partnerships y whitelisting.
   `Approved for validation`; no autoriza pricing público ni venta general.
+- [Creator Influence & Content Pricing Integrity Pack V1](media-distribution/CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md) —
+  bandas de validación, fee fijo, pass-through, coordinación de terceros, performance fee, mínimos y condiciones de pago.
+- [Creator Influence & Content Market Research 2026-07-29](../audits/commercial/CREATOR_INFLUENCE_CONTENT_MARKET_RESEARCH_2026-07-29.md) —
+  benchmark de agencias/plataformas, best practices, prácticas descartadas y modelo propio escalable.
 
 - [Efeonce Creative Studio V1.1](creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md) —
   `Approved for validation`; incorpora la doctrina de autoría humana y mantiene B2B2B como hipótesis gateada.
@@ -151,3 +155,9 @@ Todo business model debe separar al menos estas dimensiones:
 - [Efeonce Partner & Provider Layer V1](EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md) — `Approved for validation`; modelo transversal para relaciones comerciales y tecnológicas, sin declarar por sí solo partnerships aprobados ni pricing.
 - [Creative Studio Skill Adoption Matrix](creative-studio/EFEONCE_CREATIVE_STUDIO_SKILL_ADOPTION_V1.md) —
   cobertura de skills, fronteras de ownership, validación y dominios auditados sin cambio.
+- [Higgsfield Partnership & Vertical Expansion Research 2026-07-29](../audits/commercial/HIGGSFIELD_PARTNERSHIP_AND_VERTICAL_EXPANSION_RESEARCH_2026-07-29.md) —
+  benchmark de partnerships, advertising beachhead, enablement y expansión vertical; evidencia direccional, no aprobación comercial.
+- [Magnific Go-to-Market & Platform Expansion Research 2026-07-29](../audits/commercial/MAGNIFIC_GO_TO_MARKET_AND_PLATFORM_EXPANSION_RESEARCH_2026-07-29.md) —
+  benchmark de wedge visual, workflow productization, ecosystem distribution, expansión Business/Enterprise y límites de evidencia.
+- [Globe Market, Distribution & Monetization Strategy V1](../strategy/EFEONCE_GLOBE_MARKET_DISTRIBUTION_AND_MONETIZATION_STRATEGY_V1.md) —
+  arquitectura de segmentos, distribución masiva, ventas B2B/enterprise, canales, packaging y validación; `Approved for validation`.

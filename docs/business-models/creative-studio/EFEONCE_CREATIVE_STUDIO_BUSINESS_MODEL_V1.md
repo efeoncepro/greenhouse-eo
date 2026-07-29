@@ -430,6 +430,45 @@ SLA por aparecer en el portal.
 
 ## 12. Plan de validación comercial y económica
 
+### 12.0 GTM de validación: adoptar patrones, no copiar vendors
+
+El benchmark de Higgsfield confirma un patrón útil para validar Creative Studio: una cuña de alta frecuencia y
+primer valor visible puede abrir la cuenta; la repetición de workflows, memoria, variantes y evidencia puede llevarla
+a un pod, workspace y engagement recurrente. Este patrón se adopta como hipótesis de GTM, no como decisión de pricing,
+self-serve o partnership.
+
+La secuencia de validación para Efeonce es:
+
+```text
+Creative Velocity Diagnostic / Sample Sprint
+  → primer entregable aprobado
+  → sistema de variantes + memoria de marca
+  → pod cliente–Efeonce o agencia–cliente–Efeonce
+  → Managed Production / Co-operated Studio
+  → expansión por campañas, mercados o lanes
+```
+
+La cuña inicial debe tener un job concreto —por ejemplo lanzamiento de producto o sistema de contenido social—,
+un buyer group identificable y un outcome controlable. No se presenta el catálogo completo ni se promete performance
+de medios si Efeonce no controla tracking, inversión y atribución.
+
+Partnerships, integraciones, creators, studios y casos se registran como mecanismos de adquisición o enablement hasta
+que exista una relación contractual, owner, economics, responsabilidad y evidencia de demanda. La expansión requiere
+trigger observable, capacidad disponible, procurement, margen y señal de renovación; no se infiere desde logos, views,
+seats o créditos consumidos.
+
+### 12.1 Magnific: workflow como activo de expansión
+
+El benchmark de Magnific (`docs/audits/commercial/MAGNIFIC_GO_TO_MARKET_AND_PLATFORM_EXPANSION_RESEARCH_2026-07-29.md`)
+añade una hipótesis complementaria: el primer output visual debe poder convertirse en un workflow reusable por un builder
+experto y ejecutable por un runner operativo. Para Globe, el builder conserva intención, referencias, invariantes,
+rubric, derechos y aprobación; el runner recibe inputs semánticos y el sistema conserva decisiones, versiones, costos,
+lineage, QA y review.
+
+Se adopta la lógica `output → workflow → pod → workspace`, pero se adapta a outcomes aprobados y accountability Efeonce.
+No se adopta la lógica de créditos, unlimited, seats o integraciones como unidad de valor ni se interpreta una agencia,
+plugin, conector o caso de uso como partnership sin terms, owner, economics y responsabilidad explícitos.
+
 ### Fase 0 — instrumentación interna
 
 - 30–50 runs reales distribuidos entre imagen, video y audio;
@@ -517,6 +556,7 @@ Fuentes internas canónicas:
 - [Creative Practice pricing](../../../.codex/skills/creative-practice/modules/04_PRICING.md)
 - [Creative Practice SOW](../../../.codex/skills/creative-practice/modules/05_SCOPE_SOW.md)
 - [EPIC-028](../../epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md)
+- [Higgsfield Partnership & Vertical Expansion Research 2026-07-29](../../audits/commercial/HIGGSFIELD_PARTNERSHIP_AND_VERTICAL_EXPANSION_RESEARCH_2026-07-29.md)
 
 Benchmark externo se conserva como evidencia direccional de packaging/usage, no como autoridad de precio. Los
 precios, términos y capabilities de vendors deben revalidarse cerca de cualquier decisión comercial.

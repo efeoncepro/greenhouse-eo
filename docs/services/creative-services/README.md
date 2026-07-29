@@ -27,9 +27,12 @@ negocio ni representa por sí solo toda la agencia creativa.
 | `audiovisual-production` | Audiovisual, Motion & Audio Production | Assets audiovisuales listos para publicación o lanzamiento dentro de un scope definido | On-Demand · Managed Squad | Proposed |
 | `run-and-gun-production` | Run-and-Gun Production | Captura audiovisual profesional, ágil y de baja fricción para contenido, entrevistas, campañas y lanzamientos | On-Demand · Managed Squad | Proposed |
 | `creative-studio-access` | Creative Studio Access | Acceso gobernado a la capacidad y al sistema de producción creativa | On-Going · Studio Access | Approved for validation; Globe gated |
+| `globe-managed-production-sprint` | Managed Creative Production Sprint powered by Globe | Workflow creativo acotado, producido y entregado por Efeonce con provenance y governance | On-Demand · Efeonce-managed | CEO conditional-go; client runtime access denied |
 
 `Creative Diagnostic` es la cuña de entrada y mecanismo de discovery. No es una sexta línea de producción ni debe
 confundirse con una solución completa: diagnostica el problema, establece baseline y propone la siguiente fase.
+
+La ficha operativa del primer carril comercial está en [`Managed Creative Production Sprint V1`](../creative-studio/EFEONCE_GLOBE_MANAGED_CREATIVE_PRODUCTION_SPRINT_V1.md).
 
 `Performance Creative Lab` es una composición con Media & Distribution (Reach puede habilitarla) y Measurement; experimenta variantes,
 hipótesis y aprendizaje creativo conectado con medios. No asume el ownership de media buying ni de atribución por sí

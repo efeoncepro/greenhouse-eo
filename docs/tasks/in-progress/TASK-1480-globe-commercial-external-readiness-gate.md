@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -17,10 +17,10 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Diseño gobernado; implementación pendiente`
+- Status real: `CEO-approved conditional-go para primer Commercial Production Sprint managed; SaaS/client-runtime externo sigue gated`
 - Rank: `TBD`
 - Domain: `commercial|legal|finance|security`
-- Blocked by: `TASK-1477, TASK-1478, TASK-1479, TASK-1482`
+- Blocked by: `none`
 - Branch: `task/TASK-1480-globe-commercial-external-readiness-gate`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -36,6 +36,50 @@ EPIC-028 exige que integración de modelos, plataforma gobernada y validación c
 ## Goal
 
 Evitar que la disponibilidad técnica se interprete como autorización comercial.
+
+## CEO Commercial Decision — 2026-07-29
+
+El CEO autoriza un `conditional-go` comercial para el primer carril de salida de Globe:
+
+```yaml
+decision_state: conditional-go
+decision_authority: CEO
+decision_date: 2026-07-29
+commercial_product: Efeonce Globe
+launch_lane: efeonce-managed
+offer: Managed Creative Production Sprint powered by Globe
+customer_count: 1
+customer: SKY Airline — Agencia Creativa
+customer_status: active Efeonce creative client / design partner
+initial_geography: Chile, subject to current engagement scope
+workflow_count: 1
+workflow: SKY Agencia Creativa workflow expansion through governed visual production
+route_count: 1
+customer_runtime_access: denied
+client_operated: false
+self_serve_checkout: false
+public_pricing: false
+required_before_execution: rights_and_input_authorization, spend_cap, route_canary, rollback_owner,
+  secure_delivery, SOW_or_order, invoice_path
+expansion_requires: full_readiness_dossier_and_new_decision
+```
+
+Esta decisión autoriza vender y ejecutar un servicio comercial gestionado por Efeonce. No autoriza acceso directo
+del cliente al runtime, operación `client-operated`, self-serve, checkout, marketplace, reseller rights ni ampliación
+de rutas. `TASK-1477`, `TASK-1478` y `TASK-1479` permanecen como evidencia requerida para ampliar el rollout; no son
+bloqueos para este primer lane si se ejecuta con alcance acotado y evidencia route-specific. `TASK-1482` sigue siendo
+una condición técnica de gasto, presupuesto y settlement antes de ejecutar trabajo facturable.
+
+### Client assignment — SKY Airline
+
+`SKY Airline` queda designada como la primera cuenta del carril por su servicio creativo vigente. La fuente de verdad
+identifica los módulos activos `agencia_creativa` + `globe`, con un squad creativo operativo. Globe debe ampliar y
+instrumentar ese servicio existente con producción gobernada, memoria, provenance, QA y aprobación humana.
+
+La licitación `SKY Blog (Wherex)` queda fuera de este rollout: es una oportunidad SEO/contenido no adjudicada y no debe
+usarse como contexto, caso ni SOW del piloto creativo.
+
+El brief interno de ejecución es [`TASK-1480 SKY Agencia Creativa Globe Design-Partner Pilot`](../../services/creative-studio/SKY_GLOBE_DESIGN_PARTNER_PILOT_BRIEF_V1.md).
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
 
@@ -58,19 +102,23 @@ Evitar que la disponibilidad técnica se interprete como autorización comercial
 
 ### Depends on
 
-- `TASK-1477`, `TASK-1478`, `TASK-1479` y `TASK-1482`.
+- Para el primer lane managed: evidencia route-specific de `TASK-1478`, controles de presupuesto de `TASK-1482` y
+  handoff operativo de `TASK-1477`/`TASK-1479`.
+- Para rollout amplio, permanecen las dependencias completas `TASK-1477`, `TASK-1478`, `TASK-1479` y `TASK-1482`.
 - `TASK-1483` es evidencia obligatoria si el scope incluye operación `client-operated` o budget administrado
   por el cliente; no bloquea un go estrictamente managed.
 
 ### Blocks / Impacts
 
 - Las tasks downstream declaradas en el grafo de EPIC-028 y el execution plan de Globe.
-- No habilita producción ni clientes externos por sí sola.
+- No habilita acceso directo de clientes al runtime ni rollout amplio por sí sola; sí registra el `conditional-go`
+  del servicio managed autorizado por el CEO.
 
 ### Files owned
 
 - `docs/business-models/creative-studio/`
 - `docs/services/`
+- `docs/services/creative-studio/EFEONCE_GLOBE_MANAGED_CREATIVE_PRODUCTION_SPRINT_V1.md`
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
 - `../efeonce-globe/docs/operations/`
 
@@ -124,7 +172,8 @@ no crea ni modifica schema, API, commands, readers, migrations o integraciones r
 
 ## Out of Scope
 
-- Producción pública, clientes externos, pricing/wallet self-serve o permisos más amplios que los aprobados expresamente.
+- Producción pública abierta, acceso directo de clientes al runtime, pricing/wallet self-serve o permisos más amplios
+  que los aprobados expresamente.
 - Mover runtime creativo, datos, provider secrets o lógica de Globe a Greenhouse.
 - Crear un segundo harness o namespace de tasks dentro de Globe.
 - Implementar monetización, billing, tax, checkout o revenue projections: eso pertenece a `TASK-1484` y
@@ -173,19 +222,23 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Acceptance Criteria
 
 - [ ] La decisión identifica alcance, fecha, owners y evidencia.
+- [ ] El primer `conditional-go` referencia el contrato de [`Managed Creative Production Sprint V1`](../../services/creative-studio/EFEONCE_GLOBE_MANAGED_CREATIVE_PRODUCTION_SPRINT_V1.md).
 - [ ] Existe un `commercial_decision_record` versionado/firmado con go state, segments/geographies/channels,
       packages/five-line economics, pricing/rates, currency/FX, discounts, tax/accounting/revenue memo refs,
       expiry/rollover/breakage/refunds/top-up/overage y support/SLA/stop-loss/rollback.
 - [ ] `conditional-go` expresa restricciones machine-readable y `TASK-1484` falla cerrado fuera de ellas.
 - [ ] Sign-off contable/tributario y legal referencia profesionales habilitados para entidades/jurisdicciones
       incluidas; ausencia o ambigüedad no se interpreta como aprobación.
-- [ ] Sin sign-off el estado permanece internal-only/no production.
+- [ ] Sin el `conditional-go` CEO o sin las condiciones técnicas/rights/finance del lane, no se ejecuta trabajo de
+      cliente; el runtime permanece `internal_smoke`.
 - [ ] Go parcial no habilita capacidades o segmentos no evaluados.
 - [ ] El dossier incluye coverage machine-readable y conformance PASS por capability crítica; cualquier
       business capability con surface `missing`, lógica duplicada o provider bypass obliga `no-go`.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
-- [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
-- [ ] El go aprueba parámetros pero no activa feature flags, adapters de pago, external tenants ni cobros.
+- [ ] No se habilita acceso directo de clientes al runtime ni expansión de segmentos/rutas sin una decisión posterior
+      explícita.
+- [ ] Este `conditional-go` aprueba la oferta managed y sus parámetros, pero no activa feature flags, adapters de pago,
+      external tenants ni cobros automáticos.
 
 ## Verification
 

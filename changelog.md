@@ -7,6 +7,33 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-29 — EPIC-028: cinco workstreams comerciales añadidos
+
+- Se añadieron `TASK-1593`–`TASK-1597` como policy tasks dentro de EPIC-028: enterprise ICP/design partners, Agency
+  Workflow Sprint, Campaign Variant Workflow, Distribution/Activation y Packaging/Unit Economics.
+- Las tasks consumen los gates comerciales existentes sin duplicarlos y mantienen el runtime, pricing público,
+  checkout, reseller rights, co-selling y clientes externos bloqueados.
+- El orden recomendado es `TASK-1595 → TASK-1594`; `TASK-1593`, `TASK-1596` y `TASK-1597` avanzan en paralelo documental.
+
+## 2026-07-29 — EPIC-028: revisión de alineación con la visión de mercado
+
+- Se auditó lo construido y lo pendiente del epic frente a la estrategia de Globe: enterprise como ICP estratégico,
+  beachhead operativo por unidad, agencias como canal, e-commerce/DTC como wedge y creators/SMB como distribución.
+- Veredicto: la fundación de producto, gobernanza y operación está alineada; la arquitectura comercial, distribución,
+  verticalización y exit criteria de negocio todavía están incompletos.
+- Se recomendó añadir dentro del mismo epic workstreams de enterprise design partners, Agency Workflow Sprint,
+  Campaign Variant Workflow, activation/distribution y packaging/economics, sin duplicar owners técnicos.
+
+## 2026-07-29 — Globe: estrategia de mercado, distribución y monetización V1
+
+- Se integraron los benchmarks de Higgsfield y Magnific en una estrategia de segmentos, oportunidades, distribución
+  masiva, ventas B2B/enterprise, canales, packaging y validación.
+- Se fijó enterprise marketing organizations como ICP estratégico; mid-market o una unidad enterprise como beachhead
+  operativo; agencias/productoras como canal multiplicador; e-commerce/DTC como vertical wedge; creators y SMB como
+  adquisición y aprendizaje inicial.
+- Se documentaron loops de artifact/template/creator/referral/content/integration/agency, límites entre software,
+  Product Service, managed/co-operated y canal, revenue architecture, cost-to-serve y pilotos de 90 días.
+
 ## 2026-07-29 — Globe Producer: craft, densidad y tres bugs que sólo vio el despliegue
 
 - Composer del Producer desplegado a `globe-studio-internal` (`00095`→`00097`): glow con reposo propio y
@@ -91,6 +118,14 @@
   5–15% para creator affiliate, 2–5% para Efeonce success fee, 15–35% por 30 días de paid usage y 15–30% por exclusividad.
 - Las skills Codex/Claude de Creator/UGC ahora incluyen las bandas, porcentajes, regla de no doble cobro y prohibición
   de presentar estos números como pricing público.
+
+## 2026-07-29 — Creator Influence & Content: simulación end-to-end documentada
+
+- Se añadió un caso comercial sintético para una campaña de perfume masculino con tres deportistas chilenos.
+- El caso recorre intake, casting, vetting, contacto con representantes, negociación, derechos, producción,
+  amplificación, medición, presupuesto de planificación y decisión go/no-go.
+- Se enlazó desde la documentación funcional, el manual de operación, el índice de auditorías comerciales y las
+  skills Codex/Claude de Creator/UGC. No constituye caso de éxito, disponibilidad confirmada ni cotización aprobada.
 
 ## 2026-07-28 — Contrato de producción visual social para reportes
 
@@ -1157,3 +1192,13 @@ fuente de verdad. Nada autenticado se cachea, verificado path por path.
   integridad; el prompt operativo de Codex y `implement-task` de Claude declaran explícitamente la ventana,
   archivo, rotación y gate del changelog, y CI verifica esos pointers. `docs/changelog/CLIENT_CHANGELOG.md`,
   `CLAUDE.md` y su CI permanecen fuera de este cambio.
+## 2026-07-29 — Globe: CEO conditional-go para primer servicio comercial gestionado
+
+Se formalizó la autorización CEO para sacar Globe al mercado mediante un `Managed Creative Production Sprint powered by
+Globe`: un cliente, un workflow y una ruta promovida, operado por Efeonce, con SOW/factura directa y sin acceso directo
+del cliente al runtime. El contrato operativo queda en `docs/services/creative-studio/`; `TASK-1480` continúa
+`in-progress` hasta reunir evidencia route-specific y ejecutar el primer sprint.
+
+Corrección de fuente de verdad: el cliente inicial es **SKY Agencia Creativa**, con módulos `agencia_creativa` +
+`globe`. La licitación SKY Blog/Wherex queda fuera del rollout; el brief correcto vive en
+`docs/services/creative-studio/SKY_GLOBE_DESIGN_PARTNER_PILOT_BRIEF_V1.md`.

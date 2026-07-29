@@ -23,6 +23,14 @@ sin influencia y valor operativo sin evidencia ejecutiva.
 
 > **Skill de MÉTODO + orquestación, no de ejecución cruda ni de dominio.** La **ejecución** (fan-out de búsquedas, verificación, síntesis con citas) se delega a la harness **`deep-research`**. El **research de dominio** se delega a su skill dueña (búsqueda/keywords/visibilidad IA → `seo-aeo`; competitivo comercial/win-loss/ICP → `commercial-expert`). Esta skill aporta la **capa de rigor** + el **diseño** + la **orquestación**.
 
+## Patrón reutilizable para benchmarks de GTM creativo
+
+Para benchmarks como Higgsfield, separar siempre wedge, activación, workflow, agency-led adoption, enterprise
+expansion, ecosystem distribution y servicios humanos. No convertir logos, casos, creator programs, plugins o
+integraciones en partnerships, PMF o revenue sin evidencia contractual/operativa. El output debe traducir cada patrón
+como `adoptar | adaptar | descartar` para Efeonce y enlazar el audit fechado
+`docs/audits/commercial/HIGGSFIELD_PARTNERSHIP_AND_VERTICAL_EXPANSION_RESEARCH_2026-07-29.md` cuando aplique.
+
 ## Regla #0 — evidencia con fecha, nunca memoria
 
 Toda afirmación load-bearing sale con **fuente + `as-of AAAA-MM`**, no de memoria. El research y el benchmarking envejecen rápido; **el paso de "revisar internet por tendencias vigentes" es obligatorio** (ver Paso 2 del método). Las herramientas de IA **alucinan 17–33% de las citas** (as-of 2026-07); la verificación es un requisito **estructural**, no opcional.

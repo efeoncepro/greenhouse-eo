@@ -323,6 +323,27 @@ fechada de postulaciones vive en `docs/audits/commercial/AI_PARTNER_PROGRAM_APPL
 No ampliar el portafolio por acumulación de logos. Un partner sube de prioridad sólo cuando existe una oferta,
 owner, economics, ruta contractual y evidencia de demanda; si no, permanece como experimento o capability opcional.
 
+### Patrón de expansión GTM aprendido de plataformas creativas
+
+El benchmark de Higgsfield documentado en `docs/audits/commercial/HIGGSFIELD_PARTNERSHIP_AND_VERTICAL_EXPANSION_RESEARCH_2026-07-29.md`
+refuerza un patrón transferible: **wedge de alta frecuencia → primer valor rápido → workflow repetible → multiplicador
+de agencia/pod → workspace/enterprise → expansión**. Efeonce puede usarlo como hipótesis, pero debe mejorarla con:
+
+- outcome y aprobación humana, no sólo throughput;
+- derechos, provenance y portabilidad desde el primer run;
+- separación de software, enablement, capacidad humana, usage y pass-through;
+- triggers de expansión observables y buyer group por etapa;
+- evidencia de margen, soporte, procurement y renovación antes de escalar.
+
+Magnific agrega un patrón útil: `builder experto → workflow parametrizado → runner → estándar de equipo`. Para Efeonce,
+ese workflow es un activo de delivery y retención sólo si conserva outcome, aprobación, derechos, provenance, costos,
+portabilidad y owner; no equivale a vender acceso a modelos, nodos o créditos.
+
+La agencia, productora o creator no se convierte automáticamente en canal. Clasificar el motion como `agency-led`,
+`ecosystem-led`, `community-led`, `provider-enabled` o `case-study-led`; registrar qué activa, quién captura valor,
+qué responsabilidad asume Efeonce y cómo se detiene. “Partner” es un estado contractual/económico, no un recurso
+narrativo de posicionamiento.
+
 ### Cómo se vende una relación de partner/provider
 
 La capa de partnerships es transversal a las líneas de Efeonce. No la presentes como otra business line ni como una

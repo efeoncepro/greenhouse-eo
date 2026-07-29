@@ -193,6 +193,8 @@ práctica dueña. No convertir estos umbrales en KPI de HubSpot sin aprobación.
 Este plan pasa a `Commercially approved` sólo cuando cada beachhead tiene ICP/anti-ICP, JTBD, buyer group, offer brief,
 pricing integrity, cost-to-serve, proof pack, RACI, rights, provider/fallback, capacity y experiment evidence.
 
+La estrategia específica de mercado, distribución y monetización de Globe vive en [`EFEONCE_GLOBE_MARKET_DISTRIBUTION_AND_MONETIZATION_STRATEGY_V1.md`](EFEONCE_GLOBE_MARKET_DISTRIBUTION_AND_MONETIZATION_STRATEGY_V1.md).
+
 Fuentes relacionadas:
 
 - [`EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md`](../architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md)

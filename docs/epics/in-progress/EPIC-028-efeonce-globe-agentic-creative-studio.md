@@ -13,6 +13,10 @@
 - Branch: `main` en el repositorio hermano
 - GitHub Issue: `TBD — backlog operativo en https://github.com/efeoncepro/efeonce-globe`
 
+> **Naturaleza comercial:** Globe es un producto comercial de Efeonce (ADR-010). `internal-only` / `internal_smoke`
+> describe el estadio técnico actual de rollout y sus gates, nunca la naturaleza del producto ni su destino de mercado.
+> EPIC-028 debe llevarlo desde ese estadio hacia un primer rollout comercial gobernado.
+
 ### Checkpoint 2026-07-23 — plataforma interna funcional, no GA
 
 - El flujo humano BFF→API→worker→provider→GCS→governance→feed/viewer produjo y reprodujo Image, Video y Audio.
@@ -203,6 +207,37 @@ La referencia de valores para migrar sin reinterpretar vive en
  - `TASK-1581` — **Globe Producer Creative Entry Hub and Session Feed.** Consumer UI que cambia el ingreso por modalidad a ingreso por intención, muestra contexto reciente y agrupa actividad por sesión sin crear otro feed.
  - `TASK-1582` — **Globe Producer Asset Workspace and Contextual Reuse.** Consumer UI que conecta el viewer/media canvases con proyecto, colección, sesión, lineage y acciones de continuidad.
  - `TASK-1583` — **Globe Producer Review-to-Element and Governed Reuse Experience.** Consumer UI que conecta review/changes-requested/approval con child sessions, creación explícita de Elements y reutilización gobernada.
+
+### Commercial architecture and market validation — 2026-07-29
+
+EPIC-028 incorpora la capa comercial que conecta la fundación de producto con la visión de mercado de Globe:
+
+```text
+enterprise marketing organizations = ICP estratégico
+enterprise unit o mid-market = beachhead operativo
+agencias/productoras = canal multiplicador
+e-commerce/DTC/retail = vertical wedge
+creators/SMB = distribución y aprendizaje
+```
+
+Estas tasks no sustituyen los gates de activación ni autorizan un bypass de clientes externos, pricing público, checkout,
+reseller rights o co-selling. Globe sigue siendo un producto comercial de Efeonce; consumen los gates existentes y no
+duplican sus owners:
+
+- `TASK-1593` — **Enterprise ICP and Design-Partner Readiness.** ICP estratégico, enterprise unit, buying group,
+  qualification y readiness dossier para `TASK-1480`.
+- `TASK-1594` — **Agency Workflow Sprint.** Validación de agencia como canal multiplicador con cliente final,
+  tenancy, approval, rights, attribution y economics; depende de `TASK-1595`.
+- `TASK-1595` — **Campaign Variant Workflow.** Proving ground vertical `brief → key visual → variantes → localización
+  → QA → review → manifest`, reusable por agency, e-commerce y enterprise lane.
+- `TASK-1596` — **Distribution and Activation Layer.** Artifact/template/content/creator/referral/integration loops,
+  PQL, Sample Sprint conversion y `second_run_activated`, sin runtime CRM.
+- `TASK-1597` — **Packaging and Unit Economics Validation.** Software/Product Service/managed/co-operated/channel,
+  cost-to-serve, rights/pass-through y margin gate ≥45%; `pricing_blocked` hasta aprobación.
+
+El orden recomendado es `1595 → 1594`, con `1593`, `1596` y `1597` en paralelo documental. La capa comercial debe
+cerrar para promover el Producer actual `internal-only` / `internal_smoke` al primer rollout comercial gobernado; no
+para decidir si Globe es un producto vendible.
 
 ### Governed Skill System and orchestration — 2026-07-26
 
@@ -717,11 +752,12 @@ maker/promoter en **política por workspace** (default `true`, `false` sólo par
 de operador de readiness en el broker de Greenhouse es el siguiente paso ejecutable para que el Producer genere.
 
 **Producto comercial (no piloto):** el runtime sigue clavado en `internal_smoke` por `readStudioRuntimeConfig`;
-habilitar cobro/clientes externos es **TASK-1521** (runtime comercial) + **TASK-1480** (readiness comercial,
-bloqueada por 1477/1478/1479/1482). Esa es la distancia real a comercial, no la UI.
+habilitar acceso directo/cobro automatizado es **TASK-1521** (runtime comercial) + **TASK-1480** (readiness comercial).
+El primer servicio comercial managed ya tiene `conditional-go` CEO en `TASK-1480`; el acceso directo al runtime y la
+expansión siguen sujetos a las dependencias completas. Esa es la distancia real a comercial, no la UI.
 **Estado verificado 2026-07-25 (no inferir de esta prosa — chequear el lifecycle real):** `TASK-1521` está
 **`in-progress`** con trabajo cerrado (Producer interno multimodal con sesión/viewer, outbox/queue age y
-severidades); `TASK-1480` sigue en `to-do`. La versión anterior de esta línea decía *"ninguna empezada"* y
+severidades); `TASK-1480` está `in-progress` con `conditional-go` CEO para el primer lane managed. La versión anterior de esta línea decía *"ninguna empezada"* y
 quedó stale — un agente la citó como hecho vigente sin verificar la carpeta de la task.
 
 ## Delta 2026-07-24 — principio faltante: catálogo multi-modelo extensible y elegible (best-in-class, coexistente)

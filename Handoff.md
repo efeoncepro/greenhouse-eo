@@ -1,5 +1,63 @@
 # Handoff activo
 
+## 2026-07-29 — CEO conditional-go para primer rollout comercial de Globe
+
+El CEO autorizó un `conditional-go` para un primer `Managed Creative Production Sprint powered by Globe`: un cliente,
+un workflow, una ruta promovida y operación `efeonce-managed`, sin acceso directo del cliente al runtime. El contrato
+operativo vive en [`EFEONCE_GLOBE_MANAGED_CREATIVE_PRODUCTION_SPRINT_V1.md`](docs/services/creative-studio/EFEONCE_GLOBE_MANAGED_CREATIVE_PRODUCTION_SPRINT_V1.md)
+y la decisión en `TASK-1480`. Antes del primer run todavía deben comprobarse rights, budget cap/settlement, canary de la
+ruta, entrega segura, rollback owner y SOW/factura. No es un go para SaaS, self-serve, client-operated ni expansión.
+
+Verificación local del repo hermano 2026-07-29: `cd ../efeonce-globe && pnpm check` pasa completo (typecheck y tests).
+Se corrigió el narrowing TypeScript del preset `Ninguno` en `ProducerComposer`; el resto de cambios preexistentes del
+archivo se preservó.
+
+Corrección crítica: el primer cliente es **SKY Agencia Creativa**, no SKY Blog. La base de verdad identifica a SKY como
+cliente creativo vigente con módulos `agencia_creativa` + `globe`; el Blog/Wherex es una licitación SEO/contenido no
+adjudicada y queda fuera. El brief correcto vive en
+`docs/services/creative-studio/SKY_GLOBE_DESIGN_PARTNER_PILOT_BRIEF_V1.md`; falta convertirlo en SOW con sponsor,
+workflow creativo vigente, derechos, ruta/modelo y budget cap aprobados.
+
+## 2026-07-29 — EPIC-028: workstreams comerciales activados
+
+Se incorporaron cinco tasks policy al epic, sin abrir un programa paralelo: `TASK-1593` Enterprise ICP/design partners,
+`TASK-1594` Agency Workflow Sprint, `TASK-1595` Campaign Variant Workflow, `TASK-1596` Distribution/Activation y
+`TASK-1597` Packaging/Unit Economics. La secuencia recomendada es `1595 → 1594`; `1593`, `1596` y `1597` pueden avanzar
+en paralelo documental.
+
+Globe es un producto comercial de Efeonce; `internal-only` describe únicamente el estadio técnico actual de rollout.
+Enterprise marketing organizations queda como ICP estratégico; enterprise unit/mid-market como beachhead operativo;
+agencias/productoras como canal; e-commerce/DTC/retail como wedge; creators/SMB como distribución/aprendizaje. Las
+tasks mantienen el rollout fail-closed mientras preparan la salida comercial, consumen `TASK-1476…1480`, `TASK-1521`,
+`TASK-1535` y `TASK-1484`, y no autorizan un bypass de pricing, checkout, reseller rights, co-selling ni clientes
+externos.
+
+## 2026-07-29 — EPIC-028: alineación con la visión de mercado de Globe
+
+La revisión de [`EPIC_028_MARKET_VISION_ALIGNMENT_REVIEW_2026-07-29.md`](docs/audits/commercial/EPIC_028_MARKET_VISION_ALIGNMENT_REVIEW_2026-07-29.md)
+concluye: `product-foundation-aligned | commercial-architecture-incomplete`. EPIC-028 refleja bien la plataforma
+agentic gobernada, provider-neutral, con memory/workflows, rights, lineage, review, modes y enterprise controls.
+Todavía no convierte en contrato de programa el ICP estratégico enterprise marketing organizations, el beachhead por
+unidad enterprise/mid-market, agencias como canal multiplicador, e-commerce/DTC como vertical wedge y creators/SMB como
+distribución/aprendizaje.
+
+La recomendación es añadir una capa comercial dentro del mismo epic —sin crear otro epic ni duplicar owners técnicos—
+con workstreams para enterprise design partners, Agency Workflow Sprint, Campaign Variant Workflow, distribution/
+activation y packaging/economics. Estado honesto: el runtime es una buena fundación; el GTM aún está incompleto.
+
+## 2026-07-29 — Globe: estrategia de mercado, distribución y monetización V1
+
+Se añadió [`EFEONCE_GLOBE_MARKET_DISTRIBUTION_AND_MONETIZATION_STRATEGY_V1.md`](docs/strategy/EFEONCE_GLOBE_MARKET_DISTRIBUTION_AND_MONETIZATION_STRATEGY_V1.md), integrando los benchmarks de Higgsfield y Magnific en una arquitectura comercial completa.
+Enterprise marketing organizations queda como ICP estratégico; mid-market o una unidad enterprise funcionan como
+beachhead operativo; agencias/productoras son canal multiplicador; e-commerce/DTC es vertical wedge; creators y SMB
+son adquisición/aprendizaje.
+La secuencia es `contenido/demo → primer resultado → segundo run/workflow → Sample Sprint pagado → workspace/pod → managed/co-operated → enterprise`.
+
+Se documentaron loops de artifact, template, creator, referral, content, integration y agency; separación software,
+Product Service, managed/co-operated y channel; revenue architecture; cost-to-serve; margin gate de validación ≥45%;
+y pilotos de 90 días. Estado honesto: `approved_for_validation`; no se autoriza pricing público, checkout, reseller
+rights, co-selling ni venta general.
+
 ## 2026-07-29 — Globe Producer: craft, densidad y despliegue a internal (TASK-1552 Slice 3, ABIERTA)
 
 Sesión completa sobre el composer del Producer, **desplegada** a `globe-studio-internal`
@@ -93,6 +151,14 @@ El Pricing Integrity Pack pasó a V1.1 y las skills Codex/Claude quedaron sincro
 porcentajes de validación: 10–15% coordinación de terceros, 15% management medio, 5–15% affiliate del creator,
 2–5% success fee Efeonce, 15–35% paid usage por 30 días y 15–30% exclusividad. Se mantiene la regla de no doble
 cobro y ningún monto está aprobado como tarifario público.
+
+## 2026-07-29 — Creator Influence & Content: caso de simulación end-to-end
+
+Se documentó [`CREATOR_INFLUENCE_PERFUME_ATHLETES_CHILE_SIMULATION_2026-07-29.md`](docs/audits/commercial/CREATOR_INFLUENCE_PERFUME_ATHLETES_CHILE_SIMULATION_2026-07-29.md),
+un caso sintético de perfume masculino con Alexis Sánchez, Joaquín Niemann y Nicolás Jarry como shortlist provisional.
+El artefacto cubre brief, scorecard, vetting, contacto, negociación, derechos, producción, medición, presupuesto y
+go/no-go. Los nombres, disponibilidad y rangos de talento quedan explícitamente como hipótesis hasta validación con
+representantes; la skill Codex/Claude de Creator/UGC enlaza el caso como patrón reusable.
 
 ## 2026-07-29 — TASK-1591: AXIS adapters pilot
 
