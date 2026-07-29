@@ -20,7 +20,9 @@
   `roles/secretmanager.secretAccessor` sobre el secreto.
 - Esto resuelve la distribución y autenticación de paquetes. Globe consume los tres paquetes
   `0.1.4` en `apps/studio-client` y expone los fixtures opt-in `/_axis-pilot`; la evidencia del
-  piloto vive en `TASK-1591`. La promoción a superficies de producto permanece separada.
+  piloto vive en `TASK-1591`. El wiring efímero de CI/Cloud Build ya está implementado; falta
+  ejecutar el pipeline real y verificar digest/rollback. La promoción a superficies de producto
+  permanece separada.
 - Riesgo vigente: el PAT utilizado es operator-owned y expira `2026-08-27`. Sustituirlo por
   una identidad de máquina dedicada antes de rollout externo o uso durable. El valor secreto
   no se documenta.

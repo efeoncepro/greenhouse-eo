@@ -25,11 +25,12 @@ source control.
 - The current PAT is operator-owned and expires on 2026-08-27. Replace it with a
   dedicated machine identity before the first external/customer rollout.
 - Local private-package installation for the TASK-1591 canary was verified with a temporary
-  developer credential. CI/Cloud Build consumption is not yet end-to-end wired: the consumer
-  workflows and `studio-web` Docker build still need to materialize `AXIS_PACKAGES_READ_TOKEN`
-  ephemerally before `pnpm install --frozen-lockfile`.
-- The Globe AXIS browser/accessibility/reduced-motion evidence is currently a local spot check;
-  a dedicated Playwright canary and persisted visual diff remain promotion gates.
+  developer credential. CI/Cloud Build wiring is now implemented: GitHub Actions uses its scoped
+  `GITHUB_TOKEN`, while Cloud Build reads `axis-packages-read-token` and mounts an ephemeral
+  BuildKit secret for `pnpm install`.
+- The Globe AXIS browser/accessibility/reduced-motion evidence is automated by
+  `apps/studio-client/scripts/axis-pilot-canary.test.mjs`; a real CI/Cloud Build execution and
+  deployed digest verification remain required before promotion.
 
 ## Required GitHub package access
 
@@ -96,8 +97,9 @@ The deployment workflow must prove:
 3. the deployed digest matches the build digest;
 4. rollback restores the previous package version and image digest.
 
-Until those checks are automated in the consumer pipeline, the AXIS adapters remain an opt-in
-canary and must not be described as a production-wide rollout.
+Until those checks have run successfully in the consumer pipeline and the deployed digest has been
+verified, the AXIS adapters remain an opt-in canary and must not be described as a production-wide
+rollout.
 
 ## Credential options
 

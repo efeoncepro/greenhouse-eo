@@ -94,12 +94,14 @@ simple y una compleja en Greenhouse/MUI y Globe/Tailwind, con adopción opt-in y
 
 La distribución y el slice de consumer están implementados como canary opt-in en ambos
 runtimes. La promoción productiva permanece separada y requiere el gate de release correspondiente.
-La instalación privada fue verificada localmente con una credencial temporal; la materialización
-del secreto en los pipelines de CI/Cloud Build todavía no está conectada end-to-end:
+La instalación privada fue verificada localmente con una credencial temporal y el wiring efímero
+ya quedó implementado en los pipelines; falta ejecutar una corrida real de CI/Cloud Build para
+cerrar la evidencia operativa:
 
-- `.github/workflows/ci.yml` aún instala sin materializar `AXIS_PACKAGES_READ_TOKEN`.
-- `.github/workflows/deploy-internal.yml`, `infra/cloudbuild/deploy.yaml` y el Dockerfile de
-  `studio-web` aún requieren ese wiring antes de un rollout automatizado.
+- `.github/workflows/ci.yml` materializa el `GITHUB_TOKEN` sólo durante `pnpm install`.
+- `infra/cloudbuild/deploy.yaml` lee `axis-packages-read-token` desde Secret Manager y monta
+  `.npmrc` mediante Docker BuildKit, sin incorporarlo a la imagen.
+- `apps/studio-web/Dockerfile` usa el secreto BuildKit sólo durante la instalación.
 
 El estado es `complete` para el slice opt-in y `rollout pendiente` para la promoción
 automatizada/externalizada:
@@ -111,10 +113,10 @@ automatizada/externalizada:
 4. [x] Verificar desktop/mobile, teclado, reduced motion, estados de estado y build de cada consumer.
 5. [x] Ejecutar canary opt-in en `/design-system/axis-adapters` y `/_axis-pilot`.
 
-La verificación browser/accessibility/reduced-motion del fixture Globe fue un spot check local
-documentado en la evidencia de entrega; todavía no existe una suite Playwright dedicada ni un
-visual diff persistido específico de AXIS. Esto no bloquea el piloto opt-in, pero sí bloquea el
-gate de promoción productiva hasta convertir esa evidencia en automatización.
+La verificación browser/accessibility/reduced-motion del fixture Globe ahora tiene un canary
+dedicado en `apps/studio-client/scripts/axis-pilot-canary.test.mjs`, ejecutado por el script de
+test del paquete. Esto cubre el piloto local; la promoción productiva todavía requiere una corrida
+real del pipeline, digest desplegado y rollback probado.
 
 ## Delivery evidence — 2026-07-29
 
