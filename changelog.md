@@ -741,20 +741,3 @@ fuente de verdad. Nada autenticado se cachea, verificado path por path.
   transporta pista (WCAG 1.2.2; `eslint-disable` justificado, cerrarlo es cambio de contrato); el `h1` usa un
   fallback para toda pieza y los comentarios van sin autor porque la proyección no tiene esos campos, y
   inventarlos en la superficie donde un cliente juzga trabajo sería fabricar evidencia.
-
-## 2026-07-24 — Globe flota multi-modelo: principio en EPIC-028 + TASK-1553 + canary real Nano Banana Pro
-
-- **EPIC-028 corregido:** se plantó el principio (faltaba) del **catálogo multi-modelo extensible** — Globe corre los
-  mejores modelos coexistiendo y creciendo, sin sustituir; **update** (bump de versión, reemplaza) ≠ **add** (modelo/tier
-  nuevo, coexiste); compatible con el non-goal "no mejor global" (el catálogo ofrece, la selección es explícita o por
-  contrato de fidelidad). Delta + Outcome nuevos.
-- **`TASK-1553` (to-do, backend-data):** vehículo del principio — **resolución de modelo por-ruta** en los adapters (hoy
-  resuelven por-capacidad → dos modelos del mismo proveedor no coexisten). Selector UI = consumer `TASK-1552`.
-- **Defaults frontier actualizados** (updates legítimos, sin borrar Seedream): OpenAI `gpt-image-1→gpt-image-2`
-  (`acb0776`), Vertex Nano Banana `gemini-2.5-flash-image→gemini-3-pro-image` (`46ab5ab`).
-- **Canary real (TASK-1535):** Nano Banana Pro (`gemini-3-pro-image`) genera **imágenes reales** en el proyecto Globe
-  vía endpoint `global`; Nano Banana 2 (`gemini-3.1-flash-image`) 404 (falta allowlist del proyecto, ask a Google).
-  Provider flip revertido a `composite`; sin IAM break-glass sucio.
-- **Skill `greenhouse-globe` actualizada** (.claude + .codex): sección "Flota de modelos" (roster, seam route→model,
-  gotchas del canary) + 2 fixes de drift (composite rutea imagen→Fal, no "default Vertex"; Vertex image default es
-  `gemini-3-pro-image`). Bloqueo para implementar: el classifier del entorno bloquea ediciones de código en Globe.
