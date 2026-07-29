@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-29 — PR #164: autenticación de paquetes privados y gobierno de release
+
+- Los workflows con instalación de dependencias privadas usan `GITHUB_TOKEN` con `packages: read` y un `.npmrc`
+  efímero en `$RUNNER_TEMP`; no se versionan tokens ni se exponen credenciales en runtime o artefactos.
+- Vercel `efeonce-7670142f/greenhouse-eo` recibió `NPM_RC` cifrado para Preview (`develop`) y Production, siguiendo
+  el runbook de AXIS. La credencial operator-owned es temporal y requiere reemplazo por una identidad read-only antes
+  del rollout externo.
+- `CLAUDE.md` quedó bajo el techo estricto de 35k tokens (34.945) y la auditoría de contenido quedó sin huérfanas;
+  el detalle del Design System vive en `docs/architecture/ui-platform/README.md`.
+
 ## 2026-07-29 — EPIC-028: cinco workstreams comerciales añadidos
 
 - Se añadieron `TASK-1593`–`TASK-1597` como policy tasks dentro de EPIC-028: enterprise ICP/design partners, Agency

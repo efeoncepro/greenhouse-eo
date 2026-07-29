@@ -21,6 +21,7 @@ concurrency:
 
 permissions:
   contents: read
+  packages: read
 
 jobs:
   coverage:
@@ -59,7 +60,13 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npmrc="$RUNNER_TEMP/greenhouse-npmrc"
+          trap 'rm -f "$npmrc"' EXIT
+          printf '%s\n' '@efeoncepro:registry=https://npm.pkg.github.com' '//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}' > "$npmrc"
+          NPM_CONFIG_USERCONFIG="$npmrc" pnpm install --frozen-lockfile
 
       # Deep coverage executes the artifact-composer suites too. Those tests
       # launch Playwright's pinned Chromium headless shell, so this workflow

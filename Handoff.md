@@ -1,5 +1,20 @@
 # Handoff activo
 
+## 2026-07-29 — PR #164: release hardening en curso
+
+Se corrigió la instalación de los paquetes privados `@efeoncepro/axis-*` en los workflows que ejecutan
+`pnpm install`: cada workflow declara `packages: read` y crea un `.npmrc` efímero en `$RUNNER_TEMP` usando
+`GITHUB_TOKEN`; el archivo se vacía al terminar y no entra al artefacto ni al runtime. El proyecto Vercel correcto
+es `efeonce-7670142f/greenhouse-eo`; se configuró `NPM_RC` cifrado para Preview de `develop` y Production para
+permitir el build de AXIS. La credencial actual es temporal/operator-owned según el runbook y debe reemplazarse por
+una identidad de máquina read-only antes del rollout externo.
+
+`CLAUDE.md` quedó en 34.945 tokens y la auditoría de contenido reporta cero huérfanas; el contrato completo del
+Design System quedó en `docs/architecture/ui-platform/README.md`. Validaciones locales verdes: instalación privada,
+`ops:lint --changed`, `task:lint --changed`, `docs:closure-check` advisory, `qa:gates --changed` advisory y
+`git diff --check`. Pendiente: push de los fixes, checks del PR #164, preflight y promoción canónica develop→main.
+Los artefactos locales ajenos de SKY Blog y `.vercel/project.json` no se tocaron.
+
 ## 2026-07-29 — CEO conditional-go para primer rollout comercial de Globe
 
 El CEO autorizó un `conditional-go` para un primer `Managed Creative Production Sprint powered by Globe`: un cliente,

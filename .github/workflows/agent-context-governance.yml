@@ -50,6 +50,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
+    permissions:
+      contents: read
+      packages: read
+
     steps:
       - uses: actions/checkout@v5
 
@@ -60,7 +64,14 @@ jobs:
           node-version: 24
           cache: pnpm
 
-      - run: pnpm install --frozen-lockfile
+      - name: Install dependencies
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npmrc="$RUNNER_TEMP/greenhouse-npmrc"
+          trap 'rm -f "$npmrc"' EXIT
+          printf '%s\n' '@efeoncepro:registry=https://npm.pkg.github.com' '//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}' > "$npmrc"
+          NPM_CONFIG_USERCONFIG="$npmrc" pnpm install --frozen-lockfile
       - name: Verify active context budgets, routing and immutable snapshots
         run: pnpm docs:context-check:strict
       - name: Test context and changelog rotation
