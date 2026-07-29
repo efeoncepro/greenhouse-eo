@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -15,7 +15,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `optional`
-- Status real: `Adapters implementados y verificados en fixtures opt-in; promoción productiva sigue pendiente`
+- Status real: `Piloto implementado y verificado; promoción productiva sigue pendiente`
 - Rank: `TBD`
 - Domain: `ui-platform|cross-runtime`
 - Blocked by: `none`
