@@ -6,12 +6,14 @@
 el merge completo `e711fe2560e3a7c2e7e8639e07a8a394e9582cdb`. CI, CI Deep, context-governance, CLAUDE, task-contract,
 Design Contract, smoke afectado y Vercel pasaron. Vercel production quedó READY para ese SHA.
 
-El primer orchestrator `30452322643` se detuvo en preflight, antes de crear manifest, aprobar Production o desplegar
-workers. Causa exacta: `playwright_smoke` tenía cero runs para el SHA de `main`; el smoke manual canónico
-`30452463889` ya pasó verde y publicó resultados en Postgres. Un segundo dispatch sin bypass quedó bloqueado por
-timeout intermitente de la API de GitHub; no hay evidencia de un run nuevo. Estado honesto: **code complete, rollout
-pendiente / operativamente bloqueado**. Reintentar `production-release.yml` con el SHA exacto, sin bypass, cuando la
-API de Actions esté disponible.
+Los orchestrators `30452322643`, `30452924614`, `30453278402` y `30453818726` se detuvieron en preflight, antes de
+crear manifest, aprobar Production o desplegar workers. El primer bloqueo fue `playwright_smoke` sin run para
+`main`; el smoke manual canónico `30452463889` pasó verde y publicó resultados en Postgres. Los siguientes intentos
+resolvieron smoke, CI y Vercel; `30452924614` encontró timeout de Sentry, `30453278402` encontró staging cancelado +
+Sentry timeout y `30453818726` encontró Sentry timeout persistente con staging READY. Estado honesto: **code
+complete, rollout pendiente / operativamente bloqueado**. El siguiente paso es corregir o autorizar explícitamente el
+override auditado de `sentry_critical_issues`; el bypass requiere capability `platform.release.bypass_preflight` y
+razón de al menos 20 caracteres. No se usó bypass.
 
 Cambios propios: autenticación efímera de paquetes privados AXIS en workflows, `NPM_RC` cifrado en Vercel `staging`,
 Preview develop y Production, compactación documentada de contexto, corrección del presupuesto/auditoría de

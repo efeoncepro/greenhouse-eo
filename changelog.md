@@ -16,6 +16,15 @@
 - Queda pendiente reintentar el orchestrator sin bypass cuando la API de GitHub Actions responda. No hubo manifest,
   deploy de workers ni promoción parcial.
 
+## 2026-07-29 — PR #164: bloqueo persistente del preflight Sentry
+
+- Smoke manual `30452463889` pasó y staging fue recuperado a `READY` mediante redeploy del deployment existente del
+  proyecto Greenhouse; Production permaneció READY.
+- Los orchestrators `30452924614`, `30453278402` y `30453818726` fallaron antes del manifest por
+  `sentry_critical_issues` timeout de 6 s; el último ya no tuvo bloqueos de smoke ni staging.
+- El rollout queda pendiente. No se activó `bypass_preflight`; requiere `platform.release.bypass_preflight` y razón
+  auditada de al menos 20 caracteres.
+
 ## 2026-07-29 — PR #164: autenticación de paquetes privados y gobierno de release
 
 - Los workflows con instalación de dependencias privadas usan `GITHUB_TOKEN` con `packages: read` y un `.npmrc`
