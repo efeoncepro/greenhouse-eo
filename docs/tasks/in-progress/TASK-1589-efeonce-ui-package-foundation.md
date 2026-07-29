@@ -105,7 +105,10 @@ En Greenhouse:
 - [x] Contenedor del secreto creado en `efeonce-group` con IAM a las dos identidades de build.
 - [ ] Identidad de máquina creada, con dueño y fecha de rotación documentados. **Sólo el operador.**
 - [ ] Valor publicado en `efeonce-group`; los 5 consumidores migrados y verdes **antes** de revocar el legacy.
-- [ ] Los 4 puntos del runbook ejecutados en pipeline real.
+- [~] Los 4 puntos del runbook: **2 de 4 verificados** en pipeline real (2026-07-29). ✅ (1) install con
+  `0.1.5` en los cuatro worker builds de Cloud Build · ✅ (3) revisión desplegada == commit construido, por
+  el contrato de TASK-851 · 🔴 (2) ausencia de `.npmrc`/token en la imagen: garantizada por el diseño de
+  BuildKit pero **sin comprobación empírica** · 🔴 (4) rollback no ejercitado.
 
 ### Rollback
 

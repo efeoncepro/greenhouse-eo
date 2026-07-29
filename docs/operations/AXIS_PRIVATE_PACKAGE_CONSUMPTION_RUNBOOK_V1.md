@@ -33,9 +33,14 @@ source control.
   developer credential. CI/Cloud Build wiring is now implemented: GitHub Actions uses its scoped
   `GITHUB_TOKEN`, while Cloud Build reads `axis-packages-read-token` and mounts an ephemeral
   BuildKit secret for `pnpm install`.
+- Cloud Build ejecutó el contrato **en real** el 2026-07-29: los cuatro worker deploys de Greenhouse
+  corrieron verdes contra `0.1.5`. Ver los 4 puntos más abajo — **2 de 4 verificados**; faltan la
+  comprobación de no-leak sobre la imagen y el ejercicio de rollback.
 - The Globe AXIS browser/accessibility/reduced-motion evidence is automated by
-  `apps/studio-client/scripts/axis-pilot-canary.test.mjs`; a real CI/Cloud Build execution and
-  deployed digest verification remain required before promotion.
+  `apps/studio-client/scripts/axis-pilot-canary.test.mjs`. ⚠️ **Ese canary NO se ejecuta en el CI de Globe:**
+  resuelve Playwright con un fallback a una ruta absoluta del disco de un desarrollador, así que muere con
+  `ERR_MODULE_NOT_FOUND` en cualquier runner. El CI de Globe lleva 9 commits en `failure` por esa causa
+  (compartida con otros tres canaries). La evidencia del piloto sigue siendo **local, no de CI**.
 
 ## Delta 2026-07-29 — dónde vive el credencial, y dónde NO hace falta (TASK-1589 V1.1)
 
@@ -207,10 +212,19 @@ copied into the image.
 
 The deployment workflow must prove:
 
-1. package installation succeeds;
-2. the resulting image does not contain `.npmrc` or the token;
-3. the deployed digest matches the build digest;
-4. rollback restores the previous package version and image digest.
+1. ✅ **package installation succeeds** — verificado en pipeline real el 2026-07-29: los cuatro worker
+   deploys de Greenhouse (`ops-worker`, `artifact-worker`, `ico-batch`, `commercial-cost-worker`) corrieron
+   verdes contra AXIS `0.1.5`, con el credencial leído de Secret Manager y montado como secreto BuildKit.
+   Es la primera ejecución real de este contrato, no un ensayo local.
+2. 🔴 **the resulting image does not contain `.npmrc` or the token** — **NO verificado**. BuildKit
+   `--mount=type=secret` no persiste el archivo en la capa *por diseño*, y el `trap 'rm -f .npmrc'` cubre el
+   workspace de Cloud Build; pero **la comprobación empírica sobre la imagen publicada no existe**. Es una
+   garantía del mecanismo, no evidencia. Falta un gate que inspeccione la imagen.
+3. ✅ **the deployed revision matches the built commit** — cubierto por el contrato de TASK-851: los
+   `deploy.sh` leen `GIT_SHA` de la revisión Cloud Run servida y abortan fail-loud ante mismatch contra
+   `EXPECTED_SHA`. Verificado en los cuatro deploys de esta pasada.
+4. 🔴 **rollback restores the previous package version and image digest** — **NO ejercitado**. El camino
+   existe (versión fija en el lockfile + revisión anterior de Cloud Run) pero nadie lo corrió.
 
 Until those checks have run successfully in the consumer pipeline and the deployed digest has been
 verified, the AXIS adapters remain an opt-in canary and must not be described as a production-wide
