@@ -9,6 +9,8 @@
 
 La arquitectura concreta de fees, pass-through, comisiones y condiciones de pago vive en el [Pricing Integrity Pack](CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md). Sus bandas son hipótesis de validación y no pricing público.
 
+La hipótesis de diferenciación y los claims autorizados viven en el [Positioning & Differentiation V1](../../audits/commercial/CREATOR_INFLUENCE_CONTENT_DIFFERENTIATION_POSITIONING_V1.md). No presentar superioridad competitiva antes de cerrar sus pruebas de validación.
+
 ## 1. Decisión ejecutiva
 
 Efeonce operará Influencers, Creators & UGC como una capability de distribución, contenido y aprendizaje. No se
@@ -190,3 +192,4 @@ gates de Finance, Legal, Commercial y Operations.
 - [Arquitectura operativa](../../architecture/media-distribution/CREATOR_INFLUENCE_CONTENT_OPERATING_ARCHITECTURE_V1.md)
 - [Documentación funcional](../../documentation/media-distribution/creator-influence-content.md)
 - [Manual de operación](../../manual-de-uso/media-distribution/operar-creator-influence-content.md)
+- [Positioning & Differentiation V1](../../audits/commercial/CREATOR_INFLUENCE_CONTENT_DIFFERENTIATION_POSITIONING_V1.md)

@@ -15,6 +15,8 @@ Para trabajo comercial de Efeonce, carga también el contrato canónico de [Crea
 
 Para practicar el flujo completo, usa la [simulación de perfume masculino con deportistas chilenos](../../../../docs/audits/commercial/CREATOR_INFLUENCE_PERFUME_ATHLETES_CHILE_SIMULATION_2026-07-29.md). Es un caso sintético: los nombres, roles creativos y rangos de planificación no equivalen a disponibilidad, fee cotizado ni endorsement aprobado.
 
+Para posicionar la oferta sin sobreprometer, carga también el [Positioning & Differentiation V1](../../../../docs/audits/commercial/CREATOR_INFLUENCE_CONTENT_DIFFERENTIATION_POSITIONING_V1.md). Distingue diferenciadores defendibles, claims bloqueados y pruebas necesarias antes de afirmar superioridad competitiva.
+
 ## 0. Modelo operativo de Efeonce
 
 La capability se divide en cinco ofertas, que no deben mezclarse en una sola tarifa:

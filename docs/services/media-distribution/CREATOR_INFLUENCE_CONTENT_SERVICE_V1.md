@@ -34,7 +34,7 @@ derechos adicionales, exclusividad, whitelisting y usos fuera del territorio/pla
 El fee Efeonce se cotiza separado de terceros. La modalidad preferida es fee fijo más pass-through; si Efeonce
 administra contratación y pagos de terceros, puede aplicar una comisión explícita de coordinación aprobada en el SOW.
 La comisión de performance no reemplaza el fee base y sólo se habilita con tracking y reglas de atribución aceptadas.
-Las bandas de validación están en el [Pricing Integrity Pack](../../business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md).
+Las bandas de validación están en el [Pricing Integrity Pack](../../business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md). La hipótesis de diferenciación, los claims permitidos y las pruebas pendientes están en el [Positioning & Differentiation V1](../../audits/commercial/CREATOR_INFLUENCE_CONTENT_DIFFERENTIATION_POSITIONING_V1.md).
 
 ## Ciclo de servicio
 
@@ -74,3 +74,4 @@ evidencia del ciclo anterior y economics aceptables; no se renueva sólo por vol
 - [Arquitectura operativa](../../architecture/media-distribution/CREATOR_INFLUENCE_CONTENT_OPERATING_ARCHITECTURE_V1.md)
 - [Documentación funcional](../../documentation/media-distribution/creator-influence-content.md)
 - [Manual](../../manual-de-uso/media-distribution/operar-creator-influence-content.md)
+- [Positioning & Differentiation V1](../../audits/commercial/CREATOR_INFLUENCE_CONTENT_DIFFERENTIATION_POSITIONING_V1.md)

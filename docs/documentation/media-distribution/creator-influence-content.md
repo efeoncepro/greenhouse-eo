@@ -51,3 +51,4 @@ Strategy & Measurement. Cada composición debe declarar owner, alcance y RACI; n
 - [Business Model V1](../../business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md)
 - [Manual de operación](../../manual-de-uso/media-distribution/operar-creator-influence-content.md)
 - [Simulación end-to-end: perfume masculino con deportistas chilenos](../../audits/commercial/CREATOR_INFLUENCE_PERFUME_ATHLETES_CHILE_SIMULATION_2026-07-29.md)
+- [Positioning & Differentiation V1](../../audits/commercial/CREATOR_INFLUENCE_CONTENT_DIFFERENTIATION_POSITIONING_V1.md)
