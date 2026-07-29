@@ -7,7 +7,7 @@
 > **Versión:** V1 · 2026-07-29
 > **Revisión:** después de cada piloto pagado y, como mínimo, trimestral
 
-La arquitectura concreta de fees, pass-through, comisiones y condiciones de pago vive en el [Pricing Integrity Pack](CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md). Sus bandas son hipótesis de validación y no pricing público.
+La arquitectura concreta de fees, pass-through, comisiones y condiciones de pago vive en el [Pricing Integrity Pack](CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md). Sus bandas son hipótesis de validación y no pricing público. La política regional de derechos, usage, overlays, gates y expiración vive en el [Rights & Usage Integrity Pack](CREATOR_INFLUENCE_CONTENT_RIGHTS_AND_USAGE_INTEGRITY_PACK_V1.md).
 
 La hipótesis de diferenciación y los claims autorizados viven en el [Positioning & Differentiation V1](../../audits/commercial/CREATOR_INFLUENCE_CONTENT_DIFFERENTIATION_POSITIONING_V1.md). No presentar superioridad competitiva antes de cerrar sus pruebas de validación.
 
@@ -193,3 +193,5 @@ gates de Finance, Legal, Commercial y Operations.
 - [Documentación funcional](../../documentation/media-distribution/creator-influence-content.md)
 - [Manual de operación](../../manual-de-uso/media-distribution/operar-creator-influence-content.md)
 - [Positioning & Differentiation V1](../../audits/commercial/CREATOR_INFLUENCE_CONTENT_DIFFERENTIATION_POSITIONING_V1.md)
+- [Rights & Usage Integrity Pack V1](CREATOR_INFLUENCE_CONTENT_RIGHTS_AND_USAGE_INTEGRITY_PACK_V1.md)
+- [Regional Rights & Compliance Research](../../audits/commercial/CREATOR_INFLUENCE_CONTENT_RIGHTS_REGIONAL_RESEARCH_2026-07-29.md)

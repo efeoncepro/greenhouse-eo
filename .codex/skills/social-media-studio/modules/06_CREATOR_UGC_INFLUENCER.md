@@ -17,6 +17,10 @@ Para practicar el flujo completo, usa la [simulación de perfume masculino con d
 
 Para posicionar la oferta sin sobreprometer, carga también el [Positioning & Differentiation V1](../../../../docs/audits/commercial/CREATOR_INFLUENCE_CONTENT_DIFFERENTIATION_POSITIONING_V1.md). Distingue diferenciadores defendibles, claims bloqueados y pruebas necesarias antes de afirmar superioridad competitiva.
 
+Para derechos y compliance regional, carga el [Rights & Usage Integrity Pack V1](../../../../docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_RIGHTS_AND_USAGE_INTEGRITY_PACK_V1.md) y la [investigación regional](../../../../docs/audits/commercial/CREATOR_INFLUENCE_CONTENT_RIGHTS_REGIONAL_RESEARCH_2026-07-29.md). El baseline cubre Chile, Colombia, México y Perú; el overlay local se valida antes de firmar o publicar.
+
+Para ejecutar la capability, carga también el [Operating Control Pack V1](../../../../docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_OPERATING_CONTROL_PACK_V1.md). Favikon sirve para discovery y snapshots; la fuente propia de Efeonce conserva Creator Record, Rights Brief, Rights Matrix, chain of title, contratos, assets, expiraciones, takedown y renovaciones.
+
 ## 0. Modelo operativo de Efeonce
 
 La capability se divide en cinco ofertas, que no deben mezclarse en una sola tarifa:

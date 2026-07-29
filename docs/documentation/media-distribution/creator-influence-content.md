@@ -5,6 +5,8 @@
 
 ## Para qué sirve
 
+La operación detallada de registros, herramientas, gates, medición, caja y capacidad está en el [Operating Control Pack V1](../../business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_OPERATING_CONTROL_PACK_V1.md).
+
 Esta capacidad permite planificar y ejecutar colaboraciones con influencers, creators y productores de UGC sin
 confundir audiencia, contenido, derechos o amplificación paid.
 
@@ -52,3 +54,6 @@ Strategy & Measurement. Cada composición debe declarar owner, alcance y RACI; n
 - [Manual de operación](../../manual-de-uso/media-distribution/operar-creator-influence-content.md)
 - [Simulación end-to-end: perfume masculino con deportistas chilenos](../../audits/commercial/CREATOR_INFLUENCE_PERFUME_ATHLETES_CHILE_SIMULATION_2026-07-29.md)
 - [Positioning & Differentiation V1](../../audits/commercial/CREATOR_INFLUENCE_CONTENT_DIFFERENTIATION_POSITIONING_V1.md)
+- [Rights & Usage Integrity Pack V1](../../business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_RIGHTS_AND_USAGE_INTEGRITY_PACK_V1.md)
+- [Regional Rights & Compliance Research](../../audits/commercial/CREATOR_INFLUENCE_CONTENT_RIGHTS_REGIONAL_RESEARCH_2026-07-29.md)
+- Operación, herramientas, registros, gates, medición y capacidad: [Operating Control Pack V1](../../business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_OPERATING_CONTROL_PACK_V1.md).

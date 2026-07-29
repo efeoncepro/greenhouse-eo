@@ -6,6 +6,8 @@
 
 ## Antes de empezar
 
+Usa el [Operating Control Pack V1](../../business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_OPERATING_CONTROL_PACK_V1.md) como referencia para registros, derechos, gates, caja, expiraciones y reporting.
+
 Reúne brief, objetivo, audiencia, mercados, plataformas, fechas, producto, claims aprobados, presupuesto separado,
 owner de aprobación, requisitos de disclosure y uso esperado del contenido.
 
@@ -65,3 +67,6 @@ recomendación de siguiente ciclo. En caso de conflicto, prevalecen el contrato 
 - [Ficha de servicio](../../services/media-distribution/CREATOR_INFLUENCE_CONTENT_SERVICE_V1.md)
 - [Arquitectura operativa](../../architecture/media-distribution/CREATOR_INFLUENCE_CONTENT_OPERATING_ARCHITECTURE_V1.md)
 - [Simulación end-to-end: perfume masculino con deportistas chilenos](../../audits/commercial/CREATOR_INFLUENCE_PERFUME_ATHLETES_CHILE_SIMULATION_2026-07-29.md)
+- [Rights & Usage Integrity Pack V1](../../business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_RIGHTS_AND_USAGE_INTEGRITY_PACK_V1.md)
+- [Regional Rights & Compliance Research](../../audits/commercial/CREATOR_INFLUENCE_CONTENT_RIGHTS_REGIONAL_RESEARCH_2026-07-29.md)
+- Para el sistema de registros, gates de publicación, control de caja, expiraciones y reporting, usa el [Operating Control Pack V1](../../business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_OPERATING_CONTROL_PACK_V1.md).

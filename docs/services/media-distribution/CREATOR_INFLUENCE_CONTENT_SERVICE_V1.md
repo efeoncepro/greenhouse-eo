@@ -34,7 +34,7 @@ derechos adicionales, exclusividad, whitelisting y usos fuera del territorio/pla
 El fee Efeonce se cotiza separado de terceros. La modalidad preferida es fee fijo más pass-through; si Efeonce
 administra contratación y pagos de terceros, puede aplicar una comisión explícita de coordinación aprobada en el SOW.
 La comisión de performance no reemplaza el fee base y sólo se habilita con tracking y reglas de atribución aceptadas.
-Las bandas de validación están en el [Pricing Integrity Pack](../../business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md). La hipótesis de diferenciación, los claims permitidos y las pruebas pendientes están en el [Positioning & Differentiation V1](../../audits/commercial/CREATOR_INFLUENCE_CONTENT_DIFFERENTIATION_POSITIONING_V1.md).
+Las bandas de validación están en el [Pricing Integrity Pack](../../business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md). La política regional de derechos, usage y compliance está en el [Rights & Usage Integrity Pack](../../business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_RIGHTS_AND_USAGE_INTEGRITY_PACK_V1.md). La hipótesis de diferenciación, los claims permitidos y las pruebas pendientes están en el [Positioning & Differentiation V1](../../audits/commercial/CREATOR_INFLUENCE_CONTENT_DIFFERENTIATION_POSITIONING_V1.md).
 
 ## Ciclo de servicio
 
@@ -75,3 +75,6 @@ evidencia del ciclo anterior y economics aceptables; no se renueva sólo por vol
 - [Documentación funcional](../../documentation/media-distribution/creator-influence-content.md)
 - [Manual](../../manual-de-uso/media-distribution/operar-creator-influence-content.md)
 - [Positioning & Differentiation V1](../../audits/commercial/CREATOR_INFLUENCE_CONTENT_DIFFERENTIATION_POSITIONING_V1.md)
+- [Rights & Usage Integrity Pack V1](../../business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_RIGHTS_AND_USAGE_INTEGRITY_PACK_V1.md)
+- [Regional Rights & Compliance Research](../../audits/commercial/CREATOR_INFLUENCE_CONTENT_RIGHTS_REGIONAL_RESEARCH_2026-07-29.md)
+- [Operating Control Pack V1](../../business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_OPERATING_CONTROL_PACK_V1.md)
