@@ -57,6 +57,23 @@ visuales que merecen una secuencia.
 Se conserva la lógica del slide de deck: una afirmación real y evidencia visible. Solo se usa si el brief acepta
 copy adicional; no se debe comprimir el slide horizontal dentro de un post vertical.
 
+### D. Carrusel narrativo de producto
+
+Cuando el objetivo sea explicar o promocionar un producto, usar una secuencia de hook → problema → reencuadre →
+mecanismo → evidencia → lectura → acción → cierre. La portada no debe resolver la historia.
+
+En la portada de un carrusel, el logo Efeonce va pequeño y centrado en la franja inferior; no va en una esquina
+superior. La firma de marca no debe competir con el avatar, nombre de cuenta o controles de la plataforma.
+
+Instagram y LinkedIn se producen como entregables diferentes: Instagram como secuencia nativa de imágenes; LinkedIn
+como documento PDF con páginas uniformes, título y descripción. La auditoría y las fuentes viven en
+[`docs/audits/social/2026-07-28-carousel-storytelling-platform-research.md`](../audits/social/2026-07-28-carousel-storytelling-platform-research.md).
+
+La conversión se define antes de escribir: guardar, compartir, comentar, conversación comercial o lead. Instagram
+prioriza tensión visual → descubrimiento → utilidad → conversación; LinkedIn prioriza patrón → implicación de
+negocio → mecanismo → prueba → aplicación → debate. Cada carrusel usa un solo cierre y nunca simula un clic sobre
+la imagen.
+
 ## Anti-patrones bloqueantes
 
 - Captura dentro de un marco azul.
@@ -69,6 +86,34 @@ copy adicional; no se debe comprimir el slide horizontal dentro de un post verti
 - Bordes, radios o sombras que convierten evidencia en “dashboard card”.
 - Aprobar una pieza porque se ve correcta a tamaño completo sin probar thumbnail de feed.
 
+## Contrato de superficies y overlays
+
+El formato del archivo no equivale a la superficie donde se consume. Instagram, LinkedIn y YouTube
+rodean, recortan o rejerarquizan una imagen de forma distinta; no existe una safe zone universal publicada
+por las plataformas. La auditoría fechada y sus fuentes viven en
+[`docs/audits/social/2026-07-28-social-platform-surface-audit.md`](../audits/social/2026-07-28-social-platform-surface-audit.md).
+
+### Familia mínima de derivados
+
+| Uso | Salida mínima |
+| --- | ---: |
+| Instagram feed / LinkedIn imagen nativa | 1080 × 1350 |
+| Instagram perfil prioritario | 1080 × 1440 opcional |
+| LinkedIn preview de enlace | derivado horizontal 1.91:1 |
+| YouTube Community | 1080 × 1080 |
+| YouTube thumbnail | 16:9, idealmente 1920 × 1080 o superior |
+| YouTube Shorts / video vertical | 1080 × 1920 |
+
+### Reglas de supervivencia
+
+- En 1080 × 1350, protege aproximadamente los 944 px centrales; los 68 px laterales son margen no crítico
+  prudencial, no una especificación oficial.
+- Mantén logo, score, headline y dato load-bearing en la zona central. Evita esquinas y tercio inferior.
+- Prueba Instagram en feed, vista individual y perfil; LinkedIn en móvil, desktop y preview de enlace;
+  YouTube en Home, Subscriptions, Watch, Community expandido y Shorts cuando aplique.
+- Haz autónoma la primera lámina de un carrusel o secuencia. Nunca dependas del caption para explicar la evidencia.
+- No reutilices el 4:5 como thumbnail de YouTube ni como preview horizontal de enlace de LinkedIn.
+
 ## Contrato de producción
 
 1. Normalizar brief: canal, objetivo, formato, evidencia, audiencia y restricción de copy.
@@ -78,8 +123,9 @@ copy adicional; no se debe comprimir el slide horizontal dentro de un post verti
 5. Seleccionar una dirección y declarar locks, zonas seguras, foco y anti-patrones.
 6. Componer determinísticamente el frame; no enviar el compuesto final a un modelo.
 7. Auditar: thumbnail, tamaño real, crop, legibilidad, logo único, ausencia de clipping y continuidad del sistema.
-8. Derivar carrusel/variantes desde la dirección aprobada, no desde el último archivo disponible.
-9. Registrar fuente, prompts si hubo generación, assets, dimensiones, versión y veredicto humano.
+8. Auditar las superficies de cada canal con la matriz de overlays antes de aprobar.
+9. Derivar carrusel/variantes desde la dirección aprobada, no desde el último archivo disponible.
+10. Registrar fuente, prompts si hubo generación, assets, dimensiones, superficies probadas, versión y veredicto humano.
 
 ## Gate de salida para Instagram 1080 × 1350
 
@@ -92,7 +138,17 @@ copy adicional; no se debe comprimir el slide horizontal dentro de un post verti
 - [ ] El reporte conserva contexto suficiente para funcionar como prueba.
 - [ ] La textura del sistema está subordinada.
 - [ ] La composición es nativa 4:5, no un slide horizontal reducido.
+- [ ] El contenido crítico sobrevive al recorte operacional 4:5 → 3:4 y al preview de perfil.
+- [ ] Se revisaron feed, vista individual y perfil, no solo el lienzo aislado.
 - [ ] El frame final no pasó por generación después de estampar datos/logo/UI.
+
+## Gate adicional para carruseles
+
+- [ ] La portada tiene hook autónomo, logo pequeño centrado abajo y no depende del caption.
+- [ ] Cada lámina tiene una sola idea y abre o cierra una pregunta narrativa.
+- [ ] El cierre usa una instrucción de post/caption, no un botón falso dentro de una imagen orgánica.
+- [ ] Instagram conserva el orden y la orientación en todas las láminas.
+- [ ] LinkedIn se entrega como PDF con páginas uniformes, título, descripción y accesibilidad revisada.
 
 ## Evidencia y referencias
 
