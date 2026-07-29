@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-29 — Release preflight: corrección de latencia del check Sentry
+
+- La causa del timeout persistente de `sentry_critical_issues` era la consulta de hasta 100 issues, que tardaba
+  8,5–9,1 s en Sentry aunque no hubiera resultados; el presupuesto externo e interno anterior era de 6 s.
+- El check ahora solicita 10 resultados, suficiente para detectar el umbral bloqueante `>=10`, mantiene la semántica
+  estricta ante errores, usa un deadline API de 15 s y un presupuesto de runner de 20 s. El runner reporta el budget
+  efectivo de cada check.
+- El cambio está en `develop`; todavía no se ha repetido el orchestrator ni se ha desplegado producción.
+
 ## 2026-07-29 — PR #164: promoción completa y release detenido por evidencia de smoke
 
 - PR #164 promovió todo `develop` a `main` en `e711fe2560e3a7c2e7e8639e07a8a394e9582cdb`; no hubo cherry-picks ni
@@ -722,22 +731,3 @@ fuente de verdad. Nada autenticado se cachea, verificado path por path.
 - **Skill `greenhouse-globe` actualizada** (.claude + .codex): sección "Flota de modelos" (roster, seam route→model,
   gotchas del canary) + 2 fixes de drift (composite rutea imagen→Fal, no "default Vertex"; Vertex image default es
   `gemini-3-pro-image`). Bloqueo para implementar: el classifier del entorno bloquea ediciones de código en Globe.
-
-## 2026-07-24 — Globe: promoción comercial por atestación (ADR-010) — golden briefs + docs (TASK-1535)
-
-- **Slice 5 (fleet enablement) — golden briefs para las 6 rutas reference-conditioned pendientes:**
-  `ref/still/reference-v1`, `ref/motion/reference-v1`, `ref/video/frames-v1`, `ref/video/motion-v1`,
-  `ref/voice/change-v1`, `ref/voice/translate-v1`. Se agregaron 3 rúbricas (`preserve-set-v1`,
-  `voice-transform-v1`, `voice-translation-v1`) y 2 contratos de fidelidad aditivos (`voice-transform`,
-  `voice-translation`) al enum — todos los consumers validan membresía, ninguno hace switch exhaustivo. Cada
-  fixture lleva una referencia sintética `rights: 'test-fixture'` (aceptada sin puerto de assets, el caso del
-  harness). El test del **segundo consumidor** corre las 6 end-to-end y asserta que la referencia autorizada
-  **sobrevive** al manifiesto puntuado (`input_lineage_intact`). Globe `pnpm check` (domain 337/0) + build verde.
-  Commit Globe `f62c2e4`.
-- **Slice 6 (docs closure):** doc funcional [`efeonce-globe-promocion-comercial-atestacion.md`](docs/documentation/creative-studio/efeonce-globe-promocion-comercial-atestacion.md)
-  + manual [`operar-promocion-comercial-atestacion-globe.md`](docs/manual-de-uso/creative-studio/operar-promocion-comercial-atestacion-globe.md),
-  ambos indexados. Triple documentación completa (ADR-010 técnica + funcional + manual).
-- **Pendiente (único gate abierto de TASK-1535):** el **canary facturable** (acceptance criterion de evidencia
-  runtime) implica **gasto real** de proveedor y/o promoción comercial a un workspace de cliente real — requiere
-  autorización explícita del operador; no se ejecuta de forma autónoma. La lane ya se probó en vivo con proveedor
-  interno (canary de lane + 2 atestaciones comerciales firmadas por el CEO). Task sigue `in-progress` por este gate.

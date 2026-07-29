@@ -27,8 +27,12 @@ import type { PreflightCheckResult } from '../types'
 import type { PreflightInput } from '../runner'
 
 const SENTRY_API_BASE = process.env.SENTRY_API_BASE ?? 'https://sentry.io'
-const SENTRY_TIMEOUT_MS = 6_000
+// Sentry's issues endpoint can take several seconds even when it returns an
+// empty result. Keep the API deadline below the runner budget, while avoiding
+// the old 6s/6s race that surfaced as an opaque runner timeout.
+const SENTRY_TIMEOUT_MS = 15_000
 const ERROR_THRESHOLD = 10
+const SENTRY_QUERY_LIMIT = ERROR_THRESHOLD
 const DEFAULT_SENTRY_ENVIRONMENT = 'production'
 const DEFAULT_ACTIVE_WINDOW_MINUTES = 15
 
@@ -73,7 +77,10 @@ const fetchSentryIssues = async (
   const params = new URLSearchParams({
     query: 'is:unresolved level:[error,fatal] lastSeen:-24h',
     statsPeriod: '24h',
-    limit: '100',
+    // The gate only needs to distinguish fewer than 10 active issues from
+    // 10+; requesting 100 made the Sentry endpoint needlessly slow and caused
+    // the previous 6s runner budget to expire before the response arrived.
+    limit: String(SENTRY_QUERY_LIMIT),
     environment
   })
 

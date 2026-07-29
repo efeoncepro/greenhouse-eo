@@ -1,6 +1,6 @@
 # Handoff activo
 
-## 2026-07-29 — PR #164: main promovido, release bloqueado en smoke control-plane
+## 2026-07-29 — PR #164: main promovido, release bloqueado por latencia Sentry (fix en develop)
 
 `develop` quedó en `2ecef6a5c4c8a79a738536fe04192b7343e358b0` y PR #164 promovió todo el contenido a `main` mediante
 el merge completo `e711fe2560e3a7c2e7e8639e07a8a394e9582cdb`. CI, CI Deep, context-governance, CLAUDE, task-contract,
@@ -10,10 +10,12 @@ Los orchestrators `30452322643`, `30452924614`, `30453278402` y `30453818726` se
 crear manifest, aprobar Production o desplegar workers. El primer bloqueo fue `playwright_smoke` sin run para
 `main`; el smoke manual canónico `30452463889` pasó verde y publicó resultados en Postgres. Los siguientes intentos
 resolvieron smoke, CI y Vercel; `30452924614` encontró timeout de Sentry, `30453278402` encontró staging cancelado +
-Sentry timeout y `30453818726` encontró Sentry timeout persistente con staging READY. Estado honesto: **code
-complete, rollout pendiente / operativamente bloqueado**. El siguiente paso es corregir o autorizar explícitamente el
-override auditado de `sentry_critical_issues`; el bypass requiere capability `platform.release.bypass_preflight` y
-razón de al menos 20 caracteres. No se usó bypass.
+Sentry timeout y `30453818726` encontró Sentry timeout persistente con staging READY. La medición aisló la causa:
+Secret Manager tardó ~1,1 s y la consulta Sentry con `limit=100` tardó ~8,5–9,1 s aunque devolvió cero issues. El
+fix en develop reduce el límite a 10 (el umbral de bloqueo), da al check un presupuesto de 20 s y conserva el API
+deadline interno de 15 s; también corrige la evidencia del runner para mostrar el timeout específico. Estado honesto:
+**fix code complete en develop; rollout pendiente / operativamente bloqueado**. Falta llevar este fix a `main` mediante
+el PR canónico, esperar sus gates y repetir el preflight sin bypass. No se usó bypass.
 
 Cambios propios: autenticación efímera de paquetes privados AXIS en workflows, `NPM_RC` cifrado en Vercel `staging`,
 Preview develop y Production, compactación documentada de contexto, corrección del presupuesto/auditoría de

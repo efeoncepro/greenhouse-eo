@@ -99,6 +99,7 @@ describe('checkSentryCriticalIssues', () => {
 
     expect(String(url)).toContain('lastSeen%3A-24h')
     expect(String(url)).toContain('environment=production')
+    expect(String(url)).toContain('limit=10')
   })
 
   it('does not block stale unresolved issues after the active release window', async () => {

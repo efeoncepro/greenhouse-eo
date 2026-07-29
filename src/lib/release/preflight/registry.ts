@@ -36,5 +36,7 @@ export const PREFLIGHT_CHECK_REGISTRY: readonly PreflightCheckDefinition[] = Obj
   { id: 'postgres_migrations', timeoutMs: 35_000, run: checkPostgresMigrations },
   { id: 'gcp_wif_subject', timeoutMs: 12_000, run: checkGcpWifSubject },
   { id: 'azure_wif_subject', timeoutMs: 12_000, run: checkAzureWifSubject },
-  { id: 'sentry_critical_issues', run: checkSentryCriticalIssues }
+  // Secret Manager + Sentry can exceed the 6s default on a cold CI runner.
+  // The check remains strict and has its own bounded API deadline.
+  { id: 'sentry_critical_issues', timeoutMs: 20_000, run: checkSentryCriticalIssues }
 ])
