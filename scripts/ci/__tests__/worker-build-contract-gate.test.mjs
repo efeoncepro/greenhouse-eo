@@ -89,6 +89,16 @@ test('deploy scripts preservan el escape de Cloud Build para el token AXIS', () 
   }
 })
 
+test('los contextos de build excluyen el npmrc efímero', () => {
+  for (const ignorePath of ['.dockerignore', '.gcloudignore']) {
+    const rules = readFileSync(resolve(process.cwd(), ignorePath), 'utf8')
+      .split('\n')
+      .map(line => line.trim())
+
+    assert.ok(rules.includes('.npmrc'), `${ignorePath} debe excluir .npmrc`)
+  }
+})
+
 test('workflow toolchain hereda packageManager y bloquea versiones duplicadas', () => {
   const valid = { jobs: { test: { steps: [{ uses: 'pnpm/action-setup@v6' }] } } }
   const invalid = { jobs: { test: { steps: [{ uses: 'pnpm/action-setup@v4', with: { version: '10.9.0' } }] } } }

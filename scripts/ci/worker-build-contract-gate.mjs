@@ -195,9 +195,24 @@ export const validateWorkerWorkflowPaths = ({ path, workflow }) => {
 const validateIgnoreContract = ({ root, path }) => {
   const source = readText(root, path)
 
-  return source.includes('!vendor/efeonce-globe/**')
-    ? []
-    : [`${path}: debe incluir explícitamente !vendor/efeonce-globe/**`]
+  const rules = new Set(
+    source
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line && !line.startsWith('#'))
+  )
+
+  const errors = []
+
+  if (!rules.has('!vendor/efeonce-globe/**')) {
+    errors.push(`${path}: debe incluir explícitamente !vendor/efeonce-globe/**`)
+  }
+
+  if (!rules.has('.npmrc')) {
+    errors.push(`${path}: debe excluir .npmrc para que credenciales de package install no entren al build context`)
+  }
+
+  return errors
 }
 
 export const runWorkerBuildContractGate = (root = repoRoot) => {

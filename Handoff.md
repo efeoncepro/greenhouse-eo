@@ -25,6 +25,10 @@ antes de entregar el config a Cloud Build, lo que explica que cada build reporta
 El fix preserva `$$AXIS_PACKAGES_READ_TOKEN` para que Cloud Build inyecte el secreto real. Falta revalidar CI, los
 tres builds/digests y repetir el orchestrator.
 
+La revisión de arquitectura añadió `.npmrc` a `.dockerignore` y `.gcloudignore`: aunque los Dockerfiles usan `COPY`
+explícitos y el archivo no entraba a las imágenes, el secreto efímero tampoco debe viajar dentro del contexto enviado
+al daemon de Docker. El worker build-contract gate ahora bloquea ambas omisiones.
+
 La ubicación en `efeonce-globe` es un acoplamiento legado deliberado y temporal, no ownership de Globe. La decisión de
 retiro está atada a ownership: cuando se cree la identidad de máquina, el secreto nuevo debe nacer en un proyecto
 neutral del ecosistema AXIS, fuera de cualquier producto; después se migran ambos consumers, se completan build/digest

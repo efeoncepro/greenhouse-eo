@@ -16,6 +16,8 @@
 - La primera corrida autenticada aún respondió `401`: el PAT estaba sano, pero el heredoc no quoted expandía `$$` al
   PID del shell antes de que Cloud Build pudiera resolver `secretEnv`. Los scripts ahora preservan el doble dólar
   requerido por Cloud Build y un test de contrato cubre los tres consumidores.
+- `.dockerignore` y `.gcloudignore` excluyen `.npmrc`; el gate de contratos impide que el secreto efímero viaje en el
+  contexto de Docker o en un upload local accidental.
 - Se concedió acceso Secret Manager sólo al service account de Cloud Build de Greenhouse. Validaciones locales de
   contratos de workers y tests focales pasaron; rollout queda pendiente de PR y nuevo orchestrator.
 

@@ -47,6 +47,7 @@ node_modules/
 .env*
 !.env.example
 !.env.local.example
+.npmrc
 
 # Repo areas not needed by current Cloud Run worker images
 bigquery/
