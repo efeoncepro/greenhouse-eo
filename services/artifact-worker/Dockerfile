@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.7
+
 # artifact-worker — Cloud Run JOB de render de artefactos (TASK-1391)
 #
 # PRIMER Cloud Run Job del ecosistema (frontera autorizada 2026-07-12, excepción documentada
@@ -29,7 +31,8 @@ COPY package.json pnpm-lock.yaml ./
 COPY vendor/ ./vendor/
 # --ignore-scripts: sin husky/postinstalls en el contenedor (mismo patrón que ops-worker);
 # los binarios nativos (esbuild de tsx, sharp) llegan como optional deps por plataforma.
-RUN pnpm install --frozen-lockfile --ignore-scripts
+RUN --mount=type=secret,id=axis_npmrc,target=/root/.npmrc,required=true \
+    pnpm install --frozen-lockfile --ignore-scripts
 
 COPY tsconfig.json ./
 COPY src/ ./src/

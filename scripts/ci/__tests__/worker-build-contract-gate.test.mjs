@@ -62,17 +62,33 @@ ARG PNPM_VERSION=10.32.1
 COPY vendor/ ./vendor/
 RUN --mount=type=secret,id=axis_npmrc,target=/root/.npmrc,required=true pnpm install --prod`,
     pnpmVersion: '10.32.1',
-    localDependencies: [{ path: 'vendor/package.tgz' }]
+    localDependencies: [{ path: 'vendor/package.tgz' }],
+    requiresPrivatePackageAuth: true
   })
 
   assert.deepEqual(findings, [])
+})
+
+test('validateDockerfile bloquea private package install sin secreto BuildKit', () => {
+  const findings = validateDockerfile({
+    source: `FROM node:22
+ARG PNPM_VERSION=10.32.1
+COPY vendor/ ./vendor/
+RUN pnpm install --frozen-lockfile`,
+    pnpmVersion: '10.32.1',
+    localDependencies: [{ path: 'vendor/package.tgz' }],
+    requiresPrivatePackageAuth: true
+  })
+
+  assert.match(findings.join('\n'), /debe montar el secreto BuildKit axis_npmrc/)
 })
 
 test('deploy scripts preservan el escape de Cloud Build para el token AXIS', () => {
   const deployScripts = [
     'services/ops-worker/deploy.sh',
     'services/commercial-cost-worker/deploy.sh',
-    'services/ico-batch/deploy.sh'
+    'services/ico-batch/deploy.sh',
+    'services/artifact-worker/deploy.sh'
   ]
 
   for (const scriptPath of deployScripts) {

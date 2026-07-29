@@ -18,6 +18,8 @@
   requerido por Cloud Build y un test de contrato cubre los tres consumidores.
 - `.dockerignore` y `.gcloudignore` excluyen `.npmrc`; el gate de contratos impide que el secreto efímero viaje en el
   contexto de Docker o en un upload local accidental.
+- `artifact-worker`, cuarto build unit que instala el `package.json` raíz, adoptó el mismo montaje BuildKit; el gate
+  ahora exige AXIS auth en todas las etapas `pnpm install` de los cuatro workers.
 - Se concedió acceso Secret Manager sólo al service account de Cloud Build de Greenhouse. Validaciones locales de
   contratos de workers y tests focales pasaron; rollout queda pendiente de PR y nuevo orchestrator.
 

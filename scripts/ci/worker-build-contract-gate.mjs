@@ -64,7 +64,7 @@ export const collectLocalFileDependencies = pkg => {
 export const splitDockerStages = dockerfile =>
   dockerfile.split(/(?=^FROM\s+)/gim).filter(stage => /^FROM\s+/im.test(stage))
 
-export const validateDockerfile = ({ source, pnpmVersion, localDependencies }) => {
+export const validateDockerfile = ({ source, pnpmVersion, localDependencies, requiresPrivatePackageAuth = false }) => {
   const errors = []
   // Docker BuildKit options may precede the command and line continuations may
   // split `RUN --mount=... pnpm install` across physical lines.
@@ -76,6 +76,13 @@ export const validateDockerfile = ({ source, pnpmVersion, localDependencies }) =
     const installsDependencies = /RUN(?:\s+--[^\n]+)*\s+pnpm\s+install\b/i.test(stage)
 
     if (!installsDependencies) continue
+
+    if (
+      requiresPrivatePackageAuth &&
+      !/RUN\s+--mount=type=secret,id=axis_npmrc,[^\n]*\s+pnpm\s+install\b/i.test(stage)
+    ) {
+      errors.push(`stage ${index + 1}: pnpm install debe montar el secreto BuildKit axis_npmrc`)
+    }
 
     const versionMatches = [...stage.matchAll(/^ARG\s+PNPM_VERSION=([^\s]+)$/gim)].map(match => match[1])
 
@@ -222,6 +229,10 @@ export const runWorkerBuildContractGate = (root = repoRoot) => {
   const pnpmVersion = parsePnpmVersion(pkg.packageManager)
   const localDependencies = collectLocalFileDependencies(pkg)
 
+  const requiresPrivatePackageAuth = Object.keys(pkg.dependencies ?? {}).some(name =>
+    name.startsWith('@efeoncepro/axis-')
+  )
+
   if (localDependencies.length === 0) {
     console.log('• No hay dependencias file: locales; se mantienen los demás contratos de build.')
   }
@@ -235,7 +246,8 @@ export const runWorkerBuildContractGate = (root = repoRoot) => {
       ...validateDockerfile({
         source: readText(root, unit.dockerfile),
         pnpmVersion,
-        localDependencies
+        localDependencies,
+        requiresPrivatePackageAuth
       }).map(error => `${unit.dockerfile}: ${error}`)
     )
 

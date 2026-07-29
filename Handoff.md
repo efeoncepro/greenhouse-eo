@@ -29,6 +29,11 @@ La revisión de arquitectura añadió `.npmrc` a `.dockerignore` y `.gcloudignor
 explícitos y el archivo no entraba a las imágenes, el secreto efímero tampoco debe viajar dentro del contexto enviado
 al daemon de Docker. El worker build-contract gate ahora bloquea ambas omisiones.
 
+El inventario completo de build units detectó un cuarto consumidor: `artifact-worker` instala el mismo `package.json`
+y por tanto también requiere AXIS auth, aunque sea un Cloud Run Job staging-only y no forme parte del orchestrator
+productivo. Su Dockerfile/deploy script ahora usan el mismo contrato `secretEnv` → `.npmrc` efímero → BuildKit secret;
+el gate exige el montaje en los cuatro Dockerfiles.
+
 La ubicación en `efeonce-globe` es un acoplamiento legado deliberado y temporal, no ownership de Globe. La decisión de
 retiro está atada a ownership: cuando se cree la identidad de máquina, el secreto nuevo debe nacer en un proyecto
 neutral del ecosistema AXIS, fuera de cualquier producto; después se migran ambos consumers, se completan build/digest

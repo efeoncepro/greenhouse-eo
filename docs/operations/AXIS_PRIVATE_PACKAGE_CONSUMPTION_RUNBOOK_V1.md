@@ -105,10 +105,11 @@ Greenhouse binding to this legacy secret, and remove the legacy secret only afte
 consumers pass their build and digest gates. Do not recreate the coupling by placing the
 replacement secret in `efeonce-globe` merely because the legacy secret is there today.
 
-The Greenhouse deploy scripts for `ops-worker`, `commercial-cost-worker` and
-`ico-batch-worker` use the same contract. Their Dockerfiles mount the secret in
-both the builder and runtime `pnpm install` layers because BuildKit secrets are
-scoped to one `RUN`; the token is never passed as a Docker build argument or
+The Greenhouse deploy scripts for `ops-worker`, `commercial-cost-worker`,
+`ico-batch-worker` and the staging-only `artifact-worker` use the same contract.
+The service Dockerfiles mount the secret in both builder and runtime installs;
+the single-stage artifact worker mounts it in its only `pnpm install`. BuildKit
+secrets are scoped to one `RUN`; the token is never passed as a Docker build argument or
 copied into the image.
 
 The deployment workflow must prove:
