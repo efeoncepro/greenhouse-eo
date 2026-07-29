@@ -341,8 +341,17 @@ el sitio de uso.
 y **derivan su autoridad del manifiesto y del theme**, nunca de listas escritas a mano: agregar
 `geist-bold.ttf` a `GLOBE_FONT_FACES` haría que el primero deje de objetar por ese solo acto. Su contrato
 completo, la frontera declarada del escaneo (`apps/studio-client/src` y nada más; `studio-web` **no está
-mirado** hasta `TASK-1560` Slice 2) y el riesgo abierto de `bolder` del UA —invisible para cualquier gate,
-consecuencia directa de la decisión de dejar **preflight fuera**— viven en el contrato de tipografía.
+mirado** hasta `TASK-1560` Slice 2) y el caso del `bolder` del UA —invisible para cualquier gate, consecuencia
+directa de la decisión de dejar **preflight fuera**— viven en el contrato de tipografía.
+
+**Delta 2026-07-29 — el `bolder` del UA quedó cerrado sin adoptar preflight.** Se declaró
+`b, strong { font-weight: var(--weight-semibold) }` en `@layer base` de `styles/tailwind.css` (`403d346`,
+desplegado en la revisión `globe-studio-internal-00101-x2d`; medido con `getComputedStyle` sobre los 25
+`<strong>`/`<b>` del Producer vivo: 24 en Geist@600, 1 en Poppins@700, **cero sintetizados**). Es la salida
+barata de las tres que el contrato describía, y **no cambia la decisión de este ADR**: el preflight sigue
+fuera, y adoptarlo sigue siendo lo que se evalúa cuando migre la última superficie. Lo que sí deja escrito es
+una consecuencia de diseño — **el énfasis sobre Geist topa en 600**, porque no hay más archivo; más peso es
+`font-display` (Poppins 700), no un corte inventado de Geist.
 
 **Corrección al aparato de gates que afectaba a los cinco:** `withoutComments` **borraba** los comentarios en
 vez de blanquearlos, y borrar un bloque borra sus saltos de línea. **Todo `file:line` reportado después de un
@@ -351,4 +360,11 @@ comentario venía corrido.** Ahora se sobrescriben con espacios, preservando off
 **La generalización para el próximo gate de este ADR:** un valor de diseño puede ser correcto en su
 declaración y equivocado en su uso. Cuando la corrección depende de un contexto que sólo existe en el sitio
 de uso —familia heredada, audiencia de la superficie, elemento HTML—, el gate tiene que mudarse ahí, y si no
-puede (§ el `bolder` del UA), eso se declara como riesgo abierto en vez de asumirse cubierto.
+puede, eso se declara como riesgo abierto en vez de asumirse cubierto.
+
+**Y hay un tercer movimiento, que es el que cerró el `bolder` del UA:** cuando el defecto entra por el
+**nombre del elemento** y no por una clase, ningún gate de `className` puede verlo — pero una **regla de base
+que lo vuelva imposible** hace innecesario el gate. Preferir el reset cuando el reset cierra la puerta
+entera; el gate sigue haciendo falta para lo que un autor puede escribir mal, no para lo que el navegador
+inyecta por detrás. La categoría, eso sí, no se cierra con el caso: otro elemento con default propio del UA
+la reabre con los gates verdes.

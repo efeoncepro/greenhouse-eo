@@ -1,14 +1,19 @@
 # Globe Client Payload — Contrato de Tipografía V1
 
 > **Tipo de documento:** Contrato técnico (SSOT del uso tipográfico del payload cliente de Globe)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-29 por Claude (sesión de tipografía del payload · `TASK-1485` / ADR-016)
+> **Última actualización:** 2026-07-29 por Claude — §6 pasa de riesgo abierto a **resuelto**: el `bolder` del
+> UA está neutralizado en `@layer base` (`403d346`), medido contra el runtime vivo. La categoría de defecto
+> (lo que entra por el nombre del elemento es invisible a un gate de `className`) sigue viva y se conserva
 > **Ámbito:** `efeonce-globe/apps/studio-client/**` — composer, shell Producer, diálogos, feed, viewer,
 > share board y toda superficie futura del payload cliente
 > **ADR gobernante:** [ADR-016 — Motor de estilos del payload cliente](EFEONCE_GLOBE_CLIENT_STYLING_ENGINE_DECISION_V1.md)
 > **Contrato hermano:** [Contrato de Motion V1](GLOBE_CLIENT_MOTION_CONTRACT_V1.md)
-> **Evidencia:** commits `68a2cbe`, `d009871`, `b9112a8` — los tres desplegados a `globe-studio-internal`
-> y verificados en vivo en `https://globe.efeoncepro.com/producer` con sesión real el 2026-07-29
+> **Evidencia:** commits `68a2cbe`, `d009871`, `b9112a8` y `403d346` — los cuatro desplegados a
+> `globe-studio-internal` (revisión viva `globe-studio-internal-00101-x2d`, verificada con
+> `gcloud run services describe`) y revisados en vivo en `https://globe.efeoncepro.com/producer` con sesión
+> real el 2026-07-29
 
 ---
 
@@ -218,13 +223,16 @@ para cerrar.
 
 ---
 
-## 6 · 🔴 Riesgo abierto y sin dueño: `bolder` del UA, invisible para cualquier gate
+## 6 · ✅ Resuelto 2026-07-29: el `bolder` del UA — y la categoría de defecto que sigue viva
 
-**Éste no está resuelto. No tiene task dueña. No lo puede ver ningún escaneo de `className`.**
+**La instancia está cerrada en `@layer base` (`403d346`, desplegado y medido contra el runtime vivo). La
+categoría de defecto no, y por eso este bloque se reescribe en vez de borrarse.**
+
+### 6.1 · El diagnóstico — por qué la regla existe
 
 El proyecto **no emite el preflight de Tailwind** — decisión deliberada de ADR-016, porque adoptarlo sería un
-segundo reset global aplicado de golpe a superficies que conviven. La consecuencia es que la hoja del
-navegador sigue aplicando:
+segundo reset global aplicado de golpe a superficies que conviven. La consecuencia era que la hoja del
+navegador aplicaba sin oposición:
 
 ```css
 b, strong { font-weight: bolder }
@@ -237,29 +245,66 @@ b, strong { font-weight: bolder }
 | dentro de un contenedor a `400` | **700** | no existe | faux bold |
 | dentro de un contenedor a `600` | **900** | no existe | faux bold |
 
-En los dos casos se pide un corte que Geist no carga, **sin que ninguna clase lo diga**. El gate escanea
-`className` y bloques de regla; un elemento HTML que hereda un peso del UA le es **estructuralmente
-invisible**.
+En los dos casos se pedía un corte que Geist no carga, **sin que ninguna clase lo dijera**. El gate escanea
+`className` y bloques de regla; un elemento HTML que hereda un peso del UA le era **estructuralmente
+invisible** — el peso entraba por el **nombre del elemento**, no por una clase. Era el único defecto
+tipográfico de esta superficie que ningún gate podía ver.
 
 **Apareció tres veces el mismo día, en sitios sin relación entre sí:** el riel del composer, el centro del
 donut de créditos y la paleta de comandos. Los tres se corrigieron declarando el peso — y el código dejó
 escrito el porqué en el sitio (`ProducerComposer.tsx:2252`: *«`font-semibold` es EXPLÍCITO, y no es
-redundante con el `<strong>`: esta superficie corre SIN preflight»*).
+redundante con el `<strong>`: esta superficie corre SIN preflight»*). Quedaban al menos seis `<strong>` más
+en el payload cayendo en `bolder`, entre ellos `ProducerHeader.tsx:315`, `:333`, `:560`, `:646`,
+`ProducerViewer.tsx:179` y `ProducerComposer.tsx:1648`.
 
-**La causa sigue viva.** Al 2026-07-29 quedan al menos seis `<strong>` sin peso declarado en el payload,
-entre ellos `ProducerHeader.tsx:315`, `:333`, `:560`, `:646`, `ProducerViewer.tsx:179` y
-`ProducerComposer.tsx:1648`. Cada uno cae en `bolder`.
+### 6.2 · El cierre — `403d346`, la salida 1 de las tres que este bloque describía
 
-**Salidas posibles, ninguna elegida todavía:**
+`apps/studio-client/src/styles/tailwind.css`, dentro de `@layer base`, justo después del reset de
+`box-sizing`:
 
-1. **Neutralizar `b, strong` en `@layer base`** con un peso declarado del SSOT. Barato y global, pero es una
-   decisión de reset y toca toda superficie que conviva.
-2. **Adoptar preflight** cuando migre la última superficie, con dueño y diff visual — es lo que ADR-016 ya
-   prevé, y cerraría esto de paso.
-3. **Un gate estructural** que escanee elementos HTML con peso implícito del UA (`b`, `strong`, `h1`–`h6`,
-   `th`) y exija peso declarado. Es el único de los tres que ataca la clase completa, y es el más caro.
+```css
+b,
+strong {
+  font-weight: var(--weight-semibold);
+}
+```
 
-Hasta que una se elija, **esto es riesgo residual conocido, no deuda cerrada.**
+Neutralizar `b, strong` con un peso declarado del SSOT era la salida barata y global. No se adoptó preflight
+—sigue siendo la decisión de ADR-016 que se toma cuando migre la última superficie— ni se construyó el gate
+estructural: **la regla hace innecesario el gate para este caso**, porque ya no hay peso que el UA pueda
+inyectar por detrás.
+
+**Por qué 600 y no `inherit`:** `inherit` mata el énfasis y `<strong>` dejaría de significar algo. 600 es un
+corte que existe y conserva el contraste contra el 400 heredado.
+
+**Evidencia medida contra el runtime vivo**, no supuesta — `https://globe.efeoncepro.com/producer`, revisión
+`globe-studio-internal-00101-x2d` sirviendo `403d346`, consultando `getComputedStyle` sobre los 25 elementos
+`<strong>`/`<b>` de la página:
+
+```text
+Geist@600   × 24   ← corte real
+Poppins@700 ×  1   ← corte real
+SINTETIZADOS: []
+```
+
+### 6.3 · La consecuencia vigente: el énfasis sobre Geist topa en 600
+
+**Esto es regla, no nota al pie.** Un `<strong>` dentro de un contenedor que ya está en 600 se ve **igual que
+su padre** — no hay un escalón más porque **no hay archivo**. Geist carga 400 y 600, y nada más.
+
+Si de verdad hace falta más peso, el camino es **`font-display` (Poppins 700)**, no pedirle a Geist un corte
+que no tiene. Pedirlo devuelve el problema original por otra puerta: síntesis silenciosa.
+
+### 6.4 · Lo que NO se cerró: la categoría
+
+La instancia murió; **la clase de defecto sigue siendo verdadera**. Lo que entra por el **nombre del
+elemento** —un default del user agent— es invisible a un gate que lee clases. Si un elemento HTML futuro trae
+otro default del UA que pida un corte inexistente (`h1`–`h6` y `th` son los candidatos obvios; hoy el reset
+del proyecto los cubre por otra vía), **el mismo agujero reaparece con los gates verdes**.
+
+La salida 3 —un gate estructural que escanee elementos con peso implícito del UA y exija peso declarado— es
+la única que ataca la clase completa, sigue sin construirse y sigue siendo la más cara. Está en Open
+questions como lo que es: una decisión pendiente sobre una categoría, **no un defecto vivo**.
 
 ---
 
@@ -365,9 +410,14 @@ que importa; el presupuesto prueba exactamente la propiedad que evita que el pan
   tapa lo desconocido, el otro se funde con lo conocido.
 - **NUNCA** perder el valor exacto de una magnitud de crédito. Abreviar es una decisión de **slot**; el
   exacto vive siempre en encabezado, `title` y `sr-only`.
-- **SIEMPRE** declarar el peso explícitamente en `<strong>`, `<b>`, `<h1>`–`<h6>` y `<th>`. Esta superficie
-  corre **sin preflight**, así que el UA aplica `bolder` y pide un corte que Geist no tiene — **y ningún gate
-  lo ve**.
+- **NUNCA** pedir más peso que 600 en un `<strong>`/`<b>` sobre Geist. Desde `403d346` la base los declara en
+  `var(--weight-semibold)`, así que **el énfasis topa ahí**: dentro de un contenedor que ya está en 600 se ve
+  igual que su padre, porque no existe el archivo. Si hace falta más, el camino es **`font-display`
+  (Poppins 700)** — no pedirle a Geist un corte que no carga (§6.3).
+- **SIEMPRE** verificar qué peso inyecta el UA antes de introducir un elemento HTML nuevo con default propio.
+  Esta superficie corre **sin preflight** por decisión de ADR-016: lo que entra por el **nombre del elemento**
+  es invisible a un gate que lee `className`. `b`/`strong` ya están neutralizados en `@layer base`; cualquier
+  otro reabre la categoría con los gates verdes (§6.4).
 - **SIEMPRE** blanquear comentarios en un gate, nunca borrarlos: borrar un bloque borra sus saltos de línea y
   todo `file:line` posterior queda corrido.
 
@@ -380,10 +430,12 @@ que importa; el presupuesto prueba exactamente la propiedad que evita que el pan
 
 ## Open questions
 
-- **Dueño de `bolder` (§6).** Las tres salidas están descritas; ninguna elegida. Mientras tanto cada
-  `<strong>` nuevo nace con el defecto salvo que su autor recuerde declarar el peso — y recordar no es un
-  mecanismo.
-- **¿Cargar `geist-bold.ttf`?** Resolvería §2 y §6 de un golpe y el gate dejaría de objetar por ese solo
+- **¿Un gate estructural para los defaults del UA (§6.4)?** El `bolder` de `b`/`strong` está cerrado en
+  `@layer base`, pero la **categoría** sigue abierta: un elemento HTML con peso implícito del user agent es
+  invisible a cualquier gate que lea `className`. La salida 3 —escanear elementos con peso implícito y exigir
+  peso declarado— ataca la clase completa y no está construida. Hoy el mecanismo es el reset, que cubre los
+  elementos que conocemos, no los que alguien introduzca después.
+- **¿Cargar `geist-bold.ttf`?** Resolvería §2 y el techo de 600 de §6.3 de un golpe y el gate dejaría de objetar por ese solo
   acto. El costo es un cuarto archivo de fuente en el payload y una decisión de dirección de arte que no se
   tomó: hoy el 700 es **de Poppins**, y eso es lo que separa display de body. Cargar Geist 700 borra esa
   separación por accidente si nadie la defiende.

@@ -1,6 +1,6 @@
 ---
 name: typography-design-globe-overlay
-description: Pins tipográficos de Efeonce Globe (repo hermano `efeonce-globe`, payload `apps/studio-client`) que ANULAN tanto los defaults del skill global `typography-design` como el overlay de Greenhouse. Cargar en lugar del overlay de Greenhouse cuando el trabajo toca Globe. Fija las dos familias y los TRES cortes realmente cargados, la escala de nueve pasos con el contrato escrito de cada token, la trampa de faux bold Geist@700 (incluido el `<strong>` que ningún gate puede ver), las utilidades de peso muertas, los ratios de contraste medidos y sus scrims, el formato de números con presupuesto de caracteres, y la frontera real de los gates.
+description: Pins tipográficos de Efeonce Globe (repo hermano `efeonce-globe`, payload `apps/studio-client`) que ANULAN tanto los defaults del skill global `typography-design` como el overlay de Greenhouse. Cargar en lugar del overlay de Greenhouse cuando el trabajo toca Globe. Fija las dos familias y los TRES cortes realmente cargados, la escala de nueve pasos con el contrato escrito de cada token, la trampa de faux bold Geist@700 (incluido el techo de 600 del `<strong>`, una vez neutralizado el `bolder` del UA), las utilidades de peso muertas, los ratios de contraste medidos y sus scrims, el formato de números con presupuesto de caracteres, y la frontera real de los gates.
 type: overlay
 overrides: typography-design, typography-design-greenhouse-overlay
 applies-to: efeonce-globe/apps/studio-client
@@ -74,11 +74,24 @@ Cerrado por el aserto `never writes a font utility the theme cannot generate`, q
 
 **Propiedad defensiva que conviene conocer:** vaciar el namespace tiene un efecto secundario útil — un nombre de utilidad que el theme no puede generar **no se materializa aunque Tailwind lo lea como texto**. Por eso los comentarios que mencionan `font-normal` para explicar por qué está prohibido no reintroducen la clase. Ojo: esto **no** te salva con nombres que el theme SÍ genera; ahí la regla dura de no documentar el anti-patrón dentro del árbol escaneado sigue vigente en toda su fuerza.
 
-### ⚠️ `<strong>` y `<b>` piden Geist@700 por herencia, y ningún gate lo ve
+### ✅ `<strong>` y `<b>`: el `bolder` del UA está neutralizado — y el énfasis topa en 600
 
-El proyecto **no emite el preflight de Tailwind**: no hay `font-weight: bolder` neutralizado en ninguna parte, así que la hoja del navegador aplica `b, strong { font-weight: bolder }`. Un `<strong>` dentro de un contenedor a 600 computa **900**; dentro de uno a 400 computa 700. En ambos casos pide un corte de Geist que no existe → **faux bold sin que ninguna clase lo diga**.
+**Por qué existía el problema (el diagnóstico se conserva porque explica la regla):** el proyecto **no emite el preflight de Tailwind**, así que la hoja del navegador aplicaba `b, strong { font-weight: bolder }`. `bolder` es **relativo**: un `<strong>` dentro de un contenedor a 400 computaba 700; dentro de uno a 600, **900**. En ambos casos pedía un corte de Geist que no existe → **faux bold sin que ninguna clase lo dijera**. El gate escanea `className`, no elementos HTML, así que **le era estructuralmente invisible**: el peso entraba por el **nombre del elemento**. Apareció **tres veces el mismo día en sitios distintos**, ya conocida — prueba de que "acordarse" no es un mecanismo.
 
-El gate escanea `className`, no elementos HTML, así que **le es estructuralmente invisible**. Es la misma falla una capa más abajo, y por eso no basta con "acordarse": apareció **tres veces el mismo día en sitios distintos**, ya conocida. Al usar `<strong>`/`<b>` en Globe, declara el peso explícitamente (`font-semibold`) en vez de confiar en el default del navegador. Detectado 2026-07-29, **sin dueño asignado todavía**.
+**Cerrado el 2026-07-29 (`403d346`)**, en `@layer base` de `styles/tailwind.css`:
+
+```css
+b,
+strong {
+  font-weight: var(--weight-semibold);
+}
+```
+
+600 y no `inherit`, porque `inherit` mata el énfasis y `<strong>` dejaría de significar algo. Medido en el runtime vivo con `getComputedStyle` sobre los 25 `<strong>`/`<b>` del Producer: 24 Geist@600, 1 Poppins@700, **cero sintetizados**.
+
+**Lo que tienes que saber hoy:** ya no hace falta declarar el peso en cada `<strong>` — la base lo hace. Lo que sí hace falta saber es el **techo**: el énfasis sobre Geist **topa en 600**. Un `<strong>` dentro de un contenedor que ya está en 600 se ve **igual que su padre**, porque no hay archivo. Si de verdad necesitas más peso, el camino es **`font-display` (Poppins 700)**, no pedirle a Geist un corte que no carga.
+
+**La categoría de defecto sigue viva:** lo que entra por el nombre del elemento es invisible a un gate de `className`. `b`/`strong` están cubiertos por el reset; cualquier elemento HTML nuevo con default propio del UA reabre el agujero **con los gates verdes**.
 
 ## La escala — nueve pasos, y tres tienen prohibiciones escritas
 
@@ -150,7 +163,7 @@ Consecuencia operativa: **`--faint` es el último escalón legible y no tiene ho
 
 **Trampa del runner, que ya mordió más de una vez:** el runner es **`node --test`, NO Vitest**, y los scripts `test` de cada package **enumeran los archivos a mano** — no hay glob ni descubrimiento. Un `*.test.ts` nuevo que no se agregue al script `test` de su package **NUNCA corre**, y la suite queda **verde por no haberlo mirado**, que es el peor de los verdes. Confirma que tu test aparece en la salida del run.
 
-**Y esa suite no termina sola (2026-07-29, sin dueño).** El último paso del `test` de `studio-client` es `axis-pilot-canary.test.mjs`, que hace `server.kill('SIGTERM')` sobre el wrapper de `pnpm` y **no sobre el `vite` nieto**: el nieto sobrevive reteniendo los pipes, el comando no retorna y cada corrida deja un huérfano en el puerto **4326** (se acumularon doce, uno de tres días). Workaround verificado: correr los canarios por separado y liberar el puerto antes de la corrida siguiente. Cuenta para el paso 11 de la pasada de auditoría — **«se colgó» no es aquí un verde ni un rojo, y confundirlo con lo normal es cómo un cuelgue real pasa desapercibido**.
+**Esa suite ya termina sola (cerrado 2026-07-29, `403d346`).** El último paso del `test` de `studio-client` es `axis-pilot-canary.test.mjs`, que hacía `server.kill('SIGTERM')` sobre el wrapper de `pnpm` y **no sobre el `vite` nieto** — porque `pnpm exec vite` no es un proceso, son tres. El nieto sobrevivía reteniendo los pipes, el comando no retornaba y cada corrida dejaba un huérfano en el puerto **4326** (se acumularon doce, uno de tres días). Hoy el canary corre con `detached: true`, señala al **grupo** con `process.kill(-pid, …)` y **espera** la muerte con escalón a `SIGKILL`. Medido: `pnpm --filter @efeonce-globe/studio-client test` → **exit 0 en 29 s**, 129/129, tres canarios verdes, cero huérfanos. ⚠️ **El workaround de correr los canarios por separado y liberar el puerto a mano queda retirado** — sostenerlo para un bug muerto hace pagar el costo dos veces. La lección de método sigue vigente para el paso 11 de la pasada de auditoría: **«se colgó» no es un verde ni un rojo, y confundirlo con lo normal es cómo un cuelgue real pasa desapercibido**.
 
 ## Reglas duras (NUNCA / SIEMPRE)
 
@@ -188,7 +201,7 @@ Consecuencia operativa: **`--faint` es el último escalón legible y no tiene ho
 **Paso 0, y no es retórico: MIRA el frame renderizado antes de leer código.** El 2026-07-29 la regresión la introdujimos nosotros y sobrevivió a `pnpm build`, ESLint, **129 tests y tres canarios en verde**, con un renglón cortado a media letra en pantalla. Todo lo que sigue audita lo que el código *dice*; nada de eso audita lo que la pantalla *hace*.
 
 1. ¿Cada `font-bold` va acompañado de `font-display`? (si no → **faux bold sobre Geist**)
-2. ¿Hay `<strong>`/`<b>` sin peso declarado? (→ `bolder` del navegador ⇒ faux bold que ningún gate ve)
+2. ¿Hay un `<strong>`/`<b>` dentro de un contenedor que ya está en 600? (→ se ve **igual que su padre**: el énfasis sobre Geist topa en 600; si hace falta contraste, es `font-display`, no un peso mayor de Geist). ¿Y algún elemento HTML nuevo con default de peso del UA sin verificar? (→ el reset cubre `b`/`strong` desde `403d346`, no lo que se introduzca después)
 3. ¿Aparece `font-normal` o `font-medium`? (→ clases muertas, no declaran nada)
 4. ¿Algún peso pedido fuera de los tres cortes de `GLOBE_FONT_FACES`? (revisa **también `tailwind.css`**: la mayoría del caso fuente vivía en la hoja, no en JSX)
 5. ¿`--text-micro`/`--text-2xs`/`--text-meta` usados como **prosa** o en superficie client-facing? (→ token fuera de su contrato escrito)

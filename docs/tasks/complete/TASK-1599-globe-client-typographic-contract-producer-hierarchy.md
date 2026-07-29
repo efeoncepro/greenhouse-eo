@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `COMPLETE 2026-07-29. Tres commits desplegados y verificados en vivo sobre globe-studio-internal-00100-9kq (imagen b9112a80985d) en https://globe.efeoncepro.com/producer con sesión real a 1440px. Quedan CINCO puntos abiertos declarados abajo; TRES de ellos SIN DUEÑO.`
+- Status real: `COMPLETE 2026-07-29. Tres commits desplegados y verificados en vivo en https://globe.efeoncepro.com/producer con sesión real a 1440px. Declaró CINCO puntos abiertos, TRES sin dueño; DOS de esos tres (bolder del UA y fuga del axis-pilot-canary) se cerraron el mismo día en 403d346, desplegado y medido sobre globe-studio-internal-00101-x2d (imagen 403d3464e88e) — ver Delta 2026-07-29. Sigue abierto sin dueño el H9 del feed.`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`
@@ -155,17 +155,22 @@ Repo `greenhouse-eo`:
 
 ### Gap
 
-Lo que sigue abierto al cerrar esta task. **Tres de los cinco no tienen dueño**, y así se declaran.
+Lo que quedaba abierto al cerrar esta task. **Tres de los cinco no tenían dueño**, y así se declararon;
+**dos de esos tres se cerraron el mismo día en `403d346`** (ver `## Delta 2026-07-29 — dos gaps cerrados`).
 
-1. **El preflight de Tailwind no se emite — SIN DUEÑO.** La regla del navegador
-   `b, strong { font-weight: bolder }` pide el corte fuerte **por herencia, sin que ninguna clase lo
-   diga**. El gate escanea `className`, no elementos HTML, así que el caso le es
-   **estructuralmente invisible**. Apareció tres veces el mismo día. Ninguna task lo reclama hoy.
-2. **La frontera de los gates.** Escanean sólo `apps/studio-client/src`. `apps/studio-web` no está
-   vigilado: **184 hex crudos y 4 familias literales** medidos hoy. Dueño: `TASK-1560` Slice 2.
-3. **Fuga del `axis-pilot-canary` — SIN DUEÑO.** Mata el envoltorio de `pnpm` y no el `vite` nieto, que
-   sobrevive reteniendo los pipes. Consecuencia: **`pnpm test` no termina solo** y deja un huérfano en
-   el puerto 4326 por corrida. Se acumularon doce, uno de tres días. Ninguna task lo reclama hoy.
+1. ~~**El preflight de Tailwind no se emite — SIN DUEÑO.**~~ **CERRADO en `403d346`.** La regla del
+   navegador `b, strong { font-weight: bolder }` pedía el corte fuerte **por herencia, sin que ninguna
+   clase lo dijera**; el gate escanea `className`, no elementos HTML, así que el caso le era
+   **estructuralmente invisible**. Apareció tres veces el mismo día. Cerrado con un peso declarado del
+   SSOT en `@layer base`, **sin adoptar preflight**. La **categoría** —lo que entra por el nombre del
+   elemento— sigue viva.
+2. 🔴 **La frontera de los gates — SIGUE ABIERTA.** Escanean sólo `apps/studio-client/src`.
+   `apps/studio-web` no está vigilado: **184 hex crudos y 4 familias literales** medidos hoy. Dueño:
+   `TASK-1560` Slice 2.
+3. ~~**Fuga del `axis-pilot-canary` — SIN DUEÑO.**~~ **CERRADA en `403d346`.** Mataba el envoltorio de
+   `pnpm` y no el `vite` nieto, que sobrevivía reteniendo los pipes: **`pnpm test` no terminaba solo** y
+   dejaba un huérfano en el puerto 4326 por corrida (se acumularon doce, uno de tres días). Cerrada
+   señalando al **grupo** de procesos y esperando la muerte del nieto.
 4. **H9 del feed (tarjeta destacada) — SIN DUEÑO asignado en esta task.** No se arregló, y los
    bloqueadores están medidos: el 45 % vacío es alto fijo en la hoja más un pie `absolute`; y el `…` del
    título **no es CSS** — `DISPLAY_TITLE_MAX_LENGTH = 96` recorta por conteo de caracteres en
@@ -281,8 +286,10 @@ Lo que sigue abierto al cerrar esta task. **Tres de los cinco no tienen dueño**
   declaración protege la declaración, no el contrato.
 - Reuse / extend / new primitive: `new` sólo para el formato de cifras; los gates **extienden** el
   archivo que `TASK-1561` creó.
-- Open risks: el preflight no emitido deja el peso heredado fuera del alcance de cualquier gate que
-  escanee `className`. Sin dueño.
+- Open risks: el preflight no emitido dejaba el peso heredado fuera del alcance de cualquier gate que
+  escanee `className`. **Cerrado en `403d346`** con un peso declarado del SSOT en `@layer base`: el reset
+  vuelve innecesario el gate para este caso. Persiste la **categoría** — otro elemento HTML con default
+  propio del UA vuelve a caer fuera de todo escaneo de clases.
 
 ### Visual verification
 
@@ -347,7 +354,8 @@ Nueve hallazgos de una revisión visual en vivo. Los dos de fondo:
   task no reclama haberla revisado visualmente.
 - **El preflight de Tailwind.** Se diagnosticó y se declaró abierto; no se decidió su remedio, porque
   emitir el preflight cambia el reset de toda la superficie y esa es una decisión del motor
-  (ADR-016 / `TASK-1485`), no de esta task.
+  (ADR-016 / `TASK-1485`), no de esta task. **Delta: el preflight sigue fuera** — lo que se cerró después
+  (`403d346`) fue el síntoma, neutralizando `b, strong` con un peso del SSOT. Ver Follow-ups.
 - **Cualquier cambio de backend, de capability o de scope de autenticación.**
 
 ## Detailed Spec
@@ -413,7 +421,7 @@ El orden fue y debe leerse así: **Slice 1 → Slice 2 → Slice 3**.
 |---|---|---|---|---|
 | Cambiar el peso pedido altera la jerarquía percibida más allá de lo previsto | UI (Producer) | medium | Revisión humana en vivo a 1440px después de cada despliegue, no sólo canarios | Revisión visual del operador |
 | El gate nuevo produce falsos positivos y bloquea trabajo ajeno | UI / tooling | low | Los dos gates se ejercitaron contra el payload completo antes del despliegue; 129/129 verdes | `node --test` rojo en la suite del payload |
-| El gate da falsa sensación de cobertura completa | UI / tooling | **high** | Declarado explícito: el peso heredado por preflight no emitido es invisible al gate. Punto abierto 1, **sin dueño** | Ninguna señal automática — sólo aparece en revisión visual |
+| El gate da falsa sensación de cobertura completa | UI / tooling | **high** | Declarado explícito: el peso heredado por preflight no emitido es invisible al gate. **Punto 1 cerrado en `403d346`** con un reset en `@layer base`, no con un gate; la categoría (defaults del UA) sigue sin cobertura automática | Ninguna señal automática — sólo aparece en revisión visual |
 | El token `--rail-scrim` se usa fuera del riel y se convierte en un gris genérico | design tokens | low | Nombre acotado a su función; el SSOT es único | Deriva visible en revisión |
 | La corrección del contenedor rompe el panel en anchos que no se revisaron | UI (Producer) | low | Canarios existentes a 1440/390/320 verdes | Canario del composer rojo |
 | El H9 medido y no arreglado se pierda como conocimiento | UI (feed) | medium | Bloqueadores escritos con archivo y constante exactos, acá y en el handoff de runtime | — |
@@ -521,16 +529,23 @@ gcloud run services describe globe-studio-internal \
 
 ## Follow-ups
 
-- **Sin dueño — el preflight de Tailwind no se emite.** `b, strong { font-weight: bolder }` pide el corte
-  fuerte por herencia, sin que ninguna clase lo diga. Todo gate que escanee `className` es ciego a esto.
-  Apareció tres veces en un día. Necesita dueño: emitir el preflight cambia el reset de toda la
-  superficie, así que la decisión pertenece al motor de estilos (ADR-016 / `TASK-1485`), pero **hoy
-  ninguna task lo reclama**.
+- ~~**Sin dueño — el preflight de Tailwind no se emite.**~~ **CERRADO 2026-07-29 en `403d346`**, sin
+  adoptar preflight: `b, strong { font-weight: var(--weight-semibold) }` en `@layer base` de
+  `styles/tailwind.css`. 600 y no `inherit` porque `inherit` mata el énfasis. Medido en el runtime vivo
+  (revisión `globe-studio-internal-00101-x2d`) con `getComputedStyle` sobre los 25 `<strong>`/`<b>` del
+  Producer: 24 Geist@600, 1 Poppins@700, **cero sintetizados**. Consecuencia vigente: el énfasis sobre Geist
+  **topa en 600** — más peso es `font-display` (Poppins 700). **Lo que NO se cerró es la categoría:** lo que
+  entra por el nombre del elemento sigue siendo invisible a un gate de `className`, así que otro elemento con
+  default propio del UA reabre el agujero. Detalle en el contrato de tipografía §6.
 - **`TASK-1560` Slice 2** — la frontera de los gates hacia `apps/studio-web`, que hoy tiene 184 hex
   crudos y 4 familias literales medidos. Hereda las dos clases nuevas.
-- **Sin dueño — fuga del `axis-pilot-canary`.** Mata el envoltorio de `pnpm` y no el `vite` nieto, que
-  sobrevive reteniendo los pipes: `pnpm test` no termina solo y deja un huérfano en el puerto 4326 por
-  corrida. Se acumularon doce, uno de tres días. **Ninguna task lo reclama hoy.**
+- ~~**Sin dueño — fuga del `axis-pilot-canary`.**~~ **CERRADO 2026-07-29 en `403d346`.** `pnpm exec vite` no
+  es un proceso sino tres (wrapper de `pnpm`, su `node`, el `vite` nieto) y el `kill` alcanzaba sólo al
+  primero. El arreglo: `detached: true` + `process.kill(-pid, …)` al **grupo** de procesos, esperando a que
+  muera con escalón a `SIGKILL` — sin ese `await` el proceso puede terminar antes de que el nieto suelte el
+  puerto, que es el mismo bug con otro disfraz. En Windows se conserva `server.kill()`. Medición:
+  `pnpm --filter @efeonce-globe/studio-client test` → **exit 0 en 29 s** (antes: indefinido), 129/129, tres
+  canarios verdes, cero huérfanos en el 4326. **El workaround manual del puerto queda retirado.**
 - **H9 del feed, medido y no arreglado.** El 45 % vacío es alto fijo en la hoja más un pie `absolute`; y
   el `…` del título **no es CSS** — `DISPLAY_TITLE_MAX_LENGTH = 96` recorta por conteo de caracteres en
   `packages/domain/src/producer-live-feed.ts`, antes de que exista layout. Ningún ancho lo arregla. La
@@ -552,10 +567,34 @@ contra el sistema de archivos y contra el registry, y se corrigió el pie. Barri
 superficie**, no por título: la vecina real de esta task es `TASK-1561` (misma superficie: los gates de
 contrato de diseño del payload), y no comparten ninguna palabra del título.
 
+## Delta 2026-07-29 — dos gaps cerrados en `403d346`
+
+Dos de los tres puntos que esta task declaró **sin dueño** se cerraron en código, se desplegaron y se
+midieron contra el runtime vivo el mismo día. La task no se reescribe: su registro de lo que **hizo** sigue
+intacto, y acá se declara lo que cambió después.
+
+| Gap | Estado | Cierre | Medición |
+|---|---|---|---|
+| 1 · `bolder` del UA | ✅ cerrado | `b, strong { font-weight: var(--weight-semibold) }` en `@layer base` de `apps/studio-client/src/styles/tailwind.css`. **Sin adoptar preflight**; 600 y no `inherit` porque `inherit` mata el énfasis | `getComputedStyle` sobre los 25 `<strong>`/`<b>` del Producer vivo: 24 Geist@600, 1 Poppins@700, **`SINTETIZADOS: []`** |
+| 3 · fuga del `axis-pilot-canary` | ✅ cerrado | `detached: true` + `process.kill(-pid, …)` al **grupo** de procesos, esperando la muerte con escalón a `SIGKILL`. `server.kill()` se conserva en Windows | `pnpm --filter @efeonce-globe/studio-client test` → **exit 0 en 29 s** (antes: indefinido), 129/129, tres canarios verdes, cero huérfanos en el 4326 |
+| 4 · H9 del feed | 🔴 abierto | — | Bloqueadores medidos y vigentes: alto fijo en la hoja más pie `absolute`; `DISPLAY_TITLE_MAX_LENGTH = 96` recorta por conteo de caracteres en `packages/domain/src/producer-live-feed.ts` |
+
+**Lo que NO cerró el gap 1:** la categoría. Un defecto que entra por el **nombre del elemento** sigue siendo
+invisible a cualquier gate que lea `className`; el reset cubre `b`/`strong`, no un elemento futuro con otro
+default del UA. **Y el workaround del gap 3 —correr los canarios por separado y liberar el 4326 a mano— queda
+retirado:** sostener un workaround para un bug muerto hace pagar el costo dos veces y enseña a desconfiar del
+comando canónico.
+
+Revisión viva verificada con `gcloud run services describe globe-studio-internal`:
+`globe-studio-internal-00101-x2d`, imagen `…globe-studio-internal:403d3464e88e`.
+
 ## Open Questions
 
-- ¿Emitir el preflight de Tailwind, o construir una verificación que lea el HTML renderizado en vez del
-  `className`? La primera cambia el reset de toda la superficie; la segunda es un tipo de gate que hoy no
-  existe. La decisión pertenece al dueño del motor de estilos y **no se tomó** en esta sesión.
+- ~~¿Emitir el preflight de Tailwind, o construir una verificación que lea el HTML renderizado?~~
+  **Resuelto por una tercera vía en `403d346`:** neutralizar `b, strong` en `@layer base` con un peso del
+  SSOT. El preflight sigue fuera (decisión de ADR-016, intacta) y el gate sobre HTML renderizado sigue sin
+  existir. **Lo que queda abierto es la categoría:** ¿hace falta un gate estructural que exija peso declarado
+  en todo elemento con default del UA (`h1`–`h6`, `th`)? Hoy el mecanismo es el reset, que cubre los
+  elementos que conocemos, no los que alguien introduzca después.
 - ¿Quién adopta el H9 del feed — `TASK-1559` o `TASK-1526`? Ambas tocan la superficie; ninguna declara
   hoy el hallazgo.
