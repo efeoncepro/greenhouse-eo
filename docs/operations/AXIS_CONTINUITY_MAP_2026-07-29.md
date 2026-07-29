@@ -84,6 +84,50 @@ Dockerfile (`68a2cbe`, `d009871`, `b9112a8`, `403d346`; revisión viva `00101-x2
 
 ---
 
+## 2-bis. Hueco que este mapa NO cubrió, y que apareció después (2026-07-29, `e3f3e667a`)
+
+**Los tres Cloud Run workers de Greenhouse construían con `401 Unauthorized` sobre `@efeoncepro/axis-tokens`.**
+
+Este diagnóstico verificó, para Greenhouse, **GitHub Actions** (10 workflows con wiring) y **Vercel**
+(`NPM_RC` en tres entornos) — y **no verificó su Cloud Build**. Greenhouse tiene un tercer carril de build que
+no es ninguno de esos dos: `services/{ops-worker,ico-batch,commercial-cost-worker}`, cada uno con su
+`Dockerfile` + `deploy.sh`. Ahí faltaba la auth.
+
+> **La lección de método, que vale más que el arreglo:** "el consumidor tiene la auth" no es una respuesta
+> hasta que se enumeran **todos** sus carriles de build. Greenhouse tiene tres (Actions, Vercel, Cloud Build);
+> comprobar dos y concluir da un verde que no existe.
+
+Corregido aplicando el patrón canónico de Globe —Secret Manager + BuildKit `--mount=type=secret`, sin token en
+imagen, logs ni runtime— **en los dos RUN de cada Dockerfile**, que es donde el primer deploy de Globe se
+había estrellado (`--mount=type=secret` es por-RUN y `pnpm deploy --prod` re-resuelve después). Incluye
+extensión del `worker-build-contract-gate` con su test.
+
+### ⚠️ Acoplamiento cross-proyecto: deliberado, temporal, y con condición de retiro
+
+Para habilitarlo se concedió `roles/secretmanager.secretAccessor` **sobre ese único secreto** al SA de Cloud
+Build de Greenhouse:
+
+```
+axis-packages-read-token  (vive en GCP efeonce-globe)
+  ├── 818083690953-compute@  ← Cloud Build de Globe        (preexistente)
+  └── 183008134038-compute@  ← Cloud Build de Greenhouse   (agregado 2026-07-29)
+```
+
+**Se decidió NO duplicar el secreto.** Dos copias son dos rotaciones, y con el PAT venciendo el 2026-08-27 la
+segunda es la que alguien olvida.
+
+**Pero hay que verlo por lo que es:** `axis-packages-read-token` es una credencial **del ecosistema AXIS**
+archivada en el proyecto de un **producto**, porque ese producto la necesitó primero. La consecuencia es que
+**los builds de Greenhouse dependen hoy del proyecto GCP de Globe** — lo que invierte la dirección de
+gobierno, ya que Greenhouse gobierna a Globe.
+
+🔴 **Condición de retiro — y es una DECISIÓN, no un vencimiento automático.** Al reemplazar el PAT por la
+identidad de máquina (requisito previo a rollout externo, §7), el secreto nuevo **debe nacer fuera del
+proyecto de un producto**. Si simplemente se recrea en `efeonce-globe`, **el acoplamiento se reinstala en
+silencio y nadie lo nota**, porque todo sigue funcionando. Es el único momento en que retirarlo cuesta cero.
+
+---
+
 ## 3. Qué falta en GREENHOUSE
 
 | Falta | Archivo / superficie | Nota |
@@ -183,7 +227,8 @@ Son evidencia de promoción, no capacidad. Se cierran juntos en una pasada.
 
 | Gate | Estado | Detalle |
 |---|---|---|
-| PAT → identidad de máquina | 🔴 **con reloj: 2026-08-27** | Operator-owned. Requisito declarado antes de rollout externo. |
+| PAT → identidad de máquina | 🔴 **con reloj: 2026-08-27** | Operator-owned. Requisito declarado antes de rollout externo. **Es también la única ventana barata para retirar el acoplamiento cross-proyecto de §2-bis** — el secreto nuevo debe nacer fuera del proyecto de un producto. |
+| Credencial AXIS en proyecto neutral | ❌ vive en `efeonce-globe` (proyecto de un producto) | Ver §2-bis. Aceptado como temporal para no crear una segunda copia que rotar. |
 | Secreto nunca en la imagen | ✅ | BuildKit `--mount=type=secret`, montado en **ambos** RUNs desde el fix del Delta. |
 | Token nunca en logs ni lockfile | ✅ | `trap 'rm -f .npmrc' EXIT` en Actions. |
 | Paquetes privados, no públicos | ✅ | El runbook lo prohíbe explícitamente como atajo. |
