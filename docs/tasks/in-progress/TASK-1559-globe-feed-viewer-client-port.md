@@ -443,3 +443,71 @@ de un error de decodificación.
 port —que cubrió composer, header y tool dock—. **Feed, viewer y share siguen sin auditar**, y este defecto
 vino justamente de ahí: si el patrón se repitió en esas superficies, sigue invisible.
 Ver [auditoría 2026-07-29 §5](../../audits/globe/GLOBE_PRODUCER_VERIFICATION_BLIND_SPOTS_2026-07-29.md).
+
+## Delta 2026-07-29 (2) — el H9 del hero, y un invariante de esta task que se está violando
+
+Sale de una **revisión visual en vivo** del Producer desplegado (1440 px, sesión real), no de la suite:
+build, ESLint, 129 tests y tres canarios estaban verdes con todo lo de abajo en pantalla. Se adopta acá
+porque `TASK-1526`, la dueña real del dominio, está `complete` — colgarle alcance abierto a una task cerrada
+la reabre por la puerta de atrás. Esta task queda como el registro vivo del feed sobre el payload cliente.
+
+### 🔴 `displayTitle` SÍ sale del prompt — el criterio de aceptación no está cumplido
+
+Esta task declara como regla obligatoria *«**NUNCA** derivar `displayTitle` del prompt ni dejar una receta
+faltante como título permanente»*, y su criterio `[ ] displayTitle nunca sale del prompt` sigue **sin marcar**.
+**Se está violando**, y la evidencia es el SQL del store
+(`packages/database/src/stores/producer-live-feed-store.ts:140` y `:180`):
+
+```sql
+NULLIF(COALESCE(e.request->>'prompt', e.request#>>'{structuredBrief,ingredients,0,value}', …)) AS display_title
+```
+
+El prompt es **el primer término del `COALESCE`**. El fallback `displayTitle(route, capability)`
+(`packages/domain/src/producer-live-feed.ts:254`) es la otra mitad que la regla prohíbe: la receta como
+título permanente.
+
+**Síntoma observable**, y es el que disparó la revisión: dos cards de video de la grilla son **literalmente
+indistinguibles** — mismo degradado, mismo play, mismo título truncado en el mismo carácter, mismo modelo,
+mismo estado, mismo crédito. No es un defecto de render: **son dos corridas del mismo prompt, y un prompt no
+identifica una corrida**. Mientras el título sea el prompt, el feed no puede distinguir dos intentos de la
+misma intención, que es exactamente lo que un operador hace todo el día.
+
+**El criterio no se marca.** Queda declarado como abierto con su evidencia, que es lo contrario de darlo por
+bueno porque la superficie renderiza.
+
+### El `…` del título no es CSS, y ningún ancho lo arregla
+
+`DISPLAY_TITLE_MAX_LENGTH = 96` (`producer-live-feed.ts:260`) recorta por **conteo de caracteres** y pega el
+`…` **antes de que exista layout**. Con la columna al 100 % se vería el mismo `…`, ahora a mitad de línea.
+Ensanchar la card no hace nada.
+
+⚠️ **No se mueve a CSS sin decidirlo como contrato.** Ese recorte es parte de la **proyección** que consumen
+MCP, SDK, CLI y cualquier plataforma hermana, no sólo la card web: mover el recorte al cliente significa que
+el contrato deja de entregar un string acotado y **todos los demás consumidores heredan uno sin cota**. El
+radio de impacto excede el feed.
+
+### El 45 % vacío del hero es consecuencia de dos reglas correctas
+
+`.pf__hero-media` tiene techo de altura y `.pf__hero-foot` es `position: absolute; inset-block-end: 0`, así
+que el contenido **no puede empujar el alto**: crece hacia arriba desde el borde inferior y el sobrante queda
+arriba. Las dos reglas están bien y el techo está argumentado en la propia hoja (*«sin él, a 1440 px un 16/7
+da ~610 px y el hero se come el fold… el feed tiene que seguir siendo un feed»*).
+
+El vacío aparece porque **el media no llena su caja**, y no la llena porque hoy es un placeholder. El hero de
+audio **sí** la llena con su onda — por eso se ve razonable. **Está aguas abajo de `TASK-1569`** (póster de
+video): redistribuir el espacio ahora es diseñar alrededor de un placeholder y volver a hacerlo cuando llegue
+el arte real.
+
+Menor, del mismo bloque: `.pf__duration { right: 43px }` escalona los créditos para dejarle sitio a
+`.pf__select`, un control que **el hero no renderiza** — 26 px muertos contra el borde derecho.
+
+### Descartado, para que no se reintente
+
+Elegir el hero por *«el más nuevo que tenga arte»* llenaría el frame, pero **fabrica una jerarquía que el
+contrato no trae** y haría saltar el hero de pieza mientras las miniaturas resuelven de forma asíncrona.
+
+### Secuencia propuesta
+
+1. `TASK-1569` (póster) primero: con arte real en la caja se sabe cuánto espacio sobra **de verdad**.
+2. El título como **decisión de contrato** con ADR corto — no es trabajo de maqueta, y la pregunta real no es
+   en cuántos caracteres cortar sino **si el título de una corrida debería ser su prompt**.
