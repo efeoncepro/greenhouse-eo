@@ -741,20 +741,3 @@ fuente de verdad. Nada autenticado se cachea, verificado path por path.
   runtime) implica **gasto real** de proveedor y/o promoción comercial a un workspace de cliente real — requiere
   autorización explícita del operador; no se ejecuta de forma autónoma. La lane ya se probó en vivo con proveedor
   interno (canary de lane + 2 atestaciones comerciales firmadas por el CEO). Task sigue `in-progress` por este gate.
-
-## 2026-07-24 — Globe formaliza Storyboard Studio y Narrative Preproduction
-
-- ADR-012/SPEC-012 establecen Storyboard Studio como surface propia, no como capability aislada de Producer o
-  Video Effectiveness. Narrative Preproduction posee Brief/Script/Storyboard/revisiones/review/handoffs; media
-  generation, análisis, asset governance, scheduling y delivery conservan sus dueños.
-- La experiencia seleccionada es Editorial Sequence Desk: Brief, Outline, Guion, Storyboard y Review sobre un
-  Structured Sequence Canvas responsive. Comentarios y markup vectorial se anclan a revisiones exactas; un mask
-  crea una intención de edición que Producer estima/ejecuta, sin mutar assets desde Storyboard.
-- Los shots pueden combinar contribuciones capturadas, grabadas, generativas, licenciadas, de archivo y
-  determinísticas como `mixed-origin realization`; no se reutiliza el término comercial `Hybrid`. La IA propone
-  diffs y humanos aplican, aprueban, ejecutan e incorporan.
-- `TASK-1542` cerró el contrato documental y `TASK-1543…1550` registran dominio durable, colaboración, propuestas,
-  handoffs, canvas, exports, rollout cliente y el Realization Orchestrator que coordinará ProductionPlans con
-  Producer sin mutar Storyboard. El grafo quedó parallel-first: el primer fold avanza con fixtures, Video
-  Effectiveness y paquetes de export se habilitan por slice, y exports `policy-blocked` no frenan el primer piloto.
-  No hubo cambios de runtime ni habilitación externa.
