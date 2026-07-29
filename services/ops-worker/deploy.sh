@@ -190,7 +190,7 @@ images:
   - '${IMAGE}'
 availableSecrets:
   secretManager:
-    - versionName: projects/efeonce-globe/secrets/axis-packages-read-token/versions/latest
+    - versionName: projects/efeonce-group/secrets/axis-packages-read-token/versions/latest
       env: AXIS_PACKAGES_READ_TOKEN
 options:
   logging: CLOUD_LOGGING_ONLY
