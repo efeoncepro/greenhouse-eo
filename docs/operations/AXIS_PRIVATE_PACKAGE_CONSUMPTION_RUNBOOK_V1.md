@@ -36,11 +36,13 @@ source control.
 - Cloud Build ejecutó el contrato **en real** el 2026-07-29: los cuatro worker deploys de Greenhouse
   corrieron verdes contra `0.1.5`. Ver los 4 puntos más abajo — **2 de 4 verificados**; faltan la
   comprobación de no-leak sobre la imagen y el ejercicio de rollback.
-- The Globe AXIS browser/accessibility/reduced-motion evidence is automated by
-  `apps/studio-client/scripts/axis-pilot-canary.test.mjs`. ⚠️ **Ese canary NO se ejecuta en el CI de Globe:**
-  resuelve Playwright con un fallback a una ruta absoluta del disco de un desarrollador, así que muere con
-  `ERR_MODULE_NOT_FOUND` en cualquier runner. El CI de Globe lleva 9 commits en `failure` por esa causa
-  (compartida con otros tres canaries). La evidencia del piloto sigue siendo **local, no de CI**.
+- ✅ The Globe AXIS browser/accessibility/reduced-motion evidence is automated by
+  `apps/studio-client/scripts/axis-pilot-canary.test.mjs` **y desde el 2026-07-29 corre en el CI de Globe**.
+  Hasta entonces no corría: resolvía Playwright con un fallback a una ruta absoluta del disco de un
+  desarrollador y moría con `ERR_MODULE_NOT_FOUND` en cualquier runner, dejando el CI de Globe rojo 9
+  commits (`ISSUE-128`, resuelto en `efeonce-globe@498ffce` con `playwright-core` + `channel: 'chrome'`,
+  sin descargar browsers). Evidencia: run `30499520419` `success` con `AXIS pilot canary OK` en el log.
+  La evidencia del piloto pasa de **local** a **CI**.
 
 ## Delta 2026-07-29 — dónde vive el credencial, y dónde NO hace falta (TASK-1589 V1.1)
 

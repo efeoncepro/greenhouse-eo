@@ -82,6 +82,22 @@ En Greenhouse:
   build y readback verificado. **Cero versiones**: inerte, sin riesgo, y el legacy sigue sirviendo a los
   builds sin cambio de runtime.
 
+### Delta 2026-07-29 (b) — la evidencia del piloto AXIS pasa de local a CI (`ISSUE-128`)
+
+El `axis-pilot-canary` figuraba como evidencia automatizada del piloto, pero **nunca había corrido en CI**:
+resolvía Playwright con un fallback a una ruta absoluta del disco de un desarrollador, así que moría con
+`ERR_MODULE_NOT_FOUND` en cualquier runner. El CI de Globe llevaba 9 commits en `failure` por esa causa,
+compartida con otros tres canaries. Detrás había un segundo fallo, sólo visible tras arreglar el primero:
+un aserto huérfano pineaba el catálogo en `1.4.0` cuando ya estaba en `1.5.0`.
+
+Resuelto en `efeonce-globe@498ffce` con `playwright-core` (nunca descarga browsers) + `channel: 'chrome'`
+sobre el Chrome preinstalado del runner — el mismo patrón que `playwright.yml` de Greenhouse. **La
+disyuntiva de costo que parecía necesaria se disolvió: gates reales con cero descarga de browser.**
+
+Evidencia: run `30499520419` `success`, primer verde en 10 commits, con `composer canary OK` y
+`AXIS pilot canary OK` en el log del runner — corrieron, no se saltearon. Detalle completo en
+`docs/issues/resolved/ISSUE-128-globe-canaries-absolute-path-ci-failure.md`.
+
 ### Pendiente — sólo el operador (un agente no debe ejecutarlo)
 
 1. Crear la identidad de máquina con `read:packages` únicamente y su dueño de rotación.
