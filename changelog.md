@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-29 — PR #164: promoción completa y release detenido por evidencia de smoke
+
+- PR #164 promovió todo `develop` a `main` en `e711fe2560e3a7c2e7e8639e07a8a394e9582cdb`; no hubo cherry-picks ni
+  release aislado de AXIS.
+- CI/CI Deep, Vercel READY y los gates de governance pasaron. El orchestrator `30452322643` detuvo el proceso en
+  preflight por falta de smoke asociado al SHA de `main`; el smoke manual `30452463889` pasó verde posteriormente.
+- Queda pendiente reintentar el orchestrator sin bypass cuando la API de GitHub Actions responda. No hubo manifest,
+  deploy de workers ni promoción parcial.
+
 ## 2026-07-29 — PR #164: autenticación de paquetes privados y gobierno de release
 
 - Los workflows con instalación de dependencias privadas usan `GITHUB_TOKEN` con `packages: read` y un `.npmrc`
@@ -740,13 +749,3 @@ fuente de verdad. Nada autenticado se cachea, verificado path por path.
   Producer sin mutar Storyboard. El grafo quedó parallel-first: el primer fold avanza con fixtures, Video
   Effectiveness y paquetes de export se habilitan por slice, y exports `policy-blocked` no frenan el primer piloto.
   No hubo cambios de runtime ni habilitación externa.
-
-## 2026-07-24 — Globe separa la paridad de avatar canónico de Producer
-
-- `TASK-1551` extrae el avatar de cuenta de `TASK-1505`: Greenhouse seguirá siendo el único source of truth de la
-  foto sincronizada desde Entra/Graph y Globe la consumirá mediante descriptor OAuth, reader self-only y BFF
-  same-origin.
-- El contrato prohíbe hardcode, copias de la foto, acceso browser-side a Graph/GCS/URLs privadas y lookups por
-  user id arbitrario. Trigger y panel usarán la foto cuando exista e iniciales como fallback.
-- Es planificación/contrato, no implementación ni deploy. `TASK-1505` recupera un cierre propio de Producer; la
-  evidencia de avatar queda aislada en `TASK-1551`.

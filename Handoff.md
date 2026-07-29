@@ -1,25 +1,39 @@
 # Handoff activo
 
-## 2026-07-29 — PR #164: release hardening y promoción pendiente
+## 2026-07-29 — PR #164: main promovido, release bloqueado en smoke control-plane
 
-`develop` está en `9a39d27c2c4e13dfecdcc646cdf326624e1fb5de` con el fix de autenticación privada AXIS. Los
-workflows de GitHub usan `GITHUB_TOKEN` + `packages: read` y un `.npmrc` efímero en `$RUNNER_TEMP`; Vercel usa el
-proyecto `efeonce-7670142f/greenhouse-eo` y `NPM_RC` cifrado en `staging`, Preview de `develop` y Production.
+`develop` quedó en `2ecef6a5c4c8a79a738536fe04192b7343e358b0` y PR #164 promovió todo el contenido a `main` mediante
+el merge completo `e711fe2560e3a7c2e7e8639e07a8a394e9582cdb`. CI, CI Deep, context-governance, CLAUDE, task-contract,
+Design Contract, smoke afectado y Vercel pasaron. Vercel production quedó READY para ese SHA.
 
-Validación local: instalación privada, lint, typecheck, build, route-reachability (225/225), CLAUDE budget/audit,
-task tests, `ops:lint --changed`, `qa:gates --changed` y `git diff --check`. El PR debe volver a verificar CI,
-context-governance, task-contract, Playwright y Vercel antes del release. La rotación documental preservó el handoff
-anterior en [`2026-07-pre-release.md`](docs/operations/agent-context-history/handoff/2026-07-pre-release.md).
+El primer orchestrator `30452322643` se detuvo en preflight, antes de crear manifest, aprobar Production o desplegar
+workers. Causa exacta: `playwright_smoke` tenía cero runs para el SHA de `main`; el smoke manual canónico
+`30452463889` ya pasó verde y publicó resultados en Postgres. Un segundo dispatch sin bypass quedó bloqueado por
+timeout intermitente de la API de GitHub; no hay evidencia de un run nuevo. Estado honesto: **code complete, rollout
+pendiente / operativamente bloqueado**. Reintentar `production-release.yml` con el SHA exacto, sin bypass, cuando la
+API de Actions esté disponible.
 
-Los cambios locales ajenos siguen fuera del commit: `.vercel/project.json` y los dos artefactos SKY Blog. No se han
-implementado trabajos nuevos de AXIS/Globe; el release debe promover todo `develop` como unidad.
+Cambios propios: autenticación efímera de paquetes privados AXIS en workflows, `NPM_RC` cifrado en Vercel `staging`,
+Preview develop y Production, compactación documentada de contexto, corrección del presupuesto/auditoría de
+`CLAUDE.md` y manifest de reachability. La credencial Vercel actual es operator-owned y debe rotarse por una
+identidad read-only antes de rollout externo.
+
+Los cambios locales ajenos siguen fuera de commits: `.vercel/project.json` y los dos artefactos SKY Blog. No se
+implementó trabajo nuevo de AXIS/Globe.
 
 ## AXIS/Globe — continuidad sin implementación
 
-Globe sigue siendo producto comercial Efeonce; su estadio técnico permanece `internal-only`/`internal_smoke`.
-Revisar TASK-1480, TASK-1485, TASK-1552, TASK-1591, ADR-010, ADR-016, la arquitectura Creative Studio, el runtime
-handoff, el runbook de paquetes privados y el estado de la flota de modelos. El siguiente task recomendado se
-define sólo después del cierre de este release y debe separar lo ya incluido de lo pendiente para Globe/AXIS.
+Globe sigue siendo producto comercial Efeonce; su estadio técnico permanece `internal-only`/`internal_smoke`, con
+externos gated por TASK-1480. Incluido en este release de Greenhouse: el fixture opt-in `/design-system/axis-adapters`,
+la infraestructura de consumo privado y la documentación/gates asociados. Pendiente para Globe/AXIS: TASK-1591 tiene
+promoción productiva pendiente; TASK-1485 sigue `to-do` y depende de TASK-1455/aceptación ADR-016; TASK-1552 mantiene
+Slice 3 abierto (estados de error/cancelación, evidencia premium y operación live/internal-only); TASK-1480 requiere
+cerrar dossier/evidencia del lane managed y no habilita runtime operado por cliente. ADR-010 mantiene atestación,
+promoción por ruta y gates comerciales; ADR-016 exige Tailwind v4 + `tokens.ts` como theme y cero literales de diseño.
+
+Siguiente task recomendado: **TASK-1480**, cerrar primero el readiness dossier del lane managed SKY con sus gates de
+derechos, gasto, ruta, rollback, entrega segura, SOW y facturación; después coordinar TASK-1485/TASK-1552 según sus
+dependencias. No implementar ese trabajo en esta sesión.
 
 La historia anterior y los índices archivados viven en [Handoff.archive.md](Handoff.archive.md) y
 `docs/operations/agent-context-history/`; no cargar esos shards completos al inicio.
