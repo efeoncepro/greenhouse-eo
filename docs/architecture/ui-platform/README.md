@@ -27,6 +27,15 @@ Esta carpeta describe la **plataforma de ingeniería UI**. El **lenguaje visual 
 
 Regla: cuando un doc temático difiera del runtime, **gana el runtime** y el doc se actualiza.
 
+### AXIS cross-runtime boundary
+
+AXIS gobierna tokens, contratos y registry compartidos; cada producto conserva su adapter y
+runtime nativo. Para consumir AXIS desde Greenhouse, Globe o un producto futuro, usa la decisión
+[EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1](../EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md),
+el [runbook de paquetes privados](../../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md)
+y la evidencia de [TASK-1591](../../tasks/complete/TASK-1591-efeonce-ui-adapters-pilot.md). No copies
+componentes MUI/Vuexy a Globe ni conviertas el Lab en una dependencia de runtime de producto.
+
 ## Mapa "¿dónde vive X?"
 
 | Necesito… | Doc |

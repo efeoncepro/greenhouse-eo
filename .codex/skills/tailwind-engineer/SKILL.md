@@ -34,8 +34,9 @@ AXIS is Efeonce's portable foundation and Lab. For Globe, the native adapter is
 Tailwind v4 and the theme is generated from semantic tokens in `tokens.ts`; do
 not use literal values or arbitrary design values in `className`. Consult
 `docs/architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md` and
-`docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`. Do not claim
-consumer runtime readiness while `TASK-1591` remains pending.
+`docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`. `TASK-1591` now
+has an opt-in Globe consumer pilot verified at package `0.1.4`; do not infer product-
+promotion readiness from the pilot alone.
 
 **Sello de frescura: núcleo verificado as-of 2026-07.** Los **mecanismos** de v4 (CSS-first, `@theme`,
 `@utility`, capas, namespaces) son estables. Lo **volátil** es qué utilidades existen: v4.2 y v4.3

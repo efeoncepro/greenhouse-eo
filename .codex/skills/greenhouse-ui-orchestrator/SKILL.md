@@ -13,8 +13,8 @@ AXIS is the portable foundation and Lab. Route consumers through native
 adapters: MUI for Greenhouse and Tailwind v4 for Globe. Require semantic tokens
 and `tokens.ts` for every design value; reject literals in UI code. Consult the
 shared UI ADR and `docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`
-for package/auth boundaries. Do not mark consumer runtime ready while
-`TASK-1591` is pending.
+for package/auth boundaries. The `TASK-1591` opt-in consumer pilot is verified at
+package `0.1.4`; keep product promotion behind the release and rollback gates.
 
 ## Composition Shell — default base for every NEW interface (TASK-1114/1117/1119 · operator directive 2026-06-14)
 

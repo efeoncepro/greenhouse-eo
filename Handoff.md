@@ -22,7 +22,7 @@ La distribución privada ya tiene sus precondiciones operativas verificadas: Gre
 tiene el secreto `axis-packages-read-token` en Secret Manager con `roles/secretmanager.secretAccessor` para el
 service account de Cloud Build. El procedimiento y la evidencia no sensible viven en
 [`AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
-Estado honesto: **foundation/distribution completas; consumer runtime pendiente**. El PAT actual es operator-owned
+Estado histórico de ese corte: **foundation/distribution completas; consumer runtime pendiente**. El PAT actual es operator-owned
 y vence el 2026-08-27; antes del rollout externo se debe reemplazar por una identidad de máquina dedicada.
 
 ## 2026-07-28 — Globe: payload React en pipeline Tailwind v4

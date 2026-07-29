@@ -60,6 +60,10 @@ La capa portable no puede importar MUI, Vuexy, Next, browser globals ni lógica 
 
 ## Delivery evidence — 2026-07-28
 
+The foundation was originally published as `0.1.2` for this task. AXIS subsequently
+published `0.1.4` with the consumer-governed status/progress contracts used by
+`TASK-1591`; the original version evidence below remains historical.
+
 - Repositorio privado: `efeoncepro/axis-design-system`.
 - Packages privados publicados: `@efeoncepro/axis-tokens`, `@efeoncepro/axis-ui-contracts` y `@efeoncepro/axis-ui-registry`, `0.1.2`.
 - Lab: `https://axis-design-system-lab.vercel.app`.

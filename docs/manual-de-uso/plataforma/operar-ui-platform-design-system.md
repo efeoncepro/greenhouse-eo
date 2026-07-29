@@ -25,6 +25,15 @@
 4. Revisa props, variants y kinds documentados.
 5. Usa la primitive desde `@/components/greenhouse/primitives` cuando exista.
 
+## Consumir AXIS desde otro producto
+
+1. Lee la [decisión de plataforma compartida](../../architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md)
+   y el [runbook de paquetes privados](../../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
+2. Consume contracts, tokens y registry versionados; implementa el adapter con el runtime nativo
+   del producto. No copies MUI/Vuexy a Globe ni importes primitives de Greenhouse.
+3. Mantén el consumo opt-in hasta verificar instalación privada, responsive, teclado, reduced motion,
+   build y rollback. La evidencia del canary actual vive en [TASK-1591](../../tasks/complete/TASK-1591-efeonce-ui-adapters-pilot.md).
+
 ## Operar handoffs de diseño producto
 
 1. Abre `/design-system/handoff`.

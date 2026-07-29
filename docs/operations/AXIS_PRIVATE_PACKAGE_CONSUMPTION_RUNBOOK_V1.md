@@ -6,7 +6,7 @@ This runbook describes how Greenhouse, Globe and future Efeonce products consume
 private AXIS packages without coupling runtimes or placing personal credentials in
 source control.
 
-## Current state — 2026-07-28
+## Current state — 2026-07-29
 
 - Package repository: `efeoncepro/axis-design-system`.
 - Private packages published at version `0.1.4`:
@@ -24,6 +24,12 @@ source control.
   `roles/secretmanager.secretAccessor`.
 - The current PAT is operator-owned and expires on 2026-08-27. Replace it with a
   dedicated machine identity before the first external/customer rollout.
+- Local private-package installation for the TASK-1591 canary was verified with a temporary
+  developer credential. CI/Cloud Build consumption is not yet end-to-end wired: the consumer
+  workflows and `studio-web` Docker build still need to materialize `AXIS_PACKAGES_READ_TOKEN`
+  ephemerally before `pnpm install --frozen-lockfile`.
+- The Globe AXIS browser/accessibility/reduced-motion evidence is currently a local spot check;
+  a dedicated Playwright canary and persisted visual diff remain promotion gates.
 
 ## Required GitHub package access
 
@@ -89,6 +95,9 @@ The deployment workflow must prove:
 2. the resulting image does not contain `.npmrc` or the token;
 3. the deployed digest matches the build digest;
 4. rollback restores the previous package version and image digest.
+
+Until those checks are automated in the consumer pipeline, the AXIS adapters remain an opt-in
+canary and must not be described as a production-wide rollout.
 
 ## Credential options
 

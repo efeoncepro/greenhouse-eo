@@ -87,7 +87,8 @@ install private `@efeoncepro/axis-*` packages; they do not prove that Greenhouse
 or Globe imports, renders, or operates an AXIS consumer at runtime. The Vercel
 Lab's `NPM_RC` is Lab readiness evidence only, not consumer-runtime evidence.
 
-Treat the AXIS consumer rollout as gated by `TASK-1591`. Before promotion, the
+Treat AXIS consumer product promotion as gated by the release control plane;
+`TASK-1591` is the completed opt-in pilot. Before promotion, the
 release evidence must include the exact consumer build, package versions, target
 commit, image/deployment digest where applicable, runtime smoke evidence, and a
 rollback target. For Globe/Cloud Build, keep the package credential scoped to

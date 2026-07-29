@@ -2,7 +2,7 @@
 
 ## Status
 
-`Accepted — foundation published; consumer rollout gated`
+`Accepted — foundation published; opt-in consumer adapters verified`
 
 ## Context
 

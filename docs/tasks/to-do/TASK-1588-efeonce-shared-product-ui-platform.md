@@ -15,7 +15,8 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `optional`
-- Status real: `Diseño gobernado; ejecución por slices pendiente`
+- Status real: `Aceptada; foundation/distribución y piloto TASK-1591 completados; extracción del Lab,
+  workflow agéntico y promoción productiva siguen por slices`
 - Rank: `TBD`
 - Domain: `ui-platform|architecture|cross-runtime`
 - Blocked by: `none`
@@ -43,6 +44,15 @@ accesibilidad y evidencia.
 - Separar gobierno, contratos, adapters, consumers y Lab.
 - Producir un package foundation y un Lab independiente sin romper Greenhouse ni Globe.
 - Definir lifecycle y gates para que el desarrollo agéntico reutilice antes de crear.
+
+## Current progress — 2026-07-29
+
+- La decisión compartida está aceptada y AXIS publica paquetes privados `0.1.4`.
+- `TASK-1591` verificó adapters opt-in en Greenhouse y Globe; no implica promoción productiva.
+- `TASK-1590` mantiene la extracción del Lab como trabajo pendiente.
+- `TASK-1592` mantiene el workflow agéntico como trabajo pendiente.
+- Fuente canónica de consumo, autenticación y rollback:
+  `docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`.
 
 ## Architecture Alignment
 

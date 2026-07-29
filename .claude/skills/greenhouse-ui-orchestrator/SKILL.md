@@ -14,8 +14,9 @@ For `TASK-1376+`, validate `## Modular Placement Contract` before selecting plac
 AXIS is the portable foundation and Lab. Use native adapters: MUI for
 Greenhouse and Tailwind v4 for Globe. Require semantic tokens and `tokens.ts`,
 with no literal design values. Consult the shared UI ADR and
-`docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`; consumer
-runtime readiness remains pending while `TASK-1591` is pending.
+`docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`; the `TASK-1591`
+opt-in consumer pilot is verified at package `0.1.4`, while product promotion remains
+behind release and rollback gates.
 
 ## Composition Shell — default base for every NEW interface (TASK-1114/1117/1119 · operator directive 2026-06-14)
 

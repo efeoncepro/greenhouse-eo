@@ -18,7 +18,7 @@
 - Status real: `Diseño gobernado; workflow pendiente`
 - Rank: `TBD`
 - Domain: `ui-platform|agent-workflow`
-- Blocked by: `TASK-1589`
+- Blocked by: `none` (foundation publicada; workflow sigue pendiente)
 - Branch: `task/TASK-1592-efeonce-agentic-ui-registry-workflow`
 - Legacy ID: `none`
 - GitHub Issue: `none`

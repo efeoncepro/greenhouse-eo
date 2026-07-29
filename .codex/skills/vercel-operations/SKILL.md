@@ -52,7 +52,8 @@ If the task is time-sensitive or blocked by auth/protection, verify against offi
   configured project can be prepared to install private `@efeoncepro/axis-*` packages; it does
   not prove that a Greenhouse or Globe consumer imports, renders, or operates AXIS at runtime.
   The AXIS Lab's `NPM_RC` is Lab readiness evidence, not consumer-runtime evidence.
-- AXIS consumer deploys remain gated by `TASK-1591`. Before promotion, record the exact commit,
+- AXIS consumer deploys remain gated by product-promotion controls; `TASK-1591` is the verified
+  opt-in pilot. Before promotion, record the exact commit,
   package versions, deployment URL, build/deployment digest where available, runtime smoke evidence,
   and rollback target. If a rollback is needed, verify the restored deployment and its reproducible
   package/auth configuration; changing traffic alone is not sufficient evidence.

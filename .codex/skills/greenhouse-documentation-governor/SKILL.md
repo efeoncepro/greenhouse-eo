@@ -87,8 +87,11 @@ or operational doc for that domain.
 For AXIS work, use `TASK-1591`, the accepted shared UI platform ADR, and
 `docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md` as canonical pointers. Record package auth,
 environment variables, and secrets without copying secret values. Closure requires runtime completeness plus
-evidence for consumer adapters, visual/accessibility behavior, and rollback. Publishing AXIS packages is
-foundation/distribution evidence only; it does not justify moving `TASK-1591` to `complete`.
+evidence for consumer adapters, visual/accessibility behavior, and rollback. `TASK-1591` may move to
+`complete` when the opt-in adapter slice and its evidence are verified; that status does not imply
+production promotion. Publishing AXIS packages is foundation/distribution evidence only. CI/Cloud Build
+secret wiring, a dedicated browser canary, persisted visual diffs, and external promotion remain separate
+rollout gates when they are not yet implemented.
 
 ## Documentation Decision Matrix
 

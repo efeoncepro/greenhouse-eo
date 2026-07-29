@@ -132,11 +132,12 @@ When an architectural decision touches reusable UI across Greenhouse, Globe or f
 Greenhouse owns governance, registry, lifecycle, QA and evidence; each consumer owns its native adapter. Do not
 turn AXIS into a shared runtime, import MUI/Vuexy into the portable layer, or make Globe a Greenhouse module.
 
-The current verified state is **foundation/distribution ready, consumer rollout gated**: packages
+The current verified state is **foundation/distribution ready, opt-in consumer adapters verified**: packages
 `@efeoncepro/axis-tokens`, `@efeoncepro/axis-ui-contracts` and `@efeoncepro/axis-ui-registry` are published at
-`0.1.2`; Greenhouse and Globe have GitHub Packages `Read` access; the Lab has sensitive `NPM_RC` in Vercel
-Production/Preview; and Globe has `axis-packages-read-token` in Secret Manager with Cloud Build IAM. These facts
-do not mean Greenhouse or Globe consume AXIS at runtime. `TASK-1591` owns the adapters pilot.
+`0.1.4`; Greenhouse and Globe have GitHub Packages `Read` access and consume the registry in opt-in adapters;
+the Lab has sensitive `NPM_RC` in Vercel Production/Preview; and Globe has `axis-packages-read-token` in Secret
+Manager with Cloud Build IAM. `TASK-1591` owns the completed adapters pilot; product promotion remains a separate
+release decision.
 
 Architecture decisions must preserve semantic tokens and fixed package versions, keep package credentials out of
 source/artifacts/images, and document the native adapter boundary (MUI for Greenhouse, Tailwind v4 for Globe).

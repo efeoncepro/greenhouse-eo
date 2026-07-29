@@ -18,7 +18,7 @@
 - Status real: `Diseño gobernado; Lab independiente pendiente`
 - Rank: `TBD`
 - Domain: `ui-platform|cross-runtime`
-- Blocked by: `TASK-1589`
+- Blocked by: `none` (foundation publicada; extracción del Lab sigue pendiente)
 - Branch: `task/TASK-1590-efeonce-design-system-lab-extraction`
 - Legacy ID: `none`
 - GitHub Issue: `none`

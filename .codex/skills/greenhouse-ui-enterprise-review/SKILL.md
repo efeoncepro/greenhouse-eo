@@ -16,7 +16,8 @@ Treat AXIS as Efeonce's portable foundation/Lab and review the consumer's native
 adapter: MUI for Greenhouse or Tailwind v4 for Globe. Verify semantic tokens and
 `tokens.ts` are used and no literal design values bypass the system. Consult the
 shared UI ADR and `docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`;
-do not issue a runtime-ready verdict while `TASK-1591` remains pending.
+the `TASK-1591` opt-in consumer pilot is runtime-verified at package `0.1.4`, while
+product promotion still requires its release evidence.
 
 ## Inputs
 

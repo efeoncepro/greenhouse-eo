@@ -61,8 +61,8 @@ simple y una compleja en Greenhouse/MUI y Globe/Tailwind, con adopción opt-in y
 - [x] Cada consumer puede rollback por versión (`0.1.3`/`0.1.4` en lockfile y adapter opt-in).
 - [x] Evidence y ownership quedan en registry (`greenhouse-ui-platform`, fixtures desktop/mobile/keyboard).
 
-> La foundation y la distribución privada son prerrequisitos completados; estos criterios
-> permanecen abiertos hasta implementar y verificar los adapters en ambos consumidores.
+> La foundation, la distribución privada y el piloto de adapters están completados. La
+> promoción productiva y la automatización de instalación en CI/Cloud Build quedan separadas.
 
 ## Rollout / Rollback
 
@@ -71,7 +71,7 @@ simple y una compleja en Greenhouse/MUI y Globe/Tailwind, con adopción opt-in y
 - Greenhouse: revertir los tres paquetes a `0.1.3` y retirar la ruta `/design-system/axis-adapters`.
 - Globe: revertir los tres paquetes a `0.1.3` y retirar la ruta `/_axis-pilot`; las superficies existentes no dependen del adapter.
 
-## Delivery state — 2026-07-28
+## Delivery state — 2026-07-29
 
 ### Foundation y distribución — completas
 
@@ -90,10 +90,19 @@ simple y una compleja en Greenhouse/MUI y Globe/Tailwind, con adopción opt-in y
 - Evidencia operativa detallada, incluyendo rotación pendiente de la credencial actual,
   vive en `docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`.
 
-### Consumer runtime — pendiente
+### Consumer runtime — verificado como canary opt-in
 
 La distribución y el slice de consumer están implementados como canary opt-in en ambos
-runtimes. La promoción productiva permanece separada y requiere el gate de release correspondiente:
+runtimes. La promoción productiva permanece separada y requiere el gate de release correspondiente.
+La instalación privada fue verificada localmente con una credencial temporal; la materialización
+del secreto en los pipelines de CI/Cloud Build todavía no está conectada end-to-end:
+
+- `.github/workflows/ci.yml` aún instala sin materializar `AXIS_PACKAGES_READ_TOKEN`.
+- `.github/workflows/deploy-internal.yml`, `infra/cloudbuild/deploy.yaml` y el Dockerfile de
+  `studio-web` aún requieren ese wiring antes de un rollout automatizado.
+
+El estado es `complete` para el slice opt-in y `rollout pendiente` para la promoción
+automatizada/externalizada:
 
 1. [x] Incorporar las dependencias AXIS `0.1.4` y autenticar el registry privado durante la instalación.
 2. [x] Implementar una primitive simple y una compleja por consumer mediante adapters locales:
@@ -101,6 +110,11 @@ runtimes. La promoción productiva permanece separada y requiere el gate de rele
 3. [x] Registrar contract, versión, ownership, estados y evidencia en el registry.
 4. [x] Verificar desktop/mobile, teclado, reduced motion, estados de estado y build de cada consumer.
 5. [x] Ejecutar canary opt-in en `/design-system/axis-adapters` y `/_axis-pilot`.
+
+La verificación browser/accessibility/reduced-motion del fixture Globe fue un spot check local
+documentado en la evidencia de entrega; todavía no existe una suite Playwright dedicada ni un
+visual diff persistido específico de AXIS. Esto no bloquea el piloto opt-in, pero sí bloquea el
+gate de promoción productiva hasta convertir esa evidencia en automatización.
 
 ## Delivery evidence — 2026-07-29
 

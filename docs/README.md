@@ -40,6 +40,7 @@ Indice maestro de la documentacion no operativa del repo.
 ### Architecture
 
 - [Architecture Decisions Index](architecture/DECISIONS_INDEX.md)
+- [Efeonce Shared Product UI Platform Decision](architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md)
 - [Creative Studio — Business Model Decision V1](architecture/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_DECISION_V1.md)
 - [Efeonce Creative Studio — Agentic Platform](architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md)
 - [Efeonce Creative Studio — Enterprise Model Portfolio](architecture/EFEONCE_CREATIVE_STUDIO_ENTERPRISE_MODEL_PORTFOLIO_V1.md)
@@ -168,6 +169,7 @@ Indice maestro de la documentacion no operativa del repo.
 ### Operations
 
 - [Issue Tracker](issues/README.md)
+- [AXIS Private Package Consumption Runbook](operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md)
 - [Agent Context History](operations/agent-context-history/README.md)
 - [Agent Context Router Decision](architecture/GREENHOUSE_AGENT_CONTEXT_ROUTER_DECISION_V1.md)
 - [SOLUTION_QUALITY_OPERATING_MODEL_V1.md](operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md)
