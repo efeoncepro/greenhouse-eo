@@ -135,7 +135,18 @@ invertir la rampa**: es re-derivar qué token cumple cada rol.
 | `--action` `#4db8ff` sobre blanco | **2,18:1** | **falla incluso el 3:1 de componente UI** |
 | `--action-strong` `#0375db` sobre blanco | **4,59:1** | pasa texto normal |
 | `--faint` claro, primer intento `#838a99` | 3,23:1 | falla |
-| `--faint` claro corregido `#666d7d` | 4,84:1 | pasa |
+| `--faint` claro, segundo intento `#666d7d` | 4,84:1 sobre el canvas · **4,47:1 sobre el plano más oscuro** | **falla** — ver nota |
+| `--faint` claro corregido `#606674` | 4,95:1 en el peor plano | pasa |
+| `--action-strong` `#0375db` sobre el plano más oscuro | **3,95:1** | pasa como componente (3:1), **no como texto** |
+
+> **Nota — la misma clase de error, dos veces en este documento.** Los valores del modo claro se midieron
+> contra `#f6f7f9`, que es el canvas, y **no** contra el plano de menor contraste, que en una escala clara
+> es el **más oscuro** (`--stage`, donde vive el bloque de estado del share board: vacío, error, cargando).
+> Con la regla bien aplicada, `--faint` fallaba por 0,03 y `--action-strong` no alcanza el piso de texto
+> ahí. Es exactamente el defecto que el Delta corrigió en la escala oscura, repetido en la clara mientras
+> se escribía la corrección — evidencia de que la regla no se cumple por conocerla, sino por ejecutarla en
+> cada plano. **Consecuencia para el día que se reabra el modo claro:** `--action-strong` es válido como
+> texto sobre `--surface` y `--canvas`, y **sólo como componente** sobre `--stage`.
 
 Dos hallazgos que sobreviven a este ADR y valen para cualquier futuro modo claro:
 
@@ -303,8 +314,16 @@ planos:
 | `--faint` `#8b92a3` | 6,23:1 | 5,68:1 | **4,91:1** |
 | `--action` `#4db8ff` | 8,89:1 | 8,11:1 | 7,00:1 |
 
-**Regla que se desprende, y aplica a todo el SSOT:** un token de texto se verifica contra el plano **más
-claro** sobre el que puede aparecer, nunca contra el canvas. Un solo par medido no es la escala verificada.
+**Regla que se desprende, y aplica a todo el SSOT:**
+
+> Un token de texto se verifica contra el plano de **menor contraste** sobre el que puede aparecer, nunca
+> contra el canvas por defecto.
+
+En una escala oscura ese plano es el **más claro** (el caso de este ADR: las cards y los popovers). En una
+escala clara es el **más oscuro** — la formulación general importa porque quien reabra el modo claro con la
+versión específica de dark mediría exactamente el par equivocado, que es el error que este Delta corrige.
+
+Un solo par medido no es la escala verificada.
 
 ### Defecto 4 — la propuesta quita un problema y no entrega un momento visual
 
@@ -343,6 +362,11 @@ escala de superficie sí puede implementarse: es correcta, medida y no depende d
 - **v1.1** — 2026-07-30 — Delta de autoauditoría: regla de luminancia conservada (sustituye la tabla de
   valores a ojo), inventario completo de 15 tokens de superficie, `--faint` corregido tras detectar una
   regresión de contraste sobre los planos elevados, y `visual impact` declarado abierto con dueño.
+  **Corrección posterior del mismo día:** la regla de verificación se generaliza de *"el plano más claro"*
+  a *"el plano de menor contraste"* — la versión específica de dark habría hecho medir el par equivocado a
+  quien reabra el modo claro. Aplicarla reveló que los valores del modo claro tenían **el mismo defecto**
+  (`--faint` `#666d7d` fallaba por 0,03 sobre `--stage`; `--action-strong` no alcanza el piso de texto
+  ahí): corregidos a `#606674` y a "componente-only sobre `--stage`" respectivamente.
 - **v1.0** — 2026-07-30 — Decisión inicial. Chasis desaturado, dark-only declarado con condiciones de
   revisión, costo del modo claro medido y las dos restricciones estructurales documentadas (`--action` no
   sobrevive blanco; el payload no re-tematiza en runtime).
