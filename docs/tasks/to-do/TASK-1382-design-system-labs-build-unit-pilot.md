@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-027`
-- Status real: `Ready — accepted architecture; execution requires task hook/plan`
+- Status real: `BLOQUEADA POR UNA DECISION DE DESTINO, no por plan (2026-07-30). Contradice a TASK-1590: esta task quiere Labs como build unit DENTRO de Greenhouse; TASK-1590 quiere el Lab en el repo AXIS con Vercel propio — y ese Lab YA EXISTE y está desplegado. Son dos destinos incompatibles para la misma superficie. Ver Delta 2026-07-30`
 - Rank: `1`
 - Domain: `platform|ops`
 - Blocked by: `none`
@@ -141,6 +141,40 @@ Reglas obligatorias:
 - Prove trigger matrix: Labs-only, Portal-only and shared-package changes.
 - Run clean/warm A/B for current Portal baseline, decomposed Portal and Labs.
 - Produce `expand|hold|rollback` verdict against thresholds.
+
+## Delta 2026-07-30 — contradicción de destino con `TASK-1590`
+
+Detectado al contrastar el estado real de AXIS contra las specs (no leído de la doc).
+
+Esta task quiere Design System Labs como **primera unidad de build independiente *de Greenhouse***
+(EPIC-026): el catálogo se queda en el repo y se demuestra que un cambio en Labs no construye el Portal.
+
+`TASK-1590` (*AXIS Design System Lab Extraction*, `to-do`, P0) quiere lo contrario: **el Lab vive en el
+repo `axis-design-system`, con proyecto Vercel propio**. Y ese Lab **ya existe y está desplegado**
+(`apps/lab` → `axis-design-system-lab.vercel.app`), con la estructura de su dirección visual implementada.
+
+**Son dos destinos incompatibles para la misma superficie**, y ninguna de las dos declaraba a la otra:
+
+| | Destino del catálogo | Estado |
+|---|---|---|
+| `TASK-1382` (ésta) | build unit **dentro** de Greenhouse | `to-do`, arquitectura aceptada |
+| `TASK-1590` | repo **AXIS**, Vercel aparte | `to-do`, **contenedor ya desplegado**, contenido pendiente (2 contratos vs 43 rutas) |
+
+**Esta task es la que decide.** Si Labs se queda como build unit de Greenhouse, `TASK-1590` pierde su
+destino y el Lab de AXIS queda como algo distinto (¿la cara pública del design system?). Si el catálogo se
+muda a AXIS, esta task pierde su sujeto y EPIC-026 necesita otro candidato para su primer build unit.
+
+**Dato que inclina la balanza hacia `TASK-1590`:** el ADR
+[`EFEONCE_AXIS_DESIGN_SYSTEM_OWNERSHIP_DECISION_V1`](../../architecture/EFEONCE_AXIS_DESIGN_SYSTEM_OWNERSHIP_DECISION_V1.md)
+(aceptado 2026-07-29) le asigna al Lab de AXIS un rol que esta task no cubre: ser la superficie donde se
+documenta el **uso** del design system para N productos. Obligar a un consumidor (Globe, Wave) a leer
+documentación dentro de `greenhouse-eo` acopla ese consumidor con Greenhouse, que es justo lo que el ADR
+deshace.
+
+Eso no cierra la pregunta de EPIC-026 —Greenhouse sigue necesitando un primer build unit— pero sí sugiere
+que **Labs no es el candidato**, porque su destino natural ya no está en el repo.
+
+**No tomar ninguna de las dos hasta resolverlo.** Decisión del operador.
 
 ## Out of Scope
 
