@@ -235,8 +235,114 @@ clara nueva.
 
 ---
 
+## Delta 2026-07-30 — autoauditoría: la v1.0 tenía la dirección correcta y la ejecución incompleta
+
+La v1.0 se auditó contra el scorecard del orquestador de diseño el mismo día en que se aceptó. **Falló dos
+umbrales duros y tenía tres defectos materiales.** La dirección no cambia; los valores sí, y el método
+pasa a ser un principio en vez de una tabla negociada.
+
+### Defecto 1 — la escala propuesta aplanaba el modelo de profundidad a la mitad
+
+Medido: los saltos entre los tres planos de superficie caían de `1,096 / 1,152 / 1,263` (navy) a
+`1,051 / 1,076 / 1,131`. En navy, parte de la separación entre una card y su fondo la cargaba el **croma**;
+al quitarlo, la v1.0 dejó sólo luminancia — y además la bajó.
+
+**Causa raíz:** la v1.0 eligió los valores a ojo, moviendo saturación **y** luminancia a la vez.
+
+**Regla que reemplaza la tabla:**
+
+> Un token de superficie se desatura a hue ~225 / sat ~20 % **conservando su luminancia relativa**.
+
+Con eso los saltos quedan idénticos **por construcción**, no por ajuste: `1,096 / 1,159 / 1,270` contra los
+`1,096 / 1,152 / 1,263` del navy. El modelo de profundidad se preserva exacto y lo único que se retira es
+el croma — que era el objetivo declarado.
+
+### Defecto 2 — el inventario decía seis tokens de superficie y son quince
+
+La v1.0 listó `--canvas`, `--canvas-raised`, `--surface`, `--surface-strong`, `--surface-solid` y `--rail`.
+El barrido completo de `tokens.ts` encuentra **nueve más**, todos con navy de fondo:
+
+| Token | Hoy | Qué rompía si quedaba fuera |
+|---|---|---|
+| `--field` | `#060f2d` | el fondo de **todo input** del composer |
+| `--media-base` | `#0a1330` | el lecho del visor de media |
+| `--overlay-fill` | `linear-gradient(165deg,rgba(20,40,110,.97),rgba(9,20,60,.98))` | **overlays azules flotando sobre chasis neutro** |
+| `--page-backdrop` | `…linear-gradient(158deg,#071647,#030c26 74%)` | el telón de fondo de la página |
+| `--thumb-placeholder` | `linear-gradient(145deg,#153276,#07143d)` | el placeholder de cada miniatura del feed |
+| `--model-menu-fill` | `linear-gradient(168deg,#0d2160,#071440)` | el desplegable de modelo |
+| `--rail-scrim` | `rgba(5,13,40,.72→.94)` | el velo del riel |
+| `--media-control` | `rgba(6,15,45,.5)` | los controles sobre media |
+| `--media-control-strong` | `rgba(6,15,45,.6)` | ídem, estado fuerte |
+
+Un cambio parcial de escala deja el resto derivando: alguien implementando la v1.0 al pie de la letra
+habría producido overlays y menús azules sobre un chasis desaturado. **Los quince se mueven juntos o no se
+mueve ninguno.**
+
+Las dos paradas de gradiente se desaturan cada una por su luminancia, con la misma regla.
+
+**No se tocan** (son rampa de acción, no superficie): `--action`, `--action-strong`, `--cta-fill`, `--warm`,
+los ocho `--preset-*`, `--accent-*`, `--stage-halo`, `--glow-rest/hover/focus`, `--cta-lift`,
+`--preset-selected`, `--composer-light`. Su **valor** no cambia; su **lectura** sí — un glow azul al 22 %
+es más presente sobre casi-negro neutro que sobre navy. Se acepta y se verifica en GVC; no se recalibra a
+ciegas.
+
+### Defecto 3 — el contraste se midió sobre el plano más fácil
+
+La v1.0 declaró `--faint` en **4,78:1** y lo dio por bueno. Ese número es sobre `--canvas`, el plano **más
+oscuro**. El texto `faint` también vive sobre cards y popovers (`--surface-solid`), y ahí el valor
+propuesto daba **3,71:1 — falla**, contra los 4,62:1 que da hoy en navy. **La v1.0 introducía una
+regresión de accesibilidad mientras decía haberla verificado.**
+
+Corrección: `--faint` pasa de `#767d8f` a **`#8b92a3`**. Escala completa, los nueve pares sobre los tres
+planos:
+
+| Texto | sobre `--canvas` | sobre `--canvas-raised` | sobre `--surface-solid` |
+|---|---|---|---|
+| `--text` `#e8eaf0` | 16,14:1 | 14,73:1 | 12,71:1 |
+| `--muted` `#a3a9b8` | 8,25:1 | 7,53:1 | 6,50:1 |
+| `--faint` `#8b92a3` | 6,23:1 | 5,68:1 | **4,91:1** |
+| `--action` `#4db8ff` | 8,89:1 | 8,11:1 | 7,00:1 |
+
+**Regla que se desprende, y aplica a todo el SSOT:** un token de texto se verifica contra el plano **más
+claro** sobre el que puede aparecer, nunca contra el canvas. Un solo par medido no es la escala verificada.
+
+### Defecto 4 — la propuesta quita un problema y no entrega un momento visual
+
+Desaturar es **sustracción**. Deja el chasis correcto y anónimo, y el estándar premium trata "correcto y
+anónimo" como fallo aunque los gates de token estén verdes. La v1.0 llegó a enunciar la salida —*un solo
+momento de marca dominante en vez de teñido global*— y **no la diseñó**.
+
+Queda declarado como **pendiente con dueño: `TASK-1523`** (contratos visual/flow/motion), no como parte de
+este ADR. Este ADR gobierna la escala de superficie; el momento de marca es composición.
+
+### Tabla de valores vigente tras el Delta
+
+| Token | Hoy | v1.0 (obsoleta) | **Vigente** |
+|---|---|---|---|
+| `--canvas` | `#030c26` | ~~`#0a0b0f`~~ | **`#0c0d12`** |
+| `--canvas-raised` | `#061443` | ~~`#101218`~~ | **`#161820`** |
+| `--surface-solid` | `#0e1f5c` | ~~`#171a22`~~ | **`#212531`** |
+| `--faint` | `#7f8cb5` | ~~`#767d8f`~~ | **`#8b92a3`** |
+| `--text` | `#eaf0ff` | `#e8eaf0` | `#e8eaf0` (sin cambio) |
+| `--muted` | `#aeb9d7` | `#a3a9b8` | `#a3a9b8` (sin cambio) |
+
+`--surface`, `--surface-strong`, `--rail` y los nueve tokens del Defecto 2 se derivan con la misma regla de
+luminancia conservada al implementar.
+
+### Estado del gate de diseño
+
+Contra el scorecard del orquestador, esta propuesta **no cierra como diseño**: `visual impact` y
+`depth/surface model` no alcanzaban el piso de 4,5. El Delta resuelve profundidad y contraste; **`visual
+impact` sigue abierto** y es lo que `TASK-1523` debe cubrir antes de que el chasis se declare terminado. La
+escala de superficie sí puede implementarse: es correcta, medida y no depende de esa decisión.
+
+---
+
 ## Version
 
+- **v1.1** — 2026-07-30 — Delta de autoauditoría: regla de luminancia conservada (sustituye la tabla de
+  valores a ojo), inventario completo de 15 tokens de superficie, `--faint` corregido tras detectar una
+  regresión de contraste sobre los planos elevados, y `visual impact` declarado abierto con dueño.
 - **v1.0** — 2026-07-30 — Decisión inicial. Chasis desaturado, dark-only declarado con condiciones de
   revisión, costo del modo claro medido y las dos restricciones estructurales documentadas (`--action` no
   sobrevive blanco; el payload no re-tematiza en runtime).
