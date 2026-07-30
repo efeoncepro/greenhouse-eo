@@ -22,6 +22,21 @@
 - Se promovió el readiness y se creó/activó el binding de producción mediante los comandos canónicos; el selector live lo muestra como `Disponible`.
 - El resto de la flota conserva sus gates honestos: no se forzaron rutas sin evaluación exacta, driver gobernado o dependencia externa resuelta.
 
+## 2026-07-30 — Globe: Nano Banana 2 promovido y probado desde Producer
+
+- Vertex habilitó de hecho `gemini-3.1-flash-image`: el probe oficial devolvió HTTP 200 y se retiró
+  el bloqueo histórico de allowlist.
+- Se añadieron rates, driver gobernado, endpoint exacto, derechos comerciales, evaluación 5/5,
+  revisión humana y promoción de readiness/binding/circuito.
+- La generación real desde la UI autenticada es
+  `ce06f8b4-ebe9-43b6-9d47-8e4cc901f49a`, 10 créditos.
+- El smoke detectó y corrigió en Globe `1fb57285` un off-by-one en la reconstrucción del hash
+  durable de Vertex; CI `30565123529` y worker `30565166238` quedaron verdes. El mismo run terminó
+  `completed/retained`, la UI mostró `Listo` y el output fue
+  `sha256:b8a0eb45289558a2cb99e9989fa401aa794035c709505b10c58fba34e0768c1e`.
+- El Producer ofrece simultáneamente cinco modelos de imagen. TASK-1553 permanece `in-progress`
+  por los receipts pendientes de TASK-1468/TASK-1578.
+
 ## 2026-07-30 — Creative Velocity y producción modular
 
 - Se profundizó el benchmark de Creative Velocity contra Superside, Publicis, WPP, VML, Monks, DEPT, Dentsu,
@@ -643,17 +658,3 @@ Corrección de fuente de verdad: el cliente inicial es **SKY Agencia Creativa**,
   `docs/business-models/wave/WAVE_BUSINESS_MODEL_V1.md`.
 - Se separaron product service, delivery model, engagement, operating mode y composición del ecosistema; Wave puede
   operar Managed Squad, Staff Augmentation y otros modelos sin cambiar el ownership de la oferta.
-
-## 2026-07-25 — Globe: el payload de browser deja de ser un string (ADR-014, foundation)
-
-`TASK-1556` cerrada. Nació `apps/studio-client` en `efeonce-globe` (Vite + React + React Router, SSR
-apagado) compilando a assets estáticos que sirve el **mismo** `studio-web`; host, BFF, sesión SSO, CSP por
-nonce, ALB y API privada sin tocar. Con el flag `client_app_enabled` en `false` **ningún comportamiento
-cambia**: es fundación, no superficie.
-
-Globe estrena SSOT de tokens con drift ledger, capa de copy locale-keyed, ESLint acotado (jsx-a11y +
-rules-of-hooks) y 3 gates de diseño como tests — los 6 verificados **mordiendo**. React Compiler activado.
-Las dos compuertas de la ADR cerraron verdes, así que el fallback a `vite@7.3.x` se retira.
-
-El share board, la única superficie que ve un cliente, se separó a `TASK-1558`: necesita dirección visual
-aprobada y no existe.

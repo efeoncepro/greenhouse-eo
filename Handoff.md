@@ -1,5 +1,20 @@
 # Handoff activo
 
+## 2026-07-30 — Globe: flota de imagen completa con Nano Banana 2
+
+Nano Banana 2 (`gemini-3.1-flash-image`) dejó de estar bloqueado por allowlist y quedó promovido en
+`ref/still/nanobanana-2-v1`: evaluación exacta 5/5, derechos comerciales, revisión humana, binding,
+readiness y circuito gobernados. La prueba real salió desde Producer con la sesión autenticada del
+operador, run `ce06f8b4-ebe9-43b6-9d47-8e4cc901f49a`, 10 créditos.
+
+El smoke encontró un off-by-one en la reconstrucción del hash durable de Vertex. Globe `1fb57285`
+lo corrigió con una regresión focal; CI `30565123529` y worker `30565166238` quedaron verdes. El
+mismo run terminó `completed/retained` y la UI mostró `Listo`. La flota
+de imagen queda en cinco modelos disponibles: Seedream 5 Pro, Nano Banana Pro, Nano Banana 2,
+GPT Image 2 y GPT Image 1.5. TASK-1553 continúa `in-progress` sólo por los receipts transversales
+TASK-1468/TASK-1578. Detalle:
+[`GLOBE_RUNTIME_HANDOFF.md`](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md).
+
 ## 2026-07-30 — Skill AI Creative Rights & Enterprise Governance
 
 Se creó `.codex/skills/greenhouse-ai-creative-rights-governance/` y su companion `.claude/skills/greenhouse-ai-creative-rights-governance/` para gobernar producción generativa enterprise en imagen, video, audio, música, voz, likeness, copy y medios híbridos. Incluye clasificación A–D, gates de inputs/providers/contratos, no-training vs retention/zero-retention/no-human-access/residency/isolation, estados `approved-commercial`/`approved-with-restrictions`/`proof-only`/`blocked`/`incident-replacement`, rights pack, AI Data Protection Pack, checklist de consentimiento y matriz de vetting de proveedores con baseline fechado 2026-07-30. El contrato canónico propuesto vive en [`GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1`](docs/architecture/GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md). Estado: documentación completa para validación; adopción runtime, provider allowlist y cláusulas contractuales requieren validación de Legal/IP, Security, Operations, Finance y Commercial.

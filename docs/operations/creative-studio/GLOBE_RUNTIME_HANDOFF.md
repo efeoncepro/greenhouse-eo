@@ -6,6 +6,31 @@
 
 ---
 
+## Nano Banana 2 — promoción y smoke real 2026-07-30
+
+- `gemini-3.1-flash-image` respondió HTTP 200 en el proyecto `efeonce-globe`; se retiró el bloqueo
+  histórico de allowlist.
+- La ruta `ref/still/nanobanana-2-v1` quedó promovida con binding activo, circuito cerrado,
+  readiness promovido, atestación comercial
+  `mcra_4a15625c-0186-4d01-bae1-472071c38e4d` y revisión humana
+  `review_8ce9fa89-b566-4d51-b150-1d83fce0dec6`.
+- La evaluación exacta produjo el experimento `82e3f630-63e8-4c59-a629-8ea670c79dd7`,
+  `image/png`, 10 créditos y 5/5 checks objetivos.
+- La generación real desde `https://globe.efeoncepro.com/producer`, con sesión autenticada del
+  operador, es `ce06f8b4-ebe9-43b6-9d47-8e4cc901f49a`: `completed/retained`, 10 créditos,
+  `image/png`, SHA-256 `b8a0eb45289558a2cb99e9989fa401aa794035c709505b10c58fba34e0768c1e`.
+- El smoke descubrió un off-by-one en `VertexGovernedRunDriver.resolve`: el prefijo
+  `vertex-output:` tiene 14 caracteres, pero se aplicaba `slice(15)`. El SHA `1fb57285` reemplaza
+  el índice mágico por la longitud del prefijo y añade una regresión focal. CI `30565123529` y
+  deploy de worker `30565166238` terminaron `success`; el outbox conservó y completó el mismo run
+  de forma idempotente.
+- Evidencia canónica:
+  [`GLOBE_MODEL_FLEET_STATUS.md`](GLOBE_MODEL_FLEET_STATUS.md) y
+  [`evidence/2026-07-30/README.md`](evidence/2026-07-30/README.md).
+- TASK-1553 permanece `in-progress` por su criterio 7 transversal: rate-version receipts de
+  TASK-1468 + onboarding receipts de TASK-1578. Este pendiente documental/gobernante no revierte
+  la disponibilidad live de las cinco rutas de imagen.
+
 ## AXIS package distribution/auth — estado verificado 2026-07-30
 
 - GitHub Packages publica `@efeoncepro/axis-tokens`, `@efeoncepro/axis-ui-contracts` y
@@ -463,8 +488,9 @@ Continúa el estado LATE de abajo. Nuevo desde entonces (todo en `efeonce-globe`
   por el break-glass IAM** (`tokenCreator` sobre `greenhouse-globe-caller` lo rechazó el classifier — nunca se concedió,
   sin grant sucio), y el provider se **revirtió a `composite`** (api `00077-bxp`). La pregunta de allowlist se respondió
   con probe directo `generateContent`: **`gemini-3-pro-image` (Nano Banana Pro) @ `global` → HTTP 200, imagen real ~1.23 MB
-  — allowlist DESPEJADO** (us-central1 404; solo `global`, que es lo que usa el adapter). **`gemini-3.1-flash-image`
-  (Nano Banana 2) @ global → 404: el proyecto AÚN no tiene acceso** (ask a Google). Pendiente: dispatch end-to-end
+  — allowlist DESPEJADO** (us-central1 404; solo `global`, que es lo que usa el adapter). En ese corte histórico,
+  **`gemini-3.1-flash-image` (Nano Banana 2) @ global devolvía 404**; el estado fue superado el 2026-07-30 por el
+  HTTP 200 y la promoción documentados al inicio de este archivo. Pendiente en ese momento: dispatch end-to-end
   gobernado (break-glass, autoriza el operador); canary de `gpt-image-2` (OpenAI, path aparte); atestación humana por
   modelo antes de comercializar; pricing OpenAI `PROVISIONAL`. Detalle: `TASK-1535` §"Canary run — evidencia real".
 
