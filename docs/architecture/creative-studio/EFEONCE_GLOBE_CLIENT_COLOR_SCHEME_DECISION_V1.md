@@ -1,4 +1,9 @@
-# ADR-017 — Globe es dark-only, y el chasis se desatura para dejar de teñir el trabajo
+# ADR-017 — Color scheme y arquitectura de superficie del payload cliente de Globe
+
+> ⚠️ **El título original de este ADR era «Globe es dark-only, y el chasis se desatura».** La segunda mitad
+> quedó **superada por el Delta v2 (2026-07-30)**: no se desatura nada — el chasis **adopta** el theme que
+> el equipo de diseño ya tenía en AXIS, y el azul sobre el que se razonó **no era el color de marca**.
+> La decisión dark-only se mantiene, con un argumento menos.
 
 > **Tipo:** Architecture Decision Record
 > **Estado:** `Accepted` — aceptado por el operador el 2026-07-30
@@ -357,8 +362,152 @@ escala de superficie sí puede implementarse: es correcta, medida y no depende d
 
 ---
 
+## Delta v2 2026-07-30 — la premisa de marca era falsa: Globe no es azul
+
+Las v1.0 y v1.1 razonaron sobre una premisa que nadie había verificado contra el design system: **que
+`--action #4db8ff` era el color de marca de Globe.** No lo es. El theme vigente lo definió el equipo de
+diseño en AXIS (nodo *Theme Color · Globe*, verificado el 2026-07-30 con el operador y el agente de Figma):
+
+| Rol | Valor |
+|---|---|
+| **primary-500** | **`#FF6500`** — naranja |
+| **secondary-500** | **`#4A108C`** — morado |
+| info-500 | `#3B5ED9` |
+| success-500 | `#10B981` |
+| warning-500 | `#EAB308` |
+| error-500 | `#E5333B` |
+
+El azul `#4db8ff` **no ocupa ningún rol** del sistema. Se originó en un prototipo de Claude Design que
+inventó su propia paleta, y el runtime la heredó. El naranja, que hoy vive como `--warm` (un acento menor:
+el punto del logotipo, un segmento de la dona), **es el primary**.
+
+**Qué invalida:** el diagnóstico —el azul cubría el 85 % del área y hundía las piezas frías— era correcto,
+pero la solución no. Desaturar el chasis alrededor de un color que no pertenece al sistema habría dejado el
+defecto mayor intacto y más visible.
+
+**Qué sobrevive:** el método (desaturar conservando luminancia, verificar contra el plano de menor
+contraste), todas las mediciones, la decisión dark-only y el inventario de superficies.
+
+### El chasis se ADOPTA, no se desatura
+
+Las superficies son tokens **globales** del design system (`Misc`), no por tema:
+
+| Token | Light | Dark |
+|---|---|---|
+| `body-bg` | `#F8F7FA` | `#25293C` |
+| `paper` | `#FFFFFF` | `#2F3349` |
+| `text-primary` | `#2F2B3DE5` | `#E1DEF5E5` |
+| `text-secondary` | `#2F2B3DB2` | `#E1DEF5B2` |
+| `divider` | `#2F2B3D1F` | `#E1DEF51F` |
+
+**`#25293C` tiene hue 230 y saturación 24 %** — es exactamente el neutro tintado al que llegó el cálculo de
+la v1.1 por otro camino. El equipo ya había resuelto el problema; **el runtime nunca adoptó su theme.** La
+tabla de valores de la v1.1 (`#0c0d12`, `#161820`, `#212531`, `#8b92a3`) queda **retirada**: eran una
+derivación correcta de una premisa equivocada.
+
+Estos valores ya están en el paquete `@efeoncepro/axis-tokens` (`axisNeutral.light` / `.dark`), idénticos
+byte por byte, y Globe ya lo tiene como dependencia (`0.1.5`) — sólo que `tokens.ts` no lo importa.
+
+### Arquitectura de superficie: el contenido sube, no baja
+
+Dos planos alcanzan para un dashboard, no para el Producer (chasis → composer → cards → overlays → lecho de
+media). Se extiende la escala **en las dos direcciones**, con el mismo paso de la progresión:
+
+| Plano | Dark | Light |
+|---|---|---|
+| **hundido** *(nuevo)* | `#181B28` | `#ECEAF1` |
+| body-bg | `#25293C` | `#F8F7FA` |
+| paper | `#2F3349` | `#FFFFFF` |
+| **elevado** *(nuevo)* | `#3B405C` | = paper + sombra |
+
+Y la regla de asignación, decidida por el operador el 2026-07-30 tras comparar tres variantes con el frame
+delante:
+
+> **El contenedor del contenido se hunde; las piezas suben a `paper`.** El chasis se queda en `body-bg`.
+
+Medido — separación entre una card y su fondo:
+
+| Variante | dark | claro |
+|---|---|---|
+| A · card sobre el chasis | 1,157 | 1,067 |
+| B · card baja al lienzo (chasis invertido) | 1,192 | **1,118** |
+| **C · card sube sobre lienzo** | **1,379** | **1,193** |
+
+**C es la única que funciona en los dos modos**, y su valor en claro supera al de B en oscuro. La razón es
+estructural: en el extremo claro los planos se comprimen, así que bajar el fondo no alcanza — **hay que
+subir el contenido a blanco puro.**
+
+**B queda descartada**, y por tres razones además del número: sólo funciona en oscuro; invierte la elevación
+de Material (pone el contenido *por debajo* del fondo, y Globe es consumidor de ese modelo); y responde al
+patrón de una app de **lienzo continuo** (Figma, Runway) cuando el Producer es un **feed** de resultados,
+que es el patrón de Behance o Dribbble. Fue un error de categoría del autor, corregido por el operador.
+
+**El viewer y el share board sí usan lienzo hundido con la pieza sola**, sin cards: cuando hay una obra y la
+tarea es juzgarla, el entorno se apaga; cuando hay varias y la tarea es compararlas, el entorno sostiene.
+
+🔴 **El contenedor hundido NO es una card.** Va hundido y sin sombra propia. Implementarlo con borde y
+sombra elevada lo convierte en card-on-card, que el estándar premium marca como fallo aunque los gates de
+token pasen.
+
+### El presupuesto del naranja, declarado
+
+El naranja es el color de **acción**: `primary` en este stack resuelve botones, estado activo y foco, y el
+producto no decide nada visual (ADR de ownership de AXIS). Pero se declara su presupuesto, porque el ADR-017
+nació precisamente de no tener uno:
+
+- **Vive en:** CTA primario, estado activo, foco.
+- **NUNCA como superficie** — ni `primary-8` de fondo, ni gradientes de marca detrás del contenido. Los
+  cálidos avanzan ópticamente: un naranja mal presupuestado sería peor que el navy que reemplaza.
+- **NUNCA porta significado de estado.** Está a **21–27° de matiz** de `warning` (45°) y `error` (357°);
+  un icono naranja suelto junto a uno de alerta se confunde. El color de estado sale sólo de los tokens
+  semánticos.
+- **No es identidad ni etiqueta.** Un avatar y un eyebrow no son acciones.
+
+🔴 **El CTA lleva texto oscuro, no blanco.** Blanco sobre `#FF6500` da **2,95:1** y falla; el `text-primary`
+oscuro del theme da **4,64:1**. Es contraintuitivo —casi todos los botones primarios llevan texto blanco—
+así que se declara para que nadie lo implemente por reflejo.
+
+🔴 **Las dos familias de sombra del theme no son intercambiables.** `Dark/elevation/Primary/Globe/*` está
+teñida de `primary-38` y es para **acción**; `Dark/elevation/gray/*` usa `gray-38` y es para **superficie**.
+Elevar un header con la sombra de marca produce un halo naranja que se lee como si el elemento estuviera
+encendido — medido al construir el mockup, eligiendo la equivocada porque el nombre parecía el correcto.
+
+### El morado no es usable en modo oscuro
+
+Medido sobre `body-bg #25293C`:
+
+| Token | Contraste | Uso |
+|---|---|---|
+| `secondary-500` `#4A108C` | **1,19:1** | invisible |
+| `secondary-400` `#6E40A3` | 2,00:1 | invisible |
+| `secondary-300` `#9270BA` | 3,59:1 | sólo componente |
+| **`orchid-300` `#A18CBE`** | **4,80:1** | texto — el único |
+
+Ningún escalón del color secundario de la marca alcanza el piso de texto en dark. Eso reencuadra a `orchid`:
+deja de parecer una familia redundante con `secondary` y pasa a ser **su versión operable en modo oscuro**.
+Es un rol legítimo, pero **hoy nada lo declara**, y el resultado por defecto es texto que no se ve. La regla
+de mapeo pertenece a AXIS, no a Globe.
+
+### Corrección al argumento del dark-only
+
+La v1.0 sostuvo dark-only con **dos** razones: la colorimétrica y que el modo claro no existía. **La segunda
+es falsa** — el theme tiene light completo y verificado. La decisión se mantiene, pero apoyada en una sola
+razón: el chasis de una herramienta que muestra obra no debe teñir la percepción del contenido, y la lectura
+tiene que ser estable para poder comparar dos generaciones entre sí.
+
+Que el light exista y esté medido **baja el costo de reabrir** la decisión bajo las condiciones ya escritas
+en este ADR — en particular para una superficie que deje de ser un visor de piezas.
+
+---
+
 ## Version
 
+- **v2.0** — 2026-07-30 — La premisa de marca era falsa: el color de Globe es naranja `#FF6500`, no el azul
+  `#4db8ff` que inventó un prototipo. El chasis adopta las superficies del theme en vez de desaturarse;
+  se retiran los valores de la v1.1. Se decide la arquitectura de superficie (variante C: contenedor
+  hundido, piezas elevadas), se declara el presupuesto del naranja, el texto oscuro del CTA, la separación
+  entre sombra de marca y de superficie, y el mapeo del morado en dark. Se corrige el argumento del
+  dark-only, que se apoyaba en un hecho falso.
 - **v1.1** — 2026-07-30 — Delta de autoauditoría: regla de luminancia conservada (sustituye la tabla de
   valores a ojo), inventario completo de 15 tokens de superficie, `--faint` corregido tras detectar una
   regresión de contraste sobre los planos elevados, y `visual impact` declarado abierto con dueño.
