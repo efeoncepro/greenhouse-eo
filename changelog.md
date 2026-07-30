@@ -7,6 +7,12 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-30 — Globe: Nano Banana Pro promovido en el carril gobernado
+
+- Se firmó la revisión humana desde el Producer autenticado y se propuso `ref/still/nanobanana-pro-v1` al operador.
+- Se promovió el readiness y se creó/activó el binding de producción mediante los comandos canónicos; el selector live lo muestra como `Disponible`.
+- El resto de la flota conserva sus gates honestos: no se forzaron rutas sin evaluación exacta, driver gobernado o dependencia externa resuelta.
+
 ## 2026-07-30 — Creative Velocity y producción modular
 
 - Se profundizó el benchmark de Creative Velocity contra Superside, Publicis, WPP, VML, Monks, DEPT, Dentsu,
@@ -650,20 +656,3 @@ edge. El backend del shell SSO conserva `enable_cdn = false` y el path matcher e
 default apunta al backend sin caché: si una regla no matchea, el request cae hacia el lado seguro.
 La política de caché la sigue declarando el origen (`USE_ORIGIN_HEADERS`), para no crear una segunda
 fuente de verdad. Nada autenticado se cachea, verificado path por path.
-
-## 2026-07-25 — Globe: /producer convertido a React y el bug que dejaba todo command inoperante
-
-- Header y composer de `/producer` convertidos 1:1 reutilizando `producerStyles` verbatim: selector de flota
-  con isotipo real y filtrado por modalidad, formato de salida con chips y stepper, Sugerencias, presets,
-  Seed y Modo. `/producer` sigue en legacy (flag en `false`).
-- Causa raíz: el transporte inventaba la cabecera `x-globe-idempotency-key`; la plataforma usa
-  `x-idempotency-key`. El BFF rechazaba todos los commands sin lanzar, así que el fallo no dejaba rastro.
-  Ni `Generar` ni `Mejorar` funcionaban. Corregido y verificado en vivo.
-- La API (`globe-api-internal`) estaba desfasada del web varios commits, y el dispatch de commands ocurre
-  ahí. Ambos servicios al día.
-- Observabilidad: se otorgó `roles/logging.logWriter` a las runtime SAs (sin él el servicio corre mudo) y se
-  agregó la señal de arranque. Localización de rechazos en handler y envelope, con el nombre del campo.
-- Un rechazo de la salida del enhancer ya no se reporta como `invalid_request` del caller.
-- La skill `greenhouse-globe` (Claude y Codex) suma siete reglas duras nuevas: cabeceras al portar,
-  `idempotencyKey` en el cuerpo, el deploy por servicio, `textPayload` vs logs JSON, `logging.logWriter`,
-  el estilado por atributo de la hoja legacy y los controles de salida sin `<select>`.

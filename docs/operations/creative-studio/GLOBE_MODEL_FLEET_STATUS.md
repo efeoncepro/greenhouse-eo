@@ -35,9 +35,9 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 |---|---|---|---|---|---|---|
 | `ref/still/rrss-v1` | Seedream · 5 Pro | Fal (`bytedance/seedream/v5/pro/text-to-image`) | image-generate | ✅ 07-19 | ✅ driver Fal | default vivo de imagen |
 | `ref/still/reference-v1` | Seedream · 5 Pro Edit | Fal (`…/v5/pro/edit`) | image-edit | ✅ 07-19 | ✅ driver Fal | — |
-| `ref/still/nanobanana-pro-v1` | Nano Banana · Pro | Vertex (`gemini-3-pro-image`) | image-generate | ✅ 07-24 | 🟢 canary verde 07-24; **promoción ADR-009 ⏳** | región `global`; driver gobernado `9b62b19` |
-| `ref/still/openai-v2` | GPT Image · 2 | OpenAI (`gpt-image-2`) | image-generate | ✅ 07-24 | 🔒 sin lane de producción | falta verifier OpenAI (`governed-production-composition.ts`) |
-| `ref/still/openai-v1-5` | GPT Image · 1.5 | OpenAI (`gpt-image-1.5`) | image-generate | ✅ 07-24 | 🔒 sin lane de producción | idem; slug a reverificar en canary |
+| `ref/still/nanobanana-pro-v1` | Nano Banana · Pro | Vertex (`gemini-3-pro-image`) | image-generate | ✅ 07-24 | ✅ readiness promovido + binding activo 07-30 | región `global`; driver gobernado `9b62b19`; revisión live `896a0620` |
+| `ref/still/openai-v2` | GPT Image · 2 | OpenAI (`gpt-image-2`) | image-generate | ✅ 07-24 | 🔒 sin lane de producción | atestación comercial firmada 07-30; falta verifier OpenAI (`governed-production-composition.ts`) |
+| `ref/still/openai-v1-5` | GPT Image · 1.5 | OpenAI (`gpt-image-1.5`) | image-generate | ✅ 07-24 | 🔒 sin lane de producción | atestación comercial firmada 07-30; falta lane gobernado y canary exacto |
 | `ref/motion/loop-v1` | Seedance · 2.0 | Fal | video-generate | ✅ 07-19 | ✅ driver Fal | — |
 | `ref/motion/reference-v1` | Gemini Omni Flash · Preview | Vertex (Omni, Interactions API) | video-generate | ✅ 07-20 (40cr) | ⏳ **solo Lab** — Omni NO está en el path gobernado | ver "Delta" abajo |
 | `ref/video/frames-v1` | Veo · 2.0 | Vertex (`veo-…:predictLongRunning`) | video-frames | ✅ 07-20 (MP4 real, 32cr) | ✅ driver Veo gobernado (`vertex-video`, `us-central1`) desde 07-22 | — |
@@ -120,10 +120,10 @@ Manual: [operar la flota](../../manual-de-uso/creative-studio/operar-flota-model
 ## Delta / pendientes conocidos
 
 - **Gemini Omni en producción gobernada:** hoy Omni está **solo en el Lab**; el path gobernado tiene Fal + Veo + (ahora) Vertex-imagen, **no Omni**. Si `ref/motion/reference-v1` se quiere entregar a cliente, falta su driver gobernado (Interactions API) — análogo a lo que se hizo para Vertex-imagen.
-- **OpenAI (GPT Image 2/1.5):** canarean en el Lab; **sin lane de producción** hasta implementar el verifier oficial.
+- **OpenAI (GPT Image 2/1.5):** atestaciones comerciales firmadas en Producer el 07-30; canarean en el Lab, pero siguen **sin lane de producción** hasta implementar el verifier oficial y su callback firmado.
 - **Nano Banana 2:** espera **allowlist de Google**.
 - **Grant de créditos 409 → `ISSUE-124`:** el comando canónico de administración de créditos devuelve `409 conflict` en un grant adicional pese a pool activo + identidad válida + idempotencia nueva. No bloquea lo hecho (el canary corrió con el budget subido 100→110 + grant de 10). Documentado en `docs/issues/open/ISSUE-124-globe-credit-grant-canonical-409-root-cause-hidden.md` (Codex, 2026-07-24). No se hizo bypass ni mutación directa.
-- **Promoción ADR-009 bloqueada:** la saga de promoción de Nano Banana Pro espera **identidades de readiness firmadas** (paso humano/gobernado). Codex intentó y NO forzó (correcto). Hasta esa firma, todas las rutas siguen `gated/not_promoted` — ningún modelo queda `available` en el reader/selector.
+- **Promoción ADR-009:** Nano Banana Pro ya tiene revisión humana firmada en Producer, readiness `promoted` y binding de producción `enabled`, con readback live en la revisión `896a0620`. Las demás rutas siguen sujetas a sus gates propios; no se fuerza ninguna sin evaluación exacta, derechos y driver gobernado.
 
 ## Roadmap → "todos los modelos probados en el Producer"
 
@@ -143,7 +143,7 @@ Para llevar una ruta del Lab al Producer hacen falta 4 cosas (las 2 primeras son
 |---|---|---|
 | Seedream / Seedance / ElevenLabs / Seed Audio (Fal) | solo **promoción ADR-009** por ruta (driver ✅) | Codex/operador (gobernado) |
 | Veo (video) | solo **promoción ADR-009** (driver ✅) | Codex/operador |
-| **Nano Banana Pro** | **promoción ADR-009** (canary ✅, driver ✅, atestación ✅) — el más cercano | Codex/operador |
+| **Nano Banana Pro** | **completado 07-30** (canary ✅, driver ✅, atestación ✅, readiness ✅, binding ✅) | — |
 | **Gemini Omni** | **construir driver gobernado** (Interactions API) → allowlist → promoción | código (Globe) + Codex |
 | GPT Image 2/1.5 | **verifier de producción OpenAI** (código) → promoción | código (Globe) + Codex |
 | Nano Banana 2 | **allowlist de Google** (externo) → luego ruta + driver + promoción | Google + luego equipo |

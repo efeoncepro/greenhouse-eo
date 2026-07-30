@@ -205,20 +205,22 @@ identidad read-only antes de rollout externo.
 Los cambios locales ajenos siguen fuera de commits: `.vercel/project.json` y los dos artefactos SKY Blog. No se
 implementó trabajo nuevo de AXIS/Globe.
 
-## AXIS/Globe — continuidad sin implementación
+## AXIS/Globe — promoción live de Nano Banana Pro
 
 Globe sigue siendo producto comercial Efeonce; su estadio técnico permanece `internal-only`/`internal_smoke`, con
-externos gated por TASK-1480. Incluido en este release de Greenhouse: el fixture opt-in `/design-system/axis-adapters`,
-la infraestructura de consumo privado y la documentación/gates asociados. La migración de credenciales, canaries,
-release y rollback ya está cerrada; la promoción comercial sigue separada del piloto. TASK-1485 sigue `to-do` y depende de
-TASK-1455/aceptación ADR-016; TASK-1552 mantiene
-Slice 3 abierto (estados de error/cancelación, evidencia premium y operación live/internal-only); TASK-1480 requiere
-cerrar dossier/evidencia del lane managed y no habilita runtime operado por cliente. ADR-010 mantiene atestación,
-promoción por ruta y gates comerciales; ADR-016 exige Tailwind v4 + `tokens.ts` como theme y cero literales de diseño.
+externos gated por TASK-1480. En la sesión 2026-07-30 se completó la promoción independiente de
+`ref/still/nanobanana-pro-v1`: revisión humana firmada desde el Producer autenticado, readiness `promoted` en revisión 2,
+binding de routing creado y activado en revisión 2, y despliegue live `896a0620cc93cccfb93ab5576068ff5a87e85113`.
+El selector live muestra Nano Banana Pro como `Disponible`. No se forzaron rutas restantes: siguen bloqueadas por
+evidencia exacta ausente, driver gobernado ausente o dependencia externa según `GLOBE_MODEL_FLEET_STATUS.md`.
+Desde el Producer autenticado también quedaron firmadas el 2026-07-30 las atestaciones comerciales de
+`gpt-image-2` y `gpt-image-1.5`; eso no habilita promoción todavía porque Globe aún carece del verifier/callback
+gobernado de OpenAI y de un canary exacto por ruta.
+TASK-1485 sigue `to-do` y depende de TASK-1455/aceptación ADR-016; TASK-1552 mantiene Slice 3 abierto.
 
 Siguiente task recomendado: **TASK-1480**, cerrar primero el readiness dossier del lane managed SKY con sus gates de
 derechos, gasto, ruta, rollback, entrega segura, SOW y facturación; después coordinar TASK-1485/TASK-1552 según sus
-dependencias. No implementar ese trabajo en esta sesión.
+dependencias. Para promover otra ruta, primero completar su brief/evaluación exacta y repetir el flujo gobernado.
 
 La historia anterior y los índices archivados viven en [Handoff.archive.md](Handoff.archive.md) y
 `docs/operations/agent-context-history/`; no cargar esos shards completos al inicio.
