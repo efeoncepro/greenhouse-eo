@@ -120,9 +120,9 @@ done
 
 # ✅ 4. HECHO 2026-07-29 — consumidores migrados al nuevo secret resource.
 # ✅ 5. HECHO 2026-07-30 — builds, canaries y release productivo verdes en ambos productos.
-# 🟡 6. PENDIENTE — deshabilitar y retirar el secreto legacy en `efeonce-globe` después de
-#       completar la comprobación autenticada de estado. Mantenerlo recuperable mientras la
-#       sesión local de GCP no pueda reautenticarse.
+# ✅ 6. HECHO 2026-07-30 — versión legacy deshabilitada y secreto eliminado de `efeonce-globe`;
+#       el PAT `AXIS GCP Cloud Build read` también fue revocado en GitHub después de verificar
+#       el release productivo.
 ```
 
 **NUNCA** revocar el binding legacy antes del paso 5. Revocar primero deja a Greenhouse sin poder
