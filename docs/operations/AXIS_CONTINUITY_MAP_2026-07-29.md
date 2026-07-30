@@ -8,6 +8,24 @@
 > [`EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1`](../architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md);
 > el runbook operativo en [`AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1`](./AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
 
+## Actualización de cierre — 2026-07-30
+
+La migración Axis descrita por este diagnóstico quedó ejecutada y verificada. Esta actualización supersede
+los estados parciales que permanecen más abajo como registro histórico:
+
+- `axis-packages-read-token` está activo únicamente en `efeonce-group`; el secreto legacy fue eliminado de
+  `efeonce-globe` después de comprobar que no quedaban referencias runtime.
+- El PAT legacy fue revocado. El PAT temporal aprobado para la migración permanece activo como medida
+  interina para builds internos/producción; la identidad de máquina sigue siendo el trabajo previo al
+  rollout externo.
+- El release productivo `30502476429` terminó en `success` sobre
+  `41fa94846d0ca18a0f83529dc90cdc2da15a632d`; los workers, HubSpot, Vercel y health checks quedaron verdes.
+- Los canaries Playwright usan `playwright-core` con `channel: 'chrome'`. El rollback de
+  `globe-studio-internal` y `globe-api-internal` fue ejercitado, verificado al 100% y restaurado.
+
+Para el estado operativo vigente, prevalecen el runbook y este bloque de cierre sobre las tablas históricas
+de este mapa.
+
 ---
 
 ## 0. Los cuatro actores, y por qué confundirlos es caro
@@ -41,8 +59,8 @@ Todo lo de esta sección está verificado contra artefactos, no contra prosa.
 ### Acceso y credenciales — cerrado (con reloj, ver §7)
 
 - Acceso `Read` de GitHub Actions concedido a `greenhouse-eo` y `efeonce-globe` sobre los tres paquetes.
-- Secreto `axis-packages-read-token` en Secret Manager de `efeonce-globe`; el SA de Cloud Build
-  (`818083690953-compute@…`) tiene `secretAccessor` **a nivel de secreto**, no de proyecto.
+- Secreto `axis-packages-read-token` en Secret Manager de `efeonce-group`; el secreto legacy de
+  `efeonce-globe` fue eliminado tras la migración y el PAT legacy fue revocado.
 - Vercel `NPM_RC` en `axis-design-system-lab` (Production + Preview).
 
 ### Consumo — cerrado como piloto opt-in en LOS DOS runtimes
@@ -71,13 +89,16 @@ Dockerfile (`68a2cbe`, `d009871`, `b9112a8`, `403d346`; revisión viva `00101-x2
 
 ---
 
-## 2. Qué está PARCIALMENTE implementado
+## 2. Qué estaba PARCIALMENTE implementado
+
+La tabla siguiente conserva el diagnóstico histórico del 2026-07-29. Los gates P1–P3 fueron cerrados por
+el release productivo `30502476429`; no deben tratarse como pendientes actuales.
 
 | # | Qué | Estado real | Por qué no está cerrado |
 |---|---|---|---|
-| **P1** | Corrida real de **GitHub Actions** con install de AXIS | ⚠️ **NO VERIFICADO** | El wiring existe en los dos repos y hubo pushes hoy que debieron dispararlo, pero **no pude confirmar la conclusión**: la API de GitHub estaba en rate limit (0/5000). **No se asume verde.** |
-| **P2** | Verificación de **digest desplegado** | ❌ falta | Declarado requisito de promoción en `TASK-1591` y en el runbook. Cloud Build corre verde, pero nadie verificó que el digest servido corresponda al build con AXIS. |
-| **P3** | **Rollback probado** | ❌ falta | Existe `rollback-internal.yml`, pero no hay evidencia de un rollback ejercido con AXIS adentro. |
+| **P1** | Corrida real de **GitHub Actions** con install de AXIS | ✅ **CERRADO** | CI, deep verification y Playwright smoke pasaron como precondiciones del release productivo. |
+| **P2** | Verificación de **digest desplegado** | ✅ **CERRADO** | Las revisiones productivas y sus imágenes quedaron verificadas por el release control plane. |
+| **P3** | **Rollback probado** | ✅ **CERRADO** | Rollback interno de Studio y API ejercitado al 100% y restaurado correctamente. |
 | **P4** | Promoción del **registry a `stable`** | ❌ bloqueado por diseño | El ADR es explícito: *«`TASK-1485` pasa a ser consumer/piloto de la plataforma compartida y **debe actualizarse antes de promover el registry como estable**»*. |
 | **P5** | `TASK-1485` (motor de estilos + governance de Globe) | `to-do`, **desbloqueada** | Ver §6: su `Blocked by` está stale. |
 | **P6** | `TASK-1552` Slice 3 | `in-progress` | Estados de ejecución y evidencia premium del composer. Consume el motor que gobierna `TASK-1485`. |
@@ -108,7 +129,7 @@ Para habilitarlo se concedió `roles/secretmanager.secretAccessor` **sobre ese �
 Build de Greenhouse:
 
 ```
-axis-packages-read-token  (vive en GCP efeonce-globe)
+axis-packages-read-token  (histórico: vivía en GCP efeonce-globe; hoy vive en efeonce-group)
   ├── 818083690953-compute@  ← Cloud Build de Globe        (preexistente)
   └── 183008134038-compute@  ← Cloud Build de Greenhouse   (agregado 2026-07-29)
 ```
@@ -158,7 +179,7 @@ Lab.
 
 ```
 AXIS (axis-design-system)
-  │  publica @efeoncepro/axis-{tokens,ui-contracts,ui-registry} 0.1.4
+  │  publica @efeoncepro/axis-{tokens,ui-contracts,ui-registry} 0.1.5
   │  ⇩ tag v*.*.* → release-packages.yml → GitHub Packages (privado)
   │
   ├─► GREENHOUSE ── consume vía package.json raíz + adapters MUI/Vuexy
@@ -227,8 +248,8 @@ Son evidencia de promoción, no capacidad. Se cierran juntos en una pasada.
 
 | Gate | Estado | Detalle |
 |---|---|---|
-| PAT → identidad de máquina | 🔴 **con reloj: 2026-08-27** | Operator-owned. Requisito declarado antes de rollout externo. **Es también la única ventana barata para retirar el acoplamiento cross-proyecto de §2-bis** — el secreto nuevo debe nacer fuera del proyecto de un producto. |
-| Credencial AXIS en proyecto neutral | ❌ vive en `efeonce-globe` (proyecto de un producto) | Ver §2-bis. Aceptado como temporal para no crear una segunda copia que rotar. |
+| PAT → identidad de máquina | 🟠 **pendiente para rollout externo** | El token temporal sigue activo para la operación interina. La identidad de máquina continúa siendo el requisito antes de rollout externo. |
+| Credencial AXIS en proyecto neutral | ✅ `efeonce-group` | El secreto legacy de `efeonce-globe` fue eliminado y el PAT legacy fue revocado. |
 | Secreto nunca en la imagen | ✅ | BuildKit `--mount=type=secret`, montado en **ambos** RUNs desde el fix del Delta. |
 | Token nunca en logs ni lockfile | ✅ | `trap 'rm -f .npmrc' EXIT` en Actions. |
 | Paquetes privados, no públicos | ✅ | El runbook lo prohíbe explícitamente como atajo. |
@@ -237,7 +258,7 @@ Son evidencia de promoción, no capacidad. Se cierran juntos en una pasada.
 
 | Gate | Estado |
 |---|---|
-| Versiones fijadas (no rangos) | ✅ `"0.1.4"` exacto en los dos consumers |
+| Versiones fijadas (no rangos) | ✅ `"0.1.5"` exacto en los dos consumers |
 | Registry scoped `@efeoncepro` | ✅ en CI; **`.npmrc` deliberadamente NO committeado** (llevaría token) — se materializa efímero |
 | Canario cross-repo ante un bump | ❌ **no existe** |
 
@@ -255,7 +276,7 @@ Son evidencia de promoción, no capacidad. Se cierran juntos en una pasada.
 |---|---|
 | Wiring en Greenhouse | ✅ 10 workflows |
 | Wiring en Globe (`ci.yml`) | ✅ |
-| **Corrida real verde con AXIS** | ⚠️ **NO VERIFICADO** (rate limit de la API). No se asume. |
+| **Corrida real verde con AXIS** | ✅ verificada en CI y release productivo `30502476429` |
 
 ### Runtime
 
@@ -263,26 +284,27 @@ Son evidencia de promoción, no capacidad. Se cierran juntos en una pasada.
 |---|---|
 | Cloud Build de Globe con AXIS | ✅ **probado**: 1 fallo + fix + 5 deploys verdes |
 | Canario del piloto | ✅ `axis-pilot-canary.test.mjs`, 16 asertos; su leak de proceso se cerró el 2026-07-29 |
-| Digest desplegado verificado | ❌ |
-| Rollback ejercido con AXIS | ❌ |
+| Digest desplegado verificado | ✅ |
+| Rollback ejercido con AXIS | ✅ Studio y API internos, restaurados |
 
 ---
 
-## 8. Documentación stale detectada (corregir al ejecutar, no antes)
+## 8. Documentación histórica corregida
 
 1. **Runbook** — *«falta ejecutar una corrida real de CI/Cloud Build»*: para **Cloud Build ya se ejecutó**,
-   falló, se corrigió y lleva 5 deploys verdes. Lo que sigue sin verificar es **GitHub Actions**.
-2. **Runbook** — solo menciona `NPM_RC` en el proyecto Vercel del Lab; **también existe en `greenhouse-eo`**.
+   falló, se corrigió y lleva 5 deploys verdes. CI y el release productivo ya quedaron verificados.
+2. El runbook mantiene la distinción entre el Lab, que no necesita credencial de registry, y los consumidores
+   que usan el secreto de Secret Manager.
 3. **`TASK-1485`** — `Blocked by: TASK-1455`, que está `complete`.
 
-> Se dejan **anotadas y sin corregir** a propósito: corregirlas es parte del arranque de `TASK-1485`, y un
-> barrido documental suelto ahora mezclaría el diagnóstico con la ejecución.
+> Las referencias de `TASK-1485` se mantienen fuera de este barrido; el estado operativo de la migración Axis
+> queda cerrado en el bloque de cierre y en el runbook.
 
 ---
 
 ## 9. Handoff — para arrancar sin releer nada
 
-**Estado de partida (2026-07-29):**
+**Estado de partida histórico (2026-07-29):**
 
 - AXIS `0.1.4` publicado y consumido por los dos productos como **piloto opt-in verificado**.
 - Globe: `main` limpio, revisión viva `globe-studio-internal-00101-x2d` sirviendo `403d3464e88e`.
@@ -297,15 +319,14 @@ Son evidencia de promoción, no capacidad. Se cierran juntos en una pasada.
 > `greenhouse-task-planner` completa antes de editarla; el cierre exige `pnpm task:lint --task TASK-1485` en
 > `errors=0 warnings=0`.
 
-**Dos cosas que hay que verificar en cuanto la API de GitHub deje de estar en rate limit:**
+**Verificaciones que ya no están pendientes:**
 
 ```bash
 gh run list --repo efeoncepro/efeonce-globe  --workflow=ci.yml --limit 5
 gh run list --repo efeoncepro/greenhouse-eo  --workflow=ci.yml --limit 5
 ```
 
-Si alguna corrió verde con el install de AXIS, **P1 se cierra sin trabajo**. Si ninguna tocó el path, hay que
-provocarla.
+El release `30502476429` dejó CI, smoke, workers, HubSpot, Vercel y health checks en verde.
 
 **Lo que NO hay que hacer todavía:** promover adapters a superficie de producto, bumpear la versión de AXIS,
 avanzar `TASK-1552` Slice 3, ni tocar el release develop→main.

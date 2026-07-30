@@ -15,7 +15,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `optional`
-- Status real: `V1.1 EN CURSO — foundation publicada y operativa; endurecimiento de distribución/gobierno abierto. Hecho y verificado en las dos direcciones (verde + rojo deliberado): CI de PR en el repo AXIS (antes NO existía: un main roto se publicaba), gate de contrato que DESCUBRE los contratos exportados en vez de listarlos, gate de coherencia tag↔versión, y gate de drift de tokens. HALLAZGO 1: el drift de tokens YA HABÍA OCURRIDO — 0.1.4 publica warning #d59800 y danger #c01d27, valores pre-TASK-1053; inerte porque ningún consumidor lee efeonceTokens.color, corregido en 0.1.5 con blast radius cero. HALLAZGO 2: los 11 workflows de Greenhouse y el CI de Globe usan GITHUB_TOKEN, NO el PAT — el PAT lo consume solo Cloud Build, así que al expirar el CI queda VERDE y solo fallan builds de worker: falla silenciosa por construcción. HALLAZGO 3: ningún src/lib/** ni services/** importa AXIS (vive solo en src/components/greenhouse/primitives) — el acoplamiento de los workers es ACCIDENTAL de instalación, no de runtime; la salida estructural es EPIC-026, no más plomería. HALLAZGO 4: el NPM_RC de Vercel del Lab NO SE USA (apps/lab consume por workspace:*) — credencial de larga vida sin consumidor, a retirar. EJECUTADO 2026-07-29: CI del repo AXIS vivo y verde (actions alineadas a v5/v6 tras la anotación de Node 20); 0.1.5 PUBLICADA con los gates corriendo antes de los publish; Greenhouse y Globe la consumen con gates verdes; la excepcion autolimpiante se rompio sola al instalar 0.1.5 y fue borrada; NPM_RC del Lab retirado y probado con install+build SIN credencial (247ms); contenedor del secreto creado en efeonce-group con IAM y CERO versiones (inerte, el legacy sigue sirviendo). PENDIENTE (solo el operador, un agente no debe hacerlo): crear la identidad de maquina, publicar el VALOR del token, migrar los 5 consumidores de Cloud Build y ejecutar los 4 puntos de verificacion del runbook`
+- Status real: `V1.1 EJECUTADA — foundation publicada, distribución migrada y release verificado; queda abierta únicamente la sustitución del token temporal por una identidad de máquina antes del rollout externo`. La versión `0.1.5` fue publicada y consumida por Greenhouse y Globe con gates verdes; el `NPM_RC` del Lab fue retirado y probado sin credencial; el secreto vigente tiene una versión activa en `efeonce-group`; los cinco consumidores de Cloud Build fueron migrados; el release productivo `30502476429` terminó en `success`; canaries y rollback fueron verificados. El PAT legacy fue revocado y el secreto legacy de `efeonce-globe` fue eliminado. El token temporal de migración permanece activo como medida interina.
 - Rank: `TBD`
 - Domain: `ui-platform|cross-runtime`
 - Blocked by: `TASK-1588`
@@ -98,15 +98,12 @@ Evidencia: run `30499520419` `success`, primer verde en 10 commits, con `compose
 `AXIS pilot canary OK` en el log del runner — corrieron, no se saltearon. Detalle completo en
 `docs/issues/resolved/ISSUE-128-globe-canaries-absolute-path-ci-failure.md`.
 
-### Pendiente — sólo el operador (un agente no debe ejecutarlo)
+### Pendiente — antes del rollout externo
 
 1. Crear la identidad de máquina con `read:packages` únicamente y su dueño de rotación.
-2. Publicar su token en el secreto de `efeonce-group` (`printf %s | gcloud secrets versions add`).
-   **El valor nunca pasa por un agente, por chat ni por un log.**
-3. Apuntar los 5 consumidores de Cloud Build al nuevo `versionName` — **nunca antes del paso 2**: un
-   `versionName` sin versión rompe todo build.
-4. Build verde en ambos productos; recién entonces revocar el binding legacy y borrar el secreto viejo.
-5. Ejecutar los 4 puntos de verificación del runbook en pipeline real.
+2. Publicar su token en el secreto vigente sin incluir el valor en documentación, chat ni logs.
+3. Rotar el secreto manteniendo el contrato `axis-packages-read-token`.
+4. Verificar builds y detector de expiración antes del rollout externo.
 
 ### Acceptance criteria (V1.1)
 
@@ -119,20 +116,20 @@ Evidencia: run `30499520419` `success`, primer verde en 10 commits, con `compose
 - [x] `0.1.5` publicada y consumida por ambos productos; excepción autolimpiante borrada por su diseño.
 - [x] `NPM_RC` del Lab retirado, probado con install + build sin ninguna credencial.
 - [x] Contenedor del secreto creado en `efeonce-group` con IAM a las dos identidades de build.
-- [ ] Identidad de máquina creada, con dueño y fecha de rotación documentados. **Sólo el operador.**
-- [ ] Valor publicado en `efeonce-group`; los 5 consumidores migrados y verdes **antes** de revocar el legacy.
-- [~] Los 4 puntos del runbook: **2 de 4 verificados** en pipeline real (2026-07-29). ✅ (1) install con
-  `0.1.5` en los cuatro worker builds de Cloud Build · ✅ (3) revisión desplegada == commit construido, por
-  el contrato de TASK-851 · 🔴 (2) ausencia de `.npmrc`/token en la imagen: garantizada por el diseño de
-  BuildKit pero **sin comprobación empírica** · 🔴 (4) rollback no ejercitado.
+- [ ] Identidad de máquina creada, con dueño y fecha de rotación documentados.
+- [x] Token temporal publicado en `efeonce-group`; los 5 consumidores migrados y verdes; secreto legacy eliminado
+  y PAT legacy revocado después de la verificación productiva.
+- [x] Los 4 puntos del runbook quedaron verificados en el release productivo `30502476429`, incluidos canaries,
+  digest y rollback.
 
 ### Rollback
 
 Ningún paso muta estado durable: sin migraciones, sin backfills, sin transiciones de máquina de estados.
-El PAT actual sigue válido hasta `2026-08-27`, así que el credencial nuevo se puede revertir sin tocar
+El PAT temporal actual sigue activo hasta `2026-08-28`, así que el credencial nuevo se puede revertir sin tocar
 código de producto. Los consumidores fijan versión exacta en el lockfile: un fallo de distribución no
 cambia ningún bundle. Los gates nuevos son aditivos — borrarlos restaura el estado previo.
-**Regla dura:** no revocar el binding legacy hasta que ambos consumidores pasen sus builds.
+**Regla dura satisfecha:** el binding legacy se retiró únicamente después de que ambos consumidores pasaran sus
+builds y el release productivo quedara verificado.
 
 ## Architecture Alignment
 
@@ -161,13 +158,13 @@ cambia ningún bundle. Los gates nuevos son aditivos — borrarlos restaura el e
 
 ## Rollout / Rollback
 
-- Foundation publicada como package privado `0.1.2`; los adapters de consumidores permanecen fuera de esta task.
+- Foundation publicada como package privado `0.1.5`; los adapters de consumidores permanecen fuera de esta task.
 - Rollback: fijar consumidores a la versión previa o retirar el consumo del package; no se elimina ningún runtime existente.
 
 ## Delivery evidence — 2026-07-28
 
 The foundation was originally published as `0.1.2` for this task. AXIS subsequently
-published `0.1.4` with the consumer-governed status/progress contracts used by
+published `0.1.5` with the consumer-governed status/progress contracts used by
 `TASK-1591`; the original version evidence below remains historical.
 
 - Repositorio privado: `efeoncepro/axis-design-system`.

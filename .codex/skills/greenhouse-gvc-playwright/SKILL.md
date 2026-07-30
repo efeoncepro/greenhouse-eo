@@ -108,6 +108,23 @@ El DSL de GVC cubre captura/scroll/interacción/baseline. Caé a Playwright ad-h
 - Si el flujo es repetible, **promovelo a scenario** (`scripts/frontend/scenarios/`) — el artefacto durable es el DSL determinístico, no un `.mjs` huérfano.
 - Reusá `lib/auth.ts` + `lib/browser.ts` (auth + lifecycle ya resueltos); no reinventes el setup.
 
+## Canaries de navegador para consumidores AXIS
+
+Los canaries de consumidor AXIS son opt-in y deben ser reproducibles en CI y en local:
+
+- Declara `playwright-core` como dependencia del canary; no uses `playwright` si el canary no necesita
+  descargar browsers.
+- Lanza el navegador con `chromium.launch({ channel: 'chrome' })`, usando el Chrome instalado por el runner;
+  no hardcodees `/Applications/...`, rutas del perfil del desarrollador ni ejecutables locales.
+- Mantén el canary read-only salvo que el contrato requiera una mutación explícita. Comprueba la superficie
+  real del consumidor, no una página o mock que el propio canary invente.
+- Guarda evidencia mínima y no sensible: target SHA, versión de paquetes, URL, assertions, errores de
+  consola/red y resultado. Nunca incluyas cookies, headers de autorización, tokens ni valores de Secret
+  Manager en artifacts o logs.
+- Si el canary falla, conserva el artifact de diagnóstico, detén la promoción y usa el deployment anterior
+  conocido como rollback target. Verifica salud y smoke después de restaurar tráfico; rollback no significa
+  solo cambiar tráfico, también exige conservar el digest y la configuración de build que permite repetirlo.
+
 ## Public WordPress / Elementor landing mode
 
 Cuando el target es `efeoncepro.com` u otra landing pública WordPress/Elementor, **también aplica Webwright**, aunque no exista una ruta local Greenhouse ni un scenario GVC previo.

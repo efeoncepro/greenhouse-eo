@@ -57,32 +57,26 @@ desplegará como proyecto Vercel independiente, inicialmente en modo internal-on
 crea un runtime Cloud Run para el Lab mientras no exista una necesidad de backend,
 persistencia o jobs.
 
-## Estado verificable de distribución, autenticación y adapters — 2026-07-29
+## Estado verificable de distribución, autenticación y adapters — 2026-07-30
 
 - Los paquetes privados publicados en GitHub Packages son `@efeoncepro/axis-tokens`,
-  `@efeoncepro/axis-ui-contracts` y `@efeoncepro/axis-ui-registry`, versión `0.1.4`.
+  `@efeoncepro/axis-ui-contracts` y `@efeoncepro/axis-ui-registry`, versión `0.1.5`.
 - Los repositorios `efeoncepro/greenhouse-eo` y `efeoncepro/efeonce-globe` tienen acceso
   `Read` configurado en GitHub Actions para los tres paquetes.
-- El proyecto Vercel independiente `axis-design-system-lab` tiene `NPM_RC` configurado
-  como variable sensible para `Production` y `Preview`, con el registry de GitHub Packages
-  para el scope `@efeoncepro`. Esto habilita la instalación del Lab y el consumo fijado por
-  lockfile en los consumers.
-- En GCP, proyecto `efeonce-globe`, existe el secreto de Secret Manager
-  `axis-packages-read-token`. El service account de Cloud Build
-  `818083690953-compute@developer.gserviceaccount.com` y el de Cloud Build de
-  Greenhouse `183008134038-compute@developer.gserviceaccount.com` tienen
-  `roles/secretmanager.secretAccessor` sobre ese secreto. La ubicación es ownership
-  deliberado del ecosistema AXIS, no una credencial exclusiva de Globe; no se duplica
-  el PAT. La retirada es una decisión de ownership, no un vencimiento: al crear la
-  identidad de máquina, el secreto nuevo debe nacer en un proyecto neutral del
-  ecosistema AXIS, fuera de cualquier producto. Sólo después de migrar ambos consumers
-  y completar sus gates de build/digest se revoca el binding cross-project y se retira
-  el secreto legado; nunca se recrea en `efeonce-globe` por inercia.
+- El proyecto Vercel independiente `axis-design-system-lab` ya no tiene `NPM_RC`: el Lab
+  consume AXIS mediante `workspace:*` y su instalación/build fueron verificados sin credencial.
+- En GCP, el secreto vigente `axis-packages-read-token` vive en `efeonce-group`. Los service
+  accounts de Cloud Build de Globe y Greenhouse conservan `roles/secretmanager.secretAccessor`
+  únicamente sobre ese secreto. El secreto legacy de `efeonce-globe` fue eliminado después de
+  verificar la migración y el PAT legacy fue revocado; no se debe recrear ese acoplamiento.
 - Greenhouse y Globe consumen `efeonce.status` y `efeonce.progress` en adapters opt-in de
   `TASK-1591`, cada uno con una primitive simple y una compleja nativa a su runtime.
-- El token de GitHub usado para esta preparación es operator-owned y tiene expiración
-  `2026-08-27`. Antes de rollout externo o para una operación durable debe reemplazarse por
-  una identidad de máquina dedicada; el valor del token no forma parte de esta documentación.
+- El token temporal de GitHub usado para esta migración permanece activo para la operación
+  interna/producción y tiene expiración `2026-08-28`. Antes del rollout externo debe reemplazarse
+  por una identidad de máquina dedicada; el valor del token no forma parte de esta documentación.
+- El release productivo `30502476429` terminó en `success` sobre
+  `41fa94846d0ca18a0f83529dc90cdc2da15a632d`; CI, canaries, workers, HubSpot, Vercel y health
+  checks quedaron verdes. El rollback interno de Studio y API fue ejercitado y restaurado.
 
 ## Rules
 
@@ -159,9 +153,9 @@ GitHub App: sus installation tokens duran una hora y `availableSecrets.secretMan
 estático, así que exigiría un rotador programado — maquinaria nueva y un modo de falla nuevo para resolver
 un problema que un detector resuelve sin infraestructura.
 
-**Retira** el acoplamiento cross-project actual (el secreto vive hoy en `efeonce-globe`, un proyecto de
-producto, y Greenhouse lo lee desde afuera). `efeonce-group` no es simétrico a `efeonce-globe`: es el
-control plane que ya gobierna a Globe, no un peer.
+**Retirado:** el acoplamiento cross-project anterior usaba un secreto en `efeonce-globe`, pero el
+secreto vigente vive en `efeonce-group`, el control plane que ya gobierna a Globe. El PAT temporal
+permanece como medida interina hasta la identidad de máquina.
 
 **Hallazgo que dimensiona el riesgo — el acoplamiento de los workers es accidental, no esencial.**
 Ningún archivo de `src/lib/**` ni `services/**` importa AXIS: vive únicamente en
@@ -209,9 +203,8 @@ paquete roto que entra a producción por instalación. *Gates:* secreto solo en 
 BuildKit acotado a un `RUN`, `.npmrc` borrado por `trap`, `read:packages` como único scope, CI obligatorio
 antes de publicar y coherencia tag↔versión. *Blast radius:* lectura de tres paquetes de UI; no hay datos de
 cliente ni escritura detrás de este credencial. *Verificado por:* `worker-build-contract-gate` exige el
-wiring de auth; los 4 puntos del runbook siguen **pendientes de ejecución real**. *Riesgo residual:* hasta
-que esos 4 puntos corran en pipeline real, la ausencia de `.npmrc` en la imagen está razonada, no
-verificada.
+wiring de auth; los 4 puntos del runbook quedaron verificados en el release productivo `30502476429`.
+*Riesgo residual:* el token temporal debe sustituirse por una identidad de máquina antes del rollout externo.
 
 **Robustness** — *Idempotencia:* publicar es idempotente por versión (npm rechaza republicar la misma).
 *Atomicidad:* no aplica; no hay escritura multi-paso ni estado durable. *Protección de carrera:* `concurrency`
@@ -281,10 +274,10 @@ rotación —el modo de falla real observado— a cambio de aislar un riesgo de 
 | Greenhouse y Globe en `0.1.5` | ✅ gates verdes en ambos |
 | Excepción autolimpiante del drift | ✅ se rompió al instalar `0.1.5` y fue borrada |
 | `NPM_RC` del Lab retirado | ✅ probado con install+build sin credencial |
-| Secreto en `efeonce-group` | ⏳ contenedor + IAM creados; **cero versiones** |
-| Identidad de máquina y valor del token | 🔴 sólo el operador |
-| Migración de los 5 consumidores de Cloud Build | 🔴 bloqueada por lo anterior |
-| Los 4 puntos de verificación del runbook | 🔴 pendientes |
+| Secreto en `efeonce-group` | ✅ versión activa, IAM verificado; legacy eliminado de Globe |
+| Identidad de máquina y valor del token | 🟠 identidad de máquina pendiente para rollout externo; token temporal activo |
+| Migración de los 5 consumidores de Cloud Build | ✅ consumidores migrados y builds productivos verdes |
+| Los 4 puntos de verificación del runbook | ✅ release, canaries, digest y rollback verificados |
 
 ## Supersession
 
