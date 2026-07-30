@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-027`
-- Status real: `NECESITA RE-SCOPE O CIERRE (2026-07-30). El operador decidio que el Lab vive en el Vercel de AXIS, consumiendo lo publicado y sin importar de greenhouse-eo. Labs deja de ser candidato a primer build unit de Greenhouse: su destino no esta en el repo. EPIC-026 sigue necesitando un primer build unit, pero con OTRO sujeto. No ejecutar esta task como esta escrita. Contexto previo: Contradice a TASK-1590: esta task quiere Labs como build unit DENTRO de Greenhouse; TASK-1590 quiere el Lab en el repo AXIS con Vercel propio — y ese Lab YA EXISTE y está desplegado. Son dos destinos incompatibles para la misma superficie. Ver Delta 2026-07-30`
+- Status real: `RE-SCOPEADA 2026-07-30 — NO cerrar. Su sujeto (Design System Labs) se muda al repo AXIS, pero su OBJETIVO sigue vivo y es load-bearing para EPIC-027: probar que un cambio en un build unit no construye el Portal. El epic la cita como gate de la siguiente frontera del portal (Labs/Admin/Public). Lo que hay que decidir es el NUEVO SUJETO del piloto, no si la task existe. Contexto previo: El operador decidio que el Lab vive en el Vercel de AXIS, consumiendo lo publicado y sin importar de greenhouse-eo. Labs deja de ser candidato a primer build unit de Greenhouse: su destino no esta en el repo. EPIC-026 sigue necesitando un primer build unit, pero con OTRO sujeto. No ejecutar esta task como esta escrita. Contexto previo: Contradice a TASK-1590: esta task quiere Labs como build unit DENTRO de Greenhouse; TASK-1590 quiere el Lab en el repo AXIS con Vercel propio — y ese Lab YA EXISTE y está desplegado. Son dos destinos incompatibles para la misma superficie. Ver Delta 2026-07-30`
 - Rank: `1`
 - Domain: `platform|ops`
 - Blocked by: `none`
@@ -176,7 +176,7 @@ que **Labs no es el candidato**, porque su destino natural ya no está en el rep
 
 **No tomar ninguna de las dos hasta resolverlo.** Decisión del operador.
 
-### Delta 2026-07-30 (b) — resuelta por decisión del operador: Labs NO es el sujeto
+### Delta 2026-07-30 (b) — Labs deja de ser el sujeto; el OBJETIVO sigue vivo
 
 El operador decidió que **el Lab vive en el Vercel de AXIS**, consumiendo el registry y los tokens
 publicados, sin importar nada de `greenhouse-eo` (ver `TASK-1590` § Delta 2026-07-30 (b)).
@@ -188,8 +188,33 @@ es otro repo. `TASK-1590` avanza; ésta no como está escrita.
 primer build unit independiente de Greenhouse, y cómo se demuestra que su cambio no construye el Portal?"* —
 sigue abierta y es de EPIC-026. Lo que cambia es el candidato.
 
-**Acción pendiente (decisión del operador):** re-scopear esta task a otro candidato de build unit, o
-cerrarla y dejar la pregunta en la umbrella de EPIC-026. No la ejecute ningún agente como está.
+### Corrección 2026-07-30 (c) — **no cerrar**: es un nodo load-bearing de `EPIC-027`
+
+La nota anterior sugería «cerrarla y dejar la pregunta en EPIC-026». **Incorrecto en dos cosas**, y la
+segunda importa:
+
+1. Esta task pertenece a **`EPIC-027`** (`in-progress`, *build cost recovery / decomposition*), no a
+   EPIC-026 (que está `complete`).
+2. `EPIC-027` la cita **tres veces como gate**:
+   - *"`TASK-1382` — workspace + Design System Labs physical pilot and **affected-build proof**"*
+   - *"`TBD` — preview routing/auth and Vercel project cutover **after TASK-1382 local gate**"*
+   - *"the portal next-boundary decision (Labs/Admin/Public) **remains gated by the ordinary path
+     (`TASK-1382` pilot** + 30-day cost rebaseline)"*
+
+**Su valor nunca fue Labs: era el mecanismo.** Labs era el conejillo de indias elegido para *probar que un
+cambio en un build unit no construye el Portal*. Ese objetivo sigue intacto y sigue bloqueando la decisión
+de la siguiente frontera del portal.
+
+**Lo que hay que decidir es el nuevo sujeto del piloto**, no si la task existe. El candidato debe ser
+pure-UI, sin dominio y con frontera clara — y elegirlo es una decisión de `EPIC-027`, no un re-scope
+mecánico que un agente pueda hacer solo.
+
+**Matiz que conviene tener presente al decidir:** que Labs salga a AXIS **entrega parte del beneficio
+económico** de `EPIC-027` —un cambio de Labs deja de construir el Portal, porque ni siquiera vive en el
+repo— pero **no entrega la prueba del mecanismo** de workspaces internos, que es lo que el epic necesita
+para autorizar la siguiente frontera. Beneficio sí; evidencia no.
+
+**No la ejecute ningún agente hasta que el sujeto esté decidido.**
 
 ## Out of Scope
 

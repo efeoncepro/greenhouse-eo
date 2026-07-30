@@ -481,3 +481,39 @@ El **Slice 4 no requería tocar nada.** La spec asumía que los cuatro consumido
 necesitaban migrarse; en la práctica importan de `@core/theme/*`, que ahora re-exporta, así que consumen
 AXIS **transitivamente**. Mantener la frontera en la capa de theme es mejor que propagar el import: un
 consumidor menos que tocar y una superficie menos que vigilar.
+
+## Delta 2026-07-30 (c) — el ADR que esta task ejecutó quedó corregido (la task NO se reabre)
+
+El ADR que esta task ejecuta **fue corregido el mismo día**, por un error de razonamiento que el operador
+detectó: la frontera daba "la materialización" al producto, lo que permitía que **el mismo pattern se viera
+distinto en cada producto**.
+
+La arquitectura correcta es de **tres capas** (`modern-ui` §3, que shippean Carbon, Fluent, Primer,
+Atlassian, Polaris y Spectrum):
+
+```
+primitivo → semántico → COMPONENTE
+```
+
+**Esta task movió las dos primeras.** La tercera —`button-height`, `button-padding-x`, `button-radius`,
+`button-danger-bg`— es la que garantiza consistencia visual, y sigue viviendo dentro de Greenhouse.
+
+### Esta task queda `complete`. No se reabre.
+
+Su alcance escrito era **el valor de color** —ramps, semántica, neutrales, secondary, charts— y lo cumplió
+entero, con evidencia. Su propio `## Out of Scope` ya decía que tipografía, elevación, geometría y motion
+iban en tasks aparte.
+
+**Lo que estaba incompleto no era la task: era el ADR.** Ella ejecutó fielmente un mapa que resultó más
+chico de lo que debía ser. Reabrirla sería castigarla por un error de quien escribió el mapa, y además
+mezclaría dos alcances distintos en un mismo lifecycle.
+
+La capa de componente es **trabajo nuevo**, con su propia task.
+
+Lo que falta es el **eje 3** del ADR corregido: extender `DesignPatternContract` con `spec` + `tones` en
+tokens, y construir el **diff visual cross-runtime** que verifica que dos adapters del mismo pattern rinden
+igual. Necesita su propia task.
+
+Dato que dimensiona ese trabajo y que se puede medir el primer día: `efeonce.status` ya tiene **dos adapters
+vivos** (MUI en Greenhouse, Tailwind en Globe) escritos **sin spec compartida**. Cuánto divergen hoy es
+desconocido, y es el número que hace falta antes de estimar nada.
