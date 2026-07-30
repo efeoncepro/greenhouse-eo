@@ -42,6 +42,23 @@ Cada generador tiene **sus términos**, y **no son iguales**:
 8. **Studio Credits no son una licencia de IP.** La wallet mide consumo generativo; copyright, cesión, exclusividad, stock, música, likeness y voz se documentan y valorizan por separado.
 9. **Versiona la evidencia del proveedor.** Conserva proveedor/modelo, plan y versión de términos aplicables, provenance, intervención humana, prompts/inputs permitidos y releases. Un cambio de proveedor o términos puede cambiar el riesgo aunque la tarifa en créditos no cambie.
 
+## 4. No-training no equivale a no-processing
+
+En trabajo enterprise, la pregunta del cliente suele ser “¿se entrenarán modelos con nuestros datos?”. La respuesta debe
+separar controles:
+
+- **No training/no improvement:** el proveedor no usa Customer Data para entrenar o mejorar modelos generales.
+- **No fine-tuning:** los datos no se incorporan a un modelo compartido o del proveedor.
+- **Retention:** prompts, archivos, outputs, caches, historial, moderation/abuse logs y metadata pueden seguir retenidos.
+- **Zero retention:** sólo se afirma cuando existe para la ruta exacta y se documentan excepciones legales, de seguridad o abuso.
+- **No human access:** requiere cobertura contractual y operativa para soporte, moderación y abuso; no se presume.
+- **Isolation/residency:** tenant, workspace, región y subprocesadores deben revisarse por proveedor y endpoint.
+
+No usar “no entrenamos sus datos” como sinónimo de “sus datos nunca salen del entorno”, “nadie los puede ver” o
+“se eliminan inmediatamente”. La skill `greenhouse-ai-creative-rights-governance` y
+[`GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md`](../../../../docs/architecture/GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md)
+definen tiers, evidencia y límites de la promesa.
+
 ## En el contrato con el cliente
 
 - Sé **honesto sobre lo que puedes garantizar**: si un entregable es IA-generado, quizá no puedas prometer copyright exclusivo. Ajusta warranties (`05`) — no garantices una propiedad que la ley no reconoce.
@@ -56,6 +73,9 @@ Cada generador tiene **sus términos**, y **no son iguales**:
 - [ ] Warranties/indemnidad del contrato ajustadas a la realidad IA (`05`).
 - [ ] Disclosure al cliente (y al público si aplica) (`08`).
 - [ ] Sin PII/confidencial en herramientas IA sin gobernanza.
+- [ ] No-training, retention, human-access, residency, subprocessors e isolation evaluados por ruta exacta.
+- [ ] Zero Retention sólo declarado con configuración/evidencia del proveedor, no por marketing general.
+- [ ] AI Data Protection Pack preparado para cliente enterprise cuando el material sea confidencial/restringido.
 - [ ] Studio Credits separados de licencias, releases y pass-throughs; provenance y términos del proveedor versionados.
 
 ## Hand-off

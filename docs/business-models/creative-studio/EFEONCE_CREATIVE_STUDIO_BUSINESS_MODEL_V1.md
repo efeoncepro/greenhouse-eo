@@ -60,6 +60,13 @@ El benchmark de mercado que fundamenta esta reorganización vive en
 [`CREATIVE_SERVICES_MARKET_BENCHMARK_2026-07-30`](../../audits/commercial/CREATIVE_SERVICES_MARKET_BENCHMARK_2026-07-30.md) y la decisión estructural en
 [`EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_DECISION_V1`](../../architecture/EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_DECISION_V1.md).
 
+Para clientes enterprise, Creative Studio/Globe sólo puede sostener una promesa de protección de datos mediante la
+ruta exacta de provider/model/endpoint/plan registrada por run. No-training, no fine-tuning, retention, zero
+retention, no human access, residency, isolation, reuse, exclusividad e indemnity son dimensiones separadas. La
+configuración Tier 2 Enterprise Protected o Tier 3 Restricted/Zero Retention requiere evidencia y validación de
+Legal/IP, Security, Operations, Finance y Commercial; no es una consecuencia automática de usar credits o de que el
+cliente no tenga acceso directo al runtime. Ver [`GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1`](../../architecture/GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md).
+
 ## 2. Tesis y problema que resolvemos
 
 ### 2.1 El problema del cliente
@@ -379,6 +386,16 @@ ronda. `candidate_ready` no equivale a aprobado; sólo aprobación humana habili
 
 High-risk, minor, salud, finanzas, política, biometría/deepfake o uso regulado requieren review especializado y
 pueden quedar fuera de V1. Ningún agente aprueba derechos, gasto o publicación de forma autónoma.
+
+### 9.3 AI Data Protection Pack
+
+Cuando el material sea confidencial o restringido, el run mantiene un AI Data Protection Pack separado del rights
+pack. Incluye provider/model/endpoint/plan y términos vigentes, no-training/no-improvement, retención y logging,
+zero-retention si aplica, región, subprocesadores/DPA, aislamiento, eliminación/offboarding, excepciones e incidentes.
+
+El pack no contiene secretos, credenciales, prompts innecesarios ni payloads privilegiados. Su objetivo es que el
+cliente pueda responder a procurement, Security y Legal sin convertir la evidencia operativa en una exposición de
+datos. No se entrega un claim más amplio que la evidencia de la ruta efectivamente ejecutada.
 
 ## 10. Journey y flywheel
 

@@ -89,6 +89,20 @@ AI Creative Operations Diagnostic
 
 Globe/Creative Studio puede habilitar esta ruta, pero no es la marca contractual ni una condición de la promesa base.
 
+#### Enterprise AI Data & Rights Governance
+
+La promesa enterprise de esta ruta incluye una capa separada de governance de datos y derechos. Efeonce no promete que
+un proveedor jamás procese el material: promete procesarlo sólo por rutas aprobadas y documentadas. La promesa máxima
+queda limitada por el proveedor, modelo, endpoint, plan, región y configuración de cada proyecto.
+
+No-training, zero retention, no human access, no reuse, data residency, customer isolation, copyright exclusivity e
+indemnity son controles diferentes. Para clientes con material confidencial o restringido, la compra debe declarar
+el tier de protección, el AI Data Protection Pack, la evidencia de retención/eliminación, los subprocesadores y los
+límites de la garantía. Ver [`GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1`](../../architecture/GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md).
+
+Estado: **Proposed — validation pending**. No habilita claims públicos, pricing, provider global allowlist ni acceso
+self-serve hasta que Legal/IP, Security, Operations, Finance y Commercial validen el contrato y la operación.
+
 ## 3. Catálogo de Product Services y capabilities
 
 El catálogo es el índice de reconocimiento. Las rutas anteriores son la capa de orientación; los paquetes de la

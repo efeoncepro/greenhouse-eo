@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-30 — AI Creative Rights & Enterprise Governance
+
+- Se creó la skill canónica `.codex/skills/greenhouse-ai-creative-rights-governance/` con companion Claude y referencias para enterprise rights framework, provider vetting y contrato/consentimiento.
+- Se incorporaron gates para inputs, planes comerciales, provenance, voz/likeness, música, disclosure, indemnidad, rights pack y estados de release.
+- Se sincronizaron `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `Handoff.md` y `docs/operations/agent-context-router.json`.
+- La skill no autoriza claims legales ni venta automática: cláusulas, indemnidad y jurisdicciones requieren `legal-privacy-ip-operator`/Legal.
+- Se añadió la decisión propuesta [`GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1`](docs/architecture/GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md): no-training, retention, zero-retention, no human access, residency, isolation, subprocesadores, deletion y AI Data Protection Pack quedan separados y sujetos a evidencia por ruta.
+- Se sincronizaron Creative Services, Creative Studio/Globe, el manual de pilotos AI, Legal/IP y los routers para no prometer “no se procesan” cuando el compromiso real es procesamiento por provider/endpoint/plan aprobado.
+
 ## 2026-07-30 — Globe: Nano Banana Pro promovido en el carril gobernado
 
 - Se firmó la revisión humana desde el Producer autenticado y se propuso `ref/still/nanobanana-pro-v1` al operador.
@@ -648,11 +657,3 @@ Las dos compuertas de la ADR cerraron verdes, así que el fallback a `vite@7.3.x
 
 El share board, la única superficie que ve un cliente, se separó a `TASK-1558`: necesita dirección visual
 aprobada y no existe.
-
-## 2026-07-25 — Globe: `/assets/*` sale por CDN (TASK-1557)
-
-Carril CDN acotado a `/assets/*` sobre el ALB existente, aplicado y verificado en vivo con hits del
-edge. El backend del shell SSO conserva `enable_cdn = false` y el path matcher es un allowlist cuyo
-default apunta al backend sin caché: si una regla no matchea, el request cae hacia el lado seguro.
-La política de caché la sigue declarando el origen (`USE_ORIGIN_HEADERS`), para no crear una segunda
-fuente de verdad. Nada autenticado se cachea, verificado path por path.

@@ -35,6 +35,12 @@ Esas dimensiones usan líneas económicas separadas.
 5. **Append-only:** balance es proyección de ledger; ajustes nunca borran historia.
 6. **No double charge:** un retry técnico no crea un segundo cargo silencioso.
 7. **No hidden rights:** licencias y derechos se cotizan aparte.
+
+8. **La protección de datos no se compra con créditos:** no-training/no-improvement, no fine-tuning,
+   retención, zero retention, acceso humano, residencia, subprocessors, aislamiento y borrado son
+   controles de proveedor, contrato y runtime. Los carriles empresariales sensibles requieren el
+   [AI Data Protection Pack](../../architecture/GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md#8-ai-data-protection-pack),
+   y no se consideran incluidos por defecto en un saldo de créditos.
 8. **No false precision:** bandas antes que decimales arbitrarios; recalibración con datos observados.
 9. **Human authority:** aprobación de gasto y delivery permanece humana según policy.
 10. **Margin floor:** equivalencias se diseñan para sostener ≥45% de margen bruto total, no para copiar costos.

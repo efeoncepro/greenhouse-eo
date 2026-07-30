@@ -60,6 +60,9 @@ skill.
 - Asset Governance procesa `inspection → malware → C2PA → rights` en un Job keyless, durable y fenced. En
   `c2patool` 0.26.60, un MP4/MP3 válido sin manifest devuelve nonzero `No claim found`: se normaliza como
   `unverified/c2pa_manifest_absent`, no como outage ni `unsupported`. Sólo `Trusted` habilita badge C2PA.
+- La protección de datos enterprise es una dimensión separada de C2PA/rights: provider/model/endpoint/plan exactos,
+  no-training/no-improvement, retención, zero-retention, acceso humano, región, subprocesadores, aislamiento y
+  eliminación se verifican por ruta. Canon: `docs/architecture/GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md`.
 - Antes de crear otra revisión, el worker reconcilia proyecciones terminales no aplicadas y recupera autoridad de
   rights desde evidencia durable; requeue/replay son revisionados e idempotentes, nunca SQL manual.
 - El cierre proporcional exige `pnpm check && pnpm build`, test nuevo registrado en el script del package,

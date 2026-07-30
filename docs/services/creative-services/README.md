@@ -129,9 +129,10 @@ Antes de convertir un servicio en `Commercially approved`, su ficha debe declara
 5. especialistas, plataforma, providers y sistemas de registro;
 6. rondas, aceptación, quality gates, SLA/expectations y fallback;
 7. derechos de uso, IP, provenance, privacidad y offboarding;
-8. métricas de valor y delivery: OTD, FTR, RpA, cycle time y adopción cuando aplique;
-9. revenue architecture, unidad de valor, cost-to-serve, margen y pass-through;
-10. evidencia, renovación, expansión, stop conditions y owner de revisión.
+8. postura de data protection GenAI: no-training, retención, acceso humano, subprocesadores, región, eliminación y disclosure;
+9. métricas de valor y delivery: OTD, FTR, RpA, cycle time y adopción cuando aplique;
+10. revenue architecture, unidad de valor, cost-to-serve, margen y pass-through;
+11. evidencia, renovación, expansión, stop conditions y owner de revisión.
 
 ## Boundaries con otras líneas y marcas
 

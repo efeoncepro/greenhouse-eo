@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Creative Rights Governance"
+  short_description: "Gobierna derechos GenAI para clientes enterprise"
+  default_prompt: "Usa $greenhouse-ai-creative-rights-governance para revisar y gobernar derechos, consentimiento, provenance y contrato de una producción creativa con IA."

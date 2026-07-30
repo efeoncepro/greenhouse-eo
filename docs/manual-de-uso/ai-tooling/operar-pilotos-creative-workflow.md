@@ -74,6 +74,21 @@ el segundo prueba familia de campaña, format wall, mezcla y release creativo si
 7. El runner debe usar submission fence/outbox/idempotencia, lease/heartbeat, reconciliación, DLQ y recuperación
    de reservas huérfanas. Si no puede probar que un retry no duplica gasto, no reintentar automáticamente.
 
+### Data protection y no-training
+
+La frase “el proveedor no entrena con los datos” no cierra el preflight. Registrar por la ruta exacta:
+
+- no-training/no-improvement y no fine-tuning;
+- retención de prompts, inputs, outputs, caches, historial, metadata y abuse/moderation logs;
+- zero-retention sólo si el proveedor la habilita para ese modelo/endpoint y se documentan excepciones;
+- acceso humano de soporte, seguridad, moderación o abuso;
+- región y subprocesadores;
+- aislamiento de workspace/proyecto/tenant;
+- eliminación, offboarding y evidencia de cumplimiento.
+
+Si falta cualquiera para una clasificación `confidential` o `restricted`, marcar `proof-only` o `blocked`; no
+compensar el gap con una promesa comercial. Ver [`GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1`](../../architecture/GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md).
+
 ### Exploración no es producción
 
 Antes de crear un piloto, declarar si se está **explorando** una dirección o ejecutando una receta ya aprobada. Un agente puede recuperar contexto y proponer brief, referencias, shot list, ruta y estimate; debe entregar ese plan en forma editable. Sólo una aprobación humana habilita un run con gasto. No convertir una conversación, un prompt prometedor o un render aislado en un workflow compartible sin evidencia, rúbrica y límites explícitos. Contexto y preguntas abiertas: [RESEARCH-009](../../research/RESEARCH-009-creative-operations-agentic-workflows.md).

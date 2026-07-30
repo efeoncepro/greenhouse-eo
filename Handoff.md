@@ -1,5 +1,9 @@
 # Handoff activo
 
+## 2026-07-30 — Skill AI Creative Rights & Enterprise Governance
+
+Se creó `.codex/skills/greenhouse-ai-creative-rights-governance/` y su companion `.claude/skills/greenhouse-ai-creative-rights-governance/` para gobernar producción generativa enterprise en imagen, video, audio, música, voz, likeness, copy y medios híbridos. Incluye clasificación A–D, gates de inputs/providers/contratos, no-training vs retention/zero-retention/no-human-access/residency/isolation, estados `approved-commercial`/`approved-with-restrictions`/`proof-only`/`blocked`/`incident-replacement`, rights pack, AI Data Protection Pack, checklist de consentimiento y matriz de vetting de proveedores con baseline fechado 2026-07-30. El contrato canónico propuesto vive en [`GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1`](docs/architecture/GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md). Estado: documentación completa para validación; adopción runtime, provider allowlist y cláusulas contractuales requieren validación de Legal/IP, Security, Operations, Finance y Commercial.
+
 ## 2026-07-30 — Efeonce Talent Assurance: documentación propuesta
 
 La auditoría de selección en Berel se documentó como un gap de `Hiring Quality Assurance`, no como una falla

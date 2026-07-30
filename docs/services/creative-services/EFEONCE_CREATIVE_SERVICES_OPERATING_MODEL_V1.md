@@ -313,7 +313,14 @@ Cada proposal/SOW debe declarar:
 - uso de proveedores/modelos;
 - provenance y disclosure cuando corresponda;
 - almacenamiento, acceso y offboarding;
+- no-training/no-improvement, retención, zero-retention, acceso humano, región, subprocesadores e isolation por provider/model/endpoint/plan;
+- AI Data Protection Pack para material confidencial o restringido;
 - responsabilidad por claims, aprobación y publicación.
+
+La garantía enterprise debe distinguir no-training de no-processing, retention, zero retention, no human access,
+residency, reuse, isolation e indemnity. El alcance válido es el de la ruta exacta registrada en la evidencia; un
+cambio de proveedor, modelo, endpoint, región, plan o feature reabre el gate. La fuente canónica es
+[`GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1`](../../architecture/GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md).
 
 ## 11. Proof y métricas
 

@@ -138,6 +138,18 @@
       ]
     },
     {
+      "id": "ai-creative-rights-governance",
+      "triggers": ["AI creative", "AI Creative Operations", "GenAI", "generative AI", "synthetic media", "voice clone", "likeness", "provenance", "rights", "rights pack", "AI rider", "AI contract", "AI consent"],
+      "skills": ["greenhouse-ai-creative-rights-governance", "legal-privacy-ip-operator"],
+      "sources": [
+        "docs/architecture/GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md",
+        "docs/services/creative-services/EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_V2.md",
+        "docs/services/creative-services/EFEONCE_CREATIVE_SERVICES_OPERATING_MODEL_V1.md",
+        "docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md",
+        "docs/architecture/creative-studio/README.md"
+      ]
+    },
+    {
       "id": "growth-public-site",
       "triggers": ["growth", "SEO", "AEO", "form", "CTA", "GTM", "meeting", "scheduler", "agenda", "WordPress", "Kinsta"],
       "skills": ["seo-aeo", "greenhouse-growth-forms", "greenhouse-growth-ctas", "greenhouse-growth-meetings", "greenhouse-gtm-ga4-operator", "efeonce-public-site-wordpress"],
