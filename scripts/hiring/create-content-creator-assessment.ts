@@ -18,7 +18,7 @@ import {
 import type { CreateQuestionInput } from '@/types/hiring-assessment'
 
 const ACTOR = 'user-content-creator-assessment-authoring'
-const TEMPLATE_NAME = 'Content Creator L2 — Editorial, SEO/AEO & Social'
+const TEMPLATE_NAME = 'Content Creator L2 — Integral: Editorial, Social, SEO/AEO, Tools & Measurement'
 
 const rubric = (criteria: string[]) => ({
   scale: '0-100 (25 puntos por criterio; parcial permitido)',
@@ -130,6 +130,45 @@ const QUESTIONS: CreateQuestionInput[] = [
       'Deja una regla, criterio o recurso reutilizable que mejore el sistema de trabajo.',
     ]),
   },
+  {
+    competencyKey: 'project_management',
+    level: 'intermedio',
+    type: 'open_text',
+    prompt:
+      'Describe cómo convertirías un brief aprobado en un flujo de producción ejecutable usando las herramientas que dominas. Incluye: estructura del brief, calendario, estados, revisión, aprobación, publicación y documentación. Puedes usar CMS, gestor de proyectos, calendario editorial, scheduler social, herramientas de analítica o IA; nombra herramientas concretas y explica qué resuelve cada una.',
+    rubric: rubric([
+      'Presenta un flujo completo, con entradas, responsables, estados, aprobaciones y salida publicada.',
+      'Demuestra experiencia práctica con software concreto, no solo enumera nombres de herramientas.',
+      'Usa herramientas según su función y evita depender de una sola plataforma para todo.',
+      'Incluye controles de calidad, trazabilidad y documentación de aprendizajes.',
+    ]),
+  },
+  {
+    competencyKey: 'logical',
+    level: 'intermedio',
+    type: 'situational',
+    prompt:
+      'Una semana de contenido tuvo estos resultados: el artículo recibió muchas impresiones y pocos clics; el carrusel tuvo menos alcance y muchas guardadas; el video tuvo mucho alcance y casi ninguna visita al sitio. ¿Qué hipótesis plantearías, qué revisarías antes de concluir y qué experimento harías la semana siguiente?',
+    rubric: rubric([
+      'Distingue métricas de distribución, interacción e intención; no declara ganador por una sola cifra.',
+      'Formula hipótesis conectadas con formato, audiencia, mensaje, CTA y canal.',
+      'Pide o identifica datos adicionales antes de atribuir causalidad.',
+      'Propone un experimento comparable con una decisión clara según el resultado.',
+    ]),
+  },
+  {
+    competencyKey: 'verbal',
+    level: 'intermedio',
+    type: 'open_text',
+    prompt:
+      'Recibes un brief de dos páginas, tres enlaces y una entrevista de 30 minutos. En máximo 250 palabras, explica cómo separarías hechos, opiniones, señales de audiencia y una idea editorial defendible antes de escribir. Incluye qué información pedirías si todavía no puedes sostener el contenido.',
+    rubric: rubric([
+      'Distingue evidencia, interpretación, opinión y vacío de información.',
+      'Propone un método concreto para sintetizar fuentes y encontrar una tesis.',
+      'Hace preguntas de aclaración que mejoran la decisión editorial, no preguntas genéricas.',
+      'Evita publicar afirmaciones que no puede respaldar y explicita sus límites.',
+    ]),
+  },
 ]
 
 const findTemplate = async () => {
@@ -151,13 +190,16 @@ const main = async () => {
     const template = await createTemplate(
       {
         name: TEMPLATE_NAME,
-        roleHint: 'content_creator',
+        roleHint: 'content_creator_integral',
         modules: [
-          { competencyKey: 'copywriting', targetLevel: 'intermedio', weight: 35 },
-          { competencyKey: 'community_management', targetLevel: 'intermedio', weight: 25 },
+          { competencyKey: 'copywriting', targetLevel: 'intermedio', weight: 25 },
+          { competencyKey: 'community_management', targetLevel: 'intermedio', weight: 15 },
           { competencyKey: 'seo', targetLevel: 'intermedio', weight: 15 },
+          { competencyKey: 'project_management', targetLevel: 'intermedio', weight: 15 },
+          { competencyKey: 'logical', targetLevel: 'intermedio', weight: 10 },
           { competencyKey: 'communication', targetLevel: 'intermedio', weight: 10 },
-          { competencyKey: 'ownership', targetLevel: 'intermedio', weight: 15 },
+          { competencyKey: 'ownership', targetLevel: 'intermedio', weight: 5 },
+          { competencyKey: 'verbal', targetLevel: 'intermedio', weight: 5 },
         ],
       },
       ACTOR,
