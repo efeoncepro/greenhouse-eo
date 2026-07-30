@@ -28,6 +28,9 @@ source control.
   migration; it expires on 2026-08-28. This is the accepted interim path, not a dedicated GitHub
  machine account. Create that account before external/customer rollout and rotate the Secret
   Manager version without changing the consumer contract.
+- The temporary migration PAT remains active for the current internal/production build path. The
+  legacy PAT used by the former Globe Cloud Build path was revoked after production verification;
+  do not confuse the two credentials.
 - Local private-package installation for the TASK-1591 canary was verified with a temporary
   developer credential. CI/Cloud Build wiring is now implemented: GitHub Actions uses its scoped
   `GITHUB_TOKEN`, while Cloud Build reads `axis-packages-read-token` and mounts an ephemeral
@@ -35,6 +38,8 @@ source control.
 - Cloud Build ejecutó el contrato **en real** el 2026-07-29 y 2026-07-30: los cuatro worker deploys
   de Greenhouse corrieron verdes contra `0.1.5`; el release productivo `30502476429` terminó en
   `success` sobre `41fa94846d0ca18a0f83529dc90cdc2da15a632d`, con health check productivo verde.
+- El secreto legacy de `efeonce-globe` fue deshabilitado y eliminado después de verificar el release;
+  el secreto activo es únicamente `projects/efeonce-group/secrets/axis-packages-read-token`.
 - ✅ The Globe AXIS browser/accessibility/reduced-motion evidence is automated by
   `apps/studio-client/scripts/axis-pilot-canary.test.mjs` **y desde el 2026-07-29 corre en el CI de Globe**.
   Hasta entonces no corría: resolvía Playwright con un fallback a una ruta absoluta del disco de un
@@ -42,6 +47,8 @@ source control.
   commits (`ISSUE-128`, resuelto en `efeonce-globe@498ffce` con `playwright-core` + `channel: 'chrome'`,
   sin descargar browsers). Evidencia: run `30499520419` `success` con `AXIS pilot canary OK` en el log.
   La evidencia del piloto pasa de **local** a **CI**.
+- El rollback interno de `globe-studio-internal` y `globe-api-internal` fue ejercitado al 100%, verificado y
+  restaurado correctamente durante la promoción productiva.
 
 ## Delta 2026-07-29 — dónde vive el credencial, y dónde NO hace falta (TASK-1589 V1.1)
 
@@ -120,8 +127,7 @@ done
 # ✅ 4. HECHO 2026-07-29 — consumidores migrados al nuevo secret resource.
 # ✅ 5. HECHO 2026-07-30 — builds, canaries y release productivo verdes en ambos productos.
 # ✅ 6. HECHO 2026-07-30 — versión legacy deshabilitada y secreto eliminado de `efeonce-globe`;
-#       el PAT `AXIS GCP Cloud Build read` también fue revocado en GitHub después de verificar
-#       el release productivo.
+#       el PAT legacy también fue revocado en GitHub después de verificar el release productivo.
 ```
 
 **NUNCA** revocar el binding legacy antes del paso 5. Revocar primero deja a Greenhouse sin poder
@@ -191,11 +197,9 @@ Greenhouse worker build identity:
 183008134038-compute@developer.gserviceaccount.com
 ```
 
-The previous cross-project binding is now legacy. Retire the `efeonce-globe` secret only after
-the production verification is complete and the operator has a reauthenticated GCP session;
-disable its active version first, verify no runtime references remain, then delete the container
-in a separate approved action. Do not recreate the coupling by placing the replacement secret in
-`efeonce-globe` merely because the legacy secret is there today.
+The previous cross-project binding is retired. The `efeonce-globe` secret container was disabled and
+deleted after production verification, and no runtime reference should be recreated there. Keep the
+replacement in `efeonce-group`; do not recreate the coupling by placing it in a product project.
 
 The Greenhouse deploy scripts for `ops-worker`, `commercial-cost-worker`,
 `ico-batch-worker` and the staging-only `artifact-worker` use the same contract.
@@ -237,7 +241,7 @@ short expiration and documented rotation owner. Do not send the token through ch
 1. Grant repository read access to all AXIS packages.
 2. Configure the read-only token in Vercel and/or Secret Manager.
 3. Add the scoped registry configuration without resolving the secret in source.
-4. Add fixed package versions, starting at the verified pilot version `0.1.4`.
+4. Add fixed package versions, starting at the verified pilot version `0.1.5`.
 5. Implement one simple and one complex adapter under the consumer's native runtime.
 6. Run desktop, 390 px, keyboard, reduced-motion, accessibility and visual-diff evidence.
 7. Record the consumer and evidence in the AXIS registry.

@@ -102,6 +102,21 @@ Canonical pointers: [AXIS shared UI platform ADR](../../docs/architecture/EFEONC
 [AXIS private package consumption runbook](../../docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md),
 and `TASK-1591`.
 
+For an AXIS secret migration, the release gate is also a secret-hygiene gate: confirm that every consumer
+references `projects/efeonce-group/secrets/axis-packages-read-token`, that the legacy `efeonce-globe`
+reference is absent from active build/deploy paths, and that only the required build identities can access
+the replacement. Temporary GitHub authentication is allowed only to create the scoped `read:packages`
+credential through an already authenticated browser session; never put the token in a command argument,
+file, CI variable, screenshot, log, or chat. Stream it directly into Secret Manager and retain only
+non-sensitive metadata (owner, note, expiry, version, IAM principals, build status).
+
+The release evidence must include: exact target SHA; package names/versions; CI/build run; artifact or
+deployment digest; active Cloud Run/Vercel revision; runtime smoke result; canary result; and the previous
+known-good deployment/image digest as rollback target. Do not retire the legacy secret version or revoke the
+legacy credential until the production build and runtime evidence are green. After retirement, verify the
+replacement still builds a private package and record the legacy disable/revocation result without exposing
+either credential.
+
 ## Canonical Release Path
 
 The normal release path is:
@@ -167,6 +182,8 @@ GITHUB_RELEASE_OBSERVER_TOKEN="$(gh auth token)" pnpm release:watchdog --json
    - `commercial-cost-worker` in `us-east4`
    - `ico-batch-worker` in `us-east4`
    - `hubspot-greenhouse-integration` in `us-central1`
+   For AXIS consumers, also verify the active revision/image digest and that the deployed artifact does
+   not contain `.npmrc`, the package token, or an unscoped registry credential.
 10. **Prender los flags pendientes de este release — en TODOS los runtimes, no sólo Vercel.** Revisar `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` → `§ Pendientes de acción`. Por cada feature `code-complete` cuyo flip estaba gated a este release:
     - **Paso 0 obligatorio — mapear dónde se LEE el flag:** `grep -rn "<FLAG>" src/ services/ | grep -v __tests__`. Hay **5 runtimes con env vars independientes**: Vercel (app Next.js) + 4 Cloud Run (`ops-worker`, `commercial-cost-worker`, `ico-batch-worker`, `hubspot-greenhouse-integration`). Prenderlo en uno **NO** lo prende en los otros. **Heurística:** si gatea algo **async** (email, projection reactiva, consumer del outbox, cron de Cloud Scheduler, materializer) vive en el **`ops-worker`, NO en Vercel** — prenderlo en Vercel no hace nada; si gatea una ruta/superficie visible vive en Vercel; puede vivir en **ambos**.
     - **Aplicar en cada runtime del mapeo:** Vercel → `vercel env add <FLAG> Production` + redeploy. Cloud Run → **los DOS pasos**: (a) declarar el flag en `services/<worker>/deploy.sh` (SoT; esos scripts usan `--set-env-vars` **destructivo**, que borra cualquier var agregada out-of-band) y (b) `gcloud run services update <svc> --region <us-east4|us-central1> --project efeonce-group --update-env-vars <FLAG>=true` para efecto inmediato. Hacer sólo (b) = el flag desaparece en el próximo deploy del worker, en silencio.
@@ -175,6 +192,14 @@ GITHUB_RELEASE_OBSERVER_TOKEN="$(gh auth token)" pnpm release:watchdog --json
 
     El deploy del código no activa nada por sí solo. Si un flag requería su migración en prod, confirmar que entró por este release antes de prenderlo. **Apagar/rollback también es multi-runtime.** Caso fuente 2026-07-09: `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED` vive sólo en el `ops-worker`; el runbook sólo enseñaba `vercel env add` y prenderlo ahí habría dejado el email muerto con la success card prometiéndoselo al usuario.
 11. **Registrar tiempos del release.** Actualizar `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md` con agente, fecha, release ID, run ID, target SHA, agent E2E elapsed como KPI principal, desglose de fases, workflow elapsed, manifest elapsed, runtime-green elapsed, blocker principal y aprendizaje.
+
+12. **Canary y rollback AXIS.** Mantener los canaries de navegador opt-in y deterministas: usar la
+    dependencia `playwright-core` y lanzar Chromium con `channel: 'chrome'`; no descargar browsers ni
+    depender de una ruta local del equipo del autor. El canary debe ejercitar la superficie real del
+    consumidor, guardar evidencia de assertions/URL/console/network relevante y fallar con un diagnóstico
+    accionable. Si falla después de publicar, detener la promoción o restaurar el tráfico al deployment
+    anterior conocido, verificar salud y smoke del rollback, y conservar ambos digests/SHA y la evidencia.
+    Restaurar tráfico sin conservar la configuración de build/credencial no es un rollback reproducible.
 
 ## Gotchas conocidos del release (verificados 2026-07-03 #139; fix de raíz = ISSUE-114)
 
