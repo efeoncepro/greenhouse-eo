@@ -91,6 +91,19 @@ confiar en la disciplina de quien escribe el adapter.
   no tendría tokens a los que referirse.
 - `TASK-1589` V1.1 — distribución y CI del paquete operativos.
 
+### Acoplamiento con `TASK-1590` (el Lab)
+
+El Lab aloja la **implementación de referencia** y la superficie de comparación, así que las dos tasks se
+tocan — pero **no se bloquean en el arranque**:
+
+- El **Slice 0 de `1601`** (medir divergencia) **no necesita el Lab**: usa los dos adapters donde están.
+- El **Slice 0 de `1590`** (inventario de las 43 rutas) y la reescritura en Astro **no necesitan la `spec`**.
+- El acople real aparece después: la **referencia** de `1590` necesita la `spec` de `1601` Slice 1, y el
+  **runner** de `1601` Slice 2 necesita el Lab en Astro.
+
+Orden recomendado: los dos Slice 0 pueden correr en paralelo; después `1601` S1 → `1590` referencia →
+`1601` S2.
+
 ### 🔴 Contradicción abierta con `TASK-1485` (P0) — resolver antes de ejecutar
 
 `TASK-1485` declara:
@@ -211,16 +224,32 @@ Y la salida obvia es una trampa conocida: hacer que el Lab **importe** los adapt
 reintroduciría la dependencia cross-repo que causó `ISSUE-128` (el CI de Globe rojo 9 commits por una ruta
 al `node_modules` de otro proyecto). **No repetir esa forma.**
 
-**Dirección recomendada — cada producto exporta su fixture; el Lab compara artefactos:**
+**Dirección DECIDIDA (2026-07-30, ADR § Delta del stack del Lab) — tres puntos de comparación:**
 
 1. Cada consumidor renderiza el pattern **en su propio arnés** (donde ya tiene su motor, su theme y su
    toolchain) y emite un artefacto: captura + propiedades computadas en JSON.
-2. El Lab —o el runner— **compara artefactos**, no renders en vivo.
+2. El Lab implementa el pattern **desde la `spec`, en HTML + CSS puro** — la **implementación de
+   referencia**. `TASK-1590` la ejecuta.
+3. El runner **compara artefactos** contra la referencia. Nunca renders en vivo cross-repo.
 
-Ventajas: cero acoplamiento cross-repo, cada producto usa la maquinaria que ya tiene (GVC en Greenhouse, los
-canaries en Globe), y el artefacto es versionable y adjuntable como evidencia de promoción.
+Cero acoplamiento cross-repo, cada producto usa la maquinaria que ya tiene (GVC en Greenhouse, canaries en
+Globe), y el artefacto es versionable y adjuntable como evidencia de promoción.
 
-El Slice 0 debe **confirmar o refutar** esta dirección antes de que el Slice 2 construya nada.
+**Por qué tres puntos y no dos** — es lo que hace el diagnóstico accionable:
+
+| Qué se observa | Dónde está el problema |
+|---|---|
+| Los dos adapters coinciden entre sí, pero difieren de la referencia | **en la `spec`** — es ambigua o incompleta |
+| Sólo un adapter difiere | **en ese adapter** |
+| Los tres coinciden | el pattern es consistente |
+
+Con dos puntos esas tres situaciones son indistinguibles.
+
+**Y la referencia es, además, el test de completitud de la `spec`:** si un pattern no se puede implementar
+en CSS puro sin inventar un valor, la spec está incompleta. Eso se descubre al escribirla, no meses después.
+
+El Slice 0 debe **confirmar** que los artefactos de ambos productos son comparables, y **medir** la
+divergencia actual.
 
 ### Slice 1 — `DesignPatternContract` gana `spec` + `tones`
 
@@ -245,7 +274,9 @@ Requiere además **acuñar los tokens de componente que falten** (`control-md`, 
 
 Un runner que, dado un `patternId`, renderiza el fixture de cada adapter y compara con umbral.
 
-- Vive en el Lab (único lugar donde los dos adapters coexisten).
+- Vive en el Lab (único lugar donde referencia y artefactos coexisten).
+- Compara **cada adapter contra la referencia**, no adapters entre sí — así el reporte dice si el defecto
+  está en la spec o en un adapter concreto.
 - Reporta por parte y por estado, no un único porcentaje global: *"el `root` difiere 4 px de alto en
   `danger`"* es accionable; *"difiere 3%"* no.
 - **Precondición de promoción a `stable`.** Un pattern `candidate` puede tener un solo adapter.

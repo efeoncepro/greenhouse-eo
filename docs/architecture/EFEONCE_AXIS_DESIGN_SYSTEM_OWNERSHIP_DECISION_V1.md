@@ -201,6 +201,67 @@ comparado con umbral.
 
 Es el mismo principio que el gate de drift de tokens, un nivel arriba: SSOT + derivación + señal.
 
+## Delta 2026-07-30 — el stack del Lab, y qué renderiza exactamente
+
+El ADR le asigna al Lab dos funciones —documentar el **uso** y alojar el **diff cross-runtime**— sin decir
+cómo. Medido: `apps/lab` es **Vite + TypeScript vanilla**, sin React, y construye la UI con `innerHTML` y
+template strings. Los adapters a comparar son componentes React. La pregunta *"¿el Lab tiene que ser React,
+Next o Astro?"* quedó abierta y se decide acá.
+
+### Qué renderiza el Lab: una implementación de REFERENCIA, no los adapters
+
+La opción intuitiva —que el Lab importe los adapters de Greenhouse y de Globe— es **la trampa de
+`ISSUE-128`**: acoplamiento cross-repo al `node_modules` de otro proyecto, que ya dejó el CI de Globe rojo 9
+commits. Se descarta.
+
+**El Lab implementa cada pattern desde su `spec`, en HTML + CSS puro.** Y eso no es un parche: es el mejor
+test que la spec puede tener.
+
+> Si un pattern **no se puede implementar** desde su `spec` sin inventar un valor, **la spec está
+> incompleta**. La implementación de referencia es la prueba de completitud, no una demo.
+
+Además da el tercer punto de comparación: **MUI vs Tailwind vs referencia**. Si los dos adapters coinciden
+entre sí pero difieren de la referencia, el problema está en la spec; si uno solo difiere, está en ese
+adapter. Con dos puntos no se distingue; con tres, sí.
+
+**Frontera que hay que no confundir:** el Lab **es una app**, no un paquete publicado. Que implemente un
+pattern en CSS **no** viola la regla de que AXIS nunca publica apariencia implementada — nadie consume el
+Lab como dependencia. Lo que se publica sigue siendo dato: tokens, contratos y comportamiento.
+
+Los **artefactos** de cada producto (captura + propiedades computadas) se muestran junto a la referencia,
+emitidos por cada consumidor con su propia maquinaria (GVC en Greenhouse, canaries en Globe). El Lab los
+compara; no los produce.
+
+### Stack: **Astro**, y no es preferencia estética
+
+| Candidato | Veredicto |
+|---|---|
+| **Astro** | ✅ **elegido** |
+| Vanilla (hoy) | Alcanza para 2 contratos; no escala a N patterns con prosa, do/don't y ejemplos. `innerHTML` con template strings no es un sistema de contenido |
+| Next | Ataría el Lab a React y es un framework de app para un sitio de contenido |
+| Storybook | Es el estándar de labs de DS, pero su modelo es *"componentes de un repo"*, no *"una spec y N implementaciones"*. Y ata a un framework — justo lo que este ADR evita |
+
+Cinco razones, en orden de peso:
+
+1. **La decisiva — no ata el Lab al framework de un consumidor.** Un Lab en React ataría la documentación
+   del design system a React, que es el motor de dos de sus consumidores hoy pero no necesariamente de
+   Wave. Astro mantiene el Lab **tan agnóstico como los paquetes**. La portabilidad no se negocia en la
+   capa que documenta la portabilidad.
+2. **Islas cuando hagan falta, no antes.** Cuando el eje 2 necesite demostrar un `<Dialog>` headless
+   interactivo —que es React— se agrega **una isla React** en esa página, sin convertir el Lab entero.
+   Ningún otro candidato permite eso sin comprometer todo el sitio.
+3. **El Lab es un sitio de documentación**, no una app. Content Collections + Zod dan contenido tipado y
+   validado en build; hoy los docs serían template strings.
+4. **Zero JS por defecto** — la referencia en HTML + CSS se sirve sin una línea de JavaScript, lo que
+   refuerza en el propio artefacto que la spec no depende de ningún framework.
+5. **El ecosistema ya lo usa.** `efeonce-think` es Astro, hay skill `astro` con overlay, y la disciplina de
+   *dumb render* ya está escrita: el Lab renderiza lo que AXIS publica, no computa nada.
+
+**Migración:** el Lab actual son ~70 líneas (`main.ts` + `index.ts`). Reescribirlo en Astro es más barato
+que adaptarlo, y no hay estado ni backend que preservar.
+
+**Dueña de la ejecución:** `TASK-1590`.
+
 ## Rules
 
 1. **AXIS posee la especificación visual completa** — primitivo, semántico y **componente**. El producto

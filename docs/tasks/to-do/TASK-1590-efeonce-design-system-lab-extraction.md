@@ -15,7 +15,7 @@
 - Motion: `docs/ui/motion/TASK-1590-efeonce-design-system-lab-motion.md`
 - Backend impact: `none`
 - Epic: `optional`
-- Status real: `A MEDIAS, no pendiente (medido 2026-07-30). DESTINO Y ACCESO DECIDIDOS 2026-07-30: el Lab vive en el Vercel de AXIS (consume lo publicado, nunca importa de greenhouse-eo) y queda PUBLICO por decision explicita, lo que supersede el internal-only de la spec original. El Lab independiente YA EXISTE y está desplegado (apps/lab en axis-design-system → axis-design-system-lab.vercel.app), con la estructura de su dirección visual ya implementada: registry searchable + preview + panel de evidencia. Lo que falta es el CONTENIDO: 2 contratos en el Lab contra 43 rutas de /design-system en Greenhouse. Y dos desalineaciones con su propia spec: el Lab es PUBLICO (200 sin auth) cuando la task pide internal-only, y su acceptance criterion 1 ("Lab corre fuera de Greenhouse") ya se cumple. CONTRADICCION ABIERTA con TASK-1382, que quiere Labs como build unit DENTRO de Greenhouse: son dos destinos incompatibles para la misma superficie y ninguna declara a la otra`
+- Status real: `A MEDIAS, no pendiente (medido 2026-07-30). STACK DECIDIDO 2026-07-30: el Lab se reescribe en ASTRO (no React/Next/Storybook: no atar la doc del DS al framework de un consumidor; islas sólo donde hagan falta) y renderiza una IMPLEMENTACION DE REFERENCIA en HTML+CSS derivada de la spec, NUNCA importando los adapters (seria el cross-repo de ISSUE-128). DESTINO Y ACCESO DECIDIDOS 2026-07-30: el Lab vive en el Vercel de AXIS (consume lo publicado, nunca importa de greenhouse-eo) y queda PUBLICO por decision explicita, lo que supersede el internal-only de la spec original. El Lab independiente YA EXISTE y está desplegado (apps/lab en axis-design-system → axis-design-system-lab.vercel.app), con la estructura de su dirección visual ya implementada: registry searchable + preview + panel de evidencia. Lo que falta es el CONTENIDO: 2 contratos en el Lab contra 43 rutas de /design-system en Greenhouse. Y dos desalineaciones con su propia spec: el Lab es PUBLICO (200 sin auth) cuando la task pide internal-only, y su acceptance criterion 1 ("Lab corre fuera de Greenhouse") ya se cumple. CONTRADICCION ABIERTA con TASK-1382, que quiere Labs como build unit DENTRO de Greenhouse: son dos destinos incompatibles para la misma superficie y ninguna declara a la otra`
 - Rank: `TBD`
 - Domain: `ui-platform|cross-runtime`
 - Blocked by: `none` (foundation publicada; extracción del Lab sigue pendiente)
@@ -149,6 +149,64 @@ notas internas, nombres de clientes, capturas de datos reales ni referencias a d
 
 `TASK-1382` queda resuelta por esta decisión: Labs **no** es candidato a primer build unit de Greenhouse,
 porque su destino no está en el repo. EPIC-026 necesita otro sujeto.
+
+## Delta 2026-07-30 (c) — stack DECIDIDO: Astro, y qué renderiza el Lab
+
+Decisión completa con su razonamiento en
+[`EFEONCE_AXIS_DESIGN_SYSTEM_OWNERSHIP_DECISION_V1`](../../architecture/EFEONCE_AXIS_DESIGN_SYSTEM_OWNERSHIP_DECISION_V1.md)
+§ Delta 2026-07-30 (stack del Lab). Lo ejecutable:
+
+### El Lab se reescribe en **Astro**
+
+Hoy es Vite + TS vanilla (~70 líneas, `innerHTML` + template strings). No hay estado ni backend que
+preservar: **reescribir sale más barato que adaptar**.
+
+Las cinco razones, en orden de peso:
+
+1. **No ata el Lab al framework de un consumidor.** Un Lab en React ataría la documentación del design
+   system a React —motor de dos consumidores hoy, no necesariamente de Wave—. Astro lo mantiene tan
+   agnóstico como los paquetes. *La portabilidad no se negocia en la capa que documenta la portabilidad.*
+2. **Islas cuando hagan falta, no antes.** El eje 2 (`axis-headless`) va a necesitar demostrar un
+   `<Dialog>` interactivo, que es React: se agrega **una isla** en esa página, sin convertir el sitio.
+3. **Es un sitio de documentación, no una app.** Content Collections + Zod dan contenido tipado; hoy los
+   docs serían template strings.
+4. **Zero JS por defecto** — la referencia en HTML + CSS se sirve sin una línea de JavaScript.
+5. **El ecosistema ya lo usa** (`efeonce-think`), con skill `astro` y overlay.
+
+Descartados: **Next** (ataría a React, y es framework de app para un sitio de contenido) y **Storybook**
+(su modelo es *"componentes de un repo"*, no *"una spec y N implementaciones"*, y ata a un framework).
+
+### Qué renderiza: una implementación de REFERENCIA, no los adapters
+
+**El Lab NO importa los adapters de Greenhouse ni de Globe.** Eso sería el acoplamiento cross-repo de
+`ISSUE-128`, que dejó el CI de Globe rojo 9 commits.
+
+**El Lab implementa cada pattern desde su `spec`, en HTML + CSS puro.** Y eso es el mejor test que la spec
+puede tener: si un pattern no se puede implementar sin inventar un valor, **la spec está incompleta**.
+
+Da además el tercer punto de comparación —**MUI vs Tailwind vs referencia**—: si los dos adapters coinciden
+entre sí pero difieren de la referencia, el problema está en la spec; si sólo uno difiere, está en ese
+adapter. Con dos puntos no se distingue; con tres, sí.
+
+Los **artefactos** de cada producto (captura + propiedades computadas) los emite cada consumidor con su
+propia maquinaria y el Lab los muestra junto a la referencia. El Lab compara; no produce.
+
+> **Frontera que no hay que confundir:** el Lab **es una app**, no un paquete publicado. Que implemente un
+> pattern en CSS **no** viola la regla de que AXIS nunca publica apariencia implementada — nadie consume el
+> Lab como dependencia.
+
+### Qué agrega esto al alcance
+
+- Reescritura del Lab en Astro (config, layout, Content Collections, deploy en el mismo proyecto Vercel).
+- Una implementación de referencia por pattern, derivada de su `spec` — **depende de `TASK-1601` Slice 1**,
+  que es quien crea la `spec`.
+- La superficie que muestra referencia + artefactos lado a lado.
+
+### Consecuencia para el orden
+
+El **inventario de las 43 rutas** (Slice 0 de esta task) **no depende de nada** y puede arrancar ya. La
+reescritura en Astro tampoco. Lo único que depende de `TASK-1601` es la implementación de referencia, que
+necesita que la `spec` exista.
 
 ## Rollout / Rollback
 
