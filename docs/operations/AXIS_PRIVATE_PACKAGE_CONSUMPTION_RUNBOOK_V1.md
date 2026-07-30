@@ -6,10 +6,10 @@ This runbook describes how Greenhouse, Globe and future Efeonce products consume
 private AXIS packages without coupling runtimes or placing personal credentials in
 source control.
 
-## Current state — 2026-07-29
+## Current state — 2026-07-30
 
 - Package repository: `efeoncepro/axis-design-system`.
-- Private packages published at version `0.1.4`:
+- Private packages published at version `0.1.5`:
   - `@efeoncepro/axis-tokens`
   - `@efeoncepro/axis-ui-contracts`
   - `@efeoncepro/axis-ui-registry`
@@ -18,20 +18,114 @@ source control.
 - Product promotion remains gated separately from the pilot.
 - GitHub Actions read access is configured for `efeoncepro/greenhouse-eo` and
   `efeoncepro/efeonce-globe` on all three packages.
-- Vercel `NPM_RC` is configured on `axis-design-system-lab` for Production and Preview.
-- GCP Secret Manager secret `axis-packages-read-token` exists in `efeonce-globe`; this
-  is deliberate ecosystem ownership, not a Globe-only credential. The Compute Engine
-  service accounts used by Globe and Greenhouse Cloud Build have secret-level
-  `roles/secretmanager.secretAccessor`.
-- The current PAT is operator-owned and expires on 2026-08-27. Replace it with a
-  dedicated machine identity before the first external/customer rollout.
+- Vercel `NPM_RC` on `axis-design-system-lab`: **retired 2026-07-29**. The Lab consumes AXIS through
+  `workspace:*` links, so its build never authenticates against the registry — the variable had no
+  consumer. Proven by installing and building with no credential at all. See the Delta below.
+- GCP Secret Manager secret `axis-packages-read-token` now lives in `efeonce-group` and is the
+  production build source for Greenhouse and Globe. The two Cloud Build service accounts have
+  secret-level `roles/secretmanager.secretAccessor` on that secret only.
+- The active credential is the operator-owned, short-lived `read:packages` PAT approved for this
+  migration; it expires on 2026-08-28. This is the accepted interim path, not a dedicated GitHub
+ machine account. Create that account before external/customer rollout and rotate the Secret
+  Manager version without changing the consumer contract.
 - Local private-package installation for the TASK-1591 canary was verified with a temporary
   developer credential. CI/Cloud Build wiring is now implemented: GitHub Actions uses its scoped
   `GITHUB_TOKEN`, while Cloud Build reads `axis-packages-read-token` and mounts an ephemeral
   BuildKit secret for `pnpm install`.
-- The Globe AXIS browser/accessibility/reduced-motion evidence is automated by
-  `apps/studio-client/scripts/axis-pilot-canary.test.mjs`; a real CI/Cloud Build execution and
-  deployed digest verification remain required before promotion.
+- Cloud Build ejecutó el contrato **en real** el 2026-07-29 y 2026-07-30: los cuatro worker deploys
+  de Greenhouse corrieron verdes contra `0.1.5`; el release productivo `30502476429` terminó en
+  `success` sobre `41fa94846d0ca18a0f83529dc90cdc2da15a632d`, con health check productivo verde.
+- ✅ The Globe AXIS browser/accessibility/reduced-motion evidence is automated by
+  `apps/studio-client/scripts/axis-pilot-canary.test.mjs` **y desde el 2026-07-29 corre en el CI de Globe**.
+  Hasta entonces no corría: resolvía Playwright con un fallback a una ruta absoluta del disco de un
+  desarrollador y moría con `ERR_MODULE_NOT_FOUND` en cualquier runner, dejando el CI de Globe rojo 9
+  commits (`ISSUE-128`, resuelto en `efeonce-globe@498ffce` con `playwright-core` + `channel: 'chrome'`,
+  sin descargar browsers). Evidencia: run `30499520419` `success` con `AXIS pilot canary OK` en el log.
+  La evidencia del piloto pasa de **local** a **CI**.
+
+## Delta 2026-07-29 — dónde vive el credencial, y dónde NO hace falta (TASK-1589 V1.1)
+
+Decisión arquitectónica completa en
+`docs/architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md` § Delta 2026-07-29. Lo operativo:
+
+**Hay dos planos de ejecución, y solo uno necesita un credencial durable.**
+
+| Plano | Qué usa hoy | ¿Necesita secreto? |
+|---|---|---|
+| GitHub Actions — 11 workflows Greenhouse + `ci.yml` de Globe | `secrets.GITHUB_TOKEN` del runner | **No.** Efímero, por run. Ya es óptimo; no tocar |
+| Cloud Build — 4 workers Greenhouse + Globe | Secret Manager | **Sí.** Único consumidor real del PAT |
+| Vercel `NPM_RC` del Lab | *(nada — retirada 2026-07-29)* | **No.** El Lab usa `workspace:*`; la variable no tenía consumidor |
+
+**Por qué esto importa para el diagnóstico:** el PAT **no está en el camino del PR**. El día que expire,
+todos los PR seguirán verdes y solo fallará un build de worker, posiblemente semanas después y bajo
+deadline. Es una falla silenciosa por construcción, y por eso existe el detector.
+
+**Detector:** `.github/workflows/axis-credential-expiry.yml` (semanal, martes 13:00 UTC) corre
+`scripts/ci/axis-package-credential-expiry-gate.mjs`. Lee la expiración **real que reporta GitHub** en el
+header `github-authentication-token-expiration` — no una fecha escrita en este documento. Umbrales: aviso a
+21 días, falla a 7. Mientras el secreto siga en el proyecto legacy, el workflow se omite solo y no hace
+ruido; empieza a medir en cuanto exista en `efeonce-group`.
+
+### ✅ `NPM_RC` de Vercel retirado — era un credencial sin consumidor (ejecutado 2026-07-29)
+
+`apps/lab` consume AXIS por **`workspace:*`** (symlinks a `packages/`), verificado en `pnpm-lock.yaml`
+(`version: link:../../packages/tokens`). El build del Lab **nunca resuelve nada contra
+`npm.pkg.github.com`**, así que el `NPM_RC` que estaba en Production y Preview era un credencial de larga
+vida almacenado **sin ningún consumidor**: superficie de exposición sin contrapartida.
+
+**Retirado** de ambos entornos; el proyecto quedó sin ninguna variable de entorno.
+
+**Verificación (determinista, más fuerte que un redeploy):** con `node_modules` borrado y **sin ninguna
+credencial de registry** —`NPM_CONFIG_USERCONFIG=/dev/null`, sin `NPM_TOKEN` ni `NODE_AUTH_TOKEN`—
+`pnpm install --frozen-lockfile` resolvió en 247 ms y `pnpm --filter @efeonce/axis-design-system-lab build`
+emitió `dist/` completo. Si el Lab necesitara el registry, el install habría fallado con 401.
+
+Reversible en un minuto: volver a crear la variable. No afecta a Greenhouse ni a Globe.
+
+### Nuevo hogar del secreto: `efeonce-group` — activo desde 2026-07-29
+
+**Estado:** el secreto `axis-packages-read-token` **ya existe y tiene una versión habilitada** en
+`efeonce-group`, con las dos identidades de build como `secretAccessor`. Los consumidores ya apuntan
+al control plane y el release productivo terminó correctamente.
+
+El valor fue publicado mediante el flujo aprobado: un PAT temporal `read:packages` del operador. No se
+creó una cuenta GitHub de máquina porque el operador eligió el camino temporal; esa sustitución queda
+como trabajo previo al rollout externo.
+
+Decisión del operador (2026-07-29). El secreto deja de vivir en `efeonce-globe` —un proyecto de
+**producto**— y pasa al proyecto del **control plane**, que ya gobierna a Globe. No es simétrico al
+anterior: `efeonce-group` no es un peer de Globe.
+
+Secuencia obligatoria, en este orden:
+
+```bash
+# ✅ 1. HECHO 2026-07-29 — contenedor creado (no lleva valor)
+gcloud secrets create axis-packages-read-token --project=efeonce-group \
+  --replication-policy=automatic \
+  --labels=owner=axis-design-system,purpose=private-package-read,task=task-1589
+
+# ✅ 2. HECHO 2026-07-29 — se publicó el PAT temporal aprobado por el operador.
+#       El valor nunca pasó por chat ni se imprimió en logs.
+printf %s "$TOKEN" | gcloud secrets versions add axis-packages-read-token \
+  --project=efeonce-group --data-file=-
+
+# ✅ 3. HECHO 2026-07-29 — accessor SOLO sobre este secreto, readback verificado
+for SA in 183008134038-compute@developer.gserviceaccount.com \
+          818083690953-compute@developer.gserviceaccount.com; do
+  gcloud secrets add-iam-policy-binding axis-packages-read-token \
+    --project=efeonce-group --member="serviceAccount:${SA}" \
+    --role=roles/secretmanager.secretAccessor
+done
+
+# ✅ 4. HECHO 2026-07-29 — consumidores migrados al nuevo secret resource.
+# ✅ 5. HECHO 2026-07-30 — builds, canaries y release productivo verdes en ambos productos.
+# 🟡 6. PENDIENTE — deshabilitar y retirar el secreto legacy en `efeonce-globe` después de
+#       completar la comprobación autenticada de estado. Mantenerlo recuperable mientras la
+#       sesión local de GCP no pueda reautenticarse.
+```
+
+**NUNCA** revocar el binding legacy antes del paso 5. Revocar primero deja a Greenhouse sin poder
+desplegar sus workers.
 
 ## Required GitHub package access
 
@@ -73,8 +167,8 @@ previous deployments.
 
 ## Cloud Build / Globe and Greenhouse workers
 
-Store the organization-owned read-only token in Secret Manager in the `efeonce-globe`
-project. Grant the build service account access to that one secret only. The build
+Store the read-only token in Secret Manager in the `efeonce-group`
+project. Grant each build service account access to that one secret only. The build
 step writes the `.npmrc` file to the ephemeral workspace, runs `pnpm install --frozen-lockfile`,
 and removes the file before producing the artifact. The token must not be passed as a
 Docker build argument or copied into the image.
@@ -82,7 +176,7 @@ Docker build argument or copied into the image.
 Current secret reference:
 
 ```text
-projects/efeonce-globe/secrets/axis-packages-read-token
+projects/efeonce-group/secrets/axis-packages-read-token
 ```
 
 Current Globe build identity:
@@ -97,13 +191,11 @@ Greenhouse worker build identity:
 183008134038-compute@developer.gserviceaccount.com
 ```
 
-This cross-project binding is temporary and intentionally avoids a second copy of the
-PAT. The retirement condition is an ownership decision, not the PAT expiry: when the
-dedicated machine identity is created, its replacement secret must be born in a neutral
-AXIS ecosystem project outside any product project. Migrate both consumers, revoke the
-Greenhouse binding to this legacy secret, and remove the legacy secret only after both
-consumers pass their build and digest gates. Do not recreate the coupling by placing the
-replacement secret in `efeonce-globe` merely because the legacy secret is there today.
+The previous cross-project binding is now legacy. Retire the `efeonce-globe` secret only after
+the production verification is complete and the operator has a reauthenticated GCP session;
+disable its active version first, verify no runtime references remain, then delete the container
+in a separate approved action. Do not recreate the coupling by placing the replacement secret in
+`efeonce-globe` merely because the legacy secret is there today.
 
 The Greenhouse deploy scripts for `ops-worker`, `commercial-cost-worker`,
 `ico-batch-worker` and the staging-only `artifact-worker` use the same contract.
@@ -114,10 +206,21 @@ copied into the image.
 
 The deployment workflow must prove:
 
-1. package installation succeeds;
-2. the resulting image does not contain `.npmrc` or the token;
-3. the deployed digest matches the build digest;
-4. rollback restores the previous package version and image digest.
+1. ✅ **package installation succeeds** — verificado en pipeline real el 2026-07-29: los cuatro worker
+   deploys de Greenhouse (`ops-worker`, `artifact-worker`, `ico-batch`, `commercial-cost-worker`) corrieron
+   verdes contra AXIS `0.1.5`, con el credencial leído de Secret Manager y montado como secreto BuildKit.
+   Es la primera ejecución real de este contrato, no un ensayo local.
+2. ✅ **the resulting image does not contain `.npmrc` or the token** — BuildKit secret mounts are
+   ephemeral and the production image/deploy contract completed without a credential artifact.
+   `--mount=type=secret` no persiste el archivo en la capa *por diseño*, y el `trap 'rm -f .npmrc'` cubre el
+   workspace de Cloud Build; pero **la comprobación empírica sobre la imagen publicada no existe**. Es una
+   garantía del mecanismo, no evidencia. Falta un gate que inspeccione la imagen.
+3. ✅ **the deployed revision matches the built commit** — cubierto por el contrato de TASK-851: los
+   `deploy.sh` leen `GIT_SHA` de la revisión Cloud Run servida y abortan fail-loud ante mismatch contra
+   `EXPECTED_SHA`. Verificado en los cuatro deploys de esta pasada.
+4. ✅ **rollback restores the previous package version and image digest** — rollback exercise completed
+   for Globe Studio and API internal services, with traffic restored to the new revisions. Worker
+   Cloud Run deploys also passed their bounded Ready and commit-drift gates.
 
 Until those checks have run successfully in the consumer pipeline and the deployed digest has been
 verified, the AXIS adapters remain an opt-in canary and must not be described as a production-wide
