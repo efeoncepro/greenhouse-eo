@@ -1,5 +1,29 @@
 # Handoff activo
 
+## 2026-07-30 — Efeonce Talent Assurance: documentación propuesta
+
+La auditoría de selección en Berel se documentó como un gap de `Hiring Quality Assurance`, no como una falla
+general de retención: las salidas fueron despidos por falta de conocimiento/capacidad, mientras diseño muestra
+estabilidad. Se propuso `Efeonce Talent Assurance` como capa transversal para proteger el significado de
+`Verificado por Efeonce` frente a cliente/operador y colaborador.
+
+Artefactos:
+
+- [`GREENHOUSE_HIRING_QUALITY_ASSURANCE_AUDIT_2026-07-30`](docs/audits/hiring/GREENHOUSE_HIRING_QUALITY_ASSURANCE_AUDIT_2026-07-30.md)
+- [`GREENHOUSE_EFEONCE_TALENT_ASSURANCE_DECISION_V1`](docs/architecture/GREENHOUSE_EFEONCE_TALENT_ASSURANCE_DECISION_V1.md) — `Proposed`, no runtime autorizado todavía
+- [`GREENHOUSE_EFEONCE_TALENT_ASSURANCE_ARCHITECTURE_V1`](docs/architecture/GREENHOUSE_EFEONCE_TALENT_ASSURANCE_ARCHITECTURE_V1.md) + [`EPIC-038`](docs/epics/to-do/EPIC-038-efeonce-talent-assurance-agentic-quality-system.md) — target agentic-by-design y programa de ejecución
+- [`EFEONCE_TALENT_ASSURANCE_ECONOMIC_GUARDRAILS_V1`](docs/business-models/EFEONCE_TALENT_ASSURANCE_ECONOMIC_GUARDRAILS_V1.md) — economics y gate de viabilidad, sin cifras aprobadas
+- [`efeonce-talent-assurance`](docs/documentation/hr/efeonce-talent-assurance.md)
+- [`operar-efeonce-talent-assurance`](docs/manual-de-uso/hr/operar-efeonce-talent-assurance.md)
+
+La propuesta conecta selección, verificación, onboarding, performance, continuidad y economics. Pendiente: checkpoint
+humano de la decisión, creación de tasks con IDs formales y validación de thresholds/economics con Talent,
+Operations, Commercial y Finance.
+
+Restricción añadida: EPIC-038 es una capa de assurance sobre capacidades existentes. No autoriza crear ATS, HRIS,
+skills registry, portfolio vault, performance system, cost ledger, identidad verificada paralela ni agent runtime
+separado. Toda task futura debe justificar reuse/extend antes de proponer un objeto nuevo.
+
 ## 2026-07-30 — Fully Managed Creative Capacity global
 
 Se incorporó al modelo que Efeonce absorbe equipo, computadores, infraestructura, licencias, contratación, costos
