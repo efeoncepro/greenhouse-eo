@@ -198,6 +198,30 @@ mismo arnés**, o si hace falta que cada producto exporte su fixture.
 Es esperable que difieran: se escribieron sin spec. **Ese número dimensiona la task entera** y es el
 argumento más honesto a favor o en contra del eje.
 
+### Hallazgo previo al Slice 0 — el Lab **no puede** renderizar los adapters hoy
+
+Medido el 2026-07-30: `apps/lab` es **Vite + TypeScript vanilla**. Sus dependencias son `axis-tokens` y
+`axis-ui-registry`; sus devDependencies, `typescript` y `vite`. **No tiene React**, y su `main.ts` construye
+la UI con `innerHTML` y template strings.
+
+Los dos adapters que hay que comparar son **componentes React** (MUI en Greenhouse, Tailwind en Globe). El
+Lab no puede montarlos tal cual.
+
+Y la salida obvia es una trampa conocida: hacer que el Lab **importe** los adapters de cada repo
+reintroduciría la dependencia cross-repo que causó `ISSUE-128` (el CI de Globe rojo 9 commits por una ruta
+al `node_modules` de otro proyecto). **No repetir esa forma.**
+
+**Dirección recomendada — cada producto exporta su fixture; el Lab compara artefactos:**
+
+1. Cada consumidor renderiza el pattern **en su propio arnés** (donde ya tiene su motor, su theme y su
+   toolchain) y emite un artefacto: captura + propiedades computadas en JSON.
+2. El Lab —o el runner— **compara artefactos**, no renders en vivo.
+
+Ventajas: cero acoplamiento cross-repo, cada producto usa la maquinaria que ya tiene (GVC en Greenhouse, los
+canaries en Globe), y el artefacto es versionable y adjuntable como evidencia de promoción.
+
+El Slice 0 debe **confirmar o refutar** esta dirección antes de que el Slice 2 construya nada.
+
 ### Slice 1 — `DesignPatternContract` gana `spec` + `tones`
 
 ```ts
@@ -314,7 +338,7 @@ línea base contra la cual verificar nada.
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
-| Los adapters no son renderizables en un arnés común | UI platform | **medium** | Slice 0 lo responde antes de invertir en specs | el propio Slice 0 |
+| Los adapters no son renderizables en un arnés común | UI platform | **alta — ya medido: el Lab no tiene React** | dirección recomendada: cada producto emite su artefacto y el runner compara artefactos, nunca renders en vivo cross-repo (`ISSUE-128`) | el propio Slice 0 |
 | El diff da falsos positivos por antialiasing / sub-pixel entre motores | UI platform | **high** | umbral calibrado con el número del Slice 0, y comparación por propiedad computada además de píxeles | ruido en el gate; si es constante, el umbral está mal |
 | Escribir la `spec` cambia sin querer cómo se ve un producto | UI (Greenhouse y/o Globe) | medium | la spec se **deriva** del render actual de Greenhouse, no se inventa; diff intra-producto antes de mergear | GVC por producto + tests de contraste |
 | La spec queda ambigua y los adapters divergen "legítimamente" | UI platform | medium | reportar por parte y estado, no global; una ambigüedad se ve como divergencia localizada | el diff |

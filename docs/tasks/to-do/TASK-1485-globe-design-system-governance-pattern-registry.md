@@ -17,7 +17,7 @@
 - Motion: `docs/ui/motion/TASK-1485-globe-design-system-motion-governance.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `NECESITA RE-SCOPE (2026-07-30). Su premisa central —Globe posee e implementa tokens, patterns y components; Pattern Lab Globe— contradice el ADR de ownership de AXIS (AXIS posee la especificación completa; el producto traduce) y la decisión de que el Lab vive en el Vercel de AXIS. Ya venía señalado: el ADR de plataforma exigía actualizarla antes de promover el registry, y el continuity map la listaba como P4 bloqueada. SIGUE VÁLIDO: que Globe no herede MUI/Vuexy, el lifecycle candidate→trial→stable, el motor ADR-016 (implementado) y la identidad Capacity. No ejecutar como está escrita. Ver Delta 2026-07-30`
+- Status real: `RE-SCOPEADA 2026-07-30: pasa de "crear el DS propio de Globe" a "adoptar AXIS en Globe" (traducir la spec a Tailwind, aportar fixtures al Lab de AXIS, gobernar solo los patterns propios de su dominio). Contexto: Su premisa central —Globe posee e implementa tokens, patterns y components; Pattern Lab Globe— contradice el ADR de ownership de AXIS (AXIS posee la especificación completa; el producto traduce) y la decisión de que el Lab vive en el Vercel de AXIS. Ya venía señalado: el ADR de plataforma exigía actualizarla antes de promover el registry, y el continuity map la listaba como P4 bloqueada. SIGUE VÁLIDO: que Globe no herede MUI/Vuexy, el lifecycle candidate→trial→stable, el motor ADR-016 (implementado) y la identidad Capacity. No ejecutar como está escrita. Ver Delta 2026-07-30`
 - Rank: `TBD`
 - Domain: `creative|ui-platform|governance|accessibility`
 - Blocked by: `TASK-1455`
@@ -100,9 +100,18 @@ No queda sin sujeto — buena parte se sostiene:
 
 ## Summary
 
-Crear el Design System propio de Globe como sistema incremental: Greenhouse gobierna decisiones, registry,
-lifecycle, QA, evidencia y promoción; Globe posee e implementa tokens seleccionados, patterns, components,
-motion y runtime sin heredar el Design System de Greenhouse.
+**Re-scopeada 2026-07-30.** Adoptar AXIS en Globe: traducir a Tailwind la especificación que AXIS publica,
+aportar los fixtures de Globe al Lab de AXIS, y gobernar únicamente los patterns **propios del dominio de
+Globe** — los que no suben porque conocen su negocio. Greenhouse conserva el gobierno del proceso.
+
+Globe **no hereda MUI/Vuexy** (eso se mantiene íntegro) pero **tampoco es dueño de la apariencia de un
+pattern compartido**: si el mismo pattern se ve distinto en cada producto, el design system no sistematiza
+nada. Globe traduce; no diseña.
+
+> *Alcance anterior, retirado:* «Crear el Design System propio de Globe (…) Globe posee e implementa tokens
+> seleccionados, patterns, components, motion y runtime sin heredar el Design System de Greenhouse», más un
+> Pattern Lab Globe. Contradecía el ADR de ownership de AXIS y la decisión de que el Lab vive en el Vercel
+> de AXIS. Ver Delta 2026-07-30.
 
 ## Why This Task Exists
 
@@ -111,10 +120,19 @@ a Vuexy/MUI/CompositionShell ni improvisar patterns aislados por pantalla.
 
 ## Goal
 
-Entregar un registry versionado y un Pattern Lab Globe donde cada pattern nazca `candidate`, demuestre anatomy,
-states, responsive, a11y, motion y evidence, y sólo entonces se promueva para reuso. El registry también fija la
-identidad internacional de la suite **Capacity**: la capacidad es la superficie de producto; `credits` es la
-unidad operativa, no el nombre de una wallet ni una equivalencia monetaria.
+Que Globe consuma el registry y la especificación de AXIS, aporte sus fixtures al Lab compartido, y que
+cada pattern **propio de Globe** nazca `candidate` demostrando anatomy, states, responsive, a11y, motion y
+evidence antes de promoverse.
+
+El lifecycle `candidate → trial → stable` se conserva **tal cual** — es el mismo del contrato compartido, no
+uno paralelo.
+
+También se conserva la identidad internacional de la suite **Capacity**: la capacidad es la superficie de
+producto; `credits` es la unidad operativa, no el nombre de una wallet ni una equivalencia monetaria. Eso es
+**producto, no design system**, y no lo toca el re-scope.
+
+> *Retirado del Goal:* «un registry versionado y un Pattern Lab Globe». El registry es el de AXIS y el Lab
+> es uno solo, en el Vercel de AXIS. Globe aporta fixtures, no un segundo Lab.
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
 
