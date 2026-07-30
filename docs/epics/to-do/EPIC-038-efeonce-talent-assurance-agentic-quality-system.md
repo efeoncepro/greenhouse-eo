@@ -112,17 +112,27 @@ Only reversible, allowlisted actions with exact approval binding, idempotency, r
 
 ## Child Tasks
 
-Task IDs must be reserved through the task process after ADR review. These workstreams are not executable tasks yet:
+Task IDs were reserved through the task process. Execution remains gated by ADR acceptance, owner assignment and
+the dependencies recorded in each task:
 
-1. V1 claims, verification lifecycle and evidence ledger.
-2. Quality Gate and opening/template binding.
-3. Role templates and work samples for Account Manager and Content Creator.
-4. Quality-of-Hire 30/60/90 and selection-failure taxonomy.
-5. Client-operator feedback and continuity projection.
-6. Recruitability/economic feasibility gate.
-7. Agent contracts, proposal ledger, policy bindings and run state.
-8. Evals, observability, cost controls and autonomy promotion gates.
-9. Internal assurance cockpit and operator workflows.
+### Phase 0 — Decision and evidence baseline
+
+- [TASK-1602](../../tasks/to-do/TASK-1602-talent-assurance-claim-verification-contract.md) — claims, verification lifecycle and evidence contract.
+- [TASK-1607](../../tasks/to-do/TASK-1607-recruitability-economic-feasibility-gate.md) — recruitability and economic feasibility.
+
+### Phase 1 — Read-only assurance projection
+
+- [TASK-1603](../../tasks/to-do/TASK-1603-hiring-quality-gate-opening-binding.md) — Hiring Quality Gate and opening/template binding.
+- [TASK-1604](../../tasks/to-do/TASK-1604-role-scorecard-assessment-template-pack.md) — critical-role scorecards and assessment templates.
+- [TASK-1605](../../tasks/to-do/TASK-1605-quality-of-hire-outcome-selection-failure.md) — Quality-of-Hire outcomes and selection-failure taxonomy.
+- [TASK-1606](../../tasks/to-do/TASK-1606-client-operator-feedback-continuity-projection.md) — client-operator feedback and continuity projection.
+- [TASK-1610](../../tasks/to-do/TASK-1610-talent-assurance-read-models-api-parity.md) — read models and Full API Parity.
+
+### Phases 2–4 — Agentic proposals and bounded actions
+
+- [TASK-1608](../../tasks/to-do/TASK-1608-talent-assurance-agent-proposal-run-contract.md) — agent proposal, policy and run contract.
+- [TASK-1609](../../tasks/to-do/TASK-1609-talent-assurance-evals-observability-promotion.md) — evals, observability and autonomy promotion.
+- [TASK-1611](../../tasks/to-do/TASK-1611-talent-assurance-operator-cockpit.md) — internal assurance cockpit and operator workflows.
 
 ## Existing Related Work
 
