@@ -17,6 +17,17 @@ búsqueda dentro de las redes, trend-jacking o audio/sonido trending.
 
 ---
 
+## 0. Social Search como puente comercial con SEO/AEO
+
+En el servicio Efeonce, Social Search no es una táctica aislada ni una promesa de ranking universal. Es una capability recurrente que convierte preguntas, lenguaje, temas, entidades y señales de conversación en decisiones editoriales y oportunidades de demanda.
+
+- Social Media es dueño de escucha, preguntas sociales, hooks, formatos, conversación y query coverage dentro de plataformas.
+- SEO/AEO es dueño de queries web, páginas, crawl/indexación, entidades, schema y visibilidad en motores de respuesta.
+- Ambas lanes comparten un mapa de temas/entidades, `content_id`, evidencias y aprendizajes, pero mantienen scope, pricing y accountability separados.
+- Reporta visibilidad como observación controlada, no como ranking universal ni causalidad automática.
+
+Esto materializa el diferenciador: convertir conocimiento y conversación en autoridad y demanda medibles.
+
 ## 1. Social listening — qué es y qué monitorear
 
 Listening = monitorear conversación pública para extraer inteligencia (no solo contar

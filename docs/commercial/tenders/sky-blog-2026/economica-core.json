@@ -1,0 +1,130 @@
+{
+  "$comment": "Oferta económica alternativa SKY Visibility Core. Fuente única para el Excel alternativo; no reemplaza economica.json ni la oferta original de CLP 5.200.000. El conteo de contenidos es capacidad y priorización, nunca precio unitario.",
+  "output": "propuesta-economica-sky-visibility-core.xlsx",
+  "sheetName": "SKY Visibility Core",
+  "title": "PROPUESTA ECONÓMICA",
+  "subtitle": "SKY Visibility Core — Operación de Optimización Editorial y Visibilidad SEO/AEO",
+  "currency": "CLP",
+  "ivaRate": 0.19,
+  "meta": {
+    "Oferente": "Efeonce Group SpA",
+    "Licitación": "Servicio de Producción de Contenido Blog SKY (plataforma Wherex)",
+    "Configuración": "SKY Visibility Core",
+    "Fecha": "julio 2026",
+    "Validez de la oferta": "120 días desde su recepción por parte de SKY"
+  },
+  "sections": [
+    {
+      "type": "value-table",
+      "title": "1. Valor de la operación mensual",
+      "columns": ["Configuración", "Alcance de la operación mensual", "Valor mensual (neto, sin IVA)"],
+      "rows": [
+        {
+          "cells": [
+            "SKY Visibility Core",
+            "Operación continua del portfolio editorial: priorización de hasta 50 contenidos en la cartera mensual · refresh ligeros y profundos · contenidos nuevos estratégicos dentro de la capacidad acordada · SEO/AEO · publicación WordPress · QA editorial, SEO/AEO y de marca · medición · reportería · pod asignado · newsletter mensual de hasta 10 contenidos",
+            3000000
+          ],
+          "strong": true
+        },
+        {
+          "cells": [
+            "Newsletter mensual",
+            "Incluida dentro de la operación Core: curaduría, adaptación de títulos, bajadas, llamados y enlaces para hasta 10 contenidos, más una ronda de ajustes. SKY conserva el envío y la administración de su plataforma de email.",
+            "Incluida"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "totals",
+      "title": "Detalle del valor mensual — SKY Visibility Core",
+      "basis": 3000000,
+      "label": "Valor mensual neto"
+    },
+    {
+      "type": "keyvalue",
+      "title": "Proyección de la configuración Core",
+      "rows": [
+        { "cells": ["Anual (12 meses)", 36000000] },
+        { "cells": ["Total del contrato (24 meses)", 72000000], "strong": true }
+      ]
+    },
+    {
+      "type": "value-table",
+      "title": "2. Addons de capacidad",
+      "columns": ["Addon", "Alcance", "Precio"],
+      "rows": [
+        {
+          "cells": [
+            "New Content Capacity",
+            "Mayor capacidad mensual para contenidos nuevos estratégicos, definida como un bloque de producción y no como precio por artículo.",
+            "Cotización separada"
+          ]
+        },
+        {
+          "cells": [
+            "Deep Refresh",
+            "Bloques adicionales de actualizaciones profundas para contenidos prioritarios del portfolio.",
+            "Cotización separada"
+          ]
+        },
+        {
+          "cells": [
+            "Technical SEO",
+            "Intervenciones técnicas en WordPress, datos estructurados, rastreo, templates y arquitectura que excedan la operación editorial mensual.",
+            "Cotización separada"
+          ]
+        },
+        {
+          "cells": [
+            "Multimedia Content",
+            "Videos simples, piezas visuales adicionales o adaptaciones sociales para contenidos prioritarios.",
+            "Cotización separada"
+          ]
+        },
+        {
+          "cells": [
+            "Newsletter Expansion",
+            "Mayor volumen, diseño, carga, segmentación o automatización de newsletters más allá de la preparación mensual incluida.",
+            "Cotización separada"
+          ]
+        },
+        {
+          "cells": [
+            "Market Expansion",
+            "Adaptación de la operación a nuevos mercados, idiomas o versiones regionales.",
+            "Cotización separada"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "keyvalue",
+      "title": "3. Condiciones comerciales",
+      "rows": [
+        { "cells": ["Precio", "CLP 3.000.000 mensuales, valor neto. Tarifa fija en pesos chilenos, conforme al numeral 3.2 de las Bases"] },
+        { "cells": ["Impuestos", "Valores netos, sin IVA. El IVA se aplica en la factura según corresponda"] },
+        { "cells": ["Reajustes", "Sin reajuste durante la vigencia del contrato"] },
+        { "cells": ["Condiciones de pago", "30 días desde la correcta recepción y aceptación conforme de la factura por parte de SKY"] },
+        { "cells": ["Facturación", "Mensual"] },
+        { "cells": ["Modalidad de pago", "Transferencia electrónica a la cuenta bancaria de Efeonce Group SpA"] },
+        { "cells": ["Duración", "Dos (2) años a contar del inicio del servicio"] },
+        { "cells": ["Condiciones de término", "Renovable por igual período previo acuerdo de ambas partes, con notificación 60 días antes del término del período en curso"] },
+        { "cells": ["Desembolsos", "No aplican dentro del alcance descrito. La operación Core incluye planificación, refresh, contenidos nuevos estratégicos dentro de la capacidad acordada, SEO/AEO, publicación, newsletter, medición, reportería y coordinación"] },
+        { "cells": ["Comisiones de plataforma", "Las comisiones de Wherex aplicables al adjudicado son asumidas por Efeonce y están consideradas en esta oferta"] }
+      ]
+    },
+    {
+      "type": "keyvalue",
+      "title": "4. Límites de capacidad y responsabilidades",
+      "rows": [
+        { "cells": ["Cartera editorial", "La operación revisa y prioriza hasta 50 contenidos mensuales. La ejecución se define según la mezcla de refresh ligeros, refresh profundos y contenidos nuevos; no todos los contenidos representan el mismo nivel de intervención"] },
+        { "cells": ["Capacidad excedente", "Los contenidos que excedan la capacidad mensual se priorizan para el siguiente ciclo o se incorporan mediante un Addon previamente aprobado"] },
+        { "cells": ["Newsletter", "Incluye preparación de hasta 10 contenidos y una ronda de ajustes. El envío, la plataforma, la segmentación y la automatización permanecen a cargo de SKY"] },
+        { "cells": ["Responsabilidad de SKY", "SKY proporciona acceso a WordPress, fuentes oficiales, responsables de aprobación y observaciones dentro de los plazos acordados"] }
+      ]
+    }
+  ],
+  "footerNote": "Documento alternativo de oferta económica. Valores expresados en pesos chilenos (CLP), netos sin IVA. SKY Visibility Core compra una operación mensual de visibilidad y capacidad editorial; los contenidos son un límite de capacidad y no una unidad de precio. Los Addons se cotizan separadamente según alcance y capacidad."
+}

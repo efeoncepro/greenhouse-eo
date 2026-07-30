@@ -1,14 +1,16 @@
-# CLIENT_DELIVERY — social as-a-service para clientes Globe
+# CLIENT_DELIVERY — adaptador de delivery para clientes internacionales
+
+> **Estado vigente (2026-07): Globe no está disponible ni es dependencia de Social Media.** Este archivo describe un patrón futuro/gated de delivery para clientes internacionales. El servicio actual debe poder venderse y ejecutarse sin Globe, con el squad humano y las herramientas operativas disponibles.
 
 > Cómo opera el estudio cuando el social es **para un cliente**, no para Efeonce. Los clientes
-> Globe son **equipos de marketing enterprise internacionales** (aerolíneas, bancos,
+> En el patrón futuro, los clientes internacionales son **equipos de marketing enterprise** (aerolíneas, bancos,
 > manufactura) — exigen multi-marca, aprobaciones formales, reporting presentable y
 > localización real. Esto NO es lo mismo que operar los canales propios de Efeonce
 > (`EFEONCE_OVERLAY.md`).
 
 ## Qué cambia respecto a canales propios
 
-| Dimensión | Canal propio Efeonce | Cliente Globe |
+| Dimensión | Canal propio Efeonce | Cliente internacional futuro |
 |---|---|---|
 | Marca | Efeonce (una) | la del cliente (multi-marca; nunca mezclar con Efeonce) |
 | Aprobación | operador Efeonce | flujo formal del cliente (brand/legal/compliance) |
@@ -53,7 +55,7 @@ Creator/UGC, whitelisting, música, voz, likeness, territorio, plazo y paid usag
 
 ## Localización (clientes internacionales)
 
-Los clientes Globe operan en múltiples mercados. El social se **localiza**, no se traduce
+Los clientes internacionales futuros pueden operar en múltiples mercados. El social se **localiza**, no se traduce
 literal: hook, referencias culturales, sonido trending y horario óptimo cambian por país.
 Corre `getBestTimeToPostByNetwork` por mercado. Para craft multilingüe fino → `copywriting`
 (sistema bilingüe). Respeta RTL/CJK si el mercado lo exige (typography → `typography-design`).
@@ -71,7 +73,7 @@ Corre `getBestTimeToPostByNetwork` por mercado. Para craft multilingüe fino →
 
 ## Costura con el runtime Greenhouse
 
-El cliente Globe vive en el 360 de Greenhouse como `Cliente`. El trabajo social de delivery es
+En un rollout futuro, el cliente internacional viviría en el 360 de Greenhouse como `Cliente`. El trabajo social de delivery sería
 operación de agencia (marca Efeonce como agencia), no una capacidad del portal. Si el delivery
 genera métricas que deban verse en Account 360 / ICO, esa integración es trabajo de plataforma
 (no de esta skill) — nómbralo como follow-up, no lo inventes acá.

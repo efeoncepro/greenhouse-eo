@@ -282,6 +282,21 @@ regalo:
 
 **Template:** `templates/sow-creativo.md`
 
+## 8. Aplicación a Social Media y Run & Gun
+
+En Social Media, el SOW debe separar explícitamente:
+
+- el servicio humano recurrente del squad;
+- el contenido y la producción incluida en capacidad;
+- cada jornada o sprint de **Efeonce Run & Gun Production**;
+- derechos de imagen, voz, música, talentos, territorio, plazo y uso paid;
+- rondas, ventana de aprobación, quality gates y criterios de aceptación;
+- community/social care, SLA y escalamiento de crisis;
+- Social Search/SEO/AEO como composición entre lanes, no como alcance implícito;
+- exclusiones: Globe, paid/media spend, creators, 24/7, viajes y producción extraordinaria.
+
+El **Efeonce Run & Gun Studio** es la capability interna y no debe aparecer como un entregable arrendable. La cuarta ronda, un cambio de dirección, una jornada adicional o un uso no previsto requieren change order.
+
 ---
 
 **→ Siguiente:** ya sabes qué vendes, a cuánto y hasta dónde. Ahora, **cómo abres la puerta** →

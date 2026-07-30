@@ -50,7 +50,8 @@ Cada servicio debe declarar como mínimo:
 ## Familias disponibles
 
 - [HubSpot as a Service](hubspot-as-a-service/README.md)
-- [Creative Services](creative-services/README.md)
+- [Creative Services](creative-services/README.md) — incluye Social Media, su operación recurrente y la capability
+  **Efeonce Run & Gun Studio**, que se comercializa mediante **Efeonce Run & Gun Production** con alcance propio.
 - [Media & Distribution](media-distribution/README.md)
 
 HubSpot as a Service pertenece a la línea de negocio **RevOps & CRM**. Su arquitectura comercial y la revisión de los
@@ -81,6 +82,8 @@ que diseña, construye y opera la capa digital inteligente. El catálogo económ
 La composición de un proyecto puede incorporar capacidades de RevOps & CRM/Kortex, Creative Services/Globe o
 Media & Distribution (con Reach cuando aplique) según el resultado contratado y el RACI definido. Wave conserva el ownership de sus
 familias de servicio.
+
+La composición propuesta [`Search + Social Visibility`](../business-models/search-visibility-360/SEARCH_SOCIAL_VISIBILITY_COMPOSITION_V1.md) conecta Search Visibility 360 con Social Media sin fusionar ownership, pricing o accountability.
 
 ### Delivery models de Wave
 

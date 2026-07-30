@@ -12,6 +12,16 @@
 
 ---
 
+## 0. Efeonce Run & Gun Studio → Run & Gun Production
+
+El nombre **Efeonce Run & Gun Studio** identifica la capability interna: equipo humano, crew, captura profesional, sonido, iluminación, movilidad, edición y postproducción.
+
+El nombre **Efeonce Run & Gun Production** identifica el servicio vendible. Sus cuatro paquetes son `Content Capture Day`, `Executive / Interview Capture`, `Social-First Production Sprint` y `Brand Story / Campaign Capture`.
+
+Antes de producir, el brief debe fijar objetivo, red, formato, jornada, crew, assets, entregables, rondas, quality gates, derechos de imagen/voz/música, territorio, plazo, uso paid, movilidad, postproducción y aprobador. Globe no es requisito ni dependencia: el flujo debe funcionar sin Globe.
+
+Run & Gun acelera y eleva la calidad del servicio humano recurrente; no convierte el retainer en producción ilimitada. Jornadas adicionales, viajes, talentos, licencias, crisis y postproducción extraordinaria requieren SOW y change order.
+
 ## 1. El loop del estudio
 
 ```

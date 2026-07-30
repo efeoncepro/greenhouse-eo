@@ -1,34 +1,6 @@
 ---
 name: social-media-studio
-description: >-
-  Skill experta y de EJECUCIÓN de Social Media al estado del arte 2026 — el
-  "estudio" que idea, produce, publica, escucha, gestiona comunidad y mide social
-  plataforma-por-plataforma. Dos manos: (1) conocimiento profundo de la mecánica
-  real de cada red (algoritmos y señales de ranking, formatos y su craft, social
-  search/AEO-social, social commerce, creator/UGC, community management, escucha
-  y trend-jacking, analítica nativa), y (2) capacidad de producción (orquesta
-  Metricool para programar/analizar, Higgsfield para video/imagen/audio/UGC,
-  greenhouse-ai-image-generator + Figma/Express para estáticos y carruseles),
-  cerrando el loop idear→producir→programar→medir→iterar. COMPLEMENTARIA pero
-  DISTINTA de digital-marketing: digital-marketing decide social como UN canal
-  del mix (nivel estrategia/campaña); social-media-studio es el ESPECIALISTA de
-  ejecución profunda por red. Delega a digital-marketing (mix de canales, campaña
-  integrada, paid programático), a growth-marketing-cro (conversión/CRO,
-  experimentación, atribución/funnel, retención), a copywriting (craft fino de
-  texto/voz), a seo-aeo (SEO técnico + AEO por-motor LLM/schema), a
-  commercial-expert (pricing/pipeline), a efeonce-agency (doctrina marca/GTM/ASaaS)
-  y a los generadores visuales (greenhouse-ai-image-generator / higgsfield-* /
-  greenhouse-digital-brand-asset-designer) para producir el asset concreto.
-  Incluye overlay Efeonce (canales propios Think/Glitch/grader) y capa de delivery
-  para clientes Globe. Triggers: "social media", "redes sociales", "Instagram",
-  "Reels", "TikTok", "LinkedIn", "YouTube", "Shorts", "carrusel", "carousel",
-  "story", "stories", "community management", "comunidad", "engagement", "hook",
-  "guion de video", "video corto", "short-form", "long-form", "UGC", "creator",
-  "influencer", "trend", "trend-jacking", "social listening", "escucha social",
-  "social search", "AEO social", "social commerce", "TikTok Shop", "live shopping",
-  "calendario de redes", "programar posts", "Metricool", "reporte de redes",
-  "share of voice social", "algoritmo de Instagram/TikTok/LinkedIn", "cadencia de
-  publicación", "content pillars", "batch de contenido".
+description: Diseña y opera social media por plataforma para estrategia editorial, producción, publicación, community, listening, medición, creator/UGC y formatos de Instagram, TikTok, LinkedIn, YouTube y otros. Use for Studio Credits y derechos dentro de producción social; no reemplaza la estrategia de canales.
 user-invocable: true
 argument-hint: "[red/tarea o pregunta — ej: 'plan de 30 días para LinkedIn del grader', 'guion de Reel para el lanzamiento', 'auditar nuestro Instagram', 'estrategia de TikTok Shop', 'matriz de community management']"
 ---
@@ -58,6 +30,20 @@ argument-hint: "[red/tarea o pregunta — ej: 'plan de 30 días para LinkedIn de
 
 ---
 
+## 0. Contrato de servicio Efeonce
+
+Cuando el pedido sea para vender, diseñar o entregar el servicio de Efeonce, esta skill opera sobre estas decisiones:
+
+- **Social Media es un servicio humano recurrente:** `On-Going + Managed Squad + efeonce-managed`. El squad dirige estrategia, contenido, publicación, comunidad, listening, Social Search, medición y aprendizaje mensual; no vende posts sueltos ni promete volumen ilimitado.
+- **Diferenciador:** convertimos conocimiento, conversación y contenido social en un sistema medible de autoridad y demanda.
+- **ICP prioritario:** B2B experto con oferta compleja, responsable interno de marketing y acceso a expertos, fundadores o ejecutivos. Las demás categorías se califican por capacidad, riesgo y economía.
+- **Social Search + SEO/AEO:** Social Search trabaja la búsqueda dentro de las plataformas; SEO/AEO trabaja web, queries, entidades, indexación y motores de respuesta. Comparten mapa de temas, entidades, contenido e insights, pero mantienen ownership y pricing separados.
+- **Run & Gun:** `Efeonce Run & Gun Studio` es la capability interna. `Efeonce Run & Gun Production` es el servicio cotizable. Paquetes: `Content Capture Day`, `Executive / Interview Capture`, `Social-First Production Sprint` y `Brand Story / Campaign Capture`.
+- **Globe:** Globe no está disponible como dependencia del servicio actual. La operación debe funcionar sin Globe; cualquier referencia a Globe es un adaptador futuro y gated, nunca una promesa de rollout.
+- **Scope y gates:** toda entrega define owner y backup de aprobación, número de rondas, derechos/territorio/plazo, assets y claims autorizados, calendario, SLA, quality gates, evidencia y change order. Paid, creators, talentos, derechos, media spend, crisis, 24/7 y producción especial se cotizan separadamente.
+
+La narrativa de venta es el sistema de autoridad y demanda; Trendjacking, reels, community, Social Search y Run & Gun son capacidades dentro de ese sistema, no sustitutos del posicionamiento.
+
 ## 1. Cómo se usa esta skill (router)
 
 1. **Clasifica la intención** con el árbol de §2. ¿Es realmente social de ejecución
@@ -69,11 +55,11 @@ argument-hint: "[red/tarea o pregunta — ej: 'plan de 30 días para LinkedIn de
 4. **Si hay que ejecutar** (producir/programar/medir), abre `efeonce/STUDIO_TOOLING.md`
    y usa el pipeline con las herramientas conectadas — **con confirmación humana antes
    de publicar** (§4).
-5. **Aterriza a Efeonce** si el trabajo es de canales propios o de un cliente Globe:
-   `efeonce/EFEONCE_OVERLAY.md` / `efeonce/CLIENT_DELIVERY.md`.
+5. **Aterriza a Efeonce** si el trabajo es de canales propios o de un cliente internacional:
+   `efeonce/EFEONCE_OVERLAY.md` / `efeonce/CLIENT_DELIVERY.md`. Globe es un adaptador futuro gated, no una dependencia.
 6. **Cierra con un artefacto** de `templates/` (brief, calendario, guion, reporte…),
    no con prosa suelta.
-7. Si la producción corre por Creative Studio / Efeonce Globe, carga el Business Model y Credit Model desde
+7. Si la producción corre por Creative Studio / un runtime futuro de Globe, carga el Business Model y Credit Model desde
    `efeonce/CLIENT_DELIVERY.md`: la pieza social no es la unidad de crédito; identifica las operaciones
    generativas y separa layout/copy/export/QA, capacidad y derechos.
 
@@ -125,7 +111,7 @@ herramientas conectadas (detalle en `efeonce/STUDIO_TOOLING.md`):
   - Ganas gratis lo que ya está probado: **`overflow: reject`** (un texto que no cabe en el 4:5 **no se
     recorta**: falla) y la **verificación de geometría antes de renderizar**.
   - **La marca es un INPUT (brand pack)**, no una constante → el mismo catálogo sirve para Efeonce **y
-    para un cliente Globe** (as-a-service). **NUNCA** hardcodees un HEX de marca en una plantilla.
+    para un cliente internacional** (as-a-service). **NUNCA** hardcodees un HEX de marca en una plantilla.
   - Frontera con **Media Foundry**: Foundry **genera** el pixel (IA); el Composer **compone** el frame. Un
     carrusel puede usar los dos. **NO** se fusionan.
 

@@ -8,7 +8,7 @@
 
 ## Contexto
 
-Efeonce presta gestión de redes sociales (Community Management, Influencers/Creators, Trendjacking, contenido/reels modernos) como parte de su capability creativa (**Globe**, con pie en **Reach** para amplificación), pero **no tiene una landing pública** que la posicione y capture demanda. Hoy hay spokes de servicio para SEO (`TASK-1343`) y desarrollo web (`TASK-1345`), y el paraguas creativo (`PDR-004`/`TASK-1350`), pero el servicio social queda sin superficie de conversión propia.
+Efeonce presta un servicio humano y recurrente de Social Media, operado por un squad gestionado por Efeonce. La oferta puede apoyarse en contenido profesional producido mediante **Efeonce Run & Gun Studio**, pero no depende de Globe ni debe prometer creación automatizada mientras esa capacidad no esté disponible para este servicio. La landing pública debe posicionar y capturar demanda para esta oferta, dentro del paraguas creativo y del ecosistema de crecimiento de Efeonce.
 
 **Demanda de búsqueda real (Semrush, base `cl`, as-of 2026-07)** que ancla la decisión de IA:
 
@@ -33,6 +33,20 @@ No liderar con la promesa commodity ("manejamos tus redes", el "todas las agenci
 - Los sub-servicios (Community Management · Creators/Influencers · Trendjacking · Reels/Contenido · Social listening) van como **bloques de capability**, no como la promesa titular.
 - Regla dura: liderar con el outcome + prueba, **nunca** con "publicamos todos los días" ni volumen de posts como valor.
 
+### 1.1 Diferenciador y beachhead
+
+La categoría que Efeonce debe ocupar es:
+
+> **Social Media para empresas expertas: convertimos conocimiento, conversación y contenido social en un sistema medible de autoridad y demanda.**
+
+El ICP prioritario es B2B experto —tecnología, SaaS, consultoría, servicios profesionales, educación especializada, minería, energía, infraestructura y otras ofertas complejas— con responsable interno de marketing, acceso a expertos/voceros y capacidad de comprometer al menos un trimestre. Consumo especializado y ecommerce son un segundo beachhead; multi-marca y regulados son expansiones condicionadas.
+
+El diferenciador se prueba mediante cinco elementos: estrategia conectada al negocio, activación de conocimiento experto y voces ejecutivas, operación social gobernada por squad, Social Search conectado con SEO/AEO, y medición que distingue outputs, señales de demanda y resultados atribuibles. Run & Gun es una ventaja de delivery que hace ejecutable esa estrategia; no reemplaza el diferenciador ni convierte el retainer en producción ilimitada.
+
+### 1.2 Search + Social Visibility
+
+Social Search no es una promesa aislada ni una tercera línea de servicio. Es una capability de Social Media que compone inmediatamente con Search Visibility 360: las preguntas, temas, entidades y señales de conversación alimentan contenidos, páginas, FAQs y oportunidades SEO/AEO; la investigación de búsqueda informa hooks, formatos y prioridades sociales. La landing puede presentar esta composición como **Search + Social Visibility**, manteniendo contratos, owners y economics separados.
+
 ### 2. Doctrina social 2026 encarnada, no descrita
 
 La landing debe *demostrar* que Efeonce hace social del estado del arte, no listarlo. Principios verificados (volatilidad en `social-media-studio/SOURCES.md`; reverificar antes de citar cifras): autenticidad > pulido; **social search** (TikTok/IG/YT como buscador); community management como **palanca de alcance** (no soporte); micro/nano creadores rinden más engagement por post; video corto con parity + long-form volviendo; **likes/followers demotados** → lo que importa es watch-time / saves / shares / dwell. La métrica de vanidad (seguidores, "posteamos X veces") queda fuera del argumento de valor.
@@ -44,8 +58,15 @@ Build en el patrón de la familia de spokes (`posicionamiento-seo`/`desarrollo-s
 ### 4. Marca, oferta y conversión
 
 - **Lidera la masterbrand Efeonce** (`09`): Globe/Reach nunca solos; capabilities nombradas descriptivamente ("nuestro equipo de creatividad y contenido"). Tuteo es-CL neutro, sin voseo.
-- **Oferta de dos escalones:** CTA primario **"Agenda una reunión"** (HubSpot Meetings + UTM, consistente con `PDR-004`); CTA secundario **"Pide una auditoría de tus redes"** como oferta liviana de captura para el que aún no quiere reunión. Reusa `<greenhouse-form>` + Turnstile + atribución HubSpot portal 48713323 (Full API Parity por reuso, no motor nuevo).
+- **Oferta comercial:** CTA primario **"Agenda una reunión"**. La alternativa de **auditoría gratuita** frente a **Social Operating Diagnostic pagado** y piloto de 90 días permanece como decisión comercial pendiente; la landing no debe presentar una auditoría gratuita como equivalente al diagnóstico estratégico hasta que Commercial/Finance aprueben el modelo. Reusa `<greenhouse-form>` + Turnstile + atribución HubSpot portal 48713323 (Full API Parity por reuso, no motor nuevo).
+- **Ventaja de delivery:** **Efeonce Run & Gun Studio** cuenta con equipos profesionales para capturar contenido en terreno, entrevistas, reels, liderazgo ejecutivo y social-first production. El servicio comprable se nombra **Efeonce Run & Gun Production**, con paquetes como Content Capture Day, Executive/Interview Capture, Social-First Production Sprint y Brand Story/Campaign Capture. Cada producción mantiene SOW, jornada, crew, movilidad, edición, derechos y rondas propios.
 - **Solo casos/resultados citables.** Sky, Bresler, Berel u otros con métrica real. Si no hay resultado social citable, usar cifras **ilustrativas del modelo** declarándolo (mismo patrón que `PDR-004`).
+
+### 4.1 Módulos y exclusiones que la landing debe hacer explícitos
+
+El retainer puede incluir, según tier y alcance: estrategia y diagnóstico; sistema editorial y copy; adaptación nativa y publicación; community management; listening, tendencias y trendjacking caso a caso; Social Search; reporting y aprendizaje. Son módulos o proyectos separados cuando aplican: Paid Social y media spend; creators, influencers y UGC; Efeonce Run & Gun Production; derechos de imagen, música y licencias; cobertura de eventos; producción audiovisual especial; localización profesional; crisis/war room; atención 24/7; CRM, customer care completo y resolución de pedidos, pagos, entregas o soporte técnico.
+
+Community/Social Care significa responder, clasificar, moderar y derivar conversaciones dentro del SLA contratado. La resolución de casos transaccionales o privados permanece con el cliente, salvo que exista un alcance específico con sistema de casos, base de conocimiento, autoridad, SLA y governance propios.
 
 ## Consecuencias
 
@@ -53,7 +74,9 @@ Build en el patrón de la familia de spokes (`posicionamiento-seo`/`desarrollo-s
 - **Slug canónico:** `/servicios/redes-sociales`. Registrar en el landing registry de la skill `efeonce-public-site-wordpress` antes del segundo cambio.
 - **Follow-up de contenido (Think):** guía pillar "community manager" (4.400/mes, intención job/how-to) como autoridad top-of-funnel que enlaza a la spoke — bajar a TASK aparte bajo el eje Think/EPIC-020, no bloquea el diseño de la landing.
 - **Gap a resolver en ejecución:** confirmar qué resultados sociales citables existen; si no, cifras ilustrativas declaradas.
-- Coherencia con el paraguas creativo (`PDR-004`): la spoke social es una capability *dentro* de la agencia creativa, no una marca paralela.
+- **Decisión comercial pendiente:** definir si la auditoría introductoria permanece gratuita y acotada o si la entrada comercial pasa a un Social Operating Diagnostic pagado seguido de un piloto de 90 días. La etiqueta runtime `Auditoría` no resuelve por sí sola esta decisión.
+- Coherencia con el paraguas creativo (`PDR-004`): la spoke social es una capability *dentro* de la agencia creativa, no una marca paralela. **Efeonce Run & Gun Studio** es una capability interna/comercial habilitadora; **Efeonce Run & Gun Production** es el servicio cotizable.
+- La página mantiene `publish + noindex, follow` hasta aprobar explícitamente el cutover de indexación, canonical y la decisión de auditoría/diagnóstico. No retirar `noindex` como parte de esta actualización documental.
 
 ## Execution delta 2026-07-08
 
@@ -77,6 +100,11 @@ Build en el patrón de la familia de spokes (`posicionamiento-seo`/`desarrollo-s
 
 - No es self-serve, no expone el portal ni datos de cliente.
 - No lidera con volumen de posts / seguidores ni con "somos ágiles" sin prueba.
+- No se dirige primero a cualquier marca que necesite publicaciones: el beachhead es B2B experto con conocimiento y voceros activables.
+- No presenta Globe como dependencia ni promete creación de contenido automatizada no disponible.
+- No presenta Run & Gun Studio como arriendo de equipos ni incluye producción ilimitada en el retainer.
+- No confunde Community/Social Care con customer care transaccional o soporte 24/7.
+- No presenta auditoría gratuita, diagnóstico pagado y piloto como la misma oferta antes de decisión comercial.
 - No usa `elementor_canvas`, custom sticky header, ni header/wrapper overrides.
 - No migra a Astro ni cambia de host.
 - No infla cifras; no inventa resultados sociales.

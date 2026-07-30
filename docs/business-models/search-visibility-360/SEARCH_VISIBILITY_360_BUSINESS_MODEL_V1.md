@@ -6,6 +6,7 @@
 > **Pricing Integrity Pack:** [`SEARCH_VISIBILITY_360_PRICING_INTEGRITY_PACK_V1.md`](SEARCH_VISIBILITY_360_PRICING_INTEGRITY_PACK_V1.md)
 > **Business Model Integrity Pack:** [`SEARCH_VISIBILITY_360_BUSINESS_MODEL_INTEGRITY_PACK_V1.md`](SEARCH_VISIBILITY_360_BUSINESS_MODEL_INTEGRITY_PACK_V1.md)
 > **Customer Model Integrity Pack:** [`SEARCH_VISIBILITY_360_CUSTOMER_MODEL_INTEGRITY_PACK_V1.md`](SEARCH_VISIBILITY_360_CUSTOMER_MODEL_INTEGRITY_PACK_V1.md)
+> **Search + Social composition:** [`SEARCH_SOCIAL_VISIBILITY_COMPOSITION_V1.md`](SEARCH_SOCIAL_VISIBILITY_COMPOSITION_V1.md)
 
 ## Scope hypothesis
 
@@ -13,6 +14,8 @@ Un producto-servicio de Wave que conecta búsqueda clásica, visibilidad generat
 arquitectura de entidades, medición e inteligencia para entender dónde una marca es descubierta y qué acciones
 mejoran esa presencia. Globe puede producir contenido y Reach puede aportar distribución, pero no cambian el
 ownership de Wave sobre la oferta de visibilidad.
+
+Social Media es una composición inmediata pero separada: Wave conserva ownership de Search Visibility 360 y Efeonce Social Media conserva ownership de operación social, community, publishing y Social Search. La composición y sus gates están documentados en [`Search + Social Visibility Composition V1`](SEARCH_SOCIAL_VISIBILITY_COMPOSITION_V1.md).
 
 ## Model questions
 

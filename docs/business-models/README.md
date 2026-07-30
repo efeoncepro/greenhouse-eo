@@ -38,6 +38,25 @@ línea deben referenciarlo y declarar sus diferencias; no deben redefinir `Produ
 La capa transversal que gobierna partners, providers, licencias, pass-through, co-selling, capability enablement y
 captura de valor vive en [`Efeonce Partner & Provider Layer Operating Model V1`](EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md).
 
+## Social Media
+
+- [`Efeonce Social Media — Business Model V1`](creative-services/EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md)
+- [`Efeonce Social Media — Product Service Contract V1`](../services/creative-services/EFEONCE_SOCIAL_MEDIA_PRODUCT_SERVICE_CONTRACT_V1.md)
+- [`Efeonce Social Media — Pricing Integrity Pack V1`](creative-services/EFEONCE_SOCIAL_MEDIA_PRICING_INTEGRITY_PACK_V1.md)
+- [`Efeonce Social Media — Customer Model Integrity Pack V1`](creative-services/EFEONCE_SOCIAL_MEDIA_CUSTOMER_MODEL_INTEGRITY_PACK_V1.md)
+- [`Efeonce Social Media — Differentiation & Positioning V1`](creative-services/EFEONCE_SOCIAL_MEDIA_DIFFERENTIATION_POSITIONING_V1.md)
+- [`Efeonce Run & Gun Production — Offer V1`](../services/creative-services/EFEONCE_RUN_AND_GUN_PRODUCTION_OFFER_V1.md)
+- [`Efeonce Social Media — Pricing Validation Addendum`](creative-services/EFEONCE_SOCIAL_MEDIA_PRICING_VALIDATION_ADDENDUM_2026-07-29.md)
+- [`Efeonce Social Media — Operating Model V1`](../services/creative-services/EFEONCE_SOCIAL_MEDIA_OPERATING_MODEL_V1.md)
+- [`Efeonce Social Media — Subservices Catalog V1`](../services/creative-services/EFEONCE_SOCIAL_MEDIA_SUBSERVICES_CATALOG_V1.md)
+- [`Social Media Service Market Research 2026-07-29`](../audits/commercial/SOCIAL_MEDIA_SERVICE_MARKET_RESEARCH_2026-07-29.md)
+- [`Search + Social Visibility Composition V1`](search-visibility-360/SEARCH_SOCIAL_VISIBILITY_COMPOSITION_V1.md)
+- [`Search + Social Visibility — Measurement Contract V1`](search-visibility-360/SEARCH_SOCIAL_MEASUREMENT_CONTRACT_V1.md)
+
+Estado: `Approved for validation`. El servicio es humano y recurrente; Efeonce Run & Gun Studio es una capability real
+componible, mientras Globe / Creative Studio no forma parte de la promesa base actual. `Approved for validation` habilita
+pilotos y SOW gobernados, no venta self-serve ni aprobación comercial definitiva.
+
 ## Fronteras con las demás categorías
 
 | Categoría | Pregunta que responde | No debe contener como canon |
@@ -133,6 +152,7 @@ Todo business model debe separar al menos estas dimensiones:
 - [Efeonce AEO Business Model V1](aeo/EFEONCE_AEO_BUSINESS_MODEL_V1.md) — draft de wedge/capability.
 - [Search Visibility 360 Business Model V1](search-visibility-360/SEARCH_VISIBILITY_360_BUSINESS_MODEL_V1.md) + [Business Model Integrity Pack](search-visibility-360/SEARCH_VISIBILITY_360_BUSINESS_MODEL_INTEGRITY_PACK_V1.md) + [Customer Model Integrity Pack](search-visibility-360/SEARCH_VISIBILITY_360_CUSTOMER_MODEL_INTEGRITY_PACK_V1.md) —
   draft de capability en construcción; alcance comercial mid-market y enterprise.
+- [Search + Social Visibility Composition V1](search-visibility-360/SEARCH_SOCIAL_VISIBILITY_COMPOSITION_V1.md) — composición propuesta entre Search Visibility 360 y Social Media; no es una tercera línea contractual.
 - [Wave Business Model V1](wave/WAVE_BUSINESS_MODEL_V1.md) — `Proposed`; productora/capability con cinco familias y
   Agentic Readiness Audit como wedge prioritario de validación:
   Search Visibility 360, Web Experience 360, Measurement & Analytics, Agent Systems & Platforms y Digital

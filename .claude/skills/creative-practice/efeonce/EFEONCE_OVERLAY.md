@@ -35,7 +35,7 @@ un commodity con 10.000 competidores y un ranking de recall en el que no salimos
 | **Campaign & Creative Platform Systems** | Idea, campaña, KV, mensajes y toolkit multicanal | `design-studio` · `copywriting` |
 | **Content & Social Operations** | Capacidad recurrente de contenido, social, QA y aprendizaje | `content-marketing-studio` · `social-media-studio` · `copywriting` |
 | **Audiovisual, Motion & Audio Production** | Producción, edición, motion, audio y finishing | `motion-design-studio` · `audio-studio` |
-| **Run-and-Gun Production** | Captura profesional ágil con crew, setup y post definidos | Run-and-Gun Studio · `motion-design-studio` · `audio-studio` |
+| **Run & Gun Production** | Captura profesional ágil con crew, setup y post definidos | Efeonce Run & Gun Studio · `motion-design-studio` · `audio-studio` |
 | **Managed Creative Capacity** | Squad recurrente con prioridades, RACI y accountability | `greenhouse-talent-people-operator` + studios |
 | **AI Creative Operations / Studio Access** | Workflow, memoria, provenance y governance creativo | Globe / Creative Studio + studios |
 | **Creative Diagnostic** | Baseline y roadmap para elegir la siguiente fase | `modules/06_CUNA.md` |

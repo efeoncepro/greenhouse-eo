@@ -23,14 +23,18 @@ negocio ni representa por sí solo toda la agencia creativa.
 | `creative-capacity-managed` | Creative Capacity / Managed Creative Squad | Capacidad creativa recurrente, priorizada y entregada con accountability de delivery | On-Going · Managed Squad | Approved for validation |
 | `creative-strategy-brand-systems` | Creative Strategy & Brand Systems | Claridad estratégica, identidad verbal/visual y sistema de marca usable y gobernado | Diagnostic · On-Demand · Managed Squad | Proposed |
 | `campaign-platform` | Campaign & Key Visual Systems | Plataforma creativa de campaña con conceptos, key visual y adaptaciones controladas | On-Demand · Managed Squad | Proposed |
-| `content-social-operations` | Content & Social Operations | Flujo recurrente de contenido y social con grilla, producción y control de calidad | On-Going · Managed Squad | Approved for validation |
+| `content-social-operations` | Content & Social Operations / Social Media | Operación recurrente gestionada por personas: estrategia, contenido, publicación, comunidad, escucha y aprendizaje | On-Going · Managed Squad | Approved for validation |
 | `audiovisual-production` | Audiovisual, Motion & Audio Production | Assets audiovisuales listos para publicación o lanzamiento dentro de un scope definido | On-Demand · Managed Squad | Proposed |
-| `run-and-gun-production` | Run-and-Gun Production | Captura audiovisual profesional, ágil y de baja fricción para contenido, entrevistas, campañas y lanzamientos | On-Demand · Managed Squad | Proposed |
+| `run-and-gun-production` | Run & Gun Production | Captura audiovisual profesional, ágil y de baja fricción para contenido, entrevistas, campañas y lanzamientos | On-Demand · Managed Squad | Proposed |
 | `creative-studio-access` | Creative Studio Access | Acceso gobernado a la capacidad y al sistema de producción creativa | On-Going · Studio Access | Approved for validation; Globe gated |
 | `globe-managed-production-sprint` | Managed Creative Production Sprint powered by Globe | Workflow creativo acotado, producido y entregado por Efeonce con provenance y governance | On-Demand · Efeonce-managed | CEO conditional-go; client runtime access denied |
 
 `Creative Diagnostic` es la cuña de entrada y mecanismo de discovery. No es una sexta línea de producción ni debe
 confundirse con una solución completa: diagnostica el problema, establece baseline y propone la siguiente fase.
+
+La oferta de Social Media está documentada en [`Social Media Product Service Contract V1`](EFEONCE_SOCIAL_MEDIA_PRODUCT_SERVICE_CONTRACT_V1.md), su [`Operating Model V1`](EFEONCE_SOCIAL_MEDIA_OPERATING_MODEL_V1.md), [`Subservices Catalog V1`](EFEONCE_SOCIAL_MEDIA_SUBSERVICES_CATALOG_V1.md), modelo en [`Social Media Business Model V1`](../../business-models/creative-services/EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md), [`Customer Model Integrity Pack V1`](../../business-models/creative-services/EFEONCE_SOCIAL_MEDIA_CUSTOMER_MODEL_INTEGRITY_PACK_V1.md), [`Differentiation & Positioning V1`](../../business-models/creative-services/EFEONCE_SOCIAL_MEDIA_DIFFERENTIATION_POSITIONING_V1.md), [`Search + Social Measurement Contract V1`](../../business-models/search-visibility-360/SEARCH_SOCIAL_MEASUREMENT_CONTRACT_V1.md) y sus hipótesis de pricing en [`Social Media Pricing Integrity Pack V1`](../../business-models/creative-services/EFEONCE_SOCIAL_MEDIA_PRICING_INTEGRITY_PACK_V1.md) y [`Pricing Validation Addendum`](../../business-models/creative-services/EFEONCE_SOCIAL_MEDIA_PRICING_VALIDATION_ADDENDUM_2026-07-29.md). Globe / Creative Studio no forma parte de la promesa base actual; Run & Gun Studio sí es una capability real de Creative Services que puede componerse con scope propio.
+
+El inventario completo de capacidades y subservicios está en [`Social Media Subservices Catalog V1`](EFEONCE_SOCIAL_MEDIA_SUBSERVICES_CATALOG_V1.md).
 
 La ficha operativa del primer carril comercial está en [`Managed Creative Production Sprint V1`](../creative-studio/EFEONCE_GLOBE_MANAGED_CREATIVE_PRODUCTION_SPRINT_V1.md).
 
@@ -38,14 +42,14 @@ La ficha operativa del primer carril comercial está en [`Managed Creative Produ
 hipótesis y aprendizaje creativo conectado con medios. No asume el ownership de media buying ni de atribución por sí
 solo.
 
-## Run-and-Gun Production
+## Run & Gun Production
 
-`Run-and-Gun Production` es una oferta especializada dentro de Audiovisual, Motion & Audio Production. El cliente
+`Run & Gun Production` es una oferta especializada dentro de Audiovisual, Motion & Audio Production. Su ficha de oferta está en [`Efeonce Run & Gun Production — Offer V1`](EFEONCE_RUN_AND_GUN_PRODUCTION_OFFER_V1.md). El cliente
 compra una producción audiovisual profesional con capacidad de reacción, equipo y setup liviano, dirección,
 captura, sonido, iluminación, coordinación y postproducción definidos. No compra simplemente el arriendo de una
 cámara ni una lista de horas de rodaje.
 
-El **Run-and-Gun Studio** es la capability/infraestructura que hace posible el servicio: equipo humano, cámaras,
+El **Efeonce Run & Gun Studio** es la capability/infraestructura que hace posible el servicio: equipo humano, cámaras,
 audio, iluminación, espacio, movilidad, workflow y post. Si en el futuro se vende acceso autónomo al espacio o al
 equipamiento, eso debe modelarse como `Studio Access` con su propio RACI, liability, seguros, soporte y condiciones
 de uso; no se debe mezclar con la producción dirigida por Efeonce.
@@ -66,6 +70,10 @@ contingencia climática o técnica.
 
 `Editorial Content & SEO` puede componerse con Search Visibility 360/Wave. No se mantiene como oferta independiente
 de Creative Services hasta resolver owner, pricing y boundary con `seo-aeo-practice`.
+
+La composición [`Search + Social Visibility`](../../business-models/search-visibility-360/SEARCH_SOCIAL_VISIBILITY_COMPOSITION_V1.md)
+mantiene ownership, pricing y accountability separados entre Search Visibility 360 y Social Media. El estado de ambos
+carriles es `Approved for validation`; el contrato de medición compartido no convierte la composición en un tercer producto.
 
 ## Separación de capas
 
@@ -101,7 +109,7 @@ Antes de convertir un servicio en `Commercially approved`, su ficha debe declara
 ## Boundaries con otras líneas y marcas
 
 - **Globe / Creative Studio:** plataforma/product brand que habilita producción, memoria, créditos y governance.
-- **Run-and-Gun Studio:** capability de producción audiovisual de Creative Services; no es Globe ni una product
+- **Efeonce Run & Gun Studio:** capability de producción audiovisual de Creative Services; no es Globe ni una product
   brand por defecto.
 - **Media & Distribution:** performance creative, distribución y medios. Reach puede habilitar la capacidad; el laboratorio creativo puede
   componer esta línea, pero no sustituye su ownership.

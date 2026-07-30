@@ -124,7 +124,7 @@ Elige donde tu audiencia **ya está y ya consume tu formato**, no donde te gusta
 - **Descubrimiento amplio / cultura / <30 años** → **TikTok** o **Reels** (alcance frío + social search).
 - **Educación profunda / SEO / autoridad de largo plazo** → **YouTube** (long-form + cola de búsqueda).
 - **Comunidad visual / lifestyle / producto** → **Instagram** (carrusel + Reel + Stories).
-- **Clientes Globe (enterprise marketing):** decide con datos del cliente (dónde vive *su* audiencia),
+- **Clientes internacionales (patrón futuro, si se habilita):** decide con datos del cliente (dónde vive *su* audiencia),
   no por defecto → ver `efeonce/CLIENT_DELIVERY.md`.
 
 Regla: **una** primaria dominada > cinco a medias. Expande solo tras alcanzar consistencia en la primera.
