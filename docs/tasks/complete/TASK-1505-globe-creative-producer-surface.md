@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -571,3 +571,21 @@ deshabilitados, 0 chips, 5 de 14 capabilities — que **no es** la conversión y
 3. Comportamiento portado desde `producer-controller.ts` (5.172 líneas) función por función contra el
    transporte ya portado.
 4. Tokenizar la hoja legacy y ampliar la frontera del gate de diseño (`TASK-1560` Slice 2) **antes** de retirar.
+
+## Delta 2026-07-30 — cierre en el barrido de EPIC-028
+
+Cerrada con sus **16 acceptance criteria ya marcados y verificados**. Estaba terminada y siguió en
+`in-progress`.
+
+Su `Status real` declaraba dos pendientes; ninguno es criterio de esta task:
+
+- **"7 promociones pendientes"** — ya no aplica. Hoy hay **10 rutas operativas** en producción gobernada
+  (Nano Banana Pro promovido el 2026-07-30, revisión live `896a0620`), y las 3 restantes dependen de
+  terceros: el verifier de OpenAI y una allowlist de Google.
+- **"sesión expirada"** — es un **gap declarado de la arquitectura del Producer**
+  (`EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1` lo registra junto a outbox stale, derivados,
+  Range/streaming y GC), no un criterio de esta task.
+
+Los criterios cubren el contrato completo: inventario aprobado implementado o visiblemente gateado con
+task dueña, `UI ready` flipeado sólo tras mapping/scenario/first-fold reales, baseline source-led con
+SHA-256 verificado, y lookup de primitives con `reuse|extend|new` registrado.

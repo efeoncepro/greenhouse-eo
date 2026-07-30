@@ -160,3 +160,30 @@ forma de distinguirlos es verificar criterio por criterio. Este barrido lo hizo 
 - `TASK-1558` y `TASK-1562` siguen compartiendo el mismo bloqueo: **una sesión humana con un grant real**.
   Ningún agente puede resolverlo — el token se guarda como `hashSecret` y crear uno requiere sesión OAuth de
   Globe (runbook `operar-share-board-globe.md`).
+
+### Segunda pasada — medir criterios antes de leer estados (2026-07-30)
+
+En vez de seguir revisando tasks al azar, se midió **cuántos criterios marcados vs abiertos** tiene cada
+una. El resultado señaló sola la respuesta:
+
+| Task | Criterios | Veredicto |
+|---|---|---|
+| `TASK-1498` | **8/8** | ✅ **CERRADA** — sus pendientes eran follow-ups con dueño (`1474`, `1472`, `1465`) |
+| `TASK-1505` | **16/16** | ✅ **CERRADA** — "7 promociones" ya no aplica y "sesión expirada" es un gap declarado de la arquitectura del Producer, no un criterio suyo |
+| `TASK-1558` | **11/11** | 🔴 **no cerrable** — su `Status` declara *"falta verificar el estado ready con un grant real"*, la misma sesión humana que bloquea a `1562` |
+
+**Tres tasks con el 100% de sus criterios marcados seguían en `in-progress`.** Alguien verificó y no cerró.
+
+**WIP de EPIC-028: 22 → 19.**
+
+#### El método que funcionó, para la próxima
+
+Contar `- [x]` vs `- [ ]` en `## Acceptance Criteria` **antes** de leer el `Status real` encuentra las tasks
+terminadas en un solo pase. El `Status real` es prosa optimista o pesimista según quién la escribió; los
+checkboxes son binarios.
+
+La regla que se desprende: **cuando los criterios están al 100% y el `Status` declara pendientes, casi
+siempre esos pendientes son follow-ups con dueño o gaps de otra spec** — no trabajo de la task. Vale
+verificarlo caso por caso, pero el sesgo es ése.
+
+Quedan **19**, de las cuales `1553` y `1559` ya se verificaron y NO son cerrables por razones reales.

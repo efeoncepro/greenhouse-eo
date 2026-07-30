@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -376,3 +376,17 @@ Evidencia local 2026-07-22: Globe commit `6756c3b`; `pnpm check` y `pnpm build` 
 
 - `[verificar]` estado del `ExperimentStorePort` persistente: ¿ya guarda `editFrom`/`parentExperimentId` recuperable para el índice inverso, o requiere backfill?
 - ¿El grant se mantiene único (`GLOBE_LAB_EXPERIMENT_CAPABILITY`) para list/children/tree, o el modelo de grants del Globe pide un grant de lectura de workspace separado? `[verificar]` con el owner del capability model.
+
+## Delta 2026-07-30 — cierre en el barrido de EPIC-028
+
+Cerrada con sus **8 acceptance criteria ya marcados y verificados**. Estaba terminada y siguió en
+`in-progress`: nadie la movió.
+
+Su `Status real` decía *"visibilidad governance y escala siguen abiertas"*, y eso es correcto — **pero no
+son criterios de esta task**: están declarados como follow-ups con dueño propio (`TASK-1474` para la
+promoción de los readers a `available`, `TASK-1472` para la comparación lado a lado, `TASK-1465` para el
+índice del store). Un follow-up con dueño no bloquea un cierre; si lo hiciera, ninguna task cerraría nunca.
+
+Los criterios son sustantivos, no formales: enumeración paginada por cursor estable con filtros
+allowlisted, descendientes derivados del índice inverso de `editFrom`/`lineage`, proyección de árbol con
+`maxDepth` y `truncated` explícito, y `not_found` que **no revela existencia** cross-workspace.
