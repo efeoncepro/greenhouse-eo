@@ -1,0 +1,4 @@
+interface:
+  display_name: "Axis Design System"
+  short_description: "Gobierna tokens, contratos, registry y consumo seguro de Axis."
+  default_prompt: "Aplica el contrato Axis vigente para diseñar, consumir, publicar o verificar paquetes, adapters, canaries y releases."
