@@ -95,6 +95,38 @@ interface CanonicalReleaseSha {
   fullSha: string
 }
 
+// ops-worker puede conservar el GIT_SHA anterior cuando su workflow determina
+// que el release no cambió ninguna ruta de runtime del worker. Ese caso es
+// change-gated (y esperado), no drift: el workflow verificó Ready=True y saltó
+// el rebuild/deploy de forma explícita.
+const OPS_WORKER_RUNTIME_PATHS = [
+  'package.json',
+  'pnpm-lock.yaml',
+  'tsconfig.json',
+  'services/ops-worker',
+  'services/_shared',
+  'src/lib/sync',
+  'src/lib/nubox',
+  'src/lib/knowledge',
+  'src/lib/payroll',
+  'src/lib/finance/payroll-expense-reactive.ts',
+  'src/lib/finance/apply-payroll-reliquidation-delta.ts',
+  'src/lib/email',
+  'src/lib/integrations',
+  'src/lib/space-notion',
+  'src/lib/auth',
+  'src/lib/auth-secrets.ts',
+  'src/lib/secrets',
+  'src/lib/reliability',
+  'src/lib/notion-metrics',
+  'src/lib/growth/ai-visibility',
+  'src/lib/growth/forms',
+  'src/components/growth/ai-visibility',
+  'src/lib/hubspot',
+  'src/emails',
+  'src/lib/observability'
+] as const
+
 const normalizeSha = (sha: string | null | undefined): string | null => {
   if (!sha) return null
   const trimmed = sha.trim().toLowerCase()
@@ -356,6 +388,30 @@ const resolveCloudRunRevisionSha = async (
   }
 }
 
+const isOpsWorkerChangeGated = async (
+  service: string,
+  targetSha: string | null,
+  runSha: string | null
+): Promise<boolean> => {
+  if (service !== 'ops-worker' || !targetSha || !runSha || targetSha === runSha) return false
+
+  try {
+    await execFileAsync('git', ['cat-file', '-e', `${targetSha}^{commit}`], { timeout: 5_000 })
+    await execFileAsync('git', ['cat-file', '-e', `${runSha}^{commit}`], { timeout: 5_000 })
+    await execFileAsync(
+      'git',
+      ['diff', '--quiet', `${targetSha}..${runSha}`, '--', ...OPS_WORKER_RUNTIME_PATHS],
+      { timeout: 10_000 }
+    )
+    
+return true
+  } catch {
+    // If the runtime has no repository checkout, preserve the existing
+    // fail-loud drift behavior instead of guessing that paths are unchanged.
+    return false
+  }
+}
+
 const checkWorker = async (
   workflow: ReleaseDeployWorkflow,
   token: string
@@ -371,12 +427,15 @@ const checkWorker = async (
   const ghSha = canonicalSha?.compareSha ?? null
   const targetSha = canonicalSha?.fullSha ?? null
   const dataMissing = ghSha === null || runSha === null
-  const hasDrift = !dataMissing && ghSha !== runSha
+  const changeGated = await isOpsWorkerChangeGated(cloudRunService, targetSha, runSha)
+  const hasDrift = !dataMissing && ghSha !== runSha && !changeGated
 
   let detail: string
 
   if (dataMissing) {
     detail = `${cloudRunService}: gh=${ghSha ?? 'n/a'} run=${runSha ?? 'n/a'} (data missing — gcloud absent o GIT_SHA no inyectado aun)`
+  } else if (changeGated) {
+    detail = `${cloudRunService}: gh=${ghSha} != run=${runSha} (change-gated — rutas runtime sin cambios; workflow omitió deploy y servicio está Ready=True)`
   } else if (hasDrift) {
     detail = `${cloudRunService}: gh=${ghSha} != run=${runSha} (DRIFT — revision Cloud Run no matchea ultimo deploy verde)`
   } else {
