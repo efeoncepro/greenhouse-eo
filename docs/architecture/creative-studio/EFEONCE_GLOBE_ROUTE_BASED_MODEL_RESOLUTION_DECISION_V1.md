@@ -1,7 +1,7 @@
 # Efeonce Globe — Route-Based Model Resolution and Extensible Multi-Model Catalog Decision V1
 
 - Decision: ADR-013
-- Status: Accepted; implementation and commercial rollout gated
+- Status: Accepted; route-based foundation implemented, per-route rollout remains governed
 - Date: 2026-07-24
 - Owners: Efeonce Globe platform, creative operations and security
 - Implements through: `TASK-1553`
@@ -167,6 +167,24 @@ this decision keeps both open with zero backend change.
 Steps 1–5 are additive and reversible by revert; step 6 is governed by the existing promotion machinery. No engine
 logic changes when a model is added — resolution is already route-based.
 
+## Implementation update — 2026-07-30
+
+The route-based foundation is live. Six image routes now coexist as `available` in the Producer for the internal
+workspace and were exercised through the authenticated UI: Seedream 5 Pro, Nano Banana Pro, Nano Banana 2,
+GPT Image 2, GPT Image 1.5 and Recraft v4.1 Vector. OpenAI gained an official governed driver; Google cleared
+Nano Banana 2 for the Globe project; and Recraft completed exact-route evaluation, human review, commercial-rights
+attestation, binding/readiness/circuit promotion and a retained SVG generation.
+
+This does not turn catalog presence into blanket approval. Every new exact identity still needs its own endpoint
+allowlist, rate, evaluation, human review where required, commercial-rights evidence, binding, readiness, circuit
+state and real UI canary. `TASK-1553` remains in progress only for its cross-task rate-version and onboarding
+receipts, not because these six routes are unavailable.
+
+The Recraft canary added one transport invariant to the implementation: Fal declares `image/svg+xml` in its result
+payload while its CDN may serve the bytes as `application/octet-stream`. A generic transport MIME may be accepted
+only when the exact route expects SVG and the bytes verify as SVG before ingest; serving the retained SVG uses a
+sandboxed CSP. This is a fail-closed exception for a verified output contract, not a global MIME relaxation.
+
 ## Alternatives rejected
 
 - **Keep capability-keyed resolution, add a provider suffix to the capability** (e.g. `image-generate@openai-2`) —
@@ -185,10 +203,9 @@ logic changes when a model is added — resolution is already route-based.
 ## Four-pillar scoring
 
 - **Safety** — the provider slug never leaves the adapter boundary (ADR-003 drift guard, module-load abort);
-  production promotion stays gated by the ADR-009 saga + per-model attestation (ADR-010); `openAiEnabled` remains
-  hard-blocked in production (`governed-production-composition.ts:71`) until a verifier exists, so GPT Image routes
-  can be Lab-canaried but not promoted. A route present with no adapter entry hard-fails rather than silently
-  resolving the wrong model.
+  production promotion stays gated by exact-route evaluation, rights attestation and the governed promotion
+  controls. OpenAI is executable only through its official governed driver and endpoint allowlist. A route present
+  with no adapter entry hard-fails rather than silently resolving the wrong model.
 - **Robustness** — the four-space identity is reconciled by construction (one adapter SSOT, binding derives) and
   fail-closed by the existing `exactReport` / `resolveExact` checks; lineage immutability per `routeId` prevents
   silent model swaps; the per-capability fallback is scoped strictly to route-absent requests.
@@ -230,30 +247,27 @@ unchanged.
 - **SIEMPRE** keep the live image default on Seedream absent an explicit selection; move it only by human decision
   via `recommendedDefault`.
 
-## Open questions (deliberately not decided here)
+## Follow-ups and resolved questions
 
-- **Selector shape (Q1 → TASK-1552).** Whether the UI surfaces explicit model selection or "Globe picks the best
-  by encargo with model as secondary" is the selector's decision. This ADR exposes `recommendedDefault` so either
-  UX works with no backend change; it does not decide the UX.
-- **OpenAI production lane.** GPT Image 2 / 1.5 routes can be added and Lab-canaried now, but their production
-  promotion is blocked until the OpenAI official verifier exists (`governed-production-composition.ts:71`). Whether
-  that verifier ships inside TASK-1553 or as a follow-up is left to execution scope; the Lab path is unaffected.
+- **Selector shape (resolved by TASK-1555/TASK-1552).** The Producer uses a compact model dropdown with the real
+  model mark and availability from `globe.producer.fleet.list`; the rejected gallery direction is not current.
+- **OpenAI production lane (resolved 2026-07-30).** GPT Image 2 and GPT Image 1.5 use the official governed
+  OpenAI Images driver and both completed exact-route promotion plus real Producer generations.
+- **Nano Banana 2 access (resolved 2026-07-30).** The `global` Vertex endpoint now accepts
+  `gemini-3.1-flash-image`; the route completed evaluation, promotion and a real Producer generation.
 - **Video/audio multi-model.** The design is extensible to video and audio by the same route-keyed resolution;
   shipping there is a follow-up.
 - **Public `model.version` ↔ executable `modelVersion` coupling.** The two strings differ by design and are
   coordinated by convention (both bump on update). Whether to add a lint asserting the pairing is a hardening
   follow-up, not a blocker.
 
-## Roadmap by slices (mirrors TASK-1553)
+## Delivery record (mirrors TASK-1553)
 
-1. **This ADR** — indexed as ADR-013 in `DECISIONS_INDEX.md`.
-2. **Route-based resolution in the adapters** (`openai-adapter.ts`, `vertex-adapter.ts`, `fal-adapter.ts`) — re-key
-   routing tables to `routeId`, capability fallback for route-absent, hard-fail on declared-but-unknown route. Seed
-   with current values (no regression). Foundation: Slices 3/4 cannot ship before this or a second same-provider
-   model denies with `route_binding_missing`.
-3. **Multi-route catalog + per-route composite policy** — add Nano Banana Pro / GPT Image 2 / GPT Image 1.5 routes
-   (Nano Banana 2 declared but allowlist-gated); composite image policy becomes a per-route resolver.
-4. **Bindings + endpoint allowlist + per-model promotion** — append bindings, add endpoint entries (`region:'global'`
-   for Vertex image), promote per route via ADR-009/010.
-5. **Evidence + canary per model + functional doc + manual** — Lab canary per new route with MIME/hash; the
-   multi-model catalog functional doc + the "add a model" runbook.
+1. **ADR indexed** — complete.
+2. **Route-based resolution in adapters** — complete; route-present requests hard-fail when unmapped.
+3. **Multi-route catalog + per-route provider resolution** — complete for the six available image routes.
+4. **Governed drivers, bindings, endpoint allowlists and per-model promotion** — complete for the six available
+   image routes; future routes repeat the same controls independently.
+5. **Evidence + real UI canary + functional/manual layers** — complete for the six available image routes.
+6. **Cross-task receipts** — still open in `TASK-1553`: current rate-version receipts from `TASK-1468` and onboarding
+   receipts from `TASK-1578`.

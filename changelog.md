@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-30 — Globe: documentación y skills sincronizadas con seis rutas de imagen
+
+- Se reconciliaron ADR-013, EPIC-028, el barrido WIP, task activa, documentación funcional, manuales, ledger,
+  runtime handoff y evidencia con las promociones reales de Seedream, Nano Banana Pro/2, GPT Image 2/1.5 y Recraft.
+- Las skills gemelas `greenhouse-globe` y `greenhouse-ai-creative-rights-governance` incorporan identidad exacta,
+  atestación/política inmutable, promoción distinta de delivery, diagnósticos seguros y canary real desde UI.
+- El caso Recraft queda como regla reusable: `application/octet-stream` sólo se admite para una salida SVG esperada
+  después de validar bytes; el asset se sirve con CSP sandbox. No se amplió la allowlist MIME global.
+- No hubo mutaciones de runtime. `TASK-1553` sigue abierta sólo por receipts cross-task de `TASK-1468`/`TASK-1578`.
+
 ## 2026-07-30 — Globe: Recraft v4.1 promovido y probado desde Producer
 
 - `ref/still/vector-v1` quedó disponible con evaluación, revisión humana, derechos, rate de 4 créditos,
@@ -651,9 +661,3 @@ Corrección de fuente de verdad: el cliente inicial es **SKY Agencia Creativa**,
 - El pack separa diagnóstico, foundation, operación, transparencia/plataforma, capacidad de contenido y expansión;
   evita usar artículos como unidad pública y trata SEO+AEO como producto integrado.
 - Verdict: `hypothesis_only`, pendiente de Finance, evidencia de willingness-to-pay, capacidad y aprobación comercial.
-
-## 2026-07-26 — Business Model Integrity Pack para Search Visibility 360
-
-- Se creó `SEARCH_VISIBILITY_360_BUSINESS_MODEL_INTEGRITY_PACK_V1.md` para completar customer/value, oferta, delivery,
-  revenue, economics, data/IP, evidence, scale y capital sin convertir hipótesis en decisiones.
-- El modelo canónico ahora enlaza su Integrity Pack y mantiene `Draft`; el verdict actual es `model_incomplete`.

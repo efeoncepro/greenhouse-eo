@@ -777,16 +777,15 @@ sustituya a otro.** Se agrega como principio del epic:
   la **selección** es explícita del operador (selector, TASK-1552) o por contrato de fidelidad / recommendation matrix
   (TASK-1459) — nunca un "mejor global".
 
-**Gap de implementación (real, no cubierto por ninguna child task):** hoy los adapters resuelven el modelo **por
-capacidad** (`OPENAI_ROUTING[capability]`, `VERTEX_ROUTING[capability]`) y el composite rutea imagen a **un** proveedor
-por capacidad, así que **dos modelos del mismo proveedor no pueden coexistir** — el compiler ancla a `estimate.model` y
-un binding al segundo modelo da `route_binding_missing`. Se requiere **resolución de modelo por-ruta** en los adapters.
-Vehículo: **`TASK-1553` — Globe Extensible Multi-Model Provider Catalog + Route-Based Model Resolution** (backend-data
-foundation; el selector de UI es su consumer TASK-1552).
+**Gap de implementación al abrir el delta:** los adapters resolvían el modelo por capacidad y dos modelos del mismo
+proveedor no podían coexistir. **Resuelto por TASK-1553:** la identidad ejecutable se resuelve por ruta, una ruta
+declarada sin entry falla cerrada y el selector consume disponibilidad live. La historia de esta brecha se conserva
+porque explica ADR-013; no representa el runtime actual.
 
-**Evidencia viva (TASK-1535, 2026-07-24):** Nano Banana Pro (`gemini-3-pro-image`) **genera imágenes reales** en el
-proyecto Globe vía endpoint `global`; Nano Banana 2 (`gemini-3.1-flash-image`) pendiente de allowlist del proyecto
-(ask a Google). Los defaults de adapter ya se actualizaron a los frontier (updates legítimos), sin borrar Seedream.
+**Actualización 2026-07-30:** Seedream 5 Pro, Nano Banana Pro, Nano Banana 2, GPT Image 2, GPT Image 1.5 y Recraft
+v4.1 Vector coexisten como rutas disponibles y fueron ejercitados desde el Producer autenticado. El 404 histórico
+de Nano Banana 2 y el bloqueo del verifier OpenAI quedaron superados. Cada futura identidad conserva evaluación,
+revisión, derechos, binding/readiness/circuito y canary UI propios.
 
 ### Outcome (adición)
 
@@ -825,7 +824,7 @@ principio sobre cómo se construyen**. ADR-014 lo hace explícito y su foundatio
   bundle real corre en Chromium real bajo la CSP estricta real sin un solo error. El fallback a
   `vite@7.3.x` se retira.
 - **Cluster ADR-013/ADR-014 en el programa:** `TASK-1553` (resolución de modelo por-ruta) · `TASK-1554`
-  (reader de availability, desplegado) · `TASK-1555` (selector compacto del Producer, in-progress — la galería se rechazó) · `TASK-1556`
+  (reader de availability, desplegado) · `TASK-1555` (selector compacto del Producer, **complete** — la galería se rechazó) · `TASK-1556`
   (esta foundation, **complete**) · `TASK-1557` (CDN de assets, **complete y verificado en vivo**).
 
 ### El programa de ADR-014, completo (creado 2026-07-25)

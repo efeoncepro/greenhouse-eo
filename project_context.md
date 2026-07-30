@@ -18,6 +18,11 @@ composer, shell, diálogos, feed, viewer, share board, primitives y capas base/m
 payload Tailwind. El renderer vanilla y `producerStyles` permanecen sólo como fallback de rollout hasta
 `TASK-1560`; no confundir esa frontera con una hoja activa en la ruta React.
 
+La flota de modelos de Globe se resuelve y promueve por identidad exacta de ruta. El estado live se consulta en
+`globe.producer.fleet.list` y el mapa humano en `GLOBE_MODEL_FLEET_STATUS.md`; una promoción se cierra con
+evaluación/derechos/readbacks y una generación real desde la UI autenticada. Un MIME de transporte genérico nunca
+amplía la allowlist global: sólo puede aceptarse para una salida exacta esperada después de verificar sus bytes.
+
 ### Lectura mínima obligatoria
 
 1. [AGENTS.md](AGENTS.md): reglas transversales y router de dominios.

@@ -91,6 +91,18 @@ Create or update a dated provider record before production. Check current offici
 
 Free, beta, public-gallery, research-only, or unclear-license tooling is not approved for final enterprise delivery unless Legal explicitly accepts the exception. Keep provider facts in the provider matrix, not in a sales promise.
 
+Treat commercial-rights clearance as an exact, immutable identity:
+`provider + model + model version + terms digest`. Include the plan, endpoint/route, terms reference, access date,
+and effective restrictions in the evidence, but never let a provider-level or model-family statement authorize a
+different version or route. Hash the reviewed terms evidence with SHA-256. A changed model version, terms digest,
+plan, endpoint, or material restriction requires a new record and reopens clearance; never overwrite the prior
+attestation.
+
+Terms evidence is not an approval. When a workflow requires commercial-rights attestation, a human reviewer must
+verify the exact evidence and sign the grant actually supported: commercial use, client delivery, sublicensing, and
+restrictions. Service identities may verify and derive policy from that signed fact; they must not invent, widen, or
+self-attest the grant.
+
 ### Data protection posture
 
 Treat these as separate controls and record each one independently:
@@ -140,6 +152,11 @@ Use agency-managed accounts, approved plans, least-privilege access, and client-
 
 For Globe, follow the runtime’s durable governance, C2PA, rights state, retrieval, and asset identity contracts. Do not infer rights from appearance, filename, or UI badge.
 
+At generation time, bind the exact route identity and applicable rights-policy version/digest into an immutable
+asset snapshot. Future policy changes, provider-term changes, or route promotion must not retroactively rewrite
+what governed an existing asset. Re-evaluation creates new evidence or a new asset/revision; it does not mutate
+history.
+
 ### 7. Modality-specific review
 
 **Image:** faces, trademarks, characters, product appearance, stock/reference rights, style imitation, text/logo accuracy, commercial-safe model status.
@@ -163,6 +180,10 @@ Every final asset receives exactly one state:
 - `incident-replacement` — previously delivered asset withdrawn or replaced after a rights concern.
 
 The release state is not a copyright opinion. It is an operational permission state backed by evidence.
+
+Provider/model promotion is not generation, human approval, release, or delivery. Promotion only makes an exact
+route available under a bounded workspace ceiling. Every produced candidate still requires asset-level provenance,
+the policy snapshot applied at generation, substantive human review, and an authorized delivery decision.
 
 ### 9. Deliver an enterprise rights pack
 
@@ -192,6 +213,9 @@ Separate third-party pass-throughs from Creative Studio Credits. Rights, talent,
 - **No silent provider substitution.** A model or endpoint change can change rights, retention, output behavior, or indemnity.
 - **No hidden training permission.** Client confidentiality and provider improvement rights must be explicit.
 - **No credit laundering.** Provider spend and rights costs remain distinct from Studio Credits and human capacity.
+- **No mutable rights history.** Preserve the exact identity, terms digest, attestation, policy snapshot, and asset linkage applied at generation.
+- **No promotion laundering.** Route availability never upgrades a generated candidate to client-deliverable.
+- **No upstream leakage.** Keep credentials, signed URLs, provider payloads, prompts, client content, stack traces, and raw upstream prose server-side. Persist or expose only allowlisted identifiers, hashes, bounded metadata, and canonical safe codes.
 
 ## Synergy contracts with other skills
 

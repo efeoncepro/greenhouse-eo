@@ -28,6 +28,21 @@ Read the provider’s current official:
 
 Save the URL, access date, plan, relevant section, and a short interpretation in the provider record. Never paste confidential client content into a research prompt merely to test a tool.
 
+## Exact identity and attestation
+
+Key each commercial-rights fact by exact
+`provider_id + model_id + model_version + provider_terms_digest`, not by provider brand, model family, display
+label, or UI selection. Also record the plan and endpoint/route because they can narrow eligibility, retention, and
+delivery rights. Compute `provider_terms_digest` from the durable evidence reviewed, using SHA-256.
+
+The evidence record documents sources; it grants nothing by itself. A human reviewer must verify that exact record
+before signing an immutable attestation containing the supported commercial-use, client-delivery, sublicensing, and
+restriction values. Reuse is valid only for the same exact identity and digest. A changed version, digest, plan,
+route, or material term creates a new record and reopens downstream policy; never edit the old attestation in place.
+
+Promotion may derive a bounded workspace policy from a verified attestation and objective evaluation, but it only
+makes the route available. It does not approve, release, or deliver any generated asset.
+
 ## Data-protection checklist
 
 For every provider/model/endpoint/plan, record these as distinct values:
@@ -48,6 +63,14 @@ For every provider/model/endpoint/plan, record these as distinct values:
 Do not mark a provider “enterprise-safe” from a single marketing sentence. A provider may prohibit training while
 still retaining prompts for abuse monitoring, caching outputs, exposing data to subprocessors or allowing a feature
 to persist session state. Those are separate restrictions that belong in the project evidence and client promise.
+
+## Evidence hygiene
+
+Provider and transport failures may contain credentials, signed URLs, request bodies, prompts, client material,
+stack traces, internal paths, or uncontrolled upstream prose. Never store or surface those values in rights records,
+logs, UI, diagnostics, or client evidence. Keep raw material inside the authorized server-side diagnostic boundary;
+emit only allowlisted IDs, hashes, bounded metadata, and canonical safe error/reason codes. Terms references must be
+durable public or controlled references without tokens, credentials, or secret-bearing query strings.
 
 ## Industry pattern sources
 

@@ -31,8 +31,8 @@ agente que lo lea va a creer que tiene que construir lo que ya corre:
 1. La deuda que la propia task declara (Checkpoint 2026-07-23): eventos outbox `reconcile` en `pending` con runs
    ya terminales, inflando `queueOldestAgeSeconds`. Cierre correcto ya escrito ahí: terminalizar/superseder al
    completar + medir edad sólo sobre trabajo reclamable. **NUNCA** limpiar por SQL ni subir el threshold.
-2. OpenAI sigue sin lane productivo (`globe_governed_openai_official_verifier_missing`); el selector del Producer
-   lo muestra como *"No disponible por una dependencia externa"*, que es honesto.
+2. ~~OpenAI sin lane productivo~~ — **resuelto 2026-07-30**. GPT Image 2 y GPT Image 1.5 tienen driver gobernado,
+   promociones exactas y generaciones reales desde el Producer. No forma parte del alcance restante de esta task.
 
 **Lo que NO es de esta task, y hay que no confundirlo:** la superficie de fallo en el feed (tarjeta de una corrida
 fallida ofreciendo acciones muertas) es de **`TASK-1526`**. Ver el delta que se le agregó allí.

@@ -11,9 +11,15 @@ Use this as the working schema for a campaign, asset family, or governed product
 | `campaign` | SOW/campaign reference |
 | `modality` | image, video, audio, music, voice, likeness, copy, hybrid |
 | `lane` | A assisted, B AI-produced/human-directed, C synthetic identity, D rights-sensitive |
-| `provider` | Provider and product |
+| `provider_id` | Exact provider identity |
 | `plan` | Exact paid/enterprise plan |
-| `model_endpoint_version` | Model, endpoint, version/date |
+| `model_id` | Exact model identity, not display label or family |
+| `model_version` | Exact immutable model version |
+| `endpoint_route` | Exact endpoint/route used |
+| `provider_terms_ref` | Durable reviewed terms evidence without secrets or signed query parameters |
+| `provider_terms_digest` | SHA-256 digest of the exact reviewed terms evidence |
+| `commercial_rights_attestation` | Human reviewer, signed grant, restrictions, timestamp, and attestation ID |
+| `applied_policy_snapshot` | Immutable policy ID/version/digest and route snapshot applied at generation |
 | `input_register` | IDs and permission references |
 | `human_contribution` | Direction, selection, arrangement, edits, finishing |
 | `consent_register` | Talent/voice/face/likeness permissions |
@@ -39,9 +45,20 @@ Use this as the working schema for a campaign, asset family, or governed product
 
 ## State transition
 
-`intake → classified → inputs-cleared → provider-cleared → client-authorized → produced → human-reviewed → rights-reviewed → approved/restricted/proof-only/blocked → delivered → archived`
+`intake → classified → inputs-cleared → exact-provider-cleared → human-attested → client-authorized → route-available → produced-with-policy-snapshot → human-reviewed → asset-rights-reviewed → approved/restricted/proof-only/blocked → delivered → archived`
 
-An asset can move backward at any point. Provider term changes, new territory, new media, a new voice, a material edit, or a new model version reopens the gate.
+`route-available` is promotion, not delivery. It grants no asset-level approval. Every candidate must retain its
+generation-time route and policy snapshot and pass human review plus an explicit delivery decision.
+
+An asset can move backward at any point. Provider term changes, a changed terms digest, new territory, new media,
+a new voice, a material edit, or a new model version reopens the gate. Preserve prior attestations and applied
+asset policies as immutable history; corrections create a new version, evidence record, or asset revision.
+
+## Safe evidence boundary
+
+Rights and delivery evidence may contain allowlisted identifiers, digests, bounded metadata, canonical reason/error
+codes, approval identity, and timestamps. It must not contain credentials, bearer material, signed URLs, raw
+provider payloads, prompts, client content, stack traces, internal paths, or uncontrolled upstream error prose.
 
 ## Risk thresholds
 

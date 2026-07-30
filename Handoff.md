@@ -1,5 +1,18 @@
 # Handoff activo
 
+## 2026-07-30 — Globe: documentación y skills reconciliadas con el rollout real
+
+La arquitectura ADR-013, el epic, la auditoría WIP, los contratos funcionales/manuales, el ledger, el handoff
+runtime, la evidencia y las skills gemelas de Globe/derechos quedaron reconciliados con el estado posterior a los
+canaries de hoy. Se retiraron como estado vigente los bloqueos ya resueltos de OpenAI y Nano Banana 2, la dirección
+rechazada de galería y el supuesto de que Recraft sólo vivía en el Lab.
+
+El contrato reusable nuevo es fail-closed: un MIME genérico sólo puede aceptarse cuando la ruta exacta espera SVG
+y los bytes verifican como SVG; el serving usa CSP sandbox. La prueba de salida de una promoción de modelo exige una
+generación real desde la UI autenticada, además de evaluación, derechos, binding/readiness/circuito y readbacks.
+No hubo cambios de runtime en este cierre documental. `TASK-1553` permanece `in-progress` únicamente por receipts de
+`TASK-1468`/`TASK-1578`.
+
 ## 2026-07-30 — Globe: Recraft v4.1 promovido y probado desde Producer
 
 Recraft v4.1 quedó disponible en `ref/still/vector-v1` con rate de 4 créditos, evaluación,

@@ -4,8 +4,6 @@ description: >-
   Implementa, audita y opera Efeonce Globe, plataforma hermana gobernada por Greenhouse. Úsala para Producer
   UI/BFF, API Contract Spine, trusted context, provider adapters, Model Lab y readiness, generación y retrieval,
   GCS privado, Asset Governance/C2PA/rights, workers Cloud Run, Cloud SQL, IaC keyless y rollout comercial.
-user-invocable: true
-argument-hint: "[describe la capability, command/reader, provider adapter, o cambio del spine que vas a construir en efeonce-globe]"
 ---
 
 # Efeonce Globe — Ingeniero de plataforma hermana
@@ -24,7 +22,7 @@ Consecuencias operativas, no retóricas:
 - **NUNCA** dimensiones infraestructura, UX, seguridad ni calidad "porque es interno". Se dimensiona para el producto comercial que es; si hay brecha, se declara como **deuda con dueño** (`TASK-1521` runtime comercial, `TASK-1480` readiness comercial), no como diseño correcto.
 - El modelo de negocio es real y está escrito: `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md` (cinco líneas de ingreso, tres modalidades de delivery, tres modos operativos) + `..._CREDIT_MODEL_V1.md`.
 
-Baseline verificado contra código y runtime real hasta 2026-07-25. El estado mutable —revisiones, digests,
+Los contratos de esta skill están contrastados con código y runtime real. El estado mutable —revisiones, digests,
 flags, rutas promovidas, canarios y bloqueos— vive en
 `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`; nunca se infiere desde un número histórico de esta
 skill.
@@ -34,7 +32,7 @@ skill.
 > (qué modelo/proveedor está integrado, en qué **carril** — Model Lab vs producción gobernada —, validado cuándo y
 > con qué evidencia, y qué falta para llevarlo al Producer). Los proveedores del Lab (Vertex imagen/Veo/Omni, Fal
 > Seedream/Seedance, ElevenLabs, etc.) están integrados y validados en vivo desde 2026-07-19/20 — **no re-integrar**;
-> lo que suele faltar es el **driver gobernado + promoción ADR-009** por ruta. Actualizá ese ledger al integrar,
+> lo que suele faltar es el **driver gobernado + promoción ADR-009** por ruta. Actualiza ese ledger al integrar,
 > validar o promover cualquier modelo.
 >
 > **Desde `TASK-1554` (COMPLETE) el ledger ya no es la única autoridad:** el **SoT LIVE** de disponibilidad de
@@ -65,8 +63,20 @@ skill.
   eliminación se verifican por ruta. Canon: `docs/architecture/GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md`.
 - Antes de crear otra revisión, el worker reconcilia proyecciones terminales no aplicadas y recupera autoridad de
   rights desde evidencia durable; requeue/replay son revisionados e idempotentes, nunca SQL manual.
+- **Recuperación después de timeout o fallo:** preserva `idempotencyKey` y `correlationId`; consulta primero el
+  reader de estado y la evidencia del attempt. Si el servidor completó, continúa desde ese estado. Si quedó
+  terminal sin finalizar, usa el command gobernado de reconciliación/requeue con la misma identidad lógica. Nunca
+  repitas `execute`, reserves créditos otra vez ni alteres filas a mano para “destrabar” una corrida.
+- **Diagnóstico seguro:** conserva códigos y razones curadas server-side (`errorName`, control y `reasonShape`
+  cuando corresponda), pero nunca imprime mensajes upstream, stacks, cuerpos, tokens, cookies, URLs firmadas ni
+  secretos. Verifica cada salto por su reader, audit y manifest; una respuesta sanitizada sin señal operable no
+  basta para diagnosticar.
+- **SVG servido por Fal:** Fal puede declarar `image/svg+xml` en el resultado y entregar el objeto CDN como
+  `application/octet-stream`. Acepta ese MIME genérico **sólo** cuando la salida esperada por la ruta es SVG,
+  valida los bytes como SVG antes del ingest y rechaza cualquier otra combinación. Sirve el SVG retenido con CSP
+  `sandbox`; no generalices esta excepción a otros tipos ni confíes sólo en extensión, URL o header.
 - El cierre proporcional exige `pnpm check && pnpm build`, test nuevo registrado en el script del package,
-  imagen/digest/policy verificados y canario UI de Image/Video/Audio con feed, viewer/playback, MIME/hash,
+  imagen/digest/policy verificados y canario UI de Image/Video/Audio/vector con feed, viewer/playback, MIME/hash,
   governance y `tofu plan` sin drift.
 - Gaps de escala vigentes: derivados de preview (thumbnail/poster/transcode/waveform), Range/streaming real,
   política explícita de visibilidad mientras governance está pendiente y reconciliación/GC de objetos huérfanos.
@@ -651,61 +661,54 @@ una regla del broker que un agente futuro DEBE conocer:
   corre contra greenhouse-pg vía **proxy** con `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=` vacío para deshabilitar
   el connector que cuelga).
 
-### El canary (verificado en vivo) + fleet
+### Flota multi-modelo — resolución y promoción por ruta
 
-Canary honesto cero-spend-nuevo: reusar un eval existente (`foley-v1` / `fal`/`seed-audio`/`v1`, report
-`objective_pass` en `greenhouse-org:efeonce`). El auto-lane SA (impersonado con tokenCreator temporal + `--include-email`
-en el ID token, break-glass revocado con corte verificado) creó el binding disabled (rev1) y el `auto-lane.promote` lo
-habilitó (rev2) + publicó `appliedRestrictions` = la postura derivada de la attestation — **postura aplicada =
-atestada**. Fleet: el **OpenAI adapter** (`apps/creative-runner/src/openai-adapter.ts`, `gpt-image-2` snapshot
-`2026-04-21`, key Globe-owned `globe-openai-api-key` NUNCA la de Greenhouse, `image-generate` only fail-closed) enchufa
-en el mismo seam. Evidencia de términos en `scripts/evidence/*-commercial-terms.json` (Vertex, OpenAI, Fal Seed Audio) —
-**as-of, `reviewerMustVerify`, la stale se supersede con nuevo digest**. Estado vivo (attestations, rutas promovidas,
-flags, canarios): SIEMPRE `GLOBE_RUNTIME_HANDOFF.md`, nunca esta skill.
+**Principio de producto:** Globe mantiene modelos frontier que coexisten. **Update** cambia la versión dentro de un
+lineaje cuando el contrato decide reemplazarla; **add** crea otra ruta/tier seleccionable. La UI y la recommendation
+matrix eligen una ruta explícita; nunca existe un “mejor modelo global”.
 
-### Flota de modelos — catálogo multi-modelo extensible (update-vs-add) + el seam route→model (2026-07-24)
+**La identidad ejecutable es por ruta, no sólo por capability ni proveedor.** La resolución conserva como tupla
+exacta `routeId + capability + provider + model + version/endpoint`. Estimate, binding, readiness, circuito,
+attempt y manifest deben concordar con esa identidad. Un segundo modelo del mismo proveedor no se habilita
+añadiendo otra etiqueta al catálogo: exige resolución route→model en el adapter/driver y falla cerrado ante
+`route_binding_missing` o `route_identity_mismatch`. `globe.producer.fleet.list` es el SoT live; el ledger humano
+explica evidencia y pendientes, pero no sobreescribe el reader.
 
-**Principio de producto (EPIC-028 Delta 2026-07-24):** Globe corre los **mejores modelos del mercado, coexistiendo y
-creciendo — sin que uno sustituya a otro.** Dos operaciones distintas: **update** = bump de versión dentro del mismo
-lineaje/ruta (**reemplaza**: Gemini 2.5→3, gpt-image-1→2); **add** = modelo/tier distinto = **ruta nueva que coexiste**
-(Seedream ≠ Nano Banana; GPT Image 1.5 **y** 2; Nano Banana Pro **y** 2). Compatible con el non-goal "no mejor global":
-el catálogo **ofrece**; la selección es **explícita** (selector UI, TASK-1552) o por **contrato de fidelidad**
-(recommendation matrix), nunca un "mejor global".
+**Carriles separados; no los colapses:**
 
-**Roster frontier vigente (imagen)** — IDs reales SÓLO en adapter/binding, NUNCA en el catálogo público (`assertNoSlugLeak`):
+1. **Descubrimiento/evaluación:** probes de existencia o forma, Lab y evaluation harness producen candidatos y
+   reportes. Un 200/422, una generación directa o un `objective_pass` no publica la ruta.
+2. **Readiness/promoción operator-only:** registra rate vigente, driver gobernado, términos/derechos, attestation,
+   evaluación exacta, revisión humana cuando aplica, binding, readiness y circuito para la identidad exacta. La
+   promoción hace la ruta `available`; no aprueba piezas para cliente.
+3. **Ejecución humana:** el operador selecciona la ruta en Producer desde su sesión autenticada; el browser usa BFF
+   same-origin y nunca credenciales de workload. El run conserva la ruta elegida hasta provider, attempt y output.
+4. **Entrega/retrieval:** sólo un output exacto, retenido, íntegro y autorizado puede previsualizarse o descargarse.
+   Candidate→approval humana sigue siendo un gate distinto de la promoción del modelo.
 
-| Modelo | Proveedor | providerModelId | Estado (2026-07-24) |
-|---|---|---|---|
-| Seedream 5 Pro | fal | `bytedance/seedream/v5/pro/...` | vivo (default de imagen del composite) |
-| Nano Banana Pro | vertex | `gemini-3-pro-image` | **allowlist despejado, genera imágenes reales** vía `global` |
-| GPT Image 2 | openai | `gpt-image-2` (`2026-04-21`) | adapter default OpenAI; canary facturable pendiente |
-| GPT Image 1.5 | openai | `gpt-image-1.5` | 2.º tier a sumar (route-based) |
-| Nano Banana 2 | vertex | `gemini-3.1-flash-image` | **404 — proyecto sin allowlist** (ask a Google) |
+**Paquete mínimo de evidencia exacta para declarar una ruta operativa:** identidad de ruta/modelo/endpoint,
+rate-version, rights attestation y digest de términos, evaluation experiment/report exactos, review/proposal si
+aplica, binding/readiness/circuit readback, run + attempt, descriptor de output con MIME/hash/`retained`, y prueba
+desde la UI real. Registra identificadores y enlaces en el runtime handoff/ledger; no copies snapshots mutables a
+esta skill.
 
-Excluidos a propósito: `gpt-image-1`, `gemini-2.5-flash-image`, `gemini-3.1-flash-lite-image` (NB2 **Lite**).
+**La prueba de salida es una generación real desde la UI.** Usa la pestaña ya autenticada del operador en su Chrome
+cuando esa sea la sesión autorizada; no abras un perfil Playwright nuevo y lo presentes como equivalente. La
+evidencia debe mostrar el modelo/ruta seleccionados, operación, créditos, estado terminal, `Guardada`/retenida,
+preview de los bytes reales y descarga habilitada. API, runner, CI y canary técnico son evidencia necesaria, pero
+no sustituyen esta prueba cuando el criterio es “funciona en Producer”.
 
-**El seam route→model (hallazgo load-bearing).** Exponer **dos modelos del mismo proveedor** (2 OpenAI / 2 Vertex) NO
-es data — es CÓDIGO. Hoy los adapters resuelven el modelo **por capacidad** (`OPENAI_ROUTING[capability]`,
-`VERTEX_ROUTING[capability]`); el composite rutea imagen a **un** proveedor por capacidad
-(`DEFAULT_COMPOSITE_POLICY['image-generate']='fal'` → Seedream; Vertex sólo para video reference). El compiler ancla a
-`estimate.model` (`production-route-compiler.ts:154-171`): un binding a un 2.º modelo del mismo proveedor da
-`route_binding_missing`/`route_identity_mismatch` → **denegado**. Se necesita **resolución de modelo por-ruta** en los
-adapters. Vehículo: **`TASK-1553`** (backend-data foundation); selector UI = **`TASK-1552`**. OpenAI además no tiene lane
-de producción (`governed-production-composition.ts:71` lanza `globe_governed_openai_official_verifier_missing`; sólo Lab).
+**Referencias ejercitadas del portafolio still/vector** (consulta el reader antes de actuar): Seedream 5 Pro
+`ref/still/rrss-v1`; Nano Banana Pro `ref/still/nanobanana-pro-v1`; Nano Banana 2
+`ref/still/nanobanana-2-v1`; GPT Image 2 `ref/still/openai-v2`; GPT Image 1.5
+`ref/still/openai-v1-5`; y Recraft v4.1 `ref/still/vector-v1`. OpenAI es directo con secreto propio de Globe;
+Google-native va por Vertex/GCP (`global` para estas rutas de imagen); Recraft va por Fal. No revivas los estados
+históricos “OpenAI pendiente” ni “Nano Banana 2 en 404”: revalida disponibilidad con el reader y el runtime handoff.
 
-**Gotchas de runtime del canary facturable (verificados en vivo, TASK-1535 §"Canary path"):**
-- **Región Vertex image = `global`** (us-central1 da 404). El adapter usa `region:'global'`. ✓
-- **`composite` incluye openai** en el Lab (`app.ts:3488`) pero rutea imagen→Fal por política; para correr un modelo
-  Vertex/OpenAI de imagen hay que **flipear `GLOBE_LAB_PROVIDER`** (worker **`globe-producer-worker`** + api, SoT
-  Terraform) → afecta TODOS los lab runs → flip, canary, **revert a `composite`**.
-- **Auth para disparar un lab run real:** el api es IAM-private; un token de usuario NO pasa el SA-allowlist
-  (`GLOBE_API_CALLER_SERVICE_ACCOUNTS`). Hace falta **break-glass** impersonando una SA con `globe.lab.experiment.run`
-  (`greenhouse-globe-caller`) + `tokenCreator` temporal + `--include-email`.
-- **Para probar SÓLO el allowlist de un modelo Vertex** (sin el flujo gobernado): probe directo `generateContent` al
-  proyecto con ADC de operador — así se verificó Nano Banana Pro (200, imagen real) vs Nano Banana 2 (404).
-- **`gcloud` auth expira a mitad de sesión** → `gcloud auth login` + `application-default login` (interactivos).
-- **El classifier del entorno bloquea** IAM policy-bindings y a veces ediciones de código impactantes en Globe →
-  necesita permiso/aprobación del operador.
+**Caso Recraft/SVG generalizable:** `ref/still/vector-v1` usa el endpoint Fal de text-to-vector y espera SVG.
+Aunque el payload de Fal declare `image/svg+xml`, el CDN puede responder `application/octet-stream`; aplica la
+excepción estrecha de MIME + validación de bytes descrita arriba y sirve con CSP `sandbox`. Una aceptación genérica
+por proveedor, extensión o URL sería fail-open.
 
 ## Provider boundary
 
@@ -859,28 +862,11 @@ con grant, y no llama a nada. **No son riqueza: son promesas muertas**, declarad
 `LEGACY_PARITY_EXCLUSIONS`. Cuando alguien diga *"el legacy tiene X y el nuevo no"*, la pregunta es **si X
 DESPACHA**.
 
-- **`TASK-1555` (selector de modelo del Producer) — in-progress.** La **galería de láminas** se implementó y **el
-  operador la rechazó al verla**; se reemplazó por un **desplegable compacto con isotipo real** de cada modelo
-  (`a45954f`), que lista **toda la flota de la modalidad activa** (`0258534`). **No la llames "galería": está
-  muerta.** Ojo con dónde vive: el selector está todavía en el **payload legacy**
-  (`apps/studio-web/src/producer-ui.ts` + `producer-controller.ts`), así que porta bajo `TASK-1560`.
-
-### 🔴 El flag `client_app_enabled` NO está cableado — ninguna superficie sirve sobre el payload nuevo
-
-Esta es la parte que hay que interiorizar antes de prometer un cutover. Verificado el 2026-07-25 contra `main`
-(`6e8ef5a`):
-
-- `grep -rn client_app_enabled infra/terraform/` devuelve **UNA sola línea**: su propia declaración en
-  `variables.tf:188`. `GLOBE_CLIENT_APP_ENABLED` **no aparece en ningún `.tf`**, ni en el spec del Cloud Run service.
-- La **imagen desplegada** de `globe-studio-internal` es `45235ccb62ca`, **anterior** al commit de `TASK-1556`
-  (`4bf631e`): `git merge-base --is-ancestor 4bf631e 45235cc` → **falso**.
-- **Consecuencia: cambiar el default a `true` y correr `tofu apply` da un PLAN VACÍO.** El contenedor vivo no tiene
-  bundle, no tiene `renderShell` y no lee esa variable. **Ninguna superficie sirve sobre el payload nuevo todavía:**
-  el cliente ve `public-share-ui.ts`, el template viejo.
-
-**La cadena real del cutover, en este orden:** (1) **cablear** la variable en el `.tf` del servicio → (2)
-`TASK-1562` → (3) desplegar `origin/main` vía `deploy-internal.yml` → (4) flip + `tofu apply` → (5) verificar con
-**grant real** → (6) retirar el legacy (`TASK-1560`).
+- **Selector de modelo del Producer:** la dirección de “galería de láminas” fue descartada. El contrato vigente es
+  un **desplegable compacto con isotipo real**, dentro del composer React
+  (`apps/studio-client/src/surfaces/producer/composer/ProducerComposer.tsx`), que lista la flota de la modalidad
+  activa. No lo llames galería, no lo vuelvas a implementar en el payload legacy y no uses una nota histórica de
+  port/cutover para ubicarlo.
 
 ## 🔴 Antes de crear una TASK de este epic: barrer por DOMINIO, no por nombre (2026-07-25)
 
@@ -959,7 +945,9 @@ shippeó con **4 de 11** animaciones del diseño aprobado. El task-lint sólo ve
 - 🔴 **NUNCA** uses un peso tipográfico que no tenga su `@font-face`: el browser lo **sintetiza**, deformando las letras, **sin fallar nada**. En Globe eso es concreto — `GLOBE_FONT_FACES` carga **tres cortes** (Poppins 700, Geist 400, Geist 600), así que **`font-bold` SÓLO acompañado de `font-display`**; el énfasis en Geist es **`font-semibold`**. Y `font-normal`/`font-medium` son **clases MUERTAS**: el theme hace `--font-weight-*: initial` y el build emite exactamente cuatro utilidades (`font-bold`/`font-semibold`/`font-regular`/`font-display`) ⇒ el 400 explícito se escribe **`font-regular`**. La síntesis sólo va hacia **más pesado**, por eso `font-display` sin peso se ve bien **por accidente** — se declara igual, porque la intención se escribe. Caso fuente 2026-07-29: **trece sitios** pedían Geist@700 (los tres KPI de crédito del header y **cinco reglas `.pf__*` en `styles/tailwind.css`** — la mayoría en la hoja, no en JSX) con el aserto de pesos sintetizados **verde**, porque era ciego a la familia. Hoy lo cierran dos gates: **`never asks a family for a cut it does not load`** (aparea familia×peso **en el sitio de uso**, deriva de `GLOBE_FONT_FACES` agrupado por familia y mapea con `themeKeyFor` —la misma función del generador— para honrar el alias `--weight-display → font-bold`) y **`never writes a font utility the theme cannot generate`**. El gate cubre además `font-family`/`font-size`/`font-weight`/`line-height`/`letter-spacing` (+ el shorthand `font:`) y camina `.ts`/`.tsx`/`.css`. Detalle tipográfico completo: overlay `typography-design/GLOBE_OVERLAY.md`.
 - ⚠️ **NUNCA** pidas más de 600 en un `<strong>`/`<b>` sobre Geist, y **NUNCA** introduzcas un elemento HTML nuevo sin verificar qué peso le inyecta el UA. Contexto: el proyecto **no emite el preflight de Tailwind**, así que `b, strong { font-weight: bolder }` computaba **900** dentro de un contenedor a 600 (y 700 dentro de uno a 400) y pedía un corte de Geist que no existe — **faux bold que ninguna clase declaraba**, invisible al gate porque el peso entraba por el **nombre del elemento** y el gate escanea `className`. **Cerrado el 2026-07-29 (`403d346`)**: la base declara `b, strong { font-weight: var(--weight-semibold) }` y ya no hace falta repetir el peso en cada sitio (medido en el runtime vivo: 24 Geist@600, 1 Poppins@700, **cero sintetizados**). Lo que **sí** hay que saber es el techo: el énfasis sobre Geist **topa en 600** — un `<strong>` dentro de un contenedor que ya está en 600 se ve **igual que su padre**, porque no hay archivo. Si de verdad hace falta más peso, el camino es **`font-display` (Poppins 700)**, no pedirle a Geist un corte que no carga. Y la **categoría** sigue abierta: `b`/`strong` están neutralizados, cualquier otro elemento con default del UA vuelve a caer fuera de todo escaneo de clases.
 - **NUNCA** decidas la disponibilidad de un modelo desde el ledger `GLOBE_MODEL_FLEET_STATUS.md`: el **SoT LIVE** es el reader **`globe.producer.fleet.list`** (`TASK-1554`); el ledger es el SoT **humano**. Si divergen, **manda el reader**.
-- **NUNCA** te refieras al selector de modelo del Producer (`TASK-1555`) como **"galería"**: esa dirección se implementó, **el operador la rechazó al verla** y hoy es un **desplegable compacto con isotipo real** que lista toda la flota de la modalidad activa. **Ya está portado** al payload cliente: vive dentro de `apps/studio-client/src/surfaces/producer/composer/ProducerComposer.tsx` (marcadores `producer-model-*`), en `/producer`. **Corregido 2026-07-25:** `TASK-1564` quedó **retirada** y el dueño del composer —port y rediseño de jerarquía— es **`TASK-1552`**; las dos tasks editan el MISMO archivo, así que hay que coordinar orden. La región `producer-route` es composición, no feed. `TASK-1560` sólo **borra** el legacy después, no lo porta.
+- **NUNCA** te refieras al selector de modelo del Producer como **“galería”** ni lo reimplementes en el legacy:
+  es un desplegable compacto con isotipo real dentro del composer React, lista la flota de la modalidad activa y
+  la región `producer-route` pertenece a composición, no al feed.
 - 🔴 **NUNCA inventes un nombre de cabecera al portar.** El transporte del payload cliente enviaba
   `x-globe-idempotency-key` y **ese nombre no lo lee NADIE**: toda la plataforma usa **`x-idempotency-key`**
   (`producer-client.ts` lo manda, `app.ts:2982` lo lee, `app.ts:3164` lo **EXIGE** igual a
@@ -1239,17 +1227,11 @@ Un video falló con `provider_failed`; la hipótesis "es el audio" pareció conf
 pasó. **La corrida de confirmación la refutó: `with-audio` también pasó.** Marcador real: 2 de 3.
 Antes de shippear un fix sobre una correlación, **corré el caso que la refutaría**.
 
-### Producer React — el flag que lo tenía invisible
+### Producer React — verificar wiring e imagen, no historia
 
-`GLOBE_CLIENT_PRODUCER_ENABLED` estaba en `false`, y `app.ts:2061` caía al **fallback legacy**. El
-código React estaba **desplegado desde antes** (la imagen ya contenía `ProducerComposer.tsx`): no
-faltaba deploy, faltaba el flag. El gate que la propia variable citaba (`legacy-parity.test.ts`) estaba
-**verde 7/7**, así que la condición para prenderlo estaba cumplida y sin medir.
-
-⚠️ **Notas de esta skill que resultaron STALE y ya no aplican:** `client_app_enabled` "no está
-cableado" (sí lo está, y en `true` desde 2026-07-25) y "ninguna superficie sirve sobre el payload
-nuevo" (el Producer sirve React desde 2026-07-26, rev `00092-9pr`). **Verificá contra el runtime antes
-de citar una nota de estado de este archivo.**
+Producer sirve el payload React. Antes de diagnosticar un fallback, verifica en el runtime el flag efectivo, que
+la variable esté cableada en IaC, que la imagen desplegada contenga el código que la lee y que la ruta bajo prueba
+use ese payload. Un plan vacío, un commit o una nota histórica no prueban el estado de la superficie.
 
 🔴 **`MediaStage` es primitive COMPARTIDA (share board + viewer): su `padding` y su
 `max-height: calc(100svh - 8.5rem)` son correctos en el share board y ROMPEN el viewer**, donde la

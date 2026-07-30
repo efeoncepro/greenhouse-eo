@@ -1,5 +1,11 @@
 # EPIC-028 — Barrido de WIP y camino real al lane comercial (2026-07-30)
 
+> **Reconciliación posterior del mismo día:** este barrido capturó el estado de la mañana. Después se completaron
+> los drivers, promociones y canaries reales de Nano Banana 2, GPT Image 2, GPT Image 1.5 y Recraft v4.1. Las tres
+> filas marcadas abajo como bloqueadas por terceros ya no lo están. El estado vigente vive en
+> `GLOBE_MODEL_FLEET_STATUS.md` y `GLOBE_RUNTIME_HANDOFF.md`; esta auditoría conserva el corte temporal que motivó
+> el trabajo y no debe usarse como ledger live.
+
 > **Qué es esto.** Las 22 tasks `in-progress` de EPIC-028, contrastadas contra el runtime y contra el git de
 > `efeonce-globe` — no contra lo que declaran. El objetivo era responder una pregunta concreta: **qué falta
 > realmente para el primer lane comercial (SKY Airline, `TASK-1480`)**.
@@ -17,7 +23,7 @@ que declaran.**
 | Task | Declara | Realidad medida |
 |---|---|---|
 | `TASK-1535` | `Diseno` | **Desplegado y verificado live** (ADR-010). Múltiples commits en `main` de Globe, incluidos los fixes de adapters de la flota frontier |
-| `TASK-1553` | `Diseno` | **Code-complete en `main`** — `5482a60 feat(creative-runner): route-based model resolution + multi-model catalog (ADR-013)` |
+| `TASK-1553` | `Diseno` | **Foundation y rollout de seis rutas de imagen completos**; sigue abierta sólo por receipts cross-task de TASK-1468/TASK-1578 |
 | `TASK-1559` | *"falta push a main + deploy"* | **Ya está en `main`** (`494caa0`, `c9ceabc`). Y el motion que declaraba faltante (`TASK-1565`) también (`1c0684e`) |
 
 Tres de 22 con estado falso. Ninguna estaba menos avanzada de lo declarado.
@@ -35,8 +41,8 @@ la promoción está ocurriendo hoy:
 | 🔒 Bloqueadas por **terceros** | 3 | `openai-v2` y `openai-v1-5` (falta el verifier de OpenAI) · `nanobanana-2-v1` (allowlist de Google) |
 | ⏳ Solo Lab | 1 | `motion/reference-v1` (Omni no está en el path gobernado) |
 
-**De "3 promovidas / 7 pendientes" se pasó a 10 operativas.** Y lo que queda bloqueado **no depende de
-trabajo interno**: son un verifier de OpenAI y una allowlist de Google.
+**Corte de la mañana:** de "3 promovidas / 7 pendientes" se pasó a 10 operativas. **Corrección posterior:** OpenAI,
+Nano Banana 2 y Recraft completaron sus carriles gobernados y canaries desde la UI; consulta el ledger vigente.
 
 El propio `TASK-1521` ya lo refleja en sus criterios —habla de *"las diez rutas"*— mientras su `Status real`
 sigue diciendo "7 rutas". La task se contradice a sí misma.
@@ -48,7 +54,7 @@ sigue diciendo "7 rutas". La task se contradice a sí misma.
 | Task | Qué falta de verdad |
 |---|---|
 | `1535` | Nada técnico. **Actualizar el estado y cerrar** |
-| `1553` | Nada técnico. **Actualizar el estado y cerrar** |
+| `1553` | Receipts de rate-version/onboarding desde `TASK-1468` y `TASK-1578`; no falta disponibilidad de las seis rutas de imagen |
 | `1559` | Ya está en `main`. Verificar deploy y cerrar |
 | `1558` | *"LIVE, flag prendido y verificado"* — falta **verificación humana con un grant real** |
 | `1562` | Slices 1-2 desplegados; Slice 3 decidido a la baja — falta el mismo **resolve con grant real** |
