@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-027`
-- Status real: `BLOQUEADA POR UNA DECISION DE DESTINO, no por plan (2026-07-30). Contradice a TASK-1590: esta task quiere Labs como build unit DENTRO de Greenhouse; TASK-1590 quiere el Lab en el repo AXIS con Vercel propio — y ese Lab YA EXISTE y está desplegado. Son dos destinos incompatibles para la misma superficie. Ver Delta 2026-07-30`
+- Status real: `NECESITA RE-SCOPE O CIERRE (2026-07-30). El operador decidio que el Lab vive en el Vercel de AXIS, consumiendo lo publicado y sin importar de greenhouse-eo. Labs deja de ser candidato a primer build unit de Greenhouse: su destino no esta en el repo. EPIC-026 sigue necesitando un primer build unit, pero con OTRO sujeto. No ejecutar esta task como esta escrita. Contexto previo: Contradice a TASK-1590: esta task quiere Labs como build unit DENTRO de Greenhouse; TASK-1590 quiere el Lab en el repo AXIS con Vercel propio — y ese Lab YA EXISTE y está desplegado. Son dos destinos incompatibles para la misma superficie. Ver Delta 2026-07-30`
 - Rank: `1`
 - Domain: `platform|ops`
 - Blocked by: `none`
@@ -175,6 +175,21 @@ Eso no cierra la pregunta de EPIC-026 —Greenhouse sigue necesitando un primer 
 que **Labs no es el candidato**, porque su destino natural ya no está en el repo.
 
 **No tomar ninguna de las dos hasta resolverlo.** Decisión del operador.
+
+### Delta 2026-07-30 (b) — resuelta por decisión del operador: Labs NO es el sujeto
+
+El operador decidió que **el Lab vive en el Vercel de AXIS**, consumiendo el registry y los tokens
+publicados, sin importar nada de `greenhouse-eo` (ver `TASK-1590` § Delta 2026-07-30 (b)).
+
+Eso deja a esta task **sin sujeto**: no se puede extraer como build unit de Greenhouse algo cuyo destino
+es otro repo. `TASK-1590` avanza; ésta no como está escrita.
+
+**Lo que sigue siendo válido y no se pierde:** la pregunta que esta task venía a responder — *"¿cuál es el
+primer build unit independiente de Greenhouse, y cómo se demuestra que su cambio no construye el Portal?"* —
+sigue abierta y es de EPIC-026. Lo que cambia es el candidato.
+
+**Acción pendiente (decisión del operador):** re-scopear esta task a otro candidato de build unit, o
+cerrarla y dejar la pregunta en la umbrella de EPIC-026. No la ejecute ningún agente como está.
 
 ## Out of Scope
 

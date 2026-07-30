@@ -15,7 +15,7 @@
 - Motion: `docs/ui/motion/TASK-1590-efeonce-design-system-lab-motion.md`
 - Backend impact: `none`
 - Epic: `optional`
-- Status real: `A MEDIAS, no pendiente (medido 2026-07-30). El Lab independiente YA EXISTE y está desplegado (apps/lab en axis-design-system → axis-design-system-lab.vercel.app), con la estructura de su dirección visual ya implementada: registry searchable + preview + panel de evidencia. Lo que falta es el CONTENIDO: 2 contratos en el Lab contra 43 rutas de /design-system en Greenhouse. Y dos desalineaciones con su propia spec: el Lab es PUBLICO (200 sin auth) cuando la task pide internal-only, y su acceptance criterion 1 ("Lab corre fuera de Greenhouse") ya se cumple. CONTRADICCION ABIERTA con TASK-1382, que quiere Labs como build unit DENTRO de Greenhouse: son dos destinos incompatibles para la misma superficie y ninguna declara a la otra`
+- Status real: `A MEDIAS, no pendiente (medido 2026-07-30). DESTINO Y ACCESO DECIDIDOS 2026-07-30: el Lab vive en el Vercel de AXIS (consume lo publicado, nunca importa de greenhouse-eo) y queda PUBLICO por decision explicita, lo que supersede el internal-only de la spec original. El Lab independiente YA EXISTE y está desplegado (apps/lab en axis-design-system → axis-design-system-lab.vercel.app), con la estructura de su dirección visual ya implementada: registry searchable + preview + panel de evidencia. Lo que falta es el CONTENIDO: 2 contratos en el Lab contra 43 rutas de /design-system en Greenhouse. Y dos desalineaciones con su propia spec: el Lab es PUBLICO (200 sin auth) cuando la task pide internal-only, y su acceptance criterion 1 ("Lab corre fuera de Greenhouse") ya se cumple. CONTRADICCION ABIERTA con TASK-1382, que quiere Labs como build unit DENTRO de Greenhouse: son dos destinos incompatibles para la misma superficie y ninguna declara a la otra`
 - Rank: `TBD`
 - Domain: `ui-platform|cross-runtime`
 - Blocked by: `none` (foundation publicada; extracción del Lab sigue pendiente)
@@ -127,6 +127,28 @@ el gate — son una declaración de dirección que ya se materializó.
 Lo que **no** son es suficientes como contrato de implementación para mudar 43 rutas: falta el inventario de
 superficies, el mapping a las rutas actuales de `/design-system`, los estados y el copy. `UI ready: no` es
 correcto y debe seguir así hasta que eso exista.
+
+## Delta 2026-07-30 (b) — destino y acceso DECIDIDOS por el operador
+
+**Destino: el Lab vive en el Vercel de AXIS.** Confirmado por el operador. La razón que dio es la correcta
+y conviene dejarla escrita porque es el criterio, no la preferencia: el Lab debe **consumir lo que AXIS
+publica**, no el código de Greenhouse. Es un render de un contrato publicado — el mismo patrón de
+`efeonce-think` sobre el modelo headless de reportes.
+
+⚠️ **No confundir con `axis-headless`** (eje 2 del ADR: componentes con comportamiento y sin apariencia).
+Acá "headless" describe el **desacople del Lab respecto de Greenhouse**, no la capa de comportamiento. Son
+dos cosas distintas con la misma palabra.
+
+Consecuencia dura: **el Lab nunca importa de `greenhouse-eo`.** Lee del registry publicado y de los tokens
+publicados. Si necesita algo que AXIS no publica, el gap es de AXIS, no del Lab.
+
+**Acceso: público, y ahora es una decisión, no una omisión.** El operador decide mantenerlo público y
+revisar el nivel de acceso más adelante. Esto **supersede** el `internal-only` de la spec original de esta
+task. Consecuencia operativa: el contenido del Lab se escribe sabiendo que es visible desde fuera — nada de
+notas internas, nombres de clientes, capturas de datos reales ni referencias a decisiones no publicadas.
+
+`TASK-1382` queda resuelta por esta decisión: Labs **no** es candidato a primer build unit de Greenhouse,
+porque su destino no está en el repo. EPIC-026 necesita otro sujeto.
 
 ## Rollout / Rollback
 
