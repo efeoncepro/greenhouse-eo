@@ -6,26 +6,25 @@
 
 ---
 
-## AXIS package distribution/auth — estado verificado 2026-07-29
+## AXIS package distribution/auth — estado verificado 2026-07-30
 
 - GitHub Packages publica `@efeoncepro/axis-tokens`, `@efeoncepro/axis-ui-contracts` y
-  `@efeoncepro/axis-ui-registry` en versión `0.1.4`.
+  `@efeoncepro/axis-ui-registry` en versión `0.1.5`.
 - `efeoncepro/greenhouse-eo` y `efeoncepro/efeonce-globe` tienen permiso `Read` en GitHub
   Actions para los tres paquetes.
-- `axis-design-system-lab` tiene `NPM_RC` sensible configurado en Vercel para `Production` y
-  `Preview`, apuntando el scope `@efeoncepro` a GitHub Packages.
-- En el proyecto GCP `efeonce-globe` existe `axis-packages-read-token` en Secret Manager.
-  Cloud Build usa el service account
-  `818083690953-compute@developer.gserviceaccount.com`, que tiene
-  `roles/secretmanager.secretAccessor` sobre el secreto.
-- Esto resuelve la distribución y autenticación de paquetes. Globe consume los tres paquetes
-  `0.1.4` en `apps/studio-client` y expone los fixtures opt-in `/_axis-pilot`; la evidencia del
-  piloto vive en `TASK-1591`. El wiring efímero de CI/Cloud Build ya está implementado; falta
-  ejecutar el pipeline real y verificar digest/rollback. La promoción a superficies de producto
-  permanece separada.
-- Riesgo vigente: el PAT utilizado es operator-owned y expira `2026-08-27`. Sustituirlo por
-  una identidad de máquina dedicada antes de rollout externo o uso durable. El valor secreto
-  no se documenta.
+- `axis-design-system-lab` no tiene `NPM_RC`: consume AXIS mediante `workspace:*` y su
+  instalación/build fueron verificados sin credencial.
+- El secreto vigente `axis-packages-read-token` vive en el proyecto GCP `efeonce-group`.
+  Cloud Build de Globe conserva `roles/secretmanager.secretAccessor` sobre ese secreto.
+  El secreto legacy de `efeonce-globe` fue eliminado y el PAT legacy fue revocado.
+- Globe consume los tres paquetes `0.1.5` en `apps/studio-client` y expone el fixture opt-in
+  `/_axis-pilot`; la evidencia del piloto vive en `TASK-1591`. CI/Cloud Build ya tienen wiring
+  operativo y el release productivo `30502476429` terminó en `success` sobre
+  `41fa94846d0ca18a0f83529dc90cdc2da15a632d`.
+- Los canaries usan `playwright-core` con `channel: 'chrome'`. El rollback de
+  `globe-studio-internal` y `globe-api-internal` fue ejercitado al 100% y restaurado.
+- Riesgo residual: el token temporal de migración permanece activo hasta sustituirlo por una
+  identidad de máquina dedicada antes del rollout externo. El valor secreto no se documenta.
 
 # Handoff
 
