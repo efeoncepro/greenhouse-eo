@@ -82,6 +82,33 @@ describe('careers public view model', () => {
     ])
   })
 
+  it('keeps the narrative separate from responsibility bullets', () => {
+    const vm = buildCareersOpeningViewModel(
+      {
+        ...opening,
+        description:
+          'Hay ideas valiosas atrapadas en un brief.\n\n- Investigar el contexto.\n- Convertir la idea en contenido.',
+      },
+      copy,
+    )
+
+    expect(vm.descriptionParagraphs).toEqual(['Hay ideas valiosas atrapadas en un brief.'])
+    expect(vm.responsibilityItems).toEqual(['Investigar el contexto.', 'Convertir la idea en contenido.'])
+  })
+
+  it('removes a public description heading before rendering the narrative section', () => {
+    const vm = buildCareersOpeningViewModel(
+      {
+        ...opening,
+        description:
+          'Sobre el rol\n\nUna introducción breve.\n\nResponsabilidades:\n- Investigar el contexto.',
+      },
+      copy,
+    )
+
+    expect(vm.descriptionParagraphs).toEqual(['Una introducción breve.'])
+  })
+
   it('uses structured public fields before legacy inference', () => {
     const vm = buildCareersOpeningViewModel(
       {
