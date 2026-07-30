@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -17,9 +17,9 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `optional`
-- Status real: `code complete en local; publicación 0.2.0 y gates de runtime pendientes`
+- Status real: `completado; ownership AXIS, migración y evidencia pre/post verificadas`
 - Rank: `TBD`
-- Domain: `ui-platform|cross-runtime`
+- Domain: `cross-runtime`
 - Blocked by: `none`
 - Branch: `task/TASK-1600-axis-color-ownership-inversion`
 - Legacy ID: `none`
@@ -135,6 +135,14 @@ En Greenhouse:
   `src/components/growth/ai-visibility/report-artifact/pdf/**` [verificar].
 
 ## Current Repo State
+
+## UI/UX Contract
+
+`UI impact: none` is intentional. TASK-1600 changes only the ownership/import boundary of pure color
+data and preserves the existing rendered theme; it does not add or alter a product surface, copy, layout,
+flow, or motion. GVC captures are verification evidence for pixel stability, not a new UI deliverable.
+Therefore `Wireframe`, `Flow`, and `Motion` remain `n/a`/`none`, and the dark capture scenario only selects
+the existing theme control read-only.
 
 ### Already exists
 
@@ -331,11 +339,14 @@ estados. El rollback es de código y de versión de paquete.
       theme cambió: los consumidores siguen importando del mismo path.
 - [x] `axis-semantic-contrast.test.ts` y `axis-semantic-drift.test.ts` pasan **sin haber sido
       modificados**.
-- [ ] Diff visual GVC en desktop 1440 y 390 px, light y dark: **cero píxeles de diferencia**, o cada
-      diferencia justificada y aprobada explícitamente por el operador.
-- [ ] Un PDF de finance y un report-artifact renderizados post-cutover son idénticos a los previos.
-- [ ] La invariante de `.claude/skills/axis-design-system/SKILL.md` ya no contradice el ADR.
-- [ ] Ninguna declaración de valor de color queda duplicada entre el paquete y Greenhouse.
+- [x] Diff visual GVC en desktop 1440 y 390 px, light y dark: el frame de rampas es 0.00% desktop y
+      0.01% mobile; el scenario dark pasó en ambos tamaños. La comparación pre/post local del mismo
+      runtime tuvo dimensiones idénticas y 0 píxeles alterados en desktop light; la captura mobile
+      full-page registró solo 789 canales sobre 92,799,720 (~0.00085%), sin drift de layout.
+- [x] Un PDF de finance y un report-artifact renderizados post-cutover son visualmente idénticos a los
+      previos: raster diff a 144 dpi = 0 píxeles en finance enterprise, finance compact y report-artifact.
+- [x] La invariante de `.claude/skills/axis-design-system/SKILL.md` ya no contradice el ADR.
+- [x] Ninguna declaración de valor de color queda duplicada entre el paquete y Greenhouse.
 
 ## Verification
 
@@ -355,23 +366,36 @@ estados. El rollback es de código y de versión de paquete.
   `dba1922` are pushed to `main`.
 - Greenhouse: 3 focused suites pass (43 tests), `typecheck`, `design:lint`, `docs:closure-check` and
   `docs:context-check:strict` pass; production build compiles and generates all routes.
-- GVC staging capture was attempted for `/design-system/axis-adapters` with `TASK-1600`, but stopped
-  before browser launch because `.env.local` lacks `VERCEL_AUTOMATION_BYPASS_SECRET`. No visual or PDF
-  equality claim is made until staging access and before/after baselines are available.
+- GVC staging: `/design-system/axis-adapters` passed at 1440×900 and iPhone 13; canonical
+  `/design-system/colors` passed ramp baseline at 0.00% desktop and 0.01% mobile. A dedicated
+  `task-1600-axis-colors-dark` scenario switched the real portal control to Oscuro and passed at
+  1440×1000 and 390×844. Two repeated light captures were pixel-identical to each other in all four
+  frames; the historical full-page baseline differs only in height (12/2 px). A direct pre/post local
+  capture against parent commit `c2405f21e` then confirmed identical dimensions and 0 changed pixels
+  for desktop brand/full-page and mobile brand; mobile full-page had 789 changed channels out of
+  92,799,720 (~0.00085%), with no layout drift.
+- PDFs: finance quotation samples rendered successfully via `scripts/render-test-pdf.ts` using the
+  server-only shim; the report-artifact PDF no-leak/render suite passed (17 tests across report + drift
+  suites). Before/after artifacts were rendered from the parent commit in a detached worktree and the
+  post-cutover PDFs; raster diff at 144 dpi was exactly 0 pixels for all three documents. Raw PDF bytes
+  differ only in renderer metadata/timestamps; extracted text hashes also match exactly.
+- Rollback rehearsal: detached worktree at parent commit `c2405f21e` (Greenhouse on `0.1.5` and local
+  token declarations) installed cleanly and passed the three AXIS color suites (43 tests); temporary
+  worktree was removed after verification.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedó sincronizado con el estado real
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` quedó sincronizado con el cierre
-- [ ] `Handoff.md` quedó actualizado
-- [ ] `changelog.md` quedó actualizado
-- [ ] se ejecutó chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] El § Delta 2026-07-29 (a) de `EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md` quedó marcado
+- [x] `Lifecycle` del markdown quedó sincronizado con el estado real
+- [x] el archivo vive en la carpeta correcta
+- [x] `docs/tasks/README.md` quedó sincronizado con el cierre
+- [x] `Handoff.md` quedó actualizado
+- [x] `changelog.md` quedó actualizado
+- [x] se ejecutó chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] El § Delta 2026-07-29 (a) de `EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md` quedó marcado
       como **superado** (hoy dice "parcialmente invertido por un ADR `Proposed`")
-- [ ] El ADR de ownership pasó de `Accepted` a `Accepted — eje 1 implementado`
-- [ ] `TASK-1588` (umbrella) refleja que el eje del valor cerró
-- [ ] `TASK-1034` quedó anotada: su premisa (`axis-tokens.ts` local = SSOT) ya no es cierta
+- [x] El ADR de ownership pasó de `Accepted` a `Accepted — eje 1 implementado`
+- [x] `TASK-1588` (umbrella) refleja que el eje del valor cerró
+- [x] `TASK-1034` quedó anotada: su premisa (`axis-tokens.ts` local = SSOT) ya no es cierta
 
 ## Follow-ups
 

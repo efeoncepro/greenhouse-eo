@@ -15,7 +15,8 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `optional`
-- Status real: `Aceptada; foundation/distribución y piloto TASK-1591 completados; extracción del Lab,
+- Status real: `Aceptada; foundation/distribución y piloto TASK-1591 completados; eje 1 de ownership de
+  color cerrado por TASK-1600; extracción del Lab,
   workflow agéntico y promoción productiva siguen por slices`
 - Rank: `TBD`
 - Domain: `ui-platform|architecture|cross-runtime`

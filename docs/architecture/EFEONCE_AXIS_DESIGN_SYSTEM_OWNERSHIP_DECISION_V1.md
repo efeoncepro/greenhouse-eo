@@ -2,12 +2,13 @@
 
 ## Status
 
-**`Accepted`** — aprobado por el operador el 2026-07-29. Nada implementado todavía.
+**`Accepted — eje 1 implementado`** — aprobado por el operador el 2026-07-29; eje 1 ejecutado mediante
+TASK-1600 el 2026-07-30. El eje 2 (`axis-headless`) sigue fuera de alcance.
 
 Ejecución por ejes: el **eje 1 (el valor / color)** es `TASK-1600`. El **eje 2 (comportamiento /
 `axis-headless`)** es una compuerta y necesita su propia task cuando el eje 1 esté verde.
 
-Invierte parcialmente el § Delta 2026-07-29 (a) de
+Invierte y supersede en la propiedad del valor el § Delta 2026-07-29 (a) de
 [`EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md`](EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md),
 que declaró a Greenhouse dueño del valor de marca. Ese Delta sigue vigente en todo lo demás (gobierno del
 proceso, distribución, versionado, gates); lo único que se invierte es **quién es autor del valor**.
