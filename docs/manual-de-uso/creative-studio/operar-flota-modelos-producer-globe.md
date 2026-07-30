@@ -69,6 +69,8 @@ La distinción no es cosmética: un modelo ofrecido como ejecutable donde no pue
 5. Verificar el reader `globe.producer.fleet.list`.
 6. Ejecutar una generación real desde Producer y comprobar estado terminal, gasto, MIME, retención,
    vista previa y descarga.
+7. Adjuntar el receipt transversal de TASK-1578, incluida la rate version vigente cuyo dueño es
+   TASK-1468. Sin ese receipt, la ruta puede estar operativa, pero la task de onboarding no es cerrable.
 
 No se edita ninguna pantalla. Si alguien pide "cablear el modelo en la UI", algo se desvió del
 diseño. El procedimiento transversal completo y sus receipts pertenecen a `TASK-1578`; este manual
@@ -83,6 +85,35 @@ no crea un segundo ledger ni una segunda promoción.
 - Gotcha verificado: Fal declara el archivo como SVG, pero su CDN puede transportarlo como
   `application/octet-stream`. No relajes MIME globalmente; la ruta admite ese transporte sólo tras
   verificar que los bytes realmente forman un SVG.
+
+### Canary Nano Banana 2 de referencia
+
+- Ruta: `ref/still/nanobanana-2-v1`.
+- Resultado esperado: `image/png`, 10 créditos, `completed/retained`.
+- Evidencia UI: run `ce06f8b4-ebe9-43b6-9d47-8e4cc901f49a`, modelo Nano Banana 2 y estado `Listo`.
+- Gotcha verificado: el prefijo durable `vertex-output:` tiene 14 caracteres. Globe `1fb5728`
+  deriva el corte desde la longitud del prefijo y recuperó el mismo run idempotentemente. No
+  reejecutes un run pagado para corregir su finalización.
+
+### Canaries OpenAI de referencia
+
+- GPT Image 2: `ref/still/openai-v2`, run
+  `a81c8049-7772-4933-82f2-1e2e59e5121c`, 14 créditos.
+- GPT Image 1.5: `ref/still/openai-v1-5`, run
+  `bf8cd62b-e2d7-4e83-981a-7631a14a5d3a`, 10 créditos.
+- Ambos usan el driver gobernado oficial de OpenAI Images. Verifica que el asset herede la versión
+  efectiva de derechos fijada antes del gasto; no uses una policy expirada ni una lookup posterior
+  no anclada al snapshot del run.
+
+### Promoción Nano Banana Pro de referencia
+
+- Ruta: `ref/still/nanobanana-pro-v1`; modelo `gemini-3-pro-image`; región `global`.
+- Canary base: experimento `a258dda8-ea6e-4a34-94f0-4cd9ca301d17`, 10 créditos,
+  `image/png`, SHA-256
+  `9e9edaf59cb927610d043e3af3cac9b90c321ed48e55eb34ec0300c72dc429cf`.
+- El 2026-07-30 la revisión humana, readiness y binding quedaron promovidos y el selector live pasó
+  a `Disponible`. No vuelvas a seguir el baseline histórico que lo describe como
+  `gated/not_promoted`.
 
 ## Verificar
 
@@ -121,6 +152,17 @@ por workspace, recomendado honesto, y que **el identificador del proveedor nunca
 | Dice "Próximamente" y sabes que funciona | Verificado en el Model Lab, **no promovido** a producción | Revisar el ledger; promover si corresponde |
 | Nexa y la pantalla muestran distinto | **Un consumer se armó su propia lista** | Bug: buscar el cálculo paralelo y borrarlo |
 | Falla después de reservar crédito | Se ofreció ejecutable donde no puede correr | Bug: reportar con la ruta y el modo |
+| Un run pagado queda sin finalizar tras un fix | El proveedor terminó, pero falló la reconciliación local | Leer el run/attempt y recuperar idempotentemente; no generar otra vez |
+| SVG llega como `application/octet-stream` | Transporte genérico del CDN de Fal | Aceptar sólo si la ruta espera SVG y los bytes verifican como SVG; nunca relajar MIME globalmente |
+
+## Estado operativo de la flota de imagen
+
+Al 2026-07-30 están disponibles y ejercitadas desde la UI las seis rutas de imagen: Seedream 5 Pro,
+Nano Banana Pro, Nano Banana 2, GPT Image 2, GPT Image 1.5 y Recraft v4.1. El selector vigente es un
+desplegable compacto; la antigua dirección de galería no se usa.
+
+El único pendiente de TASK-1553 es documental/gobernante: receipts de rate-version TASK-1468 y
+onboarding TASK-1578. No uses ese pendiente para diagnosticar estas rutas como no promovidas.
 
 ## Referencias técnicas
 

@@ -64,6 +64,38 @@ Recraft v4.1 lo demuestra: `ref/still/vector-v1` pasó de existir como ruta no e
 disponible sin modificar el selector. La prueba real desde Producer produjo y retuvo un SVG de
 4 créditos, con vista previa y descarga habilitadas.
 
+## Estado verificado el 2026-07-30
+
+El workspace interno ofrece simultáneamente seis rutas de imagen:
+
+| Modelo | Ruta | Evidencia visible |
+|---|---|---|
+| Seedream 5 Pro | `ref/still/rrss-v1` | disponible y sin regresión como default |
+| Nano Banana Pro | `ref/still/nanobanana-pro-v1` | revisión humana, readiness y binding promovidos; selector `Disponible` |
+| Nano Banana 2 | `ref/still/nanobanana-2-v1` | generación UI real de 10 créditos, `completed/retained` |
+| GPT Image 2 | `ref/still/openai-v2` | generación UI real de 14 créditos |
+| GPT Image 1.5 | `ref/still/openai-v1-5` | generación UI real de 10 créditos, asset gobernado y descargable |
+| Recraft v4.1 | `ref/still/vector-v1` | generación UI real de 4 créditos, SVG retenido y descargable |
+
+La disponibilidad no elimina los controles. Cada identidad exacta llegó mediante rate, driver,
+endpoint, evaluación, revisión, derechos, binding, readiness y circuito gobernados. El canary final
+se hizo desde el Producer autenticado, no sólo desde una llamada directa al proveedor.
+
+Los canaries también corrigieron defectos que los tests aislados no habían expuesto:
+
+- Nano Banana 2 detectó un off-by-one al reconstruir el hash durable de Vertex. Globe `1fb5728`
+  recuperó y completó el mismo run de forma idempotente, sin generar ni cobrar dos veces.
+- Recraft detectó que Fal declara SVG en el payload pero su CDN lo transporta como
+  `application/octet-stream`. Globe `84d6a8e` acepta ese MIME genérico sólo para una salida que
+  espera SVG, verifica los bytes antes del ingest y sirve el asset con CSP sandbox.
+
+Estos fixes no son excepciones generales: ambos fallan cerrado y están acotados al contrato exacto
+que verifican.
+
+TASK-1553 sigue `in-progress` únicamente porque faltan los receipts transversales que conectan cada
+ruta promovible con la rate version vigente de TASK-1468 y el onboarding receipt de TASK-1578. No
+queda una promoción, un selector ni un canary pendiente para estas seis rutas.
+
 ## El "recomendado"
 
 Por cada tipo de tarea hay un modelo recomendado, marcado con **✦**. Es una sugerencia, no una
