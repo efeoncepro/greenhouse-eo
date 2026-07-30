@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-028`
-- Status real: `Diseno`
+- Status real: `CODE-COMPLETE + DESPLEGADO + VERIFICADO LIVE (2026-07-24) — el Status decia 'Diseno' y era falso (barrido 2026-07-30). ADR-010 completo en main de efeonce-globe: autoridad de atestacion, lane automatizado, techo por workspace y modal Command-K desplegados; attestations firmadas por el CEO (fal/seed-audio internal-eval + re-atestacion comercial, Vertex comercial); canary del lane verificado con binding disabled->enabled y rights policy derivada; migracion 0030 aplicada; secrets provisionados. Detalle en GLOBE_RUNTIME_HANDOFF. PENDIENTE PARA CERRAR: marcar los 7 acceptance criteria contra la evidencia ya existente — no falta trabajo, falta verificacion documental`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none` (builds on ADR-009/TASK-1527 saga, live)
@@ -500,14 +500,14 @@ Ver `EFEONCE_GLOBE_COMMERCIAL_PROMOTION_ATTESTATION_DECISION_V1.md` (ADR-010) �
 
 ## Acceptance Criteria
 
-- [ ] Existe `model_commercial_rights_attestations` (append-only, inmutable por `(modelId, termsDigest)`) + capability
+- [x] Existe `model_commercial_rights_attestations` (append-only, inmutable por `(modelId, termsDigest)`) + capability
       `globe.model-rights.attest` (`requireHuman`) / `.read`.
-- [ ] La postura de derechos que aplica el lane es siempre una derivación de la attestation (test: aplicada = atestiguada).
-- [ ] El techo por workspace bloquea fail-closed una ruta internal-eval hacia un workspace `client` (negativo verde).
-- [ ] El lane promueve una ruta end-to-end (attestation + eval → saga) sin firma humana por ruta, con canary facturable verde.
-- [ ] `requireHuman` sigue en `recordModelReadinessReview`; el lane nunca lo firma; attestor≠lane principalId.
-- [ ] Flota objetivo: evidencia de términos real por proveedor + golden briefs por ruta; slugs verificados con probes de gasto cero.
-- [ ] Docs: ADR-010 + skill + funcional + manual + handoff sincronizados.
+- [x] La postura de derechos que aplica el lane es siempre una derivación de la attestation (test: aplicada = atestiguada).
+- [x] El techo por workspace bloquea fail-closed una ruta internal-eval hacia un workspace `client` (negativo verde).
+- [x] El lane promueve una ruta end-to-end (attestation + eval → saga) sin firma humana por ruta, con canary facturable verde.
+- [x] `requireHuman` sigue en `recordModelReadinessReview`; el lane nunca lo firma; attestor≠lane principalId.
+- [x] Flota objetivo: evidencia de términos real por proveedor + golden briefs por ruta; slugs verificados con probes de gasto cero.
+- [x] Docs: ADR-010 + skill + funcional + manual + handoff sincronizados.
 
 ## Verification
 
@@ -536,3 +536,23 @@ Ver `EFEONCE_GLOBE_COMMERCIAL_PROMOTION_ATTESTATION_DECISION_V1.md` (ADR-010) �
 
 - Lane = clase de workload nueva vs gate de citación sobre promoter/checker (resuelto en Slice 1 leyendo el wiring exacto).
 - Techo por workspace: jsonb en projection vs columna tipada + CHECK (leaning jsonb; el campo de techo es load-bearing).
+
+## Delta 2026-07-30 — cierre con verificación criterio por criterio
+
+Cerrada en el barrido de WIP de EPIC-028. El `Status real` decía `Diseno` y era falso: el trabajo estaba
+hecho, desplegado y verificado live desde el 2026-07-24 — **faltaba la verificación documental, no el
+trabajo**. Los 7 criterios se marcaron contra evidencia medida, no por inercia:
+
+| # | Criterio | Evidencia verificada |
+|---|---|---|
+| 1 | Tabla append-only + capability | `packages/database/migrations/0030_model_commercial_rights_attestations.sql` + `stores/model-commercial-rights-store.ts` |
+| 2 | Postura aplicada = atestada | test `derives restrictions that only tighten from the attested grant` |
+| 3 | Techo fail-closed (negativo verde) | tests `an internal-eval-only route is NEVER eligible for a client workspace` **y** su positivo `the SAME internal-eval-only route IS eligible for an internal workspace` |
+| 4 | Lane promueve end-to-end | test `promotes a full-grant route into a CLIENT workspace: rights published + binding enabled`; canary del lane verificado live (handoff 2026-07-24) |
+| 5 | `requireHuman` intacto; attestor ≠ lane | `packages/domain/src/model-readiness.ts:85,98,106`; workload class disjunto `globe:service:promotion-auto-lane` |
+| 6 | Evidencia de términos + golden briefs | 7 archivos en `scripts/evidence/` (Fal, OpenAI, Vertex, ElevenLabs, Seedance, Seedream) + `packages/domain/src/evaluation.ts` |
+| 7 | Docs sincronizados | ADR-010 · funcional `efeonce-globe-promocion-comercial-atestacion.md` · manual `operar-promocion-comercial-atestacion-globe.md` · `GLOBE_RUNTIME_HANDOFF` |
+
+**Lección que deja para el epic:** una task puede estar terminada y desplegada durante seis días sin que
+nadie lo sepa, porque el `Status real` no se actualizó y los checkboxes quedaron sin marcar. Con 108 tasks
+`in-progress` en el repo, esto no es un caso aislado — ver `EPIC-028_WIP_SWEEP_2026-07-30.md`.

@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Diseno`
+- Status real: `CODE-COMPLETE 6/7 — el Status decia 'Diseno' y era falso (barrido 2026-07-30). ADR-013 mergeado en main de efeonce-globe (5482a60): resolucion por-ruta en los 3 adapters, catalogo v1.3.0+ y PRODUCER_RECOMMENDED_DEFAULTS. NO ES CERRABLE: su unico criterio abierto —cada ruta promovible referencia un rate version vigente de TASK-1468 y un receipt de onboarding de TASK-1578— depende de dos tasks abiertas (1468 in-progress con migracion pendiente, 1578 to-do sin formalizar). Bloqueo real, no olvido`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`

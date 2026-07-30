@@ -29,7 +29,7 @@
 - Motion: `docs/ui/motion/TASK-1559-globe-feed-viewer-client-port-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `code complete PARCIAL — estructura/estados/concurrencia cerrados y verificados; MOTION no implementado (4 de 11 animaciones) y declarado en TASK-1565; falta push a main + deploy`
+- Status real: `CODE-COMPLETE EN MAIN — el Status decia 'falta push a main + deploy' y era falso (barrido 2026-07-30): esta en main de efeonce-globe (494caa0, c9ceabc) y el MOTION que declaraba faltante tambien (TASK-1565 Slices 1-6, 1c0684e). NO ES CERRABLE TODAVIA (verificado 2026-07-30): su criterio 7 exige before/after desktop y 390px, y NO existe ninguna captura suya en apps/studio-client/.captures/ (solo axis-pilot, tailwind-engine y las tres de TASK-1552). Los invariantes de concurrencia SI tienen tests verdes (watermark: 'la marca solo avanza'; epoch: 'DESCARTA un delta con revision menor o igual') y el cliente NO mintea URLs firmadas. Lo que falta es EVIDENCIA VISUAL, no codigo`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none` (TASK-1558 LIVE 2026-07-25; las primitives existen)

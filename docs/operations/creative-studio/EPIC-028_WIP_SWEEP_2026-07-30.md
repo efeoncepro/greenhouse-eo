@@ -120,3 +120,43 @@ Es trabajo de rigor, no de features. Y `TASK-1480` no puede cerrar antes porque 
 - Si las revisiones Cloud Run desplegadas corresponden a los SHAs que las tasks declaran (se verificó el git,
   no el runtime desplegado de cada servicio).
 - Las tasks `to-do` de EPIC-028 — el barrido cubrió sólo las `in-progress`.
+
+---
+
+## Ejecución del barrido — resultado real (2026-07-30)
+
+Al intentar cerrar las tres tasks de la categoría A, **la estimación inicial resultó optimista**. Los
+`Acceptance Criteria` estaban **sin marcar** en las tres, así que cerrarlas exigía verificación real, no un
+cambio de estado. El resultado:
+
+| Task | Veredicto | Por qué |
+|---|---|---|
+| `TASK-1535` | ✅ **CERRADA** | Los 7 criterios verificados uno por uno contra migración, stores, tests nominales, `requireHuman`, 7 archivos de evidencia de términos y las 4 capas documentales |
+| `TASK-1553` | 🔴 **no cerrable** | 6/7. Su criterio abierto depende de `TASK-1578` (`to-do`, sin formalizar) y `TASK-1468` (`in-progress`, migración pendiente). **Bloqueo real, no olvido** |
+| `TASK-1559` | 🔴 **no cerrable** | Código en `main` y concurrencia con tests verdes, pero su criterio 7 exige *before/after desktop y 390px* y **no existe ninguna captura suya** en `.captures/`. Falta **evidencia visual**, no código |
+
+**WIP de EPIC-028: 22 → 21.** No 17.
+
+### La lección, que vale más que el número
+
+Mi recomendación decía *"tres no necesitan código"*. Era cierto —ninguna necesitaba código nuevo— pero
+**incompleta**: dos necesitaban algo que no tenían, y una de ellas depende de tasks ajenas.
+
+**Un `Status real` optimista y unos checkboxes sin marcar se parecen mucho a una task terminada.** La única
+forma de distinguirlos es verificar criterio por criterio. Este barrido lo hizo con tres tasks; quedan 18.
+
+### Estados corregidos en esta pasada
+
+- `1535` · `1553` · `1559` — el `Status real` decía `Diseno` o *"falta push"*; ahora declara el estado
+  medido y, cuando corresponde, **qué falta exactamente para cerrar**.
+- `1521` · `1463` · `1505` — se añadió la nota de que el bloqueo de "7 rutas" ya no aplica: hoy hay **10
+  operativas** y las 3 restantes dependen de terceros.
+
+### Lo que sigue sin verificar
+
+- `TASK-1522` sigue declarando *"smoke bloqueado por ausencia de output elegible"*. Con 10 rutas vivas es
+  **candidata a desbloqueo**, pero confirmarlo exige una generación real (gasto + auth), fuera del alcance
+  de un barrido documental.
+- `TASK-1558` y `TASK-1562` siguen compartiendo el mismo bloqueo: **una sesión humana con un grant real**.
+  Ningún agente puede resolverlo — el token se guarda como `hashSecret` y crear uno requiere sesión OAuth de
+  Globe (runbook `operar-share-board-globe.md`).

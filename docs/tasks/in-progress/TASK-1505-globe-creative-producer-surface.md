@@ -17,7 +17,7 @@
 - Motion: `docs/ui/motion/TASK-1505-globe-creative-producer-surface-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Operativa internal-only en 3 rutas promovidas; sesión expirada y 7 promociones pendientes`
+- Status real: `Operativa internal-only en 3 rutas promovidas; sesión expirada y 7 promociones pendientes ACTUALIZACION 2026-07-30 (barrido EPIC-028): el bloqueo de '7 rutas sin promocion' YA NO APLICA en esa magnitud — hoy hay 10 rutas OPERATIVAS en produccion gobernada (Nano Banana Pro promovido el 07-30, revision live 896a0620). Quedan 3 bloqueadas por TERCEROS (verifier de OpenAI x2, allowlist de Google x1) y 1 solo-Lab (Omni). Ninguna depende de trabajo interno. Ver EPIC-028_WIP_SWEEP_2026-07-30.md`
 - Rank: `TBD`
 - Domain: `creative|ui|product`
 - Blocked by: `none`

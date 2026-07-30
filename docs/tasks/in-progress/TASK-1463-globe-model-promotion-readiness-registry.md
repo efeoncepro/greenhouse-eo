@@ -31,7 +31,7 @@ Nota de frontera, alineada con el Goal ("separar probar de autorizar") y la AC "
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-028`
-- Status real: `Operativo internal-only para 3 rutas promovidas; 7 rutas del catálogo siguen sin promoción exacta`
+- Status real: `Operativo internal-only para 3 rutas promovidas; 7 rutas del catálogo siguen sin promoción exacta ACTUALIZACION 2026-07-30 (barrido EPIC-028): el bloqueo de '7 rutas sin promocion' YA NO APLICA en esa magnitud — hoy hay 10 rutas OPERATIVAS en produccion gobernada (Nano Banana Pro promovido el 07-30, revision live 896a0620). Quedan 3 bloqueadas por TERCEROS (verifier de OpenAI x2, allowlist de Google x1) y 1 solo-Lab (Omni). Ninguna depende de trabajo interno. Ver EPIC-028_WIP_SWEEP_2026-07-30.md`
 - Rank: `TBD`
 - Domain: `creative|platform|data`
 - Blocked by: `none`
