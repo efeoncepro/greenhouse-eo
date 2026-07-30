@@ -67,3 +67,11 @@
   confundiría con real. Regla: "ante la duda, revela".
 - **propose → confirm → execute**: el estudio propone/produce; publicar/programar pasa
   siempre por confirmación humana.
+
+## Servicio Efeonce
+
+- **Social Media recurrente**: servicio humano `On-Going + Managed Squad + efeonce-managed`; estrategia, contenido, publicación, comunidad, listening, Social Search, medición y aprendizaje mensual.
+- **Social Search**: visibilidad y descubrimiento dentro de plataformas sociales; no equivale a SEO web ni a AEO de motores LLM.
+- **Run & Gun Studio**: capability interna de producción profesional rápida.
+- **Run & Gun Production**: servicio cotizable que usa esa capability. Paquetes: `Content Capture Day`, `Executive / Interview Capture`, `Social-First Production Sprint` y `Brand Story / Campaign Capture`.
+- **Autoridad y demanda**: diferenciador de Efeonce; convertir conocimiento, conversación y contenido social en señales medibles de consideración y demanda.

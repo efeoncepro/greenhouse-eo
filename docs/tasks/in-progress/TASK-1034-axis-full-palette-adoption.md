@@ -1,6 +1,10 @@
 # TASK-1034 — Adopción completa de la paleta AXIS en el runtime Greenhouse
 
 > **Lifecycle:** in-progress
+
+> **Cross-task update 2026-07-30:** TASK-1600 invirtió el ownership del valor de color. Este task sigue
+> siendo dueño únicamente de su Slice 5 de shadows/elevación; `src/@core/theme/axis-tokens.ts` ya no es
+> SSOT de color, sino adapter de `@efeoncepro/axis-tokens`.
 > **Creado:** 2026-06-06 por Claude (sesión con Julio)
 > **Prioridad:** P1
 > **Domain:** ui | platform | design-system | accessibility

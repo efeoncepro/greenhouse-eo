@@ -17,6 +17,8 @@ canonical source:
 - Architecture and ownership: [shared UI platform decision](../../docs/architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md).
 - Distribution and credentials: [private package runbook](../../docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
 - Current continuity and evidence: [AXIS continuity map](../../docs/operations/AXIS_CONTINUITY_MAP_2026-07-29.md).
+- Ownership decision: [AXIS ownership ADR](../../docs/architecture/EFEONCE_AXIS_DESIGN_SYSTEM_OWNERSHIP_DECISION_V1.md).
+- Color ownership cutover: [TASK-1600](../../docs/tasks/in-progress/TASK-1600-axis-color-ownership-inversion.md).
 - Foundation history and task status: [TASK-1589](../../docs/tasks/in-progress/TASK-1589-efeonce-ui-package-foundation.md) when present.
 - Release procedure: \`.codex/skills/greenhouse-production-release/SKILL.md\`.
 - Secret procedure: \`.codex/skills/greenhouse-secret-hygiene/SKILL.md\`.
@@ -25,8 +27,11 @@ canonical source:
 
 - \`@efeoncepro/axis-tokens\`, \`axis-ui-contracts\` and \`axis-ui-registry\` remain portable: no
   imports from MUI, Vuexy, Next, browser globals or product logic.
-- AXIS names semantic roles; it does not become the owner of a product brand value. Check the
-  current SSOT and drift gate before changing a token.
+- AXIS owns the portable value and semantic role; each product owns materialization in its own
+  styling engine. AXIS may publish values, never painted components or engine-specific appearance.
+- AXIS owns portable color values, semantic roles, neutral light/dark data and chart palettes. Products own
+  engine-specific materialization such as MUI's `axisSemanticPalette`, product flags and layout/painted components.
+  Brand-value changes are signed through the Greenhouse ADR/task governance before an AXIS package release.
 - Consumers use exact published versions. Never use a floating range for a release-critical
   consumer, and never repoint an existing contract id to a different shape.
 - Lifecycle promotion (\`candidate → trial → stable → deprecated → retired\`) is additive metadata.
@@ -45,6 +50,29 @@ canonical source:
 3. Keep package version, contract version and lifecycle metadata distinct.
 4. Run the AXIS repository's build, typecheck, tests and promotion gates.
 5. Record the published package version and consumer evidence in the runbook.
+
+### Color ownership cutover (TASK-1600)
+
+Treat this as a staged provenance migration, not a visual redesign:
+
+1. Slice 0: align this skill with the accepted ownership ADR.
+2. Slice 1: publish the complete portable color data in `@efeoncepro/axis-tokens@0.2.0`, preserving
+   the existing `0.1.5` roles and values.
+3. Slice 2: invert the consumer drift gate so Greenhouse proves it reflects AXIS; ship this before
+   removing the local declaration.
+4. Slice 3: make the five Greenhouse `axis-*.ts` files consume AXIS while keeping MUI materialization
+   local; no consumer import path should change.
+5. Slice 4: verify non-theme consumers, including Finance PDF and report artifacts.
+
+Slice 1 publishes explicit light/dark neutrals; products resolve the active mode. `axisSemanticPalette` remains
+local because it is MUI-shaped. Charts are portable AXIS data; product-specific subsets remain local. Do not run
+Slice 3 before Slice 2 is green. Require unchanged contrast/drift tests, GVC diffs at 1440 px and 390 px
+in light and dark, and before/after PDF comparisons. No feature flag is needed: exact package versions
+provide pull-based rollback, and `0.1.5` remains the fallback if `0.2.0` is not adopted.
+
+The boundary is: AXIS owns **what** (`#dc2e39`, semantic roles, portable data); the product owns **how**
+(`theme.palette`, Tailwind utilities, layout and painted components). The separate `axis-headless` behavior
+axis is not part of TASK-1600 and needs its own task.
 
 ### Private package consumption
 
@@ -83,6 +111,7 @@ preserve both digests and the build/credential configuration needed to reproduce
 Stop and surface the blocker when the requested change would:
 
 - put a secret in source, logs, images, lockfiles or chat;
+- move a color source or remove a local declaration before the preceding drift, visual and PDF evidence is green;
 - change a shared contract without an owning ADR/gate;
 - promote adapters beyond opt-in without product/commercial authorization;
 - require a new machine identity or external account decision not yet approved;

@@ -15,7 +15,7 @@
  * Decision: GREENHOUSE_SECONDARY_TEAL_COLOR_DECISION_V1.md.
  */
 
-import { axisRamp } from './axis-tokens'
+import { axisRamp } from '@efeoncepro/axis-tokens'
 
 export type SecondaryRole = {
   main: string

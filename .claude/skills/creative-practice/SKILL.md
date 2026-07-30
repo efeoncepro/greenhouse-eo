@@ -3,7 +3,7 @@ name: creative-practice
 description: >-
   Operador comercial de la práctica creativa de Efeonce: oferta, pricing, scope,
   SOW, descalificación, pitch, retención y expansión para marca, campaña,
-  audiovisual, Run-and-Gun, social y contenido creativo. Usar al vender o cotizar Managed
+  audiovisual, Run & Gun, social y contenido creativo. Usar al vender o cotizar Managed
   Squad, Staff Augmentation, Studio Access, On-Going, On-Demand, Sample Sprint o
   Creative Studio; al definir Studio/Globe Credits, pools, consumo por pieza,
   refunds o top-ups; y ante preguntas de rate card, retainer, derechos, buyout,
@@ -266,6 +266,20 @@ Dos cosas que el SEO no tiene y el creativo sí, y que **ninguna** de nuestras s
 🔴 **Carga solo el módulo que la tarea necesita.** `SOURCES.md` se carga **siempre** que vayas a citar un número.
 
 ---
+
+## 3.5 Contrato específico: Efeonce Social Media
+
+Cuando la solicitud sea vender, cotizar o scopear Social Media, aplica además este contrato:
+
+- **Servicio:** operación humana recurrente (`On-Going + Managed Squad + efeonce-managed`). No es un calendario de publicaciones ni un paquete por pieza.
+- **Diferenciador:** Efeonce convierte conocimiento, conversación y contenido social en un sistema medible de autoridad y demanda.
+- **Beachhead:** B2B experto con oferta compleja, responsable interno de marketing y acceso a expertos, fundadores o ejecutivos.
+- **Sinergia:** Social Search detecta preguntas, temas y entidades sociales; SEO/AEO convierte esa inteligencia en contenido web, queries, páginas y visibilidad. Coordina ambas lanes sin duplicar pricing.
+- **Producción:** **Efeonce Run & Gun Studio** es la capability interna; **Efeonce Run & Gun Production** es el servicio cotizable. Los paquetes son `Content Capture Day`, `Executive / Interview Capture`, `Social-First Production Sprint` y `Brand Story / Campaign Capture`.
+- **Globe:** no es dependencia, requisito ni promesa de disponibilidad para Social Media. Si una propuesta menciona Globe, trátalo como adaptador futuro gated; entrega el servicio con personas, herramientas y procesos disponibles hoy.
+- **Scope:** toda propuesta separa capacidad recurrente, producción especial, derechos/licencias, rondas, desplazamientos, talentos, postproducción ampliada, paid/media y crisis. Todo SOW incluye owner de aprobación, quality gates y change order.
+
+La narrativa comercial debe vender el sistema y su evidencia, no una suma de formatos. El Run & Gun es una ventaja de delivery; no convierte la producción especial en ilimitada.
 
 ## 4. Contrato de sinergias — quién manda en qué
 

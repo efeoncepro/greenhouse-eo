@@ -200,3 +200,9 @@ reemplazado: quiere ser ascendido.** Nuestro pitch *("escalamos tu equipo")* es 
 no entiende lo que hace)*. **Nosotros retenemos porque el cliente es MÁS CAPAZ con nosotros.**
 🔴 **Corolario: si el cliente nunca entra al portal, no percibe el switching cost — y en la renovación te
 compara por precio como si fueras cualquiera.**
+
+**Efeonce Run & Gun Studio** — capability interna de producción profesional rápida. No es un entregable ni un arriendo de equipo.
+
+**Efeonce Run & Gun Production** — servicio cotizable de captura y producción que usa el Studio. Se estructura en `Content Capture Day`, `Executive / Interview Capture`, `Social-First Production Sprint` y `Brand Story / Campaign Capture`, con scope, rondas, quality gates y derechos propios.
+
+**Social Media recurrente** — servicio humano `On-Going + Managed Squad + efeonce-managed` que convierte conocimiento y conversación en autoridad y demanda; no se vende por post.

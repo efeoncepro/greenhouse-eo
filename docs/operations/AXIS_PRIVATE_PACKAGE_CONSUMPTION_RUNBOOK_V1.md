@@ -9,7 +9,8 @@ source control.
 ## Current state — 2026-07-30
 
 - Package repository: `efeoncepro/axis-design-system`.
-- Private packages published at version `0.1.5`:
+- Private packages published at version `0.1.5` (was `0.1.4` until 2026-07-29; the bump corrected
+  the `warning`/`danger` token drift and was the first release gated by CI):
   - `@efeoncepro/axis-tokens`
   - `@efeoncepro/axis-ui-contracts`
   - `@efeoncepro/axis-ui-registry`
@@ -26,7 +27,7 @@ source control.
   secret-level `roles/secretmanager.secretAccessor` on that secret only.
 - The active credential is the operator-owned, short-lived `read:packages` PAT approved for this
   migration; it expires on 2026-08-28. This is the accepted interim path, not a dedicated GitHub
- machine account. Create that account before external/customer rollout and rotate the Secret
+  machine account. Create that account before external/customer rollout and rotate the Secret
   Manager version without changing the consumer contract.
 - The temporary migration PAT remains active for the current internal/production build path. The
   legacy PAT used by the former Globe Cloud Build path was revoked after production verification;
@@ -49,6 +50,20 @@ source control.
   La evidencia del piloto pasa de **local** a **CI**.
 - El rollback interno de `globe-studio-internal` y `globe-api-internal` fue ejercitado al 100%, verificado y
   restaurado correctamente durante la promoción productiva.
+
+## Delta 2026-07-30 — el release admite versionado independiente y es idempotente
+
+Los tres paquetes se versionan **de forma independiente**: `tokens` puede ir en `0.2.1` mientras
+`contracts` y `registry` siguen en `0.1.5`. Bumpear los tres por un cambio de uno publicaría versiones sin
+contenido. El contrato del tag es **"al menos un paquete está en esta versión"**, no "los tres coinciden".
+
+El paso de publish **salta las versiones que ya están en el registry** en vez de fallar. Eso permite
+re-taguear un commit ya publicado y usar el run como **verificación a posteriori** — que es lo que se hizo
+con `v0.2.1` después de que `0.2.0`/`0.2.1` se publicaran a mano durante `TASK-1600`.
+
+**NUNCA publicar a mano.** El pipeline es el que corre CI, el gate de contratos y la coherencia del tag; sin
+él, una versión llega al registry sin que nadie haya verificado su contenido. Ocurrió el 2026-07-30 y el
+síntoma fue inmediato: `0.2.0` salió sin los type aliases del adapter y hubo que publicar `0.2.1`.
 
 ## Delta 2026-07-29 — dónde vive el credencial, y dónde NO hace falta (TASK-1589 V1.1)
 
@@ -163,7 +178,12 @@ file. Never add the resolved token to git, a deployment artifact or a log.
 
 ## Vercel
 
-For a Vercel consumer, configure the project environment variable `NPM_RC` with the
+⚠️ **This section does NOT apply to the AXIS Lab.** The Lab is a workspace member and resolves
+AXIS through `workspace:*` links, so it needs no registry credential at all — its `NPM_RC` is
+being retired (see the Delta above). What follows applies only to a Vercel project that consumes
+the **published** packages from outside the AXIS workspace.
+
+For such a Vercel consumer, configure the project environment variable `NPM_RC` with the
 `.npmrc` contents and select only the required environments (`Preview` first, then
 `Production` after a successful canary). Vercel must receive an organization-owned
 PAT classic with `read:packages` only; do not use a personal deployment token.

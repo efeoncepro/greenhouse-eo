@@ -1,5 +1,21 @@
 # Overlay Efeonce / Greenhouse — índice (social-media-studio)
 
+## Contrato vigente de Social Media
+
+El servicio comercial vigente es una operación humana recurrente, operada por un squad Efeonce. Su diferenciador es convertir conocimiento, conversación y contenido social en autoridad y demanda medibles, con foco inicial en B2B experto.
+
+### Run & Gun: capability vs servicio
+
+- **Efeonce Run & Gun Studio:** capability interna de producción profesional rápida, con equipo, crew, captura, sonido, iluminación, movilidad, edición y postproducción.
+- **Efeonce Run & Gun Production:** servicio cotizable que define objetivo, jornada, equipo, entregables, rondas, derechos y fecha de entrega.
+- **Paquetes:** `Content Capture Day`, `Executive / Interview Capture`, `Social-First Production Sprint` y `Brand Story / Campaign Capture`.
+
+Run & Gun es una ventaja de delivery, no producción ilimitada incluida en el retainer. Jornadas, viajes, talentos, derechos, licencias, postproducción ampliada y campañas extraordinarias requieren SOW y economics propios.
+
+### Globe no es dependencia
+
+La operación actual debe funcionar con personas, herramientas y procesos disponibles sin Globe. `CLIENT_DELIVERY.md` conserva un adaptador futuro para clientes internacionales, pero no debe leerse como disponibilidad de Globe ni como requisito para vender o ejecutar Social Media.
+
 > Aterriza el conocimiento portable de social media en el ecosistema real de Efeonce.
 > Lo genérico vive en `../modules/`; aquí van los mapeos, boundaries, herramientas y paths
 > reales. **Reverifica el estado en el repo y en las plataformas** (todo cambia rápido).
@@ -9,7 +25,7 @@
 ## Cuándo usar este overlay
 
 Cuando el trabajo social toca los canales propios de Efeonce (marca, Think/Glitch/grader) o
-la operación para un cliente Globe. Para social genérico basta `../modules/`.
+la operación para un cliente internacional futuro. Para Social Media actual basta `../modules/`; Globe no es dependencia.
 
 ## Archivos del overlay
 
@@ -17,7 +33,7 @@ la operación para un cliente Globe. Para social genérico basta `../modules/`.
 |---|---|
 | `STUDIO_TOOLING.md` | El pipeline real de ejecución: Metricool + Higgsfield + AI-image + Figma/Express + hand-offs. |
 | `SOCIAL_BOUNDARY.md` | La costura completa vs digital-marketing / growth-marketing-cro / copywriting / seo-aeo / efeonce-agency / generadores. Regla de precedencia. |
-| `CLIENT_DELIVERY.md` | Social as-a-service para clientes Globe: multi-marca, aprobaciones, reporting cliente. |
+| `CLIENT_DELIVERY.md` | Adaptador futuro para clientes internacionales: multi-marca, aprobaciones y reporting. No implica disponibilidad de Globe. |
 
 ## Ecosistema digital Efeonce (SSOT: `docs/public-site/decisions/PDR-003`)
 

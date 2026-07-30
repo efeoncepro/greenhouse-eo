@@ -7,6 +7,35 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-30 — TASK-1600: ownership de color transferido a AXIS
+
+- AXIS publica la paleta portable completa y Greenhouse consume `@efeoncepro/axis-tokens@0.2.1` mediante adapters; `0.2.0` queda como publicación manual histórica y `v0.2.1` fue regularizada con el pipeline gobernado (`30525304584`, success), incluyendo publish idempotente.
+- GVC staging pasó rampas light en 1440/390, captura dark real en 1440/390 y dos capturas repetidas fueron pixel-identical; queda una diferencia de altura del full-page histórico pendiente de aprobación/re-baseline.
+- Finance PDF y report-artifact comparados contra el parent commit: raster diff 144 dpi = 0 píxeles. Rollback rehearsal sobre `0.1.5` pasó 43 tests.
+
+## 2026-07-29 — Social Media: modelo de negocio y Product Service V1
+
+- Se documentó Social Media como servicio recurrente humano y gestionado por personas, con estrategia, contenido,
+  publicación, community management, escucha, reporting y aprendizaje.
+- Se añadieron el Product Service Contract, Business Model y Pricing Integrity Pack con packaging por capacidad,
+  hipótesis de bandas, economics, guardrails y gates de validación.
+- Se añadió el benchmark comercial [`Social Media Service Market Research`](docs/audits/commercial/SOCIAL_MEDIA_SERVICE_MARKET_RESEARCH_2026-07-29.md), con agencias globales, Chile/LATAM, tendencias, patrones de venta, pricing público y confidence/limitaciones.
+- Se añadió el [`Social Media Subservices Catalog V1`](docs/services/creative-services/EFEONCE_SOCIAL_MEDIA_SUBSERVICES_CATALOG_V1.md), que detalla dirección, editorial, contenido, publishing, community, listening, trendjacking, social search, measurement, activaciones y fronteras con otras líneas.
+- Se documentó [`Search + Social Visibility Composition V1`](docs/business-models/search-visibility-360/SEARCH_SOCIAL_VISIBILITY_COMPOSITION_V1.md) como composición propuesta entre Search Visibility 360 y Social Media, con workflow compartido, RACI, wedges, economics separados y gates para evaluar un futuro Product Service compuesto.
+- Se añadió el [`Social Media Operating Model`](docs/services/creative-services/EFEONCE_SOCIAL_MEDIA_OPERATING_MODEL_V1.md), con squad, capacidad, onboarding, cadence, SLA, community/care, crisis y fallbacks.
+- Se añadió el [`Social Media Customer Model Integrity Pack`](docs/business-models/creative-services/EFEONCE_SOCIAL_MEDIA_CUSTOMER_MODEL_INTEGRITY_PACK_V1.md), con beachhead B2B experto, buying group, anti-ICP, triggers y motion de validación.
+- Se añadió el [`Search + Social Measurement Contract`](docs/business-models/search-visibility-360/SEARCH_SOCIAL_MEASUREMENT_CONTRACT_V1.md), con Social Search, ownership, instrumentación, confidence y gates contra claims causales.
+- Se añadió un [`Pricing Validation Addendum`](docs/business-models/creative-services/EFEONCE_SOCIAL_MEDIA_PRICING_VALIDATION_ADDENDUM_2026-07-29.md) con ladder revisada, escenarios de economics y condiciones comerciales de prueba; sigue sujeto a Finance.
+- Se documentó el [`Differentiation & Positioning V1`](docs/business-models/creative-services/EFEONCE_SOCIAL_MEDIA_DIFFERENTIATION_POSITIONING_V1.md): autoridad y demanda, Social + Search, squad gobernado, transparencia, enemigo commodity, proof system y claims permitidos.
+- Se incorporó **Efeonce Run & Gun Studio** como ventaja real de delivery de Social Media: equipos profesionales, captura en terreno y producción social-first componible con SOW, derechos y economics propios.
+- Se creó [`Efeonce Run & Gun Production — Offer V1`](docs/services/creative-services/EFEONCE_RUN_AND_GUN_PRODUCTION_OFFER_V1.md) con Content Capture Day, Executive/Interview Capture, Social-First Production Sprint y Brand Story/Campaign Capture; la capability se normalizó como Efeonce Run & Gun Studio.
+- Globe / Creative Studio quedó explícitamente fuera de la promesa y pricing base actual; Paid Social, Creator/UGC
+  y Producción Especial quedaron como módulos separados.
+- Estado honesto: `Approved for validation`; no habilita precios públicos ni venta self-serve.
+
+La continuidad consolidada de esta sesión y el índice histórico mensual quedan reflejados en [`Handoff.md`](Handoff.md)
+y [`docs/changelog/internal/2026-07.md`](docs/changelog/internal/2026-07.md).
+
 ## 2026-07-29 — Release Cloud Build: autenticación privada AXIS en workers
 
 - El release orchestrator `30465872005` reveló `ERR_PNPM_FETCH_401` en los builds Cloud Run de `ops-worker`,
@@ -636,72 +665,3 @@ fuente de verdad. Nada autenticado se cachea, verificado path por path.
   y Search Visibility 360 sin inventar datos financieros o de tracción.
 - Se redactó la arquitectura canónica de modelos de negocio: corporativo, plataforma, capability/oferta,
   packaging y submodelos, con ownership, gates y reglas de consolidación.
-
-## 2026-07-25 — Cutover del share board de Globe: LIVE, y las dos precondiciones que faltaban (TASK-1558 Slice 3 + TASK-1562)
-
-- **El share board nuevo esta sirviendo.** `client_app_enabled` en `true`, revision
-  `globe-studio-internal-00071-6vp`, imagen `85dac33b03b1`. La pagina paso de 6.095 bytes de HTML
-  concatenado a 2.446 de shell, el rotulo interno `Producer` desaparecio del DOM servido, y el footer
-  existe por primera vez.
-- **Precondicion 1: el flag estaba declarado y conectado a NADA.** `grep -rn client_app_enabled
-  infra/terraform/*.tf` devolvia **una sola linea**, su propia declaracion. Cambiar su default a `true`
-  habria producido un **plan vacio**: el env var nunca llegaba al contenedor, y el cutover habria quedado
-  como un commit que dice "prendido" con produccion sirviendo lo viejo — el modo de falla de
-  `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED`, donde el ledger decia ON y la realidad era OFF.
-  **Heuristica reutilizable:** si el grep de un flag devuelve una sola linea, esa linea es su declaracion
-  y no esta cableado; un flag conectado aparece al menos dos veces.
-- **Precondicion 2: la imagen desplegada era anterior incluso a TASK-1556**, o sea sin bundle y sin leer
-  esa variable. Otra sesion habia reportado que "lo unico que quedaba era el flip"; verificado contra el
-  runtime, faltaban tres cosas.
-- **La cadena se ejecuto en el orden que importa:** cablear (revision `00069`, flag en `false`) → hidratar
-  la proyeccion → desplegar (revision `00070`, **share board todavia legacy con el flag OFF**, o sea el
-  strangler verificado en vivo y no afirmado) → flip (revision `00071`). Los dos planes: `0 to add,
-  1 to change, 0 to destroy`, sin replace de Cloud Run.
-- **TASK-1562 — la proyeccion del share dejaba el panel vacio en produccion.** `resolveForShare` devolvia
-  `{ target, mediaType }`, y `project()` solo emite un field si el grant lo autoriza **y** la fuente lo
-  trae: `modelLabel`, `reviewStatus` y `comments` se descartaban en **todos** los shares, aunque el
-  Producer pide los cuatro fields y el operador puede crear los comentarios. Nada fallaba y nada loggeaba.
-- **El nombre del modelo sale del catalogo, no del intento.** `attempt.model` es el modelId —el valor que
-  `model-readiness` compara contra `route.modelId`— y es un identificador de wire; `RouteModelIdentityV1`
-  del catalogo es el ancla publica con drift guards que rechazan cualquier cosa con forma de slug. Leerlo
-  del intento habria shippeado el slug a una superficie cliente, que es lo que ADR-003 prohibe.
-- **Reglas de audiencia client:** los comentarios borrados se descartan (`getThread` sirve el hilo interno,
-  donde un borrado es historial; para un cliente es algo que alguien retiro); orden ascendente por
-  `createdAt` y tope de 20 conservando el **comienzo**, porque los ultimos veinte de un hilo largo son
-  decisiones sin premisa; y el hilo degrada solo — store caido cuesta el panel, nunca la pieza.
-- **Verificacion en vivo contra el front door real**, 3 anchos (1440, 390 y **320**, el piso de WCAG
-  1.4.10): estado terminal correcto, un solo `role="alert"`, Reintentar ausente donde no aplica, fuentes de
-  Globe cargadas, `scrollWidth <= clientWidth`, cero fuga en el DOM servido, axe **0 violations**, y la CSP
-  de produccion sin rechazar nada.
-- **Lo que NO se verifico, y por que importa:** el estado `ready` con un **grant real**. Crear uno exige
-  sesion interna en el Producer sobre un output existente y no es alcanzable headless. Es el unico punto
-  pendiente del runbook, y es exactamente la razon por la que `TASK-1560` (retiro de `public-share-ui.ts`)
-  sigue bloqueada: ADR-014 exige cobertura equivalente en runtime antes de retirar lo viejo.
-- Rollback vigente: `default = false` + `tofu apply`, <10 min, y vuelve `public-share-ui.ts` intacto
-  porque no se retiro.
-
-## 2026-07-25 — Globe: el CDN de assets es lo único que cambió en runtime; el payload cliente NO está servido
-
-- **Cambio real en runtime — `TASK-1557` (cerrada):** Cloud CDN path-scoped sobre `/assets/*` en
-  `globe.efeoncepro.com`, **aplicado y verificado en vivo** (hits del edge). Nada autenticado se cachea, y el
-  invariante quedó como test (`front-door-contract.test.ts`) en vez de comentario. Detalle:
-  [`GLOBE_RUNTIME_HANDOFF.md`](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md).
-- 🔴 **El share board y el payload cliente NO cambiaron nada para ningún usuario.** `TASK-1556` (foundation) y
-  `TASK-1558` Slices 1-2 están en `main` de `efeonce-globe`, pero **ninguna superficie sirve sobre el payload
-  nuevo**: el cliente externo sigue viendo `public-share-ui.ts`, el template viejo. Es construcción, no entrega.
-- **Se corrigió una creencia equivocada: el cutover no es "un `tofu apply`".** `client_app_enabled` no estaba
-  cableado a ningún recurso (aparecía sólo en su propia declaración) y la imagen desplegada del shell
-  (`45235ccb62ca`) es anterior a `TASK-1556`, así que no lee la variable. El flip solo habría dado plan vacío y
-  producción idéntica — el modo de falla de `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED`. La cadena real (cablear →
-  `TASK-1562` → deploy con **autorización humana** → flip + apply → verificar con grant real → retirar legacy)
-  vive en [`operar-share-board-globe.md`](docs/manual-de-uso/creative-studio/operar-share-board-globe.md) **v1.1**;
-  la v1.0 afirmaba lo contrario.
-- **`TASK-1562` reclasificada:** `resolveForShare` descarta en silencio `modelLabel`/`reviewStatus`/`comments`
-  en todos los shares de producción, aunque el grant los pide y el dominio los proyecta. Es un bug con impacto
-  de cliente, no una condición estética del cutover.
-- **Cierres documentales:** `TASK-1554` (reader de flota de modelos) cerró con doc funcional
-  [`efeonce-globe-producer-flota-modelos.md`](docs/documentation/creative-studio/efeonce-globe-producer-flota-modelos.md)
-  y manual [`operar-flota-modelos-producer-globe.md`](docs/manual-de-uso/creative-studio/operar-flota-modelos-producer-globe.md).
-  `TASK-1561` cerró el gate de diseño (tipografía + frontera declarada). El selector de modelo del Producer
-  (`TASK-1555`) quedó como desplegable compacto con isotipo real: la galería se implementó y el operador la
-  rechazó al verla. Nuevas: `TASK-1559`, `TASK-1560`, `TASK-1562`.

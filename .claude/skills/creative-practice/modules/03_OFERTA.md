@@ -273,7 +273,7 @@ Lo que está roto es cómo lo cobramos.**
 | **Campaign & Creative Platform Systems** | On-Demand · Managed Squad | **Concepto, plataforma, KV, mensajes, toolkit, canales, adaptaciones, territorio y uso** | `design-studio` · `copywriting` |
 | **Content & Social Operations** | 🎯 **On-Going** *(capacidad recurrente)* | **Grilla, cadencia, formatos, aprobador, QA y capacidad; nunca precio por post** | `social-media-studio` · `copywriting` · `content-marketing-studio` |
 | **Audiovisual, Motion & Audio Production** | On-Demand · Managed Squad | **Rondas sobre el corte, derechos, formatos, finishing, audio, uso en pauta y pass-through** | `motion-design-studio` · `audio-studio` |
-| **Run-and-Gun Production** | On-Demand · Managed Squad | **Setup, crew, jornada, locación, talentos, permisos, captura, backup, post, derechos y contingencia** | `motion-design-studio` · `audio-studio` |
+| **Run & Gun Production** | On-Demand · Managed Squad | **Setup, crew, jornada, locación, talentos, permisos, captura, backup, post, derechos y contingencia** | `motion-design-studio` · `audio-studio` |
 | **Managed Creative Capacity** | 🎯 **On-Going** *(Managed Squad)* | **Capacity envelope, lanes, prioridades, RACI, SLA/expectations y telemetría** | `greenhouse-talent-people-operator` + studios especializados |
 | **AI Creative Operations / Studio Access** | On-Going · Studio Access · Pilot | **Workspace, memoria, provenance, providers, créditos, governance y límites; Globe potencia, no reemplaza la línea** | `greenhouse-globe` · studios especializados |
 | **Creative Diagnostic** | 🎯 Entrada / Diagnostic | **Baseline de marca, contenido, capacidad u operación; propone la siguiente fase, no la sustituye** | `modules/06_CUNA.md` |
@@ -283,9 +283,9 @@ hipótesis y aprendizaje creativo conectado con medios. `Experience/Product/CX` 
 producto, web o tecnología. `Editorial Content & SEO` compone con Search Visibility hasta resolver ownership y
 pricing. Ninguna de estas composiciones crea una nueva línea de Creative Services por sí sola.
 
-### Run-and-Gun: capability versus servicio
+### Run & Gun: capability versus servicio
 
-**Run-and-Gun Production** es el servicio que compra el cliente. **Run-and-Gun Studio** es la capability de
+**Run & Gun Production** es el servicio que compra el cliente. **Efeonce Run & Gun Studio** es la capability de
 infraestructura, equipo y crew que permite entregarlo. No es Globe ni una product brand por defecto.
 
 Candidatos de packaging para validación: `Content Capture Day`, `Interview / Podcast Capture`, `Social-First
@@ -316,6 +316,16 @@ Si es *cuánto vale, qué incluye y hasta dónde llega* → **es de acá.**
     implementación/IP y derechos/pass-through.
 
 ---
+
+## 7.1 Servicio específico: Social Media + Run & Gun
+
+Para Social Media, la oferta base es una operación humana recurrente con Managed Squad; no es un catálogo de posts.
+
+El diferenciador es convertir conocimiento, conversación y contenido social en autoridad y demanda medibles, especialmente para B2B experto. Social Search se coordina con SEO/AEO mediante un mapa compartido de temas, entidades y preguntas, manteniendo ownership y pricing separados.
+
+La capability de producción se nombra **Efeonce Run & Gun Studio**. El servicio que se cotiza se nombra **Efeonce Run & Gun Production**, con cuatro paquetes: `Content Capture Day`, `Executive / Interview Capture`, `Social-First Production Sprint` y `Brand Story / Campaign Capture`.
+
+Globe no es una dependencia ni una condición de venta. Si se requiere producción, se debe scopear por jornada/sprint, assets, rondas, quality gates, derechos, movilidad, talentos y postproducción; nunca asumir que el retainer incluye producción ilimitada.
 
 ## → Siguiente
 

@@ -60,7 +60,8 @@ persistencia o jobs.
 ## Estado verificable de distribución, autenticación y adapters — 2026-07-30
 
 - Los paquetes privados publicados en GitHub Packages son `@efeoncepro/axis-tokens`,
-  `@efeoncepro/axis-ui-contracts` y `@efeoncepro/axis-ui-registry`, versión `0.1.5`.
+  `@efeoncepro/axis-ui-contracts` y `@efeoncepro/axis-ui-registry`; AXIS tokens está en `0.2.1`
+  (compatibilidad funcional de `0.2.0` más aliases de tipos públicos).
 - Los repositorios `efeoncepro/greenhouse-eo` y `efeoncepro/efeonce-globe` tienen acceso
   `Read` configurado en GitHub Actions para los tres paquetes.
 - El proyecto Vercel independiente `axis-design-system-lab` ya no tiene `NPM_RC`: el Lab
@@ -102,9 +103,9 @@ la misma pregunta: **quién es dueño del valor, y qué lo detecta cuando alguie
 
 ### (a) Dirección del SSOT de tokens — decidida, y **cuestionada el mismo día**
 
-> ⚠️ **Esta sub-decisión quedó parcialmente invertida por
+> ✅ **Esta sub-decisión quedó supersedida en la propiedad del valor por
 > [`EFEONCE_AXIS_DESIGN_SYSTEM_OWNERSHIP_DECISION_V1.md`](EFEONCE_AXIS_DESIGN_SYSTEM_OWNERSHIP_DECISION_V1.md)
-> (`Proposed`, 2026-07-29).** Lo de abajo describe el estado implementado y sigue siendo correcto como
+> (`Accepted — eje 1 implementado`, 2026-07-30).** Lo de abajo describe el estado histórico y
 > descripción del runtime de hoy; lo que cambia es el destino. El razonamiento aquí —*"AXIS no puede
 > importar de Greenhouse → entonces Greenhouse es el dueño"*— tiene premisa correcta y **conclusión no
 > derivada**: la tercera opción (mover el dato a AXIS y que Greenhouse lo consuma) no se evaluó, y los
@@ -114,9 +115,9 @@ la misma pregunta: **quién es dueño del valor, y qué lo detecta cuando alguie
 `@efeoncepro/axis-tokens` y `src/@core/theme/axis-tokens.ts` cargaban los mismos valores de marca bajo
 el mismo nombre, **sin relación declarada**. Coincidían porque alguien los tecleó dos veces.
 
-**Decisión:** el **valor** de marca lo posee Greenhouse (`axisRamp` + `axisSemanticHex`). AXIS publica un
-**subconjunto portable** de esos valores bajo nombres de rol estables. **AXIS nombra roles; nunca es autor
-de un valor de marca.**
+**Decisión histórica, supersedida por TASK-1600:** el **valor** de marca lo poseía Greenhouse (`axisRamp` +
+`axisSemanticHex`). AXIS publicaba un subconjunto portable. El estado vigente es AXIS como dueño de los
+valores portables y Greenhouse como adapter.
 
 La derivación **no puede ser mecánica**: el paquete debe permanecer runtime-agnóstico e instalable por
 Globe, que no tiene MUI. Un generador cross-repo acoplaría el build de Greenhouse al de AXIS y volvería a
@@ -232,8 +233,8 @@ rotación —el modo de falla real observado— a cambio de aislar un riesgo de 
 
 ### Hard rules
 
-- **NUNCA** un valor de marca se declara en `@efeoncepro/axis-tokens`. El valor vive en `axisRamp` /
-  `axisSemanticHex`; AXIS publica el rol que lo referencia.
+- **Vigente:** los valores portables de marca se declaran una sola vez en `@efeoncepro/axis-tokens`.
+  Greenhouse no redeclara esos valores; sus cinco `axis-*.ts` son adapters y materializaciones locales.
 - **NUNCA** promover `candidate → stable` cambiando la forma del contrato. Promoción es metadato aditivo;
   cambiar la forma es `version` mayor (reemplaza) o `id` nuevo (coexiste). Re-apuntar un `id` es
   substitución prohibida.

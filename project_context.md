@@ -7,6 +7,12 @@ TypeScript. Este archivo contiene solo contratos durables y rutas de descubrimie
 rollout o bloqueo vive en [Handoff.md](Handoff.md); la historia pre-2026-07-19 quedó preservada en
 [`docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`](docs/operations/agent-context-history/2026-07-19/project_context.legacy.md).
 
+La migración de consumo privado de AXIS está cerrada para la operación interna/producción: el secreto activo
+vive en `efeonce-group`, el secreto legacy de `efeonce-globe` fue eliminado y el PAT legacy fue revocado. El
+PAT temporal aprobado para la migración permanece activo hasta su sustitución por una identidad de máquina
+antes del rollout externo. El release productivo `30502476429` y el rollback ejercitado están documentados en
+[`AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
+
 El payload React activo de Efeonce Globe (`../efeonce-globe`) usa Tailwind v4 como pipeline único de estilos:
 composer, shell, diálogos, feed, viewer, share board, primitives y capas base/motion están absorbidos por el
 payload Tailwind. El renderer vanilla y `producerStyles` permanecen sólo como fallback de rollout hasta
@@ -69,7 +75,8 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 | Cómo evaluar el portafolio de partners/providers de IA | `.codex/skills/efeonce-business-model-operator/SKILL.md` + `.codex/skills/efeonce-customer-model-operator/SKILL.md` + audit comercial fechado; economics y routing directo/Fal en `design-studio` y `motion-design-studio` |
 | Qué es un Product Service y cómo separar oferta, productización, delivery, operación y engagement | `docs/business-models/EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md` |
 | Cómo se relacionan los modelos corporativo, portfolio, capability, packaging y submodelo | `docs/business-models/EFEONCE_BUSINESS_MODEL_ARCHITECTURE_V1.md` |
-| Cómo se estructura y vende Creative Services, incluido Run-and-Gun y sus composiciones | `docs/services/creative-services/README.md` + `.codex/skills/creative-practice/modules/03_OFERTA.md` |
+| Cómo se estructura y vende Creative Services, incluido Efeonce Run & Gun Studio/Production y sus composiciones | `docs/services/creative-services/README.md` + `.codex/skills/creative-practice/modules/03_OFERTA.md` + `.codex/skills/creative-practice/efeonce/EFEONCE_OVERLAY.md` |
+| Cómo se estructura, vende y opera Social Media, incluido el beachhead B2B experto, Social Search + SEO/AEO y el squad humano | `docs/business-models/creative-services/EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md` + `docs/services/creative-services/EFEONCE_SOCIAL_MEDIA_PRODUCT_SERVICE_CONTRACT_V1.md` + `.codex/skills/social-media-studio/SKILL.md` |
 | Cómo se estructura y vende Media & Distribution, sus tres soluciones, Performance & Commerce, capacidades de delivery, Influencers/UGC y el rol de Reach | `docs/services/media-distribution/README.md` + `docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md` + `docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md` + `docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md` + `docs/audits/commercial/CREATOR_INFLUENCE_CONTENT_MARKET_RESEARCH_2026-07-29.md` + `docs/audits/commercial/CREATOR_INFLUENCE_PERFUME_ATHLETES_CHILE_SIMULATION_2026-07-29.md` |
 | Cómo se estructura y vende RevOps & CRM/HubSpot, y cómo usar los brochures comerciales como insumo sin volverlos canon | `docs/services/hubspot-as-a-service/README.md` + `docs/audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md` + skills `hubspot-as-a-service` y `hubspot-solutions-partner` |
 | Cómo funcionan partnerships/providers, licencias, co-selling, capability enablement y captura de valor en Efeonce | `docs/business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md` + `docs/audits/commercial/AI_PARTNER_PROGRAM_APPLICATIONS_2026-07-26.md` + `efeonce-business-model-operator` |
