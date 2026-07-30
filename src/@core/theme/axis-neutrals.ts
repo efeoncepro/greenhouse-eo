@@ -37,7 +37,7 @@
  * is intentionally not part of these fragments.
  */
 
-import { axisNeutral } from './axis-tokens'
+import { axisNeutral } from '@efeoncepro/axis-tokens'
 
 /** Neutral customColors keys this layer owns (surface + text mirrors). */
 type NeutralCustomColors = {

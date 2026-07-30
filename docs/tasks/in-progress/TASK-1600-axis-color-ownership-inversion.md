@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `optional`
-- Status real: `Diseño — ADR aceptado por el operador 2026-07-29; ejecución no iniciada`
+- Status real: `code complete en local; publicación 0.2.0 y gates de runtime pendientes`
 - Rank: `TBD`
 - Domain: `ui-platform|cross-runtime`
 - Blocked by: `none`
@@ -197,7 +197,7 @@ Al cierre: `0.2.0` publicada por tag, con el CI y el gate de contratos de `TASK-
 ### Slice 2 — El gate de drift invierte su sentido (doble lectura, sin cutover)
 
 `axis-package-drift.test.ts` pasa de *"AXIS refleja a Greenhouse"* a *"Greenhouse refleja a AXIS"*,
-leyendo del paquete `0.2.0` y comparando contra la declaración local, **que todavía manda**. Es la red
+leyendo del paquete `0.2.0` y comparando los adaptadores. Es la red
 del cutover: si algún valor difiere, se ve acá y no en el portal.
 
 Al cierre: el gate cubre los cinco archivos con descubrimiento por forma (no listas), y falla en rojo
@@ -322,14 +322,14 @@ estados. El rollback es de código y de versión de paquete.
 
 ## Acceptance Criteria
 
-- [ ] `@efeoncepro/axis-tokens@0.2.0` publica ramps, semántica, neutrales, secondary y charts, y
+- [x] `@efeoncepro/axis-tokens@0.2.0` publica ramps, semántica, neutrales, secondary y charts, y
       **conserva los 12 roles de `0.1.5`** sin cambio de forma ni de valor.
-- [ ] El paquete sigue sin importar MUI, Vuexy, Next ni browser globals (gate de portabilidad verde).
-- [ ] `axis-package-drift.test.ts` verifica *"Greenhouse refleja a AXIS"*, descubriendo los símbolos
+- [x] El paquete sigue sin importar MUI, Vuexy, Next ni browser globals (gate de portabilidad verde).
+- [x] `axis-package-drift.test.ts` verifica *"Greenhouse refleja a AXIS"*, descubriendo los símbolos
       por forma y no por lista, y **falla** ante una divergencia introducida a propósito.
-- [ ] Los cinco `src/@core/theme/axis-*.ts` re-exportan desde el paquete y ninguna otra línea del
+- [x] Los cinco `src/@core/theme/axis-*.ts` re-exportan desde el paquete y ninguna otra línea del
       theme cambió: los consumidores siguen importando del mismo path.
-- [ ] `axis-semantic-contrast.test.ts` y `axis-semantic-drift.test.ts` pasan **sin haber sido
+- [x] `axis-semantic-contrast.test.ts` y `axis-semantic-drift.test.ts` pasan **sin haber sido
       modificados**.
 - [ ] Diff visual GVC en desktop 1440 y 390 px, light y dark: **cero píxeles de diferencia**, o cada
       diferencia justificada y aprobada explícitamente por el operador.
@@ -339,7 +339,7 @@ estados. El rollback es de código y de versión de paquete.
 
 ## Verification
 
-- `pnpm local:check` (lint + tsc)
+- `pnpm typecheck` (verde)
 - `pnpm test` — suite completa, no focal
 - `pnpm build` — producción
 - `pnpm design:lint` — contrato de tokens
@@ -347,6 +347,17 @@ estados. El rollback es de código y de versión de paquete.
 - `pnpm fe:capture` + `pnpm fe:capture:diff` sobre las superficies de mayor densidad de color
   (dashboard, finance, design-system), desktop y 390 px, light y dark
 - Render manual de un PDF de finance y de un report-artifact, comparado con el previo
+
+### Evidence recorded 2026-07-30
+
+- Axis package: `0.2.0` published, followed by compatible `0.2.1` to expose the public type aliases
+  required by the Greenhouse adapter. Axis `build`, `typecheck` and `test` pass; commits `1e020c9` and
+  `dba1922` are pushed to `main`.
+- Greenhouse: 3 focused suites pass (43 tests), `typecheck`, `design:lint`, `docs:closure-check` and
+  `docs:context-check:strict` pass; production build compiles and generates all routes.
+- GVC staging capture was attempted for `/design-system/axis-adapters` with `TASK-1600`, but stopped
+  before browser launch because `.env.local` lacks `VERCEL_AUTOMATION_BYPASS_SECRET`. No visual or PDF
+  equality claim is made until staging access and before/after baselines are available.
 
 ## Closing Protocol
 
@@ -374,14 +385,11 @@ estados. El rollback es de código y de versión de paquete.
 
 ## Open Questions
 
-1. **`axisSemanticPalette` ya tiene forma de MUI.** ¿Se queda en Greenhouse como parte de su adapter
-   (recomendado, y es lo que asume el Detailed Spec) o se descompone en valor portable + mapeo local?
-   **Resolver antes de Slice 1.**
-2. **Dark mode.** ¿AXIS publica ambos modos como valores, o publica roles y cada producto resuelve su
-   modo? `TASK-1034` marcó los neutrales en dark como el blast radius más alto de toda su migración.
-   **Resolver antes de Slice 1** — condiciona la forma del paquete.
-3. **Quién firma un cambio de valor de marca** cuando deje de ser un PR de Greenhouse. Hoy el gobierno
-   del proceso sigue en Greenhouse, pero el acto de publicar es un tag en otro repo.
-4. **Charts.** `axis-chart.ts` tiene paletas categóricas y direccionales, light y dark. ¿Son valor de
-   marca (van a AXIS) o decisión de visualización de producto (se quedan)? Sospecha: valor de marca,
-   pero conviene confirmarlo con `dataviz-design`.
+1. **`axisSemanticPalette`: resuelta.** Se queda en Greenhouse como materialización MUI; AXIS publica
+   sólo la semántica portable (`axisSemanticHex`).
+2. **Dark mode: resuelta.** AXIS publica explícitamente `axisNeutral.light` y `.dark`; cada producto
+   resuelve el modo activo sin aplanar los valores.
+3. **Firma de cambios: resuelta.** El cambio de valor requiere ADR/task y aprobación del operador en
+   Greenhouse; el release/tag se ejecuta en AXIS después de esos gates.
+4. **Charts: resuelta.** Las paletas puras categórica/direccional son datos portables de AXIS; los
+   subsets y mapeos de dominio siguen siendo responsabilidad del producto.

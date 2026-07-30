@@ -310,7 +310,7 @@
     "@emotion/styled": "11.14.1",
     "@efeonce-globe/contracts": "file:vendor/efeonce-globe/efeonce-globe-contracts-0.0.1.tgz",
     "@efeonce-globe/sdk": "file:vendor/efeonce-globe/efeonce-globe-sdk-0.1.1.tgz",
-    "@efeoncepro/axis-tokens": "0.1.5",
+    "@efeoncepro/axis-tokens": "0.2.1",
     "@efeoncepro/axis-ui-contracts": "0.1.5",
     "@efeoncepro/axis-ui-registry": "0.1.5",
     "@flaticon/flaticon-uicons": "^3.3.1",

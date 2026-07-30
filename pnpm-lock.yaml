@@ -30,8 +30,8 @@ importers:
         specifier: file:vendor/efeonce-globe/efeonce-globe-sdk-0.1.1.tgz
         version: file:vendor/efeonce-globe/efeonce-globe-sdk-0.1.1.tgz(@efeonce-globe/contracts@file:vendor/efeonce-globe/efeonce-globe-contracts-0.0.1.tgz)
       '@efeoncepro/axis-tokens':
-        specifier: 0.1.5
-        version: 0.1.5
+        specifier: 0.2.1
+        version: 0.2.1
       '@efeoncepro/axis-ui-contracts':
         specifier: 0.1.5
         version: 0.1.5
@@ -837,8 +837,8 @@ packages:
     peerDependencies:
       '@efeonce-globe/contracts': 0.0.1
 
-  '@efeoncepro/axis-tokens@0.1.5':
-    resolution: {integrity: sha512-jQ4GgKrWFUx9n/tN51dXGzvfkYee6tOMUHWBw2zKWcUsH5XoBb/adxtCbzPAcT6kUUyoYn2Ls5F4CkzOso2uuA==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-tokens/0.1.5/83b7ffaf801fcd05ca7feb0697ee5e7092809676}
+  '@efeoncepro/axis-tokens@0.2.1':
+    resolution: {integrity: sha512-d41QjC7ZUwIEAP6rYjTCegJy3lvEwYWMZ+z0QIgHUJzs35xnWWdncxnQk9CrihA6VIHyT7+rXV3DkSvkV0/loQ==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-tokens/0.2.1/e7d8e3d6d2f62a9abb3d696ea3c777ac94335c8a}
 
   '@efeoncepro/axis-ui-contracts@0.1.5':
     resolution: {integrity: sha512-nqo3+Pv+5/UYwRHVVz6uSZ477DmZI1UgcxdfrD9T5FciYDHu3X4hndpM2yhXoJkUgs1g6ahLPutSUP+5vE49ZQ==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-ui-contracts/0.1.5/73f70a021cd3d1617cba03c43841a16336f28b6e}
@@ -10864,7 +10864,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@efeoncepro/axis-tokens@0.1.5': {}
+  '@efeoncepro/axis-tokens@0.2.1': {}
 
   '@efeoncepro/axis-ui-contracts@0.1.5': {}
 

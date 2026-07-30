@@ -20,7 +20,7 @@
  *   blanco (blanco sobre amber falla; INK pasa ~8:1). contrastText = INK solo aquí.
  */
 
-import { axisRamp } from './axis-tokens'
+import { axisRamp, axisSemanticHex } from '@efeoncepro/axis-tokens'
 
 /** AXIS dark text ink (`#2f2b3d`) — AA contrastText for bright semantic fills. */
 const INK = '#2f2b3d'
@@ -55,12 +55,7 @@ type SemanticRole = {
  * (success #157f47 5.05:1, info #1f6fd4 4.9:1, error #dc2e39 4.6:1) → main = ramp[500]
  * uniforme (sin la desviación a error-800). warning sigue traffic-sign (texto OSCURO).
  */
-export const axisSemanticHex = {
-  success: axisRamp.success[500],
-  warning: axisRamp.warning[500],
-  error: axisRamp.error[500],
-  info: axisRamp.info[500]
-} as const satisfies Record<'success' | 'warning' | 'error' | 'info', string>
+export { axisSemanticHex }
 
 /**
  * Curated semantic SUB-VALUES (TASK-1053 Fase B) — re-exported here for UI/theme
