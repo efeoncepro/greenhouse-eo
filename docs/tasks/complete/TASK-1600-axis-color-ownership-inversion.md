@@ -200,7 +200,8 @@ actuales se conservan tal cual** — Globe declara la dependencia y no debe romp
 (minor: aditivo). Tests del paquete cubren la forma de cada estructura nueva. `emit-css.mjs` emite las
 custom properties nuevas.
 
-Al cierre: `0.2.0` publicada por tag, con el CI y el gate de contratos de `TASK-1589` verdes.
+Al cierre: `0.2.0` publicada como release manual histórica; la versión consumida por Greenhouse es
+`0.2.1`, cuya publicación quedó regularizada mediante el tag `v0.2.1` y el run gobernado posterior.
 
 ### Slice 2 — El gate de drift invierte su sentido (doble lectura, sin cutover)
 
@@ -309,9 +310,9 @@ estados. El rollback es de código y de versión de paquete.
 
 ### Production verification sequence
 
-1. Slice 1 en AXIS: CI verde + gate de contratos + tag → `0.2.0` publicada. Verificar que `0.1.5`
-   sigue instalable (nadie se rompe).
-2. Slice 2 en Greenhouse: gate invertido verde contra `0.2.0`, y **en rojo deliberado** ante una
+1. Slice 1 en AXIS: CI verde + gate de contratos + tag → `0.2.0` fue publicada manualmente y
+   `0.2.1` quedó como release gobernado posterior. Verificar que `0.1.5` sigue instalable.
+2. Slice 2 en Greenhouse: gate invertido verde contra `0.2.1`, y **en rojo deliberado** ante una
    divergencia introducida a propósito.
 3. Slice 3 en staging: `pnpm build` + tests de contraste/drift sin modificar + **diff GVC
    desktop 1440 y 390 px, light y dark**, contra la captura previa al cutover.
@@ -321,8 +322,9 @@ estados. El rollback es de código y de versión de paquete.
 
 ### Out-of-band coordination required
 
-- **Publicar `0.2.0`** es un tag en `axis-design-system` — acto de release, no un merge. El operador
-  decide cuándo.
+- **Publicar `0.2.1`** es un tag en `axis-design-system` — acto de release gobernado, no un merge. El
+  tag `v0.2.1` y el run `30525304584` ya regularizaron la versión consumida; `0.2.0` queda como release
+  manual histórica sin tag propio.
 - **Ninguna coordinación con Globe** en esta task: sigue en `0.1.5` con los 12 roles intactos. Su
   actualización es una decisión suya, posterior y opcional.
 
@@ -332,6 +334,8 @@ estados. El rollback es de código y de versión de paquete.
 
 - [x] `@efeoncepro/axis-tokens@0.2.0` publica ramps, semántica, neutrales, secondary y charts, y
       **conserva los 12 roles de `0.1.5`** sin cambio de forma ni de valor.
+- [x] `@efeoncepro/axis-tokens@0.2.1` queda como versión consumida por Greenhouse; el tag `v0.2.1`
+      ejecuta el pipeline gobernado con build, typecheck, tests, contrato de release y publish idempotente.
 - [x] El paquete sigue sin importar MUI, Vuexy, Next ni browser globals (gate de portabilidad verde).
 - [x] `axis-package-drift.test.ts` verifica *"Greenhouse refleja a AXIS"*, descubriendo los símbolos
       por forma y no por lista, y **falla** ante una divergencia introducida a propósito.
@@ -361,9 +365,9 @@ estados. El rollback es de código y de versión de paquete.
 
 ### Evidence recorded 2026-07-30
 
-- Axis package: `0.2.0` published, followed by compatible `0.2.1` to expose the public type aliases
-  required by the Greenhouse adapter. Axis `build`, `typecheck` and `test` pass; commits `1e020c9` and
-  `dba1922` are pushed to `main`.
+- Axis package: `0.2.0` remains the manual historical publication; `0.2.1` exposes the public type
+  aliases required by the Greenhouse adapter and is the consumed version. Axis `build`, `typecheck`
+  and `test` pass; commits `1e020c9` and `dba1922` are pushed to `main`.
 - Greenhouse: 3 focused suites pass (43 tests), `typecheck`, `design:lint`, `docs:closure-check` and
   `docs:context-check:strict` pass; production build compiles and generates all routes.
 - GVC staging: `/design-system/axis-adapters` passed at 1440×900 and iPhone 13; canonical
@@ -427,8 +431,13 @@ corrección.
 
 ### 1. Las versiones se publicaron fuera del pipeline gobernado
 
-`0.2.0` y `0.2.1` quedaron en GitHub Packages **sin tag y sin run de `release-packages.yml`**. Se saltaron
-los tres gates construidos en `TASK-1589` V1.1: CI, gate de contratos y coherencia tag↔versión.
+`0.2.0` quedó en GitHub Packages como publicación manual histórica, sin tag ni run propio de
+`release-packages.yml`. `0.2.1` también nació manualmente, pero ya fue regularizada: existe el tag
+`v0.2.1` y el run `30525304584` ejecutó los gates y verificó el release de forma idempotente.
+
+La publicación original de ambas versiones se saltó inicialmente los gates construidos en
+`TASK-1589` V1.1; el estado corregido es que `0.2.1` tiene verificación gobernada a posteriori y
+`0.2.0` queda explícitamente identificada como release legacy/manual.
 
 La evidencia de que importaba está en la propia secuencia: **`0.2.1` existe porque `0.2.0` salió sin los
 type aliases** que el adapter necesitaba. Un `pnpm typecheck` del pipeline lo habría atrapado antes de

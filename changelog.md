@@ -9,7 +9,7 @@
 
 ## 2026-07-30 — TASK-1600: ownership de color transferido a AXIS
 
-- AXIS publica la paleta portable completa y Greenhouse consume `@efeoncepro/axis-tokens@0.2.0`/`0.2.1` mediante adapters; el drift gate ahora verifica Greenhouse contra AXIS.
+- AXIS publica la paleta portable completa y Greenhouse consume `@efeoncepro/axis-tokens@0.2.1` mediante adapters; `0.2.0` queda como publicación manual histórica y `v0.2.1` fue regularizada con el pipeline gobernado (`30525304584`, success), incluyendo publish idempotente.
 - GVC staging pasó rampas light en 1440/390, captura dark real en 1440/390 y dos capturas repetidas fueron pixel-identical; queda una diferencia de altura del full-page histórico pendiente de aprobación/re-baseline.
 - Finance PDF y report-artifact comparados contra el parent commit: raster diff 144 dpi = 0 píxeles. Rollback rehearsal sobre `0.1.5` pasó 43 tests.
 

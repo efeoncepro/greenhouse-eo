@@ -1,12 +1,15 @@
 # Handoff activo
 
-## 2026-07-30 — TASK-1600: implementación y evidencia ejecutadas; cierre visual pendiente
+## 2026-07-30 — TASK-1600: implementación y release gobernado regularizado
 
-TASK-1600 ya migró Greenhouse al paquete AXIS (`0.2.0`, corregido en `0.2.1`), invirtió el drift gate y dejó
+TASK-1600 ya migró Greenhouse al paquete AXIS `0.2.1` (sucesor compatible de la publicación manual histórica
+`0.2.0`), invirtió el drift gate y dejó
 los tests de contraste/semántica, typecheck, build, PDFs, capturas GVC light/dark y rollback rehearsal verdes.
 El frame de rampas compara 0.00% desktop y 0.01% mobile; queda pendiente aprobación o re-baseline explícito
 para la diferencia de altura del full-page histórico (12 px desktop, 2 px mobile). El commit Greenhouse es
-`f4163965e`; Axis está publicado en `main` (`dba1922`).
+`f4163965e`; Axis está publicado en `main` (`dba1922`). El tag `v0.2.1` existe y el run gobernado
+`30525304584` terminó en `success` tras ejecutar build, typecheck, tests, contrato tag↔versión y publish
+idempotente. `0.2.0` queda documentada como publicación manual legacy sin tag propio.
 
 ## 2026-07-30 — AXIS: migración de credenciales y release productivo cerrados
 
