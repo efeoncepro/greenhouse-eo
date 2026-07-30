@@ -40,6 +40,19 @@ const QUESTIONS: CreateQuestionInput[] = [
     ]),
   },
   {
+    competencyKey: 'copywriting',
+    level: 'intermedio',
+    type: 'open_text',
+    prompt:
+      'Analiza este CTA: “Haz clic aquí para conocer más sobre nuestras soluciones”. Identifica al menos cuatro problemas y propón tres alternativas: una para una persona que todavía está explorando, una para alguien que compara opciones y una para alguien listo para avanzar. Explica qué cambia entre las tres.',
+    rubric: rubric([
+      'Detecta falta de valor, especificidad, contexto o siguiente paso en el CTA original.',
+      'Propone alternativas diferenciadas por intención, no solo variaciones de palabras.',
+      'Los CTA son claros, accionables y honestos respecto de lo que ocurrirá después.',
+      'Explica la relación entre etapa del usuario, fricción y acción solicitada.',
+    ]),
+  },
+  {
     competencyKey: 'community_management',
     level: 'intermedio',
     type: 'open_text',
@@ -53,6 +66,19 @@ const QUESTIONS: CreateQuestionInput[] = [
     ]),
   },
   {
+    competencyKey: 'community_management',
+    level: 'intermedio',
+    type: 'situational',
+    prompt:
+      'El equipo quiere publicar el mismo texto en LinkedIn, Instagram y TikTok para ahorrar tiempo. El contenido tiene una idea potente, pero todavía no hay formato ni CTA definidos. ¿Qué mantendrías igual, qué cambiarías por canal y cómo decidirías qué producir primero?',
+    rubric: rubric([
+      'Distingue la idea central de la ejecución y no propone copiar/pegar el mismo texto.',
+      'Considera comportamiento de audiencia, formato, distribución y esfuerzo de producción.',
+      'Define CTA y siguiente paso adecuados para cada canal.',
+      'Prioriza con un criterio explícito de impacto, aprendizaje y capacidad disponible.',
+    ]),
+  },
+  {
     competencyKey: 'seo',
     level: 'intermedio',
     type: 'situational',
@@ -63,6 +89,19 @@ const QUESTIONS: CreateQuestionInput[] = [
       'Propone cambios concretos y verificables en título, encabezados, respuesta, enlaces o evidencia.',
       'Protege la utilidad y la voz humana de la pieza; evita tácticas de relleno o clickbait.',
       'Define señales de éxito y un período o comparación razonable para evaluar el cambio.',
+    ]),
+  },
+  {
+    competencyKey: 'seo',
+    level: 'intermedio',
+    type: 'open_text',
+    prompt:
+      'Recibes una pregunta frecuente de una audiencia: “¿Cómo elijo el canal correcto para distribuir una idea de contenido?”. Escribe una respuesta breve y estructurada para que pueda entenderla una persona y también recuperarla un buscador o asistente de IA. Incluye una respuesta directa, criterios de decisión y una invitación final a profundizar.',
+    rubric: rubric([
+      'Responde la pregunta de forma directa antes de extenderse en contexto.',
+      'Organiza la información con criterios claros, lenguaje natural y estructura escaneable.',
+      'Evita afirmaciones absolutas, relleno de keywords y promesas no demostrables.',
+      'El cierre invita a un siguiente paso relevante sin convertir la respuesta en publicidad genérica.',
     ]),
   },
   {
