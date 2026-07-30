@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-07-25 por Claude (TASK-1554)
-> **Ultima actualizacion:** 2026-07-25 por Claude
+> **Ultima actualizacion:** 2026-07-30 por Codex
 > **Documentacion tecnica:** [`GLOBE_MODEL_FLEET_STATUS.md`](../../operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md) · [`EFEONCE_GLOBE_CREATIVE_STUDIO_ARCHITECTURE_V1.md`](../../architecture/EFEONCE_GLOBE_CREATIVE_STUDIO_ARCHITECTURE_V1.md)
 
 ## Qué resuelve
@@ -51,13 +51,18 @@ interfaz pregunta y dibuja lo que recibe.
 Entonces, sumar un modelo nuevo es:
 
 1. Declararlo en el catálogo.
-2. Promoverlo para el workspace que lo va a usar.
+2. Completar su rate, driver/endpoint, evaluación, derechos y promoción gobernada para el workspace.
+3. Probar una generación real desde una superficie consumidora.
 
 Y aparece solo — en el Producer, en Nexa, en las integraciones. Nadie edita una pantalla por modelo.
 Antes, cada modelo nuevo era trabajo de interfaz; ahora es **consecuencia del dato**.
 
 Lo mismo al revés: si se despromueve, desaparece de todos lados a la vez. No queda un botón que
 promete algo que ya no existe.
+
+Recraft v4.1 lo demuestra: `ref/still/vector-v1` pasó de existir como ruta no ejecutable a aparecer
+disponible sin modificar el selector. La prueba real desde Producer produjo y retuvo un SVG de
+4 créditos, con vista previa y descarga habilitadas.
 
 ## El "recomendado"
 

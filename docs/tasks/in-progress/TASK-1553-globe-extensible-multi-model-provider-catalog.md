@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `CODE + ROLLOUT DE IMAGEN COMPLETOS, 6/7 — Seedream 5 Pro, Nano Banana Pro, Nano Banana 2, GPT Image 2 y GPT Image 1.5 están simultáneamente available en Producer y tienen generación real. NO ES CERRABLE: su único criterio abierto —cada ruta promovible referencia un rate version vigente de TASK-1468 y un receipt de onboarding de TASK-1578— depende de dos tasks abiertas. Bloqueo real, no olvido`
+- Status real: `CODE + ROLLOUT DE IMAGEN COMPLETOS, 6/7 — Seedream 5 Pro, Nano Banana Pro, Nano Banana 2, GPT Image 2, GPT Image 1.5 y Recraft v4.1 están simultáneamente available en Producer y tienen generación real. NO ES CERRABLE: su único criterio abierto —cada ruta promovible referencia un rate version vigente de TASK-1468 y un receipt de onboarding de TASK-1578— depende de dos tasks abiertas. Bloqueo real, no olvido`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -59,7 +59,8 @@ quedó retirado tras un probe HTTP 200 y una generación gobernada. GPT Image 2 
   capacidad.
 - Semántica explícita **update (reemplaza versión en la misma ruta) vs add (ruta nueva que coexiste)**, aplicada
   uniforme a todos los proveedores (Gemini, OpenAI, Fal, y futuros).
-- Seedream + Nano Banana Pro + Nano Banana 2 + GPT Image 2 + GPT Image 1.5 elegibles simultáneamente como imagen.
+- Seedream + Nano Banana Pro + Nano Banana 2 + GPT Image 2 + GPT Image 1.5 + Recraft v4.1 elegibles
+  simultáneamente como imagen.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -338,7 +339,7 @@ resolución (ya es por-ruta).
   `30562845688`, `30562911378`, `30563293626`, `30563648994`, `30564118519`.
 - Los workflows de control plane de Nano Banana 2 finalizaron `success`:
   `30564131652`, `30564134009`, `30564136579`, `30564202157`.
-- Estado honesto: las cinco rutas de imagen están disponibles y ejercitadas; TASK-1553 sigue
+- Estado honesto: las seis rutas de imagen están disponibles y ejercitadas; TASK-1553 sigue
   `in-progress` únicamente por el criterio 7 de receipts TASK-1468/TASK-1578.
 
 ### Rollout evidence — 2026-07-24 (historical baseline)
@@ -358,11 +359,11 @@ resolución (ya es por-ruta).
 
 - [x] Source of truth nombrado: catálogo público (rutas) + binding runtime (providerModelId) + resolución por-ruta en adapters. **DONE (ADR-013 + código Slice 2-3).**
 - [x] Dos modelos del mismo proveedor coexisten y se seleccionan por ruta (GPT Image 1.5 + 2 y/o Nano Banana Pro + 2) sin `route_binding_missing`. **DONE a nivel resolución/Lab** (test del segundo consumidor: `openai-v2`→`gpt-image-2`, `openai-v1-5`→`gpt-image-1.5`, dos modelos mismo proveedor). La ausencia de `route_binding_missing` en **producción** se valida al promover (rollout-pending).
-- [x] Seedream + Nano Banana Pro + Nano Banana 2 + GPT Image 2 + GPT Image 1.5 elegibles simultáneamente como imagen; Seedream sin regresión. **DONE en runtime live**: selector `Disponible`, promociones exactas y generaciones UI reales.
+- [x] Seedream + Nano Banana Pro + Nano Banana 2 + GPT Image 2 + GPT Image 1.5 + Recraft v4.1 elegibles simultáneamente como imagen; Seedream sin regresión. **DONE en runtime live**: selector `Disponible`, promociones exactas y generaciones UI reales.
 - [x] Semántica update (bump de versión en la ruta) vs add (ruta nueva) explícita y documentada; el catálogo público sin slugs (drift guard verde). **DONE** (ADR-013 + doc funcional/manual; `assertNoSlugLeak` verde con las rutas nuevas).
 - [x] Invariante de consistencia `binding.modelId == estimate.model == readiness.route.modelId` ejercitada en runtime para las rutas promovidas; el operador exacto falla cerrado ante mismatch.
 - [x] Evidencia runtime por modelo (canary por el Lab) listada; región `global` para Vertex image. **DONE for canary**: experiment `a258dda8-ea6e-4a34-94f0-4cd9ca301d17`, 10 credits, `image/png`, 1,111,472 bytes, SHA-256 `9e9edaf59cb927610d043e3af3cac9b90c321ed48e55eb34ec0300c72dc429cf`; promotion remains pending.
-- [x] Promoción ADR-009 + reader `globe.producer.fleet.list`: cinco rutas de imagen devuelven `available` y el Producer las ofrece como `Disponible`.
+- [x] Promoción ADR-009 + reader `globe.producer.fleet.list`: seis rutas de imagen devuelven `available` y el Producer las ofrece como `Disponible`.
 - [x] ADR de resolución por-ruta indexado en `DECISIONS_INDEX`. **DONE (Slice 1, 2026-07-24):** ADR-013 = `docs/architecture/creative-studio/EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md`, indexado en `DECISIONS_INDEX.md` + `creative-studio/README.md`.
 - [ ] Cada ruta promovible referencia un rate version vigente de `TASK-1468` y un receipt de onboarding de `TASK-1578`.
 

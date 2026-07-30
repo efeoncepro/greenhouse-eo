@@ -7,6 +7,17 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-30 — Globe: Recraft v4.1 promovido y probado desde Producer
+
+- `ref/still/vector-v1` quedó disponible con evaluación, revisión humana, derechos, rate de 4 créditos,
+  binding, readiness y circuito gobernados.
+- La generación real desde la UI autenticada es `b5631c86-707a-41d9-8ecc-ef61caa8200c`; terminó
+  `completed/retained` y el Producer muestra el SVG, `Listo`, `Guardada` y descarga habilitada.
+- El smoke detectó que Fal transporta el SVG como `application/octet-stream`. Globe `84d6a8e`
+  admite esa combinación sólo para la salida SVG esperada, verifica los bytes y añade CSP sandbox.
+- Worker, API y Studio se desplegaron con éxito. La flota de imagen queda en seis rutas ejercitadas;
+  TASK-1553 sigue `in-progress` sólo por los receipts transversales TASK-1468/TASK-1578.
+
 ## 2026-07-30 — AI Creative Rights & Enterprise Governance
 
 - Se creó la skill canónica `.codex/skills/greenhouse-ai-creative-rights-governance/` con companion Claude y referencias para enterprise rights framework, provider vetting y contrato/consentimiento.
@@ -646,15 +657,3 @@ Corrección de fuente de verdad: el cliente inicial es **SKY Agencia Creativa**,
 - Se creó `SEARCH_VISIBILITY_360_BUSINESS_MODEL_INTEGRITY_PACK_V1.md` para completar customer/value, oferta, delivery,
   revenue, economics, data/IP, evidence, scale y capital sin convertir hipótesis en decisiones.
 - El modelo canónico ahora enlaza su Integrity Pack y mantiene `Draft`; el verdict actual es `model_incomplete`.
-
-## 2026-07-25 — Wave portfolio y boundaries documentados
-
-- Se formalizó Wave como marca de producto de Efeonce para cinco familias: Search Visibility 360, Web Experience 360,
-  Measurement & Analytics, Agent Systems & Platforms y Digital Automation & Integrations.
-- Se fijó que CRM/RevOps pertenece a Efeonce Digital/Kortex; Wave sólo entrega capas técnicas conectadas.
-- Se documentó la frontera con Globe (contenido/producción) y Reach (medios/distribución), manteniendo Efeonce como
-  masterbrand externa.
-- Canon: `docs/architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md` y
-  `docs/business-models/wave/WAVE_BUSINESS_MODEL_V1.md`.
-- Se separaron product service, delivery model, engagement, operating mode y composición del ecosistema; Wave puede
-  operar Managed Squad, Staff Augmentation y otros modelos sin cambiar el ownership de la oferta.

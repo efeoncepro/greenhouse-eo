@@ -6,6 +6,25 @@
 
 ---
 
+## Recraft v4.1 — promoción y generación SVG real desde Producer 2026-07-30
+
+- `ref/still/vector-v1` quedó promovida con binding activo, readiness promovido, circuito Fal cerrado,
+  rate vigente de 4 créditos y la restricción comercial `no-sublicense`.
+- La evaluación exacta produjo SVG retenido y pasó la revisión humana; la atestación comercial es
+  `mcra_e7d74373-edbc-4de6-abd7-1c0888baa162` y la revisión
+  `review_f38176d1-22b0-4639-884b-a1d61c00f5f4`.
+- La prueba real se inició desde el Producer con la sesión autenticada del operador: run
+  `b5631c86-707a-41d9-8ecc-ef61caa8200c`, 4 créditos, modelo Recraft v4.1 y capacidad
+  `image-vectorize`. Terminó `completed/retained`; la UI muestra `Listo`, `Guardada`, vista previa
+  del isotipo vectorial y descarga habilitada.
+- El smoke descubrió que Fal declara el archivo como `image/svg+xml`, pero su CDN lo transporta como
+  `application/octet-stream`. Globe `84d6a8e` acepta esa combinación únicamente para la ruta SVG,
+  verifica el prefijo real del documento antes de ingerirlo y sirve el asset con CSP sandbox.
+- CI y rollout: worker `30573508938`, API/Studio `30573523066` y `30573523128`; los tres deploys
+  terminaron `success`. El diagnóstico final `30574036402` confirmó run y attempt `completed`.
+- TASK-1553 permanece `in-progress` sólo por su criterio transversal de receipts TASK-1468/TASK-1578;
+  Recraft sí está disponible y ejercitado en el runtime.
+
 ## Nano Banana 2 — promoción y smoke real 2026-07-30
 
 - `gemini-3.1-flash-image` respondió HTTP 200 en el proyecto `efeonce-globe`; se retiró el bloqueo
@@ -29,7 +48,7 @@
   [`evidence/2026-07-30/README.md`](evidence/2026-07-30/README.md).
 - TASK-1553 permanece `in-progress` por su criterio 7 transversal: rate-version receipts de
   TASK-1468 + onboarding receipts de TASK-1578. Este pendiente documental/gobernante no revierte
-  la disponibilidad live de las cinco rutas de imagen.
+  la disponibilidad live de las seis rutas de imagen.
 
 ## AXIS package distribution/auth — estado verificado 2026-07-30
 

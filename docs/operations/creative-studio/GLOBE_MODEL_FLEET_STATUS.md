@@ -47,7 +47,7 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 | `ref/voice/tts-v1` | ElevenLabs · Multilingual v2 | ElevenLabs | speech-synthesize | ✅ 07-19 | ✅ driver Fal | — |
 | `ref/voice/change-v1` | ElevenLabs · Voice Changer | ElevenLabs | audio-change-voice | ✅ 07-20 | ✅ | — |
 | `ref/voice/translate-v1` | ElevenLabs · Dubbing | ElevenLabs | audio-translate | ✅ 07-20 | ✅ | — |
-| `ref/still/vector-v1` | Recraft · v4.1 | Fal (`fal-ai/recraft/v4.1/text-to-vector`) | image-vectorize | ✅ 07-19 | ⏳ sin lane | ruta creada 07-25; vectoriza desde TEXTO (`requiresInput: false`) |
+| `ref/still/vector-v1` | Recraft · v4.1 | Fal (`fal-ai/recraft/v4.1/text-to-vector`) | image-vectorize | ✅ 07-19 | ✅ driver + promoción + generación UI real 07-30 | run UI `b5631c86-707a-41d9-8ecc-ef61caa8200c`; SVG retenido; 4 créditos |
 | `ref/still/upscale-v1` | Topaz · Upscale | Fal (`fal-ai/topaz/upscale/image`) | image-upscale | ✅ 07-19 | ⏳ sin lane | ruta creada 07-25; exige 1 imagen de origen |
 | `ref/video/upscale-v1` | Topaz · Upscale | Fal (`fal-ai/topaz/upscale/video`) | video-upscale | ✅ 07-19 | ⏳ sin lane | ruta creada 07-25; exige 1 video de origen |
 
@@ -68,6 +68,7 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 | 2026-07-22 | (`284eba6`) | **Nace el path de producción gobernado** — driver Veo (`vertex-video`) + Fal; región `us-central1` |
 | 2026-07-24 | TASK-1535 | Upgrade frontier: `gemini-2.5-flash-image` → **`gemini-3-pro-image`** (Nano Banana Pro); probe directo 200 / 1.23 MB @ `global`; adapter OpenAI GPT Image (Lab) |
 | 2026-07-24 | TASK-1553 | **Catálogo multi-modelo `v1.3.0` + resolución por-ruta (ADR-013)**; **driver Vertex-imagen gobernado** (`9b62b19`) + endpoint `global`; **canary real verde** |
+| 2026-07-30 | TASK-1553 | **Recraft v4.1 promovido**; contrato SVG, evaluación/revisión/derechos, binding/readiness/circuito y generación real desde Producer |
 
 ## Evidencia de canary — Nano Banana Pro (gobernado, TASK-1553, 2026-07-24)
 
@@ -119,6 +120,24 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
   idempotentemente, sin una segunda generación ni un segundo cobro. La UI mostró `Listo`; output
   `image/png`, SHA-256 `b8a0eb45289558a2cb99e9989fa401aa794035c709505b10c58fba34e0768c1e`.
 
+## Evidencia de promoción Fal — Recraft v4.1 Vector (2026-07-30)
+
+- Ruta `ref/still/vector-v1`, endpoint `fal.recraft.text-to-vector`, modelo
+  `recraft-v4.1-vector`, versión `v4.1`, región `us-central1`.
+- Evaluación exacta: reporte `19504a56-3e70-43f5-a86a-bbc425312cd0`, experimento
+  `a11692b1-3241-434f-8949-8cb4fc1b63b6`, 4 créditos, `image/svg+xml` y output retenido.
+- Revisión humana `review_f38176d1-22b0-4639-884b-a1d61c00f5f4`; atestación comercial
+  `mcra_e7d74373-edbc-4de6-abd7-1c0888baa162`.
+- Generación real desde el Producer autenticado:
+  `b5631c86-707a-41d9-8ecc-ef61caa8200c`, 4 créditos, `completed/retained`. La UI muestra
+  `Listo`, vista previa SVG, estado `Guardada` y descarga habilitada.
+- El smoke reveló un mismatch de transporte documentado por Fal: el payload declara SVG y el CDN
+  responde `application/octet-stream`. Globe `84d6a8e` conserva fail-closed: sólo admite ese MIME
+  genérico para la salida Recraft esperada, verifica bytes SVG antes del ingest y añade CSP sandbox
+  al servirlos. Worker `30573508938` y ambos servicios internos `30573523066`/`30573523128`
+  terminaron `success`.
+- Captura autenticada: [`evidence/2026-07-30/globe-recraft-v4-1-real-generation.png`](evidence/2026-07-30/globe-recraft-v4-1-real-generation.png).
+
 ## El reader es el SoT *live* de disponibilidad (TASK-1554, cerrada 2026-07-25)
 
 **Este documento es el SoT humano; `globe.producer.fleet.list` es el SoT *live*.** La distinción
@@ -154,16 +173,15 @@ Manual: [operar la flota](../../manual-de-uso/creative-studio/operar-flota-model
   lo declara y **cambia el modo al elegirlos** en vez de esconderlos detrás de un chip.
   Con el catálogo en **v1.4.0** cubre **12 de 14 capacidades**; faltan `model-3d-generate` y
   `video-extend`, ambas sin ruta.
-  **Promover una ruta la vuelve elegible en el Producer sin tocar la UI.** Consecuencia directa: como
-  hoy ninguna ruta de imagen está promovida, el Producer **no ofrece modelo de imagen elegible** hasta
-  que ADR-009 avance — el blocker dejó de ser invisible. `ref/audio/foley-v1` (promovida en el canary
-  ADR-010) sí queda elegible. Cero slug/costo/margen en el DOM.
+  **Promover una ruta la vuelve elegible en el Producer sin tocar la UI.** Hoy seis rutas de imagen
+  están disponibles, incluida Recraft v4.1 para vectorización. Cero slug/costo/margen en el DOM.
 
 ## Delta / pendientes conocidos
 
 - **Gemini Omni en producción gobernada:** hoy Omni está **solo en el Lab**; el path gobernado tiene Fal + Veo + (ahora) Vertex-imagen, **no Omni**. Si `ref/motion/reference-v1` se quiere entregar a cliente, falta su driver gobernado (Interactions API) — análogo a lo que se hizo para Vertex-imagen.
 - **OpenAI (GPT Image 2/1.5):** lane gobernado, promociones y canaries reales completados el 07-30.
 - **Nano Banana 2:** promovido y ejercitado desde el Producer el 07-30; el bloqueo de allowlist quedó retirado.
+- **Recraft v4.1:** promovido y ejercitado desde el Producer el 07-30; SVG retenido y descarga habilitada.
 - **Grant de créditos 409 → `ISSUE-124`:** el comando canónico de administración de créditos devuelve `409 conflict` en un grant adicional pese a pool activo + identidad válida + idempotencia nueva. No bloquea lo hecho (el canary corrió con el budget subido 100→110 + grant de 10). Documentado en `docs/issues/open/ISSUE-124-globe-credit-grant-canonical-409-root-cause-hidden.md` (Codex, 2026-07-24). No se hizo bypass ni mutación directa.
 - **Promoción ADR-009:** Nano Banana Pro ya tiene revisión humana firmada en Producer, readiness `promoted` y binding de producción `enabled`, con readback live en la revisión `896a0620`. Las demás rutas siguen sujetas a sus gates propios; no se fuerza ninguna sin evaluación exacta, derechos y driver gobernado.
 
@@ -176,7 +194,7 @@ Para llevar una ruta del Lab al Producer hacen falta 4 cosas (las 2 primeras son
    `governed-production-composition.ts`). Estado: Fal ✅, Veo ✅, Vertex-imagen ✅ (`9b62b19`), OpenAI ✅,
    **Omni ❌**.
 2. **Promoción por ruta (ADR-009)** — binding `enabled` + readiness `promoted` + atestación (ADR-010) + readback de
-   identidad. Estado: completado para las cinco rutas de imagen disponibles en el selector.
+   identidad. Estado: completado para las seis rutas de imagen disponibles en el selector.
 3. **Selector en la UI del Producer** — `TASK-1552` (consume el catálogo v1.3.0 vía ADR-013 como selector de modelo).
 4. **Gates externos despejados** donde aplique.
 
@@ -190,6 +208,7 @@ Para llevar una ruta del Lab al Producer hacen falta 4 cosas (las 2 primeras son
 | **Gemini Omni** | **construir driver gobernado** (Interactions API) → allowlist → promoción | código (Globe) + Codex |
 | GPT Image 2/1.5 | **completado 07-30**: driver, derechos, promoción, generación UI y canary ✅ | — |
 | Nano Banana 2 | **completado 07-30**: acceso Vertex, rates, driver, derechos, evaluación, promoción y generación UI ✅ | — |
+| Recraft v4.1 Vector | **completado 07-30**: driver, rate, derechos, evaluación, promoción, SVG verificado y generación UI ✅ | — |
 | **Exponer la flota data-driven** | **`TASK-1554` — DESPLEGADO + live-verificado** (`c3b6bf4`, Codex): reader `globe.producer.fleet.list` vivo (availability `available\|gated\|blocked` + `recommendedDefaults`). ✅ dependencia de datos lista | backend-data |
 | **Selector visible (todos)** | **`TASK-1555` — in-progress:** dirección visual ELEGIDA ("Galería de láminas") + wireframe + motion robustos; **Slice 1a (data layer del client) done + typecheck verde** (local `d07a1cd`). Falta: render galería (HTML/CSS/controller) + GVC premium + scorecard 14 dims. `TASK-1552` = jerarquía del composer (distinto) | UI (ui-ux) |
 

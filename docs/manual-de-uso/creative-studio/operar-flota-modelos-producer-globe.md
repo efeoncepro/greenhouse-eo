@@ -3,7 +3,7 @@
 > **Tipo de documento:** Manual de uso / runbook
 > **Version:** 1.0
 > **Creado:** 2026-07-25 por Claude (TASK-1554)
-> **Ultima actualizacion:** 2026-07-25 por Claude
+> **Ultima actualizacion:** 2026-07-30 por Codex
 > **Documentacion funcional:** [Flota de modelos del Producer](../../documentation/creative-studio/efeonce-globe-producer-flota-modelos.md)
 
 ## Para qué sirve
@@ -61,11 +61,28 @@ La distinción no es cosmética: un modelo ofrecido como ejecutable donde no pue
 
 1. Declarar la ruta en el catálogo del Producer (`PRODUCER_ROUTE_CATALOG`), **contra lo que el
    adapter realmente transporta**, no contra lo que uno supone que soporta.
-2. Promoverlo para el workspace (ADR-009).
-3. Verificar que aparece.
+2. Registrar una versión de rate vigente y el binding exacto de provider/modelo/endpoint.
+3. Ejecutar la evaluación exacta y cerrar los criterios humanos; publicar la evidencia de derechos
+   comerciales aplicable a la ruta.
+4. Promover readiness y binding mediante las identidades separadas de ADR-009/010; cerrar el circuito
+   sólo después de verificar el endpoint.
+5. Verificar el reader `globe.producer.fleet.list`.
+6. Ejecutar una generación real desde Producer y comprobar estado terminal, gasto, MIME, retención,
+   vista previa y descarga.
 
-No hay paso 4. **No se edita ninguna pantalla.** Si alguien te pide "cablear el modelo en la UI",
-algo se desvió del diseño.
+No se edita ninguna pantalla. Si alguien pide "cablear el modelo en la UI", algo se desvió del
+diseño. El procedimiento transversal completo y sus receipts pertenecen a `TASK-1578`; este manual
+no crea un segundo ledger ni una segunda promoción.
+
+### Canary Recraft v4.1 de referencia
+
+- Ruta: `ref/still/vector-v1`.
+- Resultado esperado: `image/svg+xml`, 4 créditos, `completed/retained`.
+- Evidencia UI: modelo Recraft v4.1, capacidad `Imagen · vectorizar`, estado `Guardada`, vista previa
+  SVG y descarga habilitada.
+- Gotcha verificado: Fal declara el archivo como SVG, pero su CDN puede transportarlo como
+  `application/octet-stream`. No relajes MIME globalmente; la ruta admite ese transporte sólo tras
+  verificar que los bytes realmente forman un SVG.
 
 ## Verificar
 

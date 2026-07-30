@@ -1,5 +1,20 @@
 # Handoff activo
 
+## 2026-07-30 — Globe: Recraft v4.1 promovido y probado desde Producer
+
+Recraft v4.1 quedó disponible en `ref/still/vector-v1` con rate de 4 créditos, evaluación,
+revisión humana, derechos comerciales, binding, readiness y circuito gobernados. La generación real
+se inició desde el Producer con la sesión autenticada del operador: run
+`b5631c86-707a-41d9-8ecc-ef61caa8200c`, `completed/retained`. La UI muestra el SVG, `Listo`,
+estado `Guardada` y descarga habilitada.
+
+El smoke detectó que Fal declara `image/svg+xml` en el payload pero su CDN transporta el archivo como
+`application/octet-stream`. Globe `84d6a8e` resuelve la causa sin abrir el ingest: limita la excepción
+a la salida SVG esperada, verifica los bytes y sirve el asset con CSP sandbox. Worker, API y Studio
+quedaron desplegados con éxito. TASK-1553 conserva su único criterio transversal pendiente de
+TASK-1468/TASK-1578. Detalle:
+[`GLOBE_RUNTIME_HANDOFF.md`](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md).
+
 ## 2026-07-30 — Globe: flota de imagen completa con Nano Banana 2
 
 Nano Banana 2 (`gemini-3.1-flash-image`) dejó de estar bloqueado por allowlist y quedó promovido en
@@ -10,8 +25,8 @@ operador, run `ce06f8b4-ebe9-43b6-9d47-8e4cc901f49a`, 10 créditos.
 El smoke encontró un off-by-one en la reconstrucción del hash durable de Vertex. Globe `1fb57285`
 lo corrigió con una regresión focal; CI `30565123529` y worker `30565166238` quedaron verdes. El
 mismo run terminó `completed/retained` y la UI mostró `Listo`. La flota
-de imagen queda en cinco modelos disponibles: Seedream 5 Pro, Nano Banana Pro, Nano Banana 2,
-GPT Image 2 y GPT Image 1.5. TASK-1553 continúa `in-progress` sólo por los receipts transversales
+de imagen queda en seis modelos disponibles: Seedream 5 Pro, Nano Banana Pro, Nano Banana 2,
+GPT Image 2, GPT Image 1.5 y Recraft v4.1. TASK-1553 continúa `in-progress` sólo por los receipts transversales
 TASK-1468/TASK-1578. Detalle:
 [`GLOBE_RUNTIME_HANDOFF.md`](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md).
 
