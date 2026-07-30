@@ -26,10 +26,31 @@ describe('Greenhouse consumes AXIS package tokens (ownership inversion)', () => 
     expect(axisNeutral.light.bodyBg).toBe('#f8f7fa')
     expect(axisNeutral.dark.bodyBg).toBe('#25293c')
     expect(axisSemanticHex.error).toBe('#dc2e39')
-    expect(axisChart.categorical).toEqual([...axisChartCategorical])
-    expect(axisChart.categoricalDark).toEqual([...axisChartCategoricalDark])
-    expect(axisChart.directional).toEqual({ ...axisChartDirectional })
-    expect(axisChart.directionalDark).toEqual({ ...axisChartDirectionalDark })
+
+    // Anclas de valor: lo único capaz de detectar que AXIS cambió un color de chart.
+    expect(axisChart.categorical).toHaveLength(6)
+    expect(axisChart.categorical[0]).toBe('#5145e0')
+    expect(axisChart.categoricalDark[0]).toBe('#7b72f0')
+    expect(Object.keys(axisChart.directional)).toEqual(['positive', 'caution', 'negative', 'neutral'])
+    expect(axisChart.directional.negative).toBe('#ff4d49')
+    expect(axisChart.directionalDark.negative).toBe('#ff6e6b')
+  })
+
+  /**
+   * Post-inversión, `axis-chart.ts` es un re-export puro, así que comparar sus valores
+   * contra el paquete compara el paquete CONSIGO MISMO: un aserto que no puede fallar.
+   * Lo que sí puede fallar —y es la regresión real— es que alguien reemplace el
+   * re-export por una copia local con los mismos valores: `toEqual` lo dejaría pasar.
+   *
+   * `toBe` compara IDENTIDAD de referencia, no valor. Una copia rompe el test aunque
+   * sea idéntica hex por hex, que es exactamente lo que queremos vigilar ahora que el
+   * valor tiene un solo dueño.
+   */
+  it('keeps the chart adapter a pure re-export, not a local copy', () => {
+    expect(axisChartCategorical).toBe(axisChart.categorical)
+    expect(axisChartCategoricalDark).toBe(axisChart.categoricalDark)
+    expect(axisChartDirectional).toBe(axisChart.directional)
+    expect(axisChartDirectionalDark).toBe(axisChart.directionalDark)
   })
 
   it('keeps the motion scale consistent with the shared duration contract', () => {

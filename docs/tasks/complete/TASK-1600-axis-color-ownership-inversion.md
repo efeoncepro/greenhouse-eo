@@ -417,3 +417,58 @@ estados. El rollback es de código y de versión de paquete.
    Greenhouse; el release/tag se ejecuta en AXIS después de esos gates.
 4. **Charts: resuelta.** Las paletas puras categórica/direccional son datos portables de AXIS; los
    subsets y mapeos de dominio siguen siendo responsabilidad del producto.
+
+## Delta 2026-07-30 (b) — auditoría post-cierre: dos correcciones de proceso
+
+Verificación independiente del cierre. **El trabajo funcional quedó correcto** —los cinco `axis-*.ts`
+re-exportan, el diff visual dio 0.00%/0.01%, y los tests de contraste y drift pasan **sin haber sido
+modificados**, que es la mejor prueba de que ningún hex cambió—. Dos cosas de proceso sí necesitaron
+corrección.
+
+### 1. Las versiones se publicaron fuera del pipeline gobernado
+
+`0.2.0` y `0.2.1` quedaron en GitHub Packages **sin tag y sin run de `release-packages.yml`**. Se saltaron
+los tres gates construidos en `TASK-1589` V1.1: CI, gate de contratos y coherencia tag↔versión.
+
+La evidencia de que importaba está en la propia secuencia: **`0.2.1` existe porque `0.2.0` salió sin los
+type aliases** que el adapter necesitaba. Un `pnpm typecheck` del pipeline lo habría atrapado antes de
+publicar.
+
+**Y el pipeline tenía parte de la culpa** — dos defectos del gate que yo mismo escribí:
+
+- **Asumía versionado lock-step**: exigía que los tres paquetes coincidieran con el tag. El repo ya derivó
+  a versionado independiente (`tokens` 0.2.1, `contracts`/`registry` 0.1.5), que es lo correcto: bumpear
+  los tres por un cambio de uno publica versiones vacías. Corregido: el contrato pasa a ser *"al menos un
+  paquete está en esta versión"*.
+- **No era idempotente**: republicar una versión existente hacía fallar el run entero, así que un release
+  ya publicado no se podía re-verificar. Sin idempotencia el pipeline castiga reintentar, y publicar a mano
+  parece más simple. Corregido: consulta el registry y salta lo publicado, dejando que el run corra igual
+  build, typecheck, tests y gates.
+
+Regularizado en `axis-design-system@v0.2.1` — run
+[30525304584](https://github.com/efeoncepro/axis-design-system/actions/runs/30525304584) `success`, con los
+tres paquetes en `fail 0` y el publish saltando lo ya publicado. El tag ahora existe y el run sirve como
+**verificación a posteriori** del commit publicado.
+
+### 2. Cuatro asserts del gate eran tautológicos
+
+El gate comparaba `axisChart.categorical` (paquete) contra `axisChartCategorical` (local). Como
+`axis-chart.ts` es un **re-export puro**, comparaba el paquete consigo mismo: no podía fallar.
+
+Es un efecto lógico de la inversión — donde hay re-export puro ya no puede haber drift, así que ese aserto
+pierde sujeto. Reemplazado por lo que sí puede fallar:
+
+- **anclas de valor** (`categorical[0]`, `directional.negative`, longitudes y keys), que detectan si AXIS
+  cambia un color;
+- **identidad de referencia con `toBe`** en vez de valor con `toEqual`, que detecta la regresión real:
+  que alguien reemplace el re-export por una copia local. Verificado — una copia **idéntica hex por hex**
+  rompe el test, y `toEqual` la habría dejado pasar.
+
+Suite de theme: 44 tests verdes.
+
+### Lo que la implementación hizo mejor que esta spec
+
+El **Slice 4 no requería tocar nada.** La spec asumía que los cuatro consumidores fuera de la capa de theme
+necesitaban migrarse; en la práctica importan de `@core/theme/*`, que ahora re-exporta, así que consumen
+AXIS **transitivamente**. Mantener la frontera en la capa de theme es mejor que propagar el import: un
+consumidor menos que tocar y una superficie menos que vigilar.

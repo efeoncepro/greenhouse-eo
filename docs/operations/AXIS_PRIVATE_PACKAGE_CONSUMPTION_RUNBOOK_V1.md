@@ -51,6 +51,20 @@ source control.
 - El rollback interno de `globe-studio-internal` y `globe-api-internal` fue ejercitado al 100%, verificado y
   restaurado correctamente durante la promoción productiva.
 
+## Delta 2026-07-30 — el release admite versionado independiente y es idempotente
+
+Los tres paquetes se versionan **de forma independiente**: `tokens` puede ir en `0.2.1` mientras
+`contracts` y `registry` siguen en `0.1.5`. Bumpear los tres por un cambio de uno publicaría versiones sin
+contenido. El contrato del tag es **"al menos un paquete está en esta versión"**, no "los tres coinciden".
+
+El paso de publish **salta las versiones que ya están en el registry** en vez de fallar. Eso permite
+re-taguear un commit ya publicado y usar el run como **verificación a posteriori** — que es lo que se hizo
+con `v0.2.1` después de que `0.2.0`/`0.2.1` se publicaran a mano durante `TASK-1600`.
+
+**NUNCA publicar a mano.** El pipeline es el que corre CI, el gate de contratos y la coherencia del tag; sin
+él, una versión llega al registry sin que nadie haya verificado su contenido. Ocurrió el 2026-07-30 y el
+síntoma fue inmediato: `0.2.0` salió sin los type aliases del adapter y hubo que publicar `0.2.1`.
+
 ## Delta 2026-07-29 — dónde vive el credencial, y dónde NO hace falta (TASK-1589 V1.1)
 
 Decisión arquitectónica completa en
