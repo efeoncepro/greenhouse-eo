@@ -1,5 +1,15 @@
 # 11 — LAS MÉTRICAS COMO COMPROMISO: el arma de doble filo
 
+## Addendum Creative Velocity
+
+Medir dos velocidades: producción —time to first useful asset, throughput, OTD, FTR, RpA, cycle time— y decisión
+—tiempo de priorización, aprobación, hipótesis, aprendizaje aplicado y reutilización—. En Modular Production medir
+configuración, variantes, QA, metadata, rights, template maintenance y portabilidad. No convertir delivery metrics en
+promesas de revenue, ROAS o awareness sin control causal.
+
+En un pod embedded medir también fit/adoption: asistencia a rituales, briefs completos, tiempo de decisión del cliente,
+feedback accionable, continuidad de personas, autonomía progresiva, confianza percibida y uso de memoria/templates.
+
 > **La métrica que te distingue es la misma que te puede matar.**
 >
 > Somos la única agencia que le muestra al cliente, en su propio login, si estamos cumpliendo.

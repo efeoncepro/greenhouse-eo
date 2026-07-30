@@ -1,5 +1,69 @@
 # Handoff activo
 
+## 2026-07-30 — Fully Managed Creative Capacity global
+
+Se incorporó al modelo que Efeonce absorbe equipo, computadores, infraestructura, licencias, contratación, costos
+laborales, provisionales, reemplazos, continuidad y soporte; el cliente paga un fee mensual por una capacity
+envelope definida. La modalidad se denomina `Fully Managed Creative Capacity`; “llave en mano” queda como explicación
+comercial, no como unidad contractual.
+
+El modelo aplica en todos los países donde Efeonce opera. La oferta es global, pero payroll, impuestos, moneda, FX,
+privacidad, derechos laborales, proveedores, seguros, DPA, procurement y working capital deben parametrizarse por
+jurisdicción. Estado: `Approved for validation`.
+
+## 2026-07-30 — Embedded Creative Capacity
+
+Se canonizó `Embedded Managed Pod` como configuración de Creative Velocity: un pod externalizado que trabaja
+integrado al equipo y cultura del cliente, mientras Efeonce conserva staffing, gobierno, QA y accountability. No es
+Staff Augmentation.
+
+El operating model está en [`EFEONCE_EMBEDDED_CREATIVE_POD_OPERATING_MODEL_V1`](docs/services/creative-services/EFEONCE_EMBEDDED_CREATIVE_POD_OPERATING_MODEL_V1.md).
+Incluye fit cultural bidireccional, Brand/Business Immersion Pack, rituales, RACI, pricing, métricas de fit/adoption,
+riesgos y gates de validación.
+
+## 2026-07-30 — Creative Velocity: simulación Banco BICE y caso SKY autorizado
+
+Se creó [`EFEONCE_CREATIVE_VELOCITY_BUYING_SIMULATION_BANCO_BICE_V1`](docs/audits/commercial/EFEONCE_CREATIVE_VELOCITY_BUYING_SIMULATION_BANCO_BICE_V1.md), una simulación sintética de validación comercial para David Bachman, María Teresa Arraztoa, Rodrigo Espinoza y Pamela Fuenzaliza en Banco BICE. Incluye artefactos, demo modular, objeciones, respuestas, señales de compra/no compra y criterios de cierre.
+
+El operador confirmó autorización para nombrar a SKY como caso de éxito. SKY queda usable como referencia de capability y experiencia modular; cada claim, métrica, asset, screenshot, nombre, URL y pricing conserva su propio gate de evidencia y alcance de uso.
+
+## 2026-07-30 — Creative Velocity: benchmark profundizado y Modular Production
+
+La investigación adicional confirma que Creative Velocity está alineado con el mercado en capacidad recurrente,
+content supply chain, modular production, performance creative e IA; su diferenciación potencial está en la claridad
+de compra, Creative Operations, memoria, rights/provenance, telemetría y soporte de producto para equipos in-house.
+
+Se documentó el addendum [`EFEONCE_CREATIVE_VELOCITY_MODULAR_PRODUCTION_ADDENDUM_V1`](docs/services/creative-services/EFEONCE_CREATIVE_VELOCITY_MODULAR_PRODUCTION_ADDENDUM_V1.md).
+SKY demuestra una capability modular de configuración de assets con Adobe Express, SharePoint y herramientas
+complementarias. Esto queda clasificado como delivery probado; la productización independiente permanece en roadmap.
+
+La escalera de validación es Diagnostic → Sprint → Managed Capacity/Flex → Dedicated Creative Pod → Performance
+Creative Lane o Modular Production Lane → Creative Studio/Production System. Estado honesto: **Approved for
+validation**. Falta documentar y autorizar el caso SKY, validar primer valor, capacity envelope, cost-to-serve,
+rights/provenance, portabilidad, soporte y gates de producto antes de `Commercially approved`.
+
+## 2026-07-30 — Creative Services: benchmark y arquitectura de oferta V2
+
+Se documentó la investigación de mercado 2026 y se adoptó la recomendación de reorganizar Creative Services bajo
+Creative Operations. Las fuentes primarias, confidence y límites están en
+[`CREATIVE_SERVICES_MARKET_BENCHMARK_2026-07-30`](docs/audits/commercial/CREATIVE_SERVICES_MARKET_BENCHMARK_2026-07-30.md).
+
+La decisión aceptada está en
+[`EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_DECISION_V1`](docs/architecture/EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_DECISION_V1.md)
+y el contrato de oferta en
+[`EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_V2`](docs/services/creative-services/EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_V2.md).
+La arquitectura de presentación es híbrida: el catálogo plano permite reconocimiento rápido; las rutas `Creative
+Velocity`, `Brand & Campaign Systems`, `Content Production System` y `AI Creative Operations` orientan la venta;
+los paquetes y modalidades convierten la ruta en una compra scopeable. La escalera es diagnóstico/proyecto
+exploratorio → sprint → Managed Creative Capacity → lane especializado → Studio/portfolio expansion.
+
+Estado honesto: **documentación y arquitectura completas para validación; oferta aún no Commercially approved**.
+Siguen pendientes cohortes pagadas, willingness-to-pay, loaded cost/capacidad/margen, rights/legal, proof formal de
+SKY y gates de Globe/Studio Access. Próximo paso ejecutable: producir los briefs comerciales de Creative Velocity
+Diagnostic, Capture Sprint y Campaign Sprint y someterlos a Finance, Legal/IP, Operations y Commercial.
+
+El detalle operativo ahora vive en [`CREATIVE_SERVICES_OPERATING_MODEL_V1`](docs/services/creative-services/EFEONCE_CREATIVE_SERVICES_OPERATING_MODEL_V1.md): Product Services, paquetes, creación/captura de valor, ICP/JTBD, buying group, delivery/RACI, capacity, pricing/economics, rights, proof, renewal y gates.
+
 ## 2026-07-30 — TASK-1600: implementación y release gobernado regularizado
 
 TASK-1600 ya migró Greenhouse al paquete AXIS `0.2.1` (sucesor compatible de la publicación manual histórica

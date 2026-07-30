@@ -1,5 +1,11 @@
 # 10 · El pitch — y la política de spec work, que es lo único que importa de este módulo
 
+## Addendum Embedded Creative Capacity
+
+El pitch debe mostrar al pod como extensión integrada, no como reemplazo del equipo. Llevar Brand/Business Immersion
+Pack, Demand & Capacity Map, RACI, rituales, métricas de fit/adoption y frontera con Staff Augmentation. La frase
+operativa es: “trabajamos codo a codo; Efeonce conserva gobierno y accountability”.
+
 > ## 🎯 Lo que decide un pitch NO es la mejor presentación. Es el fit con la gente.
 > ✅ *verificado 2026-07-13* — **ID Comms:** *"La variable más importante al elegir agencia es el fit con tu
 > gente, no necesariamente la mejor presentación."* **La química es lo que sostiene una relación larga.**

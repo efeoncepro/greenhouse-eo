@@ -57,6 +57,27 @@ Estado: `Approved for validation`. El servicio es humano y recurrente; Efeonce R
 componible, mientras Globe / Creative Studio no forma parte de la promesa base actual. `Approved for validation` habilita
 pilotos y SOW gobernados, no venta self-serve ni aprobación comercial definitiva.
 
+## Creative Services offer architecture
+
+- [`Creative Services — Offer Architecture V2`](../services/creative-services/EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_V2.md)
+- [`Creative Services — Operating Model V1`](../services/creative-services/EFEONCE_CREATIVE_SERVICES_OPERATING_MODEL_V1.md)
+- [`Creative Services Offer Architecture Decision V1`](../architecture/EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_DECISION_V1.md)
+- [`Creative Services Market Benchmark 2026-07-30`](../audits/commercial/CREATIVE_SERVICES_MARKET_BENCHMARK_2026-07-30.md)
+- [`Creative Velocity — Modular Production Addendum V1`](../services/creative-services/EFEONCE_CREATIVE_VELOCITY_MODULAR_PRODUCTION_ADDENDUM_V1.md)
+- [`Embedded Creative Pod Operating Model V1`](../services/creative-services/EFEONCE_EMBEDDED_CREATIVE_POD_OPERATING_MODEL_V1.md)
+
+`Fully Managed Creative Capacity` es la modalidad en la que Efeonce absorbe equipo, infraestructura, licencias,
+costos laborales, provisionales, continuidad y soporte, mientras el cliente paga un fee mensual por una capacidad
+definida. Aplica globalmente, con parametrización legal, laboral, fiscal, monetaria y de procurement por país.
+
+La arquitectura V2 organiza el catálogo en cuatro rutas de compra —Creative Velocity, Brand & Campaign Systems,
+Content Production System y AI Creative Operations— y conserva los Product Services, delivery models, engagement,
+rights y economics separados. No habilita pricing público, checkout ni venta self-serve; el estado general sigue
+`Approved for validation`.
+
+El addendum de Creative Velocity documenta la capacidad modular observada en SKY, su separación entre servicio, IP
+y producto, y los gates para evolucionar de Modular Production Lane a una experiencia productizada.
+
 ## Fronteras con las demás categorías
 
 | Categoría | Pregunta que responde | No debe contener como canon |

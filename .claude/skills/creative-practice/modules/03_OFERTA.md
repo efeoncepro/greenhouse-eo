@@ -1,5 +1,43 @@
 # 03 · La oferta — qué vendemos, exactamente
 
+## Addendum Creative Velocity
+
+Creative Velocity vende capacidad creativa recurrente y gobernada. Las lanes son `Social Velocity`, `Campaign
+Velocity`, `Performance Creative Velocity` y `Content Operations Velocity`. La velocidad incluye tanto
+throughput de producción como velocidad de decisión: priorización, aprobación y aprendizaje.
+
+`Dedicated Creative Pod` nombra comercialmente un Managed Squad gobernado por Efeonce. La capacidad modular de SKY
+—Adobe Express, assets en SharePoint y herramientas complementarias— habilita `Modular Production Sprint/Lane` como
+servicio candidato. Es delivery probado, no producto generalizado. No publicar precio por asset ni prometer
+self-service hasta cerrar rights, portabilidad, QA, cost-to-serve, runtime y soporte.
+
+Referencia completa: [`Creative Velocity — Modular Production Addendum V1`](../../../docs/services/creative-services/EFEONCE_CREATIVE_VELOCITY_MODULAR_PRODUCTION_ADDENDUM_V1.md).
+
+### Embedded Creative Capacity
+
+`Embedded Managed Pod` es un pod externalizado que trabaja codo a codo con el equipo interno de la marca. La
+experiencia es integrada; la accountability sigue siendo de Efeonce dentro del SOW.
+
+No confundir:
+
+- Managed Pod: Efeonce arma, dirige y responde.
+- Embedded Managed Pod: lo anterior, más inmersión cultural, rituales compartidos y continuidad con el equipo interno.
+- Staff Augmentation: el cliente dirige cotidianamente a la persona y compra dedicación.
+
+El fit cultural debe formar parte del delivery: Brand/Business Immersion Pack, personas nombradas, canales compartidos,
+rituales, vocabulario, ejemplos aprobados/rechazados, protocolo de escalamiento y métricas de adoption. El precio
+incluye integration cost; no venderlo al rate de staff-aug.
+
+### Fully Managed Creative Capacity
+
+Si Efeonce paga y administra equipo, computadores, infraestructura, licencias, contratación, costos laborales,
+provisionales, reemplazos y soporte, el servicio es `Fully Managed Creative Capacity`. El cliente paga un fee mensual
+por una capacity envelope y se desentiende de esa complejidad.
+
+“Llave en mano” puede usarse como explicación comercial, pero el SOW debe fijar capacidad, lanes, simultaneidad,
+rounds, rights, exclusiones, escalamiento, pass-through y condiciones por país. No confundir despreocupación
+administrativa con unlimited ni con Staff Augmentation.
+
 > **La tesis que ordena todo el módulo:**
 > ## No vendemos piezas. Vendemos capacidad gobernada.
 >
@@ -265,7 +303,37 @@ Lo que está roto es cómo lo cobramos.**
 
 ## 6. El catálogo — qué servicios creativos vendemos, y quién los ejecuta
 
+> **Arquitectura vigente:** antes de usar esta tabla, carga [`Creative Services Offer Architecture V2`](../../../docs/services/creative-services/EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_V2.md). La tabla es el índice de servicios reconocibles; después se orienta por las rutas `Creative Velocity`, `Brand & Campaign Systems`, `Content Production System` y `AI Creative Operations`, y finalmente se scopea por paquete y modalidad.
+
+> Para el contrato profundo de outcomes, ICP/JTBD, buying group, delivery, RACI, capacity, pricing, rights, proof,
+> renewal y gates, carga [`Creative Services Operating Model V1`](../../../docs/services/creative-services/EFEONCE_CREATIVE_SERVICES_OPERATING_MODEL_V1.md).
+
 **Acá se VENDE y se SCOPEA. El oficio vive en los studios. No lo reimplementes.**
+
+### La arquitectura híbrida en una propuesta
+
+La tabla de servicios es el índice de reconocimiento. Después, la propuesta debe avanzar en este orden:
+
+```text
+servicio reconocible
+→ ruta por problema
+→ paquete de entrada o continuidad
+→ delivery model + engagement + operating mode
+→ scope, rights, rounds, acceptance y economics
+```
+
+Ejemplo:
+
+```text
+Content & Social Operations + Run & Gun Production
+→ Creative Velocity
+→ Capture Sprint
+→ On-Demand + Managed Squad + efeonce-managed
+→ jornada, crew, formatos, post, rounds, derechos y entrega
+```
+
+La lista de servicios no compite con la arquitectura estratégica: permite ser encontrado. La ruta evita que el
+cliente tenga que ensamblar solo la solución. El paquete permite comprarla y el SOW la vuelve operable.
 
 | Servicio | Modalidad natural | 🔴 El borde de alcance que hay que fijar | Hand-off al oficio |
 |---|---|---|---|
@@ -282,6 +350,20 @@ Lo que está roto es cómo lo cobramos.**
 hipótesis y aprendizaje creativo conectado con medios. `Experience/Product/CX` compone con Wave cuando requiere
 producto, web o tecnología. `Editorial Content & SEO` compone con Search Visibility hasta resolver ownership y
 pricing. Ninguna de estas composiciones crea una nueva línea de Creative Services por sí sola.
+
+### Creative Operations: capa transversal de delivery
+
+Creative Operations no es un octavo servicio ni un SKU independiente por defecto. Es la capa que debe estar presente
+en los servicios donde Efeonce promete confiabilidad, capacidad o continuidad:
+
+```text
+intake → brief ownership → triage/prioritization → queue → production → review/approval
+→ rights/provenance → delivery/evidence → learning/renewal
+```
+
+Cada propuesta debe declarar el owner de cada etapa, el failure owner, la capacidad máxima, las rondas, los límites
+de simultaneidad, el fallback y la evidencia que el cliente verá. “Co-operated” nunca significa que ambos responden
+sin dueño; exige un owner por etapa o lane.
 
 ### Run & Gun: capability versus servicio
 

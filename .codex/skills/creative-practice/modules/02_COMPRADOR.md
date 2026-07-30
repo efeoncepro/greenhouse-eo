@@ -1,5 +1,12 @@
 # 02 · El comprador — quién firma y quién mata el deal
 
+## Addendum Embedded Creative Capacity
+
+En una oferta embedded, el buying group debe incluir no sólo sponsor y economic buyer, sino también el creative lead
+in-house, el owner de Marca, el operador diario y las funciones de Legal/Compliance/Procurement que gobiernan el
+contexto. Validar fit cultural bidireccional: el pod debe entender la marca y el cliente debe poder colaborar con un
+owner Efeonce, rituales, límites y feedback accionable.
+
 > **La regla que gobierna este módulo:**
 > ## En un deal creativo, el que firma casi nunca es el que decide. Y el que decide casi nunca está invitado a la reunión.
 
@@ -188,7 +195,8 @@ está mal.** → `modules/06_CUNA.md`.
 
 ### 🔴 5. *"No conozco su trabajo / no tienen casos en mi industria"*
 
-🔴 **La verdad incómoda: hoy NO tenemos casos creativos formalizados con métrica de negocio y autorización.**
+🔴 **La actualización: SKY ya está autorizado para nombrarse como caso de éxito.** Eso no elimina la obligación de
+conservar evidencia verificable ni autoriza automáticamente cada claim, métrica, asset o screenshot.
 *(→ `efeonce/ESTADO_ACTUAL.md` § 6.)* **No inventes uno. No muestres un mockup como si fuera un caso.**
 
 > *"Te voy a ser derecho: **no te voy a mostrar un caso de tu industria, porque los que tengo no están

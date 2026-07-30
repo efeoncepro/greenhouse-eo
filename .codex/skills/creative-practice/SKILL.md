@@ -16,6 +16,72 @@ description: >-
 
 # Creative Practice — el negocio, no el oficio
 
+## Canon de oferta vigente — 2026-07-30
+
+La arquitectura comercial vigente de Creative Services está en [`EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_V2.md`](../../../docs/services/creative-services/EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_V2.md) y su decisión en [`EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_DECISION_V1.md`](../../../docs/architecture/EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_DECISION_V1.md). El benchmark que la fundamenta está en [`CREATIVE_SERVICES_MARKET_BENCHMARK_2026-07-30.md`](../../../docs/audits/commercial/CREATIVE_SERVICES_MARKET_BENCHMARK_2026-07-30.md).
+
+El detalle de oferta, modelo de negocio, customer model, pricing, operaciones, rights, proof, renovación y gates
+vive en [`EFEONCE_CREATIVE_SERVICES_OPERATING_MODEL_V1.md`](../../../docs/services/creative-services/EFEONCE_CREATIVE_SERVICES_OPERATING_MODEL_V1.md). Esta skill aplica ese contrato; no inventa una taxonomía paralela.
+
+La oferta usa una arquitectura híbrida. Primero conserva un índice reconocible de servicios —estrategia de marca,
+campañas, contenido/social, producción audiovisual, Run & Gun, capacidad gestionada y AI Creative Operations— para
+que el mercado identifique rápidamente qué hacemos. Después orienta la conversación mediante cuatro rutas: **Creative
+Velocity**, **Brand & Campaign Systems**, **Content Production System** y **AI Creative Operations**. La escalera
+comercial es:
+
+```text
+diagnóstico/proyecto exploratorio → sprint pagado → Managed Creative Capacity
+→ sistema/lane especializado → Studio/Globe + composiciones de portfolio
+```
+
+**Creative Operations** es la capa transversal que hace demostrable la promesa: intake, brief ownership,
+priorización, approvals, rights/provenance, queue, quality gates, delivery, evidence y learning. No es un SKU nuevo
+por defecto. `Creative Diagnostic` es una puerta de entrada, no una sexta línea de producción.
+
+### Decisiones de mercado que esta skill debe aplicar
+
+- Vender capacidad gobernada y sistemas de producción; no horas ni piezas como unidad pública principal.
+- Complementar equipos in-house; no presentarse como reemplazo del equipo del cliente.
+- Hacer coexistir Sprint, On-Demand, On-Going, Managed Squad y Studio Access sin mezclarlos.
+- Conectar contenido, social, producción, IA, derechos, media y medición mediante composiciones con ownership separado.
+- Usar tres pruebas: creative proof, commercial proof y operational proof.
+- Mostrar límites reales de cola, simultaneidad, rounds, turnaround, derechos y overages; no usar “unlimited” sin contrato.
+- Presentar IA como infraestructura gobernada con autoridad humana, provenance, fallback y rights.
+
+La investigación fechada y sus confidence levels son evidencia de mercado, no prueba automática de willingness-to-pay,
+pricing, PMF o capacidad local. Para precios y contratos siguen mandando Finance, Legal/IP, CPQ y el modelo Creative
+Studio.
+
+### Cómo explicar la arquitectura al mercado
+
+La arquitectura tiene tres capas y cada una responde una pregunta diferente:
+
+```text
+1. Catálogo reconocible → ¿qué servicios ofrece Efeonce?
+2. Ruta por problema → ¿cuál de esos servicios resuelve mi situación?
+3. Paquete/modalidad/scope → ¿qué compro, quién opera y qué queda incluido?
+```
+
+No ocultes el catálogo para contar una historia estratégica. El catálogo plano es el índice público de reconocimiento
+para buscadores, procurement, decks y compradores. Las rutas `Creative Velocity`, `Brand & Campaign Systems`,
+`Content Production System` y `AI Creative Operations` son la capa de orientación; no reemplazan los nombres de
+servicios. Los paquetes `Creative Sprint`, `Creative Capacity` y `Creative Studio / Production System` son la capa
+de compra.
+
+Ejemplo de calificación:
+
+```text
+Cliente: “mi equipo no alcanza a producir el lanzamiento”
+→ servicios reconocibles: Content & Social Operations + Run & Gun Production
+→ ruta: Creative Velocity
+→ entrada: Creative Velocity Diagnostic o Capture Sprint
+→ continuidad: Managed Creative Capacity
+→ expansión: Campaign Systems + Performance Creative + Media/Measurement
+```
+
+Regla de copy: primero ayuda al comprador a encontrarse; después ayúdalo a entender el sistema; finalmente fija el
+alcance. No obligues al comprador a comprender la arquitectura interna antes de saber qué haces.
+
 Para la arquitectura general de pricing y economics cargar `efeonce-pricing-operator`. Esta skill sigue siendo dueña
 de las decisiones específicas de Creative Studio: créditos creativos, derechos, rounds, buyouts, pools, scope y
 capacidad creativa.
@@ -315,3 +381,44 @@ y hasta dónde llega* → **es de acá.**
 6. ¿Es una decisión de método de venta genérica? → **es de `commercial-expert`**, no de acá.
 7. ¿Hay Creative Studio/credits? → declara los **tres ejes**, separa las **cinco líneas**, carga
    `modules/14_STUDIO_CREDITS.md` y verifica si el modelo está sólo en shadow/piloto o comercialmente aprobado.
+
+## 6. Creative Velocity y producción modular — addendum vigente
+
+Creative Velocity es la ruta comercial para equipos in-house que necesitan absorber demanda recurrente sin perder
+criterio, control ni memoria. Se vende como `capacity envelope` gobernada, no como horas, piezas ilimitadas o
+urgencia permanente. Sus lanes de validación son `Social Velocity`, `Campaign Velocity`, `Performance Creative
+Velocity` y `Content Operations Velocity`.
+
+`Dedicated Creative Pod` es el nombre comercial comprensible para un Managed Squad: Efeonce dirige la operación y
+responde por el delivery dentro del scope. No equivale a Staff Augmentation.
+
+La experiencia modular de SKY demuestra una capability de configuración de distintos assets desde un sistema
+reutilizable usando Adobe Express, assets en SharePoint y herramientas complementarias. Puede venderse como
+`Modular Production Sprint/Lane` dentro de Creative Velocity. No se debe presentar todavía como producto self-service,
+API pública, precio por asset, catálogo universal de templates ni SLA independiente de la operación humana.
+
+Separar siempre servicio operado por Efeonce, IP/sistema —templates, reglas, taxonomía y memoria— y producto futuro
+—experiencia configurable, provenance, exportación, integraciones y billing—. El contrato completo y sus gates viven
+en [`Creative Velocity — Modular Production Addendum V1`](../../../docs/services/creative-services/EFEONCE_CREATIVE_VELOCITY_MODULAR_PRODUCTION_ADDENDUM_V1.md).
+
+Para validar la oferta con un buying group, usar la simulación [`Creative Velocity Buying Simulation — Banco BICE V1`](../../../docs/audits/commercial/EFEONCE_CREATIVE_VELOCITY_BUYING_SIMULATION_BANCO_BICE_V1.md). Una simulación es evidencia de preparación comercial, no evidencia de demanda real.
+
+### Embedded Creative Capacity
+
+`Embedded Managed Pod` es una configuración de Creative Velocity: el pod es externo, pero trabaja integrado al
+equipo y cultura del cliente. Efeonce conserva staffing, gobierno, QA, memoria y accountability. No es Staff
+Augmentation.
+
+El fit cultural se opera mediante inmersión de marca/negocio, personas nombradas, rituales compartidos, continuidad,
+feedback, escalamiento y métricas de adoption. Debe pricearse como capacidad + gobierno + integración; no como
+dedicación de perfiles. Validar siempre si el cliente acepta un owner Efeonce, un RACI claro y límites de capacidad.
+
+### Fully Managed Creative Capacity
+
+Cuando Efeonce absorbe equipo, infraestructura, computadores, licencias, contratación, costos laborales,
+provisionales, reemplazos y soporte, la oferta se denomina `Fully Managed Creative Capacity`. El cliente paga un fee
+mensual integral por una capacity envelope definida y se despreocupa de esa complejidad.
+
+No vender “llave en mano” como unlimited. Declarar lanes, capacidad, simultaneidad, rounds, derechos, exclusiones,
+escalamiento y pass-through. El modelo aplica en todos los países donde Efeonce opera, con payroll, impuestos, FX,
+privacidad, derechos laborales, proveedores, seguros y procurement parametrizados por jurisdicción.

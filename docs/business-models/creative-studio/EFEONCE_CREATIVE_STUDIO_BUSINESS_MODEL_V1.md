@@ -45,6 +45,21 @@ La arquitectura de ingresos tiene cinco líneas separables:
 El modelo está aprobado para medir y pilotear. No están aprobados el precio público por crédito, paquetes de
 top-up, checkout, pagos, expiración comercial ni acceso externo general.
 
+### Relación con la arquitectura de Creative Services — 2026-07-30
+
+El Business Model de Creative Studio continúa gobernando los tres ejes ortogonales —delivery model, engagement y
+operating mode— y las cinco líneas económicas. La oferta comercial de la línea Creative Services ahora se presenta
+mediante la arquitectura [`Creative Services Offer Architecture V2`](../../services/creative-services/EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_V2.md): `Creative Velocity`, `Brand & Campaign Systems`, `Content Production System` y `AI Creative Operations`.
+
+Esta decisión no crea un cuarto modelo de delivery, no convierte Globe en la marca contractual, no habilita Studio
+Access externo y no cambia la política de Studio Credits. Creative Studio/Globe es un habilitador platform-enabled
+dentro de la ruta AI Creative Operations o de composiciones aprobadas; Creative Services conserva la relación,
+dirección y accountability que cada SOW declare.
+
+El benchmark de mercado que fundamenta esta reorganización vive en
+[`CREATIVE_SERVICES_MARKET_BENCHMARK_2026-07-30`](../../audits/commercial/CREATIVE_SERVICES_MARKET_BENCHMARK_2026-07-30.md) y la decisión estructural en
+[`EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_DECISION_V1`](../../architecture/EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_DECISION_V1.md).
+
 ## 2. Tesis y problema que resolvemos
 
 ### 2.1 El problema del cliente
@@ -560,3 +575,51 @@ Fuentes internas canónicas:
 
 Benchmark externo se conserva como evidencia direccional de packaging/usage, no como autoridad de precio. Los
 precios, términos y capabilities de vendors deben revalidarse cerca de cualquier decisión comercial.
+
+## 16. Creative Velocity y Modular Production
+
+Creative Velocity es la composición comercial de capacidad creativa recurrente, Creative Operations, producción
+modular y aprendizaje. El cliente compra capacidad reservada, coordinación, craft, QA, derechos, memoria y evidencia;
+no compra horas ni una lista ilimitada de piezas.
+
+La capacidad modular observada en SKY —Adobe Express, assets en SharePoint y herramientas complementarias— es una
+prueba de delivery que puede evolucionar a `Modular Production Lane` y posteriormente a producto. No es todavía
+prueba de self-service, API pública, precio por asset o plataforma generalizada. El estado se mantiene
+`approved_for_validation` hasta cerrar proof, economics, portabilidad, rights, runtime y soporte.
+
+El modelo debe distinguir tres capas:
+
+1. **Servicio:** pod/lane administrada y producción modular dentro de un SOW.
+2. **IP y sistema:** templates, taxonomía, reglas, brand profile, memoria y método, con ownership explícito.
+3. **Producto:** experiencia configurable, governance, provenance, exportación, integraciones y billing aprobados.
+
+La especificación de lanes, packaging, primer valor y gates está en [`Creative Velocity — Modular Production Addendum V1`](../../services/creative-services/EFEONCE_CREATIVE_VELOCITY_MODULAR_PRODUCTION_ADDENDUM_V1.md).
+
+## 17. Embedded Creative Capacity
+
+El modelo incorpora `Embedded Managed Pod` como una configuración de delivery: el pod se integra al equipo y cultura
+del cliente, pero Efeonce conserva staffing, gobierno y accountability. El fit cultural no es un atributo decorativo;
+es un driver de cost-to-serve y de resultados operativos porque cambia la calidad del brief, FTR, RpA, cycle time,
+adoption y renovación.
+
+No se debe cobrar un Embedded Managed Pod como Staff Augmentation. El precio debe absorber immersion, rituales,
+documentación, memoria, continuidad, coordinación, backup y soporte. El detalle operativo, RACI, métricas y gates vive
+en [`Embedded Creative Pod Operating Model V1`](../../services/creative-services/EFEONCE_EMBEDDED_CREATIVE_POD_OPERATING_MODEL_V1.md).
+
+### Fully Managed Creative Capacity
+
+La forma de captura de valor para este modelo es un **fee mensual integral**. Efeonce absorbe:
+
+- equipo y staffing;
+- computadores e infraestructura;
+- licencias y herramientas;
+- contratación, costos laborales y provisionales;
+- coordinación, reemplazos y continuidad;
+- Creative Operations, QA y reporting.
+
+El cliente compra una capacidad definida y se desprende de la administración de esa infraestructura. Esto es valor
+por transferencia de complejidad, predictibilidad, menor riesgo y menor coordinación, no arbitraje de costos laborales.
+
+El modelo es global para todos los países donde Efeonce opera. La unidad económica debe versionarse por país,
+moneda y jurisdicción: payroll, impuestos, FX, privacidad, derechos laborales, proveedores, seguros, DPA,
+procurement y working capital. La aprobación comercial requiere economics por pod y país, no sólo promedio global.

@@ -1,6 +1,19 @@
 # 07 · Prueba sin mentir — no tenemos portafolio citable, y eso nos obliga a probar mejor
 
-> ## 🔴 Cero casos creativos con métrica verificable y autorización escrita. Hoy. Ninguno.
+## Addendum Creative Velocity
+
+La prueba debe tener tres capas: creative proof, commercial proof y operational proof. Para Modular Production
+agregar tiempo de configuración, módulos reutilizados, variantes, QA pass rate, errores de metadata/rights,
+reutilización entre campañas y costo de mantenimiento de templates. El caso SKY demuestra capability de delivery
+con Adobe Express y SharePoint. SKY está autorizado para ser nombrado como caso de éxito; cada claim, métrica,
+asset, screenshot, nombre, URL y pricing mantiene su propio alcance de evidencia y uso. El caso no prueba por sí
+solo un producto generalizado.
+
+Para Embedded Creative Capacity, el proof debe demostrar no sólo calidad y delivery, sino integración: continuidad del
+pod, adopción de rituales, mejora de brief, feedback accionable, tiempo de aprobación, confianza del equipo interno y
+memoria reutilizada.
+
+> ## ✅ SKY ya puede nombrarse como caso de éxito autorizado.
 > **`efeonce/ESTADO_ACTUAL.md` § 6 lo dice sin adornos.** Este módulo no existe para tapar eso.
 > Existe porque **la prueba que sí tenemos es mejor que un portafolio — y casi nadie la puede copiar.**
 

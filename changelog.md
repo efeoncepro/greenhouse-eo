@@ -7,6 +7,36 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-30 — Creative Velocity y producción modular
+
+- Se profundizó el benchmark de Creative Velocity contra Superside, Publicis, WPP, VML, Monks, DEPT, Dentsu,
+  Accenture Song y referentes de Chile/LatAm.
+- Se creó [`EFEONCE_CREATIVE_VELOCITY_MODULAR_PRODUCTION_ADDENDUM_V1`](docs/services/creative-services/EFEONCE_CREATIVE_VELOCITY_MODULAR_PRODUCTION_ADDENDUM_V1.md).
+- Se documentaron lanes Social/Campaign/Performance Creative/Content Operations Velocity, Dedicated Creative Pod,
+  primer valor, dos velocidades y el roadmap de Modular Production.
+- Se registró la implementación observada en SKY con Adobe Express, SharePoint y assets reutilizables como capability
+  de delivery probada, separada de un producto futuro.
+- Se actualizaron Creative Practice en `.codex` y `.claude`, además de las skills de business model, customer model
+  y pricing. Estado: `Approved for validation`; no se habilita venta self-service ni pricing público.
+- Se creó la simulación sintética [`Creative Velocity Buying Simulation — Banco BICE V1`](docs/audits/commercial/EFEONCE_CREATIVE_VELOCITY_BUYING_SIMULATION_BANCO_BICE_V1.md), con artefactos, objeciones, respuestas y criterios de validación.
+- Se actualizó el estado de SKY: el operador autoriza nombrarlo como caso de éxito; claims, métricas, assets,
+  screenshots, nombres, URLs y pricing siguen sujetos a evidencia y alcance específico.
+- Se documentó `Embedded Managed Pod / Embedded Creative Capacity` como modalidad integrada culturalmente al equipo
+  interno, con frontera explícita frente a Staff Augmentation, cost-to-serve de integración y métricas de fit/adoption.
+- Se incorporó `Fully Managed Creative Capacity`: fee mensual integral donde Efeonce absorbe equipo, infraestructura,
+  licencias, costos laborales, provisionales, reemplazos y soporte. El modelo aplica globalmente, con parametrización
+  legal, laboral, fiscal, monetaria y de procurement por jurisdicción.
+
+## 2026-07-30 — Creative Services: benchmark de mercado y arquitectura Creative Operations
+
+- Se documentó el benchmark fechado [`CREATIVE_SERVICES_MARKET_BENCHMARK_2026-07-30`](docs/audits/commercial/CREATIVE_SERVICES_MARKET_BENCHMARK_2026-07-30.md), con referentes globales, digitales/productizados, Chile/LatAm, fuentes de compradores, confidence, límites y patrones adoptables.
+- Se aceptó [`EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_DECISION_V1`](docs/architecture/EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_DECISION_V1.md): Creative Operations organiza la oferta en Creative Velocity, Brand & Campaign Systems, Content Production System y AI Creative Operations.
+- Se creó [`EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_V2`](docs/services/creative-services/EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_V2.md), con escalera diagnóstico/proyecto exploratorio → sprint → Managed Creative Capacity → lane especializado → Studio/portfolio expansion, paquetes, ICP, proof system, rights, economics y gates.
+- Se sincronizaron `README`, `project_context`, `DECISIONS_INDEX`, Creative Studio Business Model y las copias `.codex`/`.claude` de `creative-practice`. Estado honesto: `Approved for validation`; no habilita pricing público, checkout, venta self-serve ni claims no verificados.
+- Se aclaró la arquitectura como **híbrida**: el catálogo plano permanece como índice de reconocimiento rápido; las cuatro rutas orientan la conversación y los paquetes/modalidades convierten la ruta en una compra scopeable.
+- Las skills `creative-practice` ahora explican operativamente las tres capas, el orden de calificación y un ejemplo de recorrido desde servicio reconocible hasta ruta, sprint, Managed Capacity y expansión.
+- Se creó [`CREATIVE_SERVICES_OPERATING_MODEL_V1`](docs/services/creative-services/EFEONCE_CREATIVE_SERVICES_OPERATING_MODEL_V1.md), que profundiza oferta, modelo de creación/captura de valor, ICP/JTBD, buying group, delivery/RACI, capacity, pricing/economics, rights, proof, renovación y gates de madurez.
+
 ## 2026-07-30 — TASK-1600: ownership de color transferido a AXIS
 
 - AXIS publica la paleta portable completa y Greenhouse consume `@efeoncepro/axis-tokens@0.2.1` mediante adapters; `0.2.0` queda como publicación manual histórica y `v0.2.1` fue regularizada con el pipeline gobernado (`30525304584`, success), incluyendo publish idempotente.
@@ -637,31 +667,3 @@ fuente de verdad. Nada autenticado se cachea, verificado path por path.
 - La skill `greenhouse-globe` (Claude y Codex) suma siete reglas duras nuevas: cabeceras al portar,
   `idempotencyKey` en el cuerpo, el deploy por servicio, `textPayload` vs logs JSON, `logging.logWriter`,
   el estilado por atributo de la hoja legacy y los controles de salida sin `<select>`.
-
-## 2026-07-25 — Globe: regresión del feed cerrada y mecanismo de conversión de `/producer` a React
-
-- Se cerró la regresión visual de `/producer/feed` portándola del legacy (autoridad de lo ya probado en
-  producción, no del prototipo): grid con filas parejas, reposo de card con su sombra, guard de `<img>` sin
-  `src`, toggle de selección, clamp del título, fecha en el pie y washes de vuelta a la familia azul.
-  Desplegado y verificado: revisión `globe-studio-internal-00078-5gs`.
-- Dos bugs que sólo se ven con la obra cargada: `.pf__badge` sin `z-index` (el thumbnail tapaba "Destacada")
-  y su relleno dependiente de un media oscuro para ser legible.
-- Se montó el mecanismo para convertir `/producer` **sin recrear**: `renderShell` acepta
-  `extraStyles`/`extraStylesheets` y la rama React sirve `producerStyles` del legacy **verbatim** + iconos
-  Tabler, con flag propio `GLOBE_CLIENT_PRODUCER_ENABLED` (default off, cableado).
-- `/v1/session` publica `identity {name,email}` hermana del `principal` (presentación, no autoridad).
-- `/producer` sigue sirviendo el legacy: la conversión de la superficie está pendiente. Decisión en ADR-014
-  § Delta 2026-07-25 (2); checkpoint en `TASK-1505`.
-
-## 2026-07-25 — Skills de investor readiness y business model
-
-- Se crearon `.codex/skills/efeonce-investor-readiness/` y `.codex/skills/efeonce-business-model-operator/`
-  con operating loops, gates, templates, fuentes verificadas, escenarios de evaluación y validadores locales.
-- Se actualizó el routing de `AGENTS.md`, `CLAUDE.md`, `efeonce-agency`, `project_context.md` y
-  `docs/business-models/README.md`. El cambio no autoriza instrumentos financieros, emisiones, spinouts,
-  pricing, ventas ni transferencia de IP.
-- Se endurecieron los artefactos: templates del pack de inversión, source catalogs, validadores de ledger y
-  data room, acceptance criteria/protocol de evals, y drafts `Draft` de Efeonce Group, Growth Platform, AEO
-  y Search Visibility 360 sin inventar datos financieros o de tracción.
-- Se redactó la arquitectura canónica de modelos de negocio: corporativo, plataforma, capability/oferta,
-  packaging y submodelos, con ownership, gates y reglas de consolidación.
