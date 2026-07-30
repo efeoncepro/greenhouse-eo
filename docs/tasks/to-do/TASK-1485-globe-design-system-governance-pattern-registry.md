@@ -17,7 +17,7 @@
 - Motion: `docs/ui/motion/TASK-1485-globe-design-system-motion-governance.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Boundary aprobada por operador; contrato/implementación pendientes`
+- Status real: `NECESITA RE-SCOPE (2026-07-30). Su premisa central —Globe posee e implementa tokens, patterns y components; Pattern Lab Globe— contradice el ADR de ownership de AXIS (AXIS posee la especificación completa; el producto traduce) y la decisión de que el Lab vive en el Vercel de AXIS. Ya venía señalado: el ADR de plataforma exigía actualizarla antes de promover el registry, y el continuity map la listaba como P4 bloqueada. SIGUE VÁLIDO: que Globe no herede MUI/Vuexy, el lifecycle candidate→trial→stable, el motor ADR-016 (implementado) y la identidad Capacity. No ejecutar como está escrita. Ver Delta 2026-07-30`
 - Rank: `TBD`
 - Domain: `creative|ui-platform|governance|accessibility`
 - Blocked by: `TASK-1455`
@@ -55,6 +55,48 @@ la reescritura sea **traducción mecánica**, no reinterpretación — y es inde
 
 **Lo que destraba:** el Slice 0 de `TASK-1552` se retira —mover 272 reglas que se van a reescribir es trabajo
 desechable— y `TASK-1560` se destraba por el mismo camino.
+
+## Delta 2026-07-30 — 🔴 su premisa central contradice el ADR de ownership de AXIS
+
+El Summary de esta task declara que **Globe posee e implementa tokens seleccionados, patterns, components,
+motion y runtime**, y su Goal pide un **Pattern Lab Globe**. Las dos cosas son incompatibles con el estado
+vigente del ecosistema:
+
+1. **[`EFEONCE_AXIS_DESIGN_SYSTEM_OWNERSHIP_DECISION_V1`](../../architecture/EFEONCE_AXIS_DESIGN_SYSTEM_OWNERSHIP_DECISION_V1.md)
+   (`Accepted`, corregido 2026-07-30)**: AXIS posee la **especificación completa** —primitivo, semántico y
+   **componente**— y cada producto sólo traduce a su motor. Si Globe posee sus patterns y sus components, el
+   mismo pattern puede verse distinto en cada producto, que es exactamente lo que el ADR existe para
+   impedir. El operador lo nombró así: *"si un botón se va a comportar igual pero se va a ver distinto donde
+   lo pongan, ¿qué sentido tiene tener un design system?"*.
+2. **El Lab vive en el Vercel de AXIS** (decisión del operador 2026-07-30, `TASK-1590` § Delta (b)). Un
+   Pattern Lab Globe sería un segundo Lab.
+
+**Esto ya venía señalado y nadie lo cerró.** `EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1` dice desde su
+redacción que *"`TASK-1485` pasa a ser un consumer/piloto de la plataforma compartida y **debe actualizarse
+antes de promover el registry como estable**"*, y el continuity map del 2026-07-29 lo listaba como **P4
+bloqueado por diseño**. El ADR corregido agrava la distancia: `1485` no sólo deja de ser dueño del registry,
+deja de ser dueño de sus tokens y patterns.
+
+### Lo que SIGUE siendo válido de esta task
+
+No queda sin sujeto — buena parte se sostiene:
+
+- **Globe no hereda MUI/Vuexy.** Cierto, y el ADR lo preserva explícitamente: los adapters son nativos.
+- **El lifecycle `candidate → trial → stable`** con anatomy, states, responsive, a11y, motion y evidence.
+  Es el mismo del contrato compartido.
+- **El motor de estilos del payload cliente** (ADR-016, Tailwind v4 sobre el SSOT) — ya implementado y sin
+  relación con esta contradicción.
+- **La identidad de la suite Capacity** — es producto, no design system.
+
+### Lo que hay que re-scopear
+
+- *"Globe posee e implementa tokens seleccionados, patterns, components"* → Globe **traduce** la
+  especificación de AXIS a Tailwind. Puede tener patterns **propios** de su dominio (los cinco tests del
+  ADR), pero no versiones propias de patterns compartidos.
+- *"Pattern Lab Globe"* → fixtures de Globe **dentro del Lab de AXIS**, que es donde el diff cross-runtime
+  compara los dos adapters (`TASK-1601`).
+
+**No ejecutar esta task como está escrita.** Decisión de re-scope: del operador.
 
 ## Summary
 

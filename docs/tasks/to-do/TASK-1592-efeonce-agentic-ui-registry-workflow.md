@@ -28,6 +28,22 @@
 Hacer ejecutable para agentes el lookup del registry, la decisión `reuse | extend | new`,
 la promoción por lifecycle y los gates de duplicación, tokens, a11y y evidencia.
 
+## Delta 2026-07-30 — frontera con `TASK-1601` (gate de promoción)
+
+`TASK-1601` construye el **diff visual cross-runtime**, que es un gate de promoción a `stable`. Esta task
+incluye *"la promoción por lifecycle y los gates de … evidencia"*, así que se tocan.
+
+Frontera acordada, para que las dos no discutan qué bloquea una promoción:
+
+| | Alcance |
+|---|---|
+| **`TASK-1592`** (ésta) | **El proceso**: cómo un agente hace lookup en el registry, decide `reuse \| extend \| new`, y ejecuta la promoción por lifecycle |
+| **`TASK-1601`** | **El contrato y el mecanismo**: que la `spec` exista en el contrato, y que el diff cross-runtime la verifique |
+
+Dicho de otra forma: `1601` provee un gate; `1592` decide cuándo se corre y qué pasa con su resultado. Un
+pattern no puede promoverse a `stable` sin dos adapters y sin el diff en verde — esa regla vive en el ADR y
+las dos tasks la respetan desde su lado.
+
 ## Architecture Alignment
 
 - `docs/architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md`
