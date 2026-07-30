@@ -481,3 +481,31 @@ El **Slice 4 no requería tocar nada.** La spec asumía que los cuatro consumido
 necesitaban migrarse; en la práctica importan de `@core/theme/*`, que ahora re-exporta, así que consumen
 AXIS **transitivamente**. Mantener la frontera en la capa de theme es mejor que propagar el import: un
 consumidor menos que tocar y una superficie menos que vigilar.
+
+## Delta 2026-07-30 (c) — esta task es el PRIMER TERCIO, no el eje completo
+
+El ADR que esta task ejecuta **fue corregido el mismo día**, por un error de razonamiento que el operador
+detectó: la frontera daba "la materialización" al producto, lo que permitía que **el mismo pattern se viera
+distinto en cada producto**.
+
+La arquitectura correcta es de **tres capas** (`modern-ui` §3, que shippean Carbon, Fluent, Primer,
+Atlassian, Polaris y Spectrum):
+
+```
+primitivo → semántico → COMPONENTE
+```
+
+**Esta task movió las dos primeras.** La tercera —`button-height`, `button-padding-x`, `button-radius`,
+`button-danger-bg`— es la que garantiza consistencia visual, y sigue viviendo dentro de Greenhouse.
+
+**Nada de lo hecho se invalida.** El valor primitivo y semántico ya vive en AXIS, el diff visual dio
+0.00%/0.01% y los tests de contraste pasan sin modificar. Lo que cambia es el encuadre: **el eje del valor
+no está completo**, está en su primer tercio.
+
+Lo que falta es el **eje 3** del ADR corregido: extender `DesignPatternContract` con `spec` + `tones` en
+tokens, y construir el **diff visual cross-runtime** que verifica que dos adapters del mismo pattern rinden
+igual. Necesita su propia task.
+
+Dato que dimensiona ese trabajo y que se puede medir el primer día: `efeonce.status` ya tiene **dos adapters
+vivos** (MUI en Greenhouse, Tailwind en Globe) escritos **sin spec compartida**. Cuánto divergen hoy es
+desconocido, y es el número que hace falta antes de estimar nada.
