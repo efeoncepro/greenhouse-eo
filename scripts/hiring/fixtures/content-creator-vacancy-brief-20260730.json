@@ -20,14 +20,16 @@
     "Experiencia práctica investigando, escribiendo y editando contenido editorial o comercial.",
     "Experiencia creando contenido social: captions, conceptos, carruseles, guiones o series.",
     "Capacidad para pasar de una idea a una estructura, una primera versión y una mejora concreta.",
-    "Conocimientos aplicados de SEO; se valorará experiencia con AEO y social search.",
+    "Conocimientos aplicados de SEO y capacidad para estructurar contenido para búsqueda, asistentes de IA y social search; no buscamos un perfil técnico de desarrollo.",
+    "Experiencia práctica usando herramientas de producción y operación de contenido, como CMS, gestores de proyectos, analítica, publicación social o IA; no exigimos una marca específica.",
+    "Capacidad para leer señales básicas de contenido —alcance, interacción, clics y conversión— y proponer una mejora comprobable.",
     "Criterio para reconocer cuándo un brief está incompleto y qué preguntas hacer antes de producir.",
     "Comunicación escrita sólida en español y organización para cumplir compromisos."
   ],
   "niceToHave": [
     "Experiencia en agencia, consultora o equipos con múltiples marcas.",
     "Experiencia convirtiendo una fuente experta, entrevista o investigación en varias piezas de contenido.",
-    "Experiencia con briefs de contenido, CMS, analytics, herramientas de investigación o gestores de redes.",
+    "Experiencia con herramientas adicionales de investigación, automatización o producción visual.",
     "Inglés profesional para leer fuentes o trabajar con referencias internacionales."
   ],
   "skillTags": [
@@ -36,10 +38,9 @@
     "SEO",
     "AEO",
     "Investigación",
-    "Edición",
-    "Criterio editorial",
-    "Comunicación escrita",
-    "Organización"
+    "Analítica de contenido",
+    "Herramientas de contenido",
+    "Estrategia de canales"
   ],
   "publicArea": "Creative",
   "workMode": "remote",
@@ -52,6 +53,6 @@
   "requestedSeats": 1,
   "priority": "high",
   "ownerUserId": "user-efeonce-admin-julio-reyes",
-  "publicProcessNotes": "🚀 Postulación, revisión de portafolio, work sample práctico y entrevista estructurada. En el work sample te pediremos convertir una idea o brief en una pieza editorial y una adaptación social, explicando tus decisiones. La posición pertenece al equipo Efeonce y la asignación de proyectos se define según demanda, fortalezas y desarrollo.",
+  "publicProcessNotes": "🚀 Postulación, revisión de portafolio, assessment práctico de aproximadamente 90 minutos y entrevista estructurada. El assessment usa un brief ficticio y revisa criterio editorial, CTA, elección de canales, SEO/AEO, herramientas, analítica e investigación; no es trabajo para un cliente. La entrevista incluye una conversación sobre tus decisiones y una revisión práctica de las herramientas que realmente dominas. La posición pertenece al equipo Efeonce y la asignación de proyectos se define según demanda, fortalezas y desarrollo.",
   "publicCompensationBand": "USD 1.100–1.300 mensuales, según experiencia y país de contratación"
 }
