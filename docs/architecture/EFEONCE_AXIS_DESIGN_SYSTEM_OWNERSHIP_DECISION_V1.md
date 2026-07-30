@@ -2,7 +2,10 @@
 
 ## Status
 
-**`Proposed`** — 2026-07-29. Dirección planteada por el operador; nada implementado.
+**`Accepted`** — aprobado por el operador el 2026-07-29. Nada implementado todavía.
+
+Ejecución por ejes: el **eje 1 (el valor / color)** es `TASK-1600`. El **eje 2 (comportamiento /
+`axis-headless`)** es una compuerta y necesita su propia task cuando el eje 1 esté verde.
 
 Invierte parcialmente el § Delta 2026-07-29 (a) de
 [`EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md`](EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md),
