@@ -21,6 +21,44 @@ alpha resuelto contra su fondo real), y los matices en grados HSL.
 
 ---
 
+## 0 · El bloqueante: el paquete es mono-marca y el Figma ya es multi-marca
+
+Esto antecede a todo lo demás y no es opcional.
+
+```
+axisRamp.primary[500] = '#0375db'   ← el azul de Greenhouse
+```
+
+**`@efeoncepro/axis-tokens` contiene la paleta de Greenhouse sin namespace de marca.** El naranja
+`#FF6500` de Globe **no existe en el código** — sólo en Figma, donde el sistema ya está modelado
+multi-marca con colecciones `Globe/`, `GreenHouse/`, `Kortex/`, `Wave/` y `Verk/` (se verificó incluso
+`Wave/Secondary #22af80`).
+
+**El Figma va adelante del paquete.** Consecuencia directa: hoy **Globe no puede consumir su marca de
+AXIS porque AXIS no la tiene**, y eso convierte cualquier plan de "Globe traduce la especificación" en
+una imposibilidad material, no en una preferencia.
+
+### La decisión que hay que tomar
+
+El [ADR de ownership](EFEONCE_AXIS_DESIGN_SYSTEM_OWNERSHIP_DECISION_V1.md) difiere el multi-brand a V1.5
+y advierte que **no debe introducirse prematuramente**. Esa cautela era correcta *cuando no había caso*.
+Ahora hay dos —Globe y Wave tienen marca definida— y el Figma ya los modeló.
+
+**Recomendación: adelantar la estructura multi-marca del paquete.** La alternativa es que Globe teclee su
+marca por segunda vez, que es exactamente el defecto que el Delta 2026-07-29 (a) documenta: `warning` y
+`danger` divergieron así, inertes y sin que nada lo detectara.
+
+Alcance mínimo: **estructura de namespace por marca**, no la migración de todos los productos. Greenhouse
+sigue leyendo lo que lee hoy.
+
+### Lo que esto NO habilita
+
+No habilita que cada producto elija su apariencia. La marca vive en la capa **semántica** —el rol `accent`
+resuelve a otro primitivo por marca—, nunca rompiendo la capa de componente. Un botón mide lo mismo en
+Globe y en Greenhouse; cambia de color, no de anatomía.
+
+---
+
 ## 1 · La escala de superficie tiene dos planos y hacen falta cuatro
 
 ### Lo que hay
@@ -83,14 +121,19 @@ alcanza; hay que subir el contenido a blanco puro.
 Bajar el chasis entero (variante 2) además **invierte la elevación de Material**, poniendo el contenido por
 debajo del fondo. No se recomienda.
 
-### Pregunta de API que conviene resolver ahora
+### Pregunta de API — y sí es bloqueante
 
 Los nombres actuales describen **la región** (`body-bg` → el `<body>`). Pero distintos productos asignan
-regiones distintas al mismo nivel: en Globe el `<body>` del área de trabajo toma el plano hundido, no
-`body-bg`. Con los nombres actuales ese uso legítimo **parece drift**.
+regiones distintas al mismo nivel: en Globe el área de trabajo toma el plano hundido, no `body-bg`.
 
-Sugerencia: nombrar la escala por **nivel** (`surface-1…4`) y dejar `body-bg`/`paper` como alias
-semánticos. No es bloqueante —funciona igual como está— pero es barato ahora y caro después.
+Se probó con el **ejercicio del segundo consumidor**: simular Greenhouse consumiendo la escala. Los valores
+son datos puros y portables, y el rol *"nivel de superficie"* significa lo mismo en MUI que en Tailwind — la
+escala **sí** es reutilizable. Pero con los nombres actuales, **el segundo consumidor que asigne otra región
+al mismo nivel parece que driftea cuando está haciendo lo correcto**.
+
+**Propuesta: nombrar la escala por nivel** (`surface-1…4`, o `sunk / base / raised / elevated`), dejando
+`body-bg` y `paper` como alias semánticos por compatibilidad. Un nombre de región condena a todo consumidor
+cuya composición no coincida con la del primero — que es la definición de un contrato que no generaliza.
 
 ---
 
@@ -197,8 +240,12 @@ proteger a los tres consumidores a la vez, en vez de repetirse a mano en cada pr
 
 - **No propone cambiar `body-bg` ni `paper`.** Son correctos y los comparten todos los productos.
 - **No propone que Globe tenga una marca distinta.** El naranja y el morado son los del sistema.
-- **No decide nada.** Es una propuesta medida para que el equipo de diseño resuelva; la implementación en
-  Globe puede avanzar con valores locales y adoptar los del paquete cuando existan.
+- **No decide nada.** Es una propuesta medida para que el equipo de diseño resuelva.
+
+🔴 **Y NO propone que Globe avance con valores locales mientras tanto.** Una versión anterior de este
+documento lo sugería y estaba mal: declarar el valor en Globe «por ahora» es teclearlo dos veces, que es el
+defecto exacto que el Delta 2026-07-29 (a) documenta. Globe **espera** a que el paquete publique, o no hay
+adopción — hay un design system paralelo con fecha de caducidad optimista.
 
 ---
 

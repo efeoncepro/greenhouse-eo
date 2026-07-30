@@ -1,5 +1,33 @@
 # Handoff activo
 
+## 2026-07-30 — Globe: el theme del design system entra al payload (ADR-017 v2.0)
+
+El runtime de Globe estaba pintado con una paleta que **no es la del design system**: `--action #4db8ff`
+venía de un prototipo de Claude Design y no ocupa ningún rol. La marca real, definida por el equipo en el
+Figma de AXIS, es **naranja `#FF6500`** con secondary morado `#4A108C`; las superficies (`body-bg`
+`#25293C` / `paper` `#2F3349`) ya existen como tokens globales e incluso están en `@efeoncepro/axis-tokens`
+byte por byte. **El chasis no se desatura: se adopta.**
+
+ADR-017 quedó reescrito en v2.0 —no como delta al final, sino en el cuerpo— y decide: dark-only por
+colorimetría (con condiciones de reapertura escritas), adopción del theme, arquitectura de superficie de
+cuatro planos con la regla **«el contenedor del contenido se hunde; las piezas suben a `paper`»** (variante
+C, la única que funciona en dark y en claro: 1,379 / 1,193 contra 1,157/1,067 y 1,192/1,118), presupuesto
+del naranja, y tres reglas medidas — el CTA lleva **texto oscuro** (blanco da 2,95:1 y falla), la sombra de
+marca no es la de superficie (elevar un header con la teñida produce un halo naranja), y el morado **no es
+legible en dark** salvo `orchid-300` (4,80:1).
+
+🔴 **El bloqueante es upstream y no es de Globe:** `@efeoncepro/axis-tokens` es **mono-marca**
+(`axisRamp.primary[500]` es el azul de Greenhouse) y **no contiene la marca de Globe**, mientras el Figma ya
+está modelado multi-marca. `TASK-1485` quedó re-scopeada con un **Slice 0 fuera de Globe** (AXIS publica
+estructura multi-marca + los cuatro planos + el mapeo dark de `secondary`) y con `Out of Scope` explícito:
+declarar los valores en Globe «mientras tanto» es teclearlos dos veces — el defecto que ya hizo divergir
+`warning` y `danger` sin que nada lo detectara.
+
+Documentos: ADR-017 v2.0, propuesta a AXIS con las mediciones
+(`EFEONCE_AXIS_SURFACE_SCALE_AND_ACCENT_PROPOSAL_V1`), `TASK-1485` (summary/dependencies/scope reescritos)
+y las filas de registry/README. Sin cambios de runtime. Queda abierto el **momento de marca**: adoptar el
+theme deja el chasis correcto pero anónimo, y eso es composición — pertenece a `TASK-1523`.
+
 ## 2026-07-30 — Globe: documentación y skills reconciliadas con el rollout real
 
 La arquitectura ADR-013, el epic, la auditoría WIP, los contratos funcionales/manuales, el ledger, el handoff

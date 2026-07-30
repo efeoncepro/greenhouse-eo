@@ -108,6 +108,17 @@ Globe **no hereda MUI/Vuexy** (eso se mantiene íntegro) pero **tampoco es dueñ
 pattern compartido**: si el mismo pattern se ve distinto en cada producto, el design system no sistematiza
 nada. Globe traduce; no diseña.
 
+El **color scheme y la arquitectura de superficie** del payload cliente entran acá por
+[ADR-017](../../architecture/creative-studio/EFEONCE_GLOBE_CLIENT_COLOR_SCHEME_DECISION_V1.md): el runtime
+está pintado con una paleta inventada por un prototipo (`#4db8ff`), mientras la marca real de Globe es
+**naranja `#FF6500`** y las superficies del theme ya existen. Esta task las adopta — no las redefine.
+
+🔴 **Su primer paso NO es de Globe.** `@efeoncepro/axis-tokens` es **mono-marca**: `axisRamp.primary[500]`
+es `#0375db`, el azul de Greenhouse, y **el naranja de Globe no existe en el paquete** (sólo en Figma, que
+ya está modelado multi-marca). Traducir la especificación de AXIS es hoy materialmente imposible para el
+color, porque no hay de dónde traducir. La brecha se cierra en AXIS: ver
+[propuesta con las mediciones](../../architecture/EFEONCE_AXIS_SURFACE_SCALE_AND_ACCENT_PROPOSAL_V1.md).
+
 > *Alcance anterior, retirado:* «Crear el Design System propio de Globe (…) Globe posee e implementa tokens
 > seleccionados, patterns, components, motion y runtime sin heredar el Design System de Greenhouse», más un
 > Pattern Lab Globe. Contradecía el ADR de ownership de AXIS y la decisión de que el Lab vive en el Vercel
@@ -155,6 +166,9 @@ producto; `credits` es la unidad operativa, no el nombre de una wallet ni una eq
 ### Depends on
 
 - `TASK-1455` para shell Orbital Threshold, brand assets y runtime UI verificado.
+- 🔴 **AXIS publicando la marca de Globe.** El paquete es mono-marca hoy; sin estructura multi-marca +
+  los cuatro planos de superficie + el mapeo dark de `secondary`, los slices de color **no pueden
+  arrancar**. No se destraba declarando los valores en Globe (ver § Out of Scope).
 
 ### Blocks / Impacts
 
@@ -321,30 +335,60 @@ settlement.
 
 ## Scope
 
-### Slice 1 — Ownership, tokens and registry
+Los slices están ordenados por dependencia: **el 0 no se ejecuta en Globe**, y sin él los slices de color
+no arrancan.
 
-- ADR/delta load-bearing con boundary Greenhouse-governance/Globe-runtime y no-inheritance.
-- Registry machine-readable con IDs `globe.*`, lifecycle, version, owner, consumers y evidence refs.
-- Taxonomía de Globe tokens: brand-selected, semantic, surface, type, space, radius, elevation, motion.
+### Slice 0 — AXIS publica lo que Globe va a consumir *(fuera de Globe)*
 
-### Slice 2 — Pattern Lab and starter contracts
+- Estructura **multi-marca** en `@efeoncepro/axis-tokens` — hoy es mono-marca y no contiene la marca de
+  Globe. Alcance mínimo: namespace por marca, sin migrar los productos existentes.
+- Los **cuatro planos de superficie** (hundido / `body-bg` / `paper` / elevado), en light y dark.
+- El **mapeo dark de `secondary`** — ningún escalón alcanza el piso de texto en oscuro; el único morado
+  legible es `orchid-300` (4,80:1).
+- Publicar versión. Globe está pineado en `0.1.5` y el paquete va en `0.2.1`.
 
-- Implementar Pattern Lab Globe y fixtures multi-state/responsive/audience.
-- Registrar la shell vigente y contracts fundacionales, sin crear una biblioteca big-bang.
-- Habilitar propuestas de `Creative Desk` y `Runway Control Plane` como candidates independientes.
-- Registrar `Capacity Observatory` como composición transversal: `Credit Pulse`, `Runway Plane`, `Risk Rail`,
-  `Allocation Navigator`, `Evidence Ledger` y `Governed Command Dock`.
+Mediciones y alternativas: [propuesta a AXIS](../../architecture/EFEONCE_AXIS_SURFACE_SCALE_AND_ACCENT_PROPOSAL_V1.md).
+
+### Slice 1 — `tokens.ts` pasa de SSOT a adapter
+
+- Importar de `@efeoncepro/axis-tokens` y mapear rol → nombre CSS del payload. Hoy el archivo tiene **cero
+  imports** y ~100 literales; al cerrar no debe declarar **ningún** valor de color de marca ni de superficie.
+- **Drift guard** que falle si reaparece un hex de superficie o de marca declarado localmente. Sin él, el
+  paralelismo vuelve solo y en silencio: el theme generado seguiría verde.
+- Aplicar la arquitectura de ADR-017: **el contenedor del contenido se hunde; las piezas suben a `paper`**.
+- Aplicar las reglas de uso medidas: CTA con texto oscuro, sombra de marca ≠ sombra de superficie,
+  presupuesto del naranja (CTA · estado activo · foco, y nada más).
+
+### Slice 2 — Registry y contratos sobre la especificación de AXIS
+
+- Registry machine-readable con IDs `globe.*`, lifecycle, version, owner, consumers y evidence refs, para
+  los patterns **propios del dominio de Globe** — no para versiones propias de patterns compartidos.
+- Aportar los **fixtures de Globe al Lab de AXIS** (no un segundo Lab).
+- Registrar la shell vigente y los contracts fundacionales, sin biblioteca big-bang.
+- Habilitar `Creative Desk` y `Runway Control Plane` como candidates independientes; registrar
+  `Capacity Observatory` como composición transversal (`Credit Pulse`, `Runway Plane`, `Risk Rail`,
+  `Allocation Navigator`, `Evidence Ledger`, `Governed Command Dock`).
 
 ### Slice 3 — Promotion gates
 
-- Lint anti-unregistered-pattern/anti-cross-system-import y decision `reuse | extend | new` por task.
+- Lint anti-unregistered-pattern / anti-cross-system-import y decisión `reuse | extend | new` por task.
 - Gates a11y/GVC/reduced-motion/overflow y proceso de deprecation/migration.
+- Cierre: `pnpm theme:generate` + gate del theme generado, contraste re-medido en el runtime desplegado
+  contra el **plano de menor contraste** de cada texto, y GVC premium con piezas reales de las tres
+  modalidades — incluida al menos una de dominante fría.
 
 ## Out of Scope
 
+- 🔴 **Declarar valores de color en Globe «mientras AXIS los publica».** Teclear el valor dos veces es el
+  defecto que el Delta 2026-07-29 (a) de `EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1` ya documenta:
+  `warning` y `danger` divergieron así, inertes, sin que nada lo detectara. Si el Slice 0 no cerró, los
+  slices de color **esperan**.
 - Copiar Greenhouse UI, Vuexy, MUI, CompositionShell, recipes, layouts o motion patterns.
+- Un segundo Pattern Lab. El Lab vive en el Vercel de AXIS; Globe aporta fixtures.
+- Versiones propias de patterns compartidos — Globe traduce la especificación, no la reinterpreta.
+- **El momento de marca.** Adoptar el theme deja el chasis correcto pero no entrega un momento visual
+  dominante; eso es composición y pertenece a `TASK-1523`.
 - Diseñar todos los patterns futuros por adelantado.
-- Forzar los mismos tokens salvo colores de marca compartidos deliberadamente y documentados.
 - Business logic, credits calculations o provider workflows.
 
 ## Detailed Spec
