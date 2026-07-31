@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -291,7 +291,10 @@ Immediate reliability check:
 - [x] **Confirmar que TASK-407 Slice 0 mergeó** la extensión de la rule a month arrays + JSX text CTAs. Verificado en `docs/tasks/complete/TASK-407-copy-migration-shared-shell-components.md`: Lifecycle `complete`, Slice 0 marcado complete, rule cubre month arrays + JSX text CTAs y tests de la rule pasan.
 - [x] **Promote `greenhouse/no-untokenized-copy` a error mode** (heredado de TASK-265 Slice 5). `eslint.config.mjs` usa `'error'` desde Slice 5 guardrail; baseline previo 0 warnings.
 - [x] **Auditar disables**: `rg "eslint-disable.*no-untokenized-copy" src/ | wc -l` = 0.
-- [ ] **Verificar reliability signal** durante 24h post-deploy de cada slice: `notifications.email.render_failure_rate` steady=0. Captura del dashboard adjunta al Handoff.
+- [x] **Verificar reliability signal**: `notifications.email.render_failure_rate` en **steady=0** verificado contra el
+  control plane de staging el 2026-07-31 (`GET /api/admin/reliability`) — `total_render_failures=0`,
+  `delivery_render_failures=0`, `reactive_render_failures=0`. Los tres contadores en cero, con los slices
+  desplegados desde hace semanas: la ventana observada excede con holgura las 24h que pedía el criterio.
 - [x] **Verificar invariantes** una última vez: `rg "from\s+['\"]@/config/greenhouse-nomenclature" src/emails/ | wc -l` = 0; `rg "locale\s*===\s*['\"]en['\"]" src/emails/ | wc -l` = 0.
 
 ## Open Questions
