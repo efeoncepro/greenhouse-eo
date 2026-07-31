@@ -9,11 +9,10 @@ import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 import { GreenhouseGlobeConfigurationError } from '@/lib/globe/client'
 
 import {
-  auditBlockedAgentFundingConfirmation,
   brokerErrorResponse,
   globeConfigurationErrorResponse,
-  isAgentFundingProvenance,
   parseConfirmBody,
+  resolveFundingActorAuthMode,
   requireIdempotencyKey
 } from '../shared'
 
@@ -24,7 +23,8 @@ import {
  * una autoridad distinta de proponer, y la disyunción confirmante ≠ proponente la impone un `CHECK`
  * en `globe_credit_funding_intents` — no esta ruta, y no una convención de payload.
  *
- * Un agente puede proponer; **confirmar es de una persona**, y esa persona es la de la sesión.
+ * Un agente autenticado puede confirmar sólo cuando la política delegada del workspace y sus límites
+ * lo permiten. La base aplica esa decisión usando la proveniencia firmada de la sesión.
  */
 export const dynamic = 'force-dynamic'
 
@@ -44,16 +44,6 @@ export const POST = async (request: Request) => {
       return canonicalErrorResponse('forbidden')
     }
 
-    if (isAgentFundingProvenance(session.user)) {
-      auditBlockedAgentFundingConfirmation({
-        userId: tenant.userId,
-        provider: session.user.provider,
-        authMode: session.user.authMode
-      })
-
-      return canonicalErrorResponse('globe_funding_agent_confirmation_forbidden')
-    }
-
     const idempotencyKey = requireIdempotencyKey(request)
 
     if (!idempotencyKey) return canonicalErrorResponse('globe_funding_invalid_request')
@@ -69,7 +59,14 @@ export const POST = async (request: Request) => {
       fingerprint: parsed.fingerprint,
       // Igual que en `propose`: la identidad sale de la sesión. Es lo único que hace que la
       // atribución humana signifique algo del otro lado.
-      actor: { userId: tenant.userId, entitlement: 'platform.globe_credit_funding.confirm' },
+      actor: {
+        userId: tenant.userId,
+        entitlement: 'platform.globe_credit_funding.confirm',
+        authMode: resolveFundingActorAuthMode({
+          provider: session.user.provider,
+          authMode: session.user.authMode || tenant.authMode
+        })
+      },
       idempotencyKey
     })
 

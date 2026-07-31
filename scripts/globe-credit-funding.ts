@@ -303,6 +303,10 @@ export const runFundingFlow = async ({
   confirmIdempotencyKey: string
   confirm: (proposal: CreditFundingProposal) => Promise<boolean>
 }>) => {
+  if (proposeIdempotencyKey.trim() === confirmIdempotencyKey.trim()) {
+    throw new Error('idempotency_keys_must_be_distinct')
+  }
+
   const accessToken = await authorizeWithLoopbackPkce(config)
 
   const proposed = await requestFunding<{ proposal: CreditFundingProposal }>({

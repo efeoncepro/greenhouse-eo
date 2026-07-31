@@ -2,11 +2,12 @@
 
 ## TASK-1616 — Globe Admin CLI OAuth PKCE (2026-07-31, in-progress)
 
-- Corrige la frontera operativa incompleta de TASK-1566: el fondeo es transaccional y gobernado, pero no tenía un cliente API humano seguro.
+- Corrige la frontera operativa incompleta de TASK-1566: el fondeo es transaccional y gobernado, pero no tenía un cliente API seguro para personas y agentes autenticados.
 - Decisión: reusar el broker OAuth sister-platform con modalidad public-client PKCE; API Platform y CLI son adapters del mismo primitive.
-- Invariantes: cero cookies/passwords/client secrets en CLI; `agent-session` puede proponer pero nunca confirmar; loopback variable sólo en `127.0.0.1` con path exacto.
+- Invariantes: cero cookies/passwords/client secrets en CLI; un usuario agente puede confirmar sólo con procedencia OAuth durable, scopes, entitlements y delegación acotada por workspace; workloads y auth desconocida fallan cerrados; loopback variable sólo en `127.0.0.1` con path exacto.
 - Branch/worktree aislados: `codex/TASK-1616-globe-admin-cli-pkce` en `/private/tmp/greenhouse-globe-admin-cli`; no toca el trabajo UI paralelo de Claude.
-- Siguiente paso: task hook + plan formal, luego implementación paralela de OAuth, API/CLI y hardening de autoridad.
+- Estado: tres migraciones TASK-1616 aplicadas en Cloud SQL compartido; cliente `greenhouse-admin-cli` activo sin secret; política interna agente 1000 por grant / 2000 de tope; 47 tests focales, typecheck, migration gate y smoke DB transaccional verdes. El confirm valida el fingerprint y reanuda respuestas ambiguas con la idempotency key original.
+- Siguiente paso: desplegar Greenhouse staging, fondear por la API OAuth y verificar el efecto en la UI real de Globe.
 
 ## GitHub Actions — presupuesto de billing actualizado (2026-07-31)
 

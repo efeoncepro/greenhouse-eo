@@ -1,17 +1,18 @@
 # Manual — Fondear los créditos de Globe por el carril gobernado (propose → confirm)
 
 > **Tipo de documento:** Manual de uso / runbook (orientado al operador)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-26 por Claude (TASK-1566)
-> **Ultima actualizacion:** 2026-07-26 por Claude
+> **Ultima actualizacion:** 2026-07-31 por Codex (TASK-1616)
 > **Documentacion tecnica:** [ADR-015](../../architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md) · [TASK-1566](../../tasks/complete/TASK-1566-globe-governed-credit-funding-command.md)
 
 ## Para qué sirve
 
 Este manual explica cómo **ponerle presupuesto al mes de créditos de Globe** — el combustible de la
-generación de imagen/video/audio — por el **carril gobernado**: propones un plan, lo revisas, y lo
-confirmas **tú, con tu sesión**. Reemplaza al break-glass (impersonar la service account y firmar a
-mano), que se usó tres veces para esta misma clase de acto y ya no debe usarse.
+generación de imagen/video/audio — por el **carril gobernado**: un usuario autenticado, humano o
+agente delegado, propone un plan, lo revisa y lo confirma por API. Reemplaza al break-glass
+(impersonar la service account y firmar a mano), que se usó tres veces para esta misma clase de acto
+y ya no debe usarse.
 
 Ejercido end-to-end por primera vez el 2026-07-26: `confirm` en 905 ms, grant +100, tope 400→800,
 atribuido al operador real. Este manual documenta ese camino verificado, con las dos correcciones de
@@ -25,11 +26,12 @@ runbook que salieron de medirlo.
 - **Un fondeo útil casi siempre sube `monthlyCap`.** Si el tope vigente es lo que restringe (caso
   típico), un grant sin `monthlyCap` deja `policyAvailableAfter` igual o menor que antes. El plan lo
   dice antes de confirmar; léelo.
-- **Quién hace qué:** un agente **puede proponer**; **confirmar es tuyo** — el trigger de la tabla de
-  intents rechaza principals de servicio, y confirmar con una persona de prueba dejaría una
-  atribución ficticia en una tabla append-only.
-- **Necesitas:** sesión activa en el portal de Greenhouse (staging:
-  `dev-greenhouse.efeoncepro.com`), el `poolId` vigente (ver
+- **Quién hace qué:** un usuario humano puede confirmar con sus entitlements; un usuario agente
+  puede hacerlo cuando el workspace le delega expresamente esa facultad y el acto cabe en sus
+  límites por grant y por mes. Un workload, API key o principal de servicio genérico nunca confirma.
+- **Necesitas:** una sesión autenticada en Google Chrome para completar OAuth, los scopes
+  `globe.credits.funding.propose` y `globe.credits.funding.confirm`, los entitlements de
+  administración de créditos, el `poolId` vigente (ver
   [`GLOBE_RUNTIME_HANDOFF.md`](../../operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md)), y que
   `GLOBE_CREDIT_ADMIN_LANE_ENABLED=true` esté en la revisión activa de `globe-api-internal`.
 - **La propuesta vence en 15 minutos.** Se confirma sobre el estado que se vio; si venció, se
@@ -37,23 +39,24 @@ runbook que salieron de medirlo.
 
 ## Paso a paso
 
-### 1. Proponer el plan
+### 1. Ejecutar el cliente OAuth gobernado
 
-Desde el browser logueado (consola del portal) o `curl` con tu cookie de sesión:
+Desde el repo de Greenhouse, usa el cliente canónico. Abre Google Chrome para autorizar mediante
+OAuth 2.0 Authorization Code + PKCE y conserva el token solo en memoria. La sesión puede pertenecer
+a una persona o a un agente autenticado; la política de delegación se valida nuevamente al confirmar.
 
 ```bash
-BASE=https://greenhouse-eo-env-staging-efeonce-7670142f.vercel.app
-COOKIE='__Secure-next-auth.session-token=<tu cookie del portal>'
-KEY="funding-$(date +%Y%m)-cap<tope>-grant<n>"   # estable y descriptiva
-
-curl -sS -X POST "$BASE/api/admin/globe/credit-funding/propose" \
-  -H "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" \
-  -H "x-idempotency-key: $KEY" -H 'Content-Type: application/json' -H "Cookie: $COOKIE" \
-  -d '{"globeWorkspaceId":"greenhouse-org:efeonce","poolId":"<pool vigente>","grantCredits":100,"monthlyCap":800,"periodStart":"2026-07-01T00:00:00Z","periodEnd":"2026-08-01T00:00:00Z"}'
+GREENHOUSE_API_BASE_URL=https://dev-greenhouse.efeoncepro.com \
+GLOBE_ADMIN_OAUTH_CLIENT_ID=greenhouse-admin-cli \
+pnpm globe:credit-funding -- \
+  --input '{"globeWorkspaceId":"greenhouse-org:efeonce","poolId":"<pool-vigente>","grantCredits":500,"monthlyCap":1500,"periodStart":"<inicio-UTC>","periodEnd":"<fin-UTC>"}' \
+  --propose-idempotency-key <clave-unica-propose> \
+  --confirm-idempotency-key <clave-unica-confirm> \
+  --yes true
 ```
 
-La respuesta trae `proposal.proposalId`, `proposal.fingerprint` (guárdalo **exacto**, ~250 chars) y
-`proposal.plan`.
+Sin `--yes true`, el CLI muestra el plan y pide confirmación interactiva. `--yes true` es válido para
+un agente cuando el operador ya autorizó la acción; no omite ninguna verificación server-side.
 
 ### 2. Revisar el plan — éste es el punto entero del carril
 
@@ -64,14 +67,7 @@ El plan muestra el **delta**: `monthlyCapBefore/After`, `policyAvailableBefore/A
   `monthlyCap`.
 - Un `monthlyCap` por debajo de lo ya gastado se rechaza en el propose (`invalid_request`).
 
-### 3. Confirmar — con clave de idempotencia PROPIA
-
-```bash
-curl -sS -X POST "$BASE/api/admin/globe/credit-funding/confirm" \
-  -H "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" \
-  -H "x-idempotency-key: ${KEY}-confirm" -H 'Content-Type: application/json' -H "Cookie: $COOKIE" \
-  -d '{"globeWorkspaceId":"greenhouse-org:efeonce","proposalId":"<…>","fingerprint":"<exacto del propose>"}'
-```
+### 3. Confirmar — con clave de idempotencia propia
 
 ⚠️ **Corrección de runbook (medida 2026-07-26):** el confirm **necesita su propia clave** — reusar
 la del propose devuelve `409 globe_funding_already_recorded` (el broker registra la intención por
@@ -85,7 +81,7 @@ tope) y `allocationEntryId`. Todo ocurre en **una** transacción: grant + asient
 
 1. **Intents** (Greenhouse PG): `SELECT phase, actor_user_id FROM
    greenhouse_core.globe_credit_funding_intents ORDER BY created_at DESC LIMIT 2` → `proposed` +
-   `confirmed` con **tu** user id.
+   `confirmed` con el user id real y `actor_auth_mode` (`human` o `agent`).
 2. **Globe PG**: grant `posted`, política nueva `active` (la anterior `superseded`), asiento
    `allocation` con los créditos.
 3. **Generación**: el estimado del Producer debe mostrar `withinDayCap`/disponible acorde al plan.
@@ -105,8 +101,10 @@ tope) y `allocationEntryId`. Todo ocurre en **una** transacción: grant + asient
 - **NO** reintentar un `confirm` tras un timeout del cliente sin leer primero el estado — puede
   haber completado en el servidor.
 - **NO** reusar la clave de idempotencia del propose en el confirm (409 garantizado).
-- **NO** confirmar con la persona agente (`user-agent-e2e-001`) ni con ningún principal de servicio:
-  la atribución es evidencia inmutable.
+- **NO** convertir una API key, service account o principal de workload en confirmador. Un agente
+  debe entrar como usuario autenticado y estar delegado por la política del workspace.
+- **NO** extraer cookies, tokens, `localStorage` ni contraseñas de Chrome. Chrome aporta únicamente
+  la sesión autenticada para la autorización OAuth; el CLI recibe el código PKCE por loopback.
 - **NO** usar los scripts legacy de firma cliente (`raise-credit-monthly-cap.mjs`) ni el break-glass
   para fondear: su premisa (firmar desde el cliente) contradice el diseño y están en retiro.
 - **NO** tocar las tablas de crédito con SQL manual.
@@ -119,6 +117,8 @@ tope) y `allocationEntryId`. Todo ocurre en **una** transacción: grant + asient
 | `422 globe_funding_rejected` | Globe rechazó el payload (4xx real, no un problema de red) | Leer `code`; no reintentar igual |
 | `503 globe_unavailable` | El puente falló (red/WIF) | Reintentar; si persiste, `GET /api/internal/globe/health` |
 | `401` | Sin sesión válida | Renovar sesión del portal |
+| `403 agent_confirmation_forbidden` | El usuario agente no tiene delegación activa para ese workspace | Habilitar la política gobernada; no usar una identidad humana como bypass |
+| `422 agent_funding_limit_exceeded` | El grant o el tope mensual excede la delegación del agente | Reducir el acto o elevar la política mediante el dueño del workspace |
 | `400 invalid_request` en propose | Tope < gastado, período inválido, o payload incompleto | Corregir el plan |
 | Plan con `currentDenialReason: pool_exhausted` | Los grants activos no cubren lo pedido | El plan igual se puede confirmar; la razón es el estado VIGENTE, no el resultante |
 

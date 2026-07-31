@@ -1099,14 +1099,17 @@ Ocho reglas medidas contra el runtime, no razonadas. Las tres primeras cuestan u
    funciona. **NUNCA** lo conviertas en el camino normal, **NUNCA** le des
    `secretmanager.versions.access` a `greenhouse-portal@` (es la identidad de reconciliación de tenancy de
    **Greenhouse**: usarla para administrar crédito de **Globe** es admin implícito cross-plataforma), y **NUNCA**
-   dejes que un **agente o proceso** proponga y confirme: la confirmación es de un humano autenticado, siempre.
+   dejes que un **workload genérico o principal de servicio** proponga y confirme. Un agente autenticado sí puede
+   confirmar por el carril delegado de `TASK-1616`, pero sólo con OAuth público allowlisted, los dos entitlements,
+   política explícita por workspace, límites de grant/tope mensual e intención append-only.
 
    🔴 **Y NUNCA exijas DOS humanos por defecto.** La primera versión de ADR-015 lo hacía y costó **dos horas de
    fricción para sumar créditos**: el operador es CEO y product owner del presupuesto, así que no hay segundo actor
    que buscar. **Un control que nadie puede satisfacer no protege, desvía** — al break-glass, que otorga MÁS
    autoridad que el camino que reemplaza. El segundo confirmador es **política** (`requireSecondConfirmer` por
    workspace + techo por operación), **default OFF** en el workspace interno. Lo que se queda como invariante es lo
-   que cuesta cero: el agente nunca confirma, y aprobador ≠ ejecutor entre service accounts.
+   que cuesta cero: un principal de servicio nunca confirma; un agente sólo confirma dentro de su delegación
+   acotada; y aprobador ≠ ejecutor entre service accounts.
 
 6. 🔴 **La autoridad de crédito YA está concedida a la identidad que Greenhouse puede impersonar — el problema no es
    que falte, es que SOBRABA — y el 2026-07-26 SE RETIRÓ (ADR-015 §10, rev `00114-k4t`).** La cadena era:
@@ -1139,7 +1142,8 @@ superficie en Greenhouse, autoridad en Globe, lane `sister-platform` (hoy `avail
 identidades disjuntas** (broker de administración **distinto** del reconciliador de tenancy; aprobador que firma y no
 muta; ejecutor que muta y **no puede firmar**, separados como **unidad de ejecución propia** porque dentro de un
 proceso la disyunción es cosmética), **KMS asimétrico** en vez del HMAC, comando gobernado
-`credits.month.fund.propose` / `.confirm` con **UNA confirmación humana** (el agente propone, nunca confirma; el segundo confirmador es política por workspace + techo, default OFF en el interno) y la mutación (grant + asiento
+`credits.month.fund.propose` / `.confirm` con **UNA confirmación autenticada** (humana o agente delegado por
+política y límites; el segundo confirmador es política por workspace + techo, default OFF en el interno) y la mutación (grant + asiento
 de ledger + política) en **UNA transacción Postgres**, y el **retiro de la autoridad de crédito del caller
 genérico** al final. Break-glass con TTL/motivo/aprobación/revocación automática/readback **y su propio contador**.
 **Cargá ADR-015 antes de tocar administración de crédito o capabilities de usuarios de Globe.**
@@ -1278,19 +1282,20 @@ y dueño del presupuesto, no hay segundo actor, y **un control que nadie puede s
 desvía al break-glass, que otorga MÁS autoridad que el camino que reemplaza**. Se cometió ese error en
 esta sesión y bloqueó al operador hasta el forward-fix.
 
-**Lo que sí es invariante y no se toca:** el agente **nunca** confirma (trigger `actor_must_be_human`
-rechaza principals de servicio), toda confirmación registra contra quién confirma, y la evidencia es
-**append-only** (triggers anti-UPDATE/DELETE).
+**Lo que sí es invariante y no se toca:** un principal de servicio **nunca** confirma. Un usuario agente
+autenticado puede confirmar únicamente si `agent_confirmation_enabled` está activo para el workspace y el plan
+queda bajo `agent_max_grant_credits` y `agent_max_monthly_cap_credits`. Toda confirmación registra
+`actor_user_id` + `actor_auth_mode`, y la evidencia es **append-only** (triggers anti-UPDATE/DELETE).
 
 🔴 **`assertHumanAttribution` de Globe es SHAPE-ONLY** — rechaza `globe:service:` y exige entitlement
-no vacío, pero **no puede** verificar que la atribución venga de una sesión autenticada, porque Globe
+no vacío, pero **no puede** verificar la sesión humana/agente ni su delegación, porque Globe
 no tiene las sesiones. Ese amarre vive en Greenhouse (`globe_credit_funding_intents` + trigger). **No
 publiques el carril sin esa contraparte.**
 
-🔴 **El top-up de CLIENTE es otro acto económico, y el trigger actual lo bloquea.** El grant interno
-gasta presupuesto **de Efeonce** (por eso lo aprueba una persona de Efeonce); un top-up gasta plata
-**del cliente** y lo autoriza **el pago liquidado**. El trigger exige actor humano ⇒ **hay que
-discriminar por `source`** (`human_session` vs `settled_payment`), no relajarlo. Dueño: `TASK-1484`.
+🔴 **El top-up de CLIENTE es otro acto económico.** El grant interno gasta presupuesto **de Efeonce**
+y se autoriza por sesión humana o delegación agente acotada; un top-up gasta plata **del cliente** y lo autoriza
+**el pago liquidado**. Ese camino debe **discriminar por `source`** (`delegated_session` vs
+`settled_payment`), no relajarlo. Dueño: `TASK-1484`.
 Reglas no negociables: monto **del PSP nunca del cliente**, idempotencia por **id de pago** (los PSP
 reintentan webhooks), y un chargeback se corrige con **`grant.correct`**, jamás borrando el grant.
 
@@ -1307,9 +1312,10 @@ futuro debe saber:
 - **El anti-replay del broker es POR PROPUESTA**, no por clave: registrada la decisión, ningún
   confirm repetido pasa. El replay idempotente del dominio queda inalcanzable a través del broker;
   el invariante (ningún segundo grant) vive en dos capas.
-- **La atribución es lo que era "del operador", no la mecánica**: un agente puede ejecutar los curls
-  con autorización explícita SI la sesión es la del humano real; confirmar con la persona agente
-  (`user-agent-e2e-001`) fabrica evidencia en una tabla append-only y sigue prohibido.
+- **Regla vigente desde TASK-1616:** no fabriques una identidad humana. Usa `pnpm globe:credit-funding` por el
+  cliente público `greenhouse-admin-cli`; una sesión agente puede autorizar y confirmar porque la base registra
+  `actor_auth_mode=agent` y aplica la delegación del workspace. Fuera de esa política o por encima de sus límites,
+  el confirm falla cerrado.
 
 ### Ocho lecciones de método, que valen más que los fixes
 

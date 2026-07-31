@@ -30,6 +30,7 @@ export type AppPlatformRequestContext = {
   appSessionId: string | null
   authSource: 'cookie_session' | 'first_party_app' | 'sister_platform_oauth'
   oauthCapabilities: readonly string[]
+  oauthSessionAuthMode?: string | null
   rateLimit: ApiPlatformRateLimit
 }
 
@@ -136,7 +137,8 @@ const resolveAppTenantContext = async (request: Request) => {
           tenant: tenantAccessRecordToContext(tenant),
           appSessionId: null,
           authSource: 'sister_platform_oauth' as const,
-          oauthCapabilities: oauth.identity.capabilities
+          oauthCapabilities: oauth.identity.capabilities,
+          oauthSessionAuthMode: oauth.identity.authMode
         }
       } catch (oauthError) {
         if (oauthError instanceof SisterPlatformOAuthError) {

@@ -15,6 +15,7 @@ vi.mock('@/lib/db', () => ({
 const {
   authenticateSisterPlatformOAuthClient,
   assertSisterPlatformOAuthSessionProvenance,
+  resolveSisterPlatformOAuthSessionAuthMode,
   upsertSisterPlatformOAuthClient,
   validateSisterPlatformAuthorizeRequest
 } = await import('./oauth-broker')
@@ -160,6 +161,20 @@ describe('public OAuth client authentication', () => {
     expect(() =>
       assertSisterPlatformOAuthSessionProvenance(client, { provider: 'credentials', authMode: 'credentials' })
     ).not.toThrow()
+  })
+
+  it('accepts an agent session when the public client delegates provenance policy downstream', () => {
+    const client = { clientType: 'public' as const, requireHumanSession: false } as Parameters<
+      typeof assertSisterPlatformOAuthSessionProvenance
+    >[0]
+
+    expect(() =>
+      assertSisterPlatformOAuthSessionProvenance(client, { provider: 'agent', authMode: 'agent' })
+    ).not.toThrow()
+  })
+
+  it('classifies provider=agent as agent even when the account base mode is credentials', () => {
+    expect(resolveSisterPlatformOAuthSessionAuthMode({ provider: 'agent', authMode: 'credentials' })).toBe('agent')
   })
 })
 

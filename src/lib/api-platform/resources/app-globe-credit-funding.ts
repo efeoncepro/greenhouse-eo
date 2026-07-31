@@ -10,12 +10,7 @@ import {
 } from '@/lib/globe/credit-administration-broker'
 import { GreenhouseGlobeConfigurationError } from '@/lib/globe/client'
 import type { EntitlementCapabilityKey } from '@/config/entitlements-catalog'
-import {
-  auditBlockedAgentFundingConfirmation,
-  isAgentFundingProvenance,
-  parseConfirmBody,
-  parseFundingBody
-} from '@/app/api/admin/globe/credit-funding/shared'
+import { parseConfirmBody, parseFundingBody } from '@/app/api/admin/globe/credit-funding/shared'
 
 const PROPOSE_ENTITLEMENT = 'platform.globe_credit_funding.propose'
 const CONFIRM_ENTITLEMENT = 'platform.globe_credit_funding.confirm'
@@ -74,7 +69,35 @@ const mapFundingError = (error: unknown): never => {
     }
 
     if (error.code === 'confirmer_is_proposer') {
-      throw new ApiPlatformError('A different human must confirm the funding proposal.', {
+      throw new ApiPlatformError('A different authorized actor must confirm the funding proposal.', {
+        statusCode: 403,
+        errorCode: 'forbidden'
+      })
+    }
+
+    if (error.code === 'agent_confirmation_forbidden') {
+      throw new ApiPlatformError('Workspace policy does not delegate funding confirmation to agents.', {
+        statusCode: 403,
+        errorCode: 'forbidden'
+      })
+    }
+
+    if (error.code === 'agent_funding_limit_exceeded') {
+      throw new ApiPlatformError('The funding request exceeds the workspace agent delegation limit.', {
+        statusCode: 422,
+        errorCode: 'bad_request'
+      })
+    }
+
+    if (error.code === 'fingerprint_mismatch') {
+      throw new ApiPlatformError('The funding fingerprint does not match the proposed plan.', {
+        statusCode: 400,
+        errorCode: 'bad_request'
+      })
+    }
+
+    if (error.code === 'actor_auth_mode_not_allowed') {
+      throw new ApiPlatformError('The authenticated session mode cannot authorize Globe funding.', {
         statusCode: 403,
         errorCode: 'forbidden'
       })
@@ -132,7 +155,11 @@ export const proposeAppGlobeCreditFunding = async ({
       ...(parsed.monthlyCap === undefined ? {} : { monthlyCap: parsed.monthlyCap }),
       periodStart: parsed.periodStart,
       periodEnd: parsed.periodEnd,
-      actor: { userId: context.tenant.userId, entitlement: PROPOSE_ENTITLEMENT },
+      actor: {
+        userId: context.tenant.userId,
+        entitlement: PROPOSE_ENTITLEMENT,
+        authMode: context.oauthSessionAuthMode || 'unknown'
+      },
       idempotencyKey
     })
 
@@ -153,18 +180,6 @@ export const confirmAppGlobeCreditFunding = async ({
 }) => {
   assertBearerFundingAccess(context, CONFIRM_ENTITLEMENT, CONFIRM_SCOPE)
 
-  if (isAgentFundingProvenance({ authMode: context.tenant.authMode })) {
-    auditBlockedAgentFundingConfirmation({
-      userId: context.tenant.userId,
-      authMode: context.tenant.authMode
-    })
-
-    throw new ApiPlatformError('Agent sessions may propose funding but cannot confirm it.', {
-      statusCode: 403,
-      errorCode: 'forbidden'
-    })
-  }
-
   const idempotencyKey = requireFundingIdempotencyKey(request)
   const parsed = parseConfirmBody(body)
 
@@ -180,7 +195,11 @@ export const confirmAppGlobeCreditFunding = async ({
       globeWorkspaceId: parsed.globeWorkspaceId,
       proposalId: parsed.proposalId,
       fingerprint: parsed.fingerprint,
-      actor: { userId: context.tenant.userId, entitlement: CONFIRM_ENTITLEMENT },
+      actor: {
+        userId: context.tenant.userId,
+        entitlement: CONFIRM_ENTITLEMENT,
+        authMode: context.oauthSessionAuthMode || 'unknown'
+      },
       idempotencyKey
     })
 

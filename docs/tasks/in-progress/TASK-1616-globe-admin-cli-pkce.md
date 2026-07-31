@@ -27,9 +27,10 @@
 
 ## Summary
 
-Cierra la paridad programática que TASK-1566 declaró pero no entregó: un operador autenticado por
+Cierra la paridad programática que TASK-1566 declaró pero no entregó: un humano o agente autenticado por
 Greenhouse podrá ejecutar `propose → confirm` desde un CLI first-party mediante Authorization Code +
-PKCE, sin exportar cookies, compartir passwords, usar `agent-session` ni asumir una identidad de workload.
+PKCE, sin exportar cookies, compartir passwords ni asumir una identidad de workload. Una sesión agente
+es válida y conserva esa procedencia hasta la evidencia financiera.
 
 ## Why This Task Exists
 
@@ -42,8 +43,8 @@ cada operación reaprendiera el acceso y tentara atajos incompatibles con la atr
 
 - Reusar el broker OAuth existente para un cliente público instalado con PKCE y loopback seguro.
 - Publicar el fondeo en API Platform `app` como adapter del broker canónico, con entitlements e idempotencia.
-- Entregar un CLI tipado y auditable que autentique al operador en su navegador y no maneje cookies.
-- Impedir mecánicamente que una sesión de agente confirme movimientos de crédito.
+- Entregar un CLI tipado y auditable que autorice una sesión Greenhouse en Chrome y no maneje cookies.
+- Permitir confirmación agente sólo por delegación explícita del workspace y límites server-side.
 - Ejercer el flujo real en staging y conservar readback correlacionado.
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
@@ -62,10 +63,11 @@ Revisar y respetar:
 
 Reglas obligatorias:
 
-- Greenhouse autentica y atribuye al humano; Globe conserva la autoridad y la mutación financiera.
+- Greenhouse autentica y atribuye al usuario humano/agente; Globe conserva la autoridad y la mutación financiera.
 - El CLI es cliente público: PKCE S256 obligatorio, ningún `client_secret` embebido.
 - La excepción de puerto efímero aplica sólo a loopback `127.0.0.1`; scheme, host y path siguen exactos.
-- `agent-session` puede proponer para pruebas, pero nunca confirmar ni ejecutar crédito.
+- Un principal de servicio nunca confirma. Un usuario agente requiere scopes, entitlements, política por workspace
+  y límites de grant/tope mensual; el default fuera del workspace interno es OFF.
 - API Platform y CLI son adapters; no duplican el command ni acceden a DB/Globe directamente.
 
 ## Normative Docs
@@ -88,7 +90,7 @@ Reglas obligatorias:
 
 - Operación repetible de fondeo para evaluaciones y promoción de modelos Globe.
 - Full API Parity real de la capability entregada por TASK-1566.
-- El adapter Nexa continúa fuera de alcance porque un LLM no confirma movimientos financieros.
+- Nexa queda fuera de este slice, pero puede consumir la misma API en el futuro sin autoridad adicional.
 
 ### Files owned
 
@@ -115,14 +117,14 @@ Reglas obligatorias:
 
 - El broker exige `client_secret`, por lo que no admite un CLI instalado de forma segura.
 - El fondeo no está expuesto en API Platform `app` y no existe CLI tipado.
-- La prohibición “el agente nunca confirma” no se impone usando el modo/proveedor de autenticación.
+- No existe una política delegada y acotada para que los agentes confirmen sin fabricar identidad humana.
 
 ## Modular Placement Contract
 
 - Topology impact: `api`
 - Current home: `src/lib/sister-platforms/**`, `src/lib/api-platform/**`, `src/app/api/platform/app/**` y `scripts/**` en Greenhouse
 - Future candidate home: `api`
-- Boundary: OAuth broker emite identidad humana delegada; API Platform adapta el broker de fondeo; el CLI sólo consume HTTP
+- Boundary: OAuth broker emite identidad autenticada; API Platform adapta el broker de fondeo; el CLI sólo consume HTTP
 - Server/browser split: command, stores, tokens y secretos son server-only; el navegador sólo autoriza y redirige el código one-time al loopback
 - Build impact: `none` — usa Node y dependencias existentes; agrega un entrypoint local explícito
 - Extraction blocker: API Platform y broker dependen de la sesión/identidad y Postgres canónicos de Greenhouse
@@ -151,7 +153,10 @@ Reglas obligatorias:
   - public nunca acepta/necesita `client_secret`; confidential siempre lo exige;
   - PKCE S256, state, código one-time y redirect binding siguen obligatorios;
   - puerto efímero sólo para `http://127.0.0.1/<path exacto>` de public clients;
-  - confirmación exige sesión humana no acuñada por `agent-session`;
+  - confirmación agente exige `agent_confirmation_enabled`, límites y `actor_auth_mode=agent` durable;
+  - `provider=agent` prevalece sobre el modo base de la cuenta; `unknown` y workloads fallan cerrados;
+  - el fingerprint se compara contra la propuesta durable antes de registrar `confirm`;
+  - una respuesta ambigua se reanuda con la idempotency key original y termina en `completed|confirm_failed`;
   - propuesta y confirmación usan idempotency keys distintas y correlacionadas.
 - Tenant/space boundary: usuario rehidratado por access token; entitlement fino; workspace validado por broker
 - Idempotency/concurrency: claves obligatorias; replay OAuth/command rechazado o estable por constraints existentes
@@ -200,10 +205,10 @@ Reglas obligatorias:
 - Exchange PKCE-only para public; secreto obligatorio para confidential.
 - Loopback con puerto efímero y path/host exactos, con tests negativos.
 
-### Slice 2 — API Platform y autoridad humana
+### Slice 2 — API Platform y autoridad delegada
 
 - Routes `app` propose/confirm como adapters del broker canónico.
-- Enforcement server-side que rechaza confirmación desde provider/authMode de agente.
+- Enforcement server-side/DB que permite agente sólo en workspaces delegados y bajo ambos límites.
 - Errores canónicos, rate limit, entitlement y tests.
 
 ### Slice 3 — CLI first-party
@@ -215,13 +220,13 @@ Reglas obligatorias:
 ### Slice 4 — Rollout y operación real
 
 - Migración/registro/deploy staging.
-- Autorización con sesión autenticada `jreyes@efeonce.cl`.
+- Autorización con la sesión autenticada disponible en Chrome, humana o agente.
 - Fondeo real, readback correlacionado y manual/skill actualizados.
 
 ## Out of Scope
 
 - Crear otro ledger, command de crédito o sistema de sesiones.
-- Permitir confirmación autónoma a Nexa/MCP/LLM.
+- Dar autoridad de fondeo a un workload genérico, una API key global o un adapter sin política server-side.
 - Exportar cookies, leer perfiles de Chrome o guardar tokens en archivos del repo.
 - Cambiar el daily cap del Model Lab: es un fence distinto y se gobierna en TASK-1614.
 
@@ -236,15 +241,15 @@ path o tipo de cliente recibe esa excepción.
 
 Las rutas API Platform reciben el bearer token, rehidratan al usuario y construyen el mismo entitlement
 subject que las rutas admin existentes. Ambas delegan a `credit-administration-broker.ts`; no hacen HTTP
-interno. Confirm valida además el provenance de autenticación y rechaza provider/mode `agent` antes de
-registrar la intención. El CLI conserva access token sólo en memoria, imprime el plan sin tokens ni upstream
+interno. Confirm persiste el auth mode y la base permite `agent` sólo para un workspace delegado, con límites
+de grant y tope mensual; fuera de esa política falla cerrado. El CLI conserva access token sólo en memoria, imprime el plan sin tokens ni upstream
 raw errors y destruye su servidor loopback al completar o expirar.
 
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
 
-Slice 1 → Slice 2 → Slice 3 → Slice 4. La ruta de confirmación debe bloquear agentes antes del primer fondeo.
+Slice 1 → Slice 2 → Slice 3 → Slice 4. La política DB allow/deny/over-limit debe quedar verde antes del fondeo.
 
 ### Risk matrix
 
@@ -252,7 +257,7 @@ Slice 1 → Slice 2 → Slice 3 → Slice 4. La ruta de confirmación debe bloqu
 |---|---|---|---|---|
 | Public evita PKCE | identity | low | tipo explícito + tests negativos | `token_reject` |
 | Loopback demasiado amplio | identity | medium | 127.0.0.1 + path exacto | `redirect_rejected` |
-| Agente figura como humano | finance | medium | gate por auth provider/mode | error canónico + audit |
+| Agente amplía su autoridad | finance | medium | política DB default-OFF + dos límites | error canónico + audit |
 | Doble fondeo | finance | low | idempotency keys + propuesta durable | intent/grant duplicado |
 
 ### Feature flags / cutover
@@ -282,9 +287,9 @@ Sin flag global: el cliente OAuth no existe hasta registrarlo y puede suspenders
 - [ ] Public client PKCE funciona sin secret y confidential no cambia.
 - [ ] Sólo loopback `127.0.0.1` con path exacto admite puerto efímero.
 - [ ] API Platform expone propose/confirm sobre primitive existente con entitlement e idempotencia.
-- [ ] `agent-session` y cualquier sesión agente no pueden confirmar.
+- [ ] Una sesión agente confirma dentro de la delegación interna; workspace no delegado y monto sobre límite fallan.
 - [ ] CLI completa PKCE y fondeo sin cookies/passwords/secrets persistidos.
-- [ ] Fondeo real staging queda atribuido al humano y tiene readback correlacionado.
+- [ ] Fondeo real staging conserva identidad + auth mode y tiene readback correlacionado.
 - [ ] Tests, task gate, docs y verificación UI de Globe quedan verdes.
 
 ## Follow-ups

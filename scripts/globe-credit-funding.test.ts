@@ -122,4 +122,35 @@ describe('Globe credit funding CLI', () => {
       })
     )
   })
+
+  it('rejects equal idempotency keys before opening OAuth', async () => {
+    const openBrowser = vi.fn()
+
+    await expect(
+      runFundingFlow({
+        config: {
+          apiBaseUrl: 'https://greenhouse.example.test',
+          clientId: 'public-cli',
+          scope: 'openid',
+          authorizeUrl: 'https://greenhouse.example.test/authorize',
+          tokenUrl: 'https://greenhouse.example.test/token',
+          openBrowser,
+          fetchImpl: vi.fn(),
+          timeoutMs: 1000
+        },
+        input: {
+          globeWorkspaceId: 'greenhouse-org:efeonce',
+          poolId: 'pool-main',
+          grantCredits: 100,
+          periodStart: '2026-08-01T00:00:00.000Z',
+          periodEnd: '2026-09-01T00:00:00.000Z'
+        },
+        proposeIdempotencyKey: 'same-key',
+        confirmIdempotencyKey: 'same-key',
+        confirm: async () => true
+      })
+    ).rejects.toThrow('idempotency_keys_must_be_distinct')
+
+    expect(openBrowser).not.toHaveBeenCalled()
+  })
 })

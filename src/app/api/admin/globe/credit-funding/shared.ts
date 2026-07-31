@@ -16,46 +16,16 @@ const BROKER_ERROR_CODES = {
   proposal_not_found: 'globe_funding_proposal_not_found',
   confirmer_is_proposer: 'globe_funding_confirmer_is_proposer',
   already_recorded: 'globe_funding_already_recorded',
+  fingerprint_mismatch: 'globe_funding_invalid_request',
+  actor_auth_mode_not_allowed: 'forbidden',
+  agent_confirmation_forbidden: 'globe_funding_agent_confirmation_forbidden',
+  agent_funding_limit_exceeded: 'globe_funding_agent_limit_exceeded',
   globe_unavailable: 'globe_unavailable',
   rejected_by_globe: 'globe_funding_rejected'
 } as const satisfies Record<GlobeCreditFundingBrokerError['code'], string>
 
 export const brokerErrorResponse = (error: GlobeCreditFundingBrokerError) =>
   canonicalErrorResponse(BROKER_ERROR_CODES[error.code])
-
-export type FundingAuthProvenance = Readonly<{
-  provider?: unknown
-  authMode?: unknown
-}>
-
-/**
- * Agent sessions are allowed to prepare a proposal, but can never cross the
- * mutation boundary. These are signed session claims; userId is deliberately
- * not part of the decision because naming conventions are not provenance.
- */
-export const isAgentFundingProvenance = ({ provider, authMode }: FundingAuthProvenance): boolean =>
-  provider === 'agent' || authMode === 'agent'
-
-/**
- * Security audit for a blocked mutation attempt. Keep this payload bounded to
- * provenance and actor identity: no funding body, token, proposal, or upstream
- * error crosses the audit boundary.
- */
-export const auditBlockedAgentFundingConfirmation = ({
-  userId,
-  provider,
-  authMode
-}: FundingAuthProvenance & { userId: string }) => {
-  console.warn(
-    JSON.stringify({
-      event: 'greenhouse.globe_credit_funding.confirm_blocked',
-      reason: 'agent_auth_provenance',
-      userId,
-      provider: typeof provider === 'string' ? provider : 'unknown',
-      authMode: typeof authMode === 'string' ? authMode : 'unknown'
-    })
-  )
-}
 
 /**
  * El enlace con Globe no está configurado en este runtime (falta `GLOBE_API_BASE_URL` o el par WIF).
@@ -88,6 +58,19 @@ export const requireIdempotencyKey = (request: Request): string | undefined => {
   const value = request.headers.get('x-idempotency-key')?.trim()
 
   return value && value.length >= 8 ? value : undefined
+}
+
+export const resolveFundingActorAuthMode = ({
+  provider,
+  authMode
+}: {
+  provider?: string | null
+  authMode?: string | null
+}) => {
+  const normalizedProvider = provider?.trim().toLowerCase() || ''
+  const normalizedAuthMode = authMode?.trim().toLowerCase() || ''
+
+  return normalizedProvider === 'agent' || normalizedAuthMode === 'agent' ? 'agent' : normalizedAuthMode || 'unknown'
 }
 
 export type ParsedFundingBody = Readonly<{

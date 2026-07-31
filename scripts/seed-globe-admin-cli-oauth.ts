@@ -35,9 +35,11 @@ async function main() {
   const actorUserId = process.env.GLOBE_ADMIN_OAUTH_ACTOR_USER_ID?.trim() || 'system'
   const { upsertSisterPlatformConsumer } = await import('@/lib/sister-platforms/consumers')
 
-  const { loadSisterPlatformOAuthClient, upsertSisterPlatformOAuthClient } = await import(
-    '@/lib/sister-platforms/oauth-broker'
-  )
+  const {
+    loadSisterPlatformOAuthClient,
+    updateSisterPlatformOAuthSessionRequirement,
+    upsertSisterPlatformOAuthClient
+  } = await import('@/lib/sister-platforms/oauth-broker')
 
   const {
     GLOBE_ADMIN_OAUTH_ACCESS_TOKEN_TTL_SECONDS,
@@ -62,13 +64,22 @@ async function main() {
     actorUserId
   })
 
-  const existing = await loadSisterPlatformOAuthClient(GLOBE_ADMIN_OAUTH_CLIENT_ID)
+  let existing = await loadSisterPlatformOAuthClient(GLOBE_ADMIN_OAUTH_CLIENT_ID)
+
+  if (existing) {
+    existing = await updateSisterPlatformOAuthSessionRequirement({
+      clientId: GLOBE_ADMIN_OAUTH_CLIENT_ID,
+      requireHumanSession: false,
+      actorPrincipalId: actorUserId,
+      reason: 'TASK-1616 delegated agent funding policy enforced server-side'
+    })
+  }
 
   if (existing) {
     const exactConfiguration =
       existing.consumerId === consumer.consumer.consumerId &&
       existing.clientType === 'public' &&
-      existing.requireHumanSession &&
+      !existing.requireHumanSession &&
       existing.requirePkce &&
       existing.clientStatus === 'active' &&
       sameStrings(existing.redirectUris, [GLOBE_ADMIN_OAUTH_REDIRECT_URI]) &&
@@ -92,7 +103,7 @@ async function main() {
     clientName: 'Greenhouse Globe Admin CLI',
     clientStatus: 'active',
     clientType: 'public',
-    requireHumanSession: true,
+    requireHumanSession: false,
     redirectUris: [GLOBE_ADMIN_OAUTH_REDIRECT_URI],
     allowedScopes: contract.allowedScopes,
     codeTtlSeconds: GLOBE_ADMIN_OAUTH_CODE_TTL_SECONDS,

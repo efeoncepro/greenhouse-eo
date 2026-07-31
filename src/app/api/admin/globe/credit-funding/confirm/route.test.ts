@@ -67,45 +67,32 @@ beforeEach(() => {
   vi.mocked(getTenantContext).mockResolvedValue(tenant)
 })
 
-describe('POST /api/admin/globe/credit-funding/confirm — agent provenance gate', () => {
-  it('rejects agent provider before the funding broker and emits a sanitized audit event', async () => {
+describe('POST /api/admin/globe/credit-funding/confirm — delegated agent provenance', () => {
+  it('forwards an authenticated agent mode to the policy-enforcing broker', async () => {
     vi.mocked(getServerAuthSession).mockResolvedValue(sessionFor() as never)
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
 
     const response = await POST(request())
-    const body = await response.json()
 
-    expect(response.status).toBe(403)
-    expect(body).toMatchObject({ code: 'globe_funding_agent_confirmation_forbidden', actionable: false })
-    expect(confirmGlobeCreditFunding).not.toHaveBeenCalled()
-    expect(warn).toHaveBeenCalledWith(
-      JSON.stringify({
-        event: 'greenhouse.globe_credit_funding.confirm_blocked',
-        reason: 'agent_auth_provenance',
-        userId: 'operator-42',
-        provider: 'agent',
-        authMode: 'agent'
+    expect(response.status).toBe(200)
+    expect(confirmGlobeCreditFunding).toHaveBeenCalledWith(
+      expect.objectContaining({
+        actor: {
+          userId: 'operator-42',
+          entitlement: 'platform.globe_credit_funding.confirm',
+          authMode: 'agent'
+        }
       })
     )
-
-    warn.mockRestore()
   })
 
-  it('rejects authMode agent even when provider is not agent', async () => {
-    vi.mocked(getServerAuthSession).mockResolvedValue(sessionFor({ provider: 'credentials' }) as never)
-
-    const response = await POST(request())
-
-    expect(response.status).toBe(403)
-    expect(confirmGlobeCreditFunding).not.toHaveBeenCalled()
-  })
-
-  it('allows a non-agent session to reach the confirm broker', async () => {
+  it('preserves non-agent provenance for the same policy boundary', async () => {
     vi.mocked(getServerAuthSession).mockResolvedValue(sessionFor({ provider: 'google', authMode: 'sso' }) as never)
 
     const response = await POST(request())
 
     expect(response.status).toBe(200)
-    expect(confirmGlobeCreditFunding).toHaveBeenCalledOnce()
+    expect(confirmGlobeCreditFunding).toHaveBeenCalledWith(
+      expect.objectContaining({ actor: expect.objectContaining({ authMode: 'sso' }) })
+    )
   })
 })

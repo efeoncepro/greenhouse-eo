@@ -58,6 +58,7 @@ const context = (overrides: Partial<AppPlatformRequestContext> = {}): AppPlatfor
   appSessionId: null,
   authSource: 'sister_platform_oauth',
   oauthCapabilities: ['globe.credits.funding.propose', 'globe.credits.funding.confirm'],
+  oauthSessionAuthMode: 'agent',
   rateLimit: {
     limitPerMinute: 120,
     limitPerHour: 5000,
@@ -93,7 +94,7 @@ describe('API Platform Globe credit funding resource', () => {
 
     expect(broker.propose).toHaveBeenCalledWith(
       expect.objectContaining({
-        actor: { userId: 'user-1', entitlement: 'platform.globe_credit_funding.propose' },
+        actor: { userId: 'user-1', entitlement: 'platform.globe_credit_funding.propose', authMode: 'agent' },
         idempotencyKey: 'propose-key'
       })
     )
@@ -140,7 +141,7 @@ describe('API Platform Globe credit funding resource', () => {
 
     expect(broker.confirm).toHaveBeenCalledWith(
       expect.objectContaining({
-        actor: { userId: 'user-1', entitlement: 'platform.globe_credit_funding.confirm' },
+        actor: { userId: 'user-1', entitlement: 'platform.globe_credit_funding.confirm', authMode: 'agent' },
         idempotencyKey: 'confirm-key',
         proposalId: 'p-1',
         fingerprint: 'f-1'

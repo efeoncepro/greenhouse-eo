@@ -7,6 +7,20 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-31 — TASK-1616: fondeo API de Globe operable por agentes delegados
+
+- Se agregó el cliente público OAuth PKCE `greenhouse-admin-cli` y el adapter API Platform para
+  `propose → confirm`; el CLI abre Chrome, conserva el token en memoria y nunca extrae cookies.
+- Un usuario agente autenticado puede confirmar bajo política explícita por workspace, scopes,
+  entitlements y límites por grant/tope mensual. Workloads, service principals y auth desconocida
+  fallan cerrados en Postgres.
+- La procedencia de la sesión se conserva authorization code → access token → intent. El confirm
+  valida el fingerprint durable y reanuda respuestas ambiguas con la idempotency key original hasta
+  una fase append-only `completed|confirm_failed`.
+- Las tres migraciones TASK-1616 y el cliente OAuth están aplicados en Cloud SQL compartido; smoke
+  transaccional verificó delegado permitido, sobre-límite/sin delegación/auth desconocida denegados y
+  cero filas residuales.
+
 ## 2026-07-31 — GitHub Actions: presupuesto mensual de la organización actualizado
 
 - Con confirmación humana y método de pago verificado, el presupuesto externo de Actions de `efeoncepro` pasó de USD 0 a **USD 20 mensuales**; `Stop usage when budget limit is reached` y las alertas permanecen activados. La evidencia y el procedimiento están en [`cloud-cost-intelligence-finops.md`](docs/documentation/operations/cloud-cost-intelligence-finops.md) y [`github-actions-budget.md`](docs/manual-de-uso/operations/github-actions-budget.md).
@@ -675,53 +689,3 @@ Corrección de fuente de verdad: el cliente inicial es **SKY Agencia Creativa**,
   estructural, autoridad humana, plataforma/memoria, gates, economics, governance y evidencia.
 - ASaaS Manifesto, modelo ASaaS, contexto corporativo y skills de agencia, business model, pricing y customer model
   quedaron alineados. AI-native no se interpreta como SaaS puro, self-service, autonomía total ni reducción de personas.
-
-## 2026-07-26 — Customer Model Operator para Codex y Claude
-
-- Se creó la skill transversal `efeonce-customer-model-operator` en `.codex/skills/` y `.claude/skills/`.
-- Se cubrieron ICP, segmentación, beachhead, JTBD, triggers, WTP, buyer personas, buying group, stakeholder map,
-  decision/paper process, procurement readiness, qualification, evidence, adopción, retención, expansión y gates.
-- Se añadió el `Customer Model Integrity Pack` reusable, con evidence ledger, confidence, owners, falsadores y handoffs.
-- Business model, GTM, commercial, research, pricing y agency quedaron conectados a la nueva capa; las ofertas concretas
-  siguen siendo responsables de aportar evidencia y mantener sus boundaries.
-
-## 2026-07-26 — Customer Model Integrity Pack para Search Visibility 360
-
-- Se creó `SEARCH_VISIBILITY_360_CUSTOMER_MODEL_INTEGRITY_PACK_V1.md` aplicado a la oferta SEO+AEO integrada de Wave.
-- El alcance comercial queda explícitamente en mid-market y enterprise; SMB queda fuera salvo decisión posterior.
-- El pack separa ICP estratégico/oportunidad/delivery y califica de forma independiente diagnostic, implementation,
-  managed operation, ecosystem/providers y renewal.
-- Se documentan jobs secuenciales, buying group por fase, decision/paper process, provider governance, transition gates,
-  evidence ledger y experimentos. Verdict: `model_incomplete` / `hypothesis_only`.
-
-## 2026-07-26 — EPIC-022 incorpora readiness de producto-servicio
-
-- Se añadió al epic la madurez actual de AEO, la diferencia entre arquitectura SEO y runtime SEO, y los gaps para cerrar
-  el loop diagnóstico → acción → implementación → verificación → renovación.
-- Se fijó mid-market y enterprise como alcance; SMB queda fuera salvo decisión explícita.
-- Se agregaron gates independientes para diagnostic, commercial qualification, implementation, managed operation,
-  renewal/expansion y enterprise readiness, además de la secuencia por olas AEO → SEO mínimo → 360 → authority/enterprise.
-
-## 2026-07-26 — Pricing transversal para Codex y Claude
-
-- Se creó la skill agnóstica `efeonce-pricing-operator` en `.codex/skills/` y `.claude/skills/`.
-- Se consolidaron patrones investigados de value-based/cost-floor pricing, productized services, capacity,
-  managed delivery, T&M/fixed/milestone/usage/outcome/hybrid, credits, AI cost controls, margin waterfall,
-  discount governance, versionado y validación.
-- Business model, GTM, commercial, Finance, Creative Practice y SEO/AEO Practice quedaron enrutados al companion;
-  sus reglas específicas siguen siendo dueñas de sus respectivas líneas.
-
-## 2026-07-26 — Primera aplicación de pricing a Wave
-
-- Se probó `efeonce-pricing-operator` sobre las cinco familias de Wave y sus seis delivery models.
-- Se creó `docs/business-models/wave/WAVE_PRICING_INTEGRITY_PACK_V1.md` con métricas candidatas, revenue
-  architecture, economics, experimentos y gates de aprobación.
-- El resultado es `hypothesis_only`: no se aprobaron tarifas, claims, márgenes ni venta general.
-
-## 2026-07-26 — Pricing específico para Search Visibility 360
-
-- Se creó `SEARCH_VISIBILITY_360_PRICING_INTEGRITY_PACK_V1.md` como aplicación específica de la skill general de
-  pricing a Search Visibility 360.
-- El pack separa diagnóstico, foundation, operación, transparencia/plataforma, capacidad de contenido y expansión;
-  evita usar artículos como unidad pública y trata SEO+AEO como producto integrado.
-- Verdict: `hypothesis_only`, pendiente de Finance, evidencia de willingness-to-pay, capacidad y aprobación comercial.

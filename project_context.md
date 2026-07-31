@@ -23,6 +23,12 @@ La flota de modelos de Globe se resuelve y promueve por identidad exacta de ruta
 evaluación/derechos/readbacks y una generación real desde la UI autenticada. Un MIME de transporte genérico nunca
 amplía la allowlist global: sólo puede aceptarse para una salida exacta esperada después de verificar sus bytes.
 
+El fondeo administrativo de Globe es API-first mediante el cliente público OAuth PKCE
+`greenhouse-admin-cli`; Chrome sólo aporta la sesión autenticada a la autorización, nunca cookies o tokens
+extraídos. Un usuario agente puede proponer y confirmar si el workspace lo delega con scopes, entitlements y
+límites de grant/tope mensual. La procedencia real de la sesión viaja hasta el intent append-only; workloads,
+service principals y modos desconocidos fallan cerrados. Canon: ADR-015, TASK-1616 y skill `greenhouse-globe`.
+
 ### Lectura mínima obligatoria
 
 1. [AGENTS.md](AGENTS.md): reglas transversales y router de dominios.

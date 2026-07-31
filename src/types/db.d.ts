@@ -2629,6 +2629,7 @@ export interface GreenhouseCoreFirstPartyAppSessions {
 }
 
 export interface GreenhouseCoreGlobeCreditFundingIntents {
+  actor_auth_mode: Generated<string>;
   actor_entitlement: string;
   actor_user_id: string;
   correlation_id: string;
@@ -2644,6 +2645,9 @@ export interface GreenhouseCoreGlobeCreditFundingIntents {
 }
 
 export interface GreenhouseCoreGlobeCreditFundingPolicies {
+  agent_confirmation_enabled: Generated<boolean>;
+  agent_max_grant_credits: number | null;
+  agent_max_monthly_cap_credits: number | null;
   globe_workspace_id: string;
   requires_second_confirmer: Generated<boolean>;
   second_confirmer_above_credits: number | null;

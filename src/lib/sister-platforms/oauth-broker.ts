@@ -53,6 +53,7 @@ type OAuthCodeRow = {
   correlation_id: string | null
   expires_at: string | Date
   consumed_at: string | Date | null
+  session_auth_mode: string | null
 }
 
 type OAuthAccessTokenRow = {
@@ -66,6 +67,7 @@ type OAuthAccessTokenRow = {
   correlation_id: string | null
   expires_at: string | Date
   revoked_at: string | Date | null
+  session_auth_mode: string | null
 }
 
 type ConsumerTokenRow = {
@@ -106,6 +108,7 @@ export type SisterPlatformOAuthIdentityPayload = {
   identityProfileId: string | null
   roles: string[]
   capabilities: string[]
+  authMode: string
   issuedAt: string
   expiresAt: string
   organization: {
@@ -650,6 +653,76 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
   return client
 }
 
+/** Update only the session-provenance requirement; never restate scopes, redirects or TTLs. */
+export const updateSisterPlatformOAuthSessionRequirement = async (input: {
+  clientId: string
+  requireHumanSession: boolean
+  actorPrincipalId: string
+  reason: string
+}) => {
+  const clientId = input.clientId.trim().toLowerCase()
+  const actorPrincipalId = input.actorPrincipalId.trim()
+  const reason = input.reason.trim()
+
+  if (!clientId || !actorPrincipalId || reason.length < 8) {
+    throw new SisterPlatformOAuthError('clientId is required.', { errorCode: 'invalid_client' })
+  }
+
+  const rows = await query<{ oauth_client_id: string }>(
+    `UPDATE greenhouse_core.sister_platform_oauth_clients
+        SET require_human_session = $2, updated_at = CURRENT_TIMESTAMP
+      WHERE lower(client_id) = lower($1)
+      RETURNING sister_platform_oauth_client_id AS oauth_client_id`,
+    [clientId, input.requireHumanSession]
+  )
+
+  if (!rows[0]) {
+    throw new SisterPlatformOAuthError('OAuth client not found.', {
+      statusCode: 404,
+      errorCode: 'invalid_client'
+    })
+  }
+
+  const client = await loadSisterPlatformOAuthClient(clientId)
+
+  if (!client) {
+    throw new SisterPlatformOAuthError('Unable to reload OAuth client after session policy update.', {
+      statusCode: 500,
+      errorCode: 'client_reload_failed'
+    })
+  }
+
+  const evidence = await query<{ evidence_exists: boolean }>(
+    `SELECT EXISTS (
+       SELECT 1
+         FROM greenhouse_core.sister_platform_oauth_audit_log
+        WHERE sister_platform_oauth_client_id = $1
+          AND event_type = 'client_policy_changed'
+          AND metadata_json #>> '{policy}' = 'require_human_session'
+          AND metadata_json #>> '{requireHumanSession}' = $2
+          AND metadata_json #>> '{reason}' = $3
+     ) AS evidence_exists`,
+    [client.oauthClientId, String(input.requireHumanSession), reason]
+  )
+
+  if (!evidence[0]?.evidence_exists) {
+    await recordSisterPlatformOAuthAuditEvent({
+      client,
+      eventType: 'client_policy_changed',
+      outcome: 'success',
+      responseStatus: 200,
+      metadata: {
+        policy: 'require_human_session',
+        requireHumanSession: input.requireHumanSession,
+        actorPrincipalId,
+        reason
+      }
+    })
+  }
+
+  return client
+}
+
 /**
  * Adjust ONLY the redirect-URI allowlist of an existing OAuth client (TASK-1507).
  *
@@ -1120,6 +1193,15 @@ export type SisterPlatformOAuthSessionProvenance = {
   authMode: string
 }
 
+export const resolveSisterPlatformOAuthSessionAuthMode = (
+  provenance?: SisterPlatformOAuthSessionProvenance
+): string => {
+  const provider = provenance?.provider.trim().toLowerCase() || ''
+  const authMode = provenance?.authMode.trim().toLowerCase() || ''
+
+  return provider === 'agent' || authMode === 'agent' ? 'agent' : authMode || 'unknown'
+}
+
 export const assertSisterPlatformOAuthSessionProvenance = (
   client: SisterPlatformOAuthClient,
   provenance?: SisterPlatformOAuthSessionProvenance
@@ -1142,13 +1224,15 @@ export const buildSisterPlatformOAuthIdentityPayload = ({
   client,
   requestedScopes,
   expiresAt,
-  workspaceBindings
+  workspaceBindings,
+  authMode
 }: {
   tenant: TenantAccessRecord
   client: SisterPlatformOAuthClient
   requestedScopes: string[]
   expiresAt: string
   workspaceBindings?: readonly GlobeOAuthWorkspaceBindingV1[]
+  authMode?: string
 }): SisterPlatformOAuthIdentityPayload => {
   const identity: SisterPlatformOAuthIdentityPayload = {
     sub: `greenhouse:user:${tenant.userId}`,
@@ -1158,6 +1242,7 @@ export const buildSisterPlatformOAuthIdentityPayload = ({
     identityProfileId: tenant.identityProfileId,
     roles: client.policy.claims.includeGreenhouseRoles ? tenant.roleCodes : [],
     capabilities: resolveSisterPlatformOAuthCapabilities(client.policy, requestedScopes),
+    authMode: authMode?.trim().toLowerCase() || tenant.authMode?.trim().toLowerCase() || 'unknown',
     issuedAt: new Date().toISOString(),
     expiresAt,
     organization: {
@@ -1178,12 +1263,14 @@ export const buildBrokerSisterPlatformOAuthIdentityPayload = async ({
   tenant,
   client,
   requestedScopes,
-  expiresAt
+  expiresAt,
+  authMode
 }: {
   tenant: TenantAccessRecord
   client: SisterPlatformOAuthClient
   requestedScopes: string[]
   expiresAt: string
+  authMode?: string
 }): Promise<SisterPlatformOAuthIdentityPayload> => {
   const workspaceBindings =
     client.sisterPlatformKey === 'globe' ? await resolveGlobeOAuthWorkspaceBindings(tenant) : undefined
@@ -1193,7 +1280,8 @@ export const buildBrokerSisterPlatformOAuthIdentityPayload = async ({
     client,
     requestedScopes,
     expiresAt,
-    workspaceBindings
+    workspaceBindings,
+    authMode
   })
 }
 
@@ -1230,6 +1318,7 @@ export const recordSisterPlatformOAuthAuditEvent = async ({
     | 'redirect_rejected'
     | 'token_revoked'
     | 'client_status_changed'
+    | 'client_policy_changed'
   outcome: 'success' | 'rejected' | 'failure'
   errorCode?: string | null
   redirectUri?: string | null
@@ -1353,7 +1442,10 @@ export const issueSisterPlatformAuthorizationCode = async ({
       expiresAt,
       auditMetadata.ipHash,
       auditMetadata.userAgentHash,
-      JSON.stringify({ codeChallengeMethod: 'S256' })
+      JSON.stringify({
+        codeChallengeMethod: 'S256',
+        sessionAuthMode: resolveSisterPlatformOAuthSessionAuthMode(sessionProvenance)
+      })
     ]
   )
 
@@ -1520,7 +1612,8 @@ export const consumeSisterPlatformAuthorizationCode = async ({
           code_challenge_method,
           correlation_id,
           expires_at,
-          consumed_at
+          consumed_at,
+          metadata_json #>> '{sessionAuthMode}' AS session_auth_mode
         FROM greenhouse_core.sister_platform_authorization_codes
         WHERE code_hash = $1
         FOR UPDATE
@@ -1677,7 +1770,10 @@ export const consumeSisterPlatformAuthorizationCode = async ({
         requestedScopes,
         codeRow.correlation_id ?? auditMetadata.correlationId,
         expiresAt,
-        JSON.stringify({ source: 'TASK-948 token exchange' })
+        JSON.stringify({
+          source: 'TASK-948 token exchange',
+          sessionAuthMode: codeRow.session_auth_mode || 'unknown'
+        })
       ]
     )
 
@@ -1687,7 +1783,8 @@ export const consumeSisterPlatformAuthorizationCode = async ({
       tenant,
       requestedScopes,
       correlationId: codeRow.correlation_id ?? auditMetadata.correlationId,
-      expiresAt
+      expiresAt,
+      sessionAuthMode: codeRow.session_auth_mode || 'unknown'
     }
   }).catch(async error => {
     if (error instanceof SisterPlatformOAuthError && error.errorCode !== 'invalid_client') {
@@ -1710,7 +1807,8 @@ export const consumeSisterPlatformAuthorizationCode = async ({
     correlationId: result.correlationId,
     auditMetadata,
     metadata: {
-      expiresAt: result.expiresAt
+      expiresAt: result.expiresAt,
+      authMode: result.sessionAuthMode
     }
   }).catch(() => undefined)
 
@@ -1725,7 +1823,8 @@ export const consumeSisterPlatformAuthorizationCode = async ({
       tenant: result.tenant,
       client,
       requestedScopes: result.requestedScopes,
-      expiresAt: result.expiresAt
+      expiresAt: result.expiresAt,
+      authMode: result.sessionAuthMode
     })
   }
 }
@@ -1755,6 +1854,7 @@ export const resolveSisterPlatformOAuthUserinfo = async ({
         token.correlation_id,
         token.expires_at,
         token.revoked_at,
+        token.metadata_json #>> '{sessionAuthMode}' AS session_auth_mode,
         oauth.sister_platform_oauth_client_id AS oauth_client_id,
         oauth.sister_platform_consumer_id AS consumer_id,
         consumer.sister_platform_key,
@@ -1844,7 +1944,8 @@ export const resolveSisterPlatformOAuthUserinfo = async ({
       tenant,
       client,
       requestedScopes,
-      expiresAt: toIsoString(row.expires_at) || new Date().toISOString()
+      expiresAt: toIsoString(row.expires_at) || new Date().toISOString(),
+      authMode: row.session_auth_mode || 'unknown'
     })
   }
 }
