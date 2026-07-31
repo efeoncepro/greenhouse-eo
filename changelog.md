@@ -7,6 +7,26 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-31 — Globe: el `:root` del payload cliente proyecta sobre el `@theme` (TASK-1612)
+
+- El payload emitía sus custom properties desde dos mecanismos con nombres distintos (`--canvas` en el
+  `:root` del shell, `--color-canvas` en el `@theme` del bundle), así que no podía re-tematizarse: mover
+  uno no movía al otro y un tema alternativo habría exigido cada override dos veces. Hoy cada hoja
+  renombrada se emite como `--canvas: var(--color-canvas, #25293c)` y un solo override mueve la utilidad
+  y el CSS plano a la vez. Es el paso previo que ADR-017 fijaba para cualquier modo claro; **no decide
+  ningún valor** y su criterio de éxito era cero cambio visual.
+- **Cero cambio visual, medido contra control.** El diff por bytes resultó inválido —el arnés de captura
+  no es determinista—; por píxeles, toda diferencia aparece igual o mayor en un control de dos corridas
+  del mismo código, y `globe-theme.generated.css` quedó byte-identical.
+- No se proyectan los namespaces passthrough ni las que ya derivan, y las dos exclusiones salen de medición:
+  proyectar `--text-xs` emite `var(--text-xs, …)` —referencia circular— y reprodujo el incidente de ADR-016
+  con los mismos números **con los tests unitarios en verde**; sólo el canario de browser lo vio.
+- Instrumentos nuevos, los dos verificados poniéndolos rojo: `gates/root-theme-equivalence.test.ts`
+  (compara por clave; su primera versión comparaba valores y dejaba pasar una utilidad borrada) y
+  `scripts/legacy-fallback-canary.mjs` (renderiza el `:root` sin Tailwind, la condición de las superficies
+  legacy, y mide el payoff del override único).
+- ADR-016 y ADR-017 quedaron reescritos en el cuerpo: la consecuencia que declaraban aceptada está cerrada.
+
 ## 2026-07-30 — Globe: documentación y skills sincronizadas con seis rutas de imagen
 
 - Se reconciliaron ADR-013, EPIC-028, el barrido WIP, task activa, documentación funcional, manuales, ledger,

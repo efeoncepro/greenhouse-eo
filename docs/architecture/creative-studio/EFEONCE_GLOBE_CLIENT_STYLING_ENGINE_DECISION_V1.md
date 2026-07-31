@@ -189,11 +189,26 @@ Medido en browser con `getComputedStyle`:
 (`src/styles/theme-from-tokens.ts` → `globe-theme.generated.css`, vía `pnpm theme:generate`). La clasificación
 es por **regla, no por lista**, para que un token nuevo aparezca como utilidad sin editar el generador.
 
-**La consecuencia que se acepta y hay que saber:** los valores quedan en dos lugares del CSS servido (el
-`:root` del shell y el `@theme` del bundle). No pueden derivar —los genera la misma fuente y un gate lo
-afirma carácter por carácter— pero **este payload no soporta re-tematizado en runtime**. Globe tiene un solo
-tema y ninguna superficie lo cambia, así que el costo hoy es cero. Si algún día se quiere, la salida **no** es
-volver a `var()`: es que el shell deje de emitir su `:root` y Tailwind sea el único que lo emita.
+**La consecuencia que se aceptó al adoptar el motor, y que `TASK-1612` cerró (2026-07-31):** los valores
+quedaban en dos lugares del CSS servido —el `:root` del shell y el `@theme` del bundle—. Nunca divergían,
+porque los genera la misma fuente y un gate lo afirma carácter por carácter, pero los nombres difieren a
+propósito (`--canvas` / `--color-canvas`), así que eran dos propiedades independientes: **el payload no
+podía re-tematizarse en runtime** y un tema alternativo habría exigido escribir cada override dos veces.
+
+Hoy el `:root` **proyecta** sobre el `@theme`: cada hoja renombrada se emite como
+`--canvas: var(--color-canvas, #25293c)`, y un solo override sobre la clave del theme mueve la utilidad y el
+CSS plano a la vez. Dos clases no se proyectan, y las dos por medición y no por criterio:
+
+- **Los namespaces passthrough** (`--text-xs`, `--radius-sm`, `--font-display`), donde la clave del theme se
+  llama igual que el token. Proyectarlos emite `--text-xs: var(--text-xs, …)` — una referencia circular que
+  reprodujo en browser este mismo incidente, con los mismos números, **con los tests unitarios en verde**. No
+  hacía falta: compartir nombre ya los hace un solo knob.
+- **Las que ya derivan** (`var()` adentro, las diez animaciones). El `@theme` las lleva resueltas, y
+  proyectarlas cambiaría una derivación viva por un valor congelado.
+
+El fallback del `var()` es load-bearing, no decorativo: las superficies legacy sirven ese `:root` **sin el
+bundle de Tailwind**, y sin el segundo argumento la propiedad quedaría inválida. Lo verifica
+`scripts/legacy-fallback-canary.mjs`, que renderiza esa condición exacta y compara los 198 tokens.
 
 ### Dos decisiones de integración que el ADR no anticipaba
 

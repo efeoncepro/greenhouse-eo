@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -246,16 +246,16 @@ Ninguna. No toca infraestructura, secretos, migraciones ni despliegue.
 
 ## Acceptance Criteria
 
-- [ ] Existe un test que afirma la equivalencia entre lo que emite `tokensToCss()` y lo que expone el
+- [x] Existe un test que afirma la equivalencia entre lo que emite `tokensToCss()` y lo que expone el
       `@theme` generado, y falla si una variable existe en uno y no en el otro.
-- [ ] El payload tiene **un solo emisor** de custom properties; el segundo, si sobrevive, es una
+- [x] El payload tiene **un solo emisor** de custom properties; el segundo, si sobrevive, es una
       proyección declarada del primero y su docblock lo dice.
-- [ ] Ningún valor cambió —color, tipografía, radio, sombra, duración, curva—: `git diff` sobre
+- [x] Ningún valor cambió —color, tipografía, radio, sombra, duración, curva—: `git diff` sobre
       `globe-theme.generated.css` no muestra cambios de valor.
-- [ ] Las capturas del Producer y del share board son idénticas a las de referencia — **cero diff visual**.
-- [ ] El docblock del emisor declara qué hace falta para agregar un segundo tema y qué no se decide acá.
-- [ ] El comentario de `theme-from-tokens.ts` que pedía esta decisión fue retirado, porque ya está tomada.
-- [ ] `pnpm check && pnpm build` en verde y los tres canarios de browser pasan.
+- [x] Las capturas del Producer y del share board son idénticas a las de referencia — **cero diff visual**.
+- [x] El docblock del emisor declara qué hace falta para agregar un segundo tema y qué no se decide acá.
+- [x] El comentario de `theme-from-tokens.ts` que pedía esta decisión fue retirado, porque ya está tomada.
+- [x] `pnpm check && pnpm build` en verde y los tres canarios de browser pasan.
 
 ## Verification
 
@@ -280,3 +280,38 @@ Más la verificación visual: capturar el Producer antes y después y confirmar 
 - El modo claro propiamente dicho, cuando exista la primera superficie que deje de ser un visor de
   piezas (ADR-017 § condiciones de reapertura).
 - `TASK-1560` — retiro del payload legacy, que elimina los consumidores planos del `:root`.
+
+## Evidencia de cierre (2026-07-31)
+
+**Cero cambio visual, medido y con control.** La comparación por bytes resultó inválida: el arnés de
+captura no es determinista. Se midió por PÍXELES, y contra un control de dos corridas del MISMO código:
+
+| captura | before→after | control (HEAD→HEAD) |
+|---|---|---|
+| 6 capturas (320/390/390-reduce) | 0 px | 0 px |
+| `first-fold-1440`, `model-selector-1440` | 1 px | 1 px |
+| `functional-flow-390` | **0 px** | **87.491 px** |
+
+Toda diferencia observada aparece en el control con magnitud igual o mayor — incluida una animación
+captada a media frame que el control acusa con 87k píxeles y el before/after con cero. No hay
+diferencia atribuible a la consolidación. `globe-theme.generated.css` quedó **byte-identical**, así que
+las utilidades no se movieron en absoluto.
+
+**Lo que se encontró al implementar, y no estaba en la spec:** proyectar los namespaces passthrough
+—donde la clave del theme se llama IGUAL que el token— emite `--text-xs: var(--text-xs, …)`, una
+referencia circular. Se midió en browser y reprodujo el incidente de ADR-016 con los mismos números
+(`text-xs` 16px, `rounded-sm` 0px, `font-display` Times) **con los 18 tests unitarios en verde**. Sólo
+el canario de browser lo vio. Esos tokens no necesitaban proyección: compartir nombre ya los hacía un
+solo knob.
+
+**Instrumentos nuevos**, los dos verificados poniéndolos rojo a propósito:
+
+- `gates/root-theme-equivalence.test.ts` — compara por CLAVE. Su primera versión comparaba conjuntos de
+  VALORES y se midió su falla: borrar `--color-action` del theme pasaba en verde porque otro token
+  servía el mismo hex. Incluye el aserto de que ninguna proyección funcione sólo por su fallback, que
+  sería el knob muerto reintroducido en silencio.
+- `scripts/legacy-fallback-canary.mjs` — renderiza el `:root` SIN Tailwind (la condición exacta de las
+  superficies legacy) y compara los 198 tokens contra el SSOT; sin el fallback colapsan a vacío. Mide
+  además el payoff: un solo override sobre `--color-canvas` mueve `--canvas`.
+
+Commits: `422a768` (Slice 1), `362d6e1` (Slices 2-3) en `efeonce-globe`.

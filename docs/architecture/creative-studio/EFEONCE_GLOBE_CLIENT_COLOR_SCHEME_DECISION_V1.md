@@ -63,7 +63,8 @@ una decisión:
 
 La ausencia de modo claro era indistinguible de un olvido. El propio código pedía la decisión por escrito,
 en el docblock de `theme-from-tokens.ts`: *«Si algún día se quiere tematizado en runtime… **decisión con
-dueño, no un efecto colateral**»*. Este ADR es ese dueño.
+dueño, no un efecto colateral**»*. Este ADR es ese dueño, y `TASK-1612` ejecutó la parte mecánica que la
+decisión habilitaba: el docblock ya no pide nada — declara qué hace falta para un segundo tema.
 
 ---
 
@@ -234,7 +235,7 @@ necesita para decidir, en
 | **Desaturar el chasis conservando el azul como marca** *(dirección original de este ADR)* | Partía de que `#4db8ff` era la marca. No lo es. Habría dejado el defecto mayor —una paleta que no es la del sistema— intacto y más visible. |
 | **Dejar el navy como está** | El chasis tiñe el trabajo del cliente y hace desaparecer las piezas frías. |
 | **Modo claro completo en las cinco superficies** | El Producer lo rechaza por colorimetría; sería un modo claro para las superficies que menos lo necesitan, al precio de duplicar la rampa y sus gates. |
-| **Seguir `prefers-color-scheme` del sistema** | Delega al sistema operativo una decisión de oficio: la pieza no puede verse distinta según cómo el cliente configuró su laptop. Además hoy es inejecutable — el payload no re-tematiza en runtime (dos emisores de `:root`). |
+| **Seguir `prefers-color-scheme` del sistema** | Delega al sistema operativo una decisión de oficio: la pieza no puede verse distinta según cómo el cliente configuró su laptop. Y aunque el payload ya re-tematiza en runtime desde `TASK-1612`, la objeción de oficio se sostiene sola. |
 | **Variante B — hundir el chasis entero** | Sólo funciona en oscuro; invierte la elevación de Material poniendo el contenido *por debajo* del fondo; y responde al patrón de una app de **lienzo continuo** (Figma, Runway) cuando el Producer es un **feed** de resultados (Behance, Dribbble). |
 | **Que Globe declare los valores localmente hasta que AXIS publique** | Es teclear el valor dos veces, con drift garantizado y silencioso. |
 
@@ -250,9 +251,10 @@ Este ADR se revisa —sin necesidad de superarlo— cuando ocurra cualquiera de 
    reporte exportable o una vista de facturación no tienen la restricción colorimétrica del Producer: son
    documentos, y ahí el modo claro es legítimo.
 3. **La entrega imprimible** entra en alcance. Un PDF o una hoja de contacto nace claro por destino.
-4. **El re-tematizado en runtime se vuelve requisito** por accesibilidad — en cuyo caso el primer paso no es
-   elegir colores sino **consolidar la emisión de `:root`** (hoy la emiten el shell y el `@theme` del bundle
-   por separado, así que cambiar un token desde JS no movería una sola utilidad).
+4. **El re-tematizado en runtime se vuelve requisito** por accesibilidad. Ese paso previo **ya está hecho**:
+   `TASK-1612` consolidó la emisión de `:root` el 2026-07-31, y hoy el `:root` proyecta sobre el `@theme`
+   (`--canvas: var(--color-canvas, …)`). Un tema alternativo es ahora **un solo bloque de override** sobre
+   las claves del theme, medido por canario; lo que falta al reabrir es elegir los valores, que son de AXIS.
 
 Que el modo claro **exista y esté medido** en el theme baja el costo de reabrir. Cuando se reabra, el punto
 de partida es rotar el rol de acción a `--action-strong` `#0375db` — `#4db8ff` sobre blanco da **2,18:1** y

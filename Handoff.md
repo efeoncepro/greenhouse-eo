@@ -1,5 +1,26 @@
 # Handoff activo
 
+## TASK-1612 — emisor de `:root` de Globe consolidado (2026-07-31, complete)
+
+El payload cliente de Globe emitía sus custom properties desde dos mecanismos con nombres distintos
+(`--canvas` en el `:root` del shell, `--color-canvas` en el `@theme` del bundle), así que no podía
+re-tematizarse: mover uno no movía al otro. Hoy el `:root` **proyecta** sobre el `@theme` y un solo
+override mueve utilidad y CSS plano a la vez — el paso previo que ADR-017 fijaba para cualquier modo claro.
+
+**Cerrada con cero cambio visual, medido contra control.** El diff por bytes resultó inválido (el arnés
+de captura no es determinista); por píxeles, toda diferencia observada aparece igual o mayor en un control
+de dos corridas del mismo código. `globe-theme.generated.css` quedó byte-identical.
+
+**Lo que hay que saber si alguien toca esto:** proyectar los namespaces passthrough emite
+`--text-xs: var(--text-xs, …)` —referencia circular— y reproduce el incidente de ADR-016 con los tests
+unitarios EN VERDE. Sólo el canario de browser lo ve. El fallback del `var()` es load-bearing: las
+superficies legacy sirven ese `:root` sin Tailwind.
+
+Instrumentos nuevos: `gates/root-theme-equivalence.test.ts` y `scripts/legacy-fallback-canary.mjs`, los dos
+verificados poniéndolos rojo. Sin rollout pendiente — es cambio de repo, sin flags ni migraciones.
+
+Commits en `efeonce-globe`: `422a768`, `362d6e1`. **Sin push** (local-first).
+
 ## 2026-07-30 — Globe: el theme del design system entra al payload (ADR-017 v2.0)
 
 El runtime de Globe estaba pintado con una paleta que **no es la del design system**: `--action #4db8ff`
