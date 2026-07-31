@@ -32,9 +32,11 @@ Sin control comparativo, un barrido sólo dice que el diseño tiene deuda; y un 
 un número. Con las dos correcciones: claro y oscuro fallan en los MISMOS 14 textos (`--faint` a 40% de
 alpha, deuda preexistente que este cambio no tocó).
 
-**Estado:** `@efeoncepro/axis-tokens@0.2.3` publicada y el pin de Globe subido; la suite corre contra el
-paquete del registry. PR abierto en `efeonce-globe`: https://github.com/efeoncepro/efeonce-globe/pull/8
-(lleva `TASK-1612` y `TASK-1613`), **pendiente de revisión y merge humano**.
+**PROMOVIDO 2026-07-31.** PR #8 mergeado (`f3357d2`) y desplegado (rev `00118-cfh`). AXIS 0.2.3 publicada
+y el pin subido. Falta sólo la verificación visual del operador en vivo — la superficie está tras SSO.
+
+También mergeado: PR #15 (todo paquete que compila, compila antes de testear + gate). Abierto y en CI:
+PR #25 (el lecho de las piezas deja de ser el azul del prototipo).
 
 ⚠️ Al rebasear sobre `origin/main` apareció que **su CI ya estaba rojo**: `packages/domain/dist` está
 desactualizado respecto de `evaluation.ts` (`observeInvalidRequest` existe en el source y no en el

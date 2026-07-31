@@ -293,8 +293,13 @@ Publicar `@efeoncepro/axis-tokens@0.2.3` y subir el pin de Globe de `0.2.2` a `0
 - [x] `Handoff.md` y `changelog.md` actualizados.
 - [x] `@efeoncepro/axis-tokens@0.2.3` **publicada** y el pin de Globe subido a `0.2.3`; la suite corre
       contra el paquete del registry, no contra un `dist` copiado a mano.
-- [x] PR abierto en `efeonce-globe`: https://github.com/efeoncepro/efeonce-globe/pull/8 (lleva
-      `TASK-1612` y `TASK-1613`). **Pendiente de revisión y merge humano.**
+- [x] **PROMOVIDO A PRODUCCIÓN 2026-07-31.** PR [#8](https://github.com/efeoncepro/efeonce-globe/pull/8)
+      (lleva `TASK-1612` y `TASK-1613`) mergeado a `main` en `f3357d2` y desplegado en
+      `globe-studio-internal` rev `00118-cfh`. El guardrail `Verify exact remote main SHA` del propio
+      workflow confirma que la imagen se construyó desde ese SHA exacto.
+- [ ] **Verificación visual en vivo pendiente del operador.** La superficie está tras SSO; abrir el menú
+      de cuenta en `globe.efeoncepro.com/producer` y alternar «Apariencia». No se sustituye por una
+      sesión Playwright nueva: este repo tiene documentado que eso no es evidencia equivalente.
 
 ## Follow-ups
 

@@ -18,6 +18,23 @@
 - Se reforzaron las skills de licitaciones, deck-studio, SEO/AEO, diseño e imagen con las lecciones de Grader/X-Ray/Greenhouse, mockups honestos, assets extraíbles y protección de decks previos.
 - La salida client-facing queda separada de investigación, métricas ilustrativas, manifiestos vacíos y archivos `-INTERNO`.
 
+## 2026-07-31 — Globe: modo claro PROMOVIDO, y el lecho de las piezas deja el azul del prototipo
+
+- **El modo claro está en producción.** PR #8 mergeado (`f3357d2`) y desplegado en `globe-studio-internal`
+  rev `00118-cfh`; el guardrail del propio workflow confirma que la imagen se construyó desde ese SHA.
+  Falta sólo la verificación visual del operador — la superficie está tras SSO.
+- **El lecho de las piezas** (PR #25) retira el último sobreviviente de la paleta jubilada: una función
+  que derivaba un tono del id de cada pieza, con su ventana anclada al cian `#4db8ff` que ADR-017 v2.0
+  retiró. Ningún guard podía verlo — no hay azul *escrito*, hay una receta que lo fabrica en runtime.
+  Ahora es un token, con familia **magenta** elegida por medición: orchid no está libre (es el acento) y
+  coral está a 14° del rojo de error.
+- **Todo paquete que compila, compila antes de testear** (PR #15). Ocho de diez tenían el agujero, y el
+  `test` raíz construía al consumidor antes que a sus dependencias — desde un `dist` limpio nunca
+  funcionó. Gate nuevo para que el paquete once no pueda olvidarlo.
+- 🔴 **Drift encontrado:** AXIS declara **tres** familias de acento para Globe (Coral, Magenta, Orchid) y
+  **sólo orchid llegó al código**. `TASK-1615` lo cierra; mientras tanto la rampa magenta vive local en
+  Globe como deuda declarada, no como drift silencioso.
+
 ## 2026-07-31 — Globe: modo claro con interruptor de apariencia (TASK-1613)
 
 - Interruptor en el menú de cuenta del Producer. El tema es **un bloque de override** sobre las claves
