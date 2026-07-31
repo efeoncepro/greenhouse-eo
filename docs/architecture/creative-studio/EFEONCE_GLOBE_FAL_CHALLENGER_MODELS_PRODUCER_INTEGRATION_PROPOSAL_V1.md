@@ -19,8 +19,8 @@ La separación es necesaria porque cada familia tiene contratos de salida, preci
 |---|---|---|---|
 | Kling 3/O3 | `fal-ai/kling-video/v3/{pro,standard}/{text-to-video,image-to-video}`, `.../o3/{pro,standard}/{text-to-video,image-to-video,reference-to-video,video-to-video/edit}`, `.../v3/{pro,standard}/motion-control` | Texto/imagen a video, referencias, edición, motion control, audio nativo según ruta, multi-shot/custom elements según schema | No integrado |
 | Grok Imagine Video | `xai/grok-imagine-video/{text-to-video,image-to-video,reference-to-video,edit-video,extend-video}`, además `v1.5/image-to-video` | Texto/imagen/referencias, edición, extensión, audio nativo, diálogo/lip-sync según modalidad | No integrado |
-| Wan 2.7 | `fal-ai/wan/v2.7/{text-to-video,image-to-video,reference-to-video,edit-video}`, además `edit` y rutas de imagen | Texto/imagen/referencias, edición y continuidad video-a-video, imagen | No integrado |
-| FLUX.2 Max | `fal-ai/flux-2-max`, `fal-ai/flux-2-max/edit` | Generación y edición de imagen, múltiples referencias/consistencia, texto dentro de imagen según schema | No integrado |
+| Wan 2.7 | `fal-ai/wan/v2.7/{text-to-video,image-to-video,reference-to-video,edit-video}`, además `edit` y rutas de imagen | Texto/imagen/referencias, first/end frame, continuación, audio conductor, multi-shot, edición y generación/edición de imagen | No integrado |
+| FLUX.2 Max | `fal-ai/flux-2-max`, `fal-ai/flux-2-max/edit` | Generación y edición de imagen, referencias múltiples en Edit, seed, safety checker, JPEG/PNG y tamaños preset/custom según schema | No integrado |
 
 No existe coincidencia exacta `Flux 3` en el catálogo autenticado. No se debe nombrar ni registrar Flux 3 hasta que Fal publique un endpoint identificable y su OpenAPI.
 
@@ -62,7 +62,7 @@ El selector debe seguir siendo data-driven. Las tasks deben añadir rutas, const
 
 Para video: tray de imagen/video/audio con roles, orden estable y citación; start/end frame; referencias de sujeto/estilo/movimiento; edición con rango temporal y preservación; audio nativo como opción explícita; validación antes de estimate y nuevamente en `prepare`; preview/poster/playback/retrieval y recovery.
 
-Para FLUX.2: prompt, image-to-image/edit, múltiples referencias, máscara o regiones solo si el schema live las soporta, aspect ratio/resolution, preview, compare y lineage. No agregar controles especulativos.
+Para FLUX.2: prompt, image-to-image/edit, múltiples referencias, seed, safety y tamaños solo si el schema live los soporta, preview, compare y lineage. FLUX.2 Edit no debe sustituir el flujo regional Fill/Erase porque su schema no declara máscara ni regiones. No agregar controles especulativos.
 
 ## Gates antes de implementación
 

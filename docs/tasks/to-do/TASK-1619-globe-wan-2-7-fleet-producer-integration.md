@@ -49,10 +49,16 @@ Integrar Wan 2.7 Pro/standard para texto/imagen/referencias, edición de video y
 
 ## Backend/Data Contract
 
-- Revalidar los ocho endpoints Wan 2.7 observados y fijar solo los que tengan OpenAPI/terms compatibles.
+- Revalidar los ocho endpoints Wan 2.7 observados y fijar solo los que tengan OpenAPI/terms compatibles. Model Search no entrega pricing confiable; resolver la discrepancia entre páginas generales y precios 720p/1080p antes de crear rates.
+- `text-to-video` acepta prompt/negative prompt, `audio_url`, 720p/1080p, 2–15 segundos y ratios 16:9, 9:16, 1:1, 4:3 y 3:4.
+- `image-to-video` debe distinguir `image_url`, `end_image_url`, `video_url` de continuación y `audio_url`; validar límites de imagen/video y no mezclar first/end frame con video source.
+- `reference-to-video` transporta arrays separados de imágenes y videos y `multi_shots`; el manifest debe conservar roles y orden por modalidad.
+- `edit-video` exige `video_url`, permite referencia de imagen y `audio_setting` (`auto`/`origin`); consume `video-edit` de `TASK-1573`, no `video-generate`.
+- Wan image generate/edit reutiliza `image-generate`/`image-edit`; Pro y standard tienen rutas y límites separados, incluyendo cantidades de salida distintas.
 - Separar Pro de standard; no usar un rate ni evidencia común.
 - Extender video-edit para preservar audio, duración, rango y lineage solo donde el schema lo soporte.
-- Validar referencias, MIME, resolución, duración, output schema, retries, queue y settlement.
+- El rate engine debe considerar resolución, duración y, en reference-to-video, duración del video de entrada.
+- Validar referencias, MIME, codec, resolución, duración, output schema, retries, queue y settlement.
 - Mantener imagen y video como capacidades distintas; no crear una capability `wan`.
 
 ## UI/UX Contract
@@ -89,6 +95,9 @@ Crear wireframe/flow al tomar la task. El Producer debe mostrar únicamente los 
 
 - [ ] Rutas Pro/standard y modalidades tienen identidades separadas.
 - [ ] `edit-video` no se materializa como `image-to-video`.
+- [ ] `image-to-video` distingue first frame, end frame, video continuation y audio source.
+- [ ] `reference-to-video` conserva arrays separados de imágenes/videos y `multi_shots` sin truncamiento.
+- [ ] `edit-video` conserva la policy de audio y lineage de video fuente.
 - [ ] Constraints y output MIME provienen del schema validado.
 - [ ] Producer no contiene lógica específica de Wan ni muestra plumbing vendor.
 - [ ] Evaluación, rights, rate, binding, canary y rollback quedan evidenciados por ruta.

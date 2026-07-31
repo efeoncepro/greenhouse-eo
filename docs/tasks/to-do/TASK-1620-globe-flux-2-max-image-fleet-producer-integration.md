@@ -50,9 +50,12 @@ Integrar `fal-ai/flux-2-max` y `fal-ai/flux-2-max/edit` como rutas de imagen gob
 
 ## Backend/Data Contract
 
-- Revalidar OpenAPI y pricing de generate/edit antes de fijar campos, ratios, resolución y referencias.
+- Revalidar OpenAPI y pricing de generate/edit antes de fijar campos, ratios, resolución y referencias. Snapshot observado: USD 0,07/MP; la página indica USD 0,07 por el primer MP y USD 0,03 por cada MP adicional, incluyendo inputs en Edit.
+- Generate acepta `image_size` preset o custom, dimensiones múltiplos de 16, 256–2.560 px y área máxima 4.194.304 px; `output_format` es JPEG/PNG y la respuesta es un `images[]` de una imagen por ejecución aunque no exista `count`.
+- Edit recibe `image_urls[]` y referencias citables como `@ImageN`; el schema no fija todavía el máximo de imágenes, por lo que Globe debe definir un límite gobernado antes de promocionar.
 - Reutilizar `image-generate`/`image-edit`; cada endpoint conserva route ID e identidad exacta.
-- Extender `image-edit` para referencias/máscara solo si el contrato actual no alcanza; no crear capability `flux-2` ni `flux-3`.
+- Extender `image-edit` para references, seed, safety tolerance/checker y custom dimensions solo si el contrato actual no alcanza; no crear capability `flux-2` ni `flux-3`.
+- No mapear FLUX.2 Max Edit a edición regional/inpaint: no declara máscara, regiones ni erase/fill; conservar esas rutas en FLUX Fill/Erase.
 - Validar output image MIME, hashes, lineage, governance, rights, rate y retrieval.
 - Tests de payload, result schema, host allowlist, idempotencia, timeout/reconcile y ausencia de slug en cliente.
 
@@ -91,6 +94,9 @@ Crear wireframe/flow al tomar la task. Reutilizar Image Producer y extender el e
 - [ ] Generate y edit están separados por route ID y evidencia.
 - [ ] Producer reutiliza la capability image existente y solo muestra controls soportados.
 - [ ] No existe referencia a `Flux 3` como modelo disponible.
+- [ ] Estimate calcula megapíxeles de output y de inputs de Edit con rate versionado.
+- [ ] Generate se trata inicialmente como una salida por ejecución y Edit tiene límite explícito de referencias antes del spend fence.
+- [ ] La edición regional continúa usando Fill/Erase; FLUX.2 Edit se reserva para referencias + prompt.
 - [ ] Output, hash, lineage, rights, rate, retrieval y rollback están verificados por ruta.
 - [ ] No hay slugs, URLs Fal ni costos vendor en el payload cliente.
 
