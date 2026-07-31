@@ -21,7 +21,7 @@
 - Barrido de contraste nuevo, con veredicto comparativo: falla sólo si el claro introduce un fallo que
   el oscuro no tiene. Quedan 14 textos que fallan en **ambos** modos (`--faint` a 40% de alpha) — deuda
   preexistente, no de este cambio.
-- ⚠️ Requiere publicar `@efeoncepro/axis-tokens@0.2.3`; hasta entonces Globe compila con el `dist` local.
+- `@efeoncepro/axis-tokens@0.2.3` publicada y el pin de Globe subido. PR en `efeonce-globe`: [#8](https://github.com/efeoncepro/efeonce-globe/pull/8), pendiente de revisión humana.
 
 ## 2026-07-31 — Globe: el `:root` del payload cliente proyecta sobre el `@theme` (TASK-1612)
 

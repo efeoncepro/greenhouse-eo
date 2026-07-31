@@ -17,12 +17,17 @@ Sin control comparativo, un barrido sólo dice que el diseño tiene deuda; y un 
 un número. Con las dos correcciones: claro y oscuro fallan en los MISMOS 14 textos (`--faint` a 40% de
 alpha, deuda preexistente que este cambio no tocó).
 
-**Rollout pendiente:** `@efeoncepro/axis-tokens@0.2.3` está commiteado y tagueado (`c9198c9` / `v0.2.3`)
-pero **NO publicado** — el push quedó bloqueado por el clasificador de permisos del entorno. Globe sigue
-pineado en `0.2.2` y hoy compila sólo con el `dist` copiado a mano. **Sin eso, esto no funciona fuera de
-la máquina local.**
+**Estado:** `@efeoncepro/axis-tokens@0.2.3` publicada y el pin de Globe subido; la suite corre contra el
+paquete del registry. PR abierto en `efeonce-globe`: https://github.com/efeoncepro/efeonce-globe/pull/8
+(lleva `TASK-1612` y `TASK-1613`), **pendiente de revisión y merge humano**.
 
-Commits en `efeonce-globe`: `994711e`, `d87d71f`, `59339f0`. Sin push.
+⚠️ Al rebasear sobre `origin/main` apareció que **su CI ya estaba rojo**: `packages/domain/dist` está
+desactualizado respecto de `evaluation.ts` (`observeInvalidRequest` existe en el source y no en el
+compilado). Se resuelve reconstruyendo el paquete; no es de estas tasks.
+
+⚠️ Instalar desde GitHub Packages en local necesita el token por entorno — el `.npmrc` del repo lo
+documenta pero con la variable de `setup-node`, que pnpm NO lee. La forma que funciona es
+`env "npm_config_//npm.pkg.github.com/:_authToken=$(gh auth token)" pnpm install`.
 
 ## TASK-1612 — emisor de `:root` de Globe consolidado (2026-07-31, complete)
 

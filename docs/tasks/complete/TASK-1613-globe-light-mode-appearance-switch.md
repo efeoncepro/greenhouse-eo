@@ -291,11 +291,12 @@ Publicar `@efeoncepro/axis-tokens@0.2.3` y subir el pin de Globe de `0.2.2` a `0
 - [x] Wireframe y flow con contenido real de lo implementado, no stubs para el gate.
 - [x] Evidencia visual durable en `docs/ui/evidence/task-1613/`.
 - [x] `Handoff.md` y `changelog.md` actualizados.
-- [ ] **Rollout pendiente:** publicar `@efeoncepro/axis-tokens@0.2.3` y subir el pin de Globe de
-      `0.2.2` a `0.2.3`. Hasta entonces esto compila sólo con el `dist` copiado a mano.
+- [x] `@efeoncepro/axis-tokens@0.2.3` **publicada** y el pin de Globe subido a `0.2.3`; la suite corre
+      contra el paquete del registry, no contra un `dist` copiado a mano.
+- [x] PR abierto en `efeonce-globe`: https://github.com/efeoncepro/efeonce-globe/pull/8 (lleva
+      `TASK-1612` y `TASK-1613`). **Pendiente de revisión y merge humano.**
 
 ## Follow-ups
 
-- Publicar `@efeoncepro/axis-tokens@0.2.3` y subir el pin de Globe.
 - Decidir qué hacer con los 14 textos que fallan el piso en **ambos** modos (`--faint` a 40% de alpha).
 - Cubrir launch y error surfaces en el barrido cuando tengan canario.
