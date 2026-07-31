@@ -55,7 +55,10 @@ Reglas: no exponer slugs, no fallback silencioso, no declarar audio sin evidenci
 
 - Revalidar schemas/pricing de `fal-ai/kling-video/v3/...` y `.../o3/...` antes de congelar rutas.
 - Mapear text/image/reference/edit/motion a capabilities existentes; extender union solo si falta una semántica discriminada.
-- Modelar audio nativo, multi-shot, custom elements y voice-control como constraints de ruta, no flags arbitrarios.
+- Modelar audio nativo, `multi_prompt` con duración por shot, `shot_type`, custom elements y voice-control como constraints de ruta, no flags arbitrarios.
+- El manifest debe agrupar elementos semánticos —imagen frontal, referencias 1–3, video y `@ElementN`—; una lista plana de imágenes no es equivalente.
+- Diferenciar explícitamente `start_image_url`, `end_image_url`, `image_urls` y `video_url`; O3 edit/reference requiere video base más referencias y el límite combinado de cuatro imágenes/elementos.
+- Motion control debe conservar sus límites por `character_orientation`; V3 puede conservar audio original y O3 edit puede usar `keep_audio`.
 - Tests de payload, output MP4/audio presence, host allowlist, idempotencia, retry y route/binding/model equality.
 - Evidencia independiente para Pro, Standard, 4K y O3; no promover un tier por evidencia de otro.
 
@@ -97,6 +100,9 @@ Wireframe y flow son obligatorios al tomar la task. El Producer debe operar star
 - [ ] Cada modalidad/tier promovido tiene route ID, binding, rate, rights, readiness y canary propios.
 - [ ] Producer no expone slugs, costos vendor ni lógica específica de Kling.
 - [ ] Audio solo se declara cuando el output real contiene audio y pasa governance.
+- [ ] Multi-shot, elementos agrupados y referencias O3 se materializan sin aplanamiento semántico.
+- [ ] Video-to-video edit/reference nunca resuelve al endpoint genérico text-to-video.
+- [ ] `voice_id` permanece privado dentro del binding/adapter y no aparece en el payload cliente.
 - [ ] Edición, referencias y motion control validan antes de reservar créditos.
 - [ ] Existe evidencia durable de evaluación, MIME/hash, lineage, settlement y recovery sin doble cobro.
 - [ ] La flota previa no presenta regresiones.

@@ -17,7 +17,7 @@ La separación es necesaria porque cada familia tiene contratos de salida, preci
 
 | Familia | Endpoints observados | Capacidades | Estado en Globe |
 |---|---|---|---|
-| Kling 3/O3 | `fal-ai/kling-video/v3/{pro,standard}/{text-to-video,image-to-video}`, `.../o3/{pro,standard}/{text-to-video,image-to-video,reference-to-video,video-to-video/edit}`, `.../v3/{pro,standard}/motion-control` | Texto/imagen a video, referencias, edición, motion control, audio nativo según ruta, multi-shot/custom elements según schema | No integrado |
+| Kling 3/O3 | `fal-ai/kling-video/v3/{pro,standard}/{text-to-video,image-to-video}`, `.../o3/{pro,standard}/{text-to-video,image-to-video,reference-to-video,video-to-video/edit}`, `.../v3/{pro,standard}/motion-control` | Texto/imagen a video, start/end frames, elementos agrupados, edición, motion control, audio nativo, multi-shot y voice control según schema | No integrado |
 | Grok Imagine Video | `xai/grok-imagine-video/{text-to-video,image-to-video,reference-to-video,edit-video,extend-video}`, además `v1.5/image-to-video` | Texto/imagen/referencias, edición, extensión, audio nativo, diálogo/lip-sync según modalidad | No integrado |
 | Wan 2.7 | `fal-ai/wan/v2.7/{text-to-video,image-to-video,reference-to-video,edit-video}`, además `edit` y rutas de imagen | Texto/imagen/referencias, first/end frame, continuación, audio conductor, multi-shot, edición y generación/edición de imagen | No integrado |
 | FLUX.2 Max | `fal-ai/flux-2-max`, `fal-ai/flux-2-max/edit` | Generación y edición de imagen, referencias múltiples en Edit, seed, safety checker, JPEG/PNG y tamaños preset/custom según schema | No integrado |
@@ -51,7 +51,7 @@ No se requiere una capability nueva para FLUX.2: extiende `image-generate`/`imag
 
 | Modelo | Reutilizar | Extender | No reutilizar como equivalente |
 |---|---|---|---|
-| Kling 3/O3 | video-generate, video-frames, referencias, video-edit, motion cuando ya esté gobernado | audio nativo, multi-shot, custom elements, start/end/reference roles y voice-control si el schema lo confirma | no mapear `reference-to-video` a un único start frame |
+| Kling 3/O3 | video-generate, video-frames, referencias, video-edit, motion cuando ya esté gobernado | audio nativo, multi-shot por shot, elementos agrupados, start/end/reference roles y voice-control si el schema lo confirma | no mapear `reference-to-video` a un único start frame |
 | Grok Imagine Video | video-generate, video-frames, referencias, video-edit | edit-video/extend-video, audio/lip-sync, 1–10s, 480/720 y cargos por violación | no prometer audio ni extensión si la ruta no lo entrega |
 | Wan 2.7 | video-generate, video-frames, referencias e image-generate | video-edit, continuidad y límites propios de edición/referencia; `pro` como ruta independiente | no presentar `edit-video` como image-to-video |
 | FLUX.2 Max/Edit | image-generate, image-edit, referencia/lineage, aspect ratio y estimate | múltiples referencias, controls de edición, typography/consistencia según OpenAPI | no crear capability `flux-3` ni un adapter separado |
