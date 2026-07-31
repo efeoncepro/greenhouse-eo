@@ -38,9 +38,14 @@
 - **ADR-017 v2.1** canoniza los dos invariantes nuevos (§6 «Lo que NO voltea con el modo» y §7 «La familia
   del escenario es magenta») y generaliza el hallazgo: **una receta que fabrica color en runtime es un
   literal con disfraz** que ningún drift guard de literales puede ver.
-- 🔴 **Drift abierto:** AXIS declara **tres** familias de acento para Globe (Coral, Magenta, Orchid) y
-  **sólo orchid llegó al paquete**. `TASK-1615` lo cierra; mientras tanto la rampa magenta vive local en
-  Globe como deuda declarada, con un consumidor real en producción.
+- ✅ **Drift cerrado el mismo día.** `axis-tokens@0.2.4` porta las **tres** familias de acento, leídas del
+  archivo de Figma en alta resolución (en baja, `#f1d1dd` se lee como `#f101dd`). Globe consume
+  `axisAccentRamp.magenta` y borró su copia; el valor servido quedó **byte-identical**. `TASK-1615`
+  cerrada. Los nueve pasos de orchid ya en el paquete coincidían **exactamente** con el archivo — cero
+  drift ahí, lo que valida el método de lectura.
+- **Queda abierto para diseño:** si coral y magenta merecen rol (coral está a **14°** del rojo de
+  `danger`), y si scrim/escenario se canoniza en AXIS como grupo **sin variante por modo** — que la firma
+  del token impida el error, en vez de un comentario que pida no cometerlo.
 
 ## 2026-07-31 — Globe: modo claro promovido (entrada previa del mismo día)
 

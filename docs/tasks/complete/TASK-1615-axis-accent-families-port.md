@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`
@@ -179,11 +179,11 @@ Publicar la versión de AXIS (push del tag `v*.*.*`) y subir el pin de Globe.
 
 ## Acceptance Criteria
 
-- [ ] `axisAccentRamp` expone `coral` y `magenta` completas, con valores leídos del archivo de Figma.
-- [ ] `orchid` y toda forma existente quedan intactas.
-- [ ] Globe consume `axisAccentRamp.magenta` y su constante local ya no existe.
-- [ ] El lecho de las piezas se ve idéntico antes y después.
-- [ ] Suites de AXIS y del monorepo de Globe en verde.
+- [x] `axisAccentRamp` expone `coral` y `magenta` completas, con valores leídos del archivo de Figma.
+- [x] `orchid` y toda forma existente quedan intactas.
+- [x] Globe consume `axisAccentRamp.magenta` y su constante local ya no existe.
+- [x] El lecho de las piezas se ve idéntico antes y después.
+- [x] Suites de AXIS y del monorepo de Globe en verde.
 
 ## Verification
 
@@ -191,11 +191,34 @@ Publicar la versión de AXIS (push del tag `v*.*.*`) y subir el pin de Globe.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle: complete` y archivo movido a `complete/`.
-- [ ] `docs/tasks/README.md` y `TASK_ID_REGISTRY.md` sincronizados.
-- [ ] Retirado el comentario de deuda en `tokens.ts` de Globe.
+- [x] `Lifecycle: complete` y archivo movido a `complete/`.
+- [x] `docs/tasks/README.md` y `TASK_ID_REGISTRY.md` sincronizados.
+- [x] Retirado el comentario de deuda en `tokens.ts` de Globe.
 
 ## Follow-ups
 
 - Decidir si coral merece un rol semántico — hoy no tiene ninguno, y está a 14° del rojo de `danger`.
 - Portar opacidades y sombras de cada familia cuando alguien las consuma.
+
+## Evidencia de cierre (2026-07-31)
+
+`@efeoncepro/axis-tokens@0.2.4` publicada con las **tres** familias, leídas del archivo en alta
+resolución (nodos `12770:4` coral, `12770:122` magenta, `12770:240` orchid). Globe subió el pin, consume
+`axisAccentRamp.magenta` y **borró su copia local**. PR [#32](https://github.com/efeoncepro/efeonce-globe/pull/32).
+
+**El valor servido no cambió:** los mismos cinco hex en `--media-wash` y `globe-theme.generated.css`
+**byte-identical**. Sólo cambió de quién es, que era el punto.
+
+**Verificación cruzada que vale registrar:** los nueve pasos de orchid que ya estaban en el paquete
+coinciden **exactamente** con el archivo. Cero drift ahí — lo que valida el método de lectura usado para
+las otras dos, y descarta que el problema fuera de transcripción y no de omisión.
+
+**Tres asertos nuevos en AXIS:** que las tres familias estén (para que la ausencia vuelva a ser visible),
+que cada rampa suba en oscuridad de forma monótona (una rampa que no ordena no es una rampa), y que
+**coral queda a 14° del rojo de `danger`** — no como prohibición sino como el dato que la decisión de
+asignarle rol necesita.
+
+### Lo que sigue abierto, y es del equipo de diseño
+
+Coral y magenta entran **sin rol asignado**. Las opacidades y sombras que el archivo también declara por
+familia se portan cuando alguien las consuma: portar lo que nadie usa es la otra forma de drift.

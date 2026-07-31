@@ -77,9 +77,19 @@ Los dos venían de tratar como SUPERFICIE algo que no lo es:
 la rampa contra el canvas. Esa medición era del TOKEN, no de lo que RENDERIZA — ignoraba la composición
 por alfa. **Un número sobre el token no describe el píxel.** Los tres defectos aparecieron MIRANDO.
 
-**Drift abierto:** AXIS declara TRES familias de acento para Globe (Coral, Magenta, Orchid) y sólo orchid
-llegó al paquete. `TASK-1615` lo cierra; mientras tanto la rampa magenta vive local en Globe como deuda
-declarada.
+**Drift CERRADO el mismo día.** `axis-tokens@0.2.4` porta las tres familias de acento leídas del archivo
+en alta resolución; Globe subió el pin, consume `axisAccentRamp.magenta` y borró su copia local (PR #32,
+rev `00123-gtv`). El valor servido no cambió —los mismos cinco hex, theme generado byte-identical—: sólo
+cambió de quién es. `TASK-1615` cerrada.
+
+Verificación cruzada que vale conservar: los nueve pasos de **orchid** que ya estaban en el paquete
+coinciden EXACTAMENTE con el archivo. Cero drift ahí, lo que valida el método de lectura y descarta que
+el problema fuera de transcripción y no de omisión.
+
+**Queda abierto para el equipo de diseño** (escrito en `EFEONCE_AXIS_SURFACE_SCALE_AND_ACCENT_PROPOSAL_V1.md`):
+si coral y magenta merecen rol —coral está a 14° del rojo de `danger` y es la más saturada—, y si el grupo
+scrim/escenario se canoniza en AXIS **sin variante por modo**, para que la firma del token impida el error
+en vez de un comentario que pida no cometerlo.
 
 ⚠️ Al rebasear sobre `origin/main` apareció que **su CI ya estaba rojo**: `packages/domain/dist` está
 desactualizado respecto de `evaluation.ts` (`observeInvalidRequest` existe en el source y no en el
