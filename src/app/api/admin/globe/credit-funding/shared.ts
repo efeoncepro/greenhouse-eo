@@ -23,6 +23,40 @@ const BROKER_ERROR_CODES = {
 export const brokerErrorResponse = (error: GlobeCreditFundingBrokerError) =>
   canonicalErrorResponse(BROKER_ERROR_CODES[error.code])
 
+export type FundingAuthProvenance = Readonly<{
+  provider?: unknown
+  authMode?: unknown
+}>
+
+/**
+ * Agent sessions are allowed to prepare a proposal, but can never cross the
+ * mutation boundary. These are signed session claims; userId is deliberately
+ * not part of the decision because naming conventions are not provenance.
+ */
+export const isAgentFundingProvenance = ({ provider, authMode }: FundingAuthProvenance): boolean =>
+  provider === 'agent' || authMode === 'agent'
+
+/**
+ * Security audit for a blocked mutation attempt. Keep this payload bounded to
+ * provenance and actor identity: no funding body, token, proposal, or upstream
+ * error crosses the audit boundary.
+ */
+export const auditBlockedAgentFundingConfirmation = ({
+  userId,
+  provider,
+  authMode
+}: FundingAuthProvenance & { userId: string }) => {
+  console.warn(
+    JSON.stringify({
+      event: 'greenhouse.globe_credit_funding.confirm_blocked',
+      reason: 'agent_auth_provenance',
+      userId,
+      provider: typeof provider === 'string' ? provider : 'unknown',
+      authMode: typeof authMode === 'string' ? authMode : 'unknown'
+    })
+  )
+}
+
 /**
  * El enlace con Globe no está configurado en este runtime (falta `GLOBE_API_BASE_URL` o el par WIF).
  *
@@ -35,10 +69,7 @@ export const brokerErrorResponse = (error: GlobeCreditFundingBrokerError) =>
  * La línea de servidor va acá y no queda a criterio del caller (ISSUE-127): sin ella, el operador ve
  * un código honesto pero nadie puede decir QUÉ variable falta.
  */
-export const globeConfigurationErrorResponse = (
-  error: GreenhouseGlobeConfigurationError,
-  operation: string
-) => {
+export const globeConfigurationErrorResponse = (error: GreenhouseGlobeConfigurationError, operation: string) => {
   // `error.code` es un enum cerrado de configuración: no lleva secreto, host ni payload.
   console.error(
     JSON.stringify({

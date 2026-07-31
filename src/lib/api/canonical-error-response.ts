@@ -78,6 +78,7 @@ export type CanonicalErrorCode =
   | 'globe_funding_invalid_request'
   | 'globe_funding_proposal_not_found'
   | 'globe_funding_confirmer_is_proposer'
+  | 'globe_funding_agent_confirmation_forbidden'
   | 'globe_funding_already_recorded'
   | 'globe_unavailable'
   | 'globe_not_configured'
@@ -324,6 +325,11 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   globe_funding_confirmer_is_proposer: {
     status: 409,
     message: 'No puedes confirmar un fondeo que propusiste. Pídele a otra persona con autorización que lo confirme.',
+    actionable: false
+  },
+  globe_funding_agent_confirmation_forbidden: {
+    status: 403,
+    message: 'Una sesión de agente puede proponer fondeos, pero no puede confirmarlos.',
     actionable: false
   },
   globe_funding_already_recorded: {

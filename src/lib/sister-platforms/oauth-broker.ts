@@ -25,6 +25,8 @@ type OAuthClientRow = {
   client_id: string
   client_name: string
   client_status: string
+  client_type: 'public' | 'confidential' | null
+  require_human_session: boolean | null
   redirect_uris: string[] | null
   allowed_scopes: string[] | null
   code_ttl_seconds: number
@@ -84,6 +86,8 @@ export type SisterPlatformOAuthClient = {
   clientId: string
   clientName: string
   clientStatus: string
+  clientType: 'public' | 'confidential'
+  requireHumanSession: boolean
   redirectUris: string[]
   allowedScopes: string[]
   codeTtlSeconds: number
@@ -150,6 +154,8 @@ export type UpsertSisterPlatformOAuthClientInput = {
   clientId: string
   clientName: string
   clientStatus?: 'draft' | 'active' | 'suspended' | 'deprecated'
+  clientType?: 'public' | 'confidential'
+  requireHumanSession?: boolean
   redirectUris: string[]
   allowedScopes?: string[]
   codeTtlSeconds?: number
@@ -256,6 +262,60 @@ const normalizeRedirectUris = (value: string[]) => {
   return uris
 }
 
+const isLoopbackPublicRedirectUri = (uri: string) => {
+  try {
+    const parsed = new URL(uri)
+
+    return (
+      parsed.protocol === 'http:' &&
+      parsed.hostname === '127.0.0.1' &&
+      !parsed.username &&
+      !parsed.password &&
+      !parsed.hash &&
+      Boolean(parsed.pathname)
+    )
+  } catch {
+    return false
+  }
+}
+
+const assertPublicClientRedirectUris = (redirectUris: readonly string[]) => {
+  if (redirectUris.some(uri => !isLoopbackPublicRedirectUri(uri))) {
+    throw new SisterPlatformOAuthError(
+      'Public OAuth clients must use an exact http://127.0.0.1 loopback redirect path.',
+      { errorCode: 'invalid_redirect_uri' }
+    )
+  }
+}
+
+const redirectUriMatchesClient = ({
+  client,
+  registeredRedirectUri,
+  requestedRedirectUri
+}: {
+  client: SisterPlatformOAuthClient
+  registeredRedirectUri: string
+  requestedRedirectUri: string
+}) => {
+  if (client.clientType === 'confidential') {
+    return registeredRedirectUri === requestedRedirectUri
+  }
+
+  if (!isLoopbackPublicRedirectUri(registeredRedirectUri) || !isLoopbackPublicRedirectUri(requestedRedirectUri)) {
+    return false
+  }
+
+  const registered = new URL(registeredRedirectUri)
+  const requested = new URL(requestedRedirectUri)
+
+  return (
+    registered.protocol === requested.protocol &&
+    registered.hostname === requested.hostname &&
+    registered.pathname === requested.pathname &&
+    registered.search === requested.search
+  )
+}
+
 const normalizeAllowedScopes = (value: string[] | undefined) => {
   const scopes = Array.from(
     new Set((value?.length ? value : DEFAULT_ALLOWED_SCOPES).map(scope => scope.trim()).filter(Boolean))
@@ -304,6 +364,8 @@ const mapOAuthClient = (row: OAuthClientRow): SisterPlatformOAuthClient => {
       clientId: row.client_id,
       clientName: row.client_name,
       clientStatus: row.client_status,
+      clientType: row.client_type === 'public' ? 'public' : 'confidential',
+      requireHumanSession: Boolean(row.require_human_session),
       redirectUris: normalizeStringArray(row.redirect_uris, []),
       allowedScopes,
       codeTtlSeconds: Number(row.code_ttl_seconds || 300),
@@ -385,6 +447,8 @@ export const loadSisterPlatformOAuthClient = async (clientId: string) => {
         oauth.client_id,
         oauth.client_name,
         oauth.client_status,
+        oauth.client_type,
+        oauth.require_human_session,
         oauth.redirect_uris,
         oauth.allowed_scopes,
         oauth.code_ttl_seconds,
@@ -409,6 +473,7 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
   const clientId = input.clientId.trim().toLowerCase()
   const clientName = input.clientName.trim()
   const clientStatus = input.clientStatus ?? 'active'
+  const requestedClientType = input.clientType
   const redirectUris = normalizeRedirectUris(input.redirectUris)
   const allowedScopes = normalizeAllowedScopes(input.allowedScopes)
   const codeTtlSeconds = normalizeTtl(input.codeTtlSeconds, 300, 60, AUTHORIZATION_CODE_TTL_MAX_SECONDS)
@@ -424,10 +489,24 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
     })
   }
 
+  if (requestedClientType === 'public') {
+    if (input.requirePkce === false) {
+      throw new SisterPlatformOAuthError('Public OAuth clients require PKCE.', {
+        errorCode: 'invalid_pkce_configuration'
+      })
+    }
+
+    assertPublicClientRedirectUris(redirectUris)
+  }
+
   await withTransaction(async pgClient => {
-    const existing = await pgClient.query<{ oauth_client_id: string }>(
+    const existing = await pgClient.query<{
+      oauth_client_id: string
+      client_type: 'public' | 'confidential' | null
+      require_human_session: boolean | null
+    }>(
       `
-        SELECT sister_platform_oauth_client_id AS oauth_client_id
+        SELECT sister_platform_oauth_client_id AS oauth_client_id, client_type, require_human_session
         FROM greenhouse_core.sister_platform_oauth_clients
         WHERE lower(client_id) = lower($1)
         LIMIT 1
@@ -437,6 +516,27 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
     )
 
     if (existing.rows[0]) {
+      const existingClientType = existing.rows[0].client_type === 'public' ? 'public' : 'confidential'
+
+      if (requestedClientType && requestedClientType !== existingClientType) {
+        throw new SisterPlatformOAuthError('OAuth client_type is immutable after creation.', {
+          errorCode: 'invalid_client_configuration'
+        })
+      }
+
+      const clientType = existingClientType
+      const requireHumanSession = input.requireHumanSession ?? Boolean(existing.rows[0].require_human_session)
+
+      if (clientType === 'public') {
+        if (input.requirePkce === false) {
+          throw new SisterPlatformOAuthError('Public OAuth clients require PKCE.', {
+            errorCode: 'invalid_pkce_configuration'
+          })
+        }
+
+        assertPublicClientRedirectUris(redirectUris)
+      }
+
       await pgClient.query(
         `
           UPDATE greenhouse_core.sister_platform_oauth_clients
@@ -444,16 +544,18 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
             sister_platform_consumer_id = $2,
             client_name = $3,
             client_status = $4,
-            redirect_uris = $5::text[],
-            allowed_scopes = $6::text[],
-            code_ttl_seconds = $7,
-            access_token_ttl_seconds = $8,
-            require_pkce = $9,
-            issue_identity_inline = $10,
-            policy_json = $11::jsonb,
-            metadata_json = $12::jsonb,
-            suspended_by_user_id = CASE WHEN $4 = 'suspended' THEN $13 ELSE NULL END,
-            deprecated_by_user_id = CASE WHEN $4 = 'deprecated' THEN $13 ELSE NULL END,
+            client_type = $5,
+            require_human_session = $6,
+            redirect_uris = $7::text[],
+            allowed_scopes = $8::text[],
+            code_ttl_seconds = $9,
+            access_token_ttl_seconds = $10,
+            require_pkce = $11,
+            issue_identity_inline = $12,
+            policy_json = $13::jsonb,
+            metadata_json = $14::jsonb,
+            suspended_by_user_id = CASE WHEN $4 = 'suspended' THEN $15 ELSE NULL END,
+            deprecated_by_user_id = CASE WHEN $4 = 'deprecated' THEN $15 ELSE NULL END,
             suspended_at = CASE WHEN $4 = 'suspended' THEN CURRENT_TIMESTAMP ELSE NULL END,
             deprecated_at = CASE WHEN $4 = 'deprecated' THEN CURRENT_TIMESTAMP ELSE NULL END,
             updated_at = CURRENT_TIMESTAMP
@@ -464,6 +566,8 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
           input.sisterPlatformConsumerId,
           clientName,
           clientStatus,
+          clientType,
+          requireHumanSession,
           redirectUris,
           allowedScopes,
           codeTtlSeconds,
@@ -479,6 +583,8 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
       return
     }
 
+    const clientType = requestedClientType ?? 'confidential'
+
     await pgClient.query(
       `
         INSERT INTO greenhouse_core.sister_platform_oauth_clients (
@@ -487,6 +593,8 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
           client_id,
           client_name,
           client_status,
+          client_type,
+          require_human_session,
           redirect_uris,
           allowed_scopes,
           code_ttl_seconds,
@@ -501,12 +609,12 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
           suspended_at,
           deprecated_at
         ) VALUES (
-          $1, $2, $3, $4, $5, $6::text[], $7::text[], $8, $9, $10, $11, $12::jsonb, $13::jsonb,
-          $14,
-          CASE WHEN $5 = 'suspended' THEN $14 ELSE NULL END,
-          CASE WHEN $5 = 'deprecated' THEN $14 ELSE NULL END,
-          CASE WHEN $5 = 'suspended' THEN CURRENT_TIMESTAMP ELSE NULL END,
-          CASE WHEN $5 = 'deprecated' THEN CURRENT_TIMESTAMP ELSE NULL END
+          $1, $2, $3, $4, $5, $6, $7, $8::text[], $9::text[], $10, $11, $12, $13, $14::jsonb, $15::jsonb,
+          $16,
+          CASE WHEN $4 = 'suspended' THEN $16 ELSE NULL END,
+          CASE WHEN $4 = 'deprecated' THEN $16 ELSE NULL END,
+          CASE WHEN $4 = 'suspended' THEN CURRENT_TIMESTAMP ELSE NULL END,
+          CASE WHEN $4 = 'deprecated' THEN CURRENT_TIMESTAMP ELSE NULL END
         )
       `,
       [
@@ -515,6 +623,8 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
         clientId,
         clientName,
         clientStatus,
+        clientType,
+        input.requireHumanSession ?? false,
         redirectUris,
         allowedScopes,
         codeTtlSeconds,
@@ -722,9 +832,7 @@ export const updateSisterPlatformOAuthTokenTtls = async (input: UpdateSisterPlat
     previousAccessTokenTtlSeconds = Number(row.access_token_ttl_seconds || 300)
     codeTtlSeconds = requestedCodeTtlSeconds ?? previousCodeTtlSeconds
     accessTokenTtlSeconds = requestedAccessTokenTtlSeconds ?? previousAccessTokenTtlSeconds
-    changed =
-      previousCodeTtlSeconds !== codeTtlSeconds ||
-      previousAccessTokenTtlSeconds !== accessTokenTtlSeconds
+    changed = previousCodeTtlSeconds !== codeTtlSeconds || previousAccessTokenTtlSeconds !== accessTokenTtlSeconds
 
     if (!changed) return
 
@@ -890,6 +998,17 @@ const assertClientActive = (client: SisterPlatformOAuthClient) => {
       errorCode: 'consumer_expired'
     })
   }
+
+  if (client.clientType === 'public') {
+    if (!client.requirePkce) {
+      throw new SisterPlatformOAuthError('Public OAuth client PKCE configuration is invalid.', {
+        statusCode: 503,
+        errorCode: 'invalid_pkce_configuration'
+      })
+    }
+
+    assertPublicClientRedirectUris(client.redirectUris)
+  }
 }
 
 export const validateSisterPlatformAuthorizeRequest = async (url: URL): Promise<ValidatedAuthorizeRequest> => {
@@ -921,7 +1040,12 @@ export const validateSisterPlatformAuthorizeRequest = async (url: URL): Promise<
 
   assertClientActive(client)
 
-  if (!redirectUri || !client.redirectUris.includes(redirectUri)) {
+  if (
+    !redirectUri ||
+    !client.redirectUris.some(registeredRedirectUri =>
+      redirectUriMatchesClient({ client, registeredRedirectUri, requestedRedirectUri: redirectUri })
+    )
+  ) {
     throw new SisterPlatformOAuthError('Redirect URI is not registered for this OAuth client.', {
       statusCode: 400,
       errorCode: 'invalid_redirect_uri'
@@ -987,6 +1111,28 @@ export const assertTenantEligibleForSisterPlatformOAuth = (
     throw new SisterPlatformOAuthError('User is not eligible for this OAuth client.', {
       statusCode: 403,
       errorCode: decision.errorCode
+    })
+  }
+}
+
+export type SisterPlatformOAuthSessionProvenance = {
+  provider: string
+  authMode: string
+}
+
+export const assertSisterPlatformOAuthSessionProvenance = (
+  client: SisterPlatformOAuthClient,
+  provenance?: SisterPlatformOAuthSessionProvenance
+) => {
+  if (!client.requireHumanSession) return
+
+  const provider = provenance?.provider.trim().toLowerCase() || ''
+  const authMode = provenance?.authMode.trim().toLowerCase() || ''
+
+  if (!provider || !authMode || provider === 'agent' || authMode === 'agent') {
+    throw new SisterPlatformOAuthError('OAuth client requires a human-authenticated session.', {
+      statusCode: 403,
+      errorCode: 'human_session_required'
     })
   }
 }
@@ -1148,12 +1294,15 @@ export const recordSisterPlatformOAuthAuditEvent = async ({
 export const issueSisterPlatformAuthorizationCode = async ({
   authorizeRequest,
   tenant,
-  auditMetadata
+  auditMetadata,
+  sessionProvenance
 }: {
   authorizeRequest: ValidatedAuthorizeRequest
   tenant: TenantAccessRecord
   auditMetadata: OAuthRequestAuditMetadata
+  sessionProvenance?: SisterPlatformOAuthSessionProvenance
 }): Promise<IssuedAuthorizationCode> => {
+  assertSisterPlatformOAuthSessionProvenance(authorizeRequest.client, sessionProvenance)
   assertTenantEligibleForSisterPlatformOAuth(tenant, authorizeRequest.client, authorizeRequest.requestedScopes)
 
   const code = generateAuthorizationCode()
@@ -1242,8 +1391,19 @@ export const authenticateSisterPlatformOAuthClient = async ({
   clientSecret
 }: {
   client: SisterPlatformOAuthClient
-  clientSecret: string
+  clientSecret?: string
 }) => {
+  if (client.clientType === 'public') {
+    if (clientSecret?.trim()) {
+      throw new SisterPlatformOAuthError('Public OAuth clients must not send a client secret.', {
+        statusCode: 401,
+        errorCode: 'invalid_client'
+      })
+    }
+
+    return null
+  }
+
   if (!clientSecret) {
     throw new SisterPlatformOAuthError('Missing client secret.', {
       statusCode: 401,
@@ -1310,7 +1470,7 @@ export const consumeSisterPlatformAuthorizationCode = async ({
   auditMetadata
 }: {
   clientId: string
-  clientSecret: string
+  clientSecret?: string
   code: string
   redirectUri: string
   codeVerifier: string

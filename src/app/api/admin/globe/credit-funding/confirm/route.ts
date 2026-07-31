@@ -2,18 +2,17 @@ import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
 import { getServerAuthSession } from '@/lib/auth'
 import { buildTenantEntitlementSubject } from '@/lib/commercial/party/route-entitlement-subject'
 import { can } from '@/lib/entitlements/runtime'
-import {
-  confirmGlobeCreditFunding,
-  GlobeCreditFundingBrokerError
-} from '@/lib/globe/credit-administration-broker'
+import { confirmGlobeCreditFunding, GlobeCreditFundingBrokerError } from '@/lib/globe/credit-administration-broker'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 
 import { GreenhouseGlobeConfigurationError } from '@/lib/globe/client'
 
 import {
+  auditBlockedAgentFundingConfirmation,
   brokerErrorResponse,
   globeConfigurationErrorResponse,
+  isAgentFundingProvenance,
   parseConfirmBody,
   requireIdempotencyKey
 } from '../shared'
@@ -43,6 +42,16 @@ export const POST = async (request: Request) => {
 
     if (!can(subject, 'platform.globe_credit_funding.confirm', 'execute', 'all')) {
       return canonicalErrorResponse('forbidden')
+    }
+
+    if (isAgentFundingProvenance(session.user)) {
+      auditBlockedAgentFundingConfirmation({
+        userId: tenant.userId,
+        provider: session.user.provider,
+        authMode: session.user.authMode
+      })
+
+      return canonicalErrorResponse('globe_funding_agent_confirmation_forbidden')
     }
 
     const idempotencyKey = requireIdempotencyKey(request)

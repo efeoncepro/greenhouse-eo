@@ -86,7 +86,11 @@ export async function GET(request: Request) {
     const issued = await issueSisterPlatformAuthorizationCode({
       authorizeRequest,
       tenant,
-      auditMetadata
+      auditMetadata,
+      sessionProvenance: {
+        provider: session.user.provider,
+        authMode: session.user.authMode
+      }
     })
 
     await recordSisterPlatformOAuthAuditEvent({
