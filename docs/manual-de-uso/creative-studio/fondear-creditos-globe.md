@@ -44,6 +44,9 @@ runbook que salieron de medirlo.
 Desde el repo de Greenhouse, usa el cliente canónico. Abre Google Chrome para autorizar mediante
 OAuth 2.0 Authorization Code + PKCE y conserva el token solo en memoria. La sesión puede pertenecer
 a una persona o a un agente autenticado; la política de delegación se valida nuevamente al confirmar.
+Cuando el origen es staging protegido por Vercel, el CLI resuelve el bypass de automatización mediante el
+helper canónico del repo y lo envía únicamente en token/propose/confirm; no lo abre en el navegador, no lo
+imprime y no lo persiste durante este flujo.
 
 ```bash
 GREENHOUSE_API_BASE_URL=https://dev-greenhouse.efeoncepro.com \

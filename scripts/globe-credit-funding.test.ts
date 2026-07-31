@@ -81,7 +81,8 @@ describe('Globe credit funding CLI', () => {
         await fetch(`${callback}?code=test-code&state=${new URL(url).searchParams.get('state')}`)
       }),
       fetchImpl,
-      timeoutMs: 1000
+      timeoutMs: 1000,
+      vercelBypassSecret: 'staging-bypass'
     }
 
     const result = await runFundingFlow({
@@ -100,11 +101,17 @@ describe('Globe credit funding CLI', () => {
 
     expect(result.confirmed).toBe(true)
     expect(fetchImpl).toHaveBeenCalledTimes(3)
+    expect(fetchImpl.mock.calls[0]?.[1]).toEqual(
+      expect.objectContaining({
+        headers: expect.objectContaining({ 'x-vercel-protection-bypass': 'staging-bypass' })
+      })
+    )
     expect(fetchImpl.mock.calls[1]?.[1]).toEqual(
       expect.objectContaining({
         headers: expect.objectContaining({
           authorization: 'Bearer opaque-token',
-          'idempotency-key': 'propose-key'
+          'idempotency-key': 'propose-key',
+          'x-vercel-protection-bypass': 'staging-bypass'
         })
       })
     )
@@ -112,7 +119,8 @@ describe('Globe credit funding CLI', () => {
       expect.objectContaining({
         headers: expect.objectContaining({
           authorization: 'Bearer opaque-token',
-          'idempotency-key': 'confirm-key'
+          'idempotency-key': 'confirm-key',
+          'x-vercel-protection-bypass': 'staging-bypass'
         })
       })
     )

@@ -1319,6 +1319,10 @@ futuro debe saber:
   normaliza ese query param a `localhost` antes del route; el matcher acepta sólo ese alias contra el registro
   literal y lo canoniza inmediatamente de vuelta a `127.0.0.1`, de modo que code, callback y token exchange
   usan el mismo URI exacto. Conserva protocolo/path/query exactos y PKCE/state obligatorios. No amplíes a otros hosts.
+- **Deployment Protection no es OAuth:** Chrome puede autorizar porque tiene sesión Vercel, pero el `fetch` del
+  CLI no hereda esa cookie. En staging, `pnpm globe:credit-funding` resuelve el automation bypass con
+  `scripts/lib/vercel-staging-access.mjs` y lo adjunta sólo a token/propose/confirm. Nunca lo pongas en el URL
+  del navegador, nunca lo imprimas y nunca lo envíes fuera del origen Greenhouse de staging.
 
 ### Ocho lecciones de método, que valen más que los fixes
 

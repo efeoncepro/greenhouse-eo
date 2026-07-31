@@ -4,6 +4,8 @@ import { createServer, type Server } from 'node:http'
 import { pathToFileURL } from 'node:url'
 import { promisify } from 'node:util'
 
+import { resolveBypassSecret } from './lib/vercel-staging-access.mjs'
+
 const execFile = promisify(execFileCallback)
 
 export type CreditFundingInput = Readonly<{
@@ -30,10 +32,18 @@ type CliConfig = Readonly<{
   openBrowser: (url: string) => Promise<void>
   fetchImpl: typeof fetch
   timeoutMs: number
+  vercelBypassSecret?: string
 }>
 
 const DEFAULT_SCOPE = 'openid profile email globe.credits.funding.propose globe.credits.funding.confirm'
 const DEFAULT_TIMEOUT_MS = 180_000
+
+const vercelBypassHeaders = (config: CliConfig): Record<string, string> =>
+  config.vercelBypassSecret
+    ? {
+        'x-vercel-protection-bypass': config.vercelBypassSecret
+      }
+    : {}
 
 export const buildPkceChallenge = (verifier: string) => createHash('sha256').update(verifier).digest('base64url')
 
@@ -226,7 +236,11 @@ export const authorizeWithLoopbackPkce = async (config: CliConfig): Promise<stri
 
     const tokenResponse = await config.fetchImpl(config.tokenUrl, {
       method: 'POST',
-      headers: { 'content-type': 'application/x-www-form-urlencoded', accept: 'application/json' },
+      headers: {
+        'content-type': 'application/x-www-form-urlencoded',
+        accept: 'application/json',
+        ...vercelBypassHeaders(config)
+      },
       body: new URLSearchParams({
         grant_type: 'authorization_code',
         client_id: config.clientId,
@@ -274,7 +288,8 @@ const requestFunding = async <T>({
       authorization: `Bearer ${accessToken}`,
       'content-type': 'application/json',
       'idempotency-key': idempotencyKey,
-      accept: 'application/json'
+      accept: 'application/json',
+      ...vercelBypassHeaders(config)
     },
     body: JSON.stringify(body)
   })
@@ -359,13 +374,20 @@ const requiredArg = (args: Map<string, string>, key: string) => {
   return value
 }
 
-const defaultConfig = (): CliConfig => {
+const defaultConfig = async (): Promise<CliConfig> => {
   const apiBaseUrl = process.env.GREENHOUSE_API_BASE_URL?.trim()
   const clientId = process.env.GLOBE_ADMIN_OAUTH_CLIENT_ID?.trim()
 
   if (!apiBaseUrl || !clientId) throw new Error('GREENHOUSE_API_BASE_URL_and_GLOBE_ADMIN_OAUTH_CLIENT_ID_required')
 
   const base = new URL(apiBaseUrl)
+
+  const needsVercelBypass =
+    base.hostname === 'dev-greenhouse.efeoncepro.com' || base.hostname.endsWith('.vercel.app')
+
+  const vercelBypassSecret = needsVercelBypass
+    ? await resolveBypassSecret({ persist: false })
+    : process.env.VERCEL_AUTOMATION_BYPASS_SECRET?.trim() || undefined
 
   return {
     apiBaseUrl: base.origin,
@@ -379,7 +401,8 @@ const defaultConfig = (): CliConfig => {
       new URL('/api/integrations/v1/sister-platforms/oauth/token', base).toString(),
     openBrowser: openBrowserDefault,
     fetchImpl: fetch,
-    timeoutMs: Number(process.env.GLOBE_ADMIN_OAUTH_TIMEOUT_MS || DEFAULT_TIMEOUT_MS)
+    timeoutMs: Number(process.env.GLOBE_ADMIN_OAUTH_TIMEOUT_MS || DEFAULT_TIMEOUT_MS),
+    vercelBypassSecret
   }
 }
 
@@ -407,7 +430,7 @@ const main = async () => {
   const input = validateFundingInput(await readJsonFileOrValue(requiredArg(args, 'input')))
   const proposeIdempotencyKey = requiredArg(args, 'propose-idempotency-key')
   const confirmIdempotencyKey = requiredArg(args, 'confirm-idempotency-key')
-  const config = defaultConfig()
+  const config = await defaultConfig()
   const autoConfirm = args.get('yes') === 'true' || args.get('yes') === '1'
 
   const result = await runFundingFlow({

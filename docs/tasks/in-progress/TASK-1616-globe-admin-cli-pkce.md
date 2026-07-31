@@ -216,6 +216,8 @@ Reglas obligatorias:
 ### Slice 3 — CLI first-party
 
 - PKCE, state, loopback efímero, apertura de Chrome y exchange.
+- Bypass de automatización Vercel resuelto por el helper canónico y limitado a requests API de staging;
+  nunca se incorpora al authorization URL ni se imprime.
 - `propose → confirm` con preview, idempotencia distinta y salida redactada.
 - Cero cookies, passwords, secrets persistidos o llamadas directas a Globe.
 
@@ -239,7 +241,8 @@ request conserva PKCE S256 para todos los clientes. En el token exchange, `confi
 secreto actual; `public` rechaza cualquier secreto y prueba posesión sólo con el `code_verifier`. Para el
 redirect loopback de un public client se compara protocolo `http:` y pathname exacto contra el redirect
 registrado `127.0.0.1`; el puerto lo elige el sistema operativo. Vercel/Next normaliza ese query param a
-`localhost`, por lo que el matcher admite ese único alias de runtime contra un registro literal; ningún otro
+`localhost`, por lo que el matcher admite ese único alias de runtime, lo canoniza al registro literal antes
+de emitir el código y exige igualdad exacta en el token exchange; ningún otro
 host, protocolo, path o tipo de cliente recibe la excepción.
 
 Las rutas API Platform reciben el bearer token, rehidratan al usuario y construyen el mismo entitlement
