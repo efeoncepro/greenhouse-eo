@@ -1,9 +1,9 @@
 # WordPress Blog, Content Hub and Search Contract
 
 > **Tipo de documento:** Documentacion funcional
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-07-09 por Codex
-> **Ultima actualizacion:** 2026-07-09 por Codex
+> **Ultima actualizacion:** 2026-07-16 por Codex
 > **Modulo:** Public Site / WordPress / Ohio / Content Hub
 > **Runtime vigente:** `efeoncepro.com` en WordPress/Kinsta, tema activo
 > `ohio-child`, parent `ohio`
@@ -235,6 +235,21 @@ Pillar a `think.efeoncepro.com`. Ese subdominio sirve hoy tools, reportes y
 experiencias enfocadas. Las Pillars editoriales conservan una sola canonical,
 actualmente WordPress/apex salvo decisión de route ownership; el target es Astro
 en el dominio principal consumiendo la fuente estructurada de WordPress.
+
+El futuro content hub debe representar una **Cluster Experience federada**, no
+reducir el territorio a posts de WordPress. Artículos, tools y piezas
+platform-native pueden relacionarse desde un registry gobernado. Un reel,
+carrusel, pin, video, post o newsletter sólo entra cuando resuelve un JTBD,
+entrega valor autónomo y declara su relación/progreso; no se importa ni se
+duplica como post sólo para que aparezca en el hub. La Pillar sigue siendo el
+hogar canónico y el nodo social conserva su URL de plataforma.
+
+La medición futura separa tres planos: Google Search/Discover/News, búsqueda y
+recomendación internas de cada plataforma, y progreso hacia el siguiente nodo.
+Search Console está desplegando gradualmente Platform Properties para Instagram,
+TikTok, X y YouTube; su disponibilidad debe verificarse por cuenta y no se
+presume habilitada para Efeonce. Ese preflight se complementa con analytics
+nativos y no autoriza conexiones, publicación ni cambios de indexación.
 
 Si una pieza cambia de renderer o ruta, WordPress debe redirigir o quedar como
 backend/source no indexable para esa pieza. Nunca duplicar contenido indexado ni

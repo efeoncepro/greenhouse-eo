@@ -25,7 +25,18 @@
   (as-of 2026-07).
 - **AEO-social (Answer Engine Optimization social)**: optimizar contenido social para ser
   *encontrado* dentro de la red — keywords en caption/on-screen text/alt/nombre de archivo,
-  hook con la query en los primeros 3s. Distinto del AEO por-motor LLM (eso es `seo-aeo`).
+  hook con la query en los primeros 3s. `social-media-studio` gobierna este plano;
+  `seo-aeo` gobierna la aparición de la URL social en Google y la coherencia de entidad.
+- **Platform-native cluster node**: pieza social con JTBD propio, valor autónomo, relación
+  gobernada con una Pillar/cluster, URL o ID estable, owner y medición. No todo post califica.
+- **Search Console Platform Property**: propiedad de Search Console para medir cómo contenido
+  de Instagram, TikTok, X o YouTube aparece en Google. Rollout gradual; no mide vistas dentro
+  de esas plataformas.
+- **External search**: aparición de una URL social en Google Search/Discover/News.
+- **Platform search/recommendation**: descubrimiento dentro de la red mediante Search, Browse,
+  Suggested, For You u otras superficies nativas.
+- **Downstream progress**: cambio posterior observable, como visita, suscripción, uso de tool,
+  diagnóstico, decisión o handoff. No equivale a impresiones ni engagement.
 - **SoV social (Share of Voice)**: % de la conversación de una categoría que captura una
   marca vs competencia.
 

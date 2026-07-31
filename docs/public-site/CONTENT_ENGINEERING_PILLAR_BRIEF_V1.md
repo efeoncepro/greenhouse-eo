@@ -133,8 +133,10 @@ conversión y operación/aprendizaje.
 ### 6. Del cluster de artículos a Cluster Experience
 
 Mostrar que el territorio no se desarrolla sólo con posts satélite. Artículos, casos, templates, research,
-diagnósticos y tools pueden componer una Cluster Experience cuando resuelven trabajos conectados de aprender,
-aplicar, evaluar, verificar o decidir. Diferenciar con claridad un nodo editorial de un producto o servicio.
+diagnósticos, tools y piezas nativas de plataforma pueden componer una Cluster Experience cuando resuelven
+trabajos conectados de aprender, aplicar, evaluar, verificar o decidir. Explicar por qué un reel, carrusel, pin,
+video, post o newsletter puede ser nodo de primera clase sin que toda publicación social califique. Diferenciar
+con claridad un nodo editorial, una activación, un producto y un servicio mediante atributos, no sólo formatos.
 
 ### 7. La interactividad no es la respuesta
 
@@ -190,16 +192,31 @@ jerarquía, lectura continua y un indicio claro del siguiente nivel de profundid
 La Pillar debe explicar y anticipar un cluster heterogéneo:
 
 ```text
-aprender  -> artículos · guías · glosarios
+aprender  -> artículos · guías · glosarios · videos · carruseles
 aplicar   -> templates · checklists · generadores
-evaluar   -> diagnósticos · calculadoras · autoevaluaciones
-verificar -> casos · benchmarks · datasets · research
-decidir   -> comparadores · matrices · handoff pertinente
+evaluar   -> diagnósticos · calculadoras · autoevaluaciones · encuestas útiles
+verificar -> casos · benchmarks · datasets · research · entrevistas
+decidir   -> comparadores · matrices · webinars · handoff pertinente
 ```
 
-El mapa sólo muestra nodos publicados y debe nacer del cluster registry. Cada nodo futuro declara `node_type`, JTBD,
-valor autónomo, canonical, estado, owner, freshness, relaciones, progreso esperado y siguiente paso. Una tool no
-pertenece por ser interactiva y una landing de servicio no pertenece sólo por compartir la categoría.
+La red es federada: la Pillar permanece como hogar canónico del territorio, pero un nodo puede vivir en una
+superficie propia o ser `platform-native`. Reels, posts, carruseles, pins, videos, Shorts y newsletters pueden ser
+nodos si resuelven un JTBD autónomo, tienen URL o identificador estable, relación explícita, owner, durabilidad y
+medición. No necesitan una copia web. Una pieza que sólo anuncia o resume otra sigue siendo activación.
+
+`cluster node` y `activation` son roles compatibles, no buckets excluyentes. El registry debe describir cada pieza
+en dimensiones independientes:
+
+```text
+surface · platform · ownership · node_role · primary_job · search_intent · query_set
+indexing_eligibility · discovery_surfaces · measurement_sources · derived_from
+canonical_parent · durability · progress_event · next_best_node
+```
+
+El mapa sólo muestra nodos publicados y debe nacer del cluster registry. `canonical_parent` expresa linaje y
+pertenencia, no reemplaza la canonical pública de la pieza. `indexing_eligibility` registra condiciones conocidas,
+pero nunca promete indexación. Una tool no pertenece por ser interactiva, una publicación no pertenece por ser
+social y una landing de servicio no pertenece sólo por compartir la categoría.
 
 ### Primitive 1 — Cambio de propósito
 
@@ -253,16 +270,33 @@ Research pendiente con `seo-aeo`:
 - query fan-out y preguntas citables;
 - entidades y relaciones con Content Strategy, Content Design y structured content;
 - oportunidad de categoría en español y riesgo de ambigüedad con ingeniería de software.
+- elegibilidad y disponibilidad real de indexación/medición para las cuentas y plataformas elegidas;
+- queries que deben resolverse en la Pillar, en un nodo web o mediante una pieza platform-native.
 
 Contrato base:
 
 - `Article`/`BlogPosting`, `Person`, `Organization` y breadcrumbs coherentes con runtime;
 - `CollectionPage` + `ItemList` para el hogar y los nodos publicados cuando el output sea semánticamente
   correcto; no prometer rich result;
+- nodos platform-native pueden aparecer como enlaces del mapa y del `ItemList` visible sin transferir su
+  canonical a la Pillar ni prometer indexación;
 - `FAQPage` sólo si existe FAQ visible y elegible; preguntas/schema desde la misma fuente;
 - answer capsules autocontenidas bajo headings útiles;
 - canonical única, index/follow, Open Graph y media verificadas;
 - fuentes primarias o de alta autoridad inline y claim ledger antes de draft final.
+
+Contexto verificable as-of 2026-07-16:
+
+- Search Console Platform Properties soporta Instagram, TikTok, X y YouTube mediante rollout gradual, con clics,
+  impresiones, CTR y posición por contenido en Google; no mide el consumo dentro de la plataforma;
+- contenido público profesional elegible de Instagram puede aparecer en buscadores;
+- TikTok Creator Search Insights, YouTube Search/Analytics y Pinterest Trends/Analytics permiten investigar y
+  medir descubrimiento en sus respectivas superficies;
+- LinkedIn ofrece Search Appearances y post analytics, pero no figura entre las Platform Properties de Search
+  Console soportadas en esa fecha.
+
+Estas capacidades cambian; cada ejecución debe verificar elegibilidad, disponibilidad, configuración de cuenta y
+documentación vigente antes de definir un KPI o prometer visibilidad.
 
 ## 11. Evidencia y límites
 
@@ -296,12 +330,23 @@ El tracking plan debe definir antes del build:
 - tráfico no-brand, citas IA y menciones del concepto;
 - leads y deals influenciados, sin atribuir causalidad por un único touch.
 
+Debe separar tres planos antes de agregarlos:
+
+1. **External search:** Google Search, Discover y News para URLs propias o Platform Properties elegibles.
+2. **Platform search/recommendation:** queries, términos, recomendaciones, impresiones, consumo y guardados dentro
+   de cada plataforma según su analytics nativo.
+3. **Downstream progress:** tránsito hacia otro nodo, uso de una tool, suscripción, diagnóstico, handoff o resultado
+   comercial gobernado por Efeonce.
+
+No sumar impresiones de estos planos como si fueran equivalentes ni presentar clic, view o guardado como progreso
+sin una hipótesis explícita.
+
 North Star editorial propuesta: **personas que completan una experiencia y eligen un siguiente paso útil**. Debe
 validarse con `growth-marketing-cro`; no convertirla en métrica corporativa sin baseline.
 
-## 13. Distribución y derivados
+## 13. Red federada, distribución y derivados
 
-La Pillar no nace sin mapa de distribución. Candidatos:
+La Pillar no nace sin mapa de nodos y activaciones. Candidatos:
 
 - Glitch: ensayo sobre por qué el usuario no quiere contenido.
 - LinkedIn Julio: "Un post ya no es una página" con el cambio de unidad de valor.
@@ -312,6 +357,23 @@ La Pillar no nace sin mapa de distribución. Candidatos:
 
 Cada derivado debe adaptar el insight al canal; no copiar fragmentos mecánicamente.
 
+Antes de producirlo, cada candidato declara si será activación, cluster node o ambos. Para graduarse como nodo debe
+resolver un trabajo autónomo, diseñarse para una intención o momento de descubrimiento, mantener relación con la
+Pillar y declarar medición. La mera derivación desde la Pillar no lo convierte en nodo.
+
+Fuentes operativas para esta capa:
+
+- [Google Search Console — Platform properties](https://support.google.com/webmasters/answer/17148418?hl=en-GB)
+- [Google Search Console — Add a platform property](https://support.google.com/webmasters/answer/34592?hl=en)
+- [Meta — Search engine indexing of public professional Instagram content](https://www.facebook.com/help/147542625391305)
+- [TikTok — Creator Search Insights](https://support.tiktok.com/en/using-tiktok/growing-your-audience/creator-search-insights)
+- [YouTube — Search](https://support.google.com/youtube/answer/16090438) y
+  [content performance](https://support.google.com/youtube/answer/12220281)
+- [Pinterest — Trends](https://help.pinterest.com/en/business/article/pinterest-trends) y
+  [Pin performance](https://help.pinterest.com/en/business/article/pin-performance-and-distribution)
+- [LinkedIn — Search Appearances](https://www.linkedin.com/help/linkedin/answer/a7473929) y
+  [post analytics](https://www.linkedin.com/help/linkedin/answer/a525196)
+
 ## 14. Fronteras y gates
 
 - Este brief no crea una oferta llamada Content Engineering.
@@ -320,7 +382,7 @@ Cada derivado debe adaptar el insight al canal; no copiar fragmentos mecánicame
 - Think como producto editorial no implica `think.efeoncepro.com`; resolver host/canonical con PDR-016 y route
   ownership antes del draft público.
 - Elementor puede componer un shell/template, pero no duplicar cuerpo, registry ni schema en `_elementor_data`.
-- El mapa de satélites debe consumir un registry estructurado; no mantener cards y enlaces manualmente por
+- El mapa federado debe consumir un registry estructurado; no mantener cards y enlaces manualmente por
   renderer.
 - Si la autoevaluación captura datos, persiste estado o produce una recomendación de riesgo, deja de ser un simple
   recurso editorial y requiere PDR/arquitectura/privacidad/evals/task.

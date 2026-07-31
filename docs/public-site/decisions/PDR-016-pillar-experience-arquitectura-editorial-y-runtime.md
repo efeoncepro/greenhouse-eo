@@ -62,23 +62,50 @@ La Pillar debe seguir siendo útil si JavaScript falla y si todavía no existe n
 ### Cluster Experience
 
 > **Cluster Experience es el sistema navegable de experiencias conectadas que permite avanzar alrededor de un
-> territorio: aprender, aplicar, evaluar, verificar y decidir.**
+> territorio: aprender, aplicar, evaluar, verificar y decidir, dentro o fuera de las superficies propias.**
 
 La Pillar es el hogar; el cluster es el grafo; un **cluster node** es cada destino autónomo; la **Cluster
-Experience** es el recorrido que emerge entre esos nodos. El formato no decide pertenencia. Un nodo puede ser:
+Experience** es el recorrido que emerge entre esos nodos. Es una red federada: la Pillar conserva la definición y
+el hogar canónicos, mientras los nodos pueden vivir en una superficie propia o ser nativos de una plataforma. El
+formato, el host y el ownership no deciden por sí solos la pertenencia. Un nodo puede ser:
 
 | Trabajo | Tipos de nodo posibles |
 |---|---|
-| **Aprender** | artículo, guía, glosario, video, podcast |
+| **Aprender** | artículo, guía, glosario, video, podcast, carrusel explicativo |
 | **Aplicar** | template, checklist, worksheet, generador |
-| **Evaluar** | diagnóstico, grader, calculadora, autoevaluación |
-| **Verificar** | caso, benchmark, dataset, research |
-| **Decidir** | comparador, matriz, configurador, siguiente paso comercial |
+| **Evaluar** | diagnóstico, grader, calculadora, autoevaluación, encuesta con devolución útil |
+| **Verificar** | caso, benchmark, dataset, research, entrevista o video con evidencia |
+| **Decidir** | comparador, matriz, configurador, webinar, siguiente paso comercial |
 
 Un nodo pertenece al cluster sólo si resuelve un JTBD del territorio, entrega valor autónomo, mantiene una relación
-explícita con la Pillar y puede gobernarse con owner, canonical, estado, freshness y medición. Una tool no entra por
-ser interactiva y una landing comercial no entra por compartir keywords. Servicios y productos pueden ser destinos
-adyacentes de handoff sin convertirse automáticamente en nodos editoriales.
+explícita con la Pillar u otro nodo y puede gobernarse con owner, identificador o URL estable, estado, freshness y
+medición. Reels, posts, carruseles, pins, videos, Shorts y newsletters pueden ser **platform-native cluster nodes**
+de primera clase si cumplen ese contrato; no necesitan una copia en el dominio propio ni se degradan a promoción
+por vivir en una plataforma. Una pieza que sólo anuncia, resume o conduce hacia otra sin completar un trabajo sigue
+siendo activación. Una tool no entra por ser interactiva y una landing comercial no entra por compartir keywords.
+Servicios y productos pueden ser destinos adyacentes de handoff sin convertirse automáticamente en nodos
+editoriales.
+
+### Roles multidimensionales, no silos de formato
+
+`cluster node` y `activation node` no son clases mutuamente excluyentes. Son roles que una misma pieza puede
+cumplir en momentos distintos. Un carrusel puede activar reconocimiento, responder una búsqueda dentro de
+LinkedIn, explicar un modelo de forma autónoma y orientar hacia un comparador. Un reel que sólo dice "lee la
+Pillar" puede cumplir únicamente activación.
+
+Cada pieza se clasifica en dimensiones independientes:
+
+- **trabajo y rol:** reconocimiento, comprensión, aplicación, diagnóstico, evidencia, decisión, activación o
+  handoff;
+- **superficie:** `owned` o `platform-native`;
+- **plataforma:** web, newsletter, Instagram, TikTok, X, YouTube, Pinterest, LinkedIn u otra superficie gobernada;
+- **ownership:** propio, compartido o alquilado;
+- **descubrimiento:** external search, platform search, recommendation, navegación directa o relación editorial;
+- **durabilidad:** evergreen, refreshable, campaign-bound o efímero;
+- **progreso:** cambio observable que produce y siguiente nodo pertinente.
+
+Esta taxonomía evita dos errores: tratar toda publicación social como nodo por defecto y reducir todo contenido de
+plataforma a distribución descartable.
 
 ## 3. Placement: Think no equivale al subdominio Think
 
@@ -157,7 +184,9 @@ Contrato mínimo conceptual por nodo:
 id · pillar_id · node_type · title · canonical_url · status · intent · jtbd · stage
 summary · outcome · format · order · relationships · published_at · updated_at
 primary_job · entry_state · desired_progress · progress_event · next_best_nodes
-conversion_level · commercial_handoff
+conversion_level · commercial_handoff · surface · platform · ownership · node_role
+search_intent · query_set · indexing_eligibility · discovery_surfaces · measurement_sources
+derived_from · canonical_parent · durability · next_best_node
 ```
 
 Reglas:
@@ -166,8 +195,12 @@ Reglas:
 - `planned` puede existir en roadmap, pero no como enlace vacío;
 - las relaciones Pillar↔nodo y laterales se validan en ambas direcciones;
 - title, URL, estado y schema no se reescriben manualmente por cada renderer;
-- artículos, casos, templates, tools y otros nodos comparten el contrato, pero conservan schema, runtime y gates
-  apropiados a su naturaleza;
+- `canonical_url` identifica la URL pública que posee la pieza cuando existe; `canonical_parent` expresa linaje y
+  pertenencia, pero no declara una canonical SEO cruzada ni exige duplicar la pieza en el sitio;
+- artículos, casos, templates, tools y nodos platform-native comparten el contrato, pero conservan schema,
+  runtime, permisos y gates apropiados a su naturaleza;
+- `indexing_eligibility` describe condiciones conocidas de elegibilidad, no garantiza indexación ni aparición;
+- `measurement_sources` declara qué sistemas pueden observar cada plano sin fusionar métricas incompatibles;
 - el registry puede materializarse inicialmente en Content Factory/WordPress y evolucionar sin cambiar el
   contrato editorial.
 
@@ -192,9 +225,26 @@ aplicación; un caso hacia confianza; una tool hacia diagnóstico; una Pillar ha
 conversación. El compromiso solicitado debe crecer con el valor entregado. No usar el mismo CTA en todo el cluster,
 ni pedir datos antes de devolver utilidad proporcional.
 
-La medición sigue la progresión entre momentos y no confunde una interacción con progreso. Growth/CRO gobierna la
-hipótesis, instrumentación, consentimiento y atribución; Content Engineering gobierna la relación entre conocimiento,
-trabajo y siguiente paso.
+La medición sigue la progresión entre momentos y no confunde una interacción con progreso. Opera en tres planos:
+
+1. **External search:** aparición y rendimiento de URLs propias o contenido de plataforma dentro de Google Search,
+   Discover y News. Search Console Platform Properties soporta Instagram, TikTok, X y YouTube con rollout gradual,
+   y reporta clics, impresiones, CTR y posición por contenido cuando está disponible.
+2. **Platform search/recommendation:** búsquedas, términos, impresiones, recomendaciones, guardados y consumo dentro
+   de cada plataforma mediante sus analytics nativos. Search Console no reemplaza este plano.
+3. **Downstream progress:** progreso posterior gobernado por Efeonce, como visitar otro nodo, usar una tool,
+   suscribirse, completar un diagnóstico o iniciar un handoff contextualizado.
+
+Instagram puede permitir que posts y reels públicos elegibles de cuentas profesionales aparezcan en buscadores;
+TikTok ofrece Creator Search Insights; YouTube gobierna búsqueda y expone analytics de descubrimiento; Pinterest
+opera como superficie de búsqueda/descubrimiento visual con Trends y analytics; LinkedIn ofrece Search Appearances
+y analytics de posts, pero al 2026-07-16 no figura entre las Platform Properties soportadas por Search Console.
+Estas capacidades son contingentes a elegibilidad, configuración, país, cuenta y cambios de plataforma; deben
+verificarse al operar, no convertirse en promesa de indexación.
+
+Growth/CRO gobierna hipótesis, instrumentación, consentimiento y atribución; Content Engineering gobierna la
+relación entre conocimiento, trabajo y siguiente paso. Impresiones externas, descubrimiento dentro de plataforma y
+progreso downstream se reportan separados antes de construir cualquier lectura agregada.
 
 ## 7. Authoring, Elementor y frontend
 
@@ -239,7 +289,10 @@ El schema describe la experiencia visible y nace de su misma fuente:
 - `FAQPage` sólo cuando existe FAQ visible y elegible, sincronizada desde el mismo modelo.
 
 `CollectionPage` e `ItemList` mejoran la representación semántica, pero no se prometen como rich result. Cada
-implementación debe validar output, canonical, sitemap y compatibilidad con Yoast o el renderer objetivo.
+implementación debe validar output, canonical, sitemap y compatibilidad con Yoast o el renderer objetivo. El mapa
+visible puede enlazar nodos platform-native y representarlos en el `ItemList` cuando sea semánticamente correcto;
+eso no transfiere su canonical a la Pillar ni garantiza indexación. Schema nunca se usa para declarar piezas que no
+aparecen en la experiencia visible.
 
 ## 9. Decisiones para los casos vigentes
 
@@ -279,7 +332,7 @@ implementación debe validar output, canonical, sitemap y compatibilidad con Yoa
 - Creative Workflows puede evolucionar sin migración ni duplicado.
 - Content Engineering obtiene un contrato de experiencia antes de elegir renderer.
 - El cluster deja de limitarse a artículos satélite y pasa a admitir nodos editoriales, aplicables, diagnósticos y
-  de evidencia bajo un contrato común.
+  de evidencia bajo un contrato común, incluidos nodos platform-native gobernados.
 - El content hub necesita una decisión de IA/route ownership antes de asignar nuevas Pillars a un host definitivo.
 - Content Factory deberá poder representar relaciones de cluster antes de automatizar mapas dinámicos; este PDR no
   autoriza todavía esa extensión.
@@ -292,6 +345,10 @@ implementación debe validar output, canonical, sitemap y compatibilidad con Yoa
 - **NUNCA** reemplazar enlaces HTML descriptivos por navegación JS-only.
 - **NUNCA** mantener manualmente contenido visible, cluster registry y schema como tres verdades.
 - **NUNCA** incluir una tool, landing o recurso en el cluster sólo por compartir tema o keyword.
+- **NUNCA** asumir que toda pieza social es sólo distribución ni que toda pieza publicada en una plataforma merece
+  ser cluster node.
+- **NUNCA** mezclar external search, búsqueda/recomendación de plataforma y downstream progress como si fueran una
+  sola métrica de alcance o conversión.
 - **NUNCA** tratar clic, apertura o captura de datos como conversión sin progreso y valor devuelto.
 - **SIEMPRE** ubicar primero el JTBD en demand gen, demand capture o experiencia; luego elegir host/runtime.
 - **SIEMPRE** asignar a cada nodo un trabajo, progreso esperado y siguiente paso proporcional.
@@ -314,6 +371,16 @@ implementación debe validar output, canonical, sitemap y compatibilidad con Yoa
 - [Ahrefs — Content pillars](https://ahrefs.com/blog/content-pillars/)
 - [Google — Creating helpful, reliable, people-first content](https://developers.google.com/search/docs/fundamentals/creating-helpful-content)
 - [Google — Link best practices](https://developers.google.com/search/docs/crawling-indexing/links-crawlable)
+- [Google Search Console — About platform properties](https://support.google.com/webmasters/answer/17148418?hl=en-GB)
+- [Google Search Console — Add a website or platform property](https://support.google.com/webmasters/answer/34592?hl=en)
+- [Meta — Search engine indexing of public professional Instagram content](https://www.facebook.com/help/147542625391305)
+- [TikTok — Creator Search Insights](https://support.tiktok.com/en/using-tiktok/growing-your-audience/creator-search-insights)
+- [YouTube — How YouTube search works](https://support.google.com/youtube/answer/16090438)
+- [YouTube — Understand your content performance](https://support.google.com/youtube/answer/12220281)
+- [Pinterest — Trends](https://help.pinterest.com/en/business/article/pinterest-trends)
+- [Pinterest — Pin performance and distribution](https://help.pinterest.com/en/business/article/pin-performance-and-distribution)
+- [LinkedIn — Search Appearances analytics](https://www.linkedin.com/help/linkedin/answer/a7473929)
+- [LinkedIn — Post analytics](https://www.linkedin.com/help/linkedin/answer/a525196)
 - [Elementor — Posts and custom post types](https://elementor.com/help/does-elementor-work-with-posts-and-custom-post-types/)
 - [Route Ownership Matrix](../../operations/public-site-route-ownership-matrix-20260616.md)
 - [WordPress Blog/Content Hub Audit](../../audits/public-site/2026-07-09-wordpress-blog-content-hub-search.md)

@@ -21,6 +21,12 @@
 > heterogéneos — artículos, casos, templates, research, diagnósticos y tools — unidos por JTBD, valor autónomo y
 > progreso. Conversión se modela como `reconocimiento -> comprensión -> orientación -> aplicación -> diagnóstico ->
 > evidencia -> decisión -> handoff`; cada nodo tiene una conversión natural y no existe CTA universal.
+> **Delta federado/social search:** los nodos también pueden ser platform-native —reels, carruseles, pins, videos,
+> posts o newsletters— cuando resuelven un JTBD, entregan valor autónomo y mantienen relación/progreso gobernados; no
+> todo post social entra. La Pillar conserva el hogar canónico. La medición separa Google, analytics/búsqueda nativos
+> y progreso. Search Console está desplegando gradualmente Platform Properties para Instagram, TikTok, X y YouTube;
+> no se presume disponible en las cuentas Efeonce. Próximo paso operativo: inventario y preflight read-only por cuenta,
+> URL y elegibilidad; sin conexiones, publicación, cambios de indexación ni rollout autorizados.
 > La futura Pillar debe demostrar la
 > tesis como documento canónico accesible/indexable y experiencia sobria; no puede ser una colección ornamental de
 > widgets. Estado F0 documental: no hay research dossier, wireframe, draft WordPress, custom block, tool, oferta,

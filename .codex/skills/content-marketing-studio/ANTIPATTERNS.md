@@ -24,6 +24,10 @@ Lo que NO se hace. Si te sorprendes haciendo esto, para.
 - **Ráfaga de un día.** Quemar todos los átomos el día 1 en vez de secuenciar en el tiempo. (→ `05`)
 - **Spam en comunidades.** Dropear links sin aportar valor en Reddit/Slack/foros. Daña la marca. (→ `05`)
 - **Monocanal frágil.** Depender de un solo canal/algoritmo ajeno sin canal owned (newsletter). (→ `05`)
+- **Social sólo como promoción.** Reducir reel, pin, video o carrusel a teaser cuando podría resolver un JTBD
+  autónomo y funcionar como nodo platform-native. (→ `03`, `04`)
+- **Todo social es cluster.** Inflar el registry con publicaciones sin valor autónomo, relación o progreso medible.
+  Un activation asset legítimo no necesita fingir que es nodo. (→ `04`)
 
 ## Cruces de frontera (no dupliques ni te metas en terreno ajeno)
 
@@ -40,3 +44,5 @@ Lo que NO se hace. Si te sorprendes haciendo esto, para.
 - **Claimed sobre influenced.** Decir que el contenido "cerró" el deal en vez de "influyó". (→ `06`)
 - **Benchmark como resultado propio.** Presentar un número de mercado como tu métrica real. (→ `06`)
 - **Podar sin distribuir.** Matar contenido que "no funcionó" cuando en realidad nunca se distribuyó bien. (→ `05`, `06`)
+- **Impresión agregada falsa.** Sumar external search, búsqueda interna, feed, alcance y views como si midieran la
+  misma exposición o persona. (→ `06`)

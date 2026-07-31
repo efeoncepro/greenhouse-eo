@@ -35,15 +35,17 @@ Regla: **elige pocos pillars y ve profundo**, no muchos temas superficiales. 3�
 ## Mapa Pillar Experience → Cluster Experience (artefacto)
 
 Cada Pillar se documenta con nodos que resuelven trabajos de aprender, aplicar, evaluar, verificar o decidir. El
-cluster puede incluir artículos, casos, templates, research y tools; cada nodo declara etapa, progreso, siguiente
-paso y plan de atomización. No agrupes assets sólo por keyword.
+cluster federado puede incluir artículos, casos, templates, research, tools y piezas platform-native; cada nodo
+declara superficie, roles, etapa, progreso, relación, medición y siguiente paso. No agrupes assets sólo por keyword
+ni eleves toda pieza social al cluster.
 
 ```
 PILLAR: "AEO: cómo te encuentra la IA"  [autoridad + demanda | evergreen]
 ├─ cluster: "¿Qué es AEO vs SEO?"            [awareness]
 ├─ cluster: "Cómo medir citabilidad en LLMs" [consideración]
 ├─ cluster: "Checklist de contenido citable" [consideración | lead magnet → 03]
-└─ atomización planificada → newsletter (Glitch), 6 posts social, 1 webinar clip
+├─ nodo platform-native: video "AEO vs SEO en 90s" [search + comprensión]
+└─ activation assets → newsletter (Glitch), 5 posts social, 1 webinar clip
 ```
 
 Plantilla: `templates/pillar-cluster-map.md`.
@@ -66,7 +68,8 @@ Un calendario editorial operable declara, por pieza:
 - **Pillar profundo:** mensual o quincenal.
 - **Cluster / posts de apoyo:** semanal.
 - **Newsletter:** cadencia fija (semanal/quincenal) — el compromiso de fecha es sagrado (`03`).
-- **Átomos social:** derivados de lo anterior (no producción paralela — `04`).
+- **Social:** mezcla gobernada de platform-native cluster nodes y activation assets derivados (`04`); el formato
+  no decide el rol.
 
 ## Balance de portafolio de contenido
 

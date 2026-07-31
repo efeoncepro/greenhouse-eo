@@ -47,7 +47,7 @@ Cadena típica de un pillar de **Marketing con Manzanitas**:
 ```
 Pillar (blog, vía Content Factory) 
   → Glitch (edición dedicada al insight)        [greenhouse-email]
-  → LinkedIn/IG/X (átomos nativos)              [social-media-studio + Metricool]
+  → LinkedIn/IG/X (nodos o activation assets)   [social-media-studio + Metricool]
   → Reel/clip (si aplica)                       [motion-design-studio]
   → Lead magnet gated (si el tema lo amerita)   [03 + growth-forms]
   → Slides sales enablement                     [commercial-expert]
@@ -56,6 +56,8 @@ Pillar (blog, vía Content Factory)
 
 - **Metricool** está conectado (MCP, 10 marcas) y **sí programa posts** (`createScheduledPost`; gotcha `dayOfWeek 1=lun..7=dom`). La ejecución social es de `social-media-studio`.
 - **Redes sociales de Efeonce** y su calendario → `social-media-studio` + landing de redes (TASK-1351).
+- **Cluster federado:** una pieza social sólo entra al registry como nodo cuando resuelve un JTBD autónomo y
+  declara roles, relación y progreso; de lo contrario conserva su rol honesto de activation asset.
 
 ## Voz y contexto (delegado, citado)
 

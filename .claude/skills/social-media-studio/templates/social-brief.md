@@ -16,6 +16,11 @@
 - **Formato:** `[Reel/Short | carrusel | foto | live | long-form | texto | story]`
 - **Pilar de contenido:** `[educar | inspirar | entretener | prueba social | detrás de escena | producto]`
 - **Serie / recurrente:** `[nombre de serie o "one-off"]`
+- **Relación con territorio:** `[territory + Pillar/cluster node relacionado | n/a]`
+- **Rol del nodo:** `[recognition | comprehension | application | evidence | evaluation | decision | activation]`
+- **¿Platform-native cluster node?:** `[sí | no]` — *sí exige JTBD propio, valor autónomo,
+  relación gobernada, URL/ID estable, owner y medición; no basta con el formato*
+- **Cluster node ID / canonical parent:** `[ID + URL/ID relacionado | n/a]`
 
 ## Audiencia y ángulo
 - **Audiencia objetivo:** `[quién específico — rol, dolor, momento]`
@@ -50,6 +55,10 @@
 - **KPI primario (real, no vanity):** `[completion % | saves | sends | dwell | CTR | leads]`
 - **Meta numérica / benchmark:** `[vs. mediana de la cuenta o meta absoluta]`
 - **Ventana de lectura:** `[a las 48h y a los 7 días — social search da cola larga]`
+- **External search:** `[Search Console Platform Property/consulta/CTR | no disponible | n/a]`
+- **Platform search/recommendation:** `[Search/Browse/Suggested/For You + métrica nativa]`
+- **Downstream progress event:** `[visita | suscripción | tool | diagnóstico | decisión | handoff | n/a]`
+- **Next best node:** `[URL/ID del siguiente progreso útil | n/a]`
 
 ## Antes de producir — checklist
 - [ ] El objetivo es UNO y el KPI mide ese objetivo (no likes)
@@ -57,4 +66,5 @@
 - [ ] La keyword de búsqueda está en on-screen text + caption
 - [ ] El CTA pide save/send/comentario, no like pasivo
 - [ ] Datos volátiles (cadencia, hora, feature) reverificados `as-of [fecha]`
+- [ ] External search, descubrimiento nativo y progreso downstream tienen métricas separadas
 - [ ] Publicación pasa por confirmación humana (nunca auto-post)

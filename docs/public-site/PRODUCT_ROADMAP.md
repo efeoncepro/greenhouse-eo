@@ -161,12 +161,17 @@ capability dentro del sistema, no presentarse como agencia suelta.
 - **Territorio editorial “Content Engineering”** (PDR-015/PDR-016, foundation brief listo): Efeonce resignifica el blog
   como sistema de conocimiento y experiencia de decisión para personas y agentes. La futura Pillar deberá demostrar
   la tesis — documento canónico accesible/indexable + primitives sobrias de comprensión y autoevaluación local —
-  y abrir una Cluster Experience con artículos, casos, templates, research y tools gobernados por JTBD. Cada nodo
-  debe producir progreso y un siguiente paso proporcional; el cluster no es una lista de posts ni un catálogo de
-  assets. Esto se implementará sin convertir interactividad en decoración ni una tool editorial en producto. Nace como Pillar Experience del
+  y abrir una Cluster Experience federada con nodos propios y platform-native: artículos, casos, templates, research,
+  tools, videos, reels, carruseles, pins, posts o newsletters gobernados por JTBD. Una pieza social sólo entra como
+  nodo de primera clase cuando entrega valor autónomo, tiene relación gobernada con el territorio y produce progreso
+  observable; publicar sobre el tema no basta. La Pillar conserva el hogar canónico aunque el descubrimiento ocurra
+  dentro o fuera del sitio. Esto se implementará sin convertir interactividad en decoración ni una tool editorial en producto. Nace como Pillar Experience del
   producto Think/Marketing con Manzanitas, pero no se asigna por defecto a `think.efeoncepro.com`: host, slug y
   renderer se resuelven con la IA del content hub y route ownership. F0 documental completada; research,
-  diseño, draft privado y publicación siguen pendientes. Ver
+  diseño, draft privado y publicación siguen pendientes. Antes de diseñar distribución se hará un preflight read-only
+  de cuentas y URLs sociales: verificar elegibilidad pública/profesional, disponibilidad gradual de Search Console
+  Platform Properties para Instagram, TikTok, X y YouTube, y analytics nativos accesibles. No se asume que esa
+  capacidad esté habilitada en las cuentas de Efeonce. Ver
   [PDR-015](decisions/PDR-015-content-engineering-territorio-editorial.md) +
   [PDR-016](decisions/PDR-016-pillar-experience-arquitectura-editorial-y-runtime.md) +
   [brief](CONTENT_ENGINEERING_PILLAR_BRIEF_V1.md).

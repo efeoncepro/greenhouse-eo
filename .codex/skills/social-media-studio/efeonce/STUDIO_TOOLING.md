@@ -15,7 +15,7 @@
 | **Programar** | **Metricool** MCP | mejor hora, crear post programado, ver calendario |
 | **Medir** | **Metricool** MCP + `../modules/09` | analítica nativa por red |
 | **Capturar lead** | `growth-marketing-cro` + `greenhouse-growth-forms` | grader/newsletter como destino |
-| **Publicar long-form/blog** | `efeonce-public-site-wordpress` | el post que el social distribuye |
+| **Publicar nodo owned (long-form/blog/landing)** | `efeonce-public-site-wordpress` | la pieza owned relacionada; social puede distribuirla o aportar un nodo platform-native autónomo |
 
 ## Metricool MCP — endpoints canónicos
 

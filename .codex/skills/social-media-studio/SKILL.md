@@ -15,7 +15,9 @@ description: >-
   ejecución profunda por red. Delega a digital-marketing (mix de canales, campaña
   integrada, paid programático), a growth-marketing-cro (conversión/CRO,
   experimentación, atribución/funnel, retención), a copywriting (craft fino de
-  texto/voz), a seo-aeo (SEO técnico + AEO por-motor LLM/schema), a
+  texto/voz), a seo-aeo (SEO técnico, AEO por-motor LLM/schema y aparición de
+  URLs sociales en Google/Search Console), a content-marketing-studio
+  (pertenencia de una pieza al territorio/Pillar/Cluster Experience), a
   commercial-expert (pricing/pipeline), a efeonce-agency (doctrina marca/GTM/ASaaS)
   y a los generadores visuales (greenhouse-ai-image-generator / higgsfield-* /
   greenhouse-digital-brand-asset-designer) para producir el asset concreto.
@@ -82,8 +84,11 @@ argument-hint: "[red/tarea o pregunta — ej: 'plan de 30 días para LinkedIn de
   **`growth-marketing-cro`**.
 - ¿El texto necesita craft persuasivo fino, sistema de voz/tono, headline bank? →
   **`copywriting`** (esta skill da la *estructura* del hook/caption; el craft lo pule copy).
-- ¿SEO técnico, AEO por-motor LLM (ChatGPT/Perplexity/AI Overviews), schema, llms.txt? →
-  **`seo-aeo`** (esta skill cubre *social search* — TikTok/IG/YT como buscador — no el SEO web).
+- ¿SEO técnico, AEO por-motor LLM, schema, llms.txt o aparición de una URL social en
+  Google/Search Console? → **`seo-aeo`**. Esta skill gobierna búsqueda y recomendación
+  *dentro* de la plataforma; ambas colaboran cuando una pieza social aparece también en Google.
+- ¿La pieza pertenece al territorio, Pillar Experience o Cluster Experience? →
+  **`content-marketing-studio`** decide la pertenencia; esta skill diseña y opera su expresión social.
 - ¿Pricing, pipeline, quote-to-cash? → **`commercial-expert`**.
 - ¿Doctrina de marca/GTM/ASaaS, arquitectura de mensaje institucional? → **`efeonce-agency`**.
 - ¿Producir el asset visual/video concreto? → **generadores** (`greenhouse-ai-image-generator`,
@@ -155,8 +160,9 @@ Estas son las apuestas verificadas hoy; cada una con su volatilidad en `SOURCES.
    saves por pieza). El formato se elige por *objetivo*, no por moda.
 2. **Likes y followers están demotados** a señal débil en todas las redes. Lo que rankea
    es **watch time / completion, saves, shares/sends y dwell time**.
-3. **Social search vence a Google** para <30 años (>50% en Gen Z): TikTok/IG/YT como
-   buscador → hay que optimizar para **AEO-social** (captions, alt, on-screen text, keywords).
+3. **Social también es búsqueda y recomendación**: TikTok, Instagram, YouTube, Pinterest y
+   LinkedIn funcionan como superficies de descubrimiento con señales y analytics propios. Optimiza
+   captions, alt, texto en pantalla y lenguaje de consulta, y verifica la evidencia por plataforma.
 4. **Autenticidad > pulido**: saturación de IA → gana lo humano, imperfecto, serializado.
    **IA que un espectador razonable confunda con real debe etiquetarse** ("ante la duda, revela").
 5. **Community management es palanca de alcance**, no soporte: el algoritmo premia *cómo*
@@ -167,6 +173,10 @@ Estas son las apuestas verificadas hoy; cada una con su volatilidad en `SOURCES.
 7. **Micro/nano creadores** rinden 2.4×–6.7× más engagement por post que los grandes.
 8. **"Estar en todas" murió**: gana elegir *una* red primaria, *un* formato, *una* cadencia
    sostenible. Consistencia + engagement > volumen.
+9. **Social no es sólo distribución**: una pieza nativa puede ser un nodo de primera clase de
+   una Cluster Experience federada cuando resuelve un JTBD propio, entrega valor autónomo,
+   mantiene relación gobernada con la Pillar, tiene URL/ID estable, owner y medición. No toda
+   pieza califica; un teaser sigue siendo activación.
 
 ## 7. Artefactos (cierra con uno)
 

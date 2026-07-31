@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-06-29 por Claude (TASK-1282)
-> **Ultima actualizacion:** 2026-06-29 por Claude (TASK-1282, rollout staging + redesign property-picker)
+> **Ultima actualizacion:** 2026-07-16 por Codex (frontera de Platform Properties; sin rollout)
 > **Documentacion tecnica:** [GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md](../../architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md) · [TASK-1282](../../tasks/in-progress/TASK-1282-growth-search-console-multitenant-connection.md)
 
 # Conexion a Google Search Console (Growth)
@@ -37,6 +37,19 @@ Operadores internos de Growth/Account con la capability `growth.search_console.c
 - Nexa (puede reportar el estado de conexion por el mismo contrato gobernado).
 
 Todos consumen el **mismo reader canonico** (`readSearchConsoleAnalytics`), no cada uno su propia logica.
+
+## Propiedades de plataformas sociales
+
+Google está desplegando gradualmente propiedades de Search Console para cuentas de Instagram, TikTok, X y YouTube.
+Estas propiedades permiten medir cómo su contenido aparece en Google Search y, cuando aplica, Discover o News. No
+miden las impresiones que ocurren dentro de la red social.
+
+**Estado Greenhouse:** no soportado ni verificado todavía. El selector y reader actuales son genéricos, pero sólo
+tienen evidencia real con propiedades web como `sc-domain:berel.com`. Antes de ofrecer una cuenta social en el
+selector se debe comprobar que el API `sites.list` la devuelve, que Search Analytics acepta su identificador y que
+las dimensiones disponibles se modelan sin mezclar métricas externas con analytics in-platform.
+
+Fuente oficial: [Google Search Console Platform Properties](https://support.google.com/webmasters/answer/17148418?hl=en-GB).
 
 ## Estados de la conexion
 

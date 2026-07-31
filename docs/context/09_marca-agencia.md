@@ -157,9 +157,13 @@ evidencia, capacidad operativa y decisión de packaging propios. El PDR público
 `docs/public-site/decisions/PDR-015-content-engineering-territorio-editorial.md`; el canon operativo reusable vive
 en `content-marketing-studio/references/content-engineering.md`.
 
-Su arquitectura editorial usa **Pillar Experience** como hogar y **Cluster Experience** como sistema de artículos,
-casos, templates, research y tools conectados por trabajos y progreso. Conversión significa avanzar desde reconocer
-y comprender hasta aplicar, verificar, decidir o pedir ayuda; no capturar un lead antes de entregar valor.
+Su arquitectura editorial usa **Pillar Experience** como hogar y **Cluster Experience federada** como sistema de
+nodos propios y platform-native conectados por trabajos y progreso. Un artículo, tool, video, reel, carrusel, pin,
+post o newsletter puede pertenecer si entrega valor autónomo y una relación gobernada; publicar sobre el territorio
+no basta. La Pillar conserva el hogar canónico. Think es el producto editorial, Marketing con Manzanitas es la
+publicación y ninguna de esas identidades obliga un host específico. Conversión significa avanzar desde reconocer y
+comprender hasta aplicar, verificar, decidir o pedir ayuda; no capturar un lead antes de entregar valor. El contrato
+operativo, la elegibilidad social y sus planos de medición viven en PDR-016, no en este context pack.
 
 ### Jerarquía de IP propietaria (cómo se nombra hacia el cliente)
 

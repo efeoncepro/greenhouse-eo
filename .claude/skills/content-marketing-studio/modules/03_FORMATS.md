@@ -24,8 +24,9 @@ Cada formato es una herramienta distinta con una anatomía y un trabajo propio. 
 - **2026:** escríbelo para ser **citable por IA** (respuestas autocontenidas, datos, fuentes, estructura escaneable). La *táctica técnica* (schema, chunking, entidad) es de `seo-aeo`.
 - **Regla:** un pillar sin plan de cluster, atomización (`04`) y mantenimiento está a medio construir. El renderer
   no define el formato; aplica `references/content-engineering.md` y PDR-016 en Efeonce.
-- **Cluster Experience:** los nodos no se limitan a posts. Artículos, casos, templates, datasets, diagnósticos y
-  tools pertenecen sólo si completan un JTBD del territorio y componen una progresión medible, no un inventario.
+- **Cluster Experience federada:** los nodos no se limitan al sitio. Artículos, casos, templates, datasets,
+  diagnósticos, tools y piezas platform-native pertenecen sólo si completan un JTBD del territorio, entregan valor
+  autónomo y componen una progresión medible. La Pillar conserva el hogar canónico y el registry las relaciones.
 
 ## Ebook / Whitepaper / Lead magnet
 
@@ -57,6 +58,8 @@ Cada formato es una herramienta distinta con una anatomía y un trabajo propio. 
 
 - **Corto** (awareness/alcance social) vs **largo** (autoridad/profundidad). Video-first domina feeds.
 - El asset lo produce `motion-design-studio` / `audio-studio` / studios de asset via brief creativo; la distribución social es de `social-media-studio`. Aquí decides el *rol y guion editorial*.
+- Un video, Short o Reel puede ser `platform-native cluster node` si resuelve un JTBD de forma autónoma, tiene
+  URL/ID estable, relación gobernada y medición. Si sólo anuncia otra pieza, es `activation asset`.
 
 ## Podcast
 
@@ -70,7 +73,9 @@ Cada formato es una herramienta distinta con una anatomía y un trabajo propio. 
 
 ## Regla de oro del módulo
 
-**Piensa en sistemas de formato, no en piezas sueltas:** un pillar + su ebook gated + su webinar + su newsletter + sus átomos social son **un solo tema** expresado en formatos. Diseña el sistema, no la pieza aislada (→ `04`).
+**Piensa en sistemas de formato, no en piezas sueltas:** un pillar + su ebook gated + su webinar + su newsletter +
+sus nodos platform-native y activation assets son **un solo territorio** expresado en superficies y roles. Diseña
+el sistema, no la pieza aislada (→ `04`).
 
 ## Cross-links
 

@@ -9,7 +9,8 @@ Este directorio documenta el **runtime del subdominio**, no toda la superficie
 editorial Think. Según [PDR-003](../public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md),
 Think es el producto/hub de demand generation que agrupa Marketing con
 Manzanitas, Glitch, newsletter, tools y lead magnets. Esa identidad puede
-materializarse en más de un host con canonical única.
+materializarse en más de un host y en plataformas externas, con la Pillar como
+hogar canónico del territorio.
 
 El sitio principal sigue siendo `efeoncepro.com`; el subdominio
 `think.efeoncepro.com` es hoy un satélite público para experiencias enfocadas,
@@ -37,6 +38,11 @@ y la route-ownership matrix.
 - **Producto ≠ host.** Una pieza puede pertenecer editorialmente a Think y
   mantener canonical en `efeoncepro.com`; nunca duplicar una pieza indexable
   entre WordPress, el dominio principal y el subdominio.
+- **Cluster federado ≠ inventario social.** Un reel, carrusel, pin, video, post
+  o newsletter platform-native puede ser nodo de primera clase si resuelve un
+  JTBD, entrega valor autónomo, tiene relación gobernada con la Pillar y produce
+  progreso medible. Publicar sobre el tema no basta. La URL de plataforma no
+  convierte a `think.efeoncepro.com` en owner ni desplaza el hogar canónico.
 - **Greenhouse calcula; Think presenta.** Los modelos, contratos, formularios,
   status, tokens e informes vienen de Greenhouse.
 - **Grader diagnostica; Radiografía demuestra.** El Grader responde "qué hueco

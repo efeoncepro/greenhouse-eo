@@ -255,6 +255,25 @@ y permite que cada pregunta profunda tenga una URL propia.
 La prioridad es provisional. Search research, preguntas de clientes y evidencia operativa pueden reordenarla.
 No se abre una ola completa si las piezas anteriores todavía no tienen señal, fuentes o distribución.
 
+### Extensión federada del cluster
+
+Los doce artículos son la columna editorial inicial, no la frontera completa del cluster. La Pillar conserva el
+hogar canónico de Creative Workflows, mientras casos, templates, tools y piezas platform-native pueden incorporarse
+como nodos de primera clase. Un reel, post, carrusel, pin, video, Short o newsletter califica sólo si resuelve un
+JTBD autónomo, tiene URL o identificador estable, relación explícita, owner, durabilidad y medición. No necesita una
+copia web; una pieza que sólo promociona otro nodo sigue siendo activación.
+
+Cada candidato debe declarar en el registry:
+
+```text
+surface · platform · ownership · node_role · primary_job · search_intent · query_set
+indexing_eligibility · discovery_surfaces · measurement_sources · derived_from
+canonical_parent · durability · progress_event · next_best_node
+```
+
+Los roles son multidimensionales: una pieza puede activar, explicar y conducir a progreso al mismo tiempo. El
+formato social no la excluye del cluster, pero tampoco la admite automáticamente.
+
 ## 6. Arquitectura de enlaces
 
 | Desde | Hacia | Anchor orientativo | Relación lateral útil |
@@ -280,6 +299,8 @@ No se abre una ola completa si las piezas anteriores todavía no tienen señal, 
 - Un satélite no intenta rankear por la definición genérica de `Creative Workflow`.
 - El enlace comercial aparece cuando el lector ya entiende el problema; no interrumpe la respuesta.
 - Una pieza pública tiene una sola canonical aunque WordPress participe en authoring y Think en distribución.
+- Los nodos platform-native conservan su URL pública; `canonical_parent` expresa linaje hacia la Pillar, no una
+  canonical SEO cruzada ni una obligación de duplicarlos en el dominio propio.
 
 ## 7. SEO y AEO
 
@@ -402,23 +423,24 @@ no valida por sí solo el territorio.
 El panel debe registrar motor/modelo, fecha, país/idioma, respuesta, fuentes citadas y presencia Efeonce. No se
 compara una captura aislada contra otra como si fuera una métrica estable.
 
-## 11. Atomización planificada
+## 11. Nodos y activaciones derivados
 
-| Derivado | Pieza | Fuente dentro de la Pillar | Trabajo |
-|---|---|---|---|
-| **Diagrama propietario** | El loop de seis momentos y dos velocidades | §4 | Asset citable y reutilizable |
-| **Carrusel LinkedIn** | “Automatizar lo repetible no es automatizar la creatividad” | §1–5 | Crear categoría |
-| **Post POV** | “Más contenido, más rápido es una promesa insuficiente” | Enemigo conceptual | Conversación y postura |
-| **Glitch** | Edición editorial con tesis + caso breve | Pillar completa | Nurturing |
-| **Video corto 1** | Qué es un Creative Workflow en 60–90 s | Answer capsule | Awareness |
-| **Video corto 2** | Dos velocidades: explorar y producir | §4 | Educación visual |
-| **Video corto 3** | Qué decide la persona y qué ejecuta el sistema | §5 | Desactivar miedo |
-| **Lámina comercial** | Intención → exploración → decisión → producción → review → aprendizaje | Modelo canónico | Enablement sin convertir la Pillar en pitch |
-| **Checklist** | ¿Está tu proceso listo para convertirse en workflow? | §10 | Utilidad y futuro lead magnet, solo tras validar demanda |
-| **FAQ social** | Ocho respuestas autocontenidas | §11 | Distribución sostenida |
+| Derivado | Pieza | Fuente dentro de la Pillar | Trabajo | Rol inicial |
+|---|---|---|---|---|
+| **Diagrama propietario** | El loop de seis momentos y dos velocidades | §4 | Asset citable y reutilizable | Nodo owned candidato |
+| **Carrusel LinkedIn** | “Automatizar lo repetible no es automatizar la creatividad” | §1–5 | Crear categoría | Nodo + activación si es autónomo |
+| **Post POV** | “Más contenido, más rápido es una promesa insuficiente” | Enemigo conceptual | Conversación y postura | Activación; graduable por JTBD |
+| **Glitch** | Edición editorial con tesis + caso breve | Pillar completa | Nurturing | Nodo owned candidato |
+| **Video corto 1** | Qué es un Creative Workflow en 60–90 s | Answer capsule | Awareness | Nodo platform-native si responde completo |
+| **Video corto 2** | Dos velocidades: explorar y producir | §4 | Educación visual | Nodo + activación candidato |
+| **Video corto 3** | Qué decide la persona y qué ejecuta el sistema | §5 | Desactivar miedo | Nodo + activación candidato |
+| **Lámina comercial** | Intención → exploración → decisión → producción → review → aprendizaje | Modelo canónico | Enablement sin convertir la Pillar en pitch | Activación privada |
+| **Checklist** | ¿Está tu proceso listo para convertirse en workflow? | §10 | Utilidad y futuro lead magnet, solo tras validar demanda | Nodo owned candidato |
+| **FAQ social** | Ocho respuestas autocontenidas | §11 | Descubrimiento sostenido | Serie de nodos o activaciones según autonomía |
 
-Cada átomo enlaza o atribuye la pieza canónica cuando el canal lo permite. La atomización adapta formato y
-contexto; no publica el mismo extracto sin edición en todos los canales.
+Cada derivado enlaza o atribuye la Pillar cuando el canal lo permite. Adaptar formato y contexto no basta para
+graduarlo a nodo: antes de producir debe declarar JTBD, rol, búsqueda/descubrimiento, progreso y medición. No se
+publica el mismo extracto sin edición en todos los canales.
 
 ### Evolución a activos de mayor orden
 
@@ -435,6 +457,18 @@ El contrato completo está en
 
 ## 12. Distribución
 
+La distribución se opera como red federada y se mide en tres planos separados:
+
+1. **External search:** Google Search, Discover y News para URLs propias y Platform Properties elegibles.
+2. **Platform search/recommendation:** consultas, recomendaciones, impresiones, guardados y consumo en analytics
+   nativos.
+3. **Downstream progress:** tránsito entre nodos, uso de recursos, suscripción, diagnóstico o handoff.
+
+Search Console Platform Properties soporta Instagram, TikTok, X y YouTube mediante rollout gradual al 2026-07-16.
+LinkedIn ofrece Search Appearances y post analytics, pero no figura entre esas Platform Properties. Instagram,
+TikTok, YouTube y Pinterest tienen condiciones y herramientas distintas de indexación o descubrimiento; deben
+verificarse antes de comprometer KPIs. Impresiones de estos tres planos no se suman como si fueran equivalentes.
+
 - **Owned:** Think/Marketing con Manzanitas, Glitch, LinkedIn de Efeonce y vocerías, enablement comercial.
 - **Earned:** conversaciones con líderes creativos, partners y comunidades cuando exista una idea o dato que
   merezca ser citado; no outreach genérico.
@@ -442,6 +476,14 @@ El contrato completo está en
 - **Sales:** usar Pillar o satélite como educación previa a la reunión; la landing Agencia Creativa conserva el
   trabajo de conversión.
 - **Internal enablement:** Creative, Growth, Ventas e Ingeniería comparten la misma definición y frontera.
+
+Fuentes operativas: [Google Search Console Platform Properties](https://support.google.com/webmasters/answer/17148418?hl=en-GB),
+[Meta](https://www.facebook.com/help/147542625391305),
+[TikTok Creator Search Insights](https://support.tiktok.com/en/using-tiktok/growing-your-audience/creator-search-insights),
+[YouTube Search](https://support.google.com/youtube/answer/16090438),
+[Pinterest Trends](https://help.pinterest.com/en/business/article/pinterest-trends),
+[LinkedIn Search Appearances](https://www.linkedin.com/help/linkedin/answer/a7473929) y
+[LinkedIn post analytics](https://www.linkedin.com/help/linkedin/answer/a525196).
 
 ## 13. Flujo de producción
 

@@ -38,13 +38,27 @@ Un data study se convierte en **8–10 activos** con una fracción del esfuerzo 
 | **Ebook** | Serie de posts (1 por capítulo), newsletter, webinar, carrusel del framework, clips |
 | **Case study** | Post de resultado, quote-card, slide de venta, video testimonial, mención en newsletter |
 
+## Átomo, activation asset o cluster node
+
+Atomizar describe el linaje de producción, no el valor estratégico final. Un derivado sigue siendo **activation
+asset** cuando sólo resume, anuncia o deriva tráfico. Puede registrarse como **platform-native cluster node** cuando
+resuelve un JTBD autónomo, entrega valor completo para su escala, tiene URL/ID estable, relación explícita,
+durabilidad razonable y medición propia. El formato social no lo incluye ni lo excluye automáticamente.
+
+Al planificar cada derivado declara `surface`, `platform`, `roles`, `primary_job`, `derived_from`,
+`canonical_parent`, `discovery_surfaces`, `progress_event` y `next_best_node`. Los roles pueden coexistir: una pieza
+puede ser `search + comprehension + activation` sin crear tres registros.
+
 ## Reglas del motor
 
 1. **Nativo por canal.** Cada átomo se re-escribe/re-corta para el canal, no se copia-pega. El craft del átomo textual es de `copywriting`; el corte de video/audio de los studios de asset; la publicación social de `social-media-studio`.
 2. **Un insight por átomo.** No metas los 5 datos en un post; haz 5 posts. La atomización también es enfocar.
 3. **Secuencia, no ráfaga.** Distribuye los átomos en el tiempo (semanas) para exprimir el pilar, no los quemes todos el día 1 (`05`).
-4. **Cross-link de vuelta al pilar.** Cada átomo enlaza/apunta al activo ancla (tráfico + autoridad + descubribilidad con `seo-aeo`).
+4. **Relación gobernada.** Cada átomo enlaza o apunta al activo ancla cuando el canal lo permite; si no, conserva
+   la relación en el registry y ofrece el siguiente paso nativo más claro (descubribilidad con `seo-aeo`).
 5. **Etiqueta el linaje.** Todo átomo sabe de qué pillar viene (para medir el rendimiento del **tema**, no solo de la pieza — `06`).
+6. **No mezcles métricas.** External search, platform search/recommendation y downstream progress se reportan por
+   fuente y definición; no sumes sus impresiones como alcance total comparable.
 
 ## Refresh de evergreen (la otra cara del motor)
 
@@ -63,8 +77,10 @@ Repurposing no es solo atomizar hacia afuera; es **exprimir el activo en el tiem
 ## Checklist de salida del módulo
 
 - [ ] Cada pillar tiene su **mapa de átomos** (planificado en el brief).
-- [ ] Cada átomo es **nativo** del canal (no copia-pega) y lleva **un** insight.
-- [ ] Átomos **secuenciados en el tiempo**, con cross-link al pilar y linaje etiquetado.
+- [ ] Cada átomo es **nativo** del canal (no copia-pega), lleva **un** insight y está clasificado como activation
+      asset o cluster node mediante criterios explícitos.
+- [ ] Átomos **secuenciados en el tiempo**, con relación al pilar/nodo y linaje etiquetado.
+- [ ] Roles, superficie, relación, discovery source y progreso medidos sin agregar impresiones incompatibles.
 - [ ] Plan de **refresh** para los pillars evergreen.
 - [ ] Hand-offs nombrados (copywriting / studios de asset / social-media-studio / runtime).
 

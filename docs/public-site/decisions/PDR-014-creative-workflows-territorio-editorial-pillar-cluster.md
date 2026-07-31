@@ -137,8 +137,9 @@ existan satélites publicados. No se crea una Page Elementor paralela ni se migr
 de diseño.
 
 Los doce satélites siguen siendo el plan editorial vigente, pero no agotan la arquitectura futura. PDR-016 permite
-que casos, templates, research o tools se incorporen como nodos de una Cluster Experience sólo si resuelven un JTBD
-propio, entregan valor autónomo y pasan sus gates; no nacen por extensión automática de este PDR.
+que casos, templates, research, tools o piezas platform-native se incorporen como nodos de una Cluster Experience
+sólo si resuelven un JTBD propio, entregan valor autónomo, declaran relación y medición y pasan sus gates; no nacen
+por extensión automática de este PDR.
 
 ## 5. Los satélites
 
@@ -163,7 +164,25 @@ Los satélites se abren por intención real y aporte propietario, no por cada va
 
 Una idea merece satélite si reúne las cuatro condiciones: responde una intención independiente, tiene una
 respuesta útil sin leer la Pillar completa, permite evidencia o pensamiento original y puede enlazar de vuelta
-sin competir por la definición canónica. Si no las cumple, es una sección, FAQ o átomo de distribución.
+sin competir por la definición canónica. Si no las cumple, es una sección, FAQ o activación, pero no un nodo
+canónico por defecto.
+
+### Red federada y piezas platform-native
+
+El cluster futuro no se limita a estos doce artículos ni al dominio propio. Reels, posts, carruseles, pins, videos,
+Shorts o newsletters pueden ser nodos platform-native de primera clase cuando:
+
+1. completan un JTBD de Creative Workflows con valor autónomo;
+2. poseen URL o identificador estable, owner, estado y durabilidad declarados;
+3. mantienen relación explícita con la Pillar u otro nodo;
+4. declaran intención de búsqueda/descubrimiento, progreso esperado y fuente de medición;
+5. no duplican la definición canónica que pertenece a la Pillar.
+
+`cluster node` y `activation` son roles multidimensionales, no clases excluyentes. Un carrusel que explica de forma
+autónoma la frontera humano/sistema puede ser nodo y activación; un post que sólo anuncia CW-03 es activación. El
+registry debe distinguir `surface`, `platform`, `ownership`, `node_role`, `search_intent`, `query_set`,
+`indexing_eligibility`, `discovery_surfaces`, `measurement_sources`, `derived_from`, `canonical_parent`,
+`durability`, `progress_event` y `next_best_node`.
 
 ## 6. Arquitectura de enlaces y canonical
 
@@ -177,6 +196,8 @@ sin competir por la definición canónica. Si no las cumple, es una sección, FA
   evidencia educativa. Ninguna reemplaza el CTA de la otra.
 - WordPress y Think nunca publican copias indexables. Cada pieza tiene una URL canónica y una sola fuente
   pública, incluso si el authoring o render usan más de un runtime.
+- La Pillar conserva el hogar canónico, pero puede enlazar nodos platform-native publicados cuando aportan el
+  siguiente trabajo útil; `canonical_parent` expresa pertenencia editorial, no una canonical SEO cruzada.
 
 ## 7. Faseo
 

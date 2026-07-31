@@ -82,6 +82,10 @@ Carga selectiva: no traigas los 7 módulos de una.
     `post`, `page`, Gutenberg, Elementor o Astro son rails; no dupliques canonical, cuerpo, registry ni schema.
 11. **Cluster es sistema, no lista de posts.** Admite artículos, casos, templates, datasets, diagnósticos y tools sólo
     cuando resuelven un JTBD del territorio. Cada nodo declara progreso y siguiente paso; no uses CTA universal.
+12. **Cluster federado, Pillar gobernada.** Una pieza platform-native puede ser nodo si entrega valor autónomo,
+    resuelve un JTBD y declara relación, roles y medición; un teaser sigue siendo activation asset. Mantén la Pillar
+    como hogar canónico y separa external search, platform search/recommendation y downstream progress: sus
+    impresiones no son aditivas ni equivalentes.
 
 ## Tabla de sinergias (nombra y encadena el hand-off)
 
@@ -89,7 +93,7 @@ Carga selectiva: no traigas los 7 módulos de una.
 |---|---|---|
 | **Rol del contenido en el mix / campaña integrada / content-led demand como canal** | operacionaliza la decisión | **`digital-marketing`** (módulo 02 le hace hand-off a este studio) |
 | **Conversión, loops de growth, experimentación, PLG, ¿el contenido convierte?** | produce la pieza que alimenta el loop | **`growth-marketing-cro`** |
-| **Descubribilidad + citabilidad (SEO técnico, schema, AEO/GEO por motor, entidad)** | produce contenido answer-first/citable | **`seo-aeo`** |
+| **Descubribilidad + citabilidad (SEO técnico, schema, AEO/GEO, external/platform search)** | produce contenido answer-first/citable y clasifica roles del nodo | **`seo-aeo`** |
 | **El craft de las palabras (headline, narrativa, estructura, edición)** | define la pieza + brief editorial | **`copywriting`** |
 | **Distribución social profunda por red + programar (Metricool)** | entrega el átomo social | **`social-media-studio`** (studio peer) |
 | **Assets: visual / motion / audio / imagen IA de la pieza** | dirige el asset (brief creativo) | `design-studio` · `motion-design-studio` · `audio-studio` · `greenhouse-ai-image-generator` |

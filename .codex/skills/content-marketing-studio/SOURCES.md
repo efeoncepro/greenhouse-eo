@@ -15,11 +15,32 @@
 - **They Ask, You Answer** (Marcus Sheridan) — contenido que responde las preguntas reales del comprador.
 - **Content Engineering / structured content** — Content Science Review y Digital.gov documentan la base histórica: modelos de contenido, metadata, templates, automatización, gobernanza y reutilización multicanal. La extensión Efeonce hacia experiencias humanas + computables vive en `references/content-engineering.md`.
 
+## Búsqueda y medición de piezas platform-native (fuentes oficiales)
+
+- [Google Search Console Platform Properties](https://support.google.com/webmasters/answer/17148418?hl=en-GB) —
+  Instagram, TikTok, X y YouTube; rollout gradual, verificar elegibilidad y disponibilidad por cuenta.
+- [Meta: apariciones de fotos y videos públicos en buscadores](https://www.facebook.com/help/147542625391305) —
+  condiciones de elegibilidad/indexación para contenido público de Instagram.
+- [TikTok Creator Search Insights](https://support.tiktok.com/en/using-tiktok/growing-your-audience/creator-search-insights) —
+  consultas, content gaps y desempeño en búsqueda dentro de TikTok.
+- [YouTube Search](https://support.google.com/youtube/answer/16090438) y
+  [YouTube Analytics](https://support.google.com/youtube/answer/12220281) — criterios del sistema de búsqueda y
+  fuentes/términos de descubrimiento reportados en Studio.
+- [Pinterest Trends](https://help.pinterest.com/en/business/article/pinterest-trends) y
+  [Pin performance and distribution](https://help.pinterest.com/en/business/article/pin-performance-and-distribution) —
+  demanda de búsqueda y métricas nativas de Pins.
+- [LinkedIn Search Appearances](https://www.linkedin.com/help/linkedin/answer/a7473929) y
+  [Post analytics](https://www.linkedin.com/help/linkedin/answer/a525196) — visibilidad interna y desempeño por
+  publicación. LinkedIn no se asume cubierto por Platform Properties mientras Google no lo documente.
+
 ## Qué reverificar cada vez (volátil — usar WebSearch, citar as-of)
 
 - **Comportamiento de IA-search / citabilidad:** cómo AI Overviews / AI Mode / ChatGPT Search / Perplexity / Gemini seleccionan y citan fuentes. (Táctica → `seo-aeo`.)
 - **Intermediación y verificación:** revalidar estudios conductuales de Pew sobre AI summaries y el Digital News Report de Reuters Institute antes de afirmar cómo cambian clics, profundización o confianza.
 - **Formatos y algoritmos sociales:** qué formato rinde por red este año (video corto, carruseles, etc.). (Ejecución → `social-media-studio`.)
+- **Indexación y analytics platform-native:** elegibilidad, rollout de Search Console Platform Properties,
+  superficies de descubrimiento y definiciones de métricas. Verificar por cuenta y plataforma antes de prometer
+  cobertura o comparar resultados.
 - **Benchmarks de engagement/conversión** por formato/industria/canal.
 - **Herramientas de IA de contenido** y sus capacidades/gobernanza.
 - **Reglas de disclosure** de contenido asistido por IA según jurisdicción/plataforma.

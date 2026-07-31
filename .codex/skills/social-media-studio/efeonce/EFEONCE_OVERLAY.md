@@ -26,8 +26,10 @@ Dos ejes ortogonales — **superficies** front-of-house (por audiencia/etapa) qu
 
 - **Think** = demand-gen + nurturing top-of-funnel: blog *Marketing con Manzanitas* →
   newsletter semanal *Glitch* (IA/Marketing/Negocios) + tools (*AI Visibility Grader*, ebooks,
-  webinars). **Social es el motor de distribución de Think**: reels/carruseles/posts que llevan
-  al blog, capturan suscriptores de Glitch y activan el grader como lead magnet.
+  webinars). Social distribuye Think, pero no se reduce a promoción: reels, carruseles, posts,
+  Pins, Shorts y videos pueden ser **platform-native cluster nodes** de sus Territory/Cluster
+  Experiences cuando tienen JTBD propio, valor autónomo, relación gobernada, URL/ID, owner y
+  medición. Un teaser que sólo lleva al blog sigue siendo activación.
 - **`efeoncepro.com`** = demand-capture + conversión (WordPress/Kinsta, recalibrando a Astro).
   Social empuja tráfico a las landings de servicio (ej. `/aeo-2/`).
 - **El grader (AI Visibility Grader)** es la costura top→bottom — pieza social-nativa ideal:
@@ -49,6 +51,7 @@ Dos ejes ortogonales — **superficies** front-of-house (por audiencia/etapa) qu
 
 Esta skill es **social-first ejecución**. Encadena con: `digital-marketing` (cuando social es
 parte de una campaña integrada), `growth-marketing-cro` + `greenhouse-growth-forms` (captura de
-lead social → grader/newsletter), `seo-aeo` (AEO por-motor LLM; acá cubrimos social search),
-`efeonce-public-site-wordpress` (publicar el long-form/blog que el social distribuye),
+lead social → grader/newsletter), `content-marketing-studio` (pertenencia al territorio/cluster),
+`seo-aeo` (URLs sociales en Google/Search Console + AEO; acá búsqueda/recomendación in-platform),
+`efeonce-public-site-wordpress` (publicar nodos owned cuando corresponde),
 `greenhouse-email` (Glitch newsletter runtime). Detalle en `SOCIAL_BOUNDARY.md`.

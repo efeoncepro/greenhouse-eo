@@ -6,6 +6,10 @@ Define how `efeoncepro.com` routes should be owned during the transition from th
 
 This matrix is a planning artifact. It does not change DNS, Vercel, Kinsta or WordPress.
 
+Delta 2026-07-16: PDR-016 amplía el cluster a nodos federados propios y
+platform-native. Esta matriz registra ownership y preflight; no conecta cuentas,
+publica piezas ni cambia indexación.
+
 ## Decision Summary
 
 - Target public frontend: Astro/Vercel through `efeoncepro/efeonce-web`.
@@ -27,6 +31,7 @@ This matrix is a planning artifact. It does not change DNS, Vercel, Kinsta or Wo
 | `/blog` | WordPress/Kinsta | Astro/Vercel rendering WordPress content | Do not cut over until blog listing/card/meta parity exists | Sitemap/canonical must not duplicate WordPress-rendered listing |
 | Blog posts | WordPress Gutenberg content | Astro/Vercel rendering WordPress content | Headless render preferred; proxy only temporary and gated | Preserve Yoast/meta/schema or deliberate replacement |
 | Editorial Pillars / Pillar Experience | WordPress Gutenberg + Content Factory | Astro/Vercel apex rendering structured WordPress content | Preserve existing canonical; decide new route per PDR-016 before draft public | Think product does not imply `think.efeoncepro.com`; no duplicate Page/Elementor canonical |
+| Platform-native Cluster nodes | Social/video platforms own the public URL; metadata is not yet centrally governed | Platform URL + governed cluster registry referencing PDR-016 | Inventory and verify search/analytics eligibility before activation | Pillar remains the canonical territory home; do not mirror every social item as a WordPress post and do not admit posts without autonomous JTBD/value |
 | Think tools, reports and focused experiences | `think.efeoncepro.com` Astro | `think.efeoncepro.com` unless a PDR/ADR moves the route | Separate specialized runtime | A tool route does not become the default home for editorial Pillars |
 | `/wp-admin/*` | WordPress/Kinsta | `cms.efeoncepro.com/wp-admin/*` | Keep admin off public Astro runtime | Never proxy admin through public Astro unless explicitly security-reviewed |
 | `/wp-login.php` | WordPress/Kinsta | `cms.efeoncepro.com/wp-login.php` | Same as admin | Avoid public apex login exposure after cutover |
@@ -49,6 +54,9 @@ Before any route reaches production under Astro:
 - [ ] Current titles, descriptions, canonicals, OG tags and structured data captured.
 - [ ] Current sitemap entries captured.
 - [ ] Pillar routes classify product/surface separately from host/runtime per PDR-016.
+- [ ] Platform-native nodes inventory stable URLs/identifiers, account ownership, public/professional eligibility and relationship to the Pillar.
+- [ ] Search Console Platform Properties availability is checked per Efeonce account for Instagram, TikTok, X and YouTube; gradual rollout is not treated as enabled-by-default.
+- [ ] Native platform analytics and downstream progress events are mapped separately; impressions across planes are not summed as equivalent.
 - [ ] Target Astro route emits canonical URL on `https://efeoncepro.com`.
 - [ ] Preview/Vercel URLs are noindex or protected.
 - [ ] Redirect map exists for every changed path.

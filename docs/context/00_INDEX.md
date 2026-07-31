@@ -22,7 +22,7 @@
 | Entender cómo Greenhouse conversa con Kortex/Verk/Creative Studio/HubSpot | `03_ecosistema-producto` |
 | Priorizar features con justificación comercial (cuentas, cross-sell, Pulse) | `08_estrategia-comercial` |
 | Cuidar marca/branding en el portal (Ecosystem Tour, onboarding, naming) | `09_marca-agencia` |
-| Definir Content Engineering como territorio, método u oferta | `09_marca-agencia` + `docs/public-site/decisions/PDR-015-content-engineering-territorio-editorial.md` + skill `content-marketing-studio` |
+| Definir Content Engineering, una Pillar Experience o un cluster federado | `09_marca-agencia` + `docs/public-site/decisions/PDR-015-content-engineering-territorio-editorial.md` + `docs/public-site/decisions/PDR-016-pillar-experience-arquitectura-editorial-y-runtime.md` + skill `content-marketing-studio` |
 | Diseñar la experiencia/onboarding del cliente en el portal | `10_experiencia-cliente` |
 | Tocar el sync con HubSpot, Account 360, lifecycle stages o properties | `11_hubspot-bowtie` |
 | Definir ICP, buyer persona, JTBD o prioridad por job del cliente | `13_icp-buyer-personas-jtbd` |

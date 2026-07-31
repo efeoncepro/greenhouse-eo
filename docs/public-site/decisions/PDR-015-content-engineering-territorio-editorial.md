@@ -88,7 +88,7 @@ producto que hoy trabajan por separado sobre la misma experiencia.
 | Superficie | Trabajo | Estado / frontera |
 |---|---|---|
 | **Pillar Content Engineering** | Definir la categoría, explicar el cambio de propósito y demostrarlo | Autorizada para research/diseño; no publicada |
-| **Cluster Experience futuro** | Artículos, casos, templates, research y tools que permitan aprender, aplicar, evaluar, verificar o decidir | Cada nodo nace sólo con JTBD, valor autónomo y relación gobernada; no por compartir keyword |
+| **Cluster Experience futuro** | Red federada de artículos, casos, templates, tools y piezas platform-native para aprender, aplicar, evaluar, verificar o decidir | Cada nodo nace sólo con JTBD, valor autónomo, relación y medición gobernadas; no por formato ni keyword |
 | **Content Factory** | Ensamblar y validar contenido gobernado | No se reimplementa ni se convierte en autopublisher |
 | **Primitives editoriales** | Resolver trabajos repetibles de comprensión o decisión | Reuse-first; capability nueva sólo con contrato reusable |
 | **Tools diagnósticas** | Personalizar una decisión y devolver utilidad explicable | Requieren PDR, privacidad, analytics, evals y task propios |
@@ -133,9 +133,16 @@ como shell o template de composición, pero el cuerpo, las relaciones del cluste
 fuente estructurada, portable y gobernada por Content Factory/WordPress.
 
 La Pillar es el hogar de una futura **Cluster Experience**, no el índice de una serie exclusiva de artículos. El
-cluster puede incorporar casos, templates, research, diagnósticos y tools si cada nodo completa un trabajo del
-territorio, entrega valor autónomo y declara su momento de conversión. Productos y servicios permanecen como
-handoffs adyacentes salvo decisión explícita; compartir tema o keyword no basta para entrar al cluster.
+cluster es una red federada: puede incorporar casos, templates, research, diagnósticos, tools, reels, posts,
+carruseles, pins, videos o newsletters si cada nodo completa un trabajo del territorio, entrega valor autónomo,
+declara su relación y posee medición apropiada a su superficie. La Pillar mantiene el hogar y la definición
+canónicos, pero un nodo platform-native no necesita una copia web para ser de primera clase.
+
+No existe una separación rígida entre `cluster` y `activation`: son roles multidimensionales. Una pieza puede
+activar reconocimiento y, al mismo tiempo, resolver una búsqueda o producir comprensión autónoma. Si sólo anuncia
+otra pieza, sigue siendo activación; si completa un JTBD y cumple el contrato de PDR-016, puede pertenecer al
+cluster. Productos y servicios permanecen como handoffs adyacentes salvo decisión explícita; compartir tema,
+keyword o campaña no basta para entrar.
 
 ## 7. Frontera de producto
 
@@ -169,7 +176,10 @@ Estado de naming:
 
 La Pillar no se evaluará sólo por tráfico:
 
-- **Descubrimiento:** queries, impresiones, entradas no-brand, recuperación y citación por motor.
+- **Descubrimiento externo:** queries, impresiones, CTR, posición, entradas no-brand, recuperación y citación en
+  buscadores, incluidas Platform Properties elegibles cuando estén disponibles.
+- **Descubrimiento de plataforma:** búsquedas, términos, recomendaciones y consumo según analytics nativos, sin
+  confundirlos con Search Console.
 - **Comprensión:** uso de ayudas, profundidad elegida, finalización y feedback cualitativo.
 - **Decisión:** autoevaluaciones completadas, próximos pasos elegidos y utilidad declarada.
 - **Conversión:** acciones cualificadas y pipeline influenciado, con atribución honesta.
@@ -198,6 +208,12 @@ URL reservada ni publicación autorizada.
 - [Digital.gov — An introduction to structured content](https://digital.gov/resources/an-introduction-to-structured-content)
 - [Pew Research Center — Google users are less likely to click on links when an AI summary appears](https://www.pewresearch.org/short-reads/2025/07/22/google-users-are-less-likely-to-click-on-links-when-an-ai-summary-appears-in-the-results/)
 - [Reuters Institute — Emerging uses of AI chatbots for news](https://reutersinstitute.politics.ox.ac.uk/digital-news-report/2026/emerging-uses-ai-chatbots-news-and-what-it-means-journalism)
+- [Google Search Console — Platform properties](https://support.google.com/webmasters/answer/17148418?hl=en-GB)
+- [Meta — Search engine indexing of public professional Instagram content](https://www.facebook.com/help/147542625391305)
+- [TikTok — Creator Search Insights](https://support.tiktok.com/en/using-tiktok/growing-your-audience/creator-search-insights)
+- [YouTube — Search and content performance](https://support.google.com/youtube/answer/16090438)
+- [Pinterest — Trends](https://help.pinterest.com/en/business/article/pinterest-trends)
+- [LinkedIn — Search Appearances analytics](https://www.linkedin.com/help/linkedin/answer/a7473929)
 
 Estas fuentes sostienen contexto y comportamiento, no prueban por sí solas impacto de conversión. Los claims de
 negocio de la Pillar deberán tener evidencia propia o presentarse explícitamente como hipótesis.

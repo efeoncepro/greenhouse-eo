@@ -97,22 +97,52 @@ nodos enlazan de vuelta a la definición canónica y sólo se publican como dest
 > **Cluster Experience es el sistema navegable de experiencias conectadas que permite avanzar alrededor de un
 > territorio: aprender, aplicar, evaluar, verificar y decidir.**
 
-La Pillar es el hogar; el cluster es el grafo; cada destino autónomo es un **cluster node**; la experiencia es el
-recorrido entre ellos. Los nodos no se definen por formato:
+La Pillar es el hogar canónico gobernado; el cluster es un grafo federado; cada destino autónomo es un **cluster
+node**; la experiencia es el recorrido entre ellos. Los nodos no se definen por formato ni por vivir en dominio
+propio:
 
-- **Aprender:** artículos, guías, glosarios, video o podcast.
+- **Aprender:** artículos, guías, glosarios, video, podcast, carrusel o reel explicativo.
 - **Aplicar:** templates, checklists, worksheets o generadores.
 - **Evaluar:** diagnósticos, graders, calculadoras o autoevaluaciones.
 - **Verificar:** casos, benchmarks, datasets o research.
 - **Decidir:** comparadores, matrices, configuradores o un handoff comercial pertinente.
 
 Para pertenecer, el nodo debe resolver un JTBD del territorio, entregar valor autónomo, relacionarse explícitamente
-con la Pillar y tener owner, canonical, estado, freshness y medición. Una tool no pertenece por ser interactiva; un
-servicio o producto puede ser el destino de un handoff sin convertirse en nodo editorial.
+con la Pillar o con otro nodo gobernado y tener owner, URL o ID estable, estado, freshness/durabilidad y medición.
+Una tool no pertenece por ser interactiva y una pieza social no pertenece por haber sido publicada: un teaser que
+sólo deriva tráfico sigue siendo un **activation asset**. Un servicio o producto puede ser el destino de un handoff
+sin convertirse en nodo editorial.
 
-El registry amplía su contrato con `node_type`, `primary_job`, `entry_state`, `desired_progress`, `progress_event`,
+El registry amplía su contrato con `node_type`, `surface`, `platform`, `ownership`, `roles`, `primary_job`,
+`search_intent`, `query_set`, `url_or_platform_id`, `canonical_parent`, `indexing_eligibility`,
+`discovery_surfaces`, `measurement_sources`, `entry_state`, `desired_progress`, `progress_event`,
 `next_best_nodes`, `conversion_level` y `commercial_handoff`. Esto permite que mapa, recomendación, analytics y
 schema describan la misma red sin imponer el mismo runtime a todos los nodos.
+
+### Cluster Experience federada y búsqueda social
+
+Una pieza platform-native puede ser un cluster node de primera clase cuando completa el contrato anterior. Puede
+cumplir varios roles simultáneos: `search`, `activation`, `comprehension`, `relationship`, `evidence` o `handoff`.
+`owned`/`platform` describe dónde vive; el rol describe el trabajo que hace. Esta taxonomía evita dos errores:
+reducir toda pieza social a promoción o elevar automáticamente cada post al cluster.
+
+La descubribilidad de estas piezas ocurre en planos distintos:
+
+1. **External search:** Google u otro buscador muestra una URL propia o platform-native.
+2. **Platform search / recommendation:** el buscador, feed o recomendador de la plataforma entrega la pieza.
+3. **Downstream progress:** la persona guarda, visita otro nodo, completa una experiencia, se suscribe o inicia un
+   handoff.
+
+Google Search Console está desplegando gradualmente **Platform Properties** para Instagram, TikTok, X y YouTube;
+la disponibilidad debe comprobarse por cuenta antes de prometer cobertura. TikTok Creator Search Insights,
+YouTube Analytics, Pinterest Trends/Analytics y LinkedIn Search Appearances/Post Analytics aportan medición nativa
+con contratos diferentes. Por eso no se suman impresiones de external search, búsquedas internas, feeds y alcance
+como si fueran la misma métrica. Cada señal conserva `source`, `surface`, definición, ventana y denominador.
+
+La Pillar sigue siendo la sede canónica del territorio y el registry la fuente de relaciones. Que una plataforma
+indexe o mida un nodo no transfiere la gobernanza editorial ni autoriza a duplicar el cuerpo canónico. Cuando la
+plataforma no permita un enlace directo, la relación se declara en metadata/registry y se expresa con el siguiente
+paso nativo más claro que el canal permita.
 
 ### Producto, marca y host
 
@@ -239,12 +269,17 @@ Una Pillar que enseñe esta doctrina debe demostrarla:
 10. Alimenta mapa del cluster, enlaces y schema desde una fuente estructurada compartida.
 11. Admite nodos heterogéneos sólo cuando resuelven un JTBD del territorio y declara su progreso esperado.
 12. Diseña momentos de conversión proporcionales al valor, sin CTA universal ni captura prematura.
+13. Distingue nodos owned, platform-native y activation assets mediante roles, relación y medición explícitos.
+14. Separa external search, platform search/recommendation y downstream progress; nunca suma sus impresiones como
+    una métrica homogénea.
 
 ## Métricas
 
 Combinar señales sin confundir correlación con impacto:
 
-- **Descubrimiento:** queries, impresiones, entradas no-brand, recuperación y citación por motor.
+- **External search:** queries, impresiones, CTR y posición por buscador/propiedad elegible.
+- **Platform search / recommendation:** consultas, apariciones, alcance, guardados y consumo según definición nativa.
+- **Downstream progress:** visitas al siguiente nodo, completitud, suscripción, diagnóstico, handoff e influencia.
 - **Comprensión:** uso de ayudas, profundidad elegida, finalización y feedback cualitativo.
 - **Decisión:** comparaciones completadas, diagnósticos útiles, exportaciones o próximos pasos elegidos.
 - **Conversión:** acciones cualificadas, leads/deals influenciados y progresión en el bow-tie.
@@ -270,6 +305,8 @@ Combinar señales sin confundir correlación con impacto:
 - Medir clics como éxito sin definir qué progreso representan.
 - Aplicar el mismo CTA a todos los nodos del cluster.
 - Llamar cluster a cualquier colección de assets que comparte keyword, aunque no componga un recorrido.
+- Tratar toda pieza social como promoción o, en el extremo opuesto, declarar cada publicación como cluster node.
+- Sumar impresiones de Google, feeds y búsquedas internas sin conservar fuente, definición y denominador.
 - Confundir una tool editorial con una feature disponible del producto.
 - Generar experiencias en volumen sin insight, factcheck, voz ni owner de freshness.
 

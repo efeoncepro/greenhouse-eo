@@ -254,6 +254,17 @@ handoff. Exige formular fricción, estado de entrada, progreso esperado, valor d
 plan por nodo. El compromiso solicitado crece con el valor; evita CTA universal, gating innecesario, scores mágicos
 y tests A/B sin tráfico suficiente.
 
+**Contrato de Cluster Experience federada:** un nodo owned o platform-native se evalúa por el progreso que produce,
+no por su formato. Reel, pin, carrusel, post, video o newsletter pueden ser cluster nodes si resuelven un JTBD,
+entregan valor autónomo y mantienen relación/medición; si sólo anuncian otra pieza son activation assets. Modela cada
+nodo con `surface`, `platform`, `roles`, `entry_state`, `desired_progress`, `progress_event`, `next_best_node` y
+`commercial_handoff`.
+
+Conserva tres planos de medición: **external search**, **platform search/recommendation** y **downstream progress**.
+No sumes impresiones, alcance, apariciones o views entre plataformas como si compartieran definición, denominador o
+intención. Reporta cada métrica con fuente, ventana y contrato; conecta downstream progress mediante UTMs, eventos,
+referrals, IDs de campaña o evidencia CRM cuando exista. Alcance correlacionado no demuestra conversión ni ingreso.
+
 ---
 
 ## 7. Voz, idioma y entrega

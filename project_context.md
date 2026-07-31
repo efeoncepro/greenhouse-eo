@@ -11,9 +11,13 @@
   tool, oferta comercial, write live ni publicación autorizada. Think es el producto editorial; no equivale al
   subdominio `think.efeoncepro.com`. Creative Workflows permanece en su canonical actual y el host/renderer de la
   futura Pillar Content Engineering sigue abierto hasta resolver IA del hub y route ownership. PDR-016 también
-  define Cluster Experience: artículos, casos, templates, research, diagnósticos y tools sólo pertenecen por JTBD,
-  valor autónomo y relación gobernada. Conversión se mide como progresión desde reconocimiento hasta handoff, no
-  como clic, captura o CTA universal.
+  define Cluster Experience federada: artículos, casos, templates, research, diagnósticos, tools y nodos
+  platform-native sólo pertenecen por JTBD, valor autónomo y relación gobernada. Reels, carruseles, pins, videos,
+  posts o newsletters pueden ser nodos de primera clase, pero no todo post social entra; la Pillar conserva el hogar
+  canónico. Conversión se mide como progresión desde reconocimiento hasta handoff, no como clic, captura o CTA
+  universal. Social search se observa en tres planos separados: Google, búsqueda/analytics nativos y progreso. Search
+  Console despliega gradualmente Platform Properties para Instagram, TikTok, X y YouTube; el próximo preflight debe
+  verificar disponibilidad por cuenta Efeonce sin asumir habilitación ni ejecutar conexiones, publicación o rollout.
 - **Creative Workflows FAQ disclosure + schema V6 publicada (2026-07-16):** el runtime WordPress `7.0.1`/Ohio del post
   `251363` registra `core/details`, `core/accordion`, `essential-blocks/accordion` y `yoast/faq-block`; para la FAQ editorial
   de la Pillar se eligió `kind: "faq"` en Content Factory: fuente única que renderiza cuatro `core/details` bajo el H2
