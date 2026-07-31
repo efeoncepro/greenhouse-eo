@@ -23,6 +23,11 @@ La flota de modelos de Globe se resuelve y promueve por identidad exacta de ruta
 evaluación/derechos/readbacks y una generación real desde la UI autenticada. Un MIME de transporte genérico nunca
 amplía la allowlist global: sólo puede aceptarse para una salida exacta esperada después de verificar sus bytes.
 
+Las evaluaciones con provider real requieren output rights durables antes del gasto, aunque aún no exista readiness
+comercial. La autoridad se resuelve por identidad exacta, `purpose=evaluation|production` y source kind; una
+referencia debe resolver a un activo retenido y gobernado, no sólo a un hash u objeto GCS. TASK-1614 y las skills
+gemelas `greenhouse-globe` contienen el contrato y el handoff vivo de Seedance R2V.
+
 El fondeo administrativo de Globe es API-first mediante el cliente público OAuth PKCE
 `greenhouse-admin-cli`; Chrome sólo aporta la sesión autenticada a la autorización, nunca cookies o tokens
 extraídos. Un usuario agente puede proponer y confirmar si el workspace lo delega con scopes, entitlements y

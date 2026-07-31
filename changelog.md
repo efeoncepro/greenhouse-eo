@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-31 — TASK-1614: handoff de Seedance R2V y output rights de evaluación
+
+- Se documentó la causa real del run live: Fal generó y retuvo el MP4, pero el finalizer falló cerrado porque el
+  snapshot inmutable no incluía autoridad de output rights; no fue un error del selector Seedream ni del webhook.
+- El diseño pendiente separa políticas `evaluation|production`, exige coincidencia de source kind y resuelve cada
+  referencia a un activo retenido y gobernado antes del gasto. Los outputs de evaluación no pueden entregarse ni
+  compartirse comercialmente.
+- El fondeo API quedó verificado en +500 créditos, cap 800→1500 y disponible 836. TASK-1614, Handoff y ambas skills
+  `greenhouse-globe` registran IDs, worktree, pruebas y secuencia exacta para continuar en una sesión nueva.
+
 ## 2026-07-31 — TASK-1616: fondeo API de Globe operable por agentes delegados
 
 - Se agregó el cliente público OAuth PKCE `greenhouse-admin-cli` y el adapter API Platform para
@@ -681,11 +691,3 @@ Corrección de fuente de verdad: el cliente inicial es **SKY Agencia Creativa**,
   legal/IP, evidence, expansion y stop conditions.
 - Business Model y Pricing Operators de Codex/Claude ahora deben cargar este modelo antes de diseñar packaging o
   pricing; Wave, Globe y Experience LaunchOps quedan referenciados a él.
-
-## 2026-07-26 — Directriz corporativa 2028: todos los servicios Productized y AI-native
-
-- Se creó `docs/strategy/EFEONCE_2028_PRODUCTIZED_AI_NATIVE_SERVICES_STRATEGIC_DIRECTION_V1.md`.
-- La directriz aplica a todo servicio client-facing y exige Product Service Contract, workflow repetible, IA
-  estructural, autoridad humana, plataforma/memoria, gates, economics, governance y evidencia.
-- ASaaS Manifesto, modelo ASaaS, contexto corporativo y skills de agencia, business model, pricing y customer model
-  quedaron alineados. AI-native no se interpreta como SaaS puro, self-service, autonomía total ni reducción de personas.

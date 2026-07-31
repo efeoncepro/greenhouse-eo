@@ -350,6 +350,49 @@ Si el Model Lab muestra "capability con estado + provider", el **Evaluation Harn
 - **Separar lo objetivo de lo humano; el verdict nunca auto-aprueba craft.** `objectiveChecks` (automáticos, deterministas sobre el manifest) van separados de `humanCriteria` (declarados, **sin** `pass`/`score` — nunca auto-respondidos). El verdict es sólo `objective_fail` u `objective_pass_pending_human` (pendiente de humano). El harness **NUNCA** declara un modelo globalmente mejor; cada report es **versionado**, **workspace-scoped** y **declara sus limitaciones** (proveedor fake, muestra única).
 - **Coverage + capability idénticos al patrón.** `globe.lab.evaluation.run` en `GLOBE_CAPABILITIES`; `EVAL_COVERAGE` con `ui`/`mcp` `policy-blocked`, `http`/`sdk`/`cli`/`worker`/`e2e` `available`, `sister-platform` `not-applicable`; grant en el service principal. Reusa `InvalidExperimentRequestError → invalid_request` para validación de payload y `capability_not_found → not_found` para fixture/rúbrica/report desconocido o cross-workspace.
 
+### Evaluación durable con inputs reales (TASK-1614, regla vigente desde 2026-07-31)
+
+Una evaluación durable no puede confundir el **dato hermético del fixture** con el **activo que el provider debe
+consumir**. Los handles estáticos `sha256:*` con `rights=test-fixture` sólo sirven en tests herméticos cuando el
+resolver conoce sus bytes; en Cloud Run no prueban que exista un objeto y terminan como
+`provider_input_resolution_failed` antes del submit. Para cualquier golden brief condicionado por referencia:
+
+1. parte de un output ya retenido y autorizado;
+2. conviértelo en referencia canónica mediante `globe.producer.asset.copyAsReference`;
+3. pasa el handle completo devuelto como `authorizedInputs` de `globe.lab.evaluation.evaluate`;
+4. persiste esos inputs efectivos en el experimento/reporte y verifica `input_lineage_intact`;
+5. ante un timeout, consulta experimento/run/reporte; no relances con otra idempotency key hasta clasificar el
+   intento anterior.
+
+El dominio rechaza una evaluación durable condicionada cuando faltan los overrides o todavía llevan
+`rights=test-fixture`; además conserva cantidad, modalidad y orden del fixture.
+
+**Output rights de evaluación y lineage durable (incidente Seedance R2V, 2026-07-31).** Una evaluación puede
+ejecutarse antes de la promoción comercial, pero eso **no** significa que su output carezca de autoridad de
+derechos. Antes de reservar o llamar al provider, el compiler de evaluación debe resolver exactamente una política
+durable para la tupla `workspace + route + provider + model + version + purpose=evaluation + sourceKind + time`.
+La política de evaluación exige como mínimo `internal-evaluation-only`, `no-commercial-use`,
+`no-client-delivery` y `no-sublicensing`; una política `purpose=production` no la sustituye. Si hay input, una
+política `appliesTo=generated` tampoco autoriza un derivado. El policy id/version/digest/purpose forma parte del
+snapshot y del fingerprint. Cero fallback a readiness, cero política inventada en memoria.
+
+Un `ProducerReferenceHandleV1` tampoco es un `assetId`. Antes del gasto, el servidor debe resolverlo contra el
+experimento y attempt fuente, verificar workspace, hash, medio, retención, Asset Governance elegible y autoridad
+de derechos del output fuente, y persistir el `assetId` canónico en `generatedAssetParents`. El finalizer registra
+ese padre durable al crear el output derivado. Referencias antiguas cuyo MP4 está en GCS pero que no tienen fila de
+activo gobernado **no son reutilizables**: deben entrar por private-ingest y completar governance, o se rechazan.
+Los outputs `purpose=evaluation` pueden verse internamente, pero no descargarse como attachment ni entrar a un
+share board. Esta separación evita que “sirvió para evaluar” se convierta accidentalmente en “se puede entregar”.
+
+El síntoma que reveló el hueco fue `run_finalization_failed` después de que Fal ya había generado y retenido bytes:
+el snapshot de la ruta no incluía `generatedRights`, por lo que `generationAuthority` falló cerrado. No se arregla
+reintentando webhooks, relajando Asset Governance ni editando el run inmutable. Se cancela canónicamente el run
+viejo después del rollout y se crea uno nuevo con policy + lineage completos.
+El workflow `Globe Operator Lane (keyless)` ofrece los actos explícitos `copy-reference:caller`, `evaluate:caller`,
+`run-get:caller` y `run-cancel:caller`. Son comandos de la API Contract Spine con WIF y capabilities acotadas;
+no son scripts que escriben SQL ni llamadas directas al proveedor. El cliente debe desanidar la respuesta canónica
+`{ data: ... }` y esperar el reporte durable o un estado terminal clasificado.
+
 ## El tercer ejemplo trabajado — Provider adapters reales (TASK-1486/1487/1488): el provider seam con motores reales
 
 Los dos ejemplos anteriores corren sobre `FakeReferenceAdapter` (hermético, gasto cero). TASK-1486/1487/1488 enchufan **motores reales** sobre el mismo `CreativeProviderAdapter`, **sin tocar el dominio ni el command** — exactamente lo que promete el provider seam. Son el patrón a copiar cuando agregues un provider nuevo. Todos viven en `apps/creative-runner/src/*`.
@@ -1315,6 +1358,13 @@ futuro debe saber:
   cliente público `greenhouse-admin-cli`; una sesión agente puede autorizar y confirmar porque la base registra
   `actor_auth_mode=agent` y aplica la delegación del workspace. Fuera de esa política o por encima de sus límites,
   el confirm falla cerrado.
+- **Un solo comando de operador, dos fases server-side:** `pnpm globe:credit-funding` es la interfaz canónica de
+  fondeo para humanos y agentes. El CLI hace OAuth público + PKCE, llama `propose`, toma el `proposalId` real y
+  ejecuta `confirm` con otra idempotency key; luego imprime el readback de grant, política y ledger. El operador no
+  debe reproducir esas llamadas manualmente ni usar Chrome para ejecutar el fondeo. La UI interviene únicamente
+  en el consentimiento OAuth cuando la política lo exige; una sesión agente autorizada por `TASK-1616` completa
+  el flujo sin fabricar una sesión humana. Si una fase queda ambigua, el comando recupera por propuesta e
+  idempotencia: no crea otro grant.
 - **Loopback en Vercel:** el redirect se registra siempre como `http://127.0.0.1/oauth/callback`. Vercel/Next
   normaliza ese query param a `localhost` antes del route; el matcher acepta sólo ese alias contra el registro
   literal y lo canoniza inmediatamente de vuelta a `127.0.0.1`, de modo que code, callback y token exchange
@@ -1326,6 +1376,13 @@ futuro debe saber:
 - **La procedencia debe cruzar el wrapper API completo:** `resolveAppTenantContext` no basta; `runAppRoute` debe
   copiar `oauthSessionAuthMode` al `AppPlatformRequestContext` entregado al handler. Si se omite, el broker recibe
   `unknown` y falla cerrado antes de insertar la intención. La regresión vive en `app-auth.test.ts`.
+- **Último fondeo real verificado (2026-07-31):** `pnpm globe:credit-funding` añadió **500 créditos** al pool
+  `10b0c57a-231d-4244-88d3-49ee7ecab17f` del workspace `greenhouse-org:efeonce`, elevó el tope mensual
+  **800→1500** y dejó disponible **836** tras 244 gastados. Evidencia append-only: proposal
+  `ef775b1b-ebe0-411f-95e6-eff1000cbf62`, grant `3ef983b4-e41e-4d83-8a53-c02ae00fccdc`, policy
+  `eca7c50e-563e-4174-b508-be244e85783b`, ledger `24ecb9a7-e7fc-4338-a9b3-9c12a5441d45`, correlation
+  `392e5076-2701-41d7-8b19-53db5126ce40`. El camino correcto fue API OAuth/PKCE + sesión agente permitida;
+  Chrome no ejecutó el fondeo y no se usó break-glass.
 
 ### Ocho lecciones de método, que valen más que los fixes
 

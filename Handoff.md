@@ -1,5 +1,19 @@
 # Handoff activo
 
+## TASK-1614 — Seedance R2V: output rights + lineage antes de promoción (2026-07-31, in-progress)
+
+Se detuvo deliberadamente la sesión antes de integrar o desplegar. El fondeo API ya está resuelto (+500; cap
+800→1500; disponible 836) y sus IDs durables están en `.codex/skills/greenhouse-globe/SKILL.md`. Seedance R2V sigue
+sin promover: Fal sí generó el MP4, pero el finalizer rechazó el run porque el snapshot inmutable no tenía autoridad
+de output rights. La solución robusta está sin commit en `/private/tmp/globe-evaluation-rights`, branch
+`codex/evaluation-rights-provenance`: policy purpose `evaluation|production`, exact match por source kind, lineage a
+asset gobernado, parent derivado y prohibición de entregar/compartir outputs de evaluación. Creative Runner: 253/253;
+typecheck: OK; `pnpm check` fue interrumpido por el cierre y debe repetirse.
+
+Continuidad completa, IDs y secuencia: `docs/tasks/in-progress/TASK-1614-globe-durable-model-evaluation-lifecycle.md`.
+No tocar Omni, Seed Audio ni Seedance Loop. La prueba final debe ser en Chrome autenticado, **Video → Seedance 2.0**;
+la captura en **Imagen → Seedream** no prueba Seedance.
+
 ## TASK-1616 — Globe Admin CLI OAuth PKCE (2026-07-31, in-progress)
 
 - Corrige la frontera operativa incompleta de TASK-1566: el fondeo es transaccional y gobernado, pero no tenía un cliente API seguro para personas y agentes autenticados.
