@@ -98,6 +98,7 @@ const FieldsProgressChip = ({
     >
       <Stack direction='row' spacing={1.25} alignItems='center' justifyContent='space-between' sx={{ minWidth: 0 }}>
         <Typography
+          component='div'
           variant='body2'
           sx={{
             lineHeight: 1.35,

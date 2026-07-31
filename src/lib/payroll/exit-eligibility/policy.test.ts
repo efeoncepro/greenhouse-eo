@@ -12,6 +12,7 @@ const baseFacts: ExitCaseFacts = {
   exitCasePublicId: null,
   exitLane: null,
   exitStatus: null,
+  contractTypeSnapshot: null,
   lastWorkingDay: null,
   effectiveDate: null
 }
@@ -411,6 +412,40 @@ describe('derivePolicy — internal_payroll lane (Greenhouse Chile)', () => {
 
     expect(window.projectionPolicy).toBe('partial_until_cutoff')
     expect(window.eligibleTo).toBe(PERIOD_END)
+  })
+})
+
+describe('derivePolicy — international_internal lane', () => {
+  it('excludes from the cutoff once the internal international exit is approved', () => {
+    const window = derivePolicy(
+      withCase({
+        exitLane: 'internal_payroll',
+        contractTypeSnapshot: 'international_internal',
+        exitStatus: 'approved',
+        lastWorkingDay: '2026-05-14'
+      }),
+      PERIOD_START,
+      PERIOD_END
+    )
+
+    expect(window.projectionPolicy).toBe('exclude_from_cutoff')
+    expect(window.eligibleFrom).toBeNull()
+    expect(window.eligibleTo).toBeNull()
+  })
+
+  it('does not apply the international rule to Chile dependent payroll', () => {
+    const window = derivePolicy(
+      withCase({
+        exitLane: 'internal_payroll',
+        contractTypeSnapshot: 'indefinido',
+        exitStatus: 'approved',
+        lastWorkingDay: '2026-05-14'
+      }),
+      PERIOD_START,
+      PERIOD_END
+    )
+
+    expect(window.projectionPolicy).toBe('full_period')
   })
 })
 

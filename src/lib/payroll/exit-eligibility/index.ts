@@ -51,6 +51,7 @@ export const resolveExitEligibilityForMembers = async (
       exitCasePublicId: null,
       exitLane: null,
       exitStatus: null,
+      contractTypeSnapshot: null,
       lastWorkingDay: null,
       effectiveDate: null
     }

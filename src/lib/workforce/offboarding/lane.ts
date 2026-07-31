@@ -67,10 +67,14 @@ export const resolveOffboardingLane = ({
     })
   }
 
-  if (payrollVia === 'internal' && payRegime === 'chile' && (contractType === 'indefinido' || contractType === 'plazo_fijo')) {
+  if (
+    payrollVia === 'internal' &&
+    ((payRegime === 'chile' && (contractType === 'indefinido' || contractType === 'plazo_fijo')) ||
+      (payRegime === 'international' && contractType === 'international_internal'))
+  ) {
     return decision('internal_payroll', {
       requiresPayrollClosure: true,
-      requiresLeaveReconciliation: true,
+      requiresLeaveReconciliation: payRegime === 'chile',
       requiresHrDocuments: true,
       requiresAssetRecovery: true,
       greenhouseExecutionMode: 'full'

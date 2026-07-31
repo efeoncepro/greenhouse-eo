@@ -2629,6 +2629,7 @@ export interface GreenhouseCoreFirstPartyAppSessions {
 }
 
 export interface GreenhouseCoreGlobeCreditFundingIntents {
+  actor_auth_mode: Generated<string>;
   actor_entitlement: string;
   actor_user_id: string;
   correlation_id: string;
@@ -2644,6 +2645,9 @@ export interface GreenhouseCoreGlobeCreditFundingIntents {
 }
 
 export interface GreenhouseCoreGlobeCreditFundingPolicies {
+  agent_confirmation_enabled: Generated<boolean>;
+  agent_max_grant_credits: number | null;
+  agent_max_monthly_cap_credits: number | null;
   globe_workspace_id: string;
   requires_second_confirmer: Generated<boolean>;
   second_confirmer_above_credits: number | null;
@@ -3753,6 +3757,7 @@ export interface GreenhouseCoreSisterPlatformOauthClients {
   client_id: string;
   client_name: string;
   client_status: Generated<string>;
+  client_type: Generated<string>;
   code_ttl_seconds: Generated<number>;
   created_at: Generated<Timestamp>;
   created_by_user_id: string | null;
@@ -3765,6 +3770,7 @@ export interface GreenhouseCoreSisterPlatformOauthClients {
    */
   policy_json: Json | null;
   redirect_uris: string[];
+  require_human_session: Generated<boolean>;
   require_pkce: Generated<boolean>;
   sister_platform_consumer_id: string;
   sister_platform_oauth_client_id: string;

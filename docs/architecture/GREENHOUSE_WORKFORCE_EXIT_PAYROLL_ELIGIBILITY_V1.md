@@ -144,6 +144,8 @@ export async function isMemberInPayrollScope(
 |---|---|---|
 | `internal_payroll` | `status = 'executed'` AND cutoff in periodo | `partial_until_cutoff` (prorratear) |
 | `internal_payroll` | `status = 'executed'` AND cutoff < periodStart | `exclude_entire_period` |
+| `internal_payroll` + `contract_type_snapshot='international_internal'` | `status IN ('approved','scheduled','executed')` AND cutoff in periodo | `exclude_from_cutoff` |
+| `internal_payroll` + `contract_type_snapshot='international_internal'` | `status IN ('approved','scheduled','executed')` AND cutoff < periodStart | `exclude_entire_period` |
 | `external_payroll` | `status IN ('approved','scheduled','executed')` AND cutoff in periodo | `exclude_from_cutoff` |
 | `external_payroll` | `status IN ('approved','scheduled','executed')` AND cutoff < periodStart | `exclude_entire_period` |
 | `non_payroll` | `status IN ('approved','scheduled','executed')` AND cutoff < periodStart | `exclude_entire_period` |
@@ -156,6 +158,7 @@ export async function isMemberInPayrollScope(
 **Rationale (defensa de la asimetria)**:
 
 - **Internal payroll** (`internal_payroll`) requiere `status='executed'` porque Greenhouse PAGA hasta el ultimo dia; el threshold `executed` es momento canonico donde finiquito Chile esta emitido + ratificado (TASK-862/863) y compensation_versions se cierra automatico (HR_PAYROLL_V1:1896-1898). Mantener `executed` preserva el contract legal.
+- **Excepción internacional interna** (`internal_payroll` + `contract_type_snapshot='international_internal'`) mantiene el cierre dentro del lane de nómina interna, pero no usa settlement/documento chileno. Por eso `approved`/`scheduled` es suficiente para cerrar elegibilidad desde el cutoff y evitar una persona atrapada esperando un aggregate que no aplica.
 - **External payroll** (`external_payroll`) NO requiere `executed` porque Greenhouse NUNCA paga la nomina — la paga el proveedor externo (Deel/EOR). `approved` es el momento canonico donde el operador firmo la decision de cerrar via proveedor. Esperar `executed` para un evento que vive afuera del Greenhouse runtime es deuda operativa permanente.
 - **Non_payroll** (contractor/honorarios) sigue la regla external: cierra sin finiquito interno; threshold `approved`.
 
@@ -316,6 +319,38 @@ Override block exime: `src/lib/payroll/exit-eligibility/**`, tests del helper, m
 11. **SIEMPRE** que emerja un `rule_lane` nuevo en schema (e.g. `eor_provider`, `intercompany_loan`), extender §2 tabla + resolver + tests + lint rule en el mismo PR. CHECK constraint del enum existente bloquea valores nuevos defensivamente.
 12. **SIEMPRE** que un consumer nuevo necesite "members en scope laboral interno" (capacity, staffing, cost attribution), llamar el resolver. Cero composicion ad-hoc.
 13. **SIEMPRE** que BQ fallback se invoque, emitir `captureWithDomain('payroll', warn, { source: 'bq_fallback_no_exit_gate' })` y el signal `bq_fallback_invoked` lo escala.
+
+## Architecture Decision 2026-07-31 — `international_internal` en Offboarding y elegibilidad
+
+- **Status:** Accepted
+- **Owner:** HR / Payroll / Workforce / Reliability
+- **Scope:** `work_relationship_offboarding_cases`, Offboarding lane resolver y resolver canónico de elegibilidad.
+- **Reversibility:** two-way-but-slow
+- **Confidence:** high
+- **Validated as of:** 2026-07-31
+
+### Context
+
+`international_internal` es un `ContractType` aceptado por TASK-894 (`payRegime=international`, `payrollVia=internal`), pero la fundación de Offboarding TASK-760 no amplió su `CHECK`. Además, el lane resolver lo clasificaba como `unknown`, lo que podía permitir que una salida creada manualmente siguiera proyectando nómina completa.
+
+### Decision
+
+Mantener `international_internal` dentro del lane persistido `internal_payroll`, ampliar el `CHECK` de snapshot contractual y hacer que el resolver de elegibilidad lo excluya desde `approved`/`scheduled` cuando el cutoff cae en el período. El gate de settlement/documento legal chileno se limita a `indefinido` y `plazo_fijo`; `international_internal` mantiene el cierre auditable de elegibilidad sin inventar un finiquito chileno.
+
+### Consequences
+
+- El caso puede crearse desde la misma API y conserva el snapshot contractual canónico.
+- La nómina usa el mismo resolver para proyectada y real; no se borran entradas históricas ni compensaciones.
+- La creación en `draft` no excluye todavía: el operador debe avanzar el caso a `approved`/`scheduled` según la fecha efectiva.
+- El lane no crea una nueva enumeración ni una nueva tabla; evita otra divergencia entre schema, UI y Payroll.
+
+### Runtime Contract
+
+La migración `TASK-1630` acepta el snapshot. `resolveOffboardingLane` produce `internal_payroll`; `fetchExitCaseFactsForMembers` lee el snapshot; `derivePolicy` aplica el threshold internacional; y la transición a `executed` cierra la elegibilidad futura dentro de la misma transacción.
+
+### Revisit When
+
+Reabrir si aparece un proceso legal/documental específico para `international_internal`, si otro tipo internacional interno requiere un threshold distinto o si Payroll adopta un aggregate de cierre no chileno.
 
 ## Open Questions (deliberadamente NO decididas en V1)
 
