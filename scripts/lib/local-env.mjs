@@ -1,7 +1,10 @@
 import { readFile } from 'node:fs/promises'
-import { resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-export const PROJECT_ROOT = resolve(import.meta.dirname, '../..')
+const MODULE_DIRECTORY = dirname(fileURLToPath(import.meta.url))
+
+export const PROJECT_ROOT = resolve(MODULE_DIRECTORY, '../..')
 export const ENV_LOCAL_PATH = resolve(PROJECT_ROOT, '.env.local')
 
 export function parseEnvFile(content) {
