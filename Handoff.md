@@ -1,5 +1,12 @@
 # Handoff activo
 
+## GitHub Actions — presupuesto de billing actualizado (2026-07-31)
+
+- Se actualizó en GitHub el presupuesto de Actions de `efeoncepro` / Efeonce Group de USD 0 a **USD 20 mensuales**.
+- Verificación: fila `Actions` muestra `$0 spent`, `$20.00 budget` y `Stop usage: Yes`; alertas y método de pago quedan configurados en GitHub.
+- El límite es de gasto metered adicional y no aumenta los 2.000 minutos incluidos; el reset de la cuota reportada ocurre el 2026-08-01.
+- Referencias: [`cloud-cost-intelligence-finops.md`](docs/documentation/operations/cloud-cost-intelligence-finops.md) y [`github-actions-budget.md`](docs/manual-de-uso/operations/github-actions-budget.md).
+
 ## Brightcell — continuidad de la segunda licitación con Artifact Composer (2026-07-31)
 
 - Brightcell es el segundo deck de licitación producido con Artifact Composer y plantillas cerradas; SKY Blog 2026 es el primer caso de referencia.
