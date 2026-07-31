@@ -182,6 +182,24 @@ Effort     = persona-semanas (dev + contenido + PR)
   Runtime en `efeonce-think`, documentación/governance en `greenhouse-eo`.
   Nunca la trates como lead magnet ni como promesa de ranking/cita.
 
+### Secuencia de evidencia para propuestas
+
+Cuando SEO/AEO se presenta en una propuesta comercial, los artefactos deben cumplir
+roles distintos y aparecer en este orden:
+
+1. **AEO Grader = diagnóstico.** Expone la línea base y las brechas del cliente.
+   Nunca inventes un score, una cita o un resultado; si no se ejecutó el diagnóstico,
+   etiqueta la vista como conceptual.
+2. **X-Ray = demostración de recuperabilidad.** Descompone una página o solución en
+   intención, entidad, estructura, answer capsules, schema, evidencia y CTA. Demuestra
+   cómo se vuelve recuperable y accionable; no reemplaza una auditoría live.
+3. **Greenhouse = operación mensual.** Conecta backlog, páginas, contenidos, visibilidad
+   orgánica/AEO y conversiones (cotización, formulario o agendamiento) en un ciclo de
+   medición, aprendizaje y siguiente acción.
+
+La narrativa mínima es **diagnosticar → demostrar → operar → medir conversión**. No
+introduzcas estos artefactos como una galería de herramientas desconectadas.
+
 **Regla de honestidad de datos:** si no puedes medir algo (no hay GSC, no hay
 herramienta SoV), dilo explícito y marca el dato como *estimado*. Nunca presentes
 una estimación como medición.

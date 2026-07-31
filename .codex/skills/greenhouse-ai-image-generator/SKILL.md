@@ -57,6 +57,10 @@ pnpm ai:image --batch concepts.json         # [{ "filename": "a.png", "prompt": 
 - Defaults: `gpt-image-2 · 1536x1024 · quality high · opaque · out-dir public/images/generated`. Timeout default **280s** (gpt-image-2 `high` exceeds the 125s of the runtime `generateImage` helper).
 - `--background transparent` falls back to `gpt-image-1.5` (gpt-image-2 has no alpha). Still **raster** (PNG) — for real vectors use Higgsfield + Recraft V4.1 (fal slug verified live 2026-07-19: `fal-ai/recraft/v4.1/text-to-vector`, text-driven, carries the `fal-ai/` prefix).
 - The CLI **operates** the model; THIS skill is the **art direction** (brief, composition, finish, palette, QA). Run the skill to write the prompt, then the CLI to generate, then critique + GVC if it lands in UI.
+- For a slide-integrated, extractable asset, generate on a **uniform studio background**
+  (not a baked checkerboard), then run `pnpm ai:image:rmbg` and inspect the resulting
+  alpha at original size and on the destination slide. This reduces matting halos and
+  keeps the asset reusable across layouts.
 - Keep exploratory concepts out of commits (gitignored dir, e.g. `.captures/concepts/`).
 
 ## Reference edit + character consistency (`--image`)
@@ -219,6 +223,9 @@ deterministic and are composed after any generative finish.
 6. For a Creative Studio run, obtain the governed estimate/reservation/approval; then generate through the
    canonical capability route. For a repo-bound Greenhouse asset outside Globe, use the canonical helper.
 7. Critique the result like production design: small-size readability, crop, alpha edge, material believability, brand fit, and integration fit.
+   When the image contains channel iconography or marks, inspect every light/white
+   interior (for example the LinkedIn “in” and YouTube play) after matting; a clean
+   silhouette with erased logo details is a failed asset.
 8. Refine with single-change follow-ups; restate invariants on every edit. In multi-model flows,
    carry `anchor_id`, parent asset, reference roles, precedence, locks, one delta, safe zones and
    acceptance criteria at every handoff; derive every ratio from the approved anchor using star topology,
@@ -243,6 +250,10 @@ deterministic and are composed after any generative finish.
   family in deterministic post; use Seedance 2.0 only for a genuinely new shot/action/continuity need,
   never to repair timing, crop, copy/logo, grade, foley or other editing defects.
 - Do not ship assets with watermarks, fake logos, accidental letters, cropped subjects, dirty alpha edges, or background residue.
+- Do not accept a full-bleed scene or dashboard collage when the brief requires an
+  extractable slide asset. Prefer one clear visual thesis, a clean plate/alpha channel,
+  and deterministic placement inside the deck. Preserve white logo details during
+  background removal; if a logo must be exact, use the real vector asset in composition.
 - For hands or culturally meaningful gestures, validate topology rather than silhouette: identify palm/dorso,
   locate the thumb/radial side, trace every digit from base to tip and inspect offensive/alternative readings at
   original resolution and thumbnail. A mirrored crop invalidates the previous approval. If text-only prompting

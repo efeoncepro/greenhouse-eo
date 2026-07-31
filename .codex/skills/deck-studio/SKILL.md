@@ -261,6 +261,58 @@ estiman/reservan/liquidan en Creative Studio. Reutilizar un anchor aprobado o de
 Derechos de stock, talento, música, likeness y licencias se cotizan aparte. Canon:
 `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md`.
 
+### Patrón reusable: segunda licitación con Artifact Composer — Brightcell
+
+Brightcell dejó un patrón de producción reusable para una segunda licitación armada con el
+Artifact Composer y el catálogo de plantillas. No es una secuencia de herramientas agregadas por
+decoración: cada lámina debe avanzar el argumento y mostrar cómo la capacidad se convierte en
+resultado para el cliente.
+
+#### Método paso a paso
+
+1. **Fijar el arquetipo y la tesis.** Confirmar que la propuesta se leerá sin narrador, escribir la
+   única frase gobernante y ordenar la historia según la decisión del comité. La lámina debe poder
+   defenderse sola.
+2. **Traducir la oferta a una cadena de evidencia.** Para capacidades de crecimiento, usar la
+   secuencia `diagnóstico → intervención → operación`: primero se mide la visibilidad y la brecha,
+   luego se muestra qué se corrige en una página o activo, y finalmente cómo se gobierna el trabajo
+   mes a mes.
+3. **Asignar una plantilla por función argumental.** Elegir desde el catálogo cerrado. No introducir
+   una herramienta, un mockup o una lámina de equipo si no responde a una pregunta de la licitación.
+4. **Hacer visibles las capacidades sin convertirlas en inventario.** `ToolStackFull` responde con
+   qué stack se ejecuta la propuesta y `TeamGalleryFull` responde quién la ejecuta y con qué rol.
+   Ambos deben aparecer después de explicar el método y antes del cierre operativo, cuando reducen
+   riesgo de ejecución. No deben funcionar como páginas aisladas de credenciales.
+5. **Usar mockups conceptuales con honestidad.** Un AEO Grader, X-Ray, dashboard de operación o
+   pipeline se presenta como `vista conceptual`, `ejemplo de lectura` o caption equivalente mientras
+   no existan datos reales del cliente. El mockup debe demostrar el flujo de decisión, no inventar
+   scores, resultados, métricas ni testimonios.
+6. **Conectar cada evidencia con la conversión.** El diagnóstico debe llevar a la intervención; la
+   intervención debe llevar a una operación medible; y la operación debe conectar con el CTA del
+   cliente (cotización, agendamiento, formulario o conversación comercial).
+7. **Componer y auditar visualmente.** Ejecutar el Composer, inspeccionar todos los frames y revisar
+   especialmente titulares, recortes, captions, legibilidad de mockups, jerarquía y consistencia de
+   assets. Los tests son piso técnico, no aprobación visual.
+8. **Proteger trabajos previos.** Componer Brightcell en un output y workspace propios, no editar el
+   plan, assets, PDFs ni capturas de SKY para reutilizarlos. Antes del cierre, revisar `git diff` y
+   confirmar que el deck anterior conserva sus archivos y que los nuevos assets están referenciados
+   sólo por el plan del nuevo deal.
+
+#### Secuencia narrativa recomendada
+
+Para una propuesta que combina SEO/AEO, contenido y social media:
+
+`problema del cliente → sistema propuesto → stack y equipo → diagnóstico → intervención →
+operación mensual → conversión y medición → cierre seguro`.
+
+En particular, las láminas de AEO Grader, X-Ray y dashboard no deben aparecer como demos de producto
+sueltas. Deben leerse como tres momentos de una misma promesa: **entender cómo el cliente es
+encontrado, corregir cómo es comprendido y operar cómo convierte**.
+
+Este patrón fue validado por la segunda licitación de referencia, Brightcell, después del primer
+deck producido con el Composer para SKY. La referencia sirve para repetir el método, no para copiar
+datos, branding, screenshots, equipo, métricas ni assets entre propuestas.
+
 ---
 
 ## Router — qué cargar según lo que estés haciendo

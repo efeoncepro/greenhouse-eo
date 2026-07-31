@@ -1,5 +1,13 @@
 # Handoff activo
 
+## Brightcell — continuidad de la segunda licitación con Artifact Composer (2026-07-31)
+
+- Brightcell es el segundo deck de licitación producido con Artifact Composer y plantillas cerradas; SKY Blog 2026 es el primer caso de referencia.
+- El método consolidado es: `intake/evidencia → narrativa → deck-plan → assets/mockups → composición → auditoría visual → validación`.
+- La narrativa SEO/AEO usa `AEO Grader → X-Ray → Greenhouse` como diagnóstico, intervención y operación mensual; los mockups siguen rotulados como conceptuales hasta contar con runs o URLs reales.
+- El deck Brightcell vive en `docs/commercial/tenders/brightcell-lic-95/` y sus salidas compuestas en `.captures/brightcell-bid-v13/`; SKY no fue sustituida.
+- Las skills actualizadas son `deck-studio`, `seo-aeo`, `design-studio` y `greenhouse-ai-image-generator`; revisar sus patrones antes de iniciar la tercera licitación.
+
 ## TASK-1613 — modo claro de Globe con interruptor (2026-07-31, complete)
 
 Interruptor de apariencia en el menú de cuenta del Producer. Habilitado por `TASK-1612`: desde que el

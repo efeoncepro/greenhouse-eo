@@ -188,6 +188,18 @@ estética): `cover` · `agenda` · `statement` · `highlight` · `one-metric` ·
 `greenhouse-public-private-tenders` → `deck-visual-system.md` + el `registry.json`
 del catálogo.)
 
+### Regla de artefactos y mockups
+
+La oferta debe distinguir entre una capacidad que se muestra y un resultado que ya fue medido. Un Grader,
+X-Ray o dashboard usado para explicar la metodología puede ser un mockup conceptual dentro del deck; debe
+rotularse como tal y no incluir cifras ficticias presentadas como evidencia. Una Radiografía, un informe del
+Grader o un dashboard navegable se trata como artefacto vivo: se registra con URL, `as_of`, procedencia,
+audiencia y `render: "by_link"` en `artifact-manifest.json`.
+
+Antes de cerrar el PDF, audita la composición completa: continuidad de la narrativa, legibilidad, safe areas,
+logos, alpha de assets extraíbles, fotos reales del equipo, claims, cifras y enlaces. El composer materializa
+la fuente; no reemplaza la revisión humana.
+
 ---
 
 ## Reglas duras (para el que llene esta plantilla)

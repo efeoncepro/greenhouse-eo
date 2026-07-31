@@ -1,0 +1,421 @@
+{
+  "_readme": [
+    "Deck técnico de Brightcell Logistics Chile — LIC-95 / Wherex.",
+    "Segundo caso de licitación construido con Artifact Composer y plantillas cerradas; SKY Blog 2026 fue el primer caso.",
+    "Fuente narrativa: oferta-tecnica.md. Este plan es una proyección independiente y auditable.",
+    "No contiene precios ni material interno. Las referencias BC-E* corresponden al ledger de evidencia.",
+    "La secuencia de construcción fue intake/evidencia → narrativa → plan → assets/mockups → composición → auditoría visual → validación.",
+    "Grader, X-Ray y Greenhouse se presentan como mockups conceptuales mientras no exista un run real de Brightcell; no son resultados.",
+    "Componer: pnpm deck:compose docs/commercial/tenders/brightcell-lic-95/deck-plan.json --out .captures/brightcell-bid"
+  ],
+  "tenderId": "BRIGHTCELL-LIC-95-TECHNICAL",
+  "slides": [
+    {
+      "slideId": "portada",
+      "contentType": "cover",
+      "template": "CoverFull",
+      "slots": {
+        "clientLogo": { "src": "assets/clients/brightcell.svg" },
+        "proposalKind": "technical"
+      }
+    },
+    {
+      "slideId": "agenda",
+      "contentType": "agenda",
+      "template": "AgendaFull",
+      "slots": {
+        "sectionLabel": "LO QUE VAMOS A REVISAR",
+        "title": "Agenda",
+        "deckMeta": "<b>6</b> capítulos · propuesta técnica",
+        "chapters": [
+          { "number": "01", "title": "El desafío", "description": "De presencia regional a capacidad local", "targetSlideId": "desafio" },
+          { "number": "02", "title": "La solución", "description": "Web, contenido y conversión B2B", "targetSlideId": "solucion" },
+          { "number": "03", "title": "El sistema", "description": "Web, RRSS, SEO/AEO y conversión B2B", "targetSlideId": "sistema" },
+          { "number": "04", "title": "El plan", "description": "Metodología, fases y roadmap", "targetSlideId": "metodologia" },
+          { "number": "05", "title": "La operación", "description": "Medición, gobernanza y continuidad", "targetSlideId": "medicion" },
+          { "number": "06", "title": "El alcance", "description": "Qué incluye y cómo evoluciona", "targetSlideId": "alcance" }
+        ],
+        "footerLabel": "Propuesta técnica · Brightcell Chile"
+      }
+    },
+    {
+      "slideId": "desafio",
+      "contentType": "narrative",
+      "template": "NarrativeSplit",
+      "slots": {
+        "sectionLabel": "EL DESAFÍO",
+        "title": "Brightcell Chile necesita una <em>puerta de entrada comercial local</em>",
+        "body": [
+          "<b>La página no debe ser una réplica aislada del sitio regional.</b> Debe conservar la confianza de Brightcell y traducir sus capacidades a las decisiones de un comprador chileno.",
+          "<b>La primera etapa debe ser simple de lanzar y preparada para crecer.</b> El objetivo es generar contactos medibles sin imponer desde el inicio un e-commerce o una automatización compleja."
+        ],
+        "closing": "De presencia regional a <span class='ac'>capacidad comercial local</span>.",
+        "conceptLabel": "LA TESIS",
+        "conceptTitle": "Marca, demanda y seguimiento",
+        "conceptLegend": [
+          { "layer": "Marca", "definition": "Continuidad regional con relevancia local", "tone": "outer" },
+          { "layer": "Demanda", "definition": "Servicios y contenidos que responden", "tone": "middle" },
+          { "layer": "Acción", "definition": "Contacto comercial medible y trazable", "tone": "core" }
+        ]
+      }
+    },
+    {
+      "slideId": "solucion",
+      "contentType": "dual-list",
+      "template": "DualListSplit",
+      "slots": {
+        "leftEyebrow": "LO QUE BRIGHTCELL NECESITA",
+        "leftTitle": "Una experiencia B2B clara para una oferta amplia",
+        "leftItems": [
+          { "lead": "Coherencia regional", "body": "Mantener el sistema visual y la confianza de Brightcell." },
+          { "lead": "Relevancia chilena", "body": "Hablar desde las prioridades y capacidades disponibles en Chile." },
+          { "lead": "Jerarquía comercial", "body": "Ordenar servicios e industrias según valor y demanda." },
+          { "lead": "Contacto útil", "body": "Convertir interés en una conversación comercial medible." }
+        ],
+        "rightEyebrow": "LO QUE EFEONCE CONSTRUYE",
+        "rightTitle": "Una primera plataforma preparada para evolucionar",
+        "rightItems": [
+          { "lead": "Web administrable", "body": "Una base simple de operar y extensible por fases." },
+          { "lead": "Contenido y SEO", "body": "Mensajes, arquitectura y fundamentos de búsqueda desde el inicio." },
+          { "lead": "HubSpot Suite Starter + AEO", "body": "Una base comercial inicial para registrar, clasificar y hacer visible cada contacto." },
+          { "lead": "Medición continua", "body": "Datos para decidir qué servicio, canal o contenido desarrollar después." }
+        ]
+      }
+    },
+    {
+      "slideId": "prioridades",
+      "contentType": "capabilities-grid",
+      "template": "CardGridFull",
+      "slots": {
+        "eyebrow": "PRIORIDAD COMERCIAL",
+        "headline": "La experiencia debe poner primero lo que <em>más valor concentra</em>",
+        "intro": "La arquitectura inicial prioriza los servicios y sectores informados por Brightcell para Chile.",
+        "highlight": "No se presenta todo con el mismo peso: la navegación debe ayudar a decidir <em>qué solución corresponde</em>.",
+        "panelQuestion": "¿Qué debe entender el comprador primero?",
+        "capabilities": [
+          { "kind": "governance", "title": "3PL y almacenaje", "description": "Control, inventario y operación integral como puerta de entrada." },
+          { "kind": "authoring", "title": "Valor agregado", "description": "Kitting, empaquetado, etiquetado y servicios que agregan precisión." },
+          { "kind": "data", "title": "Transporte B2B", "description": "Distribución orientada a continuidad y trazabilidad." },
+          { "kind": "conversation", "title": "Última milla B2C", "description": "Una capacidad complementaria, presentada con el peso adecuado." },
+          { "kind": "search", "title": "Hi Tech y telecom", "description": "Industrias foco para organizar mensajes y contenidos." }
+        ]
+      }
+    },
+    {
+      "slideId": "conversion",
+      "contentType": "process-sequential",
+      "template": "ProcessStepsFull",
+      "slots": {
+        "sectionLabel": "EL SISTEMA DE CONVERSIÓN",
+        "title": "El interés se convierte en contacto <em>sin complejidad innecesaria</em>",
+        "steps": [
+          { "title": "Atraer", "description": "SEO, AEO, contenidos y redes sociales responden las preguntas de compradores B2B.", "deliverable": "Demanda y señales identificables" },
+          { "title": "Orientar", "description": "La página organiza servicios, industrias y problemas para que el visitante encuentre su ruta.", "deliverable": "Experiencia y CTA diferenciados" },
+          { "title": "Contactar", "description": "El usuario solicita asesoría o información por correo o formulario breve.", "deliverable": "Contacto comercial recibido" },
+          { "title": "Dar seguimiento", "description": "El responsable recibe, clasifica y trabaja el contacto con una trazabilidad inicial.", "deliverable": "Pipeline y siguiente acción" }
+        ]
+      }
+    },
+    {
+      "slideId": "wireframe",
+      "contentType": "artifact-showcase",
+      "template": "ArtifactShowcaseFull",
+      "slots": {
+        "sectionLabel": "LA EXPERIENCIA PROPUESTA",
+        "title": "La landing debe hacer visible <em>la ruta comercial</em>",
+        "lead": "El wireframe convierte la estrategia en una primera experiencia concreta: propuesta local, servicios prioritarios, confianza y contacto.",
+        "artifact": { "src": "assets/brightcell/landing-wireframe.svg" },
+        "caption": "Wireframe conceptual · arquitectura y contenido sujetos a validación de Brightcell",
+        "note": "Vista de trabajo · no es diseño final"
+      }
+    },
+    {
+      "slideId": "sistema",
+      "contentType": "dual-text",
+      "template": "DualTextSplit",
+      "slots": {
+        "title": "La demanda y el seguimiento se diseñan como un mismo sistema",
+        "leftConcept": {
+          "label": "VISIBILIDAD Y CONFIANZA",
+          "title": "SEO, AEO y redes preparan la conversación",
+          "paragraphs": [
+            "<strong>SEO</strong> captura búsquedas existentes sobre servicios y problemas logísticos.",
+            "<strong>AEO y redes sociales</strong> ayudan a que Brightcell sea comprendida, recordada y considerada antes del contacto."
+          ],
+          "icon": "search"
+        },
+        "rightConcept": {
+          "label": "TRAZABILIDAD COMERCIAL",
+          "title": "La Web y HubSpot ordenan lo que ocurre después",
+          "paragraphs": [
+            "La página convierte interés en <strong>correo o formulario</strong> con fuente y servicio de interés.",
+            "La combinación de <strong>HubSpot Suite Starter + AEO</strong> registra, clasifica y hace visible el <strong>avance del contacto</strong> sin convertir la primera fase en un CRM complejo."
+          ],
+          "icon": "data"
+        },
+        "outcome": { "label": "LA JUGADA", "text": "Cada canal cumple una función y el contacto termina en una <strong>acción visible</strong>." }
+      }
+    },
+    {
+      "slideId": "hubspot",
+      "contentType": "artifact-showcase",
+      "template": "ArtifactShowcaseFull",
+      "slots": {
+        "sectionLabel": "TRAZABILIDAD COMERCIAL",
+        "title": "HubSpot ordena el contacto <em>después de la conversión</em>",
+        "lead": "HubSpot Suite Starter + AEO pueden registrar fuente, servicio de interés y siguiente acción sin volver compleja la primera fase.",
+        "artifact": { "src": "assets/brightcell/hubspot-pipeline.svg" },
+        "caption": "Mockup conceptual · Suite Starter + AEO · sin datos reales",
+        "note": "Modelo propuesto · estados se validan con Brightcell"
+      }
+    },
+    {
+      "slideId": "metodologia",
+      "contentType": "four-pillars",
+      "template": "FourPillarsFull",
+      "slots": {
+        "sectionLabel": "LA METODOLOGÍA",
+        "title": "Cuatro frentes que se sostienen <em>entre sí</em>",
+        "context": [
+          "No proponemos una página aislada: proponemos una capacidad comercial que se puede operar y mejorar.",
+          "Cada frente deja una decisión, un entregable y una señal para el siguiente ciclo."
+        ],
+        "thesis": "La evolución se vuelve segura cuando <em>el alcance y la evidencia</em> guían cada decisión.",
+        "pillars": [
+          { "kind": "method", "title": "Entender primero", "body": "Capacidades Chile, audiencias, claims y plataforma.", "detail": "El descubrimiento evita prometer servicios que no están validados." },
+          { "kind": "human", "title": "Construir con Brightcell", "body": "Copy, diseño y desarrollo sobre aprobaciones claras.", "detail": "Brightcell mantiene control sobre la exactitud de su operación y su marca." },
+          { "kind": "data", "title": "Medir desde el día uno", "body": "Eventos, fuentes, contactos y señales de demanda.", "detail": "La primera versión deja una base verificable para optimizar." },
+          { "kind": "ai", "title": "Evolucionar por evidencia", "body": "SEO, AEO, contenidos, redes y nuevas capacidades.", "detail": "El siguiente módulo se decide cuando existe una necesidad comercial clara." }
+        ]
+      }
+    },
+    {
+      "slideId": "stack-operativo",
+      "contentType": "tool-stack",
+      "template": "ToolStackFull",
+      "slots": {
+        "sectionLabel": "STACK OPERATIVO",
+        "title": "Un sistema para producir, revisar y <em>optimizar contenido</em>",
+        "badge": "Capacidades incluidas",
+        "lead": "Cada plataforma entra en una etapa concreta del ciclo, con trazabilidad, licencias y control humano de punta a punta.",
+        "stages": [
+          { "stage": "Planificar", "outcome": "Brief, calendario, responsables y conversaciones quedan visibles desde el inicio.", "tools": [{ "tool": "microsoft-365", "name": "Microsoft 365" }] },
+          { "stage": "Investigar", "outcome": "KW mining, auditoría técnica y señales AEO sostienen cada decisión.", "tools": [{ "tool": "semrush", "name": "Semrush" }, { "tool": "ahrefs", "name": "Ahrefs" }, { "tool": "screaming-frog", "name": "Screaming Frog" }, { "tool": "brand-visibility-grader", "name": "Brand Visibility Grader" }] },
+          { "stage": "Producir", "outcome": "Texto, diseño y piezas derivadas avanzan sobre una misma ruta de contenido.", "tools": [{ "tool": "adobe-illustrator", "name": "Illustrator" }, { "tool": "adobe-photoshop", "name": "Photoshop" }, { "tool": "adobe-premiere-pro", "name": "Premiere Pro" }, { "tool": "adobe-after-effects", "name": "After Effects" }, { "tool": "adobe-express", "name": "Adobe Express" }] },
+          { "stage": "Enriquecer", "outcome": "Exploración visual y mejoras asistidas amplían el territorio creativo sin perder marca.", "tools": [{ "tool": "adobe-firefly", "name": "Adobe Firefly" }, { "tool": "higgsfield", "name": "Higgsfield" }, { "tool": "magnific", "name": "Magnific" }] },
+          { "stage": "Revisar", "outcome": "Versiones, comentarios y mejoras se cierran antes de publicar y aprender.", "tools": [{ "tool": "frameio", "name": "Frame.io" }] }
+        ],
+        "supportLayer": {
+          "label": "Capa transversal",
+          "summary": "Comentarios, aprobaciones, licencias y fuentes aprobadas se mantienen trazables entre brief, contenido y assets.",
+          "tools": [{ "tool": "notion", "name": "Notion" }, { "tool": "microsoft-teams", "name": "Teams" }, { "tool": "slack", "name": "Slack" }, { "tool": "shutterstock", "name": "Shutterstock" }, { "tool": "adobe-stock", "name": "Adobe Stock" }, { "tool": "envato-elements", "name": "Envato Elements" }]
+        },
+        "footerNote": "Cada herramienta se activa según alcance, licencias y fuentes aprobadas; el criterio humano gobierna el ciclo."
+      }
+    },
+    {
+      "slideId": "seo-aeo-social",
+      "contentType": "bullet-list",
+      "template": "BulletListSplit",
+      "slots": {
+        "brandTitle": "Social Media mensual",
+        "bullets": [
+          { "lead": "Pilares de autoridad", "description": "Operación, especialización sectorial, prueba y conversación comercial." },
+          { "lead": "Plan editorial", "description": "Temas, formatos, CTA, responsables y materiales requeridos." },
+          { "lead": "LinkedIn como canal B2B", "description": "Capacidades y aprendizajes para decisores, aliados y cuentas objetivo." },
+          { "lead": "YouTube e Instagram", "description": "Evidencia operacional y confianza visual cuando exista material aprobado." },
+          { "lead": "Escucha y comunidad", "description": "Preguntas y objeciones que alimentan la web, SEO/AEO y ventas." },
+          { "lead": "Medición mensual", "description": "Interacciones útiles, visitas, clics y señales de conversación comercial." }
+        ]
+      }
+    },
+    {
+      "slideId": "seo-aeo",
+      "contentType": "dual-text",
+      "template": "DualTextSplit",
+      "slots": {
+        "title": "SEO y AEO convierten preguntas en demanda comprensible",
+        "leftConcept": {
+          "label": "SEO · BUSCADORES",
+          "title": "Capturar demanda existente",
+          "paragraphs": [
+            "Analizamos consultas, páginas y conversiones para priorizar mejoras en arquitectura, contenidos, enlazado y rendimiento.",
+            "El trabajo busca que el comprador encuentre la solución correcta y llegue a una página preparada para convertir."
+          ],
+          "icon": "search"
+        },
+        "rightConcept": {
+          "label": "AEO · MOTORES DE RESPUESTA",
+          "title": "Mejorar comprensión y citabilidad",
+          "paragraphs": [
+            "Ordenamos entidades, servicios, industrias, preguntas y evidencias para que Brightcell sea comprendida con claridad.",
+            "Monitoreamos señales de visibilidad y recomendamos qué contenido o autoridad reforzar, sin prometer citaciones."
+          ],
+          "icon": "ai"
+        },
+        "outcome": { "label": "EL CIRCUITO", "text": "RRSS descubre; SEO/AEO ordenan; la web conduce a <strong>cotización o conversación</strong>." }
+      }
+    },
+    {
+      "slideId": "aeo-baseline",
+      "contentType": "artifact-showcase",
+      "template": "ArtifactShowcaseFull",
+      "slots": {
+        "sectionLabel": "SEO/AEO · DIAGNÓSTICO",
+        "title": "Primero medimos qué entiende la <em>IA</em>",
+        "lead": "El AEO Grader establece una línea base de entidad, categoría, servicios, cobertura y capacidad de acción antes de recomendar cambios.",
+        "artifact": { "src": "assets/brightcell/aeo-grader-mockup.svg" },
+        "caption": "Mockup conceptual · diagnóstico inicial de Brightcell · sin datos reales",
+        "note": "AEO Grader · línea base y brechas"
+      }
+    },
+    {
+      "slideId": "seo-aeo-xray",
+      "contentType": "artifact-showcase",
+      "template": "ArtifactShowcaseFull",
+      "slots": {
+        "sectionLabel": "SEO/AEO · INTERVENCIÓN",
+        "title": "Cada página deja una <em>evidencia</em> comprobable",
+        "lead": "El X-Ray muestra cómo una página de solución responde al comprador, conecta entidad y servicio, y conduce a cotización o agendamiento.",
+        "artifact": { "src": "assets/brightcell/page-xray-mockup.svg" },
+        "caption": "Mockup conceptual · X-Ray de una página de solución Brightcell",
+        "note": "X-Ray · contenido, estructura y CTA"
+      }
+    },
+    {
+      "slideId": "seo-aeo-dashboard",
+      "contentType": "artifact-showcase",
+      "template": "ArtifactShowcaseFull",
+      "slots": {
+        "sectionLabel": "SEO/AEO · OPERACIÓN MENSUAL",
+        "title": "La mejora queda visible, no encerrada en un <em>informe</em>",
+        "lead": "Greenhouse conecta visibilidad SEO, citabilidad, contenidos y conversiones para que Brightcell vea qué cambió y cuál es la siguiente acción.",
+        "artifact": { "src": "assets/product/greenhouse-seo-dashboard.png" },
+        "caption": "Vista conceptual del dashboard · cifras ilustrativas · se poblaría con datos de Brightcell",
+        "note": "Greenhouse · operación mensual propuesta"
+      }
+    },
+    {
+      "slideId": "social-visual",
+      "contentType": "narrative",
+      "template": "NarrativeSplit",
+      "slots": {
+        "sectionLabel": "SOCIAL MEDIA · LA IDEA",
+        "title": "Una operación. Tres formas de entrar en la <em>conversación</em>",
+        "body": [
+          "<b>La operación de Brightcell es la fuente del contenido.</b> LinkedIn construye autoridad sobre capacidades y problemas B2B.",
+          "<b>YouTube demuestra.</b> Instagram humaniza. Los tres canales llevan la conversación hacia la web, la cotización y el contacto comercial."
+        ],
+        "closing": "De la operación a la conversación <span class='ac'>comercial.</span>",
+        "conceptLabel": "EL SISTEMA",
+        "conceptTitle": "Autoridad visible",
+        "conceptLegend": [
+          { "layer": "LinkedIn", "definition": "autoridad B2B", "tone": "outer" },
+          { "layer": "YouTube", "definition": "evidencia operacional", "tone": "middle" },
+          { "layer": "Instagram", "definition": "confianza visual", "tone": "core" }
+        ],
+        "heroAsset": { "src": "assets/brightcell/social-operations-hero.png", "alt": "Ejecutivo de operaciones con un paquete trazable y emblemas tridimensionales de LinkedIn, YouTube e Instagram conectados por una ruta visual" }
+      }
+    },
+    {
+      "slideId": "equipo",
+      "contentType": "team-gallery",
+      "template": "TeamGalleryFull",
+      "slots": {
+        "sectionLabel": "EL EQUIPO",
+        "title": "Las personas que <em>responden</em> por Brightcell",
+        "rosterMeta": "Squad propuesto · dedicación",
+        "members": [
+          { "photo": "julio", "name": "Julio", "role": "Account & SEO Strategist", "dedication": "12%" },
+          { "photo": "andres", "name": "Andrés", "role": "AI Developer", "dedication": "25%" },
+          { "photo": "daniela", "name": "Daniela", "role": "Directora de Arte", "dedication": "12%" },
+          { "photo": "maria-fernanda", "name": "María Fernanda", "role": "Social Media Manager", "dedication": "50%" }
+        ]
+      }
+    },
+    {
+      "slideId": "medicion",
+      "contentType": "requirements-table",
+      "template": "RequirementsTableFull",
+      "slots": {
+        "sectionLabel": "MEDICIÓN Y GOBERNANZA",
+        "title": "Cada contacto tiene fuente, estado y <em>siguiente acción</em>",
+        "summary": { "value": "4 capas", "label": "De la visita a la oportunidad", "detail": "Responsables y estados se acuerdan con Brightcell." },
+        "requirements": [
+          { "kind": "excluyente", "requirement": "Contacto recibido", "evidence": "Correo o formulario con evento de conversión", "status": "cubierto" },
+          { "kind": "puntúa", "requirement": "Fuente y campaña identificadas", "evidence": "UTM, canal, contenido y servicio de interés", "status": "cubierto" },
+          { "kind": "puntúa", "requirement": "Lead calificado · validación conjunta", "evidence": "Servicio, industria y necesidad atendible; definición acordada con Brightcell", "status": "en-revisión" },
+          { "kind": "puntúa", "requirement": "Oportunidad comercial · validación conjunta", "evidence": "Estado y criterios definidos con el proceso comercial de Brightcell", "status": "en-revisión" }
+        ]
+      }
+    },
+    {
+      "slideId": "roadmap",
+      "contentType": "timeline",
+      "template": "TimelineFull",
+      "slots": {
+        "sectionLabel": "ROADMAP PRELIMINAR",
+        "title": "Lanzar con control y <em>aprender desde el primer ciclo</em>",
+        "meta": "Siguiente paso: validar alcance, accesos, responsables y fecha de inicio.",
+        "timeUnit": "month",
+        "timeAxis": ["Descubrir", "Construir", "Lanzar", "Optimizar"],
+        "milestones": [
+          { "at": 1, "label": "Brief aprobado", "caption": "Fase 1" },
+          { "at": 3, "label": "Página publicada", "caption": "Fase 3" },
+          { "at": 4, "label": "Primer backlog", "caption": "Fase 4" }
+        ],
+        "phases": [
+          { "kind": "work", "startUnit": 1, "endUnit": 1, "title": "Descubrimiento", "description": "Capacidades, claims, arquitectura y medición.", "barLabel": "Definir antes de construir" },
+          { "kind": "work", "startUnit": 2, "endUnit": 2, "title": "Construcción", "description": "Copy, diseño, desarrollo y SEO inicial.", "barLabel": "Convertir el brief en experiencia" },
+          { "kind": "work", "startUnit": 3, "endUnit": 3, "title": "Lanzamiento", "description": "QA, publicación, eventos y transferencia.", "barLabel": "Publicar con evidencia" },
+          { "kind": "continuous", "startUnit": 4, "endUnit": 4, "title": "Optimización", "description": "Contactos, búsquedas, contenido y señales AEO.", "barLabel": "Decidir el siguiente ciclo" }
+        ]
+      }
+    },
+    {
+      "slideId": "alcance",
+      "contentType": "comparison",
+      "template": "ComparisonSplit",
+      "slots": {
+        "leftTitle": "La primera etapa debe resolver lo esencial",
+        "rightTitle": "La evolución se activa cuando exista evidencia",
+        "rows": [
+          { "left": { "lead": "Página comercial Chile", "body": "Arquitectura, contenido, diseño, desarrollo, SEO y conversión." }, "right": { "lead": "Páginas por servicio o industria", "body": "Se agregan cuando una solución demuestra demanda o requiere profundidad." } },
+          { "left": { "lead": "Contacto por correo o formulario", "body": "La primera conversión no necesita una integración compleja." }, "right": { "lead": "Automatización y nurturing", "body": "Se incorporan cuando el volumen y el proceso comercial lo justifican." } },
+          { "left": { "lead": "Base administrable y extensible", "body": "La plataforma permite operar Chile con autonomía." }, "right": { "lead": "Catálogo o venta de equipos", "body": "Requiere definir inventario, precios, despacho, pagos y ownership." } },
+          { "left": { "lead": "Medición desde el lanzamiento", "body": "Eventos, fuentes, contactos y aprendizajes quedan visibles." }, "right": { "lead": "Operación mensual", "body": "SEO/AEO, Social Media y optimización se contratan como continuidad." } }
+        ]
+      }
+    },
+    {
+      "slideId": "seguridad",
+      "contentType": "dual-list",
+      "template": "DualListSplit",
+      "slots": {
+        "leftEyebrow": "RIESGOS QUE CONTROLAMOS",
+        "leftTitle": "La propuesta no oculta las decisiones pendientes",
+        "leftItems": [
+          { "lead": "Claims no validados", "body": "Matriz de servicios, cifras, clientes y capacidades aprobadas." },
+          { "lead": "Crecimiento de alcance", "body": "Fases, opciones, exclusiones y control de cambios." },
+          { "lead": "Lead sin responsable", "body": "Correo, owner, estados y siguiente acción definidos." },
+          { "lead": "E-commerce prematuro", "body": "Catálogo, pagos e inventario quedan como evolución." }
+        ],
+        "rightEyebrow": "POR QUÉ EFEONCE",
+        "rightTitle": "Un solo ownership para estrategia y operación",
+        "rightItems": [
+          { "lead": "Entendemos el negocio", "body": "Traducimos logística, servicios y sectores a una experiencia B2B." },
+          { "lead": "Integramos disciplinas", "body": "Estrategia, contenido, diseño, desarrollo, SEO/AEO y medición." },
+          { "lead": "Trabajamos con evidencia", "body": "La mejora mensual parte de señales, no de publicaciones aisladas." },
+          { "lead": "Dejamos capacidad instalada", "body": "Documentación, medición y una base preparada para crecer." },
+          { "lead": "Siguiente paso claro", "body": "Validar alcance, responsables, accesos y fecha objetivo para comenzar." }
+        ]
+      }
+    },
+    {
+      "slideId": "cierre",
+      "contentType": "back-cover",
+      "template": "BackCoverFull",
+      "slots": {}
+    }
+  ]
+}

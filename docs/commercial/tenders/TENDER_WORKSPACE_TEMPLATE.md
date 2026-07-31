@@ -76,6 +76,46 @@ deck-plan.json  →  pnpm deck:compose  →  PDF
 registrar como Proposal en el Studio  →  adjuntar salidas (versionadas)  →  portal /admin/commercial/proposals
 ```
 
+## Flujo de construcción con Artifact Composer
+
+Cuando la licitación requiere una presentación, el workspace debe conservar esta secuencia auditable:
+
+```text
+intake + evidencia
+      ↓
+taxonomía del desafío y audiencia
+      ↓
+narrativa de la oferta técnica
+      ↓
+deck-plan.json (intención y slots)
+      ↓
+assets / mockups / artefactos vivos
+      ↓
+pnpm deck:compose
+      ↓
+auditoría visual sobre el PDF
+      ↓
+pruebas, consistencia oferta↔deck↔económica y cierre humano
+```
+
+La plantilla se selecciona por intención (`contentType`), no por gusto visual. El deck es una proyección
+de la oferta técnica: cada lámina debe responder una pregunta del comprador y dejar claro qué es evidencia,
+qué es un mockup conceptual y qué es una pieza viva.
+
+### Audiencia de los artefactos
+
+- **Artefacto vivo:** Radiografía AEO, informe ejecutado del Grader o dashboard navegable. Tiene URL,
+  procedencia y fecha; se referencia por enlace mediante `artifact-manifest.json`.
+- **Mockup conceptual:** representación de cómo funcionará una herramienta o dashboard para el cliente.
+  Es un asset del deck, no evidencia de resultados; debe rotularse como conceptual y no mostrar cifras
+  ficticias como si fueran mediciones.
+- **Asset de composición:** imagen, logo, wireframe o ilustración que explica la propuesta. Se inspecciona
+  sobre el fondo real y se verifica su transparencia, bordes y legibilidad.
+
+La auditoría visual es obligatoria: revisa la salida PDF completa, no solo el JSON. Debe comprobar jerarquía,
+continuidad narrativa, safe areas, legibilidad, logos, alpha, fotos reales del equipo, claims y enlaces.
+La salida del composer nunca sustituye la revisión humana.
+
 ## La oferta económica en Excel (brandeada, no a mano)
 
 Hay clientes que **exigen Excel** (documento integrante de las bases). El `.xlsx` **no se mantiene a
