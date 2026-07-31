@@ -1700,12 +1700,17 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-1584` | `to-do` | **Globe Credit Admin: firma asimétrica KMS + identidades disjuntas por unidad de ejecución.** EPIC-028; backend-data/integration; backend-critical; P2/Alto/Alto. Hardening D+E de ADR-015 sobre el carril de fondeo ya vivo (TASK-1566): clave asimétrica en Cloud KMS (quien verifica NO puede forjar), aprobador como unidad de ejecución propia que firma y no muta, verificador dual con fecha de retiro declarada + señal `legacy_hmac_approval_used`, y broker de administración de Greenhouse distinto del reconciliador de tenancy con guard de disyunción extendido. | `docs/tasks/to-do/TASK-1584-globe-credit-admin-kms-disjoint-identities.md` |
 | `TASK-1585` | `to-do` | **Globe Credit Admin: break-glass gobernado + retiro del HMAC.** EPIC-028; backend-data/integration; backend-critical; P2/Alto/Medio. Slice H de ADR-015: break-glass con TTL/motivo/atribución/revocación automática/readback + señal `break_glass_active` (steady 0), y el retiro del formato HMAC del verificador dual cuando la señal legacy quede en cero por la ventana declarada — `api_runtime` pierde el accessor del secreto. Bloqueada por TASK-1584. | `docs/tasks/to-do/TASK-1585-globe-credit-breakglass-governance-hmac-retirement.md` |
 | `TASK-1586` | `to-do` | **Globe Credit Admin: desambiguador de negación al alcance del operador.** EPIC-028; backend-data/api; backend-standard; P2/Medio/Medio. Slice F de ADR-015: rutas broker de Greenhouse que exponen `budget.evaluate` + `budget.availability.get` a la sesión del operador (vía recomendada: broker lane, cero scopes nuevos — la alternativa exige el rollout de 3 pasos de ADR-010). Cierra la mitad operativa de ISSUE-124 y es el precursor backend de la futura superficie ui-ux de administración. | `docs/tasks/to-do/TASK-1586-globe-credit-denial-disambiguator-operator.md` |
+| `TASK-1617` | `to-do` | Globe Kling 3/O3 video fleet y Producer: text/image/reference/edit/motion, audio y multi-shot según OpenAPI; rutas, catálogo, rights, rates, evaluación, canary y promoción. | `docs/tasks/to-do/TASK-1617-globe-kling-3-o3-video-fleet-producer-integration.md` |
+| `TASK-1618` | `to-do` | Globe Grok Imagine Video fleet y Producer: text/image/reference/edit/extend, audio/lip-sync según evidencia, policy de billing y promoción por ruta. | `docs/tasks/to-do/TASK-1618-globe-grok-imagine-video-fleet-producer-integration.md` |
+| `TASK-1619` | `to-do` | Globe Wan 2.7 fleet y Producer: rutas Pro/standard de video e imagen, referencias y edición; constraints y evidencia independientes. | `docs/tasks/to-do/TASK-1619-globe-wan-2-7-fleet-producer-integration.md` |
+| `TASK-1620` | `to-do` | Globe FLUX.2 Max/Edit fleet y Producer: extensión de image-generate/image-edit, references y controls soportados; no Flux 3 inexistente. | `docs/tasks/to-do/TASK-1620-globe-flux-2-max-image-fleet-producer-integration.md` |
+
 ## Siguiente ID disponible
 
-`TASK-1615`
+`TASK-1621`
 
 > **Corrección 2026-07-30.** Este pie declaraba `TASK-1587`, pero la tabla de este mismo archivo ya
 > registraba hasta `TASK-1598` y esos archivos existen en disco: el pie estaba obsoleto respecto de su
 > propia tabla. Antes de reservar un ID, **verificar contra el sistema de archivos**
 > (`ls docs/tasks/*/TASK-*.md`), no sólo contra este pie. Reservados `TASK-1599`, `TASK-1600`, `TASK-1601` y
-> `TASK-1602`…`TASK-1611`; `TASK-1614` fue reservado para el ciclo durable de evaluación; el siguiente ID libre es `TASK-1616`.
+> `TASK-1602`…`TASK-1611`; `TASK-1614` fue reservado para el ciclo durable de evaluación; `TASK-1616`…`TASK-1620` fueron reservadas para la flota challenger de Fal; el siguiente ID libre es `TASK-1621`.

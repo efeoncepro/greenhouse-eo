@@ -12,6 +12,13 @@
 - Siguiente paso: tomar `TASK-1616` con su goal/preflight, revisar ADR y ejecutar el plan en
   `efeonce-globe`; no marcar H3 `available` antes de los gates de onboarding y promoción.
 
+## Fal challenger models — documentación y tasks Globe (2026-07-31)
+
+- La consulta autenticada de Fal confirmó rutas activas para Kling 3/O3, Grok Imagine Video, Wan 2.7 y FLUX.2 Max/Edit; no existe endpoint exacto `Flux 3` en el snapshot.
+- Se documentó la matriz de capacidades y reutilización/extensión en [`EFEONCE_GLOBE_FAL_CHALLENGER_MODELS_PRODUCER_INTEGRATION_PROPOSAL_V1.md`](docs/architecture/creative-studio/EFEONCE_GLOBE_FAL_CHALLENGER_MODELS_PRODUCER_INTEGRATION_PROPOSAL_V1.md).
+- Se crearon `TASK-1617` Kling, `TASK-1618` Grok, `TASK-1619` Wan y `TASK-1620` FLUX.2. Son tasks separadas porque sus schemas, derechos, rates, outputs y canarios no son intercambiables; comparten el seam Fal y las extensiones de Producer de `TASK-1616`/`TASK-1573`.
+- No se ejecutó código ni generación. Antes de implementar cada task se debe revalidar OpenAPI y pricing autenticados; todas las rutas parten `gated`.
+
 ## GitHub Actions — presupuesto de billing actualizado (2026-07-31)
 
 - Se actualizó en GitHub el presupuesto de Actions de `efeoncepro` / Efeonce Group de USD 0 a **USD 20 mensuales**.
