@@ -7,6 +7,22 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-07-31 — Globe: modo claro con interruptor de apariencia (TASK-1613)
+
+- Interruptor en el menú de cuenta del Producer. El tema es **un bloque de override** sobre las claves
+  del `@theme` (31 de 198 tokens), habilitado por `TASK-1612`. El modo oscuro no se movió ni un hex.
+- 🔴 **El tematizado es opt-in por superficie** (`ShellOptions.themable`, default `false`). El share
+  board —donde el cliente ve la pieza— heredaba el modo del `localStorage` sin tener interruptor propio.
+  No se veía mal: se veía bien en claro, y por eso ningún barrido de contraste lo habría encontrado.
+- Cerró 2 regresiones de contraste medidas **contra control**: `--success` usado como texto (2,54:1) y
+  el interruptor propio (4,2:1). AXIS 0.2.3 separa fill de tinta (`axisBrandSemanticInk`).
+- El isotipo pasa a servirse como máscara: el SVG es monocromo, así que su color no es la marca sino una
+  decisión de render; en negativo sobre canvas claro era blanco sobre blanco.
+- Barrido de contraste nuevo, con veredicto comparativo: falla sólo si el claro introduce un fallo que
+  el oscuro no tiene. Quedan 14 textos que fallan en **ambos** modos (`--faint` a 40% de alpha) — deuda
+  preexistente, no de este cambio.
+- ⚠️ Requiere publicar `@efeoncepro/axis-tokens@0.2.3`; hasta entonces Globe compila con el `dist` local.
+
 ## 2026-07-31 — Globe: el `:root` del payload cliente proyecta sobre el `@theme` (TASK-1612)
 
 - El payload emitía sus custom properties desde dos mecanismos con nombres distintos (`--canvas` en el

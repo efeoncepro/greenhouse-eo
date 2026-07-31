@@ -1,5 +1,29 @@
 # Handoff activo
 
+## TASK-1613 — modo claro de Globe con interruptor (2026-07-31, complete)
+
+Interruptor de apariencia en el menú de cuenta del Producer. Habilitado por `TASK-1612`: desde que el
+`:root` proyecta sobre el `@theme`, un tema es **un bloque de override** sobre las claves del theme — se
+emiten sólo los **31 de 198** tokens que cambian. El modo oscuro no se movió ni un hex.
+
+🔴 **Lo que hay que saber si alguien agrega una superficie:** el tematizado es **opt-in**
+(`ShellOptions.themable`, default `false`). El share board heredaba el modo del `localStorage` sin tener
+interruptor propio, y le habría mostrado al cliente la pieza sobre un fondo que el diseñador no aprobó.
+**No se veía mal** — se veía perfectamente bien en claro, y por eso ningún barrido de contraste lo
+habría encontrado. Hay gate que afirma el bi-condicional.
+
+Lección del instrumento: el primer barrido de contraste reportó 61 fallos y casi todos eran mentira.
+Sin control comparativo, un barrido sólo dice que el diseño tiene deuda; y un gradiente no se mide con
+un número. Con las dos correcciones: claro y oscuro fallan en los MISMOS 14 textos (`--faint` a 40% de
+alpha, deuda preexistente que este cambio no tocó).
+
+**Rollout pendiente:** `@efeoncepro/axis-tokens@0.2.3` está commiteado y tagueado (`c9198c9` / `v0.2.3`)
+pero **NO publicado** — el push quedó bloqueado por el clasificador de permisos del entorno. Globe sigue
+pineado en `0.2.2` y hoy compila sólo con el `dist` copiado a mano. **Sin eso, esto no funciona fuera de
+la máquina local.**
+
+Commits en `efeonce-globe`: `994711e`, `d87d71f`, `59339f0`. Sin push.
+
 ## TASK-1612 — emisor de `:root` de Globe consolidado (2026-07-31, complete)
 
 El payload cliente de Globe emitía sus custom properties desde dos mecanismos con nombres distintos
