@@ -19,6 +19,13 @@
 - Se crearon `TASK-1617` Kling, `TASK-1618` Grok, `TASK-1619` Wan y `TASK-1620` FLUX.2. Son tasks separadas porque sus schemas, derechos, rates, outputs y canarios no son intercambiables; comparten el seam Fal y las extensiones de Producer de `TASK-1616`/`TASK-1573`.
 - No se ejecutó código ni generación. Antes de implementar cada task se debe revalidar OpenAPI y pricing autenticados; todas las rutas parten `gated`.
 
+## Imagen — expansión Fal y decisión Runway (2026-07-31)
+
+- El ledger vigente de Globe contiene seis rutas raster disponibles: Seedream 5 Pro/ Edit, Nano Banana Pro/2 y GPT Image 2/1.5; Recraft v4.1 está promovido para vector.
+- Se descartó Runway de esta ola: no está disponible en Fal y requeriría un proveedor directo, credenciales, billing y adapter propios; solo debe abrirse si un benchmark demuestra una ventaja de Gen-4.5 frente a Seedance/Veo.
+- Se documentó la expansión en [`EFEONCE_GLOBE_IMAGE_FLEET_EXPANSION_PROPOSAL_V1.md`](docs/architecture/creative-studio/EFEONCE_GLOBE_IMAGE_FLEET_EXPANSION_PROPOSAL_V1.md) y se crearon `TASK-1621` Ideogram, `TASK-1622` Recraft Raster, `TASK-1623` Qwen Image 2 y `TASK-1624` Grok Image. FLUX.2 queda cubierto por `TASK-1620`.
+- Se intentó lanzar una nueva flota de subagentes, pero el pool de hilos permaneció saturado por agentes completados no liberables desde esta sesión. La investigación se completó con catálogo Fal autenticado, OpenAPI/documentación oficial y lectura del runtime Globe; no se editaron repositorios hermanos ni se generaron assets.
+
 ## GitHub Actions — presupuesto de billing actualizado (2026-07-31)
 
 - Se actualizó en GitHub el presupuesto de Actions de `efeoncepro` / Efeonce Group de USD 0 a **USD 20 mensuales**.

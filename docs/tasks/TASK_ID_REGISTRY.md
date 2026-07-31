@@ -1704,13 +1704,17 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-1618` | `to-do` | Globe Grok Imagine Video fleet y Producer: text/image/reference/edit/extend, audio/lip-sync según evidencia, policy de billing y promoción por ruta. | `docs/tasks/to-do/TASK-1618-globe-grok-imagine-video-fleet-producer-integration.md` |
 | `TASK-1619` | `to-do` | Globe Wan 2.7 fleet y Producer: rutas Pro/standard de video e imagen, referencias y edición; constraints y evidencia independientes. | `docs/tasks/to-do/TASK-1619-globe-wan-2-7-fleet-producer-integration.md` |
 | `TASK-1620` | `to-do` | Globe FLUX.2 Max/Edit fleet y Producer: extensión de image-generate/image-edit, references y controls soportados; no Flux 3 inexistente. | `docs/tasks/to-do/TASK-1620-globe-flux-2-max-image-fleet-producer-integration.md` |
+| `TASK-1621` | `to-do` | Globe Ideogram v4 Generate/Edit: typography, posters, logos, prompt expansion, image-to-image, evaluación y promoción por ruta. | `docs/tasks/to-do/TASK-1621-globe-ideogram-v4-image-fleet-producer-integration.md` |
+| `TASK-1622` | `to-do` | Globe Recraft v4.1 Raster: extensión de Recraft vector a raster/Pro con MIME, rates, rights, evaluación y canary separados. | `docs/tasks/to-do/TASK-1622-globe-recraft-v4-1-raster-image-fleet.md` |
+| `TASK-1623` | `to-do` | Globe Qwen Image 2/Pro: generate/edit challenger con seed, negative prompt, outputs múltiples, formatos y benchmark cancelable. | `docs/tasks/to-do/TASK-1623-globe-qwen-image-2-fleet-producer-integration.md` |
+| `TASK-1624` | `to-do` | Globe Grok Imagine Image: generate/edit, references, 1K/2K, outputs múltiples, policy receipt y safety/rights gate. | `docs/tasks/to-do/TASK-1624-globe-grok-imagine-image-fleet-producer-integration.md` |
 
 ## Siguiente ID disponible
 
-`TASK-1621`
+`TASK-1625`
 
 > **Corrección 2026-07-30.** Este pie declaraba `TASK-1587`, pero la tabla de este mismo archivo ya
 > registraba hasta `TASK-1598` y esos archivos existen en disco: el pie estaba obsoleto respecto de su
 > propia tabla. Antes de reservar un ID, **verificar contra el sistema de archivos**
 > (`ls docs/tasks/*/TASK-*.md`), no sólo contra este pie. Reservados `TASK-1599`, `TASK-1600`, `TASK-1601` y
-> `TASK-1602`…`TASK-1611`; `TASK-1614` fue reservado para el ciclo durable de evaluación; `TASK-1616`…`TASK-1620` fueron reservadas para la flota challenger de Fal; el siguiente ID libre es `TASK-1621`.
+> `TASK-1602`…`TASK-1611`; `TASK-1614` fue reservado para el ciclo durable de evaluación; `TASK-1616`…`TASK-1624` fueron reservadas para la flota challenger de Fal; Runway queda fuera de esta expansión; el siguiente ID libre es `TASK-1625`.
