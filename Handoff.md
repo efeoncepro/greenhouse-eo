@@ -1,5 +1,17 @@
 # Handoff activo
 
+## MiniMax H3 — documentación y task de integración Globe (2026-07-31)
+
+- Fal live confirmó tres endpoints comerciales activos: `minimax/h3/text-to-video`,
+  `minimax/h3/image-to-video` y `minimax/h3/reference-to-video`, con snapshot de precio de
+  `USD 0,26/s`. La consulta y los probes fueron de catálogo/validación; no hubo generación.
+- Se documentó la propuesta en [`EFEONCE_GLOBE_MINIMAX_H3_INTEGRATION_PROPOSAL_V1.md`](docs/architecture/creative-studio/EFEONCE_GLOBE_MINIMAX_H3_INTEGRATION_PROPOSAL_V1.md).
+- Se creó [`TASK-1616`](docs/tasks/to-do/TASK-1616-globe-minimax-h3-fleet-producer-integration.md),
+  todavía `to-do`: integra las tres rutas, referencias image/video/audio, contratos, Producer,
+  ingest/retrieval, rates, rights, evaluación, canary y promoción. No se ejecutó código de Globe.
+- Siguiente paso: tomar `TASK-1616` con su goal/preflight, revisar ADR y ejecutar el plan en
+  `efeonce-globe`; no marcar H3 `available` antes de los gates de onboarding y promoción.
+
 ## GitHub Actions — presupuesto de billing actualizado (2026-07-31)
 
 - Se actualizó en GitHub el presupuesto de Actions de `efeoncepro` / Efeonce Group de USD 0 a **USD 20 mensuales**.
