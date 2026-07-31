@@ -1,5 +1,13 @@
 # Handoff activo
 
+## TASK-1616 — Globe Admin CLI OAuth PKCE (2026-07-31, in-progress)
+
+- Corrige la frontera operativa incompleta de TASK-1566: el fondeo es transaccional y gobernado, pero no tenía un cliente API humano seguro.
+- Decisión: reusar el broker OAuth sister-platform con modalidad public-client PKCE; API Platform y CLI son adapters del mismo primitive.
+- Invariantes: cero cookies/passwords/client secrets en CLI; `agent-session` puede proponer pero nunca confirmar; loopback variable sólo en `127.0.0.1` con path exacto.
+- Branch/worktree aislados: `codex/TASK-1616-globe-admin-cli-pkce` en `/private/tmp/greenhouse-globe-admin-cli`; no toca el trabajo UI paralelo de Claude.
+- Siguiente paso: task hook + plan formal, luego implementación paralela de OAuth, API/CLI y hardening de autoridad.
+
 ## GitHub Actions — presupuesto de billing actualizado (2026-07-31)
 
 - Se actualizó en GitHub el presupuesto de Actions de `efeoncepro` / Efeonce Group de USD 0 a **USD 20 mensuales**.

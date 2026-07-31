@@ -1,0 +1,120 @@
+# Plan — TASK-1616 Globe Admin CLI con OAuth PKCE y fondeo gobernado
+
+## Discovery summary
+
+- TASK-1566 cerró correctamente el command y la transacción, pero no entregó el consumer CLI declarado.
+- Las rutas `/api/admin/globe/credit-funding/{propose,confirm}` dependen de NextAuth y no aceptan bearer app.
+- `agent-session` permite seleccionar email y acuña una cookie; es E2E-only y no es autoridad humana durable.
+- API Platform `app` ya tiene bearer, rehidratación de permisos, logs y rate limits.
+- El broker sister-platform ya tiene Authorization Code, PKCE S256, state, TTL, one-time/replay, tokens opacos,
+  revocación y audit. El único gap auth es que todo cliente requiere un consumer secret.
+- ADR-015 gobierna la atribución humana y la separación Greenhouse/Globe; requiere delta append-only para
+  formalizar el cliente público instalado y la excepción RFC 8252 de puerto loopback.
+- El objetivo persistente del operador autoriza resolver end-to-end sin intervención y autorizó subagentes.
+  Ese mandato cuenta como checkpoint humano previo para este plan P0/Alto; no amplía alcance ni autoriza secretos.
+
+## Solution quality assessment
+
+La causa raíz es la ausencia de una credencial humana delegada para herramientas locales. Se extiende el broker
+canónico; no se copian cookies, no se usa `agent-session`, no se agrega API key admin y no se duplica el fondeo.
+
+## Access model
+
+- `routeGroups`: sin cambio.
+- `views` / `authorizedViews`: sin cambio; no hay UI nueva.
+- `entitlements`: se reusan `platform.globe_credit_funding.propose|confirm` y se evalúan sobre el usuario OAuth.
+- `startup policy`: sin cambio.
+- Decisión: bearer prueba sesión app; el entitlement fino prueba autoridad; auth provenance prueba humanidad.
+
+## Architecture decision
+
+- ADR existente: ADR-015, administración Globe desde Greenhouse.
+- Delta requerido: public client PKCE y loopback `127.0.0.1` con puerto efímero, sin wildcard semántico.
+- Status: delta append-only sobre ADR Accepted; no cambia la autoridad financiera ni la topología Greenhouse→Globe.
+
+## Backend/data contract
+
+- Source of truth: `sister_platform_oauth_clients.client_type` y stores OAuth existentes.
+- Contract: authorize + token exchange; API Platform app routes adaptan el funding broker.
+- Invariants: confidential exige secret; public rechaza secret y exige PKCE; loopback sólo 127.0.0.1/path exacto;
+  sesión agente no confirma; idempotency distinta por fase.
+- Migration: aditiva, default `confidential`, sin backfill mutante.
+- Rollback: suspender public client y retirar routes/CLI; clientes existentes permanecen intactos.
+- Evidence: tests negativos, migration readback, OAuth real, fondeo real y readback correlacionado.
+
+## Skills
+
+- `greenhouse-globe`: command, rollout y criterio UI final.
+- `software-architect-2026`: frontera OAuth/API y disyunción de identidades.
+- `greenhouse-task-planner`: registro TASK-1616.
+- `greenhouse-agent`: implementación backend/TypeScript y routes.
+- `greenhouse-secret-hygiene`: tokens, logs, env y registro del cliente.
+- `greenhouse-qa-release-auditor`: verificación final.
+- `greenhouse-documentation-governor`: cierre documental.
+- `greenhouse-production-release`: despliegue gobernado.
+
+## Subagent strategy
+
+`fork` — autorizado y conveniente por tres write sets disjuntos.
+
+### Subagent A — OAuth public client (Slice 1)
+
+- Owns: `oauth-broker.ts`, token route, migration y tests OAuth.
+- Contract: `clientType: public|confidential`; no toca funding routes/CLI/docs.
+
+### Subagent B — API Platform + CLI (Slices 2-3)
+
+- Owns: routes app, script CLI, tests y package script.
+- Contract: reutiliza funding broker; espera public client PKCE; no toca oauth core/migration/docs.
+
+### Subagent C — Human authority gate (Slice 2)
+
+- Owns: helper/gate de auth provenance, confirm route y tests focales.
+- Contract: agent puede proponer, nunca confirmar; no usa prefijo de userId como señal única.
+
+### Principal
+
+- Owns: task/ADR/plan/manual/skill, integración, migración/runtime, release y verificación UI.
+- Consolida interfaces y ejecuta gates combinados.
+
+## Execution order
+
+1. Registrar task/plan/ADR delta y baseline.
+2. Slice 1: migration + OAuth public client + tests.
+3. Slice 2: gate de humanidad + routes API Platform.
+4. Slice 3: CLI PKCE loopback y tests.
+5. Integración local, lint/typecheck/test/build proporcional.
+6. Aplicar migration/registrar client/deploy staging.
+7. Autorizar en Chrome, fondear y verificar readback.
+8. Continuar TASK-1614/R2V hasta promoción y asset UI retenido.
+9. QA, docs, lifecycle, commits y limpieza de worktrees.
+
+## Files to create
+
+- migration `task-1616-*`
+- routes `src/app/api/platform/app/globe/credit-funding/**`
+- `scripts/globe-credit-funding.mjs`
+- tests focales
+
+## Files to modify
+
+- `src/lib/sister-platforms/oauth-broker.ts` — client type y redirect loopback.
+- token route — secret condicional por client type.
+- funding confirm/auth helper — provenance humana.
+- `package.json` — entrypoint CLI.
+- ADR-015/manual/skill/task/handoff/changelog — contrato y operación.
+
+## Files to delete
+
+- Ninguno.
+
+## Risk flags
+
+- Auth y finanzas: backend-critical; pruebas negativas y staging real obligatorios.
+- El authorize endpoint auto-emite code después de sesión; state/PKCE/redirect son load-bearing.
+- No persistir access token en disco ni imprimirlo.
+- No tocar el checkout UI de Claude ni el repo Globe compartido.
+
+## Open questions
+
+- Ninguna bloqueante. Refresh tokens quedan fuera; cada corrida autoriza de nuevo usando la sesión Chrome viva.

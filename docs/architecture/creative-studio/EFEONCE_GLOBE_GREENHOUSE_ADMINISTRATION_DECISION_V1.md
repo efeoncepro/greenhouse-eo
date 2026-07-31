@@ -11,6 +11,36 @@
 
 ---
 
+## Delta 2026-07-31 — Cliente administrativo instalado: OAuth public client + PKCE
+
+TASK-1566 dejó vivo el carril financiero, pero no cerró el acceso programático humano: las rutas Greenhouse
+requieren una cookie NextAuth y el broker OAuth sólo admite clientes confidenciales. Copiar cookies, usar
+`agent-session` o embutir un `client_secret` en un CLI convertiría la atribución humana en impersonación o
+en un secreto redistribuible.
+
+**Decisión.** TASK-1616 extiende el broker canónico con `client_type = confidential|public`. Los clientes
+confidenciales conservan su secreto y redirect exacto. Un cliente público instalado:
+
+- usa Authorization Code + PKCE S256 y nunca posee/acepta `client_secret`;
+- autoriza en Greenhouse con la sesión NextAuth humana existente;
+- recibe el code en un listener loopback efímero y conserva el token sólo en memoria;
+- consume API Platform `app`, que rehidrata entitlements y delega al mismo broker de fondeo;
+- no puede confirmar si la sesión/token proviene de `agent-session` o de un modo de autenticación agente.
+
+Para clientes públicos instalados se adopta la semántica loopback de RFC 8252: un redirect registrado
+`http://127.0.0.1/<path>` acepta un puerto efímero elegido por el sistema operativo, pero protocolo, hostname
+literal y path deben coincidir. Esto **no es wildcard**: `localhost`, IPv6, otro host, HTTPS, otro path,
+userinfo, fragmentos o la misma URI en un cliente confidencial siguen rechazados.
+
+La autoridad no cambia: Greenhouse autentica/atribuye; Globe verifica, firma y muta. API Platform y CLI son
+adapters, no un segundo command. El cliente puede suspenderse sin tocar los commands ni clientes OAuth vivos.
+
+**Alternativas rechazadas:** exportar cookies; `agent-session` para mutación financiera; password en CLI;
+API key administrativa global; WIF como identidad humana; secret embebido en cliente instalado.
+
+**Evidencia exigida:** tests negativos de client type/secret/redirect/replay, migración aditiva con default
+confidential, OAuth real usando la sesión humana, fondeo real con readback correlacionado y verificación UI.
+
 ## Contexto (baseline verificado 2026-07-26 contra el código de los dos repos, no contra la doc)
 
 ### 1. La dirección del operador
