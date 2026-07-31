@@ -77,7 +77,8 @@ describe('API Platform app bearer authentication', () => {
     mocks.resolveOAuthUserinfo.mockResolvedValue({
       identity: {
         sub: 'greenhouse:user:human-1',
-        capabilities: ['globe.credits.funding.propose', 'globe.credits.funding.confirm']
+        capabilities: ['globe.credits.funding.propose', 'globe.credits.funding.confirm'],
+        authMode: 'both'
       }
     })
     mocks.getTenantAccessRecordByUserId.mockResolvedValue(tenant)
@@ -91,7 +92,8 @@ describe('API Platform app bearer authentication', () => {
         data: {
           authSource: context.authSource,
           appSessionId: context.appSessionId,
-          capabilities: context.oauthCapabilities
+          capabilities: context.oauthCapabilities,
+          authMode: context.oauthSessionAuthMode
         }
       })
     })
@@ -101,7 +103,8 @@ describe('API Platform app bearer authentication', () => {
       data: {
         authSource: 'sister_platform_oauth',
         appSessionId: null,
-        capabilities: ['globe.credits.funding.propose', 'globe.credits.funding.confirm']
+        capabilities: ['globe.credits.funding.propose', 'globe.credits.funding.confirm'],
+        authMode: 'both'
       }
     })
     expect(mocks.getTenantAccessRecordByUserId).toHaveBeenCalledWith('human-1')

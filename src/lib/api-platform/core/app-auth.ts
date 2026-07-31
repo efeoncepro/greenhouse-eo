@@ -310,6 +310,7 @@ export const runAppRoute = async <T>({
       appSessionId: appContext.appSessionId,
       authSource: appContext.authSource,
       oauthCapabilities: appContext.oauthCapabilities,
+      oauthSessionAuthMode: appContext.oauthSessionAuthMode,
       rateLimit
     })
 

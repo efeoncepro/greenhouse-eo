@@ -1323,6 +1323,9 @@ futuro debe saber:
   CLI no hereda esa cookie. En staging, `pnpm globe:credit-funding` resuelve el automation bypass con
   `scripts/lib/vercel-staging-access.mjs` y lo adjunta sólo a token/propose/confirm. Nunca lo pongas en el URL
   del navegador, nunca lo imprimas y nunca lo envíes fuera del origen Greenhouse de staging.
+- **La procedencia debe cruzar el wrapper API completo:** `resolveAppTenantContext` no basta; `runAppRoute` debe
+  copiar `oauthSessionAuthMode` al `AppPlatformRequestContext` entregado al handler. Si se omite, el broker recibe
+  `unknown` y falla cerrado antes de insertar la intención. La regresión vive en `app-auth.test.ts`.
 
 ### Ocho lecciones de método, que valen más que los fixes
 

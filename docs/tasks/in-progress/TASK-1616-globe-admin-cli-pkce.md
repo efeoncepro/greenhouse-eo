@@ -70,6 +70,8 @@ Reglas obligatorias:
 - Un principal de servicio nunca confirma. Un usuario agente requiere scopes, entitlements, política por workspace
   y límites de grant/tope mensual; el default fuera del workspace interno es OFF.
 - API Platform y CLI son adapters; no duplican el command ni acceden a DB/Globe directamente.
+- `runAppRoute` debe propagar `oauthSessionAuthMode` desde la resolución del bearer hasta el handler; omitirlo
+  degrada una sesión válida a `unknown` y el broker financiero la rechaza correctamente.
 
 ## Normative Docs
 
