@@ -217,6 +217,17 @@ Se introduce el modelo canonico **event-sourced** para ajustar el pago de un ent
 - **API**: `POST/GET /api/hr/payroll/entries/[entryId]/adjustments`, `POST .../[adjustmentId]/approve|revert`. Permisos: `hr.payroll_adjustments` (crear/revertir), `hr.payroll_adjustments_approval` (aprobar).
 - **UI**: `PayrollEntryAdjustDialog` (3 modos radio + descuento adicional + dropdown motivo + nota + preview neto en vivo) y `PayrollAdjustmentHistoryDrawer` (historial activo + revertido + superseded por entry, con acciones approve/revert).
 
+### Decision delta 2026-07-31 — materialización obligatoria de ajustes
+
+El comando de ajuste y el monto persistido deben cerrar en la misma operación lógica. Un `201` no puede significar únicamente que se creó la fila en `payroll_adjustments` mientras `payroll_entries` conserva el monto natural.
+
+- En períodos no exportados, el API materializa el ajuste inmediatamente. Con `PAYROLL_PARTICIPATION_WINDOW_ENABLED=true`, usa el cálculo canónico de período completo; con la bandera apagada, usa el recálculo de entry existente.
+- Si la materialización falla, el ajuste activo se revierte automáticamente mediante el evento de reversión y el API responde `409`; no queda un ajuste activo sin proyección.
+- Un período `exported` se rechaza antes de crear el ajuste y dirige al flujo formal de reapertura/reliquidación. No se permite una mutación silenciosa sobre una obligación ya exportada.
+- La UI refresca la tabla después de crear, aprobar o revertir y muestra el error de materialización en vez de presentar el cambio como aplicado.
+
+Esta decisión mantiene `payroll_adjustments` como ledger event-sourced y `calculatePayroll` como único materializador oficial; no agrega una segunda fórmula ni una vía de escritura especial por colaborador.
+
 **Reglas duras**:
 
 - **NUNCA** computar neto fuera de `computePayrollEntryNet` cuando hay adjustments — perder la lectura del trigger compliance, del audit chain o del outbox event.

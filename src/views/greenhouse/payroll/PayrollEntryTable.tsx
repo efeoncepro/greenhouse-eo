@@ -749,6 +749,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate, onAdj
       entryId={adjustHistoryEntry?.entryId ?? null}
       memberName={adjustHistoryEntry?.memberName ?? null}
       canApprove={canApproveAdjustments}
+      onAdjustmentChanged={onAdjustmentChanged}
     />
     </>
   )

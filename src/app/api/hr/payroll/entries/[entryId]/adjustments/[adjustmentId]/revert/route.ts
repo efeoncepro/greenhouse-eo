@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server'
 
 import { getServerAuthSession } from '@/lib/auth'
+import { query } from '@/lib/db'
+import { PayrollAdjustmentValidationError, revertAdjustment } from '@/lib/payroll/adjustments/apply-adjustment'
 import {
-  PayrollAdjustmentValidationError,
-  revertAdjustment
-} from '@/lib/payroll/adjustments/apply-adjustment'
-import { recalculatePayrollEntry } from '@/lib/payroll/recalculate-entry'
+  assertAdjustmentPeriodWritable,
+  recalculateAfterAdjustment
+} from '@/lib/payroll/adjustments/recalculate-adjustment'
 import { requireHrTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -27,11 +28,19 @@ export async function POST(
     const revertedReason = String(body?.revertedReason ?? '').trim()
 
     if (revertedReason.length < 5) {
-      return NextResponse.json(
-        { error: 'Indica el motivo de la reversion (min 5 caracteres).' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Indica el motivo de la reversion (min 5 caracteres).' }, { status: 400 })
     }
+
+    const entryRows = await query<{ period_id: string }>(
+      'SELECT period_id FROM greenhouse_payroll.payroll_entries WHERE entry_id = $1 LIMIT 1',
+      [entryId]
+    )
+
+    const periodId = entryRows[0]?.period_id
+
+    if (!periodId) throw new PayrollAdjustmentValidationError('Payroll entry no encontrada.', 404)
+
+    await assertAdjustmentPeriodWritable(periodId)
 
     const adjustment = await revertAdjustment({
       adjustmentId,
@@ -44,9 +53,9 @@ export async function POST(
     let recalculated = false
 
     try {
-      await recalculatePayrollEntry({
+      await recalculateAfterAdjustment({
         entryId,
-        input: {},
+        periodId,
         actorIdentifier: userId
       })
       recalculated = true
@@ -54,6 +63,15 @@ export async function POST(
       console.warn(
         `[adjustments revert] auto-recalc failed for entry ${entryId}:`,
         recalcError instanceof Error ? recalcError.message : recalcError
+      )
+
+      return NextResponse.json(
+        {
+          error:
+            'La reversión quedó registrada, pero la nómina no pudo recalcularse. Ejecuta el cálculo del período antes de continuar.',
+          code: 'payroll_adjustment_recalculation_failed'
+        },
+        { status: 409 }
       )
     }
 
