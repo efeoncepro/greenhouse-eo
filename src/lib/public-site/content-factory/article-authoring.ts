@@ -32,9 +32,25 @@ export type GutenbergRichTextSegment = {
 
 export type GutenbergRichText = string | GutenbergRichTextSegment[]
 
+export type GutenbergFaqItem = {
+  question: string
+  answer: GutenbergArticleBlock[]
+  open?: boolean
+}
+
+export type GutenbergFaqSchemaOptions = {
+  enabled?: boolean
+  name?: string
+  canonicalUrl?: string
+  id?: string
+  inLanguage?: string
+}
+
 export type GutenbergArticleBlock =
   | { kind: 'paragraph'; text: GutenbergRichText }
   | { kind: 'list'; items: GutenbergRichText[]; ordered?: boolean }
+  | { kind: 'details'; summary: string; blocks: GutenbergArticleBlock[]; open?: boolean }
+  | { kind: 'faq'; items: GutenbergFaqItem[]; schema?: GutenbergFaqSchemaOptions }
   | {
       kind: 'table'
       headers: GutenbergRichText[]
@@ -74,6 +90,8 @@ export type GutenbergArticleSpec = {
   seo: {
     title: string
     description: string
+    canonicalUrl?: string
+    inLanguage?: string
     indexPolicy?: 'index' | 'noindex'
   }
   /** Intro paragraphs framing the piece, rendered before the TOC. */
@@ -112,6 +130,14 @@ const renderRichText = (value: GutenbergRichText): string => {
     })
     .join('')
 }
+
+const renderRichTextPlainText = (value: GutenbergRichText): string => {
+  if (typeof value === 'string') return value
+
+  return value.map(segment => segment.text).join('')
+}
+
+const normalizePlainText = (value: string): string => value.replace(/\s+/g, ' ').trim()
 
 const paragraphBlock = (text: GutenbergRichText): string =>
   ['<!-- wp:paragraph -->', `<p>${renderRichText(text)}</p>`, '<!-- /wp:paragraph -->'].join('\n')
@@ -152,6 +178,130 @@ const tableBlock = (block: Extract<GutenbergArticleBlock, { kind: 'table' }>): s
     `<figure class="wp-block-table"><table><thead><tr>${headers}</tr></thead><tbody>${rows}</tbody></table>${caption}</figure>`,
     '<!-- /wp:table -->'
   ].join('\n')
+}
+
+const detailsBlock = (
+  block: Extract<GutenbergArticleBlock, { kind: 'details' }>,
+  context: { canonicalUrl?: string; inLanguage?: string }
+): string => {
+  if (!block.summary.trim()) {
+    throw new Error('content_factory_article_details_summary_required')
+  }
+
+  if (block.blocks.length === 0) {
+    throw new Error('content_factory_article_details_blocks_required')
+  }
+
+  const attrs = block.open ? { summary: block.summary, showContent: true } : { summary: block.summary }
+  const open = block.open ? ' open' : ''
+  const children = block.blocks.map(child => renderArticleBlock(child, context)).join('\n')
+
+  return [
+    `<!-- wp:details ${JSON.stringify(attrs)} -->`,
+    `<details class="wp-block-details"${open}><summary>${escapeGutenbergHtml(block.summary)}</summary>`,
+    children,
+    '</details>',
+    '<!-- /wp:details -->'
+  ].join('\n')
+}
+
+const blockToPlainText = (block: GutenbergArticleBlock): string => {
+  switch (block.kind) {
+    case 'paragraph':
+      return renderRichTextPlainText(block.text)
+    case 'list':
+      return block.items.map(item => renderRichTextPlainText(item)).join(' ')
+    case 'details':
+      return [block.summary, ...block.blocks.map(child => blockToPlainText(child))].join(' ')
+    case 'table':
+      return [
+        ...block.headers.map(header => renderRichTextPlainText(header)),
+        ...block.rows.flatMap(row => row.map(cell => renderRichTextPlainText(cell))),
+        block.caption ? renderRichTextPlainText(block.caption) : ''
+      ].join(' ')
+    case 'quote':
+    case 'pullquote':
+      return block.text
+    case 'separator':
+    case 'image':
+    case 'embed':
+      return ''
+    case 'faq':
+      throw new Error('content_factory_article_faq_nested_unsupported')
+  }
+}
+
+const faqAnswerText = (answer: GutenbergArticleBlock[]): string => normalizePlainText(answer.map(blockToPlainText).join(' '))
+
+const jsonLdScriptBlock = (data: Record<string, unknown>): string => {
+  const json = JSON.stringify(data, null, 2).replace(/</g, '\\u003c')
+
+  return [
+    '<!-- wp:html -->',
+    `<script type="application/ld+json">${json}</script>`,
+    '<!-- /wp:html -->'
+  ].join('\n')
+}
+
+const renderFaqJsonLdBlock = (
+  block: Extract<GutenbergArticleBlock, { kind: 'faq' }>,
+  context: { canonicalUrl?: string; inLanguage?: string }
+): string => {
+  const schema = block.schema ?? {}
+  const canonicalUrl = schema.canonicalUrl ?? context.canonicalUrl
+  const id = schema.id ?? (canonicalUrl ? `${canonicalUrl.replace(/\/?$/, '/')}#faq` : undefined)
+  const inLanguage = schema.inLanguage ?? context.inLanguage
+
+  const faqPage: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    name: schema.name ?? 'Preguntas frecuentes',
+    mainEntity: block.items.map(item => ({
+      '@type': 'Question',
+      name: item.question.trim(),
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faqAnswerText(item.answer)
+      }
+    }))
+  }
+
+  if (id) faqPage['@id'] = id
+  if (canonicalUrl) faqPage.url = canonicalUrl
+  if (inLanguage) faqPage.inLanguage = inLanguage
+
+  return jsonLdScriptBlock(faqPage)
+}
+
+const faqBlock = (
+  block: Extract<GutenbergArticleBlock, { kind: 'faq' }>,
+  context: { canonicalUrl?: string; inLanguage?: string }
+): string => {
+  if (!block.items.length) {
+    throw new Error('content_factory_article_faq_items_required')
+  }
+
+  for (const [index, item] of block.items.entries()) {
+    if (!item.question.trim()) {
+      throw new Error(`content_factory_article_faq_question_required:${index}`)
+    }
+
+    if (!item.answer.length) {
+      throw new Error(`content_factory_article_faq_answer_required:${index}`)
+    }
+
+    if (!faqAnswerText(item.answer)) {
+      throw new Error(`content_factory_article_faq_answer_text_required:${index}`)
+    }
+  }
+
+  const details = block.items
+    .map(item => detailsBlock({ kind: 'details', summary: item.question, blocks: item.answer, open: item.open }, context))
+    .join('\n\n')
+
+  if (block.schema?.enabled === false) return details
+
+  return [details, renderFaqJsonLdBlock(block, context)].join('\n\n')
 }
 
 const quoteBlock = (text: string): string =>
@@ -229,12 +379,19 @@ const embedBlock = (block: Extract<GutenbergArticleBlock, { kind: 'embed' }>): s
     '<!-- /wp:embed -->'
   ].join('\n')
 
-const renderArticleBlock = (block: GutenbergArticleBlock): string => {
+const renderArticleBlock = (
+  block: GutenbergArticleBlock,
+  context: { canonicalUrl?: string; inLanguage?: string }
+): string => {
   switch (block.kind) {
     case 'paragraph':
       return paragraphBlock(block.text)
     case 'list':
       return listBlock(block.items, block.ordered)
+    case 'details':
+      return detailsBlock(block, context)
+    case 'faq':
+      return faqBlock(block, context)
     case 'table':
       return tableBlock(block)
     case 'quote':
@@ -293,7 +450,12 @@ export const authorGutenbergDraft = (spec: GutenbergArticleSpec): ContentFactory
     parts.push(renderHeadingBlock({ level: section.level, text: section.heading }))
 
     for (const block of section.blocks) {
-      parts.push(renderArticleBlock(block))
+      parts.push(
+        renderArticleBlock(block, {
+          canonicalUrl: spec.seo.canonicalUrl,
+          inLanguage: spec.seo.inLanguage
+        })
+      )
     }
   }
 

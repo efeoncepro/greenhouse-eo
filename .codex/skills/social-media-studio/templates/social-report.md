@@ -10,6 +10,7 @@
 - **Redes cubiertas:** `[…]` · **Objetivo del periodo:** `[el que se fijó]`
 - **Versión:** `[cliente | interna]` · **Preparado por:** `[…]` · **Fecha:** `[…]`
 - **Fuente de datos:** Metricool (`getAnalyticsDataByMetrics`) `as-of [fecha]`
+- **Fuentes adicionales:** `[analytics nativo | Search Console Platform Property | analytics web/CRM]`
 
 ## Resumen ejecutivo (3-5 líneas)
 - **Qué logramos:** `[el titular — movimos X hacia el objetivo]`
@@ -39,6 +40,15 @@
 - **Mejor hora/día real:** `[vs. lo que asumíamos]`
 - **Social search / cola larga:** `[piezas que revivieron por búsqueda semanas después]`
 - **Sorpresa / contraintuitivo:** `[algo que no esperábamos]`
+
+## Búsqueda y progreso por plano *(no sumar impresiones entre planos)*
+
+| Nodo/pieza | External search (Google) | Platform search/recommendation | Downstream progress |
+|---|---|---|---|
+| `[cluster_node_id/URL]` | `[clicks, impressions, CTR, position o n/a]` | `[queries/surface + métrica nativa]` | `[evento + completions]` |
+
+> Search Console Platform Properties (Instagram/TikTok/X/YouTube) tienen rollout gradual y
+> sólo miden Google. Declara fuente, superficie, ventana y limitación de cada cifra.
 
 ## Aprendizajes
 - **Qué confirmamos:** `[hipótesis validada]`

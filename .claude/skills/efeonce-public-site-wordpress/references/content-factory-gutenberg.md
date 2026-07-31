@@ -95,6 +95,8 @@ pnpm public-website:content-factory:post-tool -- edit-pullquote --post-url <url>
 - Treat `core/freeform` as observable legacy debt for inspection/refresh, not as a generated block for new drafts.
 - Validate drafts before any bridge write.
 - Author inline links and restrained semantic emphasis as structured rich-text segments (`{ text, href?, strong? }`) in intros, paragraphs, lists and CTAs. Let Content Factory escape them, render `strong: true` as `<strong>` and enforce `http:`, `https:` or `mailto:`; never inject raw anchor or emphasis HTML into a spec.
+- For compact editorial FAQs that need schema, use semantic `kind: "faq"` in the `GutenbergArticleSpec`; Content Factory emits native `core/details` plus governed `FAQPage` JSON-LD from the same `items[]`. Use raw `kind: "details"` only for non-schema disclosures. Keep the question in `<summary>`, the complete answer as child blocks, and let the global TOC target the parent FAQ H2 unless a reviewed outline decision says otherwise. `core/accordion` is available in the 2026-07-15 runtime, but use it only when grouped/exclusive accordion behavior is a real requirement.
+- Do not hand-author `core/html`; the validator only allows generated `application/ld+json` structured data from semantic capabilities such as `kind: "faq"` and blocks FAQPage questions that do not match visible summaries.
 - `status=block` from validation is a hard stop; `status=warning` requires review.
 - For Glitch POV, prefer `efeoncepro/glitch-drop`; it is an editorial aside, not a quote.
 

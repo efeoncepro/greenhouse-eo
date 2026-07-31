@@ -1,6 +1,6 @@
 ---
 name: social-media-studio
-description: Diseña y opera social media por plataforma para estrategia editorial, producción, publicación, community, listening, medición, creator/UGC y formatos de Instagram, TikTok, LinkedIn, YouTube y otros. Use for Studio Credits y derechos dentro de producción social; no reemplaza la estrategia de canales.
+description: Diseña y opera social media por plataforma para estrategia editorial, producción, publicación, community, listening, medición, creator/UGC y formatos de Instagram, TikTok, LinkedIn, YouTube y otros. Use for Studio Credits y derechos dentro de producción social; no reemplaza la estrategia de canales. Delega a content-marketing-studio la pertenencia de una pieza al territorio/Pillar/Cluster Experience.
 user-invocable: true
 argument-hint: "[red/tarea o pregunta — ej: 'plan de 30 días para LinkedIn del grader', 'guion de Reel para el lanzamiento', 'auditar nuestro Instagram', 'estrategia de TikTok Shop', 'matriz de community management']"
 ---

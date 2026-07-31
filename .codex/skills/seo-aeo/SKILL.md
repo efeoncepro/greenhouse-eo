@@ -126,12 +126,42 @@ decláralo. Ramifica la recomendación según las respuestas.
 | GSC API, Platform Properties, URL Inspection, sitemaps, ping o aviso de una URL nueva | `references/google-search-console-api-indexing.md` + `modules/01_SEO_TECHNICAL.md` |
 | Infografías, SVG directo, `<picture>`, image SEO, ALT/caption, featured/OG y descripción larga | `references/editorial-image-seo.md` + `modules/01_SEO_TECHNICAL.md` |
 | Blogposts, pillars y guías: dossier, traducción de metadata, E-E-A-T, publicación WordPress/Think, link health y verificación live | `references/agentic-editorial-eeat.md` + `content-marketing-studio/references/metadata-translation-method.md` |
+| Pillar Experience Efeonce: canonical, mapa de cluster, `ItemList`, enlaces y placement Think/host | `docs/public-site/decisions/PDR-018-pillar-experience-arquitectura-editorial-y-runtime.md`; esta skill valida semántica/schema, no elige el CMS por SEO |
+| Cluster Experience federada: nodos owned/platform-native, indexación social y medición por superficie | Canon editorial en `../content-marketing-studio/references/content-engineering.md`; aplicar contrato de búsqueda federada abajo y reverificar plataformas |
+| **Content Engineering**: contenido como experiencia humana + computable, sin duplicar fuentes ni esconder conocimiento | Canon editorial en `../content-marketing-studio/references/content-engineering.md`; esta skill gobierna semántica, schema, entidades, recuperación y citabilidad |
 | **Framework + metodología propietaria Efeonce** (los 5 niveles para existir en un internet de agentes: Be Found · Readable · Correct · Actionable · Intrinsic; narrativa pública + modelo de 2 ejes del grader) | `efeonce/EFEONCE_AGENTIC_READINESS_FRAMEWORK.md` ⭐ |
 | Caso Efeonce: WordPress/Kinsta + AI Content Factory + HubSpot + ICP Globe | `efeonce/EFEONCE_OVERLAY.md` |
 | **Producto Greenhouse que operacionaliza esta skill** (AI Visibility Grader / dominio `growth`, TASK-1226/1227) | `efeonce/AI_VISIBILITY_GRADER.md` |
 | **Radiografía AEO** (Think): muestra viva que educa y demuestra ejecución SEO/AEO sobre un hueco medido; no reemplaza al Grader | `docs/think/radiografia-aeo-architecture.md` + manual comercial `docs/manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md` |
 | **Web agéntica**: WebMCP, exponer tools a agentes, agentic-web *readiness* (¿los agentes pueden *usar* el sitio, no solo *citarlo*?), Lighthouse API programática + audit `registered-webmcp-tools` | **skill `webmcp`** (cross-skill) |
 | Artefactos listos para usar | `templates/` (jsonld, llms-txt, briefs, checklists) |
+
+### Contrato de búsqueda para Cluster Experience federada
+
+Una pieza social puede ser un search node de primera clase, pero no por su formato. Debe resolver un JTBD, entregar
+valor autónomo, tener URL/ID estable, relación gobernada y medición. Distingue:
+
+1. **External search:** una URL owned o platform-native aparece en Google/Bing u otro buscador.
+2. **Platform search / recommendation:** la pieza aparece en el buscador, feed o recomendador interno.
+3. **Downstream progress:** la persona continúa a otro nodo, guarda, completa, se suscribe o inicia un handoff.
+
+Google Search Console documenta un rollout gradual de
+[Platform Properties](https://support.google.com/webmasters/answer/17148418?hl=en-GB) para Instagram, TikTok, X y
+YouTube. Verifica disponibilidad por cuenta; no confundas soporte anunciado con propiedad ya habilitada. Para
+medición nativa usa las fuentes oficiales de cada plataforma: [TikTok Creator Search Insights](https://support.tiktok.com/en/using-tiktok/growing-your-audience/creator-search-insights),
+[YouTube Search](https://support.google.com/youtube/answer/16090438) y
+[YouTube Analytics](https://support.google.com/youtube/answer/12220281),
+[Pinterest Trends](https://help.pinterest.com/en/business/article/pinterest-trends) y
+[Pin performance](https://help.pinterest.com/en/business/article/pin-performance-and-distribution), más
+[LinkedIn Search Appearances](https://www.linkedin.com/help/linkedin/answer/a7473929) y
+[Post Analytics](https://www.linkedin.com/help/linkedin/answer/a525196). La elegibilidad de contenido público de
+Instagram para buscadores se valida contra la [documentación de Meta](https://www.facebook.com/help/147542625391305).
+
+No sumes impresiones de external search, búsquedas internas, feeds y alcance: no comparten definición ni
+denominador. El registry conserva `surface`, `platform`, `roles`, `search_intent`, `query_set`,
+`indexing_eligibility`, `discovery_surfaces` y `measurement_sources`. Indexación social tampoco autoriza schema
+inventado: `ItemList` y demás JSON-LD deben corresponder a relaciones visibles, tipos elegibles y la fuente
+editorial gobernada; la Pillar conserva su canonical.
 
 ---
 
@@ -235,3 +265,6 @@ una estimación como medición.
    mecánicas difieren.
 6. **Mide o no existió.** GSC/GA4 para clásico; Share of Voice + tráfico IA para
    AEO. Sin medición, no hay caso.
+7. **Una verdad, dos interfaces.** En Content Engineering, la experiencia humana y la representación computable
+   deben derivar del mismo contenido gobernado. Schema, FAQ, entidades y respuestas nunca mantienen una versión
+   manual paralela a lo visible.

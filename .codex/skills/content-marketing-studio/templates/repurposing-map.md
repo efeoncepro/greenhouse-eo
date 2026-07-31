@@ -1,17 +1,23 @@
 # Repurposing / Atomization Map
 
-> Artefacto de `04`. Un pillar → N átomos nativos. Uno por línea. Secuenciar en el tiempo.
+> Artefacto de `04`. Un pillar → N derivados nativos. Clasificar, relacionar y secuenciar en el tiempo.
 
 ## PILLAR: <título>  (formato ancla)
 
-| Átomo | Canal | Nativo (no copia-pega) | Un insight | Owner ejecución | Fecha | Cross-link al pillar |
-|---|---|---|---|---|---|---|
-| Newsletter (Glitch) | email | | | greenhouse-email | | ✅ |
-| Carrusel | LinkedIn | | | social-media-studio | | ✅ |
-| Post texto x3 | LinkedIn | | | social-media-studio | | ✅ |
-| Reel/clip | IG/TikTok | | | motion-design-studio + social | | ✅ |
-| Lead magnet gated | web | | | 03 + growth-forms | | ✅ |
-| Pitch PR/datos | earned | | | 05 | | ✅ |
+| Derivado | Surface / canal | Clasificación | Roles | JTBD / insight | Relación / next node | Owner | Fecha |
+|---|---|---|---|---|---|---|---|
+| Newsletter (Glitch) | owned / email | node o activation asset | | | | greenhouse-email | |
+| Carrusel | platform / LinkedIn | node o activation asset | | | | social-media-studio | |
+| Post texto x3 | platform / LinkedIn | node o activation asset | | | | social-media-studio | |
+| Reel/clip | platform / IG/TikTok | node o activation asset | | | | motion-design-studio + social | |
+| Lead magnet gated | owned / web | cluster node | | | | 03 + growth-forms | |
+| Pitch PR/datos | earned | activation asset | | | | 05 | |
+
+## Contrato de medición
+- External search: _
+- Platform search / recommendation: _
+- Downstream progress: _
+- Definiciones/ventanas incompatibles que no deben sumarse: _
 
 ## Refresh evergreen
 - Cuándo actualizar: _ | Qué actualizar (datos/año/ejemplos): _ | Re-distribución: _

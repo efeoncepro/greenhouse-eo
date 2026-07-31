@@ -6,6 +6,8 @@
 > **Fecha:** 2026-07-05. **Skills:** `info-architecture`, `seo-aeo`.
 > **Depende de:** [PDR-001](PDR-001-seo-landing-complementaria-al-aeo.md) ·
 > alinea con [PDR-003](PDR-003-layering-ecosistema-digital-efeonce.md).
+> **Placement editorial:** [PDR-018](PDR-018-pillar-experience-arquitectura-editorial-y-runtime.md) aclara que
+> Think es el producto de contenido; la canonical de una guía no se asigna automáticamente al subdominio Think.
 
 ## Contexto
 
@@ -21,7 +23,8 @@ magnet (AI Visibility Grader) vive en `think.efeoncepro.com` (hub Astro).
 ## Decisión
 
 **Hub `/servicios` con spokes por keyword comercial; el pillar de autoridad
-temática es una guía de CONTENIDO en Think, no una página de servicio genérica.**
+temática es una guía del producto editorial Think, no una página de servicio genérica. Su host se decide por
+PDR-018 y route ownership.**
 
 Dos correcciones sobre la versión inicial (que proponía un pillar `/visibilidad`):
 (1) `/visibilidad` como URL de servicio apunta a un término sin volumen de
@@ -29,11 +32,11 @@ búsqueda → peso muerto; (2) el hub se llama `/servicios` (no `/soluciones`: e
 manual de voz de Efeonce, `docs/context/05_voz-tono-estilo.md`, lista "soluciones
 integrales" como cliché de agencia a evitar; y `Servicio` es el objeto canónico
 del modelo 360). El pillar-cluster canónico = pillar de contenido comprehensivo +
-spokes que son las páginas-servicio; el pillar de autoridad se muda a Think.
+spokes que son las páginas-servicio; el pillar de autoridad pertenece a Think como producto editorial.
 
 ```text
-Think (capa de contenido)   Guía pillar "Visibilidad en búsqueda + IA"
-                            (topical authority; linkea ↓ a spokes + grader)
+Think (producto editorial)  Guía pillar "Visibilidad en búsqueda + IA"
+                            (canonical host según PDR-018; linkea ↓ a spokes + grader)
 efeoncepro.com  (apex · marketing · conversión)
 └── /servicios                          hub (outcome vía copy, no vía la palabra)
     ├── /servicios/posicionamiento-seo  spoke SEO  · title→"agencia SEO" (880) + "posicionamiento web"
@@ -44,10 +47,10 @@ think.efeoncepro.com  (hub de lead magnets · Astro)
 └── AI Visibility Grader    NODO — instrumento diagnóstico (Search + AI Visibility, EPIC-022)
 ```
 
-- **Pillar de autoridad = guía de contenido en Think** ("Visibilidad en búsqueda
+- **Pillar de autoridad = guía del producto editorial Think** ("Visibilidad en búsqueda
   e IA"): tesis "no basta con rankear en Google", más el framework 5 niveles;
   linkea a las spokes y al grader. NO es una página de servicio; vive en la capa de
-  contenido (coherente con PDR-003). Ahí "visibilidad" (genérico-amplio) es
+  contenido (coherente con PDR-003), con host/canonical por resolver según PDR-018. Ahí "visibilidad" (genérico-amplio) es
   correcto para una guía.
 - **`/servicios/posicionamiento-seo`** (spoke, cimiento Be Found/Readable): slug =
   categoría del servicio (evergreen); title/H1 apuntan a **"agencia SEO"** (880) +
@@ -110,7 +113,7 @@ localización aparte de fase posterior.
 
 - Global: entrada "Servicios" en nav top → flyout con las spokes.
 - Local: breadcrumb `Inicio › Servicios › Posicionamiento SEO` + cross-link entre spokes.
-- Contextual: cada spoke enlaza su hermana + el nodo grader + la guía pillar (Think).
+- Contextual: cada spoke enlaza su hermana + el nodo grader + la guía pillar editorial (canonical según PDR-018).
 - Supplemental: footer + sitemap del ecosistema (incluye el nodo grader).
 
 ### URLs / redirects
@@ -125,7 +128,7 @@ localización aparte de fase posterior.
 - **Pillar `/visibilidad` como URL de servicio** — apunta a un término sin volumen
   ("visibilidad" no se busca; "servicios/de seo" = 70/20 confirma que ese tipo de
   segmento no captura búsqueda). Peso muerto como pillar-URL. En su lugar, el
-  pillar de autoridad se muda a una guía de contenido en Think (donde "visibilidad"
+  pillar de autoridad se mueve a una guía del producto editorial Think (donde "visibilidad"
   amplio es correcto) y las spokes cargan la keyword comercial.
 - **Hub `/soluciones`** — el manual de voz (`docs/context/05_voz-tono-estilo.md`)
   lista "soluciones integrales" como cliché de agencia a evitar; `Servicio` es el
@@ -140,11 +143,11 @@ localización aparte de fase posterior.
 ## Consecuencias
 
 - **Positivas:** slugs con volumen real (data-backed); hub on-brand y honesto
-  (`/servicios`); autoridad temática en la capa correcta (guía en Think); grader
+  (`/servicios`); autoridad temática en la capa correcta (guía editorial Think); grader
   como nodo único; esquema a prueba de migración (port 1:1 a Astro); AEO ocupa un
   término barato antes de que se encarezca.
-- **Costo:** un 301 + registrar en redirect map/matrix; producir la guía pillar en
-  Think (no solo las dos spokes) para que el cluster tenga autoridad.
+- **Costo:** un 301 + registrar en redirect map/matrix; producir la guía pillar
+  editorial (no solo las dos spokes) para que el cluster tenga autoridad.
 - **4 pilares:** Safety = 301 con equity bajo, reversible. Robustez = pillar-cluster
   estándar. Resiliencia = redirect map + matrix la preservan. Escalabilidad =
   admite más spokes bajo `/servicios/[servicio]` sin refactor.
@@ -154,7 +157,7 @@ localización aparte de fase posterior.
 1. **Crawl vivo** de `efeoncepro.com`: confirmar si `/servicios` ya existe con
    contenido/IA propia (para nested limpio) y el equity actual de `/aeo-2` (para el
    301). Los slugs ya NO dependen del crawl — están cerrados con datos Semrush.
-2. Producir la guía pillar en Think + las dos spokes; registrar el esquema en el
+2. Producir la guía pillar bajo Think/Marketing con Manzanitas + las dos spokes; resolver canonical y registrar el esquema en el
    route-ownership matrix.
 
 ## Reglas duras
@@ -167,8 +170,8 @@ localización aparte de fase posterior.
 - **SIEMPRE** registrar el esquema en el route-ownership matrix para el port Astro.
 - **SIEMPRE** un solo NODO grader canónico (una engine, muchos entry points): las
   spokes funnelean hacia él; NUNCA reconstruirlo ni duplicarlo como página.
-- **SIEMPRE** el pillar de autoridad vive como contenido en Think, no como página
-  de servicio genérica en el sitio.
+- **SIEMPRE** el pillar de autoridad pertenece editorialmente al producto Think, no a
+  la página de servicio genérica; esto no prescribe el subdominio y su host/canonical se decide por PDR-018.
 
 ## Enlaces
 

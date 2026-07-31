@@ -30,7 +30,9 @@ const DEFAULT_ALLOWED_GUTENBERG_BLOCKS = [
   'core/embed',
   'core/gallery',
   'core/group',
+  'core/details',
   'core/heading',
+  'core/html',
   'core/image',
   'core/list',
   'core/list-item',
@@ -49,7 +51,15 @@ export const EFEONCE_BLOGPOST_COMPOSITION_PROFILE: GutenbergBlogpostCompositionP
   description:
     'Efeonce blog posts should be generated as structured Gutenberg editorial pieces, not plain paragraph dumps.',
   requiredBlocks: ['core/heading', 'core/paragraph', 'core/list', 'yoast-seo/table-of-contents'],
-  recommendedBlocks: ['core/quote', 'core/pullquote', 'core/separator', 'core/table', 'core/image', 'core/embed'],
+  recommendedBlocks: [
+    'core/quote',
+    'core/pullquote',
+    'core/details',
+    'core/separator',
+    'core/table',
+    'core/image',
+    'core/embed'
+  ],
   tableOfContentsBlock: 'yoast-seo/table-of-contents',
   minHeadingCount: 3,
   minLevel2HeadingCount: 2,
@@ -61,6 +71,7 @@ export const EFEONCE_BLOGPOST_COMPOSITION_PROFILE: GutenbergBlogpostCompositionP
     'core/list',
     'core/quote',
     'core/pullquote',
+    'core/details',
     'core/separator',
     'core/table',
     'core/image',
@@ -160,6 +171,16 @@ const stripHtml = (value: string) =>
     .replace(/\s+/g, ' ')
     .trim()
 
+const decodeBasicHtmlEntities = (value: string) =>
+  value
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+
+const normalizeComparableText = (value: string) => decodeBasicHtmlEntities(stripHtml(value)).replace(/\s+/g, ' ').trim()
+
 const inferHeadingLevel = (block: ParsedGutenbergBlockComment, postContent: string, nextBlockIndex: number) => {
   const attrLevel = typeof block.attrs.level === 'number' ? block.attrs.level : null
 
@@ -194,8 +215,13 @@ const collectHeadingOutline = (
   return headings
 }
 
+const GOVERNED_JSON_LD_SCRIPT_PATTERN =
+  /<script type="application\/ld\+json">[\s\S]*?<\/script>/gi
+
+const stripGovernedJsonLdScripts = (postContent: string) => postContent.replace(GOVERNED_JSON_LD_SCRIPT_PATTERN, '')
+
 const hasUnsafeMarkup = (postContent: string) =>
-  /<\s*script\b/i.test(postContent) ||
+  /<\s*script\b/i.test(stripGovernedJsonLdScripts(postContent)) ||
   /<\s*iframe\b/i.test(postContent) ||
   /\son[a-z]+\s*=/i.test(postContent) ||
   /javascript\s*:/i.test(postContent)
@@ -431,6 +457,245 @@ const validateTableOfContentsIntegrity = (
   }
 }
 
+const findMatchingClosingBlockIndex = (blocks: ParsedGutenbergBlockComment[], openingIndex: number) => {
+  const opening = blocks[openingIndex]
+  let depth = 0
+
+  for (let index = openingIndex; index < blocks.length; index += 1) {
+    const block = blocks[index]
+
+    if (block.blockName !== opening.blockName) continue
+    if (!block.closing) depth += 1
+    if (block.closing) depth -= 1
+    if (depth === 0) return index
+  }
+
+  return -1
+}
+
+const asStringArray = (value: unknown): string[] => {
+  if (Array.isArray(value)) return value.filter((item): item is string => typeof item === 'string')
+  
+return typeof value === 'string' ? [value] : []
+}
+
+const hasSchemaType = (value: Record<string, unknown>, type: string) => asStringArray(value['@type']).includes(type)
+
+const collectJsonLdNodes = (value: unknown): Record<string, unknown>[] => {
+  if (Array.isArray(value)) return value.flatMap(collectJsonLdNodes)
+  if (!value || typeof value !== 'object') return []
+
+  const record = value as Record<string, unknown>
+  const graphNodes = Array.isArray(record['@graph']) ? collectJsonLdNodes(record['@graph']) : []
+
+  return [record, ...graphNodes]
+}
+
+const collectDetailsSummaries = (postContent: string, blocks: ParsedGutenbergBlockComment[]) => {
+  const summaries = new Set<string>()
+
+  for (const [blockIndex, block] of blocks.entries()) {
+    if (block.closing || block.blockName !== 'core/details') continue
+
+    const closingIndex = findMatchingClosingBlockIndex(blocks, blockIndex)
+    const blockEnd = closingIndex >= 0 ? blocks[closingIndex + 1]?.index ?? postContent.length : postContent.length
+    const blockSlice = postContent.slice(block.index, blockEnd)
+    const summary = blockSlice.match(/<summary\b[^>]*>([\s\S]*?)<\/summary>/i)?.[1] ?? ''
+    const normalized = normalizeComparableText(summary)
+
+    if (normalized) summaries.add(normalized)
+  }
+
+  return summaries
+}
+
+const validateFaqPageNode = ({
+  faqPage,
+  findings,
+  path,
+  visibleDetailsSummaries
+}: {
+  faqPage: Record<string, unknown>
+  findings: ContentFactoryValidationFinding[]
+  path: string
+  visibleDetailsSummaries: Set<string>
+}) => {
+  const mainEntity = Array.isArray(faqPage.mainEntity) ? faqPage.mainEntity : []
+
+  if (mainEntity.length === 0) {
+    findings.push({
+      severity: 'block',
+      code: 'faqpage_main_entity_missing',
+      message: 'FAQPage JSON-LD must include at least one mainEntity Question.',
+      path
+    })
+
+    return
+  }
+
+  for (const [index, entity] of mainEntity.entries()) {
+    const question = asRecord(entity)
+    const answer = asRecord(question.acceptedAnswer)
+    const questionName = typeof question.name === 'string' ? normalizeComparableText(question.name) : ''
+    const answerText = typeof answer.text === 'string' ? normalizeComparableText(answer.text) : ''
+    const entityPath = `${path}.mainEntity[${index}]`
+
+    if (!hasSchemaType(question, 'Question')) {
+      findings.push({
+        severity: 'block',
+        code: 'faqpage_question_type_invalid',
+        message: 'FAQPage mainEntity items must be Schema.org Question nodes.',
+        path: entityPath
+      })
+    }
+
+    if (!questionName) {
+      findings.push({
+        severity: 'block',
+        code: 'faqpage_question_name_missing',
+        message: 'FAQPage Question nodes need a non-empty name.',
+        path: `${entityPath}.name`
+      })
+    } else if (!visibleDetailsSummaries.has(questionName)) {
+      findings.push({
+        severity: 'block',
+        code: 'faqpage_question_not_visible',
+        message: 'FAQPage Question names must match a visible core/details summary in the article body.',
+        path: `${entityPath}.name`
+      })
+    }
+
+    if (!hasSchemaType(answer, 'Answer')) {
+      findings.push({
+        severity: 'block',
+        code: 'faqpage_answer_type_invalid',
+        message: 'FAQPage acceptedAnswer must be a Schema.org Answer node.',
+        path: `${entityPath}.acceptedAnswer`
+      })
+    }
+
+    if (!answerText) {
+      findings.push({
+        severity: 'block',
+        code: 'faqpage_answer_text_missing',
+        message: 'FAQPage acceptedAnswer.text must be non-empty.',
+        path: `${entityPath}.acceptedAnswer.text`
+      })
+    }
+  }
+}
+
+const validateGovernedHtmlJsonLdBlocks = (
+  postContent: string,
+  blocks: ParsedGutenbergBlockComment[],
+  findings: ContentFactoryValidationFinding[]
+) => {
+  const visibleDetailsSummaries = collectDetailsSummaries(postContent, blocks)
+
+  for (const [blockIndex, block] of blocks.entries()) {
+    if (block.closing || block.blockName !== 'core/html') continue
+
+    const closingIndex = findMatchingClosingBlockIndex(blocks, blockIndex)
+    const blockEnd = closingIndex >= 0 ? blocks[closingIndex + 1]?.index ?? postContent.length : postContent.length
+    const blockSlice = postContent.slice(block.index, blockEnd)
+    const html = blockSlice.replace(BLOCK_COMMENT_PATTERN, '').trim()
+    const scriptMatch = html.match(/^<script type="application\/ld\+json">([\s\S]*?)<\/script>$/i)
+
+    if (!scriptMatch) {
+      findings.push({
+        severity: 'block',
+        code: 'html_block_not_governed_jsonld',
+        message:
+          'core/html is allowed only for Content Factory generated application/ld+json structured data, not arbitrary HTML.',
+        path: `draft.postContent[${block.index}]`
+      })
+      continue
+    }
+
+    let jsonLd: unknown
+
+    try {
+      jsonLd = JSON.parse(scriptMatch[1] ?? '')
+    } catch {
+      findings.push({
+        severity: 'block',
+        code: 'jsonld_parse_error',
+        message: 'core/html JSON-LD must contain valid JSON.',
+        path: `draft.postContent[${block.index}]`
+      })
+      continue
+    }
+
+    const faqPages = collectJsonLdNodes(jsonLd).filter(node => hasSchemaType(node, 'FAQPage'))
+
+    if (faqPages.length === 0) {
+      findings.push({
+        severity: 'block',
+        code: 'jsonld_schema_type_unsupported',
+        message: 'Content Factory core/html JSON-LD currently supports generated FAQPage nodes only.',
+        path: `draft.postContent[${block.index}]`
+      })
+      continue
+    }
+
+    for (const [index, faqPage] of faqPages.entries()) {
+      validateFaqPageNode({
+        faqPage,
+        findings,
+        path: `draft.postContent[${block.index}].FAQPage[${index}]`,
+        visibleDetailsSummaries
+      })
+    }
+  }
+}
+
+const validateDetailsBlocks = (
+  postContent: string,
+  blocks: ParsedGutenbergBlockComment[],
+  findings: ContentFactoryValidationFinding[]
+) => {
+  for (const [blockIndex, block] of blocks.entries()) {
+    if (block.closing || block.blockName !== 'core/details') continue
+
+    const closingIndex = findMatchingClosingBlockIndex(blocks, blockIndex)
+    const blockEnd = closingIndex >= 0 ? blocks[closingIndex + 1]?.index ?? postContent.length : postContent.length
+    const blockSlice = postContent.slice(block.index, blockEnd)
+    const summary = blockSlice.match(/<summary\b[^>]*>([\s\S]*?)<\/summary>/i)?.[1] ?? ''
+
+    if (!stripHtml(summary).trim()) {
+      findings.push({
+        severity: 'block',
+        code: 'details_summary_missing',
+        message: 'core/details blocks need a visible summary label.',
+        path: `draft.postContent[${block.index}]`
+      })
+    }
+
+    if (closingIndex >= 0) {
+      const childBlocks = blocks.slice(blockIndex + 1, closingIndex).filter(child => !child.closing)
+
+      if (childBlocks.length === 0) {
+        findings.push({
+          severity: 'block',
+          code: 'details_content_missing',
+          message: 'core/details blocks need at least one governed child block.',
+          path: `draft.postContent[${block.index}]`
+        })
+      }
+
+      if (childBlocks.some(child => child.blockName === 'core/heading')) {
+        findings.push({
+          severity: 'warning',
+          code: 'details_heading_inside_disclosure',
+          message:
+            'Avoid heading blocks inside core/details unless the TOC/outline decision explicitly owns hidden headings.',
+          path: `draft.postContent[${block.index}]`
+        })
+      }
+    }
+  }
+}
+
 export const validateGeneratedGutenbergDraft = (
   draft: ContentFactoryGeneratedDraft,
   options: GutenbergDraftValidationOptions = {}
@@ -534,6 +799,8 @@ export const validateGeneratedGutenbergDraft = (
   }
 
   validateTableOfContentsIntegrity(postContent, blocks, findings)
+  validateGovernedHtmlJsonLdBlocks(postContent, blocks, findings)
+  validateDetailsBlocks(postContent, blocks, findings)
 
   if (postContent.length < 600) {
     findings.push({

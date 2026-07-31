@@ -33,6 +33,11 @@ segunda red solo cuando la primera esté en piloto automático.
 Un **pilar** es un tema recurrente que conecta lo que *tú* sabes con lo que tu audiencia
 *necesita*. Define **3–5 pilares** (más = dispersión, menos = repetición). Método:
 
+> **No confundir taxonomías.** Un *pilar de contenido social* organiza el calendario de una
+> cuenta. Una **Pillar Experience** es el hogar canónico de un territorio y una **Cluster
+> Experience** es su red federada de nodos. La pertenencia a ese territorio la gobierna
+> `content-marketing-studio`; este módulo convierte esa decisión en ejecución social.
+
 1. **Intersección** — lista lo que dominas × lo que tu audiencia pregunta/sufre. Los cruces son pilares.
 2. **Prueba de sostenibilidad** — ¿puedes generar 10+ piezas por pilar sin forzar? Si no, no es pilar.
 3. **Asigna un trabajo a cada pilar** — educar, inspirar, probar (social proof), entretener, convertir.
@@ -46,6 +51,23 @@ Un **pilar** es un tema recurrente que conecta lo que *tú* sabes con lo que tu 
 | "Auditorías en vivo" | probar | Live / long-form | dwell + conversión |
 | "Antes/después de marca" | inspirar | carrusel | sends |
 | "Detrás del estudio" | humanizar | foto/estático | comunidad |
+
+### Platform-native cluster nodes
+
+Un Reel, Pin, Short, video, post, carrusel o newsletter social puede ser un nodo de primera
+clase del cluster, no sólo un átomo promocional. Califica únicamente cuando:
+
+1. resuelve un JTBD o intención propios del territorio;
+2. entrega valor autónomo y no es sólo teaser;
+3. declara relación con la Pillar u otro nodo;
+4. posee URL o ID estable, plataforma, owner y estado;
+5. define medición de búsqueda/recomendación y progreso posterior.
+
+Clasifica por rol, no por formato: `recognition`, `comprehension`, `application`, `evidence`,
+`evaluation`, `decision` o `activation`. Una pieza puede cumplir varios roles. Registra además
+`territory`, `cluster_node_id`, `primary_job`, `search_intent`, `canonical_parent`,
+`indexing_eligibility`, `progress_event` y `next_best_node`. Si no supera los cinco criterios,
+es una pieza de activación/distribución, no un cluster node.
 
 ---
 

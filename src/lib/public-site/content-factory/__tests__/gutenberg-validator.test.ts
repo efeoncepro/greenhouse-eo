@@ -167,6 +167,180 @@ describe('validateGeneratedGutenbergDraft', () => {
     )
   })
 
+  it('allows governed native details blocks when they include summary and child content', () => {
+    const base = buildDraft()
+    const postContent = base.draft.kind === 'gutenberg_post' ? base.draft.postContent : ''
+
+    const validation = validateGeneratedGutenbergDraft(
+      buildDraft({
+        draft: {
+          kind: 'gutenberg_post',
+          observedBlocks: [
+            'core/details',
+            'core/heading',
+            'core/list',
+            'core/paragraph',
+            'core/quote',
+            'yoast-seo/table-of-contents'
+          ],
+          postContent: [
+            postContent,
+            '<!-- wp:details {"summary":"¿Qué queda visible?"} -->',
+            '<details class="wp-block-details"><summary>¿Qué queda visible?</summary>',
+            '<!-- wp:paragraph -->',
+            '<p>La respuesta completa queda en HTML y se despliega con controles nativos.</p>',
+            '<!-- /wp:paragraph -->',
+            '</details>',
+            '<!-- /wp:details -->'
+          ].join('\n')
+        }
+      })
+    )
+
+    expect(validation.status).toBe('pass')
+    expect(validation.summary?.uniqueBlocks).toContain('core/details')
+  })
+
+  it('allows governed FAQPage JSON-LD when every schema question matches a visible details summary', () => {
+    const base = buildDraft()
+    const postContent = base.draft.kind === 'gutenberg_post' ? base.draft.postContent : ''
+
+    const faqPage = {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: '¿Qué queda visible?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'La respuesta completa queda en HTML y se despliega con controles nativos.'
+          }
+        }
+      ]
+    }
+
+    const validation = validateGeneratedGutenbergDraft(
+      buildDraft({
+        draft: {
+          kind: 'gutenberg_post',
+          observedBlocks: [
+            'core/details',
+            'core/heading',
+            'core/html',
+            'core/list',
+            'core/paragraph',
+            'core/quote',
+            'yoast-seo/table-of-contents'
+          ],
+          postContent: [
+            postContent,
+            '<!-- wp:details {"summary":"¿Qué queda visible?"} -->',
+            '<details class="wp-block-details"><summary>¿Qué queda visible?</summary>',
+            '<!-- wp:paragraph -->',
+            '<p>La respuesta completa queda en HTML y se despliega con controles nativos.</p>',
+            '<!-- /wp:paragraph -->',
+            '</details>',
+            '<!-- /wp:details -->',
+            '<!-- wp:html -->',
+            `<script type="application/ld+json">${JSON.stringify(faqPage)}</script>`,
+            '<!-- /wp:html -->'
+          ].join('\n')
+        }
+      })
+    )
+
+    expect(validation.status).toBe('pass')
+    expect(validation.summary?.uniqueBlocks).toContain('core/html')
+  })
+
+  it('blocks FAQPage JSON-LD when a schema question is not visible in a details summary', () => {
+    const base = buildDraft()
+    const postContent = base.draft.kind === 'gutenberg_post' ? base.draft.postContent : ''
+
+    const faqPage = {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'Pregunta que no existe en la página',
+          acceptedAnswer: { '@type': 'Answer', text: 'Respuesta.' }
+        }
+      ]
+    }
+
+    const validation = validateGeneratedGutenbergDraft(
+      buildDraft({
+        draft: {
+          kind: 'gutenberg_post',
+          observedBlocks: [
+            'core/details',
+            'core/heading',
+            'core/html',
+            'core/list',
+            'core/paragraph',
+            'core/quote',
+            'yoast-seo/table-of-contents'
+          ],
+          postContent: [
+            postContent,
+            '<!-- wp:details {"summary":"¿Qué queda visible?"} -->',
+            '<details class="wp-block-details"><summary>¿Qué queda visible?</summary>',
+            '<!-- wp:paragraph -->',
+            '<p>La respuesta completa queda en HTML.</p>',
+            '<!-- /wp:paragraph -->',
+            '</details>',
+            '<!-- /wp:details -->',
+            '<!-- wp:html -->',
+            `<script type="application/ld+json">${JSON.stringify(faqPage)}</script>`,
+            '<!-- /wp:html -->'
+          ].join('\n')
+        }
+      })
+    )
+
+    expect(validation.status).toBe('block')
+    expect(validation.findings).toEqual(
+      expect.arrayContaining([expect.objectContaining({ code: 'faqpage_question_not_visible', severity: 'block' })])
+    )
+  })
+
+  it('blocks details disclosures without a visible summary or child block', () => {
+    const base = buildDraft()
+    const postContent = base.draft.kind === 'gutenberg_post' ? base.draft.postContent : ''
+
+    const validation = validateGeneratedGutenbergDraft(
+      buildDraft({
+        draft: {
+          kind: 'gutenberg_post',
+          observedBlocks: [
+            'core/details',
+            'core/heading',
+            'core/list',
+            'core/paragraph',
+            'core/quote',
+            'yoast-seo/table-of-contents'
+          ],
+          postContent: [
+            postContent,
+            '<!-- wp:details {"summary":""} -->',
+            '<details class="wp-block-details"><summary></summary></details>',
+            '<!-- /wp:details -->'
+          ].join('\n')
+        }
+      })
+    )
+
+    expect(validation.status).toBe('block')
+    expect(validation.findings).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: 'details_summary_missing', severity: 'block' }),
+        expect.objectContaining({ code: 'details_content_missing', severity: 'block' })
+      ])
+    )
+  })
+
   it('blocks unsafe markup', () => {
     const validation = validateGeneratedGutenbergDraft(
       buildDraft({
@@ -182,8 +356,33 @@ describe('validateGeneratedGutenbergDraft', () => {
     expect(validation.findings).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ code: 'unsafe_markup_detected', severity: 'block' }),
-        expect.objectContaining({ code: 'unsupported_gutenberg_block', severity: 'block' })
+        expect.objectContaining({ code: 'html_block_not_governed_jsonld', severity: 'block' })
       ])
+    )
+  })
+
+  it('blocks invalid JSON-LD inside governed html blocks', () => {
+    const base = buildDraft()
+    const postContent = base.draft.kind === 'gutenberg_post' ? base.draft.postContent : ''
+
+    const validation = validateGeneratedGutenbergDraft(
+      buildDraft({
+        draft: {
+          kind: 'gutenberg_post',
+          observedBlocks: ['core/html'],
+          postContent: [
+            postContent,
+            '<!-- wp:html -->',
+            '<script type="application/ld+json">{"@type":"FAQPage"</script>',
+            '<!-- /wp:html -->'
+          ].join('\n')
+        }
+      })
+    )
+
+    expect(validation.status).toBe('block')
+    expect(validation.findings).toEqual(
+      expect.arrayContaining([expect.objectContaining({ code: 'jsonld_parse_error', severity: 'block' })])
     )
   })
 

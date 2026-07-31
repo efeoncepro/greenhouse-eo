@@ -18,7 +18,8 @@ Toda pieza necesita un plan across the three:
 
 - **Newsletter** — tu canal de mayor ROI y el único que no depende de algoritmos ajenos. Toda pieza pilar debería tener su lugar en la newsletter (`03`, `greenhouse-email`).
 - **Blog/hub** — la sede; enlaza clusters y pillars entre sí (internal linking = táctica `seo-aeo`).
-- **Redes propias** — los átomos (`04`) ejecutados por `social-media-studio`.
+- **Redes propias** — activation assets y platform-native cluster nodes (`04`) ejecutados por
+  `social-media-studio`; una cuenta propia no convierte la plataforma arrendada en canonical editorial.
 - **Email a segmentos** — nurture/secuencias como *canal* es de `digital-marketing`/`growth`; el contenido lo provee el studio.
 
 ## Distribución earned (la que se gana)
@@ -51,6 +52,18 @@ Trimestral: refresh + re-distribución del evergreen (04)
 - No distribuyas en un canal donde tu ICP no está o donde no puedes producir el nativo. Monocanal es frágil; multicanal enfocado gana.
 - La **economía del canal** (cuánto cuesta y rinde) es de `growth-marketing-cro`; aquí decides *qué contenido va a qué canal* según la audiencia y el formato.
 
+## Distribución que también es descubrimiento
+
+Una pieza social puede ser encontrada en buscadores externos y en la búsqueda/recomendación de su propia
+plataforma. Si resuelve un JTBD autónomo, registra intención, roles, URL/ID, relación y progreso como nodo federado;
+si sólo amplifica otro nodo, mantenla como activation asset. Search Console está desplegando gradualmente Platform
+Properties para Instagram, TikTok, X y YouTube, y las plataformas ofrecen medición nativa con cobertura y
+definiciones distintas. Verifica disponibilidad real antes de diseñar el dashboard.
+
+Reporta por separado: **external search**, **platform search/recommendation** y **downstream progress**. No sumes
+impresiones de Google, feeds y búsqueda interna como una misma audiencia ni atribuyas causalidad comercial sólo
+porque una plataforma reporta alcance.
+
 ## Distribución para clientes (agencia)
 
 Cuando el studio produce contenido para un cliente de Efeonce, el POE se ejecuta en los **canales del cliente** (su newsletter, sus redes, su PR), respetando su brand safety. La doctrina de servicio/ICP es de `efeonce-agency`.
@@ -62,6 +75,8 @@ Cuando el studio produce contenido para un cliente de Efeonce, el POE se ejecuta
 - [ ] Contenido **citable** para earned/GEO (datos + fuentes; táctica → `seo-aeo`).
 - [ ] Boosting reservado a lo que **ya funcionó** orgánico (paid → `digital-marketing`).
 - [ ] Canal-market fit validado (audiencia presente + nativo producible).
+- [ ] Cada pieza social clasificada por rol y relación: cluster node federado o activation asset.
+- [ ] External search, platform discovery y progreso posterior conservan fuentes y denominadores separados.
 
 ## Cross-links
 

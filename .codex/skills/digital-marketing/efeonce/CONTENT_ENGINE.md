@@ -33,8 +33,13 @@ Docs: `docs/documentation/public-site/public-site-content-factory-end-to-end.md`
 - **GEO / AI-search como canal:** el contenido del blog debe ser citable (answer-first, datos,
   fuentes) — decisión de canal de esta skill; la táctica técnica (schema, chunking, entidad) es
   de `seo-aeo`.
-- **Distribución + repurposing:** el post del content factory es el activo pilar; planifica su
-  distribución owned/earned/paid y su repurposing a social/email/clips (`../modules/02, 04, 06`).
+- **Pillar/Cluster Experience federada:** la Pillar es el hogar canónico, no necesariamente un
+  "post activo" del que todo deriva. Artículos, tools y piezas platform-native pueden ser nodos
+  heterogéneos del cluster. `content-marketing-studio` gobierna pertenencia y relación; esta skill
+  diseña el mix/distribución y `social-media-studio` el craft y search nativo.
+- **Distribución + adaptación:** planifica owned/earned/paid y piezas nativas por JTBD; no reduzcas
+  reels/carruseles/posts a recortes promocionales. Un nodo social requiere valor autónomo, URL/ID,
+  owner y medición; un teaser sigue siendo activación (`../modules/02, 04, 06`).
 - **Governance de IA:** el content factory genera con IA → aplica brand safety + revisión humana
   (`../modules/09`); no publiques output crudo (barra de insight original).
 
@@ -46,3 +51,5 @@ Docs: `docs/documentation/public-site/public-site-content-factory-end-to-end.md`
   **lead magnet** self-serve del grader (eso es growth; ver `growth-marketing-cro/efeonce/`).
 - La estrategia de contenido y su distribución son de esta skill; la publicación y la táctica SEO,
   de sus skills dueñas.
+- **NUNCA** sumes impresiones de Search Console, búsqueda/recomendación in-platform y progreso
+  downstream: son planos distintos y tienen owners/métodos distintos.

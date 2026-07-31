@@ -9,6 +9,13 @@
 
 Greenhouse ya mide si los motores de IA citan una marca (AEO Grader, `growth.ai_visibility`, EPIC-020/021). No mide el otro lado — Google orgánico clásico: rankeo, click, evolución en el tiempo. Es media película para el cliente. Ya existen los dos primitives base: **DataForSEO** integrado (`src/lib/ai/dataforseo.ts`, hoy candado a `/v3/serp/`) y **Search Console per-org** (TASK-1282, Grupo Berel conectado live). La pregunta ancla del operador — *"¿cómo rinde una serie de URLs y su evolución en el tiempo?"* — no tiene hoy dónde vivir.
 
+Google despliega gradualmente **Platform Properties** de Search Console para Instagram, TikTok, X y YouTube. Esto
+abre un plano adicional de visibilidad orgánica externa para contenido social, pero no forma parte del runtime
+verificado de Greenhouse: `listSearchConsoleSiteOptions()` y `readSearchConsoleAnalytics()` sólo tienen evidencia
+E2E con propiedades web `sc-domain:*`. Antes de declarar soporte se debe comprobar con una cuenta elegible si
+`sites.list` expone la propiedad social y si `searchAnalytics.query` conserva dimensiones y métricas compatibles.
+Fuente: [Google Search Console Platform Properties](https://support.google.com/webmasters/answer/17148418?hl=en-GB).
+
 ## Decisión
 
 Construir un **módulo SEO** dentro del dominio `growth` (`growth.seo`), hermano del AEO, y envolver ambos en una sola narrativa de producto: **"Search Visibility 360"** — los dos internets de búsqueda (Google orgánico + motores de IA) en un panel, con la misma identidad de org, el mismo evidence ledger gobernado y el mismo modelo de entitlement. Se materializa como programa `EPIC-022` (12 tasks).
@@ -42,6 +49,9 @@ Construir un **módulo SEO** dentro del dominio `growth` (`growth.seo`), hermano
 - **Riesgo #1 — costo DataForSEO** (rank tracking O(orgs × keywords × devices × días); Lighthouse $0.00425/pág): mitigado con GSC-first (gratis/medido), quota cap por-org en el chokepoint, audits programados, signal `seo.provider.cost_over_budget`.
 - **Reversibilidad:** todo detrás de `GROWTH_SEO_ENABLED` (default OFF) + assignment per-org; rollback = revocar assignment (la historia append-only no se borra por diseño).
 - **Secreto compartido con AEO:** DataForSEO comparte credenciales/cuota con el AEO AI Overview; los breakers y budgets **por familia** aíslan SERP-AI (AEO) de Labs/Backlinks/OnPage (SEO).
+- **Platform Properties no implícitas:** las propiedades sociales de Search Console son una capacidad candidata.
+  Requieren fixture/smoke real, clasificación de tipo de propiedad y métricas separadas de las impresiones
+  in-platform antes de entrar a Search Visibility 360.
 
 ## Seguimiento
 
