@@ -1317,7 +1317,8 @@ futuro debe saber:
   el confirm falla cerrado.
 - **Loopback en Vercel:** el redirect se registra siempre como `http://127.0.0.1/oauth/callback`. Vercel/Next
   normaliza ese query param a `localhost` antes del route; el matcher acepta sólo ese alias contra el registro
-  literal, conservando protocolo/path/query exactos y PKCE/state obligatorios. No amplíes a otros hosts.
+  literal y lo canoniza inmediatamente de vuelta a `127.0.0.1`, de modo que code, callback y token exchange
+  usan el mismo URI exacto. Conserva protocolo/path/query exactos y PKCE/state obligatorios. No amplíes a otros hosts.
 
 ### Ocho lecciones de método, que valen más que los fixes
 

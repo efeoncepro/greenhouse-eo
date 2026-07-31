@@ -85,7 +85,7 @@ describe('public OAuth client RFC 8252 loopback behavior', () => {
   it('accepts localhost only as the Vercel/Next normalized alias of a registered 127.0.0.1 loopback', async () => {
     const result = await validateSisterPlatformAuthorizeRequest(authorizeUrl('http://localhost:43123/callback'))
 
-    expect(result.redirectUri).toBe('http://localhost:43123/callback')
+    expect(result.redirectUri).toBe('http://127.0.0.1:43123/callback')
     expect(result.client.redirectUris).toEqual(['http://127.0.0.1/callback'])
   })
 

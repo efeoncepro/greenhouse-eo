@@ -36,7 +36,8 @@ canónico; no se copian cookies, no se usa `agent-session`, no se agrega API key
 
 - Source of truth: `sister_platform_oauth_clients.client_type` y stores OAuth existentes.
 - Contract: authorize + token exchange; API Platform app routes adaptan el funding broker.
-- Invariants: confidential exige secret; public rechaza secret y exige PKCE; loopback sólo 127.0.0.1/path exacto;
+- Invariants: confidential exige secret; public rechaza secret y exige PKCE; loopback canónico sólo
+  127.0.0.1/path exacto (el alias `localhost` medido en Vercel se resuelve antes de emitir el código);
   sesión agente confirma sólo en workspace delegado y bajo límites; idempotency distinta por fase.
 - Migration: aditiva, default `confidential`, sin backfill mutante.
 - Rollback: suspender public client y retirar routes/CLI; clientes existentes permanecen intactos.

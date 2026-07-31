@@ -291,7 +291,7 @@ const assertPublicClientRedirectUris = (redirectUris: readonly string[]) => {
   }
 }
 
-const redirectUriMatchesClient = ({
+const resolveClientRedirectUri = ({
   client,
   registeredRedirectUri,
   requestedRedirectUri
@@ -301,26 +301,35 @@ const redirectUriMatchesClient = ({
   requestedRedirectUri: string
 }) => {
   if (client.clientType === 'confidential') {
-    return registeredRedirectUri === requestedRedirectUri
+    return registeredRedirectUri === requestedRedirectUri ? requestedRedirectUri : null
   }
 
   if (
     !isLoopbackPublicRedirectUri(registeredRedirectUri) ||
     !isLoopbackPublicRedirectUri(requestedRedirectUri, true)
   ) {
-    return false
+    return null
   }
 
   const registered = new URL(registeredRedirectUri)
   const requested = new URL(requestedRedirectUri)
 
-  return (
+  const matches =
     registered.protocol === requested.protocol &&
     (registered.hostname === requested.hostname ||
       (registered.hostname === '127.0.0.1' && requested.hostname === 'localhost')) &&
     registered.pathname === requested.pathname &&
     registered.search === requested.search
-  )
+
+  if (!matches) return null
+
+  // Vercel/Next can normalize a 127.0.0.1 query parameter to localhost before
+  // the route sees it. Return the registered loopback host while preserving the
+  // RFC 8252 ephemeral port so authorization, callback and token exchange share
+  // one exact redirect_uri value.
+  requested.hostname = registered.hostname
+
+  return requested.toString()
 }
 
 const normalizeAllowedScopes = (value: string[] | undefined) => {
@@ -1117,12 +1126,15 @@ export const validateSisterPlatformAuthorizeRequest = async (url: URL): Promise<
 
   assertClientActive(client)
 
-  if (
-    !redirectUri ||
-    !client.redirectUris.some(registeredRedirectUri =>
-      redirectUriMatchesClient({ client, registeredRedirectUri, requestedRedirectUri: redirectUri })
-    )
-  ) {
+  const resolvedRedirectUri = redirectUri
+    ? client.redirectUris
+        .map(registeredRedirectUri =>
+          resolveClientRedirectUri({ client, registeredRedirectUri, requestedRedirectUri: redirectUri })
+        )
+        .find((candidate): candidate is string => Boolean(candidate))
+    : null
+
+  if (!resolvedRedirectUri) {
     throw new SisterPlatformOAuthError('Redirect URI is not registered for this OAuth client.', {
       statusCode: 400,
       errorCode: 'invalid_redirect_uri'
@@ -1160,7 +1172,7 @@ export const validateSisterPlatformAuthorizeRequest = async (url: URL): Promise<
 
   return {
     client,
-    redirectUri,
+    redirectUri: resolvedRedirectUri,
     state,
     nonce,
     requestedScopes,
