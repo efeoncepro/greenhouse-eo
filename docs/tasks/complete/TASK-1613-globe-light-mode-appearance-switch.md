@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Modo claro completo con interruptor en el menú de cuenta del Producer. Habilitado por TASK-1612 (el :root proyecta sobre el @theme), el tema es UN bloque de override sobre las claves del theme. Cerró 2 regresiones de contraste medidas y un defecto de herencia: el share board tomaba el modo del localStorage sin tener interruptor propio. AXIS 0.2.3 aporta las tintas semánticas por modo`
+- Status real: `Modo claro completo con interruptor en el menú de cuenta del Producer, DESPLEGADO y verificado en vivo por el operador. Habilitado por TASK-1612 (el :root proyecta sobre el @theme), el tema es UN bloque de override sobre las claves del theme. Cerró 2 regresiones de contraste medidas y un defecto de herencia: el share board tomaba el modo del localStorage sin tener interruptor propio. AXIS 0.2.3 aporta las tintas semánticas por modo. 🔴 Post-despliegue aparecieron DOS defectos más que ni la suite ni el barrido detectaron —scrims que voltearon a claro y el lecho de las piezas apagado—; se encontraron MIRANDO el render y se cerraron en las rev 00121-vft y 00122-lwd`
 - Rank: `TBD`
 - Domain: `creative|design-tokens|styling-pipeline`
 - Blocked by: `none`
@@ -81,8 +81,9 @@ superficie herede el modo por accidente.
 
 ## Current Repo State
 
-Implementado y cerrado. Commits en `efeonce-globe`: `994711e`, `d87d71f`, `59339f0`. AXIS en `c9198c9`
-(tag `v0.2.3`).
+Implementado, cerrado y **en producción**. Commits en `efeonce-globe`: `994711e`, `d87d71f`, `59339f0`.
+AXIS en `c9198c9` (tag `v0.2.3`). Los dos arreglos posteriores al cierre viven en `e27ffbe` (lecho de las
+piezas) y `adc3941` (scrims), detallados en `## Post-cierre`.
 
 <!-- ZONE 2 — PLAN MODE: se completa al tomar la task -->
 
@@ -283,6 +284,70 @@ Publicar `@efeoncepro/axis-tokens@0.2.3` y subir el pin de Globe de `0.2.2` a `0
    servirse como máscara con el color del token.
 5. **Mi primer barrido reportó 61 fallos y casi todos eran mentira.** Sin control comparativo, un
    barrido de contraste sólo dice que el diseño tiene deuda; y un gradiente no se mide con un número.
+
+## Post-cierre — los dos defectos que sólo aparecieron mirando producción
+
+La task se cerró, se mergeó y se desplegó. **Al abrirla en producción aparecieron dos defectos que ni la
+suite ni el barrido de contraste habían detectado.** Los dos se encontraron mirando el render, no
+ejecutando un test; los dos están arreglados y desplegados. Se registran acá porque son evidencia de
+dónde falla la verificación, no una nota al pie.
+
+### Defecto 1 — el título de la pieza destacada quedó ilegible en claro
+
+Los cuatro scrims (`--stage-scrim-strong`, `--stage-scrim-mid`, `--media-scrim`, `--media-vignette`)
+derivaban de `surface.sunk`, así que en modo claro voltearon a `#eceaf1`. **Un scrim claro deja de ser un
+scrim.** El scrim no existe para armonizar con el chasis: existe para que el texto blanco (`--on-media`)
+se lea sobre un medio arbitrario — y el medio es arbitrario en los **dos** modos, porque lo pone el
+cliente. Volteárlos con el modo fue tratar como token de superficie algo que es un token de legibilidad.
+
+**Por qué el barrido no podía verlo.** El `light-contrast-audit` declara los gradientes «no medibles» a
+propósito, para no inventar fallos donde no puede calcular el fondo efectivo. El defecto cayó
+**exactamente** en ese hueco: el instrumento estaba correctamente diseñado y el defecto vivía justo donde
+el instrumento se declara ciego. Un barrido que se abstiene honestamente sigue siendo un barrido con un
+punto ciego declarado, y un punto ciego declarado no deja de ser un punto ciego.
+
+**Arreglo:** los cuatro derivan de `axisSurface.dark.sunk` en ambos modos. `adc3941`, rev `00122-lwd`.
+
+### Defecto 2 — el fondo de las piezas se veía apagado
+
+Al mirarlo se descubrió además que ese fondo (`mediaWashFor`) era **el último sobreviviente de la paleta
+azul que ADR-017 v2.0 retiró**. Nadie lo había notado porque el azul apagado sobre un lecho de piezas se
+lee como «neutro», no como «color equivocado». Se reemplazó por el token `--media-wash` con familia
+magenta — la familia que TASK-1615 porta a AXIS.
+
+Llegar ahí tomó **dos iteraciones fallidas, ambas por el mismo error de método**:
+
+1. **Base en escala de grises con el color sólo como brillos a baja alfa.** El resultado fue exactamente
+   lo que la aritmética predice: gris con una insinuación de color, es decir, apagado. El color no puede
+   entrar sólo como acento si lo que se busca es que el lecho TENGA color.
+2. **Modo claro mapeado al extremo pálido de la rampa**, declarando «presencia equivalente» tras medir el
+   PASO del token contra el canvas. **Esa medición era del token, no de lo que renderiza.** El lecho se
+   compone por alfa sobre lo que hay debajo, así que medir el hex declarado contra el canvas ignora la
+   composición y produce un número correcto sobre un render equivocado. Es el mismo error que el punto
+   ciego del defecto 1, en espejo: ahí se midió lo que no se podía medir; acá se midió lo que no era.
+
+**Solución final:** el escenario **no voltea con el modo**. Es el mismo magenta profundo en claro y en
+oscuro, por la misma razón que los scrims: el lecho existe para que la pieza se vea, y la pieza es
+arbitraria en los dos modos. `e27ffbe`, rev `00121-vft`.
+
+### La lección de método
+
+Los dos defectos comparten causa: **se tokenizó por dónde vive el valor (superficie) en vez de por qué
+existe (legibilidad de un medio arbitrario)**. Todo token cuyo trabajo sea hacer legible o presentable
+contenido que el sistema no controla es candidato a NO voltear con el modo. Y ninguno de los dos se podía
+encontrar con la instrumentación existente — el primero por un hueco declarado, el segundo porque la
+medición aplicable era sobre el render compuesto y se hizo sobre el token.
+
+### Estado de despliegue
+
+| Revisión | Qué lleva | SHA | PR |
+|---|---|---|---|
+| `00118-cfh` | `TASK-1612` + `TASK-1613` (modo claro e interruptor) | `f3357d2` | [#8](https://github.com/efeoncepro/efeonce-globe/pull/8) |
+| `00121-vft` | Lecho de las piezas (`--media-wash`, familia magenta) | `e27ffbe` | [#25](https://github.com/efeoncepro/efeonce-globe/pull/25) |
+| `00122-lwd` | Scrims fijados a `axisSurface.dark.sunk` | `adc3941` | [#27](https://github.com/efeoncepro/efeonce-globe/pull/27) |
+
+También mergeado en el camino: [#15](https://github.com/efeoncepro/efeonce-globe/pull/15), el gate de
+orden de build.
 
 ## Closing Protocol
 

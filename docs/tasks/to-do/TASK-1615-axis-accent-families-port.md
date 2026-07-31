@@ -86,6 +86,21 @@ claves de `axisRamp` y `efeonceTokens.color` **exactamente**, así que crecer es
 - Build impact: `ninguno; aditivo sobre axisAccentRamp, que no está en el contrato de forma exacta de Greenhouse`
 - Extraction blocker: `ninguno`
 
+## Consumidor real, y por qué ya no es hipotética
+
+Desde el 2026-07-31 la rampa magenta **tiene un consumidor en producción**: el token `--media-wash` del
+payload de Globe —el escenario de una pieza sin bytes todavía— la usa entera (pasos 300, 400, 700, 800 y
+900). O sea que la duplicación **no es un riesgo futuro: está viva y sirviendo píxeles.**
+
+La elección de familia está medida y canonizada en ADR-017 §7. Los datos que la sostienen, por si esta
+task los necesita al portar:
+
+| Familia | Matiz | Saturación | Distancia a `danger` (357°) | Estado |
+|---|---|---|---|---|
+| Coral | 343° | 85% | **14°** | Sin rol, pero la más saturada y la más cerca del error |
+| Magenta | 338° | 76% | 19° | **Sin rol asignado** — la elegida para el escenario |
+| Orchid | 266° | 40% | 91° | **Ocupada**: es el acento de Globe (`--accent*`) |
+
 ## Current Repo State
 
 `axisAccentRamp` tiene **sólo** `orchid`. Globe declara `axisMagentaRamp` local con un comentario que

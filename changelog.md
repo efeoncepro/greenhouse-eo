@@ -18,7 +18,31 @@
 - Se reforzaron las skills de licitaciones, deck-studio, SEO/AEO, diseño e imagen con las lecciones de Grader/X-Ray/Greenhouse, mockups honestos, assets extraíbles y protección de decks previos.
 - La salida client-facing queda separada de investigación, métricas ilustrativas, manifiestos vacíos y archivos `-INTERNO`.
 
-## 2026-07-31 — Globe: modo claro PROMOVIDO, y el lecho de las piezas deja el azul del prototipo
+## 2026-07-31 — Globe: modo claro en producción, y dos defectos que sólo aparecieron mirando
+
+- **Cuatro PRs mergeados y desplegados** en `efeonce-globe`: #8 (modo claro + consolidación del `:root`),
+  #15 (todo paquete compila antes de testear + gate), #25 (el lecho de las piezas deja el azul del
+  prototipo) y #27 (scrims y escenario). Revisión activa `00122-lwd`. Verificado visualmente por el operador.
+- 🔴 **Dos defectos llegaron a producción y ni la suite ni el barrido de contraste los vieron**, y los dos
+  venían de lo mismo: **tratar como superficie algo que no lo es**.
+  - Los **scrims** voltearon con el modo y en claro pasaron a `#eceaf1`. Un scrim claro deja de ser un
+    scrim: existe para que el texto blanco se lea sobre un medio **arbitrario**, y el medio es arbitrario
+    en los dos modos. El título de la pieza destacada quedó blanco sobre casi blanco. El barrido declara
+    los gradientes «no medibles» a propósito —para no inventar fallos— y el defecto cayó en ese hueco.
+  - El **escenario** de la pieza tampoco es superficie. Hoy es el mismo magenta en ambos modos, lo que
+    además le deja al producto una sola identidad.
+- **Lección que se repitió tres veces en el día:** se declaró «presencia equivalente» midiendo el PASO de
+  la rampa contra el canvas. Esa medición era del **token, no de lo que renderiza** — ignoraba la
+  composición por alfa. *Un número sobre el token no describe el píxel.* Los tres defectos aparecieron
+  **mirando**, no testeando.
+- **ADR-017 v2.1** canoniza los dos invariantes nuevos (§6 «Lo que NO voltea con el modo» y §7 «La familia
+  del escenario es magenta») y generaliza el hallazgo: **una receta que fabrica color en runtime es un
+  literal con disfraz** que ningún drift guard de literales puede ver.
+- 🔴 **Drift abierto:** AXIS declara **tres** familias de acento para Globe (Coral, Magenta, Orchid) y
+  **sólo orchid llegó al paquete**. `TASK-1615` lo cierra; mientras tanto la rampa magenta vive local en
+  Globe como deuda declarada, con un consumidor real en producción.
+
+## 2026-07-31 — Globe: modo claro promovido (entrada previa del mismo día)
 
 - **El modo claro está en producción.** PR #8 mergeado (`f3357d2`) y desplegado en `globe-studio-internal`
   rev `00118-cfh`; el guardrail del propio workflow confirma que la imagen se construyó desde ese SHA.

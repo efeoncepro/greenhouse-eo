@@ -1,7 +1,7 @@
 # ADR-017 — Color scheme y arquitectura de superficie del payload cliente de Globe
 
 > **Tipo:** Architecture Decision Record
-> **Estado:** `Accepted` — v2.0 aceptada por el operador el 2026-07-30
+> **Estado:** `Accepted` — v2.1 vigente desde el 2026-07-31 (v2.0 aceptada por el operador el 2026-07-30)
 > **Creado:** 2026-07-30
 > **Dueño de implementación:** `TASK-1485`
 > **Depende de:** [ADR de ownership de AXIS](../EFEONCE_AXIS_DESIGN_SYSTEM_OWNERSHIP_DECISION_V1.md) —
@@ -66,6 +66,15 @@ en el docblock de `theme-from-tokens.ts`: *«Si algún día se quiere tematizado
 dueño, no un efecto colateral**»*. Este ADR es ese dueño, y `TASK-1612` ejecutó la parte mecánica que la
 decisión habilitaba: el docblock ya no pide nada — declara qué hace falta para un segundo tema.
 
+### Y al construir el segundo modo apareció lo que el ADR no declaraba
+
+El 2026-07-31 se implementó la resolución por modo: `tokensFor(mode)` resuelve el mapa completo desde
+`axisSurface[mode]` / `axisNeutral[mode]`, así que **agregar un tema es un cambio de resolución, no una
+segunda tabla de valores**. Eso confirmó la forma de la §3 y, al mismo tiempo, dejó ver un hueco del ADR:
+**no declaraba qué tokens NO deben voltear.** El resultado fue un defecto en producción —el título de la
+pieza destacada blanco sobre casi blanco— porque los scrims habían heredado el modo como si fueran
+superficies de la interfaz. Las §6 y §7 cierran ese hueco.
+
 ---
 
 ## Decisión
@@ -85,6 +94,12 @@ generaciones entre sí.
 El **share board** —la única superficie sin autenticar, que un cliente abre una vez en un dispositivo
 desconocido— queda dark en V1 por dos razones: coherencia de lectura con lo que el equipo aprobó, y porque
 una galería oscura es el canon del oficio para presentar una pieza terminada.
+
+**Dark-only es la decisión de producto, no la ausencia de máquina.** Desde el 2026-07-31 el payload
+resuelve los dos modos (`tokensFor(mode)` sobre `axisSurface[mode]` / `axisNeutral[mode]`): la escala clara
+existe, está medida y es consumible. Lo que este ADR sostiene es qué se sirve, no qué se puede construir.
+La consecuencia práctica de tener las dos escalas vivas es que **hay que declarar explícitamente qué no
+voltea** — ver §6.
 
 Las condiciones que reabren esta decisión están escritas más abajo.
 
@@ -187,6 +202,77 @@ Ningún escalón del color secundario alcanza el piso de texto. Eso reencuadra a
 una familia redundante con `secondary` y pasa a ser **su versión operable en oscuro**. La regla de mapeo
 pertenece a AXIS.
 
+### 6 · Lo que NO voltea con el modo
+
+> **Un token que trabaja contra contenido arbitrario no pertenece a la escala de la interfaz.** No se
+> resuelve por modo: se fija.
+
+Dos clases de token caen acá, y ninguna es una superficie del chasis.
+
+#### 6.1 · Los scrims son oscuros en los dos modos
+
+🔴 `--stage-scrim-strong`, `--stage-scrim-mid`, `--media-scrim` y `--media-vignette` **NUNCA** derivan de
+`surface[mode].sunk`. Los cuatro salen de `axisSurface.dark.sunk` en ambos modos.
+
+Un scrim existe para que el texto blanco (`--on-media`, `#ffffff` fijo) se lea sobre un medio **arbitrario**
+—una foto clara, un video oscuro, lo que devuelva el modelo—. **El medio es arbitrario en los dos modos**,
+así que el scrim tiene que oscurecer en los dos. Un scrim claro deja de ser un scrim: no le queda ninguna
+función.
+
+Derivarlos de `surface.sunk` los volteó a `#eceaf1` en claro y dejó **el título de la pieza destacada blanco
+sobre casi blanco, ilegible, en producción**. El barrido de contraste no podía verlo: declara los gradientes
+«no medibles» a propósito —para no inventar fallos— y el defecto cayó exactamente en ese hueco. La lección
+de método es que **un instrumento honesto sobre lo que no puede medir sigue dejando una zona sin cubrir, y
+esa zona necesita otra defensa** — acá, esta regla escrita.
+
+#### 6.2 · El escenario de la pieza tampoco voltea
+
+🔴 `--media-wash` es idéntico en los dos modos.
+
+`--media-wash` es el fondo de una pieza que **todavía no tiene bytes**: mientras genera, o detrás de la onda
+de audio. Desaparece en cuanto llega el thumbnail. No es una superficie de la interfaz — es el **escenario**
+donde va la pieza, y lleva texto blanco encima vía el scrim. Un escenario no cambia porque cambie la sala.
+
+El beneficio de producto es directo: le deja a Globe **una sola identidad**. Quien alterne de modo ve la
+misma pieza, no otra.
+
+### 7 · La familia del escenario es MAGENTA, y la elección está medida
+
+AXIS declara **tres familias de acento** para Globe. Sólo una está libre:
+
+| Familia | Matiz | Saturación | Estado |
+|---|---|---|---|
+| **Orchid** | 266° | 40 % | **ocupada** — `--accent`, `--accent-ink`, `--accent-wash` y `--accent-line` salen todas de ella |
+| **Coral** | 343° | 85 % | **reservada** — a **14°** del rojo de `danger`, y la más saturada de las tres |
+| **Magenta** | 338° | 76 % | **libre** — sin rol asignado |
+
+Un escenario en **orchid** compartiría color con los chips y crearía un parentesco entre la pieza y el
+acento que no existe. **Coral** como fondo puede leerse como fallo: a 14° del `danger`, y con la saturación
+más alta del trío, un lienzo coral dice "algo salió mal" antes de que el usuario lea nada. **Magenta** es la
+única sin rol, y por eso puede tomar uno.
+
+El valor vive hoy en `axisMagentaRamp` dentro de `tokens.ts`, leído del nodo `12770:122` de Figma el
+2026-07-31. **Es la única excepción vigente a la regla de cero literales**, y es deuda **declarada con
+dueño y condición de retiro**, no drift: AXIS declara las tres familias pero `@efeoncepro/axis-tokens` sólo
+portó `orchid`. Cuando el paquete publique coral+magenta, la constante se borra y el token consume
+`axisAccentRamp.magenta`. La excepción no se extiende a marca ni a superficie — ahí la regla dura sigue
+absoluta.
+
+#### Qué reemplazó, y por qué ningún guard podía verlo
+
+Antes el fondo lo componía `mediaWashFor(stableKey)`: una función que derivaba un **tono** del id de cada
+pieza. Ese color **no codificaba nada** —dos piezas del mismo modelo salían distintas, dos sin relación
+podían salir casi iguales—: era decoración con forma de información, usando el canal perceptual más débil
+que existe para no decir nada. Y su ventana de tono seguía anclada a la paleta que **este mismo ADR
+retiró**: su comentario citaba el cian `#4db8ff` y el navy `#0e1f5c`, los dos jubilados en la v2.0.
+
+Era el último sobreviviente del prototipo, y estaba en la superficie más visible del producto.
+
+🔴 **Ningún guard podía verlo, y esto generaliza:** no había ningún azul escrito. Había una **receta que los
+fabrica en runtime**, fuera del bloque de tokens que el drift guard escanea. Un drift guard que busca
+literales no encuentra funciones que los producen. **Todo color debe salir de un token declarado; una
+función que compone color en runtime desde un dato de dominio es un literal con disfraz.**
+
 ---
 
 ## Regla de verificación de contraste (aplica a todo el SSOT)
@@ -201,6 +287,26 @@ quien trabaje el modo claro.
 Esta regla se aplicó dos veces durante la redacción de este ADR y **encontró un defecto las dos veces** —
 uno en la escala oscura y otro en la clara, el segundo mientras se escribía la corrección del primero. Un
 solo par medido no es la escala verificada.
+
+### Y una segunda regla, aprendida al construir el modo claro
+
+> 🔴 **Un número sobre el token no describe el píxel.** Una medición sobre el valor declarado no sustituye
+> a mirar el render.
+
+Al elegir el escenario de la pieza se declaró "presencia equivalente" en los dos modos midiendo el **paso**
+de la rampa contra el canvas: 10× en oscuro y 12,7× en claro. La medición era correcta y era del **token,
+no de lo que renderiza** — ignoraba la composición por alfa. Un magenta oscuro al 30 % sobre blanco compone
+a rosa pálido, y ningún ratio sobre el hex declarado lo dice.
+
+El defecto sólo apareció al **mirar el render**. La misma clase de hueco que dejó pasar los scrims: los
+gradientes y los compuestos multicapa son la zona donde el instrumento numérico no llega, y donde la
+verificación tiene que ser visual y en el runtime desplegado.
+
+Corolario para elegir un valor de escenario: **el extremo pálido de una rampa (`200-400`) son tintes
+lavados por construcción** y no sirven de base para un lienzo que debe tener cuerpo. Esa fue la segunda
+iteración fallida; la primera fue dejar la base en la escala de grises con el color sólo como brillos a baja
+alfa. El azul del prototipo tenía presencia porque su base **también** era color saturado — corregir el tono
+no autorizaba a bajarle el cuerpo.
 
 ---
 
@@ -222,6 +328,16 @@ Declarar el valor localmente es teclearlo dos veces, que es exactamente cómo `w
 divergieron sin que nada lo detectara (Delta 2026-07-29 (a) de
 `EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1`).
 
+**La regla se extiende a las recetas, no sólo a los literales.** Una función que compone un color en runtime
+—derivándolo de un id, de un índice o de cualquier dato de dominio— evade el drift guard por construcción:
+no hay hex que encontrar. Eso es lo que mantuvo vivo el cian del prototipo dentro de `mediaWashFor` después
+de que la v2.0 lo retirara (§7). Todo color sale de un token declarado, o no sale.
+
+**Única excepción vigente:** la rampa `axisMagentaRamp` en `tokens.ts`, que es acento —no marca ni
+superficie— y existe porque el paquete portó `orchid` pero no `coral` ni `magenta`. Es deuda declarada con
+dueño y condición de retiro explícita (§7); la excepción **no se generaliza** ni se invoca para adelantar
+otro valor "mientras AXIS publica".
+
 Si AXIS no publicó, la implementación **espera**. La secuencia vive en `TASK-1485`; las mediciones que AXIS
 necesita para decidir, en
 [`EFEONCE_AXIS_SURFACE_SCALE_AND_ACCENT_PROPOSAL_V1`](../EFEONCE_AXIS_SURFACE_SCALE_AND_ACCENT_PROPOSAL_V1.md).
@@ -238,6 +354,12 @@ necesita para decidir, en
 | **Seguir `prefers-color-scheme` del sistema** | Delega al sistema operativo una decisión de oficio: la pieza no puede verse distinta según cómo el cliente configuró su laptop. Y aunque el payload ya re-tematiza en runtime desde `TASK-1612`, la objeción de oficio se sostiene sola. |
 | **Variante B — hundir el chasis entero** | Sólo funciona en oscuro; invierte la elevación de Material poniendo el contenido *por debajo* del fondo; y responde al patrón de una app de **lienzo continuo** (Figma, Runway) cuando el Producer es un **feed** de resultados (Behance, Dribbble). |
 | **Que Globe declare los valores localmente hasta que AXIS publique** | Es teclear el valor dos veces, con drift garantizado y silencioso. |
+| **Derivar los scrims de `surface[mode].sunk`** *(lo implementado, y el defecto)* | El medio que el scrim cubre es arbitrario en los dos modos. En claro voltearon a `#eceaf1` y dejaron el título de la pieza destacada blanco sobre casi blanco, **en producción**. |
+| **Que `--media-wash` voltee con el modo** | No es una superficie de la interfaz: es el escenario de la pieza, con texto blanco encima. Voltearlo le daría al producto dos identidades para el mismo trabajo. |
+| **Escenario en `orchid`** | Es el acento del producto (`--accent`, `--accent-ink`, `--accent-wash`, `--accent-line`). Crearía un parentesco visual entre la pieza y los chips que no existe. |
+| **Escenario en `coral`** | 343°, sat 85 %: a **14°** del rojo de `danger` y la más saturada del trío. Como fondo puede leerse como fallo. |
+| **Escenario en el extremo pálido de la rampa (`magenta[200-400]`)** | Son tintes lavados por construcción. Se declaró "presencia equivalente" midiendo el paso contra el canvas (10× / 12,7×), pero esa medición era del token: la composición por alfa lo rendía a rosa pálido. |
+| **`mediaWashFor(stableKey)` — tono derivado del id de la pieza** *(lo que había)* | El color no codificaba nada: decoración con forma de información. Y su ventana de tono seguía anclada a la paleta que este ADR retiró (`#4db8ff`, `#0e1f5c`). |
 
 ---
 
@@ -251,10 +373,11 @@ Este ADR se revisa —sin necesidad de superarlo— cuando ocurra cualquiera de 
    reporte exportable o una vista de facturación no tienen la restricción colorimétrica del Producer: son
    documentos, y ahí el modo claro es legítimo.
 3. **La entrega imprimible** entra en alcance. Un PDF o una hoja de contacto nace claro por destino.
-4. **El re-tematizado en runtime se vuelve requisito** por accesibilidad. Ese paso previo **ya está hecho**:
-   `TASK-1612` consolidó la emisión de `:root` el 2026-07-31, y hoy el `:root` proyecta sobre el `@theme`
-   (`--canvas: var(--color-canvas, …)`). Un tema alternativo es ahora **un solo bloque de override** sobre
-   las claves del theme, medido por canario; lo que falta al reabrir es elegir los valores, que son de AXIS.
+4. **El re-tematizado en runtime se vuelve requisito** por accesibilidad. Ese paso ya no es un pendiente:
+   `TASK-1612` consolidó la emisión de `:root` el 2026-07-31 (`--canvas: var(--color-canvas, …)`) y ese
+   mismo día `tokensFor(mode)` pasó a resolver el mapa completo por modo. **La escala clara está
+   construida y medida**; reabrir es una decisión de producto, no una obra. Lo que sí queda como costo al
+   reabrir son los invariantes de la §6: cualquier superficie nueva tiene que declarar qué no voltea.
 
 Que el modo claro **exista y esté medido** en el theme baja el costo de reabrir. Cuando se reabra, el punto
 de partida es rotar el rol de acción a `--action-strong` `#0375db` — `#4db8ff` sobre blanco da **2,18:1** y
@@ -276,8 +399,12 @@ falla incluso el 3:1 de componente.
 
 - El trabajo del cliente deja de competir con el fondo, que es lo único que esta pantalla existe para
   mostrar.
-- El runtime deja de tener una paleta propia inventada y pasa a ser un consumidor del design system.
+- El runtime deja de tener una paleta propia inventada y pasa a ser un consumidor del design system. Con
+  el retiro de `mediaWashFor` (§7) **no queda ningún color del prototipo vivo en el payload**, ni escrito
+  ni fabricado en runtime.
 - La rampa de acción queda libre para significar acción, en lugar de compartir canal con la superficie.
+- El escenario de la pieza pasa a ser **una identidad estable**: la misma en los dos modos, la misma para
+  todas las piezas, con una familia elegida por descarte medido y no por disponibilidad.
 
 **Se pierde:**
 
@@ -294,7 +421,8 @@ falla incluso el 3:1 de componente.
 - **No decide el momento de marca**, y ese es el hueco real. Adoptar el theme y ordenar los planos deja el
   chasis correcto; **no entrega un momento visual dominante**, y el estándar premium trata "correcto y
   anónimo" como fallo aunque los gates de token estén verdes. Es composición, no tokens: pertenece a
-  `TASK-1523`. **Sin él, el chasis no se declara terminado.**
+  `TASK-1523`. **Sin él, el chasis no se declara terminado.** El escenario magenta de la §7 **no es** ese
+  momento: sólo aparece antes de que la pieza tenga bytes y desaparece cuando llega el thumbnail.
 - **No decide la dirección visual completa del share board.** ADR-014 la bloquea por dirección visual
   aprobada; este ADR resuelve **sólo la dimensión de color**.
 - **No autoriza tocar el legacy.** `producer-ui.ts`, `public-share-ui.ts` y `ui.ts` son payload en retiro
@@ -304,13 +432,21 @@ falla incluso el 3:1 de componente.
 
 ## Verificación exigida al implementar
 
-1. `tokens.ts` sin **ningún** literal de color de marca ni de superficie, con drift guard que lo pruebe.
+1. `tokens.ts` sin **ningún** literal de color de marca ni de superficie, con drift guard que lo pruebe —
+   y sin ninguna **receta** que componga color en runtime desde un dato de dominio (§7), que el guard de
+   literales no detecta.
 2. `pnpm theme:generate` y el gate que compara el archivo generado carácter por carácter, en verde.
 3. Contraste re-medido **en el runtime desplegado**, contra el plano de menor contraste de cada texto.
 4. GVC premium desktop + 390 px del Producer **con piezas reales de las tres modalidades**, incluida al
    menos una de dominante fría — el caso que hoy falla.
 5. El share board en sus estados `ready`, `empty`, `error` y `denied`.
 6. `pnpm check && pnpm build` en `efeonce-globe`.
+7. 🔴 **Mirar el render en los dos modos**, no sólo medir tokens: todo gradiente o compuesto multicapa
+   (`--media-wash`, `--media-scrim`, `--media-vignette`, `--stage-scrim-*`, `--page-backdrop`) queda fuera
+   de lo que el barrido de contraste puede evaluar. La verificación de esa clase es visual, sobre el
+   runtime desplegado, con el texto blanco encima.
+8. Confirmar que los tokens de la §6 **no cambian** al alternar de modo — es la única prueba de que no
+   volvieron a heredar la escala de la interfaz.
 
 ---
 
@@ -320,10 +456,12 @@ Se registra porque el recorrido tiene valor de método, no porque el contenido s
 
 | Versión | Qué cambió |
 |---|---|
+| **v2.1** (2026-07-31) | **Se construyó el modo claro y apareció lo que el ADR no declaraba: qué NO voltea.** Los cuatro scrims (`--stage-scrim-strong`, `--stage-scrim-mid`, `--media-scrim`, `--media-vignette`) derivaban de `surface[mode].sunk` y en claro voltearon a `#eceaf1`, dejando el título de la pieza destacada blanco sobre casi blanco **en producción**; ahora salen de `axisSurface.dark.sunk` en ambos modos (§6.1). El escenario de la pieza (`--media-wash`) se fija igual en los dos modos y adopta la familia **magenta** (338°) por descarte medido de orchid —ocupada por `--accent*`— y coral —a 14° de `danger`— (§6.2 + §7), retirando `mediaWashFor(stableKey)`, el último color del prototipo, que fabricaba cian y navy en runtime donde ningún drift guard de literales podía verlos. Se suman dos reglas de método: **un número sobre el token no describe el píxel** (la composición por alfa no aparece en el ratio del hex) y **la regla de cero literales se extiende a las recetas**. |
 | **v2.0** (2026-07-30) | **La premisa de marca era falsa.** Las v1.0/v1.1 razonaron sobre `#4db8ff` como marca de Globe; el theme del design system define naranja `#FF6500`. El chasis pasa de "desaturarse" a "adoptarse", y los valores derivados en la v1.1 quedan retirados. Se suman la arquitectura de superficie (variante C), el presupuesto del naranja, las tres reglas de uso medidas y la dependencia de AXIS. |
 | **v1.1** (2026-07-30) | Autoauditoría contra el gate de diseño el mismo día. Corrigió tres defectos: la escala propuesta **aplanaba la profundidad a la mitad** (elegía valores a ojo moviendo luminancia además de croma), el inventario listaba **6 tokens de superficie cuando eran 15**, y `--faint` se declaró verificado **midiéndolo sólo sobre el plano más oscuro** — sobre las cards era una regresión de contraste. De ahí sale la regla de verificación que este ADR conserva. |
 | **v1.0** (2026-07-30) | Decisión inicial: dark-only + desaturar el chasis. La primera mitad sobrevive; la segunda fue superada. |
 
 ## Version
 
-- **v2.0** — 2026-07-30 — vigente.
+- **v2.1** — 2026-07-31 — vigente.
+- **v2.0** — 2026-07-30 — superada por la v2.1.

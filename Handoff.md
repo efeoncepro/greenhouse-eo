@@ -32,11 +32,28 @@ Sin control comparativo, un barrido sólo dice que el diseño tiene deuda; y un 
 un número. Con las dos correcciones: claro y oscuro fallan en los MISMOS 14 textos (`--faint` a 40% de
 alpha, deuda preexistente que este cambio no tocó).
 
-**PROMOVIDO 2026-07-31.** PR #8 mergeado (`f3357d2`) y desplegado (rev `00118-cfh`). AXIS 0.2.3 publicada
-y el pin subido. Falta sólo la verificación visual del operador en vivo — la superficie está tras SSO.
+**PROMOVIDO Y VERIFICADO 2026-07-31.** Cuatro PRs mergeados y desplegados en `efeonce-globe`: **#8**
+(modo claro + consolidación del `:root`, `f3357d2`), **#15** (todo paquete compila antes de testear),
+**#25** (el lecho de las piezas deja el azul del prototipo, `e27ffbe`) y **#27** (scrims y escenario,
+`adc3941`). Revisión activa `00122-lwd`. El operador confirmó el resultado visual en vivo.
 
-También mergeado: PR #15 (todo paquete que compila, compila antes de testear + gate). Abierto y en CI:
-PR #25 (el lecho de las piezas deja de ser el azul del prototipo).
+🔴 **Dos defectos aparecieron DESPUÉS del primer despliegue, y ni la suite ni el barrido los vieron.**
+Los dos venían de tratar como SUPERFICIE algo que no lo es:
+
+1. **Los scrims voltearon con el modo** y en claro pasaron a `#eceaf1`. Un scrim claro deja de ser un
+   scrim: existe para que el texto blanco se lea sobre un medio ARBITRARIO, y el medio es arbitrario en
+   los dos modos. El título de la pieza destacada quedó blanco sobre casi blanco, en producción. El
+   barrido de contraste declara los gradientes «no medibles» a propósito, y el defecto cayó en ese hueco.
+2. **El escenario de la pieza tampoco es superficie.** Hoy es el mismo magenta en ambos modos, lo que
+   además le deja al producto una sola identidad.
+
+**Lección que se repitió tres veces en el día:** se declaró «presencia equivalente» midiendo el PASO de
+la rampa contra el canvas. Esa medición era del TOKEN, no de lo que RENDERIZA — ignoraba la composición
+por alfa. **Un número sobre el token no describe el píxel.** Los tres defectos aparecieron MIRANDO.
+
+**Drift abierto:** AXIS declara TRES familias de acento para Globe (Coral, Magenta, Orchid) y sólo orchid
+llegó al paquete. `TASK-1615` lo cierra; mientras tanto la rampa magenta vive local en Globe como deuda
+declarada.
 
 ⚠️ Al rebasear sobre `origin/main` apareció que **su CI ya estaba rojo**: `packages/domain/dist` está
 desactualizado respecto de `evaluation.ts` (`observeInvalidRequest` existe en el source y no en el
