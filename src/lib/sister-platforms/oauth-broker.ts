@@ -265,13 +265,13 @@ const normalizeRedirectUris = (value: string[]) => {
   return uris
 }
 
-const isLoopbackPublicRedirectUri = (uri: string) => {
+const isLoopbackPublicRedirectUri = (uri: string, allowRuntimeLocalhostAlias = false) => {
   try {
     const parsed = new URL(uri)
 
     return (
       parsed.protocol === 'http:' &&
-      parsed.hostname === '127.0.0.1' &&
+      (parsed.hostname === '127.0.0.1' || (allowRuntimeLocalhostAlias && parsed.hostname === 'localhost')) &&
       !parsed.username &&
       !parsed.password &&
       !parsed.hash &&
@@ -304,7 +304,10 @@ const redirectUriMatchesClient = ({
     return registeredRedirectUri === requestedRedirectUri
   }
 
-  if (!isLoopbackPublicRedirectUri(registeredRedirectUri) || !isLoopbackPublicRedirectUri(requestedRedirectUri)) {
+  if (
+    !isLoopbackPublicRedirectUri(registeredRedirectUri) ||
+    !isLoopbackPublicRedirectUri(requestedRedirectUri, true)
+  ) {
     return false
   }
 
@@ -313,7 +316,8 @@ const redirectUriMatchesClient = ({
 
   return (
     registered.protocol === requested.protocol &&
-    registered.hostname === requested.hostname &&
+    (registered.hostname === requested.hostname ||
+      (registered.hostname === '127.0.0.1' && requested.hostname === 'localhost')) &&
     registered.pathname === requested.pathname &&
     registered.search === requested.search
   )

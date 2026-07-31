@@ -1309,13 +1309,15 @@ futuro debe saber:
 
 - **El confirm exige `x-idempotency-key` PROPIA** — reusar la del propose da
   `409 globe_funding_already_recorded` (el broker registra la intención por clave).
-- **El anti-replay del broker es POR PROPUESTA**, no por clave: registrada la decisión, ningún
-  confirm repetido pasa. El replay idempotente del dominio queda inalcanzable a través del broker;
-  el invariante (ningún segundo grant) vive en dos capas.
+- **El confirm es recuperable por propuesta:** si el dispatch queda ambiguo, el broker reusa la
+  idempotency key original y completa una fase append-only `completed|confirm_failed`; nunca crea un segundo grant.
 - **Regla vigente desde TASK-1616:** no fabriques una identidad humana. Usa `pnpm globe:credit-funding` por el
   cliente público `greenhouse-admin-cli`; una sesión agente puede autorizar y confirmar porque la base registra
   `actor_auth_mode=agent` y aplica la delegación del workspace. Fuera de esa política o por encima de sus límites,
   el confirm falla cerrado.
+- **Loopback en Vercel:** el redirect se registra siempre como `http://127.0.0.1/oauth/callback`. Vercel/Next
+  normaliza ese query param a `localhost` antes del route; el matcher acepta sólo ese alias contra el registro
+  literal, conservando protocolo/path/query exactos y PKCE/state obligatorios. No amplíes a otros hosts.
 
 ### Ocho lecciones de método, que valen más que los fixes
 

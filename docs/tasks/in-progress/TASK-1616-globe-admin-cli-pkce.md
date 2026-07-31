@@ -65,7 +65,8 @@ Reglas obligatorias:
 
 - Greenhouse autentica y atribuye al usuario humano/agente; Globe conserva la autoridad y la mutación financiera.
 - El CLI es cliente público: PKCE S256 obligatorio, ningún `client_secret` embebido.
-- La excepción de puerto efímero aplica sólo a loopback `127.0.0.1`; scheme, host y path siguen exactos.
+- La excepción de puerto efímero aplica al loopback registrado `127.0.0.1`; scheme/path siguen exactos y
+  `localhost` se acepta sólo como normalización observada de Vercel/Next para ese mismo request.
 - Un principal de servicio nunca confirma. Un usuario agente requiere scopes, entitlements, política por workspace
   y límites de grant/tope mensual; el default fuera del workspace interno es OFF.
 - API Platform y CLI son adapters; no duplican el command ni acceden a DB/Globe directamente.
@@ -152,7 +153,8 @@ Reglas obligatorias:
 - Invariantes que no se pueden romper:
   - public nunca acepta/necesita `client_secret`; confidential siempre lo exige;
   - PKCE S256, state, código one-time y redirect binding siguen obligatorios;
-  - puerto efímero sólo para `http://127.0.0.1/<path exacto>` de public clients;
+  - puerto efímero sólo para el loopback registrado `http://127.0.0.1/<path exacto>` de public clients;
+    `localhost` es un alias de transporte aceptado sólo contra ese registro y nunca se persiste como redirect;
   - confirmación agente exige `agent_confirmation_enabled`, límites y `actor_auth_mode=agent` durable;
   - `provider=agent` prevalece sobre el modo base de la cuenta; `unknown` y workloads fallan cerrados;
   - el fingerprint se compara contra la propuesta durable antes de registrar `confirm`;
@@ -235,9 +237,10 @@ Reglas obligatorias:
 El `client_type` es una propiedad persistida y validada, no inferida por ausencia de secreto. El authorize
 request conserva PKCE S256 para todos los clientes. En el token exchange, `confidential` autentica con el
 secreto actual; `public` rechaza cualquier secreto y prueba posesión sólo con el `code_verifier`. Para el
-redirect loopback de un public client se compara protocolo `http:`, hostname literal `127.0.0.1` y pathname
-exacto contra el redirect registrado; el puerto lo elige el sistema operativo. Ningún otro host, protocolo,
-path o tipo de cliente recibe esa excepción.
+redirect loopback de un public client se compara protocolo `http:` y pathname exacto contra el redirect
+registrado `127.0.0.1`; el puerto lo elige el sistema operativo. Vercel/Next normaliza ese query param a
+`localhost`, por lo que el matcher admite ese único alias de runtime contra un registro literal; ningún otro
+host, protocolo, path o tipo de cliente recibe la excepción.
 
 Las rutas API Platform reciben el bearer token, rehidratan al usuario y construyen el mismo entitlement
 subject que las rutas admin existentes. Ambas delegan a `credit-administration-broker.ts`; no hacen HTTP
@@ -256,7 +259,7 @@ Slice 1 → Slice 2 → Slice 3 → Slice 4. La política DB allow/deny/over-lim
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
 | Public evita PKCE | identity | low | tipo explícito + tests negativos | `token_reject` |
-| Loopback demasiado amplio | identity | medium | 127.0.0.1 + path exacto | `redirect_rejected` |
+| Loopback demasiado amplio | identity | medium | registro 127.0.0.1 + alias localhost medido + path exacto | `redirect_rejected` |
 | Agente amplía su autoridad | finance | medium | política DB default-OFF + dos límites | error canónico + audit |
 | Doble fondeo | finance | low | idempotency keys + propuesta durable | intent/grant duplicado |
 
@@ -285,7 +288,7 @@ Sin flag global: el cliente OAuth no existe hasta registrarlo y puede suspenders
 ## Acceptance Criteria
 
 - [ ] Public client PKCE funciona sin secret y confidential no cambia.
-- [ ] Sólo loopback `127.0.0.1` con path exacto admite puerto efímero.
+- [ ] Sólo loopback registrado `127.0.0.1` (o su alias Vercel `localhost`) con path exacto admite puerto efímero.
 - [ ] API Platform expone propose/confirm sobre primitive existente con entitlement e idempotencia.
 - [ ] Una sesión agente confirma dentro de la delegación interna; workspace no delegado y monto sobre límite fallan.
 - [ ] CLI completa PKCE y fondeo sin cookies/passwords/secrets persistidos.

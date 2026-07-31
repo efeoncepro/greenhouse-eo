@@ -36,8 +36,10 @@ siendo OFF; `greenhouse-org:efeonce` delega hasta 1000 créditos por grant y top
 aplica y audita esos límites; no dependen de la disciplina del CLI.
 
 Para clientes públicos instalados se adopta la semántica loopback de RFC 8252: un redirect registrado
-`http://127.0.0.1/<path>` acepta un puerto efímero elegido por el sistema operativo, pero protocolo, hostname
-literal y path deben coincidir. Esto **no es wildcard**: `localhost`, IPv6, otro host, HTTPS, otro path,
+`http://127.0.0.1/<path>` acepta un puerto efímero elegido por el sistema operativo, pero protocolo y path
+deben coincidir. La configuración conserva el hostname literal `127.0.0.1`; el matcher acepta `localhost`
+únicamente como alias de request porque Vercel/Next normaliza el valor de query antes de entregarlo al route
+(medido en el audit log de staging el 2026-07-31). Esto **no es wildcard**: IPv6, otro host, HTTPS, otro path,
 userinfo, fragmentos o la misma URI en un cliente confidencial siguen rechazados.
 
 La autoridad no cambia: Greenhouse autentica/atribuye; Globe verifica, firma y muta. API Platform y CLI son

@@ -48,7 +48,7 @@ a una persona o a un agente autenticado; la política de delegación se valida n
 ```bash
 GREENHOUSE_API_BASE_URL=https://dev-greenhouse.efeoncepro.com \
 GLOBE_ADMIN_OAUTH_CLIENT_ID=greenhouse-admin-cli \
-pnpm globe:credit-funding -- \
+pnpm globe:credit-funding \
   --input '{"globeWorkspaceId":"greenhouse-org:efeonce","poolId":"<pool-vigente>","grantCredits":500,"monthlyCap":1500,"periodStart":"<inicio-UTC>","periodEnd":"<fin-UTC>"}' \
   --propose-idempotency-key <clave-unica-propose> \
   --confirm-idempotency-key <clave-unica-confirm> \
