@@ -109,7 +109,13 @@ async function main() {
   )
 }
 
-main().catch(error => {
-  process.stderr.write(`${error instanceof Error ? error.message : 'globe_admin_oauth_seed_failed'}\n`)
-  process.exitCode = 1
-})
+main()
+  .catch(error => {
+    process.stderr.write(`${error instanceof Error ? error.message : 'globe_admin_oauth_seed_failed'}\n`)
+    process.exitCode = 1
+  })
+  .finally(async () => {
+    const { closeGreenhousePostgres } = await import('@/lib/db')
+
+    await closeGreenhousePostgres({ source: 'close' }).catch(() => undefined)
+  })

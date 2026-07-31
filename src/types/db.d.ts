@@ -3753,6 +3753,7 @@ export interface GreenhouseCoreSisterPlatformOauthClients {
   client_id: string;
   client_name: string;
   client_status: Generated<string>;
+  client_type: Generated<string>;
   code_ttl_seconds: Generated<number>;
   created_at: Generated<Timestamp>;
   created_by_user_id: string | null;
@@ -3765,6 +3766,7 @@ export interface GreenhouseCoreSisterPlatformOauthClients {
    */
   policy_json: Json | null;
   redirect_uris: string[];
+  require_human_session: Generated<boolean>;
   require_pkce: Generated<boolean>;
   sister_platform_consumer_id: string;
   sister_platform_oauth_client_id: string;
