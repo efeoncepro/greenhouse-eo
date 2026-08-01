@@ -120,6 +120,20 @@ Las capturas son evidencia de la UI autenticada, no autoridad de estado por sí 
 una ruta disponible deben concordar: reader live, identidad de ruta, rate vigente, evaluación,
 revisión/rights, readiness, binding, circuito, run terminal, output retenido y readback/diagnóstico.
 
+## TASK-1614 — Seedance R2V durable evaluation (2026-08-01)
+
+- Migración Globe `0040` aplicada; API interna y producer worker desplegados. No se desplegó Studio.
+- Policy `seedance-r2v-evaluation` v2 publicada para `ref/video/motion-v1 / fal / seedance-2.0-r2v / 2.0`,
+  `purpose=evaluation`, `appliesTo=derived`.
+- Fuente canónica private-ingested: `asset_6e9c95d3-7b94-473d-b91a-00f8b35d9eec`, SHA-256
+  `69cbc966999963ed2959c9adedf409560097dce06700d4fe5c9719292a392509`, 773.219 bytes, `video/mp4`,
+  `working-30d`; Asset Governance relee `clean / verified / active / eligibleForGeneration=true`.
+- Run `eval_16272c31b11f75be3e0369870f89746b`, attempt `9361550f-6ce3-456d-b710-d5cd3ded6217`: Fal completó;
+  estado `completion_received/finalizing`. No repetir provider spend: recuperar por readback/outbox.
+- Bloqueo: `asset_rights_denied` durante `registerGeneratedAsset`. El diagnóstico allowlisted de Globe PR `#72`
+  debe probar si `generatedAssetParents` apunta al asset canónico y si la proyección consumida por el finalizer
+  conserva evidencia/verifiedAt. Hasta resolverlo no hay report, atestación, readiness ni promoción.
+
 ## Riesgos abiertos
 
 - Rollout externo/comercial sigue gated por `TASK-1480`; `internal_smoke` describe el estadio, no

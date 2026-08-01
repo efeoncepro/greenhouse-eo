@@ -1,18 +1,24 @@
 # Handoff activo
 
-## TASK-1614 — Seedance R2V: output rights + lineage antes de promoción (2026-07-31, in-progress)
+## TASK-1614 — Seedance R2V: provider completo, finalización durable bloqueada (2026-08-01, in-progress)
 
-Se detuvo deliberadamente la sesión antes de integrar o desplegar. El fondeo API ya está resuelto (+500; cap
-800→1500; disponible 836) y sus IDs durables están en `.codex/skills/greenhouse-globe/SKILL.md`. Seedance R2V sigue
-sin promover: Fal sí generó el MP4, pero el finalizer rechazó el run porque el snapshot inmutable no tenía autoridad
-de output rights. La solución robusta está sin commit en `/private/tmp/globe-evaluation-rights`, branch
-`codex/evaluation-rights-provenance`: policy purpose `evaluation|production`, exact match por source kind, lineage a
-asset gobernado, parent derivado y prohibición de entregar/compartir outputs de evaluación. Creative Runner: 253/253;
-typecheck: OK; `pnpm check` fue interrumpido por el cierre y debe repetirse.
+La implementación de output rights/lineage se integró por PR/CI; migración Globe `0040` aplicada, API interna y
+producer worker desplegados, policy `purpose=evaluation` publicada y video fuente incorporado por private-ingest.
+El asset canónico `asset_6e9c95d3-7b94-473d-b91a-00f8b35d9eec` relee `clean / verified / active /
+eligibleForGeneration=true`, con SHA-256 `69cbc966…2509` y retención `working-30d`.
 
-Continuidad completa, IDs y secuencia: `docs/tasks/in-progress/TASK-1614-globe-durable-model-evaluation-lifecycle.md`.
-No tocar Omni, Seed Audio ni Seedance Loop. La prueba final debe ser en Chrome autenticado, **Video → Seedance 2.0**;
-la captura en **Imagen → Seedream** no prueba Seedance.
+Fal completó la evaluación `eval_16272c31b11f75be3e0369870f89746b` (attempt
+`9361550f-6ce3-456d-b710-d5cd3ded6217`). No es saldo ni webhook y no debe repetirse el gasto: el run está
+`completion_received/finalizing`, con el outbox recuperando `complete`. El bloqueo exacto es
+`asset_rights_denied` al registrar el output derivado, pese al estado elegible visible del parent. PR Globe `#72`
+añade el diagnóstico allowlisted de `generatedAssetParents`/rights snapshot para reconciliar proyección y autoridad
+durable sin exponer el snapshot completo.
+
+Continuidad e IDs: `docs/tasks/in-progress/TASK-1614-globe-durable-model-evaluation-lifecycle.md`. Después del fix
+sistémico: finalizar el mismo run, emitir report, completar atestación/readiness/promoción sólo para
+`ref/video/motion-v1 / fal / seedance-2.0-r2v / 2.0` y probar en Chrome autenticado de `jreyes@efeonce.cl` mediante
+**Video → control de movimiento/cámara → Seedance 2.0**. No tocar Omni, Seed Audio ni Seedance Loop; Imagen/Seedream
+no cuenta.
 
 ## TASK-1616 — Globe Admin CLI OAuth PKCE (2026-07-31, in-progress)
 

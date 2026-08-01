@@ -7,6 +7,17 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-01 — TASK-1614: evaluación Seedance R2V llegó a provider completion con fuente gobernada
+
+- Se integró y desplegó en API + worker internos el lifecycle de output rights/lineage; la migración `0040` quedó
+  aplicada y la policy exacta de Seedance R2V está publicada con `purpose=evaluation`.
+- El video fuente quedó private-ingested, retenido y gobernado (`clean / verified / active / eligible`). Fal completó
+  la evaluación nueva y el sistema preservó el resultado para finalización idempotente, sin confundir timeout,
+  webhook o saldo con un fallo del proveedor.
+- La promoción continúa cerrada: `registerGeneratedAsset` rechaza con `asset_rights_denied` pese al readback elegible
+  del parent. El siguiente cambio debe reconciliar la autoridad durable/proyección y recuperar el mismo run; no
+  repetir gasto ni tocar Omni, Seed Audio o Seedance Loop.
+
 ## 2026-07-31 — TASK-1614: handoff de Seedance R2V y output rights de evaluación
 
 - Se documentó la causa real del run live: Fal generó y retuvo el MP4, pero el finalizer falló cerrado porque el
@@ -682,12 +693,3 @@ Corrección de fuente de verdad: el cliente inicial es **SKY Agencia Creativa**,
   Globe-assisted, Globe-managed y full Efeonce.
 - Las skills gemelas `.codex/skills/greenhouse-globe/SKILL.md` y `.claude/skills/greenhouse-globe/SKILL.md` incorporan
   el `Creative Production Contract`, la composición con Wave y la regla de no pasar secretos ni integrar ad hoc.
-
-## 2026-07-26 — Efeonce Product Service Operating Model transversal
-
-- Se creó `docs/business-models/EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md` para definir `Product Service` y
-  separar oferta, productización, delivery model, operating mode y engagement.
-- El contrato cubre scope, outputs, roles, plataformas, Workers, quality gates, pricing architecture, economics,
-  legal/IP, evidence, expansion y stop conditions.
-- Business Model y Pricing Operators de Codex/Claude ahora deben cargar este modelo antes de diseñar packaging o
-  pricing; Wave, Globe y Experience LaunchOps quedan referenciados a él.

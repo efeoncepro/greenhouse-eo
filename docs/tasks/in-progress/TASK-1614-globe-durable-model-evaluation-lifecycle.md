@@ -1,10 +1,20 @@
 # TASK-1614 — Globe durable model evaluation lifecycle
 
-- Status: `in-progress`
-- Domain: `EPIC-028 / Globe / Model Lab / evaluation / worker`
-- Type: implementation + architecture
-- Priority: P0
-- Owner: Efeonce Globe runtime
+## Status
+
+- Lifecycle: `in-progress`
+- Priority: `P0`
+- Impact: `Muy alto`
+- Effort: `Alto`
+- Type: `implementation`
+- Execution profile: `standard`
+- UI impact: `verification-only`
+- Backend impact: `yes`
+- Epic: `EPIC-028`
+- Status real: `Rollout parcial; finalización durable bloqueada`
+- Domain: `Globe / Model Lab / evaluation / worker`
+- Owner: `Efeonce Globe runtime`
+- Branch: `codex/evaluation-rights-provenance` en el worktree aislado de Globe
 - ADR: [Async evaluation lifecycle](../../architecture/creative-studio/EFEONCE_GLOBE_ASYNC_EVALUATION_LIFECYCLE_DECISION_V1.md)
 
 ## Objective
@@ -67,20 +77,45 @@ Do not alter already promoted Omni, Seed Audio or Seedance Loop; do not bypass t
 - El workspace ya fue fondeado por el command API canónico: +500, cap 800→1500, disponible 836; IDs durables están
   registrados en la skill `greenhouse-globe` bajo “Último fondeo real verificado”.
 
+## Live progress — 2026-08-01
+
+- La implementación de output rights y lineage se integró por PR/CI en Globe. La migración
+  `0040_generated_rights_policy_purpose.sql` se aplicó mediante el workflow `30679292565`; API interna y producer
+  worker se desplegaron y verificaron sin desplegar Studio.
+- La policy `seedance-r2v-evaluation` v2 está publicada y releída con `purpose=evaluation`, provider `fal`, modelo
+  `seedance-2.0-r2v`, versión `2.0`, ruta exacta `ref/video/motion-v1` y `appliesTo=derived`.
+- El video fuente se incorporó por private-ingest como asset
+  `asset_6e9c95d3-7b94-473d-b91a-00f8b35d9eec`, `video/mp4`, 773.219 bytes, SHA-256
+  `69cbc966999963ed2959c9adedf409560097dce06700d4fe5c9719292a392509`, retención `working-30d` hasta
+  `2026-08-30T23:27:57.776Z`. El readback de Asset Governance quedó `scan=clean`, rights `verified`, lifecycle
+  `active` y `eligibleForGeneration=true`.
+- La evaluación nueva `eval_16272c31b11f75be3e0369870f89746b`, attempt
+  `9361550f-6ce3-456d-b710-d5cd3ded6217`, llegó a Fal y el proveedor completó la generación. El estado durable quedó
+  `completion_received/finalizing`; el outbox reintenta `complete` de forma recuperable y no se debe lanzar otro
+  provider run.
+- El bloqueo vigente ya no es saldo, webhook ni polling: el finalizer clasifica `asset_rights_denied` al registrar
+  el output derivado, pese al readback elegible del asset fuente. La investigación está acotada a la concordancia
+  entre `generatedAssetParents`, la proyección durable de derechos que consume `registerGeneratedAsset` y el
+  snapshot de autoridad. PR `#72` añadió un diagnóstico allowlisted de ese linaje y pasó CI antes de integrarse.
+- Los runs viejos de la identidad exacta se cancelaron mediante el command canónico cuando su estado lo permitía;
+  los que ya estaban provider-completed/approved devolvieron conflicto de transición y se preservan como evidencia,
+  sin forzar SQL ni estados inválidos.
+- Atestación, readiness, binding/promoción y prueba final en Chrome continúan pendientes. El criterio permanece
+  exclusivamente **Video → control de movimiento/cámara → Seedance 2.0** en la sesión autenticada de
+  `jreyes@efeonce.cl`; no se toca Omni, Seed Audio ni Seedance Loop, y Seedream no cuenta como evidencia.
+
 ## Handoff ejecutable
 
-1. Inspeccionar y preservar el worktree Globe; ejecutar `pnpm check` completo y `git diff --check`.
-2. Rebasar contra `origin/main` sólo dentro del worktree aislado, abrir PR, esperar CI y desplegar API + worker con
-   la migración 0040. No tocar el checkout compartido donde Claude trabaja UI.
-3. Publicar una policy `purpose=evaluation`, exacta para `ref/video/motion-v1 / fal / seedance-2.0-r2v / 2.0`,
-   `appliesTo=derived`, con las cuatro restricciones internas obligatorias y digest de términos
-   `sha256:93e8ed03a8948e33d1cb03df5929da47f50d6f642d7949a85bf9b6f82c4c85bb`.
-4. Private-ingest + governance del video fuente, cancelar canónicamente los runs viejos y lanzar una evaluación nueva.
-   Exigir report `objective_pass_pending_human` y un activo retenido/elegible antes de attestation/promoción.
-5. Completar rights comerciales, revisión humana, readiness, binding y promoción sólo para la identidad exacta de
+1. Leer el diagnóstico allowlisted del run `eval_16272c31b11f75be3e0369870f89746b` y reconciliar el parent asset
+   persistido con `asset_6e9c95d3-7b94-473d-b91a-00f8b35d9eec` y su evidencia durable de derechos.
+2. Corregir la causa sistémica de la divergencia de lifecycle/proyección, con regresiones de idempotencia y
+   reconciliación. Ejecutar `pnpm check && pnpm build`, integrar por PR/CI y desplegar sólo API + worker internos.
+3. Reanudar/finalizar el mismo run provider-completed; no invocar Fal nuevamente. Exigir report
+   `objective_pass_pending_human` y un activo retenido/elegible antes de attestation/promoción.
+4. Completar rights comerciales, revisión humana, readiness, binding y promoción sólo para la identidad exacta de
    Seedance R2V. No tocar Omni, Seed Audio ni Seedance Loop.
-6. Criterio final: en la sesión Chrome autenticada de `jreyes@efeonce.cl`, abrir explícitamente **Video**, elegir el
+5. Criterio final: en la sesión Chrome autenticada de `jreyes@efeonce.cl`, abrir explícitamente **Video**, elegir el
    control de movimiento/cámara y **Seedance 2.0**, generar una pieza nueva, reproducirla y verificar retención y
    governance. La captura previa estaba en **Imagen → Seedream** y no cuenta como prueba.
-7. Limpiar proxy Cloud SQL PID 15604, archivos/worktrees temporales y cerrar el subagente sólo después de preservar
+6. Limpiar proxies, artefactos/worktrees temporales y cerrar subagentes sólo después de preservar
    cambios y evidencia.
