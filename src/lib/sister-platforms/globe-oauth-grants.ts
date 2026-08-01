@@ -11,12 +11,6 @@ export const GLOBE_OAUTH_REVALIDATE_AFTER_SECONDS = 5 * 60
 export const GLOBE_SHELL_CAPABILITY_SCOPES = ['globe.studio.access'] as const
 
 /**
- * Scopes admitted before Globe starts requesting them. They stay outside the grant and required
- * set until the final half of the zero-downtime OAuth rollout.
- */
-export const GLOBE_TRANSITIONAL_ALLOWED_SCOPES = ['globe.credits.capacity.self.read'] as const
-
-/**
  * Exact internal Producer grant. This is the non-operator creative role: it can create,
  * organize, review and share its workspace's outputs, but cannot purge assets, administer
  * commercial credit, reveal provider-house classification or promote models.
@@ -42,6 +36,7 @@ export const GLOBE_PRODUCER_CAPABILITY_SCOPES = [
   'globe.lab.recipe.author',
   'globe.credits.read',
   'globe.credits.estimate',
+  'globe.credits.capacity.self.read',
   // Internal creative operators may review evidence and propose an exact model
   // version. Promotion remains outside the Producer grant and is completed by
   // Globe's independent control-plane checker.
@@ -64,7 +59,7 @@ export const buildGlobeOAuthGrantContract = (mode: GlobeOAuthGrantMode) => {
   const capabilityScopes =
     mode === 'producer' ? [...GLOBE_PRODUCER_CAPABILITY_SCOPES] : [...GLOBE_SHELL_CAPABILITY_SCOPES]
 
-  const allowedScopes = [...GLOBE_OIDC_SCOPES, ...capabilityScopes, ...GLOBE_TRANSITIONAL_ALLOWED_SCOPES]
+  const allowedScopes = [...GLOBE_OIDC_SCOPES, ...capabilityScopes]
 
   const policy: SisterPlatformOAuthPolicyV1 = {
     schemaVersion: '1',

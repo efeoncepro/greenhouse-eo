@@ -15,7 +15,6 @@ const {
   GLOBE_OAUTH_CODE_TTL_SECONDS,
   GLOBE_OAUTH_REVALIDATE_AFTER_SECONDS,
   GLOBE_PRODUCER_CAPABILITY_SCOPES,
-  GLOBE_TRANSITIONAL_ALLOWED_SCOPES,
   buildGlobeOAuthGrantContract,
   updateGlobeOAuthGrantContract,
   updateGlobeOAuthSessionContract
@@ -109,6 +108,7 @@ describe('Globe OAuth grant contract', () => {
       'globe.lab.recipe.author',
       'globe.credits.read',
       'globe.credits.estimate',
+      'globe.credits.capacity.self.read',
       'globe.model-readiness.review',
       'globe.model-readiness.propose',
       'globe.model-rights.attest',
@@ -143,11 +143,9 @@ describe('Globe OAuth grant contract', () => {
       expect(PRODUCER_CONTRACT.allowedScopes).toContain(attestScope)
     }
 
-    for (const scope of GLOBE_TRANSITIONAL_ALLOWED_SCOPES) {
-      expect(PRODUCER_CONTRACT.allowedScopes).toContain(scope)
-      expect(PRODUCER_CONTRACT.policy.requiredScopes).not.toContain(scope)
-      expect(PRODUCER_CONTRACT.policy.capabilityScopes).not.toContain(scope)
-    }
+    expect(PRODUCER_CONTRACT.policy.requiredScopes).toContain('globe.credits.capacity.self.read')
+    expect(PRODUCER_CONTRACT.policy.capabilityScopes).toContain('globe.credits.capacity.self.read')
+    expect(PRODUCER_CONTRACT.allowedScopes).toContain('globe.credits.capacity.self.read')
   })
 
   it('promotes only allowed_scopes and policy_json, preserving every other client field', async () => {

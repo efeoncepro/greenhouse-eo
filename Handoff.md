@@ -28,6 +28,12 @@
   query self sin `requestedCredits`; `/v1/session` entrega el deep link Greenhouse desde `GREENHOUSE_BASE_URL`.
   Domain 419/419, database 143/143, SDK 18/18 y studio-web 286/286 pasan. Greenhouse ya prepara el movimiento OAuth
   1/4 (`allowedScopes` solamente); coverage UI continúa `policy-blocked` hasta completar los cuatro movimientos.
+  Movimiento 1/4 aplicado y leído de vuelta live. Globe `main` fue publicado en `3105add`; CI remoto y build
+  pasaron sobre ese SHA. Las migrations `0043`–`0045` fueron aplicadas por el run keyless `30713283566` y el
+  readback quedó limpio: sin pendientes, inesperadas ni checksum mismatch. API `30713331682` y Studio
+  `30713332904` desplegaron el mismo SHA con 100% de tráfico; el smoke en Chrome autenticado abrió Producer como
+  Julio Reyes Rangel, sin redirección ni errores de consola. El movimiento 3/4 queda listo para promover el scope
+  a required + capability antes de habilitar la cobertura UI.
 
 ## Checkout compartido único — worktrees prohibidos (2026-08-01)
 
