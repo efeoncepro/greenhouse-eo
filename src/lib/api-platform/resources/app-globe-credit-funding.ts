@@ -11,6 +11,7 @@ import {
 import { GreenhouseGlobeConfigurationError } from '@/lib/globe/client'
 import { parseConfirmBody, parseFundingBody } from '@/lib/globe/credit-funding-request'
 import type { EntitlementCapabilityKey } from '@/config/entitlements-catalog'
+import { hasGlobeOAuthWorkspaceBinding } from '@/lib/sister-platforms/oauth-workspace-bindings'
 
 const PROPOSE_ENTITLEMENT = 'platform.globe_credit_funding.propose'
 const CONFIRM_ENTITLEMENT = 'platform.globe_credit_funding.confirm'
@@ -57,6 +58,15 @@ const requireFundingIdempotencyKey = (request: Request) => {
   }
 
   return key
+}
+
+const assertOAuthWorkspaceBinding = (context: AppPlatformRequestContext, globeWorkspaceId: string) => {
+  if (!hasGlobeOAuthWorkspaceBinding(context.oauthWorkspaceBindings, globeWorkspaceId)) {
+    throw new ApiPlatformError('The OAuth session is not bound to this Globe workspace.', {
+      statusCode: 403,
+      errorCode: 'binding_not_active'
+    })
+  }
 }
 
 const mapFundingError = (error: unknown): never => {
@@ -147,6 +157,8 @@ export const proposeAppGlobeCreditFunding = async ({
     })
   }
 
+  assertOAuthWorkspaceBinding(context, parsed.globeWorkspaceId)
+
   try {
     const proposal = await proposeGlobeCreditFunding({
       globeWorkspaceId: parsed.globeWorkspaceId,
@@ -189,6 +201,8 @@ export const confirmAppGlobeCreditFunding = async ({
       errorCode: 'bad_request'
     })
   }
+
+  assertOAuthWorkspaceBinding(context, parsed.globeWorkspaceId)
 
   try {
     const outcome = await confirmGlobeCreditFunding({

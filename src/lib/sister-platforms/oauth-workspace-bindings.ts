@@ -1,7 +1,6 @@
 import 'server-only'
 
 import { query } from '@/lib/db'
-import type { TenantAccessRecord } from '@/lib/tenant/access'
 
 const SAFE_WORKSPACE_ID = /^[A-Za-z0-9][A-Za-z0-9._:@/-]{0,255}$/
 const MAX_DISPLAY_NAME_LENGTH = 160
@@ -11,6 +10,15 @@ export type GlobeOAuthWorkspaceBindingV1 = Readonly<{
   displayName: string
   kind: 'internal' | 'organization' | 'client' | 'space'
   isPrimary: boolean
+}>
+
+type GlobeWorkspaceBindingSubject = Readonly<{
+  userId: string
+  tenantType: 'efeonce_internal' | 'client'
+  clientId: string
+  clientName: string
+  organizationId?: string | null
+  spaceId?: string | null
 }>
 
 type WorkspaceBindingRow = Readonly<{
@@ -40,15 +48,15 @@ export type OAuthWorkspaceBindingsQuery = <T extends Record<string, unknown>>(
  * selected id against the authenticated principal and its own enforced tenancy projection.
  */
 export async function resolveGlobeOAuthWorkspaceBindings(
-  tenant: TenantAccessRecord,
+  tenant: GlobeWorkspaceBindingSubject,
   runQuery: OAuthWorkspaceBindingsQuery = query
 ): Promise<readonly GlobeOAuthWorkspaceBindingV1[]> {
   const rows = await runQuery<WorkspaceBindingRow>(WORKSPACE_BINDINGS_SQL, [
     tenant.userId,
     tenant.tenantType,
     tenant.clientId || null,
-    tenant.organizationId,
-    tenant.spaceId
+    tenant.organizationId ?? null,
+    tenant.spaceId ?? null
   ])
 
   const hasExplicitCurrentBinding = rows.some(row => row.current_scope)
@@ -89,6 +97,15 @@ export async function resolveGlobeOAuthWorkspaceBindings(
   }))
 }
 
+export function hasGlobeOAuthWorkspaceBinding(
+  bindings: readonly GlobeOAuthWorkspaceBindingV1[],
+  workspaceId: string
+): boolean {
+  const requestedWorkspaceId = normalizeWorkspaceId(workspaceId)
+
+  return requestedWorkspaceId !== null && bindings.some(binding => binding.workspaceId === requestedWorkspaceId)
+}
+
 function mapBindingRow(
   row: WorkspaceBindingRow
 ): (Omit<GlobeOAuthWorkspaceBindingV1, 'isPrimary'> & Readonly<{ preferred: boolean }>) | null {
@@ -108,7 +125,7 @@ function mapBindingRow(
 }
 
 function legacyCurrentWorkspace(
-  tenant: TenantAccessRecord
+  tenant: GlobeWorkspaceBindingSubject
 ): (Omit<GlobeOAuthWorkspaceBindingV1, 'isPrimary'> & Readonly<{ preferred: boolean }>) | null {
   const clientId = tenant.clientId?.trim()
 

@@ -26,7 +26,9 @@
 - ADR-015 ahora aprueba que una instrucción atribuida del CEO pueda autorizar una operación acotada y que el
   mismo agente autenticado puede proponer y confirmar end-to-end cuando la política del workspace no exige segundo
   confirmante. La autoridad one-shot sigue pendiente; live hoy sólo existe la delegación persistente acotada.
-- Este cambio fue sólo documental: no hubo fondeo, deploy, migración, push, release ni promoción a `main`.
+- La primera corrección ejecutable ya cierra el aislamiento de workspace: API Platform conserva los bindings
+  emitidos por OAuth y tanto el bearer como las rutas admin rechazan un `globeWorkspaceId` no vinculado antes de
+  invocar el broker. No hubo fondeo, deploy, migración, release ni promoción a `main`.
 
 ## 2026-08-01 — Efeonce MCP: Globe fleet reader end-to-end
 

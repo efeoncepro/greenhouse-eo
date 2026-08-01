@@ -9,6 +9,7 @@ import {
   resolveSisterPlatformOAuthUserinfo,
   SisterPlatformOAuthError
 } from '@/lib/sister-platforms/oauth-broker'
+import type { GlobeOAuthWorkspaceBindingV1 } from '@/lib/sister-platforms/oauth-workspace-bindings'
 
 import { ApiPlatformError, normalizeApiPlatformError } from './errors'
 import { executeApiPlatformCommand } from './commands'
@@ -30,6 +31,7 @@ export type AppPlatformRequestContext = {
   appSessionId: string | null
   authSource: 'cookie_session' | 'first_party_app' | 'sister_platform_oauth'
   oauthCapabilities: readonly string[]
+  oauthWorkspaceBindings: readonly GlobeOAuthWorkspaceBindingV1[]
   oauthSessionAuthMode?: string | null
   rateLimit: ApiPlatformRateLimit
 }
@@ -114,7 +116,8 @@ const resolveAppTenantContext = async (request: Request) => {
         tenant: tenantAccessRecordToContext(tenant),
         appSessionId: payload.sid,
         authSource: 'first_party_app' as const,
-        oauthCapabilities: [] as readonly string[]
+        oauthCapabilities: [] as readonly string[],
+        oauthWorkspaceBindings: [] as readonly GlobeOAuthWorkspaceBindingV1[]
       }
     } catch (appTokenError) {
       try {
@@ -138,6 +141,7 @@ const resolveAppTenantContext = async (request: Request) => {
           appSessionId: null,
           authSource: 'sister_platform_oauth' as const,
           oauthCapabilities: oauth.identity.capabilities,
+          oauthWorkspaceBindings: oauth.identity.workspaceBindings ?? [],
           oauthSessionAuthMode: oauth.identity.authMode
         }
       } catch (oauthError) {
@@ -171,7 +175,8 @@ const resolveAppTenantContext = async (request: Request) => {
     tenant,
     appSessionId: null,
     authSource: 'cookie_session' as const,
-    oauthCapabilities: [] as readonly string[]
+    oauthCapabilities: [] as readonly string[],
+    oauthWorkspaceBindings: [] as readonly GlobeOAuthWorkspaceBindingV1[]
   }
 }
 
@@ -310,6 +315,7 @@ export const runAppRoute = async <T>({
       appSessionId: appContext.appSessionId,
       authSource: appContext.authSource,
       oauthCapabilities: appContext.oauthCapabilities,
+      oauthWorkspaceBindings: appContext.oauthWorkspaceBindings,
       oauthSessionAuthMode: appContext.oauthSessionAuthMode,
       rateLimit
     })

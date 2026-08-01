@@ -14,10 +14,18 @@ vi.mock('@/lib/observability/capture', () => ({ captureWithDomain: vi.fn() }))
 vi.mock('@/lib/globe/client', () => ({
   GreenhouseGlobeConfigurationError: class GreenhouseGlobeConfigurationError extends Error {}
 }))
+vi.mock('@/lib/sister-platforms/oauth-workspace-bindings', () => ({
+  resolveGlobeOAuthWorkspaceBindings: vi.fn(),
+  hasGlobeOAuthWorkspaceBinding: vi.fn()
+}))
 
 import { getServerAuthSession } from '@/lib/auth'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 import { confirmGlobeCreditFunding } from '@/lib/globe/credit-administration-broker'
+import {
+  hasGlobeOAuthWorkspaceBinding,
+  resolveGlobeOAuthWorkspaceBindings
+} from '@/lib/sister-platforms/oauth-workspace-bindings'
 
 import { POST } from './route'
 
@@ -65,6 +73,10 @@ const request = () =>
 beforeEach(() => {
   vi.clearAllMocks()
   vi.mocked(getTenantContext).mockResolvedValue(tenant)
+  vi.mocked(resolveGlobeOAuthWorkspaceBindings).mockResolvedValue([
+    { workspaceId: 'workspace-1', displayName: 'Workspace 1', kind: 'internal', isPrimary: true }
+  ])
+  vi.mocked(hasGlobeOAuthWorkspaceBinding).mockReturnValue(true)
 })
 
 describe('POST /api/admin/globe/credit-funding/confirm — delegated agent provenance', () => {
@@ -94,5 +106,15 @@ describe('POST /api/admin/globe/credit-funding/confirm — delegated agent prove
     expect(confirmGlobeCreditFunding).toHaveBeenCalledWith(
       expect.objectContaining({ actor: expect.objectContaining({ authMode: 'sso' }) })
     )
+  })
+
+  it('rejects confirmation when the session is not bound to the requested workspace', async () => {
+    vi.mocked(getServerAuthSession).mockResolvedValue(sessionFor() as never)
+    vi.mocked(hasGlobeOAuthWorkspaceBinding).mockReturnValue(false)
+
+    const response = await POST(request())
+
+    expect(response.status).toBe(403)
+    expect(confirmGlobeCreditFunding).not.toHaveBeenCalled()
   })
 })

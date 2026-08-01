@@ -58,6 +58,14 @@ const context = (overrides: Partial<AppPlatformRequestContext> = {}): AppPlatfor
   appSessionId: null,
   authSource: 'sister_platform_oauth',
   oauthCapabilities: ['globe.credits.funding.propose', 'globe.credits.funding.confirm'],
+  oauthWorkspaceBindings: [
+    {
+      workspaceId: 'greenhouse-org:efeonce',
+      displayName: 'Efeonce',
+      kind: 'internal',
+      isPrimary: true
+    }
+  ],
   oauthSessionAuthMode: 'agent',
   rateLimit: {
     limitPerMinute: 120,
@@ -127,6 +135,22 @@ describe('API Platform Globe credit funding resource', () => {
     expect(broker.propose).not.toHaveBeenCalled()
   })
 
+  it('rejects a workspace that is not bound to the OAuth session', async () => {
+    const request = new Request('https://greenhouse.example.test/api/platform/app/globe/credit-funding/propose', {
+      method: 'POST',
+      headers: { 'Idempotency-Key': 'propose-key' }
+    })
+
+    await expect(
+      proposeAppGlobeCreditFunding({
+        context: context(),
+        request,
+        body: { ...proposeBody, globeWorkspaceId: 'globe-workspace:other' }
+      })
+    ).rejects.toMatchObject({ statusCode: 403, errorCode: 'binding_not_active' })
+    expect(broker.propose).not.toHaveBeenCalled()
+  })
+
   it('uses a separate confirmation actor and idempotency key', async () => {
     const request = new Request('https://greenhouse.example.test/api/platform/app/globe/credit-funding/confirm', {
       method: 'POST',
@@ -162,6 +186,22 @@ describe('API Platform Globe credit funding resource', () => {
         body: { globeWorkspaceId: 'greenhouse-org:efeonce', proposalId: 'p-1', fingerprint: 'f-1' }
       })
     ).rejects.toMatchObject({ statusCode: 403, errorCode: 'forbidden' })
+    expect(broker.confirm).not.toHaveBeenCalled()
+  })
+
+  it('does not confirm funding for an unbound workspace', async () => {
+    const request = new Request('https://greenhouse.example.test/api/platform/app/globe/credit-funding/confirm', {
+      method: 'POST',
+      headers: { 'Idempotency-Key': 'confirm-key' }
+    })
+
+    await expect(
+      confirmAppGlobeCreditFunding({
+        context: context({ routeKey: 'platform.app.globe.credit_funding.confirm' }),
+        request,
+        body: { globeWorkspaceId: 'globe-workspace:other', proposalId: 'p-1', fingerprint: 'f-1' }
+      })
+    ).rejects.toMatchObject({ statusCode: 403, errorCode: 'binding_not_active' })
     expect(broker.confirm).not.toHaveBeenCalled()
   })
 })

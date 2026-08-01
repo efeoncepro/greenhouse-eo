@@ -75,6 +75,7 @@ const buildSessionData = (result: Awaited<ReturnType<typeof createFirstPartyAppS
       appSessionId: result.appSessionId,
       authSource: 'first_party_app',
       oauthCapabilities: [],
+      oauthWorkspaceBindings: [],
       rateLimit: {
         limitPerMinute: 120,
         limitPerHour: 5000

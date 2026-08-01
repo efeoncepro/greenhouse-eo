@@ -6,6 +6,10 @@ import { GlobeCreditFundingBrokerError, proposeGlobeCreditFunding } from '@/lib/
 import { parseFundingBody } from '@/lib/globe/credit-funding-request'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
+import {
+  hasGlobeOAuthWorkspaceBinding,
+  resolveGlobeOAuthWorkspaceBindings
+} from '@/lib/sister-platforms/oauth-workspace-bindings'
 
 import { GreenhouseGlobeConfigurationError } from '@/lib/globe/client'
 
@@ -49,6 +53,12 @@ export const POST = async (request: Request) => {
     const parsed = parseFundingBody(body)
 
     if (!parsed) return canonicalErrorResponse('globe_funding_invalid_request')
+
+    const workspaceBindings = await resolveGlobeOAuthWorkspaceBindings(tenant)
+
+    if (!hasGlobeOAuthWorkspaceBinding(workspaceBindings, parsed.globeWorkspaceId)) {
+      return canonicalErrorResponse('forbidden')
+    }
 
     const proposal = await proposeGlobeCreditFunding({
       globeWorkspaceId: parsed.globeWorkspaceId,

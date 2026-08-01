@@ -184,18 +184,21 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
   `ensure-funded` por objetivo.
 - Auditoría inicial Greenhouse: están vivos intents, provenance, delegación agente persistente, API Platform y CLI.
   La regla de segundo confirmador ya es condicional en base de datos, aunque quedan mensajes/comentarios stale.
-  La autoridad one-shot CEO→agente y los adapters de readback/ensure-funded aún no están implementados. Además,
-  `workspaceBindings` entra por OAuth pero hoy se descarta antes del adapter; el body controla
-  `globeWorkspaceId` sin cotejo. Es un gate de autorización P0 previo a ampliar el surface.
-- Estado de repos: Greenhouse en `develop` con WIP ajeno preservado; Globe en
-  `feat/producer-feed-new-items-pill` (`18f3e60`), rama ya fusionada, con
-  `scripts/evidence/vertex-omni-commercial-terms.json` no versionado. No se cambió branch ni se creó worktree.
+  La autoridad one-shot CEO→agente y los adapters de readback/ensure-funded aún no están implementados.
+- G0 workspace authorization quedó code-complete local: API Platform preserva `workspaceBindings` del OAuth y
+  los aplica antes del broker; las rutas admin resuelven la misma proyección Greenhouse y también fallan cerradas.
+  Evidencia: 19 tests focales y `pnpm typecheck` verdes. No está desplegado todavía.
+- Estado de repos: Greenhouse en `develop` con WIP ajeno preservado. Globe ahora tiene `develop` creado desde
+  `origin/main@001ce1b`, publicado y activo en el checkout compartido; `main` permanece como rama predeterminada
+  y de release. El commit `9dc166c` agrega el contrato no-worktree/develop y CI para pushes a `develop`; su frase
+  inicial sobre default branch se corrigió inmediatamente después. El JSON ajeno no versionado sigue intacto.
+  GitHub branch protection no está disponible para este repo privado en el plan actual (API 403); no se falsea
+  ese control. `main` sigue release-only y sus workflows de deploy exigen SHA exacto.
 - Acciones todavía no realizadas: no migración aplicada, no deploy, no fondeo, no generación, no push y no
   release completo. La verificación browser futura debe usar la sesión Chrome autenticada anclada a
   `jreyes@efeonce.cl`.
-- Próximo punto seguro de continuación: cerrar el workspace binding en Greenhouse; documentar el contrato exacto
-  de snapshot/evaluator V2; obtener autorización antes de cambiar el checkout compartido de Globe y luego
-  implementar la unidad TASK-1482 con tests de conformance y concurrencia. El orden interno del kernel es:
+- Próximo punto seguro de continuación: commitear G0 en Greenhouse e implementar en Globe el contrato exacto de
+  snapshot/evaluator V2 con tests de conformance y concurrencia. El orden interno del kernel es:
   período/snapshot/evaluator puro → facts con spent+holds+eligibility → reserve común → fail-closed para
   `actual > reserved` → settlement/expiry reconciliada → `ensure-funded` sobre `propose → confirm`.
 
