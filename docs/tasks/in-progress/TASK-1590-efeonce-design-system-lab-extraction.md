@@ -343,3 +343,14 @@ necesita que la `spec` exista.
 
 - Preview primero; dominio interno después de revisión humana.
 - `/design-system` queda como fallback y catálogo Greenhouse.
+
+### Delta 2026-08-01 (m) — reconstrucción fiel de chips
+
+- `efeonce.chip` se reconstruyó en AXIS a partir de `ChipsLabView` y sus capturas Greenhouse: boards light/dark,
+  matrices de variantes (`Solid`, `Label`, `Outline`), avatar, closable, tamaños y siete tonos.
+- Se conservaron los bloques funcionales visibles del Lab: `Feedback atoms`, estados tonales y la capability
+  animada de spotlight/signal con fallback explícito para `prefers-reduced-motion`.
+- La referencia expone 72 especímenes y 6 acciones nativas de cierre; el E2E responsive/reduced-motion y la suite
+  completa de 22 pruebas pasan. Publicado en `028dba2` y desplegado en `https://axis.efeonce.org/patterns/efeonce.chip/`.
+- Estado honesto: `candidate parity`; falta comparación visual/computed contra Greenhouse y provenance del avatar
+  sintético. `/design-system/chips` continúa como fallback.
