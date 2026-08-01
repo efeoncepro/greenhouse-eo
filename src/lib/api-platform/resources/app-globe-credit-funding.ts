@@ -9,8 +9,8 @@ import {
   proposeGlobeCreditFunding
 } from '@/lib/globe/credit-administration-broker'
 import { GreenhouseGlobeConfigurationError } from '@/lib/globe/client'
+import { parseConfirmBody, parseFundingBody } from '@/lib/globe/credit-funding-request'
 import type { EntitlementCapabilityKey } from '@/config/entitlements-catalog'
-import { parseConfirmBody, parseFundingBody } from '@/app/api/admin/globe/credit-funding/shared'
 
 const PROPOSE_ENTITLEMENT = 'platform.globe_credit_funding.propose'
 const CONFIRM_ENTITLEMENT = 'platform.globe_credit_funding.confirm'

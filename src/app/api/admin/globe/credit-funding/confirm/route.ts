@@ -3,6 +3,7 @@ import { getServerAuthSession } from '@/lib/auth'
 import { buildTenantEntitlementSubject } from '@/lib/commercial/party/route-entitlement-subject'
 import { can } from '@/lib/entitlements/runtime'
 import { confirmGlobeCreditFunding, GlobeCreditFundingBrokerError } from '@/lib/globe/credit-administration-broker'
+import { parseConfirmBody } from '@/lib/globe/credit-funding-request'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 
@@ -11,7 +12,6 @@ import { GreenhouseGlobeConfigurationError } from '@/lib/globe/client'
 import {
   brokerErrorResponse,
   globeConfigurationErrorResponse,
-  parseConfirmBody,
   resolveFundingActorAuthMode,
   requireIdempotencyKey
 } from '../shared'
