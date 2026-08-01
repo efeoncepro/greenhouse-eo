@@ -30,7 +30,7 @@ Cada candidato requiere auditoría transitive de imports antes de migrarse.
 | `utilities` | skeleton reference | `efeonce.activity-timeline`; no equivale a toda la suite Utilities |
 | `buttons` | candidate parity | dos boards, matrices y 152 controles en AXIS; falta canary visual/computed |
 | `chips` | candidate parity | boards light/dark, 72 especímenes, avatar/closable, feedback atoms y motion; faltan canary visual/computed y provenance del avatar |
-| `breadcrumbs` | skeleton reference | faltan matrices de estados, overflow real, acciones y canaries |
+| `breadcrumbs` | candidate parity | cuatro ports, overflow, variantes/kinds, hit area cómoda y reduced-motion; falta canary visual/computed |
 | `disclosure`, `loaders`, `floating-surfaces` | skeleton reference | faltan flujos, focus management y estados completos |
 | `card-density`, `composition-shell` | skeleton reference | faltan drivers, morph y composición real |
 | `motion`, `border-beam` | skeleton reference | faltan replay, escenas y medición de motion |

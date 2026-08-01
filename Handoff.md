@@ -52,9 +52,11 @@
 - `chips` ya tiene una reconstrucción de candidate parity en AXIS (`028dba2`): boards light/dark, 72 especímenes,
   avatar/closable, feedback atoms, spotlight/signal motion y reduced-motion; falta el compare visual/computed y
   provenance del avatar sintético.
+- `breadcrumbs` ya tiene una reconstrucción de candidate parity en AXIS (`6979641`): cuatro ports, overflow nativo,
+  variantes/kinds, hit area cómoda, motion sutil y reduced-motion; falta el compare visual/computed contra Greenhouse.
 - `leaderboard` ya tiene contrato y fixture estática con datos sintéticos; `brand-motion` ya tiene contrato y
   referencia orbital HTML/CSS sin SVG privado ni GSAP. El Lab queda en 27 páginas y 21 contratos; build, lint,
-  typecheck, tests y 16 E2E pasan. `axis.efeonce.org` ya resuelve a `76.76.21.21` y el smoke HTTPS devuelve `200`.
+  typecheck, tests y 24 E2E pasan. `axis.efeonce.org` ya resuelve a `76.76.21.21` y el smoke HTTPS devuelve `200`.
   La siguiente continuidad debe continuar con `handoff`, `microinteractions` y las superficies con API.
 
 ## Globe Producer — seis defectos de superficie, el pie de la app y la paginación del feed (2026-08-01)
