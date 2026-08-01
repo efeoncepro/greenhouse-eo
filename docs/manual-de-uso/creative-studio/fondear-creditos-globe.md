@@ -47,6 +47,24 @@ runbook que salieron de medirlo.
 Este camino evita que el agente calcule `poolId`, grant o tope. El CEO emite una autoridad con objetivo y techos;
 Globe lee su estado real, deriva el delta y devuelve `no_effect` si el sistema ya tenía fondos suficientes.
 
+### Opción A — Greenhouse UI (persona autorizada)
+
+Una vez desplegado el slice:
+
+1. Abre `/admin/globe/credits` en Greenhouse con la sesión humana autorizada.
+2. Revisa la capacidad efectiva y pulsa `Asegurar capacidad`.
+3. Define `Disponible objetivo`, `Máximo a otorgar` y `Tope máximo resultante`; confirma el período mostrado.
+4. Pulsa `Autorizar y ejecutar`. El servidor emite y reclama una sola autoridad ligada a esa misma sesión; el
+   navegador no calcula el grant ni puede cambiar usuario, canal, client o modo de autenticación.
+5. Considera éxito únicamente `completed` o `no_effect`. Si aparece `Resultado por verificar`, selecciona la
+   operación y usa `Verificar y reconciliar`; no abras un fondeo nuevo.
+
+La UI exige simultáneamente la view `administracion.globe_credits` y los entitlements de emisión/ejecución. La
+operation key se conserva ante timeout o reintento incierto. Este camino está validado localmente, pero no debe
+usarse en staging/live antes de la migración y deploy documentados en TASK-1629.
+
+### Opción B — autoridad OAuth para CLI/agente
+
 1. Desde una sesión humana autenticada del CEO, emitir `POST
    /api/admin/globe/credits/funding/authorities` con un cuerpo como éste:
 
@@ -59,7 +77,7 @@ Globe lee su estado real, deriva el delta y devuelve `no_effect` si el sistema y
   "targetAvailableCredits": 800,
   "maxGrantCredits": 500,
   "maxResultingCapCredits": 1500,
-  "executorOauthClientId": "greenhouse-admin-cli",
+  "executorClientId": "greenhouse-admin-cli",
   "evidenceRef": "instruction:TASK-1629"
 }
 ```

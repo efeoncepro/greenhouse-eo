@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Base OAuth/API/CLI viva; status/readback/reconcile code-complete local; autoridad one-shot + ensure end-to-end en implementación local; rollout pendiente`
+- Status real: `OAuth/API/CLI y carril browser one-shot code-complete local; migración/deploy/smoke real pendientes`
 - Rank: `next.4`
 - Domain: `platform|identity|finance|globe`
 - Blocked by: `none`
@@ -151,7 +151,9 @@ ownership operativo vigente de ese trabajo es `TASK-1629`.
 
 - Código local completo para `status/preview/ensure/list/get/reconcile`, autoridad one-shot y recuperación; falta
   aplicar migración, seed OAuth, deploy y prueba real en staging.
-- Falta la UI administrativa de TASK-1483 y el self-view de Producer de TASK-1628.
+- La UI administrativa de TASK-1483 ya consume el carril browser one-shot y expone recovery explícito para
+  `outcome_unknown`; la validación manual autenticada desktop/390 px pasó sin overflow ni errores de consola.
+  Faltan sus gates premium automatizados y el self-view de Producer de TASK-1628.
 - Falta reauditoría final, gates de cierre, manual con evidencia runtime y promoción gobernada posterior.
 
 ## Modular Placement Contract
@@ -160,7 +162,8 @@ ownership operativo vigente de ese trabajo es `TASK-1629`.
 - Current home: `src/lib/sister-platforms/**`, `src/lib/api-platform/**`, `src/app/api/platform/app/**` y `scripts/**` en Greenhouse
 - Future candidate home: `api`
 - Boundary: OAuth broker emite identidad autenticada; API Platform adapta el broker de fondeo; el CLI sólo consume HTTP
-- Server/browser split: command, stores, tokens y secretos son server-only; el navegador sólo autoriza y redirige el código one-time al loopback
+- Server/browser split: command, stores, tokens y secretos son server-only; el navegador OAuth sólo redirige el
+  código one-time al loopback y la UI humana envía límites exactos a una route same-origin con sesión real
 - Build impact: `none` — usa Node y dependencias existentes; agrega un entrypoint local explícito
 - Extraction blocker: API Platform y broker dependen de la sesión/identidad y Postgres canónicos de Greenhouse
 
@@ -357,13 +360,30 @@ Sin flag global: el cliente OAuth no existe hasta registrarlo y puede suspenders
 - [x] Tests y evidencia de la base integrada quedaron asociados a PR `#176`/TASK-1566.
 - [x] API Platform y CLI adaptan `status/list/get/reconcile` de TASK-1586 sin duplicar lifecycle ni errores crudos.
 - [x] El CLI ofrece `status`, `preview`, `ensure` y `operations reconcile` usando una sola operation key visible.
-- [x] Una instrucción one-shot atribuida del CEO liga exactamente usuario, OAuth client, modo, período, objetivo y
+- [x] Una instrucción one-shot atribuida del CEO liga exactamente usuario, canal/client, modo, período, objetivo y
   techos; esa autoridad exacta sustituye el segundo actor para esa sola ejecución. Fuera de ella, la policy manual
   conserva su maker-checker configurado.
+- [x] La misma state machine admite dos canales explícitos: `oauth` para API/CLI/agente y `browser` para la sesión
+  humana same-origin. Browser exige issuer=executor, client `greenhouse-portal`, modo humano y attestation exacta;
+  OAuth conserva client activo, bearer evidence renovable y workspace binding.
 - [x] Los comentarios, errores y manuales dejan de presentar `confirmante ≠ proponente` como invariante universal.
 - [x] El contrato y guard de Globe describen “usuario autenticado” y no “humano”; principals de servicio siguen
   fallando cerrados y la evidencia conserva `actor_auth_mode`.
 - [ ] Migración, seed OAuth, deploy y smoke PKCE con Chrome autenticado prueban el carril en staging.
+
+### Checkpoint 2026-08-01 — paridad browser sin OAuth ficticio
+
+- Se generalizaron authority/execution a `executor_channel = oauth|browser` sin crear otra tabla de autoridad ni
+  otro lifecycle. El fingerprint y el trigger ligan canal, client, usuario, auth mode y evidencia.
+- Browser no consulta ni suplanta un OAuth client: usa `greenhouse-portal`, el mismo usuario humano que emite y
+  ejecuta, y `issuer_auth_evidence_ref` como attestation interna. Delegar a otro usuario, usar modo `agent` o una
+  attestation distinta falla cerrado.
+- `POST /api/admin/globe/credits/funding/ensure` exige ambos entitlements, binding de workspace y una sola
+  idempotency key; emite y ejecuta inmediatamente el primitive recuperable existente.
+- La migración agrega checks para el canal browser y el trigger vuelve a validar attestation exacta; el canal
+  OAuth exige client público activo con binding provider Globe.
+- Evidencia local actual: typecheck, ESLint focal y 38 tests dirigidos verdes. Migración PostgreSQL real, deploy y
+  smoke autenticado siguen pendientes; no se hizo push ni release.
 
 ## Follow-ups
 

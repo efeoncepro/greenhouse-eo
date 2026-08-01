@@ -31,10 +31,14 @@
   MCP/comercial. Globe conserva la máquina de estados económica; Greenhouse sólo proyecta/adapta.
 - ADR-015 ahora aprueba que una instrucción atribuida del CEO pueda autorizar una operación acotada y que el
   mismo agente autenticado puede proponer y confirmar end-to-end cuando la política del workspace no exige segundo
-  confirmante. La autoridad one-shot sigue pendiente; live hoy sólo existe la delegación persistente acotada.
+  confirmante. La autoridad one-shot y sus carriles `oauth|browser` están code-complete localmente; live hoy sólo
+  existe la delegación persistente acotada hasta aplicar migración, configuración y deploy.
 - La primera corrección ejecutable ya cierra el aislamiento de workspace: API Platform conserva los bindings
   emitidos por OAuth y tanto el bearer como las rutas admin rechazan un `globeWorkspaceId` no vinculado antes de
   invocar el broker. No hubo fondeo, deploy, migración, release ni promoción a `main`.
+- El workbench Greenhouse conecta `Asegurar capacidad` a la misma state machine one-shot y agrega recovery
+  readback-first para `outcome_unknown`; la validación autenticada desktop/390 px pasó sin overflow ni errores de
+  consola. Sigue pendiente el rollout y smoke real, por lo que no se declara capacidad operativa todavía.
 
 ## 2026-08-01 — Efeonce MCP: Globe fleet reader end-to-end
 

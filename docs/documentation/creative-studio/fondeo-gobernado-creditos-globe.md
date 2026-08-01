@@ -75,11 +75,16 @@ TASK-1630 distingue dos formas de autoridad agente:
 - **Delegación persistente:** sirve para operación rutinaria y queda versionada, revocable y limitada por
   workspace, período, monto por operación/acumulado, cap, vigencia y cantidad de ejecuciones.
 
-El runtime recuperado por TASK-1629 ya soporta OAuth PKCE, scopes, entitlements, provenance y confirmación agente
-con la policy vigente. La autoridad one-shot, el `status/list/get/reconcile`, la selección automática del ciclo y
-la fachada one-command siguen pendientes de implementación. Hasta ese cierre, una instrucción en texto no se
-interpreta por sí sola como credencial de runtime y el CLI actual continúa exigiendo el pool y las claves de cada
-fase.
+TASK-1629 ya deja code-complete la autoridad one-shot, los readers `status/list/get/reconcile`, la selección
+automática del ciclo y la fachada `ensure`. Hay dos adaptadores sobre la misma state machine y el mismo ledger:
+
+- `browser`: la sesión humana de Greenhouse emite y ejecuta inmediatamente una operación exacta desde
+  `/admin/globe/credits`, sin fabricar OAuth ni pedir un segundo operador;
+- `oauth`: API/CLI/agente ejecutan con un cliente OAuth activo y evidencia renovable del bearer.
+
+Ambos ligan usuario, workspace, client, modo de autenticación, fingerprint y límites. El código todavía requiere
+migración, configuración, deploy y smoke staging/live; hasta entonces una instrucción en texto no es por sí sola
+una credencial de runtime y la capacidad no se considera operativa.
 
 > Detalle técnico: comandos `globe.credits.month.fund.propose` / `.confirm` (surface
 > `sister-platform`), dominio en `efeonce-globe/packages/domain/src/credit-funding.ts`, rutas en

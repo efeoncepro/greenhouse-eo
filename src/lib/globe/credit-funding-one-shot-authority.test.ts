@@ -9,6 +9,7 @@ function harness() {
   let clock = NOW
   let authority: Record<string, unknown> | undefined
   let execution: Record<string, unknown> | undefined
+  let oauthClientChecks = 0
 
   const query = async (sql: string, params: unknown[] = []) => {
     if (sql.includes('FROM greenhouse_core.globe_credit_funding_authority_issuers')) {
@@ -25,7 +26,11 @@ function harness() {
       }
     }
 
-    if (sql.includes('FROM greenhouse_core.sister_platform_oauth_clients')) return { rows: [{ allowed: true }] }
+    if (sql.includes('FROM greenhouse_core.sister_platform_oauth_clients')) {
+      oauthClientChecks += 1
+
+      return { rows: [{ allowed: true }] }
+    }
 
     if (sql.includes('INSERT INTO greenhouse_core.globe_credit_funding_authority_auth_attestations')) {
       return { rows: [] }
@@ -45,16 +50,18 @@ function harness() {
         max_grant_credits: params[6],
         max_resulting_cap_credits: params[7],
         issuer_user_id: params[8],
+        issuer_auth_evidence_ref: params[11],
         executor_user_id: params[12],
-        executor_oauth_client_id: params[13],
-        executor_auth_mode: params[14],
-        not_before: params[15],
-        expires_at: params[16],
+        executor_channel: params[13],
+        executor_client_id: params[14],
+        executor_auth_mode: params[15],
+        not_before: params[16],
+        expires_at: params[17],
         max_executions: 1,
-        operation_key: params[17],
-        instruction_fingerprint: params[18],
-        evidence_ref: params[19],
-        issued_at: params[20]
+        operation_key: params[18],
+        instruction_fingerprint: params[19],
+        evidence_ref: params[20],
+        issued_at: params[21]
       }
 
       return { rows: [authority] }
@@ -75,20 +82,21 @@ function harness() {
         execution_id: params[0],
         authority_id: params[1],
         executor_user_id: params[2],
-        executor_oauth_client_id: params[3],
-        actor_auth_mode: params[5],
-        execution_fingerprint: params[6],
-        operation_key: params[7],
+        executor_channel: params[3],
+        executor_client_id: params[4],
+        actor_auth_mode: params[6],
+        execution_fingerprint: params[7],
+        operation_key: params[8],
         state: 'claimed',
-        propose_idempotency_key: params[9],
-        confirm_idempotency_key: params[10],
-        reconcile_idempotency_key: params[11],
+        propose_idempotency_key: params[10],
+        confirm_idempotency_key: params[11],
+        reconcile_idempotency_key: params[12],
         proposal_id: null,
         plan_fingerprint: null,
         globe_operation_id: null,
         outcome: null,
-        claimed_at: params[12],
-        updated_at: params[12],
+        claimed_at: params[13],
+        updated_at: params[13],
         completed_at: null,
         dispatch_lease_owner: null,
         dispatch_lease_expires_at: null,
@@ -161,7 +169,8 @@ function harness() {
     store,
     setNow: (value: Date) => {
       clock = value
-    }
+    },
+    getOauthClientChecks: () => oauthClientChecks
   }
 }
 
@@ -179,10 +188,19 @@ const issueInput = {
   issuerAuthProvider: 'microsoft-entra-id',
   issuerAuthCorrelationId: 'correlation:issuer-1',
   executorUserId: 'user-agent-e2e-001',
-  executorOauthClientId: 'greenhouse-admin-cli',
+  executorChannel: 'oauth',
+  executorClientId: 'greenhouse-admin-cli',
   executorAuthMode: 'agent',
   operationKey: 'fund-2026-08-evaluation',
   evidenceRef: 'codex-goal:TASK-1629'
+} as const
+
+const browserIssueInput = {
+  ...issueInput,
+  executorUserId: issueInput.issuerUserId,
+  executorChannel: 'browser',
+  executorClientId: 'greenhouse-portal',
+  executorAuthMode: 'microsoft_sso'
 } as const
 
 describe('Globe credit funding one-shot authority', () => {
@@ -204,8 +222,9 @@ describe('Globe credit funding one-shot authority', () => {
     const first = await store.claim({
       authorityId: authority.authorityId,
       executorUserId: issueInput.executorUserId,
-      executorOauthClientId: issueInput.executorOauthClientId,
-      oauthAccessTokenId: 'token:first',
+      executorChannel: issueInput.executorChannel,
+      executorClientId: issueInput.executorClientId,
+      authEvidenceRef: 'token:first',
       actorAuthMode: 'agent',
       correlationId: 'correlation:first',
       allowedGlobeWorkspaceIds: [issueInput.globeWorkspaceId]
@@ -214,8 +233,9 @@ describe('Globe credit funding one-shot authority', () => {
     const resumed = await store.claim({
       authorityId: authority.authorityId,
       executorUserId: issueInput.executorUserId,
-      executorOauthClientId: issueInput.executorOauthClientId,
-      oauthAccessTokenId: 'token:renewed',
+      executorChannel: issueInput.executorChannel,
+      executorClientId: issueInput.executorClientId,
+      authEvidenceRef: 'token:renewed',
       actorAuthMode: 'agent',
       correlationId: 'correlation:resume',
       allowedGlobeWorkspaceIds: [issueInput.globeWorkspaceId]
@@ -227,28 +247,54 @@ describe('Globe credit funding one-shot authority', () => {
   })
 
   it('binds a Chrome-authenticated executor without relabeling it as an agent', async () => {
-    const { store } = harness()
-
-    const humanIssue = {
-      ...issueInput,
-      executorUserId: issueInput.issuerUserId,
-      executorAuthMode: 'microsoft_sso'
-    } as const
-
-    const authority = await store.issue(humanIssue)
+    const { store, getOauthClientChecks } = harness()
+    const authority = await store.issue(browserIssueInput)
 
     const claimed = await store.claim({
       authorityId: authority.authorityId,
-      executorUserId: humanIssue.executorUserId,
-      executorOauthClientId: humanIssue.executorOauthClientId,
-      oauthAccessTokenId: 'token:human',
+      executorUserId: browserIssueInput.executorUserId,
+      executorChannel: browserIssueInput.executorChannel,
+      executorClientId: browserIssueInput.executorClientId,
+      authEvidenceRef: authority.issuerAuthEvidenceRef,
       actorAuthMode: 'microsoft_sso',
       correlationId: 'correlation:human',
-      allowedGlobeWorkspaceIds: [humanIssue.globeWorkspaceId]
+      allowedGlobeWorkspaceIds: [browserIssueInput.globeWorkspaceId]
     })
 
+    expect(getOauthClientChecks()).toBe(0)
+    expect(claimed.authority.executorChannel).toBe('browser')
     expect(claimed.authority.executorAuthMode).toBe('microsoft_sso')
     expect(claimed.execution.actorAuthMode).toBe('microsoft_sso')
+  })
+
+  it('rejects browser delegation to another user and browser agent impersonation', async () => {
+    const { store } = harness()
+
+    await expect(
+      store.issue({ ...browserIssueInput, executorUserId: 'user-other-human' })
+    ).rejects.toMatchObject({ code: 'authority_binding_mismatch' })
+
+    await expect(store.issue({ ...browserIssueInput, executorAuthMode: 'agent' })).rejects.toMatchObject({
+      code: 'authority_binding_mismatch'
+    })
+  })
+
+  it('requires the exact issuer attestation when the browser claims the authority', async () => {
+    const { store } = harness()
+    const authority = await store.issue(browserIssueInput)
+
+    await expect(
+      store.claim({
+        authorityId: authority.authorityId,
+        executorUserId: browserIssueInput.executorUserId,
+        executorChannel: browserIssueInput.executorChannel,
+        executorClientId: browserIssueInput.executorClientId,
+        authEvidenceRef: 'gh-credit-auth:wrong-attestation',
+        actorAuthMode: browserIssueInput.executorAuthMode,
+        correlationId: 'correlation:wrong-browser-evidence',
+        allowedGlobeWorkspaceIds: [browserIssueInput.globeWorkspaceId]
+      })
+    ).rejects.toMatchObject({ code: 'authority_binding_mismatch' })
   })
 
   it('rejects agent issuance and wrong executor binding', async () => {
@@ -263,8 +309,9 @@ describe('Globe credit funding one-shot authority', () => {
       store.claim({
         authorityId: authority.authorityId,
         executorUserId: 'another-agent',
-        executorOauthClientId: issueInput.executorOauthClientId,
-        oauthAccessTokenId: 'token:first',
+        executorChannel: issueInput.executorChannel,
+        executorClientId: issueInput.executorClientId,
+        authEvidenceRef: 'token:first',
         actorAuthMode: 'agent',
         correlationId: 'correlation:first',
         allowedGlobeWorkspaceIds: [issueInput.globeWorkspaceId]
@@ -280,8 +327,9 @@ describe('Globe credit funding one-shot authority', () => {
       store.claim({
         authorityId: authority.authorityId,
         executorUserId: issueInput.executorUserId,
-        executorOauthClientId: issueInput.executorOauthClientId,
-        oauthAccessTokenId: 'token:first',
+        executorChannel: issueInput.executorChannel,
+        executorClientId: issueInput.executorClientId,
+        authEvidenceRef: 'token:first',
         actorAuthMode: 'agent',
         correlationId: 'correlation:first',
         allowedGlobeWorkspaceIds: ['globe-workspace:other']
@@ -296,8 +344,9 @@ describe('Globe credit funding one-shot authority', () => {
     const claim = {
       authorityId: authority.authorityId,
       executorUserId: issueInput.executorUserId,
-      executorOauthClientId: issueInput.executorOauthClientId,
-      oauthAccessTokenId: 'token:first',
+      executorChannel: issueInput.executorChannel,
+      executorClientId: issueInput.executorClientId,
+      authEvidenceRef: 'token:first',
       actorAuthMode: 'agent',
       correlationId: 'correlation:first',
       allowedGlobeWorkspaceIds: [issueInput.globeWorkspaceId]
@@ -306,7 +355,7 @@ describe('Globe credit funding one-shot authority', () => {
     const first = await store.claim(claim)
 
     setNow(new Date('2026-08-01T13:00:00.000Z'))
-    const resumed = await store.claim({ ...claim, oauthAccessTokenId: 'token:renewed' })
+    const resumed = await store.claim({ ...claim, authEvidenceRef: 'token:renewed' })
 
     expect(resumed.execution.executionId).toBe(first.execution.executionId)
   })
@@ -318,8 +367,9 @@ describe('Globe credit funding one-shot authority', () => {
     const { execution } = await store.claim({
       authorityId: authority.authorityId,
       executorUserId: issueInput.executorUserId,
-      executorOauthClientId: issueInput.executorOauthClientId,
-      oauthAccessTokenId: 'token:first',
+      executorChannel: issueInput.executorChannel,
+      executorClientId: issueInput.executorClientId,
+      authEvidenceRef: 'token:first',
       actorAuthMode: 'agent',
       correlationId: 'correlation:first',
       allowedGlobeWorkspaceIds: [issueInput.globeWorkspaceId]
@@ -331,20 +381,20 @@ describe('Globe credit funding one-shot authority', () => {
       state: 'proposed',
       proposalId: 'proposal-1',
       planFingerprint: 'plan-1',
-      oauthAccessTokenId: 'token:first',
+      authEvidenceRef: 'token:first',
       correlationId: 'correlation:proposed'
     })
     await store.advance({
       executionId: execution.executionId,
       expectedState: 'proposed',
       state: 'confirming',
-      oauthAccessTokenId: 'token:first',
+      authEvidenceRef: 'token:first',
       correlationId: 'correlation:confirming'
     })
     await store.acquireDispatchLease({
       executionId: execution.executionId,
       leaseOwnerId: 'lease:first',
-      oauthAccessTokenId: 'token:first',
+      authEvidenceRef: 'token:first',
       correlationId: 'correlation:lease'
     })
 
@@ -352,7 +402,7 @@ describe('Globe credit funding one-shot authority', () => {
       store.acquireDispatchLease({
         executionId: execution.executionId,
         leaseOwnerId: 'lease:other',
-        oauthAccessTokenId: 'token:other',
+        authEvidenceRef: 'token:other',
         correlationId: 'correlation:other'
       })
     ).rejects.toMatchObject({ code: 'execution_busy' })
@@ -365,8 +415,9 @@ describe('Globe credit funding one-shot authority', () => {
     const claimed = await store.claim({
       authorityId: authority.authorityId,
       executorUserId: issueInput.executorUserId,
-      executorOauthClientId: issueInput.executorOauthClientId,
-      oauthAccessTokenId: 'token:first',
+      executorChannel: issueInput.executorChannel,
+      executorClientId: issueInput.executorClientId,
+      authEvidenceRef: 'token:first',
       actorAuthMode: 'agent',
       correlationId: 'correlation:first',
       allowedGlobeWorkspaceIds: [issueInput.globeWorkspaceId]
@@ -378,21 +429,21 @@ describe('Globe credit funding one-shot authority', () => {
       state: 'proposed',
       proposalId: 'proposal-1',
       planFingerprint: 'plan-1',
-      oauthAccessTokenId: 'token:first',
+      authEvidenceRef: 'token:first',
       correlationId: 'correlation:proposed'
     })
     await store.advance({
       executionId: claimed.execution.executionId,
       expectedState: 'proposed',
       state: 'confirming',
-      oauthAccessTokenId: 'token:first',
+      authEvidenceRef: 'token:first',
       correlationId: 'correlation:confirming'
     })
 
     const staleLease = await store.acquireDispatchLease({
       executionId: claimed.execution.executionId,
       leaseOwnerId: 'lease:stale',
-      oauthAccessTokenId: 'token:first',
+      authEvidenceRef: 'token:first',
       correlationId: 'correlation:stale',
       leaseSeconds: 30
     })
@@ -401,7 +452,7 @@ describe('Globe credit funding one-shot authority', () => {
     await store.acquireDispatchLease({
       executionId: claimed.execution.executionId,
       leaseOwnerId: 'lease:new',
-      oauthAccessTokenId: 'token:new',
+      authEvidenceRef: 'token:new',
       correlationId: 'correlation:new'
     })
 
@@ -410,7 +461,7 @@ describe('Globe credit funding one-shot authority', () => {
         executionId: claimed.execution.executionId,
         expectedState: 'confirming',
         state: 'completed',
-        oauthAccessTokenId: 'token:first',
+        authEvidenceRef: 'token:first',
         correlationId: 'correlation:stale-settle',
         leaseOwnerId: 'lease:stale',
         leaseGeneration: staleLease.dispatchLeaseGeneration
@@ -425,8 +476,9 @@ describe('Globe credit funding one-shot authority', () => {
     const { execution } = await store.claim({
       authorityId: authority.authorityId,
       executorUserId: issueInput.executorUserId,
-      executorOauthClientId: issueInput.executorOauthClientId,
-      oauthAccessTokenId: 'token:first',
+      executorChannel: issueInput.executorChannel,
+      executorClientId: issueInput.executorClientId,
+      authEvidenceRef: 'token:first',
       actorAuthMode: 'agent',
       correlationId: 'correlation:first',
       allowedGlobeWorkspaceIds: [issueInput.globeWorkspaceId]
@@ -437,7 +489,7 @@ describe('Globe credit funding one-shot authority', () => {
         executionId: execution.executionId,
         expectedState: 'claimed',
         state: 'confirming',
-        oauthAccessTokenId: 'token:first',
+        authEvidenceRef: 'token:first',
         correlationId: 'correlation:bad'
       })
     ).rejects.toMatchObject({ code: 'invalid_transition' })
@@ -448,7 +500,7 @@ describe('Globe credit funding one-shot authority', () => {
       state: 'proposed',
       proposalId: 'proposal-1',
       planFingerprint: 'plan-1',
-      oauthAccessTokenId: 'token:first',
+      authEvidenceRef: 'token:first',
       correlationId: 'correlation:proposed'
     })
 

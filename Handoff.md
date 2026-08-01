@@ -1,9 +1,34 @@
 # Handoff activo
 
+## Studio Credits — ramas y first fold Greenhouse (2026-08-01)
+
+- Contrato de ramas corregido por el operador: `efeonce-globe` trabaja directamente en `main` (también default,
+  integración y release); `greenhouse-eo` trabaja en `develop`. No existe una rama `develop` de trabajo para
+  Globe en este flujo. En ambos repos están prohibidos los worktrees aislados.
+- Globe fue verificado en `main`, `origin/HEAD -> origin/main`, un único worktree y ocho commits locales sin push.
+- TASK-1483 quedó `in-progress` y su first fold ya existe en `/admin/globe/credits`: doble gate de view +
+  entitlement, status y operaciones leídos desde contratos canónicos de Globe, runway sin matemática de negocio
+  en browser, estados unknown/degraded honestos, navegación y detalle seleccionable.
+- El CTA `Asegurar capacidad` ya consume localmente un carril browser one-shot: exige sesión humana, ambos
+  entitlements y workspace binding; liga issuer=executor, `browser`, `greenhouse-portal` y attestation exacta.
+  El drawer conserva la misma operation key ante retry, y sólo declara éxito con `completed|no_effect`.
+  `outcome_unknown` permanece reconciliable y no dispara un fondeo ciego.
+- First fold aceptado tras evidencia Chrome autenticada desktop + 390 px. La primera captura mobile detectó el
+  drawer lateral persistido abierto; el scenario lo normaliza con `Escape`. Sin overflow después del cierre,
+  selección causal y detail drawer comprobados. El drawer de fondeo también fue validado a 390×844: tres límites
+  accesibles, confirmación bloqueada cuando `target > maxCap`, foco dentro del diálogo y cero errores de consola.
+  La operación `op-jul-recovery-001` dejó `aria-pressed=true` y expuso `Verificar y reconciliar` habilitado en el
+  detalle móvil; no se ejecutó fondeo ni reconcile real. Review:
+  `docs/ui/reviews/TASK-1483-globe-credits-operations-workbench-first-fold-review-2026-08-01.md`.
+- Pendiente inmediato: gates premium/automatizados, migración/deploy y smoke real. El path OAuth/API/CLI permanece
+  separado pero usa la misma authority state machine y ledger. Typecheck, ESLint focal y 38 tests dirigidos pasan.
+  No hubo push, deploy ni release.
+
 ## Checkout compartido único — worktrees prohibidos (2026-08-01)
 
-- Se eliminaron los dos worktrees temporales creados erróneamente bajo `/private/tmp/greenhouse-mcp-push.*`.
-  El checkout principal no fue modificado por esa limpieza; el worktree de rescate preexistente no se tocó.
+- Se eliminaron los dos worktrees temporales creados erróneamente bajo `/private/tmp/greenhouse-mcp-push.*` y el
+  worktree de rescate `/Users/jreye/.codex/worktrees/ecd5/greenhouse-eo`, que estaba limpio, 777 commits detrás y
+  0 por delante de `develop`. Greenhouse conserva un único checkout en `develop`; Globe uno en `main`.
 - Todo agente debe operar sólo en el checkout compartido actual. No puede crear, usar, integrar, limpiar ni
   eliminar worktrees, checkouts aislados o carpetas clonadas; si el estado compartido bloquea, debe detenerse y
   pedir dirección al operador. Canon:

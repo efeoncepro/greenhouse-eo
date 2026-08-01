@@ -219,8 +219,9 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
   exclusiva ante evidencia terminal `failed|cancelled`. `completed|timed_out|unknown|partial` conserva el hold;
   estados activos solicitan cancelación o conciliación. El worker expone summary y edad del hold vencido más
   antiguo, con alerta WARNING a 900 segundos. Flag Terraform default `false`; no se aplicó migración ni deploy.
-- La rama predeterminada de `efeonce-globe` es y debe seguir siendo `main`. El checkout compartido trabaja en
-  `develop`; no usar worktrees ni cambiar el default branch como parte de esta ejecución.
+- La rama predeterminada, de integración y release de `efeonce-globe` es y debe seguir siendo `main`. Su checkout
+  compartido trabaja directamente en `main`; `develop` corresponde únicamente a `greenhouse-eo`. No usar
+  worktrees ni cambiar el default branch como parte de esta ejecución.
 - TASK-1586 quedó code-complete local a nivel de contrato/read-recovery: capacity admin/self comparte evaluator
   con reserve; lifecycle de funding tiene operation list/get, expiry bounded, receipt append-only y reconcile
   readback-first que jamás repite la mutación económica. Globe agrega migración `0045`; SDK tiene wrappers tipados.

@@ -42,6 +42,7 @@ export const GH_INTERNAL_NAV = {
   adminCloudIntegrations: { label: 'Cloud & Integrations', subtitle: 'Syncs, webhooks, auth y runtime operativo' },
   adminNotifications: { label: 'Notificaciones', subtitle: 'Sistema de notificaciones in-app y email' },
   adminOpsHealth: { label: 'Ops Health', subtitle: 'Outbox, proyecciones y freshness del serving' },
+  adminGlobeCredits: { label: 'Créditos Globe', subtitle: 'Capacidad, fondeo y trazabilidad operativa' },
   adminUntitledNotionPages: { label: 'Páginas sin título Notion', subtitle: 'Tareas, proyectos y sprints sin título — fix directo en Notion' },
   adminOrganizationLogos: { label: 'Logos de organizaciones', subtitle: 'Candidatos y cobertura de marca para organizaciones no legales' },
   adminDesignSystem: { label: 'Design System', subtitle: 'Catálogo AXIS y handoffs de producto' },

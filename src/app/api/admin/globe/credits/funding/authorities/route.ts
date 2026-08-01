@@ -68,6 +68,7 @@ export const POST = async (request: Request) => {
       issuerAuthProvider: session.user.provider,
       issuerAuthCorrelationId: correlationId,
       executorUserId: input.executorUserId ?? tenant.userId,
+      executorChannel: 'oauth',
       executorAuthMode: input.executorAuthMode ?? authMode
     })
 
@@ -103,7 +104,7 @@ function parseIssueBody(raw: unknown) {
   const periodEnd = text('periodEnd')
   const executorUserId = text('executorUserId')
   const executorAuthMode = text('executorAuthMode')
-  const executorOauthClientId = text('executorOauthClientId')
+  const executorClientId = text('executorClientId')
   const evidenceRef = text('evidenceRef')
   const targetAvailableCredits = integer('targetAvailableCredits')
   const maxGrantCredits = integer('maxGrantCredits')
@@ -122,7 +123,7 @@ function parseIssueBody(raw: unknown) {
     !periodKey ||
     !periodStart ||
     !periodEnd ||
-    !executorOauthClientId ||
+    !executorClientId ||
     !evidenceRef ||
     !targetAvailableCredits ||
     !maxGrantCredits ||
@@ -137,7 +138,7 @@ function parseIssueBody(raw: unknown) {
     periodStart,
     periodEnd,
     executorUserId,
-    executorOauthClientId,
+    executorClientId,
     evidenceRef,
     targetAvailableCredits,
     maxGrantCredits,

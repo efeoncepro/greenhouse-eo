@@ -16,7 +16,8 @@ import {
 import {
   GlobeCreditFundingAuthorityError,
   GlobeCreditFundingOneShotAuthorityStore,
-  type GlobeCreditFundingAuthorityExecution
+  type GlobeCreditFundingAuthorityExecution,
+  type GlobeCreditFundingExecutorChannel
 } from './credit-funding-one-shot-authority'
 import type { GreenhouseGlobeClientDependencies } from './client'
 
@@ -25,8 +26,9 @@ const ENSURE_ENTITLEMENT = 'platform.globe_credit_funding.ensure'
 export type ExecuteOneShotGlobeCreditFundingInput = Readonly<{
   authorityId: string
   executorUserId: string
-  executorOauthClientId: string
-  oauthAccessTokenId: string
+  executorChannel: GlobeCreditFundingExecutorChannel
+  executorClientId: string
+  authEvidenceRef: string
   actorAuthMode: string
   correlationId: string
   allowedGlobeWorkspaceIds: readonly string[]
@@ -93,7 +95,7 @@ export async function executeOneShotGlobeCreditFunding(
         executionId: current.executionId,
         expectedState: 'claimed',
         state: 'completed',
-        oauthAccessTokenId: input.oauthAccessTokenId,
+        authEvidenceRef: input.authEvidenceRef,
         correlationId: input.correlationId,
         outcome: 'no_effect',
         globeOperationId: planned.operation.operationId,
@@ -107,7 +109,7 @@ export async function executeOneShotGlobeCreditFunding(
       executionId: current.executionId,
       expectedState: 'claimed',
       state: 'proposed',
-      oauthAccessTokenId: input.oauthAccessTokenId,
+      authEvidenceRef: input.authEvidenceRef,
       correlationId: input.correlationId,
       proposalId: planned.proposalId,
       planFingerprint: planned.fingerprint,
@@ -127,7 +129,7 @@ export async function executeOneShotGlobeCreditFunding(
     current = await store.acquireDispatchLease({
       executionId: current.executionId,
       leaseOwnerId,
-      oauthAccessTokenId: input.oauthAccessTokenId,
+      authEvidenceRef: input.authEvidenceRef,
       correlationId: input.correlationId
     })
 
@@ -141,7 +143,7 @@ export async function executeOneShotGlobeCreditFunding(
       executionId: current.executionId,
       expectedState: 'proposed',
       state: 'confirming',
-      oauthAccessTokenId: input.oauthAccessTokenId,
+      authEvidenceRef: input.authEvidenceRef,
       correlationId: input.correlationId
     })
     enteredConfirming = true
@@ -151,7 +153,7 @@ export async function executeOneShotGlobeCreditFunding(
   current = await store.acquireDispatchLease({
     executionId: current.executionId,
     leaseOwnerId,
-    oauthAccessTokenId: input.oauthAccessTokenId,
+    authEvidenceRef: input.authEvidenceRef,
     correlationId: input.correlationId
   })
 
@@ -196,7 +198,7 @@ export async function executeOneShotGlobeCreditFunding(
       executionId: current.executionId,
       expectedState: 'confirming',
       state: 'completed',
-      oauthAccessTokenId: input.oauthAccessTokenId,
+      authEvidenceRef: input.authEvidenceRef,
       correlationId: input.correlationId,
       globeOperationId: proposalId,
       outcome: 'completed',
@@ -212,7 +214,7 @@ export async function executeOneShotGlobeCreditFunding(
         executionId: current.executionId,
         expectedState: 'confirming',
         state: 'outcome_unknown',
-        oauthAccessTokenId: input.oauthAccessTokenId,
+        authEvidenceRef: input.authEvidenceRef,
         correlationId: input.correlationId,
         globeOperationId: proposalId,
         outcome: 'outcome_unknown',
@@ -245,7 +247,7 @@ export async function executeOneShotGlobeCreditFunding(
         executionId: current.executionId,
         expectedState: 'confirming',
         state: 'failed_definitive',
-        oauthAccessTokenId: input.oauthAccessTokenId,
+        authEvidenceRef: input.authEvidenceRef,
         correlationId: input.correlationId,
         leaseOwnerId,
         leaseGeneration: requiredLeaseGeneration(current)
@@ -284,7 +286,7 @@ async function recoverUnknown(
     executionId: args.current.executionId,
     expectedState: 'outcome_unknown',
     state: 'reconciled',
-    oauthAccessTokenId: args.input.oauthAccessTokenId,
+    authEvidenceRef: args.input.authEvidenceRef,
     correlationId: args.input.correlationId,
     globeOperationId: operation.operationId,
     outcome: terminal,
@@ -314,7 +316,7 @@ async function settleObserved(
       executionId: args.current.executionId,
       expectedState: 'confirming',
       state: 'completed',
-      oauthAccessTokenId: args.input.oauthAccessTokenId,
+      authEvidenceRef: args.input.authEvidenceRef,
       correlationId: args.input.correlationId,
       globeOperationId: args.observed.operationId,
       outcome: terminal,
@@ -331,7 +333,7 @@ async function settleObserved(
       executionId: args.current.executionId,
       expectedState: 'confirming',
       state: 'failed_definitive',
-      oauthAccessTokenId: args.input.oauthAccessTokenId,
+      authEvidenceRef: args.input.authEvidenceRef,
       correlationId: args.input.correlationId,
       globeOperationId: args.observed.operationId,
       leaseOwnerId: args.leaseOwnerId,
@@ -358,7 +360,7 @@ async function settleObserved(
         executionId: args.current.executionId,
         expectedState: 'confirming',
         state: 'completed',
-        oauthAccessTokenId: args.input.oauthAccessTokenId,
+        authEvidenceRef: args.input.authEvidenceRef,
         correlationId: args.input.correlationId,
         globeOperationId: operation.operationId,
         outcome: reconciled,
@@ -374,7 +376,7 @@ async function settleObserved(
       executionId: args.current.executionId,
       expectedState: 'confirming',
       state: 'outcome_unknown',
-      oauthAccessTokenId: args.input.oauthAccessTokenId,
+      authEvidenceRef: args.input.authEvidenceRef,
       correlationId: args.input.correlationId,
       globeOperationId: operation.operationId,
       outcome: 'outcome_unknown',

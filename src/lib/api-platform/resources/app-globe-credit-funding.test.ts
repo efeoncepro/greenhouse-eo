@@ -178,8 +178,9 @@ describe('API Platform Globe credit funding resource', () => {
     expect(oneShot.execute).toHaveBeenCalledWith({
       authorityId: 'authority-1',
       executorUserId: 'user-1',
-      executorOauthClientId: 'greenhouse-admin-cli',
-      oauthAccessTokenId: 'spoauth-token-1',
+      executorChannel: 'oauth',
+      executorClientId: 'greenhouse-admin-cli',
+      authEvidenceRef: 'spoauth-token-1',
       actorAuthMode: 'agent',
       correlationId: 'oauth-correlation-1',
       allowedGlobeWorkspaceIds: ['greenhouse-org:efeonce']

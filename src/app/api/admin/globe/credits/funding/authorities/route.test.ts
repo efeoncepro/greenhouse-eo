@@ -85,7 +85,7 @@ describe('Globe credit funding one-shot authority admin routes', () => {
           targetAvailableCredits: 800,
           maxGrantCredits: 500,
           maxResultingCapCredits: 1500,
-          executorOauthClientId: 'greenhouse-admin-cli',
+          executorClientId: 'greenhouse-admin-cli',
           evidenceRef: 'instruction:TASK-1629',
           issuerUserId: 'forged'
         })
@@ -121,7 +121,7 @@ describe('Globe credit funding one-shot authority admin routes', () => {
           maxResultingCapCredits: 1500,
           executorUserId: 'user-agent-e2e-001',
           executorAuthMode: 'agent',
-          executorOauthClientId: 'greenhouse-admin-cli',
+          executorClientId: 'greenhouse-admin-cli',
           evidenceRef: 'instruction:1'
         })
       })

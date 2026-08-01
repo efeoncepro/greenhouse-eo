@@ -274,8 +274,9 @@ export const ensureAppGlobeCreditFunding = async ({
       funding: await executeOneShotGlobeCreditFunding({
         authorityId,
         executorUserId: context.tenant.userId,
-        executorOauthClientId: context.oauthClientId,
-        oauthAccessTokenId: context.oauthAccessTokenId,
+        executorChannel: 'oauth',
+        executorClientId: context.oauthClientId,
+        authEvidenceRef: context.oauthAccessTokenId,
         actorAuthMode: context.oauthSessionAuthMode,
         correlationId: context.oauthCorrelationId || context.requestId,
         allowedGlobeWorkspaceIds: context.oauthWorkspaceBindings.map(binding => binding.workspaceId)

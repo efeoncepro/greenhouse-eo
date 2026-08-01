@@ -1,6 +1,6 @@
 -- Up Migration
 
--- TASK-1629 — autoridad exacta, expirable y de un solo uso para fondeo agente de Globe.
+-- TASK-1629 — autoridad exacta, expirable y de un solo uso para fondeo humano o agente de Globe.
 -- La policy persistente sigue siendo el techo global; esta autoridad es un segundo AND-gate.
 
 ALTER TABLE greenhouse_core.globe_credit_funding_policies
@@ -61,7 +61,8 @@ CREATE TABLE IF NOT EXISTS greenhouse_core.globe_credit_funding_one_shot_authori
   ),
   issuer_auth_evidence_ref       text        NOT NULL,
   executor_user_id               text        NOT NULL,
-  executor_oauth_client_id       text        NOT NULL,
+  executor_channel               text        NOT NULL CHECK (executor_channel IN ('oauth', 'browser')),
+  executor_client_id             text        NOT NULL,
   executor_auth_mode             text        NOT NULL CHECK (
     executor_auth_mode IN ('agent', 'credentials', 'both', 'microsoft_sso', 'google_sso')
   ),
@@ -76,12 +77,21 @@ CREATE TABLE IF NOT EXISTS greenhouse_core.globe_credit_funding_one_shot_authori
   CHECK (issued_at <= not_before AND not_before < expires_at),
   CHECK (expires_at <= issued_at + INTERVAL '1 hour'),
   CHECK (target_available_credits <= max_resulting_cap_credits),
+  CHECK (
+    executor_channel = 'oauth'
+    OR (
+      executor_channel = 'browser'
+      AND executor_client_id = 'greenhouse-portal'
+      AND executor_user_id = issuer_user_id
+      AND executor_auth_mode = issuer_auth_mode
+      AND executor_auth_mode <> 'agent'
+    )
+  ),
   UNIQUE (globe_workspace_id, operation_key),
   UNIQUE (globe_workspace_id, instruction_fingerprint),
   FOREIGN KEY (globe_workspace_id, issuer_user_id)
     REFERENCES greenhouse_core.globe_credit_funding_authority_issuers (globe_workspace_id, issuer_user_id),
   FOREIGN KEY (executor_user_id) REFERENCES greenhouse_core.client_users(user_id),
-  FOREIGN KEY (executor_oauth_client_id) REFERENCES greenhouse_core.sister_platform_oauth_clients(client_id),
   FOREIGN KEY (issuer_auth_evidence_ref)
     REFERENCES greenhouse_core.globe_credit_funding_authority_auth_attestations(attestation_id)
 );
@@ -101,8 +111,9 @@ CREATE TABLE IF NOT EXISTS greenhouse_core.globe_credit_funding_authority_execut
   execution_id                 uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
   authority_id                 uuid        NOT NULL UNIQUE REFERENCES greenhouse_core.globe_credit_funding_one_shot_authorities(authority_id),
   executor_user_id             text        NOT NULL,
-  executor_oauth_client_id     text        NOT NULL,
-  first_access_token_id        text        NOT NULL,
+  executor_channel             text        NOT NULL CHECK (executor_channel IN ('oauth', 'browser')),
+  executor_client_id           text        NOT NULL,
+  first_auth_evidence_ref      text        NOT NULL,
   actor_auth_mode              text        NOT NULL CHECK (
     actor_auth_mode IN ('agent', 'credentials', 'both', 'microsoft_sso', 'google_sso')
   ),
@@ -140,7 +151,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_core.globe_credit_funding_authority_execut
   ),
   event_fingerprint       char(64)    NOT NULL CHECK (event_fingerprint ~ '^[0-9a-f]{64}$'),
   correlation_id          text        NOT NULL,
-  oauth_access_token_id   text        NOT NULL,
+  auth_evidence_ref      text        NOT NULL,
   evidence                jsonb       NOT NULL DEFAULT '{}'::jsonb,
   occurred_at             timestamptz NOT NULL DEFAULT NOW(),
   UNIQUE (execution_id, event_fingerprint)
@@ -159,8 +170,8 @@ ALTER TABLE greenhouse_core.globe_credit_funding_intents
     (authority_id IS NULL) = (authority_execution_id IS NULL)
   );
 
--- El agente puede confirmar sólo si la policy persistente Y la autoridad one-shot exacta lo
--- permiten. El trigger sigue conservando los límites y el segundo confirmador configurables.
+-- El actor humano o agente puede confirmar sólo si la policy persistente Y la autoridad one-shot
+-- exacta lo permiten. El trigger conserva los límites y el segundo confirmador configurables.
 CREATE OR REPLACE FUNCTION greenhouse_core.enforce_globe_credit_funding_intent_authority()
 RETURNS trigger AS $$
 DECLARE
@@ -244,9 +255,30 @@ BEGIN
          AND authority.globe_workspace_id = NEW.globe_workspace_id
          AND authority.executor_user_id = NEW.actor_user_id
          AND execution.executor_user_id = NEW.actor_user_id
-         AND authority.executor_oauth_client_id = execution.executor_oauth_client_id
+         AND authority.executor_channel = execution.executor_channel
+         AND authority.executor_client_id = execution.executor_client_id
          AND authority.executor_auth_mode = NEW.actor_auth_mode
          AND execution.actor_auth_mode = NEW.actor_auth_mode
+         AND (
+           (
+             authority.executor_channel = 'browser'
+             AND authority.executor_client_id = 'greenhouse-portal'
+             AND authority.executor_user_id = authority.issuer_user_id
+             AND authority.executor_auth_mode = authority.issuer_auth_mode
+             AND execution.first_auth_evidence_ref = authority.issuer_auth_evidence_ref
+           )
+           OR (
+             authority.executor_channel = 'oauth'
+             AND EXISTS (
+               SELECT 1
+                 FROM greenhouse_core.sister_platform_oauth_clients oauth_client
+                WHERE oauth_client.client_id = authority.executor_client_id
+                  AND oauth_client.client_status = 'active'
+                  AND oauth_client.client_type = 'public'
+                  AND oauth_client.metadata_json->>'workspaceBindingProvider' = 'globe'
+             )
+           )
+         )
          AND execution.state = 'confirming'
          AND execution.proposal_id = NEW.proposal_id
          AND execution.plan_fingerprint = NEW.plan_fingerprint
@@ -321,7 +353,7 @@ CREATE TRIGGER globe_credit_funding_authority_events_no_update_delete
 
 CREATE INDEX globe_credit_funding_authorities_executor_active_idx
   ON greenhouse_core.globe_credit_funding_one_shot_authorities
-  (executor_user_id, executor_oauth_client_id, expires_at DESC);
+  (executor_user_id, executor_channel, executor_client_id, expires_at DESC);
 CREATE INDEX globe_credit_funding_authority_executions_state_idx
   ON greenhouse_core.globe_credit_funding_authority_executions (state, updated_at);
 

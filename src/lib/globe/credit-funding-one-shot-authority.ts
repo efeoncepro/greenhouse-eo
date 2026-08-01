@@ -8,6 +8,8 @@ import { withTransaction } from '@/lib/db'
 
 const HUMAN_AUTH_MODES = new Set(['credentials', 'both', 'microsoft_sso', 'google_sso'])
 const EXECUTOR_AUTH_MODES = new Set([...HUMAN_AUTH_MODES, 'agent'])
+const EXECUTOR_CHANNELS = new Set(['oauth', 'browser'])
+const GREENHOUSE_BROWSER_CLIENT_ID = 'greenhouse-portal'
 const SAFE_REF = /^[A-Za-z0-9][A-Za-z0-9._:@/-]{2,511}$/
 
 const TRANSITIONS = {
@@ -21,6 +23,7 @@ const TRANSITIONS = {
 } as const
 
 export type GlobeCreditFundingAuthorityExecutionState = keyof typeof TRANSITIONS
+export type GlobeCreditFundingExecutorChannel = 'oauth' | 'browser'
 
 export type GlobeCreditFundingOneShotAuthority = Readonly<{
   schemaVersion: '1'
@@ -34,8 +37,10 @@ export type GlobeCreditFundingOneShotAuthority = Readonly<{
   maxGrantCredits: number
   maxResultingCapCredits: number
   issuerUserId: string
+  issuerAuthEvidenceRef: string
   executorUserId: string
-  executorOauthClientId: string
+  executorChannel: GlobeCreditFundingExecutorChannel
+  executorClientId: string
   executorAuthMode: string
   notBefore: string
   expiresAt: string
@@ -53,6 +58,8 @@ export type GlobeCreditFundingAuthorityExecution = Readonly<{
   operationKey: string
   executionFingerprint: string
   state: GlobeCreditFundingAuthorityExecutionState
+  executorChannel: GlobeCreditFundingExecutorChannel
+  executorClientId: string
   actorAuthMode: string
   proposeIdempotencyKey: string
   confirmIdempotencyKey: string
@@ -112,7 +119,8 @@ export class GlobeCreditFundingOneShotAuthorityStore {
       issuerAuthProvider: string
       issuerAuthCorrelationId: string
       executorUserId: string
-      executorOauthClientId: string
+      executorChannel: GlobeCreditFundingExecutorChannel
+      executorClientId: string
       executorAuthMode: string
       operationKey: string
       evidenceRef: string
@@ -155,17 +163,19 @@ export class GlobeCreditFundingOneShotAuthorityStore {
         throw new GlobeCreditFundingAuthorityError('issuer_not_allowed')
       }
 
-      const executorClient = await client.query<{ allowed: boolean }>(
-        `SELECT EXISTS (
-          SELECT 1 FROM greenhouse_core.sister_platform_oauth_clients
-           WHERE client_id = $1 AND client_status = 'active' AND client_type = 'public'
-             AND metadata_json->>'workspaceBindingProvider' = 'globe'
-        ) AS allowed`,
-        [normalized.executorOauthClientId]
-      )
+      if (normalized.executorChannel === 'oauth') {
+        const executorClient = await client.query<{ allowed: boolean }>(
+          `SELECT EXISTS (
+            SELECT 1 FROM greenhouse_core.sister_platform_oauth_clients
+             WHERE client_id = $1 AND client_status = 'active' AND client_type = 'public'
+               AND metadata_json->>'workspaceBindingProvider' = 'globe'
+          ) AS allowed`,
+          [normalized.executorClientId]
+        )
 
-      if (!executorClient.rows[0]?.allowed) {
-        throw new GlobeCreditFundingAuthorityError('authority_binding_mismatch')
+        if (!executorClient.rows[0]?.allowed) {
+          throw new GlobeCreditFundingAuthorityError('authority_binding_mismatch')
+        }
       }
 
       const instructionFingerprint = fingerprint({
@@ -183,7 +193,8 @@ export class GlobeCreditFundingOneShotAuthorityStore {
         issuerAuthMode: normalized.issuerAuthMode,
         issuerAuthProvider: normalized.issuerAuthProvider,
         executorUserId: normalized.executorUserId,
-        executorOauthClientId: normalized.executorOauthClientId,
+        executorChannel: normalized.executorChannel,
+        executorClientId: normalized.executorClientId,
         executorAuthMode: normalized.executorAuthMode,
         ttlSeconds: normalized.ttlSeconds,
         maxExecutions: 1,
@@ -229,9 +240,9 @@ export class GlobeCreditFundingOneShotAuthorityStore {
         `INSERT INTO greenhouse_core.globe_credit_funding_one_shot_authorities
         (authority_id, globe_workspace_id, period_key, period_start, period_end, target_available_credits,
          max_grant_credits, max_resulting_cap_credits, issuer_user_id, issuer_entitlement, issuer_auth_mode,
-         issuer_auth_evidence_ref, executor_user_id, executor_oauth_client_id, executor_auth_mode,
+         issuer_auth_evidence_ref, executor_user_id, executor_channel, executor_client_id, executor_auth_mode,
          not_before, expires_at, operation_key, instruction_fingerprint, evidence_ref, issued_at)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22)
        ON CONFLICT (globe_workspace_id, operation_key) DO NOTHING RETURNING *`,
         [
           authorityId,
@@ -247,7 +258,8 @@ export class GlobeCreditFundingOneShotAuthorityStore {
           normalized.issuerAuthMode,
           issuerAuthEvidenceRef,
           normalized.executorUserId,
-          normalized.executorOauthClientId,
+          normalized.executorChannel,
+          normalized.executorClientId,
           normalized.executorAuthMode,
           issuedAt,
           expiresAt,
@@ -278,8 +290,9 @@ export class GlobeCreditFundingOneShotAuthorityStore {
     input: Readonly<{
       authorityId: string
       executorUserId: string
-      executorOauthClientId: string
-      oauthAccessTokenId: string
+      executorChannel: GlobeCreditFundingExecutorChannel
+      executorClientId: string
+      authEvidenceRef: string
       actorAuthMode: string
       correlationId: string
       allowedGlobeWorkspaceIds: readonly string[]
@@ -290,13 +303,14 @@ export class GlobeCreditFundingOneShotAuthorityStore {
     refs(
       input.authorityId,
       input.executorUserId,
-      input.executorOauthClientId,
-      input.oauthAccessTokenId,
+      input.executorChannel,
+      input.executorClientId,
+      input.authEvidenceRef,
       input.correlationId
     )
     input.allowedGlobeWorkspaceIds.forEach(value => refs(value))
 
-    if (!EXECUTOR_AUTH_MODES.has(input.actorAuthMode)) {
+    if (!EXECUTOR_CHANNELS.has(input.executorChannel) || !EXECUTOR_AUTH_MODES.has(input.actorAuthMode)) {
       throw new GlobeCreditFundingAuthorityError('authority_binding_mismatch')
     }
 
@@ -318,8 +332,10 @@ export class GlobeCreditFundingOneShotAuthorityStore {
 
       if (
         row.executor_user_id !== input.executorUserId ||
-        row.executor_oauth_client_id !== input.executorOauthClientId ||
-        row.executor_auth_mode !== input.actorAuthMode
+        row.executor_channel !== input.executorChannel ||
+        row.executor_client_id !== input.executorClientId ||
+        row.executor_auth_mode !== input.actorAuthMode ||
+        (input.executorChannel === 'browser' && row.issuer_auth_evidence_ref !== input.authEvidenceRef)
       ) {
         throw new GlobeCreditFundingAuthorityError('authority_binding_mismatch')
       }
@@ -337,13 +353,14 @@ export class GlobeCreditFundingOneShotAuthorityStore {
       if (existing.rows[0]) {
         if (
           existing.rows[0].executor_user_id !== input.executorUserId ||
-          existing.rows[0].executor_oauth_client_id !== input.executorOauthClientId ||
+          existing.rows[0].executor_channel !== input.executorChannel ||
+          existing.rows[0].executor_client_id !== input.executorClientId ||
           existing.rows[0].actor_auth_mode !== input.actorAuthMode
         ) {
           throw new GlobeCreditFundingAuthorityError('authority_binding_mismatch')
         }
 
-        await insertEvent(client, existing.rows[0], 'claimed', input.oauthAccessTokenId, input.correlationId, {
+        await insertEvent(client, existing.rows[0], 'claimed', input.authEvidenceRef, input.correlationId, {
           resumed: true
         })
 
@@ -363,7 +380,8 @@ export class GlobeCreditFundingOneShotAuthorityStore {
         instructionFingerprint: row.instruction_fingerprint,
         operationKey: row.operation_key,
         executorUserId: input.executorUserId,
-        executorOauthClientId: input.executorOauthClientId,
+        executorChannel: input.executorChannel,
+        executorClientId: input.executorClientId,
         executorAuthMode: input.actorAuthMode
       })
 
@@ -371,16 +389,17 @@ export class GlobeCreditFundingOneShotAuthorityStore {
 
       const inserted = await client.query<ExecutionRow>(
         `INSERT INTO greenhouse_core.globe_credit_funding_authority_executions
-        (execution_id, authority_id, executor_user_id, executor_oauth_client_id, first_access_token_id,
+        (execution_id, authority_id, executor_user_id, executor_channel, executor_client_id, first_auth_evidence_ref,
          actor_auth_mode, execution_fingerprint, operation_key, correlation_id, propose_idempotency_key,
          confirm_idempotency_key, reconcile_idempotency_key, claimed_at, updated_at)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$13) RETURNING *`,
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$14) RETURNING *`,
         [
           executionId,
           row.authority_id,
           input.executorUserId,
-          input.executorOauthClientId,
-          input.oauthAccessTokenId,
+          input.executorChannel,
+          input.executorClientId,
+          input.authEvidenceRef,
           input.actorAuthMode,
           executionFingerprint,
           row.operation_key,
@@ -392,7 +411,7 @@ export class GlobeCreditFundingOneShotAuthorityStore {
         ]
       )
 
-      await insertEvent(client, inserted.rows[0]!, 'claimed', input.oauthAccessTokenId, input.correlationId, {})
+      await insertEvent(client, inserted.rows[0]!, 'claimed', input.authEvidenceRef, input.correlationId, {})
 
       return { authority: authority(row), execution: execution(inserted.rows[0]!) }
     })
@@ -494,7 +513,7 @@ export class GlobeCreditFundingOneShotAuthorityStore {
       executionId: string
       expectedState: GlobeCreditFundingAuthorityExecutionState
       state: GlobeCreditFundingAuthorityExecutionState
-      oauthAccessTokenId: string
+      authEvidenceRef: string
       correlationId: string
       proposalId?: string
       planFingerprint?: string
@@ -509,7 +528,7 @@ export class GlobeCreditFundingOneShotAuthorityStore {
       throw new GlobeCreditFundingAuthorityError('invalid_transition')
     }
 
-    refs(input.executionId, input.oauthAccessTokenId, input.correlationId)
+    refs(input.executionId, input.authEvidenceRef, input.correlationId)
 
     if (input.leaseOwnerId) refs(input.leaseOwnerId)
 
@@ -556,7 +575,7 @@ export class GlobeCreditFundingOneShotAuthorityStore {
       )
 
       if (!result.rows[0]) throw new GlobeCreditFundingAuthorityError('invalid_transition')
-      await insertEvent(client, result.rows[0], input.state, input.oauthAccessTokenId, input.correlationId, {
+      await insertEvent(client, result.rows[0], input.state, input.authEvidenceRef, input.correlationId, {
         ...(input.proposalId ? { proposalId: input.proposalId } : {}),
         ...(input.globeOperationId ? { globeOperationId: input.globeOperationId } : {}),
         ...(input.outcome ? { outcome: input.outcome } : {})
@@ -570,12 +589,12 @@ export class GlobeCreditFundingOneShotAuthorityStore {
     input: Readonly<{
       executionId: string
       leaseOwnerId: string
-      oauthAccessTokenId: string
+      authEvidenceRef: string
       correlationId: string
       leaseSeconds?: number
     }>
   ): Promise<GlobeCreditFundingAuthorityExecution> {
-    refs(input.executionId, input.leaseOwnerId, input.oauthAccessTokenId, input.correlationId)
+    refs(input.executionId, input.leaseOwnerId, input.authEvidenceRef, input.correlationId)
     const leaseSeconds = input.leaseSeconds ?? 240
 
     if (!Number.isSafeInteger(leaseSeconds) || leaseSeconds < 30 || leaseSeconds > 600) {
@@ -600,7 +619,7 @@ export class GlobeCreditFundingOneShotAuthorityStore {
       )
 
       if (!result.rows[0]) throw new GlobeCreditFundingAuthorityError('execution_busy')
-      await insertEvent(client, result.rows[0], 'lease_acquired', input.oauthAccessTokenId, input.correlationId, {
+      await insertEvent(client, result.rows[0], 'lease_acquired', input.authEvidenceRef, input.correlationId, {
         leaseGeneration: result.rows[0].dispatch_lease_generation
       })
 
@@ -626,8 +645,10 @@ type AuthorityRow = Readonly<
     max_grant_credits: number
     max_resulting_cap_credits: number
     issuer_user_id: string
+    issuer_auth_evidence_ref: string
     executor_user_id: string
-    executor_oauth_client_id: string
+    executor_channel: GlobeCreditFundingExecutorChannel
+    executor_client_id: string
     executor_auth_mode: string
     not_before: string | Date
     expires_at: string | Date
@@ -643,7 +664,8 @@ type ExecutionRow = Readonly<
     execution_id: string
     authority_id: string
     executor_user_id: string
-    executor_oauth_client_id: string
+    executor_channel: GlobeCreditFundingExecutorChannel
+    executor_client_id: string
     actor_auth_mode: string
     execution_fingerprint: string
     operation_key: string
@@ -668,7 +690,7 @@ async function insertEvent(
   client: TransactionClient,
   row: ExecutionRow,
   eventType: string,
-  accessTokenId: string,
+  authEvidenceRef: string,
   correlationId: string,
   evidence: Record<string, unknown>
 ) {
@@ -676,16 +698,16 @@ async function insertEvent(
     executionId: row.execution_id,
     eventType,
     state: row.state,
-    accessTokenId,
+    authEvidenceRef,
     correlationId,
     evidence
   })
 
   await client.query(
     `INSERT INTO greenhouse_core.globe_credit_funding_authority_execution_events
-    (execution_id,event_type,event_fingerprint,correlation_id,oauth_access_token_id,evidence)
+    (execution_id,event_type,event_fingerprint,correlation_id,auth_evidence_ref,evidence)
     VALUES ($1,$2,$3,$4,$5,$6::jsonb) ON CONFLICT (execution_id,event_fingerprint) DO NOTHING`,
-    [row.execution_id, eventType, eventFingerprint, correlationId, accessTokenId, JSON.stringify(evidence)]
+    [row.execution_id, eventType, eventFingerprint, correlationId, authEvidenceRef, JSON.stringify(evidence)]
   )
 }
 
@@ -698,13 +720,27 @@ function parseIssue(input: Parameters<GlobeCreditFundingOneShotAuthorityStore['i
     input.issuerAuthProvider,
     input.issuerAuthCorrelationId,
     input.executorUserId,
-    input.executorOauthClientId,
+    input.executorChannel,
+    input.executorClientId,
     input.operationKey,
     input.evidenceRef
   )
   if (!HUMAN_AUTH_MODES.has(input.issuerAuthMode)) throw new GlobeCreditFundingAuthorityError('issuer_not_allowed')
 
   if (!EXECUTOR_AUTH_MODES.has(input.executorAuthMode)) {
+    throw new GlobeCreditFundingAuthorityError('authority_binding_mismatch')
+  }
+
+  if (!EXECUTOR_CHANNELS.has(input.executorChannel)) {
+    throw new GlobeCreditFundingAuthorityError('authority_binding_mismatch')
+  }
+
+  if (
+    input.executorChannel === 'browser' &&
+    (input.executorClientId !== GREENHOUSE_BROWSER_CLIENT_ID ||
+      input.executorUserId !== input.issuerUserId ||
+      !HUMAN_AUTH_MODES.has(input.executorAuthMode))
+  ) {
     throw new GlobeCreditFundingAuthorityError('authority_binding_mismatch')
   }
 
@@ -738,8 +774,10 @@ function authority(row: AuthorityRow): GlobeCreditFundingOneShotAuthority {
     maxGrantCredits: row.max_grant_credits,
     maxResultingCapCredits: row.max_resulting_cap_credits,
     issuerUserId: row.issuer_user_id,
+    issuerAuthEvidenceRef: row.issuer_auth_evidence_ref,
     executorUserId: row.executor_user_id,
-    executorOauthClientId: row.executor_oauth_client_id,
+    executorChannel: row.executor_channel,
+    executorClientId: row.executor_client_id,
     executorAuthMode: row.executor_auth_mode,
     notBefore: iso(row.not_before),
     expiresAt: iso(row.expires_at),
@@ -759,6 +797,8 @@ function execution(row: ExecutionRow): GlobeCreditFundingAuthorityExecution {
     operationKey: row.operation_key,
     executionFingerprint: row.execution_fingerprint,
     state: row.state,
+    executorChannel: row.executor_channel,
+    executorClientId: row.executor_client_id,
     actorAuthMode: row.actor_auth_mode,
     proposeIdempotencyKey: row.propose_idempotency_key,
     confirmIdempotencyKey: row.confirm_idempotency_key,

@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -17,11 +17,11 @@
 - Motion: `docs/ui/motion/TASK-1483-globe-credits-operations-workbench-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Dirección preservada; surface reubicada en Greenhouse y bloqueada por snapshot/read-recovery plane`
+- Status real: `First fold aceptado y fondeo browser one-shot conectado localmente; recovery, GVC final y rollout pendientes`
 - Rank: `next.5`
 - Domain: `finance|creative|ui|operations`
-- Blocked by: `TASK-1468, TASK-1482, TASK-1586, TASK-1629`
-- Branch: `task/TASK-1483-globe-credits-operations-workbench`
+- Blocked by: `none`
+- Branch: `develop compartida por autorización explícita del operador`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -65,6 +65,8 @@ dinero/token ni calcular business logic en browser. Las personas objetivo no con
 
 - `TASK-1468` ledger/expiry, `TASK-1482` snapshot/cycle, `TASK-1586` status/recovery y `TASK-1629`
   identity/operation adapters.
+- Los contratos locales requeridos para implementar y probar el first fold ya están disponibles. La aceptación
+  runtime sigue condicionada a aplicar migraciones, seed OAuth y deploy de esas tasks; no bloquea fixtures ni JSX.
 
 ### Blocks / Impacts
 
@@ -225,6 +227,57 @@ se valida first fold contra visual direction y fixtures; `UI ready` permanece `n
 - `pnpm qa:gates --changed`
 - `pnpm docs:closure-check`
 - GVC scenario/review/scorecard definidos en los artefactos UI.
+
+### Checkpoint 2026-08-01 — first fold local
+
+- Implementada la ruta canónica `/admin/globe/credits` sobre `SurfaceRecipe operationalWorkbench` con
+  `WorkbenchHeader`, `SignalStrip` y `OperationalSection`.
+- La página aplica `administracion.globe_credits` + `platform.globe_credit_funding.read`, resuelve el workspace
+  autorizado y consume `CreditCapacityStatusV1` y `CreditFundingOperationV1` server-side.
+- El browser sólo formatea y presenta valores autoritativos: no deriva saldo, cap, funding, policy ni forecast.
+  Un fallo parcial conserva `unknown/degraded`; nunca normaliza ausencia a cero.
+- El inventario de operaciones y el detail canvas preservan `operationId`, plan, pool, receipt y vencimiento.
+- El CTA se renderiza deshabilitado: el first fold no finge una mutación hasta conectar un carril one-shot de
+  navegador con identidad y readback terminal. API/CLI/agente permanecen bajo TASK-1629.
+- Verificación local pasada: ESLint focal, `pnpm typecheck` y `git diff --check`.
+- Pendiente en ese corte inicial: evidencia responsive, teclado/reduced motion, revisión visual, drawer y
+  ejecución/recuperación gobernadas. El checkpoint siguiente actualiza la evidencia ya completada.
+
+### Checkpoint 2026-08-01 — ACCEPT FIRST FOLD
+
+- Fixture y scenario premium implementados. La captura local se ejecutó con la sesión Chrome anclada a
+  `jreyes@efeonce.cl`, sin exportar cookies/storage state: `.captures/2026-08-01_globe-credits-operations-workbench-chrome/`.
+- Desktop solicitado 1440×1000: `clientWidth=1425`, `scrollWidth=1425`. Mobile solicitado 390×844 con menú
+  normalizado: `clientWidth=375`, `scrollWidth=375`.
+- La primera captura mobile fue `REVISE` por drawer lateral persistido abierto. El scenario ahora envía `Escape`
+  antes de medir; el resultado usa el drawer temporal canónico de `CompositionShell masterDetail`.
+- Selección mobile verificada: `op-jul-readback-002` dejó `aria-pressed=true` y el drawer mostró grant `0` +
+  receipt `no_effect`, sin crear estado económico local.
+- Veredicto y evidencia: `docs/ui/reviews/TASK-1483-globe-credits-operations-workbench-first-fold-review-2026-08-01.md`.
+- `UI ready` permanece `no`: falta cablear la mutación/recovery y ejecutar los gates premium finales.
+
+### Checkpoint 2026-08-01 — fondeo humano one-shot conectado
+
+- El CTA `Asegurar capacidad` se habilita únicamente con proyección confiable y ambos entitlements:
+  `platform.globe_credit_funding.authority.issue` + `platform.globe_credit_funding.ensure`.
+- El drawer autoriza límites exactos de objetivo, grant y cap para el período devuelto por Globe. El browser no
+  calcula el plan económico: sólo entrega techos y el primitive server-side vuelve a leer, propone, confirma y
+  obtiene el receipt canónico.
+- La ruta `POST /api/admin/globe/credits/funding/ensure` exige sesión humana real, payload cerrado, workspace
+  binding e idempotency key; liga issuer=executor al mismo usuario, canal `browser`, client `greenhouse-portal`
+  y attestation exacta. No fabrica un token OAuth ni crea otro ledger.
+- La clave de operación permanece estable ante timeout/reintento del mismo intento. `completed|no_effect` son los
+  únicos éxitos; `outcome_unknown` conserva la operación para readback/reconcile y nunca induce un fondeo nuevo.
+- La respuesta al navegador omite la referencia interna de attestation y expone sólo autoridad resumida +
+  resultado. Pasan typecheck, ESLint focal y 38 tests de route/authority/executor/API parity.
+- Recovery explícito conectado: una operación `outcome_unknown` ofrece `Verificar y reconciliar`, llama al command
+  canónico con idempotency key estable y refresca la proyección; nunca repite el fondeo.
+- Validación manual con Chrome autenticado a 390×844: diálogo visible, tres spinbuttons y confirmación accesibles,
+  `target > maxCap` deshabilita el submit, `clientWidth=scrollWidth=390`; `op-jul-recovery-001` queda seleccionado
+  con `aria-pressed=true` y el detalle expone recovery habilitado. Cero errores de consola. No se ejecutó una
+  mutación real desde el fixture.
+- Pendiente: suite premium automatizada desktop/mobile/teclado/reduced-motion, scorecard y smoke staging posterior
+  a migración/deploy.
 
 ## Closing Protocol
 
