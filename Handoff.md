@@ -23,10 +23,9 @@
   Playwright desktop/mobile. No hay React, SSR, Actions, secretos ni imports desde Greenhouse/Globe.
 - Verificado en el repo AXIS: `pnpm install --frozen-lockfile`, `pnpm design:check`, `pnpm build`,
   `pnpm typecheck`, `pnpm test`, `pnpm lint`, `git diff --check` y preview local HTTP 200.
-- Estado honesto: `code complete, rollout pendiente`. Faltan fixtures/evidencia visual completa por contrato,
-  despliegue público de esta revisión y la migración futura del catálogo Greenhouse; no se hizo commit ni push
-  de esta migración. `TASK-1382` no es dependencia: permanece pausada hasta elegir otro build unit dentro de
-  Greenhouse.
+- Estado honesto: el runtime base está desplegado, pero la migración del catálogo Greenhouse sigue abierta.
+  Las entradas no reconstruidas son `reference skeletons`; no se retira `/design-system` hasta cerrar parity
+  contractual, funcional, estética, motion, accesibilidad y evidencia de consumidor. `TASK-1382` no es dependencia.
 - Rollout realizado el 2026-08-01: deployment `dpl_8TohYh27fJizvDVC3MV5aoemvFPK`, alias público
   `https://axis-design-system-lab.vercel.app`, `READY`, Astro/output `apps/lab/dist`, Node 24. Se retiró la
   protección SSO del proyecto porque el Lab ya tenía decisión explícita de ser público; `/`, `/docs/`,
@@ -35,9 +34,9 @@
   token-backed en `/references/colors/`, `/references/typography/`, `/references/geometry/` y
   `/references/elevation/`; el inventario y el triage están en
   [`AXIS_GREENHOUSE_LAB_MIGRATION_INVENTORY_V1.md`](docs/architecture/AXIS_GREENHOUSE_LAB_MIGRATION_INVENTORY_V1.md).
-- El primer bloque pure-UI ya tiene contratos y fixtures estáticos para `button`, `chip`, `breadcrumbs`,
-  `disclosure`, `loaders` y `floating-surface`; la migración sigue en curso y `/design-system` continúa como
-  fallback hasta cerrar parity visual y de consumidores.
+- El primer bloque pure-UI tiene contratos publicados, pero sólo `button` y `chip` están documentados como
+  `candidate parity`; `breadcrumbs`, `disclosure`, `loaders` y `floating-surface` siguen siendo skeletons. La
+  migración continúa y `/design-system` permanece como fallback hasta cerrar parity visual y de consumidores.
 - También quedaron publicados `motion` y `border-beam` como contratos portables; `microinteractions` sigue fuera
   del traslado inicial porque mezcla múltiples primitivas y estados de producto.
 - `composition-shell` y `card-density` ya tienen fixtures estáticos en AXIS; el shell de Portal y su telemetría
@@ -50,6 +49,9 @@
   licencia y checksum aprobados.
 - `buttons` ya tiene una reconstrucción de candidate parity en AXIS (`b1c9869`): boards light/dark, 152 controles,
   matrices completas y E2E responsive/reduced-motion; falta el compare visual/computed contra Greenhouse MUI/Vuexy.
+- `chips` ya tiene una reconstrucción de candidate parity en AXIS (`028dba2`): boards light/dark, 72 especímenes,
+  avatar/closable, feedback atoms, spotlight/signal motion y reduced-motion; falta el compare visual/computed y
+  provenance del avatar sintético.
 - `leaderboard` ya tiene contrato y fixture estática con datos sintéticos; `brand-motion` ya tiene contrato y
   referencia orbital HTML/CSS sin SVG privado ni GSAP. El Lab queda en 27 páginas y 21 contratos; build, lint,
   typecheck, tests y 16 E2E pasan. `axis.efeonce.org` ya resuelve a `76.76.21.21` y el smoke HTTPS devuelve `200`.
