@@ -1,8 +1,8 @@
 # Content Engineering Pillar Brief V1
 
 > **Estado:** foundation brief aceptado; research, outline final, diseño, draft y publicación pendientes.
-> **Decisión:** [PDR-015 — Content Engineering como territorio editorial](decisions/PDR-015-content-engineering-territorio-editorial.md).
-> **Arquitectura transversal:** [PDR-016 — Pillar Experience](decisions/PDR-016-pillar-experience-arquitectura-editorial-y-runtime.md).
+> **Decisión:** [PDR-017 — Content Engineering como territorio editorial](decisions/PDR-017-content-engineering-territorio-editorial.md).
+> **Arquitectura transversal:** [PDR-018 — Pillar Experience](decisions/PDR-018-pillar-experience-arquitectura-editorial-y-runtime.md).
 > La Pillar pertenece editorialmente a Think/Marketing con Manzanitas, pero este brief no asigna su canonical al
 > subdominio `think.efeoncepro.com`.
 > **Doctrina:** `.codex/skills/content-marketing-studio/references/content-engineering.md` y espejo Claude.
@@ -379,7 +379,7 @@ Fuentes operativas para esta capa:
 - Este brief no crea una oferta llamada Content Engineering.
 - No autoriza custom block, app embebida, plugin ni capability de Content Factory.
 - Reuse-first: investigar primitives WordPress/Ohio/Gutenberg y runtime antes de extender.
-- Think como producto editorial no implica `think.efeoncepro.com`; resolver host/canonical con PDR-016 y route
+- Think como producto editorial no implica `think.efeoncepro.com`; resolver host/canonical con PDR-018 y route
   ownership antes del draft público.
 - Elementor puede componer un shell/template, pero no duplicar cuerpo, registry ni schema en `_elementor_data`.
 - El mapa federado debe consumir un registry estructurado; no mantener cards y enlaces manualmente por

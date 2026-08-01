@@ -147,7 +147,7 @@ paso nativo más claro que el canal permita.
 ### Producto, marca y host
 
 Una superficie editorial puede pertenecer a un producto de contenido sin vivir en un host homónimo. Para Efeonce,
-PDR-016 fija la regla: Think es el producto de demand generation; `think.efeoncepro.com` es hoy un runtime
+PDR-018 fija la regla: Think es el producto de demand generation; `think.efeoncepro.com` es hoy un runtime
 especializado. El canonical de una Pillar se decide por intención, route ownership y continuidad SEO, no por el
 nombre `Think`, Elementor o el post type de WordPress.
 
@@ -322,8 +322,8 @@ sola una oferta comercial empaquetada ni autoriza una herramienta o producto.
 
 Decisión pública y brief del caso:
 
-- `docs/public-site/decisions/PDR-015-content-engineering-territorio-editorial.md`
-- `docs/public-site/decisions/PDR-016-pillar-experience-arquitectura-editorial-y-runtime.md`
+- `docs/public-site/decisions/PDR-017-content-engineering-territorio-editorial.md`
+- `docs/public-site/decisions/PDR-018-pillar-experience-arquitectura-editorial-y-runtime.md`
 - `docs/public-site/CONTENT_ENGINEERING_PILLAR_BRIEF_V1.md`
 
 ## Fuentes de partida

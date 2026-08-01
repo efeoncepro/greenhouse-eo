@@ -1,4 +1,4 @@
-# PDR-015 — Content Engineering como territorio editorial y doctrina de experiencia
+# PDR-017 — Content Engineering como territorio editorial y doctrina de experiencia
 
 > **Tipo:** Product Decision Record (territorio editorial + posicionamiento + experiencia de contenido).
 > **Estado:** Accepted — 2026-07-16 (operador).
@@ -6,7 +6,7 @@
 > **Doctrina reusable:**
 > `.codex/skills/content-marketing-studio/references/content-engineering.md` y espejo Claude.
 > **Brief de la Pillar:** [Content Engineering Pillar Brief V1](../CONTENT_ENGINEERING_PILLAR_BRIEF_V1.md).
-> **Arquitectura Pillar:** [PDR-016](PDR-016-pillar-experience-arquitectura-editorial-y-runtime.md).
+> **Arquitectura Pillar:** [PDR-018](PDR-018-pillar-experience-arquitectura-editorial-y-runtime.md).
 > **Frontera operativa:** este PDR autoriza investigación, definición editorial, diseño de experiencia y un futuro
 > draft privado. No autoriza publicar, crear una oferta comercial, desplegar una tool ni modificar producción.
 
@@ -120,7 +120,7 @@ prescribe un custom block, una app embebida ni un framework.
 
 La pieza nace como **Pillar Experience**, no como una entrada cronológica enriquecida después. Debe resolver
 `aprender -> explorar -> decidir` mediante documento canónico, rutas por intención y ayudas mínimas de comprensión
-o decisión. PDR-016 gobierna el contrato reusable y evita confundir `page`, `post`, Elementor o Astro con la
+o decisión. PDR-018 gobierna el contrato reusable y evita confundir `page`, `post`, Elementor o Astro con la
 definición de Pillar.
 
 Content Engineering pertenece editorialmente a **Think / Marketing con Manzanitas**, porque su trabajo es demand
@@ -140,7 +140,7 @@ canónicos, pero un nodo platform-native no necesita una copia web para ser de p
 
 No existe una separación rígida entre `cluster` y `activation`: son roles multidimensionales. Una pieza puede
 activar reconocimiento y, al mismo tiempo, resolver una búsqueda o producir comprensión autónoma. Si sólo anuncia
-otra pieza, sigue siendo activación; si completa un JTBD y cumple el contrato de PDR-016, puede pertenecer al
+otra pieza, sigue siendo activación; si completa un JTBD y cumple el contrato de PDR-018, puede pertenecer al
 cluster. Productos y servicios permanecen como handoffs adyacentes salvo decisión explícita; compartir tema,
 keyword o campaña no basta para entrar.
 
@@ -192,7 +192,7 @@ por falta de A/B testing si el tráfico no entrega poder estadístico.
 
 | Fase | Resultado | Gate |
 |---|---|---|
-| **F0 — doctrina** | PDR-015 + canon reusable + brief | Definición, fronteras y ownership aceptados |
+| **F0 — doctrina** | PDR-017 + canon reusable + brief | Definición, fronteras y ownership aceptados |
 | **F1 — research** | Dossier de categoría, audiencia, SERP/AEO y claims | Fuentes verificadas; sin apropiarse del término |
 | **F2 — diseño editorial** | Outline, wireframe de experiencia y tracking plan | Cada primitive tiene trabajo y fallback |
 | **F3 — draft** | Spec Content Factory + registry de cluster / preview privado | Copy, enlaces, schema, a11y, mobile y validator PASS |

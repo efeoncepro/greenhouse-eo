@@ -1,4 +1,4 @@
-# PDR-016 — Pillar + Cluster Experience: arquitectura editorial, conversión y runtime
+# PDR-018 — Pillar + Cluster Experience: arquitectura editorial, conversión y runtime
 
 > **Tipo:** Product Decision Record (arquitectura editorial + placement de superficie + gobernanza).
 > **Estado:** Accepted — 2026-07-16 (operador).
@@ -6,7 +6,7 @@
 > `growth-marketing-cro`.
 > **Deriva de:** [PDR-003](PDR-003-layering-ecosistema-digital-efeonce.md) (Think como producto de demand gen),
 > [PDR-014](PDR-014-creative-workflows-territorio-editorial-pillar-cluster.md) (primer caso editorial),
-> [PDR-015](PDR-015-content-engineering-territorio-editorial.md) (doctrina de experiencia) y
+> [PDR-017](PDR-017-content-engineering-territorio-editorial.md) (doctrina de experiencia) y
 > [Astro Runtime Strategy](../../architecture/GREENHOUSE_PUBLIC_SITE_ASTRO_RUNTIME_STRATEGY_DECISION_V1.md)
 > (WordPress como origen editorial y Astro en el dominio principal como frontend objetivo).
 > **Frontera:** decide qué es una Pillar, cómo se relaciona con su cluster y cómo elegir superficie/runtime.
